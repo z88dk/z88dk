@@ -1,9 +1,9 @@
 ;
 ;
-;	Support char table (pseudo graph symbols) for the Commodore 128
+;	Support char table (pseudo graph symbols) for the Mattel Aquarius
 ;	Sequence: blank, top-left, top-right, top-half, bottom-left, left-half, etc..
 ;
-;	$Id: textpixl.asm,v 1.1 2002-02-01 14:37:49 stefano Exp $
+;	$Id: textpixl.asm,v 1.2 2002-02-04 10:53:21 stefano Exp $
 ;
 ;
 
