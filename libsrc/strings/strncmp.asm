@@ -5,7 +5,7 @@
 ;
 ; Hopefully this is now right! (djm 19/3/2000)
 ;
-; $Id: strncmp.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
+; $Id: strncmp.asm,v 1.3 2002-05-10 11:09:22 dom Exp $
 
                 XLIB    strncmp
 
@@ -16,6 +16,7 @@
 
 
 .strncmp
+IF 0
 	ld	ix,0
 	add	ix,sp
 	ld	c,(ix+2)
@@ -24,6 +25,22 @@
 	ld	d,(ix+5)
 	ld	l,(ix+6)	;s1
 	ld	h,(ix+7)
+ELSE
+       ld      hl,2
+        add     hl,sp
+        ld      c,(hl)
+        inc     hl
+        ld      b,(hl)
+        inc     hl
+        ld      e,(hl)  ;s2
+        inc     hl
+        ld      d,(hl)
+        inc     hl
+        ld      a,(hl)  ;s1
+        inc     hl
+        ld      h,(hl)
+        ld      l,a
+ENDIF
 .loop
 	ld	a,b
 	or	c
