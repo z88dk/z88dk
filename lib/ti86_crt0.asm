@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.11 2001-08-20 09:28:25 stefano Exp $
+;	$Id: ti86_crt0.asm,v 1.12 2001-08-21 15:40:16 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -57,6 +57,7 @@
 ;2 - ASE, Rascal, emanon, etc.
 ;-----------------------------
 IF (startup=2)
+	DEFINE ASE
 	DEFINE NOT_DEFAULT_SHELL
 	org	_asm_exec_ram	;TI 86 standard asm() entry point.
 	nop			;identifier of table
@@ -77,6 +78,7 @@ ENDIF
 ;3 - zap2000
 ;-----------
 IF (startup=3)
+	DEFINE ZAP2000
 	DEFINE NOT_DEFAULT_SHELL
 	org	_asm_exec_ram
 	nop
@@ -111,6 +113,7 @@ ENDIF
 ;4 - emanon
 ;----------
 IF (startup=4)
+	DEFINE EMANON
 	DEFINE NOT_DEFAULT_SHELL
 	org	_asm_exec_ram	;TI 86 standard asm() entry point.
 	nop			;identifier of table
@@ -145,6 +148,7 @@ ENDIF
 ; 10 - asm() executable
 ;----------------------
 IF (startup=10)
+	DEFINE ASM
 	DEFINE NOT_DEFAULT_SHELL
         org     _asm_exec_ram
 ENDIF
@@ -166,13 +170,14 @@ ENDIF
 ;1 - LASM (default)
 ;------------------
 IF !NOT_DEFAULT_SHELL
+	DEFINE LASM
 	org	$801F	; "Large asm block". To be loaded with "LASM"
 	; You need LASM 0.8 Beta by Patrick Wong for this (www.ticalc.org)
 	; - First wipe TI86 RAM (InstLASM is simply a memory cleaner)
 	; - Load LargeLd
-	; - Load you compiled and converted .86p code
+	; - Load your compiled and converted .86p code
 	; - run asm(LargeLd
-	; It will run you program. Loading order is important.
+	; It will run your program. Loading order is important.
 	
 	org	$801F	; "Large asm block". To be loaded with "LASM"
 	ret
@@ -185,6 +190,9 @@ ENDIF
 ; End of header, begin of startup part
 ;-------------------------------------
 .start
+IF ASM				; asm( executable
+	call	_runindicoff	; stop anoing run-indicator
+ENDIF
 	ld	hl,0
 	add	hl,sp
 	ld	(start1+1),hl
@@ -200,50 +208,41 @@ ELSE
 	ld	(exitsp),sp
 ENDIF
 
-IF !DEFINED_nostreams
- IF DEFINED_ANSIstdio
-  IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
-   IF !non_ANSI
+IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
+ IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
+  IF NONANSI
+	call	_homeup		; Set text cursor at (0,0)
+	ld	a,8		; Set _winBtm back to 8, so we
+	ld	(_winBtm),a	;  can print on the last line
+  ELSE
 	; Reset the ANSI cursor
 	XREF	ansi_ROW
 	XREF	ansi_COLUMN
 	xor	a
 	ld	(ansi_ROW),a
 	ld	(ansi_COLUMN),a
- 	; Set up the std* stuff so we can be called again
-	;ld	hl,__sgoioblk+2
-	;ld	(hl),19	;stdin
-	;ld	hl,__sgoioblk+6
-	;ld	(hl),21	;stdout
-	;ld	hl,__sgoioblk+10
-	;ld	(hl),21	;stderr
   ENDIF
  ENDIF
 ENDIF
 
 IF DEFINED_GRAYlib
 	INCLUDE	"#gray86.asm"
-	;im	2
 ENDIF
 
-	call	_homeup		; Close menus
-
-	call	tidi
+	im	2
 	call	_main
-.cleanup
+.cleanup			; exit() jumps to this point
+.start1
+	ld	sp,0
 IF DEFINED_GRAYlib
-	;im	1
        	ld	a,$3C		; Make sure video mem is active
 	out	(0),a
 ENDIF
-.start1
-	; What's the the normal IY value on the Ti86? (?_Flags?)
+	ld	IY,_Flags	; Restore Flag pointer
 	im	1
 	ei
-	ld	sp,0
 .cpygraph
 	ret
-
 
 ;----------------------------------------
 ; End of startup part, routines following
@@ -286,35 +285,30 @@ ENDIF
 
 
 ; Now, define some values for stdin, stdout, stderr
-
-IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
- IF !DEFINED_nostreams
-  IF DEFINED_ANSIstdio
+IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
+ IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
 .__sgoioblk
 	INCLUDE	"#stdio_fp.asm"
-  ENDIF
  ENDIF
 ENDIF
 
 
 ; Now, which of the vfprintf routines do we need?
-IF !DEFINED_nostreams
- IF DEFINED_ANSIstdio
-  IF DEFINED_floatstdio
+IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
+ IF DEFINED_floatstdio
 ._vfprintf
 	LIB vfprintf_fp
 	jp  vfprintf_fp
-  ELSE
-   IF DEFINED_complexstdio
+ ELSE
+  IF DEFINED_complexstdio
 ._vfprintf
 	LIB vfprintf_comp
 	jp  vfprintf_comp
-   ELSE
-    IF DEFINED_ministdio
+  ELSE
+   IF DEFINED_ministdio
 ._vfprintf
 	LIB vfprintf_mini
 	jp  vfprintf_mini
-    ENDIF
    ENDIF
   ENDIF
  ENDIF
@@ -344,4 +338,3 @@ IF NEED_floatpack
 .fa		defs	6
 .fasign		defb	0
 ENDIF
-

@@ -3,7 +3,7 @@
 ;	Stefano Bodrato	- Dec 2000
 ;	Henk Poley	- Apr 2001 Fixed and add some things
 ;
-;	$Id: ti83_crt0.asm,v 1.13 2001-08-20 09:28:25 stefano Exp $
+;	$Id: ti83_crt0.asm,v 1.14 2001-08-21 15:40:16 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -272,6 +272,9 @@ ENDIF
 ; End of header, begin of startup part
 ;-------------------------------------
 .start
+IF ZASMLOAD
+	call	_runindicoff	; stop anoing run-indicator
+ENDIF
 	ld	hl,0		; Store current StackPointer
 	add	hl,sp
 	ld	(start1+1),hl
@@ -298,6 +301,14 @@ IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
 	ld	(ansi_COLUMN),a
   ENDIF
  ENDIF
+ENDIF
+
+IF ZASMLOAD
+ IF NONANSI
+	call	_CLRTXTSHD	; Clear textbuffer
+	call	_homeup		; Set cursor to (0,0)
+ ENDIF
+	call	_clrScrnFull	; Clear plotSScreen and LCD
 ENDIF
 
 IF DEFINED_GRAYlib

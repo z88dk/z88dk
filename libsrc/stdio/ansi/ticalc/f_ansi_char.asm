@@ -14,7 +14,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.3 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.4 2001-08-21 15:40:17 stefano Exp $
 ;
 
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
@@ -190,4 +190,4 @@
 ; 3 dots: MAX 42 columns
 
 .font
-        BINARY  "stdio/ansi/ticalc/FONT4.BIN"
+        BINARY  "stdio/ansi/FONT4.BIN"

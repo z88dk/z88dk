@@ -1,6 +1,9 @@
 /*
    Chessboard lib demo/test program
    By Stefano Bodrato - 13/08/2001
+   
+   $Id: chessboard.c,v 1.2 2001-08-21 15:40:15 stefano Exp $
+   
 */
 
 #if defined __TI85__ || defined __TI86__ || defined __Z88__ || defined __VZ200__
