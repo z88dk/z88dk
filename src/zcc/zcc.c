@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.10 2001-10-06 20:55:46 dom Exp $
+ *      $Id: zcc.c,v 1.11 2002-01-06 21:23:03 dom Exp $
  */
 
 
@@ -536,11 +536,6 @@ int main(argc, argv)
  */
         sprintf(buffer,"%s%s ",myconf[LIBPATH].def,myconf[STARTUPLIB].def);
         BuildOptions(&linkargs,buffer);
-/*
- *      Build the cpp list
- */
-        BuildOptions(&cpparg,myconf[INCPATH].def);
-
 
 /*
  *      Set the default output file
@@ -593,6 +588,12 @@ int main(argc, argv)
                 if (argv[gargc][0]=='-') ParseArgs(1+argv[gargc]);
                 else AddToFileList(argv[gargc]);
         }
+
+/*
+ *      Add the default cpp path
+ */
+        BuildOptions(&cpparg,myconf[INCPATH].def);
+
 
 /*
  *      First thing we do is to remove the zcc_opt.def file
