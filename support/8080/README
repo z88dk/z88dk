@@ -1,0 +1,10 @@
+$Id: README,v 1.1 2004-03-09 13:31:15 stefano Exp $
+
+8080 conversion and support tools.
+
+
+toz80.awk usage (awk or gawk required):
+
+gawk -f toz80.awk < 8080code.asm > z80code.asm
+
+You might need to tweak the script a bit by changing the record separator.
