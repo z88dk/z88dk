@@ -121,5 +121,5 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -// -v -O2 -I. -lti82ansi_clib -lndos -DZ80 -DSMALL_C -DTI82 -D__TI82__ -M -DSCCZ80
+OPTIONS		 -// -v -O2 -I. -lti82ansi_clib -lndos -DZ80 -DSMALL_C -DTI82 -D__TI82__ -M -DSCCZ80 -Cz+ti82
 
