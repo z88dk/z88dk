@@ -59,7 +59,7 @@ char *str;      /* output string */
                 x -= float(d) * scale ;
         }
         if ( f <= 0 ) {
-                *str = NULL ;
+                *str = 0;
                 return ;
         }
         *str++ = '.' ;
@@ -70,5 +70,5 @@ char *str;      /* output string */
                 *str++ = d + '0' ;
                 x -= float(d) ;
         }
-        *str = NULL ;
+        *str = 0;
 }

@@ -84,5 +84,5 @@ char *str ;             /* output string */
         if ( expon < 0 ) { *str++ = '-' ; expon = -expon ; }
         if(expon>9) *str++ = '0' + expon/10 ;
         *str++ = '0' + expon % 10 ;
-        *str = NULL;
+        *str = 0;
 }
