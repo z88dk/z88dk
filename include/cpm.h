@@ -7,7 +7,7 @@
  *    Many of these values have been obtained via reference to
  *    Hitech C
  *
- *    $Id: cpm.h,v 1.3 2002-01-27 21:38:05 dom Exp $
+ *    $Id: cpm.h,v 1.4 2002-02-17 22:44:55 dom Exp $
  */
 
 #include <sys/types.h>
@@ -47,7 +47,7 @@ struct fcb {
     char    next_record;    /* next record to read or write */
     u8_t    ranrec[3];      /* random record number (24 bit no. ) */
     /* Below here is used by the library */
-    long    rwptr;          /* read/write pointer in bytes */
+    unsigned long    rwptr;          /* read/write pointer in bytes */
     u8_t    use;            /* use flag */
     u8_t    uid;            /* user id belonging to this file */
 };
