@@ -11,7 +11,7 @@
  *	This routine is infact a vfprintf, so naming as such...
  *
  * --------
- * $Id: vfprintf_mini.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
+ * $Id: vfprintf_mini.c,v 1.3 2002-02-17 22:00:57 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -91,6 +91,6 @@ static void miniprintn(long number, FILE *file, unsigned char flag)
         }
         if ((i =(unsigned long) number / 10L) != 0)
                 miniprintn(i,file,flag);
-        fputc(number%10+'0', file);
+        fputc((unsigned long)number%10+'0', file);
 }
 
