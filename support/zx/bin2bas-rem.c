@@ -12,7 +12,7 @@
  *
  *	To be used with relocatable code only !!
  *
- *	$Id: bin2bas-rem.c,v 1.1 2001-09-13 15:31:29 stefano Exp $
+ *	$Id: bin2bas-rem.c,v 1.2 2001-09-14 08:03:52 stefano Exp $
  */
 
 #include <stdio.h>
@@ -34,13 +34,18 @@ int main(int argc, char *argv[])
 	int	c;
 	int	i;
 	int	len;
-	int	pos;
+	int	bline;
 
-	if (argc != 3 ) {
-		fprintf(stdout,"Usage: %s [code file] [tap file]\n",argv[0]);
+	if ((argc < 3 )||(argc > 4 )) {
+		fprintf(stdout,"Usage: %s [code file] [tap file] <Basic Line>\n",argv[0]);
 		exit(1);
 	}
-	
+
+	bline=1;
+	if (argc == 4 ) {
+		bline=atoi(argv[3]);
+	}
+
 	if ( (fpin=fopen(argv[1],"rb") ) == NULL ) {
 		fprintf(stderr,"Can't open input file\n");
 		exit(1);
@@ -73,11 +78,11 @@ int main(int argc, char *argv[])
 	writebyte(0,fpout);	/* Header is 0 */
 
 	parity=0;
-	writebyte(0,fpout);	/* Filetype (Basic) */
+	writebyte(0,fpout);	 /* Filetype (Basic) */
 	writestring("REM line  ",fpout);
-	writeword(6+len,fpout);	/* length */
-	writeword(0,fpout);	/* line for auto-start */
-	writeword(6+len,fpout);	/* length (?) */
+	writeword(6+len,fpout);	 /* length */
+	writeword(0x8000,fpout); /* line for auto-start */
+	writeword(6+len,fpout);	 /* length (?) */
 	writebyte(parity,fpout);
 
 
@@ -86,8 +91,8 @@ int main(int argc, char *argv[])
 
 	parity=0;
 	writebyte(255,fpout);		/* Data... */
-	writebyte(0,fpout);		/* MSB of BASIC line number */
-	writebyte(10,fpout);		/* LSB... */
+	writebyte(bline/256,fpout);	/* MSB of BASIC line number */
+	writebyte(bline%256,fpout);	/* MSB of BASIC line number */
 	writeword(26,fpout);		/* BASIC line length */
 	writebyte(0xEA,fpout);		/* REM */
 
