@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti82_crt0.asm,v 1.13 2001-09-20 15:54:03 stefano Exp $
+;	$Id: ti82_crt0.asm,v 1.14 2001-11-02 09:10:27 stefano Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -40,11 +40,23 @@
 
 	INCLUDE "#Ti82.def"	; ROM / RAM adresses on Ti82
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
+	
+;OS82Head:
+;    defb     $FE,$82,$0F
+;
+;AshHead:
+;    defb     $D9,$00,$20
+;
+;CrASHhead:
+;    defb     $D5,$00,$11
+
 
 ;-------------------
 ;1 - CrASH (default)
 ;-------------------
-	org	START_ADDR
+	org	START_ADDR-3
+	DEFB $D5,$00,$11
+;	org	START_ADDR
 	DEFINE NEED_name
 	INCLUDE	"zcc_opt.def"
 	UNDEFINE NEED_name
@@ -72,9 +84,9 @@ ELSE
 	ld	(exitsp),sp
 ENDIF
 
-IF !DEFINED_nostreams
- IF DEFINED_ANSIstdio
-  IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
+IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
+ IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
+  IF !NONANSI
 	;Reset the ANSI cursor
 	XREF	ansi_ROW
 	XREF	ansi_COLUMN
