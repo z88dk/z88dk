@@ -1,4 +1,9 @@
-A few support routines, most of them are programs to create files which
-can be loaded into the appropriate emulator
+$Id: README,v 1.2 2001-06-26 10:39:09 dom Exp $
+
+A few support programs, mainly to allow conversion of outputted binary files
+from the compiler into a form suitable for loading into emulators or
+simulators.
+
+Other small programs:
 
 bogomips - Fake speed calculator
