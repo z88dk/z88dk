@@ -1,6 +1,6 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.5 2002-02-20 11:11:54 dom Exp $
+ * $Id: define.h,v 1.6 2003-02-01 20:31:30 dom Exp $
  */
 
 /*      Stand-alone definitions                 */
@@ -148,6 +148,7 @@ SYMBOL {
 #define FAR     7
 #define LSTKEXT 8
 #define TYPDEF  9
+#define LIBOVER 10	/* Library override */
 
 
 /*      Flags */

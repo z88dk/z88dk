@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.19 2002-08-20 13:59:09 dom Exp $
+ *      $Id: codegen.c,v 1.20 2003-02-01 20:31:30 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -92,7 +92,14 @@ void DoLibHeader()
                 	outstr ("\n\tMODULE\t");
 		if (strlen (filen) && strncmp(filen,"<stdin>",7) ) {
                 	changesuffix(filen,".c");
-                	outstr(filen);
+                        if ( (segment=strrchr(filen,'/')) ) /* Unix */
+                                ++segment;
+                        else if ( (segment=strrchr(filen,'\\')) ) /*DOG*/
+                                segment++;
+                        else if ( (segment=strrchr(filen,':')) )/*Amiga*/
+                                segment++;
+                        else segment=filen;
+                        outstr(segment);
 		} else {
 /* This handles files produced by a filter cpp */
 			strcpy(filen,Filenorig);
@@ -731,6 +738,8 @@ void zcallop(void)
 char dopref(SYMBOL *sym)
 {
 	if (sym->flags&LIBRARY && (sym->ident == FUNCTION || sym->ident == FUNCTIONP)) return(0);
+	if ( sym->storage == LIBOVER )
+		return(0);
         return(1);
 }
 

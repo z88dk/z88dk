@@ -3,7 +3,7 @@
  *
  *      Errors and other such misfitting routines
  *
- *      $Id: error.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: error.c,v 1.2 2003-02-01 20:31:30 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -176,6 +176,7 @@ struct errors {
  */
         {"Maximum number of gotos reached (%d)",1},
         {"Unknown goto label: %s at line %d",1},
+	{"Cannot assign to compound auto variable \'%s\'",1},
         
 };
 

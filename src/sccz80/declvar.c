@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.9 2002-11-02 20:17:14 dom Exp $
+ *      $Id: declvar.c,v 1.10 2003-02-01 20:31:30 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -577,6 +577,8 @@ char zfar)               /* Far pointer thing.. */
 				if (cmatch('=') ) {
 					int vconst, val, expr;
 					char *before,*start;
+					if ( typ == STRUCT || ident == ARRAY )
+						error(E_AUTOASSIGN,sname);
 					if (lstdecl) postlabel(lstlab);
 					lstdecl=0;
 					Zsp=modstk(Zsp-(declared-size),NO,NO);
