@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.3 2001-02-28 18:20:45 dom Exp $
+ *      $Id: stmt.c,v 1.4 2001-03-08 09:23:38 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -257,7 +257,7 @@ void doiferror()
         }
         postlabel(flab1);                               /* print false label */
         statement();                                    /* and do 'else' clause */
-	postlabel(flab1);
+	postlabel(flab2);
 }
 
 /*
