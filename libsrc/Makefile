@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.59 2003-03-22 15:00:36 dom Exp $
+# $Id: Makefile,v 1.60 2003-03-23 10:31:17 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -166,7 +166,7 @@ zxvgs.lib:
 	@echo ''
 	@echo '--- Building ZXVGS Library  ---'
 	@echo ''
-	cd fcntl/zxvgs ; $(MAKE)
+	cd fcntl ; $(MAKE) lzxvgs
 	cd zxvgs; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORzx -xzxvgs @zxvgs.lst
 
