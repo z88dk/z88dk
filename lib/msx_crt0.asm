@@ -2,11 +2,11 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.2 2001-04-12 13:26:13 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.3 2001-09-07 18:17:11 dom Exp $
 ;
 
 
-                MODULE  z88_crt0
+                MODULE  msx_crt0
 
 ;
 ; Initially include the zcc_opt.def file to find out lots of lovely

@@ -4,11 +4,11 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: m5_crt0.asm,v 1.1 2001-06-25 16:10:08 stefano Exp $
+;       $Id: m5_crt0.asm,v 1.2 2001-09-07 18:17:11 dom Exp $
 ;
 
 
-                MODULE  z88_crt0
+                MODULE  m5_crt0
 
 ;
 ; Initially include the zcc_opt.def file to find out lots of lovely

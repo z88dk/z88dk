@@ -2,10 +2,10 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.2 2001-06-15 15:52:49 stefano Exp $
+;       $Id: cpc_crt0.asm,v 1.3 2001-09-07 18:17:11 dom Exp $
 ;
 
-                MODULE  z88_crt0
+                MODULE  cpc_crt0
 
 ;
 ; Initially include the zcc_opt.def file to find out lots of lovely

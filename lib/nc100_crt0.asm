@@ -9,12 +9,12 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: nc100_crt0.asm,v 1.1 2001-05-04 14:38:05 dom Exp $
+;       $Id: nc100_crt0.asm,v 1.2 2001-09-07 18:17:11 dom Exp $
 ;
 
 
 
-                MODULE  z88_crt0
+                MODULE  nc100_crt0
 
 ;
 ; Initially include the zcc_opt.def file to find out lots of lovely
