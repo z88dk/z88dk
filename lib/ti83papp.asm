@@ -164,17 +164,11 @@ ENDIF				;
 	ld      hl,$8080	;
 	ld      (fp_seed),hl	;
 
-IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
- IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
- 	; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
- ENDIF
-ENDIF
+	XREF	fputc_cons
+	ld	hl,12
+	push	hl
+	call	fputc_cons
+	pop	hl
 
 IF DEFINED_GRAYlib
  IF DEFINED_GimmeSpeed

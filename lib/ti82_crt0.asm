@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti82_crt0.asm,v 1.16 2002-04-24 08:15:02 stefano Exp $
+;	$Id: ti82_crt0.asm,v 1.17 2002-06-06 09:41:39 stefano Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -87,25 +87,12 @@ ELSE
 	ld	(exitsp),sp
 ENDIF
 
-IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
- IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
-  IF !NONANSI
-	;Reset the ANSI cursor
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
-	xor	a
-	ld	(ansi_ROW),a
-	ld	(ansi_COLUMN),a
- 	; Set up the std* stuff so we can be called again
-	;ld	hl,__sgoioblk+2
-	;ld	(hl),19	;stdin
-	;ld	hl,__sgoioblk+6
-	;ld	(hl),21	;stdout
-	;ld	hl,__sgoioblk+10
-	;ld	(hl),21	;stderr
-  ENDIF
- ENDIF
-ENDIF
+	XREF	fputc_cons
+	ld	hl,12
+	push	hl
+	call	fputc_cons
+	pop	hl
+
 
 IF DEFINED_GRAYlib
 	INCLUDE	"#gray82.asm"

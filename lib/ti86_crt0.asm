@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.18 2002-04-24 08:15:02 stefano Exp $
+;	$Id: ti86_crt0.asm,v 1.19 2002-06-06 09:41:39 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -233,22 +233,17 @@ ELSE
 	ld	(exitsp),sp
 ENDIF
 
-IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
- IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
-  IF NONANSI
+;  IF NONANSI
 	call	_homeup		; Set text cursor at (0,0)
 	ld	a,8		; Set _winBtm back to 8, so we
 	ld	(_winBtm),a	;  can print on the last line
-  ELSE
-	; Reset the ANSI cursor
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
-	xor	a
-	ld	(ansi_ROW),a
-	ld	(ansi_COLUMN),a
-  ENDIF
- ENDIF
-ENDIF
+;  ELSE
+
+	XREF	fputc_cons
+	ld	hl,12
+	push	hl
+	call	fputc_cons
+	pop	hl
 
 IF DEFINED_GRAYlib
 	INCLUDE	"#gray86.asm"
