@@ -134,3 +134,4 @@ graphics/drawbox
 graphics/setxy
 graphics/zx81/swapgfxbk
 graphics/zx81/clsgraph
+games/joystick

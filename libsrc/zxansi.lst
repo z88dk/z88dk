@@ -137,3 +137,4 @@ graphics/bksave
 graphics/bkrestore
 graphics/spectrum/pixladdr
 graphics/spectrum/swapgfxbk
+games/spectrum/joystick

@@ -132,3 +132,4 @@ graphics/unplot
 graphics/drawbox
 graphics/setxy
 graphics/vz200/swapgfxbk
+games/joystick
