@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.17 2002-04-21 17:22:08 dom Exp $
+ *      $Id: codegen.c,v 1.18 2002-04-22 14:45:50 stefano Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -34,6 +34,7 @@ extern char Filenorig[];
 
 int donelibheader;
 
+void constbc(long val);
 
 /* Begin a comment line for the assembler */
 

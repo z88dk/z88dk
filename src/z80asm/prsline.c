@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.7 2002-01-18 21:12:17 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.8 2002-04-22 14:45:51 stefano Exp $ */
 /* $History: PRSLINE.C $ */
 /*  */
 /* *****************  Version 8  ***************** */
@@ -69,8 +69,7 @@ extern char separators[];
 extern enum symbols sym, ssym[];
 extern short currentline;
 extern struct module *CURRENTMODULE;
-extern enum flag EOL;
-
+extern enum flag EOL, swapIXIY;
 
 /* get a character from file with CR/LF/CRLF parsing capability.
  *
@@ -446,13 +445,37 @@ CheckRegister8 (void)
     else
       {
 	if (strcmp (ident, "IXL") == 0)
-	  return (8 + 5);
+	  {
+	    if (swapIXIY == ON)
+	      return (16 + 5);
+	    else
+	      return (8 + 5);
+	  }
+
 	else if (strcmp (ident, "IXH") == 0)
-	  return (8 + 4);
+	  {
+	    if (swapIXIY == ON)
+	      return (16 + 4);
+	    else
+	      return (8 + 4);
+	  }
+	  
 	else if (strcmp (ident, "IYL") == 0)
-	  return (16 + 5);
+	  {
+	    if (swapIXIY == ON)
+	      return (8 + 5);
+	    else
+	      return (16 + 5);
+	  }
+
 	else if (strcmp (ident, "IYH") == 0)
-	  return (16 + 4);
+	  {
+	    if (swapIXIY == ON)
+	      return (8 + 4);
+	    else
+	      return (16 + 4);
+	  }
+	  
       }
   return -1;
 }
@@ -494,9 +517,19 @@ CheckRegister16 (void)
 	  switch (*(ident + 1))
 	    {
 	    case 'X':
-	      return (5);
+	      {
+	        if (swapIXIY == ON)
+	          return (6);
+	        else
+	          return (5);
+	      }
 	    case 'Y':
-	      return (6);
+	      {
+	        if (swapIXIY == ON)
+	          return (5);
+	        else
+	          return (6);
+	      }
 	    }
 	}
   return -1;

@@ -485,4 +485,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * operations
  * Added d and b specifiers for constants - decimal and binary
  * C-style 0x prefix for hex digits is permitted
+ *
+ * 22.04.2002 [no version increment] (Stefano)
+ * IX <-> IY swap option added (-IXIY)
  */

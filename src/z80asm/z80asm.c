@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.9 2002-02-20 21:37:57 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.10 2002-04-22 14:45:51 stefano Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -229,7 +229,7 @@ enum symbols sym, ssym[] =
 
 enum flag pass1, listing, listing_CPY, symtable, z80bin, writeline, mapref, globaldef, datestamp, ti83plus;
 enum flag deforigin, verbose, ASMERROR, EOL, symfile, library, createlibrary, autorelocate;
-enum flag smallc_source, codesegment, expl_binflnm, clinemode;
+enum flag smallc_source, codesegment, expl_binflnm, clinemode, swapIXIY;
 
 int ASSEMBLE_ERROR, ERRORS, TOTALERRORS, PAGENR, LINENR;
 long TOTALLINES;
@@ -684,6 +684,14 @@ SetAsmFlag (char *flagid)
   if (strcmp(flagid, "plus") == 0 ) 
     {
       ti83plus = ON;
+      return;
+    }
+
+  /* (stefano) IX and IY swap option */
+
+  if (strcmp (flagid, "IXIY") == 0)
+    {
+      swapIXIY = ON;
       return;
     }
 

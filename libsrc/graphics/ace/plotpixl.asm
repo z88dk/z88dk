@@ -5,7 +5,7 @@
 	XREF	COORDS
 
 ;
-;	$Id: plotpixl.asm,v 1.2 2001-04-18 13:21:38 stefano Exp $
+;	$Id: plotpixl.asm,v 1.3 2002-04-22 14:45:49 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -38,7 +38,8 @@
 				ld	c,a
 
 				ld	b,0	; x=x*2/3
-				sll	h
+				;sll	h
+				sla	h
 				ld	a,h
 .subtract
 				inc	b

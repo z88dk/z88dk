@@ -115,7 +115,9 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.12 2002-01-28 11:35:06 dom Exp $
+ *	22/4/2002 - (Stefano) Visual C "snprintf" workaround
+ *
+ *      $Id: zcc.c,v 1.13 2002-04-22 14:45:51 stefano Exp $
  */
 
 
@@ -125,6 +127,10 @@
 #include        <ctype.h>
 #include        "zcc.h"
 
+
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif
 
 
 /* All our function prototypes */

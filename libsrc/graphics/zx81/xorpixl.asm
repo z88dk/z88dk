@@ -4,7 +4,7 @@
 	XREF	COORDS
 
 ;
-;	$Id: xorpixl.asm,v 1.2 2002-04-17 21:30:25 dom Exp $
+;	$Id: xorpixl.asm,v 1.3 2002-04-22 14:45:50 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -37,7 +37,8 @@
 				ld	c,a
 
 				ld	b,0	; x=x*2/3
-				sll	h
+				;sll	h
+				sla	h
 				ld	a,h
 .subtract
 				inc	b

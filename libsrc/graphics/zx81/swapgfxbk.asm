@@ -5,17 +5,17 @@
 ;	Moved the HL' thing under CRT0
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.5 2002-04-17 21:30:25 dom Exp $
+;	$Id: swapgfxbk.asm,v 1.6 2002-04-22 14:45:50 stefano Exp $
 ;
 
 
                 XLIB    swapgfxbk
 
 		XDEF	swapgfxbk1
-
-
+		
 .swapgfxbk
 		ret
 .swapgfxbk1
-		ld	iy,16384
+		; This would become IX when swapped !
+		;ld	iy,16384 
                 ret

@@ -4,7 +4,7 @@
 	XREF	COORDS
 
 ;
-;	$Id: plotpixl.asm,v 1.6 2002-04-17 21:30:25 dom Exp $
+;	$Id: plotpixl.asm,v 1.7 2002-04-22 14:45:50 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -37,7 +37,8 @@
 				ld	c,a
 
 				ld	b,0	; x=x*2/3
-				sll	h
+				;sll	h
+				sla	h
 				ld	a,h
 .subtract
 				inc	b
@@ -51,7 +52,6 @@
 				srl	c
 				ld	hl,(16396)
 				inc	hl
-				;ld	a,b
 				ld	a,c
 				ld	c,b	; !!
 				ld	de,33	; 32+1. Every text line ends with an HALT
