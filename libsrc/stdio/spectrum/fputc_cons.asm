@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.3 2003-01-24 14:20:38 dom Exp $
 ;
 
 
@@ -48,6 +48,19 @@
 
 .putit_out1
         ex      af,af'
+	bit	7,a
+	jr	z,putit_out2
+; deal with UDGs here
+	sub	128
+	ld	l,a
+	ld	h,0
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+.udgaddr	ld	de,65368
+	add	hl,de
+	jp	print32_entry
+.putit_out2
         cp      32
 .print1
         jp      nc,print64
@@ -106,7 +119,7 @@
 ;c'=scr mask, hl'=scr addr
           ld    b,8  
 .char1    ld    a,(hl)  
-.char2    defb    0  
+.invers1  defb    0  
           and   c  
           inc   hl  
           exx   ; screen  
@@ -119,6 +132,17 @@
           exx   
           djnz  char1  
           exx   
+          ld    a,h  
+	  dec   a
+          rrca  
+          rrca  
+          rrca  
+          and   3  
+          or    88  
+          ld    h,a  
+	  ld    a,(attr)
+	  ld    (hl),a
+
 .cbak     ld    hl,(chrloc)  
           inc   l  
 .posncheck
@@ -138,6 +162,16 @@
 ; x posn and divide by two to get our real position
 
 .print32
+	sub	32	;subtract 32 to get space = 0
+	ld	l,a
+	ld	h,0
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+.fontaddr
+	ld	bc,15616
+	add	hl,bc
+.print32_entry
           ld    bc,(chrloc)  
 	  srl   c  
           ex    af,af'  
@@ -154,20 +188,25 @@
 	  ld	e,a
 ; Screen posn in de, now get font
 	  ex	af,af
-	ld	l,a
-	ld	h,0
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	ld	bc,(23606)
-	add	hl,bc
+
 	ld	b,8
 .loop32
 	ld	a,(hl)
+.invers2 defb	0
 	ld	(de),a
 	inc	d	;down screen row
 	inc	hl
 	djnz	loop32
+        ld      a,h  
+	dec     a
+        rrca  
+        rrca  
+        rrca  
+        and     3  
+        or      88  
+        ld      h,a  
+	ld      a,(attr)
+	ld      (hl),a
 	ld	hl,(chrloc)
 	inc	l
 	inc	l
@@ -185,8 +224,8 @@
 .code_table
         defw    noop    ; 0 - NUL
         defw    switch  ; 1 - SOH
-        defw    noop    ; 2
-        defw    noop    ; 3
+        defw    setfont32 ; 2
+        defw    setudg ; 3
         defw    noop    ; 4
         defw    noop    ; 5
         defw    noop    ; 6
@@ -199,12 +238,12 @@
         defw    cr      ;13 - CR (+NL)
         defw    noop    ;14
         defw    noop    ;15
-        defw    noop    ;16
-        defw    noop    ;17
-        defw    noop    ;18
-        defw    noop    ;19
-        defw    noop    ;20
-        defw    noop    ;21
+        defw    setink  ;16  - ink
+        defw    setpaper;17  - paper
+        defw    setflash;18  - flash
+        defw    setbright;19  - bright
+        defw    setinverse ;20  - inverse
+        defw    noop    ;21  - over
         defw    setposn ;22
         defw    noop    ;23
         defw    noop    ;24
@@ -264,9 +303,13 @@
 .cls
         ld      hl,16384
         ld      de,16385
-        ld      bc,6143
+        ld      bc,6144
         ld      (hl),l
         ldir
+	ld	a,(attr)
+	ld	(hl),a
+	ld	bc,767
+	ldir
         ld      hl,0
         ld      (chrloc),hl
         ret
@@ -285,15 +328,114 @@
         ld      (chrloc),hl
         ret
 
+; Set attributes etc
+.doinverse
+	ld	a,(params)
+	ld	b,47	;cpl
+	rrca
+	jr	c,doinverse1
+	ld	b,0	;nop
+.doinverse1
+	ld	a,b
+	ld	(invers1),a
+	ld	(invers2),a
+	ret
+
+
+.dobright
+	ld	hl,attr
+	ld	a,(params)
+	rrca
+	jr	c,dobright1
+	res	6,(hl)
+	ret
+.dobright1
+	set	6,(hl)
+	ret
+
+
+.doflash
+	ld	hl,attr
+	ld	a,(params)
+	rrca
+	jr	c,doflash1
+	res	7,(hl)
+	ret
+.doflash1
+	set	7,(hl)
+	ret
+
+.dopaper
+	ld	hl,attr
+	ld	a,(hl)	
+	and	@11000111
+	ld	c,a
+	ld	a,(params)
+	rlca
+	rlca
+	rlca
+	and	@00111000
+	or	c
+	ld	(hl),a
+	ret
+	
+.doink
+	ld	hl,attr
+	ld	a,(hl)
+	and	@11111000
+	ld	c,a
+	ld	a,(params)
+	and	7		;doesn't matter what chars were used..
+	or	c
+	ld	(hl),a
+	ret
+
+.dofont	ld	hl,(params)
+	ld	(fontaddr+1),hl
+	ret
+
+.doudg	ld	hl,(params)
+	ld	(udgaddr+1),hl
+	ret
+
+.setfont32
+	ld	hl,dofont
+	ld	a,2
+	jr	setparams
+
+.setudg
+	ld	hl,doudg
+	ld	a,2
+	jr 	setparams
+	
+
+.setinverse
+	ld	hl,doinverse
+	jr	setink1
+.setbright
+	ld	hl,dobright
+	jr	setink1
+.setflash
+	ld	hl,doflash
+	jr	setink1
+.setpaper
+	ld	hl,dopaper
+	jr	setink1
+.setink	ld	hl,doink
+.setink1
+	ld	a,1	;number to expect
+.setparams
+	ld	(flags),a
+	ld	(flagrout),hl
+	ret
+
 ; Set xy position
 ; Code 22,y,x (as per ZX)
 
 .setposn
         ld      a,2     ;number to expect
-        ld      (flags),a
         ld      hl,doposn
-        ld      (flagrout),hl
-        ret
+	jr	setparams
 
 ; Setting the position
 ; We only care 
@@ -339,6 +481,9 @@
 
 .chrloc
         defw    0
+
+; Attribute to use
+.attr	defb	56
 
 ; Flags..used for incoming bit sequences
 .flags
