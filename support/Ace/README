@@ -1,4 +1,4 @@
-$Id: README,v 1.1 2001-04-12 13:26:13 stefano Exp $
+$Id: README,v 1.2 2001-10-22 10:55:00 stefano Exp $
 
 The Jupiter ACE has a built-in FORTH interpreter in ROM (no BASIC, here!)
 There is very little software for it;  maybe the Z88DK will help !
@@ -12,10 +12,33 @@ addr call will call Z80 machine code at addr, should be terminated with a jp (iy
 So:
 
 - compile the program:				zcc +ace program.c
-- convert it:					bin2byt a.bas program.byt
+- convert it:					bin2byt a.bin program.byt
 - run the emulator				vace
 - from within the emulator, load the program:	16384 40000 bload
 - run the thing:				16384 call
 
 
 Have fun !
+
+
+--- ---
+
+22-10-2001
+
+Using ACE32 on WinNT/Win2000
+
+Get the file:
+http://users.aol.com/autismuk/ace/ace32.zip
+
+It is compiled with an old DOS extender and gives compatibility problems when used on WinNT.
+To override this, get the updated extender from:
+http://michael.tippach.bei.t-online.de/wdosx/
+
+Download the latest release and unzip the binary folder.
+Then update the ACE32 DOS extender stub with the "stubtit" utility:
+stubit ace32.exe
+
+It will replace the faulty stub with a working one.
+Now...  the tape format seems to be different; will let you know!
+
+						Stefano Bodrato
