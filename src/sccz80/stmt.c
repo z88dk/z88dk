@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.2 2001-02-02 12:24:06 dom Exp $
+ *      $Id: stmt.c,v 1.3 2001-02-28 18:20:45 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -679,6 +679,7 @@ void dopragma()
         else if ( amatch("asm") ) doasm();
         else if ( amatch("endasm") ) endasm=1; 
 	else if ( amatch("output") ) WriteDefined(line+lptr+1,0);
+	else if ( amatch("string") ) PragmaOutput(line+lptr+1);
         else if ( rcmatch('-') ) ParseArgs(line+lptr+1);
         else {
                warning(W_PRAGMA);

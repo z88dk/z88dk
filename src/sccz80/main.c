@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.4 2001-02-15 13:28:34 dom Exp $
+ *      $Id: main.c,v 1.5 2001-02-28 18:20:45 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -583,6 +583,34 @@ dumpfns()
                         outstr("\tDEFINE\tDO_inline\n");
         outstr("\n\n; --- End of Scope Defns ---\n\n");
 }
+
+/*
+ * Dump some text into the zcc_opt.def, this allows us to define some
+ * things that the startup code might need
+ */
+
+void PragmaOutput(char *ptr)
+{
+        char *text;
+        FILE *fp;
+
+        text = strchr(ptr,' ');
+        if ( text == NULL ) text = strchr(ptr,'\t');
+
+        if ( text != NULL ) {
+                *text = 0;
+                text++;
+                if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
+                        error(E_ZCCOPT);
+                }
+                fprintf(fp,"\nIF NEED_%s\n",ptr);
+                fprintf(fp,"\tdefm\t\"%s\"\n",text);
+                fprintf(fp,"ENDIF\n\n");
+                fclose(fp);
+        }
+}
+
+
 
 /*
  * Dump a function into the zcc_opt.def file - this allows us to pass

@@ -60,3 +60,4 @@ extern void SetNoFrame(char *);
 extern void OutOfMem(void);
 extern void SetFarHeap(char *);
 extern void SetPfLevel(char *);
+extern void PragmaOutput(char *);
