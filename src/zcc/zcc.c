@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.4 2001-02-07 09:01:37 dom Exp $
+ *      $Id: zcc.c,v 1.5 2001-03-09 18:14:52 dom Exp $
  */
 
 
@@ -1416,7 +1416,11 @@ int FindConfigFile(char *arg, int gc)
 		strcat(outfilename,"zcc.cfg");
 	} else {
 #if 1
+#ifdef MSDOS
+		sprintf(outfilename,"%s\lib\config\zcc.cfg",PREFIX);
+#else
 		sprintf(outfilename,"%s/lib/config/zcc.cfg",PREFIX);
+#endif
 #else
 		fprintf(stderr,"Couldn't find env variable ZCCCFG\n");
 		exit(1);

@@ -3,17 +3,17 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.4 2001-02-06 14:53:20 dom Exp $
+ * $Id: zcc.h,v 1.5 2001-03-09 18:14:52 dom Exp $
  */
 
 
 /* Some machine specific definitions (paths etc!) */
 
-char *version = "v2.47 (C) 2.1.2001 D.J.Morris\n";
+char *version = "v2.48 (C) 9.3.2001 D.J.Morris\n";
 
 #ifdef AMIGA
 #define PREFIX "zcc:"
-char *amiver="$VER: zcc v2.47 (2.1.2001)";
+char *amiver="$VER: zcc v2.48 (9.3.2001)";
 #endif
 
 /* Insert your machines definitions in here... */
