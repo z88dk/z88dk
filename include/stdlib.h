@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.9 2001-10-16 20:39:37 dom Exp $
+ * $Id: stdlib.h,v 1.10 2001-12-04 19:06:15 dom Exp $
  */
 
 extern __LIB__ abs(int);
@@ -38,6 +38,8 @@ extern double __LIB__ atof(char *);
 
 
 /* random number things */
+
+#define RAND_MAX 32767
 
 extern int __LIB__ rand(void);
 extern void __LIB__ srand(int);
