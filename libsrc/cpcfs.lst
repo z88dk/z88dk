@@ -1,0 +1,12 @@
+fcntl/cpc/close
+fcntl/cpc/cpc_closein
+fcntl/cpc/cpc_closeout
+fcntl/cpc/cpc_openin
+fcntl/cpc/cpc_openout
+fcntl/cpc/cpc_setup_open
+fcntl/cpc/open
+fcntl/cpc/open_z88
+fcntl/cpc/readbyte
+fcntl/cpc/read
+fcntl/cpc/writebyte
+fcntl/cpc/write

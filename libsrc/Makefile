@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.64 2003-09-11 10:20:30 dom Exp $
+# $Id: Makefile,v 1.65 2003-09-14 11:24:21 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -744,6 +744,14 @@ cpc_clib.lib:
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
 	z80asm -d -ns -nm -Mo -DFORcpc -xcpc_clib @cpc.lst
+
+cpcfs.lib:
+	@echo ''
+	@echo '--- Building Amstrad CPC fcntl Library ---'
+	@echo ''
+	cd fcntl ; $(MAKE) lcpc
+	z80asm -d -ns -nm -Mo -DFORcpc -xcpcfs @cpcfs.lst
+
 
 # Amstrad CPC maths libraries - Dom
 cpc_math.lib:
