@@ -107,10 +107,9 @@ printflike/fscanf
 printflike/vfscanf
 printflike/vsscanf
 graphics/circle
-graphics/clg
+graphics/spectrum/clg
 graphics/clga
 graphics/clrarea
-graphics/clsgraph
 graphics/dcircle
 graphics/draw
 graphics/drawb
@@ -136,10 +135,11 @@ graphics/drawbox
 graphics/setxy
 graphics/fill
 graphics/dfill
-graphics/putsprite
-graphics/bksave
-graphics/bkrestore
-graphics/spectrum/pixladdr
+graphics/spectrum/putsprite
+graphics/spectrum/bksave
+graphics/spectrum/bkrestore
+graphics/spectrum/rowtab
+graphics/spectrum/pixladdr2
 graphics/spectrum/swapgfxbk
 games/spectrum/joystick
 games/spectrum/bit_open

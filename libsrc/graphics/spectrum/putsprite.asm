@@ -3,16 +3,14 @@
 ; original code by Patrick Davidson (TI 85)
 ; modified by Stefano Bodrato - Jan 2001
 ;
-; Generic version (just a bit slow)
+; ZX Spectrum version (speeded up with a row table)
 ;
 ;
-; $Id: putsprite.asm,v 1.4 2002-02-27 13:12:26 stefano Exp $
+; $Id: putsprite.asm,v 1.1 2002-02-27 13:12:26 stefano Exp $
 ;
 
 	XLIB    putsprite
-	LIB	pixeladdress
-	LIB     swapgfxbk
-        XREF	swapgfxbk1
+	LIB	zx_rowtab
 
 	INCLUDE	"graphics/grafix.inc"
 
@@ -23,12 +21,8 @@
 .offsets_table
          defb	128,64,32,16,8,4,2,1
 
-.actcoord
-	 defw	0
-
-
 .putsprite
-	
+
         ld      hl,2   
         add     hl,sp
         ld      e,(hl)
@@ -55,15 +49,36 @@
         ld	(ortype),a	; Self modifying code
         ld	(ortype2),a	; Self modifying code
 
+	ld	a,d
+	ld	d,0
+	
+	ld	hl,zx_rowtab
+	add	hl,de
+	add	hl,de
+	ld	(actrow+1),hl	; save row table position
+	ld	(actrow1+1),hl
+	ld	(actrow2+1),hl
 
-	ld	h,d
+	ld	e,(hl)
+	inc	hl
+	ld	h,(hl)
 	ld	l,e
+	
+	push	af
+	srl	a
+	srl	a
+	srl	a
+	ld	(actcol+1),a
+	ld	(actcol1+1),a
+	ld	(actcol2+1),a
+	ld	e,a
+	pop	af
 
-	ld	(actcoord),hl	; save current coordinates
-
-	call    swapgfxbk
-	call	pixeladdress
-	xor	7
+	add	hl,de
+	
+	push	hl
+	
+        AND     @00000111
 
          ld       hl,offsets_table
          ld       c,a
@@ -73,16 +88,14 @@
          ld       (wsmc1+1),a
          ld       (wsmc2+1),a
 	 ld       (_smc1+1),a
-	ld	h,d
-	ld	l,e
+
+	pop	hl
 
 	ld	a,(ix+0)
-	cp	17
-	jr	nc,putspritebig
 	cp	9
 	jr	nc,putspritew
 
-.putsprites
+	 di
          ld       d,(ix+0)
          ld       b,(ix+1)
 ._oloop  push     bc                ;Save # of rows
@@ -97,7 +110,7 @@
 .ortype
 	nop	; changed into nop / cpl
          nop	; changed into and/or/xor (hl)
-	 ld       (hl),a
+         ld       (hl),a
          ld       a,e
 ._noplot rrca
          jr       nc,_notedge       ;Test if edge of byte reached
@@ -105,22 +118,30 @@
 ._notedge djnz     _iloop
 
 	; ---------
-	push	de
-        ld	hl,(actcoord)
-	inc	l
-	ld	(actcoord),hl
-	call	pixeladdress
-	ld	h,d
-	ld	l,e
-	pop	de
+.actrow
+	ld	hl,0
+	inc	hl
+	inc	hl
+	ld	(actrow+1),hl
+	
+	ld	b,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,b
+
+.actcol	
+	ld	bc,0
+	add	hl,bc
 	; ---------
 
          pop      bc                ;Restore data
          djnz     _oloop
-	 jp       swapgfxbk1
+         ei
+         ret
 
 
 .putspritew
+	 di
          ld       d,(ix+0)
          ld       b,(ix+1)        
 .woloop  push     bc                ;Save # of rows
@@ -147,20 +168,26 @@
          djnz     wiloop
 
 	; ---------
-	push	de
-        ld	hl,(actcoord)
-	inc	l
-	ld	(actcoord),hl
-	call	pixeladdress
-	ld	h,d
-	ld	l,e
-	pop	de
+.actrow1
+	ld	hl,0
+	inc	hl
+	inc	hl
+	ld	(actrow1+1),hl
+	
+	ld	b,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,b
+
+.actcol1	
+	ld	bc,0
+	add	hl,bc
 	; ---------
 
          pop      bc                ;Restore data
          djnz     woloop
-	 jp       swapgfxbk1
-	
+         ei
+         ret
 
 .wover_1 ld       c,(ix+2)
          inc      ix
@@ -168,17 +195,24 @@
          dec      ix
 
 	; ---------
-	push	de
-        ld	hl,(actcoord)
-	inc	l
-	ld	(actcoord),hl
-	call	pixeladdress
-	ld	h,d
-	ld	l,e
-	pop	de
+.actrow2
+	ld	hl,0
+	inc	hl
+	inc	hl
+	ld	(actrow2),hl
+	
+	ld	b,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,b
+
+.actcol2
+	ld	bc,0
+	add	hl,bc
 	; ---------
 
          pop      bc
          djnz     woloop
-	 jp       swapgfxbk1
+         ei
+         ret
 
