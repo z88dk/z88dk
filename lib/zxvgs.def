@@ -1,0 +1,125 @@
+lstoff
+
+; List of parameters for ZXVGS calls
+
+
+	defc	ZXVGS_J0	= $80
+	defc	ZXVGS_J1	= $81
+	defc	ZXVGS_J2	= $82
+	defc	ZXVGS_J3	= $83
+
+	defc	ZXVGS_MSEINI	= $84
+	defc	ZXVGS_MSEGET	= $85
+
+	defc	ZXVGS_FAST	= $87
+	defc	ZXVGS_SLOW	= $88
+
+	defc	ZXVGS_KBDGET	= $8C
+	defc	ZXVGS_KBDTST	= $8D
+	defc	ZXVGS_KBDMOD	= $8E
+	defc	ZXVGS_KBDINT	= $8F
+
+	defc	ZXVGS_CHOICE	= $9F
+
+	defc	ZXVGS_GETCFG	= $A2
+	defc	ZXVGS_SETCFG	= $A3
+
+	defc	ZXVGS_SOUND	= $A4
+	defc	ZXVGS_OPENSOUND = $A5
+
+	defc	ZXVGS_VIDEO	= $A6
+	defc	ZXVGS_OPENVIDEO	= $A7
+
+	defc	ZXVGS_RSXINIT	= $AC
+	defc	ZXVGS_RSXCTRL	= $AD
+	defc	ZXVGS_RSXINFO	= $AE
+	defc	ZXVGS_RSXLOAD	= $AF
+
+	defc	ZXVGS_BNK0	= $B0
+	defc	ZXVGS_BNK1	= $B1
+	defc	ZXVGS_BNK2	= $B2
+	defc	ZXVGS_BNK3	= $B3
+	defc	ZXVGS_BNK4	= $B4
+	defc	ZXVGS_BNK5	= $B5
+	defc	ZXVGS_BNK6	= $B6
+	defc	ZXVGS_BNK7	= $B7
+	defc	ZXVGS_BNKE	= $B8
+	defc	ZXVGS_BNKCTRL	= $B9
+	defc	ZXVGS_BNKCODE	= $BA
+	defc	ZXVGS_BNKCOPY	= $BB
+	defc	ZXVGS_BNKOPEN	= $BC
+	defc	ZXVGS_BNKCLOSE	= $BD
+	defc	ZXVGS_BNKRESET	= $BE
+	defc	ZXVGS_BNKINFO	= $BF
+
+	defc	ZXVGS_GETPATH	= $C0
+	defc	ZXVGS_SETPATH	= $C1
+	defc	ZXVGS_GETENTRY	= $C2
+	defc	ZXVGS_SETMASK	= $C3
+
+	defc	ZXVGS_GETINFO	= $C4
+	defc	ZXVGS_SETINFO	= $C5
+	defc	ZXVGS_GETINFS	= $C6
+	defc	ZXVGS_SETINFS	= $C7
+
+	defc	ZXVGS_RESET	= $C8
+	defc	ZXVGS_FLUSH	= $C9
+	defc	ZXVGS_MAKE	= $CA
+	defc	ZXVGS_KILL	= $CB
+	defc	ZXVGS_EXIST	= $CC
+	defc	ZXVGS_ASSIGN	= $CD
+	defc	ZXVGS_MOVE	= $CE
+	defc	ZXVGS_COPY	= $CF
+
+	defc	ZXVGS_CLOSE	= $D0
+	defc	ZXVGS_OPENI	= $D1
+	defc	ZXVGS_OPENO	= $D2
+	defc	ZXVGS_OPENB	= $D3
+	defc	ZXVGS_READ	= $D4
+	defc	ZXVGS_WRITE	= $D5
+	defc	ZXVGS_GETL	= $D6
+	defc	ZXVGS_PUTL	= $D7
+	defc	ZXVGS_FPOS	= $D8
+	defc	ZXVGS_SEEK	= $D9
+	defc	ZXVGS_EOF	= $DA
+	defc	ZXVGS_TRUNC	= $DB
+
+	defc	ZXVGS_HEADER0	= $E0
+	defc	ZXVGS_HEADER1	= $E1
+	defc	ZXVGS_HEADER2	= $E2
+	defc	ZXVGS_HEADER3	= $E3
+	defc	ZXVGS_LOAD	= $E4
+	defc	ZXVGS_SAVE	= $E5
+	defc	ZXVGS_VERIFY	= $E6
+	defc	ZXVGS_SHIFT	= $E7
+	defc	ZXVGS_LOADSCR	= $E8
+	defc	ZXVGS_SAVESCR	= $E9
+	defc	ZXVGS_LOADCFG	= $EA
+	defc	ZXVGS_SAVECFG	= $EB
+	defc	ZXVGS_LOADANY	= $EC
+	defc	ZXVGS_SAVEANY	= $ED
+	defc	ZXVGS_FILESELL	= $EE
+	defc	ZXVGS_FILESELH	= $EF
+
+	defc	ZXVGS_GETPRINT	= $F0
+	defc	ZXVGS_SETPRINT	= $F1
+	defc	ZXVGS_DUMP	= $F2
+	defc	ZXVGS_DUMPANY	= $F3
+	defc	ZXVGS_ZXPRINT	= $F4
+	defc	ZXVGS_HLPRINT	= $F5
+	defc	ZXVGS_DEPRINT	= $F6
+	defc	ZXVGS_LPRINT	= $F7
+
+	defc	ZXVGS_OVRLOAD	= $F8
+	defc	ZXVGS_OVRPREPARE= $F9
+	defc	ZXVGS_OVRSTORE	= $FA
+	defc	ZXVGS_OVRREMOVE	= $FB
+
+	defc	ZXVGS_MENU	= $FC
+	defc	ZXVGS_QUIT	= $FD
+	defc	ZXVGS_FATAL	= $FE
+	defc	ZXVGS_OK	= $FF
+
+lstoff
+
+
