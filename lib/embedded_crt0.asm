@@ -1,24 +1,45 @@
 ;       Startup Code for Embedded Targets
 ;
+;	Daniel Wallner March 2002
+;
+;	$Id: embedded_crt0.asm,v 1.2 2002-10-17 12:38:45 dom Exp $
+;
+; (DM) Could this do with a cleanup to ensure rstXX functions are
+; available?
 
 	DEFC	ROM_Start  = $0000
 	DEFC	RAM_Start  = $8000
 	DEFC	RAM_Length = $100
 	DEFC	Stack_Top  = $ffff
 
-	MODULE  z88_crt0
+	MODULE  embedded_crt0
 
-;
-; Initially include the zcc_opt.def file to find out lots of lovely
-; information about what we should do..
-;
+;-------
+; Include zcc_opt.def to find out information about us
+;-------
 
 	INCLUDE "zcc_opt.def"
 
-; No matter what set up we have, main is always, always external to
-; this file
+;-------
+; Some general scope declarations
+;-------
 
-	XREF	_main
+        XREF    _main           ;main() is always external to crt0 code
+        XDEF    cleanup         ;jp'd to by exit()
+        XDEF    l_dcal          ;jp(hl)
+
+        XDEF    int_seed        ;Integer rand() seed
+
+        XDEF    exitsp          ;Pointer to atexit() stack
+        XDEF    exitcount       ;Number of atexit() functions registered
+
+        XDEF    __sgoioblk      ;std* control block
+
+        XDEF    heaplast        ;Near malloc heap variables
+        XDEF    heapblocks      ;
+
+        XDEF    _vfprintf       ;jp to printf() core routine
+
 
 	org    ROM_Start
 
@@ -72,17 +93,9 @@ ENDIF
 .l_dcal
 	jp      (hl)
 
-;For stdin, stdout, stder
-
-	XDEF    __sgoioblk
-
-; vprintf is internal to this file so we only ever include one of the set
-; of routines
-
-	XDEF	_vfprintf
-
-; Now, which of the vfprintf routines do we need?
-
+;---------------------------------
+; Select which printf core we want
+;---------------------------------
 ._vfprintf
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
@@ -103,37 +116,22 @@ ENDIF
 
 DEFVARS RAM_Start
 {
-__sgoioblk
-	ds.b	40	;4 bytes * 10 handles
-; Are these next two actually used?
-l_erraddr
-	ds.w    1
-l_errlevel
-	ds.w    1
-int_seed
-	ds.w    1
-exitsp
-	ds.w    1
-exitcount
-	ds.b    1
-fp_seed
-	ds.w    3       ;not used ATM
-extra
-	ds.w    3
-fa
-	ds.w    3
-fasign
-	ds.b    1
-heapblocks
-	ds.w	1
-heaplast
-	ds.w	1
+__sgoioblk      ds.b    40      ;stdio control block
+int_seed        ds.w    1       ;Integer seed
+exitsp          ds.w    1       ;atexit() stack
+exitcount       ds.b    1       ;Number of atexit() routines
+fp_seed         ds.w    3       ;Floating point seed (not used ATM)
+extra           ds.w    3       ;Floating point spare register
+fa              ds.w    3       ;Floating point accumulator
+fasign          ds.b    1       ;Floating point variable
+heapblocks      ds.w    1       ;Number of free blocks
+heaplast        ds.w    1       ;Pointer to linked blocks
 }
 
-;
-; Now, include the math routines if needed..
-;
 
+;--------
+; Now, include the math routines if needed..
+;--------
 IF NEED_floatpack
         INCLUDE "#float.asm"
 ENDIF
