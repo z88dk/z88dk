@@ -1,7 +1,7 @@
 #ifndef __STDIO_H__
 #define __STDIO_H__
 
-/* $Id: stdio.h,v 1.10 2002-06-09 15:13:57 dom Exp $ */
+/* $Id: stdio.h,v 1.11 2003-01-26 17:40:05 dom Exp $ */
 
 #undef __STDIO_BINARY        /* By default don't consider binary files */
 
@@ -133,9 +133,8 @@ extern int __LIB__ fread(void *ptr, int size, int num, FILE *);
 extern int __LIB__ fwrite(void *ptr, int size, int num, FILE *);
 
 
-/* You shouldn't use gets, let this teach you a lesson! */
-
-#define gets(s) fgets(s,255,stdin)
+/* You shouldn't use gets. z88 gets() is limited to 255 characters */
+extern int __LIB__ gets(char *s);
 
 /* Some standard macros */
 
