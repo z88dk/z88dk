@@ -6,7 +6,7 @@
 ;	+ specific display metrics
 ;
 ;
-;	$Id: ticalc.inc,v 1.5 2001-04-20 11:56:39 stefano Exp $
+;	$Id: ticalc.inc,v 1.6 2001-11-05 09:47:07 stefano Exp $
 ;
 
 	defc columns	= 32
@@ -14,7 +14,7 @@
 IF FORti82
 	defc row_bytes	= 12
 	defc char_dots	= 3
-	defc TIALPHAKEY	= $30
+	defc TIALPHAKEY	= $30	; Not used !  CrASH does the job.
 
 	;ROM key handler
 	;defc getkey	= $01D4
@@ -22,8 +22,12 @@ IF FORti82
 	;CRASH key handler
 	defc getkey	= $8D91
 	
-	defc ti_putchar = $39EC
-	defc ti_newline = $3794
+	defc ti_putchar = $39D2
+	defc ti_scroll  = $377A
+	defc ti_x_text	= $800D
+	defc ti_y_text	= $800C
+	defc ti_maxx_t	= 15
+	defc ti_maxy_t	= 7
 ENDIF
 
 IF FORti83
@@ -33,7 +37,11 @@ IF FORti83
 	defc getkey	= $4CFE
 	
 	defc ti_putchar = $4705
-	defc ti_newline = $473D
+	defc ti_scroll  = $473D
+	defc ti_x_text	= $800D
+	defc ti_y_text	= $800C
+	defc ti_maxx_t	= 15
+	defc ti_maxy_t	= 7
 ENDIF
 
 IF FORti83p
@@ -43,7 +51,11 @@ IF FORti83p
 	defc getkey	= $4972
 	
 	defc ti_putchar = $4504
-	defc ti_newline = $452E
+	defc ti_scroll  = $452E
+	defc ti_x_text	= $800D
+	defc ti_y_text	= $800C
+	defc ti_maxx_t	= 15
+	defc ti_maxy_t	= 7
 ENDIF
 
 ; TI 85 and TI 86 can go up to 42 columns if char_dots is set to 3
@@ -53,9 +65,14 @@ IF FORti85
 	defc char_dots	= 4
 	defc TIALPHAKEY	= $30
 	defc getkey	= $01BE
+	;defc getkey	= $0168
 	
 	defc ti_putchar = 0
-	defc ti_newline = 6
+	defc ti_scroll  = 6
+	defc ti_x_text	= $800D
+	defc ti_y_text	= $800C
+	defc ti_maxx_t	= 20
+	defc ti_maxy_t	= 7
 ENDIF
 
 IF FORti86
@@ -65,5 +82,9 @@ IF FORti86
 	defc getkey	= $55AA
 	
 	defc ti_putchar = $4A2B
-	defc ti_newline = $4A5F
+	defc ti_scroll  = $4A5F
+	defc ti_x_text	= $C010
+	defc ti_y_text	= $C00F
+	defc ti_maxx_t	= 20
+	defc ti_maxy_t	= 7
 ENDIF
