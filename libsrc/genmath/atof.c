@@ -76,7 +76,7 @@ unsigned char s[];		/* s points to a character string */
 			expon = 0 ;
 		}
 		k = 32 ;	/* set one bit in mask */
-		scale = 1 ;
+		scale = 1. ;
 		while(k) {
 			scale *= scale;
 			if ( k & expon ) scale *= ten ;
