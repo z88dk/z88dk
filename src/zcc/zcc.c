@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.19 2003-03-13 14:50:30 dom Exp $
+ *      $Id: zcc.c,v 1.20 2003-03-13 16:34:24 dom Exp $
  */
 
 
@@ -264,6 +264,7 @@ int     usetemp         = 1;
 int     preserve        = 0;    /* don't destroy zcc_opt */
 int     createapp       = 0;    /* Go the next stage and create the app */
 int     lateassemble    = 0;
+int     makeapp		= 0;
 int     z80verbose      = 0;
 int     cleanup         = 1;
 int     assembleonly    = 0;
@@ -658,6 +659,9 @@ int main(argc, argv)
         if (createapp && outputfile==defaultout ) 
                 outputfile=defaultbin;
 
+	if ( createapp && makeapp )
+		lateassemble = YES;
+
 
 /*
  * Now, a little bit of trickery to allow many people to use zcc at
@@ -818,7 +822,7 @@ void SetCreateApp(char *arg)
 
 void SetLateAssemble(char *arg)
 {
-    lateassemble = YES;
+    makeapp = YES;
     AddComp("-make-app");
 }
 

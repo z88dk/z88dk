@@ -3,7 +3,7 @@
  *
  *  djm 21/6/2001 after Damjan Marion
  *
- *  $Id: rex6000.c,v 1.1 2003-03-13 14:50:30 dom Exp $
+ *  $Id: rex6000.c,v 1.2 2003-03-13 16:34:23 dom Exp $
  */
 
 #include "appmake.h"
@@ -49,8 +49,8 @@ static char  icon_default [5*32] = {
     0x00,0x00,0x00,0x00,0x00 };
 
 
-static char             *application_name    = "z88dkapp";
-static char             *application_comment = "Made with z88dk";
+static char             *application_name    = NULL;
+static char             *application_comment = NULL;
 static char             *binname             = NULL;
 static char             *outfile             = NULL;
 static char              help                = 0;
@@ -206,7 +206,6 @@ static void icon_form(char *filen)
             ptr = buffer+8;
             while ( *ptr && isspace(*ptr) )
                 ptr++;
-            printf(ptr);
             if ( strlen(ptr) ) {
                 application_name_file = cleanup_string(ptr);
             }
@@ -214,7 +213,6 @@ static void icon_form(char *filen)
             ptr = buffer+8;
             while ( *ptr && isspace(*ptr) )
                 ptr++;
-            printf(ptr);
             if ( strlen(ptr) ) {
                 application_comment_file = cleanup_string(ptr);
             }
