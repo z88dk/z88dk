@@ -42,11 +42,15 @@
 	pop	ix		;get number of stack
 	ld	hl,0
 	add	hl,sp		;address of our parameters
+	push	hl	
+	ld	hl,0
+	add	hl,sp		;ptr to ptr to params
 	ld	($c004),hl
 	ld	hl,$00ce	;DS_SYSCALL_EXTENDED
 	ld	($c000),hl
 	rst	$10		;ix survives the call
 	ld	b,ixl		;terrible inefficient, but I'm lazy
+	pop	de		;discard ptr to ptr to args
 .syscallex2
 	pop	de
 	djnz	syscallex2
