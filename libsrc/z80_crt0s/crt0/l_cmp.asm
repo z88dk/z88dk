@@ -1,26 +1,26 @@
-;       Z88 Small C+ Run time Library
-;       Moved functions over to proper libdefs
-;       To make startup code smaller and neater!
 ;
-;       6/9/98  djm
+;	Z80 Runtime Library
+;
+;	Signed integer compare
+;
+;	$Id: l_cmp.asm,v 1.6 2002-02-17 10:39:24 dom Exp $:
+
 
                 XLIB    l_cmp
 
 ; signed compare of DE and HL
 ;   carry is sign of difference [set => DE < HL]
 ;   zero is zero/non-zero
-.l_cmp 
-        ld a,e
-        sub   l
-        ld e,a
-        ld a,d
-        sbc   a,h
-        ld hl,1                 ;preset true
-	jp m,l_cmp1             ;Should it be M or c, does it make a diffence
-;        jr c,l_cmp1
-        or      e       ;resets carry
-        ret
+.l_cmp
+	ld	a,h
+	add	$80
+	ld	b,a
+	ld	a,d
+	add	$80
+	cp	b
+	jr	nz,l_cmp1
+	ld	a,e
+	cp	l
 .l_cmp1
-        or e
-        scf             ;signal minus
-        ret
+	ld	hl,1
+	ret
