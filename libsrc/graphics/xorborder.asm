@@ -4,7 +4,7 @@
 	XREF	swapgfxbk1
 
 ;
-;	$Id: xorborder.asm,v 1.2 2002-03-28 11:18:01 stefano Exp $
+;	$Id: xorborder.asm,v 1.3 2002-04-03 10:56:52 stefano Exp $
 ;
 
 ; ***********************************************************************
@@ -24,8 +24,8 @@
 		
 		ld	ix,0
 		add	ix,sp
-		ld	b,(ix+2)
-		ld	c,(ix+4)
+		ld	c,(ix+2)
+		ld	b,(ix+4)
 		ld	l,(ix+6)
 		ld	h,(ix+8)
 
