@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.23 2003-09-11 10:11:24 dom Exp $
+ *      $Id: zcc.c,v 1.24 2003-10-30 11:13:30 dom Exp $
  */
 
 
@@ -264,6 +264,7 @@ int     usetemp         = 1;
 #endif
 int     preserve        = 0;    /* don't destroy zcc_opt */
 int     createapp       = 0;    /* Go the next stage and create the app */
+int     makelib         = 0;
 int     lateassemble    = 0;
 int     makeapp		= 0;
 int     z80verbose      = 0;
@@ -635,6 +636,10 @@ int main(argc, argv)
         KillEOL(myconf[LINKOPTS].def);
         KillEOL(myconf[ASMOPTS].def);
 
+	/* We can't create an app and make a library.... */
+	if ( createapp && makelib )
+		createapp = NO;
+
 /*
  * If we're making an app, we want the default name to be a.bin not a.out
  */
@@ -787,6 +792,7 @@ void BuildAsmLine(char *dest, char *prefix)
 
 void SetLibMake(char *arg)
 {
+	makelib=YES;
         compileonly=YES;        /* Get to object file */
         peepholeopt=2*YES;
         AddComp(arg);
