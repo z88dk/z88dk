@@ -1,12 +1,12 @@
 #
 # Makefile for OZ-7xx specific libraries
 #
-# $Id: Makefile,v 1.1 2003-10-21 17:15:19 stefano Exp $
+# $Id: Makefile,v 1.2 2003-10-22 09:56:34 stefano Exp $
 
 
 
 all:	
-	zcc +z88 -vn -make-lib oztime/ozt.c
+	zcc +z88 -vn -make-lib oztime/ozt.c ozinput/ozeditline.c
 	z80asm -d -ns -nm -Mo -xozextra @oz700.lst
 
 clean:

@@ -2,7 +2,7 @@
 	HTC Compatibility Library and OZ extras 
 	Fonts
 
-	$Id: ozfont.h,v 1.2 2003-10-21 17:15:18 stefano Exp $
+	$Id: ozfont.h,v 1.3 2003-10-22 09:56:34 stefano Exp $
 */
 
 #ifndef _OZ_BYTE
@@ -33,7 +33,7 @@ struct ozfonttableentry
     unsigned offset;
 };
 
-extern byte *_ozfontpointers[];
+extern byte *ozfontpointers[];
 extern byte ozcustomactivefont;
 
 extern byte _LIB_ ozscancustomfonts(void);

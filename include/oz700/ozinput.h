@@ -2,43 +2,46 @@
 	HTC Compatibility Library and OZ extras 
 	2. KEYBOARD AND INPUT
 
-	$Id: ozinput.h,v 1.2 2003-10-21 17:15:19 stefano Exp $
+	$Id: ozinput.h,v 1.3 2003-10-22 09:56:34 stefano Exp $
 */
+
+#ifndef _OZINPUT_H
+#define _OZINPUT_H
 
 #ifndef _OZ_BYTE
 typedef unsigned char byte;
 #define _OZ_BYTE
 #endif
 
-void ozrestorekeysettings(void);
-void ozsavekeysettings(void);
+extern __LIB__ ozrestorekeysettings(void);
+extern __LIB__ ozsavekeysettings(void);
 #define SETTINGS_LENGTH 14
-void ozcopyfromcursettings(byte *p);
-void ozcopytocursettings(byte *p);
+extern __LIB__ ozcopyfromcursettings(byte *p);
+extern __LIB__ ozcopytocursettings(byte *p);
 
 #define OZEDITLINE_ERROR  -2
 #define OZEDITLINE_CANCEL -1
-int ozeditline(byte x0,byte y0,char *s,byte slen,byte xlen);
-int oznkeyhit(void);
-int ozkeyhit(void);
-unsigned ozgetch(void);
-unsigned ozngetch(void);
-unsigned ngetch(void);
-void ozungetch(unsigned key);
-void ozkbdon(void);
-void ozkbdoff(void);
-void ozkeyclear(void);
-byte ozkeyupper(byte mask);
-byte ozkeylower(byte mask);
-unsigned getch(void);
-int kbhit(void);
-int nkbhit(void);
-byte ozgetrepeatspeed(void);
-byte ozgetrepeatdelay(void);
-void ozsetrepeatspeed(byte val);
-void ozsetrepeatdelay(byte val);
-void ozclick(byte state);
-byte ozgetclick(void);
+extern int __LIB__ ozeditline(byte x0,byte y0,char *s,byte slen,byte xlen);
+extern int __LIB__ oznkeyhit(void);
+extern int __LIB__ ozkeyhit(void);
+//extern unsigned __LIB__ ozgetch(void);
+//extern unsigned __LIB__ ozngetch(void);
+//extern unsigned __LIB__ ngetch(void);
+//extern __LIB__ ozungetch(unsigned key);
+extern __LIB__ ozkbdon(void);
+extern __LIB__ ozkbdoff(void);
+extern __LIB__ ozkeyclear(void);
+extern byte __LIB__ ozkeyupper(byte mask);
+extern byte __LIB__ ozkeylower(byte mask);
+//extern unsigned __LIB__ getch(void);
+//extern int __LIB__ kbhit(void);
+//extern int __LIB__ nkbhit(void);
+extern byte __LIB__ ozgetrepeatspeed(void);
+extern byte __LIB__ ozgetrepeatdelay(void);
+extern __LIB__ ozsetrepeatspeed(byte val);
+extern __LIB__ ozsetrepeatdelay(byte val);
+extern __LIB__ ozclick(byte state);
+extern byte __LIB__ ozgetclick(void);
 extern byte _ozkeyrepeatspeed;
 extern byte _ozkeyrepeatdelay;
 
@@ -51,7 +54,7 @@ struct ozmenuentry
     char *label;
 };
 
-int ozmenu(int x,int y,char *title,unsigned start,unsigned num_entries,
+extern int __LIB__ ozmenu(int x,int y,char *title,unsigned start,unsigned num_entries,
     struct ozmenuentry *menu, byte options);
 #define OZMENU_NUMBERED 1
 #define OZMENU_NOEXIT   2
@@ -106,9 +109,10 @@ int ozmenu(int x,int y,char *title,unsigned start,unsigned num_entries,
 #endif
 
 
-extern unsigned ozautoofftime;
-extern unsigned ozautoblanktime;
-extern unsigned ozautolightofftime;
+extern unsigned __LIB__ ozautoofftime;
+extern unsigned __LIB__ ozautoblanktime;
+extern unsigned __LIB__ ozautolightofftime;
 
-unsigned ozgetchblank(void);
+extern unsigned __LIB__ ozgetchblank(void);
 
+#endif

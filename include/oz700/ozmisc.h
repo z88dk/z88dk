@@ -1,7 +1,7 @@
 /* 
 	HTC Compatibility Library and OZ extras 
 
-	$Id: ozmisc.h,v 1.1 2003-10-21 17:15:19 stefano Exp $
+	$Id: ozmisc.h,v 1.2 2003-10-22 09:56:34 stefano Exp $
 */
 
 #ifndef _OZMISC_H
@@ -66,7 +66,7 @@ byte __LIB__ ozdetectmodel(void);
 					  /* 770M NOT YET EXISTENT OR DETECTED, BUT IF IT IS */
 					  /* MADE, THAT WILL BE ITS MODEL NUMBER */
 
-char * __LIB__ ozgetnextfilename(byte mode);
+char __LIB__ *ozgetnextfilename(byte mode);
 #define FIND_RESET 1
 #define FIND_OWNED 2
 

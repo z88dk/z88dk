@@ -2,7 +2,7 @@
 	HTC Compatibility Library and OZ extras 
 	1. GRAPHICS AND DISPLAY
 
-	$Id: ozgfx.h,v 1.2 2003-10-21 17:15:19 stefano Exp $
+	$Id: ozgfx.h,v 1.3 2003-10-22 09:56:34 stefano Exp $
 */
 
 #include <graphics.h>
@@ -63,8 +63,19 @@ void ozline(int x,int y,int x2,int y2,byte color)
 }
 
 
-extern __LIB__ _ozhline(byte x,byte y,byte len,byte color);
-extern __LIB__ _ozvline(byte x,byte y,byte len,byte color);
+//extern __LIB__ _ozhline(byte x,byte y,byte len,byte color);
+void _ozhline(byte x,byte y,byte len,byte color)
+{
+	if (color==1) draw (x,y,x,y+len);
+	if (color==0) undraw (x,y,x,y+len);
+}
+//extern __LIB__ _ozvline(byte x,byte y,byte len,byte color);
+void _ozvline(byte x,byte y,byte len,byte color)
+{
+	if (color==1) draw (x,y,x+len,y);
+	if (color==0) undraw (x,y,x+len,y);
+}
+
 extern __LIB__ ozdisplayorbyte(unsigned offset, byte v);
 extern __LIB__ ozdisplayputbyte(unsigned offset, byte v);
 extern __LIB__ ozdisplayandbyte(unsigned offset, byte v);

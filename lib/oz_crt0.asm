@@ -3,15 +3,17 @@
 ;       Stefano Bodrato 13 Aug. 2002
 ;
 ;	Mix of the Dominic's work and the Hi-Tech C modifications
-;	by the OZDEV team (Alexander R. Pruss, etc..)
+;	by the OZDEV team (Alexander R. Pruss, Green, etc..)
 ;
 ;	all the "$" prefixes have been changed to "s_";
 ;	the "$sp$" label is been changed to "s_sp".
 ; 
+;	the "-startup=2" enables the OZ7xx DK compatibility mode
+;	with extra functions and interrupt handling
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.2 2003-10-14 08:36:19 stefano Exp $
+;       $Id: oz_crt0.asm,v 1.3 2003-10-22 09:56:34 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -46,12 +48,7 @@
 	XDEF	heapblocks
 
         XDEF    base_graphics   ;Graphical variables
-        XDEF    ozactivepage    ;current mem page
-	XDEF    ozmodel         ;detected model (call "detect" first)
-	XDEF    ozbacklight     ;display light status
-	XDEF    ozcontrast      ;display contrast
-        XDEF	s_ozlcdstatus
-	
+
         XDEF    coords          ;Current xy position
         XDEF	s_filetypetable
 
@@ -60,12 +57,29 @@
 
 ; --- OZ related stuff---
 
+        XDEF    ozactivepage    ;current mem page
+	XDEF    ozmodel         ;detected model (call "detect" first)
+	XDEF    ozbacklight     ;display light status
+	XDEF    ozcontrast      ;display contrast
+	XDEF	ozbacklight_save
+        XDEF	s_ozlcdstatus
+	XDEF	s_init_unblank	;service entry point to go back from "ozfast" or "ozblankscreen"
+
 	XDEF	ScrCharSet
 	XDEF	KeyBufGetPos
 	XDEF	KeyBufPutPos
         XDEF    EnableKeyboard
-
-	defc	contrast    = 0c026h
+	XDEF	KeyboardBuffer
+; --- settings ---
+	XDEF	ozkeyrepeatspeed
+	XDEF	ozkeyrepeatdelay
+	XDEF	ozclick_setting
+	XDEF	ozautoofftime
+	XDEF	ozautoblanktime
+	XDEF	ozautolightofftime
+	XDEF	ozprogoptions
+; --- -------- ---
+	defc	contrast  = 0c026h
 	defc	lcdstatus = 0c024h
 
 	org	$8000
@@ -76,12 +90,12 @@
 
 start:
         jr     skipname
-__ozfilename:
+ozfilename:
         defm    "BFILNAMEBAS"
         defb    00
-__ozfileowner:
+ozfileowner:
         defw    65535
-__ozspare1start:
+; __ozspare1start:
 skipname:
         in     a,(1)
         push   af
@@ -153,13 +167,18 @@ continue:
 ;        ld      a,2
 ;        out     (16h),a         ;; enable key click
 
-        ;ld      hl,__ozcustomisr
-        ;push    hl
-        ;call    _ozsetisr       ;; install our ISR
-        ;pop     bc
-        ;ld      a,l
-        ;or      h
-        ;jr      nz,__exit
+IF (startup=2)
+	LIB	ozcustomisr
+	LIB	ozsetisr
+	
+        ld      hl,ozcustomisr
+        push    hl
+        call    ozsetisr       ;; install our ISR
+        pop     bc
+        ld      a,l
+        or      h
+        jr      nz,__exit
+ENDIF
 
         ;ld      hl,1
         ;push    hl
@@ -192,7 +211,7 @@ ENDIF
 ;-------- Z88DK specific code (end) -------
 
         call    _main    ;call main program
-__ozspare1end:
+; __ozspare1end:
 
 ;------- Z88DK specific code (begin) -------
 .cleanup
@@ -221,9 +240,8 @@ _exit:
         out     (4),a   ;; page in proper second page
         ;call    __ozcallexitfunctions
 __exit:
-        call    ret_only
-;$init_unblank equ $-2
-;;;;        call    _ozslow
+s_init_unblank:			; ozblankscreen or ozfast might have hidden everything;
+        call    ret_only	; if so, ret_only is changed into "ozunblankscreen" to make it back visible.
 
         di
 ;intset  equ    $+1
@@ -373,6 +391,7 @@ top:
 s_32kintoff:
         di
         im      1
+
 ret_only:
         ret
 
@@ -405,7 +424,7 @@ s_ozlcdstatus:
 KeyBufGetPos:   defb 0
 KeyBufPutPos:   defb 0
 KeyboardBuffer: ;     123456789012345678901234
-                defm "(c)Pruss,Green,&c v0.093"
+                defm "(c)Pruss,Green,&c vZ88DK"
 ;        psect midpage
 ;        psect text
 ;        psect data
@@ -416,6 +435,30 @@ EnableKeyboard: defs 1
 ;HeapTop EQU 0f980h
 
 ;Model32k EQU 1
+
+
+
+; --- settings - leave untouched ---
+
+ozkeyrepeatspeed:
+        defb 5
+ozkeyrepeatdelay:
+        defb 32
+ozclick_setting:
+        defb 1
+ozautoofftime:
+        defw 60*180 ;; 3 hours
+ozautoblanktime:
+        defw 240    ;; 4 minutes
+ozautolightofftime:
+        defw 120    ;; 2 minutes
+ozprogoptions:
+        defb 0
+
+;
+
+;; padding (for future expansion)
+defb 0,0,0,0
 
 
 ;------------------------------------------

@@ -10,7 +10,7 @@
 ;	int ozputs(int x, int y, char *string);
 ;
 ; ------
-; $Id: ozputs.asm,v 1.1 2003-10-21 17:15:20 stefano Exp $
+; $Id: ozputs.asm,v 1.2 2003-10-22 09:56:34 stefano Exp $
 ;
 
 	XLIB	ozputs
@@ -117,13 +117,13 @@ DidInit: ;;;yyll001122
         ld      (charset_mask+1),a
 
         ;ld      a,(iy+5)
-        ld      a,(iy+7)
+        ld      a,(iy+5)
         or      a
         jp      nz,LengthOnly
 
         ld      a,80
         ;ld      c,(iy+4)
-        ld      c,(iy+6)
+        ld      c,(iy+4)
         sub     c            ;; number of rows available
 
         jp      c,LengthOnly
@@ -138,7 +138,7 @@ HeightOK:
 
 
 	;ld	l,(iy+4)
-	ld	l,(iy+6)
+	ld	l,(iy+4)
         ld      h,0
 	add	hl,hl
 	ld	c,l
@@ -154,8 +154,8 @@ HeightOK:
 	pop	ix	 ; ix=screen-offset for y
         ;ld      c,(iy+2)   ; x-position
         ;ld      b,(iy+3)
-        ld      c,(iy+4)   ; x-position
-        ld      b,(iy+5)
+        ld      c,(iy+6)   ; x-position
+        ld      b,(iy+7)
         exx
 DoPrintLoop:
         ld      a,(hl)       ;; get character from string
