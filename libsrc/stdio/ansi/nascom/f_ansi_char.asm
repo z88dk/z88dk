@@ -8,10 +8,10 @@
 ;	Display a char in location (ansi_ROW),(ansi_COLUMN)
 ;	A=char to display
 ;
-;	Stefano Bodrato - May 2003
+;	Stefano Bodrato - Jul 2004
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.1 2003-06-30 15:58:53 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.2 2004-07-27 09:40:19 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -34,15 +34,16 @@
 	and	a
 	jr	z,gotline
 
-	ld	hl,$84a
+;	ld	hl,$84a
+	ld	hl,$80a
 	dec	a
 	jr	z,gotline
 
-	ld	b,a
 	ld	de,64
 .r_loop
 	add	hl,de
-	djnz	r_loop
+	dec	a
+	jr	nz,r_loop
 
 .gotline
 	ld	a,(ansi_COLUMN)

@@ -3,40 +3,45 @@
 ;
 ;	Scrollup
 ;
-;	Stefano Bodrato - May 2003
+;	Stefano Bodrato - Jul 2004
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.1 2003-06-30 15:58:53 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.2 2004-07-27 09:40:19 stefano Exp $
 ;
 
 
 	XLIB	ansi_SCROLLUP
 
-defc	vram	=	0800h
-defc	vl1	=	vram+10
-defc	vl2	=	vl1+64
-defc	vl15	=	vram+038ah
-defc	vend	=	vram+0400h
-
-
 .ansi_SCROLLUP
 	
-	; first line (weird, isn't it?)
+	; first line
 	ld	hl,$80a
 	ld	de,$bca
 	ld	bc,48
 	ldir
 
-	; all the other lines
-	ld	de,vl1
-	ld	hl,vl2
-	ld	bc,vend-vram-64-64-16
+	; remaining lines
+	ld	a,14
+	ld	hl,$80a
+.scrlloop
+	ld	d,h
+	ld	e,l
+	ld	bc,$40
+	add	hl,bc
+
+	ld	bc,48
+	push	hl
 	ldir
+	pop	hl
+
+	dec	a
+	jr	nz,scrlloop
 
 	; clear bottom line
 	ld	b,48
-clloop:	dec	hl
+.clloop
 	ld	(hl),' '
+	inc	hl
 	djnz	clloop
 
 	ret

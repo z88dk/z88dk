@@ -4,10 +4,10 @@
 ; 	CLS - Clear the screen
 ;	
 ;
-;	Stefano Bodrato - May 2003
+;	Stefano Bodrato - Jul 2004
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.1 2003-06-30 15:58:53 stefano Exp $
+;	$Id: f_ansi_cls.asm,v 1.2 2004-07-27 09:40:19 stefano Exp $
 ;
 
 	XLIB	ansi_cls
@@ -18,8 +18,24 @@ defc	vl2	=	vl1+64
 defc	vl15	=	vram+038ah
 defc	vend	=	vram+0400h
 	
-
+;	LIB	montest
+	
 .ansi_cls
+
+;	call	montest
+;	jr	nz,nassys
+;	
+;; T monitor
+;	ld	a,1eh
+;	jp	c4ah
+;
+;.nassys
+;; NASSYS monitor
+;	ld	a,0ch
+;	defb	f7h
+;	ret
+
+
 	ld	hl,vl1
 	push	hl
 	ld	b,48

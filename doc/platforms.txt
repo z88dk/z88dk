@@ -1,6 +1,6 @@
 Z88DK Port Status
 
-$Id: platforms.txt,v 1.13 2004-07-19 15:22:13 stefano Exp $
+$Id: platforms.txt,v 1.14 2004-07-27 09:40:19 stefano Exp $
 
 
 PLATFORM      | Native I/O  | ANSI VT I/O |  GRAPH LIB  |  GRAY LIB   |  FILELIB    |   ZSOCK     |   SOUND     |   Others    |
@@ -15,7 +15,7 @@ Commodore 128 |     No      |    40x25 COL|     No      |     No      |     No  
 CP/M          |     Yes     | If Hardware |     No      |     No      |     Yes     |     No      |     ---     |     ---     |
 Jupiter ACE   |     No      |    32x24 B/W| 96x64 emul. |     No      |     No      |     No      |   1 bit     |     ---     |
 MSX 1         |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
-NASCOM 1/2    |     No      |    48x16 B/W| Unfinished  |     No      |     No      |     No      |     ---     |     ---     |
+NASCOM 1/2    |    48x15    |    48x16 B/W| Unfinished  |     No      |     No      |     No      |     ---     |     ---     |
 REX 6000      |     No      |     No      |     No      |     No      |     No      |     No      |     ---     |     (1)     |
 Sam Coupe     | 32x24-buggy |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
 Sharp MZ      |    40x25    |    40x25 COL|   80x50     |     No      |     No      |     No      |     ---     |     (2)     |
