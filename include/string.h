@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.8 2005-02-22 12:43:34 stefano Exp $
+ *	$Id: string.h,v 1.9 2005-02-25 12:25:47 dom Exp $
  */
 
 
@@ -18,7 +18,7 @@ extern int __LIB__ strlen(char *);
 extern char __LIB__ *strcat(char *, char *);
 extern __LIB__ strcmp(char *, char *);
 extern char __LIB__  *strcpy(char *, char *);
-extern char __LIB__ *strncat(char *, char *);
+extern char __LIB__ *strncat(char *, char *, int);
 extern __LIB__ strncmp(char *, char *, int);
 extern char __LIB__ *strncpy(char *, char *, int);
 extern __LIB__ reverse(char *);
@@ -63,9 +63,9 @@ extern int __LIB__ strlen_far(far char *);
 extern far char __LIB__ *strcat_far(far char *, far char *);
 #define strcpy(s1,s2) strcpy_far(s1,s2)
 extern far char __LIB__ *strcpy_far(far char *, far char *);
-#define strncat(s1,s2) strncat_far(s1,s2)
-extern far char __LIB__ *strncat_far(far char *, far char *);
-#define strncpy(s1,s2) strncpy_far(s1,s2)
+#define strncat(s1,s2) strncat_far(s1,s2,n)
+extern far char __LIB__ *strncat_far(far char *, far char *, int);
+#define strncpy(s1,s2) strncpy_far(s1,s2,n)
 extern far char __LIB__ *strncpy_far(far char *, far char *, int);
 #define strlwr(s) strlwr_far(s)
 extern far char __LIB__ *strlwr_far(far char *);
