@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.19 2002-10-02 09:19:36 dom Exp $
+#	$Id: Makefile,v 1.18 2002-10-02 09:17:54 dom Exp $
 #
 
 prefix = /usr/local
@@ -40,10 +40,6 @@ config:
 
 libs:
 	cd libsrc ; $(MAKE)
-
-install-libs:
-	mkdir -p $(prefix)/lib/clibs
-	cp -R lib/clibs/* $(prefix)/lib/clibs/
 
 
 install:
