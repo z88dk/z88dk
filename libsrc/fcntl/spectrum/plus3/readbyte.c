@@ -7,7 +7,7 @@
  *
  *	Enter with de = filehandle
  *
- *	$Id: readbyte.c,v 1.3 2003-10-10 11:05:02 dom Exp $
+ *	$Id: readbyte.c,v 1.4 2003-10-13 21:49:02 dom Exp $
  */
 
 #include <fcntl.h>
@@ -24,8 +24,9 @@ int __FASTCALL__ readbyte(int handle)
 	call	dodos
 	ld	hl,-1	;EOF
 	ccf
-	ret	c	;error
+	jr	c,end	;error
 	ld	l,c
 	ld	h,0
+.end
 #endasm
 }
