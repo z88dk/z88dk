@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.6 2001-03-12 13:27:38 dom Exp $
+ * $Id: zcc.h,v 1.7 2001-04-24 08:49:42 dom Exp $
  */
 
 
@@ -12,7 +12,7 @@
 char *version = "v2.48 (C) 9.3.2001 D.J.Morris\n";
 
 #ifdef AMIGA
-#define PREFIX "zcc:"
+#define PREFIX "zcc:lib/config/"
 char *amiver="$VER: zcc v2.48 (9.3.2001)";
 #endif
 
@@ -20,6 +20,10 @@ char *amiver="$VER: zcc v2.48 (9.3.2001)";
 
 #ifdef MSDOS
 #define PREFIX "c:\\z88dk\\lib\\config\\"
+#endif
+
+#ifdef _WIN32
+#define PREFIX "c:/z88dk/lib/config/"
 #endif
 
 #ifdef UNIX
