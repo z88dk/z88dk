@@ -4,7 +4,7 @@ all: info
 
 
 info:
-	zcc +zxvgs -v -s info.c -create-app
+	zcc +zx -v -s info.c -create-app -lzxvgs
 
 clean:
 	rm -f *.bin *.i *.asm *.op* *.o *~ zcc_opt.def
