@@ -7,7 +7,7 @@
 ;       Plot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: plotpixl.asm,v 1.1 2002-01-30 10:11:13 stefano Exp $
+;	$Id: plotpixl.asm,v 1.2 2002-02-01 14:37:49 stefano Exp $
 ;
 
 
@@ -45,7 +45,7 @@
 			and	a
 			jr	z,r_zero
 			ld	b,a
-			ld	de,40
+			ld	de,maxx/2
 .r_loop
 			add	hl,de
 			djnz	r_loop
@@ -61,12 +61,13 @@
 			ld	hl,textpixl
 			ld	e,0
 			ld	b,16
-.ckmap				cp	(hl)
+.ckmap			cp	(hl)
 			jr	z,chfound
 			inc	hl
 			inc	e
 			djnz	ckmap
-.chfound			ld	a,e
+			ld	e,0
+.chfound		ld	a,e
 			pop	hl
 
 			ex	(sp),hl		; save char address <=> restore x,y

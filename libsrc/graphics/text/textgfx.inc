@@ -7,13 +7,20 @@
 ;       Define for graphics and other standard library functions
 ;
 ;
-;	$Id: textgfx.inc,v 1.1 2002-01-30 10:11:13 stefano Exp $
+;	$Id: textgfx.inc,v 1.2 2002-02-01 14:37:50 stefano Exp $
 ;
 
 IF FORc128
 	DEFINE gotgfx
 	defc maxx	= 80
 	defc maxy	= 50
+	defc blankch	= 32
+ENDIF
+
+IF FORaquarius
+	DEFINE gotgfx
+	defc maxx	= 80
+	defc maxy	= 48
 	defc blankch	= 32
 ENDIF
 

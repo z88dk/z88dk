@@ -108,9 +108,12 @@ graphics/line
 graphics/liner
 graphics/lscroll
 graphics/plot
-graphics/zx81/plotpixl
-graphics/zx81/respixl
-graphics/zx81/xorpixl
+graphics/aquarius/textpixl
+graphics/text/plotpixl
+graphics/text/respixl
+graphics/text/xorpixl
+graphics/text/clsgraph
+graphics/text/swapgfxbk
 graphics/putsprite2
 graphics/point
 graphics/pointxy
@@ -123,8 +126,6 @@ graphics/undrawr
 graphics/unplot
 graphics/drawbox
 graphics/setxy
-graphics/zx81/swapgfxbk
-graphics/zx81/clsgraph
 games/aquarius/bit_open
 games/aquarius/bit_open_di
 games/aquarius/bit_close

@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.34 2002-01-27 22:34:09 dom Exp $
+# $Id: Makefile,v 1.35 2002-02-01 14:37:49 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -517,6 +517,7 @@ aquarius_clib.lib:
 	cd assert ; make 
 	./gamesdeps.sh
 	cd games ; make
+	./gfxdeps.sh
 	z80asm -d -ns -nm -Mo -DFORaquarius -xaquarius_clib.lib @aquarius.lst
 
 # Mattel Aquarius ANSI library - Stefano
@@ -532,6 +533,7 @@ aquansi_clib.lib:
 	cd assert ; make 
 	./gamesdeps.sh
 	cd games ; make
+	./gfxdeps.sh
 	z80asm -d -ns -nm -Mo -DFORaquarius -xaquansi_clib.lib @aquansi.lst
 
 # Xircom REX 6000 library - Dominic
@@ -621,6 +623,7 @@ c128ansi_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
+	./gfxdeps.sh
 	z80asm -d -ns -nm -Mo -DFORc128 -xc128ansi_clib @c128ansi.lst
 
 clean:

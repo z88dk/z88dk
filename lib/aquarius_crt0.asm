@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: aquarius_crt0.asm,v 1.1 2001-12-24 13:16:20 stefano Exp $
+;       $Id: aquarius_crt0.asm,v 1.2 2002-02-01 14:37:47 stefano Exp $
 ;
 
 
@@ -115,7 +115,7 @@ ENDIF
 ; Now some variables
 ;-----------
 .coords         defw    0       ; Current graphics xy coordinates
-.base_graphics  defw    0       ; Address of the Graphics map
+.base_graphics  defw    $3000   ; Address of the Graphics map
 
 .int_seed       defw    0       ; Seed for integer rand() routines
 
