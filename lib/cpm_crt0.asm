@@ -3,7 +3,7 @@
 ;       Stefano Bodrato - Apr. 2000
 ;                         Apr. 2001: Added MS-DOS protection
 ;
-;       $Id: cpm_crt0.asm,v 1.5 2001-10-07 12:53:26 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.6 2002-01-21 22:32:02 dom Exp $
 ;
 
 	MODULE  cpm_crt0
@@ -53,7 +53,13 @@
 	defb	13,10,'$'
 
 .begin	ld      (start1+1),sp	;Save entry stack
-        ld      hl,-64		;Make space for atexit() stack
+	ld	a,($80)		;byte count of length of args
+	inc	a		;we can use this since args are space separated
+	neg
+	ld	l,a
+	ld	h,-1		;negative number
+        ld      de,-64		;Add on space for atexit() stack
+	add	hl,de
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
@@ -72,8 +78,55 @@ ENDIF
 	ld	c,25		;Set the default disc
 	call	5
 	ld	(defltdsk),a
-	
+
+; Push pointers to argv[n] onto the stack now
+; We must start from the end 
+	ld	hl,0	;NULL pointer at end, just in case
+	push	hl
+	ld	hl,$80
+	ld	a,(hl)
+	ld	b,0
+	and	a
+	jr	z,argv_done
+	ld	c,a
+	add	hl,bc	;now points to the end
+; Try to find the end of the arguments
+.argv_loop_1
+	ld	a,(hl)
+	cp	' '
+	jr	nz,argv_loop_2
+	ld	(hl),0
+	dec	hl
+	dec	c
+	jr	nz,argv_loop_1
+; We've located the end of the last argument, try to find the start
+.argv_loop_2
+	ld	a,(hl)
+	cp	' '
+	jr	nz,argv_loop_3
+	ld	(hl),0
+	inc	hl
+	push	hl
+	inc	b
+	dec	hl
+.argv_loop_3
+	dec	hl
+	dec	c
+	jr	nz,argv_loop_2
+
+.argv_done
+	ld	hl,end	;name of program (NULL)
+	push	hl
+	inc	b
+	ld	hl,0
+	add	hl,sp	;address of argv
+	ld	c,b
+	ld	b,0
+	push	bc	;argc
+	push	hl	;argv
         call    _main		;Call user code
+	pop	bc	;kill argv
+	pop	bc	;kill argc
 
 	ld	a,(defltdsk)	;Restore default disc
 	ld	e,a
@@ -139,7 +192,8 @@ ENDIF
 ;----------------------------
 ; Unneccessary file signature
 ;----------------------------
-         	defm  	"Small C+ CP/M"&0
+         	defm  	"Small C+ CP/M"
+.end		defb	0
 
 ;----------------------------------------------
 ; Floating point support routines and variables
