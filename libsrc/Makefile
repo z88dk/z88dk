@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.61 2003-06-27 14:04:12 stefano Exp $
+# $Id: Makefile,v 1.62 2003-08-22 18:34:08 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -12,7 +12,7 @@ all:	genlibs z88libs tilibs zxlibs \
 	aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
 	cpc_clib.lib cpm_clib.lib c128ansi_clib.lib \
 	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
-	nascom.lib nasansi_clib.lib ozansi_clib.lib\
+	nascom_clib.lib nasansi_clib.lib ozansi_clib.lib\
 	rex_clib.lib svi_clib.lib sam_clib.lib samansi_clib.lib \
 	zx81_clib.lib zx81ansi_clib.lib \
 	pps_clib.lib ppsansi_clib.lib embedded_clib.lib 
