@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.13 2002-12-01 15:47:17 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.14 2002-12-09 19:55:24 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -182,7 +182,7 @@ char amiver[] = "$VER: z80asm v1.0.19, (c) InterLogic 1993-2002";
 #endif
 
 
-char copyrightmsg[] = "Z80 Module Assembler V1.0.19 (20.2.2002), (c) InterLogic 1993-2002";
+char copyrightmsg[] = "Z80 Module Assembler V1.0.19 (1.12.2002), (c) InterLogic 1993-2002";
 
 FILE *z80asmfile, *listfile, *errfile, *objfile, *mapfile, *modsrcfile, *deffile, *libfile;
 long	clineno;
