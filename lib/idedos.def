@@ -1,0 +1,163 @@
+lstoff
+; IDEDOS Definitions - for external applications
+; Defines for calling ResiDOS from BASIC
+;
+; Combined .def file for IDEDOS and ResiDOS 
+;
+; $Id: idedos.def,v 1.1 2003-10-10 11:03:42 dom Exp $
+
+	defc	RST_HOOK=$08
+	defc	HOOK_VERSION=$fc
+	defc	HOOK_PACKAGE=$fb
+
+
+; Package IDs
+
+defgroup
+{
+	PKG_RESIDOS=0,
+	PKG_IDEDOS
+}
+
+
+; ResiDOS Package Calls
+
+	defc	resi_report=$0310
+
+
+; Important package entry/exit points
+
+	defc	PACKAGE_SIZE=$0000
+	defc	PACKAGE_ENTRY=$0008
+	defc	PACKAGE_EXIT=$0014
+	defc	PACKAGE_HANDLECALL=$0020
+	defc	PACKAGE_LEAVE_RESIDOS=$0006
+	defc	PACKAGE_REENTER_RESIDOS=$001d
+
+
+; Partition entry structure
+defvars 0 {	part_name	ds.b	16
+		part_sysinfo	ds.b	16
+		part_info	ds.b	32
+	}
+
+; Partition handle structure
+
+defvars 0 {	ph_type	ds.b	1
+		ph_scyl	ds.w	1
+		ph_shd	ds.b	1
+		ph_ecyl	ds.w	1
+		ph_ehd	ds.b	1
+                ph_secs ds.l    1       ; highest logical sector number
+                ph_rsvd ds.b    5
+		ph_unit	ds.b	1
+		ph_num	ds.w	1
+	}
+
+; Swap handle additional structure
+
+defvars ph_rsvd {
+		sh_size	ds.b	1
+		sh_curb	ds.w	1
+		sh_maxb	ds.w	1
+	}
+
+; System partition info section structure
+
+defvars 0 {
+		sinf_unit	ds.b	8
+		sinf_edcols	ds.b	1
+		sinf_bascols	ds.b	1
+		sinf_physunmap	ds.b	3
+		sinf_physmap	ds.b	3
+		sinf_defdrv	ds.b	1
+		
+		; IDEDOS v1.02 onwards below here
+		sinf_defusr	ds.b	1
+		sinf_bootfile	ds.b	14	; $ff-terminated
+	}
+
+; +3DOS partition info section structure
+
+defvars 0 {
+		p3inf_xdpb	ds.b	28
+		p3inf_map	ds.b	1
+	}
+
+; Partition types
+
+defgroup {	ptype_unused,
+		ptype_system,
+		ptype_swap,
+		ptype_p3dos,
+		ptype_bad=254,
+		ptype_free
+	}
+
+
+; Calls
+
+defvars $0056 { ide_stream_open		ds.p	1
+		ide_stream_close	ds.p	1
+		ide_stream_in		ds.p	1
+		ide_stream_out		ds.p	1
+		ide_stream_ptr		ds.p	1
+	}
+
+defvars $00a0 { ide_version		ds.p	1
+                ide_interface		ds.p	1
+                ide_init		ds.p	1
+                ide_drive		ds.p	1
+                ide_sector_read		ds.p	1
+                ide_sector_write	ds.p	1
+                ide_format		ds.p	1
+                ide_partition_find	ds.p	1
+                ide_partition_new	ds.p	1
+                ide_partition_init	ds.p	1
+                ide_partition_erase	ds.p	1
+                ide_partition_rename	ds.p	1
+                ide_partition_read	ds.p	1
+                ide_partition_write	ds.p	1
+		ide_partition_winfo	ds.p	1
+                ide_partition_open	ds.p	1
+                ide_partition_close	ds.p	1
+		ide_partition_getinfo	ds.p	1
+		ide_partition_setinfo	ds.p	1
+                ide_swap_open		ds.p	1
+                ide_swap_close		ds.p	1
+                ide_swap_out		ds.p	1
+                ide_swap_in		ds.p	1
+                ide_swap_ex		ds.p	1
+                ide_swap_pos		ds.p	1
+                ide_swap_move		ds.p	1
+		ide_swap_resize		ds.p	1
+                ide_dos_map		ds.p	1
+                ide_dos_unmap		ds.p	1
+		ide_dos_mapping		ds.p	1
+		ide_dos_unpermanent	ds.p	1
+		ide_snapload		ds.p	1
+        }
+
+defvars $019f {	ide_access_data		ds.p	1	; Implemented for ResiDOS only - IDEDOS v1.01
+		ide_identify		ds.p	1	; Implemented for ResiDOS only - IDEDOS v1.01
+		ide_partitions		ds.p	1	; Implemented for ResiDOS only - IDEDOS v1.01
+	}
+
+; Error codes
+
+defgroup {      rc_invpartition=56,
+		rc_partexist,
+		rc_notimp,
+		rc_partopen,
+		rc_nohandle,
+		rc_notswap,
+		rc_mapped,
+		rc_noxdpb,
+                rc_noswap,
+		rc_invdevice,
+		rc_cmdphase,
+		rc_dataphase
+        }
+
+
+lston

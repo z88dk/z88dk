@@ -1,0 +1,100 @@
+lstoff
+
+; +3DOS routine addresses
+;
+; $Id: p3dos.def,v 1.1 2003-10-10 11:03:41 dom Exp $
+;
+; Stolen from Residos - thanks Garry!
+
+
+
+	defc	STD_ALERT=$0002
+	defc	STD_CHANGEDISK=$0005
+
+        defc    DOS_INITIALISE=$0100
+        defc    DOS_VERSION=$0103
+        defc    DOS_OPEN=$0106
+        defc    DOS_CLOSE=$0109
+        defc    DOS_ABANDON=$010c
+        defc    DOS_REF_HEAD=$010f
+        defc    DOS_READ=$0112
+        defc    DOS_WRITE=$0115
+        defc    DOS_BYTE_READ=$0118
+        defc    DOS_BYTE_WRITE=$011b
+        defc    DOS_CATALOG=$011e
+        defc    DOS_FREE_SPACE=$0121
+        defc    DOS_DELETE=$0124
+        defc    DOS_RENAME=$0127
+        defc    DOS_BOOT=$012a
+        defc    DOS_SET_DRIVE=$012d
+        defc    DOS_SET_USER=$0130
+        defc    DOS_GET_POSITION=$0133
+        defc    DOS_SET_POSITION=$0136
+        defc    DOS_GET_EOF=$0139
+        defc    DOS_GET_1346=$013c
+        defc    DOS_SET_1346=$013f
+        defc    DOS_FLUSH=$0142
+        defc    DOS_SET_ACCESS=$0145
+        defc    DOS_SET_ATTRIBUTES=$0148
+        defc    DOS_OPEN_DRIVE=$014b
+        defc    DOS_SET_MESSAGE=$014e
+        defc    DOS_REF_XDPB=$0151
+        defc    DOS_MAP_B=$0154
+
+        defc    DD_INTERFACE=$0157
+        defc    DD_INIT=$015a
+        defc    DD_SETUP=$015d
+        defc    DD_SET_RETRY=$0160
+        defc    DD_READ_SECTOR=$0163
+        defc    DD_WRITE_SECTOR=$0166
+        defc    DD_CHECK_SECTOR=$0169
+        defc    DD_FORMAT=$016c
+        defc    DD_READ_ID=$016f
+        defc    DD_TEST_UNSUITABLE=$0172
+        defc    DD_LOGIN=$0175
+        defc    DD_SEL_FORMAT=$0178
+        defc    DD_ASK_1=$017b
+        defc    DD_DRIVE_STATUS=$017e
+        defc    DD_EQUIPMENT=$0181
+        defc    DD_ENCODE=$0184
+        defc    DD_L_XDPB=$0187
+        defc    DD_L_DPB=$018a
+        defc    DD_L_SEEK=$018d
+        defc    DD_L_READ=$0190
+        defc    DD_L_WRITE=$0193
+        defc    DD_L_ON_MOTOR=$0196
+        defc    DD_L_T_OFF_MOTOR=$0199
+        defc    DD_L_OFF_MOTOR=$019c
+
+; +3DOS Error codes
+
+defgroup {	rc_ready,
+		rc_wp,
+		rc_seek,
+		rc_crc,
+		rc_nodata,
+		rc_mark,
+		rc_unrecog,
+		rc_unknown,
+		rc_diskchg,
+		rc_unsuit,
+		rc_badname=20,
+		rc_badparam,
+		rc_nodrive,
+		rc_nofile,
+		rc_exists,
+		rc_eof,
+		rc_diskfull,
+		rc_dirfull,
+		rc_ro,
+		rc_number,
+		rc_denied,
+		rc_norename,
+		rc_extent,
+		rc_uncached,
+		rc_toobig,
+		rc_notboot,
+		rc_inuse
+	}
+
+lston
