@@ -81,8 +81,8 @@
         XDEF  NORM
         XDEF  COMPARE
         XDEF  INT2
-        XDEF  PI
-        XDEF  HALFPI
+        XDEF  _PI
+        XDEF  _HALFPI
 
 
 
@@ -767,10 +767,9 @@
 ;
 ; Useful constants in C, pi and pi/2
 ;
-.PI    DEFW    $A222  ;3.1415926535 = pi
-        DEFW    $0FDA
-        DEFW    $8249
-.HALFPI        
+._PI  
+	DEFB	$22,$A2,$DA,$0F,$49,$82	  ;pi
+._HALFPI        
         DEFB      $22,$A2,$DA,$0F,$49,$81 ; pi/2
 ;
 ;       exchange floating point accumulator with
