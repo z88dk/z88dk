@@ -6,7 +6,7 @@
 all:	genlibs z88libs tilibs zxlibs \
 	nc_clib.lib vz_clib.lib vzansi_clib.lib cpm_clib.lib \
 	mz_clib.lib mzansi_clib.lib zx81_clib.lib zx81ansi_clib.lib \
-	abc80_clib.lib
+	abc80_clib.lib aceansi_clib.lib
 
 genlibs: m.lib malloc.lib z80_crt0.lib
 
@@ -263,6 +263,16 @@ abc80_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -xabc80_clib @abc80.lst
+
+# Jupiter ACE library - stefano
+aceansi_clib.lib:
+	cd strings ; make
+	cd stdlib ; make gen
+	cd stdio ; make generic
+	cd printflike ; make 
+	cd setjmp ; make 
+	cd assert ; make 
+	z80asm -d -ns -nm -Mo -xaceansi_clib.lib @aceansi.lst
 
 
 

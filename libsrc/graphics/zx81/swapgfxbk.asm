@@ -1,13 +1,7 @@
 ;
-;       Z88 Graphics Functions - Small C+ stubs
-;
-;       Written around the Interlogic Standard Library
-;
-;       Stubs Written by D Morris - 15/10/98
+;       ZX81 Graphics Functions - Small C+ stubs
 ;
 ;
-;       Page the graphics bank in/out - used by all gfx functions
-;       Simply does a swap...
 
 
                 XLIB    swapgfxbk
@@ -15,11 +9,16 @@
 		XDEF	swapgfxbk1
 
 
-.iysave		defw	0
+.phlsave	defw	0
 
 .swapgfxbk
-		ld	(iysave),iy
+		exx
+		ld	(phlsave),hl
+		exx
 		ret
 .swapgfxbk1
-		ld	iy,(iysave)
+		ld	iy,16384
+		exx
+		ld	hl,(phlsave)
+		exx
                 ret

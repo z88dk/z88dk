@@ -1,12 +1,14 @@
 /*
  *	Quick 'n' dirty mym to tap converter
  *
- *	Usage: mym2tap [mymfile] [tapfile]
+ *	Usage: bin2tap [binfile] [tapfile]
  *
  *	zack 8/2/2000
+ *	Modified by Stefano	3/12/2000
  *
- *	Actually..can be used for any CODE file
- *	And we append so we can create mega files...
+ *	Creates a new TAP file (overwriting if necessary) just ready to run.
+ *	Use tapemeker for customizing your work.
+ *
  */
 
 #include <stdio.h>
@@ -52,12 +54,48 @@ int main(int argc, char *argv[])
 
 	fseek(fpin,0L,SEEK_SET);
 
-	if ( (fpout=fopen(argv[2],"a+b") ) == NULL ) {
+	if ( (fpout=fopen(argv[2],"wb") ) == NULL ) {
 		printf("Can't open output file\n");
 		exit(1);
 	}
 
-/* Write out the header file */
+/* Write a BASIC loader, first */
+
+	fputc(0x13,fpout);
+	fputc(0,fpout);
+	fputc(0,fpout);
+	fputc(0,fpout);
+
+	fprintf(fpout,"loader    ");
+	fputc(0x1e,fpout);	/* line length */
+	fputc(0,fpout);
+	fputc(0x0a,fpout);	/* 10 */
+	fputc(0,fpout);
+	fputc(0x1e,fpout);	/* line length */
+	fputc(0,fpout);
+	fputc(0x1b,fpout);
+	fputc(0x20,fpout);
+	fputc(0,fpout);
+	fputc(0xff,fpout);
+	fputc(0,fpout);
+	fputc(0x0a,fpout);
+	fputc(0x1a,fpout);
+	fputc(0,fpout);
+	fputc(0xfd,fpout);	/* CLEAR */
+	fputc(0xb0,fpout);	/* VAL */
+	fprintf(fpout,"\"32767\":");	/* guess... */
+	fputc(0xef,fpout);	/* LOAD */
+	fprintf(fpout,"\"\"");
+	fputc(0xaf,fpout);	/* CODE */
+	fputc(':',fpout);
+	fputc(0xf9,fpout);	/* RANDOMIZE */
+	fputc(0xc0,fpout);	/* USR */
+	fputc(0xb0,fpout);	/* VAL */
+	fprintf(fpout,"\"32768\"");	/* guess again... */
+	fputc(0x0d,fpout);
+	fputc(0x69,fpout);
+
+/* Write out the code header file */
 	fputc(19,fpout);	/* Header len */
 	fputc(0,fpout);		/* MSB of len */
 	fputc(0,fpout);		/* Header is 0 */
@@ -73,7 +111,7 @@ int main(int argc, char *argv[])
 	for	(i=0;i<=9;i++)
 		writebyte(name[i],fpout);
 	writeword(len,fpout);
-	writeword(0,fpout);	/* load address */
+	writeword(32768,fpout);	/* load address */
 	writeword(0,fpout);	/* offset */
 	writebyte(parity,fpout);
 /* Now onto the data bit */
