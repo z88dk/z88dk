@@ -1,9 +1,9 @@
 #
 # Makefile for sccz80
 #
-# $Id: Makefile,v 1.7 2003-01-24 21:48:23 dom Exp $
+# $Id: Makefile,v 1.8 2003-01-24 21:48:52 dom Exp $
 #
-CFLAGS=-g
+
 OBJS =	callfunc.o     	\
 	codegen.o	\
 	const.o		\
