@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.5 2001-03-09 18:14:52 dom Exp $
+ *      $Id: zcc.c,v 1.6 2001-04-30 14:31:49 dom Exp $
  */
 
 
@@ -1362,10 +1362,12 @@ int FindConfigFile(char *arg, int gc)
  */
                 strcpy(outfilename,arg+1);
                 gc++;   /* Increment first arg to search from */
-		if	( (fp=fopen(outfilename,"r")) != NULL ) {
-			/* Local config file */
+		if (strstr(arg,".cfg") != NULL ) {
+			if	( (fp=fopen(outfilename,"r")) != NULL ) {
+				/* Local config file */
 				fclose(fp);
 				return(gc);
+			}
 		}
 		cfgfile=getenv("ZCCCFG");
 		if	(cfgfile != NULL ) {
