@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.10 2002-01-26 22:10:19 dom Exp $
+ *      $Id: const.c,v 1.11 2002-01-27 15:47:59 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -131,7 +131,7 @@ int fnumber(long *val)
     while ( numeric(*s) )
 	++s ;
 
-    if ( *s != '.' || *s != 'e' ) {   /* Check that it is floating point */
+    if ( *s != '.' && *s != 'e'  ) {   /* Check that it is floating point */
 	s++;
 	return 0;
     }

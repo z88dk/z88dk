@@ -5,8 +5,9 @@
  *	Some more floating point routines..I can't remember
  *	why these are separated out..
  *
- *	$Id: float.h,v 1.5 2001-10-16 18:30:31 dom Exp $
+ *	$Id: float.h,v 1.6 2002-01-27 15:49:42 dom Exp $
  */
+
 
 
 extern double __LIB__ fmod();
@@ -28,7 +29,6 @@ extern double __LIB__ atof(char *);
 /*
  * Some support routines for floating point printf
  */
-
 extern void __LIB__ ftoa(double, int, char *);
 extern void __LIB__ ftoe(double, int, char *);
 

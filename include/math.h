@@ -1,11 +1,11 @@
 #ifndef __MATH_H__
 #define __MATH_H__
 
-/* $Id: math.h,v 1.4 2001-10-16 18:30:32 dom Exp $ */
+/* $Id: math.h,v 1.5 2002-01-27 15:49:42 dom Exp $ */
 
 
-extern double __LIB__ acos(double);  /* arc cosine (z88 only) */
-extern double __LIB__ asin(double);  /* arc cosine (z88 only) */
+extern double __LIB__ acos(double);  /* arc cosine */
+extern double __LIB__ asin(double);  /* arc cosine */
 
 extern double __LIB__ atan(double);  /* arc tangent */
 extern double __LIB__ atan2(double,double); /* atan2(a,b) = arc tangent of a/b */
