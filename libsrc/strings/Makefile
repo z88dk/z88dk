@@ -1,9 +1,10 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.4 2002-04-22 08:25:27 dom Exp $
+# $Id: Makefile,v 1.5 2002-09-07 08:40:38 dom Exp $
 
 CFILES = \
+	memchr.c \
 	memcmp.c \
 	memcpy.c \
 	memset.c \
