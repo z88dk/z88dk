@@ -8,11 +8,12 @@
 ;       Liberated from ticalc.org, mods to standard z80 by djm 11/4/99
 ;
 ; -----
-; $Id: rand.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
+; $Id: rand.asm,v 1.3 2001-12-04 19:04:44 dom Exp $
 
 
                 XLIB    rand
                 XREF    int_seed
+		LIB	l_neg
 
 
 ;       My contribution to randon number generators     (by Risto Jrvinen)
@@ -57,4 +58,6 @@
    ld   bc,$7415
    add  hl,bc                   ;Add $7415 to HL
    ld   (int_seed),hl
+   bit     7,h			;force to be +ve
+   call    nz,l_neg
    ret
