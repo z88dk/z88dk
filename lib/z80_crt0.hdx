@@ -12,7 +12,7 @@
 ;
 ;	(Used by asxxx)
 ;
-;	$Id: z80_crt0.hdx,v 1.2 2001-10-07 12:53:26 dom Exp $
+;	$Id: z80_crt0.hdx,v 1.2.2.1 2002-04-07 12:31:55 dom Exp $
 
         .globl    base_graphics	; Address of graphics screen
 
@@ -74,6 +74,7 @@
 ;Long functions now
 ;------------------
 
+	.globl	   lpush2	;Push long under the stack
 	.globl     l_int2long_s	;Int->long signed conversion
 	.globl     l_long2int_s	;Long->int signed conversion
 	.globl     l_glong		;Get long
