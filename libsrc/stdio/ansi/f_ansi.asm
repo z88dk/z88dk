@@ -15,7 +15,7 @@
 ;	L - Insert line: to be completed
 ;
 ;
-;	$Id: f_ansi.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi.asm,v 1.3 2001-08-01 08:53:49 dom Exp $
 ;
 
         XLIB	f_ansi
@@ -155,6 +155,18 @@
  pop    hl
  jr     loopn
 .NoBEL
+
+;------------------------
+ cp     8   ; BackSpace
+;------------------------
+ jr     nz,NoBS
+ ld     a,(ansi_COLUMN)
+ cp     0
+ jr     z,NoBS ; don't decrement if already zero
+ dec    a
+ ld     (ansi_COLUMN),a
+ jr     loopn
+.NoBS
 
 
 ; **** Link to ANSI engine ****
