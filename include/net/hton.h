@@ -7,7 +7,7 @@
  *
  *      djm 24/4/99
  *
- *	$Id: hton.h,v 1.3 2001-10-16 18:30:32 dom Exp $
+ *	$Id: hton.h,v 1.4 2003-10-19 21:36:35 dom Exp $
  */
 
 
@@ -16,6 +16,7 @@
 
 /* Get the types */
 
+#include <sys/types.h>
 #include <net/inet.h>
 
 
