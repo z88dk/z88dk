@@ -13,7 +13,7 @@
  *      Allocate memory for num*size and clear it (set to 0)
  *
  *
- *	$Id: calloc.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
+ *	$Id: calloc.c,v 1.3 2002-05-11 20:57:22 dom Exp $
  */
 
 #include <malloc.h>
@@ -22,6 +22,26 @@
 
 void *calloc(int num, int size)
 {
+#if Z80
+#asm
+	LIB	clrmem
+
+	pop	bc
+	pop	hl	;num
+	pop	de	;size
+	push	de
+	push	hl
+	push	bc
+	call	l_mult
+	push	hl	;save total size
+	call	malloc	;leave size on stack hl = memory
+	pop	bc
+	ex	de,hl	;de = memory, bc = size
+	push	de	;save it
+	call	clrmem
+	pop	hl
+#endasm
+#else
         void *ptr;
         int  tsize;
 
@@ -31,6 +51,7 @@ void *calloc(int num, int size)
 		memset(ptr,0,tsize);
         }
         return (ptr);
+#endif
 }
 
 

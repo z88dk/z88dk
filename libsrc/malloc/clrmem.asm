@@ -13,21 +13,14 @@
 ;       Allocate memory for numsize and clear it (set to 0)
 ;
 ;
-; $Id: clrmem.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+; $Id: clrmem.asm,v 1.3 2002-05-11 20:57:22 dom Exp $
 ;
 
 
                 XLIB    clrmem
 
-
+; Entry bc = length de = heap
 .clrmem
-        pop     hl
-        pop     bc      ;length
-        pop     de      ;buffer
-        push    de
-        push    bc
-        push    hl
-
         ld      a,b
         or      c
         ret     z       ;so no duff stuff!

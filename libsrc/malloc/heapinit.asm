@@ -13,7 +13,7 @@
 ;       void initmem(size)
 ;
 ;
-; $Id: heapinit.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+; $Id: heapinit.asm,v 1.3 2002-05-11 20:57:22 dom Exp $
 ;
 
                 XLIB    heapinit 
@@ -26,21 +26,17 @@
 ;       Initialise Memory
 ;
 
-; Exit: hl=free blocks
+; Exit: hl=free memory
 
 .heapinit
-        pop     bc
-        pop     de      ;heapsize
+        pop     de
+        pop     bc      ;heapsize
+        push    bc 
         push    de
-        push    bc
-        push    de      ;put size back on stack
+        push    bc      ;put size back on stack
 
-        ld      hl,_heap
-        push    hl      ;start
-        push    de      ;size
+        ld      de,_heap	;bc already holds size
         call    clrmem
-        pop     bc
-        pop     bc
 
         ld   hl,1
         ld   (HeapBlocks),hl    ; One free block fot starters
