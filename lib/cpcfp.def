@@ -3,7 +3,7 @@ lstoff
 ; CPC Calculator Functions
 ;
 ; August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
-; $Id: cpcfp.def,v 1.1 2003-08-22 21:19:15 dom Exp $
+; $Id: cpcfp.def,v 1.2 2003-08-30 17:28:31 dom Exp $
 ;	
 
 
@@ -138,3 +138,4 @@ ELSE
 		defc	CPCFP_FLO_ATAN	= $BDB5
 		defc	CPCFP_FLO_RND	= $BD7F
 ENDIF
+lston
