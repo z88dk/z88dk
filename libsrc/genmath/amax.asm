@@ -2,9 +2,9 @@
 
         XLIB amax
         
-        XREF    ldbchl
-        XREF    compare
-        XREF    ldfabc
+        LIB	ldbchl
+        LIB	compare
+        LIB	ldfabc
 
 
 

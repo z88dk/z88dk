@@ -3,12 +3,11 @@
 
 
                 XLIB    ceil
+
                 LIB     floor
+                LIB	odd
 
-                XREF    odd
 
-
-;
 ;       return -(floor(-x))
 .CEIL   CALL    ODD
         jp      floor

@@ -5,15 +5,15 @@
  *
  *	Undefined results otherwise
  *
- *	$Id: acos.c,v 1.1 2002-01-20 18:41:41 dom Exp $
+ *	$Id: acos.c,v 1.2 2002-01-21 20:35:21 dom Exp $
  */
 
 #include <float.h>
 #include <math.h>
 
-extern	double halfpi;
+extern double _halfpi;
 
 double acos(double x)
 {
-	return ( halfpi - asin(x) );
+	return ( _halfpi - asin(x) );
 }

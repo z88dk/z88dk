@@ -11,12 +11,12 @@
                 LIB     evenpol
                 LIB     floor
 
-                XREF    pushfa
-                XREF    ldfabc
-                XREF    fsub
-                XREF    sgn
-                XREF    minusfa
-                XREF    fdiv
+                LIB	pushfa
+                LIB	ldfabc
+                LIB	fsub
+                LIB	sgn
+                LIB	minusfa
+                LIB	fdiv
 
 
 

@@ -10,11 +10,11 @@
 
 
                 XLIB    fmod
-                XREF    pushfa
-                XREF    fdiv
-                XREF    floor
-                XREF    fsub
-		XREF	fmul
+                LIB	pushfa
+                LIB	fdiv
+                LIB	floor
+                LIB	fsub
+		LIB	fmul
 
 
 ;

@@ -7,17 +7,17 @@
 
                 XLIB    fprand
                 
+                LIB	fmul
+                lIB	fadd
+                LIB	ldbcfa
+                LIB	norm
+                
+
                 XREF    fp_seed
                 XREF    dload
-                XREF    fmul
-                XREF    fadd
-                XREF    ldbcfa
                 XREF    fa
                 XREF    fasign
                 XREF    dstore
-                XREF    norm
-                
-
 
 
 .fpRAND

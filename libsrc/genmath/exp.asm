@@ -1,16 +1,20 @@
 ;       Small C+ Math Library
 ;       exp(x)
 
+; FIXME: norm4
+
 
                 XLIB    exp
+
+		LIB	sgn
                 LIB     floor
                 LIB     poly
 
-                XREF    fmul
-                XREF    pushfa
-                XREF    div17
+                LIB	fmul
+                LIB	pushfa
+		LIB	norm4
                 XREF    fa
-                XREF    fsub
+                LIB	fsub
 
 ;
 
@@ -45,6 +49,13 @@
         LD      (HL),A
         RET     NC
         JP      DIV17   
+
+.div17	call	sgn
+	cpl
+	or	a
+	pop	hl
+	jp	p,norm4
+	ret		;jp oflow
 
 ;
 

@@ -3,8 +3,8 @@
 
                 XLIB    hlsub
 
-                XREF    ldbchl
-                XREF    fsub
+                LIB	ldbchl
+                LIB	fsub
 
 
 ;

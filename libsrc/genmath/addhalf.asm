@@ -3,17 +3,12 @@
 
                 XLIB    addhalf
 
-                XREF    ldbchl
-                XREF    fadd
+		LIB	hladd
 
 
-;
-.ADDHALF LD     HL,HALF
-;.HLADD  
-        CALL    LDBCHL
-        JP      FADD
-
+.addhalf
+	ld	hl,half
+	jp	hladd
 
 
 .HALF   DEFB    0,0,0,0,0,$80   ;0.5
-;

@@ -3,12 +3,12 @@
 
                 XLIB    poly
 
-                XREF    pushfa
-                XREF    dload
-                XREF    ldbchl
-                XREF    fadd
-                XREF    fmul
+                LIB	pushfa
+                LIB	ldbchl
+                LIB	fadd
+                LIB	fmul
 
+                XREF    dload
 
 ;
 .POLY   CALL    PUSHFA  

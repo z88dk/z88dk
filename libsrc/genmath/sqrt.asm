@@ -14,15 +14,16 @@
 
         XREF    dload
         XREF    dpush
-        XREF    dleq
-        XREF    dlt
         XREF    dstore
         XREF    dldpsh
+
         LIB     l_pint
         LIB     l_gint
         LIB     l_sxt
-        XREF    ddiv
-        XREF    dadd
+        LIB	ddiv
+        LIB	dadd
+        LIB	dleq
+        LIB	dlt
 
 
 .sqrt

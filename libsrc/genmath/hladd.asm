@@ -3,8 +3,8 @@
 
                 XLIB    hladd
 
-                XREF    ldbchl
-                XREF    fadd
+                LIB	ldbchl
+                LIB	fadd
 
 
 ;

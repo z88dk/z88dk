@@ -5,9 +5,11 @@
                 XLIB    floor
 
 
-                XREF    int2
+                LIB	int2
+		LIB	norma
+
+
                 XREF    fa
-                XREF    norma
 
 
 ;

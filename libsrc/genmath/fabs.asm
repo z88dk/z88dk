@@ -7,7 +7,7 @@
                 LIB     minusfa
 
 
-                XREF    sgn
+                LIB	sgn
                 XREF    fa
 
 

@@ -11,16 +11,6 @@
  * have to do a nasty kludge around them
  */
 
-extern double __FASTCALL__ float(int);
-extern int __FASTCALL__ ifix(double);
-
-#asm
-._float
-        jp      float
-._ifix
-        jp      ifix
-#endasm
-
 
 
 
@@ -54,9 +44,9 @@ char *str;      /* output string */
         while ( i-- ) {
                 /* output digits before decimal */
                 scale = floor(0.5 + scale * 0.1 ) ;
-                d = ifix( x / scale ) ;
+                d = ( x / scale ) ;
                 *str++ = d + '0' ;
-                x -= float(d) * scale ;
+                x -= (double)d * scale ;
         }
         if ( f <= 0 ) {
                 *str = 0;
@@ -66,9 +56,9 @@ char *str;      /* output string */
         while ( f-- ) {
                 /* output digits after decimal */
                 x *= 10.0 ;
-                d = ifix(x) ;
+                d = x;
                 *str++ = d + '0' ;
-                x -= float(d) ;
+                x -= d ;
         }
         *str = 0;
 }

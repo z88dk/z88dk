@@ -7,11 +7,11 @@
 
                 LIB     sin
                 LIB     cos
+                LIB	ldfabc
 
-                XREF    pushfa
+                LIB	pushfa
                 XREF    pushf2
-                XREF    ldfabc
-                XREF    div1
+                LIB	div1
 
 
 

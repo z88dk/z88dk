@@ -4,8 +4,7 @@
                 XLIB    log10
 
                 LIB     log
-        
-                XREF    fmul
+                LIB	fmul
 
 
 

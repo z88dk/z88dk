@@ -1,9 +1,0 @@
-Construct the Generic Maths library via:
-
-% make
-
-A file ../m.lib will be produced, copy this to the clibs directory
-
-To clean up do (predictably enuff!)
-
-% make clean

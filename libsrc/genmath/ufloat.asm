@@ -16,3 +16,5 @@
 .ufloat
         xor     a               ;signify no sign
         jp      float1
+	defw	float
+	

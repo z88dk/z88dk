@@ -11,17 +11,6 @@
  * have to do a nasty kludge around them
  */
 
-extern double __FASTCALL__ float(int);
-extern int __FASTCALL__ ifix(double);
-
-#asm
-._float
-        jp      float
-._ifix
-        jp      ifix
-#endasm
-
-
 
 
 void ftoe(x,prec,str)
@@ -74,9 +63,9 @@ char *str ;             /* output string */
         while ( i <= prec ) {
                 scale = floor( 0.5 + scale * 0.1 ) ;
                 /* now, scale <= x < 10*scale */
-                d = ifix( x / scale ) ;
+                d = ( x / scale ) ;
                 *str++ = d + '0' ;
-                x -= float(d) * scale ;
+                x -= (d * scale) ;
                 if ( i++ ) continue ;
                 *str++ = '.' ;
         }

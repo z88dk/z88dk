@@ -5,10 +5,11 @@
 
                 XLIB     float
 
+		LIB	norm
+
                 XDEF    float1
                 XREF    fasign
                 XREF    fa
-                XREF    norm    ;in lib/float.asm
 
 ;
 ;       convert the integer in hl to

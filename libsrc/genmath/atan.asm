@@ -4,25 +4,34 @@
 ;
 
                 XLIB    atan
+
                 LIB     evenpol
 		LIB	hlsub
                 LIB	odd
 
+                LIB	sgn
+                LIB	fdiv
 
-                XREF    sgn
-                XREF    fdiv
-                XREF    _halfpi
+		XREF	dload
 		XREF	fa
 
-                XDEF    atncoef
+		XDEF	__halfpi
+		XDEF	__pi
+
+.__PI  
+        DEFB    $22,$A2,$DA,$0F,$49,$82   ;pi
+.__HALFPI        
+        DEFB      $22,$A2,$DA,$0F,$49,$81 ; pi/2
+
+
 
 
 ;double atan(double val)
 
-;Looks odd, but don't worry..value is already in FA - no need for stack
 
 
-.ATAN   CALL    SGN     
+.atan
+	CALL    SGN     
         CALL    M,ODD           ;negate argument & answer
         LD      A,(FA+5)
         CP      $81
@@ -32,16 +41,16 @@
         LD      D,C
         LD      E,C
         CALL    FDIV    
-        LD      HL,HLSUB
-        PUSH    HL      ;will subtract answer from pi/2
+	ld	hl,hlsub
+	push	hl
 .ATAN5  LD      HL,ATNCOEF
         CALL    EVENPOL
-        LD      HL,_HALFPI      ;may use for subtraction
-        RET     
+        LD      HL,__HALFPI      ;may use for subtraction
+	ret
+
 ;
 .ATNCOEF 
         defb     13               ;hmmm? $13?
-
         defb      $14, $7,$BA,$FE,$62,$75
         defb      $51,$16,$CE,$D8,$D6,$78
         defb      $4C,$BD,$7D,$D1,$3E,$7A

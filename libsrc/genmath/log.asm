@@ -3,21 +3,19 @@
 
 
                 XLIB    log
+
 		LIB 	hlsub
+		LIB	evenpol
+                LIB	sgn
+                LIB	fdiv
+                LIB	fmul
+                LIB	fadd
+                LIB	norma
+                LIB	pushfa
 
-                LIB     evenpol
 
-
-                XREF    sgn
-                XREF    fdiv
-                XREF    fmul
-                XREF    fadd
                 XREF    fa
                 XREF    fasign
-                XREF    norma
-                XREF    pushfa
-
-
 
 ;
 ;       transcendental functions: log

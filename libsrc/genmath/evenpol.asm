@@ -4,9 +4,9 @@
                 XLIB    evenpol
                 LIB     poly
 
-                XREF    pushfa
-                XREF    ldbcfa
-                XREF    fmul
+                LIB	pushfa
+                LIB	ldbcfa
+                LIB	fmul
 
 ;
 ;       transcendental floating point routines: polynomial evaluation
