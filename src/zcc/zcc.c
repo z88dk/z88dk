@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.21 2003-08-30 17:53:36 dom Exp $
+ *      $Id: zcc.c,v 1.22 2003-08-30 19:11:32 dom Exp $
  */
 
 
@@ -173,8 +173,8 @@ void BuildOptions_start(char **, char *);
 void CopyOutFiles(char *);
 void ParseOpts(char *);
 void SetNormal(char *,int);
-void SetNumber(char *,int);
 void SetOptions(char *,int);
+void SetNumber(char *,int);
 void SetConfig(char *, int);
 void KillEOL(char *);
 
@@ -1152,21 +1152,48 @@ void SetNumber(char *arg,int num)
 void SetNormal(char *arg,int num)
 {
         char name[LINEMAX+1];
+	char *ptr,*ptr2;
         sscanf(arg,"%s%s",name,name);
+
+	ptr = &arg[strlen(myconf[num].name)+1];
+	while (*ptr && isspace(*ptr))
+		++ptr;
+
+	if ( ptr2 = strchr(ptr,'\n') )
+		*ptr2 = 0;
+	if ( ptr2 = strchr(ptr,'\r') )
+		*ptr2 = 0;
+
+
         if (strncmp(name,myconf[num].name,strlen(myconf[num].name)) != 0 ) {
-                SetConfig(name,num);
-        }
+                SetConfig(ptr,num);
+        } 
 }
 
-void SetOptions(char *arg, int num)
+void SetOptions(char *arg,int num)
 {
         char name[LINEMAX+1];
+	char *ptr,*ptr2;
         sscanf(arg,"%s%s",name,name);
+
+	ptr = &arg[strlen(myconf[num].name)+1];
+	while (*ptr && isspace(*ptr))
+		++ptr;
+
+	if ( ptr2 = strchr(ptr,'\n') )
+		*ptr2 = 0;
+	if ( ptr2 = strchr(ptr,'\r') )
+		*ptr2 = 0;
+
+
         if (strncmp(name,myconf[num].name,strlen(myconf[num].name)) != 0 ) {
-                SetConfig(&arg[strlen(myconf[num].name)+1],num);
-        } else
-                myconf[num].def="";
+                SetConfig(ptr,num);
+        } else {
+		myconf[num].def = "";
+	}
 }
+
+
 
 /*
  * If there's a \n in the option line then kill it
@@ -1520,7 +1547,7 @@ void parse_option(char *option)
 {
     char   *ptr;
 
-    ptr = strtok(option," \r\n");
+    ptr = strtok(option," \t\r\n");
 
     while ( ptr != NULL ) {
 	if ( ptr[0] == '-' ) {
