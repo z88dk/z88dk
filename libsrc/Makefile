@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.40 2002-04-25 11:24:13 stefano Exp $
+# $Id: Makefile,v 1.41 2002-05-22 15:42:49 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -156,8 +156,8 @@ zx_clib.lib:
 	cd time ; make lzx
 	cd rs232 ; make lzx
 	./gamesdeps.sh
-	cd games ; make
 	cd spectrum ; make
+	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORzx -xzx_clib @zx.lst
 
 # vt100 C lib for spectrum
@@ -178,7 +178,9 @@ zxan_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	cd time ; make lzx
+	cd rs232 ; make lzx
 	./gamesdeps.sh
+	cd spectrum ; make
 	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORzx -DROMFONT -xzxan_clib @zxansi.lst
 
