@@ -1,14 +1,14 @@
 /*
- *	Graphics Routines
+ *      Graphics Routines
  *
- *	Since no one actually used these routines I've taken it upon
- *	myself to rewrite the entry conditions so that they are actually
- *	useful and easy to use (hurrah!)
+ *      Since no one actually used these routines I've taken it upon
+ *      myself to rewrite the entry conditions so that they are actually
+ *      useful and easy to use (hurrah!)
  *
- *	djm 12/4/2000
+ *      djm 12/4/2000
  *
- *	Stefano has converted many of these routines to the new ports
- *	Some will work, some will not. djm 6/6/2000
+ *      Stefano has converted many of these routines to the new ports
+ *      Some will work, some will not. djm 6/6/2000
  *
  */
 
@@ -31,6 +31,8 @@ struct window {
         char    graph;
 } ;
 
+/* Fills an area */
+extern __LIB__ fill(int x, int y);
 /* Plot a pixel to screen */
 extern __LIB__ plot(int x, int y);
 /* Unplot a pixel */
@@ -72,4 +74,5 @@ extern __LIB__ closegfx(struct window *);
 
 
 #endif
+
 
