@@ -6,7 +6,7 @@
 all:	genlibs z88libs tilibs zxlibs \
 	nc_clib.lib vz_clib.lib vzansi_clib.lib cpm_clib.lib \
 	mz_clib.lib mzansi_clib.lib zx81_clib.lib zx81ansi_clib.lib \
-	abc80_clib.lib aceansi_clib.lib
+	abc80_clib.lib aceansi_clib.lib rex_clib.lib
 
 genlibs: m.lib malloc.lib z80_crt0.lib
 
@@ -274,6 +274,13 @@ aceansi_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORjupiter -xaceansi_clib.lib @aceansi.lst
 
+# Xircom REX 6000 library - dom
+rex_clib.lib:
+	cd strings; make
+	cd stdlib ; make
+	cd setjmp ; make
+	cd rex    ; make
+	z80asm -d -ns -nm -Mo -DFORrex -xrex_clib.lib @rex6000.lst
 
 
 clean:
