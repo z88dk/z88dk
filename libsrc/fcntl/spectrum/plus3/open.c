@@ -14,7 +14,7 @@
  *	Open a file for writing - e=4, d=2 (creat)
  *	Open a file for append  - e=2, d=2
  *
- *	$Id: open.c,v 1.2 2002-06-17 17:21:50 dom Exp $
+ *	$Id: open.c,v 1.3 2003-01-28 15:45:08 dom Exp $
  */
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */
@@ -52,20 +52,42 @@ int open(far char *name, int flags, mode_t mode)
 	call	findhand
 	pop	de
 	jr	c,open_abort
-	push	hl
+	push	hl		;save handle number
 	ld	b,l		;b=file number
 	ld	c,3		;exclusive read/write - who cares?
-	ld	l,(ix+6)	;filename
-	ld	h,(ix+7)
+; Offset the stack so we have somewhere to store our nobbled name
+; - we need to replace the '\0' with a 255
+	ld	hl,-20
+	add	hl,sp		;hl now points to filename
+	ld	sp,hl
+	push	de		;save open mode
+	push	bc		;save file etc
+	push	hl		;save filename
+	ld	e,(ix+6)	;filename
+	ld	d,(ix+7)
+	ld	b,15
+.copyloop
+	ld	a,(de)
+	and	a
+	jr	z,endcopy
+	ld	(hl),a
+	inc	hl
+	inc	de
+	djnz	copyloop
+.endcopy
+	ld	(hl),255
+	pop	hl
+	pop	bc
+	pop	de
 	ld	iy,262		;DOS_OPEN
 	call	dodos
-	pop	hl
+	ex	af,af		;save flags
+	ld	hl,20		;repair the stack after our storage
+	add	hl,sp
+	ld	sp,hl
+	ex	af,af
+	pop	hl		;file number back
 	jr	nc,open_abort	;error
 #endasm
 }
-
-
-
-
-
 

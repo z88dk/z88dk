@@ -3,7 +3,7 @@
  *
  *	18/3/2000 djm
  *
- *	$Id: read.c,v 1.1 2001-05-01 13:55:21 dom Exp $
+ *	$Id: read.c,v 1.2 2003-01-28 15:45:09 dom Exp $
  */
 
 #include <fcntl.h>
@@ -30,7 +30,7 @@ size_t read(int handle, void *buf, size_t len)
 	ld	iy,274		;DOS_READ
 	call	dodos
 	pop	hl		;bytes we wanted to write
-	ret	c		;it went okay
+	ret	nc		;it went okay
 	sbc	hl,de		;gives number written
 #endasm
 }

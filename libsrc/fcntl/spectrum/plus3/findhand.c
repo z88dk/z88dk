@@ -6,14 +6,14 @@
  *
  *	djm 17/3/2000
  *
- *	$Id: findhand.c,v 1.1 2001-05-01 13:55:21 dom Exp $
+ *	$Id: findhand.c,v 1.2 2003-01-28 15:45:08 dom Exp $
  */
 
 #include <spectrum.h>
 
 /* One bit per file */
 
-int hand_status;
+int hand_status = 3;
 
 int findhand()
 {
