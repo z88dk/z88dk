@@ -1,18 +1,24 @@
-$Id: README,v 1.3 2003-09-30 10:23:12 stefano Exp $
+$Id: README,v 1.4 2003-09-30 10:27:52 stefano Exp $
+
+The default startup behaviour has now changed.
+The BASIC loader block is embedded in the CRT0 stub, so that the resulting binary
+file is ready for use (name it with the "vz" extension).
+The graph/text mode is automatically switched by calling "clg" or printing CHR$ 12.
+
+If you prefer the old behaviuour (separate BASIC loader + external tools), then 
+go on reading.  This can still be useful for some particular situation, such as 
+mixing BASIC and machine code.
 
 
-The new default for startup creates automatically a valid "vz" file
-with BASIC loader included; use the old way for graphics applications.
-
-
---- --- ---
+THIS IS THE OLD PROCEDURE  (use the "-startup=2" parameter)
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 How pass the code to the VZ emulator.
 
 - Get the VZ emulator from:
   http://www.powerup.com.au/~intertek/VZ200/vz.htm
 - Get the utilities, also
 - Set the environment variables correctly
-- Compile your code (to a.bin)  NOTE THAT THE "-startup=2" PARAMETER IS REQUIRED
+- Compile your code (to a.bin)  NOTE: the "-startup=2" parameter is now required
 - Use the rbinary utility (Rbinary.exe a.bin a.vz)
 - Run the emulator
 - Type: POKE 30862,0:POKE 30863,128
