@@ -39,6 +39,9 @@ endif
 z80asm : $(OBJS)
 	$(CC) $(LDFLAGS) -o ../../bin/z80asm $(CFLAGS) $(OBJS)
 
+install:
+	install  ../../bin/z80asm $(PREFIX)/bin/
+
 
 clean :
 	rm -f *.o *~ core $(EXECS) 

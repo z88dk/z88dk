@@ -4,7 +4,7 @@
 # Hacked together out of one I found elsewhere (I hate writing
 # makefiles - they never work for me!)
 #
-# These needs gnu make!!!
+# This needs gnu make!!!
 #
 
 CC=gcc
@@ -51,6 +51,8 @@ endif
 scc : $(OBJS)
 	$(CC) $(LDFLAGS) -o ../../bin/sccz80 $(CFLAGS) $(OBJS)
 
+install:
+	install -m 755 ../../bin/sccz80 $(PREFIX)/bin/sccz80
 
 clean :
 	rm -f *.o *~ core $(EXECS) *.map

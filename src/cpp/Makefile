@@ -22,5 +22,8 @@ cpp5.o:cpp5.c cpp.h cppdef.h
 cpp6.o:cpp6.c cpp.h cppdef.h
 	$(CC) $(CCOPT) -c -o cpp6.o cpp6.c
 
+install:
+	install ../../bin/zcpp $(PREFIX)/bin
+
 clean:
 	rm -f *.o core *~

@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.11 2002-01-28 11:35:06 dom Exp $
+ * $Id: zcc.h,v 1.12 2002-07-15 17:45:46 dom Exp $
  */
 
 
@@ -27,7 +27,7 @@ char *amiver="$VER: zcc v2.492 (28.1.2002)";
 #endif
 
 #ifdef UNIX
-#define PREFIX "/usr/local/z88dk/lib/config/"
+#include "../config.h"
 #endif
 
 #ifdef hpux

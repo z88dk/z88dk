@@ -2,10 +2,10 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.16 2002-07-15 16:30:57 dom Exp $
+#	$Id: Makefile,v 1.17 2002-07-15 17:45:45 dom Exp $
 #
 
-prefix = /usr/local/lib
+prefix = /usr/local
 
 # The default machine, the lib/config/DEFAULT.cfg file is copied to zcc.cfg
 DEFAULT = z88
@@ -36,46 +36,29 @@ zcc:
 	cd src/zcc ; $(MAKE) 
 
 config:
-	rm -f lib/config/*.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/abc80.lnx > lib/config/abc80.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/aceansi.lnx > lib/config/aceansi.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/aquarius.lnx > lib/config/aquarius.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/aquansi.lnx > lib/config/aquansi.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/c128ansi.lnx > lib/config/c128ansi.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/cpm.lnx > lib/config/cpm.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/cpc.lnx > lib/config/cpc.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/m5.lnx > lib/config/m5.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/msx.lnx > lib/config/msx.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/mz.lnx > lib/config/mz.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/mzansi.lnx > lib/config/mzansi.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/nc.lnx > lib/config/nc.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/rex.lnx > lib/config/rex.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/rexlib.lnx > lib/config/rexlib.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/sam.lnx > lib/config/sam.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/svi.lnx > lib/config/svi.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/ti82.lnx > lib/config/ti82.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/ti82ansi.lnx > lib/config/ti82ansi.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/ti83.lnx > lib/config/ti83.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/ti83ansi.lnx > lib/config/ti83ansi.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/ti8x.lnx > lib/config/ti8x.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/ti8xansi.lnx > lib/config/ti8xansi.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/ti85.lnx > lib/config/ti85.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/ti85ansi.lnx > lib/config/ti85ansi.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/ti86.lnx > lib/config/ti86.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/ti86ansi.lnx > lib/config/ti86ansi.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/vz.lnx > lib/config/vz.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/vzansi.lnx > lib/config/vzansi.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/z88.lnx > lib/config/z88.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/z88ansi.lnx > lib/config/z88ansi.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/z88net.lnx > lib/config/z88net.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/zx81.lnx > lib/config/zx81.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/zx81ansi.lnx > lib/config/zx81ansi.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/zx.lnx > lib/config/zx.cfg
-	sed "s?DESTDIR?`pwd`?g" < lib/config/zxansi.lnx > lib/config/zxansi.cfg
-	cp lib/config/$(DEFAULT).cfg lib/config/zcc.cfg
+	./config.sh `pwd` $(DEFAULT)
 
 libs:
 	cd libsrc ; $(MAKE)
+
+
+install:
+	cd src/appmake ; make PREFIX=$(prefix) install
+	cd src/copt ; make PREFIX=$(prefix) install
+	cd src/cpp ; make PREFIX=$(prefix) install
+	cd src/sccz80 ; make PREFIX=$(prefix) install
+	cd src/z80asm ; make PREFIX=$(prefix) install
+	cd src/zcc ; make PREFIX=$(prefix) install
+	mkdir -p $(prefix)/lib/z88dk
+	cp -R include $(prefix)/lib/z88dk
+	cp -R lib $(prefix)/lib/z88dk
+	find $(prefix)/lib/z88dk/include -name '*.h' | xargs chmod 644
+	find $(prefix)/lib/z88dk/include -type d | xargs chmod 755
+	find $(prefix)/lib/z88dk/lib  | xargs chmod 644
+	find $(prefix)/lib/z88dk/lib -type d | xargs chmod 755
+	./config.sh $(prefix)/lib/z88dk $(DEFAULT)
+
+
 
 clean:
 	cd libsrc ; $(MAKE) clean
