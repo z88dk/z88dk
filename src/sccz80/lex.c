@@ -3,15 +3,14 @@
  *
  *      Lexical routines - string matching etc
  *
- *      $Id: lex.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: lex.c,v 1.2 2004-03-26 22:06:09 denniz Exp $
  */
 
 #include "ccdefs.h"
 
 extern char line[];
 
-int streq(str1,str2)
-char str1[],str2[];
+int streq(char str1[], char str2[])
 {
         int k;
         k=0;
@@ -29,8 +28,7 @@ char str1[],str2[];
  * strings, the other one has reached a non-alphanumeric character
  * (so that, for example, astreq("if", "ifline") is not a match)
  */
-int astreq(str1, str2)
-char *str1, *str2 ;
+int astreq(char *str1, char *str2)
 {
         int k;
 
@@ -45,8 +43,7 @@ char *str1, *str2 ;
         return k;
 }
 
-int match(lit)
-char *lit;
+int match(char *lit)
 {
         int k;
 
@@ -103,8 +100,7 @@ int CheckTypDef(void)
  */
 
 
-int rmatch(lit)
-char *lit;
+int rmatch(char *lit)
 {
         int k;
         blanks();
@@ -127,8 +123,7 @@ int rcmatch(char lit)
 }
 
 
-int amatch(lit)
-char *lit;
+int amatch(char *lit)
 {
         int k;
 
@@ -145,8 +140,7 @@ char *lit;
  */
 
 
-int swallow(lit)
-char *lit;
+int swallow(char *lit)
 {
         return (amatch(lit));
 }

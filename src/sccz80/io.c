@@ -3,7 +3,7 @@
  *
  *      Various compiler file i/o routines
  *
- *      $Id: io.c,v 1.4 2002-10-08 20:40:01 dom Exp $
+ *      $Id: io.c,v 1.5 2004-03-26 22:06:09 denniz Exp $
  */
 
 #include "ccdefs.h"
@@ -15,9 +15,7 @@ int opt_outc(char c);
 /*
  * get integer of length len bytes from address addr
  */
-int getint(addr, len)
-unsigned char *addr ;
-int len ;
+int getint(unsigned char *addr, int len)
 {
         int i ;
 
@@ -30,9 +28,7 @@ int len ;
  * put integer of length len bytes into address addr
  * (low byte first)
  */
-void putint(i, addr, len)
-unsigned char *addr ;
-int i, len ;
+void putint(int i, unsigned char *addr, int len)
 {
         while (len--) {
                 *addr++ = i ;
@@ -44,8 +40,7 @@ int i, len ;
  * Test if next input string is legal symbol name
  * if it is, truncate it and copy it to sname
  */
-int symname(sname)
-char *sname;
+int symname(char *sname)
 {
         int k ;
 
@@ -83,8 +78,7 @@ int getlabel()
 
 /* Print a queue label/reference */
 
-void queuelabel(label)
-int label;
+void queuelabel(int label)
 {
        	outstr("i_");
        	outdec(label);
@@ -93,8 +87,7 @@ int label;
 
 
 /* Print specified number as label */
-void printlabel(label)
-int label;
+void printlabel(int label)
 {
 	if (asxx) {
 		outdec(label);
@@ -106,8 +99,7 @@ int label;
 }
 
 /* print label with colon and newline */
-void postlabel(label)
-int label;
+void postlabel(int label)
 {
         prefix();
         printlabel(label) ;
@@ -139,8 +131,7 @@ int an(char c)
 }
 
 /* Print a carriage return and a string only to console */
-void pl(str)
-char *str;
+void pl(char *str)
 {
 		putchar('\n');
 		while(*str)putchar(*str++);
@@ -202,8 +193,7 @@ int outbuffer(char c)
 
 /* initialise staging buffer */
 
-void setstage( before, start )
-char **before, **start ;
+void setstage(char **before, char **start)
 {
 		if ( (*before=stagenext) == 0 )
 				stagenext = stage ;
@@ -212,8 +202,7 @@ char **before, **start ;
 
 /* flush or clear staging buffer */
 
-void clearstage( before, start )
-char *before, *start ;
+void clearstage(char *before, char *start)
 {
 		*stagenext = 0 ;
 		if ( (stagenext=before) ) return ;
@@ -293,8 +282,7 @@ int outstage(char c)
 		return c ;
 }
 
-void outstr(ptr)
-char ptr[];
+void outstr(char ptr[])
 {
 		while(outbyte(*ptr++));
 }
@@ -322,15 +310,13 @@ void bell()
 
 
 
-void ol(ptr)
-char *ptr ;
+void ol(char *ptr)
 {
         ot(ptr);
         nl();
 }
 
-void ot(ptr)
-char *ptr ;
+void ot(char *ptr)
 {
         tab();
         outstr(ptr);
@@ -350,8 +336,7 @@ void blanks()
 }
 
 
-void outdec(number)
-long number;
+void outdec(long number)
 {
         if ( number < 0 ) {
 		number=-number;

@@ -3,7 +3,7 @@
  *
  *      The rather simple preprocessor is here
  *
- *      $Id: preproc.c,v 1.2 2002-02-05 21:02:03 dom Exp $
+ *      $Id: preproc.c,v 1.3 2004-03-26 22:06:09 denniz Exp $
  */
 
 #include "ccdefs.h"
@@ -350,8 +350,7 @@ char putmac(char c)
         return (c) ;
 }
 
-int findmac(sname)
-char *sname;
+int findmac(char *sname)
 {
         if( findglb(sname) != 0 && glbptr->ident == MACRO ) {
                 return (glbptr->offset.i) ;

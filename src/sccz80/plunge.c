@@ -3,7 +3,7 @@
  *
  *      Plunging routines
  *
- *      $Id: plunge.c,v 1.7 2002-05-29 22:54:09 dom Exp $
+ *      $Id: plunge.c,v 1.8 2004-03-26 22:06:09 denniz Exp $
  *
  *      Altogether now...arse! My cunning scheme to use c as an
  *      indicator flops badly due to logical conditions, I just
@@ -18,12 +18,7 @@
 /*
  * skim over text adjoining || and && operators
  */
-int skim(opstr, testfuncz, testfuncq, dropval, endval, heir, lval)
-char *opstr;
-void (*testfuncz)();
-void (*testfuncq)();
-int dropval, endval, (*heir)() ;
-LVALUE *lval ;
+int skim(char *opstr, void (*testfuncz)(), void (*testfuncq)(), int dropval, int endval, int (*heir)(), LVALUE *lval)
 {
         int droplab, endlab, hits, k ;
 
@@ -60,11 +55,7 @@ LVALUE *lval ;
 /*
  * test for early dropout from || or && evaluations
  */
-void dropout(k, testfuncz,testfuncq, exit1, lval)
-int k, exit1;
-void (*testfuncz)();
-void (*testfuncq)();
-LVALUE *lval ;
+void dropout(int k, void (*testfuncz)(), void (*testfuncq)(), int exit1, LVALUE *lval)
 {
     int temp;
         if ( k )
@@ -86,9 +77,7 @@ LVALUE *lval ;
 /*
  * unary plunge to lower level
  */
-int plnge1(heir, lval)
-int (*heir)() ;
-LVALUE *lval ;
+int plnge1(int (*heir)(), LVALUE *lval)
 {
         char *before, *start ;
         int k ;
@@ -105,10 +94,7 @@ LVALUE *lval ;
 /*
  * binary plunge to lower level (not for +/-)
  */
-void plnge2a(heir, lval, lval2, oper, doper)
-int (*heir)() ;
-LVALUE *lval, *lval2 ;
-void (*oper)(), (*doper)();
+void plnge2a(int (*heir)(), LVALUE *lval, LVALUE *lval2, void (*oper)(), void (*doper)())
 {
         char *before, *start ;
 
@@ -241,10 +227,7 @@ void (*oper)(), (*doper)();
 /*
  * binary plunge to lower level (for +/-)
  */
-void plnge2b(heir, lval, lval2, oper)
-int (*heir)() ;
-LVALUE *lval, *lval2 ;
-void (*oper)();
+void plnge2b(int (*heir)(), LVALUE *lval, LVALUE *lval2, void (*oper)())
 {
         char *before, *start, *before1, *start1 ;
         int val ;

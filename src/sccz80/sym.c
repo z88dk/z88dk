@@ -3,13 +3,12 @@
  *
  *      Routines for symbol hashing etc
  *
- *      $Id: sym.c,v 1.2 2003-03-31 21:28:00 dom Exp $
+ *      $Id: sym.c,v 1.3 2004-03-26 22:06:09 denniz Exp $
  */
 
 #include "ccdefs.h"
 
-int hash(sname)
-char *sname;
+int hash(char *sname)
 {
         int c, h ;
 
@@ -23,8 +22,7 @@ char *sname;
  * name to a hopefully unique identifier!
  */
 
-SYMBOL *findstc(sname)
-char *sname;
+SYMBOL *findstc(char *sname)
 {
         char    sname2[3*NAMESIZE];     /* Should be enuff! */
         strcpy(sname2,"st_");
@@ -53,8 +51,7 @@ SYMBOL *findenum(char *sname)
         return(0);
 }
 
-SYMBOL *findglb(sname)
-char *sname ;
+SYMBOL *findglb(char *sname)
 {
         glbptr = STARTGLB + hash(sname) ;
         while ( strcmp(sname, glbptr->name) ) {
@@ -65,8 +62,7 @@ char *sname ;
         return glbptr ;
 }
 
-SYMBOL *findloc(sname)
-char *sname ;
+SYMBOL *findloc(char *sname)
 {
         SYMBOL *ptr ;
 
@@ -83,8 +79,7 @@ char *sname ;
  * find symbol in structure tag symbol table, return 0 if not found
  */
 
-TAG_SYMBOL *findtag(sname)
-char *sname ;
+TAG_SYMBOL *findtag(char *sname)
 {
         TAG_SYMBOL *ptr ;
 
@@ -102,9 +97,7 @@ char *sname ;
  * return pointer to member symbol if it is, else 0
  */
 
-SYMBOL *findmemb(tag, sname)
-TAG_SYMBOL *tag ;
-char *sname ;
+SYMBOL *findmemb(TAG_SYMBOL *tag, char *sname)
 {
         SYMBOL *ptr ;
 

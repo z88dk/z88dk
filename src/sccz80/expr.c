@@ -2,7 +2,7 @@
  * cc4.c - fourth part of Small-C/Plus compiler
  *         routines for recursive descent
  *
- * $Id: expr.c,v 1.11 2003-03-31 21:34:39 dom Exp $
+ * $Id: expr.c,v 1.12 2004-03-26 22:06:09 denniz Exp $
  *
  */
 
@@ -36,8 +36,7 @@ void ClearCast(LVALUE *lval)
 
 
 
-int expression(con, val)
-int *con, *val ;
+int expression(int *con, int *val)
 {
     LVALUE lval ;
     char    type;
@@ -59,8 +58,7 @@ int *con, *val ;
     return lval.val_type ;
 }
 
-int heir1(lval)
-LVALUE *lval ;
+int heir1(LVALUE *lval)
 {
     char *before, *start ;
     LVALUE lval2, lval3 ;
@@ -164,8 +162,7 @@ LVALUE *lval ;
 /*
  * heir1a - conditional operator
  */
-int heir1a(lval)
-LVALUE *lval ;
+int heir1a(LVALUE *lval)
 {
         int falselab, endlab, skiplab ;
         LVALUE lval2 ;
@@ -251,14 +248,12 @@ LVALUE *lval ;
 }
 
 
-int heir2a(lval)
-LVALUE *lval ;
+int heir2a(LVALUE *lval)
 {
         return skim("||", eq0, jumpc, 1, 0, heir2b, lval);
 }
 
-int heir2b(lval)
-LVALUE *lval ;
+int heir2b(LVALUE *lval)
 {
         return skim("&&", testjump, jumpnc, 0 , 1, heir2, lval);
 }
@@ -283,26 +278,22 @@ int heir234(LVALUE *lval, int (*heir)(), char opch, void (*oper)())
         }
 }
 
-int heir2(lval)
-LVALUE *lval ;
+int heir2(LVALUE *lval)
 {
         return heir234(lval, heir3, '|', zor) ;
 }
 
-int heir3(lval)
-LVALUE *lval ;
+int heir3(LVALUE *lval)
 {
         return heir234(lval, heir4, '^', zxor) ;
 }
 
-int heir4(lval)
-LVALUE *lval ;
+int heir4(LVALUE *lval)
 {
         return heir234(lval, heir5, '&', zand) ;
 }
 
-int heir5(lval)
-LVALUE *lval ;
+int heir5(LVALUE *lval)
 {
         LVALUE lval2 ;
         int     k;
@@ -326,8 +317,7 @@ LVALUE *lval ;
         }
 }
 
-int heir6(lval)
-LVALUE *lval ;
+int heir6(LVALUE *lval)
 {
         LVALUE lval2 ;
         int k ;
@@ -362,8 +352,7 @@ LVALUE *lval ;
         }
 }
 
-int heir7(lval)
-LVALUE *lval ;
+int heir7(LVALUE *lval)
 {
         LVALUE lval2 ;
         int k ;
@@ -395,8 +384,7 @@ LVALUE *lval ;
         }
 }
 
-int heir8(lval)
-LVALUE *lval ;
+int heir8(LVALUE *lval)
 {
         LVALUE lval2 ;
         int k ;
@@ -420,8 +408,7 @@ LVALUE *lval ;
         }
 }
 
-int heir9(lval)
-LVALUE *lval ;
+int heir9(LVALUE *lval)
 {
         LVALUE lval2 ;
         int k ;
@@ -496,8 +483,7 @@ deref(LVALUE *lval, char isaddr)
 }
 
 
-int heira(lval)
-LVALUE *lval ;
+int heira(LVALUE *lval)
 {
         int k,j;
         TAG_SYMBOL *otag;
@@ -639,8 +625,7 @@ LVALUE *lval ;
         }
 }
 
-int heirb(lval)
-LVALUE *lval ;
+int heirb(LVALUE *lval)
 {
     char *before, *start ;
     char *before1, *start1 ;

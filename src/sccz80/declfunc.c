@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.6 2004-03-23 08:52:19 dom Exp $
+ *      $Id: declfunc.c,v 1.7 2004-03-26 22:06:09 denniz Exp $
  */
 
 #include "ccdefs.h"
@@ -322,9 +322,7 @@ char   simple)
  * taken out of newfunc by djm
  */
 
-void setlocvar(prevarg,currfn)
-SYMBOL *prevarg;
-SYMBOL *currfn;
+void setlocvar(SYMBOL *prevarg,SYMBOL *currfn)
 {
     int lgh,where;
     int *iptr;
@@ -455,8 +453,7 @@ SYMBOL *currfn;
 #ifndef SMALL_C
 SYMBOL *
 #endif
-dofnansi(currfn)
-SYMBOL *currfn;
+dofnansi(SYMBOL *currfn)
 {
         SYMBOL *prevarg;       /* ptr to symbol table entry of most recent argument */
         SYMBOL *argptr;        /* Temporary holder.. */

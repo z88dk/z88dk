@@ -8,7 +8,7 @@
  *
  *      Started djm 22/4/99
  *
- *      $Id: goto.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: goto.c,v 1.2 2004-03-26 22:06:09 denniz Exp $
  *
  *      The scheme is:
  *
@@ -116,8 +116,7 @@ void dogoto()
         jump(label);
 }
 
-SYMBOL *addgotosym(sname)
-char *sname;
+SYMBOL *addgotosym(char *sname)
 {
 	char	sname2[NAMEMAX*3];
 	strcpy(sname2,"goto_");
@@ -127,8 +126,7 @@ char *sname;
         return(addglb(sname2,GOTOLABEL,0,0,0,0,0));
 }
 	
-SYMBOL *findgoto(sname)
-char *sname;
+SYMBOL *findgoto(char *sname)
 {
 	char	sname2[NAMEMAX*3];
 	strcpy(sname2,"goto_");

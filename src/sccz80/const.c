@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.14 2002-05-29 22:54:09 dom Exp $
+ *      $Id: const.c,v 1.15 2004-03-26 22:06:09 denniz Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -32,8 +32,7 @@ char    conssign;
  * for doubles..
  */
 
-int constant(lval)
-LVALUE *lval ;
+int constant(LVALUE *lval)
 {
         constype=CINT;
         conssign=dosigned;
@@ -291,8 +290,7 @@ long searchdub(unsigned char *num)
 
 
 
-int number(val)
-long *val;
+int number(long *val)
 {
         char c ;
         int minus;
@@ -359,8 +357,7 @@ int hex(char c)
 
 /* djm, seems to load up literal address? */
 
-void address(ptr)
-SYMBOL *ptr ;
+void address(SYMBOL *ptr)
 {
         immed() ;
         outname(ptr->name,dopref(ptr)) ;

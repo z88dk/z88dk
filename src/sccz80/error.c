@@ -3,7 +3,7 @@
  *
  *      Errors and other such misfitting routines
  *
- *      $Id: error.c,v 1.3 2003-08-30 16:29:53 dom Exp $
+ *      $Id: error.c,v 1.4 2004-03-26 22:06:09 denniz Exp $
  */
 
 #include "ccdefs.h"
@@ -204,8 +204,7 @@ void multidef(void)
 }
 
 
-void needtoken(str)
-char *str;
+void needtoken(char *str)
 {
         if ( match(str) == 0 ) {
                 error(E_TOKEN,str);

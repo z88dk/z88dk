@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.12 2003-01-26 19:34:47 denniz Exp $
+ *      $Id: main.c,v 1.13 2004-03-26 22:06:09 denniz Exp $
  */
 
 #include "ccdefs.h"
@@ -72,9 +72,7 @@ void    SetUseShared(char *);
 /*
  *      Compiler begins execution here
  */
-int main(argc, argv)
-int argc ;
-char **argv ;
+int main(int argc, char **argv)
 {
         int     n;      /* Loop counter */
         gargc = argc ;
@@ -296,10 +294,7 @@ errsummary()
 char *
 #endif
 
-nextarg(n, s, size)
-int n;
-char *s;
-int size ;
+nextarg(int n, char *s, int size)
 {
         char *str;
         char *str2;
@@ -346,7 +341,7 @@ info()
 {
         fputs(titlec,stderr);
         fputs(Version,stderr);
-        fputs("\n(C) 1980-2003 Cain, Van Zandt, Hendrix, Yorston, Morris\n",stderr);
+        fputs("\n(C) 1980-2004 Cain, Van Zandt, Hendrix, Yorston, Morris\n",stderr);
         fprintf(stderr,"Usage: %s [flags] [file]\n",gargv[0]);
         
 }
@@ -822,8 +817,7 @@ unsigned char *queue)
  * dump zeroes for default initial value
  * (or rather, get loader to do it for us)
  */
-int dumpzero(size, count)
-int size, count ;
+int dumpzero(int size, int count)
 {
         if (count <= 0) return (0);
         defstorage() ;

@@ -1,7 +1,7 @@
 /* codegen.c */
 extern void comment(void);
 extern void header(void);
-extern void DoLibHeader();
+extern void DoLibHeader(void);
 extern void trailer(void);
 extern void outname(char *sname, char pref);
 extern void getmem(SYMBOL *sym);
@@ -93,6 +93,7 @@ extern void convUlong2doub(void);
 extern void convdoub2int(void);
 extern void DoubSwap(void);
 extern void vlongconst(unsigned long val);
+extern void vlongconst_noalt(unsigned long val);
 extern void vconst(long val);
 extern void const2(long val);
 extern void constbc(long val);
@@ -118,11 +119,11 @@ extern void FrameP(void);
 extern void PutFrame(char,int);
 extern void RestoreSP(char);
 extern int CheckOffset(int);
-extern void zcarryconv();
+extern void zcarryconv(void);
 extern void convUint2char(void);
 extern void convSint2char(void);
-extern void savehl();
-extern void savede();
-extern void restorehl();
-extern void restorede();
+extern void savehl(void);
+extern void savede(void);
+extern void restorehl(void);
+extern void restorede(void);
 

@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.20 2003-02-01 20:31:30 dom Exp $
+ *      $Id: codegen.c,v 1.21 2004-03-26 22:06:09 denniz Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -71,7 +71,7 @@ void header(void)
  * Print the header for a library function, called from the preprocessor!
  */
 
-void DoLibHeader()
+void DoLibHeader(void)
 {
         char    filen[FILENAME_LEN+1];
 	char	*incdir;	
@@ -715,8 +715,7 @@ void zclibcallop()
 	
 
 /* Call the specified subroutine name */
-void zcall(sname)
-SYMBOL *sname;
+void zcall(SYMBOL *sname)
 {
         zcallop();
         outname(sname->name,dopref(sname));
@@ -1753,7 +1752,7 @@ void zge(LVALUE *lval)
     }
 }
 
-void zcarryconv()
+void zcarryconv(void)
 {
     vconst(0);
     ol("rl\tl");
@@ -1856,8 +1855,7 @@ void vlongconst_noalt(unsigned long val)
 /*
  * load constant into primary register
  */
-void vconst(val)
-long val ;
+void vconst(long val)
 {
 	if ( val < 0 )
 		val += 65536;
@@ -1869,8 +1867,7 @@ long val ;
 /*
  * load constant into secondary register
  */
-void const2(val)
-long val ;
+void const2(long val)
 {
 	if ( val < 0 )
 		val += 65536;
@@ -1951,22 +1948,22 @@ void EmitLine(int line)
 
 /* These routines save and restore hl/de from special places */
 
-void savehl()
+void savehl(void)
 {
     ol("ld\t(saved_hl),hl");
 }
 
-void savede()
+void savede(void)
 {
     ol("ld\t(saved_de),de");
 }
 
-void restorehl()
+void restorehl(void)
 {
     ol("ld\thl,(saved_hl)");
 }
 
-void restorede()
+void restorede(void)
 {
     ol("ld\thl,(saved_de)");
 }

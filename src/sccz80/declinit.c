@@ -10,7 +10,7 @@
  * 
  *      3/2/02 djm - Unspecified structure members are now padded out
  *
- *      $Id: declinit.c,v 1.11 2003-09-22 09:01:32 dom Exp $
+ *      $Id: declinit.c,v 1.12 2004-03-26 22:06:09 denniz Exp $
  */
 
 #include "ccdefs.h"
@@ -192,9 +192,7 @@ int str_init(TAG_SYMBOL *tag)
 /*
  * initialise aggregate
  */
-void agg_init(size, type, ident, dim, more, tag)
-int size, type, ident, *dim, more;
-TAG_SYMBOL *tag;
+void agg_init(int size, int type, int ident, int *dim, int more, TAG_SYMBOL *tag)
 {
     while (*dim) {
 	if (ident == ARRAY && type == STRUCT) {
@@ -222,8 +220,7 @@ TAG_SYMBOL *tag;
  * this is used for structures and arrays of pointers to char, so that the
  * struct or array is built immediately and the char strings are dumped later
  */
-void init(size, ident, dim, more, dump, is_struct)
-int size, ident, *dim, more, dump, is_struct;
+void init(int size, int ident, int *dim, int more, int dump, int is_struct)
 {
     long value;
     int sz;			/* number of chars in queue */
