@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.26 2004-04-15 20:04:05 dom Exp $
+ *      $Id: zcc.c,v 1.27 2004-06-14 09:05:45 dom Exp $
  */
 
 
@@ -815,8 +815,9 @@ void SetCreateApp(char *arg)
 
 void SetLateAssemble(char *arg)
 {
+    char  *temp = " -make-app";
     makeapp = YES;
-    AddComp("-make-app");
+    AddComp(temp + 1);
 }
 
 void SetCompileOnly(char *arg)
