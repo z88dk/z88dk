@@ -23,6 +23,12 @@ typedef unsigned int tcpport_t;
 /* Macro to turn an IP address into a UDWORD */
 #define IP_ADDR(a,b,c,d)        (d<<24 | c<<16 | b<<8 | a )
 
+/* Some sizes */
+
+#define IP_MAX_HDR_SIZE 60
+#define TCP_MAX_HDR_SIZE 60
+#define IP_MIN_HDR_SIZE 20
+#define TCP_MIN_HDR_SIZE 20
 
 /* TCP Header */
 
@@ -37,6 +43,10 @@ struct tcp_header {
         u16_t        cksum;
         u16_t        urgptr;
 };
+
+#define TH_DO_MASK      0xf0
+#define TH_FLAGS_MASK   0x3f
+
 
 
 /* IP Header */
@@ -53,6 +63,16 @@ struct ip_header {
         ipaddr_t source;
         ipaddr_t dest;
 };
+
+/* Some IP flags */
+
+#define IH_IHL_MASK     0xf
+#define IH_VERSION_MASK 0xf
+#define IH_FRAGOFF_MASK 0x1fff
+#define IH_MORE_FRAGS   0x2000
+#define IH_DONT_FRAG    0x4000
+#define IH_FLAGS_UNUSED 0x8000
+
 
 /* ICMP Header */
 
@@ -72,6 +92,10 @@ struct udp_header {
         u16_t           length;
         u16_t           cksum;
 };
+
+typedef struct udp_header udp_header_t;
+typedef struct ip_header ip_header_t;
+typedef struct tcp_header tcp_header_t;
 
 
 

@@ -12,15 +12,15 @@
 
 #include <sys/types.h>
 
-#ifdef SPECTRUM
+#ifdef __SPECTRUM__
 #define CLOCKS_PER_SEC 50
 #endif
 
-#ifdef ZX81
+#ifdef __ZX81__
 #define CLOCKS_PER_SEC 50
 #endif
 
-#ifdef Z88
+#ifdef __Z88__
 #define CLOCKS_PER_SEC 100
 
 extern time_t __LIB__ time(time_t *);
