@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.24 2001-10-25 13:31:32 stefano Exp $
+# $Id: Makefile,v 1.25 2001-10-30 09:18:24 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -594,7 +594,7 @@ clean:
 	cd printflike ; make clean
 	cd rex ; make clean
 	cd setjmp ; make clean
-	cd sound ; make clean
+	cd games ; make clean
 	cd spectrum ; make clean
 	cd stdio ; make clean
 	cd stdlib ; make clean
