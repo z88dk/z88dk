@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.2 2001-03-21 16:34:01 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.3 2002-05-11 20:09:38 dom Exp $ */
 /* $History: Z80PASS.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -236,7 +236,8 @@ parseline (enum flag interpret)
 	  break;		/* empty line, get next... */
 
 	default:
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);	/* Syntax error */
+	    if ( interpret == ON )
+	       ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);	/* Syntax error */
 	}
 
       if (listing && writeline)
@@ -257,6 +258,7 @@ ifstatement (enum flag interpret)
     {				/* evaluate #if expression */
       if (Evallogexpr () != 0)
 	{
+
 	  do
 	    {			/* expression is TRUE, interpret lines until #else or #endif */
 	      if (!feof (z80asmfile))

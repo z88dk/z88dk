@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.4 2001-02-28 18:19:24 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.5 2002-05-11 20:09:38 dom Exp $ */
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -267,9 +267,9 @@ ParseIdent (enum flag interpret)
 {
   int id;
 
-  if ((id = SearchId ()) == -1)
+  if ((id = SearchId ()) == -1 && interpret == ON) {
       ReportError (CURRENTFILE->fname, CURRENTFILE->line, 10);
-  else
+  } else
     {
       switch (id)
 	{

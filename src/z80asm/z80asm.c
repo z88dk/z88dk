@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.10 2002-04-22 14:45:51 stefano Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.11 2002-05-11 20:09:38 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -1129,7 +1129,7 @@ ReportError (char *filename, short lineno, int errnum)
         if (errfile == NULL) 
           fprintf (stderr, "%s\n", errstr);
         else
-	  fprintf (errfile, "%s\n", errstr);
+	  fprintf (errfile, "%s\n", errstr,line);
      }
 
   ++ERRORS;
