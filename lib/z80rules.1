@@ -1850,3 +1850,17 @@
 	ld	l,a
 	push	hl
 	ld	h,0
+
+	ld	hl,%1
+	add	hl,sp
+	push	hl
+	ld	hl,%2
+	call	dload
+	pop	hl
+	call	dstore
+=
+	ld	hl,%2
+	call	dload
+	ld	hl,%1
+	add	hl,sp
+	call	dstore
