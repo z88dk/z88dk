@@ -1,12 +1,18 @@
-$Id: README,v 1.2 2001-10-25 14:29:15 stefano Exp $
+$Id: README,v 1.3 2003-09-30 10:23:12 stefano Exp $
 
+
+The new default for startup creates automatically a valid "vz" file
+with BASIC loader included; use the old way for graphics applications.
+
+
+--- --- ---
 How pass the code to the VZ emulator.
 
 - Get the VZ emulator from:
   http://www.powerup.com.au/~intertek/VZ200/vz.htm
 - Get the utilities, also
 - Set the environment variables correctly
-- Compile your code (to a.bin)
+- Compile your code (to a.bin)  NOTE THAT THE "-startup=2" PARAMETER IS REQUIRED
 - Use the rbinary utility (Rbinary.exe a.bin a.vz)
 - Run the emulator
 - Type: POKE 30862,0:POKE 30863,128

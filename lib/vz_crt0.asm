@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: vz_crt0.asm,v 1.5 2002-09-11 08:18:44 stefano Exp $
+;       $Id: vz_crt0.asm,v 1.6 2003-09-30 10:23:12 stefano Exp $
 ;
 
 
@@ -57,17 +57,44 @@
 ; Now, getting to the real stuff now!
 
 
-        org     32768
+IF (startup=2)
 
+	org     32768
+
+ELSE
+
+  org $7ae9-24
+
+  defb	$20,$20,0,0
+  defm  "z80.mc"
+  defb	0,0,0,0,0,0,0,0,0,0,0
+  defb $f0
+  defw $7ae9		; 24 bytes so far
+  
+  defw $7b04
+  defw 1
+  defb $B1		;POKE
+  defm " 30862,18:"
+  defb $B1		;POKE
+  defm " 30863,123"
+  defb 0		; this block is 27 bytes long
+  
+  defw $7b0f
+  defw 2
+  defb $b2		; PRINT
+  defb ' '
+  defb $c1		; USR
+  defm "(0)"
+  defb 0		; this block is 11 bytes long
+  
+  defw 0
+  defb 4
+  
+; Header ends here: 65 bytes
+
+ENDIF
 
 .start
-        ld      hl,0
-        add     hl,sp
-        ld      (start1+1),hl
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
-        ld      (exitsp),sp
 
         call    _main
 .cleanup

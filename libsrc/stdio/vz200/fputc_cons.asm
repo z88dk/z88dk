@@ -10,7 +10,7 @@
 ;       Stefano Bodrato - Apr.2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.3 2003-09-30 10:23:12 stefano Exp $
 ;
 
 
@@ -29,6 +29,14 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
+	cp	12
+	jr	nz,nocls
+
+	ld	a,0
+	ld	(6800h),a	; force TEXT mode
+	jp	457
+.nocls
+
 	; Some undercase text?  Transform in UPPER !
 	cp	97
 	jr	c,nounder

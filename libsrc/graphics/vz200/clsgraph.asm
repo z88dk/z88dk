@@ -4,15 +4,15 @@
 	XREF	base_graphics
 
 ;
-;	$Id: clsgraph.asm,v 1.2 2001-04-18 13:21:38 stefano Exp $
+;	$Id: clsgraph.asm,v 1.3 2003-09-30 10:23:12 stefano Exp $
 ;
 
 ; ******************************************************************
 ;
-;	Clear graphics	area, i.e. reset all bits in graphics
-;	window (256x64	pixels)
+;	Clear graphics	area, i.e. reset all bits and sets graphics mode
 ;
-;	Design & programming by Gunther Strube,	Copyright	(C) InterLogic	1995
+;	Design & programming by Gunther Strube,	Copyright (C) InterLogic 1995
+;	ported by Stefano Bodrato
 ;
 ;	Registers	changed after return:
 ;		a.bcdehl/ixiy	same
@@ -22,6 +22,9 @@
 				push	bc
 				push	de
 				push	hl
+
+				ld	a,8
+				ld	(6800h),a		; force graph mode
 
 				ld	hl,(base_graphics)	; base of graphics area
 				ld	(hl),0

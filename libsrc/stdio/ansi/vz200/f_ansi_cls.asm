@@ -7,12 +7,15 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_cls.asm,v 1.3 2003-09-30 10:23:12 stefano Exp $
 ;
 
 	XLIB	ansi_cls
 
 .ansi_cls
+	ld	a,0
+	ld	(6800h),a	; force TEXT mode
+
 	ld	hl,$7000
 	ld	(hl),32 ;' '
 	ld	d,h
