@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.5 2002-02-01 14:37:47 stefano Exp $
+;	$Id: c128_crt0.asm,v 1.6 2002-04-10 20:31:10 dom Exp $
 ;
 
 

@@ -2,7 +2,7 @@ lstoff
 
 ; ZX Spectrum stack calculator functions (ZXFP)
 
-; $Id: zxfp.def,v 1.1 2001-04-12 15:03:23 stefano Exp $
+; $Id: zxfp.def,v 1.2 2002-04-10 20:31:11 dom Exp $
 
 ; function codes:
 		DEFC	ZXFP_JUMP_TRUE	= $00

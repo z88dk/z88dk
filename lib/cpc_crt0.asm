@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.3 2001-09-07 18:17:11 dom Exp $
+;       $Id: cpc_crt0.asm,v 1.4 2002-04-10 20:31:10 dom Exp $
 ;
 
                 MODULE  cpc_crt0

@@ -3,7 +3,7 @@
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.12 2001-09-20 15:54:03 stefano Exp $
+;	$Id: ti83p_crt0.asm,v 1.13 2002-04-10 20:31:10 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells

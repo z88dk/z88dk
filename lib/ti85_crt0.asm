@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti85_crt0.asm,v 1.15 2001-10-27 13:20:15 stefano Exp $
+;	$Id: ti85_crt0.asm,v 1.16 2002-04-10 20:31:11 dom Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler

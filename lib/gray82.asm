@@ -6,7 +6,7 @@
 ; Recoded -because of strange problems- by Henk Poley - July 2001
 ; Based upon vnGrey, a Venus greyscale library (Ti83).
 ;
-; $Id: gray82.asm,v 1.2 2001-08-20 09:28:25 stefano Exp $
+; $Id: gray82.asm,v 1.3 2002-04-10 20:31:10 dom Exp $
 ;
 
 defc intcount   = $8501 ; 1   byte  - interrupt variable

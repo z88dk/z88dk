@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.12 2002-04-10 20:31:10 dom Exp $
+;       $Id: rxl_crt0.asm,v 1.1 2002-04-10 20:31:10 dom Exp $
 ;
 
 	MODULE rex_crt0
@@ -14,6 +14,7 @@
 ;--------
 
 	XREF	_main		;main() is always external to crt0
+	XREF	_LibMain
 
 	XDEF	int_seed	;integer rand() seed
 	XDEF	exitsp		;atexit() variables
@@ -21,6 +22,7 @@
 	XDEF	heapblocks	;malloc() variables
 	XDEF	heaplast
 	XDEF	l_dcal		;jp(hl) instruction
+
 
 
 ;	defm	"ApplicationName:Addin"&10&13
@@ -36,6 +38,12 @@
         org    $8000
 
 	jp	start		;addin signature jump
+.signature
+	defm	"XXX"
+.lib
+	ld	hl,farret
+	push	hl
+	jp	_LibMain
 .start
 ; Make room for the atexit() stack
 	ld	hl,65535-64	;Initialise sp
@@ -60,6 +68,10 @@
 .endloop
 	jr	endloop
 .l_dcal	jp	(hl)		;Used for call by function pointer
+.farret				;Used for farcall logic
+	pop	bc
+	ld	a,c
+	jp	$26ea
 
 ;--------
 ; Static variables are kept in RAM in high memory

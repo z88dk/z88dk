@@ -10,7 +10,7 @@
 ; Subject:  LZ: Graydraw source!
 ;------------------------------------------------------------
 ;
-; $Id: gray85.asm,v 1.3 2001-10-31 11:25:11 stefano Exp $
+; $Id: gray85.asm,v 1.4 2002-04-10 20:31:10 dom Exp $
 ;
 
 	XDEF	graybit1

@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.16 2002-01-09 08:21:38 stefano Exp $
+;	$Id: ti86_crt0.asm,v 1.17 2002-04-10 20:31:11 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
