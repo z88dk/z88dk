@@ -3,6 +3,12 @@ ozcopy
 ozdetectmodel
 ozinput/ozclick
 ozinput/ozeditline
+ozinput/ozkbdon
+ozinput/ozkbdoff
+ozinput/ozkeyclear
+ozinput/ozkeyhit
+ozinput/ozkeyupper
+ozinput/ozkeylower
 ozinterrupt/ozcustomisr
 ozinterrupt/serial_int
 ozinterrupt/ozsetisr
@@ -10,6 +16,7 @@ ozinterrupt/ozinstisr
 ozmisc/ozgetautorun
 ozmisc/ozportin
 ozmisc/ozportout
+ozmisc/ozdelay
 ozscreen/ozsetcontrast
 ozscreen/ozgetcontrast
 ozscreen/ozblankscreen
