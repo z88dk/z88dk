@@ -1,3 +1,8 @@
+# There's a backup of this file cos the output of the compiler changed
+# greatly, and I haven't got time to test all of these, so resorting to
+# an older version to make things square - you may like to import some
+# of the later ones in this file to the z80rules.1 used by default	
+
 	ld	a,#(0 % 256)
 =
 	xor	a
@@ -604,7 +609,7 @@
 	or	l
 	jp	z,%1
 
-	ld	de,65535	;const
+	ld	de,-1	;const
 	ex	de,hl
 	call	l_ne
 	jp	nc,%1
@@ -615,7 +620,7 @@
 	jp	z,%1
 
 	push	de
-	ld	hl,65535	;const
+	ld	hl,-1	;const
 	pop	de
 	call	l_eq
 	jp	nc,%1
@@ -626,7 +631,7 @@
 	jp	nz,%1
 
 	push	de
-	ld	hl,65535	;const
+	ld	hl,-1	;const
 	pop	de
 	call	l_eq
 	jp	c,%1
@@ -658,7 +663,7 @@
 	or	e
 	jp	nz,%1
 
-	ld	de,65535	;const
+	ld	de,-1	;const
 	ex	de,hl
 	call	l_eq
 	jp	nc,%1
@@ -668,7 +673,7 @@
 	or	l
 	jp	nz,%1
 
-	ld	de,65535	;const
+	ld	de,-1	;const
 	ex	de,hl
 	call	l_eq
 	jp	c,%1
@@ -919,17 +924,10 @@
 	ld	hl,0	;const
 	add	hl,sp
 	ld	a,(hl)
-	add	a,%1
-	ld	(hl),a
-	ld	l,a
-	ld	h,0
 =
 	pop	hl
-	ld	a,l
-	add	a,%1
-	ld	l,a
 	push	hl
-	ld	h,0
+	ld	a,l
 
 	push	de
 	pop	bc
@@ -1837,16 +1835,74 @@
 =
 	ld	hl,%2
 
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	ld	(%1),a
+	ld	hl,%2
+=
+	ld	a,(hl)
+	ld	(%1),a
+	ld	hl,%2
+
+	xor	a
+	ld	(%1),a
+	xor	a
+	ld	(%2),a
+=
+	xor	a
+	ld	(%1),a
+	ld	(%2),a
+
+	ld	%1,%2
+	ld	(%3),%1
+	ld	%1,%2
+	ld	(%4),%1
+=
+	ld	%1,%2
+	ld	(%3),%1
+	ld	(%4),%1
+
+	ld	hl,%1
+	ld	a,h
+	or	l
+	jp	%2
+	ld	hl,%1
+=
+	ld	hl,%1
+	ld	a,h
+	or	l
+	jp	%2
+
 	ld	hl,0	;const
 	add	hl,sp
-	add	a,#(%1 % 256)
-	ld	(hl),a
-	ld	l,a
+	ld	(hl),%1
+	ld	l,(hl)
 	ld	h,0
 =
 	pop	hl
-	ld	a,l
-	add	a,#(%1 % 256)
-	ld	l,a
+	ld	l,%1
 	push	hl
 	ld	h,0
+
+	ld	hl,1	;const
+	add	hl,sp
+	ld	(hl),%1
+	ld	l,(hl)
+	ld	h,0
+=
+	pop	hl
+	ld	h,%1
+	push	hl
+	ld	l,h
+	ld	h,0
+
+	ld	h,0
+	ld	hl,%1
+=
+	ld	hl,%1
+
+	ld	l,h
+	ld	hl,%1
+=
+	ld	hl,%1
