@@ -1,6 +1,6 @@
-# $Id: gfxdeps.sh,v 1.3 2002-03-11 17:11:34 stefano Exp $
-#
 #!/bin/sh
+
+# $Id: gfxdeps.sh,v 1.4 2002-12-08 16:35:16 dom Exp $
 #  short script to sort out gfx dependencies
 
 	rm -f graphics/*.o
