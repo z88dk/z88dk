@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.1 2000-07-04 15:33:32 dom Exp $
+ *      $Id: primary.c,v 1.1.1.1 2000-07-04 15:33:32 dom Exp $
  */
 
 

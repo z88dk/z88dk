@@ -8,7 +8,7 @@
  *
  *      Started djm 22/4/99
  *
- *      $Id: goto.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: goto.c,v 1.1.1.1 2000-07-04 15:33:31 dom Exp $
  *
  *      The scheme is:
  *

@@ -3,7 +3,7 @@
  *
  *      Routines for symbol hashing etc
  *
- *      $Id: sym.c,v 1.1 2000-07-04 15:33:32 dom Exp $
+ *      $Id: sym.c,v 1.1.1.1 2000-07-04 15:33:32 dom Exp $
  */
 
 #include "ccdefs.h"

@@ -3,7 +3,7 @@
  *
  *      Various compiler file i/o routines
  *
- *      $Id: io.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: io.c,v 1.1.1.1 2000-07-04 15:33:31 dom Exp $
  */
 
 #include "ccdefs.h"

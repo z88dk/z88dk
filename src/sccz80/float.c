@@ -3,7 +3,7 @@
  *
  *      Routines to float an string
  *
- *      $Id: float.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: float.c,v 1.1.1.1 2000-07-04 15:33:31 dom Exp $
  */
 
 #include "ccdefs.h"

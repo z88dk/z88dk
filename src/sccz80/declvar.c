@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: declvar.c,v 1.1.1.1 2000-07-04 15:33:31 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)

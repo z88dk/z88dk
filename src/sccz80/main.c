@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.1 2000-07-04 15:33:32 dom Exp $
+ *      $Id: main.c,v 1.1.1.1 2000-07-04 15:33:32 dom Exp $
  */
 
 #include "ccdefs.h"

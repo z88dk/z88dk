@@ -3,7 +3,7 @@
  *
  *      Plunging routines
  *
- *      $Id: plunge.c,v 1.1 2000-07-04 15:33:32 dom Exp $
+ *      $Id: plunge.c,v 1.1.1.1 2000-07-04 15:33:32 dom Exp $
  *
  *      Altogether now...arse! My cunning scheme to use c as an
  *      indicator flops badly due to logical conditions, I just

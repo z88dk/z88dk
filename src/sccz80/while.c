@@ -3,7 +3,7 @@
  *
  *      Couple of routines for while statements
  *
- *      $Id: while.c,v 1.1 2000-07-04 15:33:32 dom Exp $
+ *      $Id: while.c,v 1.1.1.1 2000-07-04 15:33:32 dom Exp $
  */
 
 #include "ccdefs.h"

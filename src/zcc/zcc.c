@@ -112,7 +112,7 @@
  *	and made the + operator a tad more useful in specifying machines
  *	within that directory
  *
- *      $Id: zcc.c,v 1.1 2000-07-04 15:33:32 dom Exp $
+ *      $Id: zcc.c,v 1.1.1.1 2000-07-04 15:33:32 dom Exp $
  */
 
 

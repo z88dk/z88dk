@@ -28,7 +28,7 @@
  *	djm 12/1/2000
  *	Add option to disallow page truncation
  *      
- *      $Id: appmake.c,v 1.1 2000-07-04 15:33:28 dom Exp $
+ *      $Id: appmake.c,v 1.1.1.1 2000-07-04 15:33:28 dom Exp $
  */
 
 #include <stdio.h>

@@ -1,5 +1,5 @@
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.c,v 1.1 2000-07-04 15:33:30 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.c,v 1.1.1.1 2000-07-04 15:33:30 dom Exp $ */
 /* $History: AVLTREE.C $ */
 /*  */
 /* *****************  Version 4  ***************** */

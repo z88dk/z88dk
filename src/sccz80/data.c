@@ -6,7 +6,7 @@
  *      I'm starting to split these up once more and stick them in
  *      the relevant files..
  *
- *      $Id: data.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: data.c,v 1.1.1.1 2000-07-04 15:33:31 dom Exp $
  */
 
 #include "ccdefs.h"

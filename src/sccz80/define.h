@@ -1,6 +1,6 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.1 2000-07-04 15:33:31 dom Exp $
+ * $Id: define.h,v 1.1.1.1 2000-07-04 15:33:31 dom Exp $
  */
 
 /*      Stand-alone definitions                 */

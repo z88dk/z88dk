@@ -6,7 +6,7 @@
  *      char arrays in structs now initialised correctly, strings
  *      truncated if too long, all seems to be fine - hurrah!
  *
- *      $Id: declinit.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: declinit.c,v 1.1.1.1 2000-07-04 15:33:31 dom Exp $
  */
 
 #include "ccdefs.h"

@@ -3,7 +3,7 @@
  *
  *      Lexical routines - string matching etc
  *
- *      $Id: lex.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: lex.c,v 1.1.1.1 2000-07-04 15:33:31 dom Exp $
  */
 
 #include "ccdefs.h"

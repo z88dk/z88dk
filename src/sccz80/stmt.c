@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.1 2000-07-04 15:33:32 dom Exp $
+ *      $Id: stmt.c,v 1.1.1.1 2000-07-04 15:33:32 dom Exp $
  */
 
 #include "ccdefs.h"

@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: const.c,v 1.1.1.1 2000-07-04 15:33:31 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE

@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: declfunc.c,v 1.1.1.1 2000-07-04 15:33:31 dom Exp $
  */
 
 #include "ccdefs.h"
