@@ -32,6 +32,9 @@
         call    _main
 .cleanup
 ; Should call application exit here
+	ld	de,$42	;DS_ADDIN_TERMINATE
+	ld	($c000),de
+	rst	$10
 
 .endloop
 	jr	endloop
