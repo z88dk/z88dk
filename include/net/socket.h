@@ -5,7 +5,7 @@
  *
  *	djm 13/2/2000
  *
- *	$Id: socket.h,v 1.3 2001-04-20 16:04:25 dom Exp $
+ *	$Id: socket.h,v 1.4 2001-10-06 19:14:48 dom Exp $
  */
 
 #ifndef __NET_SOCKET_H
@@ -56,6 +56,9 @@ extern void  __LIB__ __SHARED__ sock_flush(SOCKET *s);
  * Return length read
  */
 
+#define MSG_PEEK 0x02
+
+extern size_t __LIB__ __SHARED__  sock_recv(SOCKET *s,u8_t *dp,size_t len,u8_t flags);
 extern size_t __LIB__ __SHARED__  sock_read(SOCKET *s,u8_t *dp,size_t len);
 
 /*
@@ -151,6 +154,18 @@ extern int __LIB__ __SHARED__ sock_waitclose(SOCKET *s);
 
 extern void __LIB__ __SHARED__ sock_settos(SOCKET *s,u8_t tos);
 extern void __LIB__ __SHARED__ sock_setttl(SOCKET *s,u8_t ttl);
+
+struct sockinfo_t {
+	u8_t	  protocol;
+	ipaddr_t  local_addr;
+	tcpport_t local_port;
+	ipaddr_t  remote_addr;
+	tcpport_t remote_port;
+	u8_t      ttl;
+};
+
+extern int __LIB__ __SHARED__ sock_getinfo(SOCKET *s, struct sockinfo_t *);
+
 
 
 #endif /* _NET_SOCKET_H */

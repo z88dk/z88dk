@@ -9,7 +9,7 @@
  *
  *	djm 13/2/2000
  *
- *	$Id: resolv.h,v 1.2 2001-04-20 16:04:25 dom Exp $
+ *	$Id: resolv.h,v 1.3 2001-10-06 19:14:48 dom Exp $
  */
 
 #ifndef _NET_RESOLV_H
@@ -34,6 +34,14 @@
 extern ipaddr_t __LIB__ __SHARED__   resolve(char *name);
 extern int __LIB__ __SHARED__   reverse_addr_lookup(ipaddr_t ipaddr, char *name);
 
+/* The getxxbyXX routines are now implemented in the library not the kernel */
+
+struct data_entry {
+        u8_t    *name;
+        tcpport_t port;
+        u8_t    protocol;
+};
+
 /*
  * Services
  *
@@ -45,10 +53,10 @@ extern int __LIB__ __SHARED__   reverse_addr_lookup(ipaddr_t ipaddr, char *name)
  * most common - usu TCP
  */
 
-extern int __LIB__ __SHARED__   getservbyname(char *name);
-extern char __LIB__ __SHARED__   *getservbyport(int port, char *store);
-extern char __LIB__ __SHARED__    getservprotobyport(int port);
-extern char __LIB__ __SHARED__    getservprotobyname(char *name);
+extern int __LIB__   getservbyname(char *name);
+extern char __LIB__ *getservbyport(int port, char *store);
+extern char __LIB__  getservprotobyport(int port);
+extern char __LIB__  getservprotobyname(char *name);
 
 /*
  * Protocols
@@ -59,16 +67,22 @@ extern char __LIB__ __SHARED__    getservprotobyname(char *name);
  * getprotobynumber does it the other way round
  */
 
-extern int __LIB__ __SHARED__   getprotobyname(char *name);
-extern char __LIB__ __SHARED__   *getprotobynumber(int proto, char *store);
+extern int __LIB__   getprotobyname(char *name);
+extern char __LIB__ *getprotobynumber(int proto, char *store);
 
 /*
  * Networks...let's be complete here!
  */
 
-extern int __LIB__ __SHARED__   getnetbyname(char *name);
-extern char __LIB__ __SHARED__   getnetbynumber(int network, char *store);
+extern int __LIB__   getnetbyname(char *name);
+extern char __LIB__ *getnetbynumber(int network, char *store);
 
+/* The helper routines */
+extern int __LIB__  getxxbyname(struct data_entry *,char *name);
+extern int __LIB__ *getxxbyport(struct data_entry *, int, char *store);
+extern struct data_entry *get_services();
+extern struct data_entry *get_networks();
+extern struct data_entry *get_protocols();
 
 
 #endif /* _NET_RESOLV_H */
