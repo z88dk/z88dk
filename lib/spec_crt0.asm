@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.6 2002-04-24 08:15:02 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.7 2003-01-21 10:34:56 dom Exp $
 ;
 
 
@@ -39,8 +39,14 @@
 
 	XDEF	snd_tick	;Sound variable
 
-
-        org     32768
+;--------
+; Set an origin for the application (-zorg=) default to 32768
+;--------
+        
+        IF      !myzorg
+                defc    myzorg  = 32768
+        ENDIF
+                org     myzorg
 
 
 .start
