@@ -10,7 +10,7 @@
  * 
  *      3/2/02 djm - Unspecified structure members are now padded out
  *
- *      $Id: declinit.c,v 1.8 2003-01-24 21:28:25 dom Exp $
+ *      $Id: declinit.c,v 1.9 2003-01-24 21:48:25 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -25,7 +25,6 @@ int initials(char *sname,
 {
     int size, desize = 0;
     int olddim = dim;
-
 
 
     if (cmatch('=')) {
@@ -77,15 +76,23 @@ int initials(char *sname,
             if (type == STRUCT) {
 		dumpzero(tag->size, dim);
                 desize = dim < 0 ? abs(dim+1)*tag->size : olddim * tag->size;
-            } else
-		desize = dumpzero(size, dim);
-	    dumplits(0, YES, gltptr, glblab, glbq);
+            } else { /* Handles unsized arrays of chars */
+		dumpzero(size, dim);
+                dim = dim < 0 ? abs(dim+1) : olddim;
+                cscale(type,tag,&dim);
+                desize = dim;
+            }
+            dumplits(0, YES, gltptr, glblab, glbq);
 	} else {
 	    if (!(ident == POINTER && type == CCHAR)) {
 		dumplits(((size == 1) ? 0 : size), NO, gltptr, glblab,glbq);
 		if ( type != CCHAR )  /* Already dumped by init? */
 		    desize = dumpzero(size, dim);
-	    }
+                dim = dim < 0 ? abs(dim+1) : olddim;
+                cscale(type,tag,&dim);
+                desize = dim;
+            }             
+                
 	}
     } else {
 	char *dosign, *typ;
