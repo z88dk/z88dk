@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: pps_crt0.asm,v 1.2 2002-10-12 10:51:24 dom Exp $
+;       $Id: pps_crt0.asm,v 1.3 2002-11-15 12:58:03 dom Exp $
 ;
 
 
@@ -62,6 +62,7 @@
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
+	ld	(start_prefix),ix
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 ; Set up the std* stuff so we can be called again
@@ -79,12 +80,57 @@ ENDIF
 	ld	a,' '
 	ld	c,$56		;CLEAR
 	rst	$10
-        call    _main		;Call user program
+; Work out argc/argv - same as the CPM version 
+	ld	hl,0		; NULL pointer at the end
+	push	hl
+	ld	b,0		;arguments
+	ld	hl,(start_prefix)
+	ld	a,(hl)		;length of arguments
+	and	a
+	jr	z,argv_done
+	ld	c,a
+	add	hl,bc		;now points to end of arguments
+; Try to find the end of the arguments
+.argv_loop_1
+        ld      a,(hl)
+        cp      ' '
+        jr      nz,argv_loop_2
+        ld      (hl),0
+        dec     hl
+        dec     c
+        jr      nz,argv_loop_1
+; We've located the end of the last argument, try to find the start
+.argv_loop_2
+        ld      a,(hl)
+        cp      ' '
+        jr      nz,argv_loop_3
+        ld      (hl),0
+        inc     hl
+        push    hl
+        inc     b
+        dec     hl
+.argv_loop_3
+        dec     hl
+        dec     c
+        jr      nz,argv_loop_2
+.argv_done
+        ld      hl,end  ;name of program (NULL)
+        push    hl
+        inc     b
+        ld      hl,0
+        add     hl,sp   ;address of argv
+        ld      c,b
+        ld      b,0
+        push    bc      ;argc
+        push    hl      ;argv
+        call    _main           ;Call user code
+        pop     bc      ;kill argv
+        pop     bc      ;kill argc
 .cleanup
 ;
 ;       Deallocate memory which has been allocated here!
 ;
-	push	hl
+	push	hl	;save return code
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 	LIB	closeall
@@ -148,11 +194,14 @@ ENDIF
 .heaplast       defw    0       ; Address of last block on heap
 .heapblocks     defw    0       ; Number of blocks
 
+.start_prefix	defw	0	; Entry handle from OS
+
 IF DEFINED_NEED1bitsound
 .snd_tick	defb	0	; Sound variable
 ENDIF
 
-		defm	"Small C+ ZX"&0	;Unnecessary file signature
+		defm	"Small C+ PPS"	;Unnecessary file signature
+.end		defb	0
 
 ;-----------------------
 ; Floating point support
