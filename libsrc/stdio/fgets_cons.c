@@ -7,7 +7,7 @@
  *	which takes a length argument..
  *
  * --------
- * $Id: fgets_cons.c,v 1.3 2002-01-27 13:50:56 dom Exp $
+ * $Id: fgets_cons.c,v 1.4 2002-06-08 16:52:08 dom Exp $
  */
 
 #include <stdio.h>
@@ -22,12 +22,13 @@ int fgets_cons(unsigned char *str, int max)
       c = fgetc_cons();
       if (c == '\n' || c == '\r' || ptr == max-1) return ptr;
       if (c == 12) {
-         str[--ptr] = 0;
-	 fputc_cons(8);
-	 fputc_cons(32);
-	 fputc_cons(8);
-      }
-      else {
+	if ( ptr > 0 ) {
+           str[--ptr] = 0;
+	   fputc_cons(8);
+	   fputc_cons(32);
+	   fputc_cons(8);
+        }
+      } else {
          str[ptr++] = c;
          str[ptr] = 0;
 	 fputc_cons(c);
