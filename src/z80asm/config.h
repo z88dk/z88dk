@@ -43,7 +43,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* WIN32 definitions:
 #define OS_ID "WIN32"
 #define WIN32 1
-#define DEFLIBDIR "c:\z88dk\lib\"
+#define DEFLIBDIR "c:\\z88dk\\lib\\"
 */
 
 #ifdef MSDOS
