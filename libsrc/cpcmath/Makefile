@@ -9,7 +9,10 @@ CFILES = \
 	fabs.c \
 	fmod.c \
 	ftoa.c \
-	ftoe.c
+	ftoe.c \
+	cosh.c \
+	sinh.c \
+	tanh.c 
 
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)

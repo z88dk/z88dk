@@ -40,3 +40,6 @@ fabs
 fmod
 ftoa
 ftoe
+cosh
+sinh
+tanh
