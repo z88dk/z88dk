@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.2 2002-10-22 19:15:28 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.3 2002-10-22 19:21:10 dom Exp $ */
 /* $History: MODLINK.C $ */
 /*  */
 /* *****************  Version 16  ***************** */
@@ -205,7 +205,7 @@ ReadNames (long nextname, long endnames)
 	case 'G':
 	  if ((foundsymbol = FindSymbol (line, globalroot)) == NULL)
 	    {
-	      foundsymbol = CreateSymbol (line, value, symtype | SYMXDEF | SYMDEF, CURRENTMODULE);
+	      foundsymbol = CreateSymbol (line, value, symtype | SYMXDEF , CURRENTMODULE);
 	      if (foundsymbol != NULL)
 		insert (&globalroot, foundsymbol, (int (*)()) cmpidstr);
 	    }
