@@ -1,7 +1,7 @@
 #ifndef __STDIO_H__
 #define __STDIO_H__
 
-/* $Id: stdio.h,v 1.6 2001-10-16 18:30:32 dom Exp $ */
+/* $Id: stdio.h,v 1.7 2002-01-21 11:56:06 dom Exp $ */
 
 #ifdef FDSTDIO
 #include <z88stdio.h>
@@ -147,6 +147,7 @@ extern int __LIB__ vsprintf(char *str,unsigned char *fmt,void *ap);
 
 extern int __LIB__ vfprintf_mini(FILE *, unsigned char *, void *);
 extern int __LIB__ vfprintf_comp(FILE *, unsigned char *, void *);
+extern int __LIB__ vfprintf_fp(FILE *, unsigned char *, void *);
 
 extern __LIB__ printn(int number, int radix,FILE *file);
 
