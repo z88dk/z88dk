@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.4 2002-01-16 21:56:43 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.5 2002-01-18 16:53:13 dom Exp $ */
 /* $History: PRSLINE.C $ */
 /*  */
 /* *****************  Version 8  ***************** */
@@ -60,6 +60,7 @@ int CheckCondition (void);
 int GetChar (FILE *fptr);
 enum symbols GetSym (void);
 void Skipline (FILE *fptr);
+int CheckBaseType(int chcount);
 
 /* global variables */
 extern FILE *z80asmfile;
@@ -221,19 +222,7 @@ GetSym (void)
 		}
 	    }
 	}
-      /* Check for this to be a hex num here - coudl start with a letter*/
-      for ( i = 0; i < chcount; i++ ) 
-	{
-	  if ( !isxdigit(ident[i]) )
-	      break;
-        }
-      if ( chcount > 1 && i == ( chcount - 1 ) && toupper(ident[i]) == 'H' ) 
-	{
-	    for ( i = (chcount-1); i >= 0 ; i-- ) 
-		ident[i+1] = ident[i];
-	    ident[0] = '$';
-	    sym = hexconst;
-        }	       
+      chcount = CheckBaseType(chcount);             
     }
   else
     {
@@ -257,25 +246,69 @@ GetSym (void)
 		}
 	    }
 	}
- /* Check for this to be a hex num here */
-      for ( i = 0; i <  chcount ; i++ ) 
-	{
-	  if ( !isxdigit(ident[i])  )
-	      break;
-        }
-      if ( i == ( chcount - 1) && toupper(ident[i]) == 'H' ) 
-	{
-	    for ( i = (chcount-1); i >= 0 ; i-- ) 
-		ident[i+1] = ident[i];
-	    ident[0] = '$';
-	    sym = hexconst;
-        }	  
-
+      chcount = CheckBaseType(chcount);                   
     }
 
   ident[chcount] = '\0';
   return sym;
 }
+
+int
+CheckBaseType(int chcount)
+{
+    int   i;
+
+    if ( !isxdigit(ident[0]) )      /* If it's not a hex digit straight off then reject it */
+	return chcount;
+
+    /* Check for this to be a hex num here */
+    for ( i = 0; i <  chcount ; i++ ) 
+	{
+	    if ( !isxdigit(ident[i])  )
+		break;
+        }
+    if ( i == ( chcount - 1)  ) 
+	{
+	    if ( toupper(ident[i]) == 'H' ) 
+		{
+		    for ( i = (chcount-1); i >= 0 ; i-- ) 
+			ident[i+1] = ident[i];
+		    ident[0] = '$';
+		    sym = hexconst;
+		    return chcount;
+		} else {
+		    return chcount;      /* If we reached end of hex digits and the last one wasn't a 'h', then something is wrong, so return */
+		}
+        }
+    /* Check for binary constant (ends in b) */
+    for ( i = 0; i <  chcount ; i++ ) 
+	{
+	    if ( ident[i] != '0' && ident[i] != '1'  )
+		break;
+        }
+    if ( i == ( chcount - 1) && toupper(ident[i]) == 'B' ) 
+	{
+	    for ( i = (chcount-1); i >= 0 ; i-- ) 
+		ident[i+1] = ident[i];
+	    ident[0] = '@';
+	    sym = binconst;
+	    return chcount;
+        }
+    /* Check for decimal (we default to it in anycase..but */
+    for ( i = 0; i <  chcount ; i++ ) 
+	{
+	    if ( !isdigit(ident[i])  )
+		break;
+        }
+    if ( i == ( chcount - 1) && toupper(ident[i]) == 'D' ) 
+	{
+	    sym = decmconst;
+	    return chcount-1;	    
+        }
+    return chcount;
+}
+
+
 
 
 

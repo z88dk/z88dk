@@ -483,4 +483,5 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * 18.01.2001 [no version increment] (djm)
  * Dropped the requirement for add, sbc, and adc to specify "a," for 8 bit
  * operations
+ * Added d and b specifiers for constants - decimal and binary
  */
