@@ -8,9 +8,6 @@
 ;
 
 
-
-                INCLUDE "grafix.inc"    /* Contains fn defs */
-
                 XLIB    draw
                 LIB     swapgfxbk
                 XREF	swapgfxbk1

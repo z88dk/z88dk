@@ -13,7 +13,7 @@
 ;Close the map screen and restore memory map to normal
 
 
-                INCLUDE "grafix.inc"    /* Contains fn defs */
+                INCLUDE "graphics/grafix.inc"    /* Contains fn defs */
                 INCLUDE "#map.def"
 
                 XLIB    closegfx

@@ -12,8 +12,6 @@
 ;Result is true/false
 
 
-                INCLUDE "grafix.inc"    /* Contains fn defs */
-
                 XLIB    point
 
                 LIB     pointxy

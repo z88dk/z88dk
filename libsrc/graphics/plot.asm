@@ -7,20 +7,15 @@
 ;
 ;
 
-
 ;Usage: plot(struct *pixel)
-;
 
 
-                INCLUDE "grafix.inc"    /* Contains fn defs */
 
                 XLIB    plot
                 LIB     swapgfxbk
                 LIB     swapgfxbk1
 
                 LIB     plotpixel
-
-
 
 .plot
 		ld	ix,0

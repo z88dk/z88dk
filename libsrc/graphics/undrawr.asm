@@ -11,7 +11,6 @@
 ;Usage: undrawr(struct *pixels)
 
 
-                INCLUDE "grafix.inc"    /* Contains fn defs */
 
                 XLIB    undrawr
                 LIB     swapgfxbk

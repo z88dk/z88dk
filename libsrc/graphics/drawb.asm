@@ -8,8 +8,6 @@
 ;
 
 
-                INCLUDE "grafix.inc"    /* Contains fn defs */
-
                 XLIB    drawb
 
                 LIB     drawbox

@@ -11,8 +11,6 @@
 ;Usage: circle(struct *pixels)
 
 
-                INCLUDE "grafix.inc"    /* Contains fn defs */
-
                 XLIB    circle
 
                 LIB     draw_circle

@@ -4,10 +4,13 @@
 ;	Ported by Stefano Bodrato
 ;
 ;	Feb 2000 - Platform dependent stack usage
-;		   Stack usage = maxy*8 (512 bytes for the Z88)
+;		   Stack usage should be maxy*8 (512 bytes for the Z88)
+;
+;	Since some platform (expecially the TI83) has very little stack space,
+;	we undersize it; this will cause a crash if a big area is filled.
 ;
 
-	INCLUDE	"grafix.inc"
+	INCLUDE	"graphics/grafix.inc"
 
         XLIB    do_fill
         LIB	pixeladdress
@@ -148,9 +151,6 @@
 	inc	hl
 	ld	(hl),255
 	
-	;exx
-	;ld	b,a
-	;exx
 	ex	af,af	; Save the Z flag
 	
 	xor	a

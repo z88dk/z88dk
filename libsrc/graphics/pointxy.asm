@@ -1,7 +1,8 @@
+	INCLUDE	"graphics/grafix.inc"
 
 	XLIB	pointxy
 
-	LIB pixeladdress
+	LIB	pixeladdress
 
 ; ******************************************************************
 ;
@@ -9,21 +10,29 @@
 ;
 ; Design & programming by Gunther Strube, Copyright (C) InterLogic 1995
 ;
-; (0,0) origin	is defined as the bottom	left	corner.
+; (0,0) origin is defined as the top left corner.
 ;
-;  in:	hl =	(x,y) coordinate of	pixel to test
-; out:	Fz =	0, if pixel is	set,	otherwise	Fz =	1.
+;  in:	hl =	(x,y) coordinate of pixel to test
+; out:	Fz =	0, if pixel is set, otherwise Fz = 1.
 ;
 ; registers changed	after return:
 ;  ..bcdehl/ixiy same
 ;  af....../.... different
 ;
-.pointxy			push	bc
+.pointxy
+			IF maxx <> 256
+				ld	a,h
+				cp	maxx
+				ret	nc
+			ENDIF
+
+				ld	a,l
+				cp	maxy
+				ret	nc			; y0	out of range
+
+				push	bc
 				push	de
 				push	hl
-				ld	a,l
-				xor	@00111111			; (0,0) is hardware	(0,63)
-				ld	l,a
 
 				call	pixeladdress
 				ld	b,a
@@ -31,7 +40,7 @@
 				jr	z, test_pixel		; pixel is at bit 0...
 .pixel_position	rlca
 				djnz	pixel_position
-.test_pixel		ex	de,hl
+.test_pixel			ex	de,hl
 				and	(hl)
 				pop	hl
 				pop	de

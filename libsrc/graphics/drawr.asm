@@ -11,8 +11,6 @@
 ;Usage: drawr(struct *pixels)
 
 
-                INCLUDE "grafix.inc"    /* Contains fn defs */
-
                 XLIB    drawr
                 LIB     swapgfxbk
                 XREF	swapgfxbk1

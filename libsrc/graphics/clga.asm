@@ -12,13 +12,10 @@
 
 
 
-                INCLUDE "grafix.inc"    /* Contains fn defs */
-
                 XLIB    clga
                 LIB     swapgfxbk
 		XREF	swapgfxbk1
                 LIB     cleararea
-
 
 
 .clga

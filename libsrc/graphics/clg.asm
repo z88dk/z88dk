@@ -8,16 +8,12 @@
 ;
 
 
-
-
-                INCLUDE "grafix.inc"    /* Contains fn defs */
-
                 XLIB    clg
                 LIB     swapgfxbk
 		XREF	swapgfxbk1
 
                 LIB     cleargraphics
-
+                
 
 .clg
                 call    swapgfxbk

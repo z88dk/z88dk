@@ -4,11 +4,11 @@
 
 ; ************************************************************************
 ;
-; Get right bitmask	for rigth	side	of byte to preserve	during clear
+; Get right bitmask for rigth side of byte to preserve during clear
 ;
 ; Design & programming by Gunther Strube, Copyright (C) InterLogic 1995
 ;
-; IN: A =	bitposition
+; IN:  A = bitposition
 ;
 ; OUT: A = bitmask at right side of bit	position of byte
 ;
@@ -16,16 +16,17 @@
 ;			IN:	A = 6
 ;			OUT:	A = @00111111	(bit	5 - 0 as mask)
 ;
-;	registers	chnaged after return:
+;	registers changed after return:
 ;		..bcdehl/ixiy	same
 ;		af....../....	different
 ;
-.rightbitmask		cp  0			; 7-bitpos
+
+.rightbitmask			cp  0				; 7-bitpos
 				ret	z			; no	bitmask to preserve...
 				push	bc
 				ld	b,a
 				xor	a
-.right_bitmask_loop	scf
+.right_bitmask_loop		scf
 				rla				; create right	bitmask
 				djnz	right_bitmask_loop
 				pop	bc

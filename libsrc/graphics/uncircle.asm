@@ -9,9 +9,6 @@
 
 
 
-
-                INCLUDE "grafix.inc"    /* Contains fn defs */
-
                 XLIB    uncircle
 
                 LIB     draw_circle

@@ -11,7 +11,6 @@
 ;Usage: plot(struct *pixel)
 
 
-                INCLUDE "grafix.inc"    /* Contains fn defs */
 
                 XLIB    unplot
                 LIB     swapgfxbk

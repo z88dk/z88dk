@@ -1,5 +1,4 @@
-	INCLUDE	"grafix.inc"
-
+	INCLUDE	"graphics/grafix.inc"
 
 	XLIB	plotpixel
 
@@ -12,34 +11,33 @@
 ;
 ; Design & programming by Gunther Strube, Copyright (C) InterLogic 1995
 ;
-; The (0,0) origin is placed at the bottom left corner.
+; The (0,0) origin is placed at the top left corner.
 ;
-; in:  hl	= (x,y) coordinate of pixel (h,l)
+; in:  hl = (x,y) coordinate of pixel (h,l)
 ;
-; registers changed	after return:
+; registers changed after return:
 ;  ..bc..../ixiy same
 ;  af..dehl/.... different
 ;
-.plotpixel		ld	a,l
-				cp	maxy
-				ret	nc				; y0	out of range
+.plotpixel
+			IF maxx <> 256
+				ld	a,h
+				cp	maxx
+				ret	nc
+			ENDIF
 
-				ld	(COORDS),hl
 				ld	a,l
-IF forZ88
-				xor	@00111111			; (0,0) is hardware	(0,63)
-ENDIF
-IF forVZ
-				xor	@00111111			; (0,0) is hardware	(0,63)
-ENDIF
-				push	bc
-				ld	l,a
+				cp	maxy
+				ret	nc			; y0	out of range
+				
+				ld	(COORDS),hl
 
+				push	bc
 				call	pixeladdress
 				ld	b,a
 				ld	a,1
 				jr	z, or_pixel		; pixel is at bit 0...
-.plot_position		rlca
+.plot_position			rlca
 				djnz	plot_position
 .or_pixel			ex	de,hl
 				or	(hl)

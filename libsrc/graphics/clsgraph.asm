@@ -1,4 +1,4 @@
-	INCLUDE		"grafix.inc"
+	INCLUDE	"graphics/grafix.inc"
 
 	XLIB	cleargraphics
 
@@ -23,11 +23,7 @@
 				ld	(hl),0
 				ld	d,h
 				ld	e,1			; de	= base_graphics+1
-IF FORzx
-				ld	bc,6143
-ELSE
-				ld	bc,256*maxy/8-1
-ENDIF
+				ld	bc,maxx*maxy/8-1
 				ldir				; reset graphics window (2K)
 				pop	hl
 				pop	de

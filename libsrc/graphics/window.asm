@@ -27,8 +27,7 @@
 
 
 
-
-                INCLUDE "grafix.inc"    /* Contains fn defs */
+                INCLUDE "graphics/grafix.inc"    /* Contains fn defs */
 
                 INCLUDE "#stdio.def"
                 INCLUDE "#map.def"

@@ -1,4 +1,5 @@
-	INCLUDE	"grafix.inc"
+	INCLUDE	"graphics/grafix.inc"
+	
 	XLIB	Line
 
 	LIB	Line_r
@@ -13,23 +14,18 @@
 ;
 ;	Design & programming by Gunther Strube,	Copyright	(C) InterLogic	1995
 ;
-;	The routine checks the range of specified coordinates which	is the boundaries
+;	The routine checks the range of specified coordinates which is the boundaries
 ;	of the graphics area (256x64 pixels).
-;	If a	boundary error	occurs the routine exits	automatically.	This	may be
-;	useful if	you are trying	to draw a	line	longer than allowed	or outside the
-;	graphics borders. Only the visible	part	will	be drawn.
+;	If a boundary error occurs the routine exits automatically.	This may be
+;	useful if you are trying to draw a line longer than allowed or outside the
+;	graphics borders. Only the visible part will be drawn.
 ;
-;	The coordinate	system is	defined by the	plot	routines which	defines the
-;	standard origin (0,0) at	the bottom left corner and (255,63) as the top
-;	right corner.
-;	However, the hardware graphics memory is organized as (0,0)	in the top
-;	left	corner and (255,63)	as the bottom right	corner. The plot routines
-;	adjusts for this automatically.
+;	Ths standard origin (0,0) is at the top left corner.
 ;
-;	The plot routine is	defined by an address pointer	in IX.
-;	This	routine converts the absolute	coordinates to	a relative distance	as (dx,dy)
-;	defining (COORDS) with (x0,y0) and	a distance in (dx,dy). The drawing	is then
-;	executed by Line_r .
+;	The plot routine is defined by an address pointer in IX.
+;	This routine converts the absolute coordinates to a relative distance as (dx,dy)
+;	defining (COORDS) with (x0,y0) and a distance in (dx,dy). The drawing is then
+;	executed by Line_r
 ;
 ;	IN:	HL =	(x0,y0) -	x0 range is 0 to 255, y0	range is 0 to 63.
 ;		DE =	(x1,y1) -	x1 range is 0 to 255, y1	range is 0 to 63.
@@ -41,8 +37,16 @@
 ;		..BCDEHL/IXIY/af......	same
 ;		AF....../..../..bcdehl	different
 ;
-.Line			push	de
+.Line				push	de
 				push	hl
+			IF maxx <> 256
+				ld	a,h
+				cp	maxx
+				jr	nc, exit_line		; x0	coordinate out	of range
+				ld	a,d
+				cp	maxx
+				jr	nc, exit_line		; x1	coordinate out	of range
+			ENDIF
 				ld	a,l
 				cp	maxy
 				jr	nc, exit_line		; y0	coordinate out	of range
@@ -63,7 +67,7 @@
 				ex	de,hl			; h.dist.	= HL, v.dist. = DE
 				call	Line_r			; draw line...
 
-.exit_line		pop	hl
+.exit_line			pop	hl
 				pop	de
 				ret
 

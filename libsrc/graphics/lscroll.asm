@@ -11,8 +11,6 @@
 ;Usage: lscroll(struct *pixels)
 
 
-                INCLUDE "grafix.inc"    /* Contains fn defs */
-
                 XLIB    lscroll
 
                 LIB     scroll_left

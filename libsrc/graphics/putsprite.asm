@@ -9,7 +9,7 @@
 	XLIB    putsprite
 	LIB	pixeladdress
 
-	INCLUDE	"grafix.inc"
+	INCLUDE	"graphics/grafix.inc"
 
 ; coords: d,e (vert-horz)
 ; sprite: (ix)
