@@ -44,13 +44,13 @@ unsigned char s[];		/* s points to a character string */
 		/* handle digits to right of decimal */
 		--s ;
 		while ( *s != '.' )
-			sum = ( sum + float( *(s--) - '0' ) ) / 10.0 ;
+			sum = ( sum + ((double)( *(s--) - '0' )) ) / 10. ;
 	}
-	scale = 1.0 ;	/* initialize scale factor */
+	scale = 1. ;	/* initialize scale factor */
 	while ( --s >= start ) {
 		/* handle remaining digits */
-		sum += scale * float( *s-'0' ) ;
-		scale *= 10.0 ;
+		sum += scale * ((double)( *s-'0' )) ;
+		scale *= 10. ;
 	}
 	c = *end++ ;
 	if( tolower(c)=='e' ) {	/* interpret exponent */

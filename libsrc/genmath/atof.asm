@@ -1,27 +1,32 @@
-;* * * * *  Small-C/Plus Z88 * * * * *
-;  Version: v1.10b0.71pre3 Date: 29/1/2001 
+;* * * * *  Small-C/Plus z88dk * * * * *
+;  Version: v1.10b0.73 Date: 26/7/2001 
 ;
 ;	Reconstructed for the z80 Module Assembler
 ;	By Dominic Morris <djm@jb.man.ac.uk>
 ;
-;	Module compile time: Mon Jan 29 16:47:32 2001
+;	Module compile time: Mon Sep  3 10:48:36 2001
 
 
 
-;	Small C+ Library Function
+	XLIB	atof.c
 
-	XLIB	atof
-
-	defc DEFINED_atof = 1
+defc DEFINED_atof = 1
 	INCLUDE "#z88_crt0.hdr"
 
 
 
 .atof
-	ld	hl,-23	;const
+	ld	hl,-29	;const
 	add	hl,sp
 	ld	sp,hl
-	ld	hl,25	;const
+	ld	hl,11	;const
+	add	hl,sp
+	push	hl
+	ld	hl,10	;const
+	call	float
+	pop	hl
+	call	dstore
+	ld	hl,31	;const
 	add	hl,sp
 	call	l_gint	;
 	ld	a,(hl)
@@ -32,7 +37,7 @@
 	ld	(hl),#(1 % 256)
 	inc	hl
 	ld	(hl),#(1 / 256)
-	ld	hl,25	;const
+	ld	hl,31	;const
 	add	hl,sp
 	push	hl
 	call	l_gint	;
@@ -50,7 +55,7 @@
 	ld	hl,9	;const
 	add	hl,sp
 	ex	de,hl
-	ld	hl,27-2	;const
+	ld	hl,33-2	;const
 	add	hl,sp
 	call	l_gint	;
 	call	l_pint
@@ -58,7 +63,7 @@
 	pop	bc
 	push	hl
 .i_5
-	ld	hl,25	;const
+	ld	hl,31	;const
 	add	hl,sp
 	call	l_gint	;
 	ld	e,(hl)
@@ -72,7 +77,7 @@
 	ld	a,h
 	or	l
 	jp	nz,i_7
-	ld	hl,25	;const
+	ld	hl,31	;const
 	add	hl,sp
 	call	l_gint	;
 	ld	l,(hl)
@@ -101,7 +106,7 @@
 	inc	hl
 	push	hl
 .i_9
-	ld	hl,25	;const
+	ld	hl,31	;const
 	add	hl,sp
 	push	hl
 	call	l_gint	;
@@ -113,15 +118,15 @@
 	ld	hl,7	;const
 	add	hl,sp
 	ex	de,hl
-	ld	hl,27-2	;const
+	ld	hl,33-2	;const
 	add	hl,sp
 	call	l_gint	;
 	call	l_pint
-	ld	hl,17	;const
+	ld	hl,23	;const
 	add	hl,sp
 	push	hl
-	ld	hl,i_2+0
-	call	dload
+	ld	hl,0	;const
+	call	float
 	pop	hl
 	call	dstore
 	pop	hl
@@ -129,7 +134,7 @@
 	ld	a,h
 	or	l
 	jp	z,i_10
-	ld	hl,25	;const
+	ld	hl,31	;const
 	add	hl,sp
 	push	hl
 	call	l_gint	;
@@ -137,19 +142,19 @@
 	pop	de
 	call	l_pint
 .i_11
-	ld	hl,25	;const
+	ld	hl,31	;const
 	add	hl,sp
 	call	l_gint	;
 	ld	a,(hl)
 	cp	#(46 % 256)
 	jp	z,i_12
-	ld	hl,17	;const
+	ld	hl,23	;const
 	add	hl,sp
 	push	hl
-	ld	hl,19	;const
+	ld	hl,25	;const
 	add	hl,sp
 	call	dldpsh
-	ld	hl,33	;const
+	ld	hl,39	;const
 	add	hl,sp
 	push	hl
 	call	l_gint	;
@@ -161,29 +166,26 @@
 	ld	h,0
 	ld	bc,-48
 	add	hl,bc
-	push	hl
-	call	_float
-	pop	bc
-	call	float
+	call	ufloat
 	call	dadd
 	call	dpush
-	ld	hl,i_2+6
+	ld	hl,i_2+0
 	call	dload
-	call	dmul
+	call	ddiv
 	pop	hl
 	call	dstore
 	jp	i_11
 .i_12
 .i_10
-	ld	hl,11	;const
+	ld	hl,17	;const
 	add	hl,sp
 	push	hl
-	ld	hl,i_2+12
+	ld	hl,i_2+6
 	call	dload
 	pop	hl
 	call	dstore
 .i_13
-	ld	hl,25	;const
+	ld	hl,31	;const
 	add	hl,sp
 	push	hl
 	call	l_gint	;
@@ -196,33 +198,30 @@
 	call	l_gint	;
 	call	l_uge
 	jp	nc,i_14
-	ld	hl,17	;const
+	ld	hl,23	;const
 	add	hl,sp
 	push	hl
 	call	dldpsh
-	ld	hl,19	;const
+	ld	hl,25	;const
 	add	hl,sp
 	call	dldpsh
-	ld	hl,39	;const
+	ld	hl,45	;const
 	add	hl,sp
 	call	l_gint	;
 	ld	l,(hl)
 	ld	h,0
 	ld	bc,-48
 	add	hl,bc
-	push	hl
-	call	_float
-	pop	bc
-	call	float
+	call	ufloat
 	call	dmul
 	call	dadd
 	pop	hl
 	call	dstore
-	ld	hl,11	;const
+	ld	hl,17	;const
 	add	hl,sp
 	push	hl
 	call	dldpsh
-	ld	hl,i_2+6
+	ld	hl,i_2+0
 	call	dload
 	call	dmul
 	pop	hl
@@ -360,11 +359,11 @@
 	ld	hl,32	;const
 	pop	bc
 	push	hl
-	ld	hl,17	;const
+	ld	hl,23	;const
 	add	hl,sp
 	push	hl
-	ld	hl,i_2+12
-	call	dload
+	ld	hl,1	;const
+	call	float
 	pop	hl
 	call	dstore
 .i_22
@@ -373,11 +372,11 @@
 	ld	a,h
 	or	l
 	jp	z,i_23
-	ld	hl,17	;const
+	ld	hl,23	;const
 	add	hl,sp
 	push	hl
 	call	dldpsh
-	ld	hl,25	;const
+	ld	hl,31	;const
 	add	hl,sp
 	call	dload
 	call	dmul
@@ -392,11 +391,12 @@
 	ld	a,h
 	or	l
 	jp	z,i_24
-	ld	hl,17	;const
+	ld	hl,23	;const
 	add	hl,sp
 	push	hl
 	call	dldpsh
-	ld	hl,i_2+6
+	ld	hl,25	;const
+	add	hl,sp
 	call	dload
 	call	dmul
 	pop	hl
@@ -416,23 +416,23 @@
 	ld	a,h
 	or	l
 	jp	z,i_25
-	ld	hl,23	;const
+	ld	hl,29	;const
 	add	hl,sp
 	push	hl
 	call	dldpsh
-	ld	hl,25	;const
+	ld	hl,31	;const
 	add	hl,sp
 	call	dload
-	call	dmul
+	call	ddiv
 	pop	hl
 	call	dstore
 	jp	i_26
 .i_25
-	ld	hl,23	;const
+	ld	hl,29	;const
 	add	hl,sp
 	push	hl
 	call	dldpsh
-	ld	hl,25	;const
+	ld	hl,31	;const
 	add	hl,sp
 	call	dload
 	call	dmul
@@ -449,22 +449,21 @@
 	ld	a,h
 	or	l
 	jp	z,i_27
-	ld	hl,17	;const
+	ld	hl,23	;const
 	add	hl,sp
 	push	hl
-	ld	hl,19	;const
+	ld	hl,25	;const
 	add	hl,sp
 	call	dload
 	call	minusfa
 	pop	hl
 	call	dstore
 .i_27
-	ld	hl,17	;const
+	ld	hl,23	;const
 	add	hl,sp
 	call	dload
-	call	ifix
 	exx
-	ld	hl,23	;const
+	ld	hl,29	;const
 	add	hl,sp
 	ld	sp,hl
 	exx
@@ -473,11 +472,9 @@
 
 .i_1
 	defm	"overflow"&0
-
 .i_2
-	defb	0,0,0,0,0,0,0,0,0,0
-	defb	32,132,0,0,0,0,0,129
-
+	defb	0,0,0,0,32,132,0,0,0,0
+	defb	0,129
 ; --- Start of Static Variables ---
 
 
@@ -485,19 +482,27 @@
 ; --- Start of Scope Defns ---
 
 	LIB	vfprintf_mini
+	LIB	malloc
+	LIB	getlarge
 	LIB	feof
 	LIB	fprand
 	LIB	fpseed
-	XDEF	_atof
+	LIB	labs
 	LIB	getk
+	LIB	atoi
 	LIB	isprint
+	LIB	atol
 	LIB	fmod
+	LIB	free
 	LIB	sprintf
 	LIB	tolower
 	LIB	ispunct
 	LIB	ftoa
 	LIB	ftoe
 	LIB	read
+	LIB	strtol
+	LIB	exit
+	LIB	rand
 	LIB	isupper
 	LIB	open
 	LIB	fgetc
@@ -507,11 +512,13 @@
 	LIB	fopen_z88
 	LIB	creat
 	LIB	close
+	LIB	heapinit
 	LIB	isxdigit
 	LIB	toupper
 	LIB	puts
-	XREF	_float
+	LIB	abs
 	LIB	fseek
+	LIB	calloc
 	LIB	rename
 	LIB	floor
 	LIB	fopen
@@ -523,6 +530,7 @@
 	XREF	__sgoioblk
 	LIB	fgetc_cons
 	LIB	fgets_cons
+	LIB	mkdir
 	LIB	fputc
 	LIB	isalpha
 	LIB	remove
@@ -530,6 +538,7 @@
 	LIB	scanf
 	LIB	isascii
 	LIB	fputs
+	LIB	strtoul
 	LIB	isalnum
 	LIB	lseek
 	LIB	vsprintf
@@ -538,6 +547,7 @@
 	LIB	nropen
 	LIB	writebyte
 	LIB	fclose
+	LIB	sleep
 	LIB	iscntrl
 	LIB	fgetpos
 	LIB	printf
@@ -547,9 +557,14 @@
 	LIB	printn
 	LIB	fdtell
 	LIB	closeall
+	LIB	srand
 	LIB	freopen_z88
 	LIB	ungetc
 	LIB	getarg
+	LIB	atexit
+	LIB	getcwd
+	LIB	csleep
+	LIB	getfree
 	LIB	vfprintf_comp
 	LIB	fscanf
 	LIB	fabandon
@@ -559,6 +574,7 @@
 	XREF	_vfprintf
 	LIB	islower
 	LIB	write
+	LIB	zfloat
 	LIB	fputc_cons
 	LIB	puts_cons
 	LIB	amax
