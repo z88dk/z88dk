@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.8 2003-03-22 14:34:20 dom Exp $
+;       $Id: spec_crt0.asm,v 1.9 2003-03-23 10:28:19 dom Exp $
 ;
 
 
@@ -48,7 +48,7 @@
                 DEFC    myzorg = $5CCB  ;repleaces BASIC program
         ENDIF
         IF !STACKPTR
-                DEFC    stack = $FF57  ;below UDG, keep eye when using banks
+                DEFC    STACKPTR = $FF57  ;below UDG, keep eye when using banks
         ENDIF
         ENDIF
 
@@ -63,8 +63,8 @@
 IF !DEFINED_ZXVGS
         ld      (start1+1),sp	;Save entry stack
 ENDIF
-IF 	stack
-	ld	sp,stack
+IF 	STACKPTR
+	ld	sp,STACKPTR
 ENDIF
         ld      hl,-64
         add     hl,sp
