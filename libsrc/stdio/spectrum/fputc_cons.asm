@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.3 2003-01-24 14:20:38 dom Exp $
+;	$Id: fputc_cons.asm,v 1.4 2003-01-26 14:29:58 dom Exp $
 ;
 
 
@@ -197,16 +197,16 @@
 	inc	d	;down screen row
 	inc	hl
 	djnz	loop32
-        ld      a,h  
+        ld      a,d  
 	dec     a
         rrca  
         rrca  
         rrca  
         and     3  
         or      88  
-        ld      h,a  
+        ld      d,a  
 	ld      a,(attr)
-	ld      (hl),a
+	ld      (de),a
 	ld	hl,(chrloc)
 	inc	l
 	inc	l
