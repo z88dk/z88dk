@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: declfunc.c,v 1.2 2002-01-28 11:51:16 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -188,7 +188,7 @@ AddFuncCode(char *n, char type, char ident, char sign,char zfar, int storage, in
 /*
  * I'm not sure what *exactly* I was trying to achieve here djm 25/2/00
  */
-                            if (currfn->storage != EXTERNAL && (currfn->flags&LIBRARY != LIBRARY) ) {
+                            if (currfn->storage != EXTERNAL && ( (currfn->flags&LIBRARY) != LIBRARY) ) {
 				currfn->flags&=(~LIBRARY);
                                 currfn->size = 0;
                             }
@@ -329,6 +329,7 @@ SYMBOL *currfn;
         char buffer2[120];
         unsigned char tester;
 
+	lgh = 0;  /* Initialise it */
         argnumber=currfn->prototyped;
 /*
  *      If we have filled up our number of arguments, then pretend
@@ -517,7 +518,6 @@ SYMBOL *currfn;
 
 int CheckANSI()
 {
-	SYMBOL *ptr;
         if (rmatch("unsigned") || rmatch("signed") || rmatch("int") || rmatch("char") || rmatch("double") || rmatch("long") || rmatch("struct") || rmatch("union") || rmatch("void") || rmatch("far") || rmatch("near") || rmatch("const") || rmatch("volatile") || rmatch("__TD__") || rmatch("float") || CheckTypDef() ) return (YES);
         return (NO);
 }
@@ -556,6 +556,7 @@ char proto)              /* YES=prototyping -> names not needed */
  *      if (typ == DOUBLE)
  *              incfloat=1;
  */
+	argptr = NULL;
 
 /* Only need while loop if K&R defs */
 

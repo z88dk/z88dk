@@ -3,7 +3,7 @@
  *
  *      Routines to float an string
  *
- *      $Id: float.c,v 1.3 2002-01-26 22:10:19 dom Exp $
+ *      $Id: float.c,v 1.4 2002-01-28 11:51:16 dom Exp $
  *
  *      This code has been largely rewritten. It now produces numbers
  *      to about 4 decimal places - there's an inaccuracy creeping in
@@ -186,7 +186,7 @@ void fltmult(unsigned char *i1, unsigned char *i2)
 {
 
     unsigned char fa1[EXPONENT+2], fa2[EXPONENT+2], fa3[EXPONENT+2];
-    int i, j, k, temp, temp2, mask, carry;
+    int i, j, k, temp, mask, carry;
     unsigned long a, b, c;
     int     exp;
 
@@ -259,9 +259,9 @@ void fltmult(unsigned char *i1, unsigned char *i2)
 
 void fltadd(unsigned char *i1,unsigned char *i2)
 {
-    int i,j;
-    unsigned long temp, temp2, carry;
     unsigned char fa1[EXPONENT+2], fa2[EXPONENT+2];
+    unsigned long temp, carry;
+    int i;
 
 
     if ( i2[5]  == 0) {	/* If adding zero */

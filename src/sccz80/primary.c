@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.9 2002-01-26 23:49:13 dom Exp $
+ *      $Id: primary.c,v 1.10 2002-01-28 11:51:16 dom Exp $
  */
 
 
@@ -39,7 +39,7 @@ LVALUE *lval;
         cotag=lval->c_tag;
 	level=lval->level;
 	clevel=lval->castlevel;
-        putint(0, (char *) lval, sizeof(LVALUE) ) ;
+	memset(lval,0,sizeof(LVALUE));
         lval->c_id=cid;
         lval->c_vtype=vtype;
         lval->c_flags=cflags;
@@ -179,7 +179,7 @@ LVALUE *lval ;
  */
 int calc(left, oper, right)
 int left;
-void (*oper)();
+void (*oper)(void);
 int right;
 {
         if (oper == zdiv)      return (left / right );
@@ -194,7 +194,7 @@ int right;
 
 int calcun(left,oper,right)
 unsigned int left;
-void (*oper)();
+void (*oper)(void);
 unsigned int right;
 {
         if (oper == zdiv)      return (left / right );
@@ -213,7 +213,7 @@ unsigned int right;
 
 int CalcStand(left,oper,right)
 int left;
-void (*oper)();
+void (*oper)(void);
 int right;
 {
         if (oper == zor)        return (left | right) ;

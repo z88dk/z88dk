@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.1 2000-07-04 15:33:30 dom Exp $
+ *      $Id: callfunc.c,v 1.2 2002-01-28 11:51:16 dom Exp $
  */
 
 /*
@@ -11,7 +11,7 @@
  */
 
 static int SetWatch(char *sym);
-static int SetMiniFunc(char *arg);
+static int SetMiniFunc(unsigned char *arg);
 
 /*
  *      External variables used
@@ -41,7 +41,7 @@ SYMBOL *ptr;    /* symbol table entry (or 0) */
 {
         int nargs, vconst, val,expr,argnumber ;
         int watcharg;   /* For watching printf etc */
-        char minifunc;  /* Call cut down version */
+        unsigned char minifunc;  /* Call cut down version */
         unsigned char protoarg;
 	char preserve;	/* Preserve af when cleaningup */
 
@@ -280,7 +280,7 @@ int ForceArgs(char dest, char src,int expr, char functab)
  * standard or floating (not written yet!)
  */
 
-static int SetMiniFunc(char *arg)
+static int SetMiniFunc(unsigned char *arg)
 {
         char    c;
         char    complex;

@@ -1,6 +1,6 @@
 /* io.c */
 extern int getint(unsigned char *addr, int len);
-extern void putint(int i, char *addr, int len);
+extern void putint(int i, unsigned char *addr, int len);
 extern int symname(char *sname);
 extern int getlabel(void);
 extern void printlabel(int label);
@@ -25,6 +25,6 @@ extern void ol(char *ptr);
 extern void ot(char *ptr);
 extern void blanks(void);
 extern void outdec(long number);
-extern void outd2(int n);
+extern void outd2(long n);
 extern char raise(char c);
 extern void queuelabel(int);

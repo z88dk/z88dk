@@ -3,7 +3,7 @@
  *
  *      Various compiler file i/o routines
  *
- *      $Id: io.c,v 1.2 2002-01-20 23:28:19 dom Exp $
+ *      $Id: io.c,v 1.3 2002-01-28 11:51:16 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -31,7 +31,7 @@ int len ;
  * (low byte first)
  */
 void putint(i, addr, len)
-char *addr ;
+unsigned char *addr ;
 int i, len ;
 {
         while (len--) {
@@ -303,8 +303,7 @@ long number;
         outd2(number);
 }
 
-void outd2(n)
-int n ;
+void outd2(long n)
 {
         if ( n > 9 ) {
                 outd2(n/10) ;

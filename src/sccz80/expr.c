@@ -2,7 +2,7 @@
  * cc4.c - fourth part of Small-C/Plus compiler
  *         routines for recursive descent
  *
- * $Id: expr.c,v 1.6 2001-06-27 11:13:07 dom Exp $
+ * $Id: expr.c,v 1.7 2002-01-28 11:51:16 dom Exp $
  *
  */
 
@@ -68,6 +68,7 @@ LVALUE *lval ;
     int k;
 
     ClearCast(&lval2); ClearCast(&lval3);
+    lval2.level = lval3.level = lval->level;
     setstage(&before, &start) ;
     k = plnge1(heir1a, lval);
     if ( lval->is_const ) {
@@ -172,6 +173,7 @@ LVALUE *lval ;
         int temptype;
         ClearCast(&lval2);
 
+	lval2.level = lval->level;
         k = heir2a(lval) ;
         if ( cmatch('?') ) {
                 /* evaluate condition expression */
@@ -254,16 +256,13 @@ LVALUE *lval ;
         return skim("&&", testjump, jumpnc, 0 , 1, heir2, lval);
 }
 
-int heir234(lval, heir, opch, oper)
-LVALUE *lval;
-int (*heir)() ;
-char opch ;
-void (*oper)();
+int heir234(LVALUE *lval, int (*heir)(), char opch, void (*oper)())
 {
         LVALUE lval2 ;
         int k ;
 
         ClearCast(&lval2);
+	lval2.level = lval->level;
         k = plnge1(heir, lval);
         blanks();
         if ((ch() != opch) || (nch() == '=') || (nch() == opch)) return k;
@@ -302,6 +301,7 @@ LVALUE *lval ;
         int     k;
 
         ClearCast(&lval2);
+	lval2.level = lval->level;
 
         k = plnge1(heir6, lval) ;
         blanks() ;
@@ -326,6 +326,7 @@ LVALUE *lval ;
         int k ;
 
         ClearCast(&lval2);
+	lval2.level = lval->level;
 
         k = plnge1(heir7, lval) ;
         blanks() ;
@@ -361,6 +362,7 @@ LVALUE *lval ;
         int k ;
 
         ClearCast(&lval2);
+	lval2.level = lval->level;
 
         k = plnge1(heir8, lval) ;
         blanks();
@@ -393,6 +395,7 @@ LVALUE *lval ;
         int k ;
 
         ClearCast(&lval2);
+	lval2.level = lval->level;
 
         k = plnge1(heir9, lval) ;
         blanks();
@@ -416,6 +419,7 @@ LVALUE *lval ;
         LVALUE lval2 ;
         int k ;
         ClearCast(&lval2);
+	lval2.level = lval->level;
 
         k = plnge1(heira, lval) ;
         blanks();
@@ -510,7 +514,7 @@ LVALUE *lval ;
                        lval->c_id=ident;
                        lval->c_tag=otag;
                        lval->c_flags=var.sflag;
-			lval->castlevel=lval->level;
+		       lval->castlevel=lval->level;
                        needchar(')');
 /*
  * Reenter ourselves..gosh, recursion is fun! 

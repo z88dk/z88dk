@@ -1,6 +1,6 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.3 2002-01-20 23:30:36 dom Exp $
+ * $Id: define.h,v 1.4 2002-01-28 11:51:16 dom Exp $
  */
 
 /*      Stand-alone definitions                 */
@@ -33,7 +33,7 @@
 #define STARTGLB        symtab
 #define ENDGLB          (STARTGLB+NUMGLBS)
 
-#define NUMLOC          200
+#define NUMLOC          512
 #define STARTLOC        loctab
 #define ENDLOC          (STARTLOC+NUMLOC)
 

@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.11 2002-01-27 15:47:59 dom Exp $
+ *      $Id: const.c,v 1.12 2002-01-28 11:51:16 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -236,7 +236,7 @@ int stash_double_str(char *start, char *end)
 {
     int  len;
     long val;
-    char  *buf;
+    unsigned char  *buf;
 
     len = end-start;
 
@@ -260,9 +260,9 @@ int stash_double_str(char *start, char *end)
  * number - saves space etc etc
  */
 
-int searchdub(char *num)
+long searchdub(unsigned char *num)
 {
-        char *tempdub;
+        unsigned char *tempdub;
         int dubleft, k,match;
         
         dubleft=dubptr;
@@ -620,7 +620,6 @@ LVALUE *lval ;
                         }
 
         }
-done:
         needchar(')') ;
         lval->is_const = 1 ;
         lval->val_type = CINT ;

@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.5 2001-04-27 14:45:28 dom Exp $
+ *      $Id: stmt.c,v 1.6 2002-01-28 11:51:16 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -485,10 +485,9 @@ void doreturn(char type)
 /*
  * leave a function
  * preserve primary register if save is TRUE
+ * type: 1=c, 2=nc, 0=don't bother
  */
-void leave(save,type)
-int save ;
-char type;	/* 1=c, 2=nc 0=don't bother */
+void leave(int save,char type)
 {
         int savesp;
         modstk(0,save,NO); /* clean up stk */

@@ -1,7 +1,7 @@
 /* codegen.c */
 extern void comment(void);
 extern void header(void);
-void DoLibHeader();
+extern void DoLibHeader();
 extern void trailer(void);
 extern void outname(char *sname, char pref);
 extern void getmem(SYMBOL *sym);
@@ -41,7 +41,7 @@ extern void jump0(LVALUE *lval,int label);
 extern void jump(int label);
 extern void opjump(char *, int);
 extern void testjump(LVALUE *,int label);
-extern void zerojump(void (*oper)(), int label, LVALUE *lval);
+extern void zerojump(void (*oper)(LVALUE *,int), int label, LVALUE *lval);
 extern void defbyte(void);
 extern void defstorage(void);
 extern void defword(void);

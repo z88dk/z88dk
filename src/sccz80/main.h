@@ -42,6 +42,7 @@ extern void SetAllWarn(char *arg);
 extern void SetDefVar(char *arg);
 extern void SetSafeData(char *arg);
 extern void MemCleanup(void);
+extern void PragmaBytes(int flag);
 extern void WriteDefined(char *sname, int value);
 extern void SetIntuition(char *);
 extern void SetStartUp(char *);
