@@ -11,13 +11,17 @@
 ;       hell well break out!
 ;
 ;       djm 7/12/98
+;
+;	$Id: float.asm,v 1.4 2001-10-07 12:53:26 dom Exp $
 
+;-------------------------------------------------
+; Some scope defintionons for the crt0 float stuff
+;-------------------------------------------------
 
         XDEF    fp_seed
         XDEF    extra
         XDEF    fa
         XDEF    fasign
-;        XDEF    seed
         XDEF    dstore
         XDEF    dload
         XDEF    dldpsh
@@ -30,8 +34,9 @@
         LIB     ifix
 	LIB	atof
 
-;
-
+;-------------------------------------------
+; Unused code from the generic z80 maths lib
+;-------------------------------------------
 
 ;
 ;DIVZERO CALL   GRIPE
@@ -44,59 +49,63 @@
 ;       FA = (hl)
 ;
 
-       ;(hl) = FA
 
-.DSTORE LD      DE,FA
-        LD      BC,6
-        EX      DE,HL
-        LDIR
-        EX      DE,HL
-        RET
+;--------------
+; Copy FA to de
+;--------------
+.dstore ld      de,fa
+        ld      bc,6
+        ex      de,hl
+        ldir
+        ex      de,hl
+        ret
 
 
+;----------------
+; Load FA from hl
+;----------------
+.dload	ld	de,fa
+        ld      bc,6
+        ldir
+        ret
 
-.DLOAD
-        LD      DE,FA
-        LD      BC,6
-        LDIR
-        RET
-;
-;       load FA from (HL), and push FA onto stack
-;
-.DLDPSH
-        LD      DE,FA
-        LD      BC,6
-        LDIR
-;
-;       push the floating point accumulator
-;       (preserving return address)
-;
-.DPUSH
-        POP     DE
-        LD      HL,(FA+4)
-        PUSH    HL
-        LD      HL,(FA+2)
-        PUSH    HL
-        LD      HL,(FA)
-        PUSH    HL
-        EX      DE,HL
-        JP      (HL)
-;
-;       push floating point accumulator
-;       (preserve return address and next stacked word)
-;
-.DPUSH2 POP     DE      ;save return address
-        POP     BC      ;save next word
-        LD      HL,(FA+4)
-        PUSH    HL
-        LD      HL,(FA+2)
-        PUSH    HL
-        LD      HL,(FA)
-        PUSH    HL
-        EX      DE,HL
-        PUSH    BC      ;restore next word
-        JP      (HL)    ;return
+;-----------------------------------------
+; Load FA from (hl) and push FA onto stack
+;-----------------------------------------
+.dldpsh	ld      de,fa
+        ld      bc,6
+        ldir
+;------------------------------------------
+; Push FA onto stack (under return address)
+;------------------------------------------
+.dpush	pop	de
+        ld      hl,(fa+4)
+        push    hl
+        ld      hl,(fa+2)
+        push    hl
+        ld      hl,(fa)
+        push    hl
+        ex      de,hl
+        jp      (hl)
 
+;------------------------------------------------------
+; Push FA onto stack under ret address and stacked word
+;------------------------------------------------------
+.dpush2 pop     de      ;save return address
+        pop     bc      ;save next word
+        ld      hl,(fa+4)
+        push    hl
+        ld      hl,(fa+2)
+        push    hl
+        ld      hl,(fa)
+        push    hl
+        ex      de,hL
+        push    bc      ;restore next word
+        jp      (hl)    ;return
+
+;---------------------------------------------------------
+; Convert string to FP number in FA calls the library atof
+;---------------------------------------------------------
 .__atof2
 	push	hl
 	call	atof
@@ -106,7 +115,6 @@
 
 ; * * * * * HOPEFULLY THIS IS THE END OF THE GENERIC
 ; * * * * * ROUTINES NEEDED FOR BOTH mathz88 & genmath
-
 
 IF NEED_mathz88
         INCLUDE "#mathz88.asm"

@@ -3,57 +3,42 @@
 ;       Stefano Bodrato - Apr. 2000
 ;                         Apr. 2001: Added MS-DOS protection
 ;
-;       $Id: cpm_crt0.asm,v 1.4 2001-09-07 18:17:11 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.5 2001-10-07 12:53:26 dom Exp $
 ;
 
-                MODULE  cpm_crt0
+	MODULE  cpm_crt0
 
-;
-; Initially include the zcc_opt.def file to find out lots of lovely
-; information about what we should do..
-;
+;-------------------------------------------------
+; Include zcc_opt.def to find out some information
+;-------------------------------------------------
 
-                INCLUDE "zcc_opt.def"
+	INCLUDE "zcc_opt.def"
 
-; No matter what set up we have, main is always, always external to
-; this file
+;-----------------------
+; Some scope definitions
+;-----------------------
 
-                XREF    _main
+	XREF    _main		;main() is always external to crt0
 
-;
-; Some variables which are needed for both app and basic startup
-;
+	XDEF    cleanup		;jp'd to by exit()
+	XDEF    l_dcal		;jp(hl)
 
-        XDEF    cleanup
-        XDEF    l_dcal
+	XDEF    int_seed	;Integer rand() seed
 
-; Integer rnd seed
+	XDEF	_vfprintf	;jp to printf core routine
 
-        XDEF    int_seed
+	XDEF    exitsp		;atexit() variables
+	XDEF    exitcount
 
-; vprintf is internal to this file so we only ever include one of the set
-; of routines
-
-	XDEF	_vfprintf
-
-;Exit variables
-
-        XDEF    exitsp
-        XDEF    exitcount
-
-;For stdin, stdout, stder
-
-        XDEF    __sgoioblk
-
-; Now, getting to the real stuff now!
-
+	XDEF    __sgoioblk	;std* control block
 
 
         org     $100
 
-
+;----------------------
+; Execution starts here
+;----------------------
 .start
-
 	defb	$eb,$04		;DOS protection... JMPS LABE
 	ex	de,hl
 	jp	begin
@@ -67,11 +52,8 @@
 	defm	"This program is for a CP/M system."
 	defb	13,10,'$'
 
-.begin
-        ld      hl,0
-        add     hl,sp
-        ld      (start1+1),hl
-        ld      hl,-64
+.begin	ld      (start1+1),sp	;Save entry stack
+        ld      hl,-64		;Make space for atexit() stack
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
@@ -87,52 +69,45 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
-; 	Save the default disk
-	ld	c,25
+	ld	c,25		;Set the default disc
 	call	5
 	ld	(defltdsk),a
 	
-        call    _main
+        call    _main		;Call user code
 
-; 	Restore the default disk
-	ld	a,(defltdsk) ; 
+	ld	a,(defltdsk)	;Restore default disc
 	ld	e,a
 	ld	c,14
 	call	5
 
-
 .cleanup
-;
-;       Deallocate memory which has been allocated here!
-;
-	push	hl
+	push	hl		;Save return value
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-	LIB	closeall
+	LIB	closeall	;Close any opened files
 	call	closeall
 ENDIF
 ENDIF
-	pop	bc
-.start1
-        ld      sp,0
+	pop	bc		;Get exit() value into bc
+.start1	ld      sp,0		;Pick up entry sp
         jp	0
 
-.l_dcal
-        jp      (hl)
+.l_dcal	jp	(hl)		;Used for call by function ptr
 
-; Now, define some values for stdin, stdout, stderr
-
+;------------------------
+; The stdio control block
+;------------------------
 .__sgoioblk
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
 ELSE
-        defw    -11,-12,-10
+        defw    -11,-12,-10	;Dummy values (unused by CPM port?)
 ENDIF
 
 
-; Now, which of the vfprintf routines do we need?
-
-
+;----------------------------------------
+; Work out which vfprintf routine we need
+;----------------------------------------
 ._vfprintf
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
@@ -150,52 +125,31 @@ ELSE
 ENDIF
 
 
-;Seed for integer rand() routines
+;-----------------------
+; Some startup variables
+;-----------------------
 
-.defltdsk       defb    0
+.defltdsk       defb    0	;Default disc
+.int_seed       defw    0	;Integer seed
+.exitsp		defw	0	;Address of atexit() stack
+.exitcount	defb	0	;Number of atexit() routinens
+.heaplast	defw	0	;Pointer to last free heap block
+.heapblocks	defw	0	;Number of heap blocks available
 
-;Seed for integer rand() routines
+;----------------------------
+; Unneccessary file signature
+;----------------------------
+         	defm  	"Small C+ CP/M"&0
 
-.int_seed       defw    0
-
-;Atexit routine
-
-.exitsp
-                defw    0
-.exitcount
-                defb    0
-
-; Heap stuff
-
-.heaplast	defw	0
-.heapblocks	defw	0
-
-; mem stuff
-
-         defm  "Small C+ CP/M"&0
-
-;All the float stuff is kept in a different file...for ease of altering!
-;It will eventually be integrated into the library
-;
-;Here we have a minor (minor!) problem, we've no idea if we need the
-;float package if this is separated from main (we had this problem before
-;but it wasn't critical..so, now we will have to read in a file from
-;the directory (this will be produced by zcc) which tells us if we need
-;the floatpackage, and if so what it is..kludgey, but it might just work!
-;
-;Brainwave time! The zcc_opt file could actually be written by the
-;compiler as it goes through the modules, appending as necessary - this
-;way we only include the package if we *really* need it!
-
+;----------------------------------------------
+; Floating point support routines and variables
+;----------------------------------------------
 IF NEED_floatpack
         INCLUDE         "#float.asm"
 
-;seed for random number generator - not used yet..
-.fp_seed        defb    $80,$80,0,0,0,0
-;Floating point registers...
-.extra          defs    6
-.fa             defs    6
-.fasign         defb    0
+.fp_seed        defb    $80,$80,0,0,0,0	; FP seed (unused ATM)
+.extra          defs    6		; FP spare register
+.fa             defs    6		; FP accumulator
+.fasign         defb    0		; FP variable
 
 ENDIF
-

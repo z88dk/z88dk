@@ -1,160 +1,180 @@
 ;
+;	Header file which contains all required variables from the
+;	startup that need to be exposed to individual C files
+;
+;	Stick in this file any routines which are needed or implicitly
+;	implied by sccz80.
+;
 ;       This file is included by every module
 ;       To handle multi module programs which use floating point
 ;       routines in different modules, we have got rid of
 ;       the conditional assembly around the float routines
 ;
-
+;	(Used by asxxx)
 ;
-;       .globl    for graphics fns
-;
-        .globl    base_graphics
-;
-;       stdio/printf things
-;
-        .globl    _sf_string1
-        .globl    _sf_oldch
+;	$Id: z80_crt0.hdx,v 1.2 2001-10-07 12:53:26 dom Exp $
 
-; Process interrupt variable (**for apps only**)
-	.globl	packintrout
+        .globl    base_graphics	; Address of graphics screen
 
-;Standard .globl for startup library..
+	.globl	_cpfar2near	; Far->near conversion (z88)
+	.globl	packintrout	; Process interrupt (z88 apps)
+
+        .globl    l_dcal		; jp(hl)
+        .globl    cleanup		; cleanup before program exit
 
 
-        .globl    l_dcal
-        .globl    cleanup
+;------------------------------------
+; Scopes for integer library routines
+;------------------------------------
 
-;Hooks for library functions
-
-        .globl    l_gchar
-        .globl    l_sxt
-        .globl    l_gint
-	.globl    l_gint_eq
-	.globl    l_ghtonsint
-        .globl    l_pint
-	.globl    l_pint_eq
-        .globl    l_or
-        .globl    l_xor
-        .globl    l_and
-        .globl    l_eq
-        .globl    l_ne
-        .globl    l_gt
-        .globl    l_le
-        .globl    l_ge
-        .globl    l_lt
-        .globl    l_uge
-        .globl    l_ult
-        .globl    l_ugt
-        .globl    l_ule
-        .globl    l_cmp
-        .globl    l_ucmp
-        .globl    l_asr
-	.globl    l_asr_u
-        .globl    l_asl
-        .globl    l_sub
-        .globl    l_neg
-        .globl    l_com
-        .globl    l_lneg
-        .globl    l_bool
-        .globl    l_cm_de
+	.globl    l_getptr		;Get 3 byte pointer
+	.globl    l_putptr		;Put 3 byte pointer
+        .globl    l_gchar		;Get signed char
+        .globl    l_sxt		;Sign extend char
+        .globl    l_gint		;Get int
+	.globl    l_gint_eq	;Get int and test == 0
+	.globl    l_ghtonsint	;Get reverse order int
+        .globl    l_pint		;Put int
+	.globl    l_pint_eq	;Put int and test == 0
+	.globl    l_pint_pop	;Put int and pop place address
+	.globl    l_pint_ex	;Put int hl to addr de return addr in hl
+        .globl    l_or		;Int logical or
+        .globl    l_xor		;Int logical xor
+        .globl    l_and		;Int logical and
+        .globl    l_eq		;Int equality
+        .globl    l_ne		;Int inequality
+        .globl    l_gt		;Int signed >
+        .globl    l_le		;Int signed <=
+        .globl    l_ge		;Int signed >=
+        .globl    l_lt		;Int signed <
+        .globl    l_uge		;Int unsigned >=
+        .globl    l_ult		;Int unsigned <
+        .globl    l_ugt		;Int unsigned >
+        .globl    l_ule		;Int unsigned <=
+        .globl    l_cmp		;Int signed compare
+        .globl    l_ucmp		;Int unsigned compare
+        .globl    l_asr		;Int signed >>
+	.globl    l_asr_u		;Int unsigned >>
+        .globl    l_asl		;Int <<
+        .globl    l_sub		;Int subtract
+        .globl    l_neg		;Int negate
+        .globl    l_com		;Int ~
+        .globl    l_lneg		;Int logical negate
+        .globl    l_bool		;Int boolean tetst
+        .globl    l_cm_de		;
         .globl    l_cm_bc
         .globl    l_deneg
         .globl    l_bcneg
-        .globl    l_case
-        .globl    l_mult
-        .globl    l_div
-        .globl    l_div_u
+        .globl    l_case		;Integer case
+        .globl    l_mult		;Integer *
+        .globl    l_div		;Integer signed /
+        .globl    l_div_u		;Integer unsigned /
 
+;------------------
 ;Long functions now
+;------------------
 
-              .globl     l_int2long_s
-              .globl     l_long2int_s
-              .globl     l_glong
-              .globl     l_long_add
-              .globl     l_long_and
-              .globl     l_long_asl
-              .globl     l_long_asr
-	      .globl     l_long_aslo
-	      .globl     l_long_asro
-              .globl     l_long_bool
-              .globl     l_long_cmp
-              .globl     l_long_com
-              .globl     l_long_eq
-              .globl     l_long_ge
-              .globl     l_long_gt
-              .globl     l_long_le
-              .globl     l_long_lneg
-              .globl     l_long_lt
-              .globl     l_long_ne
-              .globl     l_long_neg
-              .globl     l_long_or
-              .globl     l_long_sub
-              .globl     l_long_ucmp
-              .globl     l_long_uge
-              .globl     l_long_ugt
-              .globl     l_long_ule
-              .globl     l_long_ult
-              .globl     l_long_xor
-              .globl     l_plong
-              .globl     l_inclong
-              .globl     l_declong
-              .globl     l_long_div
-              .globl     l_long_div_u
-              .globl     l_long_mult
-              .globl     l_long_asr_u
-	      .globl     l_long_asr_uo
-              .globl     l_long_case
+	.globl     l_int2long_s	;Int->long signed conversion
+	.globl     l_long2int_s	;Long->int signed conversion
+	.globl     l_glong		;Get long
+	.globl     l_long_add
+	.globl     l_long_and
+	.globl     l_long_asl
+	.globl     l_long_asr
+	.globl     l_long_aslo	;Long << shift in c
+	.globl     l_long_asro	;Long >> shift in c (signed)
+	.globl     l_long_bool
+	.globl     l_long_cmp
+	.globl     l_long_com
+	.globl     l_long_eq
+	.globl     l_long_ge
+	.globl     l_long_gt
+	.globl     l_long_le
+	.globl     l_long_lneg
+	.globl     l_long_lt
+	.globl     l_long_ne
+	.globl     l_long_neg
+	.globl     l_long_or
+	.globl     l_long_sub
+	.globl     l_long_ucmp
+	.globl     l_long_uge
+	.globl     l_long_ugt
+	.globl     l_long_ule
+	.globl     l_long_ult
+	.globl     l_long_xor
+	.globl     l_plong
+	.globl     l_inclong	;Increment long
+	.globl     l_declong	;Decrement long
+	.globl     l_long_div
+	.globl     l_long_div_u
+	.globl     l_long_mult
+	.globl     l_long_asr_u	;Long unsigned >>
+	.globl     l_long_asr_uo	;Long unsigned >> shift in c
+	.globl     l_long_case
 
+;--------------------------------------------------------------
+; Floating point support routines, held in startup code so .globl
+;--------------------------------------------------------------
 
-
-
-;Now .globl for floating routines
-;
-;Since we're using startup module and are distancing that from here,
-;we might as well set these permanently - djm 29/2/99
-
-
-        .globl  DADD
-        .globl  DDIV
-        .globl  DGE
-        .globl  DIV1
-        .globl  DIV17
-        .globl  DLOAD
-        .globl  DLDPSH
-        .globl  DMUL
-        .globl  DSTORE
-        .globl  DSWAP
-        .globl  DSUB
-        .globl  DEQ
-        .globl  DGT
-        .globl  DLEq      ;djm 7/10/98
-        .globl  DLT
-        .globl  DNE
-        .globl  DPUSH
-        .globl  DPUSH2
-        .globl  FA
-        .globl  extra
-        .globl  FADD
-        .globl  FDIV
-        .globl  FMUL
-        .globl  FSUB
+        XRER	DADD
+        .globl	DDIV
+        .globl 	DGE
+        .globl	DIV1
+        .globl	DIV17
+        .globl	DLOAD
+        .globl	DLDPSH
+        .globl	DMUL
+        .globl	DSTORE
+        .globl	DSWAP
+        .globl	DSUB
+        .globl	DEQ
+        .globl	DGT
+        .globl  	DLEq      ;djm 7/10/98
+        .globl  	DLT
+        .globl  	DNE
+        .globl  	DPUSH
+        .globl  	DPUSH2
+        .globl  	FA
+        .globl  	extra
+        .globl  	FADD
+        .globl  	FDIV
+        .globl  	FMUL
+        .globl  	FSUB
 ;        .globl  GRIPE   
-        .globl  PUSHF2
-        .globl  LDBCFA
-        .globl  LDBCHL
-        .globl  LDFABC
-        .globl   MINUSFA   ;negate FP number
-        .globl  NORMA
+        .globl  	PUSHF2
+        .globl  	LDBCFA
+        .globl  	LDBCHL
+        .globl  	LDFABC
+        .globl   	MINUSFA   ;negate FP number
+        .globl  	NORMA
         .globl     ODD
-        .globl  PUSHFA
-        .globl  SGN
+        .globl  	PUSHFA
+        .globl  	SGN
 ;        .globl  OFLOW
-        .globl  FASIGN
-        .globl  NORM
-        .globl  COMPARE
-        .globl  INT2
-        .globl  PI
-        .globl  HALFPI
-        .globl   float              ;Convert int to float
-	.globl   ufloat		 ;unsigned int to float
-        .globl   ifix               ;Convert float to int
+        .globl  	FASIGN
+        .globl  	NORM
+        .globl  	COMPARE
+        .globl  	INT2
+        .globl  	PI
+        .globl  	HALFPI
+	.globl  	__atof2
+        .globl   	float		;Convert int to float
+	.globl   	ufloat		;unsigned int to float
+        .globl   	ifix		;Convert float to int
+
+;--------------------------------------------------
+; Routines for picking up variables from far memory
+;--------------------------------------------------
+
+	.globl	lp_gchar
+	.globl	lp_gdoub
+	.globl	lp_gint
+	.globl	lp_glong
+	.globl	lp_gptr
+	.globl	lp_pchar
+	.globl	lp_pdoub
+	.globl	lp_pint
+	.globl	lp_plong
+	.globl	lp_pptr
+
+
