@@ -149,4 +149,9 @@ games/spectrum/beeper
 spectrum/tape_save
 spectrum/tape_save_block
 spectrum/tape_load_block
+rs232/spectrum/rs232_close
+rs232/spectrum/rs232_get
+rs232/spectrum/rs232_init
+rs232/spectrum/rs232_params
+rs232/spectrum/rs232_put
 printflike/ltoa_any

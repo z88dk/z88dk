@@ -1,16 +1,16 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.39 2002-04-24 08:15:02 stefano Exp $
+# $Id: Makefile,v 1.40 2002-04-25 11:24:13 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
 	nc_clib.lib vz_clib.lib vzansi_clib.lib cpm_clib.lib \
-	mz_clib.lib mzansi_clib.lib zx81_clib.lib zx81ansi_clib.lib \
+	mz_clib.lib mzansi_clib.lib \
 	abc80_clib.lib aceansi_clib.lib sam_clib.lib \
 	msx_clib.lib svi_clib.lib m5_clib.lib cpc_clib.lib \
 	c128ansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
-	rex_clib.lib
+	rex_clib.lib zx81_clib.lib zx81ansi_clib.lib
 
 genlibs: m.lib malloc.lib z80_crt0.lib
 
@@ -154,6 +154,7 @@ zx_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	cd time ; make lzx
+	cd rs232 ; make lzx
 	./gamesdeps.sh
 	cd games ; make
 	cd spectrum ; make
