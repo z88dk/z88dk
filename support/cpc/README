@@ -1,4 +1,4 @@
-$Id: README,v 1.1 2001-06-12 14:28:47 stefano Exp $
+$Id: README,v 1.2 2001-06-18 10:46:31 stefano Exp $
 
 Amstrad CPC
 
@@ -11,5 +11,11 @@ Amstrad CPC
 	sna_mng i a.bas loader.sna 8192 30000
 - Re-run the emulator, load the modified snapshot and type:
 	call &2000
+
+As an alternative the XTI (Disk Image XTender) utility can be used; 
+this puts a binary file into a disk image.
+A valid location/version for XTI (when this document is been updated) is:
+ftp://ftp.lip6.fr/pub/amstrad/emu-uti/pcxti14.zip
+
 
 Enjoy !

@@ -6,7 +6,7 @@
 	XREF	base_graphics
 
 ;
-;	$Id: pixladdr.asm,v 1.1 2001-06-15 15:52:49 stefano Exp $
+;	$Id: pixladdr.asm,v 1.2 2001-06-18 10:46:31 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -50,14 +50,12 @@
 
 	call	$BC1D
 	ld	d,h
-	;ld	e,a
 	ld	e,l
 
 	ld	a,c
+	
 	and	b
 	xor	b
-	;and     @00000111
-	;xor	@00000111
 
 	ret
 
