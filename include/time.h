@@ -5,7 +5,7 @@
  *
  *      djm 9/1/2000
  *
- *	$Id: time.h,v 1.6 2001-10-16 18:30:32 dom Exp $
+ *	$Id: time.h,v 1.7 2002-11-20 22:54:17 dom Exp $
  */
 
 
@@ -24,6 +24,7 @@
 
 #ifdef __Z88__
 #define CLOCKS_PER_SEC 100
+#endif
 
 extern time_t __LIB__ time(time_t *);
 
@@ -50,9 +51,9 @@ struct tm {
 
 extern struct tm __LIB__ *gmtime(time_t *t);
 extern struct tm __LIB__ *localtime(time_t *t);
+extern time_t __LIB__ mktime(struct tm *tp);
 
 
-#endif
 
 /* This is a really simple fn which will barf over midnight,.. */
 
