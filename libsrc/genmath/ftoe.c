@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 /*
- * These two functions are already listed in z88_crt0.hdr so we
+ * These two functions are already listed in z80_crt0.hdr so we
  * have to do a nasty kludge around them
  */
 

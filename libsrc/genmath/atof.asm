@@ -11,7 +11,7 @@
 	XLIB	atof.c
 
 defc DEFINED_atof = 1
-	INCLUDE "#z88_crt0.hdr"
+	INCLUDE "#z80_crt0.hdr"
 
 
 

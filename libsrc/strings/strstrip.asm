@@ -8,11 +8,11 @@
 ;
 ;       Mildly hand optimized by djm 1/3/99
 ;
-;	$Id: strstrip.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
+;	$Id: strstrip.asm,v 1.3 2001-09-10 16:08:33 stefano Exp $
 
         XLIB    strstrip
 
-        INCLUDE "#z88_crt0.hdr"
+        INCLUDE "#z80_crt0.hdr"
         LIB     strcpy
 
 .strstrip

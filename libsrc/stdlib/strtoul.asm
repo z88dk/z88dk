@@ -7,7 +7,7 @@
 ;	Module compile time: Thu May  4 19:02:41 2000
 ;
 ; -----
-; $Id: strtoul.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
+; $Id: strtoul.asm,v 1.3 2001-09-10 16:08:33 stefano Exp $
 ;
 
 
@@ -15,7 +15,7 @@
 
 	MODULE	strtoul.c
 
-	INCLUDE "#z88_crt0.hdr"
+	INCLUDE "#z80_crt0.hdr"
 
 
 ;# 13 "/home/dom/z88dk/include/sys/types.h"
