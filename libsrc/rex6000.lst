@@ -50,9 +50,7 @@ strings/strtok
 strings/strupr
 setjmp/longjmp
 setjmp/setjmp
-rex/DsClearScreen
-rex/DsPrintf
-rex/DsTextButton
+rex/RexPrintf
 rex/input8
 rex/output8
 rex/syscall0
