@@ -1,0 +1,6 @@
+A bit of mystery.. I don't know whether this will work at all, but here's
+a simple Rex 6000 example..
+
+compile: zcc +rexx -o hello.bin hello.c
+
+You'll need to do the makeaddin stuff etc
