@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.45 2002-10-02 09:45:41 dom Exp $
+# $Id: Makefile,v 1.46 2002-10-03 20:07:53 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -12,7 +12,7 @@ all:	genlibs z88libs tilibs zxlibs \
 	c128ansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
 	rex_clib.lib zx81_clib.lib zx81ansi_clib.lib pps_clib.lib
 
-genlibs: m.lib malloc.lib z80_crt0.lib
+genlibs: m.lib malloc.lib z80_crt0.lib ndos.lib
 
 z88libs: mz.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib \
 	 z88ansi_clib.lib gfx.lib 
@@ -63,6 +63,9 @@ malloc.lib:
 	@echo '---> Building Near Malloc Library  <---'
 	@echo ''
 	cd malloc ; $(MAKE)
+
+ndos.lib:
+	cd fcntl/dummy ; $(MAKE)
 
 # Startup code (such as division etc) common to all z80s
 
@@ -168,7 +171,7 @@ pps_clib.lib:
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) lzx
 	cd stdio ; $(MAKE) generic
-	cd fcntl ; $(MAKE) lzx
+	cd fcntl ; $(MAKE) lpps
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 

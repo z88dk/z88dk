@@ -7,7 +7,7 @@
  *	which takes a length argument..
  *
  * --------
- * $Id: fgets_cons.c,v 1.4 2002-06-08 16:52:08 dom Exp $
+ * $Id: fgets_cons.c,v 1.5 2002-10-03 20:07:53 dom Exp $
  */
 
 #include <stdio.h>
@@ -21,7 +21,7 @@ int fgets_cons(unsigned char *str, int max)
    while (1) {
       c = fgetc_cons();
       if (c == '\n' || c == '\r' || ptr == max-1) return ptr;
-      if (c == 12) {
+      if (c == 12 || c == 8 ) {
 	if ( ptr > 0 ) {
            str[--ptr] = 0;
 	   fputc_cons(8);

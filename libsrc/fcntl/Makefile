@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2002-07-15 15:34:07 dom Exp $
+# $Id: Makefile,v 1.7 2002-10-03 20:07:53 dom Exp $
 
 lz88:
 	cd z88 ; $(MAKE) z88_fcntl
@@ -9,6 +9,9 @@ lzx:
 
 lcpm:
 	cd cpm ; $(MAKE)
+
+lpps:
+	cd sprinter ; $(MAKE)
 
 
 clean:
