@@ -15,7 +15,6 @@
         dec     e
         ret     m
         and     a
-        rla     a
         rr      h
         rr      l
         jr      l_asr_u_1
