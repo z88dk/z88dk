@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.10 2001-12-04 19:06:15 dom Exp $
+ * $Id: stdlib.h,v 1.11 2002-06-09 17:49:44 dom Exp $
  */
 
 extern __LIB__ abs(int);
@@ -63,6 +63,14 @@ extern __LIB__ csleep(int);  /* Very non standard! sleep for centisecs! (z88)*/
 extern char __LIB__ *itoa(char *buf, int num);
 /* Not sure why Rex has it's own rand() routine using different seed? */
 #define randRex() rand()
+
+
+#ifdef __Z88__
+/* Define a system() function - only valid for z88 shell */
+extern int system(char *text);
+#endif
+
+
 
 /*
  *	Okay..include in malloc.h to be standard..
