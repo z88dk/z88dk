@@ -1,10 +1,10 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.1 2002-01-18 12:06:40 dom Exp $
+# $Id: Makefile,v 1.2 2002-04-10 20:20:22 dom Exp $
 
 
-all: DsCircle.o DsEllipse.o Set4Pixels.o
+all: 	DsDisplayEllipse.o
 
 .c.o:  
 	zcc +rex -vn -make-lib $*.c
