@@ -2,7 +2,7 @@
  * cc4.c - fourth part of Small-C/Plus compiler
  *         routines for recursive descent
  *
- * $Id: expr.c,v 1.10 2002-05-29 22:54:09 dom Exp $
+ * $Id: expr.c,v 1.11 2003-03-31 21:34:39 dom Exp $
  *
  */
 
@@ -757,7 +757,6 @@ LVALUE *lval ;
 	    else if ( (direct=cmatch('.')) || match("->") ) {
 		/* Check to see if we have a cast in operation, if so then change type
 		 * internally, but don't generate any code */
-		if ( lval->c_tag ) docast(lval,NO); 
 		if ( lval->tagsym == 0 ) {
 		    error(E_MEMBER) ;
 		    junk() ;
@@ -777,6 +776,7 @@ LVALUE *lval ;
 		if ( k && direct == 0 ) 
 		    rvaluest(lval) ;
 
+		if ( lval->c_tag ) docast(lval,NO); 
 		debug(DBG_FAR1,"prev=%s name=%s flags %d oflags %d",lval->symbol->name,ptr->name,lval->flags, lval->oflags);
 		flags = ptr->flags;
 		if ( direct == 0 ) {
