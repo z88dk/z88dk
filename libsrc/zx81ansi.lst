@@ -117,11 +117,13 @@ graphics/line
 graphics/liner
 graphics/lscroll
 graphics/plot
-graphics/plotpixl
+graphics/zx81/plotpixl
+graphics/zx81/respixl
+graphics/zx81/xorpixl
+graphics/putsprite2
 graphics/point
 graphics/pointxy
 graphics/rbitmask
-graphics/respixl
 graphics/rscroll
 graphics/uncircle
 graphics/undraw
@@ -130,6 +132,5 @@ graphics/undrawr
 graphics/unplot
 graphics/drawbox
 graphics/setxy
-graphics/vz200/pixladdr
-graphics/vz200/swapgfxbk
-graphics/vz200/clsgraph
+graphics/zx81/swapgfxbk
+graphics/zx81/clsgraph

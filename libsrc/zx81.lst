@@ -109,10 +109,12 @@ graphics/liner
 graphics/lscroll
 graphics/plot
 graphics/zx81/plotpixl
+graphics/zx81/respixl
+graphics/zx81/xorpixl
+graphics/putsprite2
 graphics/point
 graphics/pointxy
 graphics/rbitmask
-graphics/respixl
 graphics/rscroll
 graphics/uncircle
 graphics/undraw

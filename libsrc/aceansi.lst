@@ -118,10 +118,11 @@ graphics/plot
 graphics/ace/plotpixl
 graphics/ace/respixl
 graphics/ace/xorpixl
+graphics/ace/clsgraph
+graphics/putsprite2
 graphics/point
 graphics/pointxy
 graphics/rbitmask
-graphics/respixl
 graphics/rscroll
 graphics/uncircle
 graphics/undraw
