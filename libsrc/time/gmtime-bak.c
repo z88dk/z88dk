@@ -5,6 +5,9 @@
  * ..can't wait for new z80asm!!
  *
  * This is ginormous! ~ 1000 bytes
+ *	
+ * --------
+ * $Id: gmtime-bak.c,v 1.2 2001-04-18 12:40:07 stefano Exp $
  */
 
 

@@ -2,6 +2,9 @@
  * Taken from vbcc archive
  *
  * djm 13/3/2000
+ *	
+ * --------
+ * $Id: localtime.c,v 1.2 2001-04-18 12:40:07 stefano Exp $
  */
 
 

@@ -4,6 +4,10 @@
 ;	I used a spectrum...
 ;
 ;	djm 12/1/2000
+;
+; ------
+; $Id: clock.asm,v 1.2 2001-04-18 12:40:07 stefano Exp $
+;
 
 	XLIB	clock
 

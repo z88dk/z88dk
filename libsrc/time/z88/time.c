@@ -5,6 +5,8 @@
  *
  *	Our epoch is the UNIX epoch of 00:00:00 1/1/1970
  *
+ * --------
+ * $Id: time.c,v 1.3 2001-04-18 12:40:07 stefano Exp $
  */
 
 

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-
+# $Id: Makefile,v 1.3 2001-04-18 12:40:07 stefano Exp $
 
 lz88: time z88_time
 

@@ -1,12 +1,12 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.3 2001-04-18 11:17:38 dom Exp $
+# $Id: Makefile,v 1.4 2001-04-18 12:40:07 stefano Exp $
 
 
 
 all:
-	zcc +z88 -vn -D-make-lib clock.c
+	zcc +z88 -vn -make-lib clock.c
 	zcc +z88 -vn -make-lib time.c
 
 clean:

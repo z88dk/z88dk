@@ -23,6 +23,9 @@
  *	02 Jan 95	DJW   - Added 'const' qualifier to function declaration.
  *
  *	13/3/2000	djm   - Imported to z88dk (smaller than vbcc one)
+ *	
+ * --------
+ * $Id: gmtime.c,v 1.2 2001-04-18 12:40:07 stefano Exp $
  */
 
 

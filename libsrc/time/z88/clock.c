@@ -10,6 +10,9 @@
  *	twice and take the difference
  *
  *	djm 9/1/2000
+ *	
+ * --------
+ * $Id: clock.c,v 1.2 2001-04-18 12:40:07 stefano Exp $
  */
 
 #include <time.h>

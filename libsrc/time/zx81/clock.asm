@@ -2,6 +2,9 @@
 ;	ZX81 clock() function
 ;	By Stefano Bodrato - summer 2000
 ;
+; --------
+; $Id: clock.asm,v 1.3 2001-04-18 12:40:07 stefano Exp $
+
 
 	XLIB	clock
 
