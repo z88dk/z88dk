@@ -1,14 +1,15 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.26 2001-11-19 17:11:23 dom Exp $
+# $Id: Makefile,v 1.27 2001-12-28 09:46:28 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
 	nc_clib.lib vz_clib.lib vzansi_clib.lib cpm_clib.lib \
 	mz_clib.lib mzansi_clib.lib zx81_clib.lib zx81ansi_clib.lib \
 	abc80_clib.lib aceansi_clib.lib sam_clib.lib rex_clib.lib \
-	msx_clib.lib svi_clib.lib m5_clib.lib cpc_clib.lib c128ansi_clib.lib
+	msx_clib.lib svi_clib.lib m5_clib.lib cpc_clib.lib \
+	c128ansi_clib.lib aquarius_clib.lib aquansi_clib.lib
 
 genlibs: m.lib malloc.lib z80_crt0.lib
 
@@ -580,6 +581,36 @@ c128ansi_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORc128 -xc128ansi_clib @c128ansi.lst
+
+# Mattel Aquarius library - Stefano
+aquarius_clib.lib:
+	@echo ''
+	@echo '---> Building Mattel Aquarius ANSI Library <---'
+	@echo ''
+	cd strings ; make
+	cd stdlib ; make gen
+	cd stdio ; make generic
+	cd printflike ; make 
+	cd setjmp ; make 
+	cd assert ; make 
+	./gamesdeps.sh
+	cd games ; make
+	z80asm -d -ns -nm -Mo -DFORaquarius -xaquarius_clib.lib @aquarius.lst
+
+# Mattel Aquarius ANSI library - Stefano
+aquansi_clib.lib:
+	@echo ''
+	@echo '---> Building Mattel Aquarius ANSI Library <---'
+	@echo ''
+	cd strings ; make
+	cd stdlib ; make gen
+	cd stdio ; make generic
+	cd printflike ; make 
+	cd setjmp ; make 
+	cd assert ; make 
+	./gamesdeps.sh
+	cd games ; make
+	z80asm -d -ns -nm -Mo -DFORaquarius -xaquansi_clib.lib @aquansi.lst
 
 clean:
 	cd assert ; make clean

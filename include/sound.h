@@ -1,14 +1,16 @@
-#ifndef __SOUND_H__
-#define __SOUND_H__
+#ifndef SOUND_H
+#define SOUND_H
 
 
 /*
  *	Sound support code
  *
- *	Stefano, Oct 2001
+ *	Stefano, Oct 2001 - First release
+ *	         Dec 2001 - Added Mattel Aquarius
  *
- *	$Id: sound.h,v 1.5 2001-11-18 21:07:18 dom Exp $
+ *	$Id: sound.h,v 1.6 2001-12-28 09:46:28 stefano Exp $
  */
+
 
 /* 1 bit sound library */
 
@@ -32,6 +34,10 @@ extern __LIB__ bit_play(unsigned char melody[]);
 
 #ifdef SPECTRUM
   #define BEEP_TSTATES 437500.0  /* 3.5 Mhz; float value = CPU_CLOCK*125 */
+#endif
+
+#ifdef AQUARIUS
+  #define BEEP_TSTATES 500000.0  /* 4 Mhz */
 #endif
 
 #ifdef Z88

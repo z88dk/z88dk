@@ -1,6 +1,6 @@
 Z88DK Port Status
 
-$Id: platforms.txt,v 1.7 2001-10-25 13:31:32 stefano Exp $
+$Id: platforms.txt,v 1.8 2001-12-28 09:46:28 stefano Exp $
 
 
 PLATFORM      | Native I/O  | ANSI VT I/O |  GRAPH LIB  |  GRAY LIB   |  FILELIB    |   ZSOCK     |   SOUND     |   Others    |
@@ -8,8 +8,9 @@ PLATFORM      | Native I/O  | ANSI VT I/O |  GRAPH LIB  |  GRAY LIB   |  FILELIB
               |             |             |             |             |             |             |             |             |
 ABC80         |     No      | 40x24-buggy |     No      |     No      |     No      |     No      |     ---     |     ---     |
 Amstrad NC100 |     Yes     |     No      |     No      |     No      |     No      |     No      |     ---     | Untested    |
+Aquarius      |    38x25    |    40x24 COL|     No      |     No      |     No      |     No      |   1 bit     |     ---     |
 Cambridge Z88 |     Yes     |     Yes     |  256x64     |     No      |     Yes     |     Yes     |   1 bit     | Paging+many |
-Commodore 128 |     No      |     Yes     |     No      |     No      |     No      |     No      |     ---     |     ---     |
+Commodore 128 |     No      |    40x25 COL|     No      |     No      |     No      |     No      |     ---     |     ---     |
 CP/M          |     Yes     | If Hardware |     No      |     No      |     No      |     No      |     ---     |     ---     |
 Jupiter ACE   |     No      |    32x24 B/W| 96x64 emul. |     No      |     No      |     No      |   1 bit     |     ---     |
 MSX 1         |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
@@ -18,11 +19,11 @@ Sam Coupe     | 32x24-buggy |     No      |     No      |     No      |     No  
 Sharp MZ      | 40x25-buggy | In Progress |     No      |     No      |     No      |     No      |     ---     | Unstable    |
 SORD M5       |    32x24    |     No      |     No    . |     No      |     No      |     No      |     ---     |     ---     |
 Spectravideo  |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
-TI82          | 16x8-buggy  |    32x4  B/W|   96x64     |     Yes     |     No      |     No      |   1 bit     |     ---     |
-TI83          | 16x8        |    32x4  B/W|   96x64     |     Yes     | In Progress |     No      |   1 bit     |     ---     |
-TI83 Plus     | 16x8-buggy  |    32x4  B/W|   96x64     |     Yes     |     No      |     No      |   1 bit     |     ---     |
-TI85          | 21x8-buggy  |    32x4  B/W|  128x64     |     Yes     |     No      |     No      | non working |     ---     |
-TI86          | 21x8        |    32x4  B/W|  128x64     |     Yes     |     No      |     No      |   1 bit     | LASM Needed |
+TI82          |    16x8     |    32x4  B/W|   96x64     |     Yes     |     No      |     No      |   1 bit     |     ---     |
+TI83          |    16x8     |    32x4  B/W|   96x64     |     Yes     | In Progress |     No      |   1 bit     |     ---     |
+TI83 Plus     |    16x8     |    32x4  B/W|   96x64     |     Yes     |     No      |     No      |   1 bit     |     ---     |
+TI85          |    21x8     |    32x4  B/W|  128x64     |     Yes     |     No      |     No      |   1 bit     |     ---     |
+TI86          |    21x8     |    32x4  B/W|  128x64     |     Yes     |     No      |     No      |   1 bit     |     ---     |
 VZ/Laser 200  |    32x16    |    32x12 B/W|  128x64     |     No      |     No      |     No      |     ---     |     ---     |
 ZX 81         | 32x21-buggy |    32x21 B/W| 96x64 emul. |     No      |     No      |     No      |     ---     | Unstable    |
 ZX Spectrum   | 32x24+64x24 | 24-85x24 COL|  256x192    |     No      |     +3      |     No      |   1 bit     |     (2)     |
