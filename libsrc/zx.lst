@@ -150,4 +150,13 @@ games/spectrum/beeper
 spectrum/tape_save
 spectrum/tape_save_block
 spectrum/tape_load_block
+spectrum/if1_rommap
+spectrum/if1_write_sector
+spectrum/if1_wrsect
+spectrum/if1_setname
+spectrum/if1_getname
+spectrum/if1_checkblock
+spectrum/if1_checksum
+spectrum/if1_load_record
+spectrum/if1_load_sector
 printflike/ltoa_any
