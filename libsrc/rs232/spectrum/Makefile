@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2002-07-15 15:34:07 dom Exp $
+# $Id: Makefile,v 1.4 2002-10-02 09:44:13 dom Exp $
 
 all:
 	@echo ''
@@ -9,7 +9,7 @@ all:
 	@echo ''
 	@echo '---> Building Interface 1 RS232 library <---'
 	@echo ''
-	cd if1 ; make
+	cd if1 ; $(MAKE)
 
 
 clean:
