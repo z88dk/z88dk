@@ -2,7 +2,7 @@
 	HTC Compatibility Library and OZ extras 
 	2. KEYBOARD AND INPUT
 
-	$Id: ozinput.h,v 1.1 2003-10-14 10:08:35 dom Exp $
+	$Id: ozinput.h,v 1.2 2003-10-21 17:15:19 stefano Exp $
 */
 
 #ifndef _OZ_BYTE

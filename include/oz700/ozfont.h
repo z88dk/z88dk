@@ -2,7 +2,7 @@
 	HTC Compatibility Library and OZ extras 
 	Fonts
 
-	$Id: ozfont.h,v 1.1 2003-10-14 10:08:35 dom Exp $
+	$Id: ozfont.h,v 1.2 2003-10-21 17:15:18 stefano Exp $
 */
 
 #ifndef _OZ_BYTE
