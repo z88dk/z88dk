@@ -1,13 +1,8 @@
 ;
-;
 ;       Startup Code for Z88 applications
 ;
-;       Problems:
-;       - Doesn't OZ only allow entry in sector 3 of the memory map?
-;       - Cirumvented by haveing the thing link with the application
-;         header as the last file...neat <grin>
-;
-;       Anyway, on we go!
+;	The entry point is a dummy function in the DOR which then
+;	jumps to routine in this file
 ;
 ;       1/4/99 djm
 ;
@@ -21,77 +16,75 @@
 ;	1/4/2000 djm Added in conditionals for:
 ;		- far heap stuff (Ask GWL for details!)
 ;		- "ANSI" stdio - i.e. flagged and ungetc'able
-
-
-; Off we go on our voyage into the unknown...
-
-
-; First of all, set a good old fashioned org address, you can specify this
-; my using -zorg= to the compiler
 ;
-; Done this way, because I'm sure in the past I've had problems with
-; ELSE in z80asm, this way works, so use it!
+;	6/10/2001 djm Clean up (after Henk)
+;
+;	$Id: app_crt0.asm,v 1.3 2001-10-06 20:42:34 dom Exp $
 
+
+;--------
+; Call up some header files (probably too many but...)
+;--------
+	INCLUDE "#stdio.def"
+	INCLUDE "#fileio.def"
+	INCLUDE "#memory.def"
+	INCLUDE "#error.def"
+	INCLUDE "#time.def"
+	INCLUDE "#syspar.def"
+	INCLUDE "#director.def"
+
+;--------
+; Set some scope variables
+;--------
+        XDEF    app_entrypoint	;Start of execution in this file 
+        XREF    applname	;Application name (in DOR)
+        XREF    in_dor		;DOR address
+
+;--------
+; Set an origin for the application (-zorg=) default to 49152
+;--------
         
         IF      !myzorg
                 defc    myzorg  = 49152
         ENDIF
-
                 org     myzorg
 
-;
-;       Required bad memory, if we're using a near heap, then this
-;       will be set to $20+HEAPSIZE in 256 byte chunks
-;
-;       If reqpag == 0 or reqpag<>0 then we don't want to anything
-;       if there's no reqpag then we want to define it!
-
+;--------
+; Calculate the required bad memory. If we're using a near heap then the
+; compiler sets it to $20+(HEAPSIZE%256)+1
+; If we reqpag == 0 or reqpag <> 0 then we don't want to define it else
+; default to $20 (8k)
+;--------
         IF      (reqpag=0) | (reqpag)
         ELSE 
                 defc    reqpag  = $20
         ENDIF
 
+;--------
+; We need a safedata def. So if not defined set to 0
+;--------
         IF      !safedata
                 defc    safedata = 0
         ENDIF
 
-        XDEF    app_entrypoint
-        XREF    applname
-        XREF    in_dor
 
-; Include some files, probably have too many here, but I can't be
-; bothered to weed ATM
-
-                INCLUDE "#stdio.def"
-                INCLUDE "#fileio.def"
-                INCLUDE "#memory.def"
-                INCLUDE "#error.def"
-                INCLUDE "#time.def"
-                INCLUDE "#syspar.def"
-                INCLUDE "#director.def"
-
-;
-; Startup enters here, first thing we have to do is to check that we
-; got the memory we wanted, hopefully you haven't got shedloads of
-; static vars, so we must have at least 8k given to us, if you've
-; used a near heap then we may have problems...
-
-
-; Entry point..ix points to info table, if reqpag < 32 doesn't matter
-; becaus of carry condition..neat!
-
+;--------
+; Start of execution. We enter with ix pointing to info table about
+; memory allocated to us by OZ. 
+;--------
 .app_entrypoint
-;
+;-------
 ; If we want to debug, then intuition is set, so call $2000
 ; This assumes several things...no bad memory required, and we've
 ; been blown onto an EPROM along with Intuition and our app DOR
 ; has been set appropriately to page in Intuition in segment 0
-;
+; Call intuition if that set (assumes no bad memory and DOR is setup)
+;-------
 IF (intuition <> 0 ) ~ (reqpag=0)
         call    $2000
 ENDIF
 IF (reqpag <> 0)
-        ld      a,(ix+2)
+        ld      a,(ix+2)	;Check allocated bad memory if needed
         cp      $20+reqpag
         ld      hl,nomemory
 ; Bit of trickery with conditional assembly here, if we don't need an
@@ -99,16 +92,14 @@ IF (reqpag <> 0)
 ; flow into init_error.
 ; If we need expanded, jump on failure to init_error and flow onto
 ; check for expanded
-  IF (NEED_expanded=0)
+  IF (NEED_expanded=0)			
         jr      nc,init_continue
   ELSE
         jr      c,init_error
   ENDIF
 ENDIF
-
-;Now find out if we have an expanded machine or not...
 IF NEED_expanded <> 0
-        ld      ix,-1
+        ld      ix,-1		;Check for an expanded machine
         ld      a,FA_EOF
         call_oz(os_frm)
         jr      z,init_continue
@@ -116,43 +107,38 @@ IF NEED_expanded <> 0
 ENDIF
 
 IF (reqpag<>0) | (NEED_expanded<>0)
-.init_error
-        push    hl
-;Now define windows...
-        ld      hl,clrscr
+.init_error			;Code to deal with an initialisation error
+        push    hl		;The text that we are printing
+        ld      hl,clrscr	;Clear the screen
         call_oz(gn_sop)
-        ld      hl,windini
+        ld      hl,windini	;Define a small window
         call_oz(gn_sop)
         pop     hl
-        call_oz(gn_sop)
+        call_oz(gn_sop)		;Print text
         ld      bc,500
-        call_oz(os_dly)
+        call_oz(os_dly)		;Pause
         xor     a
-        call_oz(os_bye)
+        call_oz(os_bye)		;Exit
 ENDIF
 
-.init_continue
-        ld   a,sc_dis
+.init_continue			;We had enough memory
+        ld   a,sc_dis		;Disable escape 
         call_oz(os_esc)
-        xor     a
+        xor     a		;Setup our error handler
         ld      b,a
         ld      hl,errhan
         call_oz(os_erh)
-        ld      (l_errlevel),a
+        ld      (l_errlevel),a	;Save previous values
         ld      (l_erraddr),hl
-        ld      hl,applname
+        ld      hl,applname	;Name application
         call_oz(dc_nam)
-; Give the user a window which they know and love - BASIC shaped
-; window...
-        ld      hl,clrscr
+        ld      hl,clrscr	;Setup a BASIC sized window
         call_oz(gn_sop)
         ld      hl,clrscr2
         call_oz(gn_sop)
-
-
-;
+;--------
 ; Now, set up some very nice variables - stream ids for std*
-;
+;--------
 IF DEFINED_ANSIstdio
 	ld	hl,sgoprotos
 	ld	de,__sgoioblk
@@ -166,54 +152,43 @@ ELSE
         dec     hl
         ld      (__sgoioblk+2),hl
 ENDIF
-        ld      hl,$8080
+        ld      hl,$8080	;Initialise floating point seed
         ld      (fp_seed),hl
-        xor     a
+        xor     a		;Reset atexit() count
         ld      (exitcount),a
-
-; Now handle the atexit() stack..
-        ld      hl,-64
+        ld      hl,-64		;Setup atexit() stack
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
-; Initialise far memory
 IF DEFINED_farheapsz
-	call	init_far
+	call	init_far	;Initialise far memory if required
 ENDIF
-; Entry to the user code
-        call    _main
-        xor     a	;exit with zero unless explicit exit(nn)
-.cleanup
-; Close all files if necessary & dealloc memory
-; Done this confusing way to save a push/pop pair
+        call    _main		;Call the users code
+        xor     a		;Exit with zero 
+.cleanup			;Jump back to here from exit()
 IF DEFINED_ANSIstdio
-	push	af
+	push	af		;Save exit value
 	LIB	closeall
-	call	closeall
-; Deallocate memory here
+	call	closeall	;Close all files
  IF DEFINED_farheapsz
- 	call	freeall_far
+ 	call	freeall_far	;Deallocate far memory
  ENDIF
-	pop	af
+	pop	af		;Get exit value back
 ELSE	;!ANSIstdio
-; Just need need to dealloc memory if had some
   IF DEFINED_farheapsz
-	push	af
+	push	af		;Deallocate far memory
 	call	freeall_far
 	pop	af
   ENDIF
 ENDIF	;ANSIstdio
 
+        call_oz(os_bye)		;Exit back to OZ
 
+.l_dcal	jp	(hl)		;Used by various things
 
-        call_oz(os_bye)         ; See ya later, nice knowing ya...
-.l_dcal
-        jp      (hl)
-
-;
-;       Process a command - this again calls on the user to add a
-;       function via __APPFUNC__ calling via C method
-
+;-------
+; Process a <> command, we call the users handlecmds APPFUNC
+;-------
 .processcmd
 IF DEFINED_handlecmds
         XREF    _handlecmds
@@ -223,60 +198,56 @@ IF DEFINED_handlecmds
         call    _handlecmds
         pop     bc
 ENDIF
-        ld      hl,0    ;dummy return value
+        ld      hl,0		;dummy return value
         ret
 
 
-;
-; Almost forgot this, an error handler..laughable again!
-;
-
-.errhan
-        ret     z       ;fatal error - this may louse up allocated mem
+;--------
+; Fairly simple error handler
+;--------
+.errhan	ret	z		;Fatal error - far mem probs?
 IF DEFINED_redrawscreen
         XREF    _redrawscreen
-        cp      rc_draw         ;rc_susp        (Rc_susp for BASIC!)
+        cp      rc_draw		;(Rc_susp for BASIC!)
         jr      nz,errhan2
-        push    af
+        push    af		;Call users screen redraw fn if defined
         call    _redrawscreen
         pop     af
 ENDIF
-;This is to handle all errors
-;Needs to be changed!
 .errhan2
-        cp      rc_quit                 ;they don't like us!
+        cp      rc_quit		;they don't like us!
         jr      nz,keine_error
 IF DEFINED_applicationquit
-	XREF	_applicationquit
+	XREF	_applicationquit	;Call users routine if defined
 	call	_applicationquit
 ENDIF
-        xor     a
+        xor     a		;Standard cleanup
         jr      cleanup
 
 .keine_error
         xor     a
         ret
 
+;--------
 ; Far memory setup
-
+;--------
 IF DEFINED_farheapsz
 	LIB	freeall_far
 	XDEF	farpages
 	XDEF	malloc_table
 	XDEF	farmemspec
 	XDEF	pool_table
-
 ; All far memory variables now in init_far.asm
-
 	INCLUDE	"#init_far.asm"
 
 ENDIF
 
+;--------
 ; This bit of code allows us to use OZ ptrs transparently
 ; We copy any data from up far to a near buffer so that OZ
 ; is happy about it
 ; Prototype is extern void __FASTCALL__ *cpfar2near(far void *)
-
+;--------
 IF DEFINED_farheapsz
 	LIB	strcpy_far
 ._cpfar2near
@@ -303,8 +274,7 @@ IF DEFINED_farheapsz
 	ld	hl,copybuff
 	ret
 ELSE
-; We have no far code installed so all we have to do is fix the
-; stack
+; We have no far code installed so all we have to do is fix the stack
 ._cpfar2near
 	pop	bc
 	pop	hl
@@ -313,11 +283,9 @@ ELSE
 	ret
 ENDIF
 
-
-
-; Now, which of the vfprintf routines do we need?
-
-
+;--------
+; Which printf core routine do we need?
+;--------
 ._vfprintf
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
@@ -334,12 +302,11 @@ ELSE
 	ENDIF
 ENDIF
 
-; Definition for the big window - BASIC style
-
-.clrscr
-        defb    1,'7','#','1',32,32,32+94,32+8,128,1,'2','C','1',0
-.clrscr2
-        defb    1,'2','+','S',1,'2','+','C',0
+;-------
+; Text to define the BASIC style window
+;-------
+.clrscr		defb    1,'7','#','1',32,32,32+94,32+8,128,1,'2','C','1',0
+.clrscr2		defb    1,'2','+','S',1,'2','+','C',0
           
 
 IF (NEED_expanded <> 0 )  | (reqpag <>0)
@@ -366,7 +333,6 @@ ENDIF
 
 IF (NEED_expanded <> 0 )
 .need_expanded_text
-        
         defb    1,'3','@',32,32,1,'2','J','C'
         defm    "Sorry, application needs an expanded machine"
         defb    13,10,13,10
@@ -374,93 +340,60 @@ IF (NEED_expanded <> 0 )
         defb    0
 ENDIF
 
-
-
-
-
-
-;
-; Static Variables that we all need <sigh> -now kept in Safe Workspace
-; so we can make good applications
-;
-; Rounded up to 55 bytes (to be safe and allow expansion
-;
-; Current count is 53 + 40 for ANSIstdio
-;
-; Also skip down to allow our safe data to insert itself, this is so
-; we can write apps that use static data and still be good!
-; (this *WILL* cause a problem if we have any libraries that access
-; this data though - eg stdio fns)
-;
-
+;--------
+; Include the stdio handle defaults if we need them
+;--------
 IF DEFINED_ANSIstdio
-; If ANSIstdio then we want to include our handles and
-; reserve space for them
-
 .sgoprotos
 	INCLUDE	"#stdio_fp.asm"
 ENDIF
 
-
+;--------
+; Variables need by crt0 code and some lib routines are kept in safe workspace
+;--------
 DEFVARS $1ffD-100-safedata
 {
-__sgoioblk
-	ds.b	40	;4 bytes * 10 handles
-; Are these next two actually used?
-l_erraddr
-        ds.w    1
-l_errlevel
-        ds.w    1
-coords
-        ds.w    1
-base_graphics
-        ds.w    1
-gfx_bank
-        ds.w    1
-int_seed
-        ds.w    1
-exitsp
-        ds.w    1
-exitcount
-        ds.b    1
-fp_seed
-        ds.w    3       ;not used ATM
-extra
-        ds.w    3
-fa
-        ds.w    3
-fasign
-        ds.b    1
-heapblocks
-	ds.w	1
-heaplast
-	ds.w	1
-packintrout
-	ds.w	1
+__sgoioblk	ds.b	40	;stdio control block
+l_erraddr	ds.w	1	;Not sure if these are used...
+l_errlevel	ds.b	1
+coords		ds.w	1	;Graphics xy coordinates
+base_graphics	ds.w	1	;Address of graphics map
+gfx_bank	ds.b	1	;Bank that this is in
+int_seed	ds.w	1	;Integer seed
+exitsp		ds.w	1	;atexit() stack
+exitcount	ds.b	1	;Number of atexit() routines
+fp_seed		ds.w	3	;Floating point seed (not used ATM)
+extra		ds.w	3	;Floating point spare register
+fa		ds.w	3	;Floating point accumulator
+fasign		ds.b	1	;Floating point variable
+heapblocks	ds.w	1	;Number of free blocks
+heaplast	ds.w	1	;Pointer to linked blocks
+packintrout	ds.w	1	;User interrupt handler
 }
 
-;
+;--------
 ; Now, include the math routines if needed..
-;
-
+;--------
 IF NEED_floatpack
         INCLUDE "#float.asm"
 ENDIF
 
+;-------
+; If we have no safedata then set up defvars addr to point to bad memory
+; If we use safedata then we cn't have far memory
+;-------
 IF !safedata
+	IF !DEFINED_defvarsaddr
+		defc defvarsaddr = 8192
+	ENDIF
 
-IF !DEFINED_defvarsaddr
-	defc defvarsaddr = 8192
-ENDIF
+	DEFVARS defvarsaddr
+	{
+	dummydummy        ds.b    1 
+	}
 
-DEFVARS defvarsaddr
-{
-dummydummy        ds.b    1 
-}
-
-IF DEFINED_farheapsz
-	INCLUDE 	"#app_crt0.as1"
-ENDIF
-
+	IF DEFINED_farheapsz
+		INCLUDE 	"#app_crt0.as1"
+	ENDIF
 ENDIF
 

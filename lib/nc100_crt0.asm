@@ -9,84 +9,59 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: nc100_crt0.asm,v 1.2 2001-09-07 18:17:11 dom Exp $
+;       $Id: nc100_crt0.asm,v 1.3 2001-10-06 20:42:34 dom Exp $
 ;
 
 
 
-                MODULE  nc100_crt0
+	MODULE  nc100_crt0
 
-;
-; Initially include the zcc_opt.def file to find out lots of lovely
-; information about what we should do..
-;
+;--------
+; Include zcc_opt.def to find out some info
+;--------
+	INCLUDE "zcc_opt.def"
 
-                INCLUDE "zcc_opt.def"
+;--------
+; Some scope definitions
+;--------
 
-; No matter what set up we have, main is always, always external to
-; this file
+	XREF    _main		;main() is always external to crt0 code
 
-                XREF    _main
+        XDEF    cleanup		;jp'd to by exit()
+        XDEF    l_dcal		;jp(hl)
 
-;
-; Some variables which are needed for both app and basic startup
-;
+        XDEF    int_seed	;Integer rand() seed
 
-        XDEF    cleanup
-        XDEF    l_dcal
+	XDEF	_vfprintf	;jp to the printf() core
 
-; Integer rnd seed
-
-        XDEF    int_seed
-
-; vprintf is internal to this file so we only ever include one of the set
-; of routines
-
-	XDEF	_vfprintf
-
-;Exit variables
-
-        XDEF    exitsp
+        XDEF    exitsp		;atexit() variables
         XDEF    exitcount
 
-;For stdin, stdout, stder
+        XDEF    __sgoioblk	;stdio info block
 
-        XDEF    __sgoioblk
-
-; Graphics stuff
-	XDEF	base_graphics
+	XDEF	base_graphics	;Graphical variables
 	XDEF	coords
-
-; Now, getting to the real stuff now!
-
-
-
 
         org     $C000
 
 	jp	start
-
 	defs	509		;Waste 509 bytes of space
 
+;--------
 ; Card header
-	defm	"NC100PRG"
+;--------
+	defm	"NC100PRG"	
 	defb	0,0,0,0,0,0,0,0
 	jp	start			;c210
 	defm	"z88dk NC100"
 	defb	0,0
 
-
-; Entry point at $c220
-.start
-        ld      hl,0
-        add     hl,sp
-        ld      (start1+1),hl
-        ld      hl,-64
+.start				;Entry point at $c2220
+	ld	(start+1),sp	;Save entry sp
+        ld      hl,-64		;Create the atexit stack
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
-	ld	a,2	;open the upper display
-	call	5633
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 ; Set up the std* stuff so we can be called again
@@ -98,42 +73,35 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
-        call    _main
+        call    _main		;Call user code
 .cleanup
-;
-;       Deallocate memory which has been allocated here!
-;
 	push	hl
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-	LIB	closeall
+	LIB	closeall	;Close all opened files
 	call	closeall
 ENDIF
 ENDIF
-	exx
+	exx			;???? Hangover from ZX code?
 	ld	hl,10072
 	exx
 	pop	bc
-.start1
-        ld      sp,0
+.start1	ld	sp,0
         ret
 
-.l_dcal
-        jp      (hl)
+.l_dcal	jp	(hl)
 
 ; Now, define some values for stdin, stdout, stderr
 
 .__sgoioblk
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
 ENDIF
 
 
+;-------
 ; Now, which of the vfprintf routines do we need?
-
-
+;-------
 ._vfprintf
 IF DEFINFED_floatstdio
 	LIB	vfprintf_fp
@@ -151,52 +119,33 @@ ELSE
 ENDIF
 
 
-;Seed for integer rand() routines
+;-------
+; Some variables
+;-------
 
-.int_seed       defw    0
+.int_seed       defw    0	;Integer rand() seed
 
 ;Atexit routine
 
-.exitsp
-                defw    0
-.exitcount
-                defb    0
-
-; Heap stuff
-
-.heaplast	defw	0
+.exitsp		defw	0	;atexit() stack address
+.exitcount	defb	0	;Number of atexit() routines
+.heaplast	defw	0	;heap variables
 .heapblocks	defw	0
 
-; mem stuff
-
-.base_graphics
-		defw	16384
+.base_graphics	defw	0	;Graphics variables
 .coords		defw	0
 
-         defm  "Small C+ nc100"&0
+		defm	"Small C+ nc100"&0
 
-;All the float stuff is kept in a different file...for ease of altering!
-;It will eventually be integrated into the library
-;
-;Here we have a minor (minor!) problem, we've no idea if we need the
-;float package if this is separated from main (we had this problem before
-;but it wasn't critical..so, now we will have to read in a file from
-;the directory (this will be produced by zcc) which tells us if we need
-;the floatpackage, and if so what it is..kludgey, but it might just work!
-;
-;Brainwave time! The zcc_opt file could actually be written by the
-;compiler as it goes through the modules, appending as necessary - this
-;way we only include the package if we *really* need it!
-
+;-------
+; Floating point
+;-------
 IF NEED_floatpack
         INCLUDE         "#float.asm"
 
-;seed for random number generator - not used yet..
-.fp_seed        defb    $80,$80,0,0,0,0
-;Floating point registers...
-.extra          defs    6
-.fa             defs    6
-.fasign         defb    0
+.fp_seed        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
+.extra          defs    6		;FP spare register
+.fa             defs    6		;FP accumulator
+.fasign         defb    0		;FP variable
 
 ENDIF
-

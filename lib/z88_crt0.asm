@@ -16,65 +16,53 @@
 ;
 ; - - - - - - - -
 ;
-; $Id: z88_crt0.asm,v 1.2 2001-04-12 13:26:13 stefano Exp $
+; $Id: z88_crt0.asm,v 1.3 2001-10-06 20:42:34 dom Exp $
 ;
 ; - - - - - - - -
 
 
-                MODULE  z88_crt0
+	MODULE  z88_crt0
 
-;
-; Initially include the zcc_opt.def file to find out lots of lovely
-; information about what we should do..
-;
+;-------
+; Include zcc_opt.def to find out information about us
+;-------
 
-                INCLUDE "zcc_opt.def"
+	INCLUDE "zcc_opt.def"
 
-; No matter what set up we have, main is always, always external to
-; this file
 
-                XREF    _main
+;-------
+; Some general scope declarations
+;-------
 
-;
-; Some variables which are needed for both app and basic startup
-;
+	XREF    _main		;main() is always external to crt0 code
+	XDEF    cleanup		;jp'd to by exit()
+	XDEF    l_dcal		;jp(hl)
 
-        XDEF    cleanup
-        XDEF    l_dcal
+	XDEF    coords		;Current graphics xy coords
+	XDEF    base_graphics	;Address of graphics map
+	XDEF    gfx_bank	;Bank for this
 
-;Graphic function XDEFS..
+	XDEF    int_seed	;Integer rand() seed
 
-        XDEF    coords
-        XDEF    base_graphics
-        XDEF    gfx_bank
 
-        XDEF    int_seed
+	XDEF    exitsp		;Pointer to atexit() stack
+	XDEF    exitcount	;Number of atexit() functions registered
 
-;Exit variables
+	XDEF    __sgoioblk	;std* control block
 
-        XDEF    exitsp
-        XDEF    exitcount
+	XDEF    processcmd	;Processing <> commands
 
-;For stdin, stdout, stder
+	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks	;
 
-        XDEF    __sgoioblk
+	XDEF	_cpfar2near	;Conversion of far to near data
 
-; For topics etc
-        
-        XDEF    processcmd
+	XDEF	_vfprintf	;jp to printf() core routine
 
-; Near heap stuff
-	XDEF	heaplast
-	XDEF	heapblocks
 
-; Conversion of far to near
-	XDEF	_cpfar2near
-
-; Printf core
-	XDEF	_vfprintf
-
-; Now, getting to the real stuff now!
-
+;-------
+; Select which particular startup we want
+;-------
 IF DEFINED_startup
 ; User specified startup type, so do as they wish then drop out otherwise
 ; Use -startup=1 for basic      } (For sake of completeness only - don't
@@ -94,15 +82,9 @@ IF DEFINED_startup
 	ENDIF
 
 ELSE 
-
-
         IF NEED_appstartup
                 INCLUDE "#app_crt0.asm"
         ELSE
-
                 INCLUDE "#bas_crt0.asm"
         ENDIF
 ENDIF
-
-
-

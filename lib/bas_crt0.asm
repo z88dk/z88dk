@@ -1,22 +1,24 @@
-; 
-;       Startup code for BBC BASIC programs
+;       Startup stub for z88 BBC BASIC programs
 ;
 ;       Created 1/4/99 djm
+;
+;	$Id: bas_crt0.asm,v 1.2 2001-10-06 20:42:34 dom Exp $
 
 
-                INCLUDE "#bastoken.def"
-                INCLUDE "#ctrlchar.def"
-                INCLUDE "#error.def"
-                INCLUDE "#stdio.def"
+;-----------
+; The .def files that we need here
+;-----------
+	INCLUDE "#bastoken.def"
+	INCLUDE "#ctrlchar.def"
+	INCLUDE "#error.def"
+	INCLUDE "#stdio.def"
 
-
-; Dennis' snippet to create a BASIC program straight off!
-; No need for a little boot program as well, this needed mods to the
-; code as well - one line in cc6.c
 
         org $2300
 
-
+;-----------
+; Dennis Groning's BASIC file header
+;-----------
 .bas_first
         DEFB    bas_last - bas_first    ;Line Length
 ;       DEFW    0                       ;Row Number 0 can not be listed
@@ -28,18 +30,22 @@
         DEFW    $FFFF           ;End of BASIC program. Next address is TOP.
 
 
+;-----------
+; Code starts executing from here
+;-----------
 .start
-        ld      hl,0
-        add     hl,sp
-        ld      sp,($1ffe)
-        ld      (start1+1),hl
-        ld      hl,-64
+	ld	(start+1),sp	;Save starting stack
+        ld      sp,($1ffe)	;Pick up stack from OZ safe place
+        ld      hl,-64		;Make room for the atexit() table
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
-        call    doerrhan
+        call    doerrhan	;Initialise a laughable error handler
+
+;-----------
+; Initialise the (ANSI) stdio descriptors so we can be called agin
+;-----------
 IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
 	ld	hl,__sgoioblk+2
 	ld	(hl),19	;stdin
 	ld	hl,__sgoioblk+6
@@ -47,23 +53,20 @@ IF DEFINED_ANSIstdio
 	ld	hl,__sgoioblk+10
 	ld	(hl),21	;stderr
 ENDIF
-        call    _main
-.cleanup
-;
-;       Deallocate memory which has been allocated here!
-;
+        call    _main		;Run the program
+.cleanup			;Jump back here from exit() if needed
 IF DEFINED_ANSIstdio
 	LIB	closeall
-	call	closeall
+	call	closeall	;Close any open files (fopen)
 ENDIF
-        call_oz(gn_nln)
-        call    resterrhan
-.start1
-        ld      sp,0
-        ret
+        call_oz(gn_nln)		;Print a new line
+        call    resterrhan	;Restore the original error handler
+.start1	ld	sp,0		;Restore stack to entry value
+        ret			;Out we go
 
-;Install an error handler, very simple, but prevents lot so problems
-
+;-----------
+; Install the error handler
+;-----------
 .doerrhan
         xor     a
         ld      (exitcount),a
@@ -74,42 +77,38 @@ ENDIF
         ld      (l_errlevel),a
         ret
 
-;Restore BASICs error handler
-
+;-----------
+; Restore BASICs error handler
+;-----------
 .resterrhan
         ld      hl,(l_erraddr)
         ld      a,(l_errlevel)
         ld      b,0
         call_oz(os_erh)
-; Tag on the process cmd here it's not relevent at all, but return 0
-; just in case
-.processcmd
+.processcmd			;processcmd is called after os_tin
         ld      hl,0
         ret
 
-;The laughable error handler itself!
+
+;-----------
+; The error handler
+;-----------
 .errhand
-        ret     z       ;fatal
+        ret     z   		;Fatal error
         cp      rc_esc
         jr     z,errescpressed
-;Pass everything else to BASICs error handler
-        ld      hl,(l_erraddr)
+        ld      hl,(l_erraddr)	;Pass everything to BASIC's handler
         scf
-;Save a byte here, byte there! This has label because it's used for
-;calculated calls etc
-.l_dcal
-        jp      (hl)
-
-;Escape pressed, treat as cntl+c so quit out (bit crude, but there you go!)
-
+.l_dcal	jp	(hl)		;Used for function pointer calls also
 
 .errescpressed
-        call_oz(os_esc)
-        jr      cleanup
-
-; Now, which of the vfprintf routines do we need?
+        call_oz(os_esc)		;Acknowledge escape pressed
+        jr      cleanup		;Exit the program
 
 
+;-----------
+; Select which vfprintf routine is needed
+;-----------
 ._vfprintf
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
@@ -131,6 +130,11 @@ ENDIF
 ; We assume all data is in fact near, so this is a dummy fn
 ; really
 
+;-----------
+; Far stuff can't be used with BASIC because of paging issues, so we assume
+; that all data is near - this function is in fact a dummy and just adjusts
+; the stack as required
+;-----------
 ._cpfar2near
 	pop	bc
 	pop	hl
@@ -142,12 +146,10 @@ ENDIF
 
 
 
-
-; Now, define some values for stdin, stdout, stderr
-;
-; This allows us two models of stdio - the classic z88dk one
-; (kludgey) or the newer (slightly less kludgey)
-
+;-----------
+; Define the stdin/out/err area. For the z88 we have two models - the
+; classic (kludgey) one and "ANSI" model
+;-----------
 .__sgoioblk
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
@@ -156,63 +158,44 @@ ELSE
 ENDIF
 
 
-
-;Just making me life harder! These will vanish for App startup!
-
-.l_erraddr
-        defw    0
-.l_errlevel
-        defb    0
+;-----------
+; Now some variables
+;-----------
+.l_erraddr	defw	0	; BASIC error handler address
+.l_errlevel	defb	0	; And error level
 
 
-.coords         defw      0
-.base_graphics  defw      0
-.gfx_bank       defb    0
+.coords         defw	0	; Current graphics xy coordinates
+.base_graphics  defw	0	; Address of the Graphics map
+.gfx_bank       defb    0	; And the bank
 
-;Seed for integer rand() routines
+.int_seed       defw    0	; Seed for integer rand() routines
 
-.int_seed       defw    0
+.exitsp		defw	0	; Address of where the atexit() stack is
+.exitcount	defb	0	; How many routines on the atexit() stack
 
-;Atexit routine
 
-.exitsp
-                defw    0
-.exitcount
-                defb    0
+.heaplast	defw	0	; Address of last block on heap
+.heapblocks	defw 	0	; Number of blocks
 
-; Heap stuff
+.packintrout	defw	0	; Address of user interrupt routine
 
-.heaplast	defw	0
-.heapblocks	defw 	0
 
-; Interrupt routine
-.packintrout
-		defw	0
+;-----------
+; Unnecessary file signature
+;-----------
+		defm	"Small C+ z88"&0
 
-         defm  "Small C+ z88"&0
-
-;All the float stuff is kept in a different file...for ease of altering!
-;It will eventually be integrated into the library
-;
-;Here we have a minor (minor!) problem, we've no idea if we need the
-;float package if this is separated from main (we had this problem before
-;but it wasn't critical..so, now we will have to read in a file from
-;the directory (this will be produced by zcc) which tells us if we need
-;the floatpackage, and if so what it is..kludgey, but it might just work!
-;
-;Brainwave time! The zcc_opt file could actually be written by the
-;compiler as it goes through the modules, appending as necessary - this
-;way we only include the package if we *really* need it!
-
+;-----------
+; Floating point
+;-----------
 IF NEED_floatpack
         INCLUDE         "#float.asm"
 
-;seed for random number generator - not used yet..
-.fp_seed        defb    $80,$80,0,0,0,0
-;Floating point registers...
-.extra          defs    6
-.fa             defs    6
-.fasign         defb    0
+.fp_seed        defb    $80,$80,0,0,0,0	; FP seed (unused ATM)
+.extra          defs    6		; Extra register temp store
+.fa             defs    6		; ""
+.fasign         defb    0		; ""
 
 ENDIF
 
