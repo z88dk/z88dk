@@ -3,7 +3,7 @@
  *
  *      Routines for symbol hashing etc
  *
- *      $Id: sym.c,v 1.1 2000-07-04 15:33:32 dom Exp $
+ *      $Id: sym.c,v 1.2 2003-03-31 21:28:00 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -123,27 +123,34 @@ SYMBOL *addglb(
 char *sname,char id,char typ,
 int value,int storage,int more, int itag)
 {
-        SYMBOL *ptr;
-        if ( (ptr=findglb(sname)) ) {
-/*
- * djm, this is not to be abused!!!!
- *
- * This bit of code allows us to overturn extern declaration of stuff,
- * Useful for those programs which extern everything in header files
- * 
- */
-                if ( (ptr->storage==EXTERNAL && storage !=EXTERNAL) && ptr->type==typ && ptr->ident == id && ptr->more==more && itag==ptr->tag_idx ) { ptr->storage=storage; return (ptr); }
-                multidef() ;
-                return (glbptr) ;
+    SYMBOL *ptr;
+    if ( (ptr=findglb(sname)) ) {
+        /*
+         * djm, this is not to be abused!!!!
+         *
+         * This bit of code allows us to overturn extern declaration of stuff,
+         * Useful for those programs which extern everything in header files
+         * 
+         */
+        if ( (ptr->storage==EXTERNAL && storage !=EXTERNAL) && ptr->type==typ && ptr->ident == id && ptr->more==more && itag==ptr->tag_idx ) { 
+            ptr->storage=storage; 
+            return (ptr); 
         }
-        if ( glbcnt >= NUMGLBS-1 ) {
-                error(E_GLBOV);
-                return 0;
+        if ( (ptr->storage==EXTERNAL && storage ==EXTERNAL) && ptr->type==typ && ptr->ident == id && ptr->more==more && itag==ptr->tag_idx ) { 
+            return (ptr); 
         }
-        addsym(glbptr, sname, id, typ, storage, more, itag) ;
-        glbptr->offset.i = value ;
-        ++glbcnt ;
-        return (glbptr);
+
+        multidef() ;
+        return (glbptr) ;
+    }
+    if ( glbcnt >= NUMGLBS-1 ) {
+        error(E_GLBOV);
+        return 0;
+    }
+    addsym(glbptr, sname, id, typ, storage, more, itag) ;
+    glbptr->offset.i = value ;
+    ++glbcnt ;
+    return (glbptr);
 }
 
 SYMBOL *addloc(
