@@ -21,7 +21,7 @@ Here are the byte sequences for it:
 	    to (0,0) use 22,32,32
 
 All these commands can be embedded in strings using either octal or
-hexidecimal representation.
+hexadecimal representation.
 
 The screen now scrolls when line 24 is "hit", the routine used is in the
 48k ROM.
