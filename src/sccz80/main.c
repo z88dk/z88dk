@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.13 2004-03-26 22:06:09 denniz Exp $
+ *      $Id: main.c,v 1.14 2005-03-21 07:36:28 stefano Exp $
  */
 
 #include "ccdefs.h"
@@ -482,15 +482,15 @@ dumpfns()
         if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
                 error(E_ZCCOPT);
         }
+/* Now output the org */
+        if (zorg) {
+                fprintf(fp,"\tDEFINE DEFINED_myzorg\n");
+                fprintf(fp,"\tdefc myzorg = %u\n",zorg);
+        }
         if (appz88) {
                         int k,value=0;
                         fprintf(fp,"\nIF !NEED_appstartup\n");
                         fprintf(fp,"\tDEFINE\tNEED_appstartup\n");
-/* Now output the org */
-                        if (zorg) {
-                                fprintf(fp,"\tDEFINE DEFINED_myzorg\n");
-                                fprintf(fp,"\tdefc myzorg = %u\n",zorg);
-                        }
                         if (safedata != -1 )
                                 fprintf(fp,"\tdefc safedata = %d\n",safedata);
                         if (intuition)
