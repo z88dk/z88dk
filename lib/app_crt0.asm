@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.5 2002-01-20 20:28:08 dom Exp $
+;	$Id: app_crt0.asm,v 1.6 2002-05-11 21:00:51 dom Exp $
 
 
 ;--------
@@ -351,7 +351,10 @@ ENDIF
 ;--------
 ; Variables need by crt0 code and some lib routines are kept in safe workspace
 ;--------
-DEFVARS $1ffD-100-safedata
+IF !DEFINED_sysdefvarsaddr
+	defc sysdefvarsaddr = $1ffD-100-safedata
+ENDIF
+DEFVARS sysdefvarsaddr
 {
 __sgoioblk	ds.b	40	;stdio control block
 l_erraddr	ds.w	1	;Not sure if these are used...
@@ -366,12 +369,26 @@ fp_seed		ds.w	3	;Floating point seed (not used ATM)
 extra		ds.w	3	;Floating point spare register
 fa		ds.w	3	;Floating point accumulator
 fasign		ds.b	1	;Floating point variable
-heapblocks	ds.w	1	;Number of free blocks
-heaplast	ds.w	1	;Pointer to linked blocks
 packintrout	ds.w	1	;User interrupt handler
 snd_asave	ds.b	1	;Sound
 snd_tick	ds.b	1	;Sound
 }
+
+;--------
+; If the user doesn't care where the heap variables go, dump them in safe space
+;--------
+IF !userheapvar
+	defc userheapvar = 0
+ENDIF
+
+IF userheapvar = 0 
+DEFVARS -1
+{
+heapblocks	ds.w	1	;Number of free blocks
+heaplast	ds.w	1	;Pointer to linked blocks
+}
+ENDIF
+
 
 ;--------
 ; Now, include the math routines if needed..
@@ -382,21 +399,31 @@ ENDIF
 
 ;-------
 ; If we have no safedata then set up defvars addr to point to bad memory
-; If we use safedata then we cn't have far memory
+; If we use safedata then we can't have far memory
+; We try to follow on from whereever the system data has been placed
 ;-------
+
 IF !safedata
-	IF !DEFINED_defvarsaddr
-		DEFINE DEFINED_defvarsaddr
-		defc defvarsaddr = 8192
-	ENDIF
+        IF !DEFINED_defvarsaddr
+                DEFINE DEFINED_defvarsaddr
+                defc defvarsaddr = 8192
+        ENDIF
 
-	DEFVARS defvarsaddr
-	{
-	dummydummy        ds.b    1 
-	}
+        DEFVARS defvarsaddr
+        {
+        dummydummy        ds.b    1 
+        }
 
-	IF DEFINED_farheapsz
-		INCLUDE 	"#app_crt0.as1"
-	ENDIF
+        IF DEFINED_farheapsz
+                INCLUDE         "#app_crt0.as1"
+        ENDIF
 ENDIF
 
+
+IF userheapvar = 1
+DEFVARS -1
+{
+heapblocks	ds.w	1	;Number of free blocks
+heaplast	ds.w	1	;Pointer to linked blocks
+}
+ENDIF
