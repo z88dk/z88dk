@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.20 2001-09-05 15:07:20 stefano Exp $
+# $Id: Makefile,v 1.21 2001-10-16 18:09:17 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -97,7 +97,8 @@ z88_clib.lib:
 	cd time ; make lz88
 	cd setjmp ; make 
 	cd assert ; make 
-	z80asm -d -ns -nm -Mo -xz88_clib @z88.lst
+	cd games ; make lz88
+	z80asm -z80-verb -d -ns -nm -Mo -DFORz88 -xz88_clib @z88.lst
 
 
 z88ansi_clib.lib:
@@ -145,6 +146,7 @@ zx_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	cd time ; make lzx
+	cd games ; make lzx
 	z80asm -d -ns -nm -Mo -DFORzx -xzx_clib @zx.lst
 
 # vt100 C lib for spectrum
