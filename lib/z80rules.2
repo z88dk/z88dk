@@ -1111,7 +1111,7 @@
 	ld	hl,%1	;const
 	ld	h,0
 =
-	ld	hl,(%1 % 256)	;const
+	ld	hl,%1 % 256	;const
 
 	ld	%1,%2
 	ld	%1,%3
