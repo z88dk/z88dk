@@ -1,7 +1,7 @@
 ;
 ;	System Call for REX6000
 ;
-;	$Id: syscall2.asm,v 1.2 2001-06-23 19:44:53 dom Exp $
+;	$Id: syscall2.asm,v 1.3 2001-09-03 16:13:20 dom Exp $
 ;
 
 		XLIB	syscall2

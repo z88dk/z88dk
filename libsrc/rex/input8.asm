@@ -2,6 +2,8 @@
 ;	Input8 -read in from a port
 ;
 ;	djm 7/3/2001
+;
+;	$Id: input8.asm,v 1.2 2001-09-03 16:13:20 dom Exp $
 
 	XLIB	input8
 

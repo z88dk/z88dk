@@ -1,6 +1,7 @@
 
 
-all:	DsClearScreen.o DsPrintf.o
+all:
+	@echo 'Its all ASM'
 
 .c.o:
 	zcc +rex -vn -make-lib $*.c

@@ -1,7 +1,7 @@
 ;
 ;	System Call for REX6000
 ;
-;	$Id: DbGetRecordCount.asm,v 1.1 2001-07-02 07:18:44 dmarion Exp $
+;	$Id: DbGetRecordCount.asm,v 1.2 2001-09-03 16:13:20 dom Exp $
 ;
 ; extern unsigned long DbGetRecordCount( int );
 ;
