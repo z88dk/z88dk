@@ -5,7 +5,7 @@
  *
  *      Link using -lz88
  *
- *	$Id: z88.h,v 1.4 2001-10-16 18:30:32 dom Exp $
+ *	$Id: z88.h,v 1.5 2002-04-20 08:32:54 dom Exp $
  */
 
 #ifndef __Z88_H__
@@ -152,6 +152,9 @@ extern int __LIB__ wcnext(wild_t hand,void *buf, size_t len, wildcard_t *st);
  */
 
 extern int __LIB__ wcclose(wild_t hand);
+
+/* Expand a filename */
+extern char __LIB__ *fnexpand(far char *filename, char *buf, size_t buflen);
 
 
 #ifdef IFIXEDTHEMBUTWHY
