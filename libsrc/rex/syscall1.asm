@@ -8,10 +8,10 @@
 
 .syscall1
 	pop	bc
-	pop	hl	;call number
 	pop	de	;parameter
-	push	de
+	pop	hl	;call number
 	push	hl
+	push	de
 	push	bc
 	ld	($c000),hl
 	ld	($c002),de
