@@ -1864,3 +1864,14 @@
 	ld	hl,%1
 	add	hl,sp
 	call	dstore
+
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,(%1)
+	ld	h,0
+	call	l_eq
+	jp	nc,%2
+=
+	ld	a,(%1)
+	cp	(hl)
+	jp	nz,%2
