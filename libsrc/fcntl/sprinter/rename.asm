@@ -1,14 +1,6 @@
+;	Sprinter fcntl library
 ;
-; Small C z88 File functions
-; Written by Dominic Morris <djm@jb.man.ac.uk>
-; 30 September 1998 ** UNTESTED **
-;
-; *** THIS IS A Z88 SPECIFIC ROUTINE!!! ***
-
-; This doesn't check for validity of filename at all.
-
-;
-;	$Id: rename.asm,v 1.1 2002-10-03 20:07:20 dom Exp $
+;	$Id: rename.asm,v 1.2 2003-09-10 20:22:52 dom Exp $
 ;
 
 

@@ -1,12 +1,10 @@
 /*
- *      Low level reading routines for Small C+ Z88
+ *	Sprinter fcntl library
  *
  *      writebyte(int fd, int c) - Read byte from file
  *
- * 	djm 4/5/99
- *
  * -----
- * $Id: writebyte.c,v 1.1 2002-10-03 20:07:20 dom Exp $
+ * $Id: writebyte.c,v 1.2 2003-09-10 20:22:52 dom Exp $
  */
 
 

@@ -1,12 +1,10 @@
 /*
- *      Low level reading routines for Small C+ Z88
+ *      Sprinter fcntl library
  *
  *      readbyte(fd) - Read byte from file
  *
- *      Preserve tabs!!
- *
  * -----
- * $Id: readbyte.c,v 1.1 2002-10-03 20:07:20 dom Exp $
+ * $Id: readbyte.c,v 1.2 2003-09-10 20:22:52 dom Exp $
  */
 
 
@@ -25,7 +23,7 @@ int __FASTCALL__ readbyte(int fd)
 	add	hl,sp
 	ld	a,e	;fd now in e
 	ld	de,1	;length to read
-	ld	c,$13
+	ld	c,$13   ;READ
 	rst	$10
 	pop	de	;e holds the read value
 	ld	hl,-1
