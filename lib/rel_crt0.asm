@@ -4,7 +4,7 @@
 ;
 ;       Created 18/5/99 djm
 ;
-;	$Id: rel_crt0.asm,v 1.2 2001-10-06 20:42:34 dom Exp $
+;	$Id: rel_crt0.asm,v 1.3 2001-10-15 22:42:40 dom Exp $
 
 
 ;-----------
@@ -175,6 +175,10 @@ ENDIF
 
 .packintrout	defw	0	; Address of user interrupt routine
 
+IF DEFINED_NEED1bitsound
+.snd_asave      defb    0       ; Sound variable
+.snd_tick       defb    0       ;  "      "
+ENDIF
 
 ;-----------
 ; Unnecessary file signature

@@ -16,7 +16,7 @@
 ;
 ; - - - - - - - -
 ;
-; $Id: z88_crt0.asm,v 1.3 2001-10-06 20:42:34 dom Exp $
+; $Id: z88_crt0.asm,v 1.4 2001-10-15 22:42:40 dom Exp $
 ;
 ; - - - - - - - -
 
@@ -59,6 +59,8 @@
 
 	XDEF	_vfprintf	;jp to printf() core routine
 
+	XDEF	snd_asave	;sound
+	XDEF	snd_tick	;sound
 
 ;-------
 ; Select which particular startup we want

@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.3 2001-10-06 20:42:34 dom Exp $
+;	$Id: app_crt0.asm,v 1.4 2001-10-15 22:42:40 dom Exp $
 
 
 ;--------
@@ -369,6 +369,8 @@ fasign		ds.b	1	;Floating point variable
 heapblocks	ds.w	1	;Number of free blocks
 heaplast	ds.w	1	;Pointer to linked blocks
 packintrout	ds.w	1	;User interrupt handler
+snd_asave	ds.b	1	;Sound
+snd_tick	ds.b	1	;Sound
 }
 
 ;--------
