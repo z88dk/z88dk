@@ -3,7 +3,7 @@
 #
 
 all:
-	@echo 'All asm in here'
+	zcc  -Wn43 -vn -make-lib atol.c
 
 
 clean:

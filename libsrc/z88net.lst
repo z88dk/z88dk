@@ -77,6 +77,7 @@ stdlib/srand
 stdlib/strtol
 stdlib/strtoul
 stdlib/z88/atoi
+stdlib/z88/atol
 stdlib/z88/getcwd
 stdlib/z88/mkdir
 stdlib/z88/sleep
@@ -112,9 +113,7 @@ strings/strupr
 time/gmtime
 time/localtime
 time/z88/clock
-time/z88/get1970
-time/z88/gtoy
-time/z88/doepoch
+time/z88/time
 setjmp/longjmp
 setjmp/setjmp
 assert/assert

@@ -8,6 +8,7 @@ all: net
 
 net:
 	z80asm -d -ns -nm -Mo -x../net @zsock_list
+	z80asm -d -ns -nm -Mo -x../netdev @zsockdev_list
 
 
 clean:
