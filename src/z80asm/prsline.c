@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.3 2001-04-11 09:48:18 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.4 2002-01-16 21:56:43 dom Exp $ */
 /* $History: PRSLINE.C $ */
 /*  */
 /* *****************  Version 8  ***************** */
@@ -103,7 +103,7 @@ enum symbols
 GetSym (void)
 {
   char *instr;
-  int c, chcount = 0;
+  int c, i, chcount = 0;
 
   ident[0] = '\0';
 
@@ -153,6 +153,7 @@ GetSym (void)
       break;
 
     case '@':
+    case '%':
       sym = binconst;
       break;
 
@@ -220,6 +221,19 @@ GetSym (void)
 		}
 	    }
 	}
+      /* Check for this to be a hex num here - coudl start with a letter*/
+      for ( i = 0; i < chcount; i++ ) 
+	{
+	  if ( !isxdigit(ident[i]) )
+	      break;
+        }
+      if ( chcount > 1 && i == ( chcount - 1 ) && toupper(ident[i]) == 'H' ) 
+	{
+	    for ( i = (chcount-1); i >= 0 ; i-- ) 
+		ident[i+1] = ident[i];
+	    ident[0] = '$';
+	    sym = hexconst;
+        }	       
     }
   else
     {
@@ -243,6 +257,20 @@ GetSym (void)
 		}
 	    }
 	}
+ /* Check for this to be a hex num here */
+      for ( i = 0; i <  chcount ; i++ ) 
+	{
+	  if ( !isxdigit(ident[i])  )
+	      break;
+        }
+      if ( i == ( chcount - 1) && toupper(ident[i]) == 'H' ) 
+	{
+	    for ( i = (chcount-1); i >= 0 ; i-- ) 
+		ident[i+1] = ident[i];
+	    ident[0] = '$';
+	    sym = hexconst;
+        }	  
+
     }
 
   ident[chcount] = '\0';
@@ -494,6 +522,7 @@ GetConstant (char *evalerr)
   switch (ident[0])
     {
     case '@':
+    case '%':
       if (size > 8)
 	{
 	  *evalerr = 1;
