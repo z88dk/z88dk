@@ -8,7 +8,7 @@
 
 #include <net/resolv.h>
 
-u8_t getservbyname(char *name)
+int getservbyname(char *name)
 {
         return_nc (getxxbyname(get_services(),name));
 }

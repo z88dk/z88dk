@@ -8,7 +8,7 @@
 
 #include <net/resolv.h>
 
-u8_t *getservbyport(port,store)
+char  *getservbyport(port,store)
         tcpport_t port;
         u8_t    *store;
 {

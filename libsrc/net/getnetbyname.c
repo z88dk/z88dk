@@ -8,7 +8,7 @@
 
 #include <net/resolv.h>
 
-u8_t getnetbyname(char *name)
+int getnetbyname(char *name)
 {
         return_nc (getxxbyname(get_networks(),name));
 }

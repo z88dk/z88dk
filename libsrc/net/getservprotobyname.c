@@ -8,7 +8,7 @@
 
 #include <net/resolv.h>
 
-u8_t getservprotobyname(char *name )
+i8_t getservprotobyname(char *name )
 {
         struct data_entry *search=get_services();
 

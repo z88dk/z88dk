@@ -8,7 +8,7 @@
 
 #include <net/resolv.h>
 
-u8_t *getprotobynumber(port,store)
+i8_t *getprotobynumber(port,store)
         tcpport_t port;
         u8_t    *store;
 {

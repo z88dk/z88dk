@@ -8,7 +8,7 @@
 
 #include <net/resolv.h>
 
-u8_t getprotobyname(char *name)
+int getprotobyname(char *name)
 {
         return_nc (getxxbyname(get_protocols(),name));
 }

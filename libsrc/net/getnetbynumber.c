@@ -8,7 +8,7 @@
 
 #include <net/resolv.h>
 
-u8_t *getnetbynumber(port,store)
+i8_t *getnetbynumber(port,store)
         tcpport_t port;
         u8_t    *store;
 {
