@@ -4,13 +4,13 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.62 2003-08-22 18:34:08 dom Exp $
+# $Id: Makefile,v 1.63 2003-08-30 18:41:40 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
 	nc_clib.lib vz_clib.lib vzansi_clib.lib abc80_clib.lib \
 	aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
-	cpc_clib.lib cpm_clib.lib c128ansi_clib.lib \
+	cpc_clib.lib cpc_math.lib cpm_clib.lib c128ansi_clib.lib \
 	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib nasansi_clib.lib ozansi_clib.lib\
 	rex_clib.lib svi_clib.lib sam_clib.lib samansi_clib.lib \
@@ -732,6 +732,14 @@ cpc_clib.lib:
 	cd assert ; $(MAKE) 
 	z80asm -d -ns -nm -Mo -DFORcpc -xcpc_clib @cpc.lst
 
+# Amstrad CPC maths libraries - Dom
+cpc_math.lib:
+	@echo ''
+	@echo '--- Building Amstrad CPC Maths Libraries  ---'
+	@echo ''
+	cd cpcmath ; $(MAKE)
+	
+
 # Commodore 128 (Z80 mode) library - Stefano
 c128ansi_clib.lib:
 	@echo ''
@@ -783,6 +791,7 @@ clean:
 	cd zxvgs ; $(MAKE) clean
 	$(RM) *.lib
 	cd games ; $(MAKE) clean
+	cd cpcmath ; $(MAKE) clean
 
 install:
 	cp *.lib ../lib/clibs/
