@@ -1,13 +1,13 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.5 2001-10-15 15:20:05 dom Exp $
+# $Id: Makefile,v 1.6 2001-10-16 20:33:14 dom Exp $
 
 lz88: gen z88_stdlib
 
 lzx: gen zx_stdlib
 
-gen: strtoul.o strtol.o atoi.o 
+gen: strtoul.o strtol.o atoi.o itoa.o
 
 .c.o:
 	zcc -vn -make-lib $*.c
