@@ -5,7 +5,7 @@
 ; 11/3/99 djm ***UNTESTED***
 ;
 ;
-;	$Id: fdgetpos.asm,v 1.1 2001-05-01 13:55:21 dom Exp $
+;	$Id: fdgetpos.asm,v 1.2 2003-10-13 22:58:01 dom Exp $
 ;
 
                 INCLUDE "#fileio.def"
@@ -28,7 +28,7 @@
         ld      a,fa_ptr
         call_oz(os_frm)
         pop     hl              ;dumping place
-	ret	c		;error, dump is non zero
+	jr	c,fdgetpos_error
         ld      (hl),c          ;store the file posn now
         inc     hl
         ld      (hl),b
@@ -38,4 +38,7 @@
         ld      (hl),d
         ld      hl,0            ;no errors
         ret
+.fdgetpos_error
+	ld	hl,-1
+	ret
 
