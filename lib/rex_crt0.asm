@@ -38,29 +38,7 @@
 .l_dcal
         jp      (hl)
 
-
-;
-; Static Variables that we all need <sigh> -now kept in Safe Workspace
-; so we can make good applications
-;
-; Rounded up to 55 bytes (to be safe and allow expansion
-;
-; Current count is 53 + 40 for ANSIstdio
-;
-; Also skip down to allow our safe data to insert itself, this is so
-; we can write apps that use static data and still be good!
-; (this *WILL* cause a problem if we have any libraries that access
-; this data though - eg stdio fns)
-;
-
-IF DEFINED_ANSIstdio
-; If ANSIstdio then we want to include our handles and
-; reserve space for them
-
-.sgoprotos
-	INCLUDE	"#stdio_fp.asm"
-ENDIF
-
+; Static variables kept in safe workspace
 
 DEFVARS $f033
 {
