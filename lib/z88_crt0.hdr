@@ -1,4 +1,10 @@
 ;
+;	This file is used by all machine targets (this misleading
+;	name is due to archaic reasons)
+;
+;	Stick in this file any routines which are needed or implicitly
+;	implied by sccz80.
+;
 ;       This file is included by every module
 ;       To handle multi module programs which use floating point
 ;       routines in different modules, we have got rid of
@@ -13,7 +19,7 @@
 ; Far->near lib conversion
 	XREF	_cpfar2near
 
-; Process interrupt variable (**for apps only**)
+; Process interrupt variable (**for z88 apps only**)
 	XREF	packintrout
 
 ;Standard XREF for startup library..
@@ -33,6 +39,8 @@
 	LIB    l_ghtonsint
         LIB    l_pint
 	LIB    l_pint_eq
+	LIB    l_pint_pop
+	LIB    l_pint_ex
         LIB    l_or
         LIB    l_xor
         LIB    l_and
@@ -158,6 +166,7 @@
         LIB   float              ;Convert int to float
 	LIB   ufloat		 ;unsigned int to float
         LIB   ifix               ;Convert float to int
+	LIB   atof		 ;Ascii string to float
 
 ; Far lib functions (in appropriate malloc lib)
 
