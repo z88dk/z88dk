@@ -119,3 +119,85 @@
 	ld	(hl),%3
 	ld	bc,%4-%1-1
 	add	hl,bc
+
+	ld	hl,%1	;const
+	push	hl
+	call	l_gint	;%3
+	%2c	hl
+	pop	de
+	call	l_pint
+=
+	ld	hl,(%1)
+	%2c	hl
+	ld	(%1),hl
+
+	call	l_eq
+	ld	de,0	;const
+	ex	de,hl
+	call	l_eq
+	jr	c,%1
+=
+	call	l_eq
+	jr	nc,%1
+
+	call	l_eq
+	ld	de,0	;const
+	ex	de,hl
+	call	l_eq
+	jr	nc,%1
+=
+	call	l_eq
+	jr	c,%1
+
+	call	l_pint
+	ld	de,%1	;const
+	ex	de,hl
+=
+	call	l_pint_ex
+	ld	hl,%1	;const
+
+	pop	de
+	call	l_pint
+=
+	call	l_pint_pop
+
+	push	hl
+	call	l_gint	;%9
+	ld	h,0
+	call	l_pint_pop
+=
+	call	l_gint
+	ld	h,0
+
+	ld	hl,%1	;const
+	call	l_gint
+	ld	h,0
+	ld	de,%2	;const
+	ex	de,hl
+=
+	ld	de,(%1)
+	ld	hl,%2	;const
+
+	ld	hl,%1	;const
+	call	l_and
+	ld	de,%1	;const
+	ex	de,hl
+	call	l_eq
+=
+	ld	hl,%1	;const
+	call	l_and
+	call	l_eq
+
+	ld	de,%1	;const
+	ex	de,hl
+	call	l_eq
+=
+	ld	de,%1	;const
+	call	l_eq
+
+	ld	hl,%1	;const
+	ld	l,(hl)
+	ld	h,0
+=
+	ld	hl,(%1)
+	ld	h,0

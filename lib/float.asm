@@ -27,6 +27,7 @@
         LIB     float
         LIB     ufloat
         LIB     ifix
+	LIB	atof
 
 ;
 
