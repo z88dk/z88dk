@@ -2,29 +2,29 @@
 ; 	ANSI Video handling for Sharp OZ family
 ;
 ; 	CLS - Clear the text screen
-;	
-;	-- ONLY FOO STUFF, FOR NOW !! --
+;
 ;
 ;	Stefano Bodrato - Aug. 2002
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.1 2002-11-20 14:15:19 stefano Exp $
+;	$Id: f_ansi_cls.asm,v 1.2 2003-05-21 12:53:23 stefano Exp $
 ;
 
 	XLIB	ansi_cls
 	XREF	base_graphics
 
-.ansi_cls
-
 	LIB     swapgfxbk
         XREF	swapgfxbk1
 
-ret
+.ansi_cls
+
+
 	call	swapgfxbk
-	
+
         ld      hl,(base_graphics)
-        ld      (hl),l
-        ld      de,0a001h
+        ld	d,h
+        ld	e,l
+	inc	de
         ld      bc,2400-1
         ldir
 

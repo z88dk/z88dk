@@ -6,18 +6,25 @@
 ;       Clear the graph. screen
 ;
 ;
-;	$Id: clg.asm,v 1.1 2002-11-20 14:15:19 stefano Exp $
+;	$Id: clg.asm,v 1.2 2003-05-21 12:53:22 stefano Exp $
 ;
 
 
-                XLIB    clg
-		XREF	base_graphics
+	XLIB    clg
+	XREF	base_graphics
 
-.clg
-	        ld      hl,(base_graphics)
-	        ld      (hl),l
-	        ld      de,0a001h
-	        ld      bc,2400-1
-	        ldir
-	
-		ret
+	LIB     swapgfxbk
+	XREF	swapgfxbk1
+
+.ansi_cls
+
+	call	swapgfxbk
+
+	ld      hl,(base_graphics)
+	ld	d,h
+	ld	e,l
+	inc	de
+	ld      bc,2400-1
+	ldir
+
+	jp	swapgfxbk1
