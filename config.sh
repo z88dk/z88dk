@@ -17,6 +17,7 @@ sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/aquansi.lnx > $destdir/lib/conf
 sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/c128ansi.lnx > $destdir/lib/config/c128ansi.cfg
 sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/cpm.lnx > $destdir/lib/config/cpm.cfg
 sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/cpc.lnx > $destdir/lib/config/cpc.cfg
+sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/embedded.lnx > $destdir/lib/config/embedded.cfg
 sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/m5.lnx > $destdir/lib/config/m5.cfg
 sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/msx.lnx > $destdir/lib/config/msx.cfg
 sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/mz.lnx > $destdir/lib/config/mz.cfg

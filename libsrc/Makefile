@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.47 2002-10-10 20:38:54 dom Exp $
+# $Id: Makefile,v 1.48 2002-10-17 12:08:11 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -669,6 +669,18 @@ c128ansi_clib.lib:
 	cd assert ; $(MAKE) 
 	./gfxdeps.sh
 	z80asm -d -ns -nm -Mo -DFORc128 -xc128ansi_clib @c128ansi.lst
+
+embedded_clib.lib:
+	@echo ''
+	@echo '---> Building Embedded (ns16450) Library  <---'
+	@echo ''
+	cd strings ; $(MAKE)
+	cd stdlib ; $(MAKE) gen
+	cd stdio ; $(MAKE) lembedded
+	cd printflike ; $(MAKE) 
+	cd setjmp ; $(MAKE) 
+	cd assert ; $(MAKE) 
+	z80asm -d -ns -nm -Mo -DFORembedded -xembedded_clib @embedded.lst
 
 clean:
 	cd assert ; $(MAKE) clean
