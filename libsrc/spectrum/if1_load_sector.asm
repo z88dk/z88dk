@@ -9,7 +9,7 @@
 ;	2/3 sector number
 ;	0/1 buffer
 ;
-;	$Id: if1_load_sector.asm,v 1.1 2004-10-08 12:33:24 stefano Exp $
+;	$Id: if1_load_sector.asm,v 1.2 2005-02-18 08:30:13 stefano Exp $
 ;
 
 
@@ -20,9 +20,6 @@
 
 		LIB	if1_checkblock
 		XREF	if1_sect_read
-
-		LIB	if1_wrsect
-		LIB	if1_checksum
 
 		XREF	MAKE_M
 		XREF	CLOSE_M

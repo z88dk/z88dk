@@ -5,7 +5,7 @@
  *
  *      Stefano Bodrato - 6/9/2004
  *
- *	$Id: zxinterface1.h,v 1.1 2004-10-08 12:33:21 stefano Exp $
+ *	$Id: zxinterface1.h,v 1.2 2005-02-18 08:30:10 stefano Exp $
  */
 
 
@@ -13,6 +13,7 @@
 #define __ZXINTERFACE1_H__
 
 #include <sys/types.h>
+#include <fcntl.h>
 
 
 struct BASE_CHAN {
@@ -25,12 +26,12 @@ struct BASE_CHAN {
 	u16_t	len;		/* length of channel                 */
 };
 
-
+// M_CHAN is 603 bytes long
 struct M_CHAN {
 	// base channel descriptor
 	struct	BASE_CHAN base;
 	// "M" channel specific stuff
-	u16_t	bytecount;
+	u16_t	bytecount;	/* (IX+$0B) Count bytes in record */
 	u8_t	record;
 	char    name[10];	/* file name */
 	u8_t	flag;
@@ -43,15 +44,21 @@ struct M_CHAN {
 	char    hdname[10];	/* cartridge name */
 	u8_t	hdchk;		/* Header checksum */
 	char    dpreamble[12];	/* 12 bytes of data block preamble */
-	u8_t	recflg;
+	u8_t	recflg;		/* bit 1 set for EOF, bit 2 set for PRINT file type */
 	u8_t	recnum;		/* Record number in the range 0-255 */
-	u16_t	reclen;		/* Number of databytes in record 0-512 */
+	u16_t	reclen;		/* (IX+$45) Number of databytes in record 0-512 */
 	char    recname[10];	/* file name */
 	u8_t	recchk;		/* Record  description checksum */
 	char    data[512];	/* the 512 bytes of data. */
 	//char    datahd[10];	/* first 9 bytes of the 512 bytes of data. */
 	//char	data[502]	/* real program */
 	u8_t	datachk;	/* Checksum of preceding 512 bytes */
+
+	/* These values are added for the file handling
+	   the ROM shouldn't overwrite those fileds */
+	long	position;	/** NEW** - current position in file */
+	int	flags;
+	mode_t	mode;
 };
 
 
@@ -86,13 +93,13 @@ extern int __LIB__ if1_load_sector (int drive, int sector, struct M_CHAN buffer)
 // Write the sector in "buffer"
 extern int __LIB__ if1_write_sector (int drive, int sector, struct M_CHAN buffer);
 
-extern int __LIB__ if1_checksum (int pos, int len);
-
-//Put a 10 characters file name at the specified location; return with the file name length
+// Put a 10 characters file name at the specified location; return with the file name length
 extern int __LIB__ if1_setname(char* name, char *location);
 
 extern char __LIB__ *if1_getname(char *location);
 
+// Delete a file
+extern int __LIB__ if1_remove_file(int drive, char *filename);
 
 
 #endif /* _ZXINTERFACE1_H */

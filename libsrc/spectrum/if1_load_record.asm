@@ -10,7 +10,7 @@
 ;	2/3 record:	record number
 ;	0/1 buffer
 ;
-;	$Id: if1_load_record.asm,v 1.1 2004-10-08 12:33:24 stefano Exp $
+;	$Id: if1_load_record.asm,v 1.2 2005-02-18 08:30:13 stefano Exp $
 ;
 
 		XLIB 	if1_load_record
@@ -21,9 +21,7 @@
 		LIB	if1_checkblock
 		XREF	if1_sect_read
 
-		LIB	if1_wrsect
 		LIB	if1_setname
-		LIB	if1_checksum
 
 		XREF	MAKE_M
 		XREF	CLOSE_M
@@ -119,13 +117,8 @@ copyname:
 		ld	hl,04FBh
 		ld	(5CC9h),hl	; SECTOR
 
-
-
-; *** scelta routine ***
-
 		ld	a,(driveno)	; drive number selected
 		call	MOTOR		; select drive motor
-
 
 do_read:
 		call	FETCH_H		; fetch header
@@ -168,13 +161,7 @@ ckn_loop:	ld	a,(de)
 nxt_sect:
 		call	next_sector	; Decrease sector counter and check if we reached zero
 		jr	nz,do_read
-		jr	noverify
 
-do_write:
-		jp	if1_wrsect
-
-
-noverify:
 		ld	a,(if1_sect_read)	; flag for "sector read"
 		or	a
 		jr	z,sect_notfound

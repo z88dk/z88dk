@@ -8,7 +8,7 @@
 ;	 - detect the shadow rom version
 ;	 - init the jump table
 ;	
-;	$Id: if1_rommap.asm,v 1.1 2004-10-08 12:33:24 stefano Exp $
+;	$Id: if1_rommap.asm,v 1.2 2005-02-18 08:30:13 stefano Exp $
 ;
 
 
@@ -19,6 +19,7 @@
 		XDEF	FETCH_H
 		XDEF	MOTOR
 		XDEF	RD_BUFF
+		XDEF	ERASEM
 
 		XDEF	mdvbuffer
 
@@ -39,16 +40,16 @@ paged:
 		set 	0,(iy+7Ch)	; FLAGS3: reset the "executing extended command" flag
 
 	; update jump table
-		ld	bc,15		; 5 jumps * 3 bytes
-		;ld	bc,24		; 8 jumps * 3 bytes
-		ld	de,jptab	; JP table dest addr
-		ld	hl,rom1tab	; JP table for ROM 1
 		ld	a,(10A5h)
 		or	a
 		jr	z,rom1
+
+		ld	bc,18		; 6 jumps * 3 bytes
+		;ld	bc,24		; 8 jumps * 3 bytes
+		ld	de,jptab	; JP table dest addr
 		ld	hl,rom2tab	; JP table for ROM 2
-rom1:
 		ldir
+rom1:
 		
 		pop	bc		; throw away some garbage
 		pop	bc		; ... from the stack
@@ -57,7 +58,7 @@ rom1:
 		;jp	MAKE_M
 
 
-; Jump table
+; Jump table (ROM1 is the default)
 
 jptab:
 
@@ -66,21 +67,11 @@ CLOSE_M:	JP 12A9h	; close file (pointed by IX)
 FETCH_H: 	JP 12C4h	; fetch header
 MOTOR:		JP 17F7h	; select drive motor
 RD_BUFF:	JP 18A9h	; get buffer
+ERASEM:		JP 1D6Eh	; delete a file from cartridge
 
 ;LDBYTS:		JP 15ACh	;
 ;SVBYTS:		JP 14EEh	;
-;ERASEM:		JP 1D6Eh	;
 
-rom1tab:
-		JP 0FE8h	; JP table image (rom1)
-		JP 12A9h
-		JP 12C4h
-		JP 17F7h
-		JP 18A9h
-
-		;JP 15ACh ;LDBYTS
-		;JP 14EEh ;SVBYTS
-		;JP 1D6Eh ;ERASEM
 
 rom2tab:
 		JP 10A5h	; JP table image (rom2 and rom3)
@@ -88,7 +79,7 @@ rom2tab:
 		JP 13A9h
 		JP 1532h
 		JP 15EBh
+		JP 1D79h ;ERASEM
 
 		;JP 199Dh ;LDBYTS
 		;JP 18DFh ;SVBYTS
-		;JP 1D79h ;ERASEM

@@ -26,6 +26,7 @@ stdio/fputs
 stdio/fread
 stdio/freopen
 stdio/freopen_z88
+stdio/fseek
 stdio/ftell
 stdio/fwrite
 stdio/gets
@@ -169,4 +170,5 @@ spectrum/if1_checkblock
 spectrum/if1_checksum
 spectrum/if1_load_record
 spectrum/if1_load_sector
+spectrum/if1_remove_file
 printflike/ltoa_any
