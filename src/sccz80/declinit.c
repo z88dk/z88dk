@@ -10,7 +10,7 @@
  * 
  *      3/2/02 djm - Unspecified structure members are now padded out
  *
- *      $Id: declinit.c,v 1.9 2003-01-24 21:48:25 dom Exp $
+ *      $Id: declinit.c,v 1.10 2003-03-17 15:59:36 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -130,7 +130,28 @@ int str_init(TAG_SYMBOL *tag)
 	dim = ptr->size;
 	sz = getstsize(ptr,NO);
 	if ( nodata == NO ) {
-	    init(sz, ptr->ident, &dim, ptr->more, 1, 1);
+	    if ( rcmatch('{') ) {
+		needchar('{');
+                while (dim) {
+                   if (ptr->ident == ARRAY && ptr->type == STRUCT) {
+                  /* array of struct */
+                       needchar('{');
+                       str_init(tag);
+                       --dim;
+                       needchar('}');
+                   } else {
+                       init(sz, ptr->ident, &dim, 1, 1,1);
+                   }
+
+                    if (cmatch(',') == 0)
+                        break;
+                    blanks();
+                }
+		needchar('}');
+                dumpzero(sz,dim);
+	    } else {
+	    	init(sz, ptr->ident, &dim, ptr->more, 1, 1);
+	    }
 	    /* Pad out afterwards */
 	} else {  /* Run out of data for this initialisation, set blank */ 
 	    defstorage();
@@ -215,7 +236,7 @@ int size, ident, *dim, more, dump, is_struct;
 	if (ident == VARIABLE || (size != 1 && more != CCHAR))
 	    error(E_ASSIGN);
 #endif
-#ifdef DEBUG_INIT
+#ifdef INIT_TEST
 	outstr("ident=");
 	outdec(ident);
 	outstr("size=");

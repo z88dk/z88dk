@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.12 2003-02-03 19:06:43 dom Exp $
+ *      $Id: declvar.c,v 1.13 2003-03-17 15:59:37 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -72,37 +72,54 @@ dodeclare (
 TAG_SYMBOL *
 defstruct (char *sname, int storage, int is_struct)
 {
-        int itag ;                              /* index of tag in tag symbol table */
-        char nam[20];                           /* Dummy name */
-        TAG_SYMBOL *ptr ;
+    int itag ;                              /* index of tag in tag symbol table */
+    char nam[20];                           /* Dummy name */
+    TAG_SYMBOL *tag = NULL;
 
-        if ( tagptr >= ENDTAG ) {
-                error(E_STROV) ;
+    if ( tagptr >= ENDTAG ) {
+        error(E_STROV) ;
+    }
+
+    if ( sname && sname[0] == 0 )
+	sname = NULL;
+   
+    if ( sname && (tag = findtag(sname) ) ) {
+        if ( tag->weak == 0 ) {
+            if ( rcmatch('{') )
+                multidef();
+            else
+                return tag;
         }
-/* Create dummy symbol */
-        /* add dummy symbol */
-        itag = tagptr - tagtab ;
+        itag = tag - tagtab;
+    }
+
+    /* No tag defined for this, so leave it alone */
+    if ( tag == NULL ) {
+        tag = tagptr++;
+        itag = tag - tagtab ;
         sprintf(nam,"0st%d",itag);
-        if (sname == 0 ) sname = nam;
+        if ( sname == NULL )
+            sname = nam;
+        strcpy(tag->name,sname);
+        tag->size = 0;
+        tag->ptr = tag->end = membptr ;      /* Set so no member searches done.. */
+        dummy_sym[NTYPE+1+itag] = addglb(nam,POINTER,STRUCT,0,STATIK,0,itag) ;
+        tag->weak = 1;
+    }
 
-
-
-        strcpy(tagptr->name, sname) ;
-        tagptr->size = 0 ;
-        tagptr->ptr = membptr ;
-
+    if ( rcmatch('{' ) ) {        
         /* increment tagptr to add tag to table */
-        ptr = tagptr++ ;
-
-
-        dummy_sym[NTYPE+1+itag] = addglb(nam,POINTER,STRUCT,0,STATIK,0,itag) ; 
-
+        tag->ptr = membptr;
+        tag->weak = 0;
+    
+    
         needchar('{') ;
-        while ( dodeclare(storage, ptr, is_struct) )
-                ;
+        while ( dodeclare(storage, tag, is_struct) )
+            ;
         needchar('}') ;
-        ptr->end = membptr ;
-        return ptr ;
+        tag->end = membptr ;
+    }
+    return tag ;
 }
 
 /*
@@ -344,7 +361,7 @@ char zfar )                      /* TRUE if far */
                         /* this is a real variable, not a structure member */
                        if (typ == VOID && ident != FUNCTION && ident!=FUNCTIONP && ident != POINTER && ident != ARRAY ) {
                                 warning(W_BADDECL);
-                                typ=CINT;
+                                typ=type=CINT;
                        }
                        myptr=addglb(sname, ident, type, 0, storage, more, itag) ;
 /* What happens if we have an array which will be initialised? */
@@ -792,16 +809,19 @@ TAG_SYMBOL *GetVarID(struct varid *var,char storage)
                  var->type=STRUCT;
                 /* find structure tag */
                 if ( storage==TYPDEF && rcmatch('{') ) 
-                        return (defstruct(0, storage, var->sflag) );
+                        return (defstruct(NULL, storage, var->sflag) );
 		/* Get the symbol name if present */
-		symname(sname);	       
-                if ( sname[0] == 0 || ( otag= findtag(sname) ) == 0 ) {
-                        /* structure not previously defined */
-                        if ( storage == NO ) 
-                                error(E_UNSTR);
-                        else
-                                otag = defstruct(sname, storage, var->sflag) ;
+		symname(sname);
+	        if ( storage == 0 ) {
+	            if ( (otag = findtag(sname) ) == NULL ) {
+                        error(E_UNSTR);
+		    } else {
+			return otag;
+		    }
                 }
+                else
+                    otag = defstruct(sname, storage, var->sflag) ;
+            
                 return(otag);
         } else {
                 SYMBOL *ptr;
