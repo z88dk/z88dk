@@ -31,11 +31,11 @@ the generated executable, hence resulting in much smaller executables.
 
 This is a very fine idea, however potential problems may arise if you
 have retargetted the compiler to another Z80 system eg the ZX Spectrum and
-wish to generate exeutables which access far code.
+wish to generate executables which access far code.
 
 The Z88 has a very flexible method of memory paging - (virtually) any
 bank can be placed in any 16k segment of the Z80 physical address space,
-and hence it is irrelevent where the code to access far data is located. 
+and hence it is irrelevant where the code to access far data is located. 
 However in the case of the Spectrum 128 memory can only be paged in the
 top 16k of address space and, well, I think you see the problem - the code
 to access far data is in danger of being paged out.
@@ -43,7 +43,7 @@ to access far data is in danger of being paged out.
 To circumvent this, place the routines which access far data (the lp_*
 routines in the libsrc/crt0 directory) in with the startup code - this
 will slightly increase the executable size but will almost guarantee no
-embarassing paging out mistakes (assuming of course that your startup
+embarrassing paging out mistakes (assuming of course that your startup
 code is located in low memory).
 
 A short startup for the ZX Spectrum is now in lib/spec_crt0.asm file,
@@ -92,7 +92,7 @@ int getk(void)			[optional]
 
 Should you require file handling you will need the following standard routines
 from fcntl.h (or unistd.h as it is sometimes known), should you not want
-filehandling for your machine then these functions should be NULL functions
+file-handling for your machine then these functions should be NULL functions
 (chances are they won't be called!):
 
 int open(far char *name, int flags, mode_t mode);
@@ -116,7 +116,7 @@ extern int __FASTCALL__ readbyte(int fd);
 		just read
 
 extern int writebyte(int fd, int c);
-		This function writes byte c to filehandle fd, oncemore if
+		This function writes byte c to filehandle fd, once more if
 		an error occurs it should return EOF and carry set, otherwise
 		hl holds the byte just written and carry is reset
 
