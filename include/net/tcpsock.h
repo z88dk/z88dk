@@ -5,7 +5,7 @@
  *
  *      djm 24/4/99
  *
- *	$Id: tcpsock.h,v 1.2 2001-04-20 16:04:25 dom Exp $
+ *	$Id: tcpsock.h,v 1.3 2001-08-09 17:48:25 dom Exp $
  */
 
 
@@ -100,7 +100,7 @@ TCPSOCKET {
         u32_t    rtt_time;       /* Time for next transmission */
 
         u16_t    mss;
-/*        u32_t    inactive_to; */
+       u32_t    inactive_to; 
 
 /*
  * send buffer stuff, handling via pointers as well, we set the size
