@@ -52,8 +52,18 @@ Z80_OZFILES and ZCCCFG environmental variables are set.
 Amiga
 -----
 
-Extract the lha archive to whereever is convenient and set up the assign
-zcc: to point to the root of that directory.
+Extract the lha archive to whereever is convenient (eg work:z88dk)  and then
+add the following to your S:user-startup sequence:
+
+;BEGIN z88dk
+cd work:z88dk/bin
+Execute startzcc
+;END z88dk
+
+The version is compiled using a cross compiler and has been briefly tested
+to ensure code integrity. Rebuilding the libraries natively takes quite
+a while and as such is not recommended. 
+
 
 
 Source Code Installation
@@ -77,7 +87,12 @@ There's a certain degree of bootstrapping required - here's the
 procedure for a standard install on UNIX (ensure that you have
 root permissions). Where make is mentioned, this refers to GNU make.
 
-1. cd {z88dk}; make
+0. Set up some environental variables to describe your build environment eg:
+	setenv CFLAGS "-g -O2"
+	setenv CCOPT  "-DUNIX"
+	setenv CC     "gcc"
+
+1. cd {z88dk}; make -e
 
 2. make install
 
@@ -95,7 +110,12 @@ Before compiling setup the variables Z80_OZFILES to point to {z88dk}/lib/ and
 ZCCCFG to point to {z88dk}/lib/config/ (Trailing slashes are important!). 
 Additionally add {z88dk}/bin to your path.
 
-1. cd {z88dk}; make
+0. Set up some environental variables to describe your build environment eg:
+	setenv CFLAGS "-g -O2"
+	setenv CCOPT  "-DUNIX"
+	setenv CC     "gcc"
+
+1. cd {z88dk}; make -e
 
 2. cd {z88dk/libsrc} ; make ; make install
 
