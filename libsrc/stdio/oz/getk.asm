@@ -3,7 +3,7 @@
 ;
 ;	getk() Read key status
 ;
-;	$Id: getk.asm,v 1.2 2003-05-20 16:01:56 stefano Exp $
+;	$Id: getk.asm,v 1.3 2003-08-22 13:18:23 dom Exp $
 ;
 
 		XLIB	getk
@@ -51,7 +51,7 @@
 		sub	20h
 		ld	l,a
 		ret
-numsym		cp	'.'
+.numsym		cp	'.'
 		jr	nz,3
 		ld	a,':'+16
 		cp	','
