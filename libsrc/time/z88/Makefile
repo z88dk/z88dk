@@ -6,9 +6,7 @@
 
 all:
 	zcc -vn -make-lib clock.c
-	zcc -vn -make-lib gtoy.c
-	zcc -vn -make-lib doepoch.c
-	zcc -vn -make-lib get1970.c
+	zcc -vn -make-lib time.c
 
 clean:
 	rm -f *.o* *.i *.sym *.map zcc_opt.def
