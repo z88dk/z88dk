@@ -13,7 +13,8 @@ genlibs: m.lib malloc.lib z80_crt0.lib
 z88libs: mz.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib
 
 tilibs: ti82ansi_clib.lib ti83ansi_clib.lib ti83pansi_clib.lib \
-	ti85ansi_clib.lib ti86ansi_clib.lib
+	ti85ansi_clib.lib ti86ansi_clib.lib tigray82.lib tigray83.lib \
+	tigray83p.lib
 
 zxlibs: zx_clib.lib zxan_clib.lib
 
@@ -83,6 +84,7 @@ z88net_clib.lib:
 # 64/32 column library for ZX Spectrum
 
 zx_clib.lib:
+	./gfxdeps.sh
 	cd strings ; make
 	cd stdlib ; make gen
 	cd stdio ; make generic
@@ -94,6 +96,7 @@ zx_clib.lib:
 
 # vt100 C lib for spectrum
 zxan_clib.lib:
+	./gfxdeps.sh
 	cd strings ; make
 	cd stdlib ; make gen
 	cd stdio ; make generic
@@ -117,6 +120,7 @@ nc_clib.lib:
 # VZ200 lib from Stefano
 
 vz_clib.lib:
+	./gfxdeps.sh
 	cd strings ; make
 	cd stdlib ; make gen
 	cd stdio ; make generic
@@ -128,6 +132,7 @@ vz_clib.lib:
 # VZ200 ansi lib from Stefano
 
 vzansi_clib.lib:
+	./gfxdeps.sh
 	cd strings ; make
 	cd stdlib ; make gen
 	cd stdio ; make generic
@@ -139,6 +144,7 @@ vzansi_clib.lib:
 # zx81 lib from Stefano
 
 zx81_clib.lib:
+	./gfxdeps.sh
 	cd strings ; make
 	cd stdlib ; make gen
 	cd stdio ; make generic
@@ -150,6 +156,7 @@ zx81_clib.lib:
 # zx81 ansi lib from Stefano
 
 zx81ansi_clib.lib:
+	./gfxdeps.sh
 	cd strings ; make
 	cd stdlib ; make gen
 	cd stdio ; make generic
@@ -171,6 +178,10 @@ ti82_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORti82 -xti82_clib @ti82.lst
 
+tigray82.lib:
+	./tideps.sh
+	z80asm -d -ns -nm -Mo -DFORti82 -xtigray82 @tigray.lst
+
 ti82ansi_clib.lib:
 	./tideps.sh
 	cd strings ; make
@@ -191,6 +202,10 @@ ti83ansi_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORti83 -xti83ansi_clib @ticansi.lst
 
+tigray83.lib:
+	./tideps.sh
+	z80asm -d -ns -nm -Mo -DFORti83 -xtigray83 @tigray.lst
+
 ti83pansi_clib.lib:
 	./tideps.sh
 	cd strings ; make
@@ -200,6 +215,10 @@ ti83pansi_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORti83p -xti83pansi_clib @ticansi.lst
+
+tigray83p.lib:
+	./tideps.sh
+	z80asm -d -ns -nm -Mo -DFORti83p -xtigray83p @tigray.lst
 
 ti85ansi_clib.lib:
 	./tideps.sh
@@ -266,6 +285,7 @@ abc80_clib.lib:
 
 # Jupiter ACE library - stefano
 aceansi_clib.lib:
+	./gfxdeps.sh
 	cd strings ; make
 	cd stdlib ; make gen
 	cd stdio ; make generic
