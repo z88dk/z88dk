@@ -1,4 +1,4 @@
-$Id: README.1st,v 1.9 2002-10-22 19:14:19 dom Exp $
+$Id: README.1st,v 1.10 2002-11-17 16:58:46 dom Exp $
 
 There's a lot of documentation in the doc/ directory, some of it is half
 way through being written, so apologies for the fuzziness in places, most
@@ -16,7 +16,7 @@ Unix:
 
 There's a certain degree of bootstrapping required - here's the
 procedure for a standard install on UNIX (ensure that you have
-root permissions). Where make is mentioned, this referes to GNU make.
+root permissions). Where make is mentioned, this refers to GNU make.
 
 1. make
 
@@ -54,7 +54,18 @@ Where {z88dk} is the root directory of the archive (where this file is located!)
 
 --8<--
 
-Brief guide to what has changed in case I don't distribute the doco
+CHANGES (brief)
+
+
+z88dkv1.5 
+
+- [sccz80] Optimizations for if/while statements
+- [sccz80] Many, many bugfixes
+- [support] ar clone to view the contents of library files
+- [libs]    Many new machines added
+- [libs]    3 ports now support command line arguments
+
+Basically about 18 months of changes! 
 
 
 z88dkv1.33 (sccz80v1.10b72) 11.5.2001
