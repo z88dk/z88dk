@@ -1,7 +1,8 @@
 
 
 all:
-	@echo 'Its all ASM'
+	cd graphics ; make
+	cd WHmath ; make
 
 .c.o:
 	zcc +rex -vn -make-lib $*.c
@@ -9,3 +10,6 @@ all:
 
 clean:
 	rm -f *.o*  *~  zcc_opt.def
+	cd graphics ; make clean
+	cd farcall ; make clean
+	cd WHmath ; make

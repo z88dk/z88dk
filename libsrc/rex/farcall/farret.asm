@@ -4,7 +4,8 @@
 ;	FarReturn function to return from code in other mem pages
 ;	Daniel
 ;
-;	$Id: farret.asm,v 1.1 2001-09-03 16:13:20 dom Exp $
+;       $Id: farret.asm,v 1.1 2002-01-18 12:06:40 dom Exp $
+
 
 		XLIB	farret
 		XREF	far_ret

@@ -4,7 +4,8 @@
 ;	FarRestore function to restore stack
 ;	Daniel
 ;
-;	$Id: farres.asm,v 1.1 2001-09-03 16:13:20 dom Exp $
+;	$Id: farres.asm,v 1.1 2002-01-18 12:06:40 dom Exp $
+
 
 		XLIB	farres
 		XREF	far_ret_sp

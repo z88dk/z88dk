@@ -4,7 +4,8 @@
 ;	FarCall function to call code in other mem pages
 ;	Daniel
 ;
-;	$Id: farcall.asm,v 1.1 2001-09-03 16:13:20 dom Exp $
+;	$Id: farcall.asm,v 1.1 2002-01-18 12:06:40 dom Exp $
+
 
 		XLIB	farcall
 		XREF	far_ret
