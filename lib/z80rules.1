@@ -2083,18 +2083,6 @@
 	ld	d,0
 	ld	hl,%2	;const
 
-	ld	e,(hl)
-	ld	d,0
-	ld	hl,%1
-	and	a
-	sbc	hl,de
-=
-	ld	a,(hl)
-	ld	hl,%1
-	sub	l
-	ld	l,a
-	ld	h,0
-
 	ex	de,hl
 	ld	a,h
 	or	l
