@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.28 2002-12-11 10:29:58 dom Exp $
+#	$Id: Makefile,v 1.29 2004-03-05 09:30:52 dom Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -101,7 +101,7 @@ install:
 	cd src/sccz80 ; $(MAKE) PREFIX=$(prefix) install
 	cd src/z80asm ; $(MAKE) PREFIX=$(prefix) install
 	cd src/zcc ; $(MAKE) PREFIX=$(prefix) install
-	./config.sh $(prefix)/lib/z88dk $(DEFAULT)
+	./config.sh $(prefix)/lib/z88dk/ $(DEFAULT)
 	cp -R -p include $(prefix)/lib/z88dk
 	cp -R -p lib $(prefix)/lib/z88dk
 	find $(prefix)/lib/z88dk/include -name '*.h' | xargs chmod 644

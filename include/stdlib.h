@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.14 2003-01-23 10:30:25 dom Exp $
+ * $Id: stdlib.h,v 1.15 2004-03-05 09:30:52 dom Exp $
  */
 
 #include <sys/types.h>
@@ -14,6 +14,10 @@ extern __LIB__ abs(int);
 extern long __LIB__ labs(long);
 extern __LIB__ atexit();
 extern __LIB__ __FASTCALL__ exit(int);  /* Fast call stops pushing on stack*/
+
+/* Exit status can be defined for all machines */
+#define EXIT_FAILURE     1     /* Failed */
+#define EXIT_SUCCESS     0     /* Succeeded */
 
 
 extern long __LIB__ strtol(char *,char **,int);
