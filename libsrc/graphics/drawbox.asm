@@ -2,7 +2,7 @@
 	lib	plotpixel
 
 ;
-;	$Id: drawbox.asm,v 1.3 2002-03-28 09:41:14 stefano Exp $
+;	$Id: drawbox.asm,v 1.4 2002-03-28 11:08:49 stefano Exp $
 ;
 
 ; ***********************************************************************
@@ -27,6 +27,7 @@
 		ld	a,h
 		add	a,b
 		ret	c	; overflow ?
+		dec	a
 		ld	h,a
 		pop	de
 .rowloop
@@ -34,7 +35,10 @@
 		
 		push	hl
 		push	de
-		call	plotpixel
+		ld	de, p_RET1
+		push	de
+		jp	(ix)	;	execute PLOT at (h,l)
+.p_RET1
 		pop	de
 		pop	hl
 		inc	l
@@ -42,7 +46,10 @@
 
 		push	hl
 		push	de
-		call	plotpixel
+		ld	de, p_RET2
+		push	de
+		jp	(ix)	;	execute PLOT at (h,l)
+.p_RET2
 		pop	de
 		pop	hl
 		inc	l
@@ -60,6 +67,7 @@
 		ld	a,l
 		add	a,c
 		ret	c	; overflow ?
+		dec	a
 		ld	l,a
 		pop	de
 
@@ -68,7 +76,10 @@
 		
 		push	hl
 		push	de
-		call	plotpixel
+		ld	de, p_RET3
+		push	de
+		jp	(ix)	;	execute PLOT at (h,l)
+.p_RET3
 		pop	de
 		pop	hl
 		inc	h
@@ -76,7 +87,10 @@
 		
 		push	hl
 		push	de
-		call	plotpixel
+		ld	de, p_RET4
+		push	de
+		jp	(ix)	;	execute PLOT at (h,l)
+.p_RET4
 		pop	de
 		pop	hl
 		inc	h
