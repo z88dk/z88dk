@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: vz_crt0.asm,v 1.4 2001-09-07 18:17:56 dom Exp $
+;       $Id: vz_crt0.asm,v 1.5 2002-09-11 08:18:44 stefano Exp $
 ;
 
 
@@ -87,7 +87,7 @@ ENDIF
 	pop	bc
 .start1
         ld      sp,0
-        ret
+        jp	1A19h
 
 .l_dcal
         jp      (hl)
