@@ -9,7 +9,7 @@
 ;       Define for graphics and other standard library functions
 ;
 ;
-;	$Id: grafix.inc,v 1.8 2002-04-17 21:30:24 dom Exp $
+;	$Id: grafix.inc,v 1.9 2002-11-20 14:15:19 stefano Exp $
 ;
 
 
@@ -84,6 +84,13 @@ IF FORsam
 	DEFINE gotgfx
 	defc maxx	= 256
 	defc maxy	= 192
+ENDIF
+
+IF FORoz
+	DEFINE gotgfx
+	defc row_bytes	= 30
+	defc maxx	= 239
+	defc maxy	= 80
 ENDIF
 
 IF FORz88

@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.52 2002-11-14 12:52:52 dom Exp $
+# $Id: Makefile,v 1.53 2002-11-20 14:15:19 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -11,7 +11,7 @@ all:	genlibs z88libs tilibs zxlibs \
 	msx_clib.lib svi_clib.lib m5_clib.lib cpc_clib.lib \
 	c128ansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
 	rex_clib.lib zx81_clib.lib zx81ansi_clib.lib pps_clib.lib \
-	ppsansi_clib.lib embedded_clib.lib
+	ppsansi_clib.lib embedded_clib.lib ozansi_clib.lib
 
 genlibs: m.lib malloc.lib z80_crt0.lib ndos.lib
 
@@ -29,14 +29,14 @@ zxlibs: zx_clib.lib zxan_clib.lib
 # Garry's z88 far library
 farz88.lib:
 	@echo ''
-	@echo '---> Building Z88 Far Malloc Library  <---'
+	@echo '--- Building Z88 Far Malloc Library  ---'
 	@echo ''
 	cd farz88 ; $(MAKE)
 
 # Generic maths build
 m.lib:
 	@echo ''
-	@echo '---> Building Z80 Generic Maths Library  <---'
+	@echo '--- Building Z80 Generic Maths Library  ---'
 	@echo ''
 	cd genmath; $(MAKE)
 
@@ -44,7 +44,7 @@ m.lib:
 
 mz.lib:
 	@echo ''
-	@echo '---> Building Z88 Maths Library  <---'
+	@echo '--- Building Z88 Maths Library  ---'
 	@echo ''
 	cd z88math; $(MAKE)
 
@@ -52,7 +52,7 @@ mz.lib:
 
 gfx.lib:
 	@echo ''
-	@echo '---> Building Z88 BASIC gfx Library  <---'
+	@echo '--- Building Z88 BASIC gfx Library  ---'
 	@echo ''
 	./gfxdeps.sh
 	z80asm -d -ns -nm -Mo -xgfx -DFORz88 @z88gfx.lst
@@ -61,7 +61,7 @@ gfx.lib:
 
 malloc.lib:
 	@echo ''
-	@echo '---> Building Near Malloc Library  <---'
+	@echo '--- Building Near Malloc Library  ---'
 	@echo ''
 	cd malloc ; $(MAKE)
 
@@ -72,7 +72,7 @@ ndos.lib:
 
 z80_crt0.lib:
 	@echo ''
-	@echo '---> Building Z80 crt0 Library  <---'
+	@echo '--- Building Z80 crt0 Library  ---'
 	@echo ''
 	cd z80_crt0s ; $(MAKE)
 
@@ -80,7 +80,7 @@ z80_crt0.lib:
 
 z88.lib:
 	@echo ''
-	@echo '---> Building Z88 Custom Library  <---'
+	@echo '--- Building Z88 Custom Library  ---'
 	@echo ''
 	cd z88 ; $(MAKE)
 
@@ -88,7 +88,7 @@ z88.lib:
 
 net.lib:
 	@echo ''
-	@echo '---> Building Z88 ZSock Library  <---'
+	@echo '--- Building Z88 ZSock Library  ---'
 	@echo ''
 	cd net ; $(MAKE)
 
@@ -96,7 +96,7 @@ net.lib:
 
 z88_clib.lib:
 	@echo ''
-	@echo '---> Building Z88 Library  <---'
+	@echo '--- Building Z88 Library  ---'
 	@echo ''
 	cd fcntl ; $(MAKE) lz88
 	cd stdio ; $(MAKE) lz88
@@ -107,13 +107,14 @@ z88_clib.lib:
 	cd rs232 ; $(MAKE) lz88
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
+	./gamesdeps.sh
 	cd games ; $(MAKE)
 	z80asm -z80-verb -d -ns -nm -Mo -DFORz88 -xz88_clib @z88.lst
 
 
 z88ansi_clib.lib:
 	@echo ''
-	@echo '---> Building Z88 ANSI Library  <---'
+	@echo '--- Building Z88 ANSI Library  ---'
 	@echo ''
 	cd fcntl ; $(MAKE) lz88
 	cd stdio ; $(MAKE) lz88
@@ -130,7 +131,7 @@ z88ansi_clib.lib:
 
 z88net_clib.lib:
 	@echo ''
-	@echo '---> Building Z88 Network Aware Library  <---'
+	@echo '--- Building Z88 Network Aware Library  ---'
 	@echo ''
 	cd fcntl ; $(MAKE) lz88
 	cd stdio ; $(MAKE) lz88net
@@ -147,7 +148,7 @@ z88net_clib.lib:
 
 zx_clib.lib:
 	@echo ''
-	@echo '---> Building ZX Spectrum Library  <---'
+	@echo '--- Building ZX Spectrum Library  ---'
 	@echo ''
 	./gfxdeps.sh
 	cd strings ; $(MAKE)
@@ -166,7 +167,7 @@ zx_clib.lib:
 
 ppsansi_clib.lib:
 	@echo ''
-	@echo '---> Building Sprinter Library  <---'
+	@echo '--- Building Sprinter Library  ---'
 	@echo ''
 	./gfxdeps.sh
 	cd strings ; $(MAKE)
@@ -185,7 +186,7 @@ ppsansi_clib.lib:
 
 pps_clib.lib:
 	@echo ''
-	@echo '---> Building Sprinter ANSI Library  <---'
+	@echo '--- Building Sprinter ANSI Library  ---'
 	@echo ''
 	./gfxdeps.sh
 	cd strings ; $(MAKE)
@@ -208,7 +209,7 @@ pps_clib.lib:
 
 zxan_clib.lib:
 	@echo ''
-	@echo '---> Building ZX Spectrum ANSI Library  <---'
+	@echo '--- Building ZX Spectrum ANSI Library  ---'
 	@echo ''
 	$(RM) stdio/ansi/spectrum/f_ansi_char.o
 	./gfxdeps.sh
@@ -230,7 +231,7 @@ zxan_clib.lib:
 
 nc_clib.lib:
 	@echo ''
-	@echo '---> Building Amstrad NC100 Library  <---'
+	@echo '--- Building Amstrad NC100 Library  ---'
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
@@ -244,7 +245,7 @@ nc_clib.lib:
 
 vz_clib.lib:
 	@echo ''
-	@echo '---> Building VZ200/300 Library  <---'
+	@echo '--- Building VZ200/300 Library  ---'
 	@echo ''
 	./gfxdeps.sh
 	cd strings ; $(MAKE)
@@ -259,7 +260,7 @@ vz_clib.lib:
 
 vzansi_clib.lib:
 	@echo ''
-	@echo '---> Building VZ200/300 ANSI Library  <---'
+	@echo '--- Building VZ200/300 ANSI Library  ---'
 	@echo ''
 	./gfxdeps.sh
 	cd strings ; $(MAKE)
@@ -274,7 +275,7 @@ vzansi_clib.lib:
 
 zx81_clib.lib:
 	@echo ''
-	@echo '---> Building ZX81 Library  <---'
+	@echo '--- Building ZX81 Library  ---'
 	@echo ''
 	./gfxdeps.sh
 	cd strings ; $(MAKE)
@@ -289,7 +290,7 @@ zx81_clib.lib:
 
 zx81ansi_clib.lib:
 	@echo ''
-	@echo '---> Building ZX81 ANSI Library  <---'
+	@echo '--- Building ZX81 ANSI Library  ---'
 	@echo ''
 	./gfxdeps.sh
 	cd strings ; $(MAKE)
@@ -306,7 +307,7 @@ zx81ansi_clib.lib:
 
 ti82ansi_clib.lib:
 	@echo ''
-	@echo '---> Building TI82 ANSI Library  <---'
+	@echo '--- Building TI82 ANSI Library  ---'
 	@echo ''
 	./tideps.sh
 	cd strings ; $(MAKE)
@@ -315,12 +316,13 @@ ti82ansi_clib.lib:
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
+	./gamesdeps.sh
 	cd games ; $(MAKE)
 	z80asm -IXIY -d -ns -nm -Mo -DFORti82 -DPACKEDFONT -xti82ansi_clib @ticansi.lst
 
 ti82_clib.lib:
 	@echo ''
-	@echo '---> Building TI82 Library  <---'
+	@echo '--- Building TI82 Library  ---'
 	@echo ''
 	./tideps.sh
 	cd strings ; $(MAKE)
@@ -329,12 +331,13 @@ ti82_clib.lib:
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
+	./gamesdeps.sh
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORti82 -xti82_clib @ticalc.lst
 
 tigray82.lib:
 	@echo ''
-	@echo '---> Building TI82 Grey Library  <---'
+	@echo '--- Building TI82 Grey Library  ---'
 	@echo ''
 	./tideps.sh
 	z80asm -d -ns -nm -Mo -DFORti82 -xtigray82 @tigray.lst
@@ -342,7 +345,7 @@ tigray82.lib:
 
 ti83ansi_clib.lib:
 	@echo ''
-	@echo '---> Building TI83 ANSI Library  <---'
+	@echo '--- Building TI83 ANSI Library  ---'
 	@echo ''
 	./tideps.sh
 	cd strings ; $(MAKE)
@@ -351,12 +354,13 @@ ti83ansi_clib.lib:
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
+	./gamesdeps.sh
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORti83 -DPACKEDFONT -xti83ansi_clib @ticansi.lst
 
 ti83_clib.lib:
 	@echo ''
-	@echo '---> Building TI83 Library  <---'
+	@echo '--- Building TI83 Library  ---'
 	@echo ''
 	./tideps.sh
 	cd strings ; $(MAKE)
@@ -365,19 +369,20 @@ ti83_clib.lib:
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
+	./gamesdeps.sh
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORti83 -xti83_clib @ticalc.lst
 
 tigray83.lib:
 	@echo ''
-	@echo '---> Building TI83 Grey Library  <---'
+	@echo '--- Building TI83 Grey Library  ---'
 	@echo ''
 	./tideps.sh
 	z80asm -d -ns -nm -Mo -DFORti83 -xtigray83 @tigray.lst
 
 ti83pansi_clib.lib:
 	@echo ''
-	@echo '---> Building TI83+ ANSI Library  <---'
+	@echo '--- Building TI83+ ANSI Library  ---'
 	@echo ''
 	./tideps.sh
 	cd strings ; $(MAKE)
@@ -386,12 +391,13 @@ ti83pansi_clib.lib:
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
+	./gamesdeps.sh
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORti83p -DPACKEDFONT -xti83pansi_clib @ticansi.lst
 
 ti83p_clib.lib:
 	@echo ''
-	@echo '---> Building TI83+ Library  <---'
+	@echo '--- Building TI83+ Library  ---'
 	@echo ''
 	./tideps.sh
 	cd strings ; $(MAKE)
@@ -400,19 +406,20 @@ ti83p_clib.lib:
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
+	./gamesdeps.sh
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORti83p -xti83p_clib @ticalc.lst
 
 tigray83p.lib:
 	@echo ''
-	@echo '---> Building TI83+ Grey Library  <---'
+	@echo '--- Building TI83+ Grey Library  ---'
 	@echo ''
 	./tideps.sh
 	z80asm -d -ns -nm -Mo -DFORti83p -xtigray83p @tigray.lst
 
 ti85ansi_clib.lib:
 	@echo ''
-	@echo '---> Building TI85 ANSI Library  <---'
+	@echo '--- Building TI85 ANSI Library  ---'
 	@echo ''
 	./tideps.sh
 	cd strings ; $(MAKE)
@@ -421,12 +428,13 @@ ti85ansi_clib.lib:
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
+	./gamesdeps.sh
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORti85 -DPACKEDFONT -xti85ansi_clib @ticansi.lst
 
 ti85_clib.lib:
 	@echo ''
-	@echo '---> Building TI85 Library  <---'
+	@echo '--- Building TI85 Library  ---'
 	@echo ''
 	./tideps.sh
 	cd strings ; $(MAKE)
@@ -435,19 +443,20 @@ ti85_clib.lib:
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
+	./gamesdeps.sh
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORti85 -xti85_clib @ticalc.lst
 
 tigray85.lib:
 	@echo ''
-	@echo '---> Building TI85 Grey Library  <---'
+	@echo '--- Building TI85 Grey Library  ---'
 	@echo ''
 	./tideps.sh
 	z80asm -d -ns -nm -Mo -DFORti85 -xtigray85 @tigray.lst
 
 ti86ansi_clib.lib:
 	@echo ''
-	@echo '---> Building TI86 ANSI Library  <---'
+	@echo '--- Building TI86 ANSI Library  ---'
 	@echo ''
 	./tideps.sh
 	cd strings ; $(MAKE)
@@ -456,12 +465,13 @@ ti86ansi_clib.lib:
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
+	./gamesdeps.sh
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORti86 -DPACKEDFONT -xti86ansi_clib @ticansi.lst
 
 ti86_clib.lib:
 	@echo ''
-	@echo '---> Building TI86 Library  <---'
+	@echo '--- Building TI86 Library  ---'
 	@echo ''
 	./tideps.sh
 	cd strings ; $(MAKE)
@@ -470,20 +480,40 @@ ti86_clib.lib:
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
+	./gamesdeps.sh
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORti86 -xti86_clib @ticalc.lst
 
 tigray86.lib:
 	@echo ''
-	@echo '---> Building TI86 Grey Library  <---'
+	@echo '--- Building TI86 Grey Library  ---'
 	@echo ''
 	./tideps.sh
 	z80asm -d -ns -nm -Mo -DFORti86 -xtigray86 @tigray.lst
 
+# vt100 C lib for the Sharp OZ family
+# use -DPACKEDFONT for tiny 50->80 column modes
+
+ozansi_clib.lib:
+	@echo ''
+	@echo '--- Building Sharp OZ family ANSI Library  ---'
+	@echo ''
+	rm -f stdio/ansi/oz/f_ansi_char.o
+	./gfxdeps.sh
+	cd strings ; $(MAKE)
+	cd stdlib ; $(MAKE) gen
+	cd stdio ; $(MAKE) generic
+	cd printflike ; $(MAKE) 
+	cd setjmp ; $(MAKE) 
+	cd assert ; $(MAKE) 
+	./gamesdeps.sh
+	cd games ; $(MAKE)
+	z80asm -d -ns -nm -Mo -DFORoz -DPACKEDFONT -xozansi_clib @ozansi.lst
+
 # CPM lib - Stefano
 cpm_clib.lib:
 	@echo ''
-	@echo '---> Building CP/M Library <---'
+	@echo '--- Building CP/M Library ---'
 	@echo ''
 	cd fcntl ; $(MAKE) lcpm
 	cd strings ; $(MAKE)
@@ -497,7 +527,7 @@ cpm_clib.lib:
 # Sharp MZ lib - Stefano
 mz_clib.lib:
 	@echo ''
-	@echo '---> Building Sharp MZ Library <---'
+	@echo '--- Building Sharp MZ Library ---'
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
@@ -510,7 +540,7 @@ mz_clib.lib:
 # Sharp MZ ansi lib - Stefano
 mzansi_clib.lib: 
 	@echo ''
-	@echo '---> Building Sharp MZ ANSI Library <---'
+	@echo '--- Building Sharp MZ ANSI Library ---'
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
@@ -523,7 +553,7 @@ mzansi_clib.lib:
 # ABC80 ANSI library - Stefano
 abc80_clib.lib:
 	@echo ''
-	@echo '---> Building ABC80 Library <---'
+	@echo '--- Building ABC80 Library ---'
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
@@ -536,7 +566,7 @@ abc80_clib.lib:
 # Jupiter ACE library - Stefano
 aceansi_clib.lib:
 	@echo ''
-	@echo '---> Building Jupiter Ace ANSI Library <---'
+	@echo '--- Building Jupiter Ace ANSI Library ---'
 	@echo ''
 	./gfxdeps.sh
 	cd strings ; $(MAKE)
@@ -552,7 +582,7 @@ aceansi_clib.lib:
 # Mattel Aquarius library - Stefano
 aquarius_clib.lib:
 	@echo ''
-	@echo '---> Building Mattel Aquarius ANSI Library <---'
+	@echo '--- Building Mattel Aquarius Library ---'
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
@@ -568,7 +598,7 @@ aquarius_clib.lib:
 # Mattel Aquarius ANSI library - Stefano
 aquansi_clib.lib:
 	@echo ''
-	@echo '---> Building Mattel Aquarius ANSI Library <---'
+	@echo '--- Building Mattel Aquarius ANSI Library ---'
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
@@ -584,7 +614,7 @@ aquansi_clib.lib:
 # Xircom REX 6000 library - Dominic
 rex_clib.lib:
 	@echo ''
-	@echo '---> Building Xircom Rex Library  <---'
+	@echo '--- Building Xircom Rex Library  ---'
 	@echo ''
 	cd strings; $(MAKE)
 	cd stdlib ; $(MAKE)
@@ -595,7 +625,7 @@ rex_clib.lib:
 # Sam Coupe library - Stefano
 sam_clib.lib:
 	@echo ''
-	@echo '---> Building Sam Coupe Library  <---'
+	@echo '--- Building Sam Coupe Library  ---'
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
@@ -608,7 +638,7 @@ sam_clib.lib:
 # Spectravideo SVI library - Stefano
 svi_clib.lib:
 	@echo ''
-	@echo '---> Building Spectravideo Library  <---'
+	@echo '--- Building Spectravideo Library  ---'
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
@@ -621,7 +651,7 @@ svi_clib.lib:
 # MSX1 library - Stefano
 msx_clib.lib:
 	@echo ''
-	@echo '---> Building MSX Library  <---'
+	@echo '--- Building MSX Library  ---'
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
@@ -634,7 +664,7 @@ msx_clib.lib:
 # SORD M5 library - Stefano
 m5_clib.lib:
 	@echo ''
-	@echo '---> Building SORD M5 Library  <---'
+	@echo '--- Building SORD M5 Library  ---'
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
@@ -647,7 +677,7 @@ m5_clib.lib:
 # Amstrad CPC library - Stefano
 cpc_clib.lib:
 	@echo ''
-	@echo '---> Building Amstrad CPC Library  <---'
+	@echo '--- Building Amstrad CPC Library  ---'
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
@@ -660,7 +690,7 @@ cpc_clib.lib:
 # Commodore 128 (Z80 mode) library - Stefano
 c128ansi_clib.lib:
 	@echo ''
-	@echo '---> Building Commodore 128 ANSI Library  <---'
+	@echo '--- Building Commodore 128 ANSI Library  ---'
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
@@ -673,7 +703,7 @@ c128ansi_clib.lib:
 
 embedded_clib.lib:
 	@echo ''
-	@echo '---> Building Embedded (ns16450) Library  <---'
+	@echo '--- Building Embedded (ns16450) Library  ---'
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
