@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.3 2001-02-28 17:59:22 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.4 2001-02-28 18:19:24 dom Exp $ */
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -237,7 +237,7 @@ struct Z80sym Z80ident[] = {
  {"XREF", DeclExternIdent}
 };
 
-size_t totalz80id = 95;
+size_t totalz80id = 96;
 
 
 int 

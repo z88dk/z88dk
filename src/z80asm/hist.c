@@ -466,4 +466,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * 20.01.2001 <x1cygnus@xcalc.org> [No version increment]
  * Added hardcoded macro instruction Invoke and command line ti83plus 
  * to make assembler ti83/83plus compatible 
+ *
+ * 28.02.2001 V1.0.18 (djm)
+ * Added UNDEFINE command to allow undefinition of a DEFINE
  */
