@@ -1,62 +1,65 @@
 ;
 ;	Game device library for the TI82/TI83
 ;	Stefano Bodrato - 21/8/2001
+;	Henk Poley	- 03/9/2001
 ;
-;	$Id: joystick.asm,v 1.1 2001-08-21 15:40:17 stefano Exp $
+;	$Id: joystick.asm,v 1.2 2001-09-07 07:33:20 stefano Exp $
 ;
 
 
         XLIB    joystick
 
 .joystick
-	ld	ix,0
-	add	ix,sp
-	ld	a,(ix+2)
-	cp	1
-	jr	nz,j_no1
+	pop	af		;
+	pop	bc		; game device
+	push	bc		;
+	push	af		;
 
-	ld	l,0
+	;xor	a		;
+	;cp	b		; Test high-byte (should be zero)
+	;jr	nz,error	;
+	ld	hl,-1		; HL = 'ERROR'
+	dec	c		; Test if device 1 is requested
+	jr	z,device1	;
+.error
+	ret
 
-	ld	a,255
-	out	(1),a
-	ld	a,253
-	out	(1),a
-	in	a,(1)
-	and	64	; "clear" key ?
-	jr	nz,nofire1
-	inc	l
+.device1			; H = -1
+	inc	l		; L =  0
+	inc	c		; C =  1
+	out	(c),h		; Reset keypad (out (1),$FF)
+	ld	a,$BF		; Enable group 7
+	out	(1),a		;
+	in	a,(1)		;
+	and	@00100000	; [2nd] pressed ?
+	jr	nz,nofire1	; if zero, then [2nd] was pressed
+	inc	l		; L = @00000001
 .nofire1
-
-	ld	a,255
-	out	(1),a
-	ld	a,251
-	out	(1),a
-	in	a,(1)
-	and	64	; "vars" key ?
-	jr	nz,nofire2
-	set	1,l
+	;out	(c),h		;
+	ld	a,$DF		; Enable group 6
+	out	(1),a		;
+	in	a,(1)		;
+	and	@10000000	; [Alpha] pressed ?
+	jr	nz,nofire2	; if zero, then [Alpha]
+	set	1,l		; L = @0000001x
 .nofire2
-	
-	ld	a,255
-	out	(1),a
-	ld	a,254
-	out	(1),a
-	in	a,(1)
-	xor	255
-	
-	rl	l	; space for the "up" bit
-	rra		; down
-	rl	l
-	rra		; left
-	rl	l
-	rra		; right
-	rl	l
-	rra
-	jr	nc,noup
-	set	3,l
-.noup
-	jr	j_done
-.j_no1
-	xor	a
-.j_done
+	out	(c),h		;
+	ld	a,$FE		; Enable group 1
+	out	(1),a		;
+	in	a,(1)		;
+	cpl			;
+
+	rl	l		; space for the [up] bit
+	rra			; [down] bit  -> Carry
+	rl	l		; L <- Carry
+	rra			; [left] bit  -> Carry
+	rl	l		; L <- Carry
+	rra			; [right] bit -> Carry
+	rl	l		; L <- Carry
+	rra			; [up] bit    -> Carry
+
+	jr	nc,j_done	; Test Carry, if set...
+	set	3,l		; then, set bit 3 in L
+.j_done				; else, return
+	inc	h		; H = 0
 	ret

@@ -19,7 +19,7 @@ int x;
 */
   printf ("If you can read this, CSI is not working.\n");
   printf ("%c2J",155);
-  printf ("If this the firt thing you can read, CSI is OK.\n");
+  printf ("If this the first thing you can read, CSI is OK.\n");
 
 
 /*
