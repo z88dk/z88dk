@@ -9,7 +9,7 @@
 ;       Define for graphics and other standard library functions
 ;
 ;
-;	$Id: grafix.inc,v 1.5 2001-04-30 16:49:55 dom Exp $
+;	$Id: grafix.inc,v 1.6 2001-06-15 15:52:49 stefano Exp $
 ;
 
 
@@ -68,13 +68,17 @@ IF FORjupiter
 	defc maxy	= 64 ; emulated (48 real dots)
 ENDIF
 
-
 IF FORzx
 	DEFINE gotgfx
 	defc maxx	= 256
 	defc maxy	= 192
 ENDIF
 
+IF FORcpc
+	DEFINE gotgfx
+	defc maxx	= 256
+	defc maxy	= 192
+ENDIF
 
 IF FORz88
 	DEFINE gotgfx

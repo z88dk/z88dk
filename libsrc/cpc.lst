@@ -93,7 +93,7 @@ printflike/fscanf
 printflike/vfscanf
 printflike/vsscanf
 graphics/circle
-graphics/clg
+graphics/cpc/clg
 graphics/clga
 graphics/clrarea
 graphics/dcircle
@@ -121,10 +121,10 @@ graphics/drawbox
 graphics/setxy
 graphics/fill
 graphics/dfill
-graphics/vz200/putsprite
+graphics/putsprite
 graphics/getsprite
-graphics/vz200/bksave
-graphics/vz200/bkrestore
-graphics/vz200/pixladdr
-graphics/vz200/swapgfxbk
-graphics/vz200/clsgraph
+graphics/bksave
+graphics/bkrestore
+graphics/cpc/pixladdr
+graphics/cpc/swapgfxbk
+graphics/clsgraph

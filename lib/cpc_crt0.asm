@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.1 2001-06-12 14:23:40 stefano Exp $
+;       $Id: cpc_crt0.asm,v 1.2 2001-06-15 15:52:49 stefano Exp $
 ;
 
                 MODULE  z88_crt0
@@ -55,6 +55,7 @@
 
 
 .start
+	di
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
@@ -92,6 +93,7 @@ ENDIF
 	;pop	bc
 .start1
         ld      sp,0
+        ei
         ret
 
 .l_dcal
