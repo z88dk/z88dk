@@ -50,7 +50,7 @@ char Board[144];        /* Space for decompressed Level */
 #define K_CLEAR    'H'
 #endif
 
-#if defined __SPECTRUM__ || defined __Z88__ || defined __ACE__
+#if defined __SPECTRUM__ || defined __Z88__ || defined __ACE__ || defined __CPC__
 #define K_UP       'q'  /* arrow up     */
 #define K_DOWN     'a' /* arrow down   */
 #define K_LEFT     'o'  /* arrow left   */
