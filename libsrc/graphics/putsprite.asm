@@ -6,7 +6,7 @@
 ; Generic version (just a bit slow)
 ;
 ;
-; $Id: putsprite.asm,v 1.5 2002-04-17 21:30:24 dom Exp $
+; $Id: putsprite.asm,v 1.6 2002-04-18 15:27:18 stefano Exp $
 ;
 
 	XLIB    putsprite
@@ -21,7 +21,7 @@
 
 
 .offsets_table
-         defb	128,64,32,16,8,4,2,1
+         defb	1,2,4,8,16,32,64,128
 
 .actcoord
 	 defw	0
@@ -63,7 +63,6 @@
 
 	call    swapgfxbk
 	call	pixeladdress
-	xor	7
 
          ld       hl,offsets_table
          ld       c,a
@@ -77,12 +76,9 @@
 	ld	l,e
 
 	ld	a,(ix+0)
-	cp	17
-	jr	nc,putspritebig
 	cp	9
 	jr	nc,putspritew
 
-.putsprites
          ld       d,(ix+0)
          ld       b,(ix+1)
 ._oloop  push     bc                ;Save # of rows
@@ -181,4 +177,3 @@
          pop      bc
          djnz     woloop
 	 jp       swapgfxbk1
-
