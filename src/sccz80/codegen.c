@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: codegen.c,v 1.2 2001-01-25 16:09:16 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -534,9 +534,11 @@ void indirect(LVALUE *lval)
                 	ol("ld\tl,a");
                 } else {
 			ot("call\tl_gint\t;");
+#ifdef USEFRAME
 			if (useframe && CheckOffset(lval->offset)) {
 				OutIndex(lval->offset);
 			}
+#endif
 			nl();
 		}
         }
@@ -931,7 +933,9 @@ int saveaf;		/* Preerve contents of af */
         k = newsp - Zsp ;
         if ( k == 0 ) return newsp ;
 	/* Yes this goto could be an if but this is a dev compiler! */
+#ifdef USEFRAME
 	if (useframe) goto modstkcht;
+#endif
         if ( k > 0 ) {
                 if ( k < 7 ) {
                         if ( k & 1 ) {
@@ -1259,7 +1263,7 @@ void asr(LVALUE *lval)
                 case LONG:
 		case CPTR:
                         if (utype(lval)) callrts("l_long_asr_u");
-                        callrts("l_long_asr");
+                        else callrts("l_long_asr");
                         Zsp +=4;
                         break;
                 default:
@@ -1792,22 +1796,27 @@ void RestoreSP(char saveaf)
 
 void pushframe(void)
 {
+#ifdef USEFRAME
 	if (!useframe) return;
 	ot("push\t");
 	FrameP();
 	nl();
+#endif
 }
 
 void popframe(void)
 {
+#ifdef USEFRAME
 	if (!useframe) return;
 	ot("pop\t");
 	FrameP();
 	nl();
+#endif
 }
 
 void setframe(void)
 {
+#ifdef USEFRAME
 	if (!useframe) return;
 	ot("ld\t");
 	FrameP();
@@ -1815,6 +1824,7 @@ void setframe(void)
 	ot("add\t");
 	FrameP();
 	outstr(",sp\n");
+#endif
 }
 
 
