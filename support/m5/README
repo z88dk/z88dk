@@ -1,4 +1,4 @@
-$Id: README,v 1.1 2001-05-21 09:33:46 stefano Exp $
+$Id: README,v 1.2 2001-10-25 14:27:42 stefano Exp $
 
 SORD M5 support by Stefano Bodrato
 This is been tested under the "SORD" emulator by Joseba Epalza.
@@ -10,7 +10,7 @@ So:
 - exit from emulator (ESC)
 - rename dump.ram to dump.img
 - compile a program  (zcc +m5 hello.c)
-- "inject" the program into the RAM dump (inject a.bas dump.img 1024 dump.ram)
+- "inject" the program into the RAM dump (inject a.bin dump.img 1024 dump.ram)
 - run the emulator
 - press F4 to load the modified RAM dump
 - type "call 29696" and enjoy !
