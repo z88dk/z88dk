@@ -6,7 +6,10 @@
 ; Fixed djm 25/4/99 Previously would return non zero if the two
 ; strings matched (it ignored the \0 at the end!)
 ;
-; $Id: strcmp.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
+; Rewritten Graham R. Cobb 12 January 2002
+; Previously strcmp("A","AB") would return 0.
+;
+; $Id: strcmp.asm,v 1.3 2002-01-14 09:56:12 dom Exp $
 
 
 
@@ -29,30 +32,28 @@
         ld      h,(hl)  
         ld      l,a     ;hl=s1
 .strcmp1
-        ld      a,(de)
-        and     a
-        jr      z,strcmp2
-        cp      (hl)
-        jr      nz,strcmp2
+        ld      a,(de)	; Next char from s2
+        cp      (hl)	; Compare with s1
+        jr      nz,strcmp2 ; Different!
+        and     a	; Check for end of strings
+        jr      z,strcmp4 ; Both strings ended simultaneously 
         inc     hl
         inc     de
         jp      strcmp1
 .strcmp2
-        ld      a,(hl)
-        and     a
-        jp      nz,strcmp3
-;End of s1, return hl=0
-        ld      l,a
-        ld      h,a
-        ret
-;Okay, take the defn to assume if the value at *s1 and value and *s2
-;This is horrible, and probably returns the incorrect result...but WTF?
-.strcmp3
-        ex      de,hl
-        ld      a,(de)  ;s1
-        sub     (hl)
-        ld      l,a
-        ld      h,0
-        ret     nc
-        ld      h,255
-        ret
+; At this point we know the two strings are different
+; The different byte may be within the string or may be the null
+; terminator for one of the strings -- it doesn't matter
+	jr	c,strcmp5 ; jump if *s2 < *s1
+; so we know *s1 < *s2, return h=$80 (i.e. hl<0)
+	ld	h,$80
+	ret
+.strcmp5
+; now we know *s1 > *s2, return h=0 (i.e. hl>0)
+	ld	h,0
+	ret
+.strcmp4
+; now we know *s1=*s2=0, return hl=0
+	ld	l,a
+	ld	h,a
+	ret
