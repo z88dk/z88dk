@@ -1,0 +1,165 @@
+$Id: ti.txt,v 1.1 2001-05-29 12:43:00 stefano Exp $
+-------------------------------------------------------------------------------
+Compiling for the Ti82, Ti83, Ti85 and Ti86    ; By Henk Poley ;    28-mai-2001
+-------------------------------------------------------------------------------
+
+general compilation command:
+zcc [+..] [-startup=..] [-o..] [-l..] file(s)
+ [+..]
+   - Config file to load:
+     Ti82
+     Ti82ansi
+     Ti83
+     Ti83ansi
+     Ti8x
+     Ti8xansi
+     Ti85
+     Ti85ansi
+     Ti86
+     Ti86ansi
+ [-startup=..]
+   - Startup header to use (see below for values)
+ [-o..]
+   - Binary output file (standard a.bin)
+ [-l..]
+   - Link this library (see zcc.html for others):
+     tigray82
+     tigray83
+     tigray83p
+     tigray85
+     tigray86
+ file(s)
+   - File(s) to compile
+
+-------------------------------------------------------------------------------
+
+Ti82:
+compiles for CrASH (always)
+
+#pragma string name xxx
+ - program description, max 22 characters (approx)
+
+#pragma output nostreams
+ - If you just don't use the streams at all (no text and file-stuff)
+
+#pragma output atexit
+ - If you use the atexit() command
+
+-------------------------------------------------------------------------------
+
+Ti83:
+zcc [+..] [-startup=..] [-o..] [-l..] file(s)
+
+-startup =
+   n - Primary shell(s); compatible shell(s)
+	(Primary shell merely means it's the smallest implementation
+	for that shell, that uses full capabilities of the shell)
+
+   1 - Ion; Ti-Explorer (default)
+   2 - Venus;
+   3 - ZES;
+   4 - Anova; SOS
+   5 - Ti-Explorer, AShell; SOS, Anova (same as 6)
+   6 - AShell, Ti-Explorer; SOS, Anova (same as 5)
+   7 - SOS; Anova
+   8 - Venus Explorer; Venus
+   9 - Ion, Ti-Explorer; ZASMLOAD, plain TIOS
+  10 - Plain TIOS, ZASMLOAD
+  
+#pragma string name xxx
+ - program description, max 22 characters (approx)
+
+#pragma data icon xx,xx,xx;
+ - shell icon 5, 7, or 8 bytes long
+   Bigger icons won't brake anything, they are just displayed truncated
+   (with most of the shells). Standard icon is "C+".
+
+#pragma output nostreams
+ - If you just don't use the streams at all (no text and file-stuff)
+
+#pragma output atexit
+ - If you use the atexit() command
+
+-------------------------------------------------------------------------------
+
+Ti83+ (Second Edition):
+zcc -startup =
+   n - Primary shell, compatible shells
+	(Primary shell merely means it's the smallest implementation
+	for that shell, that uses full capabilities of the shell)
+
+   1 - Ion (default)
+   2 - MirageOS without quit key
+   3 - MirageOS with quit key - *dangerous* (possibly)
+   4 - TSE Kernel
+
+#pragma string name xxx
+ - program description, max 22 characters (approx)
+
+#pragma data icon xx,xx,xx;
+ - shell icon 8 bytes long. Standard icon is "C+".
+
+#pragma data mirage_icon xx,xx,xx;
+ - Icon for MirageOS, 16 bytes long. Standard icon is a 'map' with
+   "C+" written on it.
+
+#pragma output GimmeSpeed
+ - Will switch the Ti83+ Second Edition to 15MHz during runtime.
+   Setting this when compiling for the normal Ti83+ won't brake
+   anything. It will return to the shell at the normal 6MHz.
+   This won't work when using grayscale, until there is made a
+   "high speed" IM2 grayscale interrupt...
+   NOTE: Only works with ROM v1.13 and higher.
+
+#pragma output StackNeeded = nnn;
+ - External Data Required for virtual stack.
+   TSE uses this value, it is standard set to 400 bytes, which equals
+   to the normal stackspace of the Ti83+. When you think your program
+   uses more or less than that, try a bit to find the best value.
+
+#pragma output nostreams
+ - If you just don't use the streams at all (no text and file-stuff)
+
+#pragma output atexit
+ - If you use the atexit() command
+
+-------------------------------------------------------------------------------
+
+Ti85:
+compiles for Rigel (always)
+
+#pragma string name xxx
+ - program description
+
+#pragma output nostreams
+ - If you just don't use the streams at all (no text and file-stuff)
+
+#pragma output atexit
+ - If you use the atexit() command
+
+-------------------------------------------------------------------------------
+
+Ti86:
+zcc -startup =
+   n - Primary shell(s); compatible shell(s)
+   	(Primary shell merely means it's the smallest implementation
+	for that shell, that uses full capabilities of the shell)
+
+   1 - LASM (default)
+   2 - ASE, Rascal, emanon, etc.
+   3 - zap2000
+   4 - emanon
+   5 - Embedded LargeLd - !!!EXPERIMENTAL!!!
+  10 - asm() executable
+
+#pragma string name xxx
+ - program description
+
+#pragma data icon xx,xx,xx;
+ - shell icon 8 bytes long. Standard icon is "C+".
+
+#pragma output nostreams
+ - If you just don't use the streams at all (no text and file-stuff)
+
+#pragma output atexit
+ - If you use the atexit() command
