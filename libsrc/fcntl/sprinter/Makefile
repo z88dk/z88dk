@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.2 2002-10-22 19:15:06 dom Exp $
+# $Id: Makefile,v 1.3 2002-11-20 20:28:44 dom Exp $
 
 CFILES = \
 	close.c      \
@@ -12,7 +12,8 @@ CFILES = \
 	read.c       \
 	write.c      \
 	writebyte.c  \
-	readbyte.c   
+	readbyte.c   \
+	getcwd.c
 
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
