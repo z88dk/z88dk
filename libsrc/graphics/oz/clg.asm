@@ -6,7 +6,7 @@
 ;       Clear the graph. screen
 ;
 ;
-;	$Id: clg.asm,v 1.2 2003-05-21 12:53:22 stefano Exp $
+;	$Id: clg.asm,v 1.3 2003-05-21 13:52:35 stefano Exp $
 ;
 
 
@@ -16,7 +16,7 @@
 	LIB     swapgfxbk
 	XREF	swapgfxbk1
 
-.ansi_cls
+.clg
 
 	call	swapgfxbk
 
@@ -25,6 +25,8 @@
 	ld	e,l
 	inc	de
 	ld      bc,2400-1
+	xor	a
+	ld	(hl),a
 	ldir
 
 	jp	swapgfxbk1
