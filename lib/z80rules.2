@@ -1081,3 +1081,48 @@
 	ex	de,hl
 	and	a
 	sbc	hl,de
+
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	push	hl
+	ld	hl,%1
+	pop	de
+=
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%1
+
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	ld	a,h
+	or	l
+=
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	or	h
+
+	ld	hl,%1	;const
+	ld	h,0
+=
+	ld	hl,(%1 % 256)	;const
+
+	ld	%1,%2
+	ld	%1,%3
+=
+	ld	%1,%3
+
+	ld	h,0
+	pop	de
+	ld	a,l
+	ld	(de),a
+=
+	pop	de
+	ld	a,l
+	ld	(de),a
