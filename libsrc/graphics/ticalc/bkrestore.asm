@@ -4,10 +4,11 @@
 ; TI calculators version
 ;
 ;
-; $Id: bkrestore.asm,v 1.4 2002-02-18 08:41:51 stefano Exp $
+; $Id: bkrestore.asm,v 1.5 2002-03-12 11:39:17 stefano Exp $
 ;
 
 	XLIB    bkrestore
+	XREF	cpygraph
 	LIB	pixeladdress
 
 	INCLUDE	"graphics/grafix.inc"
@@ -27,20 +28,27 @@
 
 	ld	a,(ix+0)
 	ld	b,(ix+1)
-	cp	9
-	jr	nc,bkrestorew
+
+	dec	a
+	srl	a
+	srl	a
+	srl	a
+	inc	a
+	inc	a		; INT ((Xsize-1)/8+2)
+	ld	(rbytes+1),a
 
 ._sloop
 	push	bc
 	push	hl
 	
+.rbytes
+	ld	b,0
+.rloop
 	ld	a,(ix+4)
 	ld	(hl),a
 	inc	hl
-	ld	a,(ix+5)
-	ld	(hl),a
 	inc	ix
-	inc	ix
+	djnz	rloop
 
 	pop	hl
 	ld      bc,row_bytes      ;Go to next line
@@ -48,26 +56,4 @@
 	
 	pop	bc
 	djnz	_sloop
-	ret
-
-.bkrestorew
-	push	bc
-	ld	a,(ix+4)
-	ld	(hl),a
-	inc	hl
-	ld	a,(ix+5)
-	ld	(hl),a
-	inc	hl
-	ld	a,(ix+6)
-	ld	(hl),a
-	inc	ix
-	inc	ix
-	inc	ix
-
-	pop	hl
-	ld      bc,row_bytes      ;Go to next line
-	add     hl,bc
-	
-	pop	bc
-	djnz	bkrestorew
-	ret
+	jp	cpygraph

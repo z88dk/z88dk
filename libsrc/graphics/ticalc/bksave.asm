@@ -4,7 +4,7 @@
 ; TI calculators version
 ;
 ;
-; $Id: bksave.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+; $Id: bksave.asm,v 1.4 2002-03-12 11:39:17 stefano Exp $
 ;
 
 	XLIB    bksave
@@ -41,49 +41,32 @@
 
 	ld	a,(ix+0)
 	ld	b,(ix+1)
-	cp	9
-	jr	nc,bksavew
+	
+	dec	a
+	srl	a
+	srl	a
+	srl	a
+	inc	a
+	inc	a		; INT ((Xsize-1)/8+2)
+	ld	(rbytes+1),a
 
 ._sloop
 	push	bc
 	push	hl
+
+.rbytes
+	ld	b,0
+.rloop
 	ld	a,(hl)
 	ld	(ix+4),a
 	inc	hl
-	ld	a,(hl)
-	ld	(ix+5),a
 	inc	ix
-	inc	ix
+	djnz	rloop
 
 	pop	hl
 	ld      bc,row_bytes      ;Go to next line
 	add     hl,bc
 	
 	pop	bc
-	
 	djnz	_sloop
-	ret
-
-.bksavew
-	push	bc
-	push	hl
-	ld	a,(hl)
-	ld	(ix+4),a
-	inc	hl
-	ld	a,(hl)
-	ld	(ix+5),a
-	inc	hl
-	ld	a,(hl)
-	ld	(ix+6),a
-	inc	ix
-	inc	ix
-	inc	ix
-
-	pop	hl
-	ld	bc,row_bytes      ;Go to next line
-	add	hl,bc
-	
-	pop	bc
-	
-	djnz	bksavew
 	ret
