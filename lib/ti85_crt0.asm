@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti85_crt0.asm,v 1.13 2001-09-20 15:54:03 stefano Exp $
+;	$Id: ti85_crt0.asm,v 1.14 2001-09-25 07:41:06 stefano Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -38,13 +38,107 @@
 ; Begin of (shell) headers
 ;-------------------------
 
+	LSTOFF
 	INCLUDE "#Ti85.def"	; ROM / RAM adresses on Ti85
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
+	LSTON
 
-;-------------------
-;1 - Rigel (default)
-;-------------------
-	org	$9296		; Origin to Rigel programs
+;
+;PROGRAMS:
+;~~~~~~~~~
+; 00 FD  - ZShell programs
+; 00 FC  - Rigel program string
+; 00 FB  - Usgard 1.0 programs
+; 00 F9  - Usgard 1.1 programs
+; 00 F8  - Usgard 1.5 programs
+; 00 53  - Summit Shell Patch (BETA 1-3)
+; 00 50  - PhatOS
+; 02 50  - Peak BETA 2 Relocation Program
+; 02 70  - Peak BETA 2 Non-Relocation Program
+; 04 42  - Summit BETA 4 TI-BASIC ASM Subroutine
+; 04 4E  - Summit BETA 4 Non-Relocation Program
+; 04 52  - Summit BETA 4 Relocation Program
+; 04 54  - Summit BETA 4 TSR
+;
+;LIST OF LIBRARY HEADERS:
+;~~~~~~~~~~~~~~~~~~~~~~~~
+; 00 FB  - Rigel library string
+; 00 90  - fake library
+;
+;LIST OF FILE HEADERS:
+;~~~~~~~~~~~~~~~~~~~~~
+; 00 81  - GCP image (screenwide)
+; 00 80  - ZCP image (screenwide)
+; 00 7D  - 128 x 64 B/W image
+; 00 7E  - 128 x 64 GR4 image
+; 00 7F  - 128 x 64 GR8 image
+;
+;LIST OF LEVEL HEADERS:
+;~~~~~~~~~~~~~~~~~~~~~~
+;(first byte=game,second byte could be [save game,level,hiscore,...] 
+; 01 00  - Plainjump II level file
+; 02 00  - Sqrxz world (not compressed)
+; 02 01  - Sqrxz compressed world
+; 03 00  - Plainjump level file
+; 04 00  - Balloon compressed level file
+
+
+; Offset            Example                                       Description
+;컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�
+; 0000-0001          xx xx   -   A two-byte size of the string.  This is added
+;                                by the TI-85.
+; 0002-0003          00 xx   -   A signature word, where xx is either FD, FC,
+;                                or FB.
+;                                FD = ZShell 4.0 string.
+;                                FC = Rigel program string.
+;                                FB = Rigel library string.
+; 0004               xx      -   The size of the description string.
+; xxxx-xxxx                  -   The description string (null terminated).
+; xxxx-xxxx          xx xx   -   A relative pointer to the fixup table. (not
+;                                used in ZShell).
+; 
+;                 BELOW ARE DATA AREAS WITHIN THE FIXUP TABLE
+;
+; xxxx               xx      -   The number of location fixups.
+; xxxx-xxxx                  -   The relative addresses within the string
+;                                that need to be fixed up. 
+; xxxx               xx      -   The number of libraries to be linked.
+; xxxx-xxxx                  -   A length-indexed string of the first library
+;                                to be linked.
+; xxxx               xx      -   the number of fixups to be made to call
+;                                functions within the preceding library or
+;                                more clearly, the number of calls made to
+;                                the preceding library.
+; xxxx-xxxx                  -   The relative addresses within the string
+;                                that need to be fixed up to make calls to the
+;                                preceding library.
+;
+; (if more than one library is to be linked, the last three ranges described 
+;  are repeated as necessary.  The "number of libraries" byte denotes this).
+;컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�
+
+
+;--------
+;2 - Peak
+;--------
+;IF (startup=2)
+;DEFINE NOT_DEFAULT_SHELL
+;DEFC ORIGIN = $906D
+;	org	ORIGIN
+;	defb	$02,$50
+;ENDIF
+
+;----------
+;3 - PhatOS (doesn't work right)
+;----------
+IF (startup=3)
+	DEFINE PhatOS
+	DEFINE NOT_DEFAULT_SHELL
+	org	$8E54		; 'real' origin to PhatOS programs
+	defw	$5000		; This is a PhatOS program string
+	defb	enddesc-description+1
+	;org	$8E57		; Origin to PhatOS programs
+.description
 	DEFINE NEED_name
 	INCLUDE	"zcc_opt.def"	; Get namestring from zcc_opt.def
 	UNDEFINE NEED_name
@@ -52,14 +146,38 @@
 	defm	"Z88DK Small C+ Program"
  ENDIF
 	defb	$0		; Termination zero
+.enddesc
+	im	1
+ENDIF
+
+;-------------------
+;1 - Rigel (default)
+;-------------------
+IF !NOT_DEFAULT_SHELL
+	DEFINE Rigel
+	org	$9293		; 'real' origin to Rigel programs
+	defw	$FC00		; This is a Rigel program string
+	defb	enddesc-description+1
+	;org	;$9296		; Origin to Rigel programs
+.description			; = origin adress
+	DEFINE NEED_name
+	INCLUDE	"zcc_opt.def"	; Get namestring from zcc_opt.def
+	UNDEFINE NEED_name
+ IF !DEFINED_NEED_name
+	defm	"Z88DK Small C+ Program"
+ ENDIF
+	defb	$0		; Termination zero
+.enddesc
+	defw	fixuptable-enddesc
+	im	1
+ENDIF
+
 
 ;-------------------------------------
 ; End of header, begin of startup part
 ;-------------------------------------
 .start
-	ld	hl,0
-	add	hl,sp
-	ld	(start1+1),hl
+	ld	(start1+1),sp
 IF !DEFINED_atexit		; Less stack use
 	ld	hl,-6		; 3 pointers (more likely value)
 	add	hl,sp
@@ -107,7 +225,7 @@ ENDIF
 .start1
 	ld	sp,0
 	ld	iy,_IY_TABLE	; Restore flag-pointer
-	im	1
+	im	2
 	ei
 .cpygraph
 	ret
@@ -119,12 +237,12 @@ ENDIF
 	jp	(hl)
 
 .tiei
-	exx
-	ld	hl,(hl1save)
-	ld	bc,(bc1save)
-	ld	de,(de1save)
-	exx
-	ld	iy,(iysave)
+	;exx
+	;ld	hl,(hl1save)
+	;ld	bc,(bc1save)
+	;ld	de,(de1save)
+	;exx
+	;ld	iy,(iysave)
 IF DEFINED_GRAYlib
 	im	1
 ELSE
@@ -138,18 +256,18 @@ IF DEFINED_GRAYlib
 ELSE
 	di
 ENDIF
-	exx
-	ld	(hl1save),hl
-	ld	(bc1save),bc
-	ld	(de1save),de
-	exx
-	ld	(iysave),iy
+	;exx
+	;ld	(hl1save),hl
+	;ld	(bc1save),bc
+	;ld	(de1save),de
+	;exx
+	;ld	(iysave),iy
 	ret
 
-.hl1save defw	0
-.de1save defw	0
-.bc1save defw	0
-.iysave  defw	0
+;.hl1save defw	0
+;.de1save defw	0
+;.bc1save defw	0
+;.iysave  defw	0
 
 	
 ; Now, define some values for stdin, stdout, stderr
@@ -178,6 +296,11 @@ IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
    ENDIF
   ENDIF
  ENDIF
+ENDIF
+
+IF Rigel
+.fixuptable
+	defb	0,0	; zero fixups, zero ZShell libs
 ENDIF
 
 ;Seed for integer rand() routines
