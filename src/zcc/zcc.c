@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.27 2004-06-14 09:05:45 dom Exp $
+ *      $Id: zcc.c,v 1.28 2004-11-20 23:08:58 dom Exp $
  */
 
 
@@ -1364,6 +1364,7 @@ void ShowErrors(char *filen, char *orig)
         int     j;
         FILE    *fp;
 
+        printf("%s\n",filen);
         temp=changesuffix(filen,".err");
         if ( (fp=fopen(temp,"r") ) != 0 ) {
                 if (orig) fprintf(stderr,"Errors in source file %s:\n",orig);
@@ -1415,7 +1416,8 @@ void tempname(char *filen)
 			*ptr=0;  /* Don't want to risk too long filenames */
 
 #else
-	tmpnam(filen);  /* Temporary nane..get it in filen */
+        strcpy(filen,"/tmp/tmpXXXXXXXX");
+        mktemp(filen);
 #endif
 }
 
