@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.3 2001-02-01 12:04:41 dom Exp $
+ *      $Id: const.c,v 1.4 2001-03-08 17:56:19 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -282,7 +282,7 @@ long *val;
                                 k = (k << 4) + ((c&95) - '7') ;
                 }
                 *val = k ;
-                return(1) ;
+		goto typecheck;
         }
         if( ch() == '0' ) {
 		gch();
