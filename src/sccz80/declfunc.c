@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.3 2003-02-01 20:31:30 dom Exp $
+ *      $Id: declfunc.c,v 1.4 2003-02-01 20:36:52 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -182,7 +182,7 @@ AddFuncCode(char *n, char type, char ident, char sign,char zfar, int storage, in
  * compiling the library though!! Change type to local static to prevent
  * being dumped in the scope list..
  */
-				if (makelib) {
+				if (makelib || storage == LSTATIC ) {
                                 	currfn->storage=LSTATIC;
 				} else {
 					currfn->storage=LIBOVER;
