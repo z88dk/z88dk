@@ -63,6 +63,10 @@
         ld      sp,hl
         ld      (exitsp),sp
 
+	exx
+	push	hl
+
+
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 ; Set up the std* stuff so we can be called again
@@ -74,6 +78,7 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
+
         call    _main
         
 .cleanup
@@ -89,8 +94,13 @@ ENDIF
 ENDIF
 
 	pop	bc
+	exx
+        pop	hl
+        exx
+
 .start1
         ld      sp,0
+        
         ret
 
 .l_dcal
