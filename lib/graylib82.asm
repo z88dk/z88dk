@@ -13,7 +13,7 @@
 ; Date:         4/22/00
 ;---------------------------------------
 ;
-; $Id: graylib82.asm,v 1.3 2001-04-12 13:26:13 stefano Exp $
+; $Id: graylib82.asm,v 1.4 2001-06-06 14:01:55 stefano Exp $
 ;
 
 	XDEF	graybit1
@@ -39,7 +39,7 @@ defc intcount = $8BDF	;TEXT_MEM2
         ld      a,$84                   ; point i to interrupt vector
         ld      i,a                     ;
         im      2                       ;
-        jp	cont_jp
+        jp	jump_over
 
 .grayint
         push	af
@@ -105,11 +105,11 @@ defc intcount = $8BDF	;TEXT_MEM2
         jr      nz,wloop1
         jr      exit_interrupt 
 
-.graybit1 defw $88b8	;GRAPH_MEM
-;.graybit2 defw $8228	;APD_BUF
+.graybit1	defw	$88b8	;GRAPH_MEM
 
-.graybit2 defw gbuf2
-.gbuf2
-DEFS	768
+;.graybit2	defw	$8228	;APD_BUF
+.graybit2	defw	gbuf2
+.gbuf2		DEFS	768
 
+.jump_over
 .cont_jp

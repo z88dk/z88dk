@@ -3,16 +3,17 @@
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.8 2001-05-18 13:39:29 stefano Exp $
+;	$Id: ti83p_crt0.asm,v 1.9 2001-06-06 14:01:55 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells
-;	(Primary shell merely means it's the smallest implementation
-;	for that shell, that uses full capablilities of the shell)
+;       (Primary shell merely means it's the smallest implementation
+;        for that shell, that uses full capabilities of the shell)
 ;
 ;   1 - Ion (default)
-;   2 - MirageOS
-;   3 - TSE Kernel
+;   2 - MirageOS without quit key
+;   3 - MirageOS with quit key - *dangerous*
+;   4 - TSE Kernel
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -57,9 +58,9 @@
 
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 	
-;------------
-;2 - MirageOS
-;------------
+;-----------------------------
+;2 - MirageOS without quit key
+;-----------------------------
 IF (startup=2)
 	DEFINE NOT_DEFAULT_SHELL	;Else we would use Ion
 	;org	$9D93			;Origin
@@ -67,7 +68,6 @@ IF (startup=2)
 	org	$9D95	;We use Bin2var
 	ret				;So TIOS wont run the program
 	defb	1			;Identifier as MirageOS program
-	;defb	3			;Identifier (with quit key)
 .icon
 	DEFINE NEED_mirage_icon
 	INCLUDE	"zcc_opt.def"
@@ -90,8 +90,56 @@ IF (startup=2)
 	defb	@01111111,@11111100
  ENDIF
 .endicon
-	;XREF	exit
-	;DEFW	exit			; quit adress
+.description
+	DEFINE NEED_name
+	INCLUDE	"zcc_opt.def"		; Get namestring from zcc_opt.def
+	UNDEFINE NEED_name
+ IF !DEFINED_NEED_name
+	defm	"Z88DK Small C+ Program"
+ ENDIF
+	defb	$0			; Termination zero
+.enddesc
+ENDIF
+
+;----------------------------------------
+;3 - MirageOS with quit key - *dangerous*
+;----------------------------------------
+IF (startup=3)
+	DEFINE NOT_DEFAULT_SHELL	;Else we would use Ion
+	;org	$9D93			;Origin
+	;defb	$BB,$6D			;Compiled AsmPrgm token
+	org	$9D95	;We use Bin2var
+	ret				;So TIOS wont run the program
+	defb	3			;Identifier (with quit key)
+.icon
+	DEFINE NEED_mirage_icon
+	INCLUDE	"zcc_opt.def"
+	UNDEFINE NEED_mirage_icon
+ IF !DEFINED_NEED_mirage_icon
+	defb	@01111000,@00000000	;15x15 button
+	defb	@10000100,@00000000	;NEEDS TO BE THIS SIZE!!!
+	defb	@10000011,@11111100
+	defb	@10000000,@00000010	;Picture of a map with "C+" on it
+	defb	@10011111,@00000010
+	defb	@10111111,@00000010
+	defb	@10110000,@00110010
+	defb	@10110000,@01111010
+	defb	@10110000,@01111010
+	defb	@10110000,@00110010
+	defb	@10111111,@00000010
+	defb	@10011111,@00000010
+	defb	@10000000,@00000010
+	defb	@10000000,@00000010
+	defb	@01111111,@11111100
+ ENDIF
+.endicon
+	LIB	exit
+	DEFW	exit			; quit adress
+	;bit 3 = task interrupt
+	DEFINE MIRINT = MIRINT + 8
+	; No need to call the interrupt-setup, only if another
+	;  utility (other than tasker) is used.
+	; So no need to increment UseMirageInt
 .description
 	DEFINE NEED_name
 	INCLUDE	"zcc_opt.def"		; Get namestring from zcc_opt.def
@@ -104,9 +152,9 @@ IF (startup=2)
 ENDIF
 
 ;--------------
-;3 - TSE Kernel
+;4 - TSE Kernel
 ;--------------
-IF (startup = 3)
+IF (startup = 4)
 	DEFINE NOT_DEFAULT_SHELL
 	;org	$9D92		; Program origin
 	;defb	$BB,$6D		; Program variable header
@@ -138,8 +186,8 @@ ENDIF
 ;1 - Ion (default)
 ;-----------------
 IF !NOT_DEFAULT_SHELL
-	;org	$9D93			;Origin
-	;defb	$BB,$6D			;Compiled AsmPrgm token
+	;org	$9D93		; Origin
+	;defb	$BB,$6D		; Compiled AsmPrgm token
 	org	$9D95	;We use Bin2var
 	jr	nc,start
 .description
@@ -158,14 +206,22 @@ ENDIF
 ; End of header, begin of startup part
 ;-------------------------------------
 .start
-
+IF !DEFINED_GRAYlib
+ IF DEFINED_GimmeSpeed
+	ld	a,1		; switch to 15MHz (extra fast)
+	rst	28		; bcall(SetExSpeed)
+	defw	$50BF
+ ENDIF
+ENDIF
 	ld	hl,0
 	add	hl,sp
 	ld	(start1+1),hl
+IF DEFINED_atexit		; Less stack use
 	ld	hl,-64
 	add	hl,sp
 	ld	sp,hl
 	ld	(exitsp),sp
+ENDIF
 
 IF !DEFINED_nostreams
  IF DEFINED_ANSIstdio
@@ -188,14 +244,37 @@ IF !DEFINED_nostreams
 ENDIF
 
 IF DEFINED_GRAYlib
- IF (startup=2)			; MirageOS
-	; Quick hack to make things work (I hope)
-	ld	hl,IntProcStart	; Load interrupt start addres
-	ld	($966F),hl	; Store at custintaddr
-	ld	a,32		; Enable custom interrupt (bit 5)
-	call	$4191		; call setupint
- ELSE
 	INCLUDE	"#graylib83p.asm"
+ENDIF
+
+IF (startup=2) | (startup=3)	; MirageOS
+ IF DEFINED_Timer
+ ;bit 0 = Set timer on
+        DEFINE MIRINT = MIRINT + 1
+ 	DEFINE UseMirageInt = UseMirageInt + 1
+ ENDIF
+ 
+ IF DEFINED_NoGetkey2ndOnCrash
+ ;bit 1 = Disable [2nd]+[On] in _getkey
+	DEFINE MIRINT = MIRINT + 2
+ 	DEFINE UseMirageInt = UseMirageInt + 1
+ ENDIF
+
+ IF DEFINED_APD_On
+ ;bit 2 = APD after about 3 minutes (6MHz calc!)
+ 	DEFINE MIRINT = MIRINT + 4
+  	DEFINE UseMirageInt = UseMirageInt + 1
+ ENDIF
+
+ IF DEFINED_FastArrowKeys
+ ;bit 4 = keydelay interrupt
+ 	DEFINE MIRINT = MIRINT + 16
+  	DEFINE UseMirageInt = UseMirageInt + 1
+ ENDIF
+
+ IF UseMirageInt
+	ld	a,MIRINT	; Enable custom interrupt
+	call	$4191		; call setupint
  ENDIF
 ENDIF
 
@@ -212,9 +291,17 @@ IF !DEFINED_nostreams
  ENDIF
 ENDIF
 
+IF !DEFINED_GRAYlib
+ IF DEFINED_GimmeSpeed
+	xor	a		; switch to 6MHz (normal speed)
+	rst	28		; bcall(SetExSpeed)
+	defw	$50BF
+ ENDIF
+ENDIF
+
 .start1
 	ld	sp,0		; restore SP
-IF (startup=3)			; TSE Kernel
+IF (startup=4)			; TSE Kernel
 	call	$9872+20	; call _tseForceYield
 				; Task-switch back to shell (can return...)
 	jp	start		; begin again if needed...
@@ -301,22 +388,26 @@ ENDIF
 .heapblocks	defw	0
 
 ; mem stuff
-.base_graphics	defw	$9340	;TI83+
+.base_graphics	defw	$9340	; Ti83+
 .coords		defw	0
 
 .cpygraph
 IF DEFINED_GRAYlib
 		ret
 ELSE
- IF !DEFINED_startup | (startup=1) | !NOT_DEFAULT_SHELL
-		jp	$966E+80+15	; Ion FastCopy call
- ENDIF
- IF (startup=2)
-		jp	$4092		; MirageOS FastCopy call
- ENDIF
- IF (startup=3)
-		jp	$8A3A+18	; TSE FastCopy call
- ENDIF
+ IF DEFINED_GimmeSpeed
+	call	$50		; bjump(GrBufCpy)
+	defw	$486A		; FastCopy is far too fast at 15MHz...
+ ELSE
+  IF !NOT_DEFAULT_SHELL
+	jp	$966E+80+15	; Ion FastCopy call
+  ENDIF
+  IF (startup=2)
+	jp	$4092		; MirageOS FastCopy call
+  ENDIF
+  IF (startup=3)
+	jp	$8A3A+18	; TSE FastCopy call
+  ENDIF
 ENDIF
 
 ;All the float stuff is kept in a different file...for ease of altering!
@@ -337,10 +428,9 @@ IF NEED_floatpack
 ;seed for random number generator - not used yet..
 .fp_seed	defb	$80,$80,0,0,0,0
 ;Floating point registers...
-.extra	 	defs	6
+.extra		defs	6
 .fa		defs	6
 .fasign		defb	0
-
 ENDIF
 
 

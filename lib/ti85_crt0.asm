@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti85_crt0.asm,v 1.9 2001-05-18 13:39:29 stefano Exp $
+;	$Id: ti85_crt0.asm,v 1.10 2001-06-06 14:01:55 stefano Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -68,10 +68,12 @@
 	ld	hl,0
 	add	hl,sp
 	ld	(start1+1),hl
+IF DEFINED_atexit		; Less stack use
 	ld	hl,-64
 	add	hl,sp
 	ld	sp,hl
 	ld	(exitsp),sp
+ENDIF
 
 IF !DEFINED_nostreams
  IF DEFINED_ANSIstdio

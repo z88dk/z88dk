@@ -1,0 +1,49 @@
+$Id: windows.txt,v 1.1 2001-06-06 14:01:55 stefano Exp $
+-------------------------------------------------------------------------------
+Setting up the z88dk for Windows9x         ; By Henk Poley ;        05-jun-2001
+-------------------------------------------------------------------------------
+
+To begin with, these steps have only been tested on Windows95 & 98 (Lite), but they should work on other (Windows) platforms as long as they have 32bit DOS capabilities and long filenames. Maybe you will need to add entries to the PATH and environment variables in a different way than described here, because AUTOEXEC.BAT is no longer in use (Windows ME/NT/2000/XP), please revert to the manuals if it doesn't seem to work this way. You could also ask us, the makers of the z88dk, off coarse...
+
+This is going to be a step-by-step guide, please don't feel embarrassed.
+
+First unzip all files in the archive to a directory. We will call this directory from now on {z88dk}. Now you will need the Windows executables from which a link can found on the z88dk's website (http://z88dk.sourceforge.net/).
+Unzip the files into {z88dk}\bin.
+
+Now for the following steps open your AUTOEXEC.BAT file, you will find it in your C:\ directory. If it isn't there, create it.
+
+Then search for the line beginning with "PATH" or "SET PATH=". Add {z88dk}\bin\ to it, you will get a line like the following. Note that you need to separate different entries with a colon ';' (in this case {z88dk} is "c:\dos\z88dk").
+
+PATH	c:\dos\tools\;c:\dos\z88dk\bin\
+
+Now we have to setup where the z88dk needs to look for it's data files (libraries, assembly and config files needed during compile time). Add the following lines to your AUTOEXEC.BAT (remark that all "DOS" backslashes need to be turned into "unix" slashes):
+
+SET	Z80_OZFILES = {z88dk}/LIB/
+SET	ZCCCFG = {z88dk}/LIB/CONFIG/
+
+You will get for example:
+
+SET	Z80_OZFILES = C:/DOS/Z88DK/LIB/
+SET	ZCCCFG = C:/DOS/Z88DK/LIB/CONFIG/
+
+Save your new AUTOEXEC.BAT in the root (C:\).
+
+Now you need a text-editor that can search-and-replace in more documents at one time (like TextPad or UltraEdit, search for them at http://www.downloads.com/). We need this when editing the config files. You could also only change the config (*.cfg) files of the platforms you will work with, you will then only need Notepad or similar programs. Open a DOS-window and type:
+
+cd {z88dk}
+cd lib
+cd config
+copy *.lnx *.cfg
+
+Now go to {z88dk}\lib\config within Windows. Select all .cfg files and open them with the text-editor. If it doesn't open them in the right program, hold shift down and right click on the files. Chose "open with...", then deselect the "use always" selection, and select your program, then press "OK".
+
+Now find the search-and-replace utility in your text-editor. Replace the following (can also be done manualy on one file):
+
+cp      -> copy
+DESTDIR -> {z88dk} (remove the "DOS" backslash at the end!)
+/       -> \       ("unix" slashes into "DOS" backslashes)
+
+Restart your PC and there you go. For info about using the z88dk please revert to other documentation found in the {z88dk}\doc\ directory.
+
+	Have a nice day,
+	Henk Poley

@@ -3,11 +3,12 @@
 ;	Stefano Bodrato	- Dec 2000
 ;	Henk Poley	- Apr 2001 Fixed and add some things
 ;
-;	$Id: ti83_crt0.asm,v 1.10 2001-05-18 13:39:29 stefano Exp $
+;	$Id: ti83_crt0.asm,v 1.11 2001-06-06 14:01:55 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
-;		for that shell, that uses full capablilities of the shell)
+;       (Primary shell merely means it's the smallest implementation
+;        for that shell, that uses full capabilities of the shell)
 ;
 ;   1 - Ion; Ti-Explorer (default)
 ;   2 - Venus;
@@ -16,7 +17,7 @@
 ;   5 - Ti-Explorer, AShell; SOS, Anova (same as 6)
 ;   6 - AShell, Ti-Explorer; SOS, Anova (same as 5)
 ;   7 - SOS; Anova
-;   8 - Venus Explorer, Venus;
+;   8 - Venus Explorer; Venus
 ;   9 - Ion, Ti-Explorer; ZASMLOAD, plain TIOS
 ;  10 - Plain TIOS, ZASMLOAD
 ;
@@ -108,18 +109,19 @@ IF (startup=2) | (startup=8)
 	defb	@00000000
   ENDIF
 .endicon
+.externals
  ENDIF
- IF DEFINED_GRAYlib
+; IF DEFINED_GRAYlib
 	; No externals, the graylib has it's own copyroutine.
 	; Maybe we can use the graylib of Venus in the future.
-	defb	$1		; numberOfExternals+1 (maximum = 11d)
- ELSE
+;	defb	$1		; numberOfExternals+1 (maximum = 11d)
+; ELSE
  	; No graylib, so we use FastCopy
 	defb	$2		; numberOfExternals+1 (maximum = 11d)
 	defb	$5		; We use the FastCopy-lib
 	defm	"~FCPY"		;
 	defb	$ff		;
- ENDIF
+; ENDIF
 ENDIF
 
 ;------

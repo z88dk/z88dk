@@ -2,11 +2,12 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.8 2001-05-18 13:39:29 stefano Exp $
+;	$Id: ti86_crt0.asm,v 1.9 2001-06-06 14:01:55 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
-;		for that shell, that uses full capablilities of the shell)
+;       (Primary shell merely means it's the smallest implementation
+;        for that shell, that uses full capabilities of the shell)
 ;
 ;   1 - LASM (default)
 ;   2 - ASE, Rascal, emanon, etc.
@@ -198,15 +199,17 @@ ENDIF
 	ld	hl,0
 	add	hl,sp
 	ld	(start1+1),hl
+IF DEFINED_atexit		; Less stack use
 	ld	hl,-64
 	add	hl,sp
 	ld	sp,hl
 	ld	(exitsp),sp
+ENDIF
 
 IF !DEFINED_nostreams
  IF DEFINED_ANSIstdio
   IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
-	;Reset the ANSI cursor
+	; Reset the ANSI cursor
 	XREF	ansi_ROW
 	XREF	ansi_COLUMN
 	xor	a
