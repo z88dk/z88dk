@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.6 2001-04-30 14:31:49 dom Exp $
+ *      $Id: zcc.c,v 1.7 2001-06-26 10:47:03 dom Exp $
  */
 
 
@@ -288,7 +288,7 @@ char	extension[5];
  * Default output binary filename - why mess with genius?!?!
  */
 
-char    *defaultout="a.bas";
+char    *defaultout="a.bin";
 char    *defaultbin="a.bin";
 
 /* Okay! Off we Go! */
