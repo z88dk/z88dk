@@ -20,7 +20,7 @@
 	ld	e,a
 	ld	d,0
 	ld	ix,0
-	ld	hl,sp
+	add	ix,sp
 	add	ix,de	;hl now points to first given parameter i.e. syscall
 	ld	e,(ix+0)
 	ld	d,(ix+1)
@@ -30,7 +30,7 @@
 	dec	b		;now holds number of parameters left
 ; Now we have to get the parameters in the correct order
 	ld	c,b		;number of parameters - keep it safe!
-.sycallexl1
+.syscallexl1
 	ld	l,(ix+0)
 	ld	h,(ix+1)
 	push	hl
