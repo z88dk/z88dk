@@ -2,10 +2,12 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.7 2001-07-16 13:27:49 dom Exp $
+;       $Id: rex_crt0.asm,v 1.8 2001-07-23 13:39:42 dom Exp $
 ;
 
 	MODULE rex_crt0
+
+	INCLUDE "zcc_opt.def"
 
 	XREF	_main
 ;	defm	"ApplicationName:Addin"&10&13
