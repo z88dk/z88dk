@@ -94,7 +94,7 @@
 
 char type[256] = {		/* Character type codes    Hex		*/
    END,   000,   000,   000,   000,   000,   000,   000, /* 00		*/
-   000,   SPA,   000,   000,   000,   000,   000,   000, /* 08		*/
+   000,   SPA,   000,   000,   SPA,   000,   000,   000, /* 08		*/
    000,   000,   000,   000,   000,   000,   000,   000, /* 10		*/
    000,   000,   000,   000,   000,   LET,   000,   SPA, /* 18		*/
    SPA,OP_NOT,   QUO,   000,   DOL,OP_MOD,OP_AND,   QUO, /* 20  !"#$%&'	*/
@@ -128,7 +128,7 @@ skipnl()
 
 	do {				/* Skip to newline	*/
 	    c = get();
-	} while (c != '\n' && c != EOF_CHAR);
+	} while (c != '\n' && c != '\r' && c != EOF_CHAR);
 }
 
 int
@@ -746,8 +746,9 @@ newline:
 		file->parent->unrecur = 0;
 	    }
 	}
-	if (c == '\n')				/* Maintain current	*/
+	if (c == '\n') 	 			/* Maintain current	*/
 	    ++line;				/* line counter		*/
+        
 	if (instring)				/* Strings just return	*/
 	    return (c);				/* the character.	*/
 	else if (c == '/') {			/* Comment?		*/
@@ -834,7 +835,7 @@ test:		if (keepcomments && c != EOF_CHAR)
 		return ('\\');			/* Return the backslash	*/
 	    }
 	}
-	else if (c == '\f' || c == VT)		/* Form Feed, Vertical	*/
+	else if ( c == '\r' || c == '\f' || c == VT)		/* Form Feed, Vertical	*/
 	    c = ' ';				/* Tab are whitespace	*/
 	return (c);				/* Just return the char	*/
 }

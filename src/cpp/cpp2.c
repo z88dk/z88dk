@@ -68,7 +68,7 @@ int             counter;        /* Pending newline counter              */
         char                    *ep;
 
         c = skipws();
-        if (c == '\n' || c == EOF_CHAR)
+        if (c == '\n'  || c == EOF_CHAR)
             return (counter + 1);
         if (!isdigit(c))
             scanid(c);                  /* Get #word to token[]         */
@@ -291,7 +291,7 @@ nest_err:       cerror("#%s must be in an #if", token);
              */
             goto dump_line;                     /* Take common exit     */
 #else
-            if (skipws() != '\n') {
+            if (skipws() != '\n' ) {
                 cwarn("Unexpected text in #control line ignored", NULLST);
                 skipnl();
             }
@@ -315,7 +315,7 @@ int             hash;
         register int            c;
         register int            found;
 
-        if ((c = skipws()) == '\n' || c == EOF_CHAR) {
+        if ((c = skipws()) == '\n'   || c == EOF_CHAR) {
             unget();
             goto badif;
         }
