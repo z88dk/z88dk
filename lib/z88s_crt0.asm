@@ -3,33 +3,22 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.5 2002-06-09 22:22:13 dom Exp $
+;	$Id: z88s_crt0.asm,v 1.6 2002-06-23 14:18:01 dom Exp $
 
 
 
 	INCLUDE	"#stdio.def"
 	INCLUDE "#error.def"
 
-; Shell default values - these will need to be changed for a shell release
-; (but then again so does the signature)	
-	defc    cmdaddr = $20F5
-        defc    cmdlen  = $20F3
-        defc    cmdptr  = $20F7
-        defc    next    = $F886
-	defc	ZTOSTRING = $8EA4
-	defc	ALSO = $EB26
-	defc	PREVIOUS = $EB41
-	defc	internal = $94F0
-	defc	eval    = $99BA
-        defc	myzorg  = $2FB1-12
+	INCLUDE	"#shellapi.def"
 
-	org	myzorg
+	org	shell_loadaddr-shell_headerlen
+
 .header_start
-        defm    "!bin025"&13
+        defm    "!bin"&shell_verh&shell_verm&shell_verl&13
 .shell_length
         defw    0		; Fill in by make program
         defw    start
-
 
 
 ;-----------
@@ -41,8 +30,8 @@
 	ld	(saveix),ix
 	ld	(saveiy),iy
 	ld	(start1+1),sp	;Save starting stack
-	ld	hl,(cmdlen)
-	ld	de,(cmdaddr)
+	ld	hl,(shell_cmdlen)
+	ld	de,(shell_cmdaddr)
 	add	hl,de
 	ld	(hl),0		; terminate command line
 	ld	hl,-100		; atexit stack (64) + argv space
@@ -67,11 +56,11 @@ ENDIF
 	ld	hl,0		; NULL pointer at end just in case
 	push	hl
 	;; Try and work out the length available
-	ld	hl,(cmdlen)
-	ld	de,(cmdaddr)
+	ld	hl,(shell_cmdlen)
+	ld	de,(shell_cmdaddr)
 	add	hl,de		; points to end
 	ex	de,hl		; end now in de, hl=cmdaddr
-	ld	bc,(cmdptr)
+	ld	bc,(shell_cmdptr)
 	add	hl,bc		; start in hl
 	push	de		; save end
 	ex	de,hl		; hl = end, de = start
@@ -113,11 +102,16 @@ ENDIF
 	ld	b,0
 	push	bc		; argc
 	push	hl		; argv
-	ld	hl,(cmdlen)
-	ld	(cmdptr),hl
+	ld	hl,(shell_cmdlen)
+	ld	(shell_cmdptr),hl
 	call_oz(gn_nln)		; Start a new line...
+IF DEFINED_farheapsz
+        call    init_far        ;Initialise far memory if required
+ENDIF
         call    _main		;Run the program
-
+IF DEFINED_farheapsz
+        call    freeall_far        ;Initialise far memory if required
+ENDIF
 	pop	bc		; kill argv
 	pop	bc		; kill argc
 	
@@ -133,7 +127,7 @@ ENDIF
 	ld	iy,(saveiy)
 	pop	de
 	pop	bc
-	jp	next		; out we go
+	jp	shell_next	; phew! back to Forth at last.
 
 ;-----------
 ; Install the error handler
@@ -197,63 +191,119 @@ ELSE
 ENDIF
 
 
-; We can't use far stuff with BASIC cos of paging issues so
-; We assume all data is in fact near, so this is a dummy fn
-; really
+;--------
+; Far memory setup
+;--------
+IF DEFINED_farheapsz
+        LIB     freeall_far
+        XDEF    farpages
+        XDEF    malloc_table
+        XDEF    farmemspec
+        XDEF    pool_table
+        INCLUDE "#init_far.asm"
 
-;-----------
-; Far stuff can't be used with BASIC because of paging issues, so we assume
-; that all data is near - this function is in fact a dummy and just adjusts
-; the stack as required
-;-----------
+; Variables that can't be place in the normal defvars
+.copybuff	defs	258
+.actual_malloc-table
+		defs	((farheapsz/256)+1)*2
+
+; Now some memory shared with Forth - same as application setup
+DEFVARS 8192
+{
+        pool_table      ds.b    224
+        malloc_table    ds.w    1
+        farpages        ds.w    1
+        farmemspec      ds.b    1
+}
+ENDIF
+
+;--------
+; This bit of code allows us to use OZ ptrs transparently
+; We copy any data from up far to a near buffer so that OZ
+; is happy about it
+; Prototype is extern void __FASTCALL__ *cpfar2near(far void *)
+;--------
+IF DEFINED_farheapsz
+        LIB     strcpy_far
 ._cpfar2near
-	pop	bc
-	pop	hl
-	pop	de
-	push	bc
-	ret
+        pop     bc      ;ret address
+        pop     hl
+        pop     de      ;far ptr
+        push    bc      ;keep ret address
+        ld      a,e
+        and     a
+        ret     z       ;already local
+        push    ix      ;keep ix safe
+        ld      bc,0    ;local
+        push    bc
+        ld      bc,copybuff
+        push    bc      ;dest
+        push    de      ;source
+        push    hl
+        call    strcpy_far
+        pop     bc      ;dump args
+        pop     bc
+        pop     bc
+        pop     bc
+        pop     ix      ;get ix back
+        ld      hl,copybuff
+        ret
+ELSE
+; We have no far code installed so all we have to do is fix the stack
+._cpfar2near
+        pop     bc
+        pop     hl
+        pop     de
+        push    bc
+        ret
+ENDIF
+
 
 ;----------
 ; The system() function for the shell 
 ;----------
 	XDEF	_system
 ._system
-	call	resterrhan	;restore forth error handler
-	pop	de	;return address
-	pop	bc	;command start, BC=Forth's TOS
-	push	bc	;
-	push	de
-	ld	de,system_forth	; DE=Forth's IP
-	ld	iy,(saveiy)	; IY=Forth's UP
-	ld	ix,(saveix)	; IX=Forth's RSP
-				; BC=Forth's TOS
-; So at this point:
-;  DE=Forth's IP (interpretive pointer)
-;  IY=Forth's UP (user pointer)
-;  IX=Forth's RSP (return stack pointer)
-;  Forth stack (BC=TOS, rest=machine stack): yourcmdst,yourretaddr,yourcmdst
-
-	jp	next		; enter Forth, executing the following code
-
-.system_forth
-	defw	ALSO,internal
-	defw	ZTOSTRING,eval
-	defw	PREVIOUS
-	defw	system_back	; re-enter our routine
-
-.system_back
-
-; Stack effects of the Forth code are ( 0-addr -- flag ) so Forth
-; stack is now:
-;  (BC=TOS, rest=machine stack): yourcmdst,yourretaddr,flag
-
+	pop	de		; DE=return address
+	pop	bc		; BC=command address
 	push	bc
-	call	doerrhan	;put c error hander back
-	pop	hl		; HL=0 for success, or error code
+	push	de
+	push	bc		; Forth stack: addr--
+	ld	hl,system_forthcode
+	call	_shellapi
+				; Forth stack: flag--
+	pop	hl		; HL=0 or error code
 	ret
 
+.system_forthcode
+	defw	shell_also,shell_internal,shell_ztos,shell_eval,shell_previous
+	defw	shellapi_back
 
+;----------
+; The shellapi() interface
+;----------
+	XDEF	_shellapi
 
+._shellapi
+	push	hl
+	call	resterrhan	;restore forth error handler
+	pop	de		; DE=Forth's IP
+	ld	iy,(saveiy)	; IY=Forth's UP
+	ld	ix,(saveix)	; IX=Forth's RSP
+	pop	hl
+	dec	ix
+	ld	(ix+0),h	; save return address on Forth's return stack
+	dec	ix
+	ld	(ix+0),l
+	pop	bc		; BC=TOS
+	jp	shell_next	; execute Forth code
+.shellapi_back
+	push	bc		; stack TOS
+	ld	e,(ix+0)
+	ld	d,(ix+1)
+	push	de		; stack return address
+	call	doerrhan	;put c error hander back
+	ret
 
 
 ;-----------
