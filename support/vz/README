@@ -1,4 +1,4 @@
-$Id: README,v 1.1 2001-04-12 13:26:13 stefano Exp $
+$Id: README,v 1.2 2001-10-25 14:29:15 stefano Exp $
 
 How pass the code to the VZ emulator.
 
@@ -6,8 +6,8 @@ How pass the code to the VZ emulator.
   http://www.powerup.com.au/~intertek/VZ200/vz.htm
 - Get the utilities, also
 - Set the environment variables correctly
-- Compile your code (to a.bas)
-- Use the rbinary utility (Rbinary.exe a.bas a.vz)
+- Compile your code (to a.bin)
+- Use the rbinary utility (Rbinary.exe a.bin a.vz)
 - Run the emulator
 - Type: POKE 30862,0:POKE 30863,128
 - Press F10, then 1 (Load Program)
