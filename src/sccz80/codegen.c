@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.5 2001-05-03 11:14:20 dom Exp $
+ *      $Id: codegen.c,v 1.6 2001-06-27 09:21:59 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -1669,7 +1669,7 @@ void vconst(val)
 int val ;
 {
         immed();
-        outdec(val);
+        outdec(val%65536);
         ot(";const\n");
 }
 
