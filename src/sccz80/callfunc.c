@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.3 2002-02-20 11:11:54 dom Exp $
+ *      $Id: callfunc.c,v 1.4 2002-04-07 14:07:58 dom Exp $
  */
 
 /*
@@ -116,17 +116,20 @@ void callfunction(SYMBOL *ptr)
 			    expr = CINT;
 			}
                         if (expr == LONG || expr == CPTR || (expr==POINTER && lpointer) ) {
-                                lpush2();
-                                nargs += 4;
+			    swap();       /* MSW -> hl */
+			    swapstk();    /* MSW -> stack, addr -> hl */
+			    zpushde();    /* LSW -> stack, addr = hl */	
+			    nargs += 4;                             
                         }
                         else if (expr==DOUBLE) {
                                 dpush2();
                                 nargs += 6;
+				swapstk();
                         }
                         else {
                                 nargs += 2;
+				swapstk();
                         }
-                        swapstk();
                 }
                 if (cmatch(',')==0) break;
         }

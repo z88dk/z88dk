@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.14 2002-04-07 12:19:59 dom Exp $
+ *      $Id: codegen.c,v 1.15 2002-04-07 14:07:58 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -634,7 +634,7 @@ void dpush(void)
 void dpush2(void)
 {
         callrts("dpush2");
-        Zsp -= 6;
+        Zsp -= 4;
 }
 
 /* Pop the top of the stack into the primary register */
