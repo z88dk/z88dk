@@ -2,12 +2,14 @@ lstoff
 
 ; ZX 81 stack calculator functions (ZX81 version of ZXFP)
 
-; $Id: 81fp.def,v 1.2 2002-05-10 13:56:06 stefano Exp $
+; $Id: 81fp.def,v 1.3 2002-11-12 17:52:37 stefano Exp $
 
 ; function codes:
 
 		; RST 28h activates the FP calculator
 		DEFC	ZXFP_BEGIN_CALC	= $28
+
+		DEFC	ZXFP_STK_PTR	= $401C
 
 		DEFC	ZXFP_STK_STORE	= $12C2
 		DEFC	ZXFP_STK_FETCH	= $13F8

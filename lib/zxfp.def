@@ -2,12 +2,14 @@ lstoff
 
 ; ZX Spectrum stack calculator functions (ZXFP)
 
-; $Id: zxfp.def,v 1.4 2002-05-10 13:56:06 stefano Exp $
+; $Id: zxfp.def,v 1.5 2002-11-12 17:52:37 stefano Exp $
 
 ; function codes:
 
 		; RST 28h activates the FP calculator
 		DEFC	ZXFP_BEGIN_CALC	= $28
+		
+		DEFC	ZXFP_STK_PTR	= $5C65
 		
 		DEFC	ZXFP_STK_STORE	= $2AB6
 		DEFC	ZXFP_STK_FETCH	= $2BF1
