@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.6 2002-01-16 22:45:34 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.7 2002-01-16 22:46:15 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -349,7 +349,6 @@ AssembleSourceFile (void)
     if ( dotptr == NULL )
 	dotptr = srcfilename-1;
     strcpy(ident,dotptr+1);
-    printf("ident = %s\n",ident);
     dotptr = strchr(ident,asmext[0]);
     if ( dotptr )
 	*dotptr = 0;
@@ -360,7 +359,6 @@ AssembleSourceFile (void)
 	*dotptr = toupper(*dotptr);
 	dotptr++;
       }
-    printf("ident = %s\n",ident);
     DeclModuleName();
     /* ReportError (CURRENTFILE->fname, 0, 16); */
   }
