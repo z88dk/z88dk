@@ -5,7 +5,7 @@
  *
  *	Let strncmp to all the hard work...
  *
- *	$Id: memcmp.c,v 1.2 2001-04-11 12:15:32 dom Exp $
+ *	$Id: memcmp.c,v 1.3 2001-09-06 09:18:01 dom Exp $
  */
 
 
@@ -15,14 +15,20 @@ int memcmp(void *s1, void *s2, int n)
 {
 #asm
 ;return address,n, s2, s1
-	ld	ix,0
-	add	ix,sp
-	ld	c,(ix+2)
-	ld	b,(ix+3)
-	ld	e,(ix+4)	;s2
-	ld	d,(ix+5)
-	ld	l,(ix+6)	;s1
-	ld	h,(ix+7)
+	ld	hl,2
+	add	hl,sp
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)	;n
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)	;s2
+	inc	hl
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a	;s1
 .loop
 	ld	a,b
 	or	c
