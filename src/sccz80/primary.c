@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.8 2002-01-20 23:31:14 dom Exp $
+ *      $Id: primary.c,v 1.9 2002-01-26 23:49:13 dom Exp $
  */
 
 
@@ -291,8 +291,8 @@ LVALUE *lval, *lval2 ;
         else {
                 if ( lval->val_type == DOUBLE ) {
                         DoDoubConv(lval2->val_type,lval2->flags&UNSIGNED);
-                        return(1);
                         lval2->val_type=DOUBLE;
+                        return(1);
                 }
                 else return(0);
         }
@@ -838,32 +838,17 @@ int WasComp(LVALUE *lval)
         return(1);
 }
 
-/*
- * Generate Code to Turn integer type of signed to double, take care
- * to respect mathz88
- */
-
-
+/* Generate Code to Turn integer type of signed to double, Generic now does longs */
 void DoDoubConv(char type, char zunsign)
 {
-        if (mathz88) {
-/*
- * mathz88 flag set, convert an integer to long first of all
- */
-
-                if (type == CINT || type==CCHAR) {
-                        if (zunsign) convUint2long();
-                        else convSint2long();
-                }
-
-                if (zunsign) convUlong2doub();
-                else convSlong2doub();
-        } else {
-/* FIXME!! Generic conversion, we ignore top 16 word of long because
- * I haven't got a routine for long -> generic double
- */
-                if (type==LONG ) warning(W_LONGDOUB);
-                if (zunsign) convUint2doub();
-                else convSint2doub();
-        }
+	if (type == CINT || type==CCHAR) {
+		if (zunsign) 
+			convUint2long();
+		else
+			convSint2long();
+	}
+	if (zunsign) 
+		convUlong2doub();
+	else
+		convSlong2doub();
 }
