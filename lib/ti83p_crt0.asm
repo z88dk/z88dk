@@ -55,8 +55,7 @@
 
 ; Now, getting to the real stuff now!
 
-	org	$9D93	; TI 83+ (9d95-2)
-	defw	$6DBB	; ION Shell Identifier
+	org	$9D95	; TI 83+ (9d95-2)
 	ret
 	jr	nc,start ; not detectable until INSTALL is run
 
@@ -82,6 +81,11 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
+
+IF DEFINED_GRAYlib
+	INCLUDE	"#graylib83p.asm"
+ENDIF
+
 	call	tidi
         call    _main
         call	tiei
@@ -112,11 +116,19 @@ ENDIF
 	ld	de,(de1save)
 	exx
 	ld	iy,(iysave)
+IF DEFINED_GRAYlib
+	im	1
+ELSE
 	ei
+ENDIF
 	ret
 
 .tidi
+IF DEFINED_GRAYlib
+	im	2
+ELSE
 	di
+ENDIF
 	exx
 	ld	(hl1save),hl
 	ld	(bc1save),bc
@@ -180,12 +192,15 @@ ENDIF
 
 .base_graphics	defw	$9340	;TI83+
 .coords		defw	0
-.cpygraph	;call	$50	;ION bjump call
-		;defw	$486A
-
-		call	$966e+80+15 ; ION FastCopy call
-		;ei
+.cpygraph
+IF DEFINED_GRAYlib
 		ret
+ELSE
+		;call	$50	;ION bjump call
+		;defw	$486A
+		jp	$966e+80+15 ; ION FastCopy call
+ENDIF
+
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

@@ -78,21 +78,27 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
+
+IF DEFINED_GRAYlib
+	INCLUDE	"#graylib82.asm"
+ENDIF
+
 	call	tidi
         call    _main
 	call	tiei
+
 .cleanup
 ;
 ;       Deallocate memory which has been allocated here!
 ;
-	push	hl
+
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 	LIB	closeall
 	call	closeall
 ENDIF
 ENDIF
-	pop	bc
+
 .start1
         ld      sp,0
         ret
@@ -107,11 +113,19 @@ ENDIF
 	ld	de,(de1save)
 	exx
 	ld	iy,(iysave)
+IF DEFINED_GRAYlib
+	im	1
+ELSE
 	ei
+ENDIF
 	ret
 
 .tidi
+IF DEFINED_GRAYlib
+	im	2
+ELSE
 	di
+ENDIF
 	exx
 	ld	(hl1save),hl
 	ld	(bc1save),bc
@@ -177,9 +191,14 @@ ENDIF
 .base_graphics
 		defw	$88B8	;TI82
 .coords		defw	0
+
 .cpygraph	
+IF DEFINED_GRAYlib
+		ret
+ELSE
 		;jp	$38C6	; ROM handler
 		jp	$8D94	; CrAsh handler
+ENDIF
 
          defm  "Small C+ TI82"&0
 

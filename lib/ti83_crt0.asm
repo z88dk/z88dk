@@ -6,13 +6,6 @@
 
                 MODULE  z88_crt0
 
-;
-; Initially include the zcc_opt.def file to find out lots of lovely
-; information about what we should do..
-;
-
-                INCLUDE "zcc_opt.def"
-
 ; No matter what set up we have, main is always, always external to
 ; this file
 
@@ -54,11 +47,85 @@
 
 ; Now, getting to the real stuff now!
 
-	org	$9327	; TI 83
-	ret
-	jr	nc,start ; ION identifier
+	INCLUDE "zcc_opt.def"
+	DEFINE NEED_name	; The next time we'll include zcc_opt.def
+				; it will have the program name string
 
-	defm  "C+ compiled program"&0
+; 1-ION SHELL (default)
+IF !DEFINED_startup | (startup=1)
+	org	$9327
+	ret
+	jr	nc,start 	; ION identifier
+	INCLUDE "zcc_opt.def"	; from zcc_opt.def
+	; If no namestring is provided, 
+	; the compiler ident will be displayed.
+	defm  " - Small C+"&0
+ENDIF
+
+; 2-VENUS
+IF (startup=2)
+	org	$932C
+	defm	"ç9_[?"		; send(9prgm0 (where 0 is theta)
+	jr	start		; Jump to actual program
+	defb	0+1		; number_of_externals+1	(maximum = 11d)
+ENDIF
+
+; 3-ZES
+IF (startup=3)
+	org	$931E
+	defb	$E7
+	defm	"9_ZES"		; Send(9prgmZES                                                                         
+	defb	$3F,$D5,$3F	; :Return
+ENDIF
+
+; 4-ANOVA
+IF (startup=4)
+	org	$9327
+	xor	a		; One byte instruction, meaningless
+	jr	start		; Relative jump
+	defw	0		; No libraries
+	defw	description
+	defw	icon
+.description
+	INCLUDE "zcc_opt.def"	; from zcc_opt.def
+	; If no namestring is provided, 
+	; the compiler ident will be displayed.
+	defm  " - Small C+"&0
+.icon
+	defb @00110010		; icon (5 bytes, Anova icon)
+	defb @01000111		; C with a small '+'
+	defb @01000010
+	defb @01000000
+	defb @00110000
+	defb 255
+ENDIF
+
+; 5,6,7 - TI EXPLORER, Ashell, SOS
+IF (startup=5) | (startup=6) | (startup=7)
+	org	$9327
+	nop
+	jr start
+	defw 0			; pointer to libs, 0000 if no libs used
+	defw description	; pointer to a description
+	defw icon		; pointer to an 8x8 icon	
+.description
+	INCLUDE "zcc_opt.def"	; from zcc_opt.def
+	; If no namestring is provided, 
+	; the compiler ident will be displayed.
+	; otherwise, TI EXPLORER uses it as a comment
+	defm  " - Small C+"&0
+.icon
+	defb @00000000
+	defb @00110010
+	defb @01000111
+	defb @01000010
+	defb @01000000
+	defb @00110000
+	defb @00000000
+	defb @00000000
+	defb 255
+ENDIF
+
 
 .start
         ld      hl,0
@@ -80,9 +147,15 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
+
+IF DEFINED_GRAYlib
+	INCLUDE	"#graylib83.asm"
+ENDIF
+
 	call	tidi
         call    _main
 	call	tiei
+	
 .cleanup
 ;
 ;       Deallocate memory which has been allocated here!
@@ -109,11 +182,19 @@ ENDIF
 	ld	de,(de1save)
 	exx
 	ld	iy,(iysave)
+IF DEFINED_GRAYlib
+	im	1
+ELSE
 	ei
+ENDIF
 	ret
 
 .tidi
+IF DEFINED_GRAYlib
+	im	2
+ELSE
 	di
+ENDIF
 	exx
 	ld	(hl1save),hl
 	ld	(bc1save),bc
@@ -178,10 +259,43 @@ ENDIF
 
 .base_graphics	defw	$8E29	;TI83
 .coords		defw	0
-.cpygraph	;jp	$4B9C
-		call	$9157+80+15 ; ION FastCopy call
-		;ei
+.cpygraph
+IF DEFINED_GRAYlib
 		ret
+ELSE
+
+; 1-ION SHELL (default)
+IF !DEFINED_startup | (startup=1)
+		;jp	$4B9C
+		jp	$9157+80+15 ; ION FastCopy call
+ELSE
+; All the other shells don't provide a fastcopy code,
+; so here it is !
+	ld	a,$80		; 7
+	out	($10),a		; 11
+	ld	hl,$8E29-12-(-(12*64)+1)	; 10
+	ld	a,$20		; 7
+	ld	c,a		; 4		; 43
+  .fastCopyAgain
+	ld	b,64		; 7
+	inc	c		; 4
+	ld	de,-(12*64)+1	; 10
+	out	($10),a		; 11
+	add	hl,de		; 11
+	ld	de,11		; 10
+  .fastCopyLoop
+	add	hl,de		; 11
+	inc	hl		; 6
+	ret	c		; 5	; do nothing instruction (was nop (4 clocks))
+	ld	a,(hl)		; 7
+	out	($11),a		; 11
+	djnz	fastCopyLoop	; 13/8	; 3392
+	ld	a,c		; 4
+	cp	$2B+1		; 7
+	jr	nz,fastCopyAgain; 12/7	; 52	; 41773 (used to be 41136)
+	ret	; 11	; 18				; 41773 clocks total
+							; 37 bytes total
+ENDIF
 
 
 ;All the float stuff is kept in a different file...for ease of altering!

@@ -78,6 +78,12 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
+
+
+IF DEFINED_GRAYlib
+	INCLUDE	"#graylib85.asm"
+ENDIF
+
 	call	tidi
 	call	_main
 	call	tiei
@@ -86,17 +92,18 @@ ENDIF
 ;
 ;       Deallocate memory which has been allocated here!
 ;
-	push	hl
+
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 	LIB	closeall
 	call	closeall
 ENDIF
 ENDIF
-	pop	bc
+
 .start1
         ld      sp,0
         ret
+        
 .l_dcal
         jp      (hl)
 
@@ -107,11 +114,19 @@ ENDIF
 	ld	de,(de1save)
 	exx
 	ld	iy,(iysave)
+IF DEFINED_GRAYlib
+	im	1
+ELSE
 	ei
+ENDIF
 	ret
 
 .tidi
+IF DEFINED_GRAYlib
+	im	2
+ELSE
 	di
+ENDIF
 	exx
 	ld	(hl1save),hl
 	ld	(bc1save),bc
