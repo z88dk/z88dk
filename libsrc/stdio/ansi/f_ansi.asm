@@ -6,7 +6,7 @@
 ; (Intel 8086 to Z80 port)
 ;
 ; Optimized for speed in the case of multi-character write requests.
-; Original NANSI terminal driver (C) 1986 Daniel Kegel
+; Original NANSI terminal driver (C) 1986 Daniel Kegel  - http://www.kegel.com
 ; Modifications by Tom Almy without restrictions.
 ;
 ; - Port to Z80 and some improvement by Stefano Bodrato - 21/4/2000
@@ -18,7 +18,7 @@
 ;	M - Delete lines: to be completed
 ;
 ;
-;	$Id: f_ansi.asm,v 1.5 2002-11-21 08:40:51 stefano Exp $
+;	$Id: f_ansi.asm,v 1.6 2003-05-20 16:01:55 stefano Exp $
 ;
 
         XLIB	f_ansi

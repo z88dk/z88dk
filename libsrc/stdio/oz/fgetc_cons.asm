@@ -1,18 +1,28 @@
 ;
 ;	OZ 700 console library
-;	foo stub only, for now
 ;
 ;	getkey() Wait for keypress
 ;
+;	$Id: fgetc_cons.asm,v 1.2 2003-05-20 16:01:56 stefano Exp $
 ;
-;	$Id: fgetc_cons.asm,v 1.1 2002-11-20 14:17:02 stefano Exp $
-;
+
+		;XREF	KeyBufGetPos
+		;XREF	KeyBufPutPos
+		;XREF	EnableKeyboard
 
 		XLIB	fgetc_cons
-		XREF	KeyBufGetPos
-		XREF	KeyBufPutPos
-		XREF	EnableKeyboard
+		LIB	getk
 
 .fgetc_cons
-		ld	hl,13
+		call	getk
+		ld	a,l
+		and	a
+		jr	nz,fgetc_cons
+
+.kwait
+		call	getk
+		ld	a,l
+		and	a
+		jr	z,kwait
+
 		ret
