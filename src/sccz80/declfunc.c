@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.4 2003-02-01 20:36:52 dom Exp $
+ *      $Id: declfunc.c,v 1.5 2003-04-20 16:11:11 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -27,93 +27,93 @@ TAG_SYMBOL *otag,
 int ident,
 long *addr)
 {
-        SYMBOL *ptr,*ptr2;
-        int     more;
-        int     j,k;
-        char    simple;         /* Simple def () */
-        more=0;
+    SYMBOL *ptr,*ptr2;
+    int     more;
+    int     j,k;
+    char    simple;         /* Simple def () */
+    more=0;
 
-/*
- *      First of all check to see if we have a number - this is
- *      external pointer type
- */
+    /*
+     *      First of all check to see if we have a number - this is
+     *      external pointer type
+     */
 
-        if (number(addr)) return (EXTERNP);
+    if (number(addr)) return (EXTERNP);
 
-/*
- *      Now, check for simple prototyping, we can drop that
- *      back as well, we have to check for punctuation - ; or ,
- *      afterwards, so that we can know its not a function
- *      definitions
- */
-        simple=NO;
-        if ( cmatch(')') ) {
-                if ( rcmatch(';') || rcmatch(',') ) return(storage);
-                simple=YES;
-        }
+    /*
+     *      Now, check for simple prototyping, we can drop that
+     *      back as well, we have to check for punctuation - ; or ,
+     *      afterwards, so that we can know its not a function
+     *      definitions
+     */
+    simple=NO;
+    if ( cmatch(')') ) {
+        if ( rcmatch(';') || rcmatch(',') ) return(storage);
+        simple=YES;
+    }
 
-        ptrerror(ident) ;
-        if ( ident == POINTER ) {
+    ptrerror(ident) ;
+    if ( ident == POINTER ) {
         /* function returning pointer needs dummy symbol */
-                more = dummy_idx(type, otag) ;
-/*                type = (zfar ? CPTR : CINT ); */
-                ident=FUNCTIONP;        /* func returning ptr */
-        } else ident=FUNCTION;
+        more = dummy_idx(type, otag) ;
+        /*                type = (zfar ? CPTR : CINT ); */
+        ident=FUNCTIONP;        /* func returning ptr */
+    } else ident=FUNCTION;
 
-/*
- *      Okay, we've got rid of everything that could pop up apart
- *      from:
- *      - ANSI prototypes
- *      - Functions themselves (ANSI & K&R)
- *
- *      First call AddNewFunc(), if this returns 0 then we have defined
- *      a function (including code)
- */
-        ptr=AddFuncCode(sname, type, ident,sign, zfar, storage, more,NO,simple,otag);
-        if (ptr==0) { /* Defined a function */
-                /* trap external int blah() { } things */
-                if (currfn->storage==EXTERNAL) currfn->storage=STATIK;
-                return(0);
-        }
-        else {
-/*
- *      Have spotted a prototype, so do something with it!
- *      Trace back the argument train..
- */
-                j=1;
-                ptr2=ptr;
-                while ( (ptr2=ptr2->offset.p) ) j++; 
-                if ( j > MAXARGS ) j=MAXARGS-1;
-                currfn->prototyped=j;    /* Set number of arguments */
-/*
- *      Now, attempt to set them!
- */
-                while (j) {
-                        k=j;
-                        ptr2=ptr;
-                        while (--k) ptr2=ptr2->offset.p; 
-/*
- *      Okay, so now in ptr2 we have the SYMBOL for the argument
- */
-                        currfn->args[j]=CalcArgValue(ptr2->type, ptr2->ident, ptr2->flags);
-                        currfn->tagarg[j]=0;
-                        if (ptr2->type==STRUCT) {
-                                currfn->tagarg[j]=ptr2->tag_idx;
-                        }
-/*
- *      Set up the tag pointer now 
- */
-                        j--;
-                }
-/*
- *      Zero the remaining prototyped entries
- */
-                for ( j = (currfn->prototyped+1) ; j <= MAXARGS-1 ; j++) {
-                        currfn->args[j]=0;
-                        currfn->tagarg[j]=0;
-                }
-        }
+    /*
+     *      Okay, we've got rid of everything that could pop up apart
+     *      from:
+     *      - ANSI prototypes
+     *      - Functions themselves (ANSI & K&R)
+     *
+     *      First call AddNewFunc(), if this returns 0 then we have defined
+     *      a function (including code)
+     */
+    ptr=AddFuncCode(sname, type, ident,sign, zfar, storage, more,NO,simple,otag);
+    if (ptr==0) { /* Defined a function */
+        /* trap external int blah() { } things */
+        if (currfn->storage==EXTERNAL) currfn->storage=STATIK;
         return(0);
+    }
+    else {
+        /*
+         *      Have spotted a prototype, so do something with it!
+         *      Trace back the argument train..
+         */
+        j=1;
+        ptr2=ptr;
+        while ( (ptr2=ptr2->offset.p) ) j++; 
+        if ( j > MAXARGS ) j=MAXARGS-1;
+        currfn->prototyped=j;    /* Set number of arguments */
+        /*
+         *      Now, attempt to set them!
+         */
+        while (j) {
+            k=j;
+            ptr2=ptr;
+            while (--k) ptr2=ptr2->offset.p; 
+            /*
+             *      Okay, so now in ptr2 we have the SYMBOL for the argument
+             */
+            currfn->args[j]=CalcArgValue(ptr2->type, ptr2->ident, ptr2->flags);
+            currfn->tagarg[j]=0;
+            if (ptr2->type==STRUCT) {
+                currfn->tagarg[j]=ptr2->tag_idx;
+            }
+            /*
+             *      Set up the tag pointer now 
+             */
+            j--;
+        }
+        /*
+         *      Zero the remaining prototyped entries
+         */
+        for ( j = (currfn->prototyped+1) ; j <= MAXARGS-1 ; j++) {
+            currfn->args[j]=0;
+            currfn->tagarg[j]=0;
+        }
+    }
+    return(0);
 
 }
 
@@ -149,101 +149,101 @@ SYMBOL *
 
 AddFuncCode(char *n, char type, char ident, char sign,char zfar, int storage, int more, char check,char simple,TAG_SYMBOL *otag)
 {
-        unsigned char tvalue;           /* Used to hold protot value */
-        char    typ;                    /* Temporary type */
-        int     itag;
+    unsigned char tvalue;           /* Used to hold protot value */
+    char    typ;                    /* Temporary type */
+    int     itag;
 
-        itag=0;
-        if (otag)
-              itag=otag-tagtab;       /* tag number */
+    itag=0;
+    if (otag)
+        itag=otag-tagtab;       /* tag number */
 
-        lastst = 0;                     /* no last statement */
-        locptr = STARTLOC ;             /* deallocate all locals */
-        fnstart = lineno ;              /* remember where fn began */
-/*
- * Do some elementary checking before hand..
- */
-        if (zfar && ident!=FUNCTIONP) { zfar=NO; warning(W_FAR); }
-        if ( ( currfn=findglb(n) ) ) {
-                /* already in symbol table ? */
-                if ( currfn->ident != FUNCTION && currfn->ident != FUNCTIONP ) {
-                        /* already variable by that name */
-                        multidef();
-                }
-                else if ( currfn->offset.i == FUNCTION && !currfn->prototyped) {
-                        /* already function by that name */
-                        multidef();
-                }
-                else {
-                        /* we have what was earlier assumed to be a function */
+    lastst = 0;                     /* no last statement */
+    locptr = STARTLOC ;             /* deallocate all locals */
+    fnstart = lineno ;              /* remember where fn began */
+    /*
+     * Do some elementary checking before hand..
+     */
+    if (zfar && ident!=FUNCTIONP) { zfar=NO; warning(W_FAR); }
+    if ( ( currfn=findglb(n) ) ) {
+        /* already in symbol table ? */
+        if ( currfn->ident != FUNCTION && currfn->ident != FUNCTIONP ) {
+            /* already variable by that name */
+            multidef();
+        }
+        else if ( currfn->offset.i == FUNCTION && !currfn->prototyped) {
+            /* already function by that name */
+            multidef();
+        }
+        else {
+            /* we have what was earlier assumed to be a function */
 
-                        if (currfn->storage == EXTERNAL && currfn->flags&LIBRARY ) {
-/* Overwriting a lib function, is that what you wanted?!? Handy for
- * compiling the library though!! Change type to local static to prevent
- * being dumped in the scope list..
- */
+            if (currfn->storage == EXTERNAL && currfn->flags&LIBRARY ) {
+                /* Overwriting a lib function, is that what you wanted?!? Handy for
+                 * compiling the library though!! Change type to local static to prevent
+                 * being dumped in the scope list..
+                 */
 				if (makelib || storage == LSTATIC ) {
-                                	currfn->storage=LSTATIC;
+                    currfn->storage=LSTATIC;
 				} else {
 					currfn->storage=LIBOVER;
 				} 
-                                currfn->offset.i=FUNCTION;
-                        } else {
-/*
- * I'm not sure what *exactly* I was trying to achieve here djm 25/2/00
- */
-                            if (currfn->storage != EXTERNAL && ( (currfn->flags&LIBRARY) != LIBRARY) ) {
-				currfn->flags&=(~LIBRARY);
-                                currfn->size = 0;
-                            }
-                            currfn->offset.i = FUNCTION ;
-                            currfn->storage = storage;
-                        }
+                currfn->offset.i=FUNCTION;
+            } else {
+                /*
+                 * I'm not sure what *exactly* I was trying to achieve here djm 25/2/00
+                 */
+                if (currfn->storage != EXTERNAL && ( (currfn->flags&LIBRARY) != LIBRARY) ) {
+                    currfn->flags&=(~LIBRARY);
+                    currfn->size = 0;
                 }
+                currfn->offset.i = FUNCTION ;
+                currfn->storage = storage;
+            }
         }
-        /* if not in table, define as a function now */
-        else {  
-                typ=type;
-                if (ident == FUNCTIONP) typ=(zfar ? CPTR : CINT );
+    }
+    /* if not in table, define as a function now */
+    else {  
+        typ=type;
+        if (ident == FUNCTIONP) typ=(zfar ? CPTR : CINT );
 
-                currfn = addglb(n, FUNCTION,  typ, FUNCTION, storage, more, 0);
-                currfn->size=0;
-                currfn->prototyped=0;
-                currfn->flags= (sign&UNSIGNED) | (zfar&FARPTR);
-                if (type == STRUCT) currfn->tagarg[0]=itag;
-/*
- *      Set our function prototype - what we are!
- *      args[0] is free for use
- */
-                currfn->args[0]=CalcArgValue(type, ident, currfn->flags);
+        currfn = addglb(n, FUNCTION,  typ, FUNCTION, storage, more, 0);
+        currfn->size=0;
+        currfn->prototyped=0;
+        currfn->flags= (sign&UNSIGNED) | (zfar&FARPTR);
+        if (type == STRUCT) currfn->tagarg[0]=itag;
+        /*
+         *      Set our function prototype - what we are!
+         *      args[0] is free for use
+         */
+        currfn->args[0]=CalcArgValue(type, ident, currfn->flags);
 
-         }
-        tvalue=CalcArgValue(type,ident,((sign&UNSIGNED) | (zfar&FARPTR)) );
-        if ( currfn->args[0] != tvalue || (type==STRUCT && currfn->tagarg[0] != itag  )  ){
-                char buffer[120];
-                warning(W_DIFFTYPE);
-                warning(W_DIFFTYPE2,ExpandArgValue(currfn->args[0],buffer,currfn->tagarg[0]));
-                warning(W_DIFFTYPE3,ExpandArgValue(tvalue,buffer,itag) );
+    }
+    tvalue=CalcArgValue(type,ident,((sign&UNSIGNED) | (zfar&FARPTR)) );
+    if ( currfn->args[0] != tvalue || (type==STRUCT && currfn->tagarg[0] != itag  )  ){
+        char buffer[120];
+        warning(W_DIFFTYPE);
+        warning(W_DIFFTYPE2,ExpandArgValue(currfn->args[0],buffer,currfn->tagarg[0]));
+        warning(W_DIFFTYPE3,ExpandArgValue(tvalue,buffer,itag) );
 
-        }
+    }
 
-        /* we had better see open paren for args... */
-        if ( check && (cmatch('(') == 0) )
-                error(E_PAREN);
-
-
-        locptr = STARTLOC ;             /* "clear" local symbol table */
-        undeclared = 0 ;                /* init arg count */
+    /* we had better see open paren for args... */
+    if ( check && (cmatch('(') == 0) )
+        error(E_PAREN);
 
 
-/* Check to see if we are doing ANSI fn defs - must be a better way of
- * doing this! (Have an array and check by that?)           
- */
-        if (CheckANSI()) {
-                return( dofnansi(currfn) ); /* So we can pass back result */
-        }
-        DoFnKR(currfn,simple);
-        return(0);
+    locptr = STARTLOC ;             /* "clear" local symbol table */
+    undeclared = 0 ;                /* init arg count */
+
+
+    /* Check to see if we are doing ANSI fn defs - must be a better way of
+     * doing this! (Have an array and check by that?)           
+     */
+    if (CheckANSI()) {
+        return( dofnansi(currfn) ); /* So we can pass back result */
+    }
+    DoFnKR(currfn,simple);
+    return(0);
 }
 
 
@@ -257,64 +257,64 @@ void DoFnKR(
 SYMBOL *currfn,
 char   simple)
 {
-        char n[NAMESIZE];
-        SYMBOL *prevarg;       /* ptr to symbol table entry of most recent argument */
-        SYMBOL *cptr;
-        TAG_SYMBOL *otag ;     /* structure tag for structure argument */
-        struct varid var;
+    char n[NAMESIZE];
+    SYMBOL *prevarg;       /* ptr to symbol table entry of most recent argument */
+    SYMBOL *cptr;
+    TAG_SYMBOL *otag ;     /* structure tag for structure argument */
+    struct varid var;
 
-        prevarg=0;
-        Zsp=0;                  /* Reset stack pointer */
-        undeclared=0;
-        infunc=1;
+    prevarg=0;
+    Zsp=0;                  /* Reset stack pointer */
+    undeclared=0;
+    infunc=1;
 
 
 
-        while ( !simple && cmatch(')') == 0 ) {    /* then count args */
-                /* any legal name bumps arg count */
-                if ( symname(n) ) {
-                        /* add link to argument chain */
-                        if ( (cptr=addloc(n,0,CINT,0,0)) )
-                                cptr->offset.p = prevarg ;
-                        prevarg = cptr ;
-                    ++undeclared ;
-                }
-                else {
-                        error(E_ARGNAME);
-                        junk();
-                }
-                blanks();
-                /* if not closing paren, should be comma */
-                if ( ch() != ')' && cmatch(',') == 0 ) {
-                        warning(W_EXPCOM);
-                }
-                if ( endst() ) break ;
+    while ( !simple && cmatch(')') == 0 ) {    /* then count args */
+        /* any legal name bumps arg count */
+        if ( symname(n) ) {
+            /* add link to argument chain */
+            if ( (cptr=addloc(n,0,CINT,0,0)) )
+                cptr->offset.p = prevarg ;
+            prevarg = cptr ;
+            ++undeclared ;
         }
+        else {
+            error(E_ARGNAME);
+            junk();
+        }
+        blanks();
+        /* if not closing paren, should be comma */
+        if ( ch() != ')' && cmatch(',') == 0 ) {
+            warning(W_EXPCOM);
+        }
+        if ( endst() ) break ;
+    }
 
-        Zsp = 0 ;                       /* preset stack ptr */
+    Zsp = 0 ;                       /* preset stack ptr */
 
-        while ( undeclared ) {
+    while ( undeclared ) {
 		char	regit=NO;
 		if (amatch("register") ) regit=YES;
-/* Auto is be default in function defns, but someone might
- * try it on...
- */
+        /* Auto is be default in function defns, but someone might
+         * try it on...
+         */
 		if (amatch("auto") ) warning(W_AUTO);
 
-                otag=GetVarID(&var,STATIK);
+        otag=GetVarID(&var,STATIK);
 
-                if (var.type==STRUCT) {
-                        getarg(STRUCT, otag,NO,0,0, var.zfar,NO) ;
-                } else if (var.type || regit) {
+        if (var.type==STRUCT) {
+            getarg(STRUCT, otag,NO,0,0, var.zfar,NO) ;
+        } else if (var.type || regit) {
 			if (regit && var.type == NO ) var.type=CINT;
-                        getarg(var.type,NULL_TAG,NO,0,var.sign,var.zfar,NO);
-                } else {
-                        error(E_BADARG) ;
-                        break ;
-                }
+            getarg(var.type,NULL_TAG,NO,0,var.sign,var.zfar,NO);
+        } else {
+            error(E_BADARG) ;
+            break ;
         }
-/* Have finished K&R parsing */
-        setlocvar(prevarg,currfn);
+    }
+    /* Have finished K&R parsing */
+    setlocvar(prevarg,currfn);
 }
 
 
@@ -326,129 +326,129 @@ void setlocvar(prevarg,currfn)
 SYMBOL *prevarg;
 SYMBOL *currfn;
 {
-        int lgh,where;
-        int *iptr;
-        SYMBOL *copyarg;
-        int argnumber;
-        char buffer2[120];
-        unsigned char tester;
+    int lgh,where;
+    int *iptr;
+    SYMBOL *copyarg;
+    int argnumber;
+    char buffer2[120];
+    unsigned char tester;
 
 	lgh = 0;  /* Initialise it */
-        argnumber=currfn->prototyped;
-/*
- *      If we have filled up our number of arguments, then pretend
- *      we don't have any..nasty, nasty
- */
-        if (argnumber==(MAXARGS-1)) argnumber=0;
-        else   if (argnumber) argnumber=1;
-/*
- *      Dump some info about defining the function etc
- */
-        if (verbose){
+    argnumber=currfn->prototyped;
+    /*
+     *      If we have filled up our number of arguments, then pretend
+     *      we don't have any..nasty, nasty
+     */
+    if (argnumber==(MAXARGS-1)) argnumber=0;
+    else   if (argnumber) argnumber=1;
+    /*
+     *      Dump some info about defining the function etc
+     */
+    if (verbose){
         toconsole();
         outstr("Defining function: "); outstr(currfn->name); nl();
         tofile();
-        }
+    }
 
-        nl();prefix();outname(currfn->name,dopref(currfn));col();nl();  /* print function name */
+    nl();prefix();outname(currfn->name,dopref(currfn));col();nl();  /* print function name */
 
-        infunc=1;       /* In a function for sure! */
-        copyarg=prevarg;
+    infunc=1;       /* In a function for sure! */
+    copyarg=prevarg;
 
-        if ( ( (currfn->flags&SHARED) && makeshare ) || sharedfile ) {
-/* Shared library definition, offset the stack */
-                where= 2 +shareoffset;
-        } else
-                where = 2 ;
-/* If we use frame pointer we preserve previous framepointer on entry
- * to each function
- */
+    if ( ( (currfn->flags&SHARED) && makeshare ) || sharedfile ) {
+        /* Shared library definition, offset the stack */
+        where= 2 +shareoffset;
+    } else
+        where = 2 ;
+    /* If we use frame pointer we preserve previous framepointer on entry
+     * to each function
+     */
 #ifdef USEFRAME
 	if (useframe) where+=2;
 #endif
-        while ( prevarg ) {
-                lgh = 2 ;       /* all arguments except DOUBLE have length 2 bytes (even char) */
-                /* This is strange, previously double check for ->type */
-                if ( prevarg->type == LONG && prevarg->ident != POINTER )
-                        lgh=4;
-                if ( prevarg->type == DOUBLE && prevarg->ident != POINTER )
-                        lgh=6;
+    while ( prevarg ) {
+        lgh = 2 ;       /* all arguments except DOUBLE have length 2 bytes (even char) */
+        /* This is strange, previously double check for ->type */
+        if ( prevarg->type == LONG && prevarg->ident != POINTER )
+            lgh=4;
+        if ( prevarg->type == DOUBLE && prevarg->ident != POINTER )
+            lgh=6;
 		/* Far pointers */
 		if ( (prevarg->flags&FARPTR)==FARPTR && prevarg->ident == POINTER)
 			lgh=4;
-                prevarg->size=lgh;
+        prevarg->size=lgh;
 #ifdef CODSWALLOP
-/* All pointers are pushed onto the stack for functions as 4 bytes, if
- * needed, near pointers are padded out to compensate for this by dummy
- * loading with zero, this allows us to have one set of routines to
- * cope with this and hence solve a lot of duplication
- */
-                if (prevarg->ident == POINTER && lpointer) lgh=4;
-                prevarg->size=lgh;
+        /* All pointers are pushed onto the stack for functions as 4 bytes, if
+         * needed, near pointers are padded out to compensate for this by dummy
+         * loading with zero, this allows us to have one set of routines to
+         * cope with this and hence solve a lot of duplication
+         */
+        if (prevarg->ident == POINTER && lpointer) lgh=4;
+        prevarg->size=lgh;
 #endif
-/*
- * Check the definition against prototypes here...
- */
-                if (argnumber) {
-                        tester=CalcArgValue(prevarg->type,prevarg->ident,prevarg->flags);
-                        if (currfn->args[argnumber] != tester ) {
-                            if (currfn->args[argnumber] != PELLIPSES ) {
-                                if (currfn->args[argnumber] == 0 ) {
-                                        warning(W_2MADECL);
-                                } else {
-                                        if ( (currfn->args[argnumber]&PMASKSIGN) == (tester&PMASKSIGN) ) {
-                                                warning(W_SIGNARG);
-                                        } else {
-                                                error(E_ARGMIS1,currfn->name,currfn->prototyped-argnumber+1, ExpandArgValue(tester,buffer2,prevarg->tag_idx) );
-                                                error(E_ARGMIS2,ExpandArgValue(currfn->args[argnumber],buffer2, currfn->tagarg[argnumber]));
-                                        }
-                                }
-                            }
+        /*
+         * Check the definition against prototypes here...
+         */
+        if (argnumber) {
+            tester=CalcArgValue(prevarg->type,prevarg->ident,prevarg->flags);
+            if (currfn->args[argnumber] != tester ) {
+                if (currfn->args[argnumber] != PELLIPSES ) {
+                    if (currfn->args[argnumber] == 0 ) {
+                        warning(W_2MADECL);
+                    } else {
+                        if ( (currfn->args[argnumber]&PMASKSIGN) == (tester&PMASKSIGN) ) {
+                            warning(W_SIGNARG);
+                        } else {
+                            error(E_ARGMIS1,currfn->name,currfn->prototyped-argnumber+1, ExpandArgValue(tester,buffer2,prevarg->tag_idx) );
+                            error(E_ARGMIS2,ExpandArgValue(currfn->args[argnumber],buffer2, currfn->tagarg[argnumber]));
                         }
-                        argnumber++;
+                    }
                 }
-                iptr = &prevarg->offset.i ;
-                prevarg = prevarg->offset.p ;           /* follow ptr to prev. arg */
-                *iptr = where ;                                         /* insert offset */
-                where += lgh ;                                          /* calculate next offset */
+            }
+            argnumber++;
         }
+        iptr = &prevarg->offset.i ;
+        prevarg = prevarg->offset.p ;           /* follow ptr to prev. arg */
+        *iptr = where ;                                         /* insert offset */
+        where += lgh ;                                          /* calculate next offset */
+    }
 #ifdef USEFRAME
 	pushframe();
 #endif
 	currfn->handled=YES;
-        if (currfn->prototyped==1 && (currfn->flags&REGCALL) ) {
-/*
- * Fast call routine..
- */
-                if (lgh==2) zpush();
-                else if (lgh==4) lpush();
-                else if (lgh==6) dpush();
-                /* erk, if not matched, dodgy type! */
-                copyarg->offset.i=-lgh;
-                where=2;
-        }
+    if (currfn->prototyped==1 && (currfn->flags&REGCALL) ) {
+        /*
+         * Fast call routine..
+         */
+        if (lgh==2) zpush();
+        else if (lgh==4) lpush();
+        else if (lgh==6) dpush();
+        /* erk, if not matched, dodgy type! */
+        copyarg->offset.i=-lgh;
+        where=2;
+    }
 
-        stackargs=where;
-        lstdecl=0;       /* Set number of local statics to zero */
-        if ( statement() != STRETURN ) {
-                if (lstdecl) postlabel(lstlab);
-                lstdecl=0;
-                /* do a statement, but if it's a return, skip */
-                /* cleaning up the stack */
-                leave(NO,NO) ;
-        }
-        CleanGoto();
-/* Asz80 needs a label at the end to sort out local symbols */
+    stackargs=where;
+    lstdecl=0;       /* Set number of local statics to zero */
+    if ( statement() != STRETURN ) {
+        if (lstdecl) postlabel(lstlab);
+        lstdecl=0;
+        /* do a statement, but if it's a return, skip */
+        /* cleaning up the stack */
+        leave(NO,NO) ;
+    }
+    CleanGoto();
+    /* Asz80 needs a label at the end to sort out local symbols */
 	if (asxx) {
-        	nl();prefix();
+        nl();prefix();
 		outstr("smce_");
 		outname(currfn->name,NO);
 		col();nl();
 	}
 #ifdef INBUILT_OPTIMIZER
-        generate();
+    generate();
 #endif
-        infunc = 0 ;                    /* not in fn. any more */
+    infunc = 0 ;                    /* not in fn. any more */
 }
 
 /* djm Declare a function in the ansi style! */
@@ -522,7 +522,7 @@ SYMBOL *currfn;
 
 int CheckANSI()
 {
-        if (rmatch("unsigned") || rmatch("signed") || rmatch("int") || rmatch("char") || rmatch("double") || rmatch("long") || rmatch("struct") || rmatch("union") || rmatch("void") || rmatch("far") || rmatch("near") || rmatch("const") || rmatch("volatile") || rmatch("__TD__") || rmatch("float") || CheckTypDef() ) return (YES);
+        if (rmatch("unsigned") || rmatch("signed") || rmatch("int") || rmatch("char") || rmatch("double") || rmatch("long") || rmatch("struct") || rmatch("union") || rmatch("void") || rmatch("far") || rmatch("near") || rmatch("const") || rmatch("volatile") || rmatch("__TD__") || rmatch("float") || rmatch("register") || CheckTypDef() ) return (YES);
         return (NO);
 }
 

@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.13 2003-03-17 15:59:37 dom Exp $
+ *      $Id: declvar.c,v 1.14 2003-04-20 16:11:10 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -43,24 +43,24 @@ dodeclare (
 )
                                 /* only matters if mtag is non-zero */
 {
-        struct varid var;       /* Our little structure for iding vars */
-        TAG_SYMBOL *otag ;              /* tag of struct object being */
-                                        /* declared */
+    struct varid var;       /* Our little structure for iding vars */
+    TAG_SYMBOL *otag ;              /* tag of struct object being */
+    /* declared */
 
         
-        otag=GetVarID(&var,storage);
+    otag=GetVarID(&var,storage);
 
-        if (var.type == NO) {
-                if (storage==EXTERNAL) var.type=CINT;
-                else return(0); /* fail */
-        }
-        if (var.type == STRUCT ) {
-                declglb(STRUCT, storage, mtag, otag, is_struct,var.sign,var.zfar) ;
-                return (1);
-        } else {
-                declglb(var.type,storage, mtag, NULL_TAG, is_struct,var.sign,var.zfar);
-                return(1); 
-        }
+    if (var.type == NO) {
+        if (storage==EXTERNAL) var.type=CINT;
+        else return(0); /* fail */
+    }
+    if (var.type == STRUCT ) {
+        declglb(STRUCT, storage, mtag, otag, is_struct,var.sign,var.zfar) ;
+        return (1);
+    } else {
+        declglb(var.type,storage, mtag, NULL_TAG, is_struct,var.sign,var.zfar);
+        return(1); 
+    }
 }
 
 
@@ -81,7 +81,7 @@ defstruct (char *sname, int storage, int is_struct)
     }
 
     if ( sname && sname[0] == 0 )
-	sname = NULL;
+        sname = NULL;
    
     if ( sname && (tag = findtag(sname) ) ) {
         if ( tag->weak == 0 ) {
@@ -128,26 +128,26 @@ defstruct (char *sname, int storage, int is_struct)
 
 void defenum(char *sname, char storage)
 {
-        SYMBOL  *ptr;
-        char    name[NAMEMAX];
-        long    value;
-/* Add it into the symbol table, we do not need to keep track of the
- * tag because we treat enums as constants
- */
-        addglb(sname, ENUM, CINT, 0, storage, 0, 0);
-        value=0;        /* initial constant */
-        needchar('{');
-        do {
-                if (symname(name)==0)
-                        illname(name);
-                if ( cmatch('=') )
-                        constexpr(&value,1);
-                ptr=addglb(name,VARIABLE,ENUM,0,STATIK,0,0);
-                ptr->size=value;
-                value++;
+    SYMBOL  *ptr;
+    char    name[NAMEMAX];
+    long    value;
+    /* Add it into the symbol table, we do not need to keep track of the
+     * tag because we treat enums as constants
+     */
+    addglb(sname, ENUM, CINT, 0, storage, 0, 0);
+    value=0;        /* initial constant */
+    needchar('{');
+    do {
+        if (symname(name)==0)
+            illname(name);
+        if ( cmatch('=') )
+            constexpr(&value,1);
+        ptr=addglb(name,VARIABLE,ENUM,0,STATIK,0,0);
+        ptr->size=value;
+        value++;
 
-        } while (cmatch(','));
-        needchar('}');
+    } while (cmatch(','));
+    needchar('}');
 }
 
 
@@ -158,15 +158,15 @@ void defenum(char *sname, char storage)
 int 
 get_ident (void)
 {
-        if ( match("**") )
-                return PTR_TO_PTR ;
-        if ( match("*(*") )
-                return PTR_TO_FNP;
-        if ( cmatch('*') )
-                return POINTER ;
-        if ( match("(*") )
-                return PTR_TO_FN ;
-        return VARIABLE ;
+    if ( match("**") )
+        return PTR_TO_PTR ;
+    if ( match("*(*") )
+        return PTR_TO_FNP;
+    if ( cmatch('*') )
+        return POINTER ;
+    if ( match("(*") )
+        return PTR_TO_FN ;
+    return VARIABLE ;
 }
 
 /*
@@ -196,263 +196,262 @@ int is_struct ,                 /* TRUE if struct member being declared, zero if
 char sign ,                    /* TRUE if need signed */
 char zfar )                      /* TRUE if far */
 {
-        char sname[NAMESIZE];
-        int size, ident, more, itag, type, size_st;
-        long addr;
-        char    flagdef,match,ptrtofn;
-        char    libdef,fastcall,callee;
-        SYMBOL *myptr ;
+    char sname[NAMESIZE];
+    int size, ident, more, itag, type, size_st;
+    long addr;
+    char    flagdef,match,ptrtofn;
+    char    libdef,fastcall,callee;
+    SYMBOL *myptr ;
 
-        do {
-                if ( endst() ) break;   /* do line */
+    do {
+        if ( endst() ) break;   /* do line */
 
-                type = typ ;
-                size = 1 ;                              /* assume 1 element */
-                more =                                  /* assume dummy symbol not required */
-                itag = 0 ;                              /* just for tidiness */
-                flagdef=libdef=fastcall=callee=NO;
+        type = typ ;
+        size = 1 ;                              /* assume 1 element */
+        more =                                  /* assume dummy symbol not required */
+            itag = 0 ;                              /* just for tidiness */
+        flagdef=libdef=fastcall=callee=NO;
 
 
 		match=ptrtofn=NO;
 
-                while (blanks(),rcmatch('_') ) {
+        while (blanks(),rcmatch('_') ) {
 			match=NO;
-                        if (amatch("__APPFUNC__") ) { match=YES; flagdef=1; }
-                        if (amatch("__LIB__") /* && libdef==0 */) {match=YES; libdef|=LIBRARY; }
-                        if (amatch("__FASTCALL__") ) {match=YES; fastcall=REGCALL; }
-                        if (amatch("__SHARED__") ) {match=YES; libdef|=SHARED; }
+            if (amatch("__APPFUNC__") ) { match=YES; flagdef=1; }
+            if (amatch("__LIB__") /* && libdef==0 */) {match=YES; libdef|=LIBRARY; }
+            if (amatch("__FASTCALL__") ) {match=YES; fastcall=REGCALL; }
+            if (amatch("__SHARED__") ) {match=YES; libdef|=SHARED; }
 			if (amatch("__SHAREDC__") ) {match=YES; libdef|=SHAREDC; }
 			if (amatch("__CALLEE__") ) {match=YES; callee=CALLEE; }
 			if (match ==NO )break;
-                }
+        }
 
-                ident = get_ident() ;
-                if (storage==TYPDEF && ident !=VARIABLE && mtag ==0 ) warning(W_TYPEDEF);
+        ident = get_ident() ;
+        if (storage==TYPDEF && ident !=VARIABLE && mtag ==0 ) warning(W_TYPEDEF);
 
-                if ( symname(sname) == 0 )      /* name ok? */
-                        illname(sname) ;                     /* no... */
+        if ( symname(sname) == 0 )      /* name ok? */
+            illname(sname) ;                     /* no... */
 
-                if ( ident == PTR_TO_FNP ) {
-                 /* function returning pointer needs dummy symbol */
-                        more = dummy_idx(typ, otag) ;
-                        type = (zfar ? CPTR : CINT );
-                        size=0;
+        if ( ident == PTR_TO_FNP ) {
+            /* function returning pointer needs dummy symbol */
+            more = dummy_idx(typ, otag) ;
+            type = (zfar ? CPTR : CINT );
+            size=0;
 			ptrtofn=YES;
-                } 
-                else if ( ident == PTR_TO_FN ) {
-                        ident = POINTER ;
+        } 
+        else if ( ident == PTR_TO_FN ) {
+            ident = POINTER ;
 			ptrtofn=YES;
 #if 0
-                } else if ( cmatch('@') ) {
+        } else if ( cmatch('@') ) {
 			storage = EXTERNP;
 			constexpr(&addr,1);
 #endif
-                } else if ( cmatch('(') ) {
-/*
- * Here we check for functions, but we can never have a pointer to
- * function because thats considered above. Which means as a very
- * nice side effect that we don't have to consider structs/unions
- * since they can't contain functions, only pointers to functions
- * this, understandably(!) makes the work here a lot, lot easier!
- */
-                        storage=AddNewFunc(sname,type,storage,zfar,sign,otag,ident,&addr);
-/*
- *      On return from AddNewFunc, storage will be:
- *      EXTERNP  = external pointer, in which case addr will be set
- *  !!    FUNCTION = have prototyped a function (NOT USED!)
- *      0        = have declared a function/!! prototyped ANSI
- *
- *      If 0, then we have to get the hell out of here, FUNCTION
- *      then gracefully loop round again, if EXTERNP, carry on with
- *      this function, anything else means that we've come up
- *      against a K&R style function definition () so carry on
- *      as normal!
- *
- *      If we had our function prefixed with __APPFUNC__ then we want
- *      to write it out to the zcc_opt.def file (this bloody thing
- *      is becoming invaluable for messaging!
- *
- *	__SHARED__ indicates in a library so preserve carry flag
- * 	(so we can test with iferror)
- *
- *	__CALLEE__ indicates that the function called cleans up
- *	the stack
- *
- *	__SHAREDC__ is indicates call by rst 8 but is unused..
- *	(old idea unused, but may yet be useful)
- */
-                        if (flagdef) WriteDefined(sname,0);
-                        if (currfn) {
-/* djm 1/2/03 - since we can override lib functions don't reset the library
-	flag
-				currfn->flags&=(~LIBRARY);
-*/
-                                if (libdef) {
-			//		currfn->flags|=LIBRARY;
-                                        currfn->flags|=libdef;
-                                }
+        } else if ( cmatch('(') ) {
+            /*
+             * Here we check for functions, but we can never have a pointer to
+             * function because thats considered above. Which means as a very
+             * nice side effect that we don't have to consider structs/unions
+             * since they can't contain functions, only pointers to functions
+             * this, understandably(!) makes the work here a lot, lot easier!
+             */
+            storage=AddNewFunc(sname,type,storage,zfar,sign,otag,ident,&addr);
+            /*
+             *      On return from AddNewFunc, storage will be:
+             *      EXTERNP  = external pointer, in which case addr will be set
+             *  !!    FUNCTION = have prototyped a function (NOT USED!)
+             *      0        = have declared a function/!! prototyped ANSI
+             *
+             *      If 0, then we have to get the hell out of here, FUNCTION
+             *      then gracefully loop round again, if EXTERNP, carry on with
+             *      this function, anything else means that we've come up
+             *      against a K&R style function definition () so carry on
+             *      as normal!
+             *
+             *      If we had our function prefixed with __APPFUNC__ then we want
+             *      to write it out to the zcc_opt.def file (this bloody thing
+             *      is becoming invaluable for messaging!
+             *
+             *	__SHARED__ indicates in a library so preserve carry flag
+             * 	(so we can test with iferror)
+             *
+             *	__CALLEE__ indicates that the function called cleans up
+             *	the stack
+             *
+             *	__SHAREDC__ is indicates call by rst 8 but is unused..
+             *	(old idea unused, but may yet be useful)
+             */
+            if (flagdef) WriteDefined(sname,0);
+            if (currfn) {
+                /* djm 1/2/03 - since we can override lib functions don't reset the library
+                   flag
+                   currfn->flags&=(~LIBRARY);
+                */
+                if (libdef) {
+                    //		currfn->flags|=LIBRARY;
+                    currfn->flags|=libdef;
+                }
 				if (callee && (libdef&SHARED) != SHARED && \
 				    (libdef&SHAREDC) != SHAREDC )
 					currfn->flags|=callee;
-                                if (fastcall) currfn->flags|=fastcall;
-                        }
-                        if (storage==0) {
+                if (fastcall) currfn->flags|=fastcall;
+            }
+            if (storage==0) {
 				currfn=0;
 				return;
 			}
-/*
- *      External pointer..check for the closing ')'
- */
-                        if (storage==EXTERNP) {
-                                needchar(')');
-                        } else {
-/*
- *  Must be a devilishly simple prototype! ();/, type...
- */
-                                ptrerror(ident) ;
-                                if ( ident == POINTER ) {
-                                /* function returning pointer needs dummy symbol */
-                                        more = dummy_idx(typ, otag) ;
-                                        type = (zfar ? CPTR : CINT );
-                                        ident=FUNCTIONP;
-                                } else ident=FUNCTION;
-                                size = 0 ;
+            /*
+             *      External pointer..check for the closing ')'
+             */
+            if (storage==EXTERNP) {
+                needchar(')');
+            } else {
+                /*
+                 *  Must be a devilishly simple prototype! ();/, type...
+                 */
+                ptrerror(ident) ;
+                if ( ident == POINTER ) {
+                    /* function returning pointer needs dummy symbol */
+                    more = dummy_idx(typ, otag) ;
+                    type = (zfar ? CPTR : CINT );
+                    ident=FUNCTIONP;
+                } else {
+                    ident=FUNCTION;
+                }
+                size = 0 ;
                                 
-                        }
-                }
-                if (cmatch('[')) {         /* array? */
-                        ptrerror(ident) ;
-                        if ( ident == POINTER) {
-                                /* array of pointers needs dummy symbol */
-                                more = dummy_idx(typ, otag) ;
-                                type = (zfar ? CPTR : CINT );
-                        }
-                        size = needsub() ;      /* get size */
-                        if (size == 0 && ident == POINTER ) size=0;
-                        ident = ARRAY;
+            }
+        }
+        if (cmatch('[')) {         /* array? */
+            ptrerror(ident) ;
+            if ( ident == POINTER) {
+                /* array of pointers needs dummy symbol */
+                more = dummy_idx(typ, otag) ;
+                type = (zfar ? CPTR : CINT );
+            }
+            size = needsub() ;      /* get size */
+            if (size == 0 && ident == POINTER ) size=0;
+            ident = ARRAY;
 			if ( ptrtofn ) needtoken(")()");
-                }
-		else if ( ptrtofn ) {
-                        needtoken(")()") ;
-		}
-                else if ( ident == PTR_TO_PTR ) {
-                        ident = POINTER ;
-                        more = dummy_idx(typ, otag) ;
-                        type = (zfar ? CPTR : CINT );
-                }
+        } else if ( ptrtofn ) {
+            needtoken(")()") ;
+		} else if ( ident == PTR_TO_PTR ) {
+            ident = POINTER ;
+            more = dummy_idx(typ, otag) ;
+            type = (zfar ? CPTR : CINT );
+        }
 
 		if ( cmatch('@') ) {
 			storage = EXTERNP;
 			constexpr(&addr,1);
 		}
-/* Check to see if far has been defined when we haven't got a pointer */
+        /* Check to see if far has been defined when we haven't got a pointer */
 
-                if (zfar && !(ident==POINTER || (ident==ARRAY && more) || (ident==FUNCTIONP && more))) {
-                        warning(W_FAR);
-                        zfar=NO;
-                }
+        if (zfar && !(ident==POINTER || (ident==ARRAY && more) || (ident==FUNCTIONP && more))) {
+            warning(W_FAR);
+            zfar=NO;
+        }
 
-                if ( otag ) {
-                        /* calculate index of object's tag in tag table */
-                        itag = otag - tagtab ;
-                }
-                /* add symbol */
-                if ( mtag == 0 ) {
-                        /* this is a real variable, not a structure member */
-                       if (typ == VOID && ident != FUNCTION && ident!=FUNCTIONP && ident != POINTER && ident != ARRAY ) {
-                                warning(W_BADDECL);
-                                typ=type=CINT;
-                       }
-                       myptr=addglb(sname, ident, type, 0, storage, more, itag) ;
-/* What happens if we have an array which will be initialised? */
+        if ( otag ) {
+            /* calculate index of object's tag in tag table */
+            itag = otag - tagtab ;
+        }
+        /* add symbol */
+        if ( mtag == 0 ) {
+            /* this is a real variable, not a structure member */
+            if (typ == VOID && ident != FUNCTION && ident!=FUNCTIONP && ident != POINTER && ident != ARRAY ) {
+                warning(W_BADDECL);
+                typ=type=CINT;
+            }
+            myptr=addglb(sname, ident, type, 0, storage, more, itag) ;
+            /* What happens if we have an array which will be initialised? */
 
-                        myptr->flags = ( sign | zfar | fastcall );
+            myptr->flags = ( sign | zfar | fastcall );
 
-                        /* initialise variable (allocate storage space) */
-                        /* defstatic to prevent repetition of def for declared statics */
-                        defstatic=0;
-                        myptr->size=0;   /* Set to zero.. */
-                        if ( ident == FUNCTION || ident==FUNCTIONP ) {  
-                                myptr->prototyped=0;
-                                myptr->args[0]=CalcArgValue(typ,ident,myptr->flags);
-                                myptr->ident=FUNCTION;
-                                if (typ==STRUCT)
-                                        myptr->tagarg[0]=itag;
-                        }
-                        if ( storage != EXTERNAL && ident != FUNCTION ) {
-                            size_st=initials(sname, type, ident, size, more, otag, zfar) ;
+            /* initialise variable (allocate storage space) */
+            /* defstatic to prevent repetition of def for declared statics */
+            defstatic=0;
+            myptr->size=0;   /* Set to zero.. */
+            if ( ident == FUNCTION || ident==FUNCTIONP ) {  
+                myptr->prototyped=0;
+                myptr->args[0]=CalcArgValue(typ,ident,myptr->flags);
+                myptr->ident=FUNCTION;
+                if (typ==STRUCT)
+                    myptr->tagarg[0]=itag;
+            }
+            if ( storage != EXTERNAL && ident != FUNCTION ) {
+                size_st=initials(sname, type, ident, size, more, otag, zfar) ;
 
 
 			    if (storage == EXTERNP) 
-                                myptr->size=addr;
+                    myptr->size=addr;
 			    else
-                                myptr->size=size_st;
+                    myptr->size=size_st;
 			    if (defstatic)
-                                myptr->storage=DECLEXTN;
-                        }
+                    myptr->storage=DECLEXTN;
+            }
 
-/*
- *      Set the return type of the function
- */
-                        if ( ident == FUNCTION ) {
-                                myptr->args[0]=CalcArgValue(type, FUNCTION, myptr->flags);
+            /*
+             *      Set the return type of the function
+             */
+            if ( ident == FUNCTION ) {
+                myptr->args[0]=CalcArgValue(type, FUNCTION, myptr->flags);
 				myptr->flags|=callee;
 			}
-/* Make library routines so.. */
-                        if ( storage == EXTERNAL && ident == FUNCTION )
-                        {
-                                myptr->handled=0;
-				myptr->flags&=(~LIBRARY);
-                                if (libdef)
-					myptr->flags|=LIBRARY;
-                                if (libdef==SHARED || libdef==SHAREDC){
-				/* Shared can't be __CALLEE__ */
-					myptr->flags&=(~CALLEE);
-					myptr->flags|=libdef|LIBRARY;
-				}
+            /* Make library routines so.. */
+            if ( storage == EXTERNAL && ident == FUNCTION )
+                {
+                    myptr->handled=0;
+                    myptr->flags&=(~LIBRARY);
+                    if (libdef)
+                        myptr->flags|=LIBRARY;
+                    if (libdef==SHARED || libdef==SHAREDC){
+                        /* Shared can't be __CALLEE__ */
+                        myptr->flags&=(~CALLEE);
+                        myptr->flags|=libdef|LIBRARY;
+                    }
                                 
-                        }
-
                 }
-                else if ( is_struct ) {
-                        if ( type==CINT && ident==VARIABLE ) BitFieldSwallow();
-                        /* are adding structure member, mtag->size is offset */
-                        myptr=addmemb(sname, ident, type, mtag->size, storage, more, itag) ;
-                        myptr--;        /* addmemb returns myptr+1 */
-                        myptr->flags = ( (sign&UNSIGNED) | (zfar&FARPTR) );
-                        myptr->size = size;
 
-                        /* store (correctly scaled) size of member in tag table entry */
-                        /* 15/2/99 djm - screws up sizing of arrays -
-                           quite obviously!! - removing */
-                        if ( ident == POINTER) { /* || ident== ARRAY ) { */
-                                type=(zfar ? CPTR : CINT);
-                        }
+        }
+        else if ( is_struct ) {
+            if ( type==CINT && ident==VARIABLE ) BitFieldSwallow();
+            /* are adding structure member, mtag->size is offset */
+            myptr=addmemb(sname, ident, type, mtag->size, storage, more, itag) ;
+            myptr--;        /* addmemb returns myptr+1 */
+            myptr->flags = ( (sign&UNSIGNED) | (zfar&FARPTR) );
+            myptr->size = size;
 
-                        cscale(type, otag, &size) ;
-                        mtag->size += size ;
+            /* store (correctly scaled) size of member in tag table entry */
+            /* 15/2/99 djm - screws up sizing of arrays -
+               quite obviously!! - removing */
+            if ( ident == POINTER) { /* || ident== ARRAY ) { */
+                type=(zfar ? CPTR : CINT);
+            }
 
-                }
-                else {
-                        /* are adding union member, offset is always zero */
-                        myptr=addmemb(sname, ident, type, 0, storage, more, itag) ;
-                        myptr--;
-                        myptr->flags = ( (sign&UNSIGNED) | (zfar&FARPTR) );
-                        myptr->size = size;
+            cscale(type, otag, &size) ;
+            mtag->size += size ;
+
+        } else {
+            /* are adding union member, offset is always zero */
+            myptr=addmemb(sname, ident, type, 0, storage, more, itag) ;
+            myptr--;
+            myptr->flags = ( (sign&UNSIGNED) | (zfar&FARPTR) );
+            myptr->size = size;
 
 
-                        /* store maximum member size in tag table entry */
+            /* store maximum member size in tag table entry */
 			/* 2/11/2002 djm - fix from above */
-                        if ( ident == POINTER /* || ident==ARRAY */ ) {
-                                type=(zfar ? CPTR : CINT);
-                        }
-                        cscale(type, otag, &size) ;
-                        if ( mtag->size < size )
-                                mtag->size = size ;
+            if ( ident == POINTER /* || ident==ARRAY */ ) {
+                type=(zfar ? CPTR : CINT);
+            }
+            cscale(type, otag, &size) ;
+            if ( mtag->size < size )
+                mtag->size = size ;
 
-                }
-        } while ( cmatch(',') ) ;
-        ns() ;
+        }
+    } while ( cmatch(',') ) ;
+    ns() ;
 }
 
 /*
@@ -469,151 +468,151 @@ char sign,               /* Are we signed or not? */
 char locstatic,         /* Is this as static local variable? */
 char zfar)               /* Far pointer thing.. */
 {
-        char sname[NAMESIZE];
-        char sname2[3*NAMESIZE];        /* More than enuff overhead! */
-        SYMBOL *cptr ;
-        int dsize,size, ident, more, itag, type, decltype ;
+    char sname[NAMESIZE];
+    char sname2[3*NAMESIZE];        /* More than enuff overhead! */
+    SYMBOL *cptr ;
+    int dsize,size, ident, more, itag, type, decltype ;
 
 
- /*       if ( swactive ) error(E_DECLSW) ; */
-        if ( declared < 0 ) error(E_DECLST) ;
-        do {
-                if ( endst() ) break ;
+    /*       if ( swactive ) error(E_DECLSW) ; */
+    if ( declared < 0 ) error(E_DECLST) ;
+    do {
+        if ( endst() ) break ;
 
-                type = decltype = typ ;
-                more =                                          /* assume dummy symbol not required */
-                itag = 0 ;
-                dsize=size = 1 ;
-                ident = get_ident() ;
+        type = decltype = typ ;
+        more =                                          /* assume dummy symbol not required */
+            itag = 0 ;
+        dsize=size = 1 ;
+        ident = get_ident() ;
 
-                if ( symname(sname) == 0 )
-                        illname(sname) ;
+        if ( symname(sname) == 0 )
+            illname(sname) ;
 
-                if ( ident == FUNCTIONP ) {
-                           needtoken(")()");
-                 /* function returning pointer needs dummy symbol */
-                           more = dummy_idx(typ, otag) ;
-                           type = (zfar ? CPTR : CINT );
-                           dsize=size = (zfar ? 3 : 2 );
-                } 
+        if ( ident == FUNCTIONP ) {
+            needtoken(")()");
+            /* function returning pointer needs dummy symbol */
+            more = dummy_idx(typ, otag) ;
+            type = (zfar ? CPTR : CINT );
+            dsize=size = (zfar ? 3 : 2 );
+        } 
 
-                if ( ident == PTR_TO_FN ) {
-                        needtoken(")()") ;
-                        ident = POINTER ;
-                }
+        if ( ident == PTR_TO_FN ) {
+            needtoken(")()") ;
+            ident = POINTER ;
+        }
 
 
-                if ( cmatch('[') ) {
-                        ptrerror(ident) ;
-                        if ( ident == POINTER ) {
-                                /* array of pointers needs dummy symbol */
-                                more = dummy_idx(typ, otag) ;
-                                type = ( zfar ? CPTR : CINT );
-                        }
-                        dsize=size = needsub() ;
-                        ident = ARRAY ;                 /* null subscript array is NOT a pointer */
-                        cscale(type, otag, &size);
-                }
-                else if ( ident == PTR_TO_PTR ) {
-                        ident = POINTER ;
-                        more = dummy_idx(typ, otag) ;
-                        type = (zfar ? CPTR : CINT ) ;
-                        dsize=size = (zfar ? 3 : 2 );
-                }
-                else {
-                        switch ( type ) {
-                        case CCHAR :
-                                size = 1 ;
-                                break ;
-                        case LONG :
-                                size = 4;
-                                break ;
-                        case DOUBLE :
-                                size = 6 ;
-                                break ;
-                        case STRUCT :
-                                size = otag->size ;
-                                break ;
-                        default :
-                                size = 2 ;
-                        }
-                }
-/* Check to see if far has been defined when we haven't got a pointer */
-                if (zfar && !(ident==POINTER || (ident==ARRAY && more))) {
-                        warning(W_FAR);
-                        zfar=NO;
-                }
-                       if (typ == VOID && ident != FUNCTION && ident != POINTER ) {
+        if ( cmatch('[') ) {
+            ptrerror(ident) ;
+            if ( ident == POINTER ) {
+                /* array of pointers needs dummy symbol */
+                more = dummy_idx(typ, otag) ;
+                type = ( zfar ? CPTR : CINT );
+            }
+            dsize=size = needsub() ;
+            ident = ARRAY ;                 /* null subscript array is NOT a pointer */
+            cscale(type, otag, &size);
+        }
+        else if ( ident == PTR_TO_PTR ) {
+            ident = POINTER ;
+            more = dummy_idx(typ, otag) ;
+            type = (zfar ? CPTR : CINT ) ;
+            dsize=size = (zfar ? 3 : 2 );
+        }
+        else {
+            switch ( type ) {
+            case CCHAR :
+                size = 1 ;
+                break ;
+            case LONG :
+                size = 4;
+                break ;
+            case DOUBLE :
+                size = 6 ;
+                break ;
+            case STRUCT :
+                size = otag->size ;
+                break ;
+            default :
+                size = 2 ;
+            }
+        }
+        /* Check to see if far has been defined when we haven't got a pointer */
+        if (zfar && !(ident==POINTER || (ident==ARRAY && more))) {
+            warning(W_FAR);
+            zfar=NO;
+        }
+        if (typ == VOID && ident != FUNCTION && ident != POINTER ) {
                        
-                                warning(W_BADDECL);
-                                typ=type=CINT;
-                        }
-                if (ident == POINTER) {
+            warning(W_BADDECL);
+            typ=type=CINT;
+        }
+        if (ident == POINTER) {
 			decltype = ( zfar ? CPTR : CINT);
 			size = ( zfar ? 3 : 2 );
 		}
 
-/*                declared += size ; Moved down djm */
-                if ( otag )
-                        itag = otag - tagtab ;
-/* djm, add in local statics - use the global symbol table to ensure
- * that they will be placed in RAM and not in ROM
- */
-                if (locstatic) {
-                        strcpy(sname2,"st_");
-                        strcat(sname2,currfn->name);
-                        strcat(sname2,"_");
-                        strcat(sname2,sname);
-                        cptr=addglb(sname2,ident,type,0,LSTATIC,more,itag);
-                        if (cptr) {
-                                cptr->flags=( (sign&UNSIGNED) | (zfar&FARPTR));
-                                cptr->size=size;
-                        }
-                        if (rcmatch('=') ) {
-/*
- *      Insert the jump in...
- */
-                                if (lstdecl++ == 0 ) {
-                                        jump(lstlab=getlabel());
-                                }
-                                initials(sname2, type, ident, dsize, more, otag,zfar);
-                                ns();
-                                cptr->storage=LSTKEXT;
-                                return;
-                        } else if (ident==ARRAY && dsize == 0 ) {
+        /*                declared += size ; Moved down djm */
+        if ( otag )
+            itag = otag - tagtab ;
+        /* djm, add in local statics - use the global symbol table to ensure
+         * that they will be placed in RAM and not in ROM
+         */
+        if (locstatic) {
+            strcpy(sname2,"st_");
+            strcat(sname2,currfn->name);
+            strcat(sname2,"_");
+            strcat(sname2,sname);
+            cptr=addglb(sname2,ident,type,0,LSTATIC,more,itag);
+            if (cptr) {
+                cptr->flags=( (sign&UNSIGNED) | (zfar&FARPTR));
+                cptr->size=size;
+            }
+            if (rcmatch('=') ) {
+                /*
+                 *      Insert the jump in...
+                 */
+                if (lstdecl++ == 0 ) {
+                    jump(lstlab=getlabel());
+                }
+                initials(sname2, type, ident, dsize, more, otag,zfar);
+                ns();
+                cptr->storage=LSTKEXT;
+                return;
+            } else if (ident==ARRAY && dsize == 0 ) {
 				char *dosign="",*typ;
 				typ=ExpandType(more,&dosign,otag-tagtab);
 				warning(W_NULLARRAY,dosign,typ);
 			}
 
-                } else {
-                        declared += size;
-                        cptr = addloc(sname, ident, type, more, itag);
-                        if ( cptr )
-                                {
-                                cptr->size=size;
-                                cptr->offset.i = Zsp - declared ;
-                                cptr->flags=( (sign&UNSIGNED) | (zfar&FARPTR) );
-				if (cmatch('=') ) {
-					int vconst, val, expr;
-					char *before,*start;
-					if ( (typ == STRUCT && ident != POINTER) || ident == ARRAY )
-						error(E_AUTOASSIGN,sname);
-					if (lstdecl) postlabel(lstlab);
-					lstdecl=0;
-					Zsp=modstk(Zsp-(declared-size),NO,NO);
-					declared=0;
-					setstage(&before,&start);
-					expr=expression(&vconst,&val);
-					clearstage(before,start);
-					//conv type
-					force(decltype,expr,0,0,0);
-					StoreTOS(decltype);
-                                }
-			}
+        } else {
+            declared += size;
+            cptr = addloc(sname, ident, type, more, itag);
+            if ( cptr )
+                {
+                    cptr->size=size;
+                    cptr->offset.i = Zsp - declared ;
+                    cptr->flags=( (sign&UNSIGNED) | (zfar&FARPTR) );
+                    if (cmatch('=') ) {
+                        int vconst, val, expr;
+                        char *before,*start;
+                        if ( (typ == STRUCT && ident != POINTER) || ident == ARRAY )
+                            error(E_AUTOASSIGN,sname);
+                        if (lstdecl) postlabel(lstlab);
+                        lstdecl=0;
+                        Zsp=modstk(Zsp-(declared-size),NO,NO);
+                        declared=0;
+                        setstage(&before,&start);
+                        expr=expression(&vconst,&val);
+                        clearstage(before,start);
+                        //conv type
+                        force(decltype,expr,0,0,0);
+                        StoreTOS(decltype);
+                    }
                 }
-        } while ( cmatch(',') ) ;
-        ns() ;
+        }
+    } while ( cmatch(',') ) ;
+    ns() ;
 }
 
 
