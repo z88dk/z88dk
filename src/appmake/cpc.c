@@ -145,6 +145,8 @@ int cpc_exec(char *target)
     }
     fclose(fpin);
     fclose(fpout);
+
+    return (0);
 }
 
 
