@@ -9,7 +9,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.3 2002-01-15 12:59:24 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -34,10 +34,7 @@
 
 .ansi_CHAR
 
-	cp	32
-	jr	nz,nospace
-	xor	a
-	jr	setout
+
 .nospace
 	cp	48	; Between 0 and 9 ?
 	jr	c,isntnum
@@ -60,7 +57,22 @@
 	sub	64
 	jr	setout
 .isntchar
-	add	a,63 ; For now...
+	;add	a,63 ; For now...
+	
+	ld	hl,chmap
+.maploop
+	ld	e,a
+	ld	a,(hl)
+	and	a
+	ret	z	; We don't display the character since it isn't mapped
+	ld	a,e
+	cp	(hl)
+	inc	hl
+	jr	z,chfound
+	inc	hl
+	jr	maploop
+.chfound
+	ld	a,(hl)
 	
 .setout
 	push	af
@@ -89,3 +101,38 @@
 	
 	ret
 
+.chmap
+	defb	' ',0
+	defb	'£',$1b
+	defb	'-',$2a
+	defb	'=',$2b
+	defb	';',$2c
+	defb	'/',$2d
+	defb	'.',$2e
+	defb	',',$2f
+	defb	'_',$3c
+	defb	'?',$49
+	defb	':',$4f
+	defb	'}',$40
+	defb	'^',$50
+	defb	'<',$51
+	defb	'[',$52
+	defb	']',$54
+	defb	'@',$55
+	defb	'>',$57
+	defb	'\',$59
+	defb	'!',$61
+	defb	'"',$62
+	defb	'#',$63
+	defb	'$',$64
+	defb	'%',$65
+	defb	'&',$66
+	defb	39,$67
+	defb	96,$67
+	defb	'(',$68
+	defb	')',$69
+	defb	'+',$6a
+	defb	'*',$6b
+	defb	'|',$79
+	defb	0
+	
