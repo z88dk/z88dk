@@ -1,0 +1,15 @@
+$Id: README,v 1.1 2001-06-12 14:28:47 stefano Exp $
+
+Amstrad CPC
+
+- Compile the program
+	zcc +cpc program.c
+- Prepare an empty snapshot with your preferred Amstrad emulator
+	memory &1fff  (BASIC command)
+- Save the snapshot and exit from the emulator
+- Insert the compiled code into the snapshot:
+	sna_mng i a.bas loader.sna 8192 30000
+- Re-run the emulator, load the modified snapshot and type:
+	call &2000
+
+Enjoy !
