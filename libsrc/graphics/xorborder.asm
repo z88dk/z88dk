@@ -4,7 +4,7 @@
 	XREF	swapgfxbk1
 
 ;
-;	$Id: xorborder.asm,v 1.1 2002-03-28 09:41:14 stefano Exp $
+;	$Id: xorborder.asm,v 1.2 2002-03-28 11:18:01 stefano Exp $
 ;
 
 ; ***********************************************************************
@@ -37,6 +37,7 @@
 		ld	a,h
 		add	a,b
 		ret	c	; overflow ?
+		dec	a
 		ld	h,a
 		pop	de
 .rowloop
@@ -63,6 +64,7 @@
 		ld	a,l
 		add	a,c
 		ret	c	; overflow ?
+		dec	a
 		ld	l,a
 		pop	de
 
