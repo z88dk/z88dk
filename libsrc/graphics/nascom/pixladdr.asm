@@ -6,7 +6,7 @@
 ;       Stefano Bodrato - June 2003
 ;
 ;
-;	$Id: pixladdr.asm,v 1.1 2003-06-27 14:04:13 stefano Exp $
+;	$Id: pixladdr.asm,v 1.2 2003-06-30 15:58:53 stefano Exp $
 ;
 
 	XLIB	pixeladdress
@@ -26,23 +26,14 @@
 
 	; Adjust column and find the right bit mask
 
-;	ld	a,h
-;	ld	h,l
-;	ld	l,a
-	
 	push	hl
 	
-	;ld	a,h		; Get column
-	ld	a,l ;&&&
-	
-	;ld	b,1		; 2 bits per character
-	and	1		; Odd or even bit
+	ld	a,1		; 2 bits per character
+	and	h		; Odd or even bit
 	push	af		; Save it
 	
         ;pop	hl
         ;push	hl		; pick row
-	
-	ld	l,h ;&&&
 	
 	ld	h,0		; hl=row
 	ld	de,0		; Zero line count
@@ -55,15 +46,24 @@ DIV3LP:	sbc	hl,bc		; subtract 3
 	;jr	nc,DIV3LP
 DIV3EX:	add	hl,bc		; restore number
 	pop	af		; restore column and odd/even
-	or	a		; set flags (NZ or Z)
-	ld	a,l		; get remainder from /3
-	jr	z,NOREMD	; no remainder
-	add	a,3		; adjust remainder
-NOREMD: ld	b,a		; bit number+1 to B
-	ld	a,1
-SHFTBT: rlca			; shift bit left
-	djnz	SHFTBT		; count shifts
-	rra			; restore correct place
+
+	ld	a,l
+	jr	z,evenbit
+	srl	a
+	srl	a
+	srl	a
+evenbit:
+
+
+;	or	a		; set flags (NZ or Z)
+;	ld	a,l		; get remainder from /3
+;	jr	z,NOREMD	; no remainder
+;	add	a,3		; adjust remainder
+;NOREMD: ld	b,a		; bit number+1 to B
+;	ld	a,1
+;SHFTBT: rlca			; shift bit left
+;	djnz	SHFTBT		; count shifts
+;	rra			; restore correct place
 	
 	pop	hl
 	push	af
@@ -73,7 +73,6 @@ SHFTBT: rlca			; shift bit left
 	
 	; Adjust column
 	
-	;ld	a,l		; get column
 	ld	a,h		; get column
 	rra			; divide by 2
 	add	1
@@ -88,13 +87,15 @@ SHFTBT: rlca			; shift bit left
 	ld	a,b		; get adjusted line
 	and	a
 	jr	nz,nozline
-	ld	hl,0BCAh	; SCREEN VDU address (0,0)
+	ld	hl,0BC0h+10-65	; SCREEN VDU address (0,0)
+	
 	jr	zline
 
 .nozline
 	ld	hl,800h+10-65	; SCREEN VDU address (1,0)
 
 	ld	e,b		; Put adjusted line onto DE
+	dec	e
 	
 	ld	b,64		; 64 Bytes per line
 ADD64X: add	hl,de		; Add line
@@ -122,11 +123,10 @@ ADD64X: add	hl,de		; Add line
 	and	63
 
 .goover	
-;	ld	b,a
-;	ld	a,5
-;	sub b
 	
 	ld	d,h
 	ld	e,l
+	
+;	inc	a
 	
 	ret
