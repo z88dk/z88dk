@@ -9,7 +9,7 @@
 ;
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.1 2002-10-01 13:53:17 dom Exp $
+;	$Id: fputc_cons.asm,v 1.2 2002-10-02 11:21:55 dom Exp $
 ;
 
 
@@ -23,10 +23,10 @@
 	jr	nz,fputc_cons1
 	ld	c,$53	;CURSOR
 	rst	$10
-	ld	a,d
+	ld	a,e
 	and	a
 	ret	z
-	dec	d
+	dec	e
 	ld	c,$52	;LOCATE
 	rst	$10
 	ret
