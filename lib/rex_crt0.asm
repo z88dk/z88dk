@@ -5,6 +5,9 @@
 ;	djm 6/3/2001
 ;
 
+	MODULE rex_crt0
+
+	XREF	_main
 
         org    $8000
 
@@ -13,18 +16,18 @@
 ; Make room for the atexit() stack
 	ld	hl,65535-64
 	ld	sp,hl
-        ld      (exitsp),sp
-
-        ld      hl,$8080
-        ld      (fp_seed),hl
-        xor     a
-        ld      (exitcount),a
 ; Clear static memory
 	ld	hl,$f033
 	ld	de,$f034
 	ld	bc,$f6c1-$f033
 	ld	(hl),0
 	ldir
+        ld      (exitsp),sp
+
+        ld      hl,$8080
+        ld      (fp_seed),hl
+        xor     a
+        ld      (exitcount),a
 ; Entry to the user code
         call    _main
 .cleanup
