@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.43 2002-07-15 15:34:06 dom Exp $
+# $Id: Makefile,v 1.44 2002-10-01 13:54:26 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -159,6 +159,25 @@ zx_clib.lib:
 	cd spectrum ; $(MAKE)
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORzx -xzx_clib @zx.lst
+
+pps_clib.lib:
+	@echo ''
+	@echo '---> Building Sprinter Library  <---'
+	@echo ''
+	./gfxdeps.sh
+	cd strings ; $(MAKE)
+	cd stdlib ; $(MAKE) lzx
+	cd stdio ; $(MAKE) generic
+	cd fcntl ; $(MAKE) lzx
+	cd printflike ; $(MAKE) 
+	cd setjmp ; $(MAKE) 
+	cd assert ; $(MAKE) 
+	cd time ; $(MAKE) lzx
+	cd rs232 ; $(MAKE) lzx
+	./gamesdeps.sh
+	cd spectrum ; $(MAKE)
+	cd games ; $(MAKE)
+	z80asm -d -ns -nm -Mo -DFORzx -xpps_clib @pps.lst
 
 # vt100 C lib for spectrum
 # use -DROMFONT for a tiny 36 columns mode
