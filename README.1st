@@ -1,10 +1,10 @@
-$Id: README.1st,v 1.6 2001-05-11 09:19:55 dom Exp $
+$Id: README.1st,v 1.7 2002-07-15 15:57:55 dom Exp $
 
 There's a lot of documentation in the doc/ directory, some of it is half
 way through being written, so apologies for the fuzziness in places, most
 of it is in html (so that everyone can read it), some of it is plain text,
 hopefully you won't have to dig too deep to find out wat you need to know.
-If you have any questions, feel free to email me at dom@jb.man.ac.uk
+If you have any questions, feel free to email me at dom@jadara.org.uk
 
 ----- COMPILATION INSTRUCTIONS -----
 
@@ -12,7 +12,7 @@ If you have any questions, feel free to email me at dom@jb.man.ac.uk
    ENDIAN is set if the machine is big endian (68k,PPC,Sparc etc). There's
    some gcc magic to pick this up automatically which should work.
 
-2. Type: make
+2. Type: make/gmake to run GNU make
 
 3. Wait
 
@@ -33,6 +33,11 @@ Amiga: ixemul v47+ required..
 --8<--
 
 Brief guide to what has changed in case I don't distribute the doco
+
+z88dkv1.5 (sccz80 20/5/2002.1) xx.7.2002
+
+It's a long time since the previous release. Many things have changed and
+many new machines are now supported and many bug fixes have been made
 
 z88dkv1.33 (sccz80v1.10b72) 11.5.2001
 
