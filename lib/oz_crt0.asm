@@ -11,7 +11,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.1 2002-11-20 14:15:18 stefano Exp $
+;       $Id: oz_crt0.asm,v 1.2 2003-10-14 08:36:19 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -46,8 +46,14 @@
 	XDEF	heapblocks
 
         XDEF    base_graphics   ;Graphical variables
-        XDEF    __ozactivepage
+        XDEF    ozactivepage    ;current mem page
+	XDEF    ozmodel         ;detected model (call "detect" first)
+	XDEF    ozbacklight     ;display light status
+	XDEF    ozcontrast      ;display contrast
+        XDEF	s_ozlcdstatus
+	
         XDEF    coords          ;Current xy position
+        XDEF	s_filetypetable
 
 	XDEF	saved_hl	;Temporary store used by compiler
 	XDEF	saved_de	;for hl and de
@@ -59,6 +65,8 @@
 	XDEF	KeyBufPutPos
         XDEF    EnableKeyboard
 
+	defc	contrast    = 0c026h
+	defc	lcdstatus = 0c024h
 
 	org	$8000
 
@@ -87,13 +95,14 @@ skipname:
 continue:
 
         ld      a,(0c068h)  ; backlight state
-        ld      (__ozbacklight),a
+        ld      (ozbacklight),a
+        ld      (ozbacklight_save),a
 
-        ;ld      hl,(_$ozlcdstatus)
-        ;ld      ($ozlcdstatus),hl
+        ld      hl,(lcdstatus)
+        ld      (s_ozlcdstatus),hl
 
-        ;ld      a,(___ozcontrast)
-        ;ld      (__ozcontrast),a
+        ld      a,(contrast)
+        ld      (ozcontrast),a
 
         di
 
@@ -227,12 +236,15 @@ __exit:
         call    s_clearbacklighttimer
 
 ;; restore a bunch of stuff
-        ld      a,(__ozbacklight)
+        ld      a,(ozbacklight_save)
         ld      (0c068h),a
-        ;ld      hl,($ozlcdstatus)
-        ;ld      (_$ozlcdstatus),hl ;; restore right LCD Status
-        ;ld      a,(__ozcontrast)
-        ;ld      (___ozcontrast),a
+
+        ld      hl,(s_ozlcdstatus)
+        ld      (lcdstatus),hl	;; restore right LCD Status
+
+        ld      a,(ozcontrast)
+        ld      (contrast),a
+
         ld      hl,KeyBufGetPos ;; put keyboard buffer in standard buffer
         ld      de,0c031h
         ld      bc,24
@@ -374,18 +386,21 @@ s_32kinton:
 s_clearbacklighttimer:
         ld      hl,0
         ld      (0c00dh),hl
-        ;ld      hl,($ozlcdstatus)
-        ;ld      (_$ozlcdstatus),hl
+        ld      hl,(s_ozlcdstatus)
+        ld      (lcdstatus),hl
         ret
 
-__ozbacklight:
+ozbacklight:
         defb    0
-;;__ozbacklight_save:
-;;        defb    0
-;$ozlcdstatus:
-;        defw  0
-;__ozcontrast:
-;        defb   0
+
+ozbacklight_save:
+        defb    0
+
+ozcontrast:
+        defb   0
+
+s_ozlcdstatus:
+        defw  0
 
 KeyBufGetPos:   defb 0
 KeyBufPutPos:   defb 0
@@ -399,8 +414,7 @@ ScrCharSet:     defb 1
 ;        psect bss
 EnableKeyboard: defs 1
 ;HeapTop EQU 0f980h
-;_$ozlcdstatus equ 0c024h
-;___ozcontrast equ 0c026h
+
 ;Model32k EQU 1
 
 
@@ -447,7 +461,9 @@ ENDIF
 .coords         defw    0       ; Current graphics xy coordinates
 
 base_graphics:	defw A000h	; Address of the Graphics map
-__ozactivepage:	defw 0400h	; Page number for the graph map (0400h for A000h)
+ozactivepage:	defw 0400h	; Page number for the graph map (0400h for A000h)
+ozmodel:	defb    -1	; Set with "ozdetectmodel" (see libraries)
+s_filetypetable: defw    0c089h
 
 .int_seed       defw    0       ; Seed for integer rand() routines
 

@@ -6,23 +6,25 @@
 ;       Simply does a swap...
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.1 2002-11-20 14:15:19 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.2 2003-10-14 08:36:19 stefano Exp $
 ;
 
                 XLIB    swapgfxbk
 		XDEF	swapgfxbk1
 
-		XREF	__ozactivepage
+		XREF	ozactivepage
 
 ;.iysave		defw	0
 
 
 .swapgfxbk
-	        ld      bc,(__ozactivepage)
+		push	bc
+	        ld      bc,(ozactivepage)
 	        ld      a,c
 	        out     (3),a
 	        ld      a,b
 	        out     (4),a
+	        pop	bc
 ;	        ld	(iysave),iy
 		ret
 
