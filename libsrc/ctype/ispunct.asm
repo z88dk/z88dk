@@ -1,10 +1,13 @@
 ;
-; Small C z88 Character functions
-; Written by Dominic Morris <djm@jb.man.ac.uk>
+;	Small C z88 Character functions
+;	Written by Dominic Morris <djm@jb.man.ac.uk>
 ;
-; 1/3/99 djm
+;	1/3/99 djm
 ;
-; Hurrah, this is our first table for our isxxx routines!
+;	Hurrah, this is our first table for our isxxx routines!
+;
+;	$Id: ispunct.asm,v 1.2 2001-04-17 08:05:14 stefano Exp $
+;
 
                 XLIB    ispunct
 

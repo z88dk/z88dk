@@ -6,6 +6,8 @@
 ;
 ;       djm 1/3/99
 ;
+;	$Id: toascii.asm,v 1.2 2001-04-17 08:05:14 stefano Exp $
+;
 
                 XLIB    toascii
 

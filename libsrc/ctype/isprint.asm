@@ -1,12 +1,14 @@
 ;
-;       Small C+ Library
+;	Small C+ Library
 ;
-;       ctype/isprint(char c)
+;	ctype/isprint(char c)
 ;
-;       djm 23/12/99
+;	djm 23/12/99
 ;
 ;	Okay, printable for the z88 is:
 ;	7,10,13,32-126,163?
+;
+;	$Id: isprint.asm,v 1.2 2001-04-17 08:05:14 stefano Exp $
 ;
 
 

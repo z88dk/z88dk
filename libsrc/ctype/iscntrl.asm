@@ -1,10 +1,13 @@
 ;
-; Small C z88 Character functions
-; Written by Dominic Morris <djm@jb.man.ac.uk>
+;	Small C z88 Character functions
+;	Written by Dominic Morris <djm@jb.man.ac.uk>
 ;
-; 1/3/99 djm
+;	1/3/99 djm
 ;
-; Stylish, this returned the wrong way! (djm 17/5/99)
+;	Stylish, this returned the wrong way! (djm 17/5/99)
+;
+;	$Id: iscntrl.asm,v 1.2 2001-04-17 08:05:14 stefano Exp $
+;
 
                 XLIB    iscntrl
 

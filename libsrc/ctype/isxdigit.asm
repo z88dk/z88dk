@@ -1,10 +1,13 @@
 ;
-; Small C+ z88 Character functions
-; Written by Dominic Morris <djm@jb.man.ac.uk>
+;	Small C+ z88 Character functions
+;	Written by Dominic Morris <djm@jb.man.ac.uk>
 ;
-; 1/3/99 djm
+;	1/3/99 djm
 ;
-; This routine is a little bit unwieldy to say the least
+;	This routine is a little bit unwieldy to say the least
+;
+;	$Id: isxdigit.asm,v 1.2 2001-04-17 08:05:14 stefano Exp $
+;
 
                 XLIB    isxdigit
 
