@@ -1,4 +1,4 @@
-PROGS = hello keyget dstar enigma gfx smile cube mandel
+PROGS = hello keyget dstar enigma gfx smile cube mandel ansi
 
 all: $(PROGS)
 
@@ -31,13 +31,13 @@ mandel: mandel.c
 	zcc +sam -vn mandel.c -o mandel -lm
 
 rpn:
-	zcc +zx -vn rpn.c -o rpn.bin -lndos
+	zcc +sam -vn rpn.c -o rpn -lndos
 
 adv:
-	zcc +zx -vn adv_a.c -o adv_a.bin -lndos
+	zcc +sam -vn adv_a.c -o adv_a -lndos
 
-ansitest:
-	zcc +zxansi -vn ansitest.c -o ansitest.bin -lndos
+ansi:
+	zcc +samansi -vn ansitest.c -o ansitest -lndos
 
 
 clean:

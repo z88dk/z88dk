@@ -9,7 +9,7 @@
 ;       Define for graphics and other standard library functions
 ;
 ;
-;	$Id: grafix.inc,v 1.9 2002-11-20 14:15:19 stefano Exp $
+;	$Id: grafix.inc,v 1.10 2003-02-04 09:10:20 stefano Exp $
 ;
 
 
@@ -131,8 +131,3 @@ DEFVARS 0
         type    ds.b    1       ;
         graph   ds.b    1       ;0=text 1=graphics
 }
-
-
-
-
-

@@ -20,8 +20,6 @@
 #define MAX_X2  128.0
 #define MAX_Y2   32.0
 
-/* struct window win;    /* Window structure */
-
 main()
 {
         double x[NODES], y[NODES], z[NODES];
@@ -33,16 +31,6 @@ main()
         int node;
 
         vx=0; vy=0; vz=0;
-/* Next line not needed */
-/*        mx=MAX_X2; my=MAX_Y2; */
-	/*
-    win->graph=1;
-    win->width=255;
-    win->number='4';
-	*/
-        /* Open map with width 256 on window #4 */
-	/*    window(win); */
-
 
         x[0]=-SIZE; y[0]=-SIZE; z[0]=-SIZE;
         x[1]=-SIZE; y[1]= SIZE; z[1]=-SIZE;
@@ -91,5 +79,4 @@ main()
                 draw(x[2]+mx,y[2]+my,x[6]+mx,y[6]+my);
                 draw(x[1]+mx,y[1]+my,x[5]+mx,y[5]+my);
         }
-	/*        closegfx(win); */
 }

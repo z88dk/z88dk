@@ -1,23 +1,21 @@
 ;
-;       SAM Coupe C Library
+;       SAM Coupé C Library
 ;
 ;	Print character to the screen
 ;
 ;       We will corrupt any register
 ;
-;       Stefano Bodrato - Mar.2001
 ;
+;	Frode Tennebø - 29/12/2002
 ;
-;	$Id: fputc_cons.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.3 2003-02-04 09:10:25 stefano Exp $
 ;
-
 
           XLIB  fputc_cons
 
 ;
-; Entry:        hl points char to print
+; Entry:        char to print on stack
 ;
-
 
 .fputc_cons
 
@@ -31,4 +29,3 @@
 		jp	$014E
 .nocls
 		jp	$10
-

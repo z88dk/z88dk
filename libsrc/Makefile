@@ -4,13 +4,13 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.56 2002-12-08 15:24:43 dom Exp $
+# $Id: Makefile,v 1.57 2003-02-04 09:10:14 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
 	nc_clib.lib vz_clib.lib vzansi_clib.lib cpm_clib.lib \
 	mz_clib.lib mzansi_clib.lib \
-	abc80_clib.lib aceansi_clib.lib sam_clib.lib \
+	abc80_clib.lib aceansi_clib.lib sam_clib.lib samansi_clib.lib \
 	msx_clib.lib svi_clib.lib m5_clib.lib cpc_clib.lib \
 	c128ansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
 	rex_clib.lib zx81_clib.lib zx81ansi_clib.lib pps_clib.lib \
@@ -612,18 +612,37 @@ rex_clib.lib:
 	cd rex    ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORrex -xrex_clib.lib @rex6000.lst
 
-# Sam Coupe library - Stefano
+# Sam Coupe library - Stefano & Frode
 sam_clib.lib:
 	@echo ''
 	@echo '--- Building Sam Coupe Library  ---'
 	@echo ''
+	./gfxdeps.sh
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
 	cd stdio ; $(MAKE) generic
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
+	./gamesdeps.sh
+	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORsam -xsam_clib @sam.lst
+
+# Sam Coupe library - Stefano & Frode
+samansi_clib.lib:
+	@echo ''
+	@echo '--- Building Sam Coupe ANSI Library  ---'
+	@echo ''
+	./gfxdeps.sh
+	cd strings ; $(MAKE)
+	cd stdlib ; $(MAKE) gen
+	cd stdio ; $(MAKE) generic
+	cd printflike ; $(MAKE) 
+	cd setjmp ; $(MAKE) 
+	cd assert ; $(MAKE) 
+	./gamesdeps.sh
+	cd games ; $(MAKE)
+	z80asm -d -ns -nm -Mo -DFORsam -xsamansi_clib @samansi.lst
 
 # Spectravideo SVI library - Stefano
 svi_clib.lib:

@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: sam_crt0.asm,v 1.5 2002-04-24 08:15:02 stefano Exp $
+;       $Id: sam_crt0.asm,v 1.6 2003-02-04 09:10:13 stefano Exp $
 ;
 
 
@@ -38,7 +38,7 @@
 
         XDEF    _vfprintf
 
-;Exit variables
+; Exit variables
 
         XDEF    exitsp
         XDEF    exitcount
@@ -46,7 +46,7 @@
        	XDEF	heaplast	;Near malloc heap variables
 	XDEF	heapblocks
 
-;For stdin, stdout, stder
+; For stdin, stdout, stder
 
         XDEF    __sgoioblk
 
@@ -54,8 +54,11 @@
         XDEF    base_graphics
         XDEF    coords
 
-; Now, getting to the real stuff now!
+; Sound stuff
 
+        XDEF    snd_tick
+
+; Now, getting to the real stuff now!
 
 
 
@@ -64,10 +67,6 @@
 
 .start
          ld      (start1+1),sp
-;        ld      hl,-64
-;        add     hl,sp
-;        ld      sp,hl
-;        ld      (exitsp),sp
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -163,6 +162,10 @@ ENDIF
                 defw    0
 .exitcount
                 defb    0
+
+IF DEFINED_NEED1bitsound
+.snd_tick       defb    0       ; Sound variable
+ENDIF
 
 ; Heap stuff
 
