@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.11 2002-06-09 17:49:44 dom Exp $
+ * $Id: stdlib.h,v 1.12 2002-11-20 19:50:51 dom Exp $
  */
 
 extern __LIB__ abs(int);
@@ -69,6 +69,14 @@ extern char __LIB__ *itoa(char *buf, int num);
 /* Define a system() function - only valid for z88 shell */
 extern int system(char *text);
 #endif
+
+
+extern int __LIB__  getopt (int, char **, const char *);
+extern   char *optarg;                  /* getopt(3) external variables */
+extern   int opterr;
+extern   int optind;
+extern   int optopt;
+extern   int optreset;
 
 
 
