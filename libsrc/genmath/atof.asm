@@ -345,11 +345,6 @@ defc DEFINED_atof = 1
 	push	bc
 	ld	hl,38	;const
 	call	l_gt
-	jp	nc,i_21
-	ld	hl,i_1+0
-	push	hl
-	call	puts
-	pop	bc
 	ld	hl,0	;const
 	pop	de
 	pop	bc
