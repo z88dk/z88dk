@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.7 2001-09-03 09:59:36 dom Exp $
+ *      $Id: const.c,v 1.8 2002-01-14 10:01:40 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -41,6 +41,7 @@ LVALUE *lval ;
 		    immedlit(litlab);
 		    outdec(lval->const_val); nl();
 		    callrts("__atof2");
+                    WriteDefined("math_atof",1);
 		} else {
 		    immedlit(dublab);
 		    outdec(lval->const_val); nl();
