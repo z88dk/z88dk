@@ -2,9 +2,10 @@
 ;       Long functions
 ;	"8080" mode
 ;	Stefano - 29/4/2002
+;	$Id: l_long_sub.asm,v 1.2 2002-05-02 07:56:02 stefano Exp $
 ;
 
-                XLIB    l_long_sub
+	XLIB    l_long_sub
 
 
 ;primary = secondary - primary
@@ -17,27 +18,27 @@
         
         ld      hl,0
         add     hl,sp   ;points to hl on stack
-
-        ld      a,c
-        sub     a,(hl)
+	
+        ld      a,(hl)
+        sub     c
         inc     hl
         ld      c,a
-
-        ld      a,b
-        sbc     a,(hl)
+	
+        ld      a,(hl)
+        sbc     a,b
         inc     hl
         ld      b,a
-
-        ld      a,e
-        sbc     a,(hl)
+	
+        ld      a,(hl)
+        sbc     a,e
         inc     hl
         ld      e,a
-
-        ld      a,d
-        sbc     a,(hl)
+	
+        ld      a,(hl)
+        sbc     a,d
 	inc	hl
         ld      d,a
-
+        
 	ld	sp,hl
 	
         ld      l,c     ;get the lower 16 back into hl
