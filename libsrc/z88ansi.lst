@@ -149,3 +149,8 @@ games/bit_fx
 games/bit_frequency
 games/bit_beep
 games/z88/beeper
+rs232/z88/rs232_close
+rs232/z88/rs232_get
+rs232/z88/rs232_init
+rs232/z88/rs232_params
+rs232/z88/rs232_put
