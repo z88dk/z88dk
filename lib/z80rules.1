@@ -612,7 +612,7 @@
 	inc	hl
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	z,%1
 
 	push	de
 	ld	hl,-1	;const
