@@ -1829,3 +1829,42 @@
 	ld	hl,%2
 =
 	ld	hl,%2
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	ld	(%1),a
+	ld	hl,%2
+=
+	ld	a,(hl)
+	ld	(%1),a
+	ld	hl,%2
+
+	xor	a
+	ld	(%1),a
+	xor	a
+	ld	(%2),a
+=
+	xor	a
+	ld	(%1),a
+	ld	(%2),a
+
+	ld	%1,%2
+	ld	(%3),%1
+	ld	%1,%2
+	ld	(%4),%1
+=
+	ld	%1,%2
+	ld	(%3),%1
+	ld	(%4),%1
+
+	ld	hl,%1
+	ld	a,h
+	or	l
+	jp	%2
+	ld	hl,%1
+=
+	ld	hl,%1
+	ld	a,h
+	or	l
+	jp	%2
