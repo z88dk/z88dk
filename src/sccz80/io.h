@@ -24,7 +24,7 @@ extern void bell(void);
 extern void ol(char *ptr);
 extern void ot(char *ptr);
 extern void blanks(void);
-extern void outdec(int number);
+extern void outdec(long number);
 extern void outd2(int n);
 extern char raise(char c);
 extern void queuelabel(int);

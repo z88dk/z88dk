@@ -3,7 +3,7 @@
  *
  *      Various compiler file i/o routines
  *
- *      $Id: io.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: io.c,v 1.2 2002-01-20 23:28:19 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -293,7 +293,7 @@ void blanks()
 
 
 void outdec(number)
-int number;
+long number;
 {
         if ( number < 0 ) {
 		number=-number;

@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.8 2001-11-18 21:10:00 dom Exp $
+ *      $Id: codegen.c,v 1.9 2002-01-20 23:28:19 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -1666,7 +1666,7 @@ void vlongconst(unsigned long val)
  * load constant into primary register
  */
 void vconst(val)
-int val ;
+long val ;
 {
 	if ( val < 0 )
 		val += 65536;
@@ -1679,7 +1679,7 @@ int val ;
  * load constant into secondary register
  */
 void const2(val)
-int val ;
+long val ;
 {
 	if ( val < 0 )
 		val += 65536;
