@@ -1,0 +1,44 @@
+File I/O and z88dk
+------------------
+
+Many machines supported by z88dk support multiple types of disc system, 
+for this reason it is desirable to make it as easy as possible to switch 
+between them. To this end, the file libraries for certain targets have now
+been separated out from the main machine library and located in separate 
+libraries. The routines which gave been isolated are:
+
+close
+creat
+open
+open_z88
+read
+readbyte
+remove
+rename
+write
+writebyte
+
+Which are all the routines required to enable file i/o. A dummy library 
+called ndos.lib has been created which contains minimal stubs for these 
+routines which simply return an error value.
+
+Unfortunately, this means that if you don't require file i/o you have to 
+supply an extra parameter for the compile, but I believe the flexibility 
+of being able to switch between different DOS systems is worthwhile.
+
+So far, a file library has only been prepared for one system besides the 
+z88 (whose file i/o routines remain integrated) and that is for the 
+Spectrum.
+
+Spectrum:
+
+A file i/o library has been prepared for the +3, this hasn't been tested 
+but it should just work! To use it compile thusly:
+
+zcc +zx -DPLUS3 [files] -lp3
+
+To compile with no/dummy file io routines use:
+
+zcc +zx [files] -lndos
+
+In future

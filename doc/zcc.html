@@ -1,6 +1,6 @@
 <HTML>
 <HEAD>
-<TITLE>Z88 Development Kit v1.3 sccz80v1.10b0.70 - 17/4/2000</TITLE>
+<TITLE>Z88 Development Kit v1.33 sccz80v1.10b0.70 - XX/X/2001</TITLE>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF" TEXT="#000000">
 <A NAME="top"></A>
@@ -41,12 +41,13 @@ archive for more information</P>
 <H2><A NAME="intro"></A>Introduction</A></H2>
 
 <P>The z88 Development Kit (hereafter known as z88dk) is an advanced set of
-tools allowing the production of complex programs for the Cambridge Computers
-z88 in either C or assembly language.</P>
+tools allowing the production of complex programs for z80 based computers 
+in either C or assembly language.</P>
 
 <P>Although titled <I>z88</I>dk this a little bit misleading; as supplied
-the kit produces code for both the z88 and the ZX Spectrum and can be easily
-retargetted to any z80 based machine with the minimum of effort.
+the kit produces code for over a dozen z80 based machines and can be easily
+retargetted to any z80 based machine with the minimum of effort (see the file 
+<A HREF="retarget.txt">retarget.txt</A> for details on how to do this.)
 
 <P>z88dk consists of the Z80 Module Assembler (z80asm) from Interlogic, a
 highly extended Small C+ compiler as well as various libraries implementing
@@ -156,7 +157,7 @@ cd [directory where you installed it]/bin
 execute startzcc
 ;ENDF Z88DK</PRE>
 
-<P>MSDOS Installation</H4>
+<P>MSDOS/Win32 Installation</H4>
 
 <P>Grab the executables from Dennis' homepage?</P>
 
@@ -209,7 +210,7 @@ single executable if desired.</P>
      -lgfx         Link in the graphics routines (for BASIC progams)
      -lgfxapp      Link in the graphics routines (for applications)
      -lz88         Link in some Z88 application routines (eg mailboxing)
-     -lnet	   Link the ths socket routines for ZSock
+     -lnet	   Link the the socket routines for ZSock
      -m            Generate .map files when assembling/linking
 </PRE>
 
@@ -256,6 +257,8 @@ single executable if desired.</P>
      -Wn[num]      Turn off the compiler warning [num]
      -W[num]       Turn on the compiler warning [num]
      -asxx	   Cause the compiler to emit asxx compatible code
+     -Cp[option]   Pass an option through to the pre-processor
+     -Ca[option]   Pass an option through to the assembler
 </PRE>
 
 <P>In addition, the flags, -D, -I, -U are passed through to the preprocessor.</P>
@@ -270,8 +273,8 @@ that it can be easily tweaked, retargetted and generally mutilated, the
 frontend (zcc) consults a plain text configuration file which is in the
 directory pointed to be the ZCCCFG variable.</P>
 
-<P>The default is to use the file ZCCCFG/zcc.cfg which by default is for
-the z88. Should you be compiling for a different machine then simply 
+<P>The default is to use the file ZCCCFG/zcc.cfg which by default is a softlink to the configuration file for
+the z88. Should you mainly be targetting a different machine then simply 
 change the softlink to the appropriate file.</P>
 
 <P>Should you want to occasionally compile for other machines then as
@@ -281,7 +284,8 @@ the construct your zcc line thusly:</P>
 
 <P>Where name is either z88, zx (Spectrum), or vz (for the VZ200/300 port).
 If you wish to use a config file located in the current directory or anywhere
-else on the system then specify the full path and filename.</P>
+else on the system then specify the full path and filename - make sure the
+filename as the suffix .cfg.</P>
 
 <P>Finally, for the sake of backwards compatibility zcc will take the value
 of the environmental variable ZCCFILE and use that config file.</P>
@@ -328,7 +332,7 @@ true cross compiler which can produce z80 code from any machine.</P>
 see the ubiquitous K&R - "The C Programming Language", if you want details
 about the compiler try and find the now out of print "The Small-C Handbook"
 by James E Hendrix. Information on the original incarnation of the
-compiler is available on a <A HREF="http://www.ddj.com">Dr Dobbs</A> CDROM, though at $50 it could be considered overpriced.</P>
+compiler is available from <A HREF="http://www.ddj.com">Dr Dobbs</A> CDROM, though at $50 it could be considered overpriced.</P>
 
 <H3><A NAME="compdatat"></A>Datatypes Supported by the Compiler</H3>
 
@@ -374,9 +378,8 @@ of themselves, but may contain pointers to instances of themselves. Passing
 structures to a function is not permitted i.e. the only legal way a
 structure can occur in a function argument is as a pointer.</P>
 
-<P><A HREF="far.html">Far</A> pointers are now supported, although there is
-no library code which will support them, so any attempted compilation will
-fail.</P>
+<P><A HREF="far.html">Far</A> pointers are now supported, although library
+code only exists for the z88.</P>
 
 <H2><A NAME="compcode"></A>Writing Code</H2>
 
@@ -447,9 +450,7 @@ main()
 #endasm</PRE>
 
 <P>Not perhaps the best example ever, but it illustrates its use - you can
-also return longs (kept in dehl) and chars (in hl)</P>
-
-
+also return longs (kept in dehl) and chars (in h=0,l)</P>
 
 <P>There is another feature of this version of Small C which could potentially 
 be of much use if you were combining an existing assembler and a C program. 
@@ -575,8 +576,7 @@ assembler, briefly these are:
         <LI> ..whilst not sacrificing generic z80 compatibility
         <LI> A good general purpose assembler for assembly projects
         <LI> Most of the Z88 community is familar with the syntax
-        <LI> Still being actively developed...
-        <LI> ...but not by me(!)
+        <LI> Still being actively developed.
 
 </UL>
 
@@ -587,14 +587,14 @@ used:</P>
 <UL>
         <LI> Ability to specify an output file
         <LI> Ability to define scope of variables labels anywhere within a .asm file (goodbye .hdr!!)
-        <LI> Errors no give the module name in which they occurred
+        <LI> Errors now give the module name in which they occurred
         <LI> Text is now defined in .asm files via defm (OK, it's not a new
 feature in z80asm, but it's new for sccz80!) - this can result in a
 decrease in assembly time.
 </UL>
 
 <P>In future z80asm is due to gain sections, these will of course be used
-by z88dk allowing more library routines to be used in applications.</P>
+by z88dk allowing more library routines to be used in z88 applications.</P>
 
 <HR>
 
@@ -648,10 +648,6 @@ main()
 
 <P>Don't forget to link with -lmalloc</P>
 
-<P><B>WARNING!</B> I've only tested a few of these functions (and corrected
-a few bugs!) so I can't guarantee their correct function, you may well have
-to delve into the libsrc/ directory to see whats up. Please let me know
-which ones you've used and whether they work or not!</P>
 
 <HR>
 <H2><A NAME="examples"></A>Example Programs</H2>
@@ -730,7 +726,8 @@ code. I've tried to fix them but they may still occasionally go wrong.</P>
 <P><B>8.3.99</B></P>
 
 <P><B>---></B>The supplied preprocessor is ANSI C and doesn't strip //
-style comments - solution don't use them or use the -// flag.</P>
+style comments - solution don't use them or use the -// flag. The compiler
+should strip // style comments however.</P>
 
 <P>So, I guess you're here cos your code doesn't work? Have you checked it
 - I mean have you really checked it? Does it make sense, there are no
@@ -772,3 +769,5 @@ Morris</A> &lt;dom@jb.man.ac.uk&gt;
 </BODY>
 </HTML>
  
+
+

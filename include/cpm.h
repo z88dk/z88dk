@@ -3,8 +3,8 @@
 
 /* CP/M specific stuff */
 
-/* $Id: cpm.h,v 1.1 2001-04-30 19:14:50 dom Exp $ */
+/* $Id: cpm.h,v 1.2 2001-05-01 13:58:43 dom Exp $ */
 
-extern __LIB__ int bdos(int func,int arg);
+extern int __LIB__ bdos(int func,int arg);
 
 #endif
