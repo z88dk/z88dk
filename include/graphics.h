@@ -10,6 +10,7 @@
  *      Stefano has converted many of these routines to the new ports
  *      Some will work, some will not. djm 6/6/2000
  *
+ *	$Id: graphics.h,v 1.3 2001-04-20 16:04:24 dom Exp $
  */
 
 #ifndef _GFX_H

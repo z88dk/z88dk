@@ -5,6 +5,8 @@
  * Some hooks for the stdio style routines
  *
  * Do not include yourself - system file!!
+ *
+ * $Id: stdio.h,v 1.2 2001-04-20 16:04:25 dom Exp $
  */
 
 

@@ -6,6 +6,8 @@
  *      Routines for the conversiono between network and host types
  *
  *      djm 24/4/99
+ *
+ *	$Id: hton.h,v 1.2 2001-04-20 16:04:25 dom Exp $
  */
 
 

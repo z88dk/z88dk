@@ -19,6 +19,8 @@
  * These routines are not supported!!!
  *
  * djm 4/4/2000
+ *
+ * $Id: z88stdio.h,v 1.3 2001-04-20 16:04:24 dom Exp $
  */
 
 

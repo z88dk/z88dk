@@ -8,6 +8,8 @@
  *	Defines and stuff for the stat functions.
  *	We try to be good and emulate as much a possible
  *	Hence all these silly defs!
+ *
+ *	$Id: stat.h,v 1.2 2001-04-20 16:04:25 dom Exp $
  */
 
 struct stat {

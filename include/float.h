@@ -4,6 +4,8 @@
 /*
  *	Some more floating point routines..I can't remember
  *	why these are separated out..
+ *
+ *	$Id: float.h,v 1.3 2001-04-20 16:04:24 dom Exp $
  */
 
 

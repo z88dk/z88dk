@@ -1,3 +1,5 @@
+/* $Id: tftp.h,v 1.2 2001-04-20 16:04:25 dom Exp $ */
+
 /*
  * Copyright (c) 1983 Regents of the University of California.
  * All rights reserved.

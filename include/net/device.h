@@ -2,6 +2,8 @@
  *	Defs for a ZSock device driver
  *
  *	djm 25/1/2000
+ *
+ *	$Id: device.h,v 1.4 2001-04-20 16:04:25 dom Exp $
  */
 
 #ifndef _NET_DEVICE_H

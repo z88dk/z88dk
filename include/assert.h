@@ -12,6 +12,8 @@
  *
  *      djm 28/2/2000
  *
+ *	$Id: assert.h,v 1.2 2001-04-20 16:04:24 dom Exp $
+ *
  */
 
 #ifndef _ASSERT_H

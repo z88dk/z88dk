@@ -6,6 +6,8 @@
  *
  *	Stefano, Jan 2001
  *
+ *	$Id: games.h,v 1.2 2001-04-20 16:04:24 dom Exp $
+ *
  */
 
 

@@ -4,6 +4,8 @@
  *	Socket orientated routines
  *
  *	djm 13/2/2000
+ *
+ *	$Id: socket.h,v 1.3 2001-04-20 16:04:25 dom Exp $
  */
 
 #ifndef __NET_SOCKET_H

@@ -18,6 +18,8 @@
  *      library routines
  *
  *      djm 1/4/99
+ *
+ *	$Id: dor.h,v 1.2 2001-04-20 16:04:24 dom Exp $
  */
 
 

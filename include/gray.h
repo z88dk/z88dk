@@ -4,6 +4,8 @@
 /*
  * Gray Library.  Originally written for TI calcs but
  * hopefully it will grow in the future...
+ *
+ * $Id: gray.h,v 1.3 2001-04-20 16:04:24 dom Exp $
  */
 
 #pragma output GRAYlib

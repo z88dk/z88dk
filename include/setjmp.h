@@ -6,6 +6,8 @@
  *	I've *never* used these functions in either 
  *	Small C or big C..I'd never consider doing it
  *	either!
+ *
+ *	$Id: setjmp.h,v 1.2 2001-04-20 16:04:24 dom Exp $
  */
 
 

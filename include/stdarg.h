@@ -15,6 +15,8 @@
  *
  *	I've only tested this with 2 byte arguments but it 
  *	seems to work...
+ *
+ *	$Id: stdarg.h,v 1.2 2001-04-20 16:04:24 dom Exp $
  */
 
 #ifndef _STDARG_H

@@ -2,6 +2,8 @@
  * It is considered good programming practice to use these definitions, 
  * instead of the underlying base type.  By convention, all type names end 
  * with _t.
+ *
+ * $Id: types.h,v 1.2 2001-04-20 16:04:25 dom Exp $
  */
 
 #ifndef _TYPES_H

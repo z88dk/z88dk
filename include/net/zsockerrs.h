@@ -10,6 +10,8 @@
  *	djm 7/1/2000
  *
  *	Still not sure how to tie these in....
+ *
+ *	$Id: zsockerrs.h,v 1.2 2001-04-20 16:04:25 dom Exp $
  */
 
 #define EOK		0	/* Hey we're fine! RC_OK */

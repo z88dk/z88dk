@@ -3,6 +3,8 @@
 
 /* Control file for include relevent TIXX stuff */
 
+/* $Id: ti.h,v 1.2 2001-04-20 16:04:24 dom Exp $ */
+
 #ifdef __TI83__
 #include <ti/ti83>
 #endif

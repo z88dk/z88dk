@@ -4,6 +4,8 @@
 /*
  *	This file is included by the ZSock kernel
  *	**DO NOT USE IN USER PROGRAMS!!
+ *
+ *	$Id: resolver.h,v 1.2 2001-04-20 16:04:25 dom Exp $
  */
 
 /* Max domain name size to play with */

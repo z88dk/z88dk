@@ -4,6 +4,8 @@
  *      time.h - Time related functions
  *
  *      djm 9/1/2000
+ *
+ *	$Id: time.h,v 1.5 2001-04-20 16:04:24 dom Exp $
  */
 
 

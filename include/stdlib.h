@@ -4,6 +4,8 @@
 /*
  * Lots of nice support functions here and a few defines
  * to support some functions
+ *
+ * $Id: stdlib.h,v 1.7 2001-04-20 16:04:24 dom Exp $
  */
 
 extern __LIB__ abs(int);

@@ -9,6 +9,8 @@
  *	used in my programs
  *
  *	BSDisms are catered for by #defines..
+ *
+ *	$Id: string.h,v 1.4 2001-04-20 16:04:24 dom Exp $
  */
 
 

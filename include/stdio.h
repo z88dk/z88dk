@@ -1,6 +1,8 @@
 #ifndef _STDIO_H
 #define _STDIO_H
 
+/* $Id: stdio.h,v 1.4 2001-04-20 16:04:24 dom Exp $ */
+
 #ifdef FDSTDIO
 #include <z88stdio.h>
 #else

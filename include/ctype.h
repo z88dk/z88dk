@@ -1,6 +1,8 @@
 #ifndef CTYPE_H
 #define CTYPE_H
 
+/* $Id: ctype.h,v 1.2 2001-04-20 16:04:24 dom Exp $ */
+
 
 extern __LIB__ isalpha(char);
 extern __LIB__ isalnum(char);

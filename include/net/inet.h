@@ -6,6 +6,8 @@
  *      Defines all constants
  *
  *      djm 24/4/99
+ *
+ *	$Id: inet.h,v 1.5 2001-04-20 16:04:25 dom Exp $
  */
 
 

@@ -1,5 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
+ *
+ * $Id: spectrum.h,v 1.2 2001-04-20 16:04:24 dom Exp $
  */
 
 #ifndef _SPECTRUM_H_

@@ -4,6 +4,8 @@
  *      defs needed solely by initial config
  *
  *      djm 29/1/2000
+ *
+ *	$Id: zsfiles.h,v 1.2 2001-04-20 16:04:25 dom Exp $
  */
 
 #ifndef _NET_ZSFILES_H

@@ -18,6 +18,8 @@
  *      for details on these brutes...it ain't fun!!
  *
  *	Packages are now supported (work for 16k packages)
+ *
+ *	$Id: application.h,v 1.2 2001-04-20 16:04:24 dom Exp $
  */
 
 #ifndef HELP1

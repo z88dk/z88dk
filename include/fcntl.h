@@ -4,6 +4,8 @@
  *      fnctl.h - low level file routines
  *
  *      djm 27/4/99
+ *
+ *	$Id: fcntl.h,v 1.3 2001-04-20 16:04:24 dom Exp $
  */
 
 

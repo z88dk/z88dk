@@ -9,6 +9,8 @@
  *	for TCP stack - pkts recvd etc
  *
  *	djm 28/1/2000
+ *
+ *	$Id: netstats.h,v 1.3 2001-04-20 16:04:25 dom Exp $
  */
 
 typedef unsigned int nstat_t;
