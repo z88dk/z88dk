@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.7 2003-01-21 10:34:56 dom Exp $
+;       $Id: spec_crt0.asm,v 1.8 2003-03-22 14:34:20 dom Exp $
 ;
 
 
@@ -42,6 +42,16 @@
 ;--------
 ; Set an origin for the application (-zorg=) default to 32768
 ;--------
+
+        IF DEFINED_ZXVGS
+        IF !myzorg
+                DEFC    myzorg = $5CCB  ;repleaces BASIC program
+        ENDIF
+        IF !STACKPTR
+                DEFC    stack = $FF57  ;below UDG, keep eye when using banks
+        ENDIF
+        ENDIF
+
         
         IF      !myzorg
                 defc    myzorg  = 32768
@@ -50,11 +60,22 @@
 
 
 .start
+IF !DEFINED_ZXVGS
         ld      (start1+1),sp	;Save entry stack
+ENDIF
+IF 	stack
+	ld	sp,stack
+ENDIF
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
+IF DEFINED_ZXVGS
+;setting variables needed for proper keyboard reading
+        LD      (IY+1),$CD      ;FLAGS #5C3B
+        LD      (IY+48),1       ;FLAGS2 #5C6A
+        EI                      ;ZXVGS starts with disabled interrupts
+ENDIF
 	ld	a,2		;open the upper display (uneeded?)
 	call	5633
 IF !DEFINED_nostreams
@@ -80,11 +101,17 @@ IF DEFINED_ANSIstdio
 	call	closeall
 ENDIF
 ENDIF
-	ld	hl,10072	;Restore hl' to what basic wants
-	exx
-	pop	bc
-.start1	ld	sp,0		;Restore stack to entry value
+IF DEFINED_ZXVGS
+        POP     BC              ;let's say exit code goes to BC
+        RST     8
+        DEFB    $FD             ;Program finished
+ELSE
+        ld      hl,10072        ;Restore hl' to what basic wants
+        exx
+        pop     bc
+.start1 ld      sp,0            ;Restore stack to entry value
         ret
+ENDIF
 
 .l_dcal	jp	(hl)		;Used for function pointer calls
 
