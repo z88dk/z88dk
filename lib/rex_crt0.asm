@@ -10,12 +10,9 @@
 
 	jp	start
 .start
-	ld	hl,65535
+; Make room for the atexit() stack
+	ld	hl,65535-64
 	ld	sp,hl
-; Now handle the atexit() stack..
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
         ld      (exitsp),sp
 
         ld      hl,$8080
