@@ -10,11 +10,13 @@ cos
 cosh
 dadd
 ddiv
+deq
 dge
 dgt
 dleq
 dlt
 dmul
+dne
 dsub
 dswap
 exp
