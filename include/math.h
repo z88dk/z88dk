@@ -1,7 +1,7 @@
 #ifndef __MATH_H__
 #define __MATH_H__
 
-/* $Id: math.h,v 1.7 2003-08-30 16:41:13 dom Exp $ */
+/* $Id: math.h,v 1.8 2003-08-30 18:59:35 dom Exp $ */
 
 
 extern double __LIB__ acos(double);  /* arc cosine */
@@ -27,10 +27,12 @@ extern double __LIB__ atof(char *);
 #endif
 
 /* Some additional CPC only routines now */
-#ifdef __CPC__
+#if __CPC__ && __NATIVE_MATH__
 extern double __LIB__ pow10(int x);         /* pow(1,x) - CPC only */
 extern void __LIB__ deg();
 extern void __LIB__ rad();
+extern double __LIB__ pi();
+#elif __Z88__ && __NATIVE_MATH__
 extern double __LIB__ pi();
 #endif
 
