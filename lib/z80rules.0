@@ -120,6 +120,24 @@
 	ld	bc,%4-(%1)-1
 	add	hl,bc
 
+	pop	hl
+	push	hl
+	ld	bc,%1
+	add	hl,bc
+	ld	(hl),%2
+	pop	hl
+	push	hl
+	ld	bc,%3
+	add	hl,bc
+=
+	pop	hl
+	push	hl
+	ld	bc,%1
+	add	hl,bc
+	ld	(hl),%2
+	ld	bc,%3-(%1)
+	add	hl,bc
+
 	ld	hl,%1	;const
 	push	hl
 	call	l_gint	;%3

@@ -1575,10 +1575,10 @@
 	pop	bc
 	ret
 =
+	pop	bc
 	ld	a,h
 	or	l
 	ret	z
-	pop	bc
 	push	hl
 	jp	%1
 
@@ -2139,3 +2139,9 @@
 	ld	hl,%2
 =
 	ld	hl,%2
+
+	jp	%1
+
+
+.%1
+=
