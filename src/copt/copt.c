@@ -12,6 +12,10 @@
 #include <regex.h>
 #endif
 
+#ifdef _MSC_VER
+#define strcasecmp stricmp
+#endif
+
 #define HSIZE 107
 #define MAXLINE 256
 #define MAXFIRECOUNT 65535
