@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.18 2002-12-09 18:49:47 dom Exp $
+ *      $Id: zcc.c,v 1.19 2003-03-13 14:50:30 dom Exp $
  */
 
 
@@ -134,6 +134,8 @@ void AddComp(char *);
 void AddPreProc(char *);
 void AddToPreProc(char *);
 void AddToAssembler(char *);
+void AddAppmake(char *);
+void AddToAppmake(char *);
 void AddLink(char *);
 void DispInfo(void);
 void DispVer(char *);
@@ -154,8 +156,8 @@ void SetShowErrs(char *);
 void SetLibMake(char *);
 void SetPreserve(char *);
 void SetCreateApp(char *);
-void SetNoTruncate(char *);
 void SetShortObj(char *);
+void SetLateAssemble(char *);
 
 void *mustmalloc(int);
 int  hassuffix(char *, char *);
@@ -167,6 +169,7 @@ int  FindSuffix(char *);
 void BuildAsmLine(char *, char *);
 void ParseArgs(char *);
 void BuildOptions(char **, char *);
+void BuildOptions_start(char **, char *);
 void CopyOutFiles(char *);
 void ParseOpts(char *);
 void SetNormal(char *,int);
@@ -190,34 +193,36 @@ int FindConfigFile(char *, int);
 
 
 struct args myargs[]= {
-        {"z80-verb",NO,SetZ80Verb},
-        {"cleanup",NO,SetCleanUp},
-        {"no-cleanup",NO,UnSetCleanUp},
-        {"make-lib",NO,SetLibMake},
-        {"preserve",NO,SetPreserve},
-        {"create-app",NO,SetCreateApp},
-        {"usetemp",NO,SetTemp},
-        {"notemp",NO,UnSetTemp},
+    {"z80-verb",NO,SetZ80Verb},
+    {"cleanup",NO,SetCleanUp},
+    {"no-cleanup",NO,UnSetCleanUp},
+    {"make-lib",NO,SetLibMake},
+    {"preserve",NO,SetPreserve},
+    {"make-app",NO,SetLateAssemble},
+    {"create-app",NO,SetCreateApp},
+    {"usetemp",NO,SetTemp},
+    {"notemp",NO,UnSetTemp},
 	{"Cp",YES,AddToPreProc},
 	{"Ca",YES,AddToAssembler},
-        {"E",NO,SetPreProcessOnly},
-        {"R",NO,SetRelocate},
-        {"D",YES,AddPreProc},
-        {"U",YES,AddPreProc},
-        {"I",YES,AddPreProc},
-        {"l",YES,AddLink},
-        {"O",YES,SetPeepHole},
-        {"h",NO,DispVer},
-        {"v",YES,SetVerbose},
-        {"c",NO,SetCompileOnly},
-        {"a",NO,SetAssembleOnly},
-        {"m",NO,SetOutputMap},
-        {"s",NO,SetOutputSym},
-        {"o",YES,SetOutputFile},
-	{"nt",NO,SetNoTruncate},
+    {"Cz",YES,AddToAppmake},
+    {"E",NO,SetPreProcessOnly},
+    {"R",NO,SetRelocate},
+    {"D",YES,AddPreProc},
+    {"U",YES,AddPreProc},
+    {"I",YES,AddPreProc},
+    {"l",YES,AddLink},
+    {"O",YES,SetPeepHole},
+    {"h",NO,DispVer},
+    {"v",YES,SetVerbose},
+    {"c",NO,SetCompileOnly},
+    {"a",NO,SetAssembleOnly},
+    {"m",NO,SetOutputMap},
+    {"s",NO,SetOutputSym},
+    {"o",YES,SetOutputFile},
+	{"nt",NO,AddAppmake},
 	{"M",NO,SetShortObj},
 	{"+",NO,AddPreProc},	/* Strips // comments in vcpp */
-        {"",0,0}
+    {"",0,0}
 };
 
 
@@ -258,6 +263,7 @@ int     usetemp         = 1;
 #endif
 int     preserve        = 0;    /* don't destroy zcc_opt */
 int     createapp       = 0;    /* Go the next stage and create the app */
+int     lateassemble    = 0;
 int     z80verbose      = 0;
 int     cleanup         = 1;
 int     assembleonly    = 0;
@@ -270,7 +276,6 @@ int     ncppargs        = 0;
 int     preprocessonly  = 0;
 int     relocate        = 0;
 int     crtcopied       = 0; /* Copied the crt0 code over? */
-int	notruncat	= 0; /* Truncate file pages? */
 int	gargc;		     /* Copies of argc and argv */
 char	**gargv;	
 /* filelist has to stay as ** because we change suffix all the time */
@@ -283,6 +288,7 @@ char    *cpparg;
 char    *comparg;
 char    *linkargs;
 char	*asmargs;
+char	*appmakeargs;
 
 char    outfilename[FILENAME_MAX+1];
 char	extension[5];
@@ -420,7 +426,7 @@ int linkthem(linker)
                 asmline="-easm ";
 
         n = (strlen(myconf[LINKER].def) + 1);
-        if (createapp)
+        if (lateassemble)
                 n+=strlen(asmline);     /* patch for z80asm */
         n += (strlen("-nm -nv -o -R -M ")+strlen(outputfile));
         n += (strlen(linkargs) + 1);
@@ -434,12 +440,13 @@ int linkthem(linker)
 
 
         sprintf(p, "%s %s -o%s ", linker,myconf[LINKOPTS].def,outputfile);
-        if      (createapp)             /* patch */
+        if      (lateassemble)             /* patch */
                 strcat(p,asmline);      /* patch */
         if      (z80verbose)
                 strcat(p,"-v ");
         if      (relocate) {
-                if (createapp) fprintf(stderr,"Cannot relocate an application..\n");
+                if (lateassemble) 
+                    fprintf(stderr,"Cannot relocate an application..\n");
                 else strcat(p,"-R ");
         }
         strcat(p,linkargs);
@@ -450,7 +457,7 @@ int linkthem(linker)
 
         for (i = 0; i < nfiles; ++i)
         {
-                if ( (!createapp && hassuffix(filelist[i], OBJEXT) ) || createapp )
+                if ( (!lateassemble && hassuffix(filelist[i], OBJEXT) ) || lateassemble )
                 {
                         strcat(p, " ");
                         filelist[i][strlen(filelist[i])-strlen(OBJEXT)]='\0';
@@ -658,9 +665,8 @@ int main(argc, argv)
  * Copy the z88_crt0.opt file over to /tmp or t: and use it as the
  * startup code...trickery ahoy!!!
  */
-        CopyCrt0();     /* Cop out and use a function to do it - main()
-                         * is toooo large!!
-                         */
+        CopyCrt0();     /* Cop out and use a function to do it - main() is too large! */
+
 
 
 
@@ -699,12 +705,12 @@ int main(argc, argv)
 					break;
 				default:
                                 	BuildAsmLine(asmarg,"-easm");
-                                	if (!assembleonly && !createapp)
+                                	if (!assembleonly && !lateassemble)
                                         	if (process(".asm", OBJEXT, myconf[Z80EXE].def, asmarg , outimplied,i,NO)) exit(1);
                         }
                         case OFILE:
                         BuildAsmLine(asmarg,"-eopt");
-                        if (!assembleonly && !createapp)
+                        if (!assembleonly && !lateassemble)
                                 if (process(".opt", OBJEXT, myconf[Z80EXE].def, asmarg , outimplied,i,NO)) exit(1);
                         break;
                 }
@@ -726,16 +732,13 @@ int main(argc, argv)
 /*
  * Building an application - run the appmake command on it
  */
-		if (notruncat == 0 )
-					snprintf(buffer,sizeof(buffer),"%s %s %s",myconf[APPMAKE].def,outputfile,myconf[CRT0].def);
-		else
-					snprintf(buffer,sizeof(buffer),"%s %s %s -nt",myconf[APPMAKE].def,outputfile,myconf[CRT0].def);
-
-                if (verbose) printf("%s\n",buffer);
-                if (system(buffer) ){
-                        fprintf(stderr,"Building application code failed\n");
-                        exit(1);
-                }
+            snprintf(buffer,sizeof(buffer),"%s %s -b %s -c %s",myconf[APPMAKE].def,appmakeargs ? appmakeargs : "",outputfile,myconf[CRT0].def);	
+            if (verbose) 
+                printf("%s\n",buffer);
+            if (system(buffer) ){
+                fprintf(stderr,"Building application code failed\n");
+                exit(1);
+            }
         }
         if (mapon && usetemp ) {
                 char    *oldptr;
@@ -813,6 +816,12 @@ void SetCreateApp(char *arg)
         createapp=YES;
 }
 
+void SetLateAssemble(char *arg)
+{
+    lateassemble = YES;
+    AddComp("-make-app");
+}
+
 void SetCompileOnly(char *arg)
 {
         compileonly=YES;
@@ -886,6 +895,17 @@ void AddToAssembler(char *arg)
 	BuildOptions(&linkargs,arg+2);
 }
 
+void AddToAppmake(char *arg)
+{
+	BuildOptions(&appmakeargs,arg+2);
+}
+
+void AddAppmake(char *arg)
+{
+    BuildOptions(&appmakeargs,arg-1);
+}
+
+
 void AddToPreProc(char *arg)
 {
 	BuildOptions(&cpparg,arg+2);
@@ -917,11 +937,11 @@ void AddLink(char *arg)
         if (strcmp(arg,"lmz")==0) {
 		AddComp(myconf[Z88MATHFLG].def+1); 
 			snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[Z88MATHLIB].def);
-			BuildOptions(&linkargs,buffer);
+			BuildOptions_start(&linkargs,buffer);
 		return;
 	} else if (strcmp(arg,"lm") == 0 ) {
 			snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[GENMATHLIB].def);
-			BuildOptions(&linkargs,buffer);
+			BuildOptions_start(&linkargs,buffer);
 		return;
 	}
 
@@ -931,7 +951,7 @@ void AddLink(char *arg)
  * Build what the option will be and stick it in..
  */
 		snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,arg+1);
-		BuildOptions(&linkargs,buffer);
+		BuildOptions_start(&linkargs,buffer);
 
 }
 
@@ -958,6 +978,28 @@ void BuildOptions(char **list, char *arg)
         strcat(temparg,arg);
         strcat(temparg," ");
 }
+
+void BuildOptions_start(char **list, char *arg)
+{
+     char      *temparg;
+     int        len;
+     char      *orig = *list;
+ 
+     len = 2 + strlen(arg) + ( orig ? strlen(orig) : 0 );
+ 
+     if ( ( temparg = malloc(len) ) == NULL ) {
+         fprintf(stderr,"Out of memory\n");
+         exit(1);
+     }
+ 
+     *list = temparg;  /* Set the pointer to the new string */
+     strcpy(temparg,arg);
+     strcat(temparg," ");
+     strcat(temparg,orig);
+ 
+     free(orig);
+}
+
 
 
 void AddComp(char *arg)
@@ -1027,10 +1069,7 @@ void SetRelocate(char *arg)
         relocate=YES;
 }
 
-void SetNoTruncate(char *arg)
-{
-	notruncat=YES;
-}
+
 
 void SetShortObj(char *arg)
 {
