@@ -5,7 +5,7 @@
  *	djm 15/4/2000
  */
 
-/* Specify that we want to use far routines (do this be any includes) */
+/* Specify that we want to use far routines (do this before any includes) */
 #define FARDATA 1
 
 /* sccz80 magic, make application and far heapsize is 16384 */
