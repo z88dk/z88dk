@@ -5,7 +5,7 @@
 /*
  * Now some trickery to link in the correct routines for far
  *
- * $Id: malloc.h,v 1.3 2001-10-16 18:30:32 dom Exp $
+ * $Id: malloc.h,v 1.4 2002-05-22 20:13:15 dom Exp $
  */
 
 
@@ -20,19 +20,13 @@
 #define HEAPSIZE(bp)    unsigned char heap[bp]; 
 
 
-/* If INTMALLOC is defined then it assumed that these routines have been
- * included in the source that you are compiling. This is only the case
- * for ZSock
- */
-
-#ifndef INTMALLOC
 extern void __LIB__ *calloc(int,int); 
 extern void __LIB__ *malloc(int);
 extern void __LIB__ free(void *);
 extern int __LIB__ getfree();
 extern int __LIB__ getlarge();
 extern void __LIB__ heapinit(int);
-#endif
+extern void __LIB__ *realloc_down(void *,int);
 
 #else
 
