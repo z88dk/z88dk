@@ -78,8 +78,11 @@ rex/DbInsertText
 rex/DbDeleteText
 rex/DsTrace
 rex/farcall/farcall
-rex/farcall/farret
+rex/farcall/farcalld
+rex/farcall/findlib
 rex/farcall/farres
+rex/farcall/farret
+rex/farcall/wrpar
 rex/farcall/wrpar1
 rex/farcall/rdpar1
 rex/farcall/wrpar2
