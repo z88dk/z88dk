@@ -1,0 +1,166 @@
+$Id: compile.txt,v 1.1 2001-06-06 15:22:07 stefano Exp $
+-------------------------------------------------------------------------------
+Compiling with the z88dk             ; By Henk Poley ;             05-jun-2001
+-------------------------------------------------------------------------------
+
+general compilation command:
+zcc [flags] file(s)
+ [+..]
+   - Config file to load (must be the first argument)
+     zcc.cfg is used by default. See below for the arguments.
+ [-startup=..]
+   - Startup header to use (see other docs for more information)
+ [-l..]
+   - Link this library (see below and in zcc.html)
+ [-o..]
+   - Binary output file (standard a.bin)
+ file(s)
+   - File(s) to compile
+
+Controlling steps of the compilation process:
+ [-E]
+   - Preprocess files only, leave output in .i file
+ [-a]
+   - Produce .asm (or .opt) file only (aka don't assemble)
+ [-c]
+   - Do not link object files
+ [-make-lib]
+    - Shortcut to generate .o files from library .c files
+ [-m]
+   - Generate .map files when assembling/linking
+     (When compiling libs)
+
+Options to control the type code produced:
+ [-O[0,1,2,3]]
+   - Optimize compiler output (to .opt file)
+     Can be either 0 (none) 1,2,3, level 2 is recommended. Level 3 is
+     suitable for large programs (includes certain lib functions to
+     reduce size of code(!))
+ [-cc]
+   - Intersperse C code as comments in the assembler output,
+     WARNING: this *will* clobber some optimizations.
+
+Options to control compiler functions:
+ [-unsigned]
+   - Implicitly define everything as unsigned unless explicitly told otherwise.
+     (will optimize much better)
+ [-smartpf]
+   - Intelligent printf routine handling (see zcc.html for more info)
+ [-no-smartpf]
+   - Turn off the intelligent printf handling
+
+Z88 specific:
+ [-create-app]
+   - Create an application image (i.e. bank 63,62 etc)
+ [-make-app]
+   - (App) Notify the compiler that you're trying to make an application
+ [-reqpag=..]
+   - (App) Number of 256 byte pages required for bad application
+ [-zorg=..]
+   - (App) Origin for a Z88 application
+ [-safedata=..]
+   - (App) Amount of safedata required by your code
+ [-defvars=..]
+   - (App) Where static variables should be dropped (only valid for single
+      file compilations, but see later)
+ [-expandz88]
+   - (App) Expanded z88 required
+ [-no-expandz88]
+   - (App) Expanded z88 not required (these two flags toggle some startup
+      code to check for an expanded machine)
+ [-startup=3]
+   - Produce standalone code that can be run from a set address from BASIC.
+     Use -zorg= to change the address
+ [-R]
+   - (Use with above) produces relocatable code that can be loaded into
+      a DIM'd BASIC array.
+ [-stackoffset]
+   - Sets the stack offset for shared libs (see package.txt for details)
+
+Miscellaneous options:
+ [-v]
+   - Verbose - echo commands as they are executed
+ [-vn]
+   - Don't be verbose
+ [-Wall]
+   - Turn on all the compiler warnings
+ [-Wnone]
+   - Turn off all compiler warnings
+ [-Wn[num]]
+   - Turn off the compiler warning [num]
+ [-W[num]]
+   - Turn on the compiler warning [num]
+ [-z80-verb]
+   - Allow z80asm to be verbose, this tends to generate a lot of output to
+     the screen so may not be desired.
+ [-asxx]
+   - Cause the compiler to emit asxx compatible code
+ [-Cp..]
+   - Pass an option through to the pre-processor
+ [-Ca..]
+   - Pass an option through to the assembler
+ [-D, -I, -U]
+   - are passed through to the preprocessor.
+
+Any unrecognised options are passed through to the compiler (to allow
+for improvements in the future.)
+
+-------------------------------------------------------------------------------
+ [+..]
+     abc80        (ABC80)
+     aceansi      (Jupiter ACE, using VT-ANSI engine)
+     cpm          (CP/M)
+     msx          (MSX 1)
+     mz           (Sharp MZ)
+     mzansi       (Sharp MZ, using VT-ANSI)
+     nc           (Amstrad NC100)
+     rex          (REX 6000)
+     sam          (Sam Coupe)
+     svi          (Spectravideo SVI)
+     m5           (SORD M5)
+     ti82         (Ti82, using ROM text routines)
+     ti82ansi     (Ti82, using VT-ANSI)
+     ti83         (Ti83 ...)
+     ti83ansi     (Ti83 ...)
+     ti85         (Ti85 ...)
+     ti85ansi     (Ti85 ...)
+     ti86         (Ti86 ...)
+     ti86ansi     (Ti86 ...)
+     ti8x         (Ti83+ ...)
+     [ti8xansi]   (Ti83+ ...)
+     vz           (VZ / Laser 200)
+     vzansi       (VZ / Laser 200, using VT-ANSI)
+     z88          (Cambridge Z88)
+     z88ansi      (Cambridge Z88, using VT-ANSI)
+     z88net       (Cambridge Z88 with TCP/IP)
+     zx           (ZX Spectrum)
+     zx81         (ZX 81)
+     zx81ansi     (ZX 81, using VT-ANSI)
+     zxansi       (ZX Spectrum, using VT-ANSI)
+
+-------------------------------------------------------------------------------
+
+ [-startup=..]
+See other documentation to learn what -startup is used for.
+Like:
+     Ti.txt       Compiling for the Ti82, Ti83(+), Ti85 and Ti86
+
+-------------------------------------------------------------------------------
+
+ [-l..]
+     farz88       (Z88 far support)
+     gfx          (Z88 BASIC graphics lib)
+     gfxapp       (Z88 application graphics lib)
+     m            (Generic math routines)
+     malloc       (Generic near malloc routine)
+     mz           (OZ's math routines)
+     ndos         (Fake file-routines, return errors only)
+     net          (Z88 socket routines for ZSock)
+     netdev
+     p3
+     tigray82     (Ti82 graylib routines)
+     tigray83     (Ti83 ...)
+     tigray83p    (Ti83+ ...)
+     tigray85     (Ti85 ...)
+     tigray86     (Ti86 ...)
+     z88          (Some Z88 application routines, like mailboxing)

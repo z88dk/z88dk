@@ -1,4 +1,3 @@
-$Id: windows.txt,v 1.1 2001-06-06 14:01:55 stefano Exp $
 -------------------------------------------------------------------------------
 Setting up the z88dk for Windows9x         ; By Henk Poley ;        05-jun-2001
 -------------------------------------------------------------------------------
@@ -43,7 +42,7 @@ cp      -> copy
 DESTDIR -> {z88dk} (remove the "DOS" backslash at the end!)
 /       -> \       ("unix" slashes into "DOS" backslashes)
 
-Restart your PC and there you go. For info about using the z88dk please revert to other documentation found in the {z88dk}\doc\ directory.
+Restart your PC and there you go. For info about using the z88dk please revert to other documentation found in the {z88dk}\doc\ directory, like compile.txt and zcc.html.
 
 	Have a nice day,
 	Henk Poley

@@ -1,10 +1,9 @@
-$Id: ti.txt,v 1.1 2001-05-29 12:43:00 stefano Exp $
 -------------------------------------------------------------------------------
-Compiling for the Ti82, Ti83, Ti85 and Ti86    ; By Henk Poley ;    28-mai-2001
+Compiling for the Ti82, Ti83(+), Ti85 and Ti86   ; By Henk Poley ;  05-jun-2001
 -------------------------------------------------------------------------------
 
 general compilation command:
-zcc [+..] [-startup=..] [-o..] [-l..] file(s)
+zcc [+..] [-startup=..] [-o..] [-l..] [flags] file(s)
  [+..]
    - Config file to load:
      Ti82
@@ -28,6 +27,8 @@ zcc [+..] [-startup=..] [-o..] [-l..] file(s)
      tigray83p
      tigray85
      tigray86
+ [flags]
+   - For other flags see compile.txt
  file(s)
    - File(s) to compile
 
@@ -43,7 +44,7 @@ compiles for CrASH (always)
  - If you just don't use the streams at all (no text and file-stuff)
 
 #pragma output atexit
- - If you use the atexit() command
+ - If you use the atexit() command (uses 64 bytes extra stack). 
 
 -------------------------------------------------------------------------------
 
@@ -62,7 +63,7 @@ zcc [+..] [-startup=..] [-o..] [-l..] file(s)
    5 - Ti-Explorer, AShell; SOS, Anova (same as 6)
    6 - AShell, Ti-Explorer; SOS, Anova (same as 5)
    7 - SOS; Anova
-   8 - Venus Explorer; Venus
+   8 - Venus Explorer (VE); Venus
    9 - Ion, Ti-Explorer; ZASMLOAD, plain TIOS
   10 - Plain TIOS, ZASMLOAD
   
@@ -70,7 +71,7 @@ zcc [+..] [-startup=..] [-o..] [-l..] file(s)
  - program description, max 22 characters (approx)
 
 #pragma data icon xx,xx,xx;
- - shell icon 5, 7, or 8 bytes long
+ - shell icon 5 (Anova), 7 (VE), or 8 (rest) bytes long.
    Bigger icons won't brake anything, they are just displayed truncated
    (with most of the shells). Standard icon is "C+".
 
@@ -78,7 +79,7 @@ zcc [+..] [-startup=..] [-o..] [-l..] file(s)
  - If you just don't use the streams at all (no text and file-stuff)
 
 #pragma output atexit
- - If you use the atexit() command
+ - If you use the atexit() command (uses 64 bytes extra stack). 
 
 -------------------------------------------------------------------------------
 
@@ -121,7 +122,7 @@ zcc -startup =
  - If you just don't use the streams at all (no text and file-stuff)
 
 #pragma output atexit
- - If you use the atexit() command
+ - If you use the atexit() command (uses 64 bytes extra stack). 
 
 -------------------------------------------------------------------------------
 
@@ -135,7 +136,7 @@ compiles for Rigel (always)
  - If you just don't use the streams at all (no text and file-stuff)
 
 #pragma output atexit
- - If you use the atexit() command
+ - If you use the atexit() command (uses 64 bytes extra stack). 
 
 -------------------------------------------------------------------------------
 
@@ -162,4 +163,4 @@ zcc -startup =
  - If you just don't use the streams at all (no text and file-stuff)
 
 #pragma output atexit
- - If you use the atexit() command
+ - If you use the atexit() command (uses 64 bytes extra stack). 
