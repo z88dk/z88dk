@@ -4,7 +4,7 @@
 	INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: pixladdr.asm,v 1.4 2004-06-30 12:50:56 stefano Exp $
+;	$Id: pixladdr.asm,v 1.5 2004-07-09 08:57:09 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -40,6 +40,8 @@
 
 .pixeladdress
 
+	push	bc
+
 	ld	a,maxy
 	sub	l
 	
@@ -65,5 +67,6 @@
 .grayaltpage
 	nop
 
+	pop	bc
 	ret
 
