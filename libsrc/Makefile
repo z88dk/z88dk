@@ -1,7 +1,10 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.53 2002-11-20 14:15:19 stefano Exp $
+# Problems? Contact the person to blame(!) above the section
+# for the library
+#
+# $Id: Makefile,v 1.54 2002-11-20 20:05:31 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -26,30 +29,28 @@ tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 zxlibs: zx_clib.lib zxan_clib.lib
 
 
-# Garry's z88 far library
+# Garry's z88 far library - garry (probably dom now)
 farz88.lib:
 	@echo ''
 	@echo '--- Building Z88 Far Malloc Library  ---'
 	@echo ''
 	cd farz88 ; $(MAKE)
 
-# Generic maths build
+# Generic maths build - dom
 m.lib:
 	@echo ''
 	@echo '--- Building Z80 Generic Maths Library  ---'
 	@echo ''
 	cd genmath; $(MAKE)
 
-# Z88 maths build
-
+# Z88 maths build - dom
 mz.lib:
 	@echo ''
 	@echo '--- Building Z88 Maths Library  ---'
 	@echo ''
 	cd z88math; $(MAKE)
 
-# Graphics library (for both app and basic - diff libs though!)
-
+# Graphics library (for both app and basic - diff libs though!) - dom
 gfx.lib:
 	@echo ''
 	@echo '--- Building Z88 BASIC gfx Library  ---'
@@ -59,6 +60,7 @@ gfx.lib:
 	./gfxdeps.sh
 	z80asm -d -ns -nm -Mo -xgfxapp -DAPPZ88 -DFORz88 @z88gfx.lst
 
+# simple malloc library - dom
 malloc.lib:
 	@echo ''
 	@echo '--- Building Near Malloc Library  ---'
@@ -68,32 +70,28 @@ malloc.lib:
 ndos.lib:
 	cd fcntl/dummy ; $(MAKE)
 
-# Startup code (such as division etc) common to all z80s
-
+# Startup code (such as division etc) common to all z80s - dom
 z80_crt0.lib:
 	@echo ''
 	@echo '--- Building Z80 crt0 Library  ---'
 	@echo ''
 	cd z80_crt0s ; $(MAKE)
 
-# Custom z88 routines for application
-
+# Custom z88 routines for application - dom
 z88.lib:
 	@echo ''
 	@echo '--- Building Z88 Custom Library  ---'
 	@echo ''
 	cd z88 ; $(MAKE)
 
-# ZSock API (wrappers to package calls)
-
+# ZSock API (wrappers to package calls) - dom
 net.lib:
 	@echo ''
 	@echo '--- Building Z88 ZSock Library  ---'
 	@echo ''
 	cd net ; $(MAKE)
 
-# The heavy beast, contains all the other routines
-
+# z88 library - dom
 z88_clib.lib:
 	@echo ''
 	@echo '--- Building Z88 Library  ---'
@@ -111,7 +109,7 @@ z88_clib.lib:
 	cd games ; $(MAKE)
 	z80asm -z80-verb -d -ns -nm -Mo -DFORz88 -xz88_clib @z88.lst
 
-
+# z88 ansi library - dom
 z88ansi_clib.lib:
 	@echo ''
 	@echo '--- Building Z88 ANSI Library  ---'
@@ -127,8 +125,7 @@ z88ansi_clib.lib:
 	cd assert ; $(MAKE) 
 	z80asm -d -ns -nm -Mo -xz88ansi_clib @z88ansi.lst
 
-# Network stdio
-
+# Network stdio - dom
 z88net_clib.lib:
 	@echo ''
 	@echo '--- Building Z88 Network Aware Library  ---'
@@ -144,8 +141,7 @@ z88net_clib.lib:
 	cd assert ; $(MAKE) 
 	z80asm -d -ns -nm -Mo -xz88net_clib @z88net.lst
 
-# 64/32 column library for ZX Spectrum
-
+# 64/32 column library for ZX Spectrum - dom/stefano
 zx_clib.lib:
 	@echo ''
 	@echo '--- Building ZX Spectrum Library  ---'
@@ -165,6 +161,7 @@ zx_clib.lib:
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORzx -xzx_clib @zx.lst
 
+# vt100 for sprinter - dom
 ppsansi_clib.lib:
 	@echo ''
 	@echo '--- Building Sprinter Library  ---'
@@ -184,9 +181,10 @@ ppsansi_clib.lib:
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORzx -xppsansi_clib @ppsansi.lst
 
+# Native for sprinter - dom
 pps_clib.lib:
 	@echo ''
-	@echo '--- Building Sprinter ANSI Library  ---'
+	@echo '--- Building Sprinter Library  ---'
 	@echo ''
 	./gfxdeps.sh
 	cd strings ; $(MAKE)
@@ -203,10 +201,9 @@ pps_clib.lib:
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORzx -xpps_clib @pps.lst
 
-# vt100 C lib for spectrum
+# vt100 C lib for spectrum - stefano/dom
 # use -DROMFONT for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
-
 zxan_clib.lib:
 	@echo ''
 	@echo '--- Building ZX Spectrum ANSI Library  ---'
@@ -227,8 +224,7 @@ zxan_clib.lib:
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORzx -DROMFONT -xzxan_clib @zxansi.lst
 
-# Untested C lib for NC100 machinens
-
+# Untested C lib for NC100 machines - dom
 nc_clib.lib:
 	@echo ''
 	@echo '--- Building Amstrad NC100 Library  ---'
@@ -242,7 +238,6 @@ nc_clib.lib:
 	z80asm -d -ns -nm -Mo -xnc_clib @nc100.lst
 
 # VZ200/300 lib - Stefano
-
 vz_clib.lib:
 	@echo ''
 	@echo '--- Building VZ200/300 Library  ---'
@@ -257,7 +252,6 @@ vz_clib.lib:
 	z80asm -d -ns -nm -Mo -DFORvz -xvz_clib @vz200.lst
 
 # VZ200 ansi lib - Stefano
-
 vzansi_clib.lib:
 	@echo ''
 	@echo '--- Building VZ200/300 ANSI Library  ---'
@@ -272,7 +266,6 @@ vzansi_clib.lib:
 	z80asm -d -ns -nm -Mo -DFORvz -xvzansi_clib @vzansi.lst
 
 # ZX81 lib - Stefano
-
 zx81_clib.lib:
 	@echo ''
 	@echo '--- Building ZX81 Library  ---'
@@ -287,7 +280,6 @@ zx81_clib.lib:
 	z80asm -IXIY -d -ns -nm -Mo -DFORzx81 -xzx81_clib @zx81.lst
 
 # ZX81 ansi lib - Stefano
-
 zx81ansi_clib.lib:
 	@echo ''
 	@echo '--- Building ZX81 ANSI Library  ---'
@@ -301,10 +293,9 @@ zx81ansi_clib.lib:
 	cd assert ; $(MAKE) 
 	z80asm -IXIY -d -ns -nm -Mo -DFORzx81 -xzx81ansi_clib @zx81ansi.lst
 
-# Texas Instrument's calculators:
+# Texas Instrument's calculators: - stefano/henk
 # almost the same lib code with different -D flag set
 # that's why we force most of the lib code to be rebuilt (tideps.sh)
-
 ti82ansi_clib.lib:
 	@echo ''
 	@echo '--- Building TI82 ANSI Library  ---'
@@ -491,9 +482,8 @@ tigray86.lib:
 	./tideps.sh
 	z80asm -d -ns -nm -Mo -DFORti86 -xtigray86 @tigray.lst
 
-# vt100 C lib for the Sharp OZ family
+# vt100 C lib for the Sharp OZ family - stefano
 # use -DPACKEDFONT for tiny 50->80 column modes
-
 ozansi_clib.lib:
 	@echo ''
 	@echo '--- Building Sharp OZ family ANSI Library  ---'
@@ -510,7 +500,7 @@ ozansi_clib.lib:
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORoz -DPACKEDFONT -xozansi_clib @ozansi.lst
 
-# CPM lib - Stefano
+# CPM lib - Stefano/dom
 cpm_clib.lib:
 	@echo ''
 	@echo '--- Building CP/M Library ---'
@@ -701,6 +691,7 @@ c128ansi_clib.lib:
 	./gfxdeps.sh
 	z80asm -d -ns -nm -Mo -DFORc128 -xc128ansi_clib @c128ansi.lst
 
+# embedded target - contributed by Daniel Wallner
 embedded_clib.lib:
 	@echo ''
 	@echo '--- Building Embedded (ns16450) Library  ---'
