@@ -3,4 +3,14 @@ a simple Rex 6000 example..
 
 compile: zcc +rex -o hello.bin hello.c
 
-You'll need to do the makeaddin stuff etc
+If you have compiled mkaddin (from support/) then you can create an
+addin in one go using:
+
+zcc +rex -create-app -o hello.bin hello.c
+
+(hello.bin is an intermediate binary file)
+
+This uses the file hello.res which contains the application name, coment
+and an icon in an obvious format
+
+If hello.res doesn't exist then the defaults are used
