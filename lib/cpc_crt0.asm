@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.5 2002-04-24 08:15:02 stefano Exp $
+;       $Id: cpc_crt0.asm,v 1.6 2003-08-30 16:40:13 dom Exp $
 ;
 
                 MODULE  cpc_crt0
@@ -53,16 +53,19 @@
 
 ; Now, getting to the real stuff now!
 
+        IF      !myzorg
+                defc    myzorg  = $6000
+        ENDIF   
+                org     myzorg
 
-        org     $2000
+
+        org     myzorg
 
 
 .start
 	di
-        ld      hl,0
-        add     hl,sp
-        ld      (start1+1),hl
-        ld      hl,-64
+        ld      (start1+1),sp
+        ld      hl,-6530
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
@@ -78,6 +81,14 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
+
+
+; INIT math identify platform
+IF NEED_floatpack
+        LIB init_floatpack
+        call init_floatpack
+ENDIF
+
         call    _main
 .cleanup
 ;
