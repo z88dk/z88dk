@@ -1,0 +1,44 @@
+Notes on the CPC target
+=======================
+
+
+Floating Point Support
+----------------------
+
+The CPC target supports a native maths library, this is selected using the 
+-lmz switch when compiling.
+
+The library that is linked in by default supports 3 models of CPC - CPC464,
+CPC664 and CPC6128. Should memory be in short supply and you wish to compile
+for a specific CPC then you can do the following:
+
+zcc +cpc [...] -lmz -l6128_math
+
+or -l664_math or -l664_math which will save about 600 bytes of memory.
+
+The native CPC library supports some additional functions, these are:
+
+void deg();
+
+Switch the FP engine into degrees mode
+
+void rad();
+
+Switch the FP engine into radians mode
+
+double pi();
+
+Return the value of pi.
+
+double pow10(int x);
+
+Returns 10^x
+
+
+Application Creation
+--------------------
+
+The appmake has been updated to support the CPC as a target. When compiling
+if you supply the -create-app flag then a file with the suffix .cpc is
+generated. This file contains a CPC disc file header which can then be 
+easily transferred onto a CPC disc using cpcfs or a similar tool.
