@@ -7,8 +7,9 @@
                 LIB     sin
 		LIB	hladd
 
+		XREF	_halfpi
 
-                XREF    halfpi
+
 
 
 
@@ -21,7 +22,7 @@
 ;
 ;       transcendental functions: sin, cos, tan
 ;
-.COS    LD      HL,HALFPI
+.COS    LD      HL,_HALFPI
         CALL    HLADD   
         jp      sin
 

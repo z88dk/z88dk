@@ -6,12 +6,12 @@
                 XLIB    atan
                 LIB     evenpol
 		LIB	hlsub
+                LIB	odd
 
 
                 XREF    sgn
-                XREF    odd
                 XREF    fdiv
-                XREF    halfpi
+                XREF    _halfpi
 		XREF	fa
 
                 XDEF    atncoef
@@ -36,7 +36,7 @@
         PUSH    HL      ;will subtract answer from pi/2
 .ATAN5  LD      HL,ATNCOEF
         CALL    EVENPOL
-        LD      HL,HALFPI      ;may use for subtraction
+        LD      HL,_HALFPI      ;may use for subtraction
         RET     
 ;
 .ATNCOEF 
