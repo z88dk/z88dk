@@ -5,7 +5,7 @@
  *
  *      djm 24/4/99
  *
- *	$Id: tcpsock.h,v 1.4 2002-06-05 22:12:28 dom Exp $
+ *	$Id: tcpsock.h,v 1.5 2002-06-09 15:13:57 dom Exp $
  */
 
 
@@ -144,8 +144,8 @@ TCPSOCKET {
 #define tcp_stateESTAB   4      /* established */
 #define tcp_stateESTCL   5
 #define tcp_stateFINWT1  6      /* sent FIN */
-#define tcp_stateFINWT2  8      /* sent FIN, received FINACK */
-#define tcp_stateCLOSEWT 9
+#define tcp_stateFINWT2  7      /* sent FIN, received FINACK */
+#define tcp_stateCLOSEWT 8
 #define tcp_stateCLOSING 9      /* sent FIN, received FIN (waiting for FINACK) */
 #define tcp_stateLASTACK 10      /* fin received, finack+fin sent */
 #define tcp_stateTIMEWT  11      /* dally after sending final FINACK */

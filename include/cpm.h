@@ -7,7 +7,7 @@
  *    Many of these values have been obtained via reference to
  *    Hitech C
  *
- *    $Id: cpm.h,v 1.4 2002-02-17 22:44:55 dom Exp $
+ *    $Id: cpm.h,v 1.5 2002-06-09 15:13:57 dom Exp $
  */
 
 #include <sys/types.h>
@@ -35,6 +35,8 @@
 #define U_PUN   6               /* device is punch */
 #define U_LST   7               /* list device */
 
+#define __STDIO_EOFMARKER  26   /* End of file marker (^Z) */
+#define __STDIO_BINARY    1     /* We should consider binary */       
 
 struct fcb {
     u8_t    drive;          /* drive code */

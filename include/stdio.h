@@ -1,7 +1,9 @@
 #ifndef __STDIO_H__
 #define __STDIO_H__
 
-/* $Id: stdio.h,v 1.9 2002-06-05 22:12:27 dom Exp $ */
+/* $Id: stdio.h,v 1.10 2002-06-09 15:13:57 dom Exp $ */
+
+#undef __STDIO_BINARY        /* By default don't consider binary files */
 
 #ifdef FDSTDIO
 #include <z88stdio.h>
@@ -10,6 +12,11 @@
 #ifdef __SPECTRUM__
 #include <spectrum.h>
 #endif
+
+#ifdef __CPM__
+#include <cpm.h>
+#endif
+
 
 /*
  * This is the new stdio library - everything is pretty much
@@ -72,6 +79,7 @@ DEFVARS 0 {
 #define _IOEOF          8
 #define _IOSYSTEM      16
 #define _IONETWORK     32
+#define _IOTEXT        64
 #define _IOSTRING     128
 
 
@@ -220,11 +228,6 @@ extern int __LIB__ getk();
 extern void __LIB__ puts_cons();
 extern void __LIB__ printk(char *fmt,...);
 
-/* CPM stuff */
-
-#ifdef __CPM__
-#include <cpm.h>
-#endif
 
 /*
  * Networking stdio routines
