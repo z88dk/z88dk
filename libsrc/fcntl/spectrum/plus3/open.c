@@ -14,7 +14,7 @@
  *	Open a file for writing - e=4, d=2 (creat)
  *	Open a file for append  - e=2, d=2
  *
- *	$Id: open.c,v 1.3 2003-01-28 15:45:08 dom Exp $
+ *	$Id: open.c,v 1.4 2003-10-10 11:05:02 dom Exp $
  */
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */
@@ -23,17 +23,18 @@
 int open(far char *name, int flags, mode_t mode)
 {                                      
 #asm
+	INCLUDE	"#p3dos.def"
 	XREF	dodos
-	ld	ix,0
+	ld	ix,2
 	add	ix,sp
-	ld	a,(ix+3)	;mode high
+	ld	a,(ix+3)	;flags high
 	and	a
 	jr	nz,ck_append
 	ld	a,(ix+2)
 	and	a
-	ld	de,1		;read mode
+	ld	de,$0001	;read mode
 	jr	z,open_it
-	ld	de,1026		;write mode
+	ld	de,$0204	;write mode
 	dec	a
 	jr	z,open_it
 .open_abort
@@ -46,7 +47,7 @@ int open(far char *name, int flags, mode_t mode)
 	ld	a,(ix+2)
 	and	a
 	jr	nz,open_abort	;cant have low byte set
-	ld	de,512		;append mode
+	ld	de,$0202	;append mode
 .open_it
 	push	de
 	call	findhand
@@ -63,8 +64,8 @@ int open(far char *name, int flags, mode_t mode)
 	push	de		;save open mode
 	push	bc		;save file etc
 	push	hl		;save filename
-	ld	e,(ix+6)	;filename
-	ld	d,(ix+7)
+	ld	e,(ix+4)	;filename
+	ld	d,(ix+5)
 	ld	b,15
 .copyloop
 	ld	a,(de)
@@ -79,7 +80,7 @@ int open(far char *name, int flags, mode_t mode)
 	pop	hl
 	pop	bc
 	pop	de
-	ld	iy,262		;DOS_OPEN
+	ld	iy,DOS_OPEN
 	call	dodos
 	ex	af,af		;save flags
 	ld	hl,20		;repair the stack after our storage

@@ -3,7 +3,7 @@
  *
  *	18/3/2000 djm
  *
- *	$Id: write.c,v 1.1 2001-05-01 13:55:21 dom Exp $
+ *	$Id: write.c,v 1.2 2003-10-10 11:05:02 dom Exp $
  */
 
 #include <fcntl.h>
@@ -11,6 +11,7 @@
 size_t write(int handle, void *buf, size_t len)
 {
 #asm
+	INCLUDE "#p3dos.def"
 	XREF	dodos
 	ld	ix,0
 	add	ix,sp
@@ -27,7 +28,7 @@ size_t write(int handle, void *buf, size_t len)
 	ld	b,(ix+6)	;handle
 	ld	c,0		;page FIXME
 	push	de
-	ld	iy,277		;DOS_WRITE
+	ld	iy,DOS_WRITE
 	call	dodos
 	pop	hl		;bytes we wanted to write
 	ret	c		;it went okay

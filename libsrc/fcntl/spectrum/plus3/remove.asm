@@ -7,11 +7,12 @@
 ;
 ;	Being on a +3 we ignore the far stuff
 ;
-;	$Id: remove.asm,v 1.1 2001-05-01 13:55:21 dom Exp $
+;	$Id: remove.asm,v 1.2 2003-10-10 11:05:02 dom Exp $
 
 
 		XLIB	remove
 		XREF	dodos
+		INCLUDE	"#p3dos.def"
 
 
 .remove
@@ -19,7 +20,7 @@
 	pop	hl	;filename
 	push	hl
 	push	bc
-	ld	iy,292	;DOS_DELETE
+	ld	iy,DOS_DELETE
 	call	dodos
 	ld	hl,0
 	ret	c	;OK

@@ -5,9 +5,11 @@
 ;
 ; Not written as yet!
 ;
-; $Id: fdtell.asm,v 1.2 2003-01-28 15:45:04 dom Exp $
+; $Id: fdtell.asm,v 1.3 2003-10-10 11:05:02 dom Exp $
 
 		XLIB	fdtell
+
+	        INCLUDE "#p3dos.def"
 
 		XREF	dodos
 
@@ -17,7 +19,7 @@
 	push	bc
 	push	hl
 	ld	b,c
-	ld	iy,307	;DOS_GET_POSITION
+	ld	iy,DOS_GET_POSITION
 	call	dodos
 	ld	d,0
 	ret	c
