@@ -1,23 +1,39 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.6 2002-04-17 21:30:26 dom Exp $
+# $Id: Makefile,v 1.7 2002-04-21 11:37:20 dom Exp $
 
+CFILES = \
+	DeRegisterInt.c \
+	exec_cli.c \
+	fnexpand.c \
+	getpid.c \
+	nameapp.c \
+	openpopup.c \
+	opentitled.c \
+	openwindow.c \
+	QueryPackage.c \
+	RegisterInt.c \
+	stripdev.c \
+	strippath.c \
+	wcclose.c \
+	wcnext.c \
+	wcopen.c 
+
+AFILES  = $(CFILES:.c=.asm)
+OBJECTS = $(CFILES:.c=.o)
 
 all: blah z88
 
 blah:
 	cd fdstdio ; make
 
-z88:	RegisterInt.o DeRegisterInt.o QueryPackage.o getpid.o nameapp.o \
-	wcopen.o wcnext.o wcclose.o exec_cli.o stripdev.o strippath.o \
-	openpopup.o openwindow.o opentitled.o fnexpand.o
+z88: $(OBJECTS)
 	z80asm -d -ns -nm -Mo -x../z88 @z88list
 
 .c.o:
 	zcc -vn -make-lib $*.c
 
-
 clean:
-	rm -f *.obj *.sym *.map *.o *~ zcc_opt.def
+	rm -f *.obj *.sym *.map *.o* zcc_opt.def *.i $(AFILES)
 	cd fdstdio ; make clean
