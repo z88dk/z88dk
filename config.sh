@@ -28,6 +28,7 @@ sed "s?DESTDIR\/?$destdir?g" < lib/config/ppsansi.lnx > lib/config/ppsansi.cfg
 sed "s?DESTDIR\/?$destdir?g" < lib/config/rex.lnx > lib/config/rex.cfg
 sed "s?DESTDIR\/?$destdir?g" < lib/config/rexlib.lnx > lib/config/rexlib.cfg
 sed "s?DESTDIR\/?$destdir?g" < lib/config/sam.lnx > lib/config/sam.cfg
+sed "s?DESTDIR\/?$destdir?g" < lib/config/samansi.lnx > lib/config/samansi.cfg
 sed "s?DESTDIR\/?$destdir?g" < lib/config/svi.lnx > lib/config/svi.cfg
 sed "s?DESTDIR\/?$destdir?g" < lib/config/ti82.lnx > lib/config/ti82.cfg
 sed "s?DESTDIR\/?$destdir?g" < lib/config/ti82ansi.lnx > lib/config/ti82ansi.cfg
