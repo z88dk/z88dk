@@ -12,8 +12,10 @@
  *      O_APPEND = 256
  *
  *      All others are ignored(!)
+ *
+ * -----
+ * $Id: open.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
  */
-
 
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */

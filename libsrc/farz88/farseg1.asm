@@ -8,6 +8,9 @@
 ;	 A'=binding of seg 1 for local memory (still!)
 ;	 HL=local address (bound to seg 1)
 ;
+;
+; $Id: farseg1.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+;
 
 
 	XLIB	farseg1

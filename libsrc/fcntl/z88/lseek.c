@@ -10,6 +10,9 @@
  *   0  SEEK_SET from start of file
  *   1  SEEK_CUR from current position
  *   2  SEEK_END from end of file (always -ve)
+ *
+ * -----
+ * $Id: lseek.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
  */
 
 

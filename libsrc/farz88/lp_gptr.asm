@@ -4,6 +4,9 @@
 ; Entry: EHL=far pointer
 ; Exit: EHL=pointer stored there...
 
+;
+; $Id: lp_gptr.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+;
 
         XLIB    lp_gptr
 

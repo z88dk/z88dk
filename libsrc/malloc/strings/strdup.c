@@ -5,6 +5,9 @@
  *	Duplicate a string in memory
  *
  *	This requires linking with a malloc library
+ *
+ * -----
+ * $Id: strdup.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
  */
 
 #include <stdlib.h>

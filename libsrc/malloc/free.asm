@@ -13,6 +13,10 @@
 ;	28/4/99 djm, Made check for free(0) and just return if so
 ;
 ;       free(char *)
+;
+;
+; $Id: free.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+;
 
                 XLIB    free
 

@@ -4,6 +4,9 @@
 ; Entry: E'H'L'=far pointer
 ;        FA->FA+5=double
 
+;
+; $Id: lp_pdoub.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+;
 
         XLIB    lp_pdoub
         XREF    fa

@@ -4,6 +4,9 @@
 ; Entry: EHL=far pointer
 ; Exit: HL=word
 
+;
+; $Id: lp_gint.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+;
 
         XLIB    lp_gint
 

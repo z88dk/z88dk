@@ -3,6 +3,9 @@
 ;
 ; This function should be called as part of the tidyup
 ; code for applications or packages using far memory
+;
+; $Id: freeall_far.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+;
 
         XLIB    freeall_far
 

@@ -11,6 +11,10 @@
 ;       Added to Z88dk archive 1/3/99
 ;
 ; char *malloc(int bytes);
+;
+;
+; $Id: malloc.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+;
 
                 XLIB    malloc
                 

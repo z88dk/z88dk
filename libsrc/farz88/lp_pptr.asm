@@ -4,6 +4,9 @@
 ; Entry: E'H'L'=far pointer
 ;        EHL=pointer to write there
 
+;
+; $Id: lp_pptr.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+;
 
         XLIB    lp_pptr
 

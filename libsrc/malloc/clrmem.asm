@@ -12,6 +12,9 @@
 ; 
 ;       Allocate memory for numsize and clear it (set to 0)
 ;
+;
+; $Id: clrmem.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+;
 
 
                 XLIB    clrmem

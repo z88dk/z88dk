@@ -6,6 +6,9 @@
  *	Returns son of current dor (old dor invalid)
  *
  *	djm 13/3/2000
+ *
+ * -----
+ * $Id: brotherdor.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
  */
 
 #include <z88.h>

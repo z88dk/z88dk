@@ -1,3 +1,5 @@
+$Id: README,v 1.2 2001-04-18 14:59:40 stefano Exp $
+
 These files are heavily z88 specific
 Eventually it is hoped to move all Z88 specific io functions
 to this directory and rename it machine_z88

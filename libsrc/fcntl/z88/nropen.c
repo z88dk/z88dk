@@ -17,8 +17,10 @@
  *	since they don't have the startup code
  *
  *	djm 15/4/2000
+ *
+ * -----
+ * $Id: nropen.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
  */
-
 
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */

@@ -2,6 +2,9 @@
 ; 29/3/00 GWL
 ; 30/3/00 Changed size type to long, so >64K mallocs possible
 
+;
+; $Id: malloc_far.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+;
 
         XLIB malloc_far
 

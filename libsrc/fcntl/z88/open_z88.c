@@ -14,8 +14,10 @@
  *      All others are ignored(!) - i.e. mode is ignored
  *
  *	djm 24/3/2000 - Takes a buffer for expanded filename
+ *
+ * -----
+ * $Id: open_z88.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
  */
-
 
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */

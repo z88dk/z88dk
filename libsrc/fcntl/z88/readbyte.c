@@ -4,7 +4,11 @@
  *      readbyte(fd) - Read byte from file
  *
  *      Preserve tabs!!
+ *
+ * -----
+ * $Id: readbyte.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
  */
+
 
 #include <stdio.h>
 #include <fcntl.h>

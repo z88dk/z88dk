@@ -4,7 +4,11 @@
  *      writebyte(int fd, int c) - Read byte from file
  *
  * 	djm 4/5/99
+ *
+ * -----
+ * $Id: writebyte.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
  */
+
 
 #include <stdio.h>
 #include <fcntl.h>

@@ -8,7 +8,10 @@
  *      Close a file descriptor, pretty well identical to
  *      fclose from the other stuff
  *
+ * -----
+ * $Id: read.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
  */
+
 
 #include <sys/types.h>
 #include <fcntl.h>

@@ -6,7 +6,11 @@
  *	djm 13/3/2000
  *
  *	Just a tad z88 specific!
+ *
+ * -----
+ * $Id: stat.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
  */
+
 
 #include <sys/stat.h>
 #include <z88.h>

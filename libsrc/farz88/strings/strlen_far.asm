@@ -1,6 +1,9 @@
 ; strlen function for use with far pointers
 ; 31/3/00 GWL
 
+;
+; $Id: strlen_far.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+;
 
 		LIB farseg1,incfar
                 XLIB strlen_far

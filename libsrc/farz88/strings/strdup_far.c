@@ -5,6 +5,8 @@
  *	Duplicate a string in memory
  *
  *	This requires linking with a malloc library
+ *
+ *	$Id: strdup_far.c,v 1.3 2001-04-18 14:59:40 stefano Exp $
  */
 
 #define FARDATA 1

@@ -4,6 +4,9 @@
 ; Entry: E'H'L'=far pointer
 ;        DEHL=long
 
+;
+; $Id: lp_plong.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+;
 
         XLIB    lp_plong
 
