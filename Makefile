@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.22 2002-10-22 19:14:18 dom Exp $
+#	$Id: Makefile,v 1.23 2002-11-05 11:48:33 dom Exp $
 #
 
 prefix = /usr/local
@@ -71,3 +71,4 @@ clean:
 	cd src/cpp ; $(MAKE) clean
 	cd src/z80asm ; $(MAKE) clean
 	cd lib/config ; $(RM) *.cfg
+	cd lib/clibs ; $(RM) *.lib
