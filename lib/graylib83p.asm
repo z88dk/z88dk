@@ -13,7 +13,7 @@
 ;***** GreyLib version 1.0 (C) 1997 by Bill Nagel & Dines Justesen *********
 ;---------------------------------------------------------------------------
 ;
-; $Id: graylib83p.asm,v 1.3 2001-04-12 13:26:13 stefano Exp $
+; $Id: graylib83p.asm,v 1.4 2001-05-11 07:58:59 stefano Exp $
 ;
 
 	XDEF	graybit1
@@ -21,16 +21,34 @@
 
 defc intcount = $8583
 
-    LD HL,$8300
-    LD DE,$8301
-    LD BC,256
-    LD (HL),$85
-    LDIR
+; Set the IM2 mode vector table to point to the interrupt code...
 
-    LD HL,IntProcStart       ; Get pointer to interrupt rutine
-    LD DE,$8585              ; Start of int ruotine, and length of it
-    LD BC,IntProcEnd-IntProcStart+1
-    LDIR
+	LD HL,$8300
+
+	; Set the IV table
+        
+        ld      (hl),IntProcStart&$FF
+        inc     hl
+        ld      (hl),IntProcStart/256
+        ld	d,h
+        ld	e,l
+	dec	hl
+        inc	de
+        ld	bc,255
+        ldir
+
+; ...otherwise (commented out code):  copy the interrupt routine in RAM
+
+;    LD HL,$8300
+;    LD DE,$8301
+;    LD BC,256
+;    LD (HL),$85
+;    LDIR
+;
+;    LD HL,IntProcStart       ; Get pointer to interrupt rutine
+;    LD DE,$8585              ; Start of int ruotine, and length of it
+;    LD BC,IntProcEnd-IntProcStart+1
+;    LDIR
 
     XOR A                    ; Init vars
     LD (intcount),A

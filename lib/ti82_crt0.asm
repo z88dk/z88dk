@@ -2,18 +2,11 @@
 ;
 ;       Stefano Bodrato - Dec 2000
 ;
-;       $Id: ti82_crt0.asm,v 1.7 2001-04-12 13:26:13 stefano Exp $
+;       $Id: ti82_crt0.asm,v 1.8 2001-05-11 07:58:59 stefano Exp $
 ;
 
 
                 MODULE  z88_crt0
-
-;
-; Initially include the zcc_opt.def file to find out lots of lovely
-; information about what we should do..
-;
-
-                INCLUDE "zcc_opt.def"
 
 ; No matter what set up we have, main is always, always external to
 ; this file
@@ -58,7 +51,23 @@
 
         org     $9104	; TI 82. Same for ASH and CrASH
 
-        defm  	"C+ compiled program"&0
+;
+; Initially include the zcc_opt.def file to find out lots of lovely
+; information about what we should do..
+;
+
+	DEFINE NEED_name	; zcc_opt.def can have the programs namestring
+				; #pragma string name xxxx
+	INCLUDE "zcc_opt.def"
+	UNDEFINE NEED_name
+
+ IF DEFINED_NEED_name
+	; If namestring is provided, add small compiler ident
+	defm	" - Small C+"&0
+ ELSE
+	; If no namestring provided, display full compiler ident
+	defm	"Z88DK Small C+ Program"&0
+ ENDIF
 
 .start
         ld      hl,0

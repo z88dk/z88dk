@@ -13,22 +13,25 @@
 ;***** GreyLib version 1.0 (C) 1997 by Bill Nagel & Dines Justesen *********
 ;---------------------------------------------------------------------------
 ;
-; $Id: graylib83.asm,v 1.3 2001-04-12 13:26:13 stefano Exp $
+; $Id: graylib83.asm,v 1.4 2001-05-11 07:58:59 stefano Exp $
 ;
 
 	XDEF	graybit1
 	XDEF	graybit2
 
-    LD HL,$8300
-    LD DE,$8301
-    LD BC,256
-    LD (HL),$85
-    LDIR
+	LD HL,$8300
 
-    LD HL,IntProcStart       ; Get pointer to interrupt rutine
-    LD DE,$8585              ; Start of int ruotine, and length of it
-    LD BC,IntProcEnd-IntProcStart+1
-    LDIR
+	; Set the IV table
+        
+        ld      (hl),IntProcStart&$FF
+        inc     hl
+        ld      (hl),IntProcStart/256
+        ld	d,h
+        ld	e,l
+	dec	hl
+        inc	de
+        ld	bc,255
+        ldir
 
     XOR A                    ; Init vars
     LD (intcount),A

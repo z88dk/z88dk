@@ -3,18 +3,11 @@
 ;       Stefano Bodrato - Dec 2000
 ;                         Feb 2000 - Speeded up the cpygraph
 ;
-;       $Id: ti83p_crt0.asm,v 1.6 2001-04-12 13:26:13 stefano Exp $
+;       $Id: ti83p_crt0.asm,v 1.7 2001-05-11 07:58:59 stefano Exp $
 ;
 
 
                 MODULE  z88_crt0
-
-;
-; Initially include the zcc_opt.def file to find out lots of lovely
-; information about what we should do..
-;
-
-                INCLUDE "zcc_opt.def"
 
 ; No matter what set up we have, main is always, always external to
 ; this file
@@ -57,11 +50,37 @@
 
 ; Now, getting to the real stuff now!
 
-	org	$9D95	; TI 83+ (9d95-2)
+; ION shell ( Bin2Var conversion utility )
+IF !DEFINED_startup | (startup=1)
+	org	$9D95
+ENDIF
+
+; Other conversion tools - ION shell 
+IF (startup=2)
+	org	$9D93	; TI 83+ (9d95-2)
+	defb 	$BB, $6D
+ENDIF
+
 	ret
 	jr	nc,start ; not detectable until INSTALL is run
 
-	defm  "C+ compiled program"&0
+	DEFINE NEED_name	; The next time we'll include zcc_opt.def
+				; it will put (defm) the program's namestring
+				; if "#pragma string name xxxx" is been declared
+;
+; Initially include the zcc_opt.def file to find out lots of lovely
+; information about what we should do..
+;
+	INCLUDE "zcc_opt.def"
+	UNDEFINE NEED_name
+
+ IF DEFINED_NEED_name
+	; If namestring is provided, add small compiler ident
+	defm	" - Small C+"&0
+ ELSE
+	; If no namestring provided, display full compiler ident
+	defm	"Z88DK Small C+ Program"&0
+ ENDIF
 
 .start
         ld      hl,0

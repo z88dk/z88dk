@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Dec 2000
 ;
-;       $Id: ti86_crt0.asm,v 1.6 2001-04-12 13:26:13 stefano Exp $
+;       $Id: ti86_crt0.asm,v 1.7 2001-05-11 07:58:59 stefano Exp $
 ;
 
 
@@ -56,30 +56,60 @@
 
 ; Now, getting to the real stuff now!
 
-	org	$801F	; "Large asm block". To be loaded with "LASM"
+
+	; -startup=1 flag:
 	; You need LASM 0.8 Beta by Patrick Wong for this (www.ticalc.org)
 	; - First wipe TI86 RAM (InstLASM is simply a memory cleaner)
 	; - Load LargeLd
-	; - Load you compiled and converted .86p code
+	; - Load your compiled and converted .86p code
 	; - run asm(LargeLd
-	; It will run you program. Loading order is important.
-	
-	ret ; this line must be commented if standard asm() call is used instead.
-        
-        ;org     $D748	; TI 86 standard asm() entry point.
+	; It will run your program. Loading order is important.
 
-;zap2000 format
-; nop
-; jp start
-; .dw Description
-; .dw Icon
-;.start
+IF !DEFINED_startup | (startup=1)
+	org	$801F	; "Large asm block". To be loaded with "LASM"
+	ret
+	nop		;Identifies the table
+	jp	start
+ENDIF
 
-   nop		;Identifies the table
-   jp	start
-   defw	1	;Version # of Table. Release 0 has no icon (Title only)
-   defw	title	;Absolute pointer to program description
-   defw	icon	;pointer to icon
+
+	; TI 86 (Embedded LargeLd - EXPERIMENTAL)
+	; - The calculator needs to be reset (memory clean)
+	; - This has to be the first program in memory
+
+IF (startup=2)
+        org     $8000+14
+       	ld	a,$42	; (RAM_PAGE_1)
+	out	(6),a
+	jp	start
+ENDIF
+
+
+	; TI 86 standard asm() entry point.
+
+IF (startup=3)
+        org     $D748
+ENDIF
+
+
+	; zap2000 format
+IF (startup=4)
+ 	nop
+ 	jp	start
+ 	defw	title
+ 	defw	Icon
+ENDIF
+
+
+	; other shells
+
+IF (startup=5)
+	nop		;Identifies the table
+	jp	start
+	defw	1	;Version # of Table. Release 0 has no icon (Title only)
+	defw	title	;Absolute pointer to program description
+	defw	icon	;pointer to icon
+ENDIF
 
 .start
         ld      hl,0
@@ -102,13 +132,21 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
+
 IF DEFINED_GRAYlib
 	INCLUDE	"#graylib86.asm"
 ENDIF
 
+	call	$4A95	; Close menus
+	
 	call	tidi
         call    _main
         call	tiei
+        
+IF DEFINED_GRAYlib
+       	ld	a,$3C				;make sure video mem is active
+	out	(0),a
+ENDIF
         
 .cleanup
 ;
@@ -124,6 +162,8 @@ ENDIF
 
 .start1
         ld      sp,0
+
+.cpygraph
         ret
 
 .l_dcal
@@ -214,23 +254,21 @@ ENDIF
 .base_graphics
 		defw	$FC00	;TI86
 .coords		defw	0
-.cpygraph	ret
 
 
 .title
-         defm  "Small C+ compiled program"&0
+	; If no namestring provided, display full compiler ident
+	defm	"Z88DK Small C+ Program"&0
  
 .icon
- defb @0000000    ;icon (some shell could like it)
- defb @0011000
- defb @0100010
- defb @0100111
- defb @0100010
- defb @0011000
- defb @0000000
+	defb	@00000000	; Icon (max. heightOfIcon = 7 bytes)
+	defb	@00110010	; C with a small '+'
+	defb	@01000111
+	defb	@01000010
+	defb	@01000000
+	defb	@00110000
+	defb	@00000000
 
- defb @00000000	; These two bytes probably aren't necessary;
- defb 255	; TI83 shells use them, so I'm leaving both here for now.
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

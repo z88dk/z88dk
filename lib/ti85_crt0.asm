@@ -2,18 +2,11 @@
 ;
 ;       Stefano Bodrato - Dec 2000
 ;
-;       $Id: ti85_crt0.asm,v 1.7 2001-04-12 13:26:13 stefano Exp $
+;       $Id: ti85_crt0.asm,v 1.8 2001-05-11 07:58:59 stefano Exp $
 ;
 
 
                 MODULE  z88_crt0
-
-;
-; Initially include the zcc_opt.def file to find out lots of lovely
-; information about what we should do..
-;
-
-                INCLUDE "zcc_opt.def"
 
 ; No matter what set up we have, main is always, always external to
 ; this file
@@ -58,7 +51,24 @@
 
 	org	$9296	; TI 85 (RIGEL SHELL)
 
-        defm  "C+ compiled program"&0
+	DEFINE NEED_name	; The next time we'll include zcc_opt.def
+				;  it will have the programs namestring
+				; #pragma string name xxxx
+;
+; Initially include the zcc_opt.def file to find out lots of lovely
+; information about what we should do..
+; .. and the program name if available
+
+	INCLUDE "zcc_opt.def"
+	UNDEFINE NEED_name
+
+ IF DEFINED_NEED_name
+	; If namestring is provided, add small compiler ident
+	defm	" - Small C+"&0
+ ELSE
+	; If no namestring provided, display full compiler ident
+	defm	"Z88DK Small C+ Program"&0
+ ENDIF
 
 .start
         ld      hl,0
@@ -91,20 +101,8 @@ ENDIF
 	call	tiei
 
 IF DEFINED_GRAYlib
-
         ld a,$3c
         out (0),a    ;Set screen back to normal
-
-        ;This was just to clear the Graph screen
-
-        ;ld hl,$8641	;GRAPH_MEM           
-        ;ld d,h                    
-        ;ld e,l                   
-        ;inc de                    
-        ;ld (hl),0
-        ;ld bc,1024
-        ;ldir
-        
 ENDIF
 
 .cleanup
@@ -121,6 +119,7 @@ ENDIF
 
 .start1
         ld      sp,0
+.cpygraph
         ret
         
 .l_dcal
@@ -210,7 +209,7 @@ ENDIF
 
 .base_graphics	defw	$FC00	;TI85 (8641 ?)
 .coords		defw	0
-.cpygraph	ret
+
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library
