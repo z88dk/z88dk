@@ -13,7 +13,6 @@ ctype/toascii
 ctype/tolower
 ctype/toupper
 stdlib/itoa
-stdlib/randRex
 stdlib/abs
 stdlib/atoi
 stdlib/labs

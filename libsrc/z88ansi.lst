@@ -76,6 +76,7 @@ stdlib/abs
 stdlib/labs
 stdlib/atexit
 stdlib/exit
+stdlib/itoa
 stdlib/rand
 stdlib/srand
 stdlib/strtol
