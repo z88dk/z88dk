@@ -8,11 +8,13 @@
 
 		XLIB	fgetc_cons
 		LIB	getk_decode
+		XREF	TIei
+		XREF	TIdi
 
 		INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 
 .fgetc_cons
-
+		call	TIei
 .kloop
 		halt	; Power saving (?? maybe. Surely true on ti86)
 IF FORti83p
@@ -24,5 +26,6 @@ ENDIF
 		and	a
 		jr	z,kloop
 
+		call	TIdi
 		jp	getk_decode
 

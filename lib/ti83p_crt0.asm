@@ -47,7 +47,11 @@
 ; Graphics stuff
 	XDEF	base_graphics
 	XDEF	coords
+
+; TI calc specific stuff
 	XDEF	cpygraph
+	XDEF	tidi
+	XDEF	tiei
 
 ; Now, getting to the real stuff now!
 
@@ -78,7 +82,9 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
+	call	tidi
         call    _main
+        call	tiei
 .cleanup
 ;
 ;       Deallocate memory which has been allocated here!
@@ -97,6 +103,32 @@ ENDIF
 
 .l_dcal
         jp      (hl)
+
+
+.tiei
+	exx
+	ld	hl,(hl1save)
+	ld	bc,(bc1save)
+	ld	de,(de1save)
+	exx
+	ld	iy,(iysave)
+	ei
+	ret
+
+.tidi
+	di
+	exx
+	ld	(hl1save),hl
+	ld	(bc1save),bc
+	ld	(de1save),de
+	exx
+	ld	(iysave),iy
+	ret
+
+.hl1save defw	0
+.de1save defw	0
+.bc1save defw	0
+.iysave defw	0
 
 ; Now, define some values for stdin, stdout, stderr
 
@@ -152,7 +184,7 @@ ENDIF
 		;defw	$486A
 
 		call	$966e+80+15 ; ION FastCopy call
-		ei
+		;ei
 		ret
 
 ;All the float stuff is kept in a different file...for ease of altering!

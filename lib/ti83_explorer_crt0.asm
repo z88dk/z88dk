@@ -47,7 +47,11 @@
 ; Graphics stuff
 	XDEF	base_graphics
 	XDEF	coords
+
+; TI calc specific stuff
 	XDEF	cpygraph
+	XDEF	tidi
+	XDEF	tiei
 
 ; Now, getting to the real stuff now!
 
@@ -63,9 +67,9 @@
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
-;        ld      hl,-64
-;        add     hl,sp
-;        ld      sp,hl
+        ld      hl,-64
+        add     hl,sp
+        ld      sp,hl
         ld      (exitsp),sp
 
 IF !DEFINED_nostreams
@@ -79,25 +83,52 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
+	call	tidi
         call    _main
+	call	tiei
 .cleanup
 ;
 ;       Deallocate memory which has been allocated here!
 ;
-	push	hl
+
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 	LIB	closeall
 	call	closeall
 ENDIF
 ENDIF
-	pop	bc
+
 .start1
         ld      sp,0
         ret
 
 .l_dcal
         jp      (hl)
+
+.tiei
+	exx
+	ld	hl,(hl1save)
+	ld	bc,(bc1save)
+	ld	de,(de1save)
+	exx
+	ld	iy,(iysave)
+	ei
+	ret
+
+.tidi
+	di
+	exx
+	ld	(hl1save),hl
+	ld	(bc1save),bc
+	ld	(de1save),de
+	exx
+	ld	(iysave),iy
+	ret
+
+.hl1save defw	0
+.de1save defw	0
+.bc1save defw	0
+.iysave defw	0
 
 ; Now, define some values for stdin, stdout, stderr
 
@@ -153,7 +184,7 @@ ENDIF
 		
 ; Fastcopy code...
 
-	di			; 4
+	;di			; 4
 	ld	a,$80		; 7
 	out	($10),a		; 11
 	ld	hl,$8E29-12-(-(12*64)+1)	; 10
@@ -176,7 +207,8 @@ ENDIF
 	ld	a,c		; 4
 	cp	$2B+1		; 7
 	jr	nz,fastCopyAgain; 12/7	; 52	; 41773 (used to be 41136)
-	ei
+
+	;ei
 	ret	; 11	; 18				; 41773 clocks total
 							; 37 bytes total
 

@@ -18,18 +18,20 @@
 		XREF	cpygraph
 
 
+.bc1save	defw	0
+
 .swapgfxbk
-		di
 		ret
 
 .swapgfxbk1
 		push	hl
 		push	de
 		push	bc
+
 		call	cpygraph	; Copy GRAPH_MEM to LCD, then return
+
 		pop	bc
 		pop	de
 		pop	hl
 
-		ei
 		ret

@@ -110,10 +110,9 @@ printflike/fscanf
 printflike/vfscanf
 printflike/vsscanf
 graphics/circle
-graphics/clg
+graphics/ticalc/clg
 graphics/clga
 graphics/clrarea
-graphics/clsgraph
 graphics/dcircle2
 graphics/draw
 graphics/drawb

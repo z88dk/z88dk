@@ -9,6 +9,8 @@
 
 	XLIB	ansi_SCROLLUP
 	XREF	base_graphics
+	XREF	TIdi
+	XREF	TIei
 	LIB	ansi_del_line
 	LIB	fgetc_cons
 
@@ -17,6 +19,8 @@
 ; These are called before scrolling: we wait for any keypress.
 ; We don't use getkey when possible.
 
+	call	TIei
+	
 IF FORti82
 .kloop
 	ld	hl,$8004
@@ -25,6 +29,8 @@ IF FORti82
 ENDIF
 
 IF FORti83	; Thanks to Red Picasso (Brandon Whaley) for his dirinput.inc
+; We use getkey to wait for a key
+
 .kloop
 	ld	hl,krowptr
 .kloop1
@@ -73,6 +79,7 @@ IF FORti86
 	jr	z,kloop
 ENDIF
 
+	call	TIdi
 
   	ld	hl,8*row_bytes
   	ld	de,(base_graphics)
