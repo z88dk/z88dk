@@ -84,9 +84,11 @@ setincdirs()
 #define	MAXINCLUDE	(NINCLUDE - 1 - IS_INCLUDE)
 #endif
 
+#if 0
 #if HOST == SYS_UNIX
 	*incend++ = "/usr/include";
 #define	MAXINCLUDE	(NINCLUDE - 1 - IS_INCLUDE)
+#endif
 #endif
 
 #if HOST == SYS_VMS
@@ -129,6 +131,9 @@ setincdirs()
 	*incend++ = "C:";			/* Decus-C library disk	*/
 	*incend++ = "SY:";			/* System (boot) disk	*/
 #define	MAXINCLUDE	(NINCLUDE - 3 - IS_INCLUDE)
+#endif
+#ifndef MAXINCLUDE
+#define	MAXINCLUDE	(NINCLUDE - 0 - IS_INCLUDE)
 #endif
 }
 
