@@ -2,12 +2,12 @@ In this directory contain some examples which have been rejigged for the
 Spectrum, there's a config file in this directory, compile the examples
 using the makefile or you can do it by hand thusly:
 
-zcc +zx -oenigma.bin  enigma.c
-zcc +zx -odstar.bin dstar.c
-zcc +zx -orpn.bin rpn.c
-zcc +zx -oadv_a.bin adv_a.c
-zcc +zx -o gfx.bin gfx.c
-zcc +zxan -o ansitest.bin ansitest.c
+zcc +zx -oenigma.bin  enigma.c -lndos
+zcc +zx -odstar.bin dstar.c -lndos
+zcc +zx -orpn.bin rpn.c -lndos
+zcc +zx -oadv_a.bin adv_a.c -lndos
+zcc +zx -o gfx.bin gfx.c -lndos
+zcc +zxan -o ansitest.bin ansitest.c -lndos
 
 The produced file runs from 32768
 
