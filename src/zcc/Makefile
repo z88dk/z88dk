@@ -2,6 +2,8 @@
 ZCCOBJS = zcc.c
 CC = gcc
 
+CCOPT = -DUNIX
+
 all: zcc 
 
 zcc:
