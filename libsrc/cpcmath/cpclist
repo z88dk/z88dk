@@ -43,3 +43,5 @@ ftoe
 cosh
 sinh
 tanh
+atan2
+atof

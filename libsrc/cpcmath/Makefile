@@ -12,7 +12,10 @@ CFILES = \
 	ftoe.c \
 	cosh.c \
 	sinh.c \
-	tanh.c 
+	tanh.c \
+	atan2.c \
+	atof.c
+
 
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
