@@ -85,17 +85,15 @@
 ._pages
 	; We first search the pages loaded by Adder
 	defb	26,27,28
-	defb	47
-	defb	77
-	defb	81
-	defb	92
-	defb	102
+	defb	47,77,81,92,102
 	defb	124,125,126
 	defb	136,137,138,139,140,141
-	; Then a couple of pages that Adder does not load today but might in the future
-	defb	142,143		; Note: these are pages Adder does not load, yet
-	; We check the standard addin slots last because addins copied using Adder
-	; are not deleted until overwritten
-	defb	128,129,130,131,132,133,134,135 ; Standard addin slots
-	
+	; Then a couple of pages that Adder does not load today but might in 
+	; the future
+	defb	142,143	
+	defb	127,69,70,71,84,85,86,97	; Web/Calc/Clock pages
+	; We check the standard addin slots last because addins copied 
+	; using Adder are not deleted until overwritten
+	defb	128,129,130,131,132,133,134,135
 	defb	0		; pages end-marker
+
