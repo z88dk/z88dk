@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.9 2001-07-26 14:14:38 dom Exp $
+;       $Id: rex_crt0.asm,v 1.10 2001-09-04 13:53:48 dom Exp $
 ;
 
 	MODULE rex_crt0
@@ -22,6 +22,11 @@
 	XDEF	heapblocks
 	XDEF	heaplast
 	XDEF	l_dcal
+	XDEF	far_ret
+	XDEF	far_ret_p
+	XDEF	far_ret_sp
+	XDEF	far_par1
+	XDEF	far_par2
 
 
 ;	defm	"ApplicationName:Addin"&10&13
@@ -40,7 +45,7 @@
 ; Clear static memory
 	ld	hl,$f033
 	ld	de,$f034
-	ld	bc,$f6c1-$f033
+	ld	bc,$ffff-$f033
 	ld	(hl),0
 	ldir
         ld      (exitsp),sp
@@ -87,6 +92,16 @@ fasign
 heapblocks
 	ds.w	1
 heaplast
+	ds.w	1
+far_ret
+	ds.w	1
+far_ret_p
+	ds.b	1
+far_ret_sp
+	ds.w	1
+far_par1
+	ds.w	1
+far_par2
 	ds.w	1
 }
 
