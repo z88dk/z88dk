@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.24 2003-10-30 11:13:30 dom Exp $
+ *      $Id: zcc.c,v 1.25 2003-11-30 21:48:30 denniz Exp $
  */
 
 
@@ -1393,6 +1393,8 @@ void tempname(char *filen)
 	}
 	else
 		tmpnam(filen);
+	if(ptr=strrchr(filen,'.'))
+		*ptr='_';
 #elif defined(__MSDOS__) && defined(__TURBOC__)
 /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
 
@@ -1409,8 +1411,6 @@ void tempname(char *filen)
 #else
 	tmpnam(filen);  /* Temporary nane..get it in filen */
 #endif
-	while (ptr=strchr(filen,'.') )
-		*ptr='_';
 }
 
 /*
