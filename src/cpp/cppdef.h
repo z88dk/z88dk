@@ -124,7 +124,7 @@
 #define	NBUFF			4096
 #define	NWORK			4096
 #define	NEXP			128
-#define	NINCLUDE		  7
+#define	NINCLUDE		 15
 #define	NPARMWORK		(NWORK * 2)
 #define	BLK_NEST		32
 
