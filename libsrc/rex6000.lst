@@ -63,4 +63,7 @@ rex/syscall6
 rex/syscall6p
 rex/syscallex
 rex/syscallexl
+rex/DbFindRecord
+rex/DbGetRecordCount
+rex/DbReadField
 
