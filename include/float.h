@@ -5,7 +5,7 @@
  *	Some more floating point routines..I can't remember
  *	why these are separated out..
  *
- *	$Id: float.h,v 1.3 2001-04-20 16:04:24 dom Exp $
+ *	$Id: float.h,v 1.4 2001-06-25 13:06:09 dom Exp $
  */
 
 
@@ -16,6 +16,7 @@ extern double __LIB__ amin(double);
 extern double __LIB__ floor(double);
 extern double __LIB__ ceil(double);
 extern double __LIB__ fprand(void); /* Generic only */
+extern double __LIB__ __FASTCALL__ zfloat(int);
 extern int __LIB__ fpseed(double);    /* Seed random number */
 
 #ifndef _HAVE_ATOF_
