@@ -9,6 +9,11 @@
 ; HL = DE - HL
 
 .l_sub 
+	ex	de,hl
+	and	a
+	sbc	hl,de	
+	ret
+IF 0
         ld a,e
         sub   l
         ld l,a
@@ -16,4 +21,5 @@
         sbc   a,h
         ld h,a
         ret
+ENDIF
 
