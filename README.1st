@@ -1,24 +1,83 @@
-$Id: README.1st,v 1.10 2002-11-17 16:58:46 dom Exp $
+z88dk - v1.5 xx December 2002
+=============================
 
-There's a lot of documentation in the doc/ directory, some of it is half
-way through being written, so apologies for the fuzziness in places, most
-of it is in html (so that everyone can read it), some of it is plain text,
-hopefully you won't have to dig too deep to find out wat you need to know.
-If you have any questions, feel free to email me at dom@jadara.org.uk
+z88dk is a Z80 cross compiler producing binaries for over 20 different z80
+based machines. Binaries are supplied for Win32,Amiga and Solaris platforms.
 
------ COMPILATION INSTRUCTIONS -----
-Win32:
+This file contains basic install instructions and a guide to compilation of 
+the system for those systems without a binary kit prepared.
 
-See http://www.algonet.se/~dennisgr/z88dk.htm for Windows binaries
-and details on how to build libraries
 
-Unix:
+Binary Kit Instructions
+=======================
+
+Win32
+-----
+
+Extract the kit to c:\ and you should end up with a directory structure of:
+
+c:\z88dk\bin
+c:\z88dk\doc
+etc...
+
+Add c:\z88dk\bin into your path (System Properties/Advanced/Environmental
+Variables)
+
+Restart a command prompt, type zcc and you should get the response:
+
+zcc - Frontend for the z88dk Cross-C Compiler
+v2.50 (C) 3.10.2002 D.J.Morris
+
+
+You're ready to go and start compiling!
+
+
+Solaris
+-------
+
+The code was compiled on a Solaris 6 machine and hence should work on
+newer versions as well (unfortunately I don't have access to an older
+machine).
+
+1. Copy the contents of the bin directory to /usr/local/bin
+2. Copy the contents of the lib directory to /usr/local/lib
+3. Copy the contents of the share directory to eg /usr/local/share
+
+The share directory contains documentation, examples and some support
+programs for producing the final binaries for various platforms.
+
+This kit can also be installed in a users directory providing that the
+Z80_OZFILES and ZCCCFG environmental variables are set.
+
+Amiga
+-----
+
+Extract the lha archive to whereever is convenient and set up the assign
+zcc: to point to the root of that directory.
+
+
+Source Code Installation
+========================
+
+There are two modes of operation for z88dk - within a users home directory and
+installed on a system wide basis. 
+
+Preparation
+-----------
+
+If your compiler is not gcc ensure that the correct machine type is defined
+in src/z80asm/config.h and that the ENDIAN status is set accordingly - if
+you are using gcc on unix machines (including MacOS X) then this will be
+automatically defined.
+
+System wide install
+-------------------
 
 There's a certain degree of bootstrapping required - here's the
 procedure for a standard install on UNIX (ensure that you have
 root permissions). Where make is mentioned, this refers to GNU make.
 
-1. make
+1. cd {z88dk}; make
 
 2. make install
 
@@ -29,28 +88,18 @@ root permissions). Where make is mentioned, this refers to GNU make.
 With a bit of luck z88dk should be installed in /usr/local with important
 files in /usr/local/lib/z88dk
 
-The old method of configuration is great for running in situ.
+Home Directory Install
+----------------------
 
-1. Check src/z80asm/config.h for machine status and endian status.
-   ENDIAN is set if the machine is big endian (68k,PPC,Sparc etc). There's
-   some gcc magic to pick this up automatically which should work.
+Before compiling setup the variables Z80_OZFILES to point to {z88dk}/lib/ and
+ZCCCFG to point to {z88dk}/lib/config/ (Trailing slashes are important!). 
+Additionally add {z88dk}/bin to your path.
 
-1.5 Edit {z88dk}/Makefile and change prefix to point to the current directory
+1. cd {z88dk}; make
 
-2. Type: make/gmake to run GNU make
+2. cd {z88dk/libsrc} ; make ; make install
 
-3. Wait
-
-4. Add bin/ into your path.
-
-5. Define the environmental variable Z80_OZFILES to point to {z88dk}lib/
-
-6. Define the environmental variable ZCCCFG to point to {z88dk}/lib/config/
-
-Where {z88dk} is the root directory of the archive (where this file is located!)
-
-7. Rebuild the libraries using make libs from the root z88dk directory
-
+You should be ready to go!
 
 --8<--
 

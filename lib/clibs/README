@@ -6,14 +6,14 @@ Z88 Libraries:
 farz88.lib	  Far access library for the z88
 gfx.lib           Graphics lib for BASIC compiles
 gfxapp.lib        Graphics lib for Z88 application compiles
-mz.lib            Z88 Maths Routines
+z88_math.lib      Z88 Maths Routines
 net.lib		  Stubs for the ZSock package (forthcoming)
 z88.lib		  z88 specific functions (mailboxing etc)
 z88_clib.lib      The important one, contains all the other lib functions
 
 Generic Libraries:
 
-m.lib             Generic Maths Library (suitable for all z80 machines)
+gen_math.lib      Generic Maths Library (suitable for all z80 machines)
 malloc.lib        Near Malloc Routines
 z80_crt0.lib	  Startup routines common to all z80 machines
 
@@ -24,3 +24,5 @@ zxan_clib.lib	  Spectrum C library (vt100/ANSI printing)
 
 nc_clib.lib	  Amstrad NC100 C library
 vz_clib.lib	  VZ200/300 library
+
+etc etc

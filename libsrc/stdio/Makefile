@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.14 2002-10-22 19:15:16 dom Exp $
+# $Id: Makefile,v 1.15 2002-12-08 15:24:44 dom Exp $
 #
 
 STDCFILES = \
@@ -92,8 +92,10 @@ clean:
 	$(RM) ansi/aquarius/*.o
 	$(RM) ansi/c128/*.o
 	$(RM) ansi/generic/*.o
+	$(RM) ansi/oz/*.o
 	$(RM) ansi/sharp-mz/*.o
 	$(RM) ansi/spectrum/*.o
+	$(RM) ansi/sprinter/*.o
 	$(RM) ansi/vz200/*.o
 	$(RM) ansi/z88/*.o
 	$(RM) ansi/zx81/*.o
@@ -107,8 +109,10 @@ clean:
 	$(RM) msx/*.o
 	$(RM) mz/*.o
 	$(RM) nc100/*.o
+	$(RM) oz/*.o
 	$(RM) sam/*.o
 	$(RM) spectrum/*.o
+	$(RM) sprinter/*.o
 	$(RM) svi/*.o
 	$(RM) vz200/*.o
 	$(RM) z88/*.o

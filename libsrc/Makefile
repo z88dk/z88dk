@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.55 2002-11-21 10:44:23 dom Exp $
+# $Id: Makefile,v 1.56 2002-12-08 15:24:43 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -16,9 +16,9 @@ all:	genlibs z88libs tilibs zxlibs \
 	rex_clib.lib zx81_clib.lib zx81ansi_clib.lib pps_clib.lib \
 	ppsansi_clib.lib embedded_clib.lib ozansi_clib.lib
 
-genlibs: m.lib malloc.lib z80_crt0.lib ndos.lib
+genlibs: gen_math.lib malloc.lib z80_crt0.lib ndos.lib
 
-z88libs: mz.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib \
+z88libs: z88_math.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib \
 	 z88ansi_clib.lib gfx.lib 
 
 tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
@@ -37,14 +37,14 @@ farz88.lib:
 	cd farz88 ; $(MAKE)
 
 # Generic maths build - dom
-m.lib:
+gen_math.lib:
 	@echo ''
 	@echo '--- Building Z80 Generic Maths Library  ---'
 	@echo ''
 	cd genmath; $(MAKE)
 
 # Z88 maths build - dom
-mz.lib:
+z88_math.lib:
 	@echo ''
 	@echo '--- Building Z88 Maths Library  ---'
 	@echo ''

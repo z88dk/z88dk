@@ -1,36 +1,29 @@
 
+all: info ansitest cube cubez88 dstar gfx
 
-
-all: info cube cubez88 dstar enigma rpn sorter gfx adv_a
+all16: info anstst16 cube cubez88 dstar gfx
 
 info:
 	@echo Building examples..
 
-adv_a:
-	zcc -vn adv_a.c -o adv_a.bas
+ansitest:
+	- zcc -lz88ansi_clib ansitest.c -o ansitest.bas
 
-gfx:
-	zcc -vn -lgfx gfx.c -o gfx.bas
+anstst16:
+	- zcc -lz88ans~1 ansitest.c -o ansitest.bas
 
 cube:
-	zcc -vn -lm -lgfx cube.c -o cube.bas
+	- zcc -lm -lgfx cube.c -o cube.bas
 
 cubez88:
-	zcc -vn -lmz -lgfx cube.c -o cubez88.bas
-
-enigma:
-	zcc -vn enigma.c -o enigma.bas
-
-rpn:
-	zcc -vn rpn.c -o rpn.bas
-
-sorter:
-	zcc -vn sorter.c -o sorter.bas
+	- zcc -lmz -lgfx cube.c -o cubez88.bas
 
 dstar:
-	zcc -vn -lgfx dstar.c -o dstar.bas
+	- zcc -lgfx dstar.c -o dstar.bas
+
+gfx:
+	- zcc -lgfx gfx.c -o gfx.bas
 
 clean:
-	$(RM) cube.bas cubez88.bas enigma.bas rpn.bas sorter.bas
-	$(RM) dstar.bas sorter.bas zcc_opt.def *~ *.op* *.o *i *.asm
-	$(RM) gfx.bas a.* adv_a.bas
+	$(RM) ansitest.bas cube.bas cubez88.bas dstar.bas gfx.bas 
+	$(RM) zcc_opt.def *.op* *.o *.i *.asm *.err *.map *.sym

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 2002-10-03 20:07:53 dom Exp $
+# $Id: Makefile,v 1.8 2002-12-08 15:24:44 dom Exp $
 
 lz88:
 	cd z88 ; $(MAKE) z88_fcntl
@@ -15,7 +15,8 @@ lpps:
 
 
 clean:
-	cd z88 ; $(MAKE) clean
 	cd cpm ; $(MAKE) clean
-	cd spectrum ; $(MAKE) clean
 	cd dummy ; $(MAKE) clean
+	cd spectrum ; $(MAKE) clean
+	cd sprinter ; $(MAKE) clean
+	cd z88 ; $(MAKE) clean
