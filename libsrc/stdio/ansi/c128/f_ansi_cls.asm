@@ -5,19 +5,24 @@
 ; 	CLS - Clear the screen
 ;	
 ;
-;	$Id: f_ansi_cls.asm,v 1.1 2001-08-28 14:05:43 stefano Exp $
+;	$Id: f_ansi_cls.asm,v 1.2 2001-09-11 16:00:53 stefano Exp $
 ;
 
 	XLIB	ansi_cls
 
 .ansi_cls
-	ld	hl,$400
+	ld	hl,$2000	; Text
+	ld	d,h
+	ld	e,l
+	inc	de
 	ld	bc,1023
-.clsloop
 	ld	(hl),32
-	inc	hl
-	dec	bc
-	ld	a,b
-	or	c
-	jr	nz,clsloop
+	ldir
+	ld	hl,$1000	; Color attributes
+	ld	d,h
+	ld	e,l
+	inc	de
+	ld	bc,1023
+	ld	(hl),1
+	ldir
 	ret

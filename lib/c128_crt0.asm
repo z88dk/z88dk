@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.2 2001-09-07 18:08:59 dom Exp $
+;	$Id: c128_crt0.asm,v 1.3 2001-09-11 16:00:52 stefano Exp $
 ;
 
 
@@ -58,8 +58,9 @@
 	;out	(c),a	; 40 columns text at $2000
 	
 	ld	bc,$d018
-	ld	a,$17
-	out	(c),a	; Alternate (upper+lower) char set
+	;ld	a,$17	; Standard display address ($400)..
+	ld	a,$87	; Display addres at $2000...
+	out	(c),a	; ...and alternate (upper+lower) char set
 
 	ld	a,11		;dark grey
 	ld	bc,$d020
@@ -89,20 +90,7 @@ ENDIF
 
         call    _main
 
-.waitkloop
-	xor	a
-	ld	bc,$9120
-	out	(c),a
-	inc	bc
-	in	a,(c)
-	cp	255
-	jr	nz,waitkloop
-	;inc	bc
-	;in	a,(c)
-	;cp	255
-	;jr	z,waitkloop
-
-	; Loop border color and wait for keypress
+	; Loop border color and wait for the RUNSTOP key
 ;.brdloop	ld	bc,$d020  ;border colour
 ;		in	a,(c)
 ;		inc	a

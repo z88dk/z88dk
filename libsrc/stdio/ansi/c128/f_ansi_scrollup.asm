@@ -5,25 +5,36 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.1 2001-08-28 14:05:43 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.2 2001-09-11 16:00:53 stefano Exp $
 ;
 
 	XLIB	ansi_SCROLLUP
 
 
 .ansi_SCROLLUP
-
-	ld	bc,$d011
-	in	a,(c)
-	or	7
-	out	(c),a
-	
-	ld	hl,$400+(40*24)
+	ld	hl,$2000+40	; Text
+	ld	de,$2000
+	ld	bc,40*24
+	ldir
+	ld	h,d
+	ld	l,e
 	ld	b,40
 .reslloop
 	ld	(hl),32
 	inc	hl
 	djnz	reslloop
+
+	ld	hl,$1000+40	; Color attributes
+	ld	de,$1000
+	ld	bc,40*24
+	ldir
+	ld	h,d
+	ld	l,e
+	ld	b,40
+.reslloop2
+	ld	(hl),32
+	inc	hl
+	djnz	reslloop2
 
 	ret
 

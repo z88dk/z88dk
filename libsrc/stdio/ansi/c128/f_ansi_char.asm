@@ -10,7 +10,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.1 2001-08-28 14:05:43 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.2 2001-09-11 16:00:53 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -32,7 +32,7 @@
 .ansi_CHAR
 
 	push	af
-	ld	hl,$400
+	ld	hl,$2000
 	ld	a,(ansi_ROW)
 	and	a
 	jr	z,r_zero
@@ -66,8 +66,8 @@
 	or	0	; This byte is set to 128 when INVERSE is ON
 	ld	(hl),a
 
-	ld	de,$1000-$400
-	add	hl,de		; Color map location
+	ld	de,$1000
+	sbc	hl,de		; Color map location
 .ATTR
 	ld	(hl),1		; This byte is the current attribute
 
