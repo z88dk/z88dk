@@ -1,15 +1,29 @@
 /* copt version 1.00 (C) Copyright Christopher W. Fraser 1984 */
 /* Added out of memory checking and ANSI prototyping. DG 1999 */
+/* Added %L - %N variables, %activate, regexp, %check. Zrin Z. 2002 */
 
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef USE_REGEXP
+#include <sys/types.h>
+#include <regex.h>
+#endif
+
 #define HSIZE 107
-#define MAXLINE 100
+#define MAXLINE 256
+#define MAXFIRECOUNT 65535
+#define MAX_PASS 16
 
 int debug = 0;
+int global_again = 0;				/* signalize that rule set has changed */
+#define FIRSTLAB 'L'
+#define LASTLAB 'N'
+int nextlab = 1;					/* unique label counter */
+int labnum[LASTLAB - FIRSTLAB + 1];	/* unique label numbers */
+
 
 struct lnode {
 	char *l_text;
@@ -19,12 +33,36 @@ struct lnode {
 struct onode {
 	struct lnode *o_old, *o_new;
 	struct onode *o_next;
-} *opts = 0;
+	int firecount;
+} *opts = 0, *activerule = 0;
+
+
+void printlines(struct lnode *beg, struct lnode *end, FILE *out)
+{
+	struct lnode *p;
+	for (p = beg; p != end; p = p->l_next)
+		fputs(p->l_text, out);
+}
+
+
+void printrule(struct onode *o, FILE *out)
+{
+	struct lnode *p = o->o_old;
+	while (p->l_prev) p = p->l_prev;
+	printlines(p, 0, out);
+	fputs("=\n", out);
+	printlines(o->o_new, 0, out);
+}
+
 
 /* error - report error and quit */
 void error(char *s)
 {
 	fputs(s, stderr);
+	if (activerule) {
+		fputs("active rule:\n", stderr);
+		printrule(activerule, stderr);
+	}
 	exit(1);
 }
 
@@ -45,17 +83,17 @@ char *install(char *str)
 	register int i;
 	static struct hnode {
 		char *h_str;
-		struct hnode *h_ptr;		  
+		struct hnode *h_ptr;
 	} *htab[HSIZE] = {0};
-	
+
 	s = str;
 	for (i = 0; *s; i += *s++)
 		;
 	i %= HSIZE;
 
-	for (p = htab[i]; p; p = p->h_ptr) 
+	for (p = htab[i]; p; p = p->h_ptr)
 		for (p1=str, p2=p->h_str; *p1++ == *p2++; )
-			if (p1[-1] == '\0') 
+			if (p1[-1] == '\0')
 				return (p->h_str);
 
 	p = (struct hnode *) malloc(sizeof *p);
@@ -89,8 +127,29 @@ void getlst(FILE *fp, char *quit, struct lnode *p1, struct lnode *p2)
 	char *install(), lin[MAXLINE];
 
 	connect(p1, p2);
-	while (fgets(lin, MAXLINE, fp) != NULL && strcmp(lin, quit))
+	while (fgets(lin, MAXLINE, fp) != NULL && strcmp(lin, quit)) {
 		insert(install(lin), p2);
+	}
+}
+
+/* getlst_1 - link lines from fp in between p1 and p2 */
+/* skip blank lines and comments at the start */
+void getlst_1(FILE *fp, char *quit, struct lnode *p1, struct lnode *p2)
+{
+	char *install(), lin[MAXLINE];
+	int firstline = 1;
+
+	connect(p1, p2);
+	while (fgets(lin, MAXLINE, fp) != NULL && strcmp(lin, quit)) {
+		if (firstline) {
+			char *p = lin;
+			while (isspace(*p)) ++p;
+			if (! *p) continue;
+			if (lin[0] == ';' && lin[1] == ';') continue;
+			firstline = 0;
+		}
+		insert(install(lin), p2);
+	}
 }
 
 /* init - read patterns file */
@@ -106,11 +165,16 @@ void init(FILE *fp)
 		p = (struct onode *) malloc((unsigned) sizeof(struct onode));
 		if(p==NULL)
 			error("init: out of memory\n");
-		getlst(fp, "=\n", &head, &tail);
+		p->firecount = MAXFIRECOUNT;
+		getlst_1(fp, "=\n", &head, &tail);
 		head.l_next->l_prev = 0;
 		if (tail.l_prev)
 			tail.l_prev->l_next = 0;
 		p->o_old = tail.l_prev;
+		if (p->o_old == NULL) {	/* do not create empty rules */
+			free(p);
+			continue;
+		}
 
 		getlst(fp, "\n", &head, &tail);
 		tail.l_prev->l_next = 0;
@@ -124,53 +188,203 @@ void init(FILE *fp)
 	*next = 0;
 }
 
+
+/* match - check conditions in rules */
+/* format: %check min <= %n <= max */
+int check(char *pat, char **vars)
+{
+	int low, high, x;
+	char v;
+	x = sscanf(pat, "%d <= %%%c <= %d", &low, &v, &high);
+	if (x != 3 || !('0' <= v && v <= '9')) {
+		fprintf(stderr, "warning: invalid use of '%%check' in \"%s\"\n", pat);
+		fprintf(stderr, "format is '%%check min <= %%n <= max'\n");
+		return 0;
+	}
+	if (vars[v - '0'] == 0) {
+		fprintf(stderr, "error in pattern \"%s\"\n", pat);
+		error("variable is not set\n");
+	}
+	if (sscanf(vars[v - '0'], "%d", &x) != 1)
+		return 0;
+	return low <= x && x <= high;
+}
+
+
 /* match - match ins against pat and set vars */
 int match(char *ins, char *pat, char **vars)
 {
-	char *p, lin[MAXLINE];
+	char *p, lin[MAXLINE], *start = pat;
+#ifdef USE_REGEXP
+	char re[MAXLINE];	/* regular expression */
+	char *istart = ins;
+	regex_t reg;
+#define NMATCH 3
+	regmatch_t match[NMATCH];
+	char var;
+	int reerr, eflags, mi;
+#endif
 
 	while (*ins && *pat)
-		if (pat[0] == '%' && isdigit(pat[1])) {
-			for (p = lin; *ins && *ins != pat[2];)
-				*p++ = *ins++;
-			*p = 0;
-			p = install(lin);
-			if (vars[pat[1]-'0'] == 0)
-				vars[pat[1]-'0'] = p;
-			else if (vars[pat[1]-'0'] != p)
+		if (pat[0] == '%') {
+			switch (pat[1]) {
+			  case '%':
+				if (*pat != *ins++)
+					return 0;
+				pat += 2;
+				break;
+#ifdef USE_REGEXP
+			  case '"':
+				p = pat + 2;
+				for (; *p && (*p != '"' || p[-1] == '\\'); ++p)
+					;
+				if (*p != '"') {
+					fprintf(stderr,
+						"warning: invalid use of '%%\"..\"n' in \"%s\"\n",
+						start);
+					break;
+				}
+				if (isdigit(p[1]))
+					var = p[1];
+				else
+					var = 0;
+				if (var && vars[var-'0'] != 0) {
+					fprintf(stderr,
+					"warning: variable %%%c has already a value in \"%s\"\n",
+						p[1], start);
+					fprintf(stderr,
+					"please use REGEXP only on the last occurance of a variable\
+ in the input pattern\n",
+						p[1], start);
+					goto l_fallthrough;
+				}
+				strncpy(re, pat + 2, p - pat - 2);
+				re[p - pat - 2] = '\0';
+				pat = p;
+				reerr = regcomp(&reg, re, REG_EXTENDED);
+				if (reerr != 0) {
+					regerror(reerr, &reg, re, sizeof(re));
+					fprintf(stderr, "error in \"%s\": %s\n", start, re);
+					error("error: invalid rule\n");
+				}
+				eflags = 0;
+				if (ins != istart) eflags |= REG_NOTBOL;
+				reerr = regexec(&reg, ins, NMATCH, match, eflags);
+				if (reerr != 0 && reerr != REG_NOMATCH) {
+					regerror(reerr, &reg, re, sizeof(re));
+					fprintf(stderr, "error in \"%s\": %s\n", start, re);
+					error("error: while matching REGEXP\n");
+				}
+				regfree(&reg);
+				if (reerr != 0 || match[0].rm_so != 0)
+					return 0;	/* not matched */
+				mi = match[1].rm_eo == -1 ? 0 : 1;	/* which match to use */
+				if (var) {
+					int i = match[mi].rm_eo - match[mi].rm_so;
+					strncpy(re, ins + match[mi].rm_so, i);
+					re[i] = '\0';
+					ins += match[0].rm_eo;	/* eat whole match */
+					vars[var - '0'] = install(re);
+					pat += 2;
+				}
+				else {
+					ins += match[0].rm_eo;
+					++pat;
+				}
+				continue;
+l_fallthrough:
+#endif
+			  case '0': case '1': case '2': case '3': case '4':
+			  case '5': case '6': case '7': case '8': case '9':
+				if (pat[2] == '%' && pat[3] != '%') {
+					fprintf(stderr, "error in \"%s\": ", start);
+					error("input pattern %n% is not allowed\n");
+				}
+				for (p = lin; *ins && *ins != pat[2];)
+					*p++ = *ins++;
+				*p = 0;
+				p = install(lin);
+				if (vars[pat[1]-'0'] == 0)
+					vars[pat[1]-'0'] = p;
+				else if (vars[pat[1]-'0'] != p)
+					return 0;
+				pat += 2;
+				continue;
+
+			  default:
+				break;
+			}
+			if (*pat++ != *ins++)
 				return 0;
-			pat += 2;
 		}
 		else if (*pat++ != *ins++)
 			return 0;
-	return *pat==*ins;
+
+	return *pat == *ins;	/* compare end of string */
 }
 
-/* subst - return result of substituting vars into pat */
-char *subst(char *pat, char **vars)
+
+/* subst_imp - return result of substituting vars into pat */
+char *subst_imp(char *pat, char **vars)
 {
-	char lin[MAXLINE], *s;
+	static char errormsg[80];
+	static char lin[MAXLINE];
+	char num[30];
+	char *s, *start = pat;
 	int i;
+
 
 	i = 0;
 	for (;;)
-		if (pat[0] == '%' && isdigit(pat[1])) {
-			for (s = vars[pat[1]-'0']; i < MAXLINE && (lin[i] = *s++); i++)
+		if (pat[0] == '%' && pat[1] == '%') {
+			if (i < MAXLINE) {
+				lin[i] = '%';
+				++i;
+			}
+			pat += 2;
+		}
+		else if (pat[0] == '%' && pat[1] >= FIRSTLAB && pat[1] <= LASTLAB) {
+			int il = pat[1] - FIRSTLAB;
+			if (! labnum[il]) labnum[il] = nextlab++;
+			sprintf(num, "%d", labnum[il]);
+			for (s = num; i < MAXLINE && (lin[i] = *s++) != 0; ++i)
+				;
+			pat += 2;
+		}
+		else if (pat[0] == '%' && isdigit(pat[1])) {
+			if (vars[pat[1]-'0'] == 0) {
+				sprintf(errormsg, "error: variable %c is not set in \"%s\"",
+					pat[1], start);
+				error(errormsg);
+			}
+			for (s = vars[pat[1]-'0']; i < MAXLINE && (lin[i] = *s++) != 0; i++)
 				;
 			pat += 2;
 		}
 		else if (i >= MAXLINE)
 			error("line too long\n");
 		else if (!(lin[i++] = *pat++))
-			return install(lin);
+			return &lin[0];
 }
 
-/* rep - substitute vars into new and replace lines between p1 and p2 */
-struct lnode *rep(struct lnode *p1, struct lnode *p2, struct lnode *new, char **vars)
+
+/* subst - return install(result of substituting vars into pat) */
+char *subst(char *pat, char **vars)
 {
-	char *args[10], *exec(), *subst(); 
+	return install(subst_imp(pat, vars));
+}
+
+
+/* rep - substitute vars into new and replace lines between p1 and p2 */
+struct lnode *rep(
+	struct lnode *p1, struct lnode *p2, struct lnode *new, char **vars)
+{
+	char *exec(), *subst();
 	int i;
 	struct lnode *p, *psav;
+
+	for (i = 0; i < LASTLAB - FIRSTLAB + 1; ++i)
+		labnum[i] = 0;
 
 	for (p = p1->l_next; p != p2; p = psav) {
 		psav = p->l_next;
@@ -182,8 +396,6 @@ struct lnode *rep(struct lnode *p1, struct lnode *p2, struct lnode *new, char **
 	if (debug)
 		fputs("=\n", stderr);
 	for (; new; new = new->l_next) {
-		for (i = 0; i < 10; i++)
-			args[i] = 0;
 		insert(subst(new->l_text, vars), p2);
 		if (debug)
 			fputs(p2->l_prev->l_text, stderr);
@@ -193,51 +405,214 @@ struct lnode *rep(struct lnode *p1, struct lnode *p2, struct lnode *new, char **
 	return p1->l_next;
 }
 
+
+/* copylist - copy activated rule; substitute variables */
+struct lnode * copylist(
+	struct lnode *source, struct lnode **pat, struct lnode **sub, char **vars)
+{
+	struct lnode head, tail, *more = 0;
+	int pattern = 1;	/* allow nested rules */
+	int i;
+	connect(&head, &tail);
+	head.l_prev = tail.l_next = 0;
+
+	for (i = 0; i < LASTLAB - FIRSTLAB + 1; ++i)
+		labnum[i] = 0;
+
+	for (; source; source = source->l_next) {
+		if (pattern && strcmp(source->l_text, "=\n") == 0) {
+			pattern = 0;
+			if (head.l_next == &tail)
+				error("error: empty pattern\n");
+			*pat = tail.l_prev;
+			head.l_next->l_prev = 0;
+			tail.l_prev->l_next = 0;
+			connect(&head, &tail);
+			continue;
+		}
+		if (strcmp(source->l_text, "%activate\n") == 0) {
+			if (pattern)
+				error("error: %activate in pattern (before '=')\n");
+			more = source->l_next;
+			break;
+		}
+		insert(subst(source->l_text, vars), &tail);
+	}
+	if (head.l_next == &tail)
+		*sub = 0;
+	else {
+		head.l_next->l_prev = 0;
+		tail.l_prev->l_next = 0;
+		*sub = head.l_next;
+	}
+	return more;
+}
+
+
 /* opt - replace instructions ending at r if possible */
 struct lnode *opt(struct lnode *r)
 {
 	char *vars[10];
-	int i;
-	struct lnode *c, *p, *rep();
+	int i, lines;
+	struct lnode *c, *p;
 	struct onode *o;
+	static char *activated = "%activated ";
 
 	for (o = opts; o; o = o->o_next) {
+		activerule = o;
+		if (o->firecount < 1) continue;
 		c = r;
 		p = o->o_old;
+		if (p == 0)
+			continue;	/* skip empty rules */
 		for (i = 0; i < 10; i++)
 			vars[i] = 0;
-		while (p && c && match(c->l_text, p->l_text, vars)) {
+		lines = 0;
+		while (p && c) {
+			if (strncmp(p->l_text, "%check", 6) == 0) {
+				if (! check(p->l_text + 6, vars))
+					break;
+			}
+			else {
+				if (! match(c->l_text, p->l_text, vars))
+					break;
+				c = c->l_prev;
+				++lines;
+			}
 			p = p->l_prev;
-			c = c->l_prev;
 		}
-		if (p == 0)
-			return rep(c, r->l_next, o->o_new, vars);
+		if (p != 0)
+			continue;
+
+		/* decrease firecount */
+		--o->firecount;
+
+		/* check for %once */
+		if (o->o_new && strcmp(o->o_new->l_text, "%once\n") == 0) {
+			struct lnode *tmp = o->o_new;	/* delete the %once line */
+			o->o_new = o->o_new->l_next;
+			o->o_new->l_prev = 0;
+			free(tmp);
+			o->firecount = 0;	/* never again */
+		}
+
+		/* check for activation rules */
+		if (o->o_new && strcmp(o->o_new->l_text, "%activate\n") == 0) {
+			/* we have to prevent repeated activation of rules */
+			char signature[160];
+			struct lnode *lnp;
+			struct onode *nn, *last;
+			int skip = 0;
+			/* since we 'install()' strings, we can compare pointers */
+			sprintf(signature, "%s%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x\n",
+				activated,
+				vars[0], vars[1], vars[2], vars[3], vars[4],
+				vars[5], vars[6], vars[7], vars[8], vars[9]);
+			lnp = o->o_new->l_next;
+			while (lnp &&
+				strncmp(lnp->l_text, activated, strlen(activated)) == 0)
+			{
+				if (strcmp(lnp->l_text, signature) == 0) {
+					skip = 1;
+					break;
+				}
+				lnp = lnp->l_next;
+			}
+			if (! lnp || skip)
+				continue;
+			insert(install(signature), lnp);
+
+			if (debug) {
+				fputs("matched pattern:\n", stderr);
+				for (p = o->o_old; p->l_prev; p = p->l_prev) ;
+				printlines(p, 0, stderr);
+				fputs("with:\n", stderr);
+				printlines(c->l_next, r->l_next, stderr);
+			}
+			/* allow creation of several rules */
+			last = o;
+			while (lnp) {
+				nn = (struct onode *)
+					malloc((unsigned) sizeof(struct onode));
+				if(nn == NULL)
+					error("activate: out of memory\n");
+				nn->o_old = 0, nn->o_new = 0; nn->firecount = MAXFIRECOUNT;
+				lnp = copylist(lnp, &nn->o_old, &nn->o_new, vars);
+				nn->o_next = last->o_next;
+				last->o_next = nn;
+				last = nn;
+				if (debug) {
+					fputs("activated rule:\n", stderr);
+					printrule(nn, stderr);
+				}
+			}
+			if (debug)
+				fputs("\n", stderr);
+			/* step back to allow (shorter) activated rules to match
+			   in the order they appear */
+			while (--lines && r->l_prev)
+				r = r->l_prev;
+			global_again = 1; /* signalize changes */
+			continue;
+		}
+
+		/* fire the rule */
+		r = rep(c, r->l_next, o->o_new, vars);
+		activerule = 0;
+		return r;
 	}
+	activerule = 0;
 	return r->l_next;
 }
+
+
+/* #define _TESTING */
 
 /* main - peephole optimizer */
 main(int argc, char **argv)
 {
 	FILE *fp;
-	int i;
+#ifdef _TESTING
+	FILE *inp;
+#endif
+	int i, pass;
 	struct lnode head, *p, *opt(), tail;
 
 	for (i = 1; i < argc; i++)
-		if (strcmp(argv[i], "-D") == 0)
+		if (strcasecmp(argv[i], "-D") == 0)
 			debug = 1;
-		else if ((fp=fopen(argv[i], "r")) == NULL) 
+		else if ((fp=fopen(argv[i], "r")) == NULL)
 			error("copt: can't open patterns file\n");
 		else
 			init(fp);
 
+#ifdef _TESTING
+	if ((inp = fopen("input.asm", "r")) == NULL)
+		error("copt: can't open input.asm\n");
+
+	getlst(inp, "", &head, &tail);
+#else
 	getlst(stdin, "", &head, &tail);
+#endif
 	head.l_text = tail.l_text = "";
 
-	for (p = head.l_next; p != &tail; p = opt(p))
-		;
+	pass = 0;
+	do {
+		++pass;
+		if (debug)
+			fprintf(stderr, "\n--- pass %d ---\n", pass);
+		global_again = 0;
+		for (p = head.l_next; p != &tail; p = opt(p))
+			;
+	} while (global_again && pass < MAX_PASS);
 
-	for (p = head.l_next; p != &tail; p = p->l_next)
-		fputs(p->l_text, stdout);
-	exit (0);
+	if (global_again) {
+		fprintf(stderr, "error: maximum of %d passes exceeded\n", MAX_PASS);
+		error("       check for recursive substitutions");
+	}
+
+	printlines(head.l_next, &tail, stdout);
+	exit(0);
+	return 1; /* make compiler happy */
 }
+
