@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.15 2003-10-11 15:41:04 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.16 2003-12-01 22:04:25 denniz Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -166,8 +166,8 @@ struct JRPC_Hdr *AllocJRaddrHdr (void);
 #include <qdos.h>
 
 char _prog_name[] = "Z80asm";
-char _version[] = "1.0.19";
-char _copyright[] = "\x7f InterLogic 1993-2002";
+char _version[] = "1.0.20";
+char _copyright[] = "\x7f InterLogic 1993-2003";
 
 void consetup_title ();
 void (*_consetup) () = consetup_title;
@@ -178,11 +178,11 @@ struct WINDOWDEF _condetails =
 #endif
 
 #ifdef AMIGA
-char amiver[] = "$VER: z80asm v1.0.19, (c) InterLogic 1993-2002";
+char amiver[] = "$VER: z80asm v1.0.20, (c) InterLogic 1993-2003";
 #endif
 
 
-char copyrightmsg[] = "Z80 Module Assembler V1.0.19 (1.12.2002), (c) InterLogic 1993-2002";
+char copyrightmsg[] = "Z80 Module Assembler V1.0.20 (1.12.2003), (c) InterLogic 1993-2003";
 
 FILE *z80asmfile, *listfile, *errfile, *objfile, *mapfile, *modsrcfile, *deffile, *libfile;
 long	clineno;
@@ -1308,9 +1308,9 @@ main (int argc, char *argv[])
 
 #ifdef QDOS
       /* explicit extension are automatically discarded */
-      if (strchr(ident,'_') != NULL) *(strchr(ident, '_')) ='\0';	
+      if (strrchr(ident,'_') != NULL) *(strrchr(ident, '_')) ='\0';	
 #else
-      if (strchr(ident,'.') != NULL) *(strchr(ident, '.')) ='\0';
+      if (strrchr(ident,'.') != NULL) *(strrchr(ident, '.')) ='\0';
 #endif
 
       if ((srcfilename = AllocIdentifier (strlen (ident) + 5)) != NULL)
