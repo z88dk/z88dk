@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.11 2002-02-20 11:11:54 dom Exp $
+ *      $Id: codegen.c,v 1.12 2002-02-20 11:18:43 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -1278,17 +1278,17 @@ void lneg(LVALUE *lval)
     switch(lval->val_type) {
     case LONG:
     case CPTR:
-	lval.val_type = CINT;
+	lval->val_type = CINT;
 	callrts("l_long_lneg");
 	break;
     case CARRY:
-	lval.val_type = CARRY;
+	lval->val_type = CARRY;
 	ccf();
 	break;
     case DOUBLE:
 	convdoub2int();
     default:
-	lval.val_type = CARRY;
+	lval->val_type = CARRY;
 	callrts("l_lneg");
     }
 }
