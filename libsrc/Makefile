@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.58 2003-03-22 14:26:49 dom Exp $
+# $Id: Makefile,v 1.59 2003-03-22 15:00:36 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -26,7 +26,7 @@ tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 	ti86ansi_clib.lib ti86_clib.lib \
 	tigray82.lib tigray83.lib tigray83p.lib tigray85.lib tigray86.lib
 
-zxlibs: zx_clib.lib zxan_clib.lib
+zxlibs: zx_clib.lib zxan_clib.lib zxvgs.lib
 
 
 # Garry's z88 far library - garry (probably dom now)
