@@ -1,6 +1,6 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.7 2003-03-17 16:30:27 dom Exp $
+ * $Id: define.h,v 1.8 2003-04-20 16:08:22 dom Exp $
  */
 
 /*      Stand-alone definitions                 */
@@ -172,7 +172,7 @@ SYMBOL {
 
 /*      Define the structure tag table parameters */
 
-#define NUMTAG          30
+#define NUMTAG          300
 #define STARTTAG        tagtab
 #define ENDTAG          tagtab+NUMTAG
 
@@ -194,7 +194,7 @@ struct tag_symbol {
 
 /*      Define the structure member table parameters */
 
-#define NUMMEMB         200
+#define NUMMEMB         2000
 #define STARTMEMB       membtab
 #define ENDMEMB         (membtab+NUMMEMB)
 
