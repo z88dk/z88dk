@@ -1,0 +1,679 @@
+;#Define		Invoke(xxxx)	CALL	xxxx
+;#Define		JMP(xxxx)	JP	xxxx
+; Syntax Enhancers
+
+
+DEFC		UserMem_Offset =	$8565
+DEFC		NewProg =		$448A
+
+DEFC		_IO_EXEC =	$51EF
+
+DEFC		InsertMem =	$4432
+; Amount In HL, Position In DE
+
+DEFC		DeleteMem =	$44B2
+; Amount In DE, Position In HL
+
+DEFC		PushErx =		$46A5
+;PushErr		EQU		$2C21
+; Place To Jump To In HL
+
+;PopErr		EQU		$2C51
+DEFC		PopErx =		$46A9
+; Gets Rid Of Error Routine
+
+;#Define		OnError(xxxx)	LD	HL, xxxx	\	CALL	PushErr
+;#Define		OffError	CALL	PopErr
+; Syntax Enhancers
+
+
+DEFC		_GetCsc =		$4014
+DEFC		MemFree =		$441A
+; Returned In HL
+
+DEFC		_CreatePic =	$4482
+DEFC		Entry = 	$9327
+DEFC		_CLRLCDFULL =	$4755
+DEFC		_clrScrnFull =	$475D
+DEFC		_CLRTXTSHD =	$4765
+DEFC		_dispDone =	$47F1
+DEFC		_dispHL =		$4709
+DEFC		_DISPOP1A =	$51D4
+DEFC		_eraseEOL =	$476D
+DEFC		_formDCplx =	$4D2E
+DEFC		_formReal =	$4D32
+DEFC		_GDISPTOKEN =	$4B20
+DEFC		_homeUp =		$4775
+DEFC		_lcd_busy =	$4066
+DEFC		_moveup =		$474D
+DEFC		_newline =	$473D
+DEFC		_outputExpr =	$5106
+DEFC		_putc =		$4705
+DEFC		_putmap =		$4701
+DEFC		_putps =		$4715
+DEFC		_puts =		$470D
+DEFC		_runIndicOff =	$4795
+DEFC		_runIndicOn =	$4791
+DEFC		_scrollDown =	$4751
+DEFC		_scrollUp =	$4745
+DEFC		_setPenT =	$51B9
+DEFC		_setPenX =	$51A7
+DEFC		_setPenY =	$51B0
+DEFC		_SFONT_LEN =	$4A6C
+DEFC		_VPUTBLANK =	$4C53
+DEFC		_vputmap =	$477D
+DEFC		_vputs =		$4781
+DEFC		_vputsn =		$4785
+DEFC		_Axes =		$519E
+DEFC		_CLine =		$4A84
+DEFC		_CPointS =	$4B00
+DEFC		ClearPlots =	$515B
+DEFC		BufCopy =		$5164
+DEFC		_HORIZCMD =	$4BEF
+DEFC		_ILINE =		$4AE4
+DEFC		_IPOINT =		$4AE8
+DEFC		_moveDown =	$4741
+DEFC		_PDspGrph =	$4BEB
+DEFC		_PUTXY =		$4BE4
+DEFC		_REGRAPH =	$4BCC
+DEFC		_VERTCMD =	$4BF3
+DEFC		_GetK =		$4A18
+DEFC		_getkey =		$4CFE
+DEFC		_ADRLELE =	$489D
+DEFC		_GETLTOOP1 =	$48A9
+DEFC		_PUTTOL =		$48BD
+DEFC		_ADRMELE =	$486D
+DEFC		_GETMTOOP1 =	$487D
+DEFC		_PUTTOMAT =	$4889
+DEFC		_ACOS =		$4122
+DEFC		_ACOSH =		$413A
+DEFC		_ANGLE =		$4152
+DEFC		_ASIN =		$412A
+DEFC		_ASINH =		$4136
+DEFC		_ATAN =		$4126
+DEFC		_ATANH =		$4132
+DEFC		_Ceiling =	$4BE0
+DEFC		_COS =		$40FA
+DEFC		_COSH =		$410A
+DEFC		_CUBE =		$409E
+DEFC		_DTOR =		$4096
+DEFC		_ETOX =		$40EA
+DEFC		_FACTORIAL =	$50C6
+DEFC		_FPADD =		$4092
+DEFC		_FPDIV =		$40C6
+DEFC		_FPMULT =		$40AA
+DEFC		_FPRECIP =	$40C2
+DEFC		_FPSQUARE =	$40A6
+DEFC		_FPSUB =		$408E
+DEFC		_FRAC =		$40BE
+DEFC		_INT =		$40D6
+DEFC		_INTGR =		$4076
+DEFC		_INVOP1SC =	$40B2
+DEFC		_INVSUB =		$407E
+DEFC		_LNX =		$40DE
+DEFC		_LOGX =		$40E2
+DEFC		_MAX =		$406E
+DEFC		_MIN =		$406A
+DEFC		_MINUS1 =		$408A
+DEFC		_PLUS1 =		$4086
+DEFC		_PTOR =		$413E
+DEFC		_RANDOM =		$50B6
+DEFC		_RNDGUARD =	$40CE
+DEFC		_ROUND =		$40DA
+DEFC		_RTOD =		$409A
+DEFC		_RTOP =		$4142
+DEFC		_SIN =		$40F6
+DEFC		_SINH =		$410E
+DEFC		_SQROOT =		$40CA
+DEFC		_STORAND =	$50BA
+DEFC		_TAN =		$40FE
+DEFC		_TANH =		$4106
+DEFC		_TENX =		$40EE
+DEFC		_TIMES2 =		$4082
+DEFC		_TIMESPT5 =	$40A2
+DEFC		_TRUNC =		$407A
+DEFC		_XROOTY =		$4A8C
+DEFC		_YTOX =		$4A90
+DEFC		_CHKFINDSYM =	$442A
+DEFC		_DELVAR =		$44AA
+DEFC		_RCLSYSTOK =	$4EF0
+DEFC		_RCLVARSYM =	$4EEC
+DEFC		_RCLX =		$4EE8
+DEFC		_RCLY =		$4EE0
+DEFC		_RSTRSHADOW =	$47A1
+DEFC		_SAVESHADOW =	$479D
+DEFC		_STOOTHER =	$4ED8
+DEFC		_STOSYSTOK =	$4EB8
+DEFC		_STOX =		$4ED4
+DEFC		_STOY =		$4EC8
+DEFC		_CKINT =		$4322
+DEFC		_CKODD =		$4326
+DEFC		_CKOP1FP0 =	$4312
+DEFC		_CKOP1POS =	$435A
+DEFC		_CKOP1REAL =	$414E
+DEFC		_CKOP2FP0 =	$4316
+DEFC		_CKOP2POS =	$4356
+DEFC		_CKOP2REAL =	$4412
+DEFC		_CKPOSINT =	$431E
+DEFC		_CLROP1S =	$4362
+DEFC		_CLROP2S =	$435E
+DEFC		_CONVOP1 =	$4EFC
+DEFC		_cphlde =		$4004
+DEFC		_CPOP1OP2 =	$4166
+DEFC		_divHLbyA =	$400C
+DEFC		_HTIMESL =	$4382
+DEFC		_INVOP1S =	$40B6
+DEFC		_INVOP2S =	$40BA
+DEFC		_ldHLind =	$4000
+DEFC		_MOVFROP1 =	$4212
+DEFC		_OP1EXOP2 =	$4306
+DEFC		_OP1EXOP3 =	$42FE
+DEFC		_OP1EXOP4 =	$4302
+DEFC		_OP1EXOP5 =	$42EE
+DEFC		_OP1EXOP6 =	$42F2
+DEFC		_OP1SET0 =	$4286
+DEFC		_OP1SET1 =	$4232
+DEFC		_OP1SET2 =	$4242
+DEFC		_OP1SET3 =	$423A
+DEFC		_OP1SET4 =	$4236
+DEFC		_OP1TOOP2 =	$418E
+DEFC		_OP1TOOP3 =	$417E
+DEFC		_OP1TOOP4 =	$416E
+DEFC		_OP1TOOP5 =	$41BE
+DEFC		_OP1TOOP6 =	$41BA
+DEFC		_OP2EXOP4 =	$42F6
+DEFC		_OP2EXOP5 =	$42FA
+DEFC		_OP2EXOP6 =	$42E6
+DEFC		_OP2SET0 =	$4282
+DEFC		_OP2SET1 =	$4252
+DEFC		_OP2SET2 =	$4246
+DEFC		_OP2SET3 =	$422E
+DEFC		_OP2SET4 =	$422A
+DEFC		_OP2SET5 =	$4222
+DEFC		_OP2SET60 =	$4EA8
+DEFC		_OP2SET8 =	$421E
+DEFC		_OP2SETA =	$4226
+DEFC		_OP2TOOP1 =	$41C2
+DEFC		_OP2TOOP3 =	$41F6
+DEFC		_OP2TOOP4 =	$4172
+DEFC		_OP2TOOP5 =	$41B2
+DEFC		_OP2TOOP6 =	$41B6
+DEFC		_OP3SET0 =	$427E
+DEFC		_OP3SET1 =	$421A
+DEFC		_OP3SET2 =	$423E
+DEFC		_OP3TOOP1 =	$41A2
+DEFC		_OP3TOOP2 =	$417A
+DEFC		_OP3TOOP4 =	$416A
+DEFC		_OP3TOOP5 =	$41AE
+DEFC		_OP4SET0 =	$427A
+DEFC		_OP4SET1 =	$4216
+DEFC		_OP4TOOP1 =	$419A
+DEFC		_OP4TOOP2 =	$4176
+DEFC		_OP4TOOP3 =	$41FA
+DEFC		_OP4TOOP5 =	$41AA
+DEFC		_OP4TOOP6 =	$4202
+DEFC		_OP5EXOP6 =	$42EA
+DEFC		_OP5SET0 =	$4276
+DEFC		_OP5TOOP1 =	$419E
+DEFC		_OP5TOOP2 =	$4182
+DEFC		_OP5TOOP3 =	$41FE
+DEFC		_OP5TOOP4 =	$418A
+DEFC		_OP5TOOP6 =	$4186
+DEFC		_OP6TOOP1 =	$4196
+DEFC		_OP6TOOP2 =	$4192
+DEFC		_OP6TOOP5 =	$41A6
+DEFC		_PUSHREALO1 =	$4536
+DEFC		_SETXXOP1 =	$4A74
+DEFC		_SETXXOP2 =	$4A78
+DEFC		_SETXXXXOP2 =	$4A7C
+DEFC		_ZEROOOP1 =	$428E
+
+;
+;       OP1 TO OP6 RAM EQUATES
+;
+DEFC		OP2 =		$8044
+DEFC		op2exp =		$8045
+DEFC		op2m =		$8046
+DEFC		OP1M =		$803B
+DEFC		OP1 =		$8039
+DEFC		OP3 =		$804F
+DEFC		OP3EXP =		$8050
+DEFC		OP3EXT =		$8058
+DEFC		OP3M =		$8051
+DEFC		OP4 =		$805A
+DEFC		OP4EXP =		$805B
+DEFC		OP4EXT =		$8063
+DEFC		OP4M =		$805C
+DEFC		OP5 =		$8065
+DEFC		OP5EXP =		$8066
+DEFC		OP5EXT =		$806E
+DEFC		OP5M =		$8067
+DEFC		OP6 =		$8070
+DEFC		OP6EXP =		$8071
+DEFC		OP6EXT =		$8079
+DEFC		OP6M =		$8072
+;
+;       POINTERS
+;
+DEFC		IMATHPTR1 =	$8094
+DEFC		IMATHPTR2 =	$8096
+DEFC		IMATHPTR3 =	$8098
+DEFC		IMATHPTR4 =	$809A
+DEFC		IMATHPTR5 =	$809C
+;
+;       POIONTER TO START OF PROGRAM/LIST SYMBOL ENTRIES
+;
+DEFC		PROGPTR =		$9319
+;
+;       ADDRESS OF LCD DRIVER INSTRUCTION PORT
+;
+DEFC		LCDINSTPORT =	$10
+;
+;       SCREEN SHADOWS
+;
+DEFC		TEXTSHADOW =	$80C9
+DEFC		CMDSHADOW =	$9157
+;
+;       GRAPH BACKUP BUFFER
+;
+DEFC		PLOTSCREEN =	$8E29
+;
+;       SAFE RAM LOCATIONS
+;
+DEFC		SAVESCREEN =	$8265
+DEFC		STATVARS =	$858F
+;
+;       START OF SYMBOL TABLE
+;
+DEFC		SYMTABLE =	$FE6E
+;
+;       RAM EQUATES DEALING WITH DISPLAY ROUTINES
+;
+DEFC		CURROW =		$800C
+DEFC		CURCOL =		$800D
+DEFC		PENCOL =		$8252
+DEFC		PENROW =		$8253
+DEFC		CURGY =		$886D
+DEFC		CURGX =		$886E
+;
+;       INDIRECT CALL BYTE
+;
+DEFC		ASM_IND_CALL =	$80C8
+;
+;       LINK PORT WRITE EQUATES
+;
+DEFC		D0LD1L =		$D3
+DEFC		D0LD1H =		$D1
+DEFC		D0HD1L =		$D2
+DEFC		D0HD1H =		$D0
+DEFC		BPORT =		0
+;
+; SYSTEM EQUATES
+; ALL OF THESE FLAGS CAN BE ACCESSED THROUGH THE 'IY' REGISTER
+;
+DEFC		trigflags =	0		; IY OFFSET VALUE
+DEFC		trigdeg =		2
+;
+DEFC		plotflags =	2		; IY OFFSET VALUE
+DEFC		plotloc =		1
+DEFC		plotdisp =	2
+;
+DEFC		grfmodeflags =	2		; IY OFFSET VALUE
+DEFC		grffuncm =	4
+DEFC		grfpolarm =	5
+DEFC		grfparamm =	6
+DEFC		grfrecurm =	7
+;
+DEFC		graphflags =	3		; IY OFFSET VALUE
+DEFC		graphdraw =	0
+DEFC		graphcursor =	2
+;
+DEFC		grfdbflags =	4		; IY OFFSET VALUE
+DEFC		grfdot =		0
+DEFC		grfsimul =	1
+DEFC		grfgrid =		2
+DEFC		grfpolar =	3
+DEFC		grfnocoord =	4
+DEFC		grfnoaxis =	5
+DEFC      	grflabel =        6
+;
+DEFC		textflags =	5		; IY OFFSET VALUE
+DEFC		textEraseBelow =	1
+DEFC		textScrolled =	2
+DEFC		textInverse =	3
+;
+DEFC		onflags =		9		; IY OFFSET VALUE
+DEFC       	onRunning =	3
+DEFC		onInterrupt =     4
+;
+DEFC		statflags =	9		; IY OFFSET VALUE
+DEFC		statsvalid =	6
+;
+DEFC		fmtflags =	10	; IY OFFSET VALUE
+DEFC		fmtExponent =	0
+DEFC		fmtEng =		1
+;
+DEFC		nummode =		10	; IY OFFSET VALUE
+DEFC		FMTREAL =		5
+DEFC		FMTRECT =		6
+DEFC		FMTPOLAR =	7
+;
+DEFC		curflags =	12	; IY OFFSET VALUE
+DEFC		curAble =		2
+DEFC		curOn =		3
+DEFC		curLock =         4
+;
+DEFC		appflags =	13	; IY OFFSET VALUE
+DEFC		appTextSave =	1
+DEFC		appAutoScroll =	2
+;
+DEFC		PLOTFLAG2 =	17	; IY OFFSET VALUE
+DEFC		EXPR_PARAM =	3
+DEFC		EXPR_WRITING =	4
+;
+DEFC		indicflags =	18	; IY OFFSET VALUE
+DEFC		indicRun =	0
+DEFC		indicOnly =	2
+;
+DEFC		shiftflags =	18	; IY OFFSET VALUE
+DEFC		shift2nd =	3
+DEFC		shiftAlpha =	4
+DEFC		shiftALock =	6
+;
+DEFC		tblflags =	19	; IY OFFSET VALUE
+DEFC		AutoFill =	4
+DEFC		AutoCalc =	5
+;
+DEFC		sgrflags =	20	; IY OFFSET VALUE
+DEFC		grfSplit =	0
+DEFC		VertSplit =	1
+DEFC		WRITE_ON_GRAPH =	4
+DEFC		textwrite =	7
+;
+DEFC		asm_flag1 =	33	; IY OFFSET VALUE
+DEFC		asm_flag1_0 =	0
+DEFC		asm_flag1_1 =	1
+DEFC		asm_flag1_2 =	2
+DEFC		asm_flag1_3 =	3
+DEFC		asm_flag1_4 =	4
+DEFC		asm_flag1_5 =	5
+DEFC		asm_flag1_6 =	6
+DEFC		asm_flag1_7 =	7
+;
+DEFC		asm_flag2 =	34	; IY OFFSET VALUE
+DEFC		asm_flag2_0 =	0
+DEFC		asm_flag2_1 =	1
+DEFC		asm_flag2_2 =	2
+DEFC		asm_flag2_3 =	3
+DEFC		asm_flag2_4 =	4
+DEFC		asm_flag2_5 =	5
+DEFC		asm_flag2_6 =	6
+DEFC		asm_flag2_7 =	7
+;
+DEFC		asm_flag3 =	35	; IY OFFSET VALUE
+DEFC		asm_flag3_0 =	0
+DEFC		asm_flag3_1 =	1
+DEFC		asm_flag3_2 =	2
+DEFC		asm_flag3_3 =	3
+DEFC		asm_flag3_4 =	4
+DEFC		asm_flag3_5 =	5
+DEFC		asm_flag3_6 =	6
+DEFC		asm_flag3_7 =     7
+;
+;       SYSTEM VAR EQUATES, FOR STORING AND RECALLING THEM
+;
+DEFC		XSCLt =		2	; XSCALE
+DEFC		YSCLt =		3	; YSCALE
+Define		XMINt		$0A	; XMIN
+Define		XMAXt		$0B	; XMAX
+Define		YMINt		$0C	; YMIN
+Define		YMAXt		$0D	; XMAX
+Define		TMINt		$0E	; TMIN
+Define		TMAXt		$0F	; TMAX
+Define		THETMINt	$10	; THETA MIN
+Define		THETMAXt	$11	; THETA MAX
+Define		TBLMINt		$1A	; TABLE MIN
+Define		PLOTSTARTt	$1B	; PLOT START
+Define		NMAXt		$1D	; NMAX
+Define		nmint		$1F	; NMIN
+Define		TBLSTEPt	$21	; TABLE STEP
+Define		TSTEPt		$22	; T STEP
+Define		THETSTEPt	$23	; THETA STEP
+Define		DELTAXt		$26	; DELTA X
+Define		DELTAYt		$27	; DELTA Y
+Define		XFACTt		$28	; X ZOOM FACTOR
+Define		YFACTt		$29	; Y ZOOM FACTOR
+Define		FINnT		$2B	; TVM n
+Define		FINiT		$2C	; TVM i
+Define		FINpvT		$2D	; TVM pv
+Define		FINpmtT		$2E	; TVM pmt
+Define		FINfvT		$2F	; TVM fv
+Define		FINpyT		$30	; TVM p/y
+Define		FINcyT		$31	; TVM c/y
+Define		PLOTSTEPT	$34	; PLOT STEP
+Define		XREST		$36	; X RES
+
+;
+;       CHARACTER FONT EQUATES
+;
+DEFC		LSEQ_N =		$01
+DEFC		LSEQ_U =		$02
+DEFC		LSEQ_V =		$03
+DEFC		LSEQ_W =		$04
+DEFC		Lconvert =	$05
+DEFC		LsqUp =		$06
+DEFC		LsqDown =		$07
+DEFC		Lintegral =	$08
+DEFC		Lcross =		$09
+DEFC		LBOXICON =	$0A
+DEFC		LCROSSICON =	$0B
+DEFC		LDOTICON =	$0C
+Define		LsubT		$0D	; small capital T for parametric mode.
+Define		LcubeR		$0E	;slightly different 3 for cubed root.
+DEFC		LhexF =		$0F
+DEFC		Lroot =		$10
+DEFC		Linverse =	$11
+DEFC		Lsquare =		$12
+DEFC		Langle =		$13
+DEFC		Ldegree =		$14
+DEFC		Lradian =		$15
+DEFC		Ltranspose =	$16
+DEFC		LLE =		$17
+DEFC		LNE =		$18
+DEFC		LGE =		$19
+DEFC		Lneg =		$1A
+DEFC		Lexponent =	$1B
+DEFC		Lstore =		$1C
+DEFC		Lten =		$1D
+DEFC		LupArrow =	$1E
+DEFC		LdownArrow =	$1F
+DEFC		Lspace =		$20
+DEFC		Lexclam =		$21
+DEFC		Lquote =		$22
+DEFC		Lpound =		$23
+DEFC		LFOURTH =		$24
+DEFC		Lpercent =	$25
+DEFC		Lampersand =	$26
+DEFC		Lapostrophe =	$27
+DEFC		LlParen =		$28
+DEFC		LrParen =		$29
+DEFC		Lasterisk =	$2A
+DEFC		LplusSign =	$2B
+DEFC		Lcomma =		$2C
+DEFC		Ldash =		$2D
+DEFC		Lperiod =		$2E
+DEFC		Lslash =		$2F
+DEFC		L0 =		$30
+DEFC		L1 =		$31
+DEFC		L2 =		$32
+DEFC		L3 =		$33
+DEFC		L4 =		$34
+DEFC		L5 =		$35
+DEFC		L6 =		$36
+DEFC		L7 =		$37
+DEFC		L8 =		$38
+DEFC		L9 =		$39
+DEFC		Lcolon =		$3A
+DEFC		Lsemicolon =	$3B
+DEFC		LLT =		$3C
+DEFC		LEQ =		$3D
+DEFC		LGT =		$3E
+DEFC		Lquestion =	$3F
+DEFC		LatSign =		$40
+DEFC		LcapA =		$41
+DEFC		LcapB =		$42
+DEFC		LcapC =		$43
+DEFC		LcapD =		$44
+DEFC		LcapE =		$45
+DEFC		LcapF =		$46
+DEFC		LcapG =		$47
+DEFC		LcapH =		$48
+DEFC		LcapI =		$49
+DEFC		LcapJ =		$4A
+DEFC		LcapK =		$4B
+DEFC		LcapL =		$4C
+DEFC		LcapM =		$4D
+DEFC		LcapN =		$4E
+DEFC		LcapO =		$4F
+DEFC		LcapP =		$50
+DEFC		LcapQ =		$51
+DEFC		LcapR =		$52
+DEFC		LcapS =		$53
+DEFC		LcapT =		$54
+DEFC		LcapU =		$55
+DEFC		LcapV =		$56
+DEFC		LcapW =		$57
+DEFC		LcapX =		$58
+DEFC		LcapY =		$59
+DEFC		LcapZ =		$5A
+DEFC		Ltheta =		$5B
+DEFC		Lbackslash =	$5C
+DEFC		LrBrack =		$5D
+DEFC		Lcaret =		$5E
+DEFC		Lunderscore =	$5F
+DEFC		Lbackquote =	$60
+DEFC		La =		$61
+DEFC		Lb =		$62
+DEFC		Lc =		$63
+DEFC		Ld =		$64
+DEFC		Le =		$65
+DEFC		Lf =		$66
+DEFC		Lg =		$67
+DEFC		Lh =		$68
+DEFC		Li =		$69
+DEFC		Lj =		$6A
+DEFC		Lk =		$6B
+DEFC		Ll =		$6C
+DEFC		Lm =		$6D
+DEFC		Ln =		$6E
+DEFC		Lo =		$6F
+DEFC		Lp =		$70
+DEFC		Lq =		$71
+DEFC		Lr =		$72
+DEFC		Ls =		$73
+DEFC		Lt =		$74
+DEFC		Lu =		$75
+DEFC		Lv =		$76
+DEFC		Lw =		$77
+DEFC		Lx =		$78
+DEFC		Ly =		$79
+DEFC		Lz =		$7A
+DEFC		LlBrace =		$7B
+DEFC		Lbar =		$7C
+DEFC		LrBrace =		$7D
+DEFC		Ltilde =		$7E
+DEFC		LinvEQ =		$7F
+DEFC		Lsub0 =		$80
+DEFC		Lsub1 =		$81
+DEFC		Lsub2 =		$82
+DEFC		Lsub3 =		$83
+DEFC		Lsub4 =		$84
+DEFC		Lsub5 =		$85
+DEFC		Lsub6 =		$86
+DEFC		Lsub7 =		$87
+DEFC		Lsub8 =		$88
+DEFC		Lsub9 =		$89
+DEFC		LcapAAcute =	$8A
+DEFC		LcapAGrave =	$8B
+DEFC		LcapACaret =	$8C
+DEFC		LcapADier =	$8D
+DEFC		LaAcute =		$8E
+DEFC		LaGrave =		$8F
+DEFC		LaCaret =		$90
+DEFC		LaDier =		$91
+DEFC		LcapEAcute =	$92
+DEFC		LcapEGrave =	$93
+DEFC		LcapECaret =	$94
+DEFC		LcapEDier =	$95
+DEFC		LeAcute =		$96
+DEFC		LeGrave =		$97
+DEFC		LeCaret =		$98
+DEFC		LeDier =		$99
+DEFC		LcapIAcute =	$9A
+DEFC		LcapIGrave =	$9B
+DEFC		LcapICaret =	$9C
+DEFC		LcapIDier =	$9D
+DEFC		LiAcute =		$9E
+DEFC		LiGrave =		$9F
+DEFC		LiCaret =		$A0
+DEFC		LiDier =		$A1
+DEFC		LcapOAcute =	$A2
+DEFC		LcapOGrave =	$A3
+DEFC		LcapOCaret =	$A4
+DEFC		LcapODier =	$A5
+DEFC		LoAcute =		$A6
+DEFC		LoGrave =		$A7
+DEFC		LoCaret =		$A8
+DEFC		LoDier =		$A9
+DEFC		LcapUAcute =	$AA
+DEFC		LcapUGrave =	$AB
+DEFC		LcapUCaret =	$AC
+DEFC		LcapUDier =	$AD
+DEFC		LuAcute =		$AE
+DEFC		LuGrave =		$AF
+DEFC		LuCaret =		$B0
+DEFC		LuDier =		$B1
+DEFC		LcapCCed =	$B2
+DEFC		LcCed =		$B3
+DEFC		LcapNTilde =	$B4
+DEFC		LnTilde =		$B5
+DEFC		Laccent =		$B6
+DEFC		Lgrave =		$B7
+DEFC		Ldieresis =	$B8
+DEFC		LquesDown =	$B9
+DEFC		LexclamDown =	$BA
+DEFC		Lalpha =		$BB
+DEFC		Lbeta =		$BC
+DEFC		Lgamma =		$BD
+DEFC		LcapDelta =	$BE
+DEFC		Ldelta =		$BF
+DEFC		Lepsilon =	$C0
+DEFC		LlBrack =		$C1
+DEFC		Llambda =		$C2
+DEFC		Lmu =		$C3
+DEFC		Lpi =		$C4
+DEFC		Lrho =		$C5
+DEFC		LcapSigma =	$C6
+DEFC		Lsigma =		$C7
+DEFC		Ltau =		$C8
+DEFC		Lphi =		$C9
+DEFC		LcapOmega =	$CA
+DEFC		LxMean =		$CB
+DEFC		LyMean =		$CC
+DEFC		LsupX =		$CD
+DEFC		Lellipsis =	$CE
+DEFC		Lleft =		$CF
+DEFC		Lblock =		$D0
+DEFC		Lper =		$D1
+DEFC		Lhyphen =		$D2
+DEFC		Larea =		$D3
+DEFC		Ltemp =		$D4
+DEFC		Lcube =		$D5
+DEFC		Lenter =		$D6
+DEFC		LimagI =		$D7
+DEFC		Lphat =		$D8
+DEFC		Lchi =		$D9
+DEFC		LstatF =		$DA
+DEFC		Llne =		$DB
+DEFC		LlistL =		$DC
+DEFC		LfinanN =		$DD
