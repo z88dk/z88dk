@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.4 2001-04-11 12:26:25 dom Exp $
+ *      $Id: declvar.c,v 1.5 2002-01-16 20:12:20 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -787,9 +787,9 @@ TAG_SYMBOL *GetVarID(struct varid *var,char storage)
                 /* find structure tag */
                 if ( storage==TYPDEF && rcmatch('{') ) 
                         return (defstruct(0, storage, var->sflag) );
-                if ( symname(sname) == 0 )
-                        illname(sname) ;
-                if ( (otag=findtag(sname)) == 0 ) {
+		/* Get the symbol name if present */
+		symname(sname);	       
+                if ( sname[0] == 0 || ( otag= findtag(sname) ) == 0 ) {
                         /* structure not previously defined */
                         if ( storage == NO ) 
                                 error(E_UNSTR);
