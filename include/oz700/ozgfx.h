@@ -2,7 +2,7 @@
 	HTC Compatibility Library and OZ extras 
 	1. GRAPHICS AND DISPLAY
 
-	$Id: ozgfx.h,v 1.5 2003-10-23 10:42:49 stefano Exp $
+	$Id: ozgfx.h,v 1.6 2003-10-23 15:45:47 stefano Exp $
 */
 
 #include <graphics.h>
@@ -23,6 +23,25 @@ typedef unsigned char byte;
 #define _OZ_BYTE
 #endif
 
+//#ifndef NULL
+//#define NULL ((void*)0)
+//#endif
+
+#define GREYSHADE_WHITE 0
+#define GREYSHADE_BLACK 3
+#define GREYSHADE_GREY1 1
+#define GREYSHADE_GREY2 2
+#define WHITE 0
+#define BLACK 1
+#define XOR   2
+#define FILL   4
+#define UNFILL 0
+#define FONT_PC_NORMAL 1
+#define FONT_PC_LARGE 0
+#define FONT_OZ_NORMAL 3
+#define FONT_OZ_LARGE 2
+
+
 //extern __LIB__ ozsetactivepage(byte page);
 extern __LIB__ ozsetactivepage(byte page);
 extern __LIB__ ozsetdisplaypage(byte page);
@@ -31,7 +50,10 @@ extern byte __LIB__ ozgetdisplaypage(void);
 extern __LIB__ ozdisplayactivepage(void);
 extern __LIB__ ozactivatedisplaypage(void);
 extern __LIB__ ozcopypage(byte dest, byte src);
-extern __LIB__ ozswapactivedisplaypages(void);
+
+#define ozswapactivedisplaypages ozswapactivedisplay
+extern __LIB__ ozswapactivedisplay(void);
+
 #define MAX_DISPLAYPAGES 2
 
 //extern __LIB__ ozcls(void);
@@ -43,15 +65,15 @@ extern __LIB__ ozswapactivedisplaypages(void);
 int ozpoint(int x, int y, byte color)
 {
 	if (x>239 || y>80) return -1;
-	if (color==1) plot (x,y);
-	if (color==0) unplot (x,y);
+	if (color = BLACK) plot (x,y);
+	if (color = WHITE) unplot (x,y);
 }
 
 //extern __LIB__ ozcircle(int x,int y,byte r,byte color);
 void ozcircle(int x,int y,byte r,byte color)
 {
-	if (color==1) circle (x,y,r,1);
-	if (color==0) uncircle (x,y,r,1);
+	if (color = BLACK) circle (x,y,r,1);
+	if (color = WHITE) uncircle (x,y,r,1);
 }
 
 #define _ozline ozline
@@ -59,22 +81,22 @@ void ozcircle(int x,int y,byte r,byte color)
 //extern __LIB__ _ozline(byte x,byte y,byte x2,byte y2,byte color);
 void ozline(int x,int y,int x2,int y2,byte color)
 {
-	if (color==1) draw (x,y,x2,y2);
-	if (color==0) undraw (x,y,x2,y2);
+	if (color = BLACK) draw (x,y,x2,y2);
+	if (color = WHITE) undraw (x,y,x2,y2);
 }
 
 
 //extern __LIB__ _ozhline(byte x,byte y,byte len,byte color);
 void _ozhline(byte x,byte y,byte len,byte color)
 {
-	if (color==1) draw (x,y,x,y+len);
-	if (color==0) undraw (x,y,x,y+len);
+	if (color = BLACK) draw (x,y,x,y+len);
+	if (color = WHITE) undraw (x,y,x,y+len);
 }
 //extern __LIB__ _ozvline(byte x,byte y,byte len,byte color);
 void _ozvline(byte x,byte y,byte len,byte color)
 {
-	if (color==1) draw (x,y,x+len,y);
-	if (color==0) undraw (x,y,x+len,y);
+	if (color = BLACK) draw (x,y,x+len,y);
+	if (color = WHITE) undraw (x,y,x+len,y);
 }
 
 extern __LIB__ ozdisplayorbyte(unsigned offset, byte v);
@@ -123,7 +145,11 @@ extern __LIB__ ozscrolldown(unsigned numbytes);
 extern __LIB__ ozscrollclear(void);
 extern __LIB__ ozsavescreen(void);
 extern __LIB__ ozrestorescreen(void);
-extern __LIB__ _ozputsprite(byte x,byte y,byte height,byte *sprite);
+
+//extern __LIB__ _ozputsprite(byte x,byte y,byte height,byte *sprite);
+#define _ozputsprite ozputsprite
+extern __LIB__ ozputsprite(byte x,byte y,byte height,byte *sprite);
+
 extern char __LIB__ *ozputsgetend(void);
 extern int __LIB__ ozputs_system(int x, int y, char *string);
 extern int __LIB__ ozputs(int x, int y, char *string);
@@ -134,23 +160,5 @@ extern __LIB__ ozsetfont(byte fontnum);
 extern int __LIB__ ozputch(int x, int y, char c);
 extern __LIB__ ozscrollright(byte y , byte rows);
 extern __LIB__ ozscrollleft(byte y , byte rows);
-
-#define GREYSHADE_WHITE 0
-#define GREYSHADE_BLACK 3
-#define GREYSHADE_GREY1 1
-#define GREYSHADE_GREY2 2
-#define WHITE 0
-#define BLACK 1
-#define XOR   2
-#define FILL   4
-#define UNFILL 0
-#define FONT_PC_NORMAL 1
-#define FONT_PC_LARGE 0
-#define FONT_OZ_NORMAL 3
-#define FONT_OZ_LARGE 2
-
-#ifndef NULL
-#define NULL ((void*)0)
-#endif
 
 #endif
