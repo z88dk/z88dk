@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.4 2001-10-15 22:42:40 dom Exp $
+;	$Id: app_crt0.asm,v 1.5 2002-01-20 20:28:08 dom Exp $
 
 
 ;--------
@@ -386,6 +386,7 @@ ENDIF
 ;-------
 IF !safedata
 	IF !DEFINED_defvarsaddr
+		DEFINE DEFINED_defvarsaddr
 		defc defvarsaddr = 8192
 	ENDIF
 
