@@ -8,9 +8,8 @@ all: net
 
 net:
 	z80asm -d -ns -nm -Mo -x../net @zsock_list
-	rm no_zsock.o
-	z80asm -d -ns -nm -DmakeDEVLIB -Mo -x../netdev @zsock_list
+	z80asm -d -ns -nm -Mo -x../netdev @zsockdev_list
 
 
 clean:
-	rm -f *.o* *.sym *.map 
+	rm -f *.obj *.sym *.map *.o

@@ -13,15 +13,11 @@
 
 
 .no_zsock
-IF makeDEVLIB
-	ret
-ELSE
 	ld	hl,message
 	call_oz(gn_sop)
 	call_oz(os_in)
 	ld	hl,0
 	jp	exit
-ENDIF
 
 
 .message

@@ -15,7 +15,7 @@ getservprotobyport
 inet_addr
 inet_ntoa
 killdaemon
-no_zsock
+no_zsockdev
 resolve
 reverse_addr_lookup
 sethostaddr
