@@ -12,11 +12,12 @@
 ;	djm 6/6/2000
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.3 2001-05-02 09:21:51 dom Exp $
 ;
 
 	XLIB	ansi_attr
 
+	XREF	invrs
 
 	INCLUDE	"#stdio.def"
 
@@ -46,7 +47,7 @@
 	call_oz(gn_sop)
         ret
 .dimtxt
-	defb	1,'2','+','G',0
+	defb	1,'2','-','B',0
 .nodim
         cp      4
         jr      nz,nounderline
@@ -69,7 +70,7 @@
 	ld	hl,blinktxt
 	call_oz(gn_sop)
         ret
-,blinktxt
+.blinktxt
 	defb	1,'2','+','F',0
 .noblink
         cp      25
@@ -85,7 +86,7 @@
 	ld	hl,invstxt
 	call_oz(gn_sop)
         ret
-        ld      (INVRS),a     ; inverse 1
+;        ld      (INVRS),a     ; inverse 1
 .invstxt
 	defb	1,'2','+','R',0
 .noreverse
@@ -99,13 +100,21 @@
 .noCreverse
         cp      8
         jr      nz,noinvis
-; Pass, make the text invisible..
+; Pass, make the text invisible..(tiny)
+	ld	hl,tinytext
+	call_oz(gn_sop)
         ret
+.tinytext
+	defb	1,'3','+','G','T',0
 .noinvis
         cp      28
         jr      nz,nocinvis
 ; Pass, make text visible again
+	ld	hl,notinytxt
+	call_oz(gn_sop)
         ret
+.notinytxt
+	defb	1,'3','-','G','T',0
 .nocinvis
 	ret
 IF colours

@@ -6,14 +6,16 @@
 ;	Entry: a = row
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_dline.asm,v 1.3 2001-05-02 09:21:51 dom Exp $
 ;
 
+	INCLUDE	"#stdio.def"
 
-	XLIB	ansi_dline
+
+	XLIB	ansi_del_line
 
 
-.ansi_dline
+.ansi_del_line
 	push	af
 	ld	a,1
 	call_oz(os_out)
@@ -22,7 +24,7 @@
 	ld	a,'@'
 	call_oz(os_out)
 	pop	af
-	add	32
+	add	a,32
 	call_oz(os_out)
 	ld	hl,rest
 	call_oz(gn_sop)

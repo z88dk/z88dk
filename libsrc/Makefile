@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.12 2001-05-01 13:55:21 dom Exp $
+# $Id: Makefile,v 1.13 2001-05-02 09:21:51 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -97,6 +97,21 @@ z88_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -xz88_clib @z88.lst
+
+
+z88ansi_clib.lib:
+	@echo ''
+	@echo '---> Building Z88 ANSI Library  <---'
+	@echo ''
+	cd fcntl ; make lz88
+	cd stdio ; make lz88
+	cd stdlib ; make lz88
+	cd strings ; make 
+	cd printflike ; make 
+	cd time ; make lz88
+	cd setjmp ; make 
+	cd assert ; make 
+	z80asm -d -ns -nm -Mo -xz88ansi_clib @z88ansi.lst
 
 # Network stdio
 
@@ -504,6 +519,7 @@ clean:
 	cd stdio ; make clean
 	cd printflike ; make clean
 	cd setjmp ; make clean
+	cd fcntl; make clean
 	cd assert ; make clean
 	rm -f *.lib */*/*.o */*.opt */*/*.obj */*/*.err
 	rm -f */*.o */*.sym */*~ */zcc_opt.def */core */*.err
