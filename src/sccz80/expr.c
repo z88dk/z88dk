@@ -2,7 +2,7 @@
  * cc4.c - fourth part of Small-C/Plus compiler
  *         routines for recursive descent
  *
- * $Id: expr.c,v 1.2 2001-01-26 11:48:52 dom Exp $
+ * $Id: expr.c,v 1.3 2001-01-26 11:53:59 dom Exp $
  *
  */
 
@@ -690,19 +690,18 @@ LVALUE *lval ;
 		    } else {
 			scale(ptr->type, tagtab+ptr->tag_idx);
 		    }
-				/* If near, then pop other side back, otherwise
-				   load high reg with de and do an add 
-				*/
-		    if (lval->flags&FARPTR != FARPTR) zpop();
-		    else const2(0);
+		    /* If near, then pop other side back, otherwise
+		       load high reg with de and do an add  */
+		    if (lval->flags&FARPTR) {
+			const2(0);
+		    } else {
+			zpop();
+		    }
 		    zadd(lval);
 				/* If long pointer restore upper 16 bits */
 		    //    if (lval->flags&FARPTR) zpop();
 		}
-		ptr = deref(lval,YES) ;
-		if ( lval->flags&FARPTR == FARPTR) {
-		    outstr("derrefed is long still\n");
-		}
+		ptr = deref(lval,YES);
 		k = 1 ;
 	    }
 	    else if ( cmatch('(') ) {
