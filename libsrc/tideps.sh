@@ -10,6 +10,6 @@
 	rm -f stdio/ansi/ticalc/f_ansi_cls.o
 	rm -f stdio/ansi/ticalc/f_ansi_dline.o
 	rm -f stdio/ansi/ticalc/f_ansi_scrollup.o
-	rm -f graphics/ticalc/pixladdr.o
-	rm -f graphics/ticalc/swapgfxbk.o
+	rm -f graphics/*.o
+	rm -f graphics/ticalc/*.o
 
