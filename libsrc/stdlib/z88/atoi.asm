@@ -18,9 +18,9 @@
 	ld	de,2	;reutn in bc
 	ld	b,254	;well, ya never know where it is!
 	call_oz(gn_gdn)
-	ld	hl,0
-	ret	c
 	ld	l,c
 	ld	h,b
+	ret	z	;was a number
+	ld	hl,0
 	ret
 
