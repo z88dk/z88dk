@@ -1,6 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
+# $Id: Makefile,v 1.9 2001-04-20 11:56:39 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -12,9 +13,10 @@ genlibs: m.lib malloc.lib z80_crt0.lib
 
 z88libs: mz.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib
 
-tilibs: ti82ansi_clib.lib ti83ansi_clib.lib ti83pansi_clib.lib \
-	ti85ansi_clib.lib ti86ansi_clib.lib tigray82.lib tigray83.lib \
-	tigray83p.lib
+tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
+	ti83pansi_clib.lib ti83_clib.lib ti85ansi_clib.lib ti85_clib.lib \
+	ti86ansi_clib.lib ti86_clib.lib \
+	tigray82.lib tigray83.lib tigray83p.lib tigray85.lib
 
 zxlibs: zx_clib.lib zxan_clib.lib
 
@@ -117,7 +119,7 @@ nc_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -xnc_clib @nc100.lst
 
-# VZ200 lib from Stefano
+# VZ200/300 lib - Stefano
 
 vz_clib.lib:
 	./gfxdeps.sh
@@ -129,7 +131,7 @@ vz_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORvz200 -xvz_clib @vz200.lst
 
-# VZ200 ansi lib from Stefano
+# VZ200 ansi lib - Stefano
 
 vzansi_clib.lib:
 	./gfxdeps.sh
@@ -141,7 +143,7 @@ vzansi_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORvz200 -xvzansi_clib @vzansi.lst
 
-# zx81 lib from Stefano
+# ZX81 lib - Stefano
 
 zx81_clib.lib:
 	./gfxdeps.sh
@@ -153,7 +155,7 @@ zx81_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORzx81 -xzx81_clib @zx81.lst
 
-# zx81 ansi lib from Stefano
+# ZX81 ansi lib - Stefano
 
 zx81ansi_clib.lib:
 	./gfxdeps.sh
@@ -167,20 +169,7 @@ zx81ansi_clib.lib:
 
 # Texas Instrument's calculators:
 # almost the same lib code with different -D flag set
-
-ti82_clib.lib:
-	./tideps.sh
-	cd strings ; make
-	cd stdlib ; make gen
-	cd stdio ; make generic
-	cd printflike ; make 
-	cd setjmp ; make 
-	cd assert ; make 
-	z80asm -d -ns -nm -Mo -DFORti82 -xti82_clib @ti82.lst
-
-tigray82.lib:
-	./tideps.sh
-	z80asm -d -ns -nm -Mo -DFORti82 -xtigray82 @tigray.lst
+# that's why we force most of the lib code to be rebuilt (tideps.sh)
 
 ti82ansi_clib.lib:
 	./tideps.sh
@@ -192,6 +181,21 @@ ti82ansi_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORti82 -xti82ansi_clib @ticansi.lst
 
+ti82_clib.lib:
+	./tideps.sh
+	cd strings ; make
+	cd stdlib ; make gen
+	cd stdio ; make generic
+	cd printflike ; make 
+	cd setjmp ; make 
+	cd assert ; make 
+	z80asm -d -ns -nm -Mo -DFORti82 -xti82_clib @ticalc.lst
+
+tigray82.lib:
+	./tideps.sh
+	z80asm -d -ns -nm -Mo -DFORti82 -xtigray82 @tigray.lst
+
+
 ti83ansi_clib.lib:
 	./tideps.sh
 	cd strings ; make
@@ -201,6 +205,16 @@ ti83ansi_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORti83 -xti83ansi_clib @ticansi.lst
+
+ti83_clib.lib:
+	./tideps.sh
+	cd strings ; make
+	cd stdlib ; make gen
+	cd stdio ; make generic
+	cd printflike ; make 
+	cd setjmp ; make 
+	cd assert ; make 
+	z80asm -d -ns -nm -Mo -DFORti83 -xti83_clib @ticalc.lst
 
 tigray83.lib:
 	./tideps.sh
@@ -216,6 +230,16 @@ ti83pansi_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORti83p -xti83pansi_clib @ticansi.lst
 
+ti83p_clib.lib:
+	./tideps.sh
+	cd strings ; make
+	cd stdlib ; make gen
+	cd stdio ; make generic
+	cd printflike ; make 
+	cd setjmp ; make 
+	cd assert ; make 
+	z80asm -d -ns -nm -Mo -DFORti83p -xti83p_clib @ticalc.lst
+
 tigray83p.lib:
 	./tideps.sh
 	z80asm -d -ns -nm -Mo -DFORti83p -xtigray83p @tigray.lst
@@ -230,6 +254,20 @@ ti85ansi_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORti85 -xti85ansi_clib @ticansi.lst
 
+ti85_clib.lib:
+	./tideps.sh
+	cd strings ; make
+	cd stdlib ; make gen
+	cd stdio ; make generic
+	cd printflike ; make 
+	cd setjmp ; make 
+	cd assert ; make 
+	z80asm -d -ns -nm -Mo -DFORti85 -xti85_clib @ticalc.lst
+
+tigray85.lib:
+	./tideps.sh
+	z80asm -d -ns -nm -Mo -DFORti85 -xtigray85 @tigray.lst
+
 ti86ansi_clib.lib:
 	./tideps.sh
 	cd strings ; make
@@ -240,7 +278,17 @@ ti86ansi_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORti86 -xti86ansi_clib @ticansi.lst
 
-# cpm lib from Stefano
+ti86_clib.lib:
+	./tideps.sh
+	cd strings ; make
+	cd stdlib ; make gen
+	cd stdio ; make generic
+	cd printflike ; make 
+	cd setjmp ; make 
+	cd assert ; make 
+	z80asm -d -ns -nm -Mo -DFORti86 -xti86_clib @ticalc.lst
+
+# cpm lib - Stefano
 
 cpm_clib.lib:
 	cd strings ; make
@@ -251,7 +299,7 @@ cpm_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -xcpm_clib @cpm.lst
 
-# Sharp MZ lib from Stefano
+# Sharp MZ lib - Stefano
 
 mz_clib.lib:
 	cd strings ; make
@@ -262,7 +310,7 @@ mz_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -xmz_clib @mz.lst
 
-# Sharp MZ ansi lib from Stefano
+# Sharp MZ ansi lib - Stefano
 
 mzansi_clib.lib:
 	cd strings ; make
@@ -273,7 +321,7 @@ mzansi_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -xmzansi_clib @mzansi.lst
 
-# ABC80 ANSI library - from Stefano
+# ABC80 ANSI library - Stefano
 abc80_clib.lib:
 	cd strings ; make
 	cd stdlib ; make gen
@@ -283,7 +331,7 @@ abc80_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -xabc80_clib @abc80.lst
 
-# Jupiter ACE library - stefano
+# Jupiter ACE library - Stefano
 aceansi_clib.lib:
 	./gfxdeps.sh
 	cd strings ; make
@@ -294,7 +342,7 @@ aceansi_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORjupiter -xaceansi_clib.lib @aceansi.lst
 
-# Xircom REX 6000 library - dom
+# Xircom REX 6000 library - Dominic
 rex_clib.lib:
 	cd strings; make
 	cd stdlib ; make
@@ -302,7 +350,7 @@ rex_clib.lib:
 	cd rex    ; make
 	z80asm -d -ns -nm -Mo -DFORrex -xrex_clib.lib @rex6000.lst
 
-# Sam Coupe library (Stefano)
+# Sam Coupe library - Stefano
 sam_clib.lib:
 	cd strings ; make
 	cd stdlib ; make gen
