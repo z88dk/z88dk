@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.12 2002-10-17 12:08:12 dom Exp $
+# $Id: Makefile,v 1.13 2002-10-17 12:20:35 dom Exp $
 #
 
 STDCFILES = \
@@ -50,7 +50,6 @@ lz88: std gen z88_x
 
 lz88net: std net z88_x
 
-lembedded: std gen embedded_x
 
 net:
 	zcc -vn -DNET_STDIO -make-lib fclose.c
@@ -81,9 +80,6 @@ std:    $(STDOBJECTS)
 
 z88_x:
 	cd z88 ; $(MAKE)
-
-embedded_x:
-	cd embedded ; $(MAKE)
 
 .c.o:
 	zcc -vn -make-lib $*.c
@@ -120,4 +116,3 @@ clean:
 
 	cd zsock ; $(MAKE) clean
 	cd 8080 ; $(MAKE) clean
-	cd embedded ; $(MAKE) clean
