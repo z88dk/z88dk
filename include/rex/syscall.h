@@ -195,12 +195,17 @@ extern int __LIB__ SYSCALL6P(int,...);
 					
 #define DsDisplayPointGet( arg1, arg2 ) 	SYSCALL2( DS_DISP_POINT_GET, arg1, arg2 )
 #define DsDisplayPointSet( arg1, arg2, arg3 ) 	SYSCALL3( DS_DISP_POINT_SET, arg1, arg2, arg3 )
+
+#if 0
 #define DsDisplayCircle( arg1, arg2, arg3, arg4, arg5 )	SYSCALL5( DS_DISP_CIRCLE, arg1, arg2, arg3, arg4, arg5 )
+#endif
 
 #define DsDisplayBlockClear( arg1, arg2, arg3, arg4 ) \
 					SYSCALL4( DS_DISP_BLOCK_CLEAR, arg1, arg2, arg3, arg4 )
 					
+#if 0
 #define DsClearScreen() 			SYSCALL4( DS_DISP_BLOCK_CLEAR, 0, 0, 240, 120 )
+#endif
 					
 #define DsDisplayBlockReverse( arg1, arg2, arg3, arg4, arg5 ) \
 					SYSCALL5( DS_DISP_BLOCK_REV, arg1, arg2, arg3, arg4, arg5 )
