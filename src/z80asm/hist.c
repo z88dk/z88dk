@@ -476,4 +476,11 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * 27.06.2001 [no version increment] (djm)
  * defs now takes a second parameter indicating what the filler byte should be, if not
  * set the defaults to 0
+ *
+ * 17.01.2001 [no version increment] (djm)
+ * 20h is now accepted as a synonym for $20
+ *
+ * 18.01.2001 [no version increment] (djm)
+ * Dropped the requirement for add, sbc, and adc to specify "a," for 8 bit
+ * operations
  */
