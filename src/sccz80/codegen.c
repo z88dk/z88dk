@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.6 2001-06-27 09:21:59 dom Exp $
+ *      $Id: codegen.c,v 1.7 2001-09-07 18:21:50 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -121,11 +121,11 @@ void DoLibHeader()
 		incdir=getenv("Z80_OZFILES");
 		outstr("\n\n\t.include \"");
 		if (incdir) outstr(incdir);
-		outstr("z88_crt0.hdx\"\n\n");
+		outstr("z80_crt0.hdx\"\n\n");
 		ol(".area _CODE\n");
 		ol(".radix d\n");
 	} else
-        	outstr("\n\n\tINCLUDE \"#z88_crt0.hdr\"\n\n\n");
+        	outstr("\n\n\tINCLUDE \"#z80_crt0.hdr\"\n\n\n");
         donelibheader=1;
 }
 
