@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.4 2001-10-16 19:46:26 dom Exp $
+ * $Id: spectrum.h,v 1.5 2003-10-10 11:05:40 dom Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -12,6 +12,13 @@
 #ifdef PLUS3
 /* If it's a +3 we want the dodos routine */
 #pragma output NEEDplus3dodos
+extern int __LIB__ findhand();
+extern void __LIB__ freehand(int);
+#endif
+
+#ifdef RESIDOS
+/* If it's residos then we want dodos routines */
+#pragma output NEEDresidos
 extern int __LIB__ findhand();
 extern void __LIB__ freehand(int);
 #endif
