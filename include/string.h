@@ -43,6 +43,7 @@ extern void __LIB__ *memset(void *, unsigned char, int);
 extern void __LIB__ *memcpy(void *, void *,int);
 extern void __LIB__ *memchr(void *, unsigned char, int);
 
+extern char __LIB__ *strdup(char *);
 
 /*
  * Now handle far stuff
@@ -68,6 +69,8 @@ extern far char __LIB__ *strupr_far(far char *);
 extern far char __LIB__ *strchr_far(far unsigned char *, unsigned char);
 #define strrchr(s,c) strrchr_far(s1,c)
 extern far char __LIB__ *strrchr_far(far unsigned char *, unsigned char);
+#define strdup(s) strdup_far(s)
+extern far char __LIB__ *strdup_far(far char *);
 
 #endif
 

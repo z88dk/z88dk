@@ -8,8 +8,9 @@ all: malloc
 
 malloc:
 	zcc -vn -make-lib calloc.c
+	zcc -vn -make-lib strings/strdup.c
 	z80asm -d -ns -nm -Mo -x../malloc @malllist
 
 
 clean:
-	rm -f *.obj *.sym *.map *~ *.err *.o zcc_opt.def
+	rm -f *.o* *.sym *.map *~ *.err zcc_opt.def strings/*.o

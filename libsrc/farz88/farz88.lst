@@ -22,3 +22,4 @@ strings/strncat_far
 strings/strncpy_far
 strings/strrchr_far
 strings/strupr_far
+strings/strdup_far

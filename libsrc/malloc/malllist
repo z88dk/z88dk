@@ -5,3 +5,4 @@ getfree
 getlarge
 heapinit
 malloc
+strings/strdup
