@@ -1,6 +1,7 @@
 ;
 ;	System Call for REX6000
 ;
+;	$Id: syscall4.asm,v 1.2 2001-06-23 19:44:53 dom Exp $
 ;
 
 		XLIB	syscall4
@@ -17,7 +18,7 @@
 	ld	($c006),hl
 	ld	l,(ix+4)	;par 2
 	ld	h,(ix+5)
-	ld	($c005),hl
+	ld	($c004),hl
 	ld	l,(ix+6)	;par 1
 	ld	h,(ix+7)
 	ld	($c002),hl
