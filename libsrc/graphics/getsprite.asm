@@ -1,17 +1,20 @@
 ;
 ; Getsprite - Picks up a sprite from display with the given size
 ; by Stefano Bodrato - Jan 2001
+; Apr 2002 - Fixed.  (Long time, I know...)
 ;
 ; The original putsprite code is by Patrick Davidson (TI 85)
 ;
 ; Generic version (just a bit slow)
 ;
 ;
-; $Id: getsprite.asm,v 1.4 2002-04-11 10:42:49 stefano Exp $
+; $Id: getsprite.asm,v 1.5 2002-04-15 12:40:38 stefano Exp $
 ;
 
 	XLIB    getsprite
 	LIB	pixeladdress
+	LIB     swapgfxbk
+        XREF	swapgfxbk1
 
 	INCLUDE	"graphics/grafix.inc"
 
@@ -44,6 +47,7 @@
 
 	ld	(actcoord),hl	; save current coordinates
 
+	call	swapgfxbk
 	call	pixeladdress
 	xor	7
 	
@@ -64,21 +68,19 @@
 ._oloop	push	bc	;Save # of rows
 	push	de	;Save # of bytes per row
 
-._iloop2	ld	c,(hl)
-		ld	a,c	;keep it for the jump to zpos
+._iloop2	ld	a,(hl)
+		inc	hl
+		ld	d,(hl)
+
 ._smc		ld	b,1	;Load pixel position
 		inc	b
 		dec	b
 		jr	z,zpos
-		inc	hl
-		ld	d,(hl)
 
 ._iloop
 		rl	d
-		rl	c
+		rl	a
 		djnz	_iloop
-		
-		ld	a,c
 
 .zpos
 		ld	(ix+2),a
@@ -101,5 +103,6 @@
 	pop	de
 	pop	bc                ;Restore data
 	djnz	_oloop
-	ret
+	
+	jp	swapgfxbk1
 
