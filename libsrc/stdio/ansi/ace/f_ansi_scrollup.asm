@@ -8,7 +8,7 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.3 2001-10-18 15:22:46 stefano Exp $
 ;
 
 	XLIB	ansi_SCROLLUP
@@ -17,9 +17,9 @@
 .ansi_SCROLLUP
 	ld	hl,$2420
 	ld	de,$2400
-	ld	bc,(32*24)-32
+	ld	bc,736
 	ldir
-	ld	hl,$2400+(32*24)-32
+	ld	hl,$2400+736
 	ld	(hl),32 ;' '
 	ld	d,h
 	ld	e,l
