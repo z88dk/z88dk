@@ -1,11 +1,11 @@
-# $Id: Makefile,v 1.2 2002-04-25 11:24:13 stefano Exp $
+# $Id: Makefile,v 1.3 2002-07-15 15:34:07 dom Exp $
 
 lzx:	
-	cd spectrum ; make
+	cd spectrum ; $(MAKE)
 
 lz88:
-	cd z88 ; make
+	cd z88 ; $(MAKE)
 
 clean:
-	cd z88 ; make clean
-	cd spectrum ; make clean
+	cd z88 ; $(MAKE) clean
+	cd spectrum ; $(MAKE) clean

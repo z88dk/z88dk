@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.14 2002-04-10 20:34:53 dom Exp $
+#	$Id: Makefile,v 1.15 2002-07-15 15:34:04 dom Exp $
 #
 
 prefix = /usr/local/z88dk
@@ -17,23 +17,23 @@ setup:
 	echo '#define PREFIX "${prefix}$""' > src/config.h
 
 appmake:
-	cd src/appmake ; make 
+	cd src/appmake ; $(MAKE) 
 
 copt:
-	cd src/copt ; make
+	cd src/copt ; $(MAKE)
 
 zcpp:
-	cd src/cpp ; make
+	cd src/cpp ; $(MAKE)
 
 sccz80:
-	cd src/sccz80 ; make 
+	cd src/sccz80 ; $(MAKE) 
 
 z80asm:
 	echo 'Configure z80asm for ENDIAN status!!'
-	cd src/z80asm ; make
+	cd src/z80asm ; $(MAKE)
 
 zcc:
-	cd src/zcc ; make 
+	cd src/zcc ; $(MAKE) 
 
 config:
 	rm -f lib/config/*.cfg
@@ -75,11 +75,11 @@ config:
 	cp lib/config/$(DEFAULT).cfg lib/config/zcc.cfg
 
 libs:
-	cd libsrc ; make
+	cd libsrc ; $(MAKE)
 
 clean:
-	cd libsrc ; make clean
-	cd src/sccz80 ; make clean
-	cd src/cpp ; make clean
-	cd src/z80asm ; make clean
+	cd libsrc ; $(MAKE) clean
+	cd src/sccz80 ; $(MAKE) clean
+	cd src/cpp ; $(MAKE) clean
+	cd src/z80asm ; $(MAKE) clean
 	cd lib/config ; rm -f *.cfg

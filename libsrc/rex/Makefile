@@ -1,7 +1,7 @@
 
 
 all:
-	cd graphics ; make
+	cd graphics ; $(MAKE)
 
 .c.o:
 	zcc +rex -vn -make-lib $*.c
@@ -9,5 +9,5 @@ all:
 
 clean:
 	rm -f *.o*  *~  zcc_opt.def
-	cd graphics ; make clean
-	cd farcall ; make clean
+	cd graphics ; $(MAKE) clean
+	cd farcall ; $(MAKE) clean

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.7 2002-04-22 08:25:27 dom Exp $
+# $Id: Makefile,v 1.8 2002-07-15 15:34:07 dom Exp $
 
 GENCFILES = \
 	atoi.c \
@@ -25,13 +25,13 @@ gen: $(GENOBJECTS)
 	zcc -vn -make-lib $*.c
 
 z88_stdlib:
-	cd z88 ; make
+	cd z88 ; $(MAKE)
 
 zx_stdlib:
-	cd spectrum ; make
+	cd spectrum ; $(MAKE)
 	zcc +zx -vn -make-lib sleep.c
 
 clean:
 	rm -f *.o* *.sym *.map zcc_opt.def *.i $(AFILES)
-	cd z88 ; make clean
-	cd spectrum ; make clean
+	cd z88 ; $(MAKE) clean
+	cd spectrum ; $(MAKE) clean
