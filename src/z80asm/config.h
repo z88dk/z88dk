@@ -24,7 +24,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* UNIX definitions: */
 #define OS_ID "UNIX"
 #define UNIX 1
-#define DEFLIBDIR "/usr/local/z88dk/lib/"
+#define DEFLIBDIR "/usr/local/lib/z88dk/lib/"
 
 /* QDOS definitions: 
 #define OS_ID "QDOS"

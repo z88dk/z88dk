@@ -2,10 +2,10 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.15 2002-07-15 15:34:04 dom Exp $
+#	$Id: Makefile,v 1.16 2002-07-15 16:30:57 dom Exp $
 #
 
-prefix = /usr/local/z88dk
+prefix = /usr/local/lib
 
 # The default machine, the lib/config/DEFAULT.cfg file is copied to zcc.cfg
 DEFAULT = z88
