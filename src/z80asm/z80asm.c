@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.4 2001-03-21 16:34:01 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.5 2001-04-24 08:54:34 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -134,6 +134,7 @@ symbol *CreateSymbol (char *identifier, long value, unsigned char symboltype, st
 
 /* local functions */
 void prompt (void);
+void usage (void);
 void ReportError (char *filename, short linenr, int errnum);
 void ReportIOError (char *filename);
 void SetAsmFlag (char *flagid);
@@ -767,6 +768,11 @@ SetAsmFlag (char *flagid)
     {
       autorelocate = OFF;
       return;
+    }
+  if (*flagid == 'h')
+    {
+      usage();
+      exit(1);
     }
   if (*flagid == 'i')
     {
@@ -1415,9 +1421,14 @@ main (int argc, char *argv[])
       return 0;		/* assembler successfully ended */
 }
 
+void
+prompt (void)
+{
+	printf("%s\n",copyrightmsg);
+}
 
 void 
-prompt (void)
+usage (void)
 {
   printf ("%s\n", copyrightmsg);
   puts ("z80asm [options] [ @<modulefile> | {<filename>} ]");
