@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.2 2001-01-25 16:09:16 dom Exp $
+ *      $Id: codegen.c,v 1.3 2001-04-27 14:45:28 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -21,6 +21,7 @@
  *      macros which we can then optimize a lot easier..hazzah!
  */
 
+#define CHARCOMP0
 
 #include "ccdefs.h"
 #include <time.h>

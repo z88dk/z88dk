@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.6 2001-03-09 10:17:40 dom Exp $
+ *      $Id: main.c,v 1.7 2001-04-27 14:45:28 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -610,6 +610,50 @@ void PragmaOutput(char *ptr)
                 fclose(fp);
         }
 }
+
+/* Dump some bytes into the zcc_opt.def file */
+
+void PragmaBytes(int flag)
+{
+    FILE   *fp;
+    char   sname[NAMESIZE];
+    long    value;
+    int     count;
+
+    if ( symname(sname) ) {
+	if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
+	    error(E_ZCCOPT);
+	}
+	fprintf(fp,"\nIF NEED_%s\n",sname);
+	if ( flag ) 
+	    fprintf(fp,"\tdefc DEFINED_NEED_%s = 1",sname);
+
+	/* Now, do the numbers */
+	count=0;
+	while ( !cmatch(';') ) {
+	    if ( count == 0 )
+		fprintf(fp,"\n\tdefb\t");
+	    else
+		fprintf(fp,",");
+	    if ( number(&value) ) {
+		fprintf(fp,"%ld",value);
+	    } else {
+		warning(W_EXPARG);
+	    }
+	    if ( rcmatch(';') ) {
+		break;
+	    }
+	    needchar(',');
+	    count++;
+	    if ( count == 9 ) count=0;
+	}
+	fprintf(fp,"\nENDIF\n");
+	fclose(fp);
+	needchar(';');
+    }
+}	
+
+
 
 
 
