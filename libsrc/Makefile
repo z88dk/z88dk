@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.21 2001-10-16 18:09:17 dom Exp $
+# $Id: Makefile,v 1.22 2001-10-16 19:46:07 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -139,7 +139,7 @@ zx_clib.lib:
 	@echo ''
 	./gfxdeps.sh
 	cd strings ; make
-	cd stdlib ; make gen
+	cd stdlib ; make lzx
 	cd stdio ; make generic
 	cd fcntl ; make lzx
 	cd printflike ; make 
@@ -147,6 +147,7 @@ zx_clib.lib:
 	cd assert ; make 
 	cd time ; make lzx
 	cd games ; make lzx
+	cd spectrum ; make
 	z80asm -d -ns -nm -Mo -DFORzx -xzx_clib @zx.lst
 
 # vt100 C lib for spectrum
@@ -156,7 +157,7 @@ zxan_clib.lib:
 	@echo ''
 	./gfxdeps.sh
 	cd strings ; make
-	cd stdlib ; make gen
+	cd stdlib ; make lzx
 	cd stdio ; make generic
 	cd fcntl ; make lzx
 	cd printflike ; make 
@@ -578,6 +579,8 @@ clean:
 	cd printflike ; make clean
 	cd rex ; make clean
 	cd setjmp ; make clean
+	cd sound ; make clean
+	cd spectrum ; make clean
 	cd stdio ; make clean
 	cd stdlib ; make clean
 	cd strings ; make clean
