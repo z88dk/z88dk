@@ -2,10 +2,13 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.10 2001-09-12 13:36:19 stefano Exp $
+#	$Id: Makefile,v 1.11 2001-10-07 13:13:29 dom Exp $
 #
 
 prefix = /usr/local/z88dk
+
+# The default machine, the lib/config/DEFAULT.cfg file is copied to zcc.cfg
+DEFAULT = z88
 
 
 all: setup appmake copt zcpp sccz80 z80asm zcc config
@@ -65,7 +68,7 @@ config:
 	sed "s?DESTDIR?`pwd`?g" < lib/config/zx81ansi.lnx > lib/config/zx81ansi.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/zx.lnx > lib/config/zx.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/zxansi.lnx > lib/config/zxansi.cfg
-	ln -s z88.cfg lib/config/zcc.cfg
+	cp lib/config/$(DEFAULT).cfg lib/config/zcc.cfg
 
 libs:
 	cd libsrc ; make
