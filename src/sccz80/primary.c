@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.5 2001-02-15 16:59:29 dom Exp $
+ *      $Id: primary.c,v 1.6 2002-01-16 20:47:13 dom Exp $
  */
 
 
@@ -18,16 +18,18 @@ LVALUE *lval;
         char sname[NAMESIZE] ;
         SYMBOL *ptr ;
         int k,level ;
-        char cid,vtype,cflags;
+        char cid,vtype,cflags,clevel;
         TAG_SYMBOL *cotag;
 
         if ( cmatch('(') ) {
 		lval->level++;
                 do k=heir1(lval); while (cmatch(',')) ;
                 needchar(')');
-		lval->level--;
 /* Not sure about doing this here..but here goes nowt!*/
-		if (lval->c_vtype) docast(lval,YES);
+		if (lval->c_vtype) {
+		    docast(lval,YES);
+		}
+		lval->level--;
                 return k;
         }
         /* clear lval array - djm second arg was lval.. now cast, clears lval */
@@ -36,12 +38,14 @@ LVALUE *lval;
         cflags=lval->c_flags;
         cotag=lval->c_tag;
 	level=lval->level;
+	clevel=lval->castlevel;
         putint(0, (char *) lval, sizeof(LVALUE) ) ;
         lval->c_id=cid;
         lval->c_vtype=vtype;
         lval->c_flags=cflags;
         lval->c_tag=cotag;
 	lval->level=level;
+	lval->castlevel = clevel;
 
         if ( symname(sname) ) {
                 if ( strcmp(sname, "sizeof") == 0 ) {
@@ -559,7 +563,9 @@ LVALUE *lval;
         else {
 		indirect(lval);
 	}
-        if ( lval->c_vtype ) docast(lval,YES);
+        if ( lval->c_vtype ) {
+	    docast(lval,YES);
+	}
 #if DEBUG_SIGN
         if (lval->flags&UNSIGNED) ol("; unsigned");
         else ol("; signed");
@@ -716,7 +722,9 @@ int docast(LVALUE *lval,char df)
         int     itag;
         char    nam[20];
 
-	debug(DBG_CAST1,"Level=%d Castlevel=%d",lval->level,lval->castlevel);
+
+
+	debug(DBG_CAST1,"Level=%d Castlevel=%d df=%d %p",lval->level,lval->castlevel,df,lval);
 	if	(lval->level != lval->castlevel  ) return 0;
 
 
@@ -769,14 +777,18 @@ int docast(LVALUE *lval,char df)
         sprintf(nam,"0dptr%d",(int)locptr);
         temp_type = ( (lval->c_flags&FARPTR) ? CPTR : CINT );
         itag=0;
-        if ( lval->c_tag) itag=lval->c_tag-tagtab;
+        if ( lval->c_tag) 
+	    itag=lval->c_tag-tagtab;
 	ptr=lval->symbol;
         lval->symbol = addloc(nam,POINTER,temp_type,dummy_idx(lval->c_vtype,lval->c_tag),itag);
 	lval->symbol->offset.p=ptr;
-        if (df) force(temp_type,lval->val_type,0,0,0);
+        if (df) 
+	    force(temp_type,lval->val_type,0,0,0);
         lval->val_type=temp_type;
         lval->flags=( (lval->flags&FARACC) | lval->c_flags );
-	if (df) {lval->c_id=0; lval->c_vtype=0; lval->c_flags=0;}
+	if (df) {
+	    lval->c_id=0; lval->c_vtype=0; lval->c_flags=0;
+	}
         return(1);
 
 }
