@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.7 2002-04-17 21:14:27 dom Exp $
+ *      $Id: stmt.c,v 1.8 2002-04-21 12:15:28 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -491,19 +491,22 @@ void doreturn(char type)
 void leave(int vartype,char type)
 {
     int savesp;
-    int savereg;
 
     if ( vartype == CPTR )   /* they are the same in any case! */
 	vartype = LONG;
+    else if ( vartype == DOUBLE )
+	vartype = NO;
 
     if ( noaltreg ) {
 	if ( vartype == LONG )
 	    savehl();
-	swap();
+	if ( vartype )
+	    swap();
 	modstk(0,0,NO);
-	swap();
+	if ( vartype )
+	    swap();
     } else {
-	modstk(0,savereg,NO);
+	modstk(0,vartype,NO);
     }
 
     if ( (compactcode || currfn->flags&CALLEE)  && (stackargs>2) ) {
@@ -517,13 +520,11 @@ void leave(int vartype,char type)
 	if ( noaltreg ) {
 	    if ( vartype == LONG )      /* If long, then dump de somewhere */
 		savede();
-	    else                        /* Just an int, swap it over */
+	    if ( vartype )
 		swap();
 	} else {
 	    doexx();	   
 	}
-
-
 	zpop();            /* Return address in de */
 	Zsp-=stackargs-2;
 	modstk(0,NO,NO);
@@ -531,7 +532,7 @@ void leave(int vartype,char type)
 	if ( noaltreg ) {
 	    if ( vartype == LONG )
 		restorede();
-	    else
+	    if ( vartype )
 		swap();
 	} else {
 	    doexx();
@@ -539,12 +540,12 @@ void leave(int vartype,char type)
 	Zsp=savesp;
         }
 #ifdef USEFRAME
-	popframe();		/* Restore previous frame pointer */
+    popframe();		/* Restore previous frame pointer */
 #endif
-	if ( noaltreg && vartype == LONG )
-	    restorehl();
-	if (type) setcond(type);
-        zret();         /* and exit function */
+    if ( noaltreg && vartype == LONG )
+	restorehl();
+    if (type) setcond(type);
+    zret();         /* and exit function */
 }
 
 /*
