@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.5 2001-04-24 08:54:34 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.6 2002-01-16 22:45:34 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -285,6 +285,7 @@ avltree *globalroot, *staticroot;
 int 
 AssembleSourceFile (void)
 {
+  char  *dotptr;
 
   if ((errfile = fopen (errfilename, "w")) == NULL)
     {				/* Create error file */
@@ -341,8 +342,29 @@ AssembleSourceFile (void)
       fclose (z80asmfile);
       z80asmfile = NULL;
     }
-  if (CURRENTMODULE->mname == NULL)	/* Module name must be defined */
-    ReportError (CURRENTFILE->fname, 0, 16);
+  if (CURRENTMODULE->mname == NULL) {	/* Module name must be defined */
+    dotptr = strrchr(srcfilename,'/');
+    if ( dotptr == NULL )
+	dotptr = strrchr(srcfilename,'\\');
+    if ( dotptr == NULL )
+	dotptr = srcfilename-1;
+    strcpy(ident,dotptr+1);
+    printf("ident = %s\n",ident);
+    dotptr = strchr(ident,asmext[0]);
+    if ( dotptr )
+	*dotptr = 0;
+    sym = name;
+    dotptr = ident;
+    while ( *dotptr )
+     {
+	*dotptr = toupper(*dotptr);
+	dotptr++;
+      }
+    printf("ident = %s\n",ident);
+    DeclModuleName();
+    /* ReportError (CURRENTFILE->fname, 0, 16); */
+  }
+    
 
   if (ERRORS == 0)
     {
