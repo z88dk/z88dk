@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - Apr 2001
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.1 2001-04-20 11:56:39 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.2 2001-04-30 16:49:55 dom Exp $
 ;
 
 	XLIB	fputc_cons
@@ -42,7 +42,7 @@ IF FORti83p
 ELSE
 	IF FORti85
 		call	$8C09
-		.defb	ti_putchar
+		defb	ti_putchar
 		ret
 	ELSE
 		jp	ti_putchar
@@ -57,7 +57,7 @@ IF FORti83p
 ELSE
 	IF FORti85
 		call	$8C09
-		.defb	ti_newline
+		defb	ti_newline
 	ELSE
 		call	ti_newline
 	ENDIF

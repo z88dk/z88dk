@@ -9,35 +9,40 @@
 ;       Define for graphics and other standard library functions
 ;
 ;
-;	$Id: grafix.inc,v 1.4 2001-04-18 13:21:37 stefano Exp $
+;	$Id: grafix.inc,v 1.5 2001-04-30 16:49:55 dom Exp $
 ;
 
 
 IF FORti82
+	DEFINE gotgfx
 	defc row_bytes	= 12
 	defc maxx	= 96
 	defc maxy	= 64
 ENDIF
 
 IF FORti83
+	DEFINE gotgfx
 	defc row_bytes	= 12
 	defc maxx	= 96
 	defc maxy	= 64
 ENDIF
 
 IF FORti83p
+	DEFINE gotgfx
 	defc row_bytes	= 12
 	defc maxx	= 96
 	defc maxy	= 64
 ENDIF
 
 IF FORti85
+	DEFINE gotgfx
 	defc row_bytes	= 16
 	defc maxx	= 128
 	defc maxy	= 64
 ENDIF
 
 IF FORti86
+	DEFINE gotgfx
 	defc row_bytes	= 16
 	defc maxx	= 128
 	defc maxy	= 64
@@ -45,29 +50,34 @@ ENDIF
 
 
 IF FORvz
+	DEFINE gotgfx
 	defc maxx	= 128
 	defc maxy	= 64
 ENDIF
 
 
 IF FORzx81
+	DEFINE gotgfx
 	defc maxx	= 96 ; emulated (64 real dots)
 	defc maxy	= 64 ; emulated (48 real dots)
 ENDIF
 
 IF FORjupiter
+	DEFINE gotgfx
 	defc maxx	= 96 ; emulated (64 real dots)
 	defc maxy	= 64 ; emulated (48 real dots)
 ENDIF
 
 
 IF FORzx
+	DEFINE gotgfx
 	defc maxx	= 256
 	defc maxy	= 192
 ENDIF
 
 
 IF FORz88
+	DEFINE gotgfx
 	defc	maxx	= 256
 	defc	maxy 	= 64
 
@@ -82,7 +92,14 @@ ENDIF
 
 ENDIF
 
+; Catch all to sort things out
 
+IF !gotgfx
+	defc	maxx = 256
+	defc	maxy = 192
+ELSE
+	UNDEFINE gotgfx
+ENDIF
 
 
 ;       Structure for open window       struct *window

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.3 2001-04-30 14:40:04 dom Exp $
+# $Id: Makefile,v 1.4 2001-04-30 16:49:55 dom Exp $
 #
 
 generic: std gen
@@ -11,7 +11,6 @@ lz88: std gen z88_x
 lz88net: std net z88_x
 
 net:
-	zcc -vn -DNET_STDIO -make-lib fabandon.c
 	zcc -vn -DNET_STDIO -make-lib fclose.c
 	zcc -vn -DNET_STDIO -make-lib fgetc.c
 	zcc -vn -DNET_STDIO -make-lib fputc.c
@@ -20,7 +19,6 @@ net:
 	cd zsock ; make
 
 gen:
-	zcc -vn -make-lib fabandon.c
 	zcc -vn -make-lib fclose.c
 	zcc -vn -make-lib fgetc.c
 	zcc -vn -make-lib fputc.c
@@ -28,9 +26,10 @@ gen:
 
 
 std:    closeall.o fchkstd.o feof.o fgetpos.o fgets.o fopen.o fputs.o \
-	fread.o freopen.o fopen_z88.o fseek.o ftell.o  \
+	fwrite.o fread.o freopen.o fopen_z88.o fseek.o ftell.o  \
 	vfprintf_mini.o printn.o puts.o ungetc.o fdopen.o printk.o \
-	fgets_cons.o
+	fgets_cons.o fabandon.o
+
 
 z88_x:
 	cd z88 ; make

@@ -8,7 +8,7 @@
  *	Just a tad z88 specific!
  *
  * -----
- * $Id: stat.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
+ * $Id: stat.c,v 1.3 2001-04-30 16:49:55 dom Exp $
  */
 
 
@@ -18,6 +18,14 @@
 
 /* Size of a z88 block */
 #define BLKSIZE 64
+
+#define JD0101970       2440588
+time_t doepoch(time_t days, time_t sec)
+{
+	days-=JD0101970; 	/* sub 1970 */
+	days*=86400;		/* into seconds */
+        return (days+sec);
+}
 
 int stat(char *filename, struct stat *buf)
 {
@@ -65,6 +73,5 @@ int stat(char *filename, struct stat *buf)
 	buf->st_nlink=0;
 	return(0);
 }
-
 
 
