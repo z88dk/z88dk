@@ -1,0 +1,8 @@
+$Id: README,v 1.1 2001-05-18 14:18:07 stefano Exp $
+
+The SAM Coupe port is been tested on the SAMEMU emulator (http://www.inf.upol.cz/~keprta/sam/samemu/welcome.html).
+Such emulator can load a file in ram (at address 32768) by simply pressing F1, so:
+
+- compile the program (zcc +sam hello.c)
+- copy the compiled output to a file called "SAMFILE" (copy a.bas samfile -or- copy a.bin samfile )
+- run the emulator, press F1 (apparently nothing happens) and type "call 32768".
