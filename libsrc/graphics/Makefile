@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.6 2002-12-08 15:24:44 dom Exp $
+# $Id: Makefile,v 1.7 2003-09-15 22:54:57 denniz Exp $
 
 
 all: 
@@ -13,5 +13,6 @@ clean:
 	$(RM) c128/*.o
 	$(RM) cpc/*.o
 	$(RM) mz/*.o
+	$(RM) nascom/*.o
 	$(RM) oz/*.o
 	$(RM) gray/ticalc/*.o

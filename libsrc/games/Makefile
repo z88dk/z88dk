@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2002-10-22 19:15:07 dom Exp $
+# $Id: Makefile,v 1.5 2003-09-15 22:54:57 denniz Exp $
 
 lzx:
 	zcc +zx -vn -make-lib bit_frequency.c
@@ -14,4 +14,4 @@ lace:
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o*
-	$(RM) ace/*.o aquarius/*.o spectrum/*.o z88/*.o
+	$(RM) ace/*.o aquarius/*.o sam/*.o spectrum/*.o z88/*.o

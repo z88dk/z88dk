@@ -59,4 +59,4 @@ cpc_math:
 	zcc -vn -D__CPC__ -D__NATIVE_MATH__ -make-lib $*.c
 
 clean:
-	$(RM) *.o* *.sym *.map *.err  zcc_opt.def
+	$(RM) *.o* *.sym *.map *.err  zcc_opt.def *.i $(AFILES)

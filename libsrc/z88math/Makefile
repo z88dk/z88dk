@@ -22,4 +22,4 @@ z88math: $(OBJECTS)
 
 
 clean:
-	$(RM) *.o* *.sym *.map *.err 
+	$(RM) *.o* *.sym *.map *.err *.i $(AFILES)

@@ -4,13 +4,13 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.65 2003-09-14 11:24:21 dom Exp $
+# $Id: Makefile,v 1.66 2003-09-15 22:54:57 denniz Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
 	nc_clib.lib vz_clib.lib vzansi_clib.lib abc80_clib.lib \
 	aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
-	cpc_clib.lib cpc_math.lib cpm_clib.lib c128ansi_clib.lib \
+	cpc_clib.lib cpcfs.lib cpc_math.lib cpm_clib.lib c128ansi_clib.lib \
 	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib nasansi_clib.lib ozansi_clib.lib\
 	rex_clib.lib svi_clib.lib sam_clib.lib samansi_clib.lib \
