@@ -1,0 +1,50 @@
+
+
+
+reverse_addr(3z)    z88dk Programmer's Manual    reverse_addr(3z)
+
+
+NNAAMMEE
+       reverse_addr_lookup - convert IP address to hstname
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//rreessoollvv..hh>>
+
+       bbooooll__tt rreevveerrssee__aaddddrr__llooookkuupp((iippaaddddrr__tt _i_p_a_d_d_r,, cchhaarr **_n_a_m_e));;
+
+DDEESSCCRRIIPPTTIIOONN
+       The  rreevveerrssee__aaddddrr__llooookkuupp(()) function queries any configured
+       nameservers for the name  of  the  host  with  IP  address
+       _i_p_a_d_d_r.
+
+       If _i_p_a_d_d_r is not known to the queried nameservers then the
+       _i_p_a_d_d_r is converted to the form a.b.c.d and returned.
+
+
+RREETTUURRNN VVAALLUUEE
+       rreevveerrssee__aaddddrr__llooookkuupp(()) places the hostname  in  the  buffer
+       specified  by _n_a_m_e, no checks are made that this buffer is
+       large enough to  hold  the  full  hostname.  The  function
+       returns  TRUE  or  FALSE  depending on whether the queried
+       nameservers knew _i_p_a_d_d_r.
+
+       rreevveerrssee__aaddddrr__llooookkuupp(()) may also  be  called  by  the  macro
+       ggeetthhoossttbbyyaaddddrr
+
+
+BBUUGGSS
+       If  you  use  the macro ggeetthhoossttbbyyaaddddrr then beware that the
+       ZSock implementation is not at all standard.
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

@@ -1,0 +1,47 @@
+lstoff
+
+; Standard Z88	Operating	System manifests:
+
+; The information below is defined	in Developers Notes, release 3.00
+; (c) Cambridge Computer	1989-95
+
+; DOR interface:
+
+	DEFC	OS_Dor = $87			; DOR interface
+
+	; DOR codes when using OS_Dor	:
+		DEFC	DR_Get	= $01	; Get handle for a DOR name (internal use)
+		DEFC	DR_Dup	= $02	; Duplicate DOR
+		DEFC	DR_Sib	= $03	; Return brother DOR
+		DEFC	DR_Son	= $04	; Return child	DOR
+		DEFC	DR_Fre	= $05	; Free (release) DOR handle
+		DEFC	DR_Cre	= $06	; Create blank	DOR
+		DEFC	DR_Del	= $07	; Delete DOR
+		DEFC	DR_Ins	= $08	; Insert DOR
+		DEFC	DR_Rd	= $09	; Read DOR record
+		DEFC	DR_Wr	= $0A	; Write DOR record
+
+	; Major DOR types:
+
+		DEFC	Dm_Dev	= $81	; File Device
+		DEFC	Dm_Chd	= $82	; Character Device
+		DEFC	Dm_Rom	= $83	; ROM information
+
+	; Minor DOR types:
+
+		DEFC	Dn_Fil	= $11	; File type
+		DEFC	Dn_Dir	= $12	; Directory type
+		DEFC	Dn_Apl	= $13	; Application front	DOR type,
+		DEFC	Dn_Del	= $7F	; Deleted	Entry type.
+
+	; Record DOR types:
+
+		DEFC	Dt_Nam	= $4E	; filename
+		DEFC	Dt_Cre	= $43	; creation time
+		DEFC	Dt_Upd	= $55	; update time
+		DEFC	Dt_Ext	= $58	; Extent (length of	file)
+		DEFC	Dt_Atr	= $41	; Not currently used
+		DEFC	Dt_Hlp	= $48	; Help type
+		DEFC	Dt_Inf	= $40	; Information
+
+lston

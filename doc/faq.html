@@ -1,0 +1,92 @@
+<HTML>
+<HEAD>
+<TITLE>Answers to some (not so) Frequently Asked Questions</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<CENTER><H1>Some Answers...</H1>
+<H6>..to some occasionally asked questions</H6></CENTER>
+
+
+<OL>
+        <LI> <A HREF="#1">What's it all about</A>
+        <LI> <A HREF="#2">Why bother with C</A>
+        <LI> <A HREF="#3">I've discovered this bug...</A>
+        <LI> <A HREF="#4">The examples don't compile properly</A>
+        <LI> <A HREF="#5">How do I access memory directly</A>
+</OL>
+
+<HR>
+<H3><A NAME="1"></A>What's it all about</H3>
+
+<P>z88dk is a complete programming package originally designed to produce
+programs for the Cambridge Computers Ltd z88 computer. The z88 is a z80a
+based machine and was Sir Clive Sinclairs first (and last..) computer
+after selling Sinclair Research to Amstrad, for more details on the z88 see
+<A HREF="http://ww.z88forever.org.uk">Z88
+Forever</A></P>
+
+<P>The package consists of a Small C+ compiler (much extended), a peephole
+optimizer an integrated assembler/linker and a front end to drive it all.
+There's also an additional support program to facilitate the easy building
+of z88 applications<P>
+
+<P>The kit an be easily retargetted for other z80 based machines - in
+5 minutes I had created some simple code to allow Spectrum programs
+to be produced.</P>
+
+<HR>
+<H3><A NAME="2"></A>Why bother with C</H3>
+
+<P>Well, for almost as long as I can remember people on c.s.s. have been
+going on about a C compiler, but no one has ever done anything about it
+(with the exception of John Elliot who created a wrapper for Hitech C),
+but that's not what this section is about....why bother with C..well:</P>
+
+<UL>
+        <LI> Complex expressions can be easily and quickly written
+        <LI> Code can be easily ported from other machines
+        <LI> Your code is now portable across platforms
+        <LI> It's just quicker to write than the equivalent assembler
+</UL>
+
+<P>And lots of other reasons, I'm not going to lie, the code will be larger
+than hand coded assembler, but it will be so much easier to maintain, and
+will take far less time to write that it is worth it! [Not that I'm
+biased!]</P>
+
+<HR>
+<H3><A NAME="3"></A>I've discovered this bug...</H3>
+
+<P>Good! There's bound to be some, but are you sure it's not in your
+code? If not then test without optimization (use -O0) and it's still
+there try to isolate where it goes wrong - is it in the generated code, or
+is it in a library function? Let me know by sending me the C source, the
+assembler output and the optimizer output, and point out where it's
+going wrong as well. If it's in a library routine, can you come up with
+a fix for it?</P>
+
+<P>Basically, if you've found a bug make sure you can reproduce it - how
+does it occur - does it pop up in any other place? Send me examples of it
+and it at all possible send me a fix! Basically send me as much information
+as you can.</P>
+
+<P>On the other hand, if it's a bug in the assembler then read the z80asm.txt file in the doc directory for more details as to what to do with it!</P>
+
+<HR>
+<H3><A NAME="4"></A>I can't compile the examples</H3>
+
+<P>Only one thing to say here - are you supply the correct libraries?
+Anything that uses floating point needs to be linked with -lm (generic) for maths support. For the z88, anything that uses graphics
+needs to be linked with -lgfx. The README in each examples program tells
+you how to compile them.</P>
+
+<HR>
+<H3><A NAME="5"></A>How do I access memory directly</H3>
+
+<P>The compiler, sccz80, offers you several ways of accessing memory
+directly - you can cast a constant to a pointer to type and then dereference it (eg *(char *) 40000) or you can use the "external pointer" data type which is detailed in the main doc file.</P>
+
+
+</BODY>
+</HTML>

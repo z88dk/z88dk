@@ -1,0 +1,103 @@
+.TH pktdrive 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+pktdrive \- packet driver descriptor structure
+.SH SYNOPSIS
+.nf
+.B #include <net/device.h>
+.fi
+.SH DESCRIPTION
+The \fIpktdrive\fP structure defines access to a device, it is 
+only used by the ZSock kernel. Should you wish to write a packet
+driver then this structure should be filled with the relevent
+routines.
+.PP
+All external packet drivers run at address 8192 ($2000) and it as
+this address that the structure should be placed. Had z88dk the
+capability \fIpktdrive\fP would be defined as follows:
+.sp
+.RS
+.nf
+.ne 7
+.ta 8n 16n
+struct pktdrive {
+        char    magic[10];
+        char    *type;	
+        char    *copymsg;
+        void	(*initfunc)(void);
+        void	(*queuefn)(void *pkt, size_t len);	
+	void	*(*packetfn)(void);	
+        void	*(*sendfn)(void);
+        int	(*readfn)(void);
+	void	(*onlinefn)();  
+	void	(*offlinefn)(int);
+	int	(*statusfn)(void);
+};
+.ta
+.fi
+.RE
+.PP
+The members of the \fIpktdrive\fP structure are:
+.TP
+.I magic
+Magic to identifier the file as a packet driver, this is defined
+as ZS0PKTDRV\0
+.TP
+.I type
+A pointer to the type of the device
+.TP
+.I copymsg
+A pointer to the copyright message
+.TP
+.I initfunc
+A function that initialises the device during the initial configurationin
+this function.
+.TP
+.I queuefn
+A function that stores outgoing backets in a queue pending sending.
+Depending on the speed of the device it may also inject packets into
+the interface.
+.TP
+.I packetfn
+A function that returns the address of the incoming packet. This
+function is called immediately after initialisation and after
+the \fIreadfn\fP function (below) has returned a packet.
+.TP
+.I sendfn
+A function that is called on the interrupt to inject bytes out of
+the interface. If this function returns non-zero then packet at
+the address returned is freed.
+.TP
+.I readfn
+A function that is called on the interrupt to read incoming bytes.
+If the function returns non-zero then a packet is assumed to have
+been read, with length as returned by readfn and  lying at the address 
+specified by packetfn.
+.TP
+.I onlinefn
+A function that is called when the device is to be turned online
+.TP
+.I offlinefn
+A function that is called when the device is to be turned offline,
+if the parameter is non-zero then the function should hang up line
+(if appropriate) otherwise it should just suspend sending and
+receiving packets.
+.TP
+.I statusfn
+A function that returns the status of the device. It is envisaged
+that it will return 0 for offline and 1 for online though it may
+return other values. The value returned is left for the user to
+understand.
+
+.SH NOTES
+When the packet is passed to the driver for output a 4 bytes of header
+space is available at dp-4. The SLIP driver by Dominic Morris utilises
+these bytes to implement a linked list and to hold the length of
+the outgoing packet.
+.PP
+Other packet drivers might wish to copy the packet to their own
+address space for converting into other forms - eg CSLIP form. Alternatively
+they might simply create a link from their own space to the packet in
+the queue so to reduce time wasted copying bytes.
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>

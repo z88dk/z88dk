@@ -1,0 +1,314 @@
+Z80 Module Assembler V1.0.17, (c) InterLogic 1993-2000                                           Mon Apr 10 20:24:32 2000
+Page 001                                                                                                   'z88_crt0.lst'
+
+
+1     0000              ; Small C startup module for Running Compiled C from BBC BASIC
+2     0000              ; ZCC for z88 converted by Dominic Morris <djm@jb.man.ac.uk>
+3     0000              ; Written August 1998
+4     0000              ; Updated for small C+ continuously through September
+5     0000              ; Changes by DG implemented 28/9/98
+6     0000              ; GFX Stuff added 30/9/98
+7     0000              ; 19/10/98 Atexit stuff added
+8     0000              ; 27/11/98 Atexit stuff rejigged to allow 32 levels of atexit
+9     0000              ;
+10    0000              ; 29/2/99  Added the include for zcc_opt so we now if float package
+11    0000              ;          required or not..
+12    0000              ;
+13    0000              ; 14/3/99  Renamed the printf vars to smc_pf*
+14    0000              ;
+15    0000              ; 1/4/99   Changing to allow application startup
+16    0000              
+17    0000                              MODULE  z88_crt0
+18    0000              
+19    0000              ;
+20    0000              ; Initially include the zcc_opt.def file to find out lots of lovely
+21    0000              ; information about what we should do..
+22    0000              ;
+23    0000              
+1     0000              
+25    0000              
+26    0000              ; No matter what set up we have, main is always, always external to
+27    0000              ; this file
+28    0000              
+29    0000                              XREF    _main
+30    0000              
+31    0000              ;
+32    0000              ; Some variables which are needed for both app and basic startup
+33    0000              ;
+34    0000              
+35    0000                      XDEF    cleanup
+36    0000                      XDEF    l_dcal
+37    0000              
+38    0000              ;Graphic function XDEFS..
+39    0000              
+40    0000                      XDEF    coords
+41    0000                      XDEF    base_graphics
+42    0000                      XDEF    gfx_bank
+43    0000              
+44    0000                      XDEF    int_seed
+45    0000              
+46    0000              ;Exit variables
+47    0000              
+48    0000                      XDEF    exitsp
+49    0000                      XDEF    exitcount
+50    0000              
+51    0000              ;For stdin, stdout, stder
+52    0000              
+53    0000                      XDEF    __sgoioblk
+54    0000              
+55    0000              ; For topics etc
+56    0000                      
+57    0000                      XDEF    processcmd
+58    0000              
+59    0000              ; Heap stuff
+60    0000              	XDEF	heaplast
+61    0000              	XDEF	heapblocks
+
+Z80 Module Assembler V1.0.17, (c) InterLogic 1993-2000                                           Mon Apr 10 20:24:32 2000
+Page 002                                                                                                   'z88_crt0.lst'
+
+
+62    0000              
+63    0000              ; Printf core
+64    0000              	XDEF	_vfprintf
+65    0000              
+66    0000              ; Now, getting to the real stuff now!
+67    0000              
+87    0000              
+88    0000              
+92    0000              
+1     0000              ; 
+2     0000              ;       Startup code for BBC BASIC programs
+3     0000              ;
+4     0000              ;       Created 1/4/99 djm
+5     0000              
+6     0000              
+137   0000              
+51    0000              
+72    0000              
+77    0000              
+11    0000              
+12    0000              
+13    0000              ; Dennis' snippet to create a BASIC program straight off!
+14    0000              ; No need for a little boot program as well, this needed mods to the
+15    0000              ; code as well - one line in cc6.c
+16    0000              
+17    0000                      org $2300
+18    0000              
+19    0000              
+20    0000              .bas_first
+21    0000  1A                  DEFB    bas_last - bas_first    ;Line Length
+22    0001              ;       DEFW    0                       ;Row Number 0 can not be listed
+23    0001  01 00               DEFW    1
+24    0003  E7 90 3C 3E 26 32 33 30 30 8C CA 
+                          DEFM    BAS_IF & BAS_PAGE_G & "<>&2300" & BAS_THEN & BAS_NEW
+25    000E  8B D2 3D 26 41 46 46 46 D6 B8 50 0D 
+                          DEFM    BAS_ELSE & BAS_LOMEM_P & "=&AFFF" & BAS_CALL & BAS_TO & "P" & CR
+26    001A              .bas_last
+27    001A  00                  DEFB    0
+28    001B  FF FF               DEFW    $FFFF           ;End of BASIC program. Next address is TOP.
+29    001D              
+30    001D              
+31    001D              .start
+32    001D  21 00 00            ld      hl,0
+33    0020  39                  add     hl,sp
+34    0021  ED 7B FE 1F         ld      sp,($1ffe)
+35    0025  22 3E 00            ld      (start1+1),hl
+36    0028  21 C0 FF            ld      hl,-64
+37    002B  39                  add     hl,sp
+38    002C  F9                  ld      sp,hl
+39    002D  ED 73 7F 00         ld      (exitsp),sp
+40    0031  CD 41 00            call    doerrhan
+41    0034  CD 00 00            call    _main
+42    0037              .cleanup
+43    0037              ;
+44    0037              ;       Deallocate memory which has been allocated here!
+45    0037              ;
+50    0037  E7 09 2E            call_oz(gn_nln)
+51    003A  CD 53 00            call    resterrhan
+52    003D              .start1
+
+Z80 Module Assembler V1.0.17, (c) InterLogic 1993-2000                                           Mon Apr 10 20:24:32 2000
+Page 003                                                                                                   'z88_crt0.lst'
+
+
+53    003D  31 00 00            ld      sp,0
+54    0040  C9                  ret
+55    0041              
+56    0041              ;Install an error handler, very simple, but prevents lot so problems
+57    0041              
+58    0041              .doerrhan
+59    0041  AF                  xor     a
+60    0042  32 81 00            ld      (exitcount),a
+61    0045  06 00               ld      b,0
+62    0047  21 61 00            ld      hl,errhand
+63    004A  E7 75               call_oz(os_erh)
+64    004C  22 75 00            ld      (l_erraddr),hl
+65    004F  32 77 00            ld      (l_errlevel),a
+66    0052  C9                  ret
+67    0053              
+68    0053              ;Restore BASICs error handler
+69    0053              
+70    0053              .resterrhan
+71    0053  2A 75 00            ld      hl,(l_erraddr)
+72    0056  3A 77 00            ld      a,(l_errlevel)
+73    0059  06 00               ld      b,0
+74    005B  E7 75               call_oz(os_erh)
+75    005D              ; Tag on the process cmd here it's not relevent at all, but return 0
+76    005D              ; just in case
+77    005D              .processcmd
+78    005D  21 00 00            ld      hl,0
+79    0060  C9                  ret
+80    0061              
+81    0061              ;The laughable error handler itself!
+82    0061              .errhand
+83    0061  C8                  ret     z       ;fatal
+84    0062  FE 01               cp      rc_esc
+85    0064  28 05               jr     z,errescpressed
+86    0066              ;Pass everything else to BASICs error handler
+87    0066  2A 75 00            ld      hl,(l_erraddr)
+88    0069  37                  scf
+89    006A              ;Save a byte here, byte there! This has label because it's used for
+90    006A              ;calculated calls etc
+91    006A              .l_dcal
+92    006A  E9                  jp      (hl)
+93    006B              
+94    006B              ;Escape pressed, treat as cntl+c so quit out (bit crude, but there you go!)
+95    006B              
+96    006B              
+97    006B              .errescpressed
+98    006B  E7 6F               call_oz(os_esc)
+99    006D  18 C8               jr      cleanup
+100   006F              
+101   006F              ; Now, which of the vfprintf routines do we need?
+102   006F              
+103   006F              
+104   006F              ._vfprintf
+119   006F              
+120   006F              
+121   006F              
+122   006F              
+123   006F              
+124   006F              
+125   006F              
+126   006F              ; Now, define some values for stdin, stdout, stderr
+127   006F              ;
+
+Z80 Module Assembler V1.0.17, (c) InterLogic 1993-2000                                           Mon Apr 10 20:24:32 2000
+Page 004                                                                                                   'z88_crt0.lst'
+
+
+128   006F              ; This allows us two models of stdio - the classic z88dk one
+129   006F              ; (kludgey) or the newer (slightly less kludgey)
+130   006F              
+131   006F              .__sgoioblk
+135   006F  F5 FF F4 FF F6 FF 
+                          defw    -11,-12,-10
+137   0075              
+138   0075              
+139   0075              
+140   0075              ;Just making me life harder! These will vanish for App startup!
+141   0075              
+142   0075              .l_erraddr
+143   0075  00 00               defw    0
+144   0077              .l_errlevel
+145   0077  00                  defb    0
+146   0078              
+147   0078              
+148   0078  00 00       .coords         defw      0
+149   007A  00 00       .base_graphics  defw      0
+150   007C  00          .gfx_bank       defb    0
+151   007D              
+152   007D              ;Seed for integer rand() routines
+153   007D              
+154   007D  00 00       .int_seed       defw    0
+155   007F              
+156   007F              ;Atexit routine
+157   007F              
+158   007F              .exitsp
+159   007F  00 00                       defw    0
+160   0081              .exitcount
+161   0081  00                          defb    0
+162   0082              
+163   0082              ; Heap stuff
+164   0082              
+165   0082  00 00       .heaplast	defw	0
+166   0084  00 00       .heapblocks	defw 	0
+167   0086              
+168   0086              ; Interrupt routine
+169   0086              .packintrout
+170   0086  00 00       		defw	0
+171   0088              
+172   0088  53 6D 61 6C 6C 20 43 2B 20 7A 38 38 00 
+                           defm  "Small C+ z88"&0
+173   0095              
+174   0095              ;All the float stuff is kept in a different file...for ease of altering!
+175   0095              ;It will eventually be integrated into the library
+176   0095              ;
+177   0095              ;Here we have a minor (minor!) problem, we've no idea if we need the
+178   0095              ;float package if this is separated from main (we had this problem before
+179   0095              ;but it wasn't critical..so, now we will have to read in a file from
+180   0095              ;the directory (this will be produced by zcc) which tells us if we need
+181   0095              ;the floatpackage, and if so what it is..kludgey, but it might just work!
+182   0095              ;
+183   0095              ;Brainwave time! The zcc_opt file could actually be written by the
+184   0095              ;compiler as it goes through the modules, appending as necessary - this
+185   0095              ;way we only include the package if we *really* need it!
+186   0095              
+198   0095              
+199   0095              
+
+Z80 Module Assembler V1.0.17, (c) InterLogic 1993-2000                                           Mon Apr 10 20:24:32 2000
+Page 005                                                                                                   'z88_crt0.lst'
+
+
+96    0095              
+97    0095              
+98    0095              
+99    0095              
+
+
+Local Module Symbols:
+
+BAS_CALL			= 000000D6 :   2* 
+BAS_ELSE			= 0000008B :   2* 
+BAS_FIRST			= 00000000 :   2* 
+BAS_IF				= 000000E7 :   2* 
+BAS_LAST			= 0000001A :   2* 
+BAS_LOMEM_P			= 000000D2 :   2* 
+BAS_NEW				= 000000CA :   2* 
+BAS_PAGE_G			= 00000090 :   2* 
+BAS_THEN			= 0000008C :   2* 
+BAS_TO				= 000000B8 :   2* 
+CR				= 0000000D :   2* 
+DOERRHAN			= 00000041 :   3*   2 
+ERRESCPRESSED			= 0000006B :   3* 
+ERRHAND				= 00000061 :   3* 
+GN_NLN				= 00002E09 :   2* 
+L_ERRADDR			= 00000075 :   4*   3 
+L_ERRLEVEL			= 00000077 :   4*   3 
+OS_ERH				= 00000075 :   2*   3 
+OS_ESC				= 0000006F :   2*   3 
+PACKINTROUT			= 00000086 :   4* 
+RC_ESC				= 00000001 :   2*   3 
+RESTERRHAN			= 00000053 :   3*   2 
+START				= 0000001D :   2* 
+START1				= 0000003D :   2* 
+
+
+Global Module Symbols:
+
+BASE_GRAPHICS			= 0000007A :   4*   1 
+CLEANUP				= 00000037 :   2*   1   3 
+COORDS				= 00000078 :   4*   1 
+EXITCOUNT			= 00000081 :   4*   1   3 
+EXITSP				= 0000007F :   4*   1   2 
+GFX_BANK			= 0000007C :   4*   1 
+HEAPBLOCKS			= 00000084 :   4*   1 
+HEAPLAST			= 00000082 :   4*   1 
+INT_SEED			= 0000007D :   4*   1 
+L_DCAL				= 0000006A :   3*   1 
+PROCESSCMD			= 0000005D :   3*   1 
+_VFPRINTF			= 0000006F :   3*   2 
+__SGOIOBLK			= 0000006F :   4*   1 
+

@@ -1,0 +1,131 @@
+<HTML>
+<HEAD>
+<TITLE>Extended Memory Access for the Small C+ Compiler</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<H2><CENTER>More than 64k?</CENTER></H2>
+
+<P>The Z80 processor is an old processor, and it's based on an even older
+one - the Intel 8080. These two processors are 8 bit accumulator based and
+can access an address space of 65536 bytes (or 64k).</P>
+
+<P>Quite early on it was realised that this simply isn't enough address
+space to implement a comprehensive operating system and leave sufficient user RAM for their own programs.<P>
+
+<P>The solution to this is quite straightforward, have more ROM/RAM in the
+system and page it in when required. This trick isn't just used on the Z80
+but also for the 6500 series of processors from Motorola.</P>
+
+<P>However, this isn't going to be a lecture on memory models and computer
+architecture (I'd end up in hot water for what I'd say, and probably will
+even for that small bit just there!) - it's a description of how the Small
+C+ compiler can access more than 64k and whats still left to do!</P>
+
+<P>The far pointers used by Small C+ are 24 bits long i.e. 3 bytes, this
+enables the <I>theoretical</I> access of 16Mb of memory (if your program
+requires more than this then please tell me what you're trying to do on
+a Z80!). The far pointer allows for a <I>flat</I> memory model - i.e. they 
+are treated as "normal" 24 bit number by the compiler.</P>
+
+<P>Before I begin I should like to point out the for Small C+ far pointers
+are stored in the registers ehl where e contains bits 16-23 and hl bits
+0-15 of the pointer. If e holds 0 then hl is taken to be an absolute
+address in the current memory configuration.</P>
+
+<P>For this concept to work, it will be necessary to create an extremely
+well designed memory allocation system which will have to present in all
+programs that use far pointers.</P>
+
+<P>Thus initially we need a malloc routine would far the prototype:</P>
+
+<PRE>far *malloc(long)</PRE>
+
+<P>Which would take a four byte integer, reserve this much space in the
+system, and return a pointer which would consist effectively of a memory
+pool number in e and 0 in hl. If enough space couldn't be reserved it
+should return with ehl=0.</P>
+
+<P>Internally however it would have to create a memory pool within the Z88
+and extend this until the size is that wished by the user. In returning a
+pointer in ehl it should internally bind whatever e is to the system memory
+pool (this maybe via a look up table or some other method) so that whenever
+access to the pool e is requested it can be calculated where exactly offset
+hl actually is.</P>
+
+<P>I should obviously mention free which will free the memory pool e and
+deallocate all memory reserved by malloc. In addition to this there should
+be a cleanup function which will deallocate all the memory in all the
+memory pools. (This is an internal function and will be used by the
+startup code to clean up on exit of the program - and hence avoid leakage).</P>
+
+<P>All access to the memory pools at C-level will be via a set of functions to read and write various types, which will now be described with entry
+parameters and projected exit conditions:</P>
+
+<P>Reading routines, all these have entry ehl = memory pool address</P>
+
+<PRE>lp_gchar   - read char
+
+Exit:   a=l = byte at that location</PRE>
+	h=0
+
+<P>This routine should not bother with signedness - the compiler will sort
+this out</P>
+
+<PRE>lp_gint    - read 2 byte integer
+
+Exit:   hl = word at that location (stored little endian)
+
+lp_gptr
+
+Exit:  ehl = far pointer at that location
+
+lp_glong        - read 4 byte integer
+
+Exit: dehl = long at that location (l=LSB)
+
+lp_gdoub        - read 6 byte double
+
+Exit: Load FA -> FA+5 with the double stored at that location</PRE>
+
+<P>FA -> FA+5 are 6 bytes presently located in the startup code, but will
+be relocated to the bad memory for applications. This routine may require
+some thought - there is a routine in the float package to place bcixde into
+the FA area.</P>
+
+<P>Writing routines, all these have entry e'h'l' = memory pool address and the following additional entry parameters:</P>
+
+<PRE>
+lp_pchar        - write char
+
+Entry:     l = byte to write
+
+lp_pint         - write 2 byte integer
+
+Entry:    hl = word to write
+
+lp_pptr         - write far pointer
+
+Entry:   ehl = far pointer to write
+
+lp_plong        - write 4 byte integer
+
+Entry:  dehl = long to write
+
+lp_pdoub        - write double
+
+Entry:  none</PRE>
+
+<P>This routine will write the bytes stored in FA -> FA+5 to the memory
+pool address, once again this may require some thought.</P>
+
+<CENTER><HR WIDTH="20%"></CENTER>
+
+<P>These routines have now been written by Garry Lancaster for the z88
+and so this document is just hanging around should someone feel like
+writing routines for other machines.</P>
+
+<HR>
+<A HREF="mailto:dom@jb.man.ac.uk">Dom</A> 16/4/2000
+
+</BODY>
+</HTML>

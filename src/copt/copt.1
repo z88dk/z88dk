@@ -1,0 +1,69 @@
+.de DS
+.nf
+.in +3
+.sp
+..
+.de DE
+.sp
+.in -3
+.fi
+..
+.TH copt 1
+.SH NAME
+copt \- peephole optimizer
+.SH SYNOPSIS
+\fBcopt\fP \fIfile\fP ...
+.SH DESCRIPTION
+\fIcopt\fP is a general-purpose peephole optimizer.
+It reads code from its standard input
+and writes an improved version to its standard output.
+\fIcopt\fP reads the named files for its optimizations,
+which are encoded as follows:
+.DS
+<pattern for input line 1>
+<pattern for input line 2>
+ ...
+<pattern for input line n>
+=
+<pattern for output line 1>
+<pattern for output line 2>
+ ...
+<pattern for output line m>
+<blank line>
+.DE
+Pattern matching uses literal string comparison, with one exception:
+``%%'' matches the ``%'' character,
+and ``%'' followed by a digit matches everything
+up to the next occurrence of the next pattern character,
+though all occurrences of %\fIn\fP must denote the same string.
+For example, the pattern ``%1=%1.'' matches exactly those strings
+that begin with a string X, followed by a ``='' (the first),
+followed by a second occurrence of X, followed by a period.
+In this way, the input/output pattern
+.DS
+mov $%1,r%2
+mov *r%2,r%2
+=
+mov %1,r%2
+.DE
+commands \fIcopt\fP to replace runs like
+.DS
+mov $_a,r3
+mov *r3,r3
+.DE
+with
+.DS
+mov _a,r3
+.DE
+Note that a tab or newline can terminate a %\fIn\fP variable.
+.LP
+\fIcopt\fP compares each run of input patterns 
+with the current input instruction and its predecessors.
+If no match is found, it advances to the next input instruction and tries again.
+Otherwise, it replaces the input instructions
+with the corresponding output patterns, pattern variables instantiated,
+and resumes its search with the \fIfirst\fP instruction of the replacement.
+\fIcopt\fP matches input patterns in reverse order 
+to cascade optimizations without backing up.
+.SH BUGS
+Errors in optimization files are always possible.

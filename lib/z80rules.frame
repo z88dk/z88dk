@@ -1,0 +1,6 @@
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;(i%2 %3)
+=
+	ld	l,(i%2 %3)
+	ld	h,(i%2 %3+1)

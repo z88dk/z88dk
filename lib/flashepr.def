@@ -1,0 +1,55 @@
+lstoff
+;*** FLASHEP.DEF
+;*** Flash Eprom system constant definitions
+;
+;*** (C) Zlab 1995-97.
+;*** Original concept from Thierry Peycru
+;
+;*** Update of the 08.19.97
+;
+;*** Only working on Zlab 1M Flash Eprom Cards
+;*** Only for Intel i28F008 chips (ETOX III technologies)
+;*** Learn first, INTEL QuickPulse and QuickErase algorithms
+;*** Available in the 28F008 datasheet.
+;
+;*** PLEASE, DO RESPECT these new standard notations.
+;
+;*** Description :
+;(1) Flash Eprom Command codes
+;
+; fe_rst = reset chip in read array mode
+; fe_iid = get INTELligent identification code (manufacturer and device)
+; fe_int = INTEL manufacturer code
+; fe_i008= i28F008SA device code   (1024K)
+; fe_i004= i28F004S5 device code   (512K)
+; fe_i8s5= i28F008S5 device code   (1024K)
+; fe_i016= i28F016S5 device code   (2048K)
+; fe_i020= i28F020 device code     (256K)
+; fe_rsr = read status register
+; fe_csr = clear status register
+; fe_era = erase block command
+; fe_con = confirm erasure
+; fe_sus = suspend erasure
+; fe_res = resume erasure
+; fe_wri = byte write command
+; fe_alw = alternate byte write command
+;
+;(2) Flash Eprom Error Return codes
+; rc_vpl = Vpp Low error
+; rc_bwr = byte write error
+; rc_ber = block erasure error
+; rc_bes = block erasure suspended
+; rc_nfe = not a flash eprom
+; rc_noz = not an oz formatted eprom
+;
+
+DEFC FE_RST = $FF, FE_IID = $90, FE_RSR = $70, FE_CSR = $50
+DEFC FE_ERA = $20, FE_CON = $D0, FE_SUS = $B0, FE_RES = $D0
+DEFC FE_WRI = $40, FE_ALW = $10
+DEFC FE_INT = $89, FE_I004= $A7, FE_I008= $A2, FE_I020= $BD, FE_I8S5= $A6
+DEFC FE_I016 = $AA
+DEFC RC_VPL = $70, RC_BWR = $71, RC_BER = $72, RC_BES = $73
+DEFC RC_NFE = $80, RC_NOZ = $81
+
+;
+lston

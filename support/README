@@ -1,0 +1,4 @@
+A few support routines, most of them are programs to create files which
+can be loaded into the appropriate emulator
+
+bogomips - Fake speed calculator

@@ -1,0 +1,20 @@
+lstoff
+
+; Standard Z88	Operating	System manifests:
+
+; The information below is defined	in Developers Notes, release 3.00
+; (c) Cambridge Computer	1989
+
+; Miscellaneous OZ call definitions:
+
+	DEFC	Os_Blp  =	$D806		; Bleep
+	DEFC	Os_Prt  =	$24			; Send character directly to printer filter (low level)
+	DEFC	Os_Isq  =	$D006		; Initialize prefix	sequense (internal)
+	DEFC	Os_Wsq  =	$CE06		; Write to prefix sequense (internal)
+
+	DEFC	Os_Fn   =	$7B			; Miscellaneous OS functions (internal)
+		DEFC	FN_AH = $01		; allocate handle
+		DEFC	FN_VH = $02		; verify handle
+		DEFC	FN_FH = $03		; free handle
+
+lston

@@ -1,0 +1,50 @@
+lstoff
+
+; Standard Z88	Operating	System manifests:
+
+; The information below is defined	in Developers Notes, release 3.00
+; (c) Cambridge Computer	1989
+
+; Dennis Groning 14 September 1998
+
+
+;ASCII Control characters
+
+	DEFC   	NUL		=	0
+	DEFC   	SOH		=	1
+	DEFC   	STX		=	2
+	DEFC   	ETX		=	3
+	DEFC   	EOT		=	4
+	DEFC   	ENQ		=	5
+	DEFC   	ACK		=	6
+	DEFC   	BEL		=	7
+	DEFC   	BS		=	8
+	DEFC   	HT		=	9
+;	DEFC   	LF		=	10
+	DEFC   	VT		=	11
+	DEFC   	FF		=	12
+;	DEFC   	CR		=	13
+	DEFC   	SO		=	14
+	DEFC   	SI		=	15
+	DEFC   	DLE		=	16
+	DEFC   	DC1		=	17
+	DEFC   	DC2		=	18
+	DEFC   	DC3		=	19
+	DEFC   	DC4		=	20
+	DEFC   	NAK		=	21
+	DEFC   	SYN		=	22
+	DEFC   	ETB		=	23
+	DEFC   	CAN		=	24
+	DEFC   	EM		=	25
+	DEFC   	SUB		=	26
+;	DEFC   	ESC		=	27
+	DEFC   	FS		=	28
+	DEFC   	GS		=	29
+	DEFC   	RS		=	30
+	DEFC   	US		=	31
+	DEFC   	DEL		=	127
+
+	DEFC   	XON		=	17
+	DEFC   	XOFF	=	19
+
+lston

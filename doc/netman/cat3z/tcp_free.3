@@ -1,0 +1,71 @@
+
+
+
+tcp_malloc(3)       z88dk Programmer's Manual       tcp_malloc(3)
+
+
+NNAAMMEE
+       tcp_calloc,  tcp_malloc, tcp_free - Allocate and free mem-
+       ory
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//mmiisscc..hh>>
+
+       vvooiidd **ttccpp__ccaalllloocc((ssiizzee__tt _n_m_e_m_b,, ssiizzee__tt _s_i_z_e));;
+       vvooiidd **ttccpp__mmaalllloocc((ssiizzee__tt _s_i_z_e));;
+       vvooiidd ttccpp__ffrreeee((vvooiidd _*_p_t_r));;
+
+DDEESSCCRRIIPPTTIIOONN
+       ccaalllloocc(()) allocates memory for an array of  _n_m_e_m_b  elements
+       of  _s_i_z_e bytes each and returns a pointer to the allocated
+       memory.  The memory is set to zero.
+
+       mmaalllloocc(()) allocates _s_i_z_e bytes and returns a pointer to the
+       allocated memory.  The memory is not cleared.
+
+       ffrreeee(())  frees  the  memory  space pointed to by _p_t_r, which
+       must have been returned by a previous call to mmaalllloocc(())  or
+       ccaalllloocc(())  Otherwise,  or  if  ffrreeee((_p_t_r))  has  already been
+       called before, undefined  behaviour  occurs.   If  _p_t_r  is
+       NNUULLLL, no operation is performed.
+
+
+RREETTUURRNN VVAALLUUEESS
+       For ccaalllloocc(()) and mmaalllloocc(()), the value returned is a pointer
+       to the allocated memory, which is suitably aligned for any
+       kind of variable, or NNUULLLL if the request fails.
+
+       ffrreeee(()) returns no value.
+
+
+
+SSEEEE AALLSSOO
+       ttccpp__ppaaggeeiinn(3z) ,ttccpp__ppaaggeeoouutt(3z)
+
+
+NNOOTTEESS
+       These functions manipulate memory in a private memory page
+       belonging to ZSock. This 16k page holds  all  the  buffers
+       that  ZSock  uses  and hence requests for large amounts of
+       memory are likely to fail (and in any case are not  recom-
+       mended).
+
+       This  facility  has  been  offered  to allow daemons to be
+       written simply (they have no address space of their  own).
+       User  applications  should  not use these facilities. If a
+       large (>256 bytes) amount of memory is required for a user
+       application  then  the application should either be of the
+       BAD type or be redesigned.
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+                         February 18 2000                       1
+
+

@@ -1,0 +1,54 @@
+
+
+
+DeviceOffline(3z)   z88dk Programmer's Manual   DeviceOffline(3z)
+
+
+NNAAMMEE
+       DeviceOffline - turn the network device online
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//mmiisscc..hh>>
+
+       vvooiidd DDeevviicceeOOfffflliinnee((iinntt _f_l_a_g));;
+
+DDEESSCCRRIIPPTTIIOONN
+       The  DDeevviicceeOOfffflliinnee(())  function  turns  the  packet  driver
+       offline  so  that  other  application  may   utilise   the
+       resources that it is using.
+
+       For  example  for  the  built  in SLIP driver, turning the
+       device online prevents polling  of  the  serial  port  for
+       incoming  bytes  and  the  sending of queued packets, thus
+       allowing another program (e.g. Terminal) to use the serial
+       port.
+
+       The  parameter  _f_l_a_g  specifies  how  the  device is to be
+       turned offline, with current device drivers  this  has  no
+       significence.  However  it  is  envisaged  that  the value
+       NOHANGUP  the  device  will  simply  suspend  sending  and
+       receiving  packets.  Whilst  with  HANGUP  the device will
+       hangup the line and terminate the telephone connection.
+
+
+RREETTUURRNN VVAALLUUEE
+       None.
+
+
+SSEEEE AALLSSOO
+       DDeevviicceeOOnnlliinnee(3z)
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

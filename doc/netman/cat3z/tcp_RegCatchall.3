@@ -1,0 +1,71 @@
+
+
+
+tcp_RegCatchall(3z) z88dk Programmer's Manual tcp_RegCatchall(3z)
+
+
+NNAAMMEE
+       tcp_RegCatchall - (De)register packet catcher
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//mmiisscc..hh>>
+
+       iinntt ttccpp__RReeggCCaattcchhaallll((iinntt _l_i_b_c_a_l_l));;
+
+DDEESSCCRRIIPPTTIIOONN
+       The  ttccpp__RReeggCCaattcchhaallll(()) function registers or deregisters a
+       function that is used to catch all incoming packets  after
+       it  has passed the basic tests of checksumming, length and
+       ttl-checking.  l-checking.
+
+       The  parameter  lliibbccaallll   is   the   ID   for   a   shared
+       library/packet call which has the prototype thus:
+
+       bbooooll__tt FFuunnccttiioonn((vvooiidd **_d_p,, ssiizzee__tt _l_e_n));;
+
+       Where  _d_p  is  the  address  of  the packet and _l_e_n is the
+       length  of  the  packet.  This  function   should   return
+       TRUE/FALSE  to  indicate  to  the ZSock kernel whether the
+       function has dealt with the packet and  ZSock  should  not
+       process it.
+
+
+RREETTUURRNN VVAALLUUEE
+       ttccpp__RReeggCCaattcchhaallll(())  returns the previous ID of the catchall
+       function.
+
+
+NNOOTTEESS
+       Should you wish to stop  calling  your  catchall  function
+       simply call the function with an argument of NULL.
+
+       This function is of use should somebody write a driver for
+       an as yet unsupported protocol.
+
+       The package call should page in the ZSock data area  using
+       the function ttccpp__ppaaggeeiinn((33zz)).
+
+       This call could for example be used to implement a tracer-
+       oute style routine to catch ICMP replies.  Returning  TRUE
+       when  it  has received an ICMP reply packet of the correct
+       tyoe, and FALSE otherwise.
+
+
+
+SSEEEE AALLSSOO
+       ttccpp__ppaaggeeiinn(3z), ttccpp__ppaaggeeoouutt(3z)
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

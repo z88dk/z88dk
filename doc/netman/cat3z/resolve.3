@@ -1,0 +1,46 @@
+
+
+
+resolve(3z)         z88dk Programmer's Manual         resolve(3z)
+
+
+NNAAMMEE
+       resolve - convert hostname to IP address
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//rreessoollvv..hh>>
+
+       iippaaddddrr__tt rreessoollvvee((cchhaarr **_n_a_m_e));;
+
+DDEESSCCRRIIPPTTIIOONN
+       The  rreessoollvvee(()) function queries any configured nameservers
+       for the IP address of the host with the name _n_a_m_e.
+
+       If _n_a_m_e is in the form a.b.c.d then this is  converted  to
+       an IP address and returned.
+
+
+RREETTUURRNN VVAALLUUEE
+       rreessoollvv(())  returns  the  network  order  IP  address of the
+       requested host. If the name cannot be resolved  then  NULL
+       is returned.
+
+       rreessoollvv(()) may also be called by the macro ggeetthhoossttbbyynnaammee
+
+
+BBUUGGSS
+       If  you  use  the macro ggeetthhoossttbbyynnaammee then beware that the
+       ZSock implementation is not at all standard.
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

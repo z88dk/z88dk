@@ -1,0 +1,38 @@
+; Package handling package definitions
+
+	defc	pkg_ayt=$0000		; Are you there; package-handling
+
+	defc	rc_pnf=$11		; package not found error code
+					; (same as RC_PRE)
+
+	defc	pkg_inf=$000f		; static information (Packages)
+	defc	pkg_ayt_x=$020f		; are you there? (Packages)
+	defc	pkg_bye=$040f		; terminate (Packages)
+	defc	pkg_dat=$060f		; dynamic data (Packages)
+	defc	pkg_exp=$080f		; expansion call (Packages)
+	defc	pkg_reg=$0a0f		; register a package
+	defc	pkg_drg=$0c0f		; deregister a package
+	defc	pkg_nxt=$0e0f		; get next installed package ID
+	defc	pkg_get=$100f		; get information on a package
+	defc	pkg_feat=$120f		; packages feature control
+	defc	pkg_rst20=$140f		; CALL_OZ handler
+	defc	pkg_intm1=$160f		; M1 interrupt chain handler
+	defc	pkg_intr=$180f		; register interrupt handler
+	defc	pkg_intd=$1a0f		; deregister interrupt handler
+	defc	pkg_pid=$1c0f		; get current process ID
+	defc	pkg_ozcr=$1e0f		; register OZ call substitution
+	defc	pkg_ozcd=$200f		; deregister OZ call substitution
+        defc    pkg_slow=$220f          ; SlowMo interrupt call
+	defc	pkg_bal=$240f		; allocate bank
+	defc	pkg_bfr=$260f		; free bank
+	defc	pkg_boot=$280f		; package autoboot facility
+
+; Reason codes
+
+        defc    int_pkg=$00
+        defc    int_prc=$01
+
+	defc	bnk_any=$00
+	defc	bnk_even=$01
+
+	defc	exp_boot=$01

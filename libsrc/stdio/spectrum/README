@@ -1,0 +1,4 @@
+Spectrum specific routines for stdio
+
+No true file i/o yet but we still have a fake fabandon so closeall
+will work

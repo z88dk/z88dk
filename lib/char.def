@@ -1,0 +1,15 @@
+lstoff
+
+; Standard Z88	Operating	System manifests:
+
+; The information below is defined	in Developers Notes, release 3.00
+; (c) Cambridge Computer	1989-95
+
+; Character management:
+
+	DEFC	Gn_Cls  =	$3009		; Classify a character
+	DEFC	Gn_Skc  =	$3209		; Bypass a character in a sequense
+	DEFC	Gn_Skd  =	$3409		; Bypass delimiters	in a	sequense
+	DEFC	Gn_Skt  =	$3609		; Search for character in a sequense
+
+lston

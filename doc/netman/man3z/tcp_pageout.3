@@ -1,0 +1,33 @@
+.TH tcp_pageout 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+tcp_pageout \- page the ZSock data area out of the memory map
+.SH SYNOPSIS
+.nf
+.B #include <net/misc.h>
+.sp
+.BI "void tcp_pageout(u8_t "oldbinding);
+.fi
+.SH DESCRIPTION
+The \fBtcp_pageout()\fP function pages out the ZSock data area into segment
+1 (addresses 16384-32767) of the z88s memory map.
+.PP
+The parameter \fIoldbinding\fP is the return value from a prior
+\fBtcp_pagein(3z)\fP function.
+.PP
+This function is primarily of use to daemons which use the ZSock dataarea
+for small amounts of storage.
+
+.SH "RETURN VALUE"
+\fBtcp_pagein()\fP returns the previous binding of segment 1 which should
+be used as a parameter to \fBtcp_pageout\fP(3z)
+
+.SH "SEE ALSO"
+.BR tcp_pagein "(3z), " tcp_malloc (3z), " tcp_calloc"(3z)
+.BR tcp_free "(3z)"
+
+.SH BUGS
+Supplying an incorrect \fIoldbinding\fP will most likely crash the z88.
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>
+

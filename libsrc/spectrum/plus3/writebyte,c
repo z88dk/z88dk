@@ -1,0 +1,27 @@
+/*
+ *	Write byte to file (+3DOS)
+ *
+ *	18/3/2000 djm
+ *
+ *	Not user callable - internal LIB routine
+ *
+ *	Enter with de = filehandle
+ *		    c = byte to write
+ */
+
+
+int writebyte(int handle)
+{
+#asm
+	XREF	dodos
+	ld	b,e	;file handle
+	ld	iy,283	;DOS_BYTE_WRITE
+	push	bc	;keep byte
+	call	dodos
+	pop	bc
+	ld	hl,-1	;EOF
+	ret	nc	;error
+	ld	l,c
+	ld	h,0
+#endasm
+}

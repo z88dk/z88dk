@@ -1,0 +1,754 @@
+;* * * * *  Small-C/Plus Z88 * * * * *
+;  Version: v1.10b0.70pre2 Date: 1/4/2000 
+;
+;	Reconstructed for the z80 Module Assembler
+;	By Dominic Morris <djm@jb.man.ac.uk>
+;
+;	Module compile time: Thu Apr  6 01:57:17 2000
+
+
+
+	MODULE	printf2.c
+
+	INCLUDE "#z88_crt0.hdr"
+
+
+
+._printf2
+	ld	hl,-12	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,0	;const
+	push	hl
+	ld	hl,-135	;const
+	add	hl,sp
+	ld	sp,hl
+.i_3
+	ld	hl,134	;const
+	add	hl,sp
+	push	hl
+	ld	hl,155	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	inc	hl
+	pop	de
+	call	l_pint
+	dec	hl
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+	and	a
+	jp	z,i_4
+	ld	hl,134	;const
+	add	hl,sp
+	ld	a,(hl)
+	cp	#(37 % 256)
+	jp	z,i_5
+	ld	hl,134	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	push	hl
+	ld	hl,157	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	call	fputc
+	pop	bc
+	pop	bc
+	ld	hl,135	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	inc	hl
+	pop	de
+	call	l_pint
+	jp	i_3
+.i_5
+	ld	hl,153	;const
+	add	hl,sp
+	call	l_gint	;
+	ld	a,(hl)
+	cp	#(37 % 256)
+	jp	nz,i_6
+	ld	hl,153	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	inc	hl
+	pop	de
+	call	l_pint
+	dec	hl
+	ld	l,(hl)
+	ld	h,0
+	push	hl
+	ld	hl,157	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	call	fputc
+	pop	bc
+	pop	bc
+	ld	hl,135	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	inc	hl
+	pop	de
+	call	l_pint
+	jp	i_3
+.i_6
+	ld	hl,153	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	bc
+	push	hl
+	ld	a,(hl)
+	cp	#(45 % 256)
+	jp	nz,i_7
+	ld	hl,133	;const
+	add	hl,sp
+	ld	(hl),#(0 % 256)
+	pop	hl
+	inc	hl
+	push	hl
+	jp	i_8
+.i_7
+	ld	hl,133	;const
+	add	hl,sp
+	ld	(hl),#(1 % 256)
+.i_8
+	pop	hl
+	push	hl
+	ld	a,(hl)
+	cp	#(48 % 256)
+	jp	nz,i_9
+	ld	hl,4	;const
+	add	hl,sp
+	ld	(hl),#(48 % 256)
+	pop	hl
+	inc	hl
+	push	hl
+	jp	i_10
+.i_9
+	ld	hl,4	;const
+	add	hl,sp
+	ld	(hl),#(32 % 256)
+.i_10
+	ld	hl,145	;const
+	add	hl,sp
+	push	hl
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	ld	hl,147	;const
+	add	hl,sp
+	push	hl
+	call	utoi
+	pop	bc
+	pop	bc
+	pop	de
+	call	l_pint
+	xor	a
+	or	h
+	jp	m,i_11
+	pop	de
+	push	de
+	ld	hl,147-2	;const
+	add	hl,sp
+	call	l_gint	;
+	add	hl,de
+	pop	bc
+	push	hl
+	jp	i_12
+.i_11
+	jp	i_3
+.i_12
+	pop	hl
+	push	hl
+	ld	a,(hl)
+	cp	#(46 % 256)
+	jp	nz,i_13
+	ld	hl,139	;const
+	add	hl,sp
+	push	hl
+	pop	de
+	pop	hl
+	inc	hl
+	push	hl
+	push	de
+	push	hl
+	ld	hl,145	;const
+	add	hl,sp
+	push	hl
+	call	utoi
+	pop	bc
+	pop	bc
+	pop	de
+	call	l_pint
+	xor	a
+	or	h
+	jp	m,i_14
+	pop	de
+	push	de
+	ld	hl,141-2	;const
+	add	hl,sp
+	call	l_gint	;
+	add	hl,de
+	pop	bc
+	push	hl
+	jp	i_15
+.i_14
+	jp	i_3
+.i_15
+	jp	i_16
+.i_13
+	ld	hl,139	;const
+	add	hl,sp
+	ld	de,0	;const
+	ex	de,hl
+	call	l_pint
+.i_16
+	ld	hl,5	;const
+	add	hl,sp
+	pop	de
+	pop	bc
+	push	hl
+	push	de
+	ld	hl,134	;const
+	add	hl,sp
+	push	hl
+	pop	de
+	pop	hl
+	inc	hl
+	push	hl
+	push	de
+	dec	hl
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+	ld	hl,145	;const
+	add	hl,sp
+	push	hl
+	ld	hl,153	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	dec	hl
+	pop	de
+	call	l_pint
+	call	l_gint	;
+	pop	de
+	call	l_pint
+	ld	hl,134	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	jp	i_19
+.i_20
+	ld	hl,145	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,7	;const
+	add	hl,sp
+	push	hl
+	ld	hl,7	;const
+	push	hl
+	call	itod
+	pop	bc
+	pop	bc
+	pop	bc
+	jp	i_18
+.i_21
+	ld	hl,145	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,7	;const
+	add	hl,sp
+	push	hl
+	ld	hl,7	;const
+	push	hl
+	call	itox
+	pop	bc
+	pop	bc
+	pop	bc
+	jp	i_18
+.i_22
+	ld	hl,5	;const
+	add	hl,sp
+	ex	de,hl
+	ld	hl,147-2	;const
+	add	hl,sp
+	call	l_gint	;
+	ld	a,l
+	ld	(de),a
+	ld	hl,6	;const
+	add	hl,sp
+	ld	(hl),#(0 % 256)
+	ld	l,(hl)
+	ld	h,0
+	jp	i_18
+.i_23
+	ld	hl,145	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	pop	bc
+	push	hl
+	push	de
+	jp	i_18
+.i_24
+	ld	hl,145	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,7	;const
+	add	hl,sp
+	push	hl
+	ld	hl,7	;const
+	push	hl
+	call	itou
+	pop	bc
+	pop	bc
+	pop	bc
+	jp	i_18
+.i_25
+	ld	hl,139	;const
+	add	hl,sp
+	call	l_gint	;
+	ld	a,h
+	or	l
+	jp	nz,i_26
+	ld	hl,141	;const
+	add	hl,sp
+	ld	de,6	;const
+	ex	de,hl
+	call	l_pint
+.i_26
+	ld	hl,134	;const
+	add	hl,sp
+	ld	a,(hl)
+	cp	#(102 % 256)
+	jp	nz,i_27
+	ld	hl,151	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	dec	hl
+	dec	hl
+	pop	de
+	call	l_pint
+	ld	hl,147	;const
+	add	hl,sp
+	ex	de,hl
+	ld	hl,153-2	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_pint
+	ld	hl,147	;const
+	add	hl,sp
+	call	l_gint	;
+	call	dldpsh
+	ld	hl,147	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,13	;const
+	add	hl,sp
+	push	hl
+	call	ftoa
+	exx
+	ld	hl,10	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	jp	i_28
+.i_27
+	ld	hl,134	;const
+	add	hl,sp
+	ld	a,(hl)
+	cp	#(101 % 256)
+	jp	nz,i_29
+	ld	hl,151	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	dec	hl
+	dec	hl
+	pop	de
+	call	l_pint
+	ld	hl,147	;const
+	add	hl,sp
+	ex	de,hl
+	ld	hl,153-2	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_pint
+	ld	hl,147	;const
+	add	hl,sp
+	call	l_gint	;
+	call	dldpsh
+	ld	hl,147	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,13	;const
+	add	hl,sp
+	push	hl
+	call	ftoe
+	exx
+	ld	hl,10	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	jp	i_30
+.i_29
+	jp	i_3
+.i_30
+.i_28
+	jp	i_18
+.i_19
+	ld	a,l
+	cp	#(100% 256)
+	jp	z,i_20
+	cp	#(120% 256)
+	jp	z,i_21
+	cp	#(99% 256)
+	jp	z,i_22
+	cp	#(115% 256)
+	jp	z,i_23
+	cp	#(117% 256)
+	jp	z,i_24
+	jp	i_25
+.i_18
+	ld	hl,153	;const
+	add	hl,sp
+	ex	de,hl
+	pop	hl
+	push	hl
+	call	l_pint
+	ld	hl,134	;const
+	add	hl,sp
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,115	;const
+	call	l_ne
+	jp	nc,i_31
+.i_32
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	a,(hl)
+	cp	#(32 % 256)
+	jp	nz,i_33
+	pop	de
+	pop	hl
+	inc	hl
+	push	hl
+	push	de
+	jp	i_32
+.i_33
+.i_31
+	ld	hl,137	;const
+	add	hl,sp
+	ld	de,-1	;const
+	ex	de,hl
+	call	l_pint
+.i_34
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	ld	hl,139	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	inc	hl
+	pop	de
+	call	l_pint
+	pop	de
+	add	hl,de
+	ld	l,(hl)
+	ld	h,0
+	ld	a,h
+	or	l
+	jp	nz,i_34
+.i_35
+	ld	hl,134	;const
+	add	hl,sp
+	ld	a,(hl)
+	cp	#(115 % 256)
+	jp	nz,i_37
+	ld	hl,137	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,143	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	call	l_gt
+	jp	nc,i_37
+	ld	hl,139	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,0	;const
+	call	l_gt
+	jr	c,i_38_i_37
+.i_37
+	jp	i_36
+.i_38_i_37
+	ld	hl,137	;const
+	add	hl,sp
+	ex	de,hl
+	ld	hl,143-2	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_pint
+.i_36
+	ld	hl,133	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	ld	a,h
+	or	l
+	jp	z,i_39
+.i_40
+	ld	hl,143	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	dec	hl
+	pop	de
+	call	l_pint
+	inc	hl
+	ex	de,hl
+	ld	hl,139-2	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_sub
+	xor	a
+	or	h
+	jp	m,i_41
+	or	l
+	jp	z,i_41
+	ld	hl,4	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	push	hl
+	ld	hl,157	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	call	fputc
+	pop	bc
+	pop	bc
+	ld	hl,135	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	inc	hl
+	pop	de
+	call	l_pint
+	jp	i_40
+.i_41
+.i_39
+.i_42
+	ld	hl,137	;const
+	add	hl,sp
+	call	l_gint	;
+	ld	a,h
+	or	l
+	jp	z,i_43
+	pop	de
+	pop	hl
+	inc	hl
+	push	hl
+	push	de
+	dec	hl
+	ld	l,(hl)
+	ld	h,0
+	push	hl
+	ld	hl,157	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	call	fputc
+	pop	bc
+	pop	bc
+	ld	hl,135	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	inc	hl
+	pop	de
+	call	l_pint
+	ld	hl,137	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	dec	hl
+	pop	de
+	call	l_pint
+	ld	hl,143	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	dec	hl
+	pop	de
+	call	l_pint
+	jp	i_42
+.i_43
+.i_44
+	ld	hl,143	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	dec	hl
+	pop	de
+	call	l_pint
+	inc	hl
+	ex	de,hl
+	ld	hl,139-2	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_sub
+	xor	a
+	or	h
+	jp	m,i_45
+	or	l
+	jp	z,i_45
+	ld	hl,4	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	push	hl
+	ld	hl,157	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	call	fputc
+	pop	bc
+	pop	bc
+	ld	hl,135	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	inc	hl
+	pop	de
+	call	l_pint
+	jp	i_44
+.i_45
+	jp	i_3
+.i_4
+	ld	hl,135	;const
+	add	hl,sp
+	call	l_gint	;
+	exx
+	ld	hl,149	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+
+
+
+
+; --- Start of Static Variables ---
+
+
+
+; --- Start of Scope Defns ---
+
+	LIB	feof
+	LIB	fprand
+	LIB	fpseed
+	LIB	getk
+	LIB	fmod
+	LIB	sprintf
+	LIB	ftoa
+	LIB	ftoe
+	LIB	read
+	LIB	itod
+	LIB	itou
+	LIB	itox
+	LIB	open
+	LIB	fgetc
+	LIB	freopen
+	LIB	fgets
+	LIB	open_z88
+	LIB	fopen_z88
+	LIB	creat
+	LIB	close
+	LIB	minisprintf
+	LIB	puts
+	LIB	utoi
+	LIB	fseek
+	LIB	rename
+	LIB	floor
+	LIB	fopen
+	LIB	fchkstd
+	LIB	ftell
+	LIB	readbyte
+	LIB	fprintf
+	LIB	minivfprintf
+	XREF	__sgoioblk
+	LIB	fgetc_cons
+	LIB	fgets_cons
+	LIB	fputc
+	LIB	remove
+	XDEF	_printf2
+	LIB	fputs
+	LIB	lseek
+	LIB	vsprintf
+	LIB	writebyte
+	LIB	fclose
+	LIB	fgetpos
+	LIB	printf
+	LIB	minifprintf
+	LIB	minisfprintf
+	LIB	printn
+	LIB	fdtell
+	LIB	closeall
+	LIB	freopen_z88
+	LIB	ungetc
+	LIB	getarg
+	LIB	miniprintf
+	LIB	fabandon
+	LIB	fdgetpos
+	LIB	ceil
+	LIB	fabs
+	LIB	vfprintf
+	LIB	write
+	LIB	fputc_cons
+	LIB	puts_cons
+	LIB	amax
+	LIB	amin
+
+
+; --- End of Scope Defns ---
+
+
+; --- End of Compilation ---

@@ -1,0 +1,121 @@
+	call	l_pint
+	ld	a,h
+	or	l
+=
+	call	l_pint_eq
+
+	call	l_gint	;%9
+	ld	a,h
+	or	l
+=
+	call	l_gint_eq	;%9
+
+	call	l_long%1
+	call	l_int2long_s
+=
+	call	l_long%1
+
+	ld	hl,_%1
+	push	hl
+	call	l_gint	;%9
+	%2c	hl
+	pop	de
+	call	l_pint
+=
+	ld	hl,(_%1)
+	%2c	hl
+	ld	(_%1),hl
+
+	ld	hl,_%1
+	push	hl
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	l,(hl)
+	ld	h,0
+	add	hl,hl
+	pop	de
+	add	hl,de
+	push	hl
+	call	l_gint	;%9
+	inc	hl
+	pop	de
+	call	l_pint
+=
+	pop	hl
+	push	hl
+	ld	l,(hl)
+	ld	h,0
+	add	hl,hl
+	ld	de,_%1
+	add	hl,de
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	de
+	ld	(hl),d
+	dec	hl
+	ld	(hl),e
+	ex	de,hl
+
+	ld	hl,%1
+	ld	a,h
+	or	l
+	jp	%2
+	ld	hl,%1
+=
+	ld	hl,%1
+	ld	a,h
+	or	l
+	jp	%2
+
+	push	hl
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+=
+	pop	de
+	push	de
+	push	hl
+	ex	de,hl
+
+	pop	hl
+	push	hl
+	inc	hl
+	inc	hl
+	pop	de
+	push	de
+	push	hl
+	ex	de,hl
+	inc	hl
+	inc	hl
+=
+	pop	hl
+	push	hl
+	inc	hl
+	inc	hl
+	push	hl
+
+	pop	hl
+	push	hl
+	ld	bc,%1
+	add	hl,bc
+	ld	(hl),%2
+	inc	hl
+	ld	(hl),%3
+	pop	hl
+	push	hl
+	ld	bc,%4
+	add	hl,bc
+=
+	pop	hl
+	push	hl
+	ld	bc,%1
+	add	hl,bc
+	ld	(hl),%2
+	inc	hl
+	ld	(hl),%3
+	ld	bc,%4-%1-1
+	add	hl,bc

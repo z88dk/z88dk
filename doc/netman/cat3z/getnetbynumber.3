@@ -1,0 +1,46 @@
+
+
+
+getnetbyname(3z)    z88dk Programmer's Manual    getnetbyname(3z)
+
+
+NNAAMMEE
+       getnetbyname, getnetbynumber  - get network entry
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//rreessoollvv..hh>>
+
+       iinntt ggeettnneettbbyynnaammee((cchhaarr **_n_a_m_e));;
+       cchhaarr **ggeettnneettbbyynnuummbbeerr((iinntt _n_e_t_w_o_r_k,, cchhaarr ** _b_u_f));;
+
+DDEESSCCRRIIPPTTIIOONN
+       The  ggeettnneettbbyynnaammee(())  function  returns the standard number
+       for the network with the name _n_a_m_e. If no network is known
+       then NULL is returned.
+
+       The ggeettnneettbbyynnuummbbeerr(()) function copies into _b_u_f (and returns
+       _b_u_f) the network matching the _n_e_t_w_o_r_k. If  no  network  is
+       known then _n_e_t_w_o_r_k is returned in ASCII form.
+
+
+RREETTUURRNN VVAALLUUEE
+       Detailed above.
+
+
+NNOOTTEESS
+       These functions use a lookup table compiled into the ZSock
+       kernel, it is not likely that method will  change  in  the
+       near future.
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

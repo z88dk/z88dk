@@ -1,0 +1,46 @@
+
+
+
+tcp_pagein(3z)      z88dk Programmer's Manual      tcp_pagein(3z)
+
+
+NNAAMMEE
+       tcp_pagein - page the ZSock data area into the memory map
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//mmiisscc..hh>>
+
+       uu88__tt ttccpp__ppaaggeeiinn((vvooiidd));;
+
+DDEESSCCRRIIPPTTIIOONN
+       The  ttccpp__ppaaggeeiinn(())  function  pages  in the ZSock data area
+       into segment 1 (addresses 16384-32767) of the z88s  memory
+       map.
+
+       This function is primarily of use to daemons which use the
+       ZSock dataarea for small amounts of storage.
+
+
+RREETTUURRNN VVAALLUUEE
+       ttccpp__ppaaggeeiinn(()) returns the previous  binding  of  segment  1
+       which should be used as a parameter to ttccpp__ppaaggeeoouutt(3z)
+
+
+SSEEEE AALLSSOO
+       ttccpp__ppaaggeeoouutt(3z),       ttccpp__mmaalllloocc(3z),      ttccpp__ccaalllloocc(3z)
+       ttccpp__ffrreeee(3z)
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

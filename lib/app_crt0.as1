@@ -1,0 +1,13 @@
+; z80asm is getting a bit crusty!
+
+DEFVARS 8192
+{
+	pool_table      ds.b    224
+	malloc_table	ds.w	1
+	farpages	ds.w	1
+	farmemspec	ds.b	1
+	copybuff	ds.b	258
+	actual_malloc_table
+			ds.b    ((farheapsz/256)+1)*2
+}
+

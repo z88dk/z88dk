@@ -1,0 +1,4 @@
+fcntl functions
+
+These functions handle file i/o and the ilk and are *very* machine
+specific (suprise suprise!)

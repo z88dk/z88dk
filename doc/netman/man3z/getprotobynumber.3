@@ -1,0 +1,28 @@
+.TH getprotobyname 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+getprotobyname, getprotobynumber  \- get protocol entry
+.SH SYNOPSIS
+.nf
+.B #include <net/resolv.h>
+.sp
+.BI "int getprotobyname(char *"name );
+.BI "char *getprotobynumber(int "protocol ", char * "buf );
+.fi
+.SH DESCRIPTION
+The \fBgetprotobyname()\fP function returns the standard number for
+the protocol with the name \fIname\fP. If no protocol is known then
+NULL is returned.
+.PP
+The \fBgetprotobynumber()\fP function copies into \fIbuf\fP (and returns 
+\fIbuf\fP) the protocol matching the \fIprotocol\fP. If no
+protocol is known then \fIprotocol\fP is returned in ASCII form.
+
+.SH "RETURN VALUE"
+Detailed above.
+
+.SH NOTES
+These functions use a lookup table compiled into the ZSock kernel,
+it is not likely that method will change in the near future.
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>

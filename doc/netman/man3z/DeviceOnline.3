@@ -1,0 +1,23 @@
+.TH DeviceOnline 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+DeviceOnline \- turn the network device online
+.SH SYNOPSIS
+.nf
+.B #include <net/misc.h>
+.sp
+.BI "void DeviceOnline(void);
+.fi
+.SH DESCRIPTION
+The \fBDeviceOnline()\fP function turns the packet driver back on
+again after it has been previously turned offline by \fBDeviceOffline(3z)\fP.
+How this is achieved depends on the device driver in use.
+
+.SH "RETURN VALUE"
+None.
+
+.SH "SEE ALSO"
+.BR DeviceOffline "(3z)"
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>
+

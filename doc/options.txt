@@ -1,0 +1,134 @@
+This is intended to be a quick reference to the types of code that
+z88dk can produce - there is now a plethora of flags controlling
+almost every aspect of it, and needless to say it has got quite
+confusing (even for me!) so now follows a quick reminder of what
+can be achieved!
+
+BASIC Programs
+--------------
+
+The default type of output code produced by z88dk, it requires no
+flags other than those for any libraries that you wish to link in,
+
+eg: % zcc -lm -lgfx cube.c
+
+Will compile file cube.c into a BASIC program whilst pulling in
+routines from the generic maths library and the graphics library.
+
+Applications
+------------
+
+This is where the fun begins, to create an application in the .63
+form we need two flags, one to trigger the compiler into
+producing appropriate code (essentially using DEFVARS instead
+of defs to create storage), and another to call the "appmaker" program.
+
+eg: % zcc -create-app -make-app -lgfxapp dstar.c
+
+Will compile the dstar.c file into an application whilst pulling in
+routines from the application graphics library (We need different
+libraries for applications and BASIC programs due to paging
+requirements - essential so we don't page the executing code out!)
+
+We can further tweak the compilation; suppose you want to combine
+several apps onto one card (using some other program to achieve this), 
+the default address that the application is compiled to is 49152, if 
+you wish to compile to a different address use the following command 
+line:
+
+% zcc -zorg=[address in decimal] -create-app -make-app -lgfxapp dstar.c
+
+Which if the address is > 49152 will create a truncated .63 image
+from the address supplied. The application is of course org'd to
+this address.
+
+To change the amount of bad memory given to a bad application (or ugly 
+popdown) we use the flag -reqpag= where reqpag is the number of 256 
+byte pages that we require. This flag is also very useful for giving 
+back memory to the system on preemption - have a look at the dstar.c
+and rpn.c examples for examples of the usage of reqpag.
+
+Using the defaults for application creation it isn't possible to create 
+a good application which uses static variables (by default these are 
+placed in "bad memory") however, should you wish to do this then a 
+couple of flags can come to your rescue!
+
+As you know each application is allowed certain amounts of "safe 
+memory" to store some static variables (usually used to hold
+the "far pointer" to some allocated memory), the startup code
+for applications uses some of this space to hold some extremely
+useful information (have a look at the app_crt0.asm file in the lib 
+directory for the gory details).
+
+The flags of concern are -safedata=[number] and -defvars=[address]. 
+-safedata tells the compiler how much safe memory *your* code requires 
+and -defvars is used to place static variables at this address.
+
+These options should really only be used by those who should know 
+better (I myself have not even used them!) but some brief information:
+
+- Your safedata area starts at $1FFD-[num of bytes reqd], so if you 
+need $10 bytes then your defvars flag should be -defvars=$1FED
+
+It is probably a good idea not to specify -defvars on the command line 
+- but to place it in the C file using the #pragma directive - this
+allows multifile projects to be compiled without variable space
+clash.
+
+Intuition Debugging Of Application
+----------------------------------
+
+By supplying the flag -intuition to the compiler the necessary call
+is inserted in the startup code to enable the program to be debugged
+via Intuition (the Z88 debugger from Interlogic). You will need to
+blow the application to an EPROM with Intuition and adjust the 
+application DOR appropriately. For more details read the very fine 
+documentation that came with your copy of Assembler Workbench.
+[I'm getting a strange sense of deja-vu regarding the names of
+these programs <grin>]
+
+Absolute Address Code
+---------------------
+
+The compiler can also produce code that can run from an absolute 
+address, this is perhaps most suitable for use from within a BASIC 
+program with a well known memory map.
+
+To invoke it use:
+
+% zcc -startup=3 -ofile.bin [files]
+
+And file.bin will be a self contained C program or module, which can be 
+utilised via the BASIC command CALL 16384. To compile it to a different 
+address use the -zorg= flag.
+
+Relocatable Code
+----------------
+
+Thanks to the relocation feature of z80asm it is possible to produce 
+code which can be run from any address in RAM. To switch into this mode
+supply the -R flag to the frontend.
+
+At present it is not possible to pass parameters from BASIC to the 
+compiled C program - a way of translating BBC BASICs parameter passing 
+method into the argc/argv method used by C is something of headache the 
+moment.
+
+Spectrum Startup Code
+---------------------
+
+To compile code for the ZX Spectrum use the flag +zx Support is steadily
+improving and can only get better. Likewise for other machines:
+
++zxansi	- Use ZX VT100 terminal
++vz	- Create a file for a VZ200/300
++nc	- Create an application image for the Amstrad nc100
+
+----
+I hope that I've covered most of the important flags of the compiler
+which affect the type of code that is produced. If you have any questions
+just ask me!
+
+
+djm 18/4/2000
+

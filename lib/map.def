@@ -1,0 +1,17 @@
+lstoff
+
+; Standard Z88	Operating	System manifests:
+
+; The information below is defined	in Developers Notes, release 3.00
+; (c) Cambridge Computer	1989-95
+
+; Graphic	area	(map) control
+
+	DEFC	Os_Map  =	$F406	; Map control
+
+	DEFC	MP_WR   =	$01		; write a	line	to the map
+	DEFC	MP_DEF  =	$02		; define a map	using Panel width
+	DEFC	MP_GRA  =	$03		; define a map	of specific width
+	DEFC	MP_DEL  =	$04		; delete a map
+
+lston

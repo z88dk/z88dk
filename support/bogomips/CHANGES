@@ -1,0 +1,21 @@
+Changes from 1.1 to 1.2:
+- now supports 3 versions:
+  - original ("classic") Linux bogomips program
+  - version for QNX C compiler
+  - machine indenpendant version (default)
+- the machine independent version should compile and run on any ANSI C
+  conforming system (tested on Sun-3 and Sun SPARC under SunOS 4.1)
+- additional changes thanks to Paul Healy
+- here are some additional results:
+
+	Machine		BogoMIPs
+	-------		--------
+	Sun-3/80	  4.00
+	Sun IPC		 24.00
+	Sun SS10	 34.00
+
+Changes from 1.0 to 1.1:
+- added fflush() call after first printf() statement
+- fixed typo in README file
+- used compiler flags "-fomit-frame-pointer -N -s"; executable is much
+  smaller (thanks to Thomas G. McWilliams)

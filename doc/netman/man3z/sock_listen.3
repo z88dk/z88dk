@@ -1,0 +1,37 @@
+.TH sock_listen 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+sock_listen \- open a passive network connection
+.SH SYNOPSIS
+.nf
+.B #include <net/socket.h>
+.sp
+.BI "SOCKET *sock_listen(ipaddr_t "ipdest ", tcpport_t "lport ",
+.BI "                   void "(*handler)() ", char "proto);
+.fi
+.SH DESCRIPTION
+The \fBsock_listen()\fP function creates a socket descriptor for a
+passive (i.e. listening) connection on local port \fIlport\fP awaiting
+a connection from host \fIipdest\fP. At the moment only protocols prot_UDP
+and prot_TCP are supported.
+.PP
+To accept connections from any host specify the parameter \fIipdest\fP to
+be 0L.
+.PP
+The parameter \fIhandler\fP specifies a handler to be called whenever
+the connection changes state or new data arrives. It should be the 
+code for a package routine.
+.PP
+The input parameters of the function \fIhandler\fP vary depending on
+whether the socket is of type prot_UDP or prot_TCP.
+
+.SH "RETURN VALUE"
+\fBsock_listen()\fP returns a socket descriptor. Specifying a non support
+protocol will result in the carry flag being set and the return value being
+EPROTONOSUPPORT.
+
+.SH "SEE ALSO"
+.BR sock_open "(3z)"
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>
+

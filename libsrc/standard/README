@@ -1,0 +1,4 @@
+Due to clashing labels, standard.lib is no longer needed by z88dk (all
+relevant functions have been placed in gfx.lib) if you want the source for
+standard.lib then grab it from Z88 Forever:
+http://www.menaxus.demon.co.uk/z88/z88home/htm

@@ -1,0 +1,62 @@
+As we all know Bogomips are dodgy..very dodgy infact!
+
+Here's a z80 version with two switches, compile either:
+
+% zcc -DPORTABLE_BOGOMIPS bogomips.c -o bogomips.bas
+% zcc -DZ80_DELAY bogomips.c -o bogomips.bas
+
+The first uses C to generate the delay loop, the second uses
+some asm which achieves the same..with a speedup of about
+8 fold. Here's eome figures:
+
+-DPORTABLE_BOGOMIPS
+
+ZX Spectrum (emulated via ZXAM) - 0.0148 Bogomips (7400 loops)
+Z88 (Real thing)		- 0.0134 Bogomips (6700)
+(Flicking installer options achieves the same result)
+
+-DZ80_DELAY
+
+ZX Spectrum (emulated via ZXAM) - 0.10   Bogomips (51200)
+Z88 (Real thing/Int/OZ+)	- 0.0910 Bogomips (45500)
+Z88 (Real thing/OZ+)		- 0.0916 Bogomips (45800)
+Z88 (Real thing/Int)		- 0.0916 Bogomips (45800)
+Z88 (Real thing)		- 0.0928 Bogomips (46400)
+
+Ironic thing is that you can't really compare the two machines since
+clock() on the ZX just picks up some values where as on the z88 it uses
+the OS. However, the delay loop does take longer than these functions do
+take so I think it's probably possible to compare.
+
+Taking -Z80_DELAY:
+
+(.10 / 0.928 ) * 3.28 = 3.53
+
+Where 3.28 is the ~ clockspeed of the z88 and 3.53 is ~ clockspeed of ZX -
+so we have rough concurrence
+
+
+-- From the original Bogomips distribution --
+
+Tired of rebooting your system so you can see how many BogoMIPS it's
+running at today?  Want to impress your friends?  Be the first person
+on your block to run the standalone bogomips program.  Now you can
+measure BogoMIPs all day long without having to bring your system
+down.  This could be the "killer app" that Linux has been waiting for.
+
+"Bogomips" is a standalone program that displays your system
+performance using one of the world's most recognized benchmarks.  It
+uses the same code that is used in the Linux kernel while booting, but
+runs as a user program.
+
+A man page and make file are included. Detailed instructions for
+building, running, and installing are in the file INSTALLNG.
+
+Version 1.3 of BogoMIPs is now portable and should run on any system
+that supports an ANSI C compiler and library.
+
+The package is available from sunsite.unc.edu in the directory
+/pub/Linux/system/Misc
+
+P.S. Don't forget to post your results to the net and impress
+thousands of people around the world!

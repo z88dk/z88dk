@@ -1,0 +1,28 @@
+.TH resolve 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+resolve \- convert hostname to IP address
+.SH SYNOPSIS
+.nf
+.B #include <net/resolv.h>
+.sp
+.BI "ipaddr_t resolve(char *"name );
+.fi
+.SH DESCRIPTION
+The \fBresolve()\fP function queries any configured nameservers for the 
+IP address of the host with the name \fIname\fP.
+.PP
+If \fIname\fP is in the form a.b.c.d then this is converted to an
+IP address and returned.
+
+.SH "RETURN VALUE"
+\fBresolv()\fP returns the network order IP address of the requested 
+host. If the name cannot be resolved then NULL is returned.
+.PP
+\fBresolv()\fP may also be called by the macro \fBgethostbyname\fP
+
+.SH BUGS
+If you use the macro \fBgethostbyname\fP then beware that the ZSock
+implementation is not at all standard.
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>

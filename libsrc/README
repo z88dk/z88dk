@@ -1,0 +1,26 @@
+To rebuild the libraries in full do the following:
+
+% make clean
+% make
+% make install
+
+And tada, new libraries for you, if you just want to rebuild a specific
+library, eg malloc.lib then do a:
+
+% make clean
+% make malloc.lib
+
+And copy it over to the clibs directory...hey, makefiles are great!!!
+
+I've split up the crt0 routines (fetch int etc) from the clib because I was
+sick of constantly recompiling those things!! This also lends itself to
+a certain degree of machine abstraction
+
+--8<--
+
+4/4/2000
+This directory has been rearranged, machine specific routines for each
+directory are now placed in subdirs below the appropriate directory -
+this gives some sort of a clue as to what is needed for ports to
+different machines
+

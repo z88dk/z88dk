@@ -1,0 +1,27 @@
+.TH tcp_pagein 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+tcp_pagein \- page the ZSock data area into the memory map
+.SH SYNOPSIS
+.nf
+.B #include <net/misc.h>
+.sp
+.BI "u8_t tcp_pagein(void);
+.fi
+.SH DESCRIPTION
+The \fBtcp_pagein()\fP function pages in the ZSock data area into segment
+1 (addresses 16384-32767) of the z88s memory map.
+.PP
+This function is primarily of use to daemons which use the ZSock dataarea
+for small amounts of storage.
+
+.SH "RETURN VALUE"
+\fBtcp_pagein()\fP returns the previous binding of segment 1 which should
+be used as a parameter to \fBtcp_pageout\fP(3z)
+
+.SH "SEE ALSO"
+.BR tcp_pageout "(3z), " tcp_malloc (3z), " tcp_calloc"(3z)
+.BR tcp_free "(3z)"
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>
+

@@ -1,0 +1,19 @@
+There are three variants of this program:
+
+- portable version (only requires ANSI C compiler and library)
+- original Linux version (dependent on gcc and Intel CPU)
+- QNX version (dependent on QNX C compiler and Intel CPU)
+
+The first two versions should give the same results if you are using
+gcc under Linux. The original Linux version also works under FreeBSD
+and BSD386. The portable version is the default. Edit the appropriate
+lines in the make file to select one of the others.
+
+To build for Linux under gcc, just type "make". If using a compiler
+other than GNU gcc, edit the compile options in the makefile.
+
+Run the program as "bogomips".
+
+Install the binary and man page using "make install" as root (change
+the makefile if you don't want them put in /usr/local/bin and
+/usr/local/man).

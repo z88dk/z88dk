@@ -1,0 +1,13 @@
+lstoff
+
+; Standard Z88	Operating	System manifests:
+
+; The information below is defined	in Developers Notes, release 3.00
+; (c) Cambridge Computer	1989
+
+; Token manipulation:
+
+	DEFC	Os_Wrt  =	$CC06		; Write token
+	DEFC	Os_Wtb  =	$CA06		; Write token base
+
+lston

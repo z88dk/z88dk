@@ -1,0 +1,71 @@
+lstoff
+
+; Standard Z88 Operating System manifests:
+
+; The information below is defined in Developers Notes, release 2.00
+; (C) Cambridge Computer 1989
+
+
+; Error return codes:
+; Codes marked with * are fatal errors
+
+	DEFC RC_OK	= $00
+	DEFC RC_Esc	= $01	; Escape condition (e.g. ESC pressed)
+	DEFC RC_Time	= $02	; Timeout
+	DEFC RC_Unk	= $03	; Unknown request (parameter in register) *
+	DEFC RC_Bad	= $04	; Bad arguments *
+	DEFC RC_Ms	= $05	; Bad memory segment specifier *
+	DEFC RC_Na	= $06	; Not available  *
+	DEFC RC_Room	= $07	; No room
+	DEFC RC_Hand	= $08	; Bad handle  *
+	DEFC RC_Eof	= $09	; End Of File	 (also returned by DOR calls)
+	DEFC RC_Flf	= $0A	; Filter Full
+	DEFC RC_Ovf	= $0B	; Overflow
+	DEFC RC_Sntx	= $0C	; Syntax Error
+	DEFC RC_Wrap	= $0D	; Wrap condition met
+	DEFC RC_Push	= $0E	; Pushback error, cannot satisfy request
+	DEFC RC_Err	= $0F	; Internal Error   *
+	DEFC RC_Type	= $10	; Unexpected type  *
+	DEFC RC_Pre	= $11	; Cannot pre-empt, or No Room
+	DEFC RC_Onf	= $12	; Object (file or directory) not found
+	DEFC RC_Rp	= $13	; Read protected
+	DEFC RC_Wp	= $14	; Write protected
+	DEFC RC_Use	= $15	; In Use
+	DEFC RC_Fail	= $16	; General Failure, cannot satisfy request
+	DEFC RC_Ivf	= $17	; Invalid filename
+	DEFC RC_Ftm	= $18	; File Type Mismatch
+	DEFC RC_Exis	= $19	; File already exist
+	DEFC RC_Addr	= $32	; Bad address	*
+	DEFC RC_Size	= $33	; Bad size  *
+	DEFC RC_Bank	= $34	; Bad bank  *
+	DEFC RC_Frm	= $35	; Frame error	*
+	DEFC RC_Par	= $36	; Parity error
+	DEFC RC_Dvz	= $46	; Division by zero
+	DEFC RC_Tbg	= $47	; Too big
+	DEFC RC_Nvr	= $48	; Negative root
+	DEFC RC_Lgr	= $49	; Log range
+	DEFC RC_Acl	= $4A	; Accuracy lost
+	DEFC RC_Exr	= $4B	; Exponent function range
+	DEFC RC_Bdn	= $4C	; Bad number
+	DEFC RC_Draw	= $66	; Application pre-empted and screen corrupted
+	DEFC RC_Quit	= $67	; Request application to quit	 *
+	DEFC RC_Susp	= $69	; Suspicion of pre-emption
+
+; Related operating system calls and parameters:
+
+	DEFC Os_Esc  = $6F		; Examine special condition
+							; parameters in A:
+		DEFC SC_BIT = $00	; Test for Escape
+		DEFC SC_ACK = $01	; Acknowledge escape and flush input buffer
+		DEFC SC_SET = $02	; Set Escape (simulate an Escape condition)
+		DEFC SC_RES = $03	; Reset Escape without flushing input buffer
+		DEFC SC_TST = $04	; Test if Escape Detection is Enabled or Disabled
+		DEFC SC_ENA = $05	; Enable Escape Detection
+		DEFC SC_DIS = $06	; Disable Escape Detection
+
+	DEFC Os_Erh = $75		; Set (install) Error Handler
+	DEFC Os_Erc = $72		; Get error context
+	DEFC Gn_Err = $4A09		; Display an interactive error box
+	DEFC Gn_Esp = $4C09		; Return pointer to a system error message
+
+lston

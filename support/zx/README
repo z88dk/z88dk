@@ -1,0 +1,6 @@
+This is a quick and dirty hack originally written for
+mymzx - this takes any file and creates a .TAP file for it
+- the file contained is of type CODE and loads to address 0.
+
+This tool appends to the end of the specified .TAP file so
+watch out!

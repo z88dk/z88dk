@@ -1,0 +1,25 @@
+.TH sock_shutdown 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+sock_shutdown \- abort a network connection
+.SH SYNOPSIS
+.nf
+.B #include <net/socket.h>
+.sp
+.BI "void sock_close(SOCKET *"s);
+.fi
+.SH DESCRIPTION
+The parameter \fIs\fP is a descriptor to an open socket created using
+\fBsock_open(3z)\fP or \fBsock_listen(3z)\fP. 
+.PP
+The \fBsock_shutdown()\fP function wipes all trace of the socket \fIs\fP from the system. It should be preceded by either a \fBsock_close(3z)\fP or
+\fBsock_abort(3z)\fP depending on the circumstances.
+
+.SH "RETURN VALUE"
+None
+
+.SH "SEE ALSO"
+.BR sock_close "(3z), " sock_abort "(3z)"
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>
+

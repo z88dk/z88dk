@@ -1,0 +1,76 @@
+lstoff
+
+; Standard Z88	Operating	System manifests:
+
+; The information below is defined	in Developers Notes, release 3.00
+; (c) Cambridge Computer	1989-95
+
+; File open system call:
+
+	DEFC	 GN_Opf =	$6009		; open file/stream (or device)
+	DEFC	 OS_Op  =	$EA06		; internal open
+
+	; Parameters used with GN_Opf	(in A register)
+
+		DEFC	OP_IN   =	$01		; read only (shared)
+		DEFC	OP_OUT  =	$02		; write only
+		DEFC	OP_UP   =	$03		; open read/write
+		DEFC	OP_MEM  =	$04		; Open memory pool
+		DEFC	OP_DIR  =	$05		; Create directory name (returns DOR handle)
+		DEFC	OP_DOR  =	$06		; Fetch DOR handle
+
+	; Various	file/stream manipulation	calls:
+
+		DEFC	 Gn_Ren =	$6609	; rename filename
+		DEFC	 Os_Ren =	$E406	; file rename (internal)
+		DEFC	 Gn_Del =	$6409	; delete file
+		DEFC	 Os_Del =	$E606	; delete file (internal)
+		DEFC	 Gn_Cl  =	$6209	; close file/stream
+		DEFC	 Os_Cl  =	$E806	; close file/stream	(internal)
+
+		DEFC	 Os_Gb  =	$39		; get byte from file or device
+		DEFC	 Os_Gbt =	$3F		; - with timeout
+		DEFC	 Os_Pb  =	$3C		; put byte to file or device
+		DEFC	 Os_Pbt =	$42		; - with timeout
+		DEFC	 Os_Ugb =	$36		; unget byte (not implemented).
+		DEFC	 Os_Mv  =	$45		; move bytes between stream and memory
+
+		DEFC	 Os_Frm =	$48		; File read miscellaneous
+		DEFC	 Os_Fwm =	$4B		; File write miscellaneous
+
+	; File status codes, when using OS_Frm or OS_Fwm:
+
+		DEFC	 FA_PTR =	$01		; Get sequential file pointer
+		DEFC	 FA_EXT =	$02		; Get length (Extent) of	sequential file
+		DEFC	 FA_EOF =	$03		; End Of File enquiry
+		DEFC	 FA_BST =	$04		; Buffer status (system use only)
+
+	; Various	calls to process filenames:
+
+		DEFC	 GN_Pfs =	$5A09	; parse filename segment
+		DEFC	 GN_Prs =	$5809	; parse filename
+		DEFC	 GN_Fcm =	$4E09	; compress a filename
+		DEFC	 GN_Fex =	$5009	; expand a filename
+		DEFC	 GN_Esa =	$5E09	; read/write filename segments
+
+	; Calls on wildcards, searching for files, parsing filenames:
+
+		DEFC	 GN_Opw =	$5209	; open wildcard handler
+		DEFC	 GN_Wcl =	$5409	; close wildcard handler
+		DEFC	 GN_Wfn =	$5609	; get next filename	match from wc.handler
+		DEFC	 GN_Wsm =	$5C09	; match filename segment	to wildcard string
+
+
+	; File Eprom Interface:
+	; (deleted/old	files are	ignored, they can only be fetched by using
+	; EPROM file format	information)
+
+		DEFC	 OS_Epr =	$F006	; File Eprom Manipulation Interface
+		
+		; arguments:
+		DEFC	 EP_Save = $00		; blow RAM file to EPROM
+		DEFC	 EP_Load = $03		; load file from EPROM (save to RAM file)
+		DEFC	 EP_Dir  = $15		; return next filename (starting with first)
+							; (all files must be read until RC_EOF)
+
+lston

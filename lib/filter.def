@@ -1,0 +1,18 @@
+lstoff
+
+; Standard Z88	Operating	System manifests:
+
+; The information below is defined	in Developers Notes, release 3.00
+; (c) Cambridge Computer	1989-95
+
+
+; Filter manipulation:
+
+	DEFC	Gn_Flo  =	$2209		; Open a filter
+	DEFC	Gn_Flc  =	$2409		; Close a	filter
+	DEFC	Gn_Flw  =	$2609		; Push character into filter
+	DEFC	Gn_Flr  =	$2809		; Read character from filter
+	DEFC	Gn_Flf  =	$2A09		; Flush filter
+	DEFC	Gn_Fpb  =	$2C09		; Push back character into filter
+
+lston

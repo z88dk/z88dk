@@ -1,0 +1,46 @@
+
+
+
+getservbyname(3z)   z88dk Programmer's Manual   getservbyname(3z)
+
+
+NNAAMMEE
+       getservbyname, getservbyport  - get service entry
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//rreessoollvv..hh>>
+
+       ttccppppoorrtt__tt ggeettsseerrvvbbyynnaammee((cchhaarr **_n_a_m_e));;
+       cchhaarr **ggeettsseerrvvbbyyppoorrtt((ttccppppoorrtt__tt _p_o_r_t,, cchhaarr ** _b_u_f));;
+
+DDEESSCCRRIIPPTTIIOONN
+       The ggeettsseerrvvbbyynnaammee(()) function returns the standard port for
+       the service with the name _n_a_m_e. If  no  service  is  known
+       then NULL is returned.
+
+       The  ggeettsseerrvvbbyyppoorrtt(()) function copies into _b_u_f (and returns
+       _b_u_f) the service matching the standard port  _p_o_r_t.  If  no
+       service is known then _p_o_r_t is returned in ASCII form.
+
+
+RREETTUURRNN VVAALLUUEE
+       Detailed above.
+
+
+NNOOTTEESS
+       These functions use a lookup table compiled into the ZSock
+       kernel, it is not likely that method will  change  in  the
+       near future.
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

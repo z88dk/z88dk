@@ -1,0 +1,24 @@
+.TH sock_read 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+sock_read \- read bytes from a network socket
+.SH SYNOPSIS
+.nf
+.B #include <net/socket.h>
+.sp
+.BI "size_t sock_read(SOCKET * "s ", void * "dp " , size_t " len );
+.fi
+.SH DESCRIPTION
+The parameter \fIs\fP is a descriptor to an open socket created using
+\fBsock_open(3z)\fP or \fBsock_listen(3z)\fP
+.PP
+The \fBsock_read()\fP function reads at most \fIlen\fP bytes from the
+socket \fIs\fP and places them at \fIdp\fP.
+\fIdp\fP which should be in the lower 16k of the memory map.
+
+.SH "RETURN VALUE"
+The \fBsock_read()\fP function returns the number of bytes read
+from the socket. If an illegal socket is supplied the carry flag will be
+set and the return value will be EPROTONOSUPPORT.
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>

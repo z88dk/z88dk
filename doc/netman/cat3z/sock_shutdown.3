@@ -1,0 +1,45 @@
+
+
+
+sock_shutdown(3z)   z88dk Programmer's Manual   sock_shutdown(3z)
+
+
+NNAAMMEE
+       sock_shutdown - abort a network connection
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//ssoocckkeett..hh>>
+
+       vvooiidd ssoocckk__cclloossee((SSOOCCKKEETT **_s_)_;
+
+DDEESSCCRRIIPPTTIIOONN
+       The  parameter _s is a descriptor to an open socket created
+       using ssoocckk__ooppeenn((33zz)) or ssoocckk__lliisstteenn((33zz)).
+
+       The ssoocckk__sshhuuttddoowwnn(()) function wipes all trace of the socket
+       _s  from  the  system.  It  should  be preceded by either a
+       ssoocckk__cclloossee((33zz)) or ssoocckk__aabboorrtt((33zz)) depending on the  circum-
+       stances.
+
+
+RREETTUURRNN VVAALLUUEE
+       None
+
+
+SSEEEE AALLSSOO
+       ssoocckk__cclloossee(3z), ssoocckk__aabboorrtt(3z)
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

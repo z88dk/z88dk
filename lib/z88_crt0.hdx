@@ -1,0 +1,160 @@
+;
+;       This file is included by every module
+;       To handle multi module programs which use floating point
+;       routines in different modules, we have got rid of
+;       the conditional assembly around the float routines
+;
+
+;
+;       .globl    for graphics fns
+;
+        .globl    base_graphics
+;
+;       stdio/printf things
+;
+        .globl    _sf_string1
+        .globl    _sf_oldch
+
+; Process interrupt variable (**for apps only**)
+	.globl	packintrout
+
+;Standard .globl for startup library..
+
+
+        .globl    l_dcal
+        .globl    cleanup
+
+;Hooks for library functions
+
+        .globl    l_gchar
+        .globl    l_sxt
+        .globl    l_gint
+	.globl    l_gint_eq
+	.globl    l_ghtonsint
+        .globl    l_pint
+	.globl    l_pint_eq
+        .globl    l_or
+        .globl    l_xor
+        .globl    l_and
+        .globl    l_eq
+        .globl    l_ne
+        .globl    l_gt
+        .globl    l_le
+        .globl    l_ge
+        .globl    l_lt
+        .globl    l_uge
+        .globl    l_ult
+        .globl    l_ugt
+        .globl    l_ule
+        .globl    l_cmp
+        .globl    l_ucmp
+        .globl    l_asr
+	.globl    l_asr_u
+        .globl    l_asl
+        .globl    l_sub
+        .globl    l_neg
+        .globl    l_com
+        .globl    l_lneg
+        .globl    l_bool
+        .globl    l_cm_de
+        .globl    l_cm_bc
+        .globl    l_deneg
+        .globl    l_bcneg
+        .globl    l_case
+        .globl    l_mult
+        .globl    l_div
+        .globl    l_div_u
+
+;Long functions now
+
+              .globl     l_int2long_s
+              .globl     l_long2int_s
+              .globl     l_glong
+              .globl     l_long_add
+              .globl     l_long_and
+              .globl     l_long_asl
+              .globl     l_long_asr
+	      .globl     l_long_aslo
+	      .globl     l_long_asro
+              .globl     l_long_bool
+              .globl     l_long_cmp
+              .globl     l_long_com
+              .globl     l_long_eq
+              .globl     l_long_ge
+              .globl     l_long_gt
+              .globl     l_long_le
+              .globl     l_long_lneg
+              .globl     l_long_lt
+              .globl     l_long_ne
+              .globl     l_long_neg
+              .globl     l_long_or
+              .globl     l_long_sub
+              .globl     l_long_ucmp
+              .globl     l_long_uge
+              .globl     l_long_ugt
+              .globl     l_long_ule
+              .globl     l_long_ult
+              .globl     l_long_xor
+              .globl     l_plong
+              .globl     l_inclong
+              .globl     l_declong
+              .globl     l_long_div
+              .globl     l_long_div_u
+              .globl     l_long_mult
+              .globl     l_long_asr_u
+	      .globl     l_long_asr_uo
+              .globl     l_long_case
+
+
+
+
+;Now .globl for floating routines
+;
+;Since we're using startup module and are distancing that from here,
+;we might as well set these permanently - djm 29/2/99
+
+
+        .globl  DADD
+        .globl  DDIV
+        .globl  DGE
+        .globl  DIV1
+        .globl  DIV17
+        .globl  DLOAD
+        .globl  DLDPSH
+        .globl  DMUL
+        .globl  DSTORE
+        .globl  DSWAP
+        .globl  DSUB
+        .globl  DEQ
+        .globl  DGT
+        .globl  DLEq      ;djm 7/10/98
+        .globl  DLT
+        .globl  DNE
+        .globl  DPUSH
+        .globl  DPUSH2
+        .globl  FA
+        .globl  extra
+        .globl  FADD
+        .globl  FDIV
+        .globl  FMUL
+        .globl  FSUB
+;        .globl  GRIPE   
+        .globl  PUSHF2
+        .globl  LDBCFA
+        .globl  LDBCHL
+        .globl  LDFABC
+        .globl   MINUSFA   ;negate FP number
+        .globl  NORMA
+        .globl     ODD
+        .globl  PUSHFA
+        .globl  SGN
+;        .globl  OFLOW
+        .globl  FASIGN
+        .globl  NORM
+        .globl  COMPARE
+        .globl  INT2
+        .globl  PI
+        .globl  HALFPI
+        .globl   float              ;Convert int to float
+	.globl   ufloat		 ;unsigned int to float
+        .globl   ifix               ;Convert float to int

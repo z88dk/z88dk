@@ -1,0 +1,256 @@
+There's a lot of documentation in the doc/ directory, some of it is half
+way through being written, so apologies for the fuzziness in places, most
+of it is in html (so that everyone can read it), some of it is plain text,
+hopefully you won't have to dig too deep to find out wat you need to know.
+If you have any questions, feel free to email me at dom@jb.man.ac.uk
+
+----- COMPILATION INSTRUCTIONS -----
+
+1. Check src/z80asm/config.h for machine status and endian status.
+   ENDIAN is set if the machine is big endian (68k,PPC,Sparc etc) 
+
+2. Type: make
+
+3. Wait
+
+4. Add bin/ into your path.
+
+5. Define the environmental variable Z80_OZFILES to point to {z88dk}lib/
+
+6. Define the environmental variable ZCCCFG to point to {z88dk}/lib/config/
+
+Where {z88dk} is the root directory of the archive (where this file is located!)
+
+[To recompile the libraries, go into libsrc and type "make clean; make "]
+
+Amiga: ixemul v47+ required..
+
+--8<--
+
+Brief guide to what has changed in case I don't distribute the doco
+
+z88dkv1.31 (sccz80v1.10b71) 3.7.2000
+
+- [sccz80] __SHARED__ no longer implies __LIB__
+- [sccz80] long arithmetics sorted out (const on LHS etc)
+- [sccz80] *argv[{n}] now gets correct offset for near (but not far) types
+- [libs] strtol fixed
+- [libs] Fixed open_z88 (ooops!)
+- [libs/crt0] new support for CP/M, ZX81, Sharp MZ, TI86, ABC80
+
+z88dkv1.3 (sccz80v1.10b70) 20.4.2000
+
+- [sccz80] Long subtraction bug (finally!) fixed
+- [sccz80] Sane initialisation of auto variables
+- [sccz80] Little bit of framepointer support (-frameix/-frameiy)
+- [sccz80] far xx ** type correctly passed to function
+- [sccz80] unions can now be initialised (first member taken +pad)
+- [sccz80] stack cleaning on goto fixed
+- [sccz80/crt0] Improved printf handling [2]
+- [zcc] Improved config file handling
+- [lib] new stdio library (see doc/stdio.txt for details)
+- [lib] new z88 far functions (by Garry Lancaster)
+- [lib] strncmp finally fixed
+- [lib] strncpy finally usable
+- [lib] strchr/strrchr rewritten in asm
+- [lib] ZX print routine now scrolls
+- [lib] Start of +3 file routines (not usable at present)
+- [lib] z88 time routines (untested)
+- [lib] z88 DOR routines
+- [lib] z88 stat() routine (check for sanity someone please!)
+- [lib] fopen_z88/open_z88 to return explicit filename being opened
+- [lib] z88 wildcard handler routines
+- [lib] z88 exec_cli routine
+- [lib] Spectrum ANSI display routine (by Stefano Bodrato)
+- [lib] Most gfx routines now work on Spectrum
+- [lib/crt0] VZ200/300 libs and crt0 (by Stefano Bodrato)
+- [lib/crt0] NC100/200 libs and crt0 - untested (send me one!!)
+- [inc] getchar() macro added for getkey()
+- [egs] Artic Adventure A added for ZX (and z88)
+
+[1] Handling for ** types is quite flakey in prototypes - I just store
+the fact that it's a pointer and not a pointer to pointer. Fixing this
+would require extra storage so it's being left
+
+[2] Printf handling has improved greatly with this release - previously it
+was possible to end up with both sets of printf() functions within the
+executable, now only one is possible, this is done by having the crt0 file
+jp to the chosen vfprintf function. These escalate upwards so here's what
+they can do (in order of complexity):
+
+vfprintf_mini  - supports %d,u,s,c,%,ld,lu fields
+vfprintf_comp  - supports width specifiers and %d,x,c,s,u,% fields
+vfprintf_float - As above but with floating point (%e etc), only generic,
+		 untested
+
+Once a complexity escalation has been made within a project then it's not
+possible to undo - i.e. if you want to printf longs then don't specify a
+width anywhere within the project. Sorry, but until I/someone upgrades
+vfprintf_(comp|float) this limitation will remain.
+
+
+z88dkv1.2p5 (sccz80v1.10b69) xx.3.2000
+
+- z80asm patched so it now accepts '_' as first letter of symbol
+- Hence the smc_ prefix is now consigned to history
+- Archaic and obsolete HDRPRTYPE kludge removed
+- Long standing bug removed in function prototypes
+- Miniprintf now understands %u, %ld, %lu types
+- ZSock API & doc distributed
+- Package support (both utilisation and creation)
+- More library routines are in C (more efficient than mildly 
+  optimised!)
+- Arrays of pointers to functions now supported
+- ANSI compliance! Well, in literal escapes at least!
+- assert.h, setjmp.h features now available
+- stdarg.h - variadic arguments supported - see note in stdarg.h for
+  caveats
+- Improved Spectrum library - 32/64 column font routine now usable
+
+sccz80v1.10b67
+
+- iferror { } else { } now evaluates first clause(!)
+- Output in asxx compatible format (Flag=-asxx)
+- if (always true) bug fixed
+- Unreachable code warning following above
+- __CALLEE__ function flag (ask me!)
+- Internal flag rearrangement
+- Casts patched up a bit more
+- Stupid mistake in appmake sorted..
+
+
+sccz80v1.10b66
+
+- Sorted out coping with initialising xx *[]={ ,, } types
+- Warnings if these are left empty
+- Sorted out L,U,S specifiers after constants
+- Default to int type for wild auto/register defns
+- Support for #line (supplied by some pre-processors) instead of #
+- Initialising of auto variables is now supported (not arrays or
+  structs!!!)
+
+sccz80v1.10b65
+
+- Added octal parsing for constants (prefix with 0)
+- Sorted out goto problems (tags now stored on global stack)
+- Typdef-ing stucts which contain pointers no longer gives out
+  (incorrect) warning
+
+z88dkv1.2p3 (sccz80v1.10b64)
+
+- Fixed broken compiler (postincrement of structure pointers)
+- Improved compiler (l_mult no longer pushs/pop de)
+- More opt rules + fixes
+- Some mem* routines (see string.h)
+- Improved spectrum library (miniprintf etc)
+- Fixed memset, some str* routines
+- Increased size of structure table (so more structures can be
+  defined)
+- Addition of return_c return_nc iferror -stackoffset for dealing
+  with packages/shared libs (also __SHAREDC__ )
+- zcc.cfg has a default of /lib/cpp for the preprocessor which
+  is usually something with more intelligence than zcpp
+- Start up file changed to include near malloc variables so
+  apps using them can be ROMmed correctly..
+
+
+z88dkv1.2p2
+
+(p1 was not widely circulated)
+
+Changes (in no particular order):
+
+- Removed SEGV when defining external pointers - extern int blah (addr); type
+- Easy rebuilding of libraries - now makefile'd
+- Major changes in handling of conditionals - we now use c/nc to detect
+  true or false (logical true or false is also return in hl), this removes
+  two bytes for each expression (except for double expressions, sorted
+  next releasse)
+- Fixed z88 atan2() by Keith Rickard
+- Loads of new optimization rules (We now have over 200 in total!) which
+  results in vastly better (smaller & quicker) code - please let me know
+  of any problems.
+- Fixed a few of the rules as well (stupid(!) mistakes)
+- Removed annoying error which fails compilation if argument types to
+  a function differ only a sign - a warning is now emitted
+- New appmake by Dennis Groning that doesn't allocate entire 64k but
+  only allocates what is needed (ideal for MSDOS)
+- zcc now uses local files instead of temporary files if issued the 
+  -notemp flag (ideal for MSDOS)
+- Always been there but..feature: Use -cc to get the C code interspersed
+  with the assembler, warning: this will clobber some of the opt rules
+  so what you see ain't what you get if you don't use it (still thinking
+  of a way around this)
+- float is now accepted as a synonym for double
+- More compile time options - they be breeding! See doc/options.txt for
+  a short guide
+- Switch stmt for chars is now done by a cp,jp z method - faster than previously
+  (for large switch statements cast to int and old method used (less space
+  but slower))
+
+z88dkv1.2
+
+Improvements & fixes:
+
+- Fixed strcmp() - it was the worlds most useless one before
+- Added goto functionality to the compiler, but just cos its there don't   
+  mean you have to use it!!!
+- Fixed many incorrect warnings that the compiler was giving out
+- Unfixed the "if symbol not found declare as local routine", it reverts to
+  being an unmet function to not break some programs
+- Major internal reorganisation - lets say I was ill and wanted to distract
+  myself with something almost completely pointless!
+- Much improved frontend - we now use tmpnam() files to save garbage in the
+  working directory and copy back when complete, gets round the "writing to
+  {zcc}/lib problem" as well - now you can compile several projects at the
+  same time
+- Hopefully SEGV bug squashed frontend
+- Removed -show-errs flag, pointless since it really needs to be on all
+  the time! All errors are shown now, including those that occur during
+  assembly
+- Z80asm v1.0.7 - this is the only version supported! Source code included
+  with very nice makefile. NB. I will support any new features of z80asm as
+  and when they are ready - so always use the latest version!
+- Slightly better installation instructions (comments please!)
+- Added missing l_long_case symbol to z88_crt0.hdr
+- Another truly pointless demo app - wc.c
+- It's just better (and bigger :( ) okay?
+
+z88dkv1.1p4
+
+I've got tired of endlessly updating html files, so, here's a quick
+text file detailing whats new for p4
+
+- Fixed exit() routine - this now returns the exit code correctly
+- More Z88 application features - mail checking, safe data
+- Fixed bug with long comparisons with 0
+- Added a __FASTCALL__ function modifier (see below)
+- Added a __LIB__ function modifier
+
+__FASTCALL__
+
+This is quite a dangerous thing to use, it calls functions without
+passing parameters on the stack, it instead leaves them in registers
+or in the case of fp values in the floating point accumulator. Hence
+this can only be used if the function only has one parameter.
+
+This type of call is ideal if you want to make your code smaller (say
+you call one function a lot of times), or if you're combining machine
+code and c in a single file - say swapping data between big and
+little endian formats, it makes the code smaller and can also speed it
+up.
+
+exit() is defined as being __FASTCALL__ (out of necessity really, some
+of my optimization rules were a bit too clever and did a jp exit instead
+of a call exit, the saving is worth it though I think).
+
+NB. In order for __FASTCALL__ to be effective you have to fully prototype
+your function, the __FASTCALL__ goes between the type specifer (int, long
+etc) and the function name.
+
+__LIB__
+
+This is a new solution to the "Is the function to be LIB'd or XREF'd
+problem", the old method #pragma proto is still supported, but for future
+header files I'll be using the new method, arguable it's a little less
+kludgey, and also makes it easier to see whats going on.

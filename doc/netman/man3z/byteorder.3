@@ -1,0 +1,71 @@
+.\" Copyright 1993 David Metcalfe (david@prism.demon.co.uk)
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" References consulted:
+.\"     Linux libc source code
+.\"     Lewine's _POSIX Programmer's Guide_ (O'Reilly & Associates, 1991)
+.\"     386BSD man pages
+.\" Modified Sat Jul 24 21:29:05 1993 by Rik Faith (faith@cs.unc.edu)
+.\" z88dk version 18/2/2000
+.TH byteorder 3  "February 18 2000" "BSD" "z88dk Programmer's Manual"
+.SH NAME
+htonl, htons, ntohl, ntohs \- convert values between host and network
+byte order
+.SH SYNOPSIS
+.nf
+.B #include <net/hton.h>
+.sp
+.BI "unsigned long int htonl(unsigned long int " hostlong );
+.sp
+.BI "unsigned short int htons(unsigned short int " hostshort );
+.sp
+.BI "unsigned long int ntohl(unsigned long int " netlong );
+.sp
+.BI "unsigned short int ntohs(unsigned short int " netshort );
+.fi
+.SH DESCRIPTION
+The \fBhtonl()\fP function converts the long integer \fIhostlong\fP
+from host byte order to network byte order.
+.PP
+The \fBhtons()\fP function converts the short integer \fIhostshort\fP
+from host byte order to network byte order.
+.PP
+The \fBntohl()\fP function converts the long integer \fInetlong\fP
+from network byte order to host byte order.
+.PP
+The \fBntohs()\fP function converts the short integer \fInetshort\fP
+from network byte order to host byte order.
+.PP
+On the z80 the host byte order is Least Significant Byte first, 
+whereas the network byte order, as used on the Internet, is Most 
+Significant Byte first.
+.SH "CONFORMING TO"
+BSD 4.3
+.SH NOTES
+Unlike on other machines these functions are not provided through
+macros - they are instead functions kept in z80_crt0.lib. The
+optimization rules supplied with z88dk are aware of these routines
+and when appropriate optimize the function call away.
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>
+.PP
+Original manual page by David Metcalfe <david@prism.demon.co.uk>

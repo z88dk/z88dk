@@ -1,0 +1,76 @@
+lstoff
+
+; Standard Z88	Operating	System manifests:
+
+; The information below is defined	in Developers Notes, release 3.00
+; (c) Cambridge Computer	1989
+
+	DEFC	 OS_In	 = $2A		; read a byte from std. input	(keyboard)
+	DEFC	 OS_Tin	 = $2D		; read a byte from std. input, with timeout
+	DEFC	 OS_Out	 = $27		; write a	byte	to std. output
+	DEFC	 OS_Xin	 = $30		; examine	input (e.g. check for pre-emption)
+
+	DEFC	 GN_Nln	 = $2E09		; send newline	(CR/LF) to std. output
+	DEFC	 GN_Sop	 = $3A09		; write string	to std. output
+	DEFC	 GN_Soe	 = $3C09		; write string	from	extended address
+	DEFC	 GN_Sip	 = $3809		; system input	line	routine
+
+	DEFC	 OS_Pur	 = $33		; purge keyboard buffer (and reset	timeout)
+
+; Standard input key definitions (Returned by OS_IN, OS_TIN, GN_SIP)
+;
+; The following codes are NOT	zero	prefixed:
+; IN_ESC,	IN_ENT, IN_TAB, IN_SPC &	IN_DEL
+
+	DEFC	IN_ESC = $1B
+
+;		ENTER		TAB			DELETE
+
+	DEFC	IN_ENT  =	$0D,	IN_TAB  =	$09,	IN_DEL  =	$7F
+	DEFC	IN_SENT =	$D1,	IN_STAB =	$D2,	IN_SDEL =	$D3	; SHIFT
+	DEFC	IN_DENT =	$C1,	IN_DTAB =	$C2,	IN_DDEL =	$C3	; DIAMOND
+	DEFC	IN_AENT =	$B1,	IN_ATAB =	$B2,	IN_ADEL =	$B3	; SQUARE
+	DEFC	IN_SPC  =	32
+
+;		LEFT			RIGHT		DOWN			UP
+	DEFC	IN_LFT  =	$FC,	IN_RGT  =	$FD,	IN_DWN  =	$FE,	IN_UP   =	$FF
+	DEFC	IN_SLFT =	$F8,	IN_SRGT =	$F9,	IN_SDWN =	$FA,	IN_SUP  =	$FB	; SHIFT
+	DEFC	IN_DLFT =	$F4,	IN_DRGT =	$F5,	IN_DDWN =	$F6,	IN_DUP  =	$F7	; DIAMOND
+	DEFC	IN_ALFT =	$F0,	IN_ARGT =	$F1,	IN_ADWN =	$F2,	IN_AUP  =	$F3	; SQUARE
+
+; various	definitions:
+	DEFC	ESC = 27,	LF =	10, CR = 13
+
+; Menu exception codes:
+	DEFC	MU_ENT  =	$E1,	MU_TAB  =	$E2,	MU_SPC = $E0, MU_DEL = $E3
+
+; OZ	screen driver icons:
+	DEFC	SD_EXSP =	$20		; Exact space
+	DEFC	SD_BLL  =	$21		; Bell
+	DEFC	SD_GRV  =	$27		; Grave accent
+	DEFC	SD_SQUA =	$2A		; Square
+	DEFC	SD_DIAM =	$2B		; Diamond
+	DEFC	SD_SHFT =	$2D		; Shift
+	DEFC	SD_VBAR =	$7C		; Unbroken vertical	bar
+
+	DEFC	SD_ENT = $E1, SD_TAB = $E2, SD_SPC	= $E0, SD_DEL = $E3
+	DEFC	SD_ESC = $E4, SD_MNU = $E5, SD_INX	= $E6, SD_HLP = $E7
+
+; Outlined icons:
+	DEFC	SD_OLFT =	$F0,	SD_ORGT =	$F1
+	DEFC	SD_OUP  =	$F3,	SD_ODWN =	$F2
+
+; bullet icons:
+	DEFC	SD_BLFT =	$F4,	SD_BRGT =	$F5
+	DEFC	SD_BDWN =	$F6,	SD_BUP  =	$F7
+
+; pointer	icons:
+	DEFC	SD_PLFT =	$F8,	SD_PRGT =	$F9
+	DEFC	SD_PDWN =	$FA,	SD_PUP  =	$FB
+
+; Miscellaneous driver codes:
+	DEFC	SD_DTS = $7F		; Delete toggle settings
+	DEFC	SD_UP  = $FE		; Scroll screen upwards
+	DEFC	SD_DWN = $FF		; Scroll screen downwards
+
+lston

@@ -1,0 +1,28 @@
+.TH getnetbyname 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+getnetbyname, getnetbynumber  \- get network entry
+.SH SYNOPSIS
+.nf
+.B #include <net/resolv.h>
+.sp
+.BI "int getnetbyname(char *"name );
+.BI "char *getnetbynumber(int "network ", char * "buf );
+.fi
+.SH DESCRIPTION
+The \fBgetnetbyname()\fP function returns the standard number for
+the network with the name \fIname\fP. If no network is known then
+NULL is returned.
+.PP
+The \fBgetnetbynumber()\fP function copies into \fIbuf\fP (and returns 
+\fIbuf\fP) the network matching the \fInetwork\fP. If no
+network is known then \fInetwork\fP is returned in ASCII form.
+
+.SH "RETURN VALUE"
+Detailed above.
+
+.SH NOTES
+These functions use a lookup table compiled into the ZSock kernel,
+it is not likely that method will change in the near future.
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>

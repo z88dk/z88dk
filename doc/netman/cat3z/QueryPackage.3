@@ -1,0 +1,41 @@
+
+
+
+QueryPackage(3z)    z88dk Programmer's Manual    QueryPackage(3z)
+
+
+NNAAMMEE
+       QueryPackage - open a shared library/package
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<zz8888..hh>>
+
+       bbooooll__tt QQuueerryyPPaacckkaaggee((cchhaarr _p_a_c_k_a_g_e,, cchhaarr _m_a_j_o_r ,, cchhaarr _m_i_n_o_r));;
+
+DDEESSCCRRIIPPTTIIOONN
+       The QQuueerryyPPaacckkaaggee(()) function checks and makes available for
+       use the shared package _p_a_c_k_a_g_e with a version of at  least
+       _m_i_n_o_r._m_i_n_o_r
+
+       The  function  initially  checks  for  the presence of the
+       package subsystem and then proceeds to check for the spec-
+       ified package.
+
+       Version  checking  can be disabled by specifying _m_i_n_o_r and
+       _m_a_j_o_r to be 0.
+
+
+RREETTUURRNN VVAALLUUEE
+       The QQuueerryyPPaacckkaaggee(()) function returns 0 on failure or  1  on
+       success.   The  carry flag is set accordingly and thus the
+       non-standard iferror { ... }  construct  can  be  used  to
+       check for success.
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

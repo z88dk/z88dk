@@ -1,0 +1,18 @@
+Directory containing C files which are built up into applications, compile
+thus:
+
+zcc -create-app -lgfxapp dstar.c
+
+zcc -create-app rpn.c
+
+zcc -create-app useless.c
+
+zcc -create-app -lz88 viewer.c
+
+zcc -create-app -lz88 wc.c
+
+[All other options are specified in the source file]
+
+Enjoy making apps with z88dk..
+
+d.

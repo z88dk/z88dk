@@ -1,0 +1,30 @@
+.TH reverse_addr 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+reverse_addr_lookup \- convert IP address to hstname
+.SH SYNOPSIS
+.nf
+.B #include <net/resolv.h>
+.sp
+.BI "bool_t reverse_addr_lookup(ipaddr_t "ipaddr ", char *"name );
+.fi
+.SH DESCRIPTION
+The \fBreverse_addr_lookup()\fP function queries any configured nameservers for the 
+name of the host with IP address \fIipaddr\fP.
+.PP
+If \fIipaddr\fP is not known to the queried nameservers then the
+\fIipaddr\fP is converted to the form a.b.c.d and returned.
+
+.SH "RETURN VALUE"
+\fBreverse_addr_lookup()\fP places the hostname in the buffer specified
+by \fIname\fP, no checks are made that this buffer is large enough to
+hold the full hostname. The function returns TRUE or FALSE depending
+on whether the queried nameservers knew \fIipaddr\fP.
+.PP
+\fBreverse_addr_lookup()\fP may also be called by the macro \fBgethostbyaddr\fP
+
+.SH BUGS
+If you use the macro \fBgethostbyaddr\fP then beware that the ZSock
+implementation is not at all standard.
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>

@@ -1,0 +1,245 @@
+
+Errors and Warnings Produced by the Small C+ Compiler
+-----------------------------------------------------
+
+[Document under construction]
+
+The compiler has two ways of letting you know if something is either
+potentially, or is actually wrong with your code.
+
+To let you know of potential problems, or problems that it can usually
+overcome the compiler will emit a warning, if the problem is more serious
+and the compiler cannot overcome it an error will be emitted. The line
+between these two is fairly fuzzy, but given time (and this document!) I
+hope you'll discover what is important and what isn't.
+
+
+WARNINGS
+--------
+
+
+#1  Too few arguments in function
+#2  Too many arguments in function call
+#3  Too many arguments in declaration
+
+Potentially a very big problem - have you remembered to prototype
+correctly?
+
+#4  Function returns different type to prototype
+#5  Prototype is %s
+#6  Function is %s
+
+These three warnings come together, another prototyping problem perhaps? Or
+have you called a function which doesn't return an int before declaring
+it?
+
+
+#7  Return type defaults to int
+
+This annoying can be very warning, to get round it explicitly say what
+your return type is during function declaration - old Small C programs
+will kick up loads of these.
+
+#8  Converting integer to pointer without cast
+#9  Converting pointer to integer without cast
+
+"Does exactly what is says on the can"
+
+#10 Equating of different signedness
+#11 Operation on different signedness!
+
+Both of these are a sign that there may be trouble ahead - be careful
+with your signedness!
+
+#12 Converting far ptr to near ptr
+
+Uh-oh, you *really* don't want to do this, information is lost and the
+pointer could end up being wild, you can get rid of it using a cast
+but are you really sure you want to do that?
+
+#13 Pointer/pointer type mismatch
+
+This occurs during functions calls if your pointer types aren't matched
+up - eg your function needs a pointer to int and you're supplying pointer
+to char - do take care!
+
+#14  Expected ','
+#15  Expected '"'
+#16  Expected ''' (single ')
+#17  Expected ';'
+
+The last one isn't fatal, but the others possible are.
+
+
+#18  Unterminated assembler code
+
+Bung a #endasm in where it should've been in the first place!
+
+
+#19  Unknown #pragma directive
+
+You've either made a typo, or just ported some code across.
+
+#20  Far only applicable to pointers
+
+There's no such thing as a far [blah] it doesn't make sense, you have
+to point to any far data.
+
+
+#21  Initialisation too long, truncating!
+
+This is caused by supplying a string which is too long during definition
+of a character array with a finite size.
+
+
+#22  Bad variable declaration (void)
+
+Duh.
+
+
+#23  Static incompatible with register/auto
+
+What exactly did you mean here?
+
+#24  Cannot assign value to pointer
+
+This arrives during global initialisation - 0 is the only value to
+which you can assign a pointer to [During code anything goes, so maybe
+you want to try it then]
+
+#25  Illegal size of operation (on function)
+#26  Expected argument
+#27  Int constant in double expression
+#28  Getting value from void function
+
+I like explanatory error messages!
+
+#29  Compiler bug - code may not work properly
+#30  Fix soon hopefully! Next warning may be dubious!
+
+These should probably be disabled now - the code generated is perfectly
+fine - this is caused prompted by the address operator on an array in
+a struct accessed via a pointer (well, that's the only instance that
+I've found of it..)
+
+#31  Bitfields not supported by compiler
+
+Nice try <grin> They're parsed correctly but just default to ints instead
+of bits within an int - it's not worth implementing them IMHO - the
+space saved in storage is more than cancelled out than the code that
+would be required to handle them.
+
+#32  Division by zero, result set to be zero
+
+The code produced here isn't optimal, but the optimizer does its best to
+remove any wastage - check your code!
+
+#33  Call to function without prototype
+
+Do yerself a favour and prototype!
+
+#34  Func expects: %s"
+#35  Func gets: %s"
+#36  In function: %s() line %d"
+
+#37  Typedef doesn't support pointer types (sorry!)
+
+I am a lazy programmer! In theory typedef could support pointer types
+with no additional strain, however it's easier just to barf the warning
+at this point. Code is correctly parsed, but any use of the typedef 
+results in use of the fundamental only.
+
+Various messages which provide further information..
+
+
+ERRORS
+------
+
+
+#1  Unexpected end of file              FATAL
+#2  Can't open zcc_opt.def file         FATAL
+
+zcc_opt.def is a key file to the entire system - it's written to by
+the compiler to give instructions for assemble and linktime.
+
+#3  Can't nest include files            FATAL
+#4  Can't open include file             FATAL
+
+The built in pre-processor is in a word crap, you should never see
+these messages if you use the frontend
+
+#4  Input line too long
+
+Wow, that is an impressive macro - the line buffer is 1k!
+
+#5  Output file error                    FATAL
+
+Is your disc write protected?
+
+#6   Double literal space exhausted      FATAL
+#7   Literal Queue Overflow              FATAL
+#8   Staging buffer overflow             FATAL
+#9   Macro table full                    FATAL
+#10  Global symbol table overflow        FATAL
+#11  Local symbol table overflow         FATAL
+#12  Structure member table overflow     FATAL
+#13  Structure symbol table overflow     FATAL
+
+You trying to compile emacs or sommat? Your program is too big - split
+it up into little chunks!
+
+#14  Indirection too deep                FATAL
+
+Pointers to pointers to arrays are not permitted!
+
+#15  Negative Size Illegal
+
+An array definition with a negative index?
+
+#16  Not in switch
+#17  Too many cases
+#18  Multiple defaults
+
+
+#19  Too many active whiles              FATAL
+#20  Out of context
+#21  Must assign to char pointer or array
+
+#22  Dodgy declaration (not pointer)
+
+Initialising a global pointer to function with a non pointer
+
+#23  Can't declare within switch         FATAL
+#24  Must declare at start of block      FATAL
+
+#25  Illegal Function or Declaration
+#26  Missing Open Parenthesis
+#27  Illegal Argument Name: %s
+#28  Incorrect number of arguments
+#29  Expected arguments
+#30  Out of data for struct initial..    FATAL
+#31  Already defined
+#32  Must be lvalue                      FATAL
+#33  Illegal address,
+#34  Can't subscript
+#35  Can't take member                   FATAL
+#36  Unknown member                      FATAL
+#37  Unknown struct                      FATAL
+#38  Illegal symbol name
+#39  Missing closing bracket
+#40  Missing token: %s
+#41  Unknown symbol: %s
+#42  Argument mismatch %s() Arg #%d: %s
+#43  Doesn't match original decl type: %s
+#44  Missing token, expecting %c got %c
+
+
+#45  Invalid Exponent
+#46  Floating Overflow
+#47  Invalid expression
+#48  Can't dereference
+#49  Operands must be int
+#50  Expecting constant expression
+#51  Enum name already used by another symbol
+#52  No matching #if
+

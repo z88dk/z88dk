@@ -1,0 +1,22 @@
+lstoff
+
+; Standard Z88	Operating	System manifests:
+
+; The information below is defined	in Developers Notes, release 3.00
+; (c) Cambridge Computer	1989
+
+; Low level serial port interface:
+
+	DEFC	Os_Si   =	$8D			; serial interface (low level)
+
+		DEFC	SI_HRD  =	$00		; Hard reset the serial port
+		DEFC	SI_SFT  =	$03		; Soft reset the serial port
+		DEFC	SI_INT  =	$06		; Interrupt entry point
+		DEFC	SI_GBT  =	$09		; Get byte from serial port
+		DEFC	SI_PBT  =	$0C		; Put byte to serial port
+		DEFC	SI_ENQ  =	$0F		; Status enquiry
+		DEFC	SI_FTX  =	$12		; Flush Tx (transmit) buffer
+		DEFC	SI_FRX  =	$15		; Flush Rx (receive) buffer
+		DEFC	SI_TMO  =	$18		; Set timeout
+
+lston

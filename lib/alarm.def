@@ -1,0 +1,34 @@
+lstoff
+
+; Standard Z88	Operating	System manifests:
+
+; The information below is defined	in Developers Notes, release 3.00
+; (c) Cambridge Computer	1989-95
+
+; Alarm manipulation:
+
+	DEFC	Gn_Aab  =	$6809		; Allocate alarm block
+	DEFC	Gn_Fab  =	$6A09		; Free alarm block
+	DEFC	Gn_Lab  =	$6C09		; Link alarm block in chain
+	DEFC	Gn_Uab  =	$6E09		; Unlink alarm	block
+	DEFC	Gn_Alp  =	$7009		; Process	an expired alarm (OZ usage)
+
+; Low level alarm call definitions:
+	DEFC	Os_Alm  =	$81			; Alarm manipulation (OZ	usage)
+	; arguments:
+		DEFC	AH_SUSP =	$01		; suspend	alarm
+		DEFC	AH_REV  =	$02		; revive alarms
+		DEFC	AH_RES  =	$03		; reset alarm enable state
+		DEFC	AH_SINC =	$04		; display	symbol
+		DEFC	AH_SDEC =	$05		; remove symbol (subject	to use count)
+		DEFC	AH_SRES =	$06		; reset symbol
+		DEFC	AH_SET  =	$07		; Set a new alarm:
+		DEFC	AH_CNC  =	$08		; Cancel an alarm:
+		DEFC	AH_DG1  =	$09		; Ding-dong type 1
+		DEFC	AH_DG2  =	$0A		; Ding-dong type 2
+		DEFC	AH_AINC =	$0B		; action count	increment
+		DEFC	AH_ADEC =	$0C		; action count	decrement
+		DEFC	AH_ARES =	$0D		; action count	reset
+
+
+lston

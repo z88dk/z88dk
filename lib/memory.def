@@ -1,0 +1,85 @@
+lstoff
+
+; Standard Z88	Operating	System manifests:
+
+; The information below is defined	in Developers Notes, release 3.00
+; (c) Cambridge Computer	1989-95
+
+; Memory allocation, deallocation:
+
+	DEFC	Os_Mop = $4E			; Open memory (allocate memory pool)
+	DEFC	Os_Mal = $54			; Allocate memory
+	DEFC	Os_Axp = $D206			; Allocate explicit	page	(internal	OZ usage)
+	DEFC	Os_Mfr = $57			; Free memory
+	DEFC	Os_Mcl = $51			; Close memory	(free memory pool)
+
+; Memory information movement:
+
+	DEFC	Os_Bde = $DA06			; Copy bytes to extended	address
+	DEFC	Os_Bhl = $DC06			; Copy bytes from extended address
+	DEFC	Gn_Rbe = $3E09			; Read byte at	extended address
+	DEFC	Gn_Wbe = $4009			; Write byte to extended	address
+
+; Memory comparison:
+
+    DEFC Gn_Cme  = $4209			; compare	null-terminated strings
+
+; Memory/bank binding:
+
+	DEFC	Os_Mgb = $5A			; Get current binding
+	DEFC	Os_Mpb = $5D			; Set (Put) new binding
+	DEFC	Os_Bix = $60			; Bind in	extended address (internal)
+	DEFC	Os_Box = $63			; Restore	bindings after	OS_BIX (internal)
+
+; Fast code interface for bank switching (A=1)
+
+	DEFC	Os_Fc  = $8A
+
+; Linked list manipulation calls (often	used	in combination	with	Os_Mal):
+
+	DEFC	Gn_Xin = $4609
+	DEFC	Gn_Xnx = $4409
+	DEFC	Gn_Xdl = $4809
+
+; Memory Masks	used	by Os_Mop:
+
+	DEFC	MM_S0 = $00			; Segment	0 mask
+	DEFC	MM_S1 = $40			; Segment	1 mask
+	DEFC	MM_S2 = $80			; Segment	2 mask
+	DEFC	MM_S3 = $C0			; Segment	3 mask
+
+; additional allocation directives	for Os_Mop:
+	; Source of memory (to be allocated):
+	DEFC	MM_FIX = $02			; fixed workspace (not subject to swapping)
+
+	DEFC	MM_SLT = $04			; explicit slot usage, masked	with:
+		DEFC	MC_CI = $10		; internal memory
+		DEFC	MC_C1 = $01		; card 1
+		DEFC	MC_C2 = $02		; card 2
+		DEFC	MC_C3 = $03		; card 3
+
+	; Allocation variations:
+	DEFC	MM_EXC = $10			; exclusive use of bank
+	DEFC	MM_MUL = $20			; use multiple	banks
+
+
+; Segment	specifiers used by Os_Mgb, Os_Mpb:
+
+	DEFC	MS_S0 = $00			; Segment	0 specifier
+	DEFC	MS_S1 = $01			; Segment	1 specifier
+	DEFC	MS_S2 = $02			; Segment	2 specifier
+	DEFC	MS_S3 = $03			; Segment	3 specifier
+
+; Low level OZ	memory organisation	definitions:
+; (these manifests represents	bit identifiers in a configuration	byte	that
+; is	(returned	by OS_NQ,	NQ_SLT):
+
+	DEFC	BU_EPR = 1			; bank is	EPROM
+	DEFC	BU_ROM = 2			; bank is	ROM
+	DEFC	BU_WRK = 4			; work memory
+	DEFC	BU_FIX = 8			; fixed memory
+	DEFC	BU_RES = 16			; reserved memory
+	DEFC	BU_APL = 32			; bank is	application RAM
+	DEFC	BU_FRE = 128			; bank is	available	RAM
+
+lston

@@ -1,0 +1,62 @@
+
+
+
+byteorder(3)        z88dk Programmer's Manual        byteorder(3)
+
+
+NNAAMMEE
+       htonl,  htons,  ntohl, ntohs - convert values between host
+       and network byte order
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//hhttoonn..hh>>
+
+       uunnssiiggnneedd lloonngg iinntt hhttoonnll((uunnssiiggnneedd lloonngg iinntt _h_o_s_t_l_o_n_g));;
+
+       uunnssiiggnneedd sshhoorrtt iinntt hhttoonnss((uunnssiiggnneedd sshhoorrtt iinntt _h_o_s_t_s_h_o_r_t));;
+
+       uunnssiiggnneedd lloonngg iinntt nnttoohhll((uunnssiiggnneedd lloonngg iinntt _n_e_t_l_o_n_g));;
+
+       uunnssiiggnneedd sshhoorrtt iinntt nnttoohhss((uunnssiiggnneedd sshhoorrtt iinntt _n_e_t_s_h_o_r_t));;
+
+DDEESSCCRRIIPPTTIIOONN
+       The hhttoonnll(()) function converts the  long  integer  _h_o_s_t_l_o_n_g
+       from host byte order to network byte order.
+
+       The  hhttoonnss(()) function converts the short integer _h_o_s_t_s_h_o_r_t
+       from host byte order to network byte order.
+
+       The nnttoohhll(()) function converts  the  long  integer  _n_e_t_l_o_n_g
+       from network byte order to host byte order.
+
+       The  nnttoohhss(())  function converts the short integer _n_e_t_s_h_o_r_t
+       from network byte order to host byte order.
+
+       On the z80 the host byte order is Least  Significant  Byte
+       first,  whereas  the  network  byte  order, as used on the
+       Internet, is Most Significant Byte first.
+
+CCOONNFFOORRMMIINNGG TTOO
+       BSD 4.3
+
+NNOOTTEESS
+       Unlike on other machines these functions are not  provided
+       through  macros  -  they  are  instead  functions  kept in
+       z80_crt0.lib. The optimization rules supplied  with  z88dk
+       are  aware of these routines and when appropriate optimize
+       the function call away.
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+       Original     manual     page     by     David     Metcalfe
+       <david@prism.demon.co.uk>
+
+
+
+
+
+
+BSD                      February 18 2000                       1
+
+

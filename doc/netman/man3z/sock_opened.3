@@ -1,0 +1,28 @@
+.TH sock_opened 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+sock_opened \- test whether a network connection is established
+.SH SYNOPSIS
+.nf
+.B #include <net/socket.h>
+.sp
+.BI "bool_t sock_opened(SOCKET *"s);
+.fi
+.SH DESCRIPTION
+The parameter \fIs\fP is a descriptor to a socket created using
+\fBsock_open(3z)\fP or \fBsock_listen(3z)\fP.
+.PP
+The \fBsock_opened()\fP function tests whether a socket is open i.e.
+connection to a remote host has been established.
+.PP
+A socket of prot_UDP is always established.
+
+
+.SH "RETURN VALUE"
+\fBsock_opened()\fP returns TRUE or FALSE
+
+.SH "SEE ALSO"
+.BR sock_closed "(3z)"
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>
+

@@ -1,0 +1,76 @@
+
+
+
+copt(1)                                                   copt(1)
+
+
+NNAAMMEE
+       copt - peephole optimizer
+
+SSYYNNOOPPSSIISS
+       ccoopptt _f_i_l_e ...
+
+DDEESSCCRRIIPPTTIIOONN
+       _c_o_p_t  is  a  general-purpose peephole optimizer.  It reads
+       code from its standard input and writes an  improved  ver-
+       sion  to  its standard output.  _c_o_p_t reads the named files
+       for its optimizations, which are encoded as follows:
+
+          <pattern for input line 1>
+          <pattern for input line 2>
+           ...
+          <pattern for input line n>
+          =
+          <pattern for output line 1>
+          <pattern for output line 2>
+           ...
+          <pattern for output line m>
+          <blank line>
+
+       Pattern matching uses literal string comparison, with  one
+       exception:  ``%%''  matches the ``%'' character, and ``%''
+       followed by a digit matches  everything  up  to  the  next
+       occurrence  of  the  next  pattern  character,  though all
+       occurrences of %_n must denote the same string.  For  exam-
+       ple,  the pattern ``%1=%1.'' matches exactly those strings
+       that begin with a string  X,  followed  by  a  ``=''  (the
+       first),  followed by a second occurrence of X, followed by
+       a period.  In this way, the input/output pattern
+
+          mov $%1,r%2
+          mov *r%2,r%2
+          =
+          mov %1,r%2
+
+       commands _c_o_p_t to replace runs like
+
+          mov $_a,r3
+          mov *r3,r3
+
+       with
+
+          mov _a,r3
+
+       Note that a tab or newline can terminate a %_n variable.
+
+       _c_o_p_t compares each run of input patterns with the  current
+       input  instruction  and  its predecessors.  If no match is
+       found, it advances to the next input instruction and tries
+       again.  Otherwise, it replaces the input instructions with
+       the  corresponding  output  patterns,  pattern   variables
+       instantiated,  and  resumes  its  search  with  the  _f_i_r_s_t
+       instruction of the replacement.  _c_o_p_t matches  input  pat-
+       terns  in  reverse  order to cascade optimizations without
+       backing up.
+
+BBUUGGSS
+       Errors in optimization files are always possible.
+
+
+
+
+
+
+                                                                1
+
+

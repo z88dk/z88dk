@@ -1,0 +1,4 @@
+                defc    EOF = -1
+                defc    STDERR = -10
+                defc    STDIN  = -11
+                defc    STDOUT = -12

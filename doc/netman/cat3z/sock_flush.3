@@ -1,0 +1,40 @@
+
+
+
+sock_flush(3z)      z88dk Programmer's Manual      sock_flush(3z)
+
+
+NNAAMMEE
+       sock_flush - flush a network connection
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//ssoocckkeett..hh>>
+
+       vvooiidd ssoocckk__fflluusshh((SSOOCCKKEETT **_s_)_;
+
+DDEESSCCRRIIPPTTIIOONN
+       The  parameter _s is a descriptor to an open socket created
+       using ssoocckk__ooppeenn((33zz)) or ssoocckk__lliisstteenn((33zz)). The socket  should
+       be of type prot_TCP.
+
+       The  ssoocckk__fflluusshh(())  function will depending on the state of
+       the connection either immediately send any pending data in
+       the socket buffer or flag the data for sending in the next
+       timer call.
+
+
+RREETTUURRNN VVAALLUUEE
+       None
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

@@ -1,0 +1,23 @@
+;
+;	f_ansi_cls
+;
+;	Clear the screen
+;
+;	djm 6/6/2000
+
+		XLIB	ansi_CLS
+
+		INCLUDE	"#stdio.def"
+
+.ansi_CLS
+	ld	a,$0c
+	call_oz(os_out)
+	ret
+IF Blah
+	ld	hl,clstxt
+	call_oz(gn_sop)
+	ret
+
+.clstxt
+	defb	1,'3','@',32,32,1,'2','C',254,0
+ENDIF

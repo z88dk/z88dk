@@ -1,0 +1,24 @@
+.TH QueryPackage 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+QueryPackage \- open a shared library/package
+.SH SYNOPSIS
+.nf
+.B #include <z88.h>
+.sp
+.BI "bool_t QueryPackage(char " package ", char " major " , char " minor );
+.fi
+.SH DESCRIPTION
+The \fBQueryPackage()\fP function checks and makes available for use
+the shared package \fIpackage\fP with a version of at least
+\fIminor\fP.\fIminor\fP
+.PP
+The function initially checks for the presence of the package subsystem 
+and then proceeds to check for the specified package.
+.PP
+Version checking can be disabled by specifying \fIminor\fP and \fImajor\fP
+to be 0.
+
+.SH "RETURN VALUE"
+The \fBQueryPackage()\fP function returns 0 on failure or 1 on success.
+The carry flag is set accordingly and thus the non-standard iferror { ... }
+construct can be used to check for success.

@@ -1,0 +1,9 @@
+This directory contains routines which are z88 specific and probably
+have no equivalent on other machines.
+
+It's an odd rag-tag bunch of things including:
+
+- Application stuff (Mailboxing, screen restore etc)
+- Package stuff (interrupts/PIDs)
+- Window stuff (Nice stuff from GWL)
+- Wildcard handling

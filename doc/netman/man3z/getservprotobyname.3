@@ -1,0 +1,29 @@
+.TH getservprotobyname 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+getservprotobyname, getservprotobyport  \- get servprotoice entry
+.SH SYNOPSIS
+.nf
+.B #include <net/resolv.h>
+.sp
+.BI "u8_t getservprotobyname(char *"name );
+.BI "u8_t getservprotobyport(tcpport_t "port );
+.fi
+.SH DESCRIPTION
+The \fBgetservprotobyname()\fP function returns the appropriate protocol
+for the service with the name \fIname\fP. If the service isn't known then
+NULL is returned.
+.PP
+The \fBgetservprotobyport()\fP function returns the appropriate protocol
+for the service with the standard port number \fIport\fP. If the
+service is unknown then NULL is returned.
+
+.SH "RETURN VALUE"
+If a service is known to more than one protocol then the most
+frequently used is returned.
+
+.SH NOTES
+These functions use a lookup table compiled into the ZSock kernel,
+it is not likely that method will change in the near future.
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>

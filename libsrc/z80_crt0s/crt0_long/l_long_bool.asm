@@ -1,0 +1,18 @@
+;       Z88 Small C+ Run Time Library 
+;       Long functions
+;
+
+                XLIB    l_long_bool
+
+
+; HL = !!HL
+
+.l_long_bool
+        ld a,h
+        or l
+        or e
+        or d
+        ret z
+        ld hl,1
+        ld      de,0
+        ret

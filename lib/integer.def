@@ -1,0 +1,17 @@
+lstoff
+
+; Standard Z88	Operating	System manifests:
+
+; The information below is defined	in Developers Notes, release 3.00
+; (c) Cambridge Computer	1989-95
+
+; Integer	manipulation:
+
+	 DEFC Gn_M16  = $7209		; Unsigned 16bit multiplication
+	 DEFC Gn_D16  = $7409		; Unsigned 16bit division
+	 DEFC Gn_M24  = $7609		; Unsigned 24bit multiplication
+	 DEFC Gn_D24  = $7809		; Unsigned 24bit division
+	 DEFC Gn_Gdn  = $1009		; ASCII (decimal) to integer (binary) conversion
+	 DEFC Gn_Pdn  = $1209		; Integer	(binary) to ASCII (decimal) conversion
+
+lston

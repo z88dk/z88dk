@@ -1,0 +1,15 @@
+This directory contains examples which run from BASIC, compile them 
+thus:
+
+zcc -lm -lgfx cube.c		Generic Maths
+zcc -lmz -lgfx cube.c		Z88 Maths
+zcc -lgfx dstar.c
+zcc -lgfx gfx.c
+zcc rpn.c
+zcc sorter.c
+zcc enigma.c
+
+The other examples aren't meant to be compiled, but just brief demonstrations
+
+Or alternatively...use the makefile!
+

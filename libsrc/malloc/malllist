@@ -1,0 +1,7 @@
+calloc
+clrmem
+free
+getfree
+getlarge
+heapinit
+malloc

@@ -1,0 +1,7 @@
+sccz80 features several extensions to C to enable mixing of C
+and assembler:
+
+return_c		- As return but sets carry flag
+return_nc		- As return but resets carry flag
+iferror{...} else {..}  - As "if { }" but checks carry flag
+			  (does else {...} if nc )

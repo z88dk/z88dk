@@ -1,0 +1,26 @@
+The addition of working far pointers has neccessitated a few changes in
+the z88 library - a few routines have lost their far ability (though 
+since they weren't used with this in the first place this is no loss), these
+routines are:
+
+readmail
+sendmail
+remove
+
+In contrast, fopen/open/wcopen now fully understand far pointers for a filename
+specification and will not blink if you supply one. This is achieved by copying
+the string down into near memory and rewriting the address supplied to the
+gn_opf routine so that it points to this near copy. This approach is taken (as
+opposed to rewriting a C far ptr to and OZ far ptr due to the fact that a string
+may in actual fact be spread across any number of pages or banks. This happens
+tranparently and you have no need to worry about it.
+
+Should you wish to write library routines which utilise far pointers take
+a look at open_z88 in fcntl/z88 which is a commented implementation.
+
+It should be noted that since far data cannot be used with BASIC programs
+for a basic program fopen etc do not comprehend far pointers and the chances
+are that the opening the file would fail.
+
+
+

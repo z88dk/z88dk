@@ -1,0 +1,55 @@
+
+
+
+tcp_pageout(3z)     z88dk Programmer's Manual     tcp_pageout(3z)
+
+
+NNAAMMEE
+       tcp_pageout  -  page the ZSock data area out of the memory
+       map
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//mmiisscc..hh>>
+
+       vvooiidd ttccpp__ppaaggeeoouutt((uu88__tt _o_l_d_b_i_n_d_i_n_g_)_;
+
+DDEESSCCRRIIPPTTIIOONN
+       The ttccpp__ppaaggeeoouutt(()) function pages out the ZSock  data  area
+       into  segment 1 (addresses 16384-32767) of the z88s memory
+       map.
+
+       The parameter _o_l_d_b_i_n_d_i_n_g is the return value from a  prior
+       ttccpp__ppaaggeeiinn((33zz)) function.
+
+       This function is primarily of use to daemons which use the
+       ZSock dataarea for small amounts of storage.
+
+
+RREETTUURRNN VVAALLUUEE
+       ttccpp__ppaaggeeiinn(()) returns the previous  binding  of  segment  1
+       which should be used as a parameter to ttccpp__ppaaggeeoouutt(3z)
+
+
+SSEEEE AALLSSOO
+       ttccpp__ppaaggeeiinn(3z),       ttccpp__mmaalllloocc(3z),       ttccpp__ccaalllloocc(3z)
+       ttccpp__ffrreeee(3z)
+
+
+BBUUGGSS
+       Supplying an incorrect _o_l_d_b_i_n_d_i_n_g will most  likely  crash
+       the z88.
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

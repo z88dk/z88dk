@@ -1,0 +1,28 @@
+.TH sock_dataready 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+sock_dataready \- test whether a network connection has incoming data
+.SH SYNOPSIS
+.nf
+.B #include <net/socket.h>
+.sp
+.BI "size_t sock_dataready(SOCKET *"s);
+.fi
+.SH DESCRIPTION
+The parameter \fIs\fP is a descriptor to an open socket created using
+\fBsock_open(3z)\fP or \fBsock_listen(3z)\fP. 
+.PP
+The \fBsock_dataready()\fP function tests whether a socket has data
+waiting to be read by the user program.
+
+
+.SH "RETURN VALUE"
+\fBsock_dataready()\fP returns the amount of data waiting in the input
+queue.
+
+
+.SH "SEE ALSO"
+.BR sock_read "(3z)"
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>
+

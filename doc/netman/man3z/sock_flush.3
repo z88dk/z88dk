@@ -1,0 +1,23 @@
+.TH sock_flush 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+sock_flush \- flush a network connection
+.SH SYNOPSIS
+.nf
+.B #include <net/socket.h>
+.sp
+.BI "void sock_flush(SOCKET *"s);
+.fi
+.SH DESCRIPTION
+The parameter \fIs\fP is a descriptor to an open socket created using
+\fBsock_open(3z)\fP or \fBsock_listen(3z)\fP. The socket should be
+of type prot_TCP.
+.PP
+The \fBsock_flush()\fP function will depending on the state of the
+connection either immediately send any pending data in the socket buffer
+or flag the data for sending in the next timer call.
+
+.SH "RETURN VALUE"
+None
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>

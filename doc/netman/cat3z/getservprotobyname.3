@@ -1,0 +1,48 @@
+
+
+
+getservprotobyname(3zz)88dk Programmer's Manuagletservprotobyname(3z)
+
+
+NNAAMMEE
+       getservprotobyname, getservprotobyport  - get servprotoice
+       entry
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//rreessoollvv..hh>>
+
+       uu88__tt ggeettsseerrvvpprroottoobbyynnaammee((cchhaarr **_n_a_m_e));;
+       uu88__tt ggeettsseerrvvpprroottoobbyyppoorrtt((ttccppppoorrtt__tt _p_o_r_t));;
+
+DDEESSCCRRIIPPTTIIOONN
+       The ggeettsseerrvvpprroottoobbyynnaammee(()) function returns the  appropriate
+       protocol  for  the service with the name _n_a_m_e. If the ser-
+       vice isn't known then NULL is returned.
+
+       The ggeettsseerrvvpprroottoobbyyppoorrtt(()) function returns the  appropriate
+       protocol  for  the  service  with the standard port number
+       _p_o_r_t. If the service is unknown then NULL is returned.
+
+
+RREETTUURRNN VVAALLUUEE
+       If a service is known to more than one protocol  then  the
+       most frequently used is returned.
+
+
+NNOOTTEESS
+       These functions use a lookup table compiled into the ZSock
+       kernel, it is not likely that method will  change  in  the
+       near future.
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

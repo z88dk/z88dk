@@ -1,0 +1,33 @@
+.TH DeviceOffline 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+DeviceOffline \- turn the network device online
+.SH SYNOPSIS
+.nf
+.B #include <net/misc.h>
+.sp
+.BI "void DeviceOffline(int "flag );
+.fi
+.SH DESCRIPTION
+The \fBDeviceOffline()\fP function turns the packet driver offline
+so that other application may utilise the resources that it is using.
+.PP
+For example for the built in SLIP driver, turning the device online
+prevents polling of the serial port for incoming bytes and the sending
+of queued packets, thus allowing another program (e.g. Terminal) to
+use the serial port.
+.PP
+The parameter \fIflag\fP specifies how the device is to be turned
+offline, with current device drivers this has no significence. However
+it is envisaged that the value NOHANGUP the device will simply
+suspend sending and receiving packets. Whilst with HANGUP the
+device will hangup the line and terminate the telephone connection.
+
+.SH "RETURN VALUE"
+None.
+
+.SH "SEE ALSO"
+.BR DeviceOnline "(3z)"
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>
+

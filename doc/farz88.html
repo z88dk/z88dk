@@ -1,0 +1,168 @@
+<HTML>
+<HEAD>
+<TITLE>Z88 Far Memory access with z88dk</TITLE>
+</HEAD>
+<BODY>
+<H1><CENTER>Z88 Far Memory</CENTER></H1>
+<p>Far memory routines have now been implemented in <strong>z88dk</strong>
+for the Z88. This document describes how you can write C programs using
+these routines, and also gives details of how the scheme is implemented
+for anyone interested.</p>
+<p>The document is divided into the following sections:</p>
+<ul>
+<li><a href="#overview">Overview & Limitations</a></li>
+<li><a href="#using">Using far memory in Z88 applications</a></li>
+<li><a href="#details">Implementation details</a></li>
+</ul>
+<hr>
+<h2><a name="overview">Overview & Limitations</a></h2>
+<p>The Z88 far memory model used by the <em>Z88 Development Kit</em> uses
+a 3-byte far pointer size. Near pointers can easily be cast as far pointers,
+so it is easy to write programs using a mixture of near and far memory. It
+is obviously <strong>not</strong> possible to cast far pointers as near
+pointers, however.</p>
+<p>There is no limit to the size of the far memory heap (other than the 4Mb
+limit imposed by the Z88 architecture!), and allocations of any size can be
+made, provided your heap is large enough and the host Z88 has sufficient RAM
+available. Very large heaps will require more of your bad application
+RAM to be reserved for memory management, however, and full details of
+this are given in the next section.</p>
+<p>The far memory model is only supported by the application
+target type in Small C; so it is not possible to write programs running
+under BASIC using far data. Due to the memory overheads required by the
+allocation routines (see <a href="#details">implementation details</a> if
+you're interested), any application which uses this model will be
+<em>bad</em>.</p>
+<p>Packages may use far pointers as parameters passed to them by applications,
+but since each application has its own far heap managed through its static 
+workspace, the following limitations apply:</p>
+<ul>
+<li>the far pointer may only be used while the process to which it belongs is
+active</li>
+<li>far pointers may not be passed from one process to another</li>
+</ul>
+<hr>
+<h2><a name="using">Using far memory in Z88 applications</a></h2>
+<h3>Compiler Directives</h3>
+<p>Using the far memory allocation words in your Z88 applications is quite
+straightforward. Firstly, you must signal that you will be using the far
+memory functions with the following line:</p>
+<pre>  #define FARDATA 1</pre>
+<p>This line should be <em>before</em> any includes, as the standard library
+header files use it to determine whether to make far memory versions of
+the library functions available.</p>
+<p>Secondly, specify the size of the far heap your application requires
+with a line as follows:</p>
+<pre>  #pragma -farheap=65536</pre>
+<p>The above line gives a heapsize of 64K. You can specify any size up to
+a maximum of 4194304 (4Mb). Bear in mind the following points:</p>
+<ul>
+<li>memory is not actually reserved in the Z88 until it is allocated with
+the <em>malloc</em> function, so you can specify a large heapsize without
+worrying that your application is "wasting" large amounts of the Z88s
+memory</li>
+<li>the amount of bad application memory (or static workspace) required
+by the allocation system is equal to <strong>(HEAPSIZE/128)+487 bytes</strong>,
+where HEAPSIZE is the maximum heap size in bytes</li>
+</ul>
+<p>For example, if you have a maximum heapsize of 65536 bytes, the amount of
+static workspace used will be 999 bytes. A 4Mb heap would require about 32.5K
+of static workspace!</p>
+<h3>Allocating and using far memory</h3>
+<p>Within your C application, you can now use the following functions:</p>
+<dl>
+<dt>far *malloc(long size)</dt>
+<dd>Returns a far pointer to a region of memory "size" bytes in size</dd>
+<dt>void free(far *ptr)</dt>
+<dd>Free the previously allocated region of memory at "ptr"</dd>
+<dt>void freeall(void)</dt>
+<dd>Frees all allocated memory (this is done automatically when applications
+are terminated)</dd>
+</dl>
+<p>You can use various string functions on far memory pointers; where functions
+take two parameters, you can also provide near pointers as parameters (remembering
+to cast them as far!) The following functions are currently available for
+far pointers: <em>strchr, strrchr, strcpy, strncpy, strcat, strncat,
+strlen, strlwr, strupr</em>.</p>
+<p>For more information, take a look at the example in <em>examples/app/farmall/</em>.</p>
+<hr>
+<h2><a name="details">Implementation details</a></h2>
+<p>Knowledge of the way far memory is implemented on the Z88 may be helpful to
+anyone wishing to write a similar library for another machine, or for those
+hoping to port the method to their own (non-C) environment.</p>
+<p>Also, if you are planning to rewrite the Z88 operating system (!) or replace
+any of the memory-allocation calls using the pkg_ozcr call, you should take
+careful note of the assumptions I have made here, and try not to break them ;-)</p>
+<p>Note that all the assumptions made below are true for all versions of OZ up to
+and including v4.0</p>
+<h3>Memory overheads</h3>
+<p>Whenever far memory support is required in an application, a certain amount of
+bad application workspace is automatically reserved. This consists of:</p>
+<dl>
+<dt>pool_table (224 bytes)</dt>
+<dd>Used to hold memory pool handles allocated by OZ</dd>
+<dt>copybuff (258 bytes)</dt>
+<dd>Used by some library routines as a temporary buffer for OZ calls that use
+strings (this is not used internally by memory allocation routines, and will not
+be considered further)</dd>
+<dt>malloc_table (2 bytes for every 256 bytes required in the far heap)</dt>
+<dd>The most important structure, holding details of the bank and address of
+each 256-byte allocation in the heap</dd>
+</dl>
+<h3>The pool table</h3>
+<p>This structure, as noted above, is used to hold the pool handles that have
+been opened by the application. Initially, it is filled with nulls, indicating
+that no pools are open.</p>
+<p>This is a table of 1-byte entries, each corresponding to a bank in the Z88's
+memory map. As banks 0-31 are always ROM (internal), the first entry corresponds
+to bank 32, with the final entry corresponding to bank 255. Each entry holds
+either 0 (indicating no pool open for that bank), or a value which relates
+directly to the pool handle returned by OZ for that bank.</p>
+<p>Three important assumptions are made when constructing and using this table:</p>
+<ul>
+<li>each OZ pool handle always gives allocations from the same bank; when the bank is
+exhausted, no further allocations are possible with the handle</li>
+<li>as a consequence, for each process, only one pool handle is ever associated with
+a particular bank</li>
+<li>the values of OZ pool handles are always of the form $0XY0, where $XY!=$00</li>
+</ul>
+<p>The first two assumptions mean that we only need 224 table entries (one for each
+bank) no matter how much memory we allocate. The last assumption means that each
+entry only needs to be one byte in size (we shift the handle value 4 bits to the right),
+and a zero value can indicate no pool.</p>
+<h3>The malloc table</h3>
+<p>Each entry in the malloc table consists of two bytes, and corresponds to an allocation
+of 256 bytes of far memory.</p>
+<p>The first byte contains the bank number containing the allocation (0 indicates no
+allocation has been made for this entry), and the second byte contains the high byte
+of the address of the memory allocation (always in segment 1).</p>
+<p>The low byte of the address is not required, since for allocations of 256 bytes, OZ
+always returns an address with a low byte of zero; thus this is always assumed.</p>
+<h3>Allocation method</h3>
+<p>The first stage in memory allocation is to locate a section of the malloc table
+which has not yet been allocated (ie contains nulls) and which is large enough for the
+required allocation. An extra 2 bytes are always added to the amount of memory required,
+to hold the number of pages (256-byte allocations) in the allocated block.</p>
+<p>When a suitable region has been located (malloc always uses the smallest suitable
+region), we start making allocations and filling the malloc table. This is done as
+follows:</p>
+<ul>
+<li>first, existing pools in the pool table are checked, and allocations made from these</li>
+<li>if all existing pools are exhausted, new pools are opened and allocations made from these</li>
+</ul>
+<p>If all pools are exhausted and no further ones can be opened before all memory is allocated,
+the memory allocated so far is freed, and malloc returns an error.</p>
+<p>Once the allocations are completed, the number of 256-byte pages used is stored in the first
+two bytes, and a far pointer following this value is returned.</p>
+<h3>Deallocation method</h3>
+<p>Deallocating is much more straightforward. The pointer is decremented twice, and the value
+fetched is thus the number of 256-byte pages that were allocated.</p>
+<p>A loop is entered which frees each 256-byte allocation, and zeros the corresponding entry
+in the malloc table.</p>
+<p>Note that no pool handles are freed during this process, but they become usable again when
+further <em>malloc</em>s are performed. All handles in the pool table are freed by the <em>freeall</em>
+function, which is automatically called on exit from the application.</p>
+<HR>
+<address>Garry Lancaster, 18/4/00</address>
+</BODY>
+</HTML>

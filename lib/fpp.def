@@ -1,0 +1,57 @@
+lstoff
+
+; Standard Z88	Operating	System ('OZ') manifests:
+
+; The information below is copied from Developers	Notes, release	3.00
+; (c) Cambridge Computer	1989-95
+
+; Floating point package	(FPP):
+
+	DEFC	FP_BAS = $A2			; call Floating point package	function
+							; (doesn't work properly)
+; function codes:
+		DEFC	FP_AND = $21		; bitwise	AND
+		DEFC	FP_IDV = $24		; integer	division
+		DEFC	FP_EOR = $27		; bitwise	XOR
+		DEFC	FP_MOD = $2A		; integer	remainder
+		DEFC	FP_OR  = $2D		; bitwise	OR
+		DEFC	FP_LEQ = $30		; less than or	equal to
+		DEFC	FP_NEQ = $33		; not equal to
+		DEFC	FP_GEQ = $36		; greater	than	or equal to
+		DEFC	FP_LT  = $39		; less than
+		DEFC	FP_EQ  = $3C		; equal
+		DEFC	FP_MUL = $3F		; multiply
+		DEFC	FP_ADD = $42		; add
+		DEFC	FP_GT  = $45		; greater	than
+		DEFC	FP_SUB = $48		; subtract
+		DEFC	FP_PWR = $4B		; raise to the	power
+		DEFC	FP_DIV = $4E		; divide
+		DEFC	FP_ABS = $51		; absolute value
+		DEFC	FP_ACS = $54		; arc cosine
+		DEFC	FP_ASN = $57		; arc sine
+		DEFC	FP_ATN = $5A		; arc tangent
+		DEFC	FP_COS = $5D		; cosine
+		DEFC	FP_DEG = $60		; radians	to degrees
+		DEFC	FP_EXP = $63		; exponential
+		DEFC	FP_INT = $66		; integer	value
+		DEFC	FP_LN  = $69		; base e (natural) logarithm
+		DEFC	FP_LOG = $6C		; base 10	(common) logarithmn
+		DEFC	FP_NOT = $6F		; bitwise	NOT
+		DEFC	FP_RAD = $72		; degrees	to radians
+		DEFC	FP_SGN = $75		; sign
+		DEFC	FP_SIN = $78		; sinus
+		DEFC	FP_SQR = $7B		; square root
+		DEFC	FP_TAN = $7E		; tangent
+		DEFC	FP_ZER = $81		; zero
+		DEFC	FP_ONE = $84		; one
+		DEFC	FP_TRU = $87		; true (-1)
+		DEFC	FP_PI  = $8A		; PI
+		DEFC	FP_VAL = $8D		; numeric	value of string
+		DEFC	FP_STR = $90		; string value	of a	number
+		DEFC	FP_FIX = $93		; truncate a float to an	integer
+		DEFC	FP_FLT = $96		; integer	to float conversion
+		DEFC	FP_TST = $99		; test number for zero and sign
+		DEFC	FP_CMP = $9C		; compare	two numbers
+		DEFC	FP_NEG = $9F		; negate number
+
+lston

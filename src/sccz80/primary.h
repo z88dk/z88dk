@@ -1,0 +1,30 @@
+/* primary.c */
+extern int primary(LVALUE *lval);
+extern void dcerror(LVALUE *lval);
+extern int calc(int left, void (*oper)(void), int right);
+extern int calcun(unsigned int left, void (*oper)(void),unsigned int right);
+extern int CalcStand(int left, void (*oper)(void), int right);
+extern void intcheck(LVALUE *lval, LVALUE *lval2);
+extern void force(int t1, int t2, char sign1, char sign2, int lconst);
+extern int widen(LVALUE *lval, LVALUE *lval2);
+extern void widenlong(LVALUE *lval, LVALUE *lval2);
+extern int dbltest(LVALUE *lval, LVALUE *lval2);
+extern void result(LVALUE *lval, LVALUE *lval2);
+extern void prestep(LVALUE *lval, int n, void (*step)());
+extern void poststep(int k, LVALUE *lval, int n, void (*step)(), void (*unstep)());
+extern void nstep(LVALUE *lval, int n, void (*unstep)());
+extern void store(LVALUE *lval);
+extern void smartpush(LVALUE *lval, char *before);
+extern void smartstore(LVALUE *lval);
+extern void rvaluest(LVALUE *lval);
+extern void rvalload(LVALUE  *lval);
+extern void rvalue(LVALUE *lval);
+extern void test(int label, int parens);
+extern int constexpr(long *val);
+extern void cscale(int type, struct tag_symbol *tag, int *val);
+extern void addconst(int val, int opr, char zfar);
+extern int docast(LVALUE *lval,char df);
+extern void DoDoubConv(char type, char zunsign);
+extern int   utype(LVALUE *lval);
+extern int DoTestJump(LVALUE *lval);
+

@@ -1,0 +1,74 @@
+.TH tcp_malloc 3  "February 18 2000" "" "z88dk Programmer's Manual"
+.SH NAME
+tcp_calloc, tcp_malloc, tcp_free \- Allocate and free memory
+.SH SYNOPSIS
+.nf
+.B #include <net/misc.h>
+.sp
+.BI "void *tcp_calloc(size_t " "nmemb" ", size_t " "size" ");"
+.nl
+.BI "void *tcp_malloc(size_t " "size" ");"
+.nl
+.BI "void tcp_free(void " "*ptr" ");"
+.nl
+.fi
+.SH DESCRIPTION
+.B calloc()
+allocates memory for an array of 
+.I nmemb
+elements of 
+.I size
+bytes each and returns a pointer to the allocated memory. 
+The memory is set to zero.
+.PP
+.B malloc()
+allocates
+.I size
+bytes and returns a pointer to the allocated memory. 
+The memory is not cleared.
+.PP
+.B free()
+frees the memory space pointed to by
+.IR ptr ,
+which must have been returned by a previous call to
+.BR malloc() 
+or
+.B calloc()
+Otherwise, or if
+.BI "free(" "ptr" )
+has already been called before, undefined behaviour occurs.
+If
+.I ptr
+is
+.BR NULL ,
+no operation is performed.
+.PP
+.SH "RETURN VALUES"
+For
+.BR calloc() " and " malloc() ,
+the value returned is a pointer to the allocated memory, which is suitably
+aligned for any kind of variable, or
+.B NULL
+if the request fails.
+.PP
+.B free()
+returns no value.
+.PP
+
+.SH "SEE ALSO"
+.BR tcp_pagein "(3z) ," tcp_pageout (3z)
+
+.SH NOTES
+These functions manipulate memory in a private memory page belonging
+to ZSock. This 16k page holds all the buffers that ZSock uses
+and hence requests for large amounts of memory are likely to fail (and
+in any case are not recommended).
+.PP
+This facility has been offered to allow daemons to be written simply
+(they have no address space of their own). User applications should
+not use these facilities. If a large (>256 bytes) amount of memory
+is required for a user application then the application should
+either be of the BAD type or be redesigned.
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>

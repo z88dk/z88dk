@@ -1,0 +1,26 @@
+.TH sock_putc 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+sock_putc \- write byte to a network socket
+.SH SYNOPSIS
+.nf
+.B #include <net/socket.h>
+.sp
+.BI "size_t sock_putc(char "c ", SOCKET *"s );
+.fi
+.SH DESCRIPTION
+The parameter \fIs\fP is a descriptor to an open socket created using
+\fBsock_open(3z)\fP or \fBsock_listen(3z)\fP
+.PP
+The \fBsock_putc()\fP function writes a single byte \fIc\fP to the socket specified by \fIs\fP.
+
+.SH "RETURN VALUE"
+The \fBsock_write()\fP function returns the number of bytes written
+to the socket (i.e. 0 or 1). If an illegal socket is supplied the carry
+flag will be set and the return value will be EPROTONOSUPPORT.
+
+
+.SH "SEE ALSO"
+.BR sock_write "(3z), " sock_puts (3z)
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>

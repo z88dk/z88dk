@@ -1,0 +1,30 @@
+.TH sock_closed 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+sock_closed \- test whether a network connection is closed
+.SH SYNOPSIS
+.nf
+.B #include <net/socket.h>
+.sp
+.BI "bool_t sock_closed(SOCKET *"s);
+.fi
+.SH DESCRIPTION
+The parameter \fIs\fP is a descriptor to a socket created using
+\fBsock_open(3z)\fP or \fBsock_listen(3z)\fP.
+.PP
+The \fBsock_closed()\fP function tests whether a socket is closed i.e.
+connection to a remote host has not been established or has already been
+closed by the kernel.
+.PP
+A socket of prot_UDP is never closed.
+
+
+.SH "RETURN VALUE"
+\fBsock_closed()\fP returns TRUE or FALSE
+
+
+.SH "SEE ALSO"
+.BR sock_opened "(3z)"
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>
+

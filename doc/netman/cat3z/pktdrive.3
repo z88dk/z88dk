@@ -1,0 +1,118 @@
+
+
+
+pktdrive(3z)        z88dk Programmer's Manual        pktdrive(3z)
+
+
+NNAAMMEE
+       pktdrive - packet driver descriptor structure
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//ddeevviiccee..hh>>
+
+DDEESSCCRRIIPPTTIIOONN
+       The  _p_k_t_d_r_i_v_e  structure defines access to a device, it is
+       only used by the ZSock kernel. Should you wish to write  a
+       packet  driver  then  this structure should be filled with
+       the relevent routines.
+
+       All external packet drivers run at  address  8192  ($2000)
+       and  it  as  this  address  that  the  structure should be
+       placed. Had z88dk the capability _p_k_t_d_r_i_v_e would be defined
+       as follows:
+
+              struct pktdrive {
+                      char    magic[10];
+                      char    *type;
+                      char    *copymsg;
+                      void    (*initfunc)(void);
+                      void    (*queuefn)(void *pkt, size_t len);
+                      void    *(*packetfn)(void);
+                      void    *(*sendfn)(void);
+                      int     (*readfn)(void);
+                      void    (*onlinefn)();
+                      void    (*offlinefn)(int);
+                      int     (*statusfn)(void);
+              };
+
+       The members of the _p_k_t_d_r_i_v_e structure are:
+
+       _m_a_g_i_c  Magic  to  identifier  the file as a packet driver,
+              this is defined as ZS0PKTDRV
+
+       _t_y_p_e   A pointer to the type of the device
+
+       _c_o_p_y_m_s_g
+              A pointer to the copyright message
+
+       _i_n_i_t_f_u_n_c
+              A function that initialises the device  during  the
+              initial configurationin this function.
+
+       _q_u_e_u_e_f_n
+              A  function that stores outgoing backets in a queue
+              pending sending.  Depending on  the  speed  of  the
+              device  it  may also inject packets into the inter-
+              face.
+
+       _p_a_c_k_e_t_f_n
+              A function that returns the address of the incoming
+              packet.  This  function is called immediately after
+              initialisation  and  after  the   _r_e_a_d_f_n   function
+              (below) has returned a packet.
+
+       _s_e_n_d_f_n A  function  that  is  called  on  the interrupt to
+              inject bytes out of the interface. If this function
+              returns   non-zero   then  packet  at  the  address
+              returned is freed.
+
+       _r_e_a_d_f_n A function that is called on the interrupt to  read
+              incoming  bytes.   If the function returns non-zero
+              then a packet is assumed to have  been  read,  with
+              length  as  returned  by  readfn  and  lying at the
+              address specified by packetfn.
+
+       _o_n_l_i_n_e_f_n
+              A function that is called when the device is to  be
+              turned online
+
+       _o_f_f_l_i_n_e_f_n
+              A  function that is called when the device is to be
+              turned offline, if the parameter is  non-zero  then
+              the  function  should hang up line (if appropriate)
+              otherwise  it  should  just  suspend  sending   and
+              receiving packets.
+
+       _s_t_a_t_u_s_f_n
+              A  function  that returns the status of the device.
+              It is envisaged that it will return 0  for  offline
+              and 1 for online though it may return other values.
+              The value returned is left for the user  to  under-
+              stand.
+
+
+NNOOTTEESS
+       When  the  packet  is  passed to the driver for output a 4
+       bytes of header space  is  available  at  dp-4.  The  SLIP
+       driver by Dominic Morris utilises these bytes to implement
+       a linked list and to  hold  the  length  of  the  outgoing
+       packet.
+
+       Other  packet  drivers  might  wish  to copy the packet to
+       their own address space for converting into other forms  -
+       eg  CSLIP  form.  Alternatively they might simply create a
+       link from their own space to the packet in the queue so to
+       reduce time wasted copying bytes.
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

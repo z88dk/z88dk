@@ -1,0 +1,28 @@
+.TH getservbyname 3z "18 February 2000" ""  "z88dk Programmer's Manual"
+.SH NAME
+getservbyname, getservbyport  \- get service entry
+.SH SYNOPSIS
+.nf
+.B #include <net/resolv.h>
+.sp
+.BI "tcpport_t getservbyname(char *"name );
+.BI "char *getservbyport(tcpport_t "port ", char * "buf );
+.fi
+.SH DESCRIPTION
+The \fBgetservbyname()\fP function returns the standard port for
+the service with the name \fIname\fP. If no service is known then
+NULL is returned.
+.PP
+The \fBgetservbyport()\fP function copies into \fIbuf\fP (and returns 
+\fIbuf\fP) the service matching the standard port \fIport\fP. If no
+service is known then \fIport\fP is returned in ASCII form.
+
+.SH "RETURN VALUE"
+Detailed above.
+
+.SH NOTES
+These functions use a lookup table compiled into the ZSock kernel,
+it is not likely that method will change in the near future.
+
+.SH AUTHOR
+Dominic Morris <dom@jb.man.ac.uk>

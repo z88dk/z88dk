@@ -1,0 +1,87 @@
+lstoff
+
+;
+;	Package defines for ZSock
+;
+;	djm 11/2/2000
+;
+;	Because ZSock is a big package we have a single
+;	call to avoid the (large) overhead of switching in
+;	all the relevent banks for all the routines
+;
+
+	defc	package_id 	= $15
+
+	defc	tcp_inf		= $0015
+	defc	tcp_ayt		= $0215
+	defc	tcp_bye		= $0415
+	defc	tcp_dat		= $0615
+	defc	tcp_exp		= $0815
+
+; Standard ones out the way, now come package ones
+
+	defc	tcp_int		= $0A15
+	defc	tcp_all		= $0C15
+; Turn device on/offline - for slip stop sending packets
+	defc	tcp_offline	= $0E15
+	defc	tcp_online	= $1015
+; These two page in/out data segment (useful for daemons)
+	defc	tcp_pgin 	= $1215
+	defc	tcp_pgout 	= $1415
+	defc	tcp_GoTCP	= $1615	;busy loop for tcp
+
+
+; Reason codes for tcp_all (given to tcp_all in a)
+
+	defc	r_sock_write	= 0
+	defc	r_sock_putc	= 1
+	defc	r_sock_puts	= 2
+	defc	r_sock_flush	= 3
+	defc	r_sock_read	= 4
+	defc	r_sock_close	= 5
+	defc	r_sock_abort	= 6
+	defc	r_sock_shutdown	= 7
+	defc	r_sock_dataready	= 8
+	defc	r_sock_opened	= 9
+	defc	r_sock_closed	= 10
+	defc	r_sock_listen	= 11
+	defc	r_sock_open	= 12
+	defc	r_sock_settimeout = 13
+	defc	r_sock_chktimeout	= 14
+	defc	r_tcp_settimeout = 15
+	defc	r_tcp_setctimeout = 16
+	defc	r_tcp_chktimeout	= 17
+	defc	r_resolve		= 18
+	defc	r_reverse_addr_lookup	= 19
+	defc	r_getservbyname 	= 20
+	defc	r_getservbyport	= 21
+	defc	r_getservprotobyport = 22
+	defc	r_getservprotobyname = 23
+	defc	r_getprotobyname	= 24
+	defc	r_getprotobynumber = 25
+	defc	r_getnetbyname	= 26
+	defc	r_getnetbynumber	= 27
+	defc	r_getdomainname	= 28
+	defc	r_gethostaddr	= 29
+	defc	r_sethostaddr	= 30
+	defc	r_setnameservers	= 31
+	defc	r_getnetstat	= 32
+	defc	r_inet_addr	= 33
+	defc	r_inet_ntoa	= 34
+	defc	r_tcp_malloc		= 35
+	defc	r_tcp_calloc		= 36
+	defc	r_tcp_free		= 37
+	defc    r_tcp_regcatchall	= 38
+	defc	r_sock_setptr		= 39
+	defc	r_sock_getptr		= 40
+	defc	r_sock_sethandler	= 41
+	defc	r_sock_setrsize		= 42
+	defc	r_sock_setmode		= 43
+	defc	r_sock_waitopen		= 44
+	defc	r_killdaemon		= 45
+	defc	r_sock_waitclose	= 46
+	defc	r_sock_settos		= 47
+	defc	r_sock_setttl		= 48
+
+
+lston

@@ -1,0 +1,10 @@
+There may be slight differences between the portable and machine
+independent versions of the bogomips program. On my system (Linux
+1.0.9, 386DX-40, gcc 2.5.8) I get the same results, but they may vary
+with other compilers or processors. Compiling without optimization
+certainly makes a difference.
+
+When running on a new platform, look at the generated assembly
+code. The compiler might try to optimize out the delay() function. If
+so, compile with less optimization or try making the loop counter
+("i") volatile.

@@ -1,0 +1,55 @@
+
+
+
+sock_listen(3z)     z88dk Programmer's Manual     sock_listen(3z)
+
+
+NNAAMMEE
+       sock_listen - open a passive network connection
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//ssoocckkeett..hh>>
+
+       SSOOCCKKEETT **ssoocckk__lliisstteenn((iippaaddddrr__tt _i_p_d_e_s_t,, ttccppppoorrtt__tt _l_p_o_r_t,,
+                          vvooiidd _(_*_h_a_n_d_l_e_r_)_(_),, cchhaarr _p_r_o_t_o_)_;
+
+DDEESSCCRRIIPPTTIIOONN
+       The ssoocckk__lliisstteenn(()) function creates a socket descriptor for
+       a passive (i.e. listening) connection on local port  _l_p_o_r_t
+       awaiting a connection from host _i_p_d_e_s_t. At the moment only
+       protocols prot_UDP and prot_TCP are supported.
+
+       To accept connections from any host specify the  parameter
+       _i_p_d_e_s_t to be 0L.
+
+       The  parameter  _h_a_n_d_l_e_r  specifies  a handler to be called
+       whenever the connection changes state or new data arrives.
+       It should be the code for a package routine.
+
+       The  input parameters of the function _h_a_n_d_l_e_r vary depend-
+       ing on whether the socket is of type prot_UDP or prot_TCP.
+
+
+RREETTUURRNN VVAALLUUEE
+       ssoocckk__lliisstteenn(())  returns  a  socket descriptor. Specifying a
+       non support protocol will result in the carry  flag  being
+       set and the return value being EPROTONOSUPPORT.
+
+
+SSEEEE AALLSSOO
+       ssoocckk__ooppeenn(3z)
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

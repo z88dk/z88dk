@@ -1,0 +1,499 @@
+<HTML>
+<HEAD>
+<TITLE>Z88 Development Kit History File</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<A NAME="top"></A>
+<H1><CENTER>Z88 Development Kit</CENTER></H1>
+<P>
+
+<P>There seems to be little point carrying on with this file since the
+history is really contained in the "Whats New?" section, this file
+will continue to grow when I move old "What's New?" over to here.</P>
+
+
+<H2><A NAME="history"></A>Some past history</A></H2>
+
+<P><I>This is getting quite long, hence the re-location into a separate
+file where I can rabbit on about the changes I made to my hearts
+content!</I></P>
+
+<P>As a recap on the versions between v0.66 of the compiler and
+whatever the last release beneath was (v0.55?) here are the important
+new features:</P>
+
+<UL>
+	<LI> Initialising xx *[]= { ,,, } types now works properly
+	<LI> Auto variables can be initialised
+	<LI> sizeof() now works on structure members
+	<LI> Casts now slightly more cast like
+	<LI> goto now works a lot better than before
+	<LI> Octal constants are now understood	
+	<LI> Bug fixes (lots!)
+	<LI> Optimisatioin rules (lots!)
+	<LI> More lib functions
+</UL>
+
+
+
+<P>New for v1.2 on v1.1 are the following features:</P>
+
+<UL>
+        <LI> Menus and topics (v1.1p2)
+        <LI> Help for menus and topics (v1.1p3)
+        <LI> Reduction of startup codesize for good apps (v1.1p4)
+        <LI> Application Mailboxing (v1.1p4)
+        <LI> Exit function rewritten to return exit code (eg for displaying
+of error box for z88 apps)
+        <LI> Corrected bug in prototyping which could produce spurious errors (v1.1p4)
+        <LI> More example apps (v1.1p3,v1.1p4)
+        <LI> Even more optimization rules &lt;grin>
+        <LI> Support for new z80asm v1.0.10 features (this version is the minimum supported!)
+        <LI> New mini(f)printf functions which are automagically utilised (you can of course use them explicitly!)
+        <LI> fcntl.h library routines
+        <LI> static [type] outside of function or in function definition
+correctly limits the scope
+        <LI> ...details on the changes for a particular patch can always
+be found in the readme.1st file in the root directory
+</UL>
+<P>New for v1.1 of Z88dk (sccz80 v0.55) are the following features:</P>
+
+<UL>
+        <LI> Z88 <A HREF="apps.html">applications</A> can now be created!
+        <LI> \n is now correctly interpreted by the library routines - no
+need for \l anymore
+        <LI> enums are implemented
+        <LI> typedef is now accepted (kept as a storage class)
+        <LI> Casts are now implemented
+        <LI> Improved error/warning messages and handling
+        <LI> Fixed ? operator - sometimes it would test for longs instead
+of for ints (operator to the left of ? is always evaluated as an int)
+        <LI> Code generated for far access should be a lot better (ie work!) [store entry methods may still change]
+        <LI> Improved frontend and the ability to link libraries in easily
+        <LI> Improved ability to retarget compiler for other Z80 systems
+        <LI> Yeah, you guessed, more optimization rules!
+</UL>
+
+
+<P>New for v0.52 of the compiler are the following features:</P>
+
+<UL>
+        <LI> Assembler <A HREF="#macros">Macros</A> using the asm() construct
+        <LI> String concatenation (for string constants)
+        <LI> Ability to initialise global (*func)() types
+        <LI> Sizeof now works on all variables
+        <LI> Even more correct prototypes!
+        <LI> Correct initialisation of intialised local statics
+        <LI> Fixed long constant loading (I broke it last time!)
+        <LI> Added new library functions for unsigned >> ops
+        <LI> Lots of little things changed, code tidied up etc
+        <LI> Yup, more optimization rules, and fixed a bug in them which could crash copt if it was feeling awkward
+        <LI> -lmz flag for zcc to automagically use Z88math
+        <LI> WarpUp binaries for sccz80, copt, zcpp
+</UL>
+
+<P>New for v0.49 of the compiler are the following features:</P>
+
+<UL>
+        <LI>Proper function prototyping
+        <LI>ANSI style function definitios
+        <LI>Type checking on function calls (if prototyped) and promotion
+as necessary
+        <LI>More rigorous type conversion in general
+        <LI>Initialisation of local statics (except for doubles)
+        <LI>Correct initialisation of char arrays in structs
+        <LI>Use of the literal queue for char *ptr="[text]"; (previously
+initialisation was achieved via a ASMPC+2 style construct)
+        <LI>Ability to do sizeof() of const char string eg sizeof("fish")
+        <LI>Type specifiers LUS for numeric constants
+        <LI>Redirectable stdin, stdout, stderr
+        <LI>Fixed feof(),getc(), added ftell(),getpos(),gets(),putc()
+        <LI>More optimization rules (including a speed(!) one!)
+        <LI>Rejigged front end allowing easy retargetting of the compiler
+for other Z80 machines
+        <LI>Hopefully memory leak free WinSucks version
+        <LI>Z80asm v1.0.5
+</UL>
+
+<HR WIDTH="20%">
+
+<P><H4>Release v0.52 22/3/99</H4></P>
+
+<P>Does anyone actually read this file? Anyway, I've had enough of this
+compiler for the moment so this is the first Aminet version (no doubt to
+be followed by another later this week!) Lots of fixes in this release
+and a couple of extensions as well, but if you've read the docs you'll
+know that of course!</P>
+
+<HR WIDTH="20%">
+
+<P><H4>Pre-release v0.51 18/3/99</H4></P>
+
+<P>This is just getting silly! Everytime I say I want to release it I
+go through a spurt of adding new features, new this time are:</P>
+
+<UL>
+        <LI> Correct initialisation of local statics (oops, forgot to
+give the size to the initials function!)
+        <LI> Ability to set pointers to functions equal to a function name in static declarations
+        <LI> Sizeof now works on all variables (except for those passed to a function and obviously kicks up a fuss about functions!)
+        <LI> What, you want more, do you really want my blood?
+        <LI> Okay then...fixed the string.h file - missing comma!
+        <LI> Just for you...another optimization rule
+</UL>
+
+<HR WIDTH="20%">
+
+<P><H4>Pre-release v0.50 17/3/99</H4></P>
+
+<P>Corrected a few silly problems with function return values
+(prototyping), killed a silly error, added the -Wnone flag.<p>
+
+<HR WIDTH="20%">
+
+<P><H4>Pre-release v0.49 16/3/99</H4></P>
+
+<P>Hopefully the same as v0.48d?</P>
+
+<HR WIDTH="20%">
+
+<P><H4>Pre-release v0.48[a-e] 5-14/3/99</H4></P>
+
+<P>Internal release. This version saw a substantial rejigging of the
+compiler code to allow almost error free compilation - gcc -Wall is
+now without errors (I'm not going to bother with -pedantic!) Several
+annoying bugs which only showed up on Linux were fixed. Memory leaks
+on Winblows were sorted out (sassen frassen). Full prototypes make their
+appearance for the first time in Small C (is it right to call it Small
+C anymore?)</P>
+
+<HR WIDTH="20%">
+
+<P><H4>Pre-release v0.47 3/3/99</H4></P>
+
+<P>Internal bug fix release only</P>
+
+<HR WIDTH="20%">
+
+
+<P><H4>Pre-release v0.46 2/3/99</H4></P>
+
+<P><B>zcc</B> Added provison for a second layer of optimization and a few
+other tweaks. Sorted out a few problems which would have arisen in multi-module programs which used floating point operations. Also allowed
+the order of input files to be irrelevant (previously the file with main() had to be the first in the list.</P>
+
+<P><B>copt</B> Second rule file for optimization of logical operations
+on unsigned chars as well as a few other simple optimizations.</P>
+
+<P><B>sccz80</B> Fixed lots of bugs in cc6.c regarding calling of long functions (mainly missed out else statements!), squashed bugs in +/- calling for long functions (stack was not being equalised correctly),
+sorted out the widenlong() function in cc5.c so that chars/ints are 
+correctly extended to longs (regardless of sign). Sorted out representation
+of negative long constants, countless other bug fixes to long routines.</P>
+
+<P>Improved the handling of -no-header (this is used to compile library
+sources which are in C) so now it does something useful. It's also now
+possible to overwrite library functions for a particular program (in
+principle at least) - though are you sure you want to do this?</P>
+
+<P><B>library</B> Almost completely rewritten the library routines for long
+- there were so many silly mistakes here it amazes me that <I>no one</I>
+actually
+spotted them, I've extensively tested them, and am fairly confident that
+they all work now. Some sample problems that I came across l_long_sub calculated b-a instead of a-b l_long_inc/dec were completely fubarred.
+Comparison routines were complete nonsense (some more so than others) - 
+mostly due to the l_long_sub bug/feature &ltgrin&gt. In summary it
+transpires that what with bugs in the compiler and in the libraries that
+any code utilising longs would <I>never</I> have worked.</P>
+
+<P>There's also lots of new string functions as well as some new ctype
+functions. Also all new is a malloc() system.</P>
+
+
+<HR WIDTH="20%">
+
+<P><H4>Pre-release v0.45 ??/2/99</H4></P>
+
+<P>This release only got as far as Dennis, it's the release that first
+saw the introduction of the config file for zcc.</P>
+
+<HR WIDTH="20%">
+
+<P><H4>Pre-release v0.44 19/1/99</H4></P>
+
+<P>I hope you all had a good holiday season and are ready to start
+attempting to trip the compiler up once more!</P>
+
+<P>A new frontend with this edition, and at last meaningful flags for
+the compiler. Also new is support for Z88 maths routines - there is
+something fishy somewhere in the code though - the cube.c example
+refuses to work correctly and I'm baffled!</P>
+
+<P>Fixed a problem with #pragma asm/endasm statements - they weren't being
+parsed correctly.</P>
+
+
+<HR WIDTH="20%">
+
+<P><H4>Pre-release v0.43 2/12/98</H4></P>
+
+<P>A bit of a little bug fix release really, I noticed a few problems
+with the generated code and though I'd better fix them sharpish (The 
+classic one is of course getting the size of integer incorrect!). There's
+also a new demo program - Dstarz88</P>
+
+<HR WIDTH="20%">
+
+<P><H4>Pre-release v0.42 29/11/98</H4></P>
+
+<P>Far pointers have been implemented, hopefully correctly, declare as
+you would a normal pointer but prefix by "far". No support routines have
+been written for them, so nothing will compile if you use them <grin>,
+but have a look at the assembler file and see whether it is as you would
+expect it to be. [See <A HREF="far.html">far.html</A> for descriptions
+of the proposed routines!]</P>
+
+<P>I've also done a bit of fixing up of longs, so now you can set them
+equal to a constant correctly! And finally, yes I know I've been saying
+it for the past x releases, but longs should work properly know - I've
+fixed up long comparisions in if statements, and it's also possible to
+switch via a long (untested!). Also added is a lot of
+type-checking so
+that you get warnings if you try to equate/do arithmetic on different
+signed values (obviously not applicable for +/-).
+<I>This behaviour isn't ANSI atm, in the future I'll fix it so promotion
+to unsigned takes place.</I>
+Also, warnings pop up
+if you do int<->ptr conversions - it's not really a good idea to do these
+sort of things if you want your code to be portable! [Code will still
+be generated, but side effects might occur!]</P>
+
+<P>Fixed the "bug" in the 16 bit divide routines - I got the input
+parameters the wrong way round, an ex de,hl solves all! Did a small mod
+in crt0/l_mult to change rl a to rla (DLE).</P>
+
+
+<CENTER><HR WIDTH="20%"></CENTER>
+
+<P><H4>Pre-release v0.41 17/11/98</H4></P>
+
+<P>This and v0.40 were released concurrently, this version adds literal
+queue compression to save memory in the resulting executable - it works
+remarkable well and saves almost 180 bytes in the cube demo, in programs
+with lots of text even more should be saved.</P>
+
+<CENTER><HR WIDTH="20%"></CENTER>
+
+<P><H4>Pre-release v0.40 16/11/98</H4></P>
+
+<P>Another long pause <grins> However, to make it worth your while I've
+come back with a cracker - hopefully longs will now be functioning
+correctly. I've changed the manner in which they were stored when calling
+library functions - now like doubles they are stored on the stack instead
+of in the alternate registers, this makes for much nicer code that will
+work as opposed to code that might work! To celebrate this I've written
+32 bit multiplication and division routines!</P>
+
+<P>Also rewritten are the 16 bit multiply and divide routines (they're
+now a little small and hopefully faster), and I've finally got the (l)abs
+routines right..or at least I hope so!</P>
+
+<P>Labels in the compiler are now prefixed by a smc_ to avoid potential
+label clashes with routines in the library. A little bit more work has
+be done on long pointers though they still won't work! [I'm gonna hate
+sorting that out!]</P>
+
+<P>Barring any major hiccups I think the compiler is almost ready for its
+first public release, any comments?</P>
+
+<CENTER><HR WIDTH="20%"></CENTER>
+
+
+<P><H4>Pre-release v0.39 20/10/98</H4></P>
+
+<P>Apologies for the long delay in releasing this - I've been kinda tied
+up with other things of late! Anyway, it's now here and the compiler now
+fixes a few things like signed chars (dumb mistake by me) and the
+initialisation of aggregates.</P>
+
+<P>In the library functions it's been big change time - the graphic
+functions have been rewritten so that they page in the map bank each
+time (previously it was (rather sloppily!)) just left paged in permanently.
+As predicted this caused a "few" problems! There's an integer printf
+function - use only if absolutely necessary - even after <I>serious</I>
+hand optimization (It took a whole evening!!) it still weighs in at around
+2k. The exit() function has been rewritten to cope with the atexit()
+function which someone might possibly care to use.
+More serious problems are avoided by insertion of the correct case/switch
+function! Ooops, that one was hanging around waiting to clobber people!</P>
+
+<CENTER><HR WIDTH="20%"></CENTER>
+
+
+<P><H4>Pre-release v0.38 8/10/98</H4></P>
+
+<P>Implemented the local static variable storage class and fixed a few
+minor problems in sccz80 with filenames, removed some obsolete code,
+removed the prototypes for malloc and exit from ccfunc.h and included
+stdlib.h where appropriate.</P>
+
+<P>Corrected the strings.h include file and altered the strncmp() library
+function to be more efficient and smaller (DLE), found the minusfa fp
+routine and put it in mathsupp/ along with odd. Altered the double <=
+function so it has the label dleq so to avoid clash with a defc in
+cntlchar.def - hopefully fp programs will now compile?</P>
+
+<CENTER><HR WIDTH="20%"></CENTER>
+
+<P><H4>Pre-release v0.37 6/10/98</H4></P>
+
+<P>The last two releases never got very far due to problems with
+prototyping. This new release fixes those, and adds another batch of
+library functions - investigate the headers for more details!</P>
+
+<P>This release is only supplied as a complete archive because I've
+completely reorganised the libsrc/ directory and added several new files -
+it's much easier to start again that to create a set of patch
+distributions!</P>
+
+<P>Hopefully I've finally(!) fully implemented unsigned datatypes - they
+are now scanned for in function definitions, also a bare unsigned results
+in an unsigned int being produced. Removed the int and word datatypes -
+silly! In the source code spent a lot of time prototyping certain functions
+to knock some warnings off a -Wall compilation.</P>
+
+<P>Allowed for longer include filenames than 16! This also prevents
+possible segmentation faults - which solves the Amiga "gcc" problem and quite a few others I imagine as well!</P>
+
+<P>The keywords register and auto are parsed for in statement() though
+they are silently ignored.</P>
+
+<P>There's a very big bugfix for this release, dereferencing of pointers
+are now resolved correctly and generate good code - this was broken since
+v0.33 and was due to the incorrect assignment of one variable in the
+primary() function. This took me about 4 hours to track down and correct!
+Many thanks to David Earlam for putting me onto the trail for this one.</P>
+
+<P>There's also another optimization rule which optimizes some more of
+the structure referencing code.</P>
+
+<CENTER><HR WIDTH="20%"></CENTER>
+
+<P><H4>Pre-release v0.36 29/9/98</H4></P>
+ 
+<P><B>sccz80</B> Pesky prototypes again, now they're done with #pragma proto and #pragma unproto, these will now work with the Borland pp. </P>
+ 
+<P>Hopefully sorted out the gcc crash problem, this was due to not checking
+whether a pointer to struct was set or not, if unset the compiler tried to
+reference an address in low memory and this seems to have upset the memory
+protection agent, though why it should also do this on the Amiga which has
+no memory protection is a tad strange.</P>
+ 
+<P>Implemented Dennis' startup code so a BASIC program is generated which 
+contains the compiled code as well making life that little bit easier!</P>
+ 
+<P>Added a couple more optimizing rules.</P>
+
+<CENTER><HR WIDTH="20%"></CENTER>
+ 
+<P><H4>Pre-release v0.35 28/9/98</H4></P>
+ 
+<P><B>sccz80</B> (Almost) ANSI function definitions have been implemented. 
+Fixed the distinguishing of prototypes by implementing #proto/#unproto. The
+previous fix used #defines which were swallowed by the preprocessor.</P>
+
+<P>Fixed a problem that arose after v0.32 due to over-zealous use of the
+delete line key!</P>
+
+<CENTER><HR WIDTH="20%"></CENTER>
+
+<P><H4>Pre-release v0.34 22/9/98</H4></P>
+
+<P><B>sccz80</B> Made the error messages much more legible (i.e. ala Dice),
+corrected a nasty hang which could result if a symbol wasn't found by end
+of file, made the differentiation between library functions and external
+functions in other modules.</P>
+
+<P><B>Includes</B> Implemented the slightly kludgey (but it works!) way of
+ensuring that prototypes here do reference the library functions.</P>
+
+<CENTER><HR WIDTH="20%"></CENTER>
+
+
+<P><H4>Pre-release v0.33 14/9/98</H4></P>
+
+<P><B>sccz80</B> Implemented the long data type and the associated libraries.
+</P>
+
+<CENTER><HR WIDTH="20%"></CENTER>
+
+<P><H4>Pre-release v0.32 12-13/9/98</H4></P>
+
+<P><B>sccz80</B> Changed the maximum line length to 192 (so as to get 
+enigma_sc to compile!), and altered the assembler label length from 8 to 32.
+</P>
+
+<P>The big modification is the use of the signed and unsigned keywords - this
+actually affects the code being produced and hence should work! A small
+warning (which I shouldn't really need to state :) is that don't try doing
+functions on combinations of the two, really weird things will result
+otherwise!</P>
+
+<P><B>Libraries</B> Corrected a few label problems in the l_mul and l_lt 
+library functions.</P>
+
+<P><B>Optimizer</B> Put some of the rules in the correct order so that they
+don't prevent other optimizations being made.</P>
+
+<P><B>zcc</B> New pass through to the compiler for -e (stop on errors) and -f
+(implicitly define all ints and chars as unsigned.)</P>
+
+<P><B>Startup code</B> Installs a simple error handler which will trap
+escapes to stop those annoying hangs. Pressing escape will abort the program (much like Ctrl+C does on other computers).</P>
+
+<CENTER><HR WIDTH="20%"></CENTER>
+
+<P><H4>Pre-release v0.31 8/9/98</H4></P>
+
+<P><B>sccz80</B> Corrected a few problems in the definition of extern and
+static variables (assembler output) - programs should now compile and
+execute correctly!</P>
+
+<P>Restored the data type of external pointer (lost in the conversion over to
+Small C+). Allowed the explicit use of static for global variables. Created a
+fake data size of void (which is effectively int) for functions, thus allowing
+more code to compile with fewer changes.</P>
+
+<P><B>zcc</B> Allowed passing of -A flag to the <A HREF="#compiler">compiler
+</A></P>
+
+<CENTER><HR WIDTH="20%"></CENTER>
+
+
+<P><H4>Pre-release v0.3 6/9/98</H4></P>
+
+<P>The most important change is that to the Small-C+ compiler which has more features than the original Small-C and will allow the compilation of
+many more programs.</P>
+
+<P>Have moved all of the runtime functions previously held in z88_crt0.asm
+into library functions so will only be linked in if needed, this has a
+dramatic effect at reducing the size of the produced binaries. Hopefully
+all the cross references have been resolved correctly.</P>
+
+<CENTER><HR WIDTH="20%"></CENTER>
+
+<P><H4>Pre-release v0.2 August 1998</H4></P>
+
+<P>Added a lot of untested library functions, and a driver.</P>
+
+<CENTER><HR WIDTH="20%"></CENTER>
+
+<P><H4>Pre-release v0.1 August 1998</H4></P>
+
+<P>First release of the Z80 compatible Small-C compiler based on the zcc
+v0.96 sources by Ken Yap. Very minimal, just enough to compile Hello
+World.</P>
+
+<HR>
+Back to <A HREF="zcc.html">main doc file</A>
+</BODY>
+</HTML>

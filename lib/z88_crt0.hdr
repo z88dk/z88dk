@@ -1,0 +1,173 @@
+;
+;       This file is included by every module
+;       To handle multi module programs which use floating point
+;       routines in different modules, we have got rid of
+;       the conditional assembly around the float routines
+;
+
+;
+;       XREF    for graphics fns
+;
+        XREF    base_graphics
+
+; Far->near lib conversion
+	XREF	_cpfar2near
+
+; Process interrupt variable (**for apps only**)
+	XREF	packintrout
+
+;Standard XREF for startup library..
+
+
+        XREF    l_dcal
+        XREF    cleanup
+
+;Hooks for library functions
+
+	LIB    l_getptr
+	LIB    l_putptr
+        LIB    l_gchar
+        LIB    l_sxt
+        LIB    l_gint
+	LIB    l_gint_eq
+	LIB    l_ghtonsint
+        LIB    l_pint
+	LIB    l_pint_eq
+        LIB    l_or
+        LIB    l_xor
+        LIB    l_and
+        LIB    l_eq
+        LIB    l_ne
+        LIB    l_gt
+        LIB    l_le
+        LIB    l_ge
+        LIB    l_lt
+        LIB    l_uge
+        LIB    l_ult
+        LIB    l_ugt
+        LIB    l_ule
+        LIB    l_cmp
+        LIB    l_ucmp
+        LIB    l_asr
+	LIB    l_asr_u
+        LIB    l_asl
+        LIB    l_sub
+        LIB    l_neg
+        LIB    l_com
+        LIB    l_lneg
+        LIB    l_bool
+        LIB    l_cm_de
+        LIB    l_cm_bc
+        LIB    l_deneg
+        LIB    l_bcneg
+        LIB    l_case
+        LIB    l_mult
+        LIB    l_div
+        LIB    l_div_u
+
+;Long functions now
+
+              LIB     l_int2long_s
+              LIB     l_long2int_s
+              LIB     l_glong
+              LIB     l_long_add
+              LIB     l_long_and
+              LIB     l_long_asl
+              LIB     l_long_asr
+	      LIB     l_long_aslo
+	      LIB     l_long_asro
+              LIB     l_long_bool
+              LIB     l_long_cmp
+              LIB     l_long_com
+              LIB     l_long_eq
+              LIB     l_long_ge
+              LIB     l_long_gt
+              LIB     l_long_le
+              LIB     l_long_lneg
+              LIB     l_long_lt
+              LIB     l_long_ne
+              LIB     l_long_neg
+              LIB     l_long_or
+              LIB     l_long_sub
+              LIB     l_long_ucmp
+              LIB     l_long_uge
+              LIB     l_long_ugt
+              LIB     l_long_ule
+              LIB     l_long_ult
+              LIB     l_long_xor
+              LIB     l_plong
+              LIB     l_inclong
+              LIB     l_declong
+              LIB     l_long_div
+              LIB     l_long_div_u
+              LIB     l_long_mult
+              LIB     l_long_asr_u
+	      LIB     l_long_asr_uo
+              LIB     l_long_case
+
+
+
+
+;Now XREF for floating routines
+;
+;Since we're using startup module and are distancing that from here,
+;we might as well set these permanently - djm 29/2/99
+
+
+        XREF  DADD
+        XREF  DDIV
+        XREF  DGE
+        XREF  DIV1
+        XREF  DIV17
+        XREF  DLOAD
+        XREF  DLDPSH
+        XREF  DMUL
+        XREF  DSTORE
+        XREF  DSWAP
+        XREF  DSUB
+        XREF  DEQ
+        XREF  DGT
+        XREF  DLEq      ;djm 7/10/98
+        XREF  DLT
+        XREF  DNE
+        XREF  DPUSH
+        XREF  DPUSH2
+        XREF  FA
+        XREF  extra
+        XREF  FADD
+        XREF  FDIV
+        XREF  FMUL
+        XREF  FSUB
+;        XREF  GRIPE   
+        XREF  PUSHF2
+        XREF  LDBCFA
+        XREF  LDBCHL
+        XREF  LDFABC
+        LIB   MINUSFA   ;negate FP number
+        XREF  NORMA
+        LIB     ODD
+        XREF  PUSHFA
+        XREF  SGN
+;        XREF  OFLOW
+        XREF  FASIGN
+        XREF  NORM
+        XREF  COMPARE
+        XREF  INT2
+        XREF  PI
+        XREF  HALFPI
+        LIB   float              ;Convert int to float
+	LIB   ufloat		 ;unsigned int to float
+        LIB   ifix               ;Convert float to int
+
+; Far lib functions (in appropriate malloc lib)
+
+	LIB	lp_gchar
+	LIB	lp_gdoub
+	LIB	lp_gint
+	LIB	lp_glong
+	LIB	lp_gptr
+	LIB	lp_pchar
+	LIB	lp_pdoub
+	LIB	lp_pint
+	LIB	lp_plong
+	LIB	lp_pptr

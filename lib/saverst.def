@@ -1,0 +1,23 @@
+lstoff
+
+; Standard Z88	Operating	System manifests:
+
+; The information below is defined	in Developers Notes, release 3.00
+; (c) Cambridge Computer	1989
+
+; Save / Restore manipulation:
+; (screen, application mailbox, Page wait & Application card management)
+
+	DEFC	Os_Sr  = $6C			; Save & Restore
+	; arguments:
+	DEFC	SR_SUS = $01			; Save user screen
+	DEFC	SR_RUS = $02			; Restore	user	screen
+	DEFC	SR_WPD = $03			; Write parameter data (mailbox)
+	DEFC	SR_RPD = $04			; Read parameter data (mailbox)
+	DEFC	SR_FUS = $05			; Free user screen (released,	not displayed)
+	DEFC	SR_CRM = $06			; Remvove	card	(not	implemented)
+	DEFC	SR_CIN = $07			; Insert card	(not	implemented)
+	DEFC	SR_PWT = $08			; Page wait
+	DEFC	SR_RND = $09			; Occasionally	a random number (system use)
+
+lston

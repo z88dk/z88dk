@@ -1,0 +1,46 @@
+
+
+
+getprotobyname(3z)  z88dk Programmer's Manual  getprotobyname(3z)
+
+
+NNAAMMEE
+       getprotobyname, getprotobynumber  - get protocol entry
+
+SSYYNNOOPPSSIISS
+       ##iinncclluuddee <<nneett//rreessoollvv..hh>>
+
+       iinntt ggeettpprroottoobbyynnaammee((cchhaarr **_n_a_m_e));;
+       cchhaarr **ggeettpprroottoobbyynnuummbbeerr((iinntt _p_r_o_t_o_c_o_l,, cchhaarr ** _b_u_f));;
+
+DDEESSCCRRIIPPTTIIOONN
+       The  ggeettpprroottoobbyynnaammee(()) function returns the standard number
+       for the protocol with the name _n_a_m_e.  If  no  protocol  is
+       known then NULL is returned.
+
+       The  ggeettpprroottoobbyynnuummbbeerr(())  function  copies  into  _b_u_f  (and
+       returns _b_u_f) the protocol matching  the  _p_r_o_t_o_c_o_l.  If  no
+       protocol is known then _p_r_o_t_o_c_o_l is returned in ASCII form.
+
+
+RREETTUURRNN VVAALLUUEE
+       Detailed above.
+
+
+NNOOTTEESS
+       These functions use a lookup table compiled into the ZSock
+       kernel,  it  is  not likely that method will change in the
+       near future.
+
+
+AAUUTTHHOORR
+       Dominic Morris <dom@jb.man.ac.uk>
+
+
+
+
+
+
+                         18 February 2000                       1
+
+

@@ -1,0 +1,47 @@
+z88dk New Stdio Library - 4/4/2000 djm
+
+Yup, after ages of promising I've finally gotten around to updating the
+crusty stdio of z88dk. This new library finally dumps the equivalence of
+file handles and streams and hence brings the model more into line with
+libraries for "big C"
+
+The library is now highly portable across machines - to gain basic
+functionality on another machine just 3 functions have to be written -
+write character to console, read character from console and read string
+from console.
+
+At the moment for simplicities sake, file streams are not buffered, though
+adding buffering should be fairly trivial - if there is enough
+demand/clamouring then I can add it.
+
+It is highly recommended that your programs use the new library (it is the
+default and simply recompiling will enable support) even though it is
+slightly larger it offers many advantages:
+
+- Standard ANSI return values (I hope)
+- Standard ANSI functions (gets() is now defined correctly, and other
+functions behave in a standard manner (eg putchar() will now output to
+whatever stdout is instead of always to the console)
+- An ungetc() function - hurrah!
+- All streams are closed on program exit
+- minisprintf now uses the minivfprintf core routine and thus now supports
+long datatypes
+- freopen(_z88) is now available
+
+There are some as yet unresolved disadvantages:
+
+- Your program becomes slightly larger
+- A maximum of 7 open streams (10 in total including std*)
+
+This last point is not a particular disadvantage - you can of course open
+files using open() and creat() however files opened this way are /not/
+automatically closed on program exit.
+
+Should you wish to use the old stdio routines then do a #define FDSTDIO 1
+before including <stdio.h> and link with -lz88 and you can use them,
+however you should note that the printf() family of functions is not
+available.
+
+djm
+4/4/2000
+
