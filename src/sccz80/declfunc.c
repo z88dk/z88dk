@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.5 2003-04-20 16:11:11 dom Exp $
+ *      $Id: declfunc.c,v 1.6 2004-03-23 08:52:19 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -522,7 +522,7 @@ SYMBOL *currfn;
 
 int CheckANSI()
 {
-        if (rmatch("unsigned") || rmatch("signed") || rmatch("int") || rmatch("char") || rmatch("double") || rmatch("long") || rmatch("struct") || rmatch("union") || rmatch("void") || rmatch("far") || rmatch("near") || rmatch("const") || rmatch("volatile") || rmatch("__TD__") || rmatch("float") || rmatch("register") || CheckTypDef() ) return (YES);
+        if (rmatch("unsigned") || rmatch("signed") || rmatch("int") || rmatch("char") || rmatch("double") || rmatch("long") || rmatch("struct") || rmatch("union") || rmatch("void") || rmatch("far") || rmatch("near") || rmatch("const") || rmatch("volatile") || rmatch("__TD__") || rmatch("float") || rmatch("register") || rmatch("short") || CheckTypDef() ) return (YES);
         return (NO);
 }
 
