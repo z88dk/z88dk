@@ -3,10 +3,8 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-	XREF	base_graphics
-
 ;
-;	$Id: pixladdr.asm,v 1.3 2002-04-17 21:30:24 dom Exp $
+;	$Id: pixladdr.asm,v 1.4 2004-06-30 12:50:56 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -37,6 +35,8 @@
 ;              pixels stored in a byte minus 1, AF and DE are corrupt,
 ;              and all others are preserved
 
+	XDEF	grayaltpage
+
 
 .pixeladdress
 
@@ -53,9 +53,17 @@
 	ld	e,l
 
 	ld	a,c
-	
-	and	b
-	xor	b
+
+	ld	c,-1
+.loopa
+	inc	c
+	rra
+	jr	nc,loopa
+
+	ld	a,c
+
+.grayaltpage
+	nop
 
 	ret
 

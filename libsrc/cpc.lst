@@ -99,7 +99,7 @@ graphics/circle
 graphics/cpc/clg
 graphics/clga
 graphics/clrarea
-graphics/dcircle
+graphics/dcircle2
 graphics/draw
 graphics/drawb
 graphics/drawr
@@ -127,7 +127,7 @@ graphics/xorpixl
 graphics/setxy
 graphics/fill
 graphics/dfill
-graphics/putsprite
+graphics/putsprite3
 graphics/getsprite
 graphics/bksave
 graphics/bkrestore

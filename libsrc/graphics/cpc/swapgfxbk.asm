@@ -1,25 +1,23 @@
 ;
 ;       Page the graphics bank in/out - used by all gfx functions
-;       (Doesn't really page on the Amstrad CPC.
+;       Doesn't really page on the Amstrad CPC.
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.3 2002-04-17 21:30:24 dom Exp $
+;	$Id: swapgfxbk.asm,v 1.4 2004-06-30 12:50:56 stefano Exp $
+;
+;	There might be something to put here; it looks like the
+;	alternate registers and/or the index registers have to be
+;	handled carefully
 ;
 
                 XLIB    swapgfxbk
 
 		XDEF	swapgfxbk1
 
-;.asave	defb	0
-
 .swapgfxbk
-;		ex	af,af
-;		ld	(asave),a
-;		ex	af,af
-;		ret
+		;di
+		;ret
 
 .swapgfxbk1
-;		ex	af,af
-;		ld	a,(asave)
-;		ex	af,af
+		;ei
                 ret
