@@ -17,7 +17,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.5 2002-01-08 16:17:27 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.6 2002-04-17 21:30:26 dom Exp $
 ;
 
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"

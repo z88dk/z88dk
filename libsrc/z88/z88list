@@ -37,3 +37,4 @@ fdstdio/fdfputs
 fdstdio/putcons
 fdstdio/putn
 fdstdio/settxy
+fnexpand

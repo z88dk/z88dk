@@ -6,7 +6,7 @@
 ; ZX Spectrum version (speeded up with a row table)
 ;
 ;
-; $Id: putsprite.asm,v 1.2 2002-03-18 10:35:55 stefano Exp $
+; $Id: putsprite.asm,v 1.3 2002-04-17 21:30:25 dom Exp $
 ;
 
 	XLIB    putsprite

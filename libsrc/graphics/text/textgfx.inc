@@ -7,7 +7,7 @@
 ;       Define for graphics and other standard library functions
 ;
 ;
-;	$Id: textgfx.inc,v 1.2 2002-02-01 14:37:50 stefano Exp $
+;	$Id: textgfx.inc,v 1.3 2002-04-17 21:30:25 dom Exp $
 ;
 
 IF FORc128

@@ -10,7 +10,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.2 2001-09-11 16:00:53 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.3 2002-04-17 21:30:26 dom Exp $
 ;
 
 	XLIB	ansi_CHAR

@@ -3,7 +3,7 @@
 ;
 ;	I've never tested this function, hope it works. Daniel
 ;
-;	$Id: syscall1p.asm,v 1.2 2001-09-03 16:13:20 dom Exp $
+;	$Id: syscall1p.asm,v 1.3 2002-04-17 21:30:25 dom Exp $
 
 		XLIB	syscall1p
 

@@ -6,7 +6,7 @@
 	INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: pixladdr2.asm,v 1.1 2002-02-27 13:12:26 stefano Exp $
+;	$Id: pixladdr2.asm,v 1.2 2002-04-17 21:30:25 dom Exp $
 ;
 
 ; ******************************************************************

@@ -2,7 +2,7 @@
 ;	Generic game device library
 ;	Stefano Bodrato - 20/8/2001
 ;
-;	$Id: joystick.asm,v 1.1 2001-08-20 14:08:18 stefano Exp $
+;	$Id: joystick.asm,v 1.2 2002-04-17 21:30:23 dom Exp $
 ;
 
 

@@ -7,7 +7,7 @@
 ;	Stefano Bodrato - 8/6/2001
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.1 2001-06-12 14:28:47 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.2 2002-04-17 21:30:26 dom Exp $
 ;
 
 	XLIB	fputc_cons

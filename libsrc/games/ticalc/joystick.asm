@@ -3,7 +3,7 @@
 ;	Stefano Bodrato - 21/8/2001
 ;	Henk Poley	- 03/9/2001
 ;
-;	$Id: joystick.asm,v 1.3 2001-09-07 07:45:45 stefano Exp $
+;	$Id: joystick.asm,v 1.4 2002-04-17 21:30:24 dom Exp $
 ;
 
 

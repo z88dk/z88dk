@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: draw.asm,v 1.5 2002-02-27 13:12:26 stefano Exp $
+;	$Id: draw.asm,v 1.6 2002-04-17 21:30:24 dom Exp $
 ;
 
 

@@ -6,7 +6,7 @@
 ; VZ200/300 version
 ;
 ;
-; $Id: putsprite.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+; $Id: putsprite.asm,v 1.4 2002-04-17 21:30:25 dom Exp $
 ;
 
 	XLIB    putsprite

@@ -6,7 +6,7 @@
 ; Generic version (just a bit slow)
 ;
 ;
-; $Id: putsprite.asm,v 1.4 2002-02-27 13:12:26 stefano Exp $
+; $Id: putsprite.asm,v 1.5 2002-04-17 21:30:24 dom Exp $
 ;
 
 	XLIB    putsprite

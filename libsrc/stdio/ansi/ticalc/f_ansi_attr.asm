@@ -9,7 +9,7 @@
 ;	Be careful here...
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.3 2002-04-17 21:30:26 dom Exp $
 ;
 
 	XLIB	ansi_attr

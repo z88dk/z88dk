@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - 18/5/2001
 ;
 ;
-;	$Id: getk.asm,v 1.1 2001-05-21 09:48:43 stefano Exp $
+;	$Id: getk.asm,v 1.2 2002-04-17 21:30:26 dom Exp $
 ;
 
 	XLIB	getk

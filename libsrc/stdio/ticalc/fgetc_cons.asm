@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - Dec 2000
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.5 2001-11-05 09:47:11 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.6 2002-04-17 21:30:26 dom Exp $
 ;
 
 		XLIB	fgetc_cons

@@ -10,7 +10,7 @@
 ;	By Stefano Bodrato - Dec. 2000
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.6 2001-04-18 13:21:38 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.7 2002-04-17 21:30:25 dom Exp $
 ;
 
 

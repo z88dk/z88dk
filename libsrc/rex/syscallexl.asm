@@ -4,7 +4,7 @@
 ;
 ; extern LONG SYSCALLEXL( int, ... );
 ;
-;	$Id: syscallexl.asm,v 1.4 2001-09-03 16:13:20 dom Exp $ 
+;	$Id: syscallexl.asm,v 1.5 2002-04-17 21:30:25 dom Exp $ 
 
 		XLIB	syscallexl
 

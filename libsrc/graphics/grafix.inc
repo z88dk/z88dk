@@ -9,7 +9,7 @@
 ;       Define for graphics and other standard library functions
 ;
 ;
-;	$Id: grafix.inc,v 1.7 2002-03-11 17:11:34 stefano Exp $
+;	$Id: grafix.inc,v 1.8 2002-04-17 21:30:24 dom Exp $
 ;
 
 

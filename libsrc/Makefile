@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.36 2002-02-13 13:39:15 stefano Exp $
+# $Id: Makefile,v 1.37 2002-04-17 21:30:23 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \

@@ -1,7 +1,7 @@
 ;
 ;	System Call for REX6000
 ;
-;	$Id: DsPrintf.asm,v 1.1 2001-09-03 16:13:20 dom Exp $
+;	$Id: DsPrintf.asm,v 1.2 2002-04-17 21:30:25 dom Exp $
 ;
 ;	DsPrintf (int, int, int, char*)
 ;

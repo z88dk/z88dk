@@ -1,5 +1,5 @@
 /*
-; $Id: bit_frequency.c,v 1.1 2001-10-16 18:03:03 dom Exp $
+; $Id: bit_frequency.c,v 1.2 2002-04-17 21:30:23 dom Exp $
 ;
 ; Generic 1 bit sound functions
 ; Beeps the right frequency

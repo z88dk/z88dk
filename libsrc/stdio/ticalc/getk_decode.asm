@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - Dec 2000
 ;
 ;
-;	$Id: getk_decode.asm,v 1.4 2001-04-13 14:14:00 stefano Exp $
+;	$Id: getk_decode.asm,v 1.5 2002-04-17 21:30:26 dom Exp $
 ;
 
 		XLIB	getk_decode

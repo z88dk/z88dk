@@ -9,7 +9,7 @@
 ;	Since some platform (expecially the TI83) has very little stack space,
 ;	we undersize it; this will cause a crash if a big area is filled.
 ;
-;	$Id: dfill.asm,v 1.5 2001-04-18 13:21:37 stefano Exp $
+;	$Id: dfill.asm,v 1.6 2002-04-17 21:30:24 dom Exp $
 ;
 
 	INCLUDE	"graphics/grafix.inc"

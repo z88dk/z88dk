@@ -9,10 +9,9 @@
 ;
 ;       *** Z88 SPECIFIC ROUTINE - UNTESTED!!! ***
 ;
-;       This functions needs Gunthers' standard.lib
 ;
 ; -----
-; $Id: getcwd.asm,v 1.3 2002-04-07 16:04:37 dom Exp $
+; $Id: getcwd.asm,v 1.4 2002-04-17 21:30:26 dom Exp $
 
                 INCLUDE "#syspar.def"
 		INCLUDE	"#memory.def"

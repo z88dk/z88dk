@@ -3,7 +3,7 @@
 ;	By Stefano Bodrato - summer 2000
 ;
 ; --------
-; $Id: clock.asm,v 1.3 2001-04-18 12:40:07 stefano Exp $
+; $Id: clock.asm,v 1.4 2002-04-17 21:30:26 dom Exp $
 
 
 	XLIB	clock

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.5 2001-05-03 09:16:24 dom Exp $
+# $Id: Makefile,v 1.6 2002-04-17 21:30:26 dom Exp $
 
 
 all: blah z88
@@ -11,7 +11,7 @@ blah:
 
 z88:	RegisterInt.o DeRegisterInt.o QueryPackage.o getpid.o nameapp.o \
 	wcopen.o wcnext.o wcclose.o exec_cli.o stripdev.o strippath.o \
-	openpopup.o openwindow.o opentitled.o
+	openpopup.o openwindow.o opentitled.o fnexpand.o
 	z80asm -d -ns -nm -Mo -x../z88 @z88list
 
 .c.o:

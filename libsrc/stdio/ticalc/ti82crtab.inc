@@ -2,7 +2,7 @@
 ;	TI 82 Key Table
 ;
 ;
-;	$Id: ti82crtab.inc,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;	$Id: ti82crtab.inc,v 1.3 2002-04-17 21:30:26 dom Exp $
 ;
 
 .TiKeyTab1

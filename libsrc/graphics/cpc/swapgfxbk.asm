@@ -3,7 +3,7 @@
 ;       (Doesn't really page on the Amstrad CPC.
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.2 2001-06-18 10:46:31 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.3 2002-04-17 21:30:24 dom Exp $
 ;
 
                 XLIB    swapgfxbk

@@ -8,7 +8,7 @@
 ; Generic version (just a bit slow)
 ;
 ;
-; $Id: getsprite.asm,v 1.5 2002-04-15 12:40:38 stefano Exp $
+; $Id: getsprite.asm,v 1.6 2002-04-17 21:30:24 dom Exp $
 ;
 
 	XLIB    getsprite

@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.1 2001-10-22 09:33:55 stefano Exp $
+; $Id: bit_open_di.asm,v 1.2 2002-04-17 21:30:24 dom Exp $
 ;
 ; Jupiter ACE 1 bit sound functions
 ;

@@ -2,7 +2,7 @@
 ;	Game device library for the ZX Spectrum
 ;	Stefano Bodrato - 20/8/2001
 ;
-;	$Id: joystick.asm,v 1.1 2002-01-21 21:33:04 dom Exp $
+;	$Id: joystick.asm,v 1.2 2002-04-17 21:30:24 dom Exp $
 ;
 
 	INCLUDE	"#zxvgs.def"

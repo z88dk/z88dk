@@ -4,7 +4,7 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
-;	$Id: g_clg.asm,v 1.3 2001-07-12 13:16:05 stefano Exp $
+;	$Id: g_clg.asm,v 1.4 2002-04-17 21:30:25 dom Exp $
 ;
 
 

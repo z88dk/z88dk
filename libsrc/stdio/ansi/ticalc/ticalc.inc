@@ -6,7 +6,7 @@
 ;	+ specific display metrics
 ;
 ;
-;	$Id: ticalc.inc,v 1.6 2001-11-05 09:47:07 stefano Exp $
+;	$Id: ticalc.inc,v 1.7 2002-04-17 21:30:26 dom Exp $
 ;
 
 	defc columns	= 32

@@ -5,7 +5,7 @@
 ;	again with Damjan's algorithm
 ;	Daniel
 ;
-;	$Id: syscall5p.asm,v 1.1 2001-09-03 16:13:20 dom Exp $
+;	$Id: syscall5p.asm,v 1.2 2002-04-17 21:30:25 dom Exp $
 
 		XLIB	syscall5p
 

@@ -4,7 +4,7 @@
 ; TI calculators version
 ;
 ;
-; $Id: bkrestore.asm,v 1.5 2002-03-12 11:39:17 stefano Exp $
+; $Id: bkrestore.asm,v 1.6 2002-04-17 21:30:25 dom Exp $
 ;
 
 	XLIB    bkrestore
