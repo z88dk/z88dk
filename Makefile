@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.17 2002-07-15 17:45:45 dom Exp $
+#	$Id: Makefile,v 1.19 2002-10-02 09:19:36 dom Exp $
 #
 
 prefix = /usr/local
@@ -41,14 +41,18 @@ config:
 libs:
 	cd libsrc ; $(MAKE)
 
+install-libs:
+	mkdir -p $(prefix)/lib/clibs
+	cp -R lib/clibs/* $(prefix)/lib/clibs/
+
 
 install:
-	cd src/appmake ; make PREFIX=$(prefix) install
-	cd src/copt ; make PREFIX=$(prefix) install
-	cd src/cpp ; make PREFIX=$(prefix) install
-	cd src/sccz80 ; make PREFIX=$(prefix) install
-	cd src/z80asm ; make PREFIX=$(prefix) install
-	cd src/zcc ; make PREFIX=$(prefix) install
+	cd src/appmake ; $(MAKE) PREFIX=$(prefix) install
+	cd src/copt ; $(MAKE) PREFIX=$(prefix) install
+	cd src/cpp ; $(MAKE) PREFIX=$(prefix) install
+	cd src/sccz80 ; $(MAKE) PREFIX=$(prefix) install
+	cd src/z80asm ; $(MAKE) PREFIX=$(prefix) install
+	cd src/zcc ; $(MAKE) PREFIX=$(prefix) install
 	mkdir -p $(prefix)/lib/z88dk
 	cp -R include $(prefix)/lib/z88dk
 	cp -R lib $(prefix)/lib/z88dk
