@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.41 2002-05-22 15:42:49 stefano Exp $
+# $Id: Makefile,v 1.42 2002-06-09 15:12:32 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -446,7 +446,7 @@ cpm_clib.lib:
 	cd fcntl ; make lcpm
 	cd strings ; make
 	cd stdlib ; make gen
-	cd stdio ; make generic
+	cd stdio ; make lcpm
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
