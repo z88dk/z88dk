@@ -1,8 +1,14 @@
 ;       Z88DK Small C+ Graphics Functions
 ;       Fills a screen area
-;	Original code donated by Massimo Morra (Thanks!)
+;	Original code by Massimo Morra (Thanks!)
 ;	Ported by Stefano Bodrato
 ;
+;	Feb 2000 - Platform dependent stack usage
+;	           Stack is a little undersized, but will work if we don't fill
+;	           a clean screen starting from the center.
+;
+
+	INCLUDE	"grafix.inc"
 
         XLIB    do_fill
         LIB	pixeladdress
@@ -10,14 +16,14 @@
 
 .fflag	defb	0
 
-;ix points to table on stack (above)
+;ix points to the table on stack (above)
 
 ;Entry:
 ;       d=x0 e=y0
 
 .do_fill
 
-        ld      hl,-1500	; create buffer 1 on stack
+        ld      hl,-(maxy*4)	; create buffer 1 on stack
         add     hl,sp		; Massimo said: in the worst of cases a buffer 
         ld      sp,hl		; should be 1456 bytes for the Spectrum display.
         push	hl		; It depends on the display height.
@@ -27,7 +33,7 @@
         ld	(hl),e
         inc	hl
         ld	(hl),255
-        ld      hl,-1500	; create buffer 2 on stack
+        ld      hl,-(maxy*4)	; create buffer 2 on stack
         add     hl,sp
         ld      sp,hl
 .loop	push	ix
@@ -38,7 +44,7 @@
 	ld	a,(fflag)
 	or	a
 	jr	nz,loop
-        ld      hl,3000		; restore stack pointer
+        ld      hl,(maxy*4)*2	; restore the stack pointer
         add     hl,sp
         ld      sp,hl
         ret

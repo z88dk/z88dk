@@ -120,7 +120,9 @@ graphics/line
 graphics/liner
 graphics/lscroll
 graphics/plot
-graphics/ace/plotpixl
+graphics/jupiter/plotpixl
+graphics/jupiter/respixl
+graphics/jupiter/xorpixl
 graphics/point
 graphics/pointxy
 graphics/rbitmask

@@ -46,6 +46,11 @@ IF FORzx81
 	defc maxx	= 96 ; emulated (64 real dots)
 ENDIF
 
+IF FORjupiter
+	defc maxy	= 64 ; emulated (48 real dots)
+	defc maxx	= 96 ; emulated (64 real dots)
+ENDIF
+
 
 IF FORzx
 	defc maxy	= 192

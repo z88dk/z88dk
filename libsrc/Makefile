@@ -123,7 +123,7 @@ vz_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
-	z80asm -d -ns -nm -Mo -xvz_clib @vz200.lst
+	z80asm -d -ns -nm -Mo -DFORvz200 -xvz_clib @vz200.lst
 
 # VZ200 ansi lib from Stefano
 
@@ -134,7 +134,7 @@ vzansi_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
-	z80asm -d -ns -nm -Mo -xvzansi_clib @vzansi.lst
+	z80asm -d -ns -nm -Mo -DFORvz200 -xvzansi_clib @vzansi.lst
 
 # zx81 lib from Stefano
 
@@ -272,7 +272,7 @@ aceansi_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
-	z80asm -d -ns -nm -Mo -xaceansi_clib.lib @aceansi.lst
+	z80asm -d -ns -nm -Mo -DFORjupiter -xaceansi_clib.lib @aceansi.lst
 
 
 
