@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.32 2002-01-27 21:29:07 dom Exp $
+# $Id: Makefile,v 1.33 2002-01-27 22:30:58 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -15,7 +15,7 @@ all:	genlibs z88libs tilibs zxlibs \
 genlibs: m.lib malloc.lib z80_crt0.lib
 
 z88libs: mz.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib \
-	 z88ansi_clib.lib
+	 z88ansi_clib.lib gfx.lib 
 
 tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 	ti83pansi_clib.lib ti83_clib.lib ti85ansi_clib.lib ti85_clib.lib \
@@ -53,7 +53,10 @@ gfx.lib:
 	@echo ''
 	@echo '---> Building Z88 BASIC gfx Library  <---'
 	@echo ''
-	cd graphics ; make
+	./gfxdeps.sh
+	z80asm -d -ns -nm -Mo -xgfx -DFORz88 @z88gfx.lst
+	./gfxdeps.sh
+	z80asm -d -ns -nm -Mo -xgfxapp -DAPPZ88 -DFORz88 @z88gfx.lst
 
 malloc.lib:
 	@echo ''
