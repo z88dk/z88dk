@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.44 2002-10-01 13:54:26 dom Exp $
+# $Id: Makefile,v 1.45 2002-10-02 09:45:41 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -10,7 +10,7 @@ all:	genlibs z88libs tilibs zxlibs \
 	abc80_clib.lib aceansi_clib.lib sam_clib.lib \
 	msx_clib.lib svi_clib.lib m5_clib.lib cpc_clib.lib \
 	c128ansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
-	rex_clib.lib zx81_clib.lib zx81ansi_clib.lib
+	rex_clib.lib zx81_clib.lib zx81ansi_clib.lib pps_clib.lib
 
 genlibs: m.lib malloc.lib z80_crt0.lib
 
