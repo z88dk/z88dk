@@ -10,7 +10,7 @@
 ;       routines in different modules, we have got rid of
 ;       the conditional assembly around the float routines
 ;
-;	$Id: z80_crt0.hdr,v 1.4 2002-01-21 20:37:13 dom Exp $
+;	$Id: z80_crt0.hdr,v 1.5 2002-04-07 12:31:14 dom Exp $
 
         XREF    base_graphics	; Address of graphics screen
 
@@ -72,6 +72,7 @@
 ;Long functions now
 ;------------------
 
+	LIB	lpush2		;Push a long under the stack
 	LIB     l_int2long_s	;Int->long signed conversion
 	LIB     l_long2int_s	;Long->int signed conversion
 	LIB     l_glong		;Get long
