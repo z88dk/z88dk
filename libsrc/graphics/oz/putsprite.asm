@@ -16,7 +16,7 @@
 	INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: putsprite.asm,v 1.1 2002-11-20 14:15:19 stefano Exp $
+;	$Id: putsprite.asm,v 1.2 2002-11-21 08:40:51 stefano Exp $
 ;
 
 ; coords: d,e (vert-horz)
@@ -83,7 +83,7 @@
          ld       c,(ix+2)          ;Load one line of image
          inc      ix
 ._smc1   ld       a,1               ;Load pixel mask
-._iloop  sra      c                 ;Test leftmost pixel
+._iloop  sla      c                 ;Test leftmost pixel
          jr       nc,_noplot        ;See if a plot is needed
          ld       e,a
 
@@ -114,7 +114,7 @@
          ld       c,(ix+2)          ;Load one line of image
          inc      ix
 .wsmc1    ld       a,1               ;Load pixel mask
-.wiloop  sra      c                 ;Test leftmost pixel
+.wiloop  sla      c                 ;Test leftmost pixel
          jr       nc,wnoplot         ;See if a plot is needed
          ld       e,a
 

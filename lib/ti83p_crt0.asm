@@ -3,7 +3,7 @@
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.16 2002-11-09 19:54:47 dom Exp $
+;	$Id: ti83p_crt0.asm,v 1.17 2002-11-21 08:40:50 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells
@@ -62,9 +62,9 @@
 IF (startup=2)
 	DEFINE MirageOS			;Used by greyscale interrupt etc.
 	DEFINE NOT_DEFAULT_SHELL	;Else we would use Ion
-	;org	$9D93			;Origin
-	;defb	$BB,$6D			;Compiled AsmPrgm token
-	org	$9D95	;We use Bin2var
+	org	$9D93			;Origin
+	defb	$BB,$6D			;Compiled AsmPrgm token
+	;org	$9D95	;We use Bin2var
 	ret				;So TIOS wont run the program
 	defb	1			;Identifier as MirageOS program
 	DEFINE NEED_mirage_icon
@@ -140,7 +140,9 @@ ENDIF
 ;-----------------
 IF !NOT_DEFAULT_SHELL
 	DEFINE Ion
-	org	$9D95
+	;org	$9D95
+	org	$9D93
+	defb         $BB,$6D
 	ret
 	jr	nc,start
 	DEFINE NEED_name

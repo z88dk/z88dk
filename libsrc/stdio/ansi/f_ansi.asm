@@ -3,19 +3,22 @@
 ;
 ;---------------------------------------------------
 ; ANSI specifics handling.
-; (Intel to Z80)
+; (Intel 8086 to Z80 port)
 ;
 ; Optimized for speed in the case of multi-character write requests.
 ; Original NANSI terminal driver (C) 1986 Daniel Kegel
 ; Modifications by Tom Almy without restrictions.
-; Port to Z80 and some improvement by Stefano Bodrato - 21/4/2000
+;
+; - Port to Z80 and some improvement by Stefano Bodrato - 21/4/2000
+; - Small fix on the "set cursor position" range checks - 21/11/2002
 ;
 ; MISSING or surely buggy Escapes:
 ;	I - Cursor up and scroll down if on top
-;	L - Insert line: to be completed
+;	L - Insert lines: to be completed
+;	M - Delete lines: to be completed
 ;
 ;
-;	$Id: f_ansi.asm,v 1.4 2001-10-22 09:33:55 stefano Exp $
+;	$Id: f_ansi.asm,v 1.5 2002-11-21 08:40:51 stefano Exp $
 ;
 
         XLIB	f_ansi
@@ -714,7 +717,8 @@ push de
 	pop	hl
         jp      m,HLineOK
         ld      a,(text_rows)
-        dec	c
+        ;; 19/11/2002 Stefano - was: dec c
+        dec	a
 .HLineOK
         ld      (ansi_ROW),a
         inc     hl
