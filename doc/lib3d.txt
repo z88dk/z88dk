@@ -1,6 +1,11 @@
-ÿþ-------------------------
+-------------------------
 
 3D Libraries (2/15/2002)
+
+Doc taken from the OZ Developement kit.
+See section III for Credits on this file and on the whole library
+
+$Id: lib3d.txt,v 1.3 2004-03-02 16:49:48 stefano Exp $
 
 -------------------------
 
@@ -27,7 +32,7 @@ The following is a reference for the available functions in lib3d.lib. Please no
 	void ozrotatepointy(Vector_t *v, int rot)
 	void ozrotatepointz(Vector_t *v, int rot)
 
-Use these functions to rotate a vector around the origin. The variable 'rot' is the rotation factor in degrees (¸), not radians (¸ × À ÷ 180). Note: Do not rotate the original coordinates! This will distort an object after a few times of use. Use ozcopyvector() to first copy the coordinates into a temporary variable and rotate them there.
+Use these functions to rotate a vector around the origin. The variable 'rot' is the rotation factor in degrees (?), not radians (? × p ÷ 180). Note: Do not rotate the original coordinates! This will distort an object after a few times of use. Use ozcopyvector() to first copy the coordinates into a temporary variable and rotate them there.
 
 Example:
 ...
