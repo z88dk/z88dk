@@ -95,6 +95,7 @@ printflike/printf
 printflike/fprintf
 printflike/sprintf
 printflike/vfprintf_comp
+printflike/vfprintf_fp
 printflike/vsprintf
 printflike/itod
 printflike/itou
