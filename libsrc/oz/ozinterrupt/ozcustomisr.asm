@@ -9,13 +9,12 @@
 ;
 ;
 ; ------
-; $Id: ozcustomisr.asm,v 1.1 2003-10-21 17:15:20 stefano Exp $
+; $Id: ozcustomisr.asm,v 1.2 2003-10-23 10:42:50 stefano Exp $
 ;
 
 	XLIB	ozcustomisr
 	
 	XDEF	serial_hook
-	XDEF	serial_check_hook
 
 	XDEF	ozkeyclick
 	XDEF	oz1hz
@@ -48,24 +47,6 @@
 
 defc	PauseFirst = 32
 
-
-ozintwait:
-;; waits for a keystroke, serial data, or interrupt event
-        di
-serial_check_hook:
-        jp NoSerialCheck
-;$serial_check_hook equ $-2
-NoSerialCheck:
-        ld a,(KeyBufGetPos)
-        ld c,a
-        ld a,(KeyBufPutPos)
-        cp c
-        jr nz,getout
-        ei
-        halt
-getout:
-        ei
-        ret
 
 PowerOff:
         ld      a,(ozdisablepowerkey)

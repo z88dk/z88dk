@@ -3,7 +3,7 @@
 
 /* Control file for include OZ7xx stuff */
 
-/* $Id: oz.h,v 1.4 2003-10-22 13:55:48 stefano Exp $ */
+/* $Id: oz.h,v 1.5 2003-10-23 10:42:49 stefano Exp $ */
 
 //#include <oz700/ozfont.h>
 #include <oz700/ozgfx.h>
@@ -15,8 +15,19 @@
 #include <oz700/oztime.h>
 //#include <oz700/scaldate.h>
 
+
+/* functions renamed to have a double mode
+   use the -DOZDK parameter to activate this */
+
+#ifdef OZDK
+#pragma set OZDK
+#define ozgetch ozgetch2
+#define ozkeyhit ozkeyhit2
+#else
 #define ozgetch fgetc_cons
-#define ozkeykit getk
+#define ozkeyhit getk
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 

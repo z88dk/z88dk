@@ -2,7 +2,7 @@
 	HTC Compatibility Library and OZ extras 
 	2. KEYBOARD AND INPUT
 
-	$Id: ozinput.h,v 1.3 2003-10-22 09:56:34 stefano Exp $
+	$Id: ozinput.h,v 1.4 2003-10-23 10:42:49 stefano Exp $
 */
 
 #ifndef _OZINPUT_H
@@ -11,6 +11,18 @@
 #ifndef _OZ_BYTE
 typedef unsigned char byte;
 #define _OZ_BYTE
+#endif
+
+/* functions renamed to have a double mode
+   use the -DOZDK parameter to activate this */
+
+#ifdef OZDK
+extern int __LIB__ oznkeyhit2(void);
+extern int __LIB__ ozkeyhit2(void);
+extern unsigned __APPFUNC__ __LIB__ ozgetch2(void);
+extern unsigned __LIB__ ozngetch2(void);
+extern unsigned __LIB__ ngetch2(void);
+extern __LIB__ ozungetch2(unsigned key);
 #endif
 
 extern __LIB__ ozrestorekeysettings(void);
@@ -22,12 +34,7 @@ extern __LIB__ ozcopytocursettings(byte *p);
 #define OZEDITLINE_ERROR  -2
 #define OZEDITLINE_CANCEL -1
 extern int __LIB__ ozeditline(byte x0,byte y0,char *s,byte slen,byte xlen);
-extern int __LIB__ oznkeyhit(void);
-extern int __LIB__ ozkeyhit(void);
-//extern unsigned __LIB__ ozgetch(void);
-//extern unsigned __LIB__ ozngetch(void);
-//extern unsigned __LIB__ ngetch(void);
-//extern __LIB__ ozungetch(unsigned key);
+
 extern __LIB__ ozkbdon(void);
 extern __LIB__ ozkbdoff(void);
 extern __LIB__ ozkeyclear(void);

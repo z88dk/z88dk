@@ -2,7 +2,7 @@
 	HTC Compatibility Library and OZ extras 
 	1. GRAPHICS AND DISPLAY
 
-	$Id: ozgfx.h,v 1.4 2003-10-22 13:55:49 stefano Exp $
+	$Id: ozgfx.h,v 1.5 2003-10-23 10:42:49 stefano Exp $
 */
 
 #include <graphics.h>
@@ -23,6 +23,7 @@ typedef unsigned char byte;
 #define _OZ_BYTE
 #endif
 
+//extern __LIB__ ozsetactivepage(byte page);
 extern __LIB__ ozsetactivepage(byte page);
 extern __LIB__ ozsetdisplaypage(byte page);
 extern byte __LIB__ ozgetactivepage(void);
@@ -81,8 +82,13 @@ extern __LIB__ ozdisplayputbyte(unsigned offset, byte v);
 extern __LIB__ ozdisplayandbyte(unsigned offset, byte v);
 extern __LIB__ ozdisplayinbyte(unsigned offset);
 
-#define ozgetpoint point
-//extern __LIB__ ozgetpoint(int x, int y);
+//#define ozgetpoint point
+
+//extern int __LIB__ ozgetpoint(int x, int y);
+int ozgetpoint(int x, int y)
+{
+    return (!point (x,y));
+}
 
 #define _ozbox ozbox
 //extern __LIB__ _ozbox(byte x, byte y, byte width, byte height);

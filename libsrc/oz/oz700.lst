@@ -9,7 +9,10 @@ ozinput/ozkeyclear
 ozinput/ozkeyhit
 ozinput/ozkeyupper
 ozinput/ozkeylower
+ozinput/ozgetch
+ozinput/ozungetch
 ozinterrupt/ozcustomisr
+ozinterrupt/ozintwait
 ozinterrupt/serial_int
 ozinterrupt/ozsetisr
 ozinterrupt/ozinstisr
@@ -17,6 +20,7 @@ ozmisc/ozgetautorun
 ozmisc/ozportin
 ozmisc/ozportout
 ozmisc/ozdelay
+ozmisc/ozexitto
 ozscreen/ozsetcontrast
 ozscreen/ozgetcontrast
 ozscreen/ozblankscreen
@@ -48,6 +52,13 @@ ozgfx/ozscroll
 ozgfx/ozscrolldown
 ozgfx/ozscrollclear
 ozgfx/ozscrolllinesclear
+ozgfx/ozactivatedisplaypage
+ozgfx/ozdisplayactivepage
+ozgfx/ozgetactivepage
+ozgfx/ozgetdisplaypage
+ozgfx/ozsetactivepage
+ozgfx/ozsetdisplaypage
+ozgfx/ozswapactivedisplay
 ozserial/ozsnap
 ozserial/ozclearserialbuffer
 ozserial/ozgetrxhandshaking

@@ -8,12 +8,13 @@
 ;	all the "$" prefixes have been changed to "s_";
 ;	the "$sp$" label is been changed to "s_sp".
 ; 
-;	the "-startup=2" enables the OZ7xx DK compatibility mode
+;	the "-DOZDK" enables the OZ7xx DK compatibility mode
 ;	with extra functions and interrupt handling
+;	(this causes the DEFINED_ozgetch2 flag to be activated)
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.3 2003-10-22 09:56:34 stefano Exp $
+;       $Id: oz_crt0.asm,v 1.4 2003-10-23 10:42:49 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -66,10 +67,14 @@
 	XDEF	s_init_unblank	;service entry point to go back from "ozfast" or "ozblankscreen"
 
 	XDEF	ScrCharSet
-	XDEF	KeyBufGetPos
-	XDEF	KeyBufPutPos
+
+IF DEFINED_ozgetch2
+	XDEF	KeyBufGetPos	;
+	XDEF	KeyBufPutPos	; don't
         XDEF    EnableKeyboard
 	XDEF	KeyboardBuffer
+ENDIF
+
 ; --- settings ---
 	XDEF	ozkeyrepeatspeed
 	XDEF	ozkeyrepeatdelay
@@ -152,6 +157,7 @@ continue:
         ;ldir                    ;clear memory
 ;EmptyBSS:
 
+IF DEFINED_ozgetch2
         ld      hl,KeyBufGetPos
         ld      (hl),0
         ld      de,KeyBufGetPos+1
@@ -167,7 +173,6 @@ continue:
 ;        ld      a,2
 ;        out     (16h),a         ;; enable key click
 
-IF (startup=2)
 	LIB	ozcustomisr
 	LIB	ozsetisr
 	
@@ -263,10 +268,12 @@ s_init_unblank:			; ozblankscreen or ozfast might have hidden everything;
         ld      a,(ozcontrast)
         ld      (contrast),a
 
+IF DEFINED_ozgetch2
         ld      hl,KeyBufGetPos ;; put keyboard buffer in standard buffer
         ld      de,0c031h
         ld      bc,24
         ldir
+ENDIF
 
 s_wipe_hook:
         nop
@@ -421,19 +428,20 @@ ozcontrast:
 s_ozlcdstatus:
         defw  0
 
+IF DEFINED_ozgetch2
 KeyBufGetPos:   defb 0
 KeyBufPutPos:   defb 0
 KeyboardBuffer: ;     123456789012345678901234
                 defm "(c)Pruss,Green,&c vZ88DK"
-;        psect midpage
-;        psect text
-;        psect data
-ScrCharSet:     defb 1
-;argv:   defw __ozfilename
-;        psect bss
-EnableKeyboard: defs 1
-;HeapTop EQU 0f980h
+ENDIF
 
+ScrCharSet:     defb 1
+
+;argv:   defw __ozfilename
+
+EnableKeyboard: defs 1
+
+;HeapTop EQU 0f980h
 ;Model32k EQU 1
 
 
@@ -454,9 +462,6 @@ ozautolightofftime:
         defw 120    ;; 2 minutes
 ozprogoptions:
         defb 0
-
-;
-
 ;; padding (for future expansion)
 defb 0,0,0,0
 

@@ -2,16 +2,18 @@
 	HTC Compatibility Library and OZ extras 
 	Fonts
 
-	$Id: ozfont.h,v 1.3 2003-10-22 09:56:34 stefano Exp $
+	$Id: ozfont.h,v 1.4 2003-10-23 10:42:49 stefano Exp $
 */
+
+#ifndef _OZFONT_H
+#define _OZFONT_H
+
 
 #ifndef _OZ_BYTE
 typedef unsigned char byte;
 #define _OZ_BYTE
 #endif
 
-#ifndef _OZFONT_H
-#define _OZFONT_H
 
 /* 12 bytes long */
 struct ozfontheader

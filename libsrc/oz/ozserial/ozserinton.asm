@@ -8,15 +8,17 @@
 ;
 ;
 ; ------
-; $Id: ozserinton.asm,v 1.1 2003-10-21 17:15:21 stefano Exp $
+; $Id: ozserinton.asm,v 1.2 2003-10-23 10:42:50 stefano Exp $
 ;
 
 	XLIB	ozserinton
 
 	LIB	ozcustomisr
 	XREF	serial_hook
-	XREF	serial_check_hook
 	XREF	rxxoff_hook
+
+	LIB	ozintwait
+	XREF	serial_check_hook
 	
 	LIB	serial_int
 	XREF	serial_int_check
