@@ -3,7 +3,7 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.1 2002-02-12 22:24:21 dom Exp $
+;	$Id: z88s_crt0.asm,v 1.1.2.1 2002-02-20 21:45:23 dom Exp $
 
 
 
@@ -20,7 +20,7 @@
 
 	org	myzorg
 .header_start
-        defm    "!bin018"&13
+        defm    "!bin020"&13
 .shell_length
         defw    0		; Fill in by make program
         defw    start
