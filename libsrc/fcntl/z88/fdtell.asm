@@ -7,11 +7,10 @@
 ; *** THIS IS A Z88 SPECIFIC ROUTINE!!! ***
 ;
 ;
-;	$Id: fdtell.asm,v 1.1 2001-05-01 13:55:21 dom Exp $
+;	$Id: fdtell.asm,v 1.2 2003-09-11 10:58:57 dom Exp $
 ;
 
                 INCLUDE "#fileio.def"
-                INCLUDE "libdefs.def"
 
                 XLIB    fdtell
 
