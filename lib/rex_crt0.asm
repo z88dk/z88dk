@@ -2,14 +2,28 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.8 2001-07-23 13:39:42 dom Exp $
+;       $Id: rex_crt0.asm,v 1.9 2001-07-26 14:14:38 dom Exp $
 ;
 
 	MODULE rex_crt0
 
 	INCLUDE "zcc_opt.def"
 
+; Main is always external
 	XREF	_main
+
+; Variables in this file that other modules need
+
+	XDEF	l_erraddr
+	XDEF	l_errlevel
+	XDEF	int_seed
+	XDEF	exitsp
+	XDEF	exitcount
+	XDEF	heapblocks
+	XDEF	heaplast
+	XDEF	l_dcal
+
+
 ;	defm	"ApplicationName:Addin"&10&13
 ;	defm	"[program name - 10 chars?]"&10&13
 ;	defb	0
