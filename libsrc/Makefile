@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.57 2003-02-04 09:10:14 stefano Exp $
+# $Id: Makefile,v 1.58 2003-03-22 14:26:49 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -160,6 +160,16 @@ zx_clib.lib:
 	cd spectrum ; $(MAKE)
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORzx -xzx_clib @zx.lst
+
+# ZXVGS - yarek
+zxvgs.lib:
+	@echo ''
+	@echo '--- Building ZXVGS Library  ---'
+	@echo ''
+	cd fcntl/zxvgs ; $(MAKE)
+	cd zxvgs; $(MAKE)
+	z80asm -d -ns -nm -Mo -DFORzx -xzxvgs @zxvgs.lst
+
 
 # vt100 for sprinter - dom
 ppsansi_clib.lib:
@@ -744,6 +754,7 @@ clean:
 	cd z80_crt0s; $(MAKE) clean
 	cd z88 ; $(MAKE) clean
 	cd z88math ; $(MAKE) clean
+	cd zxvgs ; $(MAKE) clean
 	$(RM) *.lib
 	cd games ; $(MAKE) clean
 
