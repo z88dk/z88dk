@@ -13,7 +13,7 @@ ctype/toascii
 ctype/tolower
 ctype/toupper
 stdio/closeall
-stdio/fchkstd
+stdio/8080/fchkstd
 stdio/fclose
 stdio/feof
 stdio/fgetc
