@@ -17,7 +17,7 @@
 
 
 
-._atof
+.atof
 	ld	hl,-23	;const
 	add	hl,sp
 	ld	sp,hl

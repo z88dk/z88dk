@@ -1,29 +1,16 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.2 2001-04-18 14:59:40 stefano Exp $
+# $Id: Makefile,v 1.3 2001-04-30 14:40:04 dom Exp $
 
 
 
-z88_fcntl:
-	zcc -vn -make-lib close.c
-	zcc -vn -make-lib creat.c
-	zcc -vn -make-lib lseek.c
-	zcc -vn -make-lib open.c
-	zcc -vn -make-lib open_z88.c
-	zcc -vn -make-lib nropen.c
-	zcc -vn -make-lib read.c
-	zcc -vn -make-lib write.c
-	zcc -vn -make-lib writebyte.c
-	zcc -vn -make-lib readbyte.c
-	zcc -vn -make-lib stat.c
-	zcc -vn -make-lib opendor.c
-	zcc -vn -make-lib readdor.c
-	zcc -vn -make-lib closedor.c
-	zcc -vn -make-lib writedor.c
-	zcc -vn -make-lib deletedor.c
-	zcc -vn -make-lib sondor.c
-	zcc -vn -make-lib brotherdor.c
+z88_fcntl: close.o creat.o lseek.o open.o open_z88.o nropen.o read.o write.o \
+	writebyte.o readbyte.o stat.o opendor.o readdor.o closedor.o \
+	writedor.o deletedor.o sondor.o brotherdor.o
+
+.c.o:
+	zcc -vn -make-lib $*.c
 
 
 clean:

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.2 2001-04-13 14:13:58 stefano Exp $
+# $Id: Makefile,v 1.3 2001-04-30 14:40:04 dom Exp $
 #
 
 generic: std gen
@@ -25,32 +25,18 @@ gen:
 	zcc -vn -make-lib fgetc.c
 	zcc -vn -make-lib fputc.c
 	zcc -vn -make-lib freopen_z88.c
-	zcc -vn -make-lib fgets_cons.c
 
 
-std:
-	zcc -vn -make-lib closeall.c
-	zcc -vn -make-lib fchkstd.c
-	zcc -vn -make-lib feof.c
-	zcc -vn -make-lib fgetpos.c
-	zcc -vn -make-lib fgets.c
-	zcc -vn -make-lib fopen.c
-	zcc -vn -make-lib fputs.c
-	zcc -vn -make-lib fread.c
-	zcc -vn -make-lib freopen.c
-	zcc -vn -make-lib fopen_z88.c
-	zcc -vn -make-lib fseek.c
-	zcc -vn -make-lib ftell.c
-	zcc -vn -make-lib fwrite.c
-	zcc -vn -make-lib vfprintf_mini.c
-	zcc -vn -make-lib printn.c
-	zcc -vn -make-lib puts.c
-	zcc -vn -make-lib ungetc.c
-	zcc -vn -make-lib fdopen.c
-	zcc -vn -make-lib printk.c
+std:    closeall.o fchkstd.o feof.o fgetpos.o fgets.o fopen.o fputs.o \
+	fread.o freopen.o fopen_z88.o fseek.o ftell.o  \
+	vfprintf_mini.o printn.o puts.o ungetc.o fdopen.o printk.o \
+	fgets_cons.o
 
 z88_x:
 	cd z88 ; make
+
+.c.o:
+	zcc -vn -make-lib $*.c
 
 clean:
 	rm -f *.o* *.sym *.map zcc_opt.def

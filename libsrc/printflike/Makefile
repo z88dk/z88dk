@@ -4,19 +4,11 @@
 
 
 
-all:
-	zcc -vn -Wn43 -make-lib itou.c
-	zcc -vn -Wn43 -make-lib utoi.c
-	zcc -vn -Wn43 -make-lib printf.c
-	zcc -vn -Wn43 -make-lib sprintf.c
-	zcc -vn -Wn43 -make-lib fprintf.c
-	zcc -vn -Wn43 -make-lib vfprintf_comp.c
-	zcc -vn -Wn43 -make-lib vsprintf.c
-	zcc -vn -Wn43 -make-lib scanf.c
-	zcc -vn -Wn43 -make-lib sscanf.c
-	zcc -vn -Wn43 -make-lib fscanf.c
-	zcc -vn -Wn43 -make-lib vfscanf.c
-	zcc -vn -Wn43 -make-lib vsscanf.c
+all: itou.o utoi.o printf.o sprintf.o fprintf.o vfprintf_comp.o vsprintf.o \
+     scanf.o sscanf.o fscanf.o vfscanf.o vsscanf.o
+
+.c.o:
+	zcc -vn -Wn43 -make-lib $*.c
 
 
 clean:

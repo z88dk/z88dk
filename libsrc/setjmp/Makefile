@@ -4,9 +4,10 @@
 
 
 
-all:
-	zcc -vn -make-lib longjmp.c
-	zcc -vn -make-lib setjmp.c
+all: longjmp.o setjmp.o
+
+.c.o:
+	zcc -vn -make-lib $*.c
 
 
 clean:

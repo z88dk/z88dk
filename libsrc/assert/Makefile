@@ -4,8 +4,10 @@
 
 
 
-all:
-	zcc -vn -make-lib assert.c
+all: assert.o
+
+.c.o:
+	zcc -vn -make-lib $*.c
 
 
 clean:

@@ -1,18 +1,16 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
+# $Id: Makefile,v 1.2 2001-04-30 14:40:04 dom Exp $
 
 
 all: fdstdio
 
 
-fdstdio:
-	zcc -make-lib -vn fdfread.c
-	zcc -make-lib -vn fdfwrite.c
-	zcc -make-lib -vn fchkhdl.c
-	zcc -make-lib -vn fdprintn.c
-	zcc -make-lib -vn zfdopen.c
-	zcc -make-lib -vn zfdopen_z88.c
+fdstdio: fdfread.o fdfwrite.o fchkhdl.o fdprintn.o zfdopen.o zfdopen_z88.o
+
+.c.o:
+	zcc -make-lib -vn $*.c
 
 
 clean:

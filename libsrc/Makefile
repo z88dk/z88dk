@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.9 2001-04-20 11:56:39 stefano Exp $
+# $Id: Makefile,v 1.10 2001-04-30 14:40:04 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -129,7 +129,7 @@ vz_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
-	z80asm -d -ns -nm -Mo -DFORvz200 -xvz_clib @vz200.lst
+	z80asm -d -ns -nm -Mo -DFORvz -xvz_clib @vz200.lst
 
 # VZ200 ansi lib - Stefano
 
@@ -141,7 +141,7 @@ vzansi_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
-	z80asm -d -ns -nm -Mo -DFORvz200 -xvzansi_clib @vzansi.lst
+	z80asm -d -ns -nm -Mo -DFORvz -xvzansi_clib @vzansi.lst
 
 # ZX81 lib - Stefano
 
@@ -165,7 +165,7 @@ zx81ansi_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
-	z80asm -d -ns -nm -Mo -xzx81ansi_clib @zx81ansi.lst
+	z80asm -d -ns -nm -Mo -DFORzx81 -xzx81ansi_clib @zx81ansi.lst
 
 # Texas Instrument's calculators:
 # almost the same lib code with different -D flag set

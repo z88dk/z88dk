@@ -6,17 +6,13 @@
 all: genmath
 
 
-genmath:
-	zcc -vn -make-lib atan2.c
-	zcc -vn -make-lib cosh.c
-	zcc -vn -make-lib sinh.c
-	zcc -vn -make-lib tanh.c
-	zcc -vn -make-lib pow.c
-	zcc -vn -make-lib ftoe.c
-	zcc -vn -make-lib ftoa.c
+genmath: atan2.o cosh.o sinh.o tanh.o pow.o ftoe.o ftoa.o atof.o
 # Don't compile atof cos of label clash
 #	zcc -vn -make-lib atof.c
 	z80asm -d -ns -nm -Mo -x../m @genlist
+
+.c.o:
+	zcc -vn -make-lib $*.c
 
 
 clean:

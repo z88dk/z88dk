@@ -1,17 +1,18 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.4 2001-04-18 14:59:40 stefano Exp $
+# $Id: Makefile,v 1.5 2001-04-30 14:40:04 dom Exp $
 
 
 all: malloc
 
 
-malloc:
-	zcc -vn -make-lib calloc.c
-	zcc -vn -make-lib strings/strdup.c
+malloc: calloc.o
 	cd strings; make
 	z80asm -d -ns -nm -Mo -x../malloc @malllist
+
+.c.o:
+	zcc -vn -make-lib $*.c
 
 
 clean:

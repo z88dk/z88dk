@@ -1,11 +1,11 @@
-# $Id: Makefile,v 1.2 2001-04-13 14:14:00 stefano Exp $
+# $Id: Makefile,v 1.3 2001-04-30 14:40:04 dom Exp $
 
-all:
-	zcc -vn -DNET_STDIO -make-lib opennet.c
-	zcc -vn -DNET_STDIO -make-lib closenet.c
-	zcc -vn -DNET_STDIO -make-lib fgetc_net.c
-	zcc -vn -DNET_STDIO -make-lib fputc_net.c
-	zcc -vn -DNET_STDIO -make-lib fflush_net.c
+
+all: opennet.o closenet.o fgetc_net.o fputc_net.o fflush_net.o
+
+
+.c.o:
+	zcc -vn -DNET_STDIO -make-lib $*.c
 
 clean:
 	rm -f *.o* zcc_opt.def *.sym *.map

@@ -1,6 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
+# $Id: Makefile,v 1.3 2001-04-30 14:40:04 dom Exp $
 
 
 all: blah z88
@@ -8,22 +9,13 @@ all: blah z88
 blah:
 	cd fdstdio ; make
 
-z88:
-	zcc -vn -make-lib RegisterInt.c
-	zcc -vn -make-lib DeRegisterInt.c
-	zcc -vn -make-lib QueryPackage.c
-	zcc -vn -make-lib getpid.c
-	zcc -vn -make-lib nameapp.c
-	zcc -vn -make-lib wcopen.c
-	zcc -vn -make-lib wcnext.c
-	zcc -vn -make-lib wcclose.c
-	zcc -vn -make-lib exec_cli.c
-	zcc -vn -make-lib stripdev.c
-	zcc -vn -make-lib strippath.c
-	zcc -vn -make-lib openpopup.c
-	zcc -vn -make-lib openwindow.c
-	zcc -vn -make-lib opentitled.c
+z88:	RegisterInt.o DeRegisterInt.c QueryPackage.o getpid.o nameapp.o \
+	wcopen.o wcnext.o wcclose.o exec_cli.o stripdev.o strippath.o \
+	openpopup.o openwindow.o opentitled.o
 	z80asm -d -ns -nm -Mo -x../z88 @z88list
+
+.c.o:
+	zcc -vn -make-lib $*.c
 
 
 clean:
