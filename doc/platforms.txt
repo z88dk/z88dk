@@ -1,6 +1,6 @@
 Z88DK Port Status
 
-$Id: platforms.txt,v 1.10 2002-01-17 17:09:21 stefano Exp $
+$Id: platforms.txt,v 1.11 2002-07-15 13:14:38 dom Exp $
 
 
 PLATFORM      | Native I/O  | ANSI VT I/O |  GRAPH LIB  |  GRAY LIB   |  FILELIB    |   ZSOCK     |   SOUND     |   Others    |
@@ -11,7 +11,7 @@ Amstrad NC100 |     Yes     |     No      |     No      |     No      |     No  
 Aquarius      |    38x25    |    40x24 COL|     No      |     No      |     No      |     No      |   1 bit     |     ---     |
 Cambridge Z88 |     Yes     |     Yes     |  256x64     |     No      |     Yes     |     Yes     |   1 bit     | Paging+many |
 Commodore 128 |     No      |    40x25 COL|     No      |     No      |     No      |     No      |     ---     |     ---     |
-CP/M          |     Yes     | If Hardware |     No      |     No      |     No      |     No      |     ---     |     ---     |
+CP/M          |     Yes     | If Hardware |     No      |     No      |     Yes     |     No      |     ---     |     ---     |
 Jupiter ACE   |     No      |    32x24 B/W| 96x64 emul. |     No      |     No      |     No      |   1 bit     |     ---     |
 MSX 1         |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
 REX 6000      |     No      |     No      |     No      |     No      |     No      |     No      |     ---     |     (1)     |
@@ -27,7 +27,7 @@ TI86          |    21x8     |    32x4  B/W|  128x64     |     Yes     |     No  
 VZ/Laser 200  |    32x16    |    32x12 B/W|  128x64     |     No      |     No      |     No      |     ---     |     ---     |
 ZX 81         | 32x21-buggy |    32x21 B/W| 96x64 emul. |     No      |     No      |     No      |     ---     | Unstable    |
 ZX Spectrum   | 32x24+64x24 |24..85x24 COL|  256x192    |     No      |     +3      |     No      |   1 bit     |     (3)     |
-              |             |             |             |             |             |             |             |             |
+ZXVGS         |             |             |             |             |     Yes     |             |             |             |
               |             |             |             |             |             |             |             |             |
 
 (1) The Xircom REX 6000 port provides hooks into the native OS. No z88dk i/o functions are supported
