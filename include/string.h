@@ -42,6 +42,7 @@ extern char __LIB__ *strupr(char *);
 extern void __LIB__ *memset(void *, unsigned char, int);
 extern void __LIB__ *memcpy(void *, void *,int);
 extern void __LIB__ *memchr(void *, unsigned char, int);
+extern int __LIB__ memcmp(void *, void *, int);
 
 extern char __LIB__ *strdup(char *);
 
@@ -74,11 +75,6 @@ extern far char __LIB__ *strdup_far(far char *);
 
 #endif
 
-/*
- * Now some defines (done down so far and near will work
- */
-
-#define memcmp(a,b,c) strncmp(a,b,c)
 
 /*
  * Okay..some nice BSD-isms now..
