@@ -6,10 +6,51 @@ defc SetExSpeed       = $50BF	; BCALL entry to switch 6<->15MHz on Ti83+SE
 
 ;All Ti83+:
 ;defc statvars         = $8A3A	; 531 bytes free $8A3A / $8C4D
-;defc plotSScreen      = $9340	; 768 bytes free (normal screen buffer)
+defc plotSScreen      = $9340	; 768 bytes free (normal screen buffer)
 ;defc appBackUpScreen  = $9872	; 768 bytes free (free space for apps)
 ;defc saveSScreen      = $86EC	; 768 bytes free (APD buffer)
 defc _IY_TABLE        = $89F0   ;
+
+;TSE dfines
+
+defc krnlbase        = $9872
+defc _tseKrnlVer     = krnlbase + 2
+defc _tseChkProg     = krnlbase + 5
+defc _tseExitShell   = krnlbase + 8
+defc _tseSwitchTask  = krnlbase + 11
+defc _tseStartTask   = krnlbase + 14
+defc _tseEndTask     = krnlbase + 17
+defc _tseForceYield  = krnlbase + 20
+
+defc libsbase        = $8A3A
+defc _tseLibsVer     = libsbase + 0
+defc _tseRandom      = libsbase + 3
+defc _tseSprite      = libsbase + 6
+defc _tseLargeSprite = libsbase + 9
+defc _tseGetPixel    = libsbase + 12
+defc _tseDecompress  = libsbase + 15
+defc _tseFastcopy    = libsbase + 18
+defc _tseFindVar     = libsbase + 21
+
+;defc ionRandom       = _tseRandom
+;defc ionPutSprite    = _tseSprite
+;defc ionLargeSprite  = _tseLargeSprite
+;defc ionGetPixel     = _tseGetPixel
+;defc ionFastCopy     = _tseFastCopy
+;defc ionDecompress   = _tseDecompress
+;defc ionDetect	      = $8508
+
+; Kernel Memory Structure
+defc pptr_code         = $8C4C - 2
+defc pptr_preserve     = pptr_code - 2
+defc progsize          = pptr_preserve - 2
+defc sysstack          = progsize - 2
+defc sysflags          = sysstack - 60
+defc cprogram          = sysflags - 9
+defc fptr_varsize      = cprogram - 2
+defc fptr_prgtitle     = fptr_varsize - 2
+defc fptr_memreq       = fptr_prgtitle - 2
+defc fptr_end          = fptr_memreq - 2
 
 
 ;======================================================================

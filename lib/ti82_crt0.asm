@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti82_crt0.asm,v 1.12 2001-08-20 09:28:25 stefano Exp $
+;	$Id: ti82_crt0.asm,v 1.13 2001-09-20 15:54:03 stefano Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -75,7 +75,6 @@ ENDIF
 IF !DEFINED_nostreams
  IF DEFINED_ANSIstdio
   IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
-   IF !non_ANSI
 	;Reset the ANSI cursor
 	XREF	ansi_ROW
 	XREF	ansi_COLUMN
@@ -118,13 +117,9 @@ ENDIF
 	jp	(hl)
 
 ; Now, define some values for stdin, stdout, stderr
-IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
- IF !DEFINED_nostreams
-  IF DEFINED_ANSIstdio
+IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
 .__sgoioblk
 	INCLUDE	"#stdio_fp.asm"
-  ENDIF
- ENDIF
 ENDIF
 
 

@@ -3,17 +3,18 @@
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.11 2001-08-20 09:28:25 stefano Exp $
+;	$Id: ti83p_crt0.asm,v 1.12 2001-09-20 15:54:03 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells
 ;       (Primary shell merely means it's the smallest implementation
 ;        for that shell, that uses full capabilities of the shell)
 ;
-;   1 - Ion (default)
-;   2 - MirageOS without quit key
-;   3 -
-;   4 - TSE Kernel
+;   1  - Ion (default)
+;   2  - MirageOS without quit key
+;   3  -
+;   4  - TSE Kernel
+;   10 - asm( executable
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -126,6 +127,7 @@ ENDIF
 ;10 - asm( executable
 ;--------------------
 IF (startup=10)
+	DEFINE ASM
 	DEFINE NOT_DEFAULT_SHELL
 	org	$9D95
 ENDIF
@@ -286,6 +288,38 @@ IF !DEFINED_GRAYlib
   ENDIF
   IF TSE
 	defc	cpygraph = $8A3A+18	; TSE FastCopy call
+  ENDIF
+  IF ASM
+.cpygraph
+;(ion)FastCopy from Joe Wingbermuehle
+	di
+	ld	a,$80				; 7
+	out	($10),a				; 11
+	ld	hl,plotSScreen-12-(-(12*64)+1)		; 10
+	ld	a,$20				; 7
+	ld	c,a				; 4
+	inc	hl				; 6 waste
+	dec	hl				; 6 waste
+fastCopyAgain:
+	ld	b,64				; 7
+	inc	c				; 4
+	ld	de,-(12*64)+1			; 10
+	out	($10),a				; 11
+	add	hl,de				; 11
+	ld	de,10				; 10
+fastCopyLoop:
+	add	hl,de				; 11
+	inc	hl				; 6 waste
+	inc	hl				; 6 waste
+	inc	de				; 6
+	ld	a,(hl)				; 7
+	out	($11),a				; 11
+	dec	de				; 6
+	djnz	fastCopyLoop			; 13/8
+	ld	a,c				; 4
+	cp	$2B+1				; 7
+	jr	nz,fastCopyAgain		; 10/1
+	ret					; 10
   ENDIF
  ENDIF
 ENDIF

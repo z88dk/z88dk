@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti85_crt0.asm,v 1.12 2001-08-20 09:28:25 stefano Exp $
+;	$Id: ti85_crt0.asm,v 1.13 2001-09-20 15:54:03 stefano Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -154,10 +154,8 @@ ENDIF
 	
 ; Now, define some values for stdin, stdout, stderr
 IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
- IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
 .__sgoioblk
 	INCLUDE	"#stdio_fp.asm"
- ENDIF
 ENDIF
 
 

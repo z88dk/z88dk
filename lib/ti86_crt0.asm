@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.12 2001-08-21 15:40:16 stefano Exp $
+;	$Id: ti86_crt0.asm,v 1.13 2001-09-20 15:54:03 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -133,7 +133,7 @@ IF (startup=4)
 	DEFINE NEED_icon
 	INCLUDE	"zcc_opt.def"	; Get icon from zcc_opt.def
 	UNDEFINE NEED_icon
-  IF !DEFINED_NEED_icon
+ IF !DEFINED_NEED_icon
 	defb	@00000000	; 7x7 icon
 	defb	@00110010
 	defb	@01000111
@@ -141,14 +141,14 @@ IF (startup=4)
 	defb	@01000000
 	defb	@00110000
 	defb	@00000000
-  ENDIF
+ ENDIF
 ENDIF
 
 ;----------------------
 ; 10 - asm() executable
 ;----------------------
 IF (startup=10)
-	DEFINE ASM
+	DEFINE STDASM
 	DEFINE NOT_DEFAULT_SHELL
         org     _asm_exec_ram
 ENDIF
@@ -190,7 +190,7 @@ ENDIF
 ; End of header, begin of startup part
 ;-------------------------------------
 .start
-IF ASM				; asm( executable
+IF STDASM			; asm( executable
 	call	_runindicoff	; stop anoing run-indicator
 ENDIF
 	ld	hl,0
@@ -229,7 +229,7 @@ IF DEFINED_GRAYlib
 	INCLUDE	"#gray86.asm"
 ENDIF
 
-	im	2
+	;im	2
 	call	_main
 .cleanup			; exit() jumps to this point
 .start1
@@ -286,10 +286,8 @@ ENDIF
 
 ; Now, define some values for stdin, stdout, stderr
 IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
- IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
 .__sgoioblk
 	INCLUDE	"#stdio_fp.asm"
- ENDIF
 ENDIF
 
 

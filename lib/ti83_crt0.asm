@@ -3,7 +3,7 @@
 ;	Stefano Bodrato	- Dec 2000
 ;	Henk Poley	- Apr 2001 Fixed and add some things
 ;
-;	$Id: ti83_crt0.asm,v 1.14 2001-08-21 15:40:16 stefano Exp $
+;	$Id: ti83_crt0.asm,v 1.15 2001-09-20 15:54:03 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -396,32 +396,35 @@ IF !DEFINED_GRAYlib
  
  IF !Do_Not_Include_FastCopy
 .cpygraph
-	; Some shells don't provide the fastcopy code, so here it is !
-	ld	a,$80
-	out	($10),a
-	ld	hl,$8E29-12-(-(12*64)+1)
-	ld	a,$20
-	ld	c,a
-.fastCopyAgain
-	ld	b,64
-	inc	c
-	ld	de,-(12*64)+1
-	out	($10),a
-	add	hl,de
-	ld	de,11
-.fastCopyLoop
-	add	hl,de
-	inc	hl
-	ret	c
-	ld	a,(hl)
-	out	($11),a
-	djnz	fastCopyLoop
-	ld	a,c
-	cp	$2B+1
-	jr	nz,fastCopyAgain
-	ret
-	; 41773 clocks total
-	; 37 bytes total
+;(ion)FastCopy from Joe Wingbermuehle
+	di
+	ld	a,$80				; 7
+	out	($10),a				; 11
+	ld	hl,plotSScreen-12-(-(12*64)+1)		; 10
+	ld	a,$20				; 7
+	ld	c,a				; 4
+	inc	hl				; 6 waste
+	dec	hl				; 6 waste
+fastCopyAgain:
+	ld	b,64				; 7
+	inc	c				; 4
+	ld	de,-(12*64)+1			; 10
+	out	($10),a				; 11
+	add	hl,de				; 11
+	ld	de,10				; 10
+fastCopyLoop:
+	add	hl,de				; 11
+	inc	hl				; 6 waste
+	inc	hl				; 6 waste
+	inc	de				; 6
+	ld	a,(hl)				; 7
+	out	($11),a				; 11
+	dec	de				; 6
+	djnz	fastCopyLoop			; 13/8
+	ld	a,c				; 4
+	cp	$2B+1				; 7
+	jr	nz,fastCopyAgain		; 10/1
+	ret					; 10
  ENDIF
 ENDIF
 
