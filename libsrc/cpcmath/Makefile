@@ -14,7 +14,8 @@ CFILES = \
 	sinh.c \
 	tanh.c \
 	atan2.c \
-	atof.c
+	atof.c \
+	halfpi.c
 
 
 AFILES  = $(CFILES:.c=.asm)
