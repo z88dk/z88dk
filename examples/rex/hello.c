@@ -7,5 +7,6 @@ int main()
 {
 	DsPrintf(0,0,0,"Hello World");
 
-	DsAddinTerminate();
+	/* Another call to SYSCALLEX */
+	DsSleep(9);
 }
