@@ -1,5 +1,5 @@
-z88dk - v1.5 xx December 2002
-=============================
+z88dk - v1.5 16th December 2002
+===============================
 
 z88dk is a Z80 cross compiler producing binaries for over 20 different z80
 based machines. Binaries are supplied for Win32,Amiga and Solaris platforms.
@@ -115,7 +115,7 @@ You should be ready to go!
 CHANGES (brief)
 
 
-z88dkv1.5 
+z88dkv1.5 16.12.2002
 
 - [sccz80] Optimizations for if/while statements
 - [sccz80] Many, many bugfixes
