@@ -11,7 +11,7 @@
 ;
 ;       djm 7/12/98
 ;
-;	$Id: float.asm,v 1.6 2002-01-21 20:37:13 dom Exp $
+;	$Id: float.asm,v 1.7 2002-04-07 14:08:33 dom Exp $
 
 ;-------------------------------------------------
 ; Some scope defintionons for the crt0 float stuff
@@ -94,10 +94,9 @@
         ld      hl,(fa+2)
         push    hl
         ld      hl,(fa)
-        push    hl
-        ex      de,hL
-        push    bc      ;restore next word
-        jp      (hl)    ;return
+	push	bc	;save function call
+	push	de	;restore return address
+	ret
 
 IF DEFINED_math_atof
 ;---------------------------------------------------------
