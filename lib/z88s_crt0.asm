@@ -3,7 +3,7 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.4 2002-06-09 17:49:31 dom Exp $
+;	$Id: z88s_crt0.asm,v 1.5 2002-06-09 22:22:13 dom Exp $
 
 
 
@@ -16,6 +16,10 @@
         defc    cmdlen  = $20F3
         defc    cmdptr  = $20F7
         defc    next    = $F886
+	defc	ZTOSTRING = $8EA4
+	defc	ALSO = $EB26
+	defc	PREVIOUS = $EB41
+	defc	internal = $94F0
 	defc	eval    = $99BA
         defc	myzorg  = $2FB1-12
 
@@ -216,23 +220,10 @@ ENDIF
 ._system
 	call	resterrhan	;restore forth error handler
 	pop	de	;return address
-	pop	hl	;command start
-	push	hl	;
+	pop	bc	;command start, BC=Forth's TOS
+	push	bc	;
 	push	de
-	ld	d,h
-	ld	e,l
-	ld	bc,0
-.system_loop
-	ld	a,(hl)
-	and	a
-	jr	z,system_out
-	inc	hl
-	inc	bc
-	jr	system_loop
-.system_out
-	ex	de,hl	;get start into hl
-	push	hl	;push onto stack for forth (Forth's 2OS)
-	ld	de,system_back	; DE=Forth's IP
+	ld	de,system_forth	; DE=Forth's IP
 	ld	iy,(saveiy)	; IY=Forth's UP
 	ld	ix,(saveix)	; IX=Forth's RSP
 				; BC=Forth's TOS
@@ -240,33 +231,25 @@ ENDIF
 ;  DE=Forth's IP (interpretive pointer)
 ;  IY=Forth's UP (user pointer)
 ;  IX=Forth's RSP (return stack pointer)
-;  Forth stack (BC=TOS, rest=machine stack): yourcmdst,yourretaddr,cmdst,cmdlen
+;  Forth stack (BC=TOS, rest=machine stack): yourcmdst,yourretaddr,yourcmdst
 
-	jp	eval		; execute "eval"
+	jp	next		; enter Forth, executing the following code
 
-; Forth now fetches the word at it's interpretive pointer (DE) and then jumps
-; to that address, so we have a word pointing to the remainder of our routine
+.system_forth
+	defw	ALSO,internal
+	defw	ZTOSTRING,eval
+	defw	PREVIOUS
+	defw	system_back	; re-enter our routine
 
 .system_back
-	defw	system_really_back
-.system_really_back
 
-; The stack effects of "eval" are: ( addr len -- flag ) so Forth stack is now:
+; Stack effects of the Forth code are ( 0-addr -- flag ) so Forth
+; stack is now:
 ;  (BC=TOS, rest=machine stack): yourcmdst,yourretaddr,flag
 
 	push	bc
 	call	doerrhan	;put c error hander back
-	pop	bc
-
-;	pop	de		;random value back (NO! "eval" used it up)
-
-; Hey, why not just do ld h,b / ld l,c / ret so you have the error code itself?
-
-	ld	hl,0
-	ld	a,b
-	or	c
-	ret	z
-	dec	hl	;-1 - some ghastly unknown error
+	pop	hl		; HL=0 for success, or error code
 	ret
 
 
