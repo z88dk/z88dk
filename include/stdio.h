@@ -1,7 +1,7 @@
 #ifndef __STDIO_H__
 #define __STDIO_H__
 
-/* $Id: stdio.h,v 1.11 2003-01-26 17:40:05 dom Exp $ */
+/* $Id: stdio.h,v 1.12 2003-03-22 14:29:32 dom Exp $ */
 
 #undef __STDIO_BINARY        /* By default don't consider binary files */
 
@@ -15,6 +15,10 @@
 
 #ifdef __CPM__
 #include <cpm.h>
+#endif
+
+#ifdef ZXVGS
+#include <zxvgs.h>
 #endif
 
 
