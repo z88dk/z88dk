@@ -27,7 +27,10 @@ void *nxtarg ;
                 if ( isspace(*ctl) ) { ++ctl; continue; }
                 if ( *ctl++ != '%' ) continue ;
                 if ( *ctl == '*' ) { narg = carg = &wast; ++ctl; }
-                else                 narg = carg = *nxtarg-- ;
+                else  {
+			narg = carg = *nxtarg;
+			nxtarg -= sizeof(int) ;
+		}
                 ctl += utoi(ctl, &width) ;
                 if ( !width ) width = 32767 ;
                 if ( !(cnv=*ctl++) ) break ;
