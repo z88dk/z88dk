@@ -3,7 +3,7 @@
  *
  *      Xircom REX 6000 Routines
  *
- *	$Id: rex.h,v 1.2 2001-07-02 06:46:44 dmarion Exp $
+ *	$Id: rex.h,v 1.3 2001-07-24 09:13:10 dmarion Exp $
  *
  *	From Damjan Marion <dmarion@iskon.hr>
  *
@@ -62,7 +62,9 @@ typedef struct
 
 extern int __LIB__ SYSCALL0(int);
 extern int __LIB__ SYSCALL1(int,...);
+extern int __LIB__ SYSCALL1P(int,...);
 extern int __LIB__ SYSCALL4(int,...);
+extern int __LIB__ SYSCALL4D(int,...);
 extern int __LIB__ SYSCALL5(int,...);
 extern int __LIB__ SYSCALL6(int,...);
 extern int __LIB__ SYSCALL6P(int,...);
