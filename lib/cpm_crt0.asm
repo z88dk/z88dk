@@ -1,10 +1,22 @@
+;
 ;       Startup for CP/M
 ;
 ;       Stefano Bodrato - Apr. 2000
 ;                         Apr. 2001: Added MS-DOS protection
 ;
-;       $Id: cpm_crt0.asm,v 1.6 2002-01-21 22:32:02 dom Exp $
+;	Dominic Morris  - Jan. 2001: Added argc/argv support
+;			- Jan. 2001: Added in malloc routines
+;			- Jan. 2001: File support added
 ;
+;       $Id: cpm_crt0.asm,v 1.7 2002-01-27 21:29:37 dom Exp $
+;
+; 	There are a couple of #pragma commands which affect
+;	this file:
+;
+;	#pragma no-streams - No stdio disc files
+;	#pragma no-fileio  - No fileio at all
+;
+;	These can cut down the size of the resultant executable
 
 	MODULE  cpm_crt0
 
@@ -30,7 +42,12 @@
 	XDEF    exitsp		;atexit() variables
 	XDEF    exitcount
 
+        XDEF    heaplast        ;Near malloc heap variables
+        XDEF    heapblocks      ;
+
 	XDEF    __sgoioblk	;std* control block
+
+	XDEF	__fcb		;file control block
 
 
         org     $100
@@ -188,6 +205,9 @@ ENDIF
 .exitcount	defb	0	;Number of atexit() routinens
 .heaplast	defw	0	;Pointer to last free heap block
 .heapblocks	defw	0	;Number of heap blocks available
+IF !DEFINED_nofileio
+.__fcb		defs	420,0	;file control block (10 files) (MAXFILE)
+ENDIF
 
 ;----------------------------
 ; Unneccessary file signature
