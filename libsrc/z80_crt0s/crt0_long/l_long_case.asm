@@ -12,12 +12,10 @@
 .l_long_case
         pop     ix              ;switch table
 .swloop
-        ld      c,(ix+0)
+	ld	a,(ix+0)
+	or	(ix+1)
         inc     ix
-        ld      b,(ix+1)
         inc     ix
-        ld      a,b
-        or      c
         jr      z,swend         ;enod of table
 ;Now, have to check our values
         ld      bc,4
