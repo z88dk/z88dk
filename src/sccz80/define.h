@@ -1,6 +1,6 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.6 2003-02-01 20:31:30 dom Exp $
+ * $Id: define.h,v 1.7 2003-03-17 16:30:27 dom Exp $
  */
 
 /*      Stand-alone definitions                 */
@@ -179,6 +179,7 @@ SYMBOL {
 struct tag_symbol {
         char name[NAMESIZE] ;     /* structure tag name */
         int size ;                /* size of struct in bytes */
+	char weak; 		  /* Not fully defined */
         SYMBOL *ptr ;             /* pointer to first member */
         SYMBOL *end ;             /* pointer to beyond end of members */
 } ;
