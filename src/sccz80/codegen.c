@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.12 2002-02-20 11:18:43 dom Exp $
+ *      $Id: codegen.c,v 1.9.2.1 2002-02-22 10:54:39 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -55,7 +55,6 @@ void header(void)
 		outstr(";\tReconstucted for asz80\n");
 	else
 	        outstr (";\tReconstructed for the z80 Module Assembler\n");
-        outstr (";\tBy Dominic Morris <djm@jb.man.ac.uk>\n");
         donelibheader=0;
         if ( (tim=time(NULL) ) != -1 ) {
                 timestr=ctime(&tim);
@@ -162,7 +161,8 @@ void outname(char *sname,char pref)
  * able to just check for far to see if we need to pick up second
  * bit of long pointer (check for type POINTER as well...
  */
-void getmem(SYMBOL *sym)
+void getmem(sym)
+SYMBOL *sym ;
 {
 
         
@@ -215,7 +215,9 @@ void getmem(SYMBOL *sym)
 
 /* Fetch the address of the specified symbol (from stack)
  */
-int getloc(SYMBOL *sym, int off)
+int getloc(sym, off)
+SYMBOL *sym;
+int off ;
 {
 	int	offs;
 	offs=sym->offset.i-Zsp+off;
@@ -227,7 +229,8 @@ int getloc(SYMBOL *sym, int off)
 
 /* Store the primary register into the specified */
 /*      static memory cell */
-void putmem(SYMBOL *sym)
+void putmem(sym)
+SYMBOL *sym;
 {
         if( sym->ident != POINTER && sym->type == DOUBLE ) {
                 address(sym);
@@ -450,7 +453,8 @@ void put2tos(void)
  *            if n=0 then emit xor a instead of ld a,0 
  *            (this is picked up by the optimizer, but even so)
  */
-void loadargc(int n)
+void loadargc(n)
+int n;
 {
         n >>= 1;
         if ( n ) {
@@ -522,7 +526,7 @@ void indirect(LVALUE *lval)
                 callrts("dload");
                 break ;
         default :
-                if (doinline) {
+                if (doinline){
                 	ol("ld\ta,(hl)");
                 	ol("inc\thl");
                 	ol("ld\th,(hl)");
@@ -566,7 +570,8 @@ void immed2(void)
 }
 
 /* Partial instruction to access literal */
-void immedlit(int lab)
+void immedlit(lab)
+int lab;
 {
         immed();
         queuelabel(lab);
@@ -719,14 +724,16 @@ void zcallop(void)
  * This uses new flags bit LIBRARY
  */
 
-char dopref(SYMBOL *sym)
+char dopref(sym)
+SYMBOL *sym;
 {
 	if (sym->flags&LIBRARY && (sym->ident == FUNCTION || sym->ident == FUNCTIONP)) return(0);
         return(1);
 }
 
 /* Call a run-time library routine */
-void callrts(char *sname)
+void callrts(sname)
+char *sname;
 {
         ot("call\t");
         outstr(sname);
@@ -746,20 +753,24 @@ void zret(void)
  * Perform subroutine call to value on top of stack
  * Put arg count in A in case subroutine needs it
  */
-void callstk(int n)
+void callstk(n)
+int n;
 {
         loadargc(n) ;
         callrts( "l_dcal" ) ;
 }
 
-void jump0(LVALUE *lval,int label)
+void jump0(lval,label)
+LVALUE *lval;
+int label;
 {
 	opjump("",label);
 }
 
 
 /* Jump to specified internal label number */
-void jump(int label)
+void jump(label)
+int label;
 {
         opjump("",label);
 }
@@ -821,10 +832,10 @@ void testjump(LVALUE *lval,int label)
 
 /* test primary register against zero and jump if false */
 /* Special conditions for testing char here */
-void zerojump(
-	      void (*oper)(LVALUE *,int),
-	      int label,
-	      LVALUE *lval)
+void zerojump(oper, label, lval)
+void (*oper)(LVALUE *,int);
+int label ;
+LVALUE *lval ;
 {
         clearstage(lval->stage_add, 0) ;                /* purge conventional code */
 #ifdef CHARCOMP0
@@ -911,8 +922,10 @@ void point(void)
 }
 
 /* Modify the stack pointer to the new value indicated */
-int modstk(int newsp,int save,int saveaf)
-     /*  newsp - if true save hl;  save - preserve contents of af */	
+int modstk(newsp,save,saveaf)
+int newsp;
+int save ;              /* if true preserve contents of HL */
+int saveaf;		/* Preerve contents of af */
 {
         int k,flag=NO;
 
@@ -982,7 +995,9 @@ modstkcht:
 }
 
 /* Multiply the primary register by the length of some variable */
-void scale(int type,TAG_SYMBOL *tag)
+void scale(type, tag)
+int type ;
+TAG_SYMBOL *tag ;
 {
         switch ( type ) {
         case CINT :
@@ -1126,19 +1141,19 @@ void zadd(LVALUE *lval)
 /*      (results in primary) */
 void zsub(LVALUE *lval)
 {
-    switch(lval->val_type) {
-    case LONG:
-    case CPTR:
-	callrts("l_long_sub");
-	Zsp +=4;
-	break;
-    case DOUBLE:
-	callrts("dsub");
-	Zsp += 6;
-	break;
-    default:
-	callrts("l_sub");
-    }
+        switch(lval->val_type) {
+                case LONG:
+		case CPTR:
+                        callrts("l_long_sub");
+                        Zsp +=4;
+                        break;
+                case DOUBLE:
+                        callrts("dsub");
+                        Zsp += 6;
+                        break;
+                default:
+                        callrts("l_sub");
+        }
 }
 
 /* Multiply the primary and secondary registers */
@@ -1275,22 +1290,14 @@ void asl(LVALUE *lval)
 /* Form logical negation of primary register */
 void lneg(LVALUE *lval)
 {
-    switch(lval->val_type) {
-    case LONG:
-    case CPTR:
-	lval->val_type = CINT;
-	callrts("l_long_lneg");
-	break;
-    case CARRY:
-	lval->val_type = CARRY;
-	ccf();
-	break;
-    case DOUBLE:
-	convdoub2int();
-    default:
-	lval->val_type = CARRY;
-	callrts("l_lneg");
-    }
+        switch(lval->val_type) {
+                case LONG:
+		case CPTR:
+                        callrts("l_long_lneg");
+                        break;
+                default:
+                        callrts("l_lneg");
+        }
 }
 
 /* Form two's complement of primary register */
@@ -1320,12 +1327,6 @@ void com(LVALUE *lval)
                 default:
                         callrts("l_com");
         }
-}
-
-/* Complement the carry flag (used after arithmetic before !) */
-void ccf(void)
-{
-    ol("ccf");
 }
 
 /*
@@ -1407,8 +1408,8 @@ void lt0(LVALUE *lval, int label)
         switch(lval->val_type) {
 #ifdef CHARCOMP0
                 case CCHAR:
-                        ol("xor\ta");
-                        ol("or\tl");
+                        ol("ld\ta,l");
+                        ol("and\ta");
                         break;
 #endif
                 case LONG:
@@ -1469,100 +1470,57 @@ void ge0(LVALUE *lval, int label)
 /* Test for equal */
 void zeq(LVALUE *lval)
 {
-    switch(lval->val_type) {
-    case LONG:
-    case CPTR:
-	lval->val_type = CARRY;
-	callrts("l_long_eq");
-	Zsp+=4;
-	break;
-    case DOUBLE:
-	callrts("deq");
-	Zsp+=6;
-	break; 
-    case CCHAR:
-	if ( doinline ) {
-	    lval->val_type = CARRY;
-	    ol("ld\ta,l");
-	    ol("sub\te");
-	    ol("and\ta");
-	    ol("jr\tnz,ASMPC+3");
-	    ol("scf");
-	    break;
-	}   
-    default:
-	lval->val_type = CARRY;
-	callrts("l_eq");
-    }
+        switch(lval->val_type) {
+                case LONG:
+		case CPTR:
+                        callrts("l_long_eq");
+                        Zsp+=4;
+                        break;
+                case DOUBLE:
+                        callrts("deq");
+                        Zsp+=6;
+                        break;
+                default:
+                        callrts("l_eq");
+        }
 }
 
 
 /* Test for not equal */
 void zne(LVALUE *lval)
 {
-    switch(lval->val_type) {
-    case LONG:
-    case CPTR:
-	lval->val_type = CARRY;
-	callrts("l_long_ne");
-	Zsp+=4;
-	break;
-    case DOUBLE:
-	callrts("dne");
-	Zsp+=6;
-	break;
-    case CCHAR:
-	if ( doinline ) {
-	    lval->val_type = CARRY;
-	    ol("ld\ta,l");
-	    ol("sub\te");
-	    ol("and\ta");
-	    ol("jr\tz,ASMPC+3");
-	    ol("scf");
-	    break;
-	}
-    default:
-	lval->val_type = CARRY;
-	callrts("l_ne");
-    }
+        switch(lval->val_type) {
+                case LONG:
+		case CPTR:
+                        callrts("l_long_ne");
+                        Zsp+=4;
+                        break;
+                case DOUBLE:
+                        callrts("dne");
+                        Zsp+=6;
+                        break;
+                default:
+                        callrts("l_ne");
+        }
 }
 
 /* Test for less than*/
 void zlt(LVALUE *lval)
 {
-    switch(lval->val_type) {
-    case LONG:
-    case CPTR:
-	lval->val_type = CARRY;
-	if (utype(lval)) callrts("l_long_ult");
-	else callrts("l_long_lt");
-	Zsp+=4;
-	break;
-    case DOUBLE:
-	callrts("dlt");
-	Zsp+=6;
-	break;
-    case CCHAR:
-	if ( doinline ) { 
-	    if ( utype(lval) ) {
-		ol("ld\ta,e");
-		ol("sub\tl");
-	    } else {
-		int label = getlabel();
-		ol("ld\ta,e");
-		ol("sub\tl");
-		ol("scf");       /* success */
-		opjump("m,",label);
-		ol("ccf");
-		postlabel(label);
-	    }
-	    lval->val_type = CARRY;
-	    break;
-	}
-    default:
-	lval->val_type = CARRY;
-	if (utype(lval)) callrts("l_ult");
-	else callrts("l_lt");
+        switch(lval->val_type) {
+                case LONG:
+		case CPTR:
+                        if (utype(lval)) callrts("l_long_ult");
+                        else callrts("l_long_lt");
+                        Zsp+=4;
+                        break;
+                case DOUBLE:
+                        callrts("dlt");
+                        Zsp+=6;
+                        break;
+                default:
+                        if (utype(lval)) callrts("l_ult");
+                        else callrts("l_lt");
         }
 }
 
@@ -1570,42 +1528,21 @@ void zlt(LVALUE *lval)
 /* Test for less than or equal to (signed/unsigned) */
 void zle(LVALUE *lval)
 {
-    switch(lval->val_type) {
-    case LONG:
-    case CPTR:
-	lval->val_type = CARRY;
-	if (utype(lval)) callrts("l_long_ule");
-	else callrts("l_long_le");
-	Zsp+=4;
-	break;
-    case DOUBLE:
-	callrts("dleq");
-	Zsp+=6;
-	break;
-    case CCHAR:
-	if ( doinline ) {
-	    if ( utype(lval) ) { /* unsigned */
-		ol("ld\ta,e");
-		ol("sub\tl");          /* If l < e then carry set */
-		ol("jr\tnz,ASMPC+3");  /* If zero, then set carry */
-		ol("scf");
-	    } else {
-		int label=getlabel();
-		ol("ld\ta,l");
-		ol("sub\te");
-		ol("scf");     /* preset true */
-		opjump("p,",label);
-		ol("ccf");
-		postlabel(label);
-	    }
-	    lval->val_type = CARRY;
-	    break;
-	}
-    default:
-	lval->val_type = CARRY;
-	if (utype(lval)) callrts("l_ule");
-	else callrts("l_le");
-    }
+        switch(lval->val_type) {
+                case LONG:
+		case CPTR:
+                        if (utype(lval)) callrts("l_long_ule");
+                        else callrts("l_long_le");
+                        Zsp+=4;
+                        break;
+                case DOUBLE:
+                        callrts("dleq");
+                        Zsp+=6;
+                        break;
+                default:
+                        if (utype(lval)) callrts("l_ule");
+                        else callrts("l_le");
+        }
 }
 
 
@@ -1613,89 +1550,41 @@ void zle(LVALUE *lval)
 /* Test for greater than (signed/unsigned) */
 void zgt(LVALUE *lval)
 {
-    switch(lval->val_type) {
-    case LONG:
-    case CPTR:
-	lval->val_type = CARRY;
-	if (utype(lval)) callrts("l_long_ugt");
-	else callrts("l_long_gt");
-	Zsp+=4;
-	break;
-    case DOUBLE:
-	callrts("dgt");
-	Zsp+=6;
-	break;
-    case CCHAR:
-	if ( doinline ) {
-	    if ( utype(lval) ) {
-		ol("ld\ta,e");
-		ol("sub\tl");
-		ol("jr\tz,ASMPC+3");  /* If zero, nc */
-		ol("ccf");
-	    } else {
-		int label = getlabel();
-		ol("ld\ta,l");
-		ol("sub\te");
-		ol("scf");
-		opjump("m,",label);
-		ol("ccf");
-		postlabel(label);
-	    }
-	    lval->val_type = CARRY;
-	    break;
-	}
-    default:
-	lval->val_type = CARRY;
-	if (utype(lval)) callrts("l_ugt");
-	else callrts("l_gt");
+        switch(lval->val_type) {
+                case LONG:
+		case CPTR:
+                        if (utype(lval)) callrts("l_long_ugt");
+                        else callrts("l_long_gt");
+                        Zsp+=4;
+                        break;
+                case DOUBLE:
+                        callrts("dgt");
+                        Zsp+=6;
+                        break;
+                default:
+                        if (utype(lval)) callrts("l_ugt");
+                        else callrts("l_gt");
         }
 }
 
 /* Test for greater than or equal to */
 void zge(LVALUE *lval)
 {
-    switch(lval->val_type) {
-    case LONG:
-    case CPTR:
-	lval->val_type = CARRY;
-	if (utype(lval)) callrts("l_long_uge");
-	else callrts("l_long_ge");
-	Zsp+=4;
-	break;
-    case DOUBLE:
-	callrts("dge");
-	Zsp+=6;
-	break;
-   case CCHAR:
-	if ( doinline ) {
-	    if ( utype(lval) ) {
-		ol("ld\ta,l");
-		ol("sub\te");         /* If l > e, carry set */
-		ol("jr\tnz,ASMPC+3"); /* If l == e then we need to set carry */
-		ol("scf");
-	    } else {
-		int label = getlabel();
-		ol("ld\ta,e");
-		ol("sub\tl");
-		ol("scf");
-		opjump("p,",label);
-		ol("ccf");
-		postlabel(label);
-	    }
-	    lval->val_type = CARRY;
-	    break;
-	}
-    default:
-	lval->val_type = CARRY;
-	if (utype(lval)) callrts("l_uge");
-	else callrts("l_ge");
-    }
-}
-
-void zcarryconv()
-{
-    vconst(0);
-    ol("rl\tl");
+        switch(lval->val_type) {
+                case LONG:
+		case CPTR:
+                        if (utype(lval)) callrts("l_long_uge");
+                        else callrts("l_long_ge");
+                        Zsp+=4;
+                        break;
+                case DOUBLE:
+                        callrts("dge");
+                        Zsp+=6;
+                        break;
+                default:
+                        if (utype(lval)) callrts("l_uge");
+                        else callrts("l_ge");
+        }
 }
 
 
