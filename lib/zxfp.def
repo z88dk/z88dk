@@ -2,10 +2,20 @@ lstoff
 
 ; ZX Spectrum stack calculator functions (ZXFP)
 
-; $Id: zxfp.def,v 1.3 2002-04-29 09:54:05 stefano Exp $
+; $Id: zxfp.def,v 1.4 2002-05-10 13:56:06 stefano Exp $
 
 ; function codes:
 
+		; RST 28h activates the FP calculator
+		DEFC	ZXFP_BEGIN_CALC	= $28
+		
+		DEFC	ZXFP_STK_STORE	= $2AB6
+		DEFC	ZXFP_STK_FETCH	= $2BF1
+		DEFC	ZXFP_STACK_A	= $2D28
+		DEFC	ZXFP_STACK_BC	= $2D2B
+		DEFC	ZXFP_FP_TO_BC	= $2DA2
+		DEFC	ZXFP_FP_TO_A	= $2DD5
+		
 		DEFC	ZXFP_JUMP_TRUE	= $00
 		DEFC	ZXFP_EXCHANGE	= $01
 		DEFC	ZXFP_DELETE	= $02
@@ -24,7 +34,7 @@ lstoff
 		DEFC	ZXFP_NOS_EQL	= $0E
 		
 		DEFC	ZXFP_ADDITION	= $0F
-	
+		
 		DEFC	ZXFP_STR_AND_NO	= $10	; String and Number
 		DEFC	ZXFP_STR_L_EQL	= $11	; String <=
 		DEFC	ZXFP_STR_GR_EQL	= $12	; String >=
@@ -33,7 +43,7 @@ lstoff
 		DEFC	ZXFP_STRS_LESS	= $15	; String <
 		DEFC	ZXFP_STRS_EQL	= $16	; String =
 		DEFC	ZXFP_STRS_ADD	= $17	; String addition
-
+		
 		DEFC	ZXFP_VAL_STR	= $18	; VAL$
 		DEFC	ZXFP_USR_STR	= $19	; Computes the UDG Addresses
 		DEFC	ZXFP_READ_IN	= $1A
@@ -73,9 +83,15 @@ lstoff
 		DEFC	ZXFP_E_TO_FP	= $3C
 		DEFC	ZXFP_RE_STACK	= $3D
 		DEFC	ZXFP_SERIES_06	= $3E	; Polynomenentwicklung
-		DEFC	ZXFP_STK_ZERO	= $3F
+
 		DEFC	ZXFP_ST_MEM_0	= $40
 		DEFC	ZXFP_GET_MEM_0	= $41
 		
+		DEFC	ZXFP_STK_ZERO	= $3F
+		DEFC	ZXFP_STK_ONE	= $A1
+		DEFC	ZXFP_STK_HALF	= $A2
+		DEFC	ZXFP_STK_PI_D_2	= $A3
+		DEFC	ZXFP_STK_TEN	= $A4
+
 lston
 
