@@ -9,7 +9,7 @@
  *
  *	djm 13/2/2000
  *
- *	$Id: resolv.h,v 1.4 2001-10-16 18:30:32 dom Exp $
+ *	$Id: resolv.h,v 1.5 2002-01-27 16:19:03 dom Exp $
  */
 
 #ifndef __NET_RESOLV_H__
@@ -78,8 +78,8 @@ extern int __LIB__   getnetbyname(char *name);
 extern char __LIB__ *getnetbynumber(int network, char *store);
 
 /* The helper routines */
-extern int __LIB__  getxxbyname(struct data_entry *,char *name);
-extern int __LIB__ *getxxbyport(struct data_entry *, int, char *store);
+extern tcpport_t  __LIB__  getxxbyname(struct data_entry *,char *name);
+extern char __LIB__ *getxxbyport(struct data_entry *, int, char *store);
 extern struct data_entry *get_services();
 extern struct data_entry *get_networks();
 extern struct data_entry *get_protocols();
