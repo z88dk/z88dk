@@ -1,0 +1,30 @@
+;Additions to you your autoexec.bat:
+;
+;SET Z80_OZFILES={Z88DK}\LIB\
+;SET ZCCCFG={Z88DK}\LIB\CONFIG\
+;SET PATH=%PATH%;{Z88DK}\BIN
+
+[Version]
+Signature=$Chicago$
+;Next line so we support LFN... (M$ didn't implement that in original .inf)
+AdvancedINF=2.0
+
+[DefaultInstall]
+;Must be done in 2 passes...
+UpdateAutoBat = UnSetAutoBat, AddAutoBat
+
+[UnSetAutoBat]
+UnSet = Z80_OZFILES
+UnSet = ZCCCFG
+
+[AddAutoBat]
+CmdAdd = SET, "Z80_OZFILES=%1%\Lib\"
+CmdAdd = SET, "ZCCCFG=%1%\Lib\Config\"
+CmdAdd = SET, "PATH=%PATH%;%1%\Bin"
+
+;How to remove the {z88dk}\bin dir from the PATH? This won't work:
+;PreFixPath = Executable.Files
+;RemOldPath = Executable.Files
+
+;[DestinationDirs]
+;Executable.Files = 1,Bin
