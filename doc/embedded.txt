@@ -6,7 +6,7 @@ his Z80 core http://www.opencores.org/projects/t80/.
 It is important to initialise the UART at the start of your program, eg:
 
 #include <stdio.h>
-#include <ns16450.h>
+#include "ns16450.h"
 
 int main()
 {
@@ -18,7 +18,3 @@ Floating point is supported by this port, and some example are given in
 examples/embedded (NB. Many of these examples could be made to work
 on other z88dk targets with the minimum of hassle)
 
-Should you wish to change the port of the UART (it's currently 0), then you
-will need to change include/ns16450.h lib/ns16560.def and then recompile
-the embedded_clib.lib. Parameters concerning memory maps can be changed in
-lib/embedded_crt0.asm
