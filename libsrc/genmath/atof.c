@@ -12,14 +12,16 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <float.h>
+#include <stdlib.h>
 
 /* decimal to (double) binary conversion */
 
-atof(s)
+double atof(s)
 unsigned char s[];		/* s points to a character string */
 {
 	double sum,		/* the partial result */
 		scale;		/* scale factor for the next digit */
+	double ten;
 	unsigned char *start,	/* copy if input pointer */
 		*end,		/* points to end of number */
 		c;			/* character from input line */
@@ -27,6 +29,7 @@ unsigned char s[];		/* s points to a character string */
 		dot,		/* nonzero if *s is decimal point */
 		decimal;	/* nonzero if decimal point found */
 
+	ten = (double) 10;
 	if ( *s == '-' ) { minus = 1 ; ++s ; }
 	else minus = 0 ;
 	start = s ;
@@ -36,7 +39,7 @@ unsigned char s[];		/* s points to a character string */
 		++s ;	/* scan to end of string */
 	}
 	end = s ;
-	sum = 0.0 ;		/* initialize answer */
+	sum = (double)0 ;		/* initialize answer */
 	if ( decimal ) {
 		/* handle digits to right of decimal */
 		--s ;
@@ -75,10 +78,10 @@ unsigned char s[];		/* s points to a character string */
 			expon = 0 ;
 		}
 		k = 32 ;	/* set one bit in mask */
-		scale = 1.0 ;
+		scale = (double) 1 ;
 		while(k) {
 			scale *= scale;
-			if ( k & expon ) scale *= 10.0 ;
+			if ( k & expon ) scale *= ten ;
 			k >>= 1 ;
 		}
 		if(neg) sum /= scale;
