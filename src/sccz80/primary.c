@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.4 2001-02-02 12:24:06 dom Exp $
+ *      $Id: primary.c,v 1.5 2001-02-15 16:59:29 dom Exp $
  */
 
 
@@ -542,7 +542,9 @@ LVALUE *lval ;
 void rvaluest(lval)
 LVALUE *lval;
 {
-        if( lval->symbol && lval->indirect == 0 )
+	if ( lval->symbol && strncmp(lval->symbol->name,"0dptr",5) == 0 )
+		lval->symbol=lval->symbol->offset.p;
+        if( lval->symbol && lval->indirect == 0 ) 
                 getmem(lval->symbol);
         else {
 		indirect(lval);
@@ -709,6 +711,7 @@ void addconst(int val,int opr, char zfar)
 
 int docast(LVALUE *lval,char df)
 {
+	SYMBOL  *ptr;
         char    temp_type;
         int     itag;
         char    nam[20];
@@ -767,7 +770,9 @@ int docast(LVALUE *lval,char df)
         temp_type = ( (lval->c_flags&FARPTR) ? CPTR : CINT );
         itag=0;
         if ( lval->c_tag) itag=lval->c_tag-tagtab;
+	ptr=lval->symbol;
         lval->symbol = addloc(nam,POINTER,temp_type,dummy_idx(lval->c_vtype,lval->c_tag),itag);
+	lval->symbol->offset.p=ptr;
         if (df) force(temp_type,lval->val_type,0,0,0);
         lval->val_type=temp_type;
         lval->flags=( (lval->flags&FARACC) | lval->c_flags );
