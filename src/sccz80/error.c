@@ -3,7 +3,7 @@
  *
  *      Errors and other such misfitting routines
  *
- *      $Id: error.c,v 1.2 2003-02-01 20:31:30 dom Exp $
+ *      $Id: error.c,v 1.3 2003-08-30 16:29:53 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -80,7 +80,7 @@ struct warnings mywarn[]={
         {"Const type not supported by compiler",0},
         {"Volatile type not supported by compiler",0},
         {"... must be preceded by named argument",0},
-        {"Floating point not supported by printf yet!",0},
+        {"Floating point not supported by printf yet!",1},
 	{"Function arguments have sign mismatch",0},
 	{"Auto by default in function definition",0},
 	{"%s%s*[] type uninitialised has no storage",0},
