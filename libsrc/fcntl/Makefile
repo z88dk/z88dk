@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.8 2002-12-08 15:24:44 dom Exp $
+# $Id: Makefile,v 1.9 2003-03-22 14:17:34 dom Exp $
 
 lz88:
 	cd z88 ; $(MAKE) z88_fcntl
@@ -20,3 +20,4 @@ clean:
 	cd spectrum ; $(MAKE) clean
 	cd sprinter ; $(MAKE) clean
 	cd z88 ; $(MAKE) clean
+	cd zxvgs ; $(MAKE) clean
