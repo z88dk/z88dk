@@ -1868,3 +1868,36 @@
 	ld	a,h
 	or	l
 	jp	%2
+
+	ld	hl,0	;const
+	add	hl,sp
+	ld	(hl),%1
+	ld	l,(hl)
+	ld	h,0
+=
+	pop	hl
+	ld	l,%1
+	push	hl
+	ld	h,0
+
+	ld	hl,1	;const
+	add	hl,sp
+	ld	(hl),%1
+	ld	l,(hl)
+	ld	h,0
+=
+	pop	hl
+	ld	h,%1
+	push	hl
+	ld	l,h
+	ld	h,0
+
+	ld	h,0
+	ld	hl,%1
+=
+	ld	hl,%1
+
+	ld	l,h
+	ld	hl,%1
+=
+	ld	hl,%1
