@@ -1,16 +1,21 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.8 2002-10-22 19:15:24 dom Exp $
+# $Id: Makefile,v 1.9 2002-11-20 22:52:59 dom Exp $
 
 lz88: time z88_time
 
+lpps: time pps_time
+
 lzx: spectrum_time
 
-time: gmtime.o localtime.o
+time: gmtime.o localtime.o mktime.o
 
 .c.o:
 	zcc +z88 -vn -make-lib $*.c
+
+pps_time:
+	cd sprinter ; $(MAKE)
 
 z88_time:
 	cd z88 ; $(MAKE)
@@ -23,3 +28,4 @@ clean:
 	$(RM) zx81/*.o*
 	cd z88 ; $(MAKE) clean
 	cd spectrum ; $(MAKE) clean
+	cd sprinter ; $(MAKE) clean
