@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.29 2004-03-05 09:30:52 dom Exp $
+#	$Id: Makefile,v 1.30 2004-09-22 16:25:25 dom Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -86,7 +86,7 @@ libs:
 	cd libsrc ; $(MAKE) install
 
 install-libs:
-	mkdir -p $(prefix)/lib/z88dl/lib/clibs
+	mkdir -p $(prefix)/lib/z88dk/lib/clibs
 	cp -R lib/clibs/* $(prefix)/lib/z88dk/lib/clibs/
 	find $(prefix)/lib/z88dk/lib/clibs -type f | xargs chmod 644
 
