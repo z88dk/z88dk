@@ -91,8 +91,6 @@ rex/graphics/DsGetPixelAddr
 rex/graphics/DsSetPixel
 rex/graphics/DsDisplayCircle
 rex/graphics/DsDisplayEllipse
+setjmp/longjmp
+setjmp/setjmp
 
-
-
-
-printflike/ltoa_any
