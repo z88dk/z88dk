@@ -22,7 +22,7 @@ APPMAKER	appmake
 #
 # No handling for the Spectrum, so leave as per z88
 
-Z88MATHFLG	-math-z88
+Z88MATHFLG	-math-z88 -D__NATIVE_MATH__
 
 #
 # Style of the C Preprocessor
@@ -103,7 +103,7 @@ LINKOPTS	-a -m -Mo
 # (Leave alone!)
 #
 
-Z88MATHLIB 	z88_math
+Z88MATHLIB 	zx_math
 STARTUPLIB 	z80_crt0
 GENMATHLIB	gen_math
 
