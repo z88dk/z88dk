@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.12 2002-02-20 11:18:43 dom Exp $
+ *      $Id: codegen.c,v 1.13 2002-02-21 16:46:00 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -1548,13 +1548,12 @@ void zlt(LVALUE *lval)
 		ol("ld\ta,e");
 		ol("sub\tl");
 	    } else {
-		int label = getlabel();
 		ol("ld\ta,e");
 		ol("sub\tl");
-		ol("scf");       /* success */
-		opjump("m,",label);
-		ol("ccf");
-		postlabel(label);
+		ol("rra");
+		ol("xor\te");
+		ol("xor\tl");
+		ol("rlca");
 	    }
 	    lval->val_type = CARRY;
 	    break;
@@ -1590,12 +1589,15 @@ void zle(LVALUE *lval)
 		ol("jr\tnz,ASMPC+3");  /* If zero, then set carry */
 		ol("scf");
 	    } else {
-		int label=getlabel();
-		ol("ld\ta,l");
-		ol("sub\te");
-		ol("scf");     /* preset true */
-		opjump("p,",label);
-		ol("ccf");
+		int label = getlabel();
+		ol("ld\ta,e");
+                ol("sub\tl");
+                ol("rra");
+		ol("scf");
+		opjumpr("z,",label);
+                ol("xor\te");
+                ol("xor\tl");
+                ol("rlca");
 		postlabel(label);
 	    }
 	    lval->val_type = CARRY;
@@ -1633,13 +1635,13 @@ void zgt(LVALUE *lval)
 		ol("jr\tz,ASMPC+3");  /* If zero, nc */
 		ol("ccf");
 	    } else {
-		int label = getlabel();
-		ol("ld\ta,l");
-		ol("sub\te");
-		ol("scf");
-		opjump("m,",label);
-		ol("ccf");
-		postlabel(label);
+                ol("ld\ta,e");
+                ol("sub\tl");
+                ol("rra");
+                ol("xor\te");
+                ol("xor\tl");
+                ol("rlca");
+		ccf();	
 	    }
 	    lval->val_type = CARRY;
 	    break;
@@ -1676,10 +1678,14 @@ void zge(LVALUE *lval)
 	    } else {
 		int label = getlabel();
 		ol("ld\ta,e");
-		ol("sub\tl");
+                ol("sub\tl");
+                ol("rra");
 		ol("scf");
-		opjump("p,",label);
-		ol("ccf");
+		opjumpr("z,",label);
+                ol("xor\te");
+                ol("xor\tl");
+                ol("rlca");
+		ccf();
 		postlabel(label);
 	    }
 	    lval->val_type = CARRY;
