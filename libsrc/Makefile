@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.30 2002-01-21 19:01:13 dom Exp $
+# $Id: Makefile,v 1.31 2002-01-27 16:03:43 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -642,7 +642,7 @@ clean:
 	cd z80_crt0s; make clean
 	cd z88 ; make clean
 	cd z88math ; make clean
-	rm *.lib
+	rm -f *.lib
 
 install:
 	cp *.lib ../lib/clibs/
