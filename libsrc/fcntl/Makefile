@@ -1,4 +1,7 @@
-# $Id: Makefile,v 1.11 2003-09-14 11:46:39 dom Exp $
+# $Id: Makefile,v 1.12 2003-09-16 09:23:42 dom Exp $
+
+lcpc:
+	cd cpc ; $(MAKE)
 
 lz88:
 	cd z88 ; $(MAKE) z88_fcntl
