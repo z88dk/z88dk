@@ -3,7 +3,7 @@
  *
  *      Plunging routines
  *
- *      $Id: plunge.c,v 1.6 2002-04-21 17:22:08 dom Exp $
+ *      $Id: plunge.c,v 1.7 2002-05-29 22:54:09 dom Exp $
  *
  *      Altogether now...arse! My cunning scheme to use c as an
  *      indicator flops badly due to logical conditions, I just
@@ -204,6 +204,9 @@ void (*oper)(), (*doper)();
                 else
                         lval->const_val = calc(lval->const_val, oper, lval2->const_val) ;
                 clearstage(before, 0) ;
+		/* For long constants we push on stack, have to undo this... */
+		if ( lval->val_type == LONG ) 
+		    Zsp += 4;
         }
         else {
                 /* one or both operands not constant */

@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.13 2002-02-05 21:02:03 dom Exp $
+ *      $Id: const.c,v 1.14 2002-05-29 22:54:09 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -485,7 +485,7 @@ void stowlit(int value, int size)
 
 
 /* Return current literal char & bump lptr */
-char litchar()
+unsigned char litchar()
 {
     int i, oct ;
 
@@ -554,8 +554,9 @@ char litchar()
 	oct=(oct<<3)+gch()-'0';
     if( i == 2 )  
 	return(gch());
-    else 
+    else {
 	return((char)oct);
+    }
 }
 
 

@@ -2,7 +2,7 @@
  * cc4.c - fourth part of Small-C/Plus compiler
  *         routines for recursive descent
  *
- * $Id: expr.c,v 1.9 2002-04-07 12:19:59 dom Exp $
+ * $Id: expr.c,v 1.10 2002-05-29 22:54:09 dom Exp $
  *
  */
 
@@ -570,7 +570,7 @@ LVALUE *lval ;
         else if ( cmatch('*') ) {                       /* unary * */
                 if ( heira(lval) ) rvalue(lval) ;
 /* Cast the symbol before derefencing.. */
-                if (lval->c_vtype) { j=docast(lval,1); if (j) lval->indirect=lval->c_vtype; }
+                if (lval->c_id /* != VARIABLE */ ) { j=docast(lval,1); if (j) lval->indirect=lval->c_vtype; }
   
 
                 if ( lval->symbol == 0 ) {

@@ -11,6 +11,6 @@ extern int tstr(long *val);
 extern int storeq(int length, unsigned char *queue,long *val);
 extern int qstr(long *val);
 extern void stowlit(int value, int size);
-extern char litchar(void);
+extern unsigned char litchar(void);
 extern void size_of(LVALUE *lval);
 extern int GetMembSize(TAG_SYMBOL *ptr);
