@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 5/5/2000
 ;
-;       $Id: mz_crt0.asm,v 1.4 2002-01-16 12:19:50 stefano Exp $
+;       $Id: mz_crt0.asm,v 1.5 2002-01-30 10:11:12 stefano Exp $
 ;
 
 
@@ -125,7 +125,7 @@ ENDIF
 ; Now some variables
 ;-----------
 .coords         defw    0       ; Current graphics xy coordinates
-.base_graphics  defw    0       ; Address of the Graphics map
+.base_graphics  defw    $D000   ; Address of the Graphics map
 
 .int_seed       defw    0       ; Seed for integer rand() routines
 

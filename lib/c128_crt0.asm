@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.3 2001-09-11 16:00:52 stefano Exp $
+;	$Id: c128_crt0.asm,v 1.4 2002-01-30 10:11:11 stefano Exp $
 ;
 
 
@@ -40,6 +40,10 @@
 
         XDEF    exitsp
         XDEF    exitcount
+
+; Graphics (pseudo)
+        XDEF    base_graphics   ;Graphical variables
+	XDEF	coords		;Current xy position
 
 ;For stdin, stdout, stder
 
@@ -170,6 +174,12 @@ ENDIF
 
 .heaplast	defw	0
 .heapblocks	defw	0
+
+
+; Graph
+
+.coords         defw    0       ; Current graphics xy coordinates
+.base_graphics  defw    $2000   ; Address of the Graphics map
 
 ; mem stuff
 

@@ -1,11 +1,10 @@
 
 	XLIB	plotpixel
 
-	LIB pixeladdress
 	XREF	COORDS
 
 ;
-;	$Id: plotpixl.asm,v 1.1 2002-01-17 17:09:21 stefano Exp $
+;	$Id: plotpixl.asm,v 1.2 2002-01-30 10:11:13 stefano Exp $
 ;
 
 ; ******************************************************************

@@ -1,11 +1,11 @@
-$Id: README,v 1.2 2001-10-25 14:27:42 stefano Exp $
+$Id: README,v 1.3 2002-01-30 10:11:14 stefano Exp $
 
 VICE emulator required.
 
 RUN x128 and create a blank disk image (mydisk.d64),
 then exit emulator and do the following steps:
 
-zcc +c128 program.c	-> compile the program
+zcc +c128ansi program.c	-> compile the program
 bin3000 a.bin z80mc	-> add the 2 bit address stub
 c1541 mydisk.d64
 	(write z80run)	-> insert the BASIC loader (if new disk)
@@ -13,7 +13,7 @@ c1541 mydisk.d64
 	write z80mc	-> insert the (new) MC program
 	exit
 
-c1541 mydisk.d64	-> run the emulator
+x128 mydisk.d64	-> run the emulator
 	load "z80run",8	-> load the BASIC loader
 	run
 
