@@ -8,17 +8,21 @@
 #include <string.h>
 
 #ifdef USE_REGEXP
-#include <sys/types.h>
-#include <regex.h>
+	#include <sys/types.h>
+	#ifdef LOCAL_REGEXP
+		#include "regex/regex.h"
+	#else
+		#include <regex.h>
+	#endif
 #endif
 
-#ifdef _MSC_VER
-#define strcasecmp stricmp
+#if defined(_MSC_VER) || defined(__TURBOC__)
+	#define strcasecmp stricmp
 #endif
 
 #define HSIZE 107
 #define MAXLINE 256
-#define MAXFIRECOUNT 65535
+#define MAXFIRECOUNT 65535L
 #define MAX_PASS 16
 
 int debug = 0;
@@ -37,7 +41,7 @@ struct lnode {
 struct onode {
 	struct lnode *o_old, *o_new;
 	struct onode *o_next;
-	int firecount;
+	long firecount;
 } *opts = 0, *activerule = 0;
 
 
