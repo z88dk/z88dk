@@ -1,4 +1,4 @@
-rem @echo off
+rem $Id: zcc83.bat,v 1.2 2001-04-17 09:48:30 stefano Exp $
 zcc %1.c
 del a.bin
 copy a.bas %1.bin

@@ -1,3 +1,9 @@
+$Id: bin2var2.txt,v 1.2 2001-04-17 09:48:30 stefano Exp $
+-------
+
+(Stefano's note:
+ Removed the exe files.  They can be added in the binary distributions.)
+
 Bin2Var2
 modified by Jeremy Drake <jedrake@krl.org>
 August 25, 2000

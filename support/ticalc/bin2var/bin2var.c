@@ -17,6 +17,10 @@
     * changed error message printing to use stderr
 
   Edited by Jeremy Drake to add the tasmCmp symbol to 8XP files
+
+-------
+  $Id: bin2var.c,v 1.2 2001-04-17 09:48:30 stefano Exp $
+
 */
 
 #include <stdio.h>

@@ -18,6 +18,10 @@
 
   Edited by Jeremy Drake to create unsquished 83P and 8XP files
   with correct "End" and "AsmPrgm" symbols
+
+-------
+  $Id: bin2var2.c,v 1.2 2001-04-17 09:48:30 stefano Exp $
+
 */
 
 #include <stdio.h>
