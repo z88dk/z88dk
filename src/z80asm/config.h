@@ -37,7 +37,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #define OS_ID "AMIGA"
 #define AMIGA 1
 #define ENDIAN 1
-#define DEFLIBDIR "z88dk:lib/"
+#define DEFLIBDIR "zcc:lib/"
 */
 
 /* WIN32 definitions:
