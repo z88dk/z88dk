@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti82_crt0.asm,v 1.17 2002-06-06 09:41:39 stefano Exp $
+;	$Id: ti82_crt0.asm,v 1.18 2002-11-09 19:54:47 dom Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -87,7 +87,7 @@ ELSE
 	ld	(exitsp),sp
 ENDIF
 
-	XREF	fputc_cons
+	LIB	fputc_cons
 	ld	hl,12
 	push	hl
 	call	fputc_cons

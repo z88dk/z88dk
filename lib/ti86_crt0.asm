@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.19 2002-06-06 09:41:39 stefano Exp $
+;	$Id: ti86_crt0.asm,v 1.20 2002-11-09 19:54:47 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -239,7 +239,7 @@ ENDIF
 	ld	(_winBtm),a	;  can print on the last line
 ;  ELSE
 
-	XREF	fputc_cons
+	LIB	fputc_cons
 	ld	hl,12
 	push	hl
 	call	fputc_cons

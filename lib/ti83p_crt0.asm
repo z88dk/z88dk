@@ -3,7 +3,7 @@
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.15 2002-06-06 09:41:39 stefano Exp $
+;	$Id: ti83p_crt0.asm,v 1.16 2002-11-09 19:54:47 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells
@@ -177,7 +177,7 @@ ELSE				;
 	ld	(exitsp),sp	;
 ENDIF
 
-	XREF	fputc_cons
+	LIB	fputc_cons
 	ld	hl,12
 	push	hl
 	call	fputc_cons

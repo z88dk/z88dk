@@ -3,7 +3,7 @@
 ;	Stefano Bodrato	- Dec 2000
 ;	Henk Poley	- Apr 2001 Fixed and add some things
 ;
-;	$Id: ti83_crt0.asm,v 1.18 2002-06-06 09:41:39 stefano Exp $
+;	$Id: ti83_crt0.asm,v 1.19 2002-11-09 19:54:47 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -293,7 +293,7 @@ ELSE
 	ld	(exitsp),sp
 ENDIF
 
-	XREF	fputc_cons
+	LIB	fputc_cons
 	ld	hl,12
 	push	hl
 	call	fputc_cons

@@ -164,7 +164,7 @@ ENDIF				;
 	ld      hl,$8080	;
 	ld      (fp_seed),hl	;
 
-	XREF	fputc_cons
+	LIB	fputc_cons
 	ld	hl,12
 	push	hl
 	call	fputc_cons
