@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.8 2001-10-16 18:30:32 dom Exp $
+ * $Id: stdlib.h,v 1.9 2001-10-16 20:39:37 dom Exp $
  */
 
 extern __LIB__ abs(int);
@@ -56,6 +56,11 @@ extern __LIB__ csleep(int);  /* Very non standard! sleep for centisecs! (z88)*/
 /* abort is a macro to exit with RC_Err - only for apps */
 
 #define abort() exit(15)
+
+/* itoa is used by the Rex6000 port, but anyone could use it */
+extern char __LIB__ *itoa(char *buf, int num);
+/* Not sure why Rex has it's own rand() routine using different seed? */
+#define randRex() rand()
 
 /*
  *	Okay..include in malloc.h to be standard..
