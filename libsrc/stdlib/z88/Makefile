@@ -3,7 +3,7 @@
 #
 
 all:
-	zcc  -Wn43 -vn -make-lib atol.c
+	zcc  -Wn43 -D__Z88__ -vn -make-lib atol.c
 
 
 clean:
