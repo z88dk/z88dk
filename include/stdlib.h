@@ -5,8 +5,10 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.12 2002-11-20 19:50:51 dom Exp $
+ * $Id: stdlib.h,v 1.13 2002-11-20 20:30:33 dom Exp $
  */
+
+#include <sys/types.h>
 
 extern __LIB__ abs(int);
 extern long __LIB__ labs(long);
@@ -48,8 +50,10 @@ extern __LIB__ sleep(int);
 
 
 /* Non standard stdlib.h defs (mode is ignored)*/
+#ifndef __FCNTL_H__
 extern __LIB__ mkdir(char *, int mode);
-extern char __LIB__ *getcwd(char *buf, int maxlen); 
+extern char __LIB__ *getcwd(char *buf, size_t maxlen); 
+#endif
 
 #ifdef __Z88__
 extern __LIB__ csleep(int);  /* Very non standard! sleep for centisecs! (z88)*/
