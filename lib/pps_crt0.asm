@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: pps_crt0.asm,v 1.1 2002-10-01 13:55:23 dom Exp $
+;       $Id: pps_crt0.asm,v 1.2 2002-10-12 10:51:24 dom Exp $
 ;
 
 
@@ -62,9 +62,6 @@
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
-; Turn on system ROM
-	ld	a,0
-	out	($7c),a
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 ; Set up the std* stuff so we can be called again
@@ -76,6 +73,12 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
+	ld	de,0
+	ld	hl,$2350
+	ld	b,7
+	ld	a,' '
+	ld	c,$56		;CLEAR
+	rst	$10
         call    _main		;Call user program
 .cleanup
 ;
