@@ -22,7 +22,7 @@ APPMAKER	appmake
 #
 # (Leave alone for z88)
 
-Z88MATHFLG	-math-z88
+Z88MATHFLG -math-z88 -D__NATIVE_MATH__
 
 #
 # Style of the C Preprocessor

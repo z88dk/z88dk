@@ -22,7 +22,7 @@ APPMAKER	appmake
 #
 # No handling for the Spectrum, so leave as per z88
 
-Z88MATHFLG
+Z88MATHFLG -D__NATIVE_MATH__
 
 #
 # Style of the C Preprocessor
