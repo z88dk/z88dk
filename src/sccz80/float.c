@@ -3,7 +3,7 @@
  *
  *      Routines to float an string
  *
- *      $Id: float.c,v 1.2 2002-01-26 00:24:14 dom Exp $
+ *      $Id: float.c,v 1.3 2002-01-26 22:10:19 dom Exp $
  *
  *      This code has been largely rewritten. It now produces numbers
  *      to about 4 decimal places - there's an inaccuracy creeping in
@@ -115,6 +115,22 @@ static int fa_add(unsigned char *fa1, unsigned char *fa2, int carry)
     return carry;
 }
 
+#if 0
+static int fa_sub(unsigned char *fa1, unsigned char *fa2, int carry)
+{
+    int  i;
+    int temp;
+    for (i = 0; i < EXPONENT; i++) {
+	temp = fa1[i] - fa2[i] - carry;
+	carry = ( temp < 0 ? 1 : 0 );	
+	fa1[i] = (temp % 256);	
+
+    }
+    return carry;
+}
+#endif
+
+
 static int shift_right(unsigned char *fa, int carry)
 {
     int  temp;
@@ -139,8 +155,30 @@ static int shift_right(unsigned char *fa, int carry)
     return carry;
 }
 
+#if 0
+static int shift_left(unsigned char *fa, int carry)
+{
+    int  temp;
+    int  i;
+    for ( i = 0; i < EXPONENT-6; i ++ ) {
+	temp = (fa[i] & 128);
+	fa[i] <<= 1;
+	if ( carry )
+	    fa[i] |= 1;
+	carry = temp;
+    }
 
-
+    for ( i = EXPONENT-6; i < EXPONENT; i++ ) {
+	temp = (fa[i] & 128);
+	fa[i] <<= 1;
+	if ( carry )
+	    fa[i] |= 1;
+	carry = temp;
+    }
+  
+    return carry;
+}
+#endif
 
 
 /* Multiply two FP numbers together */
@@ -296,6 +334,7 @@ void unpack(unsigned char *s, unsigned char *d)
     unsigned char temp;
     unsigned char minus;
     
+    d[EXPONENT-6] = 0;
     d[EXPONENT-5] = s[0];
     d[EXPONENT-4] = s[1];
     d[EXPONENT-3] = s[2];

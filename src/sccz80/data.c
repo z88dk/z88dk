@@ -6,17 +6,17 @@
  *      I'm starting to split these up once more and stick them in
  *      the relevant files..
  *
- *      $Id: data.c,v 1.9 2002-01-20 23:29:41 dom Exp $
+ *      $Id: data.c,v 1.10 2002-01-26 22:10:19 dom Exp $
  */
 
 #include "ccdefs.h"
 
 /*      Now reserve some storage words          */
 
-char amivers[] = "$VER: sccz80 v1.10b0.73 (20.1.2002)";
+char amivers[] = "$VER: sccz80 v1.10b0.73 (26.1.2002)";
 char titlec[] = "Small-C/Plus - z80 Crosscompiler ";
 char Banner[]  = "* * * * *  Small-C/Plus z88dk * * * * *" ;
-char Version[] = "  Version: v1.10b0.73 Date: 20/1/2002 ";
+char Version[] = "  Version: v1.10b0.73 Date: 26/1/2002 ";
 
 
 

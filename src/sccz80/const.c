@@ -4,14 +4,17 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.9 2002-01-26 00:24:14 dom Exp $
+ *      $Id: const.c,v 1.10 2002-01-26 22:10:19 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
  *      around exponent-- for -math-z88
  *
- *      29/1/20001 djm - added ability to dump string literals and have
+ *      29/1/2001 djm - added ability to dump string literals and have
  *      them sorted out at compile time
+ *
+ *      26/1/2002 djm - Exponent code uncommented now. This works, but
+ *      there may be accuracy issues due to method used for -ve exponents
  *
  */
 
@@ -79,151 +82,153 @@ LVALUE *lval ;
 }
 
 
-int fnumber(val)
-long *val;
+int fnumber(long *val)
 {
-        unsigned char sum[6],sum2[6],scale[6],frcn[6],dig1[6],dig2[6],dig3[6];
-        int k;                  /* flag and mask */
-        unsigned char minus;     /* is if negative! */
-        char *start;    /* copy of pointer to starting point */
-        char *s;             /* points into source code */
-	char *dp1;	    /* First number after dp */
-	char *end;
-        if (mathz88) {
-                frcn[0]=0;
-                frcn[1]=205;
-                frcn[2]=frcn[3]=204;
-                frcn[4]=76;
-                frcn[5]=125;
-        } else {
-                frcn[0]=205;
-                frcn[1]=frcn[2]=frcn[3]=204;
-                frcn[4]=76;
-                frcn[5]=125;            /* frcn = 0.1 */
-        }
-        start=s=line+lptr;      /* save starting point */
-        k=1;
-        minus=1;
-        while(k) {
-                k=0;
-                if(*s=='+') {
-                        ++s; k=1;
-                }
-                if(*s=='-') {
-                        ++s; k=1; minus=(-minus);
-                }
-        }
+    unsigned char sum[6];
+    unsigned char sum2[6];
+    unsigned char scale[6];
+    unsigned char frcn[6];
+    unsigned char dig1[6];
+    unsigned char dig2[6];
+    unsigned char dig3[6];
+    int k;                  /* flag and mask */
+    unsigned char minus;     /* is if negative! */
+    char *start;    /* copy of pointer to starting point */
+    char *s;             /* points into source code */
+    char *dp1;	    /* First number after dp */
+    char *end;
+    
+
+    if (mathz88) {             /* Z88 Representation of 0.1 */
+	frcn[0] = 0;
+	frcn[1] = 205;
+	frcn[2] = frcn[3]=204;
+	frcn[4] = 76;
+	frcn[5] = 125;
+    } else {                   /* Generic representation of 0.1 */
+	frcn[0] = 205;
+	frcn[1] = frcn[2] = frcn[3] = 204;
+	frcn[4] = 76;
+	frcn[5] = 125;            
+    }
+
+    start = s = line+lptr;      /* save starting point */
+    k = 1;
+    minus = 1;
+    while(k) {
+	k=0;
+	if(*s == '+') {
+	    ++s; k=1;
+	}
+	if(*s == '-') {
+	    ++s; k=1; minus=(-minus);
+	}
+    }
         
-/* djm patch to ignore white space after sign (helps if you have defined
- * something..
- */
-        while (*s==' ')  s++;
+    while (*s==' ')   /* Ignore white space after sign */
+	s++;
 
-        while ( numeric(*s) )
-                ++s ;
-        if ( *s++ != '.' )
-                return(0);               /* not floating point */
-	dp1 = s;
-        while ( numeric(*s) )
-                ++s ;
-        lptr = (s--) - line ;           /* save ending point */
+    while ( numeric(*s) )
+	++s ;
 
-	end = s;
+    if ( *s != '.' || *s != 'e' ) {   /* Check that it is floating point */
+	s++;
+	return 0;
+    }
+    dp1 = ++s;
+    while ( numeric(*s) )
+	++s ;
+    lptr = (s--) - line ;           /* save ending point */
 
-        sum[0]=sum[1]=sum[2]=sum[3]=sum[4]=sum[5]='\0';
-        sum2[0]=sum2[1]=sum2[2]=sum2[3]=sum2[4]=sum2[5]='\0';
-#if 0
-        while ( *s != '.' ) {           /* handle digits to right of decimal */
-/* Get the value into a register - all routines dump in second register */
-	    qfloat( ( *(s--)-'0' ),dig1);
-	    fltadd(dig1,sum);
-	    fltmult(frcn,sum);
-        }
-#else
-	memcpy(dig3,frcn,6);	/* Copy 0.1 dig3 */
-	s = dp1;
-	// dump_var(dig3,"before");
-	/* Deals with the decimal place */
-	while ( numeric(*s) && s <= end) {
-	    qfloat((*s-'0'),dig1);   /* 0-9 */
-	    fltmult(dig3,dig1);      /* * 0.1 */
-	    fltadd(dig1,sum2);
-	    // dump_var(dig3,"dig3,during");
-	    fltmult(frcn,dig3);
-	    s++;
+    end = s;
+
+    sum[0]=sum[1]=sum[2]=sum[3]=sum[4]=sum[5]='\0';
+    sum2[0]=sum2[1]=sum2[2]=sum2[3]=sum2[4]=sum2[5]='\0';
+
+    memcpy(dig3,frcn,6);	/* Copy 0.1 dig3 */
+    s = dp1;
+    /* Deals with the decimal place */
+    while ( numeric(*s) && s <= end) {
+	qfloat((*s-'0'),dig1);   /* 0-9 */
+	fltmult(dig3,dig1);      /* * 0.1 */
+	fltadd(dig1,sum2);
+	fltmult(frcn,dig3);
+	s++;
+    }
+    s = --dp1;	/* Now points to dp */
+
+    qfloat(1,scale);              /* Now do numbers after decimal place */
+    while ( --s >= start ) {
+	qfloat((*s-'0'),dig1);
+	fltmult(scale,dig1);
+	fltadd(dig1,sum);
+	qfloat(10,dig2);
+	fltmult(dig2,scale);
+    }
+    fltadd(sum2,sum);
+
+
+    if( cmatch('e') ) {                       /* interpret exponent */
+	int neg;                        /* nonzero if exp is negative */
+	long expon;                     /* the exponent */
+
+	if( number(&expon) == 0 ) {
+	    error(E_EXPON);
+	    expon=0;
 	}
-	s = --dp1;	/* Now points to dp */
-#endif
-        qfloat(1,scale);
-        while ( --s >= start ) {
-                qfloat((*s-'0'),dig1);
-                fltmult(scale,dig1);
-                fltadd(dig1,sum);
-                qfloat(10,dig2);
-                fltmult(dig2,scale);
-        }
-	fltadd(sum2,sum);
-	// dump_var(sum,"sum after");
-/* Chopped out exponent stuff...for the moment! */
-        if(cmatch('e')) {                       /* interpret exponent */
-                int neg;                        /* nonzero if exp is negative */
-                long expon;                     /* the exponent */
-
-                if(number(&expon)==0) {
-                        error(E_EXPON);
-                        expon=0;
-                }
-                if(expon<0) {
-                        neg=1; expon=(-expon);
-                }
-                else neg=0;
-                if(expon>38) {
-                        error(E_FLOATING);
-                        expon=0;
-                }
-                k=32;   /* set a bit in the mask */
-#if 0
-                scale=1.;     
-                /* find 10**expon by repeated squaring */
-                while(k) {
-		    scale *= scale;
-		    if(k&expon) scale *= 10.;
-		    k >>= 1;
-                }
-                if(neg) 
-		    sum /= scale;
-                else    
-		    sum *= scale;  
-#endif
-        }
-/*
- * This negative bit is garbage! The code does a minusfa on loading in
- * anycase!!! (if the number is -ve!!!
- */
-        if ( minus != 1) 
-                sum[4]=sum[4]|128;
-
-/* Z88 FP numbers have exponent+127, gen has exponent +128
- * Not so sure about this
- */
-        if (mathz88) sum[5]--;
-
-        /* get location for result & bump litptr */
-	if ( doublestrings ) {
-	    *val = stash_double_str( start, lptr+line);
-	    return (1);
+	if( expon < 0 ) {
+	    neg=1; 
+	    expon=(-expon);
 	} else {
-	    *val = searchdub(sum);
+	    neg = 0;
 	}
-        return(1) ;      /* report success */
+	if( expon > 38 ) {
+	    error(E_FLOATING);
+	    expon=0;
+	}
+	/* Now find the scaling factor. We find 10**expon */
+	if ( neg == 0 ) {
+	    qfloat(1,scale);
+	    k = 32;
+	    while( k ) {
+		memcpy(sum2,scale,6);	/* Copy scale */
+		fltmult(sum2,scale);    /* scale * scale */
+		if( k & expon) {
+		    qfloat(10,sum2);      /* scale *= 10 */
+		    fltmult(sum2,scale);
+		}
+		k >>= 1;
+	    }
+	} else {   /* Negative exponenent find 0.1 ** expon */
+	    memcpy(scale,frcn,6);               /* 0.1 */
+	    for ( k = 1; k < expon; k++ ) {
+		fltmult(frcn,scale);            /* *0.1 */
+	    }		   
+	    neg = 0;
+	}
+	/* Now we can just multiply to find the number */
+	fltmult(scale,sum);
+    }
+
+
+    /* Not sure if this bit is necessary - dom 26/1/2002 */
+    if ( minus != 1) 
+	sum[4]=sum[4]|128;
+
+    /* Z88 FP numbers have exp+127, gen has +128 (bad?) */
+    if (mathz88) 
+	--sum[5];
+
+    /* get location for result & bump litptr */
+    if ( doublestrings ) {
+	*val = stash_double_str( start, lptr+line);
+	return (1);
+    } else {
+	*val = searchdub(sum);
+    }
+    return(1) ;      /* report success */
 }
 
-#if 0
-int dump_var(unsigned char *var,char *text)
-{
-    printf("%s: %d %d %d %d %d %d\n",text,var[0],var[1],var[2],var[3],var[4],var[5]);
-}
-#endif
 
 /* stash a double string in the literal pool */
 
