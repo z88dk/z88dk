@@ -3,7 +3,7 @@
 ;
 ;	Generic version (just a bit slow)
 ;
-;	$Id: bkrestore.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;	$Id: bkrestore.asm,v 1.4 2002-02-18 08:41:49 stefano Exp $
 ;
 
 
@@ -31,7 +31,7 @@
 	ld	a,(ix+0)
 	ld	b,(ix+1)
 	cp	9
-	jr	nc,bkrestore
+	jr	nc,bkrestorew
 
 .bkrestores
 	push	bc
