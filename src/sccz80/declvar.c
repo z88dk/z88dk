@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.8 2002-04-07 12:19:59 dom Exp $
+ *      $Id: declvar.c,v 1.9 2002-11-02 20:17:14 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -418,15 +418,18 @@ char zfar )                      /* TRUE if far */
                         myptr=addmemb(sname, ident, type, 0, storage, more, itag) ;
                         myptr--;
                         myptr->flags = ( (sign&UNSIGNED) | (zfar&FARPTR) );
+                        myptr->size = size;
 
 
                         /* store maximum member size in tag table entry */
-                        if ( ident == POINTER || ident==ARRAY ) {
+			/* 2/11/2002 djm - fix from above */
+                        if ( ident == POINTER /* || ident==ARRAY */ ) {
                                 type=(zfar ? CPTR : CINT);
                         }
                         cscale(type, otag, &size) ;
                         if ( mtag->size < size )
                                 mtag->size = size ;
+
                 }
         } while ( cmatch(',') ) ;
         ns() ;

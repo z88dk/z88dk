@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.16 2002-05-29 22:54:09 dom Exp $
+ *      $Id: primary.c,v 1.17 2002-11-02 20:17:15 dom Exp $
  */
 
 
@@ -686,9 +686,11 @@ void cscale(
                 *val *= 6 ;
                 break ;
         case STRUCT :
+
                 *val *= tag->size ;
                 break ;
         }
+
 }
 
 /*

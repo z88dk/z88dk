@@ -10,7 +10,7 @@
  * 
  *      3/2/02 djm - Unspecified structure members are now padded out
  *
- *      $Id: declinit.c,v 1.6 2002-11-02 19:13:24 dom Exp $
+ *      $Id: declinit.c,v 1.7 2002-11-02 20:17:14 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -118,30 +118,31 @@ void str_init(TAG_SYMBOL *tag)
     ptr = tag->ptr;
     while (ptr < tag->end) {
 	dim = ptr->size;
-	sz = getstsize(ptr);
-	flag = 0;
+	sz = getstsize(ptr,NO);
 	if ( nodata == NO ) {
 	    init(sz, ptr->ident, &dim, ptr->more, 1, 1);
+	    /* Pad out afterwards */
 	} else {  /* Run out of data for this initialisation, set blank */ 
 	    defstorage();
-	    outdec(dim * sz);
+	    outdec(dim * getstsize(ptr,YES));
 	    nl();		
 	}
+
+
+
+	usz = (ptr->size ? ptr->size : 1 ) * getstsize(ptr,YES);
 	++ptr;
-	/* This steps over union members */
-	usz = sz;
-	if (ptr->offset.i == 0 && ptr->size > usz)
-	    usz = ptr->size;
+	flag = NO;
 	while (ptr->offset.i == 0 && ptr < tag->end) {
-	    if (getstsize(ptr) > usz) {
-		usz = getstsize(ptr);
-		flag = 1;
+	    if (getstsize(ptr,YES) * (ptr->size ? ptr->size : 1 )  > usz) {
+		usz = getstsize(ptr,YES) * (ptr->size ? ptr->size : 1 ) ;
+		flag = YES;
 	    }
 	    ++ptr;
 	}
+
 	/* Pad out the union */
 	if (usz != sz && flag) {
-
 	    defstorage();
 	    outdec(usz - sz);
 	    nl();
@@ -198,8 +199,10 @@ int size, ident, *dim, more, dump, is_struct;
 
     if ((sz = qstr(&value)) != -1 ) {
 	sz++;
+#if 0
 	if (ident == VARIABLE || (size != 1 && more != CCHAR))
 	    error(E_ASSIGN);
+#endif
 #ifdef DEBUG_INIT
 	outstr("ident=");
 	outdec(ident);
@@ -300,6 +303,11 @@ int size, ident, *dim, more, dump, is_struct;
 		    outdec(value);
 		}
 		nl();
+		/* Dump out a train of zeros as appropriate */
+		if (ident == ARRAY && more == 0) {		 
+		    dumpzero(size,(*dim)-1);
+		}
+
 	    } else
 		stowlit(value, size);
 	    --*dim;
@@ -309,7 +317,7 @@ int size, ident, *dim, more, dump, is_struct;
 
 /* Find the size of a member of a union/structure */
 
-int getstsize(SYMBOL * ptr)
+int getstsize(SYMBOL * ptr,char real)
 {
     TAG_SYMBOL *tag;
     int         ptrsize;
@@ -318,8 +326,10 @@ int getstsize(SYMBOL * ptr)
 
     ptrsize = ptr->flags&FARPTR ? 3 : 2;
 
-    if ( ptr->ident == POINTER )
+#if 1
+    if ( ptr->ident == POINTER && real)
 	return ptrsize;
+#endif
 
     switch (ptr->type) {
     case STRUCT:
