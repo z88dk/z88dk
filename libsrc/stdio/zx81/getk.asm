@@ -6,13 +6,18 @@
 ;	Stefano Bodrato - 8/5/2000
 ;
 ;
-;	$Id: getk.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;	$Id: getk.asm,v 1.3 2002-04-17 08:35:34 stefano Exp $
 ;
 
 	XLIB	getk
 	LIB	zx81_cnvtab
 
+        XREF    save81
+        XREF    restore81
+
 .getk
+	call	restore81
+	
 	call	699
 	ld	a,h
 	add	a,2
@@ -40,4 +45,4 @@
  		ld	l,a
 		ld	h,0
 
-	ret
+	jp	save81

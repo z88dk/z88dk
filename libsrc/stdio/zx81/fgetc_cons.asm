@@ -6,13 +6,18 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.3 2002-04-17 08:35:34 stefano Exp $
 ;
 
 	XLIB	fgetc_cons
 	LIB	zx81_cnvtab
 
+        XREF    save81
+        XREF    restore81
+
 .fgetc_cons
+	call	restore81
+	
 	call	699
 	ld	a,h
 	add	a,2
@@ -68,4 +73,5 @@
 .setout
 	ld	l,a
 	ld	h,0
-	ret
+	
+	jp	save81

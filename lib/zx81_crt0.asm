@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: zx81_crt0.asm,v 1.4 2001-09-07 18:17:11 dom Exp $
+;       $Id: zx81_crt0.asm,v 1.5 2002-04-17 08:35:34 stefano Exp $
 ;
 
 
@@ -21,6 +21,13 @@
 ; this file
 
                 XREF    _main
+
+;
+; Save and restore the ZX81 critical registers 
+;
+
+        XDEF    save81
+        XDEF    restore81
 
 ;
 ; Some variables which are needed for both app and basic startup
@@ -66,9 +73,7 @@
         ld      sp,hl
         ld      (exitsp),sp
 
-	exx
-	push	hl
-
+	call	save81
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -97,9 +102,7 @@ ENDIF
 ENDIF
 
 	pop	bc
-	exx
-        pop	hl
-        exx
+	call	restore81
 
 .start1
         ld      sp,0
@@ -108,6 +111,34 @@ ENDIF
 
 .l_dcal
         jp      (hl)
+
+
+.iysave 	defw	0
+.ixsave 	defw	0
+.a1save 	defb	0
+.hl1save	defw	0
+
+.restore81
+	ld	iy,(iysave)
+	ld	ix,(ixsave)
+	ex	af,af
+	ld	a,(a1save)
+	ex	af,af
+	exx
+        ld	hl,(hl1save)
+        exx
+	ret
+	
+.save81
+	ld	(iysave),iy
+	ld	(ixsave),ix
+	ex	af,af
+	ld	(a1save),a
+	ex	af,af
+	exx
+        ld	(hl1save),hl
+        exx
+	ret
 
 ; Now, define some values for stdin, stdout, stderr
 
