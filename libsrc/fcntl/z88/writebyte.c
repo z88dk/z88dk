@@ -6,7 +6,7 @@
  * 	djm 4/5/99
  *
  * -----
- * $Id: writebyte.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
+ * $Id: writebyte.c,v 1.3 2003-10-01 20:01:07 dom Exp $
  */
 
 
@@ -30,7 +30,7 @@ int writebyte(int fd, int byte)
 	push	af
         call_oz(os_pb)
 	pop	af
-        ld      hl,EOF
+        ld      hl,-1	;EOF
         ret     c
         ld      l,a
         ld      h,0

@@ -6,7 +6,7 @@
  *      Preserve tabs!!
  *
  * -----
- * $Id: readbyte.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
+ * $Id: readbyte.c,v 1.3 2003-10-01 20:01:07 dom Exp $
  */
 
 
@@ -23,7 +23,7 @@ int __FASTCALL__ readbyte(int fd)
 	pop     ix      ; On entry to FASTCALL function, the parameter
 			; is pushed onto the stack        
 	call_oz(os_gb)
-	ld      hl,EOF
+	ld      hl,-1	;EOF
 	ret     c
 	ld      l,a
 	ld      h,0
