@@ -3,7 +3,7 @@
  *
  *      Plunging routines
  *
- *      $Id: plunge.c,v 1.4 2002-03-14 19:38:55 dom Exp $
+ *      $Id: plunge.c,v 1.5 2002-04-17 21:14:27 dom Exp $
  *
  *      Altogether now...arse! My cunning scheme to use c as an
  *      indicator flops badly due to logical conditions, I just
@@ -254,10 +254,14 @@ void (*oper)();
                 }
 		if (lval->val_type == LONG) {
 			widenlong(lval,lval2);
-			doexx();
-			vlongconst(val);
-			lpush();
-			doexx();
+			if ( noaltreg ) {
+			    vlongconst_noalt(val);
+			} else {
+			    doexx();
+			    vlongconst(val);
+			    lpush();
+			    doexx();
+			}
 		} else {
                 	const2(val) ;
 		}

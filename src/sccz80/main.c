@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.10 2002-02-20 11:11:54 dom Exp $
+ *      $Id: main.c,v 1.11 2002-04-17 21:14:27 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -39,6 +39,8 @@ int	sharedfile;	/* File contains routines which are to be
 			 * called via lib package - basically jimmy
 			 * the stack but that's it..
 			 */
+
+int     noaltreg;       /* No alternate registers */
 
 /*
  * Some external data
@@ -156,6 +158,7 @@ char **argv ;
         gotocnt=0;
 	defdenums=0;
 	doublestrings = 0;
+	noaltreg = NO;
         safedata=reqpag = -1;
 	shareoffset=SHAREOFFSET;	/* Offset for shared libs */
 	debuglevel=NO;
@@ -1045,6 +1048,7 @@ struct args myargs[]= {
 	{"debug=",YES,SetDebug},
 	{"asxx",NO,SetASXX},
 	{"doublestr",NO,SetDoubleStrings},
+	{"noaltreg",NO,SetNoAltReg},
 #ifdef USEFRAME
 	{"frameix",NO,SetFrameIX},
 	{"frameiy",NO,SetFrameIY},
@@ -1079,6 +1083,11 @@ void SetFrameIY(char *arg)
 void SetDoubleStrings(char *arg)
 {
     doublestrings = YES;
+}
+
+void SetNoAltReg(char *arg)
+{
+    noaltreg = YES;
 }
 
 void SetASXX(char *arg)

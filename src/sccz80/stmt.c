@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.6 2002-01-28 11:51:16 dom Exp $
+ *      $Id: stmt.c,v 1.7 2002-04-17 21:14:27 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -472,43 +472,77 @@ void doreturn(char type)
                 if ( currfn->more ) {
                         /* return pointer to value */
                         force(CINT, doexpr(),YES,dosigned,0) ;
+			leave(CINT,type);
                 }
                 else {
                         /* return actual value */
                         force(currfn->type, doexpr(), currfn->flags&UNSIGNED, dosigned,0) ;
+			leave(currfn->type,type);
                 }
-                leave(YES,type);
         }
         else leave(NO,type) ;
 }
 
 /*
  * leave a function
- * preserve primary register if save is TRUE
+ * If vartype is a value then save it
  * type: 1=c, 2=nc, 0=don't bother
  */
-void leave(int save,char type)
+void leave(int vartype,char type)
 {
-        int savesp;
-        modstk(0,save,NO); /* clean up stk */
-        if ( (compactcode || currfn->flags&CALLEE)  && (stackargs>2) ) {
+    int savesp;
+    int savereg;
+
+    if ( vartype == CPTR )   /* they are the same in any case! */
+	vartype = LONG;
+
+    if ( noaltreg ) {
+	if ( vartype == LONG )
+	    savehl();
+	swap();
+	modstk(0,0,NO);
+	swap();
+    } else {
+	modstk(0,savereg,NO);
+    }
+
+    if ( (compactcode || currfn->flags&CALLEE)  && (stackargs>2) ) {
 /* 
  * We're exiting a function and we want to clean up after ourselves
  * (so calling function doesn't have to do this) (first of all we
  * have to grab the return address - easy just to exchange
  */
-                savesp=Zsp;
-                doexx();
-                zpop();         /* Return address in de */
-                Zsp-=stackargs-2;
-                modstk(0,NO,NO);
-                zpushde();
-                doexx();
-                Zsp=savesp;
+	savesp=Zsp;
+
+	if ( noaltreg ) {
+	    if ( vartype == LONG )      /* If long, then dump de somewhere */
+		savede();
+	    else                        /* Just an int, swap it over */
+		swap();
+	} else {
+	    doexx();	   
+	}
+
+
+	zpop();            /* Return address in de */
+	Zsp-=stackargs-2;
+	modstk(0,NO,NO);
+	zpushde();         /* return address back on stack */
+	if ( noaltreg ) {
+	    if ( vartype == LONG )
+		restorede();
+	    else
+		swap();
+	} else {
+	    doexx();
+	}
+	Zsp=savesp;
         }
 #ifdef USEFRAME
 	popframe();		/* Restore previous frame pointer */
 #endif
+	if ( noaltreg && vartype == LONG )
+	    restorehl();
 	if (type) setcond(type);
         zret();         /* and exit function */
 }

@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.15 2002-04-07 14:07:58 dom Exp $
+ *      $Id: codegen.c,v 1.16 2002-04-17 21:14:27 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -55,7 +55,6 @@ void header(void)
 		outstr(";\tReconstucted for asz80\n");
 	else
 	        outstr (";\tReconstructed for the z80 Module Assembler\n");
-        outstr (";\tBy Dominic Morris <djm@jb.man.ac.uk>\n");
         donelibheader=0;
         if ( (tim=time(NULL) ) != -1 ) {
                 timestr=ctime(&tim);
@@ -124,8 +123,17 @@ void DoLibHeader()
 		outstr("z80_crt0.hdx\"\n\n");
 		ol(".area _CODE\n");
 		ol(".radix d\n");
-	} else
+		if ( noaltreg ) {
+		    ol(".globl\tsaved_hl");
+		    ol(".globl\tsaved_de");
+		}
+	} else {
         	outstr("\n\n\tINCLUDE \"#z80_crt0.hdr\"\n\n\n");
+		if ( noaltreg ) {
+		    ol("XREF\tsaved_hl");
+		    ol("XREF\tsaved_de");
+		}
+	}
         donelibheader=1;
 }
 
@@ -905,7 +913,7 @@ void defmesg(void)
 void point(void)
 {
 	if (asxx)
-		ol(".dw\t.+2");
+	    ol(".dw\t.+2");
 	else
         	ol("defw\tASMPC+2");
 }
@@ -955,7 +963,14 @@ int modstk(int newsp,int save,int saveaf)
  * up!
  */
 modstkcht:
-	if (saveaf) doexaf();
+	if (saveaf) {
+	    if ( noaltreg ) {
+		zpushflags();
+		zpopbc();
+	    } else {
+		doexaf();
+	    }
+	}
 #ifdef USEFRAME
 	if (useframe) {
 		ot("ld\t"); FrameP(); outstr(","); outdec(k); nl();
@@ -963,7 +978,7 @@ modstkcht:
 		FrameP();
 		outstr(",sp\n");
 		RestoreSP(NO);
-	} else {
+	} else {		
         	if ( save ) doexx() ;
         	vconst(k) ;
         	ol("add\thl,sp");
@@ -977,7 +992,15 @@ modstkcht:
         ol("ld\tsp,hl");
         if ( save ) doexx() ;
 #endif
-	if (saveaf) doexaf();
+	if (saveaf) {
+	    if ( noaltreg ) {
+		ol("push\tbc");
+		Zsp -= 2;
+		zpopflags();
+	    } else {
+		doexaf();
+	    }
+	}
         return newsp ;
 }
 
@@ -1188,9 +1211,15 @@ void zdiv(LVALUE *lval)
  */
 void zmod(LVALUE *lval)
 {
+    if ( noaltreg && ( lval->val_type == LONG || lval->val_type == CPTR ) ) {
+	callrts("l_long_mod2");
+    } else {
         zdiv(lval);
-        if (lval->val_type == LONG || lval->val_type==CPTR) doexx();
-        else swap();
+        if (lval->val_type == LONG || lval->val_type==CPTR) 
+	    doexx();
+        else 
+	    swap();
+    }
 }
 
 /* Inclusive 'or' the primary and secondary */
@@ -1800,6 +1829,14 @@ void vlongconst(unsigned long val)
         const2(val/65536);
 }
 
+void vlongconst_noalt(unsigned long val)
+{
+    constbc(val%65536);
+    ol("push\tbc");
+    constbc(val/65536);
+    ol("push\tbc");
+}
+
 
 /*
  * load constant into primary register
@@ -1823,6 +1860,15 @@ long val ;
 	if ( val < 0 )
 		val += 65536;
         immed2();
+        outdec(val);
+        nl();
+}
+
+void constbc(long val)
+{
+	if ( val < 0 )
+		val += 65536;
+	ot("ld\tbc,");
         outdec(val);
         nl();
 }
@@ -1887,6 +1933,29 @@ void EmitLine(int line)
 		nl();
 	}
 }
+
+/* These routines save and restore hl/de from special places */
+
+void savehl()
+{
+    ol("ld\t(saved_hl),hl");
+}
+
+void savede()
+{
+    ol("ld\t(saved_de),de");
+}
+
+void restorehl()
+{
+    ol("ld\thl,(saved_hl)");
+}
+
+void restorede()
+{
+    ol("ld\thl,(saved_de)");
+}
+
 
 #ifdef USEFRAME
 /*

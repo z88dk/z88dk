@@ -48,6 +48,8 @@ extern void SetIntuition(char *);
 extern void SetStartUp(char *);
 extern void SetShareOffset(char *);
 extern void SetDoubleStrings(char *);
+extern void SetNoAltReg(char *);
+extern int  noaltreg;
 extern int  makeshare;
 extern int  useshare;
 extern int sharedfile;

@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.13 2002-04-07 12:19:59 dom Exp $
+ *      $Id: primary.c,v 1.14 2002-04-17 21:14:27 dom Exp $
  */
 
 
@@ -273,12 +273,12 @@ void force(int t1, int t2,char sign1,char sign2,int lconst)
         else if (t2==CPTR && t1==CINT) warning(W_FARNR);
 
 	/* Char conversion */
-	if ( t1 == CCHAR && sign2 == NO ) {
+	if ( t1 == CCHAR && sign2 == NO && !lconst) {
 		if ( sign1 == NO )
 			convSint2char();
 		else
 			convUint2char();
-	} else if ( t1 == CCHAR && sign2 == YES ) {
+	} else if ( t1 == CCHAR && sign2 == YES && !lconst )  {
 		if ( sign1 == NO )
 			convSint2char();
 		else
