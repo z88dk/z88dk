@@ -3,11 +3,12 @@
  *
  *      djm 22/11/99
  *
- *	$Id: memcpy.c,v 1.2 2001-04-11 12:15:32 dom Exp $
+ *	$Id: memcpy.c,v 1.3 2001-09-06 08:33:56 dom Exp $
  */
 
 
 #include <string.h>
+
 
 void *memcpy(void *s1, void *s2, int size)
 {
@@ -23,12 +24,16 @@ void *memcpy(void *s1, void *s2, int size)
         inc     hl
         ld      e,(hl)  
         inc     hl
-        ld      d,(hl)  ;de=s2
+        ld      d,(hl)  ;de=src
         inc     hl
         ld      a,(hl)
         inc     hl
         ld      h,(hl)  
-        ld      l,a     ;hl=s1
+        ld      l,a     ;hl=dest
+#if 1
+	ex	de,hl
+	ldir
+#else
 .memcpy1
         ld      a,(de)
         ld      (hl),a
@@ -41,6 +46,7 @@ void *memcpy(void *s1, void *s2, int size)
         or      c
         jp      nz,memcpy1
 .memcpy3
+#endif
         ld      hl,6
         add     hl,sp
         ld      e,(hl)
