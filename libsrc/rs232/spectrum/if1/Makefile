@@ -1,19 +1,15 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.1 2002-05-20 13:10:47 stefano Exp $
+# $Id: Makefile,v 1.2 2002-05-23 11:56:26 stefano Exp $
 
-CFILES = \
-	rs232_close.c \
-	rs232_get.c \
-	rs232_init.c \
-	rs232_params.c \
-	rs232_put.c 
+CFILES = rs232_close.c rs232_get.c rs232_init.c rs232_params.c rs232_put.c 
 
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
 
-all: $(OBJECTS)
+all:	$(OBJECTS)
+	z80asm -d -ns -nm -Mo -x../../../rs232if1 @if1list
 
 .c.o:  
 	zcc -vn -make-lib $*.c

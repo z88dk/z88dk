@@ -63,7 +63,7 @@ u8_t __FASTCALL__ rs232_params(unsigned char param, unsigned char parity)
 	case RS_BAUD_134_5:
 	    return RS_ERR_BAUD_NOT_AVAIL;
 	}
-	baud=(3500000/(26*baud))-2;
+	baud = (unsigned int) (3500000.0 / (26 * baud) ) - 2;
 	rs232_setbaud(&baud);
     }
     /*
@@ -104,8 +104,7 @@ static void rs232_setbaud(u16_t *baud)
     pop  hl
     push hl
     push bc
-    ld	a,l
-    ld	(23747),a
+    ld	(23747),hl
 #endasm
 }
 #endif
