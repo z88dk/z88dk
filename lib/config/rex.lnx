@@ -13,7 +13,7 @@ LINKER 		z80asm
 COMPILER	sccz80
 COPTEXE		copt
 COPYCMD		cp
-APPMAKER	appmake
+APPMAKER	mkaddin
 
 #
 # Flag to stimulate alternate handling of math constants, this flag is
