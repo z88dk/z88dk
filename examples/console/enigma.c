@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 int main()
 #endif
 {
-    unsigned int i, j, n;
+    unsigned int i, j, n = 0;
     unsigned int ch;
 #ifdef ARGC
     int len, posn;
