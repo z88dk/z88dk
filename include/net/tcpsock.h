@@ -5,7 +5,7 @@
  *
  *      djm 24/4/99
  *
- *	$Id: tcpsock.h,v 1.3 2001-08-09 17:48:25 dom Exp $
+ *	$Id: tcpsock.h,v 1.4 2002-06-05 22:12:28 dom Exp $
  */
 
 
@@ -25,7 +25,11 @@ UDPSOCKET {
         u8_t      *errmsg;
 
 	u8_t	  handlertype;	/* Internal/Package */
+#ifdef CYBIKO
+        int (*datahandler)(void *,int,ip_header_t *,udp_header_t *,UDPSOCKET *);
+#else
         int (*datahandler)();
+#endif
 	u32_t	  timeout;
         ipaddr_t  myaddr;
         tcpport_t myport;
@@ -58,7 +62,11 @@ TCPSOCKET {
         u8_t    *errmsg;        /* Set on close etc */
 
 	u8_t	handlertype;	/* Internal/package */
+#ifdef CYBIKO
+        int (*datahandler)(void *,int,TCPSOCKET *);
+#else
         int(*datahandler)();
+#endif
 	u32_t	timeout;
         ipaddr_t   myaddr;
         tcpport_t  myport;
@@ -86,7 +94,7 @@ TCPSOCKET {
         u8_t    recent;         /* Set if recently retransmitted */
         u16_t    window;         /* His window */
 /* Van Jacobson's algorithm */
-        u8_t    cwindow;
+        u8_t    cwindow;        /* Congestion window */
         u8_t    wwindow;
         u16_t    vj_sa;
         u16_t    vj_sd;
@@ -129,19 +137,20 @@ TCPSOCKET {
  * Note: close-wait state is bypassed by automatically closing a connection
  *       when a FIN is received.  This is easy to undo.
  */
-#define tcp_stateLISTEN  0      /* listening for connection */
-#define tcp_stateSYNSENT 1      /* syn sent, active open */
-#define tcp_stateSYNREC  2      /* syn received, synack+syn sent. */
-#define tcp_stateESTAB   3      /* established */
-#define tcp_stateESTCL   4
-#define tcp_stateFINWT1  5      /* sent FIN */
-#define tcp_stateFINWT2  6      /* sent FIN, received FINACK */
-#define tcp_stateCLOSEWT 7
-#define tcp_stateCLOSING 8      /* sent FIN, received FIN (waiting for FINACK) */
-#define tcp_stateLASTACK 9      /* fin received, finack+fin sent */
-#define tcp_stateTIMEWT  10      /* dally after sending final FINACK */
-#define tcp_stateCLOSEMSL 11
-#define tcp_stateCLOSED  12      /* finack received */
+#define tcp_stateNONE    0      /* bound */
+#define tcp_stateLISTEN  1      /* listening for connection */
+#define tcp_stateSYNSENT 2      /* syn sent, active open */
+#define tcp_stateSYNREC  3      /* syn received, synack+syn sent. */
+#define tcp_stateESTAB   4      /* established */
+#define tcp_stateESTCL   5
+#define tcp_stateFINWT1  6      /* sent FIN */
+#define tcp_stateFINWT2  8      /* sent FIN, received FINACK */
+#define tcp_stateCLOSEWT 9
+#define tcp_stateCLOSING 9      /* sent FIN, received FIN (waiting for FINACK) */
+#define tcp_stateLASTACK 10      /* fin received, finack+fin sent */
+#define tcp_stateTIMEWT  11      /* dally after sending final FINACK */
+#define tcp_stateCLOSEMSL 12
+#define tcp_stateCLOSED  13      /* finack received */
 
 
 

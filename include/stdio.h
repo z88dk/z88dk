@@ -1,7 +1,7 @@
 #ifndef __STDIO_H__
 #define __STDIO_H__
 
-/* $Id: stdio.h,v 1.8 2002-02-20 11:11:53 dom Exp $ */
+/* $Id: stdio.h,v 1.9 2002-06-05 22:12:27 dom Exp $ */
 
 #ifdef FDSTDIO
 #include <z88stdio.h>
@@ -119,6 +119,11 @@ extern int __LIB__ fgetpos(FILE *fp, fpos_t *pos);
 #define fsetpos(fp,pos) fseek(fp,pos,SEEK_SET)
 #define rewind(fp) fseek(fp,0L,SEEK_SET)
 extern int __LIB__ fseek(FILE *fp, fpos_t offset, int whence);
+
+/* Block read/writing */
+extern int __LIB__ fread(void *ptr, int size, int num, FILE *);
+extern int __LIB__ fwrite(void *ptr, int size, int num, FILE *);
+
 
 /* You shouldn't use gets, let this teach you a lesson! */
 

@@ -7,7 +7,7 @@
  *
  *      djm 24/4/99
  *
- *	$Id: inet.h,v 1.8 2002-05-14 22:31:15 dom Exp $
+ *	$Id: inet.h,v 1.9 2002-06-05 22:12:28 dom Exp $
  */
 
 
@@ -69,12 +69,9 @@ struct ip_header {
 
 /* Some IP flags */
 
-#define IH_IHL_MASK     0xf
-#define IH_VERSION_MASK 0xf
-#define IH_FRAGOFF_MASK 0x1fff
-#define IH_MORE_FRAGS   0x2000
-#define IH_DONT_FRAG    0x4000
-#define IH_FLAGS_UNUSED 0x8000
+#define IP_OFFMASK      0x1fff
+#define IP_MF           0x2000
+#define IP_DF           0x4000
 
 
 /* ICMP Header */
