@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.46 2002-10-03 20:07:53 dom Exp $
+# $Id: Makefile,v 1.47 2002-10-10 20:38:54 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -10,7 +10,8 @@ all:	genlibs z88libs tilibs zxlibs \
 	abc80_clib.lib aceansi_clib.lib sam_clib.lib \
 	msx_clib.lib svi_clib.lib m5_clib.lib cpc_clib.lib \
 	c128ansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
-	rex_clib.lib zx81_clib.lib zx81ansi_clib.lib pps_clib.lib
+	rex_clib.lib zx81_clib.lib zx81ansi_clib.lib pps_clib.lib \
+	ppsansi_clib.lib
 
 genlibs: m.lib malloc.lib z80_crt0.lib ndos.lib
 
@@ -163,7 +164,7 @@ zx_clib.lib:
 	cd games ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORzx -xzx_clib @zx.lst
 
-pps_clib.lib:
+ppsansi_clib.lib:
 	@echo ''
 	@echo '---> Building Sprinter Library  <---'
 	@echo ''
@@ -180,7 +181,25 @@ pps_clib.lib:
 	./gamesdeps.sh
 	cd spectrum ; $(MAKE)
 	cd games ; $(MAKE)
-	z80asm -d -ns -nm -Mo -DFORzx -xpps_clib @pps.lst
+	z80asm -d -ns -nm -Mo -DFORzx -xppsansi_clib @ppsansi.lst
+
+pps_clib.lib:
+	@echo ''
+	@echo '---> Building Sprinter ANSI Library  <---'
+	@echo ''
+	./gfxdeps.sh
+	cd strings ; $(MAKE)
+	cd stdlib ; $(MAKE) lzx
+	cd stdio ; $(MAKE) generic
+	cd fcntl ; $(MAKE) lpps
+	cd printflike ; $(MAKE) 
+	cd setjmp ; $(MAKE) 
+	cd assert ; $(MAKE) 
+	cd time ; $(MAKE) lzx
+	cd rs232 ; $(MAKE) lzx
+	./gamesdeps.sh
+	cd spectrum ; $(MAKE)
+	cd games ; $(MAKE)
 
 # vt100 C lib for spectrum
 # use -DROMFONT for a tiny 36 columns mode
