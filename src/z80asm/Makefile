@@ -44,7 +44,7 @@ install:
 
 
 clean :
-	rm -f *.o *~ core $(EXECS) 
+	$(RM) *.o *~ core $(EXECS) 
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

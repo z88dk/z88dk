@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.13 2002-10-17 12:20:35 dom Exp $
+# $Id: Makefile,v 1.14 2002-10-22 19:15:16 dom Exp $
 #
 
 STDCFILES = \
@@ -85,34 +85,34 @@ z88_x:
 	zcc -vn -make-lib $*.c
 
 clean:
-	rm -f *.o* *.sym *.map zcc_opt.def *.i $(AFILES)
-	rm -f ansi/*.o
-	rm -f ansi/abc80/*.o
-	rm -f ansi/ace/*.o
-	rm -f ansi/aquarius/*.o
-	rm -f ansi/c128/*.o
-	rm -f ansi/generic/*.o
-	rm -f ansi/sharp-mz/*.o
-	rm -f ansi/spectrum/*.o
-	rm -f ansi/vz200/*.o
-	rm -f ansi/z88/*.o
-	rm -f ansi/zx81/*.o
-	rm -f abc80/*.o
-	rm -f ace/*.o
-	rm -f aquarius/*.o
-	rm -f c128/*.o
-	rm -f cpc/*.o
-	rm -f cpm/*.o
-	rm -f m5/*.o
-	rm -f msx/*.o
-	rm -f mz/*.o
-	rm -f nc100/*.o
-	rm -f sam/*.o
-	rm -f spectrum/*.o
-	rm -f svi/*.o
-	rm -f vz200/*.o
-	rm -f z88/*.o
-	rm -f zx81/*.o
+	$(RM) *.o* *.sym *.map zcc_opt.def *.i $(AFILES)
+	$(RM) ansi/*.o
+	$(RM) ansi/abc80/*.o
+	$(RM) ansi/ace/*.o
+	$(RM) ansi/aquarius/*.o
+	$(RM) ansi/c128/*.o
+	$(RM) ansi/generic/*.o
+	$(RM) ansi/sharp-mz/*.o
+	$(RM) ansi/spectrum/*.o
+	$(RM) ansi/vz200/*.o
+	$(RM) ansi/z88/*.o
+	$(RM) ansi/zx81/*.o
+	$(RM) abc80/*.o
+	$(RM) ace/*.o
+	$(RM) aquarius/*.o
+	$(RM) c128/*.o
+	$(RM) cpc/*.o
+	$(RM) cpm/*.o
+	$(RM) m5/*.o
+	$(RM) msx/*.o
+	$(RM) mz/*.o
+	$(RM) nc100/*.o
+	$(RM) sam/*.o
+	$(RM) spectrum/*.o
+	$(RM) svi/*.o
+	$(RM) vz200/*.o
+	$(RM) z88/*.o
+	$(RM) zx81/*.o
 
 	cd zsock ; $(MAKE) clean
 	cd 8080 ; $(MAKE) clean

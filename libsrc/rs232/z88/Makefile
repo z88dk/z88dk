@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.2 2002-04-22 08:25:25 dom Exp $
+# $Id: Makefile,v 1.3 2002-10-22 19:15:15 dom Exp $
 
 CFILES = \
 	rs232_close.c \
@@ -19,4 +19,4 @@ all: $(OBJECTS)
 	zcc -vn -make-lib $*.c
 
 clean:
-	rm -f *.sym *.map zcc_opt.def *.o* *~ *.err *.i $(AFILES)
+	$(RM) *.sym *.map zcc_opt.def *.o* *~ *.err *.i $(AFILES)

@@ -1,11 +1,11 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.1 2001-05-11 08:43:23 dom Exp $
+# $Id: Makefile,v 1.2 2002-10-22 19:15:01 dom Exp $
 
 all:
 	@echo ''
 
 
 clean:
-	rm -f *.o* *.sym *.map zcc_opt.def
+	$(RM) *.o* *.sym *.map zcc_opt.def

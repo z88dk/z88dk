@@ -22,5 +22,5 @@ dstar:
 	zcc -vn -create-app dstar.c -lgfxapp -o dstar.bin
 
 clean:
-	rm -f rpn.bin useless.bin wc.bin view.bin dstar.bin
-	rm -f zcc_opt.def *~ *.op* *.o *i *.asm *.63
+	$(RM) rpn.bin useless.bin wc.bin view.bin dstar.bin
+	$(RM) zcc_opt.def *~ *.op* *.o *i *.asm *.63

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.4 2002-04-22 08:25:24 dom Exp $
+# $Id: Makefile,v 1.5 2002-10-22 19:15:08 dom Exp $
 
 
 all: 
@@ -9,8 +9,8 @@ all:
 
 clean:
 	cd ../ ; ./gfxdeps.sh
-	rm -f aquarius/*.o
-	rm -f c128/*.o
-	rm -f cpc/*.o
-	rm -f mz/*.o
-	rm -f gray/ticalc/*.o
+	$(RM) aquarius/*.o
+	$(RM) c128/*.o
+	$(RM) cpc/*.o
+	$(RM) mz/*.o
+	$(RM) gray/ticalc/*.o

@@ -55,7 +55,7 @@ install:
 	install -m 755 ../../bin/sccz80 $(PREFIX)/bin/sccz80
 
 clean :
-	rm -f *.o *~ core $(EXECS) *.map
+	$(RM) *.o *~ core $(EXECS) *.map
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

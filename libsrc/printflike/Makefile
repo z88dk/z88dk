@@ -27,4 +27,4 @@ all: $(OBJECTS)
 	zcc -vn -Wn43 -make-lib $*.c
 
 clean:
-	rm -f *.err *.o* *.sym *.map zcc_opt.def *.i $(AFILES)
+	$(RM) *.err *.o* *.sym *.map zcc_opt.def *.i $(AFILES)

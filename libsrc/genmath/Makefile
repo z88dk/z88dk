@@ -26,5 +26,5 @@ genmath: $(OBJECTS)
 	zcc -vn -make-lib $*.c
 
 clean:
-	rm -f *.o* *.sym *.map *.err zcc_opt.def *.i $(AFILES)
+	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i $(AFILES)
 

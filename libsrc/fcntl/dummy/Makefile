@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2002-04-22 08:25:23 dom Exp $
+# $Id: Makefile,v 1.5 2002-10-22 19:15:05 dom Exp $
 
 all:
 	@echo ''
@@ -7,4 +7,4 @@ all:
 	z80asm -d -ns -nm -Mo -x../../ndos @ndoslist
 
 clean:
-	rm -f  *.sym *.map zcc_opt.def *.o*
+	$(RM) *.sym *.map zcc_opt.def *.o*

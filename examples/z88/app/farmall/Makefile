@@ -11,5 +11,5 @@ test:
 
 
 clean:
-	rm test.bin
-	rm -f zcc_opt.def *~ *.op* *.o *i *.asm *.63
+	$(RM) test.bin
+	$(RM) zcc_opt.def *~ *.op* *.o *i *.asm *.63

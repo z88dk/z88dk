@@ -10,14 +10,14 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.5 2001-10-16 18:30:32 dom Exp $
+ *	$Id: string.h,v 1.6 2002-10-22 19:14:21 dom Exp $
  */
 
 
 extern int __LIB__ strlen(char *);
 extern char __LIB__ *strcat(char *, char *);
 extern __LIB__ strcmp(char *, char *);
-extern char __LIB__ *strcpy(char *, char *);
+extern char __LIB__  *strcpy(char *, char *);
 extern char __LIB__ *strncat(char *, char *);
 extern __LIB__ strncmp(char *, char *, int);
 extern char __LIB__ *strncpy(char *, char *, int);

@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.50 2002-10-17 12:31:37 dom Exp $
+# $Id: Makefile,v 1.51 2002-10-22 19:15:00 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -209,7 +209,7 @@ zxan_clib.lib:
 	@echo ''
 	@echo '---> Building ZX Spectrum ANSI Library  <---'
 	@echo ''
-	rm -f stdio/ansi/spectrum/f_ansi_char.o
+	$(RM) stdio/ansi/spectrum/f_ansi_char.o
 	./gfxdeps.sh
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) lzx
@@ -703,7 +703,7 @@ clean:
 	cd z80_crt0s; $(MAKE) clean
 	cd z88 ; $(MAKE) clean
 	cd z88math ; $(MAKE) clean
-	rm -f *.lib
+	$(RM) *.lib
 	cd games ; $(MAKE) clean
 
 install:

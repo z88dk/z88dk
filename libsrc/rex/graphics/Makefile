@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.2 2002-04-10 20:20:22 dom Exp $
+# $Id: Makefile,v 1.3 2002-10-22 19:15:14 dom Exp $
 
 
 all: 	DsDisplayEllipse.o
@@ -11,4 +11,4 @@ all: 	DsDisplayEllipse.o
 
 
 clean:
-	rm -f *.sym *.map zcc_opt.def *.o*
+	$(RM) *.sym *.map zcc_opt.def *.o*

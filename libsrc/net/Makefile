@@ -30,4 +30,4 @@ net: $(OBJECTS)
 	zcc -vn -Wn43 -make-lib $*.c 
 
 clean:
-	rm -f *.obj *.sym *.map *.o* *.i zcc_opt.def $(AFILES)
+	$(RM) *.obj *.sym *.map *.o* *.i zcc_opt.def $(AFILES)

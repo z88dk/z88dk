@@ -20,7 +20,7 @@ main()
         int     i;
 
 /* Do yourself a favour and change the filename to something else! */
-        fp=fopen("a.uue","r");
+        fp=fopen("filetest.c","r");
         if ((fp == NULL))
         {
                 fputs("\nCan't open file, sorry",stdout);

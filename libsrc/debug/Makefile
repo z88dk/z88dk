@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2002-06-05 09:41:13 stefano Exp $
+# $Id: Makefile,v 1.2 2002-10-22 19:15:02 dom Exp $
 
 CFILES = dump.c
 
@@ -13,4 +13,4 @@ all:	$(OBJECTS)
 	zcc -vn -make-lib $*.c
 
 clean:
-	rm -f *.sym *.map zcc_opt.def *.o* *~ *.err *.i $(AFILES)
+	$(RM) *.sym *.map zcc_opt.def *.o* *~ *.err *.i $(AFILES)

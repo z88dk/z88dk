@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.5 2001-04-30 14:34:16 dom Exp $
+# $Id: Makefile,v 1.6 2002-10-22 19:15:25 dom Exp $
 
 
 
@@ -11,4 +11,4 @@ all: clock.o time.o
 	zcc +z88 -vn -make-lib $*.c
 
 clean:
-	rm -f *.o* *.i *.sym *.map zcc_opt.def
+	$(RM) *.o* *.i *.sym *.map zcc_opt.def

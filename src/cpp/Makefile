@@ -26,4 +26,4 @@ install:
 	install ../../bin/zcpp $(PREFIX)/bin
 
 clean:
-	rm -f *.o core *~
+	$(RM) *.o core *~

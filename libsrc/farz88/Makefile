@@ -1,7 +1,7 @@
 #
 # Makefile for far malloc
 #
-# $Id: Makefile,v 1.5 2002-07-15 15:34:06 dom Exp $
+# $Id: Makefile,v 1.6 2002-10-22 19:15:02 dom Exp $
 
 
 all:
@@ -9,5 +9,5 @@ all:
 	z80asm -d -ns -nm -Mo -x../farz88 @farz88.lst
 
 clean:
-	rm -f *.o *~
+	$(RM) *.o *~
 	cd strings; $(MAKE) clean

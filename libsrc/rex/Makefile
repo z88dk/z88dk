@@ -8,6 +8,6 @@ all:
 
 
 clean:
-	rm -f *.o*  *~  zcc_opt.def
+	$(RM) *.o*  *~  zcc_opt.def
 	cd graphics ; $(MAKE) clean
 	cd farcall ; $(MAKE) clean

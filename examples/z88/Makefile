@@ -31,6 +31,6 @@ dstar:
 	zcc -vn -lgfx dstar.c -o dstar.bas
 
 clean:
-	rm -f cube.bas cubez88.bas enigma.bas rpn.bas sorter.bas
-	rm -f dstar.bas sorter.bas zcc_opt.def *~ *.op* *.o *i *.asm
-	rm -f gfx.bas a.* adv_a.bas
+	$(RM) cube.bas cubez88.bas enigma.bas rpn.bas sorter.bas
+	$(RM) dstar.bas sorter.bas zcc_opt.def *~ *.op* *.o *i *.asm
+	$(RM) gfx.bas a.* adv_a.bas

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.5 2002-09-07 08:40:38 dom Exp $
+# $Id: Makefile,v 1.6 2002-10-22 19:15:24 dom Exp $
 
 CFILES = \
 	memchr.c \
@@ -30,4 +30,4 @@ string: $(OBJECTS)
 	zcc -vn -Wn43 -make-lib $*.c
 
 clean:
-	rm -f *.sym *.map zcc_opt.def *.o* *.i $(AFILES)
+	$(RM) *.sym *.map zcc_opt.def *.o* *.i $(AFILES)

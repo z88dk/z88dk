@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.4 2002-04-22 08:25:23 dom Exp $
+# $Id: Makefile,v 1.5 2002-10-22 19:15:03 dom Exp $
 
 
 all: 	strdup_far.o
@@ -10,5 +10,5 @@ all: 	strdup_far.o
 	zcc -vn -make-lib $*.c
 
 clean:
-	rm -f *.o* *.sym *.map *~ *.err zcc_opt.def
-	rm -f strdup_far.asm *.i
+	$(RM) *.o* *.sym *.map *~ *.err zcc_opt.def
+	$(RM) strdup_far.asm *.i

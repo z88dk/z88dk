@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.4 2002-04-22 08:25:23 dom Exp $
+# $Id: Makefile,v 1.5 2002-10-22 19:15:06 dom Exp $
 
 CFILES = \
 	close.c      \
@@ -33,4 +33,4 @@ z88_fcntl: $(OBJECTS)
 
 
 clean:
-	rm -f  *.sym *.map zcc_opt.def *.o* *.i $(AFILES)
+	$(RM)  *.sym *.map zcc_opt.def *.o* *.i $(AFILES)

@@ -1,4 +1,4 @@
-$Id: README.1st,v 1.8 2002-10-02 09:55:44 dom Exp $
+$Id: README.1st,v 1.9 2002-10-22 19:14:19 dom Exp $
 
 There's a lot of documentation in the doc/ directory, some of it is half
 way through being written, so apologies for the fuzziness in places, most
@@ -7,6 +7,12 @@ hopefully you won't have to dig too deep to find out wat you need to know.
 If you have any questions, feel free to email me at dom@jadara.org.uk
 
 ----- COMPILATION INSTRUCTIONS -----
+Win32:
+
+See http://www.algonet.se/~dennisgr/z88dk.htm for Windows binaries
+and details on how to build libraries
+
+Unix:
 
 There's a certain degree of bootstrapping required - here's the
 procedure for a standard install on UNIX (ensure that you have

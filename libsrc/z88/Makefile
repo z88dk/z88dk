@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.9 2002-07-15 15:34:07 dom Exp $
+# $Id: Makefile,v 1.10 2002-10-22 19:15:25 dom Exp $
 
 CFILES = \
 	DeRegisterInt.c \
@@ -35,5 +35,5 @@ z88: $(OBJECTS)
 	zcc -vn -make-lib $*.c
 
 clean:
-	rm -f *.obj *.sym *.map *.o* *~ zcc_opt.def *.i $(AFILES)
+	$(RM) *.obj *.sym *.map *.o* *~ zcc_opt.def *.i $(AFILES)
 	cd fdstdio ; $(MAKE) clean

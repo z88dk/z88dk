@@ -17,4 +17,4 @@ ansitest:
 
 
 clean:
-	rm -f *.bin *.i *.asm *.op* *.o *~ zcc_opt.def
+	$(RM) *.bin *.i *.asm *.op* *.o *~ zcc_opt.def

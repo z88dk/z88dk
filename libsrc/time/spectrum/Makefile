@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.2 2001-04-18 12:40:07 stefano Exp $
+# $Id: Makefile,v 1.3 2002-10-22 19:15:24 dom Exp $
 
 all:
 	@echo ''
@@ -10,4 +10,4 @@ all:
 	@echo ''
 
 clean:
-	rm -f *.o* *.i *.sym *.map zcc_opt.def
+	$(RM) *.o* *.i *.sym *.map zcc_opt.def

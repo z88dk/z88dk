@@ -20,4 +20,4 @@ savage.bin: embedded_clib2.lib ns16450.o savage.c
 	zcc +embedded -lm ns16450.o savage.c -o savage.bin
 
 clean:
-	rm -f *.bin *.i *.lib *.op* *.o *~ zcc_opt.def
+	$(RM) *.bin *.i *.lib *.op* *.o *~ zcc_opt.def

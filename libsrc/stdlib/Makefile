@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.8 2002-07-15 15:34:07 dom Exp $
+# $Id: Makefile,v 1.9 2002-10-22 19:15:22 dom Exp $
 
 GENCFILES = \
 	atoi.c \
@@ -32,6 +32,6 @@ zx_stdlib:
 	zcc +zx -vn -make-lib sleep.c
 
 clean:
-	rm -f *.o* *.sym *.map zcc_opt.def *.i $(AFILES)
+	$(RM) *.o* *.sym *.map zcc_opt.def *.i $(AFILES)
 	cd z88 ; $(MAKE) clean
 	cd spectrum ; $(MAKE) clean

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.3 2002-04-22 08:25:29 dom Exp $
+# $Id: Makefile,v 1.4 2002-10-22 19:15:26 dom Exp $
 
 CFILES = \
 	fchkhdl.c \
@@ -22,4 +22,4 @@ fdstdio: $(OBJECTS)
 	zcc -make-lib -vn $*.c
 
 clean:
-	rm -f *.o*  *.sym *.map zcc_opt.def *.i $(AFILES)
+	$(RM) *.o*  *.sym *.map zcc_opt.def *.i $(AFILES)

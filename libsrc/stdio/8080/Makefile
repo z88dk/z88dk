@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.2 2002-05-10 11:08:56 dom Exp $
+# $Id: Makefile,v 1.3 2002-10-22 19:15:17 dom Exp $
 #
 
 STDCFILES = \
@@ -28,4 +28,4 @@ z88_x:
 	zcc -vn -make-lib $*.c
 
 clean:
-	rm -f *.o* *.sym *.map zcc_opt.def *.i $(AFILES)
+	$(RM) *.o* *.sym *.map zcc_opt.def *.i $(AFILES)
