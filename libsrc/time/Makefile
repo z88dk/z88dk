@@ -1,15 +1,16 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.3 2001-04-18 12:40:07 stefano Exp $
+# $Id: Makefile,v 1.4 2001-04-30 14:34:16 dom Exp $
 
 lz88: time z88_time
 
 lzx: spectrum_time
 
-time:
-	zcc -vn -D__Z88__ -make-lib gmtime.c
-	zcc -vn -D__Z88__ -make-lib localtime.c
+time: gmtime.o localtime.o
+
+.c.o:
+	zcc +z88 -vn -make-lib $*.c
 
 z88_time:
 	cd z88 ; make
