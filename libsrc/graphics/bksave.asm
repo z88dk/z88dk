@@ -3,14 +3,16 @@
 ;
 ;	Generic version (just a bit slow)
 ;
-;	$Id: bksave.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;	$Id: bksave.asm,v 1.4 2002-03-11 17:11:34 stefano Exp $
 ;
 
 
 	XLIB    bksave
 	LIB	pixeladdress
 
+
 .bksave
+
         ld      hl,2   
         add     hl,sp
         ld      e,(hl)
@@ -37,21 +39,28 @@
 
 	ld	a,(ix+0)
 	ld	b,(ix+1)
-	cp	9
-	jr	nc,bksavew
+
+	dec	a
+	srl	a
+	srl	a
+	srl	a
+	inc	a
+	inc	a		; INT ((Xsize-1)/8+2)
+	ld	(rbytes+1),a
 
 .bksaves
 	push	bc
+	
+.rbytes
+	ld	b,0
+.rloop
 	ld	a,(de)
 	ld	(ix+4),a
 	inc	de
-	ld	a,(de)
-	ld	(ix+5),a
 	inc	ix
-	inc	ix
+	djnz	rloop
 
 	inc	l
-
 	push	hl
 	call	pixeladdress
 	pop	hl
@@ -59,28 +68,4 @@
 	pop	bc
 	
 	djnz	bksaves
-	ret
-
-.bksavew
-	push	bc
-	ld	a,(de)
-	ld	(ix+4),a
-	inc	de
-	ld	a,(de)
-	ld	(ix+5),a
-	inc	de
-	ld	a,(de)
-	ld	(ix+6),a
-	inc	ix
-	inc	ix
-	inc	ix
-
-	inc	l
-
-	push	hl
-	call	pixeladdress
-	pop	hl
-	
-	pop	bc
-	djnz	bksavew
 	ret

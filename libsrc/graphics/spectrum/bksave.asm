@@ -3,7 +3,7 @@
 ;
 ;	ZX Spectrum version (speeded up with a row table)
 ;
-;	$Id: bksave.asm,v 1.1 2002-02-27 13:12:26 stefano Exp $
+;	$Id: bksave.asm,v 1.2 2002-03-11 17:11:34 stefano Exp $
 ;
 
 
@@ -57,18 +57,26 @@
 	
 	ld	a,(ix+0)
 	ld	b,(ix+1)
-	cp	9
-	jr	nc,bksavew
+
+	dec	a
+	srl	a
+	srl	a
+	srl	a
+	inc	a
+	inc	a		; INT ((Xsize-1)/8+2)
+	ld	(rbytes+1),a
 
 .bksaves
 	push	bc
+	
+.rbytes
+	ld	b,0
+.rloop
 	ld	a,(hl)
 	ld	(ix+4),a
 	inc	hl
-	ld	a,(hl)
-	ld	(ix+5),a
 	inc	ix
-	inc	ix
+	djnz	rloop
 
 	; ---------
 	ld	hl,(actrow)
@@ -88,37 +96,4 @@
 	pop	bc
 	
 	djnz	bksaves
-	ret
-
-.bksavew
-	push	bc
-	ld	a,(hl)
-	ld	(ix+4),a
-	inc	de
-	ld	a,(hl)
-	ld	(ix+5),a
-	inc	de
-	ld	a,(hl)
-	ld	(ix+6),a
-	inc	ix
-	inc	ix
-	inc	ix
-
-	; ---------
-	ld	hl,(actrow)
-	inc	hl
-	inc	hl
-	ld	(actrow),hl
-	
-	ld	b,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,b
-	
-	ld	bc,(actcol)
-	add	hl,bc
-	; ---------
-	
-	pop	bc
-	djnz	bksavew
 	ret

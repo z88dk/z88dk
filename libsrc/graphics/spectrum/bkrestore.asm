@@ -3,7 +3,7 @@
 ;
 ;	ZX Spectrum version (speeded up with a row table)
 ;
-;	$Id: bkrestore.asm,v 1.1 2002-02-27 13:12:26 stefano Exp $
+;	$Id: bkrestore.asm,v 1.2 2002-03-11 17:11:34 stefano Exp $
 ;
 
 
@@ -31,7 +31,6 @@
 	add	hl,de
 	add	hl,de
 	ld	(actrow+1),hl	; save row table position
-	ld	(actrow1+1),hl
 	
 	ld	e,(hl)
 	inc	hl
@@ -43,7 +42,6 @@
 	srl	a
 	srl	a
 	ld	(actcol+1),a
-	ld	(actcol1+1),a
 	ld	e,a
 	pop	af
 
@@ -51,19 +49,27 @@
 	
 	ld	a,(ix+0)
 	ld	b,(ix+1)
-	cp	9
-	jr	nc,bkrestorew
+	
+	dec	a
+	srl	a
+	srl	a
+	srl	a
+	inc	a
+	inc	a		; INT ((Xsize-1)/8+2)
+	ld	(rbytes+1),a
+	di
 
 .bkrestores
-	di
 	push	bc
+	
+.rbytes
+	ld	b,0
+.rloop
 	ld	a,(ix+4)
 	ld	(hl),a
 	inc	hl
-	ld	a,(ix+5)
-	ld	(hl),a
 	inc	ix
-	inc	ix
+	djnz	rloop
 
 	; ---------
 .actrow
@@ -83,41 +89,5 @@
 
 	pop	bc
 	djnz	bkrestores
-	ei
-	ret
-
-.bkrestorew
-	di
-	push	bc
-	ld	a,(ix+4)
-	ld	(hl),a
-	inc	hl
-	ld	a,(ix+5)
-	ld	(hl),a
-	inc	hl
-	ld	a,(ix+6)
-	ld	(hl),a
-	inc	ix
-	inc	ix
-	inc	ix
-
-	; ---------
-.actrow1
-	ld	hl,0
-	inc	hl
-	inc	hl
-	ld	(actrow1+1),hl
-	
-	ld	b,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,b
-.actcol1
-	ld	bc,0
-	add	hl,bc
-	; ---------
-	
-	pop	bc
-	djnz	bkrestorew
 	ei
 	ret

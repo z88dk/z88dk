@@ -3,7 +3,7 @@
 ;
 ;	Generic version (just a bit slow)
 ;
-;	$Id: bkrestore.asm,v 1.4 2002-02-18 08:41:49 stefano Exp $
+;	$Id: bkrestore.asm,v 1.5 2002-03-11 17:11:34 stefano Exp $
 ;
 
 
@@ -30,18 +30,25 @@
 
 	ld	a,(ix+0)
 	ld	b,(ix+1)
-	cp	9
-	jr	nc,bkrestorew
+	
+	dec	a
+	srl	a
+	srl	a
+	srl	a
+	inc	a
+	inc	a		; INT ((Xsize-1)/8+2)
+	ld	(rbytes+1),a
 
 .bkrestores
 	push	bc
+.rbytes
+	ld	b,0
+.rloop
 	ld	a,(ix+4)
 	ld	(de),a
 	inc	de
-	ld	a,(ix+5)
-	ld	(de),a
 	inc	ix
-	inc	ix
+	djnz	rloop
 
 	inc	l
 	push	hl
@@ -50,27 +57,4 @@
 	
 	pop	bc
 	djnz	bkrestores
-	ret
-
-.bkrestorew
-	push	bc
-	ld	a,(ix+4)
-	ld	(de),a
-	inc	de
-	ld	a,(ix+5)
-	ld	(de),a
-	inc	de
-	ld	a,(ix+6)
-	ld	(de),a
-	inc	ix
-	inc	ix
-	inc	ix
-
-	inc	l
-	push	hl
-	call	pixeladdress
-	pop	hl
-	
-	pop	bc
-	djnz	bkrestorew
 	ret

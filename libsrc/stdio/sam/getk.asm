@@ -8,7 +8,7 @@
 ;       Stefano Bodrato - Mar.2001
 ;
 ;
-;	$Id: getk.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: getk.asm,v 1.3 2002-03-11 17:11:34 stefano Exp $
 ;
 
 
@@ -22,7 +22,5 @@
 		ld	l,h
 		ret
 .gotkey
-		ld	h,0
 		ld	l,a
-	
 		ret

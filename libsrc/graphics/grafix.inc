@@ -9,7 +9,7 @@
 ;       Define for graphics and other standard library functions
 ;
 ;
-;	$Id: grafix.inc,v 1.6 2001-06-15 15:52:49 stefano Exp $
+;	$Id: grafix.inc,v 1.7 2002-03-11 17:11:34 stefano Exp $
 ;
 
 
@@ -80,6 +80,12 @@ IF FORcpc
 	defc maxy	= 192
 ENDIF
 
+IF FORsam
+	DEFINE gotgfx
+	defc maxx	= 256
+	defc maxy	= 192
+ENDIF
+
 IF FORz88
 	DEFINE gotgfx
 	defc	maxx	= 256
@@ -118,3 +124,8 @@ DEFVARS 0
         type    ds.b    1       ;
         graph   ds.b    1       ;0=text 1=graphics
 }
+
+
+
+
+
