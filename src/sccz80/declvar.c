@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: declvar.c,v 1.2 2001-02-02 12:24:06 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -128,7 +128,7 @@ void defenum(char *sname, char storage)
                 if (symname(name)==0)
                         illname(name);
                 if ( cmatch('=') )
-                        constexpr(&value);
+                        constexpr(&value,1);
                 ptr=addglb(name,VARIABLE,ENUM,0,STATIK,0,0);
                 ptr->size=value;
                 value++;
@@ -228,8 +228,10 @@ char zfar )                      /* TRUE if far */
                 else if ( ident == PTR_TO_FN ) {
                         ident = POINTER ;
 			ptrtofn=YES;
-                }
-                else if ( cmatch('(') ) {
+                } else if ( cmatch('@') ) {
+			storage = EXTERNP;
+			constexpr(&addr,1);
+                } else if ( cmatch('(') ) {
 /*
  * Here we check for functions, but we can never have a pointer to
  * function because thats considered above. Which means as a very
@@ -713,7 +715,7 @@ int needsub()
         long num;
 
         if ( cmatch(']') ) return (0);   /* null size */
-        if ( constexpr(&num) == 0 ) {
+        if ( constexpr(&num,1) == 0 ) {
                 num = 1 ;
         }
         else if ( num < 0 ) {
@@ -813,7 +815,7 @@ void BitFieldSwallow()
 {
         long    val;
         if      (cmatch(':')) {
-                constexpr(&val);
+                constexpr(&val,1);
                 warning(W_BITFIELD);
         }
 }

@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.3 2001-02-01 12:04:41 dom Exp $
+ *      $Id: primary.c,v 1.4 2001-02-02 12:24:06 dom Exp $
  */
 
 
@@ -623,8 +623,9 @@ int label, parens;
  * evaluate constant expression
  * return TRUE if it is a constant expression
  */
-int constexpr(val)
+int constexpr(val,flag)
 long *val ;
+int flag;
 {
         char *before, *start ;
         int con, valtemp ;
@@ -633,7 +634,7 @@ long *val ;
         expression(&con, &valtemp) ;
         *val=(long) valtemp;
         clearstage(before, 0) ;         /* scratch generated code */
-        if (con == 0)
+        if (flag && con == 0)
                 error(E_CONSTANT) ;
         return con ;
 }

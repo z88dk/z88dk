@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.1 2000-07-04 15:33:32 dom Exp $
+ *      $Id: stmt.c,v 1.2 2001-02-02 12:24:06 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -446,7 +446,7 @@ void docase()
                 return ;
         }
         postlabel(swnext->label = getlabel()) ;
-        constexpr(&swnext->value) ;
+        constexpr(&swnext->value,1) ;
         needchar(':') ;
         ++swnext ;
 }

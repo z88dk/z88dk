@@ -20,7 +20,7 @@ extern void rvaluest(LVALUE *lval);
 extern void rvalload(LVALUE  *lval);
 extern void rvalue(LVALUE *lval);
 extern void test(int label, int parens);
-extern int constexpr(long *val);
+extern int constexpr(long *val,int flag);
 extern void cscale(int type, struct tag_symbol *tag, int *val);
 extern void addconst(int val, int opr, char zfar);
 extern int docast(LVALUE *lval,char df);
