@@ -1,5 +1,5 @@
-#ifndef SOUND_H
-#define SOUND_H
+#ifndef __SOUND_H__
+#define __SOUND_H__
 
 
 /*
@@ -7,7 +7,7 @@
  *
  *	Stefano, Oct 2001
  *
- *	$Id: sound.h,v 1.4 2001-10-27 13:20:15 stefano Exp $
+ *	$Id: sound.h,v 1.5 2001-11-18 21:07:18 dom Exp $
  */
 
 /* 1 bit sound library */
