@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.1 2000-07-04 15:33:29 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.2 2001-01-23 10:00:09 dom Exp $ */
 /* $History: Z80INSTR.C $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -96,7 +96,7 @@ extern unsigned char *codeptr, *codearea;
 extern long PC;
 extern struct module *CURRENTMODULE;
 extern enum symbols GetSym (void), sym;
-extern enum flag relocfile;
+extern enum flag relocfile, ti83plus;
 
 
 void 
@@ -507,7 +507,41 @@ CALLPKG (void)
     }
 }
 
+void
+INVOKE (void)
+{
+  long constant;
+  struct expr *postfixexpr;
 
+  if (ti83plus == ON)
+    *codeptr++ = 0xEF;		/* Ti83Plus: RST 28H instruction */
+  else
+    *codeptr++ = 0xCD;		/* Ti83: CALL */
+
+  ++PC;
+
+  if (GetSym () == lparen)
+    GetSym ();			/* Optional parenthesis around expression */
+
+  if ((postfixexpr = ParseNumExpr ()) != NULL)
+    {
+      if (postfixexpr->rangetype & NOTEVALUABLE)
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 2);		/* INVOKE expression must be evaluable */
+      else
+	{
+	  constant = EvalPfixExpr (postfixexpr);
+	  if ((constant >= 0) && (constant <= 65535))
+	    {
+	      *codeptr++ = constant % 256;	/* 2 byte parameter always */
+	      *codeptr++ = constant / 256;
+	      PC += 2;
+	    }
+	  else
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 4);
+	}
+      RemovePfixlist (postfixexpr);	/* remove linked list, because expr. was evaluated */
+    }
+}
 
 void 
 FPP (void)

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.1 2000-07-04 15:33:30 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.2 2001-01-23 10:00:08 dom Exp $ */
 /* $History: Asmdrctv.c $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -823,7 +823,11 @@ Fetchfilename (FILE *fptr)
 
   if (ident[0] == '#')
     {
-      if ((stdpath = getenv ("Z80_OZFILES")) != NULL)
+      stdpath = getenv("Z80_OZFILES");
+  /* djm 3/1/2000 try to use the default path.. */
+      if ( stdpath == NULL ) 
+	  stdpath = DEFLIBDIR; 
+      if ( stdpath != NULL)
 	{
 	  strncpy (stringconst, stdpath, 255);	/* copy   standard path */
 

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.1 2000-07-04 15:33:29 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.2 2001-01-23 10:00:09 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -225,7 +225,7 @@ enum symbols sym, ssym[] =
  lparen, lcurly, rcurly, rparen, plus, minus, multiply, divi, mod, power,
  assign, bin_and, bin_or, bin_xor, less, greater, log_not, constexpr};
 
-enum flag pass1, listing, listing_CPY, symtable, z80bin, writeline, mapref, globaldef, datestamp;
+enum flag pass1, listing, listing_CPY, symtable, z80bin, writeline, mapref, globaldef, datestamp, ti83plus;
 enum flag deforigin, verbose, ASMERROR, EOL, symfile, library, createlibrary, autorelocate;
 enum flag smallc_source, codesegment, expl_binflnm, clinemode;
 
@@ -657,6 +657,13 @@ SetAsmFlag (char *flagid)
 	strncpy ((objext + 1), (flagid + 1), 3);	/* copy argument string (append after '.') */
      objext[4] = '\0';						/* max. 3 letters extension */
    }
+
+  /* check weather to use an RST or CALL when Invoke is used */
+  if (strcmp(flagid, "plus") == 0 ) 
+    {
+      ti83plus = ON;
+      return;
+    }
 
   /* djm turn on c line mode to report line number of C source */
 
@@ -1426,6 +1433,7 @@ prompt (void)
   puts ("Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)");
   printf ("-v verbose, -l listing file, -s symbol table, -m map listing file\n");
   puts ("-r<ORG> Explicit relocation <ORG> defined in hex (ignore ORG in first module)");
+  puts ("-plus Interpret 'Invoke' as RST 28h");
   puts ("-R Generate relocatable code (Automatical relocation before execution)");
   puts ("-D<symbol> define symbol as logically TRUE (used for conditional assembly)");
   puts ("-b assemble files & link to ORG address. -c split code in 16K banks");

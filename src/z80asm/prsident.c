@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.1 2000-07-04 15:33:30 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.2 2001-01-23 10:00:09 dom Exp $ */
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -86,7 +86,7 @@ void DeclModuleName (void);
 void DefSym (void);
 void ifstatement (enum flag interpret);
 void DEFVARS (void), DEFS (void), ORG (void), IncludeFile (void), BINARY (void), CALLOZ (void), CALLPKG (void), FPP (void);
-void ADC (void), ADD (void), DEC (void), IM (void), IN (void), INC (void);
+void ADC (void), ADD (void), DEC (void), IM (void), IN (void), INC (void), INVOKE (void);
 void JR (void), LD (void), OUT (void), RET (void), SBC (void);
 void DEFB (void), DEFC (void), DEFM (void), DEFW (void), DEFL (void);
 void RST (void), DEFGROUP (void);
@@ -158,7 +158,7 @@ struct Z80sym Z80ident[] = {
  {"DEFB", DEFB},
  {"DEFC", DEFC},
  {"DEFGROUP", DEFGROUP},
- {"DEFINE", DefSym},	/* 20 */
+ {"DEFINE", DefSym},		/* 20 */
  {"DEFL", DEFL},		
  {"DEFM", DEFM},
  {"DEFS", DEFS},
@@ -168,7 +168,7 @@ struct Z80sym Z80ident[] = {
  {"DJNZ", DJNZ},
  {"EI", EI},
  {"ELSE", ELSEstat},
- {"ENDIF", ENDIFstat},	/* 30 */
+ {"ENDIF", ENDIFstat},		/* 30 */
  {"EX", EX},			
  {"EXX", EXX},
  {"FPP", FPP},
@@ -182,59 +182,60 @@ struct Z80sym Z80ident[] = {
  {"INDR", INDR},
  {"INI", INI},
  {"INIR", INIR},
- {"JP", JP},
- {"JR", JR},			/* 45 */
+ {"INVOKE", INVOKE},
+ {"JP", JP},			/* 45 */
+ {"JR", JR},
  {"LD", LD},
  {"LDD", LDD},
  {"LDDR", LDDR},
- {"LDI", LDI},
- {"LDIR", LDIR},		/* 50 */
+ {"LDI", LDI},			/* 50 */
+ {"LDIR", LDIR},
  {"LIB", DeclLibIdent},
  {"LINE", LINE},
  {"LSTOFF", ListingOff},
- {"LSTON", ListingOn},
+ {"LSTON", ListingOn},		/* 55 */
  {"MODULE", DeclModule},
- {"NEG", NEG},			/* 55 */
+ {"NEG", NEG},
  {"NOP", NOP},
  {"OR", OR},
- {"ORG", ORG},
+ {"ORG", ORG},			/* 60 */
  {"OTDR", OTDR},
- {"OTIR", OTIR},		/* 60 */
+ {"OTIR", OTIR},
  {"OUT", OUT},
  {"OUTD", OUTD},
- {"OUTI", OUTI},
- {"POP", POP},			
- {"PUSH", PUSH},		/* 65 */
+ {"OUTI", OUTI},		/* 65 */		
+ {"POP", POP},
+ {"PUSH", PUSH},
  {"RES", RES},
  {"RET", RET},
- {"RETI", RETI},		
+ {"RETI", RETI},		/* 70 */
  {"RETN", RETN},
- {"RL", RL},			/* 70 */
+ {"RL", RL},
  {"RLA", RLA},
  {"RLC", RLC},
- {"RLCA", RLCA},
+ {"RLCA", RLCA},		/* 75 */
  {"RLD", RLD},
- {"RR", RR},			/* 75 */
+ {"RR", RR},
  {"RRA", RRA},
  {"RRC", RRC},
- {"RRCA", RRCA},
+ {"RRCA", RRCA},		/* 80 */
  {"RRD", RRD},
- {"RST", RST},			/* 80 */
+ {"RST", RST},
  {"SBC", SBC},
  {"SCF", SCF},
- {"SET", SET},
+ {"SET", SET},			/* 85 */
  {"SLA", SLA},
- {"SLL", SLL},			/* 85 */
+ {"SLL", SLL},
  {"SRA", SRA},
  {"SRL", SRL},
- {"SUB", SUB},
+ {"SUB", SUB},			/* 90 */
  {"XDEF", DeclGlobalIdent},
- {"XLIB", DeclGlobalLibIdent},	/* 90 */
+ {"XLIB", DeclGlobalLibIdent},
  {"XOR", XOR},
  {"XREF", DeclExternIdent}
 };
 
-size_t totalz80id = 94;
+size_t totalz80id = 95;
 
 
 int 
