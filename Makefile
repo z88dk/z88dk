@@ -43,7 +43,7 @@ config:
 	sed "s?DESTDIR?`pwd`?g" < lib/config/ti86.lnx > lib/config/ti86.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/z88net.lnx > lib/config/z88net.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/abc80.lnx > lib/config/abc80.cfg
-	ln -s lib/config/z88.cfg lib/config/zcc.cfg
+	ln -s z88.cfg lib/config/zcc.cfg
 
 libs:
 	cd libsrc ; make
