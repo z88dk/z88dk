@@ -14,9 +14,9 @@
 
                 XLIB    mkdir
 
-;int mkdir(char *s1)
+;int mkdir(char *s1,int mode)
 ;on stack:
-;return address,s1
+;return address,mode,s1
 ;s1=filename of directory to make
 
 .mkdir
@@ -34,7 +34,7 @@
         ex      de,hl   ;put this in final place
         ld      c,8     ;max chars to expand..
 ;Now, find the filename!
-        ld      hl,2+10
+        ld      hl,4+10
         add     hl,sp
         ld      a,(hl)
         inc     hl

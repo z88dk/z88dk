@@ -112,7 +112,10 @@
  *	and made the + operator a tad more useful in specifying machines
  *	within that directory
  *
- *      $Id: zcc.c,v 1.2 2001-01-02 11:28:00 dom Exp $
+ *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
+ *	assemble pass (matches -Cp for preprocessor)
+ *
+ *      $Id: zcc.c,v 1.3 2001-02-06 10:46:05 dom Exp $
  */
 
 
@@ -130,6 +133,7 @@ void ParseArgs(char *);
 void AddComp(char *);
 void AddPreProc(char *);
 void AddToPreProc(char *);
+void AddToAssembler(char *);
 void AddLink(char *);
 void DispInfo(void);
 void DispVer(char *);
@@ -195,6 +199,7 @@ struct args myargs[]= {
         {"usetemp",NO,SetTemp},
         {"notemp",NO,UnSetTemp},
 	{"Cp",YES,AddToPreProc},
+	{"Ca",YES,AddToAssembler},
         {"E",NO,SetPreProcessOnly},
         {"R",NO,SetRelocate},
         {"D",YES,AddPreProc},
@@ -272,6 +277,7 @@ char    *outputfile;
 char    *cpparg;
 char    *comparg;
 char    *linkargs;
+char	*asmargs;
 
 char    outfilename[FILENAME_MAX+1];
 char	extension[5];
@@ -459,7 +465,7 @@ int main(argc, argv)
 {
         int     i, n, gc;
         char    *temp,*temp2,*cfgfile;
-        char    asmarg[LINEMAX+1];     /* Must hold "-eopt -ns" */
+        char    asmarg[4096];      /* Hell, that should be long enough! */
         char    buffer[LINEMAX+1]; /* For reading in option file */
         FILE    *fp;
 
@@ -474,7 +480,7 @@ int main(argc, argv)
         strcpy(buffer,"  ");
 
         AddComp(buffer+1);
-        linkargs=cpparg=0;
+        asmargs=linkargs=cpparg=0;
 
         /* allocate enough pointers for all files, slight overestimate */
         filelist = (char **)mustmalloc(sizeof(char *) * argc);
@@ -768,7 +774,11 @@ int FindSuffix(char *name)
 
 void BuildAsmLine(char *dest, char *prefix)
 {
-        strcpy(dest,prefix);
+	if (asmargs)
+		strcpy(dest,asmargs);
+	else
+		strcpy(dest,"");
+        strcat(dest,prefix);
         if (z80verbose)
                 strcat(dest," -v ");   
         if      (!symbolson)
@@ -859,6 +869,11 @@ void SetPreProcessOnly(char *arg)
 void SetZ80Verb(char *arg)
 {
         z80verbose=YES;
+}
+
+void AddToAssembler(char *arg)
+{
+	BuildOptions(&asmargs,arg+2);
 }
 
 void AddToPreProc(char *arg)
@@ -1328,6 +1343,8 @@ void tempname(char *filen)
  *		or  ZCCCFG/argv[0]
  *	Or as a first resort argv[0]
  *	Returns gc (or exits)
+ *
+ *	If ZCCCFG doesn't exist then we take the PREFIX 
  */
 
 int FindConfigFile(char *arg, int gc)
@@ -1360,6 +1377,13 @@ int FindConfigFile(char *arg, int gc)
 			strcat(outfilename,arg+1);
 			strcat(outfilename,".cfg");
 			return(gc);
+		} else {
+#if 1
+			strcpy(outfilename,PREFIX);
+			strcat(outfilename,arg+1);
+			strcat(outfilename,".cfg");
+			return(gc);
+#endif
 		}
 		/* User supplied invalid config file, let it fall over
 		   back when */
@@ -1390,8 +1414,12 @@ int FindConfigFile(char *arg, int gc)
 		strcpy(outfilename,cfgfile);
 		strcat(outfilename,"zcc.cfg");
 	} else {
+#if 1
+		sprintf(outfilename,"%s/lib/config/zcc.cfg",PREFIX);
+#else
 		fprintf(stderr,"Couldn't find env variable ZCCCFG\n");
 		exit(1);
+#endif
 	}
 	return(gc);
 }

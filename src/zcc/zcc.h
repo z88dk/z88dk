@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.2 2001-01-02 11:28:00 dom Exp $
+ * $Id: zcc.h,v 1.3 2001-02-06 10:46:05 dom Exp $
  */
 
 
@@ -20,9 +20,13 @@ char *amiver="$VER: zcc v2.47 (2.1.2001)";
 
 #ifdef MSDOS
 
+#define PRFIX "c:\z88dk\"
+
 #endif
 
 #ifdef UNIX
+
+#define PREFIX "/usr/local/z88dk"
 
 #endif
 

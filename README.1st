@@ -29,12 +29,21 @@ Amiga: ixemul v47+ required..
 
 Brief guide to what has changed in case I don't distribute the doco
 
-z88dkv1.32 (sccz80v1.10b71) 2.1.2001
+z88dkv1.32 (sccz80v1.10b71pre4) 6.2.2001
 
-- [sccz80] No change!
+- [sccz80] Fixed long pointer arithmetic
+- [sccz80] Added int blah @ nnnn type as alternative (and better implemented) 
+  version of int blah (nnnn)
+- [sccz80] Added ability for FP constants to be evaluated at run time
+- [sccz80] Got rid of *annoying* int<->ptr warning when calling func with
+  difference between two pointers
 - [zcc] Add -Cp flag to pass through to frontend (for GNU cpp purposes)
+- [zcc] Added -Ca flag to pass through to assembler
+- [z80asm] INVOKE opcode for ti calcs
+- [libs] Added z80s183_crt0.lib (minor change in l_long_case)
 - [libs] Added Stefano's TI calc support routines
 - [libs] Fixed things so that compilation is possible
+- [opt] More rules in level 3 and fixed some as well
 
 z88dkv1.31 (sccz80v1.10b71) 3.7.2000
 

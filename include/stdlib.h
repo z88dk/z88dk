@@ -37,8 +37,8 @@ extern void __LIB__ srand(int);
 extern __LIB__ sleep(int);
 
 
-/* Non standard stdlib.h defs */
-extern __LIB__ mkdir(char *);
+/* Non standard stdlib.h defs (mode is ignored)*/
+extern __LIB__ mkdir(char *, int mode);
 extern char __LIB__ *getcwd(char *buf, int maxlen); 
 
 extern __LIB__ csleep(int);  /* Very non standard! sleep for centisecs! (z88)*/

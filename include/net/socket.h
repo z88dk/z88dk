@@ -105,6 +105,7 @@ extern bool_t __LIB__ __SHARED__ sock_closed(SOCKET *s);
  */
 
 extern SOCKET __LIB__ __SHARED__ *sock_listen(ipaddr_t ipaddr,tcpport_t lport,void (*datahandler)(),char protocol);
+extern SOCKET __LIB__ __SHARED__ *sock_pair_listen(ipaddr_t ipaddr,tcpport_t lport,tcpport_t dport,void (*datahandler)(),char protocol);
 extern SOCKET __LIB__ __SHARED__ *sock_open(ipaddr_t ipaddr,tcpport_t dport,void (*datahandler)(),char protocol);
 
 /*

@@ -4,6 +4,7 @@ amax
 asin
 atan
 atan2
+atof
 ceil
 cos
 cosh

@@ -3,11 +3,14 @@
 #
 
 
-all: crt0s
+all: crt0s crtz80s183
 
 
 crt0s:
 	z80asm -d -ns -nm -Mo -x../z80_crt0 @crt0list
+
+crtz80s183:
+	z80asm -d -DZ80S183 -ns -nm -Mo -x../z80s183_crt0 @crt0list
 
 
 clean:

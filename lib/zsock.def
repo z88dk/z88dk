@@ -82,6 +82,7 @@ lstoff
 	defc	r_sock_waitclose	= 46
 	defc	r_sock_settos		= 47
 	defc	r_sock_setttl		= 48
+	defc	r_sock_pair_listen	= 49
 
 
 lston

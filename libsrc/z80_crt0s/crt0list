@@ -32,6 +32,8 @@ crt0/l_neg
 crt0/l_or
 crt0/l_pint
 crt0/l_pint_eq
+crt0/l_pint_pop
+crt0/l_pint_ex
 crt0/l_plong
 crt0/l_putptr
 crt0/l_sub

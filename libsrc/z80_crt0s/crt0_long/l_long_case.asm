@@ -34,9 +34,16 @@
         cp      d
         jr      nz,swloop
 ;Have had a match here...so, load up address, and get there
+IF Z80S183
+	ld	e,(ix-6)	;low byte
+	ld	d,(ix-5)	;high
+	push	de
+	pop	ix
+ELSE
         ld      a,(ix-6)        ;low byte
         ld      ixh,(ix-5)
         ld      ixl,a
+ENDIF
 .swend
         jp      (ix)
         

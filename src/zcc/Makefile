@@ -5,7 +5,7 @@ CC = gcc
 all: zcc 
 
 zcc:
-	${CC} -o ../../bin/zcc ${CFLAGS} ${CCOPTS} ${ZCCOBJS}
+	${CC} -o ../../bin/zcc ${CFLAGS} ${CCOPT} ${ZCCOBJS}
 
 
 #Dependencies

@@ -30,6 +30,7 @@ sock_getptr
 sock_listen
 sock_open
 sock_opened
+sock_pair_listen
 sock_putc
 sock_puts
 sock_read

@@ -13,7 +13,7 @@ Here are the byte sequences for it:
 1,32	  - Switch to 32 column mode
 
 8,9,10,11 - Move in x and y as you would expect
-12	  - Form feed - clears the screen and moves print posn to x,y
+12	  - Form feed - clears the screen and moves print posn to 0,0
 13	  - Carriage return - advances y and sets x to 0
 
 22,y,x	  - Move to position y,x on the screen (0<=y<=23, 0<=x<=63)
