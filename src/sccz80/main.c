@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.5 2001-02-28 18:20:45 dom Exp $
+ *      $Id: main.c,v 1.6 2001-03-09 10:17:40 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -605,6 +605,7 @@ void PragmaOutput(char *ptr)
                 }
                 fprintf(fp,"\nIF NEED_%s\n",ptr);
                 fprintf(fp,"\tdefm\t\"%s\"\n",text);
+		fprintf(fp,"\tdefc DEFINED_NEED_%s = 1\n",ptr);
                 fprintf(fp,"ENDIF\n\n");
                 fclose(fp);
         }
