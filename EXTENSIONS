@@ -1,3 +1,5 @@
+$Id: EXTENSIONS,v 1.2 2001-04-17 09:51:52 stefano Exp $
+
 sccz80 features several extensions to C to enable mixing of C
 and assembler:
 

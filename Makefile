@@ -2,6 +2,8 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
+#	$Id: Makefile,v 1.6 2001-04-17 09:51:52 stefano Exp $
+#
 
 prefix = /usr/local/z88dk
 

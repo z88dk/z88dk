@@ -1,3 +1,5 @@
+$Id: README.1st,v 1.4 2001-04-17 09:51:52 stefano Exp $
+
 There's a lot of documentation in the doc/ directory, some of it is half
 way through being written, so apologies for the fuzziness in places, most
 of it is in html (so that everyone can read it), some of it is plain text,
@@ -21,7 +23,9 @@ If you have any questions, feel free to email me at dom@jb.man.ac.uk
 
 Where {z88dk} is the root directory of the archive (where this file is located!)
 
-[To recompile the libraries, go into libsrc and type "make clean; make "]
+[To recompile the libraries, go into libsrc and type "make clean; make "
+ If you got the CVS tree, make sure that the libraries have been downloaded 
+ in binary mode: if the compiler crashes, rebuild libraries !]
 
 Amiga: ixemul v47+ required..
 
