@@ -1,4 +1,4 @@
-$Id: compile.txt,v 1.1 2001-06-06 15:22:07 stefano Exp $
+$Id: compile.txt,v 1.2 2001-09-07 18:34:04 dom Exp $
 -------------------------------------------------------------------------------
 Compiling with the z88dk             ; By Henk Poley ;             05-jun-2001
 -------------------------------------------------------------------------------
@@ -156,8 +156,8 @@ Like:
      mz           (OZ's math routines)
      ndos         (Fake file-routines, return errors only)
      net          (Z88 socket routines for ZSock)
-     netdev
-     p3
+     netdev	  (Z88 socket routines for devices)
+     p3           (+3 file support library)
      tigray82     (Ti82 graylib routines)
      tigray83     (Ti83 ...)
      tigray83p    (Ti83+ ...)
