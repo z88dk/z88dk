@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.66 2003-09-15 22:54:57 denniz Exp $
+# $Id: Makefile,v 1.67 2003-09-16 09:21:28 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -631,7 +631,7 @@ rex_clib.lib:
 	@echo '--- Building Xircom Rex Library  ---'
 	@echo ''
 	cd strings; $(MAKE)
-	cd stdlib ; $(MAKE)
+	cd stdlib ; $(MAKE) gen
 	cd setjmp ; $(MAKE)
 	cd rex    ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORrex -xrex_clib.lib @rex6000.lst
