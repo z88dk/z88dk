@@ -5,12 +5,12 @@
  *
  *      djm 9/1/2000
  *
- *	$Id: time.h,v 1.5 2001-04-20 16:04:24 dom Exp $
+ *	$Id: time.h,v 1.6 2001-10-16 18:30:32 dom Exp $
  */
 
 
-#ifndef _TIME_H
-#define _TIME_H
+#ifndef __TIME_H__
+#define __TIME_H__
 
 #include <sys/types.h>
 

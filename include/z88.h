@@ -5,10 +5,11 @@
  *
  *      Link using -lz88
  *
- *	$Id: z88.h,v 1.3 2001-04-20 16:04:24 dom Exp $
+ *	$Id: z88.h,v 1.4 2001-10-16 18:30:32 dom Exp $
  */
-#ifndef Z88_H
-#define Z88_H
+
+#ifndef __Z88_H__
+#define __Z88_H__
 
 
 #include <sys/types.h>
@@ -95,6 +96,7 @@ extern pid_t __LIB__ getpid(void);
 #define LIB_PACKAGE	0x0f
 #define LIB_XFS		0x12
 #define LIB_TCP		0x15
+#define LIB_TFTPD       0x18
 #define LIB_EXAMPLE	0x45
 
 /*

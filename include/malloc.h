@@ -1,11 +1,11 @@
-#ifndef _MALLOC_H
-#define _MALLOC_H
+#ifndef __MALLOC_H__
+#define __MALLOC_H__
 
 
 /*
  * Now some trickery to link in the correct routines for far
  *
- * $Id: malloc.h,v 1.2 2001-04-20 16:04:24 dom Exp $
+ * $Id: malloc.h,v 1.3 2001-10-16 18:30:32 dom Exp $
  */
 
 

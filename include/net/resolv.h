@@ -9,11 +9,11 @@
  *
  *	djm 13/2/2000
  *
- *	$Id: resolv.h,v 1.3 2001-10-06 19:14:48 dom Exp $
+ *	$Id: resolv.h,v 1.4 2001-10-16 18:30:32 dom Exp $
  */
 
-#ifndef _NET_RESOLV_H
-#define _NET_RESOLV_H
+#ifndef __NET_RESOLV_H__
+#define __NET_RESOLV_H__
 
 #include <net/inet.h>
 

@@ -16,11 +16,11 @@
  *	I've only tested this with 2 byte arguments but it 
  *	seems to work...
  *
- *	$Id: stdarg.h,v 1.2 2001-04-20 16:04:24 dom Exp $
+ *	$Id: stdarg.h,v 1.3 2001-10-16 18:30:32 dom Exp $
  */
 
-#ifndef _STDARG_H
-#define _STDARG_H
+#ifndef __STDARG_H__
+#define __STDARG_H__
 
 #ifndef DEF_GETARG
 #define DEF_GETARG

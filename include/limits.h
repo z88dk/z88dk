@@ -1,7 +1,7 @@
-#ifndef _LIMITS_H
-#define _LIMITS_H 
+#ifndef __LIMITS_H__
+#define __LIMITS_H__ 
 
-/* $Id: limits.h,v 1.2 2001-04-20 16:04:24 dom Exp $ */
+/* $Id: limits.h,v 1.3 2001-10-16 18:30:32 dom Exp $ */
 
 #define CHAR_BIT 8
 #define INT_MAX 32767

@@ -1,5 +1,5 @@
-#ifndef _NET_NETSTATS_H
-#define _NET_NETSTATS_H
+#ifndef __NET_NETSTATS_H__
+#define __NET_NETSTATS_H__
 
 #include <sys/types.h>
 #include <net/inet.h>
@@ -10,7 +10,7 @@
  *
  *	djm 28/1/2000
  *
- *	$Id: netstats.h,v 1.3 2001-04-20 16:04:25 dom Exp $
+ *	$Id: netstats.h,v 1.4 2001-10-16 18:30:32 dom Exp $
  */
 
 typedef unsigned int nstat_t;

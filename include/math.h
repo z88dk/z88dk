@@ -1,7 +1,7 @@
-#ifndef _MATH_H
-#define _MATH_H
+#ifndef __MATH_H__
+#define __MATH_H__
 
-/* $Id: math.h,v 1.3 2001-04-20 16:04:24 dom Exp $ */
+/* $Id: math.h,v 1.4 2001-10-16 18:30:32 dom Exp $ */
 
 
 extern double __LIB__ acos(double);  /* arc cosine (z88 only) */

@@ -1,5 +1,5 @@
-#ifndef STRINGS_H
-#define STRINGS_H
+#ifndef __STRINGS_H__
+#define __STRINGS_H__
 
 /*
  *	This is strings.h
@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.4 2001-04-20 16:04:24 dom Exp $
+ *	$Id: string.h,v 1.5 2001-10-16 18:30:32 dom Exp $
  */
 
 

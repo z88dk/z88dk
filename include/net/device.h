@@ -3,11 +3,11 @@
  *
  *	djm 25/1/2000
  *
- *	$Id: device.h,v 1.4 2001-04-20 16:04:25 dom Exp $
+ *	$Id: device.h,v 1.5 2001-10-16 18:30:32 dom Exp $
  */
 
-#ifndef _NET_DEVICE_H
-#define _NET_DEVICE_H
+#ifndef __NET_DEVICE_H__
+#define __NET_DEVICE_H__
 
 /* Address to which a plugin device is loaded */
 

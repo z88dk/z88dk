@@ -7,12 +7,12 @@
  *
  *      djm 24/4/99
  *
- *	$Id: inet.h,v 1.5 2001-04-20 16:04:25 dom Exp $
+ *	$Id: inet.h,v 1.6 2001-10-16 18:30:32 dom Exp $
  */
 
 
-#ifndef _NET_INET_H
-#define _NET_INET_H
+#ifndef __NET_INET_H__
+#define __NET_INET_H__
 
 #include <sys/types.h>
 

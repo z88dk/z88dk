@@ -1,12 +1,12 @@
-#ifndef GAMES_H
-#define GAMES_H
+#ifndef __GAMES_H__
+#define __GAMES_H__
 
 /*
  *	Videogames support code
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.5 2001-09-07 07:45:45 stefano Exp $
+ *	$Id: games.h,v 1.6 2001-10-16 18:30:31 dom Exp $
  *
  */
 

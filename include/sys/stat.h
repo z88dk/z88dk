@@ -1,5 +1,5 @@
-#ifndef _SYS_STAT_H
-#define _SYS_STAT_H
+#ifndef __SYS_STAT_H__
+#define __SYS_STAT_H__
 
 /* We need some time stuff */
 #include <time.h>
@@ -9,7 +9,7 @@
  *	We try to be good and emulate as much a possible
  *	Hence all these silly defs!
  *
- *	$Id: stat.h,v 1.2 2001-04-20 16:04:25 dom Exp $
+ *	$Id: stat.h,v 1.3 2001-10-16 18:30:32 dom Exp $
  */
 
 struct stat {

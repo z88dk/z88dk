@@ -3,12 +3,12 @@
  *
  *	A concession to ISO C
  *
- *	$Id: iso646.h,v 1.2 2001-04-20 16:04:24 dom Exp $
+ *	$Id: iso646.h,v 1.3 2001-10-16 18:30:31 dom Exp $
  */
 
 
-#ifndef _ISO646_H
-#define _ISO646_H
+#ifndef __ISO646_H__
+#define __ISO646_H__
 
 #define and && 
 #define and_eq &= 

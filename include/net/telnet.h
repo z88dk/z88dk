@@ -1,5 +1,5 @@
 /*	$NetBSD: telnet.h,v 1.4 1994/10/26 00:56:46 cgd Exp $	*/
-/*	$Id: telnet.h,v 1.2 2001-04-20 16:04:25 dom Exp $ */
+/*	$Id: telnet.h,v 1.3 2001-10-16 18:30:32 dom Exp $ */
 
 /*
  * Copyright (c) 1983, 1993
@@ -36,8 +36,8 @@
  *	@(#)telnet.h	8.1 (Berkeley) 6/2/93
  */
 
-#ifndef _TELNET_H_
-#define	_TELNET_H_
+#ifndef __NET_TELNET_H__
+#define	__NET_TELNET_H__
 
 /*
  * Definitions for the TELNET protocol.

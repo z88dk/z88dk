@@ -5,11 +5,11 @@
  *
  *	djm 13/2/2000
  *
- *	$Id: socket.h,v 1.4 2001-10-06 19:14:48 dom Exp $
+ *	$Id: socket.h,v 1.5 2001-10-16 18:30:32 dom Exp $
  */
 
-#ifndef __NET_SOCKET_H
-#define __NET_SOCKET_H
+#ifndef __NET_SOCKET_H__
+#define __NET_SOCKET_H__
 
 #include <sys/types.h>
 #include <net/inet.h>

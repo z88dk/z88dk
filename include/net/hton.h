@@ -7,12 +7,12 @@
  *
  *      djm 24/4/99
  *
- *	$Id: hton.h,v 1.2 2001-04-20 16:04:25 dom Exp $
+ *	$Id: hton.h,v 1.3 2001-10-16 18:30:32 dom Exp $
  */
 
 
-#ifndef HTON_H
-#define HTON_H
+#ifndef __HTON_H__
+#define __HTON_H__
 
 /* Get the types */
 

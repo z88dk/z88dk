@@ -5,11 +5,11 @@
  *
  *      djm 29/1/2000
  *
- *	$Id: zsfiles.h,v 1.2 2001-04-20 16:04:25 dom Exp $
+ *	$Id: zsfiles.h,v 1.3 2001-10-16 18:30:32 dom Exp $
  */
 
-#ifndef _NET_ZSFILES_H
-#define _NET_ZSFILES_H
+#ifndef __NET_ZSFILES_H__
+#define __NET_ZSFILES_H__
 
 /* Where files are located on the Z88 */
 

@@ -1,11 +1,11 @@
-#ifndef FLOAT_H
-#define FLOAT_H
+#ifndef __FLOAT_H__
+#define __FLOAT_H__
 
 /*
  *	Some more floating point routines..I can't remember
  *	why these are separated out..
  *
- *	$Id: float.h,v 1.4 2001-06-25 13:06:09 dom Exp $
+ *	$Id: float.h,v 1.5 2001-10-16 18:30:31 dom Exp $
  */
 
 

@@ -3,11 +3,11 @@
  * instead of the underlying base type.  By convention, all type names end 
  * with _t.
  *
- * $Id: types.h,v 1.2 2001-04-20 16:04:25 dom Exp $
+ * $Id: types.h,v 1.3 2001-10-16 18:30:32 dom Exp $
  */
 
-#ifndef _TYPES_H
-#define _TYPES_H
+#ifndef __TYPES_H__
+#define __TYPES_H__
 
 
 #ifndef _SIZE_T

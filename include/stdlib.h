@@ -1,11 +1,11 @@
-#ifndef STDLIB_H
-#define STDLIB_H
+#ifndef __STDLIB_H__
+#define __STDLIB_H__
 
 /*
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.7 2001-04-20 16:04:24 dom Exp $
+ * $Id: stdlib.h,v 1.8 2001-10-16 18:30:32 dom Exp $
  */
 
 extern __LIB__ abs(int);

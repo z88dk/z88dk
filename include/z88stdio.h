@@ -1,5 +1,5 @@
-#ifndef Z88STDIO_H
-#define Z88STDIO_H
+#ifndef __Z88STDIO_H__
+#define __Z88STDIO_H__
 
 /*
  * This file contains a few useful functions from the original
@@ -20,7 +20,7 @@
  *
  * djm 4/4/2000
  *
- * $Id: z88stdio.h,v 1.3 2001-04-20 16:04:24 dom Exp $
+ * $Id: z88stdio.h,v 1.4 2001-10-16 18:30:32 dom Exp $
  */
 
 

@@ -1,12 +1,12 @@
-#ifndef _NET_STDIO_H
-#define _NET_STDIO_H
+#ifndef __NET_STDIO_H__
+#define __NET_STDIO_H__
 
 /*
  * Some hooks for the stdio style routines
  *
  * Do not include yourself - system file!!
  *
- * $Id: stdio.h,v 1.2 2001-04-20 16:04:25 dom Exp $
+ * $Id: stdio.h,v 1.3 2001-10-16 18:30:32 dom Exp $
  */
 
 

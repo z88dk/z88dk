@@ -1,5 +1,5 @@
-#ifndef _NET_ZSOCKERRS_H
-#define _NET_ZSOCKERRS_H
+#ifndef __NET_ZSOCKERRS_H__
+#define __NET_ZSOCKERRS_H__
 
 /*
  *	This file lists the errors returned by ZSock to an
@@ -11,7 +11,7 @@
  *
  *	Still not sure how to tie these in....
  *
- *	$Id: zsockerrs.h,v 1.2 2001-04-20 16:04:25 dom Exp $
+ *	$Id: zsockerrs.h,v 1.3 2001-10-16 18:30:32 dom Exp $
  */
 
 #define EOK		0	/* Hey we're fine! RC_OK */

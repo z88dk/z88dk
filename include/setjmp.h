@@ -7,12 +7,12 @@
  *	Small C or big C..I'd never consider doing it
  *	either!
  *
- *	$Id: setjmp.h,v 1.2 2001-04-20 16:04:24 dom Exp $
+ *	$Id: setjmp.h,v 1.3 2001-10-16 18:30:32 dom Exp $
  */
 
 
-#ifndef _SETJMP_H
-#define _SETJMP_H
+#ifndef __SETJMP_H__
+#define __SETJMP_H__
 
 /*
  * We have no register variables so we just need to
