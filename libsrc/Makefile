@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.22 2001-10-16 19:46:07 dom Exp $
+# $Id: Makefile,v 1.23 2001-10-22 09:33:55 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -146,6 +146,7 @@ zx_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	cd time ; make lzx
+	./gamesdeps.sh
 	cd games ; make lzx
 	cd spectrum ; make
 	z80asm -d -ns -nm -Mo -DFORzx -xzx_clib @zx.lst
@@ -164,6 +165,8 @@ zxan_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	cd time ; make lzx
+	./gamesdeps.sh
+	cd games ; make lzx
 	z80asm -d -ns -nm -Mo -DFORzx -xzxan_clib @zxansi.lst
 
 # Untested C lib for NC100 machinens
@@ -475,6 +478,8 @@ aceansi_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
+	./gamesdeps.sh
+	cd games ; make lace
 	z80asm -d -ns -nm -Mo -DFORjupiter -xaceansi_clib.lib @aceansi.lst
 
 # Xircom REX 6000 library - Dominic

@@ -5,7 +5,7 @@
 ;	getk() Read key status
 ;
 ;
-;	$Id: getk.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: getk.asm,v 1.3 2001-10-22 09:33:55 stefano Exp $
 ;
 
 	XLIB	getk
@@ -13,6 +13,11 @@
 .getk
 
 	call	$336
+
+	cp	5	; Delete?
+	jr	nz,nodel
+	ld	a,8
+.nodel
 
 	ld	l,a
 	ld	h,0

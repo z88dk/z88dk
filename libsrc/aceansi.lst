@@ -53,7 +53,6 @@ stdlib/atoi
 stdlib/labs
 stdlib/atexit
 stdlib/exit
-stdlib/itoa
 stdlib/rand
 stdlib/srand
 stdlib/strtol
@@ -134,3 +133,13 @@ graphics/drawbox
 graphics/setxy
 graphics/vz200/swapgfxbk
 games/joystick
+games/ace/bit_open
+games/ace/bit_open_di
+games/ace/bit_close
+games/ace/bit_close_ei
+games/bit_click
+games/bit_play
+games/bit_fx
+games/bit_frequency
+games/bit_beep
+games/beeper

@@ -15,7 +15,7 @@
 ;	L - Insert line: to be completed
 ;
 ;
-;	$Id: f_ansi.asm,v 1.3 2001-08-01 08:53:49 dom Exp $
+;	$Id: f_ansi.asm,v 1.4 2001-10-22 09:33:55 stefano Exp $
 ;
 
         XLIB	f_ansi
@@ -161,11 +161,21 @@
 ;------------------------
  jr     nz,NoBS
  ld     a,(ansi_COLUMN)
- cp     0
- jr     z,NoBS ; don't decrement if already zero
+ and	a
+ jr     z,firstc ; are we in the first column?
  dec    a
  ld     (ansi_COLUMN),a
  jr     loopn
+.firstc
+ ld	a,(ansi_ROW)
+ and	a
+ jr     z,loopn
+ dec	a
+ ld	(ansi_ROW),a
+ ld	a,(text_cols)
+ dec	a
+ ld     (ansi_COLUMN),a
+ jr	loopn
 .NoBS
 
 

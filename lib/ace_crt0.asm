@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.3 2001-09-07 18:17:11 dom Exp $
+;	$Id: ace_crt0.asm,v 1.4 2001-10-22 09:33:54 stefano Exp $
 ;
 
 
@@ -19,7 +19,7 @@
 ; this file
 
                 XREF    _main
-
+		XDEF	snd_tick
 ;
 ; Some variables which are needed for both app and basic startup
 ;
@@ -144,6 +144,7 @@ ENDIF
 .base_graphics
 		defw	$2400
 .coords		defw	0
+.snd_tick	defb	0
 
          defm  "Small C+ J.ACE"&0
 

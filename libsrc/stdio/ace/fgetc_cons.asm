@@ -5,7 +5,7 @@
 ;	getkey() Wait for keypress
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.3 2001-10-22 09:33:55 stefano Exp $
 ;
 
 	XLIB	fgetc_cons
@@ -20,6 +20,11 @@
 	call	$336
 	and	a
 	jr	z,kwait1
+
+	cp	5	; Delete?
+	jr	nz,nodel
+	ld	a,8
+.nodel
 
 	ld	l,a
 	ld	h,0

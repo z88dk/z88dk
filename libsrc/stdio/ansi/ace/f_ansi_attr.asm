@@ -10,7 +10,7 @@
 ;	Stefano Bodrato - Feb. 2001
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.3 2001-10-18 12:15:10 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.4 2001-10-22 09:33:55 stefano Exp $
 ;
 
 	XLIB	ansi_attr

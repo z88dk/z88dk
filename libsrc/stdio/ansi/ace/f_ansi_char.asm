@@ -12,7 +12,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.3 2001-10-18 12:15:10 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.4 2001-10-22 09:33:55 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -25,13 +25,13 @@
 	
 	XREF	ace_inverse
 
+
 .text_cols   defb 32
 .text_rows   defb 24
 
 
 .ansi_CHAR
 
-	;sub	15
 	ld	hl,ace_inverse
 	or	(hl)
 
@@ -54,3 +54,4 @@
 	pop	af
 	ld	(hl),a
 	ret
+
