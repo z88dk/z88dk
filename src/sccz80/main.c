@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.8 2001-06-30 11:31:09 dom Exp $
+ *      $Id: main.c,v 1.9 2001-07-13 09:31:58 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -629,7 +629,7 @@ void PragmaBytes(int flag)
 	}
 	fprintf(fp,"\nIF NEED_%s\n",sname);
 	if ( flag ) 
-	    fprintf(fp,"\tdefc DEFINED_NEED_%s = 1",sname);
+	    fprintf(fp,"\tdefc DEFINED_NEED_%s = 1\n",sname);
 
 	/* Now, do the numbers */
 	count=0;
@@ -1131,7 +1131,9 @@ void SetStartUp(char *arg)
         num=0;
         sscanf(arg+8,"%d",&num);
                 startup=num;
+#if 0
         if (startup==2) appz88=YES; /* Flag that we want app startup gunk*/
+#endif
 }
 
 
@@ -1234,7 +1236,9 @@ void SetOrg(char *arg)
 {
         unsigned int    num;
         num=0;
+#if 0
         appz88=1;
+#endif
         sscanf(arg+5,"%u",&num);
         if    (num>=0 && num <= 65535U )
                 zorg=num;
@@ -1247,7 +1251,9 @@ void SetReqPag(char *arg)
 {
         int    num;
         num=-1;
+#if 0
         appz88=1;
+#endif
         sscanf(arg+7,"%d",&num);
         if    (num >= 0 && num <= 160) 
                 reqpag=num;
