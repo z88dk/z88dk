@@ -6,7 +6,7 @@
 ; ZX Spectrum version (speeded up with a row table)
 ;
 ;
-; $Id: putsprite.asm,v 1.1 2002-02-27 13:12:26 stefano Exp $
+; $Id: putsprite.asm,v 1.2 2002-03-18 10:35:55 stefano Exp $
 ;
 
 	XLIB    putsprite
@@ -199,7 +199,7 @@
 	ld	hl,0
 	inc	hl
 	inc	hl
-	ld	(actrow2),hl
+	ld	(actrow2+1),hl
 	
 	ld	b,(hl)
 	inc	hl
