@@ -121,5 +121,5 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -// -v -O2 -I. -lmzansi_clib -lndos -DZ80 -DSMALL_C -DSHARPMZ -D__SHARPMZ__ -M
+OPTIONS		 -// -v -O2 -I. -lmzansi_clib -lndos -DZ80 -DSMALL_C -DSHARPMZ -D__SHARPMZ__ -M -DSCCZ80 -Cz+mz
 
