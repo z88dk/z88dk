@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.5 2002-01-16 20:12:20 dom Exp $
+ *      $Id: declvar.c,v 1.6 2002-01-20 23:30:36 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -366,11 +366,12 @@ char zfar )                      /* TRUE if far */
                         if ( storage != EXTERNAL && ident != FUNCTION ) {
                             size_st=initials(sname, type, ident, size, more, otag, zfar) ;
 
-                        if (storage == EXTERNP) 
+
+			    if (storage == EXTERNP) 
                                 myptr->size=addr;
-                        else
+			    else
                                 myptr->size=size_st;
-                        if (defstatic)
+			    if (defstatic)
                                 myptr->storage=DECLEXTN;
                         }
 

@@ -1,6 +1,6 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.2 2001-04-11 12:26:25 dom Exp $
+ * $Id: define.h,v 1.3 2002-01-20 23:30:36 dom Exp $
  */
 
 /*      Stand-alone definitions                 */
@@ -21,7 +21,7 @@
 
 /*      System wide name size (for symbols)     */
 
-#define NAMESIZE 33
+#define NAMESIZE 127
 #define NAMEMAX  32 
 
 #define MAXARGS 10
@@ -33,7 +33,7 @@
 #define STARTGLB        symtab
 #define ENDGLB          (STARTGLB+NUMGLBS)
 
-#define NUMLOC          55
+#define NUMLOC          200
 #define STARTLOC        loctab
 #define ENDLOC          (STARTLOC+NUMLOC)
 
@@ -224,11 +224,11 @@ GOTO_TAB {
 
 /*      Define the literal pool                 */
 
-#define LITABSZ 950
+#define LITABSZ 49152
 #define LITMAX  LITABSZ-1
 
 /*      For the function literal queues... */
-#define FNLITQ 5000
+#define FNLITQ 49152
 #define FNMAX FNLITQ-1
 
 /*      Define the input line                   */

@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.6 2002-01-16 20:47:13 dom Exp $
+ *      $Id: primary.c,v 1.7 2002-01-20 23:30:36 dom Exp $
  */
 
 
@@ -131,8 +131,10 @@ LVALUE *lval;
  */
                         if ( rcmatch('(') ) 
                                 warning(W_FUNC_NO_PROTO);
-                        else
+                        else {	
+				printf("WTF\n");
                                 error(E_UNSYMB,sname);
+			}
                         /* assume it's a function we haven't seen yet */
                         /* NB value set to 0 */
                         ptr = addglb(sname,FUNCTION,CINT,0,STATIK,0,0);
@@ -727,6 +729,7 @@ int docast(LVALUE *lval,char df)
 	debug(DBG_CAST1,"Level=%d Castlevel=%d df=%d %p",lval->level,lval->castlevel,df,lval);
 	if	(lval->level != lval->castlevel  ) return 0;
 
+	//printf("Casting line %d  = <%s>\n",lineno,line+lptr);
 
         if ( lval->c_id == VARIABLE ) {
 /*
