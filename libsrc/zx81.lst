@@ -84,6 +84,7 @@ strings/strupr
 setjmp/longjmp
 setjmp/setjmp
 assert/assert
+time/zx81/clock
 printflike/printf
 printflike/fprintf
 printflike/sprintf
