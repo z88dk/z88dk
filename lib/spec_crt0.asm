@@ -2,71 +2,51 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.4 2001-09-07 18:17:11 dom Exp $
+;       $Id: spec_crt0.asm,v 1.5 2001-10-15 20:25:55 dom Exp $
 ;
 
 
 
                 MODULE  zx82_crt0
+;--------
+; Include zcc_opt.def to find out some info
+;--------
+        INCLUDE "zcc_opt.def"
 
-;
-; Initially include the zcc_opt.def file to find out lots of lovely
-; information about what we should do..
-;
+;--------
+; Some scope definitions
+;--------
 
-                INCLUDE "zcc_opt.def"
+        XREF    _main           ;main() is always external to crt0 code
 
-; No matter what set up we have, main is always, always external to
-; this file
+        XDEF    cleanup         ;jp'd to by exit()
+        XDEF    l_dcal          ;jp(hl)
 
-                XREF    _main
+        XDEF    int_seed        ;Integer rand() seed
 
-;
-; Some variables which are needed for both app and basic startup
-;
+        XDEF    _vfprintf       ;jp to the printf() core
 
-        XDEF    cleanup
-        XDEF    l_dcal
-
-; Integer rnd seed
-
-        XDEF    int_seed
-
-; vprintf is internal to this file so we only ever include one of the set
-; of routines
-
-	XDEF	_vfprintf
-
-;Exit variables
-
-        XDEF    exitsp
+        XDEF    exitsp          ;atexit() variables
         XDEF    exitcount
 
-;For stdin, stdout, stder
+        XDEF    __sgoioblk      ;stdio info block
 
-        XDEF    __sgoioblk
+        XDEF    base_graphics   ;Graphical variables
+	XDEF	coords		;Current xy position
 
-; Graphics stuff
-	XDEF	base_graphics
-	XDEF	coords
-
-; Now, getting to the real stuff now!
-
-
+	XDEF	snd_tick	;Sound variable
 
 
         org     32768
 
 
 .start
-        ld      hl,0
-        add     hl,sp
-        ld      (start1+1),hl
+        ld      (start1+1),sp	;Save entry stack
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
-	ld	a,2	;open the upper display
+	ld	a,2		;open the upper display (uneeded?)
 	call	5633
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -79,7 +59,7 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
-        call    _main
+        call    _main		;Call user program
 .cleanup
 ;
 ;       Deallocate memory which has been allocated here!
@@ -91,19 +71,19 @@ IF DEFINED_ANSIstdio
 	call	closeall
 ENDIF
 ENDIF
-	exx
-	ld	hl,10072
+	ld	hl,10072	;Restore hl' to what basic wants
 	exx
 	pop	bc
-.start1
-        ld      sp,0
+.start1	ld	sp,0		;Restore stack to entry value
         ret
 
-.l_dcal
-        jp      (hl)
+.l_dcal	jp	(hl)		;Used for function pointer calls
 
-; Now, define some values for stdin, stdout, stderr
 
+;-----------
+; Define the stdin/out/err area. For the z88 we have two models - the
+; classic (kludgey) one and "ANSI" model
+;-----------
 .__sgoioblk
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
@@ -112,9 +92,10 @@ ELSE
 ENDIF
 
 
-; Now, which of the vfprintf routines do we need?
 
-
+;---------------------------------
+; Select which printf core we want
+;---------------------------------
 ._vfprintf
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
@@ -131,7 +112,9 @@ ELSE
 	ENDIF
 ENDIF
 
+;---------------------------------------------
 ; Some +3 stuff - this needs to be below 49152
+;---------------------------------------------
 IF DEFINED_NEEDplus3dodos
 ; 	Routine to call +3DOS Routines. Located in startup
 ;	code to ensure we don't get paged out
@@ -194,52 +177,36 @@ IF 0
 ENDIF
 
 
-;Seed for integer rand() routines
+;-----------
+; Now some variables
+;-----------
+.coords         defw    0       ; Current graphics xy coordinates
+.base_graphics  defw    0       ; Address of the Graphics map
 
-.int_seed       defw    0
+.int_seed       defw    0       ; Seed for integer rand() routines
 
-;Atexit routine
+.exitsp         defw    0       ; Address of where the atexit() stack is
+.exitcount      defb    0       ; How many routines on the atexit() stack
 
-.exitsp
-                defw    0
-.exitcount
-                defb    0
 
-; Heap stuff
+.heaplast       defw    0       ; Address of last block on heap
+.heapblocks     defw    0       ; Number of blocks
 
-.heaplast	defw	0
-.heapblocks	defw	0
+IF DEFINED_NEED1bitsound
+.snd_tick	defb	0	; Sound variable
+ENDIF
 
-; mem stuff
+		defm	"Small C+ ZX"&0	;Unnecessary file signature
 
-.base_graphics
-		defw	16384
-.coords		defw	0
-
-         defm  "Small C+ ZX"&0
-
-;All the float stuff is kept in a different file...for ease of altering!
-;It will eventually be integrated into the library
-;
-;Here we have a minor (minor!) problem, we've no idea if we need the
-;float package if this is separated from main (we had this problem before
-;but it wasn't critical..so, now we will have to read in a file from
-;the directory (this will be produced by zcc) which tells us if we need
-;the floatpackage, and if so what it is..kludgey, but it might just work!
-;
-;Brainwave time! The zcc_opt file could actually be written by the
-;compiler as it goes through the modules, appending as necessary - this
-;way we only include the package if we *really* need it!
-
+;-----------------------
+; Floating point support
+;-----------------------
 IF NEED_floatpack
         INCLUDE         "#float.asm"
-
-;seed for random number generator - not used yet..
-.fp_seed        defb    $80,$80,0,0,0,0
-;Floating point registers...
-.extra          defs    6
-.fa             defs    6
-.fasign         defb    0
+.fp_seed        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
+.extra          defs    6		;FP register
+.fa             defs    6		;FP Accumulator
+.fasign         defb    0		;FP register
 
 ENDIF
 
