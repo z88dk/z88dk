@@ -8,6 +8,9 @@
 ; djm 1/12/98
 ;
 ; If we can't have usleep we'll have csleep instead!
+;
+; -----
+; $Id: csleep.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
 
 
                 INCLUDE "#time.def"

@@ -13,6 +13,10 @@
 ;		..BCDEHL/IXIY
 ;		AF....../.... af
 ;
+; -----
+; $Id: readbyte.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
+
+
 .Read_byte		PUSH	HL
 				PUSH	DE
 				LD	D,0

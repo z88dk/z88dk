@@ -6,6 +6,9 @@
 ; *** THIS IS A Z88 SPECIFIC ROUTINE!!! ***
 
 ; This doesn't check for validity of filename at all.
+;
+; -----
+; $Id: mkdir.asm,v 1.3 2001-04-18 12:43:04 stefano Exp $
 
                 INCLUDE "#fileio.def"
                 INCLUDE "#stdio.def"

@@ -4,6 +4,9 @@
 ;	djm 25/4/2000
 ;
 ;	int atoi(char *);
+;
+; -----
+; $Id: atoi.asm,v 1.3 2001-04-18 12:43:04 stefano Exp $
 
 
 		INCLUDE	"#integer.def"

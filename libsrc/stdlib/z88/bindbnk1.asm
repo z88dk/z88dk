@@ -12,6 +12,11 @@
 ;
 ;	Design & programming by Gunther Strube,	Copyright	(C) InterLogic	1995
 ;
+;
+; -----
+; $Id: bindbnk1.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
+
+
 .Bind_bank_s1		PUSH	BC
 				LD	B,A
 				EX	AF,AF'

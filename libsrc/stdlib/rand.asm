@@ -7,7 +7,10 @@
 ;
 ;       Liberated from ticalc.org, mods to standard z80 by djm 11/4/99
 ;
-;
+; -----
+; $Id: rand.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
+
+
                 XLIB    rand
                 XREF    int_seed
 

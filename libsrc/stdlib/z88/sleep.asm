@@ -8,6 +8,10 @@
 ; djm 22/3/2000 Rewritten to:
 ;		 - Not loop (was causing problems)
 ;		 - Return number of seconds left
+;
+; -----
+; $Id: sleep.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
+
 
 		INCLUDE "#time.def"
 

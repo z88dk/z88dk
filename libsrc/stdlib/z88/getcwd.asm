@@ -11,6 +11,8 @@
 ;
 ;       This functions needs Gunthers' standard.lib
 ;
+; -----
+; $Id: getcwd.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
 
                 INCLUDE "#syspar.def"
 

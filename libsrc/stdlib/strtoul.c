@@ -4,6 +4,10 @@
  *      Taken from vbcc archive
  *
  *      Added to Small C+ 27/4/99 djm
+ *
+ * -----
+ * $Id: strtoul.c,v 1.2 2001-04-18 12:43:04 stefano Exp $
+ *
  */
 
 

@@ -2,6 +2,9 @@
 ; Small C z88 stdlib functions
 ;
 ; Return absolute value of long
+;
+; -----
+; $Id: labs.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
 
 
                 XLIB    labs

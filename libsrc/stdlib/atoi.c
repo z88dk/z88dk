@@ -10,7 +10,12 @@
  *	Almost k&r but not quite..
  *
  *	djm 5/1/2000
+ *
+ * -----
+ * $Id: atoi.c,v 1.2 2001-04-18 12:43:04 stefano Exp $
+ *
  */
+
 
 #include <ctype.h>
 #include <stdlib.h>

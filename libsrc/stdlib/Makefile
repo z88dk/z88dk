@@ -1,6 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
+# $Id: Makefile,v 1.2 2001-04-18 12:43:04 stefano Exp $
 
 lz88: gen z88_stdlib
 

@@ -5,7 +5,9 @@
 ;
 ;       void srand(int) - seed "random" number
 ;
-;
+; -----
+; $Id: srand.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
+
                 XLIB    srand
                 XREF    int_seed
 

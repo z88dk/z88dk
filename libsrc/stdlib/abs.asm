@@ -4,6 +4,9 @@
 ; Return absolute value 
 ; This is interesting method, but so much quicker than what a compiled
 ; version would do..
+;
+; -----
+; $Id: abs.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
 
 
                 XLIB    abs

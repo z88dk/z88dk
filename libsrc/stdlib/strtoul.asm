@@ -5,6 +5,10 @@
 ;	By Dominic Morris <djm@jb.man.ac.uk>
 ;
 ;	Module compile time: Thu May  4 19:02:41 2000
+;
+; -----
+; $Id: strtoul.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
+;
 
 
 ;# 1 "strtoul.c"

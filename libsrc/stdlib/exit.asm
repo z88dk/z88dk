@@ -8,6 +8,10 @@
 ;of called, so we don't use the stack, instead we use hl as our
 ;entrance variable...we're buggered if we define a pointer to here
 ;though...
+;
+; -----
+; $Id: exit.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
+
 
                 XLIB    exit    ;outta here!
 
