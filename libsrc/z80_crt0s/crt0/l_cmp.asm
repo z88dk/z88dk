@@ -16,8 +16,8 @@
         ld a,d
         sbc   a,h
         ld hl,1                 ;preset true
-;jp m,_cmp1             ;Should it be M or c, does it make a diffence
-        jr c,l_cmp1
+	jp m,l_cmp1             ;Should it be M or c, does it make a diffence
+;        jr c,l_cmp1
         or      e       ;resets carry
         ret
 .l_cmp1
