@@ -1,15 +1,16 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.27 2001-12-28 09:46:28 stefano Exp $
+# $Id: Makefile,v 1.28 2002-01-07 16:59:08 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
 	nc_clib.lib vz_clib.lib vzansi_clib.lib cpm_clib.lib \
 	mz_clib.lib mzansi_clib.lib zx81_clib.lib zx81ansi_clib.lib \
-	abc80_clib.lib aceansi_clib.lib sam_clib.lib rex_clib.lib \
+	abc80_clib.lib aceansi_clib.lib sam_clib.lib \
 	msx_clib.lib svi_clib.lib m5_clib.lib cpc_clib.lib \
 	c128ansi_clib.lib aquarius_clib.lib aquansi_clib.lib
+
 
 genlibs: m.lib malloc.lib z80_crt0.lib
 
@@ -168,7 +169,7 @@ zxan_clib.lib:
 	cd time ; make lzx
 	./gamesdeps.sh
 	cd games ; make
-	z80asm -d -ns -nm -Mo -DFORzx -xzxan_clib @zxansi.lst
+	z80asm -d -ns -nm -Mo -DFORzx -DPACKEDFONT -xzxan_clib @zxansi.lst
 
 # Untested C lib for NC100 machinens
 
@@ -260,7 +261,7 @@ ti82ansi_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	cd games ; make
-	z80asm -d -ns -nm -Mo -DFORti82 -xti82ansi_clib @ticansi.lst
+	z80asm -d -ns -nm -Mo -DFORti82 -DPACKEDFONT -xti82ansi_clib @ticansi.lst
 
 ti82_clib.lib:
 	@echo ''
@@ -296,7 +297,7 @@ ti83ansi_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	cd games ; make
-	z80asm -d -ns -nm -Mo -DFORti83 -xti83ansi_clib @ticansi.lst
+	z80asm -d -ns -nm -Mo -DFORti83 -DPACKEDFONT -xti83ansi_clib @ticansi.lst
 
 ti83_clib.lib:
 	@echo ''
@@ -331,7 +332,7 @@ ti83pansi_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	cd games ; make
-	z80asm -d -ns -nm -Mo -DFORti83p -xti83pansi_clib @ticansi.lst
+	z80asm -d -ns -nm -Mo -DFORti83p -DPACKEDFONT -xti83pansi_clib @ticansi.lst
 
 ti83p_clib.lib:
 	@echo ''
@@ -366,7 +367,7 @@ ti85ansi_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	cd games ; make
-	z80asm -d -ns -nm -Mo -DFORti85 -xti85ansi_clib @ticansi.lst
+	z80asm -d -ns -nm -Mo -DFORti85 -DPACKEDFONT -xti85ansi_clib @ticansi.lst
 
 ti85_clib.lib:
 	@echo ''
@@ -401,7 +402,7 @@ ti86ansi_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	cd games ; make
-	z80asm -d -ns -nm -Mo -DFORti86 -xti86ansi_clib @ticansi.lst
+	z80asm -d -ns -nm -Mo -DFORti86 -DPACKEDFONT -xti86ansi_clib @ticansi.lst
 
 ti86_clib.lib:
 	@echo ''
@@ -493,6 +494,36 @@ aceansi_clib.lib:
 	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORjupiter -xaceansi_clib.lib @aceansi.lst
 
+# Mattel Aquarius library - Stefano
+aquarius_clib.lib:
+	@echo ''
+	@echo '---> Building Mattel Aquarius ANSI Library <---'
+	@echo ''
+	cd strings ; make
+	cd stdlib ; make gen
+	cd stdio ; make generic
+	cd printflike ; make 
+	cd setjmp ; make 
+	cd assert ; make 
+	./gamesdeps.sh
+	cd games ; make
+	z80asm -d -ns -nm -Mo -DFORaquarius -xaquarius_clib.lib @aquarius.lst
+
+# Mattel Aquarius ANSI library - Stefano
+aquansi_clib.lib:
+	@echo ''
+	@echo '---> Building Mattel Aquarius ANSI Library <---'
+	@echo ''
+	cd strings ; make
+	cd stdlib ; make gen
+	cd stdio ; make generic
+	cd printflike ; make 
+	cd setjmp ; make 
+	cd assert ; make 
+	./gamesdeps.sh
+	cd games ; make
+	z80asm -d -ns -nm -Mo -DFORaquarius -xaquansi_clib.lib @aquansi.lst
+
 # Xircom REX 6000 library - Dominic
 rex_clib.lib:
 	@echo ''
@@ -582,36 +613,6 @@ c128ansi_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORc128 -xc128ansi_clib @c128ansi.lst
 
-# Mattel Aquarius library - Stefano
-aquarius_clib.lib:
-	@echo ''
-	@echo '---> Building Mattel Aquarius ANSI Library <---'
-	@echo ''
-	cd strings ; make
-	cd stdlib ; make gen
-	cd stdio ; make generic
-	cd printflike ; make 
-	cd setjmp ; make 
-	cd assert ; make 
-	./gamesdeps.sh
-	cd games ; make
-	z80asm -d -ns -nm -Mo -DFORaquarius -xaquarius_clib.lib @aquarius.lst
-
-# Mattel Aquarius ANSI library - Stefano
-aquansi_clib.lib:
-	@echo ''
-	@echo '---> Building Mattel Aquarius ANSI Library <---'
-	@echo ''
-	cd strings ; make
-	cd stdlib ; make gen
-	cd stdio ; make generic
-	cd printflike ; make 
-	cd setjmp ; make 
-	cd assert ; make 
-	./gamesdeps.sh
-	cd games ; make
-	z80asm -d -ns -nm -Mo -DFORaquarius -xaquansi_clib.lib @aquansi.lst
-
 clean:
 	cd assert ; make clean
 	cd cpm    ; make clean
@@ -625,7 +626,7 @@ clean:
 	cd printflike ; make clean
 	cd rex ; make clean
 	cd setjmp ; make clean
-	cd games ; make clean
+	cd sound ; make clean
 	cd spectrum ; make clean
 	cd stdio ; make clean
 	cd stdlib ; make clean

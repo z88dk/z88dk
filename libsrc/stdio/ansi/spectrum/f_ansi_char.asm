@@ -5,6 +5,9 @@
 ;
 ; 	Handles colors referring to current PAPER/INK/etc. settings
 ;
+;	** alternate (smaller) 4bit font capability: 
+;	** use the -DPACKEDFONT flag
+;
 ;	set it up with:
 ;	.text_cols	= max columns
 ;	.text_rows	= max rows
@@ -15,7 +18,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.4 2001-08-21 15:40:17 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.5 2002-01-07 16:59:09 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -29,7 +32,7 @@
 ; Dirty thing for self modifying code
 	XDEF	INVRS	
 
-.text_cols   defb 51
+.text_cols   defb 64
 .text_rows   defb 24
 
 .ansi_CHAR
@@ -105,13 +108,20 @@
   pop ix
 .char
   ld b,'A'      ; Put here the character to be printed
-  ld de,8
 
-  ;ld hl,font-256   ; Put here the character font location
-  ; I'll probably strip the first 256 bytes, in future.
- ;ld hl,15360 ; The ROM font
-
+IF PACKEDFONT
+  xor	a
+  rr	b
+  jr	c,even
+  ld	a,4
+.even
+  ld	(ROLL+1),a
+  ld hl,font-128
+ELSE
   ld hl,font
+ENDIF
+
+  ld de,8
 
 .LFONT
   add hl,de
@@ -131,6 +141,16 @@
   djnz L1
 .DTS
   ld a,(hl)
+  
+IF PACKEDFONT
+.ROLL
+  jr INVRS
+  rla
+  rla
+  rla
+  rla
+ENDIF
+
 .INVRS
 ;  cpl           ; Set to NOP to disable INVERSE
   nop
@@ -145,7 +165,7 @@
 ; end of underlined text handling
 
 .DOTS
-  ld b,5        ; character FONT width in pixel
+  ld b,4        ; character FONT width in pixel
 .L2
   rla
   rl (ix+1)
@@ -181,5 +201,5 @@
 
 
 .font
-        BINARY  "stdio/ansi/FONT5.BIN"
+        BINARY  "stdio/ansi/F4PACK.BIN"
 
