@@ -6,6 +6,8 @@
 ;	int remove(far char *name)
 ;
 ;	Being on a +3 we ignore the far stuff
+;
+;	$Id: remove.asm,v 1.1 2001-05-01 13:55:21 dom Exp $
 
 
 		XLIB	remove

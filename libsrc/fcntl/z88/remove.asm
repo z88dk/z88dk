@@ -6,29 +6,29 @@
 ; *** THIS IS A Z88 SPECIFIC ROUTINE!!! ***
 
 ; This doesn't check for validity of filename at all.
-
 ;
-;	$Id: rename.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+; 27/4/99 Now takes a far char *name
+;
+; 15/4/2000 Takes a near again (can change but effort!)
+;
+;
+;	$Id: remove.asm,v 1.1 2001-05-01 13:55:21 dom Exp $
 ;
 
                 INCLUDE "#fileio.def"
                 INCLUDE "#stdio.def"
 
-                XLIB    rename
+                XLIB    remove
 
-;int rename(char *s1,char *s2)
-;on stack:
-;return address,s2,s1
-;s1=orig filename, s2=dest filename
+;int remove(char *name)
 
-.rename
-        pop     bc
-        pop     de      ;dest filename
-        pop     hl      ;orig filename
+.remove
+        pop     de
+        pop     hl      ;dest filename
         push    hl
         push    de
-        push    bc
-        call_oz(gn_ren)
+	ld	b,0
+        call_oz(gn_del)
         ld      hl,0
         ret     nc
         dec     hl      ;=1

@@ -7,3 +7,8 @@ spec_clib.lib then calls these routines
 
 This seems to be the easiest way of making things work on
 different machines easily...
+
+This library doesn't contain file positioning etc routines
+
+
+$Id: README,v 1.1 2001-05-01 13:55:21 dom Exp $

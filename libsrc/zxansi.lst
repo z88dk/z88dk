@@ -48,12 +48,6 @@ stdio/ansi/spectrum/f_ansi_cls
 stdio/ansi/spectrum/f_ansi_dline
 stdio/ansi/spectrum/f_ansi_scrollup
 stdio/spectrum/getk
-fcntl/dummy/open
-fcntl/dummy/open_z88
-fcntl/dummy/close
-fcntl/dummy/creat
-fcntl/dummy/readbyte
-fcntl/dummy/writebyte
 stdlib/abs
 stdlib/atoi
 stdlib/labs

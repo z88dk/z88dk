@@ -1,0 +1,15 @@
+close
+fabandon
+fdgetpos
+fdtell
+findhand
+freehand
+lseek
+open
+open_z88
+read
+readbyte
+remove
+rename
+write
+writebyte

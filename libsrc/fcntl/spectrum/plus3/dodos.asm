@@ -6,6 +6,8 @@
 ;	(These routines have to be below 49152)
 ;
 ;	djm 17/3/2000 (after the manual!)
+;
+;	$Id: dodos.asm,v 1.1 2001-05-01 13:55:21 dom Exp $
 
 
 	XDEF	dodos

@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.3 2001-05-01 13:55:22 dom Exp $
 ;
 
           XLIB  fputc_cons
@@ -22,13 +22,14 @@
 	jr	z,docls
 	cp	13	; CR ?
 	jr	nz,nocrlf
-	ld	e,10	; Add a LineFeed
+	ld	de,10	; Add a LineFeed
 	ld	c,2
 	push	af
 	call	5
 	pop	af
 .nocrlf
 	ld	e,a	; Send the character
+	ld	d,0
 	ld      c,2
 	jp	5
 .docls

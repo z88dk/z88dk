@@ -5,7 +5,7 @@
 ; 11/3/99 djm ***UNTESTED***
 ;
 ;
-;	$Id: fdgetpos.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;	$Id: fdgetpos.asm,v 1.1 2001-05-01 13:55:21 dom Exp $
 ;
 
                 INCLUDE "#fileio.def"

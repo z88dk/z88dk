@@ -7,7 +7,7 @@
 ; *** THIS IS A Z88 SPECIFIC ROUTINE!!! ***
 ;
 ;
-;	$Id: fdtell.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;	$Id: fdtell.asm,v 1.1 2001-05-01 13:55:21 dom Exp $
 ;
 
                 INCLUDE "#fileio.def"

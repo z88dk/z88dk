@@ -7,6 +7,8 @@
  *	(Internal library routine)
  *
  *	djm 17/3/2000
+ *
+ *	$Id: freehand.c,v 1.1 2001-05-01 13:55:21 dom Exp $
  */
 
 #include <spectrum.h>
@@ -15,7 +17,7 @@
 
 extern int hand_status;
 
-int freehand(int handle)
+void freehand(int handle)
 {
 #asm
 ; Enter with hl holding filehandle
@@ -27,10 +29,10 @@ int freehand(int handle)
 	rl	e
 	rl	d
 	djnz	loop
-; We've found a free handle - hurrah!
+; Weve found a free handle - hurrah!
 .gotone
-	call	hl,(_hand_status)
-	call	l_or	;Mark as used
+	ld	hl,(_hand_status)
+	call	l_and	;Mark as used
 	ld	(_hand_status),hl
 	ld	b,l
 	ret

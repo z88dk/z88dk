@@ -6,6 +6,7 @@
 ;
 ;	int rename(char *source, char *dest)
 ;
+;	$Id: rename.asm,v 1.1 2001-05-01 13:55:21 dom Exp $
 
 
 		XLIB	rename

@@ -1,8 +1,7 @@
-# $Id: Makefile,v 1.2 2001-04-18 14:59:40 stefano Exp $
+# $Id: Makefile,v 1.3 2001-05-01 13:55:21 dom Exp $
 
 all:
 	@echo ''
+	@echo '---> Building NDOS library <---'
 	@echo ''
-	@echo 'No fcntl functions == no file i/o'
-	@echo ''
-	@echo ''
+	z80asm -d -ns -nm -Mo -x../../ndos @ndoslist

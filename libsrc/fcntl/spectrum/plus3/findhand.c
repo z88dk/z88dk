@@ -5,6 +5,8 @@
  *	to specify which one we want
  *
  *	djm 17/3/2000
+ *
+ *	$Id: findhand.c,v 1.1 2001-05-01 13:55:21 dom Exp $
  */
 
 #include <spectrum.h>
@@ -18,7 +20,7 @@ int findhand()
 #asm
 	ld	de,1
 	ld	c,0
-	ld	hl,(_status)
+	ld	hl,(_hand_status)
 	ld	b,16
 .loop
 	srl	h	;Shift flags one bit right
@@ -32,11 +34,11 @@ int findhand()
 	ld	hl,-1	;No more!
 	scf
 	ret
-; We've found a free handle - hurrah!
+; Weve found a free handle - hurrah!
 .gotone
-	call	hl,(_status)
+	ld	hl,(_hand_status)
 	call	l_or	;Mark as used
-	ld	(_status),hl
+	ld	(_hand_status),hl
 	ld	l,c
 	ld	h,0
 	and	a

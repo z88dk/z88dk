@@ -2,9 +2,11 @@
  *	Close a file (+3 DOS)
  *
  *	18/3/2000 djm
+ *
+ *	$Id: close.c,v 1.1 2001-05-01 13:55:21 dom Exp $
  */
 
-
+#include <fcntl.h>
 #include <spectrum.h>
 
 
@@ -12,7 +14,6 @@
 int close(int handle)
 {
 #asm
-	LIB	freehand
 	XREF	dodos
 	pop	bc
 	pop	hl

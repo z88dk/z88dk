@@ -39,12 +39,6 @@ stdio/fgets_cons
 stdio/vz200/fputc_cons
 stdio/vz200/getk
 stdio/spectrum/puts_cons
-fcntl/dummy/open
-fcntl/dummy/open_z88
-fcntl/dummy/close
-fcntl/dummy/creat
-fcntl/dummy/readbyte
-fcntl/dummy/writebyte
 stdlib/abs
 stdlib/atoi
 stdlib/labs

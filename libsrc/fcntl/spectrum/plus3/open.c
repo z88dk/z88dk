@@ -14,12 +14,13 @@
  *	Open a file for writing - e=4, d=2 (creat)
  *	Open a file for append  - e=2, d=2
  *
+ *	$Id: open.c,v 1.1 2001-05-01 13:55:21 dom Exp $
  */
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */
 #include <spectrum.h>
 
-int open(char *name, int flags, mode_t mode)
+int open(far char *name, int flags, mode_t mode)
 {                                      
 #asm
 	XREF	dodos
@@ -43,8 +44,9 @@ int open(char *name, int flags, mode_t mode)
 	jr	nz,open_abort
 	ld	a,(ix+2)
 	and	a
-	jr	nz,open_abort	;can't have low byte set
+	jr	nz,open_abort	;cant have low byte set
 	ld	de,512		;append mode
+.open_it
 	push	de
 	call	findhand
 	pop	de
@@ -54,7 +56,7 @@ int open(char *name, int flags, mode_t mode)
 	ld	c,3		;exclusive read/write - who cares?
 	ld	l,(ix+6)	;filename
 	ld	h,(ix+7)
-	ld	iy.262		;DOS_OPEN
+	ld	iy,262		;DOS_OPEN
 	call	dodos
 	pop	hl
 	jr	nc,open_abort	;error

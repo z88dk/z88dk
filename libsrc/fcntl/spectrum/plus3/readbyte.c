@@ -6,8 +6,11 @@
  *	Not user callable - internal LIB routine
  *
  *	Enter with de = filehandle
+ *
+ *	$Id: readbyte.c,v 1.1 2001-05-01 13:55:21 dom Exp $
  */
 
+#include <fcntl.h>
 
 int __FASTCALL__ readbyte(int handle)
 {

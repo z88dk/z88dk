@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.11 2001-04-30 16:49:53 dom Exp $
+# $Id: Makefile,v 1.12 2001-05-01 13:55:21 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -124,6 +124,7 @@ zx_clib.lib:
 	cd strings ; make
 	cd stdlib ; make gen
 	cd stdio ; make generic
+	cd fcntl ; make lzx
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
@@ -139,6 +140,7 @@ zxan_clib.lib:
 	cd strings ; make
 	cd stdlib ; make gen
 	cd stdio ; make generic
+	cd fcntl ; make lzx
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
@@ -482,7 +484,7 @@ svi_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
-	z80asm -d -ns -nm -Mo -DFORsvi -xsam_clib @sam.lst
+	z80asm -d -ns -nm -Mo -DFORsvi -xsvi_clib @svi.lst
 
 msx_clib.lib:
 	@echo ''
@@ -494,7 +496,7 @@ msx_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
-	z80asm -d -ns -nm -Mo -DFORmsx -xsam_clib @sam.lst
+	z80asm -d -ns -nm -Mo -DFORmsx -xmsx_clib @msx.lst
 
 clean:
 	cd strings ; make clean

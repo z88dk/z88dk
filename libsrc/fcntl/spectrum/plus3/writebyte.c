@@ -7,8 +7,11 @@
  *
  *	Enter with de = filehandle
  *		    c = byte to write
+ *
+ *	$Id: writebyte.c,v 1.1 2001-05-01 13:55:21 dom Exp $
  */
 
+#include <fcntl.h>
 
 int writebyte(int handle, int byte)
 {
