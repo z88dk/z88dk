@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.68 2005-03-01 17:50:35 stefano Exp $
+# $Id: Makefile,v 1.69 2005-03-16 11:57:03 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -254,7 +254,7 @@ zxan_clib.lib:
 	./gamesdeps.sh
 	cd spectrum ; $(MAKE)
 	cd games ; $(MAKE)
-	z80asm -d -ns -nm -Mo -DFORzx -DPACKEDFONT -xzxan_clib @zxansi.lst
+	z80asm -d -ns -nm -Mo -DFORzx -DPACKEDFONT -DA64COL -xzxan_clib @zxansi.lst
 
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:

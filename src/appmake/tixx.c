@@ -1,4 +1,9 @@
 /*
+ -------------------------------------------------------------------------------
+ This version of bin2var has been adapted to work with the Z88DK's appmake tool.
+ It has been fixed to be endian-independent by Dominic Morris / Stefano Bodrato
+ -------------------------------------------------------------------------------
+
  Bin2Var by David Phillips <david@acz.org>
  Converts binary images to TI Graph Link format files
 
@@ -84,7 +89,7 @@ void cfwriteword(int i, FILE *fp, unsigned short *chk)
 void cfwrite(const void *buf, int len, FILE *fp, unsigned short *chk)
 {
     int i;
-
+    
     fwrite(buf, len, 1, fp);
     for(i = 0; i < len; i++)
         *chk += ((unsigned char *)buf)[i];
@@ -189,7 +194,7 @@ int tixx_exec(char *target)
         strncpy(comment,conf_comment,42);
         comment[42] = 0;
     } else {
-        strcpy(comment, "Created with Bin2Var v1.10");
+        strcpy(comment, "Created with Z88DK - bin2var v1.20");
     }
 
     fp = fopen(binname, "rb");
@@ -225,13 +230,13 @@ int tixx_exec(char *target)
         i = n + 10 + strlen(str);
     else
         i = n + 18;
-    fwrite(&i, 2, 1, fp);
+    writeword(i, fp);
     if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP))
         cfwrite("\x0b\0x00", 2, fp, &chk);
     else if (ext == E_85S)
     {
         i = 4 + strlen(str);
-        cfwrite(&i, 1, fp, &chk);
+        cfwritebyte(i, fp, &chk);
         cfwrite("\0x00", 1, fp, &chk);
     }
     else
@@ -241,7 +246,7 @@ int tixx_exec(char *target)
     else
         i = n + 2;
 
-    cfwrite(&i, 2, fp, &chk);
+    cfwriteword(i, fp, &chk);
     if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP))
         cfwrite("\x06", 1, fp, &chk);
     else if (ext == E_86P)
@@ -251,7 +256,7 @@ int tixx_exec(char *target)
 
     i = strlen(str);
     if ((ext == E_85S) || (ext == E_86P) || (ext == E_86S))
-        cfwrite(&i, 1, fp, &chk);
+        cfwritebyte(i, fp, &chk);
     cfwrite(str, i, fp, &chk);
     memset(str, 0, 8);
     if (ext != E_85S)
@@ -266,15 +271,17 @@ int tixx_exec(char *target)
         i = n + 2;
         n2 = n;
     }
-    cfwrite(&i, 2, fp, &chk);
-    cfwrite(&n2, 2, fp, &chk);
+
+    cfwriteword(i, fp, &chk);
+    cfwriteword(n2, fp, &chk);
+
     if(ext == E_8XP)
     {
         cfwrite("\xBB", 1, fp, &chk);
         cfwrite("\x6D", 1, fp, &chk);
     }
     cfwrite(buf, n, fp, &chk);
-    fwrite(&chk, 2, 1, fp);
+    writeword(chk, fp);
 
     if (ferror(fp))
         die("Failed writing output file: %s\n", filename);

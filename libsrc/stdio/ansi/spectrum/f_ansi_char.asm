@@ -19,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.6 2002-01-08 16:17:27 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.7 2005-03-16 11:57:05 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -33,10 +33,48 @@
 ; Dirty thing for self modifying code
 	XDEF	INVRS	
 
-IF ROMFONT
+IF A128COL
+.text_cols   defb 128
+ENDIF
+
+IF A80COL
+.text_cols   defb 80
+ENDIF
+
+IF A85COL
+.text_cols   defb 85
+ENDIF
+
+IF A64COL
+.text_cols   defb 64
+ENDIF
+
+IF A51COL
+.text_cols   defb 51
+ENDIF
+
+IF A42COL
+.text_cols   defb 42
+ENDIF
+
+IF A40COL
+.text_cols   defb 40
+ENDIF
+
+IF A36COL
 .text_cols   defb 36
-ELSE
-.text_cols   defb 64	; <- Change this for different font sizes !!
+ENDIF
+
+IF A32COL
+.text_cols   defb 32
+ENDIF
+
+IF A28COL
+.text_cols   defb 28
+ENDIF
+
+IF A24COL
+.text_cols   defb 24
 ENDIF
 
 .text_rows   defb 24
@@ -125,9 +163,9 @@ ELSE
 	  ld	a,4
 	.even
 	  ld	(ROLL+1),a
-	  ld hl,font-128
+	  ld	hl,font-128
 	ELSE
-	  ld hl,font
+	  ld hl,font-256
 	ENDIF
 ENDIF
 
@@ -179,10 +217,38 @@ ENDIF
 ; end of underlined text handling
 
 .DOTS
-IF ROMFONT
+IF A128COL
+  ld b,2
+ENDIF
+IF A80COL
+  ld b,3
+ENDIF
+IF A85COL
+  ld b,3
+ENDIF
+IF A64COL
+  ld b,4
+ENDIF
+IF A51COL
+  ld b,5
+ENDIF
+IF A42COL
+  ld b,6
+ENDIF
+IF A40COL
+  ld b,6
+ENDIF
+IF A36COL
   ld b,7
-ELSE
-  ld b,4        ; <- character FONT width in pixel
+ENDIF
+IF A32COL
+  ld b,8
+ENDIF
+IF A28COL
+  ld b,8
+ENDIF
+IF A24COL
+  ld b,9
 ENDIF
 
 .L2
@@ -218,10 +284,45 @@ ENDIF
 ; 2 dots: MAX 128 columns (useful for ANSI graphics only.. maybe)
 ; Address 15360 for ROM Font
 
-
+.font
 IF ROMFONT
 	; nothing here !
 ELSE
-.font
-        BINARY  "stdio/ansi/F4PACK.BIN"		; <- put the FONT name here !
+	IF PACKEDFONT
+	        BINARY  "stdio/ansi/F4PACK.BIN"
+	ELSE
+		IF A128COL
+			BINARY  "stdio/ansi/F3.BIN"
+		ENDIF
+		IF A80COL
+			BINARY  "stdio/ansi/F4.BIN"
+		ENDIF
+		IF A85COL
+			BINARY  "stdio/ansi/F4.BIN"
+		ENDIF
+		IF A64COL
+			BINARY  "stdio/ansi/F4.BIN"
+		ENDIF
+		IF A51COL
+			BINARY  "stdio/ansi/F5.BIN"
+		ENDIF
+		IF A42COL
+			BINARY  "stdio/ansi/F6.BIN"
+		ENDIF
+		IF A40COL
+			BINARY  "stdio/ansi/F6.BIN"
+		ENDIF
+		IF A36COL
+			BINARY  "stdio/ansi/F8.BIN"
+		ENDIF
+		IF A32COL
+			BINARY  "stdio/ansi/F8.BIN"
+		ENDIF
+		IF A28COL
+			BINARY  "stdio/ansi/F8.BIN"
+		ENDIF
+		IF A24COL
+			BINARY  "stdio/ansi/F8.BIN"
+		ENDIF
+	ENDIF
 ENDIF
