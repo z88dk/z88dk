@@ -36,7 +36,7 @@ extern __LIB__ sleep(int);
 extern __LIB__ mkdir(char *);
 extern char __LIB__ *getcwd(char *buf, int maxlen); 
 
-extern __LIB__ csleep(int)  /* Very non standard! sleep for centisecs! (z88)*/
+extern __LIB__ csleep(int);  /* Very non standard! sleep for centisecs! (z88)*/
 
 /* abort is a macro to exit with RC_Err - only for apps */
 
