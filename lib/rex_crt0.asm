@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.12 2002-04-10 20:31:10 dom Exp $
+;       $Id: rex_crt0.asm,v 1.13 2002-09-07 08:31:38 dom Exp $
 ;
 
 	MODULE rex_crt0
@@ -21,6 +21,7 @@
 	XDEF	heapblocks	;malloc() variables
 	XDEF	heaplast
 	XDEF	l_dcal		;jp(hl) instruction
+	XDEF	cleanup
 
 
 ;	defm	"ApplicationName:Addin"&10&13
