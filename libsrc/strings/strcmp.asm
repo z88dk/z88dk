@@ -12,7 +12,10 @@
 ; Fix to above fix: Graham R. Cobb 24 March 2002
 ; Make sure positive return really is > 0 (not = 0)
 ;
-; $Id: strcmp.asm,v 1.4 2002-06-09 10:19:14 dom Exp $
+; Incorporate optimisation suggested by Benjamin Green 9 June 2002
+; Use CPI and rearrange loop slightly
+;
+; $Id: strcmp.asm,v 1.5 2002-06-09 13:42:30 dom Exp $
 
 
 
@@ -36,27 +39,25 @@
         ld      l,a     ;hl=s1
 .strcmp1
         ld      a,(de)	; Next char from s2
-        cp      (hl)	; Compare with s1
+        inc	de	; Ready for next char
+        cpi     	; Compare with s1 (and inc hl) -- does not set C flag
         jr      nz,strcmp2 ; Different!
         and     a	; Check for end of strings
-        jr      z,strcmp4 ; Both strings ended simultaneously 
-        inc     hl
-        inc     de
-        jp      strcmp1
+        jr      nz,strcmp1 ; Round again
+; Both strings ended simultaneously 
+; now we know *s1=*s2=0, return hl=0
+	ld	l,a
+	ld	h,a
+	ret
 .strcmp2
 ; At this point we know the two strings are different
 ; The different byte may be within the string or may be the null
 ; terminator for one of the strings -- it doesn't matter
-	jr	c,strcmp5 ; jump if *s2 < *s1
-; so we know *s1 < *s2, return h=$80 (i.e. hl<0)
+	dec	hl	; Undo inc hl done by CPI
+	cp	(hl)	; Need to set C flag
+; Assume *s1 < *s2: return h=$80 (i.e. hl<0)
 	ld	h,$80
-	ret
-.strcmp5
-; now we know *s1 > *s2, return h=1 (i.e. hl>0)
-	ld	h,1
-	ret
-.strcmp4
-; now we know *s1=*s2=0, return hl=0
-	ld	l,a
-	ld	h,a
+	ret	nc
+; OK, so now we know *s1 > *s2, return h=$7F (i.e. hl>0)
+	dec	h
 	ret
