@@ -6,10 +6,6 @@ CFILES = \
 	get_networks.c \
 	get_protocols.c \
 	get_services.c \
-	getxxbyname.c \
-	getxxbyport.c 
-
-ACFILES = \
 	getnetbyname.c \
 	getnetbynumber.c \
 	getprotobyname.c \
@@ -17,9 +13,12 @@ ACFILES = \
 	getservbyname.c \
 	getservbyport.c \
 	getservprotobyname.c \
-	getservprotobyport.c
+	getservprotobyport.c \
+	getxxbyname.c \
+	getxxbyport.c 
 
-OBJECTS = $(CFILES:.c=.o) $(ACFILES:.c=.o)
+AFILES  = $(CFILES:.c=.asm)
+OBJECTS = $(CFILES:.c=.o)
 
 all: net
 
@@ -31,4 +30,4 @@ net: $(OBJECTS)
 	zcc -vn -Wn43 -make-lib $*.c 
 
 clean:
-	rm -f *.obj *.sym *.map *.o* *.i zcc_opt.def $(CFILES:.c=.asm)  $(ACFILES:.c=.asm)
+	rm -f *.obj *.sym *.map *.o* *.i zcc_opt.def $(AFILES)

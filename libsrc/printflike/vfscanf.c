@@ -20,7 +20,7 @@ void *nxtarg ;
         unsigned char *carg,  *zunsigned ;
         int *narg, wast, ac, width, ovfl ;
         unsigned char sign, ch, base, cnv;
- 
+
 
         ac = 0 ;
         while ( *ctl) {

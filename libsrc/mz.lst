@@ -128,3 +128,4 @@ graphics/xorplot
 graphics/setxy
 graphics/vz200/swapgfxbk
 games/joystick
+printflike/ltoa_any

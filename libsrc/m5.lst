@@ -94,3 +94,4 @@ printflike/sscanf
 printflike/fscanf
 printflike/vfscanf
 printflike/vsscanf
+printflike/ltoa_any

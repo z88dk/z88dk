@@ -134,3 +134,4 @@ graphics/drawbox
 graphics/setxy
 graphics/spectrum/pixladdr
 graphics/spectrum/swapgfxbk
+printflike/ltoa_any

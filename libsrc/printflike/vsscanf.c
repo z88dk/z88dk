@@ -17,7 +17,9 @@ int vsscanf(char *str,unsigned char *a, void *b)
 	temp.flags=_IOREAD|_IOSTRING;
 
         ret=vfscanf(temp,a,b);
+#if 0
 	*(temp.desc.ptr)=0;
+#endif
 	return(ret);
 }
 

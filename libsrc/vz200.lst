@@ -134,3 +134,4 @@ graphics/vz200/pixladdr
 graphics/vz200/swapgfxbk
 graphics/vz200/clsgraph
 games/joystick
+printflike/ltoa_any

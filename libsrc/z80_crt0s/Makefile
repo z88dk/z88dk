@@ -16,4 +16,5 @@ crtz80s183:
 
 
 clean:
-	rm -f */*.o* */*.sym */*.map 
+	rm -f crt0/*.o* crt0/*.sym crt0/*.map 
+	rm -f crt0_long/*.o* crt0_long/*.sym crt0_long/*.map 

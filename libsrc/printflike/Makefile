@@ -17,8 +17,6 @@ CFILES = \
 	vfscanf.c \
 	vsprintf.c \
 	vsscanf.c 
-#	itod.c \ 
-#	itox.c \ 
 
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)

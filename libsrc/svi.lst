@@ -123,3 +123,4 @@ graphics/setxy
 graphics/vz200/pixladdr
 graphics/vz200/swapgfxbk
 graphics/vz200/clsgraph
+printflike/ltoa_any

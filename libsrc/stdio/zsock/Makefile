@@ -1,11 +1,19 @@
-# $Id: Makefile,v 1.3 2001-04-30 14:40:04 dom Exp $
+# $Id: Makefile,v 1.4 2002-04-22 08:25:26 dom Exp $
 
+CFILES = \
+	closenet.c \
+	fflush_net.c \
+	fgetc_net.c \
+	fputc_net.c \
+	opennet.c 
 
-all: opennet.o closenet.o fgetc_net.o fputc_net.o fflush_net.o
+AFILES  = $(CFILES:.c=.asm)
+OBJECTS = $(CFILES:.c=.o)
 
+all: $(OBJECTS)
 
 .c.o:
 	zcc -vn -DNET_STDIO -make-lib $*.c
 
 clean:
-	rm -f *.o* zcc_opt.def *.sym *.map
+	rm -f *.o* zcc_opt.def *.sym *.map *.i $(AFILES)

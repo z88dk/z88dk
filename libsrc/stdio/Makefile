@@ -1,8 +1,45 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.6 2001-05-03 09:16:24 dom Exp $
+# $Id: Makefile,v 1.7 2002-04-22 08:25:26 dom Exp $
 #
+
+STDCFILES = \
+	closeall.c \
+	fabandon.c \
+	fchkstd.c \
+	fdopen.c \
+	feof.c \
+	fgetpos.c \
+	fgets.c \
+	fgets_cons.c \
+	fopen.c \
+	fopen_z88.c \
+	fputs.c \
+	fread.c \
+	freopen.c \
+	fseek.c \
+	ftell.c \
+	fwrite.c \
+	printk.c \
+	printn.c \
+	puts.c \
+	ungetc.c \
+	vfprintf_mini.c
+
+GENCFILES = \
+	fclose.c \
+	fgetc.c \
+	fputc.c \
+	freopen_z88.c \
+
+NETCFILES = $(GENCFILES) \
+	fflush.c
+
+#	stdio_fp.c
+
+AFILES  = $(STDCFILES:.c=.asm) $(NETCFILES:.c=.asm)
+STDOBJECTS = $(STDCFILES:.c=.o)
 
 generic: std gen
 
@@ -24,12 +61,7 @@ gen:
 	zcc -vn -make-lib fputc.c
 	zcc -vn -make-lib freopen_z88.c
 
-
-std:    closeall.o fchkstd.o feof.o fgetpos.o fgets.o fopen.o fputs.o \
-	fwrite.o fread.o freopen.o fopen_z88.o fseek.o ftell.o  \
-	vfprintf_mini.o printn.o puts.o ungetc.o fdopen.o printk.o \
-	fgets_cons.o fabandon.o
-
+std:    $(STDOBJECTS)
 
 z88_x:
 	cd z88 ; make
@@ -38,8 +70,33 @@ z88_x:
 	zcc -vn -make-lib $*.c
 
 clean:
-	rm -f *.o* *.sym *.map zcc_opt.def
-	rm -f ansi/*.o ansi/*/*.o
-	rm -f */*.o
-	cd z88 ; make clean
+	rm -f *.o* *.sym *.map zcc_opt.def *.i $(AFILES)
+	rm -f ansi/*.o
+	rm -f ansi/abc80/*.o
+	rm -f ansi/ace/*.o
+	rm -f ansi/aquarius/*.o
+	rm -f ansi/c128/*.o
+	rm -f ansi/generic/*.o
+	rm -f ansi/sharp-mz/*.o
+	rm -f ansi/spectrum/*.o
+	rm -f ansi/vz200/*.o
+	rm -f ansi/z88/*.o
+	rm -f ansi/zx81/*.o
+	rm -f abc80/*.o
+	rm -f ace/*.o
+	rm -f aquarius/*.o
+	rm -f c128/*.o
+	rm -f cpc/*.o
+	rm -f cpm/*.o
+	rm -f m5/*.o
+	rm -f msx/*.o
+	rm -f mz/*.o
+	rm -f nc100/*.o
+	rm -f sam/*.o
+	rm -f spectrum/*.o
+	rm -f svi/*.o
+	rm -f vz200/*.o
+	rm -f z88/*.o
+	rm -f zx81/*.o
+
 	cd zsock ; make clean

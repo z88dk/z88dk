@@ -33,3 +33,4 @@ graphics/setxy
 graphics/xorborder
 graphics/xorpixl
 graphics/xorplot
+printflike/ltoa_any

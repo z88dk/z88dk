@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.5 2001-04-30 14:40:04 dom Exp $
+# $Id: Makefile,v 1.6 2002-04-22 08:25:24 dom Exp $
 
 
 all: malloc
@@ -16,5 +16,5 @@ malloc: calloc.o
 
 
 clean:
-	rm -f *.o* *.sym *.map *~ *.err zcc_opt.def
+	rm -f *.o* *.sym *.map *~ *.err zcc_opt.def *.i calloc.asm
 	cd strings; make clean

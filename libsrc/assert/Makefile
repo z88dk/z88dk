@@ -12,3 +12,4 @@ all: assert.o
 
 clean:
 	rm -f *.o* *.sym *.map *~ *.err  zcc_opt.def
+	rm -f assert.asm *.i

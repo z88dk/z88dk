@@ -138,3 +138,4 @@ graphics/xorborder
 graphics/xorplot
 graphics/setxy
 games/joystick
+printflike/ltoa_any

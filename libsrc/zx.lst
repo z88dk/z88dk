@@ -149,3 +149,4 @@ games/spectrum/beeper
 spectrum/tape_save
 spectrum/tape_save_block
 spectrum/tape_load_block
+printflike/ltoa_any

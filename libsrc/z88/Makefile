@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.7 2002-04-21 11:37:20 dom Exp $
+# $Id: Makefile,v 1.8 2002-04-22 08:25:27 dom Exp $
 
 CFILES = \
 	DeRegisterInt.c \
@@ -18,7 +18,7 @@ CFILES = \
 	strippath.c \
 	wcclose.c \
 	wcnext.c \
-	wcopen.c 
+	wcopen.c \
 
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
@@ -35,5 +35,5 @@ z88: $(OBJECTS)
 	zcc -vn -make-lib $*.c
 
 clean:
-	rm -f *.obj *.sym *.map *.o* zcc_opt.def *.i $(AFILES)
+	rm -f *.obj *.sym *.map *.o* *~ zcc_opt.def *.i $(AFILES)
 	cd fdstdio ; make clean

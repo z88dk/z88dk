@@ -133,3 +133,4 @@ graphics/bkrestore
 graphics/cpc/pixladdr
 graphics/cpc/swapgfxbk
 graphics/clsgraph
+printflike/ltoa_any

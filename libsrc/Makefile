@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.37 2002-04-17 21:30:23 dom Exp $
+# $Id: Makefile,v 1.38 2002-04-22 08:25:22 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -9,8 +9,8 @@ all:	genlibs z88libs tilibs zxlibs \
 	mz_clib.lib mzansi_clib.lib zx81_clib.lib zx81ansi_clib.lib \
 	abc80_clib.lib aceansi_clib.lib sam_clib.lib \
 	msx_clib.lib svi_clib.lib m5_clib.lib cpc_clib.lib \
-	c128ansi_clib.lib aquarius_clib.lib aquansi_clib.lib
-
+	c128ansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
+	rex_clib.lib
 
 genlibs: m.lib malloc.lib z80_crt0.lib
 
@@ -648,6 +648,7 @@ clean:
 	cd z88 ; make clean
 	cd z88math ; make clean
 	rm -f *.lib
+	cd games ; make clean
 
 install:
 	cp *.lib ../lib/clibs/
