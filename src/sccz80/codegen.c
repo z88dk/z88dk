@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.7 2001-09-07 18:21:50 dom Exp $
+ *      $Id: codegen.c,v 1.8 2001-11-18 21:10:00 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -937,7 +937,7 @@ int saveaf;		/* Preerve contents of af */
 	if (useframe) goto modstkcht;
 #endif
         if ( k > 0 ) {
-                if ( k < 7 ) {
+                if ( k < 11 ) {
                         if ( k & 1 ) {
                                 ol("inc\tsp") ;
                                 --k ;
@@ -950,7 +950,7 @@ int saveaf;		/* Preerve contents of af */
                 }
         }
         if ( k < 0 ) {
-                if ( k > -7 ) {
+                if ( k > -11 ) {
                         if ( k & 1 ) {
 				flag=YES;
                                 ++k ;
@@ -1668,6 +1668,8 @@ void vlongconst(unsigned long val)
 void vconst(val)
 int val ;
 {
+	if ( val < 0 )
+		val += 65536;
         immed();
         outdec(val%65536);
         ot(";const\n");
@@ -1679,6 +1681,8 @@ int val ;
 void const2(val)
 int val ;
 {
+	if ( val < 0 )
+		val += 65536;
         immed2();
         outdec(val);
         nl();
