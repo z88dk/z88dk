@@ -1,0 +1,9 @@
+compile with either:
+
+zcc +z88 sndtest.c -lm
+zcc +zx  sndtest.c -lm
+zcc +z88 fx.c
+zcc +zx  fx.c
+
+Or ANSI libraries can be used of course
+
