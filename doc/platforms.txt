@@ -1,0 +1,31 @@
+Z88DK Port Status
+
+$Id: platforms.txt,v 1.1 2001-04-12 11:38:40 stefano Exp $
+
+
+PLATFORM      | Native I/O  | ANSI VT I/O |  GRAPH LIB  |  GRAY LIB   |  FILELIB    |   ZSOCK     |   Others    |
+-----------------------------------------------------------------------------------------------------------------
+              |             |             |             |             |             |             |             |
+ABC80         |     No      | 40x24-buggy |     No      |     No      |     No      |     No      |     ---     |
+Amstrad NC100 |     Yes     |     No      |     No      |     No      |     No      |     No      | Untested    |
+Cambridge Z88 |     Yes     |     No      |  256x64     |     No      |     Yes     |     Yes     | Paging+many |
+CP/M          |     Yes     | If Hardware |     No      |     No      |     No      |     No      |     ---     |
+Jupiter ACE   |    32x24    |     No      | 96x64 emul. |     No      |     No      |     No      |     ---     |
+MSX 1         |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |
+REX 6000      |     No      |     No      |     No      |     No      |     No      |     No      |    (1)      |
+Sam Coupe     | 32x24-buggy |     No      |     No      |     No      |     No      |     No      |     ---     |
+Sharp MZ      | 40x25-buggy | In Progress |     No      |     No      |     No      |     No      | Unstable    |
+Spectravideo  |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |
+TI82          |     No      |    32x4  B/W|   96x64     |     Yes     |     No      |     No      |     ---     |
+TI83          |     No      |    32x4  B/W|   96x64     |     Yes     | In Progress |     No      |     ---     |
+TI83 Plus     |     No      |    32x4  B/W|   96x64     |     Yes     |     No      |     No      |     ---     |
+TI85          |     No      |    32x4  B/W|  128x64     |     Yes     |     No      |     No      |     ---     |
+TI86          |     No      |    32x4  B/W|  128x64     |     No      |     No      |     No      | LASM Needed |
+VZ200/300     |    32x16    |    32x12 B/W|  128x64     |     No      |     No      |     No      |     ---     |
+ZX 81         | 32x21-buggy |    32x21 B/W| 96x64 emul. |     No      |     No      |     No      | Unstable    |
+ZX Spectrum   | 32x24+64x24 | 24-85x24 COL|  256x192    |     No      |     No?     |     No      |     (2)     |
+              |             |             |             |             |             |             |             |
+              |             |             |             |             |             |             |             |
+
+(1) The Xircom REX 6000 port provides hooks into the native OS. No z88dk i/o functions are supported
+(2) Work on a +3 file library is in progress
