@@ -12,7 +12,7 @@
  *	djm 1/4/2000
  *
  * --------
- * $Id: fread.c,v 1.5 2002-06-09 15:13:26 dom Exp $
+ * $Id: fread.c,v 1.6 2003-10-13 22:43:56 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -40,7 +40,7 @@ int fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
 		    /* Pick up ungot character */
 		    int c = fgetc(fp);
 		    /* Horrible hack around here */
-		    if ( c > 0 ) {
+		    if ( c >= 0 ) {
 			*ptr = (unsigned char )c;
 			readen=read(fp->desc.fd,ptr+1,readen-1);
 			++readen;
