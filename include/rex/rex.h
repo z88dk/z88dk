@@ -3,7 +3,7 @@
  *
  *      Xircom REX 6000 Routines
  *
- *	$Id: rex.h,v 1.1 2001-06-25 13:06:09 dom Exp $
+ *	$Id: rex.h,v 1.2 2001-07-02 06:46:44 dmarion Exp $
  *
  *	From Damjan Marion <dmarion@iskon.hr>
  *
@@ -40,6 +40,26 @@
 #define MSG_REX_COMMAND		03
 #define MSG_REX_KEY_DOWN	16
 
+typedef struct {
+	unsigned int	PointX;
+	unsigned int 	PointY;
+} REXPOINT;
+
+typedef struct {
+	unsigned int	x;
+	unsigned int	y;
+	unsigned int	cx;
+	unsigned int	cy;
+} REXRECT;
+
+typedef struct
+{
+	unsigned int	message;
+	unsigned char 	bCode;
+	unsigned int	sCode;
+	REXPOINT	pt;
+} REXMSG;
+
 extern int __LIB__ SYSCALL0(int);
 extern int __LIB__ SYSCALL1(int,...);
 extern int __LIB__ SYSCALL4(int,...);
@@ -48,18 +68,20 @@ extern int __LIB__ SYSCALL6(int,...);
 extern int __LIB__ SYSCALL6P(int,...);
 extern int __LIB__ SYSCALLEX(int,...);
 
+extern int __LIB__ RexPrintf(int, int, int, char *);
+
 
 #define RexBeepOn( arg1 )                 		SYSCALL1( REX_BEEP_ON, arg1 )
 #define RexEventMessageGet( arg1 )	  		SYSCALL1( REX_EVENT_MESSAGE_GET, arg1 )
 #define RexEventClear( )	          		SYSCALL0( REX_EVENT_CLEAR )
 #define RexVersionGet( )                 		SYSCALL0(REX_VERSION_GET )
 #define RexAddinTerminate( )	          		SYSCALL0( REX_ADDIN_TERMINATE )
-#define RexPrintf(arg1, arg2, arg3, arg4, arg5 ) 	SYSCALLEX(REX_PRINTF, arg1, arg2, 0xFFFF, arg3, arg4, arg5)
 #define RexSoftwareKeyboard(arg1, arg2)  		SYSCALLEX(REX_SOFTWARE_KEYBOARD, arg1, arg2 )
 #define RexSleep( arg1 )                  		SYSCALLEX( REX_SLEEP, arg1 )
 #define RexDisplayWaitIconDraw( arg1 )     		SYSCALL1( REX_DISP_WAIT_ICON_DRAW, arg1 )
 #define RexDisplayLine( arg1, arg2, arg3, arg4, arg5 ) 	SYSCALL5( REX_DISP_LINE, arg1, arg2, arg3, arg4, arg5 )
 #define RexDisplayBlockClear(arg1, arg2, arg3, arg4 )  	SYSCALL4(REX_DISP_BLOCK_CLEAR, arg1, arg2, arg3, arg4 )
+#define RexClearScreen()  				SYSCALL4(REX_DISP_BLOCK_CLEAR, 0, 0, 240, 120 )
 #define RexDialogTextButton( arg1, arg2, arg3, arg4, arg5, arg6 ) SYSCALL6P( REX_DIALOG_TEXT_BUTTON, arg1, arg2, arg3, arg4, arg5, arg6 )
 
 #endif /* _REX_H_ */
