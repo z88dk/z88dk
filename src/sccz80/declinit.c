@@ -10,7 +10,7 @@
  * 
  *      3/2/02 djm - Unspecified structure members are now padded out
  *
- *      $Id: declinit.c,v 1.10 2003-03-17 15:59:36 dom Exp $
+ *      $Id: declinit.c,v 1.11 2003-09-22 09:01:32 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -127,61 +127,64 @@ int str_init(TAG_SYMBOL *tag)
     ptr = tag->ptr;
     while (ptr < tag->end) {
         numelements++;
-	dim = ptr->size;
-	sz = getstsize(ptr,NO);
-	if ( nodata == NO ) {
-	    if ( rcmatch('{') ) {
-		needchar('{');
+        dim = ptr->size;
+        sz = getstsize(ptr,NO);
+        if ( nodata == NO ) {
+            if ( rcmatch('{') ) {
+                needchar('{');
                 while (dim) {
-                   if (ptr->ident == ARRAY && ptr->type == STRUCT) {
-                  /* array of struct */
-                       needchar('{');
-                       str_init(tag);
-                       --dim;
-                       needchar('}');
-                   } else {
-                       init(sz, ptr->ident, &dim, 1, 1,1);
-                   }
+                    if ( ptr->type == STRUCT ) {
+                        if ( ptr->ident == ARRAY )
+                        /* array of struct */
+                            needchar('{');
+                        str_init(tag);
+                        if ( ptr->ident == ARRAY ) {
+                            --dim;
+                            needchar('}');
+                        }
+                    } else {
+                        init(sz, ptr->ident, &dim, 1, 1,1);
+                    }
 
                     if (cmatch(',') == 0)
                         break;
                     blanks();
                 }
-		needchar('}');
+                needchar('}');
                 dumpzero(sz,dim);
-	    } else {
-	    	init(sz, ptr->ident, &dim, ptr->more, 1, 1);
-	    }
-	    /* Pad out afterwards */
-	} else {  /* Run out of data for this initialisation, set blank */ 
-	    defstorage();
-	    outdec(dim * getstsize(ptr,YES));
-	    nl();		
-	}
+            } else {
+                init(sz, ptr->ident, &dim, ptr->more, 1, 1);
+            }
+            /* Pad out afterwards */
+        } else {  /* Run out of data for this initialisation, set blank */ 
+            defstorage();
+            outdec(dim * getstsize(ptr,YES));
+            nl();		
+        }
 
 
 
-	usz = (ptr->size ? ptr->size : 1 ) * getstsize(ptr,YES);
-	++ptr;
-	flag = NO;
-	while (ptr->offset.i == 0 && ptr < tag->end) {
-	    if (getstsize(ptr,YES) * (ptr->size ? ptr->size : 1 )  > usz) {
-		usz = getstsize(ptr,YES) * (ptr->size ? ptr->size : 1 ) ;
-		flag = YES;
-	    }
-	    ++ptr;
+        usz = (ptr->size ? ptr->size : 1 ) * getstsize(ptr,YES);
+        ++ptr;
+        flag = NO;
+        while (ptr->offset.i == 0 && ptr < tag->end) {
+            if (getstsize(ptr,YES) * (ptr->size ? ptr->size : 1 )  > usz) {
+                usz = getstsize(ptr,YES) * (ptr->size ? ptr->size : 1 ) ;
+                flag = YES;
+            }
+            ++ptr;
 
         }
 
-	/* Pad out the union */
-	if (usz != sz && flag) {
-	    defstorage();
-	    outdec(usz - sz);
-	    nl();
-	}
-	if (cmatch(',') == 0 && ptr != tag->end) {
-	    nodata = YES;	   
-	}
+        /* Pad out the union */
+        if (usz != sz && flag) {
+            defstorage();
+            outdec(usz - sz);
+            nl();
+        }
+        if (cmatch(',') == 0 && ptr != tag->end) {
+            nodata = YES;	   
+        }
     }
     return numelements;
 }
@@ -231,126 +234,126 @@ int size, ident, *dim, more, dump, is_struct;
  */
 
     if ((sz = qstr(&value)) != -1 ) {
-	sz++;
+        sz++;
 #if 0
-	if (ident == VARIABLE || (size != 1 && more != CCHAR))
-	    error(E_ASSIGN);
+        if (ident == VARIABLE || (size != 1 && more != CCHAR))
+            error(E_ASSIGN);
 #endif
 #ifdef INIT_TEST
-	outstr("ident=");
-	outdec(ident);
-	outstr("size=");
-	outdec(size);
-	outstr("more=");
-	outdec(more);
-	outstr("dim=");
-	outdec(*dim);
-	outstr("sz=");
-	outdec(sz);
-	nl();
+        outstr("ident=");
+        outdec(ident);
+        outstr("size=");
+        outdec(size);
+        outstr("more=");
+        outdec(more);
+        outstr("dim=");
+        outdec(*dim);
+        outstr("sz=");
+        outdec(sz);
+        nl();
 #endif
-	if (ident == ARRAY && more == 0) {
+        if (ident == ARRAY && more == 0) {
 /*
  * Dump the literals where they are, padding out as appropriate
  */
-	    if (*dim != -1 && sz > *dim) {
+            if (*dim != -1 && sz > *dim) {
 /*
  * Ooops, initialised to long a string!
  */
-		warning(W_INIT2LONG);
-		sz = *dim;
-		gltptr = sz;
-		*(glbq + sz - 1) = '\0';	/* Terminate string */
-	    }
-	    dumplits(((size == 1) ? 0 : size), NO, gltptr, glblab, glbq);
-	    *dim -= sz;
-	    gltptr = 0;
-	    dumpzero(size, *dim);
-	    return;
-	} else {
+                warning(W_INIT2LONG);
+                sz = *dim;
+                gltptr = sz;
+                *(glbq + sz - 1) = '\0';	/* Terminate string */
+            }
+            dumplits(((size == 1) ? 0 : size), NO, gltptr, glblab, glbq);
+            *dim -= sz;
+            gltptr = 0;
+            dumpzero(size, *dim);
+            return;
+        } else {
 /*
  * Store the literals in the queue!
  */
-	    storeq(sz, glbq, &value);
-	    gltptr = 0;
-	    defword();
-	    printlabel(litlab);
-	    outbyte('+');
-	    outdec(value);
-	    nl();
-	    --*dim;
-	    return;
-	}
+            storeq(sz, glbq, &value);
+            gltptr = 0;
+            defword();
+            printlabel(litlab);
+            outbyte('+');
+            outdec(value);
+            nl();
+            --*dim;
+            return;
+        }
     }
 /*
  * djm, catch label names in structures (for (*name)() initialisation
  */
     else {
-	char sname[NAMEMAX + 1];
-	SYMBOL *ptr;
-	if (symname(sname)  && strcmp(sname,"sizeof") ) {	/* We have got something.. */
-	    if ((ptr = findglb(sname))) {
-		/* Actually found sommat..very good! */
-		if (ident == POINTER || (ident == ARRAY && more)) {
-		    defword();
-		    outname(ptr->name, dopref(ptr));
-		    nl();
-		    --*dim;
-		} else if (ptr->type == ENUM) {
-		    value = ptr->size;
-		    goto constdecl;
-		} else {
-		    error(E_DDECL);
-		}
-	    } else
-		error(E_UNSYMB, sname);
-	} else if (rcmatch('}')) {
+        char sname[NAMEMAX + 1];
+        SYMBOL *ptr;
+        if (symname(sname)  && strcmp(sname,"sizeof") ) {	/* We have got something.. */
+            if ((ptr = findglb(sname))) {
+                /* Actually found sommat..very good! */
+                if (ident == POINTER || (ident == ARRAY && more)) {
+                    defword();
+                    outname(ptr->name, dopref(ptr));
+                    nl();
+                    --*dim;
+                } else if (ptr->type == ENUM) {
+                    value = ptr->size;
+                    goto constdecl;
+                } else {
+                    error(E_DDECL);
+                }
+            } else
+                error(E_UNSYMB, sname);
+        } else if (rcmatch('}')) {
 #if 0
-	    dumpzero(size,*dim);
+            dumpzero(size,*dim);
 #endif
-	} else if (constexpr(&value, 1)) {
-	  constdecl:
-	    if (ident == POINTER) {
-		/* 24/1/03 dom - We want to be able to assign values to
-		   pointers or they're a bit useless..
-		*/
+        } else if (constexpr(&value, 1)) {
+        constdecl:
+            if (ident == POINTER) {
+                /* 24/1/03 dom - We want to be able to assign values to
+                   pointers or they're a bit useless..
+                */
 #if 0
-		/* the only constant which can be assigned to a pointer is 0 */
-		if (value != 0)
-		    warning(W_ASSPTR);
+                /* the only constant which can be assigned to a pointer is 0 */
+                if (value != 0)
+                    warning(W_ASSPTR);
 #endif
-		size = 2;
-		dump = YES;
-	    }
-	    if (dump) {
-		/* struct member or array of pointer to char */
-		if (size == 4) {
+                size = 2;
+                dump = YES;
+            }
+            if (dump) {
+                /* struct member or array of pointer to char */
+                if (size == 4) {
 /* there appears to be a bug in z80asm regarding defl */
-		    defbyte();
-		    outdec((value % 65536UL) % 256);
-		    outbyte(',');
-		    outdec((value % 65536UL) / 256);
-		    outbyte(',');
-		    outdec((value / 65536UL) % 256);
-		    outbyte(',');
-		    outdec((value / 65536UL) / 256);
-		} else {
-		    if (size == 1)
-			defbyte();
-		    else
-			defword();
-		    outdec(value);
-		}
-		nl();
-		/* Dump out a train of zeros as appropriate */
-		if (ident == ARRAY && more == 0) {		 
-		    dumpzero(size,(*dim)-1);
-		}
+                    defbyte();
+                    outdec((value % 65536UL) % 256);
+                    outbyte(',');
+                    outdec((value % 65536UL) / 256);
+                    outbyte(',');
+                    outdec((value / 65536UL) % 256);
+                    outbyte(',');
+                    outdec((value / 65536UL) / 256);
+                } else {
+                    if (size == 1)
+                        defbyte();
+                    else
+                        defword();
+                    outdec(value);
+                }
+                nl();
+                /* Dump out a train of zeros as appropriate */
+                if (ident == ARRAY && more == 0) {		 
+                    dumpzero(size,(*dim)-1);
+                }
 
-	    } else
-		stowlit(value, size);
-	    --*dim;
-	}
+            } else
+                stowlit(value, size);
+            --*dim;
+        }
     }
 }
 
