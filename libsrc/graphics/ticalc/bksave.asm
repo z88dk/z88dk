@@ -7,7 +7,7 @@
 	XLIB    bksave
 	LIB	pixeladdress
 
-	INCLUDE	"grafix.inc"
+	INCLUDE	"graphics/grafix.inc"
 
 .bksave
         ld      hl,2   

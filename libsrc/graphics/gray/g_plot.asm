@@ -10,12 +10,9 @@
 
                 XLIB    g_plot
 
-                XREF    base_graphics
-		XREF	graybit1
-		XREF	graybit2
-
                 LIB     plotpixel
 		LIB     respixel
+		LIB	graypage
 
 .g_plot
 		ld	ix,0
@@ -24,10 +21,12 @@
 		ld	l,(ix+4)	;y
 		ld	h,(ix+6)	;x
 		
-		ld	de,(graybit1)
-		ld	(base_graphics),de
+		push	af
+		xor	a
+		call	graypage
+		pop	af
 		rra
-		jr	c,set1
+		jr	nc,set1
 		push	af
 		push	hl
 		call	respixel
@@ -42,8 +41,10 @@
 		pop	af
 
 .page2
-		ld	de,(graybit2)
-		ld	(base_graphics),de
+		push	af
+		ld	a,1
+		call	graypage
+		pop	af
 		rra
-		jp	c,plotpixel
+		jp	nc,plotpixel
 		jp	respixel

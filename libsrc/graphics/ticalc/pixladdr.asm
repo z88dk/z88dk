@@ -1,7 +1,7 @@
 
 	XLIB	pixeladdress
 
-	INCLUDE	"grafix.inc"
+	INCLUDE	"graphics/grafix.inc"
 
 	XREF	base_graphics
 

@@ -1,7 +1,7 @@
 
 	XLIB	pixeladdress
 
-	INCLUDE	"grafix.inc"
+	INCLUDE	"graphics/grafix.inc"
 
 	XREF	base_graphics
 
@@ -20,7 +20,8 @@
 ;  ......hl/ixiy same
 ;  afbcde../.... different
 ;
-.pixeladdress		
+
+.pixeladdress
 
 	;; Ported from the ZX ROM PIXEL-ADD routine
 
@@ -35,17 +36,9 @@
 ;		ld	e,l
 ;		ret
 
-;IF noROM
+
 		LD	C,H
-		ld	a,maxy
-		; LD	A,192	; For a full height display
-		; LD	A,128	; Z88-like
-		
-	        ;SUB     L
-	        ;; JP      C,out-of-range
-		
 		LD	A,L
-		
 	        LD      B,A
 	        AND     A
 	        RRA
@@ -71,6 +64,4 @@
 	        AND     @00000111
 	        XOR	@00000111
 	        
-	        RET                     ;
-;ENDIF
-
+	        RET

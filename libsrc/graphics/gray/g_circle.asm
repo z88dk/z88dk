@@ -10,13 +10,10 @@
 
                 XLIB    g_circle
 
-                XREF    base_graphics
-		XREF	graybit1
-		XREF	graybit2
-
                 LIB     draw_circle
                 LIB     plotpixel
                 LIB     respixel
+                LIB     graypage
 
 
 .g_circle
@@ -28,11 +25,13 @@
 		ld	c,(ix+8)	;y
 		ld	b,(ix+10)	;x
 		
-		ld	hl,(graybit1)
-		ld	(base_graphics),hl
+		push	af
+		xor	a
+		call	graypage
+		pop	af
                 ld	ix,plotpixel
 		rra
-		jr	c,set1
+		jr	nc,set1
                 ld	ix,respixel
 .set1
 		push	af
@@ -43,11 +42,13 @@
 		pop	de
 		pop	af
 
-		ld	hl,(graybit2)
-		ld	(base_graphics),hl
+		push	af
+		ld	a,1
+		call	graypage
+		pop	af
                 ld	ix,plotpixel
 		rra
-		jr	c,set2
+		jr	nc,set2
                 ld	ix,respixel
 .set2
                 jp	draw_circle

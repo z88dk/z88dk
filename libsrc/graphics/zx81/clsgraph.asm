@@ -1,4 +1,3 @@
-	INCLUDE		"grafix.inc"
 
 	XLIB	cleargraphics
 

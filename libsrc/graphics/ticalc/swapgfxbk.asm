@@ -8,7 +8,6 @@
 ;
 ;	TI calcs: Copy GRAPH MEM to LCD when finished.
 ;	By Stefano Bodrato - Dec. 2000
-;	Feb. 2000 - various fixes (di/ei and dcircle2.asm workaround)
 ;
 
 
@@ -17,8 +16,6 @@
 
 		XREF	cpygraph
 
-
-.bc1save	defw	0
 
 .swapgfxbk
 		ret

@@ -7,16 +7,14 @@
 
 ;Usage: g_drawr(int px, int py, int GrayLevel)
 
-
                 XLIB    g_drawr
 
-                XREF    base_graphics
-		XREF	graybit1
-		XREF	graybit2
+		XREF	COORDS
 
                 LIB     line_r
                 LIB     plotpixel
                 LIB     respixel
+                LIB     graypage
 
 
 .g_drawr
@@ -28,11 +26,16 @@
 		ld	l,(ix+6)	;px
 		ld	h,(ix+7)
 
-		ld	bc,(graybit1)
-		ld	(base_graphics),bc
+		ld	bc,(COORDS)
+		push	bc
+		push	af
+		xor	a
+		call	graypage
+		pop	af
+		
                 ld	ix,plotpixel
 		rra
-		jr	c,set1
+		jr	nc,set1
                 ld	ix,respixel
 .set1
 		push	af
@@ -43,12 +46,16 @@
 		pop	hl
 		pop	af
 
-		ld	bc,(graybit2)
-		ld	(base_graphics),bc
+		pop	bc
+		ld	(COORDS),bc
+		push	af
+		ld	a,1
+		call	graypage
+		pop	af
 		
                 ld	ix,plotpixel
 		rra
-		jr	c,set2
+		jr	nc,set2
                 ld	ix,respixel
 .set2
                 jp	line_r

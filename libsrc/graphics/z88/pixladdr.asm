@@ -1,5 +1,3 @@
-	INCLUDE	"grafix.inc"
-
 
 	XLIB	pixeladdress
 

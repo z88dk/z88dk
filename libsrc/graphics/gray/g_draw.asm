@@ -10,13 +10,10 @@
 
                 XLIB    g_draw
 
-                XREF    base_graphics
-		XREF	graybit1
-		XREF	graybit2
-
                 LIB     line
                 LIB     plotpixel
                 LIB     respixel
+                LIB	graypage
 
 
 .g_draw
@@ -28,11 +25,13 @@
 		ld	l,(ix+8)	;y0
 		ld	h,(ix+10)	;x0
 		
-		ld	bc,(graybit1)
-		ld	(base_graphics),bc
+		push	af
+		xor	a
+		call	graypage
+		pop	af
                 ld	ix,plotpixel
 		rra
-		jr	c,set1
+		jr	nc,set1
                 ld	ix,respixel
 .set1
 		push	af
@@ -43,12 +42,13 @@
 		pop	hl
 		pop	af
 
-		ld	bc,(graybit2)
-		ld	(base_graphics),bc
-
+		push	af
+		ld	a,1
+		call	graypage
+		pop	af
                 ld	ix,plotpixel
 		rra
-		jr	c,set2
+		jr	nc,set2
                 ld	ix,respixel
 .set2
                 jp	line

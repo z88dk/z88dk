@@ -1,11 +1,11 @@
 
-	XLIB	plotpixel
+	XLIB	respixel
 
 	XREF	COORDS
 
 ; ******************************************************************
 ;
-; Plot pixel at (x,y) coordinate.
+; Erases pixel at (x,y) coordinate.
 ;
 ; ZX 81 version.  
 ; Emulated 96x64 resolution (TI82/TI83) with 64x48 dots.
@@ -13,7 +13,7 @@
 ; (x=x*2/3;  y=y*3/4)
 ;
 ;
-.plotpixel			
+.respixel			
 				ld	a,h
 				cp	96
 				ret	nc
@@ -87,7 +87,8 @@
 				add	a,a
 				add	a,a		; move down the bit
 .evenrow
-				or	b
+				cpl
+				and	b
 
 				cp	8		; Now back from binary to
 				jr	c,hisym		; graph symbols.

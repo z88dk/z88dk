@@ -7,8 +7,6 @@
 	XLIB    bkrestore
 	LIB	pixeladdress
 
-	INCLUDE	"grafix.inc"
-
 .bkrestore
 
         ld      hl,2   

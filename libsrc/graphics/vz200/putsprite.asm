@@ -10,8 +10,6 @@
 	XREF	cpygraph
 	LIB	pixeladdress
 
-	INCLUDE	"grafix.inc"
-
 ; coords: d,e (vert-horz)
 ; sprite: (ix)
 

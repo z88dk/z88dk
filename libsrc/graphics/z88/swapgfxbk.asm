@@ -12,8 +12,6 @@
 
                 XLIB    swapgfxbk
 
-                INCLUDE "grafix.inc"
-
                 XREF    gfx_bank
 		XDEF	swapgfxbk1
 

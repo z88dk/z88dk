@@ -7,8 +7,6 @@
 	XLIB    bksave
 	LIB	pixeladdress
 
-	INCLUDE	"grafix.inc"
-
 .bksave
         ld      hl,2
         add     hl,sp
