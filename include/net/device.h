@@ -3,7 +3,7 @@
  *
  *	djm 25/1/2000
  *
- *	$Id: device.h,v 1.5 2001-10-16 18:30:32 dom Exp $
+ *	$Id: device.h,v 1.6 2002-02-12 20:33:52 dom Exp $
  */
 
 #ifndef __NET_DEVICE_H__
@@ -21,7 +21,6 @@ struct pktdrive {
         char    *copymsg;	/* (C) string */
         int     (*initfunc)();	/* Initialise function */
         int     (*queuefn)();	/* Insert packet into queue */
-	int	(*packetfn)();	/* Where incoming is */
         int     (*sendfn)();	/* Spew bytes out */
         int     (*readfn)();	/* Read packet from dev */
 	void	(*onlinefn)();  /* Turn device online */

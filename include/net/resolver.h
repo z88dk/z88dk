@@ -5,27 +5,23 @@
  *	This file is included by the ZSock kernel
  *	**DO NOT USE IN USER PROGRAMS!!
  *
- *	$Id: resolver.h,v 1.3 2001-10-16 18:30:32 dom Exp $
+ *	$Id: resolver.h,v 1.4 2002-02-12 20:33:55 dom Exp $
  */
 
 /* Max domain name size to play with */
 #define	DOMSIZE	128
 
-#define WORD	unsigned int
-#define BYTE	unsigned char
-#define LWORD	unsigned long
-
 /*
  *  Header for the DOMAIN queries
- *  ALL OF THESE ARE BYTE SWAPPED QUANTITIES!
+ *  ALL OF THESE ARE u8_t SWAPPED QUANTITIES!
  */
 struct dhead {
-    WORD        ident;          /* unique identifier */
-    WORD        flags;
-    WORD        qdcount;        /* question section, # of entries */
-    WORD        ancount;        /* answers, how many */
-    WORD        nscount;        /* count of name server RRs */
-    WORD        arcount;        /* number of "additional" records */
+    u16_t        ident;          /* unique identifier */
+    u16_t        flags;
+    u16_t        qdcount;        /* question section, # of entries */
+    u16_t        ancount;        /* answers, how many */
+    u16_t        nscount;        /* count of name server RRs */
+    u16_t        arcount;        /* number of "additional" records */
 };
 
 /*
@@ -65,11 +61,11 @@ struct dhead {
  * this structure.  All of these ints need to be byteswapped before use.
  */
 struct rrpart {
-    WORD        rtype;          /* resource record type = DTYPEA */
-    WORD        rclass;         /* RR class = DIN */
-    LWORD       ttl;            /* time-to-live, changed to 32 bits */
-    WORD        rdlength;       /* length of next field */
-    BYTE        rdata[DOMSIZE]; /* data field */
+    u16_t        rtype;          /* resource record type = DTYPEA */
+    u16_t        rclass;         /* RR class = DIN */
+    u32_t        ttl;            /* time-to-live, changed to 32 bits */
+    u16_t        rdlength;       /* length of next field */
+    u8_t         rdata[DOMSIZE]; /* data field */
 };
 
 /*
@@ -77,7 +73,7 @@ struct rrpart {
  */
 static struct useek {
     struct dhead h;
-    BYTE         x[DOMSIZE];
+    u8_t         x[DOMSIZE];
 };
 
 #endif /* _NET_RESOLVER_H */

@@ -7,7 +7,7 @@
  *
  *      djm 24/4/99
  *
- *	$Id: inet.h,v 1.6 2001-10-16 18:30:32 dom Exp $
+ *	$Id: inet.h,v 1.7 2002-02-12 20:33:53 dom Exp $
  */
 
 
@@ -45,6 +45,7 @@ struct tcp_header {
         u16_t        cksum;
         u16_t        urgptr;
 };
+
 
 #define TH_DO_MASK      0xf0
 #define TH_FLAGS_MASK   0x3f
@@ -98,6 +99,7 @@ struct udp_header {
 typedef struct udp_header udp_header_t;
 typedef struct ip_header ip_header_t;
 typedef struct tcp_header tcp_header_t;
+typedef struct icmp_header icmp_header_t;
 
 
 
