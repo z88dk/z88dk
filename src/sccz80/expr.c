@@ -2,7 +2,7 @@
  * cc4.c - fourth part of Small-C/Plus compiler
  *         routines for recursive descent
  *
- * $Id: expr.c,v 1.5 2001-02-01 12:04:41 dom Exp $
+ * $Id: expr.c,v 1.6 2001-06-27 11:13:07 dom Exp $
  *
  */
 
@@ -113,7 +113,7 @@ LVALUE *lval ;
 	if ( ((lval->flags&UNSIGNED) != (lval2.flags&UNSIGNED)) && ( !(lval2.is_const) && !(lval->ptr_type) && !(lval2.ptr_type) ) ) 
 	    warning(W_EGSG);
 #endif
-	force(lval->val_type, lval2.val_type, lval->flags&UNSIGNED, lval2.flags&UNSIGNED,lval2.is_const);
+	force(lval->val_type, lval2.val_type, lval->flags&UNSIGNED, lval2.flags&UNSIGNED,0); /* 27.6.01 lval2.is_const); */
 	smartstore(lval);
 	return 0;
     }
