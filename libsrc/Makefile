@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.49 2002-10-17 12:20:35 dom Exp $
+# $Id: Makefile,v 1.50 2002-10-17 12:31:37 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -676,7 +676,7 @@ embedded_clib.lib:
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
-	cd stdio ; $(MAKE) lembedded
+	cd stdio ; $(MAKE) gen
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
