@@ -13,11 +13,10 @@
  *      Allocate memory for num*size and clear it (set to 0)
  *
  *
- *	$Id: calloc.c,v 1.3 2002-05-11 20:57:22 dom Exp $
+ *	$Id: calloc.c,v 1.4 2002-05-22 20:12:37 dom Exp $
  */
 
 #include <malloc.h>
-#include <string.h>
 
 
 void *calloc(int num, int size)
