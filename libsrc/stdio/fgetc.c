@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fgetc.c,v 1.3 2001-04-13 14:13:58 stefano Exp $
+ * $Id: fgetc.c,v 1.4 2002-02-21 15:10:53 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -55,7 +55,7 @@ int fgetc(FILE *fp)
 	ld	a,(de)
 	inc	de
 	ld	(ix+fp_desc),e
-	ld	(ix+fp_desc+1),e
+	ld	(ix+fp_desc+1),d
 	ld	hl,-1	;EOF
 	and	a	;test for zero
 	ret	z	;return EOF if so
