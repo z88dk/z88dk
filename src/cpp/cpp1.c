@@ -89,7 +89,7 @@
 #include	"cppdef.h"
 #include	"cpp.h"
 
-#ifdef __MSDOS
+#ifdef __MSDOS__
 #ifdef __BORLANDC__
 extern unsigned _stklen=8192U;	/* Default stack of 4096 is too small */
 #endif
