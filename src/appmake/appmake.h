@@ -39,6 +39,9 @@ extern option_t  acetap_options;
 extern int       aquarius_exec(char *target);
 extern option_t  aquarius_options;
 
+extern int       cpc_exec(char *target);
+extern option_t  cpc_options;
+
 extern int       hex_exec(char *target);
 extern option_t  hex_options;
 
@@ -98,7 +101,10 @@ struct {
     { "bin2caq",  "aquarius", "(C) 2001 Stefano Bodrato",
       "Creates a BASIC loader file and binary stored in variable array format",
       abc80_exec,   &abc80_options },
-   { "bin2hex",  "hex",      "(C) 2001 Dominic Morris & Jeff Brown",                         
+    { "bin2cpc",  "cpc",      "(C) 2003 Dominic Morris",
+      "Creates an AMSDOS file suitable for writing to a .DSK image",
+      cpc_exec,   &cpc_options },
+    { "bin2hex",  "hex",      "(C) 2001 Dominic Morris & Jeff Brown",                         
       "Creates an intel hex record suitable for embedded devices",
       hex_exec,     &hex_options },
     { "bin2msx",  "msx",      "(C) 2001 Stefano Bodrato",                         
