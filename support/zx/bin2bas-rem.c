@@ -12,7 +12,7 @@
  *
  *	To be used with relocatable code only !!
  *
- *	$Id: bin2bas-rem.c,v 1.2 2001-09-14 08:03:52 stefano Exp $
+ *	$Id: bin2bas-rem.c,v 1.3 2001-09-14 14:13:54 stefano Exp $
  */
 
 #include <stdio.h>
@@ -81,19 +81,19 @@ int main(int argc, char *argv[])
 	writebyte(0,fpout);	 /* Filetype (Basic) */
 	writestring("REM line  ",fpout);
 	writeword(6+len,fpout);	 /* length */
-	writeword(0x8000,fpout); /* line for auto-start */
+	writeword(0x802E,fpout); /* line for auto-start */
 	writeword(6+len,fpout);	 /* length (?) */
 	writebyte(parity,fpout);
 
 
-/* Write out the BASIC loader program */
+/* Write out the BASIC program */
 	writeword(8+len,fpout);	/* block lenght */
 
 	parity=0;
 	writebyte(255,fpout);		/* Data... */
 	writebyte(bline/256,fpout);	/* MSB of BASIC line number */
 	writebyte(bline%256,fpout);	/* MSB of BASIC line number */
-	writeword(26,fpout);		/* BASIC line length */
+	writeword(2+len,fpout);		/* BASIC line length */
 	writebyte(0xEA,fpout);		/* REM */
 
 /* BIN stuff */
