@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.20 2003-03-13 16:34:24 dom Exp $
+ *      $Id: zcc.c,v 1.21 2003-08-30 17:53:36 dom Exp $
  */
 
 
@@ -188,6 +188,7 @@ void SetRelocate(char *);
 int CopyFile(char *,char *, char *, char *);
 void tempname(char *);
 int FindConfigFile(char *, int);
+void parse_option(char *option);
 
 /* Mode Options, used for parsing arguments */
 
@@ -227,28 +228,28 @@ struct args myargs[]= {
 
 
 struct confs myconf[]={
-        {"OPTIONS",SetOptions,0},
-        {"Z80EXE",SetNormal,0},
-        {"CPP",SetNormal,0},
-        {"LINKER",SetNormal,0},
-        {"COMPILER",SetNormal,0},
-        {"COPTEXE",SetNormal,0},
-        {"COPYCMD",SetNormal,0},
-        {"INCPATH",SetNormal,0},
-        {"COPTRULES1",SetNormal,0},
-        {"COPTRULES2",SetNormal,0},
-	{"COPTRULES3",SetNormal,0},
-        {"CRT0",SetNormal,0},
-        {"LIBPATH",SetNormal,0},
-        {"LINKOPTS",SetOptions,0},
-        {"ASMOPTS",SetOptions,0},
-        {"APPMAKE",SetNormal,0},
-        {"Z88MATHLIB",SetNormal,0},
-        {"Z88MATHFLG",SetNormal,0},
-        {"STARTUPLIB",SetNormal,0},
-        {"GENMATHLIB",SetNormal,0},
-	{"STYLECPP",SetNumber,0},
-        {"",0,0}
+        {"OPTIONS",SetOptions,NULL},
+        {"Z80EXE",SetNormal,NULL},
+        {"CPP",SetNormal,NULL},
+        {"LINKER",SetNormal,NULL},
+        {"COMPILER",SetNormal,NULL},
+        {"COPTEXE",SetNormal,NULL},
+        {"COPYCMD",SetNormal,NULL},
+        {"INCPATH",SetNormal,NULL},
+        {"COPTRULES1",SetNormal,NULL},
+        {"COPTRULES2",SetNormal,NULL},
+	{"COPTRULES3",SetNormal,NULL},
+        {"CRT0",SetNormal,NULL},
+        {"LIBPATH",SetNormal,NULL},
+        {"LINKOPTS",SetOptions,NULL},
+        {"ASMOPTS",SetOptions,NULL},
+        {"APPMAKE",SetNormal,NULL},
+        {"Z88MATHLIB",SetNormal,NULL},
+        {"Z88MATHFLG",SetNormal,NULL},
+        {"STARTUPLIB",SetNormal,NULL},
+        {"GENMATHLIB",SetNormal,NULL},
+	{"STYLECPP",SetNumber,NULL},
+        {"",NULL,NULL}
 };
 
 /*
@@ -568,29 +569,12 @@ int main(argc, argv)
  * That's dealt with the options, so onto real stuff now!
  */
 
-/* Now, parse the default options list */
-        if ( myconf[OPTIONS].def != 0 ) {
-/* Now, pain up the arse time, we have to go round, chasing up every space
- * in myconf[OPTIONS].def to turn it into a \0 so that ParseArgs 
- * understands what we're on about...hmmmm
- *
- * First of all, scan forward to first non space character.
- */
-                temp2=myconf[OPTIONS].def;
-                while ( isspace(*temp2) ) temp2++;
+	/* Parse the native math library flags */
+	parse_option(myconf[Z88MATHFLG].def);
 
-                while ( (temp=strchr(temp2,' ')) != NULL ) {
-                        *temp='\0';      /* Truncate string */
-                        if (temp2[0]=='-') ParseArgs(&temp2[1]);
-                        else AddToFileList(temp2);
-                        temp2=temp+1;
-                }
-/* If we're here, we have at least one option left...so do it! first of
- * all, get rid of that pesky line feed character
- */
-                temp2[strlen(temp2)-1]='\0';
-                if (temp2[0]=='-') ParseArgs(&temp2[1]);
-                else AddToFileList(temp2);
+        /* Now, parse the default options list */
+        if ( myconf[OPTIONS].def != NULL ) {
+	    parse_option(myconf[OPTIONS].def);
         }
 
 /* Parse the argument list */
@@ -939,7 +923,6 @@ void AddLink(char *arg)
  * this way we can be as generic as possible
  */
         if (strcmp(arg,"lmz")==0) {
-		AddComp(myconf[Z88MATHFLG].def+1); 
 			snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[Z88MATHLIB].def);
 			BuildOptions_start(&linkargs,buffer);
 		return;
@@ -1530,3 +1513,21 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...)
 	return num_chars;
 }
 #endif
+
+
+/* Parse options - rewritten to use strtok cos that's nice and easy */
+void parse_option(char *option)
+{
+    char   *ptr;
+
+    ptr = strtok(option," \r\n");
+
+    while ( ptr != NULL ) {
+	if ( ptr[0] == '-' ) {
+	    ParseArgs(ptr+1);
+	} else {
+	    AddToFileList(ptr);
+	}
+	ptr = strtok(NULL," \r\n");
+    }
+}
