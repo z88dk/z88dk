@@ -112,7 +112,7 @@
  *	and made the + operator a tad more useful in specifying machines
  *	within that directory
  *
- *      $Id: zcc.c,v 1.1 2000-07-04 15:33:32 dom Exp $
+ *      $Id: zcc.c,v 1.2 2001-01-02 11:28:00 dom Exp $
  */
 
 
@@ -129,6 +129,7 @@
 void ParseArgs(char *);
 void AddComp(char *);
 void AddPreProc(char *);
+void AddToPreProc(char *);
 void AddLink(char *);
 void DispInfo(void);
 void DispVer(char *);
@@ -193,6 +194,7 @@ struct args myargs[]= {
         {"create-app",NO,SetCreateApp},
         {"usetemp",NO,SetTemp},
         {"notemp",NO,UnSetTemp},
+	{"Cp",YES,AddToPreProc},
         {"E",NO,SetPreProcessOnly},
         {"R",NO,SetRelocate},
         {"D",YES,AddPreProc},
@@ -857,6 +859,11 @@ void SetPreProcessOnly(char *arg)
 void SetZ80Verb(char *arg)
 {
         z80verbose=YES;
+}
+
+void AddToPreProc(char *arg)
+{
+	BuildOptions(&cpparg,arg+2);
 }
 
 void AddPreProc(char *arg)

@@ -1,4 +1,4 @@
-;       Stub for the TI 86 calculator
+;       Stub for the TI 85 calculator
 ;
 ;       Stefano Bodrato - Dec 2000
 ;
@@ -50,32 +50,8 @@
 
 ; Now, getting to the real stuff now!
 
-	org	$801F	; "Large asm block". To be loaded with "LASM"
-	; You need LASM 0.8 Beta by Patrick Wong for this (www.ticalc.org)
-	; - First wipe TI86 RAM (InstLASM is simply a memory cleaner)
-	; - Load LargeLd
-	; - Load you compiled and converted .86p code
-	; - run asm(LargeLd
-	; It will run you program. Loading order is important.
-	
-	ret ; this line must be commented if standard asm() call is used instead.
-        
-        ;org     $D748	; TI 86 standard asm() entry point.
+	org	$8C3C	; TI 85
 
-;zap2000 format
-; nop
-; jp start
-; .dw Description
-; .dw Icon
-;.start
-
-   nop		;Identifies the table
-   jp	start
-   defw	1	;Version # of Table. Release 0 has no icon (Title only)
-   defw	title	;Absolute pointer to program description
-   defw	icon	;pointer to icon
-
-.start
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
@@ -163,26 +139,11 @@ ENDIF
 
 ; mem stuff
 
-.base_graphics
-		defw	$FC00	;TI86
+.base_graphics	defw	$8641	;TI85
 .coords		defw	0
 .cpygraph	ret
 
-
-.title
-         defm  "Small C+ compiled program"&0
- 
-.icon
- defb @0000000    ;icon (some shell could like it)
- defb @0011000
- defb @0100010
- defb @0100111
- defb @0100010
- defb @0011000
- defb @0000000
-
- defb @00000000	; These two bytes probably aren't necessary;
- defb 255	; TI83 shells use them, so I'm leaving both here for now.
+         defm  "Small C+ TI85"&0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library
@@ -208,4 +169,3 @@ IF NEED_floatpack
 .fasign         defb    0
 
 ENDIF
-

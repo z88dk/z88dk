@@ -178,5 +178,5 @@
 
 
 .font
-        BINARY  "FONT5.BIN"
+        BINARY  "stdio/ansi/spectrum/FONT5.BIN"
 

@@ -32,9 +32,9 @@ stdio/vfprintf_mini
 stdio/printn
 stdio/puts
 stdio/ungetc
-stdio/spectrum/fabandon
+stdio/fabandon
 stdio/vz200/fgetc_cons
-stdio/spectrum/fgets_cons
+stdio/fgets_cons
 stdio/vz200/getk
 stdio/spectrum/puts_cons
 stdio/ansi/f_ansi

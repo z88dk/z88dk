@@ -85,7 +85,7 @@ int fgetc(FILE *fp)
 	ld	l,(ix+fp_desc)
 	ld	h,(ix+fp_desc+1)
 	push	ix
-;	push	hl		;don't think this push/pop is needed
+;	push	hl		;dont think this push/pop is needed
 	call	readbyte	;readbyte sorts out stack (fastcall)
 ;	pop	bc		;dump handle
 	pop	ix		;get fp back

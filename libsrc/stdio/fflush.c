@@ -36,8 +36,8 @@ int fflush(FILE *fp)
 	pop	bc
 #else
 	ld	hl,0
-#endasm
 #endif
+#endasm
 #else
 #ifdef NET_STDIO
 	if	(fp->flags&(_IOUSE|_IONETWORK) == _IOUSE|_IONETWORK ) {

@@ -29,6 +29,13 @@ Amiga: ixemul v47+ required..
 
 Brief guide to what has changed in case I don't distribute the doco
 
+z88dkv1.32 (sccz80v1.10b71) 2.1.2001
+
+- [sccz80] No change!
+- [zcc] Add -Cp flag to pass through to frontend (for GNU cpp purposes)
+- [libs] Added Stefano's TI calc support routines
+- [libs] Fixed things so that compilation is possible
+
 z88dkv1.31 (sccz80v1.10b71) 3.7.2000
 
 - [sccz80] __SHARED__ no longer implies __LIB__

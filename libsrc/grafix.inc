@@ -20,15 +20,31 @@ IF FORz88
 
 	defc	maxy 	= 64
 
-IF !APPZ88
+  IF !APPZ88
         defc    map_seg = 192
         defc    map_bk  = $4D3
-ELSE
+  ELSE
         defc    map_seg = 64     
         defc    map_bk = $4D1
+  ENDIF
+
 ENDIF
 
+IF FORti82
+	defc	maxy = 64
+ENDIF
 
+IF FORti83
+	defc	maxy = 64
+ENDIF
+
+IF FORti86
+	defc	maxy = 64
+ENDIF
+
+IF FORzx81
+	defc	maxx = 64
+	defc	maxy = 48
 ENDIF
 
 
