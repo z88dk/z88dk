@@ -130,6 +130,68 @@ ELSE
 	ENDIF
 ENDIF
 
+; Some +3 stuff - this needs to be below 49152
+IF DEFINED_NEEDplus3dodos
+; 	Routine to call +3DOS Routines. Located in startup
+;	code to ensure we don't get paged out
+;	(These routines have to be below 49152)
+;	djm 17/3/2000 (after the manual!)
+	XDEF	dodos
+.dodos
+	call	dodos2		;dummy routine to restore iy afterwards
+	ld	iy,23610
+	ret
+.dodos2
+	push	af
+	push	bc
+	ld	a,7
+	ld	bc,32765
+	di
+	ld	(23388),a
+	out	(c),a
+	ei
+	pop	bc
+	pop	af
+	call	cjumpiy
+	push	af
+	push	bc
+	ld	a,16
+	ld	bc,32765
+	di
+	ld	(23388),a
+	out	(c),a
+	ei
+	pop	bc
+	pop	af
+	ret
+.cjumpiy
+	jp	(iy)
+ENDIF
+
+IF 0
+;	Short routine to set up a +3 DOS header so files
+;	Can be accessed from BASIC, we set to type code
+;	load address 0 and length supplied
+;
+;	Entry:	b = file handle
+;	       hl = file length
+
+.setheader
+	ld	iy,setheader_r
+	call	dodos
+	ret
+.setheader_r
+	push	hl
+	call	271	;DOS_RED_HEAD
+	pop	hl
+	ld	(ix+0),3	;CODE
+	ld	(ix+1),l	;Length
+	ld	(ix+2),h
+	ld	(ix+3),0	;Load address
+	ld	(ix+4),0
+	ret
+ENDIF
+
 
 ;Seed for integer rand() routines
 

@@ -10,10 +10,17 @@
  */
 
 
-int writebyte(int handle)
+int writebyte(int handle, int byte)
 {
 #asm
 	XREF	dodos
+	pop	bc
+	pop	hl	;byte
+	pop	de	;handle
+	push	de
+	push	hl
+	push	bc
+	ld	c,l	;byte
 	ld	b,e	;file handle
 	ld	iy,283	;DOS_BYTE_WRITE
 	push	bc	;keep byte

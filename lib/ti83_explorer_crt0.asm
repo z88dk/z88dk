@@ -1,6 +1,7 @@
-;       Stub for the TI 82 calculator
+;       Stub for the TI 83 calculator
 ;
 ;       Stefano Bodrato - Dec 2000
+;	Feb 2000 - Speeded up the cpygraph
 ;
 
 
@@ -50,19 +51,21 @@
 
 ; Now, getting to the real stuff now!
 
-        org     $9104	; TI 82. Same for ASH and CrASH
+	org	$9327	; TI 83
 
-	;jr	start
-	
-        defm  	"C+ compiled program"&0
 
+	nop
+	jr start
+	defw 0		; pointer to libs, 0000 if no libs used
+	defw description	; pointer to a description
+	defw icon	; pointer to an 8x8 icon	
 .start
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,hl
+;        ld      hl,-64
+;        add     hl,sp
+;        ld      sp,hl
         ld      (exitsp),sp
 
 IF !DEFINED_nostreams
@@ -144,14 +147,39 @@ ENDIF
 
 ; mem stuff
 
-.base_graphics
-		defw	$88B8	;TI82
+.base_graphics	defw	$8E29	;TI83
 .coords		defw	0
-.cpygraph	
-		;jp	$38C6	; ROM handler
-		jp	$8D94	; CrAsh handler
+.cpygraph	;jp	$5164	; TI83 ROM CALL (commented out!)
+		
+; Fastcopy code...
 
-         defm  "Small C+ TI82"&0
+	di			; 4
+	ld	a,$80		; 7
+	out	($10),a		; 11
+	ld	hl,$8E29-12-(-(12*64)+1)	; 10
+	ld	a,$20		; 7
+	ld	c,a		; 4	; 43
+.fastCopyAgain
+	ld	b,64		; 7
+	inc	c		; 4
+	ld	de,-(12*64)+1	; 10
+	out	($10),a		; 11
+	add	hl,de		; 11
+	ld	de,11		; 10
+.fastCopyLoop
+	add	hl,de		; 11
+	inc	hl		; 6
+	ret	c		; 5	; do nothing instruction (was nop (4 clocks))
+	ld	a,(hl)		; 7
+	out	($11),a		; 11
+	djnz	fastCopyLoop	; 13/8	; 3392
+	ld	a,c		; 4
+	cp	$2B+1		; 7
+	jr	nz,fastCopyAgain; 12/7	; 52	; 41773 (used to be 41136)
+	ei
+	ret	; 11	; 18				; 41773 clocks total
+							; 37 bytes total
+
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library
@@ -178,3 +206,19 @@ IF NEED_floatpack
 
 ENDIF
 
+
+;   TI83 shells Stuff
+;
+.description
+         defm  "Small C+ compiled program"&0
+ 
+.icon
+ defb @00000000    ;icon (some shell could like it)
+ defb @00110010
+ defb @01000111
+ defb @01000010
+ defb @01000000
+ defb @00110000
+ defb @00000000
+ defb @00000000
+ defb 255

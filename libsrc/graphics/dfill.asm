@@ -4,8 +4,7 @@
 ;	Ported by Stefano Bodrato
 ;
 ;	Feb 2000 - Platform dependent stack usage
-;	           Stack is a little undersized, but will work if we don't fill
-;	           a clean screen starting from the center.
+;		   Stack usage = maxy*8 (512 bytes for the Z88)
 ;
 
 	INCLUDE	"grafix.inc"
@@ -14,26 +13,26 @@
         LIB	pixeladdress
 	LIB	plotpixel
 
-.fflag	defb	0
+.spsave	defw 0
 
 ;ix points to the table on stack (above)
 
 ;Entry:
 ;       d=x0 e=y0
 
-.do_fill
 
-        ld      hl,-(maxy*4)	; create buffer 1 on stack
-        add     hl,sp		; Massimo said: in the worst of cases a buffer 
-        ld      sp,hl		; should be 1456 bytes for the Spectrum display.
-        push	hl		; It depends on the display height.
+.do_fill
+        ld      hl,-maxy*3	; create buffer 1 on stack
+        add     hl,sp		; The stack size depends on the display height.
+        ld      sp,hl		; The worst case is when we paint a blank 
+        push	hl		; display starting from the center.
         pop	ix
         ld	(hl),d
         inc	hl
         ld	(hl),e
         inc	hl
         ld	(hl),255
-        ld      hl,-(maxy*4)	; create buffer 2 on stack
+        ld      hl,-maxy*3	; create buffer 2 on stack
         add     hl,sp
         ld      sp,hl
 .loop	push	ix
@@ -41,16 +40,22 @@
         call	cfill
 	pop	ix
 	pop	hl
-	ld	a,(fflag)
-	or	a
+
+	ex	af,af	; Restore the Z flag
+	push	af
+	ex	af,af
+	pop	af
+
 	jr	nz,loop
-        ld      hl,(maxy*4)*2	; restore the stack pointer
+        ld      hl,maxy*6	; restore the stack pointer (parm*2)
         add     hl,sp
         ld      sp,hl
         ret
 
-.cfill	xor	a
-	ld	(fflag),a
+.cfill	
+	sub	a,a	; Reset the Z flag
+	ex	af,af	; and save it
+
 .next	ld	a,(ix+0)
 	cp	255		; stopper ?
 	ret	z		; return
@@ -58,23 +63,42 @@
 	ld	c,(ix+1)
 
 	push	bc
+	
+	or	a
+	jr	z,l1
+	
 	dec	b
 	call	doplot
 	pop	bc
 	push	bc
 
 .l1	
+	ld	a,b
+	
+	cp	maxy-1
+	jr	z,l2
+	
 	inc	b
 	call	doplot
 	pop	bc
 	push	bc
 
 .l2	
+
+	ld	a,c
+	or	a
+	jr	z,l3
+
 	dec	c
 	call	doplot
 
 .l3	
 	pop	bc
+
+	ld	a,c
+	cp	maxx-1
+	jr	z,l4
+
 	inc	c
 	call	doplot
 
@@ -87,19 +111,12 @@
 	push	bc
 	ld	(hl),255
 
-; Original Pixel-Address Spectrum call...
-;	ex	de,hl
-;	call	$22B1
-;	ex	de,hl
-
-; ...changed in:  - - - - - - -
 	push	hl
 	ld	l,b
 	ld	h,c
-	call	pixeladdress
+	call	pixeladdress	; bc must be saved by pixeladdress !
 	pop	hl
 	xor	7
-; - - - - - - - - - - - - - - -
 
 	ld	b,a
 	inc	b
@@ -121,7 +138,7 @@
 
 	ld	b,a
 	ld	a,(de)
-	or	b
+	or	b	; Z flag set...
 	ld	(de),a
 
 	pop	bc
@@ -130,7 +147,11 @@
 	ld	(hl),c
 	inc	hl
 	ld	(hl),255
-	ld	(fflag),a
+	
+	;exx
+	;ld	b,a
+	;exx
+	ex	af,af	; Save the Z flag
 	
 	xor	a
 

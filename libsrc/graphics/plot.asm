@@ -16,6 +16,7 @@
 
                 XLIB    plot
                 LIB     swapgfxbk
+                LIB     swapgfxbk1
 
                 LIB     plotpixel
 
@@ -28,5 +29,5 @@
 		ld	h,(ix+4)
                 call    swapgfxbk
                 call    plotpixel
-                jp      swapgfxbk
+                jp      swapgfxbk1
 

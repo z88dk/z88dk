@@ -1,6 +1,7 @@
 ;       Stub for the TI 83+ calculator
 ;
 ;       Stefano Bodrato - Dec 2000
+;	Feb 2000 - Speeded up the cpygraph
 ;
 
 
@@ -61,9 +62,9 @@
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
-;        ld      hl,-64
-;        add     hl,sp
-;        ld      sp,hl
+        ld      hl,-64
+        add     hl,sp
+        ld      sp,hl
         ld      (exitsp),sp
 
 IF !DEFINED_nostreams
@@ -147,8 +148,12 @@ ENDIF
 
 .base_graphics	defw	$9340	;TI83+
 .coords		defw	0
-.cpygraph	call	$50	;ION bjump call
-		defw	$486A
+.cpygraph	;call	$50	;ION bjump call
+		;defw	$486A
+
+		call	$966e+80+15 ; ION FastCopy call
+		ei
+		ret
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

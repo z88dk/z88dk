@@ -79,9 +79,9 @@
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
-;        ld      hl,-64
-;        add     hl,sp
-;        ld      sp,hl
+        ld      hl,-64
+        add     hl,sp
+        ld      sp,hl
         ld      (exitsp),sp
 
 IF !DEFINED_nostreams

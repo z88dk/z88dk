@@ -114,7 +114,7 @@ graphics/clg
 graphics/clga
 graphics/clrarea
 graphics/clsgraph
-graphics/dcircle
+graphics/dcircle2
 graphics/draw
 graphics/drawb
 graphics/drawr
@@ -137,6 +137,8 @@ graphics/undrawr
 graphics/unplot
 graphics/drawbox
 graphics/setxy
+graphics/fill
+graphics/dfill
 graphics/ticalc/putsprite
 graphics/ticalc/bksave
 graphics/ticalc/bkrestore

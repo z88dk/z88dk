@@ -17,7 +17,7 @@
 
 .pixeladdress
 
-		push	hl
+		push	bc
 		ld	a,h
 		
 		push	af
@@ -30,23 +30,46 @@
 		
 		;ld	b,l
 		ld	h,0
+
+; TI 82, 83 and 83+ screens are 12 bytes wide
+
+IF FORti82
 		ld	d,h
 		ld	e,l
 		add	hl,de
 		add	hl,de
+ENDIF
 
-; TI 85 and TI86 screens are 16 bytes wide
-IF FORti85
+IF FORti83
+		ld	d,h
+		ld	e,l
+		add	hl,de
 		add	hl,de
 ENDIF
-IF FORti86
+
+IF FORti83p
+		ld	d,h
+		ld	e,l
 		add	hl,de
+		add	hl,de
+ENDIF
+
+
+; TI 85 and TI86 screens are 16 bytes wide
+
+IF FORti85
+		add	hl,hl
+		add	hl,hl
+ENDIF
+
+IF FORti86
+		add	hl,hl
+		add	hl,hl
 ENDIF
 
 		add	hl,hl
 		add	hl,hl
 		
-		;ld	hl,(base_graphics)
 		ld	de,(base_graphics)
 		add	hl,de
 		
@@ -57,7 +80,7 @@ ENDIF
 		ld	d,h
 		ld	e,l
 		pop	af
-		pop	hl
+		pop	bc
 		
 		and	@00000111		; a = x mod 8
 		xor	@00000111		; a = 7 - a

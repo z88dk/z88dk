@@ -9,11 +9,13 @@
  */
 
 
-int readbyte(int handle)
+int __FASTCALL__ readbyte(int handle)
 {
 #asm
 	XREF	dodos
-	ld	b,e	;file handle
+	pop	bc	;for FASTCALL parameter is pushed on entry
+	push	bc
+	ld	b,c	;file handle
 	ld	iy,280	;DOS_BYTE_READ
 	call	dodos
 	ld	hl,-1	;EOF

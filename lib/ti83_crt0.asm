@@ -51,20 +51,18 @@
 ; Now, getting to the real stuff now!
 
 	org	$9327	; TI 83
+	ret
+	jr	nc,start ; ION identifier
 
+	defm  "C+ compiled program"&0
 
-	nop
-	jr start
-	defw 0		; pointer to libs, 0000 if no libs used
-	defw description	; pointer to a description
-	defw icon	; pointer to an 8x8 icon	
 .start
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
-;        ld      hl,-64
-;        add     hl,sp
-;        ld      sp,hl
+        ld      hl,-64
+        add     hl,sp
+        ld      sp,hl
         ld      (exitsp),sp
 
 IF !DEFINED_nostreams
@@ -148,7 +146,11 @@ ENDIF
 
 .base_graphics	defw	$8E29	;TI83
 .coords		defw	0
-.cpygraph	jp	$5164
+.cpygraph	;jp	$4B9C
+		call	$9157+80+15 ; ION FastCopy call
+		;ei
+		ret
+
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library
@@ -174,20 +176,3 @@ IF NEED_floatpack
 .fasign         defb    0
 
 ENDIF
-
-
-;   TI83 shells Stuff
-;
-.description
-         defm  "Small C+ compiled program"&0
- 
-.icon
- defb @00000000    ;icon (some shell could like it)
- defb @00110000
- defb @01000100
- defb @01001110
- defb @01000100
- defb @00110000
- defb @00000000
- defb @00000000
- defb 255

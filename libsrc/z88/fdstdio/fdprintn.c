@@ -8,7 +8,7 @@
  *      Added to z88dk archive 11/4/99 djm
  */
 
-#define FDSTDIO
+#define FDSTDIO 
 #include <stdio.h>
 
 unsigned char dig[]= "0123456789ABCDEF";

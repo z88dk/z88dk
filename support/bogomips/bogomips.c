@@ -54,7 +54,7 @@ static void delay(long loops)
  */
 
 #ifdef Z80_DELAY
-static void delay(int loops)
+static void delay(long loops)
 {
 #asm
 .del_loop
@@ -74,6 +74,8 @@ main(void)
 {
   unsigned long loops_per_sec = 1;
   unsigned long ticks;
+  unsigned long bogo;
+  unsigned long sub;
   
   printf("Calibrating delay loop.. ");
   fflush(stdout);
@@ -84,22 +86,14 @@ main(void)
     ticks = clock() - ticks;
     if (ticks >= CLOCKS_PER_SEC) {
       loops_per_sec = (loops_per_sec / ticks) * CLOCKS_PER_SEC;
-      /* Fiddled with a bit here..values look about right! */
-      if (loops_per_sec> 500000) {
-	        printf("ok - %lu.%02lu BogoMips\n",
-	                 loops_per_sec/500000,
-	                (loops_per_sec/5000) % 100
-	              );
-      } else if (loops_per_sec > 50000) {
-	        printf("ok - 0.%lu BogoMips\n",
-	                (loops_per_sec/5000) % 100
-	              );
-      } else {
-                printf("ok - 0.%lu%lu BogoMips\n",
-	               (loops_per_sec/50000)%10,
-	               (loops_per_sec/50)
-	              );
-      }
+      bogo = loops_per_sec/500000L;
+      sub = loops_per_sec/5000L;
+      sub %=100;
+      printf("ok - %lu.%s%lu BogoMips\n",
+			bogo,
+			(sub<10)?"0":"",
+			sub
+		);
       printf("loops_per_sec=%lu\n",loops_per_sec);
       return 0;
     }
