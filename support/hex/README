@@ -1,0 +1,7 @@
+Hex support routines
+
+
+ihex.c	- This simple program converts a binary file into an Intel Hex record for use with
+	  certain simulator boards.
+
+	  Usage:  ihex [.bin file] [org, defaults to 0 if not specified]
