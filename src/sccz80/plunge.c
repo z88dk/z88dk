@@ -3,7 +3,7 @@
  *
  *      Plunging routines
  *
- *      $Id: plunge.c,v 1.5 2002-04-17 21:14:27 dom Exp $
+ *      $Id: plunge.c,v 1.6 2002-04-21 17:22:08 dom Exp $
  *
  *      Altogether now...arse! My cunning scheme to use c as an
  *      indicator flops badly due to logical conditions, I just
@@ -46,7 +46,7 @@ LVALUE *lval ;
                         postlabel(droplab);
                         vconst(dropval);
                         postlabel(endlab) ;
-                        lval->val_type = CINT;  /* stops the carry stuff coming in */
+			lval->val_type = lval->oldval_type = CINT;  /* stops the carry stuff coming in */
                         lval->indirect = lval->ptr_type = lval->is_const =
                                 lval->const_val = 0 ;
                         lval->stage_add = NULL_CHAR ;
@@ -66,6 +66,7 @@ void (*testfuncz)();
 void (*testfuncq)();
 LVALUE *lval ;
 {
+    int temp;
         if ( k )
                 rvalue(lval) ;
         else if ( lval->is_const ) {
@@ -73,7 +74,9 @@ LVALUE *lval ;
                 else vconst(lval->const_val) ;
         }
         if (DoTestJump(lval) || lval->binop==dummy ) {
-		if (lval->binop==dummy) lval->val_type=CINT;
+		if (lval->binop==dummy) {
+		    lval->val_type=CINT;
+		}
                 (*testfuncz)(lval,exit1);       /* test zero jump */
 	} else {
                 (*testfuncq)(exit1);            /* carry jump */

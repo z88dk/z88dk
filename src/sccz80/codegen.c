@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.16 2002-04-17 21:14:27 dom Exp $
+ *      $Id: codegen.c,v 1.17 2002-04-21 17:22:08 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -820,11 +820,16 @@ void setcond(int val)
 /* Test the primary register and jump if false to label */
 void testjump(LVALUE *lval,int label)
 {
-        ol("ld\ta,h");
-        ol("or\tl");
-        if (lval->oldval_type == LONG && WasComp(lval) ) { ol("or\td"); ol("or\te"); }
-        if (lval->oldval_type == CPTR && WasComp(lval) ) { ol("or\te"); }
-        opjump("z,",label);
+    int type;
+    ol("ld\ta,h");
+    ol("or\tl");
+    type = lval->oldval_type;
+    if ( lval->binop == NULL )
+	type = lval->val_type;
+
+    if ( type == LONG && WasComp(lval) ) { ol("or\td"); ol("or\te"); }
+    if ( type == CPTR && WasComp(lval) ) { ol("or\te"); }
+    opjump("z,",label);
 }
 
 /* test primary register against zero and jump if false */

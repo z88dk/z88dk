@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.14 2002-04-17 21:14:27 dom Exp $
+ *      $Id: primary.c,v 1.15 2002-04-21 17:22:08 dom Exp $
  */
 
 
@@ -636,7 +636,7 @@ void test(int label,int parens)
         else 
         {
                 if ( lval.binop==dummy || DoTestJump(&lval)) {
-			if (lval.binop == dummy) lval.val_type=CINT; /* logical always int */
+			if (lval.binop == dummy) lval.val_type=CINT; /* logical always int */			
                         testjump(&lval,label);
 		} else {
                         jumpnc(label);
