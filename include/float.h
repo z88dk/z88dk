@@ -16,6 +16,12 @@ extern double __LIB__ ceil(double);
 extern double __LIB__ fprand(void); /* Generic only */
 extern int __LIB__ fpseed(double);    /* Seed random number */
 
+#ifndef _HAVE_ATOF_
+#define _HAVE_ATOF_
+extern double __LIB__ atof(char *);
+#endif
+
+
 /*
  * Some support routines for floating point printf
  */

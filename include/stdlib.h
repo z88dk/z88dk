@@ -23,6 +23,11 @@ extern int __LIB__ atoi(char *);
 
 #define atol(s) strtol((s),(char **)NULL,10)
 
+#ifndef _HAVE_ATOF_
+#define _HAVE_ATOF_
+extern double __LIB__ atof(char *);
+#endif
+
 
 /* random number things */
 

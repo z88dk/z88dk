@@ -19,5 +19,10 @@ extern double __LIB__ sqrt(double);  /* square root */
 extern double __LIB__ tan(double);   /* tangent */
 extern double __LIB__ tanh(double);  /* hyperbolic tangent */
 
+#ifndef _HAVE_ATOF_
+#define _HAVE_ATOF_
+extern double __LIB__ atof(char *);
+#endif
+
 
 #endif /* _MATH_H */
