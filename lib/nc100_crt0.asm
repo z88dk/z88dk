@@ -9,7 +9,7 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: n100_crt0.asm,v 1.2 2001-04-12 13:26:13 stefano Exp $
+;       $Id: nc100_crt0.asm,v 1.1 2001-05-04 14:38:05 dom Exp $
 ;
 
 
