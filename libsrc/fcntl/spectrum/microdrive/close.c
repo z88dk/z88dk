@@ -5,7 +5,7 @@
  *	int close(int handle)
  *	closes file and frees memory
  *
- *	$Id: close.c,v 1.1 2005-02-18 08:35:53 stefano Exp $
+ *	$Id: close.c,v 1.2 2005-03-01 17:50:36 stefano Exp $
  */
 
 #include <fcntl.h>

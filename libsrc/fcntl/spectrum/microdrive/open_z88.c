@@ -1,7 +1,7 @@
 /*
  *	Took "as is" fron the Dominic's files
  *
- *	$Id: open_z88.c,v 1.1 2005-02-18 08:35:53 stefano Exp $
+ *	$Id: open_z88.c,v 1.2 2005-03-01 17:50:36 stefano Exp $
  */
 
 #include <fcntl.h>

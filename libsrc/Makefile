@@ -4,18 +4,20 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.67 2003-09-16 09:21:28 dom Exp $
+# $Id: Makefile,v 1.68 2005-03-01 17:50:35 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
+	debug.lib \
 	nc_clib.lib vz_clib.lib vzansi_clib.lib abc80_clib.lib \
 	aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
-	cpc_clib.lib cpcfs.lib cpc_math.lib cpm_clib.lib c128ansi_clib.lib \
+	cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib cpcgray.lib \
+	cpm_clib.lib c128ansi_clib.lib \
 	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib nasansi_clib.lib ozansi_clib.lib\
 	rex_clib.lib svi_clib.lib sam_clib.lib samansi_clib.lib \
-	zx81_clib.lib zx81ansi_clib.lib \
-	pps_clib.lib ppsansi_clib.lib embedded_clib.lib 
+	pps_clib.lib ppsansi_clib.lib embedded_clib.lib \
+	zx81_clib.lib zx81ansi_clib.lib 
 
 genlibs: gen_math.lib malloc.lib z80_crt0.lib ndos.lib
 
@@ -77,6 +79,13 @@ z80_crt0.lib:
 	@echo '--- Building Z80 crt0 Library  ---'
 	@echo ''
 	cd z80_crt0s ; $(MAKE)
+
+# Z88DK DEBUG utilities
+debug.lib:
+	@echo ''
+	@echo '--- Building DEBUG Library  ---'
+	@echo ''
+	cd debug ; $(MAKE)
 
 # Custom z88 routines for application - dom
 z88.lib:
@@ -183,7 +192,6 @@ zx_mathtiny.lib:
 	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
 	@echo ''
 	cd zxmath ; $(MAKE) zx_mathtiny
-
 
 # vt100 for sprinter - dom
 ppsansi_clib.lib:
@@ -333,7 +341,7 @@ ti82ansi_clib.lib:
 	cd assert ; $(MAKE) 
 	./gamesdeps.sh
 	cd games ; $(MAKE)
-	z80asm -IXIY -d -ns -nm -Mo -DFORti82 -DPACKEDFONT -xti82ansi_clib @ticansi.lst
+	z80asm -d -ns -nm -Mo -DFORti82 -DPACKEDFONT -xti82ansi_clib @ticansi.lst
 
 ti82_clib.lib:
 	@echo ''
@@ -709,7 +717,7 @@ nascom_clib.lib:
 
 nasansi_clib.lib:
 	@echo ''
-	@echo '--- Building NASCOM Library  ---'
+	@echo '--- Building NASCOM ANSI Library  ---'
 	@echo ''
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
@@ -744,6 +752,24 @@ cpc_clib.lib:
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
 	z80asm -d -ns -nm -Mo -DFORcpc -xcpc_clib @cpc.lst
+
+cpcansi_clib.lib:
+	@echo ''
+	@echo '--- Building Amstrad CPC ANSI Library  ---'
+	@echo ''
+	cd strings ; $(MAKE)
+	cd stdlib ; $(MAKE) gen
+	cd stdio ; $(MAKE) generic
+	cd printflike ; $(MAKE) 
+	cd setjmp ; $(MAKE) 
+	cd assert ; $(MAKE) 
+	z80asm -d -ns -nm -Mo -DFORcpc -xcpcansi_clib @cpcansi.lst
+
+cpcgray.lib:
+	@echo ''
+	@echo '--- Building CPC Pseudo Grey Library  ---'
+	@echo ''
+	z80asm -d -ns -nm -Mo -DFORcpc -xcpcgray @cpcgray.lst
 
 cpcfs.lib:
 	@echo ''

@@ -8,7 +8,7 @@
  *
  *	Enter with de = filehandle
  *
- *	$Id: readbyte.c,v 1.1 2005-02-18 08:35:53 stefano Exp $
+ *	$Id: readbyte.c,v 1.2 2005-03-01 17:50:37 stefano Exp $
 */
 
 //#include <fcntl.h>

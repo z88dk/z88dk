@@ -4,7 +4,7 @@
  *
  *	Stefano Bodrato - Feb. 2005
  *
- *	$Id: remove.c,v 1.1 2005-02-18 08:35:53 stefano Exp $
+ *	$Id: remove.c,v 1.2 2005-03-01 17:50:37 stefano Exp $
 */
 
 //#include <fcntl.h>

@@ -3,7 +3,7 @@
  *
  *	Stefano Bodrato - Oct. 2004
  *
- *	$Id: rename.c,v 1.2 2005-02-22 12:43:35 stefano Exp $
+ *	$Id: rename.c,v 1.3 2005-03-01 17:50:37 stefano Exp $
  */
 
 #include <stdio.h>
