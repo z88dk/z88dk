@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.10 2002-07-15 15:34:07 dom Exp $
+# $Id: Makefile,v 1.11 2002-10-02 09:38:57 dom Exp $
 #
 
 STDCFILES = \
@@ -57,7 +57,7 @@ net:
 	zcc -vn -DNET_STDIO -make-lib freopen_z88.c
 	zcc -vn -DNET_STDIO -make-lib fflush.c
 	zcc -vn -DNET_STDIO -make-lib fread.c
-	cd zsock ; make
+	cd zsock ; $(MAKE)
 
 cpm:	$(GENCOBJECTS)
 	zcc -vn -D__CPM__ -make-lib fclose.c
