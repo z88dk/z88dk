@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.15 2002-01-02 09:50:47 stefano Exp $
+;	$Id: ti86_crt0.asm,v 1.16 2002-01-09 08:21:38 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -213,7 +213,6 @@ ENDIF
 .start
 IF STDASM | LASM		; asm( executable
 	call	_runindicoff	; stop anoing run-indicator
-	;call	$49CC		; close (hide) menu.
 ENDIF
 
 	ld	hl,0
@@ -253,6 +252,8 @@ IF DEFINED_GRAYlib
 ENDIF
 
 	;im	2
+	call	tidi
+	call	_flushallmenus
 	call	_main
 .cleanup			; exit() jumps to this point
 .start1
@@ -261,25 +262,14 @@ IF DEFINED_GRAYlib
        	ld	a,$3C		; Make sure video mem is active
 	out	(0),a
 ENDIF
-	ld	IY,_Flags	; Restore Flag pointer
-	im	1
-	ei
-.cpygraph
-	ret
-
-;----------------------------------------
-; End of startup part, routines following
-;----------------------------------------
-.l_dcal
-	jp	(hl)
 
 .tiei
+	ld	IY,_Flags
 	exx
 	ld	hl,(hl1save)
 	ld	bc,(bc1save)
 	ld	de,(de1save)
 	exx
-	ld	iy,(iysave)
 IF DEFINED_GRAYlib
 	im	1
 ELSE
@@ -298,14 +288,21 @@ ENDIF
 	ld	(bc1save),bc
 	ld	(de1save),de
 	exx
-	ld	(iysave),iy
 	ret
 
 .hl1save defw	0
 .de1save defw	0
 .bc1save defw	0
-.iysave  defw	0
 
+
+.cpygraph
+	ret
+
+;----------------------------------------
+; End of startup part, routines following
+;----------------------------------------
+.l_dcal
+	jp	(hl)
 
 ; Now, define some values for stdin, stdout, stderr
 IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
