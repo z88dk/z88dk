@@ -12,7 +12,7 @@
 ;
 ;       djm 7/12/98
 ;
-;	$Id: float.asm,v 1.4 2001-10-07 12:53:26 dom Exp $
+;	$Id: float.asm,v 1.5 2002-01-14 10:01:12 dom Exp $
 
 ;-------------------------------------------------
 ; Some scope defintionons for the crt0 float stuff
@@ -103,6 +103,7 @@
         push    bc      ;restore next word
         jp      (hl)    ;return
 
+IF DEFINED_math_atof
 ;---------------------------------------------------------
 ; Convert string to FP number in FA calls the library atof
 ;---------------------------------------------------------
@@ -111,6 +112,7 @@
 	call	atof
 	pop	bc
 	ret
+ENDIF
 
 
 ; * * * * * HOPEFULLY THIS IS THE END OF THE GENERIC
