@@ -8,15 +8,14 @@
 ;Fetch long from (hl)
 
 .l_glong
-        ld      e,(hl)
-        inc     hl
-        ld      d,(hl)
-        inc     hl
         ld      c,(hl)
         inc     hl
         ld      b,(hl)
-        ex      de,hl
-        ld      d,b
-        ld      e,c
+        inc     hl
+        ld      e,(hl)
+        inc     hl
+        ld      d,(hl)
+        ld      h,b
+        ld      l,c
         ret
 
