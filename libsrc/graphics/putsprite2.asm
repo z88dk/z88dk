@@ -3,11 +3,13 @@
 ; original code by Patrick Davidson (TI 85)
 ; modified by Stefano Bodrato - Jan 2001
 ;
+; Sept 2003 - Stefano: Fixed bug for sprites wider than 8.
+;
 ; Much More Generic version
 ; Uses plotpixel, respixel and xorpixel
 ;
 ;
-; $Id: putsprite2.asm,v 1.3 2002-04-17 21:30:24 dom Exp $
+; $Id: putsprite2.asm,v 1.4 2003-09-22 13:30:52 stefano Exp $
 ;
 
 
@@ -47,7 +49,7 @@
 	cp	166	; and(hl) opcode
 	jr	z,doand
 
-	cp	182	; and(hl) opcode
+	cp	182	; or(hl) opcode
 	jr	z,door
 
 	; 182 - or
@@ -59,10 +61,10 @@
 .oloopx	push	bc		;Save # of rows
 	push	af
 
-	ld	b,a		;Load width
+	;ld	b,a		;Load width
+	ld	b,0		; Better, start from zero !!
 
 	ld	c,(ix+2)	;Load one line of image
-	inc	ix
 
 .iloopx	sla	c		;Test leftmost pixel
 	jr	nc,noplotx	;See if a plot is needed
@@ -73,8 +75,8 @@
 	push	hl
 	;push	bc	; this should be done by the called routine
 	push	de
-	add	a,h
-	sub	a,b
+	ld	a,h
+	add	a,b
 	ld	h,a
 	call	xorpixel
 	pop	de
@@ -83,23 +85,39 @@
 
 .noplotx
 
+	inc	b	; witdh counter
+	
 	pop	af
 	push	af
-	sub	b
-	cp	7		; Are we at a byte edge ?
-	jr	nz,noblockx
-	pop	af
-	push	af
-	cp	8
-	jr	z,noblockx	; Wasn't it the last bit ?
-
-	ld	c,(ix+2)	;Load right part of image
+	
+	cp	b		; end of row ?
+	
+	jr	nz,noblkx
+	
 	inc	ix
+	ld	c,(ix+2)	;Load next byte of image
+	
+	jr noblockx
+	
+.noblkx
+	
+	ld	a,b	; next byte in row ?
+	;dec	a
+	and	a
+	jr	z,iloopx
+	and	7
+	
+	jr	nz,iloopx
+	
+.blockx
+	inc	ix
+	ld	c,(ix+2)	;Load next byte of image
+	jr	iloopx
 
 .noblockx
 
-	djnz	iloopx
 	inc	l
+
 	pop	af
 	pop	bc		;Restore data
 	djnz	oloopx
@@ -113,10 +131,10 @@
 .oloopa	push	bc		;Save # of rows
 	push	af
 
-	ld	b,a		;Load width
+	;ld	b,a		;Load width
+	ld	b,0		; Better, start from zero !!
 
 	ld	c,(ix+2)	;Load one line of image
-	inc	ix
 
 .iloopa	sla	c		;Test leftmost pixel
 	jr	nc,noplota	;See if a plot is needed
@@ -127,8 +145,8 @@
 	push	hl
 	;push	bc	; this should be done by the called routine
 	push	de
-	add	a,h
-	sub	a,b
+	ld	a,h
+	add	a,b
 	ld	h,a
 	call	respixel
 	pop	de
@@ -137,22 +155,37 @@
 
 .noplota
 
+	inc	b	; witdh counter
+	
 	pop	af
 	push	af
-	sub	b
-	cp	7		; Are we at a byte edge ?
-	jr	nz,noblocka
-	pop	af
-	push	af
-	cp	8
-	jr	z,noblocka	; Wasn't it the last bit ?
-
-	ld	c,(ix+2)	;Load right part of image
+	
+	cp	b		; end of row ?
+	
+	jr	nz,noblka
+	
 	inc	ix
+	ld	c,(ix+2)	;Load next byte of image
+	
+	jr noblocka
+	
+.noblka
+	
+	ld	a,b	; next byte in row ?
+	;dec	a
+	and	a
+	jr	z,iloopa
+	and	7
+	
+	jr	nz,iloopa
+	
+.blocka
+	inc	ix
+	ld	c,(ix+2)	;Load next byte of image
+	jr	iloopa
 
 .noblocka
 
-	djnz	iloopa
 	inc	l
 	pop	af
         pop	bc		;Restore data
@@ -168,10 +201,10 @@
 .oloopo	push	bc		;Save # of rows
 	push	af
 
-	ld	b,a		;Load width
+	;ld	b,a		;Load width
+	ld	b,0		; Better, start from zero !!
 
 	ld	c,(ix+2)	;Load one line of image
-	inc	ix
 
 .iloopo	sla	c		;Test leftmost pixel
 	jr	nc,noploto	;See if a plot is needed
@@ -182,8 +215,8 @@
 	push	hl
 	;push	bc	; this should be done by the called routine
 	push	de
-	add	a,h
-	sub	a,b
+	ld	a,h
+	add	a,b
 	ld	h,a
 	call	plotpixel
 	pop	de
@@ -192,22 +225,38 @@
 
 .noploto
 
+	inc	b	; witdh counter
+	
 	pop	af
 	push	af
-	sub	b
-	cp	7		; Are we at a byte edge ?
-	jr	nz,noblocko
-	pop	af
-	push	af
-	cp	8
-	jr	z,noblocko	; Wasn't it the last bit ?
-
-	ld	c,(ix+2)	;Load right part of image
+	
+	cp	b		; end of row ?
+	
+	jr	nz,noblko
+	
 	inc	ix
+	ld	c,(ix+2)	;Load next byte of image
+	
+	jr noblocko
+	
+.noblko
+	
+	ld	a,b	; next byte in row ?
+	;dec	a
+	and	a
+	jr	z,iloopo
+	and	7
+	
+	jr	nz,iloopo
+	
+.blocko
+	inc	ix
+	ld	c,(ix+2)	;Load next byte of image
+	jr	iloopo
 
 .noblocko
 
-	djnz	iloopo
+	;djnz	iloopo
 	inc	l
 	pop	af
 	pop	bc		;Restore data
