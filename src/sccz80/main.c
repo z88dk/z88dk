@@ -3,14 +3,17 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.10 2002-02-20 11:11:54 dom Exp $
+ *      $Id: main.c,v 1.9.2.1 2002-02-20 11:35:36 dom Exp $
  */
 
 #include "ccdefs.h"
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
-extern unsigned _stklen=8192U; /* Default stack size 4096 bytes is too small. */
+extern unsigned _stklen=8192U; /* Default stack size 4096 bytes is too
+small. */
 #endif
+
+
 
 
 
