@@ -2,14 +2,31 @@
 # Wahey, a messed up makefile for building libraries!
 #
 
+CFILES = \
+	fprintf.c \
+	fscanf.c \
+	itou.c \
+	ltoa_any.c \
+	printf.c \
+	scanf.c \
+	sprintf.c \
+	sscanf.c \
+	utoi.c \
+	vfprintf_comp.c \
+	vfprintf_fp.c \
+	vfscanf.c \
+	vsprintf.c \
+	vsscanf.c 
+#	itod.c \ 
+#	itox.c \ 
 
+AFILES  = $(CFILES:.c=.asm)
+OBJECTS = $(CFILES:.c=.o)
 
-all: itou.o utoi.o printf.o sprintf.o fprintf.o vfprintf_comp.o vsprintf.o \
-     scanf.o sscanf.o fscanf.o vfscanf.o vsscanf.o vfprintf_fp.o ltoa_any.o
+all: $(OBJECTS)
 
 .c.o:
 	zcc -vn -Wn43 -make-lib $*.c
 
-
 clean:
-	rm -f *.err *.o* *.sym *.map zcc_opt.def
+	rm -f *.err *.o* *.sym *.map zcc_opt.def *.i $(AFILES)
