@@ -87,8 +87,6 @@ stdlib/z88/getcwd
 stdlib/z88/mkdir
 stdlib/z88/sleep
 stdlib/z88/csleep
-stdlib/z88/readbyte
-stdlib/z88/bindbnk1
 strings/memset
 strings/memcmp
 strings/memcpy
