@@ -48,6 +48,9 @@ extern option_t  msx_options;
 extern int       mz_exec(char *target);
 extern option_t  mz_options;
 
+extern int       nascom_exec(char *target);
+extern option_t  nascom_options;
+
 extern int       rex_exec(char *target);
 extern option_t  rex_options;
 
@@ -104,6 +107,10 @@ struct {
     { "bin2m12",  "mz",       "(C) 2000 Stefano Bodrato",                         
       "",
       mz_exec,      &mz_options },
+    { "bin2nas",   "nas",       "(C) 2003 Stefano Bodrato",                         
+      "Generates a .NAS file suitable for use by emulators",
+      nascom_exec,    &nascom_options },
+
     { "mkaddin",   "rex",       "(C) 2001 Dominic Morris",   
       "Creates a .rex application using data from a .res file and a .bin file",
       rex_exec,     &rex_options },
@@ -145,7 +152,7 @@ struct {
       zx81_exec,    &zx81_options },
 
 };
-#define APPMAKE_TARGETS 20
+#define APPMAKE_TARGETS 21
 #endif
 
 
