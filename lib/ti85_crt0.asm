@@ -50,8 +50,11 @@
 
 ; Now, getting to the real stuff now!
 
-	org	$8C3C	; TI 85
+	org	$9296	; TI 85 (RIGEL SHELL)
 
+        defm  "C+ compiled program"&0
+
+.start
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
@@ -71,7 +74,7 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
-        call    _main
+	call	_main
 .cleanup
 ;
 ;       Deallocate memory which has been allocated here!
@@ -139,11 +142,9 @@ ENDIF
 
 ; mem stuff
 
-.base_graphics	defw	$8641	;TI85
+.base_graphics	defw	$FC00	;TI85 (8641 ?)
 .coords		defw	0
 .cpygraph	ret
-
-         defm  "Small C+ TI85"&0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

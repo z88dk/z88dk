@@ -50,13 +50,13 @@
 
 ; Now, getting to the real stuff now!
 
-	org	$9D95	; TI 83+
+	org	$9D93	; TI 83+ (9d95-2)
+	defw	$6DBB	; ION Shell Identifier
+	ret
+	jr	nc,start ; not detectable until INSTALL is run
 
-	nop
-	jr start
-	defw 0		; pointer to libs, 0000 if no libs used
-	defw description	; pointer to a description
-	defw icon	; pointer to an 8x8 icon	
+	defm  "C+ compiled program"&0
+
 .start
         ld      hl,0
         add     hl,sp
@@ -147,7 +147,8 @@ ENDIF
 
 .base_graphics	defw	$9340	;TI83+
 .coords		defw	0
-.cpygraph	jp	$486A
+.cpygraph	call	$50	;ION bjump call
+		defw	$486A
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library
@@ -175,18 +176,3 @@ IF NEED_floatpack
 ENDIF
 
 
-;   TI83 shells Stuff
-;
-.description
-         defm  "C+ compiled program"&0
- 
-.icon
- defb @00000000    ;icon (some shell could like it)
- defb @00110000
- defb @01000100
- defb @01001110
- defb @01000100
- defb @00110000
- defb @00000000
- defb @00000000
- defb 255

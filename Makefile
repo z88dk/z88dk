@@ -42,6 +42,8 @@ config:
 	sed "s?DESTDIR?`pwd`?g" < lib/config/mzansi.lnx > lib/config/mzansi.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/ti82.lnx > lib/config/ti82.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/ti83.lnx > lib/config/ti83.cfg
+	sed "s?DESTDIR?`pwd`?g" < lib/config/ti83p.lnx > lib/config/ti83p.cfg
+	sed "s?DESTDIR?`pwd`?g" < lib/config/ti85.lnx > lib/config/ti85.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/ti86.lnx > lib/config/ti86.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/z88net.lnx > lib/config/z88net.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/abc80.lnx > lib/config/abc80.cfg

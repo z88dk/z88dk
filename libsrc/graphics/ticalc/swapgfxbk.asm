@@ -35,7 +35,9 @@
 		ld	(desave1),de
 		ld	(asave1),a
 		exx
+
 		jp	cpygraph	; Copy GRAPH_MEM to LCD, then return
+
 .swapgfxbk1
 		ld	iy,(iysave)
 		ld	ix,(ixsave)
@@ -46,4 +48,5 @@
 		ld	a,(asave1)
 		exx
 		ei
+
 		jp	cpygraph	; Copy GRAPH_MEM to LCD, then return

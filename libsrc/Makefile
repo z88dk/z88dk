@@ -12,7 +12,8 @@ genlibs: m.lib malloc.lib z80_crt0.lib
 
 z88libs: mz.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib
 
-tilibs: ti82ansi_clib.lib ti83ansi_clib.lib ti86ansi_clib.lib
+tilibs: ti82ansi_clib.lib ti83ansi_clib.lib ti83pansi_clib.lib \
+	ti85ansi_clib.lib ti86ansi_clib.lib
 
 zxlibs: zx_clib.lib zxan_clib.lib
 
@@ -189,6 +190,26 @@ ti83ansi_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORti83 -xti83ansi_clib @ticansi.lst
+
+ti83pansi_clib.lib:
+	./tideps.sh
+	cd strings ; make
+	cd stdlib ; make gen
+	cd stdio ; make generic
+	cd printflike ; make 
+	cd setjmp ; make 
+	cd assert ; make 
+	z80asm -d -ns -nm -Mo -DFORti83p -xti83pansi_clib @ticansi.lst
+
+ti85ansi_clib.lib:
+	./tideps.sh
+	cd strings ; make
+	cd stdlib ; make gen
+	cd stdio ; make generic
+	cd printflike ; make 
+	cd setjmp ; make 
+	cd assert ; make 
+	z80asm -d -ns -nm -Mo -DFORti85 -xti85ansi_clib @ticansi.lst
 
 ti86ansi_clib.lib:
 	./tideps.sh

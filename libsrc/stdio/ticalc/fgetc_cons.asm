@@ -15,7 +15,12 @@
 
 .kloop
 		halt	; Power saving (?? maybe. Surely true on ti86)
+IF FORti83p
+		rst	$28
+		defw	getkey
+ELSE
 		call	getkey
+ENDIF
 		and	a
 		jr	z,kloop
 

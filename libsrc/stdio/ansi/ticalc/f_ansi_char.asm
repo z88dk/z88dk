@@ -1,5 +1,6 @@
 ;
 ; 	ANSI Video handling for the TI calculators
+;	By Stefano Bodrato - Dec. 2000
 ;
 ; 	Handles Attributes INVERSE + UNDERLINED
 ;
@@ -163,6 +164,7 @@
   jr nz,PRE
   
   jp	cpygraph	; Copy GRAPH_MEM to LCD, then return
+
 
 
 

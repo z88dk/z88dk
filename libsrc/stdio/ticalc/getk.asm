@@ -12,6 +12,11 @@
 		INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 
 .getk
-		call	getkey
 
+IF FORti83p
+		rst	$28
+		defw	getkey
+ELSE
+		call	getkey
+ENDIF
 		jp	getk_decode

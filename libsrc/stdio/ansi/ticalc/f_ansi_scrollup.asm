@@ -14,20 +14,65 @@
 
 .ansi_SCROLLUP
 
+; These are called before scrolling: we wait for any keypress.
+; We don't use getkey when possible.
+
 IF FORti82
-; This is called before scrolling: we wait for any keypress
 .kloop
-	;halt	; Power saving (?? maybe. It worked on ti86)
 	ld	hl,$8004
 	bit	2,(hl)
 	jr	z,kloop
-ELSE
+ENDIF
+
+IF FORti83	; Thanks to Red Picasso (Brandon Whaley) for his dirinput.inc
+.kloop
+	ld	hl,krowptr
+.kloop1
+	ld      a,$ff	; Reset the keyport (kinda)
+	out     (1),a
+	ld      a,(hl)
+	and	a
+	jr	z,kloop
+	out     (1),a
+	in      a,(1)
+	cp	255
+	jr      nz,kok
+	inc	hl
+	jr	kloop1
+.krowptr
+	defb	$fe
+	defb	$fd
+	defb	$fb
+	defb	$f7
+	defb	$ef
+	defb	$df
+	defb	$bf
+	defb	0
+.kok
+ENDIF
+
+IF FORti83p
+.kloop
+	ld	a,($843F) ; Keyboard ScanCODE address
+	and	a
+	jr	z,kloop
+ENDIF
+
+IF FORti85
+.kloop
+	ld	a,($8001)
+	and	a
+	jr	z,kloop
+ENDIF
+
+IF FORti86
 ; We use getkey to wait for a key
 .kloop
 	call	getkey
 	and	a
 	jr	z,kloop
 ENDIF
+
 
   	ld	hl,8*row_bytes
   	ld	de,(base_graphics)

@@ -1,9 +1,8 @@
 ;
 ; 	ANSI Video handling for the TI calculators
+;	By Stefano Bodrato - Dec. 2000
 ;
 ; 	Clean a text line
-;
-;	Stefano Bodrato - Dec. 2000
 ;
 ; in:	A = text row number
 ;
@@ -32,4 +31,4 @@
 	ld	bc,row_bytes*8
 	ldir
 	
-	jp	cpygraph
+	jp	cpygraph	; Copy GRAPH_MEM to LCD, then return

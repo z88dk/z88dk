@@ -38,6 +38,13 @@ IF FORti83
 	defc	maxy = 64
 ENDIF
 
+IF FORti83p
+	defc	maxy = 64
+ENDIF
+
+IF FORti85
+	defc	maxy = 64
+ENDIF
 IF FORti86
 	defc	maxy = 64
 ENDIF

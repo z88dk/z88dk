@@ -51,7 +51,11 @@
 ; Now, getting to the real stuff now!
 
         org     $9104	; TI 82. Same for ASH and CrASH
+
+	jr	start
 	
+        defm  	"C+ compiled program"&0
+
 .start
         ld      hl,0
         add     hl,sp

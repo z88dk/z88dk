@@ -34,8 +34,8 @@ ENDIF
 IF FORti85
 	defc row_bytes	= 16
 	defc char_dots	= 4
-	defc TIALPHAKEY	= 0
-	defc getkey	= 0
+	defc TIALPHAKEY	= $30
+	defc getkey	= $01BE	
 ENDIF
 
 IF FORti86

@@ -1,6 +1,6 @@
 ;
 ; 	ANSI Video handling for the TI calculators
-;	By Stefano Bodrato - Apr. 2000
+;	By Stefano Bodrato - Dec. 2000
 ;
 ; 	CLS - Clear the screen
 ;	
@@ -19,4 +19,5 @@
 	inc	de
 	ld	bc,row_bytes*64
 	ldir
-	jp	cpygraph
+
+	jp	cpygraph	; Copy GRAPH_MEM to LCD, then return

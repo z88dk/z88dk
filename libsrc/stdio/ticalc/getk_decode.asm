@@ -100,7 +100,7 @@ IF FORti83
 ENDIF
 
 IF FORti83p
-	INCLUDE	"stdio/ticalc/ti83ptab.inc"
+	INCLUDE	"stdio/ticalc/ti83tab.inc"
 ENDIF
 
 IF FORti85
