@@ -27,7 +27,8 @@ int sscanf(char *str,char *fmt,...)
         ct= (getarg()*2)+&fmt-4;
 
 	temp.desc.ptr=(void *)(*ct);
-	temp.flags=_IOREAD|_IOSTRING;
+	temp.flags=_IOREAD|_IOSTRING|_IOUSE;
+	temp.ungetc = 0;
 
         return (vfscanf(temp,(unsigned char *)(*(ct-1)),ct-2));
 }
