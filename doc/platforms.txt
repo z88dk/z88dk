@@ -1,6 +1,6 @@
 Z88DK Port Status
 
-$Id: platforms.txt,v 1.9 2002-01-16 13:31:38 stefano Exp $
+$Id: platforms.txt,v 1.10 2002-01-17 17:09:21 stefano Exp $
 
 
 PLATFORM      | Native I/O  | ANSI VT I/O |  GRAPH LIB  |  GRAY LIB   |  FILELIB    |   ZSOCK     |   SOUND     |   Others    |
@@ -16,7 +16,7 @@ Jupiter ACE   |     No      |    32x24 B/W| 96x64 emul. |     No      |     No  
 MSX 1         |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
 REX 6000      |     No      |     No      |     No      |     No      |     No      |     No      |     ---     |     (1)     |
 Sam Coupe     | 32x24-buggy |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
-Sharp MZ      |    40x25    |    40x25 COL|     No      |     No      |     No      |     No      |     ---     |     (2)     |
+Sharp MZ      |    40x25    |    40x25 COL|   80x50     |     No      |     No      |     No      |     ---     |     (2)     |
 SORD M5       |    32x24    |     No      |     No    . |     No      |     No      |     No      |     ---     |     ---     |
 Spectravideo  |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
 TI82          |    16x8     |    32x4  B/W|   96x64     |     Yes     |     No      |     No      |   1 bit     |     ---     |

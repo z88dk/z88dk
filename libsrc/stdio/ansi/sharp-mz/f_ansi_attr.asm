@@ -10,7 +10,7 @@
 ;	Stefano Bodrato - May 2000
 ;	Stefano Bodrato - Jan 2002..fixed
 ;
-;	$Id: f_ansi_attr.asm,v 1.3 2002-01-15 12:59:24 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.4 2002-01-17 17:09:21 stefano Exp $
 ;
 
 	XLIB	ansi_attr
@@ -134,6 +134,11 @@
         sub     30
 
 ;'' Palette Handling ''
+        rla
+        bit     3,a
+        jr      z,ZFR
+        set     0,a
+.ZFR
         and     7
 ;''''''''''''''''''''''
         rla
@@ -154,6 +159,11 @@
         sub     40
 
 ;'' Palette Handling ''
+        rla
+        bit     3,a
+        jr      z,ZBK
+        set     0,a
+.ZBK
         and     7
 ;''''''''''''''''''''''
         ld      e,a
