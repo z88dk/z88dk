@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.8 2002-01-14 10:01:40 dom Exp $
+ *      $Id: const.c,v 1.9 2002-01-26 00:24:14 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -82,7 +82,7 @@ LVALUE *lval ;
 int fnumber(val)
 long *val;
 {
-        unsigned char sum[6],scale[6],frcn[6],dig1[6],dig2[6],dig3[6];
+        unsigned char sum[6],sum2[6],scale[6],frcn[6],dig1[6],dig2[6],dig3[6];
         int k;                  /* flag and mask */
         unsigned char minus;     /* is if negative! */
         char *start;    /* copy of pointer to starting point */
@@ -131,22 +131,26 @@ long *val;
 	end = s;
 
         sum[0]=sum[1]=sum[2]=sum[3]=sum[4]=sum[5]='\0';
+        sum2[0]=sum2[1]=sum2[2]=sum2[3]=sum2[4]=sum2[5]='\0';
 #if 0
         while ( *s != '.' ) {           /* handle digits to right of decimal */
 /* Get the value into a register - all routines dump in second register */
-        qfloat( ( *(s--)-'0' ),dig1);
-        fltadd(dig1,sum);
-        fltmult(frcn,sum);
+	    qfloat( ( *(s--)-'0' ),dig1);
+	    fltadd(dig1,sum);
+	    fltmult(frcn,sum);
         }
 #else
-	memcpy(dig3,frcn,6);	/* Copy it over */
+	memcpy(dig3,frcn,6);	/* Copy 0.1 dig3 */
 	s = dp1;
+	// dump_var(dig3,"before");
+	/* Deals with the decimal place */
 	while ( numeric(*s) && s <= end) {
-		qfloat((*s-'0'),dig1);
-		fltmult(dig3,dig1);
-		fltadd(dig1,sum);
-		fltmult(frcn,dig3);
-		s++;
+	    qfloat((*s-'0'),dig1);   /* 0-9 */
+	    fltmult(dig3,dig1);      /* * 0.1 */
+	    fltadd(dig1,sum2);
+	    // dump_var(dig3,"dig3,during");
+	    fltmult(frcn,dig3);
+	    s++;
 	}
 	s = --dp1;	/* Now points to dp */
 #endif
@@ -158,7 +162,8 @@ long *val;
                 qfloat(10,dig2);
                 fltmult(dig2,scale);
         }
-
+	fltadd(sum2,sum);
+	// dump_var(sum,"sum after");
 /* Chopped out exponent stuff...for the moment! */
         if(cmatch('e')) {                       /* interpret exponent */
                 int neg;                        /* nonzero if exp is negative */
@@ -177,15 +182,19 @@ long *val;
                         expon=0;
                 }
                 k=32;   /* set a bit in the mask */
-/*                scale=1.;     */
+#if 0
+                scale=1.;     
                 /* find 10**expon by repeated squaring */
-/*                while(k) {
-                        scale *= scale;
-                        if(k&expon) scale *= 10.;
-                        k >>= 1;
+                while(k) {
+		    scale *= scale;
+		    if(k&expon) scale *= 10.;
+		    k >>= 1;
                 }
-                if(neg) sum /= scale;
-                else    sum *= scale;   */
+                if(neg) 
+		    sum /= scale;
+                else    
+		    sum *= scale;  
+#endif
         }
 /*
  * This negative bit is garbage! The code does a minusfa on loading in
@@ -209,6 +218,12 @@ long *val;
         return(1) ;      /* report success */
 }
 
+#if 0
+int dump_var(unsigned char *var,char *text)
+{
+    printf("%s: %d %d %d %d %d %d\n",text,var[0],var[1],var[2],var[3],var[4],var[5]);
+}
+#endif
 
 /* stash a double string in the literal pool */
 
