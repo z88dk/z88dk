@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.7 2001-04-27 14:45:28 dom Exp $
+ *      $Id: main.c,v 1.8 2001-06-30 11:31:09 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -547,18 +547,6 @@ dumpfns()
                         fprintf(fp,"\tdefc startup=%d\n",startup);
                         fprintf(fp,"ENDIF\n\n");
         }
-
-	switch(printflevel) {
-		case 1:  
-			WriteDefined("ministdio",0);
-			break;
-		case 2:
-			WriteDefined("complexstdio",0);
-			break;
-		case 3:
-			WriteDefined("floatstdio",0);
-			break;
-	}
 /*
  * Now, we're gonna use #pragma define _FAR_PTR to indicate whether we need
  * far stuff - this has to go with a -D_FAR_PTR from the compile line
@@ -574,6 +562,21 @@ dumpfns()
         }
 
         fclose(fp);
+
+	if ( defvars != 0 )
+		WriteDefined("defvarsaddr",defvars);
+
+	switch(printflevel) {
+		case 1:  
+			WriteDefined("ministdio",0);
+			break;
+		case 2:
+			WriteDefined("complexstdio",0);
+			break;
+		case 3:
+			WriteDefined("floatstdio",0);
+			break;
+	}
  
 
 /*
@@ -673,7 +676,7 @@ void WriteDefined(char *sname, int value)
         }
         fprintf(fp,"\nIF !DEFINED_%s\n",sname);
         fprintf(fp,"\tdefc\tDEFINED_%s = 1\n",sname);
-	if (value) fprintf(fp,"\tdefc %s = %d",sname,value);
+	if (value) fprintf(fp,"\tdefc %s = %d\n",sname,value);
         fprintf(fp,"ENDIF\n\n");
         fclose(fp);
 }
@@ -711,10 +714,14 @@ dumpvars()
 
         if (appz88 && !asxx ) {
                 outstr("DEFVARS\t");
+#if 0
                 if (defvars) outdec(defvars);
                 else outstr("-1");
                 outstr("\n{\n");
-        }
+#else
+		outstr("-1\n{\n");
+#endif
+	}
         ptr=STARTGLB;
         while (ptr < ENDGLB)
         {

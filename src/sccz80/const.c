@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.5 2001-06-27 11:13:07 dom Exp $
+ *      $Id: const.c,v 1.6 2001-06-30 11:31:09 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -52,7 +52,6 @@ LVALUE *lval ;
         }
         else if ( number(&lval->const_val) || pstr(&lval->const_val) ) {
 /* Insert long stuff/long pointer here? */
-		printf("constype = %d lval->val_type = %d\n",constype,lval->val_type);
 		if ( (unsigned long )lval->const_val >= 65536LU )
 			constype = LONG;
 
