@@ -71,3 +71,4 @@ tan
 tanh
 ufloat
 unpack
+init_floatpack
