@@ -19,7 +19,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 enum flag           { OFF, ON };
 
-enum symbols        { space, strconq, dquote, squote, semicolon, comma, fullstop, lparen, lcurly, rcurly, rparen,
+enum symbols        { space, strconq, dquote, squote, semicolon, comma, fullstop, lparen, lcurly, lsquare, rsquare, rcurly, rparen,
                       plus, minus, multiply, divi, mod, power, assign, bin_and, bin_or, bin_xor, less,
                       greater, log_not, constexpr, newline, lessequal, greatequal, notequal, name, number,
                       decmconst, hexconst, binconst, charconst, negated, nil,

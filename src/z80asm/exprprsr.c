@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.1 2000-07-04 15:33:30 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.2 2003-10-11 15:41:04 dom Exp $ */
 /* $History: EXPRPRSR.C $ */
 /*  */
 /* *****************  Version 15  ***************** */
@@ -177,14 +177,15 @@ Factor (struct expr *pfixexpr)
       break;
 
     case lparen:
-      *pfixexpr->infixptr++ = '(';	/* store '(' in infix expr */
+    case lsquare:
+      *pfixexpr->infixptr++ = separators[sym];	/* store '(' or '[' in infix expr */
       GetSym ();
 
       if (Condition (pfixexpr))
 	{
-	  if (sym == rparen)
+	  if (sym == rparen || sym == rsquare)
 	    {
-	      *pfixexpr->infixptr++ = ')';	/* store '(' in infix expr */
+	      *pfixexpr->infixptr++ = separators[sym];	/* store ')' or ']' in infix expr */
 	      GetSym ();
 	      break;
 	    }

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.14 2002-12-09 19:55:24 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.15 2003-10-11 15:41:04 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -224,7 +224,7 @@ char *errmsg[] =
 
 enum symbols sym, ssym[] =
 {space, strconq, dquote, squote, semicolon, comma, fullstop,
- lparen, lcurly, rcurly, rparen, plus, minus, multiply, divi, mod, power,
+ lparen, lcurly, lsquare, rsquare, rcurly, rparen, plus, minus, multiply, divi, mod, power,
  assign, bin_and, bin_or, bin_xor, less, greater, log_not, constexpr};
 
 enum flag pass1, listing, listing_CPY, symtable, z80bin, writeline, mapref, globaldef, datestamp, ti83plus;
@@ -236,7 +236,7 @@ long TOTALLINES;
 int sourcefile_open;
 char PAGELEN;
 int TAB_DIST = 8, COLUMN_WIDTH;
-char separators[] = " &\"\';,.({})+-*/%^=~|:<>!#:";
+char separators[] = " &\"\';,.({[]})+-*/%^=~|:<>!#:";
 char line[255], stringconst[255], ident[255];
 char *srcfilename, *lstfilename, *objfilename, *errfilename, *libfilename;
 

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.5 2002-05-11 20:09:38 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.6 2003-10-11 15:41:04 dom Exp $ */
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -88,7 +88,7 @@ void ifstatement (enum flag interpret);
 void DEFVARS (void), DEFS (void), ORG (void), IncludeFile (void), BINARY (void), CALLOZ (void), CALLPKG (void), FPP (void);
 void ADC (void), ADD (void), DEC (void), IM (void), IN (void), INC (void), INVOKE (void);
 void JR (void), LD (void), OUT (void), RET (void), SBC (void);
-void DEFB (void), DEFC (void), DEFM (void), DEFW (void), DEFL (void);
+void DEFB (void), DEFC (void), DEFM (void), DEFW (void), DEFL (void), DEFP (void);
 void RST (void), DEFGROUP (void);
 long GetConstant(char *);
 int CheckRegister8 (void);
@@ -162,82 +162,84 @@ struct Z80sym Z80ident[] = {
  {"DEFINE", DefSym},		/* 20 */
  {"DEFL", DEFL},		
  {"DEFM", DEFM},
+ {"DEFP", DEFP},
  {"DEFS", DEFS},
- {"DEFVARS", DEFVARS},	
- {"DEFW", DEFW},		/* 25 */
+ {"DEFVARS", DEFVARS},		/* 25 */
+ {"DEFW", DEFW},
  {"DI", DI},			
  {"DJNZ", DJNZ},
  {"EI", EI},
- {"ELSE", ELSEstat},
- {"ENDIF", ENDIFstat},		/* 30 */
+ {"ELSE", ELSEstat},		/* 30 */
+ {"ENDIF", ENDIFstat},	
  {"EX", EX},			
  {"EXX", EXX},
  {"FPP", FPP},
- {"HALT", HALT},
- {"IF", IFstat},		/* 35 */
+ {"HALT", HALT},		/* 35 */
+ {"IF", IFstat},
  {"IM", IM},			
  {"IN", IN},
  {"INC", INC},
- {"INCLUDE", IncludeFile},
- {"IND", IND},			/* 40 */
+ {"INCLUDE", IncludeFile},	/* 40 */
+ {"IND", IND},
  {"INDR", INDR},
  {"INI", INI},
  {"INIR", INIR},
- {"INVOKE", INVOKE},
- {"JP", JP},			/* 45 */
+ {"INVOKE", INVOKE},		/* 45 */
+ {"JP", JP},
  {"JR", JR},
  {"LD", LD},
  {"LDD", LDD},
- {"LDDR", LDDR},
- {"LDI", LDI},			/* 50 */
+ {"LDDR", LDDR},		/* 50 */
+ {"LDI", LDI},
  {"LDIR", LDIR},
  {"LIB", DeclLibIdent},
  {"LINE", LINE},
- {"LSTOFF", ListingOff},
- {"LSTON", ListingOn},		/* 55 */
+ {"LSTOFF", ListingOff},	/* 55 */
+ {"LSTON", ListingOn},
  {"MODULE", DeclModule},
  {"NEG", NEG},
  {"NOP", NOP},
- {"OR", OR},
- {"ORG", ORG},			/* 60 */
+ {"OR", OR},			/* 60 */
+ {"ORG", ORG},
  {"OTDR", OTDR},
  {"OTIR", OTIR},
  {"OUT", OUT},
- {"OUTD", OUTD},
- {"OUTI", OUTI},		/* 65 */		
+ {"OUTD", OUTD},		/* 65 */
+ {"OUTI", OUTI},
+ {"OZ", CALLOZ},		
  {"POP", POP},
  {"PUSH", PUSH},
- {"RES", RES},
+ {"RES", RES},			/* 70 */
  {"RET", RET},
- {"RETI", RETI},		/* 70 */
+ {"RETI", RETI},
  {"RETN", RETN},
  {"RL", RL},
- {"RLA", RLA},
+ {"RLA", RLA},			/* 75 */
  {"RLC", RLC},
- {"RLCA", RLCA},		/* 75 */
+ {"RLCA", RLCA},
  {"RLD", RLD},
  {"RR", RR},
- {"RRA", RRA},
+ {"RRA", RRA},			/* 80 */
  {"RRC", RRC},
- {"RRCA", RRCA},		/* 80 */
+ {"RRCA", RRCA},
  {"RRD", RRD},
  {"RST", RST},
- {"SBC", SBC},
+ {"SBC", SBC},			/* 85 */
  {"SCF", SCF},
- {"SET", SET},			/* 85 */
+ {"SET", SET},
  {"SLA", SLA},
  {"SLL", SLL},
- {"SRA", SRA},
+ {"SRA", SRA},			/* 90 */
  {"SRL", SRL},
- {"SUB", SUB},			/* 90 */
+ {"SUB", SUB},
  {"UNDEFINE",UnDefineSym},
  {"XDEF", DeclGlobalIdent},
- {"XLIB", DeclGlobalLibIdent},
+ {"XLIB", DeclGlobalLibIdent},	/* 95 */
  {"XOR", XOR},
  {"XREF", DeclExternIdent}
 };
 
-size_t totalz80id = 96;
+size_t totalz80id = 98;
 
 
 int 
@@ -273,14 +275,14 @@ ParseIdent (enum flag interpret)
     {
       switch (id)
 	{
-	case 35:		/* IF */
+	case 36:		/* IF */
 	  if (interpret == OFF)
 	    Skipline (z80asmfile);	/* skip current line until EOL */
 	  ifstatement (interpret);
 	  break;
 
-	case 29:		/* ELSE */
-	case 30:		/* ENDIF */
+	case 30:		/* ELSE */
+	case 31:		/* ENDIF */
 	  (Z80ident[id].z80func) ();	
 	  Skipline (z80asmfile);
 	  break;

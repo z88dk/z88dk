@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.5 2002-02-20 21:37:57 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.6 2003-10-11 15:41:04 dom Exp $ */
 /* $History: Asmdrctv.c $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -619,6 +619,50 @@ DEFW (void)
 
 
 void 
+DEFP (void)
+{
+  long bytepos = 0;
+
+  do
+    {
+      if ((PC+3) > MAXCODESIZE) 
+        {
+           ReportError (CURRENTFILE->fname, CURRENTFILE->line, 12);
+           return;
+        }
+
+      GetSym ();
+      if (!ExprAddress (bytepos))
+	break;			/* syntax error - get next line from file... */
+      PC += 2;			/* DEFW allocated, update assembler PC */
+      bytepos += 2;
+
+		/* Pointers must be specified as WORD,BYTE pairs separated by commas */ 
+		if (sym != comma)
+		{
+			ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+		}
+
+      GetSym ();
+      if (!ExprUnsigned8 (bytepos))
+	break;			/* syntax error - get next line from file... */
+      PC += 1;			/* DEFB allocated, update assembler PC */
+      bytepos += 1;
+
+      if (sym == newline)
+	break;
+      else if (sym != comma)
+	{
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	  break;
+	}
+    }
+  while (sym == comma);		/* get all DEFB definitions separated by comma */
+}
+
+
+
+void 
 DEFL (void)
 {
   long bytepos = 0;
@@ -688,7 +732,7 @@ DEFM (void)
 		    {
 		      GetSym ();
 
-		      if (sym != strconq && sym != newline && sym != semicolon)
+		      if (sym != strconq && sym != comma && sym != newline && sym != semicolon)
 			{
 			  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
 			  return;
@@ -709,7 +753,7 @@ DEFM (void)
 	  if (!ExprUnsigned8 (bytepos))
 	    break;		/* syntax error - get next line from file... */
 
-	  if (sym != strconq && sym != newline && sym != semicolon)
+	  if (sym != strconq && sym != comma && sym != newline && sym != semicolon)
 	    {
 	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);	/* expression separator not found */
 	      break;
