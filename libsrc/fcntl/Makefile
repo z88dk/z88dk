@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.12 2003-09-16 09:23:42 dom Exp $
+# $Id: Makefile,v 1.13 2003-09-16 19:00:33 denniz Exp $
 
 lcpc:
 	cd cpc ; $(MAKE)
@@ -19,7 +19,7 @@ lpps:
 lzxvgs:
 	cd zxvgs; $(MAKE)
 
-lcpc:
+lcpcold:
 	cd cpc ; $(MAKE)
 	cd dummy    ; $(MAKE)
 
