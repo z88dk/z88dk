@@ -1,4 +1,3 @@
-cpm/bdos
 ctype/isalpha
 ctype/isalnum
 ctype/isascii
@@ -125,3 +124,17 @@ graphics/setxy
 graphics/vz200/pixladdr
 graphics/vz200/swapgfxbk
 graphics/vz200/clsgraph
+fcntl/cpm/bdos
+fcntl/cpm/close
+fcntl/cpm/creat
+fcntl/cpm/getfcb
+fcntl/cpm/open
+fcntl/cpm/open_z88
+fcntl/cpm/parsefcb
+fcntl/cpm/_putoffset
+fcntl/cpm/read
+fcntl/cpm/readbyte
+fcntl/cpm/remove
+fcntl/cpm/setfcb
+fcntl/cpm/write
+fcntl/cpm/writebyte
