@@ -121,5 +121,5 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -// -v -O2 -I. -oa.com -lcpm_clib -lndos -DZ80 -DSMALL_C -DCPM -D__CPM__ -M
+OPTIONS		 -// -v -O2 -I. -oa.com -lcpm_clib  -DZ80 -DSMALL_C -DCPM -D__CPM__ -M
 
