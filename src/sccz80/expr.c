@@ -2,7 +2,7 @@
  * cc4.c - fourth part of Small-C/Plus compiler
  *         routines for recursive descent
  *
- * $Id: expr.c,v 1.4 2001-01-29 14:34:41 dom Exp $
+ * $Id: expr.c,v 1.5 2001-02-01 12:04:41 dom Exp $
  *
  */
 
@@ -147,6 +147,8 @@ LVALUE *lval ;
 	plnge2b(heir1, lval, &lval2, oper) ;
     else
 	plnge2a(heir1, lval, &lval2, oper, doper) ;
+
+
     /*
      * djm 23/2/99 Major flaw in the plan here Ron, we don't check the
      * types properly before storing, this one left open for years!!!
@@ -459,7 +461,8 @@ deref(LVALUE *lval, char isaddr)
     /* NB it has already been determind that lval->symbol is non-zero */
     if ( lval->symbol->more == 0 ) {
 	/* array of/pointer to variable */
-	if (flags&FARPTR) flags|=FARACC;
+	if (flags&FARPTR && lval->val_type == CPTR) flags|=FARACC;
+	// else flags &= ~FARACC;
 	lval->val_type = lval->indirect = lval->symbol->type ;
 	lval->flags=flags;
 	lval->symbol = NULL_SYM ;                       /* forget symbol table entry */
@@ -468,7 +471,6 @@ deref(LVALUE *lval, char isaddr)
     }
     else {
 	/* array of/pointer to pointer */
-	        
 	lval->symbol = dummy_sym[(int) lval->symbol->more] ;
 	/* djm long pointers */
 	lval->ptr_type = lval->symbol->type ;

@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.2 2001-01-29 14:34:41 dom Exp $
+ *      $Id: const.c,v 1.3 2001-02-01 12:04:41 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -200,7 +200,10 @@ int stash_double_str(char *start, char *end)
     char  *buf;
 
     len = end-start;
-    buf = malloc(len+2);
+
+    if (*(start+len-1) == ' ') len--;
+
+    buf = malloc(len+1);
 
     if (buf == NULL ) {
 	error(E_LITQOV);  /* As good as any really.. */

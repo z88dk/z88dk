@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.2 2001-01-26 11:48:52 dom Exp $
+ *      $Id: primary.c,v 1.3 2001-02-01 12:04:41 dom Exp $
  */
 
 
@@ -356,8 +356,10 @@ LVALUE *lval, *lval2 ;
 {
         if ( lval->ptr_type && lval2->ptr_type ) {
                 lval->ptr_type = 0 ;                    /* ptr-ptr => int */
-                lval->val_type = CINT;
+		if (lval->val_type == CPTR) lval->val_type = LONG;
+		else lval->val_type = CINT;
                 lval->indirect = 0;
+		lval->ident = VARIABLE;
         }
         else if ( lval2->ptr_type ) {           /* ptr +- int => ptr */
                 lval->symbol = lval2->symbol ;

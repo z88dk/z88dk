@@ -3,7 +3,7 @@
  *
  *      Plunging routines
  *
- *      $Id: plunge.c,v 1.1 2000-07-04 15:33:32 dom Exp $
+ *      $Id: plunge.c,v 1.2 2001-02-01 12:04:41 dom Exp $
  *
  *      Altogether now...arse! My cunning scheme to use c as an
  *      indicator flops badly due to logical conditions, I just
@@ -327,7 +327,7 @@ void (*oper)();
         if (oper == zsub && lval->ptr_type ) {
                 /* scale difference between pointers */
 /* djm...preserve our pointer high 8 bits? */
-		if (lval->type == CPTR ){
+		if (lval->val_type == CPTR ){
 			lval->val_type=CPTR;
 			ltype=LONG;
 		} else {
@@ -335,28 +335,53 @@ void (*oper)();
                 	ltype=CINT;             /* dodgy maybe 24/4/99 */
 		}
                 if( lval->ptr_type == CINT && lval2->ptr_type == CINT ) {
-                        swap();
-                        vconst(1) ;
+			if (lval->val_type == CPTR) {
+				lpush();
+				vlongconst(1);
+			} else {
+				swap();
+				vconst(1);
+			}
                         asr(lval); /*  div by 2  */
                 }
                 else if ( lval->ptr_type == CPTR && lval2->ptr_type == CPTR) {
-                        swap();
-                        vconst(3);
+			if (lval->val_type == CPTR) {
+				lpush();
+				vlongconst(3);
+			} else {
+				swap();
+				vconst(3);
+			}
                         zdiv(lval);
                 }
                 else if( lval->ptr_type == LONG && lval2->ptr_type == LONG) {
-                        swap();
-                        vconst(2);
+			if (lval->val_type == CPTR) {
+				lpush();
+				vlongconst(2);
+			} else {
+				swap();
+				vconst(2);
+			}
                         asr(lval);  /* div by 4 */
                 }
                 else if( lval->ptr_type == DOUBLE && lval2->ptr_type == DOUBLE ) {
-                        swap();
-                        vconst(6) ;
+			if (lval->val_type == CPTR) {
+				lpush();
+				vlongconst(6);
+			} else {
+				swap();
+				vconst(6);
+			}
                         zdiv(lval); /* div by 6 */
                 }
                 else if ( lval->ptr_type == STRUCT && lval2->ptr_type == STRUCT ) {
-                        swap() ;
-                        vconst(lval->tagsym->size) ;
+			if (lval->val_type == CPTR) {
+				lpush();
+				vlongconst(lval->tagsym->size);
+			} else {
+				swap();
+				vconst(lval->tagsym->size);
+			}
                         zdiv(lval) ;
                 }
         }
