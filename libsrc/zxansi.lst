@@ -116,6 +116,7 @@ graphics/dcircle
 graphics/draw
 graphics/drawb
 graphics/drawr
+graphics/getsprite
 graphics/lbitmask
 graphics/lftscrol
 graphics/line
