@@ -6,7 +6,7 @@
  *      char arrays in structs now initialised correctly, strings
  *      truncated if too long, all seems to be fine - hurrah!
  *
- *      $Id: declinit.c,v 1.2 2001-02-02 12:24:06 dom Exp $
+ *      $Id: declinit.c,v 1.3 2001-08-19 13:18:02 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -240,6 +240,9 @@ int size, ident, *dim, more, dump ,is_struct;
                         } else 
                                 error(E_UNSYMB,sname);
                 }
+		else if ( rcmatch('}') ) {
+			//dumpzero(size,*dim);
+		}
                 else if ( constexpr(&value,1) ) {
 constdecl:
                         if ( ident == POINTER ) {
