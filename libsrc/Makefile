@@ -1,14 +1,14 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.19 2001-06-23 23:33:27 dom Exp $
+# $Id: Makefile,v 1.20 2001-09-05 15:07:20 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
 	nc_clib.lib vz_clib.lib vzansi_clib.lib cpm_clib.lib \
 	mz_clib.lib mzansi_clib.lib zx81_clib.lib zx81ansi_clib.lib \
 	abc80_clib.lib aceansi_clib.lib sam_clib.lib \
-	msx_clib.lib svi_clib.lib m5_clib.lib cpc_clib.lib
+	msx_clib.lib svi_clib.lib m5_clib.lib cpc_clib.lib c128ansi_clib.lib
 
 genlibs: m.lib malloc.lib z80_crt0.lib
 
@@ -550,6 +550,18 @@ cpc_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORcpc -xcpc_clib @cpc.lst
 
+# Commodore 128 (Z80 mode) library - Stefano
+c128ansi_clib.lib:
+	@echo ''
+	@echo '---> Building Commodore 128 ANSI Library  <---'
+	@echo ''
+	cd strings ; make
+	cd stdlib ; make gen
+	cd stdio ; make generic
+	cd printflike ; make 
+	cd setjmp ; make 
+	cd assert ; make 
+	z80asm -d -ns -nm -Mo -DFORc128 -xc128ansi_clib @c128ansi.lst
 
 clean:
 	cd assert ; make clean

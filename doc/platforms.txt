@@ -1,6 +1,6 @@
 Z88DK Port Status
 
-$Id: platforms.txt,v 1.4 2001-06-18 10:46:31 stefano Exp $
+$Id: platforms.txt,v 1.5 2001-09-05 15:07:19 stefano Exp $
 
 
 PLATFORM      | Native I/O  | ANSI VT I/O |  GRAPH LIB  |  GRAY LIB   |  FILELIB    |   ZSOCK     |   Others    |
@@ -8,15 +8,15 @@ PLATFORM      | Native I/O  | ANSI VT I/O |  GRAPH LIB  |  GRAY LIB   |  FILELIB
               |             |             |             |             |             |             |             |
 ABC80         |     No      | 40x24-buggy |     No      |     No      |     No      |     No      |     ---     |
 Amstrad NC100 |     Yes     |     No      |     No      |     No      |     No      |     No      | Untested    |
-Amstrad CPC   |     Yes     |     No      |     Yes     |     No      |     No      |     No      | Untested    |
 Cambridge Z88 |     Yes     |     Yes     |  256x64     |     No      |     Yes     |     Yes     | Paging+many |
+Commodore 128 |     No      |     Yes     |     No      |     No      |     No      |     No      |     ---     |
 CP/M          |     Yes     | If Hardware |     No      |     No      |     No      |     No      |     ---     |
 Jupiter ACE   |    32x24    |     No      | 96x64 emul. |     No      |     No      |     No      |     ---     |
 MSX 1         |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |
 REX 6000      |     No      |     No      |     No      |     No      |     No      |     No      |    (1)      |
 Sam Coupe     | 32x24-buggy |     No      |     No      |     No      |     No      |     No      |     ---     |
 Sharp MZ      | 40x25-buggy | In Progress |     No      |     No      |     No      |     No      | Unstable    |
-SORD M5       |    32x24    |     No      |     No      |     No      |     No      |     No      |     ---     |
+SORD M5       |    32x24    |     No      |     No    . |     No      |     No      |     No      |     ---     |
 Spectravideo  |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |
 TI82          | 16x8-buggy  |    32x4  B/W|   96x64     |     Yes     |     No      |     No      |     ---     |
 TI83          | 16x8        |    32x4  B/W|   96x64     |     Yes     | In Progress |     No      |     ---     |
