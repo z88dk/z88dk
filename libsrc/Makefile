@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.63 2003-08-30 18:41:40 dom Exp $
+# $Id: Makefile,v 1.64 2003-09-11 10:20:30 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -27,7 +27,7 @@ tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 	ti86ansi_clib.lib ti86_clib.lib \
 	tigray82.lib tigray83.lib tigray83p.lib tigray85.lib tigray86.lib
 
-zxlibs: zx_clib.lib zxan_clib.lib zxvgs.lib
+zxlibs: zx_clib.lib zxan_clib.lib zxvgs.lib zx_math.lib zx_mathtiny.lib
 
 
 # Garry's z88 far library - garry (probably dom now)
@@ -170,6 +170,19 @@ zxvgs.lib:
 	cd fcntl ; $(MAKE) lzxvgs
 	cd zxvgs; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORzx -xzxvgs @zxvgs.lst
+
+# ZX Spectrum maths library - Stefano
+zx_math.lib:
+	@echo ''
+	@echo '--- Building ZX Spectrum Maths Library ---'
+	@echo ''
+	cd zxmath ; $(MAKE) zx_math
+
+zx_mathtiny.lib:
+	@echo ''
+	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
+	@echo ''
+	cd zxmath ; $(MAKE) zx_mathtiny
 
 
 # vt100 for sprinter - dom
@@ -792,6 +805,7 @@ clean:
 	$(RM) *.lib
 	cd games ; $(MAKE) clean
 	cd cpcmath ; $(MAKE) clean
+	cd zxmath ; $(MAKE) clean
 
 install:
 	cp *.lib ../lib/clibs/
