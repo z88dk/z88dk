@@ -1,0 +1,25 @@
+; Shell API Definitions
+; Auto-generated for Shell v0.25
+
+defc shell_verh=$0030
+defc shell_verm=$0032
+defc shell_verl=$0035
+defc shell_loadaddr=$2FB1
+defc shell_headerlen=$000C
+
+defc shell_next=$F886
+defc shell_cmdaddr=$20F5
+defc shell_cmdlen=$20F3
+defc shell_cmdptr=$20F7
+
+defc shell_ztos=$8EA4
+defc shell_eval=$99BA
+defc shell_allocate=$D71B
+defc shell_free=$D864
+defc shell_freeall=$D8E6
+
+; TEMPORARY - for v0.25 only!
+
+defc shell_also=$EB26
+defc shell_internal=$94F0
+defc shell_previous=$EB41
