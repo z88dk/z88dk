@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.4 2001-06-27 08:53:28 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.4.2.1 2002-02-20 21:35:19 dom Exp $ */
 /* $History: Asmdrctv.c $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -835,30 +835,32 @@ Fetchfilename (FILE *fptr)
 
   char *stdpath;
 
-  for (l = 0;l<255; l++)
-    {
-      if (!feof (fptr))
-	{
-	  c = GetChar (fptr);
-	  if ((c == '\n') || (c == EOF))
-	    break;
+  do {
+      for (l = 0;l<255; l++) 
+        {
+	   if (!feof (fptr)) 
+             {
+		c = GetChar (fptr);
+		if ((c == '\n') || (c == EOF))
+		    break;
 
-	  if (c != '"')
-	    {
-	      ident[l] = (char) c;
-	    }
-	  else
-	    {
-	      break;
-	    }
+		if (c != '"') 
+		  {
+		     ident[l] = (char) c;
+		  } 
+		else 
+		  {
+		     break;       /* fatal - end of file reached! */
+		  }
+	     } 
+	   else 
+	     {
+	        break;
+	     }
 	}
-      else
-	{
-	  break;		/* fatal - end of file reached! */
-	}
-    }
-  ident[l] = '\0';		/* null-terminate file name */
-
+      ident[l] = '\0';		/* null-terminate file name */
+  } while (strlen(ident) == 0 && !feof(fptr) );
+	
   if (c != '\n') Skipline (fptr); /* prepare for next line */
 
   if (ident[0] == '#')
