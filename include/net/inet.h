@@ -7,7 +7,7 @@
  *
  *      djm 24/4/99
  *
- *	$Id: inet.h,v 1.7 2002-02-12 20:33:53 dom Exp $
+ *	$Id: inet.h,v 1.8 2002-05-14 22:31:15 dom Exp $
  */
 
 
@@ -16,11 +16,11 @@
 
 #include <sys/types.h>
 
-typedef unsigned long ipaddr_t;
-typedef unsigned int tcpport_t;
+typedef u32_t ipaddr_t;
+typedef u16_t tcpport_t;
 
-#define IPADDR_T unsigned long
-#define TCPPORT_T unsigned int
+#define IPADDR_T u32_t
+#define TCPPORT_T u16_t
 
 /* Macro to turn an IP address into a UDWORD */
 #define IP_ADDR(a,b,c,d)        (d<<24 | c<<16 | b<<8 | a )

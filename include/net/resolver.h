@@ -5,7 +5,7 @@
  *	This file is included by the ZSock kernel
  *	**DO NOT USE IN USER PROGRAMS!!
  *
- *	$Id: resolver.h,v 1.4 2002-02-12 20:33:55 dom Exp $
+ *	$Id: resolver.h,v 1.5 2002-05-14 22:31:15 dom Exp $
  */
 
 /* Max domain name size to play with */
@@ -71,7 +71,7 @@ struct rrpart {
 /*
  *  data for domain name lookup
  */
-static struct useek {
+struct useek {
     struct dhead h;
     u8_t         x[DOMSIZE];
 };
