@@ -9,7 +9,7 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.1 2002-10-10 20:38:22 dom Exp $
+;	$Id: f_ansi_cls.asm,v 1.2 2002-10-10 22:03:26 dom Exp $
 ;
 
 	XLIB	ansi_cls
@@ -19,7 +19,7 @@
 	ld	e,0		;top left y
 	ld	h,32		;height
 	ld	l,80		;depth
-	ld	a,' '		;fill character
+	xor	a		;fill character
 	ld	b,7		;clear colour?
 	ld	c,$57		;CLEAR
 	rst	$10

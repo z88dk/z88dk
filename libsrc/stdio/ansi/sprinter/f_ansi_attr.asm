@@ -12,7 +12,7 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.1 2002-10-10 20:38:22 dom Exp $
+;	$Id: f_ansi_attr.asm,v 1.2 2002-10-10 22:03:26 dom Exp $
 ;
 
 	XLIB	ansi_attr
@@ -50,26 +50,34 @@
 	ld	(text_attr),a
 	ret
 .nodim
+	cp	5
+	jr	nz,noblinkon
+	ld	hl,text_attr
+	set	7,(hl)
+	inc	hl
+	set	7,(hl)
+	ret
+.noblinkon
+	cp	25
+	jr	nz,noblinkoff
+	ld	hl,text_attr
+	res	7,(hl)
+	inc	hl
+	res	7,(hl)
+	ret
+.noblinkoff
 	cp	7
 	jr	z,switchreverse
 	cp	27
 	jr	nz,noreverse
 .switchreverse
-	ld	a,(text_attr)
-	add	a
-	add	a
-	add	a
-	add	a
-	and	@11110000
-	ld	e,a
-	ld	a,(text_attr)
-	rrca
-	rrca
-	rrca
-	rrca
-	and	@0001111
-	or	e
-	ld	(text_attr),a
+	ld	hl,text_attr
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	(hl),e
+	dec	hl
+	ld	(hl),d
 	ret
 
 .noreverse
@@ -83,19 +91,45 @@
 	and	@11111000
 	or	e
 	ld	(text_attr),a
-	ret
+	jr	calcinverse
 .background
+	cp	40
+	ret	m
 	cp	47+1
 	ret	p
 	sub	40
-	add	a,a
-	add	a,a
-	add	a,a
+	ld	d,a
+	rlca
+	rlca
+	rlca
+	rlca
+	and	@01110000
 	ld	e,a
 	ld	a,(text_attr)
 	and	@10001111
 	or	e
 	ld	(text_attr),a
+.calcinverse
+	ld	e,a
+	rlca
+	rlca
+	rlca
+	rlca
+	and	@01110000	;ink goes to paper
+	ld	d,a
+	ld	a,e
+	rrca
+	rrca
+	rrca
+	rrca
+	and	@00000111
+	or	d		
+	ld	d,a		;d holds paper and ink
+	ld	a,e
+	and	@10001000
+	or	d
+	ld	(inverse_attr),a
 	ret
 
-.text_attr	defb	15
+.text_attr	defb	@00001111	;bright white on black
+.inverse_attr	defb	@01111000	;grey on white

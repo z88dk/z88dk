@@ -10,7 +10,7 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.1 2002-10-10 20:38:22 dom Exp $
+;	$Id: f_ansi_dline.asm,v 1.2 2002-10-10 22:03:26 dom Exp $
 ;
 
 
@@ -23,7 +23,7 @@
 	ld	h,1		;height
 	ld	l,80		;width
 	ld	b,7		;colour
-	ld	a,' '
+	ld	a,0
 	ld	c,$56		;CLEAR
 	rst	$10
 	ret
