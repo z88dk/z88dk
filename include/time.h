@@ -5,7 +5,7 @@
  *
  *      djm 9/1/2000
  *
- *	$Id: time.h,v 1.7 2002-11-20 22:54:17 dom Exp $
+ *	$Id: time.h,v 1.8 2003-06-20 15:26:04 dom Exp $
  */
 
 
@@ -18,6 +18,10 @@
 #define CLOCKS_PER_SEC 50
 #endif
 
+#ifdef __SAM__
+#define CLOCKS_PER_SEC 50
+#endif
+
 #ifdef __ZX81__
 #define CLOCKS_PER_SEC 50
 #endif
@@ -25,6 +29,7 @@
 #ifdef __Z88__
 #define CLOCKS_PER_SEC 100
 #endif
+
 
 extern time_t __LIB__ time(time_t *);
 
