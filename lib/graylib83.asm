@@ -17,8 +17,6 @@
 	XDEF	graybit1
 	XDEF	graybit2
 
-defc intcount = $8583
-
     LD HL,$8300
     LD DE,$8301
     LD BC,256
@@ -53,9 +51,9 @@ defc intcount = $8583
         inc     (hl)                    ;
         ld      a,(hl)                  ;
         dec     a                       ; 1
-        jr      z,Display_pic2                 ;
+        jr      z,Display_pic1                 ;
         dec     a                       ; 2
-        jr      z,Display_pic1                 ;                     ;
+        jr      z,Display_pic2                 ;                     ;
         ld      (hl),0                  ; reset counter
 .exit_interrupt
         in      a,(3)                   ; check on interrupt status
@@ -66,7 +64,7 @@ defc intcount = $8583
         ld      a,$0B
         out     (3),a
         
-        pop	bc
+	pop	bc
         pop	de
         pop	hl
         pop	af
@@ -116,6 +114,9 @@ defc intcount = $8583
 ;.graybit2 defw $8265	;saferam1(apdram)
 .graybit2 defw gbuf2
 .gbuf2
-DEFS	768
+DEFS	769
+
+defc intcount = $8583
+;.intcount	defb	0
 
 .jump_over

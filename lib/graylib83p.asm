@@ -53,9 +53,9 @@ defc intcount = $8583
         inc     (hl)                    ;
         ld      a,(hl)                  ;
         dec     a                       ; 1
-        jr      z,Display_pic2
-        dec     a                       ; 2
         jr      z,Display_pic1
+        dec     a                       ; 2
+        jr      z,Display_pic2
         ld      (hl),0                  ; reset counter
 .exit_interrupt
         in      a,(3)                   ; check on interrupt status

@@ -73,10 +73,10 @@ defc intcount = $8BDF	;TEXT_MEM2
 
 
 .dpic1
-        ld      hl,(graybit1)
+        ld      hl,(graybit2)
         jr      drawp
 .dpic2
-        ld      hl,(graybit2)
+        ld      hl,(graybit1)
 
 .drawp  ld      a,$80
         out     ($10),a
@@ -94,8 +94,8 @@ defc intcount = $8BDF	;TEXT_MEM2
         inc     hl
         ld      a,(hl)
         out     ($11),a
-;	  push ix
-;	  pop ix
+	  ;push ix
+	  ;pop ix
         djnz    wloop2
         ld      a,c
         cp      $2B+1
