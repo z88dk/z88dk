@@ -22,6 +22,7 @@ sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/msx.lnx > $destdir/lib/config/m
 sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/mz.lnx > $destdir/lib/config/mz.cfg
 sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/mzansi.lnx > $destdir/lib/config/mzansi.cfg
 sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/nc.lnx > $destdir/lib/config/nc.cfg
+sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/pps.lnx > $destdir/lib/config/pps.cfg
 sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/rex.lnx > $destdir/lib/config/rex.cfg
 sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/rexlib.lnx > $destdir/lib/config/rexlib.cfg
 sed "s?DESTDIR?$destdir?g" < $destdir/lib/config/sam.lnx > $destdir/lib/config/sam.cfg
