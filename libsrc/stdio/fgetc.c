@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fgetc.c,v 1.4 2002-02-21 15:10:53 dom Exp $
+ * $Id: fgetc.c,v 1.5 2002-06-09 15:13:26 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -92,8 +92,19 @@ int fgetc(FILE *fp)
 	call	readbyte	;readbyte sorts out stack (fastcall)
 ;	pop	bc		;dump handle
 	pop	ix		;get fp back
+#ifdef __STDIO_BINARY
+	ld	a,_IOTEXT	;check for text mode
+	and	(ix+fp_flags)
+	ret	z
+	ld	a,l		;load bytes
+	sub	__STDIO_EOFMARKER	;compare with the EOF marker
+	and	a		;reset carry
+	ret	nz		
+	ld	hl,-1		;signify EOF
+#else
 	ret	nc		;no error so return (make sure other
 				;implementations respect this!)
+#endif
 .seteof
 	ld	a,(ix+fp_flags)
 	or	_IOEOF

@@ -12,7 +12,7 @@
  *	djm 1/4/2000
  *
  * --------
- * $Id: fread.c,v 1.4 2002-06-08 17:15:19 dom Exp $
+ * $Id: fread.c,v 1.5 2002-06-09 15:13:26 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -23,8 +23,19 @@ int fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
 {
 	if ( (fp->flags&(_IOUSE|_IOREAD)==(_IOUSE|_IOREAD))  && \
 			fchkstd(fp)== 0) {
-		int	readen=size*nmemb;
-
+		int	readen = size*nmemb;
+		int     count  = 0;
+#ifdef __STDIO_BINARY
+		while ( count < readen ) {
+		    int c = fgetc(fp);
+		    if ( c == EOF ) {
+			break;
+		    }
+		    *ptr++ = (unsigned char)c;
+		    ++count;
+		}
+		return ( count / size );  /* Relies on 0 / x != EXCEPTION */
+#else			
 		if (readen) {
 		    /* Pick up ungot character */
 		    int c = fgetc(fp);
@@ -37,6 +48,7 @@ int fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
 			return (readen/size);
 		    }
 		}
+#endif
 	}
 	return 0;
 }

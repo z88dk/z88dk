@@ -9,7 +9,7 @@
  *	djm 1/4/2000 Modified to enable file structures
  *
  * --------
- * $Id: freopen_z88.c,v 1.3 2002-04-21 19:08:09 dom Exp $
+ * $Id: freopen_z88.c,v 1.4 2002-06-09 15:13:26 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -26,19 +26,24 @@ FILE *freopen_z88(far char *name, char *mode, FILE *fp, char *explicit, size_t l
 	switch (*(unsigned char *)mode) {
 		case 'r':
 			access=O_RDONLY;
-			flags=_IOREAD | _IOUSE;
+			flags=_IOREAD | _IOUSE| _IOTEXT;
 			break;
 		case 'w':
 			access=O_WRONLY;
-                	flags = _IOWRITE | _IOUSE;
+                	flags = _IOWRITE | _IOUSE | _IOTEXT;
 			break;
 		case 'a':
 			access=O_APPEND;
-                	flags = _IOWRITE | _IOUSE;
+                	flags = _IOWRITE | _IOUSE | _IOTEXT;
 			break;
 		default:
 			return (FILE *)NULL;
 	}
+#ifdef __STDIO_BINARY
+	if ( *(unsigned char *) (mode+1) == 'b' )
+	    flags ^= _IOTEXT;
+#endif
+
 #ifdef NET_STDIO
 	if (opennet(fp,name,explicit,len) ) return (fp);
 #endif

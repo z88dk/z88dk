@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.8 2002-05-09 09:48:15 dom Exp $
+# $Id: Makefile,v 1.9 2002-06-09 15:13:26 dom Exp $
 #
 
 STDCFILES = \
@@ -16,7 +16,6 @@ STDCFILES = \
 	fopen.c \
 	fopen_z88.c \
 	fputs.c \
-	fread.c \
 	freopen.c \
 	fseek.c \
 	ftell.c \
@@ -32,6 +31,7 @@ GENCFILES = \
 	fgetc.c \
 	fputc.c \
 	freopen_z88.c \
+	fread.c 
 
 NETCFILES = $(GENCFILES) \
 	fflush.c
@@ -40,8 +40,11 @@ NETCFILES = $(GENCFILES) \
 
 AFILES  = $(STDCFILES:.c=.asm) $(NETCFILES:.c=.asm)
 STDOBJECTS = $(STDCFILES:.c=.o)
+GENCOBJECTS = $(GENCFILES:.c=.o)
 
 generic: std gen
+
+lcpm: std cpm
 
 lz88: std gen z88_x
 
@@ -53,13 +56,23 @@ net:
 	zcc -vn -DNET_STDIO -make-lib fputc.c
 	zcc -vn -DNET_STDIO -make-lib freopen_z88.c
 	zcc -vn -DNET_STDIO -make-lib fflush.c
+	zcc -vn -DNET_STDIO -make-lib fread.c
 	cd zsock ; make
+
+cpm:	$(GENCOBJECTS)
+	zcc -vn -D__CPM__ -make-lib fclose.c
+	zcc -vn -D__CPM__ -make-lib fgetc.c
+	zcc -vn -D__CPM__ -make-lib fputc.c
+	zcc -vn -D__CPM__ -make-lib freopen_z88.c
+	zcc -vn -D__CPM__ -make-lib fread.c
+
 
 gen:
 	zcc -vn -make-lib fclose.c
 	zcc -vn -make-lib fgetc.c
 	zcc -vn -make-lib fputc.c
 	zcc -vn -make-lib freopen_z88.c
+	zcc -vn -make-lib fread.c
 	cd 8080; make
 
 std:    $(STDOBJECTS)
