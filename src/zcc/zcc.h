@@ -3,27 +3,36 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.12 2002-07-15 17:45:46 dom Exp $
+ * $Id: zcc.h,v 1.13 2002-10-03 21:15:37 dom Exp $
  */
 
 
 /* Some machine specific definitions (paths etc!) */
 
-char *version = "v2.492 (C) 27.1.2002 D.J.Morris\n";
+char *version = "v2.50 (C) 3.10.2002 D.J.Morris\n";
 
 #ifdef AMIGA
-#define PREFIX "zcc:lib/config/"
-char *amiver="$VER: zcc v2.492 (28.1.2002)";
+#define PREFIX "zcc:"
+char *amiver="$VER: zcc v2.50 (3.10.2002)";
 #endif
 
 /* Insert your machines definitions in here... */
 
-#ifdef __MSDOS__
-#define PREFIX "c:\\z88dk\\lib\\config\\"
+#if defined(__MSDOS__) && defined(__TURBOC__)
+/* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
+#define PREFIX "c:\\z88dk"
+#include <stdarg.h>
+int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 #endif
 
 #ifdef _WIN32
-#define PREFIX "c:/z88dk/lib/config/"
+/* Predefined in 32-bit MS Visual C/C++ and Borland Builder C/C++ */
+#define PREFIX "c:/z88dk"
+#endif
+
+#if _MSC_VER == 1200
+/* Predefined by Microsoft Visual C++ 6.0 */
+#define snprintf _snprintf
 #endif
 
 #ifdef UNIX

@@ -115,9 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *	22/4/2002 - (Stefano) Visual C "snprintf" workaround
- *
- *      $Id: zcc.c,v 1.16 2002-10-02 09:35:46 dom Exp $
+ *      $Id: zcc.c,v 1.17 2002-10-03 21:15:37 dom Exp $
  */
 
 
@@ -127,10 +125,6 @@
 #include        <ctype.h>
 #include        "zcc.h"
 
-
-#ifdef _MSC_VER
-#define snprintf _snprintf
-#endif
 
 
 /* All our function prototypes */
@@ -256,7 +250,12 @@ struct confs myconf[]={
  * Oh, I know these could be chars, but I'm lazy!
  */
 
+#if defined(__MSDOS__) && defined(__TURBOC__)
+/* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
+int     usetemp         = 0;
+#else
 int     usetemp         = 1;
+#endif
 int     preserve        = 0;    /* don't destroy zcc_opt */
 int     createapp       = 0;    /* Go the next stage and create the app */
 int     z80verbose      = 0;
@@ -540,8 +539,8 @@ int main(argc, argv)
  *      Now, set the linkargs list up to initially consist of
  *      the startuplib
  */
-        snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[STARTUPLIB].def);
-        BuildOptions(&linkargs,buffer);
+		snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[STARTUPLIB].def);
+		BuildOptions(&linkargs,buffer);
 
 /*
  *      Set the default output file
@@ -711,26 +710,26 @@ int main(argc, argv)
                 }
         }
         if (compileonly || assembleonly) {
-                if (compileonly && !assembleonly ) {
-                        if (usetemp) CopyOutFiles(OBJEXT);
-                } else {
-                        if (usetemp) CopyOutFiles(peepholeopt ? ".opt" : ".asm");
-                }
-                exit(0);
-        }
+				if (compileonly && !assembleonly ) {
+						if (usetemp) CopyOutFiles(OBJEXT);
+				} else {
+						if (usetemp) CopyOutFiles(peepholeopt ? ".opt" : ".asm");
+				}
+				exit(0);
+		}
 
 /* Link them, if errors, atexit() deals with them! */
 
-        if (linkthem(myconf[LINKER].def)) exit(1);
+		if (linkthem(myconf[LINKER].def)) exit(1);
 
-        if      (createapp ) {
+		if      (createapp ) {
 /*
  * Building an application - run the appmake command on it
  */
-		if (notruncat == 0 ) 
-                	snprintf(buffer,sizeof(buffer),"%s %s %s",myconf[APPMAKE].def,outputfile,myconf[CRT0].def);
+		if (notruncat == 0 )
+					snprintf(buffer,sizeof(buffer),"%s %s %s",myconf[APPMAKE].def,outputfile,myconf[CRT0].def);
 		else
-                	snprintf(buffer,sizeof(buffer),"%s %s %s -nt",myconf[APPMAKE].def,outputfile,myconf[CRT0].def);
+					snprintf(buffer,sizeof(buffer),"%s %s %s -nt",myconf[APPMAKE].def,outputfile,myconf[CRT0].def);
 
                 if (verbose) printf("%s\n",buffer);
                 if (system(buffer) ){
@@ -752,8 +751,8 @@ int main(argc, argv)
 int CopyFile(char *name1,char *ext1, char *name2, char *ext2)
 {
         char    buffer[LINEMAX+1];
-        snprintf(buffer,sizeof(buffer),"%s %s%s %s%s",myconf[COPYCMD].def, name1,ext1,name2,ext2);
-        if (verbose) printf("%s\n",buffer);
+		snprintf(buffer,sizeof(buffer),"%s %s%s %s%s",myconf[COPYCMD].def, name1,ext1,name2,ext2);
+		if (verbose) printf("%s\n",buffer);
         return(system(buffer));
 }
 
@@ -859,12 +858,15 @@ void SetPeepHole(char *arg)
 
 void SetTemp(char *arg)
 {
-        usetemp=YES;
+#if !defined(__MSDOS__) || !defined(__TURBOC__)
+/* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
+		usetemp=YES;
+#endif
 }
 
 void UnSetTemp(char *arg)
 {
-        usetemp=NO;
+		usetemp=NO;
 }
 
 
@@ -914,12 +916,12 @@ void AddLink(char *arg)
  */
         if (strcmp(arg,"lmz")==0) {
 		AddComp(myconf[Z88MATHFLG].def+1); 
-        	snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[Z88MATHLIB].def);
-        	BuildOptions(&linkargs,buffer);
+			snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[Z88MATHLIB].def);
+			BuildOptions(&linkargs,buffer);
 		return;
 	} else if (strcmp(arg,"lm") == 0 ) {
-        	snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[GENMATHLIB].def);
-        	BuildOptions(&linkargs,buffer);
+			snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[GENMATHLIB].def);
+			BuildOptions(&linkargs,buffer);
 		return;
 	}
 
@@ -928,8 +930,8 @@ void AddLink(char *arg)
  * zlib: directory so all the libraries have simple names
  * Build what the option will be and stick it in..
  */
-        snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,arg+1);
-        BuildOptions(&linkargs,buffer);
+		snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,arg+1);
+		BuildOptions(&linkargs,buffer);
 
 }
 
@@ -940,8 +942,8 @@ void AddLink(char *arg)
 
 void BuildOptions(char **list, char *arg)
 {
-        char    *temparg;
-        int     len;
+		char    *temparg;
+		int     len;
         temparg=*list;
 
         len=2+strlen(arg)+( temparg ? strlen(temparg) : 0 );
@@ -979,7 +981,7 @@ void AddToFileList(char *arg)
  *      Now, create a temporary filename, and copy from the original
  *      file, to the temporary file
  */
-        if (usetemp) {
+		if (usetemp) {
                 tempname(filen);
                 j=strlen(arg);
                 while(j && arg[j]!='.') j--;
@@ -1265,7 +1267,7 @@ void CopyCrt0(void)
         char    *oldptr, *newptr;
 
         if (compileonly || assembleonly || preprocessonly) return;
-        if (usetemp) {
+		if (usetemp) {
                 tempname(filen);  /* Temporary nane..get it in filen */
         } else {
 /* If not using temporary file then the gumph goes into crt0.#? */
@@ -1326,28 +1328,28 @@ void tempname(char *filen)
 	char	*ptr;
 
 #ifdef _WIN32
+/* Predefined in 32-bit MS Visual C/C++ and Borland Builder C/C++ */
 	if(ptr=getenv("TEMP")){      /* Under Windows 95 usually C:\WINDOWS\TEMP */
 		strcpy(filen,ptr);   /* Directory is not guaranteed to exist */
 		tmpnam(filen+strlen(filen)); /* Adds strings like "\s3vvrm3t.", "\s3vvrm3t.1", "\s3vvrm3t.2" */
 	}
 	else
 		tmpnam(filen);
-#else
-  #ifdef __MSDOS__
-    #ifdef __BORLANDC__
+#elif defined(__MSDOS__) && defined(__TURBOC__)
+/* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
+
 	if(ptr=getenv("TEMP")){      /* From MS-DOS 5, C:\TEMP, C:\DOS, C:\WINDOWS\TEMP or whatever or nothing */
 		strcpy(filen,ptr);   /* Directory is not guaranteed to exist */
 		strcat(filen,"\\");
-		tmpnam(filen+strlen(filen));    /* Adds strings like "TMP1.$$$", "TMP2.$$$" */
-	}
-	else
-		tmpnam(filen);
-        if(ptr=strrchr(filen,'.'))
-        	*ptr=0;                 /* Don't want to risk too long filenames */
-    #endif
-  #else
+		tmpnam(filen+strlen(filen)); /* Adds strings like TMP1.$$$, TMP2.$$$ */
+	}                                /* Allways starts at TMP1.$$$. Does not */
+	else                             /* check if file already exists. So is  */
+		tmpnam(filen);               /* not suitable for executing zcc more  */
+		if(ptr=strrchr(filen,'.'))   /* than once without cleaning out files.*/
+			*ptr=0;  /* Don't want to risk too long filenames */
+
+#else
 	tmpnam(filen);  /* Temporary nane..get it in filen */
-  #endif
 #endif
 	while (ptr=strchr(filen,'.') )
 		*ptr='_';
@@ -1359,8 +1361,8 @@ void tempname(char *filen)
  *	Scheme is as follows:
  *	Use ZCCFILE for compatibility
  *	If not, use ZCCCFG/zcc.cfg
- *		or  ZCCCFG/argv[0]
- *	Or as a first resort argv[0]
+ *		or  ZCCCFG/argv[1]
+ *	Or as a first resort argv[1]
  *	Returns gc (or exits)
  *
  *	If ZCCCFG doesn't exist then we take the PREFIX 
@@ -1402,7 +1404,7 @@ int FindConfigFile(char *arg, int gc)
 #ifdef __MSDOS__
 		snprintf(outfilename,sizeof(outfilename),"%s\\lib\\config\\%s.cfg",PREFIX,arg+1);
 #else
-		snprintf(outfilename,sizeof(outfilename),"%s/lib/z88dk/lib/config/%s.cfg",PREFIX,arg+1);
+		snprintf(outfilename,sizeof(outfilename),"%s/lib/config/%s.cfg",PREFIX,arg+1);
 #endif
 		}
 		/* User supplied invalid config file, let it fall over
@@ -1435,10 +1437,11 @@ int FindConfigFile(char *arg, int gc)
 		strcat(outfilename,"zcc.cfg");
 	} else {
 #if 1
-#ifdef __MSDOS__
-		snprintf(outfilename,sizeof(outfilename),"%s\\lib\\config\\zcc.cfg",PREFIX);
+#if defined(__MSDOS__) && defined(__TURBOC__)
+/* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
+	    snprintf(outfilename,sizeof(outfilename),"%s\\lib\\config\\zcc.cfg",PREFIX);
 #else
-		snprintf(outfilename,sizeof(outfilename),"%s/lib/z88dk/lib/config/zcc.cfg",PREFIX);
+	    snprintf(outfilename,sizeof(outfilename),"%s/lib/config/zcc.cfg",PREFIX);
 #endif
 #else
 		fprintf(stderr,"Couldn't find env variable ZCCCFG\n");
@@ -1448,3 +1451,17 @@ int FindConfigFile(char *arg, int gc)
 	return(gc);
 }
 
+#if defined(__MSDOS__) && defined(__TURBOC__)
+/* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
+int snprintf(char * buffer, size_t bufsize, const char * format, ...)
+{
+	va_list argptr;
+	int num_chars;
+
+	va_start(argptr,format);
+	num_chars = vsprintf(buffer, format, argptr);
+	va_end(argptr);
+
+	return num_chars;
+}
+#endif
