@@ -4,13 +4,19 @@
 ;	getk() Read key status
 ;
 ;	Stefano Bodrato - Apr. 2000
+;	Stefano Bodrato - Mar. 2004 - fixed
 ;
 ;
-;	$Id: getk.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: getk.asm,v 1.3 2004-03-20 11:16:24 stefano Exp $
 ;
 
 	XLIB	getk
 
 .getk
-	ld	a,0
-	ret	; I have no idea for this..
+	LD 	c,6
+	ld	e,255
+	call	5
+	ld	h,0
+	ld	l,a
+	
+	ret
