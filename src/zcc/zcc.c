@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.7 2001-06-26 10:47:03 dom Exp $
+ *      $Id: zcc.c,v 1.8 2001-07-20 11:19:54 dom Exp $
  */
 
 
@@ -874,6 +874,7 @@ void SetZ80Verb(char *arg)
 void AddToAssembler(char *arg)
 {
 	BuildOptions(&asmargs,arg+2);
+	BuildOptions(&linkargs,arg+2);
 }
 
 void AddToPreProc(char *arg)
