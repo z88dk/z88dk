@@ -2,7 +2,6 @@
 
 all:
 	cd graphics ; make
-	cd farcall ; make
 
 .c.o:
 	zcc +rex -vn -make-lib $*.c
