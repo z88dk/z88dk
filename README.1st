@@ -1,4 +1,4 @@
-$Id: README.1st,v 1.5 2001-05-03 10:28:03 stefano Exp $
+$Id: README.1st,v 1.6 2001-05-11 09:19:55 dom Exp $
 
 There's a lot of documentation in the doc/ directory, some of it is half
 way through being written, so apologies for the fuzziness in places, most
@@ -9,7 +9,8 @@ If you have any questions, feel free to email me at dom@jb.man.ac.uk
 ----- COMPILATION INSTRUCTIONS -----
 
 1. Check src/z80asm/config.h for machine status and endian status.
-   ENDIAN is set if the machine is big endian (68k,PPC,Sparc etc) 
+   ENDIAN is set if the machine is big endian (68k,PPC,Sparc etc). There's
+   some gcc magic to pick this up automatically which should work.
 
 2. Type: make
 
@@ -32,6 +33,22 @@ Amiga: ixemul v47+ required..
 --8<--
 
 Brief guide to what has changed in case I don't distribute the doco
+
+z88dkv1.33 (sccz80v1.10b72) 11.5.2001
+
+- [sccz80] Many changes to #pragma directive
+- [sccz80] FP division now works! (Helps if I call fdiv instead of fmul!)
+- [zcpp] Should now understand various LF/CR conventions
+- [z80asm] Labels can now end in ':' and don't have to start with '.'
+- [z80asm] The options page is too long, so by default we just print version number,
+  z80asm -h now displays the options
+- [include] Fixed the annoying csleep prototype problem
+- [libs] Added support for new machines from Stefano (MSX, SVI etc)
+- [libs] z88 now has ANSI terminal support
+- [libs] Untested Spectrum +3 file support
+- [libs] Xircom Rex support (untested) - mail me (dom) for the includes etc
+- [doc] Platforms.txt details what is suppported on which machine
+
 
 z88dkv1.32 (sccz80v1.10b71pre4) 6.2.2001
 
