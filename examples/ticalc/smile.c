@@ -11,6 +11,7 @@
 
 #pragma string name Smiley Smiley (picture)
 #pragma output nostreams
+#pragma data icon 0x3C,0x42,0xA5,0xA5,0x81,0xA5,0x5A,0x3C;
 
 #include <stdio.h>
 #include <games.h>
