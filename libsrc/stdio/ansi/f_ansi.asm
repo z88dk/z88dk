@@ -15,6 +15,8 @@
 ;	L - Insert line: to be completed
 ;
 ;
+;	$Id: f_ansi.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;
 
         XLIB	f_ansi
         LIB	ansi_putc

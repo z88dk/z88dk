@@ -14,6 +14,9 @@
 ;	Display a char in location (ansi_ROW),(ansi_COLUMN)
 ;	A=char to display
 ;
+;
+;	$Id: f_ansi_char.asm,v 1.3 2001-04-13 14:13:59 stefano Exp $
+;
 
 	XLIB	ansi_CHAR
 	

@@ -4,6 +4,9 @@
 ;
 ; 	CLS - Clear the screen
 ;	
+;
+;	$Id: f_ansi_cls.asm,v 1.3 2001-04-13 14:13:59 stefano Exp $
+;
 
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 

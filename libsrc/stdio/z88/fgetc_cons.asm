@@ -4,6 +4,10 @@
 ;22/3/2000 - This was getkey() renamed to getchar
 ;
 ;1/4/2000  - Renamed to fgetc_cons
+;
+;
+;	$Id: fgetc_cons.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
                 INCLUDE "#stdio.def"
 

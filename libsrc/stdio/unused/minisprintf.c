@@ -11,6 +11,8 @@
  *
  * New I/O version, we fake up a file channel which is in fact
  * a string djm 1/4/2000
+ *	
+ *	$Id: minisprintf.c,v 1.2 2001-04-13 14:14:00 stefano Exp $
  */
 
 #define ANSI_STDIO

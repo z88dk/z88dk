@@ -5,6 +5,9 @@
 ;       Define for char size and number of columns
 ;	+ specific display metrics
 ;
+;
+;	$Id: ticalc.inc,v 1.4 2001-04-13 14:13:59 stefano Exp $
+;
 
 	defc columns	= 32
 

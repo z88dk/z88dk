@@ -1,6 +1,9 @@
 ;
 ;	TI 85 Key Table
 ;
+;
+;	$Id: ti85tab.inc,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
 
 .TiKeyTab1
@@ -28,9 +31,9 @@ defb	$0E
 defb	'^'
 
 defb	$0F	;Clear
-defb	12
+defb	8
 defb	$20	;DEL
-defb	12
+defb	8
 
 defb	$12
 defb	'3'
@@ -88,7 +91,7 @@ defb	'E'
 defb	$0F	;Clear
 defb	12
 defb	$20	;DEL
-defb	12
+defb	8
 
 defb	$11
 defb	' '

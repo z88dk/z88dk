@@ -6,6 +6,10 @@
 ;       We will corrupt any register
 ;
 ;       Stefano Bodrato - Mar.2001
+;
+;
+;	$Id: getk.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;
 
 
 

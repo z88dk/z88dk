@@ -1,4 +1,4 @@
-
+# $Id: Makefile,v 1.2 2001-04-13 14:14:00 stefano Exp $
 
 all:
 	zcc -vn -DNET_STDIO -make-lib opennet.c

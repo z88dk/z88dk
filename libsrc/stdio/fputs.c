@@ -4,6 +4,9 @@
  *	fputc handles all types
  *
  *      djm 4/5/99
+ *
+ * --------
+ * $Id: fputs.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
  */
 
 

@@ -3,6 +3,9 @@
 ;
 ;	puts(char *s) - put string to screen
 ;
+;
+;	$Id: puts_cons.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
 
 		XLIB	puts_cons

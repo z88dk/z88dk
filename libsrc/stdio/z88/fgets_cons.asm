@@ -10,6 +10,10 @@
 ; Is this better now garry?!?! djm 1/4/2000
 ;
 ; Now goes back to the correct print position
+;
+;
+;	$Id: fgets_cons.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
                 INCLUDE "#stdio.def"
 		INCLUDE	"#syspar.def"

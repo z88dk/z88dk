@@ -5,6 +5,9 @@
  *
  *	This is as usual my slightly non standard gets()
  *	which takes a length argument..
+ *
+ * --------
+ * $Id: fgets_cons.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
  */
 
 #include <stdio.h>

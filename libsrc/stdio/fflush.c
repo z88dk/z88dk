@@ -3,6 +3,8 @@
  *
  *	Only really valid for TCP net connections
  *
+ * --------
+ * $Id: fflush.c,v 1.3 2001-04-13 14:13:58 stefano Exp $
  */
 
 #ifdef Z80

@@ -6,6 +6,9 @@
  *      Liberated from an unknown source <grin>
  *
  *      Added to z88dk archive 11/4/99 djm
+ *
+ * --------
+ * $Id: printn.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
  */
 
 

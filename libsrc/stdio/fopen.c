@@ -5,6 +5,8 @@
  *
  * djm 4/5/99
  *
+ * --------
+ * $Id: fopen.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
  */
 
 #define ANSI_STDIO

@@ -8,6 +8,9 @@
  *	If implemented this routine should obviously check that
  *	it's alright to close a file (i.e. not string or default
  *	std*)
+ *
+ * --------
+ * $Id: fabandon.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
  */
 
 

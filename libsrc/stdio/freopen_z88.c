@@ -7,6 +7,9 @@
  *	djm 24/3/2000
  *
  *	djm 1/4/2000 Modified to enable file structures
+ *
+ * --------
+ * $Id: freopen_z88.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
  */
 
 #define ANSI_STDIO

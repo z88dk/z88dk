@@ -6,6 +6,9 @@
 ;
 ; in:	A = text row number
 ;
+;
+;	$Id: f_ansi_dline.asm,v 1.3 2001-04-13 14:13:59 stefano Exp $
+;
 
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 

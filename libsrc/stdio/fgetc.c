@@ -2,6 +2,9 @@
  *      New stdio functions for Small C+
  *
  *      djm 4/5/99
+ *
+ * --------
+ * $Id: fgetc.c,v 1.3 2001-04-13 14:13:58 stefano Exp $
  */
 
 #define ANSI_STDIO

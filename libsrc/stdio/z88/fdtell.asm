@@ -5,6 +5,10 @@
 ; 11/3/99 djm ***UNTESTED***
 ;
 ; *** THIS IS A Z88 SPECIFIC ROUTINE!!! ***
+;
+;
+;	$Id: fdtell.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
                 INCLUDE "#fileio.def"
                 INCLUDE "libdefs.def"

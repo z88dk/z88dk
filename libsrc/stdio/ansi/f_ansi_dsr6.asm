@@ -8,6 +8,8 @@
 ;
 ;	Stefano Bodrato - Apr. 2000
 ;
+;	$Id: f_ansi_dsr6.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;
 
 
 	XLIB	ansi_DSR6

@@ -7,6 +7,10 @@
 ;
 ;	22/3/2000 djm Rechristened getchar
 ;	1/4/2000  djm Rechristened fgetc_cons
+;
+;
+;	$Id: fgetc_cons.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
 
 		XLIB	fgetc_cons

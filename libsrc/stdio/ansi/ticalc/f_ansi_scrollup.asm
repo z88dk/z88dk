@@ -4,6 +4,9 @@
 ;
 ;	Scrollup
 ;
+;
+;	$Id: f_ansi_scrollup.asm,v 1.4 2001-04-13 14:13:59 stefano Exp $
+;
 
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 

@@ -1,3 +1,5 @@
+$Id: readme.txt,v 1.2 2001-04-13 14:14:00 stefano Exp $
+
 How pass the code to the VZ emulator.
 
 - Get the VZ emulator from:

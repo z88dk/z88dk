@@ -1,6 +1,9 @@
 ;
 ;	TI 86 Key Table
 ;
+;
+;	$Id: ti86tab.inc,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
 
 .TiKeyTab1
@@ -22,7 +25,7 @@ defb	':'
 defb	$08	;clear
 defb	12
 defb	$09	;del
-defb	12
+defb	8
 
 defb	$0C
 defb	'+'

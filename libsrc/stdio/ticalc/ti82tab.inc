@@ -1,6 +1,9 @@
 ;
 ;	TI 82 Key Table
 ;
+;
+;	$Id: ti82tab.inc,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
 
 .TiKeyTab1
@@ -61,7 +64,7 @@ defb	$25
 defb	','
 ; G_ON		$29	ON
 defb	$38	;DEL
-defb	12
+defb	8
 
 defb	0
 
@@ -155,6 +158,6 @@ defb	'X'
 ; G_ON		$29	ON
 
 defb	$38	;DEL
-defb	12
+defb	8
 
 defb	0

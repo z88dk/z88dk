@@ -4,6 +4,10 @@
 ;	djm 6/6/2000
 ;
 ;	Entry: a = row
+;
+;
+;	$Id: f_ansi_dline.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;
 
 
 	XLIB	ansi_dline

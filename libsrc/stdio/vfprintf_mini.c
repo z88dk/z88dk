@@ -10,6 +10,8 @@
  *	djm 3/3/2000
  *	This routine is infact a vfprintf, so naming as such...
  *
+ * --------
+ * $Id: vfprintf_mini.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
  */
 
 #define ANSI_STDIO

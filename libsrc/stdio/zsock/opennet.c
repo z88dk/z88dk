@@ -1,7 +1,9 @@
 /*
- * Open a TCP/UDP connection based on fileio
+ *	Open a TCP/UDP connection based on fileio
  *
- * djm 25/4/2000
+ *	djm 25/4/2000
+ *	
+ *	$Id: opennet.c,v 1.2 2001-04-13 14:14:00 stefano Exp $
  */
 
 

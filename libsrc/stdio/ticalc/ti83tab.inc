@@ -1,6 +1,9 @@
 ;
 ;	TI 83 Key Table
 ;
+;
+;	$Id: ti83tab.inc,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
 
 .TiKeyTab1
@@ -59,7 +62,7 @@ defb	$8B
 defb	','
 
 defb	$0A	;DEL
-defb	12
+defb	8
 
 ;----
 defb	$04	;AlphaDown

@@ -6,6 +6,8 @@
 ;
 ;	Stefano Bodrato - 3/4/2001
 ;
+;	$Id: puts_cons.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;
 
 
 		XLIB	puts_cons

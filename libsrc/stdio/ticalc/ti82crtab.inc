@@ -1,6 +1,9 @@
 ;
 ;	TI 82 Key Table
 ;
+;
+;	$Id: ti82crtab.inc,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
 .TiKeyTab1
 
@@ -16,7 +19,7 @@ defb	$05	;ENTER
 defb	13
 
 defb	$7	;DEL
-defb	12
+defb	8
 
 
 defb	129; K_PLUS
@@ -61,6 +64,6 @@ defb	$05	;ENTER
 defb	13
 
 defb	$7	;DEL
-defb	12
+defb	8
 
 defb	0

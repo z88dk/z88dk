@@ -3,6 +3,8 @@
  * A lot smaller than the full fledged printf.
  *
  * Liberated once more and inserted into Small C+ 29/4/99 djm
+ *	
+ *	$Id: minifprintf.c,v 1.2 2001-04-13 14:14:00 stefano Exp $
  */
 
 #define ANSI_STDIO

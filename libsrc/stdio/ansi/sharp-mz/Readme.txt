@@ -1,4 +1,5 @@
-Pre-Beta code for the SHARP MZ Family.
-There's somthing wrong somewhere and the printf works with strings only.
+$Id: Readme.txt,v 1.2 2001-04-13 14:13:59 stefano Exp $
 
-If someone wants to go on with all this... just tell me, so we're not working twice !
+Pre-Beta code for the SHARP MZ Family.
+There's somthing wrong somewhere and the printf works with text only.
+

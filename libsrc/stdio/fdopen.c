@@ -2,6 +2,9 @@
  *	Associate a file handle with a stream
  *
  *	20/4/2000 djm
+ *
+ * --------
+ * $Id: fdopen.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
  */
 
 #include <stdio.h>

@@ -6,6 +6,10 @@
 ;       We've just read in 0 from os_*in so we need to get the command
 ;       code - this should never occur from BASIC, so the basic crt0
 ;       file can just be a ret
+;
+;
+;	$Id: getcmd.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
                 XLIB    getcmd
                 XREF    processcmd

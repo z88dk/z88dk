@@ -10,6 +10,10 @@
 ; 27/4/99 Now takes a far char *name
 ;
 ; 15/4/2000 Takes a near again (can change but effort!)
+;
+;
+;	$Id: remove.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
                 INCLUDE "#fileio.def"
                 INCLUDE "#stdio.def"

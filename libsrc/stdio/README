@@ -1,3 +1,5 @@
+($Id: README,v 1.2 2001-04-13 14:13:58 stefano Exp $)
+
 The stdio library needs a couple of machine specific routines
 
 These are all located in {machine}/ directory below this

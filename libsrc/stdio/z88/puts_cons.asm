@@ -6,6 +6,10 @@
 ;	Non standard (for short programs)
 ;
 ;       djm 2/4/99
+;
+;
+;	$Id: puts_cons.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
                 INCLUDE "#stdio.def"
 

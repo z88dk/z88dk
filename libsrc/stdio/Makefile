@@ -1,6 +1,8 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
+# $Id: Makefile,v 1.2 2001-04-13 14:13:58 stefano Exp $
+#
 
 generic: std gen
 

@@ -4,7 +4,11 @@
 ;
 ; 	Text Attributes
 ;	m - Set Graphic Rendition
-;	
+;
+;
+;	$Id: f_ansi_attr.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;
+
 
 	XLIB	ansi_attr
 

@@ -7,6 +7,8 @@
  *	Returns: 0 = not console, c
  *		 1 = input, nc
  *		-1 = output, nc
+ * --------
+ * $Id: fchkstd.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
  */
 
 #define ANSI_STDIO

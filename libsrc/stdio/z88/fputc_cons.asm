@@ -7,6 +7,10 @@
 ;
 ;	1/4/2000 (Original Aug 98)
 ;
+;
+;
+;	$Id: fputc_cons.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
                 INCLUDE "#stdio.def"
 

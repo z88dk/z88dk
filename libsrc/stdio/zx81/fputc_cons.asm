@@ -9,6 +9,9 @@
 ;	With this you'll save a bit more than 1 Kbyte.
 ;	Useful if you want to use the 3K expansion.
 ;
+;
+;	$Id: fputc_cons.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;
 
 	XLIB	fputc_cons
 	LIB	zx81_cnvtab

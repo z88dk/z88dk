@@ -3,6 +3,9 @@
  * (this is useful for debugging packages)
  *
  * djm 24/4/2000
+ *
+ * --------
+ * $Id: printk.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
  */
 
 #include <stdio.h>
