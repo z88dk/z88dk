@@ -7,51 +7,65 @@
 ;
 ;
 ;       Define for graphics and other standard library functions
+;
+
+
+IF FORti82
+	defc row_bytes	= 12
+	defc maxx	= 96
+	defc maxy	= 64
+ENDIF
+
+IF FORti83
+	defc row_bytes	= 12
+	defc maxx	= 96
+	defc maxy	= 64
+ENDIF
+
+IF FORti85
+	defc row_bytes	= 16
+	defc maxx	= 128
+	defc maxy	= 64
+ENDIF
+
+IF FORti86
+	defc row_bytes	= 16
+	defc maxx	= 128
+	defc maxy	= 64
+ENDIF
+
 
 IF FORvz200
-	defc	maxy	= 64
+	defc maxy	= 64
+	defc maxx	= 128 ;should be 128, but we "emulate" it.
 ENDIF
 
-IF FORzx
-	defc	maxy	= 192
+
+IF FORzx81
+	defc maxy	= 64 ; emulated (48 real dots)
+	defc maxx	= 96 ; emulated (64 real dots)
 ENDIF
+
+
+IF FORzx
+	defc maxy	= 192
+	defc maxx	= 256
+ENDIF
+
 
 IF FORz88
 
 	defc	maxy 	= 64
 
-  IF !APPZ88
+IF !APPZ88
         defc    map_seg = 192
         defc    map_bk  = $4D3
-  ELSE
+ELSE
         defc    map_seg = 64     
         defc    map_bk = $4D1
-  ENDIF
-
 ENDIF
 
-IF FORti82
-	defc	maxy = 64
-ENDIF
 
-IF FORti83
-	defc	maxy = 64
-ENDIF
-
-IF FORti83p
-	defc	maxy = 64
-ENDIF
-
-IF FORti85
-	defc	maxy = 64
-ENDIF
-IF FORti86
-	defc	maxy = 64
-ENDIF
-
-IF FORzx81
-	defc	maxx = 64
-	defc	maxy = 48
 ENDIF
 
 

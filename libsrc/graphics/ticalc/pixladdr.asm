@@ -10,18 +10,10 @@
 ;
 ; Get absolute	pixel address in map of virtual (x,y) coordinate.
 ;
-; in:  hl	= (x,y) coordinate of pixel (h,l)
+; TI Calculator version
 ;
-; out: de	= address	of pixel byte
-;	   a	= bit number of byte where pixel is to be placed
-;	  fz	= 1 if bit number is 0 of pixel position
-;
-; registers changed	after return:
-;  ......hl/ixiy same
-;  afbcde../.... different
-;
-
 ; addr=base+12*y+int(x/8)
+;
 
 .pixeladdress
 

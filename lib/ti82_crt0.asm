@@ -52,7 +52,7 @@
 
         org     $9104	; TI 82. Same for ASH and CrASH
 
-	jr	start
+	;jr	start
 	
         defm  	"C+ compiled program"&0
 

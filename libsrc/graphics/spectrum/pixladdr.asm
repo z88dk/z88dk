@@ -26,22 +26,25 @@
 
 				; Direct ROM call
 				; better not to use it:
-		ld	b,l	; maybe someone wants to
-		ld	c,h	; make a ROM :-)
-		call	8880
-		xor	@00000111
-		ld	d,h
-		ld	e,l
-		ret
-	
-IF noROM
+;		ld	b,l	; maybe someone wants to
+;		ld	c,h	; make a ROM :-)
+;		call	8880
+;		call	8881
+;		xor	@00000111
+;		ld	d,h
+;		ld	e,l
+;		ret
+
+;IF noROM
 		LD	C,H
 		ld	a,maxy
 		; LD	A,192	; For a full height display
 		; LD	A,128	; Z88-like
 		
-	        SUB     L
+	        ;SUB     L
 	        ;; JP      C,out-of-range
+		
+		LD	A,L
 		
 	        LD      B,A
 	        AND     A
@@ -69,5 +72,5 @@ IF noROM
 	        XOR	@00000111
 	        
 	        RET                     ;
-ENDIF
+;ENDIF
 

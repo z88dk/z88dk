@@ -10,22 +10,18 @@
 ;
 ; Design & programming by Gunther Strube, Copyright (C) InterLogic 1995
 ;
-; in:  hl	= (x,y) coordinate of pixel (h,l)
+; ******************************************************************
 ;
-; out: de	= address	of pixel byte
-;	   a	= bit number of byte where pixel is to be placed
-;	  fz	= 1 if bit number is 0 of pixel position
+; VZ200/300 version By Stefano Bodrato
 ;
-; registers changed	after return:
-;  ......hl/ixiy same
-;  afbcde../.... different
+; The VZ screen size is 128x64
+; We draw blue dots over green display (UGH!)
+;
 ;
 .pixeladdress
 				push	hl
 				ld	a,h
 				push	af
-;				and	@11111000		; rowdist = x div 8 * 8
-				rra
 				rra
 				rra
 				and	@00111111
@@ -44,8 +40,9 @@
 				ld	e,l
 				pop	af
 				pop	hl
-				and	@00000111		; a = x mod 8
+				
+				rla
+				and	@00000110		; a = x mod 8
 				xor	@00000111		; a = 7 - a
 				
 				ret
-

@@ -126,5 +126,8 @@ graphics/undrawr
 graphics/unplot
 graphics/drawbox
 graphics/setxy
+graphics/putsprite
+graphics/bksave
+graphics/bkrestore
 graphics/spectrum/pixladdr
 graphics/spectrum/swapgfxbk

@@ -12,7 +12,12 @@ IF FORti82
 	defc row_bytes	= 12
 	defc char_dots	= 3
 	defc TIALPHAKEY	= $30
-	defc getkey	= $01D4
+
+	;ROM key handler
+	;defc getkey	= $01D4
+
+	;CRASH key handler
+	defc getkey	= $8D91
 ENDIF
 
 IF FORti83

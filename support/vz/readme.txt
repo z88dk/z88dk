@@ -1,0 +1,26 @@
+How pass the code to the VZ emulator.
+
+- Get the VZ emulator from:
+  http://www.powerup.com.au/~intertek/VZ200/vz.htm
+- Get the utilities, also
+- Set the environment variables correctly
+- Compile your code (to a.bas)
+- Use the rbinary utility (Rbinary.exe a.bas a.vz)
+- Run the emulator
+- Type: POKE 30862,0:POKE 30863,128
+- Press F10, then 1 (Load Program)
+- Chose a.vz
+- Return to the emulator (press ENTER)
+- Type: X=USR(0)
+
+Enjoy it !
+
+The most difficult thing is to "understand" the VZ keyboard;
+only the left SHIFT key works.
+It is also possible to create a .WAV file for passing the program on tape.
+
+If you're going to run graphics type in a small BASIC program like this:
+10 MODE (1)
+20 X = USR (0)
+
+After executing the program BASIC goes back to text mode.

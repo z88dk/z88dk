@@ -133,6 +133,9 @@ graphics/undrawr
 graphics/unplot
 graphics/drawbox
 graphics/setxy
+graphics/vz200/putsprite
+graphics/bksave
+graphics/bkrestore
 graphics/vz200/pixladdr
 graphics/vz200/swapgfxbk
 graphics/vz200/clsgraph

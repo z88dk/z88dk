@@ -12,6 +12,29 @@
 
 .getk_decode
 
+IF FORti82
+; **** If we have a TI82 and we use CRASH, ****
+; **** letters and numbers are in sequence ****
+;
+; Numbers.
+		cp	143	; >= '0' ?
+		jr	c,isntnum
+		cp	153	
+		jr	nc,isntnum ; < '9'+1
+		sub	a,95	; Ok, re-code to the ASCII charset
+		jr	setout
+.isntnum
+		cp	155	; Between A and Z ?
+		jr	c,isntupper
+		cp	181
+		jr	nc,isntupper
+		sub	a,90	; Ok, re-code to the ASCII charset
+		jr	setout
+.isntupper
+; **** End of TI82 specific key handling ****
+ENDIF
+
+
 IF FORti86
 ; **** We have a TI86. Letters and numbers are in sequence ****
 ;
@@ -91,8 +114,14 @@ ENDIF
 defb	0
 
 
+; TI82 ROM key handler
+;IF FORti82
+;	INCLUDE	"stdio/ticalc/ti82tab.inc"
+;ENDIF
+
+; CRASH re-written key handler
 IF FORti82
-	INCLUDE	"stdio/ticalc/ti82tab.inc"
+	INCLUDE	"stdio/ticalc/ti82crtab.inc"
 ENDIF
 
 IF FORti83
