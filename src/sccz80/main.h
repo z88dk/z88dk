@@ -46,6 +46,7 @@ extern void WriteDefined(char *sname, int value);
 extern void SetIntuition(char *);
 extern void SetStartUp(char *);
 extern void SetShareOffset(char *);
+extern void SetDoubleStrings(char *);
 extern int  makeshare;
 extern int  useshare;
 extern int sharedfile;

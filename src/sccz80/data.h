@@ -99,3 +99,4 @@ extern int useframe;
 extern int defdenums;
 extern int farheapsz;
 extern int printflevel;
+extern int doublestrings;

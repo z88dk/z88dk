@@ -2,7 +2,7 @@
  * cc4.c - fourth part of Small-C/Plus compiler
  *         routines for recursive descent
  *
- * $Id: expr.c,v 1.3 2001-01-26 11:53:59 dom Exp $
+ * $Id: expr.c,v 1.4 2001-01-29 14:34:41 dom Exp $
  *
  */
 
@@ -24,15 +24,13 @@
 #include "ccdefs.h"
 
 
+/* Clear the casting markers */
 void ClearCast(LVALUE *lval)
 {
-/*
- * Clear the casting markers
- */
-        lval->c_vtype = lval->c_id = lval->c_flags=0;
-        lval->c_tag = (TAG_SYMBOL *) 0;
-	lval->level=0;
-	lval->castlevel=0;
+    lval->c_vtype = lval->c_id = lval->c_flags=0;
+    lval->c_tag = (TAG_SYMBOL *) 0;
+    lval->level=0;
+    lval->castlevel=0;
 }
 
 
@@ -41,121 +39,123 @@ void ClearCast(LVALUE *lval)
 int expression(con, val)
 int *con, *val ;
 {
-        LVALUE lval ;
-        char    type;
+    LVALUE lval ;
+    char    type;
 
-        ClearCast(&lval);
+    ClearCast(&lval);
 
 
-        if ( heir1(&lval) ) {
-                rvalue(&lval) ;
-        }
-        fnflags=lval.flags;
-        if ( lval.ptr_type ) { type=lval.ptr_type; lval.ident=POINTER; }
-        else type=lval.val_type;
-        fnargvalue=CalcArgValue(type, lval.ident ,lval.flags);
-        margtag = 0;
-        if (lval.tagsym) margtag=(lval.tagsym-tagtab);
-        *con = lval.is_const ;
-        *val = lval.const_val ;
-        return lval.val_type ;
+    if ( heir1(&lval) ) {
+	rvalue(&lval) ;
+    }
+    fnflags=lval.flags;
+    if ( lval.ptr_type ) { type=lval.ptr_type; lval.ident=POINTER; }
+    else type=lval.val_type;
+    fnargvalue=CalcArgValue(type, lval.ident ,lval.flags);
+    margtag = 0;
+    if (lval.tagsym) margtag=(lval.tagsym-tagtab);
+    *con = lval.is_const ;
+    *val = lval.const_val ;
+    return lval.val_type ;
 }
 
 int heir1(lval)
 LVALUE *lval ;
 {
-        char *before, *start ;
-        LVALUE lval2, lval3 ;
-        void (*oper)(), (*doper)(), (*uoper)() ;
-        int k;
+    char *before, *start ;
+    LVALUE lval2, lval3 ;
+    void (*oper)(), (*doper)(), (*uoper)() ;
+    int k;
 
-        ClearCast(&lval2); ClearCast(&lval3);
-        setstage(&before, &start) ;
-        k = plnge1(heir1a, lval);
-        if ( lval->is_const ) {
-                if (lval->val_type == LONG) {
-                      vlongconst(lval->const_val);
+    ClearCast(&lval2); ClearCast(&lval3);
+    setstage(&before, &start) ;
+    k = plnge1(heir1a, lval);
+    if ( lval->is_const ) {
+	if (lval->val_type == LONG) {
+	    vlongconst(lval->const_val);
 
-/*                      lval->flags=lval->flags|UNSIGNED; */
-                }
-                else vconst(lval->const_val) ;
-      }
-        doper = 0 ;
-        if ( cmatch('=') ) {
-                if ( k == 0 ) {
-                        needlval() ;
-                        return 0 ;
-                }
-                if ( lval->indirect ) smartpush(lval, before);
-                if ( heir1(&lval2) ) rvalue(&lval2);
-/* Now our type checking so we can give off lots of warnings about
- * type mismatches etc..
- */
-                if (lval2.val_type == VOID && lval2.ptr_type ==0 ) 
-                        warning(W_VOID);
-/* First operand is a pointer */
-                if (lval->ptr_type) {
-                        if (lval2.ptr_type && lval->ptr_type !=lval2.ptr_type && (lval2.ptr_type!=VOID && lval->ptr_type !=VOID) ) {
+	    /*                      lval->flags=lval->flags|UNSIGNED; */
+	}
+	else vconst(lval->const_val) ;
+    }
+    doper = 0 ;
+    if ( cmatch('=') ) {
+	if ( k == 0 ) {
+	    needlval() ;
+	    return 0 ;
+	}
+	if ( lval->indirect ) smartpush(lval, before);
+	if ( heir1(&lval2) ) rvalue(&lval2);
+	/* Now our type checking so we can give off lots of warnings about
+	 * type mismatches etc..
+	 */
+	if (lval2.val_type == VOID && lval2.ptr_type ==0 ) 
+	    warning(W_VOID);
+	/* First operand is a pointer */
+	if (lval->ptr_type) {
+	    if (lval2.ptr_type && lval->ptr_type !=lval2.ptr_type && (lval2.ptr_type!=VOID && lval->ptr_type !=VOID) ) {
 /*
  * Here we have a pointer mismatch, however we don't take account of
  * ptr2ptr, so anything involvind them will barf badly, I'm leaving
  * this for now, since the code is fine, but commenting out the warning
  * which is a bit of shame, but there you go...
  */
-/*                                warning(W_PTRTYP); */
-                        }
-                        else if ( !(lval2.ptr_type) && !(lval2.is_const) && lval2.ident!=FUNCTION )
-                                warning(W_INTPTR);
-                } else if (lval2.ptr_type && ( !(lval->ptr_type) && !(lval->is_const) ) ) 
-                        warning(W_PTRINT);
+#if 0
+		warning(W_PTRTYP);
+#endif
+	    }
+	    else if ( !(lval2.ptr_type) && !(lval2.is_const) && lval2.ident!=FUNCTION )
+		warning(W_INTPTR);
+	} else if (lval2.ptr_type && ( !(lval->ptr_type) && !(lval->is_const) ) ) 
+	    warning(W_PTRINT);
 
 #ifdef SILLYWARNING
-                if ( ((lval->flags&UNSIGNED) != (lval2.flags&UNSIGNED)) && ( !(lval2.is_const) && !(lval->ptr_type) && !(lval2.ptr_type) ) ) 
-                        warning(W_EGSG);
+	if ( ((lval->flags&UNSIGNED) != (lval2.flags&UNSIGNED)) && ( !(lval2.is_const) && !(lval->ptr_type) && !(lval2.ptr_type) ) ) 
+	    warning(W_EGSG);
 #endif
-                force(lval->val_type, lval2.val_type, lval->flags&UNSIGNED, lval2.flags&UNSIGNED,lval2.is_const);
-                smartstore(lval);
-                return 0;
-        }
-        else if ( match("|=") ) oper = zor;
-        else if ( match("^=") ) oper = zxor;
-        else if ( match("&=") ) oper = zand;
-        else if ( match("+=") ) oper = doper = zadd; 
-        else if ( match("-=") ) oper = doper = zsub; 
-        else if ( match("*=") ) oper = doper = mult; 
-        else if ( match("/=") ) oper = doper = zdiv; 
-        else if ( match("%=") ) oper = zmod;
-        else if ( match(">>=") ) oper = asr; 
-        else if ( match("<<=") ) oper = asl;
-        else return k;
+	force(lval->val_type, lval2.val_type, lval->flags&UNSIGNED, lval2.flags&UNSIGNED,lval2.is_const);
+	smartstore(lval);
+	return 0;
+    }
+    else if ( match("|=") ) oper = zor;
+    else if ( match("^=") ) oper = zxor;
+    else if ( match("&=") ) oper = zand;
+    else if ( match("+=") ) oper = doper = zadd; 
+    else if ( match("-=") ) oper = doper = zsub; 
+    else if ( match("*=") ) oper = doper = mult; 
+    else if ( match("/=") ) oper = doper = zdiv; 
+    else if ( match("%=") ) oper = zmod;
+    else if ( match(">>=") ) oper = asr; 
+    else if ( match("<<=") ) oper = asl;
+    else return k;
 
         /* if we get here we have an oper= */
-        if ( k == 0 ) {
-                needlval() ;
-                return 0 ;
-        }
-        lval3.symbol = lval->symbol ;
-        lval3.indirect = lval->indirect ;
-        lval3.flags = lval->flags;
-        lval3.val_type = lval->val_type;
-	lval3.offset = lval->offset;
-	lval3.storage = lval->storage;
-        /* don't clear address calc we need it on rhs */
-        if ( lval->indirect ) smartpush(lval, 0);
-        rvalue(lval) ;
-        if ( oper==zadd || oper==zsub )
-                plnge2b(heir1, lval, &lval2, oper) ;
-        else
-                plnge2a(heir1, lval, &lval2, oper, doper) ;
-/*
- * djm 23/2/99 Major flaw in the plan here Ron, we don't check the
- * types properly before storing, this one left open for years!!!
- * So we we do int+=double we don't get the right value (slaps head
- * and runs round the room!)
- */
-        force(lval3.val_type, lval->val_type, lval3.flags&UNSIGNED, lval->flags&UNSIGNED,lval->is_const);
-        smartstore(&lval3) ;
-        return 0 ;
+    if ( k == 0 ) {
+	needlval() ;
+	return 0 ;
+    }
+    lval3.symbol = lval->symbol ;
+    lval3.indirect = lval->indirect ;
+    lval3.flags = lval->flags;
+    lval3.val_type = lval->val_type;
+    lval3.offset = lval->offset;
+    lval3.storage = lval->storage;
+    /* don't clear address calc we need it on rhs */
+    if ( lval->indirect ) smartpush(lval, 0);
+    rvalue(lval) ;
+    if ( oper==zadd || oper==zsub )
+	plnge2b(heir1, lval, &lval2, oper) ;
+    else
+	plnge2a(heir1, lval, &lval2, oper, doper) ;
+    /*
+     * djm 23/2/99 Major flaw in the plan here Ron, we don't check the
+     * types properly before storing, this one left open for years!!!
+     * So we we do int+=double we don't get the right value (slaps head
+     * and runs round the room!)
+     */
+    force(lval3.val_type, lval->val_type, lval3.flags&UNSIGNED, lval->flags&UNSIGNED,lval->is_const);
+    smartstore(&lval3) ;
+    return 0 ;
 }
 
 /*

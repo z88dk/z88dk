@@ -4,12 +4,14 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ *      $Id: const.c,v 1.2 2001-01-29 14:34:41 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
  *      around exponent-- for -math-z88
  *
+ *      29/1/20001 djm - added ability to dump string literals and have
+ *      them sorted out at compile time
  *
  */
 
@@ -35,9 +37,15 @@ LVALUE *lval ;
         lval->is_const = 1 ;            /* assume constant will be found */
         if ( fnumber(&lval->const_val) ) {
                 lval->val_type=DOUBLE;
-                immedlit(dublab);
-                outdec(lval->const_val); nl();
-                callrts("dload");
+		if ( doublestrings ) {
+		    immedlit(litlab);
+		    outdec(lval->const_val); nl();
+		    callrts("atof");
+		} else {
+		    immedlit(dublab);
+		    outdec(lval->const_val); nl();
+		    callrts("dload");
+		}
                 lval->is_const = 0 ;                    /*  floating point not constant */
                 lval->flags=0;
                 return(1);
@@ -73,8 +81,9 @@ long *val;
         unsigned char sum[6],scale[6],frcn[6],dig1[6],dig2[6];
         int k;                  /* flag and mask */
         unsigned char minus;     /* is if negative! */
-        char *start,    /* copy of pointer to starting point */
-                        *s;             /* points into source code */
+        char *start;    /* copy of pointer to starting point */
+        char *s;             /* points into source code */
+	char *end;
         if (mathz88) {
                 frcn[0]=0;
                 frcn[1]=205;
@@ -112,6 +121,9 @@ long *val;
         while ( numeric(*s) )
                 ++s ;
         lptr = (s--) - line ;           /* save ending point */
+
+	end = s;
+
         sum[0]=sum[1]=sum[2]=sum[3]=sum[4]=sum[5]='\0';
         while ( *s != '.' ) {           /* handle digits to right of decimal */
 /* Get the value into a register - all routines dump in second register */
@@ -169,9 +181,38 @@ long *val;
         if (mathz88) sum[5]--;
 
         /* get location for result & bump litptr */
-        *val = searchdub(sum);
+	if ( doublestrings ) {
+	    *val = stash_double_str( start, lptr+line);
+	    return (1);
+	} else {
+	    *val = searchdub(sum);
+	}
         return(1) ;      /* report success */
 }
+
+
+/* stash a double string in the literal pool */
+
+int stash_double_str(char *start, char *end)
+{
+    int  len;
+    long val;
+    char  *buf;
+
+    len = end-start;
+    buf = malloc(len+2);
+
+    if (buf == NULL ) {
+	error(E_LITQOV);  /* As good as any really.. */
+    }
+    strncpy(buf,start,len);
+    *(buf+len)=0;
+    storeq(len+1,buf,&val);
+    free(buf);
+    return(val);
+}
+
+
 
 /* Search through the literal queue searching for a match with our
  * number - saves space etc etc

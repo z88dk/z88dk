@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.1 2000-07-04 15:33:32 dom Exp $
+ *      $Id: main.c,v 1.2 2001-01-29 14:34:41 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -157,6 +157,7 @@ char **argv ;
         verbose = 0;
         gotocnt=0;
 	defdenums=0;
+	doublestrings = 0;
         safedata=reqpag = -1;
 	shareoffset=SHAREOFFSET;	/* Offset for shared libs */
 	debuglevel=NO;
@@ -964,6 +965,7 @@ struct args myargs[]= {
 	{"farheap=",YES,SetFarHeap},
 	{"debug=",YES,SetDebug},
 	{"asxx",NO,SetASXX},
+	{"doublestr",NO,SetDoubleStrings},
 #ifdef USEFRAME
 	{"frameix",NO,SetFrameIX},
 	{"frameiy",NO,SetFrameIY},
@@ -995,6 +997,10 @@ void SetFrameIY(char *arg)
 }
 #endif
 
+void SetDoubleStrings(char *arg)
+{
+    doublestrings = YES;
+}
 
 void SetASXX(char *arg)
 {
