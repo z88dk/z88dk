@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.15 2002-12-08 15:24:44 dom Exp $
+# $Id: Makefile,v 1.16 2003-01-26 17:39:48 dom Exp $
 #
 
 STDCFILES = \
@@ -19,6 +19,7 @@ STDCFILES = \
 	freopen.c \
 	fseek.c \
 	ftell.c \
+	gets.c  \
 	fwrite.c \
 	printk.c \
 	printn.c \

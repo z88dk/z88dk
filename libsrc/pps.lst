@@ -29,6 +29,7 @@ stdio/freopen_z88
 stdio/fseek
 stdio/ftell
 stdio/fwrite
+stdio/gets
 stdio/vfprintf_mini
 stdio/printk
 stdio/printn

@@ -41,6 +41,7 @@ stdio/z88/fgets_cons
 stdio/z88/fputc_cons
 stdio/z88/getcmd
 stdio/z88/getk
+stdio/z88/gets
 stdio/z88/puts_cons
 fcntl/z88/fdgetpos
 fcntl/z88/fdtell

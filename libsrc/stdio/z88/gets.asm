@@ -12,74 +12,56 @@
 ; Now goes back to the correct print position
 ;
 ;
-;	$Id: fgets_cons.asm,v 1.3 2003-01-26 17:39:48 dom Exp $
+;	$Id: gets.asm,v 1.1 2003-01-26 17:39:48 dom Exp $
 ;
 
                 INCLUDE "#stdio.def"
 		INCLUDE	"#syspar.def"
 
-                XLIB    fgets_cons
+                XLIB    gets
                 XREF    processcmd
 
 ;
-; Read a string from the console
+; Read a string from the console - this is limited to 255 characters
 ;
-.fgets_cons
+.gets
 	xor	a
 	ld	bc,NQ_Wcur
 	call_oz(os_nq)		;gives x in c, y in b
 	push	bc		;keep it
         ld      hl,4
         add     hl,sp
-        ld      b,(hl)		;backwards cos OZ wants length in b
-        inc     hl
-	ld	a,b
-	or	(hl)		;high byte of to read
-        jr      z,fgets_abort   ;none required
-        inc     hl              ;step up to buffer
         ld      e,(hl)          ;buffer
         inc     hl
         ld      d,(hl)
         ld      c,0             ;cursor position
         ld      a,8             ;allow return of ctrl chars
-	dec	b		;decrement count so we can put in a \n
+	ld	b,255		;max length we can read
 .loopyloo
         push    de              ;preserve buffer
         call_oz(gn_sip)
         pop     hl
         push    af
         cp      $80
-        jr      nc,fgets_gotcmd ; trapped a cmd
+        jr      nc,gets_gotcmd ; trapped a cmd
         pop     af
-        jr      nc,fgets_stripeol
-        jr      fgets_abort     ; return hl=0 - error
+        jr      nc,gets_stripeol
+        jr      gets_abort     ; return hl=0 - error
 
-.fgets_gotcmd
+.gets_gotcmd
         pop     af
         call    processcmd
-.fgets_abort
+.gets_abort
 	ld	hl,0
-.fgets_out
+.gets_out
 	pop	bc	;xy posn
 	ret
 
-.fgets_stripeol
+.gets_stripeol
 	cp	1		;escape
-	jr	z,fgets_abort
+	jr	z,gets_abort
         cp      13              ;terminating char
-	jr	nz,fgets_unknown	;exit (NULL set by gn_sip)
-; We now have to insert a \n into the line
-	push	hl		;save hl
-	ld	c,b
-	ld	b,0
-	add	hl,bc		;points to one beyond terminating NULL
-	ld	(hl),0		;terminating null
-	dec	hl
-	ld	(hl),13		;put in the \n
-	pop	hl		;get start of string back
-	jr	fgets_out
-
-.fgets_unknown
+	jr	z,gets_out	;exit (NULL set by gn_sip)
 ; Okay, unexpected thing, so go back in
 ; We've got ATP: hl=buffer
 ;		  b=line length (inputted)

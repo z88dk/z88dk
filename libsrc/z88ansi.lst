@@ -52,6 +52,7 @@ stdio/z88/fgetc_cons
 stdio/z88/fgets_cons
 stdio/z88/getcmd
 stdio/z88/getk
+stdio/z88/gets
 fcntl/z88/fdgetpos
 fcntl/z88/fdtell
 fcntl/z88/rename
