@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.6 2002-01-18 16:55:40 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.7 2002-01-18 21:12:17 dom Exp $ */
 /* $History: PRSLINE.C $ */
 /*  */
 /* *****************  Version 8  ***************** */
@@ -261,6 +261,23 @@ CheckBaseType(int chcount)
     if ( !isxdigit(ident[0]) || chcount < 2 )      /* If it's not a hex digit straight off then reject it */
 	return chcount;
 
+    /* C style hex number */
+    if ( chcount > 2 && strncmp(ident,"0x",2) == 0 ) 
+	{
+	    for ( i = 2; i < chcount; i++ ) 
+		{
+		    if ( !isxdigit(ident[i]) )
+			break;
+		}
+	    if ( i == chcount ) 
+		{
+		    for ( i = 2; i < chcount ; i++ )
+			ident[i-1] = ident[i];
+		    ident[0] = '$';
+		    sym = hexconst;
+		    return ( chcount - 1 );
+		}
+	}
     /* Check for this to be a hex num here */
     for ( i = 0; i <  chcount ; i++ ) 
 	{

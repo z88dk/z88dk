@@ -484,4 +484,5 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * Dropped the requirement for add, sbc, and adc to specify "a," for 8 bit
  * operations
  * Added d and b specifiers for constants - decimal and binary
+ * C-style 0x prefix for hex digits is permitted
  */
