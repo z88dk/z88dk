@@ -43,6 +43,7 @@ stdlib/atoi
 stdlib/labs
 stdlib/atexit
 stdlib/exit
+stdlib/getopt
 stdlib/itoa
 stdlib/rand
 stdlib/sleep
