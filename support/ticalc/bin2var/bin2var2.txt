@@ -1,0 +1,59 @@
+Bin2Var2
+modified by Jeremy Drake <jedrake@krl.org>
+August 25, 2000
+
+I have modified the program Bin2Var by David Phillips to make unsquished programs for the
+TI-83 and TI-83 Plus.  It inserts the AsmPrgm symbol at the beginning of TI-83 Plus programs
+and it inserts the End <enter> 0000 <enter> End stuff at the end of a TI-83 program.
+I have also modified the squishing version to insert the tasmCmp symbol at the beginning of
+TI-83 Plus programs so that they can be executed via Asm(prgmName) without a .db 0bbh, 6dh 
+at the beginning of your program.  
+
+Bin2var.exe squishes, Bin2var2.exe doesn't.  The syntax is the same for both.
+Bin2var(2) input.bin output.ext
+   valid output extensions are 82P 83P 8XP 85s 86p 86s, although I only modified 83P and 8XP
+   The others still work exactly the same.
+
+The batch files:
+	ion.bat:  the original asm.bat, assembles for ION
+	83asm.bat: makes an unsquished 83p file
+	83pasm.bat: makes an unsquished 8xp file
+	83squasm.bat: makes a squished 83p file
+	83psqasm.bat: makes a squished 8xp file
+
+
+The original documentation follows:
+
+
+Bin2Var version 1.20
+by David Phillips <david@acz.org>
+August 24, 2000
+
+This is a simple utility that converts binary images into variables in
+TI Graph Link format.  The following formats are supported: 82P, 83P,
+8XP, 85S, 86P and 86S.  All testing was done using VTI and not the
+actual TI Graph Link software.
+
+This program was written as a suitable replacement for DevPac83 and
+DevPac8X, as these programs do not work under Windows NT or Windows 2000.
+Other formats may be supported in the future if there is a demand (i.e.
+email me and tell me what you want!).  82P, 85S, 86P and 86S format were
+added at Clem's request.
+
+The included asm.bat batch file is a modification of the one included
+with ION.  You can use it to compile TI-83 and TI-83+ programs for ION
+using TASM.  Messages are written to stdout, so if you redirect the
+program's to nul, no output will be printed under normal circumstances.
+Error messages are written to stderr, so you will see errors even if
+output is redirected to nul.
+
+The program is written in ANSI C, so it should compile on just about any
+platform.  There is a binary version include for Win32 (a console app) that
+was compiled with Borland C++Builder 5.  I tested, it does compile on
+Linux using GCC, but you'll have to compile it yourself if you want to
+use it on Linux.
+
+This program is released under the GNU GPL version 2 or later.  In other
+words, I take no responsibility for this program, and you are free to
+do anything you like with the source, provided the source is available
+to anyone who asks for it.
