@@ -1,7 +1,10 @@
 
 
-all: dstar enigma rpn adv ansitest gfx
+all: dstar enigma rpn adv ansitest gfx save
 
+
+save:
+	zcc +zx -vn save.c -o save.bin
 
 gfx:
 	zcc +zx -vn gfx.c -o gfx.bin -lndos
