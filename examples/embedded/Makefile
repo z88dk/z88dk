@@ -1,18 +1,22 @@
 
-all:  hello.bin sine.bin loop.bin savage.bin
+all: embedded_clib2.lib hello.bin sine.bin loop.bin savage.bin
 
+embedded_clib2.lib: fputc_cons.asm fgetc_cons.asm
+	z80asm -d -ns -nm -Mo -DFORembedded -xembedded_clib2 @clib2.lst
 
+ns16450.o: embedded_clib2.lib ns16450.h ns16450.c
+	zcc +embedded -c ns16450.c 
 
-hello.bin: ns16450.o hello.c
+hello.bin: embedded_clib2.lib ns16450.o hello.c
 	zcc +embedded ns16450.o hello.c -o hello.bin
 
-sine.bin: sine.c
+sine.bin: embedded_clib2.lib ns16450.o sine.c
 	zcc +embedded -lm ns16450.o sine.c -o sine.bin
 
-loop.bin: loop.c
+loop.bin: embedded_clib2.lib ns16450.o loop.c
 	zcc +embedded -lm ns16450.o loop.c -o loop.bin
 
-savage.bin: savage.c
+savage.bin: embedded_clib2.lib ns16450.o savage.c
 	zcc +embedded -lm ns16450.o savage.c -o savage.bin
 
 clean:

@@ -1,0 +1,22 @@
+;
+;       Embedded C Library
+;
+;       UART definitions
+;
+;	Daniel Wallner - Feb. 2002
+;
+;
+
+	DEFC	UART_BASE = $0000
+
+	DEFC	RBR = 0
+	DEFC	THR = 0
+	DEFC	IER = 1
+	DEFC	IIR = 2
+	DEFC	LCR = 3
+	DEFC	MCR = 4
+	DEFC	LSR = 5
+	DEFC	MSR = 6
+	DEFC	SCR = 7
+	DEFC	DLL = 0
+	DEFC	DLM = 1
