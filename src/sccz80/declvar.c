@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.10 2003-02-01 20:31:30 dom Exp $
+ *      $Id: declvar.c,v 1.11 2003-02-01 21:02:22 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -266,7 +266,10 @@ char zfar )                      /* TRUE if far */
  */
                         if (flagdef) WriteDefined(sname,0);
                         if (currfn) {
+/* djm 1/2/03 - since we can override lib functions don't reset the library
+	flag
 				currfn->flags&=(~LIBRARY);
+*/
                                 if (libdef) {
 			//		currfn->flags|=LIBRARY;
                                         currfn->flags|=libdef;
