@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.35 2002-02-01 14:37:49 stefano Exp $
+# $Id: Makefile,v 1.36 2002-02-13 13:39:15 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -18,7 +18,7 @@ z88libs: mz.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib \
 	 z88ansi_clib.lib gfx.lib 
 
 tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
-	ti83pansi_clib.lib ti83_clib.lib ti85ansi_clib.lib ti85_clib.lib \
+	ti83pansi_clib.lib ti83p_clib.lib ti85ansi_clib.lib ti85_clib.lib \
 	ti86ansi_clib.lib ti86_clib.lib \
 	tigray82.lib tigray83.lib tigray83p.lib tigray85.lib tigray86.lib
 
