@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.3 2001-02-06 10:46:05 dom Exp $
+ *      $Id: zcc.c,v 1.4 2001-02-07 09:01:37 dom Exp $
  */
 
 
@@ -1201,9 +1201,10 @@ void CleanUpFiles(void)
                 CleanFile(myconf[CRT0].def,OBJEXT);
                 CleanFile(myconf[CRT0].def,".map");
                 CleanFile(myconf[CRT0].def,".sym");
-        } else if (usetemp==NO)
-		/* Remove crt0.o file for -notemp compiles */
-		CleanFile(myconf[CRT0].def,OBJEXT);
+	}
+   } else if (usetemp==NO) {
+	/* Remove crt0.o file for -notemp compiles */
+	CleanFile(myconf[CRT0].def,OBJEXT);
    }
 
 
