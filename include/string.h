@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.6 2002-10-22 19:14:21 dom Exp $
+ *	$Id: string.h,v 1.7 2004-04-07 18:25:17 dom Exp $
  */
 
 
@@ -62,7 +62,7 @@ extern far char __LIB__ *strcat_far(far char *, far char *);
 extern far char __LIB__ *strcpy_far(far char *, far char *);
 #define strncat(s1,s2) strncat_far(s1,s2)
 extern far char __LIB__ *strncat_far(far char *, far char *);
-#define strncpy(s1,s2) strncpy_far(s1,s2)
+#define strncpy(s1,s2,n) strncpy_far(s1,s2,n)
 extern far char __LIB__ *strncpy_far(far char *, far char *, int);
 #define strlwr(s) strlwr_far(s)
 extern far char __LIB__ *strlwr_far(far char *);
