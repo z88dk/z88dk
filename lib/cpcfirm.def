@@ -1,0 +1,20 @@
+lstoff
+
+; CPC Firmware Calculations
+;
+; September 2003
+; $Id: cpcfirm.def,v 1.1 2003-09-14 11:46:09 dom Exp $
+;
+
+
+	defc	cas_in_open	= $bc77
+	defc	cas_in_close	= $bc7a
+	defc	cas_in_char	= $bc80
+	defc	cas_out_open	= $bc8c
+	defc	cas_out_close	= $bc8f
+	defc	cas_out_char	= $bc95
+	defc	cas_test_eof	= $bc89
+
+	defc	cas_catalog	= $bc9b
+
+lston
