@@ -31,6 +31,7 @@
         ld      a,(ix-2)
         cp      e
         jr      nz,swloop
+	ld	a,(ix-1)
         cp      d
         jr      nz,swloop
 ;Have had a match here...so, load up address, and get there
