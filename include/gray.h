@@ -19,6 +19,8 @@
 extern __LIB__ g_page(int page);
 /* Plot a pixel to screen */
 extern __LIB__ g_plot(int x, int y, int GrayLevel);
+/* Get pixel status */
+extern __LIB__ g_point(int x, int y);
 /* Draw a line */
 extern __LIB__ g_draw(int x1, int y1, int x2, int y2, int GrayLevel);
 /* Relative draw */
@@ -28,7 +30,7 @@ extern __LIB__ g_drawb(int tlx, int tly, int width, int height, int GrayLevel);
 /* Draw a circle */
 extern __LIB__ g_circle(int x, int y, int radius, int skip, int GrayLevel);
 /* Clear map */
-extern __LIB__ g_clg(void);
+extern __LIB__ g_clg(int GrayLevel);
 
 
 #endif
