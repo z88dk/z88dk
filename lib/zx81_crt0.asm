@@ -4,71 +4,52 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: zx81_crt0.asm,v 1.5 2002-04-17 08:35:34 stefano Exp $
+; - - - - - - -
 ;
-
-
-                MODULE  zx81_crt0
-
+;       $Id: zx81_crt0.asm,v 1.6 2002-04-17 21:48:48 dom Exp $
 ;
-; Initially include the zcc_opt.def file to find out lots of lovely
-; information about what we should do..
-;
+; - - - - - - -
 
-                INCLUDE "zcc_opt.def"
 
-; No matter what set up we have, main is always, always external to
-; this file
+	MODULE  zx81_crt0
 
-                XREF    _main
+;-------
+; Include zcc_opt.def to find out information about us
+;-------
 
-;
-; Save and restore the ZX81 critical registers 
-;
+        INCLUDE "zcc_opt.def"
 
-        XDEF    save81
-        XDEF    restore81
+;-------
+; Some general scope declarations
+;-------
 
-;
-; Some variables which are needed for both app and basic startup
-;
+        XREF    _main           ;main() is always external to crt0 code
 
-        XDEF    cleanup
-        XDEF    l_dcal
+        XDEF    cleanup         ;jp'd to by exit()
+        XDEF    l_dcal          ;jp(hl)
 
-; Integer rnd seed
+        XDEF    int_seed        ;Integer rand() seed
 
-        XDEF    int_seed
+        XDEF    _vfprintf       ;jp to the printf() core
 
-; vprintf is internal to this file so we only ever include one of the set
-; of routines
-
-	XDEF	_vfprintf
-
-;Exit variables
-
-        XDEF    exitsp
+        XDEF    exitsp          ;atexit() variables
         XDEF    exitcount
 
-;For stdin, stdout, stder
+        XDEF    __sgoioblk      ;stdio info block
 
-        XDEF    __sgoioblk
+        XDEF    base_graphics   ;Graphical variables
+        XDEF    coords          ;Current xy position
 
-; Graphics stuff
-	XDEF	base_graphics
-	XDEF	coords
+        XDEF    save81		;Save ZX81 critical registers
+        XDEF    restore81	;Restore ZX81 critical registers
 
-; Now, getting to the real stuff now!
-
-
-        org     16514
+	XDEF	saved_hl	;Temporary store used by compiler
+	XDEF	saved_de	;for hl and de
 
 
 .start
-        ld      hl,0
-        add     hl,sp
-        ld      (start1+1),hl
-        ld      hl,-64
+	ld	(start1+1),sp	;Save entry stack
+        ld      hl,-64		;Create an atexit() stack
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
@@ -86,8 +67,7 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
-
-        call    _main
+        call    _main	;Call user program
         
 .cleanup
 ;
@@ -100,16 +80,12 @@ IF DEFINED_ANSIstdio
 	call	closeall
 ENDIF
 ENDIF
-
 	pop	bc
 	call	restore81
-
-.start1
-        ld      sp,0
-        
+.start1	ld	sp,0		;Restore stack to entry value
         ret
 
-.l_dcal
+.l_dcal	jp	(hl)		;Used for function pointer calls
         jp      (hl)
 
 
@@ -140,8 +116,10 @@ ENDIF
         exx
 	ret
 
-; Now, define some values for stdin, stdout, stderr
-
+;-----------
+; Define the stdin/out/err area. For the z88 we have two models - the
+; classic (kludgey) one and "ANSI" model
+;-----------
 .__sgoioblk
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
@@ -150,9 +128,9 @@ ELSE
 ENDIF
 
 
-; Now, which of the vfprintf routines do we need?
-
-
+;---------------------------------
+; Select which printf core we want
+;---------------------------------
 ._vfprintf
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
@@ -170,51 +148,33 @@ ELSE
 ENDIF
 
 
-;Seed for integer rand() routines
+;-----------
+; Now some variables
+;-----------
+.coords         defw    0       ; Current graphics xy coordinates
+.base_graphics  defw    0       ; Address of the Graphics map
 
-.int_seed       defw    0
+.int_seed       defw    0       ; Seed for integer rand() routines
 
-;Atexit routine
+.exitsp         defw    0       ; Address of where the atexit() stack is
+.exitcount      defb    0       ; How many routines on the atexit() stack
 
-.exitsp
-                defw    0
-.exitcount
-                defb    0
 
-; Heap stuff
+.heaplast       defw    0       ; Address of last block on heap
+.heapblocks     defw    0       ; Number of blocks
+.saved_hl	defw	0	; Temp store for hl
+.saved_de	defw	0	; Temp store for de
 
-.heaplast	defw	0
-.heapblocks	defw	0
+         	defm  "Small C+ ZX81"&0	;Unnecessary file signature
 
-; mem stuff
-.base_graphics
-		defw	0
-.coords		defw	0
-
-         defm  "Small C+ ZX81"&0
-
-;All the float stuff is kept in a different file...for ease of altering!
-;It will eventually be integrated into the library
-;
-;Here we have a minor (minor!) problem, we've no idea if we need the
-;float package if this is separated from main (we had this problem before
-;but it wasn't critical..so, now we will have to read in a file from
-;the directory (this will be produced by zcc) which tells us if we need
-;the floatpackage, and if so what it is..kludgey, but it might just work!
-;
-;Brainwave time! The zcc_opt file could actually be written by the
-;compiler as it goes through the modules, appending as necessary - this
-;way we only include the package if we *really* need it!
-
+;-----------------------
+; Floating point support
+;-----------------------
 IF NEED_floatpack
         INCLUDE         "#float.asm"
-
-;seed for random number generator - not used yet..
-.fp_seed        defb    $80,$80,0,0,0,0
-;Floating point registers...
-.extra          defs    6
-.fa             defs    6
-.fasign         defb    0
-
+.fp_seed        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
+.extra          defs    6               ;FP register
+.fa             defs    6               ;FP Accumulator
+.fasign         defb    0               ;FP register
 ENDIF
 
