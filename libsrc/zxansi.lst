@@ -54,6 +54,7 @@ stdlib/labs
 stdlib/atexit
 stdlib/exit
 stdlib/rand
+stdlib/sleep
 stdlib/srand
 stdlib/strtol
 stdlib/strtoul
