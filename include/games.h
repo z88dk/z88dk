@@ -6,7 +6,7 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.4 2001-08-21 15:40:16 stefano Exp $
+ *	$Id: games.h,v 1.5 2001-09-07 07:45:45 stefano Exp $
  *
  */
 
@@ -52,22 +52,22 @@ extern __LIB__ joystick(int game_device);
 #endif
 
 #ifdef TI82
-	unsigned char *joystick_type[] = {"Cursor,VAR-CLR"};
+	unsigned char *joystick_type[] = {"Cursor,2nd-Alpha"};
 	#define GAME_DEVICES 1
 #endif
 
 #ifdef TI83
-	unsigned char *joystick_type[] = {"Cursor,VAR-CLR"};
+	unsigned char *joystick_type[] = {"Cursor,2nd-Alpha"};
 	#define GAME_DEVICES 1
 #endif
 
 #ifdef TI85
-	unsigned char *joystick_type[] = {"Cursor,CUST-CLR"};
+	unsigned char *joystick_type[] = {"Cursor,2nd-Alpha"};
 	#define GAME_DEVICES 1
 #endif
 
 #ifdef TI86
-	unsigned char *joystick_type[] = {"Cursor,CUST-CLR"};
+	unsigned char *joystick_type[] = {"Cursor,2nd-Alpha"};
 	#define GAME_DEVICES 1
 #endif
 
