@@ -9,7 +9,10 @@
 ; Rewritten Graham R. Cobb 12 January 2002
 ; Previously strcmp("A","AB") would return 0.
 ;
-; $Id: strcmp.asm,v 1.3 2002-01-14 09:56:12 dom Exp $
+; Fix to above fix: Graham R. Cobb 24 March 2002
+; Make sure positive return really is > 0 (not = 0)
+;
+; $Id: strcmp.asm,v 1.4 2002-06-09 10:19:14 dom Exp $
 
 
 
@@ -49,8 +52,8 @@
 	ld	h,$80
 	ret
 .strcmp5
-; now we know *s1 > *s2, return h=0 (i.e. hl>0)
-	ld	h,0
+; now we know *s1 > *s2, return h=1 (i.e. hl>0)
+	ld	h,1
 	ret
 .strcmp4
 ; now we know *s1=*s2=0, return hl=0
