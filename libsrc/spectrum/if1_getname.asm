@@ -4,9 +4,8 @@
 ;	char* if1_getname(char *location);
 ;
 ;	Picks a file name from the specified location
-;	This one is still broken!!!
 ;
-;	$Id: if1_getname.asm,v 1.1 2004-10-08 12:33:24 stefano Exp $
+;	$Id: if1_getname.asm,v 1.2 2004-10-08 13:59:32 stefano Exp $
 ;
 
 		XLIB	if1_getname
@@ -24,8 +23,10 @@ if1_getname:
 		ld	bc,10
 		ldir
 
-previous:	ld	hl,tempmdvname+11
-		dec	hl
+		push	de
+		pop	hl
+		
+previous:	dec	hl
 		ld	a,(hl)
 		cp	' '
 		jr	z,previous
