@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.7 2002-04-22 08:25:26 dom Exp $
+# $Id: Makefile,v 1.8 2002-05-09 09:48:15 dom Exp $
 #
 
 STDCFILES = \
@@ -60,6 +60,7 @@ gen:
 	zcc -vn -make-lib fgetc.c
 	zcc -vn -make-lib fputc.c
 	zcc -vn -make-lib freopen_z88.c
+	cd 8080; make
 
 std:    $(STDOBJECTS)
 
@@ -100,3 +101,4 @@ clean:
 	rm -f zx81/*.o
 
 	cd zsock ; make clean
+	cd 8080 ; make clean
