@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.3 2001-02-02 17:48:25 dom Exp $
+ *      $Id: declvar.c,v 1.4 2001-04-11 12:26:25 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -203,6 +203,7 @@ char zfar )                      /* TRUE if far */
 		match=ptrtofn=NO;
 
                 while (blanks(),rcmatch('_') ) {
+			match=NO;
                         if (amatch("__APPFUNC__") ) { match=YES; flagdef=1; }
                         if (amatch("__LIB__") /* && libdef==0 */) {match=YES; libdef|=LIBRARY; }
                         if (amatch("__FASTCALL__") ) {match=YES; fastcall=REGCALL; }

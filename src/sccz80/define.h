@@ -1,6 +1,6 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.1 2000-07-04 15:33:31 dom Exp $
+ * $Id: define.h,v 1.2 2001-04-11 12:26:25 dom Exp $
  */
 
 /*      Stand-alone definitions                 */
@@ -239,7 +239,7 @@ GOTO_TAB {
 
 /*  Output staging buffer size */
 
-#define STAGESIZE       1450
+#define STAGESIZE       3450
 #define STAGELIMIT      (STAGESIZE-1)
 
 /*      Define the macro (define) pool          */
