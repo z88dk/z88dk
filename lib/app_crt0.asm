@@ -449,7 +449,11 @@ ENDIF
 
 IF !safedata
 
-DEFVARS 8192
+IF !DEFINED_defvarsaddr
+	defc defvarsaddr = 8192
+ENDIF
+
+DEFVARS defvarsaddr
 {
 dummydummy        ds.b    1 
 }

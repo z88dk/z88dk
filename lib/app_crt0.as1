@@ -1,6 +1,10 @@
 ; z80asm is getting a bit crusty!
 
-DEFVARS 8192
+IF !DEFINED_defvarsaddr
+	defc	defvarsaddr = 8192
+ENDIF
+
+DEFVARS defvarsaddr
 {
 	pool_table      ds.b    224
 	malloc_table	ds.w	1
