@@ -17,6 +17,7 @@ wcclose
 exec_cli
 openwindow
 openpopup
+opentitled
 stripdev
 strippath
 opwin

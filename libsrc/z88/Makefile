@@ -22,6 +22,7 @@ z88:
 	zcc -vn -make-lib strippath.c
 	zcc -vn -make-lib openpopup.c
 	zcc -vn -make-lib openwindow.c
+	zcc -vn -make-lib opentitled.c
 	z80asm -d -ns -nm -Mo -x../z88 @z88list
 
 

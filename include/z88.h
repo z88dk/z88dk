@@ -204,7 +204,7 @@ extern int __LIB__ exec_cli(char *str);
 extern char __LIB__ *stripdev(char *explicitname);
 
 /* Returns a pointer to the filename segment */
-extern char __LIB__ *stripath(char *explicitname);
+extern char __LIB__ *strippath(char *explicitname);
 
 /* Open a popup window */
 extern void __LIB__ openpopup(int wid, int tlx, int tly, int width, int height, char *name);
