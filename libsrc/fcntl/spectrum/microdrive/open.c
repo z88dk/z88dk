@@ -12,7 +12,7 @@
  *	O_WRONLY = 1    Starts afresh?!?!?
  *	O_APPEND = 256
  *
- *	$Id: open.c,v 1.2 2005-03-01 17:50:36 stefano Exp $
+ *	$Id: open.c,v 1.3 2005-03-04 08:24:41 stefano Exp $
  */
 
 #include <fcntl.h>
@@ -28,8 +28,12 @@ int if1_filestatus;
 struct M_CHAN *if1_file;
 
 
+//if (if1_file = malloc(sizeof(struct M_CHAN)) == 0)
+//	return (-1);
+
 if1_file = malloc(sizeof(struct M_CHAN));
-if1_filestatus = if1_load_record(1, (char *)name, 0, *if1_file);
+if (if1_file == 0) return (-1);
+if1_filestatus = if1_load_record(1, (char *)name, 0, if1_file);
 
 switch (mode) {
 	case O_RDONLY:
@@ -41,14 +45,14 @@ switch (mode) {
 		}
 		/*
 		    DEBUGGING: "hdname" could be useful to check if the disk has been changed
-			printf("\nread only :  %u  - %s\n",*if1_file, if1_getname( (char *) ((*if1_file)->name)) );
-			printf ("--%s--",if1_getname( (char*) ((*if1_file)->hdname)) );
+			printf("\nread only :  %u  - %s\n",if1_file, if1_getname( (char *) ((if1_file)->name)) );
+			printf ("--%s--",if1_getname( (char*) ((if1_file)->hdname)) );
 		*/
 		// RESET FILE COUNTER
-		(*if1_file)->position=0;
-		(*if1_file)->flags=flags;
-		(*if1_file)->mode=mode;
-		return(*if1_file);
+		(if1_file)->position=0;
+		(if1_file)->flags=flags;
+		(if1_file)->mode=mode;
+		return(if1_file);
 		break;
 
 	case O_WRONLY:
@@ -68,10 +72,10 @@ switch (mode) {
 			free(if1_file);
 			return(-1);
 		}
-		(*if1_file)->position=0;
-		(*if1_file)->flags=flags;
-		(*if1_file)->mode=mode;
-		lseek((*if1_file), 0, SEEK_END);
+		(if1_file)->position=0;
+		(if1_file)->flags=flags;
+		(if1_file)->mode=mode;
+		lseek((if1_file), 0, SEEK_END);
 		break;
 
 	}
