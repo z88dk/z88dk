@@ -2,10 +2,10 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.23 2002-11-05 11:48:33 dom Exp $
+#	$Id: Makefile,v 1.24 2002-12-01 15:46:48 dom Exp $
 #
 
-prefix = /usr/local
+prefix = /home/dom/test
 
 # The default machine, the lib/config/DEFAULT.cfg file is copied to zcc.cfg
 DEFAULT = z88
@@ -44,22 +44,25 @@ libs:
 
 install-libs:
 	mkdir -p $(prefix)/lib/clibs
-	cp -R lib/clibs/* $(prefix)/lib/clibs/
+	cp -R lib/clibs/* $(prefix)/lib/z88dk/lib/clibs/
+	find $(prefix)/lib/z88dk/lib/clibs -type f | xargs chmod 644
 
 
 install:
+	mkdir -p -m 755 $(prefix)/bin $(prefix)/lib 
+	mkdir -p -m 755 $(prefix)/lib/z88dk  $(prefix)/lib/z88dk/lib
+	mkdir -p -m 755 $(prefix)/lib/z88dk/lib/clibs  $(prefix)/lib/z88dk/lib/config
 	cd src/appmake ; $(MAKE) PREFIX=$(prefix) install
 	cd src/copt ; $(MAKE) PREFIX=$(prefix) install
 	cd src/cpp ; $(MAKE) PREFIX=$(prefix) install
 	cd src/sccz80 ; $(MAKE) PREFIX=$(prefix) install
 	cd src/z80asm ; $(MAKE) PREFIX=$(prefix) install
 	cd src/zcc ; $(MAKE) PREFIX=$(prefix) install
-	mkdir -p $(prefix)/lib/z88dk
-	cp -R include $(prefix)/lib/z88dk
-	cp -R lib $(prefix)/lib/z88dk
+	cp -R -p include $(prefix)/lib/z88dk
+	cp -R -p lib $(prefix)/lib/z88dk
 	find $(prefix)/lib/z88dk/include -name '*.h' | xargs chmod 644
 	find $(prefix)/lib/z88dk/include -type d | xargs chmod 755
-	find $(prefix)/lib/z88dk/lib  | xargs chmod 644
+	find $(prefix)/lib/z88dk/lib -type f | xargs chmod 644
 	find $(prefix)/lib/z88dk/lib -type d | xargs chmod 755
 	./config.sh $(prefix)/lib/z88dk $(DEFAULT)
 
