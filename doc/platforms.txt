@@ -1,6 +1,6 @@
 Z88DK Port Status
 
-$Id: platforms.txt,v 1.12 2002-12-09 20:35:13 dom Exp $
+$Id: platforms.txt,v 1.13 2004-07-19 15:22:13 stefano Exp $
 
 
 PLATFORM      | Native I/O  | ANSI VT I/O |  GRAPH LIB  |  GRAY LIB   |  FILELIB    |   ZSOCK     |   SOUND     |   Others    |
@@ -8,30 +8,38 @@ PLATFORM      | Native I/O  | ANSI VT I/O |  GRAPH LIB  |  GRAY LIB   |  FILELIB
               |             |             |             |             |             |             |             |             |
 ABC80         |     No      | 40x24-buggy |     No      |     No      |     No      |     No      |     ---     |     ---     |
 Amstrad NC100 |     Yes     |     No      |     No      |     No      |     No      |     No      |     ---     | Untested    |
+Amstrad CPC   |     Yes     | 20-80x25 COL|  256x192    |     No      |     No      |     No      |     ---     | Alt. FP lib |
 Aquarius      |    38x25    |    40x24 COL|     No      |     No      |     No      |     No      |   1 bit     |     ---     |
 Cambridge Z88 |     Yes     |     Yes     |  256x64     |     No      |     Yes     |     Yes     |   1 bit     | Paging+many |
 Commodore 128 |     No      |    40x25 COL|     No      |     No      |     No      |     No      |     ---     |     ---     |
 CP/M          |     Yes     | If Hardware |     No      |     No      |     Yes     |     No      |     ---     |     ---     |
 Jupiter ACE   |     No      |    32x24 B/W| 96x64 emul. |     No      |     No      |     No      |   1 bit     |     ---     |
 MSX 1         |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
+NASCOM 1/2    |     No      |    48x16 B/W| Unfinished  |     No      |     No      |     No      |     ---     |     ---     |
 REX 6000      |     No      |     No      |     No      |     No      |     No      |     No      |     ---     |     (1)     |
 Sam Coupe     | 32x24-buggy |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
 Sharp MZ      |    40x25    |    40x25 COL|   80x50     |     No      |     No      |     No      |     ---     |     (2)     |
+Sharp OZ      |     Yes     |    59x10 B/W|  239x80     |     No      |     No      |     No      |     ---     |     (3)     |
 SORD M5       |    32x24    |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
 Spectravideo  |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
-Sprinter      |    80x35    |    80x35 COL|     No      |     No      |     Yes     |     No      |     ---     |     (3)
+Sprinter      |    80x35    |    80x35 COL|     No      |     No      |     Yes     |     No      |     ---     |     (4)     |
 TI82          |    16x8     |    32x4  B/W|   96x64     |     Yes     |     No      |     No      |   1 bit     |     ---     |
 TI83          |    16x8     |    32x4  B/W|   96x64     |     Yes     | In Progress |     No      |   1 bit     |     ---     |
 TI83 Plus     |    16x8     |    32x4  B/W|   96x64     |     Yes     |     No      |     No      |   1 bit     |     ---     |
 TI85          |    21x8     |    32x4  B/W|  128x64     |     Yes     |     No      |     No      |   1 bit     |     ---     |
 TI86          |    21x8     |    32x4  B/W|  128x64     |     Yes     |     No      |     No      |   1 bit     |     ---     |
 VZ/Laser 200  |    32x16    |    32x12 B/W|  128x64     |     No      |     No      |     No      |     ---     |     ---     |
-ZX 81         | 32x21-buggy |    32x21 B/W| 96x64 emul. |     No      |     No      |     No      |     ---     | Unstable    |
-ZX Spectrum   | 32x24+64x24 |24..85x24 COL|  256x192    |     No      |     +3      |     No      |   1 bit     |     (4)     |
+ZX 81         | 32x21-buggy |    32x21 B/W| 96x64 emul. |     No      |     No      |     No      |     ---     | FP Unstable |
+ZX Spectrum   | 32x24+64x24 |24..85x24 COL|  256x192    |     No      |     +3      |     No      |   1 bit     |     (5)     |
 ZXVGS         |             |             |             |             |     Yes     |             |             |             |
               |             |             |             |             |             |             |             |             |
 
 (1) The Xircom REX 6000 port provides hooks into the native OS. No z88dk i/o functions are supported
 (2) Flagged for a lot of time as "instable" because of an emulator instability !!
-(3) Sprinter has many "standard" functions implemented
-(4) Work on a +3 (and others) file library is in progress
+(3) Much of the "OZDK" functions are ported; at the moment doesn't work if code size > 8Kbytes.
+(4) Sprinter has many "standard" functions implemented
+(5) Work on a +3 (and others) file library is in progress
+
+FP Unstable = On these platforms there are problems using some of the "special" registers, making some functions crash.
+The float variables, for example, can't be used (for now).
+

@@ -1,6 +1,7 @@
-$Id: README,v 1.4 2004-06-30 12:50:57 stefano Exp $
+$Id: README,v 1.5 2004-07-19 15:22:13 stefano Exp $
 
 Amstrad CPC
+(see also the notes on "z88dk/doc/cpc.txt")
 
 - Compile the program (optionally you can set another address for ORG)
 	zcc +cpc program.c
