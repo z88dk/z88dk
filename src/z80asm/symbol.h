@@ -23,7 +23,7 @@ enum symbols        { space, strconq, dquote, squote, semicolon, comma, fullstop
                       plus, minus, multiply, divi, mod, power, assign, bin_and, bin_or, bin_xor, less,
                       greater, log_not, constexpr, newline, lessequal, greatequal, notequal, name, number,
                       decmconst, hexconst, binconst, charconst, negated, nil,
-                      ifstatm, elsestatm, endifstatm
+                      ifstatm, elsestatm, endifstatm, label
                     };
 
 struct pageref      { struct pageref     *nextref;          /* pointer to next page reference of symbol */

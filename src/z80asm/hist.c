@@ -469,4 +469,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  *
  * 28.02.2001 V1.0.18 (djm)
  * Added UNDEFINE command to allow undefinition of a DEFINE
+ *
+ * 21.03.2001 v1.0.19 (djm)
+ * Allowed labels to end in ':' and forsake the initial '.'
  */

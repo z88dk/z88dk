@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.1 2000-07-04 15:33:29 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.2 2001-03-21 16:34:01 dom Exp $ */
 /* $History: Z80PASS.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -202,15 +202,15 @@ parseline (enum flag interpret)
 
       EOL = OFF;		/* reset END OF LINE flag */
       GetSym ();
-      if (sym == fullstop)
+      if (sym == fullstop || sym == label)
 	{
 	  if (interpret == ON)
 	    {			/* Generate only possible label declaration if line parsing is allowed */
-	      if (GetSym () == name)
+	      if (sym == label || GetSym () == name)
 		{
 		  DefineSymbol (ident, PC, SYMADDR | SYMTOUCHED);	/* labels must always be
 									 * touched due to forward */
-		  GetSym ();	/* check for another identifier *//* referencing problems in
+		  	GetSym ();	/* check for another identifier *//* referencing problems in
 				   * expressions */
 		}
 	      else
