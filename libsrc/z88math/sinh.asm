@@ -6,13 +6,14 @@
         XLIB    sinh
         LIB    exp
 
+	XREF	dldpsh
         XREF    dload
         XREF    dpush
         XREF    dstore
-        XREF    ddiv
-        XREF    dmul
-        XREF    dsub
-        XREF    dadd
+        LIB	ddiv
+        LIB	dmul
+        LIB	dsub
+        LIB	dadd
 
 
 
@@ -25,8 +26,7 @@
         push    hl
         ld      hl,10
         add     hl,sp
-        call    dload
-        call    dpush
+        call    dldpsh
         call    exp
         pop     bc
         pop     bc
@@ -34,15 +34,12 @@
         pop     hl
         call    dstore
         ld      hl,i_1+0
-        call    dload
-        call    dpush
+        call    dldpsh
         ld      hl,6
         add     hl,sp
-        call    dload
-        call    dpush
+        call    dldpsh
         ld      hl,i_1+6
-        call    dload
-        call    dpush
+        call    dldpsh
         ld      hl,18
         add     hl,sp
         call    dload

@@ -14,8 +14,8 @@
 
                 XLIB    floor
 
-                XREF    fsetup
-                XREF    stkequ2
+                LIB	fsetup
+                LIB	stkequ2
 
 .floor
         call    fsetup

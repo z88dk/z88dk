@@ -17,8 +17,8 @@
 
                 XLIB    amax
 
-                XREF    fsetup
-                XREF    stkequ2
+                LIB	fsetup
+                LIB	stkequ2
                 XREF    fa
 
 

@@ -15,8 +15,8 @@
 
                 XLIB    fabs
 
-                XREF    fsetup
-                XREF    stkequ2
+                LIB	fsetup
+                LIB	stkequ2
 
 .fabs
         call    fsetup

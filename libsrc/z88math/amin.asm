@@ -17,8 +17,8 @@
 
                 XLIB    amin
 
-                XREF    fsetup
-                XREF    stkequ2
+                LIB	fsetup
+                lIB	stkequ2
                 XREF    fa
 
 

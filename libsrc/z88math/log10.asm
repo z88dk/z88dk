@@ -14,8 +14,8 @@
 
                 XLIB    log10
 
-                XREF    fsetup
-                XREF    stkequ2
+                LIB	fsetup
+                LIB	stkequ2
 
 .log10
         call    fsetup

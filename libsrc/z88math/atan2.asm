@@ -18,8 +18,8 @@
 
                 XLIB    atan2
 
-                XREF    fsetup
-                XREF    stkequ2
+                LIB	fsetup
+                LIB	stkequ2
                 XREF    fa
 
 

@@ -6,12 +6,13 @@
         XLIB    tanh
         LIB    exp
 
+	XREF	dldpsh
         XREF    dload
         XREF    dpush
         XREF    dstore
-        XREF    ddiv
-        XREF    dadd
-	XREF	dsub
+        LIB	ddiv
+        LIB	dadd
+	LIB	dsub
 
 .tanh 
         push    bc
@@ -22,8 +23,7 @@
         push    hl
         ld      hl,10
         add     hl,sp
-        call    dload
-        call    dpush
+        call    dldpsh
         call    exp
         pop     bc
         pop     bc
@@ -32,11 +32,9 @@
         call    dstore
         ld      hl,0
         add     hl,sp
-        call    dload
-        call    dpush
+        call    dldpsh
         ld      hl,i_1+0
-        call    dload
-        call    dpush
+        call    dldpsh
         ld      hl,12
         add     hl,sp
         call    dload
@@ -45,11 +43,9 @@
         call    dpush
         ld      hl,6
         add     hl,sp
-        call    dload
-        call    dpush
+        call    dldpsh
         ld      hl,i_1+6
-        call    dload
-        call    dpush
+        call    dldpsh
         ld      hl,18
         add     hl,sp
         call    dload

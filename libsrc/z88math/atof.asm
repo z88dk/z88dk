@@ -14,7 +14,7 @@
 
                 XLIB    atof
 
-                XREF    stkequ2
+                LIB	stkequ2
 
 .atof
 	pop	de

@@ -14,8 +14,8 @@
 
                 XLIB    acos
 
-                XREF    fsetup
-                XREF    stkequ2
+                LIB	fsetup
+                LIb	stkequ2
 
 .acos
         call    fsetup
