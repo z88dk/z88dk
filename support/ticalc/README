@@ -1,36 +1,36 @@
-$Id: README,v 1.2 2001-10-27 13:20:15 stefano Exp $
+$Id: README,v 1.3 2002-01-02 09:50:49 stefano Exp $
 
 
-The batch files are the OLD conversion tools; they use conversion utilities that 
-can be found on ticalc.org
-When possible use bin2var: a single utility covers all the TI calculators.
+Since all the TI calculators' startup files have been modified to be
+"bin2var" compatible, the old conversion tool aren't supported anymore.
+
+This HOWTO is much more simple now:
 
 
 TI82: CrASH shell SDK suggested (http://www.lfx.org/crashware/ or http://www.ticalc.org)
-zcc82.bat - uses the CRPRGM82.EXE command (included with the shell).
 
 
 TI83: All the Shells ! (http://www.ticalc.org/pub/83/asm/shells)
 	Change the -startup flag at compile time (see TI83_CRT0.ASM)
 	ION Shell is used by default, now.
-zcc83.bat - uses the debug command as a workaround for problems with DEVPAC83.COM and WIN2000/NT.
-	Probably UNICODE is a problem for the parameter parser; this should FIX.
-	Such FIX isn't necessary for MS DOS - Win 95/98/ME, but should work.
-
 
 TI83 plus: Tested under the ION SHELL (http://www.ticalc.org/pub/83plus/asm/shells/ion.zip).
-zcc83p.bat - as for the TI83, but changes the file extention to .8xp.
-
 
 TI85: We heavily changed the binary structure, recently !!
-Please note that the "STRING85" utility can't be used anymore.
-Use BIN2VAR or other generic .85s string converters; an example follows:
+
+TI86: Different options available; the LASM startup is good for long programs,
+      otherwise choose another shell or the pure asm() exec starup.
+      LASM can be found on http://www.ticalc.org/pub/86/asm/shells/ti86no8k.zip
+      this will go over the 8Kb barrier.
+
+
+Generic examples :
 	- zcc +ti85ansi -lm program.c
 	- bin2var a.bin program.85s
 
+	- zcc +ti83 -lm -startup=2 program.c
+	- bin2var a.bin program.83p
 
-TI86
-zcc86.bat - Uses prgm86.exe for the file conversion.
-		If you leave the startup code unchanged (I suggest so) LASM must be used.
-		get it from http://www.ticalc.org/pub/86/asm/shells/ti86no8k.zip
-		this will go over the 8Kb barrier.
+	- zcc +ti8xansi -lm -startup=1 program.c
+	- bin2var a.bin program.8xp
+

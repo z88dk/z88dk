@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.14 2001-10-27 13:20:15 stefano Exp $
+;	$Id: ti86_crt0.asm,v 1.15 2002-01-02 09:50:47 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -61,7 +61,8 @@
 IF (startup=2)
 	DEFINE ASE
 	DEFINE NOT_DEFAULT_SHELL
-	org	_asm_exec_ram	;TI 86 standard asm() entry point.
+	org	_asm_exec_ram-2	;TI 86 standard asm() entry point.
+       	defb	$8e, $28
 	nop			;identifier of table
 	jp	start
 	defw	$0000		;version number of table
@@ -82,7 +83,8 @@ ENDIF
 IF (startup=3)
 	DEFINE ZAP2000
 	DEFINE NOT_DEFAULT_SHELL
-	org	_asm_exec_ram
+	org	_asm_exec_ram-2
+       	defb	$8e, $28
 	nop
 	jp	start
 	defw 	description
@@ -117,7 +119,8 @@ ENDIF
 IF (startup=4)
 	DEFINE EMANON
 	DEFINE NOT_DEFAULT_SHELL
-	org	_asm_exec_ram	;TI 86 standard asm() entry point.
+	org	_asm_exec_ram-2	;TI 86 standard asm() entry point.
+       	defb	$8e, $28
 	nop			;identifier of table
 	jp	start
 	defw	$0001		;version number of table
@@ -152,7 +155,8 @@ ENDIF
 IF (startup=10)
 	DEFINE STDASM
 	DEFINE NOT_DEFAULT_SHELL
-        org     _asm_exec_ram
+        org     _asm_exec_ram - 2
+       	defb	$8e, $28
 ENDIF
 
 ;--------------------------------------------------
@@ -173,7 +177,7 @@ ENDIF
 ;------------------
 IF !NOT_DEFAULT_SHELL
 	DEFINE LASM
-	org	$801F	; "Large asm block". To be loaded with "LASM"
+	org	$801D	; "Large asm block". To be loaded with "LASM"
 	; You need LASM 0.8 Beta by Patrick Wong for this (www.ticalc.org)
 	; - First wipe TI86 RAM (InstLASM is simply a memory cleaner)
 	; - Load LargeLd
@@ -181,12 +185,25 @@ IF !NOT_DEFAULT_SHELL
 	; - run asm(LargeLd
 	; It will run your program. Loading order is important.
 	
-	org	$801D	; "Large asm block". To be loaded with "LASM"
 	defb	$8e, $28
 	;org	$801F	; Start from here if you want to use PRGM86
 	ret
 	nop		;Identifies the table
 	jp	start
+	defw	1	;Version # of Table. Release 0 has no icon (Title only)
+
+	defw	description	;Absolute pointer to program description
+	defw	icon		;foo pointer to icon
+
+.description
+	DEFINE NEED_name
+	INCLUDE	"zcc_opt.def"
+	UNDEFINE NEED_name
+ IF !DEFINED_NEED_name
+	defm	"Z88DK Small C+ Program"
+ ENDIF
+.icon
+	defb	$0		; Termination zero
 ENDIF
 
 
@@ -194,9 +211,11 @@ ENDIF
 ; End of header, begin of startup part
 ;-------------------------------------
 .start
-IF STDASM			; asm( executable
+IF STDASM | LASM		; asm( executable
 	call	_runindicoff	; stop anoing run-indicator
+	;call	$49CC		; close (hide) menu.
 ENDIF
+
 	ld	hl,0
 	add	hl,sp
 	ld	(start1+1),hl
