@@ -13,6 +13,13 @@
 ; 14/3/99  Renamed the printf vars to smc_pf*
 ;
 ; 1/4/99   Changing to allow application startup
+;
+; - - - - - - - -
+;
+; $Id: z88_crt0.asm,v 1.2 2001-04-12 13:26:13 stefano Exp $
+;
+; - - - - - - - -
+
 
                 MODULE  z88_crt0
 

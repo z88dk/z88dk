@@ -3,6 +3,7 @@
  *
  *	Stefano Bodrato 5/2000
  *
+ *	$Id: bin2bas.c,v 1.2 2001-04-12 13:26:13 stefano Exp $
  */
 
 #include <stdio.h>

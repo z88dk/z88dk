@@ -2,8 +2,8 @@
 ;
 ;       Stefano Bodrato May 2000
 ;
-;       If an error occurs eg break we just drop back to BASIC
-
+;       $Id: abc80_crt0.asm,v 1.2 2001-04-12 13:26:13 stefano Exp $
+;
 
                 MODULE  z88_crt0
 

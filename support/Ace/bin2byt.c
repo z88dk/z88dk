@@ -3,14 +3,14 @@
  *
  *   FORTH command syntax
  *   s l bsave <name> saves l bytes from the memory starting at address s as <name> 
- *   s l bload <name> loades 0 bytes to the memory starting at address s as <name>. If s or l is zero will their value be taken from the file. 
+ *   s l bload <name> loades l bytes to the memory starting at address s as <name>. If s or l is zero will their value be taken from the file. 
  *   addr call will call Z80 machine code at addr, should be terminated with a jp (iy) Z80 instruction. 
  *
+ *   $Id: bin2byt.c,v 1.2 2001-04-12 13:26:13 stefano Exp $
  */
 
 #include <stdio.h>
-
-/* Stefano reckons stdlib.h is needed for binary files for Win compilers*/
+/* stdlib.h MUST be included to really open files as binary */
 #include <stdlib.h>
 
 void writebyte(unsigned char, FILE *);

@@ -9,6 +9,7 @@
  *	Creates a new TAP file (overwriting if necessary) just ready to run.
  *	Use tapemeker for customizing your work.
  *
+ *	$Id: bin2tap.c,v 1.2 2001-04-12 13:26:13 stefano Exp $
  */
 
 #include <stdio.h>

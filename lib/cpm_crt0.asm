@@ -1,8 +1,10 @@
-;       Kludgey startup for CP/M
+;       Startup for CP/M
 ;
 ;       Stefano Bodrato - Apr. 2000
+;                         Apr. 2001: Added MS-DOS protection
 ;
-
+;       $Id: cpm_crt0.asm,v 1.3 2001-04-12 13:26:13 stefano Exp $
+;
 
                 MODULE  z88_crt0
 

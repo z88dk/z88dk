@@ -7,6 +7,8 @@
  *
  *	Actually..can be used for any CODE file
  *	And we append so we can create mega files...
+ *
+ *	$Id: tapmaker.c,v 1.2 2001-04-12 13:26:13 stefano Exp $
  */
 
 #include <stdio.h>

@@ -2,6 +2,8 @@
 ;
 ;       Stefano Bodrato - Dec 2000
 ;
+;       $Id: ti86_crt0.asm,v 1.6 2001-04-12 13:26:13 stefano Exp $
+;
 
 
                 MODULE  z88_crt0

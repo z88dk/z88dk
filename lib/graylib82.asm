@@ -12,6 +12,9 @@
 ; Version:      1.0
 ; Date:         4/22/00
 ;---------------------------------------
+;
+; $Id: graylib82.asm,v 1.3 2001-04-12 13:26:13 stefano Exp $
+;
 
 	XDEF	graybit1
 	XDEF	graybit2

@@ -1,7 +1,9 @@
 ;       Stub for the TI 83+ calculator
 ;
 ;       Stefano Bodrato - Dec 2000
-;	Feb 2000 - Speeded up the cpygraph
+;                         Feb 2000 - Speeded up the cpygraph
+;
+;       $Id: ti83p_crt0.asm,v 1.6 2001-04-12 13:26:13 stefano Exp $
 ;
 
 

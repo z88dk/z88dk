@@ -5,6 +5,7 @@
  *
  *	Stefano Bodrato Feb. 2001
  *
+ *	$Id: inject.c,v 1.2 2001-04-12 13:26:13 stefano Exp $
  */
 
 #include <stdio.h>

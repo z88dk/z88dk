@@ -9,6 +9,9 @@
 ; From:     Jingyang Xu  [br00416@bingsuns.cc.binghamton.edu]
 ; Subject:  LZ: Graydraw source!
 ;------------------------------------------------------------
+;
+; $Id: graylib85.asm,v 1.2 2001-04-12 13:26:13 stefano Exp $
+;
 
 
 	XDEF	graybit1

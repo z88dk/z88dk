@@ -1,6 +1,10 @@
+$Id: README,v 1.2 2001-04-12 13:26:13 stefano Exp $
+
+Quick note for the Spectravideo SVI port:
+
 - Compile the program (zcc +svi adv_a.c)
 - Convert the binary to CAS image file (bin2svi a.bas adv.cas)
-- Run the SVI emulator.
+- Run the SVI emulator and load the "tape" with the /r option.
 
 If you are using the Jimmy Mårdell's "SVI" emulator, you can specify the autoload option:
 svi -tapa adv.cas

@@ -13,6 +13,8 @@
 ;***** GreyLib version 1.0 (C) 1997 by Bill Nagel & Dines Justesen *********
 ;---------------------------------------------------------------------------
 ;
+; $Id: graylib83p.asm,v 1.3 2001-04-12 13:26:13 stefano Exp $
+;
 
 	XDEF	graybit1
 	XDEF	graybit2

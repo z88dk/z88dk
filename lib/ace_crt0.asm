@@ -2,6 +2,8 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
+;	$Id: ace_crt0.asm,v 1.2 2001-04-12 13:26:13 stefano Exp $
+;
 
 
                 MODULE  z88_crt0

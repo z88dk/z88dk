@@ -1,3 +1,7 @@
+$Id: README,v 1.2 2001-04-12 13:26:13 stefano Exp $
+
+Quick note for the MSX1 port:
+
 - Compile the program (zcc +msx adv_a.c)
 - Convert the binary (bin2msx a.bas adv.bin)
 - Transfer the program on an MSX disk image (dsktool A adventure.dsk adv.bin)

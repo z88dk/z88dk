@@ -1,14 +1,15 @@
 /*
- *   MSX BIN file
+ *	MSX BIN file
  *
- *   BLOAD "PROG.BIN",R
+ *	BLOAD "PROG.BIN",R
  *
- *   By Stefano Bodrato
+ *	By Stefano Bodrato
+ *
+ *	$Id: bin2msx.c,v 1.3 2001-04-12 13:26:13 stefano Exp $
  */
 
 #include <stdio.h>
-
-/* stdlib.h is needed for binary files for Win compilers*/
+/* stdlib.h MUST be included to really open files as binary */
 #include <stdlib.h>
 
 void writebyte(unsigned char, FILE *);

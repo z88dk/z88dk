@@ -1,14 +1,15 @@
 /*
- *   Spectravideo SVI Cassette file
+ *	Spectravideo SVI Cassette file
  *
- *   BLOAD "CAS:",R
+ *	BLOAD "CAS:",R
  *
- *   By Stefano Bodrato
+ *	By Stefano Bodrato
+ *
+ *	$Id: bin2svi.c,v 1.2 2001-04-12 13:26:13 stefano Exp $
  */
 
 #include <stdio.h>
-
-/* stdlib.h is needed for binary files for Win compilers*/
+/* stdlib.h MUST be included to really open files as binary */
 #include <stdlib.h>
 
 void writebyte(unsigned char, FILE *);

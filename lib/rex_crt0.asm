@@ -1,8 +1,8 @@
-;
-;
 ;       Startup Code for Xircom Rex 6000
 ;
 ;	djm 6/3/2001
+;
+;       $Id: rex_crt0.asm,v 1.6 2001-04-12 13:26:13 stefano Exp $
 ;
 
 	MODULE rex_crt0

@@ -1,0 +1,21 @@
+$Id: README,v 1.1 2001-04-12 13:26:13 stefano Exp $
+
+The Jupiter ACE has a built-in FORTH interpreter in ROM (no BASIC, here!)
+There is very little software for it;  maybe the Z88DK will help !
+
+FORTH command syntax:
+s l bsave <name> saves l bytes from the memory starting at address s as <name> 
+s l bload <name> loades l bytes to the memory starting at address s as <name>. If s or l is zero will their value be taken from the file. 
+addr call will call Z80 machine code at addr, should be terminated with a jp (iy) Z80 instruction. 
+
+
+So:
+
+- compile the program:				zcc +ace program.c
+- convert it:					bin2byt a.bas program.byt
+- run the emulator				vace
+- from within the emulator, load the program:	16384 40000 bload
+- run the thing:				16384 call
+
+
+Have fun !
