@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.3 2001-09-07 18:17:11 dom Exp $
+;	$Id: msx_crt0.asm,v 1.4 2002-04-24 08:15:02 stefano Exp $
 ;
 
 
@@ -40,6 +40,9 @@
 
         XDEF    exitsp
         XDEF    exitcount
+
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
 
 ;For stdin, stdout, stder
 

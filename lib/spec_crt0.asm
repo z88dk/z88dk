@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.5 2001-10-15 20:25:55 dom Exp $
+;       $Id: spec_crt0.asm,v 1.6 2002-04-24 08:15:02 stefano Exp $
 ;
 
 
@@ -28,6 +28,9 @@
 
         XDEF    exitsp          ;atexit() variables
         XDEF    exitcount
+
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
 
         XDEF    __sgoioblk      ;stdio info block
 

@@ -3,7 +3,7 @@
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.13 2002-04-10 20:31:10 dom Exp $
+;	$Id: ti83p_crt0.asm,v 1.14 2002-04-24 08:15:02 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells
@@ -36,6 +36,9 @@
 
 	XDEF	exitsp		; Exit variables
 	XDEF	exitcount	;
+
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
 
 	XDEF	__sgoioblk	; For stdin, stdout, stder
 

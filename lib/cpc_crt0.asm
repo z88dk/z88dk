@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.4 2002-04-10 20:31:10 dom Exp $
+;       $Id: cpc_crt0.asm,v 1.5 2002-04-24 08:15:02 stefano Exp $
 ;
 
                 MODULE  cpc_crt0
@@ -43,6 +43,9 @@
 ;For stdin, stdout, stder
 
         XDEF    __sgoioblk
+
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
 
 ; Graphics stuff
 	XDEF	base_graphics

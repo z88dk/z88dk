@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.17 2002-04-10 20:31:11 dom Exp $
+;	$Id: ti86_crt0.asm,v 1.18 2002-04-24 08:15:02 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -36,6 +36,9 @@
 
 	XDEF	exitsp		; Exit variables
 	XDEF	exitcount	;
+
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
 
 	XDEF	__sgoioblk	; For stdin, stdout, stder
 

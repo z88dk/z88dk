@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.4 2001-10-22 09:33:54 stefano Exp $
+;	$Id: ace_crt0.asm,v 1.5 2002-04-24 08:15:02 stefano Exp $
 ;
 
 
@@ -44,6 +44,9 @@
 ;For stdin, stdout, stder
 
         XDEF    __sgoioblk
+
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
 
 ; Graphics stuff
 	XDEF	base_graphics

@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti82_crt0.asm,v 1.15 2002-04-10 20:31:10 dom Exp $
+;	$Id: ti82_crt0.asm,v 1.16 2002-04-24 08:15:02 stefano Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -24,6 +24,9 @@
 
 	XDEF	exitsp		; Exit variables
 	XDEF	exitcount	;
+
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
 
 	XDEF	__sgoioblk	; For stdin, stdout, stder
 

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.6 2002-04-10 20:31:10 dom Exp $
+;	$Id: c128_crt0.asm,v 1.7 2002-04-24 08:15:02 stefano Exp $
 ;
 
 
@@ -46,6 +46,9 @@
 	XDEF	coords		;Current xy position
 
 ;For stdin, stdout, stder
+
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
 
         XDEF    __sgoioblk
 

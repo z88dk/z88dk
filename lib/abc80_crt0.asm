@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato May 2000
 ;
-;       $Id: abc80_crt0.asm,v 1.3 2001-09-07 18:17:11 dom Exp $
+;       $Id: abc80_crt0.asm,v 1.4 2002-04-24 08:15:02 stefano Exp $
 ;
 
                 MODULE  abc80_crt0
@@ -43,6 +43,9 @@
 ;For stdin, stdout, stder
 
         XDEF    __sgoioblk
+
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
 
 ; Graphics stuff
 	XDEF	base_graphics

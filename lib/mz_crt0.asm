@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 5/5/2000
 ;
-;       $Id: mz_crt0.asm,v 1.5 2002-01-30 10:11:12 stefano Exp $
+;       $Id: mz_crt0.asm,v 1.6 2002-04-24 08:15:02 stefano Exp $
 ;
 
 
@@ -35,6 +35,9 @@
 
         XDEF    exitsp          ;atexit() variables
         XDEF    exitcount
+
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
 
         XDEF    __sgoioblk      ;stdio info block
 

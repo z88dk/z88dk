@@ -4,9 +4,12 @@
 ;
 ;       If an error occurs (eg. out if screen) we just drop back to BASIC
 ;
+;	ZX81 will be thrown in FAST mode by default.
+;	The "startup=2" parameter forces the SLOW mode.
+;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.8 2002-04-22 14:45:49 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.9 2002-04-24 08:15:02 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -58,9 +61,7 @@
         ld      sp,hl
         ld      (exitsp),sp
 
-IF (startup=1)
 	call	save81
-ENDIF
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -97,25 +98,31 @@ ENDIF
         jp      (hl)
 
 
+IF !(startup=2)
 .a1save 	defb	0
 .hl1save	defw	0
+.de1save	defw	0
+.bc1save	defw	0
+ENDIF
 
 .restore81
 	ld	iy,16384
-IF (startup=2)
+IF !(startup=2)
 	; SLOW/FAST trick; flickers but permits the alternate registers usage
 	ex	af,af
 	ld	a,(a1save)
 	ex	af,af
 	exx
         ld	hl,(hl1save)
+        ld	de,(de1save)
+        ld	bc,(bc1save)
         exx
         call	$F2B		; SLOW mode
 ENDIF
 	ret
 	
 .save81
-IF (startup=2)
+IF !(startup=2)
 	; SLOW/FAST trick; flickers but permits the alternate registers usage
         call	$F23		; FAST mode
 	ex	af,af
@@ -123,6 +130,8 @@ IF (startup=2)
 	ex	af,af
 	exx
         ld	(hl1save),hl
+        ld	(de1save),de
+        ld	(bc1save),bc
         exx
 ENDIF
 	ret

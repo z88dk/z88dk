@@ -9,7 +9,7 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: nc100_crt0.asm,v 1.3 2001-10-06 20:42:34 dom Exp $
+;       $Id: nc100_crt0.asm,v 1.4 2002-04-24 08:15:02 stefano Exp $
 ;
 
 
@@ -36,6 +36,9 @@
 
         XDEF    exitsp		;atexit() variables
         XDEF    exitcount
+
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
 
         XDEF    __sgoioblk	;stdio info block
 

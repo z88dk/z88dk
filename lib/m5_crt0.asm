@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: m5_crt0.asm,v 1.3 2002-04-10 20:31:10 dom Exp $
+;       $Id: m5_crt0.asm,v 1.4 2002-04-24 08:15:02 stefano Exp $
 ;
 
 
@@ -42,6 +42,9 @@
 
         XDEF    exitsp
         XDEF    exitcount
+
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
 
 ;For stdin, stdout, stder
 

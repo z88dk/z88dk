@@ -24,6 +24,9 @@
 	XDEF	exitsp		; Exit variables
 	XDEF	exitcount	;
 
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
+
 	XDEF	__sgoioblk	; For stdin, stdout, stder
 
 	XDEF	base_graphics	; Graphics stuff

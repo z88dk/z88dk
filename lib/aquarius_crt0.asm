@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: aquarius_crt0.asm,v 1.2 2002-02-01 14:37:47 stefano Exp $
+;       $Id: aquarius_crt0.asm,v 1.3 2002-04-24 08:15:02 stefano Exp $
 ;
 
 
@@ -32,6 +32,9 @@
         XDEF    exitcount
 
         XDEF    __sgoioblk      ;stdio info block
+
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
 
         XDEF    base_graphics   ;Graphical variables
 	XDEF	coords		;Current xy position
