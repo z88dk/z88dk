@@ -6,3 +6,4 @@ readbyte
 remove
 rename
 tell
+writebyte
