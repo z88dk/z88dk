@@ -77,7 +77,9 @@ strings/strstr
 strings/strstrip
 strings/strtok
 strings/strupr
+time/mktime
 time/sprinter/clock
+time/sprinter/time
 setjmp/longjmp
 setjmp/setjmp
 assert/assert
