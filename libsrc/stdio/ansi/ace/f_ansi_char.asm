@@ -12,7 +12,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.3 2001-10-18 12:15:10 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -31,7 +31,7 @@
 
 .ansi_CHAR
 
-	sub	15
+	;sub	15
 	ld	hl,ace_inverse
 	or	(hl)
 

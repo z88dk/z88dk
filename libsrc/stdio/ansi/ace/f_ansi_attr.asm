@@ -10,7 +10,7 @@
 ;	Stefano Bodrato - Feb. 2001
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.3 2001-10-18 12:15:10 stefano Exp $
 ;
 
 	XLIB	ansi_attr
@@ -41,6 +41,18 @@
         ret
 .nodim
         cp      5
+        jr      nz,nounderline
+	ld	a,@10000000
+        ld      (ace_inverse),a
+        ret
+.nounderline
+        cp      24
+        jr      nz,noCunderline
+	xor	a
+        ld      (ace_inverse),a
+        ret
+.noCunderline
+        cp      5
         jr      nz,noblink
 	ld	a,@10000000
         ld      (ace_inverse),a
@@ -64,5 +76,32 @@
         ld      (ace_inverse),a
         ret
 .noCreverse
-
+        cp      8	; invisible CHAR?
+        jr      nz,noinvis
+        ret
+.noinvis
+        cp      28	; cancel invisibility
+        jr      nz,nocinvis
+        ret
+.nocinvis
+        cp      30
+        jp      m,nofore
+        cp      37+1
+        jp      p,nofore
+        ret
+.nofore
+        cp      40
+        jp      m,noback
+        cp      47+1
+        jp      p,noback
+        sub     40
+	cp	4
+	jr	c,nowmn
+	ld	a,@10000000
+	jr	nocry
+.nowmn
+	xor	a
+.nocry
+        ld      (ace_inverse),a
+.noback
         ret
