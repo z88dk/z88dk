@@ -84,6 +84,8 @@ lstoff
 	defc	r_sock_setttl		= 48
 	defc	r_sock_pair_listen	= 49
 	defc	r_sock_setssize		= 50
+	defc	r_sock_recv		= 51
+	defc	r_sock_getinfo		= 52
 
 
 lston
