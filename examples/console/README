@@ -1,0 +1,6 @@
+The demos in this program are all console driven and should work on all
+platforms
+
+Compile thus:
+
+zcc +[machine] [file.c]

@@ -1,8 +1,3 @@
 Examples.
 
-Most of the examples contained in z88/ will run on any machine..machine
-specific versions are placed in the appropriate directory along with any
-compiled versions.
-
-Compiled versions for machines other than the z88/zx have only been tested
-by Stefano
+Console contains a few demos that should work on all machine targets
