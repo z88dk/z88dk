@@ -23,6 +23,7 @@
         XDEF    dldpsh
         XDEF    dpush
         XDEF    dpush2
+	XDEF	__atof2
 
         LIB     float
         LIB     ufloat
@@ -95,6 +96,12 @@
         EX      DE,HL
         PUSH    BC      ;restore next word
         JP      (HL)    ;return
+
+.__atof2
+	push	hl
+	call	atof
+	pop	bc
+	ret
 
 
 ; * * * * * HOPEFULLY THIS IS THE END OF THE GENERIC

@@ -163,6 +163,7 @@
         XREF  INT2
         XREF  PI
         XREF  HALFPI
+	XREF  __atof2
         LIB   float              ;Convert int to float
 	LIB   ufloat		 ;unsigned int to float
         LIB   ifix               ;Convert float to int
