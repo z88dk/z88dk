@@ -10,7 +10,7 @@
 ;       Simply does a swap...
 
 ;
-;	$Id: swapgfxbk.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.4 2002-01-27 22:28:52 dom Exp $
 ;
 
 
@@ -19,6 +19,8 @@
                 XREF    gfx_bank
 		XDEF	swapgfxbk1
 
+
+		INCLUDE	"graphics/grafix.inc"
 
 .swapgfxbk
 .swapgfxbk1
