@@ -4,31 +4,29 @@
 ;	FarCall function to call code in other mem pages
 ;	Daniel
 ;
-;	$Id: farcall.asm,v 1.1 2002-01-18 12:06:40 dom Exp $
-
 
 		XLIB	farcall
 		XREF	far_ret
 		XREF	far_ret_p
-		XREF	far_ret_sp
 
 
 .farcall
-	pop	de	;return address
-	pop	hl	;page offset
-	pop	bc	;mem page
-	push	bc
-	push	hl
+	sla	a
+	ld	b,0
+	ld	c,a
+	ld	ix,0
+	add	ix,bc
+	add	ix,sp
+	ld	c,(ix+0)	;Lib page
+	ld	e,(ix-2)	;Lib adr
+	ld	d,(ix-1)
+	pop	hl
+	ld	(far_ret),hl
 	in	a,(1)
 	ld	(far_ret_p),a
-	ld	(far_ret),de
-	ex	de,hl
-	ld	hl,4
-	add	hl,sp
-	ld	(far_ret_sp),hl
-	ex	de,hl
+	ld	hl,$8030
+	push	hl
+	push	de
 	ld	a,c
-	call	$59ca
-
-
+	jp	$26ea
 
