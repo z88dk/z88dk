@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.4 2001-04-27 14:47:53 dom Exp $
+ *      $Id: codegen.c,v 1.5 2001-05-03 11:14:20 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -1188,7 +1188,7 @@ void zdiv(LVALUE *lval)
                         Zsp +=4;
                         break;
                 case DOUBLE:
-                        callrts("dmul");
+                        callrts("ddiv");
                         Zsp += 6;
                         break;
                 default:
