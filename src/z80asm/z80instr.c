@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.2 2001-01-23 10:00:09 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.3 2002-01-18 16:22:11 dom Exp $ */
 /* $History: Z80INSTR.C $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -76,6 +76,7 @@ int CheckCondition (void);
 int CheckRegister16 (void);
 int ExprUnsigned8 (int listoffset);
 int ExprAddress (int listoffset);
+void ExtAccumulator(int opcode);
 
 /* local functions */
 struct JRPC *AllocJRPC (void);
@@ -87,7 +88,6 @@ void ArithLog8_instr (int opcode);
 void NewJRaddr (void);
 void JP_instr (int opc0, int opc);
 void Subroutine_addr (int opc0, int opc);
-void Parse_Acc (int opcode);
 
 
 /* global variables */
@@ -779,12 +779,16 @@ void
 ADD (void)
 {
   int acc16, reg16;
+  long fptr;
+
+  fptr = ftell (z80asmfile);
 
   GetSym ();
   switch (acc16 = CheckRegister16 ())
     {
     case -1:
-      Parse_Acc (0);		/* 16 bit register wasn't found - try to evaluate the 8bit version */
+      fseek (z80asmfile, fptr, SEEK_SET);
+      ExtAccumulator(0);        /* 16 bit register wasn't found - try to evaluate the 8 bit version */
       break;
 
     case 2:
@@ -854,12 +858,15 @@ void
 SBC (void)
 {
   int reg16;
+  long fptr;
 
+  fptr = ftell (z80asmfile);
   GetSym ();
   switch (CheckRegister16 ())
     {
     case -1:
-      Parse_Acc (3);		/* 16 bit register wasn't found - try to evaluate the 8bit version */
+      fseek (z80asmfile, fptr, SEEK_SET);
+      ExtAccumulator(3);        /* 16 bit register wasn't found - try to evaluate the 8 bit version */
       break;
 
     case 2:
@@ -891,12 +898,16 @@ void
 ADC (void)
 {
   int reg16;
+  long fptr;
+
+  fptr = ftell (z80asmfile);
 
   GetSym ();
   switch (CheckRegister16 ())
     {
     case -1:
-      Parse_Acc (1);		/* 16 bit register wasn't found - try to evaluate the 8bit version */
+      fseek (z80asmfile, fptr, SEEK_SET);
+      ExtAccumulator(1);        /* 16 bit register wasn't found - try to evaluate the 8 bit version */
       break;
 
     case 2:
@@ -925,20 +936,6 @@ ADC (void)
 
 
 
-void 
-Parse_Acc (int opcode)
-{
-  if (sym == name)
-    if (CheckRegister8 () == 7)
-      if (GetSym () == comma)
-	ArithLog8_instr (opcode);
-      else
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-    else
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-  else
-    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-}
 
 
 
