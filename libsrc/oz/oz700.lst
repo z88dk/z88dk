@@ -1,5 +1,6 @@
 restore_a000
 ozcopy
+memcpy
 ozdetectmodel
 ozinput/ozclick
 ozinput/ozeditline
@@ -32,7 +33,7 @@ ozscreen/ozfast
 ozscreen/ozsetlight
 ozscreen/oztogglelight
 ozscreen/ozsetlcdstate
-oztime/ozt
+oztime/oztime
 oztime/ozhour
 oztime/ozmin
 oztime/ozsec
@@ -88,3 +89,4 @@ emu/ozgfx/ozvline
 emu/ozgfx/ozplotpixel
 emu/ozgfx/ozpoint
 emu/ozgfx/ozpointcolor
+emu/ozgfx/ozgetpoint

@@ -3,7 +3,7 @@
 
 /* Control file for include OZ7xx stuff */
 
-/* $Id: oz.h,v 1.6 2003-10-27 16:56:55 stefano Exp $ */
+/* $Id: oz.h,v 1.7 2003-10-29 11:37:11 stefano Exp $ */
 
 //#include <oz700/ozfont.h>
 #include <oz700/ozgfx.h>
