@@ -105,6 +105,19 @@ int cpc_exec(char *target)
     /* Setup an AMSDOS header */
     memset(header,0,128);
 
+    header[0x01] = 'A';
+    header[0x02] = 'P';
+    header[0x03] = 'P';
+    header[0x04] = ' ';
+    header[0x05] = ' ';
+    header[0x06] = ' ';
+    header[0x07] = ' ';
+    header[0x08] = ' ';
+    header[0x09] = 'C';
+    header[0x0A] = 'O';
+    header[0x0B] = 'M';
+
+
     header[0x12] = 2;           /* File type, 2 is binary apparently */
     header[0x15] = pos % 256;
     header[0x16] = pos / 256;
@@ -114,6 +127,10 @@ int cpc_exec(char *target)
 
     header[0x1A] = exec % 256;
     header[0x1B] = exec / 256;
+
+    header[0x40] = len % 256;
+    header[0x41] = len / 256;
+
 
     checksum = cpc_checksum(header,0x42);
 
