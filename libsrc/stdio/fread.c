@@ -5,31 +5,32 @@
  *
  *	Calls read() in fcntl to do the dirty work
  *
- *	Returns number of members written
+ *	Returns number of members readen
  *
  *	We have to take account of ungotten characters
  *
  *	djm 1/4/2000
  *
  * --------
- * $Id: fread.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
+ * $Id: fread.c,v 1.3 2001-12-16 21:14:54 dom Exp $
  */
 
 #define ANSI_STDIO
 
 #include <stdio.h>
 
-int fwrite(void *ptr, size_t size, size_t nmemb, FILE *fp)
+int fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
 {
-	if ( (fp->flags&(_IOUSE|_IOWRITE)==(_IOUSE|_IOWRITE))  && \
+	if ( (fp->flags&(_IOUSE|_IOREAD)==(_IOUSE|_IOREAD))  && \
 			fchkstd(fp)== 0) {
-		int	written=size*nmemb;
+		int	readen=size*nmemb;
 
-		if (written) {
+		if (readen) {
+			/* Pick up ungot character */
 			(unsigned char *)*ptr=(unsigned char)fgetc(fp);
-			written=write(fp->desc.fd,ptr+1,written-1);
+			readen=read(fp->desc.fd,ptr+1,readen-1);
 		/* Return number of members read */
-			return (written/size);
+			return (readen/size);
 		}
 	}
 	return 0;
