@@ -1,14 +1,14 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.17 2001-05-11 08:43:23 dom Exp $
+# $Id: Makefile,v 1.18 2001-05-21 09:46:56 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
 	nc_clib.lib vz_clib.lib vzansi_clib.lib cpm_clib.lib \
 	mz_clib.lib mzansi_clib.lib zx81_clib.lib zx81ansi_clib.lib \
 	abc80_clib.lib aceansi_clib.lib sam_clib.lib \
-	msx_clib.lib svi_clib.lib
+	msx_clib.lib svi_clib.lib m5_clib.lib
 
 genlibs: m.lib malloc.lib z80_crt0.lib
 
@@ -407,7 +407,7 @@ tigray86.lib:
 	./tideps.sh
 	z80asm -d -ns -nm -Mo -DFORti86 -xtigray86 @tigray.lst
 
-# cpm lib - Stefano
+# CPM lib - Stefano
 cpm_clib.lib:
 	@echo ''
 	@echo '---> Building CP/M Library <---'
@@ -496,8 +496,9 @@ sam_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
-	z80asm -d -ns -nm -Mo -DFORSam -xsam_clib @sam.lst
+	z80asm -d -ns -nm -Mo -DFORsam -xsam_clib @sam.lst
 
+# Spectravideo SVI library - Stefano
 svi_clib.lib:
 	@echo ''
 	@echo '---> Building Spectravideo Library  <---'
@@ -510,6 +511,7 @@ svi_clib.lib:
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORsvi -xsvi_clib @svi.lst
 
+# MSX1 library - Stefano
 msx_clib.lib:
 	@echo ''
 	@echo '---> Building MSX Library  <---'
@@ -521,6 +523,19 @@ msx_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORmsx -xmsx_clib @msx.lst
+
+# SORD M5 library - Stefano
+m5_clib.lib:
+	@echo ''
+	@echo '---> Building SORD M5 Library  <---'
+	@echo ''
+	cd strings ; make
+	cd stdlib ; make gen
+	cd stdio ; make generic
+	cd printflike ; make 
+	cd setjmp ; make 
+	cd assert ; make 
+	z80asm -d -ns -nm -Mo -DFORm5 -xm5_clib @m5.lst
 
 clean:
 	cd assert ; make clean
