@@ -134,4 +134,5 @@ graphics/sam/swapgfxbk
 graphics/xorborder
 graphics/xorpixl
 graphics/xorplot
-games/joystickprintflike/ltoa_any
+games/joystick
+printflike/ltoa_any
