@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.15 2001-05-03 09:16:23 dom Exp $
+# $Id: Makefile,v 1.16 2001-05-03 09:20:05 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -411,6 +411,7 @@ cpm_clib.lib:
 	@echo ''
 	@echo '---> Building CP/M Library <---'
 	@echo ''
+	cd cpm ; make
 	cd strings ; make
 	cd stdlib ; make gen
 	cd stdio ; make generic
@@ -536,11 +537,11 @@ clean:
 	cd stdio ; make clean
 	cd stdlib ; make clean
 	cd strings ; make clean
-	cd ticalc; make clean
 	cd time ; make clean
 	cd z80_crt0s; make clean
 	cd z88 ; make clean
 	cd z88math ; make clean
+	rm *.lib
 
 install:
 	cp *.lib ../lib/clibs/
