@@ -6,6 +6,7 @@
                 XLIB     float
 
 		LIB	norm
+		LIB	l_long_neg
 
                 XDEF    float1
                 XREF    fasign
@@ -18,24 +19,22 @@
 ;       This routine will need to be rewritten slightly to handle
 ;       long ints..hopefully fairly OKish..
 
-.float  LD      A,H     ;fetch MSB
+.float  LD      A,d     ;fetch MSB
 .float1
         CPL             ;reverse sign bit
         LD      (FASIGN),A ;save sign (msb)
         RLA             ;move sign into cy
         JR      C,FL4   ;c => nonnegative number
-        EX      DE,HL
-        SBC     HL,HL   ;clear hl
-        SBC     HL,DE   ;get positive number into hl
-.FL4    LD      A,L
-        DEFB    $DD
-        LD      H,A     ;move LSB to hx
-        LD      C,H     ;move MSB to c
-        LD      DE,0    ;clear rest of registers
-        LD      B,D
-        DEFB    $DD
-        LD      L,D     ;clear lx
-        LD      A,16+128
+	call	l_long_neg
+; fp number is c ix de b
+.FL4	ld	c,d
+	ld	ixh,e
+	ld	a,h
+	ld	ixl,a
+	ld	d,l
+	ld	e,0
+	ld	b,e
+        LD      A,32+128
         LD      (FA+5),A ;preset exponent
         JP      NORM    ;go normalize c ix de b
 
