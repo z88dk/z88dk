@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.6 2001-06-30 11:31:09 dom Exp $
+ *      $Id: const.c,v 1.7 2001-09-03 09:59:36 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -40,7 +40,7 @@ LVALUE *lval ;
 		if ( doublestrings ) {
 		    immedlit(litlab);
 		    outdec(lval->const_val); nl();
-		    callrts("atof");
+		    callrts("__atof2");
 		} else {
 		    immedlit(dublab);
 		    outdec(lval->const_val); nl();
@@ -81,11 +81,12 @@ LVALUE *lval ;
 int fnumber(val)
 long *val;
 {
-        unsigned char sum[6],scale[6],frcn[6],dig1[6],dig2[6];
+        unsigned char sum[6],scale[6],frcn[6],dig1[6],dig2[6],dig3[6];
         int k;                  /* flag and mask */
         unsigned char minus;     /* is if negative! */
         char *start;    /* copy of pointer to starting point */
         char *s;             /* points into source code */
+	char *dp1;	    /* First number after dp */
 	char *end;
         if (mathz88) {
                 frcn[0]=0;
@@ -121,6 +122,7 @@ long *val;
                 ++s ;
         if ( *s++ != '.' )
                 return(0);               /* not floating point */
+	dp1 = s;
         while ( numeric(*s) )
                 ++s ;
         lptr = (s--) - line ;           /* save ending point */
@@ -128,12 +130,25 @@ long *val;
 	end = s;
 
         sum[0]=sum[1]=sum[2]=sum[3]=sum[4]=sum[5]='\0';
+#if 0
         while ( *s != '.' ) {           /* handle digits to right of decimal */
 /* Get the value into a register - all routines dump in second register */
         qfloat( ( *(s--)-'0' ),dig1);
         fltadd(dig1,sum);
         fltmult(frcn,sum);
         }
+#else
+	memcpy(dig3,frcn,6);	/* Copy it over */
+	s = dp1;
+	while ( numeric(*s) && s <= end) {
+		qfloat((*s-'0'),dig1);
+		fltmult(dig3,dig1);
+		fltadd(dig1,sum);
+		fltmult(frcn,dig3);
+		s++;
+	}
+	s = --dp1;	/* Now points to dp */
+#endif
         qfloat(1,scale);
         while ( --s >= start ) {
                 qfloat((*s-'0'),dig1);
