@@ -5,7 +5,7 @@
  *	Some more floating point routines..I can't remember
  *	why these are separated out..
  *
- *	$Id: float.h,v 1.6 2002-01-27 15:49:42 dom Exp $
+ *	$Id: float.h,v 1.7 2003-08-22 21:14:40 dom Exp $
  */
 
 
@@ -13,7 +13,7 @@
 extern double __LIB__ fmod();
 extern double __LIB__ amax(double,double);
 extern double __LIB__ fabs(double);
-extern double __LIB__ amin(double);
+extern double __LIB__ amin(double,double);
 extern double __LIB__ floor(double);
 extern double __LIB__ ceil(double);
 extern double __LIB__ fprand(void); /* Generic only */
