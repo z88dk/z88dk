@@ -7,6 +7,10 @@
 ;       Small C+ Library Function
 ;
 ;       Strongly hand optimized by djm 1/3/99
+;
+; 	$Id: strnicmp.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
+
+
 
         XLIB    strnicmp
 

@@ -2,6 +2,8 @@
  *       memset(void *s, uchar byte, size_t size)
  *
  *      djm 27/4/99
+ *
+ *	$Id: memset.c,v 1.2 2001-04-11 12:15:32 dom Exp $
  */
 
 

@@ -7,6 +7,8 @@
 ;       Small C+ Library Function
 ;
 ;       Mildly hand optimized by djm 1/3/99
+;
+;	$Id: strrstr.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
 
         XLIB    strrstr
 

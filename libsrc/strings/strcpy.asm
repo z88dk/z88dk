@@ -4,6 +4,8 @@
 ; Copy string s2 to s1, s1 must be big enough, return s1
 ;
 ; 1/3/99 djm - fixed bug in return value
+;
+; $Id: strcpy.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
 
 
                 XLIB    strcpy

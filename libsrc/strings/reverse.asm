@@ -2,6 +2,10 @@
 ; Small C z88 String functions
 ;
 ; Reverse a character string
+;
+; $Id: reverse.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
+
+
 
 
                 XLIB    reverse

@@ -4,6 +4,8 @@
  *      Taken from c68 archive
  *
  *      Added to Small C+ archive 1/3/99 djm
+ *
+ *	$Id: strstr.c,v 1.2 2001-04-11 12:15:32 dom Exp $
  */
 
 

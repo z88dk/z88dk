@@ -5,6 +5,10 @@
 ;
 ; Fixed djm 25/4/99 Previously would return non zero if the two
 ; strings matched (it ignored the \0 at the end!)
+;
+; $Id: strcmp.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
+
+
 
                 XLIB    strcmp
 

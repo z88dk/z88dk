@@ -3,6 +3,8 @@
 ;
 ; Concatenate s2 on the end of s1. Space for s1 must be large enough...
 ; At most n characters are moved
+;
+; $Id: strncat.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
 
 
                 XLIB    strncat

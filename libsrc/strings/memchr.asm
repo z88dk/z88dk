@@ -7,6 +7,8 @@
 ;	Compile time: Thu Dec 23 04:41:51 1999
 ;
 ;	Mildly hand optimized by djm 22/12/99
+;
+;	$Id: memchr.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
 
 
 

@@ -6,6 +6,8 @@
  *      Taken from vbcc archive
  *
  *      Added to Small C+ archive 1/3/99 djm
+ *
+ *	$Id: strchr.c,v 1.2 2001-04-11 12:15:32 dom Exp $
  */
 
 #include <string.h>

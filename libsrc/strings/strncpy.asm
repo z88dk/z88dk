@@ -5,6 +5,8 @@
 ; Return s1
 ;
 ; djm 15/12/99 Fixed so return s1
+;
+; $Id: strncpy.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
 
                 XLIB    strncpy
 

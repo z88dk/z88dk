@@ -6,6 +6,7 @@
 all: string
 
 string:
+	zcc -vn -make-lib memcmp.c
 	zcc -vn -make-lib memset.c
 	zcc -vn -make-lib memcpy.c
 	zcc -vn -Wn43 -make-lib strspn.c

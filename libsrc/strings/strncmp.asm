@@ -4,6 +4,8 @@
 ; Compare strings (at most n bytes): s1>s2: >0 s1==s2: 0 s1<s2: <0
 ;
 ; Hopefully this is now right! (djm 19/3/2000)
+;
+; $Id: strncmp.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
 
                 XLIB    strncmp
 

@@ -2,6 +2,8 @@
 ; Small C z88 String functions
 ;
 ; Concatenate s2 on the end of s1. Space for s1 must be large enough...
+;
+; $Id: strcat.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
 
 
                 XLIB    strcat
