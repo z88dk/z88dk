@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.2 2001-03-21 16:34:01 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.3 2001-04-11 09:48:18 dom Exp $ */
 /* $History: PRSLINE.C $ */
 /*  */
 /* *****************  Version 8  ***************** */
@@ -214,6 +214,8 @@ GetSym (void)
 		{
 		  if ( c != ':' ) 
 		  	ungetc (c, z80asmfile);	/* puch character back into stream for next read */
+		  else 
+			sym = label;
 		  break;
 		}
 	    }
