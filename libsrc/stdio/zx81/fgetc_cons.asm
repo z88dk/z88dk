@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.3 2002-04-17 08:35:34 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.4 2002-04-18 09:44:31 stefano Exp $
 ;
 
 	XLIB	fgetc_cons
@@ -17,11 +17,11 @@
 
 .fgetc_cons
 	call	restore81
-	
+.fgcloop
 	call	699
 	ld	a,h
 	add	a,2
-	jr	nc,fgetc_cons
+	jr	nc,fgcloop
 .wloop
 	call	699
 	ld	a,h

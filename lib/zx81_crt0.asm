@@ -2,11 +2,11 @@
 ;
 ;       Stefano Bodrato Apr. 2000
 ;
-;       If an error occurs eg break we just drop back to BASIC
+;       If an error occurs (eg. out if screen) we just drop back to BASIC
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.6 2002-04-17 21:48:48 dom Exp $
+;       $Id: zx81_crt0.asm,v 1.7 2002-04-18 09:44:30 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -37,6 +37,9 @@
 
         XDEF    __sgoioblk      ;stdio info block
 
+       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heapblocks
+
         XDEF    base_graphics   ;Graphical variables
         XDEF    coords          ;Current xy position
 
@@ -46,6 +49,7 @@
 	XDEF	saved_hl	;Temporary store used by compiler
 	XDEF	saved_de	;for hl and de
 
+	org	16514
 
 .start
 	ld	(start1+1),sp	;Save entry stack
@@ -80,8 +84,8 @@ IF DEFINED_ANSIstdio
 	call	closeall
 ENDIF
 ENDIF
-	pop	bc
 	call	restore81
+	pop	bc
 .start1	ld	sp,0		;Restore stack to entry value
         ret
 
@@ -89,25 +93,22 @@ ENDIF
         jp      (hl)
 
 
-.iysave 	defw	0
-.ixsave 	defw	0
 .a1save 	defb	0
 .hl1save	defw	0
 
 .restore81
-	ld	iy,(iysave)
-	ld	ix,(ixsave)
+	ld	iy,16384
 	ex	af,af
 	ld	a,(a1save)
 	ex	af,af
 	exx
         ld	hl,(hl1save)
         exx
+        call	$F2B		; SLOW mode
 	ret
 	
 .save81
-	ld	(iysave),iy
-	ld	(ixsave),ix
+        call	$F23		; FAST mode
 	ex	af,af
 	ld	(a1save),a
 	ex	af,af
