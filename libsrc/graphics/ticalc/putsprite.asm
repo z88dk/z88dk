@@ -10,6 +10,10 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
+;
+;	$Id: putsprite.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+;
+
 ; coords: d,e (vert-horz)
 ; sprite: (ix)
 

@@ -6,6 +6,8 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
+;	$Id: window.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+;
 
 ;       This function will open a window of any type (graphics/text)
 ;       on the Z88 screen, graphics flag states gfx or text

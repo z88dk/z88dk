@@ -9,6 +9,9 @@
 ;	TI calcs: Copy GRAPH MEM to LCD when finished.
 ;	By Stefano Bodrato - Dec. 2000
 ;
+;
+;	$Id: swapgfxbk.asm,v 1.6 2001-04-18 13:21:38 stefano Exp $
+;
 
 
                 XLIB    swapgfxbk

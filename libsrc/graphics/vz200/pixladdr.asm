@@ -4,6 +4,10 @@
 	XREF	base_graphics
 
 
+;
+;	$Id: pixladdr.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+;
+
 ; ******************************************************************
 ;
 ; Get absolute	pixel address in map of virtual (x,y) coordinate.

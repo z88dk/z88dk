@@ -2,10 +2,14 @@
 ;       Draw a circle on the Z88 map
 ;       Adapted from my Spectrum Routine
 ;       (C) 1995-1998 D.J.Morris
+;
+;	$Id: dcircle2.asm,v 1.2 2001-04-18 13:21:37 stefano Exp $
+;
 
 
 ;	Alternate version. (Changes by Stefano)
 ;	Dirty hack to leave iy free and save the a' register
+;	Not used anymore (I think)
 
 
                 XLIB    draw_circle

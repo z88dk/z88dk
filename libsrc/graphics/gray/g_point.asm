@@ -4,6 +4,8 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
+;	$Id: g_point.asm,v 1.2 2001-04-18 13:21:38 stefano Exp $
+;
 
 ;Usage: g_point(int px, int py)
 

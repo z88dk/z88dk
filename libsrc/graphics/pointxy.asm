@@ -4,6 +4,10 @@
 
 	LIB	pixeladdress
 
+;
+;	$Id: pointxy.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;
+
 ; ******************************************************************
 ;
 ; Check if pixel at	(x,y) coordinate is	set or not.

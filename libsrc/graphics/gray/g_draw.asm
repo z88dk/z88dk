@@ -4,6 +4,8 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
+;	$Id: g_draw.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+;
 
 ;Usage: g_draw(int x1, int y1, int x2, int y2, int GrayLevel)
 

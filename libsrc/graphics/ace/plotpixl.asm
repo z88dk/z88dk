@@ -1,9 +1,12 @@
-;	INCLUDE	"grafix.inc"
 
 	XLIB	plotpixel
 
 	LIB pixeladdress
 	XREF	COORDS
+
+;
+;	$Id: plotpixl.asm,v 1.2 2001-04-18 13:21:38 stefano Exp $
+;
 
 ; ******************************************************************
 ;

@@ -1,8 +1,11 @@
 ;
-; Fast background save
+;	Fast background save
 ;
-; Generic version (just a bit slow)
+;	Generic version (just a bit slow)
 ;
+;	$Id: bksave.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;
+
 
 	XLIB    bksave
 	LIB	pixeladdress

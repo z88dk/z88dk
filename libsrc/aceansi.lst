@@ -121,9 +121,9 @@ graphics/line
 graphics/liner
 graphics/lscroll
 graphics/plot
-graphics/jupiter/plotpixl
-graphics/jupiter/respixl
-graphics/jupiter/xorpixl
+graphics/ace/plotpixl
+graphics/ace/respixl
+graphics/ace/xorpixl
 graphics/point
 graphics/pointxy
 graphics/rbitmask

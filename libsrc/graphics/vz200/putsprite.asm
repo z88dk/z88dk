@@ -5,6 +5,9 @@
 ;
 ; VZ200/300 version
 ;
+;
+; $Id: putsprite.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+;
 
 	XLIB    putsprite
 	XREF	cpygraph

@@ -3,6 +3,10 @@
 
 	XREF	COORDS
 
+;
+;	$Id: plotpixl.asm,v 1.5 2001-04-18 13:21:38 stefano Exp $
+;
+
 ; ******************************************************************
 ;
 ; Plot pixel at (x,y) coordinate.

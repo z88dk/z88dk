@@ -8,6 +8,9 @@
 ;
 ;       Define for graphics and other standard library functions
 ;
+;
+;	$Id: grafix.inc,v 1.4 2001-04-18 13:21:37 stefano Exp $
+;
 
 
 IF FORti82

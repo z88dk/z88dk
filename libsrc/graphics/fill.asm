@@ -4,6 +4,8 @@
 ;       Fill stub - Stefano Bodrato 11/6/2000
 ;
 ;
+;	$Id: fill.asm,v 1.2 2001-04-18 13:21:37 stefano Exp $
+;
 
 
 ;Usage: fill(struct *pixel)

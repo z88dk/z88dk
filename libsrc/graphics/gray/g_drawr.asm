@@ -4,6 +4,8 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
+;	$Id: g_drawr.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+;
 
 ;Usage: g_drawr(int px, int py, int GrayLevel)
 

@@ -6,6 +6,8 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
+;	$Id: rscroll.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;
 
 
 
