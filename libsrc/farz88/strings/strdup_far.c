@@ -7,10 +7,10 @@
  *	This requires linking with a malloc library
  */
 
-#define FARDATA
+#define FARDATA 1
 
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
 
 far char *strdup_far(far char *orig)
