@@ -5,6 +5,8 @@
 # situ
 #
 
+# Start from scratch
+make clean
 
 Z80_OZFILES=`pwd`/lib/
 ZCCCFG=`pwd`/lib/config/
@@ -21,8 +23,8 @@ export CCOPT
 PATH=`pwd`/bin:$PATH
 export PATH
 make -e
-#make -C `pwd`/libsrc
-#make -C `pwd`/libsrc install
+make -C `pwd`/libsrc
+make -C `pwd`/libsrc install
 
 # That's the unix part bootstrapped, now onto the Amiga
 

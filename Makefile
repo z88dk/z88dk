@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.25 2002-12-09 18:49:44 dom Exp $
+#	$Id: Makefile,v 1.26 2002-12-09 19:43:19 dom Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -25,18 +25,28 @@ amiga:  clean-bins
 	mkdir -p z88dk/bin 
 	$(MAKE) -C src/appmake 
 	$(MAKE) -C src/appmake install PREFIX=`pwd`/z88dk
+	$(MAKE) -C src/appmake clean
 	$(MAKE) -C src/copt 
 	$(MAKE) -C src/copt install PREFIX=`pwd`/z88dk
+	$(MAKE) -C src/copt clean
 	$(MAKE) -C src/cpp 
 	$(MAKE) -C src/cpp install PREFIX=`pwd`/z88dk
+	$(MAKE) -C src/cpp clean
 	$(MAKE) -C src/sccz80 
 	$(MAKE) -C src/sccz80 install PREFIX=`pwd`/z88dk
+	$(MAKE) -C src/sccz80 clean
 	$(MAKE) -C src/z80asm 
 	$(MAKE) -C src/z80asm install PREFIX=`pwd`/z88dk
+	$(MAKE) -C src/z80asm clean
 	$(MAKE) -C src/zcc  
 	$(MAKE) -C src/zcc install PREFIX=`pwd`/z88dk
+	$(MAKE) -C src/zcc clean
+	$(MAKE) -C libsrc clean
 	./config.sh zcc: z88
-	cp -R  include/ lib/ examples/ doc/ support/ z88dk/
+	cp -R  libsrc/ include/ lib/ examples/ doc/ support/ src/ z88dk/
+	cp amiga.patch EXTENSIONS LICENSE Makefile amigabuild.sh z88dk/
+	cp README.1st z88dk/
+	cd z88dk ; patch -p0 < amiga.patch
 
 
 setup:
