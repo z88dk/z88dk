@@ -3,16 +3,15 @@
 ;
 ;       The Maths Routines (essential ones!)
 ;
-;       We have a set of generic files and then we have conditional
-;       assembly to either pick up the Z88 math stubs or the
-;       generic stubs..
+;	All maths routines are now in a library except for these
+;	small ones (which will always be used)
 ;
-;       NB. We have to remember to include the right library or all
-;       hell well break out!
+;	If -doublestr is defined then we can link with whatever
+;	library we feel like
 ;
 ;       djm 7/12/98
 ;
-;	$Id: float.asm,v 1.5 2002-01-14 10:01:12 dom Exp $
+;	$Id: float.asm,v 1.6 2002-01-21 20:37:13 dom Exp $
 
 ;-------------------------------------------------
 ; Some scope defintionons for the crt0 float stuff
@@ -29,10 +28,7 @@
         XDEF    dpush2
 	XDEF	__atof2
 
-        LIB     float
-        LIB     ufloat
-        LIB     ifix
-	LIB	atof
+	LIB	atof	;needed for __atof2
 
 ;-------------------------------------------
 ; Unused code from the generic z80 maths lib
@@ -113,15 +109,4 @@ IF DEFINED_math_atof
 	pop	bc
 	ret
 ENDIF
-
-
-; * * * * * HOPEFULLY THIS IS THE END OF THE GENERIC
-; * * * * * ROUTINES NEEDED FOR BOTH mathz88 & genmath
-
-IF NEED_mathz88
-        INCLUDE "#mathz88.asm"
-ELSE
-        INCLUDE "#mathgen.asm"
-ENDIF
-
 

@@ -10,7 +10,7 @@
 ;       routines in different modules, we have got rid of
 ;       the conditional assembly around the float routines
 ;
-;	$Id: z80_crt0.hdr,v 1.3 2001-10-08 18:45:55 dom Exp $
+;	$Id: z80_crt0.hdr,v 1.4 2002-01-21 20:37:13 dom Exp $
 
         XREF    base_graphics	; Address of graphics screen
 
@@ -111,54 +111,38 @@
 	LIB     l_long_case
 
 ;--------------------------------------------------------------
-; Floating point support routines, held in startup code so XREF
+; Floating point support routines, mostly in library
 ;--------------------------------------------------------------
 
-        XREF	DADD
-        XREF	DDIV
-        XREF 	DGE
-        XREF	DIV1
-        XREF	DIV17
-        XREF	DLOAD
-        XREF	DLDPSH
-        XREF	DMUL
-        XREF	DSTORE
-        XREF	DSWAP
-        XREF	DSUB
-        XREF	DEQ
-        XREF	DGT
-        XREF  	DLEq      ;djm 7/10/98
-        XREF  	DLT
-        XREF  	DNE
-        XREF  	DPUSH
-        XREF  	DPUSH2
-        XREF  	FA
-        XREF  	extra
-        XREF  	FADD
-        XREF  	FDIV
-        XREF  	FMUL
-        XREF  	FSUB
-;        XREF  GRIPE   
-        XREF  	PUSHF2
-        XREF  	LDBCFA
-        XREF  	LDBCHL
-        XREF  	LDFABC
-        LIB   	MINUSFA   ;negate FP number
-        XREF  	NORMA
-        LIB     ODD
-        XREF  	PUSHFA
-        XREF  	SGN
-;        XREF  OFLOW
-        XREF  	FASIGN
-        XREF  	NORM
-        XREF  	COMPARE
-        XREF  	INT2
-        XREF  	PI
-        XREF  	HALFPI
-	XREF  	__atof2
+	LIB	dadd
+	LIB	ddiv
+	LIB	dsub
+	LIB	dmul
+
+	LIB	dge
+	LIB	dgt
+	LIB	dleq
+	LIB	dlt
+	LIB	deq
+	LIB	dne
+
+	LIB	minusfa		;FA=-FA
+
+	LIB	dswap		;Exchange FA with top of stack
         LIB   	float		;Convert int to float
 	LIB   	ufloat		;unsigned int to float
         LIB   	ifix		;Convert float to int
+
+	XREF	dstore		;FA->(de)
+	XREF	dload		;FA<-(hl)
+	XREF	dldpsh		;(hl)->(stack)
+	XREF	dpush		;FA->(stack)
+	XREF	dpush2		;FA->(stack under)
+
+	XREF	fa		;may not be needed in this file
+	XREF	extra		;dittot
+	XREF  	__atof2		;string->fa convsersion
+
 
 ;--------------------------------------------------
 ; Routines for picking up variables from far memory
