@@ -1,6 +1,6 @@
-;       Kludgey startup for CP/M
+;       MSX C stub
 ;
-;       Stefano Bodrato - Apr. 2000
+;       Stefano Bodrato - Apr. 2001
 ;
 
 
@@ -46,26 +46,9 @@
 ; Now, getting to the real stuff now!
 
 
-
-        org     $100
-
+        org     40000
 
 .start
-
-	defb	$eb,$04		;DOS protection... JMPS LABE
-	ex	de,hl
-	jp	begin
-	defb	$b4,$09		;DOS protection... MOV AH,9
-	defb	$ba
-	defw	dosmessage	;DOS protection... MOV DX,OFFSET dosmessage
-	defb	$cd,$21		;DOS protection... INT 21h.
-	defb	$cd,$20		;DOS protection... INT 20h.
-
-.dosmessage
-	defm	"This program is for a CP/M system."
-	defb	13,10,'$'
-
-.begin
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
@@ -85,35 +68,25 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
-; 	Save the default disk
-	ld	c,25
-	call	5
-	ld	(defltdsk),a
-	
+
+	call	$CC	; Hide function key strings
         call    _main
-
-; 	Restore the default disk
-	ld	a,(defltdsk) ; 
-	ld	e,a
-	ld	c,14
-	call	5
-
-
+	
 .cleanup
 ;
 ;       Deallocate memory which has been allocated here!
 ;
-	push	hl
+
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 	LIB	closeall
 	call	closeall
 ENDIF
 ENDIF
-	pop	bc
+
 .start1
         ld      sp,0
-        jp	0
+        ret
 
 .l_dcal
         jp      (hl)
@@ -170,7 +143,7 @@ ENDIF
 
 ; mem stuff
 
-         defm  "Small C+ CP/M"&0
+         defm  "Small C+ MSX"&0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

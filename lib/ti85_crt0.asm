@@ -88,6 +88,23 @@ ENDIF
 	call	_main
 	call	tiei
 
+IF DEFINED_GRAYlib
+
+        ld a,$3c
+        out (0),a    ;Set screen back to normal
+
+        ;This was just to clear the Graph screen
+
+        ;ld hl,$8641	;GRAPH_MEM           
+        ;ld d,h                    
+        ;ld e,l                   
+        ;inc de                    
+        ;ld (hl),0
+        ;ld bc,1024
+        ;ldir
+        
+ENDIF
+
 .cleanup
 ;
 ;       Deallocate memory which has been allocated here!
