@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.13 2002-11-20 20:30:33 dom Exp $
+ * $Id: stdlib.h,v 1.14 2003-01-23 10:30:25 dom Exp $
  */
 
 #include <sys/types.h>
@@ -75,7 +75,7 @@ extern int system(char *text);
 #endif
 
 
-extern int __LIB__  getopt (int, char **, const char *);
+extern int __LIB__  getopt (int, char **, char *);
 extern   char *optarg;                  /* getopt(3) external variables */
 extern   int opterr;
 extern   int optind;
