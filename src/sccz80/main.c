@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.3 2001-02-02 13:45:23 dom Exp $
+ *      $Id: main.c,v 1.4 2001-02-15 13:28:34 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -959,6 +959,7 @@ struct args myargs[]= {
         {"intuition",NO,SetIntuition},
         {"smartpf",NO,SetSmart},
         {"no-smartpf",NO,UnSetSmart},
+	{"pflevel",YES,SetPfLevel},
         {"expandz88",NO,SetExpand},
         {"no-expandz88",NO,UnSetExpand},
         {"ANSI-stdio",NO,SetANSIstdio},
@@ -1086,6 +1087,16 @@ void UnSetSmart(char *arg)
 void SetSmart(char *arg)
 {
         smartprintf=YES;
+}
+
+/* pflevel= */
+void SetPfLevel(char *arg)
+{
+        int    num;
+        num=0;
+        sscanf(arg+8,"%d",&num);
+	if (num>=1 && num<=3)
+		printflevel=num;
 }
 
 
