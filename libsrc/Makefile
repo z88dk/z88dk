@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.13 2001-05-02 09:21:51 dom Exp $
+# $Id: Makefile,v 1.14 2001-05-02 11:17:47 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -17,7 +17,7 @@ z88libs: mz.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib
 tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 	ti83pansi_clib.lib ti83_clib.lib ti85ansi_clib.lib ti85_clib.lib \
 	ti86ansi_clib.lib ti86_clib.lib \
-	tigray82.lib tigray83.lib tigray83p.lib tigray85.lib
+	tigray82.lib tigray83.lib tigray83p.lib tigray85.lib tigray86.lib
 
 zxlibs: zx_clib.lib zxan_clib.lib
 
@@ -398,6 +398,13 @@ ti86_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	z80asm -d -ns -nm -Mo -DFORti86 -xti86_clib @ticalc.lst
+
+tigray86.lib:
+	@echo ''
+	@echo '---> Building TI86 Grey Library  <---'
+	@echo ''
+	./tideps.sh
+	z80asm -d -ns -nm -Mo -DFORti86 -xtigray86 @tigray.lst
 
 # cpm lib - Stefano
 cpm_clib.lib:
