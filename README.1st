@@ -87,12 +87,8 @@ There's a certain degree of bootstrapping required - here's the
 procedure for a standard install on UNIX (ensure that you have
 root permissions). Where make is mentioned, this refers to GNU make.
 
-0. Set up some environental variables to describe your build environment eg:
-	setenv CFLAGS "-g -O2"
-	setenv CCOPT  "-DUNIX"
-	setenv CC     "gcc"
 
-1. cd {z88dk}; make -e
+1. Run ./build.sh - this will build the z88dk system in situ
 
 2. make install
 
@@ -110,14 +106,7 @@ Before compiling setup the variables Z80_OZFILES to point to {z88dk}/lib/ and
 ZCCCFG to point to {z88dk}/lib/config/ (Trailing slashes are important!). 
 Additionally add {z88dk}/bin to your path.
 
-0. Set up some environental variables to describe your build environment eg:
-	setenv CFLAGS "-g -O2"
-	setenv CCOPT  "-DUNIX"
-	setenv CC     "gcc"
-
-1. cd {z88dk}; make -e
-
-2. cd {z88dk/libsrc} ; make ; make install
+1. Type ./build.sh
 
 You should be ready to go!
 
