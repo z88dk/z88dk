@@ -1,3 +1,12 @@
+;-------------------------------
+; Some DEFC's needed by the code
+;-------------------------------
+;defc statvars    = $858F	; 531 bytes free $858F / $87A2
+defc plotSScreen = $8E29	; 768 bytes free (normal screen buffer)
+defc saveSScreen = $8265        ; 768 bytes free (APD buffer) $8265 / $8566
+defc _IY_TABLE   = $8567	; Where IY usually points
+
+
 ;#Define		Invoke(xxxx)	CALL	xxxx
 ;#Define		JMP(xxxx)	JP	xxxx
 ; Syntax Enhancers

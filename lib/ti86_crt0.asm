@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.9 2001-06-06 14:01:55 stefano Exp $
+;	$Id: ti86_crt0.asm,v 1.10 2001-07-16 13:27:50 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -20,43 +20,37 @@
 ; Some general XDEFs and XREFs needed by the assembler
 ;-----------------------------------------------------
 
-	MODULE  z88_crt0
+	MODULE  Ti86_crt0
 
-; No matter what set up we have, main is always, always external to
-; this file
-	XREF	_main
+	XREF	_main		; No matter what set up we have, main is
+				;  always, always external to this file.
 
-; Some variables which are always needed
-	XDEF	cleanup
-	XDEF	l_dcal
+	XDEF	cleanup		; used by exit()
+	XDEF	l_dcal		; used by calculated calls = "call (hl)"
 
-; Integer rnd seed
-	XDEF	int_seed
+	XDEF	int_seed	; Integer rnd seed
 
-; vprintf is internal to this file so we only ever include one of the set
-; of routines
-	XDEF	_vfprintf
+	XDEF	_vfprintf	; vprintf is internal to this file so we
+				;  only ever include one of the set of
+				;  routines
 
-; Exit variables
-	XDEF	exitsp
-	XDEF	exitcount
+	XDEF	exitsp		; Exit variables
+	XDEF	exitcount	;
 
-; For stdin, stdout, stder
-	XDEF	__sgoioblk
+	XDEF	__sgoioblk	; For stdin, stdout, stder
 
-; Graphics stuff
-	XDEF	base_graphics
-	XDEF	coords
+	XDEF	base_graphics	; Graphics stuff
+	XDEF	coords		;
 
-; TI calc specific stuff
-	XDEF	cpygraph
-	XDEF	tidi
-	XDEF	tiei
+	XDEF	cpygraph	; TI calc specific stuff
+	XDEF	tidi		;
+	XDEF	tiei		;
 
 ;-------------------------
 ; Begin of (shell) headers
 ;-------------------------
 
+	INCLUDE "#Ti86.def"	; ROM / RAM adresses on Ti86
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 
 ;-----------------------------
@@ -77,7 +71,6 @@ IF (startup=2)
 	defm	"Z88DK Small C+ Program"
  ENDIF
 	defb	$0		; Termination zero
-.enddesc
 ENDIF
 
 ;-----------
@@ -98,7 +91,6 @@ IF (startup=3)
 	defm	"Z88DK Small C+ Program"
  ENDIF
 	defb	$0		; Termination zero
-.enddesc
 .icon
 	DEFINE NEED_icon
 	INCLUDE	"zcc_opt.def"
@@ -113,7 +105,6 @@ IF (startup=3)
 	defb	@00000000
 	defb	@00000000
  ENDIF
-.endicon
 ENDIF
 
 ;----------
@@ -135,7 +126,6 @@ IF (startup=4)
 	defm	"Z88DK Small C+ Program"
  ENDIF
 	defb	$0		; Termination zero
-.enddesc
 .icon
 	DEFINE NEED_icon
 	INCLUDE	"zcc_opt.def"	; Get icon from zcc_opt.def
@@ -149,7 +139,6 @@ IF (startup=4)
 	defb	@00110000
 	defb	@00000000
   ENDIF
-.endicon
 ENDIF
 
 ;----------------------
@@ -199,8 +188,13 @@ ENDIF
 	ld	hl,0
 	add	hl,sp
 	ld	(start1+1),hl
-IF DEFINED_atexit		; Less stack use
-	ld	hl,-64
+IF !DEFINED_atexit		; Less stack use
+	ld	hl,-6		; 3 pointers (more likely value)
+	add	hl,sp
+	ld	sp,hl
+	ld	(exitsp),sp
+ELSE
+	ld	hl,-64		; 32 pointers (ANSI standard)
 	add	hl,sp
 	ld	sp,hl
 	ld	(exitsp),sp
@@ -227,26 +221,30 @@ IF !DEFINED_nostreams
 ENDIF
 
 IF DEFINED_GRAYlib
-	INCLUDE	"#graylib86.asm"
+	INCLUDE	"#gray86.asm"
+	;im	2
 ENDIF
 
 	call	$4A95	; Close menus
 
 	call	tidi
 	call	_main
+.cleanup
+	; What's the the normal IY value on the Ti86?
 	call	tiei
 
 IF DEFINED_GRAYlib
+	;im	1
        	ld	a,$3C	; Make sure video mem is active
 	out	(0),a
 ENDIF
-	
-; Deallocate memory which has been allocated here!	
-.cleanup
-IF !DEFINED_nostreams
- IF DEFINED_ANSIstdio
-	LIB	closeall
-	call	closeall
+
+IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
+ IF !DEFINED_nostreams
+  IF DEFINED_ANSIstdio
+	;LIB	closeall	; Not untill we have fileroutines
+	;call	closeall
+  ENDIF
  ENDIF
 ENDIF
 
@@ -297,31 +295,39 @@ ENDIF
 
 
 ; Now, define some values for stdin, stdout, stderr
+
+IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
+ IF !DEFINED_nostreams
+  IF DEFINED_ANSIstdio
 .__sgoioblk
-IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
-ELSE
-	defw	-11,-12,-10
+  ENDIF
+ ENDIF
 ENDIF
 
 
 ; Now, which of the vfprintf routines do we need?
+IF !DEFINED_nostreams
+ IF DEFINED_ANSIstdio
+  IF DEFINED_floatstdio
 ._vfprintf
-IF DEFINED_floatstdio
-	LIB	vfprintf_fp
-	jp	vfprintf_fp
-ELSE
-	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
-		jp	vfprintf_comp
-	ELSE
-		IF DEFINED_ministdio
-			LIB	vfprintf_mini
-			jp	vfprintf_mini
-		ENDIF
-	ENDIF
+	LIB vfprintf_fp
+	jp  vfprintf_fp
+  ELSE
+   IF DEFINED_complexstdio
+._vfprintf
+	LIB vfprintf_comp
+	jp  vfprintf_comp
+   ELSE
+    IF DEFINED_ministdio
+._vfprintf
+	LIB vfprintf_mini
+	jp  vfprintf_mini
+    ENDIF
+   ENDIF
+  ENDIF
+ ENDIF
 ENDIF
-
 
 ;Seed for integer rand() routines
 .int_seed	defw	0
@@ -337,19 +343,6 @@ ENDIF
 ; mem stuff
 .base_graphics	defw	$FC00	;TI86
 .coords		defw	0
-
-;All the float stuff is kept in a different file...for ease of altering!
-;It will eventually be integrated into the library
-;
-;Here we have a minor (minor!) problem, we've no idea if we need the
-;float package if this is separated from main (we had this problem before
-;but it wasn't critical..so, now we will have to read in a file from
-;the directory (this will be produced by zcc) which tells us if we need
-;the floatpackage, and if so what it is..kludgey, but it might just work!
-;
-;Brainwave time! The zcc_opt file could actually be written by the
-;compiler as it goes through the modules, appending as necessary - this
-;way we only include the package if we *really* need it!
 
 IF NEED_floatpack
 	INCLUDE	"#float.asm"

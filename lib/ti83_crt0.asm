@@ -3,7 +3,7 @@
 ;	Stefano Bodrato	- Dec 2000
 ;	Henk Poley	- Apr 2001 Fixed and add some things
 ;
-;	$Id: ti83_crt0.asm,v 1.11 2001-06-06 14:01:55 stefano Exp $
+;	$Id: ti83_crt0.asm,v 1.12 2001-07-16 13:27:49 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -25,61 +25,51 @@
 ; Some general XDEFs and XREFs needed by the assembler
 ;-----------------------------------------------------
 
-	MODULE  z88_crt0
+	MODULE  Ti83_crt0
 
-; No matter what set up we have, main is always, always external to
-; this file
-	XREF	_main
+	XREF	_main		; No matter what set up we have, main is
+				;  always, always external to this file.
 
-; Some variables which are always needed
-	XDEF	cleanup
-	XDEF	l_dcal
+	XDEF	cleanup		; used by exit()
+	XDEF	l_dcal		; used by calculated calls = "call (hl)"
 
-; Integer rnd seed
-	XDEF	int_seed
+	XDEF	int_seed	; Integer rnd seed
 
-; vprintf is internal to this file so we only ever include one of the set
-; of routines
-	XDEF	_vfprintf
+	XDEF	_vfprintf	; vprintf is internal to this file so we
+				;  only ever include one of the set of
+				;  routines
 
-; Exit variables
-	XDEF	exitsp
-	XDEF	exitcount
+	XDEF	exitsp		; Exit variables
+	XDEF	exitcount	;
 
-; For stdin, stdout, stder
-	XDEF	__sgoioblk
+	XDEF	__sgoioblk	; For stdin, stdout, stder
 
-; Graphics stuff
-	XDEF	base_graphics
-	XDEF	coords
+	XDEF	base_graphics	; Graphics stuff
+	XDEF	coords		;
 
-; TI calc specific stuff
-	XDEF	cpygraph
-	XDEF	tidi
-	XDEF	tiei
-; Description (*always* needed)
-	XDEF	description
-	XDEF	enddesc
-; Icon (sometimes needed)
-	XDEF	icon
-	XDEF	endicon
+	XDEF	cpygraph	; TI calc specific stuff
+	XDEF	tidi		;
+	XDEF	tiei		;
 
 ;-------------------------
 ; Begin of (shell) headers
 ;-------------------------
 
+	INCLUDE "#Ti83.def"	; ROM / RAM adresses on Ti83
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 
 ;----------------------------------
 ; 2-Venus and 8-Venus Explorer (VE)
 ;----------------------------------
 IF (startup=2) | (startup=8)
+	DEFINE Venus
 	DEFINE NOT_DEFAULT_SHELL	; else we would use Ion
 	org	$932C
 	defm	"ç9_[?"		; send(9prgm0 (where 0 is theta)
- IF (startup=2)			; 2-Venus
+  IF (startup=2)			; 2-Venus
 	defb	$0,$1,$1	; No description nor icon
- ELSE				; 8-Venus Explorer
+  ELSE				; 8-Venus Explorer
+ 	DEFINE Venus_Explorer
 	defb	$1
 	defb	enddesc-description+1	; lengthOfDescription+1
 .description
@@ -89,45 +79,44 @@ IF (startup=2) | (startup=8)
 				; #pragma string name xxxx
 	INCLUDE	"zcc_opt.def"
 	UNDEFINE NEED_name
-  IF !DEFINED_NEED_name
+    IF !DEFINED_NEED_name
   	; If no namestring provided, display full compiler ident
 	defm	"Z88DK Small C+ Program"
-  ENDIF
+    ENDIF
 .enddesc
 	defb	endicon-icon+1	; heightOfIcon+1
 .icon
 	DEFINE NEED_icon
 	INCLUDE	"zcc_opt.def"	; Get icon from zcc_opt.def
 	UNDEFINE NEED_icon
-  IF !DEFINED_NEED_icon
+    IF !DEFINED_NEED_icon
 	defb	@00000000	; Icon (max. heightOfIcon = 7 bytes)
 	defb	@00110010	; C with a small '+'
 	defb	@01000111
-	defb	@01000010	; Large sprites will make Venus Explorer
-	defb	@01000000	;  crash... (Venus Explorer v0.1)
+	defb	@01000010
+	defb	@01000000
 	defb	@00110000
 	defb	@00000000
-  ENDIF
+    ENDIF
 .endicon
 .externals
- ENDIF
-; IF DEFINED_GRAYlib
-	; No externals, the graylib has it's own copyroutine.
-	; Maybe we can use the graylib of Venus in the future.
-;	defb	$1		; numberOfExternals+1 (maximum = 11d)
-; ELSE
+  ENDIF
+  IF DEFINED_GRAYlib
+	defb	$1		; numberOfExternals+1 (maximum = 11d)
+  ELSE
  	; No graylib, so we use FastCopy
 	defb	$2		; numberOfExternals+1 (maximum = 11d)
 	defb	$5		; We use the FastCopy-lib
 	defm	"~FCPY"		;
 	defb	$ff		;
-; ENDIF
+  ENDIF
 ENDIF
 
 ;------
 ; 3-ZES
 ;------
 IF (startup=3)
+	DEFINE ZES
 	DEFINE NOT_DEFAULT_SHELL
 	org	$931E
 	defm	"ç9_ZES"	; Send(9prgmZES
@@ -138,6 +127,7 @@ ENDIF
 ; 4-Anova
 ;--------
 IF (startup=4)
+	DEFINE Anova
 	DEFINE NOT_DEFAULT_SHELL
 	org	$9327
 	xor	a		; One byte instruction, meaningless
@@ -152,8 +142,7 @@ IF (startup=4)
  IF !DEFINED_NEED_name
 	defm	"Z88DK Small C+ Program"
  ENDIF
-	defb	$0		; Termination zero
-.enddesc
+	defb	$0
 .icon
 	DEFINE NEED_icon
 	INCLUDE	"zcc_opt.def"
@@ -165,13 +154,13 @@ IF (startup=4)
 	defb	@01000000	; Bigger icons don't give problems
 	defb	@00110000	; They are only truncated to 5 bytes
  ENDIF
-.endicon
 ENDIF
 
 ;-------------------------------
 ; 5,6 - Ti-Explorer, AShell, SOS
 ;-------------------------------
 IF (startup=5) | (startup=6)
+	DEFINE Ti_Explorer
 	DEFINE NOT_DEFAULT_SHELL
 	org	$9327
 	nop			; makes it compatible with AShell
@@ -186,8 +175,7 @@ IF (startup=5) | (startup=6)
  IF !DEFINED_NEED_name
 	defm	"Z88DK Small C+ Program"
  ENDIF
-	defb	$0		; Termination zero
-.enddesc
+	defb	$0
 .icon
 	DEFINE NEED_icon
 	INCLUDE	"zcc_opt.def"
@@ -202,13 +190,13 @@ IF (startup=5) | (startup=6)
 	defb	@00000000	; Bigger icons don't give problems
 	defb	@00000000	; They are only truncated to 8 bytes
  ENDIF
-.endicon
 ENDIF
 
 ;---------
 ; 7 -  SOS
 ;---------
 IF (startup=7)
+	DEFINE SOS
 	DEFINE NOT_DEFAULT_SHELL
 	org	$9327
 	ccf			; Makes program invisible to AShell
@@ -222,7 +210,7 @@ IF (startup=7)
  IF !DEFINED_NEED_name
 	defm	"Z88DK Small C+ Program"
  ENDIF
-	defb	$0		; Termination zero
+	defb	$0
 ENDIF
 
 ;---------------------------
@@ -233,15 +221,13 @@ IF (startup=9)
 	org	$9327
 	xor	a		; We don't use the Ionlibs
 	jr	nc,start 	; Ion identifier
-.description
 	DEFINE NEED_name
-	INCLUDE	"zcc_opt.def"	; Get namestring from zcc_opt.def
+	INCLUDE	"zcc_opt.def"
 	UNDEFINE NEED_name
  IF !DEFINED_NEED_name
 	defm	"Z88DK Small C+ Program"
  ENDIF
-	defb	$0		; Termination zero
-.enddesc
+	defb	$0
 ENDIF
 
 ;----------------------------------------------------------
@@ -259,6 +245,7 @@ ENDIF
 ; 1-Ion (default)
 ;----------------
 IF !NOT_DEFAULT_SHELL
+	DEFINE Ion
 	org	$9327
  IF DEFINED_GRAYlib
 	xor	a		; We don't use the Ionlibs (doesn't matter)
@@ -268,13 +255,12 @@ IF !NOT_DEFAULT_SHELL
 	jr	nc,start 	; Ion identifier
 .description
 	DEFINE NEED_name
-	INCLUDE	"zcc_opt.def"	; Get namestring from zcc_opt.def
+	INCLUDE	"zcc_opt.def"
 	UNDEFINE NEED_name
  IF !DEFINED_NEED_name
 	defm	"Z88DK Small C+ Program"
  ENDIF
-	defb	$0		; Termination zero
-.enddesc
+	defb	$0
 ENDIF
 
 
@@ -285,8 +271,13 @@ ENDIF
 	ld	hl,0
 	add	hl,sp
 	ld	(start1+1),hl
-IF DEFINED_atexit		; Less stack use
-	ld	hl,-64
+IF !DEFINED_atexit		; Less stack use
+	ld	hl,-6		; 3 pointers (more likely value)
+	add	hl,sp
+	ld	sp,hl
+	ld	(exitsp),sp
+ELSE
+	ld	hl,-64		; 32 pointers (ANSI standard)
 	add	hl,sp
 	ld	sp,hl
 	ld	(exitsp),sp
@@ -313,22 +304,16 @@ IF !DEFINED_nostreams
 ENDIF
 
 IF DEFINED_GRAYlib
-	INCLUDE	"#graylib83.asm"
+	INCLUDE	"#gray83.asm"
+ELSE
+	INCLUDE "#intwrap83.asm"
 ENDIF
 
-	call	tidi
+	im	2
 	call	_main
-	call	tiei
-
-; Deallocate memory which has been allocated here!	
 .cleanup
-IF !DEFINED_nostreams
- IF DEFINED_ANSIstdio
-	LIB	closeall
-	call	closeall
- ENDIF
-ENDIF
-
+	ld	iy,_IY_TABLE	; Restore flag-pointer
+	im	1
 .start1
 	ld	sp,0		; writeback
 IF DEFINED_GRAYlib
@@ -343,67 +328,41 @@ ENDIF
 .l_dcal
 	jp	(hl)
 
-.tiei
-	exx
-	ld	hl,(hl1save)
-	ld	bc,(bc1save)
-	ld	de,(de1save)
-	exx
-	ld	iy,(iysave)
-IF DEFINED_GRAYlib
-	im	1
-ELSE
-	ei
-ENDIF
-	ret
-
-.tidi
-IF DEFINED_GRAYlib
-	im	2
-ELSE
-	di
-ENDIF
-	exx
-	ld	(hl1save),hl
-	ld	(bc1save),bc
-	ld	(de1save),de
-	exx
-	ld	(iysave),iy
-	ret
-
-.hl1save defw	0
-.de1save defw	0
-.bc1save defw	0
-.iysave  defw	0
-
+.tiei	ei
+.tidi	ret
 
 ; Now, define some values for stdin, stdout, stderr
-.__sgoioblk
 ; The next one is true, as long we don't have fileroutines:
 IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
- IF DEFINED_ANSIstdio
+ IF !DEFINED_nostreams
+  IF DEFINED_ANSIstdio
+.__sgoioblk
 	INCLUDE	"#stdio_fp.asm"
- ELSE
-	defw	-11,-12,-10
+  ENDIF
  ENDIF
 ENDIF
 
-
 ; Now, which of the vfprintf routines do we need?
+IF !DEFINED_nostreams
+ IF DEFINED_ANSIstdio
+  IF DEFINED_floatstdio
 ._vfprintf
-IF DEFINED_floatstdio
-	LIB	vfprintf_fp
-	jp	vfprintf_fp
-ELSE
-	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
-		jp	vfprintf_comp
-	ELSE
-		IF DEFINED_ministdio
-			LIB	vfprintf_mini
-			jp	vfprintf_mini
-		ENDIF
-	ENDIF
+	LIB vfprintf_fp
+	jp  vfprintf_fp
+  ELSE
+   IF DEFINED_complexstdio
+._vfprintf
+	LIB vfprintf_comp
+	jp  vfprintf_comp
+   ELSE
+    IF DEFINED_ministdio
+._vfprintf
+	LIB vfprintf_mini
+	jp  vfprintf_mini
+    ENDIF
+   ENDIF
+  ENDIF
+ ENDIF
 ENDIF
 
 ;Seed for integer rand() routines
@@ -418,64 +377,50 @@ ENDIF
 .heapblocks	defw	0
 
 ; mem stuff
-.base_graphics	defw	$8E29
+.base_graphics	defw	plotSScreen
 .coords		defw	0
 
 IF !DEFINED_GRAYlib
 .cpygraph
- IF !NOT_DEFAULT_SHELL
+ IF Ion
  	DEFINE Do_Not_Include_FastCopy
 	jp	$9157+80+15	; ionFastCopy call
  ENDIF
 
- IF (startup=2) | (startup = 8)
+ IF Venus
  	DEFINE Do_Not_Include_FastCopy
 	jp	$FE6F		; vnFastCopy routine
  ENDIF
  
  IF !Do_Not_Include_FastCopy
 ; Some shells don't provide the fastcopy code, so here it is !
-	ld	a,$80		; 7
-	out	($10),a		; 11
-	ld	hl,$8E29-12-(-(12*64)+1)	; 10
-	ld	a,$20		; 7
-	ld	c,a		; 4		; 43
-  .fastCopyAgain
-	ld	b,64		; 7
-	inc	c		; 4
-	ld	de,-(12*64)+1	; 10
-	out	($10),a		; 11
-	add	hl,de		; 11
-	ld	de,11		; 10
-  .fastCopyLoop
-	add	hl,de		; 11
-	inc	hl		; 6
-	ret	c		; 5	; do nothing instruction (was nop (4 clocks))
-	ld	a,(hl)		; 7
-	out	($11),a		; 11
-	djnz	fastCopyLoop	; 13/8	; 3392
-	ld	a,c		; 4
-	cp	$2B+1		; 7
-	jr	nz,fastCopyAgain; 12/7	; 52	; 41773 (used to be 41136)
-	ret			; 11	; 18
+	ld	a,$80
+	out	($10),a
+	ld	hl,$8E29-12-(-(12*64)+1)
+	ld	a,$20
+	ld	c,a
+.fastCopyAgain
+	ld	b,64
+	inc	c
+	ld	de,-(12*64)+1
+	out	($10),a
+	add	hl,de
+	ld	de,11
+.fastCopyLoop
+	add	hl,de
+	inc	hl
+	ret	c
+	ld	a,(hl)
+	out	($11),a
+	djnz	fastCopyLoop
+	ld	a,c
+	cp	$2B+1
+	jr	nz,fastCopyAgain
+	ret
 	; 41773 clocks total
 	; 37 bytes total
  ENDIF
 ENDIF
-
-
-;All the float stuff is kept in a different file...for ease of altering!
-;It will eventually be integrated into the library
-;
-;Here we have a minor (minor!) problem, we've no idea if we need the
-;float package if this is separated from main (we had this problem before
-;but it wasn't critical..so, now we will have to read in a file from
-;the directory (this will be produced by zcc) which tells us if we need
-;the floatpackage, and if so what it is..kludgey, but it might just work!
-;
-;Brainwave time! The zcc_opt file could actually be written by the
-;compiler as it goes through the modules, appending as necessary - this
-;way we only include the package if we *really* need it!
 
 IF NEED_floatpack
 	INCLUDE		"#float.asm"

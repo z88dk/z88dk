@@ -1,3 +1,17 @@
+;-------------------------------
+; Some DEFC's needed by the code
+;-------------------------------
+; Ti83+ Silver Edition:
+defc SetExSpeed       = $50BF	; BCALL entry to switch 6<->15MHz on Ti83+SE
+
+;All Ti83+:
+;defc statvars         = $8A3A	; 531 bytes free $8A3A / $8C4D
+;defc plotSScreen      = $9340	; 768 bytes free (normal screen buffer)
+;defc appBackUpScreen  = $9872	; 768 bytes free (free space for apps)
+;defc saveSScreen      = $86EC	; 768 bytes free (APD buffer)
+defc _IY_TABLE        = $89F0   ;
+
+
 ;======================================================================
 ; Include File for the TI-83 Plus
 ; Last Updated 10/27/1999 
@@ -3497,3 +3511,4 @@ DEFC     E_MS =	E_SS + FPLEN
 
 
 ;======================================================================
+

@@ -1,0 +1,164 @@
+;-------------------------------
+; Some DEFC's needed by the code
+;-------------------------------
+defc PROGRAM_ADDR = $8C3C	;
+defc ROM_VERS     = $8C3E	;
+
+;zshell stuff
+defc ZSHELL_VER   = $8C3F	; We don't use zshell BTW...
+defc ZS_BITS      = $8C40	;
+
+;USGard stuff
+defc USG_VER      = $8C3F	; We don't use USGard BTW...
+defc USG_BITS     = $8C40	;
+defc ORGSP        = $8E8B	;
+defc USGSHELL     = $8EA2	;
+defc VATName      = $8EAB	;
+defc DEST_ADDR    = $8EB4	;
+defc PAGE1ADDR    = $8EB4	;
+defc PAGE2ADDR    = $8EB6	;
+defc PROG_BYTE    = $8C08	;
+
+;SuperNova Stuff (???)
+defc SNOVA_VER    = $8C3F	; We don't use SuperNova BTW...
+defc SN_BITS      = $8C40	;
+defc VAT_NAME     = $8C68	;
+defc VAT_TYPE     = $8C71	;
+defc VAT_SIZE     = $8C72	;
+defc PLUGIN_CALL  = $8CE4	;
+defc IFACE        = $8D7B	;
+defc PROG_NUM     = $8D81	;
+defc SEARCH_START = $8D83	;
+defc SEARCH_COUNT = $8D85	;
+defc FOUND_ADDR   = $8D87	;
+defc IFACE_MEM    = $8D9C	;
+defc ERROR_CALL   = $8C67	;
+defc STRING_COMP  = $8CA1	;
+defc SEARCH_VAT   = $8C74	;
+defc SEARCH_VAR   = $8CB3	;
+;defc GET_KEY      = $8CE0	;
+defc CURR_ADDR    = $8CE7	;
+defc RUN_IT       = $8D89	;
+defc REFRESH      = $8EE2	;
+
+defc LD_HL_MHL    = $0033	;
+defc CP_HL_DE     = $008E	;
+defc UNPACK_HL    = $009A	;
+defc READ_KEYPAD  = $01A2	;
+defc STORE_KEY    = $01B1	;
+defc GET_KEY      = $01BE	;
+;defc GET_KEY2     = $01BE	;
+defc UPDATE_APD   = $0115	;
+defc READ_KEY     = $0168	;
+
+;rom_call() stuff (zshell and SuperNova)
+defc TX_CHARPUT   = $0000	;
+defc D_LT_STR     = $0001	;
+defc M_CHARPUT    = $0002	;
+defc D_ZM_STR     = $0003	;
+defc D_LM_STR     = $0004	;
+defc GET_T_CUR    = $0005	;
+defc SCROLL_UP    = $0006	;
+defc TR_CHARPUT   = $0007	;
+defc CLEARLCD     = $0008	;
+defc D_HL_DECI    = $0009	;
+defc CLEARTEXT    = $000A	;
+defc D_ZT_STR     = $000B	;
+defc BUSY_OFF     = $000C	;
+defc BUSY_ON      = $000D	;
+defc FIND_PIXEL   = $0080	;
+defc RANDOMIZE    = $000E	;
+defc D_STR_HL     = $000F	;
+defc CL_ENDLINE   = $0010	;
+defc RESET_RAND   = $0011	;
+defc HLX10        = $0040	;
+defc ZERO_BYTES   = $0041	;
+defc MULT_HL      = $0042	;
+defc MSR_STRLN    = $0043	;
+defc LNSTR_COMP   = $0044	;
+
+;USGard rcall_() stuff
+;defc TX_CHARPUT   = $8C41
+;defc D_LT_STR     = $8C44
+;defc M_CHARPUT    = $8C47
+;defc D_ZM_STR     = $8C4A
+;defc D_LM_STR     = $8C4D
+;defc SCROLL_UP    = $8C50
+;defc TR_CHARPUT   = $8C53
+;defc CLEARLCD     = $8C56
+;defc D_HL_DECI    = $8C59
+;defc CLEARTEXT    = $8C5C
+;defc D_ZT_STR     = $8C5F
+;defc BUSY_OFF     = $8C62
+;defc BUSY_ON      = $8C65
+;defc RANDOM       = $8C68
+;defc FIND_PIXEL   = $8C6B
+;defc FREEMEM      = $8C77
+;defc VAR_LENGTH   = $8C7A
+;defc ASCIIZ_LEN   = $8C7D
+;defc NEG_BC       = $8C80
+;defc MUL_HL       = $8C83
+;defc COPY_STRING  = $8C8C
+;defc INT_INSTALL  = $8C9B
+;defc INT_REMOVE   = $8C9E
+;defc INT_CLEAN    = $8CA1
+;defc APPEND       = $8C95
+;defc UNAPPEND     = $8C98
+;defc CHECK_APPEND = $8CCB
+;defc VAR_NEW      = $8CA4
+;defc VAR_DELETE   = $8CA7
+;defc VAR_EXEC     = $8CAA
+;defc VAR_GET      = $8CAD
+;defc VAR_RESIZE   = $8CB0
+;defc RELOC        = $8CCE
+;defc DERELOC      = $8CD1
+;defc RELOC_TAB    = $8CD7
+;defc SEARCH_VAT   = $8CB3
+;defc OTH_SHUTDOWN = $8CB6
+;defc DM_HL_DECI   = $8CB9
+;defc OTH_PAUSE    = $8CBC
+;defc OTH_CLEAR    = $8CBF
+;defc OTH_EXIT     = $8CC2
+;defc OTH_ARROW    = $8CC5
+;defc OTH_FILL     = $8CD4
+
+;Memory adresses
+defc KEY_0        = $8000	;
+defc KEY_1        = $8001	;
+defc KEY_2        = $8002	;
+defc KEY_STAT     = $8004	;
+defc LAST_KEY     = $8006	;
+defc CONTRAST     = $8007	;
+defc CURSOR_ROW   = $800C	;
+defc CURSOR_COL   = $800D	;
+defc CURSOR_ROW2  = $800C	;
+defc CURSOR_COL2  = $800D	;
+defc CURSOR_LET   = $800E	;
+defc BUSY_COUNTER = $8080	;
+defc BUSY_BITMAP  = $8081	;
+defc OP1          = $8082	;
+defc OP2          = $808D	;
+defc OP3          = $8098	;
+defc OP4          = $80A3	;
+defc OP5          = $80AE	;
+defc OP6          = $80B9	;
+defc CURR_INPUT   = $80C6	;
+defc BYTES_USED   = $80CC	;
+defc TEXT_MEM     = $80DF	;
+defc DELC_LEN     = $800F	;
+defc DELC         = $8010	;
+defc CHECKSUM     = $81BE	;
+defc TEMP_STORAGE = $827C	;
+defc CURSOR_X     = $8333	;
+defc CURSOR_Y     = $8334	;
+defc _IY_TABLE    = $8346	; Where IY normaly points to
+defc GRAPH_MEM    = $8641	;
+defc TEXT_MEM2    = $8A6B	;
+defc USER_MEM     = $8B1B	;
+defc SCROLL_START = $8B2F	;
+defc SCROLL_END   = $8B30	;
+defc FIXED_POINT  = $8B3A	;
+defc FIRST_FREE   = $8BE1	;
+defc VAT_END      = $8BEB	;
+defc VAT_START    = $FA6F	;
+defc VIDEO_MEM    = $FC00	;

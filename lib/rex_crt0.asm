@@ -2,13 +2,18 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.6 2001-04-12 13:26:13 stefano Exp $
+;       $Id: rex_crt0.asm,v 1.7 2001-07-16 13:27:49 dom Exp $
 ;
 
 	MODULE rex_crt0
 
 	XREF	_main
-
+;	defm	"ApplicationName:Addin"&10&13
+;	defm	"[program name - 10 chars?]"&10&13
+;	defb	0
+;	defw	endprof-begprog
+;	defb	0,0
+; Prior to $8000 we have a 40x32 icon
         org    $8000
 
 	jp	start
