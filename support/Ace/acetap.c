@@ -1,7 +1,7 @@
 /*
  *	Quick 'n' dirty mym to tap converter
  *
- *	Usage: mym2tap [mymfile] [tapfile] <ORG>
+ *	Usage: acetap [mymfile] [tapfile] <ORG>
  *
  *	zack 8/2/2000
  *
@@ -9,8 +9,10 @@
  *	And we append so we can create mega files...
  *	
  *	Stefano 23/10/2001 - ORG Parameter added
+ *                         - Modified for the Jupiter ACE
+ *		It's probably buggy but works !
  *
- *	$Id: tapmaker.c,v 1.4 2001-10-23 07:31:15 stefano Exp $
+ *	$Id: acetap.c,v 1.1 2001-10-23 07:31:15 stefano Exp $
  */
 
 #include <stdio.h>
@@ -73,7 +75,9 @@ int main(int argc, char *argv[])
 	writeword(19,fpout);	/* Header len */
 	writebyte(0,fpout);	/* Header is 0 */
 	parity=0;
-	writebyte(3,fpout);	/* Filetype (Code) */
+
+/*	writebyte(3,fpout);	Filetype isn't used on the J.ACE */
+
 /* Deal with the filename */
 	if (strlen(argv[1]) >= 10 ) {
 		strncpy(name,argv[1],10);

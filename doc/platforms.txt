@@ -1,33 +1,33 @@
 Z88DK Port Status
 
-$Id: platforms.txt,v 1.5 2001-09-05 15:07:19 stefano Exp $
+$Id: platforms.txt,v 1.6 2001-10-23 07:31:14 stefano Exp $
 
 
-PLATFORM      | Native I/O  | ANSI VT I/O |  GRAPH LIB  |  GRAY LIB   |  FILELIB    |   ZSOCK     |   Others    |
------------------------------------------------------------------------------------------------------------------
-              |             |             |             |             |             |             |             |
-ABC80         |     No      | 40x24-buggy |     No      |     No      |     No      |     No      |     ---     |
-Amstrad NC100 |     Yes     |     No      |     No      |     No      |     No      |     No      | Untested    |
-Cambridge Z88 |     Yes     |     Yes     |  256x64     |     No      |     Yes     |     Yes     | Paging+many |
-Commodore 128 |     No      |     Yes     |     No      |     No      |     No      |     No      |     ---     |
-CP/M          |     Yes     | If Hardware |     No      |     No      |     No      |     No      |     ---     |
-Jupiter ACE   |    32x24    |     No      | 96x64 emul. |     No      |     No      |     No      |     ---     |
-MSX 1         |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |
-REX 6000      |     No      |     No      |     No      |     No      |     No      |     No      |    (1)      |
-Sam Coupe     | 32x24-buggy |     No      |     No      |     No      |     No      |     No      |     ---     |
-Sharp MZ      | 40x25-buggy | In Progress |     No      |     No      |     No      |     No      | Unstable    |
-SORD M5       |    32x24    |     No      |     No    . |     No      |     No      |     No      |     ---     |
-Spectravideo  |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |
-TI82          | 16x8-buggy  |    32x4  B/W|   96x64     |     Yes     |     No      |     No      |     ---     |
-TI83          | 16x8        |    32x4  B/W|   96x64     |     Yes     | In Progress |     No      |     ---     |
-TI83 Plus     | 16x8-buggy  |    32x4  B/W|   96x64     |     Yes     |     No      |     No      |     ---     |
-TI85          | 21x8-buggy  |    32x4  B/W|  128x64     |     Yes     |     No      |     No      |     ---     |
-TI86          | 21x8        |    32x4  B/W|  128x64     |     Yes     |     No      |     No      | LASM Needed |
-VZ/Laser 200  |    32x16    |    32x12 B/W|  128x64     |     No      |     No      |     No      |     ---     |
-ZX 81         | 32x21-buggy |    32x21 B/W| 96x64 emul. |     No      |     No      |     No      | Unstable    |
-ZX Spectrum   | 32x24+64x24 | 24-85x24 COL|  256x192    |     No      |     +3      |     No      |     (2)     |
-              |             |             |             |             |             |             |             |
-              |             |             |             |             |             |             |             |
+PLATFORM      | Native I/O  | ANSI VT I/O |  GRAPH LIB  |  GRAY LIB   |  FILELIB    |   ZSOCK     |   SOUND     |   Others    |
+-------------------------------------------------------------------------------------------------------------------------------
+              |             |             |             |             |             |             |             |             |
+ABC80         |     No      | 40x24-buggy |     No      |     No      |     No      |     No      |     ---     |     ---     |
+Amstrad NC100 |     Yes     |     No      |     No      |     No      |     No      |     No      |     ---     | Untested    |
+Cambridge Z88 |     Yes     |     Yes     |  256x64     |     No      |     Yes     |     Yes     |   1 bit     | Paging+many |
+Commodore 128 |     No      |     Yes     |     No      |     No      |     No      |     No      |     ---     |     ---     |
+CP/M          |     Yes     | If Hardware |     No      |     No      |     No      |     No      |     ---     |     ---     |
+Jupiter ACE   |     No      |    32x24 B/W| 96x64 emul. |     No      |     No      |     No      |   1 bit     |     ---     |
+MSX 1         |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
+REX 6000      |     No      |     No      |     No      |     No      |     No      |     No      |     ---     |    (1)      |
+Sam Coupe     | 32x24-buggy |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
+Sharp MZ      | 40x25-buggy | In Progress |     No      |     No      |     No      |     No      |     ---     | Unstable    |
+SORD M5       |    32x24    |     No      |     No    . |     No      |     No      |     No      |     ---     |     ---     |
+Spectravideo  |    40x24    |     No      |     No      |     No      |     No      |     No      |     ---     |     ---     |
+TI82          | 16x8-buggy  |    32x4  B/W|   96x64     |     Yes     |     No      |     No      |     ---     |     ---     |
+TI83          | 16x8        |    32x4  B/W|   96x64     |     Yes     | In Progress |     No      |     ---     |     ---     |
+TI83 Plus     | 16x8-buggy  |    32x4  B/W|   96x64     |     Yes     |     No      |     No      |     ---     |     ---     |
+TI85          | 21x8-buggy  |    32x4  B/W|  128x64     |     Yes     |     No      |     No      |     ---     |     ---     |
+TI86          | 21x8        |    32x4  B/W|  128x64     |     Yes     |     No      |     No      |     ---     | LASM Needed |
+VZ/Laser 200  |    32x16    |    32x12 B/W|  128x64     |     No      |     No      |     No      |     ---     |     ---     |
+ZX 81         | 32x21-buggy |    32x21 B/W| 96x64 emul. |     No      |     No      |     No      |     ---     | Unstable    |
+ZX Spectrum   | 32x24+64x24 | 24-85x24 COL|  256x192    |     No      |     +3      |     No      |   1 bit     |     (2)     |
+              |             |             |             |             |             |             |             |             |
+              |             |             |             |             |             |             |             |             |
 
 (1) The Xircom REX 6000 port provides hooks into the native OS. No z88dk i/o functions are supported
 (2) Work on a +3 file library is in progress
