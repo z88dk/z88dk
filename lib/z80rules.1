@@ -1166,9 +1166,11 @@
 	ld	l,(hl)
 	ld	h,0
 	ex	de,hl
+	ld	hl,%1
 =
 	ld	e,(hl)
 	ld	d,0
+	ld	hl,%1
 
 	ld	hl,_%1
 	ex	de,hl
