@@ -79,7 +79,7 @@ strings/strstr
 strings/strstrip
 strings/strtok
 strings/strupr
-time/spectrum/clock
+time/sprinter/clock
 setjmp/longjmp
 setjmp/setjmp
 assert/assert
@@ -112,4 +112,7 @@ fcntl/sprinter/remove
 fcntl/sprinter/rename
 fcntl/sprinter/write
 fcntl/sprinter/writebyte
-
+fcntl/sprinter/rmdir
+fcntl/sprinter/mkdir
+fcntl/sprinter/getwd
+fcntl/sprinter/getcwd
