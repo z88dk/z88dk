@@ -1,0 +1,10 @@
+This short program modifies an output file so that it can be run under
+the z88 shell.
+
+Compile your application:
+
+zcc -startup=5 -m file.c -o file.bin
+
+Then make a shell program with:
+
+shellmake file.bin file
