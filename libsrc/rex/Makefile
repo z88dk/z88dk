@@ -12,4 +12,4 @@ clean:
 	rm -f *.o*  *~  zcc_opt.def
 	cd graphics ; make clean
 	cd farcall ; make clean
-	cd WHmath ; make
+	cd WHmath ; make clean
