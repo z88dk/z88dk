@@ -1,7 +1,7 @@
 /* 
 	HTC Compatibility Library and OZ extras 
 
-	$Id: ozmisc.h,v 1.2 2003-10-22 09:56:34 stefano Exp $
+	$Id: ozmisc.h,v 1.3 2003-10-27 16:56:56 stefano Exp $
 */
 
 #ifndef _OZMISC_H
@@ -23,9 +23,6 @@ extern __LIB__ ozfarmemcpy(unsigned dest_page,unsigned dest_offset,unsigned src_
   unsigned src_offset,unsigned length);
 
 extern __LIB__ ozcopytopage(unsigned dest_page,unsigned dest_offset,byte *src,unsigned length);
-
-extern __LIB__ ozsound(unsigned div);
-extern __LIB__ ozquiet(void);
 
 extern __LIB__ ozexitto(unsigned key);
 extern __LIB__ ozfast(void);

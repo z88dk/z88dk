@@ -7,13 +7,13 @@
 ;
 ;
 ; ------
-; $Id: ozexitto.asm,v 1.1 2003-10-23 10:42:50 stefano Exp $
+; $Id: ozexitto.asm,v 1.2 2003-10-27 16:56:57 stefano Exp $
 ;
 
 	XLIB	ozexitto
 	
 	LIB	ozkeyclear
-	LIB	ozungetch
+	LIB	ozungetch2
 	XREF	cleanup		;exit
 
 
@@ -25,8 +25,8 @@ ozexitto:
 	
 	push hl ;; put two copies of key on stack
 	push hl
-	call ozungetch
+	call ozungetch2
 	pop hl  ;; use previous copy of key on stack as argument
-	call ozungetch
+	call ozungetch2
 	jp cleanup
 

@@ -3,7 +3,7 @@
 
 /* Control file for include OZ7xx stuff */
 
-/* $Id: oz.h,v 1.5 2003-10-23 10:42:49 stefano Exp $ */
+/* $Id: oz.h,v 1.6 2003-10-27 16:56:55 stefano Exp $ */
 
 //#include <oz700/ozfont.h>
 #include <oz700/ozgfx.h>
@@ -27,6 +27,8 @@
 #define ozgetch fgetc_cons
 #define ozkeyhit getk
 #endif
+
+#define getch ozgetch
 
 #include <stdio.h>
 #include <stdlib.h>

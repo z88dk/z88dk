@@ -10,7 +10,7 @@
 ;
 ;
 ; ------
-; $Id: ozintwait.asm,v 1.1 2003-10-23 10:42:50 stefano Exp $
+; $Id: ozintwait.asm,v 1.2 2003-10-27 16:56:57 stefano Exp $
 ;
 
 	XLIB	ozintwait

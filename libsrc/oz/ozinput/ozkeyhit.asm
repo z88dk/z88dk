@@ -8,17 +8,17 @@
 ;	Keyboard routines
 ;
 ; ------
-; $Id: ozkeyhit.asm,v 1.1 2003-10-22 13:55:49 stefano Exp $
+; $Id: ozkeyhit.asm,v 1.2 2003-10-27 16:56:57 stefano Exp $
 ;
 
 
-	XLIB	ozkeyhit
+	XLIB	ozkeyhit2	; renamed (will be redefined if used)
 	
 	XREF	KeyBufGetPos
 	XREF	EnableKeyboard
 
 
-ozkeyhit:
+ozkeyhit2:
     ld  de,EnableKeyboard
     ld  a,(de)
     and 0ffh-7

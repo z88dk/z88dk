@@ -9,7 +9,7 @@
 ;
 ;
 ; ------
-; $Id: ozsetisr.asm,v 1.1 2003-10-21 17:15:20 stefano Exp $
+; $Id: ozsetisr.asm,v 1.2 2003-10-27 16:56:57 stefano Exp $
 ;
 
 	XLIB	ozsetisr

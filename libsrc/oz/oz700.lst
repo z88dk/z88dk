@@ -21,6 +21,9 @@ ozmisc/ozportin
 ozmisc/ozportout
 ozmisc/ozdelay
 ozmisc/ozexitto
+ozmisc/ozinitsound
+ozmisc/ozsound
+ozmisc/ozquiet
 ozscreen/ozsetcontrast
 ozscreen/ozgetcontrast
 ozscreen/ozblankscreen
@@ -59,6 +62,7 @@ ozgfx/ozgetdisplaypage
 ozgfx/ozsetactivepage
 ozgfx/ozsetdisplaypage
 ozgfx/ozswapactivedisplay
+ozgfx/ozputsprite
 ozserial/ozsnap
 ozserial/ozclearserialbuffer
 ozserial/ozgetrxhandshaking
@@ -75,3 +79,12 @@ ozserial/ozsetbaud
 ozserial/ozgetbaud
 ozserial/ozsetlcr
 ozserial/ozgetlcr
+emu/ozgfx/ozbox
+emu/ozgfx/ozfilledbox
+emu/ozgfx/ozcircle
+emu/ozgfx/ozline
+emu/ozgfx/ozhline
+emu/ozgfx/ozvline
+emu/ozgfx/ozplotpixel
+emu/ozgfx/ozpoint
+emu/ozgfx/ozpointcolor

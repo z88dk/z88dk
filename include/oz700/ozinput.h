@@ -2,7 +2,7 @@
 	HTC Compatibility Library and OZ extras 
 	2. KEYBOARD AND INPUT
 
-	$Id: ozinput.h,v 1.4 2003-10-23 10:42:49 stefano Exp $
+	$Id: ozinput.h,v 1.5 2003-10-27 16:56:56 stefano Exp $
 */
 
 #ifndef _OZINPUT_H
@@ -33,6 +33,7 @@ extern __LIB__ ozcopytocursettings(byte *p);
 
 #define OZEDITLINE_ERROR  -2
 #define OZEDITLINE_CANCEL -1
+//extern int __LIB__ ozeditline(byte x0,byte y0,char *s,byte slen,byte xlen);
 extern int __LIB__ ozeditline(byte x0,byte y0,char *s,byte slen,byte xlen);
 
 extern __LIB__ ozkbdon(void);

@@ -9,7 +9,7 @@
 ;
 ;
 ; ------
-; $Id: ozcustomisr.asm,v 1.2 2003-10-23 10:42:50 stefano Exp $
+; $Id: ozcustomisr.asm,v 1.3 2003-10-27 16:56:57 stefano Exp $
 ;
 
 	XLIB	ozcustomisr

@@ -2,7 +2,7 @@
 	HTC Compatibility Library and OZ extras 
 	1. GRAPHICS AND DISPLAY
 
-	$Id: ozgfx.h,v 1.6 2003-10-23 15:45:47 stefano Exp $
+	$Id: ozgfx.h,v 1.7 2003-10-27 16:56:56 stefano Exp $
 */
 
 #include <graphics.h>
@@ -42,7 +42,6 @@ typedef unsigned char byte;
 #define FONT_OZ_LARGE 2
 
 
-//extern __LIB__ ozsetactivepage(byte page);
 extern __LIB__ ozsetactivepage(byte page);
 extern __LIB__ ozsetdisplaypage(byte page);
 extern byte __LIB__ ozgetactivepage(void);
@@ -61,44 +60,52 @@ extern __LIB__ ozswapactivedisplay(void);
 
 #define _ozpoint ozpoint
 //extern int __LIB__ _ozpoint(byte x, byte y, byte color);
-//extern int __LIB__ ozpoint(int x, int y, byte color);
-int ozpoint(int x, int y, byte color)
+extern int __LIB__ ozpoint(int x, int y, byte color);
+/*int ozpoint(int x, int y, byte color)
 {
 	if (x>239 || y>80) return -1;
 	if (color = BLACK) plot (x,y);
 	if (color = WHITE) unplot (x,y);
 }
+*/
 
-//extern __LIB__ ozcircle(int x,int y,byte r,byte color);
+extern __LIB__ ozcircle(int x,int y,byte r,byte color);
+/*
 void ozcircle(int x,int y,byte r,byte color)
 {
 	if (color = BLACK) circle (x,y,r,1);
 	if (color = WHITE) uncircle (x,y,r,1);
 }
+*/
 
 #define _ozline ozline
-//extern __LIB__ ozline(int x,int y,int x2,int y2,byte color);
+extern __LIB__ ozline(int x,int y,int x2,int y2,byte color);
 //extern __LIB__ _ozline(byte x,byte y,byte x2,byte y2,byte color);
+/*
 void ozline(int x,int y,int x2,int y2,byte color)
 {
 	if (color = BLACK) draw (x,y,x2,y2);
 	if (color = WHITE) undraw (x,y,x2,y2);
 }
-
-
-//extern __LIB__ _ozhline(byte x,byte y,byte len,byte color);
+*/
+#define _ozhline ozhline
+extern __LIB__ ozhline(byte x,byte y,byte len,byte color);
+/*
 void _ozhline(byte x,byte y,byte len,byte color)
 {
 	if (color = BLACK) draw (x,y,x,y+len);
 	if (color = WHITE) undraw (x,y,x,y+len);
 }
-//extern __LIB__ _ozvline(byte x,byte y,byte len,byte color);
+*/
+#define _ozvline ozvline
+extern __LIB__ ozvline(byte x,byte y,byte len,byte color);
+/*
 void _ozvline(byte x,byte y,byte len,byte color)
 {
 	if (color = BLACK) draw (x,y,x+len,y);
 	if (color = WHITE) undraw (x,y,x+len,y);
 }
-
+*/
 extern __LIB__ ozdisplayorbyte(unsigned offset, byte v);
 extern __LIB__ ozdisplayputbyte(unsigned offset, byte v);
 extern __LIB__ ozdisplayandbyte(unsigned offset, byte v);
@@ -113,12 +120,14 @@ int ozgetpoint(int x, int y)
 }
 
 #define _ozbox ozbox
-//extern __LIB__ _ozbox(byte x, byte y, byte width, byte height);
+extern __LIB__ ozbox(byte x, byte y, byte width, byte height);
 //extern __LIB__ ozbox(int x, int y, int width, int height);
+/*
 void ozbox(int x, int y, int width, int height)
 {
 	drawb (x,y,width,height);
 }
+*/
 
 /*
 extern __LIB__ ozsetgreyscale(byte grey);
