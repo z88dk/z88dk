@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.19 2004-04-15 20:04:05 dom Exp $
+ * $Id: zcc.h,v 1.20 2004-10-12 12:33:54 stefano Exp $
  */
 
 /* Very contrived, if not a Windows target then include the config file */
@@ -33,7 +33,7 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 #define PREFIX "c:/z88dk"
 #endif
 
-#if _MSC_VER == 1200
+#if _MSC_VER >= 1200
 /* Predefined by Microsoft Visual C++ 6.0 */
 #define snprintf _snprintf
 #endif
