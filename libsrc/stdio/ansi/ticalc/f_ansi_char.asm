@@ -4,6 +4,9 @@
 ;
 ; 	Handles Attributes INVERSE + UNDERLINED
 ;
+;	** alternate (smaller) 4bit font capability: 
+;	** use the -DPACKEDFONT flag
+;
 ;	set it up with:
 ;	.text_cols	= max columns
 ;	.text_rows	= max rows
@@ -14,7 +17,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.4 2001-08-21 15:40:17 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.5 2002-01-08 16:17:27 stefano Exp $
 ;
 
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
@@ -103,9 +106,21 @@
 
 .char
   ld b,'A'      ; Put here the character to be printed
-  ld de,8
-  ; I'll probably strip the first 256 bytes of the font, in future.
+  
+IF PACKEDFONT
+  xor	a
+  rr	b
+  jr	c,even
+  ld	a,4
+.even
+  ld	(ROLL+1),a
+  ld hl,font-128
+ELSE
   ld hl,font
+ENDIF
+
+  ld de,8
+
 .LFONT
   add hl,de
   djnz LFONT
@@ -128,6 +143,15 @@
 .DTS
   ld a,(hl)
   
+IF PACKEDFONT
+.ROLL
+  jr INVRS
+  rla
+  rla
+  rla
+  rla
+ENDIF
+
 ; --- --- Inverse text handling
 .INVRS
 ;  cpl		; Set to NOP to disable INVERSE
@@ -190,4 +214,4 @@
 ; 3 dots: MAX 42 columns
 
 .font
-        BINARY  "stdio/ansi/FONT4.BIN"
+        BINARY  "stdio/ansi/F4PACK.BIN"

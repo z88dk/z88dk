@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.28 2002-01-07 16:59:08 stefano Exp $
+# $Id: Makefile,v 1.29 2002-01-08 16:17:27 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -154,10 +154,14 @@ zx_clib.lib:
 	z80asm -d -ns -nm -Mo -DFORzx -xzx_clib @zx.lst
 
 # vt100 C lib for spectrum
+# use -DROMFONT for a tiny 36 columns mode
+# or -DPACKEDFONT for tiny 64->85 column modes
+
 zxan_clib.lib:
 	@echo ''
 	@echo '---> Building ZX Spectrum ANSI Library  <---'
 	@echo ''
+	rm -f stdio/ansi/spectrum/f_ansi_char.o
 	./gfxdeps.sh
 	cd strings ; make
 	cd stdlib ; make lzx
@@ -169,7 +173,7 @@ zxan_clib.lib:
 	cd time ; make lzx
 	./gamesdeps.sh
 	cd games ; make
-	z80asm -d -ns -nm -Mo -DFORzx -DPACKEDFONT -xzxan_clib @zxansi.lst
+	z80asm -d -ns -nm -Mo -DFORzx -DROMFONT -xzxan_clib @zxansi.lst
 
 # Untested C lib for NC100 machinens
 

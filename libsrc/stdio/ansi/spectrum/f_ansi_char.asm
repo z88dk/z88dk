@@ -7,6 +7,7 @@
 ;
 ;	** alternate (smaller) 4bit font capability: 
 ;	** use the -DPACKEDFONT flag
+;	** ROM font -DROMFONT
 ;
 ;	set it up with:
 ;	.text_cols	= max columns
@@ -18,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.5 2002-01-07 16:59:09 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.6 2002-01-08 16:17:27 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -32,7 +33,12 @@
 ; Dirty thing for self modifying code
 	XDEF	INVRS	
 
-.text_cols   defb 64
+IF ROMFONT
+.text_cols   defb 36
+ELSE
+.text_cols   defb 64	; <- Change this for different font sizes !!
+ENDIF
+
 .text_rows   defb 24
 
 .ansi_CHAR
@@ -109,16 +115,20 @@
 .char
   ld b,'A'      ; Put here the character to be printed
 
-IF PACKEDFONT
-  xor	a
-  rr	b
-  jr	c,even
-  ld	a,4
-.even
-  ld	(ROLL+1),a
-  ld hl,font-128
+IF ROMFONT
+  ld hl,15360
 ELSE
-  ld hl,font
+	IF PACKEDFONT
+	  xor	a
+	  rr	b
+	  jr	c,even
+	  ld	a,4
+	.even
+	  ld	(ROLL+1),a
+	  ld hl,font-128
+	ELSE
+	  ld hl,font
+	ENDIF
 ENDIF
 
   ld de,8
@@ -142,13 +152,17 @@ ENDIF
 .DTS
   ld a,(hl)
   
-IF PACKEDFONT
-.ROLL
-  jr INVRS
-  rla
-  rla
-  rla
-  rla
+IF ROMFONT
+	; nothing here !
+ELSE
+	IF PACKEDFONT
+	.ROLL
+	  jr INVRS
+	  rla
+	  rla
+	  rla
+	  rla
+	ENDIF
 ENDIF
 
 .INVRS
@@ -165,7 +179,12 @@ ENDIF
 ; end of underlined text handling
 
 .DOTS
-  ld b,4        ; character FONT width in pixel
+IF ROMFONT
+  ld b,7
+ELSE
+  ld b,4        ; <- character FONT width in pixel
+ENDIF
+
 .L2
   rla
   rl (ix+1)
@@ -200,6 +219,9 @@ ENDIF
 ; Address 15360 for ROM Font
 
 
+IF ROMFONT
+	; nothing here !
+ELSE
 .font
-        BINARY  "stdio/ansi/F4PACK.BIN"
-
+        BINARY  "stdio/ansi/F4PACK.BIN"		; <- put the FONT name here !
+ENDIF
