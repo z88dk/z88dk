@@ -2081,17 +2081,6 @@
 	ld	d,0
 	ld	hl,%2	;const
 
-	ld	de,1
-	call	l_asl
-=
-	add	hl,hl
-
-	ld	de,2
-	call	l_asl
-=
-	add	hl,hl
-	add	hl,hl
-
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,%1
