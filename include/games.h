@@ -6,7 +6,7 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.6 2001-10-16 18:30:31 dom Exp $
+ *	$Id: games.h,v 1.7 2002-01-21 21:42:25 dom Exp $
  *
  */
 
@@ -69,6 +69,11 @@ extern __LIB__ joystick(int game_device);
 #ifdef TI86
 	unsigned char *joystick_type[] = {"Cursor,2nd-Alpha"};
 	#define GAME_DEVICES 1
+#endif
+
+#ifdef ZXVGS
+	unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "Joystick 2", "Joystick 3"};
+	#define GAME_DEVICES 4
 #endif
 
 #ifndef GAME_DEVICES
