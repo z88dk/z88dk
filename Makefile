@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.6 2001-04-17 09:51:52 stefano Exp $
+#	$Id: Makefile,v 1.7 2001-05-02 09:28:17 dom Exp $
 #
 
 prefix = /usr/local/z88dk
@@ -52,6 +52,7 @@ config:
 	sed "s?DESTDIR?`pwd`?g" < lib/config/ti86.lnx > lib/config/ti86.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/z88net.lnx > lib/config/z88net.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/abc80.lnx > lib/config/abc80.cfg
+	sed "s?DESTDIR?`pwd`?g" < lib/config/rex.lnx > lib/config/rex.cfg
 	ln -s z88.cfg lib/config/zcc.cfg
 
 libs:

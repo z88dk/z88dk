@@ -9,6 +9,9 @@ libraries. The routines which gave been isolated are:
 
 close
 creat
+fdgetpos
+ftell
+lseek
 open
 open_z88
 read
