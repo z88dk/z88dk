@@ -117,7 +117,7 @@
  *
  *	22/4/2002 - (Stefano) Visual C "snprintf" workaround
  *
- *      $Id: zcc.c,v 1.13 2002-04-22 14:45:51 stefano Exp $
+ *      $Id: zcc.c,v 1.14 2002-07-15 16:30:21 dom Exp $
  */
 
 
@@ -1439,7 +1439,7 @@ int FindConfigFile(char *arg, int gc)
 #ifdef __MSDOS__
 		snprintf(outfilename,sizeof(outfilename),"%s\\lib\\config\\zcc.cfg",PREFIX);
 #else
-		snprintf(outfilename,sizeof(outfilename),"%s/lib/config/zcc.cfg",PREFIX);
+		snprintf(outfilename,sizeof(outfilename),"%s/z88dk/lib/config/zcc.cfg",PREFIX);
 #endif
 #else
 		fprintf(stderr,"Couldn't find env variable ZCCCFG\n");
