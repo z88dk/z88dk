@@ -8,19 +8,20 @@
  *	Just a tad z88 specific!
  *
  * -----
- * $Id: stat.c,v 1.3 2001-04-30 16:49:55 dom Exp $
+ * $Id: stat.c,v 1.4 2002-04-07 15:36:25 dom Exp $
  */
 
 
 #include <sys/stat.h>
 #include <z88.h>
 #include <stdio.h>
+#include <string.h>
 
 /* Size of a z88 block */
 #define BLKSIZE 64
 
 #define JD0101970       2440588
-time_t doepoch(time_t days, time_t sec)
+time_t doepoch(long days, long sec)
 {
 	days-=JD0101970; 	/* sub 1970 */
 	days*=86400;		/* into seconds */
@@ -29,10 +30,10 @@ time_t doepoch(time_t days, time_t sec)
 
 int stat(char *filename, struct stat *buf)
 {
-	int	dor;	/* file dor */
 	int	flags;	
 	long	time;
 	long	date;
+	int	dor;
 	char	buffer[8];	/* Buffer for reading times */
 
 	if ( (dor=opendor(filename)) ==0)
@@ -41,22 +42,20 @@ int stat(char *filename, struct stat *buf)
 	 * read the extent..if we fail then it wasn't a regular
 	 * file
 	 */
-	printf("Opened dor %d\n",dor);
 	flags=0777;	/* rwxrwxrwx */
 	readdor(dor,'X',4,&buf->st_size);
 	iferror {
 		buf->st_size=512L;	/* Std dir size(!) */
 		flags+=0040000;
 	}
-	printf("Read size %lu\n",buf->st_size);
 	buffer[0]=0;
 	readdor(dor,'U',6,buffer);	/* Read Update time */
 	closedor(dor);
-	time=*(long *)buffer;
-	buffer[3]=0;
-	date=*(long*)&buffer[3];
+	time = date = 0;
+	memcpy(&time,buffer,3);
+	memcpy(&date,buffer+3,3);
 	/* I don't like this, but it seems best way to do it */
-	buf->st_ctime=buf->st_mtime=buf->st_atime=doepoch(date,time);
+	buf->st_ctime=buf->st_mtime=buf->st_atime=doepoch(date,time/100L);
 	buf->st_mode=flags;
 	/* Now fill in some other things (aka faking!)*/
 	buf->st_blksize=BLKSIZE;

@@ -6,7 +6,7 @@
  *	djm 13/3/2000
  *
  * -----
- * $Id: readdor.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
+ * $Id: readdor.c,v 1.3 2002-04-07 15:36:25 dom Exp $
  */
 
 
@@ -20,10 +20,10 @@ void readdor(int handle, char type, char len, void *buf)
 	add	iy,sp
 	ld	e,(iy+2)	;buffer
 	ld	d,(iy+3)
-	ld	c,(ix+4)	;length
-	ld	b,(ix+6)	;type
-	ld	l,(ix+8)	;dor handle
-	ld	h,(ix+9)
+	ld	c,(iy+4)	;length
+	ld	b,(iy+6)	;type
+	ld	l,(iy+8)	;dor handle
+	ld	h,(iy+9)
 	push	hl
 	pop	ix		;os_dor wants it in ix
 	ld	a,DR_Rd		;read dor
