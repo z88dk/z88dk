@@ -25,7 +25,7 @@ unsigned char s[];		/* s points to a character string */
 		dot,		/* nonzero if *s is decimal point */
 		decimal;	/* nonzero if decimal point found */
 
-	ten = (double) 10;
+	ten = 10.;
 	if ( *s == '-' ) { minus = 1 ; ++s ; }
 	else minus = 0 ;
 	start = s ;
@@ -35,7 +35,7 @@ unsigned char s[];		/* s points to a character string */
 		++s ;	/* scan to end of string */
 	}
 	end = s ;
-	sum = (double)0 ;		/* initialize answer */
+	sum = 0. ;		/* initialize answer */
 	if ( decimal ) {
 		/* handle digits to right of decimal */
 		--s ;
@@ -70,11 +70,13 @@ unsigned char s[];		/* s points to a character string */
 			break;
 		}
 		if ( expon > 38 ) {
+#if 0
 			puts("overflow") ;
+#endif
 			expon = 0 ;
 		}
 		k = 32 ;	/* set one bit in mask */
-		scale = (double) 1 ;
+		scale = 1 ;
 		while(k) {
 			scale *= scale;
 			if ( k & expon ) scale *= ten ;
