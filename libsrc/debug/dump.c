@@ -3,7 +3,7 @@
  *
  *	Stefano 29/5/2002
  *
- *	$Id: dump.c,v 1.1 2002-06-05 09:41:13 stefano Exp $
+ *	$Id: dump.c,v 1.2 2002-06-10 10:14:07 stefano Exp $
  */
 
 #include <stdio.h>
@@ -17,7 +17,6 @@ unsigned int dump(unsigned int address, unsigned int count)
 {
 
 int x;	// unsigned int didn't work ...
-
 if (address == 0xFFFF)
 	{
 #asm
@@ -66,8 +65,8 @@ if (address == 0xFFFF)
 	or	e
 	jr	nz,sdloop
 	pop	hl
+	pop	bc
 	ret
-.nostack
 #endasm
 	}
 
