@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.10 2002-10-08 20:40:01 dom Exp $
+ *      $Id: stmt.c,v 1.11 2004-03-03 15:40:28 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -707,6 +707,7 @@ void doasm()
 			  strcpy(line+2,&line[(int)lab]);
 			}
                 }
+#if 0
         	if ( output != NULL_FD ) {
         		if ( fputs(line, output) == -1 ) {
                			 fabort() ;
@@ -714,6 +715,9 @@ void doasm()
                 	fputc('\n',output);
         	} else 
 			puts(line);
+#else
+		ol(line);
+#endif
 
         }
 /* Print the line out, with the appropriate prefix */
