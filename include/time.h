@@ -16,6 +16,10 @@
 #define CLOCKS_PER_SEC 50
 #endif
 
+#ifdef ZX81
+#define CLOCKS_PER_SEC 50
+#endif
+
 #ifdef Z88
 #define CLOCKS_PER_SEC 100
 

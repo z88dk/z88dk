@@ -1,0 +1,10 @@
+These samples have been tested with the VACE emulator.
+After compiling they can be converted with bin2byt utility, then loaded on the emulator.
+The FORTH commands are
+16384 30000 bload smallgfx      --> (or other file name)
+16384 call
+
+I suppose the RAMTOP (or whatever name is used on the ACE for the Stack Pointer) should 
+be set in a safe location, but I have on idea on how to do this (or on where is it by default).
+
+The ADV_A.C source code is already present under the ZX Spectrum samples.
