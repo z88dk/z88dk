@@ -12,9 +12,10 @@
 ;       This functions needs Gunthers' standard.lib
 ;
 ; -----
-; $Id: getcwd.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
+; $Id: getcwd.asm,v 1.3 2002-04-07 16:04:37 dom Exp $
 
                 INCLUDE "#syspar.def"
+		INCLUDE	"#memory.def"
 
                 XLIB    getcwd
                 LIB    readbyte        ;standard.lib
@@ -36,18 +37,17 @@
         exx
         pop     bc              ;max len
         pop     de              ;buffer
+	ld	hl,0
+	ret	c		;error
         ld      l,d             ;keep buffer safe in hl
         ld      h,e
-        exx
-        ret     c
 ;Copying loop here..
 .getcwd2
-        exx
         ld      a,c
         or      b
         ret     z               ;we've filled our buffer
         exx
-        call    readbyte
+	call_oz(gn_rbe)
         inc     hl
         exx
         ld      (de),a
