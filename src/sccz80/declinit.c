@@ -10,7 +10,7 @@
  * 
  *      3/2/02 djm - Unspecified structure members are now padded out
  *
- *      $Id: declinit.c,v 1.7 2002-11-02 20:17:14 dom Exp $
+ *      $Id: declinit.c,v 1.8 2003-01-24 21:28:25 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -24,6 +24,7 @@ int initials(char *sname,
 	     TAG_SYMBOL * tag, char zfar)
 {
     int size, desize = 0;
+    int olddim = dim;
 
 
 
@@ -56,7 +57,7 @@ int initials(char *sname,
 	    /* aggregate initialiser */
 	    if ((ident == POINTER || ident == VARIABLE) && type == STRUCT) {
 		/* aggregate is structure or pointer to structure */
-		dim = 0;
+                dim = 0; olddim = 1;
 		if (ident == POINTER)
 		    point();
 		str_init(tag);
@@ -73,9 +74,10 @@ int initials(char *sname,
 
 	/* dump literal queue and fill tail of array with zeros */
 	if ((ident == ARRAY && more == CCHAR) || type == STRUCT) {
-	    if (type == STRUCT)
-		desize = dumpzero(tag->size, dim);
-	    else
+            if (type == STRUCT) {
+		dumpzero(tag->size, dim);
+                desize = dim < 0 ? abs(dim+1)*tag->size : olddim * tag->size;
+            } else
 		desize = dumpzero(size, dim);
 	    dumplits(0, YES, gltptr, glblab, glbq);
 	} else {
@@ -108,15 +110,16 @@ int initials(char *sname,
 /*
  * initialise structure
  */
-void str_init(TAG_SYMBOL *tag)
+int str_init(TAG_SYMBOL *tag)
 {
     int dim, flag;
-    int sz, usz;
+    int sz, usz, numelements = 0;
     SYMBOL *ptr;
     int     nodata = NO;
 
     ptr = tag->ptr;
     while (ptr < tag->end) {
+        numelements++;
 	dim = ptr->size;
 	sz = getstsize(ptr,NO);
 	if ( nodata == NO ) {
@@ -139,7 +142,8 @@ void str_init(TAG_SYMBOL *tag)
 		flag = YES;
 	    }
 	    ++ptr;
-	}
+
+        }
 
 	/* Pad out the union */
 	if (usz != sz && flag) {
@@ -151,6 +155,7 @@ void str_init(TAG_SYMBOL *tag)
 	    nodata = YES;	   
 	}
     }
+    return numelements;
 }
 
 /*
@@ -278,10 +283,16 @@ int size, ident, *dim, more, dump, is_struct;
 	} else if (constexpr(&value, 1)) {
 	  constdecl:
 	    if (ident == POINTER) {
+		/* 24/1/03 dom - We want to be able to assign values to
+		   pointers or they're a bit useless..
+		*/
+#if 0
 		/* the only constant which can be assigned to a pointer is 0 */
 		if (value != 0)
 		    warning(W_ASSPTR);
+#endif
 		size = 2;
+		dump = YES;
 	    }
 	    if (dump) {
 		/* struct member or array of pointer to char */
