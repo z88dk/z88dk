@@ -14,8 +14,6 @@
 .l_ule
         call    l_ucmp
         ret     c
+	ret	nz	;nc is set
         scf
-        ret     z
-        ccf     ;set nc, i.e. false
-        dec     hl
         ret

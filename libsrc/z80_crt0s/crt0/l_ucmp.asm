@@ -12,11 +12,9 @@
 ;   zero is zero/non-zero
 
 .l_ucmp
-        ld a,d
-        cp h
-        jr nz,l_ucmp1
-        ld a,e
-        cp l
-.l_ucmp1  
-        ld hl,1    ;preset true
-        ret
+	ld	a,d
+	cp	h
+	ret	nz
+	ld	a,e
+	cp	l
+	ret

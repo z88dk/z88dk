@@ -3,7 +3,7 @@
 ;
 ;	Signed integer compare
 ;
-;	$Id: l_cmp.asm,v 1.6 2002-02-17 10:39:24 dom Exp $:
+;	$Id: l_cmp.asm,v 1.7 2002-02-21 19:21:35 dom Exp $:
 
 
                 XLIB    l_cmp
@@ -18,9 +18,7 @@
 	ld	a,d
 	add	$80
 	cp	b
-	jr	nz,l_cmp1
+	ret	nz
 	ld	a,e
 	cp	l
-.l_cmp1
-	ld	hl,1
 	ret

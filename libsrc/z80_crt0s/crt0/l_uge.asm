@@ -16,9 +16,5 @@
 .l_uge
         call    l_ucmp
         ccf
-        ret     c
-;        ret     nc
-
-        dec     hl
-        ret
+	ret
 

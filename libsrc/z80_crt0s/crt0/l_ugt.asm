@@ -13,7 +13,4 @@
 ; DE > HL [unsigned]
 .l_ugt
         ex      de,hl
-        call    l_ucmp
-        ret     c
-        dec     hl
-        ret
+        jp	l_ucmp

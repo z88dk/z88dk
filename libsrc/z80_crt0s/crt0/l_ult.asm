@@ -12,8 +12,5 @@
 ;
 ; DE < HL [unsigned]
 .l_ult
-        call    l_ucmp
-        ret     c
-        dec     hl
-        ret
+        jp	l_ucmp
 
