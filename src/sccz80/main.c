@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.2 2001-01-29 14:34:41 dom Exp $
+ *      $Id: main.c,v 1.3 2001-02-02 13:45:23 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -345,7 +345,7 @@ info()
 {
         fputs(titlec,stderr);
         fputs(Version,stderr);
-        fputs("\n(C) 1980-2000 Cain, Van Zandt, Hendrix, Yorston, Morris\n",stderr);
+        fputs("\n(C) 1980-2001 Cain, Van Zandt, Hendrix, Yorston, Morris\n",stderr);
         fprintf(stderr,"Usage: %s [flags] [file]\n",gargv[0]);
         
 }
