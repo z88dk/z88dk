@@ -55,7 +55,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* Some clever config-ing if we're using GNUC */
 
 #ifdef __GNUC__
-#if #cpu(m68k) || #cpu(sparc) || #cpu(hppa)
+#if #cpu(m68k) || #cpu(sparc) || #cpu(hppa) || #cpu(powerpc)
 #define ENDIAN 1
 #endif
 #endif	/* __GNUC__ */
