@@ -5,7 +5,7 @@
  *
  *  We don't bother filling up the explicitname (yet...)
  *
- *  $Id: open_z88.c,v 1.1 2002-01-27 21:28:48 dom Exp $
+ *  $Id: open_z88.c,v 1.2 2002-04-21 19:08:43 dom Exp $
  */
 
 #include <cpm.h>
@@ -19,11 +19,13 @@ int open_z88(far char *nam, int mode, mode_t flags, char *outbuf, size_t extlen)
     int   fd;
     char *name = nam;
 
+
     if ( ++mode > U_RDWR )
 	mode = U_RDWR;
 
-    if ( ( fc = getfcb() ) == NULL )
+    if ( ( fc = getfcb() ) == NULL ) {
 	return -1;
+    }
 
     if ( setfcb(fc,name) == 0 ) {  /* We had a real file, not a device */
 	if ( mode == U_READ && bdos(CPM_VERS,0) >= 0x30 ) 
@@ -42,6 +44,7 @@ int open_z88(far char *nam, int mode, mode_t flags, char *outbuf, size_t extlen)
 		fc->use = mode;
 		return fd;
 	    }
+	    return -1;   /* An error */
 	}
 	setuid(uid);
 	fc->use = mode;
