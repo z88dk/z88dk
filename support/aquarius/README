@@ -1,0 +1,20 @@
+$Id: README,v 1.1 2001-12-24 13:23:08 stefano Exp $
+
+Mattel Aquarius !!
+Tested under the "Virtual Aquarius" emulator, by James the Animal Tamer.
+
+The "bin2caq" tool creates two files: a basic loader and a pseudo array file.
+To compile and run
+
+- compile the program:				zcc +aquarius program.c
+- convert it:					bin2caq a.bin program.caq
+- run the emulator				aquarius
+- from within the emulator, load the loader:	cload
+- press ENTER twice, then play the "_program.caq" cassette file (loader)
+- at the "OK" prompt, type RUN <ENTER>
+- press ENTER twice, then play the "program.caq" cassette file
+- wait... then have fun !
+
+
+
+					Stefano Bodrato - Dec 2001
