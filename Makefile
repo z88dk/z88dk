@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.13 2002-01-27 16:20:22 dom Exp $
+#	$Id: Makefile,v 1.14 2002-04-10 20:34:53 dom Exp $
 #
 
 prefix = /usr/local/z88dk
@@ -50,6 +50,7 @@ config:
 	sed "s?DESTDIR?`pwd`?g" < lib/config/mzansi.lnx > lib/config/mzansi.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/nc.lnx > lib/config/nc.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/rex.lnx > lib/config/rex.cfg
+	sed "s?DESTDIR?`pwd`?g" < lib/config/rexlib.lnx > lib/config/rexlib.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/sam.lnx > lib/config/sam.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/svi.lnx > lib/config/svi.cfg
 	sed "s?DESTDIR?`pwd`?g" < lib/config/ti82.lnx > lib/config/ti82.cfg
