@@ -1,4 +1,4 @@
-$Id: README.1st,v 1.7 2002-07-15 15:57:55 dom Exp $
+$Id: README.1st,v 1.8 2002-10-02 09:55:44 dom Exp $
 
 There's a lot of documentation in the doc/ directory, some of it is half
 way through being written, so apologies for the fuzziness in places, most
@@ -8,9 +8,28 @@ If you have any questions, feel free to email me at dom@jadara.org.uk
 
 ----- COMPILATION INSTRUCTIONS -----
 
+There's a certain degree of bootstrapping required - here's the
+procedure for a standard install on UNIX (ensure that you have
+root permissions). Where make is mentioned, this referes to GNU make.
+
+1. make
+
+2. make install
+
+3. make libs
+
+4. make install-libs
+
+With a bit of luck z88dk should be installed in /usr/local with important
+files in /usr/local/lib/z88dk
+
+The old method of configuration is great for running in situ.
+
 1. Check src/z80asm/config.h for machine status and endian status.
    ENDIAN is set if the machine is big endian (68k,PPC,Sparc etc). There's
    some gcc magic to pick this up automatically which should work.
+
+1.5 Edit {z88dk}/Makefile and change prefix to point to the current directory
 
 2. Type: make/gmake to run GNU make
 
@@ -24,20 +43,13 @@ If you have any questions, feel free to email me at dom@jadara.org.uk
 
 Where {z88dk} is the root directory of the archive (where this file is located!)
 
-[To recompile the libraries, go into libsrc and type "make clean; make "
- If you got the CVS tree, make sure that the libraries have been downloaded 
- in binary mode: if z80asm crashes, rebuild libraries !]
+7. Rebuild the libraries using make libs from the root z88dk directory
 
-Amiga: ixemul v47+ required..
 
 --8<--
 
 Brief guide to what has changed in case I don't distribute the doco
 
-z88dkv1.5 (sccz80 20/5/2002.1) xx.7.2002
-
-It's a long time since the previous release. Many things have changed and
-many new machines are now supported and many bug fixes have been made
 
 z88dkv1.33 (sccz80v1.10b72) 11.5.2001
 
