@@ -8,7 +8,7 @@
 #
 
 Z80EXE  	z80asm
-CPP 		/lib/cpp
+CPP 		zcpp
 LINKER 		z80asm
 COMPILER	sccz80
 COPTEXE		copt
