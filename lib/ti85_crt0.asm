@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti85_crt0.asm,v 1.11 2001-07-16 13:27:50 dom Exp $
+;	$Id: ti85_crt0.asm,v 1.12 2001-08-20 09:28:25 stefano Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -72,9 +72,9 @@ ELSE
 	ld	(exitsp),sp
 ENDIF
 
-IF !DEFINED_nostreams
- IF DEFINED_ANSIstdio
-  IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
+IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
+ IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
+  IF !NONANSI
 	;Reset the ANSI cursor
 	XREF	ansi_ROW
 	XREF	ansi_COLUMN
@@ -82,12 +82,12 @@ IF !DEFINED_nostreams
 	ld	(ansi_ROW),a
 	ld	(ansi_COLUMN),a
  	; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
+	;ld	hl,__sgoioblk+2
+	;ld	(hl),19	;stdin
+	;ld	hl,__sgoioblk+6
+	;ld	(hl),21	;stdout
+	;ld	hl,__sgoioblk+10
+	;ld	(hl),21	;stderr
   ENDIF
  ENDIF
 ENDIF
@@ -100,26 +100,15 @@ ENDIF
 	call	tidi
 	call	_main
 .cleanup
-	ld	iy,_IY_TABLE	; Restore flag-pointer
-	call	tiei
-
 IF DEFINED_GRAYlib
-	;im	1
-        ld a,$3c
-        out (0),a    ;Set screen back to normal
+        ld	a,$3c
+        out	(0),a    ;Set screen back to normal
 ENDIF
-
-IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
- IF !DEFINED_nostreams
-  IF DEFINED_ANSIstdio
-	;LIB	closeall	; Not untill we have fileroutines
-	;call	closeall
-  ENDIF
- ENDIF
-ENDIF
-
 .start1
 	ld	sp,0
+	ld	iy,_IY_TABLE	; Restore flag-pointer
+	im	1
+	ei
 .cpygraph
 	ret
 
@@ -164,34 +153,30 @@ ENDIF
 
 	
 ; Now, define some values for stdin, stdout, stderr
-IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
- IF !DEFINED_nostreams
-  IF DEFINED_ANSIstdio
+IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
+ IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
 .__sgoioblk
 	INCLUDE	"#stdio_fp.asm"
-  ENDIF
  ENDIF
 ENDIF
 
 
 ; Now, which of the vfprintf routines do we need?
-IF !DEFINED_nostreams
- IF DEFINED_ANSIstdio
-  IF DEFINED_floatstdio
+IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
+ IF DEFINED_floatstdio
 ._vfprintf
 	LIB vfprintf_fp
 	jp  vfprintf_fp
-  ELSE
-   IF DEFINED_complexstdio
+ ELSE
+  IF DEFINED_complexstdio
 ._vfprintf
 	LIB vfprintf_comp
 	jp  vfprintf_comp
-   ELSE
-    IF DEFINED_ministdio
+  ELSE
+   IF DEFINED_ministdio
 ._vfprintf
 	LIB vfprintf_mini
 	jp  vfprintf_mini
-    ENDIF
    ENDIF
   ENDIF
  ENDIF
@@ -209,7 +194,7 @@ ENDIF
 .heapblocks	defw	0
 
 ; mem stuff
-.base_graphics	defw	VIDEO_MEM	; $8641 ?
+.base_graphics	defw	VIDEO_MEM
 .coords		defw	0
 
 IF NEED_floatpack

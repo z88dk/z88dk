@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti82_crt0.asm,v 1.11 2001-07-16 13:27:49 dom Exp $
+;	$Id: ti82_crt0.asm,v 1.12 2001-08-20 09:28:25 stefano Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -75,6 +75,7 @@ ENDIF
 IF !DEFINED_nostreams
  IF DEFINED_ANSIstdio
   IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
+   IF !non_ANSI
 	;Reset the ANSI cursor
 	XREF	ansi_ROW
 	XREF	ansi_COLUMN
@@ -82,12 +83,12 @@ IF !DEFINED_nostreams
 	ld	(ansi_ROW),a
 	ld	(ansi_COLUMN),a
  	; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
+	;ld	hl,__sgoioblk+2
+	;ld	(hl),19	;stdin
+	;ld	hl,__sgoioblk+6
+	;ld	(hl),21	;stdout
+	;ld	hl,__sgoioblk+10
+	;ld	(hl),21	;stderr
   ENDIF
  ENDIF
 ENDIF
@@ -100,25 +101,21 @@ ENDIF
 
 	im	2
 	call	_main
-.cleanup
-	ld	iy,_IY_TABLE
+.cleanup			; exit() jumps to this point
+.start1	ld	sp,0		; writeback
+	ld	iy,_IY_TABLE	; Restore flag-pointer
 	im	1
-.start1
-	ld	sp,0		; writeback
+.tiei	ei
 IF DEFINED_GRAYlib
 .cpygraph			; little opt :)
 ENDIF
-	ret
-
+.tidi	ret
 
 ;----------------------------------------
 ; End of startup part, routines following
 ;----------------------------------------
 .l_dcal
 	jp	(hl)
-
-.tiei	ei
-.tidi	ret
 
 ; Now, define some values for stdin, stdout, stderr
 IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
@@ -170,7 +167,7 @@ ENDIF
 .coords		defw	0
 	
 IF !DEFINED_GRAYlib
-.cpygraph	jp	CR_GRBCopy	; CrASH FastCopy
+	defc cpygraph = CR_GRBCopy	; CrASH FastCopy
 ENDIF
 
 IF NEED_floatpack

@@ -1,11 +1,9 @@
-;zcc +ti8x -lm -ltigray83p mandel.c -startup=3
-
 ;	Stub for the TI 83+ calculator
 ;
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.10 2001-07-16 13:27:50 dom Exp $
+;	$Id: ti83p_crt0.asm,v 1.11 2001-08-20 09:28:25 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells
@@ -124,6 +122,14 @@ IF (startup = 4)
  ENDIF
 ENDIF
 
+;--------------------
+;10 - asm( executable
+;--------------------
+IF (startup=10)
+	DEFINE NOT_DEFAULT_SHELL
+	org	$9D95
+ENDIF
+
 ;-----------------
 ;1 - Ion (default)
 ;-----------------
@@ -149,26 +155,26 @@ ENDIF
 IF DEFINED_GimmeSpeed
 	ld	a,1		; switch to 15MHz (extra fast)
 	rst	28		; bcall(SetExSpeed)
-	defw	SetExSpeed
-ENDIF
-	ld	hl,0
-	add	hl,sp
-	ld	(start1+1),hl
+	defw	SetExSpeed	;
+ENDIF				;
+	ld	hl,0		;
+	add	hl,sp		;
+	ld	(start1+1),hl	;
 IF !DEFINED_atexit		; Less stack use
 	ld	hl,-6		; 3 pointers (more likely value)
-	add	hl,sp
-	ld	sp,hl
-	ld	(exitsp),sp
-ELSE
+	add	hl,sp		;
+	ld	sp,hl		;
+	ld	(exitsp),sp	;
+ELSE				;
 	ld	hl,-64		; 32 pointers (ANSI standard)
-	add	hl,sp
-	ld	sp,hl
-	ld	(exitsp),sp
+	add	hl,sp		;
+	ld	sp,hl		;
+	ld	(exitsp),sp	;
 ENDIF
 
-IF !DEFINED_nostreams
- IF DEFINED_ANSIstdio
-  IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
+IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
+ IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
+  IF !non_ANSI
 	;Reset the ANSI cursor
 	XREF	ansi_ROW
 	XREF	ansi_COLUMN
@@ -176,12 +182,12 @@ IF !DEFINED_nostreams
 	ld	(ansi_ROW),a
 	ld	(ansi_COLUMN),a
  	; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
+	;ld	hl,__sgoioblk+2
+	;ld	(hl),19	;stdin
+	;ld	hl,__sgoioblk+6
+	;ld	(hl),21	;stdout
+	;ld	hl,__sgoioblk+10
+	;ld	(hl),21	;stderr
   ENDIF
  ENDIF
 ENDIF
@@ -196,64 +202,56 @@ ELSE
 	INCLUDE	"#intwrap83p.asm"	; Interrupt Wrapper
 ENDIF
 
-	im	2
-	call	_main
-.cleanup
-	ld	iy,_IY_TABLE
-	im	1
-IF DEFINED_GimmeSpeed
-	xor	a		; switch to 6MHz (normal speed)
+	im	2		; enable IM2 interrupt
+	call	_main		; call main()
+.cleanup			; exit() jumps to this point
+	ld	iy,_IY_TABLE	; Restore flag pointer
+	im	1		;
+IF DEFINED_GimmeSpeed		;
+	xor	a		; Switch to 6MHz (normal speed)
 	rst	28		; bcall(SetExSpeed)
-	defw	SetExSpeed
-ENDIF
-.start1
-	ld	sp,0		; restore SP
+	defw	SetExSpeed	;
+ENDIF				;
+.start1	ld	sp,0		; Restore SP
 IF TSE				; TSE Kernel
 	call	_tseForceYield	; Task-switch back to shell (can return...)
 	jp	start		; begin again if needed...
-ELSE
-	ret
-ENDIF
-
+ENDIF				;
+.tiei	ei			;
+IF DEFINED_GRAYlib		;
+.cpygraph			;
+ENDIF				;
+.tidi	ret			;
 
 ;----------------------------------------
 ; End of startup part, routines following
 ;----------------------------------------
 .l_dcal
-	jp	(hl)
-
-.tiei	ei
-.tidi	ret
+	jp	(hl)		; used as "call (hl)"
 
 ; Now, define some values for stdin, stdout, stderr
-IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
- IF !DEFINED_nostreams
-  IF DEFINED_ANSIstdio
+IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
 .__sgoioblk
 	INCLUDE	"#stdio_fp.asm"
-  ENDIF
- ENDIF
 ENDIF
 
 
 ; Now, which of the vfprintf routines do we need?
-IF !DEFINED_nostreams
- IF DEFINED_ANSIstdio
-  IF DEFINED_floatstdio
+IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
+ IF DEFINED_floatstdio
 ._vfprintf
 	LIB vfprintf_fp
 	jp  vfprintf_fp
-  ELSE
-   IF DEFINED_complexstdio
+ ELSE
+  IF DEFINED_complexstdio
 ._vfprintf
 	LIB vfprintf_comp
 	jp  vfprintf_comp
-   ELSE
-    IF DEFINED_ministdio
+  ELSE
+   IF DEFINED_ministdio
 ._vfprintf
 	LIB vfprintf_mini
 	jp  vfprintf_mini
-    ENDIF
    ENDIF
   ENDIF
  ENDIF
@@ -274,22 +272,20 @@ ENDIF
 .base_graphics	defw	plotSScreen
 .coords		defw	0
 
-.cpygraph
-IF DEFINED_GRAYlib
-		ret
-ELSE
+IF !DEFINED_GRAYlib
  IF DEFINED_GimmeSpeed
+.cpygraph
 	call	$50		; bjump(GrBufCpy)
 	defw	GrBufCpy	; FastCopy is far too fast at 15MHz...
  ELSE
   IF Ion
-	jp	$966E+80+15	; Ion FastCopy call
+	defc	cpygraph = $966E+80+15	; Ion FastCopy call
   ENDIF
   IF MirageOS
-	jp	$4092		; MirageOS FastCopy call
+	defc	cpygraph = $4092	; MirageOS FastCopy call
   ENDIF
   IF TSE
-	jp	$8A3A+18	; TSE FastCopy call
+	defc	cpygraph = $8A3A+18	; TSE FastCopy call
   ENDIF
  ENDIF
 ENDIF

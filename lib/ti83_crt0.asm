@@ -3,7 +3,7 @@
 ;	Stefano Bodrato	- Dec 2000
 ;	Henk Poley	- Apr 2001 Fixed and add some things
 ;
-;	$Id: ti83_crt0.asm,v 1.12 2001-07-16 13:27:49 dom Exp $
+;	$Id: ti83_crt0.asm,v 1.13 2001-08-20 09:28:25 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -54,9 +54,10 @@
 ;-------------------------
 ; Begin of (shell) headers
 ;-------------------------
-
+	LSTOFF			; Don't list these (huge) files
 	INCLUDE "#Ti83.def"	; ROM / RAM adresses on Ti83
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
+	LSTON			; List again
 
 ;----------------------------------
 ; 2-Venus and 8-Venus Explorer (VE)
@@ -69,7 +70,7 @@ IF (startup=2) | (startup=8)
   IF (startup=2)			; 2-Venus
 	defb	$0,$1,$1	; No description nor icon
   ELSE				; 8-Venus Explorer
- 	DEFINE Venus_Explorer
+ 	DEFINE V_Explorer
 	defb	$1
 	defb	enddesc-description+1	; lengthOfDescription+1
 .description
@@ -105,6 +106,7 @@ IF (startup=2) | (startup=8)
 	defb	$1		; numberOfExternals+1 (maximum = 11d)
   ELSE
  	; No graylib, so we use FastCopy
+ 	defc	vnFastCopy = $FE6F
 	defb	$2		; numberOfExternals+1 (maximum = 11d)
 	defb	$5		; We use the FastCopy-lib
 	defm	"~FCPY"		;
@@ -129,7 +131,7 @@ ENDIF
 IF (startup=4)
 	DEFINE Anova
 	DEFINE NOT_DEFAULT_SHELL
-	org	$9327
+	org	Entry
 	xor	a		; One byte instruction, meaningless
 	jr	start		; Relative jump
 	defw	0		; pointer to libs, 0 if no libs used
@@ -162,7 +164,7 @@ ENDIF
 IF (startup=5) | (startup=6)
 	DEFINE Ti_Explorer
 	DEFINE NOT_DEFAULT_SHELL
-	org	$9327
+	org	Entry
 	nop			; makes it compatible with AShell
 	jr	start
 	defw	0		; pointer to libs, 0 if no libs used
@@ -198,7 +200,7 @@ ENDIF
 IF (startup=7)
 	DEFINE SOS
 	DEFINE NOT_DEFAULT_SHELL
-	org	$9327
+	org	Entry
 	ccf			; Makes program invisible to AShell
 	jr	start
 	defw	0		; pointer to libs, 0 if no libs used
@@ -217,8 +219,9 @@ ENDIF
 ; 9-Ion, ZASMLOAD compatible
 ;---------------------------
 IF (startup=9)
+	DEFINE ZASMLOAD
 	DEFINE NOT_DEFAULT_SHELL
-	org	$9327
+	org	Entry
 	xor	a		; We don't use the Ionlibs
 	jr	nc,start 	; Ion identifier
 	DEFINE NEED_name
@@ -237,8 +240,9 @@ ENDIF
 ; for send(9 version, create .83p file with bin2var2.exe
 ; for ZASMLOAD version, create .83p file with bin2var.exe
 IF (startup=10)
+	DEFINE ZASMLOAD
 	DEFINE NOT_DEFAULT_SHELL
-	org	$9327
+	org	Entry
 ENDIF
 
 ;----------------
@@ -246,7 +250,7 @@ ENDIF
 ;----------------
 IF !NOT_DEFAULT_SHELL
 	DEFINE Ion
-	org	$9327
+	org	Entry
  IF DEFINED_GRAYlib
 	xor	a		; We don't use the Ionlibs (doesn't matter)
  ELSE
@@ -268,7 +272,7 @@ ENDIF
 ; End of header, begin of startup part
 ;-------------------------------------
 .start
-	ld	hl,0
+	ld	hl,0		; Store current StackPointer
 	add	hl,sp
 	ld	(start1+1),hl
 IF !DEFINED_atexit		; Less stack use
@@ -283,22 +287,15 @@ ELSE
 	ld	(exitsp),sp
 ENDIF
 
-IF !DEFINED_nostreams
- IF DEFINED_ANSIstdio
-  IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
+IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
+ IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
+  IF !(ZASMLOAD | NONANSI)
 	;Reset the ANSI cursor
 	XREF	ansi_ROW
 	XREF	ansi_COLUMN
 	xor	a
 	ld	(ansi_ROW),a
 	ld	(ansi_COLUMN),a
- 	; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
   ENDIF
  ENDIF
 ENDIF
@@ -311,55 +308,50 @@ ENDIF
 
 	im	2
 	call	_main
-.cleanup
+.cleanup			; exit() jumps to this point
+.start1	ld	sp,0		; writeback
 	ld	iy,_IY_TABLE	; Restore flag-pointer
-	im	1
-.start1
-	ld	sp,0		; writeback
-IF DEFINED_GRAYlib
-.cpygraph			; little opt :)
+IF !(Ion | SOS | Ti_Explorer | V_Explorer | Anova)
+ IF NONANSI
+	call	_CLRTXTSHD	; Clear textbuffer
+	call	_homeup		; Set cursor to (0,0)
+ ENDIF
+	call	_clrScrnFull	; Clear plotSScreen and LCD
+	res	oninterrupt,(iy+onflags) ; Reset [On]-flag (stops "ERR:Break")
 ENDIF
-	ret
-	
-	
+	im	1
+.tiei	ei
+IF DEFINED_GRAYlib
+.cpygraph
+ENDIF
+.tidi	ret
+
 ;----------------------------------------
 ; End of startup part, routines following
 ;----------------------------------------
-.l_dcal
-	jp	(hl)
+defc l_dcal = $52E8		; jp (hl)
 
-.tiei	ei
-.tidi	ret
-
-; Now, define some values for stdin, stdout, stderr
-; The next one is true, as long we don't have fileroutines:
-IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
- IF !DEFINED_nostreams
-  IF DEFINED_ANSIstdio
+IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
 .__sgoioblk
 	INCLUDE	"#stdio_fp.asm"
-  ENDIF
- ENDIF
 ENDIF
 
 ; Now, which of the vfprintf routines do we need?
-IF !DEFINED_nostreams
- IF DEFINED_ANSIstdio
-  IF DEFINED_floatstdio
+IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
+ IF DEFINED_floatstdio
 ._vfprintf
 	LIB vfprintf_fp
 	jp  vfprintf_fp
-  ELSE
-   IF DEFINED_complexstdio
+ ELSE
+  IF DEFINED_complexstdio
 ._vfprintf
 	LIB vfprintf_comp
 	jp  vfprintf_comp
-   ELSE
-    IF DEFINED_ministdio
+  ELSE
+   IF DEFINED_ministdio
 ._vfprintf
 	LIB vfprintf_mini
 	jp  vfprintf_mini
-    ENDIF
    ENDIF
   ENDIF
  ENDIF
@@ -381,19 +373,19 @@ ENDIF
 .coords		defw	0
 
 IF !DEFINED_GRAYlib
-.cpygraph
  IF Ion
  	DEFINE Do_Not_Include_FastCopy
-	jp	$9157+80+15	; ionFastCopy call
+	defc cpygraph = $9157+80+15	; ionFastCopy call
  ENDIF
 
  IF Venus
  	DEFINE Do_Not_Include_FastCopy
-	jp	$FE6F		; vnFastCopy routine
+	defc cpygraph = vnFastCopy
  ENDIF
  
  IF !Do_Not_Include_FastCopy
-; Some shells don't provide the fastcopy code, so here it is !
+.cpygraph
+	; Some shells don't provide the fastcopy code, so here it is !
 	ld	a,$80
 	out	($10),a
 	ld	hl,$8E29-12-(-(12*64)+1)

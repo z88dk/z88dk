@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.10 2001-07-16 13:27:50 dom Exp $
+;	$Id: ti86_crt0.asm,v 1.11 2001-08-20 09:28:25 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -58,7 +58,7 @@
 ;-----------------------------
 IF (startup=2)
 	DEFINE NOT_DEFAULT_SHELL
-	org	$D748		;TI 86 standard asm() entry point.
+	org	_asm_exec_ram	;TI 86 standard asm() entry point.
 	nop			;identifier of table
 	jp	start
 	defw	$0000		;version number of table
@@ -78,7 +78,7 @@ ENDIF
 ;-----------
 IF (startup=3)
 	DEFINE NOT_DEFAULT_SHELL
-	org	$D748
+	org	_asm_exec_ram
 	nop
 	jp	start
 	defw 	description
@@ -112,7 +112,7 @@ ENDIF
 ;----------
 IF (startup=4)
 	DEFINE NOT_DEFAULT_SHELL
-	org	$D748		;TI 86 standard asm() entry point.
+	org	_asm_exec_ram	;TI 86 standard asm() entry point.
 	nop			;identifier of table
 	jp	start
 	defw	$0001		;version number of table
@@ -146,7 +146,7 @@ ENDIF
 ;----------------------
 IF (startup=10)
 	DEFINE NOT_DEFAULT_SHELL
-        org     $D748
+        org     _asm_exec_ram
 ENDIF
 
 ;--------------------------------------------------
@@ -203,6 +203,7 @@ ENDIF
 IF !DEFINED_nostreams
  IF DEFINED_ANSIstdio
   IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
+   IF !non_ANSI
 	; Reset the ANSI cursor
 	XREF	ansi_ROW
 	XREF	ansi_COLUMN
@@ -210,12 +211,12 @@ IF !DEFINED_nostreams
 	ld	(ansi_ROW),a
 	ld	(ansi_COLUMN),a
  	; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
+	;ld	hl,__sgoioblk+2
+	;ld	(hl),19	;stdin
+	;ld	hl,__sgoioblk+6
+	;ld	(hl),21	;stdout
+	;ld	hl,__sgoioblk+10
+	;ld	(hl),21	;stderr
   ENDIF
  ENDIF
 ENDIF
@@ -225,30 +226,20 @@ IF DEFINED_GRAYlib
 	;im	2
 ENDIF
 
-	call	$4A95	; Close menus
+	call	_homeup		; Close menus
 
 	call	tidi
 	call	_main
 .cleanup
-	; What's the the normal IY value on the Ti86?
-	call	tiei
-
 IF DEFINED_GRAYlib
 	;im	1
-       	ld	a,$3C	; Make sure video mem is active
+       	ld	a,$3C		; Make sure video mem is active
 	out	(0),a
 ENDIF
-
-IF DEFINED_floatstdio | DEFINED_complexstdio | DEFINED_ministdio
- IF !DEFINED_nostreams
-  IF DEFINED_ANSIstdio
-	;LIB	closeall	; Not untill we have fileroutines
-	;call	closeall
-  ENDIF
- ENDIF
-ENDIF
-
 .start1
+	; What's the the normal IY value on the Ti86? (?_Flags?)
+	im	1
+	ei
 	ld	sp,0
 .cpygraph
 	ret

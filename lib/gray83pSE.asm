@@ -14,7 +14,7 @@
 ;***** GreyLib version 1.0 (C) 1997 by Bill Nagel & Dines Justesen *********
 ;---------------------------------------------------------------------------
 ;
-; $Id: gray83pSE.asm,v 1.1 2001-07-16 13:27:49 dom Exp $
+; $Id: gray83pSE.asm,v 1.2 2001-08-20 09:28:25 stefano Exp $
 ;
 
 defc LCD_BUSY_QUICK  = $000B		; Faster entry then BCALLing
