@@ -91,13 +91,3 @@ rex/farcall/rdpar4
 rex/graphics/Set4Pixels
 rex/graphics/DsCircle
 rex/graphics/DsEllipse
-rex/WHmath/xatan
-rex/WHmath/satan
-rex/WHmath/WHatan
-rex/WHmath/WHatan2
-rex/WHmath/sinus
-rex/WHmath/WHcos
-rex/WHmath/WHsin
-rex/WHmath/WHtan
-
-
