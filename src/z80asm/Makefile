@@ -4,7 +4,7 @@
 
 
 CC=gcc
-CFLAGS = -O2 -Wall -s $(CCOPT)
+CFLAGS = -O2 -Wall -s $(CCOPT) 
 LDFLAGS=
 
 OBJS = 	asmdrctv.o 	\

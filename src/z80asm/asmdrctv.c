@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.2 2001-01-23 10:00:08 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.3 2001-02-28 17:59:22 dom Exp $ */
 /* $History: Asmdrctv.c $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -99,12 +99,16 @@ struct expr *ParseNumExpr (void);
 struct sourcefile *Newfile (struct sourcefile *curfile, char *fname);
 struct sourcefile *Prevfile (void);
 struct sourcefile *FindFile (struct sourcefile *srcfile, char *fname);
+int cmpidstr (symbol * kptr, symbol * p);
+void FreeSym (symbol * node);
+symbol *FindSymbol (char *identifier, avltree * treeptr);
 
 
 /* local functions */
 void DeclModuleName (void);
 void Fetchfilename (FILE *fptr);
 void DefSym (void);
+void UnDefineSym (void);
 
 
 /* global variables */
@@ -418,7 +422,26 @@ DEFS ()
     }
 }
 
+void 
+UnDefineSym(void)
+{
+   symbol *sym;
 
+  do
+    {
+      if (GetSym () == name)
+	sym = FindSymbol(ident,CURRENTMODULE->localroot);
+	if ( sym != NULL ) {
+		delete (&CURRENTMODULE->localroot, sym, (int (*)()) cmpidstr, (void (*)()) FreeSym);
+	}
+      else
+	{
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	  break;
+	}
+    }
+  while (GetSym () == comma);
+}
 
 void 
 DefSym (void)

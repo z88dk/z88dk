@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.2 2001-01-23 10:00:09 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.3 2001-02-28 17:59:22 dom Exp $ */
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -92,6 +92,7 @@ void DEFB (void), DEFC (void), DEFM (void), DEFW (void), DEFL (void);
 void RST (void), DEFGROUP (void);
 long GetConstant(char *);
 int CheckRegister8 (void);
+void UnDefineSym(void);
 
 
 /* local functions */
@@ -229,6 +230,7 @@ struct Z80sym Z80ident[] = {
  {"SRA", SRA},
  {"SRL", SRL},
  {"SUB", SUB},			/* 90 */
+ {"UNDEFINE",UnDefineSym},
  {"XDEF", DeclGlobalIdent},
  {"XLIB", DeclGlobalLibIdent},
  {"XOR", XOR},
