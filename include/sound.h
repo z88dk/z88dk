@@ -7,11 +7,12 @@
  *
  *	Stefano, Oct 2001
  *
- *	$Id: sound.h,v 1.3 2001-10-25 13:31:32 stefano Exp $
+ *	$Id: sound.h,v 1.4 2001-10-27 13:20:15 stefano Exp $
  */
 
-
 /* 1 bit sound library */
+
+#pragma output NEED1bitsound
 
 extern __LIB__ bit_open();
 extern __LIB__ bit_close();

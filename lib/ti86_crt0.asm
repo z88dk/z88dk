@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.13 2001-09-20 15:54:03 stefano Exp $
+;	$Id: ti86_crt0.asm,v 1.14 2001-10-27 13:20:15 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -41,6 +41,8 @@
 
 	XDEF	base_graphics	; Graphics stuff
 	XDEF	coords		;
+
+	XDEF	snd_tick	; Sound variable
 
 	XDEF	cpygraph	; TI calc specific stuff
 	XDEF	tidi		;
@@ -179,7 +181,9 @@ IF !NOT_DEFAULT_SHELL
 	; - run asm(LargeLd
 	; It will run your program. Loading order is important.
 	
-	org	$801F	; "Large asm block". To be loaded with "LASM"
+	org	$801D	; "Large asm block". To be loaded with "LASM"
+	defb	$8e, $28
+	;org	$801F	; Start from here if you want to use PRGM86
 	ret
 	nop		;Identifies the table
 	jp	start
@@ -326,6 +330,10 @@ ENDIF
 ; mem stuff
 .base_graphics	defw	$FC00	;TI86
 .coords		defw	0
+
+IF DEFINED_NEED1bitsound
+.snd_tick	defb	0	; Sound variable
+ENDIF
 
 IF NEED_floatpack
 	INCLUDE	"#float.asm"

@@ -1,4 +1,4 @@
-$Id: README,v 1.1 2001-04-17 09:15:44 stefano Exp $
+$Id: README,v 1.2 2001-10-27 13:20:15 stefano Exp $
 
 
 The batch files are the OLD conversion tools; they use conversion utilities that 
@@ -22,12 +22,15 @@ TI83 plus: Tested under the ION SHELL (http://www.ticalc.org/pub/83plus/asm/shel
 zcc83p.bat - as for the TI83, but changes the file extention to .8xp.
 
 
-TI85: Runs under the RIGEL shell only (http://www.ticalc.org/pub/85/asm/shells/rigel.zip).
-zcc85.bat - uses STRING85.EXE, included in RIGEL, also.
+TI85: We heavily changed the binary structure, recently !!
+Please note that the "STRING85" utility can't be used anymore.
+Use BIN2VAR or other generic .85s string converters; an example follows:
+	- zcc +ti85ansi -lm program.c
+	- bin2var a.bin program.85s
 
 
 TI86
 zcc86.bat - Uses prgm86.exe for the file conversion.
-		If you leave the startup code unchanged (I suggest so) LASM must be used.	
+		If you leave the startup code unchanged (I suggest so) LASM must be used.
 		get it from http://www.ticalc.org/pub/86/asm/shells/ti86no8k.zip
 		this will go over the 8Kb barrier.

@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti85_crt0.asm,v 1.14 2001-09-25 07:41:06 stefano Exp $
+;	$Id: ti85_crt0.asm,v 1.15 2001-10-27 13:20:15 stefano Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -29,6 +29,8 @@
 
 	XDEF	base_graphics	; Graphics stuff
 	XDEF	coords		;
+
+	XDEF	snd_tick	; Sound variable
 
 	XDEF	cpygraph	; TI calc specific stuff
 	XDEF	tidi		;
@@ -155,11 +157,11 @@ ENDIF
 ;-------------------
 IF !NOT_DEFAULT_SHELL
 	DEFINE Rigel
+	
 	org	$9293		; 'real' origin to Rigel programs
 	defw	$FC00		; This is a Rigel program string
-	defb	enddesc-description+1
-	;org	;$9296		; Origin to Rigel programs
-.description			; = origin adress
+	defb	enddesc-description-1
+.description			; = "official" origin adress
 	DEFINE NEED_name
 	INCLUDE	"zcc_opt.def"	; Get namestring from zcc_opt.def
 	UNDEFINE NEED_name
@@ -168,10 +170,9 @@ IF !NOT_DEFAULT_SHELL
  ENDIF
 	defb	$0		; Termination zero
 .enddesc
-	defw	fixuptable-enddesc
+	defw	fixuptable-description	; Relative ptr to the fixup table
 	im	1
 ENDIF
-
 
 ;-------------------------------------
 ; End of header, begin of startup part
@@ -317,6 +318,10 @@ ENDIF
 ; mem stuff
 .base_graphics	defw	VIDEO_MEM
 .coords		defw	0
+
+IF DEFINED_NEED1bitsound
+.snd_tick	defb	0	; Sound variable
+ENDIF
 
 IF NEED_floatpack
 	INCLUDE	"#float.asm"
