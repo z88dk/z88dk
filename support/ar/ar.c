@@ -81,6 +81,8 @@ int main(int argc, char *argv[])
 	len  = read_intel32(fp,NULL);
 	if ( len == 0xFFFFFFFF ) 
 	    break;
+	if ( len == 0x0 )
+	    printf("Deleted...");
 	object_dump(fp,start,flags);
     } while ( next != 0xFFFFFFFF );
 
@@ -160,7 +162,7 @@ void object_dump(FILE *fp, unsigned long start, char flags)
 	}
     }
 
-    if ( expr != 0xFFFFFFFF && (flags | showexpr ) ) {
+    if ( expr != 0xFFFFFFFF && (flags & showexpr ) ) {
 	char type;
 	int  patch;
 	unsigned long end;
