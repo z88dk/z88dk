@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.11 2002-01-06 21:23:03 dom Exp $
+ *      $Id: zcc.c,v 1.12 2002-01-28 11:35:06 dom Exp $
  */
 
 
@@ -463,8 +463,8 @@ int main(argc, argv)
         int     argc;
         char    **argv;
 {
-        int     i, n, gc;
-        char    *temp,*temp2,*cfgfile;
+        int     i, gc;
+        char    *temp,*temp2;
         char    asmarg[4096];      /* Hell, that should be long enough! */
         char    buffer[LINEMAX+1]; /* For reading in option file */
         FILE    *fp;
@@ -534,7 +534,7 @@ int main(argc, argv)
  *      Now, set the linkargs list up to initially consist of
  *      the startuplib
  */
-        sprintf(buffer,"%s%s ",myconf[LIBPATH].def,myconf[STARTUPLIB].def);
+        snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[STARTUPLIB].def);
         BuildOptions(&linkargs,buffer);
 
 /*
@@ -722,9 +722,9 @@ int main(argc, argv)
  * Building an application - run the appmake command on it
  */
 		if (notruncat == 0 ) 
-                	sprintf(buffer,"%s %s %s",myconf[APPMAKE].def,outputfile,myconf[CRT0].def);
+                	snprintf(buffer,sizeof(buffer),"%s %s %s",myconf[APPMAKE].def,outputfile,myconf[CRT0].def);
 		else
-                	sprintf(buffer,"%s %s %s -nt",myconf[APPMAKE].def,outputfile,myconf[CRT0].def);
+                	snprintf(buffer,sizeof(buffer),"%s %s %s -nt",myconf[APPMAKE].def,outputfile,myconf[CRT0].def);
 
                 if (verbose) printf("%s\n",buffer);
                 if (system(buffer) ){
@@ -746,7 +746,7 @@ int main(argc, argv)
 int CopyFile(char *name1,char *ext1, char *name2, char *ext2)
 {
         char    buffer[LINEMAX+1];
-        sprintf(buffer,"%s %s%s %s%s",myconf[COPYCMD].def, name1,ext1,name2,ext2);
+        snprintf(buffer,sizeof(buffer),"%s %s%s %s%s",myconf[COPYCMD].def, name1,ext1,name2,ext2);
         if (verbose) printf("%s\n",buffer);
         return(system(buffer));
 }
@@ -908,11 +908,11 @@ void AddLink(char *arg)
  */
         if (strcmp(arg,"lmz")==0) {
 		AddComp(myconf[Z88MATHFLG].def+1); 
-        	sprintf(buffer,"%s%s ",myconf[LIBPATH].def,myconf[Z88MATHLIB].def);
+        	snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[Z88MATHLIB].def);
         	BuildOptions(&linkargs,buffer);
 		return;
 	} else if (strcmp(arg,"lm") == 0 ) {
-        	sprintf(buffer,"%s%s ",myconf[LIBPATH].def,myconf[GENMATHLIB].def);
+        	snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[GENMATHLIB].def);
         	BuildOptions(&linkargs,buffer);
 		return;
 	}
@@ -922,7 +922,7 @@ void AddLink(char *arg)
  * zlib: directory so all the libraries have simple names
  * Build what the option will be and stick it in..
  */
-        sprintf(buffer,"%s%s ",myconf[LIBPATH].def,arg+1);
+        snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,arg+1);
         BuildOptions(&linkargs,buffer);
 
 }
@@ -1430,10 +1430,10 @@ int FindConfigFile(char *arg, int gc)
 		strcat(outfilename,"zcc.cfg");
 	} else {
 #if 1
-#ifdef MSDOS
-		sprintf(outfilename,"%s\\lib\\config\\zcc.cfg",PREFIX);
+#ifdef __MSDOS__
+		snprintf(outfilename,sizeof(outfilename),"%s\\lib\\config\\zcc.cfg",PREFIX);
 #else
-		sprintf(outfilename,"%s/lib/config/zcc.cfg",PREFIX);
+		snprintf(outfilename,sizeof(outfilename),"%s/lib/config/zcc.cfg",PREFIX);
 #endif
 #else
 		fprintf(stderr,"Couldn't find env variable ZCCCFG\n");
