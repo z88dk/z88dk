@@ -2,11 +2,10 @@
 ;
 ;       Stefano Bodrato May 2003
 ;
-;       If an error occurs (eg. out if screen) we just drop back to BASIC
 ;
 ; - - - - - - -
 ;
-;       $Id: nascom_crt0.asm,v 1.1 2003-05-20 16:01:55 stefano Exp $
+;       $Id: nascom_crt0.asm,v 1.2 2003-06-27 14:04:12 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -43,16 +42,20 @@
 	XDEF    base_graphics   ;Graphical variables
 	XDEF    coords          ;Current xy position
 
-	XDEF
+	XDEF    montest         ;NASCOM: check the monitor type
 
-; NASSYS1..NASSYS3
-  IF (startup=1) | (startup=2) | (startup=3)
 
 	org	C80h
-
-  ENDIF
+	;org	E000h
+	
+; NASSYS1..NASSYS3
+;  IF (startup=1) | (startup=2) | (startup=3)
+;
+;
+;  ENDIF
 
 .start
+
 	ld	(start1+1),sp	;Save entry stack
 	ld      hl,-64		;Create an atexit() stack
 	add     hl,sp
@@ -87,10 +90,21 @@ ENDIF
 
 	pop	bc
 .start1	ld	sp,0		;Restore stack to entry value
-        ret
+	rst	18h
+	defb	5bh
+	;ret
 
 .l_dcal	jp	(hl)		;Used for function pointer calls
         jp      (hl)
+
+
+;------------------------------------
+; Check which monitor we have in ROM
+;------------------------------------
+
+montest: ld	a,(1)	; "T" monitor or NAS-SYS?
+         cp	33h	; 31 00 10     / 31 33 0C
+         ret
 
 
 ;-----------
@@ -123,7 +137,6 @@ ELSE
 		ENDIF
 	ENDIF
 ENDIF
-
 
 ;-----------
 ; Now some variables

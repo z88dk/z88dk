@@ -4,17 +4,18 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.60 2003-03-23 10:31:17 dom Exp $
+# $Id: Makefile,v 1.61 2003-06-27 14:04:12 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
-	nc_clib.lib vz_clib.lib vzansi_clib.lib cpm_clib.lib \
-	mz_clib.lib mzansi_clib.lib \
-	abc80_clib.lib aceansi_clib.lib sam_clib.lib samansi_clib.lib \
-	msx_clib.lib svi_clib.lib m5_clib.lib cpc_clib.lib \
-	c128ansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
-	rex_clib.lib zx81_clib.lib zx81ansi_clib.lib pps_clib.lib \
-	ppsansi_clib.lib embedded_clib.lib ozansi_clib.lib
+	nc_clib.lib vz_clib.lib vzansi_clib.lib abc80_clib.lib \
+	aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
+	cpc_clib.lib cpm_clib.lib c128ansi_clib.lib \
+	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
+	nascom.lib nasansi_clib.lib ozansi_clib.lib\
+	rex_clib.lib svi_clib.lib sam_clib.lib samansi_clib.lib \
+	zx81_clib.lib zx81ansi_clib.lib \
+	pps_clib.lib ppsansi_clib.lib embedded_clib.lib 
 
 genlibs: gen_math.lib malloc.lib z80_crt0.lib ndos.lib
 
@@ -202,7 +203,7 @@ pps_clib.lib:
 	cd stdio ; $(MAKE) generic
 	cd fcntl ; $(MAKE) lpps
 	cd printflike ; $(MAKE) 
-	cd setjmp ; $(MAKE) 
+	cd setjmp ; $(MAKE)
 	cd assert ; $(MAKE) 
 	cd time ; $(MAKE) lpps
 	cd rs232 ; $(MAKE) lzx
@@ -232,7 +233,7 @@ zxan_clib.lib:
 	./gamesdeps.sh
 	cd spectrum ; $(MAKE)
 	cd games ; $(MAKE)
-	z80asm -d -ns -nm -Mo -DFORzx -DROMFONT -xzxan_clib @zxansi.lst
+	z80asm -d -ns -nm -Mo -DFORzx -DPACKEDFONT -xzxan_clib @zxansi.lst
 
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:
@@ -272,7 +273,7 @@ vzansi_clib.lib:
 	cd stdio ; $(MAKE) generic
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
-	cd assert ; $(MAKE) 
+	cd assert ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORvz -xvzansi_clib @vzansi.lst
 
 # ZX81 lib - Stefano
@@ -675,10 +676,35 @@ msx_clib.lib:
 	cd strings ; $(MAKE)
 	cd stdlib ; $(MAKE) gen
 	cd stdio ; $(MAKE) generic
-	cd printflike ; $(MAKE) 
-	cd setjmp ; $(MAKE) 
-	cd assert ; $(MAKE) 
+	cd printflike ; $(MAKE)
+	cd setjmp ; $(MAKE)
+	cd assert ; $(MAKE)
 	z80asm -d -ns -nm -Mo -DFORmsx -xmsx_clib @msx.lst
+
+# NASCOM library - Stefano
+nascom_clib.lib:
+	@echo ''
+	@echo '--- Building NASCOM Library  ---'
+	@echo ''
+	cd strings ; $(MAKE)
+	cd stdlib ; $(MAKE) gen
+	cd stdio ; $(MAKE) generic
+	cd printflike ; $(MAKE)
+	cd setjmp ; $(MAKE)
+	cd assert ; $(MAKE)
+	z80asm -d -ns -nm -Mo -DFORnascom -xnascom_clib @nascom.lst
+
+nasansi_clib.lib:
+	@echo ''
+	@echo '--- Building NASCOM Library  ---'
+	@echo ''
+	cd strings ; $(MAKE)
+	cd stdlib ; $(MAKE) gen
+	cd stdio ; $(MAKE) generic
+	cd printflike ; $(MAKE)
+	cd setjmp ; $(MAKE)
+	cd assert ; $(MAKE)
+	z80asm -d -ns -nm -Mo -DFORnascom -xnasansi_clib @nasansi.lst
 
 # SORD M5 library - Stefano
 m5_clib.lib:
