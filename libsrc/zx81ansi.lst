@@ -65,6 +65,7 @@ stdlib/srand
 stdlib/strtol
 stdlib/strtoul
 strings/memset
+strings/memcmp
 strings/memcpy
 strings/memchr
 strings/reverse

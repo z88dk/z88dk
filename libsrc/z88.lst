@@ -79,6 +79,7 @@ stdlib/z88/csleep
 stdlib/z88/readbyte
 stdlib/z88/bindbnk1
 strings/memset
+strings/memcmp
 strings/memcpy
 strings/memchr
 strings/reverse
