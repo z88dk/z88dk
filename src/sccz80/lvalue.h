@@ -1,7 +1,7 @@
 /*
  * structure for lvalue's - (cclvalue.h)
  *
- * $Id: lvalue.h,v 1.1 2000-07-04 15:33:31 dom Exp $
+ * $Id: lvalue.h,v 1.2 2002-04-07 12:19:59 dom Exp $
  */
 
 struct lvalue {
@@ -14,6 +14,7 @@ struct lvalue {
         void (*binop)() ;                /* function address of highest/last binary operator */
         char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
         int val_type ;                  /* type of value calculated */
+	int oldval_type;		/* What the valtype was */
         char flags ;                    /* As per symbol */
         char oflags;                    /* Needed for deref of far str*/
         int type;                       /* type (from symbol table) */

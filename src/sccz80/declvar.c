@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.7 2002-02-20 11:11:54 dom Exp $
+ *      $Id: declvar.c,v 1.8 2002-04-07 12:19:59 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -35,10 +35,12 @@
  * test for global declarations/structure member declarations
  */
 
-int dodeclare(storage, mtag, is_struct)
-int storage ;
-TAG_SYMBOL *mtag ;              /* tag of struct whose members are being declared, or zero */
-int is_struct ;                 /* TRUE if struct member is being declared,                                    zero for union */
+int 
+dodeclare (
+    int storage,
+    TAG_SYMBOL *mtag,              /* tag of struct whose members are being declared, or zero */
+    int is_struct                 /* TRUE if struct member is being declared,                                    zero for union */
+)
                                 /* only matters if mtag is non-zero */
 {
         struct varid var;       /* Our little structure for iding vars */
@@ -67,14 +69,8 @@ int is_struct ;                 /* TRUE if struct member is being declared,     
  * return pointer to new structure tag
  */
 
-#ifndef SMALL_C
 TAG_SYMBOL *
-#endif
-
-defstruct(sname, storage, is_struct)
-char *sname ;
-int storage ;
-int is_struct ;
+defstruct (char *sname, int storage, int is_struct)
 {
         int itag ;                              /* index of tag in tag symbol table */
         char nam[20];                           /* Dummy name */
@@ -142,7 +138,8 @@ void defenum(char *sname, char storage)
 /*
  * make a first stab at determining the ident of a variable
  */
-int get_ident()
+int 
+get_ident (void)
 {
         if ( match("**") )
                 return PTR_TO_PTR ;
@@ -158,9 +155,8 @@ int get_ident()
 /*
  * return correct index into dummy_sym
  */
-int dummy_idx(typ, otag)
-int typ ;
-TAG_SYMBOL *otag ;
+int 
+dummy_idx (int typ, TAG_SYMBOL *otag)
 {
         if ( typ == STRUCT )
                 return NTYPE + 1 + (otag-tagtab) ;
@@ -704,8 +700,8 @@ ExpandArgValue(unsigned char value, char *buffer, char tagidx)
 /*
  * test for function returning/array of ptr to ptr (unsupported)
  */
-void ptrerror(ident)
-int ident ;
+void 
+ptrerror (int ident)
 {
         if ( ident == PTR_TO_PTR )
                 error(E_INDIRECTION) ;
@@ -719,7 +715,8 @@ int ident ;
  *      this routine makes subscript the absolute
  *      size of the array.
  */
-int needsub()
+int 
+needsub (void)
 {
         long num;
 
@@ -820,7 +817,8 @@ TAG_SYMBOL *GetVarID(struct varid *var,char storage)
  *      Swallow bitfield definition 
  */
 
-void BitFieldSwallow()
+void 
+BitFieldSwallow (void)
 {
         long    val;
         if      (cmatch(':')) {

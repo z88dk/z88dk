@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.13 2002-02-21 16:46:00 dom Exp $
+ *      $Id: codegen.c,v 1.14 2002-04-07 12:19:59 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -814,8 +814,8 @@ void testjump(LVALUE *lval,int label)
 {
         ol("ld\ta,h");
         ol("or\tl");
-        if (lval->val_type == LONG && WasComp(lval) ) { ol("or\td"); ol("or\te"); }
-        if (lval->val_type == CPTR && WasComp(lval) ) { ol("or\te"); }
+        if (lval->oldval_type == LONG && WasComp(lval) ) { ol("or\td"); ol("or\te"); }
+        if (lval->oldval_type == CPTR && WasComp(lval) ) { ol("or\te"); }
         opjump("z,",label);
 }
 
@@ -828,7 +828,7 @@ void zerojump(
 {
         clearstage(lval->stage_add, 0) ;                /* purge conventional code */
 #ifdef CHARCOMP0
-        if      (lval->val_type == CCHAR ) {
+        if      (lval->oldval_type == CCHAR ) {
                 if (oper==testjump ) { /* !=0 or >=0U */
                         LoadAccum();
                         ol("and\ta");
@@ -1275,6 +1275,7 @@ void asl(LVALUE *lval)
 /* Form logical negation of primary register */
 void lneg(LVALUE *lval)
 {
+    lval->oldval_type = lval->val_type;
     switch(lval->val_type) {
     case LONG:
     case CPTR:
@@ -1376,7 +1377,7 @@ void dummy(LVALUE *lval, int label)
 void eq0(LVALUE *lval,int label)
 {
         WasComp(lval);
-        switch(lval->val_type) {
+        switch(lval->oldval_type) {
 #ifdef CHARCOMP0
                 case CCHAR:
                         ol("ld\ta,l");
@@ -1404,7 +1405,7 @@ void eq0(LVALUE *lval,int label)
 
 void lt0(LVALUE *lval, int label)
 {
-        switch(lval->val_type) {
+        switch(lval->oldval_type) {
 #ifdef CHARCOMP0
                 case CCHAR:
                         ol("xor\ta");
@@ -1431,8 +1432,8 @@ void le0(LVALUE *lval, int label)
 {
         ol("ld\ta,h") ;
         ol("or\tl");
-        if (lval->val_type==LONG) { ol("or\td"); ol("or\te"); }
-        if (lval->val_type==CPTR) { ol("or\te"); }
+        if (lval->oldval_type==LONG) { ol("or\td"); ol("or\te"); }
+        if (lval->oldval_type==CPTR) { ol("or\te"); }
         ol("jr\tz,ASMPC+7");
         lt0(lval,label);
 }
@@ -1450,7 +1451,7 @@ void gt0(LVALUE *lval,int label)
 void ge0(LVALUE *lval, int label)
 {
         ol("xor\ta") ;
-	switch(lval->val_type) {
+	switch(lval->oldval_type) {
 		case LONG:
 			ol("or\td");
 			break;
@@ -1469,6 +1470,7 @@ void ge0(LVALUE *lval, int label)
 /* Test for equal */
 void zeq(LVALUE *lval)
 {
+    lval->oldval_type = lval->val_type;
     switch(lval->val_type) {
     case LONG:
     case CPTR:
@@ -1500,6 +1502,7 @@ void zeq(LVALUE *lval)
 /* Test for not equal */
 void zne(LVALUE *lval)
 {
+    lval->oldval_type = lval->val_type;
     switch(lval->val_type) {
     case LONG:
     case CPTR:
@@ -1530,6 +1533,8 @@ void zne(LVALUE *lval)
 /* Test for less than*/
 void zlt(LVALUE *lval)
 {
+    lval->oldval_type = lval->val_type;
+
     switch(lval->val_type) {
     case LONG:
     case CPTR:
@@ -1569,6 +1574,8 @@ void zlt(LVALUE *lval)
 /* Test for less than or equal to (signed/unsigned) */
 void zle(LVALUE *lval)
 {
+    lval->oldval_type = lval->val_type;
+
     switch(lval->val_type) {
     case LONG:
     case CPTR:
@@ -1615,6 +1622,8 @@ void zle(LVALUE *lval)
 /* Test for greater than (signed/unsigned) */
 void zgt(LVALUE *lval)
 {
+    lval->oldval_type = lval->val_type;
+
     switch(lval->val_type) {
     case LONG:
     case CPTR:
@@ -1656,6 +1665,8 @@ void zgt(LVALUE *lval)
 /* Test for greater than or equal to */
 void zge(LVALUE *lval)
 {
+    lval->oldval_type = lval->val_type;
+
     switch(lval->val_type) {
     case LONG:
     case CPTR:
@@ -1709,6 +1720,18 @@ void zcarryconv()
  *      Routines for conversion between different types, kept in this
  *      file to aid conversion etc
  */
+
+void convUint2char(void)
+{
+	ol("ld\th,0");
+}
+
+void convSint2char(void)
+{
+	ol("ld\ta,l");
+	callrts("l_sxt");
+}
+	
 
 /* Unsigned int to long */
 void convUint2long(void)

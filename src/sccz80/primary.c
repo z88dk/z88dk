@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.12 2002-03-14 19:38:55 dom Exp $
+ *      $Id: primary.c,v 1.13 2002-04-07 12:19:59 dom Exp $
  */
 
 
@@ -271,6 +271,20 @@ void force(int t1, int t2,char sign1,char sign2,int lconst)
 /* Converting between pointer types..far and near */
         if (t1==CPTR && t2==CINT) convUint2long();
         else if (t2==CPTR && t1==CINT) warning(W_FARNR);
+
+	/* Char conversion */
+	if ( t1 == CCHAR && sign2 == NO ) {
+		if ( sign1 == NO )
+			convSint2char();
+		else
+			convUint2char();
+	} else if ( t1 == CCHAR && sign2 == YES ) {
+		if ( sign1 == NO )
+			convSint2char();
+		else
+			convUint2char();
+	}
+		
 }
 
 /*
@@ -587,7 +601,9 @@ void test(int label,int parens)
         if (parens) needchar('(');
         while(1) {
                 setstage( &before, &start ) ;
-                if ( heir1(&lval) ) rvalue(&lval) ;
+                if ( heir1(&lval) ) {
+			rvalue(&lval) ;
+		}
                 if ( cmatch(',') )
                         clearstage( before, start) ;
                 else break ;

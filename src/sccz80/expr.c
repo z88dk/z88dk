@@ -2,7 +2,7 @@
  * cc4.c - fourth part of Small-C/Plus compiler
  *         routines for recursive descent
  *
- * $Id: expr.c,v 1.8 2002-02-20 11:11:54 dom Exp $
+ * $Id: expr.c,v 1.9 2002-04-07 12:19:59 dom Exp $
  *
  */
 
@@ -196,11 +196,18 @@ LVALUE *lval ;
 /* New handling by djm 13/5/99, push flags, load true, jump on true 
  * The optimizer will with a bit of luck catch inefficient push/pop
  */
+#if 1
+			jumpnc(falselab=getlabel());
+			if ( heir1(&lval2)) rvalue(&lval2);
+			jump(endlab=getlabel());
+			postlabel(falselab);
+#else
                         zpushflags();
                         /* evaluate 'true' expression */
                         if ( heir1(&lval2) ) rvalue(&lval2) ;
                         zpopflags();
                         jumpc(endlab=getlabel());
+#endif
                 }
                 needchar(':') ;
                 /* evaluate 'false' expression */
