@@ -1,9 +1,18 @@
+$Id: README,v 1.1 2001-04-17 09:15:44 stefano Exp $
+
+
+The batch files are the OLD conversion tools; they use conversion utilities that 
+can be found on ticalc.org
+When possible use bin2var: a single utility covers all the TI calculators.
+
+
 TI82: CrASH shell SDK suggested (http://www.lfx.org/crashware/ or http://www.ticalc.org)
 zcc82.bat - uses the CRPRGM82.EXE command (included with the shell).
 
 
-TI83: Tested under TI-Explorer (suggested: http://www.ticalc.org/pub/83/asm/shells/explorer.zip),
-	 ANOVA, SOS and ASHELL (NOT the ION SHELL!).
+TI83: All the Shells ! (http://www.ticalc.org/pub/83/asm/shells)
+	Change the -startup flag at compile time (see TI83_CRT0.ASM)
+	ION Shell is used by default, now.
 zcc83.bat - uses the debug command as a workaround for problems with DEVPAC83.COM and WIN2000/NT.
 	Probably UNICODE is a problem for the parameter parser; this should FIX.
 	Such FIX isn't necessary for MS DOS - Win 95/98/ME, but should work.
