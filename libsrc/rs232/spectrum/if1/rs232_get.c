@@ -19,11 +19,11 @@ u8_t rs232_get(i8_t *char)
 	defb	$1d
 
 	pop	de
-	ld	hl,RS_ERR_NO_DATA
-	and	a
-	ret	z
-	ld	(de),a
 	ld	hl,RS_ERR_OK
+	jr	nc,exitget
+	ld	(de),a
+	ld	hl,RS_ERR_NO_DATA
+.exitget
 	push	bc		;any rubbish will do
 #endasm
 }
