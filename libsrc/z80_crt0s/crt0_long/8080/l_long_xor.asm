@@ -4,13 +4,14 @@
 ;	Stefano - 29/4/2002
 ;
 
-                XLIB    l_long_and
+                XLIB    l_long_xor
 
 ;Logical routines for long functions    dehl
 ;first opr on stack
 
 
-.l_long_and   
+; "xor" deHL' and dehl into HLde'
+.l_long_xor   
 	ex	(sp),hl
 	ld	(retloc+1),hl
 	pop	bc
@@ -19,22 +20,22 @@
         add     hl,sp   ;points to hl on stack
 
         ld      a,c
-        and     (hl)
+        xor     (hl)
         inc     hl
         ld      c,a
 
         ld      a,b
-        and     (hl)
+        xor     (hl)
         inc     hl
         ld      b,a
 
         ld      a,e
-        and     (hl)
+        xor     (hl)
         inc     hl
         ld      e,a
 
         ld      a,d
-        and     (hl)
+        xor     (hl)
 	inc	hl
         ld      d,a
 
@@ -44,5 +45,3 @@
         ld      h,b
 
 .retloc	jp	0
-
-
