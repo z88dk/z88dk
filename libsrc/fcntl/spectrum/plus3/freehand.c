@@ -8,7 +8,7 @@
  *
  *	djm 17/3/2000
  *
- *	$Id: freehand.c,v 1.1 2001-05-01 13:55:21 dom Exp $
+ *	$Id: freehand.c,v 1.2 2003-10-12 12:44:23 dom Exp $
  */
 
 #include <spectrum.h>
@@ -22,16 +22,20 @@ void freehand(int handle)
 #asm
 ; Enter with hl holding filehandle
 ; Exit: b = file handle
-	ld	de,65534	
-	ld	b,l
-.loop
 	scf
+	ex	af,af
+	ld	de,65534
+	ld	a,l
+.loop	and	a
+	jr	z,gotone
+	ex	af,af
 	rl	e
 	rl	d
-	djnz	loop
+	ex	af,af
+	dec	a
+	jr	loop
 ; Weve found a free handle - hurrah!
-.gotone
-	ld	hl,(_hand_status)
+.gotone	ld	hl,(_hand_status)
 	call	l_and	;Mark as used
 	ld	(_hand_status),hl
 	ld	b,l

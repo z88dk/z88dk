@@ -3,7 +3,7 @@
  *
  *	18/3/2000 djm
  *
- *	$Id: close.c,v 1.2 2003-10-10 11:05:02 dom Exp $
+ *	$Id: close.c,v 1.3 2003-10-12 12:44:23 dom Exp $
  */
 
 #include <fcntl.h>
@@ -21,7 +21,7 @@ int close(int handle)
 	push	hl
 	push	bc
 	ld	b,l
-	push	bc
+	push	hl
 	ld	iy,DOS_CLOSE
 	call	dodos
 	pop	de
