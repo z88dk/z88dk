@@ -36,11 +36,11 @@ stdio/fabandon
 stdio/vz200/fgetc_cons
 stdio/fgets_cons
 stdio/vz200/getk
-stdio/spectrum/puts_cons
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc
 stdio/ansi/fputc_cons
+stdio/ansi/puts_cons
 stdio/ansi/f_ansi_dsr6
 stdio/ansi/vz200/f_ansi_attr
 stdio/ansi/vz200/f_ansi_bel
@@ -136,7 +136,6 @@ graphics/setxy
 graphics/fill
 graphics/dfill
 graphics/vz200/putsprite
-graphics/getsprite
 graphics/vz200/bksave
 graphics/vz200/bkrestore
 graphics/vz200/pixladdr

@@ -38,11 +38,11 @@ stdio/ticalc/fgetc_cons
 stdio/fgets_cons
 stdio/ticalc/getk
 stdio/ticalc/getk_decode
-stdio/spectrum/puts_cons
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc
 stdio/ansi/fputc_cons
+stdio/ansi/puts_cons
 stdio/ansi/f_ansi_dsr6
 stdio/ansi/ticalc/f_ansi_attr
 stdio/ansi/ticalc/f_ansi_bel
@@ -91,7 +91,6 @@ strings/strstr
 strings/strstrip
 strings/strtok
 strings/strupr
-time/spectrum/clock
 setjmp/longjmp
 setjmp/setjmp
 assert/assert

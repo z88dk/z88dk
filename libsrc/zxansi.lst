@@ -39,6 +39,7 @@ stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc
 stdio/ansi/fputc_cons
+stdio/ansi/puts_cons
 stdio/ansi/f_ansi_dsr6
 stdio/ansi/spectrum/f_ansi_attr
 stdio/ansi/spectrum/f_ansi_bel
@@ -47,7 +48,6 @@ stdio/ansi/spectrum/f_ansi_cls
 stdio/ansi/spectrum/f_ansi_dline
 stdio/ansi/spectrum/f_ansi_scrollup
 stdio/spectrum/getk
-stdio/spectrum/puts_cons
 fcntl/dummy/open
 fcntl/dummy/open_z88
 fcntl/dummy/close
@@ -116,7 +116,6 @@ graphics/dcircle
 graphics/draw
 graphics/drawb
 graphics/drawr
-graphics/getsprite
 graphics/lbitmask
 graphics/lftscrol
 graphics/line
@@ -139,7 +138,6 @@ graphics/setxy
 graphics/fill
 graphics/dfill
 graphics/putsprite
-graphics/getsprite
 graphics/bksave
 graphics/bkrestore
 graphics/spectrum/pixladdr
