@@ -13,9 +13,18 @@
 ;
 ; DE == HL
 .l_eq
+	and	a
+	sbc	hl,de
+	ld	a,h
+	or	l	;resets carry
+	ret	nz
+	scf
+	ret
+IF 0
         call    l_cmp
         scf
         ret   z
         ccf
         dec   hl
         ret
+ENDIF

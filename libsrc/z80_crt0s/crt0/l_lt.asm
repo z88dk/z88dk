@@ -14,7 +14,6 @@
 .l_lt
         call    l_cmp
         ret     c
-        dec     hl
         ret
 
 

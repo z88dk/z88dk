@@ -15,5 +15,4 @@
         ex de,hl
         call    l_cmp
         ret   c
-        dec   hl
         ret

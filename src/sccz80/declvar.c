@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.6 2002-01-20 23:30:36 dom Exp $
+ *      $Id: declvar.c,v 1.7 2002-02-20 11:11:54 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -748,7 +748,7 @@ int needsub()
 
 TAG_SYMBOL *GetVarID(struct varid *var,char storage)
 {
-        TAG_SYMBOL *otag;
+        TAG_SYMBOL *otag = NULL;
         char    sname[NAMEMAX];
         SYMBOL  *ptr;
         

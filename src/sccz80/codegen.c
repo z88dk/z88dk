@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.10 2002-02-19 20:15:17 dom Exp $
+ *      $Id: codegen.c,v 1.11 2002-02-20 11:11:54 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -1126,19 +1126,19 @@ void zadd(LVALUE *lval)
 /*      (results in primary) */
 void zsub(LVALUE *lval)
 {
-        switch(lval->val_type) {
-                case LONG:
-		case CPTR:
-                        callrts("l_long_sub");
-                        Zsp +=4;
-                        break;
-                case DOUBLE:
-                        callrts("dsub");
-                        Zsp += 6;
-                        break;
-                default:
-                        callrts("l_sub");
-        }
+    switch(lval->val_type) {
+    case LONG:
+    case CPTR:
+	callrts("l_long_sub");
+	Zsp +=4;
+	break;
+    case DOUBLE:
+	callrts("dsub");
+	Zsp += 6;
+	break;
+    default:
+	callrts("l_sub");
+    }
 }
 
 /* Multiply the primary and secondary registers */
@@ -1275,14 +1275,22 @@ void asl(LVALUE *lval)
 /* Form logical negation of primary register */
 void lneg(LVALUE *lval)
 {
-        switch(lval->val_type) {
-                case LONG:
-		case CPTR:
-                        callrts("l_long_lneg");
-                        break;
-                default:
-                        callrts("l_lneg");
-        }
+    switch(lval->val_type) {
+    case LONG:
+    case CPTR:
+	lval.val_type = CINT;
+	callrts("l_long_lneg");
+	break;
+    case CARRY:
+	lval.val_type = CARRY;
+	ccf();
+	break;
+    case DOUBLE:
+	convdoub2int();
+    default:
+	lval.val_type = CARRY;
+	callrts("l_lneg");
+    }
 }
 
 /* Form two's complement of primary register */
@@ -1312,6 +1320,12 @@ void com(LVALUE *lval)
                 default:
                         callrts("l_com");
         }
+}
+
+/* Complement the carry flag (used after arithmetic before !) */
+void ccf(void)
+{
+    ol("ccf");
 }
 
 /*
@@ -1363,10 +1377,12 @@ void eq0(LVALUE *lval,int label)
 {
         WasComp(lval);
         switch(lval->val_type) {
+#ifdef CHARCOMP0
                 case CCHAR:
                         ol("ld\ta,l");
                         ol("and\ta");
                         break;
+#endif
                 case LONG:
                         ol("ld\ta,h");
                         ol("or\tl");

@@ -17,5 +17,4 @@
         scf
         ret     z
         ccf
-        dec     hl
         ret

@@ -15,9 +15,4 @@
         call    l_cmp
 ;invert carry condition
         ccf
-        ret     c
-
-;        ret     nc
-        dec     hl
         ret
-

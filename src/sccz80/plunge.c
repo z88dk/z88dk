@@ -3,7 +3,7 @@
  *
  *      Plunging routines
  *
- *      $Id: plunge.c,v 1.2 2001-02-01 12:04:41 dom Exp $
+ *      $Id: plunge.c,v 1.3 2002-02-20 11:11:54 dom Exp $
  *
  *      Altogether now...arse! My cunning scheme to use c as an
  *      indicator flops badly due to logical conditions, I just
@@ -46,6 +46,7 @@ LVALUE *lval ;
                         postlabel(droplab);
                         vconst(dropval);
                         postlabel(endlab) ;
+                        lval->val_type = CINT;  /* stops the carry stuff coming in */
                         lval->indirect = lval->ptr_type = lval->is_const =
                                 lval->const_val = 0 ;
                         lval->stage_add = NULL_CHAR ;

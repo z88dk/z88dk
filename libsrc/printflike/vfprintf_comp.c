@@ -10,17 +10,15 @@
 
 
 extern __LIB__ utoi(); 
-extern __LIB__ itod();
-extern __LIB__ itou();
-extern __LIB__ itox();
 
-int vfprintf_comp(fd,ctl, nxtarg)
+
+int vfprintf_comp(fd,ctl, ap)
 FILE *fd ;
 unsigned char *ctl;
-void *nxtarg ;
+void *ap ;
 {
         int i, prec, preclen, len ;
-        unsigned char c, right, str[7], pad;
+        unsigned char c, right, str[25], pad;
         int width, pf_count=0;
         unsigned char *sptr, *cx ;
 
@@ -62,26 +60,40 @@ void *nxtarg ;
                         preclen = 0 ;
                 sptr = str ;
                 c = *cx++ ;
-                i = *(nxtarg--) ;
+		i = *ap;
+		ap -= sizeof(int);
                 switch(c) {
-                        case 'd' :
-                                itod(i, str, 7) ;
-                                break ;
-                        case 'x' :
-                                itox(i, str, 7) ;
-                                break ;
-                        case 'c' :
-                                str[0] = i ;
-                                str[1] = NULL ;
-                                break ;
-                        case 's' :
-                                sptr = (unsigned char *)i ;
-                                break ;
-                        case 'u' :
-                                itou(i, str, 7) ;
-                                break ;
-                        default:
-                                continue ;
+		case 'l':
+		    c = *cx++;
+		    switch ( c ) {
+		    case 'd':
+		    case 'u':
+		    case 'x':
+			ltoa_any(*(long *)ap,str,20,( c == 'x' ? 16 : 10 ),(c == 'd'));
+			ap -= sizeof(int);
+			break;
+		    default:
+			continue;
+		    }
+		    break;
+		case 'u':
+		    ltoa_any((unsigned long)i,str,7,10,0);
+		    break;
+		case 'd' :
+		    ltoa_any(i,str,7,10,1);
+		    break ;
+		case 'x' :
+		    ltoa_any((unsigned long)i,str,7,16,0);
+		    break ;
+		case 'c' :
+		    str[0] = i ;
+		    str[1] = 0 ;
+		    break ;
+		case 's' :
+		    sptr = (unsigned char *)i ;
+		    break ;		
+		default:
+		    continue ;
                 }
                 ctl = cx ; /* accept conversion spec */
                 if ( c != 's' )

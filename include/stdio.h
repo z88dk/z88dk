@@ -1,7 +1,7 @@
 #ifndef __STDIO_H__
 #define __STDIO_H__
 
-/* $Id: stdio.h,v 1.7 2002-01-21 11:56:06 dom Exp $ */
+/* $Id: stdio.h,v 1.8 2002-02-20 11:11:53 dom Exp $ */
 
 #ifdef FDSTDIO
 #include <z88stdio.h>
@@ -150,6 +150,8 @@ extern int __LIB__ vfprintf_comp(FILE *, unsigned char *, void *);
 extern int __LIB__ vfprintf_fp(FILE *, unsigned char *, void *);
 
 extern __LIB__ printn(int number, int radix,FILE *file);
+extern int __LIB__ ltoa_any(long in,unsigned  char *str, int sz, unsigned int radix, int signflag);
+
 
 /*
  * Scanf family 

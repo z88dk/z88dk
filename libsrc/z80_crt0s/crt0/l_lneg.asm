@@ -13,7 +13,7 @@
         or l
         jr z,l_lneg1
         ld hl,0
-	and	a	;reset c
+;	and	a	;reset c (already done by or l)
         ret
 .l_lneg1  
         inc   hl

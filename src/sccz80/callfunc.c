@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.2 2002-01-28 11:51:16 dom Exp $
+ *      $Id: callfunc.c,v 1.3 2002-02-20 11:11:54 dom Exp $
  */
 
 /*
@@ -36,8 +36,7 @@ extern int smartprintf;
 
 
 
-void callfunction(ptr)
-SYMBOL *ptr;    /* symbol table entry (or 0) */
+void callfunction(SYMBOL *ptr)
 {
         int nargs, vconst, val,expr,argnumber ;
         int watcharg;   /* For watching printf etc */
@@ -69,6 +68,10 @@ SYMBOL *ptr;    /* symbol table entry (or 0) */
                 if ( ptr ) {
                         /* ordinary call */
                         expr=expression(&vconst, &val);
+			if ( expr == CARRY ) {
+			    zcarryconv();
+			    expr = CINT;
+			}
                         if (ptr->prototyped && (ptr->prototyped >= argnumber) ) {
                                 protoarg=ptr->args[ptr->prototyped-argnumber+1];
                                 if ( (protoarg!=PELLIPSES) && ( (protoarg != fnargvalue) || ((protoarg&7)==STRUCT) ) ) 
@@ -108,6 +111,10 @@ SYMBOL *ptr;    /* symbol table entry (or 0) */
 
                         zpush();        /* Push address */
                         expr=expression(&vconst, &val);
+			if ( expr == CARRY ) {
+			    zcarryconv();
+			    expr = CINT;
+			}
                         if (expr == LONG || expr == CPTR || (expr==POINTER && lpointer) ) {
                                 lpush2();
                                 nargs += 4;

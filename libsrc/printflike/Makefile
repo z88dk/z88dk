@@ -5,7 +5,7 @@
 
 
 all: itou.o utoi.o printf.o sprintf.o fprintf.o vfprintf_comp.o vsprintf.o \
-     scanf.o sscanf.o fscanf.o vfscanf.o vsscanf.o vfprintf_fp.o
+     scanf.o sscanf.o fscanf.o vfscanf.o vsscanf.o vfprintf_fp.o ltoa_any.o
 
 .c.o:
 	zcc -vn -Wn43 -make-lib $*.c

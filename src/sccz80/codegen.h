@@ -70,6 +70,7 @@ extern void asl(LVALUE *);
 extern void lneg(LVALUE *);
 extern void neg(LVALUE *);
 extern void com(LVALUE *);
+extern void ccf(void);
 extern void inc(LVALUE *);
 extern void dec(LVALUE *);
 extern void zeq(LVALUE *);

@@ -1,6 +1,6 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.4 2002-01-28 11:51:16 dom Exp $
+ * $Id: define.h,v 1.5 2002-02-20 11:11:54 dom Exp $
  */
 
 /*      Stand-alone definitions                 */
@@ -21,8 +21,13 @@
 
 /*      System wide name size (for symbols)     */
 
-#define NAMESIZE 127
-#define NAMEMAX  32 
+#if defined(__MSDOS__) && defined(__TURBOC__)
+ #define NAMESIZE 33
+ #define NAMEMAX  32 
+#else
+ #define NAMESIZE 127
+ #define NAMEMAX 126
+#endif
 
 #define MAXARGS 10
 
@@ -33,7 +38,11 @@
 #define STARTGLB        symtab
 #define ENDGLB          (STARTGLB+NUMGLBS)
 
-#define NUMLOC          512
+#if defined(__MSDOS__) && defined(__TURBOC__)
+#define NUMLOC          33
+#else
+#define NUMLOC		512
+#endif
 #define STARTLOC        loctab
 #define ENDLOC          (STARTLOC+NUMLOC)
 
@@ -101,6 +110,7 @@ SYMBOL {
 #define VOID    7       /* This does actually do sommat now */
 #define ELLIPSES 8      /* Used for ANSI defs */
 #define ENUM    9       /* ONly used in symbol table */
+#define CARRY   10      /* Carry stuff */
 
 /*
  *      Value of ellipses in prototypes
@@ -224,11 +234,19 @@ GOTO_TAB {
 
 /*      Define the literal pool                 */
 
-#define LITABSZ 49152
+#if defined(__MSDOS__) && defined(__TURBOC__)
+ #define LITABSZ 950
+#else
+ #define LITABSZ 49152
+#endif
 #define LITMAX  LITABSZ-1
 
 /*      For the function literal queues... */
-#define FNLITQ 49152
+#if defined(__MSDOS__) && defined(__TURBOC__)
+ #define FNLITQ 5000
+#else
+ #define FNLITQ 49152
+#endif
 #define FNMAX FNLITQ-1
 
 /*      Define the input line                   */

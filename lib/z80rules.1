@@ -1898,3 +1898,244 @@
 	add	hl,sp
 	ld	l,(hl)
 	ld	h,0
+
+	jp	nc,%1
+	call	%2
+.%1
+=
+	call	c,%2
+.%1
+
+	jp	c,%1
+	call	%2
+.%1
+=
+	call	nc,%2
+.%1
+
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,%1	;const
+	call	l_eq
+	ld	hl,0	;const
+	rl	l
+=
+	ld	a,(hl)
+	cp	#( %1 % 256)
+	ld	hl,0
+	jr	nz,ASMPC+3
+	inc	hl
+
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,%1	;const
+	call	l_eq
+	ld	hl,%2
+	jp	c,%3
+	ld	hl,%4
+=
+	ld	a,(hl)
+	cp	#(%1 % 256)
+	ld	hl,%2
+	jp	z,%3
+	ld	hl,%4
+
+	jr	z,ASMPC+3
+	scf
+	call	c,%2
+=
+	call	nz,%2
+
+	jr	nz,ASMPC+3
+	scf
+	call	c,%2
+=
+	call	z,%2
+
+	call	l_gchar
+	push	hl
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gchar
+	pop	de
+	ld	a,l
+	sub	e
+=
+	ld	e,(hl)
+	ld	hl,%1-2	;const
+	add	hl,sp
+	ld	a,(hl)
+	sub	e
+
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	sub	e
+=
+	ld	e,(hl)
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	a,(hl)
+	sub	e
+
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,%1	;const
+	ld	a,l
+	sub	e
+=
+	ld	a,#(%1 % 256)
+	sub	(hl)
+
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,%1	;const
+	ld	a,e
+	sub	l
+=
+	ld	a,(hl)
+	sub	#(%1 % 256)
+
+	call	l_gchar
+	ld	de,%1	;const
+	ex	de,hl
+	ld	a,e
+	sub	l
+=
+	ld	a,(hl)
+	sub	#(%1 % 256)
+
+	xor	a
+	sub	(hl)
+	and	a
+	jr	nz,ASMPC+3
+	scf
+	jp	nc,%1
+=
+	ld	a,(hl)
+	and	a
+	jp	nz,%1
+
+	ld	l,a
+	ld	h,0
+	ld	de,%1	;const
+	ex	de,hl
+	ld	a,l
+	sub	e
+	and	a
+	jr	nz,ASMPC+3
+	scf
+	jp	nc,%2
+=
+	cp	#(%1 % 256)
+	jp	nz,%2
+
+	ld	l,(hl)
+	ld	h,0
+	push	hl
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	a,(hl)
+	%2	#%3
+	ld	l,a
+	ld	h,0
+	pop	de
+	ld	a,e
+=
+	ld	e,(hl)
+	ld	hl,%1-2	;const
+	add	hl,sp
+	ld	a,(hl)
+	%2	#%3
+	ld	l,a
+	ld	a,e
+
+	and	a
+	jr	nz,ASMPC+3
+	scf
+	jp	%2c,%1
+=
+	jp	%2z,%1
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	and	a
+	jp	%2z,%1
+=
+	ld	a,(hl)
+	and	a
+	jp	%2z,%1
+
+	ld	hl,(%1)
+	ld	h,0
+	ld	de,%2	;const
+	ex	de,hl
+=
+	ld	a,(%1)
+	ld	e,a
+	ld	d,0
+	ld	hl,%2	;const
+
+	ld	de,1
+	call	l_asl
+=
+	add	hl,hl
+
+	ld	de,2
+	call	l_asl
+=
+	add	hl,hl
+	add	hl,hl
+
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,%1
+	and	a
+	sbc	hl,de
+=
+	ld	a,(hl)
+	ld	hl,%1
+	sub	l
+	ld	l,a
+	ld	h,0
+
+	ex	de,hl
+	ld	a,h
+	or	l
+	jp	z,%1
+	ld	hl,%2
+=
+	ld	a,d
+	or	e
+	jp	z,%1
+	ld	hl,%2
+
+	ld	hl,1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+=
+	pop	hl
+	push	hl
+	ld	h,0
+
+	ld	l,a
+	ld	h,0
+	ld	de,%1
+	ex	de,hl
+=
+	ld	e,a
+	ld	d,0
+	ld	hl,%1
+
+	ld	l,(hl)
+	ld	h,0
+	%1c	l
+	ld	hl,%2
+=
+	ld	hl,%2

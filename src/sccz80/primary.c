@@ -5,15 +5,14 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.10 2002-01-28 11:51:16 dom Exp $
+ *      $Id: primary.c,v 1.11 2002-02-20 11:11:54 dom Exp $
  */
 
 
 #include "ccdefs.h"
 
 
-int primary(lval)
-LVALUE *lval;
+int primary(LVALUE *lval)
 {
         char sname[NAMESIZE] ;
         SYMBOL *ptr ;
@@ -167,8 +166,7 @@ LVALUE *lval;
  */
 
 
-void dcerror(lval)
-LVALUE *lval ;
+void dcerror(LVALUE *lval)
 {
         if ( lval->val_type == DOUBLE )
                 warning(W_INTDOUB) ;
@@ -177,10 +175,10 @@ LVALUE *lval ;
 /*
  * calculate constant expression (signed values)
  */
-int calc(left, oper, right)
-int left;
-void (*oper)(void);
-int right;
+int calc(
+	 int left,
+	 void (*oper)(void),
+	 int right)
 {
         if (oper == zdiv)      return (left / right );
         else if (oper == zmod) return (left % right );
@@ -192,10 +190,10 @@ int right;
         else return(CalcStand(left,oper,right)) ;
 }
 
-int calcun(left,oper,right)
-unsigned int left;
-void (*oper)(void);
-unsigned int right;
+int calcun(
+	   unsigned int left,
+	   void (*oper)(void),
+	   unsigned int right)
 {
         if (oper == zdiv)      return (left / right );
         else if (oper == zmod) return (left % right );
@@ -211,10 +209,10 @@ unsigned int right;
  * Calculations..standard ones - same for U & S 
  */
 
-int CalcStand(left,oper,right)
-int left;
-void (*oper)(void);
-int right;
+int CalcStand(
+	      int left,
+	      void (*oper)(void),
+	      int right)
 {
         if (oper == zor)        return (left | right) ;
         else if (oper == zxor)  return (left ^ right) ;
@@ -228,8 +226,7 @@ int right;
 
 
 /* Complains if an operand isn't int */
-void intcheck(lval, lval2)
-LVALUE *lval, *lval2 ;
+void intcheck(LVALUE *lval, LVALUE *lval2)
 {
         if( lval->val_type==DOUBLE || lval2->val_type==DOUBLE )
                 error(E_INTOPER);
@@ -239,6 +236,11 @@ LVALUE *lval, *lval2 ;
 /* Must take account of sign in here somewhere, also there is a problem    possibly with longs.. */
 void force(int t1, int t2,char sign1,char sign2,int lconst)
 {
+    if ( t2 == CARRY ) {
+	zcarryconv();	
+    }
+
+
         if(t1==DOUBLE) {
                 if(t2!=DOUBLE) {
                         DoDoubConv(t2,sign2);
@@ -256,7 +258,7 @@ void force(int t1, int t2,char sign1,char sign2,int lconst)
 /* Check to see if constant or not... */
         if(t1==LONG) {
                 if (t2!=LONG && (!lconst)) {
-                      if (sign2==NO && sign1==NO) convSint2long();
+                      if (sign2==NO && sign1==NO && t2 != CARRY) convSint2long();
                       else convUint2long();
                 }
                 return;
@@ -274,8 +276,7 @@ void force(int t1, int t2,char sign1,char sign2,int lconst)
  *
  * Maybe should an operand in here for LONG?
  */
-int widen(lval, lval2)
-LVALUE *lval, *lval2 ;
+int widen(LVALUE *lval, LVALUE *lval2)
 {
         if ( lval2->val_type == DOUBLE ) {
                 if ( lval->val_type != DOUBLE ) {
@@ -298,8 +299,7 @@ LVALUE *lval, *lval2 ;
         }
 }
 
-void widenlong(lval, lval2)
-LVALUE *lval, *lval2;
+void widenlong(LVALUE *lval,LVALUE *lval2)
 {
         if ( lval2->val_type == LONG ) {
 /* Second operator is long */
@@ -342,8 +342,7 @@ LVALUE *lval, *lval2;
  * true if val1 -> int pointer or int array and
  * val2 not ptr or array
  */
-int dbltest(lval, lval2)
-LVALUE *lval, *lval2 ;
+int dbltest(LVALUE *lval, LVALUE *lval2)
 {
         if ( lval->ptr_type ) {
                 if ( lval->ptr_type == CCHAR ) return(0);
@@ -356,8 +355,7 @@ LVALUE *lval, *lval2 ;
 /*
  * determine type of binary operation
  */
-void result(lval,lval2)
-LVALUE *lval, *lval2 ;
+void result(LVALUE *lval,LVALUE *lval2)
 {
         if ( lval->ptr_type && lval2->ptr_type ) {
                 lval->ptr_type = 0 ;                    /* ptr-ptr => int */
@@ -378,10 +376,10 @@ LVALUE *lval, *lval2 ;
  */
 
 
-void prestep(lval, n, step)
-LVALUE *lval ;
-int n;
-void (*step)();
+void prestep(
+	     LVALUE *lval,
+	     int n,
+	     void (*step)())
 {
         if ( heira(lval) == 0 ) {
                 needlval();
@@ -418,11 +416,12 @@ void (*step)();
 /*
  * poststep - postincrement or postdecrement lvalue
  */
-void poststep(k, lval, n, step, unstep)
-int k ;
-LVALUE *lval ;
-int n;
-void (*step)(), (*unstep)() ;
+void poststep(
+	      int k,
+	      LVALUE *lval,
+	      int n,
+	      void (*step)(), 
+	      void (*unstep)() )
 {
         if ( k == 0 ) {
                 needlval() ;
@@ -467,10 +466,10 @@ void (*step)(), (*unstep)() ;
  * no need to change for long pointers since we're going to have
  * memory pools..
  */
-void nstep(lval, n,unstep)
-LVALUE *lval ;
-int n;
-void (*unstep)();
+void nstep(
+	   LVALUE *lval,
+	   int n,
+	   void (*unstep)() )
 {
         addconst(n,1,lval->symbol->flags&FARPTR) ;
         store(lval) ;
@@ -478,8 +477,7 @@ void (*unstep)();
 }
 
 
-void store(lval)
-LVALUE *lval;
+void store(LVALUE *lval)
 {
         if (lval->indirect == 0) putmem(lval->symbol) ;
 	else 
@@ -491,9 +489,7 @@ LVALUE *lval;
  * or second TOS.  In either of those cases, forget address calculation
  * This should be followed by a smartstore()
  */
-void smartpush(lval, before)
-LVALUE *lval ;
-char *before ;
+void smartpush(LVALUE *lval,char *before)
 {
         if ( lval->indirect != CINT || lval->symbol == 0 ||
                                                         lval->symbol->storage != STKLOC ) {
@@ -524,8 +520,7 @@ char *before ;
  * store thing in primary register at address taking account
  * of previous preparation to store at TOS or second TOS
  */
-void smartstore(lval)
-LVALUE *lval ;
+void smartstore(LVALUE *lval)
 {
         if ( lval->indirect != CINT || lval->symbol == 0 ||
                                                         lval->symbol->storage != STKLOC )
@@ -544,8 +539,7 @@ LVALUE *lval ;
         }
 }
 
-void rvaluest(lval)
-LVALUE *lval;
+void rvaluest(LVALUE *lval)
 {
 	if ( lval->symbol && strncmp(lval->symbol->name,"0dptr",5) == 0 )
 		lval->symbol=lval->symbol->offset.p;
@@ -556,8 +550,7 @@ LVALUE *lval;
 	}
 }
 
-void rvalue(lval)
-LVALUE *lval;
+void rvalue(LVALUE *lval)
 {
         if( lval->symbol && lval->indirect == 0 )
                 getmem(lval->symbol);
@@ -573,8 +566,7 @@ LVALUE *lval;
 #endif
 }
 
-void test(label, parens)
-int label, parens;
+void test(int label,int parens)
 {
         char *before, *start ;
         LVALUE lval ;
@@ -632,9 +624,7 @@ int label, parens;
  * evaluate constant expression
  * return TRUE if it is a constant expression
  */
-int constexpr(val,flag)
-long *val ;
-int flag;
+int constexpr(long *val,int flag)
 {
         char *before, *start ;
         int con, valtemp ;
@@ -652,10 +642,10 @@ int flag;
 /*
  * scale constant value according to type
  */
-void cscale(type, tag, val)
-int type ;
-TAG_SYMBOL *tag ;
-int *val ;
+void cscale(
+	    int type,
+	    TAG_SYMBOL *tag,
+	    int *val)
 {
         switch ( type ) {
         case CINT:

@@ -17,5 +17,4 @@
         scf
         ret   nz
         ccf
-        dec   hl
         ret

@@ -2,7 +2,7 @@
  * cc4.c - fourth part of Small-C/Plus compiler
  *         routines for recursive descent
  *
- * $Id: expr.c,v 1.7 2002-01-28 11:51:16 dom Exp $
+ * $Id: expr.c,v 1.8 2002-02-20 11:11:54 dom Exp $
  *
  */
 
@@ -547,11 +547,9 @@ LVALUE *lval ;
         }
         else if (cmatch('!')) {
                 if (heira(lval)) rvalue(lval) ;
-                if (lval->val_type == DOUBLE) convdoub2int();
-                lneg(lval) ;
+		lneg(lval);
                 lval->binop=lneg;
                 lval->const_val = !lval->const_val ;
-                lval->val_type = CINT ;
                 lval->stage_add = NULL_CHAR ;
                 return 0 ;
         }
