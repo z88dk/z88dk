@@ -123,8 +123,7 @@ graphics/xorborder
 graphics/xorplot
 graphics/xorpixl
 graphics/setxy
-graphics/fill
-graphics/cpc/dfill
+graphics/cpc/fill
 graphics/cpc/putsprite3
 graphics/getsprite
 graphics/bksave

@@ -9,7 +9,7 @@
 ;       Define for graphics and other standard library functions
 ;
 ;
-;	$Id: grafix.inc,v 1.11 2003-06-27 14:04:13 stefano Exp $
+;	$Id: grafix.inc,v 1.12 2005-03-02 08:27:35 stefano Exp $
 ;
 
 
@@ -78,6 +78,9 @@ IF FORcpc
 	DEFINE gotgfx
 	defc maxx	= 256
 	defc maxy	= 192
+	defc bcolor	= 0
+	defc fcolor	= 2
+	defc row_bytes  = 64
 ENDIF
 
 IF FORsam
