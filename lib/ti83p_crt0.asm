@@ -3,7 +3,7 @@
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.17 2002-11-21 08:40:50 stefano Exp $
+;	$Id: ti83p_crt0.asm,v 1.18 2003-07-01 08:48:45 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells
@@ -132,7 +132,8 @@ ENDIF
 IF (startup=10)
 	DEFINE ASM
 	DEFINE NOT_DEFAULT_SHELL
-	org	$9D95
+	org	$9D93
+	defb	$BB,$6D
 ENDIF
 
 ;-----------------
