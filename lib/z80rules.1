@@ -1822,3 +1822,10 @@
 	pop	hl
 	pop	bc
 	ret
+
+	ld	l,(hl)
+	ld	h,0
+	%1c	hl
+	ld	hl,%2
+=
+	ld	hl,%2
