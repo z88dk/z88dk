@@ -62,6 +62,7 @@ extern int __LIB__ DsTrace(char*, ... );
 #define WritePar4( arg1 )			wrpar4( arg1 )
 #define ReadPar4()				rdpar4()
 
+#undef DsDisplayCircle
 #define DsDisplayCircle( arg1, arg2, arg3 )	DsCircle( arg1, arg2, arg3 )
 
 #define DsDisplayEllipse( arg1, arg2, arg3, arg4 )	DsEllipse( arg1, arg2, arg3, arg4 )
