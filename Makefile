@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.20 2002-10-02 09:55:44 dom Exp $
+#	$Id: Makefile,v 1.21 2002-10-03 21:16:02 dom Exp $
 #
 
 prefix = /usr/local
@@ -14,7 +14,7 @@ DEFAULT = z88
 all: setup appmake copt zcpp sccz80 z80asm zcc config
 
 setup:
-	echo '#define PREFIX "${prefix}$""' > src/config.h
+	echo '#define PREFIX "${prefix}$"/lib/z88dk"' > src/config.h
 
 appmake:
 	cd src/appmake ; $(MAKE) 
