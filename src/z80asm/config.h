@@ -14,6 +14,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
 /* Pick up the default installation path */
+#include "../config.h"
 
 /* MSDOS definitions: 
 #define OS_ID "MSDOS"
@@ -24,7 +25,11 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* UNIX definitions: */
 #define OS_ID "UNIX"
 #define UNIX 1
+#ifdef PREFIX
+#define DEFLIBDIR PREFIX "/lib/"
+#else
 #define DEFLIBDIR "/usr/local/lib/z88dk/lib/"
+#endif
 
 /* QDOS definitions: 
 #define OS_ID "QDOS"

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.12 2002-05-11 20:35:47 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.13 2002-12-01 15:47:17 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -638,7 +638,7 @@ GetLibfile (char *filename)
   newlib->libfilename = f;
   if ((z80asmfile = fopen (f, "rb")) == NULL)
     {				/* Does file exist? */
-      ReportError (NULL, 0, 28);
+      ReportError (f, 0, 28);
       return;
     }
   else
