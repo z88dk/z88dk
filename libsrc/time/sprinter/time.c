@@ -6,7 +6,7 @@
  *	Our epoch is the UNIX epoch of 00:00:00 1/1/1970
  *
  * --------
- * $Id: time.c,v 1.1 2002-11-20 22:53:00 dom Exp $
+ * $Id: time.c,v 1.2 2002-11-21 10:44:24 dom Exp $
  */
 
 
@@ -17,7 +17,7 @@ static void gettm(struct tm *tp);
 time_t time(time_t *store)
 {
 	struct tm tmp;
-	time_t tim
+	time_t tim;
 
 	gettm(&tmp);
 

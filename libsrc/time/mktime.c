@@ -7,10 +7,10 @@
 #define SECS_PER_DAY  86400UL
 #define SECS_PER_HOUR  3600UL
 #define SECS_PER_MIN     60UL
+#define DAYS_PER_YEAR   365UL
 
-const int _ytab[24] = {
-    31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31,
-    31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+const int _tot[] = {
+		0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 
 static int is_leap( int year )
 {
@@ -28,26 +28,25 @@ time_t mktime2(struct tm *tp)
 time_t mktime(struct tm *tp)
 #endif
 {
-    unsigned long days = 0UL;
+    unsigned long days;
     int           i,j,year;
 
     if ( tp->tm_year  < EPOCH_YEAR - 1900 ) 
 	return -1L;
 
-    for ( i = EPOCH_YEAR; i < ( tp->tm_year + 1900  ); i++ ) {
-	for ( j = 0; j < 12; j++ ) {
-	    days += _ytab[(is_leap(i) * 12) + j ];
+    days = ( tp->tm_year - ( EPOCH_YEAR - 1900 ) ) * DAYS_PER_YEAR;
 
-	}
+    /* Now chase up the leap years */
+    for ( i = EPOCH_YEAR; i < ( tp->tm_year + 1900 ); i++ ) {
+	if ( is_leap(i) )
+		++days;
     }
 
-    for ( i = 0; i < tp->tm_mon  ; i++ ) 
-	days += _ytab[(is_leap(i) * 12) + i ];
+    days += _tot[tp->tm_mon];
+    if ( is_leap(tp->tm_year) )
+	    ++days;
 
-
-    days += (tp->tm_mday-1);
-
-
+    days += (tp->tm_mday - 1);
 
     /* So days has the number of days since the epoch */
     days *= SECS_PER_DAY;
@@ -71,7 +70,7 @@ int main()
 
     tim2 = mktime2(tp);
 
-    printf("routines gives %ld\n",tim);
+    printf("routines gives %ld\n",tim2);
 
     printf("%d\n",(tim2-tim)/86400);
 }

@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.54 2002-11-20 20:05:31 dom Exp $
+# $Id: Makefile,v 1.55 2002-11-21 10:44:23 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -174,7 +174,7 @@ ppsansi_clib.lib:
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
-	cd time ; $(MAKE) lzx
+	cd time ; $(MAKE) lpps
 	cd rs232 ; $(MAKE) lzx
 	./gamesdeps.sh
 	cd spectrum ; $(MAKE)
@@ -194,7 +194,7 @@ pps_clib.lib:
 	cd printflike ; $(MAKE) 
 	cd setjmp ; $(MAKE) 
 	cd assert ; $(MAKE) 
-	cd time ; $(MAKE) lzx
+	cd time ; $(MAKE) lpps
 	cd rs232 ; $(MAKE) lzx
 	./gamesdeps.sh
 	cd spectrum ; $(MAKE)
