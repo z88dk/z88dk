@@ -217,86 +217,64 @@ int tixx_exec(char *target)
     else if ((ext == E_86P) || (ext == E_86S))
         fwrite("**TI86**\x1a\x0a\x00", 11, 1, fp);
     writecomment(fp, comment);
-    if ((ext == E_82P) )
+    if ((ext == E_82P) || (ext == E_83P))
         i = n + 17;
-    else if (ext == E_83P)
-        i = (n * 2) + 26;
     else if (ext == E_8XP)
-        i = (n * 2) + 20;
+        i = n + 19;
     else if (ext == E_85S)
         i = n + 10 + strlen(str);
     else
         i = n + 18;
-    writeword(i, fp);
-    if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP)) {
-        cfwritebyte(0x0b, fp, &chk);
-        cfwritebyte(0x00, fp, &chk);   
-    } else if (ext == E_85S) {	
+    fwrite(&i, 2, 1, fp);
+    if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP))
+        cfwrite("\x0b\0x00", 2, fp, &chk);
+    else if (ext == E_85S)
+    {
         i = 4 + strlen(str);
-        cfwritebyte(i, fp, &chk);
-        cfwritebyte(0x00, fp, &chk);
-    } else {
-        cfwritebyte(0x0c, fp, &chk);
-        cfwritebyte(0x00, fp, &chk);   
+        cfwrite(&i, 1, fp, &chk);
+        cfwrite("\0x00", 1, fp, &chk);
     }
+    else
+        cfwrite("\x0c\0x00", 2, fp, &chk);
     if(ext == E_8XP)
-        i = (n * 2) + 5;
-    else if(ext == E_83P)
-        i = (n * 2) + 11;
+        i = n + 4;
     else
         i = n + 2;
 
-    cfwriteword(i, fp, &chk);
-    if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP)) {
-        cfwritebyte(0x06, fp, &chk);
-    } else if (ext == E_86P) {
-        cfwritebyte(0x12, fp, &chk);
-    } else if ((ext == E_85S) || (ext == E_86S)) {
-        cfwritebyte(0x0c, fp, &chk);
-    }
-    
+    cfwrite(&i, 2, fp, &chk);
+    if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP))
+        cfwrite("\x06", 1, fp, &chk);
+    else if (ext == E_86P)
+        cfwrite("\x12", 1, fp, &chk);
+    else if ((ext == E_85S) || (ext == E_86S))
+        cfwrite("\x0c", 1, fp, &chk);
+
     i = strlen(str);
     if ((ext == E_85S) || (ext == E_86P) || (ext == E_86S))
-        cfwritebyte(i, fp, &chk);
+        cfwrite(&i, 1, fp, &chk);
     cfwrite(str, i, fp, &chk);
     memset(str, 0, 8);
     if (ext != E_85S)
         cfwrite(str, 8 - i, fp, &chk);
-    
-    if (ext == E_8XP) {
-        i = (n * 2) + 5;
-        n2 = (n * 2) + 3;
-    } else if (ext == E_83P) {
-        i = (n * 2) + 11;
-        n2 = (n * 2) + 9;
-    } else {
+    if (ext == E_8XP)
+    {
+        i = n + 4;
+        n2 = n + 2;
+    }
+    else
+    {
         i = n + 2;
         n2 = n;
     }
-    cfwriteword(i, fp, &chk);
-    cfwriteword(n2, fp, &chk);
-    if(ext == E_8XP) {
-        cfwritebyte(0xBB, fp, &chk);
-        cfwritebyte(0x6C, fp, &chk);
-        cfwritebyte(0x3F, fp, &chk);
+    cfwrite(&i, 2, fp, &chk);
+    cfwrite(&n2, 2, fp, &chk);
+    if(ext == E_8XP)
+    {
+        cfwrite("\xBB", 1, fp, &chk);
+        cfwrite("\x6D", 1, fp, &chk);
     }
-
-    if((ext == E_83P) || (ext == E_8XP)) {
-        datawrite(buf, n, fp, &chk);
-    } else {
-        cfwrite(buf, n, fp, &chk);
-    }
-    
-    if ( ext == E_83P ) {
-        cfwrite("\x3F", 1, fp, &chk);
-        cfwrite("\xD4", 1, fp, &chk);
-        cfwrite("\x3F", 1, fp, &chk);
-        cfwrite("0000", 4, fp, &chk);
-        cfwrite("\x3F", 1, fp, &chk);
-        cfwrite("\xD4", 1, fp, &chk);
-    }
-
-    writeword(chk, fp);
+    cfwrite(buf, n, fp, &chk);
+    fwrite(&chk, 2, 1, fp);
 
     if (ferror(fp))
         die("Failed writing output file: %s\n", filename);
