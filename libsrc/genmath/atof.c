@@ -1,9 +1,13 @@
 /*
- * Core routine for scanf-type functions, including floating point
- *        only e, f, d, o, x, c, s, and u specs are supported.
- *        Also includes atof()
+ *	Atof (generic routine)
+ *
+ *	Don't recompile cos we get a label clash!
  */
 
+
+#asm
+	defc DEFINED_atof = 1
+#endasm
 
 #include <ctype.h>
 #include <stdio.h>

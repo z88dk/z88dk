@@ -14,7 +14,8 @@ genmath:
 	zcc -vn -make-lib pow.c
 	zcc -vn -make-lib ftoe.c
 	zcc -vn -make-lib ftoa.c
-	zcc -vn -make-lib atof.c
+# Don't compile atof cos of label clash
+#	zcc -vn -make-lib atof.c
 	z80asm -d -ns -nm -Mo -x../m @genlist
 
 

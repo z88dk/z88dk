@@ -3,6 +3,7 @@ amax
 amin
 atan
 atan2
+atof
 ceil
 cos
 cosh
