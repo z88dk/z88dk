@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.9 2001-08-05 09:31:43 dom Exp $
+ *      $Id: zcc.c,v 1.10 2001-10-06 20:55:46 dom Exp $
  */
 
 
@@ -901,6 +901,22 @@ void AddLink(char *arg)
 {
         char    buffer[LINEMAX+1];      /* A little large! */
 /*
+ * We still have the "problem" of switching between maths literals,
+ * so if -lmz is supplied (custom lib) then add in the special option
+ * this way we can be as generic as possible
+ */
+        if (strcmp(arg,"lmz")==0) {
+		AddComp(myconf[Z88MATHFLG].def+1); 
+        	sprintf(buffer,"%s%s ",myconf[LIBPATH].def,myconf[Z88MATHLIB].def);
+        	BuildOptions(&linkargs,buffer);
+		return;
+	} else if (strcmp(arg,"lm") == 0 ) {
+        	sprintf(buffer,"%s%s ",myconf[LIBPATH].def,myconf[GENMATHLIB].def);
+        	BuildOptions(&linkargs,buffer);
+		return;
+	}
+
+/*
  * Dump the changing of -ls into -i - we'll change the setup in the
  * zlib: directory so all the libraries have simple names
  * Build what the option will be and stick it in..
@@ -908,12 +924,6 @@ void AddLink(char *arg)
         sprintf(buffer,"%s%s ",myconf[LIBPATH].def,arg+1);
         BuildOptions(&linkargs,buffer);
 
-/*
- * We still have the "problem" of switching between maths literals,
- * so if -lmz is supplied (custom lib) then add in the special option
- * this way we can be as generic as possible
- */
-        if (strcmp(arg,"lmz")==0) AddComp(myconf[Z88MATHFLG].def+1); 
 }
 
 /*
