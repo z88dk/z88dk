@@ -1,16 +1,18 @@
 
-ZCCOBJS = zcc.c
+OBJS = zcc.o
 CC = gcc
 
-CCOPT = -DUNIX
 
 all: zcc 
 
-zcc:
-	${CC} -o ../../bin/zcc ${CFLAGS} ${CCOPT} ${ZCCOBJS}
+zcc:	$(OBJS)
+	${CC} -o zcc ${CFLAGS} ${CCOPT} ${OBJS}
 
 install:
-	install ../../bin/zcc $(PREFIX)/bin
+	install zcc $(PREFIX)/bin/
+
+clean:
+	$(RM) zcc zcc.o core
 
 
 #Dependencies

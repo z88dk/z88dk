@@ -1,9 +1,20 @@
 
-all: appmake
+OBJS = appmake.o
+CC = gcc
 
-appmake:
-	${CC} -o ../../bin/appmake ${CFLAGS} ${CCOPTS} appmake.c
 
-install: 
-	install ../../bin/appmake $(PREFIX)/bin
+all: appmake 
 
+appmake:	$(OBJS)
+	${CC} -o appmake $(LDFLAGS) $(OBJS)
+
+install:
+	install appmake $(PREFIX)/bin
+
+clean:
+	$(RM) appmake appmake.o core
+
+
+#Dependencies
+
+appmake.o: appmake.c 

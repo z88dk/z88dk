@@ -3,20 +3,23 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.13 2002-10-03 21:15:37 dom Exp $
+ * $Id: zcc.h,v 1.14 2002-12-09 18:49:47 dom Exp $
  */
 
+/* Very contrived, if not a Windows target then include the config file */
+#if !defined(__MSDOS__) && !defined(__TURBOC__)
+#ifndef _WIN32
+#include "../config.h"
+#endif
+#endif
 
 /* Some machine specific definitions (paths etc!) */
 
 char *version = "v2.50 (C) 3.10.2002 D.J.Morris\n";
 
 #ifdef AMIGA
-#define PREFIX "zcc:"
 char *amiver="$VER: zcc v2.50 (3.10.2002)";
 #endif
-
-/* Insert your machines definitions in here... */
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
 /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
@@ -35,10 +38,7 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 #define snprintf _snprintf
 #endif
 
-#ifdef UNIX
-#include "../config.h"
-#endif
-
+/* hpux 9 has a slightly odd FILENAME_MAX defined */
 #ifdef hpux
 #undef FILENAME_MAX
 #define FILENAME_MAX 1024

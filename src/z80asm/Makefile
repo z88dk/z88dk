@@ -1,11 +1,7 @@
 #
-# ITMA! Revisit for z80asm!
+# $Id
 #
 
-
-CC=gcc
-CFLAGS = -g -O2 -Wall -s $(CCOPT) 
-LDFLAGS=
 
 OBJS = 	asmdrctv.o 	\
 	avltree.o	\
@@ -20,38 +16,29 @@ OBJS = 	asmdrctv.o 	\
 	z80instr.o	\
 	z80pass.o
 	
-
-EXECS = z80asm
-
-
-.PHONY: all
-ifeq (.depend,$(wildcard .depend))
-all : $(EXECS)
-include .depend
-else
-all:	depend
-	@echo
-	@echo Now do make again
-	@echo
-endif
+all: z80asm
 
 
 z80asm : $(OBJS)
-	$(CC) $(LDFLAGS) -o ../../bin/z80asm $(CFLAGS) $(OBJS)
+	$(CC) $(LDFLAGS) -o z80asm  $(OBJS)
 
 install:
-	install  ../../bin/z80asm $(PREFIX)/bin/
+	install  z80asm $(PREFIX)/bin/
 
 
 clean :
-	$(RM) *.o *~ core $(EXECS) 
+	$(RM) *.o *~ core z80asm
 
-# ------------------------------------------------------------------------------
-# Make the dependencies
-
-.PHONY: depend dep
-depend dep:	$(OBJS:.o=.c)
-	@echo "Creating dependency information"
-	$(CC) -MM $^ > .depend
-
-
+# Dependencies
+asmdrctv.o: asmdrctv.c symbol.h avltree.h config.h
+avltree.o: avltree.c avltree.h
+exprprsr.o: exprprsr.c symbol.h avltree.h config.h
+hist.o: hist.c
+ldinstr.o: ldinstr.c symbol.h avltree.h config.h
+modlink.o: modlink.c symbol.h avltree.h config.h
+prsident.o: prsident.c symbol.h avltree.h config.h
+prsline.o: prsline.c symbol.h avltree.h config.h
+symbols.o: symbols.c symbol.h avltree.h config.h
+z80asm.o: z80asm.c symbol.h avltree.h config.h
+z80instr.o: z80instr.c symbol.h avltree.h config.h
+z80pass.o: z80pass.c symbol.h avltree.h config.h

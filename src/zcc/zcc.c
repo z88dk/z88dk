@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.17 2002-10-03 21:15:37 dom Exp $
+ *      $Id: zcc.c,v 1.18 2002-12-09 18:49:47 dom Exp $
  */
 
 
@@ -1404,7 +1404,11 @@ int FindConfigFile(char *arg, int gc)
 #ifdef __MSDOS__
 		snprintf(outfilename,sizeof(outfilename),"%s\\lib\\config\\%s.cfg",PREFIX,arg+1);
 #else
+#ifdef AMIGA
+		snprintf(outfilename,sizeof(outfilename),"%slib/config/%s.cfg",PREFIX,arg+1);
+#else
 		snprintf(outfilename,sizeof(outfilename),"%s/lib/config/%s.cfg",PREFIX,arg+1);
+#endif
 #endif
 		}
 		/* User supplied invalid config file, let it fall over
@@ -1451,7 +1455,25 @@ int FindConfigFile(char *arg, int gc)
 	return(gc);
 }
 
-#if defined(__MSDOS__) && defined(__TURBOC__)
+#if defined(AMIGA) && defined(_DCC)
+/* Dice has no snprintf */
+#include <stdarg.h>
+int snprintf(char * buffer, size_t bufsize, const char * format, ...)
+{
+	va_list argptr;
+	int num_chars;
+
+	va_start(argptr,format);
+	num_chars = vsprintf(buffer, format, argptr);
+	va_end(argptr);
+
+	return num_chars;
+}
+#endif
+
+
+
+#if  defined(__MSDOS__) && defined(__TURBOC__) 
 /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
 int snprintf(char * buffer, size_t bufsize, const char * format, ...)
 {

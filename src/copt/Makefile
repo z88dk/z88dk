@@ -1,9 +1,20 @@
 
-all: copt
+OBJS = copt.o
+CC = gcc
 
-copt:
-	${CC} -o ../../bin/copt ${CFLAGS} ${CCOPTS} copt.c
+
+all: copt 
+
+copt:	$(OBJS)
+	$(CC) -o copt $(LDFLAGS) $(OBJS)
 
 install:
-	install ../../bin/copt $(PREFIX)/bin
+	install copt $(PREFIX)/bin
 
+clean:
+	$(RM) copt copt.o core
+
+
+#Dependencies
+
+copt.o: copt.c 

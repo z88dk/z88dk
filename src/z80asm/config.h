@@ -16,40 +16,45 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* Pick up the default installation path */
 #include "../config.h"
 
-/* MSDOS definitions: 
+/* MSDOS definitions: */
+#ifdef MSDOS
 #define OS_ID "MSDOS"
 #define MSDOS 1
 #define DEFLIBDIR "c:\\z88dk\\lib\\"
-*/
+#endif
 
 /* UNIX definitions: */
+#ifdef UNIX
 #define OS_ID "UNIX"
-#define UNIX 1
 #ifdef PREFIX
 #define DEFLIBDIR PREFIX "/lib/"
 #else
 #define DEFLIBDIR "/usr/local/lib/z88dk/lib/"
 #endif
+#endif
 
-/* QDOS definitions: 
+/* QDOS definitions:  */
+#ifdef QDOS
 #define OS_ID "QDOS"
 #define QDOS 1
 #define ENDIAN 1
 #define DEFLIBDIR ""
-*/
+#endif
 
-/* AMIGA definitions:
+/* AMIGA definitions: */
+#ifdef AMIGA
 #define OS_ID "AMIGA"
 #define AMIGA 1
 #define ENDIAN 1
 #define DEFLIBDIR "zcc:lib/"
-*/
+#endif
 
-/* WIN32 definitions:
+/* WIN32 definitions: */
+#ifdef WIN32
 #define OS_ID "WIN32"
 #define WIN32 1
 #define DEFLIBDIR "c:\\z88dk\\lib\\"
-*/
+#endif
 
 #ifdef MSDOS
 #define MAXCODESIZE 65532	/* MSDOS 64K heap boundary */
