@@ -36,7 +36,7 @@ extern size_t __LIB__ write(int fd, void *ptr, size_t len);
 extern long __LIB__ lseek(int fd,long posn, int whence);
 
 extern int __LIB__ __FASTCALL__ readbyte(int fd);
-extern int __LIB__ __FASTCALL__ writebyte(int fd, int c);
+extern int __LIB__ writebyte(int fd, int c);
 
 /* Open a file returning the explicit filename, with length len */
 

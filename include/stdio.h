@@ -5,6 +5,10 @@
 #include <z88stdio.h>
 #else
 
+#ifdef __SPECTRUM__
+#include <spectrum.h>
+#endif
+
 /*
  * This is the new stdio library - everything is pretty much
  * generic - just a few machine specific routines are needed
