@@ -3,20 +3,21 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.3 2002-04-10 20:31:11 dom Exp $
+;	$Id: z88s_crt0.asm,v 1.4 2002-06-09 17:49:31 dom Exp $
 
 
 
 	INCLUDE	"#stdio.def"
 	INCLUDE "#error.def"
 
-	
+; Shell default values - these will need to be changed for a shell release
+; (but then again so does the signature)	
 	defc    cmdaddr = $20F5
-        defc    cmdlen = $20F3
-        defc    cmdptr = $20F7
-        defc    next = $F886
-
-        defc	myzorg = $2FB1-12
+        defc    cmdlen  = $20F3
+        defc    cmdptr  = $20F7
+        defc    next    = $F886
+	defc	eval    = $99BA
+        defc	myzorg  = $2FB1-12
 
 	org	myzorg
 .header_start
@@ -33,8 +34,8 @@
 .start
 	push	bc		; Preserve registers that need to be
 	push	de	
-	push	ix
-	push	iy
+	ld	(saveix),ix
+	ld	(saveiy),iy
 	ld	(start1+1),sp	;Save starting stack
 	ld	hl,(cmdlen)
 	ld	de,(cmdaddr)
@@ -124,8 +125,8 @@ ENDIF
         call    resterrhan	;Restore the original error handler
 	
 .start1	ld	sp,0		;Restore stack to entry value
-	pop	iy		; Get back those registers
-	pop	ix
+	ld	ix,(saveix)	;Get back those registers
+	ld	iy,(saveiy)
 	pop	de
 	pop	bc
 	jp	next		; out we go
@@ -208,6 +209,66 @@ ENDIF
 	push	bc
 	ret
 
+;----------
+; The system() function for the shell 
+;----------
+	XDEF	_system
+._system
+	call	resterrhan	;restore forth error handler
+	pop	de	;return address
+	pop	hl	;command start
+	push	hl	;
+	push	de
+	ld	d,h
+	ld	e,l
+	ld	bc,0
+.system_loop
+	ld	a,(hl)
+	and	a
+	jr	z,system_out
+	inc	hl
+	inc	bc
+	jr	system_loop
+.system_out
+	ex	de,hl	;get start into hl
+	push	hl	;push onto stack for forth (Forth's 2OS)
+	ld	de,system_back	; DE=Forth's IP
+	ld	iy,(saveiy)	; IY=Forth's UP
+	ld	ix,(saveix)	; IX=Forth's RSP
+				; BC=Forth's TOS
+; So at this point:
+;  DE=Forth's IP (interpretive pointer)
+;  IY=Forth's UP (user pointer)
+;  IX=Forth's RSP (return stack pointer)
+;  Forth stack (BC=TOS, rest=machine stack): yourcmdst,yourretaddr,cmdst,cmdlen
+
+	jp	eval		; execute "eval"
+
+; Forth now fetches the word at it's interpretive pointer (DE) and then jumps
+; to that address, so we have a word pointing to the remainder of our routine
+
+.system_back
+	defw	system_really_back
+.system_really_back
+
+; The stack effects of "eval" are: ( addr len -- flag ) so Forth stack is now:
+;  (BC=TOS, rest=machine stack): yourcmdst,yourretaddr,flag
+
+	push	bc
+	call	doerrhan	;put c error hander back
+	pop	bc
+
+;	pop	de		;random value back (NO! "eval" used it up)
+
+; Hey, why not just do ld h,b / ld l,c / ret so you have the error code itself?
+
+	ld	hl,0
+	ld	a,b
+	or	c
+	ret	z
+	dec	hl	;-1 - some ghastly unknown error
+	ret
+
 
 
 
@@ -250,6 +311,9 @@ ENDIF
 .heapblocks	defw 	0	; Number of blocks
 
 .packintrout	defw	0	; Address of user interrupt routine
+
+.saveix		defw	0	; Save ix for system() calls
+.saveiy		defw	0	; Save iy for system() calls
 
 
 ;-----------
