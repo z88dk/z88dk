@@ -117,7 +117,7 @@
  *
  *	22/4/2002 - (Stefano) Visual C "snprintf" workaround
  *
- *      $Id: zcc.c,v 1.15 2002-07-15 17:45:46 dom Exp $
+ *      $Id: zcc.c,v 1.16 2002-10-02 09:35:46 dom Exp $
  */
 
 
@@ -1399,11 +1399,10 @@ int FindConfigFile(char *arg, int gc)
 			strcat(outfilename,".cfg");
 			return(gc);
 		} else {
-#if 1
-			strcpy(outfilename,PREFIX);
-			strcat(outfilename,arg+1);
-			strcat(outfilename,".cfg");
-			return(gc);
+#ifdef __MSDOS__
+		snprintf(outfilename,sizeof(outfilename),"%s\\lib\\config\\%s.cfg",PREFIX,arg+1);
+#else
+		snprintf(outfilename,sizeof(outfilename),"%s/lib/z88dk/lib/config/%s.cfg",PREFIX,arg+1);
 #endif
 		}
 		/* User supplied invalid config file, let it fall over
