@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.14 2001-05-02 11:17:47 stefano Exp $
+# $Id: Makefile,v 1.15 2001-05-03 09:16:23 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -521,15 +521,26 @@ msx_clib.lib:
 	z80asm -d -ns -nm -Mo -DFORmsx -xmsx_clib @msx.lst
 
 clean:
-	cd strings ; make clean
-	cd stdlib ; make clean
-	cd stdio ; make clean
-	cd printflike ; make clean
-	cd setjmp ; make clean
-	cd fcntl; make clean
 	cd assert ; make clean
-	rm -f *.lib */*/*.o */*.opt */*/*.obj */*/*.err
-	rm -f */*.o */*.sym */*~ */zcc_opt.def */core */*.err
+	cd cpm    ; make clean
+	cd ctype ; make clean
+	cd farz88 ; make clean
+	cd fcntl ; make clean
+	cd genmath ; make clean
+	cd graphics ; make clean
+	cd malloc ; make clean
+	cd net    ; make clean
+	cd printflike ; make clean
+	cd rex ; make clean
+	cd setjmp ; make clean
+	cd stdio ; make clean
+	cd stdlib ; make clean
+	cd strings ; make clean
+	cd ticalc; make clean
+	cd time ; make clean
+	cd z80_crt0s; make clean
+	cd z88 ; make clean
+	cd z88math ; make clean
 
 install:
 	cp *.lib ../lib/clibs/

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.5 2001-05-02 09:21:51 dom Exp $
+# $Id: Makefile,v 1.6 2001-05-03 09:16:24 dom Exp $
 #
 
 generic: std gen
@@ -40,5 +40,6 @@ z88_x:
 clean:
 	rm -f *.o* *.sym *.map zcc_opt.def
 	rm -f ansi/*.o ansi/*/*.o
+	rm -f */*.o
 	cd z88 ; make clean
 	cd zsock ; make clean

@@ -11,4 +11,4 @@ z88math:
 
 
 clean:
-	rm -f *.obj *.sym *.map *.err *.o
+	rm -f *.o* *.sym *.map *.err 

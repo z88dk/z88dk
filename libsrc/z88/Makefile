@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.4 2001-04-30 16:49:55 dom Exp $
+# $Id: Makefile,v 1.5 2001-05-03 09:16:24 dom Exp $
 
 
 all: blah z88
@@ -20,3 +20,4 @@ z88:	RegisterInt.o DeRegisterInt.o QueryPackage.o getpid.o nameapp.o \
 
 clean:
 	rm -f *.obj *.sym *.map *.o *~ zcc_opt.def
+	cd fdstdio ; make clean

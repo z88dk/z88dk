@@ -1,8 +1,9 @@
 
 
-all:
-	zcc +rex -vn -make-lib DsClearScreen.c
-	zcc +rex -vn -make-lib DsPrintf.c
+all:	DsClearScreen.o DsPrintf.o
+
+.c.o:
+	zcc +rex -vn -make-lib $*.c
 
 
 clean:

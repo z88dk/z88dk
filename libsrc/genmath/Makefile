@@ -16,4 +16,4 @@ genmath: atan2.o cosh.o sinh.o tanh.o pow.o ftoe.o ftoa.o atof.o
 
 
 clean:
-	rm -f *.obj *.sym *.map *.o *.err
+	rm -f *.o* *.sym *.map *.err zcc_opt.def

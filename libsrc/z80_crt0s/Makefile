@@ -14,4 +14,4 @@ crtz80s183:
 
 
 clean:
-	rm -f */*.obj */*.sym */*.map */*.o
+	rm -f */*.o* */*.sym */*.map 
