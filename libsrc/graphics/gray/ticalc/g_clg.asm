@@ -4,7 +4,7 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
-;	$Id: g_clg.asm,v 1.2 2001-04-18 13:21:38 stefano Exp $
+;	$Id: g_clg.asm,v 1.3 2001-07-12 13:16:05 stefano Exp $
 ;
 
 
@@ -49,7 +49,7 @@
 		ld	d,h
 		ld	e,l
 		inc	de
-		ld	bc,row_bytes*64
+		ld	bc,row_bytes*64-1
 		ldir
 
 		ret
