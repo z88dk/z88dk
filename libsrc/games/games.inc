@@ -5,7 +5,7 @@
 ;	based on the Dominic's sound routines
 ;
 ;
-;	$Id: games.inc,v 1.3 2001-10-22 09:33:55 stefano Exp $
+;	$Id: games.inc,v 1.4 2001-10-25 13:31:32 stefano Exp $
 ;
 
 IF FORzx
@@ -26,3 +26,32 @@ IF FORjupiter
 	defc sndbit_mask   = 1
 ENDIF
 
+IF FORti82
+	defc sndbit_port   = 0
+	defc sndbit_bit    = 2
+	defc sndbit_mask   = @00111100
+ENDIF
+
+IF FORti83
+	defc sndbit_port   = 0
+	defc sndbit_bit    = 0
+	defc sndbit_mask   = 3
+ENDIF
+
+IF FORti83p
+	defc sndbit_port   = 0
+	defc sndbit_bit    = 0
+	defc sndbit_mask   = 3
+ENDIF
+
+IF FORti85
+	defc sndbit_port   = 7
+	defc sndbit_bit    = 2
+	defc sndbit_mask   = @00111100
+ENDIF
+
+IF FORti86
+	defc sndbit_port   = 7
+	defc sndbit_bit    = 2
+	defc sndbit_mask   = @00111100
+ENDIF

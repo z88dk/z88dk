@@ -1,5 +1,5 @@
 #!/bin/sh
-#  $Id: tideps.sh,v 1.5 2001-04-20 11:56:39 stefano Exp $
+#  $Id: tideps.sh,v 1.6 2001-10-25 13:31:32 stefano Exp $
 #  short script to sort out ticalc dependencies
 
 	rm -f stdio/ticalc/fgetc_cons.o
@@ -12,6 +12,8 @@
 	rm -f stdio/ansi/ticalc/f_ansi_cls.o
 	rm -f stdio/ansi/ticalc/f_ansi_dline.o
 	rm -f stdio/ansi/ticalc/f_ansi_scrollup.o
+	rm -f games/*.o
+	rm -f games/ticalc/*.o
 	rm -f graphics/*.o
 	rm -f graphics/ticalc/*.o
 	rm -f graphics/gray/*.o

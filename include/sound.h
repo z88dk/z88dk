@@ -7,7 +7,7 @@
  *
  *	Stefano, Oct 2001
  *
- *	$Id: sound.h,v 1.2 2001-10-22 09:33:54 stefano Exp $
+ *	$Id: sound.h,v 1.3 2001-10-25 13:31:32 stefano Exp $
  */
 
 
@@ -40,5 +40,28 @@ extern __LIB__ bit_play(unsigned char melody[]);
 #ifdef ACE
   #define BEEP_TSTATES 406250.0 /* 3.25 Mhz */
 #endif
+
+#ifdef TI82
+  #define BEEP_TSTATES 750000.0 /* 6 Mhz */
+#endif
+
+#ifdef TI83
+  #define BEEP_TSTATES 750000.0
+#endif
+
+/* TI-83 Plus. 1875000.0 (15 Mhz) if Silver Edition */
+#ifdef TI8X
+  #define BEEP_TSTATES 750000.0 /* 6 Mhz */
+  /* #define BEEP_TSTATES 1875000.0 */
+#endif
+
+#ifdef TI85
+  #define BEEP_TSTATES 750000.0
+#endif
+
+#ifdef TI86
+  #define BEEP_TSTATES 750000.0
+#endif
+
 
 #endif

@@ -129,3 +129,13 @@ graphics/ticalc/bkrestore
 graphics/ticalc/pixladdr
 graphics/ticalc/swapgfxbk
 games/ticalc/joystick
+games/ticalc/bit_open
+games/ticalc/bit_open_di
+games/ticalc/bit_close
+games/ticalc/bit_close_ei
+games/bit_click
+games/bit_play
+games/bit_fx
+games/bit_frequency
+games/bit_beep
+games/beeper

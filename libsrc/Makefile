@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.23 2001-10-22 09:33:55 stefano Exp $
+# $Id: Makefile,v 1.24 2001-10-25 13:31:32 stefano Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -97,7 +97,7 @@ z88_clib.lib:
 	cd time ; make lz88
 	cd setjmp ; make 
 	cd assert ; make 
-	cd games ; make lz88
+	cd games ; make
 	z80asm -z80-verb -d -ns -nm -Mo -DFORz88 -xz88_clib @z88.lst
 
 
@@ -147,7 +147,7 @@ zx_clib.lib:
 	cd assert ; make 
 	cd time ; make lzx
 	./gamesdeps.sh
-	cd games ; make lzx
+	cd games ; make
 	cd spectrum ; make
 	z80asm -d -ns -nm -Mo -DFORzx -xzx_clib @zx.lst
 
@@ -166,7 +166,7 @@ zxan_clib.lib:
 	cd assert ; make 
 	cd time ; make lzx
 	./gamesdeps.sh
-	cd games ; make lzx
+	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORzx -xzxan_clib @zxansi.lst
 
 # Untested C lib for NC100 machinens
@@ -258,6 +258,7 @@ ti82ansi_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
+	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORti82 -xti82ansi_clib @ticansi.lst
 
 ti82_clib.lib:
@@ -271,6 +272,7 @@ ti82_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
+	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORti82 -xti82_clib @ticalc.lst
 
 tigray82.lib:
@@ -292,6 +294,7 @@ ti83ansi_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
+	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORti83 -xti83ansi_clib @ticansi.lst
 
 ti83_clib.lib:
@@ -305,6 +308,7 @@ ti83_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
+	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORti83 -xti83_clib @ticalc.lst
 
 tigray83.lib:
@@ -325,6 +329,7 @@ ti83pansi_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
+	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORti83p -xti83pansi_clib @ticansi.lst
 
 ti83p_clib.lib:
@@ -338,6 +343,7 @@ ti83p_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
+	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORti83p -xti83p_clib @ticalc.lst
 
 tigray83p.lib:
@@ -358,6 +364,7 @@ ti85ansi_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
+	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORti85 -xti85ansi_clib @ticansi.lst
 
 ti85_clib.lib:
@@ -371,6 +378,7 @@ ti85_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
+	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORti85 -xti85_clib @ticalc.lst
 
 tigray85.lib:
@@ -391,6 +399,7 @@ ti86ansi_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
+	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORti86 -xti86ansi_clib @ticansi.lst
 
 ti86_clib.lib:
@@ -404,6 +413,7 @@ ti86_clib.lib:
 	cd printflike ; make 
 	cd setjmp ; make 
 	cd assert ; make 
+	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORti86 -xti86_clib @ticalc.lst
 
 tigray86.lib:
@@ -479,7 +489,7 @@ aceansi_clib.lib:
 	cd setjmp ; make 
 	cd assert ; make 
 	./gamesdeps.sh
-	cd games ; make lace
+	cd games ; make
 	z80asm -d -ns -nm -Mo -DFORjupiter -xaceansi_clib.lib @aceansi.lst
 
 # Xircom REX 6000 library - Dominic
