@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.11 2002-02-20 11:11:54 dom Exp $
+ *      $Id: primary.c,v 1.12 2002-03-14 19:38:55 dom Exp $
  */
 
 
@@ -29,6 +29,9 @@ int primary(LVALUE *lval)
 		    docast(lval,YES);
 		}
 		lval->level--;
+		if (lval->c_vtype) {
+		    docast(lval,YES);
+		}
                 return k;
         }
         /* clear lval array - djm second arg was lval.. now cast, clears lval */
@@ -301,6 +304,12 @@ int widen(LVALUE *lval, LVALUE *lval2)
 
 void widenlong(LVALUE *lval,LVALUE *lval2)
 {
+    if ( lval2->val_type == CARRY ) {
+	zcarryconv();
+	lval2->val_type = CINT;
+    }
+
+
         if ( lval2->val_type == LONG ) {
 /* Second operator is long */
                 if ( lval->val_type != LONG ) {

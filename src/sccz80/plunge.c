@@ -3,7 +3,7 @@
  *
  *      Plunging routines
  *
- *      $Id: plunge.c,v 1.3 2002-02-20 11:11:54 dom Exp $
+ *      $Id: plunge.c,v 1.4 2002-03-14 19:38:55 dom Exp $
  *
  *      Altogether now...arse! My cunning scheme to use c as an
  *      indicator flops badly due to logical conditions, I just
@@ -162,7 +162,7 @@ void (*oper)(), (*doper)();
 
                 }
                 if ( lval->val_type != DOUBLE && lval2->val_type != DOUBLE && lval->val_type != LONG && lval2->val_type !=LONG && lval->val_type !=CPTR && lval2->val_type !=CPTR )
-/* Dodgy? */
+/* Dodgy? */		  		   
                         zpop() ;
         }
         lval->is_const &= lval2->is_const ;
@@ -269,7 +269,13 @@ void (*oper)();
                 if ( lval->val_type == DOUBLE ) dpush() ;
                 else if (lval->val_type == LONG || lval->val_type==CPTR) lpush() ;
 /* Long ptrs? */
-                else zpush() ;
+                else {
+		    if ( lval->val_type == CARRY ) {
+			zcarryconv();
+			lval->val_type = CINT;
+		    }
+		    zpush() ;
+		}
                 if ( plnge1(heir, lval2) ) rvalue(lval2) ;
                 if ( lval2->is_const ) {
                         /* constant on right */
@@ -323,7 +329,7 @@ void (*oper)();
         }
         else if (lval2->is_const == 0) {
                 /* right operand not constant */
-        	(*oper)(lval);
+        	(*oper)(lval);		
         }
         if (oper == zsub && lval->ptr_type ) {
                 /* scale difference between pointers */
