@@ -134,5 +134,7 @@ graphics/undrawb
 graphics/undrawr
 graphics/unplot
 graphics/drawbox
+graphics/xorborder
+graphics/xorplot
 graphics/setxy
 games/joystick

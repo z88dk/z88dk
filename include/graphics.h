@@ -10,7 +10,7 @@
  *      Stefano has converted many of these routines to the new ports
  *      Some will work, some will not. djm 6/6/2000
  *
- *	$Id: graphics.h,v 1.4 2001-10-16 18:30:31 dom Exp $
+ *	$Id: graphics.h,v 1.5 2002-03-28 09:41:12 stefano Exp $
  */
 
 #ifndef __GFX_H__
@@ -38,6 +38,8 @@ extern __LIB__ fill(int x, int y);
 extern __LIB__ plot(int x, int y);
 /* Unplot a pixel */
 extern __LIB__ unplot(int x, int y);
+/* XORs a pixel on screen */
+extern __LIB__ xorplot(int x, int y);
 /* Get pixel status */
 extern __LIB__ point(int x, int y);
 /* Draw a line */
@@ -52,6 +54,8 @@ extern __LIB__ undrawr(int px, int py);
 extern __LIB__ drawb(int tlx, int tly, int width, int height);
 /* Undraw a box */
 extern __LIB__ undrawb(int tlx, int tly, int width, int height);
+/* Draw a dotted border */
+extern __LIB__ xorborder(int tlx, int tly, int width, int height);
 /* Draw a circle */
 extern __LIB__ circle(int x, int y, int radius, int skip);
 /* Undraw a circle */

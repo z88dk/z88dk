@@ -121,10 +121,14 @@ graphics/undrawb
 graphics/undrawr
 graphics/unplot
 graphics/drawbox
+graphics/xorborder
+graphics/xorpixl
+graphics/xorplot
 graphics/setxy
 graphics/fill
 graphics/dfill
 graphics/ticalc/putsprite
+graphics/getsprite
 graphics/ticalc/bksave
 graphics/ticalc/bkrestore
 graphics/ticalc/pixladdr

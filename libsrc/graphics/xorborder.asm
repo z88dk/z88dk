@@ -1,13 +1,15 @@
-	xlib	drawbox
-	lib	plotpixel
+	XLIB	xorborder
+	LIB	xorpixel
+        LIB     swapgfxbk
+	XREF	swapgfxbk1
 
 ;
-;	$Id: drawbox.asm,v 1.3 2002-03-28 09:41:14 stefano Exp $
+;	$Id: xorborder.asm,v 1.1 2002-03-28 09:41:14 stefano Exp $
 ;
 
 ; ***********************************************************************
 ;
-; Clear specified graphics area in map.
+; XORs a dotted box.  Useful for GUIs.
 ; Generic version
 ;
 ; Stefano Bodrato - March 2002
@@ -17,7 +19,15 @@
 ;	BC	= (width,heigth)
 ;
 
-.drawbox
+.xorborder
+		call	swapgfxbk
+		
+		ld	ix,0
+		add	ix,sp
+		ld	b,(ix+2)
+		ld	c,(ix+4)
+		ld	l,(ix+6)
+		ld	h,(ix+8)
 
 		push	bc
 		push	hl
@@ -32,21 +42,14 @@
 .rowloop
 		push	bc
 		
+		inc	l
+		ex	de,hl
 		push	hl
 		push	de
-		call	plotpixel
+		call	xorpixel
 		pop	de
 		pop	hl
 		inc	l
-		ex	de,hl
-
-		push	hl
-		push	de
-		call	plotpixel
-		pop	de
-		pop	hl
-		inc	l
-		ex	de,hl
 
 		pop	bc
 		dec	c
@@ -68,22 +71,15 @@
 		
 		push	hl
 		push	de
-		call	plotpixel
+		call	xorpixel
 		pop	de
 		pop	hl
 		inc	h
 		ex	de,hl
-		
-		push	hl
-		push	de
-		call	plotpixel
-		pop	de
-		pop	hl
 		inc	h
-		ex	de,hl
 		
 		pop	bc
 		
 		djnz	vrowloop
-
-		ret
+		
+		jp	swapgfxbk1

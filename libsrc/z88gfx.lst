@@ -1,7 +1,7 @@
 graphics/circle
 graphics/clg
 graphics/clga
-graphics/clrarea
+graphics/z88/clrarea
 graphics/clsgraph
 graphics/closegfx
 graphics/dcircle
@@ -30,3 +30,6 @@ graphics/unplot
 graphics/window
 graphics/drawbox
 graphics/setxy
+graphics/xorborder
+graphics/xorpixl
+graphics/xorplot

@@ -126,7 +126,12 @@ graphics/setxy
 graphics/fill
 graphics/dfill
 graphics/putsprite
+graphics/getsprite
 graphics/bksave
 graphics/bkrestore
 graphics/spectrum/pixladdr
 graphics/sam/swapgfxbk
+graphics/xorborder
+graphics/xorpixl
+graphics/xorplot
+games/joystick

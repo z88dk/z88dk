@@ -1,5 +1,4 @@
-	INCLUDE	"grafix.inc"
-
+	INCLUDE	"graphics/grafix.inc"
 
 	XLIB	xorpixel
 
@@ -7,7 +6,7 @@
 	XREF	COORDS
 
 ;
-;	$Id: xorpixl.asm,v 1.2 2001-04-18 13:21:38 stefano Exp $
+;	$Id: xorpixl.asm,v 1.3 2002-03-28 09:41:14 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -26,7 +25,7 @@
 ;
 ; ******************************************************************
 ;
-; XOR added by Stefano Bodrato (Feb 2001) to make the sprite code work
+; XOR added by Stefano Bodrato (Feb 2001)
 ;
 ; **************
 ;

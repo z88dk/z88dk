@@ -129,10 +129,14 @@ graphics/undrawb
 graphics/undrawr
 graphics/unplot
 graphics/drawbox
+graphics/xorborder
+graphics/xorpixl
+graphics/xorplot
 graphics/setxy
 graphics/fill
 graphics/dfill
 graphics/vz200/putsprite
+graphics/getsprite
 graphics/vz200/bksave
 graphics/vz200/bkrestore
 graphics/vz200/pixladdr

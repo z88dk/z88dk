@@ -125,12 +125,16 @@ graphics/drawbox
 graphics/setxy
 graphics/fill
 graphics/dfill
+graphics/getsprite
 graphics/spectrum/putsprite
 graphics/spectrum/bksave
 graphics/spectrum/bkrestore
 graphics/spectrum/rowtab
 graphics/spectrum/pixladdr2
 graphics/spectrum/swapgfxbk
+graphics/xorborder
+graphics/xorpixl
+graphics/xorplot
 games/spectrum/joystick
 games/spectrum/bit_open
 games/spectrum/bit_open_di
