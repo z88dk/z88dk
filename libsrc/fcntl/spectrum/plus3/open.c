@@ -14,7 +14,7 @@
  *	Open a file for writing - e=4, d=2 (creat)
  *	Open a file for append  - e=2, d=2
  *
- *	$Id: open.c,v 1.1 2001-05-01 13:55:21 dom Exp $
+ *	$Id: open.c,v 1.2 2002-06-17 17:21:50 dom Exp $
  */
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */
@@ -27,6 +27,7 @@ int open(far char *name, int flags, mode_t mode)
 	ld	ix,0
 	add	ix,sp
 	ld	a,(ix+3)	;mode high
+	and	a
 	jr	nz,ck_append
 	ld	a,(ix+2)
 	and	a
