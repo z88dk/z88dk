@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.25 2003-11-30 21:48:30 denniz Exp $
+ *      $Id: zcc.c,v 1.26 2004-04-15 20:04:05 dom Exp $
  */
 
 
@@ -421,19 +421,23 @@ int linkthem(linker)
         int     i, n, status;
         char    *p;
         char    *asmline;    /* patch for z80asm */
+	char    *ext;
 
 /* patch for z80asm */
-        if (peepholeopt) 
+        if (peepholeopt)  {
                 asmline="-eopt ";
-        else
+                ext=".opt";
+        } else {
                 asmline="-easm ";
+                ext=".asm";
+        } 
 
         n = (strlen(myconf[LINKER].def) + 1);
         if (lateassemble)
                 n+=strlen(asmline);     /* patch for z80asm */
         n += (strlen("-nm -nv -o -R -M ")+strlen(outputfile));
         n += (strlen(linkargs) + 1);
-        n += (strlen(myconf[CRT0].def)+2 );
+        n += (strlen(myconf[CRT0].def)+strlen(ext) + 2 );
         n += (2*strlen(myconf[LINKOPTS].def));
         for (i = 0; i < nfiles; ++i)
         {
@@ -457,13 +461,14 @@ int linkthem(linker)
  * linkargs last character is space..
  */
         strcat(p,myconf[CRT0].def);
+	strcat(p,ext);
 
         for (i = 0; i < nfiles; ++i)
         {
                 if ( (!lateassemble && hassuffix(filelist[i], OBJEXT) ) || lateassemble )
                 {
                         strcat(p, " ");
-                        filelist[i][strlen(filelist[i])-strlen(OBJEXT)]='\0';
+                        //filelist[i][strlen(filelist[i])-strlen(OBJEXT)]='\0';
                         strcat(p, filelist[i]);
                 }
         }
@@ -697,12 +702,12 @@ int main(argc, argv)
 				default:
                                 	BuildAsmLine(asmarg,"-easm");
                                 	if (!assembleonly && !lateassemble)
-                                        	if (process(".asm", OBJEXT, myconf[Z80EXE].def, asmarg , outimplied,i,NO)) exit(1);
+                                        	if (process(".asm", OBJEXT, myconf[Z80EXE].def, asmarg , outimplied,i,YES)) exit(1);
                         }
                         case OFILE:
                         BuildAsmLine(asmarg,"-eopt");
                         if (!assembleonly && !lateassemble)
-                                if (process(".opt", OBJEXT, myconf[Z80EXE].def, asmarg , outimplied,i,NO)) exit(1);
+                                if (process(".opt", OBJEXT, myconf[Z80EXE].def, asmarg , outimplied,i,YES)) exit(1);
                         break;
                 }
         }
