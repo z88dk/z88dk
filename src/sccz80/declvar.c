@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.2 2001-02-02 12:24:06 dom Exp $
+ *      $Id: declvar.c,v 1.3 2001-02-02 17:48:25 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -228,9 +228,11 @@ char zfar )                      /* TRUE if far */
                 else if ( ident == PTR_TO_FN ) {
                         ident = POINTER ;
 			ptrtofn=YES;
+#if 0
                 } else if ( cmatch('@') ) {
 			storage = EXTERNP;
 			constexpr(&addr,1);
+#endif
                 } else if ( cmatch('(') ) {
 /*
  * Here we check for functions, but we can never have a pointer to
@@ -321,6 +323,11 @@ char zfar )                      /* TRUE if far */
                         more = dummy_idx(typ, otag) ;
                         type = (zfar ? CPTR : CINT );
                 }
+
+		if ( cmatch('@') ) {
+			storage = EXTERNP;
+			constexpr(&addr,1);
+		}
 /* Check to see if far has been defined when we haven't got a pointer */
 
                 if (zfar && !(ident==POINTER || (ident==ARRAY && more) || (ident==FUNCTIONP && more))) {
