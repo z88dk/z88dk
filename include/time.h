@@ -25,13 +25,6 @@
 
 extern time_t __LIB__ time(time_t *);
 
-/* z88 specific routines.
- * doepoch() kludges z88 time format to UNIX style seconds
- * gtoy() returns number of days since z88 epoch
- */
-extern time_t __LIB__ get1970();
-extern time_t __LIB__ doepoch(long day, long sec);
-extern long __LIB__ gtoy();
 
 struct tm {
 	int tm_sec;

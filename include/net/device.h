@@ -7,8 +7,6 @@
 #ifndef _NET_DEVICE_H
 #define _NET_DEVICE_H
 
-#include <net/inet.h>
-
 /* Address to which a plugin device is loaded */
 
 #define DRIVER_ADDR 8192

@@ -6,7 +6,7 @@
 
 /*
  *	This file contains definitions for the stats
- *	for TCP stack - packets received etc
+ *	for TCP stack - pkts recvd etc
  *
  *	djm 28/1/2000
  */
@@ -60,34 +60,34 @@ struct sysstat_s {
 
 #ifdef NETSTAT_TXT
 static char *netstat_txt[]= {
-	"IP:   %u packets received",
-	"lIP:   %lu bytes received",
-	"IP:   %u bad checksums",
+	"IP:   %u pkts recvd",
+	"lIP:   %lu bytes recvd",
+	"IP:   %u bad cksums",
 	"IP:   %u bad lengths",
-	"IP:   %u packets sent",
+	"IP:   %u pkts sent",
 
-	"UDP:  %u packets received",
-	"lUDP:  %lu bytes received",
-	"UDP:  %u bad checksums",
-	"UDP:  %u packets sent",
+	"UDP:  %u pkts recvd",
+	"lUDP:  %lu bytes recvd",
+	"UDP:  %u bad cksums",
+	"UDP:  %u pkts sent",
 	"lUDP:  %lu bytes sent",
 
-	"TCP:  %u packets received",
-	"lTCP:  %lu bytes received",
-	"TCP:  %u bad checksums",
-	"TCP:  %u rsts received",
-	"TCP:  %u packets sent",
+	"TCP:  %u pkts recvd",
+	"lTCP:  %lu bytes recvd",
+	"TCP:  %u bad cksums",
+	"TCP:  %u rsts recvd",
+	"TCP:  %u pkts sent",
 	"lTCP:  %lu bytes sent",  
 	"TCP:  %u rsts sent",
-	"TCP:  %u connections requests",
-	"TCP:  %u connection accepts",
-	"TCP:  %u connections established",
-	"TCP:  %u connections closed",
+	"TCP:  %u conns requests",
+	"TCP:  %u conn accepts",
+	"TCP:  %u conns established",
+	"TCP:  %u conns closed",
 
-	"ICMP: %u packets received",
-	"ICMP: %u checksum errors",
-	"ICMP: %u ICMP messages sent",
-	"ICMP: %u messages not send cos old message was icmp"};
+	"ICMP: %u pkts recvd",
+	"ICMP: %u cksum errors",
+	"ICMP: %u ICMP msgs sent",
+	"ICMP: %u msgs not sent cos old msg was icmp"};
 #endif
 	
 

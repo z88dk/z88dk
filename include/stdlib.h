@@ -21,7 +21,11 @@ extern int __LIB__ atoi(char *);
 #define atoi(s) (int)strtol((s),(char **)NULL,10)
 #endif
 
+#ifdef __Z88__
+extern long __LIB__ atol(char *);
+#else
 #define atol(s) strtol((s),(char **)NULL,10)
+#endif
 
 #if 0
 #ifndef _HAVE_ATOF_
@@ -43,7 +47,9 @@ extern __LIB__ sleep(int);
 extern __LIB__ mkdir(char *, int mode);
 extern char __LIB__ *getcwd(char *buf, int maxlen); 
 
+#ifdef __Z88__
 extern __LIB__ csleep(int);  /* Very non standard! sleep for centisecs! (z88)*/
+#endif
 
 /* abort is a macro to exit with RC_Err - only for apps */
 
