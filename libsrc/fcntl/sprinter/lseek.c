@@ -12,7 +12,7 @@
  *   2  SEEK_END from end of file (always -ve)
  *
  * -----
- * $Id: lseek.c,v 1.1 2002-10-03 20:07:20 dom Exp $
+ * $Id: lseek.c,v 1.2 2002-11-15 12:30:34 dom Exp $
  */
 
 
@@ -26,11 +26,11 @@ long lseek(int fd, long posn, int whence)
         ld      ix,0    
         add     ix,sp
         ld      b,(ix+2)        ;whence
-	ld	l,(ix+4)	;file position
-	ld	h,(ix+5)
-	ld	e,(ix+6)	;needs to go into ix at some point
-	ld	d,(ix+7)
-	ld	a,(ix+9)	;fd
+	ld	e,(ix+4)	;file position
+	ld	d,(ix+5)
+	ld	l,(ix+6)	;needs to go into ix at some point
+	ld	h,(ix+7)
+	ld	a,(ix+8)	;fd
 	push	de
 	pop	ix
 	ld	c,$15		;MOVE_FP
