@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.22 2003-08-30 19:11:32 dom Exp $
+ *      $Id: zcc.c,v 1.23 2003-09-11 10:11:24 dom Exp $
  */
 
 
@@ -569,8 +569,6 @@ int main(argc, argv)
  * That's dealt with the options, so onto real stuff now!
  */
 
-	/* Parse the native math library flags */
-	parse_option(myconf[Z88MATHFLG].def);
 
         /* Now, parse the default options list */
         if ( myconf[OPTIONS].def != NULL ) {
@@ -923,6 +921,7 @@ void AddLink(char *arg)
  * this way we can be as generic as possible
  */
         if (strcmp(arg,"lmz")==0) {
+			parse_option(myconf[Z88MATHFLG].def);
 			snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[Z88MATHLIB].def);
 			BuildOptions_start(&linkargs,buffer);
 		return;
