@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.51 2002-10-22 19:15:00 dom Exp $
+# $Id: Makefile,v 1.52 2002-11-14 12:52:52 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -200,6 +200,7 @@ pps_clib.lib:
 	./gamesdeps.sh
 	cd spectrum ; $(MAKE)
 	cd games ; $(MAKE)
+	z80asm -d -ns -nm -Mo -DFORzx -xpps_clib @pps.lst
 
 # vt100 C lib for spectrum
 # use -DROMFONT for a tiny 36 columns mode
