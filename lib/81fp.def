@@ -2,7 +2,7 @@ lstoff
 
 ; ZX 81 stack calculator functions (ZX81 version of ZXFP)
 
-; $Id: 81fp.def,v 1.4 2003-03-17 13:47:01 stefano Exp $
+; $Id: 81fp.def,v 1.5 2003-03-27 09:34:55 stefano Exp $
 
 ; function codes:
 
@@ -11,7 +11,7 @@ lstoff
 
 		DEFC	ZXFP_STK_PTR	= $401C
 
-		DEFC	ZXFP_STK_STORE	= $12C2
+		DEFC	ZXFP_STK_STORE	= $12C3
 		DEFC	ZXFP_TEST_5_FP	= $19EB
 		DEFC	ZXFP_STK_STR	= $12C3
 		DEFC	ZXFP_STK_FETCH	= $13F8

@@ -1,10 +1,9 @@
 ;
-;
 ;       ZX Maths Routines
 ;
 ;       9/12/02 - Stefano Bodrato
 ;
-;       $Id: atof.asm,v 1.1 2003-03-24 09:17:40 stefano Exp $
+;       $Id: atof.asm,v 1.2 2003-03-27 09:34:56 stefano Exp $
 ;
 
 
@@ -30,13 +29,47 @@ ENDIF
 
 		ld	hl,(ZXFP_CH_ADD)
 		push	hl
-		ld	a,(de)			; load the first number digit in A
+		
+.nobloop	ld	a,(de)			; load the first number digit in A
+		cp	' '			; skip spaces
+		jr	nz,noblank
+		inc	de
+		jr	nobloop
+.noblank	
 		cp	'-'
 		push	af
 		jr	nz,noneg
 		inc	de
 		ld	a,(de)
 .noneg
+
+IF FORzx
+ELSE
+		ld	hl,txtbuffer
+		push	hl
+.nloop
+		cp	0
+		jr	z,converted
+		sub	20
+		cp	26
+		jr	nz,nodot
+		ld	a,27
+.nodot
+		ld	(hl),a
+		inc	hl
+		inc	de
+		ld	a,(de)
+		jr	nloop
+
+.txtbuffer	defs	15
+
+.converted
+		ld	a,$76
+		ld	(de),a
+		pop	de
+		ld	a,(de)
+		
+ENDIF
 
 		ld	(ZXFP_CH_ADD),de		; Init the BASIC interpreter pointer
 		call	ZXFP_DEC_TO_FP		; ask BASIC to load the string into a number
@@ -52,4 +85,3 @@ ENDIF
 		ld	(ZXFP_CH_ADD),hl		; restore the pointer
 
 		jp      stkequ
-
