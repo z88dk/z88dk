@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <float.h>
+#include <stdlib.h>
 
 void ftoa(double number, int prec, char *str)
 {
@@ -15,6 +16,6 @@ void ftoa(double number, int prec, char *str)
 
         fix_number=floor(number);
         realpart_number=(number-fix_number)*pow10(prec);
-        sprintf(str,"%d.%d",(int)fix_number,(int)fabs(realpart_number));
+        sprintf(str,"%d.%d",(int)fix_number,abs(realpart_number));
 }
 
