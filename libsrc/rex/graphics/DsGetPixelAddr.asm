@@ -1,6 +1,7 @@
 ;
 ;	written by Waleed Hasan
 ;
+;	$Id;$
 
 	XLIB	DsGetPixelAddr
 	LIB	pixaddr

@@ -1,6 +1,8 @@
 ;
 ;	written by Waleed Hasan
 ;
+;	$Id: DsDisplayCircle.asm,v 1.2 2003-03-13 15:02:07 dom Exp $
+;
 
 	XLIB	DsDisplayCircle
 	LIB	set4pix

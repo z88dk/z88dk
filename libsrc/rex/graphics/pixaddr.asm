@@ -1,6 +1,7 @@
 ;
 ;	written by Waleed Hasan
 ;
+;	$Id: pixaddr.asm,v 1.2 2003-03-13 15:02:09 dom Exp $
 
 	XLIB	pixaddr
 	

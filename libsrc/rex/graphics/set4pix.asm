@@ -1,6 +1,7 @@
 ;
 ;	written by Waleed Hasan
 ;
+;	$Id: set4pix.asm,v 1.2 2003-03-13 15:02:09 dom Exp $
 
 	XLIB	set4pix
 	LIB	setpixsave

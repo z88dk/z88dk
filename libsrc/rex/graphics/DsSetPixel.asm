@@ -1,6 +1,7 @@
 ;
 ;	written by Waleed Hasan
 ;
+;	$Id;$
 
 	XLIB	DsSetPixel
 	LIB	setpix

@@ -5,6 +5,8 @@
 
   This is not in full assembly, but calling the asm set_4_pix
   saved some bytes & made the ellipse drawing faster
+
+  $Id: DsDisplayEllipse.c,v 1.2 2003-03-13 15:02:07 dom Exp $
  */
  
 #asm
