@@ -206,3 +206,13 @@
 	ld	hl,%2
 =
 	ld	hl,%2
+
+	ld	hl,_udata%1
+	ld	(hl),#(%2 % 256)
+	inc	hl
+	ld	(hl),#(%2 / 256)
+	ld	hl,%3
+=
+	ld	hl,%2
+	ld	(_udata%1),hl
+	ld	hl,%3
