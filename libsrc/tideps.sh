@@ -1,15 +1,15 @@
 #!/bin/sh
 #  short script to sort out ticalc dependencies
 
-	rm stdio/ticalc/fgetc_cons.o
-	rm stdio/ticalc/getk.o
-	rm stdio/ticalc/getk_decode.o
-	rm stdio/ansi/ticalc/f_ansi_attr.o
-	rm stdio/ansi/ticalc/f_ansi_bel.o
-	rm stdio/ansi/ticalc/f_ansi_char.o
-	rm stdio/ansi/ticalc/f_ansi_cls.o
-	rm stdio/ansi/ticalc/f_ansi_dline.o
-	rm stdio/ansi/ticalc/f_ansi_scrollup.o
-	rm graphics/ticalc/pixladdr.o
-	rm graphics/ticalc/swapgfxbk.o
+	rm -f stdio/ticalc/fgetc_cons.o
+	rm -f stdio/ticalc/getk.o
+	rm -f stdio/ticalc/getk_decode.o
+	rm -f stdio/ansi/ticalc/f_ansi_attr.o
+	rm -f stdio/ansi/ticalc/f_ansi_bel.o
+	rm -f stdio/ansi/ticalc/f_ansi_char.o
+	rm -f stdio/ansi/ticalc/f_ansi_cls.o
+	rm -f stdio/ansi/ticalc/f_ansi_dline.o
+	rm -f stdio/ansi/ticalc/f_ansi_scrollup.o
+	rm -f graphics/ticalc/pixladdr.o
+	rm -f graphics/ticalc/swapgfxbk.o
 
