@@ -201,3 +201,8 @@
 =
 	ld	hl,(%1)
 	ld	h,0
+
+	%1c	hl
+	ld	hl,%2
+=
+	ld	hl,%2

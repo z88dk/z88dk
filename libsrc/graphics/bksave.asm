@@ -7,11 +7,6 @@
 	XLIB    bksave
 	LIB	pixeladdress
 
-	INCLUDE	"grafix.inc"
-
-.actcoord
-	 defw	0
-
 .bksave
         ld      hl,2   
         add     hl,sp
@@ -27,67 +22,61 @@
         inc     hl
         ld      d,(hl)	; x and y coords
 
-	ld	h,d
-	ld	l,e
-
-	ld	(actcoord),hl	; save current coordinates
+	ld	h,d	; current x coordinate
+	ld	l,e	; current y coordinate
 
 	ld	(ix+2),h
 	ld	(ix+3),l
 
+	push	hl
 	call	pixeladdress
-	xor	7
-
-	ld	h,d
-	ld	l,e
+	pop	hl
 
 	ld	a,(ix+0)
 	ld	b,(ix+1)
 	cp	9
 	jr	nc,bksavew
 
-._sloop
+.bksaves
 	push	bc
-	ld	a,(hl)
+	ld	a,(de)
 	ld	(ix+4),a
-	inc	hl
-	ld	a,(hl)
+	inc	de
+	ld	a,(de)
 	ld	(ix+5),a
 	inc	ix
 	inc	ix
 
-        ld	hl,(actcoord)
 	inc	l
-	ld	(actcoord),hl
+
+	push	hl
 	call	pixeladdress
-	ld	h,d
-	ld	l,e
+	pop	hl
 	
 	pop	bc
 	
-	djnz	_sloop
+	djnz	bksaves
 	ret
 
 .bksavew
 	push	bc
-	ld	a,(hl)
+	ld	a,(de)
 	ld	(ix+4),a
-	inc	hl
-	ld	a,(hl)
+	inc	de
+	ld	a,(de)
 	ld	(ix+5),a
-	inc	hl
-	ld	a,(hl)
+	inc	de
+	ld	a,(de)
 	ld	(ix+6),a
 	inc	ix
 	inc	ix
 	inc	ix
 
-        ld	hl,(actcoord)
 	inc	l
-	ld	(actcoord),hl
+
+	push	hl
 	call	pixeladdress
-	ld	h,d
-	ld	l,e
+	pop	hl
 	
 	pop	bc
 	djnz	bksavew

@@ -107,5 +107,8 @@ extern void __LIB__ __SHARED__ GoTCP(void);
 
 extern int __LIB__ __SHARED__ killdaemon(tcpport_t port, char protocol);
 
+/* Fix the checksum of a packet */
+extern int __LIB__ IPHeaderCheck(void *pkt);
+
 #endif /* !_NET_MISC_H */
 

@@ -135,7 +135,10 @@ graphics/undrawr
 graphics/unplot
 graphics/drawbox
 graphics/setxy
+graphics/fill
+graphics/dfill
 graphics/putsprite
+graphics/getsprite
 graphics/bksave
 graphics/bkrestore
 graphics/spectrum/pixladdr

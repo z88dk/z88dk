@@ -47,9 +47,9 @@
 
 ;Graphic function XDEFS..
 
-;        XDEF    coords
-;        XDEF    base_graphics
-;        XDEF    gfx_bank
+        XDEF    coords
+        XDEF    base_graphics
+        XDEF    gfx_bank
 
 ; Now, getting to the real stuff now!
 
