@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.9 2002-05-29 22:54:09 dom Exp $
+ *      $Id: stmt.c,v 1.10 2002-10-08 20:40:01 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -337,102 +337,125 @@ void dodo()
         needtoken("while") ;
         postlabel(wq.loop) ;
         test(wq.exit, YES) ;
-        jump(top);
-        postlabel(wq.exit) ;
-        delwhile() ;
-        ns() ;
+		jump(top);
+		postlabel(wq.exit) ;
+		delwhile() ;
+		ns() ;
 }
 
+
 /*
- * "for" statement
+ * "for" statement (zrin)
  */
 void dofor()
 {
-        WHILE_TAB wq ;
-        int lab1, lab2 ;
+		WHILE_TAB wq ;
+		int l_condition;
+		t_buffer *buf2, *buf3;
 
-        addwhile(&wq) ;
-        lab1 = getlabel() ;
-        lab2 = getlabel() ;
-        needchar('(') ;
-        if (cmatch(';') == 0 ) {
-                doexpr() ;                              /* expr 1 */
-                ns() ;
-        }
-        postlabel(lab1) ;
-        if ( cmatch(';') == 0 ) {
-                test(wq.exit, NO ) ;    /* expr 2 */
-                ns() ;
-        }
-        jump(lab2) ;
-        postlabel(wq.loop) ;
-        if ( cmatch(')') == 0 ) {
-                doexpr() ;                              /* expr 3 */
-                needchar(')') ;
-        }
-        jump(lab1) ;
-        postlabel(lab2) ;
-        statement() ;
-        jump(wq.loop) ;
-        postlabel(wq.exit) ;
-        delwhile() ;
+		addwhile(&wq);
+		l_condition = getlabel();
+
+		needchar('(');
+		if (cmatch(';') == 0 ) {
+				doexpr();		/*         initialization             */
+				ns();
+		}
+
+		buf2 = startbuffer(1); /* save condition to buf2 */
+		if ( cmatch(';') == 0 ) {
+				test(wq.exit, NO);   /* expr 2 */
+				ns();
+		}
+		suspendbuffer();
+
+		buf3 = startbuffer(1); /* save modification to buf3 */
+		if ( cmatch(')') == 0 ) {
+				doexpr();              /* expr 3 */
+				needchar(')');
+		}
+		suspendbuffer();
+
+		jump(l_condition);		/*         goto condition             */
+		postlabel(wq.loop);		/* .loop                              */
+		statement();			/*         statement                  */
+		clearbuffer(buf3);		/*         modification               */
+		postlabel(l_condition);	/* .condition                         */
+		clearbuffer(buf2);		/*         if (!condition) goto exit  */
+		jump(wq.loop);			/*         goto loop                  */
+		postlabel(wq.exit);		/* .exit                              */
+
+		delwhile();
 }
+
 
 /*
  * "switch" statement
  */
 void doswitch()
 {
-        WHILE_TAB wq ;
-        int endlab, swact, swdef ;
-        SW_TAB *swnex, *swptr ;
-        char    swtype;   /* type of switch statement - CINT/LONG */
+		WHILE_TAB wq ;
+		int endlab, swact, swdef ;
+		SW_TAB *swnex, *swptr ;
+		char    swtype;   /* type of switch statement - CINT/LONG */
+		t_buffer *buf;
 
-        swact = swactive ;
-        swdef = swdefault ;
-        swnex = swptr = swnext ;
-        addwhile(&wq) ;
-        (wqptr-1)->loop = 0 ;
-        needchar('(') ;
-        swtype=doexpr() ;                      /* evaluate switch expression */
-        needchar(')') ;
-        swdefault = 0 ;
-        swactive = 1 ;
-        jump(endlab=getlabel()) ;
-        statement() ;           /* cases, etc. */
-        jump(wq.exit) ;
-        postlabel(endlab) ;
-        if (swtype==CCHAR) {
-                LoadAccum();
-                while (swptr < swnext) {
-                        CpCharVal(swptr->value);
-                        opjump("z,",swptr->label);
-                        ++swptr;
-                }
-        } else {
-                sw(swtype) ;                          /* insert code to match cases */
-                while ( swptr < swnext ) {
-                        defword() ;
-                        printlabel(swptr->label) ;              /* case label */
-                        if (swtype==LONG) {
-                                outbyte('\n');
-                                deflong();
-                        }else
-                                outbyte(',') ;
-                        outdec(swptr->value) ;                  /* case value */
-                        nl() ;
-                        ++swptr ;
-                }
-                defword() ;
-                outdec(0) ;
-                nl() ;
-        }
-        if (swdefault) jump(swdefault) ;
-        postlabel(wq.exit) ;
-        delwhile() ;
-        swnext = swnex ;
-        swdefault = swdef ;
-        swactive = swact ;
+		swact = swactive ;
+		swdef = swdefault ;
+		swnex = swptr = swnext ;
+		addwhile(&wq) ;
+		(wqptr-1)->loop = 0 ;
+		needchar('(') ;
+		swtype=doexpr() ;                      /* evaluate switch expression */
+		needchar(')') ;
+		swdefault = 0 ;
+		swactive = 1 ;
+		endlab=getlabel();
+		/* jump(endlab) ; */
+
+		buf = startbuffer(5);
+		statement() ;           /* cases, etc. */
+		/* jump(wq.exit) ; */
+		suspendbuffer();
+
+		postlabel(endlab) ;
+		if (swtype==CCHAR) {
+				LoadAccum();
+				while (swptr < swnext) {
+						CpCharVal(swptr->value);
+						opjump("z,",swptr->label);
+						++swptr;
+				}
+		} else {
+				sw(swtype) ;                          /* insert code to match cases */
+				while ( swptr < swnext ) {
+						defword() ;
+						printlabel(swptr->label) ;              /* case label */
+						if (swtype==LONG) {
+								outbyte('\n');
+								deflong();
+						}else
+								outbyte(',') ;
+						outdec(swptr->value) ;                  /* case value */
+						nl() ;
+						++swptr ;
+				}
+				defword() ;
+				outdec(0) ;
+				nl() ;
+		}
+		if (swdefault)
+			jump(swdefault) ;
+		else
+			jump(wq.exit);
+
+		clearbuffer(buf);
+
+		postlabel(wq.exit) ;
+		delwhile() ;
+		swnext = swnex ;
+		swdefault = swdef ;
+		swactive = swact ;
 }
 
 /*

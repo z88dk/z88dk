@@ -28,3 +28,18 @@ extern void outdec(long number);
 extern void outd2(long n);
 extern char raise(char c);
 extern void queuelabel(int);
+
+typedef struct {
+	struct t_buffer *before;
+	size_t size;
+	char *start;
+	char *end;
+	char *next;
+} t_buffer;
+
+extern t_buffer * startbuffer(int blocks);
+extern void clearbuffer(t_buffer *buf);
+extern void suspendbuffer(void);
+extern int outbuffer(char c);
+extern t_buffer *currentbuffer;
+

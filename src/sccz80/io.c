@@ -3,7 +3,7 @@
  *
  *      Various compiler file i/o routines
  *
- *      $Id: io.c,v 1.3 2002-01-28 11:51:16 dom Exp $
+ *      $Id: io.c,v 1.4 2002-10-08 20:40:01 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -59,7 +59,7 @@ char *sname;
                 /* &c is top of stack, p is end of heap */
                 if ( (k=&c-p) < minavail )
                         minavail = k ;
-                free(p) ;
+				free(p) ;
         }
 #endif
 
@@ -111,7 +111,7 @@ int label;
 {
         prefix();
         printlabel(label) ;
-        col();
+		col();
         nl();
 }
 
@@ -134,18 +134,70 @@ int numeric(char c)
 /* Test if given character is alphanumeric */
 int an(char c)
 {
-        if ( alpha(c) ) return 1 ;
-        return numeric(c) ;
+		if ( alpha(c) ) return 1 ;
+		return numeric(c) ;
 }
 
 /* Print a carriage return and a string only to console */
 void pl(str)
 char *str;
 {
-        putchar('\n');
-        while(*str)putchar(*str++);
+		putchar('\n');
+		while(*str)putchar(*str++);
 }
 
+
+/* buffering code */
+
+t_buffer *currentbuffer = NULL;
+
+t_buffer * startbuffer(int blocks)
+{
+	t_buffer *buf = (t_buffer *) mymalloc(sizeof(t_buffer)) ;
+	int size = blocks * STAGESIZE;
+	buf->size = size;
+	buf->start = (char *) mymalloc(size);
+	buf->end = buf->start + blocks * size - 1;
+	buf->next = buf->start;
+	buf->before = currentbuffer;
+	currentbuffer = buf;
+	return buf;
+}
+
+void suspendbuffer(void)
+{
+	if (currentbuffer)
+		currentbuffer = currentbuffer->before;
+}
+
+void clearbuffer(t_buffer *buf)
+{
+	if (! buf || ! buf->start) return;
+	if (currentbuffer == buf)
+		currentbuffer = currentbuffer->before;
+	* buf->next = '\0';
+	outstr(buf->start);
+	free(buf->start);
+	buf->start = buf->next = 0;
+	free(buf);
+}
+
+
+int outbuffer(char c)
+{
+	if (currentbuffer->next == currentbuffer->end) {
+		size_t size = currentbuffer->size * 2;
+		char *tmp = (char *) mymalloc(size);
+		memcpy(tmp, currentbuffer->start, currentbuffer->size);
+		free(currentbuffer->start);
+		currentbuffer->next =
+			tmp + (currentbuffer->start - currentbuffer->next);
+		currentbuffer->start = tmp;
+		currentbuffer->end = tmp + size - 1;
+		currentbuffer->size = size;
+	}
+	return * (currentbuffer->next++) = c;
+}
 
 
 /* initialise staging buffer */
@@ -153,9 +205,9 @@ char *str;
 void setstage( before, start )
 char **before, **start ;
 {
-        if ( (*before=stagenext) == 0 )
-                stagenext = stage ;
-        *start = stagenext ;
+		if ( (*before=stagenext) == 0 )
+				stagenext = stage ;
+		*start = stagenext ;
 }
 
 /* flush or clear staging buffer */
@@ -163,27 +215,29 @@ char **before, **start ;
 void clearstage( before, start )
 char *before, *start ;
 {
-        *stagenext = 0 ;
-        if ( (stagenext=before) ) return ;
-        if ( start ) {
-                if ( output != NULL_FD ) {
+		*stagenext = 0 ;
+		if ( (stagenext=before) ) return ;
+		if ( start ) {
+				if ( output != NULL_FD ) {
 #ifdef INBUILT_OPTIMIZER
-                        if (infunc) AddBuffer(start);
-                        else 
+						if (infunc) AddBuffer(start);
+						else
 #endif
-                                if ( fputs(start, output) == EOF )
-                                        fabort() ;
-                }
-                else {
-                        puts(start) ;
-                }
-        }
+							outstr(start);
+/*								if ( fputs(start, output) == EOF )
+										fabort() ;
+*/
+				}
+				else {
+						puts(start) ;
+				}
+		}
 }
 
 void fabort()
 {
-        closeout();
-        error(E_OUTERR);
+		closeout();
+		error(E_OUTERR);
 }
 
 /* direct output to console */
@@ -196,7 +250,7 @@ void toconsole()
 /* direct output back to file */
 void tofile()
 {
-        if(saveout)
+		if(saveout)
                 output = saveout;
         saveout = 0;
 }
@@ -204,57 +258,61 @@ void tofile()
 
 int outbyte(char c)
 {
-        if(c) {
-                if ( output != NULL_FD ) {
-                        if (stagenext) {
-                                return(outstage(c)) ;
-                        }
-                        else {
+		if(c) {
+				if ( output != NULL_FD ) {
+						if (stagenext) {
+								return(outstage(c)) ;
+						}
+						else {
 #ifdef INBUILT_OPTIMIZER
-                                if (infunc) opt_outc(c);
-                                else 
+								if (infunc) opt_outc(c);
+								else
 #endif
-                                        if((putc(c,output))==EOF)
-                                                fabort() ;
-                        }
-                }
-                else putchar(c);
-        }
-        return c;
+									if (currentbuffer) {
+										return outbuffer(c);
+									}
+									else
+										if((putc(c,output))==EOF)
+											fabort() ;
+						}
+				}
+				else putchar(c);
+		}
+		return c;
 }
 
 /* output character to staging buffer */
 
 int outstage(char c)
 {
-        if (stagenext == stagelast) {
-                error(E_STGOV) ;
-                return 0 ;
-        }
-        *stagenext++ = c ;
-        return c ;
+		if (stagenext == stagelast) {
+				error(E_STGOV) ;
+				return 0 ;
+		}
+		*stagenext++ = c ;
+		return c ;
 }
 
 void outstr(ptr)
 char ptr[];
 {
-        while(outbyte(*ptr++));
+		while(outbyte(*ptr++));
 }
 
 void nl()
 {
-        outbyte('\n');
+		outbyte('\n');
 }
 
 void tab()
 {
-        outbyte('\t');
+		outbyte('\t');
 }
 
 void col()
 {
-	if (asxx) 
-  	      outbyte(58);    
+	if (asxx)
+		  outbyte(58);
 }
 
 void bell()
