@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <stdarg.h>
 
 
 /* Conversion routines */
@@ -52,6 +53,9 @@ extern option_t  rex_options;
 
 extern int       svi_exec(char *target);
 extern option_t  svi_options;
+
+extern int       tixx_exec(char *target);
+extern option_t  tixx_options;
 
 extern int       z88_exec(char *target);
 extern option_t  z88_options;
@@ -103,6 +107,24 @@ struct {
     { "mkaddin",   "rex",       "(C) 2001 Dominic Morris",   
       "Creates a .rex application using data from a .res file and a .bin file",
       rex_exec,     &rex_options },
+    { "bin2var",   "ti82",       "(C) 2000 - 2003 David Phillips et al",
+        "Creates a .82p file",
+        tixx_exec,      &tixx_options },
+    { "bin2var",   "ti83",       "(C) 2000 - 2003 David Phillips et al",
+        "Creates a .83p file",
+        tixx_exec,      &tixx_options },
+    { "bin2var",   "ti8x",       "(C) 2000 - 2003 David Phillips et al",
+        "Creates a .8xp file",
+        tixx_exec,      &tixx_options },
+    { "bin2var",   "ti85",       "(C) 2000 - 2003 David Phillips et al",
+        "Creates a .85p file",
+        tixx_exec,      &tixx_options },
+    { "bin2var",   "ti86",       "(C) 2000 - 2003 David Phillips et al",
+        "Creates a .86p file",
+        tixx_exec,      &tixx_options },
+    { "bin2var",   "ti86s",       "(C) 2000 - 2003 David Phillips et al",
+        "Creates a .86s file",
+        tixx_exec,      &tixx_options },
     { "bin2svi",  "svi",       "(C) 2001 Stefano Bodrato",                         
       "Creates a .cas file loadable with the SVI emulator",
       svi_exec,      &svi_options },
@@ -123,7 +145,7 @@ struct {
       zx81_exec,    &zx81_options },
 
 };
-#define APPMAKE_TARGETS 14
+#define APPMAKE_TARGETS 20
 #endif
 
 
