@@ -18,7 +18,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* MSDOS definitions: 
 #define OS_ID "MSDOS"
 #define MSDOS 1
-#define DEFLIBDIR "c:\z88dk\lib\"
+#define DEFLIBDIR "c:\\z88dk\\lib\\"
 */
 
 /* UNIX definitions: */
