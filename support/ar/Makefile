@@ -1,11 +1,11 @@
 
 
 
-all: ar
+all: z80nm
 
-ar:	ar.c
-	$(CC) -o ar $(CFLAGS) ar.c
+z80nm:	ar.c
+	$(CC) -o z80nm $(CFLAGS) ar.c
 
 
 clean:
-	$(RM)  ar.o ar *~ core
+	$(RM)  ar.o z80nm *~ core

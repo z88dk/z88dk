@@ -20,6 +20,8 @@ static FILE *open_library(char *name);
 static unsigned long read_intel32(FILE *fp, unsigned long *offs);
 static unsigned int  read_intel16(FILE *fp, unsigned long *offs);
 
+static void object_dump(FILE *fp, unsigned long start, char showlocal);
+
 
 static void usage(char *name)
 {
@@ -34,8 +36,8 @@ static void usage(char *name)
 
 int main(int argc, char *argv[])
 {
-    char     buf[8];
-    unsigned long next,len,red,start;
+    char    *file;
+    unsigned long next,len,start;
     FILE  *fp;
     char    showlocal = 0;
     int     opt;
@@ -54,98 +56,110 @@ int main(int argc, char *argv[])
 	usage(argv[0]);
     }
 
-
-    if ( ( fp = open_library(argv[optind++]) ) == NULL ) {
-	exit(1);
+    file = argv[optind++];
+    if ( ( fp = open_library(file) ) == NULL ) {
+	if ( ( fp = fopen(file,"rb")  ) != NULL ) {	   
+	    object_dump(fp,0,showlocal);
+	    exit(0);
+	} else {
+	    exit(1);
+	}
     }
 
-    red = 0;
+
     next = 8;
 
     do {
 	start = next + 8;
 	fseek(fp,next,SEEK_SET);
-	red = 0;
-	next = read_intel32(fp,&red);
-	len  = read_intel32(fp,&red);
-	//	printf("%08x %08x\n",next,len);
+	next = read_intel32(fp,NULL);
+	len  = read_intel32(fp,NULL);
 	if ( len == 0xFFFFFFFF ) 
 	    break;
-	fread(buf,8,1,fp);
-	red = 8;
-	if ( strncmp(buf,"Z80RMF01",8) == 0 ) {
-	    unsigned long modname,expr,name,libname,code;
-	    unsigned int  org;
-	    char          c;
-	    int           len,i;
-	    org     = read_intel16(fp,&red);
-	    modname = read_intel32(fp,&red);
-	    expr    = read_intel32(fp,&red);
-	    name    = read_intel32(fp,&red);
-	    libname = read_intel32(fp,&red);
-	    code    = read_intel32(fp,&red);
-	    fseek(fp,start+modname,SEEK_SET);
-	    len = fgetc(fp);
-
-	    for ( i = 0; i < len; i++ ) {
-		c = fgetc(fp);
-		fputc(c,stdout);
-		red++;
-	    }
-	    fseek(fp,start+code,SEEK_SET);
-	    len = read_intel16(fp,&red);
-	    printf("\t\t@%08x (%d bytes)\n",start,len);
-	    /* Now print any dependencies under that */
-	    if ( name != 0 ) {
-		char   scope,type;
-		unsigned long temp;
-		fseek(fp,start+name,SEEK_SET);
-		red = 0;
-		while ( red < ( modname - name ) ) {
-		    scope = fgetc(fp); red++;
-		    type = fgetc(fp); red++;
-		    temp = read_intel32(fp,&red);
-		    len = fgetc(fp); red++;
-		    if ( type == 'A' && (showlocal || scope != 'L' ) )
-			printf("  %c  ",scope);
-		    for ( i = 0; i < len; i++ ) {
-			c = fgetc(fp);
-			if ( type == 'A' && (showlocal || scope != 'L' ) )
-			    fputc(c,stdout);
-			red++;
-		    }
-		    if ( type == 'A' && (showlocal || scope != 'L' ) ) 
-			printf("\n");
-		}
-	    }
-	    if ( libname != 0xFFFFFFFF ) {
-		fseek(fp,start+libname,SEEK_SET);
-		red = 0;
-		while ( red < (modname - libname) ) {
-		    len = fgetc(fp); red++;
-		    printf("  U  ");
-		    for ( i = 0; i < len; i++ ) {
-			c = fgetc(fp);
-			fputc(c,stdout);
-			red++;
-		    }
-		    printf("\n");
-		}
-
-	    }	       		
-	}   
+	object_dump(fp,start,showlocal);
     } while ( next != 0xFFFFFFFF );
 
     fclose(fp);
 }
 
+void object_dump(FILE *fp, unsigned long start, char showlocal)
+{
+    char     buf[8];
+    unsigned long modname,expr,name,libname,code,red;
+    unsigned int  org;
+    char          c;
+    int           len,i;
+
+    fread(buf,8,1,fp);
+
+    if ( strncmp(buf,"Z80RMF01",8) != 0 ) {
+	return;
+    }
+
+    org     = read_intel16(fp,&red);
+    modname = read_intel32(fp,&red);
+    expr    = read_intel32(fp,&red);
+    name    = read_intel32(fp,&red);
+    libname = read_intel32(fp,&red);
+    code    = read_intel32(fp,&red);
+
+
+    fseek(fp,start+modname,SEEK_SET);
+    len = fgetc(fp);
+    
+    for ( i = 0; i < len; i++ ) {
+	c = fgetc(fp);
+	fputc(c,stdout);
+	red++;
+    }
+    fseek(fp,start+code,SEEK_SET);
+    len = read_intel16(fp,&red);
+    printf("\t\t@%08x (%d bytes)\n",start,len);
+    /* Now print any dependencies under that */
+    if ( name != 0 ) {
+	char   scope,type;
+	unsigned long temp;
+	fseek(fp,start+name,SEEK_SET);
+	red = 0;
+	while ( red < ( modname - name ) ) {
+	    scope = fgetc(fp); red++;
+	    type = fgetc(fp); red++;
+	    temp = read_intel32(fp,&red);
+	    len = fgetc(fp); red++;
+	    if ( type == 'A' && (showlocal || scope != 'L' ) )
+		printf("  %c  ",scope);
+	    for ( i = 0; i < len; i++ ) {
+		c = fgetc(fp);
+		if ( type == 'A' && (showlocal || scope != 'L' ) )
+		    fputc(c,stdout);
+		red++;
+	    }
+	    if ( type == 'A' && (showlocal || scope != 'L' ) ) 
+		printf("\t+%04x\n",temp);
+	}
+    }
+    if ( libname != 0xFFFFFFFF ) {
+	fseek(fp,start+libname,SEEK_SET);
+	red = 0;
+	while ( red < (modname - libname) ) {
+	    len = fgetc(fp); red++;
+	    printf("  U  ");
+	    for ( i = 0; i < len; i++ ) {
+		c = fgetc(fp);
+		fputc(c,stdout);
+		red++;
+	    }
+	    printf("\n");
+	}
+    }
+}
 
 FILE *open_library(char *name)
 {
     char    buf[9];
     FILE   *fp;
 
-    if ( ( fp = fopen(name,"r") ) == NULL ) {
+    if ( ( fp = fopen(name,"rb") ) == NULL ) {
 	return NULL;
     }
 
@@ -167,8 +181,8 @@ static unsigned long read_intel32(FILE *fp, unsigned long *offs)
 
     i = fread(buf,1,4,fp);
 
-
-    *offs += 4;
+    if ( offs )
+	*offs += 4;
 
     return ( buf[3] << 24  | buf[2] << 16 | buf[1] << 8 | buf[0] );
 }
@@ -180,7 +194,8 @@ static unsigned int  read_intel16(FILE *fp, unsigned long *offs)
 
     fread(buf,1,2,fp);
 
-    *offs += 2;
+    if ( offs )
+	*offs += 2;
 
     return ( buf[1] << 8 | buf[0] );
 }
