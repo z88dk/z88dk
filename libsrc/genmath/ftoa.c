@@ -41,6 +41,9 @@ char *str;      /* output string */
                 scale *= 10.0 ;
                 i++ ;
         }
+	if ( i == 0 )
+	    *str++ = '0';
+
         while ( i-- ) {
                 /* output digits before decimal */
                 scale = floor(0.5 + scale * 0.1 ) ;
