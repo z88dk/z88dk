@@ -29,6 +29,13 @@ unsigned char pos[3] = { 'A', 'W', 'E' };
 unsigned char plug[] = "AMTE";
 
 #ifdef CPM
+#define ARGC
+#endif
+#ifdef Z88_SHELL
+#define ARGC
+#endif
+
+#ifdef ARGC
 int main(int argc, char *argv[])
 #else
 int main()
@@ -36,22 +43,21 @@ int main()
 {
     unsigned int i, j, n;
     unsigned int ch;
-#ifdef CPM
+#ifdef ARGC
     int len, posn;
 
-    printf("%d\n", argc);
     if (argc != 2) {
 	puts("Usage: enigma [text to be encoded]");
 	exit(1);
     }
 
     len = strlen(argv[1]);
-    posn = 0;
+    posn = -1;
 #else
     puts("Enter text to be (de)coded, finish with a .");
 #endif
 
-#ifdef CPM
+#ifdef ARGC
     while (posn++ < len) {
 	ch = toupper(*(argv[1] + posn));
 #else
