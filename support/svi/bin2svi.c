@@ -1,7 +1,7 @@
 /*
- *   MSX BIN file
+ *   Spectravideo SVI Cassette file
  *
- *   BLOAD "PROG.BIN",R
+ *   BLOAD "CAS:",R
  *
  *   By Stefano Bodrato
  */
@@ -13,6 +13,7 @@
 
 void writebyte(unsigned char, FILE *);
 void writeword(unsigned int, FILE *);
+void headtune(FILE *fp);
 
 int main(int argc, char *argv[])
 {
@@ -23,7 +24,8 @@ int main(int argc, char *argv[])
 	int	len;
 
 	if (argc != 3 ) {
-		fprintf(stdout,"Usage: %s [code file] [msx bin file]\n",argv[0]);
+		fprintf(stdout,"Binary file to Spectravideo SVI converter\n");
+		fprintf(stdout,"Usage: %s [code file] [CAS file]\n",argv[0]);
 		exit(1);
 	}
 
@@ -52,12 +54,30 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-
 /* Write out the header file */
-	fputc(254,fpout);
-	writeword(40000,fpout);	/* Start Address */
-	writeword(40000+len+1,fpout); /* End Address */
-	writeword(40000,fpout);	/* Call Address */
+	headtune (fpout);
+	for (i=0; i<10;i++)
+		writebyte(208,fpout);
+
+/* Deal with the filename */
+	if (strlen(argv[1]) >= 6 ) {
+		strncpy(name,argv[1],6);
+	} else {
+		strcpy(name,argv[1]);
+		strncat(name,"      ",6-strlen(argv[1]));
+	}
+	for	(i=0;i<6;i++)
+		writebyte(name[i],fpout);
+	
+	writeword(0,fpout);
+
+/* Now, the body */
+	headtune (fpout);
+	writeword(34816,fpout);		/* Start Address */
+	writeword(34816+len+1,fpout);	/* End Address */
+	writeword(34816,fpout);		/* Call Address */
+
+/* (58 bytes written so far...) */
 
 
 /* We append the binary file */
@@ -67,10 +87,16 @@ int main(int argc, char *argv[])
 		writebyte(c,fpout);
 	}
 
+
+/* Append some zeros, just to be sure not to get an error*/
+
+	for (i=0; i<16384;i++)
+		writebyte(0,fpout);
+
 	fclose(fpin);
 	fclose(fpout);
 }
-		
+
 
 
 void writeword(unsigned int i, FILE *fp)
@@ -84,4 +110,17 @@ void writeword(unsigned int i, FILE *fp)
 void writebyte(unsigned char c, FILE *fp)
 {
 	fputc(c,fp);
+}
+
+
+
+/* 10101....0101010101111111 */
+void headtune(FILE *fp)
+{
+	int	i;
+	
+	for (i=0; i<16;i++)
+		writebyte(85,fp);
+	writebyte(127,fp);
+
 }

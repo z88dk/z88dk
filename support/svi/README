@@ -1,0 +1,6 @@
+- Compile the program (zcc +svi adv_a.c)
+- Convert the binary to CAS image file (bin2svi a.bas adv.cas)
+- Run the SVI emulator.
+
+If you are using the Jimmy Mårdell's "SVI" emulator, you can specify the autoload option:
+svi -tapa adv.cas

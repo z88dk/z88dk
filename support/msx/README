@@ -1,0 +1,5 @@
+- Compile the program (zcc +msx adv_a.c)
+- Convert the binary (bin2msx a.bas adv.bin)
+- Transfer the program on an MSX disk image (dsktool A adventure.dsk adv.bin)
+- Run the MSX emulator configuring the disk drive so that it points to your disk image
+- Load the program with the RUN option (bload "adv.bin",r)
