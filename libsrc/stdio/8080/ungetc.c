@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: ungetc.c,v 1.1 2002-05-10 11:08:56 dom Exp $
+ * $Id: ungetc.c,v 1.2 2003-10-01 20:00:16 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -23,7 +23,7 @@ int ungetc(int c, FILE *fp)
 	push	bc
 	push	de
 	push	hl
-	ld	hl,EOF
+	ld	hl,-1	;EOF
 	inc	de
 	inc	de
 	ld	a,(de)	;fp_flags
