@@ -2,7 +2,7 @@
 ;
 ;       Created 1/4/99 djm
 ;
-;	$Id: bas_crt0.asm,v 1.2 2001-10-06 20:42:34 dom Exp $
+;	$Id: bas_crt0.asm,v 1.3 2001-10-15 21:05:02 dom Exp $
 
 
 ;-----------
@@ -34,7 +34,7 @@
 ; Code starts executing from here
 ;-----------
 .start
-	ld	(start+1),sp	;Save starting stack
+	ld	(start1+1),sp	;Save starting stack
         ld      sp,($1ffe)	;Pick up stack from OZ safe place
         ld      hl,-64		;Make room for the atexit() table
         add     hl,sp
@@ -173,6 +173,11 @@ ENDIF
 
 .exitsp		defw	0	; Address of where the atexit() stack is
 .exitcount	defb	0	; How many routines on the atexit() stack
+
+IF DEFINED_NEED1bitsound
+.snd_asave      defb    0	; Sound variable
+.snd_tick       defb    0	;  "      "
+ENDIF
 
 
 .heaplast	defw	0	; Address of last block on heap
