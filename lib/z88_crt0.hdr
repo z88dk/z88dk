@@ -166,7 +166,9 @@
         LIB   float              ;Convert int to float
 	LIB   ufloat		 ;unsigned int to float
         LIB   ifix               ;Convert float to int
+IF !DEFINED_atof
 	LIB   atof		 ;Ascii string to float
+ENDIF
 
 ; Far lib functions (in appropriate malloc lib)
 
