@@ -6,7 +6,7 @@
 all: genmath
 
 
-genmath: asin.o atan2.o cosh.o sinh.o tanh.o pow.o ftoe.o ftoa.o atof.o acos.o
+genmath: asin.o atan2.o cosh.o sinh.o tanh.o pow.o ftoe.o ftoa.o acos.o atof.o
 # Don't compile atof cos of label clash
 #	zcc -vn -make-lib atof.c
 	z80asm -d -ns -nm -Mo -x../gen_math @genlist

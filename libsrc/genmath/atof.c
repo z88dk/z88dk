@@ -5,10 +5,6 @@
  */
 
 
-#asm
-	defc DEFINED_atof = 1
-#endasm
-
 #include <ctype.h>
 #include <stdio.h>
 #include <float.h>
