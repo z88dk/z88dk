@@ -16,8 +16,9 @@
 
 .l_long_gt  
         call    l_long_cmp
-        ccf
+	jr	z,l_long_gt1
+        ccf			;true
         ret     c
-;        ret   nc
+.l_long_gt1
         dec   hl
         ret

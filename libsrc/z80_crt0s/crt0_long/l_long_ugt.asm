@@ -16,8 +16,10 @@
 
 .l_long_ugt
         call    l_long_ucmp
+	jr	z,l_long_ugt1
         ccf
         ret     c
 ;        ret     nc
+.l_long_ugt1
         dec     hl
         ret
