@@ -10,7 +10,7 @@
  * 
  *      3/2/02 djm - Unspecified structure members are now padded out
  *
- *      $Id: declinit.c,v 1.5 2002-02-05 21:02:02 dom Exp $
+ *      $Id: declinit.c,v 1.6 2002-11-02 19:13:24 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -122,7 +122,7 @@ void str_init(TAG_SYMBOL *tag)
 	flag = 0;
 	if ( nodata == NO ) {
 	    init(sz, ptr->ident, &dim, ptr->more, 1, 1);
-	} else {  /* Run out of data for this initialisation, set blank */
+	} else {  /* Run out of data for this initialisation, set blank */ 
 	    defstorage();
 	    outdec(dim * sz);
 	    nl();		
@@ -141,6 +141,7 @@ void str_init(TAG_SYMBOL *tag)
 	}
 	/* Pad out the union */
 	if (usz != sz && flag) {
+
 	    defstorage();
 	    outdec(usz - sz);
 	    nl();
@@ -311,11 +312,18 @@ int size, ident, *dim, more, dump, is_struct;
 int getstsize(SYMBOL * ptr)
 {
     TAG_SYMBOL *tag;
+    int         ptrsize;
 
     tag = tagtab + ptr->tag_idx;
 
+    ptrsize = ptr->flags&FARPTR ? 3 : 2;
+
+    if ( ptr->ident == POINTER )
+	return ptrsize;
+
     switch (ptr->type) {
     case STRUCT:
+
 	return (tag->size);
     case DOUBLE:
 	return (6);
