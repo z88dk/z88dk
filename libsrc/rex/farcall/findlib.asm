@@ -1,78 +1,101 @@
 ;
 ;	written by Waleed Hasan
 ;
-;	$Id: findlib.asm,v 1.1 2002-04-10 20:16:25 dom Exp $
-;
+; Fixed list of pages (were off by 4)
+; Graham R. Cobb 19 May 2002
 
 	XLIB	findlib
 
 
 .findlib
 	pop	hl		; ret addr
-	pop	de		; &sig to look for
+	pop	de		; &signature to look for
 	push	de
 	push	hl
+;
+;ASM entry point
+; i/p :	DE = points to signature to look for (zero terminated)
+; o/p : HL = library page
+;	   = -1 if not found
+;
+.findlib_asm
 				; save old bank2 values
-	ld	h,0
-	in	a,(4)
-	ld	l,a
+	ld	c,3		; c=3
+	in	l,(c)
+	inc	c		; c=4
+	in	h,(c)
 	push	hl
-	in	a,(3)
-	ld	l,a
-	push	hl
+
 				; REGISTER_WRITE(REG_BANK2_HI, 0x00);
 	xor	a
-	out	(4),a
+	out	(c),a		; c=4
 				; for(i=0; i<25; i++)
-	ld	b,25
 	ld	hl,_pages
-
+	dec	c		; c=3
 .PagLoop
-	push	bc		; save loop counter
-	push	hl		; save pages[]
 				; REGISTER_WRITE(REG_BANK2_LO, pages[i]);
 	ld	a,(hl)
-	out	(3),a
+	and	a		; is it pages end-marker?
+	jr	z,LibNotFound
+	out	(c),a		; c=3
 
-	ld	b,3		; signature = 3 bytes
-	ld	hl,$A003	; &signature in library
-				; de already = &signature
+	push	hl		; save pages[]
+	push	de		; we should save &sig
+	ld	hl,$A003	; &SIGnature in library
+				; de already = &sig
 .SigLoop
 	ld	a,(de)
+	and	a		; end of seg?
+	jr	z,LibFound	; yes - we found it!
+
 	cp	(hl)
 	jr	nz,ChkNxtPag
-	inc	hl
-	inc	de
-	djnz	SigLoop	
-				; this should be the page!
+
+	inc	hl		; next SIG char
+	inc	de		; next sig char
+	jr	SigLoop
+
+
+.LibFound			; we found the library
+	pop	de		; &sig
 	pop	hl		; the page in
 	ld	a,(hl)
 	sub	4		; Page[i]-4
 	ld	h,0
 	ld	l,a
-	pop	bc
-	jp	end
+	jr	end
 
 .ChkNxtPag
+	pop	de		; &sig
 	pop	hl		; get pages[]
 	inc	hl		; next page
+	jr	PagLoop
 
-	POP	bc
-	DJNZ	PagLoop
-
+.LibNotFound
 	ld	hl,-1		; page not found
-
 .end
-	pop	bc		; restore old bank2 values
-	ld	a,c
-	out	(3),a
-	pop	bc
-	ld	a,c
-	out	(4),a
+
+	pop	de		; restore old bank2 values
+	ld	c,3		; c=3
+	out	(c),e
+	inc	c		; c=4
+	out	(c),d
 	ret
-	
-	
+
 ._pages
-	defb	22,23,24,43,73,77,88,98,120,121
-	defb	122,124,125,126,127,128,129,130,131,132
-	defb	133,134,135,136,137
+	; We first search the pages loaded by Adder
+	defb	26,27,28
+	defb	47
+	defb	77
+	defb	81
+	defb	92
+	defb	102
+	defb	124,125,126
+	defb	136,137,138,139,140,141
+	; Then a couple of pages that Adder does not load today but might in the future
+	defb	142,143		; Note: these are pages Adder does not load, yet
+	; We check the standard addin slots last because addins copied using Adder
+	; are not deleted until overwritten
+	defb	128,129,130,131,132,133,134,135 ; Standard addin slots
+	
+	defb	0		; pages end-marker
