@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.3 2001-02-28 17:59:22 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.4 2001-06-27 08:53:28 dom Exp $ */
 /* $History: Asmdrctv.c $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -386,8 +386,9 @@ void
 DEFS ()
 {
   struct expr *postfixexpr;
+  struct expr *constexpr;
 
-  long constant;
+  long constant,val;
 
   GetSym ();			/* get numerical expression */
   if ((postfixexpr = ParseNumExpr ()) != NULL)
@@ -398,13 +399,29 @@ DEFS ()
 	{
 	  constant = EvalPfixExpr (postfixexpr);
 
+	  if ( sym != comma ) 
+	    {
+		val = 0;
+	    }
+	  else 
+	    {
+		GetSym();
+		if ( (constexpr = ParseNumExpr ()) != NULL ) 
+		  {
+		    if ( constexpr->rangetype & NOTEVALUABLE )
+			ReportError(CURRENTFILE->fname,CURRENTFILE->line,2);
+		    else
+			val = EvalPfixExpr(constexpr);
+		    RemovePfixlist(constexpr);
+		  }
+	    }
 	  if (constant >= 0)
 	    {
 	      if ((PC + constant) <= MAXCODESIZE)
 		{
 		  PC += constant;
 
-		  while (constant--) *codeptr++ = 0;
+		  while (constant--) *codeptr++ = val;
 		}
 	      else
 		{

@@ -472,4 +472,8 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  *
  * 21.03.2001 v1.0.19 (djm)
  * Allowed labels to end in ':' and forsake the initial '.'
+ *
+ * 27.06.2001 [no version increment] (djm)
+ * defs now takes a second parameter indicating what the filler byte should be, if not
+ * set the defaults to 0
  */
