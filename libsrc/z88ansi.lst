@@ -27,6 +27,7 @@ stdio/fputs
 stdio/fread
 stdio/freopen
 stdio/freopen_z88
+stdio/fseek
 stdio/ftell
 stdio/fwrite
 stdio/vfprintf_mini
