@@ -56,3 +56,5 @@ tcp_setctimeout
 tcp_settimeout
 IPHeaderCheck
 sock_setssize
+sock_recv
+sock_getinfo
