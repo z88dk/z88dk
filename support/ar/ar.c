@@ -20,14 +20,16 @@ static FILE *open_library(char *name);
 static unsigned long read_intel32(FILE *fp, unsigned long *offs);
 static unsigned int  read_intel16(FILE *fp, unsigned long *offs);
 
-static void object_dump(FILE *fp, unsigned long start, char showlocal);
+static void object_dump(FILE *fp, unsigned long start, char flags);
 
+enum { showlocal = 1, showexpr = 2 };
 
 static void usage(char *name)
 {
     fprintf(stderr,"Usage %s [-l] library\n",name);
     fprintf(stderr,"Display the contents of a z80asm library file\n");
     fprintf(stderr,"\n-l\tShow local symbols\n");
+    fprintf(stderr,"-e\tShow expression patches\n");
     fprintf(stderr,"-h\tDisplay this help\n");
     exit(1);
 }
@@ -39,13 +41,16 @@ int main(int argc, char *argv[])
     char    *file;
     unsigned long next,len,start;
     FILE  *fp;
-    char    showlocal = 0;
+    char    flags = 0;
     int     opt;
 
-    while ((opt = getopt(argc,argv,"hl")) != -1 ) {
+    while ((opt = getopt(argc,argv,"hle")) != -1 ) {
 	switch (opt ) {
 	case 'l':
-	    showlocal = 1;
+	    flags |= showlocal;
+	    break;
+	case 'e':
+	    flags |= showexpr;
 	    break;
 	default:
 	    usage(argv[0]);
@@ -59,7 +64,7 @@ int main(int argc, char *argv[])
     file = argv[optind++];
     if ( ( fp = open_library(file) ) == NULL ) {
 	if ( ( fp = fopen(file,"rb")  ) != NULL ) {	   
-	    object_dump(fp,0,showlocal);
+	    object_dump(fp,0,flags);
 	    exit(0);
 	} else {
 	    exit(1);
@@ -76,13 +81,13 @@ int main(int argc, char *argv[])
 	len  = read_intel32(fp,NULL);
 	if ( len == 0xFFFFFFFF ) 
 	    break;
-	object_dump(fp,start,showlocal);
+	object_dump(fp,start,flags);
     } while ( next != 0xFFFFFFFF );
 
     fclose(fp);
 }
 
-void object_dump(FILE *fp, unsigned long start, char showlocal)
+void object_dump(FILE *fp, unsigned long start, char flags)
 {
     char     buf[8];
     unsigned long modname,expr,name,libname,code,red;
@@ -126,18 +131,20 @@ void object_dump(FILE *fp, unsigned long start, char showlocal)
 	    type = fgetc(fp); red++;
 	    temp = read_intel32(fp,&red);
 	    len = fgetc(fp); red++;
-	    if ( type == 'A' && (showlocal || scope != 'L' ) )
+	    if ( type == 'A' && ( ( flags & showlocal) || scope != 'L' ) )
 		printf("  %c  ",scope);
 	    for ( i = 0; i < len; i++ ) {
 		c = fgetc(fp);
-		if ( type == 'A' && (showlocal || scope != 'L' ) )
+		if ( type == 'A' && ( (flags & showlocal) || scope != 'L' ) )
 		    fputc(c,stdout);
 		red++;
 	    }
-	    if ( type == 'A' && (showlocal || scope != 'L' ) ) 
+	    if ( type == 'A' && ( (flags & showlocal) || scope != 'L' ) ) 
 		printf("\t+%04x\n",temp);
 	}
     }
+	
+
     if ( libname != 0xFFFFFFFF ) {
 	fseek(fp,start+libname,SEEK_SET);
 	red = 0;
@@ -152,6 +159,33 @@ void object_dump(FILE *fp, unsigned long start, char showlocal)
 	    printf("\n");
 	}
     }
+
+    if ( expr != 0xFFFFFFFF && (flags | showexpr ) ) {
+	char type;
+	int  patch;
+	unsigned long end;
+	fseek(fp,start+expr,SEEK_SET);
+	red = 0;
+	end = name;
+	if (end == 0xFFFFFFFF )
+	    end = code;
+	while ( red < ( end - expr) ) {
+	    type = fgetc(fp); red++;
+	    patch = read_intel16(fp,&red);
+	    len = fgetc(fp); red++;
+	    printf("  E  ");
+	    for ( i = 0; i < len; i++ ) {
+		c = fgetc(fp);
+		fputc(c,stdout);
+		red++;
+	    }
+	    printf(" %c @ %04x\n",type,patch);
+	    c = fgetc(fp); red++;
+	    if ( c != 0 )
+		break;
+	}
+    }
+
 }
 
 FILE *open_library(char *name)
