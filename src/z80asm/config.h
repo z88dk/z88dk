@@ -53,9 +53,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #endif
 
 /* Some clever config-ing if we're using GNUC */
-
+#ifdef __BIG_ENDIAN__
+/* Sadly the compiler on OS-X falls over with the #if below... */
+#define ENDIAN
+#else
 #ifdef __GNUC__
 #if #cpu(m68k) || #cpu(sparc) || #cpu(hppa) || #cpu(powerpc)
 #define ENDIAN 1
 #endif
 #endif	/* __GNUC__ */
+#endif
