@@ -1,7 +1,7 @@
 #
 # Ah, that'd be nice, a library makefile!
 #
-# $Id: Makefile,v 1.33 2002-01-27 22:30:58 dom Exp $
+# $Id: Makefile,v 1.34 2002-01-27 22:34:09 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -625,7 +625,6 @@ c128ansi_clib.lib:
 
 clean:
 	cd assert ; make clean
-	cd cpm    ; make clean
 	cd ctype ; make clean
 	cd farz88 ; make clean
 	cd fcntl ; make clean
