@@ -6,7 +6,11 @@
  *      char arrays in structs now initialised correctly, strings
  *      truncated if too long, all seems to be fine - hurrah!
  *
- *      $Id: declinit.c,v 1.4 2002-01-20 23:30:36 dom Exp $
+ *	2/2/02 djm - This file needs to rewritten to be more flexible
+ * 
+ *      3/2/02 djm - Unspecified structure members are now padded out
+ *
+ *      $Id: declinit.c,v 1.5 2002-02-05 21:02:02 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -19,7 +23,9 @@ int initials(char *sname,
 	     int type, int ident, int dim, int more,
 	     TAG_SYMBOL * tag, char zfar)
 {
-    int size, desize;
+    int size, desize = 0;
+
+
 
     if (cmatch('=')) {
 	/* initialiser present */
@@ -28,14 +34,22 @@ int initials(char *sname,
 	glblab = getlabel();
 	if (dim == 0)
 	    dim = -1;
-	size = (type == CINT) ? 2 : 1;
-	if (type == LONG)
+	switch (type) {
+	case CCHAR:
+	    size = 1;
+	    break;
+	case LONG:
 	    size = 4;
-
+	    break;
+	case CINT:
+	default:
+	    size = 2;
+	}
+	    
 	if (asxx)
 	    ol(".area _TEXT");
 	prefix();
-	outname(sname, 1);
+	outname(sname, YES);
 	nl();
 
 	if (cmatch('{')) {
@@ -65,10 +79,11 @@ int initials(char *sname,
 		desize = dumpzero(size, dim);
 	    dumplits(0, YES, gltptr, glblab, glbq);
 	} else {
-	    if (!(ident == POINTER && type == CCHAR))
-		dumplits(((size == 1) ? 0 : size), NO, gltptr, glblab,
-			 glbq);
-	    desize = dumpzero(size, dim);
+	    if (!(ident == POINTER && type == CCHAR)) {
+		dumplits(((size == 1) ? 0 : size), NO, gltptr, glblab,glbq);
+		if ( type != CCHAR )  /* Already dumped by init? */
+		    desize = dumpzero(size, dim);
+	    }
 	}
     } else {
 	char *dosign, *typ;
@@ -93,19 +108,25 @@ int initials(char *sname,
 /*
  * initialise structure
  */
-void str_init(tag)
-TAG_SYMBOL *tag;
+void str_init(TAG_SYMBOL *tag)
 {
     int dim, flag;
     int sz, usz;
     SYMBOL *ptr;
+    int     nodata = NO;
 
     ptr = tag->ptr;
     while (ptr < tag->end) {
 	dim = ptr->size;
 	sz = getstsize(ptr);
 	flag = 0;
-	init(sz, ptr->ident, &dim, ptr->more, 1, 1);
+	if ( nodata == NO ) {
+	    init(sz, ptr->ident, &dim, ptr->more, 1, 1);
+	} else {  /* Run out of data for this initialisation, set blank */
+	    defstorage();
+	    outdec(dim * sz);
+	    nl();		
+	}
 	++ptr;
 	/* This steps over union members */
 	usz = sz;
@@ -125,8 +146,7 @@ TAG_SYMBOL *tag;
 	    nl();
 	}
 	if (cmatch(',') == 0 && ptr != tag->end) {
-	    error(E_DATA);
-	    break;
+	    nodata = YES;	   
 	}
     }
 }
@@ -146,11 +166,12 @@ TAG_SYMBOL *tag;
 	    --*dim;
 	    needchar('}');
 	} else {
-	    init(size, ident, dim, more, (ident == ARRAY && more == CCHAR),
-		 0);
+	    init(size, ident, dim, more, (ident == ARRAY && more == CCHAR),0);
 	}
+	
 	if (cmatch(',') == 0)
-	    break;
+	    break;	
+	blanks();
     }
 }
 
@@ -174,7 +195,7 @@ int size, ident, *dim, more, dump, is_struct;
  * it out..
  */
 
-    if ((sz = qstr(&value))) {
+    if ((sz = qstr(&value)) != -1 ) {
 	sz++;
 	if (ident == VARIABLE || (size != 1 && more != CCHAR))
 	    error(E_ASSIGN);
@@ -208,6 +229,7 @@ int size, ident, *dim, more, dump, is_struct;
 	    *dim -= sz;
 	    gltptr = 0;
 	    dumpzero(size, *dim);
+	    return;
 	} else {
 /*
  * Store the literals in the queue!
@@ -220,9 +242,9 @@ int size, ident, *dim, more, dump, is_struct;
 	    outdec(value);
 	    nl();
 	    --*dim;
+	    return;
 	}
     }
-
 /*
  * djm, catch label names in structures (for (*name)() initialisation
  */
@@ -246,7 +268,9 @@ int size, ident, *dim, more, dump, is_struct;
 	    } else
 		error(E_UNSYMB, sname);
 	} else if (rcmatch('}')) {
-	    //dumpzero(size,*dim);
+#if 0
+	    dumpzero(size,*dim);
+#endif
 	} else if (constexpr(&value, 1)) {
 	  constdecl:
 	    if (ident == POINTER) {

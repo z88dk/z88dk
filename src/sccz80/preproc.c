@@ -3,7 +3,7 @@
  *
  *      The rather simple preprocessor is here
  *
- *      $Id: preproc.c,v 1.1 2000-07-04 15:33:32 dom Exp $
+ *      $Id: preproc.c,v 1.2 2002-02-05 21:02:03 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -71,7 +71,8 @@ void vinline()
                         line[lptr++]=k;
                 }
                 line[lptr] = 0 ;        /* append null */
-                if (k != '\r') ++lineno ;      /* read one more line */
+                if (k != '\r') 
+		    ++lineno ;      /* read one more line */
                 if ( k <= 0 ) {
                         fclose(unit);
                         if ( inpt2  != NULL_FD ) endinclude() ;
@@ -189,12 +190,19 @@ void keepch(char c)
         if ( mptr < MPMAX ) ++mptr ;
 }
 
+
+/* The preprocessor here is pants, and messes up all sorts of
+   things - best leave it to the external preprocessor to do all
+   the dirty work
+*/
 void preprocess()
 {
         char c,sname[NAMESIZE];
         int k;
 
         ifline() ;
+	return;
+#if 0
         if ( eof || cmode == 0 ) {
                 /* while passing through assembler, only do #if, etc */
                 return ;
@@ -299,6 +307,7 @@ void preprocess()
         if ( mptr >= MPMAX ) error(E_TOOLONG) ;
         strcpy(line, mline) ;
         lptr = 0 ;
+#endif
 }
 
 
@@ -358,8 +367,7 @@ char *sname;
  */
 
 
-void defmac(text)
-char *text ;
+void defmac(char *text)
 {
         char *p ;
 

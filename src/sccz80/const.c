@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.12 2002-01-28 11:51:16 dom Exp $
+ *      $Id: const.c,v 1.13 2002-02-05 21:02:03 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -92,7 +92,7 @@ int fnumber(long *val)
     unsigned char dig2[6];
     unsigned char dig3[6];
     int k;                  /* flag and mask */
-    unsigned char minus;     /* is if negative! */
+    char minus;     /* is if negative! */
     char *start;    /* copy of pointer to starting point */
     char *s;             /* points into source code */
     char *dp1;	    /* First number after dp */
@@ -450,49 +450,35 @@ int storeq(int length, unsigned char *queue,long *val)
 
 int qstr(long *val)
 {
-        int cnt=0;
+    int c;
+    int cnt=0;
 
-        if ( cmatch('"') == 0 ) return(0) ;
-	*val=(long)gltptr;
-        do {
-                while ( ch() !='"' ) {
-                        if ( ch() == 0 ) break ;
-			cnt++;
-			stowlit(litchar(),1);
-                }
-		gch();
-        } while ( (cmatch('\\') && cmatch('"') ) || cmatch('"'));
-        glbq[gltptr++]= 0;
-        return(cnt);
+    if ( cmatch('"') == 0 ) 
+	return(-1) ;
+
+    *val=(long)gltptr;
+    do {
+	while ( ch() !='"' ) {
+	    if ( ch() == 0 ) break ;
+	    cnt++;
+	    stowlit(litchar(),1);
+	}
+	gch();
+    } while ( cmatch('"') || (cmatch('\\') && cmatch('"') ) ); 
+
+    glbq[gltptr++]= 0;
+    return(cnt);
 }
-
-/*
- * Messed around with 5/5/99 djm to allow queues to start from 1
- * internally, but to the asm file show it to start from 0
-        int cnt;
-        cnt=0;
-        if ( cmatch('"') == 0 ) return(0) ;
-        *val = (long) gltptr ;
-        while ( ch() != '"' ) {
-                if ( ch() == 0 ) break ;
-                cnt++;
-                stowlit(litchar(), 1) ;
-        }
-        gch() ;
-        glbq[gltptr++] = 0 ;
-        return(cnt);
-*/
 
 
 /* store integer i of size size bytes in global var literal queue */
-void stowlit(value, size)
-int value, size ;
+void stowlit(int value, int size)
 {
-        if ( (gltptr+size) >= LITMAX ) {
-                error(E_LITQOV);
-        }
-        putint(value, glbq+gltptr, size);
-        gltptr += size ;
+    if ( (gltptr+size) >= LITMAX ) {
+	error(E_LITQOV);
+    }
+    putint(value, glbq+gltptr, size);
+    gltptr += size ;
 }
 
 
@@ -501,140 +487,163 @@ int value, size ;
 /* Return current literal char & bump lptr */
 char litchar()
 {
-        int i, oct ;
+    int i, oct ;
 
-        if ( ch() != 92 ) return(gch()) ;
-        if ( nch() == 0 ) return(gch()) ;
-        gch() ;
-        switch( ch() ) {
-		case 'a': {++lptr; return  7;} /* Bell */
-                case 'b': {++lptr; return  8;} /* BS */
-                case 't': {++lptr; return  9;} /* HT */
-                case 'r': {++lptr; return 10;} /* LF */
-		case 'v': {++lptr; return 11;} /* VT */
-		case 'f': {++lptr; return 12;} /* FF */
-                case 'n': {++lptr; return 13;} /* CR */
-                case 34 : {++lptr; return 34;} /* "  */
-                case 39 : {++lptr; return 39;} /* '  */
-		case '\\': {++lptr; return '\\';}/* /  */
-		case '\?': {++lptr; return '\?';}/* ?  */
-                case 'l': {++lptr; return 10;} /* LF (non standard)*/
-        }
-	if (ch() != 'x' && (ch()<'0' || ch()>'7')) {
-		warning(W_ESCAPE,ch());
-		return(gch());
-	}
-	if (ch() == 'x') {
-		gch();
-		oct=0; i=2;
-        	while ( i-- > 0 && hex(ch()) ) {
-                        if ( ch() <= '9' )
-                                oct = (oct << 4) + (gch()-'0') ;
-                        else
-                                oct = (oct << 4) + ((gch()&95) - '7') ;
-		}
-		return(oct);
-	}
+    if ( ch() != 92 ) 
+	return(gch()) ;
+    if ( nch() == 0 ) 
+	return(gch()) ;
+    gch() ;
+    switch( ch() ) {
+    case 'a':  /* Bell */
+	++lptr; 
+	return 7; 
+    case 'b':  /* BS */
+	++lptr;
+	return 8; 
+    case 't':  /* HT */
+	++lptr; 
+	return 9;
+    case 'r':  /* LF */
+	++lptr;
+	return 10;
+    case 'v':  /* VT */
+	++lptr;
+	return 11;
+    case 'f':  /* FF */
+	++lptr; 
+	return 12;
+    case 'n':  /* CR */
+	++lptr; 
+	return 13;
+    case '\"' :  /* " */
+	++lptr; 
+	return 34;
+    case '\'' :  /* ' */
+	++lptr; 
+	return 39;
+    case '\\':  /* / */
+	++lptr; 
+	return '\\';
+    case '\?':  /* ? */
+	++lptr; 
+	return '\?';
+    case 'l':  /* LF (non standard)*/
+	++lptr; 
+	return 10;
+    }
 
-        i=3; oct=0;
-        while ( i-- > 0 && ch() >= '0' && ch() <= '7' )
-                oct=(oct<<3)+gch()-'0';
-        if(i==2)return(gch());
-        else return(oct);
+    if (ch() != 'x' && (ch()<'0' || ch()>'7')) {
+	warning(W_ESCAPE,ch());
+	return(gch());
+    }
+    if (ch() == 'x') {
+	gch();
+	oct=0; i=2;
+	while ( i-- > 0 && hex(ch()) ) {
+	    if ( ch() <= '9' )
+		oct = (oct << 4) + (gch()-'0') ;
+	    else
+		oct = (oct << 4) + ((gch()&95) - '7') ;
+	}
+	return((char)oct);
+    }
+
+    i=3; oct=0;
+    while ( i-- > 0 && ch() >= '0' && ch() <= '7' )
+	oct=(oct<<3)+gch()-'0';
+    if( i == 2 )  
+	return(gch());
+    else 
+	return((char)oct);
 }
 
-/*
- * find size of type (on variable now as well)
- */
-#ifndef SMALL_C
-void 
-#endif
-size_of(lval)
-LVALUE *lval ;
+
+/* Perform a sizeof (works on variables as well */
+/* FIXME: Should also dereference pointers... */
+void size_of(LVALUE *lval)
 {
-        char sname[NAMESIZE] ;
-        int  length;
-        TAG_SYMBOL *otag ;
-        SYMBOL *ptr;
-        struct varid var;
-        char    ident;
+    char         sname[NAMESIZE] ;
+    int          length;
+    TAG_SYMBOL  *otag ;
+    SYMBOL      *ptr;
+    struct varid var;
+    char         ident;
 
 
-        needchar('(') ;
-        otag=GetVarID(&var,NO);
-        if (var.type != NO ) {
-                if ( match("**") || cmatch('*') ) ident=POINTER;
-                else ident=VARIABLE;
+    needchar('(') ;
+    otag=GetVarID(&var,NO);
+    if (var.type != NO ) {
+	if ( match("**") || cmatch('*') ) 
+	    ident=POINTER;
+	else 
+	    ident=VARIABLE;
 
-                if ( otag && ident==VARIABLE ) lval->const_val =otag->size;
-                if ( ident == POINTER ) {
-                        lval->const_val = (var.zfar ?  3 : 2);
-                } else {
-                      switch(var.type) {
-                                case CCHAR:
-                                        lval->const_val=1;
-                                        break;
-                                case CINT:
-                                        lval->const_val=2;
-                                        break;
-                                case LONG:
-                                        lval->const_val=4;
-                                        break;
-                                case DOUBLE:
-                                        lval->const_val=6;
-					break;
-				case STRUCT:
-					lval->const_val=GetMembSize(otag);
-					if (lval->const_val == 0 ) lval->const_val=otag->size;
-                       }
-                }
-/*
- * djm mod to do sizeof on string
- */
-        } else if ( cmatch('"') ) {
-                length=1;       /* Always terminated by a \0 */
-                while (!cmatch('"')) {
-                        length++;
-                        litchar();
-                } ;
-                lval->const_val=length;
-        } else if ( symname(sname) ) {
-/*
- * djm mod to do sizeof on an array etc
- * Can also handle element of structure
- */
-                        if ( (ptr = findglb(sname)) || (ptr=findloc(sname)) || (ptr=findstc(sname)) ) {
-                        /* Actually found sommat..very good! */
-                            if ( ptr->ident!=FUNCTION && ptr->ident!=MACRO) {
-				if (ptr->type!=STRUCT){
-					lval->const_val=ptr->size;
-				} else {
-					lval->const_val=GetMembSize(tagtab+ptr->tag_idx);
-					if (lval->const_val == 0 ) lval->const_val=ptr->size;
-				}
-                             } else {
-                                 warning(W_SIZEOF);
+	if ( otag && ident==VARIABLE ) 
+	    lval->const_val =otag->size;
+	if ( ident == POINTER ) {
+	    lval->const_val = (var.zfar ?  3 : 2);
+	} else {
+	    switch(var.type) {
+	    case CCHAR:
+		lval->const_val=1;
+		break;
+	    case CINT:
+		lval->const_val=2;
+		break;
+	    case LONG:
+		lval->const_val=4;
+		break;
+	    case DOUBLE:
+		lval->const_val=6;
+		break;
+	    case STRUCT:
+		lval->const_val=GetMembSize(otag);
+		if (lval->const_val == 0 ) lval->const_val=otag->size;
+	    }
+	}
+    } else if ( cmatch('"') ) {    /* Check size of string */
+	length=1;                  /* Always at least one */
+	while (!cmatch('"')) {
+	    length++;
+	    litchar();
+	} ;
+	lval->const_val=length;
+    } else if ( symname(sname) ) {  /* Size of an object */
+	if (  ( ( ptr = findglb(sname) ) != NULL ) || 
+	      ( ( ptr = findloc(sname) ) != NULL ) ||
+	      ( ( ptr = findstc(sname) ) != NULL ) ) {
+	    /* Actually found sommat..very good! */
+	    if ( ptr->ident!=FUNCTION && ptr->ident!=MACRO) {
+		if (ptr->type!=STRUCT){
+		    lval->const_val=ptr->size;
+		} else {
+		    lval->const_val=GetMembSize(tagtab+ptr->tag_idx);
+		    if (lval->const_val == 0 ) lval->const_val=ptr->size;
+		}
+	    } else {
+		warning(W_SIZEOF);
                                 /* good enough default? */
-                                lval->const_val=2;
-                             }
-                        }
-
-        }
-        needchar(')') ;
-        lval->is_const = 1 ;
-        lval->val_type = CINT ;
-        lval->ident=VARIABLE;
-        vconst(lval->const_val) ;
+		lval->const_val=2;
+	    }
+	}
+    }
+    needchar(')') ;
+    lval->is_const = 1 ;
+    lval->val_type = CINT ;
+    lval->ident=VARIABLE;
+    vconst(lval->const_val) ;
 }
 
 int GetMembSize(TAG_SYMBOL *ptr)
 {
-	char	sname[NAMEMAX];
-	SYMBOL *ptr2;
-	if (cmatch('.') == NO && match("->") == NO ) return 0;
-
-	if (symname(sname) && (ptr2=findmemb(ptr,sname)) ) 
-		return ptr2->size;
-	error(E_UNMEMB,sname);
+    char	sname[NAMEMAX];
+    SYMBOL *ptr2;
+    if (cmatch('.') == NO && match("->") == NO ) 
 	return(0);
+
+    if (symname(sname) && (ptr2=findmemb(ptr,sname)) ) 
+	return ptr2->size;
+    error(E_UNMEMB,sname);
+    return(0);
 }
