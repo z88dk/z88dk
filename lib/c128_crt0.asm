@@ -2,11 +2,11 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.1 2001-08-28 14:05:42 stefano Exp $
+;	$Id: c128_crt0.asm,v 1.2 2001-09-07 18:08:59 dom Exp $
 ;
 
 
-                MODULE  z88_crt0
+                MODULE  c128_crt0
 
 ;
 ; Initially include the zcc_opt.def file to find out lots of lovely
