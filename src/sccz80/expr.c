@@ -2,7 +2,7 @@
  * cc4.c - fourth part of Small-C/Plus compiler
  *         routines for recursive descent
  *
- * $Id: expr.c,v 1.1 2000-07-04 15:33:31 dom Exp $
+ * $Id: expr.c,v 1.2 2001-01-26 11:48:52 dom Exp $
  *
  */
 
@@ -448,35 +448,38 @@ SYMBOL *
 
 deref(LVALUE *lval, char isaddr)
 {
-        char    flags;
-        flags=lval->flags;
-        if (isaddr) {
-                if (flags&FARACC) flags|=FARACC;
-        }else {
-                if (flags&FARPTR) flags|=FARACC;
-                else flags&=MKFARA;
-        }
-        /* NB it has already been determind that lval->symbol is non-zero */
-        if ( lval->symbol->more == 0 ) {
-                /* array of/pointer to variable */
-                lval->val_type = lval->indirect = lval->symbol->type ;
-                lval->flags=flags;
-                lval->symbol = NULL_SYM ;                       /* forget symbol table entry */
-                lval->ptr_type = 0 ;                            /* flag as not symbol or array */
-                lval->ident=VARIABLE;   /* We're now a variable! */
-        }
-        else {
-                /* array of/pointer to pointer */
-                lval->symbol = dummy_sym[(int) lval->symbol->more] ;
-/* djm long pointers */
-                lval->ptr_type = lval->symbol->type ;
-/* 5/10/98 restored lval->val_type */
-                lval->indirect = lval->val_type = (flags&FARPTR ? CPTR : CINT );
-                lval->flags=flags;
-                if ( lval->symbol->type == STRUCT )
-                        lval->tagsym = tagtab + lval->symbol->tag_idx ;
-        }
-        return lval->symbol ;
+    char    flags;
+    flags=lval->flags;
+    if (isaddr) {
+	if (flags&FARACC) flags|=FARACC;
+    } else {
+	if (flags&FARPTR) flags|=FARACC;
+	else flags&=MKFARA;
+    }
+    /* NB it has already been determind that lval->symbol is non-zero */
+    if ( lval->symbol->more == 0 ) {
+	/* array of/pointer to variable */
+	if (flags&FARPTR) flags|=FARACC;
+	lval->val_type = lval->indirect = lval->symbol->type ;
+	lval->flags=flags;
+	lval->symbol = NULL_SYM ;                       /* forget symbol table entry */
+	lval->ptr_type = 0 ;                            /* flag as not symbol or array */
+	lval->ident=VARIABLE;   /* We're now a variable! */
+    }
+    else {
+	/* array of/pointer to pointer */
+	        
+	lval->symbol = dummy_sym[(int) lval->symbol->more] ;
+	/* djm long pointers */
+	lval->ptr_type = lval->symbol->type ;
+	/* 5/10/98 restored lval->val_type */
+	lval->indirect = lval->val_type = (flags&FARPTR ? CPTR : CINT );
+	if ( flags&FARPTR ) flags|=FARACC;
+	lval->flags=flags;
+	if ( lval->symbol->type == STRUCT )
+	    lval->tagsym = tagtab + lval->symbol->tag_idx ;
+    }
+    return lval->symbol ;
 }
 
 
@@ -628,187 +631,195 @@ LVALUE *lval ;
 int heirb(lval)
 LVALUE *lval ;
 {
-        char *before, *start ;
-        char *before1, *start1 ;
-        char sname[NAMESIZE] ;
-        int con, val, direct, k ;
-        char flags;
-        SYMBOL *ptr ;
+    char *before, *start ;
+    char *before1, *start1 ;
+    char sname[NAMESIZE] ;
+    int con, val, direct, k ;
+    char flags;
+    SYMBOL *ptr ;
 
-        setstage(&before1, &start1);
-        k = primary(lval) ;
-        ptr = lval->symbol ;
-        blanks();
-        if ( ch()=='[' || ch()=='(' || ch()=='.' || (ch()=='-' && nch()=='>') )
+    setstage(&before1, &start1);
+    k = primary(lval) ;
+    ptr = lval->symbol ;
+    blanks();
+    if ( ch()=='[' || ch()=='(' || ch()=='.' || (ch()=='-' && nch()=='>') )
         while ( 1 ) {
-                if ( cmatch('[') ) {
-                        if ( ptr == 0 ) {
-                                error(E_SUBSCRIPT);
-                                junk();
-                                needchar(']');
-                                return 0;
-                        }
-                        else if ( k && ptr->ident == POINTER ) rvalue(lval) ;
-                        else if ( ptr->ident != POINTER && ptr->ident != ARRAY ) {
-                                error(E_SUBSCRIPT);
-                                k=0;
-                        }
-                        setstage(&before, &start) ;
-                        if (lval->flags&FARPTR)  zpushde(); 
-                        lval->ident=VARIABLE;  
-                        zpush();
-                        expression(&con, &val);
-                        needchar(']');
-                        if ( con ) {
-                                Zsp += 2 ;              /* undo push */
-                                if (lval->flags&FARPTR) Zsp += 2;
-				if (lval->symbol->more)
-					cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
-				else
-                                	cscale(ptr->type, tagtab+ptr->tag_idx, &val) ;
-                                if ( ptr->storage == STKLOC && ptr->ident == ARRAY ) {
-                                        /* constant offset to array on stack */
-                                        /* do all offsets at compile time */
-                                        clearstage(before1, 0) ;
-                                        lval->offset=getloc(ptr, val) ;
-                                }
-                                else {
-                                        /* add constant offset to address in primary */
-                                        clearstage(before, 0);
+	    if ( cmatch('[') ) {
+		if ( ptr == 0 ) {
+		    error(E_SUBSCRIPT);
+		    junk();
+		    needchar(']');
+		    return 0;
+		}
+		else if ( k && ptr->ident == POINTER ) rvalue(lval) ;
+		else if ( ptr->ident != POINTER && ptr->ident != ARRAY ) {
+		    error(E_SUBSCRIPT);
+		    k=0;
+		}
+		setstage(&before, &start) ;
+		if (lval->flags&FARPTR)  zpushde(); 
+		lval->ident=VARIABLE;  
+		zpush();
+		expression(&con, &val);
+		needchar(']');
+		if ( con ) {
+		    Zsp += 2 ;              /* undo push */
+		    if (lval->flags&FARPTR) Zsp += 2;
+		    if (lval->symbol->more)
+			cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
+		    else
+			cscale(ptr->type, tagtab+ptr->tag_idx, &val) ;
+		    if ( ptr->storage == STKLOC && ptr->ident == ARRAY ) {
+			/* constant offset to array on stack */
+			/* do all offsets at compile time */
+			clearstage(before1, 0) ;
+			lval->offset=getloc(ptr, val) ;
+		    }
+		    else {
+			/* add constant offset to address in primary */
+			clearstage(before, 0);
 				//	if (lval->symbol->more) 
 				//		cscale(lval->val_type,tagtab+ptr->tag_idx,&val);
-                                        addconst(val,1,0) ;
-                                }
-                        }
-                        else {
+			addconst(val,1,0) ;
+		    }
+		}
+		else {
                                 /* non-constant subscript, calc at run time */
-				if (lval->symbol->more)
-					scale(lval->val_type,tagtab+ptr->tag_idx);
-				else
-                                	scale(ptr->type, tagtab+ptr->tag_idx);
-                                zpop();         /* Restored djm 28/9/98 */
-                                zadd(lval);
+		    if (lval->symbol->more) {
+			scale(lval->val_type,tagtab+ptr->tag_idx);
+		    } else {
+			scale(ptr->type, tagtab+ptr->tag_idx);
+		    }
+				/* If near, then pop other side back, otherwise
+				   load high reg with de and do an add 
+				*/
+		    if (lval->flags&FARPTR != FARPTR) zpop();
+		    else const2(0);
+		    zadd(lval);
 				/* If long pointer restore upper 16 bits */
-                            //    if (lval->flags&FARPTR) zpop();
-                        }
-                        ptr = deref(lval,YES) ;
-                        k = 1 ;
-                }
-                else if ( cmatch('(') ) {
-                        if ( ptr == 0 ) {
-                                callfunction(NULL_SYM);
+		    //    if (lval->flags&FARPTR) zpop();
+		}
+		ptr = deref(lval,YES) ;
+		if ( lval->flags&FARPTR == FARPTR) {
+		    outstr("derrefed is long still\n");
+		}
+		k = 1 ;
+	    }
+	    else if ( cmatch('(') ) {
+		if ( ptr == 0 ) {
+		    callfunction(NULL_SYM);
 				/* Bugger knows what ya doing..stop SEGV */
-				ptr=dummy_sym[VOID];
-				warning(W_INTERNAL);
-                        }
-                        else if ( ptr->ident != FUNCTION ) {
-                                if ( k && lval->const_val == 0 ) rvalue(lval);
-                                callfunction(NULL_SYM);
-                        }
-                        else callfunction(ptr);
-                        k = lval->is_const = lval->const_val = 0 ;
-                        if ( ptr && ptr->more == 0 ) {
+		    ptr=dummy_sym[VOID];
+		    warning(W_INTERNAL);
+		}
+		else if ( ptr->ident != FUNCTION ) {
+		    if ( k && lval->const_val == 0 ) rvalue(lval);
+		    callfunction(NULL_SYM);
+		}
+		else callfunction(ptr);
+		k = lval->is_const = lval->const_val = 0 ;
+		if ( ptr && ptr->more == 0 ) {
                                 /* function returning variable */
-                                lval->ptr_type = 0;
-                                lval->val_type = ptr->type ;
-                                lval->ident=VARIABLE;
-                                ptr = lval->symbol = 0 ;
-                        }
-                        else {
+		    lval->ptr_type = 0;
+		    lval->val_type = ptr->type ;
+		    lval->ident=VARIABLE;
+		    ptr = lval->symbol = 0 ;
+		}
+		else {
                                 /* function returning pointer */
-                                lval->flags=ptr->flags; /* djm */
-                                ptr = lval->symbol = dummy_sym[(int) ptr->more] ;
-                                lval->ident=POINTER;
-                                lval->indirect = lval->ptr_type = ptr->type ;
-/* djm - 24/11/98 */
-                                lval->val_type = (lval->flags&FARPTR ? CPTR : CINT);
-                                if ( ptr->type == STRUCT ) {
-                                        lval->tagsym = tagtab + ptr->tag_idx ;
-                                }
+		    lval->flags=ptr->flags; /* djm */
+		    ptr = lval->symbol = dummy_sym[(int) ptr->more] ;
+		    lval->ident=POINTER;
+		    lval->indirect = lval->ptr_type = ptr->type ;
+		    /* djm - 24/11/98 */
+		    lval->val_type = (lval->flags&FARPTR ? CPTR : CINT);
+		    if ( ptr->type == STRUCT ) {
+			lval->tagsym = tagtab + ptr->tag_idx ;
+		    }
 
-                        }
-/* Perform the cast here */
-                        if (lval->c_vtype) docast(lval,YES);
+		}
+		/* Perform the cast here */
+		if (lval->c_vtype) docast(lval,YES);
 
-                }
-/* Handle structures... come in here with lval holding tehe previous
- * pointer to the struct thing..*/
-                else if ( (direct=cmatch('.')) || match("->") ) {
-/* Check to see if we have a cast in operation, if so then change type
- * internally, but don't generate any code */
-                        if ( lval->c_tag ) docast(lval,NO); 
-                        if ( lval->tagsym == 0 ) {
-                                error(E_MEMBER) ;
-                                junk() ;
-                                return 0 ;
-                        }
-                        if ( symname(sname) == 0 || (ptr=findmemb(lval->tagsym,sname)) == 0 ) {
-                                error(E_UNMEMB,sname) ;
-                                junk() ;
-                                return 0 ;
-                        }
-/*
- * Here, we're trying to chase our member up, we have to be careful
- * not to access via far methods near data..
- */
-
-
-                        if ( k && direct == 0 ) 
-                                rvaluest(lval) ;
-
-                        debug(DBG_FAR1,"prev=%s name=%s flags %d oflags %d",lval->symbol->name,ptr->name,lval->flags, lval->oflags);
-                        flags = ptr->flags;
-                        if ( direct == 0 ) {
-/*
- * So, we're accessing via a pointer if we get here
- */
-
-                                flags=ptr->flags;
-                                if (lval->oflags&FARACC || (lval->flags&FARPTR) ) flags|=FARACC;
-                                if (flags&FARPTR || (lval->flags&FARPTR) ) lval->oflags|=FARACC;
-                        }
-                        lval->flags=flags;
+	    }
+	    /* Handle structures... come in here with lval holding tehe previous
+	     * pointer to the struct thing..*/
+	    else if ( (direct=cmatch('.')) || match("->") ) {
+		/* Check to see if we have a cast in operation, if so then change type
+		 * internally, but don't generate any code */
+		if ( lval->c_tag ) docast(lval,NO); 
+		if ( lval->tagsym == 0 ) {
+		    error(E_MEMBER) ;
+		    junk() ;
+		    return 0 ;
+		}
+		if ( symname(sname) == 0 || (ptr=findmemb(lval->tagsym,sname)) == 0 ) {
+		    error(E_UNMEMB,sname) ;
+		    junk() ;
+		    return 0 ;
+		}
+		/*
+		 * Here, we're trying to chase our member up, we have to be careful
+		 * not to access via far methods near data..
+		 */
 
 
-                        addconst(ptr->offset.i,1,ptr->flags&FARPTR) ;
-                        lval->symbol = ptr ;
-                        lval->indirect = lval->val_type = ptr->type ;
-                        lval->ptr_type = lval->is_const = lval->const_val = 0 ;
-                        lval->ident=VARIABLE;
-                        lval->stage_add = NULL_CHAR ;
-                        lval->tagsym = NULL_TAG ;
-                        lval->binop = NULL_FN ;
-                        if ( ptr->type == STRUCT )
-                                lval->tagsym = tagtab + ptr->tag_idx ;
-                        if ( ptr->ident == POINTER ) {
-                                lval->ptr_type = ptr->type ;
-                                lval->ident=POINTER;
-/* djm */
-                                if (ptr->flags&FARPTR) {
-                                        lval->indirect = CPTR ;
-                                        lval->val_type = CPTR ;
-                                } else {
-                                        lval->indirect = CINT ;
-                                        lval->val_type = CINT ;
-                                }
-                        }
-                        if ( ptr->ident==ARRAY || (ptr->type==STRUCT && ptr->ident==VARIABLE) ) {
+		if ( k && direct == 0 ) 
+		    rvaluest(lval) ;
+
+		debug(DBG_FAR1,"prev=%s name=%s flags %d oflags %d",lval->symbol->name,ptr->name,lval->flags, lval->oflags);
+		flags = ptr->flags;
+		if ( direct == 0 ) {
+		    /*
+		     * So, we're accessing via a pointer if we get here
+		     */
+
+		    flags=ptr->flags;
+		    if (lval->oflags&FARACC || (lval->flags&FARPTR) ) flags|=FARACC;
+		    if (flags&FARPTR || (lval->flags&FARPTR) ) lval->oflags|=FARACC;
+		}
+		lval->flags=flags;
+
+
+		addconst(ptr->offset.i,1,ptr->flags&FARPTR) ;
+		lval->symbol = ptr ;
+		lval->indirect = lval->val_type = ptr->type ;
+		lval->ptr_type = lval->is_const = lval->const_val = 0 ;
+		lval->ident=VARIABLE;
+		lval->stage_add = NULL_CHAR ;
+		lval->tagsym = NULL_TAG ;
+		lval->binop = NULL_FN ;
+		if ( ptr->type == STRUCT )
+		    lval->tagsym = tagtab + ptr->tag_idx ;
+		if ( ptr->ident == POINTER ) {
+		    lval->ptr_type = ptr->type ;
+		    lval->ident=POINTER;
+		    /* djm */
+		    if (ptr->flags&FARPTR) {
+			lval->indirect = CPTR ;
+			lval->val_type = CPTR ;
+		    } else {
+			lval->indirect = CINT ;
+			lval->val_type = CINT ;
+		    }
+		}
+		if ( ptr->ident==ARRAY || (ptr->type==STRUCT && ptr->ident==VARIABLE) ) {
                                 /* array or struct */
-                                lval->ptr_type = ptr->type ;
-                                lval->ident=POINTER;
-/* djm Long pointers here? */
+		    lval->ptr_type = ptr->type ;
+		    lval->ident=POINTER;
+		    /* djm Long pointers here? */
 
-                                lval->val_type = ((ptr->flags&FARPTR) ? CPTR :CINT) ;
-                                k = 0 ;
-                        }
-                        else k = 1 ;
-                }
-                else return k ;
+		    lval->val_type = ((ptr->flags&FARPTR) ? CPTR :CINT) ;
+		    k = 0 ;
+		}
+		else k = 1 ;
+	    }
+	    else return k ;
         }
-        if ( ptr && ptr->ident == FUNCTION ) {
-                address(ptr);
-                lval->symbol = 0 ;
-                return 0;
-        }
-        return k;
+    if ( ptr && ptr->ident == FUNCTION ) {
+	address(ptr);
+	lval->symbol = 0 ;
+	return 0;
+    }
+    return k;
 }

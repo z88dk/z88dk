@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.1 2000-07-04 15:33:32 dom Exp $
+ *      $Id: primary.c,v 1.2 2001-01-26 11:48:52 dom Exp $
  */
 
 
@@ -382,10 +382,8 @@ void (*step)();
         else {
                 if(lval->indirect) {
                         addstk(lval);
-                        if (lval->flags&FARACC) { zpushde(); zpush(); }
-			else {
-				zpush();
-			}
+                        if (lval->flags&FARACC) lpush();
+			else zpush();
                 }
                 rvalue(lval);
                 intcheck(lval,lval);
@@ -425,10 +423,8 @@ void (*step)(), (*unstep)() ;
         else {
                 if(lval->indirect) {
                         addstk(lval);
-                        if (lval->flags&FARACC) { zpushde(); zpush(); }
-			else {
-				zpush();
-			}
+                        if (lval->flags&FARACC) lpush();
+			else zpush();
                 }
                 rvalue(lval);
                 intcheck(lval,lval);
@@ -495,7 +491,7 @@ char *before ;
         if ( lval->indirect != CINT || lval->symbol == 0 ||
                                                         lval->symbol->storage != STKLOC ) {
                 addstk(lval);
-                if ( (lval->flags&FARACC) || ( lval->symbol && lval->symbol->storage==FAR) ) { zpushde(); zpush(); }
+                if ( (lval->flags&FARACC) || ( lval->symbol && lval->symbol->storage==FAR) ) { lpush(); }
 		else {
 			zpush();
 		}
@@ -509,7 +505,7 @@ char *before ;
                                 break ;
                         default:
                                 addstk(lval);
-                                if (lval->symbol && lval->symbol->storage==FAR) { zpushde(); zpush(); }
+                                if (lval->symbol && lval->symbol->storage==FAR) { lpush(); }
 				else {
 					zpush();
                 		}

@@ -8,7 +8,7 @@
 #
 
 CC=gcc
-CFLAGS = -g -O2 -DUSEFRAME -Wall
+CFLAGS = -g -O2 -DUSEFRAME -Wall 
 LDFLAGS=
 
 OBJS =	callfunc.o     	\
