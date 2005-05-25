@@ -22,18 +22,27 @@
  *      font files, or a file manager, or a multi-purpose binary file
  *      viewer, you do not need to apply for an owner ID.
  *
- *   $Id: makewzd.c,v 1.1 2002-11-21 08:40:52 stefano Exp $
+ *   $Id: makewzd.c,v 1.2 2005-05-25 17:18:30 stefano Exp $
  */
+
 
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+
+#ifdef __APPLE__
+#define O_BINARY 0
+#define __unix__
+#else
 #ifndef __unix__
 #include <io.h>
 #endif
+#endif
+
 #include <fcntl.h>
+
 
 
 char *randname(void);
