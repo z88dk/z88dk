@@ -1,0 +1,23 @@
+Important matters:
+
+1.
+You have to add the "bin" folder (under the installation directory) to your PATH environment variable, to access compiler commands directly from the command prompt.
+2.
+If you are running Windows ME, restart your computer after this setup procedure.
+3.
+do not delete the two files "unins000.exe" and "unins000.dat" under the installation directory: they are part of the uninstall process!
+4.
+the uninstall process will not delete the files and the directories that you add under the installation folder; hence please remove them by yourself.
+
+Enjoy z88dk!
+
+
+------
+
+
+z88dk setup team:
+
+ - author: Marcello Zaniboni
+ - technical consultant: Stefano Bodrato
+ - graphics: Luciano "Lucky" Costarelli
+

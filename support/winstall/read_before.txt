@@ -1,0 +1,10 @@
+----------
+z88dk
+----------
+
+z88dk is a Z80 cross compiler producing binaries for over 20 different z80 based machines. Binaries are supplied for Win32, Amiga and Solaris platforms.
+
+This setup program will install z88dk on Windows; at the moment it is known to work fine with every version except for Windows 95 and 98 (Windows Millennium Edition is OK).
+
+For more info about z88dk, please visit http://www.z88dk.org
+For any problem/question about this setup, you can write to mzaniboni@hotmail.com
