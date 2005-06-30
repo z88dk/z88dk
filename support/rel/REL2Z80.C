@@ -2,7 +2,7 @@
 	REL to Z80ASM format library converter by Enrico Maria Giordano 
 	This file is part of the Z88 Developement Kit  -  http://www.z88dk.org
 
-	$Id: REL2Z80.C,v 1.1 2005-06-17 07:12:09 stefano Exp $
+	$Id: REL2Z80.C,v 1.2 2005-06-30 17:00:29 stefano Exp $
 */
 
 #include <stdio.h>
@@ -15,6 +15,13 @@ struct ExpDecl
     int Address;
     char Name[ 8 ];
     struct ExpDecl *Next;
+};
+
+
+struct NameDecl
+{
+    char Name[ 8 ];
+    struct NameDecl *Next;
 };
 
 
@@ -34,6 +41,7 @@ struct Z80Module
     int LibNameDeclPtr;
     int DataBlockPtr;
     struct ExpDecl *ExpDecl;
+    struct NameDecl *NameDecl;
     struct LibNameDecl *LibNameDecl;
     char ModuleName[ 8 ];
     int DataBlock[ 65536 ];
@@ -99,6 +107,60 @@ int GetExpDeclLen( struct Z80Module *Z80Module )
     while ( Tmp )
     {
         Len += 4 + strlen( Tmp -> Name ) + 1;
+        Tmp = Tmp -> Next;
+    }
+
+    return Len;
+}
+
+
+int ExistNameDecl( struct Z80Module *Z80Module, char *Name )
+{
+    struct NameDecl *Tmp = Z80Module -> NameDecl;
+
+    while ( Tmp )
+    {
+        if ( strcmp( Tmp -> Name, Name ) == 0 ) return 1;
+        Tmp = Tmp -> Next;
+    }
+
+    return 0;
+}
+
+
+void AddNameDecl( struct Z80Module *Z80Module, char *Name )
+{
+    struct NameDecl *Tmp = Z80Module -> NameDecl;
+    struct NameDecl *New;
+
+    if ( ExistNameDecl( Z80Module, Name ) ) return;
+
+    New = malloc( sizeof( struct NameDecl ) );
+
+    strcpy( New -> Name, Name );
+    New -> Next = 0;
+
+    if ( !Tmp )
+    {
+        Z80Module -> NameDecl = New;
+        return;
+    }
+
+    while ( Tmp -> Next ) Tmp = Tmp -> Next;
+
+    Tmp -> Next = New;
+}
+
+
+int GetNameDeclLen( struct Z80Module *Z80Module )
+{
+    struct NameDecl *Tmp = Z80Module -> NameDecl;
+
+    int Len = 0;
+
+    while ( Tmp )
+    {
+        Len += 7 + strlen( Tmp -> Name );
         Tmp = Tmp -> Next;
     }
 
@@ -179,6 +241,7 @@ void WriteZ80( struct Z80Module *Z80Module )
     char Filename[ 12 ];
 
     struct ExpDecl *TmpExp = Z80Module -> ExpDecl;
+    struct NameDecl *TmpName = Z80Module -> NameDecl;
     struct LibNameDecl *TmpLib = Z80Module -> LibNameDecl;
 
     int i;
@@ -209,6 +272,14 @@ void WriteZ80( struct Z80Module *Z80Module )
     WriteLong( Z80File, 0 );
     fprintf( Z80File, "%c%s", strlen( Z80Module -> ModuleName ), Z80Module -> ModuleName );
 
+    while ( TmpName )
+    {
+        fprintf( Z80File, "GA" );
+        WriteLong( Z80File, 0 );
+        fprintf( Z80File, "%c%s", strlen( TmpName -> Name ), TmpName -> Name );
+        TmpName = TmpName -> Next;
+    }
+
     while ( TmpLib )
     {
         fprintf( Z80File, "%c%s", strlen( TmpLib -> Name ), TmpLib -> Name );
@@ -228,13 +299,29 @@ void WriteZ80( struct Z80Module *Z80Module )
 
 void ReleaseZ80Module( struct Z80Module *Z80Module )
 {
-    struct ExpDecl *Tmp = Z80Module -> ExpDecl;
+    struct ExpDecl *TmpExp = Z80Module -> ExpDecl;
+    struct NameDecl *TmpName = Z80Module -> NameDecl;
+    struct LibNameDecl *TmpLib = Z80Module -> LibNameDecl;
 
-    while ( Tmp )
+    while ( TmpExp )
     {
-        Tmp = Z80Module -> ExpDecl -> Next;
+        TmpExp = Z80Module -> ExpDecl -> Next;
         free( Z80Module -> ExpDecl );
-        Z80Module -> ExpDecl = Tmp;
+        Z80Module -> ExpDecl = TmpExp;
+    }
+
+    while ( TmpName )
+    {
+        TmpName = Z80Module -> NameDecl -> Next;
+        free( Z80Module -> NameDecl );
+        Z80Module -> NameDecl = TmpName;
+    }
+
+    while ( TmpLib )
+    {
+        TmpLib = Z80Module -> LibNameDecl -> Next;
+        free( Z80Module -> LibNameDecl );
+        Z80Module -> LibNameDecl = TmpLib;
     }
 }
 
@@ -288,8 +375,8 @@ char *ReadStr( FILE *FilePtr, char *Buffer, int Length )
         Buffer[ i ] = ( char ) ReadBits( FilePtr, 8 );
         if ( Buffer[ i ] == '$' ) Buffer[ i ] = 'S';
         if ( Buffer[ i ] == '.' ) Buffer[ i ] = '_';
-        if ( Buffer[ i ] == '@' ) Buffer[ i ] = 'A';
         if ( Buffer[ i ] == '?' ) Buffer[ i ] = 'X';
+        if ( Buffer[ i ] == '@' ) Buffer[ i ] = 'A';
     }
 
     Buffer[ Length ] = '\0';
@@ -389,8 +476,13 @@ int ReadLink( FILE *FilePtr, int *Location, struct Z80Module *Z80Module )
 
 //            printf( "Entry point: %s %d [%s]\n", Name, Address, Type );
 
-            strcpy( Z80Module -> ModuleName, Name );
-            Z80Module -> OrgAddress = Address;
+            if ( *Z80Module -> ModuleName == 0 )
+            {
+                strcpy( Z80Module -> ModuleName, Name );
+                Z80Module -> OrgAddress = Address;
+            }
+            else
+                AddNameDecl( Z80Module, Name );
 
             break;
         case 8:
@@ -462,9 +554,9 @@ int ReadLink( FILE *FilePtr, int *Location, struct Z80Module *Z80Module )
                 Z80Module -> NameDeclPtr = Z80Module -> ExpDeclPtr + GetExpDeclLen( Z80Module );
 
             if ( GetLibNameDeclLen( Z80Module ) > 0 )
-                Z80Module -> LibNameDeclPtr = Z80Module -> NameDeclPtr + 7 + strlen( Z80Module -> ModuleName );
+                Z80Module -> LibNameDeclPtr = Z80Module -> NameDeclPtr + 7 + strlen( Z80Module -> ModuleName ) + GetNameDeclLen( Z80Module );
             else
-                Z80Module -> ModuleNamePtr = Z80Module -> NameDeclPtr + 7 + strlen( Z80Module -> ModuleName );
+                Z80Module -> ModuleNamePtr = Z80Module -> NameDeclPtr + 7 + strlen( Z80Module -> ModuleName ) + GetNameDeclLen( Z80Module );
 
             if ( Z80Module -> LibNameDeclPtr > 0 )
                 Z80Module -> ModuleNamePtr = Z80Module -> LibNameDeclPtr + GetLibNameDeclLen( Z80Module );
