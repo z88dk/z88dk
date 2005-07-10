@@ -3,7 +3,7 @@
  *
  *  djm 21/6/2001 after Damjan Marion
  *
- *  $Id: rex6000.c,v 1.2 2003-03-13 16:34:23 dom Exp $
+ *  $Id: rex6000.c,v 1.3 2005-07-10 11:39:31 dom Exp $
  */
 
 #include "appmake.h"
@@ -54,7 +54,7 @@ static char             *application_comment = NULL;
 static char             *binname             = NULL;
 static char             *outfile             = NULL;
 static char              help                = 0;
-static char              truncate            = 0;
+static char              do_truncate         = 0;
 
 static char             *application_name_file    = NULL;
 static char             *application_comment_file = NULL;
@@ -67,7 +67,7 @@ option_t rex_options[] = {
     { 'n', "appname",  "Application Name",           OPT_STR,   &application_name },
     { 'c', "comment",  "Application Comment",        OPT_STR,   &application_comment },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
-    {  0 , "nt",       "Don't pad out to 8k addin",  OPT_BOOL,  &truncate },
+    {  0 , "nt",       "Don't pad out to 8k addin",  OPT_BOOL,  &do_truncate },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
   
@@ -166,7 +166,7 @@ int rex_exec(char *target)
         fputc (c, fp);
     }
 
-    if ( truncate == 0 ) {  /* i.e. we've been supplied with -nt, pad out to 8k  */
+    if ( do_truncate == 0 ) {  /* i.e. we've been supplied with -nt, pad out to 8k  */
         rem = 8192 - (filesize % 8192);
         for (i = 0; i < rem ; i++ ) {
             fputc( 0, fp );

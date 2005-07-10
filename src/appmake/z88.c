@@ -28,7 +28,7 @@
  *        djm 12/1/2000
  *        Add option to disallow page truncation
  *      
- *      $Id: z88.c,v 1.1 2003-03-13 14:50:30 dom Exp $
+ *      $Id: z88.c,v 1.2 2005-07-10 11:39:33 dom Exp $
  */
 
 
@@ -70,12 +70,11 @@ static unsigned char appldef[]={ 19, 8 , 'N', 5 , 'A','P','P','L',0,255 };
 static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
-static char              truncate     = 0;
+static char              do_truncate  = 0;
 static char              help         = 0;
 
 static unsigned char    *memory;      /* Pointer to Z80 memory */
 static long              zorg;        /* Origin of compiler program */
-static int               truncat = 0; /* Do we want to truncate pages? */
 
 /* Options that are available for this module */
 option_t z88_options[] = {
@@ -83,7 +82,7 @@ option_t z88_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
-    {  0 , "nt",       "Do not truncate bank 63",    OPT_BOOL,  &truncate },
+    {  0 , "nt",       "Do not do_truncate bank 63",    OPT_BOOL,  &do_truncate },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -119,7 +118,7 @@ int z88_exec(char *target)
     }
 
 #ifdef MSDOS
-    if ( truncate ) {
+    if ( do_truncate ) {
         fputs("-nt option not supported under MSDOS..continuing\n",stderr);
     }
 #endif
@@ -151,7 +150,7 @@ int z88_exec(char *target)
  * Allocate some memory
  */
 
-    if ( truncate == FALSE ) {
+    if ( do_truncate == FALSE ) {
         memory=calloc(1,(unsigned)(65536L-zorg));
     } else {
         memory = calloc(1,65536L);
@@ -178,7 +177,7 @@ int z88_exec(char *target)
 
     /* Check to see if we will infringe on the ROM header, if not then load it in */
     if ( zorg + filesize <= MAX_ADDR ) {
-        if ( truncate == FALSE ) 
+        if ( do_truncate == FALSE ) 
             readlen = fread(memory,1,filesize,binfile);
         else 
             readlen = fread(memory+zorg,1,filesize,binfile);
@@ -193,7 +192,7 @@ int z88_exec(char *target)
     }
     fclose(binfile);
 
-    if ( truncate ) 
+    if ( do_truncate ) 
         zorg = 0;
 
 
@@ -266,7 +265,7 @@ static void SaveBlock(unsigned offset, char *base, char *ext)
         sprintf(buffer,"Can't open output file %s\n",name);
         myexit(buffer,1);
     }
-    if ( (zorg-offset) < 16384 && truncate == FALSE  ) {
+    if ( (zorg-offset) < 16384 && do_truncate == FALSE  ) {
         /* Saving the segment in which the code is org'd to */
         length = 16384-(zorg-offset);
     } else { 
