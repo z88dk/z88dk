@@ -5,7 +5,7 @@
 /*
  * Now some trickery to link in the correct routines for far
  *
- * $Id: malloc.h,v 1.4 2002-05-22 20:13:15 dom Exp $
+ * $Id: malloc.h,v 1.5 2005-08-23 00:19:21 aralbrec Exp $
  */
 
 
@@ -21,8 +21,8 @@
 
 
 extern void __LIB__ *calloc(int,int); 
-extern void __LIB__ *malloc(int);
-extern void __LIB__ free(void *);
+extern void __LIB__ __FASTCALL__ *malloc(int);
+extern void __LIB__ __FASTCALL__ free(void *);
 extern int __LIB__ getfree();
 extern int __LIB__ getlarge();
 extern void __LIB__ heapinit(int);
