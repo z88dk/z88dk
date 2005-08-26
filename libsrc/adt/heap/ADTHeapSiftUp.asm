@@ -19,6 +19,7 @@ LIB l_jpix
 
    srl d
    rr e
+   res 0,e
    push de                ; stack = parent(child=start) index
    ex de,hl               ; de = &array[child=start]
    add hl,bc              ; hl = &array[parent]
