@@ -68,10 +68,10 @@ extern void __LIB__ __FASTCALL__ *adt_ListLast(struct adt_List *list);
 extern void __LIB__ __FASTCALL__ *adt_ListNext(struct adt_List *list);
 extern void __LIB__ __FASTCALL__ *adt_ListPrev(struct adt_List *list);
 extern void __LIB__ __FASTCALL__ *adt_ListCurr(struct adt_List *list);
-extern int  __LIB__  adt_ListAdd(struct adt_List *list, void *item);
-extern int  __LIB__  adt_ListInsert(struct adt_List *list, void *item);
-extern int  __LIB__  adt_ListAppend(struct adt_List *list, void *item);
-extern int  __LIB__  adt_ListPrepend(struct adt_List *list, void *item);
+extern char __LIB__  adt_ListAdd(struct adt_List *list, void *item);
+extern char __LIB__  adt_ListInsert(struct adt_List *list, void *item);
+extern char __LIB__  adt_ListAppend(struct adt_List *list, void *item);
+extern char __LIB__  adt_ListPrepend(struct adt_List *list, void *item);
 extern void __LIB__ __FASTCALL__ *adt_ListRemove(struct adt_List *list);
 extern void __LIB__  adt_ListConcat(struct adt_List *list1, struct adt_List *list2);
 extern void __LIB__  adt_ListFree(struct adt_List *list, void *free);  /* from C: free = 0 to do nothing */
