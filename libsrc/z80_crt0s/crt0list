@@ -23,6 +23,9 @@ crt0/l_gint_eq
 crt0/l_ghtonsint
 crt0/l_glong
 crt0/l_gt
+crt0/l_jphl
+crt0/l_jpix
+crt0/l_jpiy
 crt0/l_le
 crt0/l_lneg
 crt0/l_lt
