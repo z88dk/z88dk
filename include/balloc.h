@@ -33,6 +33,7 @@
  * - maximum of 127 memory queues
  * - minimum block size is 2 bytes
  * - actual memory used for each block is size+1 bytes
+ *   (one hidden byte is used to identify the queue a block belongs to)
  */
 
 typedef unsigned char uchar;
@@ -53,10 +54,10 @@ typedef unsigned int uint;
 #define BAQTBL(numq)  uchar ba_qtbl[numq*2];
 
 extern void __LIB__ __FASTCALL__ ba_Init(uchar numq /* >=1 */);
-extern void __LIB__ ba_AddMem(uchar q, uchar numblocks /* >=1 */, uint size /* >=2 */, void *addr);
+extern void __LIB__ *ba_AddMem(uchar q, uchar numblocks /* >=1 */, uint size /* >=2 */, void *addr);
 extern uint __LIB__ __FASTCALL__ ba_BlockCount(uchar q);
 extern void __LIB__ __FASTCALL__ *ba_Malloc(uchar q);
 extern void __LIB__ __FASTCALL__ ba_Free(void *addr);
-extern void __LIB__ ba_BestFit(uchar q, uchar numq /* >=1 */);
+extern void __LIB__ *ba_BestFit(uchar q, uchar numq /* >=1 */);
 
 #endif
