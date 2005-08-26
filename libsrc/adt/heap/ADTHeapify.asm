@@ -13,12 +13,11 @@ LIB ADTHeapSiftDown
    and $fe
    or h
    ret z                ; return if one or less items in array
-   add hl,hl            ; hl = N * 2
 
    ld e,l
    ld d,h
-   srl d
-   rr e                 ; de = parent of last item in array
+   add hl,hl            ; hl = N * 2
+   res 0,e              ; de = parent of last item in array (index * 2)
 
 .while
    ld a,d
