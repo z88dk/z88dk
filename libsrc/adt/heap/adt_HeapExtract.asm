@@ -18,17 +18,17 @@ LIB ADTHeapExtract, l_jpiy
    inc hl
    ld d,(hl)
    inc hl
-   ex de,hl
+   ex de,hl               ; hl = &n, de = array on stack
    ld a,(hl)
    inc hl
    ld h,(hl)
    ld l,a
-   ex de,hl
+   ex de,hl               ; de = n, hl = array on stack
    ld a,(hl)
    inc hl
    ld h,(hl)
    ld l,a
-   ex de,hl
+   ex de,hl               ; de = array, hl = n
    call ADTHeapExtract
    jr nc, noextract
    push hl
@@ -46,6 +46,7 @@ LIB ADTHeapExtract, l_jpiy
    dec hl
    ld (hl),e
    pop hl
+   scf
    ret
 
 .noextract

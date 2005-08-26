@@ -21,7 +21,7 @@
  *
  * im2_Init initializes im2 mode and creates the default
  * im2 vector table.  The address of the default interrupt
- * service routine for all vectors is passed in as a paramter.
+ * service routine for all vectors is passed in as a parameter.
  * This can be im2_EmptyISR, which simply reenables interrupts
  * and returns, or something of your own choosing including
  * an absolute memory address.
@@ -44,9 +44,11 @@
  * function.  Remember, all registers are saved by the ISR
  * and your hooks do not have to be concerned with that.  Should
  * any hook return with the carry flag set, succeeding hooks
- * will not be run.
+ * will not be run.  Make use of the special z88dk functions
+ * return_c and return_nc to set the state of the carry flag
+ * on exit from C.
  *
- * Your own ISRs can also be registered using im2_InstallISR.
+ * Your own ISRs can also be installed using im2_InstallISR.
  * These ISRs are like any raw machine code ISR -- they will
  * need to save and restore registers as well as reenable
  * interrupts prior to returning.  Straight C functions will
