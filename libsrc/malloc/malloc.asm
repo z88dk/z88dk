@@ -13,7 +13,7 @@
 ; char *malloc(int bytes);
 ;
 ;
-; $Id: malloc.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+; $Id: malloc.asm,v 1.3 2005-08-26 23:50:42 aralbrec Exp $
 ;
 
                 XLIB    malloc
@@ -22,29 +22,22 @@
                 XREF    heaplast
 
 
-.malloc
-        pop     bc
-        pop     hl
-        push    hl
-        push    bc
-        call    basic_malloc
-        ret
-
 .OutMem
      pop  iy
      pop  ix
      pop  de
      pop  bc
      ld   hl,0
+     or a
      ret
 
 
 
 ; IN: HL=size OUT: HL=pointer to mem
-;                                    =0 if out of memory
+;                    =0 if out of memory, carry flag also set if successful
 ;           uses AF,(BC,DE),HL,(IX,IY)
 
-.basic_malloc
+.malloc
      push bc
      push de
      push ix
@@ -114,5 +107,5 @@
      pop  ix
      pop  de
      pop  bc
+     scf
      ret
-
