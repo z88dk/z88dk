@@ -15,24 +15,13 @@
 ;       free(char *)
 ;
 ;
-; $Id: free.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+; $Id: free.asm,v 1.3 2005-08-26 23:49:22 aralbrec Exp $
 ;
 
                 XLIB    free
 
                 XREF    heaplast
                 XREF    heapblocks
-
-.free
-        pop     bc
-        pop     hl
-        push    hl
-        push    bc
-	ld	a,h
-	or	l
-	call	nz,basic_free
-	ret
-
 
 
 .free_new
@@ -45,17 +34,16 @@
      ld   (bc),a         ; bp->next=bp
      inc  l         ; hl=1
      ld   (HeapBlocks),hl
-     pop  de
-     pop  bc
      ret
 
 
 ; free tries to add the block to an existing block, and keeps the
 ;   list in ascending order.
 
-.basic_free          ; IN: HL=pointer to memory previously allocated
-     push bc
-     push de
+.free               ; IN: HL=pointer to memory previously allocated
+     ld a,h
+     or l
+     ret z
      ld   bc,4
      and  a
      sbc  hl,bc
@@ -226,13 +214,9 @@
      ld   hl,(HeapBlocks)
      dec  hl        ; Lower free block counter
      ld   (HeapBlocks),hl
-     pop  de        ;original values entered...
-     pop  bc
      ret
 .nomerge_2
      pop  hl
      pop  hl
-     pop  de
-     pop  bc
      ret
 
