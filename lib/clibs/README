@@ -13,7 +13,10 @@ z88_clib.lib      The important one, contains all the other lib functions
 
 Generic Libraries:
 
+adt.lib           Abstract Data Types (linked list, heap, etc)
+balloc.lib        Block Memory Allocator
 gen_math.lib      Generic Maths Library (suitable for all z80 machines)
+im2.lib           Interrupt Mode 2 Library
 malloc.lib        Near Malloc Routines
 z80_crt0.lib	  Startup routines common to all z80 machines
 
