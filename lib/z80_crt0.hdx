@@ -12,7 +12,7 @@
 ;
 ;	(Used by asxxx)
 ;
-;	$Id: z80_crt0.hdx,v 1.3 2002-04-07 12:31:14 dom Exp $
+;	$Id: z80_crt0.hdx,v 1.4 2005-08-27 00:10:09 aralbrec Exp $
 
         .globl    base_graphics	; Address of graphics screen
 
@@ -22,6 +22,9 @@
         .globl    l_dcal		; jp(hl)
         .globl    cleanup		; cleanup before program exit
 
+        .globl    l_jphl
+        .globl    l_jpix
+        .globl    l_jpiy
 
 ;------------------------------------
 ; Scopes for integer library routines

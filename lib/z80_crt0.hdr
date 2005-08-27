@@ -10,7 +10,7 @@
 ;       routines in different modules, we have got rid of
 ;       the conditional assembly around the float routines
 ;
-;	$Id: z80_crt0.hdr,v 1.5 2002-04-07 12:31:14 dom Exp $
+;	$Id: z80_crt0.hdr,v 1.6 2005-08-27 00:09:31 aralbrec Exp $
 
         XREF    base_graphics	; Address of graphics screen
 
@@ -20,6 +20,11 @@
         XREF    l_dcal		; jp(hl)
         XREF    cleanup		; cleanup before program exit
 
+
+        LIB     l_jphl        ; another jp(hl)
+        LIB     l_jpix        ; jp(ix)
+        LIB     l_jpiy        ; jp(iy)
+        
 
 ;------------------------------------
 ; Scopes for integer library routines
