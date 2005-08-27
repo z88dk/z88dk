@@ -52,6 +52,10 @@ stdlib/sleep
 stdlib/srand
 stdlib/strtol
 stdlib/strtoul
+stdlib/l_bsearch
+stdlib/l_qsort
+stdlib/Lbsearch
+stdlib/Lqsort
 strings/memset
 strings/memcmp
 strings/memcpy
