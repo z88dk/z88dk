@@ -30,16 +30,22 @@ LIB ADTHeapSiftDown
    ld a,(de)
    ldd                          ; bc = array address
 
-   ld l,a
-   ex af,af
+   ex de,hl
+   inc de                       ; de = &array[N]
+   ld (de),a                    ; write extracted item to end of array
+   ld l,a                       ; copying extracted item to end of
+   ex af,af                     ;   array gives a heapsort for free
+   inc de                       ;   (well almost, we do pay 30 extra cycles for it)
+   ld (de),a
    ld h,a
    ex (sp),hl                   ; hl = N * 2, stack = extracted item
 
    dec hl
    dec hl                       ; hl = (N-1)*2 one less item in heap now
-   ld a,h
-   or l
-   jr z, done                   ; if took out last item, don't bother sifting
+   ld a,l
+   and $fc
+   or h
+   jr z, done                   ; if one item or less left, don't bother sifting
    ld de,2                      ; de = top of heap -- sift item copied down the heap
    call ADTHeapSiftDown
 .done
