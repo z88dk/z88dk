@@ -1,1 +1,0 @@
-z80asm -I. -d -ns -nm -Mo -xballoc @sp.lst
