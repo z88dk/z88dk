@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.16 2005-08-23 00:20:08 aralbrec Exp $
+ * $Id: stdlib.h,v 1.17 2005-09-07 01:08:56 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -87,9 +87,18 @@ extern   int optopt;
 extern   int optreset;
 
 
+/* Little Versions of Quicksort and Binary Search Added */
+
 extern void __LIB__ *l_bsearch(void *key, void *base, unsigned int n, void *cmp);
 extern void __LIB__ l_qsort(void *base, unsigned int size, void *cmp);
 /* void *cmp  <=>  char (*cmp)(const void *key, const void *datum) */
+
+
+/* Some Functions to Access 16-bit I/O Ports from C
+   Non-Standard But Required for Any Z80 Machine     */
+
+extern unsigned char __LIB__ __FASTCALL__ inp(unsigned int port);
+extern void __LIB__ outp(unsigned int port, unsigned char byte);
 
 
 /*
