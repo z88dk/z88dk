@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.70 2005-09-07 01:17:43 aralbrec Exp $
+# $Id: Makefile,v 1.71 2005-09-11 17:14:30 dom Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -35,12 +35,12 @@ zxlibs: zx_clib.lib zxan_clib.lib zxvgs.lib zx_math.lib zx_mathtiny.lib
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.70 2005-09-07 01:17:43 aralbrec Exp $
+#  $Id: Makefile,v 1.71 2005-09-11 17:14:30 dom Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.70 2005-09-07 01:17:43 aralbrec Exp $
+# $Id: Makefile,v 1.71 2005-09-11 17:14:30 dom Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -54,7 +54,7 @@ gfxdeps:
 	$(RM) -f graphics/text/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.70 2005-09-07 01:17:43 aralbrec Exp $
+#  $Id: Makefile,v 1.71 2005-09-11 17:14:30 dom Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -159,7 +159,7 @@ net.lib:
 
 # z88 library - dom
 z88_clib.lib:
-	cd @echo ''
+	@echo ''
 	@echo '--- Building Z88 Library  ---'
 	@echo ''
 	cd fcntl ; $(MAKE) lz88 ; cd ..
@@ -403,7 +403,7 @@ ti82_clib.lib:
 	@echo ''
 	@echo '--- Building TI82 Library  ---'
 	@echo ''
-	$(MAKE) tideps.sh
+	$(MAKE) tideps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
