@@ -1,9 +1,9 @@
-; void adt_ListFree(struct adt_List *list, void *free)
-; /* void (*free)(void *item) */
+; void adt_ListDelete(struct adt_List *list, void *delete)
+; /* void (*delete)(void *item) */
 ; 02.2003, 06.2005 aralbrec
 
-XLIB adt_ListFree
-LIB ADTListFree
+XLIB adt_ListDelete
+LIB ADTListDelete
 
 .adt_ListFree
    ld hl,2
@@ -22,14 +22,14 @@ LIB ADTListFree
    inc hl
    ld h,(hl)
    ld l,e
-   jp ADTListFree
+   jp ADTListDelete
 
 .justret
    ret
 
 ; enter: HL = struct adt_List *
-;        IX = free
+;        IX = delete
 ; exit : The entire list is deleted.
-;        (free) is called once for each item in the list with
+;        (delete) is called once for each item in the list with
 ;          HL = item.
 ; uses : AF,BC,DE,HL

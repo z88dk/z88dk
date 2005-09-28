@@ -22,7 +22,7 @@ linkedlist/adt_ListCount
 linkedlist/adt_ListCreate
 linkedlist/adt_ListCurr
 linkedlist/adt_ListFirst
-linkedlist/adt_ListFree
+linkedlist/adt_ListDelete
 linkedlist/adt_ListInsert
 linkedlist/adt_ListLast
 linkedlist/adt_ListNext
@@ -38,7 +38,7 @@ linkedlist/ADTListConcat
 linkedlist/ADTListCount
 linkedlist/ADTListCurr
 linkedlist/ADTListFirst
-linkedlist/ADTListFree
+linkedlist/ADTListDelete
 linkedlist/ADTListInsert
 linkedlist/ADTListLast
 linkedlist/ADTListNext
@@ -47,3 +47,19 @@ linkedlist/ADTListPrev
 linkedlist/ADTListRemove
 linkedlist/ADTListSearch
 linkedlist/ADTListTrim
+queue/adt_QueueBack
+queue/adt_QueueCreate
+queue/adt_QueueDelete
+queue/adt_QueueEmpty
+queue/adt_QueueFront
+queue/adt_QueuePopFront
+queue/adt_QueuePushBack
+queue/ADTQueueDelete
+queue/ADTQueuePushBack
+stack/adt_StackCreate
+stack/adt_StackDelete
+stack/adt_StackPeek
+stack/adt_StackPop
+stack/adt_StackPush
+stack/ADTStackDelete
+stack/ADTStackPush

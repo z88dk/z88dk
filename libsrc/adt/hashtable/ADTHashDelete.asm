@@ -38,8 +38,9 @@ XREF _u_free
    or a
    jr z, nolist
 
-   call l_jpix                  ; user cleanup function on HashCell
    push hl
+   call l_jpix                  ; user cleanup function on HashCell
+   pop hl
    inc hl
    inc hl
    ld d,(hl)
