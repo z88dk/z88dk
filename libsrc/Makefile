@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.71 2005-09-11 17:14:30 dom Exp $
+# $Id: Makefile,v 1.72 2005-09-28 00:48:14 aralbrec Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -35,12 +35,12 @@ zxlibs: zx_clib.lib zxan_clib.lib zxvgs.lib zx_math.lib zx_mathtiny.lib
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.71 2005-09-11 17:14:30 dom Exp $
+#  $Id: Makefile,v 1.72 2005-09-28 00:48:14 aralbrec Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.71 2005-09-11 17:14:30 dom Exp $
+# $Id: Makefile,v 1.72 2005-09-28 00:48:14 aralbrec Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -54,7 +54,7 @@ gfxdeps:
 	$(RM) -f graphics/text/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.71 2005-09-11 17:14:30 dom Exp $
+#  $Id: Makefile,v 1.72 2005-09-28 00:48:14 aralbrec Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -901,4 +901,4 @@ clean:
 	cd im2 ; $(MAKE) clean ; cd ..
 
 install:
-	cp *.lib ../lib/clibs/
+	cp *.lib ../lib/clibs
