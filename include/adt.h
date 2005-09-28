@@ -7,6 +7,8 @@
  * - Doubly Linked List +    ; added 08.2005 aralbrec
  * - Hash Table         +    ; added 08.2005 aralbrec
  * - Heap                    ; added 08.2005 aralbrec
+ * - Stack              +    ; added 09.2005 aralbrec
+ * - Queue              +    ; added 09.2005 aralbrec
  *
  * The data types marked with "+" require a memory allocation policy
  * that allows memory to be allocated and freed implicitly.  You can
@@ -46,7 +48,7 @@ reports a match or when the current ptr points past the end of the list.
 
 In the following:
 
-   void *free   <->  void (*free)(void *item)
+   void *delete <->  void __FASTCALL__ (*delete)(void *item)
    void *match  <->  char (*match)(void *item1, void *item2) return 0 if =
 
 */
@@ -66,6 +68,7 @@ struct adt_List {                  /* One as handle for each list */
 };
 
 extern struct adt_List __LIB__ *adt_ListCreate(void);
+extern void __LIB__  adt_ListDelete(struct adt_List *list, void *delete);  /* from C: del = 0 to do nothing */
 extern uint __LIB__ __FASTCALL__ adt_ListCount(struct adt_List *list);
 extern void __LIB__ __FASTCALL__ *adt_ListFirst(struct adt_List *list);
 extern void __LIB__ __FASTCALL__ *adt_ListLast(struct adt_List *list);
@@ -78,7 +81,6 @@ extern char __LIB__  adt_ListAppend(struct adt_List *list, void *item);
 extern char __LIB__  adt_ListPrepend(struct adt_List *list, void *item);
 extern void __LIB__ __FASTCALL__ *adt_ListRemove(struct adt_List *list);
 extern void __LIB__  adt_ListConcat(struct adt_List *list1, struct adt_List *list2);
-extern void __LIB__  adt_ListFree(struct adt_List *list, void *free);  /* from C: free = 0 to do nothing */
 extern void __LIB__ __FASTCALL__ *adt_ListTrim(struct adt_List *list);
 extern void __LIB__ *adt_ListSearch(struct adt_List *list, void *match, void *item1);
 
@@ -96,8 +98,8 @@ on keys, this implementation requires a less/equal operator in order
 to keep items in the lists sorted for marginally faster lookup when the load
 factor of the hash table becomes high.
 
-On creation, you must determine the hash table's hashing size and provide
-several functions including key compare and hash function which will be
+On creation, you must determine the hash table's size and provide
+several functions, among them key compare and hash function, which will be
 stored in the hashtable data structure and will be used implicity in hash
 table function calls.  As always performance depends on a good hash function
 and appropriate hash table size.  The goal is to evenly spread keys among all
@@ -113,7 +115,7 @@ In the following:
    void *compare   <->  char (*compare)(void *key1, void *key2)
                         if *key1 < *key2 return -ve, if = return 0
 
-delete = 0 to do no user clean-up on deleted adt_HashCells.
+delete member = 0 to do no user clean-up on deleted adt_HashCells.
 
 */
 
@@ -132,10 +134,10 @@ struct adt_HashTable {              /* One as handle for the hash table */
 };
 
 extern struct adt_HashTable __LIB__ *adt_HashCreate(uint size, void *delete, void *compare, void *hashfunc);
+extern void __LIB__ __FASTCALL__ adt_HashDelete(struct adt_HashTable *ht);
 extern void __LIB__ *adt_HashRemove(struct adt_HashTable *ht, void *key);
 extern void __LIB__ *adt_HashLookup(struct adt_HashTable *ht, void *key);
 extern void __LIB__ *adt_HashAdd(struct adt_HashTable *ht, void *key, void *value);
-extern void __LIB__ __FASTCALL__ adt_HashDelete(struct adt_HashTable *ht);
 
 
 /*** HEAP (PRIORITY QUEUE)
@@ -172,6 +174,61 @@ the heap.
 extern void __LIB__ adt_Heapify(void **array, uint n, void *compare);
 extern void __LIB__ adt_HeapAdd(void *item, void **array, uint *n, void *compare);
 extern void __LIB__ *adt_HeapExtract(void **array, uint *n, void *compare);
+
+
+/*** QUEUE
+
+A queue allows storage and retrieval of items in FIFO order.  New items
+are added to the back of the queue and items are removed from the front
+of the queue.
+
+In the following:
+
+     void *delete  <-> void __FASTCALL__ (*delete)(void *item)
+                       an opportunity for user clean up if a non-empty queue is deleted
+*/
+
+struct adt_QueueNode {                /* One for each item in queue, invisible to user */
+   void *item;
+   struct adt_QueueNode *next;
+};
+
+struct adt_Queue {                    /* A single handle for each queue created */
+   struct adt_QueueNode *front;
+   struct adt_QueueNode *back;
+};
+
+extern struct adt_Queue __LIB__ *adt_QueueCreate(void);
+extern void __LIB__ adt_QueueDelete(struct adt_Queue *q, void *delete);  /* from C: del = 0 to do nothing */
+extern int  __LIB__ __FASTCALL__ adt_QueueEmpty(struct adt_Queue *q);
+extern void __LIB__ __FASTCALL__ *adt_QueueFront(struct adt_Queue *q);
+extern void __LIB__ __FASTCALL__ *adt_QueueBack(struct adt_Queue *q);
+extern void __LIB__ __FASTCALL__ *adt_QueuePopFront(struct adt_Queue *q);
+extern int  __LIB__ adt_QueuePushBack(struct adt_Queue *q, void *item);
+
+
+/*** STACK
+
+A standard LIFO stack.  Items are pushed onto the top of a stack and are popped
+off the top as well.  An empty stack is indicated by a 0 struct adt_Stack *, hence
+there is no need for a separate function to indicate whether the stack is empty.
+
+In the following:
+
+     void *delete  <-> void __FASTCALL__ (*delete)(void *item)
+                       an opportunity for user clean up if a non-empty stack is deleted
+*/
+
+struct adt_Stack {                    /* One for each item in stack */
+   void *item;
+   struct adt_Stack *next;
+};
+
+extern struct adt_Stack __LIB__ *adt_StackCreate(void);
+extern void __LIB__ adt_StackDelete(struct adt_Stack **s, void *delete);   /* from C: del = 0 to do nothing */
+extern int  __LIB__ adt_StackPush(struct adt_Stack **s, void *item);
+extern void __LIB__ __FASTCALL__ *adt_StackPop(struct adt_Stack **s);
+extern void __LIB__ __FASTCALL__ *adt_StackPeek(struct adt_Stack *s);
 
 
 #endif
