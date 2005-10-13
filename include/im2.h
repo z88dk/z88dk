@@ -54,6 +54,10 @@
  * interrupts prior to returning.  Straight C functions will
  * not do this without the help of some embedded assembler.
  *
+ * A light generic ISR is also provided.  It is identical
+ * to the regular generic ISR but it only saves the main
+ * register set AF,BC,DE,HL on interrupt.
+ *
  */
 
 typedef unsigned char uchar;
@@ -81,6 +85,7 @@ extern void __LIB__ im2_Init(uchar extended, void *default_isr);
 extern void __LIB__ *im2_InstallISR(uchar vector, void *isr);
 extern void __LIB__ im2_EmptyISR(void);
 extern void __LIB__ *im2_CreateGenericISR(uchar numhooks /* >=1 */, void *addr);
+extern void __LIB__ *im2_CreateGenericISRLight(uchar numhooks /* >=1 */, void *addr);
 extern void __LIB__ im2_RegHookFirst(uchar vector, void *hook);
 extern void __LIB__ im2_RegHookLast(uchar vector, void *hook);
 extern int __LIB__ im2_RemoveHook(uchar vector, void *hook);
