@@ -97,7 +97,7 @@ extern void __LIB__ in_WaitForNoKey(void);
  * 2. JOYSTICK
  *
  * All joystick functions return a single byte in the format
- * F111RLDU (active low) to indicate state of directions and
+ * F000RLDU (active high) to indicate state of directions and
  * fire button.  Do not assume that any directions are
  * mutually exclusive as on traditional joysticks (ie up and
  * down cannot normally be simultaneously asserted) since
@@ -149,7 +149,7 @@ extern void __LIB__ in_WaitForNoKey(void);
  *   joyfunc = in_JoystickQuery(choice);
  *   ...
  *   dirs = (joyfunc)(&k);
- *   if ((dirs & in_FIRE) == 0)
+ *   if (dirs & in_FIRE)
  *      printf("pressed fire!\n");
  *
  * If the author is not interested in this cross-platform capability,
@@ -199,7 +199,7 @@ extern uint __LIB__ in_JoyKeyboard(struct in_UDK *u);
  *   any hw initialization
  *
  * void in_MouseNAME(uchar *buttons, uint *xcoord, uint *ycoord)
- *   Read the mouse, returning single byte 11111MRL active low for buttons +
+ *   Read the mouse, returning single byte 00000MRL active high for buttons +
  *   16-bit X and Y coords for current mouse position
  *
  * void in_MouseNAMESetPos(uint xcoord, uint ycoord)
@@ -249,7 +249,8 @@ extern uint __LIB__ in_JoyKeyboard(struct in_UDK *u);
  * Example:
  *
  *   uchar choice, b;
- *   void *mouseinit, *mouseread, *mousesetpos, *mousefunc;
+ *   void *mouseinit, *mouseread, *mousesetpos;
+ *   void **mousefunc;
  *   struct in_UDM m;
  *   struct in_UDK k;
  *   uint x, y; 
@@ -268,15 +269,15 @@ extern uint __LIB__ in_JoyKeyboard(struct in_UDK *u);
  *   m.joyfunc = in_JoyKeyboard;   * simulated mouse will use key joystick *
  *   m.delta = deltas;            * acceleration profile *
  *   ...
- *   printf("You have selected the %s mouse\n", in_MouseEnum(choice));
- *   mousefunc = in_Mouse(choice);
+ *   printf("You have selected the %s mouse\n", in_MouseEnumQuery(choice));
+ *   mousefunc = in_MouseQuery(choice);
  *   mouseinit = mousefunc[0];
  *   mousesetpos = mousefunc[1];
  *   mouseread = mousefunc[2];
  *   (mouseinit)(&m);
  *   ...
  *   (mouseread)(&m, &b, &x, &y);
- *   if ((b & in_BUT1) == 0)
+ *   if (b & in_BUT1)
  *      printf("button pressed at coord (%d,%d)!\n", x, y);
  *
  * If the author is not interested in this cross-platform capability,
@@ -326,7 +327,6 @@ extern void __LIB__ in_MouseSimSetPos(struct in_UDM *u, uint xcoord, uint ycoord
 
    Both the AMX mouse and the Kempston mouse require variables to be declared,
    see spectrum.h for details.
-
 */
 #endif
 
