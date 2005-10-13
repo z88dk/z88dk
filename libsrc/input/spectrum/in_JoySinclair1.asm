@@ -3,7 +3,7 @@
 
 XLIB in_JoySinclair1
 
-; exit : HL = F111RLDU active low
+; exit : HL = F000RLDU active high
 ; uses : AF,DE,HL
 
 .in_JoySinclair1
@@ -19,11 +19,11 @@ XLIB in_JoySinclair1
    ret
 
 .sinc1tbl
-   defb $70,$f0,$71,$f1
-   defb $72,$f2,$73,$f3
-   defb $78,$f8,$79,$f9
-   defb $7a,$fa,$7b,$fb
-   defb $74,$f4,$75,$f5
-   defb $76,$f6,$77,$f7
-   defb $7c,$fc,$7d,$fd
-   defb $7e,$fe,$7f,$ff
+   defb $8f,$0f,$8e,$0e
+   defb $8d,$0d,$8c,$0c
+   defb $87,$07,$86,$06
+   defb $85,$05,$84,$04
+   defb $8b,$0b,$8a,$0a
+   defb $89,$09,$88,$08
+   defb $83,$03,$82,$02
+   defb $81,$01,$80,$00

@@ -8,7 +8,7 @@ XLIB INMouseKemp
 XREF _in_KempcoordX, _in_KempcoordY
 XREF _in_KemprawX, _in_KemprawY
 
-; exit : C = button state 111111RL active low
+; exit : C = button state 000000RL active high
 ;        B = X coordinate (0..255)
 ;        A = Y coordinate (0..191)
 ; uses : AF,BC,E
@@ -50,7 +50,8 @@ XREF _in_KemprawX, _in_KemprawY
    srl c
    or $fc
    or c
-   ld c,a                      ; c = buttons 111111RL active low
+   cpl
+   ld c,a                      ; c = buttons 000000RL active high
 
 .doY
    ld a,(_in_KemprawY)

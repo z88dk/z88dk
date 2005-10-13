@@ -19,11 +19,11 @@ XLIB in_JoyKempston
    ret
 
 .kemptbl
-   defb $70,$78,$74,$7c
-   defb $72,$7a,$76,$7e
-   defb $71,$79,$75,$7d
-   defb $73,$7b,$77,$7f
-   defb $f0,$f8,$f4,$fc
-   defb $f2,$fa,$f6,$fe
-   defb $f1,$f9,$f5,$fd
-   defb $f3,$fb,$f7,$ff
+   defb $8f,$87,$8b,$83
+   defb $82,$8a,$86,$8e
+   defb $81,$89,$85,$8d
+   defb $8c,$84,$88,$80
+   defb $0f,$07,$0b,$03
+   defb $0d,$05,$09,$01
+   defb $0e,$06,$0a,$02
+   defb $02,$04,$08,$00

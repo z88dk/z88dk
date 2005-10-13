@@ -3,7 +3,7 @@
 
 XLIB in_JoyTimex1
 
-; exit : A = HL = F111RLDU active low
+; exit : A = HL = F000RLDU active high
 ; uses : AF,HL
 
 ; WARNING: farts around with the AY registers -- might
@@ -26,7 +26,8 @@ XLIB in_JoyTimex1
 
    ld a,2              ; left joystick
    in a,($f6)
-   or $70
+   cpl
+   and $8f
    ld l,a
    ld h,0
    ret

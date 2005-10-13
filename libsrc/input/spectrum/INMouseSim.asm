@@ -30,7 +30,7 @@ LIB l_jpix
    and $0f
    jp z, nomovement
    ld a,l
-   ex af,af                ; A' = F111RLDU active low
+   ex af,af                ; A' = F000RLDU active high
    pop hl                  ; HL = &in_UDM.delta
 
    ld e,(hl)
@@ -82,9 +82,9 @@ LIB l_jpix
    ex de,hl                ; DE = &in_UDM.y + 1b, HL = y
 
 .up
-   ex af,af                ; A = F111RLDU active low
+   ex af,af                ; A = F000RLDU active high
    rrca
-   jr c, down
+   jr nc, down
    rrca                    ; swallow down, only doing up
    or a
    sbc hl,bc
@@ -93,7 +93,7 @@ LIB l_jpix
    jp endvertical
 .down
    rrca
-   jr c, endvertical
+   jr nc, endvertical
    add hl,bc
    ex af,af
    ld a,h
@@ -103,7 +103,7 @@ LIB l_jpix
 .notoutofrange
    ex af,af
 
-.endvertical                ; A = ??F111RL
+.endvertical                ; A = ??F000RL
    ex de,hl                 ; DE = new Y, HL = &in_UDM.y + 1b
    ld (hl),d
    dec hl
@@ -118,7 +118,7 @@ LIB l_jpix
 
 .left
    rrca
-   jr c,right
+   jr nc,right
    rrca                     ; swallow right
    or a
    sbc hl,bc
@@ -127,12 +127,12 @@ LIB l_jpix
    jp endhorizontal
 .right
    rrca
-   jr c, endhorizontal
+   jr nc, endhorizontal
    add hl,bc
    jp nc, endhorizontal
    ld hl,$ffff
 
-.endhorizontal              ; A = ????F111
+.endhorizontal              ; A = ????F000
    ex de,hl                 ; DE = new x, HL = &in_UDM.x + 1b
    ld (hl),d
    dec hl
@@ -141,15 +141,15 @@ LIB l_jpix
 
    ld b,d                   ; B = x coord 0..255
    and $08
-   ld c,$ff
-   jr nz, nofire
-   dec c
+   ld c,0
+   jr z, nofire
+   inc c
 .nofire                     ; C = mouse button state
    ld a,(hl)                ; A = y coord 0..191
    ret
 
 .nomovement
-   ld a,l                   ; A = F111RLDU active low
+   ld a,l                   ; A = F000RLDU active high
    pop hl                   ; HL = &in_UDM.delta
 
    inc hl
@@ -158,9 +158,9 @@ LIB l_jpix
    inc hl
    ld (hl),0                ; count = 0
 
-   ld c,$ff
+   ld c,0
    rla
-   rl c                     ; C = 1111111L active low
+   rl c                     ; C = 0000000L active high
 
    inc hl
    inc hl

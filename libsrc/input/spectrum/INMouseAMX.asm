@@ -4,7 +4,7 @@
 XLIB INMouseAMX
 XREF _in_AMXcoordX, _in_AMXcoordY
 
-; exit : C = button state 11111MRL active low
+; exit : C = button state 00000MRL active high
 ;        B = X coordinate (0..255)
 ;        A = Y coordinate (0..191)
 ; uses : AF,BC,HL
@@ -48,4 +48,4 @@ XREF _in_AMXcoordX, _in_AMXcoordY
    ret
 
 .buttbl
-   defb $f8, $fc, $fa, $fe, $f9, $fd, $fb, $ff
+   defb $07, $03, $05, $01, $06, $02, $04, $00

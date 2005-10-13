@@ -11,17 +11,17 @@ XLIB in_JoyKeyboard
 
 ; enter : HL = struct in_UDK *, a 10-byte table containing 5 scan
 ;              codes for fire,right,left,down,up in that order
-; exit  : HL = F111RLDU active low
+; exit  : HL = F000RLDU active high
 ; uses  : AF,DE,HL
 
-   ld de,$ff
+   ld de,0
 
    ld a,(hl)
    in a,($fe)
    inc hl
    and (hl)
    jr nz, nofire
-   res 7,e
+   set 7,e
 
 .nofire
    inc hl
@@ -30,7 +30,7 @@ XLIB in_JoyKeyboard
    inc hl
    and (hl)
    jr nz, noright
-   res 3,e
+   set 3,e
 
 .noright
    inc hl
@@ -39,7 +39,7 @@ XLIB in_JoyKeyboard
    inc hl
    and (hl)
    jr nz, noleft
-   res 2,e
+   set 2,e
 
 .noleft
    inc hl
@@ -48,7 +48,7 @@ XLIB in_JoyKeyboard
    inc hl
    and (hl)
    jr nz, nodown
-   res 1,e
+   set 1,e
 
 .nodown
    inc hl
@@ -57,7 +57,7 @@ XLIB in_JoyKeyboard
    inc hl
    and (hl)
    jr nz, noup
-   res 0,e
+   set 0,e
 
 .noup
    ex de,hl
