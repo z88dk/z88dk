@@ -29,7 +29,7 @@ XREF _u_free
    ldi                      ; so set adt_Queue.front = adt_QueueNode.next
    or (hl)
    ldi
-   jr nz, notemptynow       ; if the queue is now empty
+   jp nz, notemptynow       ; if the queue is now empty
    ld (de),a
    inc de
    ld (de),a
