@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.5 2003-10-10 11:05:40 dom Exp $
+ * $Id: spectrum.h,v 1.6 2005-10-13 00:43:46 aralbrec Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -39,6 +39,35 @@ extern int __LIB__ tape_save_block(void *addr, size_t len, unsigned char type);
 extern int __LIB__ tape_load_block(void *addr, size_t len, unsigned char type);
 
 
+/* Joystick Functions */
+
+extern uint __LIB__ in_JoyFuller(void);
+extern uint __LIB__ in_JoyKempston(void);
+extern uint __LIB__ in_JoySinclair1(void);
+extern uint __LIB__ in_JoySinclair2(void);
+extern uint __LIB__ in_JoyTimex1(void);
+extern uint __LIB__ in_JoyTimex2(void);
+
+/* Mouse Functions */
+
+/*
+   AMX Mouse Variables - you must declare
+   uint in_AMXcoordX, in_AMXcoordY, in_AMXdeltaX, in_AMXdeltaY;
+*/
+
+extern void __LIB__ in_MouseAMXInit(uchar xvector, uchar yvector);
+extern void __LIB__ in_MouseAMXInit2(void);
+extern void __LIB__ in_MouseAMX(uchar *buttons, uint *xcoord, uint *ycoord);
+extern void __LIB__ in_MouseAMXSetPos(uint xcoord, uint ycoord);
+
+/*
+   Kempston Mouse Variables - you must declare
+   uchar in_KempcoordX, in_KempcoordY, in_KemprawX, in_KemprawY;
+*/
+
+extern void __LIB__ in_MouseKempInit(void);
+extern void __LIB__ in_MouseKemp(uchar *buttons, uint *xcoord, uint *ycoord);
+extern void __LIB__ in_MouseKempSetPos(uint xcoord, uint ycoord);
+
+
 #endif
-
-
