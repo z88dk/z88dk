@@ -1,4 +1,5 @@
 im2_CreateGenericISR
+im2_CreateGenericISRLight
 im2_EmptyISR
 im2_Init
 im2_InstallISR
@@ -6,6 +7,7 @@ im2_RegHookFirst
 im2_RegHookLast
 im2_RemoveHook
 IM2CreateGenericISR
+IM2CreateGenericISRLight
 IM2Init
 IM2InstallISR
 IM2RegHookFirst
