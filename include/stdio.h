@@ -1,7 +1,7 @@
 #ifndef __STDIO_H__
 #define __STDIO_H__
 
-/* $Id: stdio.h,v 1.12 2003-03-22 14:29:32 dom Exp $ */
+/* $Id: stdio.h,v 1.13 2005-10-19 21:14:31 dom Exp $ */
 
 #undef __STDIO_BINARY        /* By default don't consider binary files */
 
@@ -120,6 +120,7 @@ extern void __LIB__ closeall();
 extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp);
 extern int __LIB__ fputs(unsigned char *s,  FILE *fp);
 extern int __LIB__ fputc(int c, FILE *fp);
+#define getc(f) fgetc(f)
 extern int __LIB__ fgetc(FILE *fp);
 extern int __LIB__ ungetc(int c, FILE *);
 extern int __LIB__ feof(FILE *fp);
