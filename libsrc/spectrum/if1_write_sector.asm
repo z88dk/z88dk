@@ -1,19 +1,21 @@
 ;
 ;	ZX IF1 & Microdrive functions
 ;	
-;	if1_write_sector (int drive, int sector, struct M_CHAN buffer);
+;	int if1_write_sector (int drive, int sector, struct M_CHAN buffer);
 ;	
+;	Writes the specified sector to the specified drive.
+;
 ;	
-;	$Id: if1_write_sector.asm,v 1.1 2004-10-08 12:33:24 stefano Exp $
+;	$Id: if1_write_sector.asm,v 1.2 2005-11-21 11:49:40 stefano Exp $
 ;
 
 
 		XLIB 	if1_write_sector
 		
-		LIB 	if1_wrsect
+		;;LIB 	if1_wrsect
 		LIB 	if1_rommap
 
-		XREF	mdvbuffer
+		;;XREF	mdvbuffer
 		
 		XREF	MAKE_M
 		XREF	MOTOR
@@ -40,10 +42,7 @@ if1_write_sector:
 
 		ld	l,(ix+0)	; buffer
 		ld	h,(ix+1)
-		ld	(mdvbuffer),hl
-
-		;ld	a,'M'
-		;ld	(5CD9h),A	; l_str1 (device type = "M")
+		ld	(mdvbuffer+1),hl  ; Self modifying code  :oP
 
 		call	MAKE_M
 
@@ -52,9 +51,38 @@ if1_write_sector:
 
 		pop	af
 		ld	(ix+19h),A	; CHDRIV
+		
 		call	MOTOR
 		
-		call	if1_wrsect
+		push	ix
+		pop	hl
+		ld	de,37h		; point to 12 bytes of data block preamble
+		add	hl,de
+		
+		push	hl
+mdvbuffer:	ld	hl,0
+		add	hl,de
+		pop	de
+		
+		ld	bc,21ch
+		ldir
+
+		set	0,(ix+18h)	; set CHFLAG to "write" mode
+		call	1
+
+		RST	8
+		defb	22h		; Open a temp "M" channel
+
+		rst	8
+		defb	2Ah		; Write a sector to drive
+
+		xor	a
+		rst	8
+		defb	21h		; Switch microdrive motor off (a=0)
+
+		RST	8
+		defb	2Ch		; Reclaim an "M" channel
 
 		ld	hl,0
+
 		ret

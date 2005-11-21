@@ -1,4 +1,4 @@
-; $Id: bit_fx.asm,v 1.2 2002-04-17 21:30:23 dom Exp $
+; $Id: bit_fx.asm,v 1.3 2005-11-21 11:49:40 stefano Exp $
 ;
 ; Generic platform sound effects module.
 ;
@@ -33,7 +33,7 @@
           push de
           push bc
           
-          ld    a,e
+          ld    a,e  
           cp    8  
           ret   nc  
           add   a,a  
@@ -47,14 +47,14 @@
           ld    l,a  
           jp    (hl)  
           
-.table    defw    fx2  
-          defw    fx5  
-          defw    fx6  
-          defw    zap0  
-          defw    zap1  
-          defw    zap2  
-          defw    zap3  
-          defw    warpcall  
+.table    defw    fx2		; effect #0
+          defw    fx5
+          defw    fx6
+          defw    zap0
+          defw    zap1
+          defw    clackson
+          defw    zap3
+          defw    warpcall	; effect #7
           
           
 ;Strange squeak hl=300,de=2
@@ -129,24 +129,29 @@
 .zap0_3   jp    bit_close_ei
           
           
-;Kinda falling sound
+;Clackson sound
           
-.zap2     ld    a,c  
-          and   a  
-          jr    nz,zap2_0  
-          ld    hl,$1300
-          ld    (zap2_0+1),hl  
-          ret   
-          
-.zap2_0   ld    hl,$10  
-          ld    de,6  
-          push  hl  
-          call  beeper  
-          pop   hl  
-          ld    bc,$20  
-          and   a  
-          sbc   hl,bc  
-          ld    (zap2_0+1),hl  
+.clackson
+          call  bit_open_di
+.clackson_LENGHT
+          ld      b,90
+          ld      c,sndbit_port
+.clackson_loop
+          dec     h
+          jr      nz,clackson_jump
+          xor     sndbit_mask
+          out     (c),a
+.clackson_FR_1
+          ld      h,230
+.clackson_jump
+          dec     l
+          jr      nz,clackson_loop
+          xor     sndbit_mask
+          out     (c),a
+.clackson_FR_2
+          ld      l,255
+          djnz    clackson_loop
+          call	bit_close_ei
           ret
           
           
@@ -164,7 +169,6 @@
 .zap3_2   nop
           djnz  zap3_2
           xor   sndbit_mask
-          ld    (hl),a
           out   (sndbit_port),a
           pop   bc
           push  bc
@@ -216,7 +220,6 @@
           ld    b,0  
 .zap1_1   push  bc  
           xor   sndbit_mask  ;oscillate between high and low bits...
-          ld    (hl),a
           out   (sndbit_port),a  
 .zap1_2   nop
           nop
@@ -224,4 +227,5 @@
           pop   bc
           djnz  zap1_1
           jp    bit_close
-
+          
+          
