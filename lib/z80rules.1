@@ -722,6 +722,14 @@
 	ld	l,#(%1 % 256)
 	call	l_as%2
 
+	ex	de,hl
+	pop	hl
+	push	hl
+	ex	de,hl
+=
+	pop	de
+	push	de
+
 	pop	hl
 	push	hl
 	ex	de,hl
@@ -2131,3 +2139,10 @@
 	pop	bc
 =
 	pop	hl
+
+	push	hl
+	pop	de
+	push	de
+=
+	ld	d,h
+	ld	e,l
