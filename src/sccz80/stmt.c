@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.11 2004-03-03 15:40:28 dom Exp $
+ *      $Id: stmt.c,v 1.12 2006-01-30 21:54:10 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -378,10 +378,10 @@ void dofor()
 
 		jump(l_condition);		/*         goto condition             */
 		postlabel(wq.loop);		/* .loop                              */
-		statement();			/*         statement                  */
 		clearbuffer(buf3);		/*         modification               */
-		postlabel(l_condition);	/* .condition                         */
+		postlabel(l_condition);		/* .condition                         */
 		clearbuffer(buf2);		/*         if (!condition) goto exit  */
+		statement();			/*         statement                  */
 		jump(wq.loop);			/*         goto loop                  */
 		postlabel(wq.exit);		/* .exit                              */
 
