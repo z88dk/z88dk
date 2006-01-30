@@ -2,7 +2,7 @@
  *   Convert number to any base through to a string, space pads
  *   string for the printf routines
  *
- *   $Id: ltoa_any.c,v 1.1 2002-02-20 11:11:54 dom Exp $
+ *   $Id: ltoa_any.c,v 1.2 2006-01-30 21:58:39 dom Exp $
  */
 
 #include <stdio.h>
@@ -23,7 +23,7 @@ int ltoa_any(long in,unsigned  char *str, int sz, unsigned int radix, int signfl
         sgn = ' ';
     }
 
-    if ( sz < 0 )
+    if ( sz > 0 )
         str[--sz] = 0;
     else if ( sz < 0 )
         sz = -sz;
