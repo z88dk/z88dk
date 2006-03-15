@@ -1,26 +1,37 @@
 /*
-	REL to Z80ASM format library converter by Enrico Maria Giordano 
+	REL to Z80ASM format library converter
+	by Enrico Maria Giordano and Stefano Bodrato
 	This file is part of the Z88 Developement Kit  -  http://www.z88dk.org
 
-	$Id: REL2Z80.C,v 1.2 2005-06-30 17:00:29 stefano Exp $
+	$Id: REL2Z80.C,v 1.3 2006-03-15 09:02:04 stefano Exp $
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#define ABSOLUTE         0
+#define PROGRAM_RELATIVE 1
+#define DATA_RELATIVE    2
+#define COMMON_RELATIVE  3
+
+static int CurrByte = 0;
+static int CurrBit = -1;
+
 
 struct ExpDecl
 {
     int Address;
+    char Type;
     char Name[ 8 ];
     struct ExpDecl *Next;
 };
 
-
 struct NameDecl
 {
+    int Address;
     char Name[ 8 ];
+    char Type;
     struct NameDecl *Next;
 };
 
@@ -47,10 +58,14 @@ struct Z80Module
     int DataBlock[ 65536 ];
     int DataBlockSize;
     int DataSize;
+    int ProgramSize;
+    int Location;
+    int Pass;
+    int LastAddrType;
 };
 
 
-void AddExpDecl( struct Z80Module *Z80Module, int Address, char *Name )
+void AddExpDecl( struct Z80Module *Z80Module, int Address, char Type, char *Name )
 {
     struct ExpDecl *Tmp = Z80Module -> ExpDecl;
     struct ExpDecl *New;
@@ -58,6 +73,7 @@ void AddExpDecl( struct Z80Module *Z80Module, int Address, char *Name )
     New = malloc( sizeof( struct ExpDecl ) );
 
     New -> Address = Address;
+    New -> Type = Type;
     strcpy( New -> Name, Name );
     New -> Next = 0;
 
@@ -83,14 +99,15 @@ void CompleteExpDecl( struct Z80Module *Z80Module )
     {
         Address = Tmp -> Address;
 
-        while ( ( TmpAddr = Z80Module -> DataBlock[ Address ] + 256 * Z80Module -> DataBlock[ Address + 1 ] ) != 0 )
+        if ( Tmp -> Type == 'C' )
         {
-            Z80Module -> DataBlock[ Address ] = 0;
-            Z80Module -> DataBlock[ Address + 1 ] = 0;
-
-            Address = TmpAddr;
-
-            AddExpDecl( Z80Module, Address, Tmp -> Name );
+            while ( ( TmpAddr = Z80Module -> DataBlock[ Address ] + 256 * Z80Module -> DataBlock[ Address + 1 ] ) != 0 )
+            {
+                Z80Module -> DataBlock[ Address ] = 0;
+                Z80Module -> DataBlock[ Address + 1 ] = 0;
+                Address = TmpAddr;
+                AddExpDecl( Z80Module, Address, 'C', Tmp -> Name );
+            }
         }
 
         Tmp = Tmp -> Next;
@@ -128,7 +145,7 @@ int ExistNameDecl( struct Z80Module *Z80Module, char *Name )
 }
 
 
-void AddNameDecl( struct Z80Module *Z80Module, char *Name )
+void AddNameDecl( struct Z80Module *Z80Module, int Address, char Type, char *Name )
 {
     struct NameDecl *Tmp = Z80Module -> NameDecl;
     struct NameDecl *New;
@@ -138,6 +155,8 @@ void AddNameDecl( struct Z80Module *Z80Module, char *Name )
     New = malloc( sizeof( struct NameDecl ) );
 
     strcpy( New -> Name, Name );
+    New -> Type = Type;
+    New -> Address = Address;
     New -> Next = 0;
 
     if ( !Tmp )
@@ -265,6 +284,7 @@ void WriteZ80( struct Z80Module *Z80Module )
         fprintf( Z80File, "C" );
         WriteWord( Z80File, TmpExp -> Address );
         fprintf( Z80File, "%c%s%c", strlen( TmpExp -> Name ), TmpExp -> Name, 0 );
+
         TmpExp = TmpExp -> Next;
     }
 
@@ -274,10 +294,20 @@ void WriteZ80( struct Z80Module *Z80Module )
 
     while ( TmpName )
     {
-        fprintf( Z80File, "GA" );
-        WriteLong( Z80File, 0 );
-        fprintf( Z80File, "%c%s", strlen( TmpName -> Name ), TmpName -> Name );
-        TmpName = TmpName -> Next;
+    	if ( TmpName -> Type == 'G' )
+    	{
+            fprintf( Z80File, "GA" );
+            WriteLong( Z80File, 0 );
+            fprintf( Z80File, "%c%s", strlen( TmpName -> Name ), TmpName -> Name );
+            TmpName = TmpName -> Next;
+        }
+        else
+        {
+            fprintf( Z80File, "LA" );
+            WriteLong( Z80File, TmpName -> Address );
+            fprintf( Z80File, "%c%s", strlen( TmpName -> Name ), TmpName -> Name );
+            TmpName = TmpName -> Next;
+        }
     }
 
     while ( TmpLib )
@@ -326,23 +356,37 @@ void ReleaseZ80Module( struct Z80Module *Z80Module )
 }
 
 
+void SetRelativeAddr( struct Z80Module *Z80Module, int Location, int RelativePtr )
+{
+    char Name[ 256 ];
+
+    Z80Module -> DataBlock[ Location ] = 0;
+    Z80Module -> DataBlock[ Location + 1 ] = 0;
+    
+    sprintf ( Name, "LOC_%X", RelativePtr );
+
+    if ( Z80Module -> Pass == 2)
+    {
+        AddNameDecl( Z80Module, RelativePtr, 'L', Name );
+        AddExpDecl( Z80Module, Location, 'L', Name );
+    }
+}
+
+
 int ReadOneBit( FILE *FilePtr, int Boundary )
 {
-    static int Byte = 0;
-    static int CurrBit = -1;
-
     int Bit;
 
     if ( CurrBit == -1 || Boundary )
     {
-        Byte = fgetc( FilePtr );
+        CurrByte = fgetc( FilePtr );
         CurrBit = 7;
         if ( Boundary ) return 0;
     }
 
-    Bit = ( Byte & 128 ) == 128;
+    Bit = ( CurrByte & 128 ) == 128;
 
-    Byte *= 2;
+    CurrByte *= 2;
 
     --CurrBit;
 
@@ -363,6 +407,36 @@ int ReadBits( FILE *FilePtr, int ToRead )
         Bits = ( Bits >> 8 ) + ( ( Bits & 255 ) << 8 );
 
     return Bits;
+}
+
+
+int SwitchPass (  FILE *FilePtr, struct Z80Module *Z80Module )
+{
+static int svByte, svBit, svFile;
+
+    switch ( Z80Module -> Pass )
+    {
+        case 1:
+	    // Pass 2: pre-link and load data basing on "ProgramSize" and "ProgramSize"
+	    CurrByte = svByte;
+	    CurrBit = svBit;
+	    fseek ( FilePtr, svFile, SEEK_SET );
+            Z80Module -> Pass = 2;
+            
+            break;
+        case 2:
+            // Pass 1: find the Data and Program size
+            Z80Module -> DataSize = 0;
+            Z80Module -> ProgramSize = 0;
+            svByte = CurrByte;
+            svBit = CurrBit;
+            svFile = ftell( FilePtr );
+            Z80Module -> Pass = 1;
+
+            break;
+    }
+    
+    return ( Z80Module -> Pass );
 }
 
 
@@ -389,16 +463,16 @@ char *AddressType( char *Buffer, int Type )
 {
     switch ( Type )
     {
-        case 0:
+        case ABSOLUTE:
             strcpy( Buffer, "AB" );
             break;
-        case 1:
+        case PROGRAM_RELATIVE:
             strcpy( Buffer, "PR" );
             break;
-        case 2:
+        case DATA_RELATIVE:
             strcpy( Buffer, "DR" );
             break;
-        case 3:
+        case COMMON_RELATIVE:
             strcpy( Buffer, "CR" );
             break;
     }
@@ -407,7 +481,18 @@ char *AddressType( char *Buffer, int Type )
 }
 
 
-int ReadLink( FILE *FilePtr, int *Location, struct Z80Module *Z80Module )
+int ReadAddress ( FILE *FilePtr, struct Z80Module *Z80Module )
+{
+    int Address;
+    
+    Z80Module -> LastAddrType = ReadBits( FilePtr, 2 );
+    Address = ReadBits( FilePtr, 16 );
+    
+    return Address;
+}
+
+
+int ReadLink( FILE *FilePtr, struct Z80Module *Z80Module )
 {
     char Name[ 256 ];
 
@@ -438,51 +523,55 @@ int ReadLink( FILE *FilePtr, int *Location, struct Z80Module *Z80Module )
         case 3:
             ReadStr( FilePtr, Name, ReadBits( FilePtr, 3 ) );
 
-            printf( "Warning: ignoring special item declaration 0011 [%s]\n", Name );
+            if ( Z80Module -> Pass == 1 )
+                printf( "Warning: special item 0011 requests an external library - [%s]\n", Name );
 
             break;
         case 4:
             ReadStr( FilePtr, Name, ReadBits( FilePtr, 3 ) );
 
-            printf( "Warning: ignoring special item declaration 0100 [%s]\n", Name );
+            if ( Z80Module -> Pass == 1 )
+                printf( "Warning: ignoring special item declaration 0100 [%s]\n", Name );
 
             break;
         case 5:
-            AddressType( Type, ReadBits( FilePtr, 2 ) );
-            Address = ReadBits( FilePtr, 16 );
+            Address = ReadAddress ( FilePtr, Z80Module );
             ReadStr( FilePtr, Name, ReadBits( FilePtr, 3 ) );
 
 //            printf( "Common block size: %s %d [%s]\n", Name, Address, Type );
 
             break;
         case 6:
-            AddressType( Type, ReadBits( FilePtr, 2 ) );
-            Address = ReadBits( FilePtr, 16 );
+            Address = ReadAddress ( FilePtr, Z80Module );
             ReadStr( FilePtr, Name, ReadBits( FilePtr, 3 ) );
 
 //            printf( "Chain external: %s %d [%s]\n", Name, Address, Type );
 
-            if ( strcmp( Type, "PR" ) == 0 )
+            //if (( Z80Module -> Pass == 1 ) && ( Z80Module -> LastAddrType == PROGRAM_RELATIVE ))
+            if ( Z80Module -> Pass == 1 ) 
             {
-                AddExpDecl( Z80Module, Address, Name );
+                AddExpDecl( Z80Module, Address, 'C', Name );
                 AddLibNameDecl( Z80Module, Name );
             }
 
             break;
         case 7:
-            AddressType( Type, ReadBits( FilePtr, 2 ) );
-            Address = ReadBits( FilePtr, 16 );
+            Address = ReadAddress ( FilePtr, Z80Module );
             ReadStr( FilePtr, Name, ReadBits( FilePtr, 3 ) );
 
 //            printf( "Entry point: %s %d [%s]\n", Name, Address, Type );
 
-            if ( *Z80Module -> ModuleName == 0 )
+            if ( Z80Module -> Pass == 2 )
             {
-                strcpy( Z80Module -> ModuleName, Name );
-                Z80Module -> OrgAddress = Address;
+                if ( *Z80Module -> ModuleName == 0 )
+                //if (( *Z80Module -> ModuleName == 0 ) && ( Address == 0 ))
+                {
+                    strcpy( Z80Module -> ModuleName, Name );
+                    Z80Module -> OrgAddress = Address;
+                }
+                else
+                    AddNameDecl( Z80Module, 0, 'G', Name );
             }
-            else
-                AddNameDecl( Z80Module, Name );
 
             break;
         case 8:
@@ -492,53 +581,75 @@ int ReadLink( FILE *FilePtr, int *Location, struct Z80Module *Z80Module )
 
             break;
         case 9:
-            AddressType( Type, ReadBits( FilePtr, 2 ) );
-            Address = ReadBits( FilePtr, 16 );
+            Address = ReadAddress ( FilePtr, Z80Module );
 
 //            printf( "External offset: %d [%s]\n", Address, Type );
 
             break;
         case 10:
-            AddressType( Type, ReadBits( FilePtr, 2 ) );
-            Address = ReadBits( FilePtr, 16 );
+            Address = ReadAddress ( FilePtr, Z80Module );
 
 //            printf( "Data size: %d [%s]\n", Address, Type );
 
-            Z80Module -> DataSize = Address;
+            if ( ( Z80Module -> Pass == 1 ) && ( Address != 0 ) ) 
+                Z80Module -> DataSize = Address;
 
             break;
         case 11:
-            AddressType( Type, ReadBits( FilePtr, 2 ) );
-            Address = ReadBits( FilePtr, 16 );
+	    Address = ReadAddress ( FilePtr, Z80Module );
+            
+            //****
+            if ( Z80Module -> LastAddrType == DATA_RELATIVE )
+            {
+                Z80Module -> Location = Address + Z80Module -> ProgramSize;
+            }
+            else
+            {
+                Z80Module -> Location = Address;
+            }
 
 //            printf( "Location counter: %d [%s]\n", Address, Type );
 
-            *Location = Address;
-
             break;
         case 12:
-            AddressType( Type, ReadBits( FilePtr, 2 ) );
-            Address = ReadBits( FilePtr, 16 );
+            Address = ReadAddress ( FilePtr, Z80Module );
 
-//            printf( "Chain address: %d [%s]\n", Address, Type );
+            if ( Z80Module -> Pass == 2 )
+            {
+                SetRelativeAddr( Z80Module, Address, Z80Module -> Location );
+            }
+
+//            printf( "Chain address: %d [%d]\n", Address, Z80Module -> LastAddrType );
 
             break;
         case 13:
-            AddressType( Type, ReadBits( FilePtr, 2 ) );
-            Address = ReadBits( FilePtr, 16 );
+            Address = ReadAddress ( FilePtr, Z80Module );
 
 //            printf( "Program size: %d [%s]\n", Address, Type );
 
+            if ( ( Z80Module -> Pass == 1 ) && ( Address != 0 ) )
+                Z80Module -> ProgramSize = Address;
+            
             break;
         case 14:
-            AddressType( Type, ReadBits( FilePtr, 2 ) );
-            Address = ReadBits( FilePtr, 16 );
+        
+            if ( Z80Module -> Pass == 1 )
+            {
+                SwitchPass ( FilePtr, Z80Module );
+                Z80Module -> Location = 0;
+                return 1;
+            }
+
+            Address = ReadAddress ( FilePtr, Z80Module );
 
 //            printf( "End module: %d [%s]\n\n", Address, Type );
 
             ReadOneBit( FilePtr, 1 );
 
-            Z80Module -> DataBlockSize = *Location;
+            if ( *Z80Module -> ModuleName == 0 )
+                strcpy ( Z80Module -> ModuleName, "_MAIN" );
+
+            Z80Module -> DataBlockSize = Z80Module -> ProgramSize + Z80Module -> DataSize;
 
             if ( Z80Module -> OrgAddress == 0 )
                 Z80Module -> OrgAddress = 65535;
@@ -563,6 +674,7 @@ int ReadLink( FILE *FilePtr, int *Location, struct Z80Module *Z80Module )
 
             Z80Module -> DataBlockPtr = Z80Module -> ModuleNamePtr + 1 + strlen( Z80Module -> ModuleName );
 
+            printf ( "%s\t\tProgram Size: %u  \tData Size: %u\n", Z80Module -> ModuleName, Z80Module -> ProgramSize, Z80Module -> DataSize );
             WriteZ80( Z80Module );
 
             memset( Z80Module, 0, sizeof( struct Z80Module ) );
@@ -572,7 +684,11 @@ int ReadLink( FILE *FilePtr, int *Location, struct Z80Module *Z80Module )
             Z80Module -> NameDeclPtr    = -1;
             Z80Module -> LibNameDeclPtr = -1;
             Z80Module -> DataBlockPtr   = -1;
-
+            Z80Module -> Location       = 0;
+            Z80Module -> Pass           = 2;
+            SwitchPass( FilePtr, Z80Module );
+            Z80Module -> LastAddrType   = ABSOLUTE;
+            
             break;
         case 15:
             printf( "End file\n" );
@@ -588,42 +704,52 @@ int ReadLink( FILE *FilePtr, int *Location, struct Z80Module *Z80Module )
 
 int ReadItem( FILE *FilePtr, struct Z80Module *Z80Module )
 {
-    static int Location = 0;
+    int RelativePtr;
 
     if ( ReadBits( FilePtr, 1 ) == 0 )
     {
-//        printf( "%5d [LC] %d\n", Location++, ReadBits( FilePtr, 8 ) );
-
-        Z80Module -> DataBlock[ Location++ ] = ReadBits( FilePtr, 8 );
+        if ( Z80Module -> Pass == 2 )
+        {
+            Z80Module -> DataBlock[ Z80Module -> Location++ ] = ReadBits( FilePtr, 8 );
+        }
+        else
+        {
+            ReadBits( FilePtr, 8 );
+            Z80Module -> Location++;
+        }
     }
     else
     {
         switch ( ReadBits( FilePtr, 2 ) )
         {
             case 0:
-                return ReadLink( FilePtr, &Location, Z80Module );
+                return ReadLink( FilePtr, Z80Module );
+                
+                break;
             case 1:
 //                printf( "%5d [PS] %d\n\n", Location, ReadBits( FilePtr, 16 ) );
-
-                Z80Module -> DataBlock[ Location ] = ReadBits( FilePtr, 8 );
-                Z80Module -> DataBlock[ Location + 1 ] = ReadBits( FilePtr, 8 );
+                RelativePtr = ReadBits( FilePtr, 16 );
+                if ( Z80Module -> Pass == 2 )
+                    SetRelativeAddr( Z80Module, Z80Module -> Location, RelativePtr  );
 
                 break;
             case 2:
 //                printf( "%5d [DS] %d\n\n", Location, ReadBits( FilePtr, 16 ) );
-
-                ReadBits( FilePtr, 16 );
+                RelativePtr = ReadBits( FilePtr, 16 );
+                if ( Z80Module -> Pass == 2 )
+                    SetRelativeAddr( Z80Module, Z80Module -> Location, Z80Module -> ProgramSize + RelativePtr  );
 
                 break;
             case 3:
 //                printf( "%5d [CB] %d\n\n", Location, ReadBits( FilePtr, 16 ) );
-
-                ReadBits( FilePtr, 16 );
+                RelativePtr = ReadBits( FilePtr, 16 );
+                if ( Z80Module -> Pass == 2 )
+                    SetRelativeAddr( Z80Module, Z80Module -> Location, RelativePtr  );
 
                 break;
         }
 
-        Location += 2;
+        Z80Module -> Location += 2;
     }
 
     return 1;
@@ -636,7 +762,7 @@ int main( int argc, char *argv[] )
 
     struct Z80Module Z80Module;
 
-    if ( argc != 2 )
+    if ( ( argc != 2 ) )
     {
         printf( "Usage: REL2Z80 <rel obj file name>\n" );
         return 1;
@@ -657,6 +783,10 @@ int main( int argc, char *argv[] )
     Z80Module.NameDeclPtr    = -1;
     Z80Module.LibNameDeclPtr = -1;
     Z80Module.DataBlockPtr   = -1;
+    Z80Module.Location       = 0;
+    Z80Module.Pass           = 2;
+    SwitchPass(  RelFile, &Z80Module );
+    Z80Module.LastAddrType   = ABSOLUTE;
 
     while ( ReadItem( RelFile, &Z80Module ) );
 
