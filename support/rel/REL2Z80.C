@@ -3,7 +3,7 @@
 	by Enrico Maria Giordano and Stefano Bodrato
 	This file is part of the Z88 Developement Kit  -  http://www.z88dk.org
 
-	$Id: REL2Z80.C,v 1.3 2006-03-15 09:02:04 stefano Exp $
+	$Id: REL2Z80.C,v 1.4 2006-03-17 08:07:35 stefano Exp $
 */
 
 #include <stdio.h>
@@ -360,9 +360,9 @@ void SetRelativeAddr( struct Z80Module *Z80Module, int Location, int RelativePtr
 {
     char Name[ 256 ];
 
-    Z80Module -> DataBlock[ Location ] = 0;
-    Z80Module -> DataBlock[ Location + 1 ] = 0;
-    
+    Z80Module -> DataBlock[ Location ] = RelativePtr & 255;
+    Z80Module -> DataBlock[ Location + 1 ] = RelativePtr >> 8;
+
     sprintf ( Name, "LOC_%X", RelativePtr );
 
     if ( Z80Module -> Pass == 2)
@@ -552,6 +552,7 @@ int ReadLink( FILE *FilePtr, struct Z80Module *Z80Module )
             {
                 AddExpDecl( Z80Module, Address, 'C', Name );
                 AddLibNameDecl( Z80Module, Name );
+                //CompleteExpDecl( Z80Module );
             }
 
             break;
@@ -563,6 +564,9 @@ int ReadLink( FILE *FilePtr, struct Z80Module *Z80Module )
 
             if ( Z80Module -> Pass == 2 )
             {
+            	// Stefano - here we choose the module name
+            	// This point needs to be improved
+            	
                 if ( *Z80Module -> ModuleName == 0 )
                 //if (( *Z80Module -> ModuleName == 0 ) && ( Address == 0 ))
                 {
@@ -598,7 +602,6 @@ int ReadLink( FILE *FilePtr, struct Z80Module *Z80Module )
         case 11:
 	    Address = ReadAddress ( FilePtr, Z80Module );
             
-            //****
             if ( Z80Module -> LastAddrType == DATA_RELATIVE )
             {
                 Z80Module -> Location = Address + Z80Module -> ProgramSize;

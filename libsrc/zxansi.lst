@@ -199,8 +199,13 @@ games/spectrum/bit_close_ei
 games/bit_click
 games/bit_play
 games/bit_fx
+games/bit_fx2
+games/bit_fx3
+games/bit_fx4
+games/bit_synth
 games/bit_frequency
 games/bit_beep
+games/bit_dual_beep
 games/spectrum/beeper
 spectrum/tape_save
 spectrum/tape_save_block

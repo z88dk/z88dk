@@ -1,3 +1,11 @@
+/*
+	REL file analyzer: generates binary blocks which can be disassembled
+	by Enrico Maria Giordano and Stefano Bodrato
+	This file is part of the Z88 Developement Kit  -  http://www.z88dk.org
+
+	$Id: REL2BIN.C,v 1.2 2006-03-17 08:07:35 stefano Exp $
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -318,8 +326,8 @@ int ReadLink( FILE *FilePtr, unsigned char segment[] )
 	    segment[Address] = counter & 255;
 	    segment[Address+1] = counter >> 8;
             //printf( "Chain external: %s %d [%s]", Name, Address, Type );
-            if ( Pass == 2 )
-              printf( "Chain external: %s %x [%s]", Name, labelcnt, Type );
+            //if ( Pass == 2 )
+            //  printf( "Chain external: %s %x [%s]", Name, labelcnt, Type );
 
             break;
         case 13:
