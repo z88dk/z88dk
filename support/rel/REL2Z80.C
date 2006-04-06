@@ -1,9 +1,9 @@
 /*
-	REL to Z80ASM format library converter
-	by Enrico Maria Giordano and Stefano Bodrato
-	This file is part of the Z88 Developement Kit  -  http://www.z88dk.org
+        REL to Z80ASM format library converter
+        by Enrico Maria Giordano and Stefano Bodrato
+        This file is part of the Z88 Developement Kit  -  http://www.z88dk.org
 
-	$Id: REL2Z80.C,v 1.4 2006-03-17 08:07:35 stefano Exp $
+        $Id: REL2Z80.C,v 1.5 2006-04-06 07:20:15 stefano Exp $
 */
 
 #include <stdio.h>
@@ -106,6 +106,7 @@ void CompleteExpDecl( struct Z80Module *Z80Module )
                 Z80Module -> DataBlock[ Address ] = 0;
                 Z80Module -> DataBlock[ Address + 1 ] = 0;
                 Address = TmpAddr;
+                //printf ( "Added ExpDecl %s, address %u\n", Tmp -> Name, Address );
                 AddExpDecl( Z80Module, Address, 'C', Tmp -> Name );
             }
         }
@@ -294,8 +295,8 @@ void WriteZ80( struct Z80Module *Z80Module )
 
     while ( TmpName )
     {
-    	if ( TmpName -> Type == 'G' )
-    	{
+        if ( TmpName -> Type == 'G' )
+        {
             fprintf( Z80File, "GA" );
             WriteLong( Z80File, 0 );
             fprintf( Z80File, "%c%s", strlen( TmpName -> Name ), TmpName -> Name );
@@ -355,20 +356,28 @@ void ReleaseZ80Module( struct Z80Module *Z80Module )
     }
 }
 
-
-void SetRelativeAddr( struct Z80Module *Z80Module, int Location, int RelativePtr )
+/*
+    Here we load two types of cross-reference:
+    'L' stands for local: it is a relative pointer which needs to be relocated at linking time
+    'C' is a reference to a single pointer or to a "chain" of pointers pointing to the current position.
+    CompleteExpDecl will unroll this latest kind of xref as well as the references to global functions.
+*/
+void SetRelativeAddr( struct Z80Module *Z80Module, int Location, int RelativePtr, char Type )
 {
     char Name[ 256 ];
 
-    Z80Module -> DataBlock[ Location ] = RelativePtr & 255;
-    Z80Module -> DataBlock[ Location + 1 ] = RelativePtr >> 8;
+    if ( Type == 'L' )
+    {
+        Z80Module -> DataBlock[ Location ] = RelativePtr & 255;
+        Z80Module -> DataBlock[ Location + 1 ] = RelativePtr >> 8;
+    }
 
     sprintf ( Name, "LOC_%X", RelativePtr );
 
     if ( Z80Module -> Pass == 2)
     {
         AddNameDecl( Z80Module, RelativePtr, 'L', Name );
-        AddExpDecl( Z80Module, Location, 'L', Name );
+        AddExpDecl( Z80Module, Location, Type, Name );
     }
 }
 
@@ -413,14 +422,19 @@ int ReadBits( FILE *FilePtr, int ToRead )
 int SwitchPass (  FILE *FilePtr, struct Z80Module *Z80Module )
 {
 static int svByte, svBit, svFile;
+int x;
 
     switch ( Z80Module -> Pass )
     {
         case 1:
-	    // Pass 2: pre-link and load data basing on "ProgramSize" and "ProgramSize"
-	    CurrByte = svByte;
-	    CurrBit = svBit;
-	    fseek ( FilePtr, svFile, SEEK_SET );
+            // Pass 2: pre-link and load data basing on "ProgramSize" and "ProgramSize"
+            
+            for (x=0; x<65536; x++)
+                Z80Module -> DataBlock[x] = 0;
+
+            CurrByte = svByte;
+            CurrBit = svBit;
+            fseek ( FilePtr, svFile, SEEK_SET );
             Z80Module -> Pass = 2;
             
             break;
@@ -498,7 +512,7 @@ int ReadLink( FILE *FilePtr, struct Z80Module *Z80Module )
 
     char Type[ 3 ];
 
-    int Address;
+    int Address, TmpAddr;
 
     switch ( ReadBits( FilePtr, 4 ) )
     {
@@ -545,14 +559,11 @@ int ReadLink( FILE *FilePtr, struct Z80Module *Z80Module )
             Address = ReadAddress ( FilePtr, Z80Module );
             ReadStr( FilePtr, Name, ReadBits( FilePtr, 3 ) );
 
-//            printf( "Chain external: %s %d [%s]\n", Name, Address, Type );
-
-            //if (( Z80Module -> Pass == 1 ) && ( Z80Module -> LastAddrType == PROGRAM_RELATIVE ))
-            if ( Z80Module -> Pass == 1 ) 
+            if ( Z80Module -> Pass == 2 ) 
             {
+                //printf( "Chain external: %s %d [%d]\n", Name, Address, Z80Module -> LastAddrType );
                 AddExpDecl( Z80Module, Address, 'C', Name );
                 AddLibNameDecl( Z80Module, Name );
-                //CompleteExpDecl( Z80Module );
             }
 
             break;
@@ -564,9 +575,9 @@ int ReadLink( FILE *FilePtr, struct Z80Module *Z80Module )
 
             if ( Z80Module -> Pass == 2 )
             {
-            	// Stefano - here we choose the module name
-            	// This point needs to be improved
-            	
+                // Stefano - here we choose the module name
+                // This point needs to be improved
+                
                 if ( *Z80Module -> ModuleName == 0 )
                 //if (( *Z80Module -> ModuleName == 0 ) && ( Address == 0 ))
                 {
@@ -600,7 +611,7 @@ int ReadLink( FILE *FilePtr, struct Z80Module *Z80Module )
 
             break;
         case 11:
-	    Address = ReadAddress ( FilePtr, Z80Module );
+            Address = ReadAddress ( FilePtr, Z80Module );
             
             if ( Z80Module -> LastAddrType == DATA_RELATIVE )
             {
@@ -617,12 +628,11 @@ int ReadLink( FILE *FilePtr, struct Z80Module *Z80Module )
         case 12:
             Address = ReadAddress ( FilePtr, Z80Module );
 
-            if ( Z80Module -> Pass == 2 )
+            if ( Z80Module -> Pass == 2 ) 
             {
-                SetRelativeAddr( Z80Module, Address, Z80Module -> Location );
+                //printf( "%d: Chain address: %d [%d]\n", Z80Module -> Location, Address, Z80Module -> LastAddrType );
+                SetRelativeAddr( Z80Module, Address, Z80Module -> Location, 'C' );
             }
-
-//            printf( "Chain address: %d [%d]\n", Address, Z80Module -> LastAddrType );
 
             break;
         case 13:
@@ -639,6 +649,10 @@ int ReadLink( FILE *FilePtr, struct Z80Module *Z80Module )
             if ( Z80Module -> Pass == 1 )
             {
                 SwitchPass ( FilePtr, Z80Module );
+                
+                if ( Z80Module -> ProgramSize == 0 )
+                    Z80Module -> ProgramSize = Z80Module -> Location;
+                
                 Z80Module -> Location = 0;
                 return 1;
             }
@@ -688,6 +702,8 @@ int ReadLink( FILE *FilePtr, struct Z80Module *Z80Module )
             Z80Module -> LibNameDeclPtr = -1;
             Z80Module -> DataBlockPtr   = -1;
             Z80Module -> Location       = 0;
+            Z80Module -> DataSize       = 0;
+            Z80Module -> ProgramSize    = 0;
             Z80Module -> Pass           = 2;
             SwitchPass( FilePtr, Z80Module );
             Z80Module -> LastAddrType   = ABSOLUTE;
@@ -733,21 +749,21 @@ int ReadItem( FILE *FilePtr, struct Z80Module *Z80Module )
 //                printf( "%5d [PS] %d\n\n", Location, ReadBits( FilePtr, 16 ) );
                 RelativePtr = ReadBits( FilePtr, 16 );
                 if ( Z80Module -> Pass == 2 )
-                    SetRelativeAddr( Z80Module, Z80Module -> Location, RelativePtr  );
+                    SetRelativeAddr( Z80Module, Z80Module -> Location, RelativePtr, 'L' );
 
                 break;
             case 2:
 //                printf( "%5d [DS] %d\n\n", Location, ReadBits( FilePtr, 16 ) );
                 RelativePtr = ReadBits( FilePtr, 16 );
                 if ( Z80Module -> Pass == 2 )
-                    SetRelativeAddr( Z80Module, Z80Module -> Location, Z80Module -> ProgramSize + RelativePtr  );
+                    SetRelativeAddr( Z80Module, Z80Module -> Location, Z80Module -> ProgramSize + RelativePtr, 'L' );
 
                 break;
             case 3:
 //                printf( "%5d [CB] %d\n\n", Location, ReadBits( FilePtr, 16 ) );
                 RelativePtr = ReadBits( FilePtr, 16 );
                 if ( Z80Module -> Pass == 2 )
-                    SetRelativeAddr( Z80Module, Z80Module -> Location, RelativePtr  );
+                    SetRelativeAddr( Z80Module, Z80Module -> Location, RelativePtr, 'L' );
 
                 break;
         }
@@ -787,6 +803,8 @@ int main( int argc, char *argv[] )
     Z80Module.LibNameDeclPtr = -1;
     Z80Module.DataBlockPtr   = -1;
     Z80Module.Location       = 0;
+    Z80Module.DataSize       = 0;
+    Z80Module.ProgramSize    = 0;
     Z80Module.Pass           = 2;
     SwitchPass(  RelFile, &Z80Module );
     Z80Module.LastAddrType   = ABSOLUTE;

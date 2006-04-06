@@ -3,7 +3,7 @@
 	by Enrico Maria Giordano and Stefano Bodrato
 	This file is part of the Z88 Developement Kit  -  http://www.z88dk.org
 
-	$Id: REL2BIN.C,v 1.2 2006-03-17 08:07:35 stefano Exp $
+	$Id: REL2BIN.C,v 1.3 2006-04-06 07:20:15 stefano Exp $
 */
 
 #include <stdio.h>
@@ -15,6 +15,7 @@
 char ModuleName[256];
 
 int counter = 0;
+int chainaddr = 0;
 int PSize, DSize;
 int locator;
 int labelcnt = LabelCount;
@@ -250,21 +251,20 @@ int ReadLink( FILE *FilePtr, unsigned char segment[] )
             Address = ReadAddress ( FilePtr, Type );
             ReadStr( FilePtr, Name, ReadBits( FilePtr, 3 ) );
 
-            //printf( "Chain external: %s %d [%s]", Name, Address, Type );
             if ( Pass == 2 )
-              printf( "Chain external: %s %x [%s]", Name, labelcnt, Type );
+            {
+              printf( "Chain external: %s $%x [%s]", Name, labelcnt, Type );
 
-	    while ((Address != 0) && (Address<60000))
-	    {
-	        PtrNext = segment[Address] + 256 * segment[Address+1];
-                if ( Pass == 2 )
-	          printf(" - %u -", PtrNext);
-	        segment[Address] = labelcnt & 255;
-	        segment[Address+1] = labelcnt >> 8;
-	        //printf("%u\n\n",PtrNext);
-	        Address = PtrNext;
+              while ((Address != 0) && (Address<60000))
+	      {
+	          PtrNext = segment[Address] + 256 * segment[Address+1];
+                  printf(" - $%x -", Address);
+	          segment[Address] = labelcnt & 255;
+	          segment[Address+1] = labelcnt >> 8;
+	          //printf("%u\n\n",PtrNext);
+	          Address = PtrNext;
+	      }
 	    }
-	    
 	    labelcnt++;
             if ( Pass == 2 )
               printf( "\n" );
@@ -275,10 +275,16 @@ int ReadLink( FILE *FilePtr, unsigned char segment[] )
             ReadStr( FilePtr, Name, ReadBits( FilePtr, 3 ) );
 
             if ( Pass == 2 )
-              printf( "Entry point: %s %d [%s]\n", Name, Address, Type );
+              printf( "Entry point: %s $%x [%s]\n", Name, Address, Type );
 
-	    // STE  -- Nome blocco = a ultimo entry point trovato
+            // STE  -- Block name = last entry point found
+            // this differs from rel2z80
        	    sprintf (ModuleName,"%s",Name);
+
+            // STE
+            //  if ( ModuleName == 0 )
+            //    sprintf (ModuleName,"%s",Name);
+
 
             break;
         case 8:
@@ -292,7 +298,7 @@ int ReadLink( FILE *FilePtr, unsigned char segment[] )
             Address = ReadAddress ( FilePtr, Type );
 
             if ( Pass == 2 )
-              printf( "External offset: %d [%s]\n", Address, Type );
+              printf( "External offset: $%x [%s]\n", Address, Type );
 
             break;
         case 10:
@@ -307,7 +313,7 @@ int ReadLink( FILE *FilePtr, unsigned char segment[] )
             Address = ReadAddress ( FilePtr, Type );
 
             if ( Pass == 2 )
-              printf( "Location counter: %d [%s]\n", Address, Type );
+              printf( "Location counter: $%x [%s]\n", Address, Type );
 
             // ****
             if ( LastAddressType == 2 )
@@ -320,22 +326,35 @@ int ReadLink( FILE *FilePtr, unsigned char segment[] )
             Address = ReadAddress ( FilePtr, Type );
 
             if ( Pass == 2 )
-              printf( "Chain address: %d [%s]\n", Address, Type );
-	    
-	    // STE
-	    segment[Address] = counter & 255;
-	    segment[Address+1] = counter >> 8;
-            //printf( "Chain external: %s %d [%s]", Name, Address, Type );
-            //if ( Pass == 2 )
-            //  printf( "Chain external: %s %x [%s]", Name, labelcnt, Type );
+	    {
+              printf( "Chain address: $%x [%s]", Address, Type );
+
+              //chainaddr = Address;
+
+	      while ((Address != 0) && (Address<60000))
+	      {
+	          PtrNext = segment[Address] + 256 * segment[Address+1];
+                  printf(" - $%x -", Address);
+                  segment[Address] = counter & 255;
+                  segment[Address+1] = counter >> 8;
+	          //printf("%u\n\n",PtrNext);
+	          Address = PtrNext;
+	      }
+	    }
+            if ( Pass == 2 )
+              printf("\n");
+
+            //counter = counter +2;   ?? Why does this hang ?
 
             break;
         case 13:
             Address = ReadAddress ( FilePtr, Type );
 
-            if ( Pass == 2 )
-              printf( "Program size: %d [%s]\n", Address, Type );
-            if ( (Pass == 1) && (PSize == 0) ) PSize = Address;
+            if ( (Pass == 1) && (PSize == 0) )
+            {
+            	printf( "Program size: %d [%s]\n", Address, Type );
+                PSize = Address;
+            }
 
             break;
         case 14:
@@ -346,10 +365,18 @@ int ReadLink( FILE *FilePtr, unsigned char segment[] )
             if ( Pass == 2 )
             {
 	        WriteBlock ( ModuleName, segment, PSize + DSize );
+	        counter = 0;
 	    }
 
-            ReadOneBit( FilePtr, 1 );
+            if ( Pass == 1 )
+            {
+              if ( PSize == 0 )
+                  PSize = counter;
+            	  printf( "Adjusting program size: to %d\n", PSize );
+            }
 
+            counter = 0;
+            ReadOneBit( FilePtr, 1 );
 	    SwitchPass ( FilePtr );
 
             break;
@@ -381,17 +408,16 @@ int ReadItem( FILE *FilePtr )
         {
         	if ((byt > 31) && (byt < 128))
                    if (Pass == 2)
-                     printf( "[%d]{%d} %d \t%c\n", counter, LastAddressType, byt, byt);
+                     printf( "[$%x]{%d} %d \t%c\n", counter, LastAddressType, byt, byt);
         	else
                    if (Pass == 2)
-                     printf( "[%d]{%d} %d \t-\n", counter, LastAddressType, byt);
-        	//printf( "[%d]{%d} %d\n", counter, LastAddressType, byt);
+                     printf( "[$%x]{%d} %d \t-\n", counter, LastAddressType, byt);
         	segment[ counter ] = byt;
         }
         else
         {
                 if (Pass == 2)
-                  printf( "[%d]{%d} %d\n", counter, LastAddressType, byt);
+                  printf( "[$%x]{%d} %d\n", counter, LastAddressType, byt);
         	segment[counter] = byt;
         }
         counter++;
@@ -407,29 +433,35 @@ int ReadItem( FILE *FilePtr )
             case 1:
             	RelPtr = ReadBits( FilePtr, 16 );
                 if (Pass == 2)
-                  printf( "[%d PS] %d\n\n", counter, RelPtr );
-                segment[counter] = RelPtr & 255;
-                segment[counter+1] = RelPtr >> 8;
+                {
+                  printf( "[$%x PS] $%x\n\n", counter, RelPtr );
+                  segment[counter] = RelPtr & 255;
+                  segment[counter+1] = RelPtr >> 8;
+                }
 		counter = counter +2;
 		
                 break;
             case 2:
             	RelPtr = ReadBits( FilePtr, 16 );
                 if (Pass == 2)
-                  printf( "[%d DS] %d\n\n", counter, RelPtr );
+                {
+                  printf( "[$%x DS] $%x\n\n", counter, PSize + RelPtr );
                 // ****
-                segment[counter] = ( PSize + RelPtr ) & 255;
-                segment[counter+1] = ( PSize + RelPtr ) >> 8;
+                  segment[counter] = ( PSize + RelPtr ) & 255;
+                  segment[counter+1] = ( PSize + RelPtr ) >> 8;
+                }
 		counter = counter +2;
 		
                 break;
             case 3:
             	RelPtr = ReadBits( FilePtr, 16 );
                 if (Pass == 2)
-                  printf( "[%d CB] %d\n\n", counter, RelPtr );
-                segment[counter] = RelPtr & 255;
-                segment[counter+1] = RelPtr >> 8;
-		counter = counter +2;		
+                {
+                  printf( "[$%x CB] $%x\n\n", counter, RelPtr );
+                  segment[counter] = RelPtr & 255;
+                  segment[counter+1] = RelPtr >> 8;
+                }
+		counter = counter +2;
 		
                 break;
         }
