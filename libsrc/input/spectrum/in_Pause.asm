@@ -3,7 +3,7 @@
 
 XLIB in_Pause
 
-; Waits a period of time measured in interrupts but returns
+; Waits an approximate period of time measured in units of 1/50s but exits
 ; early if a key is pressed
 ;
 ; enter: HL = number of interrupts to wait
@@ -12,7 +12,16 @@ XLIB in_Pause
 ; uses : AF,HL
 
 .in_Pause
-   halt
+
+   ld bc,2690
+
+.loop                  ; about 70000 cycles here (1/50s)
+
+   dec bc
+   ld a,b
+   or c
+   jr nz,loop
+   
    dec hl
    ld a,h
    or l
@@ -22,5 +31,6 @@ XLIB in_Pause
    and 31
    cp 31
    jr z, in_Pause
+
    scf
    ret
