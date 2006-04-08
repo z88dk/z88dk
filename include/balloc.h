@@ -43,10 +43,15 @@ typedef unsigned int uint;
  * BAQTBL is a macro that declares the queue table statically.
  * "numq" is the number of memory queues that will be managed.
  *
- * An alternative is to declare "DEFC _ba_qtbl=addr \ XDEF _ba_qtbl"
- * using some inline assembler to place the queue table at
- * any point in memory.  The table will not then be compiled as
- * part of the final binary.
+ * An alternative is to declare the location of the queue table
+ * in memory using some inline assembler in your main.c file:
+ *
+ *    #asm
+ *       XDEF _ba_qtbl
+ *       DEFC _ba_qtbl = addr
+ *    #endasm
+ *
+ * The table will not then be compiled as part of the final binary.
  *
  * One of these declarations must be performed once in your main.c file.
  */

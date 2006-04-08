@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.6 2005-10-13 00:43:46 aralbrec Exp $
+ * $Id: spectrum.h,v 1.7 2006-04-08 07:54:17 aralbrec Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -23,7 +23,7 @@ extern int __LIB__ findhand();
 extern void __LIB__ freehand(int);
 #endif
 
-/* Tape handling routines *
+/* Tape handling routines */
 
 /* Standard tape header */
 struct zxtapehdr {
@@ -41,12 +41,12 @@ extern int __LIB__ tape_load_block(void *addr, size_t len, unsigned char type);
 
 /* Joystick Functions */
 
-extern uint __LIB__ in_JoyFuller(void);
-extern uint __LIB__ in_JoyKempston(void);
-extern uint __LIB__ in_JoySinclair1(void);
-extern uint __LIB__ in_JoySinclair2(void);
-extern uint __LIB__ in_JoyTimex1(void);
-extern uint __LIB__ in_JoyTimex2(void);
+extern unsigned int __LIB__ in_JoyFuller(void);
+extern unsigned int __LIB__ in_JoyKempston(void);
+extern unsigned int __LIB__ in_JoySinclair1(void);
+extern unsigned int __LIB__ in_JoySinclair2(void);
+extern unsigned int __LIB__ in_JoyTimex1(void);
+extern unsigned int __LIB__ in_JoyTimex2(void);
 
 /* Mouse Functions */
 

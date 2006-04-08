@@ -15,8 +15,8 @@
  * its location with some inline assembler in your main.c file:
  *
  *    #asm
- *      DEFC _im2_vtable=$fe00
  *      XDEF _im2_vtable
+ *      DEFC _im2_vtable=$fe00
  *    #endasm
  *
  * im2_Init initializes im2 mode and creates the default
@@ -88,6 +88,6 @@ extern void __LIB__ *im2_CreateGenericISR(uchar numhooks /* >=1 */, void *addr);
 extern void __LIB__ *im2_CreateGenericISRLight(uchar numhooks /* >=1 */, void *addr);
 extern void __LIB__ im2_RegHookFirst(uchar vector, void *hook);
 extern void __LIB__ im2_RegHookLast(uchar vector, void *hook);
-extern int __LIB__ im2_RemoveHook(uchar vector, void *hook);
+extern int  __LIB__ im2_RemoveHook(uchar vector, void *hook);
 
 #endif
