@@ -4,29 +4,26 @@ XLIB ba_AddMem
 LIB BAAddMem
 
 .ba_AddMem
-   ld hl,2
+   ld hl,8
    add hl,sp
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
    ld c,(hl)
-   inc hl
+   dec hl
+   dec hl
    ld b,(hl)
-   inc hl
+   dec hl
+   ld d,(hl)
+   dec hl
+   ld e,(hl)
+   dec hl
    ld a,(hl)
-   ld ixl,a
-   inc hl
-   inc hl
+   dec hl
    ld l,(hl)
-   ld h,0
-   call BAAddMem
-   ex de,hl
-   ret
+   ld h,a
+   jp BAAddMem
 
-; enter: BC = block size in bytes (>=2)
-;        DE = address of free memory to create blocks from
-;        HL = queue number
-;        IXL= number of blocks (>=1)
-; exit : DE = address of next free byte of memory
-; uses : AF,BC,DE,HL,IXL
+; enter:  B = number of blocks (>=1)
+;         C = queue number
+;        HL = address of free memory to create blocks from
+;        DE = block size in bytes (>=2)
+; exit : HL = address of next free byte of memory
+; uses : AF,B,HL
