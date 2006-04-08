@@ -17,7 +17,7 @@ typedef unsigned char uchar;
  * uint in_GetKey(void)
  *   Returns ascii code representing a single key press or zero
  *   if no/too many keys pressed.  Must implement key debounce,
- *   key start repeat and key repeat.
+ *   key start repeat and key repeat (below).
  *
  * void in_GetKeyReset(void)
  *   Resets the in_GetKey state machine.
@@ -45,12 +45,10 @@ typedef unsigned char uchar;
  *   Pause for a period of time measured in vertical blanking
  *   intervals (in Europe units of 1/50s, in North America
  *   units of 1/60s).  Return early if a key is pressed,
- *   reporting the amount of time remaining.  Machines with
- *   VBI interrupts may measure this time using "HALT" so
- *   be sure interrupts are enabled when this function
- *   executes.  Machines without a VBI interval will likely
- *   busy-wait for approximately one VBI interval between
- *   keyboard scans.
+ *   reporting the amount of time remaining.  This must be a
+ *   busy wait interval; resist the use of interrupts (a VBI
+ *   interrupt for example) to keep the function useful even
+ *   with interrupts disabled.
  *
  * void in_Wait(unit ticks)
  *   Similar to in_Pause but waits the entire period.
@@ -65,21 +63,34 @@ typedef unsigned char uchar;
  * If your program uses the in_GetKey function you must declare
  * the following variables:
  *
- * uchar in_KeyDebounce
+ * uchar in_KeyDebounce;
  *   Number of ticks before a keypress is acknowledged.
  *   Set to 1 for no debouncing.
  *
- * uchar in_KeyStartRepeat
+ * uchar in_KeyStartRepeat;
  *   Number of ticks after debounce before a key starts repeating.
  *
- * uchar in_KeyRepeatPeriod
+ * uchar in_KeyRepeatPeriod;
  *   Repeat key rate measured in ticks.
  *
- * uint in_KbdState
+ * uint in_KbdState;
  *   Reserved variable (don't alter, only declare).
  *
  * A tick in this context is the rate at which in_GetKey() is called.
  *
+ * Declaring these C variables statically will cause them to
+ * be compiled as part of the final binary.  Alternatively (required
+ * if the final binary is to be ROMable) the locations of these
+ * variables can be compiled with the help of some inline assembler
+ * in main.c.  Example:
+ *
+ *    #asm
+ *       XDEF _in_KeyDebounce, _in_KeyStartRepeat, _in_KeyRepeatPeriod, _in_KbdState
+ *       DEFC _in_KeyDebounce     = 50000
+ *       DEFC _in_KeyStartRepeat  = 50001
+ *       DEFC _in_KeyRepeatPeriod = 50002
+ *       DEFC _in_KbdState        = 50003
+ *    #endasm
  */
 
 extern uint __LIB__ in_GetKey(void);
@@ -109,52 +120,43 @@ extern void __LIB__ in_WaitForNoKey(void);
  * - in_JoyKeyboard, a keyboard joystick with user-definable
  *   keys for directions and fire button.
  *
- * - in_JoystickQuery, to return a pointer to a platform-dependent
- *   joystick function given a numerical identifier.  An
- *   out of range identifier returns the keyboard joystick.
- *
- * - in_JoyEnumQuery, to return a lower case string naming
- *   a platform-dependent joystick type given the same
- *   numerical identifier.  An out of range identifier
- *   returns 0 (NULL).
- *
- * Numerical identifier 0 always identifies the keyboard
- * joystick with succeeding identifiers choosing joystick
- * types in decreasing popularity (according to the
- * implementor).
- *
  * Protoypes for platform-specific joystick functions are
  * included from the target machine's implementation
  * dependent header file (eg spectrum.h for the zx spectrum)
+ * but are also listed in the comments below.
  *
- * The intention is for the author to call in_JoyEnumQuery to
- * get names for a list of supported joysticks, have the
- * user select one and then call in_JoystickQuery to get a pointer
- * to the relevant joystick function.  This joystick function
- * should always be called with the parameter expected by
- * in_JoyKeyboard (other joystick functions will not need
- * or refer to this parameter).
+ * It is possible to use a function pointer to use one of
+ * a number of joystick functions selected by the user from
+ * a menu since all joystick functions can accept the
+ * same parameter and return a value in the same format.
  *
- * Example:
+ * Example using Sinclair Spectrum joystick functions:
  *
  *   uchar choice, dirs;
- *   void *joyfunc;
+ *   void *joyfunc;                * pointer to joystick function  *
  *   struct in_UDK k;
  *
  *   k.fire = in_LookupKey('m');   * fill in keys for key joystick *
  *   k.left = in_LookupKey('o');   * in case it is chosen          *
  *   (etc)
  *   ...
- *   printf("You have selected the %s joystick\n", in_JoyEnumQuery(choice));
- *   joyfunc = in_JoystickQuery(choice);
+ *   printf("You have selected the %s joystick\n", joynames[choice]);
+ *   switch (choice) {
+ *      case 0 : joyfunc = in_JoyKeyboard; break;
+ *      case 1 : joyfunc = in_JoyKempston; break;
+ *      case 2 : joyfunc = in_JoySinclair1; break;
+ *      default: joyfunc = in_JoySinclair2; break;
+ *   }
  *   ...
  *   dirs = (joyfunc)(&k);
  *   if (dirs & in_FIRE)
  *      printf("pressed fire!\n");
  *
- * If the author is not interested in this cross-platform capability,
- * the platform specific functions in the include files can be
- * used instead.
+ * None of the joystick functions expect a parameter with the
+ * exception of in_JoyKeyboard.  Therefore the joystick function
+ * call through the pointer should always be made with the parameter
+ * expected by in_JoyKeyboard.  The other joystick functions will
+ * simply ignore it.
  *
  */
 
@@ -165,9 +167,9 @@ extern void __LIB__ in_WaitForNoKey(void);
 #define in_RIGHT 0x08
 
 #define in_FIRE1 0x80
-#define in_FIRE2 0x40   /* not currently used */
+#define in_FIRE2 0x40  /* not currently used */
 
-struct in_UDK {         /* user defined keys structure         */
+struct in_UDK {        /* user defined keys structure         */
    uint fire;          /* these are 16-bit scancodes returned */
    uint right;         /*  by in_LookupKey() that should be    */
    uint left;          /*  populated by the programmer        */
@@ -175,12 +177,9 @@ struct in_UDK {         /* user defined keys structure         */
    uint up;
 };
 
-extern void __LIB__ __FASTCALL__ *in_JoystickQuery(uchar i);
-extern char __LIB__ __FASTCALL__ *in_JoyEnumQuery(uchar i);
 extern uint __LIB__ in_JoyKeyboard(struct in_UDK *u);
 
 #ifdef SPECTRUM
-   #define in_NUMJOY 6   /* last valid index 0..6 */
    #include <spectrum.h>
 /*
    Adds: 1 in_JoyKempston, 2 in_JoySinclair1, 3 in_JoySinclair2,
@@ -196,7 +195,8 @@ extern uint __LIB__ in_JoyKeyboard(struct in_UDK *u);
  *
  * void in_MouseNAMEInit(void)
  *   Initializes the mouse by setting coordinates to (0,0) and performing
- *   any hw initialization
+ *   any hw initialization. (0,0) is located at the top left corner of the
+ *   screen
  *
  * void in_MouseNAME(uchar *buttons, uint *xcoord, uint *ycoord)
  *   Read the mouse, returning single byte 00000MRL active high for buttons +
@@ -208,26 +208,6 @@ extern uint __LIB__ in_JoyKeyboard(struct in_UDK *u);
  * Functions should handle out of bounds (X,Y) coords gracefully.  Each port
  * defines macros in_MAX_X and in_MAX_Y to indicate maximum X and Y values.
  *
- * Every port must provide at minimum:
- *
- * - in_MouseQuery, to return a pointer to a platform-dependent
- *   array of three functions (3 words) for a particular mouse
- *   selected by a numerical identifier.  The pointer points at,
- *   in order: init function followed by set position function
- *   followed by read function.  These functions should be called
- *   as if they were the mandatory MouseSim functions listed below
- *   (ie with the struct in_UDM * parameter most mouse functions
- *   will not need).
- *
- * - in_MouseEnumQuery, to return a lower case string naming
- *   a platform-dependent mouse type given the same
- *   numerical identifier.  An out of range identifier
- *   returns 0 (NULL).
- *
- * Numerical identifier 0 always identifies the simulated mouse
- * with succeeding identifiers selecting mouse types in decreasing
- * popularity (according to the implementor).
- *
  * Every port must implement the simulated mouse which attempts
  * to simulate a mouse using a connected joystick:
  *
@@ -238,15 +218,13 @@ extern uint __LIB__ in_JoyKeyboard(struct in_UDK *u);
  * Protoypes for platform-specific mouse functions are
  * included from the target machine's implementation
  * dependent header file (eg spectrum.h for the zx spectrum)
+ * and are listed in comments below.
  *
- * The intention is for the author to call in_MouseEnumQuery to
- * get names for a list of supported mice, have the
- * user select one and then call in_MouseQuery to get a pointer
- * to the relevant mouse functions.  These mouse functions
- * should always be called with the parameters expected by
- * the simulated mouse.
+ * As with the joystick functions, it is possible to use
+ * function pointers to use one of a number of mice selected
+ * by the user from a menu.
  *
- * Example:
+ * Example using Sinclair Spectrum mice:
  *
  *   uchar choice, b;
  *   void *mouseinit, *mouseread, *mousesetpos;
@@ -267,22 +245,29 @@ extern uint __LIB__ in_JoyKeyboard(struct in_UDK *u);
  *   ...
  *   m.keys = &k;
  *   m.joyfunc = in_JoyKeyboard;   * simulated mouse will use key joystick *
- *   m.delta = deltas;            * acceleration profile *
+ *   m.delta = deltas;             * acceleration profile *
  *   ...
- *   printf("You have selected the %s mouse\n", in_MouseEnumQuery(choice));
- *   mousefunc = in_MouseQuery(choice);
- *   mouseinit = mousefunc[0];
- *   mousesetpos = mousefunc[1];
- *   mouseread = mousefunc[2];
+ *   printf("You have selected the %s mouse\n", mousename[choice]);
+ *   switch (choice) {
+ *      case 0 : mouseinit   = in_MouseSimInit;
+ *               mousesetpos = in_MouseSimSetPos;
+ *               mouseread   = in_MouseSim;
+ *               break;
+ *      case 1 : mouseinit   = in_MouseAMXInit2;
+ *               mousesetpos = in_MouseAMXSetPos;
+ *               mouseread   = in_MouseAMX;
+ *               break;
+ *      default: mouseinit   = in_MouseKempInit;
+ *               mousesetpos = in_MouseKempSetPos;
+ *               mouseread   = in_MouseKemp;
+ *               break;
+ *   }
+ *
  *   (mouseinit)(&m);
  *   ...
  *   (mouseread)(&m, &b, &x, &y);
  *   if (b & in_BUT1)
  *      printf("button pressed at coord (%d,%d)!\n", x, y);
- *
- * If the author is not interested in this cross-platform capability,
- * the platform specific functions in the include files can be
- * used instead.
  *
  */
 
@@ -310,14 +295,11 @@ struct in_UDM {              /* user defined mouse structure                    
    uint           x;
 };
 
-extern void __LIB__ __FASTCALL__ *in_MouseQuery(uchar i);
-extern char __LIB__ __FASTCALL__ *in_MouseEnumQuery(uchar i);
 extern void __LIB__ in_MouseSimInit(struct in_UDM *u);
 extern void __LIB__ in_MouseSim(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord);
 extern void __LIB__ in_MouseSimSetPos(struct in_UDM *u, uint xcoord, uint ycoord);
 
 #ifdef SPECTRUM
-   #define in_NUMMOUSE 2    /* last valid index 0..2 */
    #define in_MAX_X    255  /* largest x coord  */
    #define in_MAX_Y    191  /* largest y coord  */
    #include <spectrum.h>
