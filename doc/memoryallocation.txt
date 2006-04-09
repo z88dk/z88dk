@@ -142,8 +142,8 @@ vector table.  Consult the im2.h header file for further information.
 
 There are two reasons why you may want to remove static variables
 from the final binary.  One is that you want to make the final
-binary smaller by pruning out RAM variables for loading into
-the final target.  Another is that the binary must be ROMable
+binary smaller for loading into the final target by pruning out
+RAM variables.  Another is that the binary must be ROMable
 so that static variables must be removed and placed in RAM locations.
 
 The methods mentioned in the last section may not be entirely

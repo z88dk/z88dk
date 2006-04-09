@@ -16,10 +16,12 @@ call to one of eight fixed entry points in the first
 256 bytes of memory.  A pro for this mode of operation
 is the quick interrupt response since the interrupt
 service routine for up to eight different peripherals
-is directly jumped to right away.  The generic ISR
-documented under IM2 can be copied to any such entry
-point at program startup as one means to accommodate
-this mode.
+is directly jumped to right away.  There is no direct
+support for this mode under z88dk but it is a simple
+matter to assemble a 3-byte JP instruction at these
+entry points to cause a jump to an ISR of your creation.
+One or more copies of the generic ISR described below can
+be used to handle the interrupts.
 
 
 2. IM 1 - Keep It Simple
@@ -29,9 +31,11 @@ causes a jump to address 0x38.  Typically the interrupt
 service routine there might poll attached peripherals
 to determine which need servicing.  If only a single
 device or two can cause interrupts this might be
-acceptable.  Again, the generic ISR documented under
-IM2 can be copied to 0x38 at program startup as one means
-to accommodate this mode.
+acceptable.  Again, There is no direct support for this
+mode under z88dk but it is a simple matter to assemble
+a 3-byte JP instruction at 0x38 to cause a jump to an ISR
+of your creation.  The generic ISR described below can be
+used to handle the interrupt.
 
 
 3. IM 2 - The Sexy Mode
@@ -84,7 +88,7 @@ on any vector with im2_InstallISR().  This can be
 the address of a C function, assembly function or
 absolute memory address.  Any such interrupt routine
 must save and restore registers as well as reenable
-interrupts prior to a "reti" to return to interrupts.
+interrupts prior to a "reti" to return from interrupt.
 If the function registered is a C function this must
 be done with embedded assembler.
 
@@ -113,7 +117,7 @@ vectors with im2_InstallISR().
 When making changes to the z80's interrupt state
 whether using im2.lib or not, make sure to have
 interrupts disabled using some inline assembler.
-Im2.lib will not enable or reenable maskable interrutps
+Im2.lib will not enable or reenable maskable interrupts
 so as not to interfere with the program.
 
 Further questions can be answered on the z88dk users
