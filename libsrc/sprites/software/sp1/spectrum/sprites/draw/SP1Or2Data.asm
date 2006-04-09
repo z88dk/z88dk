@@ -22,7 +22,7 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
 ; hl = graphic def ptr (mask,graph) pairs
 ; ix = left graphic def ptr
 ;
-; 51 + 182*4 - 6 + 10 = 783 cycles
+; 51 + 178*4 - 6 + 10 = 767 cycles
 
 .SP1Or2
 
@@ -54,15 +54,14 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    or c
    ld (SP1V_PIXELBUFFER+0),a
    ld l,(ix+3)
-   ld a,(hl)
-   or b
-   ld b,a
+   ld c,(hl)
    dec h
    inc de
    ld a,(de)
    inc de
    ld l,a
-   ld a,b
+   ld a,c
+   or b
    or (hl)
    ld (SP1PIXELBUFF+1),a
 
@@ -80,15 +79,14 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    or c
    ld (SP1V_PIXELBUFFER+2),a
    ld l,(ix+7)
-   ld a,(hl)
-   or b
-   ld b,a
+   ld c,(hl)
    dec h
    inc de
    ld a,(de)
    inc de
    ld l,a
-   ld a,b
+   ld a,c
+   or b
    or (hl)
    ld (SP1V_PIXELBUFFER+3),a
 
@@ -106,15 +104,14 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    or c
    ld (SP1V_PIXELBUFFER+4),a
    ld l,(ix+11)
-   ld a,(hl)
-   or b
-   ld b,a
+   ld c,(hl)
    dec h
    inc de
    ld a,(de)
    inc de
    ld l,a
-   ld a,b
+   ld a,c
+   or b
    or (hl)
    ld (SP1V_PIXELBUFFER+5),a
 
@@ -132,14 +129,13 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    or c
    ld (SP1V_PIXELBUFFER+6),a
    ld l,(ix+15)
-   ld a,(hl)
-   or b
-   ld b,a
+   ld c,(hl)
    dec h
    inc de
    ld a,(de)
    ld l,a
-   ld a,b
+   ld a,c
+   or b
    or (hl)
    ld (SP1V_PIXELBUFFER+7),a
 
