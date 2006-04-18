@@ -11,7 +11,7 @@ LIB SP1IterateSprChar
 ;
 ; enter : hl = & struct sp1_ss
 ;         de = destination array of sprite colour addresses
-; uses  : af, bc, de, hl
+; uses  : af, bc, de, hl, ix
 
 .SP1GetSprClrAddr
 

@@ -11,7 +11,7 @@
 typedef unsigned char uchar;
 typedef unsigned int uint;
 
-struct sp_Rect {                      // only here until rectangles lib completed
+struct sp1_Rect {                     // only here until rectangles lib completed
 
    uchar row;
    uchar col;
@@ -30,10 +30,10 @@ struct sp1_cs;
 
 struct sp1_update {                   // "update structs" Every tile in the display area managed by SP1 is described by one of these
 
-   uchar              nload;          // +0 bit 7 indicates if queued for draw already (1 for yes), bits 6:0 = number of occluding sprites present
+   uchar              nload;          // +0 bit 7 = 1 for invalidated, bit 6 = 1 for removed, bits 5:0 = number of occluding sprites present + 1
    uchar              colour;         // +1 background tile attribute
    uchar              tile;           // +2 background tile character code
-   struct sp1_cs     *slist;          // +3 BIG ENDIAN ; list of sprites occupying this tile (MSB = 0 if none)
+   struct sp1_cs     *slist;          // +3 BIG ENDIAN ; list of sprites occupying this tile (MSB = 0 if none) at struct sp1_cs.attr_mask
    struct sp1_update *ulist;          // +5 BIG ENDIAN ; next update struct in list of update structs queued for draw (MSB = 0 if none)
    uchar             *screen;         // +7 address in display file where this tile is drawn
 
@@ -46,23 +46,23 @@ struct sp1_ss {                       // "sprite structs" Every sprite is descri
    uchar              width;          // +2  width of sprite in tiles
    uchar              height;         // +3  height of sprite in tiles
 
-   uchar              vrot;           // +4  bit 7 = 1 for 2-byte graphical definition else 1-byte, bits 3:0 = current vertical rotation (0..7)
+   uchar              vrot;           // +4  bit 7 = 1 for 2-byte graphical definition else 1-byte, bits 2:0 = current vertical rotation (0..7)
    uchar              hrot;           // +5  current horizontal rotation (0..7)
 
-   uint               offset;         // +6  current sprite frame offset added to graphic pointers
+   uint               frame;          // +6  current sprite frame offset added to graphic pointers
 
    uchar              res0;           // +8  "LD A,n" opcode
    uchar              e_hrot;         // +9  effective horizontal rotation = MSB of rotation table to use
    uchar              res1;           // +10 "LD BC,nn" opcode
-   uint               e_offset;       // +11 effective offset to add to graphic pointers, includes result of vertical rotation
+   uint               e_offset;       // +11 effective offset to add to graphic pointers, equals result of vertical rotation + frame addr
    uchar              res2;           // +13 "EX DE,HL" opcode
    uchar              res3;           // +14 "JP (HL)" opcode
 
-   struct sp1_cs     *first;          // +15 first struct sp1_cs of this sprite
+   struct sp1_cs     *first;          // +15 BIG ENDIAN ; first struct sp1_cs of this sprite
 
    uchar              xthresh;        // +17 hrot must be at least this number of pixels for last column of sprite to be drawn (1 default)
    uchar              ythresh;        // +18 vrot must be at least this number of pixels for last row of sprite to be drawn (1 default)
-   uchar              nactive;        // +19 number of struct sp1_cs cells on screen (increment only by sp1_MoveSpr*)
+   uchar              nactive;        // +19 number of struct sp1_cs cells on screen (increment-only by sp1_MoveSpr*)
 
 };
 
@@ -73,7 +73,7 @@ struct sp1_cs {                       // "char structs" Every sprite is broken i
    struct sp1_update *update;         // +2  BIG ENDIAN ; tile this sprite char currently occupies (MSB = 0 if none)
 
    uchar              plane;          // +4  plane sprite occupies, 0 = closest to viewer
-   uchar              type;           // +5  bit 7 = 1 for occluding, bit 6 = 1 for last column, bit 5 = 1 for last row, bits 4:0 draw type identifier
+   uchar              type;           // +5  bit 7 = 1 occluding, bit 6 = 1 last column, bit 5 = 1 last row, bit 4 = 1 clear pixelbuffer, bits 3:0 draw type
    uchar              attr_mask;      // +6  attribute mask logically ANDed with underlying attribute, default = 0xff for transparent
    uchar              attr;           // +7  sprite colour, logically ORed to form final colour, default = 0 for transparent
 
@@ -108,7 +108,7 @@ struct sp1_tp {                       // "tile pairs" A struct to hold backgroun
 
 struct sp1_pss {                      // "print string struct" A struct holding print state information
 
-   struct sp_Rect    *bounds;         // +0 rectangular boundary within which printing will be confined
+   struct sp1_Rect    *bounds;        // +0 rectangular boundary within which printing will be confined
    uchar              flags;          // +2 bit 0=invalidate?, 1=xwrap?, 2=yinc?, 3=onscreen? (reserved), 4=ywrap?
    uchar              x;              // +3 current x coordinate of cursor with respect to top left corner of bounds
    uchar              y;              // +4 current y coordinate of cursor with respect to top left corner of bounds
@@ -123,6 +123,7 @@ struct sp1_pss {                      // "print string struct" A struct holding 
 ///////////////////////////////////////////////////////////
 
 #define SP1_TYPE_OCCLUDE   0x80       // background and sprites underneath will not be drawn
+#define SP1_TYPE_BGNDCLR   0x10       // for occluding sprites, clear pixel buffer before draw
 #define SP1_TYPE_2BYTE     0x40       // sprite graphic consists of (mask,graph) pairs
 #define SP1_TYPE_1BYTE     0x00       // sprite graphic consists of graph only
 
@@ -167,13 +168,23 @@ struct sp1_pss {                      // "print string struct" A struct holding 
 #define SP1_ID_LOAD1_LBIM  31         // load sprite 1-byte definition graph only no mask; sw rotation as LOAD1 but for left boundary of sprite with implied mask
 #define SP1_ID_LOAD1_RBIM  32         // load sprite 1-byte definition graph only no mask; sw rotation as LOAD1 but for right boundary of sprite with implied mask
 
+#define SP1_ID_ATTRONLY    33         // pixels are not drawn, only attrs
+
+#define SP1_AMASK_TRANS    0xff       // attribute mask for a transparent-colour sprite
+#define SP1_AMASK_INK      0xf8       // attribute mask for an ink-only sprite
+#define SP1_AMASK_PAPER    0xc7       // attribute mask for a paper-only sprite
+#define SP1_AMASK_NOFLASH  0x7f       // attribute mask for no-flash
+#define SP1_AMASK_NOBRIGHT 0xbf       // attribute mask for no-bright
+
+#define SP1_ATTR_TRANS     0x00       // attribute for a transparent-colour sprite
+
 // void *hook  <->  void [ __FASTCALL__ ] (*hook)(uint count, struct sp1_cs *c)  // if __FASTCALL__ only struct sp1_cs* passed
 
 extern struct sp1_ss      __LIB__  *sp1_CreateSpr(uchar type, uchar height, uchar *graphic, uchar plane);
 extern uint               __LIB__   sp1_AddColSpr(struct sp1_ss *s, uchar type, uchar *graphic, uchar plane);
-extern void               __LIB__   sp1_MoveSprAbs(struct sp1_ss *s, struct sp_Rect *clip, uchar *frame, uchar row, uchar col, uchar vrot, uchar hrot);
-extern void               __LIB__   sp1_MoveSprRel(struct sp1_ss *s, struct sp_Rect *clip, uchar *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
-extern void               __LIB__   sp1_MoveSprPix(struct sp1_ss *s, struct sp_Rect *clip, uchar *frame, uint x, uint y);
+extern void               __LIB__   sp1_MoveSprAbs(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uchar row, uchar col, uchar vrot, uchar hrot);
+extern void               __LIB__   sp1_MoveSprRel(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
+extern void               __LIB__   sp1_MoveSprPix(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uint x, uint y);
 extern void               __LIB__   sp1_IterateSprChar(struct sp1_ss *s, void *hook);
 extern void  __FASTCALL__ __LIB__   sp1_DeleteSpr(struct sp1_ss *s);
 
@@ -184,7 +195,7 @@ extern void               __LIB__   sp1_GetSprClrAddr(struct sp1_ss *s, uchar **
 extern void               __LIB__   sp1_PutSprClr(uchar **sprdest, struct sp1_ap *src, uchar n);
 extern void               __LIB__   sp1_GetSprClr(uchar **sprsrc, struct sp1_ap *dest, uchar n);
 
-extern void               __LIB__   sp1_PreShiftSpr(struct sp1_ss *s, uchar shift, void *destframe);
+extern void               __LIB__   sp1_PreShiftSpr(struct sp1_ss *s, uchar rshift, void *destframe);
 
 ///////////////////////////////////////////////////////////
 //                       TILES                           //
@@ -209,18 +220,19 @@ extern uint  __LIB__   sp1_Screen(uchar row, uchar col);
 extern void  __LIB__   sp1_PrintString(struct sp1_pss *ps, uchar *s);
 extern void  __LIB__   sp1_ComputePos(struct sp1_pss *ps, uchar row, uchar col);
 
-extern void  __LIB__   sp1_GetTiles(struct sp_Rect *r, struct sp1_tp *dest);
-extern void  __LIB__   sp1_PutTiles(struct sp_Rect *r, struct sp1_tp *src);
-extern void  __LIB__   sp1_PutTilesInv(struct sp_Rect *r, struct sp1_tp *src);
+extern void  __LIB__   sp1_GetTiles(struct sp1_Rect *r, struct sp1_tp *dest);
+extern void  __LIB__   sp1_PutTiles(struct sp1_Rect *r, struct sp1_tp *src);
+extern void  __LIB__   sp1_PutTilesInv(struct sp1_Rect *r, struct sp1_tp *src);
 
-extern void  __LIB__   sp1_ClearRect(struct sp_Rect *r, uchar colour, uchar tile, uchar rflag);
-extern void  __LIB__   sp1_ClearRectInv(struct sp_Rect *r, uchar colour, uchar tile, uchar rflag);
+extern void  __LIB__   sp1_ClearRect(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag);
+extern void  __LIB__   sp1_ClearRectInv(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag);
 
 ///////////////////////////////////////////////////////////
 //                      UPDATER                          //
 ///////////////////////////////////////////////////////////
 
-#define SP1_IFLAG_NEED_ROTTBL  0x01
+#define SP1_IFLAG_MAKE_ROTTBL      0x01
+#define SP1_IFLAG_OVERWRITE_TILES  0x02
 
 // void *hook  <->  void [ __FASTCALL__ ] (*hook)(struct sp1_update *u)
 
@@ -231,9 +243,12 @@ extern struct sp1_update  __LIB__  *sp1_GetUpdateStruct(uchar row, uchar col);
 extern void __FASTCALL__  __LIB__   sp1_InvUpdateStruct(struct sp1_update *u);
 extern void __FASTCALL__  __LIB__   sp1_ValUpdateStruct(struct sp1_update *u);
 extern void               __LIB__   sp1_IterateUpdateArr(struct sp1_update **ua, void *hook);  // zero terminated array
-extern void               __LIB__   sp1_IterateUpdateRect(struct sp_Rect *r, void *hook);
+extern void               __LIB__   sp1_IterateUpdateRect(struct sp1_Rect *r, void *hook);
 
-extern void __FASTCALL__  __LIB__   sp1_Invalidate(struct sp_Rect *r);
-extern void __FASTCALL__  __LIB__   sp1_Validate(struct sp_Rect *r);
+extern void __FASTCALL__  __LIB__   sp1_Invalidate(struct sp1_Rect *r);
+extern void __FASTCALL__  __LIB__   sp1_Validate(struct sp1_Rect *r);
+
+extern void __FASTCALL__  __LIB__   sp1_RemoveUpdateStruct(struct sp1_update *u);
+extern void __FASTCALL__  __LIB__   sp1_RestoreUpdateStruct(struct sp1_update *u);
 
 #endif

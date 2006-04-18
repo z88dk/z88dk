@@ -11,7 +11,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
 ;
 ; enter : ix = struct sp1_ss *
 ;          h = plane
-;          l = type (index into table), bit 7 = 1 for occluding
+;          l = type (index into table), bit 7 = 1 for occluding, bit 4 = 1 clear pixelbuffer
 ;         bc = graphic definition for column
 ; uses  : af, bc, de, hl, bc', de', hl', iy
 ; exit  : carry flag for success, else memory allocation failed
@@ -65,7 +65,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    ld hl,10
    add hl,de
    ex de,hl                   ; de = & struct sp1_cs.draw_code (& embedded code in struct sp1_cs)
-   and $1f                    ; a = sprite type but only index portion
+   and $0f                    ; a = sprite type but only index portion
    add a,a
    ld hl,(SP1V_DRAWTBL)
    add a,l

@@ -12,7 +12,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
 ;
 ; enter :  b = height in chars
 ;          c = plane sprite occupies (0 = closest to viewer)
-;          e = type (index into table), bit 7 = 1 for occluding, bit 6 = 1 for 2 byte definition
+;          e = type (index into table), bit 7 = 1 occluding, bit 6 = 1 2 byte definition, bit 4 = 1 clear pixelbuff
 ;         hl = graphic definition for column
 ; uses  : af, bc, de, hl, bc', de', hl', ix, iy
 ; exit  : no carry if memory allocation failed else ix = struct sp1_ss *
@@ -59,7 +59,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    
    pop bc                     ; b = height, c = plane
    ld (ix+3),b                ; store height
-   pop de                     ; e = type, bit 7 = 1 occluding, bit 6 = 1 2-byte def
+   pop de                     ; e = type, bit 7 = 1 occluding, bit 6 = 1 2-byte def, bit 4 = 1 clear pixel buff
    bit 6,e
    jr z, onebyte
    set 7,(ix+4)               ; indicate 2-byte definition
@@ -73,8 +73,8 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    pop hl
    ex (sp),hl                 ; stack = graphics ptr, hl = & first struct sp1_cs
    
-   ld (ix+15),l               ; store ptr to first struct sp1_cs in struct sp1_ss
-   ld (ix+16),h
+   ld (ix+15),h               ; store ptr to first struct sp1_cs in struct sp1_ss
+   ld (ix+16),l
    
    ; done with struct sp1_ss, now do first struct sp1_cs
    
@@ -97,7 +97,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    ld hl,10
    add hl,de
    ex de,hl                   ; de = & struct sp1_cs.draw_code (& embedded code in struct sp1_cs)
-   and $1f                    ; a = sprite type but only index portion
+   and $0f                    ; a = sprite type but only index portion
    add a,a
    ld hl,(SP1V_DRAWTBL)
    add a,l

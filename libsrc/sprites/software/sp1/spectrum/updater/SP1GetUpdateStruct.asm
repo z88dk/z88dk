@@ -4,7 +4,7 @@
 ; sinclair spectrum version
 
 XLIB SP1GetUpdateStruct
-XREF SP1V_DISPHEIGHT, SP1V_DISPWIDTH, SP1V_UPDATEARRAY
+XREF SP1V_DISPHEIGHT, SP1V_DISPWIDTH, SP1V_UPDATEARRAY, SP1V_ROTTBL
 
 ; Return struct_sp1_update for row,col coordinate given
 ; 9 * (SP1V_DISPWIDTH * ROW + COL) + SP1V_UPDATEARRAY

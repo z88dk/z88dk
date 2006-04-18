@@ -22,6 +22,71 @@ XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_U
    jp nz, updatelp1
    ret                       ; if empty update list
 
+.drawtileonly
+
+   ; hl = & update.sprite_list
+   ;  e = tile code
+   ;  d = SP1V_TILEARRAY/256
+   ; attribute in SP1V_ATTRBUFFER
+   
+   inc hl
+   inc hl
+   ld b,(hl)
+   inc hl
+   ld c,(hl)                 ; bc = next struct sp1_update in draw list
+   inc hl
+   ld a,(hl)
+   inc hl
+   ld l,(hl)
+   ld h,a
+   
+   push hl                   ; save screen address
+   ex de,hl
+   ld e,(hl)
+   inc h
+   ld d,(hl)                 ; de = address of tile graphic
+   pop hl                    ; hl = screen address
+   
+   ld a,(de)                 ; copy tile directly to screen
+   ld (hl),a
+   inc h
+   inc de
+   
+   ld a,(de)
+   ld (hl),a
+   inc h
+   inc de
+
+   ld a,(de)
+   ld (hl),a
+   inc h
+   inc de
+
+   ld a,(de)
+   ld (hl),a
+   inc h
+   inc de
+
+   ld a,(de)
+   ld (hl),a
+   inc h
+   inc de
+
+   ld a,(de)
+   ld (hl),a
+   inc h
+   inc de
+
+   ld a,(de)
+   ld (hl),a
+   inc h
+   inc de
+
+   ld a,(de)
+   ld (hl),a
+   
+   jp rejoin
+
 .skipthischar
 
    ld bc,5
@@ -41,11 +106,14 @@ XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_U
 
 .updatelp1                   ; hl = & struct update
 
+   bit 6,(hl)                ; if this update char has been removed from the display skip it
+   jr nz, skipthischar
+
    ld a,$80
    xor (hl)                  ; (hl) = # load sprites, bit 7 set for marked to update
    jp m, skipthischar        ; if bit 7 was reset (now set), this char was validated so skip it
-
    ld (hl),a                 ; mark char as not needing update (bit 7 is reset)
+
    ld b,a                    ; b = # of occluding sprites in this char + 1
    inc hl
    ld a,(hl)                 ; a = background tile attr
@@ -55,7 +123,12 @@ XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_U
                              ;   time by not drawing sprites underneath them
    ld e,(hl)                 ; else e = tile # for this char
    ld d,SP1V_TILEARRAY/256
-   inc hl
+   inc hl                    ; hl = & udpate.sprite_list
+   
+   ld a,(hl)                 ; are there any sprites in this char?
+   or a
+   jr z, drawtileonly        ; if no, speed things up by drawing tile directly to screen
+   
    push hl                   ; save & update.sprite_list
    ex de,hl
    ld e,(hl)
@@ -75,9 +148,6 @@ XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_U
    pop hl                    ; hl = & update.sprite_list
 
    ld a,(hl)
-   or a
-   jr z, donesprites         ; if there are no sprites to draw, we are done
-
    push hl                   ; save & update.sprite_list
 
 .spritedrawlp
@@ -88,11 +158,11 @@ XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_U
 
 .spritedraw
 
-   ld a,(SP1V_ATTRBUFF)      ; get current char colour
+   ld a,(SP1V_ATTRBUFFER)    ; get current char colour
    and (hl)                  ; apply sprite's colour mask
    inc hl
    or (hl)                   ; apply sprite's colour
-   ld (SP1V_ATTRBUFF),a      ; write back as current char colour
+   ld (SP1V_ATTRBUFFER),a    ; write back as current char colour
    inc hl
 
    ld e,(hl)
@@ -145,6 +215,8 @@ XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_U
    inc h
    ld (hl),d
 
+.rejoin
+
    ld a,h                    ; compute attribute addr from pixel addr
    xor $85
    rrca
@@ -189,7 +261,19 @@ XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_U
 
 .occludetype
 
-   djnz skipthisload         ; if we haven't seen all occluding sprites in this char
-   ex de,hl                  ;   yet, skip this occluding sprite and decrease count
+   djnz skipthisload         ; if haven't seen all occl sprites in this char, skip this occl spr and count--
+
+   and $20                   ; type has been rotated left one bit, checking original bit 4 if should clear pixel buffer
+   jp z, noclearbuff
+
+   ld hl,0                   ; clear pixel buffer
+   ld (SP1V_PIXELBUFFER+0),hl
+   ld (SP1V_PIXELBUFFER+2),hl
+   ld (SP1V_PIXELBUFFER+4),hl
+   ld (SP1V_PIXELBUFFER+6),hl
+
+.noclearbuff
+
+   ex de,hl
    inc hl                    ; hl = & sp1_CS.attr_mask
    jp spritedraw             ; draw sprites beginning with this one

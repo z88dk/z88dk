@@ -31,7 +31,13 @@ XREF SP1V_DISPWIDTH
 
 .colloop
 
+   bit 6,(hl)                    ; has this update char been removed from the display?
+   jr nz, skipit                 ; if so we must not validate it
+   
    res 7,(hl)                    ; validate update char
+
+.skipit
+
    add hl,de
    djnz colloop
 

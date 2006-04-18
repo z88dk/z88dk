@@ -16,5 +16,7 @@ XLIB SP1ValUpdateStruct
 
 .SP1ValUpdateStruct
 
+   bit 6,(hl)         ; must not validate removed update chars
+   ret nz
    res 7,(hl)
    ret

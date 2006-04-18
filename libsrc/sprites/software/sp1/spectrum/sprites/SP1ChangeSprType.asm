@@ -11,7 +11,7 @@ XREF SP1V_SPRDRAWTBL
 ; make sure the sprite char struct is off screen before calling.
 ;
 ; enter : hl = struct sp1_cs *
-;          e = new type (bit 7 = 1 if sprite should occlude, bits 4:0 draw type id, zero elsewhere)
+;          e = new type (bit 7 = 1 if sprite should occlude, bit 4 = 1 clear pixelbuff, bits 3:0 draw type id, zero elsewhere)
 ; uses  : af, bc, de, hl
 
 .SP1ChangeSprType
@@ -22,7 +22,7 @@ XREF SP1V_SPRDRAWTBL
    and $60               ; keep last row, last col flags
    or e
    ld (hl),a             ; store new type
-   and $1f               ; a = draw type
+   and $0f               ; a = draw type
 
    add hl,bc
    ex de,hl              ; de = & struct sp1_CS.draw_code

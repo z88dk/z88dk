@@ -23,7 +23,7 @@ XREF SP1V_DISPWIDTH, SP1V_DISPHEIGHT
 ;          l = startup background tile
 ;         bc = & sprdraw table (table of sprite draw char functions indexed by type)
 ;         de = & idtype table (table of id/type pairs that associates id with type, ends in id=0)
-;          a = flag, bit 0 = 1 if rotation table needed
+;          a = flag, bit 0 = 1 if rotation table needed, bit 1 = 1 to overwrite all tile defs
 ; used  : af, bc, de, hl
 
 .SP1Initialize
@@ -39,6 +39,7 @@ XREF SP1V_DISPWIDTH, SP1V_DISPHEIGHT
    ; construct the rotation table
   
    ld c,7                          ; rotate by c bits
+   push af
 
 .rottbllp
 
@@ -69,6 +70,7 @@ XREF SP1V_DISPWIDTH, SP1V_DISPHEIGHT
 
    dec c
    jp nz, rottbllp
+   pop af
 
 .norottbl
 
@@ -77,15 +79,20 @@ XREF SP1V_DISPWIDTH, SP1V_DISPHEIGHT
    ld hl,SP1V_TILEARRAY
    ld de,15360
    ld b,0
+   ld c,a
 
 .tileloop
 
    ld a,(hl)                        ; if a tile address is already present (ie non-zero entry)
-   inc h                            ; then we will skip it - this could be the case if a character
-   or (hl)                          ; set is loaded as part of the game binary, eg.  this also means
-   jr nz, tilepresent               ; that the area occupied by the tile array should be initialized
-                                    ; to zero (or known to be zero) prior to calling this init function
-   ld (hl),d                        ; if predefined tile addresses are not present.
+   inc h                            ;   then we will skip it
+   bit 0,c
+   jr nz, overwrite                 ; unless overwrite flag set
+   or (hl)
+   jr nz, tilepresent
+
+.overwrite
+
+   ld (hl),d
    dec h
    ld (hl),e
    inc h

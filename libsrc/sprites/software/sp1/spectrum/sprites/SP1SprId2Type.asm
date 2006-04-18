@@ -18,7 +18,7 @@ LIB SP1V_IDTYPEASSOC
 
 .SP1SprId2Type
 
-   ld hl,(SPV_IDTYPEASSOC)
+   ld hl,(SP1V_IDTYPEASSOC)
    dec hl
 
 .loop

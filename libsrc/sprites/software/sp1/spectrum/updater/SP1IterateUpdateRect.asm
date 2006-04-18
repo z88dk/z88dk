@@ -19,7 +19,7 @@ XREF SP1V_DISPWIDTH
 ;        ix = void (*func)(struct sp1_update*), hl also holds parameter
 ; uses  : af, bc, de, hl  (de can be used by user function to hold state between calls)
 
-.SP1Validate
+.SP1IterateUpdateRect
 
    call SP1GetUpdateStruct       ; hl = & struct sp1_update
    ld a,c                        ; a = height

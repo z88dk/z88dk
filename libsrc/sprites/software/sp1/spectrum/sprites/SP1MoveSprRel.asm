@@ -9,14 +9,14 @@ LIB SP1MoveSprAbs
 ; Move sprite a relative distance from current position.
 ;
 ; enter: ix = sprite structure address
-;        de = next sprite frame address (0 for no change)
-;         h = relative row coord, signed byte
-;         l = relative col coord, signed byte
+;        hl = next sprite frame address (0 for no change)
+;         d = relative row coord, signed byte
+;         e = relative col coord, signed byte
 ;         b = relative horizontal pixel movement, signed byte
 ;         c = relative vertical pixel movement, signed byte
 ;        iy = clipping rectangle absolute coords and entirely on screen
 ;             (IY+0) = row, (IY+1) = col, (IY+2) = width, (IY+3) = height
-; uses : af, bc, hl + SP1MoveSprAbs
+; uses : af, bc, de + SP1MoveSprAbs
 
 .SP1MoveSprRel
 
@@ -26,9 +26,9 @@ LIB SP1MoveSprAbs
    sra a
    sra a
    sra a
-   add a,l
+   add a,e
    add a,(ix+1)
-   ld l,a                ; l = absolute column position
+   ld e,a                ; e = absolute column position
    ld a,b
    cp $80
    jp c, mvpos1
@@ -39,14 +39,15 @@ LIB SP1MoveSprAbs
    and $07
    ld b,a                ; b = absolute horizontal rotation
    ld a,(ix+4)           ; current vertical rotation
+   and $07               ; get rid of flag in bit 7
    add a,c
    ld c,a
    sra a
    sra a
    sra a
-   add a,h
+   add a,d
    add a,(ix+0)
-   ld h,a                ; h = absolute row position
+   ld d,a                ; d = absolute row position
    ld a,c
    cp $80
    jp c, mvpos2

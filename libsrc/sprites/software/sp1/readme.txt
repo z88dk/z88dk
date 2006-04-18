@@ -8,7 +8,7 @@ z88dk license applies
 
 // DOCUMENTATION
 
-Documentation is in {z88dk}/docs/sp1.html (when it is
+Documentation is in {z88dk}/doc/sp1.txt (when it is
 written :-P an earlier version is documented at
 http://www.geocities.com/aralbrec which will give a
 good idea of how things work, although there are
@@ -31,7 +31,7 @@ of sprite characters.
 Sprites can be any size measured in character cells
 and can be moved in pixel increments, optionally
 making use of a built-in software rotater.  Sprites
-can be any of a variety of types (32 types in this
+can be any of a variety of types (33 types in this
 version!) that vary in how they mix with background
 elements and how quickly they draw.
 

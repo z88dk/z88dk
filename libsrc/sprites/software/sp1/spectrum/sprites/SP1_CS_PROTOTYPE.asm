@@ -6,7 +6,7 @@ XLIB SP1_CS_PROTOTYPE
    defw 0                  ; pointer to next struct sp1_CS in same sprite (big endian)
    defw 0                  ; pointer to struct sp1_update this sprite char is currently drawn in (big endian)
    defb 0                  ; sprite plane
-   defb 0                  ; sprite type (bit 7 = 1 if sprite occludes)
+   defb 0                  ; sprite type (bit 7 = 1 occludes, bit 6 = 1 last column, bit 5 = 1 last row, bit 4 =1 pixelbuff clear)
    defb $ff                ; attribute mask - part of underlying colour to keep; $ff = keep entire byte
    defb 0                  ; sprite colour - attribute byte ORed into remaining masked portion; $ff/0 combo makes transparent
    defw 0                  ; & struct sp1_ss.draw_code (+8 bytes offset into struct sp1_ss this struct belongs to)

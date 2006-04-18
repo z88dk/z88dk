@@ -26,8 +26,8 @@ defc SP1V_ATTRBUFFER    = $xxxx            ; address of a single byte buffer to 
 defc SP1V_TILEARRAY     = $xx00            ; address of the 512-byte tile array associating character codes with tile graphics, must lie on 256-byte boundary (LSB=0)
 defc SP1V_UPDATEARRAY   = $xxxx            ; address of the 9*SP1V_DISPWIDTH*SP1V_DISPHEIGHT byte update array
 defc SP1V_ROTTBL        = $f000            ; location of the 3584-byte rotation table.  Must lie on 256-byte boundary (LSB=0).  Table begins $0200 bytes ahead of this
-                                           ;  pointer ($f200-$ffff in this default case).  Can be eliminated with appropriate flag to sp1_Initialize()
-
+                                           ;  pointer ($f200-$ffff in this default case).  Set to $0000 if the table is not needed (if, for example, all sprites
+                                           ;  are drawn at exact horizontal character coordinates or you use pre-shifted sprites only).
 ; ///////////////////////
 ;      SP1 Variables
 ; ///////////////////////
