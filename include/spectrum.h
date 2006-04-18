@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.7 2006-04-08 07:54:17 aralbrec Exp $
+ * $Id: spectrum.h,v 1.8 2006-04-18 22:39:37 aralbrec Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -69,5 +69,33 @@ extern void __LIB__ in_MouseKempInit(void);
 extern void __LIB__ in_MouseKemp(uchar *buttons, uint *xcoord, uint *ycoord);
 extern void __LIB__ in_MouseKempSetPos(uint xcoord, uint ycoord);
 
+/* Colour Attributes */
+
+#define BLACK          0x00
+#define BLUE           0x01
+#define RED            0x02
+#define MAGENTA        0x03
+#define GREEN          0x04
+#define CYAN           0x05
+#define YELLOW         0x06
+#define WHITE          0x07
+#define INK_BLACK      0x00
+#define INK_BLUE       0x01
+#define INK_RED        0x02
+#define INK_MAGENTA    0x03
+#define INK_GREEN      0x04
+#define INK_CYAN       0x05
+#define INK_YELLOW     0x06
+#define INK_WHITE      0x07
+#define PAPER_BLACK    0x00
+#define PAPER_BLUE     0x08
+#define PAPER_RED      0x10
+#define PAPER_MAGENTA  0x18
+#define PAPER_GREEN    0x20
+#define PAPER_CYAN     0x28
+#define PAPER_YELLOW   0x30
+#define PAPER_WHITE    0x38
+#define BRIGHT         0x40
+#define FLASH          0x80
 
 #endif
