@@ -7,7 +7,7 @@
 ; a' = bit 0 = 1 if last row should not draw, bit 1 = 1 if last col should not draw
 ; iy = & clipping rectangle
 ; ix = & struct sp1_ss
-; stack = & struct sp1_update.ulist (tail of invalidated list)
+; stack = & struct sp1_update.ulist (tail of invalidated list), row
 
 .NCrowloop
 
@@ -49,7 +49,7 @@
    ex (sp),hl
 
    ; hl = & struct sp1_update.ulist (tail)
-   ; stack = & struct sp1_update
+   ; stack = & struct sp1_update, row
 
    ; is column in clipping rectangle?
    
@@ -74,9 +74,10 @@
 
    exx
    push af
-   
+   inc (ix+19)               ; number of active sprite chars++
+
    ; hl = & struct sp1_cs
-   ; stack = flag = z if last col, & struct sp1_update
+   ; stack = flag = z if last col, & struct sp1_update, row
    
    ; is sprite char already in update struct list?
    
@@ -85,7 +86,7 @@
    ld e,(hl)                 ; de = & next struct sp1_cs in sprite
    inc hl                    ; hl = & struct sp1_cs.update
    
-   ld a,(hl)                 ; if MSB of update struct this spr char is in != 0
+   ld a,(hl)                 ; if MSB of update struct this spr char is != 0
    or a                      ;   then already in list
    jr z, NCaddit
 
@@ -93,7 +94,7 @@
 
    ; de = & next struct sp1_cs in sprite
    ; hl = & struct sp1_cs.update
-   ; stack = flag = z if last col, & struct sp1_update
+   ; stack = flag = z if last col, & struct sp1_update, row
    
    pop bc
    pop hl
@@ -103,12 +104,13 @@
    ; de = & next struct sp1_cs
    ; hl = & struct sp1_update
    ;  c = bit 6 set if last col
+   ; stack = row
 
    ; invalidate
    
    ld a,(hl)                 ; skip if char already invalidated
    xor $80
-   jp p, alreadyinv0
+   jp p, NCalreadyinv0
    ld (hl),a                 ; mark as invalidated
    
    push hl
@@ -122,9 +124,7 @@
    ld (hl),0                 ; nothing after this one in list
    exx
 
-.alreadyinv0
-
-   inc (ix+19)               ; number of active sprite chars++
+.NCalreadyinv0
 
    bit 6,c                   ; is this last col?
    jr nz, NCnextrow
@@ -135,6 +135,7 @@
    
    ; hl = & struct sp1_update
    ; de = & next struct sp1_cs
+   ; stack = row
    
    ld bc,9
    add hl,bc
@@ -151,7 +152,7 @@
    exx
    
    ; hl = & struct sp1_cs
-   ; stack = & struct sp1_update
+   ; stack = & struct sp1_update, row
    
    ld d,(hl)
    inc hl
@@ -170,7 +171,7 @@
    exx
    
    ; hl = & struct sp1_cs
-   ; stack = & struct sp1_update
+   ; stack = & struct sp1_update, row
    
    ld d,(hl)
    inc hl
@@ -193,8 +194,7 @@
 
    ; is this the last col in row?
    
-   ld a,(hl)
-   and $40
+   bit 6,(hl)
    pop hl                    ; hl = & struct sp1_update
    jr z, NCnextcol
 
@@ -204,13 +204,17 @@
 
    ; de = & next struct sp1_cs
    ; hl = & struct sp1_update
+   ; stack = row
+
+   pop hl
 
    ld a,d                    ; all done if there is no next sp1_cs
    or a
-   ret z
+   jp z, done
 
    ld bc,9*SP1V_DISPWIDTH
    add hl,bc
+   push hl
    push hl
    ex de,hl                  ; hl = & next struct sp1_cs
    exx
@@ -224,42 +228,46 @@
 
    ; de = & next struct sp1_cs in sprite
    ; hl = & struct sp1_cs.update
-   ; stack = flag = z if last col, & struct sp1_update
+   ; stack = flag = z if last col, & struct sp1_update, row
 
+   pop af                    ; f = flag
+   ld b,d
+   ld c,e                    ; bc = & next struct sp1_cs in update
+   pop de                    ; de = & struct sp1_update
+   push de
+   push af
+   ld (hl),d
    inc hl
+   ld (hl),e                 ; write struct update this spr char belongs to
    inc hl
    ld a,(hl)                 ; a = plane
    inc hl
+   
+   bit 7,(hl)                ; is spr char occluding type?
+   jp z, NCnotoccluding10
+   ex de,hl
+   inc (hl)                  ; increase # occluding sprites in update struct
+   ex de,hl
+
+.NCnotoccluding10
+
    inc hl
+   push bc
    ld b,h
    ld c,l                    ; bc = & struct sp1_cs.attr_mask
-   
-   pop hl
-   ex (sp),hl                ; hl = & struct sp1_update
-   push bc
-   push de
-   push hl                   ; stack = & struct sp1_update, & next struct sp1_cs in sprite, & sp1_cs.attr_mask, flag
+   ex de,hl
    inc hl
    inc hl
    inc hl                    ; hl = & struct sp1_update.slist
    call AddSprChar           ; add sprite to update list
-   pop hl
    pop de
    pop bc
-   
-   dec bc
-   ld a,(bc)                 ; a = sprite type
-   pop bc
-   
+   pop hl
+
    ; de = & next struct sp1_cs
    ; hl = & struct sp1_update
    ;  c = bit 6 set if last col
-   ;  a = type
-   
-   and $80                   ; is it occluding type?
-   jp z, NCrejoinaddit
-
-   inc (hl)                  ; number of occluding sprites in update struct ++
+   ; stack = row
 
    jp NCrejoinaddit
 
@@ -269,9 +277,10 @@
 
    ; de = & next struct sp1_cs in sprite
    ; hl = & struct sp1_cs.update
-   ; stack = & struct sp1_update
+   ; stack = & struct sp1_update, row
 
    push de
+   ld (hl),0                 ; this spr char no longer belongs to update struct
    inc hl
    inc hl
    inc hl
@@ -327,7 +336,7 @@
 .NCcliprowlp
 
    ; hl = & struct sp1_cs
-   ; stack = & struct sp1_update
+   ; stack = & struct sp1_update, row
    
    ld d,(hl)
    inc hl
@@ -350,8 +359,7 @@
 
    ; is this the last col in row?
    
-   ld a,(hl)
-   and $40
+   bit 6,(hl)
    pop hl                    ; hl = & struct sp1_update
    jr nz, NCCRnextrow
 
@@ -359,6 +367,7 @@
    
    ; hl = & struct sp1_update
    ; de = & next struct sp1_cs
+   ; stack = row
    
    ld bc,9
    add hl,bc
@@ -373,13 +382,17 @@
 
    ; de = & next struct sp1_cs
    ; hl = & struct sp1_update
+   ; stack = row
+
+   pop hl
 
    ld a,d                    ; all done if there is no next sp1_cs
    or a
-   ret z
+   jp z, done
 
    ld bc,9*SP1V_DISPWIDTH
    add hl,bc
+   push hl
    push hl
    ex de,hl                  ; hl = & next struct sp1_cs
    exx
@@ -393,9 +406,10 @@
 
    ; de = & next struct sp1_cs in sprite
    ; hl = & struct sp1_cs.update
-   ; stack = & struct sp1_update
+   ; stack = & struct sp1_update, row
 
    push de
+   ld (hl),0                 ; spr char no longer belongs to update struct
    inc hl
    inc hl
    inc hl
@@ -419,7 +433,7 @@
 .NCCRnotoccluding0
 
    xor $80                   ; is char already invalidated?
-   jp p, NCrejoinremove      ; if so skip invalidation step
+   jp p, NCCRrejoinremove    ; if so skip invalidation step
    ld (bc),a                 ; mark as invalidated
    
    push bc

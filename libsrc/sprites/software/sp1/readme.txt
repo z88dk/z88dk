@@ -70,7 +70,8 @@ arcade games.
 
 // COMPILING THE LIBRARY
 
-Instructions below for the spectrum target:
+Instructions below for the spectrum target, follow
+the same procedure for another target.
 
 1. Copy "spectrum-customize.asm" to "customize.asm"
 2. Edit "customize.asm" to decide on display area
@@ -93,6 +94,5 @@ adding "-lsp1" to the compile command.
 Some more platform specific information can
 be found in the "readme.txt" files in the
 platform subdirectories.
-
 
 - aralbrec 04.2006

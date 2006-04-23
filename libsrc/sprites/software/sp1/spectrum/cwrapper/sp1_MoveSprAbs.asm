@@ -40,15 +40,14 @@ LIB SP1MoveSprAbs
    dec hl
    dec hl
    ld b,(hl)
-   ex de,hl
-   pop de
+   pop hl
    jp SP1MoveSprAbs
 
-; enter: IX = sprite structure address 
-;        DE = animate bitdef displacement (0 for no animation) 
-;         H = new row coord in chars 
-;         L = new col coord in chars 
-;         B = new horizontal rotation (0..7) ie horizontal pixel position 
-;         C = new vertical rotation (0..7) ie vertical pixel position 
-;        IY = clipping rectangle, absolute coords and entirely on screen
-;             (IY+0) = row, (IY+1) = col, (IY+2) = width, (IY+3) = height
+; enter: ix = & struct sp1_ss 
+;        hl = sprite frame address (0 = no change)
+;         d = new row coord in chars 
+;         e = new col coord in chars 
+;         b = new horizontal rotation (0..7) ie horizontal pixel position 
+;         c = new vertical rotation (0..7) ie vertical pixel position 
+;        iy = clipping rectangle entirely on screen
+;             (iy+0) = row, (iy+1) = col, (iy+2) = width, (iy+3) = height

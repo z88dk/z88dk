@@ -40,14 +40,13 @@ LIB SP1MoveSprRel
    dec hl
    dec hl
    ld b,(hl)
-   ex de,hl
-   pop de
+   pop hl
    jp SP1MoveSprRel
 
 ; enter: ix = sprite structure address
-;        de = next sprite frame address (0 for no change)
-;         h = relative row coord, signed byte
-;         l = relative col coord, signed byte
+;        hl = next sprite frame address (0 for no change)
+;         d = relative row coord, signed byte
+;         e = relative col coord, signed byte
 ;         b = relative horizontal pixel movement, signed byte
 ;         c = relative vertical pixel movement, signed byte
 ;        iy = clipping rectangle absolute coords and entirely on screen

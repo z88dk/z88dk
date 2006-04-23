@@ -36,14 +36,15 @@ LIB SP1MoveSprPix
    ld b,(hl)
    dec hl
    ld c,(hl)
-   pop hl
+   ex de,hl
+   pop de
    jp SP1MoveSprPix
 
 ; enter: ix = sprite structure address 
 ;        iy = clipping rectangle, absolute coords and entirely on screen
 ;             (IY+0) = row, (IY+1) = col, (IY+2) = width, (IY+3) = height
-;        hl = pixel x coordinate (0..2047 is meaningful)
+;        de = pixel x coordinate (0..2047 is meaningful)
 ;        bc = pixel y coordinate (0..2047 is meaningful)
-;        de = next sprite frame (0 for no change) 
+;        hl = next sprite frame (0 for no change) 
 ; uses : af, bc, hl + SP1MoveSprAbs
 

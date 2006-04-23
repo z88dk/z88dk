@@ -1,3 +1,4 @@
+customize
 spectrum/cwrapper/sp1_AddColSpr
 spectrum/cwrapper/sp1_ChangeSprType
 spectrum/cwrapper/sp1_ClearRect
@@ -17,6 +18,7 @@ spectrum/cwrapper/sp1_IterateUpdateRect
 spectrum/cwrapper/sp1_MoveSprAbs
 spectrum/cwrapper/sp1_MoveSprPix
 spectrum/cwrapper/sp1_MoveSprRel
+spectrum/cwrapper/sp1_PreShiftSpr
 spectrum/cwrapper/sp1_PrintAt
 spectrum/cwrapper/sp1_PrintAtInv
 spectrum/cwrapper/sp1_PutSprClr
@@ -41,8 +43,10 @@ spectrum/sprites/SP1DeleteSpr
 spectrum/sprites/SP1GetSprClr
 spectrum/sprites/SP1GetSprClrAddr
 spectrum/sprites/SP1IterateSprChar
+spectrum/sprites/SP1MoveSprAbs
 spectrum/sprites/SP1MoveSprPix
 spectrum/sprites/SP1MoveSprRel
+spectrum/sprites/SP1PreShiftSpr
 spectrum/sprites/SP1PutSprClr
 spectrum/sprites/SP1SprId2Type
 spectrum/sprites/draw/SP1AttrOnlyData

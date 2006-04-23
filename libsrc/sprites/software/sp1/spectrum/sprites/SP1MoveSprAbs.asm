@@ -26,7 +26,7 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
    rl b
    
    add a,a
-   or SP1V_ROTTBL/256
+   add a,SP1V_ROTTBL/256
    ld (ix+9),a             ; store effective horizontal rotation (MSB of lookup table to use)
    
    xor a
@@ -76,6 +76,8 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
    ;
    ; 329 cycles to this point worst case
 
+   ld (ix+19),0
+
    ld a,(ix+0)             ; has the row coord changed?
    cp d
    jp nz, changing0
@@ -91,13 +93,18 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
 
    ld h,(ix+15)
    ld l,(ix+16)
+   push de
    exx
+   pop de
    ld hl,(SP1V_UPDATELISTT)
    ld bc,5
    add hl,bc
    push hl
    call SP1GetUpdateStruct
    ld b,(ix+0)
+   pop de
+   push hl
+   push de
 
    ; b  = row coord
    ; c  = col coord (in column loop)
@@ -106,9 +113,17 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
    ; a' = bit 0 = 1 if last row should not draw, bit 1 = 1 if last col should not draw
    ; iy = & clipping rectangle
    ; ix = & struct sp1_ss
-   ; stack = & struct sp1_update.ulist (tail of invalidated list)
+   ; stack = & struct sp1_update.ulist (tail of invalidated list), row
 
    INCLUDE "MoveNC.asm"
+
+.done
+
+   exx
+   ld de,-5
+   add hl,de                 ; hl = & last struct sp1_update.ulist in invalidated list
+   ld (SP1V_UPDATELISTT),hl
+   ret
 
 ; changing character coordinate, must remove and place sprite in update struct lists
 
@@ -130,9 +145,33 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
    ; iy = & clipping rectangle
    ; a' = bit 0 = 1 if last row should not draw, bit 1 = 1 if last col should not draw
 
-***
+   ld h,(ix+15)
+   ld l,(ix+16)
+   push de
+   exx
+   pop de
+   ld hl,(SP1V_UPDATELISTT)
+   ld bc,5
+   add hl,bc
+   push hl
+   call SP1GetUpdateStruct
+   ld b,(ix+0)
+   pop de
+   push hl
+   push de
+
+   ; b  = row coord
+   ; c  = col coord (in column loop)
+   ; hl = struct sp1_update
+   ; hl'= & struct sp1_cs
+   ; a' = bit 0 = 1 if last row should not draw, bit 1 = 1 if last col should not draw
+   ; iy = & clipping rectangle
+   ; ix = & struct sp1_ss
+   ; stack = & struct sp1_update.ulist (tail of invalidated list), row
 
    INCLUDE "MoveC.asm"
+
+   ; jumps to done for exit inside INCLUDE
 
 ; /////////////////////////////////////////////////////////////////////////////////
 

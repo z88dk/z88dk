@@ -49,7 +49,7 @@ struct sp1_ss {                       // "sprite structs" Every sprite is descri
    uchar              vrot;           // +4  bit 7 = 1 for 2-byte graphical definition else 1-byte, bits 2:0 = current vertical rotation (0..7)
    uchar              hrot;           // +5  current horizontal rotation (0..7)
 
-   uint               frame;          // +6  current sprite frame offset added to graphic pointers
+   uchar             *frame;          // +6  current sprite frame offset added to graphic pointers
 
    uchar              res0;           // +8  "LD A,n" opcode
    uchar              e_hrot;         // +9  effective horizontal rotation = MSB of rotation table to use
@@ -62,7 +62,7 @@ struct sp1_ss {                       // "sprite structs" Every sprite is descri
 
    uchar              xthresh;        // +17 hrot must be at least this number of pixels for last column of sprite to be drawn (1 default)
    uchar              ythresh;        // +18 vrot must be at least this number of pixels for last row of sprite to be drawn (1 default)
-   uchar              nactive;        // +19 number of struct sp1_cs cells on screen (increment-only by sp1_MoveSpr*)
+   uchar              nactive;        // +19 number of struct sp1_cs cells on display (written by sp1_MoveSpr*)
 
 };
 
@@ -124,8 +124,8 @@ struct sp1_pss {                      // "print string struct" A struct holding 
 
 #define SP1_TYPE_OCCLUDE   0x80       // background and sprites underneath will not be drawn
 #define SP1_TYPE_BGNDCLR   0x10       // for occluding sprites, clear pixel buffer before draw
-#define SP1_TYPE_2BYTE     0x40       // sprite graphic consists of (mask,graph) pairs
-#define SP1_TYPE_1BYTE     0x00       // sprite graphic consists of graph only
+#define SP1_TYPE_2BYTE     0x40       // sprite graphic consists of (mask,graph) pairs, valid only in sp1_CreateSpr()
+#define SP1_TYPE_1BYTE     0x00       // sprite graphic consists of graph only, valid only in sp1_CreateSpr()
 
 #define SP1_ID_MASK2       1          // masked sprite 2-byte definition (mask,graph) pairs ; sw rotation will use MASK2_NR if no rotation necessary
 #define SP1_ID_MASK2_NR    2          // masked sprite 2-byte definition (mask,graph) pairs ; no rotation applied, graphic always drawn at exact tile boundary
@@ -195,7 +195,7 @@ extern void               __LIB__   sp1_GetSprClrAddr(struct sp1_ss *s, uchar **
 extern void               __LIB__   sp1_PutSprClr(uchar **sprdest, struct sp1_ap *src, uchar n);
 extern void               __LIB__   sp1_GetSprClr(uchar **sprsrc, struct sp1_ap *dest, uchar n);
 
-extern void               __LIB__   sp1_PreShiftSpr(struct sp1_ss *s, uchar rshift, void *destframe);
+extern void               __LIB__  *sp1_PreShiftSpr(struct sp1_ss *s, uchar rshift, void *destaddr);
 
 ///////////////////////////////////////////////////////////
 //                       TILES                           //
