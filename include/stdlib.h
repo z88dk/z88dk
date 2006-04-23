@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.17 2005-09-07 01:08:56 aralbrec Exp $
+ * $Id: stdlib.h,v 1.18 2006-04-23 06:48:34 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -99,6 +99,10 @@ extern void __LIB__ l_qsort(void *base, unsigned int size, void *cmp);
 
 extern unsigned char __LIB__ __FASTCALL__ inp(unsigned int port);
 extern void __LIB__ outp(unsigned int port, unsigned char byte);
+
+/* An endian swap function */
+
+extern void __LIB__ __FASTCALL__ *swapendian(void *addr);
 
 
 /*
