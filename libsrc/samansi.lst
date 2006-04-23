@@ -62,12 +62,8 @@ stdlib/sleep
 stdlib/srand
 stdlib/strtol
 stdlib/strtoul
-stdlib/l_bsearch
-stdlib/l_qsort
-stdlib/Lbsearch
-stdlib/Lqsort
-stdlib/inp.asm
-stdlib/outp.asm
+stdlib/inp
+stdlib/outp
 strings/memset
 strings/memcmp
 strings/memcpy
