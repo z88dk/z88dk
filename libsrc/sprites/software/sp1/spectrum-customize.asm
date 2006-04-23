@@ -3,7 +3,7 @@
 ; 04.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-; See below for Memory Map for these default settings
+; See below for Memory Map with these default settings
 
 ; ///////////////////////
 ; Display Characteristics
@@ -76,7 +76,7 @@ defc SP1V_SPRDRAWTBL    = $d4f5            ; address of 2-byte variable holding 
 ; d4ee - d4f6     SP1.LIB  update list head - a dummy struct sp1_update acting as first in invalidated list
 ;  * d4f1 - d4f2  SP1.LIB  update list tail pointer
 ;  * d4ee - d4ef  SP1.LIB  id / type association table address
-;  * d4f5 - d4f6  SP1.LIB  sprite function table (indexed by type) address
+;  * d4f5 - d4f6  SP1.LIB  sprite draw function table (indexed by type) address
 ; d4e5 - d4ed     --free-  11 bytes
 ; d4d4 - d4e4     IM2.LIB  generic isr with one hook
 ; d401 - d4d3     --free-  228 bytes
