@@ -7,6 +7,35 @@
 //             Sinclair Spectrum Version                 //
 //               aralbrec - April 2006                   //
 ///////////////////////////////////////////////////////////
+//
+// This library implicity allocates and deallocates memory
+// as needed.  You must provide memory allocation and de-
+// allocation functions so that this implicit behaviour can
+// occur.
+//
+// In your C program supply the following two functions:
+//
+// ( u_malloc must return carry flag set if allocation successful )
+// void __FASTCALL__ *u_malloc(uint size) {
+//    return(malloc(size));   * lib function malloc sets carry *
+// }
+//
+// ( u_free must ignore addr == 0 )
+// void __FASTCALL__ u_free(void *addr) {
+//    free(addr);             * lib function free ignores 0 *
+// }
+//
+// If implemented in assembler, use the labels _u_malloc and _u_free
+// with HL as the parameter and return value.  XDEF both labels to
+// make them globals.
+//
+// In these examples, C's standard malloc() and free() functions
+// have been used to perform the memory allocation, but any
+// method can be used.  A better choice is the block memory
+// allocator (balloc.lib) as it is quick and is designed for the
+// fixed-size block requests this and other libraries make.
+//
+///////////////////////////////////////////////////////////
 
 typedef unsigned char uchar;
 typedef unsigned int uint;
