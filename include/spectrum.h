@@ -1,11 +1,14 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.8 2006-04-18 22:39:37 aralbrec Exp $
+ * $Id: spectrum.h,v 1.9 2006-04-23 06:47:47 aralbrec Exp $
  */
 
 #ifndef __SPECTRUM_H__
 #define __SPECTRUM_H__
+
+typedef unsigned char uchar;
+typedef unsigned int uint;
 
 #include <sys/types.h>
 
@@ -97,5 +100,20 @@ extern void __LIB__ in_MouseKempSetPos(uint xcoord, uint ycoord);
 #define PAPER_WHITE    0x38
 #define BRIGHT         0x40
 #define FLASH          0x80
+
+/* Display Functions */
+
+extern void __LIB__  border(uchar colour); 
+extern void __LIB__ __FASTCALL__ *scr_chardown(void *scrnaddr);
+extern void __LIB__ __FASTCALL__ *scr_charleft(void *scrnaddr);
+extern void __LIB__ __FASTCALL__ *scr_charright(void *scrnaddr);
+extern void __LIB__ __FASTCALL__ *scr_charup(void *scrnaddr);
+extern void __LIB__ __FASTCALL__ *scr_getattraddr(void *scrnaddr);
+extern void __LIB__ *scr_getcharaddr(uchar row, uchar col);
+extern void __LIB__ *scr_getscrnaddr(uint xcoord, uchar ycoord, uchar *mask);
+extern void __LIB__ __FASTCALL__ *scr_pixeldown(void *scrnaddr);
+extern void __LIB__ __FASTCALL__ *scr_pixelup(void *scrnaddr);
+extern void __LIB__ *scr_pixelleft(void *scrnaddr, uchar *mask);
+extern void __LIB__ *scr_pixelright(void *scrnaddr, uchar *mask);
 
 #endif
