@@ -1,4 +1,4 @@
-; uchar inp(uint port)
+; uchar __FASTCALL__ inp(uint port)
 ; 09.2005 aralbrec
 
 XLIB inp
