@@ -49,7 +49,9 @@ XREF SP1V_DISPHEIGHT, SP1V_DISPWIDTH, SP1V_UPDATEARRAY, SP1V_ROTTBL
       ld de,SP1V_UPDATEARRAY
       add hl,de
 
-   ELSE IF SP1V_DISPWIDTH = 24
+   ENDIF
+
+   IF SP1V_DISPWIDTH = 24
 
       ld l,d
       ld h,0
@@ -85,7 +87,9 @@ XREF SP1V_DISPHEIGHT, SP1V_DISPWIDTH, SP1V_UPDATEARRAY, SP1V_ROTTBL
       ld de,SP1V_UPDATEARRAY
       add hl,de
 
-   ELSE IF SP1V_DISPWIDTH = 32
+   ENDIF
+
+   IF SP1V_DISPWIDTH = 32
 
       ld l,d
       ld h,0
@@ -118,10 +122,6 @@ XREF SP1V_DISPHEIGHT, SP1V_DISPWIDTH, SP1V_UPDATEARRAY, SP1V_ROTTBL
       add hl,de            ; hl = 9 * (32 * ROW + COL)
       ld de,SP1V_UPDATEARRAY
       add hl,de
-
-   ELSE
-
-      error: need to supply another multiply case to {sp1}/spectrum/updater/SP1GetUpdateStruct.asm
 
    ENDIF
 

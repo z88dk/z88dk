@@ -115,7 +115,7 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
    ; ix = & struct sp1_ss
    ; stack = & struct sp1_update.ulist (tail of invalidated list), row
 
-   INCLUDE "MoveNC.asm"
+   INCLUDE "./spectrum/sprites/MoveNC.asm"
 
 .done
 
@@ -169,7 +169,7 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
    ; ix = & struct sp1_ss
    ; stack = & struct sp1_update.ulist (tail of invalidated list), row
 
-   INCLUDE "MoveC.asm"
+   INCLUDE "./spectrum/sprites/MoveC.asm"
 
    ; jumps to done for exit inside INCLUDE
 

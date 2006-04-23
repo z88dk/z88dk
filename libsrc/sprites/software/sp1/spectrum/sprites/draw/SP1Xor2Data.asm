@@ -63,7 +63,7 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    ld a,c
    or (hl)
    xor b
-   ld (SP1PIXELBUFF+1),a
+   ld (SP1V_PIXELBUFFER+1),a
 
    ; 1
 

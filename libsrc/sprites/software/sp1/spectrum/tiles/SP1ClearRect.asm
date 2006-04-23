@@ -57,7 +57,7 @@ XDEF SP1CRSELECT
 .SP1CRSELECT
 
    add a,a
-   add a,setbl%256
+   add a,seltbl%256
    ld l,a
    ld h,seltbl/256
    jp nc, noinc0

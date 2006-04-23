@@ -123,12 +123,12 @@ XREF SP1V_DISPWIDTH, SP1V_DISPHEIGHT
    ; initialize the update array
 
    pop de                           ; d = attr, e = tile
-   ld b,SP1V_ORIGY                  ; b = current row coord
+   ld b,SP1V_DISPORIGY              ; b = current row coord
    ld hl,SP1V_UPDATEARRAY           ; hl = current struct sp1_update
    
 .rowloop
 
-   ld c,SP1V_ORIGX                  ; c = current col coord
+   ld c,SP1V_DISPORIGX              ; c = current col coord
    
 .colloop
 

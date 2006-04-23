@@ -4,7 +4,7 @@
 ; sinclair spectrum version
 
 XLIB SP1SprId2Type
-LIB SP1V_IDTYPEASSOC
+XREF SP1V_IDTYPEASSOC
 
 ; Return sprite type associated with id. Sprite
 ; Ids are invariants defined in the header file

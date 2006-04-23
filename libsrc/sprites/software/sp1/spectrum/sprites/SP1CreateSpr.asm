@@ -99,7 +99,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    ex de,hl                   ; de = & struct sp1_cs.draw_code (& embedded code in struct sp1_cs)
    and $0f                    ; a = sprite type but only index portion
    add a,a
-   ld hl,(SP1V_DRAWTBL)
+   ld hl,(SP1V_SPRDRAWTBL)
    add a,l
    ld l,a
    ld a,0

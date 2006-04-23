@@ -119,7 +119,8 @@ XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_U
    ld a,(hl)                 ; a = background tile attr
    ld (SP1V_ATTRBUFFER),a    ; write colour into the attribute buffer
    inc hl                    ; hl = & update.tile
-   djnz skiptile             ; if there are occluding sprites in this char, save draw
+   dec b
+   jp nz, skiptile           ; if there are occluding sprites in this char, save draw
                              ;   time by not drawing sprites underneath them
    ld e,(hl)                 ; else e = tile # for this char
    ld d,SP1V_TILEARRAY/256
@@ -228,7 +229,8 @@ XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_U
    ld (hl),a                 ; write colour to screen
 
    inc b                     ; go to next char to update (more if b!=0)
-   djnz updatelp0
+   dec b
+   jp nz, updatelp0          ; damn, djnz out of range
 
 .doneupdate
 

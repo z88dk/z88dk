@@ -42,7 +42,7 @@ XREF SP1V_UPDATELISTT
    ld (hl),d                        ; store this new sp1_update into current tail
    inc hl
    ld (hl),e
-   ld (SP1UPDATELISTT),de           ; this new struct sp1_update is now the tail in invalidated list
+   ld (SP1V_UPDATELISTT),de         ; this new struct sp1_update is now the tail in invalidated list
 
    ret
 

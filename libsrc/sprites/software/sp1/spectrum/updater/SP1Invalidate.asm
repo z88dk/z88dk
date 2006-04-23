@@ -62,7 +62,7 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
    djnz collp
 
    ex (sp),hl                    ; hl = first struct sp1_update in row
-   ld bc,9*SPV_DISPWIDTH
+   ld bc,9*SP1V_DISPWIDTH
    add hl,bc
    pop de
    ex de,hl                      ; de = first struct sp1_update in next row, hl = last+5 in invalidated list

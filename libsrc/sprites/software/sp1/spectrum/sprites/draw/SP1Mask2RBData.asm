@@ -4,6 +4,7 @@
 ; sinclair spectrum version
 
 XLIB SP1Mask2RBData
+LIB SP1Mask2LBData
 XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
 
 ; following data segment copied into struct sp1_cs

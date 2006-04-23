@@ -44,7 +44,7 @@
    ; has this update struct been removed from the display?
 
    bit 6,(hl)
-   jr nz, CCremoved
+   jp nz, CCremoved
    ex (sp),hl
    
    ; hl = & struct sp1_update.ulist (tail)
@@ -53,9 +53,9 @@
    ; is column in clipping rectangle?
 
    sub (iy+1)
-   jr c, CCclipcol0
+   jp c, CCclipcol0
    sub (iy+2)
-   jr nc, CCclipcol0
+   jp nc, CCclipcol0
    
    ; is this the last column in row?
    
@@ -66,7 +66,7 @@
    
    ex af,af
    bit 1,a
-   jr nz, CCclipcol1
+   jp nz, CCclipcol1
    ex af,af
 
 .CCnotlastcol
@@ -84,7 +84,7 @@
    
    ld a,(hl)
    or a
-   jr z, CCnoremovenec0
+   jp z, CCnoremovenec0
    
    ; first remove spr char from current update struct
    
