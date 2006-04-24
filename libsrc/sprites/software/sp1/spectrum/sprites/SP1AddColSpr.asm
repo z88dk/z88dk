@@ -27,7 +27,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
 
    push bc
    push ix
-   ld hl,23                   ; sizeof(struct sp1_cs)
+   ld hl,24                   ; sizeof(struct sp1_cs)
    push hl
    call _u_malloc
    pop bc
@@ -47,7 +47,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    ld iyl,e
    ld iyh,d                   ; iy = & struct sp1_cs
    push bc                    ; save bc = graphic def
-   ld bc,23                   ; sizeof(struct sp1_cs)
+   ld bc,24                   ; sizeof(struct sp1_cs)
    ldir                       ; copy prototype into new struct
    pop bc                     ; bc = graphic def
    
@@ -75,22 +75,26 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    ld a,0
    adc a,h
    ld h,a                     ; hl = & draw function to copy into struct sp1_cs
+   ld a,(hl)
+   inc hl
+   ld h,(hl)
+   ld l,a
    ld bc,10                   ; length of draw code
    ldir                       ; copy draw code into struct sp1_cs
 
    ld a,ixl
    add a,8
    ld (iy+8),a                ; store & struct sp1_ss + 8 (& embedded code in struct sp1_ss)
-   ld a,0
-   adc a,ixh
+   ld a,ixh
+   adc a,0
    ld (iy+9),a
    
    pop bc
    ld (iy+11),c               ; store graphics ptr
    ld (iy+12),b
 
-   ld l,(ix+15)               ; hl = first struct sp1_cs in sprite
-   ld h,(ix+16)
+   ld h,(ix+15)               ; hl = first struct sp1_cs in sprite
+   ld l,(ix+16)
 
 .loop
 
@@ -106,7 +110,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    add hl,bc                  ; hl = & struct sp1_cs.type
    bit 6,(hl)                 ; is this struct sp1_cs in last column?
    ex de,hl
-   jp nz, search
+   jp z, search
    
    ex de,hl                   ; hl = & struct sp1_cs.type in last column, de = next struct sp1_cs at start of next row
    res 6,(hl)                 ; no longer last in column
@@ -141,7 +145,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    ld e,iyl
    ld d,iyh
    ex de,hl                   ; hl = & new struct sp1_cs just added, de = memory block for new struct sp1_cs
-   ld bc,23                   ; sizeof(struct sp1_cs)
+   ld bc,24                   ; sizeof(struct sp1_cs)
    ldir                       ; copy struct sp1_cs just added into new one
    
    ld e,(iy+11)
