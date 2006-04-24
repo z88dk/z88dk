@@ -1,13 +1,10 @@
 ; 04.2006 aralbrec
 
-; void border(uchar colour)
+; void __FASTCALL__ border(uchar colour)
 
 XLIB border
 
 .border
-
-   ld hl,2
-   add hl,sp
-   ld a,(hl)
+   ld a,l
    out (254),a
    ret
