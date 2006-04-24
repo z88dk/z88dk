@@ -1,11 +1,11 @@
 
 XLIB SP1_SS_PROTOTYPE
-XREF SP1V_ROTTBL, SP1V_WIDTH
+XREF SP1V_ROTTBL, SP1V_DISPWIDTH
 
 .SP1_SS_PROTOTYPE
 
    defb 0                  ; initial row coordinate
-   defb SP1V_WIDTH         ; initial col coordinate
+   defb SP1V_DISPWIDTH     ; initial col coordinate
    defb 1                  ; initial width in chars/tiles
    defb 0                  ; initial height in chars/tiles
    defb 0                  ; initial vertical rotation in pixels

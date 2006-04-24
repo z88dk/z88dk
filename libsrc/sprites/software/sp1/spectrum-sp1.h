@@ -16,12 +16,12 @@
 // In your C program supply the following two functions:
 //
 // ( u_malloc must return carry flag set if allocation successful )
-// void __FASTCALL__ *u_malloc(uint size) {
+// void *u_malloc(uint size) {
 //    return(malloc(size));   * lib function malloc sets carry *
 // }
 //
 // ( u_free must ignore addr == 0 )
-// void __FASTCALL__ u_free(void *addr) {
+// void u_free(void *addr) {
 //    free(addr);             * lib function free ignores 0 *
 // }
 //
@@ -37,8 +37,15 @@
 //
 ///////////////////////////////////////////////////////////
 
-typedef unsigned char uchar;
-typedef unsigned int uint;
+#ifndef _T_UCHAR
+#define _T_UCHAR
+   typedef unsigned char uchar;
+#endif
+
+#ifndef _T_UINT
+#define _T_UINT
+   typedef unsigned int uint;
+#endif
 
 struct sp1_Rect {                     // only here until rectangles lib completed
 
@@ -262,6 +269,7 @@ extern void  __LIB__   sp1_ClearRectInv(struct sp1_Rect *r, uchar colour, uchar 
 
 #define SP1_IFLAG_MAKE_ROTTBL      0x01
 #define SP1_IFLAG_OVERWRITE_TILES  0x02
+#define SP1_IFLAG_OVERWRITE_DFILE  0x04
 
 // void *hook  <->  void [ __FASTCALL__ ] (*hook)(struct sp1_update *u)
 

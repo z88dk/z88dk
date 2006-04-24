@@ -5,8 +5,12 @@
 
 default:
 	@echo
-	@echo You must specify a target...
-	@echo Valid targets are: spectrum
+	@echo SP1 Software Sprite Engine
+	@echo
+	@echo You must specify a target machine
+	@echo Valid targets listed below
+	@echo 
+	@echo make spectrum
 	@echo
 
 spectrum: customize.asm
