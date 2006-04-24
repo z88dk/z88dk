@@ -29,14 +29,11 @@ XDEF SP1CRSELECT
    call SP1CRSELECT               ; ix = address of operation code (depending on flags passed in)
    call SP1GetUpdateStruct        ; hl = & struct update
    pop de                         ; d = attr, e = tile
-   
-   ld a,c                         ; a = height
 
 .rowloop
 
    push bc                        ; save b = width
    push hl                        ; save update position
-   ex af,af
 
 .colloop
 
@@ -48,8 +45,7 @@ XDEF SP1CRSELECT
    add hl,bc
    pop bc
    
-   ex af,af
-   dec a
+   dec c
    jp nz, rowloop
 
    ret

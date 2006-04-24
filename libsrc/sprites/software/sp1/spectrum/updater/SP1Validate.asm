@@ -16,12 +16,11 @@ XREF SP1V_DISPWIDTH
 ;         e = col coord
 ;         b = width
 ;         c = height
-; uses  : af, bc, de, hl
+; uses  : f, bc, de, hl
 
 .SP1Validate
 
    call SP1GetUpdateStruct       ; hl = & struct sp1_update
-   ld a,c                        ; a = height
    ld de,9
 
 .rowloop
@@ -33,7 +32,6 @@ XREF SP1V_DISPWIDTH
 
    bit 6,(hl)                    ; has this update char been removed from the display?
    jr nz, skipit                 ; if so we must not validate it
-   
    res 7,(hl)                    ; validate update char
 
 .skipit
@@ -46,7 +44,7 @@ XREF SP1V_DISPWIDTH
    add hl,bc                     ; hl = & struct sp1_update next row leftmost column
    pop bc
 
-   dec a                         ; a = height
+   dec c                         ; c = height
    jp nz, rowloop
 
    ret

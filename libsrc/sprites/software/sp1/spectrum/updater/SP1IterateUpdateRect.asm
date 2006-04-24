@@ -22,13 +22,11 @@ XREF SP1V_DISPWIDTH
 .SP1IterateUpdateRect
 
    call SP1GetUpdateStruct       ; hl = & struct sp1_update
-   ld a,c                        ; a = height
 
 .rowloop
 
    push bc
    push hl                       ; save update position
-   push af
 
 .colloop
 
@@ -41,13 +39,12 @@ XREF SP1V_DISPWIDTH
    pop bc
    djnz colloop
 
-   pop af
    pop hl                        ; hl = & struct sp1_update same row leftmost column
    ld bc,9*SP1V_DISPWIDTH
    add hl,bc                     ; hl = & struct sp1_update next row leftmost column
    pop bc
 
-   dec a                         ; a = height
+   dec c                         ; c = height
    jp nz, rowloop
 
    ret

@@ -31,14 +31,12 @@ defw SP1ClearRect
    call SP1GetUpdateStruct        ; hl = & struct update
    pop de                         ; d = attr, e = tile
    
-   ld a,c                         ; a = height
    ld iy,(SP1V_UPDATELISTT)       ; iy = last struct sp1_update in draw queue
 
 .rowloop
 
    push bc                        ; save b = width
    push hl                        ; save update position
-   ex af,af
 
 .colloop
 
@@ -65,8 +63,7 @@ defw SP1ClearRect
    add hl,bc
    pop bc
    
-   ex af,af
-   dec a
+   dec c
    jp nz, rowloop
 
    ld (iy+5),0

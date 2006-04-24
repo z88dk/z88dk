@@ -13,7 +13,7 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
 ;         e = col coord
 ;         b = width
 ;         c = height
-; uses  : af, bc, de, hl, af'
+; uses  : af, bc, de, hl
 
 .SP1Invalidate
 
@@ -28,9 +28,8 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
 
 .rowlp
 
-   push bc                       ; save b = width
+   push bc                       ; save b = width, c = height
    push de                       ; save first struct sp1_update in row
-   ex af,af                      ; a' = height
 
    ; hl = last struct sp1_update + 5 in invalidated list
    ; de = current struct sp1_update to invalidate
@@ -66,10 +65,9 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
    add hl,bc
    pop de
    ex de,hl                      ; de = first struct sp1_update in next row, hl = last+5 in invalidated list
-   pop bc                        ; b = width
+   pop bc                        ; b = width, c = height
 
-   ex af,af                      ; a = height
-   dec a
+   dec c
    jp nz, rowlp
 
    ld (hl),0                     ; mark end of invalidated list
