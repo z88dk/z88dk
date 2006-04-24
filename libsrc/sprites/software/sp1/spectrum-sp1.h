@@ -216,8 +216,8 @@ struct sp1_pss {                      // "print string struct" A struct holding 
 
 // void *hook  <->  void [ __FASTCALL__ ] (*hook)(uint count, struct sp1_cs *c)  // if __FASTCALL__ only struct sp1_cs* passed
 
-extern struct sp1_ss      __LIB__  *sp1_CreateSpr(uchar type, uchar height, uchar *graphic, uchar plane);
-extern uint               __LIB__   sp1_AddColSpr(struct sp1_ss *s, uchar type, uchar *graphic, uchar plane);
+extern struct sp1_ss      __LIB__  *sp1_CreateSpr(uchar type, uchar height, int graphic, uchar plane);
+extern uint               __LIB__   sp1_AddColSpr(struct sp1_ss *s, uchar type, int graphic, uchar plane);
 extern void               __LIB__   sp1_MoveSprAbs(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uchar row, uchar col, uchar vrot, uchar hrot);
 extern void               __LIB__   sp1_MoveSprRel(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
 extern void               __LIB__   sp1_MoveSprPix(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uint x, uint y);

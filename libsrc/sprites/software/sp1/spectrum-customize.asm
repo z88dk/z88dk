@@ -9,11 +9,6 @@
 ; Display Characteristics
 ; ///////////////////////
 
-XDEF SP1V_DISPORIGX
-XDEF SP1V_DISPORIGY
-XDEF SP1V_DISPWIDTH
-XDEF SP1V_DISPHEIGHT
-
 defc SP1V_DISPORIGX     = 0                ; x coordinate of top left corner of area managed by sp1 in characters
 defc SP1V_DISPORIGY     = 0                ; y coordinate of top left corner of area managed by sp1 in characters
 defc SP1V_DISPWIDTH     = 32               ; width of area managed by sp1 in characters (16, 24, 32 ok as of now)
@@ -23,19 +18,12 @@ defc SP1V_DISPHEIGHT    = 24               ; height of area managed by sp1 in ch
 ;        Buffers
 ; ///////////////////////
 
-XDEF SP1V_PIXELBUFFER
-XDEF SP1V_ATTRBUFFER
-
 defc SP1V_PIXELBUFFER   = $d4f7            ; address of an 8-byte buffer to hold intermediate pixel-draw results
 defc SP1V_ATTRBUFFER    = $d4ff            ; address of a single byte buffer to hold intermediate colour-draw results
 
 ; ///////////////////////
 ;     Data Structures
 ; ///////////////////////
-
-XDEF SP1V_TILEARRAY
-XDEF SP1V_UPDATEARRAY
-XDEF SP1V_ROTTBL
 
 defc SP1V_TILEARRAY     = $f000            ; address of the 512-byte tile array associating character codes with tile graphics, must lie on 256-byte boundary (LSB=0)
 defc SP1V_UPDATEARRAY   = $d500            ; address of the 9*SP1V_DISPWIDTH*SP1V_DISPHEIGHT byte update array
@@ -45,11 +33,6 @@ defc SP1V_ROTTBL        = $f000            ; location of the 3584-byte rotation 
 ; ///////////////////////
 ;      SP1 Variables
 ; ///////////////////////
-
-XDEF SP1V_UPDATELISTH
-XDEF SP1V_UPDATELISTT
-XDEF SP1V_IDTYPEASSOC
-XDEF SP1V_SPRDRAWTBL
 
 defc SP1V_UPDATELISTH   = $d4ee            ; address of 9-byte area holding a dummy struct_sp1_update that is always the "first" in list of screen tiles to be drawn
 defc SP1V_UPDATELISTT   = $d4f1            ; address of 2-byte variable holding the address of the last struct_sp1_update in list of screen tiles to be drawn

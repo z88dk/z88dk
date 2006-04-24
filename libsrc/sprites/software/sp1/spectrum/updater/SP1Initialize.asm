@@ -6,6 +6,21 @@
 INCLUDE "customize.asm"
 XLIB SP1Initialize
 
+XDEF SP1V_DISPORIGX
+XDEF SP1V_DISPORIGY
+XDEF SP1V_DISPWIDTH
+XDEF SP1V_DISPHEIGHT
+XDEF SP1V_PIXELBUFFER
+XDEF SP1V_ATTRBUFFER
+XDEF SP1V_TILEARRAY
+XDEF SP1V_UPDATEARRAY
+XDEF SP1V_ROTTBL
+XDEF SP1V_UPDATELISTH
+XDEF SP1V_UPDATELISTT
+XDEF SP1V_IDTYPEASSOC
+XDEF SP1V_SPRDRAWTBL
+
+
 ; 1. Stores locations of idtypeassoc table and sprdraw function table
 ; 2. Constructs the rotation table if relevant flag set
 ; 3. Initializes tile array so that ROM character set is used by
@@ -135,6 +150,10 @@ XLIB SP1Initialize
    ld (hl),e                        ; write tile code
    inc hl
    ld (hl),0                        ; no sprites in the tile
+   inc hl
+   ld (hl),0
+   inc hl
+   ld (hl),0                        ; not in invalidated list
    inc hl
    ld (hl),0
    inc hl
