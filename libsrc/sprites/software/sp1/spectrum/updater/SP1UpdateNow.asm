@@ -37,8 +37,8 @@ XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_U
    inc hl
    ld a,(hl)
    inc hl
-   ld l,(hl)
-   ld h,a
+   ld h,(hl)
+   ld l,a
    
    push hl                   ; save screen address
    ex de,hl
