@@ -2,7 +2,7 @@
 ; 09.2005 aralbrec
 
 XLIB adt_HashDelete
-LIB ADTHashDelete, l_jpiy
+LIB ADTHashDelete
 XREF _u_free
 
 .adt_HashDelete
@@ -20,22 +20,14 @@ XREF _u_free
    inc hl
    inc hl
    ld a,(hl)
-   ld iyl,a
+   ld ixl,a
    inc hl
    ld a,(hl)
-   ld iyh,a              ; iy = address of C delete function
-   ld ix,delete
-   or iyl
-   jr nz, notzero
-   ld ix,0
-.notzero
+   ld ixh,a              ; ix = address of C delete function
    ex de,hl              ; hl = address of hash table
    call ADTHashDelete
    pop hl
-   jp _u_free            ; free struct adt_HashTable itself and return
-
-.delete
    push hl
-   call l_jpiy
+   call _u_free          ; free struct adt_HashTable itself and return
    pop hl
    ret

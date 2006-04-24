@@ -61,7 +61,9 @@ XREF _u_free
    ld bc,-5
    add hl,bc
    push de
+   push hl
    call _u_free              ; free the HashCell
+   pop hl
    pop hl                    ; hl = value from deleted hashcell
    scf                       ; indicate successfully removed (key,value) pair
    ret

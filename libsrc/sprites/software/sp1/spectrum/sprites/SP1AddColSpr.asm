@@ -28,7 +28,9 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    push bc
    push ix
    ld hl,23                   ; sizeof(struct sp1_cs)
+   push hl
    call _u_malloc
+   pop bc
    jp nc, fail
    pop ix
    pop bc
@@ -181,5 +183,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    or l
    ret z                      ; if 0 done freeing, ret with nc for failure
    
+   push hl
    call _u_free               ; free the block
+   pop hl
    jp faillp

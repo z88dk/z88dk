@@ -16,7 +16,9 @@ defw ADTListPrepend, ADTListAppend
    push de
    push bc
    ld hl,6                ; sizeof(struct adt_ListNode)
+   push hl
    call _u_malloc
+   pop bc
    pop bc
    pop de
    ret nc                 ; alloc memory failed

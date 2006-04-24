@@ -10,7 +10,7 @@ XREF _u_free
 ;        IX = delete with HL = item
 ; exit : The entire list is deleted.
 ;        (delete) is called once for each item in the list with
-;          HL = item.
+;          HL = item and stack=item
 ; uses : AF,BC,DE,HL
 
 .ADTListDelete
@@ -30,7 +30,9 @@ XREF _u_free
    inc hl                ; hl = NODE.item+1
    ld d,(hl)             ; de = item
    ex de,hl
+   push hl
    call l_jpix           ; call itemfree with HL = item
+   pop hl
    pop hl                ; hl = NODE
    push hl               ; save NODE
    call _u_free          ; free NODE container
@@ -41,5 +43,7 @@ XREF _u_free
 
 .done
    pop hl                ; hl = list
+   push hl
    call _u_free          ; free list container
+   pop hl
    ret

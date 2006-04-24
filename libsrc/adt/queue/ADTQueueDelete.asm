@@ -14,7 +14,9 @@ XREF _u_free
    ld d,(hl)
    dec hl
    push de
+   push hl
    call _u_free                 ; free struct adt_Queue container
+   pop hl
    pop hl
 
 .loop                           ; hl = QueueNode to delete
@@ -28,7 +30,9 @@ XREF _u_free
    inc hl
    push hl                      ; stack = QueueNode.next
    ex de,hl                     ; hl = user item
+   push hl
    call l_jpix                  ; delete(user item)
+   pop hl
    pop hl
    ld e,(hl)
    inc hl
@@ -37,6 +41,8 @@ XREF _u_free
    dec hl
    dec hl
    push de
+   push hl
    call _u_free                 ; free QueueNode container
+   pop hl
    pop hl                       ; hl = next QueueNode
    jp loop

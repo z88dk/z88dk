@@ -25,7 +25,9 @@ XREF _u_free
    ld c,(hl)                 ; bc = next struct sp1_cs to delete
    push bc
    ex de,hl
+   push hl
    call _u_free              ; free current struct sp1_cs
+   pop hl
    pop de
    ld l,e
    ld h,d                    ; de = hl = next struct sp1_cs to delete

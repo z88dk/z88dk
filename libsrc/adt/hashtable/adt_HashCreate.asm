@@ -6,7 +6,9 @@ XREF _u_malloc, _u_free
 
 .adt_HashCreate
    ld hl,10             ; sizeof(struct adt_HashTable)
+   push hl
    call _u_malloc       ; get some memory for the table structure
+   pop bc
    ret nc               ; return with HL = 0 if allocation failed
 
    ex de,hl
@@ -24,12 +26,16 @@ XREF _u_malloc, _u_free
    push hl              ; push &new adt_HashTable->table
    ex de,hl
    add hl,hl
+   push hl
    call _u_malloc       ; try to get memory for the hash table
+   pop bc
    jr c, cont
    pop hl               ; unsuccessful so clean up
    dec hl
    dec hl
+   push hl
    call _u_free
+   pop hl
    ld hl,0
    ret                  ; return with HL = 0 to indicate no memory
 

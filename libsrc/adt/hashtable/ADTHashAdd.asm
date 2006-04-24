@@ -59,7 +59,9 @@ XREF _u_malloc
 .addnew                      ; insert new hashcell at stacked lagger
    push bc
    ld hl,6                   ; sizeof(struct adt_HashCell)
+   push hl
    call _u_malloc
+   pop bc
    pop bc
    jr nc, allocfail          ; if memory allocation fails...
 

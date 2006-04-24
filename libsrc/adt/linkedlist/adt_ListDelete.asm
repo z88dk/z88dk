@@ -31,5 +31,5 @@ LIB ADTListDelete
 ;        IX = delete
 ; exit : The entire list is deleted.
 ;        (delete) is called once for each item in the list with
-;          HL = item.
+;          HL = item and stack=item
 ; uses : AF,BC,DE,HL

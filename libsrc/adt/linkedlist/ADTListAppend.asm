@@ -16,7 +16,9 @@ XREF _u_malloc
    push bc
    push de
    ld hl,6                ; sizeof(struct adt_ListNode)
+   push hl
    call _u_malloc
+   pop bc
    pop de
    pop bc
    ret nc                 ; alloc memory failed

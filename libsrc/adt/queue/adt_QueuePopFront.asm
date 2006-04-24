@@ -37,7 +37,9 @@ XREF _u_free
 .notemptynow                ; hl = adt_QueueNode.next + 2b
    ld bc,-4
    add hl,bc                ; hl = adt_QueueNode *
+   push hl
    call _u_free             ; free empty container
+   pop hl
 
    pop hl                   ; hl = item
    scf

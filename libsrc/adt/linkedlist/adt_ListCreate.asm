@@ -12,7 +12,9 @@ XREF _u_malloc
 
 .adt_ListCreate
    ld hl,9            ; sizeof(struct adt_List)
+   push hl
    call _u_malloc     ; alloc memory, hl=0 & carry reset if fail
+   pop bc
    ret nc
 
    push hl

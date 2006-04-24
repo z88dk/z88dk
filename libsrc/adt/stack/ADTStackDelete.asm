@@ -6,7 +6,7 @@ LIB l_jpix
 XREF _u_free
 
 ; enter: HL = struct adt_Stack **
-;        IX = void __FASTCALL__ (*delete)(void *item) with HL=item
+;        IX = void (*delete)(void *item) with HL,stack=item
 
 .ADTStackDelete
    ld e,(hl)
@@ -34,9 +34,13 @@ XREF _u_free
    push de
    ld l,c
    ld h,b
+   push hl
    call l_jpix
    pop hl
+   pop hl
    ex (sp),hl
+   push hl
    call _u_free
+   pop hl
    pop hl
    jp loop

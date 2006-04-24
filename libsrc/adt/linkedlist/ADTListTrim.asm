@@ -37,7 +37,9 @@ XREF _u_free
    ld d,(hl)          ; de = item
    push de            ; save item
    dec hl
+   push hl
    call _u_free       ; free NODE
+   pop hl
    pop hl
    ex (sp),hl          ; hl = list, stack = item
    ld e,l
@@ -95,7 +97,9 @@ XREF _u_free
    dec de
    dec de             ; de = tail NODE
    ex de,hl
+   push hl
    call _u_free       ; free tail NODE
+   pop hl
    pop hl             ; hl = item
    scf
    ret

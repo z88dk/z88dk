@@ -90,7 +90,9 @@ XREF _u_free
 .rejoin2
    pop hl              ; pop item
    ex (sp),hl          ; stack = item, hl = freed NODE container
+   push hl
    call _u_free        ; free(hl)
+   pop hl
    pop hl              ; pop item
    scf
    ret

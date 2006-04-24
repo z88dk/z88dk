@@ -18,7 +18,9 @@ XREF _u_free
    ; list2 is empty, do nothing
 
    pop hl
+   push hl
    call _u_free          ; free(list2)
+   pop hl
    ret
 
 .list2nonempty           ; stack = list2
@@ -49,7 +51,9 @@ XREF _u_free
    dec hl
    ld (hl),1             ; INLIST
    pop hl
+   push hl
    call _u_free          ; free(list2)
+   pop hl
    ret
 
    ; both lists nonempty
@@ -126,5 +130,7 @@ XREF _u_free
    ldi                   ; ** list1 tail = list2 tail
 
    pop hl
+   push hl
    call _u_free          ; free(list2)
+   pop hl
    ret

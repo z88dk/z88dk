@@ -9,7 +9,9 @@ XREF _u_malloc
 
 .adt_QueueCreate
    ld hl,4           ; sizeof(struct adt_Queue)
+   push hl
    call _u_malloc
+   pop de
    ret nc            ; ret with hl = 0 and nc if fail
 
    ld e,l

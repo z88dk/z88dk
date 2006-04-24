@@ -9,7 +9,7 @@ XREF _u_free
 ; This subroutine deletes the hash table itself and does not
 ; deal with struct adt_HashTable
 ;
-; enter: IX = delete function on HL = struct adt_HashCell
+; enter: IX = delete function on HL = struct adt_HashCell (and HL stacked)
 ;             wrap up key,value members only  MUST PRESERVE HL
 ;             = 0 for no user wrap up (do nothing)
 ;        HL = &hash table array  (adt_HashTable->table)
@@ -48,7 +48,9 @@ XREF _u_free
    ld e,(hl)
    pop hl
    push de
+   push hl
    call _u_free                 ; free struct adt_HashCell
+   pop hl
    pop hl
    jp listloop
 
@@ -63,7 +65,10 @@ XREF _u_free
    jp nz, indexloop
 
    pop hl
-   jp _u_free                 ; free hash table itself
+   push hl
+   call _u_free                ; free hash table itself
+   pop hl
+   ret
 
 .justret
    ret

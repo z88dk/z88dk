@@ -15,7 +15,9 @@ XREF _u_malloc
    push hl
    push de
    ld hl,4             ; sizeof(struct adt_Stack)
+   push hl
    call _u_malloc
+   pop bc
    pop bc              ; bc = item
    pop de              ; de = adt_Stack **
    ret nc              ; mem alloc failed, hl = 0

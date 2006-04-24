@@ -32,7 +32,9 @@ XREF _u_free
    ld (de),a         ; write new stack ptr
    dec hl
    dec hl
+   push hl
    call _u_free      ; free stack container
+   pop hl
    pop hl            ; hl = item
    scf
    ret

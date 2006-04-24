@@ -13,7 +13,9 @@ XREF _u_malloc
    push de
    push hl
    ld hl,4                 ; sizeof (struct adt_QueueNode)
+   push hl
    call _u_malloc          ; get memory for a queue node
+   pop de
    pop de                  ; de = struct adt_Queue *
    pop bc                  ; bc = item
    ret nc                  ; ret with hl = 0 if alloc failed
