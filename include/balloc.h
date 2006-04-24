@@ -36,8 +36,15 @@
  *   (one hidden byte is used to identify the queue a block belongs to)
  */
 
-typedef unsigned char uchar;
-typedef unsigned int uint;
+#ifndef _T_UCHAR
+#define _T_UCHAR
+   typedef unsigned char uchar;
+#endif
+
+#ifndef _T_UINT
+#define _T_UINT
+   typedef unsigned int uint;
+#endif
 
 /*
  * BAQTBL is a macro that declares the queue table statically.

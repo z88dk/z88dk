@@ -18,12 +18,12 @@
  * block allocator, a mixture of the two, or something of your own):
  *
  * ( u_malloc must return carry flag set if allocation successful )
- * void __FASTCALL__ *u_malloc(uint size) {
+ * void *u_malloc(uint size) {
  *    return(malloc(size));   * lib function malloc sets carry *
  * }
  *
  * ( u_free must ignore addr == 0 )
- * void __FASTCALL__ u_free(void *addr) {
+ * void u_free(void *addr) {
  *    free(addr);             * lib function free ignores 0 *
  * }
  *
@@ -33,10 +33,15 @@
  *
  */
 
+#ifndef _T_UCHAR
+#define _T_UCHAR
+   typedef unsigned char uchar;
+#endif
 
-typedef unsigned char uchar;
-typedef unsigned int uint;
-
+#ifndef _T_UINT
+#define _T_UINT
+   typedef unsigned int uint;
+#endif
 
 /*** DOUBLY LINKED LIST
 
@@ -48,7 +53,7 @@ reports a match or when the current ptr points past the end of the list.
 
 In the following:
 
-   void *delete <->  void __FASTCALL__ (*delete)(void *item)
+   void *delete <->  void (*delete)(void *item)
    void *match  <->  char (*match)(void *item1, void *item2) return 0 if =
 
 */
@@ -108,7 +113,7 @@ number.
 
 In the following:
 
-   void *delete    <->  void __FASTCALL__ (*delete)(struct adt_HashCell *hc)
+   void *delete    <->  void (*delete)(struct adt_HashCell *hc)
                         an opportunity for user cleanup; delete hc->key, hc->value only
    void *hashfunc  <->  uint (*hashfunc)(void *key, uint size)
                         return a uint from 0..size-1
@@ -184,7 +189,7 @@ of the queue.
 
 In the following:
 
-     void *delete  <-> void __FASTCALL__ (*delete)(void *item)
+     void *delete  <-> void (*delete)(void *item)
                        an opportunity for user clean up if a non-empty queue is deleted
 */
 

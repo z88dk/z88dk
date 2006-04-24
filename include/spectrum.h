@@ -1,14 +1,21 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.9 2006-04-23 06:47:47 aralbrec Exp $
+ * $Id: spectrum.h,v 1.10 2006-04-24 05:56:05 aralbrec Exp $
  */
 
 #ifndef __SPECTRUM_H__
 #define __SPECTRUM_H__
 
-typedef unsigned char uchar;
-typedef unsigned int uint;
+#ifndef _T_UCHAR
+#define _T_UCHAR
+   typedef unsigned char uchar;
+#endif
+
+#ifndef _T_UINT
+#define _T_UINT
+   typedef unsigned int uint;
+#endif
 
 #include <sys/types.h>
 
@@ -103,7 +110,7 @@ extern void __LIB__ in_MouseKempSetPos(uint xcoord, uint ycoord);
 
 /* Display Functions */
 
-extern void __LIB__  border(uchar colour); 
+extern void __LIB__ __FASTCALL__ border(uchar colour); 
 extern void __LIB__ __FASTCALL__ *scr_chardown(void *scrnaddr);
 extern void __LIB__ __FASTCALL__ *scr_charleft(void *scrnaddr);
 extern void __LIB__ __FASTCALL__ *scr_charright(void *scrnaddr);

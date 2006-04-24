@@ -60,7 +60,10 @@
  *
  */
 
-typedef unsigned char uchar;
+#ifndef _T_UCHAR
+#define _T_UCHAR
+   typedef unsigned char uchar;
+#endif
 
 /*
  * In the following:
