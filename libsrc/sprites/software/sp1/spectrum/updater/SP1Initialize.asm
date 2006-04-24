@@ -3,13 +3,8 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+INCLUDE "customize.asm"
 XLIB SP1Initialize
-XREF SP1V_IDTYPEASSOC, SP1V_SPRDRAWTBL
-XREF SP1V_UPDATELISTH, SP1V_UPDATELISTT
-XREF SP1V_UPDATEARRAY, SP1V_TILEARRAY
-XREF SP1V_ROTTBL
-XREF SP1V_DISPORIGX, SP1V_DISPORIGY
-XREF SP1V_DISPWIDTH, SP1V_DISPHEIGHT
 
 ; 1. Stores locations of idtypeassoc table and sprdraw function table
 ; 2. Constructs the rotation table if relevant flag set
@@ -24,7 +19,8 @@ XREF SP1V_DISPWIDTH, SP1V_DISPHEIGHT
 ;         bc = & sprdraw table (table of sprite draw char functions indexed by type)
 ;         de = & idtype table (table of id/type pairs that associates id with type, ends in id=0)
 ;          a = flag, bit 0 = 1 if rotation table needed, bit 1 = 1 to overwrite all tile defs
-; used  : af, bc, de, hl
+;              bit 2 = 1 to overwrite screen addresses in update structs
+; used  : af, bc, de, hl, af'
 
 .SP1Initialize
 
@@ -33,8 +29,8 @@ XREF SP1V_DISPWIDTH, SP1V_DISPHEIGHT
    ld (SP1V_IDTYPEASSOC),de
    ld (SP1V_SPRDRAWTBL),bc
 
-   rra
-   jr nc, norottbl                 ; if flag bit not set, do not construct rotation table
+   bit 0,a
+   jr z, norottbl                  ; if flag bit not set, do not construct rotation table
 
    ; construct the rotation table
   
@@ -85,7 +81,7 @@ XREF SP1V_DISPWIDTH, SP1V_DISPHEIGHT
 
    ld a,(hl)                        ; if a tile address is already present (ie non-zero entry)
    inc h                            ;   then we will skip it
-   bit 0,c
+   bit 1,c
    jr nz, overwrite                 ; unless overwrite flag set
    or (hl)
    jr nz, tilepresent
@@ -115,16 +111,16 @@ XREF SP1V_DISPWIDTH, SP1V_DISPHEIGHT
    
    ld hl,SP1V_UPDATELISTH           ; this variable points at a dummy struct sp1_update that is
    ld (SP1V_UPDATELISTT),hl
-   ld de,SP1V_UPDATELISTH+1         ; always the first struct sp1_update in the invalidated list
-   ld (hl),0
-   ld bc,8                          ; sizeof(struct sp1_update) - 1
-   ldir
+   ld hl,0
+   ld (SP1V_UPDATELISTH+5),hl       ; nothing in invalidate list
 
    ; initialize the update array
 
    pop de                           ; d = attr, e = tile
    ld b,SP1V_DISPORIGY              ; b = current row coord
    ld hl,SP1V_UPDATEARRAY           ; hl = current struct sp1_update
+   bit 2,a
+   ex af,af
    
 .rowloop
 
@@ -143,6 +139,10 @@ XREF SP1V_DISPWIDTH, SP1V_DISPHEIGHT
    ld (hl),0
    inc hl
 
+   ex af,af
+   jr z, skipscrnaddr
+   ex af,af
+   
    ld a,b                           ; compute screen address for char coord (b,c)
    rrca                             ; and store in struct sp1_update
    rrca
@@ -156,15 +156,23 @@ XREF SP1V_DISPWIDTH, SP1V_DISPHEIGHT
    or $40
    ld (hl),a
 
+.rejoinscrnaddr
+
    inc hl                           ; hl points at next struct sp1_update
    inc c                            ; next column
    ld a,c
-   cp SP1V_ORIGX + SP1V_DISPWIDTH
+   cp SP1V_DISPORIGX + SP1V_DISPWIDTH
    jr c, colloop
    
    inc b                            ; next row
    ld a,b
-   cp SP1V_ORIGY + SP1V_DISPHEIGHT
+   cp SP1V_DISPORIGY + SP1V_DISPHEIGHT
    jr c, rowloop
 
    ret
+
+.skipscrnaddr
+
+   ex af,af
+   inc hl
+   jp rejoinscrnaddr
