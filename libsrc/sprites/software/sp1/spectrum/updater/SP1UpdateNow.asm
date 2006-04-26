@@ -10,7 +10,7 @@ XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_U
 ; Iterates through the invalidated tiles list, drawing all invalidated tiles on screen.
 ;
 ; enter : none
-; uses  : af, bc, de, hl, ix
+; uses  : af, bc, de, hl, ix, b' for MaskLB and MaskRB sprites
 
 .SP1UpdateNow
 
@@ -176,7 +176,7 @@ XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_U
 
 .SP1RETSPRDRAW               ; return here after sprite char drawn
 
-   pop hl                    ; hl = & sp1_CS.next_draw (pushed by sprite draw code)
+   pop hl                    ; hl = & sp1_CS.next_in_upd (pushed by sprite draw code)
    ld a,(hl)
    or a
    jr nz, spritedrawlp       ; if there are more sprites in this char, go draw them

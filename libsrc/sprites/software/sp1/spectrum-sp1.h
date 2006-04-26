@@ -69,7 +69,7 @@ struct sp1_update {                   // "update structs" Every tile in the disp
    uchar              nload;          // +0 bit 7 = 1 for invalidated, bit 6 = 1 for removed, bits 5:0 = number of occluding sprites present + 1
    uchar              colour;         // +1 background tile attribute
    uchar              tile;           // +2 background tile character code
-   struct sp1_cs     *slist;          // +3 BIG ENDIAN ; list of sprites occupying this tile (MSB = 0 if none) at struct sp1_cs.attr_mask
+   struct sp1_cs     *slist;          // +3 BIG ENDIAN ; list of sprites occupying this tile (MSB = 0 if none) points at struct sp1_cs.attr_mask
    struct sp1_update *ulist;          // +5 BIG ENDIAN ; next update struct in list of update structs queued for draw (MSB = 0 if none)
    uchar             *screen;         // +7 address in display file where this tile is drawn
 
