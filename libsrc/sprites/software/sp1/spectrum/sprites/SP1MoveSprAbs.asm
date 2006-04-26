@@ -3,6 +3,8 @@
 ; 04.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+; *** PLEASE HELP ME I'VE BEEN MADE UGLY BY BUGFIXES
+
 XLIB SP1MoveSprAbs
 LIB SP1GetUpdateStruct
 XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
@@ -32,7 +34,7 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
    xor a
    sub c                   ; a = - (vertical rotation in pixels)
    bit 7,(ix+4)
-   jp nz, onebytedef
+   jp z, onebytedef
    sub c                   ; a = - 2*(vertical rotation) for 2-byte definitions
    set 7,c
 
@@ -63,8 +65,15 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
    
 .framerejoin
 
+   ld a,c
+   or a
+   jr z, skipadj
+   
    ld b,$ff                ; bc = negative vertical rotation offset
    add hl,bc               ; add vertical rotation offset
+
+.skipadj
+
    ld (ix+11),l
    ld (ix+12),h            ; store new effective offset for graphics pointers
    
