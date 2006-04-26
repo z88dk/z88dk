@@ -23,7 +23,7 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
 ; hl = graphic def ptr
 ; de = left graphic def ptr
 ;
-; 50 + 8*54 - 6 + 10 = 486 cycles
+; 58 + 8*54 - 6 + 10 = 494 cycles
 
 .SP1Load1LBIM
 
@@ -34,7 +34,9 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    ex de,hl
    ld h,a
    ld l,$ff
-   ld c,(hl)
+   ld a,(hl)
+   cpl
+   ld c,a
    
    ;  h = shift table
    ;  c = constant mask

@@ -33,9 +33,9 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    add hl,bc
    ex de,hl
    ld h,a
-   inc h
    ld l,$ff
    ld c,(hl)
+   inc h
    
    ;  h = shift table
    ;  c = constant mask
@@ -43,5 +43,5 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
 
 .SP1Load2RBIMRotate
 
-   jp SP1Load2LBIMData+21              ; SP1Load2LBIMRotate
+   jp SP1Load2LBIMData+23              ; SP1Load2LBIMRotate
    
