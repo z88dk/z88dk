@@ -141,6 +141,7 @@ extern void __LIB__ in_WaitForNoKey(void);
  *
  *   uchar choice, dirs;
  *   void *joyfunc;                * pointer to joystick function  *
+ *   char *joynames[];             * an array of joystick names    *
  *   struct in_UDK k;
  *
  *   k.fire = in_LookupKey('m');   * fill in keys for key joystick *
@@ -213,7 +214,7 @@ extern uint __LIB__ in_JoyKeyboard(struct in_UDK *u);
  *   Move the mouse's position to given (x,y) coord
  *
  * Functions should handle out of bounds (X,Y) coords gracefully.  Each port
- * defines macros in_MAX_X and in_MAX_Y to indicate maximum X and Y values.
+ * defines macros IN_MAX_X and IN_MAX_Y to indicate maximum X and Y values.
  *
  * Every port must implement the simulated mouse which attempts
  * to simulate a mouse using a connected joystick:
@@ -236,6 +237,7 @@ extern uint __LIB__ in_JoyKeyboard(struct in_UDK *u);
  *   uchar choice, b;
  *   void *mouseinit, *mouseread, *mousesetpos;
  *   void **mousefunc;
+ *   void *mousename[];
  *   struct in_UDM m;
  *   struct in_UDK k;
  *   uint x, y; 
@@ -307,8 +309,8 @@ extern void __LIB__ in_MouseSim(struct in_UDM *u, uchar *buttons, uint *xcoord, 
 extern void __LIB__ in_MouseSimSetPos(struct in_UDM *u, uint xcoord, uint ycoord);
 
 #ifdef SPECTRUM
-   #define in_MAX_X    255  /* largest x coord  */
-   #define in_MAX_Y    191  /* largest y coord  */
+   #define IN_MAX_X    255  /* largest x coord  */
+   #define IN_MAX_Y    191  /* largest y coord  */
    #include <spectrum.h>
 /*
    Adds: 1 in_MouseKempInit, in_MouseKemp, in_MouseKempSetPos
