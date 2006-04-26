@@ -22,8 +22,13 @@
    
    ; is this the last row?
    
-   inc a
+   ; ****************************************************************
+   ; **** FIXED BUG HERE MESSED UP REGISTER ALLOCATION, IMPROVE LATER
+   ld a,b
+   sub (ix+0)
+   cp (ix+3)
    jp nz, CCnotlastrow
+   ; ****************************************************************
    
    ; this is the last row, should it be drawn?
    
@@ -44,8 +49,8 @@
    ; has this update struct been removed from the display?
 
    bit 6,(hl)
-   jp nz, CCremoved
    ex (sp),hl
+   jp nz, CCclipcol0
    
    ; hl = & struct sp1_update.ulist (tail)
    ; stack = & struct sp1_update, row
@@ -58,9 +63,14 @@
    jp nc, CCclipcol0
    
    ; is this the last column in row?
-   
-   inc a
-   jp nz, CCnotlastcol
+
+   ; ****************************************************************
+   ; **** FIXED BUG HERE MESSED UP REGISTER ALLOCATION, IMPROVE LATER
+   ld a,c
+   sub (ix+1)
+   cp (ix+2)
+   jp nz, CCnotlastcol       ; z flag set if it is the last column in row
+   ; ****************************************************************
    
    ; this is the last column, should it be drawn?
    
@@ -142,7 +152,7 @@
    ld (hl),e
    ld hl,5
    add hl,de                 ; hl = & struct sp1_update.ulist
-;;;   ld (hl),0                 ; nothing after this one in list
+   ld (hl),0                 ; nothing after this one in list
    exx
 
 .CCnoinvnew
@@ -225,28 +235,6 @@
    
    jp CCrowloop
 
-.CCremoved
-
-   ex (sp),hl
-   exx
-   
-   ; hl = & struct sp1_cs
-   ; stack = & struct sp1_update, row
-
-   ld d,(hl)
-   inc hl
-   ld e,(hl)
-   ld bc,4
-   add hl,bc
-   pop bc
-
-   ; bc = & struct sp1_update
-   ; hl = & struct sp1_cs.type
-   ; de = & next struct sp1_cs
-   ; stack = row
-
-   jp CCalreadyinv66
-
 .CCnoremovenec0
 
    ; hl = & struct sp1_cs.update
@@ -317,13 +305,20 @@
    or a
    jr z, CCskipremoveit
 
+   ld b,a
+   inc hl
+   ld c,(hl)
+
    ; need to remove this spr char from update list
 
    ; de = & next struct sp1_cs in sprite
-   ; hl = & struct sp1_cs.update
+   ; hl = & struct sp1_cs.update + 1
+   ; bc = & old struct sp1_update
    ; stack = & struct sp1_update, row
 
+   push bc
    push de
+   dec hl
    ld (hl),0                 ; this spr char no longer belongs to update struct
    inc hl
    inc hl
@@ -333,15 +328,14 @@
    call RemoveSprChar
    pop hl                    ; hl = & struct sp1_cs.type
    pop de                    ; de = & next struct sp1_cs
+   pop bc                    ; bc = & old struct sp1_update
    
    ; invalidate so char is redrawn without sprite
-   
-   pop bc                    ; bc = & struct sp1_update
 
    ld a,(bc)
    bit 7,(hl)                ; is spr char occluding type?
    jp z, CCnotoccl44
-   dec a                     ; number of occluding sprites in update struct --
+   dec a                     ; number of occluding sprites in old update struct --
    ld (bc),a
 
 .CCnotoccl44
@@ -363,11 +357,11 @@
 
 .CCalreadyinv66
 
-   ; bc = & struct sp1_update
    ; hl = & struct sp1_cs.type
    ; de = & next struct sp1_cs
-   ; stack = row
+   ; stack = & struct sp1_update, row
    
+   pop bc
    bit 6,(hl)                ; last column in row?
    jp nz, CCnextrow
 
@@ -391,7 +385,6 @@
    inc hl
    inc hl
    inc hl
-   pop bc
    
    jp CCalreadyinv66
 
@@ -479,11 +472,18 @@
 
    ; need to remove this spr char from update list
 
+   ld b,a
+   inc hl
+   ld c,(hl)
+   
    ; de = & next struct sp1_cs in sprite
-   ; hl = & struct sp1_cs.update
+   ; hl = & struct sp1_cs.update + 1
+   ; bc = & old struct sp1_update
    ; stack = & struct sp1_update, row
 
+   push bc
    push de
+   dec hl
    ld (hl),0                 ; spr char no longer belongs to update struct
    inc hl
    inc hl
@@ -493,11 +493,9 @@
    call RemoveSprChar
    pop hl                    ; hl = & struct sp1_cs.type
    pop de                    ; de = & next struct sp1_cs
+   pop bc                    ; bc = & old struct sp1_update
    
    ; invalidate so char is redrawn without sprite
-   
-   pop bc                    ; bc = & struct sp1_update
-   push bc
 
    ld a,(bc)
    bit 7,(hl)                ; is spr char occluding type?

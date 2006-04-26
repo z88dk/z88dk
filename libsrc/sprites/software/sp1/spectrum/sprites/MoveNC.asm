@@ -23,8 +23,13 @@
    
    ; is this the last row?
    
-   inc a
+   ; ****************************************************************
+   ; **** FIXED BUG HERE MESSED UP REGISTER ALLOCATION, IMPROVE LATER
+   ld a,b
+   sub (ix+0)
+   cp (ix+3)
    jp nz, NCnotlastrow
+   ; ****************************************************************
    
    ; this is the last row, should it be drawn?
    
@@ -45,8 +50,8 @@
    ; has this update struct been removed from the display?
    
    bit 6,(hl)
-   jr nz, NCremoved
    ex (sp),hl
+   jr nz, NCclipcol0
 
    ; hl = & struct sp1_update.ulist (tail)
    ; stack = & struct sp1_update, row
@@ -59,9 +64,14 @@
    jr nc, NCclipcol0
    
    ; is this the last column in row?
-   
-   inc a                     ; z flag set if it is the last column in row
-   jp nz, NCnotlastcol
+
+   ; ****************************************************************
+   ; **** FIXED BUG HERE MESSED UP REGISTER ALLOCATION, IMPROVE LATER
+   ld a,c
+   sub (ix+1)
+   cp (ix+2)
+   jp nz, NCnotlastcol       ; z flag set if it is the last column in row
+   ; ****************************************************************
    
    ; this is the last col, should it be drawn?
    
@@ -145,22 +155,6 @@
    ex (sp),hl
 
    jp NCcolloop
-
-.NCremoved
-
-   ex (sp),hl
-   exx
-   
-   ; hl = & struct sp1_cs
-   ; stack = & struct sp1_update, row
-   
-   ld d,(hl)
-   inc hl
-   ld e,(hl)                 ; de = & next struct sp1_cs in sprite
-   ld bc,4
-   add hl,bc                 ; hl = & struct sp1_cs.type
-   
-   jp NCrejoinremove
 
 .NCclipcol1
 
@@ -255,10 +249,8 @@
    push bc
    ld b,h
    ld c,l                    ; bc = & struct sp1_cs.attr_mask
-   ex de,hl
-   inc hl
-   inc hl
-   inc hl                    ; hl = & struct sp1_update.slist
+   ld hl,3
+   add hl,de                 ; hl = & struct sp1_update.slist
    call AddSprChar           ; add sprite to update list
    pop de
    pop bc
