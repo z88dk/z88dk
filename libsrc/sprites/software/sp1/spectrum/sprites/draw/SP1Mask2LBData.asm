@@ -23,7 +23,7 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
 ; hl = graphic def ptr
 ; de = left graphic def ptr
 ;
-; 32 + 150*4 - 6 + 10 = 636 cycles
+; 62 + 174*4 - 6 + 10 = 762 cycles
 
 .SP1Mask2LB
 
@@ -35,6 +35,13 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
 
    ;  d = shift table
    ; hl = sprite def (mask,graph) pairs
+   
+   ld e,$ff
+   ld a,(de)
+   cpl
+   exx
+   ld b,a
+   exx
 
 .SP1Mask2LBRotate
 
@@ -44,6 +51,9 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    ld e,(hl)
    inc hl
    ld a,(de)
+   exx
+   or b
+   exx
    and c
    ld c,a
    ld e,(hl)
@@ -54,6 +64,9 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    ld e,(hl)
    inc hl
    ld a,(de)
+   exx
+   or b
+   exx
    and b
    ld b,a
    ld e,(hl)
@@ -68,6 +81,9 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    ld e,(hl)
    inc hl
    ld a,(de)
+   exx
+   or b
+   exx
    and c
    ld c,a
    ld e,(hl)
@@ -78,6 +94,9 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    ld e,(hl)
    inc hl
    ld a,(de)
+   exx
+   or b
+   exx
    and b
    ld b,a
    ld e,(hl)
@@ -92,6 +111,9 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    ld e,(hl)
    inc hl
    ld a,(de)
+   exx
+   or b
+   exx
    and c
    ld c,a
    ld e,(hl)
@@ -102,6 +124,9 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    ld e,(hl)
    inc hl
    ld a,(de)
+   exx
+   or b
+   exx
    and b
    ld b,a
    ld e,(hl)
@@ -116,6 +141,9 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    ld e,(hl)
    inc hl
    ld a,(de)
+   exx
+   or b
+   exx
    and c
    ld c,a
    ld e,(hl)
@@ -126,6 +154,9 @@ XREF SP1RETSPRDRAW, SP1V_ROTTBL, SP1V_PIXELBUFFER
    ld e,(hl)
    inc hl
    ld a,(de)
+   exx
+   or b
+   exx
    and b
    ld b,a
    ld e,(hl)
