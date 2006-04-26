@@ -45,6 +45,7 @@ XREF SP1RETSPRDRAW, SP1V_PIXELBUFFER
    ldi
    inc hl
    ldi
+   inc hl
    ld a,(hl)
    ld (de),a
 
