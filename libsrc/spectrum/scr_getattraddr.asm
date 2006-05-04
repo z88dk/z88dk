@@ -11,15 +11,13 @@ XLIB scr_getattraddr
 ;
 ; enter: hl = screen address
 ; exit : hl = address of attribute square
-; uses : af, de, hl
+; uses : af, hl
 
-   ld e,l
    ld a,h
    or $07
    xor $85
    rrca
    rrca
    rrca
-   ld d,a
-   ex de,hl
+   ld h,a
    ret

@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.10 2006-04-24 05:56:05 aralbrec Exp $
+ * $Id: spectrum.h,v 1.11 2006-05-04 19:47:16 aralbrec Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -110,7 +110,10 @@ extern void __LIB__ in_MouseKempSetPos(uint xcoord, uint ycoord);
 
 /* Display Functions */
 
-extern void __LIB__ __FASTCALL__ border(uchar colour); 
+extern void __LIB__ __FASTCALL__ border(uchar colour);
+
+/* Manipulating Screen (Pixel) Addresses */
+
 extern void __LIB__ __FASTCALL__ *scr_chardown(void *scrnaddr);
 extern void __LIB__ __FASTCALL__ *scr_charleft(void *scrnaddr);
 extern void __LIB__ __FASTCALL__ *scr_charright(void *scrnaddr);
@@ -122,5 +125,14 @@ extern void __LIB__ __FASTCALL__ *scr_pixeldown(void *scrnaddr);
 extern void __LIB__ __FASTCALL__ *scr_pixelup(void *scrnaddr);
 extern void __LIB__ *scr_pixelleft(void *scrnaddr, uchar *mask);
 extern void __LIB__ *scr_pixelright(void *scrnaddr, uchar *mask);
+
+/* Manipulating Attribute Addresses */
+
+extern void __LIB__ *attr_getcharaddr(uchar row, uchar col);
+extern void __LIB__ __FASTCALL__ *attr_chardown(void *attraddr);
+extern void __LIB__ __FASTCALL__ *attr_charleft(void *attraddr);
+extern void __LIB__ __FASTCALL__ *attr_charright(void *attraddr);
+extern void __LIB__ __FASTCALL__ *attr_charup(void *attraddr);
+extern void __LIB__ __FASTCALL__ *attr_getscrnaddr(void *attraddr);
 
 #endif

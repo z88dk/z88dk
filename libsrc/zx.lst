@@ -214,8 +214,15 @@ spectrum/scr_pixeldown
 spectrum/scr_pixelup
 spectrum/scr_pixelleft
 spectrum/scr_pixelright
+spectrum/attr_getcharaddr
+spectrum/attr_chardown
+spectrum/attr_charleft
+spectrum/attr_charright
+spectrum/attr_charup
+spectrum/attr_getscrnaddr
 spectrum/SCRgetcharaddr
 spectrum/SCRgetscrnaddr
 spectrum/SCRpixelleft
 spectrum/SCRpixelright
+spectrum/ATTRgetcharaddr
 printflike/ltoa_any
