@@ -93,7 +93,7 @@ LIB in_keytranstbl
 
 .keyhitB
    ld b,0
-   ld hl,rowtbl - $e0
+   ld hl,rowtbl-$e0
    add hl,bc
    ld a,(hl)
    cp 5
@@ -124,9 +124,9 @@ LIB in_keytranstbl
    ld h,0
    ret
 
-.here    ; because I can't remember the symbol z80asm uses for current PC
-defc rowtbl = here - 15
-
+.rowtbl
+   defb 255,255,255,255,255,255,255
+   defb 255,255,255,255,255,255,255,255
    defb 4,255,255,255,255,255,255
    defb 255,3,255,255,255,2,255,1
    defb 0,255
