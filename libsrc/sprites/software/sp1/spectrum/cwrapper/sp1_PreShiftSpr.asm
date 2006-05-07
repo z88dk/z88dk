@@ -3,7 +3,7 @@
 ; 04.2006 aralbrec, Sprite Pack v3.0
 ; Sinclair Spectrum version
 
-; void *sp1_PreShiftSpr(struct sp1_ss *s, uchar rshift, void *destaddr)
+; void *sp1_PreShiftSpr(uchar flag, uchar height, uchar width, void *srcframe, void *destframe, uchar rshift)
 
 XLIB sp1_PreShiftSpr
 LIB SP1PreShiftSpr
@@ -12,28 +12,37 @@ LIB SP1PreShiftSpr
 
    ld hl,2
    add hl,sp
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld iyl,e
-   ld iyh,d
    ld a,(hl)
    inc hl
    inc hl
    ld e,(hl)
    inc hl
    ld d,(hl)
-   ld ixl,e
-   ld ixh,d
+   inc hl
+   ld iyl,e
+   ld iyh,d
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   ld b,(hl)
+   inc hl
+   inc hl
+   ld c,(hl)
+   inc hl
+   inc hl
+   ld h,(hl)
+   ld l,c
    call SP1PreShiftSpr
-   push iy
-   pop hl
+   ld e,iyl
+   ld d,iyh
+   ex de,hl
    ret
 
-; enter : ix = & struct sp1_ss
+; enter :  a = right shift amount (0-7)
+;          b = width in characters (# columns)
+;          h = zero for 1-byte definition; otherwise 2-byte
+;         de = source frame graphic
 ;         iy = destination frame address
-;          a = right shift amount (will be mod 8 here)
-; exit  : iy = next free address after new frame
-
-
+;          l = height in characters
+; exit  : iy = next available address

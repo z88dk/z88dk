@@ -231,7 +231,7 @@ extern void               __LIB__   sp1_GetSprClrAddr(struct sp1_ss *s, uchar **
 extern void               __LIB__   sp1_PutSprClr(uchar **sprdest, struct sp1_ap *src, uchar n);
 extern void               __LIB__   sp1_GetSprClr(uchar **sprsrc, struct sp1_ap *dest, uchar n);
 
-extern void               __LIB__  *sp1_PreShiftSpr(struct sp1_ss *s, uchar rshift, void *destaddr);
+extern void               __LIB__  *sp1_PreShiftSpr(uchar flag, uchar height, uchar width, void *srcframe, void *destframe, uchar rshift);
 
 ///////////////////////////////////////////////////////////
 //                       TILES                           //

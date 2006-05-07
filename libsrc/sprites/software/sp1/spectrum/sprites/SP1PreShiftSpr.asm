@@ -1,177 +1,129 @@
 
 ; SP1PreShiftSpr
-; 04.2006 aralbrec, Sprite Pack v3.0
+; 05.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
 XLIB SP1PreShiftSpr
 
-; Create copy of sprite's graphics shifted right 0-7
-; pixels and store at destination address specified.
-; The destination address can serve as a sprite frame
-; address in the move sprite functions.
-;
-; There should be R*C*(8 or 16) bytes of free memory at
-; the destination address for the new frame where R and
-; C are the row and column sizes of the sprite in chars.
-;
-; enter : ix = & struct sp1_ss
-;         iy = destination frame address
-;          a = right shift amount (will be mod 8 here)
-; exit  : iy = next free address after new frame
+; enter :  a = right shift amount (0-7)
+;          b = width in characters (# columns)
+;          h = zero for 1-byte definition; otherwise 2-byte
+;         de = source frame graphic
+;         iy = desitnation frame address
+;          l = height in characters
+; exit  : iy = next available address
+; uses  : af, bc, de, hl, af', iy
 
 .SP1PreShiftSpr
 
    and $07
-   ld c,a                    ; c = right shift amount
-
-   ld h,(ix+15)
-   ld l,(ix+16)              ; hl = & first struct sp1_cs in sprite
-
-.collp
-
-   push hl                   ; stack first sp1_cs in column
+   inc a
+   ld c,a                    ; c = right shift amount + 1
    
-.docolumn
-
-   ; ix = & struct sp1_ss
-   ; hl = & struct sp1_cs
-   ;  c = right shift amount
-   ; iy = destination address
-   
-   push hl
-   
-   ; stack = & struct sp1_cs, 1st in col
-
-   ld de,16
-   add hl,de
-   ld d,(hl)
-   dec hl
-   ld e,(hl)                 ; de = left char graphic ptr
-   
-   ld a,d                    ; if there is no left char graphic this is LB
-   or a
-   jr nz, notLB
-   ld de,dummychar1          ; so use a blank dummy char for graphic
-   bit 7,(ix+4)
-   jr z, notLB
-   ld de,dummychar2          ; use 2-byte definition dummy char
-
-.notLB
-
-   dec hl
-   dec hl
-   dec hl
-   ld a,(hl)
-   dec hl
-   ld l,(hl)
-   ld h,a                    ; hl = char graphic ptr
-
-   or a                      ; if there is no graphic in the char this is RB
-   jr z, notRB
-   ld hl,dummychar1          ; so use blank dummy char for graphic
-   bit 7,(ix+4)
-   jr z, notRB
-   ld hl,dummychar2          ; use 2-byte definition dummy char
-   
-.notRB
-
-   ld a,8
-   bit 7,(ix+4)              ; is it a 2-byte definition?
+   ld a,l
+   inc h
+   dec h
+   ld hl,dummy1byte          ; point at two 0 bytes if 1-byte def
    jr z, onebyte
-   add a,a                   ; a = # bytes per char
+   add a,a
+   ld hl,dummy2byte          ; point at (255,0) pair if 2-byte def
    
 .onebyte
 
-   ld b,c                    ; b = shift amount
-   
-.charloop
+   add a,a
+   add a,a
+   add a,a                   ; a = # bytes in graphic definition in each column
+      
+.dofirstcol                  ; first column has no graphics on left, will use dummy bytes for left
 
-   ex af,af                  ; a' = height of char (8 or 16)
-   push bc
+   push af                   ; save height of column in bytes
+   push de                   ; save top of first column
 
-   ld c,(hl)                 ; c = char graphic
-   inc hl
+.firstcolloop
 
-   ld a,(de)                 ; a = left graphic
+   ex af,af                  ; a' = pixel height
+
+   push bc                   ; save width and rotation amount
+   ld b,c                    ; b = right shift + 1
+   ld c,(hl)                 ; c = graphic byte from col on left
+   ld a,1
+   xor l
+   ld l,a
+   ld a,(de)                 ; a = graphic byte in current col
    inc de
+   djnz firstsloop
+   jp firstdoneshift
 
-   inc b
-   djnz shiftdone            ; in case right shift amount = 0
+.firstsloop
 
-.shiftloop
-
-   rra
    rr c
-   djnz shiftloop
+   rra
+   djnz firstsloop
 
-.shiftdone
+.firstdoneshift
 
-   ; c = shifted char graphic
-   
-   ld (iy+0),c               ; store at destination address
+   ld (iy+0),a               ; store shifted graphic in destination frame
    inc iy
    
    pop bc
    ex af,af
    dec a
-   jp nz, charloop
+   jr nz, firstcolloop
 
-   ; ix = & struct sp1_ss
-   ; iy = destination address
-   ;  c = right shift amount
-   ; stack = & struct sp1_cs, 1st in col
+   pop hl
+   pop af
+   djnz nextcol
+   
+   ret
 
-   pop hl                    ; hl = & struct sp1_cs   
-   ld b,(ix+2)               ; b = width of sprite in chars
-   
-   ; find struct sp1_cs directly underneath in same column
-   
-.nextincollp
+.nextcol                     ; do rest of columns
 
-   ld a,(hl)
-   or a
-   jp z, endcol
+   push af
+   push de
+
+;  a = height in pixels
+; de = graphic definition for this column
+; hl = graphic definition for column to left
+;  b = width remaining in characters
+;  c = right shift amount + 1
+
+.colloop
+
+   ex af,af
    
+   push bc
+   ld b,c
+   ld a,(de)
+   inc de
+   ld c,(hl)
    inc hl
-   ld l,(hl)
-   ld h,a
+   djnz sloop
+   jp doneshift
+
+.sloop
+
+   rr c
+   rra
+   djnz sloop
+
+.doneshift
+
+   ld (iy+0),a
+   inc iy
    
-   djnz nextincollp
+   pop bc
+   ex af,af
+   dec a
+   jr nz, colloop
 
-   ; hl = & next struct sp1_cs in column
-   ;  c = right shift
-   ; iy = dest address
-   ; ix = & struct sp1_ss
-   ; stack = 1st in col
+   pop hl
+   pop af
+   djnz nextcol
 
-   jp docolumn
+   ret
 
-.endcol
-
-   ;  c = right shift
-   ; iy = dest address
-   ; ix = & struct sp1_ss
-   ; stack = 1st in col
-   
-   pop hl                    ; hl = first sp1_cs in column just done
-   ld d,(hl)
-   inc hl
-   ld e,(hl)                 ; de = & struct sp1_cs in next column
-   inc hl
-   inc hl
-   inc hl
-   inc hl                    ; hl = & sp1_cs.type
-   
-   bit 6,(hl)                ; if the last column was just done
-   ret nz                    ;   we're finished
-
-   ex de,hl
-   jp collp
-
-.dummychar1                  ; just graphics
-
-   defb 0,0,0,0,0,0,0,0
-
-.dummychar2                  ; (mask,graph) pairs
-
-   defb 255,0,255,0,255,0,255,0,255,0,255,0,255,0,255,0
+   defb 0
+.dummy1byte
+   defb 0,0
+.dummy2byte
+   defb 255,0
