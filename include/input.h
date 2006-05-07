@@ -103,9 +103,9 @@
 extern uint __LIB__ in_GetKey(void);
 extern uint __LIB__ in_GetKeyReset(void);
 extern uint __LIB__ in_Inkey(void);
-extern unit __LIB__ __FASTCALL__ in_KeyPressed(uint scancode);
-extern unit __LIB__ __FASTCALL__ in_LookupKey(uchar c);
-extern uint __LIB__ __FASTCALL__ in_Pause(unit ticks);
+extern uint __LIB__ __FASTCALL__ in_KeyPressed(uint scancode);
+extern uint __LIB__ __FASTCALL__ in_LookupKey(uchar c);
+extern uint __LIB__ __FASTCALL__ in_Pause(uint ticks);
 extern void __LIB__ __FASTCALL__ in_Wait(uint ticks);
 extern void __LIB__ in_WaitForKey(void);
 extern void __LIB__ in_WaitForNoKey(void);
