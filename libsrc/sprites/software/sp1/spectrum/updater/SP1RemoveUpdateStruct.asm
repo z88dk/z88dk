@@ -16,8 +16,9 @@ XLIB SP1RemoveUpdateStruct
 .SP1RemoveUpdateStruct
 
    ld (hl),$c1           ; invalidated & removed, # occluding sprites + 1 = 1
-   ld de,5
-   add hl,de             ; hl = sprite list
+   inc hl
+   inc hl
+   inc hl                ; hl = sprite list
 
    ld a,(hl)
    ld (hl),0             ; mark no sprites in this update struct
