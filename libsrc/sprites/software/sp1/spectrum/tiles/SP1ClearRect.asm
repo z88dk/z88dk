@@ -122,8 +122,8 @@ XDEF SP1CRSELECT
 .OPTION4                                             ; sprite only
 
    ld a,(hl)
-   and $80
-   inc a                                             ; keep bit 7 flag, occluding spr count reset to 1
+   and $c0
+   inc a                                             ; keep bit 6:7 flag, occluding spr count reset to 1
    ld (hl),a
    inc hl
    inc hl
