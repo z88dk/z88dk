@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.72 2005-09-28 00:48:14 aralbrec Exp $
+# $Id: Makefile,v 1.73 2006-05-23 03:36:35 aralbrec Exp $
 
 
 all:	genlibs z88libs tilibs zxlibs \
@@ -19,7 +19,8 @@ all:	genlibs z88libs tilibs zxlibs \
 	pps_clib.lib ppsansi_clib.lib embedded_clib.lib \
 	zx81_clib.lib zx81ansi_clib.lib
 
-genlibs: gen_math.lib malloc.lib z80_crt0.lib ndos.lib adt.lib balloc.lib im2.lib 
+genlibs: gen_math.lib malloc.lib z80_crt0.lib ndos.lib adt.lib balloc.lib \
+         im2.lib rect.lib
 
 z88libs: z88_math.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib \
 	 z88ansi_clib.lib gfx.lib 
@@ -35,12 +36,12 @@ zxlibs: zx_clib.lib zxan_clib.lib zxvgs.lib zx_math.lib zx_mathtiny.lib
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.72 2005-09-28 00:48:14 aralbrec Exp $
+#  $Id: Makefile,v 1.73 2006-05-23 03:36:35 aralbrec Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.72 2005-09-28 00:48:14 aralbrec Exp $
+# $Id: Makefile,v 1.73 2006-05-23 03:36:35 aralbrec Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -54,7 +55,7 @@ gfxdeps:
 	$(RM) -f graphics/text/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.72 2005-09-28 00:48:14 aralbrec Exp $
+#  $Id: Makefile,v 1.73 2006-05-23 03:36:35 aralbrec Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -66,6 +67,13 @@ tideps:
 	$(RM) -f graphics/gray/*.o
 	$(RM) -f graphics/gray/ticalc/*.o
 
+
+# rectangles, intervals and points - aralbrec
+rect.lib:
+	@echo ''
+	@echo '--- Building Rectangles Library  ---'
+	@echo ''
+	cd rect ; $(MAKE) ; cd ..
 
 # abstract data types library - aralbrec
 adt.lib:
@@ -899,6 +907,7 @@ clean:
 	cd adt ; $(MAKE) clean ; cd ..
 	cd balloc ; $(MAKE) clean ; cd ..
 	cd im2 ; $(MAKE) clean ; cd ..
+	cd rect ; $(MAKE) clean ; cd ..
 
 install:
 	cp *.lib ../lib/clibs
