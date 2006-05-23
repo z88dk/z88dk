@@ -62,7 +62,7 @@ defc SP1V_SPRDRAWTBL    = $d4f5            ; address of 2-byte variable holding 
 ;  * d4f5 - d4f6  SP1.LIB  sprite draw function table (indexed by type) address
 ; d4e5 - d4ed     --free-  11 bytes
 ; d4d4 - d4e4     IM2.LIB  generic isr with one hook
-; d401 - d4d3     --free-  228 bytes
+; d401 - d4d3     --free-  211 bytes
 ; d300 - d400     IM2.LIB  im 2 vector table
 ; d100 - d2ff     -------  z80 stack (512 bytes) set SP=d300
 ;

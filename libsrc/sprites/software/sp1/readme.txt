@@ -8,13 +8,10 @@ z88dk license applies
 
 // DOCUMENTATION
 
-Documentation is in {z88dk}/doc/sp1.txt (when it is
-written :-P an earlier version is documented at
-http://www.geocities.com/aralbrec which will give a
-good idea of how things work, although there are
-changes and new features in this successor version).
-I also plan to place some test programs in
-{z88dk}/examples.
+Docs and test programs will be located in the docs
+and test directories respectively, as they are
+written.  Yes, this note was required because
+there is little there at the moment :)
 
 // OVERVIEW
 
