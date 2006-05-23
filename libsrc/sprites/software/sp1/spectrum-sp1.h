@@ -5,7 +5,7 @@
 ///////////////////////////////////////////////////////////
 //                  SPRITE PACK v3.0                     //
 //             Sinclair Spectrum Version                 //
-//               aralbrec - April 2006                   //
+//            aralbrec - April / May 2006                //
 ///////////////////////////////////////////////////////////
 //
 // This library implicity allocates and deallocates memory
@@ -37,6 +37,8 @@
 //
 ///////////////////////////////////////////////////////////
 
+#include <rect.h>
+
 #ifndef _T_UCHAR
 #define _T_UCHAR
    typedef unsigned char uchar;
@@ -47,7 +49,7 @@
    typedef unsigned int uint;
 #endif
 
-struct sp1_Rect {                     // only here until rectangles lib completed
+struct sp1_Rect {
 
    uchar row;
    uchar col;
@@ -144,8 +146,8 @@ struct sp1_tp {                       // "tile pairs" A struct to hold backgroun
 
 struct sp1_pss {                      // "print string struct" A struct holding print state information
 
-   struct sp1_Rect    *bounds;        // +0 rectangular boundary within which printing will be confined
-   uchar              flags;          // +2 bit 0=invalidate?, 1=xwrap?, 2=yinc?, 3=onscreen? (reserved), 4=ywrap?
+   struct sp1_Rect    *bounds;        // +0 rectangular boundary within which printing will be allowed
+   uchar              flags;          // +2 bit 0=invalidate?, 1=xwrap?, 2=yinc?, 3=ywrap?
    uchar              x;              // +3 current x coordinate of cursor with respect to top left corner of bounds
    uchar              y;              // +4 current y coordinate of cursor with respect to top left corner of bounds
    uchar              attr_mask;      // +5 current attribute mask
@@ -234,16 +236,48 @@ extern void               __LIB__   sp1_GetSprClr(uchar **sprsrc, struct sp1_ap 
 extern void               __LIB__  *sp1_PreShiftSpr(uchar flag, uchar height, uchar width, void *srcframe, void *destframe, uchar rshift);
 
 ///////////////////////////////////////////////////////////
+//                COLLISION DETECTION                    //
+///////////////////////////////////////////////////////////
+
+// These are adapter functions for the rectangles library.
+// You must link to the rectangles library during compilation
+// if you use these functions "-lrect".
+
+// Collision is detected for non-zero return values
+// and carry flag set.
+
+// Notice that each struct_sp1_ss begins with a struct_sp1_Rect,
+// meaning a struct_sp1_ss can be used where struct_sp1_Rect
+// appears below.
+
+extern int  __LIB__ sp1_IsPtInRect(uchar x, uchar y, struct sp1_Rect *r);
+extern int  __LIB__ sp1_IsPt8InRect(uint x, uint y, struct sp1_Rect *r);   // point coords divided by 8
+extern int  __LIB__ sp1_IsRectInRect(struct sp1_Rect *r1, struct sp1_Rect *r2);
+extern int  __LIB__ sp1_IntersectRect(struct sp1_Rect *r1, struct sp1_Rect *r2, struct sp1_Rect *result);
+
+// straight conversions from struct sp1_Rect to struct r_Rect8/16
+
+extern void __LIB__ sp1_MakeRect8(struct sp1_Rect *s, struct r_Rect8 *r);
+extern void __LIB__ sp1_MakeRect16(struct sp1_Rect *s, struct r_Rect16 *r);
+
+// conversions from struct sp1_ss to struct r_Rect8/16 with character coordinates changed to pixel coordinates
+// horizontal and vertical rotation also added to pixel coordinate origin
+
+extern void __LIB__ sp1_MakeRect8Pix(struct sp1_ss *s, struct r_Rect8 *r);
+extern void __LIB__ sp1_MakeRect16Pix(struct sp1_ss *s, struct r_Rect16 *r);
+
+///////////////////////////////////////////////////////////
 //                       TILES                           //
 ///////////////////////////////////////////////////////////
 
-#define SP1_RFLAG_TILE     0x01
-#define SP1_RFLAG_COLOUR   0x02
-#define SP1_RFLAG_SPRITE   0x04
+#define SP1_RFLAG_TILE          0x01
+#define SP1_RFLAG_COLOUR        0x02
+#define SP1_RFLAG_SPRITE        0x04
 
-#define SP1_PSSFLAG_XWRAP  0x01
-#define SP1_PSSFLAG_YWRAP  0x08
-#define SP1_PSSFLAG_YINC   0x02
+#define SP1_PSSFLAG_INVALIDATE  0x01
+#define SP1_PSSFLAG_XWRAP       0x02
+#define SP1_PSSFLAG_YINC        0x04
+#define SP1_PSSFLAG_YWRAP       0x08
 
 extern void  __LIB__  *sp1_TileEntry(uchar c, uchar *def);
 
@@ -254,7 +288,7 @@ extern uchar __LIB__   sp1_ScreenAttr(uchar row, uchar col);
 extern uint  __LIB__   sp1_Screen(uchar row, uchar col);
 
 extern void  __LIB__   sp1_PrintString(struct sp1_pss *ps, uchar *s);
-extern void  __LIB__   sp1_ComputePos(struct sp1_pss *ps, uchar row, uchar col);
+extern void  __LIB__   sp1_SetPrintPos(struct sp1_pss *ps, uchar row, uchar col);
 
 extern void  __LIB__   sp1_GetTiles(struct sp1_Rect *r, struct sp1_tp *dest);
 extern void  __LIB__   sp1_PutTiles(struct sp1_Rect *r, struct sp1_tp *src);
