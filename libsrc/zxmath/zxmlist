@@ -19,6 +19,7 @@ dmul
 dsub
 dswap
 exp
+f_yesno
 fabs
 float
 floor

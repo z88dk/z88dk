@@ -4,7 +4,7 @@
 ;
 ;       9/12/02 - Stefano Bodrato
 ;
-;       $Id: deq.asm,v 1.1 2003-03-24 09:17:40 stefano Exp $
+;       $Id: deq.asm,v 1.2 2006-05-23 19:45:32 stefano Exp $
 ;
 
 
@@ -17,6 +17,7 @@ ENDIF
                 XLIB    deq
 
                 LIB	fsetup
+                LIB	f_yesno
 
 .deq
         call    fsetup
@@ -24,9 +25,4 @@ ENDIF
 	defb	ZXFP_NOT
 	defb	ZXFP_END_CALC
 
-	call	ZXFP_FP_TO_BC
-	
-        ld	h,b
-        ld	l,c
-        
-	ret
+	jp	f_yesno
