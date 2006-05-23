@@ -6,7 +6,7 @@
 ;	Find the first free sector in the specified drive map
 ;
 ;	
-;	$Id: if1_find_sector_map.asm,v 1.1 2005-11-21 11:49:40 stefano Exp $
+;	$Id: if1_find_sector_map.asm,v 1.2 2006-05-23 21:47:25 stefano Exp $
 ;
 
 

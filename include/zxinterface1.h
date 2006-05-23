@@ -5,7 +5,7 @@
  *
  *      Stefano Bodrato - 6/9/2004
  *
- *	$Id: zxinterface1.h,v 1.2 2005-02-18 08:30:10 stefano Exp $
+ *	$Id: zxinterface1.h,v 1.3 2006-05-23 21:47:25 stefano Exp $
  */
 
 
@@ -93,6 +93,9 @@ extern int __LIB__ if1_load_sector (int drive, int sector, struct M_CHAN buffer)
 // Write the sector in "buffer"
 extern int __LIB__ if1_write_sector (int drive, int sector, struct M_CHAN buffer);
 
+// Add a record containing the data in "buffer"
+extern int __LIB__ if1_write_record (int drive, struct M_CHAN buffer);
+
 // Put a 10 characters file name at the specified location; return with the file name length
 extern int __LIB__ if1_setname(char* name, char *location);
 
@@ -100,6 +103,9 @@ extern char __LIB__ *if1_getname(char *location);
 
 // Delete a file
 extern int __LIB__ if1_remove_file(int drive, char *filename);
+
+// Create a file if not existing
+extern int __LIB__ if1_touch_file(int drive, char *filename);
 
 
 #endif /* _ZXINTERFACE1_H */

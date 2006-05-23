@@ -8,7 +8,7 @@
  *	Stefano, Oct 2001 - First release
  *	         Dec 2001 - Added Mattel Aquarius
  *
- *	$Id: sound.h,v 1.6 2001-12-28 09:46:28 stefano Exp $
+ *	$Id: sound.h,v 1.7 2006-05-23 21:47:25 stefano Exp $
  */
 
 
@@ -19,7 +19,15 @@
 extern __LIB__ bit_open();
 extern __LIB__ bit_close();
 extern __LIB__ bit_click();
+
+/* Sound effects; every library contains 8 different sounds (effect no. 0..7) */
 extern __LIB__ bit_fx(int effect);
+extern __LIB__ bit_fx2(int effect);
+extern __LIB__ bit_fx3(int effect);
+extern __LIB__ bit_fx4(int effect);
+
+/* 1 BIT SYNTH - Polyphony and multitimbric effects */
+extern __LIB__ bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4);
 
 /* "period": the higher value, the lower tone ! */
 extern __LIB__ bit_beep(int duration, int period);

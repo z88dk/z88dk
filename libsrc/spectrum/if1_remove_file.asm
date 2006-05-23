@@ -5,7 +5,7 @@
 ;
 ;	int if1_remove (int drive, char *filename);
 ;	
-;	$Id: if1_remove_file.asm,v 1.1 2005-02-18 08:35:53 stefano Exp $
+;	$Id: if1_remove_file.asm,v 1.2 2006-05-23 21:47:25 stefano Exp $
 ;
 
 
@@ -21,9 +21,13 @@
 filename:	defs	10
 
 if1_remove_file:
-		POP	af
-		POP	de	;filename
-		POP	bc	;driveno
+
+		rst	8
+		defb 	31h		; Create Interface 1 system vars if required
+
+		pop	af
+		pop	de	;filename
+		pop	bc	;driveno
 		push	bc
 		push	de
 		push	af
@@ -37,9 +41,7 @@ if1_remove_file:
 		call	if1_setname
 		ld	($5cda),hl	; length
 		pop	de
-
-		ld	hl,filename	; addr of file name
-		ld	(5CDCh),hl	; pointer to filename
+		ld	($5cdc),hl	; pointer to filename
 
 		call	if1_rommap
 		call	ERASEM

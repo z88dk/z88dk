@@ -9,7 +9,7 @@
 ;	... no timestamp, just opens a file creating it if necessary and closes it immediately.
 ;	A temp buffer in the BASIC area is created and destroyed, so don't locate your code too low.
 ;	
-;	$Id: if1_touch_file.asm,v 1.1 2006-02-06 06:16:00 stefano Exp $
+;	$Id: if1_touch_file.asm,v 1.2 2006-05-23 21:47:26 stefano Exp $
 ;
 
 

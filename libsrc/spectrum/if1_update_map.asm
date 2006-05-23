@@ -7,7 +7,7 @@
 ;	Load in a Microdrive MAP array (32 bytes) 
 ;	the actual values for the specified drive.
 ;	
-;	$Id: if1_update_map.asm,v 1.1 2005-11-21 11:49:40 stefano Exp $
+;	$Id: if1_update_map.asm,v 1.2 2006-05-23 21:47:26 stefano Exp $
 ;
 
 

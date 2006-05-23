@@ -6,7 +6,7 @@
 ;	Writes the specified sector to the specified drive.
 ;
 ;	
-;	$Id: if1_write_sector.asm,v 1.2 2005-11-21 11:49:40 stefano Exp $
+;	$Id: if1_write_sector.asm,v 1.3 2006-05-23 21:47:26 stefano Exp $
 ;
 
 
