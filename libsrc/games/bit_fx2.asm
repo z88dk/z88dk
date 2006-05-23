@@ -1,4 +1,4 @@
-; $Id: bit_fx2.asm,v 1.1 2005-11-21 11:49:40 stefano Exp $
+; $Id: bit_fx2.asm,v 1.2 2006-05-23 20:42:52 stefano Exp $
 ;
 ; Generic platform sound effects module.
 ; Alternate sound library by Stefano Bodrato
@@ -21,7 +21,7 @@
           push bc
           
           ld    a,e  
-          cp    9  
+          cp    8  
           ret   nc  
           add   a,a  
           ld    e,a  
