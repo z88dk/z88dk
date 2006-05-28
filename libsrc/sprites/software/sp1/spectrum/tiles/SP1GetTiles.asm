@@ -24,7 +24,7 @@ XREF SP1V_DISPWIDTH
    pop de                         ; de = dest address
 
    ld a,c                         ; a = height
-   ld c,0
+   ld c,$ff
 
 .rowloop
 

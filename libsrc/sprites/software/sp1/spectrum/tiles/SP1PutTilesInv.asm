@@ -26,7 +26,7 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
    ex de,hl                           ; hl = struct sp1_tp *, de = & struct sp1_update
  
    ld a,c                             ; a = height
-   ld c,0
+   ld c,$ff
 
    ld ix,(SP1V_UPDATELISTT)
 

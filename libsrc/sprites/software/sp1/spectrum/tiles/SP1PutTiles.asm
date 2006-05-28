@@ -25,7 +25,7 @@ XREF SP1V_DISPWIDTH
    ex de,hl                           ; hl = struct sp1_tp *, de = & struct sp1_update
  
    ld a,c                             ; a = height
-   ld c,0
+   ld c,$ff
 
 .rowloop
 
