@@ -34,7 +34,6 @@ defc SP1V_ROTTBL        = $f000            ; location of the 3584-byte rotation 
 ;      SP1 Variables
 ; ///////////////////////
 
-defc SP1V_BACKBUFFDISP  = $d4ec            ; address of optional background screen minus $4000
 defc SP1V_UPDATELISTH   = $d4ee            ; address of 9-byte area holding a dummy struct_sp1_update that is always the "first" in list of screen tiles to be drawn
 defc SP1V_UPDATELISTT   = $d4f1            ; address of 2-byte variable holding the address of the last struct_sp1_update in list of screen tiles to be drawn
 defc SP1V_IDTYPEASSOC   = $d4ee            ; address of 2-byte variable holding the address of a table of ID/TYPE pairs, you supply this table address to sp1_Initialize()
@@ -61,8 +60,7 @@ defc SP1V_SPRDRAWTBL    = $d4f5            ; address of 2-byte variable holding 
 ;  * d4f1 - d4f2  SP1.LIB  update list tail pointer
 ;  * d4ee - d4ef  SP1.LIB  id / type association table address
 ;  * d4f5 - d4f6  SP1.LIB  sprite draw function table (indexed by type) address
-; d4ec - d4ed     SP1.LIB  address of optional background screen minus $4000
-; d4e5 - d4eb     --free-  9 bytes
+; d4e5 - d4ed     --free-  11 bytes
 ; d4d4 - d4e4     IM2.LIB  generic isr with one hook
 ; d401 - d4d3     --free-  211 bytes
 ; d300 - d400     IM2.LIB  im 2 vector table

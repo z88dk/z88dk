@@ -123,12 +123,12 @@ XREF SP1V_UPDATELISTH, SP1V_UPDATELISTT, SP1V_BACKBUFFDISP
    dec b
    jp nz, skiptile           ; if there are occluding sprites in this char, save draw
                              ;   time by not drawing sprites underneath them
-   ld a,(hl)                 ; else a = tile # for this char
+   ld a,(hl)                 ; else a = e = tile # for this char
+   ld e,a
+   ld d,SP1V_TILEARRAY/256   ; de = & tilearray entry for tile
    inc hl                    ; hl = & update.sprite_list
    or a                      ; is it tile code 0?
    jp z, usebackbuff         ; if so, using second display file for background image
-   ld e,a
-   ld d,SP1V_TILEARRAY/256   ; otherwise using tile array
    
    ld a,(hl)                 ; are there any sprites in this char?
    or a
@@ -284,18 +284,22 @@ XREF SP1V_UPDATELISTH, SP1V_UPDATELISTT, SP1V_BACKBUFFDISP
    inc hl                    ; hl = & sp1_CS.attr_mask
    jp spritedraw             ; draw sprites beginning with this one
 
-.usebackbuff                 ; hl = & update.slist
+.usebackbuff                 ; hl = & update.slist, de = & tile array entry for tile code 0
 
    push hl                   ; save & update.slist
    ld a,(hl)
 
-   ld de,4
-   add hl,de                 ; hl = & update.screen
-   ld e,(hl)
+   ld bc,4
+   add hl,bc                 ; hl = & update.screen
+   ld c,(hl)
    inc hl
-   ld d,(hl)                 ; de = screen address for update struct
-   ld hl,(SP1V_BACKBUFFDISP)
-   add hl,de                 ; hl = source graphic from background
+   ld b,(hl)                 ; bc = screen address for update struct
+   ex de,hl
+   ld e,(hl)
+   inc h
+   ld d,(hl)
+   ex de,hl                  ; hl = tile entry for tile code 0 (offset to second display buffer)
+   add hl,bc                 ; hl = source graphic from background
    
    or a                      ; are there any sprites in this tile?
    jr z, bbtileonly          ; if not, draw background only
@@ -328,6 +332,9 @@ XREF SP1V_UPDATELISTH, SP1V_UPDATELISTT, SP1V_BACKBUFFDISP
    jp spritedrawlp
 
 .bbtileonly                  ; there are no sprites, just draw background
+
+   ld e,c
+   ld d,b
 
    ; de = screen address
    ; hl = background graphic address
