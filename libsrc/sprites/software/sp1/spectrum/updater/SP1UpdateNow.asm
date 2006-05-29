@@ -127,6 +127,7 @@ XREF SP1V_UPDATELISTH, SP1V_UPDATELISTT, SP1V_BACKBUFFDISP
    inc hl                    ; hl = & update.sprite_list
    or a                      ; is it tile code 0?
    jp z, usebackbuff         ; if so, using second display file for background image
+   ld e,a
    ld d,SP1V_TILEARRAY/256   ; otherwise using tile array
    
    ld a,(hl)                 ; are there any sprites in this char?
