@@ -5,7 +5,8 @@
 
 XLIB SP1UpdateNow
 XDEF SP1RETSPRDRAW
-XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_UPDATELISTT
+XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY
+XREF SP1V_UPDATELISTH, SP1V_UPDATELISTT, SP1V_BACKBUFFDISP
 
 ; Iterates through the invalidated tiles list, drawing all invalidated tiles on screen.
 ;
@@ -122,9 +123,11 @@ XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_U
    dec b
    jp nz, skiptile           ; if there are occluding sprites in this char, save draw
                              ;   time by not drawing sprites underneath them
-   ld e,(hl)                 ; else e = tile # for this char
-   ld d,SP1V_TILEARRAY/256
-   inc hl                    ; hl = & udpate.sprite_list
+   ld a,(hl)                 ; else a = tile # for this char
+   inc hl                    ; hl = & update.sprite_list
+   or a                      ; is it tile code 0?
+   jp z, usebackbuff         ; if so, using second display file for background image
+   ld d,SP1V_TILEARRAY/256   ; otherwise using tile array
    
    ld a,(hl)                 ; are there any sprites in this char?
    or a
@@ -279,3 +282,99 @@ XREF SP1V_PIXELBUFFER, SP1V_ATTRBUFFER, SP1V_TILEARRAY, SP1V_UPDATELISTH, SP1V_U
    ex de,hl
    inc hl                    ; hl = & sp1_CS.attr_mask
    jp spritedraw             ; draw sprites beginning with this one
+
+.usebackbuff                 ; hl = & update.slist
+
+   push hl                   ; save & update.slist
+   ld a,(hl)
+
+   ld de,4
+   add hl,de                 ; hl = & update.screen
+   ld e,(hl)
+   inc hl
+   ld d,(hl)                 ; de = screen address for update struct
+   ld hl,(SP1V_BACKBUFFDISP)
+   add hl,de                 ; hl = source graphic from background
+   
+   or a                      ; are there any sprites in this tile?
+   jr z, bbtileonly          ; if not, draw background only
+   
+   ; there are sprites so draw background into pixel buffer
+   
+   ld e,(hl)
+   inc h
+   ld d,(hl)
+   inc h
+   ld (SP1V_PIXELBUFFER+0),de
+   ld e,(hl)
+   inc h
+   ld d,(hl)
+   inc h
+   ld (SP1V_PIXELBUFFER+2),de
+   ld e,(hl)
+   inc h
+   ld d,(hl)
+   inc h
+   ld (SP1V_PIXELBUFFER+4),de
+   ld e,(hl)
+   inc h
+   ld d,(hl)
+   ld (SP1V_PIXELBUFFER+6),de
+   
+   pop hl                    ; hl = & update.slist
+   ld a,(hl)
+   push hl
+   jp spritedrawlp
+
+.bbtileonly                  ; there are no sprites, just draw background
+
+   ; de = screen address
+   ; hl = background graphic address
+   
+   ld a,(hl)
+   ld (de),a
+   inc d
+   inc h
+   
+   ld a,(hl)
+   ld (de),a
+   inc d
+   inc h
+   
+   ld a,(hl)
+   ld (de),a
+   inc d
+   inc h
+   
+   ld a,(hl)
+   ld (de),a
+   inc d
+   inc h
+   
+   ld a,(hl)
+   ld (de),a
+   inc d
+   inc h
+   
+   ld a,(hl)
+   ld (de),a
+   inc d
+   inc h
+   
+   ld a,(hl)
+   ld (de),a
+   inc d
+   inc h
+   
+   ld a,(hl)
+   ld (de),a                 ; de = screen address
+   
+   pop hl                    ; hl = & update.slist
+   inc hl
+   inc hl
+   ld b,(hl)
+   inc hl
+   ld c,(hl)                 ; bc = next struct sp1_update in draw list
+
+   ex de,hl                  ; hl = screen address
+   jp rejoin
