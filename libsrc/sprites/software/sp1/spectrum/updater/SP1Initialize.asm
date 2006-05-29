@@ -19,6 +19,7 @@ XDEF SP1V_UPDATELISTH
 XDEF SP1V_UPDATELISTT
 XDEF SP1V_IDTYPEASSOC
 XDEF SP1V_SPRDRAWTBL
+XDEF SP1V_BACKBUFFDISP
 
 
 ; 1. Stores locations of idtypeassoc table and sprdraw function table
