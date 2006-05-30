@@ -1310,6 +1310,20 @@
 .%1
 .%4
 
+	jr	z,%1
+	jp	nc,%2
+.%1
+	jr	%3
+.%2
+	jp	%5
+.%3
+=
+	jr	z,%3
+	jr	c,%3
+.%2
+	jp	%5
+.%3
+
 	push	de
 	ld	hl,%1
 	pop	de
