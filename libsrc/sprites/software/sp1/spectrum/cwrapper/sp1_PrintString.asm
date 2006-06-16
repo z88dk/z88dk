@@ -45,6 +45,15 @@ LIB SP1PrintString
    ld e,(hl)
    inc hl
    ld d,(hl)
+   inc hl
+   ld a,(hl)
+   ld ixl,a
+   inc hl
+   or (hl)
+   jr z, novisit
+   ld a,(hl)
+   ld ixh,a
+.rejoin
    exx
    pop hl
    call SP1PrintString
@@ -67,4 +76,9 @@ LIB SP1PrintString
    ld (hl),e
    inc hl
    ld (hl),d
+.justret
    ret
+
+.novisit
+   ld ix,justret
+   jp rejoin

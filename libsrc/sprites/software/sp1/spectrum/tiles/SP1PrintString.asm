@@ -4,7 +4,7 @@
 ; sinclair spectrum version
 
 XLIB SP1PrintString
-LIB SP1GetUpdateStruct
+LIB SP1GetUpdateStruct, l_jpix
 XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 
 ; A sophisticated print string function
@@ -46,6 +46,7 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 ;  28      pop state
 ;  29      transparent char
 ;  30      logically OR into attribute mask N*
+;  31      visit : call function pointed at by ix with current struct_sp1_update as parameter
 ;
 ; * N is a single byte parameter following the code.
 ; * W is a 16-bit parameter following the code.
@@ -61,6 +62,7 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 ;        DE' = current struct sp1_update *
 ;         B' = current attribute mask
 ;         C' = current colour
+;         IX = visit function
 ;       IY+0 = row coordinate   \
 ;       IY+1 = col coordinate   |  Bounds Rectangle
 ;       IY+2 = width in chars   |  Must Fit On Screen
@@ -90,7 +92,7 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
    jr z, alldone
    
    inc hl
-   cp 31
+   cp 32
    jp nc, printable
 
    ; here we have a special code [1,29]
@@ -134,7 +136,33 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
    defw codeInk, codePaper, codeFlash, codeBright
    defw codeAttribute, codeInvalidate, codeAt, codeAtRel
    defw codeXWrap, codeYInc, codePush, codeEscape
-   defw codePop, codeTransparent, codeAMaskOR
+   defw codePop, codeTransparent, codeAMaskOR, codeVisit
+
+.codeVisit
+   ld a,b              ; only visit if inbounds
+   cp (iy+2)
+   jp nc, psloop
+   ld a,c
+   cp (iy+3)
+   jp nc, psloop
+
+   push bc
+   push de
+   push hl
+   exx
+   push bc
+   push hl
+   push de
+   ex de,hl
+   call l_jpix
+   pop de
+   pop hl
+   pop bc
+   exx
+   pop hl
+   pop de
+   pop bc
+   jp psloop
 
 .codeYWrap
    ld a,(hl)           ; parameter following YWRAP (0/1)
