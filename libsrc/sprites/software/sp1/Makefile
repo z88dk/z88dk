@@ -25,11 +25,10 @@ spectrum: customize.asm
 	@echo
 
 clean:
-	($RM) *.o
-	($RM) spectrum/collision/*.o
-	($RM) spectrum/cwrapper/*.o
-	($RM) spectrum/sprites/*.o
-	($RM) spectrum/sprites/draw/*.o
-	($RM) spectrum/tiles/*.o
-	($RM) spectrum/updater/*.o
-
+	$(RM) spectrum/collision/*.o
+	$(RM) spectrum/cwrapper/*.o
+	$(RM) spectrum/sprites/*.o
+	$(RM) spectrum/sprites/draw/*.o
+	$(RM) spectrum/tiles/*.o
+	$(RM) spectrum/updater/*.o
+	$(RM) *.o
