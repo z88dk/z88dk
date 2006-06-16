@@ -49,6 +49,10 @@
    typedef unsigned int uint;
 #endif
 
+///////////////////////////////////////////////////////////
+//                  DATA STRUCTURES                      //
+///////////////////////////////////////////////////////////
+
 struct sp1_Rect {
 
    uchar row;
@@ -57,10 +61,6 @@ struct sp1_Rect {
    uchar height;
 
 };
-
-///////////////////////////////////////////////////////////
-//                  DATA STRUCTURES                      //
-///////////////////////////////////////////////////////////
 
 struct sp1_update;
 struct sp1_ss;
@@ -153,6 +153,7 @@ struct sp1_pss {                      // "print string struct" A struct holding 
    uchar              attr_mask;      // +5 current attribute mask
    uchar              attr;           // +6 current attribute
    struct sp1_update *pos;            // +7 RESERVED struct sp1_update associated with current cursor coordinates
+   void              *visit;          // +9 visit function, set to 0 for none
    
 };
 
