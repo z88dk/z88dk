@@ -3,11 +3,13 @@
 #
 
 
+include ../Make.config
+
 
 all: assert.o
 
 .c.o:
-	zcc -vn -make-lib $*.c
+	zcc $(CFLAGS) $*.c
 
 
 clean:

@@ -2,6 +2,8 @@
 # Wahey, a messed up makefile for building libraries!
 #
 
+include ../Make.config
+
 CFILES = \
 	fprintf.c \
 	fscanf.c \
@@ -24,7 +26,7 @@ OBJECTS = $(CFILES:.c=.o)
 all: $(OBJECTS)
 
 .c.o:
-	zcc -vn -Wn43 -make-lib $*.c
+	zcc $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.err *.o* *.sym *.map zcc_opt.def *.i $(AFILES)

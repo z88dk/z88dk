@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.4 2006-06-18 14:55:44 dom Exp $
+# $Id: Makefile,v 1.5 2006-06-18 17:59:39 dom Exp $
 
 
 include ../../../Make.config
@@ -15,7 +15,7 @@ all:	$(OBJECTS)
 	$(LIBLINKER) -x../../../rs232p3 @p3list
 
 .c.o:  
-	zcc -vn -make-lib $*.c
+	zcc $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* *~ *.err *.i $(AFILES)

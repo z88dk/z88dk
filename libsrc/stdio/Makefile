@@ -1,8 +1,10 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.18 2005-09-07 01:30:34 aralbrec Exp $
+# $Id: Makefile,v 1.19 2006-06-18 17:59:39 dom Exp $
 #
+
+include ../Make.config
 
 STDCFILES = \
 	closeall.c \
@@ -53,28 +55,28 @@ lz88net: std net z88_x
 
 
 net:
-	zcc -vn -DNET_STDIO -make-lib fclose.c
-	zcc -vn -DNET_STDIO -make-lib fgetc.c
-	zcc -vn -DNET_STDIO -make-lib fputc.c
-	zcc -vn -DNET_STDIO -make-lib freopen_z88.c
-	zcc -vn -DNET_STDIO -make-lib fflush.c
-	zcc -vn -DNET_STDIO -make-lib fread.c
+	zcc $(CFLAGS) -DNET_STDIO fclose.c
+	zcc $(CFLAGS) -DNET_STDIO fgetc.c
+	zcc $(CFLAGS) -DNET_STDIO fputc.c
+	zcc $(CFLAGS) -DNET_STDIO freopen_z88.c
+	zcc $(CFLAGS) -DNET_STDIO fflush.c
+	zcc $(CFLAGS) -DNET_STDIO fread.c
 	cd zsock ; $(MAKE) ; cd ..
 
 cpm:	$(GENCOBJECTS)
-	zcc -vn -D__CPM__ -make-lib fclose.c
-	zcc -vn -D__CPM__ -make-lib fgetc.c
-	zcc -vn -D__CPM__ -make-lib fputc.c
-	zcc -vn -D__CPM__ -make-lib freopen_z88.c
-	zcc -vn -D__CPM__ -make-lib fread.c
+	zcc $(CFLAGS) -D__CPM__ fclose.c
+	zcc $(CFLAGS) -D__CPM__ fgetc.c
+	zcc $(CFLAGS) -D__CPM__ fputc.c
+	zcc $(CFLAGS) -D__CPM__ freopen_z88.c
+	zcc $(CFLAGS) -D__CPM__ fread.c
 
 
 gen:
-	zcc -vn -make-lib fclose.c
-	zcc -vn -make-lib fgetc.c
-	zcc -vn -make-lib fputc.c
-	zcc -vn -make-lib freopen_z88.c
-	zcc -vn -make-lib fread.c
+	zcc $(CFLAGS) fclose.c
+	zcc $(CFLAGS) fgetc.c
+	zcc $(CFLAGS) fputc.c
+	zcc $(CFLAGS) freopen_z88.c
+	zcc $(CFLAGS) fread.c
 	cd 8080; $(MAKE) ; cd ..
 
 std:    $(STDOBJECTS)
@@ -83,7 +85,7 @@ z88_x:
 	cd z88 ; $(MAKE) ; cd ..
 
 .c.o:
-	zcc -vn -make-lib $*.c
+	zcc $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i $(AFILES)

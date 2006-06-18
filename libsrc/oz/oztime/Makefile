@@ -1,11 +1,12 @@
 #
 # Makefile for OZ-7xx specific libraries - oztime
 #
-# $Id: Makefile,v 1.1 2003-10-29 11:37:11 stefano Exp $
+# $Id: Makefile,v 1.2 2006-06-18 17:59:38 dom Exp $
 
+include ../../Make.config
 
 all:	
-	zcc +z88 -vn -make-lib *.c
+	zcc $(CFLAGS) *.c
 
 clean:
 	$(RM) *.o* zcc_opt.def

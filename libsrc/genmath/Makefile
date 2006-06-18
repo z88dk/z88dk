@@ -25,7 +25,7 @@ genmath: $(OBJECTS)
 	$(LIBLINKER) -x../gen_math @genlist
 
 .c.o:
-	zcc -vn -make-lib $*.c
+	zcc $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i $(AFILES)

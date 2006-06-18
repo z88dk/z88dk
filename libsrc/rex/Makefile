@@ -1,10 +1,11 @@
 
+include ../Make.config
 
 all:
 	cd graphics ; $(MAKE) ; cd ..
 
 .c.o:
-	zcc +rex -vn -make-lib $*.c
+	zcc +rex $(CFLAGS) $*.c
 
 
 clean:

@@ -1,7 +1,9 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.3 2002-10-22 19:15:04 dom Exp $
+# $Id: Makefile,v 1.4 2006-06-18 17:59:37 dom Exp $
+
+include ../../Make.config
 
 CFILES = \
 	_putoffset.c \
@@ -25,7 +27,7 @@ OBJECTS = $(CFILES:.c=.o)
 z88_fcntl: $(OBJECTS)
 
 .c.o:
-	zcc -vn -make-lib $*.c
+	zcc $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* *~ *.i $(AFILES)

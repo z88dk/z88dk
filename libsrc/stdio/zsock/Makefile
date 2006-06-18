@@ -1,4 +1,6 @@
-# $Id: Makefile,v 1.5 2002-10-22 19:15:20 dom Exp $
+# $Id: Makefile,v 1.6 2006-06-18 17:59:39 dom Exp $
+
+include ../../Make.config
 
 CFILES = \
 	closenet.c \
@@ -13,7 +15,7 @@ OBJECTS = $(CFILES:.c=.o)
 all: $(OBJECTS)
 
 .c.o:
-	zcc -vn -DNET_STDIO -make-lib $*.c
+	zcc $(CFLAGS) -DNET_STDIO $*.c
 
 clean:
 	$(RM) *.o* zcc_opt.def *.sym *.map *.i $(AFILES)
