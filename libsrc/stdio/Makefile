@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.19 2006-06-18 17:59:39 dom Exp $
+# $Id: Makefile,v 1.20 2006-06-18 18:52:47 dom Exp $
 #
 
 include ../Make.config
@@ -47,7 +47,7 @@ GENCOBJECTS = $(GENCFILES:.c=.o)
 
 generic: std gen
 
-lcpm: std cpm
+lcpm: std gen cpm
 
 lz88: std gen z88_x
 
