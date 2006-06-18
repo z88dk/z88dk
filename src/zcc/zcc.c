@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.30 2006-06-18 18:12:05 dom Exp $
+ *      $Id: zcc.c,v 1.31 2006-06-18 21:42:48 dom Exp $
  */
 
 
@@ -420,67 +420,68 @@ int process(suffix, nextsuffix, processor, extraargs, ios,number,needsuffix)
 }
 
 int linkthem(linker)
-        char    *linker;
+    char    *linker;
 {
-        int     i, n, status;
-        char    *p;
-        char    *asmline;    /* patch for z80asm */
+    int     i, n, status;
+    char    *p;
+    char    *asmline;    /* patch for z80asm */
 	char    *ext;
+    char    *linkprog = myconf[LINKER].def;
 
-/* patch for z80asm */
-        if (peepholeopt)  {
-                asmline="-eopt ";
-                ext=".opt";
-        } else {
-                asmline="-easm ";
-                ext=".asm";
-        } 
+    /* patch for z80asm */
+    if (peepholeopt)  {
+        asmline="-eopt ";
+        ext=".opt";
+    } else {
+        asmline="-easm ";
+        ext=".asm";
+    } 
 
-        n = (strlen(myconf[LINKER].def) + 1);
-        if (lateassemble)
-                n+=strlen(asmline);     /* patch for z80asm */
-        n += (strlen("-nm -nv -o -R -M ")+strlen(outputfile));
-        n += (strlen(linkargs) + 1);
-        n += (strlen(myconf[CRT0].def)+strlen(ext) + 2 );
-        n += (2*strlen(myconf[LINKOPTS].def));
-        for (i = 0; i < nfiles; ++i)
-        {
-                        n += strlen(filelist[i]);
-        }
-        p = mustmalloc(n);
+    n = (strlen(linker) + 1);
+    if (lateassemble)
+        n+=strlen(asmline);     /* patch for z80asm */
+    n += (strlen("-nm -nv -o -R -M ")+strlen(outputfile));
+    n += (strlen(linkargs) + 1);
+    n += (strlen(myconf[CRT0].def)+strlen(ext) + 2 );
+    n += (2*strlen(myconf[LINKOPTS].def));
+    for (i = 0; i < nfiles; ++i)
+    {
+        n += strlen(filelist[i]);
+    }
+    p = mustmalloc(n);
 
 
-        sprintf(p, "%s %s -o%s ", linker,myconf[LINKOPTS].def,outputfile);
-        if      (lateassemble)             /* patch */
-                strcat(p,asmline);      /* patch */
-        if      (z80verbose)
-                strcat(p,"-v ");
-        if      (relocate) {
-                if (lateassemble) 
-                    fprintf(stderr,"Cannot relocate an application..\n");
-                else strcat(p,"-R ");
-        }
-        strcat(p,linkargs);
+    sprintf(p, "%s %s -o%s ", linker,myconf[LINKOPTS].def,outputfile);
+    if      (lateassemble)             /* patch */
+        strcat(p,asmline);      /* patch */
+    if      (z80verbose)
+        strcat(p,"-v ");
+    if      (relocate) {
+        if (lateassemble) 
+            fprintf(stderr,"Cannot relocate an application..\n");
+        else strcat(p,"-R ");
+    }
+    strcat(p,linkargs);
 /* Now insert the 0crt file (so main doesn't have to be the first file
  * linkargs last character is space..
  */
-        strcat(p,myconf[CRT0].def);
+    strcat(p,myconf[CRT0].def);
 	strcat(p,ext);
 
-        for (i = 0; i < nfiles; ++i)
+    for (i = 0; i < nfiles; ++i)
+    {
+        if ( (!lateassemble && hassuffix(filelist[i], OBJEXT) ) || lateassemble )
         {
-                if ( (!lateassemble && hassuffix(filelist[i], OBJEXT) ) || lateassemble )
-                {
-                        strcat(p, " ");
-                        //filelist[i][strlen(filelist[i])-strlen(OBJEXT)]='\0';
-                        strcat(p, filelist[i]);
-                }
+            strcat(p, " ");
+            //filelist[i][strlen(filelist[i])-strlen(OBJEXT)]='\0';
+            strcat(p, filelist[i]);
         }
-        if (verbose)
-                printf("%s\n", p);
-        status = system(p);
-        free(p);
-        return (status);
+    }
+    if (verbose)
+        printf("%s\n", p);
+    status = system(p);
+    free(p);
+    return (status);
 }
 
 int main(argc, argv)
@@ -732,7 +733,7 @@ int main(argc, argv)
 
 /* Link them, if errors, atexit() deals with them! */
 
-    if (linkthem(myconf[LINKER].def)) exit(1);
+    if (linkthem(usempm ? myconf[MPMEXE].def : myconf[LINKER].def)) exit(1);
 
     if      (createapp ) {
 /*
