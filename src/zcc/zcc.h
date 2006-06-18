@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.21 2006-06-18 13:04:16 dom Exp $
+ * $Id: zcc.h,v 1.22 2006-06-18 18:12:05 dom Exp $
  */
 
 /* Very contrived, if not a Windows target then include the config file */
@@ -15,10 +15,10 @@
 
 /* Some machine specific definitions (paths etc!) */
 
-char *version = "v2.55 (C) 15.4.2004 D.J.Morris\n";
+char *version = "v2.56 (C) 18.7.2006 D.J.Morris\n";
 
 #ifdef AMIGA
-char *amiver="$VER: zcc v2.54 (15.4.2004)";
+char *amiver="$VER: zcc v2.56 (15.4.2006)";
 #endif
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
@@ -87,5 +87,5 @@ struct confs {
 
 enum iostyle { outimplied=0, outspecified, filter };
 
-enum conf { OPTIONS, Z80EXE, CPP, LINKER, COMPILER, COPTEXE, COPYCMD, INCPATH, COPTRULES1, COPTRULES2, COPTRULES3, CRT0, LIBPATH,  LINKOPTS, ASMOPTS, APPMAKE, Z88MATHLIB,  Z88MATHFLG, STARTUPLIB, GENMATHLIB, CPPSTYLE  };
+enum conf { OPTIONS, Z80EXE, CPP, LINKER, COMPILER, COPTEXE, COPYCMD, INCPATH, COPTRULES1, COPTRULES2, COPTRULES3, CRT0, LIBPATH,  LINKOPTS, ASMOPTS, APPMAKE, Z88MATHLIB,  Z88MATHFLG, STARTUPLIB, GENMATHLIB, CPPSTYLE, MPMEXE  };
 

@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.29 2004-12-29 23:19:03 dom Exp $
+ *      $Id: zcc.c,v 1.30 2006-06-18 18:12:05 dom Exp $
  */
 
 
@@ -158,6 +158,7 @@ void SetPreserve(char *);
 void SetCreateApp(char *);
 void SetShortObj(char *);
 void SetLateAssemble(char *);
+void SetMPM(char *);
 
 void *mustmalloc(int);
 int  hassuffix(char *, char *);
@@ -203,6 +204,7 @@ struct args myargs[]= {
     {"create-app",NO,SetCreateApp},
     {"usetemp",NO,SetTemp},
     {"notemp",NO,UnSetTemp},
+    {"mpm", NO, SetMPM},
 	{"Cp",YES,AddToPreProc},
 	{"Ca",YES,AddToAssembler},
     {"Cz",YES,AddToAppmake},
@@ -228,28 +230,29 @@ struct args myargs[]= {
 
 
 struct confs myconf[]={
-        {"OPTIONS",SetOptions,NULL},
-        {"Z80EXE",SetNormal,NULL},
-        {"CPP",SetNormal,NULL},
-        {"LINKER",SetNormal,NULL},
-        {"COMPILER",SetNormal,NULL},
-        {"COPTEXE",SetNormal,NULL},
-        {"COPYCMD",SetNormal,NULL},
-        {"INCPATH",SetNormal,NULL},
-        {"COPTRULES1",SetNormal,NULL},
-        {"COPTRULES2",SetNormal,NULL},
+    {"OPTIONS",SetOptions,NULL},
+    {"Z80EXE",SetNormal,NULL},
+    {"CPP",SetNormal,NULL},
+    {"LINKER",SetNormal,NULL},
+    {"COMPILER",SetNormal,NULL},
+    {"COPTEXE",SetNormal,NULL},
+    {"COPYCMD",SetNormal,NULL},
+    {"INCPATH",SetNormal,NULL},
+    {"COPTRULES1",SetNormal,NULL},
+    {"COPTRULES2",SetNormal,NULL},
 	{"COPTRULES3",SetNormal,NULL},
-        {"CRT0",SetNormal,NULL},
-        {"LIBPATH",SetNormal,NULL},
-        {"LINKOPTS",SetOptions,NULL},
-        {"ASMOPTS",SetOptions,NULL},
-        {"APPMAKE",SetNormal,NULL},
-        {"Z88MATHLIB",SetNormal,NULL},
-        {"Z88MATHFLG",SetNormal,NULL},
-        {"STARTUPLIB",SetNormal,NULL},
-        {"GENMATHLIB",SetNormal,NULL},
+    {"CRT0",SetNormal,NULL},
+    {"LIBPATH",SetNormal,NULL},
+    {"LINKOPTS",SetOptions,NULL},
+    {"ASMOPTS",SetOptions,NULL},
+    {"APPMAKE",SetNormal,NULL},
+    {"Z88MATHLIB",SetNormal,NULL},
+    {"Z88MATHFLG",SetNormal,NULL},
+    {"STARTUPLIB",SetNormal,NULL},
+    {"GENMATHLIB",SetNormal,NULL},
 	{"STYLECPP",SetNumber,NULL},
-        {"",NULL,NULL}
+    {"MPMEXE",SetNormal,NULL},
+    {"",NULL,NULL}
 };
 
 /*
@@ -283,6 +286,7 @@ int	gargc;		     /* Copies of argc and argv */
 char	**gargv;	
 /* filelist has to stay as ** because we change suffix all the time */
 int     nfiles          = 0;
+int     usempm          = 0;
 char    **filelist;
 char    **orgfiles;             /* Original filenames... */
 int     ncompargs       = 0;
@@ -480,42 +484,42 @@ int linkthem(linker)
 }
 
 int main(argc, argv)
-        int     argc;
-        char    **argv;
+    int     argc;
+    char    **argv;
 {
-        int     i, gc;
-        char    *temp,*temp2;
-        char    asmarg[4096];      /* Hell, that should be long enough! */
-        char    buffer[LINEMAX+1]; /* For reading in option file */
-        FILE    *fp;
+    int     i, gc;
+    char    *temp,*temp2;
+    char    asmarg[4096];      /* Hell, that should be long enough! */
+    char    buffer[LINEMAX+1]; /* For reading in option file */
+    FILE    *fp;
 
 /*
  * Okay, the fun begins now, first of all, lets use atexit so we can
  * cleanup after ourselves..
  */
 
-        if (( atexit(CleanUpFiles)) != 0)
+    if (( atexit(CleanUpFiles)) != 0)
 		printf("Couldn't register atexit() routine\n");
 
-        strcpy(buffer,"  ");
+    strcpy(buffer,"  ");
 
-        AddComp(buffer+1);
-        asmargs=linkargs=cpparg=0;
+    AddComp(buffer+1);
+    asmargs=linkargs=cpparg=0;
 
-        /* allocate enough pointers for all files, slight overestimate */
-        filelist = (char **)mustmalloc(sizeof(char *) * argc);
-        orgfiles = (char **)mustmalloc(sizeof(char *) * argc);
+    /* allocate enough pointers for all files, slight overestimate */
+    filelist = (char **)mustmalloc(sizeof(char *) * argc);
+    orgfiles = (char **)mustmalloc(sizeof(char *) * argc);
 
 /* Now, find the environmental variable ZCCFILE which contains the
  * filename of our config file..
  */
-        gc=1;           /* Set for the first argument to scan for */
+    gc=1;           /* Set for the first argument to scan for */
 
 /*
  * If we only have one parameter, we don't want to go any further..
  * (Linux quite rightly baulks..)
  */
-        if (argc == 1 ) { DispInfo(); exit(1); }
+    if (argc == 1 ) { DispInfo(); exit(1); }
 
 	gc=FindConfigFile(argv[gc],gc);
 
@@ -525,44 +529,45 @@ int main(argc, argv)
  * Okay, so now we read in the options file and get some info for us
  */
 
-        if ( (fp=fopen(outfilename,"r") ) == NULL )  
-        {
-                fprintf(stderr,"Can't open config file %s\n",outfilename);
-                exit(1);
-        }
+    if ( (fp=fopen(outfilename,"r") ) == NULL )  
+    {
+        fprintf(stderr,"Can't open config file %s\n",outfilename);
+        exit(1);
+    }
 
-        while (fgets(buffer,LINEMAX,fp) != NULL) 
-        {
-                if (!isupper(buffer[0])) continue;
-                ParseOpts(buffer);
-        }
-        fclose(fp);
+    while (fgets(buffer,LINEMAX,fp) != NULL) 
+    {
+        if (!isupper(buffer[0])) continue;
+        ParseOpts(buffer);
+    }
+    fclose(fp);
 
 /*
  *      Check to see if we are missing any definitions, if we are
  *      exit..
  */
 
-        for (i= Z80EXE ; i<= GENMATHLIB ; i++ ) {
-                if ( myconf[i].def == 0 ) {
-                        fprintf(stderr,"Missing definition for %s\n",myconf[i].name);
-                        exit(1);
-                }
+    for (i= Z80EXE ; i<= GENMATHLIB ; i++ ) {
+        if ( myconf[i].def == NULL ) {
+            fprintf(stderr,"Missing definition for %s\n",myconf[i].name);
+            exit(1);
         }
+    }
+
 
 /*
  *      Now, set the linkargs list up to initially consist of
  *      the startuplib
  */
-		snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[STARTUPLIB].def);
-		BuildOptions(&linkargs,buffer);
+    snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[STARTUPLIB].def);
+    BuildOptions(&linkargs,buffer);
 
 /*
  *      Set the default output file
  */
 
-        outputfile=defaultout;
-        strcpy(outfilename,defaultout);
+    outputfile=defaultout;
+    strcpy(outfilename,defaultout);
 
 /*
  *	Copy the .obj into the extension var (used for linking &c)
@@ -576,24 +581,24 @@ int main(argc, argv)
  */
 
 
-        /* Now, parse the default options list */
-        if ( myconf[OPTIONS].def != NULL ) {
+    /* Now, parse the default options list */
+    if ( myconf[OPTIONS].def != NULL ) {
 	    parse_option(myconf[OPTIONS].def);
-        }
+    }
 
 /* Parse the argument list */
 
 	gargv=argv;	/* Point argv to start of command line */
 
-        for (gargc=gc;gargc<argc;gargc++) {
-                if (argv[gargc][0]=='-') ParseArgs(1+argv[gargc]);
-                else AddToFileList(argv[gargc]);
-        }
+    for (gargc=gc;gargc<argc;gargc++) {
+        if (argv[gargc][0]=='-') ParseArgs(1+argv[gargc]);
+        else AddToFileList(argv[gargc]);
+    }
 
 /*
  *      Add the default cpp path
  */
-        BuildOptions(&cpparg,myconf[INCPATH].def);
+    BuildOptions(&cpparg,myconf[INCPATH].def);
 
 
 /*
@@ -606,40 +611,45 @@ int main(argc, argv)
  *      Apologies for the indentation here!
  *
  */
-      if ( preserve == 0 ) {
+    if ( preserve == 0 ) {
         if ( (fp=fopen(DEFFILE,"w")) != NULL ) {
-                fclose(fp);
-                if (remove(DEFFILE) < 0 ) {
-                        fprintf(stderr,"Cannot remove %s: File in use?\n",DEFFILE);
-                        exit(1);
-                }
+            fclose(fp);
+            if (remove(DEFFILE) < 0 ) {
+                fprintf(stderr,"Cannot remove %s: File in use?\n",DEFFILE);
+                exit(1);
+            }
 /*
  *      It's the merry go round, here we try to open it again, so that
  *      if we specify non .c files compiling doesn't barf, ah, if only
  *      we could do a touch [filename]!
  */
 
-                if ( ( fp=fopen(DEFFILE,"w")) != NULL) fclose(fp);
-                else { fprintf(stderr,"Could not create %s: File in use?\n",DEFFILE); exit(1); }
+            if ( ( fp=fopen(DEFFILE,"w")) != NULL) fclose(fp);
+            else { fprintf(stderr,"Could not create %s: File in use?\n",DEFFILE); exit(1); }
 
 
-         } else {
-                fprintf(stderr,"Cannot open %s: File in use?\n",DEFFILE);
-                exit(1);
-         }
-      }
-
-
-        if (nfiles <= 0) {
-                DispInfo();
-                exit(0);
+        } else {
+            fprintf(stderr,"Cannot open %s: File in use?\n",DEFFILE);
+            exit(1);
         }
+    }
+
+
+    if (nfiles <= 0) {
+        DispInfo();
+        exit(0);
+    }
+
+    if ( usempm && myconf[MPMEXE].def == NULL ) {
+        fprintf(stderr,"Missing definition for %s\n",myconf[MPMEXE].name);
+        exit(1);
+    }
 
 /*
  * Kill \n on the end of certain option lines
  */
-        KillEOL(myconf[LINKOPTS].def);
-        KillEOL(myconf[ASMOPTS].def);
+    KillEOL(myconf[LINKOPTS].def);
+    KillEOL(myconf[ASMOPTS].def);
 
 	/* We can't create an app and make a library.... */
 	if ( createapp && makelib )
@@ -648,8 +658,8 @@ int main(argc, argv)
 /*
  * If we're making an app, we want the default name to be a.bin not a.out
  */
-        if (createapp && outputfile==defaultout ) 
-                outputfile=defaultbin;
+    if (createapp && outputfile==defaultout ) 
+        outputfile=defaultbin;
 
 	if ( createapp && makeapp )
 		lateassemble = YES;
@@ -661,7 +671,7 @@ int main(argc, argv)
  * Copy the z88_crt0.opt file over to /tmp or t: and use it as the
  * startup code...trickery ahoy!!!
  */
-        CopyCrt0();     /* Cop out and use a function to do it - main() is too large! */
+    CopyCrt0();     /* Cop out and use a function to do it - main() is too large! */
 
 
 
@@ -670,81 +680,81 @@ int main(argc, argv)
  * Parse through the files, handling each one in turn
  */
 
-        for     (i=0;i<nfiles;i++) {
-                 switch (FindSuffix(filelist[i])) {
-                        case CFILE:
-                        if (process(".c", ".i", myconf[CPP].def, cpparg, (int)myconf[CPPSTYLE].def,i,YES))  exit(1);
-                        if (preprocessonly) {
-                                if (usetemp) CopyOutFiles(".i");
-                                exit(0);
-                        }
+    for     (i=0;i<nfiles;i++) {
+        switch (FindSuffix(filelist[i])) {
+        case CFILE:
+            if (process(".c", ".i", myconf[CPP].def, cpparg, (int)myconf[CPPSTYLE].def,i,YES))  exit(1);
+            if (preprocessonly) {
+                if (usetemp) CopyOutFiles(".i");
+                exit(0);
+            }
 
-                        case PFILE:
-                        if (process(".i", ".asm", myconf[COMPILER].def, comparg, outimplied,i,YES))  exit(1);
+        case PFILE:
+            if (process(".i", ".asm", myconf[COMPILER].def, comparg, outimplied,i,YES))  exit(1);
 
-                        case AFILE:
-				switch(peepholeopt) {
-				  case 1:
-                                        if (process(".asm", ".opt", myconf[COPTEXE].def, myconf[COPTRULES1].def, filter,i,YES))  exit(1);
-					break;
-				  case 2:
+        case AFILE:
+            switch(peepholeopt) {
+            case 1:
+                if (process(".asm", ".opt", myconf[COPTEXE].def, myconf[COPTRULES1].def, filter,i,YES))  exit(1);
+                break;
+            case 2:
 /* Double optimization! */
-                                        if (process(".asm", ".op1", myconf[COPTEXE].def, myconf[COPTRULES2].def, filter,i,YES))  exit(1);
+                if (process(".asm", ".op1", myconf[COPTEXE].def, myconf[COPTRULES2].def, filter,i,YES))  exit(1);
 
-                                        if (process(".op1", ".opt", myconf[COPTEXE].def, myconf[COPTRULES1].def, filter,i,YES))  exit(1);
-					break;
-				  case 3:
+                if (process(".op1", ".opt", myconf[COPTEXE].def, myconf[COPTRULES1].def, filter,i,YES))  exit(1);
+                break;
+            case 3:
 /* Triple opt (last level adds routines but can save space..) */
-                                        if (process(".asm", ".op1", myconf[COPTEXE].def, myconf[COPTRULES2].def, filter,i,YES))  exit(1);
-                                        if (process(".op1", ".op2", myconf[COPTEXE].def, myconf[COPTRULES1].def, filter,i,YES))  exit(1);
-                                        if (process(".op2", ".opt", myconf[COPTEXE].def, myconf[COPTRULES3].def, filter,i,YES))  exit(1);
-					break;
-				default:
-                                	BuildAsmLine(asmarg,"-easm");
-                                	if (!assembleonly && !lateassemble)
-                                        	if (process(".asm", OBJEXT, myconf[Z80EXE].def, asmarg , outimplied,i,YES)) exit(1);
-                        }
-                        case OFILE:
-                        BuildAsmLine(asmarg,"-eopt");
-                        if (!assembleonly && !lateassemble)
-                                if (process(".opt", OBJEXT, myconf[Z80EXE].def, asmarg , outimplied,i,YES)) exit(1);
-                        break;
-                }
+                if (process(".asm", ".op1", myconf[COPTEXE].def, myconf[COPTRULES2].def, filter,i,YES))  exit(1);
+                if (process(".op1", ".op2", myconf[COPTEXE].def, myconf[COPTRULES1].def, filter,i,YES))  exit(1);
+                if (process(".op2", ".opt", myconf[COPTEXE].def, myconf[COPTRULES3].def, filter,i,YES))  exit(1);
+                break;
+            default:
+                BuildAsmLine(asmarg,"-easm");
+                if (!assembleonly && !lateassemble)
+                    if (process(".asm", OBJEXT, myconf[usempm ? MPMEXE : Z80EXE].def, asmarg , outimplied,i,YES)) exit(1);
+            }
+        case OFILE:
+            BuildAsmLine(asmarg,"-eopt");
+            if (!assembleonly && !lateassemble)
+                if (process(".opt", OBJEXT, myconf[usempm ? MPMEXE : Z80EXE].def, asmarg , outimplied,i,YES)) exit(1);
+            break;
         }
-        if (compileonly || assembleonly) {
-				if (compileonly && !assembleonly ) {
-						if (usetemp) CopyOutFiles(OBJEXT);
-				} else {
-						if (usetemp) CopyOutFiles(peepholeopt ? ".opt" : ".asm");
-				}
-				exit(0);
-		}
+    }
+    if (compileonly || assembleonly) {
+        if (compileonly && !assembleonly ) {
+            if (usetemp) CopyOutFiles(OBJEXT);
+        } else {
+            if (usetemp) CopyOutFiles(peepholeopt ? ".opt" : ".asm");
+        }
+        exit(0);
+    }
 
 /* Link them, if errors, atexit() deals with them! */
 
-		if (linkthem(myconf[LINKER].def)) exit(1);
+    if (linkthem(myconf[LINKER].def)) exit(1);
 
-		if      (createapp ) {
+    if      (createapp ) {
 /*
  * Building an application - run the appmake command on it
  */
-            snprintf(buffer,sizeof(buffer),"%s %s -b %s -c %s",myconf[APPMAKE].def,appmakeargs ? appmakeargs : "",outputfile,myconf[CRT0].def);	
-            if (verbose) 
-                printf("%s\n",buffer);
-            if (system(buffer) ){
-                fprintf(stderr,"Building application code failed\n");
-                exit(1);
-            }
+        snprintf(buffer,sizeof(buffer),"%s %s -b %s -c %s",myconf[APPMAKE].def,appmakeargs ? appmakeargs : "",outputfile,myconf[CRT0].def);	
+        if (verbose) 
+            printf("%s\n",buffer);
+        if (system(buffer) ){
+            fprintf(stderr,"Building application code failed\n");
+            exit(1);
         }
-        if (mapon && usetemp ) {
-                char    *oldptr;
-                if ( (oldptr=strrchr(outfilename,'.')) ) *oldptr=0;
-                if (CopyFile(myconf[CRT0].def,".map",outfilename,".map") ){
-                        fprintf(stderr,"Cannot copy map file\n");
-                        exit(1);
-                }
+    }
+    if (mapon && usetemp ) {
+        char    *oldptr;
+        if ( (oldptr=strrchr(outfilename,'.')) ) *oldptr=0;
+        if (CopyFile(myconf[CRT0].def,".map",outfilename,".map") ){
+            fprintf(stderr,"Cannot copy map file\n");
+            exit(1);
         }
-        exit(0);
+    }
+    exit(0);
 }
 
 int CopyFile(char *name1,char *ext1, char *name2, char *ext2)
@@ -819,6 +829,15 @@ void SetLateAssemble(char *arg)
     makeapp = YES;
     AddComp(temp + 1);
 }
+
+void SetMPM(char *arg)
+{
+    char   *temp = " -mpm";
+    usempm = YES;
+    AddComp(temp+1);
+    printf("Setting using mpm\n");
+}
+
 
 void SetCompileOnly(char *arg)
 {
@@ -1162,9 +1181,9 @@ void SetNumber(char *arg,int num)
 
 void SetNormal(char *arg,int num)
 {
-        char name[LINEMAX+1];
+    char name[LINEMAX+1];
 	char *ptr,*ptr2;
-        sscanf(arg,"%s%s",name,name);
+    sscanf(arg,"%s%s",name,name);
 
 	ptr = &arg[strlen(myconf[num].name)+1];
 	while (*ptr && isspace(*ptr))
@@ -1176,16 +1195,16 @@ void SetNormal(char *arg,int num)
 		*ptr2 = 0;
 
 
-        if (strncmp(name,myconf[num].name,strlen(myconf[num].name)) != 0 ) {
-                SetConfig(ptr,num);
-        } 
+    if (strncmp(name,myconf[num].name,strlen(myconf[num].name)) != 0 ) {
+        SetConfig(ptr,num);
+    } 
 }
 
 void SetOptions(char *arg,int num)
 {
-        char name[LINEMAX+1];
+    char name[LINEMAX+1];
 	char *ptr,*ptr2;
-        sscanf(arg,"%s%s",name,name);
+    sscanf(arg,"%s%s",name,name);
 
 	ptr = &arg[strlen(myconf[num].name)+1];
 	while (*ptr && isspace(*ptr))
@@ -1197,9 +1216,9 @@ void SetOptions(char *arg,int num)
 		*ptr2 = 0;
 
 
-        if (strncmp(name,myconf[num].name,strlen(myconf[num].name)) != 0 ) {
-                SetConfig(ptr,num);
-        } else {
+    if (strncmp(name,myconf[num].name,strlen(myconf[num].name)) != 0 ) {
+        SetConfig(ptr,num);
+    } else {
 		myconf[num].def = "";
 	}
 }
@@ -1213,8 +1232,8 @@ void SetOptions(char *arg,int num)
 
 void KillEOL(char *str)
 {
-        char    *ptr;
-        if ( (ptr=strrchr(str,'\n')) ) *ptr=0;
+    char    *ptr;
+    if ( (ptr=strrchr(str,'\n')) ) *ptr=0;
 }
 
 /*
@@ -1224,19 +1243,19 @@ void KillEOL(char *str)
 
 void CopyOutFiles(char *suffix)
 {
-        int     j,k;
-        char    *ptr1,*ptr2;
+    int     j,k;
+    char    *ptr1,*ptr2;
 
-        for     (j=0;j<nfiles;j++) {
-                ptr1=changesuffix(filelist[j],suffix);
-                ptr2=changesuffix(orgfiles[j],suffix);
-                k=CopyFile(ptr1,"",ptr2,"");
-                free(ptr1); free(ptr2);
-                if (k) {
-                        fprintf(stderr,"Couldn't copy output files\n");
-                        exit(1);
-                }
+    for     (j=0;j<nfiles;j++) {
+        ptr1=changesuffix(filelist[j],suffix);
+        ptr2=changesuffix(orgfiles[j],suffix);
+        k=CopyFile(ptr1,"",ptr2,"");
+        free(ptr1); free(ptr2);
+        if (k) {
+            fprintf(stderr,"Couldn't copy output files\n");
+            exit(1);
         }
+    }
 }
 
 
@@ -1250,62 +1269,61 @@ void CopyOutFiles(char *suffix)
 
 void CleanUpFiles(void)
 {
-        int j;
-/*
- *      Show all error files..
- */
+    int j;
 
-        if (myconf[CRT0].def) ShowErrors(myconf[CRT0].def,0);
-        for     (j=0; j<nfiles; j++ ) {
-                ShowErrors(filelist[j],orgfiles[j]);
-        }
+    /* Show all error files */
 
-   if (cleanup && usetemp) {       /* Default is yes */
+    if (myconf[CRT0].def) ShowErrors(myconf[CRT0].def,0);
+    for     (j=0; j<nfiles; j++ ) {
+        ShowErrors(filelist[j],orgfiles[j]);
+    }
+
+    if (cleanup && usetemp) {       /* Default is yes */
 
 /*
  * Remove the temporary files, if they don't exist, it doesn't matter!
  */
         for (j=0; j<nfiles; j++ ) {
-             CleanFile(filelist[j],".i");
-             CleanFile(filelist[j],".asm");
-             CleanFile(filelist[j],".err");
-             CleanFile(filelist[j],".op1");
-	     CleanFile(filelist[j],".op2");
-             CleanFile(filelist[j],".opt");
-             CleanFile(filelist[j],OBJEXT);
-             CleanFile(filelist[j],".sym");
+            CleanFile(filelist[j],".i");
+            CleanFile(filelist[j],".asm");
+            CleanFile(filelist[j],".err");
+            CleanFile(filelist[j],".op1");
+            CleanFile(filelist[j],".op2");
+            CleanFile(filelist[j],".opt");
+            CleanFile(filelist[j],OBJEXT);
+            CleanFile(filelist[j],".sym");
         }
 /*
  * Remove all files associated with startup file, if necessary 
  */
         if ( (myconf[CRT0].def!=0) && (crtcopied!=0) ) {
-                CleanFile(myconf[CRT0].def,".asm");
-                CleanFile(myconf[CRT0].def,".opt");
-                CleanFile(myconf[CRT0].def,".err");
-                CleanFile(myconf[CRT0].def,OBJEXT);
-                CleanFile(myconf[CRT0].def,".map");
-                CleanFile(myconf[CRT0].def,".sym");
-	}
-   } else if (usetemp==NO) {
-	/* Remove crt0.o file for -notemp compiles */
-	CleanFile(myconf[CRT0].def,OBJEXT);
-   }
+            CleanFile(myconf[CRT0].def,".asm");
+            CleanFile(myconf[CRT0].def,".opt");
+            CleanFile(myconf[CRT0].def,".err");
+            CleanFile(myconf[CRT0].def,OBJEXT);
+            CleanFile(myconf[CRT0].def,".map");
+            CleanFile(myconf[CRT0].def,".sym");
+        }
+    } else if (usetemp==NO) {
+        /* Remove crt0.o file for -notemp compiles */
+        CleanFile(myconf[CRT0].def,OBJEXT);
+    }
 
 
-        for (j = OPTIONS ; j<= GENMATHLIB; j++ ) {
-                if (myconf[j].def && strlen(myconf[j].def) ) { free(myconf[j].def); myconf[j].def=0;}
+    for (j = OPTIONS ; j<= GENMATHLIB; j++ ) {
+        if (myconf[j].def && strlen(myconf[j].def) ) { free(myconf[j].def); myconf[j].def=0;}
+    }
+    if (filelist) {
+        for (j=0; j<nfiles; j++ ) {
+            free(filelist[j]);
+            free(orgfiles[j]);
         }
-        if (filelist) {
-                for (j=0; j<nfiles; j++ ) {
-                        free(filelist[j]);
-                        free(orgfiles[j]);
-                }
-                free(filelist);
-                filelist=0;
-        }
-        if (linkargs) { free(linkargs) ; linkargs=0; }
-        if (comparg) { free(comparg) ; comparg=0; }
-        if (cpparg) { free(cpparg) ; cpparg=0; }
+        free(filelist);
+        filelist=0;
+    }
+    if (linkargs) { free(linkargs) ; linkargs=0; }
+    if (comparg) { free(comparg) ; comparg=0; }
+    if (cpparg) { free(cpparg) ; cpparg=0; }
 
 
 }
