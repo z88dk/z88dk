@@ -8,6 +8,7 @@
 #
 
 Z80EXE  	z80asm
+MPMEXE		mpm
 CPP 		zcpp
 LINKER 		z80asm
 COMPILER	sccz80
