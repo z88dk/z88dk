@@ -28,9 +28,14 @@
         defb   1,'3','@',32,32 ,1,'2','A',32+34  ;keep settings for 10
         defb   1,'7','#','3',32+8,32+3,32+32,32+5,128     ;dialogue box
         defb    1,'3','@',32,32,1,'2','J','C'
-	defm	"The ZSock shared library could not be opened"&13&10
-	defm	"Please install both ZSock and Installer v2+"&13&10
-	defm	"to use this program correctly"&13&10
-	defm	"ZSock also requires 2 free banks to function"&13&10
-	defm	"correctly - delete files if required"&13&10
+	defm	"The ZSock shared library could not be opened"
+	defb	13,10
+	defm	"Please install both ZSock and Installer v2+"
+	defb	13,10
+	defm	"to use this program correctly"
+	defb	13,10
+	defm	"ZSock also requires 2 free banks to function"
+	defb	13,10
+	defm	"correctly - delete files if required"
+	defb	13,10
         defb    0

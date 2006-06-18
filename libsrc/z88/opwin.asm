@@ -32,7 +32,15 @@
 	call_oz(gn_sop)		; set default modes
 	ret
 
-.windef	defm	1&"7#"&0	; window definer
-.winclr	defm	1&"2C"&0	; window clear & reset modes
-.winmod	defm	1&"3+CS"&0	; set default modes (cursor & scroll)
+.windef	defb	1		;wndow definer
+	defm	"7#"
+	defb	0
+	
+.winclr	defb	1		;window clear + reset modes
+	defm	"2C"
+	defb	0
+
+.winmod	defb	1		;set default modes (cursor + scroll)
+	defm	"3+CS"
+	defb	0
 
