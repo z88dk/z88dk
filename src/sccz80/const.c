@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.15 2004-03-26 22:06:09 denniz Exp $
+ *      $Id: const.c,v 1.16 2006-06-18 13:03:13 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -307,7 +307,7 @@ int number(long *val)
                         k = 1 ;
                 }
         }
-        if( ch() == '0' && raise(nch()) == 'X' ) {
+        if( ch() == '0' && toupper(nch()) == 'X' ) {
                 gch() ;
                 gch() ;
                 if ( hex(ch()) == 0 ) return(0) ;
@@ -351,7 +351,7 @@ int hex(char c)
 {
         char c1 ;
 
-        c1 = raise(c) ;
+        c1 = toupper(c) ;
         return( (c1>='0' && c1<='9') || (c1>='A' && c1<='F') ) ;
 }
 

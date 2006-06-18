@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.14 2005-03-21 07:36:28 stefano Exp $
+ *      $Id: main.c,v 1.15 2006-06-18 13:03:13 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -41,6 +41,7 @@ int	sharedfile;	/* File contains routines which are to be
 			 */
 
 int     noaltreg;       /* No alternate registers */
+int     usempm;         /* We're using mpm */
 
 /*
  * Some external data
@@ -52,6 +53,7 @@ extern  GOTO_TAB *gotoq;         /* Pointer for gotoq */
 
 
 
+void    SetMPM(char *);
 void    SetSmart(char *);
 void    UnSetSmart(char *);
 void    SetExpand(char *);
@@ -162,6 +164,7 @@ int main(int argc, char **argv)
 	debuglevel=NO;
 	farheapsz=-1;			/* Size of far heap */
 	asxx=NO;
+    usempm = NO;
 	printflevel=0;
 #ifdef USEFRAME
 	indexix=YES;
@@ -751,32 +754,32 @@ dumpvars()
 
 
 void dumplits(
-int size, int pr_label ,
-int queueptr,int queuelab,
-unsigned char *queue)
+    int size, int pr_label ,
+    int queueptr,int queuelab,
+    unsigned char *queue)
 {
-        int j, k,lit ;
+    int j, k,lit ;
 
-        if ( queueptr ) {
-                if ( pr_label ) {
+    if ( queueptr ) {
+        if ( pr_label ) {
 			if (asxx) ol(".area _TEXT");
-                        prefix(); queuelabel(queuelab) ;
-                        col() ; nl();
-                }
-                k = 0 ;
-                while ( k < queueptr ) {
-                        /* pseudo-op to define byte */
-                        if (infunc) j=1;
-                        else j=10;
-                        if (size == 1) defbyte();
-                        else if (size == 4) deflong();
-                        else if (size == 0 ) { defmesg(); j=30; }
-                        else defword();
-                        while ( j-- ) {
-                                if (size==0) {
-                                        lit=getint(queue+k,1);
-                                        if (lit >= 32 && lit <= 126  && lit != '"' ) outbyte(lit);
-                                        else {
+            prefix(); queuelabel(queuelab) ;
+            col() ; nl();
+        }
+        k = 0 ;
+        while ( k < queueptr ) {
+            /* pseudo-op to define byte */
+            if (infunc) j=1;
+            else j=10;
+            if (size == 1) defbyte();
+            else if (size == 4) deflong();
+            else if (size == 0 ) { defmesg(); j=30; }
+            else defword();
+            while ( j-- ) {
+                if (size==0) {
+                    lit=getint(queue+k,1);
+                    if (lit >= 32 && lit <= 126  && lit != '"' ) outbyte(lit);
+                    else {
 						if (asxx) {
 							outstr("\"\n");
 							defbyte();
@@ -784,31 +787,41 @@ unsigned char *queue)
 							nl();
 							lit=0;
 						} else {
-						/* Now z80asm */
-                                                	outstr("\"&");
-                                                	outdec(lit);
-                                                	if (lit) outstr("&\"");
-						}
-                                        }
-                                        k++;
-                                        if ( j == 0 || k >=queueptr || lit == 0 ) {
-                                                if (lit) outbyte('"');
-                                                nl();
-                                                break;
-                                        }
+                            /* Now z80asm */
+                            if ( usempm ) {
+                                outstr("\",");
+                            } else {
+                                outstr("\"&");
+                            }
+                            outdec(lit);
+                            if (lit) {
+                                if ( usempm ) {
+                                    outstr(",\"");
                                 } else {
-                                        outdec(getint(queue+k, size));
-                                        k += size ;
-                                        if ( j == 0 || k >= queueptr ) {
-                                            nl();           /* need <cr> */
-                                            break;
-                                        }
-                                        outbyte(',');   /* separate bytes */
+                                    outstr("&\"");
                                 }
-                        }
+                            }
+						}
+                    }
+                    k++;
+                    if ( j == 0 || k >=queueptr || lit == 0 ) {
+                        if (lit) outbyte('"');
+                        nl();
+                        break;
+                    }
+                } else {
+                    outdec(getint(queue+k, size));
+                    k += size ;
+                    if ( j == 0 || k >= queueptr ) {
+                        nl();           /* need <cr> */
+                        break;
+                    }
+                    outbyte(',');   /* separate bytes */
                 }
+            }
         }
-        nl();
+    }
+    nl();
 }
 
 
@@ -1051,6 +1064,7 @@ struct args myargs[]= {
 /* Compatibility Modes.. */
         {"f",NO,SetUnsigned},
         {"l",NO,SetFarPtrs},
+        {"mpm",NO,SetMPM},
         {"",0}
         };
 
@@ -1073,6 +1087,11 @@ void SetFrameIY(char *arg)
 	indexix=NO;
 }
 #endif
+
+void SetMPM(char *arg)
+{
+    usempm = YES;
+}
 
 void SetDoubleStrings(char *arg)
 {

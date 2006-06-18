@@ -100,3 +100,4 @@ extern int defdenums;
 extern int farheapsz;
 extern int printflevel;
 extern int doublestrings;
+extern int usempm;

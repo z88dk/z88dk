@@ -26,7 +26,6 @@ extern void ot(char *ptr);
 extern void blanks(void);
 extern void outdec(long number);
 extern void outd2(long n);
-extern char raise(char c);
 extern void queuelabel(int);
 
 typedef struct {

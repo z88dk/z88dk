@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.21 2004-03-26 22:06:09 denniz Exp $
+ *      $Id: codegen.c,v 1.22 2006-06-18 13:03:13 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -167,7 +167,7 @@ void outname(char *sname,char pref)
         if ( strlen(sname) > ASMLEN ) {
                 i = ASMLEN;
                 while ( i-- )
-                        outbyte(raise(*sname++));
+                        outbyte(toupper(*sname++));
         }
         else
                 outstr(sname);

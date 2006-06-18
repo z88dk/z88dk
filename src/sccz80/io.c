@@ -3,7 +3,7 @@
  *
  *      Various compiler file i/o routines
  *
- *      $Id: io.c,v 1.5 2004-03-26 22:06:09 denniz Exp $
+ *      $Id: io.c,v 1.6 2006-06-18 13:03:13 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -356,14 +356,6 @@ void outd2(long n)
 }
 
 /* convert lower case to upper */
-char raise(char c)
-{
-        if ( c >= 'a' ) {
-                if ( c <= 'z' )
-                        c -= 32; /* 'a'-'A'=32 */
-        }
-        return c ;
-}
 
 #ifdef INBUILT_OPTIMIZER
 #	include "opt.c"
