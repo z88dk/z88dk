@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.7 2002-04-24 08:15:02 stefano Exp $
+;	$Id: c128_crt0.asm,v 1.8 2006-06-18 19:05:53 dom Exp $
 ;
 
 
@@ -186,7 +186,8 @@ ENDIF
 
 ; mem stuff
 
-         defm  "Small C+ C128"&0
+         defm  "Small C+ C128"
+	 defb  0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

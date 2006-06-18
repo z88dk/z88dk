@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.10 2003-10-10 11:03:42 dom Exp $
+;       $Id: spec_crt0.asm,v 1.11 2006-06-18 19:05:53 dom Exp $
 ;
 
 
@@ -313,7 +313,8 @@ IF DEFINED_NEED1bitsound
 .snd_tick	defb	0	; Sound variable
 ENDIF
 
-		defm	"Small C+ ZX"&0	;Unnecessary file signature
+		defm	"Small C+ ZX"	;Unnecessary file signature
+		defb	0
 
 ;-----------------------
 ; Floating point support

@@ -9,7 +9,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.9 2002-04-24 08:15:02 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.10 2006-06-18 19:05:53 dom Exp $
 ;
 ; - - - - - - -
 
@@ -185,7 +185,8 @@ ENDIF
 .saved_hl	defw	0	; Temp store for hl
 .saved_de	defw	0	; Temp store for de
 
-         	defm  "Small C+ ZX81"&0	;Unnecessary file signature
+         	defm  "Small C+ ZX81"	;Unnecessary file signature
+		defb	0
 
 ;-----------------------
 ; Floating point support

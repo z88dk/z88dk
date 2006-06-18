@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: m5_crt0.asm,v 1.4 2002-04-24 08:15:02 stefano Exp $
+;       $Id: m5_crt0.asm,v 1.5 2006-06-18 19:05:53 dom Exp $
 ;
 
 
@@ -163,7 +163,8 @@ ENDIF
 		defw	0
 .coords		defw	0
 
-         defm  "Small C+ SORD M5"&0
+         defm  "Small C+ SORD M5"
+	 defb	0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

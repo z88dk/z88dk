@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;       $Id: svi_crt0.asm,v 1.4 2002-04-24 08:15:02 stefano Exp $
+;       $Id: svi_crt0.asm,v 1.5 2006-06-18 19:05:53 dom Exp $
 ;
 
 
@@ -147,7 +147,8 @@ ENDIF
 
 ; mem stuff
 
-         defm  "Small C+ MSX"&0
+         defm  "Small C+ MSX"
+	 defb	0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

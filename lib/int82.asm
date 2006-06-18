@@ -30,7 +30,8 @@
 .UnloadStr				;
 	defm	"Please disable  "	;
 	defm	"the interrupt   "	;
-	defm	"that is running."&0	;
+	defm	"that is running."	;
+	defb	0
 					;
 .OK					;
 	im	1			; For safety reasons...

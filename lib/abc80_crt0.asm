@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato May 2000
 ;
-;       $Id: abc80_crt0.asm,v 1.4 2002-04-24 08:15:02 stefano Exp $
+;       $Id: abc80_crt0.asm,v 1.5 2006-06-18 19:05:53 dom Exp $
 ;
 
                 MODULE  abc80_crt0
@@ -150,7 +150,8 @@ ENDIF
 		defw	0
 .coords		defw	0
 
-         defm  "Small C+ ABC80"&0
+         defm  "Small C+ ABC80"
+	 defb  0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

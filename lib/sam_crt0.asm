@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: sam_crt0.asm,v 1.6 2003-02-04 09:10:13 stefano Exp $
+;       $Id: sam_crt0.asm,v 1.7 2006-06-18 19:05:53 dom Exp $
 ;
 
 
@@ -178,7 +178,8 @@ ENDIF
                 defw    16384
 .coords         defw    0
 
-         defm  "Small C+ SAM Coupe"&0
+         defm  "Small C+ SAM Coupe"
+	 defb	0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

@@ -3,7 +3,7 @@
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.19 2004-03-20 11:16:24 stefano Exp $
+;	$Id: ti83p_crt0.asm,v 1.20 2006-06-18 19:05:53 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells
@@ -105,7 +105,9 @@ IF (startup = 4)
 	DEFINE NOT_DEFAULT_SHELL
 	org	$9D94
 	ret
-	defm	"TSE"&1&" "
+	defm	"TSE"
+	defb	1
+	defm	" "
 	DEFINE NEED_name
 	INCLUDE	"zcc_opt.def"
 	UNDEFINE NEED_name

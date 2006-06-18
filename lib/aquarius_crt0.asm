@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: aquarius_crt0.asm,v 1.4 2003-06-27 14:04:12 stefano Exp $
+;       $Id: aquarius_crt0.asm,v 1.5 2006-06-18 19:05:53 dom Exp $
 ;
 
 
@@ -134,7 +134,8 @@ IF DEFINED_NEED1bitsound
 .snd_tick	defb	0	; Sound variable
 ENDIF
 
-		defm	"Small C+ Aquarius"&0	;Unnecessary file signature
+		defm	"Small C+ Aquarius"	;Unnecessary file signature
+		defb	0
 
 ;-----------------------
 ; Floating point support

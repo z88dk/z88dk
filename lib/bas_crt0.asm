@@ -2,7 +2,7 @@
 ;
 ;       Created 1/4/99 djm
 ;
-;	$Id: bas_crt0.asm,v 1.3 2001-10-15 21:05:02 dom Exp $
+;	$Id: bas_crt0.asm,v 1.4 2006-06-18 19:05:53 dom Exp $
 
 
 ;-----------
@@ -189,7 +189,8 @@ ENDIF
 ;-----------
 ; Unnecessary file signature
 ;-----------
-		defm	"Small C+ z88"&0
+		defm	"Small C+ z88"
+		defb	0
 
 ;-----------
 ; Floating point

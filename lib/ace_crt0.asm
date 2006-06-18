@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.5 2002-04-24 08:15:02 stefano Exp $
+;	$Id: ace_crt0.asm,v 1.6 2006-06-18 19:05:53 dom Exp $
 ;
 
 
@@ -149,7 +149,8 @@ ENDIF
 .coords		defw	0
 .snd_tick	defb	0
 
-         defm  "Small C+ J.ACE"&0
+         defm  "Small C+ J.ACE"
+	 defb  0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

@@ -14,7 +14,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.4 2003-10-23 10:42:49 stefano Exp $
+;       $Id: oz_crt0.asm,v 1.5 2006-06-18 19:05:53 dom Exp $
 ;
 ; - - - - - - -
 
@@ -524,7 +524,8 @@ s_filetypetable: defw    0c089h
 .saved_hl	defw	0	; Temp store for hl
 .saved_de	defw	0	; Temp store for de
 
-         	defm  "Small C+ OZ"&0	;Unnecessary file signature
+         	defm  "Small C+ OZ"	;Unnecessary file signature
+		defb	0
 
 ;-----------------------
 ; Floating point support

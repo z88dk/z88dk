@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.6 2003-08-30 16:40:13 dom Exp $
+;       $Id: cpc_crt0.asm,v 1.7 2006-06-18 19:05:53 dom Exp $
 ;
 
                 MODULE  cpc_crt0
@@ -165,7 +165,8 @@ ENDIF
 		defw	$C000
 .coords		defw	0
 
-         defm  "Small C+ CPC"&0
+         defm  "Small C+ CPC"
+	 defb   0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

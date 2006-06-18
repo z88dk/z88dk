@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 5/5/2000
 ;
-;       $Id: mz_crt0.asm,v 1.6 2002-04-24 08:15:02 stefano Exp $
+;       $Id: mz_crt0.asm,v 1.7 2006-06-18 19:05:53 dom Exp $
 ;
 
 
@@ -143,7 +143,8 @@ IF DEFINED_NEED1bitsound
 .snd_tick	defb	0	; Sound variable
 ENDIF
 
-		defm  "Small C+ SHARP MZ"&0
+		defm  "Small C+ SHARP MZ"
+		defb	0
 
 ;-----------------------
 ; Floating point support

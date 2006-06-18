@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: vz_crt0.asm,v 1.6 2003-09-30 10:23:12 stefano Exp $
+;       $Id: vz_crt0.asm,v 1.7 2006-06-18 19:05:53 dom Exp $
 ;
 
 
@@ -169,7 +169,8 @@ ENDIF
 .base_graphics  defw    28672
 .gfx_bank       defb    0
 
-         defm  "Small C+ VZ"&0
+         defm  "Small C+ VZ"
+	 defb	0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

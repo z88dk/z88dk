@@ -42,4 +42,5 @@
 .system_stack
 	defw	0
 
-	defm	"UZIz88"&0
+	defm	"UZIz88"
+	defb	0

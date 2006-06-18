@@ -9,7 +9,7 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: nc100_crt0.asm,v 1.4 2002-04-24 08:15:02 stefano Exp $
+;       $Id: nc100_crt0.asm,v 1.5 2006-06-18 19:05:53 dom Exp $
 ;
 
 
@@ -138,7 +138,8 @@ ENDIF
 .base_graphics	defw	0	;Graphics variables
 .coords		defw	0
 
-		defm	"Small C+ nc100"&0
+		defm	"Small C+ nc100"
+		defb	0
 
 ;-------
 ; Floating point

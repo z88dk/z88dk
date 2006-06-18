@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: nascom_crt0.asm,v 1.2 2003-06-27 14:04:12 stefano Exp $
+;       $Id: nascom_crt0.asm,v 1.3 2006-06-18 19:05:53 dom Exp $
 ;
 ; - - - - - - -
 
@@ -153,7 +153,8 @@ ENDIF
 .heaplast       defw    0       ; Address of last block on heap
 .heapblocks     defw    0       ; Number of blocks
 
-         	defm  "Small C+ NASCOM"&0	;Unnecessary file signature
+         	defm  "Small C+ NASCOM"	;Unnecessary file signature
+		defb	0
 
 ;-----------------------
 ; Floating point support

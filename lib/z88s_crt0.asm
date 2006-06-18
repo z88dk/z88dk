@@ -3,7 +3,7 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.6 2002-06-23 14:18:01 dom Exp $
+;	$Id: z88s_crt0.asm,v 1.7 2006-06-18 19:05:53 dom Exp $
 
 
 
@@ -15,7 +15,11 @@
 	org	shell_loadaddr-shell_headerlen
 
 .header_start
-        defm    "!bin"&shell_verh&shell_verm&shell_verl&13
+        defm    "!bin"
+	defb	shell_verh
+	defb	shell_verm
+	defb	shell_verl
+	defb	13
 .shell_length
         defw    0		; Fill in by make program
         defw    start
