@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.20 2004-10-12 12:33:54 stefano Exp $
+ * $Id: zcc.h,v 1.21 2006-06-18 13:04:16 dom Exp $
  */
 
 /* Very contrived, if not a Windows target then include the config file */
@@ -62,7 +62,7 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 #define Z88MATH 1
 #define GENMATH 2
 
-#define LINEMAX 160      /* Max number of chars to read from config file*/
+#define LINEMAX 1024      /* Max number of chars to read from config file*/
 
 /*
  *      Sorry, this is hard coded, hopefully won't cause too many
