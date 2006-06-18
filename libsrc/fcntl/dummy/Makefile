@@ -1,10 +1,12 @@
-# $Id: Makefile,v 1.5 2002-10-22 19:15:05 dom Exp $
+# $Id: Makefile,v 1.6 2006-06-18 14:55:43 dom Exp $
+
+include ../../Make.config
 
 all:
 	@echo ''
 	@echo '---> Building NDOS library <---'
 	@echo ''
-	z80asm -d -ns -nm -Mo -x../../ndos @ndoslist
+	$(LIBLINKER) -x../../ndos @ndoslist
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o*

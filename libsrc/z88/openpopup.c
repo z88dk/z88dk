@@ -7,6 +7,20 @@
 
 #include <z88.h>
 
+static char  winbot[] = "\x012-S\x012Y"; /* Move to window bottom string */
+static char  winlin[] = "\x012*I\x013N"; /* Bottom line string */
+static char  wincrn[] = "\0x5\0x1\2*L";   /* br corner string */
+
+#if 0
+#asm
+
+._winbot	defm	1&"2-S"&1&"2Y"&0	; move to window bottom string
+._winlin	defm	1&"2*I"&1&"3N"&0	; bottom line string
+._wincrn	defm	5&1&"2*L"&0		; br corner string
+
+#endasm
+#endif
+
 void openpopup(int wid,int tlx,int tly,int width,int height,char *name)
 {
 #asm
@@ -29,17 +43,17 @@ void openpopup(int wid,int tlx,int tly,int width,int height,char *name)
 	dec	(ix+2)
 	dec	(ix+4)
 	dec	(ix+4)
-	ld	hl,winbot
+	ld	hl,_winbot
 	call_oz(gn_sop)
 	ld	a,(ix+2)
 	add	a,$20
 	call_oz(os_out)		; move to last row
-	ld	hl,winlin
+	ld	hl,_winlin
 	call_oz(gn_sop)		; bottom line string
 	ld	a,(ix+4)
 	add	a,$20
 	call_oz(os_out)		; for width of window
-	ld	hl,wincrn
+	ld	hl,_wincrn
 	call_oz(gn_sop)		; bottom right corner string
 	dec	(ix+2)		; reduce height
 	jp	opentitled	; continue, with titled version
@@ -47,10 +61,3 @@ void openpopup(int wid,int tlx,int tly,int width,int height,char *name)
 #endasm
 }
 
-#asm
-
-.winbot	defm	1&"2-S"&1&"2Y"&0	; move to window bottom string
-.winlin	defm	1&"2*I"&1&"3N"&0	; bottom line string
-.wincrn	defm	5&1&"2*L"&0		; br corner string
-
-#endasm

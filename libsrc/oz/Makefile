@@ -1,19 +1,19 @@
 #
 # Makefile for OZ-7xx specific libraries
 #
-# $Id: Makefile,v 1.6 2005-09-07 01:30:33 aralbrec Exp $
+# $Id: Makefile,v 1.7 2006-06-18 14:55:44 dom Exp $
 
-
+include ../Make.config
 
 all:	
 	$(RM) emu/ozgfx/*.o*
 	cd oztime ; $(MAKE) ; cd ..
 	cd ozinput ; $(MAKE) ; cd ..
 	zcc +z88 -vn -make-lib
-	z80asm -d -ns -nm -Mo -xozextra -DFORoz -DOZDK @oz700.lst
+	$(LIBLINKER) -xozextra -DFORoz -DOZDK @oz700.lst
 
 	cd lib3d ; $(MAKE) ; cd ..
-	z80asm -d -ns -nm -Mo -xlib3d -DFORoz -DOZDK @lib3d.lst
+	$(LIBLINKER) -xlib3d -DFORoz -DOZDK @lib3d.lst
 
 clean:
 	$(RM) *.o* zcc_opt.def ozextra.lib

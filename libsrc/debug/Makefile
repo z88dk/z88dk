@@ -1,5 +1,7 @@
 #
-# $Id: Makefile,v 1.2 2002-10-22 19:15:02 dom Exp $
+# $Id: Makefile,v 1.3 2006-06-18 14:55:43 dom Exp $
+
+include ../Make.config
 
 CFILES = dump.c
 
@@ -7,7 +9,7 @@ AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
 
 all:	$(OBJECTS)
-	z80asm -d -ns -nm -Mo -x../debug @debug.lst
+	$(LIBLINKER) -x../debug @debug.lst
 
 .c.o:  
 	zcc -vn -make-lib $*.c

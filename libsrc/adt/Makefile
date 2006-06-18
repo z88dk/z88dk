@@ -2,9 +2,10 @@
 # Wahey, a messed up makefile for building libraries!
 #
 
+include ../Make.config
 
 all: 
-	z80asm -d -ns -nm -Mo -x../adt @adt.lst
+	$(LIBLINKER) -x../adt @adt.lst
 
 clean:
 	cd hashtable ; $(RM) *.o* *.sym *.map zcc_opt.def ; cd ..

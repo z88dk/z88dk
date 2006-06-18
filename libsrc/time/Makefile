@@ -1,7 +1,9 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.10 2005-09-07 01:30:34 aralbrec Exp $
+# $Id: Makefile,v 1.11 2006-06-18 14:55:44 dom Exp $
+
+include ../Make.config
 
 lz88: time z88_time
 
@@ -12,7 +14,7 @@ lzx: spectrum_time
 time: gmtime.o localtime.o mktime.o
 
 .c.o:
-	zcc +z88 -vn -make-lib $*.c
+	zcc -vn -make-lib $*.c
 
 pps_time:
 	cd sprinter ; $(MAKE) ; cd ..

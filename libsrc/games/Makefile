@@ -1,4 +1,6 @@
-# $Id: Makefile,v 1.5 2003-09-15 22:54:57 denniz Exp $
+# $Id: Makefile,v 1.6 2006-06-18 14:55:43 dom Exp $
+
+include ../Make.config
 
 lzx:
 	zcc +zx -vn -make-lib bit_frequency.c

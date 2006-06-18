@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.13 2005-09-07 01:30:34 aralbrec Exp $
+# $Id: Makefile,v 1.14 2006-06-18 14:55:44 dom Exp $
 
 GENCFILES = \
 	atoi.c \
@@ -22,7 +22,7 @@ lzx: gen zx_stdlib
 gen: $(GENOBJECTS)
 
 .c.o:
-	zcc -vn -make-lib $*.c
+	zcc -make-lib $*.c
 
 z88_stdlib:
 	cd z88 ; $(MAKE) ; cd ..
