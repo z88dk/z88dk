@@ -47,9 +47,6 @@ crt0/l_ugt
 crt0/l_ule
 crt0/l_ult
 crt0/l_xor
-crt0/l_jphl
-crt0/l_jpix
-crt0/l_jpiy
 crt0_long/int2long_s
 crt0_long/long2int_s
 crt0_long/htonl
