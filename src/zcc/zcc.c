@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.31 2006-06-18 21:42:48 dom Exp $
+ *      $Id: zcc.c,v 1.32 2006-06-20 11:32:17 dom Exp $
  */
 
 
@@ -190,6 +190,7 @@ int CopyFile(char *,char *, char *, char *);
 void tempname(char *);
 int FindConfigFile(char *, int);
 void parse_option(char *option);
+void linkargs_mangle();
 
 /* Mode Options, used for parsing arguments */
 
@@ -460,6 +461,9 @@ int linkthem(linker)
         if (lateassemble) 
             fprintf(stderr,"Cannot relocate an application..\n");
         else strcat(p,"-R ");
+    }
+    if ( usempm ) {
+        linkargs_mangle(linkargs);
     }
     strcat(p,linkargs);
 /* Now insert the 0crt file (so main doesn't have to be the first file
@@ -836,7 +840,6 @@ void SetMPM(char *arg)
     char   *temp = " -mpm";
     usempm = YES;
     AddComp(temp+1);
-    printf("Setting using mpm\n");
 }
 
 
@@ -1588,4 +1591,14 @@ void parse_option(char *option)
 	}
 	ptr = strtok(NULL," \r\n");
     }
+}
+
+/* Check link arguments (-i) to -l for mpm */
+void linkargs_mangle()
+{
+     char *ptr = linkargs;
+
+     while ( ( ptr = strstr(linkargs,"-i") ) != NULL ) {
+         ptr[1] = 'l';
+     }
 }
