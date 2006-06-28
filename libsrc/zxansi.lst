@@ -222,7 +222,16 @@ spectrum/if1_touch_file
 spectrum/if1_update_map
 spectrum/if1_from_mdv
 spectrum/if1_installed
+spectrum/zx_getint
+spectrum/zx_setint
+spectrum/zx_locatenum
+spectrum/zx_getstr
+spectrum/zx_goto
+spectrum/zx_128
+spectrum/zx_128mode
 spectrum/zx_issue3
+spectrum/zx_basic_length
+spectrum/zx_var_length
 spectrum/border
 spectrum/scr_chardown
 spectrum/scr_charleft
