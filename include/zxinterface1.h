@@ -5,7 +5,7 @@
  *
  *      Stefano Bodrato - 6/9/2004
  *
- *	$Id: zxinterface1.h,v 1.3 2006-05-23 21:47:25 stefano Exp $
+ *	$Id: zxinterface1.h,v 1.4 2006-06-28 22:09:47 stefano Exp $
  */
 
 
@@ -104,8 +104,26 @@ extern char __LIB__ *if1_getname(char *location);
 // Delete a file
 extern int __LIB__ if1_remove_file(int drive, char *filename);
 
-// Create a file if not existing
+// Create a file if it doesn't exist
 extern int __LIB__ if1_touch_file(int drive, char *filename);
+
+// Create a file and return handle
+extern int __LIB__ if1_init_file (int drive, char *filename, struct M_CHAN buffer);
+
+// Load the map values for the specified drive
+extern void __LIB__ if1_update_map (int drive, char *mdvmap);
+
+// Find a free sector
+extern int __LIB__ if1_find_sector (int drive);
+
+// Find a free sector in the specified map
+extern int __LIB__ if1_find_sector_map (char *mdvmap);
+
+// Returns true if the current program has been loaded from microdrive
+extern int __LIB__ if1_from_mdv();
+
+// Returns true if the system variables are already present
+extern int __LIB__ if1_installed();
 
 
 #endif /* _ZXINTERFACE1_H */

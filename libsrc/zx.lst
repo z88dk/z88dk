@@ -210,6 +210,8 @@ spectrum/if1_find_sector
 spectrum/if1_find_sector_map
 spectrum/if1_touch_file
 spectrum/if1_update_map
+spectrum/if1_from_mdv
+spectrum/if1_installed
 spectrum/zx_issue3
 spectrum/border
 spectrum/scr_chardown

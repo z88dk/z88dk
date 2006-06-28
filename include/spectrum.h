@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.11 2006-05-04 19:47:16 aralbrec Exp $
+ * $Id: spectrum.h,v 1.12 2006-06-28 22:09:47 stefano Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -134,5 +134,24 @@ extern void __LIB__ __FASTCALL__ *attr_charleft(void *attraddr);
 extern void __LIB__ __FASTCALL__ *attr_charright(void *attraddr);
 extern void __LIB__ __FASTCALL__ *attr_charup(void *attraddr);
 extern void __LIB__ __FASTCALL__ *attr_getscrnaddr(void *attraddr);
+
+/* Diagnostics - TRUE or FALSE */
+
+extern int __LIB__ zx_128();
+extern int __LIB__ zx_128mode();
+extern int __LIB__ zx_issue3();
+extern int __LIB__ zx_interface1();
+
+/* Other Diagnostics */
+
+extern int __LIB__ zx_basic_length();
+extern int __LIB__ zx_var_length();
+
+/* Interface to call BASIC */
+
+extern int __LIB__ zx_goto(int line);
+extern int __LIB__ zx_getstr(char variable, char *value);
+extern int __LIB__ zx_getint(char *variable);
+extern void __LIB__ zx_setint(char *variable, int value);
 
 #endif
