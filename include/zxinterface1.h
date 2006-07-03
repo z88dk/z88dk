@@ -1,11 +1,9 @@
 /*
- *      Small C+ Library
- *
  *      ZX Interface 1 and Microdrive low level support
  *
  *      Stefano Bodrato - 6/9/2004
  *
- *	$Id: zxinterface1.h,v 1.4 2006-06-28 22:09:47 stefano Exp $
+ *	$Id: zxinterface1.h,v 1.5 2006-07-03 15:04:15 stefano Exp $
  */
 
 
@@ -67,6 +65,11 @@ struct M_SECT {
 };
 
 
+struct M_MAP {
+	char    map[32];	/* 32 bytes = 256 bits for a microdrive map */
+};
+
+
 struct N_CHAN {
 	// base channel descriptor
 	struct	BASE_CHAN base;
@@ -124,6 +127,9 @@ extern int __LIB__ if1_from_mdv();
 
 // Returns true if the system variables are already present
 extern int __LIB__ if1_installed();
+
+// Returns true if the Interface 1 is present
+extern int __LIB__ zx_interface1();
 
 
 #endif /* _ZXINTERFACE1_H */

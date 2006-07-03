@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.12 2006-06-28 22:09:47 stefano Exp $
+ * $Id: spectrum.h,v 1.13 2006-07-03 15:04:15 stefano Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -18,6 +18,8 @@
 #endif
 
 #include <sys/types.h>
+
+
 
 #ifdef PLUS3
 /* If it's a +3 we want the dodos routine */
@@ -140,7 +142,6 @@ extern void __LIB__ __FASTCALL__ *attr_getscrnaddr(void *attraddr);
 extern int __LIB__ zx_128();
 extern int __LIB__ zx_128mode();
 extern int __LIB__ zx_issue3();
-extern int __LIB__ zx_interface1();
 
 /* Other Diagnostics */
 
@@ -151,7 +152,104 @@ extern int __LIB__ zx_var_length();
 
 extern int __LIB__ zx_goto(int line);
 extern int __LIB__ zx_getstr(char variable, char *value);
+extern void __LIB__ zx_setstr(char variable, char *value);
 extern int __LIB__ zx_getint(char *variable);
 extern void __LIB__ zx_setint(char *variable, int value);
+
+/* Token codes for BASIC keyworks */
+
+#define TK_RND     165
+#define TK_INKEYS  166
+#define TK_PI      167
+#define TK_FN      168
+#define TK_POINT   169
+#define TK_SCREENS 170
+#define TK_ATTR    171
+#define TK_AT      172
+#define TK_TAB     173
+#define TK_VALS    174
+#define TK_CODE    175
+#define TK_VAL     176
+#define TK_LEN     177
+#define TK_SIN     178
+#define TK_COS     179
+#define TK_TAN     180
+#define TK_ASN     181
+#define TK_ACS     182
+#define TK_ATN     183
+#define TK_LN      184
+#define TK_EXP     185
+#define TK_INT     186
+#define TK_SQR     187
+#define TK_SGN     188
+#define TK_ABS     189
+#define TK_PEEK    190
+#define TK_IN      191
+#define TK_USR     192
+#define TK_STRS    193
+#define TK_CHRS    194
+#define TK_NOT     195
+#define TK_BIN     196
+#define TK_OR      197
+#define TK_AND     198
+
+#define TK__LEQ    199
+#define TK__GEQ    200
+#define TK__NEQ    201
+
+#define TK_LINE      202
+#define TK_THEN      203
+#define TK_TO        204
+#define TK_STEP      205
+#define TK_DEF_FN    206
+#define TK_CAT       207
+#define TK_FORMAT    208
+#define TK_MOVE      209
+#define TK_ERASE     210
+#define TK_OPEN      211
+#define TK_CLOSE     212
+#define TK_MERGE     213
+#define TK_VERIFY    214
+#define TK_BEEP      215
+#define TK_CIRCLE    216
+#define TK_INK       217
+#define TK_PAPER     218
+#define TK_FLASH     219
+#define TK_BRIGHT    220
+#define TK_INVERSE   221
+#define TK_OVER      222
+#define TK_OUT       223
+#define TK_LPRINT    224
+#define TK_LLIST     225
+#define TK_STOP      226
+#define TK_READ      227
+#define TK_DATA      228
+#define TK_RESTORE   229
+#define TK_NEW       230
+#define TK_BORDER    231
+#define TK_CONTINUE  232
+#define TK_DIM       233
+#define TK_REM       234
+#define TK_FOR       235
+#define TK_GO_TO     236
+#define TK_GO_SUB    237
+#define TK_INPUT     238
+#define TK_LOAD      239
+#define TK_LIST      240
+#define TK_LET       241
+#define TK_PAUSE     242
+#define TK_NEXT      243
+#define TK_POKE      244
+#define TK_PRINT     245
+#define TK_PLOT      246
+#define TK_RUN       247
+#define TK_SAVE      248
+#define TK_RANDOMIZE 249
+#define TK_IF        250
+#define TK_CLS       251
+#define TK_DRAW      252
+#define TK_CLEAR     253
+#define TK_RETURN    254
+#define TK_COPY      255
 
 #endif

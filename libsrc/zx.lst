@@ -216,12 +216,16 @@ spectrum/zx_getint
 spectrum/zx_setint
 spectrum/zx_locatenum
 spectrum/zx_getstr
+spectrum/zx_setstr
 spectrum/zx_goto
 spectrum/zx_128
 spectrum/zx_128mode
 spectrum/zx_issue3
 spectrum/zx_basic_length
 spectrum/zx_var_length
+spectrum/currah_speech
+spectrum/currah_direct
+spectrum/currah_detect
 spectrum/border
 spectrum/scr_chardown
 spectrum/scr_charleft
