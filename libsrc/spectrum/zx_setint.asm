@@ -7,7 +7,7 @@
 ;	int zx_setint(char *variable, int value);
 ;
 ;
-;	$Id: zx_setint.asm,v 1.1 2006-06-28 22:21:26 stefano Exp $
+;	$Id: zx_setint.asm,v 1.2 2006-07-10 17:37:36 stefano Exp $
 ;
 
 	XLIB	zx_setint
@@ -58,7 +58,7 @@ vlcount:
 	cp	6
 	ld	a,(de)
 	jr	nz,morethan1
-				; fall here if the variable name is
+	or	32		; fall here if the variable name is
 	ld	(hl),a		; only one char long
 	inc	hl
 	jr	store2
@@ -72,7 +72,7 @@ lintlp:
 	ld	a,(de)		; now we copy the body of the VAR name..
 	and	a
 	jr	z,endlint
-	or	96
+	or	32
 	inc	hl
 	ld	(hl),a
 	djnz	lintlp

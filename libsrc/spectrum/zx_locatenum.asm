@@ -8,7 +8,7 @@
 ;	Carry flag is set on error
 ;
 ;
-;	$Id: zx_locatenum.asm,v 1.1 2006-06-28 22:21:26 stefano Exp $
+;	$Id: zx_locatenum.asm,v 1.2 2006-07-10 17:37:36 stefano Exp $
 ;
 
 	XLIB	zx_locatenum
@@ -17,14 +17,14 @@ zx_locatenum:
 
 	ld	a,(hl)
 	
-	ld	c,a		; keep the first letter
-	
 	and	a
 	jr	nz,notempty
 	scf
 	ret
 notempty:
-
+	or	32
+	ld	c,a		; keep the first letter
+	
 	push	hl
 	inc	hl
 	ld	a,(hl)
