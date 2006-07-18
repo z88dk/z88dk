@@ -1,0 +1,16 @@
+zxhandl
+close
+creat
+fdgetpos
+fdtell
+lseek
+open
+open_z88
+read
+readbyte
+remove
+rename
+write
+writebyte
+zx_hardcopy
+zxgetfname

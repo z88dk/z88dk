@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2005-09-07 01:30:33 aralbrec Exp $
+# $Id: Makefile,v 1.5 2006-07-18 21:02:54 stefano Exp $
 
 all:
 	@echo ''
@@ -10,6 +10,10 @@ all:
 	@echo '---> Building ZX Microdrive File library <---'
 	@echo ''
 	cd microdrive ; $(MAKE)
+	@echo ''
+	@echo '---> Building ZX BASIC driver library <---'
+	@echo ''
+	cd zxbasdrv ; $(MAKE)
 
 
 clean:
