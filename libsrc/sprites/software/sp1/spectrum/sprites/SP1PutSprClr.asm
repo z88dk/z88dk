@@ -17,7 +17,7 @@ XLIB SP1PutSprClr
 
 .SP1PutSprClr
 
-   ld c,0
+   ld c,$ff
 
 .loop
 

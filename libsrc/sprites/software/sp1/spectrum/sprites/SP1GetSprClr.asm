@@ -15,7 +15,7 @@ XLIB SP1GetSprClr
 
 .SP1GetSprClr
 
-   ld c,0
+   ld c,$ff
 
 .loop
 
