@@ -227,6 +227,7 @@ spectrum/currah_speech
 spectrum/currah_direct
 spectrum/currah_detect
 spectrum/border
+spectrum/attr
 spectrum/scr_chardown
 spectrum/scr_charleft
 spectrum/scr_charright

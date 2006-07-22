@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.13 2006-07-03 15:04:15 stefano Exp $
+ * $Id: spectrum.h,v 1.14 2006-07-22 08:30:21 aralbrec Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -113,6 +113,7 @@ extern void __LIB__ in_MouseKempSetPos(uint xcoord, uint ycoord);
 /* Display Functions */
 
 extern void __LIB__ __FASTCALL__ border(uchar colour);
+extern uchar __LIB__ attr(uchar row, uchar col);
 
 /* Manipulating Screen (Pixel) Addresses */
 

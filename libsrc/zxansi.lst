@@ -236,6 +236,7 @@ spectrum/zx_var_length
 spectrum/currah_speech
 spectrum/currah_direct
 spectrum/currah_detect
+spectrum/attr
 spectrum/border
 spectrum/scr_chardown
 spectrum/scr_charleft
