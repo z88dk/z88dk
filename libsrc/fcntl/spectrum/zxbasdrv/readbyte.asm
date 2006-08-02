@@ -8,7 +8,7 @@
 ;
 ; int __LIB__ __FASTCALL__ readbyte(int handle)
 ;
-; $Id: readbyte.asm,v 1.1 2006-07-18 21:02:54 stefano Exp $
+; $Id: readbyte.asm,v 1.2 2006-08-02 19:41:31 stefano Exp $
 
 	XLIB	readbyte
 	
@@ -39,7 +39,6 @@
 	pop	bc
 	pop	bc
 	ld	($5c3d),bc	; restore orginal ERR_SP
-	
 	ret	
 
 ; Errors ?    Probably it's an EOF !
@@ -47,5 +46,7 @@
 	pop	bc
 	ld	($5c3d),bc	; restore orginal ERR_SP
 	ld	(iy+0),255	; reset ERR_NR
+	scf
+	ccf
 	ld	hl,-1	; EOF
 	ret

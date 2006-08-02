@@ -5,7 +5,7 @@
 ;
 ; int open(char *name, int flags, mode_t mode)
 ;
-; $Id: open.asm,v 1.1 2006-07-18 21:02:54 stefano Exp $
+; $Id: open.asm,v 1.2 2006-08-02 19:41:31 stefano Exp $
 
 	XLIB	open
 	
@@ -79,8 +79,23 @@
 	push	bc
 	call	zx_goto
 	pop	bc
-	pop	hl		; restore file handle
+	pop	hl		; file handle
 
+	push	hl
+	ld	a,l
+	add	a,a
+	add	a,$16
+	ld	l,a
+	ld	h,$5c
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	a,d
+	or	e
+	pop	hl		; file handle
+	ret	nz
+
+	ld	hl,-1		; stream isn't open: file not found !
 	ret
 
 ; Drive "P::" is a unix style device for printer

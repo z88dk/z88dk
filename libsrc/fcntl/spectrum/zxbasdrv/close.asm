@@ -6,7 +6,7 @@
 ;
 ; int close(int handle)
 ;
-; $Id: close.asm,v 1.1 2006-07-18 21:02:54 stefano Exp $
+; $Id: close.asm,v 1.2 2006-08-02 19:41:31 stefano Exp $
 
 	XLIB	close
 	
@@ -43,6 +43,7 @@
 				; stream numbers from being closed
 
 	ld	bc,7550		; BASIC routine for "close"
+.goto_basic
 	push	bc
 	call	zx_goto
 	pop	bc
@@ -55,7 +56,4 @@
 ; If we had stream #3 then jump here.. it is a printer device
 
 .islpt	ld	bc,7750		; BASIC routine for "close printer device"
-	push	bc
-	call	zx_goto
-	pop	bc
-	ret
+	jr	goto_basic
