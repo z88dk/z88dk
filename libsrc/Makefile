@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.74 2006-06-18 14:55:43 dom Exp $
+# $Id: Makefile,v 1.75 2006-08-09 21:30:11 stefano Exp $
 
 
 include Make.config
@@ -38,12 +38,12 @@ zxlibs: zx_clib.lib zxan_clib.lib zxvgs.lib zx_math.lib zx_mathtiny.lib
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.74 2006-06-18 14:55:43 dom Exp $
+#  $Id: Makefile,v 1.75 2006-08-09 21:30:11 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.74 2006-06-18 14:55:43 dom Exp $
+# $Id: Makefile,v 1.75 2006-08-09 21:30:11 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -57,7 +57,7 @@ gfxdeps:
 	$(RM) -f graphics/text/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.74 2006-06-18 14:55:43 dom Exp $
+#  $Id: Makefile,v 1.75 2006-08-09 21:30:11 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -320,7 +320,7 @@ zxan_clib.lib:
 	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) ; cd ..
-	$(LIBLINKER) -DFORzx -DPACKEDFONT -DA64COL -xzxan_clib @zxansi.lst
+	$(LIBLINKER) -DFORzx $(COLDEFS) -xzxan_clib @zxansi.lst
 
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:

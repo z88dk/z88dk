@@ -1,7 +1,7 @@
 ZX BASIC driver specifications
 by Stefano Bodrato, July 2006.
 
-$Id: readme.txt,v 1.1 2006-07-18 21:02:55 stefano Exp $
+$Id: readme.txt,v 1.2 2006-08-09 21:30:11 stefano Exp $
 
 
 The "zxbasdrv" driver is a trick to get some basic functionality
@@ -36,7 +36,8 @@ s$ = Name/Description
 
 
 7500 - OPEN sequential file
-s=stream number (4-15)
+s=stream number (4-15); the ASM part detects the existence of the channel
+			and handles a "file not found" condition if it is missing
 f=mode flag (0=read, 256=write, etc..)
 d=drive number (it is extracted from the file name, see above)
 n$=file name
