@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.18 2006-04-23 06:48:34 aralbrec Exp $
+ * $Id: stdlib.h,v 1.19 2006-11-09 22:57:18 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -104,6 +104,13 @@ extern void __LIB__ outp(unsigned int port, unsigned char byte);
 
 extern void __LIB__ __FASTCALL__ *swapendian(void *addr);
 
+/* Non-Standard Functions to Peek and Poke Bytes and Words to Memory */
+/* the need turns up often and is a pain in the ass to do without these */
+
+extern void  __LIB__ bpoke(void *addr, unsigned char byte);
+extern void  __LIB__ wpoke(void *addr, unsigned int word);
+extern unsigned char __LIB__ __FASTCALL__ bpeek(void *addr);
+extern unsigned int  __LIB__ __FASTCALL__ wpeek(void *addr);
 
 /*
  *	Okay..include in malloc.h to be standard..
