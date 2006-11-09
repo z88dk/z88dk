@@ -5,7 +5,7 @@
 XLIB adt_ListDelete
 LIB ADTListDelete
 
-.adt_ListFree
+.adt_ListDelete
    ld hl,2
    add hl,sp
    ld a,(hl)
