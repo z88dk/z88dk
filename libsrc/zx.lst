@@ -93,6 +93,10 @@ stdlib/Lqsort
 stdlib/inp
 stdlib/outp
 stdlib/swapendian
+stdlib/bpeek
+stdlib/bpoke
+stdlib/wpeek
+stdlib/wpoke
 strings/memset
 strings/memcmp
 strings/memcpy
