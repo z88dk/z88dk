@@ -1,4 +1,4 @@
-; void adt_StackDelete(struct adt_Stack **s, void *delete)
+; void adt_StackDelete(struct adt_Stack *s, void *delete)
 ; 09.2005 aralbrec
 
 XLIB adt_StackDelete

@@ -1,4 +1,4 @@
-; int adt_StackPush(struct adt_Stack **s, void *item)
+; int adt_StackPush(struct adt_Stack *s, void *item)
 ; 09.2005 aralbrec
 
 XLIB adt_StackPush

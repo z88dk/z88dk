@@ -1,5 +1,5 @@
-; void *adt_StackPeek(struct adt_Stack *s)
-; 09.2005 aralbrec
+; void __FASTCALL__ *adt_StackPeek(struct adt_Stack *s)
+; 09.2005, 11.2006 aralbrec
 
 XLIB adt_StackPeek
 
@@ -8,15 +8,12 @@ XLIB adt_StackPeek
 ;
 ; enter: HL = struct adt_Stack *
 ; exit : HL = item at top of stack or 0 if stack empty
-;             carry also set if item returned
 
 .adt_StackPeek
-   ld a,h
-   or l
-   ret z
+   inc hl
+   inc hl
    ld e,(hl)
    inc hl
    ld d,(hl)
    ex de,hl
-   scf
    ret
