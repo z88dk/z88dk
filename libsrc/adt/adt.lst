@@ -61,5 +61,6 @@ stack/adt_StackDelete
 stack/adt_StackPeek
 stack/adt_StackPop
 stack/adt_StackPush
+stack/adt_StackCount
 stack/ADTStackDelete
 stack/ADTStackPush
