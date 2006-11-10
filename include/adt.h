@@ -215,8 +215,7 @@ extern int  __LIB__ adt_QueuePushBack(struct adt_Queue *q, void *item);
 /*** STACK
 
 A standard LIFO stack.  Items are pushed onto the top of a stack and are popped
-off the top as well.  An empty stack is indicated by a 0 struct adt_Stack *, hence
-there is no need for a separate function to indicate whether the stack is empty.
+off the top as well.
 
 In the following:
 
@@ -224,16 +223,22 @@ In the following:
                        an opportunity for user clean up if a non-empty stack is deleted
 */
 
-struct adt_Stack {                    /* One for each item in stack */
+struct adt_StackNode {                 /* One for each item in stack */
    void *item;
    struct adt_Stack *next;
 };
 
+struct adt_Stack {
+   uint count;                         /* Number of items in stack     */
+   struct adt_StackNode *next;         /* Pointer to top item in stack */
+};
+
 extern struct adt_Stack __LIB__ *adt_StackCreate(void);
-extern void __LIB__ adt_StackDelete(struct adt_Stack **s, void *delete);   /* from C: del = 0 to do nothing */
-extern int  __LIB__ adt_StackPush(struct adt_Stack **s, void *item);
-extern void __LIB__ __FASTCALL__ *adt_StackPop(struct adt_Stack **s);
+extern void __LIB__ adt_StackDelete(struct adt_Stack *s, void *delete);   /* from C: del = 0 to do nothing */
+extern int  __LIB__ adt_StackPush(struct adt_Stack *s, void *item);
+extern void __LIB__ __FASTCALL__ *adt_StackPop(struct adt_Stack *s);
 extern void __LIB__ __FASTCALL__ *adt_StackPeek(struct adt_Stack *s);
+extern uint __LIB__ __FASTCALL__  adt_StackCount(struct adt_Stack *s);
 
 
 #endif
