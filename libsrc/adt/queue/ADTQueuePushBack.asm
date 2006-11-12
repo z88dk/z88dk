@@ -30,7 +30,14 @@ XREF _u_malloc
    inc hl
    ld (hl),a
 
-   ex de,hl                ; hl = Queue.front
+   ex de,hl                ; hl = Queue.count
+   inc (hl)                ; count++
+   inc hl
+   jr nz, nohi
+   inc (hl)
+.nohi
+   inc hl                  ; hl = Queue.front
+    
    inc hl
    inc hl
    ld e,(hl)

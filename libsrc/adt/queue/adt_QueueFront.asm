@@ -7,6 +7,8 @@ XLIB adt_QueueFront
 ; exit : HL = peek at top item or 0 and carry reset if queue empty
 
 .adt_QueueFront
+   inc hl
+   inc hl
    ld e,(hl)
    inc hl
    ld d,(hl)

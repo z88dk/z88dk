@@ -11,12 +11,23 @@ XREF _u_free
 .adt_QueuePopFront
    ld e,(hl)
    inc hl
-   ld d,(hl)                ; de = front adt_QueueNode *
-
-   ex de,hl                 ; hl = adt_QueueNode *, de = adt_Queue.front + 1b
+   ld d,(hl)                ; de = count
+   ex de,hl
    ld a,h
    or l
-   ret z
+   ret z                    ; return no items in queue
+   ex de,hl
+   dec de                   ; count--
+   ld (hl),d
+   dec hl
+   ld (hl),e
+   inc hl
+   inc hl
+   
+   ld e,(hl)
+   inc hl
+   ld d,(hl)                ; de = front adt_QueueNode *
+   ex de,hl                 ; hl = adt_QueueNode *, de = adt_Queue.front + 1b
 
    ld c,(hl)
    inc hl

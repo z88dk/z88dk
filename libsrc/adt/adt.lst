@@ -50,10 +50,10 @@ linkedlist/ADTListTrim
 queue/adt_QueueBack
 queue/adt_QueueCreate
 queue/adt_QueueDelete
-queue/adt_QueueEmpty
 queue/adt_QueueFront
 queue/adt_QueuePopFront
 queue/adt_QueuePushBack
+queue/adt_QueueCount
 queue/ADTQueueDelete
 queue/ADTQueuePushBack
 stack/adt_StackCreate

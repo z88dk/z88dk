@@ -199,13 +199,14 @@ struct adt_QueueNode {                /* One for each item in queue, invisible t
 };
 
 struct adt_Queue {                    /* A single handle for each queue created */
+   uint                  count;
    struct adt_QueueNode *front;
    struct adt_QueueNode *back;
 };
 
 extern struct adt_Queue __LIB__ *adt_QueueCreate(void);
 extern void __LIB__ adt_QueueDelete(struct adt_Queue *q, void *delete);  /* from C: del = 0 to do nothing */
-extern int  __LIB__ __FASTCALL__ adt_QueueEmpty(struct adt_Queue *q);
+extern uint __LIB__ __FASTCALL__ adt_QueueCount(struct adt_Queue *q);
 extern void __LIB__ __FASTCALL__ *adt_QueueFront(struct adt_Queue *q);
 extern void __LIB__ __FASTCALL__ *adt_QueueBack(struct adt_Queue *q);
 extern void __LIB__ __FASTCALL__ *adt_QueuePopFront(struct adt_Queue *q);

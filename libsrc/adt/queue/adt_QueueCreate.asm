@@ -8,7 +8,7 @@ XREF _u_malloc
 ;           = 0 and nc if fail
 
 .adt_QueueCreate
-   ld hl,4           ; sizeof(struct adt_Queue)
+   ld hl,6           ; sizeof(struct adt_Queue)
    push hl
    call _u_malloc
    pop de
@@ -17,13 +17,16 @@ XREF _u_malloc
    ld e,l
    ld d,h
    xor a
-   ld (hl),a
-   inc hl
-   ld (hl),a
-   inc hl
-   ld (hl),a
-   inc hl
-   ld (hl),a
-   ex de,hl
+   ld (de),a
+   inc de
+   ld (de),a
+   inc de
+   ld (de),a
+   inc de
+   ld (de),a
+   inc de
+   ld (de),a
+   inc de
+   ld (de),a
    scf
    ret

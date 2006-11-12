@@ -7,8 +7,8 @@ XLIB adt_QueueBack
 ; exit : HL = peek at last item or 0 and carry reset if queue empty
 
 .adt_QueueBack
-   inc hl
-   inc hl
+   ld de,4
+   add hl,de
    ld e,(hl)
    inc hl
    ld d,(hl)

@@ -9,9 +9,13 @@ XREF _u_free
 ;        IX = delete function (HL = user item)
 
 .ADTQueueDelete
+   inc hl
+   inc hl
    ld e,(hl)
    inc hl
    ld d,(hl)
+   dec hl
+   dec hl
    dec hl
    push de
    push hl
