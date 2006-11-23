@@ -10,7 +10,8 @@ XREF _im2_vtable
 ; Once interrupts are reenabled, im2 mode will be
 ; active.
 ;
-; enter:  A = 0 for 256 byte tbl, otherwise 257 bytes
+; enter:  A = size of interrupt vector table minus 2; at least 1
+;             = 254 for 256-byte table, 255 for 257-byte table
 ;        BC = default ISR address
 ; uses : AF,BC,DE,HL,I
 
@@ -23,11 +24,8 @@ XREF _im2_vtable
    ld (hl),b
    inc hl
    ex de,hl
-   ld bc,254
-   or a
-   jr z, smalltbl
-   inc bc
-.smalltbl
+   ld b,0
+   ld c,a
    ldir
 
    ld a,_im2_vtable/256

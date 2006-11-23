@@ -13,6 +13,6 @@ LIB IM2Init
    ld a,(hl)
    jp IM2Init
 
-; enter:  A = 0 for 256 byte tbl, otherwise 257 bytes
+; enter:  A = size of interrupt vector table - 2, at least 1
 ;        BC = default ISR address
 ; uses : AF,BC,DE,HL,I
