@@ -71,8 +71,7 @@
  *
  * BEGIN_ISR(myisr)
  * {
- *    int i;
- *    // other C code
+ *    // C code here
  * }
  * END_ISR
  *
@@ -80,8 +79,7 @@
  *
  * BEGIN_ISR_LIGHT(myisr)
  * {
- *    int i;
- *    // other C code -- careful as only af,bc,de,hl registers saved
+ *    // C code here -- be careful as only af,bc,de,hl registers saved
  * }
  * END_ISR_LIGHT
  *
@@ -122,13 +120,12 @@
  *     on a particular interrupt will not be executed.
  */
 
-extern void __LIB__ im2_Init(uchar extended, void *default_isr);
+extern void __LIB__ im2_Init(uchar size, void *default_isr);
 
 /*
- * extended == 0 for a 256 byte im2 table otherwise a
- *             257 byte table appropriate for systems
- *             that could generate a 255 vector is
- *             created.
+ * size = size of interrupt vector table created minus 2 (minimum of 1)
+ *        for 257 byte table, use 255
+ *        for 256 byte table, use 254
  */
 
 extern void __LIB__ *im2_InstallISR(uchar vector, void *isr);
