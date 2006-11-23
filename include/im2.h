@@ -3,7 +3,7 @@
 
 /*
  * IM2 Interrupt Library
- * 04.2004 aralbrec
+ * 04.2004, 11.2006 aralbrec
  *
  * Interrupts should be disabled before calling any of these
  * functions and reenabled afterward.  Do this with some inline
@@ -52,18 +52,64 @@
  * These ISRs are like any raw machine code ISR -- they will
  * need to save and restore registers as well as reenable
  * interrupts prior to returning.  Straight C functions will
- * not do this without the help of some embedded assembler.
+ * not do this without the help of some embedded assembler
+ * (edit: described next).
  *
  * A light generic ISR is also provided.  It is identical
  * to the regular generic ISR but it only saves the main
  * register set AF,BC,DE,HL on interrupt.
  *
+ * A normal C function can be registered with an existing
+ * generic ISR to be run on interrupt.  To install a C
+ * function directly so that it alone serves an interrupt
+ * requires embedded assembler in the function to save
+ * registers, restore them and reenable interrupts prior
+ * to returning.  These additions can be made with the
+ * help of the macros defined in this header.
+ *
+ * Example 1:
+ *
+ * BEGIN_ISR(myisr)
+ * {
+ *    int i;
+ *    // other C code
+ * }
+ * END_ISR
+ *
+ * Example 2:
+ *
+ * BEGIN_ISR_LIGHT(myisr)
+ * {
+ *    int i;
+ *    // other C code -- careful as only af,bc,de,hl registers saved
+ * }
+ * END_ISR_LIGHT
+ *
+ * In both examples above the C function "void myisr(void)"
+ * is created with code inserted to preserve and restore registers
+ * as well as reenable interrupts and exit with the "reti" instruction.
+ * The light version only saves the "af,bc,de,hl" registers whereas
+ * the regular version saves all registers.  Care must be taken that
+ * your C code does not cause other unsaved registers to be used while
+ * using the light version.
+ *
+ * With this C isr created you can install it on an interrupt vector
+ * to serve interrupts directly:
+ *
+ * im2_InstallISR(0, myisr);
+ * 
  */
 
 #ifndef _T_UCHAR
 #define _T_UCHAR
    typedef unsigned char uchar;
 #endif
+
+#define BEGIN_ISR(name) void name(void) { asm("push\taf\npush\tbc\npush\tde\npush\thl\nex\taf,af\nexx\npush\taf\npush\tbc\npush\tde\npush\thl\npush\tix\npush\tiy\n");
+#define END_ISR asm("pop\tiy\npop\tix\npop\thl\npop\tde\npop\tbc\npop\taf\nexx\nex\taf,af\npop\thl\npop\tde\npop\tbc\npop\taf\nei\nreti\n"); }
+
+#define BEGIN_ISR_LIGHT(name) void name(void) { asm("push\taf\npush\tbc\npush\tde\npush\thl\n");
+#define END_ISR_LIGHT(name) asm("pop\thl\npop\tde\npop\tbc\npop\taf\nei\nreti\n"); }
 
 /*
  * In the following:
