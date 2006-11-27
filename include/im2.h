@@ -9,15 +9,12 @@
  * functions and reenabled afterward.  Do this with some inline
  * assembler.
  *
- * The location of the im2 vector table is held in "_im2_vtable"
- * which is a 16 bit address that must begin on a 256-byte page
- * (the LSB will automatically be zeroed by the library).  Declare
- * its location with some inline assembler in your main.c file:
- *
- *    #asm
- *      XDEF _im2_vtable
- *      DEFC _im2_vtable=$fe00
- *    #endasm
+ * The z80 allows the im2 vector table to be located anywhere
+ * in memory starting on an exact 256-byte page.  This location
+ * is specified to the library during the im2_Init() call which
+ * sets the I register appropriately.  Other library functions
+ * determine the location of the interrupt vector table directly
+ * from the I register.
  *
  * im2_Init initializes im2 mode and creates the default
  * im2 vector table.  The address of the default interrupt
@@ -120,12 +117,14 @@
  *     on a particular interrupt will not be executed.
  */
 
-extern void __LIB__ im2_Init(uchar size, void *default_isr);
+extern void __LIB__ im2_Init(uchar size, void *tableaddr, void *default_isr);
 
 /*
  * size = size of interrupt vector table created minus 2 (minimum of 1)
  *        for 257 byte table, use 255
  *        for 256 byte table, use 254
+ * tableaddr = 16-bit address of the interrupt vector table, LSB ignored
+ *             and assumed to be zero.
  */
 
 extern void __LIB__ *im2_InstallISR(uchar vector, void *isr);

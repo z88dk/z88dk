@@ -1,7 +1,7 @@
 ; 04.2004 aralbrec
 
 XLIB IM2RemoveHook
-XREF _im2_hookDisp, _im2_vtable
+XREF _im2_hookDisp
 
 ; DISABLE INTERRUPTS PRIOR TO CALLING
 
@@ -15,7 +15,8 @@ XREF _im2_hookDisp, _im2_vtable
 ;        no carry = hook not found
 
 .IM2RemoveHook
-   ld h,_im2_vtable/256
+   ld a,i
+   ld h,a
    ld c,(hl)
    inc hl
    ld b,(hl)

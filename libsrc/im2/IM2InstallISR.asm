@@ -1,7 +1,6 @@
 ; 04.2004 aralbrec
 
 XLIB IM2InstallISR
-XREF _im2_vtable
 
 ; DISABLE INTERRUPTS PRIOR TO CALLING
 
@@ -13,7 +12,8 @@ XREF _im2_vtable
 ; uses : AF,DE,HL
 
 .IM2InstallISR
-   ld h,_im2_vtable/256
+   ld a,i
+   ld h,a
    ld a,(hl)
    ld (hl),e
    ld e,a
