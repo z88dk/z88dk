@@ -10,9 +10,14 @@ LIB IM2Init
    inc hl
    ld b,(hl)
    inc hl
-   ld a,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   ld e,(hl)
    jp IM2Init
 
-; enter:  A = size of interrupt vector table - 2, at least 1
+; enter:  E = size of interrupt vector table minus 2; at least 1
+;             = 254 for 256-byte table, 255 for 257-byte table
+;         D = MSB of interrupt vector table address
 ;        BC = default ISR address
 ; uses : AF,BC,DE,HL,I
