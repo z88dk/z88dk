@@ -31,45 +31,37 @@ XREF _u_malloc
    ld (hl),a
 
    ex de,hl                ; hl = Queue.count
+   ld a,(hl)
    inc (hl)                ; count++
    inc hl
+   ld c,(hl)
    jr nz, nohi
    inc (hl)
 .nohi
+   or c                    ; Z flag if no items in queue
    inc hl                  ; hl = Queue.front
-    
-   inc hl
-   inc hl
-   ld e,(hl)
-   inc hl                  ; hl = Queue.back + 1b
-   ld d,(hl)               ; de = back QueueNode
 
-   ld a,d
-   or e
-   jr z, add2emptyqueue
-
-   inc de
-   inc de
-   ex (sp),hl              ; stack = Queue.back + 1b
-   ex de,hl                ; de = new QueueNode *, hl = back QueueNode.next
-   ld (hl),e
-   inc hl
-   ld (hl),d               ; back QueueNode.next = new QueueNode *
-   pop hl                  ; hl = Queue.back + 1b
-   ld (hl),d
+   pop bc                  ; bc = new QueueNode
+   jp nz, Qnotempty
+   ld (hl),c               ; an empty queue so make
+   inc hl                  ; Queue.front = new QueueNode
+   ld (hl),b
    dec hl
-   ld (hl),e               ; Queue.back = new QueueNode
+
+.Qnotempty
+   inc hl
+   inc hl                  ; hl = Queue.back
+   ld e,(hl)               ; de = current last QueueNode
+   ld (hl),c               ; Queue.back = new QueueNode
+   inc hl
+   ld d,(hl)
+   ld (hl),b
+   
+   ex de,hl                ; hl = last QueueNode
+   inc hl
+   inc hl
+   ld (hl),c               ; last QueueNode.next = new QueueNode
+   inc hl
+   ld (hl),b
    scf
-   ret
-
-.add2emptyqueue
-   pop de                  ; de = new QueueNode *
-   ld (hl),d
-   dec hl
-   ld (hl),e               ; Queue.front = Queue.back = new QueueNode
-   dec hl
-   ld (hl),d
-   dec hl
-   ld (hl),e
-   scf
-   ret
+   ret   
