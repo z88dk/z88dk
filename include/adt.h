@@ -83,10 +83,17 @@ extern void __LIB__ __FASTCALL__ *adt_ListCurr(struct adt_List *list);
 extern char __LIB__  adt_ListAdd(struct adt_List *list, void *item);
 extern char __LIB__  adt_ListInsert(struct adt_List *list, void *item);
 extern char __LIB__  adt_ListAppend(struct adt_List *list, void *item);
+extern char __LIB__  adt_ListPushBack(struct adt_List *list, void *item);
 extern char __LIB__  adt_ListPrepend(struct adt_List *list, void *item);
+extern char __LIB__  adt_ListPushFront(struct adt_List *list, void *item);
 extern void __LIB__ __FASTCALL__ *adt_ListRemove(struct adt_List *list);
 extern void __LIB__  adt_ListConcat(struct adt_List *list1, struct adt_List *list2);
 extern void __LIB__ __FASTCALL__ *adt_ListTrim(struct adt_List *list);
+extern void __LIB__ __FASTCALL__ *adt_ListPopBack(struct adt_List *list);
+extern void __LIB__ __FASTCALL__ *adt_ListPopFront(struct adt_List *list);
+extern void __LIB__ __FASTCALL__ adt_ListSetCurrBefore(struct adt_List *list);
+extern void __LIB__ __FASTCALL__ adt_ListSetCurrAfter(struct adt_List *list);
+extern void __LIB__ adt_ListSetCurr(struct adt_List *list, struct adt_ListNode *n);
 extern void __LIB__ *adt_ListSearch(struct adt_List *list, void *match, void *item1);
 
 
@@ -210,6 +217,8 @@ extern uint __LIB__ __FASTCALL__ adt_QueueCount(struct adt_Queue *q);
 extern void __LIB__ __FASTCALL__ *adt_QueueFront(struct adt_Queue *q);
 extern void __LIB__ __FASTCALL__ *adt_QueueBack(struct adt_Queue *q);
 extern void __LIB__ __FASTCALL__ *adt_QueuePopFront(struct adt_Queue *q);
+extern void __LIB__ __FASTCALL__ *adt_QueuePopBack(struct adt_Queue *q);
+extern int  __LIB__ adt_QueuePushFront(struct adt_Queue *q, void *item);
 extern int  __LIB__ adt_QueuePushBack(struct adt_Queue *q, void *item);
 
 
