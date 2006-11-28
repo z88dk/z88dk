@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.20 2006-11-11 20:27:34 aralbrec Exp $
+ * $Id: stdlib.h,v 1.21 2006-11-28 22:48:29 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -100,6 +100,9 @@ extern void __LIB__ l_qsort(void *base, unsigned int size, void *cmp);
 extern unsigned char __LIB__ __FASTCALL__ inp(unsigned int port);
 extern void __LIB__ outp(unsigned int port, unsigned char byte);
 
+#define M_INP(port) asm("ld\tbc,"#port"\nin\tl,(c)\nld\th,0\n");
+#define M_OUTP(port,byte) asm("ld\tbc,"#port"\nld\ta,"#byte"\nout\t(c),a\n");
+
 /* An endian swap function */
 
 extern void __LIB__ __FASTCALL__ *swapendian(void *addr);
@@ -111,6 +114,11 @@ extern void  __LIB__ bpoke(void *addr, unsigned char byte);
 extern void  __LIB__ wpoke(void *addr, unsigned int word);
 extern unsigned char __LIB__ __FASTCALL__ bpeek(void *addr);
 extern unsigned int  __LIB__ __FASTCALL__ wpeek(void *addr);
+
+#define M_BPOKE(addr,byte) asm("ld\thl,"#addr"\nld\t(hl),"#byte"\n");
+#define M_WPOKE(addr,word) asm("ld\thl,"#addr"\nld\t(hl),"#word"%256\ninc\thl\nld\t(hl),"#word"/256\n");
+#define M_BPEEK(addr) asm("ld\thl,("#addr")\nld\th,0\n");
+#define M_WPEEK(addr) asm("ld\thl,("#addr")\n");
 
 /*
  *	Okay..include in malloc.h to be standard..
