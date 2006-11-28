@@ -1,12 +1,10 @@
-; void adt_HashDelete(struct adt_HashTable *ht)
+; void adt_HashDeleteS(struct adt_HashTable *ht)
 ; 09.2005 aralbrec
 
-XLIB adt_HashDelete
+XLIB adt_HashDeleteS
 LIB ADTHashDelete
-XREF _u_free
 
-.adt_HashDelete
-   push hl               ; save struct adt_HashTable
+.adt_HashDeleteS
    ld c,(hl)
    inc hl
    ld b,(hl)             ; bc = table size
@@ -25,14 +23,4 @@ XREF _u_free
    ld a,(hl)
    ld ixh,a              ; ix = address of C delete function
    ex de,hl              ; hl = address of hash table
-   push hl
-   call ADTHashDelete
-   pop hl
-   push hl
-   call _u_free          ; free the hash table array
-   pop hl
-   pop hl
-   push hl
-   call _u_free          ; free struct adt_HashTable itself and return
-   pop hl
-   ret
+   jp ADTHashDelete

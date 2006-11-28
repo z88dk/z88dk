@@ -6,8 +6,9 @@ LIB l_jpix
 XREF _u_free
 
 ;
-; This subroutine deletes the hash table itself and does not
-; deal with struct adt_HashTable
+; This subroutine deletes the contents of the hash table (the
+; hashcells) and does not deallocate the adt_HashTable or the
+; hash table array
 ;
 ; enter: IX = delete function on HL = struct adt_HashCell (and HL stacked)
 ;             wrap up key,value members only  MUST PRESERVE HL
@@ -63,12 +64,6 @@ XREF _u_free
    ld a,b
    or c
    jp nz, indexloop
-
-   pop hl
-   push hl
-   call _u_free                ; free hash table itself
-   pop hl
-   ret
 
 .justret
    ret

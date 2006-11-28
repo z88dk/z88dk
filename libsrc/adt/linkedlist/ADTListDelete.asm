@@ -3,7 +3,7 @@
 ; 02.2003, 06.2005 aralbrec
 
 XLIB ADTListDelete
-LIB l_jpix
+LIB ADTListDeleteS
 XREF _u_free
 
 ; enter: HL = struct adt_List *
@@ -15,33 +15,7 @@ XREF _u_free
 
 .ADTListDelete
    push hl               ; save list
-   ld de,5
-   add hl,de             ; hl = head
-
-.while
-   ld a,(hl)
-   or a
-   jr z, done
-   inc hl
-   ld l,(hl)
-   ld h,a                ; hl = next NODE
-   ld e,(hl)
-   push hl               ; save NODE
-   inc hl                ; hl = NODE.item+1
-   ld d,(hl)             ; de = item
-   ex de,hl
-   push hl
-   call l_jpix           ; call itemfree with HL = item
-   pop hl
-   pop hl                ; hl = NODE
-   push hl               ; save NODE
-   call _u_free          ; free NODE container
-   pop hl
-   inc hl
-   inc hl                ; hl = NODE.next
-   jp while
-
-.done
+   call ADTListDeleteS
    pop hl                ; hl = list
    push hl
    call _u_free          ; free list container
