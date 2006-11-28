@@ -4,11 +4,11 @@
 XLIB ADTListSetCurr
 
 ; enter: HL = struct adt_List*
-;        DE = struct adt_ListNode*, if 0 no changes done
+;        DE = struct adt_ListNode*, if MSB = 0 no changes done
 
 .ADTListSetCurr
-   ld a,d                     ; if new current pointer = 0, do not change anything
-   or e
+   ld a,d                     ; if new current pointer has MSB 0, do not change anything
+   or a
    ret z
    
    inc hl
