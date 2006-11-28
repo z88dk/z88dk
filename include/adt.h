@@ -73,7 +73,9 @@ struct adt_List {                  /* One as handle for each list */
 };
 
 extern struct adt_List __LIB__ *adt_ListCreate(void);
-extern void __LIB__  adt_ListDelete(struct adt_List *list, void *delete);  /* from C: del = 0 to do nothing */
+extern void __LIB__ __FASTCALL__ adt_ListCreateS(struct adt_List *list);
+extern void __LIB__  adt_ListDelete(struct adt_List *list, void *delete);   /* from C: del = 0 to do nothing */
+extern void __LIB__  adt_ListDeleteS(struct adt_List *list, void *delete);  /* from C: del = 0 to do nothing */
 extern uint __LIB__ __FASTCALL__ adt_ListCount(struct adt_List *list);
 extern void __LIB__ __FASTCALL__ *adt_ListFirst(struct adt_List *list);
 extern void __LIB__ __FASTCALL__ *adt_ListLast(struct adt_List *list);
@@ -146,7 +148,9 @@ struct adt_HashTable {              /* One as handle for the hash table */
 };
 
 extern struct adt_HashTable __LIB__ *adt_HashCreate(uint size, void *delete, void *compare, void *hashfunc);
+extern void __LIB__  adt_HashCreateS(void *delete, void *compare, void *hashfunc, void *table, uint size, struct adt_HashTable *ht);
 extern void __LIB__ __FASTCALL__ adt_HashDelete(struct adt_HashTable *ht);
+extern void __LIB__ __FASTCALL__ adt_HashDeleteS(struct adt_HashTable *ht);
 extern void __LIB__ *adt_HashRemove(struct adt_HashTable *ht, void *key);
 extern void __LIB__ *adt_HashLookup(struct adt_HashTable *ht, void *key);
 extern void __LIB__ *adt_HashAdd(struct adt_HashTable *ht, void *key, void *value);
@@ -211,8 +215,10 @@ struct adt_Queue {                    /* A single handle for each queue created 
    struct adt_QueueNode *back;
 };
 
-extern struct adt_Queue __LIB__ *adt_QueueCreate(void);
+extern struct adt_Queue __LIB__  *adt_QueueCreate(void);
+extern void __LIB__ __FASTCALL__ *adt_QueueCreateS(struct adt_Queue *q);
 extern void __LIB__ adt_QueueDelete(struct adt_Queue *q, void *delete);  /* from C: del = 0 to do nothing */
+extern void __LIB__ adt_QueueDeleteS(struct adt_Queue *q, void *delete); /* from C: del = 0 to do nothing */
 extern uint __LIB__ __FASTCALL__ adt_QueueCount(struct adt_Queue *q);
 extern void __LIB__ __FASTCALL__ *adt_QueueFront(struct adt_Queue *q);
 extern void __LIB__ __FASTCALL__ *adt_QueueBack(struct adt_Queue *q);
@@ -243,8 +249,10 @@ struct adt_Stack {
    struct adt_StackNode *next;         /* Pointer to top item in stack */
 };
 
-extern struct adt_Stack __LIB__ *adt_StackCreate(void);
+extern struct adt_Stack __LIB__  *adt_StackCreate(void);
+extern void __LIB__ __FASTCALL__  adt_StackCreateS(struct adt_Stack *s);
 extern void __LIB__ adt_StackDelete(struct adt_Stack *s, void *delete);   /* from C: del = 0 to do nothing */
+extern void __LIB__ adt_StackDeleteS(struct adt_Stack *s, void *delete);  /* from C: del = 0 to do nothing */
 extern int  __LIB__ adt_StackPush(struct adt_Stack *s, void *item);
 extern void __LIB__ __FASTCALL__ *adt_StackPop(struct adt_Stack *s);
 extern void __LIB__ __FASTCALL__ *adt_StackPeek(struct adt_Stack *s);
