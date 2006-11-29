@@ -13,4 +13,24 @@ XLIB adt_HashCreateS
    inc hl
    ld bc,10
    ldir
+   ld hl,4
+   add hl,sp
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   ld a,(hl)
+   inc hl
+   ld h,(hl)
+   ld l,a
+   ex de,hl
+   add hl,hl
+   ld c,l
+   ld b,h
+   ld l,e
+   ld h,d
+   ld (hl),0
+   inc de
+   dec bc
+   ldir
    ret
