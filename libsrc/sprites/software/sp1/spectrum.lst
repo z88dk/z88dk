@@ -15,6 +15,7 @@ spectrum/cwrapper/sp1_DeleteSpr
 spectrum/cwrapper/sp1_GetSprClr
 spectrum/cwrapper/sp1_GetSprClrAddr
 spectrum/cwrapper/sp1_GetTiles
+spectrum/cwrapper/sp1_GetUpdateList
 spectrum/cwrapper/sp1_GetUpdateStruct
 spectrum/cwrapper/sp1_Initialize
 spectrum/cwrapper/sp1_IntersectRect
@@ -26,6 +27,7 @@ spectrum/cwrapper/sp1_IsRectInRect
 spectrum/cwrapper/sp1_IterateSprChar
 spectrum/cwrapper/sp1_IterateUpdateArr
 spectrum/cwrapper/sp1_IterateUpdateRect
+spectrum/cwrapper/sp1_IterateUpdateSpr
 spectrum/cwrapper/sp1_MakeRect8
 spectrum/cwrapper/sp1_MakeRect8Pix
 spectrum/cwrapper/sp1_MakeRect16
@@ -46,6 +48,7 @@ spectrum/cwrapper/sp1_Screen
 spectrum/cwrapper/sp1_ScreenAttr
 spectrum/cwrapper/sp1_ScreenStr
 spectrum/cwrapper/sp1_SetPrintPos
+spectrum/cwrapper/sp1_SetUpdateList
 spectrum/cwrapper/sp1_SprId2Type
 spectrum/cwrapper/sp1_TileEntry
 spectrum/cwrapper/sp1_UpdateNow
@@ -60,6 +63,7 @@ spectrum/sprites/SP1DeleteSpr
 spectrum/sprites/SP1GetSprClr
 spectrum/sprites/SP1GetSprClrAddr
 spectrum/sprites/SP1IterateSprChar
+spectrum/sprites/SP1IterateUpdateSpr
 spectrum/sprites/SP1MoveSprAbs
 spectrum/sprites/SP1MoveSprPix
 spectrum/sprites/SP1MoveSprRel
@@ -111,6 +115,8 @@ spectrum/tiles/SP1Screen
 spectrum/tiles/SP1ScreenAttr
 spectrum/tiles/SP1ScreenStr
 spectrum/tiles/SP1TileEntry
+spectrum/updater/sp1_GetUpdateListLength
+spectrum/updater/SP1GetUpdateList
 spectrum/updater/SP1GetUpdateStruct
 spectrum/updater/SP1Initialize
 spectrum/updater/SP1Invalidate
@@ -119,6 +125,7 @@ spectrum/updater/SP1IterateUpdateArr
 spectrum/updater/SP1IterateUpdateRect
 spectrum/updater/SP1RemoveUpdateStruct
 spectrum/updater/SP1RestoreUpdateStruct
+spectrum/updater/SP1SetUpdateList
 spectrum/updater/SP1UpdateNow
 spectrum/updater/SP1Validate
 spectrum/updater/SP1ValUpdateStruct

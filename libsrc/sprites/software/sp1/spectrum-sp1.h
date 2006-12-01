@@ -153,7 +153,7 @@ struct sp1_pss {                      // "print string struct" A struct holding 
    uchar              attr_mask;      // +5 current attribute mask
    uchar              attr;           // +6 current attribute
    struct sp1_update *pos;            // +7 RESERVED struct sp1_update associated with current cursor coordinates
-   void              *visit;          // +9 visit function, set to 0 for none
+   void              *visit;          // +9 void (*visit)(struct sp1_update *) function, set to 0 for none
    
 };
 
@@ -162,7 +162,7 @@ struct sp1_pss {                      // "print string struct" A struct holding 
 ///////////////////////////////////////////////////////////
 
 #define SP1_TYPE_OCCLUDE   0x80       // background and sprites underneath will not be drawn
-#define SP1_TYPE_BGNDCLR   0x10       // for occluding sprites, clear pixel buffer before draw
+#define SP1_TYPE_BGNDCLR   0x10       // for occluding sprites, copy background tile into pixel buffer before draw
 #define SP1_TYPE_2BYTE     0x40       // sprite graphic consists of (mask,graph) pairs, valid only in sp1_CreateSpr()
 #define SP1_TYPE_1BYTE     0x00       // sprite graphic consists of graph only, valid only in sp1_CreateSpr()
 
@@ -217,15 +217,17 @@ struct sp1_pss {                      // "print string struct" A struct holding 
 
 #define SP1_ATTR_TRANS     0x00       // attribute for a transparent-colour sprite
 
-// void *hook  <->  void [ __FASTCALL__ ] (*hook)(uint count, struct sp1_cs *c)  // if __FASTCALL__ only struct sp1_cs* passed
+// void *hook1  <->  void [ __FASTCALL__ ] (*hook1)(uint count, struct sp1_cs *c)      // if __FASTCALL__ only struct sp1_cs* passed
+// void *hook2  <->  void [ __FASTCALL__ ] (*hook2)(uint count, struct sp1_update *u)  // if __FASTCALL__ only struct sp1_update* passed
 
 extern struct sp1_ss      __LIB__  *sp1_CreateSpr(uchar type, uchar height, int graphic, uchar plane);
 extern uint               __LIB__   sp1_AddColSpr(struct sp1_ss *s, uchar type, int graphic, uchar plane);
 extern void               __LIB__   sp1_MoveSprAbs(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uchar row, uchar col, uchar vrot, uchar hrot);
 extern void               __LIB__   sp1_MoveSprRel(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
 extern void               __LIB__   sp1_MoveSprPix(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uint x, uint y);
-extern void               __LIB__   sp1_IterateSprChar(struct sp1_ss *s, void *hook);
-extern void  __FASTCALL__ __LIB__   sp1_DeleteSpr(struct sp1_ss *s);
+extern void               __LIB__   sp1_IterateSprChar(struct sp1_ss *s, void *hook1);
+extern void               __LIB__   sp1_IterateUpdateSpr(struct sp1_ss *s, void *hook2);
+extern void  __FASTCALL__ __LIB__   sp1_DeleteSpr(struct sp1_ss *s);   // only call after sprite is moved off screen
 
 extern uchar __FASTCALL__ __LIB__   sp1_SprId2Type(uchar id);
 extern void               __LIB__   sp1_ChangeSprType(struct sp1_cs *c, uchar type);
@@ -280,7 +282,7 @@ extern void __LIB__ sp1_MakeRect16Pix(struct sp1_ss *s, struct r_Rect16 *r);
 #define SP1_PSSFLAG_YINC        0x04
 #define SP1_PSSFLAG_YWRAP       0x08
 
-extern void  __LIB__  *sp1_TileEntry(uchar c, uchar *def);
+extern void  __LIB__  *sp1_TileEntry(uchar c, void *def);
 
 extern void  __LIB__   sp1_PrintAt(uchar row, uchar col, uchar colour, uchar tile);
 extern void  __LIB__   sp1_PrintAtInv(uchar row, uchar col, uchar colour, uchar tile);
@@ -310,6 +312,10 @@ extern void  __LIB__   sp1_ClearRectInv(struct sp1_Rect *r, uchar colour, uchar 
 
 extern void               __LIB__   sp1_Initialize(uchar iflag, uchar *idtypetbl, void *sprdrawtbl, uchar colour, uchar tile);
 extern void               __LIB__   sp1_UpdateNow(void);
+
+extern uint               __LIB__   sp1_GetUpdateListLength(void);
+extern void               __LIB__   sp1_GetUpdateList(struct sp1_update **head, struct sp1_update **tail);
+extern void               __LIB__   sp1_SetUpdateList(struct sp1_update *head, struct sp1_update *tail);
 
 extern struct sp1_update  __LIB__  *sp1_GetUpdateStruct(uchar row, uchar col);
 extern void __FASTCALL__  __LIB__   sp1_InvUpdateStruct(struct sp1_update *u);
