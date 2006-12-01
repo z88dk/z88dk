@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.14 2006-07-22 08:30:21 aralbrec Exp $
+ * $Id: spectrum.h,v 1.15 2006-12-01 16:58:30 stefano Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -140,14 +140,29 @@ extern void __LIB__ __FASTCALL__ *attr_getscrnaddr(void *attraddr);
 
 /* Diagnostics - TRUE or FALSE */
 
-extern int __LIB__ zx_128();
 extern int __LIB__ zx_128mode();
 extern int __LIB__ zx_issue3();
 
 /* Other Diagnostics */
 
+extern int __LIB__ zx_type();		/* 0:48K - 1: 128K - 2: TS2068 */
+extern int __LIB__ zx_model();
 extern int __LIB__ zx_basic_length();
 extern int __LIB__ zx_var_length();
+extern int __LIB__ zx_printer();
+extern int __LIB__ zx_soundchip();
+extern int __LIB__ zx_timexsound();
+extern int __LIB__ zx_fullerstick();
+extern int __LIB__ zx_kempstonmouse();
+extern int __LIB__ zx_kempston();
+extern int __LIB__ zx_iss_stick();
+extern int __LIB__ zx_multiface();
+extern int __LIB__ zx_disciple();
+extern int __LIB__ zx_plus3fdc();
+extern int __LIB__ zx_trd();
+extern int __LIB__ zx_extsys();
+extern int __LIB__ zx_basemem();
+
 
 /* Interface to call BASIC */
 
