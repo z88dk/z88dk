@@ -1,5 +1,5 @@
 ; void *adt_HashRemove(struct adt_HashTable *ht, void *key)
-; 09.2005 aralbrec
+; 09.2005, 11.2006 aralbrec
 
 XLIB ADTHashRemove
 LIB l_jphl, l_jpix
@@ -11,7 +11,7 @@ XREF _u_free
 ;              return hash index in HL, 0<=HL<DE
 ;         IX = key compare function on (BC,DE) MUST PRESERVE BC,HL,IX
 ;              return A<0 for less, A==0 for equal
-; stack:  before call push hash table address (will be popped here)
+; stack:  before call push delete() then hash table address (will be popped here)
 ; exit :  no carry = did not find key
 ;            carry = removed (key,value) pair from table, HL = value
 ; used :  AF,BC,DE,HL
@@ -51,16 +51,25 @@ XREF _u_free
    jp loop
 
 .stopsearch
+   jr nz, keynotfound
    pop de                    ; de = lagger
-   ret nz                    ; return with carry reset to indicate key not found
    ldi                       ; lagger->next = current HashCell->next
    ldi
    ld e,(hl)
    inc hl
    ld d,(hl)                 ; de = value in HashCell about to be deleted
-   ld bc,-5
-   add hl,bc
-   push de
+   ld (hl),0
+   dec hl
+   ld (hl),0                 ; zero out value in the HashCell
+   ld bc,-4
+   add hl,bc                 ; hl = & HashCell
+   pop bc                    ; bc = return address
+   pop ix                    ; ix = user delete function
+   push bc                   ; push return address
+   push de                   ; push value
+   push hl                   ; push & HashCell
+   call l_jpix               ; delete(HashCell)
+   pop hl   
    push hl
    call _u_free              ; free the HashCell
    pop hl
@@ -70,4 +79,6 @@ XREF _u_free
 
 .keynotfound
    pop de                    ; junk lagger
-   ret                       ; return with carry reset to indicate no key found
+   pop hl                    ; hl = return address
+   pop de                    ; junk delete() function
+   jp (hl)

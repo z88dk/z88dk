@@ -16,8 +16,13 @@ LIB ADTHashRemove, l_jpix, l_jpiy
    ld h,(hl)
    ld l,a                   ; hl = struct adt_HashTable
 
-   ld de,7
+   ld de,9
    add hl,de
+   ld e,(hl)
+   dec hl
+   ld d,(hl)
+   dec hl
+   push de                  ; push user delete() function
    ld a,(hl)
    ld iyh,a
    dec hl
