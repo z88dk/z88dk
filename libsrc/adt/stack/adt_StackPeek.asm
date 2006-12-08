@@ -16,4 +16,11 @@ XLIB adt_StackPeek
    inc hl
    ld d,(hl)
    ex de,hl
+   ld a,h
+   or l
+   ret z
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   ex de,hl
    ret
