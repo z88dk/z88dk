@@ -1,9 +1,9 @@
 @echo off
-rem $Id: vscmake.bat,v 1.2 2005-03-08 18:18:36 stefano Exp $
+rem $Id: vscmake.bat,v 1.3 2006-12-11 17:46:55 stefano Exp $
 
 echo ****************
 echo * Building zcc *
 echo ****************
-cl /Fezcc -DMSDOS *.c
+cl /Fezcc -DMSDOS -D _CRT_SECURE_NO_DEPRECATE *.c
 move zcc.exe ..\..\bin
 del *.obj

@@ -9,6 +9,12 @@
 #include "utils.h"
 #include "regerror.h"
 
+#if _MSC_VER >= 1400
+   /*  is this Visual C++ 2005 ?  */
+   #define errcode __vc_errcode
+#endif
+
+
 /*
  = #define	REG_OKAY	 0
  = #define	REG_NOMATCH	 1

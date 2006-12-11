@@ -3,7 +3,7 @@
  *
  *        Stefano Bodrato 5/2000
  *
- *        $Id: abc80.c,v 1.1 2003-03-13 14:50:29 dom Exp $
+ *        $Id: abc80.c,v 1.2 2006-12-11 17:46:54 stefano Exp $
  */
 
 #include "appmake.h"
@@ -39,19 +39,16 @@ int abc80_exec()
         return -1;
     }
 
-    if ( outfile == NULL )
-        outfile = binname;
-
     strcpy(tmpname,binname);
-    suffix_change(tmpname,".tmp");
+    suffix_change(tmpname,".bas");
 
     if ( outfile == NULL ) {
         strcpy(filename,binname);
-        suffix_change(filename,".bas");
+        suffix_change(filename,".bac");
     } else {
         strcpy(filename,outfile);
     }
-   
+
 
     if ( (fpin=fopen(binname,"rb") ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
