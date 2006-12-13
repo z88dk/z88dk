@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.75 2006-08-09 21:30:11 stefano Exp $
+# $Id: Makefile,v 1.76 2006-12-13 18:08:23 stefano Exp $
 
 
 include Make.config
@@ -38,12 +38,12 @@ zxlibs: zx_clib.lib zxan_clib.lib zxvgs.lib zx_math.lib zx_mathtiny.lib
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.75 2006-08-09 21:30:11 stefano Exp $
+#  $Id: Makefile,v 1.76 2006-12-13 18:08:23 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.75 2006-08-09 21:30:11 stefano Exp $
+# $Id: Makefile,v 1.76 2006-12-13 18:08:23 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -57,7 +57,7 @@ gfxdeps:
 	$(RM) -f graphics/text/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.75 2006-08-09 21:30:11 stefano Exp $
+#  $Id: Makefile,v 1.76 2006-12-13 18:08:23 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -594,6 +594,7 @@ ozansi_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	cd oz ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
 	cd games ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORoz -DPACKEDFONT -xozansi_clib @ozansi.lst

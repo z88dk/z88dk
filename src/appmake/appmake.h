@@ -1,4 +1,10 @@
-/* */
+/*
+ *
+ *   z88dk Application Generator (appmake)
+ *
+ *
+ *   $Id: appmake.h,v 1.5 2006-12-13 18:08:23 stefano Exp $
+ */
 
 
 
@@ -97,10 +103,10 @@ struct {
       acebyt_exec,   &acebyt_options },
     { "acetap",  "acetap",    "(C) 2001 Stefano Bodrato",
       "Generates a .TAP for the Ace32 emulator",
-      acebyt_exec,   &acebyt_options },
+      acetap_exec,   &acetap_options },
     { "bin2caq",  "aquarius", "(C) 2001 Stefano Bodrato",
       "Creates a BASIC loader file and binary stored in variable array format",
-      abc80_exec,   &abc80_options },
+      aquarius_exec,   &aquarius_options },
     { "bin2cpc",  "cpc",      "(C) 2003 Dominic Morris",
       "Creates an AMSDOS file suitable for writing to a .DSK image",
       cpc_exec,   &cpc_options },

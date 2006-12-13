@@ -7,7 +7,7 @@
 ;       Clears graph screen.
 ;
 ;
-;	$Id: clsgraph.asm,v 1.2 2002-02-01 14:37:49 stefano Exp $
+;	$Id: clsgraph.asm,v 1.3 2006-12-13 18:08:23 stefano Exp $
 ;
 
 
@@ -23,7 +23,7 @@
 	ld	d,h
 	ld	e,l
 	inc	de
-	ld	bc,maxx*maxy
+	ld	bc,(maxx/2)*(maxy/2)
 	ld	(hl),blankch
 	ldir
 
