@@ -5,8 +5,8 @@ XLIB in_Wait
 
 ; Waits an approximate period of time measured in milliseconds.
 ;
-; enter : HL = number of interrupts to wait
-; used  : AF,HL
+; enter : HL = time to wait in ms
+; used  : AF,BC,HL
 
 .in_Wait
 
