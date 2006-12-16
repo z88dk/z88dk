@@ -3,7 +3,7 @@
  * instead of the underlying base type.  By convention, all type names end 
  * with _t.
  *
- * $Id: types.h,v 1.4 2003-10-19 21:36:35 dom Exp $
+ * $Id: types.h,v 1.5 2006-12-16 10:21:10 aralbrec Exp $
  */
 
 #ifndef __SYS_TYPES_H__
@@ -58,6 +58,18 @@ typedef unsigned long  u32_t;      /* 32 bit type */
 typedef char            i8_t;      /* 8 bit signed type */
 typedef short          i16_t;      /* 16 bit signed type */
 typedef long           i32_t;      /* 32 bit signed type */
+
+/* use of following is deprecated, a stopgap because some libraries use it */
+
+#ifndef _T_UCHAR
+#define _T_UCHAR
+   typedef unsigned char uchar;    /* 8 bit unsigned char */
+#endif
+
+#ifndef _T_UINT
+#define _T_UINT                    /* this is especially wrong, don't use */
+   typedef unsigned int uint;      /* 16 bit unsigned int */
+#endif
 
 /* this makes converting MINIX sources a little bit easier */
 
