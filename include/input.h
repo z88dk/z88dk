@@ -6,15 +6,7 @@
  *
  */
 
-#ifndef _T_UCHAR
-#define _T_UCHAR
-   typedef unsigned char uchar;
-#endif
-
-#ifndef _T_UINT
-#define _T_UINT
-   typedef unsigned int uint;
-#endif
+#include <sys/types.h>
 
 /*
  * 1. KEYBOARD
@@ -48,16 +40,14 @@
  *   The scancode is used by in_KeyPressed and in_JoyKeyboard
  *   to scan the keyboard.
  *
- * uint in_Pause(uint ticks)
- *   Pause for a period of time measured in vertical blanking
- *   intervals (in Europe units of 1/50s, in North America
- *   units of 1/60s).  Return early if a key is pressed,
- *   reporting the amount of time remaining.  This must be a
- *   busy wait interval; resist the use of interrupts (a VBI
- *   interrupt for example) to keep the function useful even
+ * uint in_Pause(uint msec)
+ *   Pause for a period of time measured in milliseconds.
+ *   Return early if a key is pressed, reporting the amount of
+ *   time remaining.  This must be a busy wait interval; resist
+ *   the use of interrupts to keep the function useful even
  *   with interrupts disabled.
  *
- * void in_Wait(unit ticks)
+ * void in_Wait(unit msec)
  *   Similar to in_Pause but waits the entire period.
  *
  * void in_WaitForKey(void)
@@ -101,12 +91,12 @@
  */
 
 extern uint __LIB__ in_GetKey(void);
-extern uint __LIB__ in_GetKeyReset(void);
+extern void __LIB__ in_GetKeyReset(void);
 extern uint __LIB__ in_Inkey(void);
 extern uint __LIB__ __FASTCALL__ in_KeyPressed(uint scancode);
 extern uint __LIB__ __FASTCALL__ in_LookupKey(uchar c);
-extern uint __LIB__ __FASTCALL__ in_Pause(uint ticks);
-extern void __LIB__ __FASTCALL__ in_Wait(uint ticks);
+extern uint __LIB__ __FASTCALL__ in_Pause(uint msec);
+extern void __LIB__ __FASTCALL__ in_Wait(uint msec);
 extern void __LIB__ in_WaitForKey(void);
 extern void __LIB__ in_WaitForNoKey(void);
 

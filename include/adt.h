@@ -33,15 +33,7 @@
  *
  */
 
-#ifndef _T_UCHAR
-#define _T_UCHAR
-   typedef unsigned char uchar;
-#endif
-
-#ifndef _T_UINT
-#define _T_UINT
-   typedef unsigned int uint;
-#endif
+#include <sys/types.h>
 
 /*** DOUBLY LINKED LIST
 
