@@ -3,16 +3,16 @@
 
 XLIB in_Wait
 
-; Waits an approximate period of time measured in 1/50s units.
+; Waits an approximate period of time measured in milliseconds.
 ;
 ; enter : HL = number of interrupts to wait
 ; used  : AF,HL
 
 .in_Wait
 
-   ld bc,2691
+   ld bc,134
 
-.loop                  ; about 70000 cycles here (1/50s)
+.loop                  ; about 3500 cycles here (1ms)
 
    dec bc
    ld a,b
