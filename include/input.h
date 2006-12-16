@@ -45,7 +45,8 @@
  *   Return early if a key is pressed, reporting the amount of
  *   time remaining.  This must be a busy wait interval; resist
  *   the use of interrupts to keep the function useful even
- *   with interrupts disabled.
+ *   with interrupts disabled.  If msec==0 wait until key
+ *   is pressed.
  *
  * void in_Wait(unit msec)
  *   Similar to in_Pause but waits the entire period.
