@@ -5,7 +5,7 @@
 /*
  * Now some trickery to link in the correct routines for far
  *
- * $Id: malloc.h,v 1.6 2006-12-19 10:08:54 aralbrec Exp $
+ * $Id: malloc.h,v 1.7 2006-12-19 11:38:00 aralbrec Exp $
  */
 
 
@@ -28,6 +28,37 @@ extern void __LIB__ __FASTCALL__ free(void *addr);
 extern void __LIB__ __FASTCALL__ *malloc(int size);
 extern void __LIB__ *realloc(void *p, int size);
 extern void __LIB__ mallinfo(int *total, int *largest);
+
+// Named Heap Functions
+//
+// The near malloc library supports multiple independent
+// heaps; by referring to one by name, allocation
+// and deallocation can be performed from a specific heap.
+//
+// To create a new heap, simply declare an integer to hold
+// the heap's pointer as in:
+//
+// int myheap;
+// 
+// or, to place in RAM at specific address xxxx:
+//
+// extern int myheap(xxxx);
+//
+// An example heap initialization and usage using "myheap":
+//
+// HeapInit(&myheap);
+// HeapSbrk(&myheap, 50000, 5000);  /* add memory to heap */
+// a = HeapAlloc(&myheap, 14);
+//
+// The stdlib uses the process's standard heap called "heap".
+
+extern void __LIB__ __FASTCALL__ HeapInit(void *heap);
+extern void __LIB__ HeapSbrk(void *heap, void *addr, int size);
+extern void __LIB__ *HeapCalloc(void *heap, int nobj, int size); 
+extern void __LIB__ HeapFree(void *heap, void *addr);
+extern void __LIB__ HeapAlloc(void *heap, int size);
+extern void __LIB__ *HeapRealloc(void *heap, void *p, int size);
+extern void __LIB__ HeapInfo(void *heap, int *total, int *largest);
 
 #else
 
