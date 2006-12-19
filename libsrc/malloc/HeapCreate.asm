@@ -1,14 +1,14 @@
-; void __FASTCALL__ HeapInit(void *heap)
+; void __FASTCALL__ HeapCreate(void *heap)
 ; 12.2006 aralbrec
 
-XLIB HeapInit
+XLIB HeapCreate
 
 ; Just zero heap pointer to indicate empty heap.
 ;
 ; enter : hl = heap pointer
 ; uses  : hl
 
-.HeapInit
+.HeapCreate
 
    ld (hl),0
    inc hl
