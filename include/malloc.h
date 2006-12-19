@@ -5,39 +5,52 @@
 /*
  * Now some trickery to link in the correct routines for far
  *
- * $Id: malloc.h,v 1.5 2005-08-23 00:19:21 aralbrec Exp $
+ * $Id: malloc.h,v 1.6 2006-12-19 10:08:54 aralbrec Exp $
  */
 
 
 #ifndef FARDATA
 
-/*
- * Heapsize is a macro which will create a heap of size bp
- */
+// macro statically reserves space for
+// the process's default heap
 
+#define M_HEAPDECLARE    int heap; 
 
+// an alternative is to reserve two bytes
+// in RAM at address xxxx using:
+//
+// extern int heap(xxxx);
 
-#define HEAPSIZE(bp)    unsigned char heap[bp]; 
-
-
-extern void __LIB__ *calloc(int,int); 
-extern void __LIB__ __FASTCALL__ *malloc(int);
-extern void __LIB__ __FASTCALL__ free(void *);
-extern int __LIB__ getfree();
-extern int __LIB__ getlarge();
-extern void __LIB__ heapinit(int);
-extern void __LIB__ *realloc_down(void *,int);
+extern void __LIB__ mallinit(void);
+extern void __LIB__ sbrk(void *addr, int size);
+extern void __LIB__ *calloc(int nobj, int size); 
+extern void __LIB__ __FASTCALL__ free(void *addr);
+extern void __LIB__ __FASTCALL__ *malloc(int size);
+extern void __LIB__ *realloc(void *p, int size);
+extern void __LIB__ mallinfo(int *total, int *largest);
 
 #else
 
 /*
  * Now some definitions for far functions
  */
-#define HEAPSIZE(bp)
+
+#define M_HEAPDECLARE
+
 #define calloc(a,b) calloc_far(a,b)
 #define malloc(a)   malloc_far(a)
 #define free(a)     free_far(a)
-/* getfree/getlarge have no place in far stuff, non ANSI in anycase */
+
+// realloc, sbrk, mallinit not implemented in far lib
+#define realloc(a,b)
+#define sbrk(a,b)
+#define mallinit()
+
+// mallinfo has no place in far stuff, non ANSI in anycase */
+#define mallinfo(a,b)
+
+// these are for compatibility with the older version of the near malloc lib
+/* getfree/getlarge has no place in far stuff, non ANSI in anycase */
 #define getfree()  
 #define getlarge()
 #define heapinit(a) heapinit_far(a)
