@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.9 2005-02-25 12:25:47 dom Exp $
+ *	$Id: string.h,v 1.10 2006-12-19 10:08:06 aralbrec Exp $
  */
 
 
@@ -49,7 +49,7 @@ extern void __LIB__ *memcpy(void *, void *,int);
 extern void __LIB__ *memchr(void *, unsigned char, int);
 extern int __LIB__ memcmp(void *, void *, int);
 
-extern char __LIB__ *strdup(char *);
+extern char __LIB__ __FASTCALL__ *strdup(char *);
 
 /*
  * Now handle far stuff
