@@ -5,21 +5,31 @@
 /*
  * Now some trickery to link in the correct routines for far
  *
- * $Id: malloc.h,v 1.8 2006-12-19 21:32:04 aralbrec Exp $
+ * $Id: malloc.h,v 1.9 2006-12-23 08:10:06 aralbrec Exp $
  */
 
 
 #ifndef FARDATA
 
+// The Near Malloc Library is still a simple first
+// fit linear search of a list of free blocks.  The
+// list of free blocks is kept sorted by address so
+// that merging of adjacent blocks can occur.
+//
+// The block memory allocator (balloc.lib) is an
+// alternative for allocating blocks of fixed size.
+// Its main advantage is that it is very quick O(1)
+// in comparison to the O(N) of this library.
+//
 // Space must be declared to hold the process's
 // standard heap:
 //
-// int heap;
+// long heap;
 //
-// An alternative is to reserve two bytes
+// An alternative is to reserve four bytes
 // in RAM at address xxxx using:
 //
-// extern int heap(xxxx);
+// extern long heap(xxxx);
 //
 // The heap must be initialized to empty with a
 // call to mallinit() or by setting heap=0.
@@ -43,10 +53,10 @@ extern void __LIB__ mallinfo(int *total, int *largest);
 // older version of the near malloc library to
 // continue to work
 
-#define HEAPSIZE(bp)       unsigned char heap[bp+2];
-#define heapinit(a)        mallinit(); sbrk(heap+2,a);
-#define getfree()          asm("ld\thl,-2\nadd\thl,sp\npush\thl\ndec\thl\ndec\thl\npush\thl\ncall\tmallinfo\npop\thl\npop\thl\n");
-#define getlarge()         asm("ld\thl,-2\nadd\thl,sp\npush\thl\ndec\thl\ndec\thl\npush\thl\ncall\tmallinfo\npop\thl\npop\tbc\n");
+#define HEAPSIZE(bp)       unsigned char heap[bp+4];
+#define heapinit(a)        mallinit(); sbrk(heap+4,a);
+#define getfree()          asm("LIB\tmallinfo\nld\thl,-2\nadd\thl,sp\npush\thl\ndec\thl\ndec\thl\npush\thl\ncall\tmallinfo\npop\thl\npop\thl\n");
+#define getlarge()         asm("LIB\tmallinfo\nld\thl,-2\nadd\thl,sp\npush\thl\ndec\thl\ndec\thl\npush\thl\ncall\tmallinfo\npop\thl\npop\tbc\n");
 #define realloc_down(a,b)  realloc(a,b);
 
 // Named Heap Functions
@@ -55,18 +65,19 @@ extern void __LIB__ mallinfo(int *total, int *largest);
 // heaps; by referring to one by name, allocation
 // and deallocation can be performed from a specific heap.
 //
-// To create a new heap, simply declare an integer to hold
+// To create a new heap, simply declare a long to hold
 // the heap's pointer as in:
 //
-// int myheap;
+// long myheap;
 // 
 // or, to place in RAM at specific address xxxx:
 //
-// extern int myheap(xxxx);
+// extern long myheap(xxxx);
 //
 // Heaps must be initialized to empty with a call to
 // HeapCreate() or by setting them =0 (myheap=0; eg).
-// Then available memory must be added to the heap as in:
+// Then available memory must be added to the heap
+// with one or more calls to HeapSbrk():
 //
 // HeapCreate(&myheap);
 // HeapSbrk(&myheap, 50000, 5000);  /* add memory to heap */
@@ -77,7 +88,9 @@ extern void __LIB__ mallinfo(int *total, int *largest);
 // program segments to get valid near memory while different
 // memory configurations are active.
 //
-// The stdlib uses the process's standard heap called "heap".
+// The stdlib functions implicitly use the heap named "heap".
+// So, for example, a call to HeapAlloc(heap,size) is equivalent
+// to a call to malloc(size).
 
 extern void __LIB__ __FASTCALL__ HeapCreate(void *heap);
 extern void __LIB__ HeapSbrk(void *heap, void *addr, int size);
@@ -97,12 +110,11 @@ extern void __LIB__ HeapInfo(void *heap, int *total, int *largest);
 #define malloc(a)   malloc_far(a)
 #define free(a)     free_far(a)
 
-// realloc, sbrk, mallinit not implemented in far lib
-#define realloc(a,b)
-#define sbrk(a,b)
-#define mallinit()
+// realloc, sbrk, mallinit, mallinfo not implemented in far lib
 
-// mallinfo has no place in far stuff, non ANSI in anycase */
+#define realloc(a,b)
+#define sbrk(a,b)      heapinit_far(b)
+#define mallinit()
 #define mallinfo(a,b)
 
 // these are for compatibility with the older version of the near malloc lib
@@ -110,7 +122,7 @@ extern void __LIB__ HeapInfo(void *heap, int *total, int *largest);
 #define HEAPSIZE(bp)
 #define getfree()  
 #define getlarge()
-#define heapinit(a) heapinit_far(a)
+#define heapinit(a)    heapinit_far(a)
 
 extern far void __LIB__ *calloc_far(int, int);
 extern far void __LIB__ *malloc_far(long);
