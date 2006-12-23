@@ -6,15 +6,16 @@ XLIB HeapCreate
 ; Just zero heap pointer to indicate empty heap.
 ;
 ; enter : hl = heap pointer
-; uses  : hl
+; uses  : af, hl
 
 .HeapCreate
 
-   ld (hl),0
+   xor a
+   ld (hl),a
    inc hl
-   ld (hl),0
+   ld (hl),a
    inc hl
-   ld (hl),0
+   ld (hl),a
    inc hl
-   ld (hl),0
+   ld (hl),a
    ret
