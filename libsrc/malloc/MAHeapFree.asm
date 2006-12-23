@@ -7,6 +7,8 @@ XLIB MAHeapFree
 ; blocks must be kept sorted in increasing order by
 ; start address so that adjacent blocks can be merged.
 ;
+; Not allowed to use IX,IY,EXX so a bit constrained.
+;
 ; enter : de = & heap pointer
 ;         hl = block address (+2)
 ; uses  : af, bc, de, hl
@@ -16,6 +18,9 @@ XLIB MAHeapFree
    ld a,h
    or l
    ret z
+
+   inc de
+   inc de
 
    dec hl
    ld b,(hl)
@@ -35,105 +40,145 @@ XLIB MAHeapFree
 
 .loop
 
+   ; hl = & lagger's next pointer
+   ; bc = address following block to free
+   ; stack = & block to free
+   
    ld a,(hl)
    inc hl
-   push hl                   ; save & lagger's next + 1b
+   push hl                   ; save & lagger->next + 1b
    ld h,(hl)
    ld l,a                    ; hl = & next block
-   
-   or h
-   jr z, placeatend          ; if no next block, add block to end
 
-   sbc hl,bc                 ; next block address - address following block to free
-   jr z, mergeblocks
-   jr nc, insertblock
+   or h                      ; if there is no next block...
+   jr z, placeatend
+   
+   sbc hl,bc                 ; next block - address following block to free
+   jr z, mergeontop
+   jr nc, insertbefore
    
    adc hl,bc
-   inc hl                    ; hl = & block->next
+   inc hl                    ; hl = & next block->next
    pop de                    ; junk lagger
+   
    jp loop
 
-.mergeblocks
-
-   ; bc = & next block (hl-bc=0 remember)
-   ; stack = & block to free, & lagger's next + 1b
-
-   ld l,c
-   ld h,b
-   ld c,(hl)
-   inc hl
-   ld b,(hl)                 ; bc = size of next block
-   inc hl
-   ld e,(hl)
-   inc hl
-   ld d,(hl)                 ; de = next block->next
-   
-   pop hl
-   ex (sp),hl                ; hl = & block to free
-   
-   inc hl
-   inc hl
-   inc hl
-   ld (hl),d
-   dec hl
-   ld (hl),e                 ; block to free->next = next block->next
-   dec hl
-   ld d,(hl)
-   dec hl
-   ld e,(hl)                 ; de = size of block to free
-   ex de,hl
-   add hl,bc                 ; compute size of merged block
-   inc hl
-   inc hl
-   ex de,hl
-   ld (hl),e                 ; store size of merged block
-   inc hl
-   ld (hl),d
-   dec hl
-   
-   pop de
-   ex de,hl                  ; hl = & lagger's next + 1b, de = & block to free
-   ld (hl),d
-   dec hl
-   ld (hl),e                 ; lagger->next = & block to free
-   ret
-
-.insertblock
+.insertbefore
 
    add hl,bc
-   pop de
-   pop bc
-   ex de,hl
    
-   ; de = & next block
-   ; hl = & lagger's next + 1b
-   ; bc = & block to free
-   
-   ld (hl),b
-   dec hl
-   ld (hl),c                 ; lagger->next = block being freed
-   ld l,c
-   ld h,b
-   inc hl
-   inc hl
-   ld (hl),e
-   inc hl
-   ld (hl),d                 ; freed block->next = next block
-   ret
-
 .placeatend
 
-   ; stack = & block to free, & lagger's next + 1b
-
+   ld c,l
+   ld b,h
    pop hl
-   pop de
-   ld (hl),d
+   
+   ; bc = & next block
+   ; hl = & lagger->next + 1b
+   ; stack = & block to free
+
+   jp checkformergebelow
+   
+.mergeontop
+
+   ; bc = & next block
+   ; stack = & block to free, & lagger->next + 1b
+   
+   ld l,c
+   ld h,b
+   ld e,(hl)
+   inc hl
+   ld d,(hl)                 ; de = size of next block
+   inc de
+   inc de                    ; reclaim two bytes for next block's size parameter
+   inc hl
+   ld c,(hl)
+   inc hl
+   ld b,(hl)                 ; bc = & next block after merged blocks
+   
+   pop hl
+   ex (sp),hl                ; hl = & block to free, stack = & lagger->next + 1b
+   ld a,(hl)                 ; add next block's size to merged block
+   add a,e
+   ld (hl),a
+   inc hl
+   ld a,(hl)
+   adc a,d
+   ld (hl),a
    dec hl
-   ld (hl),e                 ; lagger->next = block to free
+   ex (sp),hl
+   
+.checkformergebelow
+
+   ; bc = & next block after free
+   ; hl = & lagger->next + 1b
+   ; stack = & block to free
+   
+   dec hl
+   ld e,l
+   ld d,h                    ; de = & lagger->next
+   dec hl
+   ld a,(hl)
+   dec hl
+   ld l,(hl)
+   ld h,a                    ; hl = size of lagger block
+
+   add hl,de                 ; hl = byte past end of lagger block
+   ex de,hl
+   ex (sp),hl
+   ex de,hl
+   
+   ; bc = & next block after free
+   ; hl = byte past end of lagger block
+   ; de = & block to free
+   ; stack = & lagger->next
+   
+   sbc hl,de                 ; carry must be clear here
+   pop hl
+   jr z, mergebelow
+   
+.nomergebelow
+
+   ; bc = & next block after free
+   ; de = & block to free
+   ; hl = & lagger->next
+   
+   ld (hl),e
+   inc hl
+   ld (hl),d
    inc de
    inc de
-   xor a
-   ld (de),a
+   ex de,hl
+   ld (hl),c
+   inc hl
+   ld (hl),b
+   ret
+   
+.mergebelow
+ 
+   ; bc = & next block after free
+   ; de = & block to free
+   ; hl = & lagger->next
+   
+   ld (hl),c
+   inc hl
+   ld (hl),b                 ; write new next pointer for merged block
+   dec hl
+
+   ld a,(de)
+   ld c,a
    inc de
-   ld (de),a                 ; block to free->next = 0
+   ld a,(de)
+   ld b,a
+   inc bc
+   inc bc                    ; bc = size of block to merge + 2 for size parameter
+   dec hl
+   dec hl
+   ld a,(hl)
+   add a,c
+   ld (hl),a
+   inc hl
+   ld a,(hl)
+   adc a,b
+   ld (hl),a
    ret
