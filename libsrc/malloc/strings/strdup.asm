@@ -31,9 +31,9 @@ XREF _heap
    push bc
    call MAHeapAlloc
    pop bc
+   pop de
    ret nc
    
-   pop de
    ex de,hl
    push de
    ldir
