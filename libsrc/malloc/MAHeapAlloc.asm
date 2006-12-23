@@ -34,6 +34,19 @@ XLIB MAHeapAlloc
 
 .MAHeapAlloc
 
+   inc hl
+   inc hl
+
+   ld a,b                    ; requests must be at least 2 bytes
+   or a
+   jp nz, loop
+   ld a,c
+   cp 2
+   jp nc, loop
+   ld c,2
+
+.loop
+
    ; hl = & last block's next pointer
    ; bc = size
 
@@ -61,7 +74,7 @@ XLIB MAHeapAlloc
    pop hl                    ; junk lagger on stack
    ex de,hl
    inc hl                    ; hl = & block->next
-   jp MAHeapAlloc            ; try again with next block
+   jp loop                   ; try again with next block
    
 .foundblk
 

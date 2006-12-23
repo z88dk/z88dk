@@ -8,4 +8,5 @@ XREF _heap
 
    ld hl,0
    ld (_heap),hl
+   ld (_heap+2),hl
    ret

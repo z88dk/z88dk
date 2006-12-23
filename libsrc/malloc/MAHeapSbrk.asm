@@ -12,7 +12,7 @@ LIB MAHeapFree
 ; enter : de = heap pointer
 ;         hl = address of available block
 ;         bc = size of block in bytes >= 4
-; exit  : carry set if block size too small
+; exit  : block not added if too small
 ; uses  : af, bc, de, hl
 
 .MAHeapSbrk

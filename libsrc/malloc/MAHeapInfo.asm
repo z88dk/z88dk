@@ -16,6 +16,9 @@ XLIB MAHeapInfo
    ld de,0                   ; de = total available bytes in heap
    ld bc,0                   ; bc = largest single block available
    
+   inc hl
+   inc hl
+   
 .loop
 
    ld a,(hl)

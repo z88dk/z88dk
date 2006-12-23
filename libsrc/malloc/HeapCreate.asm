@@ -13,4 +13,8 @@ XLIB HeapCreate
    ld (hl),0
    inc hl
    ld (hl),0
+   inc hl
+   ld (hl),0
+   inc hl
+   ld (hl),0
    ret
