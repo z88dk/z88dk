@@ -11,7 +11,8 @@
 ; 12.2006 aralbrec
 
 XLIB strdup
-LIB malloc
+LIB MAHeapAlloc
+XREF _heap
 
 .strdup
 
@@ -26,10 +27,9 @@ LIB malloc
    or a
    jp nz, sizeloop
    
-   ld l,c
-   ld h,b
+   ld hl,_heap
    push bc
-   call malloc
+   call MAHeapAlloc
    pop bc
    ret nc
    
