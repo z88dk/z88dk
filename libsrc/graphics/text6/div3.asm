@@ -8,7 +8,7 @@
 ;	Divide by three lookup table
 ;
 ;
-;	$Id: div3.asm,v 1.1 2006-12-23 21:33:10 stefano Exp $
+;	$Id: div3.asm,v 1.2 2006-12-28 18:08:36 stefano Exp $
 ;
 
 			XLIB	div3
@@ -34,6 +34,6 @@
 ;## ML MR
 ;## BL BR
 ;
-;POS: X/2, Y,3
+;POS: X/2, Y/3
 ;
 ;Bit: X mod 2, Y mod 3

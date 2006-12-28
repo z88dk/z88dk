@@ -8,7 +8,6 @@
 #
 
 Z80EXE  	z80asm
-MPMEXE		mpm
 CPP 		zcpp
 LINKER 		z80asm
 COMPILER	sccz80
@@ -122,5 +121,5 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -// -v -O2 -I. -lnasansi_clib -lndos -DZ80 -DSMALL_C -DNASCOM -D__NASCOM__ -M -DSCCZ80 -Cz+nasansi
+OPTIONS		 -// -v -O2 -I. -lnasansi_clib -lndos -DZ80 -DSMALL_C -DNASCOM -D__NASCOM__ -M -DSCCZ80 -Cz+nas
 

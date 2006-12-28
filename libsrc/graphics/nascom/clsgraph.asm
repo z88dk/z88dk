@@ -6,13 +6,13 @@
 ;       Stefano Bodrato - June 2003
 ;
 ;
-;       $Id: clg.asm,v 1.1 2003-08-22 15:27:40 dom Exp $
+;       $Id: clsgraph.asm,v 1.1 2006-12-28 18:08:36 stefano Exp $
 ;
 
 
-        XLIB    clg
+        XLIB    cleargraphics
         LIB     ansi_cls
 
-.clg
+.cleargraphics
         jp      ansi_cls
 
