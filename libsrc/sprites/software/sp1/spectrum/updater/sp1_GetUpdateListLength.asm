@@ -14,9 +14,9 @@ XREF SP1V_UPDATELISTH
 
 .sp1_GetUpdateListLength
 
-   ld hl,(SP1V_UPDATELISTH+5)
+   ld hl,(SP1V_UPDATELISTH+6)
    ld de,0
-   ld bc,5
+   ld bc,6
    ld a,h
 
 .loop

@@ -38,16 +38,7 @@
 ///////////////////////////////////////////////////////////
 
 #include <rect.h>
-
-#ifndef _T_UCHAR
-#define _T_UCHAR
-   typedef unsigned char uchar;
-#endif
-
-#ifndef _T_UINT
-#define _T_UINT
-   typedef unsigned int uint;
-#endif
+#include <sys/types.h>
 
 ///////////////////////////////////////////////////////////
 //                  DATA STRUCTURES                      //
@@ -66,18 +57,18 @@ struct sp1_update;
 struct sp1_ss;
 struct sp1_cs;
 
-struct sp1_update {                   // "update structs" Every tile in the display area managed by SP1 is described by one of these
+struct sp1_update {                   // "update structs" - 10 bytes - Every tile in the display area managed by SP1 is described by one of these
 
    uchar              nload;          // +0 bit 7 = 1 for invalidated, bit 6 = 1 for removed, bits 5:0 = number of occluding sprites present + 1
    uchar              colour;         // +1 background tile attribute
-   uchar              tile;           // +2 background tile character code
-   struct sp1_cs     *slist;          // +3 BIG ENDIAN ; list of sprites occupying this tile (MSB = 0 if none) points at struct sp1_cs.attr_mask
-   struct sp1_update *ulist;          // +5 BIG ENDIAN ; next update struct in list of update structs queued for draw (MSB = 0 if none)
-   uchar             *screen;         // +7 address in display file where this tile is drawn
+   uint               tile;           // +2 background 16-bit tile code (if MSB != 0 taken as address of graphic, else lookup in tile array)
+   struct sp1_cs     *slist;          // +4 BIG ENDIAN ; list of sprites occupying this tile (MSB = 0 if none) points at struct sp1_cs.attr_mask
+   struct sp1_update *ulist;          // +6 BIG ENDIAN ; next update struct in list of update structs queued for draw (MSB = 0 if none)
+   uchar             *screen;         // +8 address in display file where this tile is drawn
 
 };
 
-struct sp1_ss {                       // "sprite structs" Every sprite is described by one of these
+struct sp1_ss {                       // "sprite structs" - 20 bytes - Every sprite is described by one of these
 
    uchar              row;            // +0  current y tile-coordinate
    uchar              col;            // +1  current x tile-coordinate
@@ -104,7 +95,7 @@ struct sp1_ss {                       // "sprite structs" Every sprite is descri
 
 };
 
-struct sp1_cs {                       // "char structs" Every sprite is broken into pieces fitting into a tile, each of which is described by one of these
+struct sp1_cs {                       // "char structs" - 24 bytes - Every sprite is broken into pieces fitting into a tile, each of which is described by one of these
 
    struct sp1_cs     *next_in_spr;    // +0  BIG ENDIAN ; next sprite char within same sprite in row major order (MSB = 0 if none)
 
@@ -130,21 +121,21 @@ struct sp1_cs {                       // "char structs" Every sprite is broken i
 
 };
 
-struct sp1_ap {                       // "attribute pairs" A struct to hold sprite attribute and mask pairs
+struct sp1_ap {                       // "attribute pairs" - 2 bytes - A struct to hold sprite attribute and mask pairs
 
    uchar              attr_mask;      // +0 attribute mask logically ANDed with underlying attribute = 0xff for transparent
    uchar              attr;           // +1 sprite colour, logically ORed to form final colour = 0 for transparent
 
 };
 
-struct sp1_tp {                       // "tile pairs" A struct to hold background colour and tile pairs
+struct sp1_tp {                       // "tile pairs" - 3 bytes - A struct to hold background colour and tile pairs
 
    uchar              attr;           // +0 colour
-   uchar              tile;           // +1 tile code
+   uint               tile;           // +1 tile code
 
 };
 
-struct sp1_pss {                      // "print string struct" A struct holding print state information
+struct sp1_pss {                      // "print string struct" - 11 bytes - A struct holding print state information
 
    struct sp1_Rect    *bounds;        // +0 rectangular boundary within which printing will be allowed
    uchar              flags;          // +2 bit 0=invalidate?, 1=xwrap?, 2=yinc?, 3=ywrap?
@@ -284,9 +275,9 @@ extern void __LIB__ sp1_MakeRect16Pix(struct sp1_ss *s, struct r_Rect16 *r);
 
 extern void  __LIB__  *sp1_TileEntry(uchar c, void *def);
 
-extern void  __LIB__   sp1_PrintAt(uchar row, uchar col, uchar colour, uchar tile);
-extern void  __LIB__   sp1_PrintAtInv(uchar row, uchar col, uchar colour, uchar tile);
-extern uchar __LIB__   sp1_ScreenStr(uchar row, uchar col);
+extern void  __LIB__   sp1_PrintAt(uchar row, uchar col, uchar colour, uint tile);
+extern void  __LIB__   sp1_PrintAtInv(uchar row, uchar col, uchar colour, uint tile);
+extern uint  __LIB__   sp1_ScreenStr(uchar row, uchar col);
 extern uchar __LIB__   sp1_ScreenAttr(uchar row, uchar col);
 extern uint  __LIB__   sp1_Screen(uchar row, uchar col);
 
@@ -318,15 +309,21 @@ extern void               __LIB__   sp1_GetUpdateList(struct sp1_update **head, 
 extern void               __LIB__   sp1_SetUpdateList(struct sp1_update *head, struct sp1_update *tail);
 
 extern struct sp1_update  __LIB__  *sp1_GetUpdateStruct(uchar row, uchar col);
-extern void __FASTCALL__  __LIB__   sp1_InvUpdateStruct(struct sp1_update *u);
-extern void __FASTCALL__  __LIB__   sp1_ValUpdateStruct(struct sp1_update *u);
 extern void               __LIB__   sp1_IterateUpdateArr(struct sp1_update **ua, void *hook);  // zero terminated array
 extern void               __LIB__   sp1_IterateUpdateRect(struct sp1_Rect *r, void *hook);
 
-extern void __FASTCALL__  __LIB__   sp1_Invalidate(struct sp1_Rect *r);
-extern void __FASTCALL__  __LIB__   sp1_Validate(struct sp1_Rect *r);
+extern void __FASTCALL__  __LIB__   sp1_InvUpdateStruct(struct sp1_update *u);
+extern void __FASTCALL__  __LIB__   sp1_ValUpdateStruct(struct sp1_update *u);
+
+extern void __FASTCALL__  __LIB__   sp1_DrawUpdateStructIfInv(struct sp1_update *u);
+extern void __FASTCALL__  __LIB__   sp1_DrawUpdateStructIfVal(struct sp1_update *u);
+extern void __FASTCALL__  __LIB__   sp1_DrawUpdateStructIfNotRem(struct sp1_update *u);
+extern void __FASTCALL__  __LIB__   sp1_DrawUpdateStructAlways(struct sp1_update *u);
 
 extern void __FASTCALL__  __LIB__   sp1_RemoveUpdateStruct(struct sp1_update *u);
 extern void __FASTCALL__  __LIB__   sp1_RestoreUpdateStruct(struct sp1_update *u);
+
+extern void __FASTCALL__  __LIB__   sp1_Invalidate(struct sp1_Rect *r);
+extern void __FASTCALL__  __LIB__   sp1_Validate(struct sp1_Rect *r);
 
 #endif

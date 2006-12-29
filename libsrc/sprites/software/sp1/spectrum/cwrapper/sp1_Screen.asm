@@ -17,11 +17,11 @@ LIB SP1Screen
    inc hl
    ld d,(hl)
    call SP1Screen
-   ex de,hl
+   ld l,e
+   ld h,a
    ret
 
 ; enter : d = row coord
 ;         e = col coord
-; exit  : d = attr
-;         e = tile
-
+; exit  :  a = attr
+;         de = tile

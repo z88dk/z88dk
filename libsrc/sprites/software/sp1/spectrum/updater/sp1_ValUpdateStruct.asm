@@ -1,9 +1,11 @@
 
-; SP1ValUpdateStruct
+; sp1_ValUpdateStruct
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1ValUpdateStruct
+XLIB sp1_ValUpdateStruct
+
+; FASTCALL
 
 ; Validate struct_sp1_update so that it is not drawn in
 ; the next update.  You must make sure that this tile is
@@ -14,7 +16,7 @@ XLIB SP1ValUpdateStruct
 ; enter : HL = & struct sp1_update
 ; uses  : none
 
-.SP1ValUpdateStruct
+.sp1_ValUpdateStruct
 
    bit 6,(hl)         ; must not validate removed update chars
    ret nz

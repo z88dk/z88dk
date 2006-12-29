@@ -1,6 +1,6 @@
 
 ; SP1PrintString
-; 05.2006 aralbrec, Sprite Pack v3.0
+; 05.2006, 12.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
 XLIB SP1PrintString
@@ -20,9 +20,9 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 ;   2      gotoy N* (goto y coordinate on same column)
 ;   3      ywrap N*
 ;   4      attribute mask N*
-;   5      NOP (ignored)
+;   5      16-bit tile code follows W*
 ;   6      gotox N* (goto x coordinate on same line)
-;   7      print string at address W* (like a subroutine call for printstrings; see also 26,28)
+;   7      print string at address W* (like a subroutine call / macro for printstrings; see also 26,28)
 ;   8      left
 ;   9      right
 ;  10      up
@@ -77,7 +77,7 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 
    exx
    ld hl,(SP1V_UPDATELISTT)
-   ld a,5
+   ld a,6
    add a,l
    ld l,a
    jp nc, noinc0
@@ -95,7 +95,7 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
    cp 32
    jp nc, printable
 
-   ; here we have a special code [1,29]
+   ; here we have a special code [1,31]
 
    push hl
    ld d,a
@@ -118,7 +118,7 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 
    exx
    ld (hl),0
-   ld a,-5
+   ld a,-6
    add a,l
    ld l,a
    ld a,$ff
@@ -130,7 +130,7 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 
 .jumptbl
    defw printable, codeAMaskAND, codeGotoY, codeYWrap
-   defw codeAMask, codeNOP, codeGotoX, codePString
+   defw codeAMask, codeTC, codeGotoX, codePString
    defw codeLeft, codeRight, codeUp, codeDown
    defw codeHome, codeReturn, codeRepeat, codeEndRepeat
    defw codeInk, codePaper, codeFlash, codeBright
@@ -280,14 +280,14 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
    ld l,a
    call psloop
    pop hl
-   exx
-   ld a,5
-   add a,l
-   ld l,a
-   jp nc, noinc5
-   inc h
-.noinc5
-   exx
+;   exx
+;   ld a,6
+;   add a,l
+;   ld l,a
+;   jp nc, noinc5
+;   inc h
+;.noinc5
+;   exx
    jp psloop
 
 .codeInvalidate
@@ -404,9 +404,78 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
    exx
    jp psloop
    
-.codeNOP
+.codeTC                      ; a 16 bit tile code follows
 
-   jp psloop
+   ; first check if in bounds
+   
+   ld a,b
+   cp (iy+2)
+   jr nc, codeRight2
+   ld a,c
+   cp (iy+3)
+   jr nc, codeRight2
+   
+   ; are we invalidating?
+   
+   bit 0,e
+   exx
+   jr z, noinvalidation2
+
+   ; invalidate the char
+
+   ld a,(de)
+   xor $80
+   jp p, noinvalidation      ; if already invalidated, skip
+   ld (de),a   
+   ld (hl),d
+   inc hl
+   ld (hl),e
+   ld hl,6
+   add hl,de
+
+.noinvalidation2
+   
+   ex de,hl
+   inc hl
+   ld a,b
+   and (hl)                  ; do attr mask
+   or c
+   ld (hl),a                 ; store bgnd colour
+   inc hl
+   
+   exx
+   ld a,(hl)
+   inc hl
+   push hl
+   ld h,(hl)
+   ld l,a
+   ex (sp),hl
+   inc hl
+   exx
+   
+   ex de,hl
+   ex (sp),hl
+   ex de,hl
+   ld (hl),e                 ; store tile
+   inc hl
+   ld (hl),d
+   pop de
+   
+   ; advance to next char on right
+   
+   dec hl
+   dec hl
+   dec hl
+   ex de,hl
+   exx
+ 
+   jp codeRight
+   
+.codeRight2
+
+   inc hl
+   inc hl
+   jp codeRight
 
 .codeTransparent
 
@@ -448,7 +517,7 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
    ld (hl),d
    inc hl
    ld (hl),e
-   ld hl,5
+   ld hl,6
    add hl,de
 
 .noinvalidation
@@ -462,9 +531,12 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
    inc hl
    ex af,af
    ld (hl),a                 ; store tile
+   inc hl
+   ld (hl),0
    
    ; advance to next char on right
    
+   dec hl
    dec hl
    dec hl
    ex de,hl
@@ -479,7 +551,7 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 .inxbounds
 
    exx                       ; move update struct to right
-   ld a,9
+   ld a,10
    add a,e
    ld e,a
    jp nc, noinc1
@@ -537,7 +609,7 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 .inxbounds2
    
    exx
-   ld a,-9
+   ld a,-10
    add a,l
    ld l,a
    ld a,$ff
@@ -577,10 +649,10 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 .inybounds
 
    exx
-   ld a,(-(SP1V_DISPWIDTH*9))%256
+   ld a,(-(SP1V_DISPWIDTH*10))%256
    add a,l
    ld l,a
-   ld a,(-(SP1V_DISPWIDTH*9))/256
+   ld a,(-(SP1V_DISPWIDTH*10))/256
    adc a,h
    ld h,a
    exx
@@ -604,10 +676,10 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 .inybounds2
 
    exx
-   ld a,(SP1V_DISPWIDTH*9)%256
+   ld a,(SP1V_DISPWIDTH*10)%256
    add a,l
    ld l,a
-   ld a,(SP1V_DISPWIDTH*9)/256
+   ld a,(SP1V_DISPWIDTH*10)/256
    adc a,h
    ld h,a
    exx

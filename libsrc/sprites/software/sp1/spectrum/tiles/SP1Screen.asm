@@ -10,8 +10,8 @@ LIB SP1GetUpdateStruct
 ;
 ; enter : d = row coord
 ;         e = col coord
-; exit  : d = attr
-;         e = tile
+; exit  :  a = attr
+;         de = tile
 ; uses  : af, de, hl
 
 .SP1Screen
@@ -19,8 +19,10 @@ LIB SP1GetUpdateStruct
    call SP1GetUpdateStruct
 
    inc hl
-   ld d,(hl)
+   ld a,(hl)
    inc hl
    ld e,(hl)
+   inc hl
+   ld d,(hl)
 
    ret

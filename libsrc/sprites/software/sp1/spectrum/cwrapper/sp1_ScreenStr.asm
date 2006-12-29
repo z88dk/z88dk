@@ -3,7 +3,7 @@
 ; 04.2006 aralbrec, Sprite Pack v3.0
 ; Sinclair Spectrum version
 
-; uchar sp1_ScreenStr(uchar row, uchar col)
+; uint sp1_ScreenStr(uchar row, uchar col)
 
 XLIB sp1_ScreenStr
 LIB SP1ScreenStr
@@ -17,12 +17,11 @@ LIB SP1ScreenStr
    inc hl
    ld d,(hl)
    call SP1ScreenStr
-   ld l,e
-   ld h,0
+   ex de,hl
    ret
 
 ; enter : d = row coord
 ;         e = col coord
-; exit  : e = tile
+; exit  : de = tile
 ; uses  : af, de, hl
 

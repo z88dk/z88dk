@@ -34,13 +34,13 @@ XREF SP1V_DISPWIDTH
    push hl
    call l_jpix
    pop hl
-   ld bc,9
+   ld bc,10
    add hl,bc
    pop bc
    djnz colloop
 
    pop hl                        ; hl = & struct sp1_update same row leftmost column
-   ld bc,9*SP1V_DISPWIDTH
+   ld bc,10*SP1V_DISPWIDTH
    add hl,bc                     ; hl = & struct sp1_update next row leftmost column
    pop bc
 

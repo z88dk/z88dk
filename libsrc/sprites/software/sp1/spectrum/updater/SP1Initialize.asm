@@ -127,7 +127,7 @@ XDEF SP1V_SPRDRAWTBL
    ld hl,SP1V_UPDATELISTH           ; this variable points at a dummy struct sp1_update that is
    ld (SP1V_UPDATELISTT),hl
    ld hl,0
-   ld (SP1V_UPDATELISTH+5),hl       ; nothing in invalidate list
+   ld (SP1V_UPDATELISTH+6),hl       ; nothing in invalidate list
 
    ; initialize the update array
 
@@ -148,6 +148,8 @@ XDEF SP1V_SPRDRAWTBL
    ld (hl),d                        ; write tile colour
    inc hl
    ld (hl),e                        ; write tile code
+   inc hl
+   ld (hl),0
    inc hl
    ld (hl),0                        ; no sprites in the tile
    inc hl

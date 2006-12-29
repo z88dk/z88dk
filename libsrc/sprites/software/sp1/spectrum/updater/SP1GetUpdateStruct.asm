@@ -7,7 +7,7 @@ XLIB SP1GetUpdateStruct
 INCLUDE "customize.asm"
 
 ; Return struct_sp1_update for row,col coordinate given
-; 9 * (SP1V_DISPWIDTH * ROW + COL) + SP1V_UPDATEARRAY
+; 10 * (SP1V_DISPWIDTH * ROW + COL) + SP1V_UPDATEARRAY
 ;
 ; enter :  d = row coord
 ;          e = col coord
@@ -40,12 +40,12 @@ INCLUDE "customize.asm"
    .nowiadj
 
       add hl,de            ; hl = 16 * ROW + COL
+      add hl,hl
       ld d,h
-      ld e,l
+      le e,l
       add hl,hl
       add hl,hl
-      add hl,hl
-      add hl,de            ; hl = 9 * (16 * ROW + COL)
+      add hl,de            ; hl = 10 * (16 * ROW + COL)
       ld de,SP1V_UPDATEARRAY
       add hl,de
 
@@ -78,12 +78,12 @@ INCLUDE "customize.asm"
       add hl,de
       pop de
       add hl,de            ; hl = 24 * ROW + COL
+      add hl,hl
       ld d,h
       ld e,l
       add hl,hl
       add hl,hl
-      add hl,hl
-      add hl,de            ; hl = 9 * (24 * ROW + COL)
+      add hl,de            ; hl = 10 * (24 * ROW + COL)
       ld de,SP1V_UPDATEARRAY
       add hl,de
 
@@ -114,12 +114,12 @@ INCLUDE "customize.asm"
    .nowiadj
 
       add hl,de            ; hl = 32 * ROW + COL
+      add hl,hl
       ld d,h
       ld e,l
       add hl,hl
       add hl,hl
-      add hl,hl
-      add hl,de            ; hl = 9 * (32 * ROW + COL)
+      add hl,de            ; hl = 10 * (32 * ROW + COL)
       ld de,SP1V_UPDATEARRAY
       add hl,de
 

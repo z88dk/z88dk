@@ -129,7 +129,7 @@
    ld (hl),d                 ; write & struct sp1_update into tail's ptr
    inc hl
    ld (hl),e
-   ld hl,5
+   ld hl,6
    add hl,de                 ; hl = & struct sp1_update.ulist
    ld (hl),0                 ; nothing after this one in list
    exx
@@ -147,7 +147,7 @@
    ; de = & next struct sp1_cs
    ; stack = row
    
-   ld bc,9
+   ld bc,10
    add hl,bc
    push hl
    ex de,hl                  ; hl = & next struct sp1_cs
@@ -206,7 +206,7 @@
    or a
    jp z, done
 
-   ld bc,9*SP1V_DISPWIDTH
+   ld bc,10*SP1V_DISPWIDTH
    add hl,bc
    push hl
    push hl
@@ -249,7 +249,7 @@
    push bc
    ld b,h
    ld c,l                    ; bc = & struct sp1_cs.attr_mask
-   ld hl,3
+   ld hl,4
    add hl,de                 ; hl = & struct sp1_update.slist
    call AddSprChar           ; add sprite to update list
    pop de
@@ -305,7 +305,7 @@
    ld (hl),d                 ; write & struct sp1_update into tail's ptr
    inc hl
    ld (hl),e
-   ld hl,5
+   ld hl,6
    add hl,de                 ; hl = & struct sp1_update.ulist
    ld (hl),0                 ; nothing after this one in list
    exx
@@ -361,7 +361,7 @@
    ; de = & next struct sp1_cs
    ; stack = row
    
-   ld bc,9
+   ld bc,10
    add hl,bc
    push hl
    ex de,hl                  ; hl = & next struct sp1_cs
@@ -382,7 +382,7 @@
    or a
    jp z, done
 
-   ld bc,9*SP1V_DISPWIDTH
+   ld bc,10*SP1V_DISPWIDTH
    add hl,bc
    push hl
    push hl
@@ -434,7 +434,7 @@
    ld (hl),d                 ; write & struct sp1_update into tail's ptr
    inc hl
    ld (hl),e
-   ld hl,5
+   ld hl,6
    add hl,de                 ; hl = & struct sp1_update.ulist
    ld (hl),0                 ; nothing after this one in list
    exx

@@ -3,7 +3,7 @@
 ; 04.2006 aralbrec, Sprite Pack v3.0
 ; Sinclair Spectrum version
 
-; void sp1_PrintAt(uchar row, uchar col, uchar colour, uchar tile)
+; void sp1_PrintAt(uchar row, uchar col, uchar colour, uint tile)
 
 XLIB sp1_PrintAt
 LIB SP1PrintAt
@@ -14,8 +14,9 @@ LIB SP1PrintAt
    add hl,sp
    ld c,(hl)
    inc hl
-   inc hl
    ld b,(hl)
+   inc hl
+   ld a,(hl)
    inc hl
    inc hl
    ld e,(hl)
@@ -24,9 +25,7 @@ LIB SP1PrintAt
    ld d,(hl)
    jp SP1PrintAt
 
-; enter : d = row coord
-;         e = col coord
-;         b = attr
-;         c = tile
-; uses  : af, de, hl
-
+; enter :  d = row coord
+;          e = col coord
+;         bc = tile code
+;          a = attr

@@ -41,7 +41,7 @@ XDEF SP1CRSELECT
    djnz colloop
 
    pop hl
-   ld bc,9*SP1V_DISPWIDTH
+   ld bc,10*SP1V_DISPWIDTH
    add hl,bc
    pop bc
    
@@ -76,7 +76,7 @@ XDEF SP1CRSELECT
 
 .OPTION0                                             ; no flags
 
-   ld a,9
+   ld a,10
    add a,l
    ld l,a
    ret nc
@@ -88,6 +88,8 @@ XDEF SP1CRSELECT
    inc hl
    inc hl
    ld (hl),e
+   inc hl
+   ld (hl),0
    ld a,7
    add a,l
    ld l,a
@@ -99,7 +101,7 @@ XDEF SP1CRSELECT
 
    inc hl
    ld (hl),d
-   ld a,8
+   ld a,9
    add a,l
    ld l,a
    ret nc
@@ -112,6 +114,8 @@ XDEF SP1CRSELECT
    ld (hl),d
    inc hl
    ld (hl),e
+   inc hl
+   ld (hl),0
    ld a,7
    add a,l
    ld l,a
@@ -125,6 +129,7 @@ XDEF SP1CRSELECT
    and $c0
    inc a                                             ; keep bit 6:7 flag, occluding spr count reset to 1
    ld (hl),a
+   inc hl
    inc hl
    inc hl
    inc hl
@@ -179,6 +184,9 @@ XDEF SP1CRSELECT
    inc hl
    inc hl
    ld (hl),e
+   inc hl
+   ld (hl),0
+   dec hl
    dec hl
    dec hl
    jp OPTION4
@@ -196,6 +204,9 @@ XDEF SP1CRSELECT
    ld (hl),d
    inc hl
    ld (hl),e
+   inc hl
+   ld (hl),0
+   dec hl
    dec hl
    dec hl
    jp OPTION4

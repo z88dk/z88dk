@@ -1,9 +1,11 @@
 
-; SP1RemoveUpdateStruct
+; sp1_RemoveUpdateStruct
 ; 04.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1RemoveUpdateStruct
+XLIB sp1_RemoveUpdateStruct
+
+; FASTCALL
 
 ; Removes the character cell represented by the struct_sp1_update
 ; passed in so that the sprite engine will not draw the cell.
@@ -13,9 +15,10 @@ XLIB SP1RemoveUpdateStruct
 ; enter : hl = & struct sp1_update
 ; uses  : af, de, hl
 
-.SP1RemoveUpdateStruct
+.sp1_RemoveUpdateStruct
 
    ld (hl),$c1           ; invalidated & removed, # occluding sprites + 1 = 1
+   inc hl
    inc hl
    inc hl
    inc hl                ; hl = sprite list

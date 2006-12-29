@@ -106,7 +106,7 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
    exx
    pop de
    ld hl,(SP1V_UPDATELISTT)
-   ld bc,5
+   ld bc,6
    add hl,bc
    push hl
    call SP1GetUpdateStruct
@@ -129,7 +129,7 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
 .done
 
    exx
-   ld de,-5
+   ld de,-6
    add hl,de                 ; hl = & last struct sp1_update.ulist in invalidated list
    ld (SP1V_UPDATELISTT),hl
    ret
@@ -160,7 +160,7 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
    exx
    pop de
    ld hl,(SP1V_UPDATELISTT)
-   ld bc,5
+   ld bc,6
    add hl,bc
    push hl
    call SP1GetUpdateStruct

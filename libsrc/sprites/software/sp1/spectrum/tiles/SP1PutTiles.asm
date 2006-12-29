@@ -38,6 +38,7 @@ XREF SP1V_DISPWIDTH
    inc de
    ldi                                ; copy colour and tile from struct sp1_tp[]
    ldi                                ; into struct sp1_update
+   ldi
    ld a,6
    add a,e
    ld e,a
@@ -49,7 +50,7 @@ XREF SP1V_DISPWIDTH
    djnz colloop
 
    ex (sp),hl                         ; hl = struct sp1_update * in same row but leftmost column
-   ld bc,9*SP1V_DISPWIDTH
+   ld bc,10*SP1V_DISPWIDTH
    add hl,bc                          ; hl = struct sp1_update * one row down leftmost column
    pop de
    ex de,hl                           ; de = struct sp1_update * down one row, hl = struct sp1_tp[]

@@ -37,6 +37,7 @@ XREF SP1V_DISPWIDTH
    inc hl
    ldi
    ldi
+   ldi
    ld a,6
    add a,l
    ld l,a
@@ -48,7 +49,7 @@ XREF SP1V_DISPWIDTH
    djnz colloop
 
    pop hl                         ; hl = & struct sp1_update in same row leftmost column
-   ld bc,9*SP1V_DISPWIDTH
+   ld bc,10*SP1V_DISPWIDTH
    add hl,bc                      ; hl = & struct sp1_update in next row leftmost column
    pop bc
 

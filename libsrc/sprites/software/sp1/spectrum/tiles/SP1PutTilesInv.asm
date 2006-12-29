@@ -43,8 +43,8 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
    jp p, skipinval                    ; bit 7 now reset if already invalidated
    ld (de),a
 
-   ld (ix+5),d                        ; this struct sp1_update to end of list
-   ld (ix+6),e
+   ld (ix+6),d                        ; this struct sp1_update to end of list
+   ld (ix+7),e
    ld ixl,e
    ld ixh,d
 
@@ -53,6 +53,7 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
    inc de
    ldi                                ; copy colour and tile from struct sp1_tp[]
    ldi                                ; into struct sp1_update
+   ldi
    ld a,6
    add a,e
    ld e,a
@@ -64,7 +65,7 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
    djnz colloop
 
    ex (sp),hl                         ; hl = struct sp1_update * in same row but leftmost column
-   ld bc,9*SP1V_DISPWIDTH
+   ld bc,10*SP1V_DISPWIDTH
    add hl,bc                          ; hl = struct sp1_update * one row down leftmost column
    pop de
    ex de,hl                           ; de = struct sp1_update * down one row, hl = struct sp1_tp[]
@@ -74,7 +75,7 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
    dec a
    jp nz, rowloop
 
-   ld (ix+5),0
+   ld (ix+6),0
    ld (SP1V_UPDATELISTT),ix
    
    ret

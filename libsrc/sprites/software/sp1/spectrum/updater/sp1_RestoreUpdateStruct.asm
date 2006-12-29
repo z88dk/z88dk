@@ -1,9 +1,11 @@
 
-; SP1RestoreUpdateStruct
+; sp1_RestoreUpdateStruct
 ; 04.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1RestoreUpdateStruct
+XLIB sp1_RestoreUpdateStruct
+
+; FASTCALL
 
 ; Restores a character cell previously removed from
 ; the sprite engine so that it will again be drawn
@@ -12,7 +14,7 @@ XLIB SP1RestoreUpdateStruct
 ; enter : hl = & struct sp1_update
 ; uses  : f
 
-.SP1RestoreUpdateStruct
+.sp1_RestoreUpdateStruct
 
    bit 6,(hl)
    ret z                ; this cell was never removed so just return

@@ -20,11 +20,11 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
    call SP1GetUpdateStruct
    ex de,hl                      ; de = & struct sp1_update
    ld hl,(SP1V_UPDATELISTT)
-   ld a,5
+   ld a,6
    add a,l
    ld l,a
    jp nc, rowlp
-   inc h                         ; hl = last struct sp1_update+5 in invalidated list
+   inc h                         ; hl = last struct sp1_update+6 in invalidated list
 
 .rowlp
 
@@ -45,12 +45,12 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
    inc hl
    ld (hl),e
 
-   ld hl,5
-   add hl,de                     ; hl = new last struct sp1_update+5 in invalidated list
+   ld hl,6
+   add hl,de                     ; hl = new last struct sp1_update+6 in invalidated list
 
 .alreadyinlist
 
-   ld a,9
+   ld a,10
    add a,e
    ld e,a
    jp nc, noinc
@@ -62,16 +62,16 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
 
    pop de                        ; de = first struct sp1_update in row
    ex de,hl
-   ld bc,9*SP1V_DISPWIDTH
+   ld bc,10*SP1V_DISPWIDTH
    add hl,bc
-   ex de,hl                      ; de = first struct sp1_update in next row, hl = last+5 in invalidated list
+   ex de,hl                      ; de = first struct sp1_update in next row, hl = last+6 in invalidated list
    pop bc                        ; b = width, c = height
 
    dec c
    jp nz, rowlp
 
    ld (hl),0                     ; mark end of invalidated list
-   ld bc,-5
+   ld bc,-6
    add hl,bc                     ; point to start of struct sp1_update
    ld (SP1V_UPDATELISTT),hl      ; and store as last in invalidated list
 

@@ -45,8 +45,8 @@ defw SP1ClearRect
    jp p, alreadyinv               ; if this update struct already invalidated, skip ahead
    ld (hl),a
 
-   ld (iy+5),h                    ; store link in last invalidated update struct to this struct update
-   ld (iy+6),l
+   ld (iy+6),h                    ; store link in last invalidated update struct to this struct update
+   ld (iy+7),l
    
    ld a,l                         ; make this update struct the last one in invalidated list
    ld iyl,a                       ; "ld iyl,l" is likely taken as "ld iyl,iyl"
@@ -59,13 +59,13 @@ defw SP1ClearRect
    djnz colloop
 
    pop hl
-   ld bc,9*SP1V_DISPWIDTH
+   ld bc,10*SP1V_DISPWIDTH
    add hl,bc
    pop bc
    
    dec c
    jp nz, rowloop
 
-   ld (iy+5),0
+   ld (iy+6),0
    ld (SP1V_UPDATELISTT),iy
    ret

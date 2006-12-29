@@ -8,18 +8,21 @@ LIB SP1GetUpdateStruct
 
 ; Print tile and colour to given coordinate.
 ;
-; enter : d = row coord
-;         e = col coord
-;         b = attr
-;         c = tile
-; uses  : af, de, hl
+; enter :  d = row coord
+;          e = col coord
+;         bc = tile code
+;          a = attr
+; uses  : af, de, hl, af'
 
 .SP1PrintAt
 
+   ex af,af
    call SP1GetUpdateStruct
+   ex af,af
    inc hl
-   ld (hl),b
+   ld (hl),a
    inc hl
    ld (hl),c
-
+   inc hl
+   ld (hl),b
    ret

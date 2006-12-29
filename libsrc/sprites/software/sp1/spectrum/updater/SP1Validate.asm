@@ -21,7 +21,7 @@ XREF SP1V_DISPWIDTH
 .SP1Validate
 
    call SP1GetUpdateStruct       ; hl = & struct sp1_update
-   ld de,9
+   ld de,10
 
 .rowloop
 
@@ -40,7 +40,7 @@ XREF SP1V_DISPWIDTH
    djnz colloop
 
    pop hl                        ; hl = & struct sp1_update same row leftmost column
-   ld bc,9*SP1V_DISPWIDTH
+   ld bc,10*SP1V_DISPWIDTH
    add hl,bc                     ; hl = & struct sp1_update next row leftmost column
    pop bc
 
