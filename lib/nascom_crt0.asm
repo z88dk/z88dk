@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: nascom_crt0.asm,v 1.3 2006-06-18 19:05:53 dom Exp $
+;       $Id: nascom_crt0.asm,v 1.4 2006-12-30 14:37:47 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -39,7 +39,7 @@
 	XDEF	heaplast	;Near malloc heap variables
 	XDEF	heapblocks
 
-	XDEF    base_graphics   ;Graphical variables
+	XDEF    base_graphics   ;Graphical variables (useless with NASCOM)
 	XDEF    coords          ;Current xy position
 
 	XDEF    montest         ;NASCOM: check the monitor type
@@ -57,8 +57,16 @@
 .start
 
 	ld	(start1+1),sp	;Save entry stack
-	ld      hl,-64		;Create an atexit() stack
-	add     hl,sp
+
+	; search for the top of writeble memory and set the stack pointer
+	ld	hl,ffffh
+	ld	a,55
+.stackloop
+	ld	(hl),a
+	cp	(hl)
+	dec	hl
+	jr	nz,stackloop
+
 	ld      sp,hl
 	ld      (exitsp),sp
 
