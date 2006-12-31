@@ -1,15 +1,11 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.15 2006-06-18 17:59:40 dom Exp $
+# $Id: Makefile,v 1.16 2006-12-31 22:13:19 aralbrec Exp $
 
 include ../Make.config
 
 GENCFILES = \
-	atoi.c \
-	itoa.c \
-	strtol.c \
-	strtoul.c \
 	sleep.c   \
 	getopt.c
 
@@ -27,10 +23,10 @@ gen: $(GENOBJECTS)
 	zcc $(CFLAGS) $*.c
 
 z88_stdlib:
-	cd z88 ; $(MAKE) ; cd ..
+	cd z88 ;  ; cd ..
 
 zx_stdlib:
-	cd spectrum ; $(MAKE) ; cd ..
+	cd spectrum ;  ; cd ..
 
 clean:
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i $(AFILES)

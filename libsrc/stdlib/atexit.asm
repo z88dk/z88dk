@@ -6,56 +6,38 @@
 ;       27/11/98 djm - allows upto 32 levels of exit routines
 ;
 ; -----
-; $Id: atexit.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
+; $Id: atexit.asm,v 1.3 2006-12-31 22:13:19 aralbrec Exp $
 
+; int atexit((void *)(void))
+; FASTCALL
 
-;int atexit((void *)(void))
+XLIB atexit
+XREF exitsp, exitcount
 
-
-                XLIB    atexit
-
-;                XREF    prog_atexitrout
-
-                XREF    exitsp
-                XREF    exitcount
-
-
+; enter : hl = atexit function
+; exit  : hl !=0 and no carry if can't register
+;         hl  =0 and carry set if successful
 
 .atexit
-        pop     bc
-        pop     de      ;this should be ok, even for long pointers!
-        push    de      ;routines always in main 64k
-        push    bc
-;de holds the address of an atexit routine
-        ld      hl,exitcount
-        ld      a,(hl)
-        cp      32      ;can only hold 32 levels..
-        ret     z       ;if full, hl!=0 (hl=exitcount!)
-;It's okay, we can add another level
-        inc     (hl)    ;increment it then...
-;find the offset from exitsp..a still holds original level..
-        add     a,a     
-        ld      c,a
-        ld      b,0
-        ld      hl,(exitsp)
-        add     hl,bc
-        ld      (hl),e
-        inc     hl
-        ld      (hl),d
-        ld      hl,0    ;was fine, exit hl=0
-        ret
 
-        
+   ex de,hl                  ; de = function to register
 
+   ld hl,exitcount
+   ld a,(hl)
+   cp 32                     ; can only hold 32 levels..
+   ret nc                    ; if full returns with hl!=0
+   inc (hl)                  ; increment number of levels
 
-
-IF ARCHAIC
-
-.atexit
-        pop     bc      ;ret addr
-        pop     hl      ;routine
-        push    hl
-        push    bc
-        ld      (prog_atexitrout),hl
-        ret
-ENDIF
+   add a,a                   ; compute index in exit stack
+   ld c,a
+   ld b,0
+   ld hl,(exitsp)
+   add hl,bc
+   ld (hl),e                 ; write atexit function
+   inc hl
+   ld (hl),d
+   
+   ld h,b
+   ld l,b                    ; indicate success
+   scf
+   ret

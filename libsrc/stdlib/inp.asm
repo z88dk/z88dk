@@ -7,4 +7,5 @@ XLIB inp
    ld c,l
    ld b,h
    in l,(c)
+   ld h,0
    ret

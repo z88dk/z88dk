@@ -10,62 +10,48 @@
 ;though...
 ;
 ; -----
-; $Id: exit.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
+; $Id: exit.asm,v 1.3 2006-12-31 22:13:19 aralbrec Exp $
 
+XLIB exit
+XREF cleanup, exitsp, exitcount, l_jphl
 
-                XLIB    exit    ;outta here!
-
-                XREF    cleanup
-                XREF    exitsp
-                XREF    exitcount
-                XREF    l_dcal
-
+; FASTCALL
 
 ;This also allows for an atexit function to print a bye bye message
 ;or whatever... - no parameters are passed into it...
 
 .exit
-        push    hl      ;preserve exit value
-        ld      a,(exitcount)
-        and     a
-        jr      z,exit2
-;Now, traverse the atexit routines in reverse ordr
-        ld      b,a
-.exit1
-        push    bc
-        dec     b               ;so calc correct offset
-        ld      l,b
-        ld      h,0
-        add     hl,hl           ;x2
-        ld      de,(exitsp)     ;start of atexit stack
-        add     hl,de
-        ld      a,(hl)
-        inc     hl
-        ld      h,(hl)
-        ld      l,a
-        call    l_dcal  ;jp(hl)
-        pop     bc
-        djnz    exit1
-;Disrupt the stack completely, and exit with an appropriate error
-.exit2
-        pop     hl      ;return value. load into a then we can display
-        ld      a,l     ;a warning message (basic)
-        jp      cleanup
 
+   push hl                   ; save exit value
+   
+   ld a,(exitcount)
+   or a
+   jr z, end
 
-        
+   ld b,a                    ; b = number of registered functions
+   add a,a
+   ld e,a
+   ld d,0
+   ld hl,(exitsp)            ; hl = & atexit stack
+   add hl,de                 ; hl = & last function in exit stack + 2b
 
+.loop                        ; now traverse atexit stack in reverse order
 
+   push bc
+   dec hl
+   ld a,(hl)
+   dec hl
+   push hl
+   ld l,(hl)
+   ld h,a                    ; hl = atexit function
+   call l_jphl
+   pop hl
+   pop bc
+   
+   djnz loop
 
+.end                         ; disrupt stack completely and exit with error value
 
-
-IF ARCHAIC
-.exit
-        ld      hl,(prog_atexitrout)
-        ld      a,h
-        or      l
-        jp      z,cleanup
-        ld      de,cleanup      ;system clean up address
-        push    de
-        jp      (hl)
-ENDIF
+   pop hl
+   ld a,l                    ; was here so left as is, something to do with z88?
+   jp cleanup                ;  perhaps should be in the z88 crt0?
