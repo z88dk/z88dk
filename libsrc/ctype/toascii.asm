@@ -6,21 +6,15 @@
 ;
 ;       djm 1/3/99
 ;
-;	$Id: toascii.asm,v 1.2 2001-04-17 08:05:14 stefano Exp $
+;	$Id: toascii.asm,v 1.3 2006-12-31 21:44:58 aralbrec Exp $
 ;
 
-                XLIB    toascii
+XLIB toascii
 
-
-;toascii (c) char c
-;return address, c
+; FASTCALL
 
 .toascii
-        ld      hl,2
-        add     hl,sp
-        ld      a,(hl)
-        and     127
-        ld      l,a
-        ld      h,0
-        ret
 
+   res 7,l
+   ld h,0
+   ret

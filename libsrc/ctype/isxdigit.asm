@@ -6,41 +6,37 @@
 ;
 ;	This routine is a little bit unwieldy to say the least
 ;
-;	$Id: isxdigit.asm,v 1.2 2001-04-17 08:05:14 stefano Exp $
+;	$Id: isxdigit.asm,v 1.3 2006-12-31 21:44:58 aralbrec Exp $
 ;
 
-                XLIB    isxdigit
+XLIB isxdigit
 
-
-;isxdigit (c) char c - test for hex characters
-;return address, c
+; FASTCALL
 
 .isxdigit
-        ld      hl,2
-        add     hl,sp
-        ld      a,(hl)
-        ld      hl,0    ;fail
-        cp      '0'
-        ret     c       
-        inc     hl      ;hl=1 success
-        cp      '9'+1   ;':'
-        ret     c       ;success, have matched digit
 
-;Now we have to check for characters 'afAF'
-
-        dec     hl      ;hl=0 fail
-        cp      'A'
-        ret     c
-        cp      'f'+1
-        ret     nc
-        and     223
-        cp      'A'
-        ret     c
-        cp      'F'+1
-        ret     nc
-        inc     hl      ;success
-        ret
-
-
-
-
+   ld a,l
+   ld hl,0
+   
+   ; match digit [09]
+   
+   cp '0'
+   ret c
+   inc l
+   cp '9'+1
+   ret c
+   
+   ; match [afAF]
+   
+   dec l
+   cp 'A'
+   ret c
+   cp 'f'+1
+   ret nc
+   and 223
+   cp 'A'
+   ret c
+   cp 'F'+1
+   ret nc
+   inc l
+   ret

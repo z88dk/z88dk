@@ -3,27 +3,24 @@
 ;	Written by Dominic Morris <djm@jb.man.ac.uk>
 ;	22 August 1998
 ;
-;	$Id: isspace.asm,v 1.2 2001-04-17 08:05:14 stefano Exp $
+;	$Id: isspace.asm,v 1.3 2006-12-31 21:44:58 aralbrec Exp $
 ;
 
-                XLIB    isspace
+XLIB isspace
 
-
-;isspace (c) char c
-;return address, c
+; FASTCALL
 
 .isspace
-        ld      hl,2
-        add     hl,sp
-        ld      a,(hl)
-        ld      hl,1
-        cp      32      ;space
-        ret     z
-        cp      7       ;tab
-        ret     z
-        cp      10      ;LF
-        ret     z
-        cp      13      ;CR
-        ret     z
-        dec     hl
-        ret
+
+   ld a,l
+   ld hl,1
+   cp 32                     ; space
+   ret z
+   cp 7                      ; tab
+   ret z
+   cp 10                     ; lf
+   ret z
+   cp 13                     ; cr
+   ret z
+   dec l
+   ret

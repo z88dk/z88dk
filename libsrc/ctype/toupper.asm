@@ -3,26 +3,20 @@
 ;	Written by Dominic Morris <djm@jb.man.ac.uk>
 ;	22 August 1998
 ;
-;	$Id: toupper.asm,v 1.2 2001-04-17 08:05:14 stefano Exp $
+;	$Id: toupper.asm,v 1.3 2006-12-31 21:44:58 aralbrec Exp $
 ;
 
-                XLIB    toupper
+XLIB toupper
 
-
-;tolower (c) char c
-;return address, c
+; FASTCALL
 
 .toupper
-        ld      hl,2
-        add     hl,sp
-        ld      a,(hl)
-        ld      l,a
-        ld      h,0
-        cp      'a'
-        ret     c
-        cp      'z'+1
-        ret     nc
-	and	223
-        ld      l,a
-        ret
 
+   ld a,l
+   ld h,0
+   cp 'a'
+   ret c
+   cp 'z'+1
+   ret nc
+   res 5,l
+   ret

@@ -8,33 +8,29 @@
 ;	Okay, printable for the z88 is:
 ;	7,10,13,32-126,163?
 ;
-;	$Id: isprint.asm,v 1.2 2001-04-17 08:05:14 stefano Exp $
+;	$Id: isprint.asm,v 1.3 2006-12-31 21:44:58 aralbrec Exp $
 ;
 
+XLIB isprint
 
-                XLIB    isprint
-
-
-;islower (c) char c
-;return address, c
+; FASTCALL
 
 .isprint
-        ld      hl,2
-        add     hl,sp
-        ld      a,(hl)
-        ld      hl,1    ; failed
-	cp	7
-	ret	z
-	cp	10
-	ret	z
-	cp	13
-	ret	z
-	cp	163
-	ret	z
-	cp	32
-	jr	c,failure
-	cp	127
-	ret	c
-.failure
-	dec	hl
-	ret
+
+   ld a,l
+   ld hl,1
+   cp 7                      ; entry point for isgraph()
+   ret z
+   cp 10
+   ret z
+   cp 13
+   ret z
+   cp 163                    ; UK pound
+   ret z
+   dec l
+   cp 32
+   ret c
+   cp 127
+   ret nc
+   inc l
+   ret
