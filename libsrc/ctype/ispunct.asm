@@ -6,37 +6,26 @@
 ;
 ;	Hurrah, this is our first table for our isxxx routines!
 ;
-;	$Id: ispunct.asm,v 1.2 2001-04-17 08:05:14 stefano Exp $
+;	$Id: ispunct.asm,v 1.3 2006-12-31 21:45:26 aralbrec Exp $
 ;
 
-                XLIB    ispunct
+XLIB ispunct
 
-
-;ispunct (c) char c
-;return address, c
+; FASTCALL
 
 .ispunct
-        ld      hl,2
-        add     hl,sp
-        ld      b,(hl)
-        ld      de,ispunct_tab
-        ld      hl,1    ;mark success
-.ispunct1
-        ld      a,(de)
-        and     a
-        jr      nz,ispunct2
-        dec     hl      ;fail!
-        ret
-.ispunct2
-        cp      b
-        inc     de
-        ret     z
-        jr      ispunct1
 
-; Hopefully these codes translate over okay
+   ld a,l
+   ld hl,punctbl
+   ld bc,punctend - punctbl
+   cpir                      ; use it or lose it!
+   ld h,b
+   ld l,c
+   ret
 
-.ispunct_tab
-        defm    "!$%^&*()_+={[]}#~'@;:/?.>,<\|"
-; This line contains the " and the pound sign
-        defb    34,163,0
+.punctbl
 
+   defm "!$%^&*()_+={[]}#~'@;:/?.>,<\|"
+   defb 34,163,163           ; quote and pound, must repeat last one
+
+.punctend
