@@ -3,6 +3,7 @@ ctype/isalnum
 ctype/isascii
 ctype/iscntrl
 ctype/isdigit
+ctype/isgraph
 ctype/islower
 ctype/isprint
 ctype/ispunct
