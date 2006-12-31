@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol.asm,v 1.1 2006-12-31 22:13:19 aralbrec Exp $
+; * $Id: strtol.asm,v 1.2 2006-12-31 23:28:13 aralbrec Exp $
 ; *
 ; */
 
@@ -172,7 +172,7 @@ LIB l_long_neg, l_long_mult
    jr c, okaddit
    add a,'0'
    and $df
-   sub 'A'
+   sub 'A'-10
    
 .okaddit
 
