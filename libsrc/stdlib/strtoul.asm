@@ -6,7 +6,7 @@
 ; *      27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtoul.asm,v 1.5 2006-12-31 22:13:19 aralbrec Exp $
+; * $Id: strtoul.asm,v 1.6 2007-01-01 20:56:43 aralbrec Exp $
 ; *
 ; */
 
@@ -17,7 +17,8 @@
 ;  char **endp pointer on the stack so this function
 ;  should be called using the C convention only.
 ;
-; Uses all registers except a',iy (does use f')
+; Uses all registers except iy
+; long result in dehl
 
 XLIB strtoul
 LIB strtol

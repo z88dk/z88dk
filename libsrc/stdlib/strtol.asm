@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol.asm,v 1.3 2007-01-01 20:28:46 aralbrec Exp $
+; * $Id: strtol.asm,v 1.4 2007-01-01 20:56:43 aralbrec Exp $
 ; *
 ; */
 
@@ -17,7 +17,8 @@
 ;  char **endp parameter on the stack so this function
 ;  should be called using the C convention only.
 ;
-; Uses all registers except a',iy (does use f')
+; Uses all registers except iy
+; long result in dehl
 
 XLIB strtol
 LIB l_long_neg, l_long_mult
