@@ -6,16 +6,12 @@
 ; *      27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtoul.asm,v 1.6 2007-01-01 20:56:43 aralbrec Exp $
+; * $Id: strtoul.asm,v 1.7 2007-01-01 21:05:55 aralbrec Exp $
 ; *
 ; */
 
 ; rewritten in asm and lost the overflow check in process
 ; 12.2006 aralbrec
-;
-; Note: The writeendp subroutine expects to find the
-;  char **endp pointer on the stack so this function
-;  should be called using the C convention only.
 ;
 ; Uses all registers except iy
 ; long result in dehl

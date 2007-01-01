@@ -6,16 +6,12 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol.asm,v 1.4 2007-01-01 20:56:43 aralbrec Exp $
+; * $Id: strtol.asm,v 1.5 2007-01-01 21:05:55 aralbrec Exp $
 ; *
 ; */
 
 ; rewritten in asm and lost the overflow check in process
 ; 12.2006 aralbrec
-;
-; Note: The writeendp subroutine expects to find the
-;  char **endp parameter on the stack so this function
-;  should be called using the C convention only.
 ;
 ; Uses all registers except iy
 ; long result in dehl
@@ -31,13 +27,16 @@ LIB l_long_neg, l_long_mult
    inc hl
    ld b,(hl)                 ; bc = base
    inc hl
+   ld e,(hl)
    inc hl
+   ld d,(hl)                 ; de = char **endp
    inc hl
    ld a,(hl)
    inc hl
    ld h,(hl)
    ld l,a                    ; hl = char *s
 
+   push de                   ; push char **endp parameter for writeendp
    ld de,writeendp           ; put writeendp on stack so that it
    push de                   ; is executed on ret
    ld e,l
@@ -223,16 +222,12 @@ LIB l_long_neg, l_long_mult
 
    ; dehl = result
    ; bc = char *
-   
-   push hl
-   ld hl,6
-   add hl,sp
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a                    ; hl = char **endp
-   
-   or h                      ; if endp==NULL skip
+   ; stack = char **endp
+
+   ex (sp),hl                ; hl = char **endp
+
+   ld a,h   
+   or l                      ; if endp==NULL skip
    jr z, noendp
    
    ld (hl),c                 ; write last string position
