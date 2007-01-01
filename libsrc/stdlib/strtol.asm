@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol.asm,v 1.2 2006-12-31 23:28:13 aralbrec Exp $
+; * $Id: strtol.asm,v 1.3 2007-01-01 20:28:46 aralbrec Exp $
 ; *
 ; */
 
@@ -113,20 +113,20 @@ LIB l_long_neg, l_long_mult
    ld a,(hl)                 ; make sure there's at least one
    sub '0'                   ; digit else fail
    jr c, fail
-   cp c
-   jr nc, fail
    cp 10
-   jr c, pass
+   jr c, noadj1
    add a,'0'
-   and $df                   ; toupper(a)
+   and $df
    sub 'A'
    jr c, fail
    add a,10
-   cp c
+.noadj1
+   cp c                      ; base
    jr nc, fail
 
 .pass
 
+   ;  a = first number
    ; bc = base
    ; hl = char *
 
@@ -142,14 +142,36 @@ LIB l_long_neg, l_long_mult
    ld b,h                    ; bc = char *
    
    ld h,d
-   ld l,e                    ; dehl = 0 = total so far
+   ld l,a                    ; dehl = a = total so far
 
 .loop
-
-   ;   bc = char *, char there known to be digit
+   
+   ;   bc = char *
    ; dehl = running total
    ;   ix = & duplicate (long)(base) on stack (not valid now)
    ; stack = (long)(base)
+
+   ; first get next digit
+   
+   inc bc
+   ld a,(bc)                 ; turn next char into digit
+
+   sub '0'
+   jr c, done
+   cp 10
+   jr c, noadj2
+   add a,'0'
+   and $df
+   sub 'A'
+   jr c, done
+   add a,10
+.noadj2
+   cp (ix+6)                 ; base
+   jr nc, done
+
+.havedigit
+
+   ex af,af
 
    ; first refresh copy of duplicate base on stack
 
@@ -164,45 +186,19 @@ LIB l_long_neg, l_long_mult
    
    ; now add in digit
    
-   ld a,(bc)
-   inc bc
+   ex af,af
    
-   sub '0'
-   cp 10
-   jr c, okaddit
-   add a,'0'
-   and $df
-   sub 'A'-10
-   
-.okaddit
-
    add a,l
    ld l,a
-   jr nc, oksum
+   jr nc, loop
    inc h
-   jr nz, oksum
+   jr nz, loop
    inc e
-   jr nz, oksum
+   jr nz, loop
    inc d
 
-.oksum
-
-   ld a,(bc)                 ; check if next char is a digit
-
-   sub '0'
-   jr c, done
-   cp (ix+6)                 ; base
-   jr nc, done
-   cp 10
-   jr c, loop
-   add a,'0'
-   and $df                   ; toupper(a)
-   sub 'A'
-   jr c, done
-   add a,10
-   cp (ix+6)                 ; base
-   jp c, loop
-
+   jp loop
+   
 .done
 
    ; bc = char *
