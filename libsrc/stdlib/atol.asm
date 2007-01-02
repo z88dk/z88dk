@@ -7,8 +7,8 @@ LIB l_long_neg
 ; FASTCALL
 
 ; enter : hl = char*
-; exit  : hl = int result
-;         de = & next char to interpret in char*
+; exit  : dehl = long result
+;         bc = & next char to interpret in char*
 
 .atol
 
