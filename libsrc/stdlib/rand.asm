@@ -8,7 +8,7 @@
 ;       Liberated from ticalc.org, mods to standard z80 by djm 11/4/99
 ;
 ; -----
-; $Id: rand.asm,v 1.4 2006-12-31 22:15:32 aralbrec Exp $
+; $Id: rand.asm,v 1.5 2007-01-02 06:58:43 aralbrec Exp $
 
 ; you must declare an integer C variable "std_seed" to hold the
 ; 16-bit seed in your main.c file
@@ -65,4 +65,6 @@ XREF _std_seed
    ld de,0
    ex de,hl
    sbc hl,de
+   ret p                        ; -(-32768) still equals -32768!
+   ld h,0
    ret
