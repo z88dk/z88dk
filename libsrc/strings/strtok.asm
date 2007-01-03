@@ -9,7 +9,7 @@
 XLIB strtok
 LIB strchr
 XREF ASMDISP_STRCHR
-XDEF ASM_STRTOK
+XDEF ASMDISP_STRTOK
 
 ; static data stored here, not ROMable
 
@@ -80,4 +80,4 @@ XDEF ASM_STRTOK
 
    defw 0
 
-DEFC ASM_STRTOK = asmentry - strtok
+DEFC ASMDISP_STRTOK = asmentry - strtok
