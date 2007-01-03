@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol.asm,v 1.5 2007-01-01 21:05:55 aralbrec Exp $
+; * $Id: strtol.asm,v 1.6 2007-01-03 22:23:48 aralbrec Exp $
 ; *
 ; */
 
@@ -18,23 +18,24 @@
 
 XLIB strtol
 LIB l_long_neg, l_long_mult
+XDEF ASMDISP_STRTOL
 
 .strtol
 
-   ld hl,2
-   add hl,sp
-   ld c,(hl)
-   inc hl
-   ld b,(hl)                 ; bc = base
-   inc hl
-   ld e,(hl)
-   inc hl
-   ld d,(hl)                 ; de = char **endp
-   inc hl
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a                    ; hl = char *s
+   pop af
+   pop bc
+   pop de
+   pop hl
+   push hl
+   push de
+   push bc
+   push af
+
+   ; bc = base
+   ; de = char **endp
+   ; hl = char *s
+
+.asmentry
 
    push de                   ; push char **endp parameter for writeendp
    ld de,writeendp           ; put writeendp on stack so that it
@@ -239,6 +240,7 @@ LIB l_long_neg, l_long_mult
    pop hl
    ret
 
+DEFC ASMDISP_STRTOL = asmentry - strtol
 
 ;#include <stdio.h>
 ;#include <ctype.h>

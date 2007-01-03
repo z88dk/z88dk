@@ -10,7 +10,7 @@
 ;		 - Return number of seconds left
 ;
 ; -----
-; $Id: sleep.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
+; $Id: sleep.asm,v 1.3 2007-01-03 22:23:49 aralbrec Exp $
 
 
 		INCLUDE "#time.def"
@@ -18,6 +18,7 @@
                 XLIB    sleep
 		LIB	l_mult
 		LIB	l_div_u
+		XDEF ASMDISP_SLEEP
 
 ;sleep(int time);
 
@@ -27,6 +28,9 @@
         pop     de      ;number of seconds..
         push    de
         push    hl
+        
+.asmentry
+                
 	ld	hl,100
 	call	l_mult
 	ld	c,l
@@ -42,4 +46,6 @@
 	ld	c,l
 	ld	b,h
 	ret	
+
+DEFC ASMDISP_SLEEP = asmentry - sleep
 

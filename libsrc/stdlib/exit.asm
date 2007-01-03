@@ -10,10 +10,11 @@
 ;though...
 ;
 ; -----
-; $Id: exit.asm,v 1.3 2006-12-31 22:13:19 aralbrec Exp $
+; $Id: exit.asm,v 1.4 2007-01-03 22:23:48 aralbrec Exp $
 
 XLIB exit
 XREF cleanup, exitsp, exitcount, l_jphl
+XDEF ASMDISP_EXIT
 
 ; FASTCALL
 
@@ -55,3 +56,5 @@ XREF cleanup, exitsp, exitcount, l_jphl
    pop hl
    ld a,l                    ; was here so left as is, something to do with z88?
    jp cleanup                ;  perhaps should be in the z88 crt0?
+
+DEFC ASMDISP_EXIT = 0

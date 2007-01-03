@@ -12,12 +12,13 @@
 ; *	djm 5/1/2000
 ; *
 ; * -----
-; * $Id: atoi.asm,v 1.1 2006-12-31 22:13:19 aralbrec Exp $
+; * $Id: atoi.asm,v 1.2 2007-01-03 22:23:48 aralbrec Exp $
 ; *
 ; */
 
 XLIB atoi
 LIB l_neg
+XDEF ASMDISP_ATOI
 
 ; FASTCALL
 
@@ -48,7 +49,7 @@ LIB l_neg
    jr nz, signdone
    inc hl                    ; this is a negative number
    ld de,l_neg               ; sneakily push negatehl on stack
-   push de                   ; so it is run on ret
+   push de                   ;  so it is run on ret
    
 .signdone
 
@@ -80,6 +81,8 @@ LIB l_neg
 
    inc de
    jp loop
+
+DEFC ASMDISP_ATOI = 0
 
 ; #include <ctype.h>
 ; #include <stdlib.h>

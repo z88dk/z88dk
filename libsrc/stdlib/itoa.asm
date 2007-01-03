@@ -25,20 +25,19 @@
 
 XLIB itoa
 LIB l_deneg
+XDEF ASMDISP_ITOA
 
 .itoa
 
-   ld hl,2
-   add hl,sp
-   ld e,(hl)
-   inc hl
-   ld d,(hl)                 ; de = int
-   inc hl
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a                    ; hl = destination char*
-   
+   pop bc
+   pop de
+   pop hl
+   push hl
+   push de
+   push bc
+
+.asmentry
+
    ; de = int
    ; hl = dest char*
 
@@ -125,6 +124,9 @@ LIB l_deneg
    jr nc, divloop
    add hl,bc
    ret
+
+DEFC ASMDISP_ITOA = asmentry - itoa
+
 
 ; #include <ctype.h>
 ; #include <stdlib.h>

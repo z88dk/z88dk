@@ -2,20 +2,22 @@
 ; 11.2006 aralbrec
 
 XLIB wpoke
+XDEF ASMDISP_WPOKE
 
 .wpoke
 
-   ld hl,2
-   add hl,sp
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
+   pop bc
+   pop de
+   pop hl
+   push hl
+   push de
+   push bc
+
+.asmentry
+
    ld (hl),e
    inc hl
    ld (hl),d
    ret
+
+DEFC ASMDISP_WPOKE = asmentry - wpoke

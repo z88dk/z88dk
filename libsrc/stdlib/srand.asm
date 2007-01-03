@@ -6,10 +6,11 @@
 ;       void srand(int) - seed "random" number
 ;
 ; -----
-; $Id: srand.asm,v 1.4 2006-12-31 22:14:53 aralbrec Exp $
+; $Id: srand.asm,v 1.5 2007-01-03 22:23:48 aralbrec Exp $
 
 XLIB srand
 XREF _std_seed
+XDEF ASMDISP_SRAND
 
 ; FASTCALL
 
@@ -22,3 +23,5 @@ XREF _std_seed
 
    ld (_std_seed),hl
    ret
+
+DEFC ASMDISP_SRAND = 0

@@ -2,6 +2,7 @@
 ; 09.2005 aralbrec
 
 XLIB inp
+XDEF ASMDISP_INP
 
 .inp
    ld c,l
@@ -9,3 +10,5 @@ XLIB inp
    in l,(c)
    ld h,0
    ret
+
+DEFC ASMDISP_INP = 0

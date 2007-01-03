@@ -10,12 +10,14 @@
 ; If we can't have usleep we'll have csleep instead!
 ;
 ; -----
-; $Id: csleep.asm,v 1.2 2001-04-18 12:43:04 stefano Exp $
+; $Id: csleep.asm,v 1.3 2007-01-03 22:23:48 aralbrec Exp $
 
 
                 INCLUDE "#time.def"
 
                 XLIB    csleep
+                XDEF    ASMDISP_CSLEEP
+
 
 ;csleep(int time);
 
@@ -25,6 +27,9 @@
         pop     bc      ;number of centi-seconds..
         push    bc
         push    hl
+
+.asmentry
+
         ld      a,b
         or      c
         jr      z,csleep1
@@ -35,4 +40,5 @@
         ld      hl,0
         ret
 
+DEFC ASMDISP_CSLEEP = asmentry - csleep
 

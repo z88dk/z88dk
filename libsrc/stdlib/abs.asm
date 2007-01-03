@@ -6,10 +6,11 @@
 ; version would do..
 ;
 ; -----
-; $Id: abs.asm,v 1.3 2006-12-31 22:13:19 aralbrec Exp $
+; $Id: abs.asm,v 1.4 2007-01-03 22:23:48 aralbrec Exp $
 
 XLIB abs
 LIB l_neg
+XDEF ASMDISP_ABS
 
 ; FASTCALL
 
@@ -19,3 +20,4 @@ LIB l_neg
    ret z
    jp l_neg
    
+DEFC ASMDISP_ABS = 0

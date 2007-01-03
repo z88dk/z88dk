@@ -2,17 +2,20 @@
 ; 11.2006 aralbrec
 
 XLIB bpoke
+XDEF ASMDISP_BPOKE
 
 .bpoke
 
-   ld hl,2
-   add hl,sp
-   ld e,(hl)
-   inc hl
-   inc hl
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
+   pop bc
+   pop de
+   pop hl
+   push hl
+   push de
+   push bc
+
+.asmentry
+
    ld (hl),e
    ret
+
+DEFC ASMDISP_BPOKE = asmentry - bpoke

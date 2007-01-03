@@ -2,6 +2,7 @@
 ; 04.2006 aralbrec
 
 XLIB swapendian
+XDEF ASMDISP_SWAPENDIAN
 
 .swapendian
 
@@ -9,3 +10,5 @@ XLIB swapendian
    ld l,h
    ld h,a
    ret
+
+DEFC ASMDISP_SWAPENDIAN = 0

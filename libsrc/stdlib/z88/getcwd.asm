@@ -11,24 +11,29 @@
 ;
 ;
 ; -----
-; $Id: getcwd.asm,v 1.4 2002-04-17 21:30:26 dom Exp $
+; $Id: getcwd.asm,v 1.5 2007-01-03 22:23:49 aralbrec Exp $
 
                 INCLUDE "#syspar.def"
 		INCLUDE	"#memory.def"
 
                 XLIB    getcwd
                 LIB    readbyte        ;standard.lib
+                XDEF ASMDISP_GETCWD
 
 .getcwd
-        ld      hl,2
-        add     hl,sp
-        ld      c,(hl)          ;max length
-        inc     hl
-        ld      b,(hl)
-        inc     hl
-        ld      e,(hl)          ;buffer to dump it into
-        inc     hl
-        ld      d,(hl)
+
+        pop hl
+        pop bc
+        pop de
+        push de
+        push bc
+        push hl
+
+.asmentry
+
+        ; bc = int maxlen
+        ; de = char *buffer
+
         push    de
         push    bc
         ld      bc,NQ_dir       ;ask for current directory
@@ -56,4 +61,5 @@
         dec     bc
         jr      getcwd2
         
-        
+ DEFC ASMDISP_GETCWD = asmentry - getcwd
+ 

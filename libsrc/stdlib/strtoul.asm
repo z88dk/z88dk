@@ -6,7 +6,7 @@
 ; *      27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtoul.asm,v 1.7 2007-01-01 21:05:55 aralbrec Exp $
+; * $Id: strtoul.asm,v 1.8 2007-01-03 22:23:48 aralbrec Exp $
 ; *
 ; */
 
@@ -18,14 +18,28 @@
 
 XLIB strtoul
 LIB strtol
+XREF ASMDISP_STRTOL
+XDEF ASMDISP_STRTOUL
+
+; Q: What's the difference betweem strtoul and strtol? 
+; A: Just the overflow check and we'll have none of that here!
 
 .strtoul
 
-   jp strtol
+   pop af
+   pop bc
+   pop de
+   pop hl
+   push hl
+   push de
+   push bc
+   push af
 
-; Q: What's the difference betweem strtoul and strtol? 
-; A: Just the overflow check and we'll have none of that here
+.asmentry
 
+   jp strtol + ASMDISP_STRTOL
+
+DEFC ASMDISP_STRTOUL = asmentry - strtoul
 
 ;#include <stdio.h>
 ;#include <ctype.h>

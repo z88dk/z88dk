@@ -3,6 +3,7 @@
 
 XLIB atol
 LIB l_long_neg
+XDEF ASMDISP_ATOL
 
 ; FASTCALL
 
@@ -91,3 +92,6 @@ LIB l_long_neg
 
    inc bc
    jp loop
+   
+DEFC ASMDISP_ATOL = 0
+

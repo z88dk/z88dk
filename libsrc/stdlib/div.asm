@@ -3,28 +3,30 @@
 
 XLIB div
 LIB l_div
+XDEF ASMDISP_DIV
 
 .div
 
-   ld hl,5
-   add hl,sp
-   ld d,(hl)
-   dec hl
-   ld e,(hl)
-   dec hl
-   ld a,(hl)
-   dec hl
-   ld l,(hl)
-   ld h,a
+   pop af
+   pop hl
+   pop de
+   pop bc
+   push bc
+   push de
+   push hl
+   push af
+   
+   ; bc = div_t *
+   ; de = num
+   ; hl = denom
+   
+.asmentry
+
+   push bc
    call l_div                ; hl = q, de = r
    ex de,hl
-   push hl
-   ld hl,8
-   add hl,sp
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
+   ex (sp),hl
+
    ld (hl),e
    inc hl
    ld (hl),d
@@ -33,4 +35,7 @@ LIB l_div
    ld (hl),e
    inc hl
    ld (hl),d
+   
    ret
+
+DEFC ASMDISP_DIV = asmentry - div
