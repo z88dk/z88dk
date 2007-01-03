@@ -1,42 +1,36 @@
-;
-; Small C z88 String functions
-;
-; Copy string s2 to s1, s1 must be big enough, return s1
-;
-; 1/3/99 djm - fixed bug in return value
-;
-; $Id: strcpy.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
+; char *strcpy(char *s, char *ct)
+; copy string ct to s including '\0'
 
+; exit : hl = char *s
+; uses : af, bc, de, hl
 
-                XLIB    strcpy
-
-;strcpy(s1,s2) char *s1, *s2
-;Stack on entry runs..
-;return address, s2, s1
-
+XLIB strcpy
+XDEF ASMDISP_STRCPY
 
 .strcpy
-        ld      hl,2
-        add     hl,sp
-        ld      e,(hl)
-        inc     hl
-        ld      d,(hl)  ;de=s2
-        inc     hl
-        ld      a,(hl)
-        inc     hl
-        ld      h,(hl)  
-        ld      l,a     ;hl=s1
-        ld      c,l
-        ld      b,h     ;keep s1 safe
-.strcpy1
-        ld      a,(de)
-        ld      (hl),a
-        inc     hl
-        inc     de
-        and     a
-        jp      nz,strcpy1
-        ld      l,c
-        ld      h,b     ;restore s1
-        ret
 
+   pop bc
+   pop hl
+   pop de
+   push de
+   push hl
+   push bc
 
+   ; de = dest char*s
+   ; hl = source char*ct
+
+.asmentry
+
+   push de
+
+.loop
+
+   ld a,(hl)
+   ldi
+   or a
+   jp nz, loop
+   
+   pop hl
+   ret
+
+DEFC ASMDISP_STRCPY = asmentry - strcpy

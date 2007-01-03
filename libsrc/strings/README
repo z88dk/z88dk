@@ -1,18 +1,7 @@
 All routines in this directory are machine independent!
 
-Some of these routines shouldn't (won't be!) recompiled - these
-are hand optimized
+strtok contains a static variable!!! This routine CANNOT be ROM'd as is!
+A ROMable version would refer to a global C variable declared by the user.
 
-strtok contains a static variable!!! This routine CANNOT be ROM'd!!
 
-These routines should be machine imdependent - i.e. they could be
-shoved into z80_crt0 but that might muddy the waters somewhat!!
 
-23/12/99
-<manic grin> I've gone thru several of these and the C code 
-generated is smaller than my brief hand optimizations!!! Wicked!
-
-20/3/2000
-I've rewritten str(r)chr in asm so they're even shorter 'n' faster
-strncmp has been rewritten cos it didn't work for me..though it did
-for gwl..who knows eh?

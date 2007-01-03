@@ -1,130 +1,83 @@
-;* * * * *  Small-C/Plus Z88 * * * * *
-;  Version: v1.10b0.46 Date: 1/3/99 
-;
-;       Reconstructed for the z80 Module Assembler
-;       By Dominic Morris <djm@jb.man.ac.uk>
+; char *strtok(char *s, char *delim)
+; on each call, return next token in s using delimiters from string delim
+; 01.2007 aralbrec
 
-;       Small C+ Library Function
-;
-;       Mildly hand optimized by djm 1/3/99
-;
-;	$Id: strtok.asm,v 1.3 2001-09-10 16:08:33 stefano Exp $
+; enter: char *s = new string to tokenize or 0 if want next tkn from last string
+; exit : hl = ptr within s to next token, 0 if none
+; uses : af, c, de, hl
 
-        XLIB    strtok
+XLIB strtok
+LIB strchr
+XREF ASMDISP_STRCHR
+XDEF ASM_STRTOK
 
-        INCLUDE "#z80_crt0.hdr"
-        LIB     strchr
-        LIB     strspn
-        LIB     strcspn
+; static data stored here, not ROMable
 
 .strtok
-        ld      hl,4
-        add     hl,sp
-        call    l_gint
-        ld      a,h
-        or      l
-        jp      z,i_3
-; hl is already = (sp+4), so can delete this surplus code
-;        ld      hl,4
-;        add     hl,sp
-;        call    l_gint
-        ld      (smc_st_strtok_t),hl
-        jp      i_4
-.i_3
-        ld      hl,4
-        add     hl,sp
-;push hl, ld hl,(smc_st_strtok_t) pop de optimized
-        ld      de,(smc_st_strtok_t)
-        ex      de,hl
-        call    l_pint
-.i_4
-        ld      hl,4
-        add     hl,sp
-        push    hl
-        call    l_gint
-        push    hl
-        ld      hl,8
-        add     hl,sp
-        call    l_gint
-        push    hl
-        ld      hl,8
-        add     hl,sp
-        call    l_gint
-        push    hl
-        call    strspn
-        pop     bc
-        pop     bc
-        pop     de
-        add     hl,de
-        pop     de
-        call    l_pint
-        ld      hl,4
-        add     hl,sp
-        call    l_gint
-        ld      l,(hl)
-        ld      h,0
-        ld      a,h
-        or      l
-        ret     z
-; At this point hl is already = 0
-;        jp      nz,i_5
-;        ld      hl,0
-;        ret
 
+   pop af
+   pop de
+   pop hl
+   push hl
+   push de
+   push af
+   
+   ; de = char *delim
+   ; hl = char *s
 
-.i_5
-        ld      hl,4
-        add     hl,sp
-        call    l_gint
-;ld (smc_st_strtok_t),hl;ld hl,(smc_st_strtok_t)
-        ld      (smc_st_strtok_t),hl
-        push    hl
-        ld      hl,6
-        add     hl,sp
-        call    l_gint
-        push    hl
-        ld      hl,6
-        add     hl,sp
-        call    l_gint
-        push    hl
-        call    strcspn
-        pop     bc
-        pop     bc
-        pop     de
-        add     hl,de
-;ld (smc_st_strtok_t),hl;ld hl,(smc_st_strtok_t)
-        ld      (smc_st_strtok_t),hl
-        ld      a,(hl)
-        and     a
-        jp      z,i_6
+.asmentry
 
-;        ld      l,(hl)
-;        ld      h,0
-;        ld      a,h
-;        or      l
-;        jp      z,i_6
-        ld      hl,(smc_st_strtok_t)
-        inc     hl
-        ld      (smc_st_strtok_t),hl
-        dec     hl
-;This bit of code basically sets a char equal to 0
-        ld      (hl),0
-;push hl, ld hl,0 pop de optimized
-;        ld      de,0
-;        ex      de,hl
-;        ld      a,l
-;        ld      (de),a
-.i_6
-        ld      hl,4
-        add     hl,sp
-;Removing ret following call l_gint
-        jp      l_gint
+   ld a,h
+   or l
+   jr nz, newstart
+   
+   ld hl,(lastpos)
+   ld a,h
+   or l
+   ret z
 
+.newstart
 
+   ex de,hl
+   
+   ; hl = char *delim
+   ; de = char *s
+   
+   push de
 
+.loop
 
-; --- Start of Static Variables ---
+   ld a,(de)
+   or a
+   jr z, endstring
+   
+   ld c,a
+   push hl
+   call strchr + ASMDISP_STRCHR
+   pop hl
+   jr nc, endtoken
+   inc de
+   jp loop
 
-.smc_st_strtok_t        defs    2
+.endstring
 
-; --- End of Compilation ---
+   ld l,a
+   ld h,a
+   ld (lastpos),hl
+   pop hl
+   ret
+
+.endtoken
+
+   ex de,hl
+   ld (hl),0
+   inc hl
+   ld (lastpos),hl
+   pop hl
+   ret
+
+.lastpos
+
+   defw 0
+
+DEFC ASM_STRTOK = asmentry - strtok

@@ -1,26 +1,27 @@
-;* Strlen for Small C z88
-;* Written by D Morris <djm@jb.man.ac.uk>
-;* Assembler is great, nice and quick!
-;
-; $Id: strlen.asm,v 1.2 2001-04-11 12:15:32 dom Exp $
+; int __FASTCALL__ strlen(char *s)
+; return length of s
+; 12.2006 aralbrec
 
-                XLIB strlen
+XLIB strlen
+XDEF ASMDISP_STRLEN
 
+; A funky version that's quicker than the
+; usual implementation for lengths > 1
 
-;strlen(s) char *s
+; enter: hl = char *s
+; exit : hl = length
+; uses : af, bc, hl
 
 .strlen
-        ld      hl,2
-        add     hl,sp  
-        ld      e,(hl)
-        inc     hl
-        ld      d,(hl)  ;hl = *s
-        ld      hl,0    ; our counter
-.strlen1
-        ld      a,(de)
-        and     a
-        ret     z
-        inc     de
-        inc     hl
-        jr      strlen1
 
+   xor a
+   ld c,a
+   ld b,a
+   cpir
+   dec a
+   ld h,a
+   ld l,a
+   sbc hl,bc
+   ret
+
+DEFC ASMDISP_STRLEN = 0

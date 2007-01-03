@@ -1,15 +1,18 @@
-; int strncmp(char *s1, char *s2, int n)
-; compare at most n chars of string s1 to string s2
+; int memcmp(void *s1, void *s2, size_t size)
+; compare first n chars of s1 and s2
+; 11.1999 djm, 12.2006 aralbrec
 
 ; exit : if s==ct : hl = 0, Z flag set
 ;        if s<<ct : hl < 0, NC flag set
 ;        if s>>ct : hl > 0, C flag set
 ; uses : af, bc, de, hl
 
-XLIB strncmp
-XDEF ASMDISP_STRNCMP
+XLIB memcmp
+XDEF ASMDISP_MEMCMP
 
-.strncmp
+; not the same as strncmp because there's no '\0' to worry about
+
+.memcmp
 
    pop af
    pop bc
@@ -19,30 +22,29 @@ XDEF ASMDISP_STRNCMP
    push de
    push bc
    push af
-
+   
    ; bc = int n
    ; de = char *s2
    ; hl = char *s1
 
 .asmentry
-
+   
    ld a,b
    or c
    jr z, equal
-      
-.strncmp1
+
+.loop
 
    ld a,(de)
    inc de
    cpi
    jr nz, different
-   jp po, equal
-   or a
-   jp nz, strncmp1
+   jp pe, loop
    
 .equal
 
-   ld hl,0
+   ld h,b
+   ld l,c
    ret
 
 .different
@@ -54,4 +56,4 @@ XDEF ASMDISP_STRNCMP
    dec h
    ret
 
-DEFC ASMDISP_STRNCMP = asmentry - strncmp
+DEFC ASMDISP_MEMCMP = asmentry - memcmp
