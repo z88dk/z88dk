@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol.asm,v 1.6 2007-01-03 22:23:48 aralbrec Exp $
+; * $Id: strtol.asm,v 1.7 2007-01-03 23:51:06 aralbrec Exp $
 ; *
 ; */
 
@@ -88,7 +88,7 @@ XDEF ASMDISP_STRTOL
    dec a
    jp z, fail
    inc a
-   jr nz, knownbase
+   jr nz, checkhex
 
    ; base=0 so need to figure out if it's oct, dec or hex
 
@@ -108,6 +108,27 @@ XDEF ASMDISP_STRTOL
    cp 'X'                    ; leading 0x indicates hex
    jr nz, fail
    inc hl
+   jp knownbase
+
+.checkhex
+
+   cp 16
+   jr nz, knownbase
+   
+   ; hex numbers are allowed to begin with 0x or 0X
+
+   ld a,(hl)
+   cp '0'
+   jr nz, knownbase
+   inc hl
+   ld a,(hl)
+   inc hl
+   cp 'x'
+   jr z, knownbase
+   cp 'X'
+   jr z, knownbase
+   dec hl
+   dec hl
 
 .knownbase
 
