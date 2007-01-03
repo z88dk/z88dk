@@ -10,44 +10,42 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.10 2006-12-19 10:08:06 aralbrec Exp $
+ *	$Id: string.h,v 1.11 2007-01-03 12:06:51 aralbrec Exp $
  */
 
 
-extern int __LIB__ strlen(char *);
-extern char __LIB__ *strcat(char *, char *);
-extern __LIB__ strcmp(char *, char *);
-extern char __LIB__  *strcpy(char *, char *);
-extern char __LIB__ *strncat(char *, char *, int);
-extern __LIB__ strncmp(char *, char *, int);
-extern char __LIB__ *strncpy(char *, char *, int);
-extern __LIB__ reverse(char *);
-
-extern char __LIB__ *strchr(unsigned char *, unsigned char);
-extern char __LIB__ *strrchr(unsigned char *, unsigned char);
-/* Makes sense to search for a char... */
-extern char __LIB__ *strrstrip(char *, char);
-extern char __LIB__ *strstrip(char *, int);
-extern char __LIB__ *strstr(char *, char *);
-extern char __LIB__ *strrstr(char *, char *);
-extern char __LIB__ *strtok(char *, char *);
-extern char __LIB__ *strpbrk(char *, char *);
-extern __LIB__ strpos(char *, int);
-extern __LIB__ strcspn(char *, char *);
-extern __LIB__ strspn(char *, char *);
-extern __LIB__ stricmp(char *, char *);
-extern __LIB__ strnicmp(char *, char *,int);
+extern int  __LIB__ __FASTCALL__ strlen(char *);
+extern char __LIB__              *strcat(char *, char *);
+extern int  __LIB__              strcmp(char *, char *);
+extern char __LIB__              *strcpy(char *, char *);
+extern char __LIB__              *strncat(char *, char *, int);
+extern int  __LIB__              strncmp(char *, char *, int);
+extern char __LIB__              *strncpy(char *, char *, int);
+extern char __LIB__ __FASTCALL__ *strrev(char *);
+extern char __LIB__              *strchr(unsigned char *, unsigned char);
+extern char __LIB__              *strrchr(unsigned char *, unsigned char);
+extern char __LIB__              *strrstrip(char *, char);
+extern char __LIB__              *strstrip(char *, int);
+extern char __LIB__              *strstr(char *, char *);
+extern char __LIB__              *strrstr(char *, char *);
+extern char __LIB__              *strtok(char *, char *);
+extern char __LIB__              *strpbrk(char *, char *);
+extern int  __LIB__              strpos(char *, int);
+extern int  __LIB__              strcspn(char *, char *);
+extern int  __LIB__              strspn(char *, char *);
+extern int  __LIB__              stricmp(char *, char *);
+extern int  __LIB__              strnicmp(char *, char *,int);
 
 #define strcasecmp stricmp
 #define strncasecmp strnicmp
 
-extern char __LIB__ *strlwr(char *);
-extern char __LIB__ *strupr(char *);
+extern char __LIB__ __FASTCALL__ *strlwr(char *);
+extern char __LIB__ __FASTCALL__ *strupr(char *);
 
-extern void __LIB__ *memset(void *, unsigned char, int);
-extern void __LIB__ *memcpy(void *, void *,int);
-extern void __LIB__ *memchr(void *, unsigned char, int);
-extern int __LIB__ memcmp(void *, void *, int);
+extern void __LIB__              *memset(void *, unsigned char, int);
+extern void __LIB__              *memcpy(void *, void *,int);
+extern void __LIB__              *memchr(void *, unsigned char, int);
+extern int  __LIB__              memcmp(void *, void *, int);
 
 extern char __LIB__ __FASTCALL__ *strdup(char *);
 
