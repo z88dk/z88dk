@@ -16,13 +16,13 @@ LIB l_long_neg
    inc hl
 
    cp 32                     ; inlined isspace
-   jr z, atoi
+   jr z, atol
    cp 7
-   jr z, atoi
+   jr z, atol
    cp 10
-   jr z, atoi
+   jr z, atol
    cp 13
-   jr z, atoi
+   jr z, atol
 
    ; ate up one too many chars, see if it's a sign
    
