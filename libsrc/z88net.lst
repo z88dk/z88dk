@@ -81,9 +81,7 @@ stdlib/itoa
 stdlib/l_bsearch
 stdlib/l_qsort
 stdlib/labs
-stdlib/Lbsearch
 stdlib/ldiv
-stdlib/Lqsort
 stdlib/outp
 stdlib/rand
 stdlib/strtol
@@ -97,11 +95,10 @@ stdlib/z88/getcwd
 stdlib/z88/mkdir
 stdlib/z88/sleep
 stdlib/z88/csleep
-strings/memset
+strings/memchr
 strings/memcmp
 strings/memcpy
-strings/memchr
-strings/reverse
+strings/memset
 strings/strcat
 strings/strchr
 strings/strcmp
@@ -117,6 +114,7 @@ strings/strnicmp
 strings/strpbrk
 strings/strpos
 strings/strrchr
+strings/strrev
 strings/strrstr
 strings/strrstrip
 strings/strspn
