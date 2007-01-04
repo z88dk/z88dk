@@ -2,20 +2,26 @@
 ; 12.2006 aralbrec
 
 XLIB sbrk
-LIB MAHeapSbrk
-XREF _heap
+XDEF ASMDISP_SBRK
+
+LIB HeapSbrk
+XREF _heap, ASMDISP_HEAPSBRK
 
 .sbrk
 
-   ld hl,2
-   add hl,sp
-   ld c,(hl)
-   inc hl
-   ld b,(hl)
-   inc hl
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
+   pop de
+   pop bc
+   pop hl
+   push hl
+   push bc
+   push de
+
+.asmentry
+   
+   ; bc = size of block in bytes >- 4
+   ; hl = address of block
+   
    ld de,_heap
-   jp MAHeapSbrk
+   jp HeapSbrk + ASMDISP_HEAPSBRK
+
+DEFC ASMDISP_SBRK = asmentry - sbrk

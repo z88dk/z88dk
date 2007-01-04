@@ -2,23 +2,52 @@
 ; 12.2006 aralbrec
 
 XLIB HeapSbrk
-LIB MAHeapSbrk
+XDEF ASMDISP_HEAPSBRK
+
+LIB HeapFree
+XREF ASMDISP_HEAPFREE
 
 .HeapSbrk
 
-   ld hl,2
-   add hl,sp
-   ld c,(hl)
+   pop af
+   pop bc
+   pop hl
+   pop de
+   push de
+   push hl
+   push bc
+   push af
+
+.asmentry
+
+; Add a block of memory to the specified heap.  The
+; block must be at least 4 bytes in size.  Adding a
+; block that overlaps with one already in the heap
+; will wreck the heap.
+;
+; enter : de = heap pointer
+;         hl = address of available block
+;         bc = size of block in bytes >= 4
+; exit  : block not added if too small
+; uses  : af, bc, de, hl
+
+.MAHeapSbrk
+
+   ld a,b
+   or a
+   jr nz, sizeok
+   ld a,c
+   sub 4
+   ret c
+   
+.sizeok
+
+   dec bc
+   dec bc
+   ld (hl),c
    inc hl
-   ld b,(hl)
+   ld (hl),b
    inc hl
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
-   ex de,hl
-   jp MAHeapSbrk
+   jp HeapFree + ASMDISP_HEAPFREE
+
+DEFC ASMDISP_HEAPSBRK = asmentry - HeapSbrk

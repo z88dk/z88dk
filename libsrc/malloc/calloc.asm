@@ -2,20 +2,29 @@
 ; 12.2006 aralbrec
 
 XLIB calloc
-LIB MAHeapCalloc
-XREF _heap
+XDEF ASMDISP_CALLOC
+
+LIB l_mult, HeapCalloc
+XREF _heap, ASMDISP_HEAPCALLOC
 
 .calloc
 
-   ld hl,2
-   add hl,sp
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
+   pop bc
+   pop de
+   pop hl
+   push hl
+   push de
+   push bc
+
+; enter : hl = number of objects
+;         de = size of each object
+; exit  : hl = address of memory block and carry set if successful
+;              else 0 and no carry if failed
+; uses  : af, bc, de, hl
+
+.asmentry
+
    ld bc,_heap
-   jp MAHeapCalloc
+   jp HeapCalloc + ASMDISP_HEAPCALLOC
+
+DEFC ASMDISP_CALLOC = asmentry - calloc

@@ -2,6 +2,7 @@
 ; 12.2006 aralbrec
 
 XLIB HeapCreate
+LIB l_setmem
 
 ; Just zero heap pointer to indicate empty heap.
 ;
@@ -11,11 +12,4 @@ XLIB HeapCreate
 .HeapCreate
 
    xor a
-   ld (hl),a
-   inc hl
-   ld (hl),a
-   inc hl
-   ld (hl),a
-   inc hl
-   ld (hl),a
-   ret
+   jp l_setmem - 7           ; four bytes: 2*4-1

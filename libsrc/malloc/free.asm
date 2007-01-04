@@ -2,10 +2,14 @@
 ; 12.2006 aralbrec
 
 XLIB free
-LIB MAHeapFree
-XREF _heap
+XDEF ASMDISP_FREE
+
+LIB HeapFree
+XREF _heap, ASMDISP_HEAPFREE
 
 .free
 
    ld de,_heap
-   jp MAHeapFree
+   jp HeapFree + ASMDISP_HEAPFREE
+
+DEFC ASMDISP_FREE = 0

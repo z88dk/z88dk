@@ -2,20 +2,26 @@
 ; 12.2006 aralbrec
 
 XLIB realloc
-LIB MAHeapRealloc
-XREF _heap
+XDEF ASMDISP_REALLOC
+
+LIB HeapRealloc
+XREF _heap, ASMDISP_HEAPREALLOC
 
 .realloc
 
-   ld hl,2
-   add hl,sp
-   ld c,(hl)
-   inc hl
-   ld b,(hl)
-   inc hl
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
+   pop de
+   pop bc
+   pop hl
+   push hl
+   push bc
+   push de
+
+.asmentry
+
+   ; hl = void *p
+   ; bc = size
+   
    ld de,_heap
-   jp MAHeapRealloc
+   jp HeapRealloc + ASMDISP_HEAPREALLOC
+
+DEFC ASMDISP_REALLOC = asmentry - realloc
