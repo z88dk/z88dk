@@ -39,6 +39,7 @@ crt0/l_pint_pop
 crt0/l_pint_ex
 crt0/l_plong
 crt0/l_putptr
+crt0/l_setmem
 crt0/l_sub
 crt0/l_sxt
 crt0/l_ucmp
