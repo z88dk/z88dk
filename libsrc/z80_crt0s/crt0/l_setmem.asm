@@ -1,0 +1,51 @@
+; 01.2007 aralbrec
+
+XLIB l_setmem
+
+; Many places in the library have functions
+; that initialize structures to 0.  This
+; consolidates all those initializations into
+; one quick routine.
+
+; enter: a = init char, hl = top of struct
+; usage: jp l_setmem - 2*bytes + 1
+;        where bytes = # bytes to write, up to 16
+
+   ld (hl),a
+   inc hl
+   ld (hl),a
+   inc hl
+   ld (hl),a
+   inc hl
+   ld (hl),a
+   inc hl
+
+   ld (hl),a
+   inc hl
+   ld (hl),a
+   inc hl
+   ld (hl),a
+   inc hl
+   ld (hl),a
+   inc hl
+
+   ld (hl),a
+   inc hl
+   ld (hl),a
+   inc hl
+   ld (hl),a
+   inc hl
+   ld (hl),a
+   inc hl
+
+   ld (hl),a
+   inc hl
+   ld (hl),a
+   inc hl
+   ld (hl),a
+   inc hl
+   ld (hl),a
+
+.l_setmem
+   
+   ret
