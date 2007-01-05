@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.7 2004-03-26 22:06:09 denniz Exp $
+ *      $Id: declfunc.c,v 1.8 2007-01-05 19:17:23 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -11,6 +11,49 @@
 
 extern void CleanGoto(void);
 
+/** \brief Given an argument train, add in signature information to currfn
+ *
+ *  \param ptr - Last argument
+ */
+void StoreFunctionSignature(SYMBOL *ptr)
+{
+    SYMBOL *ptr2;
+    int     j,k;
+
+    /* Count the number of arguments that this function had */
+    j = 1;
+    ptr2 = ptr;
+    while ( (ptr2=ptr2->offset.p) ) {
+        j++; 
+    }
+    if ( j > MAXARGS ) {
+        j = MAXARGS-1;
+    }
+    currfn->prototyped = j;    /* Set number of arguments */
+
+    /* Now define them in currfn - list is in reverse order remember */
+    while (j) {
+        k = j;
+        ptr2 = ptr;
+        while (--k) {
+            ptr2 = ptr2->offset.p; 
+        }
+        /* Okay, so now in ptr2 we have the SYMBOL for the argument */
+        currfn->args[j] = CalcArgValue(ptr2->type, ptr2->ident, ptr2->flags);
+        currfn->tagarg[j] = 0;
+        /* Set the tag if necessary */
+        if (ptr2->type == STRUCT) {
+            currfn->tagarg[j]=ptr2->tag_idx;
+        }
+        j--;
+    }
+
+    /* Clear down remaining arguments */
+    for ( j = (currfn->prototyped+1) ; j <= MAXARGS-1 ; j++) {
+        currfn->args[j]=0;
+        currfn->tagarg[j]=0;
+    }
+}
 
 /*
  *      Function parsing here, we parse for prototyping and for
@@ -27,9 +70,8 @@ TAG_SYMBOL *otag,
 int ident,
 long *addr)
 {
-    SYMBOL *ptr,*ptr2;
+    SYMBOL *ptr;
     int     more;
-    int     j,k;
     char    simple;         /* Simple def () */
     more=0;
 
@@ -70,48 +112,13 @@ long *addr)
      *      a function (including code)
      */
     ptr=AddFuncCode(sname, type, ident,sign, zfar, storage, more,NO,simple,otag);
+       
     if (ptr==0) { /* Defined a function */
         /* trap external int blah() { } things */
         if (currfn->storage==EXTERNAL) currfn->storage=STATIK;
         return(0);
-    }
-    else {
-        /*
-         *      Have spotted a prototype, so do something with it!
-         *      Trace back the argument train..
-         */
-        j=1;
-        ptr2=ptr;
-        while ( (ptr2=ptr2->offset.p) ) j++; 
-        if ( j > MAXARGS ) j=MAXARGS-1;
-        currfn->prototyped=j;    /* Set number of arguments */
-        /*
-         *      Now, attempt to set them!
-         */
-        while (j) {
-            k=j;
-            ptr2=ptr;
-            while (--k) ptr2=ptr2->offset.p; 
-            /*
-             *      Okay, so now in ptr2 we have the SYMBOL for the argument
-             */
-            currfn->args[j]=CalcArgValue(ptr2->type, ptr2->ident, ptr2->flags);
-            currfn->tagarg[j]=0;
-            if (ptr2->type==STRUCT) {
-                currfn->tagarg[j]=ptr2->tag_idx;
-            }
-            /*
-             *      Set up the tag pointer now 
-             */
-            j--;
-        }
-        /*
-         *      Zero the remaining prototyped entries
-         */
-        for ( j = (currfn->prototyped+1) ; j <= MAXARGS-1 ; j++) {
-            currfn->args[j]=0;
-            currfn->tagarg[j]=0;
-        }
+    } else {
+        StoreFunctionSignature(ptr);
     }
     return(0);
 
@@ -318,10 +325,13 @@ char   simple)
 }
 
 
-/* Set the argument offsets for a function, and compile the function
- * taken out of newfunc by djm
- */
 
+/** \brief Set the argument offsets for a function, then kick off compiling
+ *  of the function
+ *
+ *  \param prevarg  - Last argument
+ *  \param currfn   - Current function
+ */
 void setlocvar(SYMBOL *prevarg,SYMBOL *currfn)
 {
     int lgh,where;
@@ -332,6 +342,10 @@ void setlocvar(SYMBOL *prevarg,SYMBOL *currfn)
     unsigned char tester;
 
 	lgh = 0;  /* Initialise it */
+    if ( prevarg != NULL && currfn->prototyped == 0 ) {
+        StoreFunctionSignature(prevarg);
+    }
+
     argnumber=currfn->prototyped;
     /*
      *      If we have filled up our number of arguments, then pretend
@@ -365,7 +379,7 @@ void setlocvar(SYMBOL *prevarg,SYMBOL *currfn)
 	if (useframe) where+=2;
 #endif
     while ( prevarg ) {
-        lgh = 2 ;       /* all arguments except DOUBLE have length 2 bytes (even char) */
+        lgh = 2 ;      /* Default length */
         /* This is strange, previously double check for ->type */
         if ( prevarg->type == LONG && prevarg->ident != POINTER )
             lgh=4;
