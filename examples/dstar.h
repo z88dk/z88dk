@@ -50,7 +50,8 @@ char Board[144];        /* Space for decompressed Level */
 #define K_CLEAR    'H'
 #endif
 
-#if defined __SPECTRUM__ || defined __Z88__ || defined __ACE__ || defined __CPC__
+//#if defined __SPECTRUM__ || defined __Z88__ || defined __ACE__ || defined __CPC__
+#ifndef K_UP
 #define K_UP       'q'  /* arrow up     */
 #define K_DOWN     'a' /* arrow down   */
 #define K_LEFT     'o'  /* arrow left   */
@@ -63,6 +64,47 @@ char Board[144];        /* Space for decompressed Level */
 extern char levels[];
 extern char sprites[];
 
+#if (spritesize == 5)
+#asm
+._sprites
+ defb    5,5
+ defb    @00000000 ; empty sprite
+ defb    @00000000
+ defb    @00000000
+ defb    @00000000
+ defb    @00000000
+
+ defb    5,5
+ defb    @11110000	;1=edge,
+ defb    @10110000
+ defb    @11010000
+ defb    @11110000
+ defb    @00000000
+
+ defb    5,5
+ defb    @01100000	;2=bubble
+ defb    @10010000
+ defb    @10010000
+ defb    @01100000
+ defb    @00000000
+
+ defb    5,5
+ defb    @01100000	;3=moveable ball
+ defb    @11010000
+ defb    @11110000
+ defb    @01100000
+ defb    @00000000
+
+ defb    5,5
+ defb    @11110000	;4=moveable block
+ defb    @10010000
+ defb    @10010000
+ defb    @11110000
+ defb    @00000000
+#endasm
+#endif
+
+#if (spritesize == 6)
 #asm
 ._sprites
  defb    6,6
@@ -104,7 +146,10 @@ extern char sprites[];
  defb    @01001000
  defb    @01111000
  defb    @00000000
+#endasm
+#endif
 
+#asm
 ._levels
  defb    17,30    ;ball offset, box offset
  defb    @01010101,@01010101,@01010101,@01010101

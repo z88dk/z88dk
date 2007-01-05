@@ -64,6 +64,11 @@
 #include <games.h>
 #include <stdlib.h>
 #include <graphics.h>
+
+#define spritesize 6
+
+/* #define spritesize 5  --> for very low resolutions */
+
 #include "dstar.h"
 
 void main()
@@ -173,7 +178,7 @@ void DrawBoard(void)
 	{
 		for (x=0 ; x!=16 ; x++)
 		{
-			putsprite(spr_or,(x*6),(y*6),sprites + (8 * (*ptr++)));
+			putsprite(spr_or,(x*spritesize),(y*spritesize),sprites + ((spritesize+2) * (*ptr++)));
 		}
 	}
 }
@@ -231,19 +236,19 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		if(TestNextPosIsStop(*(locn+temp2))) return; /* till edge */
 
 		y = (*(ptr) / 16);
-		x = (*(ptr) - (y * 16)) * 6;
-		y *= 6;
+		x = (*(ptr) - (y * 16)) * spritesize;
+		y *= spritesize;
 
 		if(*(locn+temp2)==BUBB)
-			putsprite(spr_xor,x+(plusx*6),y+(plusy*6),sprites + (8 * BUBB));
+			putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + ((spritesize+2) * BUBB));
 
 		*(locn+temp2) = *locn;
 		*locn = 0;
 
  		/* remove old */
-		putsprite(spr_xor,x,y,sprites + (8 * temp));
+		putsprite(spr_xor,x,y,sprites + ((spritesize+2) * temp));
 		/* put new */
-		putsprite(spr_xor,x+(plusx*6),y+(plusy*6),sprites + (8 * temp));
+		putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + ((spritesize+2) * temp));
 
 		(*ptr) += temp2;
 	}
