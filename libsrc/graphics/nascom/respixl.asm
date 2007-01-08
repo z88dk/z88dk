@@ -8,7 +8,7 @@
 ;       Reset pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: respixl.asm,v 1.1 2006-12-28 18:08:36 stefano Exp $
+;	$Id: respixl.asm,v 1.2 2007-01-08 18:01:48 stefano Exp $
 ;
 
 
@@ -28,10 +28,9 @@
 			ld	a,l
 			cp	maxy
 			ret	nc		; y0	out of range
-			;inc	a
-			;dec	a
-			;dec	a
 
+			dec	a
+			dec	a
 			
 			ld	(COORDS),hl
 			
@@ -45,6 +44,7 @@
 			ld	hl,div3
 			ld	d,0
 			ld	e,c
+			inc	e
 			adc	hl,de
 			ld	a,(hl)
 			ld	c,a	; y/3
