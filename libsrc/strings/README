@@ -3,5 +3,12 @@ All routines in this directory are machine independent!
 strtok contains a static variable!!! This routine CANNOT be ROM'd as is!
 A ROMable version would refer to a global C variable declared by the user.
 
+There are two entry points for each function: the usual CALLER linkage
+with a call to name() and the CALLEE linkage name_callee().  The latter
+is much better and macros defined in the header file ensure that callee
+linkage is used by default.  The CALLER linkage functions are there
+for function pointers.
+
+
 
 

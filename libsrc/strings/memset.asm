@@ -1,12 +1,8 @@
-; void *memset(void *s, char c, int n)
-; write c into first n chars of s
-; 04.2001 djm, 12.2006 aralbrec
-
-; exit : hl = char *s
-; uses : af, bc, de, hl
+; CALLER linkage for function pointers
 
 XLIB memset
-XDEF ASMDISP_MEMSET
+LIB memset_callee
+XREF ASMDISP_MEMSET_CALLEE
 
 .memset
 
@@ -19,29 +15,5 @@ XDEF ASMDISP_MEMSET
    push bc
    push af
    
-   ; hl = void *s
-   ;  e = char c
-   ; bc = int n
+   jp memset_callee + ASMDISP_MEMSET_CALLEE
 
-.asmentry
-
-   ld a,b
-   or c
-   ret z
-   
-   ld (hl),e
-   dec bc
-   ld a,b
-   or c
-   ret z
-   
-   push hl
-   ld e,l
-   ld d,h
-   inc de
-   ldir
-   pop hl
-
-   ret
-
-DEFC ASMDISP_MEMSET = asmentry - memset

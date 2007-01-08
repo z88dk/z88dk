@@ -1,0 +1,52 @@
+; int __CALLEE__ strcspn_callee(char *s1, char *s2)
+; return length of prefix of s1 NOT containing chars in s2
+; 01.2007 aralbrec
+
+XLIB strcspn_callee
+XDEF ASMDISP_STRCSPN_CALLEE
+
+LIB strchr_callee
+XREF ASMDISP_STRCHR_CALLEE
+
+.strcspn_callee
+
+   pop bc
+   pop de
+   pop hl
+   push bc
+   
+   ; enter : de = char *s2
+   ;         hl = char *s1
+   ; exit  : hl = prefix length
+   ; uses  : af, bc, hl
+
+.asmentry
+
+   ld bc,0                   ; counter
+   
+.loop
+
+   ld a,(hl)
+   or a
+   jr z, done
+   
+   push bc
+   push hl
+   ld c,a
+   ld l,e
+   ld h,d
+   call strchr_callee + ASMDISP_STRCHR_CALLEE
+   pop hl
+   pop bc
+   jr nc, done
+   inc bc
+   inc hl
+   jp loop
+
+.done
+
+   ld l,c
+   ld h,b
+   ret
+
+DEFC ASMDISP_STRCSPN_CALLEE = asmentry - strcspn_callee

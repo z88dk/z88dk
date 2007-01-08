@@ -1,0 +1,42 @@
+; char __CALLEE__ *strcat_callee(char *dst, char *src)
+; copy src to end of dst
+; 12.2006 aralbrec
+
+XLIB strcat_callee
+XDEF ASMDISP_STRCAT_CALLEE
+
+.strcat_callee
+
+   pop bc
+   pop de
+   pop hl
+   push bc
+   
+   ; enter : de = char *src
+   ;         hl = char *dst
+   ; exit  : hl = char *dst
+   ; uses  : af, bc, de
+   
+.asmentry
+
+   push hl                   ; save char *dst
+   
+   xor a                     ; first find end of char *dst
+   ld c,a
+   ld b,a
+   cpir
+   dec hl
+   
+   ex de,hl
+   
+.loop                        ; next copy char *src to end of char *dst
+
+   ld a,(hl)
+   ldi
+   or a
+   jp nz, loop
+   
+   pop hl                    ; return with hl = char *s
+   ret
+
+DEFC ASMDISP_STRCAT_CALLEE = asmentry - strcat_callee

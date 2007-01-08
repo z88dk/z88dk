@@ -1,11 +1,8 @@
-; char *strcpy(char *s, char *ct)
-; copy string ct to s including '\0'
-
-; exit : hl = char *s
-; uses : af, bc, de, hl
+; CALLER linkage for function pointers
 
 XLIB strcpy
-XDEF ASMDISP_STRCPY
+LIB strcpy_callee
+XREF ASMDISP_STRCPY_CALLEE
 
 .strcpy
 
@@ -15,22 +12,6 @@ XDEF ASMDISP_STRCPY
    push de
    push hl
    push bc
-
-   ; de = dest char*s
-   ; hl = source char*ct
-
-.asmentry
-
-   push de
-
-.loop
-
-   ld a,(hl)
-   ldi
-   or a
-   jp nz, loop
    
-   pop hl
-   ret
+   jp strcpy_callee + ASMDISP_STRCPY_CALLEE
 
-DEFC ASMDISP_STRCPY = asmentry - strcpy
