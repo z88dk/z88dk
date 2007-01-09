@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.78 2006-12-28 18:08:36 stefano Exp $
+# $Id: Makefile,v 1.79 2007-01-09 10:27:30 aralbrec Exp $
 
 
 include Make.config
@@ -22,7 +22,7 @@ all:	genlibs z88libs tilibs zxlibs \
 	zx81_clib.lib zx81ansi_clib.lib
 
 genlibs: gen_math.lib malloc.lib z80_crt0.lib ndos.lib adt.lib balloc.lib \
-         im2.lib rect.lib
+         im2.lib rect.lib algorithm.lib
 
 z88libs: z88_math.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib \
 	 z88ansi_clib.lib gfx.lib 
@@ -38,12 +38,12 @@ zxlibs: zx_clib.lib zxan_clib.lib zxvgs.lib zx_math.lib zx_mathtiny.lib
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.78 2006-12-28 18:08:36 stefano Exp $
+#  $Id: Makefile,v 1.79 2007-01-09 10:27:30 aralbrec Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.78 2006-12-28 18:08:36 stefano Exp $
+# $Id: Makefile,v 1.79 2007-01-09 10:27:30 aralbrec Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -58,7 +58,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.78 2006-12-28 18:08:36 stefano Exp $
+#  $Id: Makefile,v 1.79 2007-01-09 10:27:30 aralbrec Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -70,6 +70,12 @@ tideps:
 	$(RM) -f graphics/gray/*.o
 	$(RM) -f graphics/gray/ticalc/*.o
 
+# interesting algorithms - aralbrec
+algorithm.lib:
+	@echo ''
+	@echo '--- Building Algorithm Library  ---'
+	@echo ''
+	cd algorithm ; $(MAKE) ; cd ..
 
 # rectangles, intervals and points - aralbrec
 rect.lib:
@@ -916,6 +922,7 @@ clean:
 	cd balloc ; $(MAKE) clean ; cd ..
 	cd im2 ; $(MAKE) clean ; cd ..
 	cd rect ; $(MAKE) clean ; cd ..
+	cd algorithm ; $(MAKE) clean ; cd ..
 
 install:
 	cp *.lib ../lib/clibs
