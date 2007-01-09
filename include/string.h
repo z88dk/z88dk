@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.13 2007-01-09 20:52:53 aralbrec Exp $
+ *	$Id: string.h,v 1.14 2007-01-09 22:26:18 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -37,7 +37,7 @@ extern int  __LIB__               strpos(char *, uint);
 extern int  __LIB__               strcspn(char *, char *);
 extern int  __LIB__               strspn(char *, char *);
 extern int  __LIB__               stricmp(char *, char *);
-extern int  __LIB__               strnicmp(char *, char *,uint);
+extern int  __LIB__               strnicmp(char *, char *, uint);
 
 #define strcasecmp  stricmp
 #define strncasecmp strnicmp
@@ -50,6 +50,7 @@ extern void __LIB__              *memcpy(void *, void *,uint);
 extern void __LIB__              *memmove(void *, void *, uint);
 extern void __LIB__              *memchr(void *, unsigned char, uint);
 extern int  __LIB__               memcmp(void *, void *, uint);
+extern void __LIB__               memswap(void *, void *, uint);
 
 extern char __LIB__ __FASTCALL__ *strdup(char *);
 
@@ -73,13 +74,14 @@ extern int  __LIB__ __CALLEE__    strpos_callee(char *, uint);
 extern int  __LIB__ __CALLEE__    strcspn_callee(char *, char *);
 extern int  __LIB__ __CALLEE__    strspn_callee(char *, char *);
 extern int  __LIB__ __CALLEE__    stricmp_callee(char *, char *);
-extern int  __LIB__ __CALLEE__    strnicmp_callee(char *, char *,uint);
+extern int  __LIB__ __CALLEE__    strnicmp_callee(char *, char *, uint);
 
 extern void __LIB__ __CALLEE__   *memset_callee(void *, unsigned char, uint);
 extern void __LIB__ __CALLEE__   *memcpy_callee(void *, void *,uint);
 extern void __LIB__ __CALLEE__   *memmove_callee(void *, void *, uint);
 extern void __LIB__ __CALLEE__   *memchr_callee(void *, unsigned char, uint);
 extern int  __LIB__ __CALLEE__    memcmp_callee(void *, void *, uint);
+extern void __LIB__ __CALLEE__    memswap_callee(void *, void *, uint);
 
 // And now we make CALLEE linkage default to make compiled progs shorter and faster
 // These defines will generate warnings for function pointers but that's ok
@@ -108,7 +110,7 @@ extern int  __LIB__ __CALLEE__    memcmp_callee(void *, void *, uint);
 #define memmove(a,b,c)  memmove_callee(a,b,c)
 #define memchr(a,b,c)   memchr_callee(a,b,c)
 #define memcmp(a,b,c)   memcmp_callee(a,b,c)
-
+#define memswap(a,b,c)  memswap_callee(a,b,c)
 
 /*
  * Now handle far stuff
@@ -160,6 +162,7 @@ extern far char __LIB__ *strdup_far(far char *);
  */
 
 #define bzero(s,n)    memset_callee(s,0,n)
+#define bcmp(s1,s2,n) memcmp_callee(s1,s2,n)
 #define bcopy(s,d,l)  memcpy_callee(d,s,l)
 #define index(s,b)    strchr_callee(s,b)
 #define rindex(s,b)   strrchr_callee(s,b)
