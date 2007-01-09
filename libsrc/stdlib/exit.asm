@@ -10,10 +10,14 @@
 ;though...
 ;
 ; -----
-; $Id: exit.asm,v 1.4 2007-01-03 22:23:48 aralbrec Exp $
+; $Id: exit.asm,v 1.5 2007-01-09 21:54:21 stefano Exp $
 
 XLIB exit
-XREF cleanup, exitsp, exitcount, l_jphl
+
+XREF cleanup, exitsp, exitcount
+
+LIB l_jphl
+
 XDEF ASMDISP_EXIT
 
 ; FASTCALL

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.16 2006-12-31 22:13:19 aralbrec Exp $
+# $Id: Makefile,v 1.17 2007-01-09 21:54:21 stefano Exp $
 
 include ../Make.config
 
@@ -23,10 +23,10 @@ gen: $(GENOBJECTS)
 	zcc $(CFLAGS) $*.c
 
 z88_stdlib:
-	cd z88 ;  ; cd ..
+	cd z88  ; cd ..
 
 zx_stdlib:
-	cd spectrum ;  ; cd ..
+	cd spectrum  ; cd ..
 
 clean:
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i $(AFILES)

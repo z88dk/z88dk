@@ -1,6 +1,6 @@
 @echo off
 
-rem $Id: vscmake.bat,v 1.2 2005-03-08 18:18:33 stefano Exp $
+rem $Id: vscmake.bat,v 1.3 2007-01-09 21:54:21 stefano Exp $
 
 cl
 if %ERRORLEVEL% == 0 goto :build
@@ -15,6 +15,9 @@ echo * Building with Visual C *
 echo **************************
 echo *
 echo *
+
+echo #define WIN32 1 > config.h
+
 md ..\bin
 cd appmake
 call vscmake

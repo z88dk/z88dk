@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol.asm,v 1.7 2007-01-03 23:51:06 aralbrec Exp $
+; * $Id: strtol.asm,v 1.8 2007-01-09 21:54:21 stefano Exp $
 ; *
 ; */
 
@@ -100,7 +100,7 @@ XDEF ASMDISP_STRTOL
    ld a,(hl)                 ; if next char is a digit must be oct
    ld c,8
    cp '0'
-   jr c, fail
+   jp c, fail
    cp '7'+1
    jr c, knownbase
    and $df                   ; toupper(a)
