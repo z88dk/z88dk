@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.12 2007-01-08 21:34:17 aralbrec Exp $
+ *	$Id: string.h,v 1.13 2007-01-09 20:52:53 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -88,7 +88,6 @@ extern int  __LIB__ __CALLEE__    memcmp_callee(void *, void *, uint);
 #define strcmp(a,b)     strcmp_callee(a,b)
 #define strcpy(a,b)     strcpy_callee(a,b)
 #define strncat(a,b,c)  strncat_callee(a,b,c)
-#define strncat(a,b,c)  strncpy_callee(a,b,c)
 #define strncmp(a,b,c)  strncmp_callee(a,b,c)
 #define strncpy(a,b,c)  strncpy_callee(a,b,c)
 #define strchr(a,b)     strchr_callee(a,b)
@@ -96,6 +95,7 @@ extern int  __LIB__ __CALLEE__    memcmp_callee(void *, void *, uint);
 #define strrstrip(a,b)  strrstrip_callee(a,b)
 #define strstrip(a,b)   strstrip_callee(a,b)
 #define strstr(a,b)     strstr_callee(a,b)
+#define strrstr(a,b)    strrstr_callee(a,b)
 #define strtok(a,b)     strtok_callee(a,b)
 #define strpbrk(a,b)    strpbrk_callee(a,b)
 #define strpos(a,b)     strpos_callee(a,b)
