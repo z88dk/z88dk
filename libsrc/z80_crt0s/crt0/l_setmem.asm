@@ -8,7 +8,7 @@ XLIB l_setmem
 ; one quick routine.
 
 ; enter: a = init char, hl = top of struct
-; usage: jp l_setmem - 2*bytes + 1
+; usage: call l_setmem - 2*bytes + 1
 ;        where bytes = # bytes to write, up to 16
 
    ld (hl),a
