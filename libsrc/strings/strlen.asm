@@ -18,9 +18,7 @@ XDEF ASMDISP_STRLEN
    ld c,a
    ld b,a
    cpir
-   dec a
-   ld h,a
-   ld l,a
+   ld hl,$ffff
    sbc hl,bc
    ret
 
