@@ -17,12 +17,20 @@ XDEF ASMDISP_ASTAR_WALKPATH_CALLEE
    ; enter : bc = uint n
    ;         hl = uint []
    ;         de = astar_path *
+   ; exit  : hl = ptr into uint[] where first node in sequence written
+   ;         C flag set if entire path written
+   ;         
    ; uses  : af, bc, de, hl
 
 .asmentry
 
+   ld a,d                    ; so many tests for zero, very annoying
+   or e
+   ret z
+   
    ld a,b
    or c
+   scf
    ret z
 
    add hl,bc
@@ -30,6 +38,10 @@ XDEF ASMDISP_ASTAR_WALKPATH_CALLEE
    ex de,hl
    
 .loop
+
+   ld a,h
+   or l
+   jr z, done
 
    dec de
    inc hl
@@ -43,10 +55,21 @@ XDEF ASMDISP_ASTAR_WALKPATH_CALLEE
    ld a,(hl)
    inc hl
    ld h,(hl)
-   ld l,a
+   ld l,a                    ; hl = & next struct astar_path
    
    jp pe, loop
    
+   ex de,hl
+   
+   ld a,d                    ; wrote all nodes of path if next path = 0
+   or e
+   ret z
+   
+   scf
+   ret
+
+.done
+
    ex de,hl
    ret
 
