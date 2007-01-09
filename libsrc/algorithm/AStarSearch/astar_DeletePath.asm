@@ -41,6 +41,10 @@ XREF _u_free
    pop hl
    pop hl
    
+   ld a,h
+   or l
+   ret z                     ; no more paths!
+   
    ld e,l
    ld d,h
    
