@@ -1,6 +1,6 @@
 ; char __CALLEE__ *strrchr_callee(char *s, char c)
 ; return ptr to last occurrence of c in s
-; 04.2001 dom
+; 04.2001 dom, 01.2007 aralbrec
 
 XLIB strrchr_callee
 XDEF ASMDISP_STRRCHR_CALLEE
@@ -21,20 +21,22 @@ XDEF ASMDISP_STRRCHR_CALLEE
 .asmentry
 
    ld hl,0
-   dec de
    
 .loop
 
-   inc de
    ld a,(de)
-   or a
-   ret z
-   
    cp c
-   jp nz, loop
    
+   jp nz, nomatch
    ld l,e
    ld h,d
-   jp loop
+
+.nomatch
+
+   or a
+   inc de
+   jp nz, loop
+
+   ret
 
 DEFC ASMDISP_STRRCHR_CALLEE = asmentry - strrchr_callee
