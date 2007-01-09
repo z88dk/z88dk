@@ -4,7 +4,7 @@
 
 ; enter: hl = char *s
 ; exit : hl = char *s
-; uses : af, bc, de, af'
+; uses : af, bc, de
 
 XLIB strrev
 XDEF ASMDISP_STRREV
@@ -19,27 +19,29 @@ XDEF ASMDISP_STRREV
    cpir                      ; find end of string
    dec hl
    dec hl
-   sra b
-   rr c
-      
+   
    push de
+
+   ld a,b                    ; bc = -(bc/2)-1
+   sra a
+   rr c
+   cpl
+   ld b,a
+   ld a,c
+   cpl
+   ld c,a
+
+   or b
+   jr z, exit
    
 .revlp
 
-   inc bc
-   ld a,b
-   or c
-   jr z, exit
-   
-   ld a,(hl)
-   ex af,af
    ld a,(de)
-   ld (hl),a
-   ex af,af
-   ld (de),a
+   ldi
    dec hl
-   inc de
-   jp revlp
+   ld (hl),a
+   dec hl
+   jp pe, revlp
    
 .exit
 
