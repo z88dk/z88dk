@@ -75,12 +75,13 @@
 //    not be defined.
 //
 // Prior to calling the A* search algorithm, function pointers
-// must be declared and assigned to point at the above functions:
+// must be declared globally and assigned to point at the above
+// function implementations:
 //
 // void *astar_TestAndClose, *astar_Successor, *astar_DestCost;
 //
 // Additionally a number of variables A* uses must be declared
-// and initialized:
+// globally and initialized:
 //
 // uint astar_startNode;   /* init to starting node              */
 // uint astar_destNode;    /* init to finish node                */
@@ -97,22 +98,24 @@
 // details.
 //
 
-struct astar_path {                //  8 bytes
+struct astar_path {                //  7 bytes
 
    uint               node;        // +0 last node of this path
-   uint               ref_count;   // +2 reference count for this path
-   struct astar_path *prefix;      // +4 path leading to this node
-   uint               cost;        // +6 cost of this path 0-65535
+   uchar              ref_count;   // +2 reference count for this path
+   struct astar_path *prefix;      // +3 path leading to this node
+   uint               cost;        // +5 cost of this path 0-65535
 
 };
 
-struct astar_path              *astar_Search(void);
-struct astar_path __FASTCALL__ *astar_SearchResume(struct astar_path *p);
-struct astar_path __FASTCALL__ *astar_EstimateBestPath(struct astar_path *p);
-uint              __FASTCALL__  astar_PathLength(struct astar_path *p);
-uint              __FASTCALL__  astar_WalkPath(struct astar_path *p, uint *dest, uint n);
-void              __FASTCALL__  astar_DeletePath(struct astar_path *p);
-void                            astar_DeleteQueue(void);
+extern struct astar_path __LIB__              *astar_Search(void);
+extern struct astar_path __LIB__ __FASTCALL__ *astar_SearchResume(struct astar_path *p);
+extern struct astar_path __LIB__ __FASTCALL__ *astar_EstimateBestPath(struct astar_path *p);
+extern uint              __LIB__ __FASTCALL__  astar_PathLength(struct astar_path *p);
+extern uint              __LIB__              *astar_WalkPath(struct astar_path *p, uint *node_arr, uint n);
+extern uint              __LIB__ __CALLEE__   *astar_WalkPath_callee(struct astar_path *p, uint *node_arr, uint n);
+extern void              __LIB__ __FASTCALL__  astar_DeletePath(struct astar_path *p);
+extern void              __LIB__ __FASTCALL__  astar_CleanUp(struct astar_path *p););
 
+#define astar_WalkPath(a,b,c) astar_WalkPath_callee(a,b,c)
 
 #endif
