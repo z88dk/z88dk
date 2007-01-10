@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.23 2007-01-10 08:15:58 aralbrec Exp $
+ * $Id: stdlib.h,v 1.24 2007-01-10 22:33:39 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -42,8 +42,20 @@ extern unsigned long __LIB__               strtoul(char *s, char **endp, int bas
 //// Random Numbers
 ///////////////////
 
-// To use the random number generator you must declare the integer seed variable
-// "std_seed" globally in your main.c file:  int std_seed;
+// The pseudo-random number generator requires a 16-bit seed.
+// This bit of macro magic makes sure there is one without user
+// intervention and ensures older programs will still compile.
+// However it is only a temporary measure as independent compilation
+// units will have different seeds!
+
+#ifndef __HAVESEED
+#define __HAVESEED
+int std_seed = 1;
+#endif
+
+// To supply one's own seed, simply do a "#define __HAVESEED" before
+// including the stdlib header and globally declare the std_seed
+// variable somehow.
 
 #define RAND_MAX    32767
 #define M_SRAND(a)  asm("ld\thl,"#a"\nld\t(_std_seed),hl\n");
