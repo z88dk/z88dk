@@ -1,6 +1,6 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.8 2003-04-20 16:08:22 dom Exp $
+ * $Id: define.h,v 1.9 2007-01-10 09:43:24 stefano Exp $
  */
 
 /*      Stand-alone definitions                 */
@@ -33,8 +33,9 @@
 
 /*      Define the symbol table parameters      */
 
-#define NUMGLBS         512
-#define MASKGLBS        511
+/* Stefano - doubled the global symble table size */
+#define NUMGLBS         1024
+#define MASKGLBS        1023
 #define STARTGLB        symtab
 #define ENDGLB          (STARTGLB+NUMGLBS)
 

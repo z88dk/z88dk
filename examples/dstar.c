@@ -65,9 +65,20 @@
 #include <stdlib.h>
 #include <graphics.h>
 
+/* #define spritesize 5  -->  very low resolutions, 80x45 pixels */
+/* #define spritesize 6  -->  TI mode, 96x54  */
+/* #define spritesize 8  -->  128x72 pixels   */
+/* #define spritesize 16  --> ZX Spectrum mode 256x144 */
+
 #define spritesize 6
 
-/* #define spritesize 5  --> for very low resolutions */
+/* Single sprite memory usage, including bytes for its size */
+#if (spritesize == 16)
+  #define spritemem 34
+#else
+  #define spritemem (spritesize+2)
+#endif
+
 
 #include "dstar.h"
 
@@ -178,7 +189,7 @@ void DrawBoard(void)
 	{
 		for (x=0 ; x!=16 ; x++)
 		{
-			putsprite(spr_or,(x*spritesize),(y*spritesize),sprites + ((spritesize+2) * (*ptr++)));
+			putsprite(spr_or,(x*spritesize),(y*spritesize),sprites + (spritemem * (*ptr++)));
 		}
 	}
 }
@@ -238,17 +249,17 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		y = (*(ptr) / 16);
 		x = (*(ptr) - (y * 16)) * spritesize;
 		y *= spritesize;
-
+		
 		if(*(locn+temp2)==BUBB)
-			putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + ((spritesize+2) * BUBB));
-
+			putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
+		
 		*(locn+temp2) = *locn;
 		*locn = 0;
 
  		/* remove old */
-		putsprite(spr_xor,x,y,sprites + ((spritesize+2) * temp));
+		putsprite(spr_xor,x,y,sprites + (spritemem * temp));
 		/* put new */
-		putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + ((spritesize+2) * temp));
+		putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * temp));
 
 		(*ptr) += temp2;
 	}
