@@ -1,4 +1,5 @@
 /* Ported to the Ti82/83/83+ (rest will follow) by Henk Poley
+ * Extended with smaller and bigger sprites by Stefano Bodrato
  *
  *  up,down,left,right - move ball/box
  *  [Enter]            - toggle ball/box
@@ -70,7 +71,9 @@
 /* #define spritesize 8  -->  128x72 pixels   */
 /* #define spritesize 16  --> ZX Spectrum mode 256x144 */
 
+#ifndef spritesize
 #define spritesize 6
+#endif
 
 /* Single sprite memory usage, including bytes for its size */
 #if (spritesize == 16)
