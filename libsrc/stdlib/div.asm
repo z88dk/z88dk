@@ -1,9 +1,8 @@
-; void div(div_t *d, int num, int denom)
-; 12.2006 aralbrec
+; CALLER linkage for function pointers
 
 XLIB div
-LIB l_div
-XDEF ASMDISP_DIV
+LIB div_callee
+XREF ASMDISP_DIV_CALLEE
 
 .div
 
@@ -16,26 +15,5 @@ XDEF ASMDISP_DIV
    push hl
    push af
    
-   ; bc = div_t *
-   ; de = num
-   ; hl = denom
-   
-.asmentry
+   jp div_callee + ASMDISP_DIV_CALLEE
 
-   push bc
-   call l_div                ; hl = q, de = r
-   ex de,hl
-   ex (sp),hl
-
-   ld (hl),e
-   inc hl
-   ld (hl),d
-   inc hl
-   pop de
-   ld (hl),e
-   inc hl
-   ld (hl),d
-   
-   ret
-
-DEFC ASMDISP_DIV = asmentry - div

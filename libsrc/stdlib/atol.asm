@@ -3,7 +3,6 @@
 
 XLIB atol
 LIB l_long_neg
-XDEF ASMDISP_ATOL
 
 ; FASTCALL
 
@@ -47,8 +46,11 @@ XDEF ASMDISP_ATOL
    ; bc = char *
    ; dehl = result
 
+   dec bc
+
 .loop
 
+   inc bc
    ld a,(bc)
    
    sub '0'                   ; inlined isdigit
@@ -81,17 +83,11 @@ XDEF ASMDISP_ATOL
       
    add a,l
    ld l,a
-   jp nc, adddone
+   jp nc, loop
    inc h
-   jp nz, adddone
+   jp nz, loop
    inc e
-   jp nz, adddone
+   jp nz, loop
    inc d
-   
-.adddone
 
-   inc bc
    jp loop
-   
-DEFC ASMDISP_ATOL = 0
-

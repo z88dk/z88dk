@@ -12,13 +12,12 @@
 ; *	djm 5/1/2000
 ; *
 ; * -----
-; * $Id: atoi.asm,v 1.2 2007-01-03 22:23:48 aralbrec Exp $
+; * $Id: atoi.asm,v 1.3 2007-01-10 08:17:06 aralbrec Exp $
 ; *
 ; */
 
 XLIB atoi
 LIB l_neg
-XDEF ASMDISP_ATOI
 
 ; FASTCALL
 
@@ -81,8 +80,6 @@ XDEF ASMDISP_ATOI
 
    inc de
    jp loop
-
-DEFC ASMDISP_ATOI = 0
 
 ; #include <ctype.h>
 ; #include <stdlib.h>

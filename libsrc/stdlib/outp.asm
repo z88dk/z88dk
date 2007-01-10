@@ -1,23 +1,16 @@
-; void outp(uint port, uchar byte)
-; 09.2005 aralbrec
+; CALLER linkage for function pointers
 
 XLIB outp
-XDEF ASMDISP_OUTP
+LIB outp_callee
+XREF ASMDISP_OUTP_CALLEE
 
 .outp
 
-   ld hl,2
-   add hl,sp
-   ld a,(hl)
-   inc hl
-   inc hl
-   ld c,(hl)
-   inc hl
-   ld b,(hl)
+   pop af
+   pop de
+   pop bc
+   push bc
+   push de
+   push af
    
-.asmentry
-
-   out (c),a
-   ret
-
-DEFC ASMDISP_OUTP = asmentry - outp
+   jp outp_callee + ASMDISP_OUTP_CALLEE

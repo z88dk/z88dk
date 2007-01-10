@@ -6,14 +6,13 @@
 ;       27/11/98 djm - allows upto 32 levels of exit routines
 ;
 ; -----
-; $Id: atexit.asm,v 1.4 2007-01-03 22:23:48 aralbrec Exp $
+; $Id: atexit.asm,v 1.5 2007-01-10 08:17:06 aralbrec Exp $
 
 ; int atexit((void *)(void))
 ; FASTCALL
 
 XLIB atexit
 XREF exitsp, exitcount
-XDEF ASMDISP_ATEXIT
 
 ; enter : hl = atexit function
 ; exit  : hl !=0 and no carry if can't register
@@ -42,5 +41,3 @@ XDEF ASMDISP_ATEXIT
    ld l,b                    ; indicate success
    scf
    ret
-
-DEFC ASMDISP_ATEXIT = 0

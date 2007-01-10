@@ -3,7 +3,6 @@
 
 XLIB ldiv
 LIB l_long_div
-XDEF ASMDISP_LDIV
 
 .ldiv
 
@@ -43,5 +42,3 @@ XDEF ASMDISP_LDIV
    ex af,af
    push af
    ret
-
-DEFC ASMDISP_LDIV = 0

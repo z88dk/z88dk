@@ -1,23 +1,17 @@
-; void wpoke(void *addr, uint word)
-; 11.2006 aralbrec
+; CALLER linkage for function pointers
 
 XLIB wpoke
-XDEF ASMDISP_WPOKE
+LIB wpoke_callee
+XREF ASMDISP_WPOKE_CALLEE
 
 .wpoke
 
-   pop bc
+   pop af
    pop de
    pop hl
    push hl
    push de
-   push bc
+   push af
+   
+   jp wpoke_callee + ASMDISP_WPOKE_CALLEE
 
-.asmentry
-
-   ld (hl),e
-   inc hl
-   ld (hl),d
-   ret
-
-DEFC ASMDISP_WPOKE = asmentry - wpoke
