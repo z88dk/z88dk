@@ -245,6 +245,7 @@ games/bit_fx2
 games/bit_fx3
 games/bit_fx4
 games/bit_synth
+games/bit_frequency
 games/bit_beep
 games/spectrum/beeper
 spectrum/tape_save

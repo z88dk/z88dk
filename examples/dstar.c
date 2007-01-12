@@ -1,5 +1,6 @@
 /* Ported to the Ti82/83/83+ (rest will follow) by Henk Poley
- * Extended with smaller and bigger sprites by Stefano Bodrato
+ * Extended with different sprite sizes and sound by Stefano Bodrato
+ *
  *
  *  up,down,left,right - move ball/box
  *  [Enter]            - toggle ball/box
@@ -51,14 +52,26 @@
  *      compiler. Hopefully it will be an encouragement for others to
  *      do likewise!
  *
- *      For your interest I've also included the original Z88 converted
- *      assembler from which I worked - it's quite crude but it just
- *      about functions, the C is much more refined!
- *
  *      Enough twaddle, enjoy the game and study the source!
  *
  *      d. <djm@jb.man.ac.uk> 1/12/98
  *
+ * * * * * * *
+
+   Compile examples:
+   
+   To get a TI82 version of the game (optionally you could add sound):
+   zcc +ti82 -create-app dstar.c
+
+   To get a TI85 version of the game (optionally you could add sound):
+   zcc +ti85 -Dspritesize=7 -create-app dstar.c
+
+   To get a Spectrum 16K version of the game:
+   zcc +zx -Dspritesize=16 -DSOUND -create-app -zorg=24300 dstar.c
+
+   To get an 80 pixel graphics version of the game (Mattel Aquarius, etc):
+   zcc +aquarius -Dspritesize=5 -create-app dstar.c
+ 
  */
 
 #include <stdio.h>
@@ -66,10 +79,14 @@
 #include <stdlib.h>
 #include <graphics.h>
 
-/* #define spritesize 5  -->  very low resolutions, 80x45 pixels */
-/* #define spritesize 6  -->  TI mode, 96x54  */
-/* #define spritesize 8  -->  128x72 pixels   */
-/* #define spritesize 16  --> ZX Spectrum mode 256x144 */
+#ifdef SOUND
+#include <sound.h>
+#endif
+
+/* #define spritesize 5   -->  very low resolutions, 80x45 pixels  */
+/* #define spritesize 6   -->  TI mode, 96x54  */
+/* #define spritesize 8   -->  128x72 pixels   */
+/* #define spritesize 16  -->  Big screen mode 256x144  */
 
 #ifndef spritesize
 #define spritesize 6
@@ -120,6 +137,9 @@ void Gamekeys(void)
 		  break;
 		case K_SWITCH:
 		  PieceIsBall^=1;   /* Toggle ball/box */
+		  #ifdef SOUND
+		    bit_fx4 (5);
+		  #endif
 		  break;
 		case K_EXIT:
 		  exit(0);
@@ -133,6 +153,9 @@ void Gamekeys(void)
 		  { ++Level; break; }
 		  /* fall thrue */
 		case K_CLEAR:
+		  #ifdef SOUND
+		    bit_fx4 (3);
+		  #endif
 		  SetupLevel();
 	}
 }
@@ -176,6 +199,10 @@ void SetupLevel(void)
 	*(Board+BoxOffset)  = BOX;
 
 	DrawBoard(); /* Display the clean Board */
+
+#ifdef SOUND
+	bit_fx4 (1);
+#endif
 }
 
 
@@ -254,7 +281,13 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		y *= spritesize;
 		
 		if(*(locn+temp2)==BUBB)
+		{
 			putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
+
+			#ifdef SOUND
+			bit_fx2 (5);
+			#endif
+		}
 		
 		*(locn+temp2) = *locn;
 		*locn = 0;
@@ -263,6 +296,10 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		putsprite(spr_xor,x,y,sprites + (spritemem * temp));
 		/* put new */
 		putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * temp));
+		
+		#ifdef SOUND
+		bit_fx2 (2);
+		#endif
 
 		(*ptr) += temp2;
 	}

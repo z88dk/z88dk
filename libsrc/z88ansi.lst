@@ -197,6 +197,10 @@ games/z88/bit_close_ei
 games/bit_click
 games/bit_play
 games/bit_fx
+games/bit_fx2
+games/bit_fx3
+games/bit_fx4
+games/bit_synth
 games/bit_frequency
 games/bit_beep
 games/z88/beeper

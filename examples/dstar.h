@@ -149,11 +149,64 @@ extern char sprites[];
 #endasm
 #endif
 
+
+#if (spritesize == 7)
+#asm
+._sprites
+                        
+ defb	7,7	;0=blank
+ defb    @00000000
+ defb    @00000000
+ defb    @00000000
+ defb    @00000000
+ defb    @00000000
+ defb    @00000000
+ defb    @00000000
+
+defb	8,7	;1=edge,
+ defb    @01111110
+ defb    @10101001
+ defb    @11000111
+ defb    @10110001
+ defb    @11001011
+ defb    @10100101
+ defb    @01111110
+
+defb	7,7	;2=clear ball
+ defb    @00000000
+ defb    @00011000
+ defb    @00100100
+ defb    @00100100
+ defb    @00011000
+ defb    @00000000
+ defb    @00000000
+
+defb	7,7	;3=moveable ball
+ defb    @00000000
+ defb    @00011000
+ defb    @00110100
+ defb    @00111100
+ defb    @00011000
+ defb    @00000000
+ defb    @00000000
+
+defb	7,7	;4=moveable block
+ defb    @00000000
+ defb    @00111100
+ defb    @00111100
+ defb    @00111100
+ defb    @00111100
+ defb    @00000000
+ defb    @00000000
+
+#endasm
+#endif
+
 #if (spritesize == 8)
 #asm
 ._sprites
  defb    8,8
- defb    @00000000 ; empty sprite
+ defb    @00000000	; empty sprite
  defb    @00000000
  defb    @00000000
  defb    @00000000
@@ -164,12 +217,12 @@ extern char sprites[];
 
  defb    8,8
  defb    @01111110	;1=edge,
- defb    @10000001
- defb    @10000001
- defb    @10000001
- defb    @10000001
- defb    @10000001
- defb    @10000001
+ defb    @10101001
+ defb    @11000111
+ defb    @10110001
+ defb    @11001011
+ defb    @10100101
+ defb    @10101001
  defb    @01111110
 
  defb    8,8
@@ -250,18 +303,18 @@ extern char sprites[];
  defb    16,16
  defb    @00000000, @00000000	;3=moveable ball
  defb    @00000000, @00000000
- defb    @00000111, @11100000
+ defb    @00000011, @11000000
  defb    @00001111, @00110000
  defb    @00011111, @11011000
+ defb    @00011111, @11101000
  defb    @00111111, @11101100
- defb    @00111111, @11101100
- defb    @00111111, @11111100
  defb    @00111111, @11111100
  defb    @00111111, @11111100
  defb    @00111111, @11111100
  defb    @00011111, @11111000
+ defb    @00011111, @11111000
  defb    @00001111, @11110000
- defb    @00000111, @11100000
+ defb    @00000011, @11000000
  defb    @00000000, @00000000
  defb    @00000000, @00000000
 
