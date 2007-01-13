@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.24 2007-01-10 22:33:39 aralbrec Exp $
+ * $Id: stdlib.h,v 1.25 2007-01-13 08:59:58 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -154,6 +154,8 @@ extern void __LIB__ __CALLEE__ div_callee(div_t *d, int num, int denom);
 extern void __LIB__            ldiv(ldiv_t *d, long num, long denom);
 
 #define div(a,b,c) div_callee(a,b,c)
+
+extern uint __LIB__ __FASTCALL__ isqrt(uint n);
 
 
 /******************************************************/
