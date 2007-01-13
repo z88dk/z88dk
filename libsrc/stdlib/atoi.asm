@@ -12,7 +12,7 @@
 ; *	djm 5/1/2000
 ; *
 ; * -----
-; * $Id: atoi.asm,v 1.3 2007-01-10 08:17:06 aralbrec Exp $
+; * $Id: atoi.asm,v 1.4 2007-01-13 09:05:11 aralbrec Exp $
 ; *
 ; */
 
@@ -55,8 +55,11 @@ LIB l_neg
    ld de,0
    ex de,hl
 
+   dec de
+   
 .loop
 
+   inc de
    ld a,(de)
    
    sub '0'                   ; inlined isdigit
@@ -73,12 +76,8 @@ LIB l_neg
    
    add a,l
    ld l,a
-   jr nc, noinc
+   jp nc, noinc
    inc h
-   
-.noinc
-
-   inc de
    jp loop
 
 ; #include <ctype.h>
