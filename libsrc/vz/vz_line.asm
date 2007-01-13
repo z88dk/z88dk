@@ -14,7 +14,7 @@ XREF ASMDISP_VZ_LINE_CALLEE
    ld e,l
    pop hl
    ex af,af
-   ld a,h
+   ld a,l
    pop hl
    ld h,a
    push hl

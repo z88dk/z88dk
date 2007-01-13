@@ -16,10 +16,10 @@ XREF scrbase
 
    pop af
    pop bc
-   pop hl
    pop de
+   pop hl
    push af
-   ld l,e
+   ld h,e
 
    ; l = x
    ; h = y

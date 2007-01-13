@@ -24,7 +24,7 @@ XREF ASMDISP_VZ_PLOT_CALLEE
    ld e,l
    pop hl
    ex af,af
-   ld a,h
+   ld a,l
    pop hl
    ld h,a
    ex af,af
@@ -66,11 +66,15 @@ XREF ASMDISP_VZ_PLOT_CALLEE
 
 .ldny1
 
-   ex af,af
-   exx
+   push af
+   push bc
+   push de
+   push hl
    call vz_plot_callee + ASMDISP_VZ_PLOT_CALLEE
-   exx
-   ex af,af
+   pop hl
+   pop de
+   pop bc
+   pop af
    
    dec b                     ; done?
    ret m
@@ -91,11 +95,15 @@ XREF ASMDISP_VZ_PLOT_CALLEE
    
 .ldnx1
 
-   ex af,af
-   exx
+   push af
+   push bc
+   push de
+   push hl
    call vz_plot_callee + ASMDISP_VZ_PLOT_CALLEE
-   exx
-   ex af,af
+   pop hl
+   pop de
+   pop bc
+   pop af
    
    dec b                     ; done?
    ret m
@@ -122,11 +130,15 @@ XREF ASMDISP_VZ_PLOT_CALLEE
 
 .lupy1
 
-   ex af,af
-   exx
+   push af
+   push bc
+   push de
+   push hl
    call vz_plot_callee + ASMDISP_VZ_PLOT_CALLEE
-   exx 
-   ex af,af
+   pop hl
+   pop de
+   pop bc
+   pop af
 
    dec b                     ; done?
    ret m
@@ -147,11 +159,15 @@ XREF ASMDISP_VZ_PLOT_CALLEE
 
 .lupx1
 
-   ex af,af
-   exx
+   push af
+   push bc
+   push de
+   push hl
    call vz_plot_callee + ASMDISP_VZ_PLOT_CALLEE
-   exx
-   ex af,af
+   pop hl
+   pop de
+   pop bc
+   pop af
    
    dec b                     ; done?
    ret m

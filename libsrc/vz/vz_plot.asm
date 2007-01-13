@@ -8,11 +8,12 @@ XREF ASMDISP_VZ_PLOT_CALLEE
 
    pop af
    pop bc
-   pop hl
    pop de
-   push de
+   pop hl
    push hl
+   push de
    push bc
    push af
+   ld h,e
 
-   jp vz_plot_callee + ASMDISP_VZ_PLOT_CALLEE - 1
+   jp vz_plot_callee + ASMDISP_VZ_PLOT_CALLEE
