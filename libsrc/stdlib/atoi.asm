@@ -12,7 +12,7 @@
 ; *	djm 5/1/2000
 ; *
 ; * -----
-; * $Id: atoi.asm,v 1.4 2007-01-13 09:05:11 aralbrec Exp $
+; * $Id: atoi.asm,v 1.5 2007-01-13 09:06:01 aralbrec Exp $
 ; *
 ; */
 
@@ -76,7 +76,7 @@ LIB l_neg
    
    add a,l
    ld l,a
-   jp nc, noinc
+   jp nc, loop
    inc h
    jp loop
 
