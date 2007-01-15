@@ -5,7 +5,7 @@
 /*
  * Now some trickery to link in the correct routines for far
  *
- * $Id: malloc.h,v 1.9 2006-12-23 08:10:06 aralbrec Exp $
+ * $Id: malloc.h,v 1.10 2007-01-15 07:12:52 aralbrec Exp $
  */
 
 
@@ -41,23 +41,32 @@
 // sbrk(25000,126);   /* add 126 bytes from 25000-25125 inclusive */
 // a = malloc(100);
 
-extern void __LIB__ mallinit(void);
-extern void __LIB__ sbrk(void *addr, int size);
-extern void __LIB__ *calloc(int nobj, int size); 
+extern void __LIB__              mallinit(void);
+extern void __LIB__              sbrk(void *addr, int size);
+extern void __LIB__ __CALLEE__   sbrk_callee(void *addr, int size);
+extern void __LIB__              *calloc(int nobj, int size);
+extern void __LIB__ __CALLEE__   *calloc_callee(int nobj, int size); 
 extern void __LIB__ __FASTCALL__ free(void *addr);
 extern void __LIB__ __FASTCALL__ *malloc(int size);
-extern void __LIB__ *realloc(void *p, int size);
-extern void __LIB__ mallinfo(int *total, int *largest);
+extern void __LIB__              *realloc(void *p, int size);
+extern void __LIB__ __CALLEE__   *realloc_callee(void *p, int size);
+extern void __LIB__              mallinfo(int *total, int *largest);
+extern void __LIB__ __CALLEE__   mallinfo_callee(int *total, int *largest);
+
+#define sbrk(a,b)      sbrk_callee(a,b)
+#define calloc(a,b)    calloc_callee(a,b)
+#define realloc(a,b)   realloc_callee(a,b)
+#define mallinfo(a,b)  mallinfo_callee(a,b)
 
 // The following is to allow programs using the
 // older version of the near malloc library to
 // continue to work
 
 #define HEAPSIZE(bp)       unsigned char heap[bp+4];
-#define heapinit(a)        mallinit(); sbrk(heap+4,a);
-#define getfree()          asm("LIB\tmallinfo\nld\thl,-2\nadd\thl,sp\npush\thl\ndec\thl\ndec\thl\npush\thl\ncall\tmallinfo\npop\thl\npop\thl\n");
-#define getlarge()         asm("LIB\tmallinfo\nld\thl,-2\nadd\thl,sp\npush\thl\ndec\thl\ndec\thl\npush\thl\ncall\tmallinfo\npop\thl\npop\tbc\n");
-#define realloc_down(a,b)  realloc(a,b);
+#define heapinit(a)        mallinit(); sbrk_callee(heap+4,a);
+#define getfree()          asm("LIB\tMAHeapInfo\nXREF\t_heap\nld\thl,_heap\ncall\tMAHeapInfo\nex\tde,hl\n");
+#define getlarge()         asm("LIB\tMAHeapInfo\nXREF\t_heap\nld\thl,_heap\ncall\tMAHeapInfo\nld\tl,c\nld\th,b\n");
+#define realloc_down(a,b)  realloc_callee(a,b);
 
 // Named Heap Functions
 //
@@ -93,12 +102,25 @@ extern void __LIB__ mallinfo(int *total, int *largest);
 // to a call to malloc(size).
 
 extern void __LIB__ __FASTCALL__ HeapCreate(void *heap);
-extern void __LIB__ HeapSbrk(void *heap, void *addr, int size);
-extern void __LIB__ *HeapCalloc(void *heap, int nobj, int size); 
-extern void __LIB__ HeapFree(void *heap, void *addr);
-extern void __LIB__ HeapAlloc(void *heap, int size);
-extern void __LIB__ *HeapRealloc(void *heap, void *p, int size);
-extern void __LIB__ HeapInfo(void *heap, int *total, int *largest);
+extern void __LIB__              HeapSbrk(void *heap, void *addr, int size);
+extern void __LIB__ __CALLEE__   HeapSbrk_callee(void *heap, void *addr, int size);
+extern void __LIB__              *HeapCalloc(void *heap, int nobj, int size);
+extern void __LIB__ __CALLEE__   *HeapCalloc_callee(void *heap, int nobj, int size);
+extern void __LIB__              HeapFree(void *heap, void *addr);
+extern void __LIB__ __CALLEE__   HeapFree_callee(void *heap, void *addr);
+extern void __LIB__              *HeapAlloc(void *heap, int size);
+extern void __LIB__ __CALLEE__   *HeapAlloc_callee(void *heap, int size);
+extern void __LIB__              *HeapRealloc(void *heap, void *p, int size);
+extern void __LIB__ __CALLEE__   *HeapRealloc_callee(void *heap, void *p, int size);
+extern void __LIB__              HeapInfo(int *total, int *largest, void *heap);
+extern void __LIB__ __CALLEE__   HeapInfo_callee(int *total, int *largest, void *heap);
+
+#define HeapSbrk(a,b,c)     HeapSbrk_callee(a,b,c)
+#define HeapCalloc(a,b,c)   HeapCalloc_callee(a,b,c)
+#define HeapFree(a,b)       HeapFree_callee(a,b)
+#define HeapAlloc(a,b)      HeapAlloc_callee(a,b)
+#define HeapRealloc(a,b,c)  HeapRealloc_callee(a,b,c)
+#define HeapInfo(a,b,c)     HeapInfo_callee(a,b,c)
 
 #else
 

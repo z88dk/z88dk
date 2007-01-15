@@ -1,11 +1,9 @@
-; void sbrk(void *addr, unsigned int size)
-; 12.2006 aralbrec
+; CALLER linkage for function pointers
 
 XLIB sbrk
-XDEF ASMDISP_SBRK
 
-LIB HeapSbrk
-XREF _heap, ASMDISP_HEAPSBRK
+LIB sbrk_callee
+XREF ASMDISP_SBRK_CALLEE
 
 .sbrk
 
@@ -15,13 +13,5 @@ XREF _heap, ASMDISP_HEAPSBRK
    push hl
    push bc
    push de
-
-.asmentry
    
-   ; bc = size of block in bytes >- 4
-   ; hl = address of block
-   
-   ld de,_heap
-   jp HeapSbrk + ASMDISP_HEAPSBRK
-
-DEFC ASMDISP_SBRK = asmentry - sbrk
+   jp sbrk_callee + ASMDISP_SBRK_CALLEE

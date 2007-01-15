@@ -1,12 +1,13 @@
-; void mallinfo(unsigned int *total, unsigned int *largest)
-; 12.2006 aralbrec
+; CALLER linkage for function pointers
 
 XLIB mallinfo
 
 LIB HeapInfo
-XREF _heap, CDISP_HEAPINFO
+XREF _heap
 
 .mallinfo
 
    ld hl,_heap
-   jp HeapInfo + CDISP_HEAPINFO
+   ex (sp),hl
+   push hl
+   jp HeapInfo

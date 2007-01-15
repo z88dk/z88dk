@@ -1,11 +1,9 @@
-; void *calloc(unsigned int nobj, unsigned int size) 
-; 12.2006 aralbrec
+; CALLEE linkage for function pointers
 
 XLIB calloc
-XDEF ASMDISP_CALLOC
 
-LIB l_mult, HeapCalloc
-XREF _heap, ASMDISP_HEAPCALLOC
+LIB HeapCalloc_callee
+XREF _heap, ASMDISP_HEAPCALLOC_CALLEE
 
 .calloc
 
@@ -15,16 +13,6 @@ XREF _heap, ASMDISP_HEAPCALLOC
    push hl
    push de
    push bc
-
-; enter : hl = number of objects
-;         de = size of each object
-; exit  : hl = address of memory block and carry set if successful
-;              else 0 and no carry if failed
-; uses  : af, bc, de, hl
-
-.asmentry
-
+   
    ld bc,_heap
-   jp HeapCalloc + ASMDISP_HEAPCALLOC
-
-DEFC ASMDISP_CALLOC = asmentry - calloc
+   jp HeapCalloc_callee + ASMDISP_HEAPCALLOC_CALLEE

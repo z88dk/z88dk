@@ -1,9 +1,10 @@
-; CALLER linkage for function pointers
+; void __CALLEE__ HeapInfo_callee(unsigned int *total, unsigned int *largest, void *heap)
+; 12.2006 aralbrec
 
-XLIB HeapInfo
+XLIB HeapInfo_callee
 LIB MAHeapInfo
 
-.HeapInfo
+.HeapInfo_callee
 
    pop af
    pop hl
@@ -17,9 +18,6 @@ LIB MAHeapInfo
    ld (hl),e
    inc hl
    ld (hl),d
-   push hl
-   push hl
-   push hl
    ex af,af
    push af
    ret

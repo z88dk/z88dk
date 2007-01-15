@@ -2,11 +2,12 @@
 ; 12.2006 aralbrec
 
 XLIB mallinit
+
+LIB l_setmem
 XREF _heap
 
 .mallinit
 
-   ld hl,0
-   ld (_heap),hl
-   ld (_heap+2),hl
-   ret
+   xor a
+   ld hl,_heap
+   jp l_setmem - 7           ; four bytes: 2*4-1

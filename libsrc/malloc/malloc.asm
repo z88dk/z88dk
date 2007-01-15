@@ -2,16 +2,14 @@
 ; 12.2006 aralbrec
 
 XLIB malloc
-XDEF ASMDISP_MALLOC
 
-LIB HeapAlloc
-XREF _heap, ASMDISP_HEAPALLOC
+LIB HeapAlloc_callee
+XREF _heap, ASMDISP_HEAPALLOC_CALLEE
 
 .malloc
 
    ld c,l
    ld b,h
    ld hl,_heap
-   jp HeapAlloc + ASMDISP_HEAPALLOC
 
-DEFC ASMDISP_MALLOC = 0
+   jp HeapAlloc_callee + ASMDISP_HEAPALLOC_CALLEE

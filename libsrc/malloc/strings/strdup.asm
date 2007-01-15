@@ -11,10 +11,9 @@
 ; 12.2006 aralbrec
 
 XLIB strdup
-XDEF ASMDISP_STRDUP
 
-LIB HeapAlloc
-XREF _heap, ASMDISP_HEAPALLOC
+LIB HeapAlloc_callee
+XREF _heap, ASMDISP_HEAPALLOC_CALLEE
 
 .strdup
 
@@ -31,7 +30,7 @@ XREF _heap, ASMDISP_HEAPALLOC
    
    ld hl,_heap
    push bc
-   call HeapAlloc + ASMDISP_HEAPALLOC
+   call HeapAlloc_callee + ASMDISP_HEAPALLOC_CALLEE
    pop bc
    pop de
    ret nc
@@ -41,8 +40,6 @@ XREF _heap, ASMDISP_HEAPALLOC
    ldir
    pop hl
    ret
-
-DEFC ASMDISP_STRDUP = 0
 
 ;
 ;#include <stdlib.h>

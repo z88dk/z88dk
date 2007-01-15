@@ -2,14 +2,11 @@
 ; 12.2006 aralbrec
 
 XLIB free
-XDEF ASMDISP_FREE
 
-LIB HeapFree
-XREF _heap, ASMDISP_HEAPFREE
+LIB HeapFree_callee
+XREF _heap, ASMDISP_HEAPFREE_CALLEE
 
 .free
 
    ld de,_heap
-   jp HeapFree + ASMDISP_HEAPFREE
-
-DEFC ASMDISP_FREE = 0
+   jp HeapFree_callee + ASMDISP_HEAPFREE_CALLEE
