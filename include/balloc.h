@@ -58,10 +58,15 @@
 #define BAQTBL(numq)  uchar ba_qtbl[numq*2];
 
 extern void __LIB__ __FASTCALL__ ba_Init(uchar numq /* >=1 */);
-extern void __LIB__ *ba_AddMem(uchar q, uchar numblocks /* >=1 */, uint size /* >=2 */, void *addr);
+extern void __LIB__              *ba_AddMem(uchar q, uchar numblocks /* >=1 */, uint size /* >=2 */, void *addr);
+extern void __LIB__ __CALLEE__   *ba_AddMem_callee(uchar q, uchar numblocks, uint size, void *addr);
 extern uint __LIB__ __FASTCALL__ ba_BlockCount(uchar q);
 extern void __LIB__ __FASTCALL__ *ba_Malloc(uchar q);
 extern void __LIB__ __FASTCALL__ ba_Free(void *addr);
-extern void __LIB__ *ba_BestFit(uchar q, uchar numq /* >=1 */);
+extern void __LIB__              *ba_BestFit(uchar q, uchar numq /* >=1 */);
+extern void __LIB__ __CALLEE__   *ba_BestFit_callee(uchar q, uchar numq);
+
+#define ba_AddMem(a,b,c,d)  ba_AddMem_callee(a,b,c,d)
+#define ba_BestFit(a,b)     ba_BestFit_callee(a,b)
 
 #endif
