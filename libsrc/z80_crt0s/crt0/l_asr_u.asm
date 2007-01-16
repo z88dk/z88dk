@@ -14,10 +14,9 @@
 .l_asr_u_1
         dec     e
         ret     m
-        and     a
-        rr      h
+	srl	h
         rr      l
-        jr      l_asr_u_1
+        jp      l_asr_u_1
 
 
 
