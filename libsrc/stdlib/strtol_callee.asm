@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol_callee.asm,v 1.1 2007-01-10 08:17:07 aralbrec Exp $
+; * $Id: strtol_callee.asm,v 1.2 2007-01-16 22:00:30 aralbrec Exp $
 ; *
 ; */
 ;
@@ -39,8 +39,20 @@ XDEF ASMDISP_STRTOL_CALLEE
    jr z, noendp
    
    push de                   ; push char **endp parameter for writeendp
-   ld de,writeendp           ; put writeendp on stack so that it
-   push de                   ; is executed on ret
+   call noendp               ; do strtol but return here to write endp
+
+.writeendp
+
+   ; dehl = result
+   ; bc = char *
+   ; stack = char **endp
+
+   ex (sp),hl                ; hl = char **endp
+   ld (hl),c                 ; write last string position
+   inc hl                    ; into endp
+   ld (hl),b
+   pop hl
+   ret
    
 .noendp
 
@@ -73,9 +85,9 @@ XDEF ASMDISP_STRTOL_CALLEE
    cp '-'
    jr nz, signdone
    inc hl                    ; this is a negative number
-   push hl
-   ld hl,l_long_neg          ; sneakily push negate long function on stack
-   ex (sp),hl                ; so it is run on ret
+   
+   call signdone             ; do strtol but return here to negate result
+   jp l_long_neg             ; dehl = -dehl
    
 .signdone
 
@@ -244,19 +256,6 @@ XDEF ASMDISP_STRTOL_CALLEE
    ld de,0                   ; dehl = result = 0
    ld h,d
    ld l,e
-   ret
-   
-.writeendp
-
-   ; dehl = result
-   ; bc = char *
-   ; stack = char **endp
-
-   ex (sp),hl                ; hl = char **endp
-   ld (hl),c                 ; write last string position
-   inc hl                    ; into endp
-   ld (hl),b
-   pop hl
    ret
 
 DEFC ASMDISP_STRTOL_CALLEE = asmentry - strtol_callee

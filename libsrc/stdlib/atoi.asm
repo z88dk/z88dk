@@ -12,7 +12,7 @@
 ; *	djm 5/1/2000
 ; *
 ; * -----
-; * $Id: atoi.asm,v 1.5 2007-01-13 09:06:01 aralbrec Exp $
+; * $Id: atoi.asm,v 1.6 2007-01-16 22:00:30 aralbrec Exp $
 ; *
 ; */
 
@@ -47,8 +47,9 @@ LIB l_neg
    cp '-'
    jr nz, signdone
    inc hl                    ; this is a negative number
-   ld de,l_neg               ; sneakily push negatehl on stack
-   push de                   ;  so it is run on ret
+   
+   call signdone             ; do atoi but come back here to negate result
+   jp l_neg                  ; hl = -hl
    
 .signdone
 

@@ -32,8 +32,9 @@ LIB l_long_neg
    cp '-'
    jr nz, signdone
    inc hl                    ; this is a negative number
-   ld de,l_long_neg          ; sneakily push negate long function on stack
-   push de                   ; so it is run on ret
+   
+   call signdone             ; do atol but come back here to negate result
+   jp l_long_neg             ; dehl = -dehl
    
 .signdone
 
