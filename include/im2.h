@@ -132,4 +132,20 @@ extern void __LIB__ im2_RegHookFirst(uchar vector, void *hook);
 extern void __LIB__ im2_RegHookLast(uchar vector, void *hook);
 extern int  __LIB__ im2_RemoveHook(uchar vector, void *hook);
 
+extern void __LIB__ __CALLEE__  im2_Init_callee(uchar size, void *tableaddr, void *default_isr);
+extern void __LIB__ __CALLEE__ *im2_InstallISR_callee(uchar vector, void *isr);
+extern void __LIB__ __CALLEE__ *im2_CreateGenericISR_callee(uchar numhooks, void *addr);
+extern void __LIB__ __CALLEE__ *im2_CreateGenericISRLight_callee(uchar numhooks, void *addr);
+extern void __LIB__ __CALLEE__  im2_RegHookFirst_callee(uchar vector, void *hook);
+extern void __LIB__ __CALLEE__  im2_RegHookLast_callee(uchar vector, void *hook);
+extern int  __LIB__ __CALLEE__  im2_RemoveHook_callee(uchar vector, void *hook);
+
+#define im2_Init(a,b,c)                 im2_Init_callee(a,b,c)
+#define im2_InstallISR(a,b)             im2_InstallISR_callee(a,b)
+#define im2_CreateGenericISR(a,b)       im2_CreateGenericISR_callee(a,b)
+#define im2_CreateGenericISRLight(a,b)  im2_CreateGenericISRLight_callee(a,b)
+#define im2_RegHooKFirst(a,b)           im2_RegHookFirst_callee(a,b)
+#define im2_RegHookLast(a,b)            im2_RegHookLast_callee(a,b)
+#define im2_RemoveHook(a,b)             im2_RemoveHook_callee(a,b)
+
 #endif
