@@ -15,4 +15,4 @@
         dec   e
         ret   m
         add   hl,hl
-        jr    l_asl1
+        jp    l_asl1
