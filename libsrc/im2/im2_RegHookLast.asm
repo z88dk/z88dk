@@ -1,18 +1,17 @@
-; 05.2005 aralbrec
+; CALLER linkage for function pointers
 
 XLIB im2_RegHookLast
-LIB IM2RegHookLast
+
+LIB im2_RegHookLast_callee
+XREF ASMDISP_IM2_REGHOOKLAST_CALLEE
 
 .im2_RegHookLast
-   ld hl,2
-   add hl,sp
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld l,(hl)
-   jp IM2RegHookLast
 
-; enter: DE = address of hook (subroutine)
-;         L = interrupt vector where Generic ISR is installed
-; used : AF,BC,HL
+   pop bc
+   pop de
+   pop hl
+   push hl
+   push de
+   push bc
+
+   jp im2_RegHookLast_callee + ASMDISP_IM2_REGHOOKLAST_CALLEE

@@ -1,23 +1,19 @@
-; 05.2005 aralbrec
+; CALLER linkage for function pointers
 
 XLIB im2_Init
-LIB IM2Init
+
+LIB im2_Init_callee
+XREF ASMDISP_IM2_INIT_CALLEE
 
 .im2_Init
-   ld hl,2
-   add hl,sp
-   ld c,(hl)
-   inc hl
-   ld b,(hl)
-   inc hl
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld e,(hl)
-   jp IM2Init
 
-; enter:  E = size of interrupt vector table minus 2; at least 1
-;             = 254 for 256-byte table, 255 for 257-byte table
-;         D = MSB of interrupt vector table address
-;        BC = default ISR address
-; uses : AF,BC,DE,HL,I
+   pop hl
+   pop bc
+   pop af
+   pop de
+   push de
+   push af
+   push bc
+   push hl
+   
+   jp im2_Init_callee + ASMDISP_IM2_INIT_CALLEE

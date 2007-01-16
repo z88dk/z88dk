@@ -1,18 +1,17 @@
-; 05.2005 aralbrec
+; CALLER linkage for function pointers
 
 XLIB im2_RegHookFirst
-LIB IM2RegHookFirst
+
+LIB im2_RegHookFirst_callee
+XREF ASMDISP_IM2_REGHOOKFIRST_CALLEE
 
 .im2_RegHookFirst
-   ld hl,2
-   add hl,sp
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld l,(hl)
-   jp IM2RegHookFirst
 
-; enter: DE = address of hook (subroutine)
-;         L = interrupt vector where generic ISR is installed
-; used : AF,BC,DE,HL
+   pop bc
+   pop de
+   pop hl
+   push hl
+   push de
+   push bc
+
+   jp im2_RegHookFirst_callee + ASMDISP_IM2_REGHOOKFIRST_CALLEE

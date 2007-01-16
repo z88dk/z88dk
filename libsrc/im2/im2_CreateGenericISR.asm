@@ -1,16 +1,18 @@
-; 05.2005 aralbrec
+; CALLER linkage for function pointers
 
 XLIB im2_CreateGenericISR
-LIB IM2CreateGenericISR
+
+LIB im2_CreateGenericISR_callee
+XREF ASMDISP_IM2_CREATEGENERICISR_CALLEE
 
 .im2_CreateGenericISR
-   ld hl,2
-   add hl,sp
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld a,(hl)
-   call IM2CreateGenericISR
-   ex de,hl
-   ret
+
+   pop hl
+   pop de
+   pop bc
+   push bc
+   push de
+   push hl
+   ld a,b
+   
+   jp im2_CreateGenericISR_callee + ASMDISP_IM2_CREATEGENERICISR_CALLEE

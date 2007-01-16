@@ -1,21 +1,17 @@
-; 05.2005 aralbrec
+; CALLER linkage for function pointers
 
 XLIB im2_InstallISR
-LIB IM2InstallISR
+
+LIB im2_InstallISR_callee
+XREF ASMDISP_IM2_INSTALLISR_CALLEE
 
 .im2_InstallISR
-   ld hl,2
-   add hl,sp
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld l,(hl)
-   call IM2InstallISR
-   ex de,hl
-   ret
 
-; enter:  L = vector to install on (even by convention)
-;        DE = new ISR address
-; exit : DE = old ISR address
-; uses : AF,DE,HL
+   pop af
+   pop de
+   pop hl
+   push hl
+   push de
+   push af
+   
+   jp im2_InstallISR_callee + ASMDISP_IM2_INSTALLISR_CALLEE
