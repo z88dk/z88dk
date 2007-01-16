@@ -5,14 +5,23 @@
 ;       6/9/98  djm
 
                 XLIB    l_cm_bc
-                LIB     l_bcneg
-
-
 
 .l_cm_bc
-        ld a,b
-        or a
-        ret p
-        call    l_bcneg
-        ret
 
+   ld a,b
+   or a
+   ret p
+   cpl
+   ld b,a
+   ld a,c
+   cpl
+   ld c,a
+   inc bc
+   ret
+
+
+;        ld a,b
+;        or a
+;        ret p
+;        call    l_bcneg
+;        ret
