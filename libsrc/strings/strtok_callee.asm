@@ -73,6 +73,7 @@ XREF ASMDISP_STRCHR_CALLEE
    inc hl
    ld (lastpos),hl
    pop hl
+   scf
    ret
 
 .lastpos
