@@ -13,11 +13,9 @@
 .l_asr1
         dec     e
         ret     m
-        ld      a,h
-        rla
-        rr      h
-        rr      l
-        jr      l_asr1
+        sra h
+        rr l
+        jp      l_asr1
 
 
 
