@@ -3,18 +3,17 @@
 	Coloured sprites demo - shows the zxlowgfx capabilities
 	uses cputsprite
 
-	Uncomment the "lr64x48" #define to use the alternate resolution,
-	or comment the "bufferedgfx" one to see what happens behind the scenes.
+	The "lr64x48" #define activates the alternate resolution,
 
-	build with:   zcc +zx -lndos -lm csprite.c
+	build with:   zcc +zx -lndos -create-app csprite.c
+	              - or -
+	              zcc +zx -lndos -create-app -Dlr64x48 csprite.c
 
-	$id:$
+	$Id: csprite.c,v 1.2 2007-01-17 19:32:50 stefano Exp $
 */
 
 
-#define lr64x48  1
-
-//#define bufferedgfx 1
+//#define lr64x48  1
 
 #include <stdio.h>
 #include <zxlowgfx.h>

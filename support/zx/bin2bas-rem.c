@@ -1,18 +1,34 @@
 /*
- *	Quick 'n' dirty mym to tap converter
- *
- *	Usage: bin2rem [binfile] [tapfile]
+ *	Usage: bin2rem [binfile] [tapfile] <line number>
  *
  *	Dominic Morris  - 08/02/2000 - tapmaker
  *	Stefano	Bodrato - 03/12/2000 - bin2tap
  *	Stefano	Bodrato - 13/09/2001 - bin2bas-rem
  *
  *	Creates a new TAP file (overwriting if necessary) with a BASIC program line 
- *	in which we store the binary file as if it was a REMark.
+ *	in which we store the self-relocating binary file as if it was a REMark.
  *
- *	To be used with relocatable code only !!
+ *	To compile a relocatable program:
+ *	zcc +zx -Ca-R -lm -lndos program.c
+ *	bin2bas-rem a.bin a.tap <line number>
  *
- *	$Id: bin2bas-rem.c,v 1.3 2001-09-14 14:13:54 stefano Exp $
+ *	To run the machine code:
+ *	PRINT USR (PEEK 23635+256*PEEK 23636+5)
+ *	- or  -
+ *	1   DEF FN l()=USR(PEEK 23637+256*PEEK 23638+5)
+ *	100 LET x=FN l()
+ *	101 REM (program)
+ *	200 LET x=FN l()
+ *	201 REM (another merged program)
+ *
+ *
+ *	Warning: most of the fcntl drivers just won't run; in that case BASIC is moved, in fact.
+ *               DO NOT edit the REM line.  You need to place it at its right position with this tool.
+ *
+ *	Hint: if you are in trouble try to MERGE the REM lines again in to you main BASIC block.
+ *
+ *
+ *	$Id: bin2bas-rem.c,v 1.4 2007-01-17 19:32:50 stefano Exp $
  */
 
 #include <stdio.h>
@@ -98,7 +114,19 @@ int main(int argc, char *argv[])
 
 /* BIN stuff */
 
-	for (i=0; i<len;i++) {
+	/* eat the first 4 bytes */
+	c=getc(fpin);
+	c=getc(fpin);
+	c=getc(fpin);
+	c=getc(fpin);
+	
+	/* replace with the ZX Spectrum specific ones */
+	writebyte(0xC5,fpout);	/* push bc */
+	writebyte(0xC5,fpout);	/* push bc */
+	writebyte(0xFD,fpout);	/* --- */
+	writebyte(0xE1,fpout);	/* pop iy */
+
+	for (i=0; i<(len-4);i++) {
 		c=getc(fpin);
 		writebyte(c,fpout);
 	}

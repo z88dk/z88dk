@@ -1,12 +1,13 @@
 /*
  *      LO REZ graphics functions for the ZX Spectrum
+ *	
+ *	32x48 or (defining the "ALTLOWGFX" variable) 64x24 pixels.
  *
- *	$Id: zxlowgfx.h,v 1.1 2003-10-29 13:38:55 stefano Exp $
+ *	$Id: zxlowgfx.h,v 1.2 2007-01-17 19:32:50 stefano Exp $
  */
 
 #ifndef __ZXLOGFX_H__
 #define __ZXLOGFX_H__
-
 
 /* Clear and init pseudo-graph screen */
 void cclg(int color);
@@ -17,9 +18,14 @@ void cplot(int x, int y, int color);
 /* Get the pixel color */
 int cpoint(int x, int y);
 
+/* Draw a line */
+void cdraw(int x1, int y1, int x2, int y2, int color);
+
+/* Relative draw */
+void cdrawr(int x, int y, int color);
+
 /* Put a sprite on screen */
 void cputsprite(int x, int y, int color, void *sprite);
-
 
 /* Clear and init pseudo-graph buffer */
 void cclgbuffer(int color);
@@ -49,7 +55,7 @@ void cclg(int color)
 	ld	e,l
 	inc	de
 
-#if lr64x48
+#if ALTLOWGFX
 	ld	(hl),@11110000
 	ld	bc,6144
 	ldir
@@ -100,7 +106,7 @@ void cplot(int x, int y, int color)
 
 cplotpixel:
 
-#if lr64x48
+#if ALTLOWGFX
 	ld	a,h
 	cp	64
 	ret	nc
@@ -118,7 +124,7 @@ cplotpixel:
 	ret	nc
 #endif
 
-#if lr64x48
+#if ALTLOWGFX
 	ld	b,a
 	ld	a,h
 	srl	a
@@ -179,6 +185,7 @@ cevenrow:
 	#endasm
 }
 
+
 /* Get the pixel color */
 int cpoint(int x, int y)
 {
@@ -190,6 +197,16 @@ int cpoint(int x, int y)
 	ld	h,(ix+4)
 
 getpixel:
+
+#if ALTLOWGFX
+	ld	a,h
+	cp	64
+	ret	nc
+	
+	ld	a,l
+	cp	24
+	ret	nc
+#else
 	ld	a,h
 	cp	32
 	ret	nc
@@ -197,9 +214,17 @@ getpixel:
 	ld	a,l
 	cp	48
 	ret	nc
+#endif
 	
+#if ALTLOWGFX
+	ld	b,a
+	ld	a,h
+	srl	a
+	ld	h,a
+#else
 	srl	a	; every "row" has two pixels
 	ld	b,a	; row count
+#endif
 	
 	push	af	; save the even/odd bit in carry
 
@@ -247,9 +272,67 @@ gcevenrow:
 	#endasm
 }
 
+
+/* Relative draw */
+void cdrawr(int x, int y, int color)
+{
+	#asm
+	LIB	line_r
+	
+	ld	ix,0
+	add	ix,sp
+	ld	e,(ix+4)	;py
+	ld	d,(ix+5)
+	ld	l,(ix+6)	;px
+	ld	h,(ix+7)
+	ld	a,(ix+2)
+	and	7
+	ld	(color+1),a
+	ld      ix,csplot
+	jp    line_r
+	#endasm
+}
+
+
+/* Draw a line */
+void cdraw(int x0, int y0, int x1, int y1, int color)
+{
+	#asm
+	LIB	line
+	XREF	COORDS
+	
+	ld	ix,0
+	add	ix,sp
+	xor	a
+	ld	l,(ix+8)	;y0
+	ld	h,(ix+10)	;x0
+	ld	e,(ix+4)	;y1
+	ld	d,(ix+6)	;x1
+	ld	a,(ix+2)
+	and	7
+	ld	(color+1),a
+	push	hl
+	push    de
+	call	csplot
+	pop     de
+	pop	hl
+	ld      ix,csplot
+	call    line
+	ret
+	
+csplot:
+	ld	(COORDS),hl
+	push	bc
+color:	ld	c,0
+	call	cplotpixel
+	pop	bc
+	ret
+
+	#endasm
+}
+
+
 /* Put a sprite on screen */
-
-
 void cputsprite(int color, int x, int y, void *sprite)
 {
 	#asm
@@ -277,17 +360,6 @@ void cputsprite(int color, int x, int y, void *sprite)
 
 	ld	h,d
 	ld	l,e
-
-
-;        inc	hl
-;        inc	hl
-;        inc	hl
-
-;        ld      e,(hl)
-; 	inc	hl
-;        inc     hl
-;        ld      d,(hl)	; x and y coords
-
 
 .door
 	ld	a,(ix+0)	; Width
@@ -364,6 +436,7 @@ void cputsprite(int color, int x, int y, void *sprite)
 	
 	#endasm
 }
+
 
 /* copy the gfx buffer, if used */
 void ccopybuffer(void)

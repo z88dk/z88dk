@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.11 2006-06-18 19:05:53 dom Exp $
+;       $Id: spec_crt0.asm,v 1.12 2007-01-17 19:32:50 stefano Exp $
 ;
 
 
@@ -60,6 +60,7 @@
 
 
 .start
+	ld	iy,23610	; restore the right iy value, fixes the self-relocating trick
 IF !DEFINED_ZXVGS
         ld      (start1+1),sp	;Save entry stack
 ENDIF

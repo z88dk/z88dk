@@ -3,15 +3,17 @@
 	Coloured mandelbrot demo - shows the zxlowgfx capabilities
 	uses cclg, cplot, cpoint (for the color cycling), ccopybuffer.
 
-	Uncomment the "lr64x48" #define to use the alternate resolution,
-	or comment the "bufferedgfx" one to see what happens behind the scenes.
+	The "lr64x48" #define activates the alternate resolution.
+	Comment out the "bufferedgfx" #define to see what happens behind the scenes.
 
-	build with:   zcc +zx -lndos -lm cmandel.c
+	build with:   zcc +zx -lndos -lm -create-app cmandel.c
+	              - or -
+	              zcc +zx -lndos -lm -create-app -Dlr64x48 cmandel.c
 
-	$id:$
+	$Id: cmandel.c,v 1.2 2007-01-17 19:32:50 stefano Exp $
 */
 
-//#define lr64x48  1
+//#define DALTLOWGFX  1
 #define bufferedgfx 1
 
 #include <stdio.h>
@@ -29,7 +31,7 @@ float l,m,n,o,p;
 	cclg(1);  // Blue background
 
 
-#ifdef lr64x48
+#ifdef ALTLOWGFX
 	xmax=64;
 	ymax=24;
 #else
