@@ -75,4 +75,3 @@ LIB IM2CreateCommon
    jp (hl)
 
 DEFC ASMDISP_IM2_CREATEGENERICISRLIGHT_CALLEE = asmentry - im2_CreateGenericISRLight_callee
-DEFC _im2_hookDisp = runhooks - GenericISRLight
