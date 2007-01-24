@@ -21,11 +21,11 @@ XDEF ASMDISP_STRNCAT_CALLEE
 
 .asmentry
 
+   push de
+
    ld a,b
    or c                      ; if n=0 don't do anything
-   ret z
-   
-   push de
+   jr z, exit
    
    ; first find the end of string s1
    
@@ -52,6 +52,9 @@ XDEF ASMDISP_STRNCAT_CALLEE
 .done
 
    ld (de),a
+
+.exit
+
    pop hl
    ret
 
