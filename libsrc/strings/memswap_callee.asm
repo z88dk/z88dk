@@ -1,4 +1,4 @@
-; void __CALLEE__ memswap_callee(void *s1, void *s2, uint n)
+; void __CALLEE__ *memswap_callee(void *s1, void *s2, uint n)
 ; swap N bytes in the two memory regions
 ; 01.2007 aralbrec
 
@@ -24,6 +24,8 @@ XDEF ASMDISP_MEMSWAP_CALLEE
    or c
    ret z
 
+   push hl
+
 .loop
    
    ld a,(de)
@@ -32,7 +34,8 @@ XDEF ASMDISP_MEMSWAP_CALLEE
    ld (hl),a
    inc hl
    jp pe, loop
-   
+
+   pop hl
    ret
 
 DEFC ASMDISP_MEMSWAP_CALLEE = asmentry - memswap_callee
