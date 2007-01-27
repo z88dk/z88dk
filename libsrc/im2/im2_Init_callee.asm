@@ -23,6 +23,7 @@ XDEF ASMDISP_IM2_INIT_CALLEE
 .IM2Init
 
    ld i,a
+   ld d,a
    ld a,e
    
    ld e,0
