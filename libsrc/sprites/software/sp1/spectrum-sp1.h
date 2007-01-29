@@ -137,7 +137,7 @@ struct sp1_tp {                       // "tile pairs" - 3 bytes - A struct to ho
 
 struct sp1_pss {                      // "print string struct" - 11 bytes - A struct holding print state information
 
-   struct sp1_Rect    *bounds;        // +0 rectangular boundary within which printing will be allowed
+   struct sp1_Rect   *bounds;         // +0 rectangular boundary within which printing will be allowed
    uchar              flags;          // +2 bit 0=invalidate?, 1=xwrap?, 2=yinc?, 3=ywrap?
    uchar              x;              // +3 current x coordinate of cursor with respect to top left corner of bounds
    uchar              y;              // +4 current y coordinate of cursor with respect to top left corner of bounds
@@ -229,9 +229,40 @@ extern void               __LIB__   sp1_GetSprClr(uchar **sprsrc, struct sp1_ap 
 
 extern void               __LIB__  *sp1_PreShiftSpr(uchar flag, uchar height, uchar width, void *srcframe, void *destframe, uchar rshift);
 
+/* CALLEE LINKAGE */
+
+extern struct sp1_ss __CALLEE__ __LIB__ *sp1_CreateSpr_callee(uchar type, uchar height, int graphic, uchar plane);
+extern uint          __CALLEE__ __LIB__  sp1_AddColSpr_callee(struct sp1_ss *s, uchar type, int graphic, uchar plane);
+extern void          __CALLEE__ __LIB__  sp1_MoveSprAbs_callee(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uchar row, uchar col, uchar vrot, uchar hrot);
+extern void          __CALLEE__ __LIB__  sp1_MoveSprRel_callee(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
+extern void          __CALLEE__ __LIB__  sp1_MoveSprPix_callee(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uint x, uint y);
+extern void          __CALLEE__ __LIB__  sp1_IterateSprChar_callee(struct sp1_ss *s, void *hook1);
+extern void          __CALLEE__ __LIB__  sp1_IterateUpdateSpr_callee(struct sp1_ss *s, void *hook2);
+extern void          __CALLEE__ __LIB__  sp1_ChangeSprType_callee(struct sp1_cs *c, uchar type);
+extern void          __CALLEE__ __LIB__  sp1_GetSprClrAddr_callee(struct sp1_ss *s, uchar **sprdest);
+extern void          __CALLEE__ __LIB__  sp1_PutSprClr_callee(uchar **sprdest, struct sp1_ap *src, uchar n);
+extern void          __CALLEE__ __LIB__  sp1_GetSprClr_callee(uchar **sprsrc, struct sp1_ap *dest, uchar n);
+extern void          __CALLEE__ __LIB__ *sp1_PreShiftSpr_callee(uchar flag, uchar height, uchar width, void *srcframe, void *destframe, uchar rshift);
+
+#define sp1_CreateSpr(a,b,c,d)         sp1_CreateSpr_callee(a,b,c,d)
+#define sp1_AddColSpr(a,b,c,d)         sp1_AddColSpr_callee(a,b,c,d)
+#define sp1_MoveSprAbs(a,b,c,d,e,f,g)  sp1_MoveSprAbs_callee(a,b,c,d,e,f,g)
+#define sp1_MoveSprRel(a,b,c,d,e,f,g)  sp1_MoveSprRel_callee(a,b,c,d,e,f,g)
+#define sp1_MoveSprPix(a,b,c,d,e)      sp1_MoveSprPix_callee(a,b,c,d,e)
+#define sp1_IterateSprChar(a,b)        sp1_IterateSprChar_callee(a,b)
+#define sp1_IterateUpdateSpr(a,b)      sp1_IterateUpdateSpr_callee(a,b)
+#define sp1_ChangeSprType(a,b)         sp1_ChangeSprType_callee(a,b)
+#define sp1_GetSprClrAddr(a,b)         sp1_GetSprClrAddr_callee(a,b)
+#define sp1_PutSprClr(a,b,c)           sp1_PutSprClr_callee(a,b,c)
+#define sp1_GetSprClr(a,b,c)           sp1_GetSprClr_callee(a,b,c)
+#define sp1_PreShiftSpr(a,b,c,d,e,f)   sp1_PreShiftSpr_callee(a,b,c,d,e,f)
+
+
 ///////////////////////////////////////////////////////////
 //                COLLISION DETECTION                    //
 ///////////////////////////////////////////////////////////
+
+// BEING REVIEWED FOR CHANGES
 
 // These are adapter functions for the rectangles library.
 // You must link to the rectangles library during compilation
@@ -291,6 +322,37 @@ extern void  __LIB__   sp1_PutTilesInv(struct sp1_Rect *r, struct sp1_tp *src);
 extern void  __LIB__   sp1_ClearRect(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag);
 extern void  __LIB__   sp1_ClearRectInv(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag);
 
+/* CALLEE LINKAGE */
+
+extern void  __CALLEE__ __LIB__  *sp1_TileEntry_callee(uchar c, void *def);
+extern void  __CALLEE__ __LIB__   sp1_PrintAt_callee(uchar row, uchar col, uchar colour, uint tile);
+extern void  __CALLEE__ __LIB__   sp1_PrintAtInv_callee(uchar row, uchar col, uchar colour, uint tile);
+extern uint  __CALLEE__ __LIB__   sp1_ScreenStr_callee(uchar row, uchar col);
+extern uchar __CALLEE__ __LIB__   sp1_ScreenAttr_callee(uchar row, uchar col);
+extern uint  __CALLEE__ __LIB__   sp1_Screen_callee(uchar row, uchar col);
+extern void  __CALLEE__ __LIB__   sp1_PrintString_callee(struct sp1_pss *ps, uchar *s);
+extern void  __CALLEE__ __LIB__   sp1_SetPrintPos_callee(struct sp1_pss *ps, uchar row, uchar col);
+extern void  __CALLEE__ __LIB__   sp1_GetTiles_callee(struct sp1_Rect *r, struct sp1_tp *dest);
+extern void  __CALLEE__ __LIB__   sp1_PutTiles_callee(struct sp1_Rect *r, struct sp1_tp *src);
+extern void  __CALLEE__ __LIB__   sp1_PutTilesInv_callee(struct sp1_Rect *r, struct sp1_tp *src);
+extern void  __CALLEE__ __LIB__   sp1_ClearRect_callee(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag);
+extern void  __CALLEE__ __LIB__   sp1_ClearRectInv_callee(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag);
+
+#define sp1_TileEntry(a,b)         sp1_TileEntry_callee(a,b)
+#define sp1_PrintAt(a,b,c,d)       sp1_PrintAt_callee(a,b,c,d)
+#define sp1_PrintAtInv(a,b,c,d)    sp1_PrintAtInv_callee(a,b,c,d)
+#define sp1_ScreenStr(a,b)         sp1_ScreenStr_callee(a,b)
+#define sp1_ScreenAttr(a,b)        sp1_ScreenAttr_callee(a,b)
+#define sp1_Screen(a,b)            sp1_Screen_callee(a,b)
+#define sp1_PrintString(a,b)       sp1_PrintString_callee(a,b)
+#define sp1_SetPrintPos(a,b,c)     sp1_SetPrintPos_callee(a,b,c)
+#define sp1_GetTiles(a,b)          sp1_GetTiles_callee(a,b)
+#define sp1_PutTiles(a,b)          sp1_PutTiles_callee(a,b)
+#define sp1_PutTilesInv(a,b)       sp1_PutTilesInv_callee(a,b)
+#define sp1_ClearRect(a,b,c,d)     sp1_ClearRect_callee(a,b,c,d)
+#define sp1_ClearRectInv(a,b,c,d)  sp1_ClearRectInv_callee(a,b,c,d)
+
+
 ///////////////////////////////////////////////////////////
 //                      UPDATER                          //
 ///////////////////////////////////////////////////////////
@@ -325,5 +387,23 @@ extern void __FASTCALL__  __LIB__   sp1_RestoreUpdateStruct(struct sp1_update *u
 
 extern void __FASTCALL__  __LIB__   sp1_Invalidate(struct sp1_Rect *r);
 extern void __FASTCALL__  __LIB__   sp1_Validate(struct sp1_Rect *r);
+
+/* CALLEE LINKAGE */
+
+extern void              __CALLEE__ __LIB__   sp1_Initialize_callee(uchar iflag, uchar *idtypetbl, void *sprdrawtbl, uchar colour, uchar tile);
+extern void              __CALLEE__ __LIB__   sp1_GetUpdateList_callee(struct sp1_update **head, struct sp1_update **tail);
+extern void              __CALLEE__ __LIB__   sp1_SetUpdateList_callee(struct sp1_update *head, struct sp1_update *tail);
+extern struct sp1_update __CALLEE__ __LIB__  *sp1_GetUpdateStruct_callee(uchar row, uchar col);
+extern void              __CALLEE__ __LIB__   sp1_IterateUpdateArr_callee(struct sp1_update **ua, void *hook);
+extern void              __CALLEE__ __LIB__   sp1_IterateUpdateRect_callee(struct sp1_Rect *r, void *hook);
+
+
+#define sp1_Initialize(a,b,c,d,e)   sp1_Initialize_callee(a,b,c,d,e);
+#define sp1_GetUpdateList(a,b)      sp1_GetUpdateList_callee(a,b);
+#define sp1_SetUpdateList(a,b)      sp1_SetUpdateList_callee(a,b);
+#define sp1_GetUpdateStruct(a,b)    sp1_GetUpdateStruct_callee(a,b);
+#define sp1_IterateUpdateArr(a,b)   sp1_IterateUpdateArr_callee(a,b);
+#define sp1_IterateUpdateRect(a,b)  sp1_IterateUpdateRect_callee(a,b);
+
 
 #endif
