@@ -1,11 +1,24 @@
-
-; SP1Invalidate
+; void __FASTCALL__ sp1_Invalidate(struct sp1_Rect *r)
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1Invalidate
-LIB SP1GetUpdateStruct
-XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
+XLIB sp1_Invalidate
+XDEF ASMDISP_SP1_INVALIDATE
+
+LIB sp1_GetUpdateStruct_callee
+XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE, SP1V_DISPWIDTH, SP1V_UPDATELISTT
+
+.sp1_Invalidate
+
+   ld d,(hl)
+   inc hl
+   ld e,(hl)
+   inc hl
+   ld b,(hl)
+   inc hl
+   ld c,(hl)
+
+.asmentry
 
 ; Invalidate a rectangular area so the tiles are drawn in the next update.
 ;
@@ -17,7 +30,7 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
 
 .SP1Invalidate
 
-   call SP1GetUpdateStruct
+   call sp1_GetUpdateStruct_callee + ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
    ex de,hl                      ; de = & struct sp1_update
    ld hl,(SP1V_UPDATELISTT)
    ld a,6
@@ -76,3 +89,5 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
    ld (SP1V_UPDATELISTT),hl      ; and store as last in invalidated list
 
    ret
+
+DEFC ASMDISP_SP1_INVALIDATE = asmentry - sp1_Invalidate

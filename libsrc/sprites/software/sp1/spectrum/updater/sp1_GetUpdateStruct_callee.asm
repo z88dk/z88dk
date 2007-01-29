@@ -1,10 +1,21 @@
-
-; SP1GetUpdateStruct
+; struct sp1_update __CALLEE__ *sp1_GetUpdateStruct_callee(uchar row, uchar col)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1GetUpdateStruct
 INCLUDE "customize.asm"
+
+XLIB sp1_GetUpdateStruct_callee
+XDEF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
+
+.sp1_GetUpdateStruct_callee
+
+   pop bc
+   pop de
+   pop hl
+   push bc
+   ld d,l
+
+.asmentry
 
 ; Return struct_sp1_update for row,col coordinate given
 ; 10 * (SP1V_DISPWIDTH * ROW + COL) + SP1V_UPDATEARRAY
@@ -126,3 +137,5 @@ INCLUDE "customize.asm"
    ENDIF
 
    ret
+
+DEFC ASMDISP_SP1_GETUPDATESTRUCT_CALLEE = asmentry - sp1_GetUpdateStruct_callee

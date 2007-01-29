@@ -1,11 +1,31 @@
-
-; SP1IterateUpdateRect
+; void __CALLEE__ sp1_IterateUpdateRect_callee(struct sp1_Rect *r, void *hook)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1IterateUpdateRect
-LIB SP1GetUpdateStruct, l_jpix
-XREF SP1V_DISPWIDTH
+XLIB sp1_IterateUpdateRect_callee
+XDEF ASMDISP_SP1_ITERATEUPDATERECT_CALLEE, CDISP_SP1_ITERATEUPDATERECT_CALLEE
+
+LIB sp1_GetUpdateStruct_callee, l_jpix
+XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE, SP1V_DISPWIDTH
+
+.sp1_IterateUpdateRect_callee
+
+   pop bc
+   pop ix
+   pop hl
+   push bc
+
+.centry
+
+   ld d,(hl)
+   inc hl
+   ld e,(hl)
+   inc hl
+   ld b,(hl)
+   inc hl
+   ld c,(hl)
+
+.asmentry
 
 ; Iterate over all the struct_sp1_update making up
 ; a rectangular area in row major order.  Call a
@@ -21,7 +41,7 @@ XREF SP1V_DISPWIDTH
 
 .SP1IterateUpdateRect
 
-   call SP1GetUpdateStruct       ; hl = & struct sp1_update
+   call sp1_GetUpdateStruct_callee + ASMDISP_SP1_GETUPDATESTRUCT_CALLEE  ; hl = & struct sp1_update
 
 .rowloop
 
@@ -48,3 +68,6 @@ XREF SP1V_DISPWIDTH
    jp nz, rowloop
 
    ret
+
+DEFC ASMDISP_SP1_ITERATEUPDATERECT_CALLEE = asmentry - sp1_IterateUpdateRect_callee
+DEFC CDISP_SP1_ITERATEUPDATERECT_CALLEE = centry - sp1_IterateUpdateRect_callee

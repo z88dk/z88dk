@@ -1,10 +1,11 @@
-
-; SP1Initialize
+; void __CALLEE__ sp1_Initialize_callee(uchar iflag, uchar *idtypetbl, void *sprdrawtbl, uchar colour, uchar tile)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
 INCLUDE "customize.asm"
-XLIB SP1Initialize
+
+XLIB sp1_Initialize_callee
+XDEF ASMDISP_SP1_INITIALIZE_CALLEE
 
 XDEF SP1V_DISPORIGX
 XDEF SP1V_DISPORIGY
@@ -20,6 +21,23 @@ XDEF SP1V_UPDATELISTT
 XDEF SP1V_IDTYPEASSOC
 XDEF SP1V_SPRDRAWTBL
 
+.sp1_Initialize_callee
+
+   pop af
+   ex af,af
+   pop hl
+   pop de
+   ld h,e
+   pop bc
+   pop de
+   ex (sp),hl
+   ld a,l
+   pop hl
+   ex af,af
+   push af
+   ex af,af
+
+.asmentry
 
 ; 1. Stores locations of idtypeassoc table and sprdraw function table
 ; 2. Constructs the rotation table if relevant flag set
@@ -197,3 +215,5 @@ XDEF SP1V_SPRDRAWTBL
    ex af,af
    inc hl
    jp rejoinscrnaddr
+
+DEFC ASMDISP_SP1_INITIALIZE_CALLEE = asmentry - sp1_Initialize_callee

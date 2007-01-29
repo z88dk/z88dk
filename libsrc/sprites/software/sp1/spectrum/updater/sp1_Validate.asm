@@ -1,11 +1,24 @@
-
-; SP1Validate
+; void __FASTCALL__ sp1_Validate(struct sp1_Rect *r)
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1Validate
-LIB SP1GetUpdateStruct
-XREF SP1V_DISPWIDTH
+XLIB sp1_Validate
+XDEF ASMDISP_SP1_VALIDATE
+
+LIB sp1_GetUpdateStruct_callee
+XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE, SP1V_DISPWIDTH
+
+.sp1_Validate
+
+   ld d,(hl)
+   inc hl
+   ld e,(hl)
+   inc hl
+   ld b,(hl)
+   inc hl
+   ld c,(hl)
+
+.asmentry
 
 ; Validate a rectangular area, ensuring the area is not drawn
 ; in next update.  Make sure that none of the validated area
@@ -20,7 +33,7 @@ XREF SP1V_DISPWIDTH
 
 .SP1Validate
 
-   call SP1GetUpdateStruct       ; hl = & struct sp1_update
+   call sp1_GetUpdateStruct_callee + ASMDISP_SP1_GETUPDATESTRUCT_CALLEE  ; hl = & struct sp1_update
    ld de,10
 
 .rowloop
@@ -48,3 +61,5 @@ XREF SP1V_DISPWIDTH
    jp nz, rowloop
 
    ret
+
+DEFC ASMDISP_SP1_VALIDATE = asmentry - sp1_Validate

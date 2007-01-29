@@ -1,10 +1,20 @@
-
-; SP1IterateUpdateArr
+; void __CALLEE__ sp1_IterateUpdateArr_callee(struct sp1_update **ua, void *hook)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1IterateUpdateArr
+XLIB sp1_IterateUpdateArr_callee
+XDEF ASMDISP_SP1_ITERATEUPDATEARR_CALLEE
+
 LIB l_jpix
+
+.sp1_IterateUpdateArr_callee
+
+   pop bc
+   pop ix
+   pop hl
+   push bc
+
+.asmentry
 
 ; Iterate over an array of struct_sp1_update*, calling the supplied function
 ; with each of the struct_sp1_update* as parameter.  The array must be zero
@@ -33,3 +43,5 @@ LIB l_jpix
    pop hl
 
    jp SP1IterateUpdateArr
+
+DEFC ASMDISP_SP1_ITERATEUPDATEARR_CALLEE = asmentry - sp1_IterateUpdateArr_callee
