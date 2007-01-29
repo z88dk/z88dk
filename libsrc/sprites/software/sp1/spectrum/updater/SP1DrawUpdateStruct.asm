@@ -60,7 +60,7 @@ XREF SP1V_ATTRBUFFER, SP1V_PIXELBUFFER, SP1V_TILEARRAY
 
    ld a,h
    or a
-   jr nz, havetiledef2       ; if MSB of tile code == 0 we have & tile definition already
+   jr nz, havetiledef2       ; if MSB of tile code != 0 we have & tile definition already
    
    ld h,SP1V_TILEARRAY/256
    ld a,(hl)
@@ -114,7 +114,7 @@ XREF SP1V_ATTRBUFFER, SP1V_PIXELBUFFER, SP1V_TILEARRAY
 
    ld a,h
    or a
-   jr nz, havetiledef        ; if MSB of tile code == 0 we have & tile definition already
+   jr nz, havetiledef        ; if MSB of tile code != 0 we have & tile definition already
    
    ld h,SP1V_TILEARRAY/256
    ld a,(hl)
