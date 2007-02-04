@@ -1,12 +1,35 @@
-
-; SP1ClearRect
+; void __CALLEE__ sp1_ClearRect_callee(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1ClearRect
-LIB SP1GetUpdateStruct, l_jpix
-XREF SP1V_DISPWIDTH
-XDEF SP1CRSELECT
+XLIB sp1_ClearRect_callee
+XDEF ASMDISP_SP1_CLEARRECT_CALLEE, ASMDISP_SP1CRSELECT
+
+LIB sp1_GetUpdateStruct_callee, l_jpix
+XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE, SP1V_DISPWIDTH
+
+.sp1_ClearRect_callee
+
+   pop af
+   pop bc
+   pop hl
+   pop de
+   ld h,e
+   pop de
+   push af
+   ld a,c
+   push hl
+   ex de,hl
+   ld d,(hl)
+   inc hl
+   ld e,(hl)
+   inc hl
+   ld b,(hl)
+   inc hl
+   ld c,(hl)
+   pop hl   
+
+.asmentry
 
 ; Clear a rectangular area on screen, erasing sprites,
 ; changing tile and changing colour depending on flags.
@@ -27,7 +50,7 @@ XDEF SP1CRSELECT
 
    push hl
    call SP1CRSELECT               ; ix = address of operation code (depending on flags passed in)
-   call SP1GetUpdateStruct        ; hl = & struct update
+   call sp1_GetUpdateStruct_callee + ASMDISP_SP1_GETUPDATESTRUCT_CALLEE  ; hl = & struct update
    pop de                         ; d = attr, e = tile
 
 .rowloop
@@ -210,3 +233,6 @@ XDEF SP1CRSELECT
    dec hl
    dec hl
    jp OPTION4
+
+DEFC ASMDISP_SP1_CLEARRECT_CALLEE = asmentry - sp1_ClearRect_callee
+DEFC ASMDISP_SP1CRSELECT = SP1CRSELECT - sp1_ClearRect_callee

@@ -1,11 +1,27 @@
-
-; SP1PrintAtInv
+; void __CALLEE__ sp1_PrintAtInv_callee(uchar row, uchar col, uchar colour, uint tile)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1PrintAtInv
-LIB SP1GetUpdateStruct, SP1PrintAt
+XLIB sp1_PrintAtInv_callee
+XDEF ASMDISP_SP1_PRINTATINV_CALLEE
+
+LIB sp1_GetUpdateStruct_callee, sp1_PrintAt_callee
+XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE, ASMDISP_SP1_PRINTAT_CALLEE
 XREF SP1V_UPDATELISTT
+
+.sp1_PrintAtInv_callee
+
+   pop af
+   pop bc
+   pop hl
+   pop de
+   ld d,l
+   pop hl
+   push af
+   ld a,d
+   ld d,l
+
+.asmentry
 
 ; Print tile and colour to given coordinate and invalidate
 ; the tile so that it is redrawn in the next update.
@@ -19,11 +35,11 @@ XREF SP1V_UPDATELISTT
 .SP1PrintAtInv
 
    ex af,af
-   call SP1GetUpdateStruct
+   call sp1_GetUpdateStruct_callee + ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
 
    ld a,(hl)
    xor $80
-   jp p, SP1PrintAt+4               ; if already marked for invalidation just do PrintAt
+   jp p, sp1_PrintAt_callee + ASMDISP_SP1_PRINTAT_CALLEE + 4  ; if already marked for invalidation just do PrintAt
    ld (hl),a                        ; mark struct_sp1_update as invalidated
 
    ex af,af
@@ -50,3 +66,4 @@ XREF SP1V_UPDATELISTT
 
    ret
 
+DEFC ASMDISP_SP1_PRINTATINV_CALLEE = asmentry - sp1_PrintAtInv_callee

@@ -1,34 +1,50 @@
-
-; SP1PutTilesInv
-; 03.2006 aralbrec, Sprite Pack v3.0
+; void __CALLEE__ sp1_PutTiles_callee(struct sp1_Rect *r, struct sp1_tp *src)
+; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1PutTilesInv
-LIB SP1GetUpdateStruct
-XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
+XLIB sp1_PutTiles_callee
+XDEF ASMDISP_SP1_PUTTILES_CALLEE
+
+LIB sp1_GetUpdateStruct_callee
+XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE, SP1V_DISPWIDTH
+
+.sp1_PutTiles_callee
+
+   pop af
+   pop hl
+   ex (sp),hl
+   ld d,(hl)
+   inc hl
+   ld e,(hl)
+   inc hl
+   ld b,(hl)
+   inc hl
+   ld c,(hl)
+   pop hl
+   push af
+
+.asmentry
 
 ; Copy a rectangular set of tiles and colours to screen.  The
-; source array can be filled in by SP1GetTiles.  Invalidate
-; the rectangular area so that it is drawn in the next update.
+; source array can be filled in by SP1GetTiles.
 ;
 ; enter : hl = struct sp1_tp[] array of attr/tile pairs
 ;          d = row coord
 ;          e = col coord
 ;          b = width
 ;          c = height
-; uses  : af, bc, de, hl, af', ix
+; uses  : af, bc, de, hl, af'
 
-.SP1PutTilesInv
+.SP1PutTiles
 
    push hl
-   call SP1GetUpdateStruct            ; hl = & struct sp1_update
+   call sp1_GetUpdateStruct_callee + ASMDISP_SP1_GETUPDATESTRUCT_CALLEE  ; hl = & struct sp1_update
    pop de                             ; de = struct sp1_tp *
+   inc hl
    ex de,hl                           ; hl = struct sp1_tp *, de = & struct sp1_update
  
    ld a,c                             ; a = height
    ld c,$ff
-
-   ld ix,(SP1V_UPDATELISTT)
 
 .rowloop
 
@@ -38,23 +54,10 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
 
 .colloop
 
-   ld a,(de)
-   xor $80
-   jp p, skipinval                    ; bit 7 now reset if already invalidated
-   ld (de),a
-
-   ld (ix+6),d                        ; this struct sp1_update to end of list
-   ld (ix+7),e
-   ld ixl,e
-   ld ixh,d
-
-.skipinval
-
-   inc de
    ldi                                ; copy colour and tile from struct sp1_tp[]
    ldi                                ; into struct sp1_update
    ldi
-   ld a,6
+   ld a,7
    add a,e
    ld e,a
    jp nc, noinc
@@ -75,7 +78,6 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
    dec a
    jp nz, rowloop
 
-   ld (ix+6),0
-   ld (SP1V_UPDATELISTT),ix
-   
    ret
+
+DEFC ASMDISP_SP1_PUTTILES_CALLEE = asmentry - sp1_PutTiles_callee

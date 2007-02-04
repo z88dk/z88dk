@@ -1,11 +1,53 @@
-
-; SP1PrintString
+; void __CALLEE__ sp1_PrintString_callee(struct sp1_pss *ps, uchar *s)
 ; 05.2006, 12.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1PrintString
-LIB SP1GetUpdateStruct, l_jpix
+XLIB sp1_PrintString_callee
+XDEF ASMDISP_SP1_PRINTSTRING_CALLEE
+
+LIB sp1_GetUpdateStruct_callee, l_jpix
+XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
 XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
+
+.sp1_PrintString_callee
+
+   pop af
+   pop de
+   pop hl
+   push af
+   ld a,(hl)
+   ld iyl,a
+   inc hl
+   ld a,(hl)
+   ld iyh,a
+   inc hl
+   ld a,(hl)
+   inc hl
+   ld b,(hl)
+   inc hl
+   ld c,(hl)
+   inc hl
+   push hl
+   ex de,hl
+   ld e,a
+   exx
+   pop hl
+   ld b,(hl)
+   inc hl
+   ld c,(hl)
+   inc hl
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   ld a,(hl)
+   ld ixl,a
+   inc hl
+   ld a,(hl)
+   ld ixh,a
+   exx
+
+.asmentry
 
 ; A sophisticated print string function
 ;
@@ -593,7 +635,7 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
    ld a,(iy+1)
    add a,h
    ld e,a
-   call SP1GetUpdateStruct
+   call sp1_GetUpdateStruct_callee + ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
    ex de,hl
    pop hl
    exx
@@ -692,3 +734,5 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
    jr c, inybounds2
    ld c,0
    jp computenewupdate
+
+DEFC ASMDISP_SP1_PRINTSTRING_CALLEE = asmentry - sp1_PrintString_callee
