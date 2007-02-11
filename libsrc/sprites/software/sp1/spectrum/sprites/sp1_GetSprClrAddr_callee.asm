@@ -1,10 +1,21 @@
-
-; SP1GetSprClrAddr
+; void __CALLEE__ sp1_GetSprClrAddr_callee(struct sp1_ss *s, uchar **sprdest)
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1GetSprClrAddr
-LIB SP1IterateSprChar
+XLIB sp1_GetSprClrAddr_callee
+XDEF ASMDISP_SP1_GETSPRCLRADDR_CALLEE
+
+LIB sp1_IterateSprChar_callee
+XREF ASMDISP_SP1_ITERATESPRCHAR_CALLEE
+
+.sp1_GetSprClrAddr_callee
+
+   pop bc
+   pop de
+   pop hl
+   push bc
+
+.asmentry
 
 ; Stores address of attr_mask member in all struct_sp1_cs
 ; making up a sprite into array passed in.
@@ -16,7 +27,7 @@ LIB SP1IterateSprChar
 .SP1GetSprClrAddr
 
    ld ix,getaddr
-   jp SP1IterateSprChar
+   jp sp1_IterateSprChar_callee + ASMDISP_SP1_ITERATESPRCHAR_CALLEE
 
 .getaddr
 
@@ -33,3 +44,5 @@ LIB SP1IterateSprChar
    ex de,hl                    ; de = next destination address in array of pointers
 
    ret
+
+DEFC ASMDISP_SP1_GETSPRCLRADDR_CALLEE = asmentry - sp1_GetSprClrAddr_callee

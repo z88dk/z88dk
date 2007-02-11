@@ -1,9 +1,20 @@
-
-; SP1PutSprClr
+; void __CALLEE__ sp1_PutSprClr_callee(uchar **sprdest, struct sp1_ap *src, uchar n)
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1PutSprClr
+XLIB sp1_PutSprClr_callee
+XDEF ASMDISP_SP1_PUTSPRCLR_CALLEE
+
+.sp1_PutSprClr_callee
+
+   pop af
+   pop bc
+   ld b,c
+   pop de
+   pop hl
+   push af
+
+.asmentry
 
 ; Colour sprite by writing (mask,attr) pairs into each
 ; struct_sp1_cs whose addresses are stored in the array
@@ -34,3 +45,5 @@ XLIB SP1PutSprClr
    djnz loop
 
    ret
+
+DEFC ASMDISP_SP1_PUTSPRCLR_CALLEE = asmentry - sp1_PutSprClr_callee

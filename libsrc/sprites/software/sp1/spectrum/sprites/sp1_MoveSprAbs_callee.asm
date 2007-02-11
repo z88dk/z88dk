@@ -1,13 +1,31 @@
-
-; SP1MoveSprAbs
+; void __CALLEE__ sp1_MoveSprAbs_callee(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uchar row, uchar col, uchar vrot, uchar hrot)
 ; 04.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
 ; *** PLEASE HELP ME I'VE BEEN MADE UGLY BY BUGFIXES
 
-XLIB SP1MoveSprAbs
-LIB SP1GetUpdateStruct
+XLIB sp1_MoveSprAbs_callee
+XDEF ASMDISP_SP1_MOVESPRABS_CALLEE
+
+LIB sp1_GetUpdateStruct_callee
+XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
 XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
+
+.sp1_MoveSprAbs_callee
+
+   pop af
+   pop de
+   pop bc
+   ld b,e
+   pop de
+   pop hl
+   ld d,l
+   pop hl
+   pop iy
+   pop ix
+   push af
+
+.asmentry
 
 ; enter: ix = & struct sp1_ss 
 ;        hl = sprite frame address (0 = no change)
@@ -109,7 +127,7 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
    ld bc,6
    add hl,bc
    push hl
-   call SP1GetUpdateStruct
+   call sp1_GetUpdateStruct_callee + ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
    ld b,(ix+0)
    pop de
    push hl
@@ -163,7 +181,7 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
    ld bc,6
    add hl,bc
    push hl
-   call SP1GetUpdateStruct
+   call sp1_GetUpdateStruct_callee + ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
    ld b,(ix+0)
    pop de
    push hl
@@ -321,3 +339,5 @@ XREF SP1V_ROTTBL, SP1V_DISPWIDTH, SP1V_UPDATELISTT
    ld (hl),e                 ; next sprite's prev ptr points at new sprite
 
    ret
+
+DEFC ASMDISP_SP1_MOVESPRABS_CALLEE = asmentry - sp1_MoveSprAbs_callee

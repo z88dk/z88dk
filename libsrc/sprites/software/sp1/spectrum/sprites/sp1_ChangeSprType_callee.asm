@@ -1,10 +1,20 @@
-
-; SP1ChangeSprType
+; void __CALLEE__ sp1_ChangeSprType_callee(struct sp1_cs *c, uchar type)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1ChangeSprType
+XLIB sp1_ChangeSprType_callee
+XDEF ASMDISP_SP1_CHANGESPRTYPE_CALLEE
+
 XREF SP1V_SPRDRAWTBL
+
+.sp1_ChangeSprType_callee
+
+   pop bc
+   pop de
+   pop hl
+   push bc
+
+.asmentry
 
 ; Change the type of a sprite char struct so that it draws using
 ; a different draw function.  If the occluding flag is changed,
@@ -51,3 +61,5 @@ XREF SP1V_SPRDRAWTBL
    ldi
 
    ret
+
+DEFC ASMDISP_SP1_CHANGESPRTYPE_CALLEE = asmentry - sp1_ChangeSprType_callee

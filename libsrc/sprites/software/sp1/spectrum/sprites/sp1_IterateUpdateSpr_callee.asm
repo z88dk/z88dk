@@ -1,10 +1,20 @@
-
-; SP1IterateUpdateSpr
+; void __CALLEE__ sp1_IterateUpdateSpr_callee(struct sp1_ss *s, void *hook2)
 ; 11.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1IterateUpdateSpr
+XLIB sp1_IterateUpdateSpr_callee
+XDEF ASMDISP_SP1_ITERATEUPDATESPR_CALLEE
+
 LIB l_jpix
+
+.sp1_IterateUpdateSpr_callee
+
+   pop bc
+   pop ix
+   pop hl
+   push bc
+
+.asmentry
 
 ; Iterate over all the sp1_update* that the sprite's characters
 ; occupy in row major order, calling the user function for each
@@ -53,3 +63,5 @@ LIB l_jpix
    pop hl
    inc bc
    jp iterloop
+
+DEFC ASMDISP_SP1_ITERATEUPDATESPR_CALLEE = asmentry - sp1_IterateUpdateSpr_callee

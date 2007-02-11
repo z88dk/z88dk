@@ -1,20 +1,21 @@
 
-; SP1DeleteSpr
+; void __FASTCALL__ sp1_DeleteSpr(struct sp1_ss *s)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1DeleteSpr
+XLIB sp1_DeleteSpr
 XREF _u_free
 
 ; Delete the sprite, freeing any memory that was allocated in its
 ; creation.  Sprite must not be display on screen (move off-screen
 ; first).
 ;
-; enter : de = struct sp1_ss *
+; enter : hl = struct sp1_ss *
 ; uses  : af, bc, de, hl
 
-.SP1DeleteSpr
+.sp1_DeleteSpr
 
+   ex de,hl
    ld hl,15
    add hl,de                 ; hl = & struct sp1_ss.first
 

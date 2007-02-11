@@ -1,11 +1,24 @@
-
-; SP1AddColSpr
+; uint __CALLEE__ sp1_AddColSpr_callee(struct sp1_ss *s, uchar type, int graphic, uchar plane)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1AddColSpr
+XLIB sp1_AddColSpr_callee
+XDEF ASMDISP_SP1_ADDCOLSPR_CALLEE
+
 LIB SP1_CS_PROTOTYPE
 XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
+
+.sp1_AddColSpr_callee
+
+   pop af
+   pop de
+   pop bc
+   pop hl
+   ld h,e
+   pop ix
+   push af
+
+.asmentry
 
 ; Adds another column to an existing sprite.
 ;
@@ -14,7 +27,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
 ;          l = type (index into table), bit 7 = 1 for occluding, bit 4 = 1 clear pixelbuffer
 ;         bc = graphic definition for column
 ; uses  : af, bc, de, hl, bc', de', hl', iy
-; exit  : carry flag for success, else memory allocation failed
+; exit  : carry flag for success and hl=1, else memory allocation failed and hl=0
 
 .SP1AddColSpr
 
@@ -171,6 +184,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
 
    set 5,(iy+5)               ; indicate last struct sp1_cs added is in the last row of sprite
    inc (ix+2)                 ; increase width of sprite
+   inc l
    scf                        ; indicate success
    ret
 
@@ -191,3 +205,5 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    call _u_free               ; free the block
    pop hl
    jp faillp
+
+DEFC ASMDISP_SP1_ADDCOLSPR_CALLEE = asmentry - sp1_AddColSpr_callee

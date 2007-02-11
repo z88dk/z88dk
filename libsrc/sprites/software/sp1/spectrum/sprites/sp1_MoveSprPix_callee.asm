@@ -1,10 +1,24 @@
-
-; SP1MoveSprPix
+; void __CALLEE__ sp1_MoveSprPix_callee(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uint x, uint y)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1MoveSprPix
-LIB SP1MoveSprAbs
+XLIB sp1_MoveSprPix_callee
+XDEF ASMDISP_SP1_MOVESPRPIX_CALLEE
+
+LIB sp1_MoveSprAbs_callee
+XREF ASMDISP_SP1_MOVESPRABS_CALLEE
+
+.sp1_MoveSprPix_callee
+
+   pop af
+   pop bc
+   pop de
+   pop hl
+   pop iy
+   pop ix
+   push af
+   
+.asmentry
 
 ; Move sprite to an absolute pixel location.
 ;
@@ -42,4 +56,6 @@ LIB SP1MoveSprAbs
    ld d,c               ; d = new row coord in chars
    ld c,a               ; c = new vertical rotation (0..7)
 
-   jp SP1MoveSprAbs
+   jp sp1_MoveSprAbs_callee + ASMDISP_SP1_MOVESPRABS_CALLEE
+
+DEFC ASMDISP_SP1_MOVESPRPIX_CALLEE = asmentry - sp1_MoveSprPix_callee

@@ -7,34 +7,10 @@
 //             Sinclair Spectrum Version                 //
 //            aralbrec - April / May 2006                //
 ///////////////////////////////////////////////////////////
-//
-// This library implicity allocates and deallocates memory
-// as needed.  You must provide memory allocation and de-
-// allocation functions so that this implicit behaviour can
-// occur.
-//
-// In your C program supply the following two functions:
-//
-// ( u_malloc must return carry flag set if allocation successful )
-// void *u_malloc(uint size) {
-//    return(malloc(size));   * lib function malloc sets carry *
-// }
-//
-// ( u_free must ignore addr == 0 )
-// void u_free(void *addr) {
-//    free(addr);             * lib function free ignores 0 *
-// }
-//
-// If implemented in assembler, use the labels _u_malloc and _u_free
-// with HL as the parameter and return value.  XDEF both labels to
-// make them globals.
-//
-// In these examples, C's standard malloc() and free() functions
-// have been used to perform the memory allocation, but any
-// method can be used.  A better choice is the block memory
-// allocator (balloc.lib) as it is quick and is designed for the
-// fixed-size block requests this and other libraries make.
-//
+//                                                       //
+//       See the wiki for documentation details          //
+//             http://www.z88dk.org/wiki                 //
+//                                                       //
 ///////////////////////////////////////////////////////////
 
 #include <rect.h>
@@ -262,7 +238,7 @@ extern void          __CALLEE__ __LIB__ *sp1_PreShiftSpr_callee(uchar flag, ucha
 //                COLLISION DETECTION                    //
 ///////////////////////////////////////////////////////////
 
-// BEING REVIEWED FOR CHANGES
+// BEING REVIEWED FOR CHANGES - DON'T USE
 
 // These are adapter functions for the rectangles library.
 // You must link to the rectangles library during compilation
@@ -310,7 +286,6 @@ extern void  __LIB__   sp1_PrintAt(uchar row, uchar col, uchar colour, uint tile
 extern void  __LIB__   sp1_PrintAtInv(uchar row, uchar col, uchar colour, uint tile);
 extern uint  __LIB__   sp1_ScreenStr(uchar row, uchar col);
 extern uchar __LIB__   sp1_ScreenAttr(uchar row, uchar col);
-extern uint  __LIB__   sp1_Screen(uchar row, uchar col);
 
 extern void  __LIB__   sp1_PrintString(struct sp1_pss *ps, uchar *s);
 extern void  __LIB__   sp1_SetPrintPos(struct sp1_pss *ps, uchar row, uchar col);
@@ -329,7 +304,6 @@ extern void  __CALLEE__ __LIB__   sp1_PrintAt_callee(uchar row, uchar col, uchar
 extern void  __CALLEE__ __LIB__   sp1_PrintAtInv_callee(uchar row, uchar col, uchar colour, uint tile);
 extern uint  __CALLEE__ __LIB__   sp1_ScreenStr_callee(uchar row, uchar col);
 extern uchar __CALLEE__ __LIB__   sp1_ScreenAttr_callee(uchar row, uchar col);
-extern uint  __CALLEE__ __LIB__   sp1_Screen_callee(uchar row, uchar col);
 extern void  __CALLEE__ __LIB__   sp1_PrintString_callee(struct sp1_pss *ps, uchar *s);
 extern void  __CALLEE__ __LIB__   sp1_SetPrintPos_callee(struct sp1_pss *ps, uchar row, uchar col);
 extern void  __CALLEE__ __LIB__   sp1_GetTiles_callee(struct sp1_Rect *r, struct sp1_tp *dest);

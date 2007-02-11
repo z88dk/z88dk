@@ -1,10 +1,28 @@
-
-; SP1MoveSprRel
+; void __CALLEE__ sp1_MoveSprRel_callee(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1MoveSprRel
-LIB SP1MoveSprAbs
+XLIB sp1_MoveSprRel_callee
+XDEF ASMDISP_SP1_MOVESPRREL_CALLEE
+
+LIB sp1_MoveSprAbs_callee
+XREF ASMDISP_SP1_MOVESPRABS_CALLEE
+
+.sp1_MoveSprRel_callee
+
+   pop af
+   pop de
+   pop bc
+   ld b,e
+   pop de
+   pop hl
+   ld d,l
+   pop hl
+   pop iy
+   pop ix
+   push af
+
+.asmentry
 
 ; Move sprite a relative distance from current position.
 ;
@@ -58,4 +76,6 @@ LIB SP1MoveSprAbs
    and $07
    ld c,a                ; c = absolute vertical rotation
 
-   jp SP1MoveSprAbs
+   jp sp1_MoveSprAbs_callee + ASMDISP_SP1_MOVESPRABS_CALLEE
+
+DEFC ASMDISP_SP1_MOVESPRREL_CALLEE = asmentry - sp1_MoveSprRel_callee

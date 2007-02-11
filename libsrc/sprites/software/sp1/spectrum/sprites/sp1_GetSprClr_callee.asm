@@ -1,9 +1,20 @@
-
-; SP1GetSprClr
+; void __CALLEE__ sp1_GetSprClr_callee(uchar **sprsrc, struct sp1_ap *dest, uchar n)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1GetSprClr
+XLIB sp1_GetSprClr_callee
+XDEF ASMDISP_SP1_GETSPRCLR_CALLEE
+
+.sp1_GetSprClr_callee
+
+   pop af
+   pop bc
+   ld b,c
+   pop de
+   pop hl
+   push af
+
+.asmentry
 
 ; Copy sprite colours into an array of struct_sp1_ap
 ; colour pairs.
@@ -32,3 +43,5 @@ XLIB SP1GetSprClr
    djnz loop
 
    ret
+
+DEFC ASMDISP_SP1_GETSPRCLR_CALLEE = asmentry - sp1_GetSprClr_callee

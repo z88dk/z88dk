@@ -1,11 +1,24 @@
-
-; SP1CreateSpr
+; struct sp1_ss __CALLEE__ *sp1_CreateSpr_callee(uchar type, uchar height, int graphic, uchar plane)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1CreateSpr
+XLIB sp1_CreateSpr_callee
+XDEF ASMDISP_SP1_CREATESPR_CALLEE
+
 LIB SP1_SS_PROTOTYPE, SP1_CS_PROTOTYPE
 XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
+
+.sp1_CreateSpr_callee
+
+   pop af
+   pop bc
+   pop hl
+   pop de
+   ld b,e
+   pop de
+   push af
+
+.asmentry
 
 ; Create sprite of given height one column wide.  Further columns are
 ; added with successive calls to SP1AddColSpr.
@@ -15,7 +28,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
 ;          e = type (index into table), bit 7 = 1 occluding, bit 6 = 1 2 byte definition, bit 4 = 1 clear pixelbuff
 ;         hl = graphic definition for column
 ; uses  : af, bc, de, hl, bc', de', hl', ix, iy
-; exit  : no carry if memory allocation failed else ix = struct sp1_ss *
+; exit  : no carry and hl=0 if memory allocation failed else hl = struct sp1_ss *
 
 .SP1CreateSpr
 
@@ -172,6 +185,10 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
 .done
 
    set 5,(iy+5)               ; indicate last struct sp1_cs added is in the last row of sprite
+   ld a,ixl
+   ld l,a
+   ld a,ixh
+   ld h,a
    scf                        ; indicate success
    ret
 
@@ -191,3 +208,5 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    call _u_free               ; free the block
    pop hl
    jp faillp
+
+DEFC ASMDISP_SP1_CREATESPR_CALLEE = asmentry - sp1_CreateSpr_callee

@@ -1,15 +1,32 @@
-
-; SP1PreShiftSpr
+; void __CALLEE__ *sp1_PreShiftSpr_callee(uchar flag, uchar height, uchar width, void *srcframe, void *destframe, uchar rshift)
 ; 05.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1PreShiftSpr
+XLIB sp1_PreShiftSpr_callee
+XDEF ASMDISP_SP1_PRESHIFTSPR_CALLEE
+
+.sp1_PreShiftSpr_callee
+
+   pop af
+   pop bc
+   pop iy
+   pop de
+   pop hl
+   ld b,l
+   pop hl
+   pop ix
+   push af
+   ld a,ixl
+   ld h,a
+   ld a,c
+
+.asmentry
 
 ; enter :  a = right shift amount (0-7)
 ;          b = width in characters (# columns)
 ;          h = zero for 1-byte definition; otherwise 2-byte
 ;         de = source frame graphic
-;         iy = desitnation frame address
+;         iy = destination frame address
 ;          l = height in characters
 ; exit  : iy = next available address
 ; uses  : af, bc, de, hl, af', iy
@@ -127,3 +144,5 @@ XLIB SP1PreShiftSpr
    defb 0,0
 .dummy2byte
    defb 255,0
+
+DEFC ASMDISP_SP1_PRESHIFTSPR_CALLEE = asmentry - sp1_PreShiftSpr_callee

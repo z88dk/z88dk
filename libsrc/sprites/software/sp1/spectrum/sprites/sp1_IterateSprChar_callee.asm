@@ -1,10 +1,20 @@
-
-; SP1IterateSprChar
+; void __CALLEE__ sp1_IterateSprChar_callee(struct sp1_ss *s, void *hook1)
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1IterateSprChar
+XLIB sp1_IterateSprChar_callee
+XREF ASMDISP_SP1_ITERATESPRCHAR_CALLEE
+
 LIB l_jpix
+
+.sp1_IterateSprChar_callee
+
+   pop bc
+   pop ix
+   pop hl
+   push bc
+
+.asmentry
 
 ; Iterate over all the struct sp1_cs contained in a sprite
 ; in row major order, calling the user function for each one.
@@ -36,3 +46,5 @@ LIB l_jpix
    pop bc
    inc bc
    jp iterloop
+
+DEFC ASMDISP_SP1_ITERATESPRCHAR_CALLEE = asmentry - sp1_IterateSprChar_callee
