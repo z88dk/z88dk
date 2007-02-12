@@ -204,7 +204,7 @@
    
    jr z, CCnextrow
    
-   ld bc,9
+   ld bc,10
    add hl,bc
    push hl
    ex de,hl                  ; hl = & next struct sp1_cs
