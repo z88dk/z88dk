@@ -28,7 +28,7 @@ XDEF ASMDISP_SP1_PRESHIFTSPR_CALLEE
 ;         de = source frame graphic
 ;         iy = destination frame address
 ;          l = height in characters
-; exit  : iy = next available address
+; exit  : hl = next available address
 ; uses  : af, bc, de, hl, af', iy
 
 .SP1PreShiftSpr
@@ -91,6 +91,8 @@ XDEF ASMDISP_SP1_PRESHIFTSPR_CALLEE
    pop af
    djnz nextcol
    
+   push iy
+   pop hl
    ret
 
 .nextcol                     ; do rest of columns
@@ -137,6 +139,8 @@ XDEF ASMDISP_SP1_PRESHIFTSPR_CALLEE
    pop af
    djnz nextcol
 
+   push iy
+   pop hl
    ret
 
    defb 0
