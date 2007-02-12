@@ -372,12 +372,12 @@ extern void              __CALLEE__ __LIB__   sp1_IterateUpdateArr_callee(struct
 extern void              __CALLEE__ __LIB__   sp1_IterateUpdateRect_callee(struct sp1_Rect *r, void *hook);
 
 
-#define sp1_Initialize(a,b,c,d,e)   sp1_Initialize_callee(a,b,c,d,e);
-#define sp1_GetUpdateList(a,b)      sp1_GetUpdateList_callee(a,b);
-#define sp1_SetUpdateList(a,b)      sp1_SetUpdateList_callee(a,b);
-#define sp1_GetUpdateStruct(a,b)    sp1_GetUpdateStruct_callee(a,b);
-#define sp1_IterateUpdateArr(a,b)   sp1_IterateUpdateArr_callee(a,b);
-#define sp1_IterateUpdateRect(a,b)  sp1_IterateUpdateRect_callee(a,b);
+#define sp1_Initialize(a,b,c,d,e)   sp1_Initialize_callee(a,b,c,d,e)
+#define sp1_GetUpdateList(a,b)      sp1_GetUpdateList_callee(a,b)
+#define sp1_SetUpdateList(a,b)      sp1_SetUpdateList_callee(a,b)
+#define sp1_GetUpdateStruct(a,b)    sp1_GetUpdateStruct_callee(a,b)
+#define sp1_IterateUpdateArr(a,b)   sp1_IterateUpdateArr_callee(a,b)
+#define sp1_IterateUpdateRect(a,b)  sp1_IterateUpdateRect_callee(a,b)
 
 
 #endif
