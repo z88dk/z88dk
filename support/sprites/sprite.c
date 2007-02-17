@@ -1,27 +1,30 @@
 /*
+	$Id: sprite.c,v 1.2 2007-02-17 16:41:45 stefano Exp $
+	
 	A program to import / make sprites for use with z88dk
-	This program is not finnished, nor do I, Daniel McKinnon, wish to contribute
-	any more time to this program,
+	by Daniel McKinnon
+	slightly improved by Stefano Bodrato
 
-	HOWEVER:
-
-	Please send me your own updates to the code,
+	Please send Daniel McKinnon your own updates to the code,
 	it can be anything!  Comments, GUI elements, Bug-Fixes,
 	Features, ports, etc.
 
-	Send any updates, fixes, or support requests to:	stikmansoftware@yahoo.com
+	Send any updates, fixes, or support requests to:  stikmansoftware@yahoo.com
+	...and signal changes to the z88dk_devel list, too.
 
 	P.S. Some of the comments are a little dodgy and could use some fixing up
 */
 
-#include <allegro.h>
+//#include <allegro.h>
+//#include <winalleg.h>
+#include "allegro.h"
 
 #include <stdio.h>
 
-#define MAX_SIZE_X		97
-#define MAX_SIZE_Y		65
+#define MAX_SIZE_X		255
+#define MAX_SIZE_Y		255
 
-#define MAX_SPRITE		25
+#define MAX_SPRITE		150
 
 #define DEFAULT_BLOCK_SIZE		32
 #define DEFAULT_SIZE_X			8
@@ -39,6 +42,7 @@ typedef struct spritetype
 } spritetype;
 
 int on_sprite;
+int copied;			//Sprite selected as source for copying
 int num_sprites;
 spritetype sprite[ MAX_SPRITE + 1 ];
 
@@ -90,13 +94,13 @@ void update_screen()
 	c2 = makecol( 200, 255, 200 );
 	c3 = 0;
 	sprintf( text, "Sprite %i", on_sprite );
-	draw_button( 25, 435, 75, 23, text, c1, c2, c3 );
+	draw_button( 20, 435, 80, 23, text, c1, c2, c3 );
 
 	sprintf( text, "Width :%i", sprite[ on_sprite ].size_x );
-	draw_button( 225, 435, 75, 23, text, c1, c2, c3 );
+	draw_button( 220, 435, 80, 23, text, c1, c2, c3 );
 
 	sprintf( text, "Height: %i", sprite[ on_sprite ].size_y );
-	draw_button( 425, 435, 75, 23, text, c1, c2, c3 );
+	draw_button( 420, 435, 80, 23, text, c1, c2, c3 );
 
 	c1 = makecol( 255,255,0 );
 	c2 = makecol( 200, 100, 75 );
@@ -204,9 +208,9 @@ void fit_sprite_on_screen()
 {
 	//Calculate size of best fit
 	if ( sprite[ on_sprite ].size_x > sprite[ on_sprite ].size_y )
-		bls = (int)(600 / sprite[ on_sprite ].size_x);
+		bls = (int)(600 / (sprite[ on_sprite ].size_x + 10));
 	else
-		bls = (int)(440 / sprite[ on_sprite ].size_y);
+		bls = (int)(440 / (sprite[ on_sprite ].size_y + 10));
 }
 
 
@@ -219,6 +223,133 @@ void invert_sprite()
 	update_screen();
 }
 
+
+//flip sprite horizontally
+void flip_sprite_h()
+{
+	int x, y, p;
+	for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ )
+		for ( x = 1; x <= sprite[ on_sprite ].size_x /2; x++ ) {
+			p = sprite[ on_sprite ].p[ x ][ y ];
+			sprite[ on_sprite ].p[ x ][ y ] = sprite[ on_sprite ].p[ sprite[ on_sprite ].size_x - x + 1 ][ y ];
+			sprite[ on_sprite ].p[ sprite[ on_sprite ].size_x - x +1 ][ y ] = p;
+		}
+	update_screen();
+}
+
+
+//flip sprite vertically
+void flip_sprite_v()
+{
+	int x, y, p;
+	for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
+		for ( y = 1; y <= sprite[ on_sprite ].size_y /2; y++ ) {
+			p = sprite[ on_sprite ].p[ x ][ y ];
+			sprite[ on_sprite ].p[ x ][ y ] = sprite[ on_sprite ].p[ x ][ sprite[ on_sprite ].size_y - y + 1 ];
+			sprite[ on_sprite ].p[ x ][ sprite[ on_sprite ].size_y - y + 1 ] = p;
+		}
+	update_screen();
+}
+
+
+//flip sprite diagonally
+void flip_sprite_d()
+{
+	int x, y, p;
+	int save_x, save_y;
+	
+	//save sprite dims
+	save_x = sprite[ on_sprite ].size_x;
+	save_y = sprite[ on_sprite ].size_y;
+
+	if (save_x > save_y)
+		sprite[ on_sprite ].size_y = save_x;
+	else
+		sprite[ on_sprite ].size_x = save_y;
+	
+	for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ )
+		for ( x = y; x <= sprite[ on_sprite ].size_x; x++ ) {
+			p = sprite[ on_sprite ].p[ x ][ y ];
+			sprite[ on_sprite ].p[ x ][ y ] = sprite[ on_sprite ].p[ y ][ x ];
+			sprite[ on_sprite ].p[ y ][ x ] = p;
+		}
+
+	sprite[ on_sprite ].size_x = save_y;
+	sprite[ on_sprite ].size_y = save_x;
+	
+	update_screen();
+}
+
+
+void scroll_sprite_left()
+{
+	int x, y;
+	for ( x = 1; x < sprite[ on_sprite ].size_x; x++ )
+		for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ )
+			sprite[ on_sprite ].p[ x ][ y ] = sprite[ on_sprite ].p[ x + 1 ][ y ];
+	update_screen();
+}
+
+
+void scroll_sprite_right()
+{
+	int x, y;
+	for ( x = sprite[ on_sprite ].size_x; x > 0 ; x-- )
+		for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ )
+			sprite[ on_sprite ].p[ x ][ y ] = sprite[ on_sprite ].p[ x - 1 ][ y ];
+	update_screen();
+}
+
+
+void scroll_sprite_up()
+{
+	int x, y;
+	for ( y = 1; y < sprite[ on_sprite ].size_y; y++ )
+		for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
+			sprite[ on_sprite ].p[ x ][ y ] = sprite[ on_sprite ].p[ x ][ y + 1 ];
+	update_screen();
+}
+
+
+void scroll_sprite_down()
+{
+	int x, y;
+	for ( y = sprite[ on_sprite ].size_y; y > 0 ; y-- )
+		for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
+			sprite[ on_sprite ].p[ x ][ y ] = sprite[ on_sprite ].p[ x ][ y - 1 ];
+	update_screen();
+}
+
+
+//chop sprite in smaller items
+void chop_sprite( int src )
+{
+	int x, y, x_offset, y_offset;
+	int save_x, save_y;
+	
+	//save destination sprites' dims
+	save_x = sprite[ on_sprite ].size_x;
+	save_y = sprite[ on_sprite ].size_y;
+
+	y_offset = 0;
+	while ( sprite[ src ].size_y > y_offset) {
+	    x_offset = 0;
+	    while ( sprite[ src ].size_x > x_offset) {	
+		sprite[ on_sprite ].size_x = save_x;
+		sprite[ on_sprite ].size_y = save_y;
+		for ( y = 1; y <= save_y; y++ )
+		    for ( x = 1; x <= save_x; x++ )
+		        sprite[ on_sprite ].p[ x ][ y ] = sprite[ src ].p[ x + x_offset ][ y + y_offset ];
+		on_sprite++;
+		x_offset = x_offset + save_x;
+		//update_screen();
+	    }
+	    y_offset = y_offset + save_y;
+	}
+	update_screen();
+}
+
+
 void import_from_bitmap( char *file )
 {
 	BITMAP *temp;
@@ -228,10 +359,10 @@ void import_from_bitmap( char *file )
 
 	sprite[ on_sprite ].size_x = temp->w;
 	sprite[ on_sprite ].size_y = temp->h;
-	if ( sprite[ on_sprite ].size_x > 96 )
-		sprite[ on_sprite ].size_x = 96;
-	if ( sprite[ on_sprite ].size_y > 64 )
-		sprite[ on_sprite ].size_y = 64;
+	if ( sprite[ on_sprite ].size_x > MAX_SIZE_X )
+		sprite[ on_sprite ].size_x = MAX_SIZE_X;
+	if ( sprite[ on_sprite ].size_y > MAX_SIZE_Y )
+		sprite[ on_sprite ].size_y = MAX_SIZE_Y;
 
 	fit_sprite_on_screen();
 	for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
@@ -260,7 +391,7 @@ void save_code_file( char *file )
 
 	f = fopen( file, "w" );
 
-	fputs( "//This files generated by Daniel McKinnon's z88dk Sprite Editor\n", f );
+	fputs( "// Generated by Daniel McKinnon's z88dk Sprite Editor\n", f );
 	for ( i = 0; i <= on_sprite; i++ )
 	{
 		generate_codes( i );
@@ -355,6 +486,88 @@ void copy_sprite( int src, int dest )
 }
 
 
+//Compute the copied sprite's mask and paste it in a new one
+void copy_sprite_mask( int src, int dest )
+{
+	int x1, x2, y;
+	int fx1, fx2;
+
+	int y1, y2, x;
+	int fy1, fy2;
+	
+	//Copy sizes
+	sprite[ dest ].size_x = sprite[ src ].size_x;
+	sprite[ dest ].size_y = sprite[ src ].size_y;
+
+	/*  
+	//dst initialization shouldn't be necessary 
+	for ( x = 1; x <= sprite[ dest ].size_x; x++ )
+		for ( y = 1; y <= sprite[ dest ].size_y; y++ )
+			sprite[ dest ].p[ x ][ y ] = FALSE;
+	*/
+
+	//look for bytes to mask horizontally
+	for ( y = 1; y <= sprite[ src ].size_y; y++ ) {
+		x1 = 1; x2 = sprite[ src ].size_x;
+		fx1 = fx2 = FALSE;
+		while ( (( fx1 == FALSE ) || ( fx2 == FALSE )) && (x2 >= x1) )  {
+			if ( sprite[ src ].p[ x1 ][ y ] || sprite[ src ].p[ x1 + 1 ][ y ] )  {
+				fx1 = TRUE;
+				sprite[ dest ].p[ x1 ][ y ] = 2;
+			}
+			if ( sprite[ src ].p[ x2 ][ y ] || sprite[ src ].p[ x2 - 1 ][ y ] )  {
+				fx2 = TRUE;
+				sprite[ dest ].p[ x2 ][ y ] = 2;
+			}
+			
+			if ( fx1 != TRUE ) {
+				if ( sprite[ dest ].p[ x1 ][ y ] != 2 )
+					sprite[ dest ].p[ x1 ][ y ] = 3;
+				x1++;
+			}
+			if ( fx2 != TRUE ) {
+				if ( sprite[ dest ].p[ x2 ][ y ] != 2 )
+					sprite[ dest ].p[ x2 ][ y ] = 3;
+				x2--;
+			}
+		}
+	}
+
+	//look for bytes to mask vertically
+	for ( x = 1; x <= sprite[ src ].size_x; x++ ) {
+		y1 = 1; y2 = sprite[ src ].size_y;
+		fy1 = fy2 = FALSE;
+		while ( (( fy1 == FALSE ) || ( fy2 == FALSE )) && (y2 >= y1) )  {
+			if ( sprite[ src ].p[ x ][ y1 ] || sprite[ src ].p[ x ][ y1 + 1 ] )  {
+				fy1 = TRUE;
+				sprite[ dest ].p[ x ][ y1 ] = 2;
+			}
+			if ( sprite[ src ].p[ x ][ y2 ] || sprite[ src ].p[ x ][ y2 - 1 ] )  {
+				fy2 = TRUE;
+				sprite[ dest ].p[ x ][ y2 ] = 2;
+			}
+			
+			if ( fy1 != TRUE ) {
+				if ( sprite[ dest ].p[ x ][ y1 ] != 2 )
+					sprite[ dest ].p[ x ][ y1 ] = 3;
+				y1++;
+			}
+			if ( fy2 != TRUE ) {
+				if ( sprite[ dest ].p[ x ][ y2 ] != 2 )
+					sprite[ dest ].p[ x ][ y2 ] = 3;
+				y2--;
+			}
+		}
+	}
+
+	//now pixels marked with '3' or '2' are the mask bits, convert to white:
+	//everything else is black
+	for ( x = 1; x <= sprite[ src ].size_x; x++ )
+		for ( y = 1; y <= sprite[ src ].size_y; y++ )
+			sprite[ dest ].p[ x ][ y ] = ( sprite[ dest ].p[ x ][ y ] < 3 );
+
+	update_screen();
+}
 
 
 void do_gui_buttons()
@@ -417,32 +630,84 @@ void do_gui_buttons()
 }
 
 
-int copied;			//Sprite selected as source for copying
 void do_keyboard_input()
 {
 	//Keyboard Input
 	if ( key[ KEY_L ] )
 		do_import_bitmap();
-	if ( key[ KEY_I ] )
+
+	if ( key[ KEY_I ] ) {
 		invert_sprite();
+		while ( key[ KEY_I ] );
+	}
+
+	if ( key[ KEY_H ] ) {
+		flip_sprite_h();
+		while ( key[ KEY_H ] );
+	}
+
+	if ( key[ KEY_V ] ) {
+		flip_sprite_v();
+		while ( key[ KEY_V ] );
+	}
+
+	if ( key[ KEY_D ] ) {
+		flip_sprite_d();
+		while ( key[ KEY_D ] );
+	}
+
+	if ( key[ KEY_LSHIFT ] && key[ KEY_LEFT ] ) {
+		scroll_sprite_left();
+		while ( key[ KEY_LEFT ] );
+	}
+
+	if ( key[ KEY_LSHIFT ] && key[ KEY_RIGHT ] ) {
+		scroll_sprite_right();
+		while ( key[ KEY_RIGHT ] );
+	}
+
+	if ( key[ KEY_LSHIFT ] && key[ KEY_UP ] ) {
+		scroll_sprite_up();
+		while ( key[ KEY_UP ] );
+	}
+
+	if ( key[ KEY_LSHIFT ] && key[ KEY_DOWN ] ) {
+		scroll_sprite_down();
+		while ( key[ KEY_DOWN ] );
+	}
 
 	if ( key[ KEY_UP ] && (bls < 64 ) )
 	{
 		bls++;
 		update_screen();
+		while ( key[ KEY_UP ] );
 	}
 
 	if ( key[ KEY_DOWN ] && (bls > 1) )
 	{
 		bls--;
 		update_screen();
+		while ( key[ KEY_DOWN ] );
 	}
 
 	//Copy/Paste
 	if ( key[ KEY_C ] )
 		copied = on_sprite;
-	if ( key[ KEY_P ] )
-		copy_sprite( copied, on_sprite );
+	if ( key[ KEY_LSHIFT ] ) {
+	    if ( key[ KEY_P ] )
+	        if (copied < on_sprite) {
+	        	chop_sprite( copied );
+	        	while ( key[ KEY_P ] );
+	        }
+	}
+	else {
+	    if ( key[ KEY_P ] )
+	        if (copied != on_sprite) copy_sprite( copied, on_sprite );
+	}
+	//Paste copied sprite's mask
+	if ( key[ KEY_M ] )
+		if (copied != on_sprite) copy_sprite_mask( copied, on_sprite );
+		while ( key[ KEY_M ] );
 
 
 	// Save / Load / Generate Code
@@ -497,7 +762,8 @@ int main( int argc, char *argv[] )
 
 	//Setup graphics
 	set_color_depth( 16 );
-	if ( set_gfx_mode(GFX_XWINDOWS, 640, 480, 0, 0 ) < 0 )
+	//if ( set_gfx_mode(GFX_XWINDOWS, 640, 480, 0, 0 ) < 0 )
+	if ( set_gfx_mode(GFX_AUTODETECT_WINDOWED, 640, 480, 0, 0 ) < 0 )
 		exit( -1 );
 
 	//Setup double buffer
@@ -511,6 +777,7 @@ int main( int argc, char *argv[] )
 	//Reset all sprite sizes
 	reset_sprites();
 	on_sprite = 0;				//Choose Sprite 0
+	copied = 0;
 	fit_sprite_on_screen();
 
 

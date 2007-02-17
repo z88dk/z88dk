@@ -1,11 +1,11 @@
-
+$Id: readme.txt,v 1.2 2007-02-17 16:41:45 stefano Exp $
 
 
 Z88DK Sprite Editor
 -------------------
 By Daniel McKinnon
 
-(windows port tested by Stefano Bodrato)
+- slightly upgraded by Stefano Bodrato -
 
 
 This is a simple sprite editor for z88dk with it's main feature being that it
@@ -26,17 +26,24 @@ Those are ticks " ' " (above the ~ key on most keyboards) not apostraphies " ' "
 
 DJGPP: type "gcc -o sprite.exe sprite.c -lalleg "
 
-Wingblowz:  works with some change in the source (commented out).
+Visual C: from the Visual Studio command prompt type "cl sprite.c alleg.lib"
 
 
 How to use:
 
 Image Editing
 Up / Down......................Zoom In / Out
+SHIFT + arrow keys.............Scroll Sprite
+H..............................Flip sprite horizontally
+V..............................Flip sprite vertically
+D..............................Flip sprite diagonally
 I..............................Invert Sprite
 L..............................Import From BMP or PCX
 C..............................Choose Source Sprite for Copying (copy)
 P..............................Copy Source sprite to current sprite (paste)
+SHIFP + P......................Divide the source sprite into pieces and paste them to the 
+                               destination and its following ones.
+M..............................Compute mask for copied sprite and paste to current sprite
 
 
 Saving / Loading
