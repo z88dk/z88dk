@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.3 2002-01-18 16:22:11 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.4 2007-02-28 11:23:24 stefano Exp $ */
 /* $History: Z80INSTR.C $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -98,6 +98,7 @@ extern struct module *CURRENTMODULE;
 extern enum symbols GetSym (void), sym;
 extern enum flag relocfile, ti83plus;
 
+extern int rcmX000;
 
 void 
 PushPop_instr (int opcode)
@@ -178,8 +179,18 @@ EX (void)
 	      switch (CheckRegister16 ())
 		{
 		case 2:
-		  *codeptr++ = 227;	/* EX  (SP),HL  */
-		  ++PC;
+		    if (rcmX000)
+		    {
+			/* Instruction code changed */
+			*codeptr++ = 0xED;
+			*codeptr++ = 0x54;
+			PC+=2;
+		    }
+		    else
+		    {
+			*codeptr++ = 227;	/* EX  (SP),HL  */
+			++PC;
+		    }
 		  break;
 
 		case 5:
@@ -258,6 +269,12 @@ OUT (void)
 {
   long reg;
 
+  if (rcmX000)
+  {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+  }
+
   if (GetSym () == lparen)
     {
       GetSym ();
@@ -319,6 +336,12 @@ IN (void)
 {
   long inreg;
 
+  if (rcmX000)
+  {
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
+  }
+  
   if (GetSym () == name)
     {
       switch (inreg = CheckRegister8 ())
@@ -380,6 +403,12 @@ IM (void)
   long constant;
   struct expr *postfixexpr;
 
+  if (rcmX000)
+  {
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
+  }
+
   GetSym ();
   if ((postfixexpr = ParseNumExpr ()) != NULL)
     {
@@ -426,8 +455,16 @@ RST (void)
 	  constant = EvalPfixExpr (postfixexpr);
 	  if ((constant >= 0 && constant <= 56) && (constant % 8 == 0))
 	    {
-	      *codeptr++ = 199 + constant;	/* RST  00H, ... 38H */
-	      ++PC;
+		if ( (rcmX000) && 
+		     ((constant == 0) || (constant == 8) || (constant == 0x30)))
+		{
+		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+		}
+		else
+		{
+		    *codeptr++ = 199 + constant;	/* RST  00H, ... 38H */
+		    ++PC;
+		}
 	    }
 	  else
 	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 4);
@@ -584,13 +621,21 @@ Subroutine_addr (int opcode0, int opcode)
   GetSym ();
   if ((constant = CheckCondition ()) != -1)
     {				/* check for a condition */
-      *codeptr++ = opcode + constant * 8;	/* get instruction opcode */
-      if (GetSym () == comma)
-	GetSym ();
-      else
+
+	/** Don't allow conditional call in rcmX000 */
+	if (opcode0==205 && rcmX000)
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	  return;
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	    return;
+	}
+	
+	*codeptr++ = opcode + constant * 8;	/* get instruction opcode */
+	if (GetSym () == comma)
+	    GetSym ();
+	else
+	{
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	    return;
 	}
     }
   else

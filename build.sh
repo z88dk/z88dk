@@ -5,7 +5,9 @@
 #
 
 # Start from scratch
-make clean
+#make clean
+
+mkdir bin
 
 Z80_OZFILES=`pwd`/lib/
 ZCCCFG=`pwd`/lib/config/

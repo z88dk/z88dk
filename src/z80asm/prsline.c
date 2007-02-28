@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.8 2002-04-22 14:45:51 stefano Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.9 2007-02-28 11:23:24 stefano Exp $ */
 /* $History: PRSLINE.C $ */
 /*  */
 /* *****************  Version 8  ***************** */
@@ -70,6 +70,9 @@ extern enum symbols sym, ssym[];
 extern short currentline;
 extern struct module *CURRENTMODULE;
 extern enum flag EOL, swapIXIY;
+
+enum flag rcmX000;
+
 
 /* get a character from file with CR/LF/CRLF parsing capability.
  *
@@ -435,9 +438,23 @@ CheckRegister8 (void)
 	  case 'E':
 	    return 3;
 	  case 'I':
-	    return 8;
+	  {
+	      if (rcmX000)
+	      {
+		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+		  return -1;
+	      }	
+	      return 8;
+	  }
 	  case 'R':
-	    return 9;
+	  {
+	      if (rcmX000)
+	      {
+		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+		  return -1;
+	      }	
+	      return 9;
+	  }
 	  case 'F':
 	    return 6;
 	  }
@@ -474,6 +491,21 @@ CheckRegister8 (void)
 	      return (8 + 4);
 	    else
 	      return (16 + 4);
+	  }
+
+	else if (strcmp (ident, "IIR") == 0) /** Was 'I' register */
+	  {
+	      if (rcmX000)
+	      {
+		  return 8;
+	      }
+	  }
+	else if (strcmp (ident, "EIR") == 0) /** Was 'R' register */
+	  {
+	      if (rcmX000)
+	      {
+		  return 9;
+	      }
 	  }
 	  
       }

@@ -47,6 +47,7 @@ sed "s?DESTDIR\/?$destdir?g" < lib/config/z88ansi.lnx > lib/config/z88ansi.cfg
 sed "s?DESTDIR\/?$destdir?g" < lib/config/z88net.lnx > lib/config/z88net.cfg
 sed "s?DESTDIR\/?$destdir?g" < lib/config/zx81.lnx > lib/config/zx81.cfg
 sed "s?DESTDIR\/?$destdir?g" < lib/config/zx81ansi.lnx > lib/config/zx81ansi.cfg
+sed "s?DESTDIR\/?$destdir?g" < lib/config/rcmx000.lnx > lib/config/rcmx000.cfg
 sed "s?DESTDIR\/?$destdir?g" < lib/config/zx.lnx > lib/config/zx.cfg
 sed "s?DESTDIR\/?$destdir?g" < lib/config/zxansi.lnx > lib/config/zxansi.cfg
 cp lib/config/$DEFAULT.cfg lib/config/zcc.cfg

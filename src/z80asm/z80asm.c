@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.16 2003-12-01 22:04:25 denniz Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.17 2007-02-28 11:23:24 stefano Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -230,6 +230,9 @@ enum symbols sym, ssym[] =
 enum flag pass1, listing, listing_CPY, symtable, z80bin, writeline, mapref, globaldef, datestamp, ti83plus;
 enum flag deforigin, verbose, ASMERROR, EOL, symfile, library, createlibrary, autorelocate;
 enum flag smallc_source, codesegment, expl_binflnm, clinemode, swapIXIY;
+
+enum flag rcmX000;
+
 
 int ASSEMBLE_ERROR, ERRORS, TOTALERRORS, PAGENR, LINENR;
 long TOTALLINES;
@@ -679,6 +682,14 @@ SetAsmFlag (char *flagid)
 	strncpy ((objext + 1), (flagid + 1), 3);	/* copy argument string (append after '.') */
      objext[4] = '\0';						/* max. 3 letters extension */
    }
+
+  /** Check whether this is for the RCM2000/RCM3000 series of Z80-like CPU's */
+
+  if (strcmp (flagid, "RCMX000") == 0)
+    {
+      rcmX000=ON;
+      return;
+    }
 
   /* check weather to use an RST or CALL when Invoke is used */
   if (strcmp(flagid, "plus") == 0 ) 
@@ -1183,6 +1194,7 @@ display_options (void)
 }
 
 
+
 /***************************************************************************************************
  * Main entry of Z80asm
  ***************************************************************************************************/
@@ -1191,10 +1203,11 @@ main (int argc, char *argv[])
 {
   int asmflag;
 
-
   symtable = symfile = writeline = mapref = ON;
   verbose = smallc_source = listing = listing_CPY = z80bin = datestamp = ASMERROR = codesegment = clinemode = OFF;
   deforigin = globaldef = library = createlibrary = autorelocate = clineno = OFF;
+  rcmX000=OFF;
+
 
   libfilename = NULL;
   modsrcfile = NULL;

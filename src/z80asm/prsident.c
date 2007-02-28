@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.6 2003-10-11 15:41:04 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.7 2007-02-28 11:23:24 stefano Exp $ */
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -127,6 +127,8 @@ extern long PC;
 extern unsigned char *codeptr;
 extern struct module *CURRENTMODULE;
 extern long clineno;
+
+extern enum flag rcmX000;
 
 typedef void (*ptrfunc) (void);	/* ptr to function returning void */
 typedef int (*fptr) (const void *, const void *);
@@ -464,6 +466,12 @@ NOP (void)
 void 
 HALT (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 118;
   ++PC;
 }
@@ -513,6 +521,12 @@ LDDR (void)
 void 
 CPI (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 237;
   *codeptr++ = 161;
   PC += 2;
@@ -523,6 +537,12 @@ CPI (void)
 void 
 CPIR (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 237;
   *codeptr++ = 177;
   PC += 2;
@@ -533,6 +553,12 @@ CPIR (void)
 void 
 CPD (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 237;
   *codeptr++ = 169;
   PC += 2;
@@ -543,6 +569,12 @@ CPD (void)
 void 
 CPDR (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 237;
   *codeptr++ = 185;
   PC += 2;
@@ -553,6 +585,12 @@ CPDR (void)
 void 
 IND (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 237;
   *codeptr++ = 170;
   PC += 2;
@@ -563,6 +601,12 @@ IND (void)
 void 
 INDR (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 237;
   *codeptr++ = 186;
   PC += 2;
@@ -583,6 +627,12 @@ INI (void)
 void 
 INIR (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 237;
   *codeptr++ = 178;
   PC += 2;
@@ -593,6 +643,12 @@ INIR (void)
 void 
 OUTI (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 237;
   *codeptr++ = 163;
   PC += 2;
@@ -603,6 +659,12 @@ OUTI (void)
 void 
 OUTD (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 237;
   *codeptr++ = 171;
   PC += 2;
@@ -613,6 +675,12 @@ OUTD (void)
 void 
 OTIR (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 237;
   *codeptr++ = 179;
   PC += 2;
@@ -623,6 +691,12 @@ OTIR (void)
 void 
 OTDR (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 237;
   *codeptr++ = 187;
   PC += 2;
@@ -889,6 +963,12 @@ RETN (void)
 void 
 RLD (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 237;
   *codeptr++ = 111;
   PC += 2;
@@ -899,6 +979,12 @@ RLD (void)
 void 
 RRD (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 237;
   *codeptr++ = 103;
   PC += 2;
@@ -919,7 +1005,7 @@ NEG (void)
 void 
 CALL (void)
 {
-  Subroutine_addr (205, 196);
+    Subroutine_addr (205, 196);
 }
 
 
@@ -953,6 +1039,12 @@ SCF (void)
 void 
 DI (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 243;
   ++PC;
 }
@@ -962,6 +1054,12 @@ DI (void)
 void 
 EI (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
   *codeptr++ = 251;
   ++PC;
 }
@@ -971,6 +1069,12 @@ EI (void)
 void 
 DAA (void)
 {
-  *codeptr++ = 39;
-  ++PC;
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
+
+    *codeptr++ = 39;
+    ++PC;
 }

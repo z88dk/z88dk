@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.79 2007-01-09 10:27:30 aralbrec Exp $
+# $Id: Makefile,v 1.80 2007-02-28 11:23:17 stefano Exp $
 
 
 include Make.config
@@ -18,7 +18,7 @@ all:	genlibs z88libs tilibs zxlibs \
 	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib nasansi_clib.lib ozansi_clib.lib\
 	rex_clib.lib svi_clib.lib sam_clib.lib samansi_clib.lib \
-	pps_clib.lib ppsansi_clib.lib embedded_clib.lib \
+	pps_clib.lib ppsansi_clib.lib embedded_clib.lib rcmx000_clib.lib \
 	zx81_clib.lib zx81ansi_clib.lib
 
 genlibs: gen_math.lib malloc.lib z80_crt0.lib ndos.lib adt.lib balloc.lib \
@@ -38,12 +38,12 @@ zxlibs: zx_clib.lib zxan_clib.lib zxvgs.lib zx_math.lib zx_mathtiny.lib
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.79 2007-01-09 10:27:30 aralbrec Exp $
+#  $Id: Makefile,v 1.80 2007-02-28 11:23:17 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.79 2007-01-09 10:27:30 aralbrec Exp $
+# $Id: Makefile,v 1.80 2007-02-28 11:23:17 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -58,7 +58,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.79 2007-01-09 10:27:30 aralbrec Exp $
+#  $Id: Makefile,v 1.80 2007-02-28 11:23:17 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -891,6 +891,21 @@ embedded_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORembedded -xembedded_clib @embedded.lst
+
+# RCM2/3000 lib 
+rcmx000_clib.lib:
+	@echo ''
+	@echo '--- Building RCM2/3000 Library  ---'
+	@echo ''
+	./gfxdeps.sh
+	cd strings ; $(MAKE)
+	cd stdlib ; $(MAKE) gen
+	cd stdio ; $(MAKE) gen
+	cd printflike ; $(MAKE) 
+	cd setjmp ; $(MAKE) 
+	cd assert ; $(MAKE) 
+	z80asm -IXIY -d -ns -nm -Mo -DFORrcmx000 -xrcmx000_clib @rcmx000.lst
+
 
 clean:
 	cd assert ; $(MAKE) clean ; cd ..
