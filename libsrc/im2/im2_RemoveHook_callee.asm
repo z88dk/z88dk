@@ -7,10 +7,9 @@ LIB IM2RemoveHook
 
 .im2_RemoveHook_callee
 
-   pop bc
-   pop de
    pop hl
-   push bc
+   pop de
+   ex (sp),hl
 
 .asmentry
 

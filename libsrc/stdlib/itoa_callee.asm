@@ -9,10 +9,9 @@ LIB l_deneg
 
 .itoa_callee
 
-   pop bc
-   pop de
    pop hl
-   push bc
+   pop de
+   ex (sp),hl
    
    ; enter : de = int num
    ;         hl = char *s

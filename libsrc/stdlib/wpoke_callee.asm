@@ -6,10 +6,9 @@ XDEF ASMDISP_WPOKE_CALLEE
 
 .wpoke_callee
 
-   pop af
-   pop de
    pop hl
-   push af
+   pop de
+   ex (sp),hl
 
 .asmentry
 

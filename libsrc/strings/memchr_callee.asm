@@ -7,11 +7,10 @@ XDEF ASMDISP_MEMCHR_CALLEE
 
 .memchr_callee
 
-   pop af
+   pop hl
    pop bc
    pop de
-   pop hl
-   push af
+   ex (sp),hl
    ld a,e
    
    ; enter : hl = char *s

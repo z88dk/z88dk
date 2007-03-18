@@ -7,12 +7,11 @@ XDEF ASMDISP_SP1_PUTSPRCLR_CALLEE
 
 .sp1_PutSprClr_callee
 
-   pop af
+   pop hl
    pop bc
    ld b,c
    pop de
-   pop hl
-   push af
+   ex (sp),hl
 
 .asmentry
 

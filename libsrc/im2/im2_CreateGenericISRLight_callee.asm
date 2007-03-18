@@ -12,7 +12,7 @@ LIB IM2CreateCommon
    pop de
    pop bc
    push hl
-   ld a,b
+   ld a,c
 
 .asmentry
 

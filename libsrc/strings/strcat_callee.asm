@@ -7,10 +7,9 @@ XDEF ASMDISP_STRCAT_CALLEE
 
 .strcat_callee
 
-   pop bc
-   pop de
    pop hl
-   push bc
+   pop de
+   ex (sp),hl
    
    ; enter : de = char *src
    ;         hl = char *dst

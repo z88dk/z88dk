@@ -6,10 +6,9 @@ XDEF ASMDISP_BPOKE_CALLEE
 
 .bpoke_callee
 
-   pop af
-   pop de
    pop hl
-   push af
+   pop de
+   ex (sp),hl
    
 .asmentry
 

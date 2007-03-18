@@ -10,10 +10,9 @@ XREF ASMDISP_SP1_ITERATESPRCHAR_CALLEE
 
 .sp1_GetSprClrAddr_callee
 
-   pop bc
-   pop de
    pop hl
-   push bc
+   pop de
+   ex (sp),hl
 
 .asmentry
 

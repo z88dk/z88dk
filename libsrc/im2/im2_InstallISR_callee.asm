@@ -6,10 +6,9 @@ XDEF ASMDISP_IM2_INSTALLISR_CALLEE
 
 .im2_InstallISR_callee
 
-   pop af
-   pop de
    pop hl
-   push af
+   pop de
+   ex (sp),hl
 
 .asmentry
 

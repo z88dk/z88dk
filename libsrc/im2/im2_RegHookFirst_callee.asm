@@ -7,10 +7,9 @@ XREF _im2_hookDisp
 
 .im2_RegHookFirst_callee
 
-   pop bc
-   pop de
    pop hl
-   push bc
+   pop de
+   ex (sp),hl
 
 .asmentry
 

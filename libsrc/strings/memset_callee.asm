@@ -7,11 +7,10 @@ XDEF ASMDISP_MEMSET_CALLEE
 
 .memset_callee
 
-   pop af
+   pop hl
    pop bc
    pop de
-   pop hl
-   push af
+   ex (sp),hl
    
    ; enter : hl = void *s
    ;          e = char c

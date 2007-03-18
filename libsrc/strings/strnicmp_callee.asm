@@ -7,11 +7,10 @@ XDEF ASMDISP_STRNICMP_CALLEE
 
 .strnicmp_callee
 
-   pop af
+   pop hl
    pop bc
    pop de
-   pop hl
-   push af
+   ex (sp),hl
    
    ; enter : bc = uint n
    ;         de = char *s2

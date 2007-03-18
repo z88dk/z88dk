@@ -9,10 +9,9 @@ XREF _heap, ASMDISP_HEAPCALLOC_CALLEE
 
 .calloc
 
-   pop bc
-   pop de
    pop hl
-   push bc
+   pop de
+   ex (sp),hl
 
 .asmentry
 

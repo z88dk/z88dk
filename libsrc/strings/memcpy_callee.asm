@@ -7,11 +7,10 @@ XDEF ASMDISP_MEMCPY_CALLEE
 
 .memcpy_callee
 
-   pop af
+   pop hl
    pop bc
    pop de
-   pop hl
-   push af
+   ex (sp),hl
    
    ; enter : bc = uint n
    ;         de = void *s2

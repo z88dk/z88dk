@@ -22,10 +22,9 @@ XDEF ASMDISP_STRCMP_CALLEE
 
 .strcmp_callee
 
-   pop bc
-   pop de
    pop hl
-   push bc
+   pop de
+   ex (sp),hl
    
    ; enter : hl = char *s1
    ;         de = char *s2

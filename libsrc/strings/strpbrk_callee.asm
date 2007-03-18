@@ -10,10 +10,9 @@ XREF ASMDISP_STRCHR_CALLEE
 
 .strpbrk_callee
 
-   pop bc
-   pop de
    pop hl
-   push bc
+   pop de
+   ex (sp),hl
    
    ; enter : hl = char *s
    ;         de = char *match

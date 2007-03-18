@@ -9,10 +9,9 @@ LIB l_jpix
 
 .sp1_IterateUpdateSpr_callee
 
-   pop bc
-   pop ix
    pop hl
-   push bc
+   pop ix
+   ex (sp),hl
 
 .asmentry
 

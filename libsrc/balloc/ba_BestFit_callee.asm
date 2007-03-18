@@ -6,11 +6,10 @@ LIB BABestFit
 
 .ba_BestFit_callee
 
-   pop af
+   pop hl
    pop bc
    ld b,c
-   pop hl
+   ex (sp),hl
    ld h,0
-   push af
    
    jp BABestFit

@@ -10,10 +10,9 @@ XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
 
 .sp1_ScreenStr_callee
 
-   pop af
-   pop de
    pop hl
-   push af
+   pop de
+   ex (sp),hl
    ld d,l
 
 .asmentry

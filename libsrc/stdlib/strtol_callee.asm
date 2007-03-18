@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol_callee.asm,v 1.2 2007-01-16 22:00:30 aralbrec Exp $
+; * $Id: strtol_callee.asm,v 1.3 2007-03-18 08:55:00 aralbrec Exp $
 ; *
 ; */
 ;
@@ -22,11 +22,10 @@ XDEF ASMDISP_STRTOL_CALLEE
 
 .strtol_callee
 
-   pop af
+   pop hl
    pop bc
    pop de
-   pop hl
-   push af
+   ex (sp),hl
 
    ; bc = base
    ; de = char **endp

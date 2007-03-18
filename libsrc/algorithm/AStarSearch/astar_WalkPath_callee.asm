@@ -18,7 +18,7 @@ XDEF ASMDISP_ASTAR_WALKPATH_CALLEE
    ;         hl = uint []
    ;         de = astar_path *
    ; exit  : hl = ptr into uint[] where first node in sequence written
-   ;         C flag set if entire path written
+   ;         C flag set if entire path not written
    ;         
    ; uses  : af, bc, de, hl
 

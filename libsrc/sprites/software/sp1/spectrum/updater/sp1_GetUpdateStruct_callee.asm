@@ -9,10 +9,9 @@ XDEF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
 
 .sp1_GetUpdateStruct_callee
 
-   pop bc
-   pop de
    pop hl
-   push bc
+   pop de
+   ex (sp),hl
    ld d,l
 
 .asmentry

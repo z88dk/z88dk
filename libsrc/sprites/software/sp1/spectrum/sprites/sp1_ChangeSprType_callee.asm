@@ -9,10 +9,9 @@ XREF SP1V_SPRDRAWTBL
 
 .sp1_ChangeSprType_callee
 
-   pop bc
-   pop de
    pop hl
-   push bc
+   pop de
+   ex (sp),hl
 
 .asmentry
 

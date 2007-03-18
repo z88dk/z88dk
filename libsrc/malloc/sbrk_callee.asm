@@ -9,10 +9,9 @@ XREF _heap, ASMDISP_HEAPSBRK_CALLEE
 
 .sbrk_callee
 
-   pop de
-   pop bc
    pop hl
-   push de
+   pop bc
+   ex (sp),hl
 
 .asmentry
    

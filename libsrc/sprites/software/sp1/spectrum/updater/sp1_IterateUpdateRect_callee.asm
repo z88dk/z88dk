@@ -10,10 +10,9 @@ XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE, SP1V_DISPWIDTH
 
 .sp1_IterateUpdateRect_callee
 
-   pop bc
-   pop ix
    pop hl
-   push bc
+   pop ix
+   ex (sp),hl
 
 .centry
 

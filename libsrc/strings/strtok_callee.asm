@@ -12,10 +12,9 @@ XREF ASMDISP_STRCHR_CALLEE
 
 .strtok_callee
 
-   pop af
-   pop de
    pop hl
-   push af
+   pop de
+   ex (sp),hl
    
    ; enter : de = char *delim
    ;         hl = char *s

@@ -7,10 +7,9 @@ XDEF ASMDISP_STRRSTR_CALLEE
 
 .strrstr_callee
 
-   pop bc
-   pop de
    pop hl
-   push bc
+   pop de
+   ex (sp),hl
    
    ; enter : de = char *w
    ;         hl = char *s

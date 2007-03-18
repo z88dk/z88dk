@@ -13,6 +13,6 @@ XREF ASMDISP_IM2_CREATEGENERICISRLIGHT_CALLEE
    push bc
    push de
    push hl
-   ld a,b
+   ld a,c
 
    jp im2_CreateGenericISRLight_callee + ASMDISP_IM2_CREATEGENERICISRLIGHT_CALLEE
