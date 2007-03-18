@@ -5,7 +5,6 @@
  * Abstract Data Types Library
  *
  * - Doubly Linked List +    ; added 08.2005 aralbrec
- * - Hash Table         +    ; added 08.2005 aralbrec
  * - Heap                    ; added 08.2005 aralbrec
  * - Stack              +    ; added 09.2005 aralbrec
  * - Queue              +    ; added 09.2005 aralbrec
@@ -45,7 +44,7 @@ reports a match or when the current ptr points past the end of the list.
 
 In the following:
 
-   void *delete <->  void (*delete)(void *item)
+   void *delete <->  void [__FASTCALL__] (*delete)(void *item)
    void *match  <->  char (*match)(void *item1, void *item2) return 0 if =
 
 */
@@ -74,78 +73,44 @@ extern void __LIB__ __FASTCALL__ *adt_ListLast(struct adt_List *list);
 extern void __LIB__ __FASTCALL__ *adt_ListNext(struct adt_List *list);
 extern void __LIB__ __FASTCALL__ *adt_ListPrev(struct adt_List *list);
 extern void __LIB__ __FASTCALL__ *adt_ListCurr(struct adt_List *list);
-extern char __LIB__  adt_ListAdd(struct adt_List *list, void *item);
-extern char __LIB__  adt_ListInsert(struct adt_List *list, void *item);
-extern char __LIB__  adt_ListAppend(struct adt_List *list, void *item);
-extern char __LIB__  adt_ListPushBack(struct adt_List *list, void *item);
-extern char __LIB__  adt_ListPrepend(struct adt_List *list, void *item);
-extern char __LIB__  adt_ListPushFront(struct adt_List *list, void *item);
+extern int  __LIB__  adt_ListAdd(struct adt_List *list, void *item);
+extern int  __LIB__  adt_ListInsert(struct adt_List *list, void *item);
+extern int  __LIB__  adt_ListAppend(struct adt_List *list, void *item);
+extern int  __LIB__  adt_ListPrepend(struct adt_List *list, void *item);
 extern void __LIB__ __FASTCALL__ *adt_ListRemove(struct adt_List *list);
 extern void __LIB__  adt_ListConcat(struct adt_List *list1, struct adt_List *list2);
 extern void __LIB__ __FASTCALL__ *adt_ListTrim(struct adt_List *list);
-extern void __LIB__ __FASTCALL__ *adt_ListPopBack(struct adt_List *list);
 extern void __LIB__ __FASTCALL__ *adt_ListPopFront(struct adt_List *list);
 extern void __LIB__ __FASTCALL__ adt_ListSetCurrBefore(struct adt_List *list);
 extern void __LIB__ __FASTCALL__ adt_ListSetCurrAfter(struct adt_List *list);
 extern void __LIB__ adt_ListSetCurr(struct adt_List *list, struct adt_ListNode *n);
 extern void __LIB__ *adt_ListSearch(struct adt_List *list, void *match, void *item1);
 
+// make CALLEE linkage default
 
-/*** HASH TABLE
+extern void __LIB__ __CALLEE__ adt_ListDelete_callee(struct adt_List *list, void *delete);   /* from C: del = 0 to do nothing */
+extern void __LIB__ __CALLEE__ adt_ListDeleteS_callee(struct adt_List *list, void *delete);  /* from C: del = 0 to do nothing */
+extern int  __LIB__ __CALLEE__ adt_ListAdd_callee(struct adt_List *list, void *item);
+extern int  __LIB__ __CALLEE__ adt_ListInsert_callee(struct adt_List *list, void *item);
+extern int  __LIB__ __CALLEE__ adt_ListAppend_callee(struct adt_List *list, void *item);
+extern int  __LIB__ __CALLEE__ adt_ListPrepend_callee(struct adt_List *list, void *item);
+extern void __LIB__ __CALLEE__ adt_ListConcat_callee(struct adt_List *list1, struct adt_List *list2);
+extern void __LIB__ __CALLEE__ adt_ListSetCurr_callee(struct adt_List *list, struct adt_ListNode *n);
+extern void __LIB__ __CALLEE__ *adt_ListSearch_callee(struct adt_List *list, void *match, void *item1);
 
-A hash table stores (key,value) pairs and is intended as a fast table lookup.
-You provide the key, the hash table looks up the value.
+#define adt_ListDelete(a,b)     adt_ListDelete_callee(a,b)
+#define adt_ListDeleteS(a,b)    adt_ListDeleteS_callee(a,b)
+#define adt_ListAdd(a,b)        adt_ListAdd_callee(a,b)
+#define adt_ListInsert(a,b)     adt_ListInsert_callee(a,b)
+#define adt_ListAppend(a,b)     adt_ListAppend_callee(a,b)
+#define adt_ListPrepend(a,b)    adt_ListPrepend_callee(a,b)
+#define adt_ListConcat(a,b)     adt_ListConcat_callee(a,b)
+#define adt_ListSetCurr(a,b)    adt_ListSetCurr_callee(a,b)
+#define adt_ListSearch(a,b,c)   adt_ListSearch_callee(a,b,c)
 
-This implementation of hash table uses a linked list to store (key,value)
-pairs that map to the same table location.  Keys must be unique, with the
-lib functions taking sensible actions if the user violates this requirement.
-Unlike most hash table implementations that only require an equals operator
-on keys, this implementation requires a less/equal operator in order
-to keep items in the lists sorted for marginally faster lookup when the load
-factor of the hash table becomes high.
-
-On creation, you must determine the hash table's size and provide
-several functions, among them key compare and hash function, which will be
-stored in the hashtable data structure and will be used implicity in hash
-table function calls.  As always performance depends on a good hash function
-and appropriate hash table size.  The goal is to evenly spread keys among all
-table indices -- this can be helped by choosing a table size that is a prime
-number.
-
-In the following:
-
-   void *delete    <->  void (*delete)(struct adt_HashCell *hc)
-                        an opportunity for user cleanup; delete hc->key, hc->value only
-   void *hashfunc  <->  uint (*hashfunc)(void *key, uint size)
-                        return a uint from 0..size-1
-   void *compare   <->  char (*compare)(void *key1, void *key2)
-                        if *key1 < *key2 return -ve, if = return 0
-
-delete member = 0 to do no user clean-up on deleted adt_HashCells.
-
-*/
-
-struct adt_HashCell {               /* Invisible to user, one for each (key,value) pair in table */
-   void *key;
-   struct adt_HashCell *next;       /* big endian */
-   void *value;
-};
-
-struct adt_HashTable {              /* One as handle for the hash table */
-   uint                size;        /* size of table */
-   struct adt_HashCell **table;     /* table of buckets */
-   void                *hashfunc;   /* user supplied hash function */
-   void                *compare;    /* user supplied comparison of keys function */
-   void                *delete;     /* user supplied function for deleting (key,value) pairs */
-};
-
-extern struct adt_HashTable __LIB__ *adt_HashCreate(uint size, void *delete, void *compare, void *hashfunc);
-extern void __LIB__  adt_HashCreateS(void *delete, void *compare, void *hashfunc, void *table, uint size, struct adt_HashTable *ht);
-extern void __LIB__ __FASTCALL__ adt_HashDelete(struct adt_HashTable *ht);
-extern void __LIB__ __FASTCALL__ adt_HashDeleteS(struct adt_HashTable *ht);
-extern void __LIB__ *adt_HashRemove(struct adt_HashTable *ht, void *key);
-extern void __LIB__ *adt_HashLookup(struct adt_HashTable *ht, void *key);
-extern void __LIB__ *adt_HashAdd(struct adt_HashTable *ht, void *key, void *value);
+#define adt_ListPopBack(a)      adt_ListTrim(a)
+#define adt_ListPushBack(a,b)   adt_ListAppend_callee(a,b)
+#define adt_ListPushFront(a,b)  adt_ListPrepend_callee(a,b)
 
 
 /*** HEAP (PRIORITY QUEUE)
@@ -179,9 +144,19 @@ the heap.
 
 */
 
-extern void __LIB__ adt_Heapify(void **array, uint n, void *compare);
-extern void __LIB__ adt_HeapAdd(void *item, void **array, uint *n, void *compare);
+extern void __LIB__  adt_Heapify(void **array, uint n, void *compare);
+extern void __LIB__  adt_HeapAdd(void *item, void **array, uint *n, void *compare);
 extern void __LIB__ *adt_HeapExtract(void **array, uint *n, void *compare);
+
+// make CALLEE linkage default
+
+extern void __LIB__ __CALLEE__  adt_Heapify_callee(void **array, uint n, void *compare);
+extern void __LIB__ __CALLEE__  adt_HeapAdd_callee(void *item, void **array, uint *n, void *compare);
+extern void __LIB__ __CALLEE__ *adt_HeapExtract_callee(void **array, uint *n, void *compare);
+
+#define adt_Heapify(a,b,c)      adt_Heapify_callee(a,b,c)
+#define adt_HeapAdd(a,b,c,d)    adt_HeapAdd_callee(a,b,c,d)
+#define adt_HeapExtract(a,b,c)  adt_HeapExtract_callee(a,b,c)
 
 
 /*** QUEUE
@@ -192,7 +167,7 @@ of the queue.
 
 In the following:
 
-     void *delete  <-> void (*delete)(void *item)
+     void *delete  <-> void [__FASTCALL__] (*delete)(void *item)
                        an opportunity for user clean up if a non-empty queue is deleted
 */
 
@@ -219,6 +194,18 @@ extern void __LIB__ __FASTCALL__ *adt_QueuePopBack(struct adt_Queue *q);
 extern int  __LIB__ adt_QueuePushFront(struct adt_Queue *q, void *item);
 extern int  __LIB__ adt_QueuePushBack(struct adt_Queue *q, void *item);
 
+// make CALLEE linkage default
+
+extern void __LIB__ __CALLEE__ adt_QueueDelete_callee(struct adt_Queue *q, void *delete);
+extern void __LIB__ __CALLEE__ adt_QueueDeleteS_callee(struct adt_Queue *q, void *delete);
+extern int  __LIB__ __CALLEE__ adt_QueuePushFront_callee(struct adt_Queue *q, void *item);
+extern int  __LIB__ __CALLEE__ adt_QueuePushBack_callee(struct adt_Queue *q, void *item);
+
+#define adt_QueueDelete(a,b)     adt_QueueDelete_callee(a,b)
+#define adt_QueueDeleteS(a,b)    adt_QueueDeleteS_callee(a,b)
+#define adt_QueuePushFront(a,b)  adt_QueuePushFront_callee(a,b)
+#define adt_QueuePushBack(a,b)   adt_QueuePushBack_callee(a,b)
+
 
 /*** STACK
 
@@ -227,7 +214,7 @@ off the top as well.
 
 In the following:
 
-     void *delete  <-> void __FASTCALL__ (*delete)(void *item)
+     void *delete  <-> void [__FASTCALL__] (*delete)(void *item)
                        an opportunity for user clean up if a non-empty stack is deleted
 */
 
@@ -249,6 +236,16 @@ extern int  __LIB__ adt_StackPush(struct adt_Stack *s, void *item);
 extern void __LIB__ __FASTCALL__ *adt_StackPop(struct adt_Stack *s);
 extern void __LIB__ __FASTCALL__ *adt_StackPeek(struct adt_Stack *s);
 extern uint __LIB__ __FASTCALL__  adt_StackCount(struct adt_Stack *s);
+
+// make CALLEE linkage default
+
+extern void __LIB__ __CALLEE__ adt_StackDelete_callee(struct adt_Stack *s, void *delete);
+extern void __LIB__ __CALLEE__ adt_StackDeleteS_callee(struct adt_Stack *s, void *delete);
+extern int  __LIB__ __CALLEE__ adt_StackPush_callee(struct adt_Stack *s, void *item);
+
+#define adt_StackDelete(a,b)   adt_StackDelete_callee(a,b)
+#define adt_StackDeleteS(a,b)  adt_StackDeleteS_callee(a,b)
+#define adt_StackPush(a,b)     adt_StackPush_callee(a,b)
 
 
 #endif
