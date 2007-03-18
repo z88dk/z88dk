@@ -1,21 +1,18 @@
 ; int adt_QueuePushFront(struct adt_Queue *q, void *item)
-; 11.2006 aralbrec
+; CALLER linkage for function pointers
 
 XLIB adt_QueuePushFront
-LIB ADTQueuePushFront
+
+LIB adt_QueuePushFront_callee
+XREF ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE
 
 .adt_QueuePushFront
-   ld hl,2
-   add hl,sp
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
-   call ADTQueuePushFront
-   ret nc
-   ld hl,1
-   ret
+
+   pop bc
+   pop de
+   pop hl
+   push hl
+   push de
+   push bc
+   
+   jp adt_QueuePushFront_callee + ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE

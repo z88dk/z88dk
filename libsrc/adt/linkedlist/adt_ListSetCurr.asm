@@ -1,18 +1,18 @@
 ; void adt_ListSetCurr(struct adt_List *list, struct adt_ListNode *n)
-; 11.2006 aralbrec
+; CALLER linkage for function pointers
 
 XLIB adt_ListSetCurr
-LIB ADTListSetCurr
+
+LIB adt_ListSetCurr_callee
+XREF ASMDISP_ADT_LISTSETCURR_CALLEE
 
 .adt_ListSetCurr
-   ld hl,2
-   add hl,sp
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
-   jp ADTListSetCurr
+
+   pop af
+   pop de
+   pop hl
+   push hl
+   push de
+   push af
+   
+   jp adt_ListSetCurr_callee + ASMDISP_ADT_LISTSETCURR_CALLEE

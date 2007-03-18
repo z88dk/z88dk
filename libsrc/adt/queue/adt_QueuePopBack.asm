@@ -10,21 +10,18 @@ XREF _u_free
 
 .adt_QueuePopBack
 
-   ld e,(hl)
+   ld a,(hl)                 ; reduce count
+   dec (hl)
    inc hl
-   ld d,(hl)                 ; de = count
-   ex de,hl
-   ld a,h
-   or l
-   ret z                     ; return with carry reset and hl = 0 if empty
-   ex de,hl
-   dec de                    ; count--
-   ld (hl),d                 ; store new count
-   dec hl
-   ld (hl),e
-   inc hl
-   inc hl                    ; hl = &adt_Queue.front
-   
+   or a
+   jp nz, nomoredec
+   or (hl)
+   jr z, fail
+   dec (hl)
+
+.nomoredec
+
+   inc hl                    ; hl = &adt_Queue.front   
    ld e,l                    ; de = & lagger's next pointer
    ld d,h                    ;    = &adt_Queue.front to start with
    ld a,(hl)
@@ -54,8 +51,15 @@ XREF _u_free
 
 .exitloop
 
-   ; stack = & last adt_QueueNode.next
+   ; stack = &adt_Queue.front + 1b, & last adt_QueueNode.next
    ; de = & lagger adt_QueueNode.next
+   
+   pop hl
+   ex (sp),hl                ; hl = &adt_Queue.front + 1b
+   inc hl
+   ld (hl),e                 ; store ptr to new last node into adt_Queue.back
+   inc hl
+   ld (hl),d
    
    xor a                     ; store 0 into the second last node's next pointer
    ld (de),a
@@ -74,4 +78,12 @@ XREF _u_free
    pop hl
    pop hl                    ; hl = item
    scf
+   ret
+
+.fail
+
+   dec hl
+   ld (hl),a
+   ld l,a
+   ld h,a
    ret

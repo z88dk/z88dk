@@ -1,21 +1,18 @@
 ; int adt_StackPush(struct adt_Stack *s, void *item)
-; 09.2005 aralbrec
+; CALLER linkage for function pointers
 
 XLIB adt_StackPush
-LIB ADTStackPush
+
+LIB adt_StackPush_callee
+XREF ASMDISP_ADT_STACKPUSH_CALLEE
 
 .adt_StackPush
-   ld hl,2
-   add hl,sp
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
-   call ADTStackPush
-   ret nc
-   ld hl,1
-   ret
+
+   pop bc
+   pop de
+   pop hl
+   push hl
+   push de
+   push bc
+   
+   jp adt_StackPush_callee + ASMDISP_ADT_STACKPUSH_CALLEE

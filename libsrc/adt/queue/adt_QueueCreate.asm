@@ -2,12 +2,15 @@
 ; 09.2005 aralbrec
 
 XLIB adt_QueueCreate
+
+LIB l_setmem
 XREF _u_malloc
 
 ; exit : HL = struct adt_Queue * and carry set
 ;           = 0 and nc if fail
 
 .adt_QueueCreate
+
    ld hl,6           ; sizeof(struct adt_Queue)
    push hl
    call _u_malloc
@@ -17,16 +20,7 @@ XREF _u_malloc
    ld e,l
    ld d,h
    xor a
-   ld (de),a
-   inc de
-   ld (de),a
-   inc de
-   ld (de),a
-   inc de
-   ld (de),a
-   inc de
-   ld (de),a
-   inc de
-   ld (de),a
+   call l_setmem-11
+   ex de,hl
    scf
    ret

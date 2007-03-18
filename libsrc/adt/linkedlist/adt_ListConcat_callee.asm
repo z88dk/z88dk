@@ -1,14 +1,24 @@
-; void adt_ListConcat(struct adt_List *list1, struct sp_List *list2)
+; void __CALLEE__ adt_ListConcat_callee(struct adt_List *list1, struct adt_List *list2)
 ; 02.2003, 06.2005 aralbrec
 
-XLIB ADTListConcat
+XLIB adt_ListConcat_callee
+XDEF ASMDISP_ADT_LISTCONCAT_CALLEE
+
 XREF _u_free
 
-; enter: HL = list2, DE = list1
-; exit : list1 = list1 concat list2, list2 is deleted
-; uses : AF,BC,DE,HL
+.adt_ListConcat_callee
 
-.ADTListConcat
+   pop bc
+   pop hl
+   pop de
+   push bc
+
+.asmentry
+
+; enter: hl = list2, de = list1
+; exit : list1 = list1 concat list2, list2 is deleted
+; uses : af, bc, de, hl
+
    push hl               ; stack = list2
    ld a,(hl)
    inc hl
@@ -24,6 +34,7 @@ XREF _u_free
    ret
 
 .list2nonempty           ; stack = list2
+
    ex de,hl              ; de = list2.count+1, hl = list1
    ld a,(hl)
    inc hl
@@ -59,6 +70,7 @@ XREF _u_free
    ; both lists nonempty
 
 .list1nonempty           ; de = list2.count+1, hl = list1.count+1, stack = list2
+
    dec de
    dec hl
    ld a,(de)
@@ -93,9 +105,12 @@ XREF _u_free
    jp rejoin1
 
 .list1notafter           ; de = list2.head, hl = list1.state
+
    ld bc,5
    add hl,de             ; hl = list1.tail
+   
 .rejoin1
+
    ld b,(hl)
    inc hl                ; hl = list1.tail+1
    ld c,(hl)             ; bc = list1 tail NODE
@@ -134,3 +149,6 @@ XREF _u_free
    call _u_free          ; free(list2)
    pop hl
    ret
+
+DEFC ASMDISP_ADT_LISTCONCAT_CALLEE = asmentry - adt_ListConcat_callee
+

@@ -2,23 +2,13 @@
 ; 09.2005 aralbrec
 
 XLIB adt_QueueBack
+LIB adt_QueueFront
 
 ; enter: HL = struct adt_Queue *
 ; exit : HL = peek at last item or 0 and carry reset if queue empty
 
 .adt_QueueBack
-   ld de,4
-   add hl,de
-   ld e,(hl)
+
    inc hl
-   ld d,(hl)
-   ex de,hl
-   ld a,h
-   or l
-   ret z
-   ld e,(hl)
    inc hl
-   ld d,(hl)
-   ex de,hl
-   scf
-   ret
+   jp adt_QueueFront

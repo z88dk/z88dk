@@ -1,26 +1,18 @@
 ; void adt_StackDelete(struct adt_Stack *s, void *delete)
-; 09.2005 aralbrec
+; CALLER linkage for function pointers
 
 XLIB adt_StackDelete
-LIB ADTStackDelete
+
+LIB adt_StackDelete_callee
+XREF ASMDISP_ADT_STACKDELETE_CALLEE
 
 .adt_StackDelete
-   ld hl,2
-   add hl,sp
-   ld e,(hl)
-   ld ixl,e
-   inc hl
-   ld a,(hl)
-   ld ixh,a
-   inc hl
-   or e
-   jr nz, valid
-   ld ix,justret
-.valid
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
-   jp ADTStackDelete
-.justret
-   ret
+
+   pop bc
+   pop de
+   pop hl
+   push hl
+   push de
+   push bc
+   
+   jp adt_StackDelete_callee + ASMDISP_ADT_STACKDELETE_CALLEE

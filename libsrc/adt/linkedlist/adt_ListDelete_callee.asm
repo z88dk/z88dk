@@ -1,0 +1,39 @@
+; void __CALLEE__ adt_ListDelete_callee(struct adt_List *list, void *delete)
+; /* void __FASTCALL__ (*delete)(void *item) */
+; 02.2003, 06.2005 aralbrec
+
+XLIB adt_ListDelete_callee
+XDEF ASMDISP_ADT_LISTDELETE_CALLEE
+
+LIB adt_ListDeleteS_callee
+XREF ASMDISP_ADT_LISTDELETES_CALLEE
+
+XREF _u_free
+
+.adt_ListDelete_callee
+
+   pop bc
+   pop de
+   pop hl
+   push bc
+   
+.asmentry
+
+; enter: hl = struct adt_List *
+;        de = delete with HL = item
+; exit : All items in list deleted but not adt_List struct itself
+;        (delete) is called once for each item in the list with
+;          HL = item and stack=item
+; note : not multi-thread safe
+; uses : af, bc, de, hl, ix
+
+   push hl
+   call adt_ListDeleteS_callee + ASMDISP_ADT_LISTDELETES_CALLEE
+   pop hl
+   
+   push hl
+   call _u_free
+   pop hl
+   ret
+      
+DEFC ASMDISP_ADT_LISTDELETE_CALLEE = asmentry - adt_ListDelete_callee

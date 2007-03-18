@@ -14,16 +14,35 @@ LIB l_jpix
 
 
 .ADTListSearch
+
    inc hl
    inc hl
+   
+   ld a,(hl)           ; a = list state
+   inc hl
+   or a
+   jp nz, notbefore
+
+   inc hl
+   push hl             ; stack = list.current + 1
    inc hl
    ld a,(hl)
    inc hl
+   jp rejoin   
+
+.notbefore
+
+   ld a,(hl)
+   inc hl
    push hl             ; stack = list.current + 1
+
+.rejoin
+
    ld l,(hl)
    ld h,a              ; hl = current NODE
 
 .while
+
    ld a,h
    or l
    jr z, fail          ; if hl = NULL, failure
@@ -43,6 +62,7 @@ LIB l_jpix
    jp while
 
 .found
+
    dec hl
    dec hl              ; hl = NODE
    pop de
@@ -56,6 +76,7 @@ LIB l_jpix
    ret
 
 .fail
+
    pop hl              ; hl = list.current + 1
    xor a
    ld (hl),a

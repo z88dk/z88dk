@@ -1,30 +1,53 @@
-; void adt_ListDeleteS(struct adt_List *list, void *delete)
+; void __CALLEE__ adt_ListDeleteS_callee(struct adt_List *list, void *delete)
 ; /* void __FASTCALL__ (*delete)(void *item) */
 ; 02.2003, 06.2005 aralbrec
 
-XLIB ADTListDeleteS
+XLIB adt_ListDeleteS_callee
+XDEF ASMDISP_ADT_LISTDELETES_CALLEE
+
 LIB l_jpix
 XREF _u_free
 
-; enter: HL = struct adt_List *
-;        IX = delete with HL = item
+.adt_ListDeleteS_callee
+
+   pop bc
+   pop de
+   pop hl
+   push bc
+
+.asmentry
+
+; enter: hl = struct adt_List *
+;        de = delete with HL = item
 ; exit : All items in list deleted but not adt_List struct itself
 ;        (delete) is called once for each item in the list with
 ;          HL = item and stack=item
-; uses : AF,BC,DE,HL
+; note : not multi-thread safe
+; uses : af, bc, de, hl, ix
 
-.ADTListDeleteS
+   ld a,d
+   or e
+   jr nz, deletenotnull
+   ld de,justret
+
+.deletenotnull
+
+   ld ixl,e
+   ld ixh,d
 
    ld de,5
    add hl,de             ; hl = head
 
 .while
+
    ld a,(hl)
    or a
    ret z
+   
    inc hl
    ld l,(hl)
    ld h,a                ; hl = next NODE
+   
    ld e,(hl)
    push hl               ; save NODE
    inc hl                ; hl = NODE.item+1
@@ -34,9 +57,17 @@ XREF _u_free
    call l_jpix           ; call itemfree with HL = item
    pop hl
    pop hl                ; hl = NODE
+   
    push hl               ; save NODE
    call _u_free          ; free NODE container
    pop hl
    inc hl
    inc hl                ; hl = NODE.next
+   
    jp while
+
+.justret
+
+   ret
+
+DEFC ASMDISP_ADT_LISTDELETES_CALLEE = asmentry - adt_ListDeleteS_callee

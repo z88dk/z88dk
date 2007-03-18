@@ -9,21 +9,19 @@ XREF _u_free
 ;           = 0 and carry reset if queue empty
 
 .adt_QueuePopFront
-   ld e,(hl)
+
+   ld a,(hl)                ; decrease count
+   dec (hl)
    inc hl
-   ld d,(hl)                ; de = count
-   ex de,hl
-   ld a,h
-   or l
-   ret z                    ; return no items in queue
-   ex de,hl
-   dec de                   ; count--
-   ld (hl),d
-   dec hl
-   ld (hl),e
+   or a
+   jp nz, nomoredec
+   or (hl)
+   jr z, fail
+   dec (hl)
+
+.nomoredec
+
    inc hl
-   inc hl
-   
    ld e,(hl)
    inc hl
    ld d,(hl)                ; de = front adt_QueueNode *
@@ -41,11 +39,13 @@ XREF _u_free
    or (hl)
    ldi
    jp nz, notemptynow       ; if the queue is now empty
-   ld (de),a
+   
+   ld (de),a                ; if queue empty, store 0 into adt_Queue.back
    inc de
    ld (de),a
 
 .notemptynow                ; hl = adt_QueueNode.next + 2b
+
    ld bc,-4
    add hl,bc                ; hl = adt_QueueNode *
    push hl
@@ -54,4 +54,12 @@ XREF _u_free
 
    pop hl                   ; hl = item
    scf
+   ret
+
+.fail
+
+   dec hl
+   ld (hl),a
+   ld l,a
+   ld h,a
    ret

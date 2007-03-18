@@ -1,27 +1,18 @@
 ; void adt_QueueDeleteS(struct adt_Queue *q, void *delete)
-; 09.2005 aralbrec
+; CALLER linkage for function pointers
 
 XLIB adt_QueueDeleteS
-LIB ADTQueueDeleteS
+
+LIB adt_QueueDeleteS_callee
+XREF ASMDISP_ADT_QUEUEDELETES_CALLEE
 
 .adt_QueueDeleteS
-   ld hl,2
-   add hl,sp
-   ld e,(hl)
-   ld ixl,e
-   inc hl
-   ld a,(hl)
-   ld ixh,a
-   inc hl
-   or e
-   jr nz, deletenotzero
-   ld ix,justret
-.deletenotzero
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
-   jp ADTQueueDeleteS
 
-.justret
-   ret
+   pop bc
+   pop de
+   pop hl
+   push hl
+   push de
+   push bc
+   
+   jp adt_QueueDeleteS_callee + ASMDISP_ADT_QUEUEDELETES_CALLEE

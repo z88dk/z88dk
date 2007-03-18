@@ -1,18 +1,28 @@
-; int adt_ListAppend(struct adt_List *list, void *item)
+; int __CALLEE__ adt_ListPrepend_callee(struct adt_List *list, void *item)
 ; 02.2003, 06.2005 aralbrec
 
-XLIB ADTListAppend
+XLIB adt_ListPrepend_callee
+XDEF ASMDISP_ADT_LISTPREPEND_CALLEE
+XDEF ASMDISP_ADT_LISTPREPEND2
+
 LIB ADTemptylistadd
-XDEF ADTListAppend2
 XREF _u_malloc
 
-; enter: DE = struct adt_List *
-;        BC = item *
-; exit : carry reset if fail (no memory)
-;        new item appended to end of list, current points at new item
-; uses : AF,BC,DE,HL
+.adt_ListPrepend_callee
 
-.ADTListAppend
+   pop hl
+   pop bc
+   pop de
+   push hl
+
+.asmentry
+
+; enter: de = struct adt_List *
+;        bc = item *
+; exit : carry reset if fail (no memory) and hl = 0 else:
+;        new item prepended to start of list, current points at new item, hl != 0
+; uses : af, bc, de, hl
+
    push bc
    push de
    ld hl,6                ; sizeof(struct adt_ListNode)
@@ -35,13 +45,18 @@ XREF _u_malloc
    jp nz, noinchi
    inc (hl)
    jp cont
+   
 .noinchi
+
    or (hl)                ; hl = LIST.count+1, de = new NODE.next, list count & item done
-   jp z, ADTemptylistadd   ; if there are no items in list jump to emptylistadd helper
+   jp z, ADTemptylistadd  ; if there are no items in list jump to emptylistadd helper
+   
 .cont
+
    inc hl                 ; hl = LIST.state, de = new NODE.next, list count & item done
 
-.ADTListAppend2
+.ADTListPrepend2
+
    ld (hl),1              ; current INLIST
    inc hl
    dec de
@@ -50,31 +65,33 @@ XREF _u_malloc
    ld (hl),d
    inc hl
    ld (hl),e              ; current = new NODE
-   inc hl
-   inc hl
-   inc hl                 ; hl = tail
+   inc hl                 ; hl = head
    inc de
    inc de                 ; de = new NODE.next
+   ldi
+   ldi                    ; new NODE.next = head, hl = tail
    xor a
    ld (de),a
    inc de
-   ld (de),a              ; new NODE.next = NULL
-   inc de                 ; de = new NODE.prev
-   ldi
-   ldi                    ; new NODE.prev = tail
+   ld (de),a              ; new NODE.prev = NULL
    dec hl
    ld e,(hl)
-   dec hl                 ; hl = tail
-   ld d,(hl)              ; de = old tail NODE
+   dec hl                 ; hl = head
+   ld d,(hl)              ; de = old head NODE
    pop bc                 ; bc = new NODE
    ld (hl),b
    inc hl
-   ld (hl),c              ; tail = new NODE
-   ex de,hl               ; hl = old tail NODE
+   ld (hl),c              ; head = new NODE
+   ex de,hl               ; hl = old head NODE
    inc hl
-   inc hl                 ; hl = old tail NODE.next
+   inc hl
+   inc hl
+   inc hl                 ; hl = old head NODE.prev
    ld (hl),b
    inc hl
-   ld (hl),c              ; old tail NODE.next = new NODE
+   ld (hl),c              ; old head NODE.prev = new NODE
    scf
    ret
+
+DEFC ASMDISP_ADT_LISTPREPEND_CALLEE = asmentry - adt_ListPrepend_callee
+DEFC ASMDISP_ADT_LISTPREPEND2 = ADTListPrepend2 - adt_ListPrepend_callee

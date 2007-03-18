@@ -1,16 +1,38 @@
-; void adt_StackDeleteS(struct adt_Stack **s, void *delete)
+; void __CALLEE__ adt_StackDeleteS_callee(struct adt_Stack *s, void *delete)
 ; 11.2006 aralbrec
 
-XLIB ADTStackDeleteS
+XLIB adt_StackDeleteS_callee
+XDEF ASMDISP_ADT_STACKDELETES_CALLEE
+
 LIB l_jpix
 XREF _u_free
+
+.adt_StackDeleteS_callee
+
+   pop hl
+   pop de
+   ex (sp),hl
+
+.asmentry
 
 ; delete all items in stack but not adt_Stack struct itself
 ;
 ; enter: HL = struct adt_Stack *
-;        IX = void (*delete)(void *item) with HL,stack=item
+;        DE = void (*delete)(void *item) with HL,stack=item
 
-.ADTStackDeleteS
+   ld a,h
+   or l
+   ret z
+   
+   ld a,d
+   or e
+   jp nz, notzero
+   ld de,justret
+   
+.notzero
+
+   ld ixl,e
+   ld ixh,d
 
    inc hl
    inc hl
@@ -46,3 +68,9 @@ XREF _u_free
    pop hl
    pop hl                              ; do it all again for next node
    jp loop
+
+.justret
+
+   ret
+
+DEFC ASMDISP_ADT_STACKEDELETES_CALLEE = asmentry - adt_StackDeleteS_callee

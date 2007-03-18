@@ -1,8 +1,18 @@
-; int adt_StackPush(struct adt_Stack *s, void *item)
+; int __CALLEE__ adt_StackPush_callee(struct adt_Stack *s, void *item)
 ; 09.2005, 11.2006 aralbrec
 
-XLIB ADTStackPush
+XLIB adt_StackPush_callee
+XDEF ASMDISP_ADT_STACKPUSH_CALLEE
+
 XREF _u_malloc
+
+.adt_StackPush_callee
+
+   pop hl
+   pop de
+   ex (sp),hl
+
+.asmentry
 
 ; push item onto stack and update stack ptr
 ;
@@ -11,7 +21,6 @@ XREF _u_malloc
 ; exit : HL = 0 and no carry if fail (insufficient memory)
 ;        carry set if successful
 
-.ADTStackPush
    push hl
    push de
    ld hl,4             ; sizeof(struct adt_StackNode)
@@ -34,7 +43,9 @@ XREF _u_malloc
    inc hl
    jr nz, nohi
    inc (hl)
+   
 .nohi
+
    inc hl              ; hl = & adt_Stack.next
    
    ldi                 ; adt_StackNode.next = adt_Stack.next
@@ -48,3 +59,5 @@ XREF _u_malloc
    ld (hl),e           ; new adt_StackNode at top of stack
    scf
    ret
+
+DEFC ASMDISP_ADT_STACKPUSH_CALLEE = asmentry - adt_StackPush_callee

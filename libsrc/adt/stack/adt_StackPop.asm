@@ -11,30 +11,23 @@ XREF _u_free
 ;             carry flag also set if stack not empty
 
 .adt_StackPop
-   ld c,l
-   ld b,h            ; bc = &adt_Stack.count
+
+   ld a,(hl)
+   dec (hl)
    inc hl
+   or a
+   jp nz, nodec
+   or (hl)
+   jr z, fail
+   dec (hl)
+
+.nodec
+
    inc hl
    ld e,(hl)
    inc hl
    ld d,(hl)
    ex de,hl          ; de = &adt_Stack.next + 1b, hl = &adt_StackNode
-
-   ld a,h
-   or l
-   ret z             ; ret if empty stack with hl=0
-
-   ld a,(bc)         ; decrease stack count
-   dec a
-   ld (bc),a
-   inc a
-   jr nz, nohi
-   inc bc
-   ld a,(bc)
-   dec a
-   ld (bc),a
-
-.nohi
 
    ld c,(hl)
    inc hl
@@ -45,6 +38,7 @@ XREF _u_free
    inc hl
    ldd
    ld (de),a         ; write new stack ptr
+   
    dec hl
    dec hl
    push hl
@@ -52,4 +46,12 @@ XREF _u_free
    pop hl
    pop hl            ; hl = item
    scf
+   ret
+
+.fail
+
+   dec hl
+   ld (hl),a
+   ld l,a
+   ld h,a
    ret

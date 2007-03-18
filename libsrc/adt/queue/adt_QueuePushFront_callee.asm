@@ -1,15 +1,24 @@
-; int adt_QueuePushFront(struct adt_Queue *q, void *item)
+; int __CALLEE__ adt_QueuePushFront_callee(struct adt_Queue *q, void *item)
 ; 11.2006 aralbrec
 
-XLIB ADTQueuePushFront
+XLIB adt_QueuePushFront_callee
+XDEF ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE
+
 XREF _u_malloc
+
+.adt_QueuePushFront_callee
+
+   pop hl
+   pop de
+   ex (sp),hl
+
+.asmentry
 
 ; enter: HL = struct adt_Queue *
 ;        DE = item
 ; exit : HL = 0 and carry reset if memory allocation failed
 ;        carry set if success
 
-.ADTQueuePushFront
    push de
    push hl
    ld hl,4                 ; sizeof (struct adt_QueueNode)
@@ -31,9 +40,11 @@ XREF _u_malloc
    inc (hl)                ; count++
    inc hl
    ld c,(hl)
-   jr nz, nohi
+   jp nz, nohi
    inc (hl)
+   
 .nohi
+
    or c                    ; Z flag if 0 items in Queue
    inc hl                  ; hl = Queue.front
    
@@ -53,3 +64,5 @@ XREF _u_malloc
    inc hl
    ld (hl),d
    ret
+
+DEFC ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE = asmentry - adt_QueuePushFront_callee

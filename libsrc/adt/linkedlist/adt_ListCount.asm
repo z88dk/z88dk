@@ -1,4 +1,4 @@
-; uint adt_ListCount(struct adt_List *list)
+; uint __FASTCALL__ adt_ListCount(struct adt_List *list)
 ; 02.2003, 06.2005 aralbrec
 
 XLIB adt_ListCount
@@ -10,6 +10,7 @@ XLIB adt_ListCount
 ; uses  : DE,HL
 
 .adt_ListCount
+
    ld e,(hl)
    inc hl
    ld d,(hl)

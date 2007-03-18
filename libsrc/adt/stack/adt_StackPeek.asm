@@ -10,17 +10,17 @@ XLIB adt_StackPeek
 ; exit : HL = item at top of stack or 0 if stack empty
 
 .adt_StackPeek
+
    inc hl
    inc hl
-   ld e,(hl)
+   ld a,(hl)
    inc hl
-   ld d,(hl)
-   ex de,hl
-   ld a,h
-   or l
+   ld h,(hl)
+   ld l,a
+   or h
    ret z
-   ld e,(hl)
+   ld a,(hl)
    inc hl
-   ld d,(hl)
-   ex de,hl
+   ld h,(hl)
+   ld l,a
    ret

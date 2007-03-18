@@ -2,18 +2,11 @@
 ; 11.2006 aralbrec
 
 XLIB adt_StackCreateS
+LIB l_setmem
 
 ; initialize an adt_Stack*
 
 .adt_StackCreateS
 
    xor a
-   ld (hl),a
-   inc hl
-   ld (hl),a
-   inc hl
-   ld (hl),a
-   inc hl
-   ld (hl),a
-   ret
-
+   jp l_setmem-7

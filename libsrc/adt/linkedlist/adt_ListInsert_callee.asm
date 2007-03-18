@@ -1,18 +1,33 @@
-; int adt_ListInsert(struct adt_List *list, void *item)
+; int __CALLEE__ adt_ListInsert_callee(struct adt_List *list, void *item)
 ; 08.2005 aralbrec
 
-XLIB ADTListInsert
-LIB ADTListPrepend, ADTListAppend, ADTemptylistadd
-XREF ADTListPrepend2, ADTListAppend2, _u_malloc
-defw ADTListPrepend, ADTListAppend
+XLIB adt_ListInsert_callee
+XDEF ASMDISP_ADT_LISTINSERT_CALLEE
 
-; enter: DE = struct adt_List *
-;        BC = item *
-; exit : carry reset if fail (no memory) else:
-;        new item inserted before current, current points at new item
-; uses : AF,BC,DE,HL
+LIB adt_ListPrepend_callee
+XREF ASMDISP_ADT_LISTPREPEND2
 
-.ADTListInsert
+LIB adt_ListAppend_callee
+XREF ASMDISP_ADT_LISTAPPEND2
+
+LIB ADTemptylistadd
+XREF _u_malloc
+
+.adt_ListInsert_callee
+
+   pop hl
+   pop bc
+   pop de
+   push hl
+
+.asmentry
+
+; enter: de = struct adt_List *
+;        bc = item *
+; exit : carry reset if fail and hl = 0 (no memory) else:
+;        new item inserted before current, current points at new item, carry set, hl!=0
+; uses : af, bc, de, hl
+
    push de
    push bc
    ld hl,6                ; sizeof(struct adt_ListNode)
@@ -35,17 +50,20 @@ defw ADTListPrepend, ADTListAppend
    jp nz, noinchi
    inc (hl)
    jp cont
+   
 .noinchi
+
    or (hl)                ; hl = list.count+1, de = new NODE.next, list count & item done
    jp z, ADTemptylistadd  ; if there are no items in list, use empty list helper
 
 .cont
+
    inc hl                 ; hl = list.state, de = new NODE.next, list count & item done
    ld a,(hl)
    or a
-   jp z, ADTListPrepend2  ; if current points before start of list
+   jp z, adt_ListPrepend_callee + ASMDISP_ADT_LISTPREPEND2  ; if current points before start of list
    dec a
-   jp nz, ADTListAppend2  ; if current points past end of list
+   jp nz, adt_ListAppend_callee + ASMDISP_ADT_LISTAPPEND2   ; if current points past end of list
    inc hl                 ; hl = list.current
 
    ; inserting into non-empty list -- insert before current item
@@ -106,3 +124,5 @@ defw ADTListPrepend, ADTListAppend
    ld (hl),e              ; list.head = new NODE
    scf
    ret
+
+DEFC ASMDISP_ADT_LISTINSERT_CALLEE = asmentry - adt_ListInsert_callee

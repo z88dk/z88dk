@@ -7,18 +7,21 @@ XLIB adt_QueueFront
 ; exit : HL = peek at top item or 0 and carry reset if queue empty
 
 .adt_QueueFront
+
    inc hl
    inc hl
-   ld e,(hl)
+
+   ld a,(hl)
    inc hl
-   ld d,(hl)
-   ex de,hl
-   ld a,h
-   or l
+   ld h,(hl)
+   ld l,a
+   
+   or h
    ret z
-   ld e,(hl)
+
+   ld a,(hl)
    inc hl
-   ld d,(hl)
-   ex de,hl
+   ld h,(hl)
+   ld l,a
    scf
    ret

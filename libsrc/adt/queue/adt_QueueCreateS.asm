@@ -2,6 +2,7 @@
 ; 11.2006 aralbrec
 
 XLIB adt_QueueCreateS
+LIB l_setmem
 
 ; initialize an adt_Queue
 ;
@@ -9,10 +10,5 @@ XLIB adt_QueueCreateS
 
 .adt_QueueCreateS
 
-   ld (hl),0
-   ld e,l
-   ld d,h
-   inc de
-   ld bc,5
-   ldir
-   ret
+   xor a
+   jp l_setmem-11

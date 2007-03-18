@@ -1,17 +1,35 @@
-; void adt_QueueDeleteS(struct adt_Queue *q, void *delete)
+; void __CALLEE__ adt_QueueDeleteS_callee(struct adt_Queue *q, void *delete)
 ; 09.2005 aralbrec
 
-XLIB ADTQueueDeleteS
+XLIB adt_QueueDeleteS_callee
+XDEF ASMDISP_ADT_QUEUEDELETES_CALLEE
+
 LIB l_jpix
 XREF _u_free
+
+.adt_QueueDeleteS_callee
+
+   pop hl
+   pop de
+   ex (sp),hl
+
+.asmentry
 
 ; free all items in queue but not adt_Queue struct itself
 ;
 ; enter: HL = struct adt_Queue *
-;        IX = delete function (HL = user item)
+;        DE = delete function (HL = user item)
 
-.ADTQueueDeleteS
+   ld a,d
+   or e
+   jr nz, notzero
+   ld de, justret
 
+.notzero
+
+   ld ixl,e
+   ld ixh,d                     ; ix = delete function
+   
    inc hl
    inc hl
    ld a,(hl)
@@ -20,6 +38,7 @@ XREF _u_free
    ld l,a
    
 .loop                           ; hl = QueueNode to delete
+
    ld a,h
    or l
    ret z
@@ -47,3 +66,8 @@ XREF _u_free
    pop hl                       ; hl = next QueueNode
    jp loop
 
+.justret
+
+   ret
+
+DEFC ASMDISP_ADT_QUEUEDELETES_CALLEE = asmentry - adt_QueueDeleteS_callee
