@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.80 2007-02-28 11:23:17 stefano Exp $
+# $Id: Makefile,v 1.81 2007-03-21 21:21:36 stefano Exp $
 
 
 include Make.config
@@ -32,18 +32,18 @@ tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 	ti86ansi_clib.lib ti86_clib.lib \
 	tigray82.lib tigray83.lib tigray83p.lib tigray85.lib tigray86.lib
 
-zxlibs: zx_clib.lib zxan_clib.lib zxvgs.lib zx_math.lib zx_mathtiny.lib
+zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib zx_math.lib zx_mathtiny.lib
 
 
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.80 2007-02-28 11:23:17 stefano Exp $
+#  $Id: Makefile,v 1.81 2007-03-21 21:21:36 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.80 2007-02-28 11:23:17 stefano Exp $
+# $Id: Makefile,v 1.81 2007-03-21 21:21:36 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -58,7 +58,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.80 2007-02-28 11:23:17 stefano Exp $
+#  $Id: Makefile,v 1.81 2007-03-21 21:21:36 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -245,6 +245,26 @@ zx_clib.lib:
 	cd games ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORzx -xzx_clib @zx.lst
 
+# 64/32 column library for TS2068 - dom/stefano/alvin
+ts2068_clib.lib:
+	@echo ''
+	@echo '--- Building TS2068 (Spectrum clone) Library  ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) lzx ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd fcntl ; $(MAKE) lzx ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	cd time ; $(MAKE) lzx ; cd ..
+	cd rs232 ; $(MAKE) lzx ; cd ..
+	$(MAKE) gamesdeps
+	cd spectrum ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORzx -xts2068_clib @ts2068.lst
+
 # ZXVGS - yarek
 zxvgs.lib:
 	@echo ''
@@ -266,6 +286,52 @@ zx_mathtiny.lib:
 	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
 	@echo ''
 	cd zxmath ; $(MAKE) zx_mathtiny ; cd ..
+
+# vt100 C lib for spectrum - stefano/dom
+# use -DROMFONT for a tiny 36 columns mode
+# or -DPACKEDFONT for tiny 64->85 column modes
+zxan_clib.lib:
+	@echo ''
+	@echo '--- Building ZX Spectrum ANSI Library  ---'
+	@echo ''
+	$(RM) stdio/ansi/spectrum/f_ansi_char.o
+	$(MAKE) gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) lzx ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd fcntl ; $(MAKE) lzx ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	cd time ; $(MAKE) lzx ; cd ..
+	cd rs232 ; $(MAKE) lzx ; cd ..
+	$(MAKE) gamesdeps
+	cd spectrum ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORzx $(COLDEFS) -xzxan_clib @zxansi.lst
+
+# vt100 C lib for TS2068 - stefano/dom
+# use -DROMFONT for a tiny 36 columns mode
+# or -DPACKEDFONT for tiny 64->85 column modes
+ts2068an_clib.lib:
+	@echo ''
+	@echo '--- Building TS2068 (Spectrum clone) ANSI Library  ---'
+	@echo ''
+	$(RM) stdio/ansi/spectrum/f_ansi_char.o
+	$(MAKE) gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) lzx ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd fcntl ; $(MAKE) lzx ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	cd time ; $(MAKE) lzx ; cd ..
+	cd rs232 ; $(MAKE) lzx ; cd ..
+	$(MAKE) gamesdeps
+	cd spectrum ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORzx $(COLDEFS) -xts2068an_clib @ts2068an.lst
 
 # vt100 for sprinter - dom
 ppsansi_clib.lib:
@@ -306,29 +372,6 @@ pps_clib.lib:
 	cd spectrum ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORzx -xpps_clib @pps.lst
-
-# vt100 C lib for spectrum - stefano/dom
-# use -DROMFONT for a tiny 36 columns mode
-# or -DPACKEDFONT for tiny 64->85 column modes
-zxan_clib.lib:
-	@echo ''
-	@echo '--- Building ZX Spectrum ANSI Library  ---'
-	@echo ''
-	$(RM) stdio/ansi/spectrum/f_ansi_char.o
-	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lzx ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd fcntl ; $(MAKE) lzx ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lzx ; cd ..
-	cd rs232 ; $(MAKE) lzx ; cd ..
-	$(MAKE) gamesdeps
-	cd spectrum ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) ; cd ..
-	$(LIBLINKER) -DFORzx $(COLDEFS) -xzxan_clib @zxansi.lst
 
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:
