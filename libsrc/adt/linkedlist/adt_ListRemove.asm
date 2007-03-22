@@ -12,23 +12,18 @@ XREF _u_free
 ;        remove current item from list, current moves to next item
 ; uses : af, bc, de, hl
 
-   ld a,(hl)
-   ld c,a
+   ld a,(hl)           ; decrease list count
+   dec (hl)
    inc hl
-   ld b,(hl)           ; bc = count
-   or b
-   jr z, fail          ; return fail if list empty
-   inc hl
-   ld a,(hl)           ; a = current's state = 1 INLIST, 0 BEFORE, 2 AFTER
-   dec a
-   jr nz, fail         ; return fail if current is not INLIST
+   or a
+   jr nz, nomoredec
+   
+   or (hl)
+   jr z, fail          ; list has zero items
+   dec (hl)
 
-   dec bc              ; one less item in list
-   dec hl
-   ld (hl),b
-   dec hl
-   ld (hl),c           ; ** store new count in list
-   inc hl
+.nomoredec
+
    inc hl
    inc hl              ; hl = current
 
@@ -145,5 +140,8 @@ XREF _u_free
 
 .fail
 
-   ld hl,0
+   dec hl
+   ld (hl),a
+   ld h,a
+   ld l,a
    ret
