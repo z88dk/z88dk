@@ -6,6 +6,7 @@ XDEF ASMDISP_IN_MOUSEKEMPSETPOS_CALLEE
 XDEF CDISP_IN_MOUSEKEMPSETPOS_CALLEE
 
 LIB INMouseKemp
+XREF _in_KempcoordX, _in_KempcoordY
 
 .in_MouseKempSetPos_callee
 
