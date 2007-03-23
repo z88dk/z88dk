@@ -1,16 +1,19 @@
 ; void in_MouseAMXInit(uchar xvector, uchar yvector)
-; 09.2005 aralbrec
+; CALLER linkage for function pointers
 
 XLIB in_MouseAMXInit
-LIB INMouseAMXInit
 
-; see GMouseAMXInit.asm for comments
+LIB in_MouseAMXInit_callee
+XREF ASMDISP_IN_MOUSEAMXINIT_CALLEE
 
 .in_MouseAMXInit
-   ld hl,2
-   add hl,sp
-   ld c,(hl)
-   inc hl
-   inc hl
-   ld b,(hl)
-   jp INMouseAMXInit
+
+   pop hl
+   pop bc
+   pop de
+   push de
+   push bc
+   push hl
+   
+   ld b,e
+   jp in_MouseAMXInit_callee + ASMDISP_IN_MOUSEAMXINIT_CALLEE

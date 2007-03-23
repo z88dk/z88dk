@@ -3,10 +3,11 @@
 
 XLIB in_JoyKempston
 
-; exit : HL = F111RLDU active low
+; exit : HL = F000RLDU active high
 ; uses : AF,DE,HL
 
 .in_JoyKempston
+
    in a,($1f)
    cpl
    and $1f
@@ -19,6 +20,7 @@ XLIB in_JoyKempston
    ret
 
 .kemptbl
+
    defb $8f,$87,$8b,$83
    defb $82,$8a,$86,$8e
    defb $81,$89,$85,$8d

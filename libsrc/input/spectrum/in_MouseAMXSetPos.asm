@@ -1,24 +1,18 @@
 ; void in_MouseAMXSetPos(uint xcoord, uint ycoord)
-; 09.2005 aralbrec
+; CALLER linkage for function pointers
 
 XLIB in_MouseAMXSetPos
-LIB INMouseAMXSetPos
+
+LIB in_MouseAMXSetPos_callee
+XREF CDISP_IN_MOUSEAMXSETPOS_CALLEE
 
 .in_MouseAMXSetPos
-   ld hl,2
-   add hl,sp
-   ld b,(hl)
-   inc hl
-   ld a,(hl)
-   or a
-   jr z, cont1
-   ld b,191
-.cont1
-   inc hl
-   ld c,(hl)
-   inc hl
-   ld a,(hl)
-   or a
-   jp z, INMouseAMXSetPos
-   ld c,255
-   jp INMouseAMXSetPos
+
+   pop de
+   pop bc
+   pop hl
+   push hl
+   push bc
+   push de
+   
+   jp in_MouseAMXSetPos_callee + CDISP_IN_MOUSEAMXSETPOS_CALLEE

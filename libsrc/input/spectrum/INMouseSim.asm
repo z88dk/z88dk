@@ -12,6 +12,7 @@ LIB l_jpix
 ; note : last maxcount in struct in_UDM must be 255
 
 .INMouseSim
+
    ld e,(hl)
    inc hl
    ld d,(hl)               ; DE = struct in_UDK *
@@ -48,12 +49,16 @@ LIB l_jpix
    ld e,a
    jr nc, noinc
    inc d
+   
 .noinc                     ; DE = &delta[state]
+
    inc (hl)                ; increase current count
    jp nz, not255
    ld (hl),255
    jp samestate
+   
 .not255
+
    ld a,(de)               ; A = max count for this state
    cp (hl)
    jp nc, samestate
@@ -63,6 +68,7 @@ LIB l_jpix
    inc hl
 
 .samestate                 ; HL = &in_UDM.count, DE = &delta[state], A' = F111RLDU active low
+
    inc hl                  ; HL = &in_UDM.y
    inc de                  ; DE = delta[state].dy
    ex de,hl
@@ -82,6 +88,7 @@ LIB l_jpix
    ex de,hl                ; DE = &in_UDM.y + 1b, HL = y
 
 .up
+
    ex af,af                ; A = F000RLDU active high
    rrca
    jr nc, down
@@ -91,7 +98,9 @@ LIB l_jpix
    jp nc, endvertical
    ld hl,0
    jp endvertical
+   
 .down
+
    rrca
    jr nc, endvertical
    add hl,bc
@@ -100,10 +109,13 @@ LIB l_jpix
    cp 192
    jr nc, notoutofrange
    ld h,191
+   
 .notoutofrange
+
    ex af,af
 
 .endvertical                ; A = ??F000RL
+
    ex de,hl                 ; DE = new Y, HL = &in_UDM.y + 1b
    ld (hl),d
    dec hl
@@ -117,6 +129,7 @@ LIB l_jpix
    pop bc                   ; BC = dx
 
 .left
+
    rrca
    jr nc,right
    rrca                     ; swallow right
@@ -125,7 +138,9 @@ LIB l_jpix
    jp nc, endhorizontal
    ld hl,0
    jp endhorizontal
+   
 .right
+
    rrca
    jr nc, endhorizontal
    add hl,bc
@@ -133,6 +148,7 @@ LIB l_jpix
    ld hl,$ffff
 
 .endhorizontal              ; A = ????F000
+
    ex de,hl                 ; DE = new x, HL = &in_UDM.x + 1b
    ld (hl),d
    dec hl
@@ -144,11 +160,14 @@ LIB l_jpix
    ld c,0
    jr z, nofire
    inc c
+   
 .nofire                     ; C = mouse button state
+
    ld a,(hl)                ; A = y coord 0..191
    ret
 
 .nomovement
+
    ld a,l                   ; A = F000RLDU active high
    pop hl                   ; HL = &in_UDM.delta
 
@@ -169,7 +188,9 @@ LIB l_jpix
    jr nc, notout
    ld a,191
    ld (hl),a
+   
 .notout
+
    inc hl
    inc hl
    ld b,(hl)                ; B = x coord

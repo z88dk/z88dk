@@ -12,6 +12,7 @@ LIB in_keytranstbl
 ; uses : AF,BC,DE,HL
 
 .in_Inkey
+
    ld de,0
    ld bc,$fefe
    in a,(c)
@@ -20,49 +21,49 @@ LIB in_keytranstbl
    jr nz, keyhitA
 
    ld e,5
-   rlc b
+   ld b,$fd
    in a,(c)
    or $e0
    cp $ff
    jr nz, keyhitA
 
    ld e,10
-   rlc b
+   ld b,$fb
    in a,(c)
    or $e0
    cp $ff
    jr nz, keyhitA
 
    ld e,15
-   rlc b
+   ld b,$f7
    in a,(c)
    or $e0
    cp $ff
    jr nz, keyhitA
 
    ld e,20
-   rlc b
+   ld b,$ef
    in a,(c)
    or $e0
    cp $ff
    jr nz, keyhitA
 
    ld e,25
-   rlc b
+   ld b,$df
    in a,(c)
    or $e0
    cp $ff
    jr nz, keyhitA
 
    ld e,30
-   rlc b
+   ld b,$bf
    in a,(c)
    or $e0
    cp $ff
    jr nz, keyhitA
 
    ld e,35
-   rlc b
+   ld b,$7f
    in a,(c)
    or $e2
    cp $ff
@@ -70,11 +71,13 @@ LIB in_keytranstbl
    jr nz, keyhitB
 
 .nokey
+
    ld hl,0
    scf
    ret
 
 .keyhitA
+
    ld c,a
 
    ld a,b
@@ -92,6 +95,7 @@ LIB in_keytranstbl
    jr nz, nokey
 
 .keyhitB
+
    ld b,0
    ld hl,rowtbl-$e0
    add hl,bc
@@ -112,6 +116,7 @@ LIB in_keytranstbl
    add hl,de
 
 .nocaps
+
    ld a,$7f
    in a,($fe)
    and $02
@@ -120,6 +125,7 @@ LIB in_keytranstbl
    add hl,de
 
 .nosym
+
    ld l,(hl)
    ld h,0
    ret

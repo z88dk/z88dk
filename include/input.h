@@ -3,7 +3,6 @@
 
 /*
  * Functions for Reading Keyboards, Joysticks and Mice
- *
  */
 
 #include <sys/types.h>
@@ -79,16 +78,14 @@
  * Declaring these C variables statically will cause them to
  * be compiled as part of the final binary.  Alternatively (required
  * if the final binary is to be ROMable) the locations of these
- * variables can be compiled with the help of some inline assembler
- * in main.c.  Example:
+ * variables in RAM can be specified using special extern syntax.
  *
- *    #asm
- *       XDEF _in_KeyDebounce, _in_KeyStartRepeat, _in_KeyRepeatPeriod, _in_KbdState
- *       DEFC _in_KeyDebounce     = 50000
- *       DEFC _in_KeyStartRepeat  = 50001
- *       DEFC _in_KeyRepeatPeriod = 50002
- *       DEFC _in_KbdState        = 50003
- *    #endasm
+ *  Example:
+ *
+ *  extern char in_KeyDebounce(50000);
+ *  extern char in_KeyStartRepeat(50001);
+ *  extern char in_KeyRepeatPeriod(50002);
+ *  extern int  in_KbdState(50003);
  */
 
 extern uint __LIB__ in_GetKey(void);
@@ -177,6 +174,8 @@ struct in_UDK {        /* user defined keys structure         */
 };
 
 extern uint __LIB__ in_JoyKeyboard(struct in_UDK *u);
+extern uint __LIB__ __FASTCALL__ in_JoyKeyboard__fastcall(struct in_UDK *u);
+#define in_JoyKeyboard(a)  in_JoyKeyboard_fastcall(a)
 
 #ifdef SPECTRUM
    #include <spectrum.h>
@@ -298,6 +297,14 @@ struct in_UDM {              /* user defined mouse structure                    
 extern void __LIB__ in_MouseSimInit(struct in_UDM *u);
 extern void __LIB__ in_MouseSim(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord);
 extern void __LIB__ in_MouseSimSetPos(struct in_UDM *u, uint xcoord, uint ycoord);
+
+extern void __LIB__ __FASTCALL__ in_MouseSimInit_fastcall(struct in_UDM *u);
+extern void __LIB__ __CALLEE__ in_MouseSim_callee(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord);
+extern void __LIB__ __CALLEE__ in_MouseSimSetPos_callee(struct in_UDM *u, uint xcoord, uint ycoord);
+
+#define in_MouseSimInit(a)        in_MouseSimInit_fastcall(a)
+#define in_MouseSim(a,b,c,d)      in_MouseSim_callee(a,b,c,d)
+#define in_MouseSimSetPos(a,b,c)  in_MouseSimSetPos_callee(a,b,c)
 
 #ifdef SPECTRUM
    #define IN_MAX_X    255  /* largest x coord  */

@@ -22,6 +22,7 @@ XREF _in_KbdState
 ; uses : AF,BC,DE,HL
 
 .in_GetKey
+
    call in_Inkey              ; hl = ascii code & carry if no key
    jp c, in_GetKeyReset
 
@@ -35,11 +36,13 @@ XREF _in_KbdState
    jp z, startrepeat
 
 .repeat
+
    ld a,(_in_KeyRepeatPeriod)
    ld (_in_KbdState),a
    ret
 
 .debounce
+
    ld a,(_in_KeyStartRepeat)
    ld e,a
    ld d,1
@@ -47,6 +50,7 @@ XREF _in_KbdState
    ret
 
 .startrepeat
+
    ld a,(_in_KeyRepeatPeriod)
    ld e,a
    ld d,2
@@ -54,6 +58,7 @@ XREF _in_KbdState
    ret
 
 .nokey
+
    ld (_in_KbdState),a
    ld hl,0
    scf

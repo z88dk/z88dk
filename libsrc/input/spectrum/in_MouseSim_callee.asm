@@ -1,10 +1,10 @@
-; void in_MouseSim(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord)
-; CALLER linkage for function pointers
+; void __CALLEE__ in_MouseSim_callee(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord)
+; 09.2005 aralbrec
 
-XLIB in_MouseSim
+XLIB in_MouseSim_callee
 LIB INMouseSim
 
-.in_MouseSim
+.in_MouseSim_callee
 
    ld hl,8
    add hl,sp
@@ -27,9 +27,6 @@ LIB INMouseSim
    ld (hl),a
    pop hl
    ld (hl),c
-
-   push hl
-   push hl
-   push hl
+   pop hl
    ex de,hl
    jp (hl)

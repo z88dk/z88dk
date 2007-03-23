@@ -1,10 +1,5 @@
-; Init AMX Mouse
-; 01.2003 aralbrec
-
-XLIB INMouseAMXInit
-LIB IM2InstallISR
-XREF _in_AMXdeltaX, _in_AMXdeltaY
-XREF _in_AMXcoordX, _in_AMXcoordY
+; void __CALLEE__ in_MouseAMXInit_callee(uchar xvector, uchar yvector)
+; 09.2005 aralbrec
 
 ; References:
 ;   1. http://www.breezer.demon.co.uk/spec/tech/hware.html
@@ -46,6 +41,24 @@ XREF _in_AMXcoordX, _in_AMXcoordY
 ; joystick interface ($1f), the Disciple disk interface ($1f) and
 ; the Multiface ($3f).
 
+XLIB in_MouseAMXInit_callee
+XDEF ASMDISP_IN_MOUSEAMXINIT_CALLEE
+
+LIB im2_InstallISR_callee
+XREF ASMDISP_IM2_INSTALLISR_CALLEE
+
+XREF _in_AMXdeltaX, _in_AMXdeltaY
+XREF _in_AMXcoordX, _in_AMXcoordY
+
+.in_MouseAMXInit_callee
+
+   pop hl
+   pop bc
+   ex (sp),hl
+   ld b,l
+
+.asmentry
+
 ; enter: B = im 2 vector for X interrupts (even, 0..254)
 ;        C = im 2 vector for Y interrupts (even, 0..254)
 ; uses : AF,DE,HL
@@ -55,14 +68,13 @@ XREF _in_AMXcoordX, _in_AMXcoordY
 ; note : 1) disable interrupts prior to calling
 ;        2) uses im2.lib to register interrupt service routines
 
-.INMouseAMXInit
    ld l,b
    ld de,XInterrupt
-   call IM2InstallISR
+   call im2_InstallISR_callee + ASMDISP_IM2INSTALLISR_CALLEE
 
    ld l,c
    ld de,YInterrupt
-   call IM2InstallISR
+   call im2_InstallISR_callee + ASMDISP_IM2INSTALLISR_CALLEE
 
    ld a,b
    out ($5f),a                ; PIO vector for X
@@ -91,6 +103,7 @@ XREF _in_AMXcoordX, _in_AMXcoordY
 ; interrupt service routines
 
 .XInterrupt
+
    push af
    push de
    push hl
@@ -107,11 +120,13 @@ XREF _in_AMXcoordX, _in_AMXcoordY
    jp contx
 
 .posx
+
    add hl,de
    jp nc, contx
    ld hl,$ffff
 
 .contx
+
    ld (_in_AMXcoordX),hl
    pop hl
    pop de
@@ -121,6 +136,7 @@ XREF _in_AMXcoordX, _in_AMXcoordY
 
 
 .YInterrupt
+
    push af
    push de
    push hl
@@ -137,14 +153,18 @@ XREF _in_AMXcoordX, _in_AMXcoordY
    jp conty
 
 .posy
+
    sbc hl,de
    jp nc, conty
    ld hl,0
 
 .conty
+
    ld (_in_AMXcoordY),hl
    pop hl
    pop de
    pop af
    ei
    reti
+
+DEFC ASMDISP_IN_MOUSEAMXINIT_CALLEE = asmentry - in_MouseAMXInit_callee

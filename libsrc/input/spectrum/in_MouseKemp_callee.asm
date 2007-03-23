@@ -1,13 +1,12 @@
-; void in_MouseKemp(uchar *buttons, uint *xcoord, uint *ycoord)
-; CALLER linkage for function pointers
+; void __CALLEE__ in_MouseKemp_callee(uchar *buttons, uint *xcoord, uint *ycoord)
+; 09.2005 aralbrec
 
-XLIB in_MouseKemp
+XLIB in_MouseKemp_callee
 LIB INMouseKemp
 
-.in_MouseKemp
+.in_MouseKemp_callee
 
    call INMouseKemp
-   
    pop de
    pop hl
    ld (hl),a
@@ -20,9 +19,5 @@ LIB INMouseKemp
    ld (hl),a
    pop hl
    ld (hl),c
-   
-   push hl
-   push hl
-   push hl
    ex de,hl
    jp (hl)

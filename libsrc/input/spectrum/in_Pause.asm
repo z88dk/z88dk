@@ -18,6 +18,8 @@ LIB in_WaitForNoKey, in_WaitForKey
    or l
    jr nz, waitforkey
 
+.loop2
+
    ld bc,134
 
 .loop                  ; about 3500 cycles here (1ms)
@@ -31,11 +33,12 @@ LIB in_WaitForNoKey, in_WaitForKey
    ld a,h
    or l
    ret z
+   
    xor a
    in a,($fe)
    and 31
    cp 31
-   jr z, in_Pause
+   jr z, loop2
 
    scf
    ret

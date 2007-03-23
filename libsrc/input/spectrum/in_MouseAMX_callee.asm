@@ -1,10 +1,10 @@
-; void in_MouseAMX(uchar *buttons, uint *xcoord, uint *ycoord)
-; CALLER linkage for function pointers
+; void __CALLEE__ in_MouseAMX_callee(uchar *buttons, uint *xcoord, uint *ycoord)
+; 09.2005 aralbrec
 
-XLIB in_MouseAMX
+XLIB in_MouseAMX_callee
 LIB INMouseAMX
 
-.in_MouseAMX
+.in_MouseAMX_callee
 
    call INMouseAMX
    pop de
@@ -19,9 +19,5 @@ LIB INMouseAMX
    ld (hl),a
    pop hl
    ld (hl),c
-   
-   push hl
-   push hl
-   push hl
    ex de,hl
    jp (hl)
