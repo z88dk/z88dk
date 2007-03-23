@@ -1,21 +1,11 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.15 2006-12-01 16:58:30 stefano Exp $
+ * $Id: spectrum.h,v 1.16 2007-03-23 21:50:23 aralbrec Exp $
  */
 
 #ifndef __SPECTRUM_H__
 #define __SPECTRUM_H__
-
-#ifndef _T_UCHAR
-#define _T_UCHAR
-   typedef unsigned char uchar;
-#endif
-
-#ifndef _T_UINT
-#define _T_UINT
-   typedef unsigned int uint;
-#endif
 
 #include <sys/types.h>
 
@@ -50,8 +40,55 @@ extern int __LIB__ tape_save(char *name, size_t loadstart,void *start, size_t le
 extern int __LIB__ tape_save_block(void *addr, size_t len, unsigned char type);
 extern int __LIB__ tape_load_block(void *addr, size_t len, unsigned char type);
 
+/* 128k Memory Paging Functions */
 
-/* Joystick Functions */
+// Following System Variable Used:
+//
+// BANKM    @ $5B5C - stores last byte output to port $7ffd
+
+/*
+extern uchar __LIB__ __FASTCALL__ zx128_lbank(uchar logical_page);
+extern uchar __LIB__ __FASTCALL__ zx128_pbank(uchar physical_page);
+
+extern far   __LIB__ *zx128_makefar(uchar page, void *addr);
+extern unsigned long __LIB__ zx128_makelong(uint msw, uint lsw);
+//extern far   __LIB__ *zx128_linear2logical(far *addr);
+
+//extern void  __LIB__  zx128_lldir(far *dest, far *src, unsigned long len);
+//extern void  __LIB__  zx128_llddr(far *dest, far *src, unsigned long len);
+//extern void  __LIB__  zx128_lmemmove(far *dest, far *src, unsigned long len);
+//extern void  __LIB__  zx128_lmemset(far *dest, uchar c, unsigned long len);
+*/
+
+/* 128k RAMDisk */
+
+// Following System Variables Used:
+//
+// BANKM    @ $5B5C (1 byte ) - last byte output to port $7ffd
+// SF_NEXT  @ $5B83 (2 bytes) - points at end of catalog marker, always in physical page 7
+// SF_SPACE @ $5B85 (3 bytes) - total number of available bytes in ramdisk area
+//
+
+/*
+struct zxrd_catentry {
+   uchar name[11];                  // 10 characters spaced padded, made 11 to accommodate last \0
+   uchar type;                      // 0 = prog, 1 = num arr, 2 = str arr, 3 = bytes
+   uint  len;                       // length in bytes
+   uint  addr;                      // address saved from
+   uint  extra1;                    // length of prog or name of array
+   uint  extra2;                    // auto-run line number
+};
+
+extern void __LIB__ zxrd_format(void);
+extern int  __LIB__ zxrd_cat(uint ord, struct zxrd_catentry *c);
+extern int  __LIB__ zxrd_find(char *name, struct zxrd_catentry *c);
+extern int  __LIB__ zxrd_load(char *name, void *dest);
+extern int  __LIB__ zxrd_read(char *name, void *dest, unsigned long offset, uint len);
+extern int  __LIB__ __FASTCALL__ zxrd_save(struct zxrd_catentry *c);
+extern int  __LIB__ __FASTCALL__ zxrd_erase(char *name);
+*/
+
+/* Joystick Functions -- see input.h for further documentation */
 
 extern unsigned int __LIB__ in_JoyFuller(void);
 extern unsigned int __LIB__ in_JoyKempston(void);
@@ -60,7 +97,7 @@ extern unsigned int __LIB__ in_JoySinclair2(void);
 extern unsigned int __LIB__ in_JoyTimex1(void);
 extern unsigned int __LIB__ in_JoyTimex2(void);
 
-/* Mouse Functions */
+/* Mouse Functions -- see input.h for further documentation */
 
 /*
    AMX Mouse Variables - you must declare
@@ -68,9 +105,16 @@ extern unsigned int __LIB__ in_JoyTimex2(void);
 */
 
 extern void __LIB__ in_MouseAMXInit(uchar xvector, uchar yvector);
-extern void __LIB__ in_MouseAMXInit2(void);
 extern void __LIB__ in_MouseAMX(uchar *buttons, uint *xcoord, uint *ycoord);
 extern void __LIB__ in_MouseAMXSetPos(uint xcoord, uint ycoord);
+
+extern void __LIB__ __CALLEE__ in_MouseAMXInit_callee(uchar xvector, uchar yvector);
+extern void __LIB__ __CALLEE__ in_MouseAMX_callee(uchar *buttons, uint *xcoord, uint *ycoord);
+extern void __LIB__ __CALLEE__ in_MouseAMXSetPos_callee(uint xcoord, uint ycoord);
+
+#define in_MouseAMXInit(a,b)    in_MouseAMXInit_callee(a,b)
+#define in_MouseAMX(a,b,c)      in_MouseAMX_callee(a,b,c)
+#define in_MouseAMXSetPos(a,b)  in_MouseAMXSetPos_callee(a,b)
 
 /*
    Kempston Mouse Variables - you must declare
@@ -80,6 +124,12 @@ extern void __LIB__ in_MouseAMXSetPos(uint xcoord, uint ycoord);
 extern void __LIB__ in_MouseKempInit(void);
 extern void __LIB__ in_MouseKemp(uchar *buttons, uint *xcoord, uint *ycoord);
 extern void __LIB__ in_MouseKempSetPos(uint xcoord, uint ycoord);
+
+extern void __LIB__ __CALLEE__ in_MouseKemp_callee(uchar *buttons, uint *xcoord, uint *ycoord);
+extern void __LIB__ __CALLEE__ in_MouseKempSetPos_callee(uint xcoord, uint ycoord);
+
+#define in_MouseKemp(a,b,c)      in_MouseKemp_callee(a,b,c)
+#define in_MouseKempSetPos(a,b)  in_MouseKempSetPos_callee(a,b)
 
 /* Colour Attributes */
 
