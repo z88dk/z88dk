@@ -79,7 +79,7 @@ COPTRULES3	DESTDIR/lib/z80rules.0
 # CRT0	   = Full path and name of the startup code file (omit suffix!)
 #
 
-CRT0		DESTDIR/lib/ts2068_crt0
+CRT0		DESTDIR/lib/ts2068an_crt0
 
 
 #
@@ -123,5 +123,5 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -// -v -O2 -I. -lts2068an_clib -DZ80 -DSMALL_C -DSPECTRUM -D__SPECTRUM__ -M -DSCCZ80 -Cz+zx
+OPTIONS		 -// -v -O2 -I. -lts2068an_clib -DZ80 -DSMALL_C -DSPECTRUM -D__SPECTRUM__ -M -DSCCZ80 -Cz+ts2068an
 
