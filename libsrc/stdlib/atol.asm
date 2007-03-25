@@ -87,8 +87,6 @@ LIB l_long_neg
    jp nc, loop
    inc h
    jp nz, loop
-   inc e
-   jp nz, loop
-   inc d
+   inc de
 
    jp loop

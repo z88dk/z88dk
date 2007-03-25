@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol_callee.asm,v 1.3 2007-03-18 08:55:00 aralbrec Exp $
+; * $Id: strtol_callee.asm,v 1.4 2007-03-25 22:58:31 aralbrec Exp $
 ; *
 ; */
 ;
@@ -210,31 +210,24 @@ XDEF ASMDISP_STRTOL_CALLEE
 
 .havedigit
 
-   ex af,af
-
    ; first refresh copy of duplicate base on stack
 
    push bc                   ; save char *
    ld bc,0
    push bc                   ; make space for duplicate base on stack
+   ld c,(ix+6)               ; copy (long)(base) into duplicate, only single byte since base must be < 37
    push bc
-   ld a,(ix+6)               ; copy (long)(base) into duplicate
-   ld (ix+0),a               ; only single byte since base must be < 37
-   call l_long_mult          ; dehl = dehl * base
+   call l_long_mult          ; dehl = dehl * base, wow a mult that doesn't touch A!
    pop bc                    ; bc = char * (lib mult does stack gymnastics)
    
    ; now add in digit
-   
-   ex af,af
-   
+      
    add a,l
    ld l,a
-   jr nc, loop
+   jp nc, loop
    inc h
-   jr nz, loop
-   inc e
-   jr nz, loop
-   inc d
+   jp nz, loop
+   inc de
 
    jp loop
    
