@@ -2,7 +2,9 @@
 ; CALLER linkage for function pointers
 
 XLIB adt_HeapExtract
-LIB ADTHeapExtract, ADThcompare
+
+LIB adt_HeapExtract_callee
+XREF CDISP_HEAPEXTRACT_CALLEE
 
 .adt_HeapExtract
 
@@ -14,5 +16,5 @@ LIB ADTHeapExtract, ADThcompare
    push hl
    push hl
    push bc
-   ld ix,ADThcompare
-   jp ADTHeapExtract
+   
+   jp adt_HeapExtract_callee + CDISP_HEAPEXTRACT_CALLEE

@@ -2,6 +2,8 @@
 ; 08.2005 aralbrec
 
 XLIB adt_HeapExtract_callee
+XDEF CDISP_ADT_HEAPEXTRACT_CALLEE
+
 LIB ADTHeapExtract, ADThcompare
 
 .adt_HeapExtract_callee
@@ -11,5 +13,38 @@ LIB ADTHeapExtract, ADThcompare
    pop hl
    pop de
    push bc
+   
+.centry
+   
+   push hl
+   ld a,(hl)
+   inc hl
+   ld h,(hl)
+   ld l,a
+   push hl
+   
    ld ix,ADThcompare
-   jp ADTHeapExtract
+   call ADTHeapExtract
+   jr nc, nothing
+   
+   pop de
+   ld c,l
+   ld b,h
+   pop hl
+   dec de
+   ld (hl),e
+   inc hl
+   ld (hl),d
+   
+   ld l,c
+   ld h,b
+   ret
+
+.nothing
+
+   pop hl
+   pop hl
+   ld hl,0
+   ret
+
+DEFC CDISP_ADT_HEAPEXTRACT_CALLEE = centry - adt_HeapExtract_callee
