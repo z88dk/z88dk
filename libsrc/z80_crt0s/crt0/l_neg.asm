@@ -4,14 +4,18 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_neg
-                LIB     l_com
+XLIB    l_neg
 
 
 ; HL = -HL
+
 .l_neg
-        call    l_com    
-        inc   hl
-        ret
 
-
+   ld a,h
+   cpl
+   ld h,a
+   ld a,l
+   cpl
+   ld l,a
+   inc hl
+   ret

@@ -4,13 +4,20 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_ugt
-                LIB     l_ucmp
+XLIB    l_ugt
 
 ;
-;......logical operations: HL set to 0 (false) or 1 (true)
-;
 ; DE > HL [unsigned]
+; set carry if true
+
 .l_ugt
-        ex      de,hl
-        jp	l_ucmp
+
+   ld a,h
+   cp d
+   ret nz
+   ld a,l
+   cp e
+   ret
+
+;        ex      de,hl
+;        jp	l_ucmp

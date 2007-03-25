@@ -4,15 +4,29 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_ge
-                LIB     l_cmp
+XLIB    l_ge
 
 ;
-;......logical operations: HL set to 0 (false) or 1 (true)
-;
 ; DE >= HL [signed]
+; set carry if true
+
 .l_ge
-        call    l_cmp
+
+   ld a,h
+   add a,$80
+   ld b,a
+   ld a,d
+   add a,$80
+   
+   cp b
+   ccf
+   ret nz
+   ld a,e
+   cp l
+   ccf
+   ret
+
+;        call    l_cmp
 ;invert carry condition
-        ccf
-        ret
+;        ccf
+;        ret

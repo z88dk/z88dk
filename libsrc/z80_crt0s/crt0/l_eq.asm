@@ -9,17 +9,19 @@
                 LIB     l_cmp
 
 ;
-;......logical operations: HL set to 0 (false) or 1 (true)
 ;
 ; DE == HL
+; carry set if true
+
 .l_eq
+
 	and	a
 	sbc	hl,de
-	ld	a,h
-	or	l	;resets carry
-	ret	nz
-	scf
+	ccf
+	ret z
+	and     a
 	ret
+	
 IF 0
         call    l_cmp
         scf

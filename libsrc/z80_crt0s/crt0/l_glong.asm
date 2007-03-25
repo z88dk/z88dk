@@ -2,20 +2,20 @@
 ;       Long functions
 ;
 
-                XLIB    l_glong
+XLIB    l_glong
 
 
-;Fetch long from (hl)
+;Fetch long dehl from (hl)
 
 .l_glong
-        ld      c,(hl)
-        inc     hl
-        ld      b,(hl)
-        inc     hl
-        ld      e,(hl)
-        inc     hl
-        ld      d,(hl)
-        ld      h,b
-        ld      l,c
-        ret
 
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   ld a,(hl)
+   inc hl
+   ld h,(hl)
+   ld l,a
+   ex de,hl
+   ret

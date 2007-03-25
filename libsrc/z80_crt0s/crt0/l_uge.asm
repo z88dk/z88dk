@@ -6,15 +6,25 @@
 ;
 ;       13/5/99 djm, inverted carry conditions
 
-                XLIB    l_uge
-                LIB     l_ucmp
+XLIB    l_uge
 
 ;
-;......logical operations: HL set to 0 (false) or 1 (true)
-;
 ; DE >= HL [unsigned]
+; set carry if true
+
+
 .l_uge
-        call    l_ucmp
-        ccf
-	ret
+
+   ld a,d
+   cp h
+   ccf
+   ret nz
+   ld a,e
+   cp l
+   ccf
+   ret
+
+;        call    l_ucmp
+;        ccf
+;	ret
 

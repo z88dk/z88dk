@@ -8,13 +8,12 @@
 ;Fetch long from (hl)
 
 .l_getptr
-        ld      e,(hl)
-        inc     hl
-        ld      d,(hl)
-        inc     hl
-        ld      c,(hl)
-        ex      de,hl   ;low byte
-        ld      e,c
-        ld      d,0
-        ret
 
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   ld l,(hl)
+   ld h,0
+   ex de,hl
+   ret
