@@ -52,4 +52,5 @@ sed "s?DESTDIR\/?$destdir?g" < lib/config/zx.lnx > lib/config/zx.cfg
 sed "s?DESTDIR\/?$destdir?g" < lib/config/zxansi.lnx > lib/config/zxansi.cfg
 sed "s?DESTDIR\/?$destdir?g" < lib/config/ts2068.lnx > lib/config/ts2068.cfg
 sed "s?DESTDIR\/?$destdir?g" < lib/config/ts2068ansi.lnx > lib/config/ts2068ansi.cfg
+sed "s?DESTDIR\/?$destdir?g" < lib/config/newbrain.lnx > lib/config/newbrain.cfg
 cp lib/config/$DEFAULT.cfg lib/config/zcc.cfg

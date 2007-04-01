@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.5 2006-12-13 18:08:23 stefano Exp $
+ *   $Id: appmake.h,v 1.6 2007-04-01 20:48:40 stefano Exp $
  */
 
 
@@ -59,6 +59,9 @@ extern option_t  mz_options;
 
 extern int       nascom_exec(char *target);
 extern option_t  nascom_options;
+
+extern int       newbrain_exec(char *target);
+extern option_t  newbrain_options;
 
 extern int       rex_exec(char *target);
 extern option_t  rex_options;
@@ -122,7 +125,9 @@ struct {
     { "bin2nas",   "nas",       "(C) 2003 Stefano Bodrato",                         
       "Generates a .NAS file suitable for use by emulators",
       nascom_exec,    &nascom_options },
-
+    { "bin2nwbn",   "newbrain",       "(C) 2007 Stefano Bodrato",                         
+      "Generates a text basic program with DATA lines",
+      newbrain_exec,    &newbrain_options },
     { "mkaddin",   "rex",       "(C) 2001 Dominic Morris",   
       "Creates a .rex application using data from a .res file and a .bin file",
       rex_exec,     &rex_options },
@@ -164,7 +169,7 @@ struct {
       zx81_exec,    &zx81_options },
 
 };
-#define APPMAKE_TARGETS 21
+#define APPMAKE_TARGETS 23
 #endif
 
 

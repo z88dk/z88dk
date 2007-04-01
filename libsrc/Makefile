@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.81 2007-03-21 21:21:36 stefano Exp $
+# $Id: Makefile,v 1.82 2007-04-01 20:48:40 stefano Exp $
 
 
 include Make.config
@@ -16,9 +16,9 @@ all:	genlibs z88libs tilibs zxlibs \
 	cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib cpcgray.lib \
 	cpm_clib.lib c128ansi_clib.lib \
 	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
-	nascom_clib.lib nasansi_clib.lib ozansi_clib.lib\
-	rex_clib.lib svi_clib.lib sam_clib.lib samansi_clib.lib \
+	nascom_clib.lib nasansi_clib.lib newbrain_clib.lib ozansi_clib.lib\
 	pps_clib.lib ppsansi_clib.lib embedded_clib.lib rcmx000_clib.lib \
+	rex_clib.lib svi_clib.lib sam_clib.lib samansi_clib.lib \
 	zx81_clib.lib zx81ansi_clib.lib
 
 genlibs: gen_math.lib malloc.lib z80_crt0.lib ndos.lib adt.lib balloc.lib \
@@ -38,12 +38,12 @@ zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib zx
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.81 2007-03-21 21:21:36 stefano Exp $
+#  $Id: Makefile,v 1.82 2007-04-01 20:48:40 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.81 2007-03-21 21:21:36 stefano Exp $
+# $Id: Makefile,v 1.82 2007-04-01 20:48:40 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -58,7 +58,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.81 2007-03-21 21:21:36 stefano Exp $
+#  $Id: Makefile,v 1.82 2007-04-01 20:48:40 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -921,6 +921,20 @@ c128ansi_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORc128 -xc128ansi_clib @c128ansi.lst
+
+# Grundy NewBrain library - Stefano
+newbrain_clib.lib:
+	@echo ''
+	@echo '--- Building Grundy NewBrain Library  ---'
+	@echo ''
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) gen ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORnewbrain -xnewbrain_clib @newbrain.lst
 
 # embedded target - contributed by Daniel Wallner
 embedded_clib.lib:
