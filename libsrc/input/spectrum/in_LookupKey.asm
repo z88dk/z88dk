@@ -31,12 +31,13 @@ LIB in_keytranstbl
 
 .in_LookupKey
    ld a,l
-   ld hl,in_keytranstbl + 159
+   ld hl,in_keytranstbl
    ld bc,160
-   cpdr
+   cpir
    jr nz, notfound
 
-   ld a,c                  ; A = position in table of ascii code
+   ld a,159
+   sub c                       ; A = position in table of ascii code
    ld l,b
    ld h,b
 
