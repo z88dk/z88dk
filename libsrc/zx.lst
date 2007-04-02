@@ -99,6 +99,8 @@ stdlib/labs_callee
 stdlib/Lbsearch
 stdlib/ldiv
 stdlib/Lqsort
+stdlib/ltoa
+stdlib/ltoa_callee
 stdlib/outp
 stdlib/outp_callee
 stdlib/rand
@@ -107,6 +109,10 @@ stdlib/strtol
 stdlib/strtol_callee
 stdlib/strtoul
 stdlib/swapendian
+stdlib/ultoa
+stdlib/ultoa_callee
+stdlib/utoa
+stdlib/utoa_callee
 stdlib/wpeek
 stdlib/wpoke
 stdlib/wpoke_callee
