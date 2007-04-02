@@ -1,9 +1,10 @@
 ; char __CALLEE__ *itoa_callee(char *s, int num)
-; convert number to string and store in s
+; convert int to string and store in s
 ; 12.2006 aralbrec
 
 XLIB itoa_callee
 XDEF ASMDISP_ITOA_CALLEE
+XDEF ASMDISP2_ITOA_CALLEE
 
 LIB l_deneg
 
@@ -31,65 +32,64 @@ LIB l_deneg
 
 .notneg
 
-   ; skip leading zeroes
+   ex de,hl
+   ld bc,constants
+   push bc
    
-   ex de,hl                  ; de = char*, hl = int
-   ld bc,10000
-   call divide
-   cp '0'
-   jr nz, write10000
-   ld bc,1000
-   call divide
-   cp '0'
-   jr nz, write1000
-   ld bc,100
-   call divide
-   cp '0'
-   jr nz, write100
-   ld c,10
-   call divide
-   cp '0'
-   jr nz, write10
-   jp write1
+   ; de = char *
+   ; hl = int
+   ; stack = constants
+
+.skipleading0
+
+   ex (sp),hl                  ; hl = & constant
+   ld c,(hl)
+   inc hl
+   ld b,(hl)                   ; bc = constant
    
-   ; have skipped any leading zeroes already
+   ld a,b
+   or c
+   jr z, write1                ; if constant == 0, reached end
    
-.write10000
+   inc hl
+   ex (sp),hl                  ; hl = int, stack = & next constant
+   
+   call divide                 ; a = hl/bc + '0', hl = hl%bc
+   cp '0'
+   jp z, skipleading0
 
-   ld (de),a
+.write
+
+   ld (de),a                   ; write digit into string
    inc de
-   ld bc,1000
+   
+   ex (sp),hl
+   ld c,(hl)
+   inc hl
+   ld b,(hl)
+   
+   ld a,b
+   or c
+   jr z, write1
+
+   inc hl
+   ex (sp),hl
+
    call divide
+   jp write
 
-.write1000
+.write1                        ; reached 1s position, write out last digit
 
-   ld (de),a
-   inc de
-   ld bc,100
-   call divide
-
-.write100
-
-   ld (de),a
-   inc de
-   ld c,10
-   call divide
-
-.write10
-
-   ld (de),a
-   inc de
-
-.write1
-
+   pop hl                      ; hl = int
    ld a,l
    add a,'0'
-   ld (de),a
+   ld (de),a                   ; write last digit
    inc de
    
-   xor a                     ; terminate string with '\0'
+   xor a                       ; terminate string with '\0'
    ld (de),a
-   pop hl
+   
+   pop hl                      ; hl = char *s
    ret
 
 .divide
@@ -105,4 +105,10 @@ LIB l_deneg
    add hl,bc
    ret
 
+.constants
+
+   defw 10000, 1000, 100, 10, 0
+
 DEFC ASMDISP_ITOA_CALLEE = asmentry - itoa_callee
+DEFC ASMDISP2_ITOA_CALLEE = notneg - itoa_callee
+
