@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.14 2007-01-09 22:26:18 aralbrec Exp $
+ *	$Id: string.h,v 1.15 2007-04-02 06:43:30 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -160,6 +160,8 @@ extern far char __LIB__ *strdup_far(far char *);
 /*
  * Okay..some nice BSD-isms now..
  */
+
+// don't use these for function pointers
 
 #define bzero(s,n)    memset_callee(s,0,n)
 #define bcmp(s1,s2,n) memcmp_callee(s1,s2,n)

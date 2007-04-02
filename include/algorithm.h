@@ -114,7 +114,7 @@ extern uint              __LIB__ __FASTCALL__  astar_PathLength(struct astar_pat
 extern uint              __LIB__              *astar_WalkPath(struct astar_path *p, uint *node_arr, uint n);
 extern uint              __LIB__ __CALLEE__   *astar_WalkPath_callee(struct astar_path *p, uint *node_arr, uint n);
 extern void              __LIB__ __FASTCALL__  astar_DeletePath(struct astar_path *p);
-extern void              __LIB__ __FASTCALL__  astar_CleanUp(struct astar_path *p););
+extern void              __LIB__ __FASTCALL__  astar_CleanUp(struct astar_path *p);
 
 #define astar_WalkPath(a,b,c) astar_WalkPath_callee(a,b,c)
 

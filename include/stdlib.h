@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.25 2007-01-13 08:59:58 aralbrec Exp $
+ * $Id: stdlib.h,v 1.26 2007-04-02 06:43:30 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -25,9 +25,18 @@
 extern int  __LIB__ __FASTCALL__  atoi(char *s);
 extern char __LIB__              *itoa(char *s, int n);
 extern char __LIB__ __CALLEE__   *itoa_callee(char *s, int n);
+extern char __LIB__              *utoa(char *s, uint n);
+extern char __LIB__ __CALLEE__   *utoa_callee(char *s, uint n);
+extern char __LIB__              *ltoa(char *s, long n);
+extern char __LIB__ __CALLEE__   *ltoa_callee(char *s, long n);
+extern char __LIB__              *ultoa(char *s, unsigned long n);
+extern char __LIB__ __CALLEE__   *ultoa_callee(char *s, unsigned long n);
 extern long __LIB__ __FASTCALL__  atol(char *s);
 
-#define itoa(a,b) itoa_callee(a,b)
+#define itoa(a,b)  itoa_callee(a,b)
+#define utoa(a,b)  utoa_callee(a,b)
+#define ltoa(a,b)  ltoa_callee(a,b)
+#define ultoa(a,b) ultoa_callee(a,b);
 
 // double strtod(char *s, char **endp);     /* check math library for availability */
 
