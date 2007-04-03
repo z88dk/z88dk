@@ -8,22 +8,33 @@
 ;       djm 22/3/99 Unsigned version
 ;
 ;       djm 7/5/99 Optimizer version, enter with dehl = long c=counter
+;
+;       aralbrec 01/2007 Sped up, would be better with a or b = counter
 
-                XLIB    l_long_asr_uo
-
-
+XLIB l_long_asr_uo
 
 ; Shift primary (on stack) right by secondary, 
 ; We can only shift a maximum of 32 bits (or so), so the counter can
 ; go in c
 
-.l_long_asr_uo
-        dec     c
-        ret     m       ;counter has flipped to 255
-        and     a
-        rr      d
-        rr      e
-        rr      h
-        rr      l
-        jr      l_long_asr_uo
+; it's better to have the counter in a, maybe something to change in compiler
 
+.l_long_asr_uo
+
+        ld a,c
+        or a
+        ret z
+        
+        ld b,a
+        ld a,e          ; primary in dahl
+
+.loop
+
+        srl d
+        rra
+        rr h
+        rr l
+        djnz loop
+        
+        ld e,a
+        ret

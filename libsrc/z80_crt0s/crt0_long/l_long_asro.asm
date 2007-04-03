@@ -7,24 +7,32 @@
 ;
 ;       djm 7/6/99
 ;       The optimizer version! Entered with long in dehl and counter in c
+;
+;       aralbrec 01/2007
+;       Sped up, would be better with counter in a or b
 
-                XLIB    l_long_asro
-
-
+XLIB    l_long_asro
 
 ; Shift primary (on stack) right by secondary, 
 ; We can only shift a maximum of 32 bits (or so), so the counter can
 ; go in c
 
 .l_long_asro
-        dec     c
-        ret     m       ;counter has flipped to 255
-;Preserve sign
-        ld      a,d
-        rla
-        rr      d
-        rr      e
-        rr      h
-        rr      l
-        jr      l_long_asro
 
+        ld a,c
+        or a
+        ret z
+        
+        ld b,a
+        ld a,e          ; primary = dahl
+
+.loop
+
+        sra d
+        rra
+        rr h
+        rr l
+        djnz loop
+        
+        ld e,a
+        ret

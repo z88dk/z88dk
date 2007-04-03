@@ -14,5 +14,6 @@
         or d
         ret z
         ld hl,1
-        ld      de,0
+        ld e,h
+        ld d,h
         ret

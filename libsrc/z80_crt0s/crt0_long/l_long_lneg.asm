@@ -2,23 +2,26 @@
 ;       Long functions
 ;
 
-                XLIB    l_long_lneg
-
-
+XLIB    l_long_lneg
 
 ; deHL = !deHL
-.l_long_lneg   
+; set carry if result true and return val in dehl
+
+.l_long_lneg
+
         ld a,h
         or l
         or      e
         or      d
         jr z,l_long_lneg1
+
         ld hl,0
 	ld	d,h
 	ld	e,l
-	and	a
         ret
-.l_long_lneg1  
-        inc   hl
+        
+.l_long_lneg1
+  
+        inc l
 	scf
         ret

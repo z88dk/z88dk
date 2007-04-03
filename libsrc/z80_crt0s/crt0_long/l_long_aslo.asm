@@ -7,9 +7,11 @@
 ;       djm 7/5/99
 ;       This version is called when the optimizer has had a look at
 ;       the code
+;
+;       aralbrec 01/2007
+;       switched to shifts from slower doubling using de/hl
 
-                XLIB    l_long_aslo
-
+XLIB l_long_aslo
 
 ; Shift primary left by secondary
 ;
@@ -20,12 +22,19 @@
 ; counter in a
 
 .l_long_aslo
-.l_long_aslo1
-        dec     a
-        ret     m       ;flipped down to 255
-        add     hl,hl   ;double lower 16
-        ex      de,hl
-        adc     hl,hl   ;double upper 16 (taking into a/c carry from prev)
-        ex      de,hl
-        jr      l_long_aslo1
 
+   or a
+   ret z
+   
+   ld b,a
+   ld a,e         ; primary = dahl
+
+.loop
+
+   add hl,hl
+   rla
+   rl d
+   djnz loop
+   
+   ld e,a
+   ret

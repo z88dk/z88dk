@@ -11,14 +11,27 @@
 ;       but we'd lose 6T - give me your thoughts as to whether it's
 ;       worth it...
 
-                XLIB    lpush2
+; actually use of ix saves us 4T
 
-.lpush2 exx
-        pop     hl      ;save return address
-        exx
-        pop     bc      ;save next item on stack
-        push    de      ;dump our long
-        push    hl
-        push    bc      ;store back "next item on stack"
-        exx
-        jp      (hl)
+XLIB    lpush2
+
+.lpush2
+
+   pop ix
+   
+   pop bc
+   push de
+   push hl
+   push bc
+   
+   jp (ix)
+
+;        exx
+;        pop     hl      ;save return address
+;        exx
+;        pop     bc      ;save next item on stack
+;        push    de      ;dump our long
+;        push    hl
+;        push    bc      ;store back "next item on stack"
+;        exx
+;        jp      (hl)

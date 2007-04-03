@@ -2,20 +2,34 @@
 ;       Long functions
 ;
 
-                XLIB    l_long_eq
-                LIB     l_long_cmp
+XLIB    l_long_eq
 
-
-
-
-;
-;......logical operations: HL set to 0 (false) or 1 (true)
 ;
 ; dehl' == deHL
+; set carry if true
+
 .l_long_eq
-        call    l_long_cmp
-        scf
-        ret   z
-	dec	hl
-	and	a
-        ret
+
+   push hl
+   push de
+   exx
+   ex (sp),hl
+   or a
+   sbc hl,de
+   pop hl
+   pop de
+   scf
+   ccf
+   ret nz
+   sbc hl,de
+   ccf
+   ret z
+   or a
+   ret
+   
+;        call    l_long_cmp
+;        scf
+;        ret   z
+;	dec	hl
+;	and	a
+;        ret

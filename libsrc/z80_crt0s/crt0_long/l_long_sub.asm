@@ -5,13 +5,65 @@
 ;       The old routine is fubarred! Written a new one now..but
 ;       I'm mystified!
 
-                XLIB    l_long_sub
+XLIB    l_long_sub
+
+; dehl = primary
+; stack = secondary, ret
+; exit: dehl = secondary - primary
+
+.l_long_sub
+
+; 100 cycles
+
+   pop ix                      ; ix = ret address
+   
+   ld c,l
+   ld b,h                      ; bc = primary LSW
+   pop hl                      ; hl = secondary LSW
+   or a
+   sbc hl,bc
+   ex de,hl                    ; de = result LSW
+   ld c,l
+   ld b,h                      ; bc = primary MSW
+   pop hl                      ; hl = secondary MSW
+   sbc hl,bc
+   ex de,hl                    ; dehl = result
+   
+   jp (ix)
 
 
-;primary = secondary - primary
-;enter with secondary, primary on stack
+; 131 cycles
+
+;        exx             ;2nd
+;        pop     bc
+;        pop     hl
+;        pop     de
+;        push    bc
+;        ld      a,l
+;        exx
+;        sub     l
+;        ld      l,a
+;        exx             ;1st
+;        ld      a,h
+;        exx             ;2nd
+;        sbc     a,h
+;        ld      h,a
+;        exx             ;1st
+;        ld      a,e
+;        exx             '2md
+;        sbc     a,e
+;        ld      e,a     
+;        exx             ;1st
+;        ld      a,d
+;        exx             ;2nd
+;        sbc     a,d
+;        ld      d,a
+;        ret
 
 IF ARCHAIC
+
+; 174 cycles
+
 .l_long_add
         ld      b,h     ;store lower 16 in bc temporarily
         ld      c,l
@@ -43,35 +95,4 @@ IF ARCHAIC
         ld      h,b
         ret
 ENDIF
-
-
-;This routines also messes things up not inconsiderably..mystified!
-;
-
-.l_long_sub 
-        exx             ;2nd
-        pop     bc
-        pop     hl
-        pop     de
-        push    bc
-        ld      a,l
-        exx
-        sub     l
-        ld      l,a
-        exx             ;1st
-        ld      a,h
-        exx             ;2nd
-        sbc     a,h
-        ld      h,a
-        exx             ;1st
-        ld      a,e
-        exx             '2md
-        sbc     a,e
-        ld      e,a     
-        exx             ;1st
-        ld      a,d
-        exx             ;2nd
-        sbc     a,d
-        ld      d,a
-        ret
 

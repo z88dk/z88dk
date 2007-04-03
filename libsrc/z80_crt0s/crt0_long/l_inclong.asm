@@ -8,12 +8,20 @@
                 XLIB    l_inclong
 
 .l_inclong
-        inc     hl
-        ld      a,h
-        or      l
-        ret     nz
-        inc     de
-        ret
+
+   inc l
+   ret nz
+   inc h
+   ret nz
+   inc de
+   ret
+   
+;        inc     hl
+;        ld      a,h
+;        or      l
+;        ret     nz
+;        inc     de
+;        ret
 
 
 IF ARCHAIC
