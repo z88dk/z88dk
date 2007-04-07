@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol_callee.asm,v 1.4 2007-03-25 22:58:31 aralbrec Exp $
+; * $Id: strtol_callee.asm,v 1.5 2007-04-07 03:05:56 aralbrec Exp $
 ; *
 ; */
 ;
@@ -169,17 +169,15 @@ XDEF ASMDISP_STRTOL_CALLEE
    ; bc = base
    ; hl = char *
 
-   ld d,b
-   ld e,b                    ; de = 0
-   push de
-   push bc                   ; push (long)(base) on stack
+   ld ixh,b
+   ld ixl,c                  ; ix = base
    
-   ld ix,-6
-   add ix,sp                 ; ix will point at duplicate (long)(base) on stack
+   ld d,b
+   ld e,b
    
    ld c,l
    ld b,h                    ; bc = char *
-   
+
    ld h,d
    ld l,a                    ; dehl = a = total so far
 
@@ -187,8 +185,7 @@ XDEF ASMDISP_STRTOL_CALLEE
    
    ;   bc = char *
    ; dehl = running total
-   ;   ix = & duplicate (long)(base) on stack (not valid now)
-   ; stack = (long)(base)
+   ;   ix = base
 
    ; first get next digit
    
@@ -196,29 +193,30 @@ XDEF ASMDISP_STRTOL_CALLEE
    ld a,(bc)                 ; turn next char into digit
 
    sub '0'
-   jr c, done
+   ret c
    cp 10
    jr c, noadj2
    add a,'0'
    and $df
    sub 'A'
-   jr c, done
+   ret c
    add a,10
 .noadj2
-   cp (ix+6)                 ; base
-   jr nc, done
+   cp ixl                    ; base
+   ret nc
 
 .havedigit
 
-   ; first refresh copy of duplicate base on stack
-
    push bc                   ; save char *
-   ld bc,0
-   push bc                   ; make space for duplicate base on stack
-   ld c,(ix+6)               ; copy (long)(base) into duplicate, only single byte since base must be < 37
+   ex af,af
+   
+   ld bc,0                   ; push base on stack
    push bc
-   call l_long_mult          ; dehl = dehl * base, wow a mult that doesn't touch A!
-   pop bc                    ; bc = char * (lib mult does stack gymnastics)
+   push ix
+   call l_long_mult          ; dehl = dehl * base
+
+   ex af,af
+   pop bc                    ; bc = char *
    
    ; now add in digit
       
@@ -230,16 +228,6 @@ XDEF ASMDISP_STRTOL_CALLEE
    inc de
 
    jp loop
-   
-.done
-
-   ; bc = char *
-   ; dehl = result
-   ; stack = (long)(base)
-   
-   pop af
-   pop af
-   ret
    
 .fail
 
