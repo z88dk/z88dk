@@ -6,6 +6,7 @@
 ; This is the unsigned routine...disregards signs and just does it..
 
 XLIB     l_div_u
+XDEF     L_DIVENTRY
                 
 ; The old routine was so cumbersome, so come up with a new one which
 ; will hopefully be a lot quicker and nicer!
@@ -23,8 +24,10 @@ XLIB     l_div_u
         or      l
         ret     z
         ex      de,hl
-        
+
 ;Now, we have two positive numbers so can do division no problems..
+
+.entry
 
         ld      b,16    ;counter
         ld      a,h     ;arg1
@@ -57,3 +60,5 @@ XLIB     l_div_u
         ld      e,c
         ex      de,hl
         ret
+
+DEFC L_DIVENTRY = entry - l_div_u

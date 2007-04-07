@@ -5,8 +5,9 @@
 ;
 
 XLIB l_div
-LIB l_div_u
 
+LIB l_div_u
+XREF L_DIVENTRY
 
 IF !ARCHAIC
 
@@ -63,7 +64,7 @@ IF !ARCHAIC
 .l_div01
 
         or a
-        call    l_div_u+4  ; unsigned divide but skip zero check
+        call    l_div_u + L_DIVENTRY  ; unsigned divide but skip zero check
 
 ;Now do the signs..
 
