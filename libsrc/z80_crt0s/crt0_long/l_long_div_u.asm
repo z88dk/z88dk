@@ -9,85 +9,109 @@
 ;       otherwise!
 ;
 ;       This is for unsigned quantities..separate routine for signed..
+;
+;       Replaced use of ix with bcbc'
 
-                XLIB    l_long_div_u
-
-
-
-
+XLIB    l_long_div_u
+XDEF    L_LONG_DIVIDE0, L_LONG_DIVENTRY
 
 ; 32 bit division
-; Entry: arg1 on stack under return address, dehl=arg2
-; Exit:  dehl=result, de'hl'=remainder
-;
-; The number on the stack is stored LSB first
-;
+; enter:
+;    dehl = arg2
+;   stack = arg1, ret
+; exit:
+;    dehl = arg1/arg2
+;   de'hl'= arg1%arg2
 
-.l_long_div_u
-;Check for dividing by zero
-        ld      a,d
-        or      e
-        or      h
-        or      l
-        jr      nz,l_long_div0  
-; Zero, return with dehl=0 dehl=arg1
-        exx
-        pop     bc
-        pop     hl
-        pop     de
-        push    bc
-        exx
-        ret
-.l_long_div0
-        ld      ix,2
-        add     ix,sp           ;points to arg1
-        ld      b,32            ;counter
-        push    hl              ;lower 16 of arg2
-        exx
-        pop     de
-        ld      hl,0            ;lower 16 of res1
-        exx
-        ld      hl,0            ;upper 16 of res1
-        and     a               ;clear carry
+.l_long_divu
+
+   ld a,d
+   or e
+   or h
+   or l
+   jr z, divide0
+   
+   pop af
+   push hl
+   exx
+   pop de
+   pop bc
+   ld hl,0
+   exx
+   pop bc
+   ld hl,0
+   push af
+
+.entry
+
+   ld a,32
+   or a
+
+   ; bcbc' = arg1
+   ; hlhl' = res
+   ; dede' = arg2
+
 .l_long_div1
-        rl      (ix+0)          ;arg1 << 1 -> arg1
-        rl      (ix+1)
-        rl      (ix+2)
-        rl      (ix+3)
-        exx                     ;res1 << 1 -> res1
-        rl      l               ;lower 16
-        rl      h
-        exx
-        rl      l               ;upper 16
-        rl      h
-        exx                     ;res1 - arg2 -> res1
-        sbc     hl,de           ;lower 16
-        exx
-        sbc     hl,de           ;upper 16
-        jr      nc,l_long_div2  ;don't add
-        exx                     ;res1 + arg2 -> res1
-        add     hl,de           ;lower 16
-        exx
-        adc     hl,de
+
+   exx                         ; arg1 <<= 1
+   rl c
+   rl b
+   exx
+   rl c
+   rl b
+   
+   exx                         ; res <<= 1
+   adc hl,hl
+   exx
+   adc hl,hl
+   
+   exx                         ; res -= arg2
+   sbc hl,de
+   exx
+   sbc hl,de
+   jr nc, l_long_div2
+
+   exx                         ; res += arg2
+   add hl,de
+   exx
+   adc hl,de
+
 .l_long_div2
-        ccf
-        djnz    l_long_div1
-; It was so very tempting to use instructions along the lines of
-; ld l,rl(ix+0) here..it would work, would annoy the hackers, but
-; I don't think it would be any faster :(
-                                ;arg1 << 1 -> arg1
-        rl      (ix+0)
-        rl      (ix+1)
-        rl      (ix+2)
-        rl      (ix+3)
-;Now we have to return arg1 in dehl and res1 in dehl'
-;As well as clear up the stack!
-        push    hl      ;upper 16 of res1
-        exx
-        pop     de
-        exx             ;so res1 is now safe in alternate registers
-        pop     bc      ;return address
-        pop     hl      ;lower 16 of arg1
-        pop     de      ;upper 16
-        push    bc
-        ret
+
+   ccf
+   dec a
+   jp nz, l_long_div1
+
+   exx                         ; arg1 <<= 1
+   rl c
+   rl b
+   exx
+   rl c
+   rl b
+
+   ; looking to return:
+   ;  dehl  = quotient = arg1
+   ; de'hl' = remainder = res
+   
+   push hl
+   exx
+   pop de
+   push bc
+   exx
+   pop hl
+   ld e,c
+   ld d,b
+   ret
+
+.divide0
+
+   exx
+   pop bc
+   pop hl
+   pop de
+   push bc
+   exx
+   ret
+
+DEFC L_LONG_DIVIDE0 = divide0 - l_long_div_u
+DEFC L_LONG_DIVENTRY = entry - l_long_div_u
