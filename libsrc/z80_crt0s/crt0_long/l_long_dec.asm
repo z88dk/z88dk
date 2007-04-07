@@ -5,14 +5,26 @@
 ;
 ;       djm 26/2/2000
 
-                XLIB    l_long_dec
+XLIB    l_long_dec
 
 .l_long_dec
-	dec	(hl)
-	ret	nz
-	dec	(hl)
-	ret	nz
-	dec	(hl)
-	ret	nz
-	dec	(hl)
-	ret
+
+   ld a,$ff
+   
+   dec (hl)
+   cp (hl)
+   ret nz
+   
+   inc hl
+   dec (hl)
+   cp (hl)
+   ret nz
+
+   inc hl
+   dec (hl)
+   cp (hl)
+   ret nz
+   
+   inc hl
+   dec (hl)
+   ret
