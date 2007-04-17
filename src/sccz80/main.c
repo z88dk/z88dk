@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.15 2006-06-18 13:03:13 dom Exp $
+ *      $Id: main.c,v 1.16 2007-04-17 14:40:15 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -426,6 +426,14 @@ dumpfns()
 			if (ident==FUNCTIONP) ident=FUNCTION;
                         type =ptr->type;
                         storage=ptr->storage;
+                        if ( ident == FUNCTION && ptr->size != 0 ) {
+                            outstr("\tdefc\t");
+                            outname(ptr->name,1);
+                            ot("=\t");
+                            outdec(ptr->size);
+                            nl();
+
+                        } else 
                         if (ident == FUNCTION && storage!=LSTATIC )
                         {
                                 if (storage==EXTERNAL) {

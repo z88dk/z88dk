@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.8 2007-01-05 19:17:23 dom Exp $
+ *      $Id: declfunc.c,v 1.9 2007-04-17 14:40:14 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -111,7 +111,7 @@ long *addr)
      *      First call AddNewFunc(), if this returns 0 then we have defined
      *      a function (including code)
      */
-    ptr=AddFuncCode(sname, type, ident,sign, zfar, storage, more,NO,simple,otag);
+    ptr=AddFuncCode(sname, type, ident,sign, zfar, storage, more,NO,simple,otag,addr);
        
     if (ptr==0) { /* Defined a function */
         /* trap external int blah() { } things */
@@ -134,6 +134,7 @@ long *addr)
 void newfunc()
 {
         char n[NAMESIZE];               /* ptr => currfn */
+        long addr;
 
         if ( symname(n) == 0 ) {
                 error(E_ILLEGAL);
@@ -141,7 +142,7 @@ void newfunc()
                 return;
         }
         warning(W_RETINT);
-        AddFuncCode(n,CINT,FUNCTION,dosigned,0,STATIK,0,1,NO,0);
+        AddFuncCode(n,CINT,FUNCTION,dosigned,0,STATIK,0,1,NO,0, &addr);
 }
 
 /*
@@ -154,7 +155,7 @@ void newfunc()
 SYMBOL *
 #endif
 
-AddFuncCode(char *n, char type, char ident, char sign,char zfar, int storage, int more, char check,char simple,TAG_SYMBOL *otag)
+AddFuncCode(char *n, char type, char ident, char sign,char zfar, int storage, int more, char check,char simple,TAG_SYMBOL *otag, long *addr)
 {
     unsigned char tvalue;           /* Used to hold protot value */
     char    typ;                    /* Temporary type */
@@ -247,7 +248,7 @@ AddFuncCode(char *n, char type, char ident, char sign,char zfar, int storage, in
      * doing this! (Have an array and check by that?)           
      */
     if (CheckANSI()) {
-        return( dofnansi(currfn) ); /* So we can pass back result */
+        return( dofnansi(currfn, addr) ); /* So we can pass back result */
     }
     DoFnKR(currfn,simple);
     return(0);
@@ -467,7 +468,7 @@ void setlocvar(SYMBOL *prevarg,SYMBOL *currfn)
 #ifndef SMALL_C
 SYMBOL *
 #endif
-dofnansi(SYMBOL *currfn)
+dofnansi(SYMBOL *currfn, long *addr)
 {
         SYMBOL *prevarg;       /* ptr to symbol table entry of most recent argument */
         SYMBOL *argptr;        /* Temporary holder.. */
@@ -520,6 +521,10 @@ dofnansi(SYMBOL *currfn)
  *      have to have prototypes on separate lines - good practice
  *      in anycase!!
  */
+        if (cmatch('@') ) {
+            constexpr(addr,1);
+        }
+
         if (cmatch(';') ) return (prevarg);
         setlocvar(prevarg,currfn);
         return (0);

@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.14 2003-04-20 16:11:10 dom Exp $
+ *      $Id: declvar.c,v 1.15 2007-04-17 14:40:15 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -198,7 +198,7 @@ char zfar )                      /* TRUE if far */
 {
     char sname[NAMESIZE];
     int size, ident, more, itag, type, size_st;
-    long addr;
+    long addr = -1;
     char    flagdef,match,ptrtofn;
     char    libdef,fastcall,callee;
     SYMBOL *myptr ;
@@ -297,7 +297,9 @@ char zfar )                      /* TRUE if far */
                 if (fastcall) currfn->flags|=fastcall;
             }
             if (storage==0) {
-				currfn=0;
+                if ( addr != -1 ) {
+                    currfn->size = addr;
+                }
 				return;
 			}
             /*
@@ -410,6 +412,7 @@ char zfar )                      /* TRUE if far */
                         myptr->flags&=(~CALLEE);
                         myptr->flags|=libdef|LIBRARY;
                     }
+                   
                                 
                 }
 
