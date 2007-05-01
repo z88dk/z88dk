@@ -95,7 +95,6 @@ LIB l_deneg
 .divide
 
    ld a,'0'-1
-   or a
    
 .divloop
 
