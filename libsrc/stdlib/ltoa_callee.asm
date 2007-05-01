@@ -6,11 +6,7 @@ XLIB ltoa_callee
 XDEF ASMDISP_LTOA_CALLEE
 XDEF ASMDISP2_LTOA_CALLEE
 
-LIB l_long_div_u, l_long_neg
-
-; l_long_div_u
-; enter: push arg1,ret addr, arg2 = dehl
-; exit : dehl = arg1/arg2, de'hl' = arg1%arg2
+LIB l_long_neg
 
 .ltoa_callee
 
@@ -23,7 +19,7 @@ LIB l_long_div_u, l_long_neg
 .asmentry
 
    ; dehl = long num
-   ; bc = char *s
+   ;   bc = char *s
    
    push bc
 
@@ -36,117 +32,136 @@ LIB l_long_div_u, l_long_neg
 
 .notneg
 
-   push bc                     ; save current char * position
-   ld bc,constants
-   push bc
+   push de
    exx
+   pop hl
+   exx
+   ld de,constants
+   push de
    
 .skipleading0
 
-   ; de'hl'= num
-   ; stack = char *, constants
-
-   pop hl                      ; & constant
-   ld d,(hl)
-   inc hl
+   ; hl'hl = num
+   ; bc    = char *
+   ; stack = constants
+   
+   ex (sp),hl
    ld e,(hl)
    inc hl
-   ld b,(hl)
+   ld d,(hl)
    inc hl
-   ld c,(hl)                   ; debc = constant
+   ex (sp),hl
+   exx
+   ex (sp),hl
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   ex (sp),hl
    
    ld a,d
    or e
-   or b
-   or c
-   jr z, writelast             ; if there are no more constant write last digit
-   
-   inc hl
-   push hl                     ; & next constant
-   
-   ld l,c
-   ld h,b                      ; dehl = arg2
    exx
-   push de
-   push hl                     ; arg1 on stack
-   exx
-   call l_long_div_u           ; dehl = arg1/arg2, de'hl' = arg1%arg2
-
-   ld a,l
-   or a
+   or d
+   or e
+   jr z, writelast
+   
+   ; hl'hl = arg1
+   ; de'de = arg2
+   
+   call divide
+   cp '0'
    jp z, skipleading0
 
 .write
 
-   ;     a  = digit to write
-   ; de'hl' = remaining num
-   ; stack  = char *, constants
-   
-   add a,'0'
-   
-   pop hl                      ; & constant
-   pop de                      ; char *
-   ld (de),a                   ; write digit
-   inc de
-   push de
+   ;     a = ascii code of digit to write
+   ;    bc = char *
+   ; hl'hl = num
+   ; stack = constants
 
-   ld d,(hl)
-   inc hl
+   ld (bc),a
+   inc bc
+   
+   ex (sp),hl
    ld e,(hl)
    inc hl
-   ld b,(hl)
+   ld d,(hl)
    inc hl
-   ld c,(hl)                   ; debc = constant
+   ex (sp),hl
+   exx
+   ex (sp),hl
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   ex (sp),hl
    
    ld a,d
    or e
-   or b
-   or c
-   jr z, writelast             ; if there are no more constant write last digit
-   
-   inc hl
-   push hl                     ; & next constant
-   
-   ld l,c
-   ld h,b                      ; dehl = arg2
    exx
-   push de
-   push hl                     ; arg1 on stack
-   exx
-   call l_long_div_u           ; dehl = arg1/arg2, de'hl' = arg1%arg2
+   or d
+   or e
+   jr z, writelast
    
-   ld a,l
+   ; hl'hl = arg1
+   ; de'de = arg2
+   
+   call divide
    jp write
 
 .writelast
 
-   ;    hl' = remaining num
-   ; stack  = char *
-
-   exx
-   pop de
+   ;    hl  = remaining num
+   ;    bc  = char *
+   ; stack  = constants
+   
    ld a,l
    add a,'0'
-   ld (de),a                   ; write last digit
-   inc de
+   ld (bc),a
+   inc bc
    
    xor a
-   ld (de),a                   ; terminate with '\0'
-   pop hl                      ; hl = char *s
+   ld (bc),a
+   pop hl
+   pop hl
    ret
 
-.constants                     ; MSW, LSW, all big endian
+.divide
 
-   defw $9a3b, $00ca           ; 1,000,000,000
-   defw $f505, $00e1           ;   100,000,000
-   defw $9800, $8096           ;    10,000,000
-   defw $0f00, $4042           ;     1,000,000
-   defw $0100, $a086           ;       100,000
-   defw $0000, $1027           ;        10,000
-   defw $0000, $e803           ;         1,000
-   defw $0000, $6400           ;           100
-   defw $0000, $0a00           ;            10
-   defw $0000, $0000           ;  end of table
+   ld a,'0'-1
+
+.divloop
+
+;        hl'hl = arg1
+;        de'de = arg2
+; exit : hl'hl = arg1 % arg2
+;           a  = ascii arg1/arg2
+
+   inc a
+   sbc hl,de
+   exx
+   sbc hl,de
+   exx
+   jr nc, divloop
+   add hl,de
+   exx
+   adc hl,de
+   exx
+   ret
+
+.constants                     ; little endian
+
+   defw $ca00, $3b9a           ; 1,000,000,000
+   defw $e100, $05f5           ;   100,000,000
+   defw $9680, $0098           ;    10,000,000
+   defw $4240, $000f           ;     1,000,000
+   defw $86a0, $0001           ;       100,000
+   defw $2710, $0000           ;        10,000
+   defw $03e8, $0000           ;         1,000
+   defw $0064, $0000           ;           100
+   defw $000a, $0000           ;            10
+   defw $0000, $0000           ; end of table
 
 DEFC ASMDISP_LTOA_CALLEE = asmentry - ltoa_callee
 DEFC ASMDISP2_LTOA_CALLEE = notneg - ltoa_callee
