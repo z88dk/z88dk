@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.27 2007-04-02 19:57:18 aralbrec Exp $
+ * $Id: stdlib.h,v 1.28 2007-05-04 21:58:59 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -180,7 +180,7 @@ extern uint __LIB__ __FASTCALL__ isqrt(uint n);
 // For accessing 16-bit i/o ports from C.  The macros can be
 // used to inline code if the parameters resolve to constants.
 
-extern unsigned char __LIB__ __FASTCALL__ inp(unsigned int port);
+extern unsigned int  __LIB__ __FASTCALL__ inp(unsigned int port);
 extern void          __LIB__              outp(unsigned int port, unsigned char byte);
 extern void          __LIB__ __CALLEE__   outp_callee(unsigned int port, unsigned char byte);
 
