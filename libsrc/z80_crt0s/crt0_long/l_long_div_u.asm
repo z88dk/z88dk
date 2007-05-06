@@ -23,7 +23,7 @@ XDEF    L_LONG_DIVIDE0, L_LONG_DIVENTRY
 ;    dehl = arg1/arg2
 ;   de'hl'= arg1%arg2
 
-.l_long_divu
+.l_long_div_u
 
    ld a,d
    or e
