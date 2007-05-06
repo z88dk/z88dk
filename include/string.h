@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.16 2007-05-04 21:58:07 aralbrec Exp $
+ *	$Id: string.h,v 1.17 2007-05-06 21:37:54 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -51,7 +51,7 @@ extern void __LIB__              *memmove(void *, void *, uint);
 extern void __LIB__              *memchr(void *, unsigned char, uint);
 extern int  __LIB__               memcmp(void *, void *, uint);
 extern void __LIB__              *memswap(void *, void *, uint);
-extern void __LIB__              *memop(void *, void *, uint, uchar);
+extern void __LIB__              *memop(void *, void *, uint, uint);
 
 extern char __LIB__ __FASTCALL__ *strdup(char *);
 
@@ -83,7 +83,7 @@ extern void __LIB__ __CALLEE__   *memmove_callee(void *, void *, uint);
 extern void __LIB__ __CALLEE__   *memchr_callee(void *, unsigned char, uint);
 extern int  __LIB__ __CALLEE__    memcmp_callee(void *, void *, uint);
 extern void __LIB__ __CALLEE__   *memswap_callee(void *, void *, uint);
-extern void __LIB__ __CALLEE__   *memop_callee(void *, void *, uint, uchar);
+extern void __LIB__ __CALLEE__   *memop_callee(void *, void *, uint, uint);
 
 // And now we make CALLEE linkage default to make compiled progs shorter and faster
 // These defines will generate warnings for function pointers but that's ok
