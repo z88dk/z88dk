@@ -6,9 +6,8 @@ XREF ASMDISP_MEMOP_CALLEE
 
 .memop
 
+   pop af
    pop ix
-   pop bc
-   ld a,c
    pop bc
    pop de
    pop hl
@@ -16,6 +15,6 @@ XREF ASMDISP_MEMOP_CALLEE
    push de
    push bc
    push bc
-   push ix
+   push af
    
    jp memop_callee + ASMDISP_MEMOP_CALLEE
