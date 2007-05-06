@@ -54,30 +54,7 @@ XREF    L_LONG_DIVIDE0, L_LONG_DIVENTRY
    ld c,a
 
    bit 7,b
-   call nz, negbcbc
-   bit 7,d
-   call nz, negdede
-
-   call l_long_div_u + L_LONG_DIVENTRY
-
-   ; dehl   = quotient
-   ; de'hl' = remainder
-
-   ; deal with the signs
-   
-   pop bc                      ; b = sgn(arg1), c = sgn(arg2)
-
-   ld a,b
-   xor c
-   call m, l_long_neg
-   
-   ld a,b
-   and $80
-   ret p
-   exx
-   call l_long_neg
-   exx
-   ret
+   jr z, skipnegbcbc
 
 .negbcbc
 
@@ -98,9 +75,13 @@ XREF    L_LONG_DIVIDE0, L_LONG_DIVENTRY
    ld a,b
    cpl
    ld b,a
-   ret nz
+   jr nz, skipnegbcbc
    inc bc
-   ret
+
+.skipnegbcbc
+
+   bit 7,d
+   jr z, skipnegdede
 
 .negdede
 
@@ -121,6 +102,28 @@ XREF    L_LONG_DIVIDE0, L_LONG_DIVENTRY
    ld a,d
    cpl
    ld d,a
-   ret nz
+   jr nz, skipnegdede
    inc de
+
+.skipnegdede
+
+   call l_long_div_u + L_LONG_DIVENTRY
+
+   ; dehl   = quotient
+   ; de'hl' = remainder
+
+   ; deal with the signs
+   
+   pop bc                      ; b = sgn(arg1), c = sgn(arg2)
+
+   ld a,b
+   xor c
+   call m, l_long_neg
+   
+   ld a,b
+   and $80
+   ret p
+   exx
+   call l_long_neg
+   exx
    ret
