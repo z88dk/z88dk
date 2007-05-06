@@ -33,7 +33,7 @@ IF !ARCHAIC
 
         ld      a,h     ;dividend
         and     128
-        ld      b,a     ;keep it safe
+        ld      b,a     ;b = sgn(divisor)
         jr      z,l_div0
         
 ;if -ve make into positive number!
@@ -49,9 +49,7 @@ IF !ARCHAIC
 
         ld      a,d     ;divisor
         and     128
-        xor     b       
-        ld      c,a     ;keep it safe (Quotient)
-        bit     7,d
+        ld      c,a     ;c = sgn(quotient)
         jr      z,l_div01
         
         sub     a
@@ -64,16 +62,18 @@ IF !ARCHAIC
 .l_div01
 
         or a
+        push bc         ;save signs
         call    l_div_u + L_DIVENTRY  ; unsigned divide but skip zero check
 
 ;Now do the signs..
 
-        pop     bc      ;c holds quotient, b holds remainder
+        pop     bc      ;c = sgn(quotient), b = sgn(divisor)
         ex      de,hl
         
 ;de holds quotient, hl holds remainder
 
         ld      a,c
+        xor b
         call    dosign  ;quotient
         ld      a,b
         ex      de,hl   ;remainder (into de)
