@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.2 2003-03-13 14:50:29 dom Exp $
+ *   $Id: appmake.c,v 1.3 2007-05-10 20:03:25 stefano Exp $
  */
 
 #define MAIN_C
@@ -286,4 +286,16 @@ void writestring_p(char *mystring, FILE *fp,unsigned char *p)
     for (c=0; c < strlen(mystring); c++) {
         writebyte_p(mystring[c],fp,p);
     }
+}
+
+void writebyte_cksum(unsigned char c, FILE *fp, unsigned long *cksum)
+{
+    *cksum += (unsigned int) c;
+    fputc(c,fp);
+}
+
+void writeword_cksum(unsigned int i, FILE *fp, unsigned long *cksum)
+{
+    writebyte_cksum(i%256,fp,cksum);
+    writebyte_cksum(i/256,fp,cksum);
 }

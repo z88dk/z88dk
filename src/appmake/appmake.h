@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.6 2007-04-01 20:48:40 stefano Exp $
+ *   $Id: appmake.h,v 1.7 2007-05-10 20:03:25 stefano Exp $
  */
 
 
@@ -113,22 +113,22 @@ struct {
     { "bin2cpc",  "cpc",      "(C) 2003 Dominic Morris",
       "Creates an AMSDOS file suitable for writing to a .DSK image",
       cpc_exec,   &cpc_options },
-    { "bin2hex",  "hex",      "(C) 2001 Dominic Morris & Jeff Brown",                         
+    { "bin2hex",  "hex",      "(C) 2001 Dominic Morris & Jeff Brown",
       "Creates an intel hex record suitable for embedded devices",
       hex_exec,     &hex_options },
-    { "bin2msx",  "msx",      "(C) 2001 Stefano Bodrato",                         
+    { "bin2msx",  "msx",      "(C) 2001 Stefano Bodrato",
       "Adds a file header to enable the program to be loaded using 'bload \"file.bin\",r",
       msx_exec,     &msx_options },
-    { "bin2m12",  "mz",       "(C) 2000 Stefano Bodrato",                         
+    { "bin2m12",  "mz",       "(C) 2000 Stefano Bodrato",
       "",
       mz_exec,      &mz_options },
-    { "bin2nas",   "nas",       "(C) 2003 Stefano Bodrato",                         
+    { "bin2nas",   "nas",       "(C) 2003 Stefano Bodrato",
       "Generates a .NAS file suitable for use by emulators",
       nascom_exec,    &nascom_options },
-    { "bin2nwbn",   "newbrain",       "(C) 2007 Stefano Bodrato",                         
-      "Generates a text basic program with DATA lines",
+    { "bin2nwbn",   "newbrain",       "(C) 2007 Stefano Bodrato",
+      "BASIC loader + data block in Tape format or plain TXT (less efficient)",
       newbrain_exec,    &newbrain_options },
-    { "mkaddin",   "rex",       "(C) 2001 Dominic Morris",   
+    { "mkaddin",   "rex",       "(C) 2001 Dominic Morris",
       "Creates a .rex application using data from a .res file and a .bin file",
       rex_exec,     &rex_options },
     { "bin2var",   "ti82",       "(C) 2000 - 2003 David Phillips et al",
@@ -187,3 +187,6 @@ extern void         writestring(char *mystring, FILE *fp);
 extern void         writeword_p(unsigned int i, FILE *fp,unsigned char *p);
 extern void         writebyte_p(unsigned char c, FILE *fp,unsigned char *p);
 extern void         writestring_p(char *mystring, FILE *fp,unsigned char *p);
+
+extern void         writebyte_cksum(unsigned char c, FILE *fp, unsigned long *cksum);
+extern void         writeword_cksum(unsigned int i, FILE *fp, unsigned long *cksum);
