@@ -5,24 +5,17 @@
 ;	getk() Read key status
 ;
 ;
-;	$Id: getk.asm,v 1.1 2007-04-01 20:48:40 stefano Exp $
+;	$Id: getk.asm,v 1.2 2007-05-14 12:40:47 stefano Exp $
 ;
 
 	XLIB	getk
 
 .getk
-
-	ld	e,0
+	;ld	e,0
 	rst	20h
-	defb	31h
-	jr	nc,nozero
-	xor	a
-.nozero
-	cp	18h	; Delete?
-	jr	nz,nodel
-	ld	a,8
-.nodel
-
-	ld	l,a
+	defb	38h
+	rst	20h	; Convert Key code
+	defb	3Ah
 	ld	h,0
+	ld	l,a
 	ret
