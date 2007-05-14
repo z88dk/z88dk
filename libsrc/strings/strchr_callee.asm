@@ -24,14 +24,10 @@ XDEF ASMDISP_STRCHR_CALLEE
    cp c
    ret z
    
-   or a
-   jr z, zeroret
-   
    inc hl
-   jp loop
-
-.zeroret
-
+   or a
+   jp nz, loop
+   
    ld l,a
    ld h,a
    scf
