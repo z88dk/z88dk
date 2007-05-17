@@ -2,7 +2,7 @@
 ;       Grundy NewBrain startup code
 ;
 ;
-;       $Id: newbrain_crt0.asm,v 1.1 2007-05-14 12:43:22 stefano Exp $
+;       $Id: newbrain_crt0.asm,v 1.2 2007-05-17 16:25:53 stefano Exp $
 ;
 
                 MODULE  newbrain_crt0
@@ -37,6 +37,11 @@
 
 	XDEF	snd_tick	;Sound variable
 
+IF (startup<>2)
+	XDEF	nbclock		;long ptr to clock counter
+	XDEF	oldintaddr	;made available to chain an interrupt handler
+ENDIF
+
 
         IF      !myzorg
                 defc    myzorg  = 10000
@@ -51,6 +56,13 @@
         ld      sp,hl
         ld      (exitsp),sp
         
+IF (startup<>2)
+	ld	hl,(57)
+	ld	(oldintaddr),hl
+	ld	hl,nbckcount
+	ld	(57),hl
+ENDIF
+
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -76,6 +88,11 @@ IF DEFINED_ANSIstdio
 	LIB	closeall
 	call	closeall
 ENDIF
+ENDIF
+
+IF (startup<>2)
+	ld	hl,(oldintaddr)
+	ld	(57),hl
 ENDIF
 
 .cleanup_exit
@@ -119,10 +136,40 @@ ELSE
 ENDIF
 
 
+;-----------
+; Grundy NewBrain clock handler.
+; an interrupt handler could chain the "oldintaddr" value.
+;-----------
+
+IF (startup<>2)
+
+.nbckcount	push	af
+		push	hl
+		ld	hl,(nbclock)
+		inc	hl
+		ld	(nbclock),hl
+		ld	a,h
+		or	l
+		jr	nz,nomsb
+		ld	hl,(nbclock_m)
+		inc	hl
+		ld	(nbclock_m),hl
+.nomsb		pop	hl
+		pop	af
+
+		defb	195	; JP
+.oldintaddr	defw	0
+
+.nbclock	defw	0	; NewBrain Clock
+.nbclock_m	defw	0
+
+ENDIF
+
 
 ;-----------
 ; Now some variables
 ;-----------
+
 .coords         defw    0       ; Current graphics xy coordinates
 .base_graphics  defw    0       ; Address of the Graphics map
 

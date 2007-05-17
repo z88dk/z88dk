@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.82 2007-04-01 20:48:40 stefano Exp $
+# $Id: Makefile,v 1.83 2007-05-17 16:25:53 stefano Exp $
 
 
 include Make.config
@@ -16,9 +16,9 @@ all:	genlibs z88libs tilibs zxlibs \
 	cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib cpcgray.lib \
 	cpm_clib.lib c128ansi_clib.lib \
 	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
-	nascom_clib.lib nasansi_clib.lib newbrain_clib.lib ozansi_clib.lib\
-	pps_clib.lib ppsansi_clib.lib embedded_clib.lib rcmx000_clib.lib \
+	nascom_clib.lib nasansi_clib.lib ozansi_clib.lib\
 	rex_clib.lib svi_clib.lib sam_clib.lib samansi_clib.lib \
+	pps_clib.lib ppsansi_clib.lib embedded_clib.lib \
 	zx81_clib.lib zx81ansi_clib.lib
 
 genlibs: gen_math.lib malloc.lib z80_crt0.lib ndos.lib adt.lib balloc.lib \
@@ -38,12 +38,12 @@ zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib zx
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.82 2007-04-01 20:48:40 stefano Exp $
+#  $Id: Makefile,v 1.83 2007-05-17 16:25:53 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.82 2007-04-01 20:48:40 stefano Exp $
+# $Id: Makefile,v 1.83 2007-05-17 16:25:53 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -58,7 +58,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.82 2007-04-01 20:48:40 stefano Exp $
+#  $Id: Makefile,v 1.83 2007-05-17 16:25:53 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -248,7 +248,7 @@ zx_clib.lib:
 # 64/32 column library for TS2068 - dom/stefano/alvin
 ts2068_clib.lib:
 	@echo ''
-	@echo '--- Building TS2068 (Spectrum clone) Library  ---'
+	@echo '--- Building ZX Spectrum Library  ---'
 	@echo ''
 	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
@@ -286,52 +286,6 @@ zx_mathtiny.lib:
 	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
 	@echo ''
 	cd zxmath ; $(MAKE) zx_mathtiny ; cd ..
-
-# vt100 C lib for spectrum - stefano/dom
-# use -DROMFONT for a tiny 36 columns mode
-# or -DPACKEDFONT for tiny 64->85 column modes
-zxan_clib.lib:
-	@echo ''
-	@echo '--- Building ZX Spectrum ANSI Library  ---'
-	@echo ''
-	$(RM) stdio/ansi/spectrum/f_ansi_char.o
-	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lzx ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd fcntl ; $(MAKE) lzx ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lzx ; cd ..
-	cd rs232 ; $(MAKE) lzx ; cd ..
-	$(MAKE) gamesdeps
-	cd spectrum ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) ; cd ..
-	$(LIBLINKER) -DFORzx $(COLDEFS) -xzxan_clib @zxansi.lst
-
-# vt100 C lib for TS2068 - stefano/dom
-# use -DROMFONT for a tiny 36 columns mode
-# or -DPACKEDFONT for tiny 64->85 column modes
-ts2068an_clib.lib:
-	@echo ''
-	@echo '--- Building TS2068 (Spectrum clone) ANSI Library  ---'
-	@echo ''
-	$(RM) stdio/ansi/spectrum/f_ansi_char.o
-	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lzx ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd fcntl ; $(MAKE) lzx ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lzx ; cd ..
-	cd rs232 ; $(MAKE) lzx ; cd ..
-	$(MAKE) gamesdeps
-	cd spectrum ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) ; cd ..
-	$(LIBLINKER) -DFORzx $(COLDEFS) -xts2068an_clib @ts2068an.lst
 
 # vt100 for sprinter - dom
 ppsansi_clib.lib:
@@ -372,6 +326,52 @@ pps_clib.lib:
 	cd spectrum ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORzx -xpps_clib @pps.lst
+
+# vt100 C lib for spectrum - stefano/dom
+# use -DROMFONT for a tiny 36 columns mode
+# or -DPACKEDFONT for tiny 64->85 column modes
+zxan_clib.lib:
+	@echo ''
+	@echo '--- Building ZX Spectrum ANSI Library  ---'
+	@echo ''
+	$(RM) stdio/ansi/spectrum/f_ansi_char.o
+	$(MAKE) gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) lzx ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd fcntl ; $(MAKE) lzx ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	cd time ; $(MAKE) lzx ; cd ..
+	cd rs232 ; $(MAKE) lzx ; cd ..
+	$(MAKE) gamesdeps
+	cd spectrum ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORzx $(COLDEFS) -xzxan_clib @zxansi.lst
+
+# vt100 C lib for TS2068 - stefano/dom
+# use -DROMFONT for a tiny 36 columns mode
+# or -DPACKEDFONT for tiny 64->85 column modes
+ts2068an_clib.lib:
+	@echo ''
+	@echo '--- Building ZX Spectrum ANSI Library  ---'
+	@echo ''
+	$(RM) stdio/ansi/spectrum/f_ansi_char.o
+	$(MAKE) gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) lzx ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd fcntl ; $(MAKE) lzx ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	cd time ; $(MAKE) lzx ; cd ..
+	cd rs232 ; $(MAKE) lzx ; cd ..
+	$(MAKE) gamesdeps
+	cd spectrum ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORzx $(COLDEFS) -xts2068an_clib @ts2068an.lst
 
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:
@@ -932,6 +932,7 @@ newbrain_clib.lib:
 	cd stdio ; $(MAKE) generic ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
+	cd time ; $(MAKE) lnewbrain ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORnewbrain -xnewbrain_clib @newbrain.lst
@@ -948,21 +949,6 @@ embedded_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORembedded -xembedded_clib @embedded.lst
-
-# RCM2/3000 lib 
-rcmx000_clib.lib:
-	@echo ''
-	@echo '--- Building RCM2/3000 Library  ---'
-	@echo ''
-	./gfxdeps.sh
-	cd strings ; $(MAKE)
-	cd stdlib ; $(MAKE) gen
-	cd stdio ; $(MAKE) gen
-	cd printflike ; $(MAKE) 
-	cd setjmp ; $(MAKE) 
-	cd assert ; $(MAKE) 
-	z80asm -IXIY -d -ns -nm -Mo -DFORrcmx000 -xrcmx000_clib @rcmx000.lst
-
 
 clean:
 	cd assert ; $(MAKE) clean ; cd ..
