@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.83 2007-05-17 16:25:53 stefano Exp $
+# $Id: Makefile,v 1.84 2007-05-17 17:04:43 stefano Exp $
 
 
 include Make.config
@@ -17,7 +17,8 @@ all:	genlibs z88libs tilibs zxlibs \
 	cpm_clib.lib c128ansi_clib.lib \
 	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib nasansi_clib.lib ozansi_clib.lib\
-	rex_clib.lib svi_clib.lib sam_clib.lib samansi_clib.lib \
+	rex_clib.lib rcmx000_clib.lib \
+	svi_clib.lib sam_clib.lib samansi_clib.lib \
 	pps_clib.lib ppsansi_clib.lib embedded_clib.lib \
 	zx81_clib.lib zx81ansi_clib.lib
 
@@ -38,12 +39,12 @@ zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib zx
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.83 2007-05-17 16:25:53 stefano Exp $
+#  $Id: Makefile,v 1.84 2007-05-17 17:04:43 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.83 2007-05-17 16:25:53 stefano Exp $
+# $Id: Makefile,v 1.84 2007-05-17 17:04:43 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -58,7 +59,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.83 2007-05-17 16:25:53 stefano Exp $
+#  $Id: Makefile,v 1.84 2007-05-17 17:04:43 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -922,6 +923,7 @@ c128ansi_clib.lib:
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORc128 -xc128ansi_clib @c128ansi.lst
 
+
 # Grundy NewBrain library - Stefano
 newbrain_clib.lib:
 	@echo ''
@@ -936,6 +938,21 @@ newbrain_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORnewbrain -xnewbrain_clib @newbrain.lst
+
+
+# RCM2/3000 lib
+rcmx000_clib.lib:
+	@echo ''
+	@echo '--- Building RCM2/3000 Library  ---'
+	@echo ''
+	cd strings ; $(MAKE)
+	cd stdlib ; $(MAKE) gen
+	cd stdio ; $(MAKE) gen
+	cd printflike ; $(MAKE)
+	cd setjmp ; $(MAKE)
+	cd assert ; $(MAKE)
+	z80asm -IXIY -d -ns -nm -Mo -DFORrcmx000 -xrcmx000_clib @rcmx000.lst
+
 
 # embedded target - contributed by Daniel Wallner
 embedded_clib.lib:
