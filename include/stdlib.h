@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.28 2007-05-04 21:58:59 aralbrec Exp $
+ * $Id: stdlib.h,v 1.29 2007-05-18 07:37:03 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -162,8 +162,10 @@ typedef struct ldiv_t ldiv_t;
 extern void __LIB__            div(div_t *d, int num, int denom);
 extern void __LIB__ __CALLEE__ div_callee(div_t *d, int num, int denom);
 extern void __LIB__            ldiv(ldiv_t *d, long num, long denom);
+extern void __LIB__ __CALLEE__ ldiv_callee(ldiv_t *d, long num, long denom);
 
-#define div(a,b,c) div_callee(a,b,c)
+#define div(a,b,c)  div_callee(a,b,c)
+#define ldiv(a,b,c) ldiv_callee(a,b,c)
 
 extern uint __LIB__ __FASTCALL__ isqrt(uint n);
 
