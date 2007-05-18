@@ -25,7 +25,8 @@ LIB l_jpix
    inc hl
    push hl
    push de
-   call l_jpix             ; read joystick with optional parameter on stack
+   ex de,hl
+   call l_jpix             ; read joystick with optional parameter on stack, in HL
    pop de
    ld a,l
    and $0f
