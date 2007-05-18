@@ -74,15 +74,17 @@ IF !ARCHAIC
 
         ld      a,c
         xor b
-        call    dosign  ;quotient
+        call m, dosign  ;quotient
         ld      a,b
         ex      de,hl   ;remainder (into de)
         
 ;Do the signs - de holds number to sign, a holds sign
 
-.dosign
         and     128
         ret     z       ;not negative so okay..
+
+.dosign
+
         sub     a
         sub     e
         ld      e,a
