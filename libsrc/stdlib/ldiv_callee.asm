@@ -1,16 +1,16 @@
-; void ldiv(ldiv_t *d, long num, long denom)
+; void __CALLEE__ ldiv_callee(ldiv_t *d, long num, long denom)
 ; 12.2006 aralbrec
-; CALLER linkage for function pointers
 
-XLIB ldiv
+XLIB ldiv_callee
 LIB l_long_div
 
-.ldiv
+.ldiv_callee
 
    ; setup for l_long_div: dehl = denom, stack = num
    
    pop af
    ex af,af                 ; af' = return address
+
    pop hl
    pop de
    call l_long_div          ; dehl = q, de'hl' = r
@@ -37,9 +37,7 @@ LIB l_long_div
    ld (hl),e
    inc hl
    ld (hl),d
-   ld hl,-6
-   add hl,sp
-   ld sp,hl
+
    ex af,af
    push af
    ret
