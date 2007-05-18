@@ -3,8 +3,13 @@
 ;
 ; This module is included by rcmx000_crt0.asm
 ;
-; $Id: rcmx000_boot.asm,v 1.1 2007-02-28 11:23:15 stefano Exp $
+; $Id: rcmx000_boot.asm,v 1.2 2007-05-18 06:36:50 stefano Exp $
 ;
+
+
+; PLEASE NOTE: If you ever change this file, please also review
+; the boot.c utility in the support/rcmx000 section cause it makes
+; assumptions on where the code lies in memory...
 
 	org 0
 
@@ -12,10 +17,13 @@
 
 	ld sp,8000h
 
-	; Ugly trick, if boot uses raw (-r) option we will patch this to
-	; jp _main, thus we need not know the address when we are in boot
-	; utility, if we are not in raw option, this will not do anything
-	ld hl, _main
+	; If boot uses raw (-r) option we will patch this into
+	; jp _end_prog. 
+	; If we are not in raw option, this will not do anything useful
+	ld hl, __end_prog
+
+	; N.B: The "end_prog" is the end of this file's program but the
+	; beginning of the users stuff
 
 	; Tell host we have loaded!! Send the 'babe' magic pattern
 	ld a,0bah
@@ -117,8 +125,8 @@
 	call __sendchar
 	nop
 
-	call _main
-	jp start
+	call __end_prog 	; This will jump to main
+	jp 0
 
 .__recvchar
 	defb 0d3h ; ioi
@@ -194,4 +202,3 @@
 	defb 080h, 024h, 080h			; SPCR <= 80h
 
 .__end_prog
-

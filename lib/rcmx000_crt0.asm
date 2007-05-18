@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: rcmx000_crt0.asm,v 1.1 2007-02-28 11:23:15 stefano Exp $
+;       $Id: rcmx000_crt0.asm,v 1.2 2007-05-18 06:36:50 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -48,6 +48,7 @@
 	; any register for any purpose Wheee!!
 
 	include "#rcmx000_boot.asm"
+	jp _main
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio

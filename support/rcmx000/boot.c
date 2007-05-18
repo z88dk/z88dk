@@ -17,6 +17,8 @@
 
 #include <sys/poll.h>
 
+#include "bootbytes.h"
+
 static int debug_hex=0;
 static int debug_dtr=0;
 static int debug_flush=0;
@@ -141,9 +143,13 @@ static int check_fd(int anfd)
 
 static void usage(const char* argv0)
 {
-  fprintf(stderr, "Usage: %s <ttydev> <divisor> [-b/-r] <coldloadfile> <binfile>\n", argv0);
+  fprintf(stderr, "Usage: %s -r <ttydev> <coldload binfile>\n", argv0);
+  fprintf(stderr, "   or\n", argv0);
+  fprintf(stderr, "Usage: %s -b <ttydev> <divisor> <binfile>\n", argv0);
   exit(1);
 }
+
+
 
 static void talk(int tty)
 {
@@ -234,54 +240,52 @@ int main(int argc, char *argv[])
 
   int i;
 
-  if (argc!=6)
-  {
-    usage(argv[0]);
-  }
-  
-  ttyname=argv[1];
-  divisor=atoi(argv[2]);
-  fname=argv[4];
-  
-  binfilename=argv[5];
-
-  if (argc==6)
-  {
-    if (strlen(argv[3])==2)
-      {
-	if (0==strncmp(argv[3], "-b", 2))
-	  {
-	    is_bin=1;
-	  }
-	else if (0==strncmp(argv[3], "-r", 2))
-	  {
-	    is_raw=1;
-	  }
-	else
-	  {
-	    usage(argv[0]);
-	  }
-      }
-    else
-      {
-	usage(argv[0]);
-      }
-  }
-  
-  coldboot=fopen(fname, "rb");
-  
-  if (coldboot==NULL)
+  if (argc!=4 && argc!=5)
     {
-      fprintf(stderr, "Could not open %s\n", fname);
-      exit(1);
+      usage(argv[0]);
     }
 
-  binfile=fopen(binfilename, "rb");
-  
-  if (binfile==NULL)
+  if (0==strncmp(argv[1], "-b", 2))
     {
-      fprintf(stderr, "Could not open %s\n", binfilename);
-      exit(1);
+      if (argc!=5) usage(argv[0]);
+
+      ttyname=argv[2];
+      divisor=atoi(argv[3]);
+      binfilename=argv[4];
+      is_bin=1;
+
+      binfile=fopen(binfilename, "rb");
+      
+      if (binfile==NULL)
+	{
+	  fprintf(stderr, "Could not open %s\n", binfilename);
+	  exit(1);
+	}
+    }
+  else if (0==strncmp(argv[1], "-r", 2))
+    {
+      if (argc!=4) usage(argv[0]);
+
+      ttyname=argv[2];
+      fname=argv[3];
+
+      binfile=NULL;
+
+      is_raw=1;
+    }
+  else
+    {
+      usage(argv[0]);
+    }
+  
+  if (is_raw)
+    {
+      coldboot=fopen(fname, "rb");  
+      if (coldboot==NULL)
+	{
+	  fprintf(stderr, "Could not open %s\n", fname);
+	  exit(1);
+	}
     }
 
   tty=open(ttyname, O_RDWR|O_NOCTTY);
@@ -310,78 +314,76 @@ int main(int argc, char *argv[])
       if (debug_flush) fprintf(stderr, "Flushed %.2x off serial line\n", junk);
     }
 
-
-  i=0;
-
-  if (is_raw)
+  if (is_raw)  /** Take whole file from coldboot file @ 2400 */
     {
       printf("Using the -r (raw) option means that we will download the whole program\n");
       printf("with the ultra slow bootstrap utility @ 2400 baud, this means even\n");
       printf("the smallest hello-world program will take about 13-14 seconds to\n");
       printf("complete, please be patient.\n");
       printf("Also note that stdout will not work until it is set up in user code!!!\n");
-    }
 
-  while (!feof(coldboot))
-    {
-      if (is_bin || is_raw)
+      i=0;
+      while (!feof(coldboot))
 	{
 	  fread(&ch, 1, 1, coldboot);
-	}
-      else
-	{
-	  /** Wait 'till we find non-ws */
-	  while (0==fscanf(coldboot, "%2x", &ch))
+	  if (feof(coldboot)) break;
+
+	  /** Make the rawmode target code bypass the handshake BA BE etc. */
+	  if (i==0x3e)
 	    {
+	      /** Are we the dummy mnemonic ld hl,NN ???  */
+	      if (ch==0x21)
+		{
+		  ch=0xc3;  /** jp NN mnemonic, address is same */
+		  fprintf(stderr, "Changing to jp at address 0x03h\n");
+		}
+	      else
+		{
+		  fprintf(stderr, "Wrong magic pattern in .LOD file, have you changed rcmx000_boot.asm???\n");
+		  exit(1);
+		}
 	    }
+	  
+	  write(tty, &ch, 1);
+	  
+	  if (debug_hex) fprintf(stderr, "wrote: %.2x \n", ch);
+	  
+	  i++;
 	}
-
-      if (feof(coldboot)) break;
-
-      /** TODO: combine boot.c and mk_boot_code.c into one utility. It is 
-       *  stupid to have the .LOD files */
       
-      if (i==0x23 && !is_raw)
+    }
+  else  /** We take the cold boot section from this binaries own data... */
+    {
+      for (i=0;i<s_num_bytes;i++)
 	{
-	  if (ch==42)
+	  ch=s_lodfile[i];
+
+	  /** Patch the divisor in... */
+	  if (i==0x23)
 	    {
-	      ch=divisor-1;
-	      fprintf(stderr, "Changing divisor to: %d\n", ch);
+	      if (ch==42)
+		{
+		  ch=divisor-1;
+		  fprintf(stderr, "Changing divisor to: %d\n", ch);
+		}
+	      else
+		{
+		  fprintf(stderr, "Wrong magic pattern in .LOD file, have you changed rcmx000_boot.asm???\n");
+		  exit(1);
+		}
 	    }
-	  else
-	    {
-	      fprintf(stderr, "Wrong magic pattern in .LOD file, have you changed bootstrap.asm???\n");
-	      exit(1);
-	    }
+
+	  write(tty, &ch, 1);      
+	  if (debug_hex) fprintf(stderr, "(raw) wrote: %.2x \n", ch);
 	}
-
-      /** Patch code so we jump over BA,BE handshake and baudrate bumping code */
-      if (i==0x3e && is_raw)
-	{
-	  /** Are we the dummy mnemonic ld hl,NN ???  */
-	  if (ch==0x21)
-	    {
-	      ch=0xc3;  /** jp NN mnemonic, address is same */
-	      fprintf(stderr, "Changing to jp at address 0x03h\n");
-	    }
-	  else
-	    {
-	      fprintf(stderr, "Wrong magic pattern in .LOD file, have you changed bootstrap.asm???\n");
-	      exit(1);
-	    }
-	}
-
-      write(tty, &ch, 1);
-
-      if (debug_hex) fprintf(stderr, "wrote: %.2x \n", ch);
       
-      i++;
     }
 
   if (is_raw) 
     {
       fprintf(stderr, "Waiting indefinately for reply...\n");
       talk(tty);
+      exit(0);
     }
 
   /** Handshake protocol to bump baudrate */

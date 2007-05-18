@@ -304,7 +304,7 @@ int main(int argc, char* argv[])
 	  fread(&value, 1, 1, binfile);
 	  if (feof(binfile)) break;
 
-	  /** First send two bytes with the address */
+	  /** After that, send two bytes with the address */
 	  byte=i/256;
 	  if (debug_out) fprintf(stderr, "byte(hi)=%d\n", byte);
 	  fwrite(&byte, 1, 1, loadfile);

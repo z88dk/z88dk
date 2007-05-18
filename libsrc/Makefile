@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.84 2007-05-17 17:04:43 stefano Exp $
+# $Id: Makefile,v 1.85 2007-05-18 06:36:50 stefano Exp $
 
 
 include Make.config
@@ -16,8 +16,8 @@ all:	genlibs z88libs tilibs zxlibs \
 	cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib cpcgray.lib \
 	cpm_clib.lib c128ansi_clib.lib \
 	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
-	nascom_clib.lib nasansi_clib.lib ozansi_clib.lib\
-	rex_clib.lib rcmx000_clib.lib \
+	nascom_clib.lib nasansi_clib.lib newbrain_clib.lib \
+	ozansi_clib.lib rex_clib.lib rcmx000_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib \
 	pps_clib.lib ppsansi_clib.lib embedded_clib.lib \
 	zx81_clib.lib zx81ansi_clib.lib
@@ -39,12 +39,12 @@ zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib zx
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.84 2007-05-17 17:04:43 stefano Exp $
+#  $Id: Makefile,v 1.85 2007-05-18 06:36:50 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.84 2007-05-17 17:04:43 stefano Exp $
+# $Id: Makefile,v 1.85 2007-05-18 06:36:50 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -59,7 +59,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.84 2007-05-17 17:04:43 stefano Exp $
+#  $Id: Makefile,v 1.85 2007-05-18 06:36:50 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -249,7 +249,7 @@ zx_clib.lib:
 # 64/32 column library for TS2068 - dom/stefano/alvin
 ts2068_clib.lib:
 	@echo ''
-	@echo '--- Building ZX Spectrum Library  ---'
+	@echo '--- Building TS2068 (Spectrum clone) Library  ---'
 	@echo ''
 	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
@@ -356,7 +356,7 @@ zxan_clib.lib:
 # or -DPACKEDFONT for tiny 64->85 column modes
 ts2068an_clib.lib:
 	@echo ''
-	@echo '--- Building ZX Spectrum ANSI Library  ---'
+	@echo '--- Building TS2068 (Spectrum clone) ANSI Library  ---'
 	@echo ''
 	$(RM) stdio/ansi/spectrum/f_ansi_char.o
 	$(MAKE) gfxdeps
@@ -900,14 +900,12 @@ cpcfs.lib:
 	cd fcntl ; $(MAKE) lcpc ; cd ..
 	$(LIBLINKER) -DFORcpc -xcpcfs @cpcfs.lst
 
-
 # Amstrad CPC maths libraries - Dom
 cpc_math.lib:
 	@echo ''
 	@echo '--- Building Amstrad CPC Maths Libraries  ---'
 	@echo ''
 	cd cpcmath ; $(MAKE) ; cd ..
-	
 
 # Commodore 128 (Z80 mode) library - Stefano
 c128ansi_clib.lib:
@@ -922,7 +920,6 @@ c128ansi_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORc128 -xc128ansi_clib @c128ansi.lst
-
 
 # Grundy NewBrain library - Stefano
 newbrain_clib.lib:
@@ -939,7 +936,6 @@ newbrain_clib.lib:
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORnewbrain -xnewbrain_clib @newbrain.lst
 
-
 # RCM2/3000 lib
 rcmx000_clib.lib:
 	@echo ''
@@ -953,7 +949,6 @@ rcmx000_clib.lib:
 	cd assert ; $(MAKE)
 	z80asm -IXIY -d -ns -nm -Mo -DFORrcmx000 -xrcmx000_clib @rcmx000.lst
 
-
 # embedded target - contributed by Daniel Wallner
 embedded_clib.lib:
 	@echo ''
@@ -966,6 +961,7 @@ embedded_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORembedded -xembedded_clib @embedded.lst
+
 
 clean:
 	cd assert ; $(MAKE) clean ; cd ..
@@ -998,6 +994,7 @@ clean:
 	cd im2 ; $(MAKE) clean ; cd ..
 	cd rect ; $(MAKE) clean ; cd ..
 	cd algorithm ; $(MAKE) clean ; cd ..
+
 
 install:
 	cp *.lib ../lib/clibs

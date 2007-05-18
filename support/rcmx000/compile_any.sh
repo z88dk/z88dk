@@ -16,6 +16,7 @@ sccz80    -//  tmp_$THISFILE.i
 
 
 # Produce a list file...
-z80asm $FLAGS -l tmp_$THISFILE.opt
+cp tmp_$THISFILE.opt tmp_opt_$THISFILE.asm
+z80asm $FLAGS -l tmp_opt_$THISFILE.asm
 
 z80asm $FLAGS -eopt -ns -Mo tmp_$THISFILE.opt
