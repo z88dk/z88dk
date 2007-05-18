@@ -108,6 +108,7 @@ stdlib/labs
 stdlib/labs_callee
 stdlib/Lbsearch
 stdlib/ldiv
+stdlib/ldiv_callee
 stdlib/Lqsort
 stdlib/outp
 stdlib/outp_callee

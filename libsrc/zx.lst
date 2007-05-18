@@ -98,6 +98,7 @@ stdlib/labs
 stdlib/labs_callee
 stdlib/Lbsearch
 stdlib/ldiv
+stdlib/ldiv_callee
 stdlib/Lqsort
 stdlib/ltoa
 stdlib/ltoa_callee
