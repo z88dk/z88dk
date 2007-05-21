@@ -5,9 +5,6 @@
 XLIB sp1_InitCharStruct_callee
 XDEF ASMDISP_SP1_INITCHARSTRUCT_CALLEE
 
-LIB sp1_ChangeSprType_callee
-XREF ASMDISP_SP1_CHANGESPRTYPE_CALLEE
-
 LIB _sp1_struct_cs_prototype
 XREF SP1V_ROTTBL
 
@@ -32,35 +29,52 @@ XREF SP1V_ROTTBL
 
 .asmentry
 
-   push hl
-   exx                         ; first copy prototype struct sp1_cs into sp1_cs
-   pop de
+   push bc                     ; save graphic
+   push de                     ; save draw function
+
+   ex de,hl                    ; de = struct sp1_cs *
    ld hl,_sp1_struct_cs_prototype
    ld bc,24
-   ldir
-   exx
-   
-   push bc                     ; save graphic
-   push hl                     ; save & sp1_cs
-   call sp1_ChangeSprType_callee + ASMDISP_SP1_CHANGESPRTYPE_CALLEE
-   pop hl
-   
-   ld bc,4
-   add hl,bc
-   ex af,af                    ; a = plane
-   ld (hl),a                   ; write plane
-   
-   add hl,bc
-   ld (hl),sp1_ss_embedded % 256
-   inc hl
-   ld (hl),sp1_ss_embedded / 256
+   ldir                        ; copy prototype struct sp1_cs into sp1_cs
 
-   inc hl
-   inc hl
+   ld hl,-5
+   add hl,de                   ; hl = & sp1_cs.draw + 1b
+   pop de
+   dec de                      ; de = & last byte of draw function data
+   ex de,hl
+   
+   ldd                         ; copy draw function data into struct sp1_cs
+   ldd
+   ldd
+   dec hl
+   dec hl
+   dec de
+   dec de
+   ldd
+   ldd
    pop bc                      ; bc = graphic
-   ld (hl),c                   ; write graphic
-   inc hl
+   ex de,hl
    ld (hl),b
+   dec hl
+   ld (hl),c
+   dec hl
+   dec de
+   dec de
+   ex de,hl
+   ldd
+   
+   ex de,hl                    ; hl = & sp1_cs.ss_draw + 1b
+   ld (hl),sp1_ss_embedded / 256
+   dec hl
+   ld (hl),sp1_ss_embedded % 256
+   
+   dec hl
+   dec hl
+   dec hl                      ; hl = & sp1_cs.type
+   ld (hl),a                   ; store type
+   dec hl
+   ex af,af
+   ld (hl),a                   ; store plane
 
    ret   
 

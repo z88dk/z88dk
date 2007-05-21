@@ -1,4 +1,4 @@
-; void __CALLEE__ sp1_ChangeSprType_callee(struct sp1_cs *c, void *drawf, uchar type)
+; void __CALLEE__ sp1_ChangeSprType_callee(struct sp1_cs *c, void *drawf)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
@@ -10,8 +10,6 @@ XREF SP1V_SPRDRAWTBL
 .sp1_ChangeSprType_callee
 
    pop hl
-   pop bc
-   ld a,c
    pop de
    ex (sp),hl
 
@@ -23,21 +21,11 @@ XREF SP1V_SPRDRAWTBL
 ;
 ; enter : hl = struct sp1_cs *
 ;         de = address of sprite draw function
-;          a = new type (bit 7 = 1 if sprite should occlude, bit 4 = 1 clear pixelbuff, zeroes elsewhere)
 ; uses  : af, bc, de, hl
 
 .SP1ChangeSprType
 
-   ld bc,5
-   add hl,bc
-   
-   ld b,a
-   ld a,(hl)
-   and $60               ; keep last row, last col flags
-   or b
-   ld (hl),a             ; store new type
-
-   ld b,0
+   ld bc,10
    add hl,bc
    ex de,hl              ; de = & struct sp1_CS.draw_code, hl = & draw function
    ld bc,-10

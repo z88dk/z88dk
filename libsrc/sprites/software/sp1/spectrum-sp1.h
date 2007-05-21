@@ -208,7 +208,7 @@ extern void  __LIB__  SP1_DRAW_ATTR(void);         // pixels are not drawn, only
 
 extern struct sp1_ss      __LIB__  *sp1_CreateSpr(void *drawf, uchar type, uchar height, int graphic, uchar plane);
 extern uint               __LIB__   sp1_AddColSpr(struct sp1_ss *s, void *drawf, uchar type, int graphic, uchar plane);
-extern void               __LIB__   sp1_ChangeSprType(struct sp1_cs *c, void *drawf, uchar type);
+extern void               __LIB__   sp1_ChangeSprType(struct sp1_cs *c, void *drawf);
 extern void  __FASTCALL__ __LIB__   sp1_DeleteSpr(struct sp1_ss *s);   // only call after sprite is moved off screen
 
 extern void               __LIB__   sp1_MoveSprAbs(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uchar row, uchar col, uchar vrot, uchar hrot);
@@ -241,7 +241,7 @@ extern void          __CALLEE__ __LIB__  sp1_MoveSprRel_callee(struct sp1_ss *s,
 extern void          __CALLEE__ __LIB__  sp1_MoveSprPix_callee(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uint x, uint y);
 extern void          __CALLEE__ __LIB__  sp1_IterateSprChar_callee(struct sp1_ss *s, void *hook1);
 extern void          __CALLEE__ __LIB__  sp1_IterateUpdateSpr_callee(struct sp1_ss *s, void *hook2);
-extern void          __CALLEE__ __LIB__  sp1_ChangeSprType_callee(struct sp1_cs *c, void *drawf, uchar type);
+extern void          __CALLEE__ __LIB__  sp1_ChangeSprType_callee(struct sp1_cs *c, void *drawf);
 extern void          __CALLEE__ __LIB__  sp1_GetSprClrAddr_callee(struct sp1_ss *s, uchar **sprdest);
 extern void          __CALLEE__ __LIB__  sp1_PutSprClr_callee(uchar **sprdest, struct sp1_ap *src, uchar n);
 extern void          __CALLEE__ __LIB__  sp1_GetSprClr_callee(uchar **sprsrc, struct sp1_ap *dest, uchar n);
@@ -256,7 +256,7 @@ extern void          __CALLEE__ __LIB__  sp1_InsertCharStruct_callee(struct sp1_
 #define sp1_MoveSprPix(a,b,c,d,e)      sp1_MoveSprPix_callee(a,b,c,d,e)
 #define sp1_IterateSprChar(a,b)        sp1_IterateSprChar_callee(a,b)
 #define sp1_IterateUpdateSpr(a,b)      sp1_IterateUpdateSpr_callee(a,b)
-#define sp1_ChangeSprType(a,b,c)       sp1_ChangeSprType_callee(a,b,c)
+#define sp1_ChangeSprType(a,b)         sp1_ChangeSprType_callee(a,b)
 #define sp1_GetSprClrAddr(a,b)         sp1_GetSprClrAddr_callee(a,b)
 #define sp1_PutSprClr(a,b,c)           sp1_PutSprClr_callee(a,b,c)
 #define sp1_GetSprClr(a,b,c)           sp1_GetSprClr_callee(a,b,c)

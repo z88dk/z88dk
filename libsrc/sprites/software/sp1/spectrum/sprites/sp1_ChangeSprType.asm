@@ -1,4 +1,4 @@
-; void sp1_ChangeSprType(struct sp1_cs *c, uchar type)
+; void sp1_ChangeSprType(struct sp1_cs *c, void *drawf)
 ; CALLER linkage for function pointers
 
 XLIB sp1_ChangeSprType
@@ -8,13 +8,10 @@ XREF ASMDISP_SP1_CHANGESPRTYPE_CALLEE
 
 .sp1_ChangeSprType
 
-   pop af
    pop bc
    pop de
    pop hl
    push hl
    push de
    push bc
-   push af
-   ld a,c
    jp sp1_ChangeSprType_callee + ASMDISP_SP1_CHANGESPRTYPE_CALLEE
