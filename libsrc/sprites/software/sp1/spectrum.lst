@@ -19,6 +19,10 @@ spectrum/sprites/sp1_GetSprClr
 spectrum/sprites/sp1_GetSprClr_callee
 spectrum/sprites/sp1_GetSprClrAddr
 spectrum/sprites/sp1_GetSprClrAddr_callee
+spectrum/sprites/sp1_InitCharStruct
+spectrum/sprites/sp1_InitCharStruct_callee
+spectrum/sprites/sp1_InsertCharStruct
+spectrum/sprites/sp1_InsertCharStruct_callee
 spectrum/sprites/sp1_IterateSprChar
 spectrum/sprites/sp1_IterateSprChar_callee
 spectrum/sprites/sp1_IterateUpdateSpr
@@ -33,6 +37,9 @@ spectrum/sprites/sp1_PreShiftSpr
 spectrum/sprites/sp1_PreShiftSpr_callee
 spectrum/sprites/sp1_PutSprClr
 spectrum/sprites/sp1_PutSprClr_callee
+spectrum/sprites/sp1_RemoveCharStruct
+spectrum/sprites/SP1AddSprChar
+spectrum/sprites/SP1RemoveSprChar
 spectrum/sprites/draw/SP1_DRAW_ATTR
 spectrum/sprites/draw/SP1_DRAW_LOAD1
 spectrum/sprites/draw/SP1_DRAW_LOAD1LB

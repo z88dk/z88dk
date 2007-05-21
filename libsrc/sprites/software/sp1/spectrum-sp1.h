@@ -128,7 +128,7 @@ struct sp1_pss {                      // "print string struct" - 11 bytes - A st
 //                      SPRITES                          //
 ///////////////////////////////////////////////////////////
 
-// sprite flag bits
+// sprite type bits
 
 #define SP1_TYPE_OCCLUDE   0x80       // background and sprites underneath will not be drawn
 #define SP1_TYPE_BGNDCLR   0x10       // for occluding sprites, copy background tile into pixel buffer before draw
@@ -224,6 +224,14 @@ extern void               __LIB__   sp1_GetSprClr(uchar **sprsrc, struct sp1_ap 
 
 extern void               __LIB__  *sp1_PreShiftSpr(uchar flag, uchar height, uchar width, void *srcframe, void *destframe, uchar rshift);
 
+// some functions for displaying independent struct_sp1_cs not connected with any sprites; useful as foreground elements
+// if not using a no-rotate (NR) type sprite draw function, must manually init the sp1_cs.ldef member after calling sp1_InitCharStruct()
+
+extern void               __LIB__   sp1_InitCharStruct(struct sp1_cs *cs, void *drawf, uchar type, void *graphic, uchar plane);
+extern void               __LIB__   sp1_InsertCharStruct(struct sp1_update *u, struct sp1_cs *cs);
+extern void  __FASTCALL__ __LIB__   sp1_RemoveCharStruct(struct sp1_cs *cs);
+
+
 /* CALLEE LINKAGE */
 
 extern struct sp1_ss __CALLEE__ __LIB__ *sp1_CreateSpr_callee(void *drawf, uchar type, uchar height, int graphic, uchar plane);
@@ -238,6 +246,8 @@ extern void          __CALLEE__ __LIB__  sp1_GetSprClrAddr_callee(struct sp1_ss 
 extern void          __CALLEE__ __LIB__  sp1_PutSprClr_callee(uchar **sprdest, struct sp1_ap *src, uchar n);
 extern void          __CALLEE__ __LIB__  sp1_GetSprClr_callee(uchar **sprsrc, struct sp1_ap *dest, uchar n);
 extern void          __CALLEE__ __LIB__ *sp1_PreShiftSpr_callee(uchar flag, uchar height, uchar width, void *srcframe, void *destframe, uchar rshift);
+extern void          __CALLEE__ __LIB__  sp1_InitCharStruct_callee(struct sp1_cs *cs, void *drawf, uchar type, void *graphic, uchar plane);
+extern void          __CALLEE__ __LIB__  sp1_InsertCharStruct_callee(struct sp1_update *u, struct sp1_cs *cs);
 
 #define sp1_CreateSpr(a,b,c,d,e)       sp1_CreateSpr_callee(a,b,c,d,e)
 #define sp1_AddColSpr(a,b,c,d,e)       sp1_AddColSpr_callee(a,b,c,d,e)
@@ -251,6 +261,8 @@ extern void          __CALLEE__ __LIB__ *sp1_PreShiftSpr_callee(uchar flag, ucha
 #define sp1_PutSprClr(a,b,c)           sp1_PutSprClr_callee(a,b,c)
 #define sp1_GetSprClr(a,b,c)           sp1_GetSprClr_callee(a,b,c)
 #define sp1_PreShiftSpr(a,b,c,d,e,f)   sp1_PreShiftSpr_callee(a,b,c,d,e,f)
+#define sp1_InitCharStruct(a,b,c,d,e)  sp1_InitCharStruct_callee(a,b,c,d,e)
+#define sp1_InsertCharStruct(a,b)      sp1_InsertCharStruct_callee(a,b)
 
 
 ///////////////////////////////////////////////////////////
