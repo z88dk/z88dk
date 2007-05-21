@@ -251,7 +251,7 @@
    ld c,l                    ; bc = & struct sp1_cs.attr_mask
    ld hl,4
    add hl,de                 ; hl = & struct sp1_update.slist
-   call AddSprChar           ; add sprite to update list
+   call SP1AddSprChar           ; add sprite to update list
    pop de
    pop bc
    pop hl
@@ -278,7 +278,7 @@
    inc hl
    push hl
    inc hl                    ; hl = & struct sp1_cs.attr_mask
-   call RemoveSprChar
+   call SP1RemoveSprChar
    pop hl                    ; hl = & struct sp1_cs.type
    pop de                    ; de = & next struct sp1_cs
    
@@ -407,7 +407,7 @@
    inc hl
    push hl
    inc hl                    ; hl = & struct sp1_cs.attr_mask
-   call RemoveSprChar
+   call SP1RemoveSprChar
    pop hl                    ; hl = & struct sp1_cs.type
    pop de                    ; de = & next struct sp1_cs
    

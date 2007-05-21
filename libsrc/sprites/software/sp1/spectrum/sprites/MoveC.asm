@@ -102,7 +102,7 @@
    push hl                   ; stack = sp1_cs.update, next sp1_cs, sp1_update, row
    ld bc,4
    add hl,bc                 ; hl = & struct sp1_cs.attr_mask
-   call RemoveSprChar
+   call SP1RemoveSprChar
    pop de
    pop hl
    ex (sp),hl
@@ -192,7 +192,7 @@
    ld hl,4
    add hl,de                 ; hl = & struct sp1_update.slist
    push de                   ; save sp1_update
-   call AddSprChar
+   call SP1AddSprChar
    pop hl
    pop af
    pop de
@@ -325,7 +325,7 @@
    inc hl
    push hl
    inc hl                    ; hl = & struct sp1_cs.attr_mask
-   call RemoveSprChar
+   call SP1RemoveSprChar
    pop hl                    ; hl = & struct sp1_cs.type
    pop de                    ; de = & next struct sp1_cs
    pop bc                    ; bc = & old struct sp1_update
@@ -490,7 +490,7 @@
    inc hl
    push hl
    inc hl                    ; hl = & struct sp1_cs.attr_mask
-   call RemoveSprChar
+   call SP1RemoveSprChar
    pop hl                    ; hl = & struct sp1_cs.type
    pop de                    ; de = & next struct sp1_cs
    pop bc                    ; bc = & old struct sp1_update
