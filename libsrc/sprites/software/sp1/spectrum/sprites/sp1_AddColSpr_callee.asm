@@ -1,20 +1,22 @@
-; uint __CALLEE__ sp1_AddColSpr_callee(struct sp1_ss *s, uchar type, int graphic, uchar plane)
+; uint __CALLEE__ sp1_AddColSpr_callee(struct sp1_ss *s, void *drawf, uchar type, int graphic, uchar plane)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
 XLIB sp1_AddColSpr_callee
 XDEF ASMDISP_SP1_ADDCOLSPR_CALLEE
 
-LIB SP1_CS_PROTOTYPE
+LIB _sp1_struct_cs_prototype
 XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
 
 .sp1_AddColSpr_callee
 
    pop af
-   pop de
-   pop bc
    pop hl
-   ld h,e
+   ld h,l
+   pop bc
+   pop de
+   ld l,e
+   pop de
    pop ix
    push af
 
@@ -26,6 +28,7 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
 ;          h = plane
 ;          l = type (index into table), bit 7 = 1 for occluding, bit 4 = 1 clear pixelbuffer
 ;         bc = graphic definition for column
+;         de = address of sprite draw function
 ; uses  : af, bc, de, hl, bc', de', hl', iy
 ; exit  : carry flag for success and hl=1, else memory allocation failed and hl=0
 
@@ -39,8 +42,8 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
 .csalloc
 
    push bc
-   push ix
    ld hl,24                   ; sizeof(struct sp1_cs)
+   push ix
    push hl
    call _u_malloc
    pop bc
@@ -52,10 +55,11 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    
    exx
    ex (sp),hl                 ; hl = new struct sp1_cs, stack: l = type h = plane
+   push de                    ; save draw function
 
    ; have all necessary memory blocks on stack, hl = new struct sp1_cs
    
-   ld de,SP1_CS_PROTOTYPE
+   ld de,_sp1_struct_cs_prototype
    ex de,hl                   ; hl = & struct sp1_cs prototype, de = & new struct sp1_cs
    ld iyl,e
    ld iyh,d                   ; iy = & struct sp1_cs
@@ -66,12 +70,15 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    
    ; have copied prototype struct sp1_cs, now fill in the rest of the details
    
-   pop hl
+   pop de                     ; de = draw function
+   pop hl                     ; h = plane, l = type
    push bc                    ; stack graphic def
+   ld c,e
+   ld b,d                     ; bc = draw function
    
    ld (iy+4),h                ; store plane
    ld a,l
-   and $9f
+   and $90
    or $40
    ld (iy+5),a                ; store type
 
@@ -80,18 +87,8 @@ XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
    ld hl,10
    add hl,de
    ex de,hl                   ; de = & struct sp1_cs.draw_code (& embedded code in struct sp1_cs)
-   and $0f                    ; a = sprite type but only index portion
-   add a,a
-   ld hl,(SP1V_SPRDRAWTBL)
-   add a,l
-   ld l,a
-   ld a,0
-   adc a,h
-   ld h,a                     ; hl = & draw function to copy into struct sp1_cs
-   ld a,(hl)
-   inc hl
-   ld h,(hl)
-   ld l,a
+   ld hl,-10
+   add hl,bc                  ; hl = & draw function data
    ld bc,10                   ; length of draw code
    ldir                       ; copy draw code into struct sp1_cs
 

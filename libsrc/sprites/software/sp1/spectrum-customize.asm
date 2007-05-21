@@ -36,9 +36,6 @@ defc SP1V_ROTTBL        = $f000            ; location of the 3584-byte rotation 
 
 defc SP1V_UPDATELISTH   = $d1ed            ; address of 10-byte area holding a dummy struct_sp1_update that is always the "first" in list of screen tiles to be drawn
 defc SP1V_UPDATELISTT   = $d1ef            ; address of 2-byte variable holding the address of the last struct_sp1_update in list of screen tiles to be drawn
-defc SP1V_IDTYPEASSOC   = $d1ed            ; address of 2-byte variable holding the address of a table of ID/TYPE pairs, you supply this table address to sp1_Initialize()
-defc SP1V_SPRDRAWTBL    = $d1f1            ; address of 2-byte variable holding the address of a table of sprite draw functions indexed by type, you supply this
-                                           ;  table address to sp1_Initialize()
 
 ; NOTE: SP1V_UPDATELISTT, SP1V_IDTYPEASSOC, SP1V_SPRDRAWTBL are located inside unused
 ;       portions of the dummy struct_sp1_update pointed at by SP1V_UPDATELISTH
@@ -58,8 +55,6 @@ defc SP1V_SPRDRAWTBL    = $d1f1            ; address of 2-byte variable holding 
 ; d1f7 - d1fe     SP1.LIB  pixel buffer
 ; d1ed - d1f6     SP1.LIB  update list head - a dummy struct sp1_update acting as first in invalidated list
 ;  * d1ef - d1f0  SP1.LIB  update list tail pointer
-;  * d1ed - d1ee  SP1.LIB  id / type association table address
-;  * d1f1 - d1f2  SP1.LIB  sprite draw function table (indexed by type) address
 ; d1e2 - d1ec     --free-  11 bytes
 ; d1d1 - d1e1     IM2.LIB  generic isr with one hook (17 bytes)
 ; d101 - d1d0     --free-  208 bytes

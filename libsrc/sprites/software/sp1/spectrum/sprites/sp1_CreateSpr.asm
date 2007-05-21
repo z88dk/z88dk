@@ -1,4 +1,4 @@
-; struct sp1_ss *sp1_CreateSpr(uchar type, uchar height, int graphic, uchar plane)
+; struct sp1_ss *sp1_CreateSpr(void *drawf, uchar type, uchar height, int graphic, uchar plane)
 ; CALLER linkage for function pointers
 
 XLIB sp1_CreateSpr
@@ -17,9 +17,15 @@ XREF ASMDISP_SP1_CREATESPR_CALLEE
    inc hl
    ld d,(hl)
    inc hl
+   ld a,(hl)
+   inc hl
+   inc hl
    ld b,(hl)
    inc hl
    inc hl
-   ld l,(hl)
+   ld a,(hl)
+   inc hl
+   ld h,(hl)
+   ld l,a
    ex de,hl
    jp sp1_CreateSpr_callee + ASMDISP_SP1_CREATESPR_CALLEE

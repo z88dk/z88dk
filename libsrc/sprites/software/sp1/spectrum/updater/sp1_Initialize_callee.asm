@@ -1,4 +1,4 @@
-; void __CALLEE__ sp1_Initialize_callee(uchar iflag, uchar *idtypetbl, void *sprdrawtbl, uchar colour, uchar tile)
+; void __CALLEE__ sp1_Initialize_callee(uchar iflag, uchar colour, uchar tile)
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
@@ -18,25 +18,17 @@ XDEF SP1V_UPDATEARRAY
 XDEF SP1V_ROTTBL
 XDEF SP1V_UPDATELISTH
 XDEF SP1V_UPDATELISTT
-XDEF SP1V_IDTYPEASSOC
-XDEF SP1V_SPRDRAWTBL
 
 .sp1_Initialize_callee
 
-   pop af
-   ex af,af
+   pop bc
    pop hl
    pop de
    ld h,e
-   pop bc
    pop de
-   ex (sp),hl
-   ld a,l
-   pop hl
-   ex af,af
-   push af
-   ex af,af
-
+   ld a,e
+   push bc
+   
 .asmentry
 
 ; 1. Stores locations of idtypeassoc table and sprdraw function table
@@ -49,8 +41,6 @@ XDEF SP1V_SPRDRAWTBL
 ;
 ; enter :  h = startup background attribute
 ;          l = startup background tile
-;         bc = & sprdraw table (table of sprite draw char functions indexed by type)
-;         de = & idtype table (table of id/type pairs that associates id with type, ends in id=0)
 ;          a = flag, bit 0 = 1 if rotation table needed, bit 1 = 1 to overwrite all tile defs
 ;              bit 2 = 1 to overwrite screen addresses in update structs
 ; used  : af, bc, de, hl, af'
@@ -58,9 +48,6 @@ XDEF SP1V_SPRDRAWTBL
 .SP1Initialize
 
    push hl                         ; save h = attr, l = tile
-
-   ld (SP1V_IDTYPEASSOC),de
-   ld (SP1V_SPRDRAWTBL),bc
 
    bit 0,a
    jr z, norottbl                  ; if flag bit not set, do not construct rotation table
