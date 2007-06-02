@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.8 2007-06-02 23:01:03 dom Exp $
+ *   $Id: appmake.h,v 1.9 2007-06-02 23:26:03 dom Exp $
  */
 
 
@@ -44,6 +44,9 @@ extern option_t  acetap_options;
 
 extern int       aquarius_exec(char *target);
 extern option_t  aquarius_options;
+
+extern int       c128_exec(char *target);
+extern option_t  c128_options;
 
 extern int       cpc_exec(char *target);
 extern option_t  cpc_options;
@@ -113,6 +116,9 @@ struct {
     { "bin2caq",  "aquarius", "(C) 2001 Stefano Bodrato",
       "Creates a BASIC loader file and binary stored in variable array format",
       aquarius_exec,   &aquarius_options },
+    { "bin3000",  "c128",      "(C) 2001 Stefano Bodrato",
+      "Creates a bin3000 for binary transfer",
+      c128_exec,   &c128_options },
     { "bin2cpc",  "cpc",      "(C) 2003 Dominic Morris",
       "Creates an AMSDOS file suitable for writing to a .DSK image",
       cpc_exec,   &cpc_options },
