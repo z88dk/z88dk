@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.7 2007-05-10 20:03:25 stefano Exp $
+ *   $Id: appmake.h,v 1.8 2007-06-02 23:01:03 dom Exp $
  */
 
 
@@ -65,6 +65,9 @@ extern option_t  newbrain_options;
 
 extern int       rex_exec(char *target);
 extern option_t  rex_options;
+
+extern int       sms_exec(char *target);
+extern option_t  sms_options;
 
 extern int       svi_exec(char *target);
 extern option_t  svi_options;
@@ -149,9 +152,12 @@ struct {
     { "bin2var",   "ti86s",       "(C) 2000 - 2003 David Phillips et al",
         "Creates a .86s file",
         tixx_exec,      &tixx_options },
-    { "bin2svi",  "svi",       "(C) 2001 Stefano Bodrato",                         
+    { "bin2svi",  "svi",       "(C) 2001 Stefano Bodrato",
       "Creates a .cas file loadable with the SVI emulator",
       svi_exec,      &svi_options },
+    { "bin2tmr",  "sms",       "(C) 2007 Dominic Morris",
+      "Creates a .tmr file padded out to 32k ",
+      sms_exec,      &sms_options },
     { "appz88",   "z88",      "(C) 2000 - 2003 Dominic Morris & Dennis Groning",
       "Generates .63 and .62 files suitable for burning to EPROM",
       z88_exec,     &z88_options },
