@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.1 2007-06-02 22:06:32 dom Exp $
+;	$Id: sms_crt0.asm,v 1.2 2007-06-02 22:33:59 dom Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -29,7 +29,7 @@
         XDEF    cleanup         ;jp'd to by exit()
         XDEF    l_dcal          ;jp(hl)
 
-        XDEF    int_seed        ;Integer rand() seed
+        XDEF    _std_seed       ;Integer rand() seed
 
         XDEF    exitsp          ;Pointer to atexit() stack
         XDEF    exitcount       ;Number of atexit() functions registered
@@ -267,7 +267,7 @@ ENDIF
 DEFVARS RAM_Start
 {
 __sgoioblk      	ds.b    40      ;stdio control block
-int_seed        	ds.w    1       ;Integer seed
+_std_seed        	ds.w    1       ;Integer seed
 exitsp          	ds.w    1       ;atexit() stack
 exitcount       	ds.b    1       ;Number of atexit() routines
 fp_seed         	ds.w    3       ;Floating point seed (not used ATM)

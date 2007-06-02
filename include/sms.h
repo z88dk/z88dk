@@ -1,7 +1,7 @@
 /*
  *  Sega Master System
  *
- *  $Id: sms.h,v 1.1 2007-06-02 22:06:32 dom Exp $
+ *  $Id: sms.h,v 1.2 2007-06-02 22:33:59 dom Exp $
  */
 
 #ifndef __SMS_H__
@@ -80,12 +80,14 @@ typedef UINT32             ULWORD;
 typedef INT32		   DWORD;
 typedef UINT32		   UDWORD;
 
-typedef void *             POINTER;
-
+#ifndef NULL
 #define	NULL     0
+#endif
 
+#ifndef FALSE
 #define	FALSE    0
 #define	TRUE     1
+#endif
 
 /* Useful definition for fixed point values */
 typedef union _fixed {

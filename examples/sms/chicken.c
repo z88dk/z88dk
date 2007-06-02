@@ -1,3 +1,5 @@
+#define __HAVESEED
+
 #include <stdlib.h>
 #include <sms.h>
 
@@ -26,6 +28,7 @@ unsigned int car1_map_l[] = {0x0209, 0x0208};
 
 extern unsigned char chicken_graphics();
 
+
 int rand_speed() {
 	return (rand() & 0x3F) + 0x0A;
 }
@@ -42,6 +45,7 @@ void main() {
 	int ply2_tile = 'H';
 	int raster[10], speeds[10], *p, *p2;
 	char *c;
+
 
 	for (y = 2; y < 22; y += 2) {
 		for (x = 0; x != 32; x += 2) {
