@@ -1,0 +1,4 @@
+
+	DEFC	SpriteSet          = 0       ; 0 for sprites to use tiles 0-255, 1 for 256+
+	DEFC	NameTableAddress   = $3800   ; must be a multiple of $800; usually $3800; fills $700 bytes (unstretched)
+	DEFC	SpriteTableAddress = $3f00   ; must be a multiple of $100; usually $3f00; fills $100 bytes

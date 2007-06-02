@@ -1,0 +1,25 @@
+#include <sms.h>
+#include <stdio.h>
+
+unsigned char pal1[] = {0x00, 0x20, 0x08, 0x28, 0x02, 0x22, 0x0A, 0x2A,
+				0x15, 0x35, 0x1D, 0x3D, 0x17, 0x37, 0x1F, 0x3F};
+
+unsigned char pal2[] = {0x00, 0x03, 0x08, 0x28, 0x02, 0x22, 0x0A, 0x2A,
+				0x15, 0x35, 0x1D, 0x3D, 0x17, 0x37, 0x1F, 0x3F};
+
+void main() {
+	int y = 0;
+
+	set_vdp_reg(VDP_REG_FLAGS1, VDP_REG_FLAGS1_SCREEN);
+	load_tiles(standard_font, 0, 255, 1);
+	load_palette(pal1, 0, 16);
+	load_palette(pal2, 16, 16);
+
+	printf("Hello, stdio!\nIs it working?\nI hope so.");
+	gotoxy(5, 5);
+	printf("Hello, gotoxy(%d, %d)!", 5, 5);
+
+	for (;;) {
+		wait_vblank_noint();
+	}
+}
