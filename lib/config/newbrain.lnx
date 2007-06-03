@@ -122,5 +122,5 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -// -v -O2 -I. -lnewbrain_clib -lndos -DZ80 -DSMALL_C -DNEWBRAIN -D__NEWBRAIN__ -M -DSCCZ80 -Cz+newbrain
+OPTIONS		 -// -v -O2 -I. -lnewbrain_clib -DZ80 -DSMALL_C -DNEWBRAIN -D__NEWBRAIN__ -M -DSCCZ80 -Cz+newbrain
 

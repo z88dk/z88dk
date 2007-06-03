@@ -4,7 +4,7 @@
  *      size_t read(int fd,void *ptr, size_t len)
  *
  * -----
- * $Id: read.c,v 1.2 2007-06-03 15:13:06 stefano Exp $
+ * $Id: read.c,v 1.1 2007-06-03 15:13:06 stefano Exp $
  */
 
 

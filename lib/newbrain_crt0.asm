@@ -2,7 +2,7 @@
 ;       Grundy NewBrain startup code
 ;
 ;
-;       $Id: newbrain_crt0.asm,v 1.2 2007-05-17 16:25:53 stefano Exp $
+;       $Id: newbrain_crt0.asm,v 1.3 2007-06-03 15:13:05 stefano Exp $
 ;
 
                 MODULE  newbrain_crt0
@@ -186,7 +186,7 @@ IF DEFINED_NEED1bitsound
 .snd_tick	defb	0	; Sound variable
 ENDIF
 
-		defm	"Small C+ ZX"	;Unnecessary file signature
+		defm	"Small C+ NewBrain"	;Unnecessary file signature
 		defb	0
 
 ;-----------------------

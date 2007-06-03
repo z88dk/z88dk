@@ -6,6 +6,11 @@
 ;
 ; Print a character on LCD display
 ;
+;
+;
+; $Id: fputc_lcd.asm,v 1.3 2007-06-03 15:13:06 stefano Exp $
+;
+
 
 	XLIB fputc_lcd
 

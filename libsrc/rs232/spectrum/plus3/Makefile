@@ -1,8 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.5 2006-06-18 17:59:39 dom Exp $
-
+# $Id: Makefile,v 1.6 2007-06-03 15:13:06 stefano Exp $
 
 include ../../../Make.config
 
@@ -12,7 +11,7 @@ AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
 
 all:	$(OBJECTS)
-	$(LIBLINKER) -x../../../rs232p3 @p3list
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/rs232p3 @p3list
 
 .c.o:  
 	zcc $(CFLAGS) $*.c

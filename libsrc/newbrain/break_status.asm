@@ -7,6 +7,11 @@
 ; Check if user pressed BREAK
 ; 1 if BREAK, otherwise 0
 ;
+;
+;
+; $Id: break_status.asm,v 1.2 2007-06-03 15:13:06 stefano Exp $
+;
+
 
 	XLIB break_status
 

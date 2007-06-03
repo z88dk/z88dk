@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.86 2007-06-02 22:06:32 dom Exp $
+# $Id: Makefile,v 1.87 2007-06-03 15:13:05 stefano Exp $
 
 
 include Make.config
@@ -39,12 +39,12 @@ zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib zx
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.86 2007-06-02 22:06:32 dom Exp $
+#  $Id: Makefile,v 1.87 2007-06-03 15:13:05 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.86 2007-06-02 22:06:32 dom Exp $
+# $Id: Makefile,v 1.87 2007-06-03 15:13:05 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -59,7 +59,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.86 2007-06-02 22:06:32 dom Exp $
+#  $Id: Makefile,v 1.87 2007-06-03 15:13:05 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -929,6 +929,7 @@ newbrain_clib.lib:
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
+	cd fcntl ; $(MAKE) lnewbrain ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lnewbrain ; cd ..
