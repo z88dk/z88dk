@@ -3,7 +3,7 @@
  *
  *        Stefano Bodrato 4/2007
  *
- *        $Id: newbrain.c,v 1.2 2007-05-10 20:03:25 stefano Exp $
+ *        $Id: newbrain.c,v 1.3 2007-06-04 17:13:14 stefano Exp $
  */
 
 #include "appmake.h"
@@ -218,7 +218,7 @@ int newbrain_exec()
             fputc(0xa4,fpout);        /* PEEK */
             fprintf(fpout,"(169):");
             fputc(0x9e,fpout);        /* POKE */
-            fprintf(fpout,"169");
+            fprintf(fpout,"169,");
             fputc(0x96,fpout);        /* INT */
             fprintf(fpout,"((b");
             fputc(0x81,fpout);        /* + */
@@ -228,7 +228,7 @@ int newbrain_exec()
             fputc(0x9e,fpout);        /* POKE */
             fprintf(fpout,"168,b");
             fputc(0x81,fpout);        /* + */
-            fprintf(fpout,"23)");
+            fprintf(fpout,"23");
             fputc(0x82,fpout);        /* - */
             fprintf(fpout,"256");
             fputc(0x83,fpout);        /* * */
