@@ -25,8 +25,8 @@ OBJECTS = $(CFILES:.c=.o)
 all: net
 
 net: $(OBJECTS)
-	$(LIBLINKER) -x../net @zsock_list
-	$(LIBLINKER) -x../netdev @zsockdev_list
+	$(LIBLINKER) -x../$(OUTPUT_DIRECTORY)/net @zsock_list
+	$(LIBLINKER) -x../$(OUTPUT_DIRECTORY)/netdev @zsockdev_list
 
 .c.o:
 	zcc $(CFLAGS) $*.c 

@@ -5,7 +5,7 @@
 include ../Make.config
 
 all: 
-	$(LIBLINKER) -x../adt @adt.lst
+	$(LIBLINKER) -x../$(OUTPUT_DIRECTORY)/adt @adt.lst
 
 clean:
 	cd hashtable ; $(RM) *.o* *.sym *.map zcc_opt.def ; cd ..

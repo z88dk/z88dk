@@ -5,7 +5,7 @@
 include ../Make.config
 
 all: 
-	$(LIBLINKER) -x../im2 @im2.lst
+	$(LIBLINKER) -x../$(OUTPUT_DIRECTORY)/im2 @im2.lst
 
 clean:
 	$(RM) *.o* *.sym *.map zcc_opt.def
