@@ -1,7 +1,7 @@
 /*
  *      Grundy Newbrain specific functions
  *
- *      $Id: newbrain.h,v 1.4 2007-06-05 08:24:38 stefano Exp $
+ *      $Id: newbrain.h,v 1.5 2007-06-06 08:43:47 stefano Exp $
  */
 
 #ifndef __NEWBRAIN_H__
@@ -22,11 +22,12 @@ struct NB_STREAM {
 
 struct NB_DRIVER {
         u8_t    entries;        /* Number of entry points less 1 */
-        u8_t    openin;         /* open for input                */
-        u8_t    openout;        /* open for output               */
-        u8_t    dinput;         /* reads a byte from device      */
-        u8_t    doutput;        /* outputs a byte                */
-        u8_t    dclose;         /* close the device              */
+        u8_t    openin;         /* open for input           -0-  */
+        u8_t    openout;        /* open for output          -1-  */
+        u8_t    dinput;         /* reads a byte from device -2-  */
+        u8_t    doutput;        /* outputs a byte           -3-  */
+        u8_t    dclose;         /* close the device         -4-  */
+//        u8_t    move;           /* not always implemented   -5-  */
 }
 
 /* mewbrain "system variables" */
@@ -98,24 +99,29 @@ struct NB_DRIVER {
 #define NB_CHAR_SET_LOCATION 0x77
 
 
-/* device types */
+/* device driver codes */
 
-#define DEVICE_TAPE     1       /* primary tape device                 */
-#define DEVICE_TAPE2    2       /* secondary tape device               */
-#define DEVICE_VF       3       /* VF display,                    "16" */
-#define DEVICE_PARALLEL 8       /* most common printer device          */
-#define DEVICE_SERIAL   9
-#define DEVICE_GRAPHICS 11
-#define DEVICE_BDISCIO  12      /* disk binary file, sequential access */
-#define DEVICE_TDISCIO  13      /* disk text file, sequential access   */
-#define DEVICE_RDISCIO  14      /* disk binary file, random access     */
-#define DEVICE_SDISCIO  15      /* disk directory access               */
-#define DEVICE_PRINTER  16      /* printer, various hardware,   "l0*0" */
-#define DEVICE_SERIAL   17      /* PUN/RDR, string,              "n*0" */
-#define DEVICE_SSEIO    18      /* 80 columns simplified TTY device    */
-#define DEVICE_KBFIO    19      /* enhanced fuffered keyboard driver   */
-#define DEVICE_PARALLEL2  21    /* less common printer device          */
-#define DEVICE_HRG      33      /* high resolution graphics       "*0" */
+#define DEV_TP1IO    1       /* primary tape device                 */
+#define DEV_TP2IO    2       /* secondary tape device               */
+#define DEV_LIIO     3       /* VF display, (LCD)              "16" */
+#define DEV_TLIO     4       /* combined TL and VF display          */
+#define DEV_KBWIO    5       /* keyboard, wait for a key            */
+#define DEV_KBIIO    6       /* keyboard, immediate                 */
+#define DEV_UPIO     7       /* User Port                           */
+#define DEV_LPIO     8       /* most common printer device          */
+#define DEV_JGIO     9       /* alias for software driven V24       */
+#define DEV_DUMMY    10      /* similar to /dev/null                */
+#define DEV_GRAPHICS 11      /* graphics device                     */
+#define DEV_BDISCIO  12      /* disk binary file, sequential access */
+#define DEV_TDISCIO  13      /* disk text file, sequential access   */
+#define DEV_RDISCIO  14      /* disk binary file, random access     */
+#define DEV_SDISCIO  15      /* disk directory access               */
+#define DEV_LP2IO    16      /* printer, various hardware,   "l0*0" */
+#define DEV_JG2IO    17      /* serial PUN/RDR, string,       "n*0" */
+#define DEV_SSEIO    18      /* 80 columns simplified TTY device    */
+#define DEV_KBFIO    19      /* enhanced fuffered keyboard driver   */
+#define DEV_LP3IO    21      /* less common printer device          */
+#define DEV_HRG      33      /* high resolution graphics       "*0" */
 
 
 /* IOS and generic ERRORS */

@@ -5,7 +5,7 @@
 ;	(HL)=char to display
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.2 2007-05-14 12:40:47 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.3 2007-06-06 08:43:47 stefano Exp $
 ;
 
 	XLIB	fputc_cons
@@ -14,14 +14,21 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
-	;cp	13
-	;ld	a,28		; cursor home left
-	;ld	a,13		; next line + scroll
 	
 	cp	12
 	jr	nz,nocls
-	ld	a,31
+	ld	a,31		; clear screen
 .nocls
+
+; This fix works for 80 columns, but it wouldn't scroll anymore in default mode
+;
+;	cp	13
+;	jr	nz,nocrlf
+;	ld	a,10		; line feed
+;	call	doprint
+;	ld	a,$1c		; cursor home left (13 wasn't good in 80 columns mode)
+;.nocrlf
+
 .doprint
 	ld	e,0
 	rst	20h

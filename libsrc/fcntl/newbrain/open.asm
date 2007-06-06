@@ -18,7 +18,7 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: open.asm,v 1.1 2007-06-03 15:13:06 stefano Exp $
+; $Id: open.asm,v 1.2 2007-06-06 08:43:47 stefano Exp $
 ;
 
 	XLIB	open
