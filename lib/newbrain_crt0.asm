@@ -2,7 +2,7 @@
 ;       Grundy NewBrain startup code
 ;
 ;
-;       $Id: newbrain_crt0.asm,v 1.3 2007-06-03 15:13:05 stefano Exp $
+;       $Id: newbrain_crt0.asm,v 1.4 2007-06-06 08:51:42 stefano Exp $
 ;
 
                 MODULE  newbrain_crt0
@@ -37,8 +37,8 @@
 
 	XDEF	snd_tick	;Sound variable
 
-IF (startup<>2)
-	XDEF	nbclock		;long ptr to clock counter
+	XDEF	nbclockptr	;ptr to clock counter location
+IF (startup=2)
 	XDEF	oldintaddr	;made available to chain an interrupt handler
 ENDIF
 
@@ -56,7 +56,7 @@ ENDIF
         ld      sp,hl
         ld      (exitsp),sp
         
-IF (startup<>2)
+IF (startup=2)
 	ld	hl,(57)
 	ld	(oldintaddr),hl
 	ld	hl,nbckcount
@@ -90,7 +90,7 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
-IF (startup<>2)
+IF (startup=2)
 	ld	hl,(oldintaddr)
 	ld	(57),hl
 ENDIF
@@ -141,27 +141,38 @@ ENDIF
 ; an interrupt handler could chain the "oldintaddr" value.
 ;-----------
 
-IF (startup<>2)
+IF (startup=2)
 
-.nbckcount	push	af
-		push	hl
-		ld	hl,(nbclock)
-		inc	hl
-		ld	(nbclock),hl
-		ld	a,h
-		or	l
-		jr	nz,nomsb
-		ld	hl,(nbclock_m)
-		inc	hl
-		ld	(nbclock_m),hl
-.nomsb		pop	hl
-		pop	af
+.nbclockptr	defw	$52	; ROM routine
+
+; Useless custom clock counter (we have the ROM one).
+;
+;.nbclockptr	defw	nbclock
+;
+.nbckcount
+;		push	af
+;		push	hl
+;		ld	hl,(nbclock)
+;		inc	hl
+;		ld	(nbclock),hl
+;		ld	a,h
+;		or	l
+;		jr	nz,nomsb
+;		ld	hl,(nbclock_m)
+;		inc	hl
+;		ld	(nbclock_m),hl
+;.nomsb		pop	hl
+;		pop	af
 
 		defb	195	; JP
 .oldintaddr	defw	0
 
 .nbclock	defw	0	; NewBrain Clock
 .nbclock_m	defw	0
+
+ELSE
+
+.nbclockptr	defb	$52	; paged system clock counter
 
 ENDIF
 
