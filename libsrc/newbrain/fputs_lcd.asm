@@ -8,7 +8,7 @@
 ;
 ;
 ;
-; $Id: fputs_lcd.asm,v 1.1 2007-06-03 15:13:06 stefano Exp $
+; $Id: fputs_lcd.asm,v 1.2 2007-06-07 08:23:09 stefano Exp $
 ;
 
 
@@ -22,17 +22,17 @@
 	pop	hl
 	push	hl
 	push	bc
-.fplcd
+
+	ld	de,77
+	ld	b,15
+.sloop
 	ld	a,(hl)
 	and	a
-	jr	z,endstr
-	ld	e,4
-	call	ZCALL
-	defb	$30	; ZOUTPUT
+	ret	z
+	
+	ld	(de),a
 	inc	hl
-	jr	fplcd
-.endstr
-	ld	a,$28	; send a final leftmargin
-	call	ZCALL
-	defb	$30	; ZOUTPUT
+	dec	de
+	djnz	sloop
+
 	ret

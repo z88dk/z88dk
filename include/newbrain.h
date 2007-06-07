@@ -1,7 +1,7 @@
 /*
  *      Grundy Newbrain specific functions
  *
- *      $Id: newbrain.h,v 1.5 2007-06-06 08:43:47 stefano Exp $
+ *      $Id: newbrain.h,v 1.6 2007-06-07 08:23:09 stefano Exp $
  */
 
 #ifndef __NEWBRAIN_H__
@@ -28,7 +28,7 @@ struct NB_DRIVER {
         u8_t    doutput;        /* outputs a byte           -3-  */
         u8_t    dclose;         /* close the device         -4-  */
 //        u8_t    move;           /* not always implemented   -5-  */
-}
+};
 
 /* mewbrain "system variables" */
 
@@ -120,6 +120,7 @@ struct NB_DRIVER {
 #define DEV_JG2IO    17      /* serial PUN/RDR, string,       "n*0" */
 #define DEV_SSEIO    18      /* 80 columns simplified TTY device    */
 #define DEV_KBFIO    19      /* enhanced fuffered keyboard driver   */
+#define DEV_SMDD     20      /* Serial Memory Device: RAMDISK       */
 #define DEV_LP3IO    21      /* less common printer device          */
 #define DEV_HRG      33      /* high resolution graphics       "*0" */
 
@@ -259,7 +260,7 @@ struct NB_DRIVER {
  */
 
 extern void __LIB__ fputc_lcd(int position, int character);
-extern void __LIB__ fputs_lcd( char *text );
+extern void __LIB__ __FASTCALL__ fputs_lcd( char *text );
 
 /* 
  * Check if break has been pressed
@@ -282,15 +283,15 @@ extern void __LIB__ warm_reset();
 #define OUTP    0x33    /* open mode for output with 'nb_open'*/
 
 extern int __LIB__ nb_open( int mode, int stream, int device, int port, char *paramstr );
-//extern void __LIB__ __FASTCALL__ nb_close( int stream );
-extern void __LIB__ nb_close( int stream );
+extern void __LIB__ __FASTCALL__ nb_close( int stream );
 extern void __LIB__ nb_clear( );
 extern void __LIB__ nb_putc( int stream, char byte );
 extern void __LIB__ nb_puts( int stream, char *text );
 extern void __LIB__ nb_putblock( int stream, char *bytes, int length );
 extern void __LIB__ nb_putval( int stream, int value );
-extern void __LIB__ __FASTCALL__ nb_getc( int stream );
 
+extern char __LIB__ __FASTCALL__ nb_getc( int stream );
+extern void __LIB__ nb_getblock( int stream, char *bytes, int length );
 
 
 #endif

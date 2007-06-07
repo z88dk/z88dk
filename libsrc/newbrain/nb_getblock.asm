@@ -10,20 +10,20 @@
 ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
-; void nb_putblock( int stream, char *bytes, int length );
+; void nb_getblock( int stream, char *bytes, int length );
 ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_putblock.asm,v 1.2 2007-06-07 08:23:09 stefano Exp $
+; $Id: nb_getblock.asm,v 1.1 2007-06-07 08:23:09 stefano Exp $
 ;
 
 
-	XLIB nb_putblock
+	XLIB nb_getblock
 	
 	LIB ZCALL
 
-.nb_putblock
+.nb_getblock
 
 	ld	ix,2
 	add	ix,sp
@@ -37,6 +37,6 @@
 	ld	h,(ix+3)
 
 	call	ZCALL
-	defb	$3d	; zblkout
-
+	defb	$3c	; zblkin
+	
 	ret
