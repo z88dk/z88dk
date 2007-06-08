@@ -4,18 +4,18 @@
 ; Stefano Bodrato - 19/05/2007
 ;
 ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
-; put a byte block to stream
+; put a byte block to stream, return the number of written bytes
 ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
-; void nb_putblock( int stream, char *bytes, int length );
+; int nb_putblock( int stream, char *bytes, int length );
 ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_putblock.asm,v 1.2 2007-06-07 08:23:09 stefano Exp $
+; $Id: nb_putblock.asm,v 1.3 2007-06-08 15:15:21 stefano Exp $
 ;
 
 
@@ -38,5 +38,8 @@
 
 	call	ZCALL
 	defb	$3d	; zblkout
+	
+	ld	h,b
+	ld	l,c
 
 	ret

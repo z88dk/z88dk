@@ -4,18 +4,18 @@
 ; Stefano Bodrato - 19/05/2007
 ;
 ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
-; put a byte block to stream
+; get a block from stream, return with the number of read bytes
 ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
-; void nb_getblock( int stream, char *bytes, int length );
+; int nb_getblock( int stream, char *bytes, int length );
 ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_getblock.asm,v 1.1 2007-06-07 08:23:09 stefano Exp $
+; $Id: nb_getblock.asm,v 1.2 2007-06-08 15:15:21 stefano Exp $
 ;
 
 
@@ -36,7 +36,13 @@
 	ld	l,(ix+2)	; block location
 	ld	h,(ix+3)
 
+	push	bc
+	
 	call	ZCALL
 	defb	$3c	; zblkin
+	
+	and	a
+	pop	hl
+	sbc	hl,bc
 	
 	ret

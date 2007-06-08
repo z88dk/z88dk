@@ -1,7 +1,7 @@
 /*
  *      Grundy Newbrain specific functions
  *
- *      $Id: newbrain.h,v 1.6 2007-06-07 08:23:09 stefano Exp $
+ *      $Id: newbrain.h,v 1.7 2007-06-08 15:15:21 stefano Exp $
  */
 
 #ifndef __NEWBRAIN_H__
@@ -287,11 +287,11 @@ extern void __LIB__ __FASTCALL__ nb_close( int stream );
 extern void __LIB__ nb_clear( );
 extern void __LIB__ nb_putc( int stream, char byte );
 extern void __LIB__ nb_puts( int stream, char *text );
-extern void __LIB__ nb_putblock( int stream, char *bytes, int length );
+extern int __LIB__ nb_putblock( int stream, char *bytes, int length );
 extern void __LIB__ nb_putval( int stream, int value );
 
 extern char __LIB__ __FASTCALL__ nb_getc( int stream );
-extern void __LIB__ nb_getblock( int stream, char *bytes, int length );
-
+extern char __LIB__ *nb_gets( int stream, char *bytes, int length );
+extern int __LIB__ nb_getblock( int stream, char *bytes, int length );
 
 #endif
