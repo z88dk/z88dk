@@ -2,26 +2,29 @@
 ; 09.2005 aralbrec
 
 XLIB in_Wait
+LIB delay
 
-; Waits an approximate period of time measured in milliseconds.
+; Waits a period of time measured in milliseconds.
 ;
 ; enter : HL = time to wait in ms
-; used  : AF,BC,HL
+; used  : AF,BC,DE,HL
 
 .in_Wait
 
-   ld bc,134
+; wait 1ms in loop controlled by HL
+; at 3.5MHz, 1ms = 3500 T states
 
-.loop                  ; about 3500 cycles here (1ms)
+   ld c,l
+   ld b,h
 
+.loop
+
+   ld hl,3500 - 34
+   call delay                  ; wait exactly HL t-states
+   
    dec bc
    ld a,b
    or c
-   jr nz,loop
-
-   dec hl
-   ld a,h
-   or l
-   ret z
-
-   jp in_Wait
+   jp nz, loop
+   
+   ret
