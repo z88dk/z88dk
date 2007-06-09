@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.29 2007-05-18 07:37:03 aralbrec Exp $
+ * $Id: stdlib.h,v 1.30 2007-06-09 21:46:48 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -213,6 +213,12 @@ extern unsigned int  __LIB__ __FASTCALL__ wpeek(void *addr);
 #define M_WPOKE(addr,word) asm("ld\thl,"#addr"\nld\t(hl),"#word"%256\ninc\thl\nld\t(hl),"#word"/256\n");
 #define M_BPEEK(addr) asm("ld\thl,("#addr")\nld\th,0\n");
 #define M_WPEEK(addr) asm("ld\thl,("#addr")\n");
+
+/////////////////////////
+// ACCURATE T-STATE DELAY
+/////////////////////////
+
+extern void          __LIB__ __FASTCALL__ delay(unsigned int tstates);   // at least 160 T
 
 
 /*********/
