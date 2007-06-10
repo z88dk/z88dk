@@ -47,6 +47,7 @@ stdlib/atol
 stdlib/bpeek
 stdlib/bpoke
 stdlib/bpoke_callee
+stdlib/delay
 stdlib/div
 stdlib/div_callee
 stdlib/exit
@@ -61,7 +62,10 @@ stdlib/labs
 stdlib/labs_callee
 stdlib/Lbsearch
 stdlib/ldiv
+stdlib/ldiv_callee
 stdlib/Lqsort
+stdlib/ltoa
+stdlib/ltoa_callee
 stdlib/outp
 stdlib/outp_callee
 stdlib/rand
@@ -70,6 +74,10 @@ stdlib/strtol
 stdlib/strtol_callee
 stdlib/strtoul
 stdlib/swapendian
+stdlib/ultoa
+stdlib/ultoa_callee
+stdlib/utoa
+stdlib/utoa_callee
 stdlib/wpeek
 stdlib/wpoke
 stdlib/wpoke_callee
@@ -79,6 +87,7 @@ strings/memchr
 strings/memcmp
 strings/memcpy
 strings/memmove
+strings/memop
 strings/memset
 strings/memswap
 strings/strcat
@@ -108,6 +117,7 @@ strings/memchr_callee
 strings/memcmp_callee
 strings/memcpy_callee
 strings/memmove_callee
+strings/memop_callee
 strings/memset_callee
 strings/memswap_callee
 strings/strcat_callee

@@ -94,6 +94,7 @@ stdlib/atol
 stdlib/bpeek
 stdlib/bpoke
 stdlib/bpoke_callee
+stdlib/delay
 stdlib/div
 stdlib/div_callee
 stdlib/exit
