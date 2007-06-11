@@ -22,7 +22,7 @@ OBJECTS = $(CFILES:.c=.o)
 all: genmath
 
 genmath: $(OBJECTS)
-	$(LIBLINKER) -x$../(OUTPUT_DIRECTORY)/gen_math @genlist
+	$(LIBLINKER) -x$../$(OUTPUT_DIRECTORY)/gen_math @genlist
 
 .c.o:
 	zcc $(CFLAGS) $*.c
