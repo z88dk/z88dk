@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.16 2007-03-23 21:50:23 aralbrec Exp $
+ * $Id: spectrum.h,v 1.17 2007-06-11 08:32:59 aralbrec Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -9,129 +9,11 @@
 
 #include <sys/types.h>
 
+/////////////
+// CONSTANTS
+/////////////
 
-
-#ifdef PLUS3
-/* If it's a +3 we want the dodos routine */
-#pragma output NEEDplus3dodos
-extern int __LIB__ findhand();
-extern void __LIB__ freehand(int);
-#endif
-
-#ifdef RESIDOS
-/* If it's residos then we want dodos routines */
-#pragma output NEEDresidos
-extern int __LIB__ findhand();
-extern void __LIB__ freehand(int);
-#endif
-
-/* Tape handling routines */
-
-/* Standard tape header */
-struct zxtapehdr {
-        unsigned char type;
-        char    name[10];
-        size_t length;
-        size_t address;
-        size_t offset;
-};
-
-extern int __LIB__ tape_save(char *name, size_t loadstart,void *start, size_t len);
-extern int __LIB__ tape_save_block(void *addr, size_t len, unsigned char type);
-extern int __LIB__ tape_load_block(void *addr, size_t len, unsigned char type);
-
-/* 128k Memory Paging Functions */
-
-// Following System Variable Used:
-//
-// BANKM    @ $5B5C - stores last byte output to port $7ffd
-
-/*
-extern uchar __LIB__ __FASTCALL__ zx128_lbank(uchar logical_page);
-extern uchar __LIB__ __FASTCALL__ zx128_pbank(uchar physical_page);
-
-extern far   __LIB__ *zx128_makefar(uchar page, void *addr);
-extern unsigned long __LIB__ zx128_makelong(uint msw, uint lsw);
-//extern far   __LIB__ *zx128_linear2logical(far *addr);
-
-//extern void  __LIB__  zx128_lldir(far *dest, far *src, unsigned long len);
-//extern void  __LIB__  zx128_llddr(far *dest, far *src, unsigned long len);
-//extern void  __LIB__  zx128_lmemmove(far *dest, far *src, unsigned long len);
-//extern void  __LIB__  zx128_lmemset(far *dest, uchar c, unsigned long len);
-*/
-
-/* 128k RAMDisk */
-
-// Following System Variables Used:
-//
-// BANKM    @ $5B5C (1 byte ) - last byte output to port $7ffd
-// SF_NEXT  @ $5B83 (2 bytes) - points at end of catalog marker, always in physical page 7
-// SF_SPACE @ $5B85 (3 bytes) - total number of available bytes in ramdisk area
-//
-
-/*
-struct zxrd_catentry {
-   uchar name[11];                  // 10 characters spaced padded, made 11 to accommodate last \0
-   uchar type;                      // 0 = prog, 1 = num arr, 2 = str arr, 3 = bytes
-   uint  len;                       // length in bytes
-   uint  addr;                      // address saved from
-   uint  extra1;                    // length of prog or name of array
-   uint  extra2;                    // auto-run line number
-};
-
-extern void __LIB__ zxrd_format(void);
-extern int  __LIB__ zxrd_cat(uint ord, struct zxrd_catentry *c);
-extern int  __LIB__ zxrd_find(char *name, struct zxrd_catentry *c);
-extern int  __LIB__ zxrd_load(char *name, void *dest);
-extern int  __LIB__ zxrd_read(char *name, void *dest, unsigned long offset, uint len);
-extern int  __LIB__ __FASTCALL__ zxrd_save(struct zxrd_catentry *c);
-extern int  __LIB__ __FASTCALL__ zxrd_erase(char *name);
-*/
-
-/* Joystick Functions -- see input.h for further documentation */
-
-extern unsigned int __LIB__ in_JoyFuller(void);
-extern unsigned int __LIB__ in_JoyKempston(void);
-extern unsigned int __LIB__ in_JoySinclair1(void);
-extern unsigned int __LIB__ in_JoySinclair2(void);
-extern unsigned int __LIB__ in_JoyTimex1(void);
-extern unsigned int __LIB__ in_JoyTimex2(void);
-
-/* Mouse Functions -- see input.h for further documentation */
-
-/*
-   AMX Mouse Variables - you must declare
-   uint in_AMXcoordX, in_AMXcoordY, in_AMXdeltaX, in_AMXdeltaY;
-*/
-
-extern void __LIB__ in_MouseAMXInit(uchar xvector, uchar yvector);
-extern void __LIB__ in_MouseAMX(uchar *buttons, uint *xcoord, uint *ycoord);
-extern void __LIB__ in_MouseAMXSetPos(uint xcoord, uint ycoord);
-
-extern void __LIB__ __CALLEE__ in_MouseAMXInit_callee(uchar xvector, uchar yvector);
-extern void __LIB__ __CALLEE__ in_MouseAMX_callee(uchar *buttons, uint *xcoord, uint *ycoord);
-extern void __LIB__ __CALLEE__ in_MouseAMXSetPos_callee(uint xcoord, uint ycoord);
-
-#define in_MouseAMXInit(a,b)    in_MouseAMXInit_callee(a,b)
-#define in_MouseAMX(a,b,c)      in_MouseAMX_callee(a,b,c)
-#define in_MouseAMXSetPos(a,b)  in_MouseAMXSetPos_callee(a,b)
-
-/*
-   Kempston Mouse Variables - you must declare
-   uchar in_KempcoordX, in_KempcoordY, in_KemprawX, in_KemprawY;
-*/
-
-extern void __LIB__ in_MouseKempInit(void);
-extern void __LIB__ in_MouseKemp(uchar *buttons, uint *xcoord, uint *ycoord);
-extern void __LIB__ in_MouseKempSetPos(uint xcoord, uint ycoord);
-
-extern void __LIB__ __CALLEE__ in_MouseKemp_callee(uchar *buttons, uint *xcoord, uint *ycoord);
-extern void __LIB__ __CALLEE__ in_MouseKempSetPos_callee(uint xcoord, uint ycoord);
-
-#define in_MouseKemp(a,b,c)      in_MouseKemp_callee(a,b,c)
-#define in_MouseKempSetPos(a,b)  in_MouseKempSetPos_callee(a,b)
-
-/* Colour Attributes */
+// Attributes
 
 #define BLACK          0x00
 #define BLUE           0x01
@@ -141,6 +23,7 @@ extern void __LIB__ __CALLEE__ in_MouseKempSetPos_callee(uint xcoord, uint ycoor
 #define CYAN           0x05
 #define YELLOW         0x06
 #define WHITE          0x07
+
 #define INK_BLACK      0x00
 #define INK_BLUE       0x01
 #define INK_RED        0x02
@@ -149,6 +32,7 @@ extern void __LIB__ __CALLEE__ in_MouseKempSetPos_callee(uint xcoord, uint ycoor
 #define INK_CYAN       0x05
 #define INK_YELLOW     0x06
 #define INK_WHITE      0x07
+
 #define PAPER_BLACK    0x00
 #define PAPER_BLUE     0x08
 #define PAPER_RED      0x10
@@ -157,165 +41,300 @@ extern void __LIB__ __CALLEE__ in_MouseKempSetPos_callee(uint xcoord, uint ycoor
 #define PAPER_CYAN     0x28
 #define PAPER_YELLOW   0x30
 #define PAPER_WHITE    0x38
+
 #define BRIGHT         0x40
 #define FLASH          0x80
 
-/* Display Functions */
+// Basic Tokens
 
-extern void __LIB__ __FASTCALL__ border(uchar colour);
-extern uchar __LIB__ attr(uchar row, uchar col);
+#define TK_RND         165
+#define TK_INKEYS      166
+#define TK_PI          167
+#define TK_FN          168
+#define TK_POINT       169
+#define TK_SCREENS     170
+#define TK_ATTR        171
+#define TK_AT          172
+#define TK_TAB         173
+#define TK_VALS        174
+#define TK_CODE        175
+#define TK_VAL         176
+#define TK_LEN         177
+#define TK_SIN         178
+#define TK_COS         179
+#define TK_TAN         180
+#define TK_ASN         181
+#define TK_ACS         182
+#define TK_ATN         183
+#define TK_LN          184
+#define TK_EXP         185
+#define TK_INT         186
+#define TK_SQR         187
+#define TK_SGN         188
+#define TK_ABS         189
+#define TK_PEEK        190
+#define TK_IN          191
+#define TK_USR         192
+#define TK_STRS        193
+#define TK_CHRS        194
+#define TK_NOT         195
+#define TK_BIN         196
+#define TK_OR          197
+#define TK_AND         198
+#define TK_LEQ         199
+#define TK_GEQ         200
+#define TK_NEQ         201
+#define TK_LINE        202
+#define TK_THEN        203
+#define TK_TO          204
+#define TK_STEP        205
+#define TK_DEF_FN      206
+#define TK_CAT         207
+#define TK_FORMAT      208
+#define TK_MOVE        209
+#define TK_ERASE       210
+#define TK_OPEN        211
+#define TK_CLOSE       212
+#define TK_MERGE       213
+#define TK_VERIFY      214
+#define TK_BEEP        215
+#define TK_CIRCLE      216
+#define TK_INK         217
+#define TK_PAPER       218
+#define TK_FLASH       219
+#define TK_BRIGHT      220
+#define TK_INVERSE     221
+#define TK_OVER        222
+#define TK_OUT         223
+#define TK_LPRINT      224
+#define TK_LLIST       225
+#define TK_STOP        226
+#define TK_READ        227
+#define TK_DATA        228
+#define TK_RESTORE     229
+#define TK_NEW         230
+#define TK_BORDER      231
+#define TK_CONTINUE    232
+#define TK_DIM         233
+#define TK_REM         234
+#define TK_FOR         235
+#define TK_GO_TO       236
+#define TK_GO_SUB      237
+#define TK_INPUT       238
+#define TK_LOAD        239
+#define TK_LIST        240
+#define TK_LET         241
+#define TK_PAUSE       242
+#define TK_NEXT        243
+#define TK_POKE        244
+#define TK_PRINT       245
+#define TK_PLOT        246
+#define TK_RUN         247
+#define TK_SAVE        248
+#define TK_RANDOMIZE   249
+#define TK_IF          250
+#define TK_CLS         251
+#define TK_DRAW        252
+#define TK_CLEAR       253
+#define TK_RETURN      254
+#define TK_COPY        255
 
-/* Manipulating Screen (Pixel) Addresses */
 
-extern void __LIB__ __FASTCALL__ *scr_chardown(void *scrnaddr);
-extern void __LIB__ __FASTCALL__ *scr_charleft(void *scrnaddr);
-extern void __LIB__ __FASTCALL__ *scr_charright(void *scrnaddr);
-extern void __LIB__ __FASTCALL__ *scr_charup(void *scrnaddr);
-extern void __LIB__ __FASTCALL__ *scr_getattraddr(void *scrnaddr);
-extern void __LIB__ *scr_getcharaddr(uchar row, uchar col);
-extern void __LIB__ *scr_getscrnaddr(uint xcoord, uchar ycoord, uchar *mask);
-extern void __LIB__ __FASTCALL__ *scr_pixeldown(void *scrnaddr);
-extern void __LIB__ __FASTCALL__ *scr_pixelup(void *scrnaddr);
-extern void __LIB__ *scr_pixelleft(void *scrnaddr, uchar *mask);
-extern void __LIB__ *scr_pixelright(void *scrnaddr, uchar *mask);
+///////////////////////////////////////////
+// DIAGNOSTICS AND HARDWARE IDENTIFICATION
+///////////////////////////////////////////
 
-/* Manipulating Attribute Addresses */
+extern int  __LIB__ zx_128mode(void);            // true or false
+extern int  __LIB__ zx_issue3(void);             // true or false
 
-extern void __LIB__ *attr_getcharaddr(uchar row, uchar col);
-extern void __LIB__ __FASTCALL__ *attr_chardown(void *attraddr);
-extern void __LIB__ __FASTCALL__ *attr_charleft(void *attraddr);
-extern void __LIB__ __FASTCALL__ *attr_charright(void *attraddr);
-extern void __LIB__ __FASTCALL__ *attr_charup(void *attraddr);
-extern void __LIB__ __FASTCALL__ *attr_getscrnaddr(void *attraddr);
-
-/* Diagnostics - TRUE or FALSE */
-
-extern int __LIB__ zx_128mode();
-extern int __LIB__ zx_issue3();
-
-/* Other Diagnostics */
-
-extern int __LIB__ zx_type();		/* 0:48K - 1: 128K - 2: TS2068 */
-extern int __LIB__ zx_model();
-extern int __LIB__ zx_basic_length();
-extern int __LIB__ zx_var_length();
-extern int __LIB__ zx_printer();
-extern int __LIB__ zx_soundchip();
-extern int __LIB__ zx_timexsound();
-extern int __LIB__ zx_fullerstick();
-extern int __LIB__ zx_kempstonmouse();
-extern int __LIB__ zx_kempston();
-extern int __LIB__ zx_iss_stick();
-extern int __LIB__ zx_multiface();
-extern int __LIB__ zx_disciple();
-extern int __LIB__ zx_plus3fdc();
-extern int __LIB__ zx_trd();
-extern int __LIB__ zx_extsys();
-extern int __LIB__ zx_basemem();
+extern int  __LIB__ zx_type(void);		 // 0:48K - 1: 128K - 2: TS2068
+extern int  __LIB__ zx_model(void);
+extern int  __LIB__ zx_basic_length(void);
+extern int  __LIB__ zx_var_length(void);
+extern int  __LIB__ zx_printer(void);
+extern int  __LIB__ zx_soundchip(void);
+extern int  __LIB__ zx_timexsound(void);
+extern int  __LIB__ zx_fullerstick(void);
+extern int  __LIB__ zx_kempstonmouse(void);
+extern int  __LIB__ zx_kempston(void);
+extern int  __LIB__ zx_iss_stick(void);
+extern int  __LIB__ zx_multiface(void);
+extern int  __LIB__ zx_disciple(void);
+extern int  __LIB__ zx_plus3fdc(void);
+extern int  __LIB__ zx_trd(void);
+extern int  __LIB__ zx_extsys(void);
+extern int  __LIB__ zx_basemem(void);
 
 
-/* Interface to call BASIC */
+///////////////////////////////
+// INTERFACE FOR CALLING BASIC
+///////////////////////////////
 
-extern int __LIB__ zx_goto(int line);
-extern int __LIB__ zx_getstr(char variable, char *value);
-extern void __LIB__ zx_setstr(char variable, char *value);
-extern int __LIB__ zx_getint(char *variable);
-extern void __LIB__ zx_setint(char *variable, int value);
+extern int  __LIB__ __FASTCALL__ zx_goto(int line);
+extern int  __LIB__              zx_getstr(char variable, char *value);
+extern void __LIB__              zx_setstr(char variable, char *value);
+extern int  __LIB__ __FASTCALL__ zx_getint(char *variable);
+extern void __LIB__              zx_setint(char *variable, int value);
 
-/* Token codes for BASIC keyworks */
+extern int  __LIB__ __CALLEE__   zx_getstr_callee(char variable, char *value);
+extern void __LIB__ __CALLEE__   zx_setstr_callee(char variable, char *value);
+extern void __LIB__ __CALLEE__   zx_setint_callee(char *variable, int value);
 
-#define TK_RND     165
-#define TK_INKEYS  166
-#define TK_PI      167
-#define TK_FN      168
-#define TK_POINT   169
-#define TK_SCREENS 170
-#define TK_ATTR    171
-#define TK_AT      172
-#define TK_TAB     173
-#define TK_VALS    174
-#define TK_CODE    175
-#define TK_VAL     176
-#define TK_LEN     177
-#define TK_SIN     178
-#define TK_COS     179
-#define TK_TAN     180
-#define TK_ASN     181
-#define TK_ACS     182
-#define TK_ATN     183
-#define TK_LN      184
-#define TK_EXP     185
-#define TK_INT     186
-#define TK_SQR     187
-#define TK_SGN     188
-#define TK_ABS     189
-#define TK_PEEK    190
-#define TK_IN      191
-#define TK_USR     192
-#define TK_STRS    193
-#define TK_CHRS    194
-#define TK_NOT     195
-#define TK_BIN     196
-#define TK_OR      197
-#define TK_AND     198
+#define zx_getstr(a,b)           zx_getstr_callee(a,b)
+#define zx_setstr(a,b)           zx_setstr_callee(a,b)
+#define zx_setint(a,b)           zx_setint_callee(a,b)
 
-#define TK__LEQ    199
-#define TK__GEQ    200
-#define TK__NEQ    201
 
-#define TK_LINE      202
-#define TK_THEN      203
-#define TK_TO        204
-#define TK_STEP      205
-#define TK_DEF_FN    206
-#define TK_CAT       207
-#define TK_FORMAT    208
-#define TK_MOVE      209
-#define TK_ERASE     210
-#define TK_OPEN      211
-#define TK_CLOSE     212
-#define TK_MERGE     213
-#define TK_VERIFY    214
-#define TK_BEEP      215
-#define TK_CIRCLE    216
-#define TK_INK       217
-#define TK_PAPER     218
-#define TK_FLASH     219
-#define TK_BRIGHT    220
-#define TK_INVERSE   221
-#define TK_OVER      222
-#define TK_OUT       223
-#define TK_LPRINT    224
-#define TK_LLIST     225
-#define TK_STOP      226
-#define TK_READ      227
-#define TK_DATA      228
-#define TK_RESTORE   229
-#define TK_NEW       230
-#define TK_BORDER    231
-#define TK_CONTINUE  232
-#define TK_DIM       233
-#define TK_REM       234
-#define TK_FOR       235
-#define TK_GO_TO     236
-#define TK_GO_SUB    237
-#define TK_INPUT     238
-#define TK_LOAD      239
-#define TK_LIST      240
-#define TK_LET       241
-#define TK_PAUSE     242
-#define TK_NEXT      243
-#define TK_POKE      244
-#define TK_PRINT     245
-#define TK_PLOT      246
-#define TK_RUN       247
-#define TK_SAVE      248
-#define TK_RANDOMIZE 249
-#define TK_IF        250
-#define TK_CLS       251
-#define TK_DRAW      252
-#define TK_CLEAR     253
-#define TK_RETURN    254
-#define TK_COPY      255
+////////////
+// TAPE I/O
+////////////
+
+struct zxtapehdr {             // standard tape header
+   unsigned char type;
+   char          name[10];
+   size_t        length;
+   size_t        address;
+   size_t        offset;
+};
+
+extern int  __LIB__            tape_save(char *name, size_t loadstart,void *start, size_t len);
+extern int  __LIB__            tape_save_block(void *addr, size_t len, unsigned char type);
+extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned char type);
+
+extern int  __LIB__ __CALLEE__ tape_save_block_callee(void *addr, size_t len, unsigned char type);
+extern int  __LIB__ __CALLEE__ tape_load_block_callee(void *addr, size_t len, unsigned char type);
+
+#define tape_save_block(a,b,c) tape_save_block_callee(a,b,c)
+#define tape_load_block(a,b,c) tape_load_block_callee(a,b,c)
+
+
+///////////////////////////////////
+// DISK AND OTHER MASS STORAGE I/O
+///////////////////////////////////
+
+// +3 Disk
+
+#ifdef PLUS3                   // if it's a +3 we want the dodos routine
+#pragma output NEEDplus3dodos
+
+extern int  __LIB__ findhand(void);
+extern void __LIB__ freehand(int);
+
+#endif
+
+// RESIDOS
+
+#ifdef RESIDOS                 // if it's residos then we want dodos routines
+#pragma output NEEDresidos
+
+extern int  __LIB__ findhand(void);
+extern void __LIB__ freehand(int);
+
+#endif
+
+
+/////////////////////////////////////////////////////////////////
+// INPUT DEVICES: KEYBOARD, JOYSTICK AND MICE (SEE ALSO INPUT.H)
+/////////////////////////////////////////////////////////////////
+
+// Joystick Functions
+
+extern unsigned int  __LIB__ in_JoyFuller(void);
+extern unsigned int  __LIB__ in_JoyKempston(void);
+extern unsigned int  __LIB__ in_JoySinclair1(void);
+extern unsigned int  __LIB__ in_JoySinclair2(void);
+extern unsigned int  __LIB__ in_JoyTimex1(void);
+extern unsigned int  __LIB__ in_JoyTimex2(void);
+
+// AMX Mouse
+//
+// To use you must declare the following global variables
+// uint in_AMXcoordX, in_AMXcoordY, in_AMXdeltaX, in_AMXdeltaY;
+
+extern void __LIB__             in_MouseAMXInit(uchar xvector, uchar yvector);
+extern void __LIB__             in_MouseAMX(uchar *buttons, uint *xcoord, uint *ycoord);
+extern void __LIB__             in_MouseAMXSetPos(uint xcoord, uint ycoord);
+
+extern void __LIB__ __CALLEE__  in_MouseAMXInit_callee(uchar xvector, uchar yvector);
+extern void __LIB__ __CALLEE__  in_MouseAMX_callee(uchar *buttons, uint *xcoord, uint *ycoord);
+extern void __LIB__ __CALLEE__  in_MouseAMXSetPos_callee(uint xcoord, uint ycoord);
+
+#define in_MouseAMXInit(a,b)    in_MouseAMXInit_callee(a,b)
+#define in_MouseAMX(a,b,c)      in_MouseAMX_callee(a,b,c)
+#define in_MouseAMXSetPos(a,b)  in_MouseAMXSetPos_callee(a,b)
+
+// Kempston Mouse
+//
+// To use you must declare the following global variables
+// uchar in_KempcoordX, in_KempcoordY, in_KemprawX, in_KemprawY;
+
+extern void __LIB__             in_MouseKempInit(void);
+extern void __LIB__             in_MouseKemp(uchar *buttons, uint *xcoord, uint *ycoord);
+extern void __LIB__             in_MouseKempSetPos(uint xcoord, uint ycoord);
+
+extern void __LIB__ __CALLEE__  in_MouseKemp_callee(uchar *buttons, uint *xcoord, uint *ycoord);
+extern void __LIB__ __CALLEE__  in_MouseKempSetPos_callee(uint xcoord, uint ycoord);
+
+#define in_MouseKemp(a,b,c)     in_MouseKemp_callee(a,b,c)
+#define in_MouseKempSetPos(a,b) in_MouseKempSetPos_callee(a,b)
+
+
+//////////////////////////
+// DISPLAY FILE FUNCTIONS
+//////////////////////////
+
+extern void  __LIB__ __FASTCALL__ border(uchar colour);
+extern uchar __LIB__              attr(uchar row, uchar col);
+
+extern uchar __LIB__ __CALLEE__   attr_callee(uchar row, uchar col);
+#define attr(a,b)                 attr_callee(a,b)
+
+// DISPLAY PIXEL ADDRESS MANIPULATORS
+
+extern uchar __LIB__              *zx_CharYXToPixelAddr(uchar row, uchar col);
+extern uchar __LIB__ __FASTCALL__ *zx_CharYToPixelAddr(uchar row);
+
+extern uchar __LIB__              *zx_PixelXYToPixelAddr(uchar xcoord, uchar ycoord, uchar *mask);
+extern uchar __LIB__ __FASTCALL__ *zx_PixelYToPixelAddr(uchar ycoord);
+
+extern uchar __LIB__ __FASTCALL__  zx_PixelAddrToCharX(void *pixeladdr);
+extern uchar __LIB__ __FASTCALL__  zx_PixelAddrToCharY(void *pixeladdr);
+
+extern uchar __LIB__               zx_PixelAddrToPixelX(void *pixeladdr, uchar mask);
+extern uchar __LIB__ __FASTCALL__  zx_PixelAddrToPixelY(void *pixeladdr);
+
+extern uchar __LIB__ __FASTCALL__ *zx_PixelAddrToAttrAddr(void *pixeladdr);
+
+extern uchar __LIB__ __FASTCALL__ *zx_PixelAddrCharDown(void *pixeladdr);
+extern uchar __LIB__ __FASTCALL__ *zx_PixelAddrCharLeft(void *pixeladdr);
+extern uchar __LIB__ __FASTCALL__ *zx_PixelAddrCharRight(void *pixeladdr);
+extern uchar __LIB__ __FASTCALL__ *zx_PixelAddrCharUp(void *pixeladdr);
+
+extern uchar __LIB__ __FASTCALL__ *zx_PixelAddrPixelDown(void *pixeladdr);
+extern uchar __LIB__              *zx_PixelAddrPixelLeft(void *pixeladdr, uchar *mask);
+extern uchar __LIB__              *zx_PixelAddrPixelRight(void *pixeladdr, uchar *mask);
+extern uchar __LIB__ __FASTCALL__ *zx_PixelAddrPixelUp(void *pixeladdr);
+
+// DISPLAY ATTRIBUTE ADDRESS MANIPULATORS
+
+extern uchar __LIB__              *zx_CharYXToAttrAddr(uchar row, uchar col);
+extern uchar __LIB__ __FASTCALL__ *zx_CharYToAttrAddr(uchar row);
+
+extern uchar __LIB__              *zx_PixelXYToAttrAddr(uchar xcoord, uchar ycoord);
+extern uchar __LIB__ __FASTCALL__ *zx_PixelYToAttrAddr(uchar ycoord);
+
+extern uchar __LIB__ __FASTCALL__  zx_AttrAddrToCharX(void *attraddr);
+extern uchar __LIB__ __FASTCALL__  zx_AttrAddrToCharY(void *attraddr);
+ 
+extern uchar __LIB__ __FASTCALL__  zx_AttrAddrToPixelX(void *attraddr);
+extern uchar __LIB__ __FASTCALL__  zx_AttrAddrToPIxelY(void *attraddr);
+
+extern uchar __LIB__ __FASTCALL__ *zx_AttrAddrToPixelAddr(void *attraddr);
+
+extern uchar __LIB__ __FASTCALL__ *zx_AttrAddrCharDown(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_AttrAddrCharLeft(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_AttrAddrCharRight(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_AttrAddrCharUp(void *attraddr);
+
 
 #endif
