@@ -9,11 +9,11 @@ all: crt0s crtz80s183
 
 crt0s:
 	@$(RM) crt0_long/l_long_case.o
-	$(LIBLINKER) -x../z80_crt0 @crt0list
+	$(LIBLINKER) -x../$(OUTPUT_DIRECTORY)/z80_crt0 @crt0list
 
 crtz80s183:
 	@$(RM) crt0_long/l_long_case.o
-	$(LIBLINKER) -DZ80S183 -x../z80s183_crt0 @crt0list
+	$(LIBLINKER) -DZ80S183 -x../$(OUTPUT_DIRECTORY)/z80s183_crt0 @crt0list
 
 
 clean:

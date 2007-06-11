@@ -1,12 +1,12 @@
 #
 # Makefile for the Grundy NewBrain fcntl driver
 #
-# $Id: Makefile,v 1.2 2007-06-11 07:07:23 stefano Exp $
+# $Id: Makefile,v 1.3 2007-06-11 14:41:04 stefano Exp $
 
 include ../../Make.config
 
 all:	open_z88.o read.o remove.o rename.o
-	$(LIBLINKER) -x../../nbdrv @nbflst
+	$(LIBLINKER) -x../../$(OUTPUT_DIRECTORY)/nbdrv @nbflst
 
 .c.o:
 	zcc +newbrain $(CFLAGS) $*.c

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.13 2006-06-18 17:59:40 dom Exp $
+# $Id: Makefile,v 1.14 2007-06-11 14:41:04 stefano Exp $
 
 include ../Make.config
 
@@ -31,7 +31,7 @@ blah:
 	cd fdstdio ; $(MAKE) ; cd ..
 
 z88: $(OBJECTS)
-	$(LIBLINKER) -x../z88 @z88list
+	$(LIBLINKER) -x../$(OUTPUT_DIRECTORY)/z88 @z88list
 
 .c.o:
 	zcc $(CFLAGS) $*.c
