@@ -1,0 +1,16 @@
+newbrain/cpmzcall
+newbrain/break_status
+newbrain/fputc_lcd
+newbrain/fputs_lcd
+newbrain/warm_reset
+newbrain/nb_open
+newbrain/nb_close
+newbrain/nb_clear
+newbrain/nb_getc
+newbrain/nb_gets
+newbrain/nb_getblock
+newbrain/nb_putc
+newbrain/nb_puts
+newbrain/nb_putblock
+newbrain/nb_putval
+time/newbrain/clock

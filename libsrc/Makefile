@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.87 2007-06-03 15:13:05 stefano Exp $
+# $Id: Makefile,v 1.88 2007-06-11 14:48:21 stefano Exp $
 
 
 include Make.config
@@ -39,12 +39,12 @@ zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib zx
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.87 2007-06-03 15:13:05 stefano Exp $
+#  $Id: Makefile,v 1.88 2007-06-11 14:48:21 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.87 2007-06-03 15:13:05 stefano Exp $
+# $Id: Makefile,v 1.88 2007-06-11 14:48:21 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -59,7 +59,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.87 2007-06-03 15:13:05 stefano Exp $
+#  $Id: Makefile,v 1.88 2007-06-11 14:48:21 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -936,6 +936,7 @@ newbrain_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(LISTFILE_DIRECTORY)/newbrain.lst
+	$(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/nbcpm_clib @$(LISTFILE_DIRECTORY)/nbcpm.lst
 
 # RCM2/3000 lib
 rcmx000_clib.lib:
