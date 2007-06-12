@@ -5,7 +5,7 @@
 /*
  * Now some trickery to link in the correct routines for far
  *
- * $Id: malloc.h,v 1.10 2007-01-15 07:12:52 aralbrec Exp $
+ * $Id: malloc.h,v 1.11 2007-06-12 23:58:58 aralbrec Exp $
  */
 
 
@@ -32,26 +32,26 @@
 // extern long heap(xxxx);
 //
 // The heap must be initialized to empty with a
-// call to mallinit() or by setting heap=0.
+// call to mallinit() or by setting heap=0L.
 // Then available memory must be added by one or
 // more calls to sbrk() as in:
 //
-// mallinit();
+// mallinit();        /* heap = 0L; is an alternative              */
 // sbrk(50000,4000);  /* add 4000 bytes from 50000-53999 inclusive */
-// sbrk(25000,126);   /* add 126 bytes from 25000-25125 inclusive */
+// sbrk(25000,126);   /* add 126 bytes from 25000-25125 inclusive  */
 // a = malloc(100);
 
 extern void __LIB__              mallinit(void);
-extern void __LIB__              sbrk(void *addr, int size);
-extern void __LIB__ __CALLEE__   sbrk_callee(void *addr, int size);
-extern void __LIB__              *calloc(int nobj, int size);
-extern void __LIB__ __CALLEE__   *calloc_callee(int nobj, int size); 
+extern void __LIB__              sbrk(void *addr, unsigned int size);
+extern void __LIB__ __CALLEE__   sbrk_callee(void *addr, unsigned int size);
+extern void __LIB__              *calloc(unsigned int nobj, unsigned int size);
+extern void __LIB__ __CALLEE__   *calloc_callee(unsigned int nobj, unsigned int size); 
 extern void __LIB__ __FASTCALL__ free(void *addr);
-extern void __LIB__ __FASTCALL__ *malloc(int size);
-extern void __LIB__              *realloc(void *p, int size);
-extern void __LIB__ __CALLEE__   *realloc_callee(void *p, int size);
-extern void __LIB__              mallinfo(int *total, int *largest);
-extern void __LIB__ __CALLEE__   mallinfo_callee(int *total, int *largest);
+extern void __LIB__ __FASTCALL__ *malloc(unsigned int size);
+extern void __LIB__              *realloc(void *p, unsigned int size);
+extern void __LIB__ __CALLEE__   *realloc_callee(void *p, unsigned int size);
+extern void __LIB__              mallinfo(unsigned int *total, unsigned int *largest);
+extern void __LIB__ __CALLEE__   mallinfo_callee(unsigned int *total, unsigned int *largest);
 
 #define sbrk(a,b)      sbrk_callee(a,b)
 #define calloc(a,b)    calloc_callee(a,b)
@@ -84,11 +84,11 @@ extern void __LIB__ __CALLEE__   mallinfo_callee(int *total, int *largest);
 // extern long myheap(xxxx);
 //
 // Heaps must be initialized to empty with a call to
-// HeapCreate() or by setting them =0 (myheap=0; eg).
+// HeapCreate() or by setting them =0L (myheap=0L; eg).
 // Then available memory must be added to the heap
 // with one or more calls to HeapSbrk():
 //
-// HeapCreate(&myheap);
+// HeapCreate(&myheap);             /* myheap = 0L;       */
 // HeapSbrk(&myheap, 50000, 5000);  /* add memory to heap */
 // a = HeapAlloc(&myheap, 14);
 //
@@ -102,18 +102,18 @@ extern void __LIB__ __CALLEE__   mallinfo_callee(int *total, int *largest);
 // to a call to malloc(size).
 
 extern void __LIB__ __FASTCALL__ HeapCreate(void *heap);
-extern void __LIB__              HeapSbrk(void *heap, void *addr, int size);
-extern void __LIB__ __CALLEE__   HeapSbrk_callee(void *heap, void *addr, int size);
-extern void __LIB__              *HeapCalloc(void *heap, int nobj, int size);
-extern void __LIB__ __CALLEE__   *HeapCalloc_callee(void *heap, int nobj, int size);
+extern void __LIB__              HeapSbrk(void *heap, void *addr, unsigned int size);
+extern void __LIB__ __CALLEE__   HeapSbrk_callee(void *heap, void *addr, unsigned int size);
+extern void __LIB__              *HeapCalloc(void *heap, unsigned int nobj, unsigned int size);
+extern void __LIB__ __CALLEE__   *HeapCalloc_callee(void *heap, unsigned int nobj, unsigned int size);
 extern void __LIB__              HeapFree(void *heap, void *addr);
 extern void __LIB__ __CALLEE__   HeapFree_callee(void *heap, void *addr);
-extern void __LIB__              *HeapAlloc(void *heap, int size);
-extern void __LIB__ __CALLEE__   *HeapAlloc_callee(void *heap, int size);
-extern void __LIB__              *HeapRealloc(void *heap, void *p, int size);
-extern void __LIB__ __CALLEE__   *HeapRealloc_callee(void *heap, void *p, int size);
-extern void __LIB__              HeapInfo(int *total, int *largest, void *heap);
-extern void __LIB__ __CALLEE__   HeapInfo_callee(int *total, int *largest, void *heap);
+extern void __LIB__              *HeapAlloc(void *heap, unsigned int size);
+extern void __LIB__ __CALLEE__   *HeapAlloc_callee(void *heap, unsigned int size);
+extern void __LIB__              *HeapRealloc(void *heap, void *p, unsigned int size);
+extern void __LIB__ __CALLEE__   *HeapRealloc_callee(void *heap, void *p, unsigned int size);
+extern void __LIB__              HeapInfo(unsigned int *total, unsigned int *largest, void *heap);
+extern void __LIB__ __CALLEE__   HeapInfo_callee(unsigned int *total, unsigned int *largest, void *heap);
 
 #define HeapSbrk(a,b,c)     HeapSbrk_callee(a,b,c)
 #define HeapCalloc(a,b,c)   HeapCalloc_callee(a,b,c)
