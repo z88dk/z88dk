@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.17 2007-06-11 08:32:59 aralbrec Exp $
+ * $Id: spectrum.h,v 1.18 2007-06-12 23:59:32 aralbrec Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -284,57 +284,107 @@ extern void __LIB__ __CALLEE__  in_MouseKempSetPos_callee(uint xcoord, uint ycoo
 //////////////////////////
 
 extern void  __LIB__ __FASTCALL__ border(uchar colour);
-extern uchar __LIB__              attr(uchar row, uchar col);
+extern uint  __LIB__              attr(uchar row, uchar col);
+extern uint  __LIB__              screenstr(uchar row, uchar col);
 
-extern uchar __LIB__ __CALLEE__   attr_callee(uchar row, uchar col);
+extern uint  __LIB__ __CALLEE__   attr_callee(uchar row, uchar col);
+extern uint  __LIB__ __CALLEE__   screenstr_callee(uchar row, uchar col);
+
 #define attr(a,b)                 attr_callee(a,b)
+#define screenstr(a,b)            screenstr_callee(a,b)
+
+// In the following, screen address refers to a pixel address within the display file while
+// attribute address refers to the attributes area.
+//
+// Function names are constructed from the following atoms:
+//
+// saddr = screen address
+// aaddr = attribute address
+// 
+// px    = pixel x coordinate (0..255)
+// py    = pixel y coordinate (0..191)
+// pxy   = pixel (x,y) coordinate
+//
+// cx    = character x coordinate (0..31)
+// cy    = character y coordinate (0..23)
+// cyx   = character (y,x) coordinate - ordering borrowed from Sinclair Basic
+//
+// So for example:
+//
+// zx_saddr2cy() will return the character y coordinate corresponding to the given screen address
+// zx_saddr2aaddr() will return the attribute address corresponding to the given screen address
+// zx_pxy2aaddr() will return the attribute address corresponding to the given (x,y) pixel coordinate
+//
+// Some functions will return with carry flag set if coordinates or addresses move out of
+// bounds.  In these cases the special z88dk keywords iferror() and ifnerror() can be used
+// to test the carry flag and determine if invalid results are returned.  Check with the
+// wiki documentation or the asm source files to see which functions support this.  If
+// comments in the asm source file do not mention this, it is not supported.
 
 // DISPLAY PIXEL ADDRESS MANIPULATORS
 
-extern uchar __LIB__              *zx_CharYXToPixelAddr(uchar row, uchar col);
-extern uchar __LIB__ __FASTCALL__ *zx_CharYToPixelAddr(uchar row);
+extern uchar __LIB__              *zx_cyx2saddr(uchar row, uchar col);
+extern uchar __LIB__ __FASTCALL__ *zx_cy2saddr(uchar row);
 
-extern uchar __LIB__              *zx_PixelXYToPixelAddr(uchar xcoord, uchar ycoord, uchar *mask);
-extern uchar __LIB__ __FASTCALL__ *zx_PixelYToPixelAddr(uchar ycoord);
+extern uchar __LIB__              *zx_pxy2saddr(uchar xcoord, uchar ycoord, uchar *mask);
+extern uchar __LIB__ __FASTCALL__ *zx_py2saddr(uchar ycoord);
 
-extern uchar __LIB__ __FASTCALL__  zx_PixelAddrToCharX(void *pixeladdr);
-extern uchar __LIB__ __FASTCALL__  zx_PixelAddrToCharY(void *pixeladdr);
+extern uint  __LIB__ __FASTCALL__  zx_saddr2cx(void *pixeladdr);
+extern uint  __LIB__ __FASTCALL__  zx_saddr2cy(void *pixeladdr);
 
-extern uchar __LIB__               zx_PixelAddrToPixelX(void *pixeladdr, uchar mask);
-extern uchar __LIB__ __FASTCALL__  zx_PixelAddrToPixelY(void *pixeladdr);
+extern uint  __LIB__               zx_saddr2px(void *pixeladdr, uchar mask);
+extern uint  __LIB__ __FASTCALL__  zx_saddr2py(void *pixeladdr);
 
-extern uchar __LIB__ __FASTCALL__ *zx_PixelAddrToAttrAddr(void *pixeladdr);
+extern uchar __LIB__ __FASTCALL__ *zx_saddr2aaddr(void *pixeladdr);
 
-extern uchar __LIB__ __FASTCALL__ *zx_PixelAddrCharDown(void *pixeladdr);
-extern uchar __LIB__ __FASTCALL__ *zx_PixelAddrCharLeft(void *pixeladdr);
-extern uchar __LIB__ __FASTCALL__ *zx_PixelAddrCharRight(void *pixeladdr);
-extern uchar __LIB__ __FASTCALL__ *zx_PixelAddrCharUp(void *pixeladdr);
+extern uchar __LIB__ __FASTCALL__ *zx_saddrcdown(void *pixeladdr);
+extern uchar __LIB__ __FASTCALL__ *zx_saddrcleft(void *pixeladdr);
+extern uchar __LIB__ __FASTCALL__ *zx_saddrcright(void *pixeladdr);
+extern uchar __LIB__ __FASTCALL__ *zx_saddrcup(void *pixeladdr);
 
-extern uchar __LIB__ __FASTCALL__ *zx_PixelAddrPixelDown(void *pixeladdr);
-extern uchar __LIB__              *zx_PixelAddrPixelLeft(void *pixeladdr, uchar *mask);
-extern uchar __LIB__              *zx_PixelAddrPixelRight(void *pixeladdr, uchar *mask);
-extern uchar __LIB__ __FASTCALL__ *zx_PixelAddrPixelUp(void *pixeladdr);
+extern uchar __LIB__ __FASTCALL__ *zx_saddrpdown(void *pixeladdr);
+extern uchar __LIB__              *zx_saddrpleft(void *pixeladdr, uchar *mask);
+extern uchar __LIB__              *zx_saddrpright(void *pixeladdr, uchar *mask);
+extern uchar __LIB__ __FASTCALL__ *zx_saddrpup(void *pixeladdr);
+
+extern uchar __LIB__ __CALLEE__   *zx_cyx2saddr_callee(uchar row, uchar col);
+extern uchar __LIB__ __CALLEE__   *zx_pxy2saddr_callee(uchar xcoord, uchar ycoord, uchar *mask);
+extern uint  __LIB__ __CALLEE__    zx_saddr2px_callee(void *pixeladdr, uchar mask);
+extern uchar __LIB__ __CALLEE__   *zx_saddrpleft_callee(void *pixeladdr, uchar *mask);
+extern uchar __LIB__ __CALLEE__   *zx_saddrpright_callee(void *pixeladdr, uchar *mask);
+
+#define zx_cyx2saddr(a,b)          zx_cyx2saddr_callee(a,b)
+#define zx_pxy2saddr(a,b,c)        zx_pxy2saddr_callee(a,b,c)
+#define zx_saddr2px(a,b)           zx_saddr2px_callee(a,b)
+#define zx_saddrpleft(a,b)         zx_saddrpleft_callee(a,b)
+#define zx_saddrpright(a,b)        zx_saddrpright_callee(a,b)
 
 // DISPLAY ATTRIBUTE ADDRESS MANIPULATORS
 
-extern uchar __LIB__              *zx_CharYXToAttrAddr(uchar row, uchar col);
-extern uchar __LIB__ __FASTCALL__ *zx_CharYToAttrAddr(uchar row);
+extern uchar __LIB__              *zx_cyx2aaddr(uchar row, uchar col);
+extern uchar __LIB__ __FASTCALL__ *zx_cy2aaddr(uchar row);
 
-extern uchar __LIB__              *zx_PixelXYToAttrAddr(uchar xcoord, uchar ycoord);
-extern uchar __LIB__ __FASTCALL__ *zx_PixelYToAttrAddr(uchar ycoord);
+extern uchar __LIB__              *zx_pxy2aaddr(uchar xcoord, uchar ycoord);
+extern uchar __LIB__ __FASTCALL__ *zx_py2aaddr(uchar ycoord);
 
-extern uchar __LIB__ __FASTCALL__  zx_AttrAddrToCharX(void *attraddr);
-extern uchar __LIB__ __FASTCALL__  zx_AttrAddrToCharY(void *attraddr);
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2cx(void *attraddr);
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2cy(void *attraddr);
  
-extern uchar __LIB__ __FASTCALL__  zx_AttrAddrToPixelX(void *attraddr);
-extern uchar __LIB__ __FASTCALL__  zx_AttrAddrToPIxelY(void *attraddr);
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2px(void *attraddr);
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2py(void *attraddr);
 
-extern uchar __LIB__ __FASTCALL__ *zx_AttrAddrToPixelAddr(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_aaddr2saddr(void *attraddr);
 
-extern uchar __LIB__ __FASTCALL__ *zx_AttrAddrCharDown(void *attraddr);
-extern uchar __LIB__ __FASTCALL__ *zx_AttrAddrCharLeft(void *attraddr);
-extern uchar __LIB__ __FASTCALL__ *zx_AttrAddrCharRight(void *attraddr);
-extern uchar __LIB__ __FASTCALL__ *zx_AttrAddrCharUp(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcdown(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcleft(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcright(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcup(void *attraddr);
+
+extern uchar __LIB__ __CALLEE__   *zx_cyx2aaddr_callee(uchar row, uchar col);
+extern uchar __LIB__ __CALLEE__   *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord);
+
+#define zx_cyx2aaddr(a,b)          zx_cyx2aaddr_callee(a,b)
+#define zx_pxy2aaddr(a,b)          zx_pxy2aaddr_callee(a,b)
 
 
 #endif
