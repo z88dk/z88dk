@@ -1,17 +1,20 @@
-; 07.2006 aralbrec
-
-; uchar attr(uchar row, uchar col)
-;
-; Return attribute occupying character square
-; on screen.  Works like the basic command of
-; same name.
+; uint attr(uchar row, uchar col)
+; CALLER linkage for function pointers
 
 XLIB attr
-LIB attr_getcharaddr
+
+LIB attr_callee
+XREF ASMDISP_ATTR_CALLEE
 
 .attr
 
-   call attr_getcharaddr
-   ld l,(hl)
-   ld h,0
-   ret
+   pop af
+   pop de
+   pop hl
+   push hl
+   push de
+   push af
+   
+   ld h,l
+   ld l,e
+   jp attr_callee + ASMDISP_ATTR_CALLEE

@@ -5,24 +5,20 @@
 ;	Copy a variable from basic to integer
 ;	Float values are rounded authomatically
 ;
-;	int zx_getint(char *variable);
+;	int __FASTCALL__ zx_getint(char *variable);
 ;
 ;
-;	$Id: zx_getint.asm,v 1.1 2006-06-28 22:21:26 stefano Exp $
-;
+;	$Id: zx_getint.asm,v 1.2 2007-06-13 00:03:13 aralbrec Exp $
+;	
 
-	XLIB	zx_getint
+XLIB	zx_getint
+LIB	zx_locatenum
 
-	LIB	zx_locatenum
-	
-	INCLUDE  "#zxfp.def"
+INCLUDE  "#zxfp.def"
 
+; hl = char *variable
 
 zx_getint:
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
 
 	call	zx_locatenum
 	jr	c,error
@@ -43,7 +39,8 @@ zx_getint:
 	ld	h,b
 	ld	l,c
 	ret
-	
+
 error:
+
 	ld	hl,-1
 	ret

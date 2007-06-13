@@ -5,6 +5,7 @@
  *      djm 16/10/2001
  */
 
+#define __HAVESEED
 #include <stdlib.h>
 #include <string.h>
 #include <spectrum.h>
