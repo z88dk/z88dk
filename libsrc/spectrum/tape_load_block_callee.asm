@@ -18,6 +18,8 @@ XDEF ASMDISP_TAPE_LOAD_BLOCK_CALLEE
 	pop ix
 	push hl
 
+.asmentry
+
 ; enter : ix = addr
 ;         de = len
 ;          a = type
