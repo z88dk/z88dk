@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: rcmx000_crt0.asm,v 1.2 2007-05-18 06:36:50 stefano Exp $
+;       $Id: rcmx000_crt0.asm,v 1.3 2007-06-14 08:12:04 aralbrec Exp $
 ;
 ; - - - - - - -
 
@@ -17,6 +17,17 @@
 ;-------
 
         INCLUDE "zcc_opt.def"
+
+;-------
+; Simulate unsupported z80 instructions
+;-------
+
+        LIB     rcmx_cpd
+        LIB     rcmx_cpdr
+        LIB     rcmx_cpi
+        LIB     rcmx_cpir
+        LIB     rcmx_rld
+        LIB     rcmx_rrd
 
 ;-------
 ; Some general scope declarations
