@@ -12,6 +12,12 @@ ctype/isxdigit
 ctype/toascii
 ctype/tolower
 ctype/toupper
+rcmx000/rcmx_cpd
+rcmx000/rcmx_cpdr
+rcmx000/rcmx_cpi
+rcmx000/rcmx_cpir
+rcmx000/rcmx_rld
+rcmx000/rmcx_rrd
 stdio/closeall
 stdio/8080/fchkstd
 stdio/8080/fclose
