@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.18 2007-06-12 23:59:32 aralbrec Exp $
+ * $Id: spectrum.h,v 1.19 2007-06-15 21:59:19 aralbrec Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -311,23 +311,23 @@ extern uint  __LIB__ __CALLEE__   screenstr_callee(uchar row, uchar col);
 //
 // So for example:
 //
-// zx_saddr2cy() will return the character y coordinate corresponding to the given screen address
-// zx_saddr2aaddr() will return the attribute address corresponding to the given screen address
-// zx_pxy2aaddr() will return the attribute address corresponding to the given (x,y) pixel coordinate
+// zx_saddr2cy(saddr) will return the character y coordinate corresponding to the given screen address
+// zx_saddr2aaddr(saddr) will return the attribute address corresponding to the given screen address
+// zx_pxy2aaddr(px,py) will return the attribute address corresponding to the given (x,y) pixel coordinate
 //
 // Some functions will return with carry flag set if coordinates or addresses move out of
 // bounds.  In these cases the special z88dk keywords iferror() and ifnerror() can be used
 // to test the carry flag and determine if invalid results are returned.  Check with the
 // wiki documentation or the asm source files to see which functions support this.  If
-// comments in the asm source file do not mention this, it is not supported.
+// comments in the asm source file do not mention this it is not supported.
 
 // DISPLAY PIXEL ADDRESS MANIPULATORS
 
 extern uchar __LIB__              *zx_cyx2saddr(uchar row, uchar col);
-extern uchar __LIB__ __FASTCALL__ *zx_cy2saddr(uchar row);
+extern uchar __LIB__ __FASTCALL__ *zx_cy2saddr(uchar row);           // cx assumed 0
 
 extern uchar __LIB__              *zx_pxy2saddr(uchar xcoord, uchar ycoord, uchar *mask);
-extern uchar __LIB__ __FASTCALL__ *zx_py2saddr(uchar ycoord);
+extern uchar __LIB__ __FASTCALL__ *zx_py2saddr(uchar ycoord);        // px assumed 0
 
 extern uint  __LIB__ __FASTCALL__  zx_saddr2cx(void *pixeladdr);
 extern uint  __LIB__ __FASTCALL__  zx_saddr2cy(void *pixeladdr);
@@ -362,10 +362,10 @@ extern uchar __LIB__ __CALLEE__   *zx_saddrpright_callee(void *pixeladdr, uchar 
 // DISPLAY ATTRIBUTE ADDRESS MANIPULATORS
 
 extern uchar __LIB__              *zx_cyx2aaddr(uchar row, uchar col);
-extern uchar __LIB__ __FASTCALL__ *zx_cy2aaddr(uchar row);
+extern uchar __LIB__ __FASTCALL__ *zx_cy2aaddr(uchar row);           // cx assumed 0
 
 extern uchar __LIB__              *zx_pxy2aaddr(uchar xcoord, uchar ycoord);
-extern uchar __LIB__ __FASTCALL__ *zx_py2aaddr(uchar ycoord);
+extern uchar __LIB__ __FASTCALL__ *zx_py2aaddr(uchar ycoord);        // px assumed 0
 
 extern uint  __LIB__ __FASTCALL__  zx_aaddr2cx(void *attraddr);
 extern uint  __LIB__ __FASTCALL__  zx_aaddr2cy(void *attraddr);
