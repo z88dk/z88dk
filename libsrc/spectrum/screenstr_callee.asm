@@ -70,7 +70,7 @@ XREF ASMDISP_ZX_CYX2SADDR_CALLEE
    jp nz, charloop
    
    ld l,c
-   ld h,b                      ; return with 0 to indicate no match
+   ld h,c                      ; return with 0 to indicate no match
    scf
    ret
 
