@@ -34,7 +34,8 @@ XREF ASMDISP_ZX_CYX2SADDR_CALLEE
    ; hl = screen address
    
    ld c,96                     ; number of chars to match against
-   ld de,$3d00                 ; character set in ROM
+   ld de,(23606)               ; use CHARS system variable to locate character set bitmap
+   inc d
 
 .charloop
 
