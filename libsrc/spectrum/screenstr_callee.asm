@@ -1,6 +1,13 @@
 ; uint __CALLEE__ screenstr_callee(uchar row, uchar col)
 ; aralbrec 06.2007
 
+; Sinclair Basic's SCREEN$() returns ascii code if the
+; bit pattern on screen matches exactly the character
+; set's bit pattern or its inverse.  This subroutine
+; goes a little further and will conclude a match
+; if the bit pattern contains a mixture of inverted
+; and non-inverted bit patterns.
+
 XLIB screenstr_callee
 XDEF ASMDISP_SCREENSTR_CALLEE
 
@@ -37,8 +44,13 @@ XREF ASMDISP_ZX_CYX2SADDR_CALLEE
 .mloop
 
    ld a,(de)
-   cp (hl)
-   jr nz, nomatch
+   xor (hl)
+   jr z, cont                  ; jump if bit patterns match
+   inc a
+   jr nz, nomatch              ; jump if bit patterns are not inverses
+
+.cont
+
    inc de
    inc h
    djnz mloop
