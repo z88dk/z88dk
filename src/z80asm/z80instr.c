@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.4 2007-02-28 11:23:24 stefano Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.5 2007-06-17 12:07:43 dom Exp $ */
 /* $History: Z80INSTR.C $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -612,37 +612,109 @@ FPP (void)
 }
 
 
-
 void 
 Subroutine_addr (int opcode0, int opcode)
 {
-  long constant;
+    long constant;
+    extern enum flag EOL;
 
-  GetSym ();
-  if ((constant = CheckCondition ()) != -1)
-    {				/* check for a condition */
+    GetSym ();
+    if ((constant = CheckCondition ()) != -1) { /* Check for condition */
+           
+        if (GetSym () != comma) {
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+            return;
+        }
+        printf("Constant %d %d\n",opcode0,constant);
 
-	/** Don't allow conditional call in rcmX000 */
-	if (opcode0==205 && rcmX000)
-	{
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	    return;
-	}
-	
-	*codeptr++ = opcode + constant * 8;	/* get instruction opcode */
-	if (GetSym () == comma)
-	    GetSym ();
-	else
-	{
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	    return;
-	}
+        if (opcode0==205 && rcmX000)
+        {
+            static char buffer[200];
+            extern char *ident;
+
+#if 0
+            if ( constant >= 4 ) 
+            {
+                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                return;
+            }
+#endif
+
+            switch ( constant ) {
+            case 0:  /* nz */
+                *codeptr++ =  0x28;  /* jr z */
+                *codeptr++ = 0x03;
+                *codeptr++ = opcode0;           
+                PC += 2;
+                break;
+            case 1:  /* z */
+                *codeptr++ = 0x20;  /* jr nz */
+                *codeptr++ = 0x03;
+                *codeptr++ = opcode0;           
+                PC += 2;
+                break;
+            case 2:  /* nc */
+                *codeptr++ = 0x38;  /* jr c */
+                *codeptr++ = 0x03;
+                *codeptr++ = opcode0;           
+                PC += 2;
+                break;
+            case 3:  /* c */
+                *codeptr++ = 0x30;  /* jr nc */
+                *codeptr++ = 0x03;
+                *codeptr++ = opcode0;           
+                PC += 2;
+                break;
+            case 4:  /* po */
+                *codeptr++ =  0xea; /* jp pe */
+                sprintf(buffer,"ASMPC+6\n");
+                SetTemporaryLine(buffer);
+                GetSym();
+                ExprAddress (1);
+                EOL = OFF;
+                *codeptr++ = 205;
+                PC += 3;
+                break;
+            case 5:  /* pe */
+                *codeptr++ = 0xe2; /* jp po */
+                sprintf(buffer,"ASMPC+6\n");
+                SetTemporaryLine(buffer);
+                GetSym();
+                ExprAddress (1);
+                EOL = OFF;
+                *codeptr++ = 205;
+                PC += 3;
+                break;
+            case 6:  /* p */
+                *codeptr++ =  0xfa; /* jp m */
+                sprintf(buffer,"ASMPC+6\n");
+                SetTemporaryLine(buffer);
+                GetSym();
+                ExprAddress (1);
+                EOL = OFF;
+                *codeptr++ = 205;
+                PC += 3;
+                break;
+            case 7:  /* m */
+                *codeptr++ = 0xf2; /* jp p */
+                sprintf(buffer,"ASMPC+6\n");
+                SetTemporaryLine(buffer);
+                GetSym();
+                ExprAddress (1);
+                EOL = OFF;
+                *codeptr++ = 205;
+                PC += 3;
+                break;
+            }
+        } else {
+            *codeptr++ = opcode + constant * 8;	/* get instruction opcode */
+        }
+        GetSym();
+    } else {
+        *codeptr++ = opcode0;	/* JP nn, CALL nn */
     }
-  else
-    *codeptr++ = opcode0;	/* JP nn, CALL nn */
-
-  ExprAddress (1);
-  PC += 3;
+    ExprAddress (1);
+    PC += 3;
 }
 
 

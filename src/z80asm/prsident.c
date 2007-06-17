@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.7 2007-02-28 11:23:24 stefano Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.8 2007-06-17 12:07:43 dom Exp $ */
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -116,7 +116,7 @@ void DeclLibIdent (void), DeclGlobalLibIdent (void);
 void IFstat (void), ELSEstat (void), ENDIFstat (void);
 void DeclModule (void);
 void LINE (void);
-
+void SetTemporaryLine(char *line);
 
 /* global variables */
 extern FILE *z80asmfile;
@@ -241,7 +241,7 @@ struct Z80sym Z80ident[] = {
  {"XREF", DeclExternIdent}
 };
 
-size_t totalz80id = 98;
+size_t totalz80id = sizeof(Z80ident) / sizeof(Z80ident[0]);
 
 
 int 
@@ -337,7 +337,6 @@ void LINE(void)
 
 
 
-
 /* dummy function - not used */
 void 
 IFstat (void)
@@ -428,20 +427,22 @@ DeclExternIdent (void)
 void 
 DeclLibIdent (void)
 {
-  do
-    {
-      if (GetSym () == name)
-	DeclSymExtern (ident, SYMDEF);	/* Define symbol as extern LIB reference */
-      else
-	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	  return;
-	}
-    }
-  while (GetSym () == comma);
 
-  if (sym != newline)
-    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+    do
+    {
+        if (GetSym () == name) {
+            DeclSymExtern (ident, SYMDEF);	/* Define symbol as extern LIB reference */
+        }
+        else
+        {
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+            return;
+        }
+    }
+    while (GetSym () == comma);
+
+    if (sym != newline)
+        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
 }
 
 
@@ -523,8 +524,8 @@ CPI (void)
 {
     if (rcmX000)
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      SetTemporaryLine("\ncall rcmx_cpi\n");
+      return;
     }
 
   *codeptr++ = 237;
@@ -539,8 +540,8 @@ CPIR (void)
 {
     if (rcmX000)
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      SetTemporaryLine("\ncall rcmx_cpir\n");
+      return;
     }
 
   *codeptr++ = 237;
@@ -555,6 +556,7 @@ CPD (void)
 {
     if (rcmX000)
     {
+      SetTemporaryLine("\ncall rcmx_cpd\n");
 	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
 	return;
     }
@@ -569,11 +571,11 @@ CPD (void)
 void 
 CPDR (void)
 {
-    if (rcmX000)
-    {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
-    }
+  if (rcmX000)
+  {
+      SetTemporaryLine("\ncall rcmx_cpdr\n");
+      return;
+  }
 
   *codeptr++ = 237;
   *codeptr++ = 185;
@@ -965,7 +967,7 @@ RLD (void)
 {
     if (rcmX000)
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      SetTemporaryLine("\ncall rcmx_rld\n");
 	return;
     }
 
@@ -981,7 +983,7 @@ RRD (void)
 {
     if (rcmX000)
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      SetTemporaryLine("\ncall rcmx_rrd\n");
 	return;
     }
 

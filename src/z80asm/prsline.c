@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.9 2007-02-28 11:23:24 stefano Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.10 2007-06-17 12:07:43 dom Exp $ */
 /* $History: PRSLINE.C $ */
 /*  */
 /* *****************  Version 8  ***************** */
@@ -73,6 +73,27 @@ extern enum flag EOL, swapIXIY;
 
 enum flag rcmX000;
 
+char  *temporary_start;
+char  *temporary_ptr = NULL;
+
+
+void UnGet(int c, FILE *fp)
+{
+    if ( temporary_ptr ) {
+        temporary_ptr--;
+    } else {
+        ungetc(c,fp);
+    }
+}
+
+
+
+
+void 
+SetTemporaryLine(char *line)
+{
+    temporary_start = temporary_ptr = line;
+}
 
 /* get a character from file with CR/LF/CRLF parsing capability.
  *
@@ -83,6 +104,15 @@ int
 GetChar (FILE *fptr)
 {
   int c;
+
+  if ( temporary_ptr != NULL ) {
+      if ( *temporary_ptr != 0 ) {
+          c = *temporary_ptr++;
+          return c;
+      } 
+      temporary_ptr = NULL;
+  }
+      
   
   c = fgetc (fptr);
   if (c == 13)
@@ -217,7 +247,7 @@ GetSym (void)
 	      else
 		{
 		  if ( c != ':' ) 
-		  	ungetc (c, z80asmfile);	/* puch character back into stream for next read */
+		  	UnGet (c, z80asmfile);	/* puch character back into stream for next read */
 		  else 
 			sym = label;
 		  break;
@@ -243,7 +273,7 @@ GetSym (void)
 		}
 	      else
 		{
-		  ungetc (c, z80asmfile);	/* puch character back into stream for next read */
+		  UnGet (c, z80asmfile);	/* puch character back into stream for next read */
 		  break;
 		}
 	    }
@@ -252,6 +282,7 @@ GetSym (void)
     }
 
   ident[chcount] = '\0';
+
   return sym;
 }
 

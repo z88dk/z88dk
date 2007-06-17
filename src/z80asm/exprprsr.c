@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.2 2003-10-11 15:41:04 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.3 2007-06-17 12:07:43 dom Exp $ */
 /* $History: EXPRPRSR.C $ */
 /*  */
 /* *****************  Version 15  ***************** */
@@ -426,7 +426,7 @@ ParseNumExpr (void)
       pfixhdr->infixexpr = NULL;
       pfixhdr->infixptr = NULL;
 
-      if ((pfixhdr->infixexpr = (char *) malloc (sizeof (char) * 128)) == NULL)
+      if ((pfixhdr->infixexpr = (char *) calloc (128,sizeof (char))) == NULL)
 	{
 	  ReportError (NULL, 0, 3);
 	  free (pfixhdr);
