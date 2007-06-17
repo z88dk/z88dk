@@ -12,12 +12,6 @@ ctype/isxdigit
 ctype/toascii
 ctype/tolower
 ctype/toupper
-rcmx000/rcmx_cpd
-rcmx000/rcmx_cpdr
-rcmx000/rcmx_cpi
-rcmx000/rcmx_cpir
-rcmx000/rcmx_rld
-rcmx000/rcmx_rrd
 stdio/closeall
 stdio/8080/fchkstd
 stdio/8080/fclose
@@ -166,3 +160,9 @@ printflike/fscanf
 printflike/vfscanf
 printflike/vsscanf
 printflike/ltoa_any
+z80_crt0s/z80_emu/rcmx_cpd
+z80_crt0s/z80_emu/rcmx_cpdr
+z80_crt0s/z80_emu/rcmx_cpi
+z80_crt0s/z80_emu/rcmx_cpir
+z80_crt0s/z80_emu/rcmx_rld
+z80_crt0s/z80_emu/rcmx_rrd
