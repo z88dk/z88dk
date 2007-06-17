@@ -1129,3 +1129,13 @@
 	pop	de
 	ld	a,l
 	ld	(de),a
+
+	ld	de,0
+	call	ufloat
+	ld	hl,%1
+	call	dpush
+=
+	ld	hl,%1
+	ld	de,0
+	call	ufloat
+	call	dpush
