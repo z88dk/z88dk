@@ -1,7 +1,7 @@
 /*
  *      Grundy Newbrain specific functions
  *
- *      $Id: newbrain.h,v 1.7 2007-06-08 15:15:21 stefano Exp $
+ *      $Id: newbrain.h,v 1.8 2007-06-19 09:20:49 stefano Exp $
  */
 
 #ifndef __NEWBRAIN_H__
@@ -101,6 +101,7 @@ struct NB_DRIVER {
 
 /* device driver codes */
 
+#define DEV_TVIO     0       /* screen editor, I/O                  */
 #define DEV_TP1IO    1       /* primary tape device                 */
 #define DEV_TP2IO    2       /* secondary tape device               */
 #define DEV_LIIO     3       /* VF display, (LCD)              "16" */
@@ -134,16 +135,32 @@ struct NB_DRIVER {
 #define NB_ERR_STROPN   108     /* Error code: stream already open     */
 #define NB_ERR_REQERR   109     /* Error code: illegal request code    */
                                 /* i.e. attempt to read following an "open out" */
-#define NB_ERR_PARAMETER        110     /* Syntax error in parameter string */
 
-//#define NB_ERR_       114     /*  */
+#define NB_ERR_PARAMETER        110     /* Syntax error in parameter string     */
+#define NB_ERR_NOPOWER          111     /* Device without mains power connected */
+#define NB_ERR_STREAM_CLOSED    115     /* Linked stream has been closed        */
+
+
+/* GRAPHICS and screen device control errors */
+
+#define NB_ERR_FILLMEM          112     /* Insufficient memory for FILL request */
+#define NB_ERR_NOSCREEN         113     /* Linked stream is not a screen device */
+#define NB_ERR_HEIGHT           114     /* No memory space for requested height */
+#define NB_ERR_SCREEN_POS       116     /* Screen position illegal in context   */
+#define NB_ERR_GRAPH_COMMAND    117     /* Invalid graph command or PEN parm.   */
+#define NB_ERR_GRAPH_INPUT      118     /* Cannot input from graph dev. Use PEN */
+#define NB_ERR_GRAPH_OUTPUT     119     /* Cannot output to graph while reading */
 
 
 /* TAPE IO ERRORS  */
 
-#define NB_ERR_TAPE_HARDWARE    130     /* Error code: cassette hardware error */
-#define NB_ERR_TAPE_LENGTH      131     /* Error code: data block in tape too long for buffer */
-#define NB_ERR_TAPE_CHECKSUM    132     /* Error code: cassette checksum error */
+#define NB_ERR_TAPE_HARDWARE    130     /* Cassette hardware error */
+#define NB_ERR_TAPE_LENGTH      131     /* Data block in tape too long for buffer */
+#define NB_ERR_TAPE_CHECKSUM    132     /* Cassette checksum error */
+#define NB_ERR_TAPE_EOF         133     /* End of file or hardware failure */
+#define NB_ERR_TAPE_SEQUENCE    134     /* Data out of sequence or hardware failure */
+#define NB_ERR_TAPE_MODE        135     /* Reading on a 'write' channel or vice versa */
+#define NB_ERR_TAPE_SYNTAX      136     /* Syntax error in parameter string */
 
 /* DISCIO ERRORS (normally for devices 12, 13, 14 or 15) */
 
@@ -165,9 +182,11 @@ struct NB_DRIVER {
 #define NB_ERR_SMDD_HLM         197     /* attempt to read past High Level Mark */
 #define NB_ERR_SMDD_SAMEDIR     198     /* attempt to open 2nd directory with same name as an active one */
 
-/* ACIA drivers ERRORS */
+/* JGIO - ACIA drivers ERRORS */
 
 #define NB_ERR_ACIA_SYNTAX      120     /* Syntax error in parameter string */
+#define NB_ERR_ACIA_PORT        121     /* Port number different than zero for serial dev. */
+#define NB_ERR_ACIA_TIMEOUT     200     /* Time out on serial input port */
 
 #define NB_ERR_ACIA_BUFFER      206     /* ACIA buffer not available */
 #define NB_ERR_ACIA_BUSY        207     /* ACIA or buffer already in use */

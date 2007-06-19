@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.9 2007-06-02 23:26:03 dom Exp $
+ *   $Id: appmake.h,v 1.10 2007-06-19 09:20:50 stefano Exp $
  */
 
 
@@ -181,7 +181,7 @@ struct {
       zx81_exec,    &zx81_options },
 
 };
-#define APPMAKE_TARGETS 23
+#define APPMAKE_TARGETS 25
 #endif
 
 
