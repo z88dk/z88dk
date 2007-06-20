@@ -5,7 +5,7 @@
  *
  *      djm 9/1/2000
  *
- *	$Id: time.h,v 1.8 2003-06-20 15:26:04 dom Exp $
+ *	$Id: time.h,v 1.9 2007-06-20 09:01:51 stefano Exp $
  */
 
 
@@ -13,6 +13,10 @@
 #define __TIME_H__
 
 #include <sys/types.h>
+
+#ifdef __NEWBRAIN__
+#define CLOCKS_PER_SEC 50
+#endif
 
 #ifdef __SPECTRUM__
 #define CLOCKS_PER_SEC 50
