@@ -253,9 +253,11 @@ games/bit_synth
 games/bit_frequency
 games/bit_beep
 games/spectrum/beeper
-spectrum/attr
-spectrum/attr_callee
-spectrum/border
+spectrum/zx_attr
+spectrum/zx_attr_callee
+spectrum/zx_border
+spectrum/zx_screenstr
+spectrum/zx_screenstr_callee
 spectrum/currah_detect
 spectrum/currah_direct
 spectrum/currah_speech

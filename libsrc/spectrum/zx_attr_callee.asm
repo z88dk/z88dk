@@ -1,13 +1,13 @@
-; uint __CALLEE__ attr_callee(uchar row, uchar col)
+; uint __CALLEE__ zx_attr_callee(uchar row, uchar col)
 ; aralbrec 06.2007
 
-XLIB attr_callee
-XDEF ASMDISP_ATTR_CALLEE
+XLIB zx_attr_callee
+XDEF ASMDISP_ZX_ATTR_CALLEE
 
 LIB zx_cyx2aaddr_callee
 XREF ASMDISP_ZX_CYX2AADDR_CALLEE
 
-.attr_callee
+.zx_attr_callee
 
    pop hl
    pop de
@@ -26,4 +26,4 @@ XREF ASMDISP_ZX_CYX2AADDR_CALLEE
    
    ret
 
-DEFC ASMDISP_ATTR_CALLEE = asmentry - attr_callee
+DEFC ASMDISP_ZX_ATTR_CALLEE = asmentry - zx_attr_callee
