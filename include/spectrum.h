@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.19 2007-06-15 21:59:19 aralbrec Exp $
+ * $Id: spectrum.h,v 1.20 2007-06-23 07:01:10 aralbrec Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -283,15 +283,15 @@ extern void __LIB__ __CALLEE__  in_MouseKempSetPos_callee(uint xcoord, uint ycoo
 // DISPLAY FILE FUNCTIONS
 //////////////////////////
 
-extern void  __LIB__ __FASTCALL__ border(uchar colour);
-extern uint  __LIB__              attr(uchar row, uchar col);
-extern uint  __LIB__              screenstr(uchar row, uchar col);
+extern void  __LIB__ __FASTCALL__ zx_border(uchar colour);
+extern uint  __LIB__              zx_attr(uchar row, uchar col);
+extern uint  __LIB__              zx_screenstr(uchar row, uchar col);
 
-extern uint  __LIB__ __CALLEE__   attr_callee(uchar row, uchar col);
-extern uint  __LIB__ __CALLEE__   screenstr_callee(uchar row, uchar col);
+extern uint  __LIB__ __CALLEE__   zx_attr_callee(uchar row, uchar col);
+extern uint  __LIB__ __CALLEE__   zx_screenstr_callee(uchar row, uchar col);
 
-#define attr(a,b)                 attr_callee(a,b)
-#define screenstr(a,b)            screenstr_callee(a,b)
+#define zx_attr(a,b)              zx_attr_callee(a,b)
+#define zx_screenstr(a,b)         zx_screenstr_callee(a,b)
 
 // In the following, screen address refers to a pixel address within the display file while
 // attribute address refers to the attributes area.
