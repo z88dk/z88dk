@@ -4,6 +4,7 @@
 
 
 destdir=$1
+default=$2
 
 
 rm -f lib/config/*.cfg
@@ -12,6 +13,6 @@ for file in `ls lib/config/*.lnx`; do
    sed "s?DESTDIR\/?$destdir?g" < $file > $dest
 done
 
-if [ x$DEFAULT != x ]; then
-   cp lib/config/$DEFAULT.cfg lib/config/zcc.cfg
+if [ x$default != x ]; then
+   cp lib/config/${default}.cfg lib/config/zcc.cfg
 fi
