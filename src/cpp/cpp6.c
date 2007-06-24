@@ -514,7 +514,7 @@ int	c;				/* First character of token	*/
 	register int		nhash;
 	register DEFBUF		*dp;
 	register char		*np;
-	int			temp;
+	int			temp = 0;
 	int			isrecurse;	/* For #define foo foo	*/
 
 	np = token;
