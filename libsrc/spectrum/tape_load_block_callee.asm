@@ -8,6 +8,7 @@
 
 XLIB tape_load_block_callee
 XDEF ASMDISP_TAPE_LOAD_BLOCK_CALLEE
+XREF call_rom3
 
 .tape_load_block_callee
 
@@ -25,7 +26,8 @@ XDEF ASMDISP_TAPE_LOAD_BLOCK_CALLEE
 ;          a = type
 
 	scf
-        call    1366            ;call ROM3 load routine
+        call    call_rom3
+        defw    1366            ;call ROM3 load routine
         ld      hl,-1
 	ret	nc		;error
 	inc	hl		;okay

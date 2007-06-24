@@ -12,12 +12,14 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.4 2003-01-26 14:29:58 dom Exp $
+;	$Id: fputc_cons.asm,v 1.5 2007-06-24 17:14:21 dom Exp $
 ;
 
 
           XLIB  fputc_cons
 
+
+	  XREF  call_rom3
 ;
 ; Entry:        a= char to print
 ;
@@ -216,7 +218,9 @@
 ; We should scroll the screen up one character here
 ; Blanking the bottom row..
 .scrollup
-	jp	3582
+        call    call_rom3
+	defw	3582
+        ret
 
 ; This nastily inefficient table is the code table for the routines
 ; Done this way for future! Expansion

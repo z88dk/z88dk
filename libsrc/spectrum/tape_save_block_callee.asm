@@ -7,6 +7,7 @@
 
 XLIB tape_save_block_callee
 XDEF ASMDISP_TAPE_SAVE_BLOCK_CALLEE
+XREF call_rom3
 
 .tape_save_block_callee
 
@@ -28,7 +29,8 @@ XDEF ASMDISP_TAPE_SAVE_BLOCK_CALLEE
         ld      hl,saveblock1
         push    hl
         ld      (23613),sp
-        call    1218            ;call ROM3 routine
+        call    call_rom3
+        defw	1218            ;call ROM3 routine
         pop     hl              ;successfull dump the random value
         ld      hl,0
         
