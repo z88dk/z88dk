@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.5 2002-04-17 21:14:27 dom Exp $
+ *      $Id: callfunc.c,v 1.6 2007-06-24 14:43:45 dom Exp $
  */
 
 /*
@@ -38,142 +38,142 @@ extern int smartprintf;
 
 void callfunction(SYMBOL *ptr)
 {
-        int nargs, vconst, val,expr,argnumber ;
-        int watcharg;   /* For watching printf etc */
-        unsigned char minifunc;  /* Call cut down version */
-        unsigned char protoarg;
+    int nargs, vconst, val,expr,argnumber ;
+    int watcharg;   /* For watching printf etc */
+    unsigned char minifunc;  /* Call cut down version */
+    unsigned char protoarg;
 	char preserve;	/* Preserve af when cleaningup */
 
-        nargs=0;
-        preserve=argnumber=0;
-        watcharg=minifunc=0;
-        blanks();       /* already saw open paren */
+    nargs=0;
+    preserve=argnumber=0;
+    watcharg=minifunc=0;
+    blanks();       /* already saw open paren */
 /*
  * djm, another fabulous kludge!!
  * we don't check return types or anything..beautiful!!
  */
 
-        if (ptr && (strcmp(ptr->name,"asm")==0) ) {
+    if (ptr && (strcmp(ptr->name,"asm")==0) ) {
 /* We're calling asm("code") */
-                doasmfunc(NO);
-                return;
-        }
+        doasmfunc(NO);
+        return;
+    }
 
-        if (ptr && smartprintf)
-                watcharg=SetWatch(ptr->name);
+    if (ptr && smartprintf)
+        watcharg=SetWatch(ptr->name);
 
-        while ( ch() != ')' ) {
-                if(endst())break;
-                argnumber++;
-                if ( ptr ) {
-                        /* ordinary call */
-                        expr=expression(&vconst, &val);
+    while ( ch() != ')' ) {
+        if(endst())break;
+        argnumber++;
+        if ( ptr ) {
+            /* ordinary call */
+            expr=expression(&vconst, &val);
 			if ( expr == CARRY ) {
 			    zcarryconv();
 			    expr = CINT;
 			}
-                        if (ptr->prototyped && (ptr->prototyped >= argnumber) ) {
-                                protoarg=ptr->args[ptr->prototyped-argnumber+1];
-                                if ( (protoarg!=PELLIPSES) && ( (protoarg != fnargvalue) || ((protoarg&7)==STRUCT) ) ) 
-                                            expr=ForceArgs(protoarg,fnargvalue,expr,ptr->tagarg[ptr->prototyped-argnumber+1]);
-                        }
-                        if ( (ptr->flags&REGCALL) && ptr->prototyped==1 ) {
+            if (ptr->prototyped && (ptr->prototyped >= argnumber) ) {
+                protoarg=ptr->args[ptr->prototyped-argnumber+1];
+                if ( (protoarg!=PELLIPSES) && ( (protoarg != fnargvalue) || ((protoarg&7)==STRUCT) ) ) 
+                    expr=ForceArgs(protoarg,fnargvalue,expr,ptr->tagarg[ptr->prototyped-argnumber+1]);
+            }
+            if ( (ptr->flags&REGCALL) && ptr->prototyped==1 ) {
 /* fastcall of single expression */
 
-                        } else {
-                              if (argnumber==watcharg) {
-                                if (ptr) debug(DBG_ARG1,"Caughtarg!! %s",litq+val+1);
-                                        minifunc=SetMiniFunc(litq+val+1);
+            } else {
+                if (argnumber==watcharg) {
+                    if (ptr) debug(DBG_ARG1,"Caughtarg!! %s",litq+val+1);
+                    minifunc=SetMiniFunc(litq+val+1);
 
-                              }
-                              if (expr==DOUBLE) {
-                                  dpush();
-                                  nargs += 6;
-                              }
-/* Longs and (ahem) long pointers! */
-                                else if (expr == LONG || expr == CPTR || (expr==POINTER && lpointer)) {
-                                        if (!(fnflags&FARPTR) && expr != LONG ) const2(0);
-                                        lpush();
-
-                                        nargs += 4;
-                                } else {
-                                        zpush();
-                                        nargs += 2;
-                                }
-                        }
                 }
-                else { /* call to address in HL */
+                if (expr==DOUBLE) {
+                    dpush();
+                    nargs += 6;
+                }
+/* Longs and (ahem) long pointers! */
+                else if (expr == LONG || expr == CPTR || (expr==POINTER && lpointer)) {
+                    if (!(fnflags&FARPTR) && expr != LONG ) const2(0);
+                    lpush();
+
+                    nargs += 4;
+                } else {
+                    zpush();
+                    nargs += 2;
+                }
+            }
+        }
+        else { /* call to address in HL */
 /*
  * What do you do about longs also long pointers, need to push under
  * stack...hmmmmm: parse for LONG & CPTR push onto stk
  * then check if doubles...should work.
  */
 
-                        zpush();        /* Push address */
-                        expr=expression(&vconst, &val);
+            zpush();        /* Push address */
+            expr=expression(&vconst, &val);
 			if ( expr == CARRY ) {
 			    zcarryconv();
 			    expr = CINT;
 			}
-                        if (expr == LONG || expr == CPTR || (expr==POINTER && lpointer) ) {
+            if (expr == LONG || expr == CPTR || (expr==POINTER && lpointer) ) {
 			    swap();       /* MSW -> hl */
 			    swapstk();    /* MSW -> stack, addr -> hl */
 			    zpushde();    /* LSW -> stack, addr = hl */	
 			    nargs += 4;                             
-                        }
-                        else if (expr==DOUBLE) {
-                                dpush2();
-                                nargs += 6;
+            }
+            else if (expr==DOUBLE) {
+                dpush2();
+                nargs += 6;
 				swapstk();
-                        }
-                        else {
-                                nargs += 2;
-				swapstk();
-                        }
+            } else {
+                /* If we've only got one 2 byte argment, don't swap the stack */
+                if ( rcmatch(',') || nargs != 0 ) {
+                    swapstk();
                 }
-                if (cmatch(',')==0) break;
+                nargs += 2;
+            }
         }
-        needchar(')');
+        if (cmatch(',')==0) break;
+    }
+    needchar(')');
 
-        if (ptr) debug(DBG_ARG2,"arg %d proto %d",argnumber,ptr->args[1]);
+    if (ptr) debug(DBG_ARG2,"arg %d proto %d",argnumber,ptr->args[1]);
 
-        if (ptr && ( ptr->prototyped != 0 )) {
-                if ( (ptr->prototyped > argnumber) && (ptr->args[1]!=PVOID)  && (ptr->args[1] !=PELLIPSES) ) {
-                        warning(W_2FAFUNC);
-                } else if ( (ptr->prototyped < argnumber)  && (ptr->args[1]!=PELLIPSES)) {
-                        warning(W_2MAFUNC);
-                }
+    if (ptr && ( ptr->prototyped != 0 )) {
+        if ( (ptr->prototyped > argnumber) && (ptr->args[1]!=PVOID)  && (ptr->args[1] !=PELLIPSES) ) {
+            warning(W_2FAFUNC);
+        } else if ( (ptr->prototyped < argnumber)  && (ptr->args[1]!=PELLIPSES)) {
+            warning(W_2MAFUNC);
         }
+    }
 
-        if ( ptr ) {
-/* Check to see if we have a variable number of arguments */
-                if ( (ptr->prototyped) && ptr->args[1]==PELLIPSES ) {
-                        loadargc(nargs) ;
-                }
-/* Watcharg for printf and the ilk, we know that it's a lib function
- * so skip this rubbish about prefix..
- */
-                if (watcharg || (ptr->flags&SHARED) || (ptr->flags&SHAREDC) ) {
+    if ( ptr ) {
+        /* Check to see if we have a variable number of arguments */
+        if ( (ptr->prototyped) && ptr->args[1]==PELLIPSES ) {
+            loadargc(nargs) ;
+        }
+        /* Watch arguments */
+        if (watcharg || (ptr->flags&SHARED) || (ptr->flags&SHAREDC) ) {
 			if ( (ptr->flags&SHARED) || (ptr->flags&SHAREDC)) preserve=YES;
 			if (ptr->flags&SHAREDC) zclibcallop();
-                        else zcallop();
-                        switch(minifunc) {
-				case 1:
-/* Mini function */
-                               // outstr("mini");
-                                	break;
-                              	case 3:
-/* Fp function */
-                                	warning(W_FLTPRINTF);
-                        }
+            else zcallop();
+            switch(minifunc) {
+            case 1:
+                /* Mini function */
+                break;
+            case 3:
+                /* Fp function */
+                warning(W_FLTPRINTF);
+            }
 			if (minifunc > printflevel) printflevel=minifunc;
-                        outname(ptr->name,dopref(ptr));
-                        if ( (ptr->flags&SHARED) && useshare ) outstr("_sl");
+            outname(ptr->name,dopref(ptr));
+            if ( (ptr->flags&SHARED) && useshare ) outstr("_sl");
 			else if (ptr->flags&SHAREDC) outstr("_rst");
-                        nl();
-                } else  zcall(ptr) ;
-        }
-        else callstk(nargs);
+            nl();
+        } else  zcall(ptr) ;
+    } else {      
+        callstk(nargs);
+    }
 /*
  *	Modify the stack after a function call
  *
@@ -193,7 +193,7 @@ void callfunction(SYMBOL *ptr)
 			Zsp+=nargs;
 		} else
 #endif
-                	Zsp=modstk(Zsp+nargs,YES,preserve);      /* clean up arguments - we know what type is MOOK */
+            Zsp=modstk(Zsp+nargs,YES,preserve);      /* clean up arguments - we know what type is MOOK */
 	}
 }
 

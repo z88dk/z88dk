@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.17 2002-11-02 20:17:15 dom Exp $
+ *      $Id: primary.c,v 1.18 2007-06-24 14:43:45 dom Exp $
  */
 
 
@@ -14,16 +14,16 @@
 
 int primary(LVALUE *lval)
 {
-        char sname[NAMESIZE] ;
-        SYMBOL *ptr ;
-        int k,level ;
-        char cid,vtype,cflags,clevel;
-        TAG_SYMBOL *cotag;
+    char sname[NAMESIZE] ;
+    SYMBOL *ptr ;
+    int k,level ;
+    char cid,vtype,cflags,clevel;
+    TAG_SYMBOL *cotag;
 
-        if ( cmatch('(') ) {
+    if ( cmatch('(') ) {
 		lval->level++;
-                do k=heir1(lval); while (cmatch(',')) ;
-                needchar(')');
+        do k=heir1(lval); while (cmatch(',')) ;
+        needchar(')');
 		/* Not sure about doing this here..but here goes nowt!*/
 		if (lval->c_vtype) {
 		    docast(lval,YES);
@@ -32,136 +32,136 @@ int primary(LVALUE *lval)
 		if (lval->c_vtype) {
 		    docast(lval,YES);
 		}
-                return k;
-        }
-        /* clear lval array - djm second arg was lval.. now cast, clears lval */
-        cid=lval->c_id;
-        vtype=lval->c_vtype;
-        cflags=lval->c_flags;
-        cotag=lval->c_tag;
+        return k;
+    }
+    /* clear lval array - djm second arg was lval.. now cast, clears lval */
+    cid=lval->c_id;
+    vtype=lval->c_vtype;
+    cflags=lval->c_flags;
+    cotag=lval->c_tag;
 	level=lval->level;
 	clevel=lval->castlevel;
 	memset(lval,0,sizeof(LVALUE));
-        lval->c_id=cid;
-        lval->c_vtype=vtype;
-        lval->c_flags=cflags;
-        lval->c_tag=cotag;
+    lval->c_id=cid;
+    lval->c_vtype=vtype;
+    lval->c_flags=cflags;
+    lval->c_tag=cotag;
 	lval->level=level;
 	lval->castlevel = clevel;
 
-        if ( symname(sname) ) {
-                if ( strcmp(sname, "sizeof") == 0 ) {
-                        size_of(lval) ;
-                        return(0) ;
-                }
-                else if ( (ptr=findloc(sname)) && ptr->ident !=GOTOLABEL ) {
+    if ( symname(sname) ) {
+        if ( strcmp(sname, "sizeof") == 0 ) {
+            size_of(lval) ;
+            return(0) ;
+        }
+        else if ( (ptr=findloc(sname)) && ptr->ident !=GOTOLABEL ) {
 
-                        lval->offset=getloc(ptr, 0);
-                        lval->symbol = ptr;
-                        lval->val_type = lval->indirect = ptr->type;
-                        lval->flags = ptr->flags;
-                        lval->ident = ptr->ident;
+            lval->offset=getloc(ptr, 0);
+            lval->symbol = ptr;
+            lval->val_type = lval->indirect = ptr->type;
+            lval->flags = ptr->flags;
+            lval->ident = ptr->ident;
 			lval->storage = ptr->storage;
-                        lval->ptr_type=0;
-                        ltype=ptr->type;
-                        if ( ptr->type == STRUCT )
-                                lval->tagsym = tagtab + ptr->tag_idx ;
-                        if ( ptr->ident == POINTER ) {
-                                lval->ptr_type = ptr->type;
+            lval->ptr_type=0;
+            ltype=ptr->type;
+            if ( ptr->type == STRUCT )
+                lval->tagsym = tagtab + ptr->tag_idx ;
+            if ( ptr->ident == POINTER ) {
+                lval->ptr_type = ptr->type;
 /* djm long pointers */
-                                lval->indirect=lval->val_type = (ptr->flags&FARPTR ? CPTR : CINT);
-                                ltype=lval->indirect;
-                        }
-                        if ( ptr->ident == ARRAY ||
-                                                (ptr->ident == VARIABLE && ptr->type == STRUCT) ) {
-                                /* djm pointer? */
-                                lval->ptr_type = ptr->type ;
-                                lval->val_type = (ptr->flags&FARPTR ? CPTR : CINT );
-                                return(0) ;
-                        }
-                        else return(1);
-                }
+                lval->indirect=lval->val_type = (ptr->flags&FARPTR ? CPTR : CINT);
+                ltype=lval->indirect;
+            }
+            if ( ptr->ident == ARRAY ||
+                 (ptr->ident == VARIABLE && ptr->type == STRUCT) ) {
+                /* djm pointer? */
+                lval->ptr_type = ptr->type ;
+                lval->val_type = (ptr->flags&FARPTR ? CPTR : CINT );
+                return(0) ;
+            }
+            else return(1);
+        }
 /* djm search for local statics */
-                ptr=findstc(sname);
-                if (!ptr) ptr=findglb(sname);
-                if ( ptr ) {
-                        if ( ptr->ident != FUNCTION && ptr->ident !=FUNCTIONP ) {
-                                if (ptr->ident==ENUM )
-                                        error(E_UNSYMB,sname);
-                                if (ptr->type==ENUM) {
-                                        lval->symbol = NULL_SYM ;
-                                        lval->indirect = 0 ;
-                                        lval->is_const = 1;
-                                        lval->const_val=ptr->size;
-                                        lval->flags=0;
-                                        lval->ident = VARIABLE;
-                                        return(0) ;
-                                }
-                                lval->symbol = ptr ;
-                                lval->indirect = 0 ;
-                                lval->val_type = ptr->type ;
-                                lval->flags = ptr->flags ;
-                                lval->ident = ptr->ident;
-                                lval->ptr_type = 0;
-				lval->storage = ptr->storage;
-                                ltype=ptr->type;
-                                if ( ptr->type == STRUCT )
-                                        lval->tagsym = tagtab + ptr->tag_idx ;
-                                if ( ptr->ident != ARRAY &&
-                                                        (ptr->ident != VARIABLE || ptr->type != STRUCT) ) {
-                                        if ( ptr->ident == POINTER ) {
-                                          lval->ptr_type = ptr->type;
-                                          lval->val_type = (ptr->flags&FARPTR ? CPTR : CINT);
-                                          ltype=lval->val_type;
-                                        }
-                                        return(1);
-                                }
-/* Handle arrays... */
-                                address(ptr);
-/* djm sommat here about pointer types? */
-                                lval->indirect = lval->ptr_type = ptr->type ;
-                                lval->val_type = (ptr->flags&FARPTR ? CPTR : CINT);
-                                return(0) ;
-                        } else  {
-                                lval->ident=FUNCTION;
-			}
+        ptr=findstc(sname);
+        if (!ptr) ptr=findglb(sname);
+        if ( ptr ) {
+            if ( ptr->ident != FUNCTION && ptr->ident !=FUNCTIONP ) {
+                if (ptr->ident==ENUM )
+                    error(E_UNSYMB,sname);
+                if (ptr->type==ENUM) {
+                    lval->symbol = NULL_SYM ;
+                    lval->indirect = 0 ;
+                    lval->is_const = 1;
+                    lval->const_val=ptr->size;
+                    lval->flags=0;
+                    lval->ident = VARIABLE;
+                    return(0) ;
                 }
-                else {
+                lval->symbol = ptr ;
+                lval->indirect = 0 ;
+                lval->val_type = ptr->type ;
+                lval->flags = ptr->flags ;
+                lval->ident = ptr->ident;
+                lval->ptr_type = 0;
+				lval->storage = ptr->storage;
+                ltype=ptr->type;
+                if ( ptr->type == STRUCT )
+                    lval->tagsym = tagtab + ptr->tag_idx ;
+                if ( ptr->ident != ARRAY &&
+                     (ptr->ident != VARIABLE || ptr->type != STRUCT) ) {
+                    if ( ptr->ident == POINTER ) {
+                        lval->ptr_type = ptr->type;
+                        lval->val_type = (ptr->flags&FARPTR ? CPTR : CINT);
+                        ltype=lval->val_type;
+                    }
+                    return(1);
+                }
+/* Handle arrays... */
+                address(ptr);
+/* djm sommat here about pointer types? */
+                lval->indirect = lval->ptr_type = ptr->type ;
+                lval->val_type = (ptr->flags&FARPTR ? CPTR : CINT);
+                return(0) ;
+            } else  {
+                lval->ident=FUNCTION;
+			}
+        }
+        else {
 /* Check to see if we have a right bracket, if we don't assume
  * it's a function then we can break an awful lot of code, do it
  * this way and it's safer... we're not GNU after all!
  */
-                        if ( rcmatch('(') ) 
-                                warning(W_FUNC_NO_PROTO);
-                        else {	
-                                error(E_UNSYMB,sname);
+            if ( rcmatch('(') ) 
+                warning(W_FUNC_NO_PROTO);
+            else {	
+                error(E_UNSYMB,sname);
 			}
-                        /* assume it's a function we haven't seen yet */
-                        /* NB value set to 0 */
-                        ptr = addglb(sname,FUNCTION,CINT,0,STATIK,0,0);
-                        ptr->size=0;
-                        ptr->prototyped=0; /* No parameters known */
-                        ptr->args[0]=CalcArgValue(CINT, FUNCTION, 0);
-                }
-                lval->symbol = ptr ;
-                lval->indirect = 0 ;
-                lval->val_type = CINT ;  /* Null function, always int */
-                lval->flags = 0 ;        /* Assume signed, no far */
-                lval->ident=FUNCTION;
-                return(0) ;
+            /* assume it's a function we haven't seen yet */
+            /* NB value set to 0 */
+            ptr = addglb(sname,FUNCTION,CINT,0,STATIK,0,0);
+            ptr->size=0;
+            ptr->prototyped=0; /* No parameters known */
+            ptr->args[0]=CalcArgValue(CINT, FUNCTION, 0);
         }
-        if ( constant(lval) ) {
-                lval->symbol = NULL_SYM ;
-                lval->indirect = 0 ;
-                lval->ident = VARIABLE;
-                return(0) ;
-        }
-        else {
-                error(E_EXPRESSION);
-                vconst(0);
-                junk();
-                return(0);
-        }
+        lval->symbol = ptr ;
+        lval->indirect = 0 ;
+        lval->val_type = CINT ;  /* Null function, always int */
+        lval->flags = 0 ;        /* Assume signed, no far */
+        lval->ident=FUNCTION;
+        return(0) ;
+    }
+    if ( constant(lval) ) {
+        lval->symbol = NULL_SYM ;
+        lval->indirect = 0 ;
+        lval->ident = VARIABLE;
+        return(0) ;
+    }
+    else {
+        error(E_EXPRESSION);
+        vconst(0);
+        junk();
+        return(0);
+    }
 }
 
 /*
@@ -240,37 +240,37 @@ void intcheck(LVALUE *lval, LVALUE *lval2)
 void force(int t1, int t2,char sign1,char sign2,int lconst)
 {
     if ( t2 == CARRY ) {
-	zcarryconv();	
+        zcarryconv();	
     }
 
 
-        if(t1==DOUBLE) {
-                if(t2!=DOUBLE) {
-                        DoDoubConv(t2,sign2);
-                }
+    if(t1==DOUBLE) {
+        if(t2!=DOUBLE) {
+            DoDoubConv(t2,sign2);
         }
-        else {
-           if (t2==DOUBLE ) {
-                convdoub2int();
-                return;
-           }
+    }
+    else {
+        if (t2==DOUBLE ) {
+            convdoub2int();
+            return;
+        }
 
-        }
+    }
 /* t2 =source, t1=dest */
 /* int to long, if signed, do sign, if not ld de,0 */
 /* Check to see if constant or not... */
-        if(t1==LONG) {
-                if (t2!=LONG && (!lconst)) {
-                      if (sign2==NO && sign1==NO && t2 != CARRY) convSint2long();
-                      else convUint2long();
-                }
-                return;
+    if(t1==LONG) {
+        if (t2!=LONG && (!lconst)) {
+            if (sign2==NO && sign1==NO && t2 != CARRY) convSint2long();
+            else convUint2long();
         }
+        return;
+    }
 /* Converting long to int, not needed, if it don't fit tough!! */
 
 /* Converting between pointer types..far and near */
-        if (t1==CPTR && t2==CINT) convUint2long();
-        else if (t2==CPTR && t1==CINT) warning(W_FARNR);
+    if (t1==CPTR && t2==CINT) convUint2long();
+    else if (t2==CPTR && t1==CINT) warning(W_FARNR);
 
 	/* Char conversion */
 	if ( t1 == CCHAR && sign2 == NO && !lconst) {
@@ -736,9 +736,9 @@ void addconst(int val,int opr, char zfar)
 int docast(LVALUE *lval,char df)
 {
 	SYMBOL  *ptr;
-        char    temp_type;
-        int     itag;
-        char    nam[20];
+    char    temp_type;
+    int     itag;
+    char    nam[20];
 
 
 
@@ -746,68 +746,69 @@ int docast(LVALUE *lval,char df)
 	if	(lval->level != lval->castlevel  ) return 0;
 
 
-        if ( lval->c_id == VARIABLE ) {
+    if ( lval->c_id == VARIABLE ) {
 /*
  * Straight forward variable conversion now..
  */
-                if (df) force(lval->c_vtype,lval->val_type,lval->c_flags&UNSIGNED,lval->flags&UNSIGNED,0);
-                lval->val_type=lval->c_vtype;
-                lval->ptr_type=0;
-                lval->ident=VARIABLE;
-                lval->flags= ( (lval->flags&FARACC) | (lval->c_flags&UNSIGNED) );
+        if (df) force(lval->c_vtype,lval->val_type,lval->c_flags&UNSIGNED,lval->flags&UNSIGNED,0);
+        lval->val_type=lval->c_vtype;
+        lval->ptr_type=0;
+        lval->ident=VARIABLE;
+        lval->flags= ( (lval->flags&FARACC) | (lval->c_flags&UNSIGNED) );
 		lval->c_id=0; lval->c_vtype=0; lval->c_flags=0;
-                return(0);
-        } 
+        lval->is_const = 0;
+        return(0);
+    } 
 
-        if  ( lval->c_id == POINTER || lval->c_id==PTR_TO_FN ) {
-                switch(lval->c_vtype) {
-                   case STRUCT:
+    if  ( lval->c_id == POINTER || lval->c_id==PTR_TO_FN ) {
+        switch(lval->c_vtype) {
+        case STRUCT:
 /*
  * Casting a structure - has to be a pointer...
  */
-                        lval->tagsym=lval->c_tag;       /* Copy tag symbol over */
-                        lval->ptr_type=STRUCT;
-                        temp_type=( ( lval->c_flags&FARPTR ) ? CPTR : CINT );
-                        if (df) force(temp_type,lval->val_type,0,0,0);
-                        lval->val_type=temp_type;
-                        lval->flags=( (lval->flags&FARACC) | lval->c_flags );
+            lval->tagsym=lval->c_tag;       /* Copy tag symbol over */
+            lval->ptr_type=STRUCT;
+            temp_type=( ( lval->c_flags&FARPTR ) ? CPTR : CINT );
+            if (df) force(temp_type,lval->val_type,0,0,0);
+            lval->val_type=temp_type;
+            lval->flags=( (lval->flags&FARACC) | lval->c_flags );
 			if (df) {lval->c_id=0; lval->c_vtype=0; lval->c_flags=0;}
-                        return(1);
+            return(1);
 
 /* All other simple pointers.. */
-                  default:
-                  debug(DBG_CAST2,"Converting %d to %d",lval->ptr_type,lval->c_vtype);
-                        lval->ptr_type=lval->c_vtype;
-                        lval->symbol=dummy_sym[(int)lval->c_vtype];
-                        temp_type=( ( lval->c_flags&FARPTR ) ? CPTR : CINT );
-                        if (df) force(temp_type,lval->val_type,0,0,0);
-                        lval->val_type=temp_type;
-                        lval->flags=( (lval->flags&FARACC) | lval->c_flags );
-                        lval->ident=POINTER;
+        default:
+            debug(DBG_CAST2,"Converting %d to %d",lval->ptr_type,lval->c_vtype);
+            lval->ptr_type=lval->c_vtype;
+            lval->symbol=dummy_sym[(int)lval->c_vtype];
+            temp_type=( ( lval->c_flags&FARPTR ) ? CPTR : CINT );
+            if (df) force(temp_type,lval->val_type,0,0,0);
+            lval->val_type=temp_type;
+            lval->flags=( (lval->flags&FARACC) | lval->c_flags );
+            lval->ident=POINTER;
 			if (df) {lval->c_id=0; lval->c_vtype=0; lval->c_flags=0; }
-                        return(1);
-                }
+            return(1);
         }
+    }
 /* Now we deal with pointers to pointers and pointers to functions 
  * returning pointers - to do this, we will define dummy symbols in
  * the local symbol table so that they do what we want them to do!
  */
-        sprintf(nam,"0dptr%d",(int)locptr);
-        temp_type = ( (lval->c_flags&FARPTR) ? CPTR : CINT );
-        itag=0;
-        if ( lval->c_tag) 
+    sprintf(nam,"0dptr%d",(int)locptr);
+    temp_type = ( (lval->c_flags&FARPTR) ? CPTR : CINT );
+    itag=0;
+    if ( lval->c_tag) 
 	    itag=lval->c_tag-tagtab;
 	ptr=lval->symbol;
-        lval->symbol = addloc(nam,POINTER,temp_type,dummy_idx(lval->c_vtype,lval->c_tag),itag);
+    lval->symbol = addloc(nam,POINTER,temp_type,dummy_idx(lval->c_vtype,lval->c_tag),itag);
 	lval->symbol->offset.p=ptr;
-        if (df) 
+    if (df) 
 	    force(temp_type,lval->val_type,0,0,0);
-        lval->val_type=temp_type;
-        lval->flags=( (lval->flags&FARACC) | lval->c_flags );
+    lval->val_type=temp_type;
+    lval->flags=( (lval->flags&FARACC) | lval->c_flags );
 	if (df) {
 	    lval->c_id=0; lval->c_vtype=0; lval->c_flags=0;
 	}
-        return(1);
+    return(1);
 
 }
 

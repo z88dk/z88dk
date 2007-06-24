@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.22 2006-06-18 13:03:13 dom Exp $
+ *      $Id: codegen.c,v 1.23 2007-06-24 14:43:45 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -765,8 +765,24 @@ void zret(void)
  */
 void callstk(int n)
 {
+    if ( n == 2 ) {
+        /* At this point, TOS = function, hl = argument */
+        int  label = getlabel();
+        ol("pop\tde");   /* function */
+        outstr("\tld\tbc,");   /* ret address */
+        printlabel(label);
+        nl();
+        /* Argument in hl, on stack */
+        ol("push\thl");
+        ol("push\tbc");  /* Return address */
+        ol("push\tde");
+        loadargc(n);
+        ol("ret");
+        postlabel(label);
+    } else {
         loadargc(n) ;
         callrts( "l_dcal" ) ;
+    }
 }
 
 void jump0(LVALUE *lval,int label)
