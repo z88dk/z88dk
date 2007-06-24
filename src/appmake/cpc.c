@@ -40,8 +40,6 @@ int cpc_exec(char *target)
 {
     unsigned char header[128];
     char        filename[FILENAME_MAX+1];
-    char        name[11];
-    char        mybuf[20];
     FILE       *fpin, *fpout;
     long        pos;
     int         c;

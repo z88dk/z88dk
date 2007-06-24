@@ -3,13 +3,14 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.10 2007-06-19 09:20:50 stefano Exp $
+ *   $Id: appmake.h,v 1.11 2007-06-24 15:32:04 dom Exp $
  */
 
 
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <time.h>
 #include <string.h>
 #include <stdarg.h>
@@ -19,9 +20,7 @@
 
 typedef enum { OPT_NONE, OPT_BOOL, OPT_INT, OPT_STR } type_t;
 
-#ifndef WIN32
 enum { FALSE = 0, TRUE };
-#endif
 
 typedef struct {
     char     sopt;

@@ -6,7 +6,7 @@
  *
  *        Stefano Bodrato Apr. 2000
  *
- *        $Id: zx81.c,v 1.1 2003-03-13 14:50:30 dom Exp $
+ *        $Id: zx81.c,v 1.2 2007-06-24 15:32:04 dom Exp $
  */
 
 #include "appmake.h"
@@ -28,7 +28,6 @@ option_t zx81_options[] = {
 int zx81_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
-    char        name[11];
     FILE        *fpin, *fpout;
     int        c;
     int        i;

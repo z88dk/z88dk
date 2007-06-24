@@ -4,7 +4,7 @@
  *      This simply adds in the length of the program
  *      
  *      
- *      $Id: z88shell.c,v 1.2 2005-07-10 11:39:33 dom Exp $
+ *      $Id: z88shell.c,v 1.3 2007-06-24 15:32:04 dom Exp $
  */
 
 
@@ -39,8 +39,7 @@ void save_block(long filesize, char *base, char *ext);
  */
 
 int z88shell_exec(char *target)
-{
-    int     pages;          /* size of card in banks */       
+{ 
     FILE    *binfile;        /* Read in bin file */
     long    filesize;
     long    readlen;
@@ -120,6 +119,7 @@ int z88shell_exec(char *target)
 
 
     myexit(0,0);
+	return 0;
 }
 
 void save_block(long filesize, char *base, char *ext)

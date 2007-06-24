@@ -4,7 +4,7 @@
  *    Harold O. Pinheiro - 2006 - pascal
  *    Dominic Morris - 02/06/2007 - rewritten and placed into appmake
  *
- *    $Id: sms.c,v 1.1 2007-06-02 23:01:03 dom Exp $
+ *    $Id: sms.c,v 1.2 2007-06-24 15:32:04 dom Exp $
  *
  *    Figure out what this does exactly!
  */
@@ -36,8 +36,6 @@ option_t sms_options[] = {
 int sms_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
-    char        name[11];
-    char        mybuf[20];
     FILE        *fpin, *fpout;
     int          i;
     unsigned short checksum;

@@ -41,7 +41,7 @@ option_t tixx_options[] = {
 {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
-#if (!defined(__MSDOS__)) && (!defined(__WIN32__))
+#ifndef WIN32
 #define stricmp strcasecmp
 #endif
 
