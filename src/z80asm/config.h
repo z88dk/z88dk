@@ -14,7 +14,9 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
 /* Pick up the default installation path */
+#ifndef WIN32
 #include "../config.h"
+#endif
 
 /* MSDOS definitions: */
 #ifdef MSDOS
