@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.5 2007-06-17 12:07:43 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.6 2007-06-24 14:46:24 dom Exp $ */
 /* $History: Z80INSTR.C $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -625,7 +625,6 @@ Subroutine_addr (int opcode0, int opcode)
             ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
             return;
         }
-        printf("Constant %d %d\n",opcode0,constant);
 
         if (opcode0==205 && rcmX000)
         {
