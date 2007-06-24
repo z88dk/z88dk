@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="z80asm"
-	ProjectGUID="{53E270D6-344C-49AB-94F2-7871479963C1}"
+	Name="copt"
+	ProjectGUID="{96114913-11E4-4A62-A268-46F702C0B025}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -19,7 +19,6 @@
 			OutputDirectory="Debug"
 			IntermediateDirectory="Debug"
 			ConfigurationType="1"
-			UseOfMFC="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -38,9 +37,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/U &quot;MSDOS&quot; /wd4996"
+				AdditionalOptions="/wd4996"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE"
+				AdditionalIncludeDirectories="regex"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;USE_REGEXP"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -113,7 +113,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -133,7 +133,7 @@
 				Name="VCLinkerTool"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -173,15 +173,35 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\avltree.h"
+				RelativePath=".\regex\cclass.h"
 				>
 			</File>
 			<File
-				RelativePath=".\config.h"
+				RelativePath=".\regex\cname.h"
 				>
 			</File>
 			<File
-				RelativePath=".\symbol.h"
+				RelativePath=".\regex\engine.h"
+				>
+			</File>
+			<File
+				RelativePath=".\regex\regcomp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\regex\regerror.h"
+				>
+			</File>
+			<File
+				RelativePath=".\regex\regex.h"
+				>
+			</File>
+			<File
+				RelativePath=".\regex\regex2.h"
+				>
+			</File>
+			<File
+				RelativePath=".\regex\utils.h"
 				>
 			</File>
 		</Filter>
@@ -197,51 +217,23 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\asmdrctv.c"
+				RelativePath=".\copt.c"
 				>
 			</File>
 			<File
-				RelativePath=".\avltree.c"
+				RelativePath=".\regex\regcomp.c"
 				>
 			</File>
 			<File
-				RelativePath=".\exprprsr.c"
+				RelativePath=".\regex\regerror.c"
 				>
 			</File>
 			<File
-				RelativePath=".\hist.c"
+				RelativePath=".\regex\regexec.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ldinstr.c"
-				>
-			</File>
-			<File
-				RelativePath=".\modlink.c"
-				>
-			</File>
-			<File
-				RelativePath=".\prsident.c"
-				>
-			</File>
-			<File
-				RelativePath=".\prsline.c"
-				>
-			</File>
-			<File
-				RelativePath=".\symbols.c"
-				>
-			</File>
-			<File
-				RelativePath=".\z80asm.c"
-				>
-			</File>
-			<File
-				RelativePath=".\z80instr.c"
-				>
-			</File>
-			<File
-				RelativePath=".\z80pass.c"
+				RelativePath=".\regex\regfree.c"
 				>
 			</File>
 		</Filter>

@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="z80asm"
-	ProjectGUID="{53E270D6-344C-49AB-94F2-7871479963C1}"
+	Name="sccz80"
+	ProjectGUID="{F132AE45-BCBF-4B5A-A61A-8816E4A88941}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -19,7 +19,6 @@
 			OutputDirectory="Debug"
 			IntermediateDirectory="Debug"
 			ConfigurationType="1"
-			UseOfMFC="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -38,9 +37,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/U &quot;MSDOS&quot; /wd4996"
+				AdditionalOptions="/wd4996"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -113,7 +112,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -133,7 +132,7 @@
 				Name="VCLinkerTool"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -173,15 +172,95 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\avltree.h"
+				RelativePath=".\callfunc.h"
 				>
 			</File>
 			<File
-				RelativePath=".\config.h"
+				RelativePath=".\ccdefs.h"
 				>
 			</File>
 			<File
-				RelativePath=".\symbol.h"
+				RelativePath=".\codegen.h"
+				>
+			</File>
+			<File
+				RelativePath=".\const.h"
+				>
+			</File>
+			<File
+				RelativePath=".\data.h"
+				>
+			</File>
+			<File
+				RelativePath=".\declfunc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\declinit.h"
+				>
+			</File>
+			<File
+				RelativePath=".\declvar.h"
+				>
+			</File>
+			<File
+				RelativePath=".\define.h"
+				>
+			</File>
+			<File
+				RelativePath=".\error.h"
+				>
+			</File>
+			<File
+				RelativePath=".\expr.h"
+				>
+			</File>
+			<File
+				RelativePath=".\float.h"
+				>
+			</File>
+			<File
+				RelativePath=".\io.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lex.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lvalue.h"
+				>
+			</File>
+			<File
+				RelativePath=".\main.h"
+				>
+			</File>
+			<File
+				RelativePath=".\misc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\plunge.h"
+				>
+			</File>
+			<File
+				RelativePath=".\preproc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\primary.h"
+				>
+			</File>
+			<File
+				RelativePath=".\stmt.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sym.h"
+				>
+			</File>
+			<File
+				RelativePath=".\while.h"
 				>
 			</File>
 		</Filter>
@@ -197,51 +276,87 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\asmdrctv.c"
+				RelativePath=".\callfunc.c"
 				>
 			</File>
 			<File
-				RelativePath=".\avltree.c"
+				RelativePath=".\codegen.c"
 				>
 			</File>
 			<File
-				RelativePath=".\exprprsr.c"
+				RelativePath=".\const.c"
 				>
 			</File>
 			<File
-				RelativePath=".\hist.c"
+				RelativePath=".\data.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ldinstr.c"
+				RelativePath=".\declfunc.c"
 				>
 			</File>
 			<File
-				RelativePath=".\modlink.c"
+				RelativePath=".\declinit.c"
 				>
 			</File>
 			<File
-				RelativePath=".\prsident.c"
+				RelativePath=".\declvar.c"
 				>
 			</File>
 			<File
-				RelativePath=".\prsline.c"
+				RelativePath=".\error.c"
 				>
 			</File>
 			<File
-				RelativePath=".\symbols.c"
+				RelativePath=".\expr.c"
 				>
 			</File>
 			<File
-				RelativePath=".\z80asm.c"
+				RelativePath=".\float.c"
 				>
 			</File>
 			<File
-				RelativePath=".\z80instr.c"
+				RelativePath=".\goto.c"
 				>
 			</File>
 			<File
-				RelativePath=".\z80pass.c"
+				RelativePath=".\io.c"
+				>
+			</File>
+			<File
+				RelativePath=".\lex.c"
+				>
+			</File>
+			<File
+				RelativePath=".\main.c"
+				>
+			</File>
+			<File
+				RelativePath=".\misc.c"
+				>
+			</File>
+			<File
+				RelativePath=".\plunge.c"
+				>
+			</File>
+			<File
+				RelativePath=".\preproc.c"
+				>
+			</File>
+			<File
+				RelativePath=".\primary.c"
+				>
+			</File>
+			<File
+				RelativePath=".\stmt.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sym.c"
+				>
+			</File>
+			<File
+				RelativePath=".\while.c"
 				>
 			</File>
 		</Filter>
