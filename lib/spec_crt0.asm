@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.12 2007-01-17 19:32:50 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.13 2007-06-24 17:08:41 dom Exp $
 ;
 
 
@@ -38,6 +38,8 @@
 	XDEF	coords		;Current xy position
 
 	XDEF	snd_tick	;Sound variable
+
+        XDEF    call_rom3	;Interposer
 
 ;--------
 ; Set an origin for the application (-zorg=) default to 32768
@@ -294,6 +296,20 @@ IF 0
 	ret
 ENDIF
 
+; Call a routine in the spectrum ROM
+; The routine to call is stored in the two bytes following
+.call_rom3
+	exx			 ; Use alternate registers
+        ex      (sp),hl          ; get return address
+        ld      c,(hl)
+        inc     hl
+        ld      b,(hl)           ; BC=BASIC address
+        inc     hl
+        ex      (sp),hl          ; restore return address
+        push    bc
+	exx			 ; Back to the regular set
+	ret
+	
 
 ;-----------
 ; Now some variables

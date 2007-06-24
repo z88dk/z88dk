@@ -1,0 +1,145 @@
+; Defines for calling ResiDOS from BASIC
+
+	defc	RST_HOOK=$08
+	defc	HOOK_VERSION=$fc
+	defc	HOOK_PACKAGE=$fb
+
+; Hook codes that may be handled by packages
+
+	defc	HOOK_SAVE=$ef
+	defc	HOOK_LOAD=$ee
+
+; Routine to call to execute a package call from within
+; another package. Packages must not use their bank beyond
+; this point.
+
+	defc	PACKAGE_CALL_PKG=$3fc0
+
+; Package IDs
+
+defgroup
+{
+	PKG_RESIDOS=$00,
+	PKG_IDEDOS=$01,
+	PKG_SYNTAX=$02,
+}
+
+; Standard package calls that must be provided
+
+defgroup
+{
+	PKG_STDCALL_INSTALL=$00,
+	PKG_STDCALL_BYE=$01,
+	PKG_STDCALL_INFO=$02
+	PKG_STDCALL_EXP=$03,
+	PKG_STDCALL_HOOK=$04,
+	PKG_STDCALL_CHANNELS=$05,
+	PKG_STDCALL_FS=$06,
+	PKG_STDCALL_NMI=$07,
+}
+
+defc PKG_STDCALL_HIGHEST = PKG_STDCALL_NMI
+
+; Reason codes for INFO call
+
+defgroup
+{
+	info_version=0,
+	info_error,
+}
+
+; Reason codes for EXP call
+
+defgroup
+{
+	exp_boot=0,
+	exp_fs_setdrive,
+	exp_fs_setuser,
+	exp_fs_snapdata
+}
+
+; Reason codes for NMI call
+
+defgroup
+{
+	nmi_nmi=0,
+	nmi_startup
+}
+
+; Reason codes for RESI_NMISVC call
+
+defgroup
+{
+	nmisvc_getregs=0,
+	nmisvc_putregs
+}
+
+; Reason codes for RESI_CONFIG call
+; NOTE - the ordering of these is relied on by RESI_CONFIG
+
+defgroup
+{
+	rc_config_getvalue=0,
+	rc_config_gettext,
+	rc_config_setvalue,
+	rc_config_settext,
+	rc_config_delete
+}
+
+; Low-level calls provided for filesystem packages.
+
+	defc	PACKAGE_FS_LOWLEVEL=$3dc0
+	defc	PACKAGE_FS_SECTOR_READ=$3dc0
+	defc	PACKAGE_FS_SECTOR_WRITE=$3dc3
+	defc	PACKAGE_FS_SECBUF_INIT=$3dc6
+	defc	PACKAGE_FS_SECBUF_ADD=$3dc9
+	defc	PACKAGE_FS_SECBUF_FINISH=$3dcc
+
+; Package capabilities
+
+	defc	pkgcaps_bit_syntax=0
+	defc	pkgcaps_bit_hook=1
+	defc	pkgcaps_bit_channels=2
+	defc	pkgcaps_bit_nmi=3
+	defc	pkgcaps_bit_fs=4
+	defc	pkgcaps_bit_ram=5
+	defc	pkgcaps_bit_di=6
+	
+	defc	PKGCAPS_SYNTAX=$01
+	defc	PKGCAPS_HOOK=$02
+	defc	PKGCAPS_CHANNELS=$04
+	defc	PKGCAPS_NMI=$08
+	defc	PKGCAPS_FS=$10
+	defc	PKGCAPS_RAM=$20
+	defc	PKGCAPS_DI=$40
+
+; ResiDOS Package Calls
+
+	defc	RESI_REPORT=$0310
+	defc	RESI_BASIC=$0313
+	defc	RESI_SAVEPRBUFF=$0316
+	defc	RESI_RESTOREPRBUFF=$0319
+	defc	RESI_GETPAGER=$031c
+	defc	RESI_FINDPKG=$031f
+	defc	RESI_FINDBASIC=$0322
+	defc	RESI_ALLOC=$0325
+	defc	RESI_DEALLOC=$0328
+	defc	RESI_LOGO=$032b
+	defc	RESI_MESSAGE=$032e
+	defc	RESI_NMISVC=$0331
+	defc	RESI_BROADCASTEXP=$0334
+	defc	RESI_CONFIG=$0337
+	
+; Syntax Package Calls
+
+	defc	SYNTAX_VERSION=$0100		; Current version of Syntax package
+
+	defgroup
+	{
+		SYNTAX_CHECKER=$0208,
+		SYNTAX_FUNCTION,
+		SYNTAX_ADDPKG,
+		SYNTAX_REMOVEPKG,
+		SYNTAX_MAXCALL		; dummy
+	}
+	
