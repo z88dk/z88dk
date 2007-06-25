@@ -3,11 +3,7 @@
  *
  *	Routines for dealing with longjmps
  *
- *	I've *never* used these functions in either 
- *	Small C or big C..I'd never consider doing it
- *	either!
- *
- *	$Id: setjmp.h,v 1.3 2001-10-16 18:30:32 dom Exp $
+ *	$Id: setjmp.h,v 1.4 2007-06-25 19:17:45 dom Exp $
  */
 
 
