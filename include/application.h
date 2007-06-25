@@ -19,16 +19,13 @@
  *
  *	Packages are now supported (work for 16k packages)
  *
- *	$Id: application.h,v 1.2 2001-04-20 16:04:24 dom Exp $
+ *	$Id: application.h,v 1.3 2007-06-25 19:15:22 dom Exp $
  */
 
 #ifndef HELP1
         #define HELP1 "An application made with the z88dk"
         #define HELP2 "For more information on the z88dk"
-        #define HELP3 "See http://www.jb.man.ac.uk/~djm/z88dk"
-        #define HELP4 
-        #define HELP5 "Email: djm@jb.man.ac.uk"
-        #define HELP6 "z88dk v1.2 10/4/99"
+        #define HELP3 "See http://www.z88dk.org"
 #endif
 
 #ifndef HELP2
