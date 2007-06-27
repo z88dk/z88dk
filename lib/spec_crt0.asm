@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.13 2007-06-24 17:08:41 dom Exp $
+;       $Id: spec_crt0.asm,v 1.14 2007-06-27 20:48:03 dom Exp $
 ;
 
 
@@ -22,7 +22,6 @@
         XDEF    cleanup         ;jp'd to by exit()
         XDEF    l_dcal          ;jp(hl)
 
-        XDEF    int_seed        ;Integer rand() seed
 
         XDEF    _vfprintf       ;jp to the printf() core
 
@@ -317,7 +316,10 @@ ENDIF
 .coords         defw    0       ; Current graphics xy coordinates
 .base_graphics  defw    0       ; Address of the Graphics map
 
-.int_seed       defw    0       ; Seed for integer rand() routines
+IF !DEFINED_HAVESEED
+		XDEF    _std_seed        ;Integer rand() seed
+._std_seed       defw    0       ; Seed for integer rand() routines
+ENDIF
 
 .exitsp         defw    0       ; Address of where the atexit() stack is
 .exitcount      defb    0       ; How many routines on the atexit() stack

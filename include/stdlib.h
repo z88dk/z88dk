@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.30 2007-06-09 21:46:48 aralbrec Exp $
+ * $Id: stdlib.h,v 1.31 2007-06-27 20:48:03 dom Exp $
  */
 
 #include <sys/types.h>
@@ -53,19 +53,13 @@ extern unsigned long __LIB__               strtoul(char *s, char **endp, int bas
 ///////////////////
 
 // The pseudo-random number generator requires a 16-bit seed.
-// This bit of macro magic makes sure there is one without user
-// intervention and ensures older programs will still compile.
-// However it is only a temporary measure as independent compilation
-// units will have different seeds!
+// The seed is present in the crt0 for a given platform, but if
+// you wish to define your own then do it in whatever way you wish
+// and add the following pragma to your source code:
+// #pragma output HAVESEED
 
-#ifndef __HAVESEED
-#define __HAVESEED
-int std_seed = 1;
-#endif
+extern int std_seed;
 
-// To supply one's own seed, simply do a "#define __HAVESEED" before
-// including the stdlib header and globally declare the std_seed
-// variable somehow.
 
 #define RAND_MAX    32767
 #define M_SRAND(a)  asm("ld\thl,"#a"\nld\t(_std_seed),hl\n");
