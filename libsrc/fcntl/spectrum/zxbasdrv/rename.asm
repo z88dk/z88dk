@@ -8,7 +8,7 @@
 ;
 ; int rename(char *oldname, char *newname)
 ;
-; $Id: rename.asm,v 1.1 2006-07-18 21:02:54 stefano Exp $
+; $Id: rename.asm,v 1.2 2007-06-27 16:51:59 stefano Exp $
 
 	XLIB	rename
 
@@ -33,10 +33,8 @@
 	call	zx_setstr
 	pop	de
 
-	ld	bc,7950		; BASIC routine for "rename"
-	push	bc
+	ld	hl,7950		; BASIC routine for "rename"
 	call	zx_goto
-	pop	bc
 
 	ret
 

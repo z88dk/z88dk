@@ -6,7 +6,7 @@
 ;
 ; int close(int handle)
 ;
-; $Id: close.asm,v 1.2 2006-08-02 19:41:31 stefano Exp $
+; $Id: close.asm,v 1.3 2007-06-27 16:51:59 stefano Exp $
 
 	XLIB	close
 	
@@ -42,11 +42,9 @@
 				; note: here we could prevent the "special"
 				; stream numbers from being closed
 
-	ld	bc,7550		; BASIC routine for "close"
+	ld	hl,7550		; BASIC routine for "close"
 .goto_basic
-	push	bc
 	call	zx_goto
-	pop	bc
 	
 	ld	hl,0
 	

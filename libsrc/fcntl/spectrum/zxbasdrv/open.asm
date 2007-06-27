@@ -5,7 +5,7 @@
 ;
 ; int open(char *name, int flags, mode_t mode)
 ;
-; $Id: open.asm,v 1.2 2006-08-02 19:41:31 stefano Exp $
+; $Id: open.asm,v 1.3 2007-06-27 16:51:59 stefano Exp $
 
 	XLIB	open
 	
@@ -75,10 +75,9 @@
 	pop	hl
 
 	push	bc		; save file handle
-	ld	bc,7500		; BASIC routine for "open"
-	push	bc
+				; BASIC routine for "open"
+	ld	hl,7500		; now it is __FASTCALL__
 	call	zx_goto
-	pop	bc
 	pop	hl		; file handle
 
 	push	hl

@@ -5,7 +5,7 @@
 ;
 ; int remove(char *name)
 ;
-; $Id: remove.asm,v 1.1 2006-07-18 21:02:54 stefano Exp $
+; $Id: remove.asm,v 1.2 2007-06-27 16:51:59 stefano Exp $
 
 	XLIB	remove
 	
@@ -20,10 +20,8 @@
 	
 	call	zxgetfname
 	
-	ld	bc,7900		; BASIC routine for "erase"
-	push	bc
+	ld	hl,7900		; BASIC routine for "erase"
 	call	zx_goto
-	pop	bc
 
 	ret
 
