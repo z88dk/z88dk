@@ -2,7 +2,7 @@
 ;
 ;	Daniel Wallner March 2002
 ;
-;	$Id: embedded_crt0.asm,v 1.2 2002-10-17 12:38:45 dom Exp $
+;	$Id: embedded_crt0.asm,v 1.3 2007-06-27 20:49:27 dom Exp $
 ;
 ; (DM) Could this do with a cleanup to ensure rstXX functions are
 ; available?
@@ -28,7 +28,7 @@
         XDEF    cleanup         ;jp'd to by exit()
         XDEF    l_dcal          ;jp(hl)
 
-        XDEF    int_seed        ;Integer rand() seed
+        XDEF    _std_seed        ;Integer rand() seed
 
         XDEF    exitsp          ;Pointer to atexit() stack
         XDEF    exitcount       ;Number of atexit() functions registered
@@ -117,7 +117,7 @@ ENDIF
 DEFVARS RAM_Start
 {
 __sgoioblk      ds.b    40      ;stdio control block
-int_seed        ds.w    1       ;Integer seed
+_std_seed        ds.w    1       ;Integer seed
 exitsp          ds.w    1       ;atexit() stack
 exitcount       ds.b    1       ;Number of atexit() routines
 fp_seed         ds.w    3       ;Floating point seed (not used ATM)

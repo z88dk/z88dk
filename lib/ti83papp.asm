@@ -15,7 +15,7 @@
 	XDEF	cleanup		; used by exit()
 	XDEF	l_dcal		; used by calculated calls = "call (hl)"
 
-	XDEF	int_seed	; Integer rnd seed
+	XDEF	_std_seed	; Integer rnd seed
 
 	XDEF	_vfprintf	; vprintf is internal to this file so we
 				;  only ever include one of the set of
@@ -247,7 +247,7 @@ base_graphics
         ds.w    1	;  2 bytes
 gfx_bank
         ds.w    1	;  2 bytes
-int_seed
+_std_seed
         ds.w    1	;  2 bytes
 exitsp
         ds.w    1	;  2 bytes

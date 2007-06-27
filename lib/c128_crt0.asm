@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.8 2006-06-18 19:05:53 dom Exp $
+;	$Id: c128_crt0.asm,v 1.9 2007-06-27 20:49:27 dom Exp $
 ;
 
 
@@ -29,7 +29,7 @@
 
 ; Integer rnd seed
 
-        XDEF    int_seed
+        XDEF    _std_seed
 
 ; vprintf is internal to this file so we only ever include one of the set
 ; of routines
@@ -164,7 +164,7 @@ ENDIF
 
 ;Seed for integer rand() routines
 
-.int_seed       defw    0
+._std_seed       defw    0
 
 ;Atexit routine
 

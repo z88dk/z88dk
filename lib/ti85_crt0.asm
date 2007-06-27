@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti85_crt0.asm,v 1.19 2002-11-09 19:54:47 dom Exp $
+;	$Id: ti85_crt0.asm,v 1.20 2007-06-27 20:49:28 dom Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -16,7 +16,7 @@
 	XDEF	cleanup		; used by exit()
 	XDEF	l_dcal		; used by calculated calls = "call (hl)"
 
-	XDEF	int_seed	; Integer rnd seed
+	XDEF	_std_seed	; Integer rnd seed
 
 	XDEF	_vfprintf	; vprintf is internal to this file so we
 				;  only ever include one of the set of
@@ -294,7 +294,7 @@ IF Rigel
 ENDIF
 
 ;Seed for integer rand() routines
-.int_seed	defw	0
+._std_seed	defw	0
 
 ;Atexit routine
 .exitsp		defw	0

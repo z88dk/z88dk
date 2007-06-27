@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: aquarius_crt0.asm,v 1.5 2006-06-18 19:05:53 dom Exp $
+;       $Id: aquarius_crt0.asm,v 1.6 2007-06-27 20:49:27 dom Exp $
 ;
 
 
@@ -24,7 +24,7 @@
         XDEF    cleanup         ;jp'd to by exit()
         XDEF    l_dcal          ;jp(hl)
 
-        XDEF    int_seed        ;Integer rand() seed
+        XDEF    _std_seed        ;Integer rand() seed
 
         XDEF    _vfprintf       ;jp to the printf() core
 
@@ -121,7 +121,7 @@ ENDIF
 .base_graphics  defw    $3028   ; Address of the Graphics map
 				; (text area-second line)
 
-.int_seed       defw    0       ; Seed for integer rand() routines
+._std_seed       defw    0       ; Seed for integer rand() routines
 
 .exitsp         defw    0       ; Address of where the atexit() stack is
 .exitcount      defb    0       ; How many routines on the atexit() stack

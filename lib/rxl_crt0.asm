@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rxl_crt0.asm,v 1.2 2002-09-07 08:31:38 dom Exp $
+;       $Id: rxl_crt0.asm,v 1.3 2007-06-27 20:49:28 dom Exp $
 ;
 
 	MODULE rex_crt0
@@ -16,7 +16,7 @@
 	XREF	_main		;main() is always external to crt0
 	XREF	_LibMain
 
-	XDEF	int_seed	;integer rand() seed
+	XDEF	_std_seed	;integer rand() seed
 	XDEF	exitsp		;atexit() variables
 	XDEF	exitcount
 	XDEF	heapblocks	;malloc() variables
@@ -80,7 +80,7 @@
 
 DEFVARS $f033
 {
-int_seed	ds.w	1	;Integer seed
+_std_seed	ds.w	1	;Integer seed
 exitsp		ds.w	1	;Pointer to atexit() stack
 exitcount	ds.b	1	;Number of atexit() routines registered
 fp_seed		ds.w	3	;Floating point seed, unused ATM

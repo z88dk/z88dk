@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.7 2002-01-27 21:29:37 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.8 2007-06-27 20:49:27 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -35,7 +35,7 @@
 	XDEF    cleanup		;jp'd to by exit()
 	XDEF    l_dcal		;jp(hl)
 
-	XDEF    int_seed	;Integer rand() seed
+	XDEF    _std_seed	;Integer rand() seed
 
 	XDEF	_vfprintf	;jp to printf core routine
 
@@ -200,7 +200,7 @@ ENDIF
 ;-----------------------
 
 .defltdsk       defb    0	;Default disc
-.int_seed       defw    0	;Integer seed
+._std_seed       defw    0	;Integer seed
 .exitsp		defw	0	;Address of atexit() stack
 .exitcount	defb	0	;Number of atexit() routinens
 .heaplast	defw	0	;Pointer to last free heap block

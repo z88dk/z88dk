@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: rcmx000_crt0.asm,v 1.3 2007-06-14 08:12:04 aralbrec Exp $
+;       $Id: rcmx000_crt0.asm,v 1.4 2007-06-27 20:49:27 dom Exp $
 ;
 ; - - - - - - -
 
@@ -41,7 +41,7 @@
         XDEF    cleanup         ;jp'd to by exit()
         XDEF    l_dcal          ;jp(hl)
 
-        XDEF    int_seed        ;Integer rand() seed
+        XDEF    _std_seed        ;Integer rand() seed
 
         XDEF    _vfprintf       ;jp to the printf() core
 
@@ -137,7 +137,7 @@ ENDIF
 	; Here is a great place to store temp variables and stuff!!
 .acme	defw 4711 			; useless arbitrarily choosen number
 	defm  "Small C+ RCM2/3000"&0	;Unnecessary file signature
-.int_seed
+._std_seed
 	defw 0          		; Needed for rand and srand
 
 ;-----------------------

@@ -1,7 +1,7 @@
 ;
 ; Startup for Residos packages
 ;
-; $Id: zxr_crt0.asm,v 1.1 2007-06-24 17:08:41 dom Exp $
+; $Id: zxr_crt0.asm,v 1.2 2007-06-27 20:49:28 dom Exp $
 ;
 
         MODULE	zxs_crt0
@@ -9,6 +9,7 @@
         org     0
 
         INCLUDE	"zcc_opt.def"
+	INCLUDE	"zxsysvar48.def"
 
 ; Define all the restarts to go to an appropriate routine
 if (ASMPC<>$0000)
@@ -162,7 +163,7 @@ ENDIF
 .coords         defw    0       ; Current graphics xy coordinates
 .base_graphics  defw    0       ; Address of the Graphics map
 
-.int_seed       defw    0       ; Seed for integer rand() routines
+._std_seed       defw    0       ; Seed for integer rand() routines
 
 .exitsp         defw    0       ; Address of where the atexit() stack is
 .exitcount      defb    0       ; How many routines on the atexit() stack

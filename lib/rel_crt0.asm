@@ -4,7 +4,7 @@
 ;
 ;       Created 18/5/99 djm
 ;
-;	$Id: rel_crt0.asm,v 1.4 2006-06-18 19:05:53 dom Exp $
+;	$Id: rel_crt0.asm,v 1.5 2007-06-27 20:49:28 dom Exp $
 
 
 ;-----------
@@ -164,7 +164,7 @@ ENDIF
 .base_graphics  defw	0	; Address of the Graphics map
 .gfx_bank       defb    0	; And the bank
 
-.int_seed       defw    0	; Seed for integer rand() routines
+._std_seed       defw    0	; Seed for integer rand() routines
 
 .exitsp		defw	0	; Address of where the atexit() stack is
 .exitcount	defb	0	; How many routines on the atexit() stack

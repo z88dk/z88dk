@@ -16,7 +16,7 @@
 ;
 ; - - - - - - - -
 ;
-; $Id: z88_crt0.asm,v 1.5 2002-02-12 22:24:21 dom Exp $
+; $Id: z88_crt0.asm,v 1.6 2007-06-27 20:49:28 dom Exp $
 ;
 ; - - - - - - - -
 
@@ -42,7 +42,7 @@
 	XDEF    base_graphics	;Address of graphics map
 	XDEF    gfx_bank	;Bank for this
 
-	XDEF    int_seed	;Integer rand() seed
+	XDEF    _std_seed	;Integer rand() seed
 
 
 	XDEF    exitsp		;Pointer to atexit() stack
