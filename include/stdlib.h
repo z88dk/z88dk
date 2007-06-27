@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.31 2007-06-27 20:48:03 dom Exp $
+ * $Id: stdlib.h,v 1.32 2007-06-27 20:59:34 dom Exp $
  */
 
 #include <sys/types.h>
@@ -220,11 +220,6 @@ extern void          __LIB__ __FASTCALL__ delay(unsigned int tstates);   // at l
 /*********/
 
 // Non standard stdlib.h defs (mode is ignored)
-
-#ifndef __FCNTL_H__
-extern __LIB__ mkdir(char *, int mode);
-extern char __LIB__ *getcwd(char *buf, size_t maxlen); 
-#endif
 
 #ifdef __Z88__
 extern __LIB__ csleep(int);                 /* Very non standard! sleep for centisecs! (z88)*/

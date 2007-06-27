@@ -5,7 +5,7 @@
  *
  *      djm 27/4/99
  *
- *	$Id: fcntl.h,v 1.6 2005-02-18 08:30:10 stefano Exp $
+ *	$Id: fcntl.h,v 1.7 2007-06-27 20:59:34 dom Exp $
  */
 
 
@@ -49,11 +49,8 @@ extern int __LIB__ open_z88(far char *name, int flags, mode_t mode, char *explic
 
 extern int __LIB__ nropen(char *name, int flags, mode_t mode, char *explicit, size_t len);
 
-/* mkdir and getcwd were erroneously defined in stdlib.h */
-#ifndef __STDLIB_H__
 extern int __LIB__ mkdir(char *, int mode);
 extern char __LIB__ *getcwd(char *buf, size_t maxlen);
-#endif
 
 /* Following two only implemented for Sprinter ATM (20.11.2002) */
 extern int  __LIB__ rmdir(char *);
