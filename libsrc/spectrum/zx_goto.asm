@@ -18,7 +18,7 @@
 ;		 or 
 ;		 9999 STOP
 ;
-;	$Id: zx_goto.asm,v 1.3 2007-06-13 00:03:13 aralbrec Exp $
+;	$Id: zx_goto.asm,v 1.4 2007-06-28 20:16:21 stefano Exp $
 ;
 
 XLIB	zx_goto	
@@ -45,7 +45,14 @@ return:
 	ld	h,0
 	ld	l,(iy+0)	; error code (hope so !)
 	ld	(iy+0),255	; reset ERR_NR
-	inc	hl
+
+	bit	0,(iy+124)	; test FLAGS3: coming from paged ROM ?
+	jr	nz,stderr
+	ld	(iy+124),0	; yes, reset FLAGS3..
+	ld	l,254		; ... and set error code to 255
+stderr:
+
+	inc	l		; return with error code (0=OK, etc..)
 
 exitgoto:
 

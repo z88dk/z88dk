@@ -6,7 +6,7 @@
 ;
 ; int close(int handle)
 ;
-; $Id: close.asm,v 1.3 2007-06-27 16:51:59 stefano Exp $
+; $Id: close.asm,v 1.4 2007-06-28 20:16:20 stefano Exp $
 
 	XLIB	close
 	

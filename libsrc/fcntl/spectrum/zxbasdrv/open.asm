@@ -5,7 +5,7 @@
 ;
 ; int open(char *name, int flags, mode_t mode)
 ;
-; $Id: open.asm,v 1.3 2007-06-27 16:51:59 stefano Exp $
+; $Id: open.asm,v 1.4 2007-06-28 20:16:20 stefano Exp $
 
 	XLIB	open
 	
@@ -101,9 +101,7 @@
 ; We call BASIC to init the #3 stream
 
 .islpt
-	ld	bc,7700		; BASIC routine for "init printer device"
-	push	bc
+	ld	hl,7700		; BASIC routine for "init printer device"
 	call	zx_goto
-	pop	bc
 	ld	hl,3		; force stream #3 as file handle
 	ret

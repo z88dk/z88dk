@@ -8,7 +8,7 @@
 ;
 ; int __LIB__ __FASTCALL__ readbyte(int handle)
 ;
-; $Id: readbyte.asm,v 1.2 2006-08-02 19:41:31 stefano Exp $
+; $Id: readbyte.asm,v 1.3 2007-06-28 20:16:20 stefano Exp $
 
 	XLIB	readbyte
 	
@@ -46,6 +46,7 @@
 	pop	bc
 	ld	($5c3d),bc	; restore orginal ERR_SP
 	ld	(iy+0),255	; reset ERR_NR
+	ld	(iy+124),0	; clear FLAGS3
 	scf
 	ccf
 	ld	hl,-1	; EOF
