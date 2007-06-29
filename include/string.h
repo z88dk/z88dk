@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.17 2007-05-06 21:37:54 aralbrec Exp $
+ *	$Id: string.h,v 1.18 2007-06-29 23:04:58 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -37,11 +37,9 @@ extern int  __LIB__               strpos(char *, uint);
 extern int  __LIB__               strcspn(char *, char *);
 extern int  __LIB__               strspn(char *, char *);
 extern int  __LIB__               stricmp(char *, char *);
+extern int  __LIB__               strcasecmp(char *, char *);
 extern int  __LIB__               strnicmp(char *, char *, uint);
-
-#define strcasecmp  stricmp
-#define strncasecmp strnicmp
-
+extern int  __LIB__               strncasecmp(char *, char *, uint);
 extern char __LIB__ __FASTCALL__ *strlwr(char *);
 extern char __LIB__ __FASTCALL__ *strupr(char *);
 
@@ -88,25 +86,28 @@ extern void __LIB__ __CALLEE__   *memop_callee(void *, void *, uint, uint);
 // And now we make CALLEE linkage default to make compiled progs shorter and faster
 // These defines will generate warnings for function pointers but that's ok
 
-#define strcat(a,b)     strcat_callee(a,b)
-#define strcmp(a,b)     strcmp_callee(a,b)
-#define strcpy(a,b)     strcpy_callee(a,b)
-#define strncat(a,b,c)  strncat_callee(a,b,c)
-#define strncmp(a,b,c)  strncmp_callee(a,b,c)
-#define strncpy(a,b,c)  strncpy_callee(a,b,c)
-#define strchr(a,b)     strchr_callee(a,b)
-#define strrchr(a,b)    strrchr_callee(a,b)
-#define strrstrip(a,b)  strrstrip_callee(a,b)
-#define strstrip(a,b)   strstrip_callee(a,b)
-#define strstr(a,b)     strstr_callee(a,b)
-#define strrstr(a,b)    strrstr_callee(a,b)
-#define strtok(a,b)     strtok_callee(a,b)
-#define strpbrk(a,b)    strpbrk_callee(a,b)
-#define strpos(a,b)     strpos_callee(a,b)
-#define strcspn(a,b)    strcspn_callee(a,b)
-#define strspn(a,b)     strspn_callee(a,b)
-#define stricmp(a,b)    stricmp_callee(a,b)
-#define strnicmp(a,b,c) strnicmp_callee(a,b,c)
+#define strcat(a,b)         strcat_callee(a,b)
+#define strcmp(a,b)         strcmp_callee(a,b)
+#define strcpy(a,b)         strcpy_callee(a,b)
+#define strncat(a,b,c)      strncat_callee(a,b,c)
+#define strncmp(a,b,c)      strncmp_callee(a,b,c)
+#define strncpy(a,b,c)      strncpy_callee(a,b,c)
+#define strchr(a,b)         strchr_callee(a,b)
+#define strrchr(a,b)        strrchr_callee(a,b)
+#define strrstrip(a,b)      strrstrip_callee(a,b)
+#define strstrip(a,b)       strstrip_callee(a,b)
+#define strstr(a,b)         strstr_callee(a,b)
+#define strrstr(a,b)        strrstr_callee(a,b)
+#define strtok(a,b)         strtok_callee(a,b)
+#define strpbrk(a,b)        strpbrk_callee(a,b)
+#define strpos(a,b)         strpos_callee(a,b)
+#define strcspn(a,b)        strcspn_callee(a,b)
+#define strspn(a,b)         strspn_callee(a,b)
+#define stricmp(a,b)        stricmp_callee(a,b)
+#define strnicmp(a,b,c)     strnicmp_callee(a,b,c)
+#define strcasecmp(a,b)     stricmp_callee(a,b)
+#define strncasecmp(a,b,c)  strnicmp_callee(a,b,c)
+
 #define memset(a,b,c)   memset_callee(a,b,c)
 #define memcpy(a,b,c)   memcpy_callee(a,b,c)
 #define memmove(a,b,c)  memmove_callee(a,b,c)
@@ -164,7 +165,11 @@ extern far char __LIB__ *strdup_far(far char *);
  * Okay..some nice BSD-isms now..
  */
 
-// don't use these for function pointers
+extern void __LIB__  *bzero(void *, uint);
+extern int  __LIB__   bcmp(void *, void *, uint);
+extern void __LIB__  *bcopy(void *, void *,uint);
+extern char __LIB__  *index(unsigned char *, unsigned char);
+extern char __LIB__  *rindex(unsigned char *, unsigned char);
 
 #define bzero(s,n)    memset_callee(s,0,n)
 #define bcmp(s1,s2,n) memcmp_callee(s1,s2,n)
