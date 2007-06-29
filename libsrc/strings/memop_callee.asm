@@ -26,7 +26,6 @@ LIB l_jpix
    ld a,b
    or c
    ret z
-   inc b
 
    push hl
    
@@ -47,7 +46,7 @@ LIB l_jpix
    ld ixh,a
 
    ; ix = addr of op function
-
+   
 .loop
 
    ld a,(de)
@@ -59,8 +58,12 @@ LIB l_jpix
    inc hl
    inc de
    
+   dec bc                      ; must not mess with carry flag in loop
+   inc c
    dec c
    jp nz, loop
+   
+   inc b
    djnz loop
    
    pop hl
@@ -88,8 +91,12 @@ LIB l_jpix
    inc hl
    inc de
    
+   dec bc                      ; must not mess with carry flag in loop
+   inc c
    dec c
    jp nz, func
+   
+   inc b
    djnz func
       
    pop hl
