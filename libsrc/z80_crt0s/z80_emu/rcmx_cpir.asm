@@ -6,7 +6,6 @@ XLIB rcmx_cpir
 
 .rcmx_cpir
  
-   inc b
    jr nc, enterloop
  
    call enterloop
@@ -14,17 +13,18 @@ XLIB rcmx_cpir
    ret
 
 .loop
-
+   
    inc hl
    
 .enterloop
- 
+
    cp (hl)
+   dec bc
    jr z, match
    
-   dec c
+   ld a,b
+   or c
    jp nz, loop
-   djnz loop
  
 .nomatch
  
@@ -45,13 +45,11 @@ XLIB rcmx_cpir
 
    inc hl
    push af
-   
-   dec b
-   dec bc
+
    ld a,b
    or c
    jr z, joinbc0
- 
+  
    ex (sp),hl
    res 0,l 
    set 2,l
