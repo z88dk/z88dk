@@ -16,7 +16,7 @@ LIB in_WaitForNoKey, in_WaitForKey, delay
 
    ld a,h
    or l
-   jr nz, waitforkey
+   jr z, waitforkey
    
    ld c,l
    ld b,h
