@@ -151,6 +151,13 @@ strings/strspn_callee
 strings/strstr_callee
 strings/strstrip_callee
 strings/strtok_callee
+strings/bcmp
+strings/bcopy
+strings/bzero
+strings/index
+strings/rindex
+strings/strcasecmp
+strings/strncasecmp
 setjmp/longjmp
 setjmp/setjmp
 assert/assert
