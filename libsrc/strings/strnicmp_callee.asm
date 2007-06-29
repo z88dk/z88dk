@@ -33,9 +33,9 @@ XDEF ASMDISP_STRNICMP_CALLEE
    inc hl
    
    cp 'A'
-   jr c, +6
+   jr c, ASMPC+8
    cp 'Z'+1
-   jr nc, +2
+   jr nc, ASMPC+4
    or $20
    
    ld c,a
@@ -44,9 +44,9 @@ XDEF ASMDISP_STRNICMP_CALLEE
    inc de
    
    cp 'A'
-   jr c, +6
+   jr c, ASMPC+8
    cp 'Z'+1
-   jr nc, +2
+   jr nc, ASMPC+4
    or $20
    
    cp c
