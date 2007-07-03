@@ -12,5 +12,7 @@ remove
 rename
 write
 writebyte
+zx_load_block
+zx_save_block
 zx_hardcopy
 zxgetfname

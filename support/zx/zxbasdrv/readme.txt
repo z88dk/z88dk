@@ -1,7 +1,7 @@
 ZX BASIC driver specifications
 by Stefano Bodrato, July 2006.
 
-$Id: readme.txt,v 1.2 2006-08-09 21:30:11 stefano Exp $
+$Id: readme.txt,v 1.3 2007-07-03 07:32:03 stefano Exp $
 
 
 The "zxbasdrv" driver is a trick to get some basic functionality
@@ -49,6 +49,7 @@ s=stream number
 
 7600 - LOAD block
 a=address or 0 if unspecified
+l=length or 0 if unspecified
 d=drive number
 n$=file name
 
