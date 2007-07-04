@@ -119,7 +119,9 @@ strings/memchr
 strings/memcmp
 strings/memcpy
 strings/memmove
-strings/memop
+strings/memopi
+strings/memopd
+strings/memops
 strings/memset
 strings/memswap
 strings/strcat
@@ -149,7 +151,8 @@ strings/memchr_callee
 strings/memcmp_callee
 strings/memcpy_callee
 strings/memmove_callee
-strings/memop_callee
+strings/memopd_callee
+strings/memopi_callee
 strings/memset_callee
 strings/memswap_callee
 strings/strcat_callee
