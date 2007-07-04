@@ -1,14 +1,14 @@
-; void __CALLEE__ *memop(void *dst, void *src, uint n, uint op)
-; *dst = *src OP *dst
+; void __CALLEE__ *memopd(void *dst, void *src, uint n, uint op)
+; *dst = *src OP *dst, decreasing src and dst addresses
 ; OP: 0=load, 1=or, 2=xor, 3=and, 4=add, 5 = adc, 6=sub, 7 = sbc, 8 = rls, 9 = rrs else address of OP function
 ; 05.2007 aralbrec
 
-XLIB memop_callee
-XDEF ASMDISP_MEMOP_CALLEE
+XLIB memopd_callee
+XDEF ASMDISP_MEMOPD_CALLEE
 
-LIB l_jpix
+LIB l_jpix, memops
 
-.memop_callee
+.memopd_callee
 
    pop hl
    pop ix
@@ -38,11 +38,10 @@ LIB l_jpix
    jr nc, func
 
    add a,a
-   add a,a
-   add a,opload%256
+   add a,memops%256
    ld ixl,a
    ld a,0
-   adc a,opload/256
+   adc a,memops/256
    ld ixh,a
 
    ; ix = addr of op function
@@ -50,13 +49,13 @@ LIB l_jpix
 .loop
 
    ld a,(de)
-   jp (ix)
+   call l_jpix
 
 .return
 
    ld (hl),a
-   inc hl
-   inc de
+   dec hl
+   dec de
    
    dec bc                      ; must not mess with carry flag in loop
    inc c
@@ -76,7 +75,9 @@ LIB l_jpix
    push hl
    ld a,(de)
    ld e,a
+   ld d,0
    ld l,(hl)
+   ld h,d
    push hl
    push de
    call l_jpix                 ; (func)(uchar dst_byte, uchar src_byte)
@@ -88,8 +89,8 @@ LIB l_jpix
    pop bc
 
    ld (hl),a
-   inc hl
-   inc de
+   dec hl
+   dec de
    
    dec bc                      ; must not mess with carry flag in loop
    inc c
@@ -102,54 +103,4 @@ LIB l_jpix
    pop hl
    ret
 
-.opload
-
-   nop
-   jp return
-
-.opor
-
-   or (hl)
-   jp return
-
-.opxor
-
-   xor (hl)
-   jp return
-
-.opand
-
-   and (hl)
-   jp return
-
-.opadd
-
-   add a,(hl)
-   jp return
-   
-.opadc
-
-   adc a,(hl)
-   jp return
-
-.opsub
-
-   sub (hl)
-   jp return
-
-.opsbc
-
-   sbc a,(hl)
-   jp return
-
-.oprls
-
-   rla
-   jp return
-
-.oprrs
-
-   rra
-   jp return
-
-DEFC ASMDISP_MEMOP_CALLEE = asmentry - memop_callee
+DEFC ASMDISP_MEMOPD_CALLEE = asmentry - memopd_callee

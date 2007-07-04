@@ -1,10 +1,10 @@
 ; CALLER linkage for function pointers
 
-XLIB memop
-LIB memop_callee
-XREF ASMDISP_MEMOP_CALLEE
+XLIB memopd
+LIB memopd_callee
+XREF ASMDISP_MEMOPD_CALLEE
 
-.memop
+.memopd
 
    pop af
    pop ix
@@ -17,4 +17,4 @@ XREF ASMDISP_MEMOP_CALLEE
    push bc
    push af
    
-   jp memop_callee + ASMDISP_MEMOP_CALLEE
+   jp memopd_callee + ASMDISP_MEMOPD_CALLEE
