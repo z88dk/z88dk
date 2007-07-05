@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.18 2007-06-24 14:43:45 dom Exp $
+ *      $Id: primary.c,v 1.19 2007-07-05 18:39:00 dom Exp $
  */
 
 
@@ -702,30 +702,31 @@ void cscale(
  */
 void addconst(int val,int opr, char zfar)
 {
-        LVALUE  lval;
+    LVALUE  lval;
 /*        if (!opr) lval->val_type=ltype; */
-        if ( (ltype == LONG && (!opr) ) || (ltype==CPTR && (!opr)) ) {
-                lval.val_type=LONG;
-                lpush();
-                vlongconst(val);
-                zadd(&lval);
-        }
-        else 
+    if ( (ltype == LONG && (!opr) ) || (ltype==CPTR && (!opr)) ) {
+        lval.val_type=LONG;
+        lpush();
+        vlongconst(val);
+        zadd(&lval);
+    } else {
+        lval.val_type = CINT;
         switch(val) {
 
-                case -3 :       dec(&lval) ;
-                case -2 :       dec(&lval) ;
-                case -1 :       dec(&lval) ;
-                case  0 :       break ;
+        case -3 :       dec(&lval) ;
+        case -2 :       dec(&lval) ;
+        case -1 :       dec(&lval) ;
+        case  0 :       break ;
 
-                case  3 :       inc(&lval) ;
-                case  2 :       inc(&lval) ;
-                case  1 :       inc(&lval) ;
-                                        break ;
+        case  3 :       inc(&lval) ;
+        case  2 :       inc(&lval) ;
+        case  1 :       inc(&lval) ;
+            break ;
 
-                default :       
-                                addbchl(val);
+        default :       
+            addbchl(val);
         }
+    }
 }
 
 /*

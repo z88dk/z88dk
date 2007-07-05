@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.15 2007-04-17 14:40:15 dom Exp $
+ *      $Id: declvar.c,v 1.16 2007-07-05 18:39:00 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -828,7 +828,7 @@ TAG_SYMBOL *GetVarID(struct varid *var,char storage)
         } else {
                 SYMBOL *ptr;
                 ptr=STARTGLB;
-                while ( ptr <= ENDGLB ) {
+                while ( ptr < ENDGLB ) {
                         if (ptr->name[0] && ptr->storage == TYPDEF && amatch(ptr->name) ) {
 /* Found a typedef match */
                                 var->sign=ptr->flags&UNSIGNED;
