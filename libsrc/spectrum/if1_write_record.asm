@@ -6,10 +6,9 @@
 ;
 ;	This one is similar to "write sector" but fixes the record header.
 ;	It is necessary to load a copy of the microdirve MAP and to pass it
-;	putting its location into the record structure.
+;	putting its location into the record structure.;	
 ;	
-;	
-;	$Id: if1_write_record.asm,v 1.1 2006-05-23 21:47:26 stefano Exp $
+;	$Id: if1_write_record.asm,v 1.2 2007-07-07 14:26:48 stefano Exp $
 ;
 
 

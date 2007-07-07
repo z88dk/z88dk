@@ -6,16 +6,13 @@
 ;	Writes the specified sector to the specified drive.
 ;
 ;	
-;	$Id: if1_write_sector.asm,v 1.3 2006-05-23 21:47:26 stefano Exp $
+;	$Id: if1_write_sector.asm,v 1.4 2007-07-07 14:26:48 stefano Exp $
 ;
 
 
 		XLIB 	if1_write_sector
 		
-		;;LIB 	if1_wrsect
 		LIB 	if1_rommap
-
-		;;XREF	mdvbuffer
 		
 		XREF	MAKE_M
 		XREF	MOTOR
@@ -53,7 +50,14 @@ if1_write_sector:
 		ld	(ix+19h),A	; CHDRIV
 		
 		call	MOTOR
-		
+		ld	hl,-1
+IF !OLDIF1MOTOR
+		ret	nz		; microdrive not present
+ENDIF
+		in	a,($ef)
+		and	1		; test the write-protect tab
+		ret	z		; drive 'write' protected
+
 		push	ix
 		pop	hl
 		ld	de,37h		; point to 12 bytes of data block preamble
