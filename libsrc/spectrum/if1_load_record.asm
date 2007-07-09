@@ -10,7 +10,7 @@
 ;       2/3 record:     record number
 ;       0/1 buffer
 ;
-;       $Id: if1_load_record.asm,v 1.3 2007-07-07 14:26:47 stefano Exp $
+;       $Id: if1_load_record.asm,v 1.4 2007-07-09 08:01:59 stefano Exp $
 ;
 
                 XLIB    if1_load_record
@@ -90,7 +90,7 @@ if1_load_record:
                 ld      (5CDCh),hl      ; pointer to filename
 
 ;IF !OLDIF1MOTOR
-;		ld	a,(driveno)
+;               ld      a,(driveno)
 ;                call    MOTOR           ; select drive motor
 ;                jp      nz,error_exit
 ;ENDIF
@@ -193,7 +193,9 @@ sect_notfound:
 error_exit:
                 call    1               ; unpage
                 ei
-                xor     a
+;               xor     a
+;               ld      (if1_sect_read),a       ; flag for "sector read"
+                ld      hl,-1           ; sector not found
                 ret
 
 ; Decrease sector counter and check if we reached zero
