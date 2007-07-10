@@ -112,6 +112,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/wd4996"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"

@@ -113,6 +113,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/wd4996"
+				AdditionalIncludeDirectories="getopt"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"

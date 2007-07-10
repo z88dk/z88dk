@@ -113,6 +113,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/wd4996&#x0D;&#x0A;"
+				AdditionalIncludeDirectories="regex"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
