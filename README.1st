@@ -1,4 +1,4 @@
-z88dk - v1.6 15 Jul 2007
+z88dk - v1.7 15 Jul 2007
 ========================
 
 z88dk is a Z80 cross compiler producing binaries for over 20 different z80
@@ -64,7 +64,7 @@ You should be ready to go!
 
 CHANGES (brief)
 
-z88dkv1.6 15.7.2007
+z88dkv1.7 15.7.2007
 
 - [sccz80] Bug fixes, tweaks to single parameter function pointer calls
 - [z80asm] Z80asm supporting Rabbit
