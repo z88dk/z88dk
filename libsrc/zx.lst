@@ -277,6 +277,7 @@ spectrum/if1_init_file
 spectrum/if1_installed
 spectrum/if1_load_record
 spectrum/if1_load_sector
+spectrum/if1_mdv_status
 spectrum/if1_remove_file
 spectrum/if1_rommap
 spectrum/if1_setname

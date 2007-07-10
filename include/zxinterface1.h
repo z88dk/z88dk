@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 6/9/2004
  *
- *	$Id: zxinterface1.h,v 1.5 2006-07-03 15:04:15 stefano Exp $
+ *	$Id: zxinterface1.h,v 1.6 2007-07-10 08:12:50 stefano Exp $
  */
 
 
@@ -131,5 +131,7 @@ extern int __LIB__ if1_installed();
 // Returns true if the Interface 1 is present
 extern int __LIB__ zx_interface1();
 
+// Returns the microdrive status 0=ok, 1=wr protect, 2=not present
+extern int __LIB__ if1_mdv_status(int drive);
 
 #endif /* _ZXINTERFACE1_H */
