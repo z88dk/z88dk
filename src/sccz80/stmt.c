@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.13 2007-07-05 18:39:00 dom Exp $
+ *      $Id: stmt.c,v 1.14 2007-07-10 20:06:04 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -690,7 +690,7 @@ void doasm()
  */
 			lab=0;
 			if (label[0]=='_') {
-				memmove(label,label+1,strlen(label+1));
+				memmove(label,label+1,strlen(label+1)+1);
 				lab=2; 
                         } else if ( strncmp(label,"smc_",4)==0 ) {
                          	strcpy(label,label+4);
@@ -704,7 +704,7 @@ void doasm()
                                         myptr->storage = DECLEXTN;
                           }
 			  line[1]='_';
-			  memmove(line+2,&line[(int)lab],strlen(&line[(int)lab]));
+			  memmove(line+2,&line[(int)lab],strlen(&line[(int)lab])+1);
 			}
                 }
 #if 0
