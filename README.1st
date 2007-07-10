@@ -1,5 +1,5 @@
-z88dk - v1.5 16th December 2002
-===============================
+z88dk - v1.6 15 Jul 2007
+========================
 
 z88dk is a Z80 cross compiler producing binaries for over 20 different z80
 based machines. Binaries are supplied for Win32,Amiga and Solaris platforms.
@@ -14,57 +14,7 @@ Binary Kit Instructions
 Win32
 -----
 
-Extract the kit to c:\ and you should end up with a directory structure of:
-
-c:\z88dk\bin
-c:\z88dk\doc
-etc...
-
-Add c:\z88dk\bin into your path (System Properties/Advanced/Environmental
-Variables)
-
-Restart a command prompt, type zcc and you should get the response:
-
-zcc - Frontend for the z88dk Cross-C Compiler
-v2.50 (C) 3.10.2002 D.J.Morris
-
-
-You're ready to go and start compiling!
-
-
-Solaris
--------
-
-The code was compiled on a Solaris 6 machine and hence should work on
-newer versions as well (unfortunately I don't have access to an older
-machine).
-
-1. Copy the contents of the bin directory to /usr/local/bin
-2. Copy the contents of the lib directory to /usr/local/lib
-3. Copy the contents of the share directory to eg /usr/local/share
-
-The share directory contains documentation, examples and some support
-programs for producing the final binaries for various platforms.
-
-This kit can also be installed in a users directory providing that the
-Z80_OZFILES and ZCCCFG environmental variables are set.
-
-Amiga
------
-
-Extract the lha archive to whereever is convenient (eg work:z88dk)  and then
-add the following to your S:user-startup sequence:
-
-;BEGIN z88dk
-cd work:z88dk/bin
-Execute startzcc
-;END z88dk
-
-The version is compiled using a cross compiler and has been briefly tested
-to ensure code integrity. Rebuilding the libraries natively takes quite
-a while and as such is not recommended. 
-
-
+Run the installer.
 
 Source Code Installation
 ========================
@@ -114,6 +64,29 @@ You should be ready to go!
 
 CHANGES (brief)
 
+z88dkv1.6 15.7.2007
+
+- [sccz80] Bug fixes, tweaks to single parameter function pointer calls
+- [z80asm] Z80asm supporting Rabbit
+- [zcpp] End of file fix for win32
+- [zcc] -Cz flag to pass through to appmake
+- [appmake] Support for most z88dk targets
+- [lib/crt0] Support for Newbrain, Rabbit, Sega Master System SMS, TS2068 
+- [lib] Much of the library rewritten to use FASTCALL and CALLEE linkage
+  for faster and small library function calls
+- [lib] malloc library can now allocate from a scattered map of available 
+  RAM and supports multiple heaps
+- [lib] balloc library introduced as a block memory allocator
+- [lib] interrupt mode 2 library added
+- [lib] stdlib and strings now completely implemented in assembler and expanded
+- [lib] abstract data types library introduced initially containing linked list, 
+  heap, stack and queue algorithms library begun initially containing an implementation
+  of the A* search algorithm
+- [lib] ZX Spectrum : SZX basic fcntl driver
+- [lib] ZX Spectrum : SP1 software sprite engine added
+- [lib] ZX Spectrum : Residos packages support
+- [lib] ZX Spectrum : Improved Spectrum library includes new display functions
+- [lib] ZX Spectrum : Input library added for direct access to keyboard, joystick and mouse devices
 
 z88dkv1.5 16.12.2002
 
