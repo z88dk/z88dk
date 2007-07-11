@@ -10,6 +10,7 @@ XDEF ASMDISP_STRCPY_CALLEE
    pop hl
    pop de
    ex (sp),hl
+   ex  de,hl
    
    ; enter : hl = char *src
    ;         de = char *dst
