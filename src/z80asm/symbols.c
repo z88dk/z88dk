@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.1 2000-07-04 15:33:29 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.2 2007-07-13 09:03:10 dom Exp $ */
 /* $History: SYMBOLS.C $ */
 /*  */
 /* *****************  Version 9  ***************** */
@@ -374,8 +374,10 @@ DeclSymGlobal (char *identifier, unsigned char libtype)
 	      else								/* cannot declare two identical global's */
 		ReportError (CURRENTFILE->fname, CURRENTFILE->line, 22);	/* Already declared global */
 	    }
-	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 23);	/* re-declaration not allowed */
+	  else if ( (foundsym->type & (SYMXDEF|libtype)) != (SYMXDEF|libtype) )
+	    {
+	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 23);	/* re-declaration not allowed */
+	    }
 	}
     }
   else
@@ -395,7 +397,9 @@ DeclSymGlobal (char *identifier, unsigned char libtype)
             }
         }
       else
+       {
 	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 18);	/* already declared global */
+       }
    }
 }
 
@@ -414,8 +418,10 @@ DeclSymExtern (char *identifier, unsigned char libtype)
 	  if (foundsym != NULL)
 	    insert (&globalroot, foundsym, (int (*)()) cmpidstr);	/* declare symbol as extern */
 	}
-      else if (foundsym->owner == CURRENTMODULE)
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 23);	/* Re-declaration not allowed */
+      else if (foundsym->owner == CURRENTMODULE) {
+	if ( (foundsym->type & (SYMXREF | libtype)) != (SYMXREF |libtype) )
+     	   ReportError (CURRENTFILE->fname, CURRENTFILE->line, 23);	/* Re-declaration not allowed */
+      }
     }
   else
    {
@@ -439,8 +445,10 @@ DeclSymExtern (char *identifier, unsigned char libtype)
           else
 	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 17);	/* already declared local */
         }
-      else
+      else if ( (foundsym->type & (SYMXREF|libtype)) != (SYMXREF|libtype) ) 
+	{
 	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 23);	/* re-declaration not allowed */
+	}
    }
 }
 
