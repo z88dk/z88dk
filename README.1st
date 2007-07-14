@@ -84,7 +84,6 @@ z88dkv1.7 15.7.2007
   of the A* search algorithm
 - [lib] ZX Spectrum : SZX basic fcntl driver
 - [lib] ZX Spectrum : SP1 software sprite engine added
-- [lib] ZX Spectrum : Residos packages support
 - [lib] ZX Spectrum : Improved Spectrum library includes new display functions
 - [lib] ZX Spectrum : Input library added for direct access to keyboard, joystick and mouse devices
 
