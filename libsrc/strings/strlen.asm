@@ -4,6 +4,8 @@
 
 XLIB strlen
 XDEF ASMDISP_STRLEN
+LIB     rcmx_cpir
+
 
 ; A funky version that's quicker than the
 ; usual implementation for lengths > 1

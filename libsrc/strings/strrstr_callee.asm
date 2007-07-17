@@ -4,6 +4,8 @@
 
 XLIB strrstr_callee
 XDEF ASMDISP_STRRSTR_CALLEE
+LIB     rcmx_cpir
+
 
 .strrstr_callee
 

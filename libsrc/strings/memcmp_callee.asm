@@ -4,6 +4,8 @@
 
 XLIB memcmp_callee
 XDEF ASMDISP_MEMCMP_CALLEE
+LIB     rcmx_cpi
+
 
 .memcmp_callee
 

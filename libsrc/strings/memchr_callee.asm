@@ -4,6 +4,8 @@
 
 XLIB memchr_callee
 XDEF ASMDISP_MEMCHR_CALLEE
+LIB     rcmx_cpir
+
 
 .memchr_callee
 

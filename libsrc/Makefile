@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.88 2007-06-11 14:48:21 stefano Exp $
+# $Id: Makefile,v 1.89 2007-07-17 18:12:04 dom Exp $
 
 
 include Make.config
@@ -39,12 +39,12 @@ zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib zx
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.88 2007-06-11 14:48:21 stefano Exp $
+#  $Id: Makefile,v 1.89 2007-07-17 18:12:04 dom Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.88 2007-06-11 14:48:21 stefano Exp $
+# $Id: Makefile,v 1.89 2007-07-17 18:12:04 dom Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -59,7 +59,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.88 2007-06-11 14:48:21 stefano Exp $
+#  $Id: Makefile,v 1.89 2007-07-17 18:12:04 dom Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -943,13 +943,13 @@ rcmx000_clib.lib:
 	@echo ''
 	@echo '--- Building RCM2/3000 Library  ---'
 	@echo ''
-	cd strings ; $(MAKE)
+	make -C strings clean all
 	cd stdlib ; $(MAKE) gen
 	cd stdio ; $(MAKE) gen
 	cd printflike ; $(MAKE)
 	cd setjmp ; $(MAKE)
 	cd assert ; $(MAKE)
-	z80asm -IXIY -d -ns -nm -Mo -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
+	z80asm -RCMX000 -d -ns -nm -Mo -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
 
 # embedded target - contributed by Daniel Wallner
 embedded_clib.lib:

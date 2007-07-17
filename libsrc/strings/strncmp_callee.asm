@@ -4,6 +4,8 @@
 
 XLIB strncmp_callee
 XDEF ASMDISP_STRNCMP_CALLEE
+LIB     rcmx_cpi
+
 
 .strncmp_callee
 

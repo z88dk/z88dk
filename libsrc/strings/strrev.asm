@@ -8,6 +8,8 @@
 
 XLIB strrev
 XDEF ASMDISP_STRREV
+LIB     rcmx_cpir
+
 
 .strrev
 
