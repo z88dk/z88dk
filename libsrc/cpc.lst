@@ -30,7 +30,7 @@ stdio/freopen_z88
 stdio/ftell
 stdio/fwrite
 stdio/gets
-stdio/8080/vfprintf_mini
+stdio/vfprintf_mini
 stdio/printk
 stdio/printn
 stdio/puts
