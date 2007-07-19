@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.14 2007-07-10 20:06:04 dom Exp $
+ *      $Id: stmt.c,v 1.15 2007-07-19 18:42:37 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -627,14 +627,14 @@ void doasmfunc(char wantbr)
         outbyte('\t');
         needchar('"');
         do {
-                while (!cmatch('"')) {
+                while (!acmatch('"')) {
                         c=litchar();
                         if (c == 0)
                                 break;
                         outbyte(c);
                         if ( c == 10 || c == 13 ) outstr("\n\t");
                 }
-        } while (cmatch ('"'));
+        } while (acmatch ('"'));
         needchar (')');
         outbyte('\n');
 }

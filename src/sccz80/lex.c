@@ -3,7 +3,7 @@
  *
  *      Lexical routines - string matching etc
  *
- *      $Id: lex.c,v 1.2 2004-03-26 22:06:09 denniz Exp $
+ *      $Id: lex.c,v 1.3 2007-07-19 18:42:37 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -58,6 +58,17 @@ int match(char *lit)
 int cmatch(char lit)
 {
         blanks() ;
+        if (eof) error(E_EOF);
+        if ( line[lptr] == lit ) {
+                ++lptr ;
+                return 1 ;
+        }
+        return 0 ;
+}
+
+/* Get the next character, don't skip spaces */
+int acmatch(char lit)
+{
         if (eof) error(E_EOF);
         if ( line[lptr] == lit ) {
                 ++lptr ;
