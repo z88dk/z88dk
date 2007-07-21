@@ -14,7 +14,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.18 2007-07-21 22:41:00 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.19 2007-07-21 22:43:35 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -167,8 +167,8 @@ struct JRPC_Hdr *AllocJRaddrHdr (void);
 #include <qdos.h>
 
 char _prog_name[] = "Z80asm";
-char _version[] = "1.0.20";
-char _copyright[] = "\x7f InterLogic 1993-2003";
+char _version[] = "1.0.30";
+char _copyright[] = "\x7f InterLogic 1993-2007";
 
 void consetup_title ();
 void (*_consetup) () = consetup_title;
@@ -179,11 +179,11 @@ struct WINDOWDEF _condetails =
 #endif
 
 #ifdef AMIGA
-char amiver[] = "$VER: z80asm v1.0.20, (c) InterLogic 1993-2003";
+char amiver[] = "$VER: z80asm v1.0.30, (c) InterLogic 1993-2007";
 #endif
 
 
-char copyrightmsg[] = "Z80 Module Assembler V1.0.20 (1.12.2003), (c) InterLogic 1993-2003";
+char copyrightmsg[] = "Z80 Module Assembler V1.0.30 (21.7.2007), (c) InterLogic 1993-2007";
 
 FILE *z80asmfile, *listfile, *errfile, *objfile, *mapfile, *modsrcfile, *deffile, *libfile;
 long	clineno;
