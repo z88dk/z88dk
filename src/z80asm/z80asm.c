@@ -1,3 +1,4 @@
+
 /*
      ZZZZZZZZZZZZZZZZZZZZ    8888888888888       00000000000
    ZZZZZZZZZZZZZZZZZZZZ    88888888888888888    0000000000000
@@ -13,7 +14,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.17 2007-02-28 11:23:24 stefano Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.18 2007-07-21 22:41:00 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -1202,6 +1203,8 @@ int
 main (int argc, char *argv[])
 {
   int asmflag;
+  int    include_level = 0;
+  FILE  *includes[10];   /* 10 levels of inclusion should be enough */
 
   symtable = symfile = writeline = mapref = ON;
   verbose = smallc_source = listing = listing_CPY = z80bin = datestamp = ASMERROR = codesegment = clinemode = OFF;
@@ -1255,14 +1258,14 @@ main (int argc, char *argv[])
       ++argv;
  
       if ((*argv)[0] == '-')
-	SetAsmFlag (((*argv) + 1));
+        SetAsmFlag (((*argv) + 1));
       else
-	{
-	  if ((*argv)[0] == '@')
-	    if ((modsrcfile = fopen ((*argv + 1), "rb")) == NULL)
-	      ReportIOError ((*argv + 1));
-	  break;
-	}
+        {
+          if ((*argv)[0] == '@')
+            if ((modsrcfile = fopen ((*argv + 1), "rb")) == NULL)
+              ReportIOError ((*argv + 1));
+          break;
+        }
     }
 
   ReleaseModules ();		/* Now remove dummy module again, not needed */
@@ -1291,33 +1294,52 @@ main (int argc, char *argv[])
       ASSEMBLE_ERROR = -1;	/* General error flag */
 
       if (modsrcfile == NULL)
-	{
-	  if (argc > 0)
-	    {
-	      if ((*argv)[0] != '-')
-		{
-		  strncpy(ident, *argv, 254);
-		  --argc;
-		  ++argv;	/* get ready for next filename */
-		}
-	      else
-		{
-		  ReportError (NULL, 0, 21);	/* Illegal source file name */
-		  break;
-		}
-	    }
-	  else
-	    break;
-	}
+        {
+          if (argc > 0)
+            {
+              if ((*argv)[0] != '-')
+                {
+                  strncpy(ident, *argv, 254);
+                  --argc;
+                  ++argv;	/* get ready for next filename */
+                }
+              else
+                {
+                  ReportError (NULL, 0, 21);	/* Illegal source file name */
+                  break;
+                }
+            }
+          else
+            break;
+        }
       else
-	{
+        {
+        again:          
           Fetchfilename(modsrcfile);
-	  if (strlen (ident) == 0)
-	    {
-	      fclose (modsrcfile);
-	      break;
-	    }
-	}
+          if (strlen (ident) == 0)
+            {
+              fclose (modsrcfile);
+              if ( include_level )
+                {
+                  include_level--;
+                  modsrcfile = includes[include_level];
+                  goto again;
+                }
+              break;
+            }
+          else if ( ident[0] == '@' && include_level < sizeof(includes) - 1 )
+            {
+              includes[include_level++] = modsrcfile;
+              if ( ( modsrcfile = fopen(ident + 1, "rb") ) == NULL )
+                {
+                  ReportIOError(ident+1);
+                }
+              else
+                {
+                  goto again;
+                }
+            }
+        }
 
 #ifdef QDOS
       /* explicit extension are automatically discarded */
@@ -1327,74 +1349,74 @@ main (int argc, char *argv[])
 #endif
 
       if ((srcfilename = AllocIdentifier (strlen (ident) + 5)) != NULL)
-	{
-	  strcpy (srcfilename, ident);
-	  strcat (srcfilename, srcext);		/* add '_asm' or '_opt' extension   */
-	}
+        {
+          strcpy (srcfilename, ident);
+          strcat (srcfilename, srcext);		/* add '_asm' or '_opt' extension   */
+        }
       else
-	{
-	  ReportError (NULL, 0, 3);
-	  break;
-	}
+        {
+          ReportError (NULL, 0, 3);
+          break;
+        }
       if ((objfilename = AllocIdentifier (strlen (srcfilename) + 1)) != NULL)
-	{
-	  strcpy (objfilename, srcfilename);
-	  strcpy (objfilename + strlen (srcfilename) - 4, objext);	/* overwrite '_asm' extension with
-									   * '_obj' */
-	}
+        {
+          strcpy (objfilename, srcfilename);
+          strcpy (objfilename + strlen (srcfilename) - 4, objext);	/* overwrite '_asm' extension with
+                                                                     * '_obj' */
+        }
       else
-	{
-	  ReportError (NULL, 0, 3);
-	  break;		/* No more room     */
-	}
+        {
+          ReportError (NULL, 0, 3);
+          break;		/* No more room     */
+        }
 
       if ((lstfilename = AllocIdentifier (strlen (srcfilename) + 1)) != NULL)
-	{
-	  strcpy (lstfilename, srcfilename);
-	  if (listing)
-	    strcpy (lstfilename + strlen (srcfilename) - 4, lstext);	/* overwrite '_asm' extension
-									   * with   '_lst' */
-	  else
-	    strcpy (lstfilename + strlen (srcfilename) - 4, symext);	/* overwrite '_asm' extension
-									   * with   '_sym' */
-	}
+        {
+          strcpy (lstfilename, srcfilename);
+          if (listing)
+            strcpy (lstfilename + strlen (srcfilename) - 4, lstext);	/* overwrite '_asm' extension
+                                                                         * with   '_lst' */
+          else
+            strcpy (lstfilename + strlen (srcfilename) - 4, symext);	/* overwrite '_asm' extension
+                                                                         * with   '_sym' */
+        }
       else
-	{
-	  ReportError (NULL, 0, 3);
-	  break;		/* No more room     */
-	}
+        {
+          ReportError (NULL, 0, 3);
+          break;		/* No more room     */
+        }
 
       if ((errfilename = AllocIdentifier (strlen (srcfilename) + 1)) != NULL)
-	{
-	  strcpy (errfilename, srcfilename);
-	  strcpy (errfilename + strlen (srcfilename) - 4, errext);	/* overwrite '_asm' extension with
-									   * '_err' */
-	}
+        {
+          strcpy (errfilename, srcfilename);
+          strcpy (errfilename + strlen (srcfilename) - 4, errext);	/* overwrite '_asm' extension with
+                                                                     * '_err' */
+        }
       else
-	{
-	  ReportError (NULL, 0, 3);
-	  break;		/* No more room     */
-	}
+        {
+          ReportError (NULL, 0, 3);
+          break;		/* No more room     */
+        }
 
       if ((CURRENTMODULE = NewModule ()) == NULL)
-	{			/* Create module data structures for new file */
-	  ReportError (NULL, 0, 3);
-	  break;
-	}
+        {			/* Create module data structures for new file */
+          ReportError (NULL, 0, 3);
+          break;
+        }
       if ((CURRENTFILE = Newfile (NULL, srcfilename)) == NULL)
-	break;			/* Create first     file record, if     possible */
+        break;			/* Create first     file record, if     possible */
 
       if (globaldef && CURRENTMODULE == modulehdr->first)
-	CreateDeffile ();
+        CreateDeffile ();
 
       if ((asmflag = TestAsmFile ()) == 1)
-	{
-	  AssembleSourceFile ();	/* begin assembly... */
-	  if (verbose)
-	    putchar ('\n');	/* separate module texts */
-	}
+        {
+          AssembleSourceFile ();	/* begin assembly... */
+          if (verbose)
+            putchar ('\n');	/* separate module texts */
+        }
       else if (asmflag == -1)
-	break;			/* file open error - stop assembler */
+        break;			/* file open error - stop assembler */
 
       ReleaseFilenames ();
     }				/* for */
@@ -1412,7 +1434,7 @@ main (int argc, char *argv[])
     {
       fclose (libfile);
       if (ASMERROR)
-	remove (libfilename);
+        remove (libfilename);
       free (libfilename);
       libfilename = NULL;
     }
@@ -1426,7 +1448,7 @@ main (int argc, char *argv[])
   if ((TOTALERRORS == 0) && z80bin)
     {
       if (mapref)
-	WriteMapFile ();
+        WriteMapFile ();
 
       CreateBinFile ();
     }
@@ -1458,9 +1480,9 @@ main (int argc, char *argv[])
    * surely?
    */
   if (ASMERROR)
-      return 1;
+    return 1;
   else
-      return 0;		/* assembler successfully ended */
+    return 0;		/* assembler successfully ended */
 }
 
 void
@@ -1542,3 +1564,16 @@ AllocLib (void)
 {
   return (struct libfile *) malloc (sizeof (struct libfile));
 }
+
+/*
+ * Local Variables:
+ *  indent-tabs-mode:nil
+ *  require-final-newline:t
+ *  c-basic-offset: 2
+ *  eval: (c-set-offset 'case-label 0)
+ *  eval: (c-set-offset 'substatement-open 2)
+ *  eval: (c-set-offset 'access-label 0)
+ *  eval: (c-set-offset 'class-open 2)
+ *  eval: (c-set-offset 'class-close 2)
+ * End:
+ */
