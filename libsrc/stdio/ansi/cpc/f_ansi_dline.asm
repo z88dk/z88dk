@@ -8,16 +8,20 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.1 2004-07-15 10:03:49 stefano Exp $
+;	$Id: f_ansi_dline.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
 
-	XLIB	ansi_del_line
+        XLIB	ansi_del_line
 
+        INCLUDE "#cpcfirm.def"
 
 .ansi_del_line
+        ld      a,$11
+        call    firmware
+        defw    txt_output
+        ld      a,$12
+        call    firmware
+        defw    txt_output
+        ret
 
-	ld	a,$11
-	call	$BB5A
-	ld	a,$12
-	jp	$BB5A

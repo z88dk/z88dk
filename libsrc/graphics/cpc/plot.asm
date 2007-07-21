@@ -4,7 +4,7 @@
 ;	by Stefano Bodrato  - Jul 2004
 ;
 ;
-;	$Id: plot.asm,v 1.1 2004-07-09 08:57:09 stefano Exp $
+;	$Id: plot.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
 ;Usage: plot(struct *pixel)
@@ -18,31 +18,28 @@
 ;HL = Y coordinate relative to user origin
 
 
-	INCLUDE	"graphics/grafix.inc"
 
+        XLIB    plot
+        
+        INCLUDE "#cpcfirm.def"              
+        INCLUDE	"graphics/grafix.inc"
 
-                XLIB    plot
 
 .plot
-		ld	ix,0
-		add	ix,sp
-		
-		ld	e,(ix+2)
-		ld	d,(ix+3)
-
-		ld	hl,maxy
-		sbc	hl,de
-
-		ld	e,(ix+4)
-		ld	d,(ix+5)
-
-		and	a		; double size (?)
-		rl	l
-		rl	h
-
-		and	a
-		rl	e
-		rl	d
-
-                jp      $BBEA
-
+		ld      ix,0
+		add     ix,sp
+		ld      e,(ix+2)
+		ld      d,(ix+3)
+		ld      hl,maxy
+		sbc     hl,de
+		ld      e,(ix+4)
+		ld      d,(ix+5)
+		and     a		; double size (?)
+		rl      l
+		rl      h
+		and     a
+		rl      e
+		rl      d
+        call    firmware
+        defw    gra_plot_absolute
+        ret

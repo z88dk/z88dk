@@ -3,7 +3,7 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: int_inv_sgn.asm,v 1.1 2003-08-30 16:42:48 dom Exp $
+;	$Id: int_inv_sgn.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
 		INCLUDE		"#cpcfp.def"
@@ -12,16 +12,16 @@
 
 
 .int_inv_sgn
-		xor a
-		sub l
-		ld l,a
-		sbc a,h
-		sub l
-		cp h
-		ld h,a
+		xor     a
+		sub     l
+		ld      l,a
+		sbc     a,h
+		sub     l
+		cp      h
+		ld      h,a
 		scf
-		ret nz
-		cp 1
+		ret     nz
+		cp      1
 		ret
 
 		

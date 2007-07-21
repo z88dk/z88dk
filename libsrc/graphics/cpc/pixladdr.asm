@@ -1,10 +1,11 @@
 
-	XLIB	pixeladdress
+        XLIB	pixeladdress
 
-	INCLUDE	"graphics/grafix.inc"
+        INCLUDE "#cpcfirm.def"
+        INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: pixladdr.asm,v 1.5 2004-07-09 08:57:09 stefano Exp $
+;	$Id: pixladdr.asm,v 1.6 2007-07-21 21:28:22 dom Exp $
 ;
 
 ; ******************************************************************
@@ -39,34 +40,26 @@
 
 
 .pixeladdress
-
-	push	bc
-
-	ld	a,maxy
-	sub	l
-	
-	ld	d,0
-	ld	e,h
-	ld	h,d
-	ld	l,a
-
-	call	$BC1D
-	ld	d,h
-	ld	e,l
-
-	ld	a,c
-
-	ld	c,-1
-.loopa
-	inc	c
-	rra
-	jr	nc,loopa
-
-	ld	a,c
+        push	bc
+        ld      a,maxy
+        sub     l	
+        ld      d,0
+        ld      e,h
+        ld      h,d
+        ld      l,a
+        call    firmware
+        defw    scr_dot_position
+        ld      d,h
+        ld      e,l
+        ld      a,c
+        ld      c,-1
+.loopa  inc     c
+        rra
+        jr      nc,loopa
+        ld      a,c
 
 .grayaltpage
-	nop
-
-	pop	bc
-	ret
+        nop
+        pop     bc
+        ret
 

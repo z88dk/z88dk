@@ -4,22 +4,27 @@
 ;       Amstrad CPC version by Stefano Bodrato  15/6/2001
 ;
 ;
-;	$Id: clg.asm,v 1.4 2004-07-09 08:57:09 stefano Exp $
+;	$Id: clg.asm,v 1.5 2007-07-21 21:28:22 dom Exp $
 ;
 
 
-	XLIB    clg
+        XLIB    clg
 
-
-	INCLUDE	"graphics/grafix.inc"
+        INCLUDE "#cpcfirm.def"
+        
+        INCLUDE	"graphics/grafix.inc"
 
 ; Possible colors: 0 (blue), 1 (yellow), 2 (cyan), 3 (red)
 ;
 ;
 
 .clg
-	ld	a,bcolor
-	call	$BBE4
-	ld	a,fcolor
-	call	$BBDE
-	jp	$BC14	; clear the screen
+        ld      a,bcolor
+        call    firmware
+        defw    gra_set_paper
+        ld      a,fcolor
+        call    firmware
+        defw    gra_set_pen
+        call    firmware
+        defw    scr_clear
+        ret

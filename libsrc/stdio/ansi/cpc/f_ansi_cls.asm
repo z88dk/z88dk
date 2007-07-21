@@ -6,24 +6,29 @@
 ;	Stefano Bodrato - Jul. 2004
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.1 2004-07-15 10:03:49 stefano Exp $
+;	$Id: f_ansi_cls.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
-	XLIB	ansi_cls
+        XLIB	ansi_cls
 
-.ansi_cls
-	
+        INCLUDE "#cpcfirm.def"
+
+ .ansi_cls	
 	;ld	a,0	; 20x25x16 text mode
 	;ld	a,1	; 40x25x4 text mode
 	;ld	a,2	; 80x25 mono text mode
 	;call	$bc0e	;set mode
 	
-	; call $BB7B 
-	call	$BB4E	; init TEXT
+        call    firmware
+        defw    txt_initialise
         ld      a,2
-        call	$BB90 	;ink	bright cyan
-        ld	a,0
-        call	$BB96	;paper	blue
-	ld	a,$0C
-	jp	$BB5A	; Form Feed (CLS)
+        call    firmware
+        defw    txt_set_pen
+        xor     a
+        call    firmware
+        defw    txt_set_paper
+        ld      a,$0c
+        call    firmware
+        defw    txt_output
+        ret
 

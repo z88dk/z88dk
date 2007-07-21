@@ -4,26 +4,29 @@
 ;	by Stefano Bodrato  - Jul 2004
 ;
 ;
-;	$Id: undraw.asm,v 1.1 2004-07-09 08:57:09 stefano Exp $
+;	$Id: undraw.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
 
-                XLIB    undraw
-		LIB	draw
+            
+        XLIB    undraw
+		LIB     draw
 
-	INCLUDE	"graphics/grafix.inc"
+        INCLUDE "#cpcfirm.def"
 
-.hlsave		defw	0
+        INCLUDE	"graphics/grafix.inc"
 
-.undraw
-	ld	a,bcolor
-	call	$BBDE
+.hlsave	defw	0
 
-	pop	hl
-	ld	(hlsave),hl
-	call	draw
-	ld	hl,(hlsave)
-	push	hl
-
-	ld	a,fcolor
-	jp	$BBDE
+.undraw ld      a,bcolor
+        call    firmware
+        defw    gra_set_pen
+        pop     hl
+        ld      (hlsave),hl
+        call	draw
+        ld      hl,(hlsave)
+        push	hl
+        ld      a,fcolor
+        call    firmware
+        defw    gra_set_pen
+        ret

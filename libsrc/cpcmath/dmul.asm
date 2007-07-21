@@ -3,9 +3,10 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: dmul.asm,v 1.1 2003-08-30 16:42:48 dom Exp $
+;	$Id: dmul.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
+		INCLUDE		"#cpcfirm.def"
 		INCLUDE		"#cpcfp.def"
 
 		XLIB		dmul
@@ -17,7 +18,8 @@
 
 .dmul						; (fa+1)=(fa+1)*(sp+3)
 		call	fsetup
-.dmulc		call	CPCFP_FLO_MUL		; (hl)=(hl)*(de)
-		jp	stkequ
+        call    firmware
+.dmulc	defw    CPCFP_FLO_MUL		; (hl)=(hl)*(de)
+		jp      stkequ
 
 

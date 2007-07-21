@@ -5,7 +5,7 @@
  *
  *
  * -----
- * $Id: writebyte.c,v 1.1 2003-09-12 16:30:43 dom Exp $
+ * $Id: writebyte.c,v 1.2 2007-07-21 21:28:22 dom Exp $
  */
 
 
@@ -20,20 +20,21 @@ int writebyte(int fd, int byte)
 		return EOF;
 #asm
         INCLUDE "#cpcfirm.def"
-	pop	bc
-	pop	hl	;byte
-	pop	de	;file handle (ignore it)
+	pop	    bc
+	pop	    hl	;byte
+	pop	    de	;file handle (ignore it)
 	push	de
 	push	hl
 	push	bc
-	ld	a,l
+	ld	    a,l
 	push	af
-	call	cas_out_char
-	pop	af
-	ld	l,a
-	ld	h,0
-	ret	c	;was written ok
-	ld	hl,EOF
+    call    firmware
+	defw	cas_out_char
+	pop	    af
+	ld	    l,a
+	ld	    h,0
+	ret	    c	;was written ok
+	ld	    hl,EOF
 #endasm
 }
 

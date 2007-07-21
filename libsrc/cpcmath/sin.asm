@@ -3,9 +3,10 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: sin.asm,v 1.1 2003-08-30 16:42:48 dom Exp $
+;	$Id: sin.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
+		INCLUDE		"#cpcfirm.def"
 		INCLUDE		"#cpcfp.def"
 
 		XLIB		sin
@@ -13,6 +14,7 @@
 
 		LIB		get_para
 
-.sin		call	get_para
-.sinc		call	CPCFP_FLO_SIN
+.sin	call	get_para
+        call    firmware
+.sinc	defw	CPCFP_FLO_SIN
 		ret

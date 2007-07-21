@@ -3,9 +3,10 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: deg.asm,v 1.1 2003-08-30 16:42:48 dom Exp $
+;	$Id: deg.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
+		INCLUDE		"#cpcfirm.def"
 		INCLUDE		"#cpcfp.def"
 
 		XLIB		deg
@@ -13,7 +14,8 @@
 
 
 
-.deg		ld	a,1
-.degc		call	CPCFP_FLO_DEG_RAD
+.deg	ld      a,1
+        call    firmware
+.degc   defw	CPCFP_FLO_DEG_RAD
 		ret
 

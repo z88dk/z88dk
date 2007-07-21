@@ -3,9 +3,10 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: log10.asm,v 1.1 2003-08-30 16:42:48 dom Exp $
+;	$Id: log10.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
+		INCLUDE		"#cpcfirm.def"
 		INCLUDE		"#cpcfp.def"
 
 		XLIB		log10
@@ -13,6 +14,7 @@
 
 		LIB		get_para
 
-.log10		call	get_para
-.log10c		call	CPCFP_FLO_LOG10
+.log10	call	get_para
+        call    firmware
+.log10c	defw	CPCFP_FLO_LOG10
 		ret

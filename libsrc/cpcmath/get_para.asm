@@ -3,7 +3,7 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: get_para.asm,v 1.1 2003-08-30 16:42:48 dom Exp $
+;	$Id: get_para.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
 		INCLUDE		"#cpcfp.def"
@@ -12,11 +12,12 @@
 
 		XREF		fa
 
-.get_para	ld	hl,4
-		add	hl,sp
-		ld	de,fa		;(fa) <- (hl)
-		ld	bc,6
+.get_para	
+        ld      hl,4
+		add     hl,sp
+		ld      de,fa		;(fa) <- (hl)
+		ld      bc,6
 		ldir
-		ld	hl,fa+1
+		ld      hl,fa+1
 		ret
 

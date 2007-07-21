@@ -3,7 +3,7 @@
  *
  * 	Open a CPC file for reading
  * -----
- * $Id: cpc_openin.c,v 1.1 2003-09-12 16:30:43 dom Exp $
+ * $Id: cpc_openin.c,v 1.2 2007-07-21 21:28:22 dom Exp $
  */
 
 
@@ -15,7 +15,8 @@ int cpc_openin(char *name, int len, char *buf)
 	INCLUDE		"#cpcfirm.def"
 	LIB		cpc_setup_open
 	call	cpc_setup_open
-	call	cas_in_open
+    call    firmware
+	defw	cas_in_open
 	ld	hl,1
 	ret	c
 	ld	hl,-1

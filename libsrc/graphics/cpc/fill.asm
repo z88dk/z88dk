@@ -23,48 +23,53 @@
 ;              Carry false
 ;
 ;
-;	$Id: fill.asm,v 1.1 2005-03-02 08:27:35 stefano Exp $
+;	$Id: fill.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
 
 ;Usage: fill(struct *pixel)
 
-	INCLUDE	"graphics/grafix.inc"
+        XLIB    fill
 
-                XLIB    fill
+        INCLUDE "#cpcfirm.def"
+        
+        INCLUDE	"graphics/grafix.inc"
+
 
 .fill
-		ld	ix,0
-		add	ix,sp
+		ld      ix,0
+		add     ix,sp
 		
-		ld	e,(ix+2)
-		ld	d,(ix+3)
+		ld      e,(ix+2)
+		ld      d,(ix+3)
 
-		ld	hl,maxy
-		sbc	hl,de
+		ld      hl,maxy
+		sbc     hl,de
 
-		ld	e,(ix+4)
-		ld	d,(ix+5)
+		ld      e,(ix+4)
+		ld      d,(ix+5)
 
-		and	a		; double size (?)
-		rl	l
-		rl	h
+		and     a		; double size (?)
+		rl      l
+		rl      h
 
-		and	a
-		rl	e
-		rl	d
+		and     a
+		rl      e
+		rl      d
 
-		call	$BBC0		; Move to absolute pos.
+        call    firmware
+        defw    gra_move_absolute
 
-             	ld	a,fcolor
+        ld      a,fcolor
 
 		ld      hl,-3192	; create the buffer on stack
 		add     hl,sp
 		ld      sp,hl
-		ld	d,h
-		ld	e,l
+		ld      d,h
+		ld      e,l
 
-		call	$BD52		; Fill the area
+        call    firmware
+        defw    gra_fill        ; 664/6128 only
 
 		ld      hl,3192		; restore the stack pointer
 		add     hl,sp

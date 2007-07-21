@@ -3,9 +3,10 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: dgt.asm,v 1.1 2003-08-30 16:42:48 dom Exp $
+;	$Id: dgt.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
+		INCLUDE		"#cpcfirm.def"
 		INCLUDE		"#cpcfp.def"
 
 		XLIB		dgt
@@ -15,10 +16,11 @@
 		LIB		stkequcmp
 		LIB		cmpfin
 
-.dgt		call	fsetup
-.dgtc		call	CPCFP_FLO_CMP		; comp (hl)?(de)	
-		cp	$1			;(hl) > (de)
-		jp	z,cmpfin
-		xor	a
-		jp	stkequcmp
+.dgt	call	fsetup
+        call    firmware
+.dgtc	defw	CPCFP_FLO_CMP		; comp (hl)?(de)	
+		cp      $1			;(hl) > (de)
+		jp      z,cmpfin
+		xor     a
+		jp      stkequcmp
 

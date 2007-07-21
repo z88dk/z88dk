@@ -5,7 +5,7 @@
  *
  *
  * -----
- * $Id: readbyte.c,v 1.1 2003-09-12 16:30:43 dom Exp $
+ * $Id: readbyte.c,v 1.2 2007-07-21 21:28:22 dom Exp $
  */
 
 
@@ -20,12 +20,13 @@ int __FASTCALL__ readbyte(int fd)
 		return EOF;
 #asm
         INCLUDE "#cpcfirm.def"
-	call	cas_in_char
+    call    firmware
+	defw	cas_in_char
 	ccf
-	ld	l,a
-	ld	h,0
-	jr	nc,read_ok
-	ld	hl,EOF
+	ld	    l,a
+	ld  	h,0
+	jr	    nc,read_ok
+	ld	    hl,EOF
 .read_ok	; Need this label since this function is __FASTCALL__
 #endasm
 }

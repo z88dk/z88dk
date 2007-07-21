@@ -6,18 +6,22 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.1 2004-07-15 10:03:49 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
-	XLIB	ansi_SCROLLUP
+        XLIB	ansi_SCROLLUP
 
-	XREF	text_rows
+        INCLUDE "#cpcfirm.def"
+        XREF	text_rows
 
 
 .ansi_SCROLLUP
-	ld	a,50
-	call	$BB72
-	ld	a,10
-	jp	$BB5A
+        ld      a,50
+        call    firmware
+        defw    txt_set_row
+        ld      a,10
+        call    firmware
+        defw    txt_output
+        ret
  
  

@@ -13,13 +13,15 @@
 ; The XOR mode is totally untested.
 ;
 ;
-; $Id: putsprite3.asm,v 1.1 2004-07-09 08:57:09 stefano Exp $
+; $Id: putsprite3.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
 
-	XLIB    putsprite
-
-	INCLUDE	"graphics/grafix.inc"
+	
+        XLIB    putsprite
+        
+        INCLUDE "#cpcfirm.def"
+        INCLUDE	"graphics/grafix.inc"
 
 
 ; coords: h,l (vert-horz)
@@ -32,17 +34,15 @@
         ld      e,(hl)
         inc     hl
         ld      d,(hl)  ;sprite address
-	push	de
-	pop	ix
+        push	de
+        pop     ix
 
         inc     hl
         ld      e,(hl)
- 	inc	hl
+        inc     hl
         inc     hl
         ld      d,(hl)	; x and y coords
-
-	inc	hl
-
+        inc     hl
         inc     hl
         ld      a,(hl)  ; and/or/xor mode
 
@@ -50,125 +50,128 @@
 	; 182 - or
 	; 174 - xor
 
-	cp	166	; and(hl) opcode
-	jr	nz,noand
+        cp      166	; and(hl) opcode
+        jr      nz,noand
 	
-	push	de
-	ld	a,bcolor
-	call	$BBDE
-	pop	de
-
-	jr	modeset
+        push	de
+        ld      a,bcolor
+        call    firmware
+        defw    gra_set_pen
+        pop     de
+        jr      modeset
 .noand
 
-	cp	174	; xor(hl) opcode
-	jr	nz,modeset ; Probably we have an "OR"
+        cp      174	; xor(hl) opcode
+        jr      nz,modeset ; Probably we have an "OR"
 
-	push	de
-	ld	a,1	; XOR
-	call	$BC59	; ..set mode
-	;ld	a,fcolor
-	;call	$BBDE
-	pop	de
+        push	de
+        ld      a,1	; XOR
+        call    firmware
+        defw    scr_access
+        pop     de
 
 .modeset
-	ld	h,d
-	ld	l,e
+        ld      h,d
+        ld      l,e
 
-	ld	a,(ix+0)	; Width
-	ld	b,(ix+1)	; Height
+        ld      a,(ix+0)	; Width
+        ld      b,(ix+1)	; Height
 .oloopx	push	bc		;Save # of rows
-	push	af
+        push	af
 
-	;ld	b,a		;Load width
-	ld	b,0		; Better, start from zero !!
+        ;ld	b,a		;Load width
+        ld      b,0		; Better, start from zero !!
 
-	ld	c,(ix+2)	;Load one line of image
+        ld      c,(ix+2)	;Load one line of image
 
-.iloopx	sla	c		;Test leftmost pixel
-	jr	nc,noplotx	;See if a plot is needed
+.iloopx	sla     c		;Test leftmost pixel
+        jr      nc,noplotx	;See if a plot is needed
 
-	pop	af
-	push	af
+        pop     af
+        push	af
 
-	push	hl
-	push	bc
-	push	de
+        push	hl
+        push	bc
+        push	de
 
-	ld	a,h
-	add	a,b
-	ld	h,a
+        ld      a,h
+        add     a,b
+        ld      h,a
 
-	ld	a,maxy
-	sub	l
-	ld	e,h
-	ld	h,0
-	ld	d,h
-	ld	l,a
+        ld      a,maxy
+        sub     l
+        ld      e,h
+        ld      h,0
+        ld      d,h
+        ld      l,a
 
 	;ld	h,0
 	;ld	d,h
 	;ld	e,a
 
 
-	and	a		; double size (?)
-	rl	l
-	rl	h
+        and     a		; double size (?)
+        rl      l
+        rl      h
 
-	and	a
-	rl	e
-	rl	d
+        and     a
+        rl      e
+        rl      d
 
-	call	$BBEA	; plot pixel in current mode
-
-	pop	de
-	pop	bc
-	pop	hl
+        call    firmware
+        defw    gra_plot_absolute
+        pop     de
+        pop     bc
+        pop     hl
 
 .noplotx
 
-	inc	b	; witdh counter
+        inc     b	; witdh counter
 	
-	pop	af
-	push	af
+        pop     af
+        push	af
 	
-	cp	b		; end of row ?
+        cp      b		; end of row ?
 	
-	jr	nz,noblkx
+        jr      nz,noblkx
 	
-	inc	ix
-	ld	c,(ix+2)	;Load next byte of image
+        inc     ix
+        ld      c,(ix+2)	;Load next byte of image
 	
-	jr noblockx
+        jr      noblockx
 	
 .noblkx
 	
-	ld	a,b	; next byte in row ?
-	;dec	a
-	and	a
-	jr	z,iloopx
-	and	7
+        ld      a,b	; next byte in row ?
+        ;dec	a
+        and     a
+        jr      z,iloopx
+        and     7
 	
-	jr	nz,iloopx
+        jr      nz,iloopx
 	
 .blockx
-	inc	ix
-	ld	c,(ix+2)	;Load next byte of image
-	jr	iloopx
+        inc     ix
+        ld      c,(ix+2)	;Load next byte of image
+        jr      iloopx
 
 .noblockx
 
-	inc	l
+        inc     l
 
-	pop	af
-	pop	bc		;Restore data
-	djnz	oloopx
+        pop     af
+        pop     bc		;Restore data
+        djnz	oloopx
 	
 	
-	ld	a,fcolor	;Restore fore color
-	call	$BBDE
-	
-	ld	a,0	; FORCE mode (OR)
-	jp	$BC59	; .. and return
+        ld      a,fcolor	;Restore fore color
+        call    firmware
+        defw    gra_set_pen
+
+          
+        ld      a,0	; FORCE mode (OR)
+        call    firmware
+        defw    scr_access
+        ret
 
 

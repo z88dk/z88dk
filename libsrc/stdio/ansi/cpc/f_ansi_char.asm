@@ -11,10 +11,13 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.1 2004-07-15 10:03:49 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
 ;
 
 	XLIB	ansi_CHAR
+
+    INCLUDE "#cpcfirm.def"
+               
 	
 	XREF	ansi_ROW
 	XREF	ansi_COLUMN
@@ -30,27 +33,33 @@
 .text_rows   defb 25
 
 .ansi_CHAR
-	ld	e,a
-	ld	a,(ansi_COLUMN)
-	inc	a
-	ld	h,a
-	ld	a,(ansi_ROW)
-	inc	a
-	ld	l,a
-	push	hl
-	call	$BB75
-	ld	a,e
-	call	$BB5A
-	pop	hl
-	ld	a,(UNDRL)
-	and	a
-	ret	z
-
-	call	$BB75
-	ld	a,1
-	call	$BB9F	; Transparent Text mode
-	ld	a,'_'
-	call	$BB5A
-	xor	a
-	jp	$BB9F	; Opaque Text mode
-
+        ld      e,a
+        ld      a,(ansi_COLUMN)
+        inc     a
+        ld      h,a
+        ld      a,(ansi_ROW)
+        inc     a
+        ld      l,a
+        push	hl
+        call    firmware
+        defw    txt_set_cursor
+        ld      a,e
+        call    firmware
+        defw    txt_output
+        pop     hl
+        ld      a,(UNDRL)
+        and     a
+        ret     z
+        call    firmware
+        defw    txt_set_cursor
+        ld      a,1
+        call    firmware
+        defw    txt_set_back
+        ld      a,'_'
+        call    firmware
+        defw    txt_output
+        xor     a
+        call    firmware
+        defw    txt_set_back
+        ret
+        
