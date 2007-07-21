@@ -3,9 +3,10 @@ lstoff
 ; CPC Firmware Calculations
 ;
 ; September 2003
-; $Id: cpcfirm.def,v 1.2 2007-07-21 19:56:33 dom Exp $
+; $Id: cpcfirm.def,v 1.3 2007-07-21 21:27:23 dom Exp $
 ;
 
+    XREF    firmware    ; Interposer for firmware routines
 
     defc    kl_choke_off    = $bcc8
     defc    kl_rom_walk     = $bccb
@@ -207,8 +208,7 @@ lstoff
     defc    mc_send_printer = $bd31
     defc    mc_sound_register = $bd34
     defc    mc_jump_restore = $bd37
-
-    
+ 
     defc    bios_set_message = $c033
     defc    bios_setup_disc = $c036
     defc    bios_select_format = $c039
@@ -220,6 +220,19 @@ lstoff
     defc    bios_set_retry_count = $c04b
     defc    bios_get_sector_data = $c56c
 
+    ; 664 + 6128 only
+    defc    km_set_locks    = $bd3a
+    defc    km_flush        = $bd3d
+    defc    txt_ask_state   = $bd40
+    defc    gra_default     = $bd43
+    defc    gra_set_back    = $bd46
+    defc    gra_set_first   = $bd49
+    defc    gra_set_line_mask = $bd4c
+    defc    gra_from_user   = $bd4f
+    defc    gra_fill        = $bd52
+    defc    scr_set_position = $bd55
+    defc    mc_print_translation = $bd58
+    defc    kl_bank_switch  = $bd5b ; 6128 only
 
 
 
