@@ -10,7 +10,7 @@
  *      Stefano has converted many of these routines to the new ports
  *      Some will work, some will not. djm 6/6/2000
  *
- *	$Id: graphics.h,v 1.5 2002-03-28 09:41:12 stefano Exp $
+ *	$Id: graphics.h,v 1.6 2007-08-17 13:52:33 stefano Exp $
  */
 
 #ifndef __GFX_H__
@@ -42,6 +42,8 @@ extern __LIB__ unplot(int x, int y);
 extern __LIB__ xorplot(int x, int y);
 /* Get pixel status */
 extern __LIB__ point(int x, int y);
+/* Get horizontal or vertical pixel bar, up to 16 pixel long */
+extern __LIB__ multipoint(int hv, int length, int x, int y);
 /* Draw a line */
 extern __LIB__ draw(int x1, int y1, int x2, int y2);
 /* Remove a line */
