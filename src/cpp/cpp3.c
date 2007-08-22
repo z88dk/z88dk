@@ -350,21 +350,11 @@ initdefines()
 	     * Define __DATE__ as today's date.
 	     */
 	    dp = defendel("__DATE__", FALSE);
-	    dp->repl = tp = getmem(13);
+	    dp->repl = tp = getmem(14);
 	    dp->nargs = DEF_NOARGS;
             time(&tvec);
 	    tmp=localtime(&tvec);
-	    tp[0] = '"';
-	    strncpy(&tp[1],"JanFebMarAprMayJunJulAugSepOctNovDec"+tmp->tm_mon*3,3);
-	    tp[4] = ' ';
-	    tp[5] = '0'+tmp->tm_mday/10;
-	    tp[6] = '0'+tmp->tm_mday%10;
-	    tp[7] = ' ';
-	    tp[8] = '0'+((tmp->tm_year+1900)/1000);
-	    tp[9] = '0'+(((tmp->tm_year+1900)/100)%10);
-	    tp[10] = '0'+tmp->tm_year/10;
-	    tp[11] = '0'+tmp->tm_year%10;
-	    tp[12] = '"';
+	    strftime(tp, 14,"\"%b %d %Y\"",tmp);
             /*
              * Define __TIME__ as current time.
              */
