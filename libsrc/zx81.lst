@@ -190,6 +190,7 @@ graphics/zx81/xorpixl
 graphics/putsprite3
 graphics/point
 graphics/pointxy
+graphics/multipoint
 graphics/rbitmask
 graphics/rscroll
 graphics/uncircle

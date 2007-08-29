@@ -192,6 +192,7 @@ graphics/putsprite_smc
 graphics/swapgfxbk_foo
 graphics/point
 graphics/pointxy
+graphics/multipoint
 graphics/rbitmask
 graphics/rscroll
 graphics/uncircle

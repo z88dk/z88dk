@@ -183,6 +183,7 @@ graphics/cpc/plot
 graphics/plotpixl
 graphics/point
 graphics/pointxy
+graphics/multipoint
 graphics/rbitmask
 graphics/respixl
 graphics/rscroll
