@@ -200,7 +200,7 @@ graphics/text6/clsgraph
 graphics/text6/swapgfxbk
 graphics/putsprite2
 graphics/point
-graphics/pointxy
+graphics/text6/pointxy
 graphics/multipoint
 graphics/rbitmask
 graphics/rscroll
