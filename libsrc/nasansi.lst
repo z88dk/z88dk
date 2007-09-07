@@ -201,7 +201,7 @@ graphics/nascom/swapgfxbk
 graphics/text6/div3
 graphics/putsprite2
 graphics/point
-graphics/pointxy
+graphics/nascom/pointxy
 graphics/multipoint
 graphics/rbitmask
 graphics/rscroll
