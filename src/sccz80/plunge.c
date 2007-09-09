@@ -3,7 +3,7 @@
  *
  *      Plunging routines
  *
- *      $Id: plunge.c,v 1.9 2007-07-15 16:14:44 dom Exp $
+ *      $Id: plunge.c,v 1.10 2007-09-09 15:29:33 dom Exp $
  *
  *      Altogether now...arse! My cunning scheme to use c as an
  *      indicator flops badly due to logical conditions, I just
@@ -310,7 +310,7 @@ void plnge2b(int (*heir)(), LVALUE *lval, LVALUE *lval2, void (*oper)())
             }
         }
     }
-    if ( lval->is_const && lval2->is_const ) {
+    if ( lval->is_const &= lval2->is_const ) {
         /* both operands constant */
         if (oper == zadd) lval->const_val += lval2->const_val ;
         else if (oper == zsub) lval->const_val -= lval2->const_val ;
