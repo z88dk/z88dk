@@ -7,7 +7,7 @@
 ;	Non IY dependent (self modifying code)
 ;	A' isn't used
 ;
-;	$Id: dcircle2.asm,v 1.3 2002-04-24 08:15:03 stefano Exp $
+;	$Id: dcircle2.asm,v 1.4 2007-09-24 08:07:24 stefano Exp $
 ;
 
 
@@ -74,8 +74,6 @@ DEFVARS 0
 .l9920    ld    a,(ix+y0)  
           add   a,(ix+radius)  
 
-          ;ld    l,a
-          ;ex    af,af'
           ld    l,a
           ld	a,(asave)
           push	af
@@ -88,8 +86,6 @@ DEFVARS 0
           ld    h,a  
           call  doplot  
 
-          ;ex    af,af'
-          ;ld    l,a
           push	af
           ld	a,(asave)
           ld	l,a
@@ -104,8 +100,6 @@ DEFVARS 0
           ld    a,(ix+y0)  
           sub   (ix+radius)
           
-          ;ld    l,a  
-          ;ex    af,af'
           ld    l,a
           ld	a,(asave)
           push	af
@@ -118,8 +112,6 @@ DEFVARS 0
           ld    h,a  
           call  doplot  
           
-          ;ex    af,af'
-          ;ld    l,a
           push	af
           ld	a,(asave)
           ld	l,a
@@ -136,8 +128,6 @@ DEFVARS 0
           ld    a,(ix+y0)  
           add   a,(ix+cx)  
 
-          ;ld    l,a  
-          ;ex    af,af'
           ld    l,a
           ld	a,(asave)
           push	af
@@ -150,8 +140,6 @@ DEFVARS 0
           ld    h,a  
           call  doplot  
           
-          ;ex    af,af'
-          ;ld    l,a
           push	af
           ld	a,(asave)
           ld	l,a
@@ -166,8 +154,6 @@ DEFVARS 0
           ld    a,(ix+y0)  
           sub   (ix+cx)  
 
-          ;ld    l,a  
-          ;ex    af,af'
           ld    l,a
           ld	a,(asave)
           push	af
@@ -180,8 +166,6 @@ DEFVARS 0
           ld    h,a  
           call  doplot  
 
-          ;ex    af,af'
-          ;ld    l,a
           push	af
           ld	a,(asave)
           ld	l,a

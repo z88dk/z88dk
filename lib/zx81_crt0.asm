@@ -9,7 +9,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.11 2007-06-27 20:49:28 dom Exp $
+;       $Id: zx81_crt0.asm,v 1.12 2007-09-24 08:07:24 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -54,7 +54,37 @@
 
 	org	16514
 
+
+; Hide the mess in the REM line from BASIC program listing
+
+;	jr	start
+;	defb	118,255		; block further listing
+
+; As above, but more elegant
+
+	ld	a,(hl)		; hide the first 6 bytes of REM line
+	jp	start		; invisible
+	defb	0,0		; invisible
+
+	defb	'Z'-27		; Change this with your own signature
+	defb	'8'-20
+	defb	'8'-20
+	defb	'D'-27
+	defb	'K'-27
+	defb	0
+	defb	'C'+101
+	defb	149	; '+'
+	defb	118,255		; block further listing
+
 .start
+
+IF (startup=2)
+	ld	ix,L0281
+ENDIF
+
+IF (startup=3)
+	call	HRG_On
+ENDIF
 	ld	(start1+1),sp	;Save entry stack
         ld      hl,-64		;Create an atexit() stack
         add     hl,sp
@@ -74,6 +104,7 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
+
         call    _main	;Call user program
         
 .cleanup
@@ -90,6 +121,14 @@ ENDIF
 
 	call	restore81
 
+IF (startup=2)
+	ld	ix,$281
+ENDIF
+
+IF (startup=3)
+;	call	HRG_Off
+ENDIF
+
 	pop	bc
 .start1	ld	sp,0		;Restore stack to entry value
         ret
@@ -98,41 +137,30 @@ ENDIF
         jp      (hl)
 
 
-IF !(startup=2)
+IF !((startup=2)|(startup=3))
 .a1save 	defb	0
-.hl1save	defw	0
-.de1save	defw	0
-.bc1save	defw	0
 ENDIF
 
 .restore81
 	ld	iy,16384
-IF !(startup=2)
+IF !((startup=2)|(startup=3))
 	; SLOW/FAST trick; flickers but permits the alternate registers usage
 	ex	af,af
 	ld	a,(a1save)
 	ex	af,af
-	exx
-        ld	hl,(hl1save)
-        ld	de,(de1save)
-        ld	bc,(bc1save)
-        exx
         call	$F2B		; SLOW mode
+        ;call	$207	;slowfast
 ENDIF
 	ret
 	
 .save81
-IF !(startup=2)
+IF !((startup=2)|(startup=3))
 	; SLOW/FAST trick; flickers but permits the alternate registers usage
         call	$F23		; FAST mode
+        ;call	$2E7	;setfast
 	ex	af,af
 	ld	(a1save),a
 	ex	af,af
-	exx
-        ld	(hl1save),hl
-        ld	(de1save),de
-        ld	(bc1save),bc
-        exx
 ENDIF
 	ret
 
@@ -165,6 +193,20 @@ ELSE
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF
+ENDIF
+
+
+IF (startup=2)
+	INCLUDE "#zx81_altint.def"
+ENDIF
+
+;---------------------------------------
+; High Resolution Graphics (Wilf Righter WRX mode)
+; Code my Matthias Swatosch
+;---------------------------------------
+
+IF (startup=3)
+	INCLUDE "#zx81_hrg.def"
 ENDIF
 
 

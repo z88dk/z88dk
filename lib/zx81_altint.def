@@ -1,0 +1,119 @@
+;       CRT0 for the ZX81 - SLOW MODE
+;
+;       Modified display handler to preserve IY
+;
+;       Stefano Bodrato Sept. 2007
+;
+; - - - - - - -
+;
+;       $Id: zx81_altint.def,v 1.1 2007-09-24 08:07:24 stefano Exp $
+;
+; - - - - - - -
+
+
+;; DISPLAY-1
+L0229:  LD      HL,($4034)      ; fetch two-byte system variable FRAMES.
+        DEC     HL              ; decrement frames counter.
+
+;; DISPLAY-P
+L022D:  LD      A,$7F           ;
+        AND     H               ;
+        OR      L               ;
+        LD      A,H             ;
+        JR      NZ,L0237        ; to ANOTHER
+
+        RLA                     ;
+        JR      L0239           ; to OVER-NC
+
+; ---
+
+;; ANOTHER
+L0237:  LD      B,(HL)          ;
+        SCF                     ; Set Carry Flag
+
+;; OVER-NC
+L0239:  LD      H,A             ;
+        LD      ($4034),HL      ; sv FRAMES_lo
+        RET     NC              ;
+
+;; DISPLAY-2
+L023E:  
+	push	iy
+	ld	iy,16384
+	CALL    $2BB           ; routine KEYBOARD
+	pop	iy
+        LD      BC,($4025)      ; sv LAST_K
+        LD      ($4025),HL      ; sv LAST_K
+        LD      A,B             ;
+        ADD     A,$02           ;
+        SBC     HL,BC           ;
+        LD      A,($4027)       ; sv DEBOUNCE
+        OR      H               ;
+        OR      L               ;
+        LD      E,B             ;
+        LD      B,$0B           ;
+        LD      HL,$403B        ; system variable CDFLAG
+        RES     0,(HL)          ;
+        JR      NZ,L0264        ; to NO-KEY
+
+        BIT     7,(HL)          ;
+        SET     0,(HL)          ;
+        RET     Z               ;
+
+        DEC     B               ;
+        NOP                     ;
+        SCF                     ; Set Carry Flag
+
+;; NO-KEY
+L0264:  LD      HL,$4027        ; sv DEBOUNCE
+        CCF                     ; Complement Carry Flag
+        RL      B               ;
+
+;; LOOP-B
+L026A:  DJNZ    L026A           ; to LOOP-B
+
+        LD      B,(HL)          ;
+        LD      A,E             ;
+        CP      $FE             ;
+        SBC     A,A             ;
+        LD      B,$1F           ;
+        OR      (HL)            ;
+        AND     B               ;
+        RRA                     ;
+        LD      (HL),A          ;
+        OUT     ($FF),A         ;
+        LD      HL,($400C)      ; sv D_FILE_lo
+        SET     7,H             ;
+
+        CALL    L0292           ; routine DISPLAY-3
+
+; ---
+
+;; R-IX-1
+L0281:  LD      A,R             ;
+        LD      BC,$1901        ;
+        LD      A,$F5           ;
+        CALL    $2B5           ; routine DISPLAY-5
+        DEC     HL              ;
+
+        CALL    L0292           ; routine DISPLAY-3
+
+; ---
+
+;; R-IX-2
+L028F:  JP      L0229           ; to DISPLAY-1
+
+; ---
+
+;; DISPLAY-3
+L0292:  POP     IX              ; return address to IX register.
+                                ; will be either L0281 or L028F - see above.
+
+; Changed here to keep IY unchanged
+
+	ld	a,(16424)      ; load C with MARGIN
+	ld	c,a
+	ld	a,(16443)      ; test CDFLAG
+	bit	7,a
+
+	jp	$29b
