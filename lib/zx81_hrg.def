@@ -2,30 +2,43 @@
 ;
 ;
 ;       This code comes from the 'HRG_Tool'  by Matthias Swatosch
-;	Display handler modifications (to preserve IY) by Stefano Bodrato
+;       Display handler modifications (to preserve IY) by Stefano Bodrato
 ;       
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.1 2007-09-24 08:07:24 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.2 2007-09-26 08:22:52 stefano Exp $
 ;
 ; - - - - - - -
 
+IF (startup>=5)
+  DEFC  BASE16K   = $7800
+  DEFC  RAMTOP16K = $7780
+  DEFC  WHOLEMEM = 2048+128
+ELSE
+  DEFC  BASE16K = $6800
+  DEFC  RAMTOP16K = $6780
+  DEFC  WHOLEMEM = 6144+128
+ENDIF
+
 ;--------------------------------------------------------------
 ;--------------------------------------------------------------
+
+XDEF    HRG_On
+XDEF    HRG_Off
 
 ;------------------------------------------
 ;
 ;   ZX81 system variables
 ;
 ;------------------------------------------
-;DEFC	ERR_NR 	= 16384	;byte 	one less than the report code
-;DEFC	FLAGS 	= 16385	;byte   flags to control the BASIC system.
-;DEFC	MODE 	= 16390	;byte   Specified K, L, F or G cursor.
-;DEFC	PPC	= 16391	;word   Line number of statement currently being executed
+;DEFC   ERR_NR  = 16384 ;byte   one less than the report code
+;DEFC   FLAGS   = 16385 ;byte   flags to control the BASIC system.
+;DEFC   MODE    = 16390 ;byte   Specified K, L, F or G cursor.
+;DEFC   PPC     = 16391 ;word   Line number of statement currently being executed
 
-DEFC	ERR_SP 	= 16386	;word   Address of first item on machine stack (after GOSUB returns).
-DEFC	RAMTOP 	= 16388	;word   Address of first byte above BASIC system area. 
+DEFC    ERR_SP  = 16386 ;word   Address of first item on machine stack (after GOSUB returns).
+DEFC    RAMTOP  = 16388 ;word   Address of first byte above BASIC system area. 
 
 
 ;----------------------------------------------------------------
@@ -35,16 +48,17 @@ DEFC	RAMTOP 	= 16388	;word   Address of first byte above BASIC system area.
 ;
 ;----------------------------------------------------------------
 HRG_On:
-	push	af
-	push	hl
-	ld	hl,(base_graphics)
-	ld	a,h
-	or	l
-	;jr	z,HRG_SyncEnd	; if nor reasonable exit here
-	call	z,HRG_Interface_BaseRamtop
-	
-	ld 	hl,HRG_handler	; starts the hires mode when JP (IX) is made
-      	jr	HRG_Sync
+        ;push   af
+        ;push   hl
+
+        ld      hl,(base_graphics)
+        ld      a,h
+        or      l
+        ;jr     z,HRG_SyncEnd   ; if nor reasonable exit here
+        call    z,HRG_Interface_BaseRamtop
+        
+        ld      hl,HRG_handler  ; starts the hires mode when JP (IX) is made
+        jr      HRG_Sync
 
 ;----------------------------------------------------------------
 ;
@@ -52,29 +66,29 @@ HRG_On:
 ;
 ;----------------------------------------------------------------
 HRG_Off:
-	push	af
-	push	hl
+        ;push   af
+        ;push   hl
 
-	ld	hl,$281	; switch back to text
-      	ld 	a,$1e 
-      	ld 	i,a  
+        ld      hl,$281 ; switch back to text
+        ld      a,$1e 
+        ld      i,a  
 
 HRG_Sync:
-      	push 	hl
-      	ld 	hl,$4034 	; FRAMES counter
-      	ld 	a,(hl)    	; get old FRAMES
+        push    hl
+        ld      hl,$4034        ; FRAMES counter
+        ld      a,(hl)          ; get old FRAMES
 HRG_Sync1:
-	cp 	(hl)  		; compare to new FRAMES
-      	jr 	z,HRG_Sync1 	; exit after a change is detected
-      	pop 	ix     		; SINCLAIR video routine
+        cp      (hl)            ; compare to new FRAMES
+        jr      z,HRG_Sync1     ; exit after a change is detected
+        pop     ix              ; SINCLAIR video routine
 
-	;ld	hl,(base_graphics)
-	;ld	(HRG_Driver_Filestart),hl
+        ;ld     hl,(base_graphics)
+        ;ld     (HRG_Driver_Filestart),hl
 
 HRG_SyncEnd:
-	pop	hl
-	pop	af
-	ret
+        ;pop    hl
+        ;pop    af
+        ret
 
 ;----------------------------------------------------------------
 ;
@@ -90,13 +104,13 @@ HRG_SyncEnd:
 ; Some variables for storing
 ;
 ;----------------------------------------------------------------
-;base_graphics		defw	$0000
-;HRG_Driver_Filestart:	defw	$0000
+;base_graphics          defw    $0000
+;HRG_Driver_Filestart:  defw    $0000
 
 
 
 
-	
+        
 
 ;----------------------------------------------------------------
 ;
@@ -104,70 +118,79 @@ HRG_SyncEnd:
 ;
 ;----------------------------------------------------------------
 ;calculation of label above 32k
-;HRG_LineStartAbove set HRG_LineStart + $8000
-;DEFINE HRG_LineStartAbove = (HRG_LineStart + $8000)
 
 HRG_handler:
-      	ld 	b,6         	; delay sets the left edge of the screen
+        ld      b,6             ; delay sets the left edge of the screen
 HRG_wait_left:
-	djnz 	HRG_wait_left  	; delay loop
-	ld hl,0			; delay fine tuning here! Do not change!
-        nop			; delay fine tuning here! Do not change!
+        djnz    HRG_wait_left   ; delay loop
+        ld hl,0                 ; delay fine tuning here! Do not change!
+        nop                     ; delay fine tuning here! Do not change!
 
-      	dec 	b             	; make Z flag=0
-      	ld 	hl,(base_graphics)
-      	ld 	de,32           ; 32 bytes offset is added to HL for next hline
-      	ld 	b,192           ; 192 lines per hires screen
+        dec     b               ; make Z flag=0
+        ld      hl,(base_graphics)
+        ld      de,32           ; 32 bytes offset is added to HL for next hline
+IF (startup>=5)
+        ld      b,64            ; 64 lines per hires screen
+ELSE
+        ld      b,192            ; 192 lines per hires screen
+ENDIF
 
 HRG_outloop:
-	ld 	a,h          	; get HGR address MSB from HL
-      	ld 	i,a             ; load MSB into I register which is RFSH address MSB
-      	ld 	a,l            	; get HGR address LSB from HL
-      	;call 	HRG_LineStartAbove
-      	call 	(HRG_LineStart + $8000)
-      	add 	hl,de         	; add 32 to HL to point to next hline
-      	dec 	b             	; decrement line counter
-      	jp 	nz,HRG_outloop  ; test for last line
+        ld      a,h             ; get HGR address MSB from HL
+        ld      i,a             ; load MSB into I register which is RFSH address MSB
+        ld      a,l             ; get HGR address LSB from HL
+        call    (HRG_LineStart + $8000)
+        add     hl,de           ; add 32 to HL to point to next hline
+        dec     b               ; decrement line counter
+        jp      nz,HRG_outloop  ; test for last line
 
 
-	;call 	$0292          ; return to application program
+        ;call   $0292          ; return to application program
 
+; Different from original call to keep IY unchanged
+; and to eventually add blank lines
 
-	ld	ix,pointedbyix
-;L0292:  POP     IX              ; return address to IX register.
-                                 ; will be either L0281 or L028F - see above.
+        ld      ix,pointedbyix ; in ROM we'd have had a POP IX and JP IX as a 'return'
+        ld      a,(16424)      ; MARGIN
 
-; Changed here to keep IY unchanged
+; this idea comes from the Wilf Rigter's WRX1K hi-resolution implementation
+; if we run in 64 lines mode we need to increase the number of border's lines
 
-	ld	a,(16424)      ; load C with MARGIN
-	ld	c,a
-	ld	a,(16443)      ; test CDFLAG
-	bit	7,a
+IF (startup>=5)
+        add     164            ; more blank lines for fast application code execution
+ENDIF
 
-	jp	$29b
-	        
+        ld      c,a            ; load C with MARGIN
+        ld      a,(16443)      ; test CDFLAG
+        bit     7,a
+
+        jp      $29b           ; save blank lines, start NMI, POP registers and RETURN
+
 pointedbyix:        
-	push	iy
-	ld	iy,16384
+        push    iy
+        ld      iy,16384
 
-      	call 	$0220          ; first PUSH register, then do VSYNC and get KEYBD
+        call    $0220          ; first PUSH register, then do VSYNC and get KEYBD
 
-IF !DEFINED_NOBREAK
-      	call 	$0F46          ; check break (space) key
+IF ((startup=3)|(startup=5))
+        call    $0F46          ; check break (space) key
+        jp      c,nobrkk
+        ld      a,(hrgbrkflag)     ; set to '0' if program isn't running
+        and	a
+        jr	z,nobrkk
+        SCF
+.nobrkk
 ENDIF
+        pop     iy
 
-	pop	iy
+IF ((startup=3)|(startup=5))
+        ld      a,$1e           ; the I register is restored with the MSB address
+        ld      i,a             ; of the ROM pattern table in case of BREAK key down
 
-      	ld 	a,$1e          ; the I register is restored with the MSB address of
-      	ld 	i,a            	; of the ROM pattern table in case of BREAK key down
-
-IF !DEFINED_NOBREAK
-	jp	nc,$02A4
+        jp      nc,$02A4
 ENDIF
-	ld 	ix,HRG_handler	; reload vector if no BREAK or else SINCLAIR video
-	jp 	$02A4         	; now return to BASIC and other application programs
-
-.iysave defw	0
+        ld      ix,HRG_handler  ; reload vector if no BREAK or else SINCLAIR video
+        jp      $02A4           ; now return to BASIC and other application programs
 
 ;----------------------------------------------------------------
 ;
@@ -175,16 +198,17 @@ ENDIF
 ;
 ;----------------------------------------------------------------
 HRG_LineStart:
-	ld 	r,a            	; load LSB to R register which is RFSH address LSB
-      	defb	0, 0, 0, 0     	; 32 NOPs = 32x8 bits = 256 pixels each HLINE
-      	defb	0, 0, 0, 0
-      	defb	0, 0, 0, 0
-      	defb	0, 0, 0, 0
-      	defb	0, 0, 0, 0
-      	defb	0, 0, 0, 0
-      	defb	0, 0, 0, 0
-      	defb	0, 0, 0, 0
-      	ret 	nz            	; always returns because Z flag=0
+        ld      r,a             ; load LSB to R register which is RFSH address LSB
+        defb    0, 0, 0, 0      ; 32 NOPs = 32x8 bits = 256 pixels each HLINE
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        defb    0, 0, 0, 0
+        ret     nz              ; always returns because Z flag=0
+
 ;----------------------------------------------------------------
 ;
 ; End of HRG handler
@@ -206,70 +230,71 @@ HRG_LineStart:
 ;--------------------------------------------------------------
 HRG_Interface_BaseRamtop:
 
-	ld	hl,(RAMTOP)
-	ld	de,$8000	;is RAMTOP in original 16k?
-	xor	a
-	sbc	hl,de
-	ld	a,h
-	or	l
-	jr	z,HRG_Interface_BaseRamtopModify
-	ld	hl,(RAMTOP)
-	ld	de,$6780	;is RAMTOP already lowerd?
-	xor	a
-	sbc	hl,de
-	ld	a,h
-	or	l		;no, so this is a problem!
-	jr	nz,HRG_Interface_BaseRamError
+        ld      hl,(RAMTOP)
+        ld      de,$8000        ;is RAMTOP in original 16k?
+        xor     a
+        sbc     hl,de
+        ld      a,h
+        or      l
+        jr      z,HRG_Interface_BaseRamtopModify
+        ld      hl,(RAMTOP)
+        ld      de,RAMTOP16K    ;is RAMTOP already lowered?
+        xor     a
+        sbc     hl,de
+        ld      a,h
+        or      l               ;no, so this is a problem!
+        jr      nz,HRG_Interface_BaseRamError
 
-	ld	hl,$6800	;yes, then set base_graphics
-	ld	(base_graphics),hl
-	jr	HRG_Interface_BaseRamtopRet
-
-
-HRG_Interface_BaseRamtopModify:	
-	ld	hl,$6800
-	ld	(base_graphics),hl
-
-	ld	hl,$6780	;lower RAMTOP
-	ld	(RAMTOP),hl
-	
-	ld	hl,(ERR_SP)
-	ld	de,$1880
-	xor	a
-	sbc	hl,de
-	ld	(ERR_SP),hl	;lower ERR_SP
+        ld      hl,BASE16K      ;yes, then set base_graphics
+        ld      (base_graphics),hl
+        jr      HRG_Interface_BaseRamtopRet
 
 
-	ld	hl,$0000
-	add	hl,sp		;load SP into HL
-	push	hl
-	ld	de,$8000	;prepare to copy the stack
-	ex	de,hl
-	xor	a
-	sbc	hl,de
-	ld	de,$0040
-	add	hl,de		;stackdeepth in HL
-	push	hl
-	pop	bc		;stackdeepth in BC
-	
-	ld	hl,$7fff	;make a copy of the stack
-	ld	de,$677f
-	lddr
+HRG_Interface_BaseRamtopModify: 
+        ld      hl,BASE16K
+        ld      (base_graphics),hl
 
-	pop	hl		;stackpointer in HL
-	ld	de,$1880
-	xor	a
-	sbc	hl,de		;lower the stackpointer
-	ld	sp,hl		;WOW!
+        ld      hl,RAMTOP16K    ;lower RAMTOP
+        ld      (RAMTOP),hl
+        
+        ld      hl,(ERR_SP)
+        ld      de,WHOLEMEM
+        xor     a
+        sbc     hl,de
+        ld      (ERR_SP),hl     ;lower ERR_SP
+
+
+        ld      hl,$0000
+        add     hl,sp           ;load SP into HL
+        push    hl
+        ld      de,$8000        ;prepare to copy the stack
+        ex      de,hl
+        xor     a
+        sbc     hl,de
+        ld      de,$0040
+        add     hl,de           ;stackdeepth in HL
+        push    hl
+        pop     bc              ;stackdeepth in BC
+        
+        ld      hl,$7fff        ;make a copy of the stack
+        ;ld     de,$677f
+        ld      de,RAMTOP16K-1
+        lddr
+
+        pop     hl              ;stackpointer in HL
+        ld      de,WHOLEMEM
+        xor     a
+        sbc     hl,de           ;lower the stackpointer
+        ld      sp,hl           ;WOW!
 
 
 
 HRG_Interface_BaseRamtopRet:
-	ret
+        ret
 
 
 
 HRG_Interface_BaseRamError:
-	rst	$08		;error
-	defb	$1a		;type R
+        rst     $08             ;error
+        defb    $1a             ;type R
 
