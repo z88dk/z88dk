@@ -6,10 +6,11 @@
 ;
 ;       ZX81 will be thrown in FAST mode by default.
 ;       The "startup=2" parameter forces the SLOW mode.
+;	Values for "startup" from 3 to 6 activate the HRG modes
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.13 2007-09-26 08:22:52 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.14 2007-10-01 12:26:46 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -44,6 +45,7 @@
         XDEF    heapblocks
 
         XDEF    base_graphics   ;Graphical variables
+        XDEF    _base_graphics   ;as above for C declarations
         XDEF    coords          ;Current xy position
 
         XDEF    save81          ;Save ZX81 critical registers
@@ -85,7 +87,7 @@ IF (startup=2)
 ENDIF
 
 IF (startup>=3)
-        call    HRG_On
+        call    hrg_on
  IF ((startup=3)|(startup=5))
         ld	a,1
         ld      (hrgbrkflag),a
@@ -133,7 +135,7 @@ ENDIF
 
 IF (startup>=3)
  IF ((startup=4)|(startup=6))
-        call    HRG_Off
+        call    hrg_off
  ELSE
         xor	a
         ld      (hrgbrkflag),a
@@ -212,7 +214,7 @@ IF (startup=2)
 ENDIF
 
 ;---------------------------------------
-; High Resolution Graphics (Wilf Righter WRX mode)
+; High Resolution Graphics (Wilf Rigter WRX mode)
 ; Code my Matthias Swatosch
 ;---------------------------------------
 
@@ -225,9 +227,10 @@ ENDIF
 ; Now some variables
 ;-----------
 .coords         defw    0       ; Current graphics xy coordinates
+._base_graphics
 .base_graphics  defw    0       ; Address of the Graphics map
 
-._std_seed       defw    0       ; Seed for integer rand() routines
+._std_seed      defw    0       ; Seed for integer rand() routines
 
 .exitsp         defw    0       ; Address of where the atexit() stack is
 .exitcount      defb    0       ; How many routines on the atexit() stack
