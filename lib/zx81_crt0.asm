@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.14 2007-10-01 12:26:46 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.15 2007-10-02 11:20:23 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -44,6 +44,9 @@
         XDEF    heaplast        ;Near malloc heap variables
         XDEF    heapblocks
 
+        XDEF    hr_rows		;Current number of text rows in graphics mode
+        XDEF    _hr_rows	 ;as above for C declarations
+        XDEF    text_rows	 ;as above for VT ANSI mode
         XDEF    base_graphics   ;Graphical variables
         XDEF    _base_graphics   ;as above for C declarations
         XDEF    coords          ;Current xy position
@@ -226,6 +229,17 @@ ENDIF
 ;-----------
 ; Now some variables
 ;-----------
+IF (startup>=3)
+.text_rows
+.hr_rows
+._hr_rows
+ IF (startup>=5)
+		defw	8	; Current number of text rows in graphics mode
+ ELSE
+		defw	24	; Current number of text rows in graphics mode
+ ENDIF
+ENDIF
+
 .coords         defw    0       ; Current graphics xy coordinates
 ._base_graphics
 .base_graphics  defw    0       ; Address of the Graphics map

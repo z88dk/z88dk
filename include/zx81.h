@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.1 2007-10-01 12:26:46 stefano Exp $
+ * $Id: zx81.h,v 1.2 2007-10-02 11:20:23 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -25,6 +25,9 @@
 
 // graphics page
 extern int base_graphics;
+
+// direct call for "clear graphics page"
+extern void __LIB__ _clg_hr();
 
 // Switch on/off the high resolution graphics mode
 extern void __LIB__ hrg_on();
