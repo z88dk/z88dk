@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2006-07-18 21:02:54 stefano Exp $
+# $Id: Makefile,v 1.6 2007-10-02 14:13:48 stefano Exp $
 
 all:
 	@echo ''
@@ -19,3 +19,4 @@ all:
 clean:
 	cd plus3 ; $(MAKE) clean ; cd ..
 	cd microdrive ; $(MAKE) clean ; cd ..
+	cd zxbasdrv ; $(MAKE) clean ; cd ..

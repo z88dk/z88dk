@@ -19,3 +19,4 @@ crtz80s183:
 clean:
 	$(RM) crt0/*.o* crt0/*.sym crt0/*.map 
 	$(RM) crt0_long/*.o* crt0_long/*.sym crt0_long/*.map 
+	$(RM) z80_emu/*.o* z80_emu/*.sym z80_emu/*.map 

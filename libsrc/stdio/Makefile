@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.20 2006-06-18 18:52:47 dom Exp $
+# $Id: Makefile,v 1.21 2007-10-02 14:13:48 stefano Exp $
 #
 
 include ../Make.config
@@ -94,12 +94,14 @@ clean:
 	$(RM) ansi/ace/*.o
 	$(RM) ansi/aquarius/*.o
 	$(RM) ansi/c128/*.o
+	$(RM) ansi/cpc/*.o
 	$(RM) ansi/generic/*.o
 	$(RM) ansi/nascom/*.o
 	$(RM) ansi/oz/*.o
 	$(RM) ansi/sam/*.o
 	$(RM) ansi/sharp-mz/*.o
 	$(RM) ansi/spectrum/*.o
+	$(RM) ansi/ts2068/*.o
 	$(RM) ansi/sprinter/*.o
 	$(RM) ansi/vz200/*.o
 	$(RM) ansi/z88/*.o
@@ -115,13 +117,16 @@ clean:
 	$(RM) mz/*.o
 	$(RM) nascom/*.o
 	$(RM) nc100/*.o
+	$(RM) newbrain/*.o
 	$(RM) oz/*.o
 	$(RM) sam/*.o
 	$(RM) spectrum/*.o
+	$(RM) ts2068/*.o
 	$(RM) sprinter/*.o
 	$(RM) svi/*.o
 	$(RM) vz200/*.o
 	$(RM) z88/*.o
 	$(RM) zx81/*.o
+	$(RM) rcmx000/*.o
 	cd zsock ; $(MAKE) clean ; cd ..
 	cd 8080 ; $(MAKE) clean ; cd ..
