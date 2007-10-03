@@ -7,7 +7,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.4 2007-10-02 11:20:23 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.5 2007-10-03 14:49:34 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -80,7 +80,7 @@ HRG_Sync:
 HRG_Sync1:
         cp      (hl)            ; compare to new FRAMES
         jr      z,HRG_Sync1     ; exit after a change is detected
-        pop     ix              ; SINCLAIR video routine
+        pop     iy              ; SINCLAIR video routine
 
         ;ld     hl,(base_graphics)
         ;ld     (HRG_Driver_Filestart),hl
@@ -150,7 +150,7 @@ HRG_outloop:
 ; Different from original call to keep IY unchanged
 ; and to eventually add blank lines
 
-        ld      ix,pointedbyix ; in ROM we'd have had a POP IX and JP IX as a 'return'
+        ld      iy,pointedbyix ; in ROM we'd have had a POP IX and JP IX as a 'return'
         ld      a,(16424)      ; MARGIN
 
 ; this idea comes from the Wilf Rigter's WRX1K hi-resolution implementation
@@ -167,8 +167,8 @@ ENDIF
         jp      $29b           ; save blank lines, start NMI, POP registers and RETURN
 
 pointedbyix:        
-        push    iy
-        ld      iy,16384
+        push    ix
+        ld      ix,16384
 
         call    $0220          ; first PUSH register, then do VSYNC and get KEYBD
 
@@ -181,7 +181,7 @@ IF ((startup=3)|(startup=5))
         SCF
 .nobrkk
 ENDIF
-        pop     iy
+        pop     ix
 
 IF ((startup=3)|(startup=5))
         ld      a,$1e           ; the I register is restored with the MSB address
@@ -189,7 +189,7 @@ IF ((startup=3)|(startup=5))
 
         jp      nc,$02A4
 ENDIF
-        ld      ix,HRG_handler  ; reload vector if no BREAK or else SINCLAIR video
+        ld      iy,HRG_handler  ; reload vector if no BREAK or else SINCLAIR video
         jp      $02A4           ; now return to BASIC and other application programs
 
 ;----------------------------------------------------------------

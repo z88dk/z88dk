@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.15 2007-10-02 11:20:23 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.16 2007-10-03 14:49:34 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -85,17 +85,14 @@
 
 .start
 
-IF (startup=2)
-        ld      ix,L0281
-ENDIF
-
-IF (startup>=3)
+IF (startup>=2)
         call    hrg_on
  IF ((startup=3)|(startup=5))
         ld	a,1
         ld      (hrgbrkflag),a
  ENDIF
 ENDIF
+
         ld      (start1+1),sp   ;Save entry stack
         ld      hl,-64          ;Create an atexit() stack
         add     hl,sp
@@ -132,11 +129,7 @@ ENDIF
 
         call    restore81
 
-IF (startup=2)
-        ld      ix,$281
-ENDIF
-
-IF (startup>=3)
+IF (startup>=2)
  IF ((startup=4)|(startup=6))
         call    hrg_off
  ELSE
@@ -158,7 +151,7 @@ IF (!DEFINED_startup | (startup=1))
 ENDIF
 
 .restore81
-        ld      iy,16384
+        ld      ix,16384	; IT WILL BECOME IY AFTER SWAP !!
 IF (!DEFINED_startup | (startup=1))
         ; SLOW/FAST trick; flickers but permits the alternate registers usage
         ex      af,af
@@ -211,6 +204,10 @@ ELSE
         ENDIF
 ENDIF
 
+
+;---------------------------------------
+; Modified IRQ handler
+;---------------------------------------
 
 IF (startup=2)
         INCLUDE "#zx81_altint.def"

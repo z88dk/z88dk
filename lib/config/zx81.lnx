@@ -1,5 +1,6 @@
 #
 # Config file for zcc (front end for Small C+ compiler)
+# $Id: zx81.lnx,v 1.6 2007-10-03 14:49:34 stefano Exp $
 #
 
 #
@@ -122,5 +123,5 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -// -v -O2 -I. -lzx81_clib -lndos -DZ80 -DSMALL_C -DZX81 -D__ZX81__ -M -DSCCZ80 -Cz+zx81
+OPTIONS		 -// -v -O2 -I. -Ca-IXIY -lzx81_clib -lndos -DZ80 -DSMALL_C -DZX81 -D__ZX81__ -M -DSCCZ80 -Cz+zx81
 

@@ -1,14 +1,52 @@
 ;       CRT0 for the ZX81 - SLOW MODE
 ;
+;
+; ----------------------------------------------------------------------------------------
 ;       Modified display handler to preserve IY
+;	Note: the IX and IY registers are swapped "on the fly" during assembly !
+; ----------------------------------------------------------------------------------------
 ;
 ;       Stefano Bodrato Sept. 2007
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_altint.def,v 1.1 2007-09-24 08:07:24 stefano Exp $
+;       $Id: zx81_altint.def,v 1.2 2007-10-03 14:49:33 stefano Exp $
 ;
 ; - - - - - - -
+
+
+
+;--------------------------------------------------------------
+;--------------------------------------------------------------
+
+XDEF    hrg_on
+XDEF    hrg_off
+
+;========
+; Not HRG really, but switches the new interrupt handler with no sighs
+;========
+
+hrg_on:
+        ld      hl,L0281
+        push	hl
+        jr      HRG_Sync
+
+hrg_off:
+        ld      hl,$281
+        push	hl
+        ld      a,$1e 
+        ld      i,a  
+HRG_Sync:
+        ld      hl,$4034        ; FRAMES counter
+        ld      a,(hl)          ; get old FRAMES
+HRG_Sync1:
+        cp      (hl)            ; compare to new FRAMES
+        jr      z,HRG_Sync1     ; exit after a change is detected
+        pop	iy              ; switch to new display handler
+        ret
+
+;--------------------------------------------------------------
+;--------------------------------------------------------------
 
 
 ;; DISPLAY-1
@@ -38,10 +76,10 @@ L0239:  LD      H,A             ;
 
 ;; DISPLAY-2
 L023E:  
-	push	iy
-	ld	iy,16384
+	push	ix
+	ld	ix,16384
 	CALL    $2BB           ; routine KEYBOARD
-	pop	iy
+	pop	ix
         LD      BC,($4025)      ; sv LAST_K
         LD      ($4025),HL      ; sv LAST_K
         LD      A,B             ;
@@ -106,7 +144,7 @@ L028F:  JP      L0229           ; to DISPLAY-1
 ; ---
 
 ;; DISPLAY-3
-L0292:  POP     IX              ; return address to IX register.
+L0292:  POP     IY              ; return address to IX register.
                                 ; will be either L0281 or L028F - see above.
 
 ; Changed here to keep IY unchanged
@@ -117,3 +155,4 @@ L0292:  POP     IX              ; return address to IX register.
 	bit	7,a
 
 	jp	$29b
+
