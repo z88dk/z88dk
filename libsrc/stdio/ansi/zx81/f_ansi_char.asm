@@ -1,38 +1,98 @@
 ;
-; 	ANSI Video handling for the ZX81
-;	By Stefano Bodrato - Apr. 2000
+;       Spectrum C Library
+;
+; 	ANSI Video handling for ZX Spectrum
+;
+; 	Handles colors referring to current PAPER/INK/etc. settings
+;
+;	** alternate (smaller) 4bit font capability: 
+;	** use the -DPACKEDFONT flag
+;	** ROM font -DROMFONT
 ;
 ;	set it up with:
 ;	.text_cols	= max columns
 ;	.text_rows	= max rows
+;	.DOTS+1		= char size
+;	.font		= font file
 ;
 ;	Display a char in location (ansi_ROW),(ansi_COLUMN)
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.3 2007-10-03 15:11:39 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
+
+IF ROMFONT
+	LIB	zx81_cnvtab
+ENDIF
 	
-	XDEF	text_cols
-	XDEF	text_rows
+	XREF	base_graphics
 
 	XREF	ansi_ROW
 	XREF	ansi_COLUMN
-	
-	XREF	zx_inverse
 
+	XDEF	text_cols
+	;XDEF	text_rows
+		
+; Dirty thing for self modifying code
+	XDEF	INVRS	
+
+IF A128COL
+.text_cols   defb 128
+ENDIF
+
+IF A80COL
+.text_cols   defb 80
+ENDIF
+
+IF A85COL
+.text_cols   defb 85
+ENDIF
+
+IF A64COL
+.text_cols   defb 64
+ENDIF
+
+IF A51COL
+.text_cols   defb 51
+ENDIF
+
+IF A42COL
+.text_cols   defb 42
+ENDIF
+
+IF A40COL
+.text_cols   defb 40
+ENDIF
+
+IF A36COL
+.text_cols   defb 36
+ENDIF
+
+IF A32COL
 .text_cols   defb 32
-.text_rows   defb 24
+ENDIF
 
+IF A28COL
+.text_cols   defb 28
+ENDIF
+
+IF A24COL
+.text_cols   defb 24
+ENDIF
+
+;text_rows   defb 24
 
 .ansi_CHAR
-	cp	48	; Between 0 and 9 ?
+; --- TO USE ROM FONT WE NEED TO MAP TO THE ASCII CODES ---
+IF ROMFONT
+ 	cp	48	; Between 0 and 9 ?
 	jr	c,isntnum
 	cp	58
 	jr	nc,isntnum
-	add	a,108	; Ok, re-code to the ZX81 charset
+	sub	20	; Ok, re-code to the ZX81 charset
 	jr	setout	; .. and put it out
 .isntnum
 	cp	97	; Between a and z ?
@@ -45,14 +105,14 @@
 	jr	c,isntchar
 	cp	91
 	jr	nc,isntchar
-	add	a,101	; Ok, re-code to the ZX81 charset
+	sub	27	; Ok, re-code to the ZX81 charset
 	jr	setout	; .. and put it out
 .isntchar
-	ld	hl,cnvtab
+	ld	hl,zx81_cnvtab
 .symloop
+	inc	hl
 	cp	(hl)
 	jr	z,chfound
-	inc	hl
 	inc	hl
 	push	af
 	xor	a
@@ -61,96 +121,248 @@
 	pop	af
 	jr	symloop
 .chfound
-	inc	hl
+	dec	hl
 	ld	a,(hl)
 	jr	setout
 .isntsym
 	pop	af
-	ld	a,128	; Else (space, exclamation mark, ..), blank.
-
+	xor	a	; Else (space,  ..), blank.
 .setout
-	ld	hl,zx_inverse
-	sub	(hl)
+ENDIF
+; --- END OF ROM FONT ADAPTER ---
 
-	push	af
-	ld	hl,(16396)
-	inc	hl
-	ld	a,(ansi_ROW)
-	and	a
-	jr	z,r_zero
-	ld	b,a
-	ld	de,33	; 32+1. Every text line ends with an HALT
-.r_loop
-	add	hl,de
-	djnz	r_loop
-.r_zero
-	ld	a,(ansi_COLUMN)
-	ld	d,0
-	ld	e,a
-	add	hl,de
-	pop	af
-	ld	(hl),a
-	ret
+  ld (char+1),a
+  ld a,(ansi_ROW)       ; Line text position
+  
+  ld	d,a
+  ld	e,0
 
-.cnvtab
-	defb	'"'
-	defb	139
-	defb	'£'
-	defb	140
-	defb	'$'
-	defb	141
-	defb	':'
-	defb	142
-	defb	'?'
-	defb	143
-	defb	'('
-	defb	144
-	defb	')'
-	defb	145
-	defb	'>'
-	defb	146
-	defb	'<'
-	defb	147
-	defb	'='
-	defb	148
-	defb	'+'
-	defb	149
-	defb	'-'
-	defb	150
-	defb	'*'
-	defb	151
-	defb	'/'
-	defb	152
-	defb	';'
-	defb	153
-	defb	','
-	defb	154
-	defb	'.'
-	defb	155
-	defb	'!'
-	defb	151 ; * stands for !
-	defb	'{'
-	defb	147 ; <
-	defb	'}'
-	defb	146 ; >
-	defb	'@'
-	defb	137
-	defb	'#'
-	defb	8
-	defb	'&'
-	defb	130
-	defb	'%'
-	defb	6
-	defb	'~'
-	defb	139
-	defb	'['
-	defb	133
-	defb	']'
-	defb	5
-	defb	'_'
-	defb	131
-	defb	39 ;"'"
-	defb	129
-			
-	defb	0
-	
+  ;push af
+  ;and 24
+  ;ld d,a
+  ;pop af
+  ;and 7
+  ;rrca
+  ;rrca
+  ;rrca
+  ;ld e,a
+  
+  ld hl,(base_graphics)
+  add hl,de
+  ld (RIGA+1),hl
+;  xor a
+  ld hl,DOTS+1
+  ld b,(hl)
+  ld hl,0
+  ld a,(ansi_COLUMN)       ; Column text position
+  ld e,a
+  ld d,0
+  or d
+  jr z,ZCL
+.LP
+  add hl,de
+  djnz LP
+  ld b,3
+.LDIV
+  srl h
+  rr l
+  rra
+  djnz LDIV
+
+
+  ld b,5
+.RGTA
+  srl a
+  djnz RGTA
+.ZCL
+  ld (PRE+1),a
+  ld e,a
+  ld a,(DOTS+1)
+  add a,e
+  ld e,a
+  ld a,16
+  sub e
+.NOC
+  ld (POST+1),a
+.RIGA           ; Location on screen
+  ld de,16384
+  add hl,de
+  push hl
+  pop ix
+.char
+  ld b,'A'      ; Put here the character to be printed
+
+IF ROMFONT
+  ld hl,$1e00
+ELSE
+	IF PACKEDFONT
+	  xor	a
+	  rr	b
+	  jr	c,even
+	  ld	a,4
+	.even
+	  ld	(ROLL+1),a
+	  ld	hl,font-128
+	ELSE
+	  ld hl,font-256
+	ENDIF
+ENDIF
+
+  ld de,8
+
+.LFONT
+  add hl,de
+  djnz LFONT
+  ;ld de,256
+  ld de,32
+  ld c,8
+.PRE
+  ld b,4
+  rl (ix+1)
+  rl (ix+0)
+  inc b
+  dec b
+  jr z,DTS
+.L1
+  rl (ix+1)
+  rl (ix+0)
+  djnz L1
+.DTS
+  ld a,(hl)
+  
+IF ROMFONT
+	; nothing here !
+ELSE
+	IF PACKEDFONT
+	.ROLL
+	  jr INVRS
+	  rla
+	  rla
+	  rla
+	  rla
+	ENDIF
+ENDIF
+
+.INVRS
+;  cpl           ; Set to NOP to disable INVERSE
+  nop
+
+; Underlined text handling
+  dec c
+;  jr nz,UNDRL   ; Set to JR UNDRL to disable underlined text (loc. INVRS+2)
+  jr UNDRL
+  ld a,255
+.UNDRL
+  inc c
+; end of underlined text handling
+
+.DOTS
+IF A128COL
+  ld b,2
+ENDIF
+IF A80COL
+  ld b,3
+ENDIF
+IF A85COL
+  ld b,3
+ENDIF
+IF A64COL
+  ld b,4
+ENDIF
+IF A51COL
+  ld b,5
+ENDIF
+IF A42COL
+  ld b,6
+ENDIF
+IF A40COL
+  ld b,6
+ENDIF
+IF A36COL
+  ld b,7
+ENDIF
+IF A32COL
+  ld b,8
+ENDIF
+IF A28COL
+  ld b,8
+ENDIF
+IF A24COL
+  ld b,9
+ENDIF
+
+.L2
+  rla
+  rl (ix+1)
+  rl (ix+0)
+  djnz L2
+.POST
+  ld b,6
+  inc b
+  dec b
+  jr z,NEXT
+.L3
+  rl (ix+1)
+  rl (ix+0)
+  djnz L3
+.NEXT
+  add ix,de
+  inc hl
+  dec c
+  jr nz,PRE
+  ret
+
+
+; The font
+; 9 dots: MAX 28 columns
+; 8 dots: MAX 32 columns The only one perfecly color aligned
+; 7 dots: MAX 36 columns
+; 6 dots: MAX 42 columns Good matching with color attributes
+; 5 dots: MAX 51 columns
+; 4 dots: MAX 64 columns Matched with color attributes (2 by 2)
+; 3 dots: MAX 85 columns Just readable!
+; 2 dots: MAX 128 columns (useful for ANSI graphics only.. maybe)
+; Address 15360 for ROM Font
+
+.font
+IF ROMFONT
+	; nothing here !
+ELSE
+	IF PACKEDFONT
+	        BINARY  "stdio/ansi/F4PACK.BIN"
+	ELSE
+		IF A128COL
+			BINARY  "stdio/ansi/F3.BIN"
+		ENDIF
+		IF A80COL
+			BINARY  "stdio/ansi/F4.BIN"
+		ENDIF
+		IF A85COL
+			BINARY  "stdio/ansi/F4.BIN"
+		ENDIF
+		IF A64COL
+			BINARY  "stdio/ansi/F4.BIN"
+		ENDIF
+		IF A51COL
+			BINARY  "stdio/ansi/F5.BIN"
+		ENDIF
+		IF A42COL
+			BINARY  "stdio/ansi/F6.BIN"
+		ENDIF
+		IF A40COL
+			BINARY  "stdio/ansi/F6.BIN"
+		ENDIF
+		IF A36COL
+			BINARY  "stdio/ansi/F8.BIN"
+		ENDIF
+		IF A32COL
+			BINARY  "stdio/ansi/F8.BIN"
+		ENDIF
+		IF A28COL
+			BINARY  "stdio/ansi/F8.BIN"
+		ENDIF
+		IF A24COL
+			BINARY  "stdio/ansi/F8.BIN"
+		ENDIF
+	ENDIF
+ENDIF

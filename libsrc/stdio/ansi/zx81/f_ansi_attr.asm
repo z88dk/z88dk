@@ -1,65 +1,71 @@
 ;
 ; 	ANSI Video handling for the ZX81
-;	By Stefano Bodrato - Apr. 2000
+;	By Stefano Bodrato - Sep. 2007
 ;
 ; 	Text Attributes
 ;	m - Set Graphic Rendition
+;	
+;	The most difficult thing to port:
+;	Be careful here...
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.3 2007-10-03 15:11:39 stefano Exp $
 ;
-
 
 	XLIB	ansi_attr
 
-	XDEF	zx_inverse
-	
-.zx_inverse	defb 0
+	XREF	INVRS
 
 .ansi_attr
-        and     a
-        jr      nz,noreset
-        ld      (zx_inverse),a
+;        and     a
+;        jr      nz,noreset
+;        ret
+;.noreset
+;        cp      1
+;        jr      nz,nobold
+;        ret
+;.nobold
+;        cp      2
+;        jr      z,dim
+;        cp      8
+;        jr      nz,nodim
+;.dim
+;        ret
+;.nodim
+        cp      4
+        jr      nz,nounderline
+        ld      a,32
+        ld      (INVRS+2),a   ; underline 1
         ret
-.noreset
-        cp      1
-        jr      nz,nobold
-	ld	a,128
-        ld      (zx_inverse),a
+.nounderline
+        cp      24
+        jr      nz,noCunderline
+        ld      a, 24
+        ld      (INVRS+2),a   ; underline 0
         ret
-.nobold
-        cp      2
-        jr      z,dim
-        cp      8
-        jr      nz,nodim
-.dim
-	xor	a
-        ld      (zx_inverse),a
-        ret
-.nodim
+.noCunderline
         cp      5
         jr      nz,noblink
-	ld	a,128
-        ld      (zx_inverse),a
+        ld      a,32
+        ld      (INVRS+2),a   ; underline (blink emulation) 1
         ret
 .noblink
         cp      25
         jr      nz,nocblink
-	xor	a
-        ld      (zx_inverse),a
+        ld      a, 24
+        ld      (INVRS+2),a   ; underline (blink emulation) 0
         ret
 .nocblink
         cp      7
         jr      nz,noreverse
-	ld	a,128
-        ld      (zx_inverse),a
+        ld      a,47
+        ld      (INVRS),a     ; inverse 1
         ret
 .noreverse
         cp      27
         jr      nz,noCreverse
-	xor	a
-        ld      (zx_inverse),a
+        xor     a
+        ld      (INVRS),a      ; inverse 0
         ret
 .noCreverse
-
         ret
