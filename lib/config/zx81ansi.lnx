@@ -1,6 +1,6 @@
 #
 # Config file for zcc (front end for Small C+ compiler)
-# $Id: zx81ansi.lnx,v 1.8 2007-10-04 20:16:12 stefano Exp $
+# $Id: zx81ansi.lnx,v 1.9 2007-10-04 20:55:41 stefano Exp $
 #
 
 #
@@ -107,7 +107,7 @@ LINKOPTS	-a -m -Mo
 
 Z88MATHLIB 	z88_math
 STARTUPLIB 	z80iy_crt0
-GENMATHLIB	gen_math_iy
+GENMATHLIB	m81
 
 #
 # Any default options you want - these are options to zcc which are fed
