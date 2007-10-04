@@ -9,11 +9,11 @@
 ;	This version works on the first 64 lines only
 ;
 ;
-;	$Id: clg.asm,v 1.1 2007-10-04 10:28:47 stefano Exp $
+;	$Id: clg.asm,v 1.2 2007-10-04 20:16:12 stefano Exp $
 ;
 
                 XLIB	clg
-                LIB	clg_hr
+                LIB	_clg_hr
 
 .clg
-		jp	clg_hr
+		jp	_clg_hr
