@@ -359,5 +359,14 @@ spectrum/zx_trd
 spectrum/zx_type
 spectrum/zx_var_length
 spectrum/tape_save
+spectrum/opus/opus_6116
+spectrum/opus/opus_getblocks
+spectrum/opus/opus_getblocksize
+spectrum/opus/opus_lptread
+spectrum/opus/opus_lptwrite
+spectrum/opus/opus_rommap
+spectrum/opus/opus_testchannel
+spectrum/opus/opus_version
+spectrum/opus/set_kempston
 spectrum/disciple/zx_disciple.asm
 printflike/ltoa_any
