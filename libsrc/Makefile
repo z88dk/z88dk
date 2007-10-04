@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.91 2007-10-04 10:28:46 stefano Exp $
+# $Id: Makefile,v 1.92 2007-10-04 14:50:02 stefano Exp $
 
 
 include Make.config
@@ -35,18 +35,18 @@ tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 
 zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib zx_math.lib zx_mathtiny.lib
 
-zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81_clib.lib gfx81hr64_clib.lib gfx81hr192_clib.lib
+zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81_clib.lib gfx81hr64.lib gfx81hr192.lib
 
 
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.91 2007-10-04 10:28:46 stefano Exp $
+#  $Id: Makefile,v 1.92 2007-10-04 14:50:02 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.91 2007-10-04 10:28:46 stefano Exp $
+# $Id: Makefile,v 1.92 2007-10-04 14:50:02 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -61,7 +61,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.91 2007-10-04 10:28:46 stefano Exp $
+#  $Id: Makefile,v 1.92 2007-10-04 14:50:02 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -465,20 +465,20 @@ gfx81_clib.lib:
 	$(MAKE) zx81deps
 
 # ZX81 HR graphics lib - Stefano
-gfx81hr64_clib.lib:
+gfx81hr64.lib:
 	@echo ''
 	@echo '--- Building ZX81 High Resolution Library (64 rows)  ---'
 	@echo ''
 	$(MAKE) zx81deps
-	$(LIBLINKER) -IXIY -DFORzx81hr64 -x$(OUTPUT_DIRECTORY)/gfx81hr64_clib @$(LISTFILE_DIRECTORY)/gfx81hr.lst
+	$(LIBLINKER) -IXIY -DFORzx81hr64 -x$(OUTPUT_DIRECTORY)/gfx81hr64 @$(LISTFILE_DIRECTORY)/gfx81hr.lst
 	$(MAKE) zx81deps
 
-gfx81hr192_clib.lib:
+gfx81hr192.lib:
 	@echo ''
 	@echo '--- Building ZX81 High Resolution Library (192 rows)  ---'
 	@echo ''
 	$(MAKE) zx81deps
-	$(LIBLINKER) -IXIY -DFORzx81hr192 -x$(OUTPUT_DIRECTORY)/gfx81hr192_clib @$(LISTFILE_DIRECTORY)/gfx81hr.lst
+	$(LIBLINKER) -IXIY -DFORzx81hr192 -x$(OUTPUT_DIRECTORY)/gfx81hr192 @$(LISTFILE_DIRECTORY)/gfx81hr.lst
 	$(MAKE) zx81deps
 
 
