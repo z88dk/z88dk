@@ -38,7 +38,7 @@ stdio/fabandon
 stdio/m5/fgetc_cons
 stdio/fgets_cons
 stdio/m5/getk
-stdio/spectrum/puts_cons
+stdio/puts_cons
 stdio/m5/fputc_cons
 stdlib/abs
 stdlib/atexit

@@ -39,7 +39,7 @@ stdio/fabandon
 stdio/aquarius/fgetc_cons
 stdio/fgets_cons
 stdio/aquarius/getk
-stdio/spectrum/puts_cons
+stdio/puts_cons
 stdio/aquarius/fputc_cons
 stdlib/abs
 stdlib/atexit

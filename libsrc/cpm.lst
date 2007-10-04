@@ -40,7 +40,7 @@ stdio/fabandon
 stdio/cpm/fgetc_cons
 stdio/fgets_cons
 stdio/cpm/getk
-stdio/spectrum/puts_cons
+stdio/puts_cons
 stdio/cpm/fputc_cons
 stdlib/abs
 stdlib/atexit

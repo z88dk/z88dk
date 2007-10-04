@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.90 2007-10-02 14:13:48 stefano Exp $
+# $Id: Makefile,v 1.91 2007-10-04 10:28:46 stefano Exp $
 
 
 include Make.config
@@ -19,7 +19,8 @@ all:	genlibs z88libs tilibs zxlibs \
 	nascom_clib.lib nasansi_clib.lib newbrain_clib.lib \
 	ozansi_clib.lib rex_clib.lib rcmx000_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib \
-	pps_clib.lib ppsansi_clib.lib embedded_clib.lib
+	pps_clib.lib ppsansi_clib.lib embedded_clib.lib \
+	zx81libs
 
 genlibs: gen_math.lib malloc.lib z80_crt0.lib ndos.lib adt.lib balloc.lib \
          im2.lib rect.lib algorithm.lib
@@ -34,18 +35,18 @@ tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 
 zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib zx_math.lib zx_mathtiny.lib
 
-zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81_clib.lib gfx81hr_clib.lib gfx81hr64_clib.lib
+zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81_clib.lib gfx81hr64_clib.lib gfx81hr192_clib.lib
 
 
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.90 2007-10-02 14:13:48 stefano Exp $
+#  $Id: Makefile,v 1.91 2007-10-04 10:28:46 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.90 2007-10-02 14:13:48 stefano Exp $
+# $Id: Makefile,v 1.91 2007-10-04 10:28:46 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -60,7 +61,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.90 2007-10-02 14:13:48 stefano Exp $
+#  $Id: Makefile,v 1.91 2007-10-04 10:28:46 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -73,10 +74,12 @@ tideps:
 	$(RM) -f graphics/gray/ticalc/*.o
 
 zx81deps:
+	$(RM) -f stdio/*.o
 	$(RM) -f stdio/ansi/zx81/*.o
 	$(RM) -f games/*.o
 	$(RM) -f graphics/*.o
 	$(RM) -f graphics/zx81/*.o
+	$(RM) -f graphics/zx81/hr/*.o
 
 # interesting algorithms - aralbrec
 algorithm.lib:
@@ -430,11 +433,12 @@ zx81_clib.lib:
 	$(MAKE) zx81deps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic_iy ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
-	$(LIBLINKER) -IXIY -Cz-IXIY -DFORzx81 -x$(OUTPUT_DIRECTORY)/zx81_clib @$(LISTFILE_DIRECTORY)/zx81.lst
+	$(LIBLINKER) -IXIY -DFORzx81 -x$(OUTPUT_DIRECTORY)/zx81_clib @$(LISTFILE_DIRECTORY)/zx81.lst
+	$(MAKE) zx81deps
 
 # ZX81 ansi lib - Stefano
 zx81ansi_clib.lib:
@@ -444,11 +448,39 @@ zx81ansi_clib.lib:
 	$(MAKE) zx81deps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic_iy ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
-	$(LIBLINKER) -IXIY -DFORzx81 -x$(OUTPUT_DIRECTORY)/zx81ansi_clib @$(LISTFILE_DIRECTORY)/zx81ansi.lst
+	$(LIBLINKER) -IXIY -DFORzx81 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx81ansi_clib @$(LISTFILE_DIRECTORY)/zx81ansi.lst
+	$(MAKE) zx81deps
+
+# ZX81 std graphics lib - Stefano
+gfx81_clib.lib:
+	@echo ''
+	@echo '--- Building ZX81 Standard Graphics Library  ---'
+	@echo ''
+	$(MAKE) zx81deps
+	$(LIBLINKER) -IXIY -DFORzx81 -x$(OUTPUT_DIRECTORY)/gfx81_clib @$(LISTFILE_DIRECTORY)/gfx81.lst
+	$(MAKE) zx81deps
+
+# ZX81 HR graphics lib - Stefano
+gfx81hr64_clib.lib:
+	@echo ''
+	@echo '--- Building ZX81 High Resolution Library (64 rows)  ---'
+	@echo ''
+	$(MAKE) zx81deps
+	$(LIBLINKER) -IXIY -DFORzx81hr64 -x$(OUTPUT_DIRECTORY)/gfx81hr64_clib @$(LISTFILE_DIRECTORY)/gfx81hr.lst
+	$(MAKE) zx81deps
+
+gfx81hr192_clib.lib:
+	@echo ''
+	@echo '--- Building ZX81 High Resolution Library (192 rows)  ---'
+	@echo ''
+	$(MAKE) zx81deps
+	$(LIBLINKER) -IXIY -DFORzx81hr192 -x$(OUTPUT_DIRECTORY)/gfx81hr192_clib @$(LISTFILE_DIRECTORY)/gfx81hr.lst
+	$(MAKE) zx81deps
+
 
 # Texas Instrument's calculators: - stefano/henk
 # almost the same lib code with different -D flag set

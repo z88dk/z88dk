@@ -37,7 +37,7 @@ stdio/puts
 stdio/ungetc
 stdio/fabandon
 stdio/fgets_cons
-stdio/spectrum/puts_cons
+stdio/puts_cons
 stdlib/abs
 stdlib/atexit
 stdlib/atoi

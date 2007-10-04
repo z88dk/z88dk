@@ -9,7 +9,7 @@
 ;       Define for graphics and other standard library functions
 ;
 ;
-;	$Id: grafix.inc,v 1.12 2005-03-02 08:27:35 stefano Exp $
+;	$Id: grafix.inc,v 1.13 2007-10-04 10:28:47 stefano Exp $
 ;
 
 
@@ -58,8 +58,20 @@ ENDIF
 
 IF FORzx81
 	DEFINE gotgfx
-	defc maxx	= 96 ; emulated (64 real dots)
-	defc maxy	= 64 ; emulated (48 real dots)
+	defc maxx	= 64
+	defc maxy	= 48
+ENDIF
+
+IF FORzx81hr64
+	DEFINE gotgfx
+	defc maxx	= 256
+	defc maxy	= 64
+ENDIF
+
+IF FORzx81hr192
+	DEFINE gotgfx
+	defc maxx	= 256
+	defc maxy	= 192
 ENDIF
 
 IF FORjupiter

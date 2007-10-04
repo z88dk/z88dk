@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.21 2007-10-02 14:13:48 stefano Exp $
+# $Id: Makefile,v 1.22 2007-10-04 10:28:47 stefano Exp $
 #
 
 include ../Make.config
@@ -80,6 +80,36 @@ gen:
 	cd 8080; $(MAKE) ; cd ..
 
 std:    $(STDOBJECTS)
+
+generic_iy:
+#stdc
+	zcc $(CFLAGS) -Ca-IXIY closeall.c
+	zcc $(CFLAGS) -Ca-IXIY fabandon.c
+	zcc $(CFLAGS) -Ca-IXIY fchkstd.c
+	zcc $(CFLAGS) -Ca-IXIY fdopen.c
+	zcc $(CFLAGS) -Ca-IXIY feof.c
+	zcc $(CFLAGS) -Ca-IXIY fgetpos.c
+	zcc $(CFLAGS) -Ca-IXIY fgets.c
+	zcc $(CFLAGS) -Ca-IXIY fgets_cons.c
+	zcc $(CFLAGS) -Ca-IXIY fopen.c
+	zcc $(CFLAGS) -Ca-IXIY fopen_z88.c
+	zcc $(CFLAGS) -Ca-IXIY fputs.c
+	zcc $(CFLAGS) -Ca-IXIY freopen.c
+	zcc $(CFLAGS) -Ca-IXIY fseek.c
+	zcc $(CFLAGS) -Ca-IXIY ftell.c
+	zcc $(CFLAGS) -Ca-IXIY gets.c
+	zcc $(CFLAGS) -Ca-IXIY fwrite.c
+	zcc $(CFLAGS) -Ca-IXIY printk.c
+	zcc $(CFLAGS) -Ca-IXIY printn.c
+	zcc $(CFLAGS) -Ca-IXIY puts.c
+	zcc $(CFLAGS) -Ca-IXIY ungetc.c
+	zcc $(CFLAGS) -Ca-IXIY vfprintf_mini.c
+#gen
+	zcc $(CFLAGS) -Ca-IXIY fclose.c
+	zcc $(CFLAGS) -Ca-IXIY fgetc.c
+	zcc $(CFLAGS) -Ca-IXIY fputc.c
+	zcc $(CFLAGS) -Ca-IXIY freopen_z88.c
+	zcc $(CFLAGS) -Ca-IXIY fread.c
 
 z88_x:
 	cd z88 ; $(MAKE) ; cd ..

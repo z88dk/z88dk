@@ -76,7 +76,7 @@ stdio/spectrum/fgetc_cons
 stdio/fgets_cons
 stdio/spectrum/fputc_cons
 stdio/spectrum/getk
-stdio/spectrum/puts_cons
+stdio/puts_cons
 stdlib/abs
 stdlib/atexit
 stdlib/atoi

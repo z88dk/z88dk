@@ -40,7 +40,7 @@ stdio/nc100/fgetc_cons
 stdio/fgets_cons
 stdio/nc100/fputc_cons
 stdio/nc100/getk
-stdio/nc100/puts_cons
+stdio/puts_cons
 stdlib/abs
 stdlib/atexit
 stdlib/atoi

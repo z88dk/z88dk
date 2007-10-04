@@ -39,7 +39,7 @@ stdio/fabandon
 stdio/svi/fgetc_cons
 stdio/fgets_cons
 stdio/svi/getk
-stdio/spectrum/puts_cons
+stdio/puts_cons
 stdio/svi/fputc_cons
 stdlib/abs
 stdlib/atexit

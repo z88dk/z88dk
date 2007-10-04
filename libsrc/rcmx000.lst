@@ -39,7 +39,7 @@ stdio/rcmx000/fgetc_cons
 stdio/rcmx000/cnvtab
 stdio/fgets_cons
 stdio/rcmx000/getk
-stdio/spectrum/puts_cons
+stdio/puts_cons
 stdio/rcmx000/fputc_cons
 stdlib/abs
 stdlib/atexit

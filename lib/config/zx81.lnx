@@ -1,6 +1,6 @@
 #
 # Config file for zcc (front end for Small C+ compiler)
-# $Id: zx81.lnx,v 1.6 2007-10-03 14:49:34 stefano Exp $
+# $Id: zx81.lnx,v 1.7 2007-10-04 10:28:46 stefano Exp $
 #
 
 #
@@ -106,7 +106,7 @@ LINKOPTS	-a -m -Mo
 #
 
 Z88MATHLIB 	z88_math
-STARTUPLIB 	z80_crt0
+STARTUPLIB 	z80iy_crt0
 GENMATHLIB	gen_math
 
 #

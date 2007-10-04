@@ -1,21 +1,20 @@
 ;
 ;	ZX81 clock() function
-;	By Stefano Bodrato - summer 2000
+;	By Stefano Bodrato - Oct. 2007
+;	New version based on custom interrupt driver
+;	(doesn't work in FAST MODE)
 ;
 ; --------
-; $Id: clock.asm,v 1.4 2002-04-17 21:30:26 dom Exp $
+; $Id: clock.asm,v 1.5 2007-10-04 10:28:48 stefano Exp $
 
 
 	XLIB	clock
+	XREF	frames
 
 .clock
-; 16436/7 word running backwards from 65535 to 32768 (bit 15 always set).
-; It is reset by basic if running a PAUSE statement.
 
-	ld	hl,65535
-	ld	de,(16436)
-	scf
-	ccf
-	sbc	hl,de
-	ld	de,0
+	ld	hl,(frames)
+	ld	a,(frames+1)
+	ld	e,a
+	ld	d,0
 	ret

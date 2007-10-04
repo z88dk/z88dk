@@ -37,7 +37,7 @@ stdio/puts
 stdio/ungetc
 stdio/fabandon
 stdio/ticalc/fputc_cons
-stdio/spectrum/puts_cons
+stdio/puts_cons
 stdio/ticalc/fgetc_cons
 stdio/fgets_cons
 stdio/ticalc/getk

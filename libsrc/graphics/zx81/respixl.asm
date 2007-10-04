@@ -4,48 +4,33 @@
 	XREF	COORDS
 
 ;
-;	$Id: respixl.asm,v 1.3 2002-04-22 14:45:50 stefano Exp $
+;	$Id: respixl.asm,v 1.4 2007-10-04 10:28:47 stefano Exp $
 ;
 
 ; ******************************************************************
 ;
 ; Clears pixel at (x,y) coordinate.
 ;
-; ZX 81 version.  
-; Emulated 96x64 resolution (TI82/TI83) with 64x48 dots.
-;
-; (x=x*2/3;  y=y*3/4)
+; ZX 81 version.
+; 64x48 dots.
 ;
 ;
-.respixel			
+.respixel
 				ld	a,h
-				cp	96
+				cp	64
 				ret	nc
 				ld	a,l
 				;cp	maxy
-				cp	64
+				cp	48
 				ret	nc		; y0	out of range
 				
 				ld	(COORDS),hl
 				
 				push	bc
 
-				add	a,l	; y=y*3/4
-				add	a,l
-				srl	a
-				srl	a
-				ld	c,a
+				ld	c,l
+				ld	b,h
 
-				ld	b,0	; x=x*2/3
-				;sll	h
-				sla	h
-				ld	a,h
-.subtract
-				inc	b
-				sub	3
-				jr	nc,subtract
-				dec	b
-				
 				push	bc
 				
 				srl	b

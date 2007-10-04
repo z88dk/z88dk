@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.16 2007-10-03 14:49:34 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.17 2007-10-04 10:28:46 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -32,8 +32,6 @@
         XDEF    cleanup         ;jp'd to by exit()
         XDEF    l_dcal          ;jp(hl)
 
-        XDEF    _std_seed        ;Integer rand() seed
-
         XDEF    _vfprintf       ;jp to the printf() core
 
         XDEF    exitsp          ;atexit() variables
@@ -54,8 +52,7 @@
         XDEF    save81          ;Save ZX81 critical registers
         XDEF    restore81       ;Restore ZX81 critical registers
 
-        XDEF    saved_hl        ;Temporary store used by compiler
-        XDEF    saved_de        ;for hl and de
+        XDEF    frames          ;Frame counter for time()
 
         org     16514
 
@@ -241,7 +238,10 @@ ENDIF
 ._base_graphics
 .base_graphics  defw    0       ; Address of the Graphics map
 
-._std_seed      defw    0       ; Seed for integer rand() routines
+IF !DEFINED_HAVESEED
+		XDEF    _std_seed        ;Integer rand() seed
+._std_seed       defw    0       ; Seed for integer rand() routines
+ENDIF
 
 .exitsp         defw    0       ; Address of where the atexit() stack is
 .exitcount      defb    0       ; How many routines on the atexit() stack
@@ -249,8 +249,8 @@ ENDIF
 
 .heaplast       defw    0       ; Address of last block on heap
 .heapblocks     defw    0       ; Number of blocks
-.saved_hl       defw    0       ; Temp store for hl
-.saved_de       defw    0       ; Temp store for de
+.frames         defw    0       ; counter handled with new interrupt
+		defb	0	; third byte for "frames"
 
                 defm  "Small C+ ZX81"   ;Unnecessary file signature
                 defb    0

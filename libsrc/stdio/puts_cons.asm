@@ -4,7 +4,7 @@
 ;	puts(char *s) - put string to screen
 ;
 ;
-;	$Id: puts_cons.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;	$Id: puts_cons.asm,v 1.1 2007-10-04 10:28:47 stefano Exp $
 ;
 
 

@@ -38,7 +38,7 @@ stdio/fabandon
 stdio/aquarius/fgetc_cons
 stdio/fgets_cons
 stdio/aquarius/getk
-stdio/spectrum/puts_cons
+stdio/puts_cons
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc

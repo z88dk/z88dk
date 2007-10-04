@@ -1,20 +1,21 @@
 
-	XLIB	xorpixel
+	XLIB	pointxy
 
 	XREF	COORDS
 
 ;
-;	$Id: xorpixl.asm,v 1.4 2007-10-04 10:28:47 stefano Exp $
+;	$Id: pointxy.asm,v 1.1 2007-10-04 10:28:47 stefano Exp $
 ;
 
 ; ******************************************************************
 ;
-; XORs pixel at (x,y) coordinate.
+; Get pixel at (x,y) coordinate.
 ;
 ; ZX 81 version.  
 ; 64x48 dots.
 ;
-.xorpixel
+;
+.pointxy
 				ld	a,h
 				cp	64
 				ret	nc
@@ -30,13 +31,12 @@
 				ld	c,l
 				ld	b,h
 
-				push	bc
+				;push	bc
 				
 				srl	b
 				srl	c
 				ld	hl,(16396)
 				inc	hl
-				;ld	a,b
 				ld	a,c
 				ld	c,b	; !!
 				ld	de,33	; 32+1. Every text line ends with an HALT
@@ -64,7 +64,7 @@
 .issym
 				ld	b,a
 
-				ld	a,1		; the bit we want to XOR
+				ld	a,1		; the bit we want to draw
 				
 				bit	0,h
 				jr	z,iseven
@@ -76,17 +76,8 @@
 				add	a,a
 				add	a,a		; move down the bit
 .evenrow
-				xor	b
 
-				cp	8		; Now back from binary to
-				jr	c,hisym		; graph symbols.
-				ld	b,a
-				ld	a,15
-				sub	b
-				add	a,128
-.hisym
-				pop	hl
-				ld	(hl),a
+				and	b
 				
 				pop	bc
 				ret

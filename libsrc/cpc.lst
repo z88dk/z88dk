@@ -40,7 +40,7 @@ stdio/cpc/fgetc_cons
 stdio/fgets_cons
 stdio/cpc/fputc_cons
 stdio/cpc/getk
-stdio/spectrum/puts_cons
+stdio/puts_cons
 stdlib/abs
 stdlib/atexit
 stdlib/atoi

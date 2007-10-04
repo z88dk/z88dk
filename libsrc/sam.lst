@@ -39,7 +39,7 @@ stdio/sam/fgetc_cons
 stdio/fgets_cons
 stdio/sam/fputc_cons
 stdio/sam/getk
-stdio/spectrum/puts_cons
+stdio/puts_cons
 stdlib/abs
 stdlib/atexit
 stdlib/atoi

@@ -39,7 +39,7 @@ stdio/fabandon
 stdio/newbrain/fgetc_cons
 stdio/fgets_cons
 stdio/newbrain/getk
-stdio/spectrum/puts_cons
+stdio/puts_cons
 stdio/newbrain/fputc_cons
 stdlib/abs
 stdlib/atexit

@@ -40,7 +40,7 @@ stdio/vz200/fgetc_cons
 stdio/fgets_cons
 stdio/vz200/fputc_cons
 stdio/vz200/getk
-stdio/spectrum/puts_cons
+stdio/puts_cons
 stdlib/abs
 stdlib/atexit
 stdlib/atoi
