@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.93 2007-10-04 20:16:12 stefano Exp $
+# $Id: Makefile,v 1.94 2007-10-05 07:38:33 stefano Exp $
 
 
 include Make.config
@@ -33,20 +33,20 @@ tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 	ti86ansi_clib.lib ti86_clib.lib \
 	tigray82.lib tigray83.lib tigray83p.lib tigray85.lib tigray86.lib
 
-zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib zx_math.lib zx_mathtiny.lib
+zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib mzx.lib mzx_tiny
 
-zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib
+zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib
 
 
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.93 2007-10-04 20:16:12 stefano Exp $
+#  $Id: Makefile,v 1.94 2007-10-05 07:38:33 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.93 2007-10-04 20:16:12 stefano Exp $
+# $Id: Makefile,v 1.94 2007-10-05 07:38:33 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -61,7 +61,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.93 2007-10-04 20:16:12 stefano Exp $
+#  $Id: Makefile,v 1.94 2007-10-05 07:38:33 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -286,17 +286,17 @@ zxvgs.lib:
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zxvgs @$(LISTFILE_DIRECTORY)/zxvgs.lst
 
 # ZX Spectrum maths library - Stefano
-zx_math.lib:
+mzx.lib:
 	@echo ''
 	@echo '--- Building ZX Spectrum Maths Library ---'
 	@echo ''
-	cd zxmath ; $(MAKE) zx_math ; cd ..
+	cd zxmath ; $(MAKE) mzx ; cd ..
 
-zx_mathtiny.lib:
+mzx_tiny.lib:
 	@echo ''
 	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
 	@echo ''
-	cd zxmath ; $(MAKE) zx_mathtiny ; cd ..
+	cd zxmath ; $(MAKE) mzx_tiny ; cd ..
 
 # vt100 for sprinter - dom
 ppsansi_clib.lib:
@@ -481,6 +481,18 @@ gfx81hr192.lib:
 	$(LIBLINKER) -IXIY -DFORzx81hr192 -x$(OUTPUT_DIRECTORY)/gfx81hr192 @$(LISTFILE_DIRECTORY)/gfx81hr.lst
 	$(MAKE) zx81deps
 
+# ZX81 maths library - Stefano
+m81.lib:
+	@echo ''
+	@echo '--- Building ZX 81 Maths Library ---'
+	@echo ''
+	cd zxmath ; $(MAKE) m81 ; cd ..
+
+m81_tiny.lib:
+	@echo ''
+	@echo '--- Building ZX 81 Tiny Maths Library ---'
+	@echo ''
+	cd zxmath ; $(MAKE) m81_tiny ; cd ..
 
 # Texas Instrument's calculators: - stefano/henk
 # almost the same lib code with different -D flag set
