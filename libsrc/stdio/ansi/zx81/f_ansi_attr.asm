@@ -9,29 +9,43 @@
 ;	Be careful here...
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.3 2007-10-03 15:11:39 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.4 2007-10-06 17:19:43 stefano Exp $
 ;
 
 	XLIB	ansi_attr
 
 	XREF	INVRS
+	XREF	BOLD
 
 .ansi_attr
-;        and     a
-;        jr      nz,noreset
-;        ret
-;.noreset
-;        cp      1
-;        jr      nz,nobold
-;        ret
-;.nobold
-;        cp      2
-;        jr      z,dim
-;        cp      8
-;        jr      nz,nodim
-;.dim
-;        ret
-;.nodim
+        and     a
+        jr      nz,noreset
+        ld	(BOLD),a
+        ld	(BOLD+1),a
+        xor     a
+        ld      (INVRS),a      ; inverse 0
+        ld      a, 24
+        ld      (INVRS+2),a   ; underline 0
+        ret
+.noreset
+        cp      1
+        jr      nz,nobold
+        ld	a,23
+        ld	(BOLD),a
+        ld	a,182
+        ld	(BOLD+1),a
+        ret
+.nobold
+        cp      2
+        jr      z,dim
+        cp      8
+        jr      nz,nodim
+.dim
+	xor	a
+        ld	(BOLD),a
+        ld	(BOLD+1),a
+        ret
+.nodim
         cp      4
         jr      nz,nounderline
         ld      a,32
