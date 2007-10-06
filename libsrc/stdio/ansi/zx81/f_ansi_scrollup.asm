@@ -5,7 +5,7 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.3 2007-10-03 15:11:39 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.4 2007-10-06 16:51:39 stefano Exp $
 ;
 
 	XLIB	ansi_SCROLLUP
@@ -19,7 +19,11 @@
 	ld	d,h
 	ld	e,l
 	inc	h
-	ld	bc,6144-256
+	ld	a,(text_rows)
+	ld	b,a
+	ld	c,0
+	dec	b
+	;ld	bc,6144-256
 	ldir
 	ld	a,(text_rows)
 	dec	a

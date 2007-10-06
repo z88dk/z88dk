@@ -19,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.3 2007-10-03 15:11:39 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.4 2007-10-06 16:51:39 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -194,6 +194,9 @@ ENDIF
 
 IF ROMFONT
   ld hl,$1e00
+  xor	a
+  add	b
+  jr	z,NOLFONT
 ELSE
 	IF PACKEDFONT
 	  xor	a
@@ -209,12 +212,11 @@ ELSE
 ENDIF
 
   ld de,8
-
 .LFONT
   add hl,de
   djnz LFONT
-  ;ld de,256
-  ld de,32
+.NOLFONT
+  ld de,32	; next row
   ld c,8
 .PRE
   ld b,4
@@ -315,14 +317,14 @@ ENDIF
 
 ; The font
 ; 9 dots: MAX 28 columns
-; 8 dots: MAX 32 columns The only one perfecly color aligned
+; 8 dots: MAX 32 columns
 ; 7 dots: MAX 36 columns
-; 6 dots: MAX 42 columns Good matching with color attributes
+; 6 dots: MAX 42 columns
 ; 5 dots: MAX 51 columns
-; 4 dots: MAX 64 columns Matched with color attributes (2 by 2)
+; 4 dots: MAX 64 columns
 ; 3 dots: MAX 85 columns Just readable!
 ; 2 dots: MAX 128 columns (useful for ANSI graphics only.. maybe)
-; Address 15360 for ROM Font
+; No file for ROM Font
 
 .font
 IF ROMFONT
