@@ -7,7 +7,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.6 2007-10-04 10:28:46 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.7 2007-10-06 14:22:04 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -166,7 +166,9 @@ HRG_outloop:
 ; if we run in 64 lines mode we need to increase the number of border's lines
 
 IF (startup>=5)
-        add     164            ; more blank lines for fast application code execution
+        add     140             ; more blank lines for fast application code and correct sync
+        			; Siegfried Engel reports that values between 80 and 159 worked
+        			; fine on both a normal TV and an LCD one
 ENDIF
 
         ld      c,a            ; load C with MARGIN
