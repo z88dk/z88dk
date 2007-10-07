@@ -1,7 +1,7 @@
 
 
 
-SUBDIRS = string
+SUBDIRS = string stdio
 
 all: subdirs-all
 

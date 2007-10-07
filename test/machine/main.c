@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <getopt.h>
 #include "cmds.h"
 
 
@@ -91,10 +92,23 @@ static void sighandler(int sig)
 
 int main(int argc, char *argv[])
 {
+    int   ch;
+    int   alarmtime = 30;
+    char *progname = argv[0];
 
+    while ( ( ch = getopt(argc, argv, "w:")) != -1 ) {
+        switch ( ch ) {
+        case 'w':
+            alarmtime = atoi(optarg);
+            break;
+        }
+    }
 
-    if ( argc < 2 ) {
-        printf("Usage: %s [program to run]\n");
+    argc -= optind;
+    argv += optind;
+
+    if ( argc < 1 ) {
+        printf("Usage: %s [program to run]\n", progname);
         exit(1);
     }
 
@@ -104,11 +118,13 @@ int main(int argc, char *argv[])
 
     signal(SIGALRM, sighandler);
 
-    alarm(5);  /* 30 seconds should be enough... */
+    if ( alarmtime != -1 ) {
+        alarm(alarmtime);  /* Abort a test run if it's been too long */
+    }
 
     /* Reset the machine */
     ResetZ80(&z80);
-    load_file(argv[1]);
+    load_file(argv[0]);
 
     RunZ80(&z80);
 
