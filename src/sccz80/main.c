@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.17 2007-06-24 14:42:48 dom Exp $
+ *      $Id: main.c,v 1.18 2007-10-07 16:16:03 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -27,7 +27,6 @@ int     safedata;       /* amount of safe workspace required */
 int     intuition;      /* Intuitiono to debug?!?!? */
 int     smartprintf;    /* Map printf -> miniprintf */
 int     expanded;       /* Do we need expanded Z88? */
-int     ansistdio;      /* Complex ANSI stdio       */
 int     startup;        /* Which startup to we want? app has it's own
                            but by using -startup= we can switch
                            between "BASIC" startups, eg for shell
@@ -52,13 +51,12 @@ extern  int     gotocnt;        /* No of gotos */
 extern  GOTO_TAB *gotoq;         /* Pointer for gotoq */
 
 
-
+void    DispVersion(char *);
 void    SetMPM(char *);
 void    SetSmart(char *);
 void    UnSetSmart(char *);
 void    SetExpand(char *);
 void    UnSetExpand(char *);
-void    SetANSIstdio(char *);
 void    SetMakeShared(char *);
 void    SetUseShared(char *);
 
@@ -148,7 +146,7 @@ int main(int argc, char **argv)
         ncomp=doinline=mathz88 = incfloat= compactcode =0;
         intuition=zorg=lpointer=cppcom=appz88=0;
         dosigned=NO;
-        ansistdio=makelib=useshare=makeshare=sharedfile=NO;
+        makelib=useshare=makeshare=sharedfile=NO;
         smartprintf=expanded=YES;
         startup=0;                      /* Which startup do we want? */
         nxtlab =                        /* start numbers at lowest possible */
@@ -1014,65 +1012,65 @@ void closeout()
 
 
 struct args {
-        char *name;
-        char more;
-        void (*setfunc)(char *);
+    char *name;
+    char more;
+    void (*setfunc)(char *);
+    char  *help;
 };
 
 
 struct args myargs[]= {
-        {"math-z88",NO,SetMathZ88},
-        {"unsigned",NO,SetUnsigned},
-        {"//",NO,SetCppComm},
-        {"make-app",NO,SetMakeApp},
-        {"do-inline",NO,SetDoInline},
-        {"stop-error",NO,SetStopError},
-        {"far-pointers",NO,SetFarPtrs},	/* Obsolete..but maybe useful*/
-        {"make-lib",NO,SetNoHeader},
-        {"make-shared",NO,SetMakeShared},
-	{"shared-file",NO,SetSharedFile},
-        {"use-shared",NO,SetUseShared},
-        {"Wnone",NO,SetNoWarn},
-        {"compact",NO,SetCompactCode},
-        {"cc",NO,SetCCode},
-        {"verbose",NO,SetVerbose},
-        {"D",YES,SetDefine},
-        {"U",YES,SetUndefine},
-        {"h",NO,DispInfo},
-        {"v",NO,SetVerbose},
-        {"Wall",NO,SetAllWarn},
-        {"Wn",YES,UnSetWarning},
-        {"W",YES,SetWarning},
-        {"zorg=",YES,SetOrg},
-        {"reqpag=",YES,SetReqPag},
-        {"defvars=",YES,SetDefVar},
-        {"safedata=",YES,SetSafeData},
-        {"startup=",YES,SetStartUp},
-	{"shareoffset=",YES,SetShareOffset},
-        {"version",NO,DispInfo},
-        {"intuition",NO,SetIntuition},
-        {"smartpf",NO,SetSmart},
-        {"no-smartpf",NO,UnSetSmart},
-	{"pflevel",YES,SetPfLevel},
-        {"expandz88",NO,SetExpand},
-        {"no-expandz88",NO,UnSetExpand},
-        {"ANSI-stdio",NO,SetANSIstdio},
-	{"farheap=",YES,SetFarHeap},
-	{"debug=",YES,SetDebug},
-	{"asxx",NO,SetASXX},
-	{"doublestr",NO,SetDoubleStrings},
-	{"noaltreg",NO,SetNoAltReg},
+    {"math-z88",NO,SetMathZ88, "Enable machine native maths mode" },
+    {"unsigned",NO,SetUnsigned, "Make all types unsigned" },
+    {"//",NO,SetCppComm, "Accept C++ style // comments" },
+    {"make-app",NO,SetMakeApp, "Turn on ROMable code mode" },
+    {"do-inline",NO,SetDoInline, "Inline certain common functions" },
+    {"stop-error",NO,SetStopError, "Stop when an error is received" },
+    {"far-pointers",NO,SetFarPtrs, NULL},	/* Obsolete..but maybe useful*/
+    {"make-lib",NO,SetNoHeader, "Turn on Library code mode" },
+    {"make-shared",NO,SetMakeShared, "This Library file is shared" },
+	{"shared-file",NO,SetSharedFile, "All functions within this file are shared" },
+    {"use-shared",NO,SetUseShared, "Used shared library functions" },
+    {"Wnone",NO,SetNoWarn, "Disable all warnings" },
+    {"compact",NO,SetCompactCode, "Enable caller cleanup for all functions" },
+    {"cc",NO,SetCCode, "Intersperse the assembler output with the source c code" },
+    {"verbose",NO,SetVerbose, "Be more verbose"},
+    {"D",YES,SetDefine, "Define a preprocessor directive"},
+    {"U",YES,SetUndefine, "Undefine a preprocessor directive"},
+    {"h",NO,DispInfo, "Displace this text"},
+    {"v",NO,SetVerbose, "Be more verbose"},
+    {"Wall",NO,SetAllWarn, "Enable all warnings" },
+    {"Wn",YES,UnSetWarning, "Unset a warning"},
+    {"W",YES,SetWarning, "Set a warning"},
+    {"zorg=",YES,SetOrg, "Set the origin for this program" },
+    {"reqpag=",YES,SetReqPag, "Define the number of safe pages required (z88)" },
+    {"defvars=",YES,SetDefVar, "Assign all initialised statics to this address" },
+    {"safedata=",YES,SetSafeData, "Amount of safedata (z88)" },
+    {"startup=",YES,SetStartUp, "Switch between startups" },
+	{"shareoffset=",YES,SetShareOffset, "Define the shared offset (use with -make-shared" },
+    {"version",NO,DispVersion, "Display the this"},
+    {"intuition",NO,SetIntuition, "Enable intuition debugging (z88)" },
+    {"smartpf",NO,SetSmart, "Enable smart printf format handling" },
+    {"no-smartpf",NO,UnSetSmart, "Disable smart printf format handling" },
+	{"pflevel",YES,SetPfLevel, "Set the manual printf level" },
+    {"expandz88",NO,SetExpand, "Enable use only on expanded z88" },
+    {"no-expandz88",NO,UnSetExpand, "Enable use on non-expanded z88"},
+	{"farheap=",YES,SetFarHeap, "Set the size of the far heap (z88)"},
+	{"debug=",YES,SetDebug, "Enable some extra logging" },
+	{"asxx",NO,SetASXX, "Use asxx as the output format"},
+	{"doublestr",NO,SetDoubleStrings, "Convert fp strings to values at runtime"},
+	{"noaltreg",NO,SetNoAltReg, "Don't use alternate registers" },
 #ifdef USEFRAME
 	{"frameix",NO,SetFrameIX},
 	{"frameiy",NO,SetFrameIY},
 	{"noframe",NO,SetNoFrame},
 #endif
 /* Compatibility Modes.. */
-        {"f",NO,SetUnsigned},
-        {"l",NO,SetFarPtrs},
-        {"mpm",NO,SetMPM},
-        {"",0}
-        };
+    {"f",NO,SetUnsigned, NULL},
+    {"l",NO,SetFarPtrs, NULL},
+    {"mpm",NO,SetMPM, "Enable MPM output mode"},
+    {"",0, NULL, NULL}
+};
 
 #ifdef USEFRAME
 void SetNoFrame(char *arg)
@@ -1163,12 +1161,7 @@ void SetStartUp(char *arg)
 }
 
 
-/* ANSI stdio - proper filepointers and the ilk */
 
-void SetANSIstdio(char *arg)
-{
-        ansistdio=YES;
-}
 
 /* Do we need an expanded Z88? */
  
@@ -1383,6 +1376,22 @@ void SetUndefine(char *arg)
 }
 
 void DispInfo(char *arg)
+{
+    struct   args *cur = &myargs[0];
+    info();
+
+    printf("\nOptions:\n\n");
+
+    while ( cur->setfunc ) {
+        if ( cur->help ) {
+            printf("%-15s %s\n",cur->name, cur->help);
+        }
+        cur++;
+    }
+    exit(1);
+}
+
+void DispVersion(char *arg)
 {
         info(); 
         exit(1);
