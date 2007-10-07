@@ -1,0 +1,10 @@
+lstoff
+
+
+	defc	CMD_EXIT = 0
+	defc	CMD_PRINTCHAR = 1
+	defc	CMD_READKEY = 1
+
+
+
+lston

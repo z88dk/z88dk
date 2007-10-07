@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.94 2007-10-05 07:38:33 stefano Exp $
+# $Id: Makefile,v 1.95 2007-10-07 17:49:34 dom Exp $
 
 
 include Make.config
@@ -20,6 +20,7 @@ all:	genlibs z88libs tilibs zxlibs \
 	ozansi_clib.lib rex_clib.lib rcmx000_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib \
 	pps_clib.lib ppsansi_clib.lib embedded_clib.lib \
+	test_clib.lib \
 	zx81libs
 
 genlibs: gen_math.lib malloc.lib z80_crt0.lib ndos.lib adt.lib balloc.lib \
@@ -41,12 +42,12 @@ zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.94 2007-10-05 07:38:33 stefano Exp $
+#  $Id: Makefile,v 1.95 2007-10-07 17:49:34 dom Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.94 2007-10-05 07:38:33 stefano Exp $
+# $Id: Makefile,v 1.95 2007-10-07 17:49:34 dom Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -61,7 +62,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.94 2007-10-05 07:38:33 stefano Exp $
+#  $Id: Makefile,v 1.95 2007-10-07 17:49:34 dom Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -1028,6 +1029,19 @@ sms_clib.lib:
 	$(MAKE) -C assert
 	$(LIBLINKER) -DFORsms -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
 
+# Test platform - dom
+test_clib.lib:
+	@echo ''
+	@echo '--- Building Test System Library  ---'
+	@echo ''
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib
+	$(MAKE) -C stdio
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/test_clib @$(LISTFILE_DIRECTORY)/test.lst
+
 
 
 
@@ -1073,3 +1087,5 @@ clean:
 
 install:
 	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs
+
+
