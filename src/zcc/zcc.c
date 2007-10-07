@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.32 2006-06-20 11:32:17 dom Exp $
+ *      $Id: zcc.c,v 1.33 2007-10-07 15:59:39 dom Exp $
  */
 
 
@@ -196,37 +196,37 @@ void linkargs_mangle();
 
 
 struct args myargs[]= {
-    {"z80-verb",NO,SetZ80Verb},
-    {"cleanup",NO,SetCleanUp},
-    {"no-cleanup",NO,UnSetCleanUp},
-    {"make-lib",NO,SetLibMake},
-    {"preserve",NO,SetPreserve},
-    {"make-app",NO,SetLateAssemble},
-    {"create-app",NO,SetCreateApp},
-    {"usetemp",NO,SetTemp},
-    {"notemp",NO,UnSetTemp},
-    {"mpm", NO, SetMPM},
-	{"Cp",YES,AddToPreProc},
-	{"Ca",YES,AddToAssembler},
-    {"Cz",YES,AddToAppmake},
-    {"E",NO,SetPreProcessOnly},
-    {"R",NO,SetRelocate},
-    {"D",YES,AddPreProc},
-    {"U",YES,AddPreProc},
-    {"I",YES,AddPreProc},
-    {"l",YES,AddLink},
-    {"O",YES,SetPeepHole},
-    {"h",NO,DispVer},
-    {"v",YES,SetVerbose},
-    {"c",NO,SetCompileOnly},
-    {"a",NO,SetAssembleOnly},
-    {"m",NO,SetOutputMap},
-    {"s",NO,SetOutputSym},
-    {"o",YES,SetOutputFile},
-	{"nt",NO,AddAppmake},
-	{"M",NO,SetShortObj},
-	{"+",NO,AddPreProc},	/* Strips // comments in vcpp */
-    {"",0,0}
+    {"z80-verb",NO,SetZ80Verb, "Make the assembler more verbose" },
+    {"cleanup",NO,SetCleanUp, "(default) Cleanup temporary files" },
+    {"no-cleanup",NO,UnSetCleanUp, "Don't cleanup temporary files" },
+    {"make-lib",NO,SetLibMake, "Compile as if to make a library" },
+    {"preserve",NO,SetPreserve, "Don't remove zcc_opt.def and start of run"},
+    {"make-app",NO,SetLateAssemble, "Create binary suitable for generated application" },
+    {"create-app",NO,SetCreateApp,   "Run appmake on the resulting binary to create emulator usable file" },
+    {"usetemp",NO,SetTemp, "(default) Use the temporary directory for intermediate files"},
+    {"notemp",NO,UnSetTemp, "Don't use the temporary directory for intermediate files"},
+    {"mpm", NO, SetMPM, "Use MPM rather than Z80asm as the assembler"},
+	{"Cp",YES,AddToPreProc, "Add an option to the preprocessor" },
+	{"Ca",YES,AddToAssembler, "Add an option to the assembler" },
+    {"Cz",YES,AddToAppmake, "Add an option to appmake" },
+    {"E",NO,SetPreProcessOnly, "Only preprocess files" },
+    {"R",NO,SetRelocate, "Generate relocatable code"},
+    {"D",YES,AddPreProc, "Define a preprocessor option"},
+    {"U",YES,AddPreProc, "Undefine a preprocessor option"},
+    {"I",YES,AddPreProc, "Add an include directory for the preprocessor"},
+    {"l",YES,AddLink,  "Add a library" },
+    {"O",YES,SetPeepHole, "Set the peephole optimiser setting" },
+    {"h",NO,DispVer, "Display this text"},
+    {"v",YES,SetVerbose, "Output all commands that are run (-vn suppresses)" },
+    {"c",NO,SetCompileOnly, "Only compile the .c files to .o files" },
+    {"a",NO,SetAssembleOnly, "Only compile the .c files to .asm/.opt files" },
+    {"m",NO,SetOutputMap, "Generate an output map of the final executable" },
+    {"s",NO,SetOutputSym, "Generate a symbol map of the final executable" },
+    {"o",YES,SetOutputFile, "Set the output files" },
+	{"nt",NO,AddAppmake, "Set notruncate on the appmake options" },
+	{"M",NO,SetShortObj, "Define the suffix of the object files (eg -Mo)" },
+	{"+",NO,AddPreProc, NULL},	/* Strips // comments in vcpp */
+    {"",0,NULL, NULL}
 };
 
 
@@ -1081,8 +1081,17 @@ void SetVerbose(char *arg)
 
 void DispVer(char *arg)
 {
-        DispInfo();
-        exit(0);
+    struct   args *cur = &myargs[0];
+    DispInfo();
+
+    printf("\nOptions:\n\n");
+
+    while ( cur->help ) {
+        printf("-%-15s %s\n",cur->name, cur->help);
+        cur++;
+    }
+
+    exit(0);
 }
 
 void SetRelocate(char *arg)
