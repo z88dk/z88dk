@@ -37,6 +37,8 @@ word LoopZ80(Z80 *R)
 
 void PatchZ80(Z80 *R)
 {
+    int   val;
+
     switch (R->AF.B.h ) {
     case CMD_EXIT:
         exit(R->HL.B.l);
@@ -47,6 +49,10 @@ void PatchZ80(Z80 *R)
             fputc(R->HL.B.l,stdout);
         }
         fflush(stdout);
+        break;
+    case CMD_READKEY:
+        val = getchar();
+        R->HL.W = val;
         break;
     default:
         printf("Unknown code %d\n",R->AF.B.h);
