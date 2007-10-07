@@ -41,7 +41,12 @@ void PatchZ80(Z80 *R)
     case CMD_EXIT:
         exit(R->HL.B.l);
     case CMD_PRINTCHAR:
-        fputc(R->HL.B.l,stdout);
+        if ( R->HL.B.l == '\n' || R->HL.B.l == '\r' ) {
+            fputc('\n',stdout);
+        } else {
+            fputc(R->HL.B.l,stdout);
+        }
+        fflush(stdout);
         break;
     default:
         printf("Unknown code %d\n",R->AF.B.h);
@@ -67,7 +72,7 @@ static char *load_file(char *filename)
         printf("Cannot load file %s\n",filename);
         exit(1);
     }
-    printf("%d\n",fread(&RAM[0], sizeof(RAM[0]), 65536, fp));
+    fread(&RAM[0], sizeof(RAM[0]), 65536, fp);
 
     fclose(fp);
 }
