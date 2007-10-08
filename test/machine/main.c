@@ -1,7 +1,7 @@
 
 
 
-#include "Z80/z80.h"
+#include "Z80/Z80.h"
 
 #include <signal.h>
 #include <stdio.h>
