@@ -1,13 +1,14 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.2 2007-10-02 11:20:23 stefano Exp $
+ * $Id: zx81.h,v 1.3 2007-10-09 14:17:31 stefano Exp $
  */
 
 #ifndef __ZX81_H__
 #define __ZX81_H__
 
 #include <sys/types.h>
+
 
 /////////////
 // CONSTANTS
@@ -28,10 +29,6 @@ extern int base_graphics;
 
 // direct call for "clear graphics page"
 extern void __LIB__ _clg_hr();
-
-// Switch on/off the high resolution graphics mode
-extern void __LIB__ hrg_on();
-extern void __LIB__ hrg_off();
 
 // Copies text to HRG screen
 extern void __LIB__ __FASTCALL__ copytxt(int ovmode);

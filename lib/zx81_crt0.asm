@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.17 2007-10-04 10:28:46 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.18 2007-10-09 14:17:32 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -82,21 +82,25 @@
 
 .start
 
-IF (startup>=2)
+        call    save81
+
+IF ((startup=4)|(startup=6))
         call    hrg_on
- IF ((startup=3)|(startup=5))
-        ld	a,1
-        ld      (hrgbrkflag),a
- ENDIF
 ENDIF
 
         ld      (start1+1),sp   ;Save entry stack
-        ld      hl,-64          ;Create an atexit() stack
+        ;ld      hl,-64          ;Create an atexit() stack
+        ld      hl,0            ;Create an atexit() stack
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
 
-        call    save81
+IF ((startup=3)|(startup=5))
+        call    hrg_on
+        ld	a,1
+        ld      (hrgbrkflag),a
+ENDIF
+
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -116,7 +120,8 @@ ENDIF
 ;
 ;       Deallocate memory which has been allocated here!
 ;
-        push    hl
+        push    hl		; keep return code
+
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
         LIB     closeall
@@ -124,18 +129,19 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
-        call    restore81
 
 IF (startup>=2)
  IF ((startup=4)|(startup=6))
+        call    restore81
         call    hrg_off
  ELSE
+        call    restore81
         xor	a
         ld      (hrgbrkflag),a
  ENDIF
 ENDIF
 
-        pop     bc
+        pop     bc		; return code (for BASIC)
 .start1 ld      sp,0            ;Restore stack to entry value
         ret
 
@@ -148,7 +154,10 @@ IF (!DEFINED_startup | (startup=1))
 ENDIF
 
 .restore81
-        ld      ix,16384	; IT WILL BECOME IY AFTER SWAP !!
+        exx
+        ld	hl,(hl1save)
+        ld	bc,(bc1save)
+        exx
 IF (!DEFINED_startup | (startup=1))
         ; SLOW/FAST trick; flickers but permits the alternate registers usage
         ex      af,af
@@ -157,6 +166,7 @@ IF (!DEFINED_startup | (startup=1))
         call    $F2B            ; SLOW mode
         ;call   $207    ;slowfast
 ENDIF
+        ld      ix,16384	; IT WILL BECOME IY  !!
         ret
         
 .save81
@@ -166,9 +176,16 @@ IF (!DEFINED_startup | (startup=1))
         ;call   $2E7    ;setfast
         ex      af,af
         ld      (a1save),a
-        ex      af,af
+        ex      af,a
 ENDIF
+        exx
+        ld	(hl1save),hl
+        ld	(bc1save),bc
+        exx
         ret
+
+.hl1save	defw	0
+.bc1save	defw	0
 
 ;-----------
 ; Define the stdin/out/err area. For the z88 we have two models - the
@@ -235,8 +252,14 @@ IF (startup>=3)
 ENDIF
 
 .coords         defw    0       ; Current graphics xy coordinates
+
 ._base_graphics
-.base_graphics  defw    0       ; Address of the Graphics map
+.base_graphics
+IF DEFINED_MEM32K
+		defw    $B800       ; Address of the Graphics map
+ELSE
+		defw    0           ; Address of the Graphics map
+ENDIF
 
 IF !DEFINED_HAVESEED
 		XDEF    _std_seed        ;Integer rand() seed

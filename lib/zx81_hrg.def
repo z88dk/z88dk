@@ -1,31 +1,40 @@
 ;       CRT0 for the ZX81 - HIGH RESOLUTION MODE (WRX trick by Wilf Rigter)
 ;
-;
 ;       This code comes from the 'HRG_Tool'  by Matthias Swatosch
 ;       Display handler modifications (to preserve IY) by Stefano Bodrato
-;       
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.7 2007-10-06 14:22:04 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.8 2007-10-09 14:17:32 stefano Exp $
 ;
 ; - - - - - - -
 
 IF (startup>=5)
-  DEFC  BASE16K   = $7800
-  DEFC  RAMTOP16K = $7780
-  DEFC  WHOLEMEM = 2048+128
+  IF DEFINED_MEM8K
+    DEFC  TOPOFRAM  = $6000
+    DEFC  BASE16K   = $5800
+    DEFC  RAMTOP16K = $5780
+  ELSE
+    DEFC  TOPOFRAM  = $8000
+    DEFC  BASE16K   = $7800
+    DEFC  RAMTOP16K = $7780
+ ENDIF
+    DEFC  WHOLEMEM  = 2048+128
 ELSE
-  DEFC  BASE16K = $6800
-  DEFC  RAMTOP16K = $6780
-  DEFC  WHOLEMEM = 6144+128
+ IF DEFINED_MEM8K
+    DEFC  TOPOFRAM  = $6000
+    DEFC  BASE16K   = $4800
+    DEFC  RAMTOP16K = $4780
+ ELSE
+    DEFC  TOPOFRAM  = $8000
+    DEFC  BASE16K   = $6800
+    DEFC  RAMTOP16K = $6780
+ ENDIF
+    DEFC  WHOLEMEM = 6144+128
 ENDIF
 
 ;--------------------------------------------------------------
 ;--------------------------------------------------------------
-
-XDEF    hrg_on
-XDEF    hrg_off
 
 ;------------------------------------------
 ;
@@ -48,14 +57,11 @@ DEFC    RAMTOP  = 16388 ;word   Address of first byte above BASIC system area.
 ;
 ;----------------------------------------------------------------
 hrg_on:
-        ;push   af
-        ;push   hl
 
         ld      hl,(base_graphics)
         ld      a,h
         or      l
-        ;jr     z,HRG_SyncEnd   ; if nor reasonable exit here
-        call    z,HRG_Interface_BaseRamtop
+        call    z,HRG_Interface_BaseRamtop	; if zero, make space and adjust ramtop for 16K
         
         ld      hl,HRG_handler  ; starts the hires mode when JP (IX) is made
         jr      HRG_Sync
@@ -242,7 +248,7 @@ HRG_LineStart:
 HRG_Interface_BaseRamtop:
 
         ld      hl,(RAMTOP)
-        ld      de,$8000        ;is RAMTOP in original 16k?
+        ld      de,TOPOFRAM     ;is RAMTOP in original 8k/16k position?
         xor     a
         sbc     hl,de
         ld      a,h
@@ -278,7 +284,7 @@ HRG_Interface_BaseRamtopModify:
         ld      hl,$0000
         add     hl,sp           ;load SP into HL
         push    hl
-        ld      de,$8000        ;prepare to copy the stack
+        ld      de,TOPOFRAM     ;prepare to copy the stack
         ex      de,hl
         xor     a
         sbc     hl,de
