@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.19 2007-10-09 16:32:31 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.20 2007-10-09 20:05:04 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -90,7 +90,7 @@ IF (!DEFINED_startup | (startup=1))
         ;call   $2E7    ;setfast
 ENDIF
 
-IF (startup>=3)
+IF (startup>=2)
         call    hrg_on
  IF ((startup=3)|(startup=5))
         ld	a,1
@@ -139,8 +139,8 @@ ENDIF
 
         call    restore81
 
-IF (startup>=3)
- IF ((startup=4)|(startup=6))
+IF (startup>=2)
+ IF ((startup=2)|(startup=4)|(startup=6))
         call    hrg_off
  ELSE
         xor	a
