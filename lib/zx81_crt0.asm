@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.18 2007-10-09 14:17:32 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.19 2007-10-09 16:32:31 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -84,23 +84,31 @@
 
         call    save81
 
-IF ((startup=4)|(startup=6))
-        call    hrg_on
+IF (!DEFINED_startup | (startup=1))
+        ; FAST mode, safest way to use the special registers
+        call    $F23    ; FAST mode
+        ;call   $2E7    ;setfast
 ENDIF
 
+IF (startup>=3)
+        call    hrg_on
+ IF ((startup=3)|(startup=5))
+        ld	a,1
+        ld      (hrgbrkflag),a
+        call    hrg_on
+ ENDIF
+ENDIF
+
+	; this must be after 'hrg_on', sometimes
+	; the stack will be moved to make room
+	; for high-resolution graphics.
+	
         ld      (start1+1),sp   ;Save entry stack
         ;ld      hl,-64          ;Create an atexit() stack
         ld      hl,0            ;Create an atexit() stack
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
-
-IF ((startup=3)|(startup=5))
-        call    hrg_on
-        ld	a,1
-        ld      (hrgbrkflag),a
-ENDIF
-
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -129,15 +137,19 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
-
-IF (startup>=2)
- IF ((startup=4)|(startup=6))
         call    restore81
+
+IF (startup>=3)
+ IF ((startup=4)|(startup=6))
         call    hrg_off
  ELSE
-        call    restore81
         xor	a
         ld      (hrgbrkflag),a
+ ENDIF
+ELSE
+ IF (!DEFINED_startup | (startup=1))
+        call    $F2B            ; SLOW mode
+        ;call   $207    ;slowfast
  ENDIF
 ENDIF
 
@@ -149,43 +161,39 @@ ENDIF
         jp      (hl)
 
 
-IF (!DEFINED_startup | (startup=1))
-.a1save         defb    0
-ENDIF
-
 .restore81
-        exx
-        ld	hl,(hl1save)
-        ld	bc,(bc1save)
-        exx
 IF (!DEFINED_startup | (startup=1))
-        ; SLOW/FAST trick; flickers but permits the alternate registers usage
         ex      af,af
         ld      a,(a1save)
         ex      af,af
-        call    $F2B            ; SLOW mode
-        ;call   $207    ;slowfast
 ENDIF
+        exx
+        ld	hl,(hl1save)
+        ;ld	bc,(bc1save)
+        ;ld	de,(de1save)
+        exx
         ld      ix,16384	; IT WILL BECOME IY  !!
         ret
         
 .save81
 IF (!DEFINED_startup | (startup=1))
-        ; SLOW/FAST trick; flickers but permits the alternate registers usage
-        call    $F23            ; FAST mode
-        ;call   $2E7    ;setfast
         ex      af,af
         ld      (a1save),a
-        ex      af,a
+        ex      af,af
 ENDIF
         exx
         ld	(hl1save),hl
-        ld	(bc1save),bc
+        ;ld	(bc1save),bc
+        ;ld	(de1save),de
         exx
         ret
 
+IF (!DEFINED_startup | (startup=1))
+.a1save         defb    0
+ENDIF
 .hl1save	defw	0
-.bc1save	defw	0
+;.bc1save	defw	0
+;.de1save	defw	0
 
 ;-----------
 ; Define the stdin/out/err area. For the z88 we have two models - the
