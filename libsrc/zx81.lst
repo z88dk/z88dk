@@ -175,4 +175,5 @@ printflike/ltoa_any
 games/joystick
 zx81/copytxt
 zx81/invtxt
+zx81/mirrortxt
 zx81/_clg_hr

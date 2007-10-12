@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.3 2007-10-09 14:17:31 stefano Exp $
+ * $Id: zx81.h,v 1.4 2007-10-12 14:49:16 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -50,6 +50,8 @@ extern void __LIB__ __FASTCALL__ copytxt(int ovmode);
 // Invert screen in text mode
 extern void __LIB__ invtxt();
 
+// Mirror screen in text mode
+extern void __LIB__ mirrortxt();
 
 
 ///////////////////////////////
