@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.20 2007-06-23 07:01:10 aralbrec Exp $
+ * $Id: spectrum.h,v 1.21 2007-10-17 14:38:40 stefano Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -115,6 +115,7 @@
 #define TK_NEW         230
 #define TK_BORDER      231
 #define TK_CONTINUE    232
+#define TK_CONT        232
 #define TK_DIM         233
 #define TK_REM         234
 #define TK_FOR         235
@@ -132,6 +133,7 @@
 #define TK_RUN         247
 #define TK_SAVE        248
 #define TK_RANDOMIZE   249
+#define TK_RAND        249
 #define TK_IF          250
 #define TK_CLS         251
 #define TK_DRAW        252

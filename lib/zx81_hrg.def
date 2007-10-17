@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.8 2007-10-09 14:17:32 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.9 2007-10-17 14:38:40 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -33,6 +33,11 @@ ELSE
     DEFC  WHOLEMEM = 6144+128
 ENDIF
 
+IF ((startup=3)|(startup=5))
+.hrgbrkflag
+        defb    0
+ENDIF
+
 ;--------------------------------------------------------------
 ;--------------------------------------------------------------
 
@@ -58,11 +63,12 @@ DEFC    RAMTOP  = 16388 ;word   Address of first byte above BASIC system area.
 ;----------------------------------------------------------------
 hrg_on:
 
+IF !DEFINED_hrgpage
         ld      hl,(base_graphics)
         ld      a,h
         or      l
         call    z,HRG_Interface_BaseRamtop	; if zero, make space and adjust ramtop for 16K
-        
+ENDIF
         ld      hl,HRG_handler  ; starts the hires mode when JP (IX) is made
         jr      HRG_Sync
 
@@ -72,8 +78,6 @@ hrg_on:
 ;
 ;----------------------------------------------------------------
 hrg_off:
-        ;push   af
-        ;push   hl
 
         ld      hl,$281 ; switch back to text
         ld      a,$1e 
@@ -88,35 +92,7 @@ HRG_Sync1:
         jr      z,HRG_Sync1     ; exit after a change is detected
         pop     iy              ; SINCLAIR video routine
 
-        ;ld     hl,(base_graphics)
-        ;ld     (HRG_Driver_Filestart),hl
-
-HRG_SyncEnd:
-        ;pop    hl
-        ;pop    af
         ret
-
-;----------------------------------------------------------------
-;
-; End of basic functions for HRG
-;
-;----------------------------------------------------------------
-
-
-
-
-;----------------------------------------------------------------
-;
-; Some variables for storing
-;
-;----------------------------------------------------------------
-;base_graphics          defw    $0000
-;HRG_Driver_Filestart:  defw    $0000
-
-
-
-
-        
 
 ;----------------------------------------------------------------
 ;
@@ -209,6 +185,7 @@ ENDIF
         ld      iy,HRG_handler  ; reload vector if no BREAK or else SINCLAIR video
         jp      $02A4           ; now return to BASIC and other application programs
 
+
 ;----------------------------------------------------------------
 ;
 ; This is a dummy-line used for HRG output
@@ -233,6 +210,7 @@ HRG_LineStart:
 ;----------------------------------------------------------------
 
 
+IF !DEFINED_hrgpage
 ;--------------------------------------------------------------
 ;
 ; HRG_Interface_BaseRamtop
@@ -264,7 +242,7 @@ HRG_Interface_BaseRamtop:
 
         ld      hl,BASE16K      ;yes, then set base_graphics
         ld      (base_graphics),hl
-        jr      HRG_Interface_BaseRamtopRet
+        ret
 
 
 HRG_Interface_BaseRamtopModify: 
@@ -305,13 +283,16 @@ HRG_Interface_BaseRamtopModify:
         ld      sp,hl           ;WOW!
 
 
+HRG_Interface_BaseRamError:
 
-HRG_Interface_BaseRamtopRet:
+        ;rst     $08             ;error
+        ;defb    $1a             ;type R
+
+	; Nothig is as expected: let's put graphics just above the actual RAMTOP
+
+        ld      hl,(RAMTOP)
+        ld      (base_graphics),hl
+        
         ret
 
-
-
-HRG_Interface_BaseRamError:
-        rst     $08             ;error
-        defb    $1a             ;type R
-
+ENDIF

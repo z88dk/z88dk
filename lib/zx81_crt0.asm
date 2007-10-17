@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.20 2007-10-09 20:05:04 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.21 2007-10-17 14:38:40 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -66,10 +66,13 @@
 
         ld      a,(hl)          ; hide the first 6 bytes of REM line
         jp      start           ; invisible
-.hrgbrkflag
-        defb    0             ; invisible
-        defb	0             ; invisible
-
+._base_graphics                 ; Address of the Graphics map..
+.base_graphics			; it is POKEable at address 16518/16519
+IF DEFINED_hrgpage
+		defw	hrgpage
+ELSE
+		defw    0
+ENDIF
         defb    'Z'-27          ; Change this with your own signature
         defb    '8'-20
         defb    '8'-20
@@ -140,11 +143,11 @@ ENDIF
         call    restore81
 
 IF (startup>=2)
- IF ((startup=2)|(startup=4)|(startup=6))
-        call    hrg_off
- ELSE
+ IF ((startup=3)|(startup=5))
         xor	a
         ld      (hrgbrkflag),a
+ ELSE
+        call    hrg_off		; this is valid for mode 2, too !
  ENDIF
 ELSE
  IF (!DEFINED_startup | (startup=1))
@@ -261,17 +264,9 @@ ENDIF
 
 .coords         defw    0       ; Current graphics xy coordinates
 
-._base_graphics
-.base_graphics
-IF DEFINED_MEM32K
-		defw    $B800       ; Address of the Graphics map
-ELSE
-		defw    0           ; Address of the Graphics map
-ENDIF
-
 IF !DEFINED_HAVESEED
 		XDEF    _std_seed        ;Integer rand() seed
-._std_seed       defw    0       ; Seed for integer rand() routines
+._std_seed       defw    0      ; Seed for integer rand() routines
 ENDIF
 
 .exitsp         defw    0       ; Address of where the atexit() stack is

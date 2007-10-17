@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.4 2007-10-12 14:49:16 stefano Exp $
+ * $Id: zx81.h,v 1.5 2007-10-17 14:38:40 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -16,8 +16,76 @@
 
 // Basic Tokens
 
-#define TK_PRINT       245
+#define TK_RND         64
+#define TK_INKEYS      65
+#define TK_PI          66
 
+#define TK_DLBQUOTE    192	; Strange behaviour for '""'
+#define TK_AT          193
+#define TK_TAB         194
+
+#define TK_CODE        196
+#define TK_VAL         197
+#define TK_LEN         198
+#define TK_SIN         199
+#define TK_COS         200
+#define TK_TAN         201
+#define TK_ASN         202
+#define TK_ACS         203
+#define TK_ATN         204
+#define TK_LN          205
+#define TK_EXP         206
+#define TK_INT         207
+#define TK_SQR         208
+#define TK_SGN         209
+#define TK_ABS         210
+#define TK_PEEK        211
+#define TK_USR         212
+#define TK_STRS        213
+#define TK_CHRS        214
+#define TK_NOT         215
+#define TK_STAR_STAR   216
+#define TK_OR          217
+#define TK_AND         218
+#define TK_LEQ         219
+#define TK_GEQ         220
+#define TK_NEQ         221
+#define TK_THEN        222
+#define TK_TO          223
+#define TK_STEP        224
+#define TK_LPRINT      225
+#define TK_LLIST       226
+#define TK_STOP        227
+#define TK_SLOW        228
+#define TK_FAST        229
+#define TK_NEW         230
+#define TK_SCROLL      231
+#define TK_CONTINUE    232
+#define TK_CONT        232
+#define TK_DIM         233
+#define TK_REM         234
+#define TK_FOR         235
+#define TK_GO_TO       236
+#define TK_GO_SUB      237
+#define TK_INPUT       238
+#define TK_LOAD        239
+#define TK_LIST        240
+#define TK_LET         241
+#define TK_PAUSE       242
+#define TK_NEXT        243
+#define TK_POKE        244
+#define TK_PRINT       245
+#define TK_PLOT        246
+#define TK_RUN         247
+#define TK_SAVE        248
+#define TK_RANDOMIZE   249
+#define TK_RAND        249
+#define TK_IF          250
+#define TK_CLS         251
+#define TK_UNPLOT      252
+#define TK_CLEAR       253
+#define TK_RETURN      254
+#define TK_COPY        255
 
 
 /////////////////////////////////
