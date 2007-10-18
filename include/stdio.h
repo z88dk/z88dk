@@ -1,7 +1,7 @@
 #ifndef __STDIO_H__
 #define __STDIO_H__
 
-/* $Id: stdio.h,v 1.13 2005-10-19 21:14:31 dom Exp $ */
+/* $Id: stdio.h,v 1.14 2007-10-18 10:12:40 stefano Exp $ */
 
 #undef __STDIO_BINARY        /* By default don't consider binary files */
 
@@ -11,6 +11,10 @@
 
 #ifdef __SPECTRUM__
 #include <spectrum.h>
+#endif
+
+#ifdef __ZX81__
+#include <zx81.h>
 #endif
 
 #ifdef __CPM__
