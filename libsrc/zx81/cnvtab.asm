@@ -7,7 +7,7 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: cnvtab.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;	$Id: cnvtab.asm,v 1.1 2007-10-22 17:06:13 stefano Exp $
 ;
 
 	XLIB	zx81_cnvtab

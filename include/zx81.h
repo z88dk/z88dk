@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.5 2007-10-17 14:38:40 stefano Exp $
+ * $Id: zx81.h,v 1.6 2007-10-22 17:06:12 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -102,13 +102,14 @@ extern void __LIB__ _clg_hr();
 extern void __LIB__ __FASTCALL__ copytxt(int ovmode);
 
 // modes for copytxt
-#define txt_inv  47          // AND (HL)
-#define txt_and  47+166*256  // AND (HL) - CPL
-#define txt_or   182         // OR (HL)
-#define txt_xor  174         // XOR (HL)
-#define txt_or_r 31+182*256  // RRA - OR (HL)
-#define txt_or_l 23+182*256  // RLA - OR (HL)
-
+#define txt_and      47          // AND (HL)
+#define txt_and_cpl  47+166*256  // AND (HL) - CPL
+#define txt_or       182         // OR (HL)
+#define txt_xor      174         // XOR (HL)
+#define txt_or_r     31+182*256  // RRA - OR (HL)
+#define txt_or_l     23+182*256  // RLA - OR (HL)
+#define txt_and_r    31+47*256  // RRA - AND (HL)
+#define txt_and_l    23+47*256  // RLA - AND (HL)
 
 
 //////////////////
@@ -122,25 +123,33 @@ extern void __LIB__ invtxt();
 extern void __LIB__ mirrortxt();
 
 
+///////////////////////////////////////////
+// DIAGNOSTICS AND HARDWARE IDENTIFICATION
+///////////////////////////////////////////
+
+extern int  __LIB__ zx_basic_length(void);
+extern int  __LIB__ zx_var_length(void);
+
+
 ///////////////////////////////
 // INTERFACE FOR CALLING BASIC
 ///////////////////////////////
 
-/*
-extern int  __LIB__ __FASTCALL__ zx_goto(int line);
+// extern int  __LIB__ __FASTCALL__ zx_goto(int line);	// calls the BASIC interpreter at a single line
+extern int  __LIB__ __FASTCALL__ zx_line(int line);	// executes a single BASIC line
+
 extern int  __LIB__              zx_getstr(char variable, char *value);
 extern void __LIB__              zx_setstr(char variable, char *value);
-extern int  __LIB__ __FASTCALL__ zx_getint(char *variable);
-extern void __LIB__              zx_setint(char *variable, int value);
+// extern int  __LIB__ __FASTCALL__ zx_getint(char *variable);
+// extern void __LIB__              zx_setint(char *variable, int value);
 
 extern int  __LIB__ __CALLEE__   zx_getstr_callee(char variable, char *value);
 extern void __LIB__ __CALLEE__   zx_setstr_callee(char variable, char *value);
-extern void __LIB__ __CALLEE__   zx_setint_callee(char *variable, int value);
+// extern void __LIB__ __CALLEE__   zx_setint_callee(char *variable, int value);
 
 #define zx_getstr(a,b)           zx_getstr_callee(a,b)
 #define zx_setstr(a,b)           zx_setstr_callee(a,b)
-#define zx_setint(a,b)           zx_setint_callee(a,b)
-*/
+// #define zx_setint(a,b)           zx_setint_callee(a,b)
 
 
 

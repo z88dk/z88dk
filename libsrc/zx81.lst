@@ -38,7 +38,6 @@ stdio/puts
 stdio/ungetc
 stdio/fabandon
 stdio/zx81/fgetc_cons
-stdio/zx81/cnvtab
 stdio/fgets_cons
 stdio/zx81/getk
 stdio/puts_cons
@@ -173,7 +172,17 @@ printflike/vfscanf
 printflike/vsscanf
 printflike/ltoa_any
 games/joystick
+zx81/cnvtab
 zx81/copytxt
 zx81/invtxt
 zx81/mirrortxt
 zx81/_clg_hr
+zx81/zx_basic_length.asm
+zx81/zx_getstr.asm
+zx81/zx_getstr_callee.asm
+zx81/zx_line.asm
+zx81/zx_setstr.asm
+zx81/zx_setstr_callee.asm
+zx81/zx_var_length.asm
+zx81/zx81toasc
+zx81/asctozx81
