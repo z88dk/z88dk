@@ -7,7 +7,7 @@
 ;	int __CALLEE__ zx_setstr_callee(char variable, char *value);
 ;
 ;
-;	$Id: zx_setstr_callee.asm,v 1.1 2007-10-22 17:06:13 stefano Exp $
+;	$Id: zx_setstr_callee.asm,v 1.2 2007-10-23 20:33:49 stefano Exp $
 ;
 
 XLIB	zx_setstr_callee
@@ -27,9 +27,9 @@ zx_setstr_callee:
 .asmentry
 	
 	ld	a,e
-	and	95	; TO UPPER
-	sub	27	; to ZX81
-	
+	and	31
+	add	69
+
 	
 	ld	(morevar+1),a
 	ld	(pointer+1),hl
