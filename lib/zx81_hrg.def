@@ -6,7 +6,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.10 2007-10-25 14:53:04 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.11 2007-10-25 16:37:12 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -89,8 +89,8 @@ ENDIF
 IF (startup=7)
         ld      hl,(base_graphics)
         ld	(graybit1),hl
-	ld	a,8
-	add	h,a
+	ld	de,2048
+	add	hl,de
 	ld	(graybit2),hl
         ld	(current_graphics),hl
 ENDIF
@@ -195,6 +195,25 @@ pointedbyix:
 
         call    $0220          ; first PUSH register, then do VSYNC and get KEYBD
 
+IF ((startup=3)|(startup=5))
+        call    $0F46          ; check break (space) key
+        jp      c,nobrkk
+        ld      a,(hrgbrkflag)     ; set to '0' if program isn't running
+        and	a
+        jr	z,nobrkk
+        SCF
+.nobrkk
+ENDIF
+
+        pop     ix
+
+IF ((startup=3)|(startup=5))
+        ld      a,$1e           ; the I register is restored with the MSB address
+        ld      i,a             ; of the ROM pattern table in case of BREAK key down
+
+        jp      nc,$02A4
+ENDIF
+
 IF (startup=7)
 	ld	hl,gcount
 	;res	7,(hl)
@@ -206,30 +225,14 @@ IF (startup=7)
 	jp	z,Display_pic2
 	ld	(hl),0
 Display_pic1:
-	ld	a,8
-Display_pic2:
 	ld	hl,(graybit1)
-	add	h,a
+	jp	setpage
+Display_pic2:
+	ld	hl,(graybit2)
+setpage:
 	ld	(current_graphics),hl
 ENDIF
 
-IF ((startup=3)|(startup=5))
-        call    $0F46          ; check break (space) key
-        jp      c,nobrkk
-        ld      a,(hrgbrkflag)     ; set to '0' if program isn't running
-        and	a
-        jr	z,nobrkk
-        SCF
-.nobrkk
-ENDIF
-        pop     ix
-
-IF ((startup=3)|(startup=5))
-        ld      a,$1e           ; the I register is restored with the MSB address
-        ld      i,a             ; of the ROM pattern table in case of BREAK key down
-
-        jp      nc,$02A4
-ENDIF
         ld      iy,HRG_handler  ; reload vector if no BREAK or else SINCLAIR video
         jp      $02A4           ; now return to BASIC and other application programs
 
