@@ -3,34 +3,51 @@
 ;       This code comes from the 'HRG_Tool'  by Matthias Swatosch
 ;       Display handler modifications (to preserve IY) by Stefano Bodrato
 ;
+;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.9 2007-10-17 14:38:40 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.10 2007-10-25 14:53:04 stefano Exp $
 ;
 ; - - - - - - -
 
+XDEF	hrg_on
+XDEF	hrg_off
+
 IF (startup>=5)
+ IF (startup=7)
   IF DEFINED_MEM8K
-    DEFC  TOPOFRAM  = $6000
-    DEFC  BASE16K   = $5800
-    DEFC  RAMTOP16K = $5780
+    DEFC  TOPOFRAM    = $6000
+    DEFC  BASE_VRAM   = $5000
+    DEFC  NEW_RAMTOP  = $4F80
   ELSE
-    DEFC  TOPOFRAM  = $8000
-    DEFC  BASE16K   = $7800
-    DEFC  RAMTOP16K = $7780
+    DEFC  TOPOFRAM    = $8000
+    DEFC  BASE_VRAM   = $7000
+    DEFC  NEW_RAMTOP  = $6F80
+  ENDIF
+    DEFC  WHOLEMEM    = 4096+128   ; size of graphics map in grayscale mode
+ ELSE
+  IF DEFINED_MEM8K
+    DEFC  TOPOFRAM    = $6000
+    DEFC  BASE_VRAM   = $5800
+    DEFC  NEW_RAMTOP  = $5780
+  ELSE
+    DEFC  TOPOFRAM    = $8000
+    DEFC  BASE_VRAM   = $7800
+    DEFC  NEW_RAMTOP  = $7780
+  ENDIF
+    DEFC  WHOLEMEM    = 2048+128   ; size of graphics map in 256x64 mode
  ENDIF
-    DEFC  WHOLEMEM  = 2048+128
 ELSE
  IF DEFINED_MEM8K
-    DEFC  TOPOFRAM  = $6000
-    DEFC  BASE16K   = $4800
-    DEFC  RAMTOP16K = $4780
+    DEFC  TOPOFRAM    = $6000
+    DEFC  BASE_VRAM   = $4800
+    DEFC  NEW_RAMTOP  = $4780
  ELSE
-    DEFC  TOPOFRAM  = $8000
-    DEFC  BASE16K   = $6800
-    DEFC  RAMTOP16K = $6780
+    DEFC  TOPOFRAM    = $8000
+    DEFC  BASE_VRAM   = $6800
+    DEFC  NEW_RAMTOP  = $6780
  ENDIF
-    DEFC  WHOLEMEM = 6144+128
+    DEFC  WHOLEMEM    = 6144+128   ; size of graphics map in 256x192 mode
 ENDIF
 
 IF ((startup=3)|(startup=5))
@@ -62,12 +79,20 @@ DEFC    RAMTOP  = 16388 ;word   Address of first byte above BASIC system area.
 ;
 ;----------------------------------------------------------------
 hrg_on:
-
+	call   $F2B	; SLOW
 IF !DEFINED_hrgpage
         ld      hl,(base_graphics)
         ld      a,h
         or      l
         call    z,HRG_Interface_BaseRamtop	; if zero, make space and adjust ramtop for 16K
+ENDIF
+IF (startup=7)
+        ld      hl,(base_graphics)
+        ld	(graybit1),hl
+	ld	a,8
+	add	h,a
+	ld	(graybit2),hl
+        ld	(current_graphics),hl
 ENDIF
         ld      hl,HRG_handler  ; starts the hires mode when JP (IX) is made
         jr      HRG_Sync
@@ -109,7 +134,12 @@ HRG_wait_left:
         nop                     ; delay fine tuning here! Do not change!
 
         dec     b               ; make Z flag=0
+IF (startup=7)
+        ld      hl,(current_graphics)
+ELSE
         ld      hl,(base_graphics)
+ENDIF
+
         ld      de,32           ; 32 bytes offset is added to HL for next hline
 IF (startup>=5)
         ld      b,64            ; 64 lines per hires screen
@@ -165,6 +195,24 @@ pointedbyix:
 
         call    $0220          ; first PUSH register, then do VSYNC and get KEYBD
 
+IF (startup=7)
+	ld	hl,gcount
+	;res	7,(hl)
+	inc	(hl)
+	ld	a,(hl)
+	dec	a
+	jp	z,Display_pic1
+	dec	a
+	jp	z,Display_pic2
+	ld	(hl),0
+Display_pic1:
+	ld	a,8
+Display_pic2:
+	ld	hl,(graybit1)
+	add	h,a
+	ld	(current_graphics),hl
+ENDIF
+
 IF ((startup=3)|(startup=5))
         call    $0F46          ; check break (space) key
         jp      c,nobrkk
@@ -185,6 +233,22 @@ ENDIF
         ld      iy,HRG_handler  ; reload vector if no BREAK or else SINCLAIR video
         jp      $02A4           ; now return to BASIC and other application programs
 
+;----------------------------------------------------------------
+;  Variables for grayscale graphics
+;----------------------------------------------------------------
+
+IF (startup=7)
+		XDEF	graybit1
+		XDEF	graybit2
+gcount:
+		defb	0
+current_graphics:
+		defw	0
+graybit1:
+		defw	0
+graybit2:
+		defw	0
+ENDIF
 
 ;----------------------------------------------------------------
 ;
@@ -233,23 +297,23 @@ HRG_Interface_BaseRamtop:
         or      l
         jr      z,HRG_Interface_BaseRamtopModify
         ld      hl,(RAMTOP)
-        ld      de,RAMTOP16K    ;is RAMTOP already lowered?
+        ld      de,NEW_RAMTOP    ;is RAMTOP already lowered?
         xor     a
         sbc     hl,de
         ld      a,h
         or      l               ;no, so this is a problem!
         jr      nz,HRG_Interface_BaseRamError
 
-        ld      hl,BASE16K      ;yes, then set base_graphics
+        ld      hl,BASE_VRAM      ;yes, then set base_graphics
         ld      (base_graphics),hl
         ret
 
 
 HRG_Interface_BaseRamtopModify: 
-        ld      hl,BASE16K
+        ld      hl,BASE_VRAM
         ld      (base_graphics),hl
 
-        ld      hl,RAMTOP16K    ;lower RAMTOP
+        ld      hl,NEW_RAMTOP    ;lower RAMTOP
         ld      (RAMTOP),hl
         
         ld      hl,(ERR_SP)
@@ -261,7 +325,7 @@ HRG_Interface_BaseRamtopModify:
 
         ld      hl,$0000
         add     hl,sp           ;load SP into HL
-        push    hl
+        push    hl		; *** stack pointer
         ld      de,TOPOFRAM     ;prepare to copy the stack
         ex      de,hl
         xor     a
@@ -271,12 +335,11 @@ HRG_Interface_BaseRamtopModify:
         push    hl
         pop     bc              ;stackdeepth in BC
         
-        ld      hl,$7fff        ;make a copy of the stack
-        ;ld     de,$677f
-        ld      de,RAMTOP16K-1
+        ld	hl,TOPOFRAM-1   ;make a copy of the stack
+        ld      de,NEW_RAMTOP-1
         lddr
 
-        pop     hl              ;stackpointer in HL
+        pop     hl              ; *** stackpointer in HL
         ld      de,WHOLEMEM
         xor     a
         sbc     hl,de           ;lower the stackpointer
@@ -289,6 +352,7 @@ HRG_Interface_BaseRamError:
         ;defb    $1a             ;type R
 
 	; Nothig is as expected: let's put graphics just above the actual RAMTOP
+	; and cross fingers
 
         ld      hl,(RAMTOP)
         ld      (base_graphics),hl

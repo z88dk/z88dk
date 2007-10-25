@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_altint.def,v 1.4 2007-10-09 14:17:32 stefano Exp $
+;       $Id: zx81_altint.def,v 1.5 2007-10-25 14:53:04 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -18,12 +18,15 @@
 ;--------------------------------------------------------------
 ;--------------------------------------------------------------
 
+XDEF	hrg_on
+XDEF	hrg_off
 
 ;========
 ; Not HRG really, but switches the new interrupt handler with no sighs
 ;========
 
 hrg_on:
+	call   $F2B	; SLOW
         ld      hl,L0281
         push	hl
         jr      HRG_Sync

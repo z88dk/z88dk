@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.21 2007-10-17 14:38:40 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.22 2007-10-25 14:53:04 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -196,7 +196,7 @@ IF (!DEFINED_startup | (startup=1))
 ENDIF
 .hl1save	defw	0
 ;.bc1save	defw	0
-;.de1save	defw	0
+.de1save	defw	0
 
 ;-----------
 ; Define the stdin/out/err area. For the z88 we have two models - the
@@ -246,7 +246,6 @@ ENDIF
 IF (startup>=3)
         INCLUDE "#zx81_hrg.def"
 ENDIF
-
 
 ;-----------
 ; Now some variables

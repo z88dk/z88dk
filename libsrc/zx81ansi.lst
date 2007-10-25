@@ -196,3 +196,8 @@ zx81/zx_setstr_callee.asm
 zx81/zx_var_length.asm
 zx81/zx81toasc
 zx81/asctozx81
+zx81/zx_ascii
+zx81/ascii_zx
+zx81/zx_asciimode
+zx81/zx_fast
+zx81/zx_slow

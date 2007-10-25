@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.6 2007-10-22 17:06:12 stefano Exp $
+ * $Id: zx81.h,v 1.7 2007-10-25 14:53:04 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -98,6 +98,10 @@ extern int base_graphics;
 // direct call for "clear graphics page"
 extern void __LIB__ _clg_hr();
 
+// Enable/disable High Resolution Graphics mode
+extern void __LIB__ hrg_off();
+extern void __LIB__ hrg_on();
+
 // Copies text to HRG screen
 extern void __LIB__ __FASTCALL__ copytxt(int ovmode);
 
@@ -121,6 +125,20 @@ extern void __LIB__ invtxt();
 
 // Mirror screen in text mode
 extern void __LIB__ mirrortxt();
+
+// Activates / Deactivates the ZX81 <-> ASCII converter,
+// used in some output routine and interfacing to the BASIC strings
+extern void __LIB__ zx_asciimode();
+
+// ZX81 <-> ASCII char conversion
+unsigned char zx_ascii(unsigned char character);
+
+// ASCII <-> ZX81 char conversion
+unsigned char ascii_zx(unsigned char character);
+
+// FAST / SLOW mode switching, available only if startup >= 2
+extern void __LIB__ zx_fast();
+extern void __LIB__ zx_slow();
 
 
 ///////////////////////////////////////////
