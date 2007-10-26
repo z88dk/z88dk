@@ -198,7 +198,7 @@ graphics/mz/clsgraph
 graphics/putsprite2
 graphics/point
 graphics/pointxy
-graphics/mz/multipoint
+graphics/multipoint
 graphics/rbitmask
 graphics/rscroll
 graphics/uncircle
