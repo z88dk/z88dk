@@ -7,13 +7,14 @@
 ;	Stefano Bodrato - Jul. 2004
 ;
 ;
-;	$Id: f_ansi_bel.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
+;	$Id: f_ansi_bel.asm,v 1.3 2007-10-27 09:13:40 stefano Exp $
 ;
 
         XLIB	ansi_BEL
 
+    INCLUDE "#cpcfirm.def"
+
         XREF    firmware
-; A fine double frequency beep for BEL
 
 .ansi_BEL
         ld      a,7

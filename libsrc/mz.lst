@@ -188,7 +188,7 @@ graphics/mz/xorpixl
 graphics/mz/clsgraph
 graphics/putsprite2
 graphics/point
-graphics/pointxy
+graphics/mz/pointxy
 graphics/multipoint
 graphics/rbitmask
 graphics/rscroll
