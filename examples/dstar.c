@@ -140,6 +140,7 @@ void Gamekeys(void)
 		  #ifdef SOUND
 		    bit_fx4 (5);
 		  #endif
+		  while (getk() != 0) {}
 		  break;
 		case K_EXIT:
 		  exit(0);

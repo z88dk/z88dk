@@ -6,7 +6,7 @@
 ;	in: source character in (HL)
 ;	out: A = converter character
 ;
-;	$Id: zx81toasc.asm,v 1.1 2007-10-22 17:06:13 stefano Exp $
+;	$Id: zx81toasc.asm,v 1.2 2007-10-29 08:03:00 stefano Exp $
 ;
 
 XLIB zx81toasc
@@ -15,6 +15,11 @@ LIB zx81_cnvtab
 .zx81toasc
 	ld	a,(hl)
 	push	hl
+	and	a	; space ?
+	jr	nz,testnum
+	ld	a,' '
+	jr	setout
+.testnum
  	cp	28	; Between 0 and 9 ?
 	jr	c,isntnum
 	cp	38
@@ -47,7 +52,7 @@ LIB zx81_cnvtab
 	jr	setout
 .isntsym
 	pop	af
-	ld	a,0	; Else (space, exclamation mark, ..), blank.
+	ld	a,0	; Else blank.
 
 .setout
 	pop	hl
