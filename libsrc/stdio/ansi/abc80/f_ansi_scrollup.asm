@@ -4,7 +4,7 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.3 2007-10-31 14:01:47 stefano Exp $
 ;
 
 	XLIB	ansi_SCROLLUP
@@ -12,5 +12,4 @@
 
 .ansi_SCROLLUP
 
-	ret
- 
+	jp	$241

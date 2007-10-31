@@ -8,7 +8,7 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_dline.asm,v 1.3 2007-10-31 14:01:47 stefano Exp $
 ;
 
 
@@ -16,4 +16,14 @@
 
 
 .ansi_del_line
-	ret
+
+	ld	hl,$374		; ROW table in ROM
+	ld	d,0
+	rla
+	ld	e,a
+	add	hl,de
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+
+	jp	$267
