@@ -9,12 +9,12 @@
 ;       imported by Stefano Bodrato - 29/12/2006  :o)
 ;
 ;
-;       $Id: xorgraph.asm,v 1.1 2007-01-04 17:41:34 stefano Exp $
+;       $Id: abc_inv.asm,v 1.1 2007-10-31 16:15:36 stefano Exp $
 ;
 
-		XLIB	xorg
+		XLIB	abc_inv
 
-.xorg
+.abc_inv
 		ld	ix,884
 		ld	b,24
 .xorloop	push	bc

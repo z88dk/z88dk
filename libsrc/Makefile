@@ -4,14 +4,14 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.96 2007-10-25 14:53:04 stefano Exp $
+# $Id: Makefile,v 1.97 2007-10-31 16:15:36 stefano Exp $
 
 
 include Make.config
 
 all:	genlibs z88libs tilibs zxlibs \
 	debug.lib \
-	nc_clib.lib vz_clib.lib vzansi_clib.lib abc80_clib.lib \
+	nc_clib.lib vz_clib.lib vzansi_clib.lib abc80_clib.lib abc80ansi_clib.lib \
 	aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
 	cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib cpcgray.lib \
 	cpm_clib.lib c128ansi_clib.lib \
@@ -42,12 +42,12 @@ zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.96 2007-10-25 14:53:04 stefano Exp $
+#  $Id: Makefile,v 1.97 2007-10-31 16:15:36 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.96 2007-10-25 14:53:04 stefano Exp $
+# $Id: Makefile,v 1.97 2007-10-31 16:15:36 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -62,7 +62,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.96 2007-10-25 14:53:04 stefano Exp $
+#  $Id: Makefile,v 1.97 2007-10-31 16:15:36 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -744,7 +744,7 @@ mzansi_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/mzansi_clib @$(LISTFILE_DIRECTORY)/mzansi.lst
 
-# ABC80 ANSI library - Stefano
+# ABC80 library - Stefano
 abc80_clib.lib:
 	@echo ''
 	@echo '--- Building ABC80 Library ---'
@@ -757,6 +757,20 @@ abc80_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/abc80_clib @$(LISTFILE_DIRECTORY)/abc80.lst
+
+# ABC80 ANSI library - Stefano
+abc80ansi_clib.lib:
+	@echo ''
+	@echo '--- Building ABC80 ANSI Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) gen ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/abc80ansi_clib @$(LISTFILE_DIRECTORY)/abc80ansi.lst
 
 # Jupiter ACE library - Stefano
 aceansi_clib.lib:
