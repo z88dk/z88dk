@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_altint.def,v 1.5 2007-10-25 14:53:04 stefano Exp $
+;       $Id: zx81_altint.def,v 1.6 2007-11-02 16:50:37 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -34,8 +34,8 @@ hrg_on:
 hrg_off:
         ld      hl,$281
         push	hl
-        ld      a,$1e 
-        ld      i,a  
+        ;ld      a,$1e 
+        ;ld      i,a  
 HRG_Sync:
         ld      hl,$4034        ; FRAMES counter
         ld      a,(hl)          ; get old FRAMES

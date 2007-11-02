@@ -6,7 +6,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.11 2007-10-25 16:37:12 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.12 2007-11-02 16:50:37 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -94,8 +94,9 @@ IF (startup=7)
 	ld	(graybit2),hl
         ld	(current_graphics),hl
 ENDIF
-        ld      hl,HRG_handler  ; starts the hires mode when JP (IX) is made
-        jr      HRG_Sync
+	call	HRG_Sync
+        ld      iy,HRG_handler  ; starts the hires mode when JP (IX) is made
+        ret
 
 ;----------------------------------------------------------------
 ;
@@ -103,20 +104,23 @@ ENDIF
 ;
 ;----------------------------------------------------------------
 hrg_off:
+	call	HRG_Sync
+        ld      iy,$281    ; switch back to text (original video routine)
+        ld      a,$1e
+        ld      i,a
+        ret
 
-        ld      hl,$281 ; switch back to text
-        ld      a,$1e 
-        ld      i,a  
-
+;----------------------------------------------------------------
+;
+; Sync display before mode switching
+;
+;----------------------------------------------------------------
 HRG_Sync:
-        push    hl
         ld      hl,$4034        ; FRAMES counter
         ld      a,(hl)          ; get old FRAMES
 HRG_Sync1:
         cp      (hl)            ; compare to new FRAMES
         jr      z,HRG_Sync1     ; exit after a change is detected
-        pop     iy              ; SINCLAIR video routine
-
         ret
 
 ;----------------------------------------------------------------
