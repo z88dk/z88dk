@@ -69,6 +69,7 @@ stdlib/ltoa_callee
 stdlib/outp
 stdlib/outp_callee
 stdlib/rand
+stdlib/randomize
 stdlib/srand
 stdlib/strtol
 stdlib/strtol_callee
@@ -205,3 +206,4 @@ graphics/xorplot
 graphics/setxy
 games/joystick
 printflike/ltoa_any
+abc80/abc_inv

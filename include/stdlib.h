@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.32 2007-06-27 20:59:34 dom Exp $
+ * $Id: stdlib.h,v 1.33 2007-11-02 12:51:33 stefano Exp $
  */
 
 #include <sys/types.h>
@@ -65,6 +65,7 @@ extern int std_seed;
 #define M_SRAND(a)  asm("ld\thl,"#a"\nld\t(_std_seed),hl\n");
 
 extern int  __LIB__              rand(void);
+extern void __LIB__              randomize(void);
 extern void __LIB__ __FASTCALL__ srand(unsigned int seed);
 
 // Not sure why Rex has it's own rand() routine using different seed?
