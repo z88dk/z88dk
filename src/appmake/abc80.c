@@ -3,20 +3,24 @@
  *
  *        Stefano Bodrato 5/2000
  *
- *        $Id: abc80.c,v 1.2 2006-12-11 17:46:54 stefano Exp $
+ *        $Id: abc80.c,v 1.3 2007-11-05 07:54:53 stefano Exp $
  */
 
 #include "appmake.h"
 
 static char             *binname      = NULL;
+static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
+static int               origin       = -1;
 static char              help         = 0;
 
 /* Options that are available for this module */
 option_t abc80_options[] = {
     { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
+    { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -34,9 +38,17 @@ int abc80_exec()
     int        lnum;
     int        blocks;
     int        blcount;
-        
-    if ( help || binname == NULL ) {
+    int        pos;
+    
+    if ( help || binname == NULL || ( crtfile == NULL && origin == -1 ) )
         return -1;
+
+    if ( origin != -1 ) {
+        pos = origin;
+    } else {
+        if ( ( pos = parameter_search(crtfile,".sym","MYZORG") ) == -1 ) {
+            myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
+        }
     }
 
     strcpy(tmpname,binname);
@@ -76,7 +88,7 @@ int abc80_exec()
 
 /* Write out the file */
 
-    fprintf(fpout,"10 B=50000");
+    fprintf(fpout,"10 B=%i",pos);
     fputc(13,fpout);
     fprintf(fpout,"20 FOR I=B To B+%i",len-1);
     fputc(13,fpout);

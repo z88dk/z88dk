@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato May 2000
 ;
-;       $Id: abc80_crt0.asm,v 1.6 2007-06-27 20:49:27 dom Exp $
+;       $Id: abc80_crt0.asm,v 1.7 2007-11-05 07:54:53 stefano Exp $
 ;
 
                 MODULE  abc80_crt0
@@ -54,7 +54,10 @@
 ; Now, getting to the real stuff now!
 
 
-        org     50000
+IF      !myzorg
+        defc    myzorg  = 50000
+ENDIF
+        org     myzorg
 
 
 .start
