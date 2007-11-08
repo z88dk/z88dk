@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.22 2007-10-04 10:28:47 stefano Exp $
+# $Id: Makefile,v 1.23 2007-11-08 14:11:50 stefano Exp $
 #
 
 include ../Make.config
@@ -137,6 +137,7 @@ clean:
 	$(RM) ansi/z88/*.o
 	$(RM) ansi/zx81/*.o
 	$(RM) abc80/*.o
+	$(RM) abc800/*.o
 	$(RM) ace/*.o
 	$(RM) aquarius/*.o
 	$(RM) c128/*.o

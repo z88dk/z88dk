@@ -4,14 +4,15 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.97 2007-10-31 16:15:36 stefano Exp $
+# $Id: Makefile,v 1.98 2007-11-08 14:11:49 stefano Exp $
 
 
 include Make.config
 
 all:	genlibs z88libs tilibs zxlibs \
 	debug.lib \
-	nc_clib.lib vz_clib.lib vzansi_clib.lib abc80_clib.lib abc80ansi_clib.lib \
+	nc_clib.lib vz_clib.lib vzansi_clib.lib \
+	abc80_clib.lib abc80ansi_clib.lib abc800_clib.lib \
 	aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
 	cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib cpcgray.lib \
 	cpm_clib.lib c128ansi_clib.lib \
@@ -42,12 +43,12 @@ zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.97 2007-10-31 16:15:36 stefano Exp $
+#  $Id: Makefile,v 1.98 2007-11-08 14:11:49 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.97 2007-10-31 16:15:36 stefano Exp $
+# $Id: Makefile,v 1.98 2007-11-08 14:11:49 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -62,7 +63,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.97 2007-10-31 16:15:36 stefano Exp $
+#  $Id: Makefile,v 1.98 2007-11-08 14:11:49 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -772,6 +773,20 @@ abc80ansi_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/abc80ansi_clib @$(LISTFILE_DIRECTORY)/abc80ansi.lst
 
+# ABC800 library - Stefano
+abc800_clib.lib:
+	@echo ''
+	@echo '--- Building ABC800 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) gen ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/abc800_clib @$(LISTFILE_DIRECTORY)/abc800.lst
+
 # Jupiter ACE library - Stefano
 aceansi_clib.lib:
 	@echo ''
@@ -1094,6 +1109,9 @@ clean:
 	cd debug ; $(MAKE) clean ; cd ..
 	cd oz ; $(MAKE) clean ; cd ..
 	cd input ; $(MAKE) clean ; cd ..
+	cd abc80 ; $(RM) *.o ; cd ..
+	cd abc800 ; $(RM) *.o ; cd ..
+	cd msx ; $(RM) *.o ; cd ..
 	cd newbrain ; $(RM) *.o ; cd ..
 	cd vz ; $(RM) *.o ; cd ..
 	cd zx81 ; $(RM) *.o ; cd ..
