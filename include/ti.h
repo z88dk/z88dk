@@ -1,11 +1,15 @@
+/* Control file for include relevent TIXX stuff */
+
+/* $Id: ti.h,v 1.4 2007-11-16 14:52:45 stefano Exp $ */
+
 #ifndef __TICALC_H__
 #define __TICALC_H__
 
-/* Control file for include relevent TIXX stuff */
-
-/* $Id: ti.h,v 1.3 2005-03-30 10:38:31 stefano Exp $ */
-
 #include <sys/types.h>
+
+#ifdef __TI82__
+#include <ti/ti82.h>
+#endif
 
 #ifdef __TI83__
 #include <ti/ti83.h>
@@ -30,6 +34,31 @@
 
 /* Variable types */
 
+#if defined __TI85__ || defined __TI86__
+
+#define RealObj       0x00      /* Real number       */
+#define CplxObj       0x01      /* Complex number    */
+#define RealVect      0x02      /* Real Vector       */
+#define CplxVect      0x03      /* Complex Vector    */
+#define ListObj       0x04      /* List of Real Nums */
+#define CListObj      0x05      /* List of Complex N */
+#define MatObj        0x06      /* Matrix of Real N  */
+#define CplxMatObj    0x07      /* Matrix of Cplx N  */
+#define ConstObj      0x08      /* Constant Real     */
+#define CConstObj     0x09      /* Constant Complex  */
+#define EquObj        0x0A      /* Equation          */
+#define RangeObj      0x0A      /* Range             */
+#define StrngObj      0x0C      /* String            */
+#define GDBObj        0x0D      /* Graph DB standard */
+#define PolGDBObj     0x0E      /* Graph DB polar    */
+#define PolGDBParm    0x0F      /* Graph DB parametric            */
+#define PolGDBDiff    0x10      /* Graph DB differential equation */
+#define PictObj       0x11      /* Picture           */
+#define ProgObj       0x12      /* Program           */
+#define ConvObj       0x13      /* Conversion/Range  */
+
+#else
+
 #define RealObj       0x00      /* Real number       */
 #define ListObj       0x01      /* List              */
 #define MatObj        0x02      /* Matrix            */
@@ -45,6 +74,8 @@
 #define AppVarObj     0x15	/* AppVar            */
 #define TempProgObj   0x16	/* Temporary program */
 
+#endif
+
 
 struct TI_FILE {
 	u16_t	first;		/* first byte in file  */
@@ -53,10 +84,11 @@ struct TI_FILE {
 	u16_t	blsize;		/* block (single variable) size */
 };
 
-/* Check if variable (file) exists */
-extern int  __LIB__ check_var (char objtype, char *filename);
+
+/* Find a variable */
+extern long  __LIB__ ti_findvar (char objtype, char *filename);
 
 /* Delete a variable (file) */
-extern int  __LIB__ remove_var (char objtype, char *filename);
+extern int  __LIB__ ti_removevar (char objtype, char *filename);
 
 #endif
