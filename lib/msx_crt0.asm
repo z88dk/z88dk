@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.6 2007-06-27 20:49:27 dom Exp $
+;	$Id: msx_crt0.asm,v 1.7 2007-12-03 07:29:38 stefano Exp $
 ;
 
 
@@ -19,6 +19,11 @@
 ; this file
 
                 XREF    _main
+
+;
+; MSX platform specific stuff
+;
+        XDEF    msxbios
 
 ;
 ; Some variables which are needed for both app and basic startup
@@ -50,8 +55,10 @@
 
 ; Now, getting to the real stuff now!
 
-
-        org     40000
+        IF      !myzorg
+                defc    myzorg  = 40000
+        ENDIF
+                org     myzorg
 
 .start
         ld      hl,0
@@ -74,7 +81,8 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
-	call	$CC	; Hide function key strings
+	ld	ix,$CC	; Hide function key strings
+	call	msxbios
         call    _main
 	
 .cleanup
@@ -125,6 +133,13 @@ ELSE
 	ENDIF
 ENDIF
 
+; Safe BIOS call
+.msxbios
+	ld	iy,($FCC0)	; slot address of BIOS ROM
+	call	001Ch		; CALSLT
+	ei			; make sure interrupts are enabled
+	ret
+
 
 ;Seed for integer rand() routines
 
@@ -145,6 +160,7 @@ ENDIF
 
 .heaplast	defw	0
 .heapblocks	defw	0
+
 
 ; mem stuff
 

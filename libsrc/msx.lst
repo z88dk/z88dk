@@ -70,7 +70,6 @@ stdlib/ltoa_callee
 stdlib/outp
 stdlib/outp_callee
 stdlib/rand
-stdlib/randomize
 stdlib/srand
 stdlib/strtol
 stdlib/strtol_callee
@@ -201,4 +200,12 @@ graphics/vz200/pixladdr
 graphics/vz200/swapgfxbk
 graphics/vz200/clsgraph
 printflike/ltoa_any
+msx/msx_blank
+msx/msx_color
+msx/msx_noblank
+msx/msx_screen
 msx/msx_type
+msx/msx_text
+msx/msx_vpeek
+msx/msx_vpoke
+msx/msx_vram

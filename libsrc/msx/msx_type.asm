@@ -6,7 +6,7 @@
 ;
 ;	The int result is 1 or two, depending on the MSX hardware being used
 ;
-;	$Id: msx_type.asm,v 1.1 2007-11-08 14:11:50 stefano Exp $
+;	$Id: msx_type.asm,v 1.2 2007-12-03 07:29:40 stefano Exp $
 ;
 
 	XLIB	msx_type

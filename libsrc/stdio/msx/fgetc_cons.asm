@@ -6,13 +6,15 @@
 ;	Stefano Bodrato - Apr. 2001
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.3 2007-12-03 07:29:40 stefano Exp $
 ;
 
 	XLIB	fgetc_cons
+	LIB	msxbios
 
 .fgetc_cons
-	call	$9f
+	ld	ix,$9f
+	call	msxbios
 	ld	l,a
 	ld	h,0
 	ret
