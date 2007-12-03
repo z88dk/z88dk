@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 2006-06-18 17:59:38 dom Exp $
+# $Id: Makefile,v 1.8 2007-12-03 16:05:19 stefano Exp $
 
 include ../Make.config
 
@@ -16,4 +16,4 @@ lace:
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o*
-	$(RM) ace/*.o aquarius/*.o sam/*.o spectrum/*.o z88/*.o
+	$(RM) ace/*.o aquarius/*.o msx/*.o sam/*.o spectrum/*.o z88/*.o

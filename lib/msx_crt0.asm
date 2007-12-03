@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.7 2007-12-03 07:29:38 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.8 2007-12-03 16:05:18 stefano Exp $
 ;
 
 
@@ -15,33 +15,20 @@
 
                 INCLUDE "zcc_opt.def"
 
-; No matter what set up we have, main is always, always external to
-; this file
+;--------
+; Some scope definitions
+;--------
 
-                XREF    _main
-
-;
-; MSX platform specific stuff
-;
-        XDEF    msxbios
-
-;
-; Some variables which are needed for both app and basic startup
-;
+	XREF    _main
 
         XDEF    cleanup
         XDEF    l_dcal
 
-; Integer rnd seed
-
         XDEF    _std_seed
 
-; vprintf is internal to this file so we only ever include one of the set
-; of routines
+	XDEF	snd_tick	;Sound variable
 
 	XDEF	_vfprintf
-
-;Exit variables
 
         XDEF    exitsp
         XDEF    exitcount
@@ -49,9 +36,14 @@
        	XDEF	heaplast	;Near malloc heap variables
 	XDEF	heapblocks
 
-;For stdin, stdout, stder
-
         XDEF    __sgoioblk
+
+;
+; MSX platform specific stuff
+;
+        XDEF    msxbios
+
+
 
 ; Now, getting to the real stuff now!
 
@@ -141,7 +133,10 @@ ENDIF
 	ret
 
 
-;Seed for integer rand() routines
+IF DEFINED_NEED1bitsound
+.snd_tick	defb	0	; Sound variable
+ENDIF
+
 
 .defltdsk       defb    0
 

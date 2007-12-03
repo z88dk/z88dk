@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.98 2007-11-08 14:11:49 stefano Exp $
+# $Id: Makefile,v 1.99 2007-12-03 16:05:19 stefano Exp $
 
 
 include Make.config
@@ -43,12 +43,12 @@ zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.98 2007-11-08 14:11:49 stefano Exp $
+#  $Id: Makefile,v 1.99 2007-12-03 16:05:19 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.98 2007-11-08 14:11:49 stefano Exp $
+# $Id: Makefile,v 1.99 2007-12-03 16:05:19 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -63,7 +63,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.98 2007-11-08 14:11:49 stefano Exp $
+#  $Id: Makefile,v 1.99 2007-12-03 16:05:19 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -902,6 +902,8 @@ msx_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
+	cd games ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
 # NASCOM library - Stefano

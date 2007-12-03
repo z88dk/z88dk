@@ -6,7 +6,7 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.7 2002-01-21 21:42:25 dom Exp $
+ *	$Id: games.h,v 1.8 2007-12-03 16:05:18 stefano Exp $
  *
  */
 
@@ -74,6 +74,11 @@ extern __LIB__ joystick(int game_device);
 #ifdef ZXVGS
 	unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "Joystick 2", "Joystick 3"};
 	#define GAME_DEVICES 4
+#endif
+
+#ifdef MSX
+	unsigned char *joystick_type[] = { "QAOP-MN", "Joystick 1", "Joystick 2"};
+	#define GAME_DEVICES 3
 #endif
 
 #ifndef GAME_DEVICES

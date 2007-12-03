@@ -5,13 +5,19 @@
 ;	based on the Dominic's sound routines
 ;
 ;
-;	$Id: games.inc,v 1.7 2003-02-04 09:10:16 stefano Exp $
+;	$Id: games.inc,v 1.8 2007-12-03 16:05:19 stefano Exp $
 ;
 
 IF FORzx
 	defc sndbit_port   = 254
 	defc sndbit_bit    = 4
 	defc sndbit_mask   = 16		; (2^sndbit_bit)
+ENDIF
+
+IF FORmsx
+	defc sndbit_port   = 170
+	defc sndbit_bit    = 7
+	defc sndbit_mask   = 158	; bit 7 (key click) and 5 (tape)
 ENDIF
 
 IF FORsam
