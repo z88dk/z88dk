@@ -9,7 +9,7 @@
 ;	int __FASTCALL__ zx_asciimode(int mode);
 ;
 ;
-;	$Id: zx_asciimode.asm,v 1.1 2007-10-25 14:53:04 stefano Exp $
+;	$Id: zx_asciimode.asm,v 1.2 2007-12-04 07:02:11 stefano Exp $
 ;	
 
 XLIB	zx_asciimode
@@ -30,5 +30,5 @@ on:
 off:
 	ld	(hl),a
 	pop	hl
-	ld	(hl),229
+	ld	(hl),a
 	ret

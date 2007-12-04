@@ -3,11 +3,12 @@
 ;
 ;	(HL)=char to display
 ;
-;	$Id: fputc_cons.asm,v 1.4 2007-10-23 06:03:56 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.5 2007-12-04 07:02:07 stefano Exp $
 ;
 
 	XLIB	fputc_cons
 	LIB	asctozx81
+	XREF	restore81
 	
 	DEFC	ROWS=24
 	DEFC	COLUMNS=32
@@ -28,6 +29,7 @@
 	xor	a
 	ld	(ROW),a
  	ld	(COLUMN),a
+	call	restore81	; Assembler will swap it to iy
 	jp	2602	; CLS
 .nocls
 	cp 13		; CR
