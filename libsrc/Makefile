@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.99 2007-12-03 16:05:19 stefano Exp $
+# $Id: Makefile,v 1.100 2007-12-05 07:41:32 stefano Exp $
 
 
 include Make.config
@@ -43,12 +43,12 @@ zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.99 2007-12-03 16:05:19 stefano Exp $
+#  $Id: Makefile,v 1.100 2007-12-05 07:41:32 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.99 2007-12-03 16:05:19 stefano Exp $
+# $Id: Makefile,v 1.100 2007-12-05 07:41:32 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -63,7 +63,7 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.99 2007-12-03 16:05:19 stefano Exp $
+#  $Id: Makefile,v 1.100 2007-12-05 07:41:32 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -204,7 +204,7 @@ z88_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) lz88; cd ..
+	cd games ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
 
 # z88 ansi library - dom
@@ -254,8 +254,8 @@ zx_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lzx ; cd ..
 	cd rs232 ; $(MAKE) lzx ; cd ..
-	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
 	cd games ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zx_clib @$(LISTFILE_DIRECTORY)/zx.lst
 
@@ -274,8 +274,8 @@ ts2068_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lzx ; cd ..
 	cd rs232 ; $(MAKE) lzx ; cd ..
-	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
 	cd games ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
@@ -316,8 +316,8 @@ ppsansi_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lpps ; cd ..
 	cd rs232 ; $(MAKE) lzx ; cd ..
-	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
 	cd games ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ppsansi_clib @$(LISTFILE_DIRECTORY)/ppsansi.lst
 
@@ -336,8 +336,8 @@ pps_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lpps ; cd ..
 	cd rs232 ; $(MAKE) lzx ; cd ..
-	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
 	cd games ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
 
@@ -359,8 +359,8 @@ zxan_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lzx ; cd ..
 	cd rs232 ; $(MAKE) lzx ; cd ..
-	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
 	cd games ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxan_clib @$(LISTFILE_DIRECTORY)/zxansi.lst
 
@@ -382,8 +382,8 @@ ts2068an_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lzx ; cd ..
 	cd rs232 ; $(MAKE) lzx ; cd ..
-	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
 	cd games ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/ts2068an_clib @$(LISTFILE_DIRECTORY)/ts2068an.lst
 

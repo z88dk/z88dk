@@ -186,3 +186,4 @@ newbrain/nb_puts
 newbrain/nb_putblock
 newbrain/nb_putval
 time/newbrain/clock
+games/joystick

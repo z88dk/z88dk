@@ -190,3 +190,4 @@ fcntl/sprinter/rmdir
 fcntl/sprinter/mkdir
 fcntl/sprinter/getwd
 fcntl/sprinter/getcwd
+games/joystick
