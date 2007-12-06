@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.100 2007-12-05 07:41:32 stefano Exp $
+# $Id: Makefile,v 1.101 2007-12-06 10:19:05 stefano Exp $
 
 
 include Make.config
@@ -43,12 +43,10 @@ zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
 
-#  $Id: Makefile,v 1.100 2007-12-05 07:41:32 stefano Exp $
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
 
-# $Id: Makefile,v 1.100 2007-12-05 07:41:32 stefano Exp $
 #  short script to sort out gfx dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
@@ -63,7 +61,6 @@ gfxdeps:
 	$(RM) -f graphics/text6/*.o
 	$(RM) -f graphics/sam/*.o
 
-#  $Id: Makefile,v 1.100 2007-12-05 07:41:32 stefano Exp $
 #  short script to sort out ticalc dependencies
 tideps:
 	$(RM) -f stdio/ticalc/*.o
@@ -204,7 +201,7 @@ z88_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lz88 ; cd ..
 	$(LIBLINKER) -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
 
 # z88 ansi library - dom
@@ -254,9 +251,9 @@ zx_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lzx ; cd ..
 	cd rs232 ; $(MAKE) lzx ; cd ..
-	cd spectrum ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd spectrum ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zx_clib @$(LISTFILE_DIRECTORY)/zx.lst
 
 # 64/32 column library for TS2068 - dom/stefano/alvin
@@ -274,9 +271,9 @@ ts2068_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lzx ; cd ..
 	cd rs232 ; $(MAKE) lzx ; cd ..
-	cd spectrum ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd spectrum ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
 # ZXVGS - yarek
@@ -316,9 +313,9 @@ ppsansi_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lpps ; cd ..
 	cd rs232 ; $(MAKE) lzx ; cd ..
-	cd spectrum ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd spectrum ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ppsansi_clib @$(LISTFILE_DIRECTORY)/ppsansi.lst
 
 # Native for sprinter - dom
@@ -336,9 +333,9 @@ pps_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lpps ; cd ..
 	cd rs232 ; $(MAKE) lzx ; cd ..
-	cd spectrum ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd spectrum ; $(MAKE) lzx ; cd ..
+	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
 
 # vt100 C lib for spectrum - stefano/dom
@@ -359,9 +356,9 @@ zxan_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lzx ; cd ..
 	cd rs232 ; $(MAKE) lzx ; cd ..
-	cd spectrum ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd spectrum ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxan_clib @$(LISTFILE_DIRECTORY)/zxansi.lst
 
 # vt100 C lib for TS2068 - stefano/dom
@@ -382,9 +379,9 @@ ts2068an_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lzx ; cd ..
 	cd rs232 ; $(MAKE) lzx ; cd ..
-	cd spectrum ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd spectrum ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/ts2068an_clib @$(LISTFILE_DIRECTORY)/ts2068an.lst
 
 # Untested C lib for NC100 machines - dom
@@ -512,7 +509,7 @@ ti82ansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lticalc ; cd ..
 	$(LIBLINKER) -DFORti82 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti82ansi_clib @$(LISTFILE_DIRECTORY)/ticansi.lst
 
 ti82_clib.lib:
@@ -527,7 +524,7 @@ ti82_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lticalc ; cd ..
 	$(LIBLINKER) -DFORti82 -x$(OUTPUT_DIRECTORY)/ti82_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 tigray82.lib:
@@ -550,7 +547,7 @@ ti83ansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lticalc ; cd ..
 	$(LIBLINKER) -DFORti83 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83ansi_clib @$(LISTFILE_DIRECTORY)/ticansi.lst
 
 ti83_clib.lib:
@@ -565,7 +562,7 @@ ti83_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lticalc ; cd ..
 	$(LIBLINKER) -DFORti83 -x$(OUTPUT_DIRECTORY)/ti83_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 tigray83.lib:
@@ -587,7 +584,7 @@ ti83pansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lticalc ; cd ..
 	$(LIBLINKER) -DFORti83p -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti83pansi_clib @$(LISTFILE_DIRECTORY)/ticansi.lst
 
 ti83p_clib.lib:
@@ -602,7 +599,7 @@ ti83p_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lticalc ; cd ..
 	$(LIBLINKER) -DFORti83p -x$(OUTPUT_DIRECTORY)/ti83p_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 tigray83p.lib:
@@ -624,7 +621,7 @@ ti85ansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lticalc ; cd ..
 	$(LIBLINKER) -DFORti85 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti85ansi_clib @$(LISTFILE_DIRECTORY)/ticansi.lst
 
 ti85_clib.lib:
@@ -639,7 +636,7 @@ ti85_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lticalc ; cd ..
 	$(LIBLINKER) -DFORti85 -x$(OUTPUT_DIRECTORY)/ti85_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 tigray85.lib:
@@ -661,7 +658,7 @@ ti86ansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lticalc ; cd ..
 	$(LIBLINKER) -DFORti86 -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ti86ansi_clib @$(LISTFILE_DIRECTORY)/ticansi.lst
 
 ti86_clib.lib:
@@ -676,7 +673,7 @@ ti86_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lticalc ; cd ..
 	$(LIBLINKER) -DFORti86 -x$(OUTPUT_DIRECTORY)/ti86_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
 tigray86.lib:
@@ -702,7 +699,7 @@ ozansi_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd oz ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) loz ; cd ..
 	$(LIBLINKER) -DFORoz -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ozansi_clib @$(LISTFILE_DIRECTORY)/ozansi.lst
 
 # CPM lib - Stefano/dom
@@ -800,7 +797,7 @@ aceansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lace ; cd ..
 	$(LIBLINKER) -DFORjupiter -x$(OUTPUT_DIRECTORY)/aceansi_clib.lib @$(LISTFILE_DIRECTORY)/aceansi.lst
 
 # Mattel Aquarius library - Stefano
@@ -815,7 +812,7 @@ aquarius_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) laquarius ; cd ..
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
 
@@ -831,7 +828,7 @@ aquansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) laquarius ; cd ..
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquansi_clib.lib @$(LISTFILE_DIRECTORY)/aquansi.lst
 
@@ -859,7 +856,7 @@ sam_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/sam_clib @$(LISTFILE_DIRECTORY)/sam.lst
 
 # Sam Coupe library - Stefano & Frode
@@ -875,7 +872,7 @@ samansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/samansi_clib @$(LISTFILE_DIRECTORY)/samansi.lst
 
 # Spectravideo SVI library - Stefano
@@ -903,7 +900,7 @@ msx_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
-	cd games ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lmsx ; cd ..
 	$(LIBLINKER) -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
 # NASCOM library - Stefano

@@ -8,7 +8,7 @@
  *	Stefano, Oct 2001 - First release
  *	         Dec 2001 - Added Mattel Aquarius
  *
- *	$Id: sound.h,v 1.7 2006-05-23 21:47:25 stefano Exp $
+ *	$Id: sound.h,v 1.8 2007-12-06 10:19:05 stefano Exp $
  */
 
 
@@ -40,8 +40,12 @@ extern __LIB__ bit_play(unsigned char melody[]);
 
 /* Platform specific parameters (mainly timing stuff) */
 
-#ifdef SPECTRUM
+#ifdef SPECTRUM 
   #define BEEP_TSTATES 437500.0  /* 3.5 Mhz; float value = CPU_CLOCK*125 */
+#endif
+
+#ifdef MSX
+  #define BEEP_TSTATES 447500.0  /* 3.58 Mhz */
 #endif
 
 #ifdef AQUARIUS
@@ -56,26 +60,11 @@ extern __LIB__ bit_play(unsigned char melody[]);
   #define BEEP_TSTATES 406250.0 /* 3.25 Mhz */
 #endif
 
-#ifdef TI82
-  #define BEEP_TSTATES 750000.0 /* 6 Mhz */
-#endif
-
-#ifdef TI83
-  #define BEEP_TSTATES 750000.0
-#endif
-
-/* TI-83 Plus. 1875000.0 (15 Mhz) if Silver Edition */
+#if defined TICALC || defined TI82 || defined TI83 || defined TI8X || defined TI85 || defined TI86
 #ifdef TI8X
   #define BEEP_TSTATES 750000.0 /* 6 Mhz */
+  /* TI-83 Plus should have 1875000.0 (15 Mhz) if Silver Edition */
   /* #define BEEP_TSTATES 1875000.0 */
-#endif
-
-#ifdef TI85
-  #define BEEP_TSTATES 750000.0
-#endif
-
-#ifdef TI86
-  #define BEEP_TSTATES 750000.0
 #endif
 
 
