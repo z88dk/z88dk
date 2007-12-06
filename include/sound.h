@@ -1,5 +1,5 @@
-#ifndef SOUND_H
-#define SOUND_H
+#ifndef __SOUND_H__
+#define __SOUND_H__
 
 
 /*
@@ -7,8 +7,9 @@
  *
  *	Stefano, Oct 2001 - First release
  *	         Dec 2001 - Added Mattel Aquarius
+ *               Dec 2007 - Various fixes and improvements
  *
- *	$Id: sound.h,v 1.8 2007-12-06 10:19:05 stefano Exp $
+ *	$Id: sound.h,v 1.9 2007-12-06 11:32:36 stefano Exp $
  */
 
 
@@ -38,9 +39,9 @@ extern __LIB__ bit_frequency(float duration, float frequency);
 /* Play a song (example: "2A--A-B-CDEFGAB5C+") */
 extern __LIB__ bit_play(unsigned char melody[]);
 
-/* Platform specific parameters (mainly timing stuff) */
 
-#ifdef SPECTRUM 
+/* Platform specific parameters (mainly timing stuff) */
+#ifdef SPECTRUM
   #define BEEP_TSTATES 437500.0  /* 3.5 Mhz; float value = CPU_CLOCK*125 */
 #endif
 
@@ -52,19 +53,20 @@ extern __LIB__ bit_play(unsigned char melody[]);
   #define BEEP_TSTATES 500000.0  /* 4 Mhz */
 #endif
 
-#ifdef Z88
-  #define BEEP_TSTATES 410000.0 /* 3.28 Mhz */
+#ifdef TICALC
+// TICALC, TI82, TI83, TI8X, TI85, TI86, SHARP OZ
+  #define BEEP_TSTATES 750000.0 /* 6 Mhz */
+  /* TI-83 Plus should have 1875000.0 (15 Mhz) if Silver Edition */
+  /* #define BEEP_TSTATES 1875000.0 */
 #endif
 
 #ifdef ACE
   #define BEEP_TSTATES 406250.0 /* 3.25 Mhz */
 #endif
 
-#if defined TICALC || defined TI82 || defined TI83 || defined TI8X || defined TI85 || defined TI86
-#ifdef TI8X
-  #define BEEP_TSTATES 750000.0 /* 6 Mhz */
-  /* TI-83 Plus should have 1875000.0 (15 Mhz) if Silver Edition */
-  /* #define BEEP_TSTATES 1875000.0 */
+/* We always get Z88, so it can't be a condition */
+#ifndef BEEP_TSTATES
+  #define BEEP_TSTATES 410000.0 /* Z88 -- 3.28 Mhz */
 #endif
 
 
