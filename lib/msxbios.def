@@ -1,0 +1,154 @@
+lstoff
+
+; MSX BIOS functions definition
+;
+; December 2007
+; $Id: msxbios.def,v 1.1 2007-12-07 11:28:59 stefano Exp $
+;
+
+
+defc CHKRAM = $0000 ; Check RAM and sets slot for command area.
+defc RESET  = $0000
+defc BOOT   = $0000
+defc STARTUP = $0000
+
+defc SYNCHR = $0008 ; Checks if then current character pointed by
+                    ; HL is one desired.If not,generates
+                    ; 'Syntax error',otherwise falls into CHRGTB.
+defc RDSLT  = $000C ; Reads the value of an address in another slot
+defc CHRGTB = $0010 ; Gets next character (or token) from BASIC text.
+defc WRTSLT = $0014 ; Writes a value to an address in another slot.
+defc OUTDO  = $0018 ; Output to the current device.
+defc CALSLT = $001C ; Performs inter-slot call to specified address.
+defc DCOMPR = $0020 ; Compare HL with DE.
+defc ENASLT = $0024 ; Switches indicated slot at indicated page on perpetual
+defc GETYPR = $0028 ; Return the type FAC.
+defc CALLF  = $0030 ; Performs far_call (i.e. inter-slots call)
+defc KEYINT = $0038 ; Performs hardware interrupt procedures.
+
+; I/O initialization.
+
+defc INITIO = $003B ; Dev. initialization.
+defc INIFNK = $003E ; Initializes function key strings.
+
+; Accessing to the VDP (T19918)
+
+defc DISSCR = $0041 ; Disables screen display.
+defc ENASCR = $0044 ; Enables screen display.
+defc WRTVDP = $0047 ; Writes to the VDP register.
+defc RDVRM  = $004A ; Reads the VRAM address by [HL].
+defc WRTVRM = $004D ; Write to the VRAM address by [HL].
+defc SETRD  = $0050 ; Sets up the VDP for read.
+defc SETWRT = $0053 ; Sets up the VDP for write.
+defc FILVRM = $0056 ; Fill the vram with specified data
+defc LDIRMV = $0059 ; Block transfer to memory from VRAM
+defc LDIRVM = $005C ; Block transfer to VRAM from memory
+defc CHGMOD = $005F ; Sets the VDP mode according to SCRMOD.
+defc CHGCLR = $0062 ; Changes the color of the screen.
+defc NMI    = $0066 ; Performs non-maskable interrupt procedures.
+defc CLRSPR = $0069 ; Initializes all sprites.
+defc INITXT = $006C ; Initializes screen for text mode (40*24) and sets the VDP.
+defc INIT32 = $006F ; Initializes screen for text mode (32*24) and sets the VDP.
+defc INIGRP = $0072 ; Initializes screen for high-resolution mode and sets the VDP.
+defc INIMLT = $0075 ; Initializes screen for multi-color mode and sets the VDP.
+defc SETTXT = $0078 ; Sets the VDP for text (40*24) mode.
+defc SETT32 = $007B ; Sets the VDP for text (32*24) mode.
+defc SETGRP = $007E ; Sets the VDP for high-resolution mode.
+defc SETMLT = $0081 ; Sets the VDP for multicolor mode.
+defc CALPAT = $0084 ; Returns address of sprite pattern table.
+defc CALATR = $0087 ; Returns address of sprite atribute table.
+defc GSPSIZ = $008A ; Returns the current sprite size.
+defc GRPPRT = $008D ; Prints a character on the graphic screen.
+
+; Accessing to the PSG.
+
+defc GICINI = $0090 ; Initializes PSG,and static data for PLAY
+defc WRTPSG = $0093 ; Writes data to the PSG register.
+defc RDPSG  = $0096 ; Reads data from PSG register.
+defc STRTMS = $0099 ; Checks/starts background tasks for PLAY.
+
+; Console (i.e. the keyboard and the CRT)
+
+defc CHSNS  = $009C ; Check the status of keyboard buffer.
+defc CHGET  = $009F ; Waits for character being input and returns the character codes.
+defc CHPUT  = $00A2 ; Outputs a character to the console.
+defc LPTOUT = $00A5 ; Output a character to the line printer.
+defc LPTSTT = $00A8 ; Check the line priter status.
+defc SNVCHR = $00AB ; Check graphic header byte and converts codes.
+defc PINLIN = $00AE ; Accepts a line from console until a CR or STOP
+                    ; is typed,and stores the line in a buffer.
+defc INLIN  = $00B1 ; Same as PINLIN,exept if AUTFLO if set.
+defc QINLIN = $00B4 ; Output a '?' mark and a space then falls into the INLIN routine.
+defc BREAKX = $00B7 ; Check the status of the Control-STOP key.
+defc ISCNTC = $00BA ; Check the status of the SHIFT-STOP key.
+defc CKCNTC = $00BD ; Same as ISCNTC,used by BASIC
+defc BEEP   = $00C0 ; Sounds the buffer
+defc CLS    = $00C3 ; Clear the screen.
+defc POSIT  = $00C6 ; Locate cursor at the specified position.
+defc FNKSB  = $00C9 ; Check if function key display is active. If
+                    ; it is,it display it,otherwise does nothing.
+defc ERAFNK = $00CC ; Hide the function key diplay.
+defc DSPFNK = $00CF ; Show the function key display.
+defc TOTEXT = $00D2 ; Forcidly places the screen in text mode.
+
+; Game I/O devices
+
+defc GTSTCK = $00D5 ; Return the current joystick status.
+defc GTTRIG = $00D8 ; Return the current trigger button status.
+defc GTPAD  = $00DB ; Check the current touch PAD status.
+defc GTPDL  = $00DE ; Return the value of the paddle.
+
+; Tape device routines
+
+defc TAPION = $00E1 ; Reads the header block after turning the cassette motor on
+defc TAPIN  = $00E4 ; Read data from the tape
+defc TAPIOF = $00E7 ; Stops reading from the tape
+defc TAPOON = $00EA ; Turns on the cassette motor and writes the header
+defc TAPOUT = $00ED ; Writes data on the tape
+defc TAPOOF = $00F0 ; Stops writing on the tape
+defc STMOTR = $00F3 ; Sets the cassette motor action
+
+; Queue routines
+
+defc LFTQ   = $00F6 ; Gives number of bytes in queue
+defc PUTQ   = $00F9 ; Put byte in queue
+
+; Graphic routines
+
+defc RIGHTC = $00FC ; Shifts screenpixel to the right
+defc LEFTC  = $00FF ; Shifts screenpixel to the left
+defc UPC    = $0102 ; Shifts screenpixel up
+defc TUPC   = $0105 ; Tests whether UPC is possible, if possible, execute UPC
+defc DOWNC  = $0108 ; Shifts screenpixel down
+defc TDOWNC = $010B ; Tests whether DOWNC is possible, if possible, execute DOWNC
+defc SCALXY = $010E ; Scales X and Y coordinates
+defc MAPXY  = $0111 ; Places cursor at current cursor address
+defc FETCHC = $0114 ; Gets current cursor addresses mask pattern
+defc STOREC = $0117 ; Record current cursor addresses mask pattern
+defc SETATR = $011A ; Set attribute byte
+defc READC  = $011D ; Reads attribute byte of current screenpixel
+defc SETC   = $0120 ; Returns currenct screenpixel of specificed attribute byte
+defc NSETCX = $0123 ; Set horizontal screenpixels
+defc GTASPC = $0126 ; Gets screen relations
+defc PNTINI = $0129 ; Initalises the PAINT instruction
+defc SCANR  = $012C ; Scans screenpixels to the right
+defc SCANL  = $012F ; Scans screenpixels to the left
+
+; Misc routines
+
+defc CHGCAP = $0132 ; Alternates the CAP lamp status
+defc CHGSND = $0135 ; Alternates the 1-bit sound port status
+defc RSLREG = $0138 ; Reads the primary slot register
+defc WSLREG = $013B ; Writes value to the primary slot register
+defc RDVDP  = $013E ; Reads VDP status register
+defc SNSMAT = $0141 ; Returns the value of the specified line from the keyboard matrix
+defc PHYDIO = $0144 ; Executes I/O for mass-storage media like diskettes
+defc FORMAT = $0147 ; Initialises mass-storage media like formatting of diskettes
+defc ISFLIO = $014A ; Tests if I/O to device is taking place
+defc OUTDLP = $014D ; Printer output
+defc GETVCP = $0150 ; Returns pointer to play queue
+defc GETVC2 = $0153 ; Returns pointer to variable in queue number VOICEN (byte op #FB38)
+defc KILBUF = $0156 ; Clear keyboard buffer
+defc CALBAS = $0159 ; Executes inter-slot call to the routine in BASIC interpreter
+
+lston

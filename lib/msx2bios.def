@@ -1,0 +1,35 @@
+lstoff
+
+; MSX 2 BIOS functions definition
+;
+; December 2007
+; $Id: msx2bios.def,v 1.1 2007-12-07 11:28:58 stefano Exp $
+;
+
+
+; MSX 2 BIOS Entries
+
+defc SUBROM = $015C ; Calls a routine in SUB-ROM
+defc EXTROM = $015F ; Calls a routine in SUB-ROM. Most common way
+defc CHKSLZ = $0162 ; Search slots for SUB-ROM
+defc CHKNEW = $0165 ; Tests screen mode
+defc EOL    = $0168 ; Deletes to the end of the line
+defc BIGFIL = $016B ; Same function as FILVRM (total VRAM can be reached).
+defc NSETRD = $016E ; Same function as SETRD.(with full 16 bits VRAM-address)
+defc NSTWRT = $0171 ; Same function as SETWRT.(with full 16 bits VRAM-address)
+defc NRDVRM = $0174 ; Reads VRAM like in RDVRM.(with full 16 bits VRAM-address)
+defc NWRVRM = $0177 ; Writes to VRAM like in WRTVRM.(with full 16 bits VRAM-address)
+
+; MSX 2+ BIOS Entries
+
+defc RDBTST = $017A ; Read value of I/O poort #F4
+defc WRBTST = $017D ; Write value to I/O poort #F4
+
+; MSX turbo R BIOS Entries
+
+defc CHGCPU = $0180 ; Changes CPU mode
+defc GETCPU = $0183 ; Returns current CPU mode
+defc PCMPLY = $0186 ; Plays specified memory area through the PCM chip
+defc PCMREC = $0189 ; Records audio using the PCM chip into the specified memory area
+
+lston

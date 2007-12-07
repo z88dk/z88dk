@@ -6,13 +6,15 @@
 ;
 ;	Enable screen
 ;
-;	$Id: msx_noblank.asm,v 1.1 2007-12-03 07:29:39 stefano Exp $
+;	$Id: msx_noblank.asm,v 1.2 2007-12-07 11:28:59 stefano Exp $
 ;
 
 	XLIB	msx_noblank
 	LIB	msxbios
 	
+        INCLUDE "#msxbios.def"
+
 msx_noblank:
 
-	ld	ix,0044h	;BIOS call for ENASCR
+	ld	ix,ENASCR
 	jp	msxbios

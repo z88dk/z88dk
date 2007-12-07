@@ -6,15 +6,17 @@
 ;
 ;	Read the MSX video memory
 ;
-;	$Id: msx_vpeek.asm,v 1.1 2007-12-03 07:29:40 stefano Exp $
+;	$Id: msx_vpeek.asm,v 1.2 2007-12-07 11:28:59 stefano Exp $
 ;
 
 	XLIB	msx_vpeek
 	LIB	msxbios
 	
+        INCLUDE "#msxbios.def"
+
 msx_vpeek:
 	; (FASTCALL) -> HL = address
-	ld	ix,$4A	; RDVRM
+	ld	ix,RDVRM
 	call	msxbios
 	ld	h,0
 	ld	l,a

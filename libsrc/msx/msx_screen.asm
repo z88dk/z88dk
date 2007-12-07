@@ -6,13 +6,15 @@
 ;
 ;	Change the MSX screen mode; mode in HL (FASTCALL)
 ;
-;	$Id: msx_screen.asm,v 1.1 2007-12-03 07:29:39 stefano Exp $
+;	$Id: msx_screen.asm,v 1.2 2007-12-07 11:28:59 stefano Exp $
 ;
 
 	XLIB	msx_screen
 	LIB	msxbios
 	
+        INCLUDE "#msxbios.def"
+
 msx_screen:
 	ld	a,l
-	ld	ix,$5F	; CHGMOD
+	ld	ix,CHGMOD
 	jp	msxbios

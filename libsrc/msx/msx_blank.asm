@@ -6,13 +6,15 @@
 ;
 ;	Disable screen
 ;
-;	$Id: msx_blank.asm,v 1.1 2007-12-03 07:29:39 stefano Exp $
+;	$Id: msx_blank.asm,v 1.2 2007-12-07 11:28:59 stefano Exp $
 ;
 
 	XLIB	msx_blank
 	LIB	msxbios
 	
+        INCLUDE "#msxbios.def"
+
 msx_blank:
 
-	ld	ix,0041h	;DISSCR
+	ld	ix,DISSCR
 	jp	msxbios

@@ -6,13 +6,14 @@
 ;
 ;	Switch to text mode
 ;
-;	$Id: msx_text.asm,v 1.1 2007-12-03 07:29:39 stefano Exp $
+;	$Id: msx_text.asm,v 1.2 2007-12-07 11:28:59 stefano Exp $
 ;
 
 	XLIB	msx_text
 	LIB	msxbios
 	
-msx_text:
+        INCLUDE "#msxbios.def"
 
-	ld	ix,00D2h	;BIOS call for "text mode"
+msx_text:
+	ld	ix,TOTEXT
 	jp	msxbios
