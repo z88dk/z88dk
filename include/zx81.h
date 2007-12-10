@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.8 2007-12-10 10:29:18 stefano Exp $
+ * $Id: zx81.h,v 1.9 2007-12-10 18:01:38 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -128,13 +128,13 @@ extern void __LIB__ mirrortxt();
 
 // Activates / Deactivates the ZX81 <-> ASCII converter,
 // used in some output routine and interfacing to the BASIC strings
-extern void __LIB__ zx_asciimode();
+extern void __LIB__ __FASTCALL__ zx_asciimode();
 
 // ZX81 <-> ASCII char conversion
-extern unsigned char __LIB__ __FASTCALL__ zx_ascii(unsigned char character);
+extern char __LIB__ zx_ascii(char character);
 
 // ASCII <-> ZX81 char conversion
-extern unsigned char __LIB__ __FASTCALL__ ascii_zx(unsigned char character);
+extern char __LIB__ ascii_zx(char character);
 
 // FAST / SLOW mode switching, available only if startup >= 2
 extern void __LIB__ zx_fast();
