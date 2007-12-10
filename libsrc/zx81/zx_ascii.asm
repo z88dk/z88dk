@@ -7,17 +7,14 @@
 ;	unsigned char zx_ascii(unsigned char character);
 ;
 ;
-;	$Id: zx_ascii.asm,v 1.1 2007-10-25 14:53:04 stefano Exp $
+;	$Id: zx_ascii.asm,v 1.2 2007-12-10 10:29:25 stefano Exp $
 ;	
 
 XLIB	zx_ascii
 LIB	zx81toasc
 
 zx_ascii:
-	pop	de
-	pop	hl	; location of char
-	push	hl
-	push	de
+	; __FASTCALL__ :  HL = location of char
 	call	zx81toasc
 	ld	h,0
 	ld	l,a
