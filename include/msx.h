@@ -1,7 +1,7 @@
 /*
  * Headerfile for MSX specific stuff
  *
- * $Id: msx.h,v 1.2 2007-12-03 07:51:33 stefano Exp $
+ * $Id: msx.h,v 1.3 2007-12-13 11:28:38 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -10,11 +10,19 @@
 #include <sys/types.h>
 
 
-// Check if MSX 1 or MSX 2
-extern int __LIB__ msx_type();
+// PSG register, sound, ...
 
-// Detect the VRAM size (in KB)
-extern int __LIB__ msx_vram();
+// Init the PSG (reset sound etc..)
+extern void __LIB__ msx_initpsg();
+
+// Play a sound by PSG
+extern void __LIB__ msx_sound(int reg, int val);
+
+// Reat the PSG register
+extern int __LIB__ __FASTCALL__ msx_readpsg(int regno);
+
+
+// Video related functions
 
 // Set the screen mode
 extern void __LIB__ __FASTCALL__ msx_screen(int mode);
@@ -24,6 +32,9 @@ extern int __LIB__ __FASTCALL__ msx_vpeek(int address);
 
 // VRAM write
 extern void __LIB__ msx_vpoke(int address, int value);
+
+// Set screen mode
+extern void __LIB__ msx_screen(int mode);
 
 // Switch to text mode
 extern void __LIB__ msx_text();
@@ -53,6 +64,24 @@ extern int __LIB__ msx_color(int foreground, int background, int border);
 #define MAGENTA        0x0D
 #define GRAY           0x0E
 #define WHITE          0x0F
+
+
+// Misc functions
+
+// Check if MSX 1 or MSX 2
+extern int __LIB__ msx_type();
+
+// Detect the VRAM size (in KB)
+extern int __LIB__ msx_vram();
+
+// Check if the line printer is ready (1=ready, 0 if not)
+extern int __LIB__ msx_lpt();
+
+// Check if Ctrl-STOP is being pressed (1=if pressed, 0 if not)
+extern int __LIB__ msx_break();
+
+// Clear the keyboard buffer
+extern void __LIB__ msx_clearkey();
 
 
 #endif

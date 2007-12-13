@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.21 2007-10-17 14:38:40 stefano Exp $
+ * $Id: spectrum.h,v 1.22 2007-12-13 11:28:38 stefano Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -148,7 +148,6 @@
 
 extern int  __LIB__ zx_128mode(void);            // true or false
 extern int  __LIB__ zx_issue3(void);             // true or false
-
 extern int  __LIB__ zx_type(void);		 // 0:48K - 1: 128K - 2: TS2068
 extern int  __LIB__ zx_model(void);
 extern int  __LIB__ zx_basic_length(void);
@@ -166,6 +165,7 @@ extern int  __LIB__ zx_plus3fdc(void);
 extern int  __LIB__ zx_trd(void);
 extern int  __LIB__ zx_extsys(void);
 extern int  __LIB__ zx_basemem(void);
+extern int  __LIB__ zx_break(void);
 
 
 ///////////////////////////////

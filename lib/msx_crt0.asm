@@ -2,9 +2,16 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.8 2007-12-03 16:05:18 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.9 2007-12-13 11:28:42 stefano Exp $
 ;
 
+; 	There are a couple of #pragma commands which affect
+;	this file:
+;
+;	#pragma no-streams      - No stdio disc files
+;	#pragma no-protectmsdos - strip the MS-DOS protection header
+;
+;	These can cut down the size of the resultant executable
 
                 MODULE  msx_crt0
 
@@ -44,15 +51,42 @@
         XDEF    msxbios
 
 
-
 ; Now, getting to the real stuff now!
 
+IF (!DEFINED_startup | (startup=1))
         IF      !myzorg
                 defc    myzorg  = 40000
         ENDIF
                 org     myzorg
+ELSE
+        org     $100		; MSXDOS
+ENDIF
 
+;----------------------
+; Execution starts here
+;----------------------
 .start
+
+IF (startup=2)
+IF !DEFINED_noprotectmsdos
+	; This protection takes little less than 50 bytes
+	defb	$eb,$04		;MS DOS protection... JMPS to MS-DOS message if Intel
+	ex	de,hl
+	jp	begin		;First decent instruction for Z80, it survived up to here !
+	defb	$b4,$09		;DOS protection... MOV AH,9 (Err msg for MS-DOS)
+	defb	$ba
+	defw	dosmessage	;DOS protection... MOV DX,OFFSET dosmessage
+	defb	$cd,$21		;DOS protection... INT 21h.
+	defb	$cd,$20		;DOS protection... INT 20h.
+
+.dosmessage
+	defm	"This program is for MSXDOS."
+	defb	13,10,'$'
+
+.begin
+ENDIF
+ENDIF
+
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
@@ -125,6 +159,7 @@ ELSE
 	ENDIF
 ENDIF
 
+
 ; Safe BIOS call
 .msxbios
 	ld	iy,($FCC0)	; slot address of BIOS ROM
@@ -136,7 +171,6 @@ ENDIF
 IF DEFINED_NEED1bitsound
 .snd_tick	defb	0	; Sound variable
 ENDIF
-
 
 .defltdsk       defb    0
 

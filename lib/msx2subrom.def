@@ -1,0 +1,127 @@
+lstoff
+
+; MSX 2 SUBROM functions definition
+; to be activated via the "msx2subrom" call.
+;
+; December 2007
+; $Id: msx2subrom.def,v 1.1 2007-12-13 11:28:42 stefano Exp $
+;
+
+; NOTE: due to function name overlaps, 
+; this file conflicts with the MSX BIOS definitions
+
+
+; These functions need a BASIC text part for parameters
+defc PAINT  = $0069 ; Paints graphical screen
+defc PSET   = $006D ; Sets a point
+defc ATRSCN = $0071 ; Scans color attribute
+defc GLINE  = $0075 ; Draws a line
+defc DOBOXF = $0079 ; Draws a filled box
+defc DOLINE = $007D ; Draws a line
+defc BOXLIN = $0081 ; Draws a box
+
+; Other graphics functions
+defc DOGRPH = $0085 ; Draws a line
+defc GRPPRT = $0089 ; Places a character on graphic screen
+defc SCALXY = $008D ; Clip coordinates (till border of screen)
+defc MAPXYC = $0091 ; Converts an X,Y position to an address: and mask in CLOC and CMASK
+defc READC  = $0095 ; Reads attribute of pixel
+defc SETATR = $0099 ; Set attribute in ATRBYT
+defc SETC   = $009D ; Set attribute of pixel
+
+; SCREEN 3 only functions
+defc TRIGHT = $00A1 ; Moves pixel to the right (C-flag set if border of screen is reached)
+defc RIGHTC = $00A5 ; Moves pixel to the right
+defc TLEFTC = $00A9 ; Moves pixel to the left (C-flag set if border of screen is reached)
+defc LEFTC  = $00AD ; Moves pixel to the left
+defc TDOWNC = $00B1 ; Moves pixel down (C-flag set if border of screen is reached)
+defc DOWNC  = $00B5 ; Moves pixel down
+defc TUPC   = $00B9 ; Moves pixel up (C-flag set if border of screen is reached)
+defc UPC    = $00BD ; Moves pixel up
+
+; More graph functions
+defc SCANR  = $00C1 ; Scans pixels to the right
+defc SCANL  = $00C5 ; Scans pixels to the left
+defc NVBXLN = $00C9 ; Draws a box
+defc NVBXFL = $00CD ; Draws a filled box
+
+; Double BIOS calls
+; The following routines are called from the equally named calls in the MAIN ROM
+
+defc CHGMOD = $00D1 ; Switches to given screenmode
+defc INITXT = $00D5 ; Switches to SCREEN 0
+defc INIT32 = $00D9 ; Switches to SCREEN 1
+defc INIGRP = $00DD ; Switches to SCREEN 2
+defc INIMLT = $00E1 ; Switches to SCREEN 3
+defc SETTXT = $00E5 ; Switches VDP in SCREEN 0
+defc SETT32 = $00E9 ; Switches VDP in SCREEN 1
+defc SETGRP = $00ED ; Switches VDP in SCREEN 2
+defc SETMLT = $00F1 ; Switches VDP in SCREEN 3
+defc CLRSPR = $00F5 ; Initialises sprite tables
+defc CALPAT = $00F9 ; Returns address of sprite pattern-table
+defc CALATR = $00FD ; Returns address of sprite attribute-table
+defc GSPSIZ = $0101 ; Returns current sprite-size
+
+; MSX 2 specific calls
+defc GETPAT = $0105 ; Returns current pattern of a character
+defc WTRVRM = $0109 ; Writes data in VRAM (#0000 - #ffff)
+defc RDVRM  = $010D ; Reads content in VRAM (#0000 - #ffff)
+defc CHGCLR = $0111 ; Changes screen colors
+defc CLS    = $0115
+defc CLRTXT = $0119 ; Clear Text-screen
+defc DSPFNK = $011D ; Display the function keys
+defc DELLNO = $0121 ; Remove line in text screen
+defc INSLNO = $0125 ; Add line to text screen
+defc PUTVRM = $0129 ; Put character on text screen
+defc WRTVDP = $012D ; Write to VDP-register
+defc VDPSTA = $0131 ; Read VDP-status
+defc KYKLOK = $0135 ; Control KANA-key and KANA-lamp (Japan)
+defc PUTCHR = $0139 ; Gets a key-code of keyboard, conversion to KANA and in buffer (Japan)
+defc SETPAG = $013D ; Switches the page
+
+; Palette-functions
+
+defc INIPLT = $0141 ; Initialises the palette (current palet is save in VRAM)
+defc RSTPLT = $0145 ; Restores palette from VRAM
+defc GETPLT = $0149 ; Obtains the colorcodes from the palette
+defc SETPLT = $014D ; Sets the color code to the palette
+
+; These functions need a BASIC text part for parameters
+defc PUTSPRT = $0151 ; Set sprites
+defc COLOR   = $0155 ; Changes Screen- or spritecolor, or palettevalues
+defc SCREEN  = $0159 ; Changes screenmode
+defc WIDTHS  = $015D ; Changes textscreen-width
+defc VDP     = $0161 ; Sets VDP-register
+defc VDPF    = $0165 ; Reads VDP-register
+defc BASE    = $0169 ; Sets VDP base-register
+defc BASEF   = $016D ; Reads VDP base-register
+defc VPOKE   = $0171 ; Writes a byte to VRAM
+defc VPEEK   = $0175 ; Reads a byte from VRAM
+defc SETS    = $0179 ; Sets BEEP, ADJUST, TIME and DATE
+
+; Misc functions
+defc BEEP   = $017D ; Generates beep
+defc PROMPT = $0181 ; Shows prompt
+defc SDFSCR = $0185 ; Recovers screen-parameters of clock-chip. 
+                    ; When C-flag is set function-key text will be displayd
+defc SETSCR = $0189 ; Recovers screen-parameter and prints Welcome message
+defc SCOPY  = $018D ; Copy's VRAM, array and disk-file (BASIC string needed)
+
+; BIT-BLIT routines
+defc BLTVV  = $0191 ; Copy VRAM to VRAM
+defc BLTVM = $0195 ; Copy Main-RAM to VRAM
+defc BLTMV = $0199 ; Copy VRAM to Main-RAM
+defc BLTVD = $019D ; Copy Diskfile to VRAM
+defc BLTDV = $01A1 ; Copy VRAM to Diskfile
+defc BLTMD = $01A5 ; Copy Diskfile to Main-RAM
+defc BLTDM = $01A9 ; Copy Main-RAM to Diskfile
+
+defc NEWPAD = $01AD ; Read lightpen, mouse and trackball
+defc GETPUT = $01B1 ; GET TIME, GET DATE and PUT KANJI (BASIC string needed)
+defc CHGMDP = $01B5 ; sets SCREEN-mode
+defc RESVI  = $01B9 ; Not used... Reserve entry
+defc KNJPRT = $01BD ; Puts Kanji-character on graphical screen (5-8)
+defc REDCLK = $01F5 ; Read clock-RAM
+defc WRTCLK = $01F9 ; Write clock-RAM
+
+lston

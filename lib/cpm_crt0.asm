@@ -8,13 +8,14 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.8 2007-06-27 20:49:27 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.9 2007-12-13 11:28:42 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
 ;
 ;	#pragma no-streams - No stdio disc files
 ;	#pragma no-fileio  - No fileio at all
+;	#pragma no-protectmsdos - strip the MS-DOS protection header
 ;
 ;	These can cut down the size of the resultant executable
 
@@ -56,6 +57,7 @@
 ; Execution starts here
 ;----------------------
 .start
+IF !DEFINED_noprotectmsdos
 	defb	$eb,$04		;DOS protection... JMPS LABE
 	ex	de,hl
 	jp	begin
@@ -69,7 +71,9 @@
 	defm	"This program is for a CP/M system."
 	defb	13,10,'$'
 
-.begin	ld      (start1+1),sp	;Save entry stack
+.begin
+ENDIF
+	ld      (start1+1),sp	;Save entry stack
 	ld	a,($80)		;byte count of length of args
 	inc	a		;we can use this since args are space separated
 	neg
