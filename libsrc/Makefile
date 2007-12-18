@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.101 2007-12-06 10:19:05 stefano Exp $
+# $Id: Makefile,v 1.102 2007-12-18 09:00:25 stefano Exp $
 
 
 include Make.config
@@ -51,15 +51,11 @@ gamesdeps:
 gfxdeps:
 	$(RM) -f graphics/*.o
 	$(RM) -f graphics/ticalc/*.o
-	$(RM) -f graphics/ace/*.o
 	$(RM) -f graphics/gray/*.o
 	$(RM) -f graphics/spectrum/*.o
-	$(RM) -f graphics/vz200/*.o
-	$(RM) -f graphics/zx81/*.o
 	$(RM) -f graphics/z88/*.o
 	$(RM) -f graphics/text/*.o
 	$(RM) -f graphics/text6/*.o
-	$(RM) -f graphics/sam/*.o
 
 #  short script to sort out ticalc dependencies
 tideps:
@@ -446,6 +442,7 @@ zx81ansi_clib.lib:
 	@echo '--- Building ZX81 ANSI Library  ---'
 	@echo ''
 	$(MAKE) zx81deps
+	$(RM) stdio/ansi/zx81/f_ansi_char.o
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
 	cd stdio ; $(MAKE) generic_iy ; cd ..
@@ -721,6 +718,7 @@ mz_clib.lib:
 	@echo ''
 	@echo '--- Building Sharp MZ Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
@@ -734,6 +732,7 @@ mzansi_clib.lib:
 	@echo ''
 	@echo '--- Building Sharp MZ ANSI Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
@@ -805,6 +804,7 @@ aquarius_clib.lib:
 	@echo ''
 	@echo '--- Building Mattel Aquarius Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
@@ -813,7 +813,6 @@ aquarius_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
 	cd games ; $(MAKE) laquarius ; cd ..
-	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
 
 # Mattel Aquarius ANSI library - Stefano
@@ -821,6 +820,7 @@ aquansi_clib.lib:
 	@echo ''
 	@echo '--- Building Mattel Aquarius ANSI Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
@@ -829,7 +829,6 @@ aquansi_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE) gamesdeps
 	cd games ; $(MAKE) laquarius ; cd ..
-	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquansi_clib.lib @$(LISTFILE_DIRECTORY)/aquansi.lst
 
 # Xircom REX 6000 library - Dominic
@@ -888,11 +887,12 @@ svi_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
 
-# MSX1 library - Stefano
+# MSX library - Stefano
 msx_clib.lib:
 	@echo ''
 	@echo '--- Building MSX Library  ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
@@ -948,6 +948,7 @@ cpc_clib.lib:
 	@echo ''
 	@echo '--- Building Amstrad CPC Library  ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
@@ -960,6 +961,7 @@ cpcansi_clib.lib:
 	@echo ''
 	@echo '--- Building Amstrad CPC ANSI Library  ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
@@ -993,13 +995,13 @@ c128ansi_clib.lib:
 	@echo ''
 	@echo '--- Building Commodore 128 ANSI Library  ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
-	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
 
 # Grundy NewBrain library - Stefano
@@ -1007,6 +1009,7 @@ newbrain_clib.lib:
 	@echo ''
 	@echo '--- Building Grundy NewBrain Library  ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
@@ -1015,7 +1018,6 @@ newbrain_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lnewbrain ; cd ..
 	cd assert ; $(MAKE) ; cd ..
-	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(LISTFILE_DIRECTORY)/newbrain.lst
 	$(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/nbcpm_clib @$(LISTFILE_DIRECTORY)/nbcpm.lst
 
