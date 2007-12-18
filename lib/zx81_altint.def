@@ -3,14 +3,15 @@
 ;
 ; ----------------------------------------------------------------------------------------
 ;       Modified display handler to preserve IY
-;	Note: the IX and IY registers are swapped "on the fly" during assembly !
+;	Note: a swap between IX and IY happens "on the fly" during assembly !
 ; ----------------------------------------------------------------------------------------
 ;
 ;       Stefano Bodrato Sept. 2007
+;       Sync fixed by Siegfried Engel - Dec. 2007
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_altint.def,v 1.6 2007-11-02 16:50:37 stefano Exp $
+;       $Id: zx81_altint.def,v 1.7 2007-12-18 13:35:51 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -34,8 +35,8 @@ hrg_on:
 hrg_off:
         ld      hl,$281
         push	hl
-        ;ld      a,$1e 
-        ;ld      i,a  
+        ;ld      a,$1e
+        ;ld      i,a
 HRG_Sync:
         ld      hl,$4034        ; FRAMES counter
         ld      a,(hl)          ; get old FRAMES
@@ -50,17 +51,7 @@ HRG_Sync1:
 
 
 ;; DISPLAY-1
-L0229:  
-	ld	hl,(frames)	; clock handler
-        inc	hl
-        ld	(frames),hl
-        ld	a,h
-        or	l
-        jp	nz,nofr1
-        ld	hl,frames+1
-        inc	(hl)
-.nofr1
-
+L0229:
 	LD      HL,($4034)      ; fetch two-byte system variable FRAMES.
         DEC     HL              ; decrement frames counter.
 
@@ -86,7 +77,7 @@ L0239:  LD      H,A             ;
         RET     NC              ;
 
 ;; DISPLAY-2
-L023E:  
+L023E:
 	push	ix
 	ld	ix,16384
 	CALL    $2BB           ; routine KEYBOARD
@@ -155,15 +146,30 @@ L028F:  JP      L0229           ; to DISPLAY-1
 ; ---
 
 ;; DISPLAY-3
-L0292:  POP     IY              ; return address to IX register.
+L0292:  POP     IY              ; return address to IX register (-IXIY swap).
                                 ; will be either L0281 or L028F - see above.
-
-; Changed here to keep IY unchanged
+; Modified here to keep IY unchanged
 
 	ld	a,(16424)      ; load C with MARGIN
 	ld	c,a
 	ld	a,(16443)      ; test CDFLAG
 	bit	7,a
+        jp	z,$2a9
 
-	jp	$29b
+        ld 	a,c
+        neg
+        inc	a
+        ex 	af,af
+        out 	($FE),a
+
+	ld	hl,(frames)	; clock handler
+        inc	hl
+        ld	(frames),hl
+        ld	a,h
+        or	l
+        jp	nz,nofr1
+        ld	hl,frames+1
+        inc	(hl)
+.nofr1
+	jp	$2A4
 
