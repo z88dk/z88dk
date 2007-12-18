@@ -1,0 +1,35 @@
+lstoff
+
+; MSX BASIC and SYSTEM VARIABLES definitions
+;
+; December 2007
+; $Id: msxbasic.def,v 1.1 2007-12-18 13:17:41 stefano Exp $
+;
+
+
+; System variables
+defc ATRBYT = $F3F2
+defc ACPAGE = $FAF6
+defc BAKCLR = $F3EA
+defc BASROM = $FBB1
+defc BDRCLR = $F3EB
+defc BRDATR = $FCB2
+defc FORCLR = $F3E9
+defc GRPACX = $FCB7
+defc GRPACY = $FCB9
+defc KBUF   = $F41F
+defc SCRMOD = $FCAF
+defc STREND = $F6C6
+
+
+; BASIC locations
+defc BOXLIN  = $5912
+defc DO_CIRC = $5B19
+defc DOBOXF  = $58C1
+defc DOPSET  = $57F5
+defc N_PAINT = $266E
+defc O_PAINT = $59E3
+
+
+lston
+

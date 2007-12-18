@@ -1,7 +1,7 @@
 /*
  * Headerfile for MSX specific stuff
  *
- * $Id: msx.h,v 1.3 2007-12-13 11:28:38 stefano Exp $
+ * $Id: msx.h,v 1.4 2007-12-18 13:17:41 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -27,14 +27,14 @@ extern int __LIB__ __FASTCALL__ msx_readpsg(int regno);
 // Set the screen mode
 extern void __LIB__ __FASTCALL__ msx_screen(int mode);
 
+// Get the screen mode
+extern int __LIB__ msx_screenmode();
+
 // VRAM read
 extern int __LIB__ __FASTCALL__ msx_vpeek(int address);
 
 // VRAM write
 extern void __LIB__ msx_vpoke(int address, int value);
-
-// Set screen mode
-extern void __LIB__ msx_screen(int mode);
 
 // Switch to text mode
 extern void __LIB__ msx_text();
@@ -83,5 +83,10 @@ extern int __LIB__ msx_break();
 // Clear the keyboard buffer
 extern void __LIB__ msx_clearkey();
 
+// Disable the CTRL-STOP effect (when a BASIC routine is being called)
+extern void __LIB__ msx_breakoff();
+
+// Restore the CTRL-STOP break command
+extern void __LIB__ msx_breakon();
 
 #endif

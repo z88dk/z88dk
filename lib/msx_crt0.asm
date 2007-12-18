@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.9 2007-12-13 11:28:42 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.10 2007-12-18 13:17:41 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -45,10 +45,12 @@
 
         XDEF    __sgoioblk
 
+        XDEF    coords          ;Current xy position
 ;
 ; MSX platform specific stuff
 ;
         XDEF    msxbios
+        XDEF    brksave
 
 
 ; Now, getting to the real stuff now!
@@ -159,6 +161,9 @@ ELSE
 	ENDIF
 ENDIF
 
+; ---------------
+; MSX specific stuff
+; ---------------
 
 ; Safe BIOS call
 .msxbios
@@ -167,16 +172,24 @@ ENDIF
 	ei			; make sure interrupts are enabled
 	ret
 
+; Keeping the BREAK status
+.brksave	defb	1
+
+
+; ---------------
+; Misc Variables
+; ---------------
+
+.coords         defw    0       ; Current graphics xy coordinates
+
 
 IF DEFINED_NEED1bitsound
 .snd_tick	defb	0	; Sound variable
 ENDIF
 
-.defltdsk       defb    0
-
 ;Seed for integer rand() routines
 
-._std_seed       defw    0
+._std_seed	 defw    0
 
 ;Atexit routine
 
