@@ -1,0 +1,60 @@
+lstoff
+
+; MSX-DOS and DiskROM definitions
+;
+; December 2007
+; $Id: msxdos.def,v 1.1 2007-12-19 10:00:27 stefano Exp $
+;
+
+
+; System Variables located in RAM
+
+defc A_DRIVE     = $F197  ;00 DPB drive A:   +00 (0=A, 1=B, etc)
+defc A_ID        = $F198  ;F9                +01 Media ID byte (0F8h/0F9h)
+defc A_SECSIZ    = $F199  ;0200h             +02 Sector size (200h = 512 byte)
+defc A_DIRMSK    = $F19B  ;0F (SECSIZ/32)-1  +04 (Directory registrations in 1 sector)-1 
+defc A_DIRSHFT   = $F19C  ;04                +05 Number of bits in DIRMSK
+defc A_CLUSMSK   = $F19D  ;01                +06 (Number of sectors per cluster)-1
+defc A_CLUSSHFT  = $F19E  ;02                +07 (Number of bits in CLUSMSK)+1
+defc A_FIRFAT    = $F19F  ;0001h             +08 First sector of the FAT
+defc A_FATCNT    = $F1A1  ;02                +0A FATs number
+defc A_MAXENT    = $F1A2  ;70                +0B max. directory registrations
+defc A_FIRREC    = $F1A3  ;000Eh             +0C First sector of the DATA field 
+defc A_MAXCLUS   = $F1A5  ;02CAh             +0E Maximum number of clusters
+defc A_FATSIZ    = $F1A7  ;03                +10 Number of sectors per FAT
+defc A_FIRDIR    = $F1A8  ;0007              +11 First sector of the DIRectory
+defc A_FATADR    = $F1AA  ;E597h             +13 Address of the FAT storage in RAM
+
+defc B_DRIVE     = $F1AC  ;00 DPB drive B    +00 (0=A, 1=B, etc)
+defc B_ID        = $F1AD  ;F9                +01 Media ID byte (0F8h/0F9h)
+defc B_SECSIZ    = $F1AE  ;0200h             +02 Sector size (200h = 512 byte)
+defc B_DIRMSK    = $F1B0  ;0F (SECSIZ/32)-1  +04 (Directory registrations in 1 sector)-1 
+defc B_DIRSHFT   = $F1B1  ;04                +05 Number of bits in DIRMSK
+defc B_CLUSMSK   = $F1B2  ;01                +06 (Number of sectors per cluster)-1
+defc B_CLUSSHFT  = $F1B3  ;02                +07 (Number of bits in CLUSMSK)+1
+defc B_FIRFAT    = $F1B4  ;0001h             +08 First sector of the FAT
+defc B_FATCNT    = $F1B6  ;02                +0A FATs number
+defc B_MAXENT    = $F1B7  ;70                +0B max. directory registrations
+defc B_FIRREC    = $F1B8  ;000Eh             +0C First sector of the DATA field 
+defc B_MAXCLUS   = $F1BA  ;02CAh             +0E Maximum number of clusters
+defc B_FATSIZ    = $F1BC  ;03                +10 Number of sectors per FAT
+defc B_FIRDIR    = $F1BD  ;0007h             +11 First sector of the DIRectory
+defc B_FATADR    = $F1BF  ;E597              +13 Address of the FAT storage in RAM
+
+
+defc DEFAULTDRV = $F306  ;00 Default drive of MSXDOS
+
+defc ERRADR     = $F323  ; pointer to a disk error routine
+defc CTRLCAD    = $F325  ; Like ERRADR, but now ^C is eventually printed
+
+defc RAMAD0 = $F341	;1 Slot address of RAM in page 0 (DOS) 
+defc RAMAD1 = $F342	;1 Slot address of RAM in page 1 (DOS) 
+defc RAMAD2 = $F343	;1 Slot address of RAM in page 2 (DOS/BASIC) 
+defc RAMAD3 = $F344	;1 Slot address of RAM in page 3 (DOS/BASIC) 
+defc EXDRSA = $F348	;1 Slot address of the main DiskROM 
+
+defc DSK_CONN = $FFA7	; info on diskdrive connections:  anything different
+			; from C9H means a connection is made
+
+
+lston
