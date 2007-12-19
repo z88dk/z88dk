@@ -7,14 +7,24 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: cnvtab.asm,v 1.1 2007-10-22 17:06:13 stefano Exp $
+;	$Id: cnvtab.asm,v 1.2 2007-12-19 18:13:43 stefano Exp $
 ;
 
 	XLIB	zx81_cnvtab
 
 
 .zx81_cnvtab
-	defb	118
+	defb	114	; cursor-left
+	defb	8
+        defb	115	; cursor-right
+        defb	9
+        defb	112	; cursor-up
+        defb	11
+        defb	113	; cursor-down
+        defb	10
+	defb	119	; Rubout
+	defb	12
+	defb	118	; Newline
 	defb	13
 	defb	11
 	defb	'"'

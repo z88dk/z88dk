@@ -3,7 +3,7 @@
 ;
 ;	(HL)=char to display
 ;
-;	$Id: fputc_cons.asm,v 1.5 2007-12-04 07:02:07 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.6 2007-12-19 18:13:43 stefano Exp $
 ;
 
 	XLIB	fputc_cons
@@ -70,13 +70,15 @@
 	cp     8   ; BackSpace
 
 	jr	nz,NoBS
-	ld	a,(COLUMN)
-	and	a
+	ld	hl,COLUMN
+	xor	a
+	push	hl
+	call	charput	 ; a=0 -> blank
+	pop	hl
+	cp	(hl)
 	jr	z,firstc ; are we in the first column?
-	dec	a
-	ld	(COLUMN),a
+	dec	(hl)
 	ret
-
 .firstc
 	ld	a,(ROW)
 	and	a
@@ -87,10 +89,22 @@
 	ld     (COLUMN),a
  	ret
 .NoBS
+
 .charpos
 	ld	hl,0
 	call	asctozx81
+	call	charput
 
+	ld	a,(COLUMN)
+	inc	a
+	ld	(COLUMN),a
+	cp	COLUMNS		; last column ?
+	ret	nz		; no, return
+ 	jp	isLF
+
+
+
+.charput
 	push	af
 	ld	hl,(16396)
 	inc	hl
@@ -109,10 +123,4 @@
 	add	hl,de
 	pop	af
 	ld	(hl),a
-
-	ld	a,(COLUMN)
-	inc	a
-	ld	(COLUMN),a
-	cp	COLUMNS		; last column ?
-	ret	nz		; no, return
- 	jp	isLF
+	ret
