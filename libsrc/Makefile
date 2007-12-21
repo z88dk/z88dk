@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.102 2007-12-18 09:00:25 stefano Exp $
+# $Id: Makefile,v 1.103 2007-12-21 08:04:23 stefano Exp $
 
 
 include Make.config
@@ -52,10 +52,12 @@ gfxdeps:
 	$(RM) -f graphics/*.o
 	$(RM) -f graphics/ticalc/*.o
 	$(RM) -f graphics/gray/*.o
+	$(RM) -f graphics/gray/ticalc/*.o
 	$(RM) -f graphics/spectrum/*.o
 	$(RM) -f graphics/z88/*.o
 	$(RM) -f graphics/text/*.o
 	$(RM) -f graphics/text6/*.o
+	cd graphics ; $(MAKE) ; cd ..
 
 #  short script to sort out ticalc dependencies
 tideps:

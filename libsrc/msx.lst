@@ -171,6 +171,8 @@ printflike/fscanf
 printflike/vfscanf
 printflike/vsscanf
 graphics/msx/clg
+graphics/clga
+graphics/clrarea
 graphics/circle
 graphics/dcircle2
 graphics/draw

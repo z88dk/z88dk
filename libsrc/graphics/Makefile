@@ -1,14 +1,14 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.11 2007-12-18 09:00:34 stefano Exp $
+# $Id: Makefile,v 1.12 2007-12-21 08:04:23 stefano Exp $
 
 
 all: 
-	@echo 'All in asm'
+	cd x11 ; $(MAKE) ; cd ..
 
 clean:
-	cd .. ; $(MAKE) gfxdeps ; cd graphics
+	$(RM) *.o
 	$(RM) 8080/*.o
 	$(RM) abc80/*.o
 	$(RM) ace/*.o

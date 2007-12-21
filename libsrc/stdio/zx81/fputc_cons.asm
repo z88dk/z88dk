@@ -3,7 +3,7 @@
 ;
 ;	(HL)=char to display
 ;
-;	$Id: fputc_cons.asm,v 1.6 2007-12-19 18:13:43 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.7 2007-12-21 08:04:24 stefano Exp $
 ;
 
 	XLIB	fputc_cons
@@ -47,6 +47,7 @@
 	ret nz		; no, return
 	ld a,ROWS-1
 	ld (ROW),a
+
 ; scroll up
 	ld	hl,(16396)
 	inc	hl
@@ -56,13 +57,13 @@
 	add	hl,bc
 	ld	bc,33*23-1
 	ldir
-	ld	de,32
-	sbc	hl,de	; clean last line
-	ld	(hl),0
-	ld	d,h
-	ld	e,l
+	ld	h,d	; clean last line
+	ld	l,e
+	inc	hl
 	inc	de
-	ld	bc,31
+	inc	de
+	ld	(hl),0
+	ld	c,31
 	ldir
 	ret
 .NoLF
@@ -89,10 +90,11 @@
 	ld     (COLUMN),a
  	ret
 .NoBS
-
 .charpos
 	ld	hl,0
 	call	asctozx81
+	bit	6,a		; filter the dangerous codes
+	ret	nz
 	call	charput
 
 	ld	a,(COLUMN)
