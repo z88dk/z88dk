@@ -37,8 +37,7 @@ defc SP1V_ROTTBL        = $f000            ; location of the 3584-byte rotation 
 defc SP1V_UPDATELISTH   = $d1ed            ; address of 10-byte area holding a dummy struct_sp1_update that is always the "first" in list of screen tiles to be drawn
 defc SP1V_UPDATELISTT   = $d1ef            ; address of 2-byte variable holding the address of the last struct_sp1_update in list of screen tiles to be drawn
 
-; NOTE: SP1V_UPDATELISTT, SP1V_IDTYPEASSOC, SP1V_SPRDRAWTBL are located inside unused
-;       portions of the dummy struct_sp1_update pointed at by SP1V_UPDATELISTH
+; NOTE: SP1V_UPDATELISTT is located inside the dummy struct_sp1_update pointed at by SP1V_UPDATELISTH
 
 ; ///////////////////////
 ;   DEFAULT MEMORY MAP
