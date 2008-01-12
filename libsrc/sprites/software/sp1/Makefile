@@ -12,7 +12,7 @@ default:
 	@echo Valid targets listed below
 	@echo 
 	@echo make spectrum
-	@echo make cpc-mode1
+	@echo make cpc-mode1  -- not yet!
 	@echo
 
 spectrum: customize.asm
@@ -20,7 +20,7 @@ spectrum: customize.asm
 	@echo SP1 Software Sprite Engine 
 	@echo making sinclair spectrum version
 	@echo
-	$(LIBLINKER) -x../../../../lib/clibs/sp1 @spectrum.lst
+	$(LIBLINKER) -x../../../$(OUTPUT_DIRECTORY)/sp1 @spectrum.lst
 	cp spectrum-sp1.h ../../../../include/sprites/sp1.h
 	@echo
 	@echo all done
@@ -31,7 +31,7 @@ cpc-mode1: customize.asm
 	@echo SP1 Software Sprite Engine 
 	@echo making amstrad cpc mode 1 version
 	@echo
-	$(LIBLINKER) -x../../../../lib/clibs/sp1 @cpc-mode1.lst
+	$(LIBLINKER) -x../../../$(OUTPUT_DIRECTORY)/sp1 @cpc-mode1.lst
 	cp cpc-mode1-sp1.h ../../../../include/sprites/sp1.h
 	@echo
 	@echo all done
@@ -39,7 +39,6 @@ cpc-mode1: customize.asm
 
 clean:
 	$(RM) spectrum/collision/*.o
-	$(RM) spectrum/cwrapper/*.o
 	$(RM) spectrum/sprites/*.o
 	$(RM) spectrum/sprites/draw/*.o
 	$(RM) spectrum/tiles/*.o

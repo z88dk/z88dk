@@ -8,10 +8,9 @@ z88dk license applies
 
 // DOCUMENTATION
 
-Docs and test programs will be located in the docs
-and test directories respectively, as they are
-written.  Yes, this note was required because
-there is little there at the moment :)
+See the z88dk wiki at http://www.z88dk.org/
+Documentation is still scant there but will
+hopefully fill out with time.
 
 // OVERVIEW
 
@@ -50,14 +49,8 @@ library.
 The library is designed to be called from
 C or asm or both.  The C API is, of couse,
 documented in the header file.  Asm entry
-points can typically be constructed from
-the C name for a function with the leading
-"sp1_" replaced with "SP1".  Eg the C
-entry point "sp1_UpdateNow" has an equivalent
-asm entry point "SP1UpdateNow".  The register
-set-up to each asm function is described in
-the *.asm files in the implementation
-subdirectores.
+points can be gleaned from the corresponding
+C implementation file.
 
 This engine is best used in games with small
 portions of the screen changing between updates.
@@ -68,7 +61,9 @@ arcade games.
 // COMPILING THE LIBRARY
 
 Instructions below for the spectrum target, follow
-the same procedure for another target.
+the same procedure for another target.  Entering
+"make" on its own will display a list of supported
+targets.
 
 1. Copy "spectrum-customize.asm" to "customize.asm"
 2. Edit "customize.asm" to decide on display area
@@ -88,8 +83,4 @@ library header with "#include <sprites/sp1.h>"
 and link the library during compilation by
 adding "-lsp1" to the compile command.
 
-Some more platform specific information can
-be found in the "readme.txt" files in the
-platform subdirectories.
-
-- aralbrec 04.2006
+- aralbrec 04.2006, 06.2007
