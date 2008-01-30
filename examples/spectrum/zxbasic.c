@@ -11,7 +11,7 @@
 	
 	Then, after run, try to PRINT b$
 	
-	$Id: zxbasic.c,v 1.1 2006-07-03 15:04:15 stefano Exp $
+	$Id: zxbasic.c,v 1.2 2008-01-30 14:05:40 stefano Exp $
 
 */
 
@@ -24,7 +24,11 @@ char	value[100];
 
 int main()
 {
+
 	if ( if1_installed() )  printf ("Interface 1 is active\n");
+	else
+	   if ( zx_interface1() )  printf ("Interface 1 is present (now activated)\n");
+
 	if ( if1_from_mdv() )  printf ("Program loaded from microdrive\n");
 
 	if ( currah_detect() )  printf ("CURRAH uSpeech is present\n");
@@ -38,6 +42,7 @@ int main()
 		printf ("This Spectrum is issue 1 or 2 !\n");
 	}
 
+/*
 	if ( zx_128() )
 	{
 		printf ("This is a Spectrum 128K\n");
@@ -46,6 +51,7 @@ int main()
 	{
 		printf ("This is a Spectrum 16 or 48K\n");
 	}
+*/
 
 	if ( zx_128mode() )
 	{
@@ -71,7 +77,7 @@ int main()
 	printf ("Got numeric value in 'n' :  %u\n", zx_getint ("n") );
 	
 	zx_setstr ('b',"This is the b$ string, which nobody can deny...");
-	
+
 	printf ("\n\nProgram end\n");
 
 }

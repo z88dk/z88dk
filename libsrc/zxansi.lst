@@ -326,6 +326,7 @@ spectrum/zx_getint
 spectrum/zx_getstr
 spectrum/zx_getstr_callee
 spectrum/zx_goto
+spectrum/zx_interface1
 spectrum/zx_iss_stick
 spectrum/zx_issue3
 spectrum/zx_kempston
