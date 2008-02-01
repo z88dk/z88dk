@@ -5,7 +5,7 @@
  *
  *      Stefano Bodrato - 7/6/2006
  *
- *	$Id: zxopus.h,v 1.1 2007-10-04 12:18:49 stefano Exp $
+ *	$Id: zxopus.h,v 1.2 2008-02-01 10:36:39 stefano Exp $
  */
 
 
@@ -15,6 +15,9 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
+
+#ifndef __ZX_CHANNELS__
+#define	__ZX_CHANNELS__
 
 struct BASE_CHAN {
 	// base channel descriptor
@@ -109,6 +112,8 @@ struct J_CHAN {
 					/* 2 for QWERT and 12345 */
 };
 
+#endif /*__ZX_CHANNELS__*/
+
 
 // set the kempston emulation (1=on, 0=off)
 extern void __LIB__ set_kempston (int mode);
@@ -125,6 +130,13 @@ extern int __LIB__ opus_getblocksize (int drive);
 // parallel port put/get byte
 extern void __LIB__ opus_lptwrite (unsigned char databyte);
 extern unsigned char __LIB__ opus_lptread ();
+
+
+// Returns true if the Opus Discovery interface is present
+extern int __LIB__ zx_opus();
+
+// Returns true if the Opus system variables are already present
+extern int __LIB__ opus_installed();
 
 
 #endif /* _ZXOPUS_H */

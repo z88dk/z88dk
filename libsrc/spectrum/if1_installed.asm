@@ -1,13 +1,13 @@
 ;
 ;	ZX Spectrum specific routines
 ;
-;	int zx_interface1();
+;	int if1_installed();
 ;
 ;	The result is:
 ;	- 0 (false) if the ZX Interface1 is missing or not paged in
 ;	- 1 (true) if the ZX Interface1 is connected and activated.
 ;
-;	$Id: if1_installed.asm,v 1.2 2008-01-30 14:05:41 stefano Exp $
+;	$Id: if1_installed.asm,v 1.3 2008-02-01 10:36:40 stefano Exp $
 ;
 
 	XLIB	if1_installed

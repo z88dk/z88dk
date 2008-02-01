@@ -335,7 +335,6 @@ spectrum/zx_setstr
 spectrum/zx_setstr_callee
 spectrum/zx_soundchip
 spectrum/zx_timexsound
-spectrum/zx_trd
 spectrum/zx_type
 spectrum/zx_var_length
 spectrum/tape_save

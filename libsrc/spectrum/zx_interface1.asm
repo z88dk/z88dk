@@ -12,7 +12,7 @@
 ;
 ;	Shouldn't conflict with other interfaces.
 ;
-;	$Id: zx_interface1.asm,v 1.1 2008-01-30 14:05:41 stefano Exp $
+;	$Id: zx_interface1.asm,v 1.2 2008-02-01 10:36:40 stefano Exp $
 ;
 
 	XLIB	zx_interface1

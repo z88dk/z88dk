@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 6/9/2004
  *
- *	$Id: zxinterface1.h,v 1.6 2007-07-10 08:12:50 stefano Exp $
+ *	$Id: zxinterface1.h,v 1.7 2008-02-01 10:36:39 stefano Exp $
  */
 
 
@@ -13,6 +13,9 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
+
+#ifndef __ZX_CHANNELS__
+#define	__ZX_CHANNELS__
 
 struct BASE_CHAN {
 	// base channel descriptor
@@ -85,6 +88,8 @@ struct N_CHAN {
 	u8_t	nc_ibl;		/* Number of bytes in the input buffer */
 	char    data[255];	/* 255 byte data buffer */
 };
+
+#endif /*__ZX_CHANNELS__*/
 
 
 // Load a sector identified by file name and record number
