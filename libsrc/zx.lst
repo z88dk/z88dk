@@ -353,6 +353,7 @@ spectrum/zx_setint_callee
 spectrum/zx_setstr
 spectrum/zx_setstr_callee
 spectrum/zx_soundchip
+spectrum/zx_syntax
 spectrum/zx_timexsound
 spectrum/zx_type
 spectrum/zx_var_length
@@ -362,7 +363,6 @@ spectrum/beta/zx_betadisk
 spectrum/opus/opus_6116
 spectrum/opus/opus_getblocks
 spectrum/opus/opus_getblocksize
-spectrum/opus/opus_installed
 spectrum/opus/opus_lptread
 spectrum/opus/opus_lptwrite
 spectrum/opus/opus_rommap

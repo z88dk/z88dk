@@ -5,7 +5,7 @@
  *
  *      Stefano Bodrato - 7/6/2006
  *
- *	$Id: zxopus.h,v 1.2 2008-02-01 10:36:39 stefano Exp $
+ *	$Id: zxopus.h,v 1.3 2008-02-07 11:18:03 stefano Exp $
  */
 
 
@@ -134,9 +134,6 @@ extern unsigned char __LIB__ opus_lptread ();
 
 // Returns true if the Opus Discovery interface is present
 extern int __LIB__ zx_opus();
-
-// Returns true if the Opus system variables are already present
-extern int __LIB__ opus_installed();
 
 
 #endif /* _ZXOPUS_H */

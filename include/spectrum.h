@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.23 2008-02-01 10:36:39 stefano Exp $
+ * $Id: spectrum.h,v 1.24 2008-02-07 11:18:03 stefano Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -171,6 +171,7 @@ extern int  __LIB__ zx_break(void);
 // INTERFACE FOR CALLING BASIC
 ///////////////////////////////
 
+extern int  __LIB__              zx_syntax(char *statement);
 extern int  __LIB__ __FASTCALL__ zx_goto(int line);
 extern int  __LIB__              zx_getstr(char variable, char *value);
 extern void __LIB__              zx_setstr(char variable, char *value);

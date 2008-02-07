@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 6/9/2004
  *
- *	$Id: zxinterface1.h,v 1.7 2008-02-01 10:36:39 stefano Exp $
+ *	$Id: zxinterface1.h,v 1.8 2008-02-07 11:18:03 stefano Exp $
  */
 
 

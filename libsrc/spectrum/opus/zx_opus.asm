@@ -1,61 +1,28 @@
 ;
 ;	ZX Spectrum specific routines
+;	Stefano Bodrato - 5/2/2008
 ;
-;	int zx_opus();
+;	int opus_installed();
 ;
 ;	The result is:
-;	- 0 (false) if the OPUS Discovery Interface is missing
-;	- 1 (true) if the OPUS Discovery Interface is connected
+;	- 0 (false) if the Opus Discovery Interface is missing
+;	- 1 (true) if the Opus Discovery Interface is connected
 ;
-;	This function has the side of loading the OPUS or possibly other
-;	disk interfaces system variables.
+;	Tries to issue a POINT #0,1 command, to see if the syntax is accepted.
+;	Shouldn't conflict with other interfaces.
 ;
-;
-;	$Id: zx_opus.asm,v 1.1 2008-02-01 10:36:40 stefano Exp $
+;	$Id: zx_opus.asm,v 1.2 2008-02-07 11:18:07 stefano Exp $
 ;
 
 	XLIB	zx_opus
-	
+	LIB	zx_syntax
+
 zx_opus:
+		ld	hl,testcmd
+		push	hl
+		call	zx_syntax
+		pop	bc
+		ret
+		
+testcmd:	defb	169,35,195,167,44,188,167,13    ; POINT # NOT PI,SGN PI <CR>
 
-	ld	hl,result-1
-	ld	(hl),0		; assume we don't have Opus
-	ld	hl,result-1
-	ld	(hl),1		; Opus Discovery is present and reactive !!
-
-	ld	bc,($5c3d)
-	push	bc		; save original ERR_SP
-	ld	bc,return
-	push	bc
-	ld	($5c3d),sp	; update error handling routine
-	
-	di
-	call	$1708		; Page in the Discovery ROM
-
-	;ld	hl,7
-	;ld	a,(hl)		; We should have a pointer to $1748, here
-	;inc	hl
-	;or	(hl)
-	;cp	$5F		; Logic OR between $17 and $48
-	;ld	hl,result+1
-	;lh	(hl),0
-	;jr	z,notpresent
-	;ld	(hl),1
-;notpresent:
-
-	call	$1748		; Page out the Discovery ROM
-
-
-	pop	bc	
-
-return:
-	; if we're here, opus is not present !
-	pop	bc
-	ei
-	
-	ld	(iy+0),255	; reset ERR_NR
-
-	ld	($5c3d),bc	; restore orginal ERR_SP
-
-result:	ld	hl,0
-	ret
