@@ -5,7 +5,7 @@
  *
  *      Stefano Bodrato - 7/6/2006
  *
- *	$Id: zxopus.h,v 1.3 2008-02-07 11:18:03 stefano Exp $
+ *	$Id: zxopus.h,v 1.4 2008-02-08 08:20:24 stefano Exp $
  */
 
 
@@ -134,6 +134,9 @@ extern unsigned char __LIB__ opus_lptread ();
 
 // Returns true if the Opus Discovery interface is present
 extern int __LIB__ zx_opus();
+
+// Get the Opus firmware version
+extern float __LIB__ opus_version ();
 
 
 #endif /* _ZXOPUS_H */

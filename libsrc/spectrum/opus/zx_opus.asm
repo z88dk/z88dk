@@ -9,9 +9,10 @@
 ;	- 1 (true) if the Opus Discovery Interface is connected
 ;
 ;	Tries to issue a POINT #0,1 command, to see if the syntax is accepted.
+;	If so, tries the short style command LOAD *PI;"A"
 ;	Shouldn't conflict with other interfaces.
 ;
-;	$Id: zx_opus.asm,v 1.2 2008-02-07 11:18:07 stefano Exp $
+;	$Id: zx_opus.asm,v 1.3 2008-02-08 08:20:25 stefano Exp $
 ;
 
 	XLIB	zx_opus
@@ -19,10 +20,14 @@
 
 zx_opus:
 		ld	hl,testcmd
-		push	hl
 		call	zx_syntax
-		pop	bc
-		ret
-		
+		xor	a
+		or	l
+		ret	z
+		ld	hl,testcmd2	; further test (Disciple might accept "POINT")
+		jp	zx_syntax
+
+
 testcmd:	defb	169,35,195,167,44,188,167,13    ; POINT # NOT PI,SGN PI <CR>
+testcmd2:	defb	239,42,167,59,34,65,34,13	; LOAD *PI;"A"
 

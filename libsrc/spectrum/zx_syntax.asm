@@ -11,21 +11,20 @@
 ;		Terminate the string with carriage return.
 ;
 ;
-;	$Id: zx_syntax.asm,v 1.1 2008-02-07 11:18:03 stefano Exp $
+;	$Id: zx_syntax.asm,v 1.2 2008-02-08 08:20:25 stefano Exp $
 ;
 
 XLIB	zx_syntax
+LIB	zx_interface1
 
 	; max space for BASIC command(s)
 	defc	cmdlen = 20
 	
 zx_syntax:
+		push	hl
+		call	zx_interface1	; force IF1 activation to avoid crashes
 		call	$16b0		; clear buffers
-		
-		pop	hl
-		pop	de		; statement
-		push	de
-		push	hl		; return address
+		pop	de
 		
 		ld	hl,($5c5d)	; save CH-ADD
 		push	hl

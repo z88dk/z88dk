@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.103 2007-12-21 08:04:23 stefano Exp $
+# $Id: Makefile,v 1.104 2008-02-08 08:20:25 stefano Exp $
 
 
 include Make.config
@@ -35,7 +35,7 @@ tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 	ti86ansi_clib.lib ti86_clib.lib \
 	tigray82.lib tigray83.lib tigray83p.lib tigray85.lib tigray86.lib
 
-zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib mzx.lib mzx_tiny
+zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib
 
 zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib
 

@@ -12,14 +12,13 @@
 ;
 ;	Shouldn't conflict with other interfaces.
 ;
-;	$Id: zx_interface1.asm,v 1.3 2008-02-07 11:18:03 stefano Exp $
+;	$Id: zx_interface1.asm,v 1.4 2008-02-08 08:20:25 stefano Exp $
 ;
 
 	XLIB	zx_interface1
 	LIB	if1_installed
 	
 zx_interface1:
-
 	ld	bc,($5c3d)
 	push	bc		; save original ERR_SP
 	ld	bc,return
