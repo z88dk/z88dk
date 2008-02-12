@@ -321,6 +321,7 @@ spectrum/zx_cyx2aaddr_callee
 spectrum/zx_cyx2saddr
 spectrum/zx_cyx2saddr_callee
 spectrum/zx_extsys
+spectrum/zx_floatingbus
 spectrum/zx_fullerstick
 spectrum/zx_getint
 spectrum/zx_getstr
@@ -332,6 +333,7 @@ spectrum/zx_issue3
 spectrum/zx_kempston
 spectrum/zx_kempstonmouse
 spectrum/zx_locatenum
+spectrum/zx_mb02
 spectrum/zx_model
 spectrum/zx_multiface
 spectrum/zx_plus3fdc
