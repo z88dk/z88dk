@@ -4,7 +4,6 @@ im2_CreateGenericISRLight
 im2_CreateGenericISRLight_callee
 im2_EmptyISR
 im2_Init
-im2_Init_callee
 im2_InstallISR
 im2_InstallISR_callee
 im2_RegHookFirst

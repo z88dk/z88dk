@@ -1,19 +1,13 @@
-; CALLER linkage for function pointers
+; void __FASTCALL__ im2_Init_callee(void *tableaddr)
+; 04.2004, 02.2008 aralbrec
 
 XLIB im2_Init
 
-LIB im2_Init_callee
-XREF ASMDISP_IM2_INIT_CALLEE
-
 .im2_Init
 
-   pop hl
-   pop bc
-   pop af
-   pop de
-   push de
-   push af
-   push bc
-   push hl
-   
-   jp im2_Init_callee + ASMDISP_IM2_INIT_CALLEE
+; enter : hl = address of im2 vector table
+
+   ld a,h
+   ld i,a
+   im 2
+   ret
