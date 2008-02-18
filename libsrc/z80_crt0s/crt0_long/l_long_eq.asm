@@ -5,27 +5,42 @@
 XLIB    l_long_eq
 
 ;
-; dehl' == deHL
-; set carry if true
+; DEHL == secondary
+; set carry if result true
+; stack = secondary MSW, secondary LSW, ret
 
 .l_long_eq
 
-   push hl
-   push de
-   exx
-   ex (sp),hl
-   or a
-   sbc hl,de
-   pop hl
-   pop de
+   pop ix                      ; return address
+   
+   pop bc                      ; secondary LSW
+   ld a,c
+   cp l
+   jp nz, notequal0
+   ld a,b
+   cp h
+   jp nz, notequal0
+   
+   pop bc                      ; secondary MSW
+   ld a,c
+   cp e
+   jp nz, notequal1
+   ld a,b
+   cp d
+   jp nz, notequal1
+   
    scf
-   ccf
-   ret nz
-   sbc hl,de
-   ccf
-   ret z
+   jp (ix)
+
+.notequal0
+
+   pop bc
+
+.notequal1
+
    or a
-   ret
+   jp (ix)
+
    
 ;        call    l_long_cmp
 ;        scf
