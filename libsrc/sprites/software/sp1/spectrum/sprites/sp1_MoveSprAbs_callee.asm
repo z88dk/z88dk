@@ -144,7 +144,7 @@ LIB SP1AddSprChar, SP1RemoveSprChar
    ; ix = & struct sp1_ss
    ; stack = & struct sp1_update.ulist (tail of invalidated list), row
 
-   INCLUDE "./spectrum/sprites/MoveNC.asm"
+   INCLUDE "./sprites/MoveNC.asm"
 
 .done
 
@@ -198,7 +198,7 @@ LIB SP1AddSprChar, SP1RemoveSprChar
    ; ix = & struct sp1_ss
    ; stack = & struct sp1_update.ulist (tail of invalidated list), row
 
-   INCLUDE "./spectrum/sprites/MoveC.asm"
+   INCLUDE "./sprites/MoveC.asm"
 
    ; jumps to done for exit inside INCLUDE
 
