@@ -53,11 +53,10 @@ defc SP1V_UPDATELISTT   = $d1ef            ; address of 2-byte variable holding 
 ; d1ff - d1ff     SP1.LIB  attribute buffer
 ; d1f7 - d1fe     SP1.LIB  pixel buffer
 ; d1ed - d1f6     SP1.LIB  update list head - a dummy struct sp1_update acting as first in invalidated list
-;  * d1ef - d1f0  SP1.LIB  update list tail pointer
+;  * d1ef - d1f0  SP1.LIB  update list tail pointer (inside dummy struct sp1_update)
 ; d1e2 - d1ec     --free-  11 bytes
 ; d1d1 - d1e1     IM2.LIB  generic isr with one hook (17 bytes)
 ; d101 - d1d0     --free-  208 bytes
 ; d000 - d100     IM2.LIB  im 2 vector table
 ; ce00 - cfff     -------  z80 stack (512 bytes) set SP=d000
 ;
-; * = variables located inside the struct pointed at by the update list head

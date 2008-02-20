@@ -348,7 +348,6 @@ extern void  __CALLEE__ __LIB__   sp1_ClearRectInv_callee(struct sp1_Rect *r, uc
 #define sp1_PrintAtInv(a,b,c,d)    sp1_PrintAtInv_callee(a,b,c,d)
 #define sp1_ScreenStr(a,b)         sp1_ScreenStr_callee(a,b)
 #define sp1_ScreenAttr(a,b)        sp1_ScreenAttr_callee(a,b)
-#define sp1_Screen(a,b)            sp1_Screen_callee(a,b)
 #define sp1_PrintString(a,b)       sp1_PrintString_callee(a,b)
 #define sp1_SetPrintPos(a,b,c)     sp1_SetPrintPos_callee(a,b,c)
 #define sp1_GetTiles(a,b)          sp1_GetTiles_callee(a,b)
