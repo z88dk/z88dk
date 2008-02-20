@@ -5,8 +5,6 @@
 XLIB sp1_ChangeSprType_callee
 XDEF ASMDISP_SP1_CHANGESPRTYPE_CALLEE
 
-XREF SP1V_SPRDRAWTBL
-
 .sp1_ChangeSprType_callee
 
    pop hl

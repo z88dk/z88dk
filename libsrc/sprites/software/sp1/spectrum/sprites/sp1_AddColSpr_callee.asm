@@ -6,7 +6,7 @@ XLIB sp1_AddColSpr_callee
 XDEF ASMDISP_SP1_ADDCOLSPR_CALLEE
 
 LIB _sp1_struct_cs_prototype
-XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
+XREF _u_malloc, _u_free
 
 .sp1_AddColSpr_callee
 

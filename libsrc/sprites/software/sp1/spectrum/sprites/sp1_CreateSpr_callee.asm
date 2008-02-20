@@ -6,7 +6,7 @@ XLIB sp1_CreateSpr_callee
 XDEF ASMDISP_SP1_CREATESPR_CALLEE
 
 LIB _sp1_struct_ss_prototype, _sp1_struct_cs_prototype
-XREF _u_malloc, _u_free, SP1V_SPRDRAWTBL
+XREF _u_malloc, _u_free
 
 .sp1_CreateSpr_callee
 
