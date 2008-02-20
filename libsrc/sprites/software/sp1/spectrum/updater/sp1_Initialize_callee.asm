@@ -2,7 +2,7 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-INCLUDE "customize.asm"
+INCLUDE "spectrum/customize.asm"
 
 XLIB sp1_Initialize_callee
 XDEF ASMDISP_SP1_INITIALIZE_CALLEE

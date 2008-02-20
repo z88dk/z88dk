@@ -2,7 +2,7 @@
 ; 01.2008 aralbrec, Sprite Pack v3.0
 ; ts2068 hi-res version
 
-INCLUDE "customize.asm"
+INCLUDE "ts2068hr/customize.asm"
 
 XLIB sp1_GetUpdateStruct_callee
 XDEF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
