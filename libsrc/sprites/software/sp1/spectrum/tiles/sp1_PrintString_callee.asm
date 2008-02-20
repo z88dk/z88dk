@@ -467,7 +467,7 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 
    ld a,(de)
    xor $80
-   jp p, noinvalidation      ; if already invalidated, skip
+   jp p, noinvalidation2     ; if already invalidated, skip
    ld (de),a   
    ld (hl),d
    inc hl
@@ -521,15 +521,28 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 
 .codeTransparent
 
-   exx
-   inc de
-   inc de
-   ld a,(de)
-   dec de
-   dec de
-   exx
+   ; are we invalidating?
    
-   ; fall through to printable
+   bit 0,e
+   jp z, codeRight
+   
+   ; invalidate the char
+   
+   exx
+   ld a,(de)
+   xor $80
+   jp p, noinvalidation20    ; if already invalidated, skip
+   ld (de),a   
+   ld (hl),d
+   inc hl
+   ld (hl),e
+   ld hl,6
+   add hl,de
+
+.noinvalidation20
+   
+   exx
+   jp codeRight
 
 .printable                   ; a = tile#
 
@@ -652,11 +665,11 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
    
    exx
    ld a,-10
-   add a,l
-   ld l,a
+   add a,e
+   ld e,a
    ld a,$ff
-   adc a,h
-   ld h,a
+   adc a,d
+   ld d,a
    exx
    jp psloop
    
@@ -692,11 +705,11 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 
    exx
    ld a,(-(SP1V_DISPWIDTH*10))%256
-   add a,l
-   ld l,a
+   add a,e
+   ld e,a
    ld a,(-(SP1V_DISPWIDTH*10))/256
-   adc a,h
-   ld h,a
+   adc a,d
+   ld d,a
    exx
    jp psloop
 
@@ -719,11 +732,11 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 
    exx
    ld a,(SP1V_DISPWIDTH*10)%256
-   add a,l
-   ld l,a
+   add a,e
+   ld e,a
    ld a,(SP1V_DISPWIDTH*10)/256
-   adc a,h
-   ld h,a
+   adc a,d
+   ld d,a
    exx
    jp psloop
 
