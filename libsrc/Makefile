@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.105 2008-02-20 10:27:48 aralbrec Exp $
+# $Id: Makefile,v 1.106 2008-02-20 23:28:23 aralbrec Exp $
 
 
 include Make.config
@@ -1095,10 +1095,10 @@ sp1:
 	@echo
 
 sp1-spectrum:
-	cd sprites/software/sp1/spectrum ; $(MAKE) ; cd ../../../..
+	cd sprites/software/sp1 ; $(MAKE) sp1-spectrum; cd ../../..
 
 sp1-ts2068hr:
-	cd sprites/software/sp1/ts2068hr ; $(MAKE) ; cd ../../../..
+	cd sprites/software/sp1 ; $(MAKE) sp1-ts2068hr; cd ../../..
 
 clean:
 	cd assert ; $(MAKE) clean ; cd ..
@@ -1141,8 +1141,7 @@ clean:
 	cd vz ; $(RM) *.o ; cd ..
 	cd zx81 ; $(RM) *.o ; cd ..
 	$(MAKE) -C sms clean
-	cd sprites/software/sp1/spectrum ; $(MAKE) clean; cd ../../../..
-	cd sprites/software/sp1/ts2068hr ; $(MAKE) clean; cd ../../../..
+	cd sprites/software/sp1 ; $(MAKE) clean ; cd ../../..
 
 install:
 	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs
