@@ -4,10 +4,13 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.104 2008-02-08 08:20:25 stefano Exp $
+# $Id: Makefile,v 1.105 2008-02-20 10:27:48 aralbrec Exp $
 
 
 include Make.config
+
+# LIBRARIES not built by the global list below:
+# - SP1 (build depends on customization and machine target, "make sp1" for options)
 
 all:	genlibs z88libs tilibs zxlibs \
 	debug.lib \
@@ -38,7 +41,6 @@ tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 zxlibs: ts2068_clib.lib zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib
 
 zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib
-
 
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
@@ -1075,8 +1077,28 @@ test_clib.lib:
 	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/test_clib @$(LISTFILE_DIRECTORY)/test.lst
 
+# SP1 sprite library - aralbrec
+sp1:
+	@echo
+	@echo SP1 Software Sprite Engine
+	@echo
+	@echo Prior to building the library you can customize several
+	@echo parameters such as display size, memory map, etc by editing
+	@echo the file "customize.asm" found in {z88dk}/libsrc/sprites/software/sp1/{target}
+	@echo Otherwise the defaults will be used.
+	@echo 
+	@echo You must specify a target machine to build the library.
+	@echo Only one version of the library can exist at a time.
+	@echo 
+	@echo make sp1-spectrum      (256x192 pixel, 32x24 attribute)
+	@echo make sp1-ts2068hr      (512x192 pixel monochrome)
+	@echo
 
+sp1-spectrum:
+	cd sprites/software/sp1/spectrum ; $(MAKE) ; cd ../../../..
 
+sp1-ts2068hr:
+	cd sprites/software/sp1/ts2068hr ; $(MAKE) ; cd ../../../..
 
 clean:
 	cd assert ; $(MAKE) clean ; cd ..
@@ -1119,7 +1141,8 @@ clean:
 	cd vz ; $(RM) *.o ; cd ..
 	cd zx81 ; $(RM) *.o ; cd ..
 	$(MAKE) -C sms clean
-
+	cd sprites/software/sp1/spectrum ; $(MAKE) clean; cd ../../../..
+	cd sprites/software/sp1/ts2068hr ; $(MAKE) clean; cd ../../../..
 
 install:
 	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs
