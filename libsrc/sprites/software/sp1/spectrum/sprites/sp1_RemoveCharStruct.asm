@@ -24,7 +24,7 @@ LIB SP1RemoveSprChar
    ld d,a
    ld (hl),0                   ; not part of this draw list anymore
    inc hl
-   ld e,a                      ; de = struct update *
+   ld e,(hl)                   ; de = struct update *
    inc hl
    inc hl                      ; hl = & sp1_cs.type
    
