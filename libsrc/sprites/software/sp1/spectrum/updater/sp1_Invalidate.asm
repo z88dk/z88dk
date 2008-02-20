@@ -44,7 +44,7 @@ XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE, SP1V_DISPWIDTH, SP1V_UPDATELISTT
    push bc                       ; save b = width, c = height
    push de                       ; save first struct sp1_update in row
 
-   ; hl = last struct sp1_update + 5 in invalidated list
+   ; hl = last struct sp1_update + 6 in invalidated list
    ; de = current struct sp1_update to invalidate
 
 .collp
