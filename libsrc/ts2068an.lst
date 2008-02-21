@@ -348,4 +348,5 @@ spectrum/zx_type
 spectrum/zx_var_length
 spectrum/tape_save
 spectrum/disciple/zx_disciple.asm
+ts2068/ts_vmod
 printflike/ltoa_any
