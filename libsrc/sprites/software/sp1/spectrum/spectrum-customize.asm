@@ -43,7 +43,7 @@ defc SP1V_UPDATELISTT   = $d1ef            ; address of 2-byte variable holding 
 ;   DEFAULT MEMORY MAP
 ; ///////////////////////
 
-; With these default settings the suggested memory map is:
+; With these default settings the memory map is:
 ;
 ; ADDRESS (HEX)   LIBRARY  DESCRIPTION
 ;
@@ -54,9 +54,9 @@ defc SP1V_UPDATELISTT   = $d1ef            ; address of 2-byte variable holding 
 ; d1f7 - d1fe     SP1.LIB  pixel buffer
 ; d1ed - d1f6     SP1.LIB  update list head - a dummy struct sp1_update acting as first in invalidated list
 ;  * d1ef - d1f0  SP1.LIB  update list tail pointer (inside dummy struct sp1_update)
-; d1e2 - d1ec     --free-  11 bytes
-; d1d1 - d1e1     IM2.LIB  generic isr with one hook (17 bytes)
+; d1d4 - d1ec     --free-  25 bytes free
+; d1d1 - d1d3     -------  JP to im2 service routine (im2 table filled with 0xd1 bytes)
 ; d101 - d1d0     --free-  208 bytes
-; d000 - d100     IM2.LIB  im 2 vector table
+; d000 - d100     IM2.LIB  im 2 vector table (257 bytes)
 ; ce00 - cfff     -------  z80 stack (512 bytes) set SP=d000
 ;
