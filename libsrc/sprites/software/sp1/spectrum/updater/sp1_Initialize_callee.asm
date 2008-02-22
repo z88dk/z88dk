@@ -31,16 +31,16 @@ XDEF SP1V_UPDATELISTT
    
 .asmentry
 
-; 1. Stores locations of idtypeassoc table and sprdraw function table
-; 2. Constructs the rotation table if relevant flag set
-; 3. Initializes tile array so that ROM character set is used by
-;    default - will not alter graphic pointers for character codes
-;    set previously (any non-zero pointer is not touched)
-; 4. Resets the invalidated list to empty
-; 5. Resets the update array
+; 1. Constructs the rotation table if SP1_IFLAG_MAKE_ROTTBL flag set
+; 2. Initializes tile array so that ROM character set is used by
+;    default - if SP1_IFLAG_OVERWRITE_TILES flag is set will not alter
+;    graphic pointers for character codes set previously (any non-zero
+;    pointer is not touched)
+; 3. Resets the invalidated list to empty
+; 4. Resets the update array, generating display file addresses for
+;    each char square if SP1_IFLAG_OVERWRITE_DFILE flag is set
 ;
-; enter :  h = startup background attribute
-;          l = startup background tile
+; enter :  hl= startup background tile
 ;          a = flag, bit 0 = 1 if rotation table needed, bit 1 = 1 to overwrite all tile defs
 ;              bit 2 = 1 to overwrite screen addresses in update structs
 ; used  : af, bc, de, hl, af'
