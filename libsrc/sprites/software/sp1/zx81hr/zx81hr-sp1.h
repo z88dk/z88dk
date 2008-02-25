@@ -84,7 +84,7 @@ struct sp1_cs {                       // "char structs" - 22 bytes - Every sprit
 
    uchar              res0;           // +8  typically "LD HL,nn" opcode
    uchar             *def;            // +9  graphic definition pointer
-   uchar              res1;           // +11 typically "LD IX,nn" opcode
+   uchar              res1;           // +11 typically "LD IY,nn" opcode
    uchar              res2;           // +12
    uchar             *l_def;          // +13 graphic definition pointer for sprite character to left of this one
    uchar              res3;           // +15 typically "CALL nn" opcode
