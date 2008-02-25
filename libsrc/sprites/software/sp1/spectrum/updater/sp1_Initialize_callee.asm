@@ -139,7 +139,7 @@ XDEF SP1V_UPDATELISTT
    pop de                           ; d = attr, e = tile
    ld b,SP1V_DISPORIGY              ; b = current row coord
    ld hl,SP1V_UPDATEARRAY           ; hl = current struct sp1_update
-   bit 2,a
+   bit 2,c
    ex af,af
    
 .rowloop

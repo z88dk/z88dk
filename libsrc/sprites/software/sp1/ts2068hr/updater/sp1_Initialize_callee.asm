@@ -1,6 +1,6 @@
 ; void __CALLEE__ sp1_Initialize_callee(uchar iflag, uchar tile)
 ; 02.2008 aralbrec, Sprite Pack v3.0
-; sinclair spectrum version
+; ts2068 hi-res version
 
 INCLUDE "ts2068hr/customize.asm"
 
@@ -136,7 +136,7 @@ XDEF SP1V_UPDATELISTT
    pop de                           ; de = tile code
    ld b,SP1V_DISPORIGY              ; b = current row coord
    ld hl,SP1V_UPDATEARRAY           ; hl = current struct sp1_update
-   bit 2,a
+   bit 2,c
    ex af,af
    
 .rowloop
