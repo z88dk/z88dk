@@ -31,6 +31,17 @@ sp1-ts2068hr:
 	@echo
 	@echo all done
 	@echo
+	
+sp1-zx81hr:
+	@echo
+	@echo SP1 Software Sprite Engine 
+	@echo making zx81 hrg version
+	@echo
+	$(LIBLINKER) -x../../../$(OUTPUT_DIRECTORY)/sp1 -IXIY @zx81hr.lst
+	cp zx81hr/zx81hr-sp1.h ../../../../include/sprites/sp1.h
+	@echo
+	@echo all done
+	@echo
 
 clean:
 	$(RM) *.o
@@ -42,3 +53,7 @@ clean:
 	$(RM) ts2068hr/sprites/draw/*.o
 	$(RM) ts2068hr/tiles/*.o
 	$(RM) ts2068hr/updater/*.o
+	$(RM) zx81hr/sprites/*.o
+	$(RM) zx81hr/sprites/draw/*.o
+	$(RM) zx81hr/tiles/*.o
+	$(RM) zx81hr/updater/*.o

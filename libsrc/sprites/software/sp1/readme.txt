@@ -17,17 +17,25 @@ directories.
 
 // PORTING TO OTHER MACHINES
 
-Several ports are underway.  As of now two versions
+Several ports are underway.  As of now three versions
 of the library are available:
 
 1. spectrum  (256x192 pixel, 32x192 colour resolution)
 2. ts2068hr  (512x192 pixel monochrome)
+3. zx81hr    (256x192 pixel monochrome)
 
 These ports can be used as the basis for other targets
-having similar screen resolutions.  ts2068hr is suitable
-for any black and white target with memory mapped display
-and spectrum is suitable for targets with displays having
-a lower resolution character-size colour overlay.
+having similar screen resolutions.
+
+ts2068hr is suitable for any black and white target with
+memory mapped display.
+
+spectrum is suitable for targets with pixel displays
+having character-size colour overlays.
+
+If the new target's screen resolution matches one of the
+descriptions above, porting can be as simple as customizing
+two or three assembler functions.
 
 // COMPILING THE LIBRARY
 
@@ -53,7 +61,7 @@ so that C programs can include it with
 The customized sp1 library "sp1.lib" will be created in
 the {z88dk}/libsrc directory as is done with all libraries.
 Move it to the correct final location with a "make install"
-from the {z88dk|/libsrc directory.  Link to the sp1 library
+from the {z88dk}/libsrc directory.  Link to the sp1 library
 on the compile line with "-lsp1".
 
 - aralbrec 02.2008
