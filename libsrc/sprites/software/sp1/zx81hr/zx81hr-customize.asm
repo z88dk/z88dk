@@ -79,4 +79,4 @@ defc SP1V_UPDATELISTT   = $d4f0            ; address of 2-byte variable holding 
 ;  * d4f2 - d4f3  SP1.LIB  SP1V_TEMP_AF (inside dummy struct sp1_update)
 ;  * d4f6 - d4f7  SP1.LIB  SP1V_TEMP_IX (inside dummy struct sp1_update)
 ; d4ed - d4ee     SP1.LIB  SP1V_TEMP_IY
-; bced - d4ec     ZX81HRG  base graphics -- 6144 byte 256x192 display file (suggested)
+; bc6d - d4ec     ZX81HRG  base graphics -- 6144 + 128 byte 256x192 display file (suggested)
