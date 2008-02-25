@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.106 2008-02-20 23:28:23 aralbrec Exp $
+# $Id: Makefile,v 1.107 2008-02-25 10:38:59 aralbrec Exp $
 
 
 include Make.config
@@ -1092,6 +1092,7 @@ sp1:
 	@echo 
 	@echo make sp1-spectrum      (256x192 pixel, 32x24 attribute)
 	@echo make sp1-ts2068hr      (512x192 pixel monochrome)
+	@echo make sp1-zx81hr        (256x192 pixel monochrome)
 	@echo
 
 sp1-spectrum:
@@ -1099,6 +1100,9 @@ sp1-spectrum:
 
 sp1-ts2068hr:
 	cd sprites/software/sp1 ; $(MAKE) sp1-ts2068hr; cd ../../..
+
+sp1-zx81hr:
+	cd sprites/software/sp1 ; $(MAKE) sp1-zx81hr; cd ../../..
 
 clean:
 	cd assert ; $(MAKE) clean ; cd ..
