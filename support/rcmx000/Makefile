@@ -47,7 +47,7 @@ tmp_baudmeas.o: baudmeas.c baudmeas.asm
 # Use this to find out the baudrate of your Rabbit, but you only can know
 # the tty device!!
 run_baudmeas:
-	./boot $(SERDEVICE) 0 -r BAUDMEAS.LOD
+	./boot -r $(SERDEVICE) BAUDMEAS.LOD
 
 clean:
 	rm -f *.o boot mk_boot_code *.sym *.map *.LOD *.bin rcmx000_boot.asm mk_coldboot_hfile bootbytes.h tmp_* zcc_opt.def *.obj *~

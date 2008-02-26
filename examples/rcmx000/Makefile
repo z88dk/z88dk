@@ -1,6 +1,6 @@
 # Z88DK - Rabbit Control Module examples
 #
-# $Id: Makefile,v 1.2 2007-05-18 06:36:50 stefano Exp $
+# $Id: Makefile,v 1.3 2008-02-26 12:37:22 aralbrec Exp $
 
 # You NEED to set this to your baudrate divisor and your serial port
 SERDEVICE=/dev/ttyXXX
@@ -25,13 +25,13 @@ twinkle3000.bin:
 
 
 run_example:
-	$(SUPPORT)/boot $(SERDEVICE) $(BAUD_DIV) -b EXAMPLE.LOD example.bin
+	$(SUPPORT)/boot -b $(SERDEVICE) $(BAUD_DIV) example.bin
 
 run_twinkle2000:
-	$(SUPPORT)/boot $(SERDEVICE) $(BAUD_DIV) -b TWINKLE2000.LOD twinkle2000.bin
+	$(SUPPORT)/boot -b $(SERDEVICE) $(BAUD_DIV) twinkle2000.bin
 
 run_twinkle3000:
-	$(SUPPORT)/boot $(SERDEVICE) $(BAUD_DIV) -b TWINKLE3000.LOD twinkle3000.bin
+	$(SUPPORT)/boot -b $(SERDEVICE) $(BAUD_DIV) twinkle3000.bin
 
 clean:
 	rm -f *.bin ; rm -f *.LOD ; rm -f tmp_* ; rm -f zcc_opt.def ; \
