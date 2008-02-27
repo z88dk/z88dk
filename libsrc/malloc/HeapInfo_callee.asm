@@ -8,8 +8,9 @@ LIB MAHeapInfo
 
    pop af
    pop hl
-   ex af,af
+   push af
    call MAHeapInfo
+   pop af
    pop hl
    ld (hl),c
    inc hl
@@ -18,6 +19,5 @@ LIB MAHeapInfo
    ld (hl),e
    inc hl
    ld (hl),d
-   ex af,af
    push af
    ret
