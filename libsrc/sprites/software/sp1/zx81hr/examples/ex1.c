@@ -14,7 +14,6 @@
 #include <sprites/sp1.h>
 #include <malloc.h>
 #include <sys/types.h>
-#include <zx81.h>
 
 #pragma output hrgpage=48237                     // set location of the hrg display file
 long heap;                                       // malloc's heap pointer
