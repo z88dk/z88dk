@@ -33,7 +33,7 @@ XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE, SP1V_DISPWIDTH
 ;          e = col coord
 ;          b = width
 ;          c = height
-; uses  : af, bc, de, hl, af'
+; uses  : af, bc, de, hl, ixl
 
 .SP1PutTiles
 
@@ -43,14 +43,13 @@ XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE, SP1V_DISPWIDTH
    inc hl
    ex de,hl                           ; hl = struct sp1_tp *, de = & struct sp1_update
  
-   ld a,c                             ; a = height
+   ld ixl,c                           ; ixl = height
    ld c,$ff
 
 .rowloop
 
    push bc                            ; save b = width
    push de                            ; save update position
-   ex af,af                           ; a' = height
 
 .colloop
 
@@ -73,8 +72,7 @@ XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE, SP1V_DISPWIDTH
    ex de,hl                           ; de = struct sp1_update * down one row, hl = struct sp1_tp[]
    pop bc                             ; b = width
 
-   ex af,af                           ; a = height
-   dec a
+   dec ixl
    jp nz, rowloop
 
    ret
