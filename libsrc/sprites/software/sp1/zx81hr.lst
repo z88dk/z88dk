@@ -63,7 +63,7 @@ ts2068hr/tiles/sp1_ClearRect_callee
 ts2068hr/tiles/sp1_ClearRectInv
 zx81hr/tiles/sp1_ClearRectInv_callee
 spectrum/tiles/sp1_GetTiles
-zx81hr/tiles/sp1_GetTiles_callee
+ts2068hr/tiles/sp1_GetTiles_callee
 ts2068hr/tiles/sp1_PrintAt
 ts2068hr/tiles/sp1_PrintAt_callee
 ts2068hr/tiles/sp1_PrintAtInv
@@ -71,7 +71,7 @@ ts2068hr/tiles/sp1_PrintAtInv_callee
 zx81hr/tiles/sp1_PrintString
 zx81hr/tiles/sp1_PrintString_callee
 spectrum/tiles/sp1_PutTiles
-zx81hr/tiles/sp1_PutTiles_callee
+ts2068hr/tiles/sp1_PutTiles_callee
 spectrum/tiles/sp1_PutTilesInv
 zx81hr/tiles/sp1_PutTilesInv_callee
 spectrum/tiles/sp1_ScreenStr

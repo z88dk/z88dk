@@ -186,44 +186,49 @@ XREF SP1V_PIXELBUFFER, SP1V_TILEARRAY
    ; hl = screen address for char
    ; de = tile definition
    
+   push bc
+   ld bc,32
+   
    ld a,(de)                 ; copy tile directly to screen
    ld (hl),a
-   inc h
+   add hl,bc
    inc de
    
    ld a,(de)
    ld (hl),a
-   inc h
+   add hl,bc
    inc de
 
    ld a,(de)
    ld (hl),a
-   inc h
+   add hl,bc
    inc de
 
    ld a,(de)
    ld (hl),a
-   inc h
+   add hl,bc
    inc de
 
    ld a,(de)
    ld (hl),a
-   inc h
+   add hl,bc
    inc de
 
    ld a,(de)
    ld (hl),a
-   inc h
+   add hl,bc
    inc de
 
    ld a,(de)
    ld (hl),a
-   inc h
+   add hl,bc
    inc de
 
    ld a,(de)
    ld (hl),a
 
+   pop bc
+   
    ; bc = & next sp1_update in update list
 
    ret

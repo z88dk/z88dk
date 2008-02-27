@@ -96,10 +96,9 @@ XDEF SP1V_TEMP_AF
    ; Initialize tile array to point to characters in ROM
    
    ; The problem here is that the zx81 character set is not
-   ; ascii but the entire z88dk library operates in ascii.
-   ; The character bitmaps in the zx81 ROM are in the zx81's
-   ; character set sequence.  So here we step through all
-   ; 64 bitmap definitions, convert the associated zx81
+   ; in ascii sequence and the bitmaps stored in ROM are in
+   ; the zx81 character set sequence.  So here we step through
+   ; all 64 bitmap definitions, convert the associated zx81
    ; code (0-63) to an ascii code and then store the bitmap
    ; address for that ascii code into the tile map.
    ;
@@ -154,8 +153,8 @@ XDEF SP1V_TEMP_AF
 
    ; now copy upper case tiles to lower case tiles
    
-   ld de,SP1V_TILEARRAY + 65        ; tile entry for 'A'
-   ld hl,SP1V_TILEARRAY + 97        ; tile entry for 'a'
+   ld de,SP1V_TILEARRAY + 'A'       ; tile entry for 'A'
+   ld hl,SP1V_TILEARRAY + 'a'       ; tile entry for 'a'
    ld b,26                          ; 26 letters in the english alphabet
 
 .tileloop2
@@ -182,8 +181,8 @@ XDEF SP1V_TEMP_AF
 
    dec h
 
-   inc l
-   inc e
+   inc hl
+   inc de
    djnz tileloop2
 
    ; init the invalidated list

@@ -164,7 +164,7 @@ XREF _u_malloc, _u_free, SP1V_TEMP_AF, SP1V_TEMP_IX
    ld e,(ix+9)
    ld d,(ix+10)               ; de = graphics ptr from last struct sp1_cs
 
-   pop iy                     ; iy = new struct sp1_cs
+   pop ix                     ; ix = new struct sp1_cs
 
    ld (ix+0),c                ; place 0 into struct sp1_cs.next_in_spr to indicate
    ld (ix+1),c                ;  this is currently last struct sp1_cs in sprite

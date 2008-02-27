@@ -168,7 +168,7 @@ XREF _u_malloc, _u_free, SP1V_TEMP_IX
    ld e,(ix+9)
    ld d,(ix+10)               ; de = graphics ptr from last struct sp1_cs
 
-   pop ix                     ; iy = new struct sp1_cs
+   pop ix                     ; ix = new struct sp1_cs
    
    ld hl,(SP1V_TEMP_IX)
    ld bc,4
