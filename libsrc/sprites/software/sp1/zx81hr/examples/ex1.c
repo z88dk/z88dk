@@ -9,13 +9,14 @@
 // this first test program.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx81 -vn ex1.c -o ex1.bin -create-app -startup=4 -lgfx81hr192 -lsp1 -lmalloc
+// zcc +zx81 -vn ex1.c -o ex1.bin -create-app -startup=4 -lgfx81hr192 -lsp1 -lmalloc -Ca"-IXIY"
 
 #include <sprites/sp1.h>
 #include <malloc.h>
 #include <sys/types.h>
+#include <zx81.h>
 
-extern uchar *base_graphics;                     // address of the hrg display file
+#pragma output hrgpage=48237                     // set location of the hrg display file
 long heap;                                       // malloc's heap pointer
 
 // Memory Allocation Policy
@@ -31,6 +32,7 @@ void u_free(void *addr) {
 // Clipping Rectangle for Sprites
 
 struct sp1_Rect cr = {0, 0, 32, 24};             // full screen
+struct sp1_Rect clip1 = {1, 1, 12, 12};          // clip region 1
 
 // Table Holding Movement Data for Each Sprite
 
@@ -59,26 +61,22 @@ main()
    struct sp1_ss *s;
    struct sprentry *se;
    void *temp;
-   
+
    // Initialize MALLOC.LIB
    
    heap = 0L;                  // heap is empty
    sbrk(40000, 6000);          // make available memory from 40000-45999
-   
-   // Set Suitable Location for the HRG Display File
-   
-   base_graphics = 0xbc6d;
-   
+      
    // Initialize SP1.LIB
-   
+
    sp1_Initialize(SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE, ' ');
    sp1_TileEntry(' ', hash);   // redefine graphic associated with space character
 
    sp1_Invalidate(&cr);        // invalidate entire screen so that it is all initially drawn
    sp1_UpdateNow();            // draw screen area managed by sp1 now
-   
+ 
    // Create Ten Masked Software-Rotated Sprites
-   
+
    for (i=0; i!=10; i++) {
 
       s = sprtbl[i].s = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 3, 0, i);

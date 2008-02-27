@@ -35,13 +35,13 @@
 // doorway.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx81 -vn ex4c.c -o ex4c.bin -create-app -startup=4 -lgfx81hr192 -lsp1 -lmalloc
+// zcc +zx81 -vn ex4c.c -o ex4c.bin -create-app -startup=4 -lgfx81hr192 -lsp1 -lmalloc -Ca"-IXIY"
 
 #include <sprites/sp1.h>
 #include <malloc.h>
 #include <sys/types.h>
 
-extern uchar *base_graphics;                     // address of the hrg display file
+#pragma output hrgpage=48237                     // set location of the hrg display file
 long heap;                                       // malloc's heap pointer
 
 // Memory Allocation Policy
@@ -92,10 +92,6 @@ main()
    
    heap = 0L;                  // heap is empty
    sbrk(40000, 6000);          // make available memory from 40000-45999
-   
-   // Set Suitable Location for the HRG Display File
-   
-   base_graphics = 0xbc6d;
    
    // Initialize SP1.LIB
    
