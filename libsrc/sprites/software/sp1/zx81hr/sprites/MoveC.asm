@@ -294,7 +294,6 @@
 .CCclipcol1
 
    ; IX = IX
-   ex af,af
    
 .CCclipcol0
 
@@ -401,7 +400,6 @@
 .CCcliprow1
 
    ; IX = IX
-   ex af,af
 
 .CCcliprow0
 
