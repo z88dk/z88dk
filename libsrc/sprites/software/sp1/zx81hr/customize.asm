@@ -34,15 +34,15 @@ defc SP1V_DISPHEIGHT    = 24               ; height of area managed by sp1 in ch
 ;        Buffers
 ; ///////////////////////
 
-defc SP1V_PIXELBUFFER   = $d4f8            ; address of an 8-byte buffer to hold intermediate pixel-draw results
+defc SP1V_PIXELBUFFER   = $bcf8            ; address of an 8-byte buffer to hold intermediate pixel-draw results
 
 ; ///////////////////////
 ;     Temp Variables
 ; ///////////////////////
 
-defc SP1V_TEMP_AF       = $d4f2
-defc SP1V_TEMP_IX       = $d4f6
-defc SP1V_TEMP_IY       = $d4ed
+defc SP1V_TEMP_AF       = $bcf2
+defc SP1V_TEMP_IX       = $bcf6
+defc SP1V_TEMP_IY       = $bced
 
 ; ///////////////////////
 ;     Data Structures
@@ -57,8 +57,8 @@ defc SP1V_ROTTBL        = $f000            ; location of the 3584-byte rotation 
 ;      SP1 Variables
 ; ///////////////////////
 
-defc SP1V_UPDATELISTH   = $d4ef            ; address of 9-byte area holding a dummy struct_sp1_update that is always the "first" in list of screen tiles to be drawn
-defc SP1V_UPDATELISTT   = $d4f0            ; address of 2-byte variable holding the address of the last struct_sp1_update in list of screen tiles to be drawn
+defc SP1V_UPDATELISTH   = $bcef            ; address of 9-byte area holding a dummy struct_sp1_update that is always the "first" in list of screen tiles to be drawn
+defc SP1V_UPDATELISTT   = $bcf0            ; address of 2-byte variable holding the address of the last struct_sp1_update in list of screen tiles to be drawn
 
 ; NOTE: SP1V_UPDATELISTT is located inside the dummy struct_sp1_update pointed at by SP1V_UPDATELISTH
 
@@ -73,10 +73,10 @@ defc SP1V_UPDATELISTT   = $d4f0            ; address of 2-byte variable holding 
 ; f200 - ffff     SP1.LIB  horizontal rotation tables
 ; f000 - f1ff     SP1.LIB  tile array
 ; d500 - efff     SP1.LIB  update array for 32x24 display
-; d4f8 - d4ff     SP1.LIB  pixel buffer
-; d4ef - d4f7     SP1.LIB  update list head - a dummy struct sp1_update acting as first in invalidated list
-;  * d4f0 - d4f1  SP1.LIB  update list tail pointer (inside dummy struct sp1_update)
-;  * d4f2 - d4f3  SP1.LIB  SP1V_TEMP_AF (inside dummy struct sp1_update)
-;  * d4f6 - d4f7  SP1.LIB  SP1V_TEMP_IX (inside dummy struct sp1_update)
-; d4ed - d4ee     SP1.LIB  SP1V_TEMP_IY
-; bc6d - d4ec     ZX81HRG  base graphics -- 6144 + 128 byte 256x192 display file (suggested)
+; bd00 - d4ff     ZX81HRG  256x192 display file (suggested, least significant 5 bits of address must be 0)
+; bcf8 - bcff     SP1.LIB  pixel buffer
+; bcef - bcf7     SP1.LIB  update list head - a dummy struct sp1_update acting as first in invalidated list
+;  * bcf0 - bcf1  SP1.LIB  update list tail pointer (inside dummy struct sp1_update)
+;  * bcf2 - bcf3  SP1.LIB  SP1V_TEMP_AF (inside dummy struct sp1_update)
+;  * bcf6 - bcf7  SP1.LIB  SP1V_TEMP_IX (inside dummy struct sp1_update)
+; bced - bcee     SP1.LIB  SP1V_TEMP_IY
