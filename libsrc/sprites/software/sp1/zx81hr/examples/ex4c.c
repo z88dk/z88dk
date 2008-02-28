@@ -41,7 +41,7 @@
 #include <malloc.h>
 #include <sys/types.h>
 
-#pragma output hrgpage=48237                     // set location of the hrg display file
+#pragma output hrgpage=48384                     // set location of the hrg display file
 long heap;                                       // malloc's heap pointer
 
 // Memory Allocation Policy
