@@ -1,4 +1,4 @@
 	XLIB standard_font
 
 .standard_font
-        BINARY  "sms/font8.bin"
+        BINARY  "sms/FONT8.bin"

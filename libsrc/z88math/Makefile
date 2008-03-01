@@ -17,7 +17,7 @@ all: z88math
 
 
 z88math: $(OBJECTS)
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/z88_math @z88list
+	$(LIBLINKER) -x../$(OUTPUT_DIRECTORY)/z88_math @z88list
 
 .c.o:
 	zcc $(CFLAGS) -math-z88 -D__Z88__ -D__NATIVE_MATH__ $*.c

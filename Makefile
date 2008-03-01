@@ -2,12 +2,13 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.30 2004-09-22 16:25:25 dom Exp $
+#	$Id: Makefile,v 1.31 2008-03-01 10:20:25 aralbrec Exp $
 #
 
 # ---> Configurable parameters are below his point
 
 prefix = /usr/local
+prefix_share = $(prefix)/share
 
 # The default machine, the lib/config/DEFAULT.cfg file is copied to zcc.cfg
 DEFAULT = z88
@@ -92,29 +93,27 @@ install-libs:
 
 
 install:
-	mkdir -p -m 755 $(prefix)/bin $(prefix)/lib 
-	mkdir -p -m 755 $(prefix)/lib/z88dk  $(prefix)/lib/z88dk/lib
-	mkdir -p -m 755 $(prefix)/lib/z88dk/lib/clibs  $(prefix)/lib/z88dk/lib/config
-	cd src/appmake ; $(MAKE) PREFIX=$(prefix) install
-	cd src/copt ; $(MAKE) PREFIX=$(prefix) install
-	cd src/cpp ; $(MAKE) PREFIX=$(prefix) install
-	cd src/sccz80 ; $(MAKE) PREFIX=$(prefix) install
-	cd src/z80asm ; $(MAKE) PREFIX=$(prefix) install
-	cd src/zcc ; $(MAKE) PREFIX=$(prefix) install
-	./config.sh $(prefix)/lib/z88dk/ $(DEFAULT)
-	cp -R -p include $(prefix)/lib/z88dk
-	cp -R -p lib $(prefix)/lib/z88dk
-	find $(prefix)/lib/z88dk/include -name '*.h' | xargs chmod 644
-	find $(prefix)/lib/z88dk/include -type d | xargs chmod 755
-	find $(prefix)/lib/z88dk/lib -type f | xargs chmod 644
-	find $(prefix)/lib/z88dk/lib -type d | xargs chmod 755
-
-
+	mkdir -p -m 755 $(DESTDIR)/$(prefix)/bin $(DESTDIR)/$(prefix_share)/z88dk
+	mkdir -p -m 755 $(DESTDIR)/$(prefix_share)/z88dk/lib
+	mkdir -p -m 755 $(DESTDIR)/$(prefix_share)/z88dk/lib/clibs 
+	mkdir -p -m 755 $(DESTDIR)/$(prefix_share)/z88dk/lib/config
+	cd src/appmake ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd src/copt ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd src/cpp ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd src/sccz80 ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd src/z80asm ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd src/zcc ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	./config.sh $(prefix_share)/z88dk/ $(DEFAULT)
+	cp -R -p include $(DESTDIR)/$(prefix_share)/z88dk
+	cp -R -p lib $(DESTDIR)/$(prefix_share)/z88dk
+	find $(DESTDIR)/$(prefix_share)/z88dk -type f -exec chmod 644 {} \;
+	find $(DESTDIR)/$(prefix_share)/z88dk -type d -exec chmod 755 {} \;
 
 clean: clean-bins
 	cd libsrc ; $(MAKE) clean
 	cd lib/config ; $(RM) *.cfg
 	cd lib/clibs ; $(RM) *.lib
+	find -type f -name "*.o" -exec rm -f {} \;
 
 clean-bins:
 	cd src/appmake ; $(MAKE) clean
