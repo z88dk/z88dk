@@ -1,4 +1,4 @@
-z88dk - v1.7 15 Jul 2007
+z88dk - v1.8 XX Mar 2008
 ========================
 
 z88dk is a Z80 cross compiler producing binaries for over 20 different z80
@@ -25,7 +25,7 @@ installed on a system wide basis.
 Preparation
 -----------
 
-If your compiler is not gcc ensure that the correct machine type is defined
+If your compiler is not gcc, ensure that the correct machine type is defined
 in src/z80asm/config.h and that the ENDIAN status is set accordingly - if
 you are using gcc on unix machines (including MacOS X) then this will be
 automatically defined.
@@ -63,6 +63,27 @@ You should be ready to go!
 --8<--
 
 CHANGES (brief)
+
+z88dkv1.8 XX.3.2008
+
+- [sccz80] Bug fixes
+- [cpp] DATE directive now outputs the date in a sensible format
+- [lib] crt0: Different versions of the library are built to avoid index
+  registers or alternate registers depending on the target
+- [lib] A simple Xlib emulation has been imported and is available to ports
+  with graphics capabilities
+- [lib] CPC: Stability improvements
+- [lib] ZX: Direct access to Opus Discovery is available
+- [lib] ZX81: Stability improvements
+- [lib] ZX81: High Res graphics are available
+- [lib] ZX81: SP1 sprite ackage support
+- [lib] TS2068: SP1 sprite package support
+- [lib] Newbrain: fcntl support
+- [lib] MSX: Improved support
+- [lib] MSX: 1 bit sound
+- [lib] ABC80: graphics
+- [lib] TEST: New test target for supporting a testing infrastructure
+
 
 z88dkv1.7 15.7.2007
 
