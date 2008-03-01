@@ -8,6 +8,8 @@
 #make clean
 
 mkdir bin
+PATH=`pwd`/bin:$PATH
+export PATH
 
 Z80_OZFILES=`pwd`/lib/
 ZCCCFG=`pwd`/lib/config/
