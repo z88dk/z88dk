@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.31 2008-03-01 10:20:25 aralbrec Exp $
+#	$Id: Makefile,v 1.32 2008-03-01 15:06:51 dom Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -113,7 +113,7 @@ clean: clean-bins
 	cd libsrc ; $(MAKE) clean
 	cd lib/config ; $(RM) *.cfg
 	cd lib/clibs ; $(RM) *.lib
-	find -type f -name "*.o" -exec rm -f {} \;
+	find . -name "*.o" -type f -exec rm -f {} \;
 
 clean-bins:
 	cd src/appmake ; $(MAKE) clean
