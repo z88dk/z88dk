@@ -212,7 +212,7 @@ printflike/vsscanf
 graphics/circle
 graphics/spectrum/clg
 graphics/clga
-graphics/clrarea2
+graphics/clrarea
 graphics/dcircle
 graphics/draw
 graphics/drawb
