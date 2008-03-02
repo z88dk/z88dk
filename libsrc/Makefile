@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.108 2008-03-01 10:21:13 aralbrec Exp $
+# $Id: Makefile,v 1.109 2008-03-02 21:28:43 aralbrec Exp $
 
 
 include Make.config
@@ -73,6 +73,8 @@ tideps:
 	$(RM) -f graphics/gray/ticalc/*.o
 
 zx81deps:
+	$(RM) -f strings/*.o
+	$(RM) -f stdlib/*.o
 	$(RM) -f stdio/*.o
 	$(RM) -f stdio/ansi/zx81/*.o
 	$(RM) -f games/*.o
