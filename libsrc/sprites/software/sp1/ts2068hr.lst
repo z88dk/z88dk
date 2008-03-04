@@ -68,8 +68,8 @@ ts2068hr/tiles/sp1_PrintAt
 ts2068hr/tiles/sp1_PrintAt_callee
 ts2068hr/tiles/sp1_PrintAtInv
 ts2068hr/tiles/sp1_PrintAtInv_callee
-ts2068hr/tiles/sp1_PrintString
-ts2068hr/tiles/sp1_PrintString_callee
+spectrum/tiles/sp1_PrintString
+spectrum/tiles/sp1_PrintString_callee
 spectrum/tiles/sp1_PutTiles
 ts2068hr/tiles/sp1_PutTiles_callee
 spectrum/tiles/sp1_PutTilesInv
@@ -80,6 +80,9 @@ spectrum/tiles/sp1_SetPrintPos
 ts2068hr/tiles/sp1_SetPrintPos_callee
 spectrum/tiles/sp1_TileEntry
 spectrum/tiles/sp1_TileEntry_callee
+ts2068hr/tiles/SP1PrintString
+ts2068hr/tiles/SP1PSPOP
+ts2068hr/tiles/SP1PSPUSH
 spectrum/updater/sp1_DrawUpdateStructAlways
 spectrum/updater/sp1_DrawUpdateStructIfInv
 spectrum/updater/sp1_DrawUpdateStructIfNotRem

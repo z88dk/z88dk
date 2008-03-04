@@ -2,9 +2,7 @@
 ; CALLER linkage for function pointers
 
 XLIB sp1_PrintString
-
-LIB sp1_PrintString_callee
-XREF ASMDISP_SP1_PRINTSTRING_CALLEE
+LIB SP1PrintString, SP1PSPOP, SP1PSPUSH
 
 .sp1_PrintString
 
@@ -12,41 +10,16 @@ XREF ASMDISP_SP1_PRINTSTRING_CALLEE
    add hl,sp
    ld e,(hl)
    inc hl
-   ld d,(hl)
+   ld d,(hl)                 ; de = & string
    inc hl
    ld a,(hl)
    inc hl
    ld h,(hl)
-   ld l,a
-   ld a,(hl)
-   ld iyl,a
-   inc hl
-   ld a,(hl)
-   ld iyh,a
-   inc hl
-   ld a,(hl)
-   inc hl
-   ld b,(hl)
-   inc hl
-   ld c,(hl)
-   inc hl
-   push hl
-   ex de,hl
-   ld e,a
-   exx
-   pop hl
-   ld b,(hl)
-   inc hl
-   ld c,(hl)
-   inc hl
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   ld a,(hl)
-   ld ixl,a
-   inc hl
-   ld a,(hl)
-   ld ixh,a
-   exx
-   jp sp1_PrintString_callee + ASMDISP_SP1_PRINTSTRING_CALLEE
+   ld l,a                    ; hl = & struct sp1_pss
+   
+   push hl                   ; push & struct sp1_pss
+   call SP1PSPOP
+   call SP1PrintString
+   pop hl                    ; hl = & struct sp1_pss
+   
+   jp SP1PSPUSH

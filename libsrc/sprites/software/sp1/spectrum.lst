@@ -89,6 +89,9 @@ spectrum/tiles/sp1_SetPrintPos
 spectrum/tiles/sp1_SetPrintPos_callee
 spectrum/tiles/sp1_TileEntry
 spectrum/tiles/sp1_TileEntry_callee
+spectrum/tiles/SP1PrintString
+spectrum/tiles/SP1PSPOP
+spectrum/tiles/SP1PSPUSH
 spectrum/updater/sp1_DrawUpdateStructAlways
 spectrum/updater/sp1_DrawUpdateStructIfInv
 spectrum/updater/sp1_DrawUpdateStructIfNotRem
