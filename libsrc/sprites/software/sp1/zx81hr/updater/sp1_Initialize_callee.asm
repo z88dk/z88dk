@@ -119,7 +119,12 @@ XDEF SP1V_TEMP_AF
 
    ld a,64
    sub b
+   cp 11
+   jr c, codeok                     ; if it's a block graphic, leave in 0-10
    call zx81toasc+1                 ; convert zx81 code in A to ascii
+
+
+.codeok
    
    ld e,a                           ; de = tile array entry for ascii code
    ex de,hl                         ; hl = tile array entry, de = zx81 rom bitmap
