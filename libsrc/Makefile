@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.109 2008-03-02 21:28:43 aralbrec Exp $
+# $Id: Makefile,v 1.110 2008-03-04 11:25:55 aralbrec Exp $
 
 
 include Make.config
@@ -77,6 +77,8 @@ zx81deps:
 	$(RM) -f stdlib/*.o
 	$(RM) -f stdio/*.o
 	$(RM) -f stdio/ansi/zx81/*.o
+	$(RM) -f input/spectrum/*.o
+	$(RM) -f input/zx81/*.o
 	$(RM) -f games/*.o
 	$(RM) -f graphics/*.o
 	$(RM) -f graphics/zx81/*.o
