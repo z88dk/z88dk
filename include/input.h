@@ -173,9 +173,7 @@ struct in_UDK {        /* user defined keys structure         */
    uint up;
 };
 
-extern uint __LIB__ in_JoyKeyboard(struct in_UDK *u);
-extern uint __LIB__ __FASTCALL__ in_JoyKeyboard__fastcall(struct in_UDK *u);
-#define in_JoyKeyboard(a)  in_JoyKeyboard_fastcall(a)
+extern uint __LIB__ __FASTCALL__ in_JoyKeyboard(struct in_UDK *u);
 
 #ifdef SPECTRUM
    #include <spectrum.h>

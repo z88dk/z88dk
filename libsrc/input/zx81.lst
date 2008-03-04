@@ -2,7 +2,6 @@ input/spectrum/in_GetKey
 input/spectrum/in_GetKeyReset
 input/zx81/in_Inkey
 input/spectrum/in_JoyKeyboard
-input/spectrum/in_JoyKeyboard_fastcall
 input/zx81/in_KeyPressed
 input/zx81/in_keytranstbl
 input/zx81/in_LookupKey
