@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.110 2008-03-04 11:25:55 aralbrec Exp $
+# $Id: Makefile,v 1.111 2008-03-04 11:31:10 aralbrec Exp $
 
 
 include Make.config
@@ -24,7 +24,7 @@ all:	genlibs z88libs tilibs zxlibs \
 	ozansi_clib.lib rex_clib.lib rcmx000_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib \
 	pps_clib.lib ppsansi_clib.lib embedded_clib.lib \
-	test_clib.lib \
+	test_clib.lib sms_clib.lib \
 	zx81libs
 
 genlibs: gen_math.lib malloc.lib z80_crt0.lib ndos.lib adt.lib balloc.lib \
