@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2006-06-18 17:59:39 dom Exp $
+# $Id: Makefile,v 1.7 2008-03-05 20:35:48 dom Exp $
 
 include ../../Make.config
 
@@ -15,7 +15,7 @@ OBJECTS = $(CFILES:.c=.o)
 all: $(OBJECTS)
 
 .c.o:
-	zcc $(CFLAGS) -DNET_STDIO $*.c
+	zcc +z88 $(CFLAGS) -DNET_STDIO $*.c
 
 clean:
 	$(RM) *.o* zcc_opt.def *.sym *.map *.i $(AFILES)

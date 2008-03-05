@@ -20,7 +20,7 @@ z88math: $(OBJECTS)
 	$(LIBLINKER) -x../$(OUTPUT_DIRECTORY)/z88_math @z88list
 
 .c.o:
-	zcc $(CFLAGS) -math-z88 -D__Z88__ -D__NATIVE_MATH__ $*.c
+	zcc +zx $(CFLAGS) -math-z88 -D__Z88__ -D__NATIVE_MATH__ $*.c
 
 
 clean:

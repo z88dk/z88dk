@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.17 2007-01-09 21:54:21 stefano Exp $
+# $Id: Makefile,v 1.18 2008-03-05 20:35:48 dom Exp $
 
 include ../Make.config
 
@@ -13,19 +13,21 @@ GENCFILES = \
 AFILES = $(GENCFILES:.c=.asm)
 GENOBJECTS = $(GENCFILES:.c=.o)
 
-lz88: gen z88_stdlib
+lz88: z88_stdlib
 
-lzx: gen zx_stdlib
+lzx: zx_stdlib
 
 gen: $(GENOBJECTS)
 
 .c.o:
-	zcc $(CFLAGS) $*.c
+	zcc +test $(CFLAGS) $*.c
 
 z88_stdlib:
+	zcc +z88 $(CFLAGS) *.c
 	cd z88  ; cd ..
 
 zx_stdlib:
+	zcc +zx $(CFLAGS) *.c
 	cd spectrum  ; cd ..
 
 clean:

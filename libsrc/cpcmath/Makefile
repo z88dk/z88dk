@@ -58,7 +58,7 @@ cpc_math:
 	$(LIBLINKER) -DforCPC6128 -x../$(OUTPUT_DIRECTORY)/6128_math @468list
 
 .c.o:
-	zcc $(CFLAGS) -D__CPC__ -D__NATIVE_MATH__  $*.c
+	zcc +cpc $(CFLAGS) -D__CPC__ -D__NATIVE_MATH__  $*.c
 
 clean:
 	$(RM) *.o* *.sym *.map *.err  zcc_opt.def *.i $(AFILES)

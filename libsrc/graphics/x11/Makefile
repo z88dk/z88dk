@@ -1,12 +1,12 @@
 #
 # Makefile for X-Motif graphics emulation
 #
-# $Id: Makefile,v 1.1 2007-12-21 08:04:23 stefano Exp $
+# $Id: Makefile,v 1.2 2008-03-05 20:35:46 dom Exp $
 
 include ../../Make.config
 
 all:	
-	zcc $(CFLAGS) *.c
+	zcc +test $(CFLAGS) *.c
 	$(LIBLINKER) -x../../x11.lib @x11.lst
 
 clean:

@@ -26,7 +26,7 @@ OBJECTS = $(CFILES:.c=.o)
 all: $(OBJECTS)
 
 .c.o:
-	zcc $(CFLAGS) $*.c
+	zcc +test $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.err *.o* *.sym *.map zcc_opt.def *.i $(AFILES)

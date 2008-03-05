@@ -1,13 +1,13 @@
 #
 # Makefile for OZ-7xx specific libraries - lib3d
 #
-# $Id: Makefile,v 1.2 2006-06-18 17:59:38 dom Exp $
+# $Id: Makefile,v 1.3 2008-03-05 20:35:47 dom Exp $
 
 
 include ../../Make.config
 
 all:	
-	zcc $(CFLAGS) *.c
+	zcc +ozansi $(CFLAGS) *.c
 
 clean:
 	$(RM) *.o* zcc_opt.def

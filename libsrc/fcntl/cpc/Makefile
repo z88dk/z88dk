@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.2 2006-06-18 17:59:37 dom Exp $
+# $Id: Makefile,v 1.3 2008-03-05 20:35:46 dom Exp $
 
 include ../../Make.config
 
@@ -22,7 +22,7 @@ OBJECTS = $(CFILES:.c=.o)
 cpc_fcntl: $(OBJECTS)
 
 .c.o:
-	zcc $(CFLAGS)  -D__CPC__  $*.c
+	zcc +cpc $(CFLAGS)  -D__CPC__  $*.c
 
 
 clean:

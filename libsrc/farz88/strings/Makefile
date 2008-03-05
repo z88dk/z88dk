@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.6 2006-06-18 17:59:37 dom Exp $
+# $Id: Makefile,v 1.7 2008-03-05 20:35:46 dom Exp $
 
 
 include ../../Make.config
@@ -9,7 +9,7 @@ include ../../Make.config
 all: 	strdup_far.o
 
 .c.o:
-	zcc $(CFLAGS) $*.c
+	zcc +z88 $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* *.sym *.map *~ *.err zcc_opt.def

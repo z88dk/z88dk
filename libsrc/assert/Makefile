@@ -9,7 +9,7 @@ include ../Make.config
 all: assert.o
 
 .c.o:
-	zcc $(CFLAGS) $*.c
+	zcc +test $(CFLAGS) $*.c
 
 
 clean:

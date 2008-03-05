@@ -29,7 +29,7 @@ net: $(OBJECTS)
 	$(LIBLINKER) -x../$(OUTPUT_DIRECTORY)/netdev @zsockdev_list
 
 .c.o:
-	zcc $(CFLAGS) $*.c 
+	zcc +z88 $(CFLAGS) $*.c 
 
 clean:
 	$(RM) *.obj *.sym *.map *.o* *.i zcc_opt.def $(AFILES)
