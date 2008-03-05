@@ -1,7 +1,5 @@
 stdio/cpm/fgetc_cons
-stdio/fgets_cons
 stdio/cpm/getk
-stdio/puts_cons
 stdio/cpm/fputc_cons
 fcntl/cpm/bdos
 fcntl/cpm/close
