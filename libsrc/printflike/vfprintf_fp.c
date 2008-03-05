@@ -11,6 +11,8 @@
 
 #include <stdio.h>
 #include <float.h>
+extern __LIB__ utoi() ;
+
 
 #define ERR -1
 
