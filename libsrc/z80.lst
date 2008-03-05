@@ -23,6 +23,7 @@ stdio/fgets
 stdio/fopen
 stdio/fopen_z88
 stdio/fdopen
+stdio/fgets_cons
 stdio/fputc
 stdio/fputs
 stdio/fread
