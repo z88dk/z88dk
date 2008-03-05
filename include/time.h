@@ -5,7 +5,7 @@
  *
  *      djm 9/1/2000
  *
- *	$Id: time.h,v 1.9 2007-06-20 09:01:51 stefano Exp $
+ *	$Id: time.h,v 1.10 2008-03-05 21:08:37 dom Exp $
  */
 
 
@@ -32,6 +32,10 @@
 
 #ifdef __Z88__
 #define CLOCKS_PER_SEC 100
+#endif
+
+#ifndef CLOCKS_PER_SEC
+#define CLOCKS_PER_SEC 50
 #endif
 
 
