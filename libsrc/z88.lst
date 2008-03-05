@@ -1,4 +1,3 @@
-@z80.lst
 stdio/z88/fgetc_cons
 stdio/z88/fgets_cons
 stdio/z88/fputc_cons
@@ -56,3 +55,4 @@ rs232/z88/rs232_get
 rs232/z88/rs232_init
 rs232/z88/rs232_params
 rs232/z88/rs232_put
+@z80.lst
