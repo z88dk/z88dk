@@ -13,25 +13,22 @@ XLIB rcmx_cpdr
    scf
    ret
 
-.loop1
-
-   dec c
-
-.loop2
+.loop
 
    dec hl
 
 .enterloop
 
+   dec bc
    cp (hl)
    jr z, match
    
-   dec c
    inc c
-   jp nz, loop1
-
    dec c
-   djnz loop2
+   jp nz, loop
+
+   inc b
+   djnz loop
    
 .nomatch
 
@@ -51,7 +48,6 @@ XLIB rcmx_cpdr
 .match
 
    dec hl
-   dec bc
    push af
 
    ld a,b
