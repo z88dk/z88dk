@@ -32,12 +32,15 @@ stdio/freopen_z88
 stdio/fseek
 stdio/ftell
 stdio/fwrite
+stdio/gets
 stdio/vfprintf_mini
 stdio/printk
 stdio/printn
 stdio/puts
 stdio/ungetc
 stdio/fabandon
+stdio/fgets_cons
+stdio/puts_cons
 stdlib/abs
 stdlib/atexit
 stdlib/atoi
