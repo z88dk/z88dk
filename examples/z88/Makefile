@@ -7,22 +7,22 @@ info:
 	@echo Building examples..
 
 ansitest:
-	- zcc -lz88ansi_clib ansitest.c -o ansitest.bas
+	- zcc +z88 -lz88ansi_clib ansitest.c -o ansitest.bas
 
 anstst16:
-	- zcc -lz88ans~1 ansitest.c -o ansitest.bas
+	- zcc +z88 -lz88ans~1 ansitest.c -o ansitest.bas
 
 cube:
-	- zcc -lm -lgfx cube.c -o cube.bas
+	- zcc +z88 -lm -lgfx cube.c -o cube.bas
 
 cubez88:
-	- zcc -lmz -lgfx cube.c -o cubez88.bas
+	- zcc +z88 -lmz -lgfx cube.c -o cubez88.bas
 
 dstar:
-	- zcc -lgfx dstar.c -o dstar.bas
+	- zcc +z88 -lgfx dstar.c -o dstar.bas
 
 gfx:
-	- zcc -lgfx gfx.c -o gfx.bas
+	- zcc +z88 -lgfx gfx.c -o gfx.bas
 
 clean:
 	$(RM) ansitest.bas cube.bas cubez88.bas dstar.bas gfx.bas 
