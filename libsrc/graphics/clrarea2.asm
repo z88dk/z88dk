@@ -4,7 +4,7 @@
 	lib leftbitmask, rightbitmask
 
 ;
-;	$Id: clrarea2.asm,v 1.1 2008-03-02 13:43:19 stefano Exp $
+;	$Id: clrarea2.asm,v 1.2 2008-03-07 07:12:09 stefano Exp $
 ;
 
 ; ***********************************************************************
@@ -13,118 +13,104 @@
 ;
 ; Design & programming by Gunther Strube, Copyright (C) InterLogic 1995
 ;
+; Generic SMC version by Stefano Bodrato.
+;
+;
 ;
 ; IN:	HL	= (x,y)
 ;	BC	= (width,heigth)
-;
-;	  Variables on stack; ix pointer to base of variables:
-;
-;		(ix+0)	y
-;		(ix+1)	height
-;		(ix+2,3)	adr0
-;
-;		(ix+4)	bitmask0		bitmask for leftmost byte of pixel row
-;		(ix+5)	bitmask1		bitmask for rightmost byte of pixel row
-;		(ix+6)	rowbytes		number of bytes in pixel row to clear
-;
-; OUT: None. (graphics area is scrolled)
 ;
 ; Registers changed after return:
 ;   ......../IXIY same
 ;   AFBCDEHL/.... different
 ;
 
-.cleararea		push	ix
-				;push	iy
-				ld	de,0
-				ex	de,hl
-				add	hl,sp
-				ex	de,hl
-				ld	ix,-7
-				add	ix,sp		; ix	points at	base	of variables
-				ld	sp,ix		; local variable area created
-				push	de			; remember pointer to original ix,	iy
+.adr0		defw	0
 
-				ld	(ix+0),l		; remember y
-				ld	(ix+1),c		; remember height
-				push	bc
-				call	PixelAddress	; adr0, bitpos0 = PixelAddress(x,y)
-				ld	(ix+2),e
-				ld	(ix+3),d
-				call	leftbitmask
-				ld	(ix+4),a		; bitmask0 = LeftBitMask(bitpos0)
-				pop	bc
-				ld	a,h
-				add	a,b
-				dec	a
-				ld	h,a
-				push	de
-				call	PixelAddress	; adr1, bitpos1 = PixelAddress(x+width-1,y)
-				call	rightbitmask
-				ld	(ix+5),a		; bitmask1 = LeftBitMask(bitpos0)
-				pop	hl
-				ex	de,hl
-				cp	a
-				sbc	hl,de		; (adr1-adr0)
-				srl	l
-				srl	l
-				srl	l
-				ld	(ix+6),l		; rowbytes = (adr1-adr0) div 8, no. of bytes in row
-								; 0 means that area is within same address
-								; FOR h = 1 TO height
+.cleararea
+			ld	(coord+1),hl		; SMC: remember y,x
+			inc	b
+			push	bc			; remember height
+			push	bc
+			call	pixeladdress	; adr0, bitpos0 = pixeladdress(x,y)
+			ld	(adr0),de
+			call	leftbitmask
+			ld	(bitmaskl1+1),a		; bitmask0 = LeftBitMask(bitpos0)
+			ld	(bitmaskl2+1),a		; bitmask0 = LeftBitMask(bitpos0)
+			pop	bc
+			ld	a,h
+			add	a,b
+			dec	a
+			ld	h,a
+			push	de
+			push	hl
+			call	pixeladdress	; adr1, bitpos1 = pixeladdress(x+width-1,y)
+			pop	hl
+			call	rightbitmask
+			ld	(bitmaskr1+1),a		; bitmask1 = LeftBitMask(bitpos0)
+			ld	(bitmaskr2+1),a		; bitmask1 = LeftBitMask(bitpos0)
+			pop	hl
+			ex	de,hl
+			cp	a
+			sbc	hl,de		; (adr1-adr0)
+			srl	l
+			srl	l
+			srl	l
+			ld	a,l
+			ld	(rowbytes1+1),a
+			ld	(rowbytes2+1),a		; rowbytes = (adr1-adr0) div 8, no. of bytes in row
+							; 0 means that area is within same address
+							; FOR h = 1 TO height
 .clear_height
-				ld	l,(ix+2)
-				ld	h,(ix+3)			; offset = adr0
-				xor	a
-				cp	(ix+6)			; if rowbytes = 0
-				jr	nz, clear_row			; area is within one byte...
-					ld	a,(hl)
-					and	(ix+4)			; preserve bits of leftmost side of byte
-					ld	b,a
-					ld	a,(hl)
-					and	(ix+5)
-					ld	c,a
-					xor	a				; clear byte
-					or	b				; merge preserved bits of left side
-					or	c				; merge preserve bits of right side
-					ld	(hl),a			; (offset) = byte
-					jr	clear_nextrow	; else
-.clear_row								; clear area is defined as rows of bytes
-					ld	a,(hl)
-					and	(ix+4)			; preserve only leftmost bits (outside of area)
-					ld	(hl),a			; (offset) = (offset) AND bitmask0
-					ld	bc,8
-					add	hl,bc			; offset += 8
-					ld	b,(ix+6)			; r = rowbytes
-					dec	b				; --r
-					jr	z, row_cleared		; if	( r )
+			ld	hl,(adr0)
+			xor	a
+.rowbytes1		cp	0			; if rowbytes = 0
+			jr	nz, clear_row			; area is within one byte...
+			ld	a,(hl)
+.bitmaskl1		and	0			; preserve bits of leftmost side of byte
+			ld	b,a
+			ld	a,(hl)
+.bitmaskr1		and	0
+			ld	c,a
+			xor	a				; clear byte
+			or	b				; merge preserved bits of left side
+			or	c				; merge preserve bits of right side
+			ld	(hl),a			; (offset) = byte
+			jr	clear_nextrow	; else
+.clear_row						; clear area is defined as rows of bytes
+			ld	a,(hl)
+.bitmaskl2		and	0			; preserve only leftmost bits (outside of area)
+			ld	(hl),a			; (offset) = (offset) AND bitmask0
+			ld	bc,8
+			add	hl,bc			; offset += 8
+.rowbytes2		ld	b,0			; r = rowbytes
+			dec	b				; --r
+			jr	z, row_cleared		; if	( r )
 .clear_row_loop			push	bc				; do
-						ld	(hl),0				; (offset) = 0
-						ld	bc,8
-						add	hl,bc				; offset += 8
-						pop	bc
-					djnz	clear_row_loop			; while ( r-- != 0 )
-.row_cleared			ld	a,(hl)			; byte = (adr1)
-					and	(ix+5)
-					ld	(hl),a			; preserve only rightmost side of byte (outside area)
+				ld	(hl),0				; (offset) = 0
+				ld	bc,8
+				add	hl,bc				; offset += 8
+				pop	bc
+				djnz	clear_row_loop			; while ( r-- != 0 )
+.row_cleared		ld	a,(hl)			; byte = (adr1)
+.bitmaskr2		and	0
+			ld	(hl),a			; preserve only rightmost side of byte (outside area)
 
-.clear_nextrow		inc	(ix+0)			; inc y
-				ld	a,(ix+0)
-				and	@00000111			; if	y MOD 8 <> 0
-				jr	z, clear_newline
-					inc	(ix+2)			; inc adr0
-					jr	clear_next_h
-									; else
-.clear_newline			ld	a,(ix+2)
-					add	a,256-7
-					ld	(ix+2),a
-					inc	(ix+3)			; adr0 += 256 (address of start of row)
+.clear_nextrow
+			push	de
+.coord			ld	hl,0		; SMC -> y,x
+			inc	l
+			ld	(coord+1),hl	; SMC -> y,x
+			call	pixeladdress
+			ld	(adr0),de
+			pop	de
+			
+.clear_next_h		
+			;dec	(height)		; END FOR	h
+.height			pop	bc
+			dec	c			; height
+			push	bc
+			jp	nz, clear_height
+			pop	bc
 
-.clear_next_h		dec	(ix+1)		; END FOR	h
-				jp	nz, clear_height
-
-.end_cleararea		pop	hl
-				ld	sp,hl		; pointer to original ix, iy
-				;pop	iy
-				pop	ix
-				ret
+.end_cleararea		ret

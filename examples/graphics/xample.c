@@ -2,7 +2,7 @@
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
 
-#pragma output hrgpage=36000
+#pragma output hrgpage=36096
 
 #include <stdio.h>
 #include "icon"
