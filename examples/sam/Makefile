@@ -41,4 +41,4 @@ ansi:
 
 
 clean:
-	$(RM) *.i *.asm *.op* *.o *~ zcc_opt.def $(PROGS)
+	$(RM) *.i *.asm *.op* *.o *~ zcc_opt.def $(PROGS) 
