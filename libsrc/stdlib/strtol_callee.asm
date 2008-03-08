@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol_callee.asm,v 1.5 2007-04-07 03:05:56 aralbrec Exp $
+; * $Id: strtol_callee.asm,v 1.6 2008-03-08 11:28:15 aralbrec Exp $
 ; *
 ; */
 ;
@@ -208,14 +208,14 @@ XDEF ASMDISP_STRTOL_CALLEE
 .havedigit
 
    push bc                   ; save char *
-   ex af,af
+   push af
    
    ld bc,0                   ; push base on stack
    push bc
    push ix
    call l_long_mult          ; dehl = dehl * base
 
-   ex af,af
+   pop af
    pop bc                    ; bc = char *
    
    ; now add in digit
