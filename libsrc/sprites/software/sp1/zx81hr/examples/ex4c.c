@@ -3,13 +3,15 @@
 // EXAMPLE PROGRAM #4C
 // 04.2006 aralbrec
 //
+// Beginning from ex4a.c we have ten sprites, five of them
+// MASK and five of them XOR to distinguish between them.
 // Up to this point we have been using a single clipping
 // rectangle in all the sp1_MoveSpr*() calls we have been
-// making with little explanation of what this clipping rectangle
+// making with little explanation what this clipping rectangle
 // is for.  It's exactly what you think it is -- the sprite
 // is drawn such that only the parts of the sprite inside
-// the rectangle get drawn.  By using the full screen as
-// clipping rectangle up to this point we have been
+// the rectangle are made visible.  By using the full screen
+// as clipping rectangle up to this point we have been
 // accomplishing one important function of the clipping
 // rectangle and that is preventing the sprite engine from
 // drawing into non-existent areas of the screen.
@@ -17,16 +19,15 @@
 // Now we are going to use the clipping rectangle for a
 // second purpose which is to control where the sprites
 // can appear on screen.  Two new clipping rectangles are
-// defined and the sp1_MoveSprAbs() call in the main loop
+// defined and the sp1_MoveSprRel() call in the main loop
 // uses clipping rectangle #1 for the first five sprites
-// created (the MASKed sprites) and clipping rectangle #2
-// for the rest (the XOR sprites).  The result is,
-// although the sprites are freely moving across the
-// entire screen, they are only drawn when they appear
-// in their respective clipping rectangles.
+// (the MASK ones remember) and clipping rectangle #2
+// for the rest (the XOR ones).  The result is, although the
+// rectangles are freely moving across the entire screen,
+// they are only visible when they appear in their respective
+// clipping rectangles.
 //
 // Clipping can only be done to character cell boundaries.
-//
 // Among applications of this, consider a vertical gate
 // hidden in a doorway.  As the player approaches it drops
 // closed.  If the gate is a sprite with clipping rectangle
@@ -35,7 +36,7 @@
 // doorway.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx81 -vn ex4c.c -o ex4c.bin -create-app -startup=4 -lgfx81hr192 -lsp1 -lmalloc -Ca"-IXIY"
+// zcc +zx81 -vn ex4c.c -o ex4c.bin -create-app -startup=4 -lsp1 -lmalloc
 
 #include <sprites/sp1.h>
 #include <malloc.h>
@@ -44,8 +45,8 @@
 #pragma output hrgpage=48384                     // set location of the hrg display file
 long heap;                                       // malloc's heap pointer
 
-// Memory Allocation Policy
-
+// Memory Allocation Policy                      // the sp1 library will call these functions
+                                                 //  to allocate and deallocate dynamic memory
 void *u_malloc(uint size) {
    return malloc(size);
 }
@@ -79,7 +80,7 @@ uchar hash[] = {0x55,0xaa,0x55,0xaa,0x55,0xaa,0x55,0xaa};
 
 // Attach C Variable to Sprite Graphics Declared in ASM at End of File
 
-extern uchar gr_window[];
+extern uchar gr_window[];      // gr_window will hold the address of the asm label _gr_window
 
 main()
 {
@@ -91,7 +92,7 @@ main()
    // Initialize MALLOC.LIB
    
    heap = 0L;                  // heap is empty
-   sbrk(40000, 6000);          // make available memory from 40000-45999
+   sbrk(40000, 5000);          // add 40000-44999 to malloc
    
    // Initialize SP1.LIB
    

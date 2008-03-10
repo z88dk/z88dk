@@ -4,16 +4,16 @@
 // 04.2006 aralbrec
 //
 // In ex4a.c we used sp1_IterateSprChar() to call our function
-// once for each "struct sp1_cs" character cell in the sprite.
+// once for each "struct sp1_cs" character cell in a sprite.
 // We used this opportunity to change the colour of the sprite
 // char by modifying appropriate members of each "struct sp1_cs".
 //
 // sp1_IterateSprChar() actually iterates over a sprite's char
-// cells in row-major order.  That is left-to-right, top-to-
+// cells in row-major order.  That is, left-to-right, top-to-
 // bottom.  It also passes two parameters to the user function:
 // a count, beginning at zero and incremented for each sprite
-// cell visited, and a actual "struct sp1_cs" being visited.
-// In ex4a.c we ignored that second count parameter.
+// cell visited, and the actual "struct sp1_cs" being visited.
+// In ex4a.c we ignored the second count parameter.
 //
 // This time we use the count parameter to colour the middle
 // column of all sprites with YELLOW ink and BLACK paper.
@@ -39,8 +39,8 @@
 long heap;                                       // malloc's heap pointer
 
 
-// Memory Allocation Policy
-
+// Memory Allocation Policy                      // the sp1 library will call these functions
+                                                 //  to allocate and deallocate dynamic memory
 void *u_malloc(uint size) {
    return malloc(size);
 }
@@ -51,7 +51,7 @@ void u_free(void *addr) {
 
 // Clipping Rectangle for Sprites
 
-struct sp1_Rect cr = {0, 0, 32, 24};             // full screen
+struct sp1_Rect cr = {0, 0, 32, 24};             // rectangle covering the full screen
 
 // Table Holding Movement Data for Each Sprite
 
@@ -72,7 +72,7 @@ uchar hash[] = {0x55,0xaa,0x55,0xaa,0x55,0xaa,0x55,0xaa};
 
 // Attach C Variable to Sprite Graphics Declared in ASM at End of File
 
-extern uchar gr_window[];
+extern uchar gr_window[];      // gr_window will hold the address of the asm label _gr_window
 
 // Used to colour the sprites
 
@@ -83,7 +83,7 @@ void colourSpr(uint count, struct sp1_cs *c)
 {
    if ((count == 1) || (count == 4) || (count == 7))
    {
-      c->attr_mask = SP1_AMASK_INK & SP1_AMASK_PAPER;
+      c->attr_mask = 0xc0;        // keep background flash and bright
       c->attr = INK_YELLOW | PAPER_BLACK;
    }
    else
@@ -107,8 +107,8 @@ main()
    // Initialize MALLOC.LIB
    
    heap = 0L;                  // heap is empty
-   sbrk(40000, 10000);         // make available memory from 40000-49999
-   
+   sbrk(40000, 10000);         // add 40000-49999 to malloc
+
    // Initialize SP1.LIB
    
    zx_border(BLACK);
@@ -127,15 +127,15 @@ main()
       sp1_AddColSpr(s, SP1_DRAW_MASK2RB, 0, 0, i);
       sp1_MoveSprAbs(s, &cr, gr_window, 10, 14, 0, 4);
       
-      if (i < 5)
+      if (i < 5)                           // for the first five sprites
       {      
          attr  = INK_RED;                  // store colour in global variable
-         amask = SP1_AMASK_INK;            // store INK-only mask (defined in sp1.h) in global variable
+         amask = 0xf8;                     // store INK-only mask (set bits indicate what parts of background attr are kept)
       }
       else
       {
          attr  = INK_BLUE | PAPER_GREEN;
-         amask = SP1_AMASK_INK & SP1_AMASK_PAPER;  
+         amask = 0xc0;                     // mask will keep background flash and bright  
       }
       
       sp1_IterateSprChar(s, colourSpr);    // colour the sprite

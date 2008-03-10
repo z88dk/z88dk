@@ -19,8 +19,8 @@
 long heap;                                       // malloc's heap pointer
 
 
-// Memory Allocation Policy
-
+// Memory Allocation Policy                      // the sp1 library will call these functions
+                                                 //  to allocate and deallocate dynamic memory
 void *u_malloc(uint size) {
    return malloc(size);
 }
@@ -31,7 +31,7 @@ void u_free(void *addr) {
 
 // Clipping Rectangle for Sprites
 
-struct sp1_Rect cr = {0, 0, 32, 24};             // full screen
+struct sp1_Rect cr = {0, 0, 32, 24};             // rectangle covering the full screen
 
 // Table Holding Movement Data for Each Sprite
 
@@ -52,7 +52,7 @@ uchar hash[] = {0x55,0xaa,0x55,0xaa,0x55,0xaa,0x55,0xaa};
 
 // Attach C Variable to Sprite Graphics Declared in ASM at End of File
 
-extern uchar gr_window[];
+extern uchar gr_window[];      // gr_window will hold the address of the asm label _gr_window
 
 main()
 {
@@ -68,8 +68,8 @@ main()
    // Initialize MALLOC.LIB
    
    heap = 0L;                  // heap is empty
-   sbrk(40000, 10000);         // make available memory from 40000-49999
-   
+   sbrk(40000, 10000);         // add 40000-49999 to malloc
+
    // Initialize SP1.LIB
    
    zx_border(BLACK);

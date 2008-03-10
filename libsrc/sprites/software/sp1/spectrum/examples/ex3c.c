@@ -8,12 +8,15 @@
 // when this is done in ex2f.c but here we do it to reinforce
 // the idea.  With the background clear flag not set, nothing
 // is drawn underneath the occluding sprite, not even the
-// background tile.  Instead what appears underneath the
-// occluding sprite is the completed graphics for the
-// *previous* character cell drawn.  The results are confusing
-// visually but by controlling the order that character cells
-// are drawn will will be able to implement things like
-// mirrors and watery reflections using this feature.
+// background tile.  This means the pixel buffer used to draw
+// the graphic for the cell goes uninitialized.
+//
+// Instead what appears underneath the occluding sprite is
+// the completed graphics for the *previous* character cell
+// drawn.  The results are confusing visually but by
+// controlling the order that character cells are drawn we
+// will be able to implement things like mirrors and watery
+// reflections using this feature.
 /////////////////////////////////////////////////////////////
 
 // zcc +zx -vn ex3c.c -o ex3c.bin -create-app -lsp1 -lmalloc
@@ -26,8 +29,8 @@
 long heap;                                       // malloc's heap pointer
 
 
-// Memory Allocation Policy
-
+// Memory Allocation Policy                      // the sp1 library will call these functions
+                                                 //  to allocate and deallocate dynamic memory
 void *u_malloc(uint size) {
    return malloc(size);
 }
@@ -38,7 +41,7 @@ void u_free(void *addr) {
 
 // Clipping Rectangle for Sprites
 
-struct sp1_Rect cr = {0, 0, 32, 24};             // full screen
+struct sp1_Rect cr = {0, 0, 32, 24};             // rectangle covering the full screen
 
 // Table Holding Movement Data for Each Sprite
 
@@ -59,7 +62,7 @@ uchar hash[] = {0x55,0xaa,0x55,0xaa,0x55,0xaa,0x55,0xaa};
 
 // Attach C Variable to Sprite Graphics Declared in ASM at End of File
 
-extern uchar gr_window[];
+extern uchar gr_window[];      // gr_window will hold the address of the asm label _gr_window
 
 main()
 {
@@ -75,8 +78,8 @@ main()
    // Initialize MALLOC.LIB
    
    heap = 0L;                  // heap is empty
-   sbrk(40000, 10000);         // make available memory from 40000-49999
-   
+   sbrk(40000, 10000);         // add 40000-49999 to malloc
+
    // Initialize SP1.LIB
    
    zx_border(BLACK);

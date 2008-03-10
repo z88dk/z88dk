@@ -4,28 +4,33 @@
 // 04.2006 aralbrec
 //
 // We begin with the ten masked sprites once again and for
-// the first time add some colour.  By default created
-// sprites are transparent in colour, meaning they do not
-// alter the background colour.  We make the first half
-// of the sprites (which appear closer to the viewer) 
-// have RED ink and INK-only mask meaning they do not affect
-// the background PAPER/FLASH/BRIGHT.  The second half of
-// the sprites we make BLUE ink and GREEN paper.  When
-// a RED sprite overlaps a BLUE one you will see the colour
-// becomes RED on GREEN.  This is because the BLUE one
+// the first time add some colour.  By default sprites are
+// created transparent in colour, meaning they do not
+// alter the background colour.  We make the first five
+// sprites (which appear closer to the viewer) RED ink with
+// INK-only attribute mask meaning they will not affect the
+// background PAPER/FLASH/BRIGHT.  The attribute mask byte
+// has 1s where the background attribute should be preserved
+// before the sprite colour is ORed in to determine the
+// final colour of the square.
+//
+// The last five sprites we make BLUE ink and GREEN paper.
+// When a RED sprite overlaps a BLUE one you will see the
+// colour becomes RED on GREEN.  This is because the BLUE one
 // appears underneath the RED one, setting the paper to GREEN.
 // The RED one is then drawn on top but it is INK-only so
 // only alters the INK colour to RED.  The result is RED
 // on GREEN.
 //
-// As the sprite is created SP1 internally represents each
-// character of the sprite by a "struct sp1_cs" which you
-// can look up in the sp1 header file.  Among the properties
+// As sprites are created in sp1_CreateSpr() and sp1_AddColSpr()
+// calls, sp1 internally creates a "struct sp1_cs" for each
+// character square of the sprite, the details of which you
+// can examine in the sp1 header file.  Among the properties
 // of each sprite character stored here is the sprite char's
 // attribute (ie colour) and attribute mask (ie colour mask).
 // By using the function "sp1_IterateSprChar()" we can
-// visit all nine "struct sp1_cs" of each sprite, calling
-// a supplied function once for each of those nine structs.
+// visit all nine "struct sp1_cs" of each 3x3 sprite, calling
+// a supplied function once for each of these nine structs.
 // We supply a function that change's the struct's stored
 // colour.
 /////////////////////////////////////////////////////////////
@@ -40,8 +45,8 @@
 long heap;                                       // malloc's heap pointer
 
 
-// Memory Allocation Policy
-
+// Memory Allocation Policy                      // the sp1 library will call these functions
+                                                 //  to allocate and deallocate dynamic memory
 void *u_malloc(uint size) {
    return malloc(size);
 }
@@ -52,7 +57,7 @@ void u_free(void *addr) {
 
 // Clipping Rectangle for Sprites
 
-struct sp1_Rect cr = {0, 0, 32, 24};             // full screen
+struct sp1_Rect cr = {0, 0, 32, 24};             // rectangle covering the full screen
 
 // Table Holding Movement Data for Each Sprite
 
@@ -73,7 +78,7 @@ uchar hash[] = {0x55,0xaa,0x55,0xaa,0x55,0xaa,0x55,0xaa};
 
 // Attach C Variable to Sprite Graphics Declared in ASM at End of File
 
-extern uchar gr_window[];
+extern uchar gr_window[];      // gr_window will hold the address of the asm label _gr_window
 
 // Used to colour the sprites
 
@@ -100,8 +105,8 @@ main()
    // Initialize MALLOC.LIB
    
    heap = 0L;                  // heap is empty
-   sbrk(40000, 10000);         // make available memory from 40000-49999
-   
+   sbrk(40000, 10000);         // add 40000-49999 to malloc
+
    // Initialize SP1.LIB
    
    zx_border(BLACK);
@@ -120,15 +125,15 @@ main()
       sp1_AddColSpr(s, SP1_DRAW_MASK2RB, 0, 0, i);
       sp1_MoveSprAbs(s, &cr, gr_window, 10, 14, 0, 4);
       
-      if (i < 5)
+      if (i < 5)                           // for the first five sprites
       {      
          attr  = INK_RED;                  // store colour in global variable
-         amask = SP1_AMASK_INK;            // store INK-only mask (defined in sp1.h) in global variable
+         amask = 0xf8;                     // store INK-only mask (set bits indicate what parts of background attr are kept)
       }
-      else
+      else                                 // for the last five sprites
       {
          attr  = INK_BLUE | PAPER_GREEN;
-         amask = SP1_AMASK_INK & SP1_AMASK_PAPER;  
+         amask = 0xc0;                     // mask will keep background flash and bright  
       }
       
       sp1_IterateSprChar(s, colourSpr);    // colour the sprite

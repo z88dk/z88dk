@@ -10,8 +10,8 @@
 // making with little explanation what this clipping rectangle
 // is for.  It's exactly what you think it is -- the sprite
 // is drawn such that only the parts of the sprite inside
-// the rectangle get drawn.  By using the full screen as
-// clipping rectangle up to this point we have been
+// the rectangle are made visible.  By using the full screen
+// as clipping rectangle up to this point we have been
 // accomplishing one important function of the clipping
 // rectangle and that is preventing the sprite engine from
 // drawing into non-existent areas of the screen.
@@ -19,12 +19,12 @@
 // Now we are going to use the clipping rectangle for a
 // second purpose which is to control where the sprites
 // can appear on screen.  Two new clipping rectangles are
-// defined and the sp1_MoveSprAbs() call in the main loop
-// uses clipping rectangle #1 for the first half of the
-// sprites (those coloured red) and clipping rectangle #2
+// defined and the sp1_MoveSprRel() call in the main loop
+// uses clipping rectangle #1 for the first five sprites
+// (the red ones remember) and clipping rectangle #2
 // for the rest (those coloured blue).  The result is,
 // although the rectangles are freely moving across the
-// entire screen, they are only drawn when they appear
+// entire screen, they are only visible when they appear
 // in their respective clipping rectangles.
 //
 // Clipping can only be done to character cell boundaries.
@@ -45,9 +45,8 @@
 #pragma output STACKPTR=53248                    // place stack at $d000 at startup
 long heap;                                       // malloc's heap pointer
 
-
-// Memory Allocation Policy
-
+// Memory Allocation Policy                      // the sp1 library will call these functions
+                                                 //  to allocate and deallocate dynamic memory
 void *u_malloc(uint size) {
    return malloc(size);
 }
@@ -58,7 +57,7 @@ void u_free(void *addr) {
 
 // Clipping Rectangle for Sprites
 
-struct sp1_Rect cr = {0, 0, 32, 24};             // full screen
+struct sp1_Rect cr = {0, 0, 32, 24};             // rectangle covering the full screen
 struct sp1_Rect clip1 = {1, 1, 12, 12};          // clip region 1
 struct sp1_Rect clip2 = {10, 18, 12, 12};        // clip region 2
 
@@ -81,7 +80,7 @@ uchar hash[] = {0x55,0xaa,0x55,0xaa,0x55,0xaa,0x55,0xaa};
 
 // Attach C Variable to Sprite Graphics Declared in ASM at End of File
 
-extern uchar gr_window[];
+extern uchar gr_window[];      // gr_window will hold the address of the asm label _gr_window
 
 // Used to colour the sprites
 
@@ -108,8 +107,8 @@ main()
    // Initialize MALLOC.LIB
    
    heap = 0L;                  // heap is empty
-   sbrk(40000, 10000);         // make available memory from 40000-49999
-   
+   sbrk(40000, 10000);         // add 40000-49999 to malloc
+
    // Initialize SP1.LIB
    
    zx_border(BLACK);
@@ -133,15 +132,15 @@ main()
       sp1_AddColSpr(s, SP1_DRAW_MASK2RB, 0, 0, i);
       sp1_MoveSprAbs(s, &cr, gr_window, 10, 14, 0, 4);
       
-      if (i < 5)
+      if (i < 5)                           // for the first five sprites
       {      
          attr  = INK_RED;                  // store colour in global variable
-         amask = SP1_AMASK_INK;            // store INK-only mask (defined in sp1.h) in global variable
+         amask = 0xf8;                     // store INK-only mask (set bits indicate what parts of background attr are kept)
       }
-      else
+      else                                 // for the last five sprites
       {
          attr  = INK_BLUE | PAPER_GREEN;
-         amask = SP1_AMASK_INK & SP1_AMASK_PAPER;  
+         amask = 0xc0;                     // mask will keep background flash and bright  
       }
       
       sp1_IterateSprChar(s, colourSpr);    // colour the sprite

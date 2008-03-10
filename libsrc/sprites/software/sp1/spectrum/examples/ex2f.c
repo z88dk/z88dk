@@ -5,12 +5,20 @@
 //
 // As in ex2e.c with the occluding load sprites but this time
 // we see what happens when the SP1_TYPE_BGNDCLR flag is not
-// specified.  Backgrounds will not be drawn before occluding
-// sprites are drawn into the buffer, meaning a mix of
-// complete graphics from a previous character square and the
-// occluding sprite is drawn on screen.  This will be used
-// later to do things like reflections but for here it only
-// confuses the eye.  See if you can make sense of it all.
+// specified.  Last time SP1_TYPE_OCCLUDE was specified in
+// combination with SP1_TYPE_BGNDCLR; the occlude flag 
+// indicates to the engine not to bother drawing any graphics
+// that appear underneath the sprite but the background clear
+// flag makes an exception to draw the background tile only.
+//
+// We remove the SP1_TYPE_BGNDCLR flag so that not even the
+// background tile is drawn.  Since the pixel buffer drawn
+// into isn't initialized with the background tile graphics,
+// a mix of complete graphics from a previous character
+// square and the occluding sprite is drawn on screen.  This
+// will be used later to do things like reflections but for
+// here it only confuses the eye.  See if you can make sense
+// of it all.
 /////////////////////////////////////////////////////////////
 
 // zcc +zx -vn ex2f.c -o ex2f.bin -create-app -lsp1 -lmalloc
@@ -23,8 +31,8 @@
 long heap;                                       // malloc's heap pointer
 
 
-// Memory Allocation Policy
-
+// Memory Allocation Policy                      // the sp1 library will call these functions
+                                                 //  to allocate and deallocate dynamic memory
 void *u_malloc(uint size) {
    return malloc(size);
 }
@@ -35,7 +43,7 @@ void u_free(void *addr) {
 
 // Clipping Rectangle for Sprites
 
-struct sp1_Rect cr = {0, 0, 32, 24};             // full screen
+struct sp1_Rect cr = {0, 0, 32, 24};             // rectangle covering the full screen
 
 // Table Holding Movement Data for Each Sprite
 
@@ -56,7 +64,7 @@ uchar hash[] = {0x55,0xaa,0x55,0xaa,0x55,0xaa,0x55,0xaa};
 
 // Attach C Variable to Sprite Graphics Declared in ASM at End of File
 
-extern uchar gr_window[];
+extern uchar gr_window[];      // gr_window will hold the address of the asm label _gr_window
 
 main()
 {
@@ -72,7 +80,7 @@ main()
    // Initialize MALLOC.LIB
    
    heap = 0L;                  // heap is empty
-   sbrk(40000, 10000);         // make available memory from 40000-49999
+   sbrk(40000, 10000);         // add 40000-49999 to malloc
    
    // Initialize SP1.LIB
    
