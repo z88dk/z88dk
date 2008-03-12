@@ -4,43 +4,34 @@
 // 04.2006 aralbrec
 //
 // This will likely be a challenging example to understand
-// so be prepared for a little head-scratching.  sp1's
-// coordinate system is always rectangular just as basic's
-// is, even if you may be questioning this while trying
-// to figure out this example program :).  Speaking in terms
-// of character coordinates (0,0) is always at the top left
-// corner of sp1's display area and in these series of
-// examples, (23,31) is always at the bottom right of sp1's
-// display area.  I qualified this last sentence because
-// sp1's display area is configurable when the library is
-// compiled.  These example programs have been compiled
-// assuming the default configuration which has sp1 manage
-// the full size 32x24 screen.
+// so be prepared for a little head-scratching.  Keep in
+// mind that sp1's coordinate system is always rectangular
+// even if you may be questioning this while trying to figure
+// out this example program :).
 //
-// sp1 creates a single "struct sp1_update" for each of the
-// characters on screen that sp1 manages.  In our case there
-// are 32x24 of them.  It has already been seen that these
-// "struct sp1_update"s contain information such as the
-// background graphic occupying the character square and the
-// background colour of the character square.  One last piece
-// of information they contain is the display file address
-// where the character square should be drawn.
+// Whether background tiles are being printed (sp1_PrintAt,
+// etc) or sprites are being moved (sp1_MoveSprRel, etc)
+// the coordinates used are actually referring to the
+// array of "struct sp1_update"s that sp1 manages and not
+// to screen coordinates.  So, eg, coordinate (4,5) doesn't
+// actually refer to the screen location row=4, column=5 but
+// to the particular "struct sp1_update" in row 4, column 5
+// of sp1's update array.
 //
-// During the sp1_Initialize() call these display file
-// addresses are initialized such that the character cell
-// in coordinate (0,0) gets drawn to the physical screen
-// location corresponding to (0,0), etc.  When the program
-// instructs sp1 to print a tile at a specific coordinate
-// or to move a sprite to a specific location, these locations
-// are actually mapped to the rectangular array of "struct
-// sp1_update"s.  So, eg, location (4,5) causes sp1 to deal
-// with the specific "struct sp1_update" in row 4 and column 5.
-// The sp1_Initialize() call initialized the display file
-// address in that particular "struct sp1_update" with the
-// display file address corresponding to screen location (4,5).
-// So thus far sp1's coordinates, which refer to an array
-// of "struct sp1_update"s, correspond exactly to the screen
-// coordinates you are already familiar with.
+// If you recall, the screen address where each "struct
+// sp1_update" is drawn is actually stored inside the
+// "struct sp1_update" itself in the "screen" member.
+// During initialization (the call to sp1_Initialize)
+// the "screen" members of each "struct sp1_update"
+// were initialized such that there was a perfect
+// correspondence between screen coordinates and
+// sp1 coordinates.  So, eg, the "struct sp1_update"
+// at sp1 coordinate (4,5) had its "screen" member
+// initialized with the screen address of the character
+// in the 4th row and 5th column on the screen.
+//
+// What this has meant is there has been no difference
+// between screen coordinates and sp1 coordinates.
 //
 // In this example program we break that correspondence by
 // telling sp1 to draw certain "struct sp1_update"s at a
