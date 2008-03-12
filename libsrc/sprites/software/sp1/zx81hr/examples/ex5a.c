@@ -35,7 +35,7 @@
 // the entire screen so that everything gets drawn anyway.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx81 -startup=4 -vn ex2a.c -o ex2a.bin -create-app -lsp1 -lmalloc
+// zcc +zx81 -startup=4 -vn ex5a.c -o ex5a.bin -create-app -lsp1 -lmalloc
 
 #include <sprites/sp1.h>
 #include <malloc.h>

@@ -23,10 +23,10 @@
 // "struct sp1_update" itself in the "screen" member.
 // During initialization (the call to sp1_Initialize)
 // the "screen" members of each "struct sp1_update"
-// were initialized such that there was a perfect
+// are initialized such that there is a perfect
 // correspondence between screen coordinates and
 // sp1 coordinates.  So, eg, the "struct sp1_update"
-// at sp1 coordinate (4,5) had its "screen" member
+// at sp1 coordinate (4,5) has its "screen" member
 // initialized with the screen address of the character
 // in the 4th row and 5th column on the screen.
 //
@@ -39,7 +39,7 @@
 //
 // While the program runs, the keyboard is read to allow
 // the user to select two tic-tac-toe rectangles.  These
-// rectangles are highlighted in cyan paper.  Once the
+// rectangles are highlighted using asterisks.  Once the
 // two rectangles are selected, the "struct sp1_update"s
 // making them up have their screen addresses swapped,
 // meaning the two tic-tac-toe rectangles are drawn in
@@ -64,14 +64,13 @@
 // and are documented on the z88dk wiki.  The only new sp1
 // function used is sp1_ClearRectInv() which clears a rectangular
 // area on screen.  A flag is passed as parameter to indicate
-// whether the background tile, background colour, sprites or
-// a combination of these should be cleared from the character
-// squares in the rectangle.  sp1_ClearRect() is also in the
-// library and functions similarly but does not invalidate
-// the rectangular area.
+// whether the background tile, sprites or both should be
+// cleared from the character squares in the rectangle.
+// sp1_ClearRect() is also in the library and functions
+// similarly but does not invalidate the rectangular area.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx81 -startup=4 -vn ex2a.c -o ex2a.bin -create-app -lsp1 -lmalloc
+// zcc +zx81 -startup=4 -vn ex5e.c -o ex5e.bin -create-app -lsp1 -lmalloc
 
 #include <input.h>
 #include <sprites/sp1.h>
@@ -291,23 +290,31 @@ main()
          {
             sel1 = i;                            // select this one as first rectangle
             sp1_ClearRectInv(&sq[sel1], '*', SP1_RFLAG_TILE);
+            sp1_PrintAt(sq[sel1].row + 3, sq[sel1].col + 5, sel1 + '0');
          }
          else if (sel2 > 8)                      // if second rectangle not selected
          {
             sel2 = i;                            // select this one as second rectangle
             sp1_ClearRectInv(&sq[sel2], '*', SP1_RFLAG_TILE);
+            sp1_PrintAt(sq[sel2].row + 3, sq[sel2].col + 5, sel2 + '0');
+            
             sp1_Invalidate(&sq[sel1]);           // make sure the first rectangle is redrawn too
             swap_dfile(&sq[sel1], &sq[sel2]);    // swap the location where the two rectangles are drawn on screen
          }
          else                                    // both rectangles have already been selected
          {
             sp1_ClearRectInv(&sq[sel1], ' ', SP1_RFLAG_TILE);
+            sp1_PrintAt(sq[sel1].row + 3, sq[sel1].col + 5, sel1 + '0');
+            
             sp1_ClearRectInv(&sq[sel2], ' ', SP1_RFLAG_TILE);
+            sp1_PrintAt(sq[sel2].row + 3, sq[sel2].col + 5, sel2 + '0');
+            
             swap_dfile(&sq[sel1], &sq[sel2]);    // restore location where the two rectangles are drawn on screen
             
             sel1 = i; sel2 = 9;                  // select this rectangle as first one and unselect the second one
             sp1_ClearRectInv(&sq[sel1], '*', SP1_RFLAG_TILE);
-         }
+            sp1_PrintAt(sq[sel1].row + 3, sq[sel1].col + 5, sel1 + '0');
+        }
       }
       
    }  // end while loop

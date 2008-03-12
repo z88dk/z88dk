@@ -17,7 +17,7 @@
 // poke the background graphic and background colour directly.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx81 -startup=4 -vn ex2a.c -o ex2a.bin -create-app -lsp1 -lmalloc
+// zcc +zx81 -startup=4 -vn ex5d.c -o ex5d.bin -create-app -lsp1 -lmalloc
 
 #include <sprites/sp1.h>
 #include <malloc.h>
