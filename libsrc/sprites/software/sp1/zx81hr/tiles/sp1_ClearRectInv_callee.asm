@@ -50,15 +50,15 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
    push hl
    call sp1_ClearRect_callee + ASMDISP_SP1CRSELECT  ; ix = address of operation code (depending on flags passed in)
    call sp1_GetUpdateStruct_callee + ASMDISP_SP1_GETUPDATESTRUCT_CALLEE  ; hl = & struct update
-   pop de                         ; d = attr, e = tile
+   pop de                         ; e = tile
    
-   push ix
-   ld ix,(SP1V_UPDATELISTT)       ; ix = last struct sp1_update in draw queue
-
 .rowloop
 
    push bc                        ; save b = width
    push hl                        ; save update position
+
+   push ix                        ; save operation function
+   ld ix,(SP1V_UPDATELISTT)       ; ix = last struct sp1_update in draw queue
 
 .colloop
 
@@ -82,6 +82,9 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
    ex (sp),ix
    djnz colloop
 
+   ld (SP1V_UPDATELISTT),ix
+   pop ix
+   
    pop hl
    ld bc,9*SP1V_DISPWIDTH
    add hl,bc
@@ -90,10 +93,8 @@ XREF SP1V_DISPWIDTH, SP1V_UPDATELISTT
    dec c
    jp nz, rowloop
 
+   ld ix,(SP1V_UPDATELISTT)
    ld (ix+5),0
-   ld (SP1V_UPDATELISTT),ix
-
-   pop ix
    ret
 
 DEFC ASMDISP_SP1_CLEARRECTINV_CALLEE = asmentry - sp1_ClearRectInv_callee
