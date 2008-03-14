@@ -1,12 +1,11 @@
 #ifndef __MATH_H__
 #define __MATH_H__
 
-/* $Id: math.h,v 1.10 2008-03-11 09:56:12 stefano Exp $ */
+/* $Id: math.h,v 1.11 2008-03-14 12:23:57 stefano Exp $ */
 
 
 extern double __LIB__ acos(double);  /* arc cosine */
 extern double __LIB__ asin(double);  /* arc cosine */
-
 extern double __LIB__ atan(double);  /* arc tangent */
 extern double __LIB__ atan2(double,double); /* atan2(a,b) = arc tangent of a/b */
 extern double __LIB__ cos(double);   /* cosine */
@@ -29,16 +28,25 @@ extern double __LIB__ atof(char *);
 
 /* Some additional CPC only routines now */
 #if __CPC__ && __NATIVE_MATH__
-#define _LIBRARY_POW10
-extern double __LIB__ pow10(int x);         /* pow(10,x) - CPC only */
-extern void __LIB__ deg();
-extern void __LIB__ rad();
+  extern double __LIB__ pow10(int x);         /* pow(10,x) - CPC only */
+  extern void __LIB__ deg();
+  extern void __LIB__ rad();
+#else
+  #define pow10(x) pow(10.,x)
+  #define deg(x) (x*180./pi())
+  #define rad(x) (x*pi()/180.)
 #endif
 
 
-#ifndef _LIBRARY_POW10
-#define pow10(x) pow(10.,x)
-#endif
+/* More (unoptimized) functions */
+
+#define cbrt(x) pow(x,.3333333)
+#define ldexp(x,y) (pow(2.,(int)(y))*x)
+#define hypot(x,y) sqrt(x*x+y*y)
+#define asinh(x) log(2.*fabs(x)+1./(sqrt(x*x+1.)+fabs(x)))
+#define acosh(x) log(2.*x-1./(x+sqrt(x*x-1.)))
+#define log1p(x) log(1.+x)
+#define expm1(x) (exp(x)-1.)
 
 
 #endif /* _MATH_H */
