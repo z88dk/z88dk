@@ -19,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.7 2005-03-16 11:57:05 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.8 2008-03-16 17:07:39 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -112,7 +112,7 @@ ENDIF
   rr l
   rra
   djnz LDIV
-
+.ZCL
 ; Added for color handling
   push hl
   push af
@@ -135,7 +135,6 @@ ENDIF
 .RGTA
   srl a
   djnz RGTA
-.ZCL
   ld (PRE+1),a
   ld e,a
   ld a,(DOTS+1)

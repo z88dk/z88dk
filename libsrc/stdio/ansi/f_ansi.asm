@@ -18,7 +18,7 @@
 ;	M - Delete lines: to be completed
 ;
 ;
-;	$Id: f_ansi.asm,v 1.7 2008-03-14 14:50:31 stefano Exp $
+;	$Id: f_ansi.asm,v 1.8 2008-03-16 17:07:38 stefano Exp $
 ;
 
         XLIB	f_ansi
@@ -708,10 +708,12 @@ push de
         inc     hl
         ld      a,1
         ld      (hl),a
+
 .H_nodef1
-        ld      hl,param_buffer
+        ld      hl,param_buffer	; point to row
         ld      a,(hl)
 	push	hl
+	dec	a
         ld	hl,text_rows
         cp      (hl)
 	pop	hl
@@ -720,13 +722,12 @@ push de
         dec	a
 .HLineOK
         ld      (ansi_ROW),a
+
         inc     hl		; point to column
         ld      a,(hl)
-        ;dec     a		; char position
-        push	hl
+        dec     a		; char position
         ld      hl,text_cols
         cp      (hl)
-        pop	hl
         jp      m,HColOK
         ld      a,(text_cols)	; position next char at max possible column
         dec     a
