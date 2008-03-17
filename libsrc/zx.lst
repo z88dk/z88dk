@@ -372,6 +372,7 @@ spectrum/opus/opus_lptwrite
 spectrum/opus/opus_rommap
 spectrum/opus/opus_testchannel
 spectrum/opus/opus_version
+spectrum/opus/get_kempston
 spectrum/opus/set_kempston
 spectrum/opus/zx_opus
 spectrum/disciple/zx_disciple.asm

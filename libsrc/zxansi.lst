@@ -372,6 +372,8 @@ spectrum/zx_timexsound
 spectrum/zx_type
 spectrum/zx_var_length
 spectrum/tape_save
+spectrum/beta/trdos_installed
+spectrum/beta/zx_betadisk
 spectrum/opus/opus_6116
 spectrum/opus/opus_getblocks
 spectrum/opus/opus_getblocksize
@@ -380,6 +382,7 @@ spectrum/opus/opus_lptwrite
 spectrum/opus/opus_rommap
 spectrum/opus/opus_testchannel
 spectrum/opus/opus_version
+spectrum/opus/get_kempston
 spectrum/opus/set_kempston
 spectrum/opus/zx_opus
 spectrum/disciple/zx_disciple.asm
