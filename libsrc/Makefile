@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.111 2008-03-04 11:31:10 aralbrec Exp $
+# $Id: Makefile,v 1.112 2008-03-19 16:23:04 stefano Exp $
 
 
 include Make.config
@@ -1094,11 +1094,11 @@ sp1:
 	@echo You must specify a target machine to build the library.
 	@echo Only one version of the library can exist at a time.
 	@echo 
-	@echo make sp1-spectrum      (256x192 pixel, 32x24 attribute)
-	@echo make sp1-ts2068hr      (512x192 pixel monochrome)
-	@echo make sp1-zx81hr        (256x192 pixel monochrome)
+	@echo "make sp1-spectrum      (256x192 pixel, 32x24 attribute)"
+	@echo "make sp1-ts2068hr      (512x192 pixel monochrome)"
+	@echo "make sp1-zx81hr        (256x192 pixel monochrome)"
 	@echo
-	@echo make sp1-clean         (recommended prior to building)
+	@echo "make sp1-clean         (recommended prior to building)"
 	@echo
 
 sp1-spectrum:
