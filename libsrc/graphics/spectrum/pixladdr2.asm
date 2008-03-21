@@ -6,13 +6,16 @@
 	INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: pixladdr2.asm,v 1.2 2002-04-17 21:30:25 dom Exp $
+;	$Id: pixladdr2.asm,v 1.3 2008-03-21 17:51:54 stefano Exp $
 ;
-
+;
+; ******************************************************************
+;
+; IT IS SLOWER THAN THE DEFAULT ONE !  124 vs 104 Cycles !!
+;
 ; ******************************************************************
 ;
 ; Table based version - Stefano 19/2/2002
-; Seems to have exactly the same speed of pixladdr.asm
 ;
 ; Get absolute	pixel address in map of virtual (x,y) coordinate.
 ;
@@ -30,30 +33,33 @@
 
 .pixeladdress
 
-		ld	a,h
-		ld	d,0
-		ld	e,l
+		; de = l*2
+		xor	a		; 4
+		rl	l		; 8
+		rla			; 4
+		ld	e,l		; 4
+		ld	d,a		; 4
 		
-		ld	hl,zx_rowtab
-		add	hl,de
-		add	hl,de
+		ld	a,h		; 4
 		
-		ld	e,(hl)
-		inc	hl
-		ld	h,(hl)
-		ld	l,e
+		ld	hl,zx_rowtab	; 10
 		
-		ld	e,a
-		srl	e
-		srl	e
-		srl	e
+		add	hl,de		; 15
+		
+		ld	b,a		; 4
+		rra			; 4
+		srl	a		; 8
+		srl	a		; 8
+		add	(hl)		; 7
+		ld	e,a		; 4
+		inc	hl		; 6
+		ld	a,0		; 7
+		adc	(hl)		; 7
+		ld	d,a		; 4
+		ld	a,b		; 4
 
-		add	hl,de
-		ld	d,h
-		ld	e,l
-
-	        AND     @00000111
-	        XOR	@00000111
+	        AND     @00000111	; 4
+	        XOR	@00000111	; 4
 	        
 	        RET
 

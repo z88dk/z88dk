@@ -211,7 +211,7 @@ printflike/vsscanf
 graphics/circle
 graphics/spectrum/clg
 graphics/clga
-graphics/clrarea
+graphics/clrarea2
 graphics/dcircle
 graphics/draw
 graphics/drawb
@@ -243,7 +243,7 @@ graphics/spectrum/putsprite
 graphics/spectrum/bksave
 graphics/spectrum/bkrestore
 graphics/spectrum/rowtab
-graphics/spectrum/pixladdr2
+graphics/spectrum/pixladdr
 graphics/spectrum/swapgfxbk
 graphics/xorborder
 graphics/xorpixl
