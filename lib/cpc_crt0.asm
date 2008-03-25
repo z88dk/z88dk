@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.9 2007-07-21 21:27:23 dom Exp $
+;       $Id: cpc_crt0.asm,v 1.10 2008-03-25 13:19:55 stefano Exp $
 ;
 
         MODULE  cpc_crt0
@@ -51,10 +51,12 @@
         ld      sp,hl
         ld      (exitsp),sp
         exx
+        ex	af,af
         ld      (firmware_bc),bc
         push    af
         pop     hl
         ld      (firmware_af),hl
+        ex	af,af
         exx
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -127,20 +129,33 @@ ENDIF
 ; ix = firmware routine to call
 ; 
 .firmware
+
+;LD IX,faraddr1
+;LD HL,readst
+;CALL 0BCD4h
+
+
         exx                      ; Use alternate registers
+        ex	af,af
         ex      (sp),hl          ; get return address
         ld      c,(hl)
         inc     hl
         ld      b,(hl)           ; BC=BASIC address
         inc     hl
         ex      (sp),hl          ; restore return address
-        push    bc
+        ;push    bc
+        ld	(fw_caller+1),bc
         ld      bc,(firmware_bc)
         ld      hl,(firmware_af)
         push    hl
         pop     af
+        ex	af,af
         exx                      ; Back to the regular set
-        ret                      ; And call the firmware routine 
+.fw_caller
+        call	0
+        di          ; Disable interrupt (in case the subroutine re-activates it)
+        ret                      ; And call the firmware routine
+.restore_fw
 
         
 ._std_seed      defw    0       ;  Default seed
@@ -149,8 +164,8 @@ ENDIF
 .base_graphics
                 defw	$C000
 .coords         defw	0
-.firmware_bc    defw    0
 .firmware_af    defw    0
+.firmware_bc    defw    0
 
                 defm    "Small C+ CPC"
                 defb    0
