@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.13 2008-03-21 17:51:54 stefano Exp $
+# $Id: Makefile,v 1.14 2008-03-25 12:48:12 stefano Exp $
 
 
 all: 
@@ -32,4 +32,4 @@ clean:
 	$(RM) z88/*.o
 	$(RM) zx81/*.o
 	$(RM) zx81/hr/*.o
-	$(RM) x11/*.o
+	cd x11 ; $(MAKE) clean ; cd ..

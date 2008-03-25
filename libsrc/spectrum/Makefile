@@ -1,7 +1,7 @@
 #
 # Makefile for +3 file support
 #
-# $Id: Makefile,v 1.5 2007-10-02 14:13:48 stefano Exp $
+# $Id: Makefile,v 1.6 2008-03-25 12:48:12 stefano Exp $
 
 include ../Make.config
 
@@ -13,6 +13,7 @@ all:	tape_save.o
 
 clean:
 	$(RM) *.o* zcc_opt.def
+	cd beta ; $(RM) *.o* ; cd ..
 	cd disciple ; $(RM) *.o* ; cd ..
 	cd microdrive ; $(RM) *.o* ; cd ..
 	cd opus ; $(RM) *.o* ; cd ..

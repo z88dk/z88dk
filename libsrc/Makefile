@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.112 2008-03-19 16:23:04 stefano Exp $
+# $Id: Makefile,v 1.113 2008-03-25 12:48:12 stefano Exp $
 
 
 include Make.config
@@ -1151,6 +1151,7 @@ clean:
 	cd abc800 ; $(RM) *.o ; cd ..
 	cd msx ; $(RM) *.o ; cd ..
 	cd newbrain ; $(RM) *.o ; cd ..
+	cd ts2068 ; $(RM) *.o ; cd ..
 	cd vz ; $(RM) *.o ; cd ..
 	cd zx81 ; $(RM) *.o ; cd ..
 	$(MAKE) -C sms clean
