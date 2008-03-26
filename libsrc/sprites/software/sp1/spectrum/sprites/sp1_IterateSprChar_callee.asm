@@ -3,7 +3,7 @@
 ; sinclair spectrum version
 
 XLIB sp1_IterateSprChar_callee
-XREF ASMDISP_SP1_ITERATESPRCHAR_CALLEE
+XDEF ASMDISP_SP1_ITERATESPRCHAR_CALLEE
 
 LIB l_jpix
 
