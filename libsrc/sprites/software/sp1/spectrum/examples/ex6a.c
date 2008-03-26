@@ -98,7 +98,7 @@ main()
    // Colour the Four Print Windows to Make Them Easily Identifiable
 
    sp1_ClearRect(&br1, INK_BLUE | PAPER_CYAN, 0, SP1_RFLAG_COLOUR);
-   sp1_ClearRect(&br2, INK_BLUE | PAPER_YELLOW, 0, SP1_RFLAG_COLOUR);
+   sp1_ClearRect(&br2, INK_BLUE | PAPER_RED, 0, SP1_RFLAG_COLOUR);
    sp1_ClearRect(&br3, INK_BLUE | PAPER_MAGENTA, 0, SP1_RFLAG_COLOUR);
    sp1_ClearRect(&br4, INK_BLUE | PAPER_GREEN, 0, SP1_RFLAG_COLOUR);
 
@@ -108,7 +108,7 @@ main()
    // Initialize the Four Print Contexts
    
    ps1.bounds    = &br1;                       // print window
-   ps1.flags     = SP1_PSSFLAG_INVALIDATE;     // printed characters marked for drawing
+   ps1.flags     = SP1_PSSFLAG_INVALIDATE;     // printed characters invalidated so that they are drawn in the next sp1_UpdateNow
    ps1.attr_mask = 0;                          // overwrite background colour
    ps1.attr      = INK_BLUE | PAPER_CYAN;
    ps1.visit     = 0;                          // no visit function (irrelevant in this example)
@@ -117,7 +117,7 @@ main()
    ps2.bounds    = &br2;                       // print window
    ps2.flags     = SP1_PSSFLAG_INVALIDATE | SP1_PSSFLAG_XWRAP;  // wrap when the x-coord reaches edge of print window but don't increment y-coord!
    ps2.attr_mask = 0;                          // overwrite background colour
-   ps2.attr      = INK_BLUE | PAPER_YELLOW;
+   ps2.attr      = INK_BLUE | PAPER_RED;
    ps2.visit     = 0;                          // no visit function (irrelevant in this example)
    sp1_SetPrintPos(&ps2, 11, 0);               // set initial cursor postion (coords relative to top left of print window)
 
