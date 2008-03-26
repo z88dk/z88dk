@@ -81,11 +81,21 @@ XREF SP1V_TEMP_IX, SP1V_TEMP_AF
    add hl,bc
    exx
    
+   call psloop
+   
+   exx
+   ld (hl),0
+   ld bc,-5
+   add hl,bc
+   ld (SP1V_UPDATELISTT),hl
+   exx
+   ret
+   
 .psloop
 
    ld a,(hl)
    or a
-   jr z, alldone
+   ret z
    
    inc hl
    cp 32
@@ -108,16 +118,6 @@ XREF SP1V_TEMP_IX, SP1V_TEMP_AF
    ld l,a
    ld a,d                    ; restore A to code
    ex (sp),hl
-   ret
-
-.alldone
-
-   exx
-   ld (hl),0
-   ld bc,-5
-   add hl,bc
-   ld (SP1V_UPDATELISTT),hl
-   exx
    ret
 
 .jumptbl

@@ -86,11 +86,25 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
 .noinc0
    exx
    
+   call psloop
+   
+   exx
+   ld (hl),0
+   ld a,-6
+   add a,l
+   ld l,a
+   ld a,$ff
+   adc a,h
+   ld h,a
+   ld (SP1V_UPDATELISTT),hl
+   exx
+   ret   
+   
 .psloop
 
    ld a,(hl)
    or a
-   jr z, alldone
+   ret z
    
    inc hl
    cp 32
@@ -113,20 +127,6 @@ XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
    ld l,a
    ld a,d                    ; restore A to code
    ex (sp),hl
-   ret
-
-.alldone
-
-   exx
-   ld (hl),0
-   ld a,-6
-   add a,l
-   ld l,a
-   ld a,$ff
-   adc a,h
-   ld h,a
-   ld (SP1V_UPDATELISTT),hl
-   exx
    ret
 
 .jumptbl
