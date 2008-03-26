@@ -102,6 +102,8 @@ uchar tree[] = "\x04\x00\x14\x44" \
                "\xb1\xb2\xb3\xb4\x17\x01\xfc" \
                "\xb5\xb6\xb7\xb8";
 
+uchar credit[] = "\x04\x00\x14\x07graphics.by.redballoon";
+
 // string for drawing the screen
 // must be defined in asm since there is no C mechanism to bury
 // addresses inside a string, which is needed here to print the fan
@@ -112,21 +114,25 @@ extern uchar scene[];
 
 ._scene                        ; C variable "scene" will hold this address
 
-   defb 22, 1, 1               ; set coords to (1,1)
+   defb 22, 0, 10              ; set coords to (0,10)
+   defb 7                      ; print credit
+   defw _credit
+
+   defb 22, 2, 1               ; set coords to (2,1)
    defb 7                      ; print fan
    defw _fan
    
-   defb 22, 4, 23              ; set coords to (4,23)
+   defb 22, 5, 23              ; set coords to (5,23)
    defb 7                      ; print fan
    defw _fan
    
-   defb 22, 15, 6              ; set coords to (15,6)
+   defb 22, 16, 6              ; set coords to (16,6)
    defb 7                      ; print fan
    defw _fan
    
    defb 20, $44                ; set attr to bright green on black
    
-   defb 22, 14, 1              ; set coords to (14,1)
+   defb 22, 15, 1              ; set coords to (15,1)
    defb 14, 9                  ; repeat 9 times (row loop)
    defb 14, 4                  ; repeat 4 times (col loop)
    defb '#'                    ; grass char
@@ -134,7 +140,7 @@ extern uchar scene[];
    defb 23, 1, -4              ; move cursor one char down, four chars left
    defb 15                     ; end row loop
 
-   defb 22, 10, 1              ; set coords to (10,1)
+   defb 22, 11, 1              ; set coords to (11,1)
    defb 14, 4                  ; repeat 4 times (row loop)
    defb 14, 21                 ; repeat 21 times (col loop)
    defb '#'                    ; grass char
@@ -142,7 +148,7 @@ extern uchar scene[];
    defb 23, 1, -21             ; move cursor one char down, 21 chars left
    defb 15                     ; end row loop
 
-   defb 22, 1, 9               ; set coords to (1,9)
+   defb 22, 2, 9               ; set coords to (2,9)
    defb 14, 9                  ; repeat 9 times (row loop)
    defb 14, 13                 ; repeat 13 times (col loop)
    defb '#'                    ; grass char
@@ -150,12 +156,12 @@ extern uchar scene[];
    defb 23, 1, -13             ; move cursor one char down, 13 chars left
    defb 15                     ; end row loop
  
-   defb 22, 13, 22             ; set coords to (13,22)
+   defb 22, 14, 22             ; set coords to (14,22)
    defb 14, 9                  ; repeat 9 times (col loop)
    defb '#'                    ; grass char
    defb 15                     ; end col loop
 
-   defb 22, 14, 14             ; set coords to (14,14)
+   defb 22, 15, 14             ; set coords to (15,14)
    defb 14, 9                  ; repeat 9 times (row loop)
    defb 14, 17                 ; repeat 17 times (col loop)
    defb '#'                    ; grass char
@@ -163,15 +169,15 @@ extern uchar scene[];
    defb 23, 1, -17             ; move cursor one char down, 17 chars left
    defb 15                     ; end row loop
 
-   defb 22, 17, 17             ; set coords to (17,17)
+   defb 22, 18, 17             ; set coords to (18,17)
    defb 7                      ; print tree
    defw _tree
    
-   defb 22, 18, 25             ; set coords to (18,25)
+   defb 22, 19, 25             ; set coords to (19,25)
    defb 7                      ; print tree
    defw _tree
    
-   defb 22, 2, 10
+   defb 22, 3, 10
    defb 14, 3                  ; repeat 3 times (row loop)
    defb 14, 3                  ; repeat 3 times (col loop)
    defb 26                     ; save cursor position
@@ -240,26 +246,26 @@ main()
    {
       in_Wait(62);             // wait 62 ms
       
-      sp1_SetPrintPos(&ps0, 5, 3);
+      sp1_SetPrintPos(&ps0, 6, 3);
       sp1_PrintString(&ps0, blade1);
       
-      sp1_SetPrintPos(&ps0, 8, 25);
+      sp1_SetPrintPos(&ps0, 9, 25);
       sp1_PrintString(&ps0, blade1);
 
-      sp1_SetPrintPos(&ps0, 19, 8);
+      sp1_SetPrintPos(&ps0, 20, 8);
       sp1_PrintString(&ps0, blade1);
 
       sp1_UpdateNow();
       
       in_Wait(62);             // wait 62 ms
 
-      sp1_SetPrintPos(&ps0, 5, 3);
+      sp1_SetPrintPos(&ps0, 6, 3);
       sp1_PrintString(&ps0, blade0);
       
-      sp1_SetPrintPos(&ps0, 8, 25);
+      sp1_SetPrintPos(&ps0, 9, 25);
       sp1_PrintString(&ps0, blade0);
 
-      sp1_SetPrintPos(&ps0, 19, 8);
+      sp1_SetPrintPos(&ps0, 20, 8);
       sp1_PrintString(&ps0, blade0);
 
       sp1_UpdateNow();
