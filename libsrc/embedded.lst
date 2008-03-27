@@ -1,3 +1,4 @@
+stdio/puts_cons
 rex/input8
 rex/output8
 @z80.lst
