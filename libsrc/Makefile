@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.113 2008-03-25 12:48:12 stefano Exp $
+# $Id: Makefile,v 1.114 2008-03-27 08:26:40 stefano Exp $
 
 
 include Make.config
@@ -59,7 +59,7 @@ gfxdeps:
 	$(RM) -f graphics/z88/*.o
 	$(RM) -f graphics/text/*.o
 	$(RM) -f graphics/text6/*.o
-	cd graphics ; $(MAKE) ; cd ..
+	$(RM) -f graphics/x11/*.o
 
 #  short script to sort out ticalc dependencies
 tideps:
@@ -150,6 +150,13 @@ gfx.lib:
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/gfx -DFORz88 @$(LISTFILE_DIRECTORY)/z88gfx.lst
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/gfxapp -DAPPZ88 -DFORz88 @$(LISTFILE_DIRECTORY)/z88gfx.lst
+
+# Xlib / X11 and tiny GUI portable library - stefano
+x11.lib:
+	@echo ''
+	@echo '--- Building X11 emulation Library  ---'
+	@echo ''
+	cd graphics ; $(MAKE) lx11 ; cd ..
 
 # simple malloc library - dom
 # adding multiple heaps and realloc - aralbrec

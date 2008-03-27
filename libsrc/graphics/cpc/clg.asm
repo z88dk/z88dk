@@ -4,7 +4,7 @@
 ;       Amstrad CPC version by Stefano Bodrato  15/6/2001
 ;
 ;
-;	$Id: clg.asm,v 1.5 2007-07-21 21:28:22 dom Exp $
+;	$Id: clg.asm,v 1.6 2008-03-27 08:26:40 stefano Exp $
 ;
 
 
@@ -25,6 +25,10 @@
         ld      a,fcolor
         call    firmware
         defw    gra_set_pen
+
+	; gra_clear_window needs colors to be set, 
+	; scr_clear forces default (cyan on blue)
+	
         call    firmware
-        defw    scr_clear
+        defw    scr_clear	        
         ret

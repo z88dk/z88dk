@@ -5,6 +5,9 @@ displayheight
 displaywidth
 rootwindow
 whitepixel
+win_close
+win_move
+win_open
 xchecktypedevent
 xcheckwindowevent
 xclearwindow

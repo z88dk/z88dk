@@ -183,7 +183,7 @@ printflike/vsscanf
 graphics/circle
 graphics/cpc/clg
 graphics/clga
-graphics/clrarea
+graphics/cpc/clrarea
 graphics/dcircle2
 graphics/cpc/draw
 graphics/drawb

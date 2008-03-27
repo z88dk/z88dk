@@ -9,7 +9,7 @@
 ;       Define for graphics and other standard library functions
 ;
 ;
-;	$Id: grafix.inc,v 1.15 2007-12-18 13:35:51 stefano Exp $
+;	$Id: grafix.inc,v 1.16 2008-03-27 08:26:40 stefano Exp $
 ;
 
 
@@ -90,6 +90,7 @@ IF FORcpc
 	DEFINE gotgfx
 	defc maxx	= 256
 	defc maxy	= 192
+	; Possible colors: 0 (blue), 1 (yellow), 2 (cyan), 3 (red)
 	defc bcolor	= 0
 	defc fcolor	= 2
 	defc row_bytes  = 64

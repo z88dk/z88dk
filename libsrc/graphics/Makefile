@@ -1,10 +1,10 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.14 2008-03-25 12:48:12 stefano Exp $
+# $Id: Makefile,v 1.15 2008-03-27 08:26:40 stefano Exp $
 
 
-all: 
+lx11:
 	cd x11 ; $(MAKE) ; cd ..
 
 clean:
