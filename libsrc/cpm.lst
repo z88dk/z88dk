@@ -16,4 +16,5 @@ fcntl/cpm/remove
 fcntl/cpm/setfcb
 fcntl/cpm/write
 fcntl/cpm/writebyte
+games/joystick
 @z80.lst

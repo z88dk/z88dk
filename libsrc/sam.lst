@@ -23,8 +23,11 @@ input/spectrum/in_MouseKempInit
 input/spectrum/in_MouseKempSetPos
 input/spectrum/in_MouseKempSetPos_callee
 input/spectrum/in_MouseSim
+input/spectrum/in_MouseSim_callee
 input/spectrum/in_MouseSimInit
+input/spectrum/in_MouseSimInit_fastcall
 input/spectrum/in_MouseSimSetPos
+input/spectrum/in_MouseSimSetPos_callee
 input/spectrum/in_Pause
 input/spectrum/in_Wait
 input/spectrum/in_WaitForKey
@@ -35,6 +38,7 @@ input/spectrum/INMouseSim
 stdio/sam/fgetc_cons
 stdio/sam/fputc_cons
 stdio/sam/getk
+stdio/puts_cons
 time/spectrum/clock
 graphics/circle
 graphics/clg
@@ -72,8 +76,7 @@ graphics/spectrum/putsprite
 graphics/spectrum/bksave
 graphics/spectrum/bkrestore
 graphics/spectrum/rowtab
-graphics/spectrum/pixladdr2
-graphics/spectrum/swapgfxbk
+graphics/spectrum/pixladdr
 graphics/sam/swapgfxbk
 graphics/xorborder
 graphics/xorpixl

@@ -11,7 +11,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.3 2008-03-27 18:24:42 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -33,7 +33,7 @@
 .text_rows   defb 25
 
 .ansi_CHAR
-        ld      e,a
+        push	af
         ld      a,(ansi_COLUMN)
         inc     a
         ld      h,a
@@ -43,7 +43,9 @@
         push	hl
         call    firmware
         defw    txt_set_cursor
-        ld      a,e
+        pop	hl
+        pop	af
+        push	hl
         call    firmware
         defw    txt_output
         pop     hl
@@ -62,4 +64,3 @@
         call    firmware
         defw    txt_set_back
         ret
-        

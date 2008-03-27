@@ -10,7 +10,7 @@
 ;	Stefano Bodrato - Jul. 2004
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
+;	$Id: f_ansi_attr.asm,v 1.3 2008-03-27 18:24:42 stefano Exp $
 ;
 
 	XLIB	ansi_attr
@@ -83,8 +83,9 @@
         cp      7
         jr      nz,noreverse
 .callinverse
-        ld      ix,txt_inverse
-        jp      firmware
+	call    firmware
+        defw	txt_inverse
+        ret
 .noreverse
         cp      27
         jr      z,callinverse
