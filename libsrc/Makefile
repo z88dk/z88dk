@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.114 2008-03-27 08:26:40 stefano Exp $
+# $Id: Makefile,v 1.115 2008-03-27 08:51:22 stefano Exp $
 
 
 include Make.config
@@ -13,7 +13,6 @@ include Make.config
 # - SP1 (build depends on customization and machine target, "make sp1" for options)
 
 all:	genlibs z88libs tilibs zxlibs \
-	debug.lib \
 	nc_clib.lib vz_clib.lib vzansi_clib.lib \
 	abc80_clib.lib abc80ansi_clib.lib abc800_clib.lib \
 	aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
@@ -27,8 +26,8 @@ all:	genlibs z88libs tilibs zxlibs \
 	test_clib.lib sms_clib.lib \
 	zx81libs
 
-genlibs: gen_math.lib malloc.lib z80_crt0.lib ndos.lib adt.lib balloc.lib \
-         im2.lib rect.lib algorithm.lib
+genlibs: debug.lib gen_math.lib malloc.lib z80_crt0.lib ndos.lib adt.lib balloc.lib \
+         im2.lib rect.lib algorithm.lib lib3d.lib x11.lib
 
 z88libs: z88_math.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib \
 	 z88ansi_clib.lib gfx.lib 
@@ -150,6 +149,13 @@ gfx.lib:
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/gfx -DFORz88 @$(LISTFILE_DIRECTORY)/z88gfx.lst
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/gfxapp -DAPPZ88 -DFORz88 @$(LISTFILE_DIRECTORY)/z88gfx.lst
+
+# Fast vector 3D library - stefano
+lib3d.lib:
+	@echo ''
+	@echo '--- Building 3D Library  ---'
+	@echo ''
+	cd oz ; $(MAKE) lib3d.lib ; cd ..
 
 # Xlib / X11 and tiny GUI portable library - stefano
 x11.lib:
