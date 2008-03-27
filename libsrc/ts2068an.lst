@@ -252,7 +252,7 @@ graphics/spectrum/putsprite
 graphics/spectrum/bksave
 graphics/spectrum/bkrestore
 graphics/spectrum/rowtab
-graphics/spectrum/pixladdr2
+graphics/spectrum/pixladdr
 graphics/spectrum/swapgfxbk
 graphics/xorborder
 graphics/xorplot
