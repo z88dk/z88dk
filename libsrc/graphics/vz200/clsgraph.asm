@@ -4,7 +4,7 @@
 	XREF	base_graphics
 
 ;
-;	$Id: clsgraph.asm,v 1.3 2003-09-30 10:23:12 stefano Exp $
+;	$Id: clsgraph.asm,v 1.4 2008-03-31 17:16:20 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -24,7 +24,8 @@
 				push	hl
 
 				ld	a,8
-				ld	(6800h),a		; force graph mode
+				ld	(6800h),a
+				ld	(783bh),a		; force graph mode
 
 				ld	hl,(base_graphics)	; base of graphics area
 				ld	(hl),0

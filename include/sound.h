@@ -9,7 +9,7 @@
  *	         Dec 2001 - Added Mattel Aquarius
  *               Dec 2007 - Various fixes and improvements
  *
- *	$Id: sound.h,v 1.9 2007-12-06 11:32:36 stefano Exp $
+ *	$Id: sound.h,v 1.10 2008-03-31 17:16:17 stefano Exp $
  */
 
 
@@ -41,16 +41,21 @@ extern __LIB__ bit_play(unsigned char melody[]);
 
 
 /* Platform specific parameters (mainly timing stuff) */
-#ifdef SPECTRUM
-  #define BEEP_TSTATES 437500.0  /* 3.5 Mhz; float value = CPU_CLOCK*125 */
+
+#ifdef ACE
+  #define BEEP_TSTATES 406250.0 /* 3.25 Mhz */
+#endif
+
+#ifdef AQUARIUS
+  #define BEEP_TSTATES 500000.0  /* 4 Mhz */
 #endif
 
 #ifdef MSX
   #define BEEP_TSTATES 447500.0  /* 3.58 Mhz */
 #endif
 
-#ifdef AQUARIUS
-  #define BEEP_TSTATES 500000.0  /* 4 Mhz */
+#ifdef SPECTRUM
+  #define BEEP_TSTATES 437500.0  /* 3.5 Mhz; float value = CPU_CLOCK*125 */
 #endif
 
 #ifdef TICALC
@@ -60,8 +65,11 @@ extern __LIB__ bit_play(unsigned char melody[]);
   /* #define BEEP_TSTATES 1875000.0 */
 #endif
 
-#ifdef ACE
-  #define BEEP_TSTATES 406250.0 /* 3.25 Mhz */
+/* Clock timing is not perfect, here we have a slightly different 
+   routine, with the inner loop differing for one cycle,and
+   VZ300 has a CPU clock of 3,54 Mhz, VZ200 -> 3,58.. we stay in the middle */
+#ifdef VZ
+  #define BEEP_TSTATES 442500.0  /* 3.54 Mhz */
 #endif
 
 /* We always get Z88, so it can't be a condition */

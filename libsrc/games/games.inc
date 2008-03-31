@@ -5,7 +5,7 @@
 ;	based on the Dominic's sound routines
 ;
 ;
-;	$Id: games.inc,v 1.8 2007-12-03 16:05:19 stefano Exp $
+;	$Id: games.inc,v 1.9 2008-03-31 17:16:19 stefano Exp $
 ;
 
 IF FORzx
@@ -75,3 +75,8 @@ IF FORti86
 	defc sndbit_mask   = @00111100
 ENDIF
 
+IF FORvz
+	defc sndbit_port   = 26624	; yes, this is a memory address !
+	defc sndbit_bit    = 0
+	defc sndbit_mask   = 33		; bit 0 (Speaker A) and 5 (Speaker B)
+ENDIF

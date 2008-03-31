@@ -23,6 +23,7 @@ XLIB vz_mode
    and $f7                   ; res 3,a
    ld (hl),a
    ld ($6800),a
+   ld ($783b),a
    jp $01c9                  ; cls
 
 .mode1
@@ -30,6 +31,7 @@ XLIB vz_mode
    or $08                    ; set 3,a
    ld (hl),a
    ld ($6800),a
+   ld ($783b),a
    
    ld hl,$7000
    ld de,$7001

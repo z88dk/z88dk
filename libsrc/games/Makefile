@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.11 2008-03-05 20:35:46 dom Exp $
+# $Id: Makefile,v 1.12 2008-03-31 17:16:18 stefano Exp $
 
 include ../Make.config
 
@@ -31,6 +31,11 @@ lmsx:
 	zcc +msx $(CFLAGS) -DMSX bit_frequency.c
 	zcc +msx $(CFLAGS) -DMSX bit_play.c
 
+# This piezo speaker has to be accessed in its own way
+lvz:
+	zcc +vz $(CFLAGS) -DVZ bit_frequency.c
+	zcc +vz $(CFLAGS) -DVZ bit_play.c
+
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o*
-	$(RM) ace/*.o aquarius/*.o msx/*.o sam/*.o spectrum/*.o z88/*.o
+	$(RM) ace/*.o aquarius/*.o msx/*.o sam/*.o spectrum/*.o vz/*.o z88/*.o

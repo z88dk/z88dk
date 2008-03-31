@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.115 2008-03-27 08:51:22 stefano Exp $
+# $Id: Makefile,v 1.116 2008-03-31 17:16:17 stefano Exp $
 
 
 include Make.config
@@ -426,6 +426,8 @@ vz_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
+	cd games ; $(MAKE) lvz ; cd ..
 	$(LIBLINKER) -DFORvz -x$(OUTPUT_DIRECTORY)/vz_clib @$(LISTFILE_DIRECTORY)/vz200.lst
 
 # VZ200 ansi lib - Stefano
@@ -440,6 +442,8 @@ vzansi_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
+	cd games ; $(MAKE) lvz ; cd ..
 	$(LIBLINKER) -DFORvz -x$(OUTPUT_DIRECTORY)/vzansi_clib @$(LISTFILE_DIRECTORY)/vzansi.lst
 
 # ZX81 lib - Stefano
