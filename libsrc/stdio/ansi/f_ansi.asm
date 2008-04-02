@@ -13,82 +13,71 @@
 ; - Small fix on the "set cursor position" range checks - 21/11/2002
 ;
 ; MISSING or surely buggy Escapes:
-;	I - Cursor up and scroll down if on top
-;	L - Insert lines: to be completed
-;	M - Delete lines: to be completed
+;       I - Cursor up and scroll down if on top
+;       L - Insert lines: to be completed
+;       M - Delete lines: to be completed
 ;
 ;
-;	$Id: f_ansi.asm,v 1.9 2008-03-17 06:55:56 stefano Exp $
+;       $Id: f_ansi.asm,v 1.10 2008-04-02 19:44:27 stefano Exp $
 ;
 
-        XLIB	f_ansi
-        LIB	ansi_putc
-	LIB	ansi_attr
-	LIB	ansi_CHAR
-	LIB	ansi_CLS
-	LIB	ansi_LF
-	LIB	ansi_DSR6
-	LIB	ansi_BEL
-	LIB	ansi_del_line
+        XLIB    f_ansi
+        LIB     ansi_putc
+        LIB     ansi_attr
+        LIB     ansi_CHAR
+        LIB     ansi_CLS
+        LIB     ansi_LF
+        LIB     ansi_DSR6
+        LIB     ansi_BEL
+        LIB     ansi_del_line
 
-	XDEF	ansi_COLUMN
-	XDEF	ansi_ROW
+        XDEF    ansi_COLUMN
+        XDEF    ansi_ROW
 
-	XREF	text_cols
-	XREF	text_rows
+        XREF    text_cols
+        XREF    text_rows
+
 
 
 ;---------------------------------------------------
 ;  Fire out all the buffer (pointed by HL; len DE)
 ;---------------------------------------------------
 
-.ansi_COLUMN	defb	0
-.ansi_ROW	defb	0
+.ansi_COLUMN    defb    0
+.ansi_ROW       defb    0
 
 .f_ansi
-
- ld     a,d
- or     e
- ret	z
+        ld     a,d
+        or     e
+        ret    z
 
 .show
 
 ; **** Link to ANSI engine ****
- ld     bc,(escvector)
- ld     a,b
- or     c
- jp     nz,f_in_escape
-; *****************************
+        ld     bc,(escvector)
+        ld     a,b
+        or     c
+        jp     nz,f_in_escape
+        
+        ld     a,(hl)
+        inc    hl
+        dec    de
+        
+        cp     27
+        jp     z,f_escape
 
- ld     a,(hl)
- inc    hl
- dec    de
+; Hide the following two lines to disable CSI.
+        cp    155 ;h9b ;CSI?
+        jp    z,f_9b
 
-; **** Link to ANSI engine ****
- cp     27
- jp     z,f_escape
-; *****************************
-
-; **** Link to ANSI engine ****
-; Un-comment this and the line containing [f_9b:] to activate CSI.
-;
- cp    155 ;h9b ;CSI?
- jp    z,f_9b
 ; *****************************
 
 ;------------------------
  cp     12  ; Form Feed (CLS) ?
 ;------------------------
- jr     nz,NoFF
- push   hl
- push   de
- call   ansi_CLS
- xor	a
- ld     (ansi_ROW),a
- ld     (ansi_COLUMN),a
- pop    de
- pop    hl
- jr     loopn
+        jr     nz,NoFF
+        call   docls
+        jr     loopn
 .noFF
 
 ;------------------------
@@ -106,103 +95,117 @@
 ; Temporary (?) patch.
 ; CR becomes CR+LF
 ;------------------------
- cp 13
- jr	z,isLF
+        cp 13
+        jr     z,isLF
 ;------------------------
 
- cp     10  ; LF?
- jr     nz,NoLF
+        cp     10  ; LF?
+        jr     nz,NoLF
 
 ;------------------------
 .isLF
 ;------------------------
 ;
- push   hl
- push   de
- call   ansi_LF
- pop    de
- pop    hl
- jr     loopn
+        push   hl
+        push   de
+        call   ansi_LF
+        pop    de
+        pop    hl
+        jr     loopn
 
 .NoLF
- cp     9 ; TAB?
- jr     nz,NoTAB
- push   hl
- push   de
- ld     a,(ansi_COLUMN)
- rra
- rra
- inc    a
- rla
- rla
- push   hl
- ld     hl,text_cols
- cp     (hl)
- pop    hl
- jp     p,OutTAB
- ld     (ansi_COLUMN),a
+        cp     9 ; TAB?
+        jr     nz,NoTAB
+        push   hl
+        push   de
+        ld     a,(ansi_COLUMN)
+        rra
+        rra
+        inc    a
+        rla
+        rla
+        push   hl
+        ld     hl,text_cols
+        cp     (hl)
+        pop    hl
+        jp     p,OutTAB
+        ld     (ansi_COLUMN),a
 .OutTAB
- pop	de
- pop	hl
- jr     loopn
+        pop    de
+        pop    hl
+        jr     loopn
 .NoTAB
 
 ;------------------------
  cp     7  ; BEL?
 ;------------------------
- jr     nz,NoBEL
- push   hl
- push   de
- call   ansi_BEL
- pop    de
- pop    hl
- jr     loopn
+        jr     nz,NoBEL
+        push   hl
+        push   de
+        call   ansi_BEL
+        pop    de
+        pop    hl
+        jr     loopn
 .NoBEL
 
 ;------------------------
  cp     8   ; BackSpace
 ;------------------------
- jr     nz,NoBS
- ld     a,(ansi_COLUMN)
- and	a
- jr     z,firstc ; are we in the first column?
- dec    a
- ld     (ansi_COLUMN),a
- jr     loopn
+        jr     nz,NoBS
+        ld     a,(ansi_COLUMN)
+        and    a
+        jr     z,firstc ; are we in the first column?
+        dec    a
+        ld     (ansi_COLUMN),a
+        jr     loopn
 .firstc
- ld	a,(ansi_ROW)
- and	a
- jr     z,loopn
- dec	a
- ld	(ansi_ROW),a
- ld	a,(text_cols)
- dec	a
- ld     (ansi_COLUMN),a
- jr	loopn
+        ld     a,(ansi_ROW)
+        and    a
+        jr     z,loopn
+        dec    a
+        ld     (ansi_ROW),a
+        ld     a,(text_cols)
+        dec    a
+        ld     (ansi_COLUMN),a
+        jr     loopn
 .NoBS
 
 
 ; **** Link to ANSI engine ****
+
 .f_not_ANSI   ;
- push   hl
- push   de
- call   ansi_putc
- pop    de
- pop    hl
-; *****************************
-
+        push   hl
+        push   de
+        call   ansi_putc
+        pop    de
+        pop    hl
 .loopn
-; I'm not sure about this three lines
-;------------------------------------
- ld     a,d
- or     e
- jp     nz,show
+        ld     a,d
+        or     e
+        jp     nz,show
 
-; **** Link to ANSI engine ****
 .f_loopdone
+        ret
+
 ; *****************************
 
- ret
+
+;------------------------------------------------
+;   Clear screen and set text position to HOME
+;------------------------------------------------
+
+.docls
+        push   hl
+        push   de
+        push   bc
+        call   ansi_CLS
+        xor    a                ; HOME cursor
+        ld     (ansi_ROW),a
+        ld     (ansi_COLUMN),a
+        pop    bc
+        pop    de
+        pop    hl
+        ret
 
 
 ; A state machine implementation of the mechanics of ANSI terminal control
@@ -227,21 +230,23 @@
 ;  HL points to the incoming string.
 ;  DE holds the length remaining in the incoming string.
 ;  BC is the (incrementing) pointer to param_buffer
+
 ;-----------------------------------------
 ; Variables declaration
 ;-----------------------------------------
+
 .escvector      defw 0
 .cur_parm_ptr   defw 0
 .eat_key        defb 0
 .string_term    defb 0
 
 .param_buffer   defs 40
-.param_end	defw 0
+.param_end      defw 0
 
 .f_ANSI_exit
- ld     bc,0
- ld     (escvector), bc
- jp     loopn
+        ld     bc,0
+        ld     (escvector), bc
+        jp     loopn
 
 ;----- f_in_escape ---------------------------------------------------
 ; Main loop noticed that escvector was not zero.
@@ -284,12 +289,12 @@
         cp      '['
         jr      nz, syntax_error
 .f_9b       ; Entry for CSI.  (Eq. ESC[)
-	; Set up for getting a parameter string.
+        ; Set up for getting a parameter string.
         ld      bc, param_buffer
         xor     a                       ; zero
         ld      (bc), a                 ; default first char
         dec     bc                      ; point buffer before start
-        ld      (eat_key), a		; no eaten key
+        ld      (eat_key), a            ; no eaten key
         ; next_is f_get_args
         ld      a,d
         or      e
@@ -350,7 +355,7 @@
                 inc     bc
               .NoBCinc
 
-                ; It's the first digit.	 Initialize parameter with it.
+                ; It's the first digit.  Initialize parameter with it.
                 sub     '0'
                 ld      (bc), a
                 ; next_is f_in_param
@@ -370,13 +375,13 @@
 .fgp_isquote
         ld      (string_term), a       ; save it for end of string
         ; and read string into param_buffer ; next_is f_get_string
-         ld      a,d
-         or      e
-         jr      nz, f_get_string
-         ld      (cur_parm_ptr), bc
-         ld      bc, f_get_string
-         ld      (escvector), bc
-         jp      f_loopdone
+        ld      a,d
+        or      e
+        jr      nz, f_get_string
+        ld      (cur_parm_ptr), bc
+        ld      bc, f_get_string
+        ld      (escvector), bc
+        jp      f_loopdone
 
 .fgp_semi_or_cmd
         cp      ';'                    ; is it a semi?
@@ -479,7 +484,7 @@
         cp      '9'+1
         jp      p, fgp_not_digit
 
-		; It's another digit.  Add into current parameter.
+                ; It's another digit.  Add into current parameter.
                 sub     '0'
                 push    bc
                 push    af
@@ -508,7 +513,7 @@
         cp      ';'
         jp      z, f_goto_next
 .fgp_cmd
-	; It must be a command letter.
+        ; It must be a command letter.
 
 
 push hl
@@ -555,7 +560,7 @@ push de
         ld      hl,param_buffer
 .loop_m
         ld      a,(hl)
-	call	ansi_attr
+        call    ansi_attr
         inc     hl
         dec     b
         jp      nz,loop_m
@@ -616,7 +621,7 @@ push de
         cp 'A' ; CUU - Cursor up
         jr nz,no_A
 
-	ld      hl,param_buffer
+        ld      hl,param_buffer
 .f_ansi_cup
         ld      a,(ansi_ROW)
         sub     (hl)
@@ -637,13 +642,13 @@ push de
         ld      hl,param_buffer
         ld      a,(ansi_ROW)
         add     a,(hl)
-	inc	a
-	ld	hl,text_rows
-	cp	(hl)
+        inc     a
+        ld      hl,text_rows
+        cp      (hl)
         jp      p,B_ok
         ld      a,(text_rows)
 .B_ok
-	dec	a
+        dec     a
         ld      (ansi_ROW),a
         jp      f_cmd_exit
 .no_B
@@ -673,7 +678,7 @@ push de
 ;%%%%%%%% r. cursor pos. %%%
 ;%%%%%%%%%%%%%%%%%%%%%%%%%%%
         cp 'u' ; RCP - Restore cursor position
- 	jr z,do_u
+        jr z,do_u
         cp 'k'
         jr nz,no_u
 .do_u
@@ -710,30 +715,30 @@ push de
         ld      (hl),a
 
 .H_nodef1
-        ld      hl,param_buffer	; point to row
+        ld      hl,param_buffer ; point to row
         ld      a,(hl)
-        and	a
-        jr	z,HLineOK
-	push	hl
-	dec	a
-        ld	hl,text_rows
+        and     a
+        jr      z,HLineOK
+        push    hl
+        dec     a
+        ld      hl,text_rows
         cp      (hl)
-	pop	hl
+        pop     hl
         jr      c,HLineOK
-        ld      a,(text_rows)	; position next char at max possible row
-        dec	a
+        ld      a,(text_rows)   ; position next char at max possible row
+        dec     a
 .HLineOK
         ld      (ansi_ROW),a
 
-        inc     hl		; point to column
+        inc     hl              ; point to column
         ld      a,(hl)
-        and	a
-        jr	z,HColOK
-        dec     a		; char position
+        and     a
+        jr      z,HColOK
+        dec     a               ; char position
         ld      hl,text_cols
         cp      (hl)
         jr      c,HColOK
-        ld      a,(text_cols)	; position next char at max possible column
+        ld      a,(text_cols)   ; position next char at max possible column
         dec     a
 .HColOK
         ld      (ansi_COLUMN),a
@@ -788,11 +793,11 @@ push de
         ; Then, from the cursor line + 1 up to the last line
 .j0LineLoop
         inc     a
-	inc	a
-       	ld	hl,text_rows
-	cp	(hl)
+        inc     a
+        ld      hl,text_rows
+        cp      (hl)
         jp      z,f_cmd_exit
-	;dec	a
+        ;dec    a
         push    af
         call    ansi_del_line
         pop     af
@@ -835,15 +840,7 @@ push de
         jp      nz,f_cmd_exit ;  Syntax Error!
 
         ; clear all screen
-        push    bc
-        push    de
-	call	ansi_cls
-        pop     de
-        pop     bc
-        ; HOME
-        xor     a
-        ld	(ansi_ROW),a
-        ld	(ansi_COLUMN),a
+        call    docls
         jp      f_cmd_exit
 .no_J
 
@@ -919,11 +916,11 @@ push de
 ;%% l %%%%%%%%%%%%%%%%%%%%%%%%%%
 ;%%%%%%%% Erase current line %%%
 ;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        cp	'l'
-        jr	nz,noecl
+        cp      'l'
+        jr      nz,noecl
         ld      a,(ansi_ROW)
         call    ansi_del_line
-	jp	f_cmd_exit
+        jp      f_cmd_exit
 .noecl
 
 
@@ -941,7 +938,7 @@ push de
         ld      a,(hl)
         cp      6
         jp      z, f_cmd_exit ; only mode 6 is supported
-	call	ansi_dsr6
+        call    ansi_dsr6
         jp      f_cmd_exit
 .no_n
 
@@ -955,7 +952,7 @@ push de
         ld      b,(hl)
         ld      a,(ansi_ROW)
         
-	jp	f_cmd_exit        
+        jp      f_cmd_exit        
 .no_L
 
 ;%%%%%%%%%%%%%%%%%%%%%%%%%
