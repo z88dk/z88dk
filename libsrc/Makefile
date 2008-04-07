@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.117 2008-04-07 07:49:25 stefano Exp $
+# $Id: Makefile,v 1.118 2008-04-07 17:43:30 stefano Exp $
 
 
 include Make.config
@@ -1103,6 +1103,7 @@ trs80_clib.lib:
 	@echo ''
 	@echo '--- Building TRS 80 Library  ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..

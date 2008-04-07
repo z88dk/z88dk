@@ -5,8 +5,15 @@
 ;       Written by Stefano Bodrato 13/12/2006
 ;
 ;
-;	$Id: textgfx.inc,v 1.2 2006-12-28 18:08:36 stefano Exp $
+;	$Id: textgfx.inc,v 1.3 2008-04-07 17:43:30 stefano Exp $
 ;
+
+IF FORtrs80
+	DEFINE gotgfx
+	defc maxx	= 128
+	defc maxy	= 48
+	defc blankch	= 128
+ENDIF
 
 IF FORaquarius
 	DEFINE gotgfx

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: trs80_crt0.asm,v 1.1 2008-04-07 07:44:23 stefano Exp $
+;       $Id: trs80_crt0.asm,v 1.2 2008-04-07 17:43:30 stefano Exp $
 ;
 
 
@@ -127,7 +127,7 @@ ENDIF
 ; Now some variables
 ;-----------
 .coords         defw    0       ; Current graphics xy coordinates
-.base_graphics  defw    0       ; Address of the Graphics map
+.base_graphics  defw    $3c00   ; Address of the Graphics map
 
 IF !DEFINED_HAVESEED
 		XDEF    _std_seed        ;Integer rand() seed

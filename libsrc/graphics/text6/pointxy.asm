@@ -8,7 +8,7 @@
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.1 2007-09-05 15:13:08 stefano Exp $
+;	$Id: pointxy.asm,v 1.2 2008-04-07 17:43:30 stefano Exp $
 ;
 
 
@@ -36,8 +36,6 @@
 			
 			ld	(COORDS),hl
 			
-			;push	bc
-
 			ld	c,a	; y
 			ld	b,h	; x
 			
@@ -124,17 +122,6 @@
 			
 			and	c
 			
-			
-			;or	c
-
-			;ld	hl,textpixl
-			;ld	d,0
-			;ld	e,a
-			;add	hl,de
-			;ld	a,(hl)
-
-			;pop	hl
-			;ld	(hl),a
 			
 			pop	bc
 			
