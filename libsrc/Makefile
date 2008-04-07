@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.116 2008-03-31 17:16:17 stefano Exp $
+# $Id: Makefile,v 1.117 2008-04-07 07:49:25 stefano Exp $
 
 
 include Make.config
@@ -13,17 +13,17 @@ include Make.config
 # - SP1 (build depends on customization and machine target, "make sp1" for options)
 
 all:	genlibs z88libs tilibs zxlibs \
-	nc_clib.lib vz_clib.lib vzansi_clib.lib \
+	
 	abc80_clib.lib abc80ansi_clib.lib abc800_clib.lib \
-	aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
+	aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib c128ansi_clib.lib \
 	cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib cpcgray.lib \
-	cpm_clib.lib c128ansi_clib.lib \
-	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
-	nascom_clib.lib nasansi_clib.lib newbrain_clib.lib \
-	ozansi_clib.lib rex_clib.lib rcmx000_clib.lib \
+	cpm_clib.lib m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
+	nascom_clib.lib nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
+	ozansi_clib.lib pps_clib.lib ppsansi_clib.lib \
+	rex_clib.lib rcmx000_clib.lib sms_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib \
-	pps_clib.lib ppsansi_clib.lib embedded_clib.lib \
-	test_clib.lib sms_clib.lib \
+	trs80_clib.lib vz_clib.lib vzansi_clib.lib \
+	embedded_clib.lib test_clib.lib \
 	zx81libs
 
 genlibs: debug.lib gen_math.lib malloc.lib z80_crt0.lib ndos.lib adt.lib balloc.lib \
@@ -273,88 +273,6 @@ zx_clib.lib:
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zx_clib @$(LISTFILE_DIRECTORY)/zx.lst
 
-# 64/32 column library for TS2068 - dom/stefano/alvin
-ts2068_clib.lib:
-	@echo ''
-	@echo '--- Building TS2068 (Spectrum clone) Library  ---'
-	@echo ''
-	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lzx ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd fcntl ; $(MAKE) lzx ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lzx ; cd ..
-	cd rs232 ; $(MAKE) lzx ; cd ..
-	$(MAKE) gamesdeps
-	cd spectrum ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lzx ; cd ..
-	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
-
-# ZXVGS - yarek
-zxvgs.lib:
-	@echo ''
-	@echo '--- Building ZXVGS Library  ---'
-	@echo ''
-	cd fcntl ; $(MAKE) lzxvgs ; cd ..
-	cd zxvgs; $(MAKE) ; cd ..
-	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zxvgs @$(LISTFILE_DIRECTORY)/zxvgs.lst
-
-# ZX Spectrum maths library - Stefano
-mzx.lib:
-	@echo ''
-	@echo '--- Building ZX Spectrum Maths Library ---'
-	@echo ''
-	cd zxmath ; $(MAKE) mzx ; cd ..
-
-mzx_tiny.lib:
-	@echo ''
-	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
-	@echo ''
-	cd zxmath ; $(MAKE) mzx_tiny ; cd ..
-
-# vt100 for sprinter - dom
-ppsansi_clib.lib:
-	@echo ''
-	@echo '--- Building Sprinter Library  ---'
-	@echo ''
-	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lzx ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd fcntl ; $(MAKE) lpps ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lpps ; cd ..
-	cd rs232 ; $(MAKE) lzx ; cd ..
-	$(MAKE) gamesdeps
-	cd spectrum ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lzx ; cd ..
-	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ppsansi_clib @$(LISTFILE_DIRECTORY)/ppsansi.lst
-
-# Native for sprinter - dom
-pps_clib.lib:
-	@echo ''
-	@echo '--- Building Sprinter Library  ---'
-	@echo ''
-	$(MAKE) gfxdeps
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) lzx ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
-	cd fcntl ; $(MAKE) lpps ; cd ..
-	cd printflike ; $(MAKE) ; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	cd time ; $(MAKE) lpps ; cd ..
-	cd rs232 ; $(MAKE) lzx ; cd ..
-	$(MAKE) gamesdeps
-	cd spectrum ; $(MAKE) lzx ; cd ..
-	cd games ; $(MAKE) lzx ; cd ..
-	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
-
 # vt100 C lib for spectrum - stefano/dom
 # use -DROMFONT for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
@@ -377,6 +295,26 @@ zxan_clib.lib:
 	cd spectrum ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxan_clib @$(LISTFILE_DIRECTORY)/zxansi.lst
+
+# 64/32 column library for TS2068 - dom/stefano/alvin
+ts2068_clib.lib:
+	@echo ''
+	@echo '--- Building TS2068 (Spectrum clone) Library  ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) lzx ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd fcntl ; $(MAKE) lzx ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	cd time ; $(MAKE) lzx ; cd ..
+	cd rs232 ; $(MAKE) lzx ; cd ..
+	$(MAKE) gamesdeps
+	cd spectrum ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lzx ; cd ..
+	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
 # vt100 C lib for TS2068 - stefano/dom
 # use -DROMFONT for a tiny 36 columns mode
@@ -401,18 +339,67 @@ ts2068an_clib.lib:
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/ts2068an_clib @$(LISTFILE_DIRECTORY)/ts2068an.lst
 
-# Untested C lib for NC100 machines - dom
-nc_clib.lib:
+# ZXVGS - yarek
+zxvgs.lib:
 	@echo ''
-	@echo '--- Building Amstrad NC100 Library  ---'
+	@echo '--- Building ZXVGS Library  ---'
 	@echo ''
+	cd fcntl ; $(MAKE) lzxvgs ; cd ..
+	cd zxvgs; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zxvgs @$(LISTFILE_DIRECTORY)/zxvgs.lst
+
+# ZX Spectrum maths library - Stefano
+mzx.lib:
+	@echo ''
+	@echo '--- Building ZX Spectrum Maths Library ---'
+	@echo ''
+	cd zxmath ; $(MAKE) mzx ; cd ..
+
+mzx_tiny.lib:
+	@echo ''
+	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
+	@echo ''
+	cd zxmath ; $(MAKE) mzx_tiny ; cd ..
+
+# Native for sprinter - dom
+pps_clib.lib:
+	@echo ''
+	@echo '--- Building Sprinter Library  ---'
+	@echo ''
+	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen ; cd ..
+	cd stdlib ; $(MAKE) lzx ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
+	cd fcntl ; $(MAKE) lpps ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/nc_clib @$(LISTFILE_DIRECTORY)/nc100.lst
+	cd time ; $(MAKE) lpps ; cd ..
+	cd rs232 ; $(MAKE) lzx ; cd ..
+	$(MAKE) gamesdeps
+	cd spectrum ; $(MAKE) lzx ; cd ..
+	cd games ; $(MAKE) lzx ; cd ..
+	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
+
+# vt100 for sprinter - dom
+ppsansi_clib.lib:
+	@echo ''
+	@echo '--- Building Sprinter Library  ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) lzx ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd fcntl ; $(MAKE) lpps ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	cd time ; $(MAKE) lpps ; cd ..
+	cd rs232 ; $(MAKE) lzx ; cd ..
+	$(MAKE) gamesdeps
+	cd spectrum ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lzx ; cd ..
+	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ppsansi_clib @$(LISTFILE_DIRECTORY)/ppsansi.lst
 
 # VZ200/300 lib - Stefano
 vz_clib.lib:
@@ -968,6 +955,19 @@ m5_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORm5 -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
 
+# Untested C lib for NC100 machines - dom
+nc_clib.lib:
+	@echo ''
+	@echo '--- Building Amstrad NC100 Library  ---'
+	@echo ''
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) gen ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/nc_clib @$(LISTFILE_DIRECTORY)/nc100.lst
+
 # Amstrad CPC library - Stefano
 cpc_clib.lib:
 	@echo ''
@@ -1097,6 +1097,19 @@ test_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/test_clib @$(LISTFILE_DIRECTORY)/test.lst
+
+# TRS 80 - stefano
+trs80_clib.lib:
+	@echo ''
+	@echo '--- Building TRS 80 Library  ---'
+	@echo ''
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) gen ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
 
 # SP1 sprite library - aralbrec
 sp1:
