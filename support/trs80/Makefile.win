@@ -1,0 +1,34 @@
+# Project: cmd2cas
+
+CPP  = g++.exe
+CC   = gcc.exe
+WINDRES = windres.exe
+RES  = 
+OBJ  = main.o cmd.o cas.o $(RES)
+LINKOBJ  = main.o cmd.o cas.o $(RES)
+LIBS = 
+INCS = 
+CXXINCS = 
+BIN  = cmd2cas.exe
+CXXFLAGS = $(CXXINCS)   -O1
+CFLAGS = $(INCS)   -O1
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before cmd2cas.exe all-after
+
+
+clean: clean-custom
+	rm -f $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o "cmd2cas.exe" $(LIBS)
+
+main.o: main.c
+	$(CC) -c main.c -o main.o $(CFLAGS)
+
+cmd.o: cmd.c
+	$(CC) -c cmd.c -o cmd.o $(CFLAGS)
+
+cas.o: cas.c
+	$(CC) -c cas.c -o cas.o $(CFLAGS)

@@ -1,0 +1,20 @@
+CMD2CAS 1.0 (C) 2005 by Attila Grosz
+
+This program converts standard TRS-80/System-80 disk
+(CMD) files to tape (CAS) images.
+
+Usage:
+
+cmd2cas <cmd file> <cas file>
+
+At the moment there are no command line options available.
+Also, for now there are only two CMD block types supported: 
+type 1 and 2. The program should work for most CMD files
+nevertheless.
+
+The resulting CAS image is a system image, you have to load
+it by typing the command SYSTEM followed by the name of the 
+program in the CAS image (this is the first 6 letters of the
+filename). When the prompt is back, you should type / (slash)
+to start the program as CAS files never autostart by 
+themselves.
