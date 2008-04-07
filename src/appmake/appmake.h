@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.11 2007-06-24 15:32:04 dom Exp $
+ *   $Id: appmake.h,v 1.12 2008-04-07 07:44:23 stefano Exp $
  */
 
 
@@ -77,6 +77,9 @@ extern option_t  svi_options;
 extern int       tixx_exec(char *target);
 extern option_t  tixx_options;
 
+extern int       trs80_exec(char *target);
+extern option_t  trs80_options;
+
 extern int       z88_exec(char *target);
 extern option_t  z88_options;
 
@@ -104,7 +107,7 @@ struct {
     option_t  *options;
 } machines[] = {
     { "bin2bas",  "abc80",    "(C) 2000 Stefano Bodrato",
-      "",
+      "Creates a BASIC loader and a tape file for the ABC computers",
       abc80_exec,   &abc80_options },
     { "bin2byt",  "ace",      "(C) 2001 Stefano Bodrato",
       "Generates a .byt file suitable for loading into emulators",
@@ -128,7 +131,7 @@ struct {
       "Adds a file header to enable the program to be loaded using 'bload \"file.bin\",r",
       msx_exec,     &msx_options },
     { "bin2m12",  "mz",       "(C) 2000 Stefano Bodrato",
-      "",
+      "Generates a tape file for the Sharp MZ computers",
       mz_exec,      &mz_options },
     { "bin2nas",   "nas",       "(C) 2003 Stefano Bodrato",
       "Generates a .NAS file suitable for use by emulators",
@@ -163,6 +166,9 @@ struct {
     { "bin2tmr",  "sms",       "(C) 2007 Dominic Morris",
       "Creates a .tmr file padded out to 32k ",
       sms_exec,      &sms_options },
+    { "bin2cmd",  "trs80",    "(C) 2008 Stefano Bodrato",
+      "Creates a CMD file for the TRS 80",
+      trs80_exec,   &trs80_options },
     { "appz88",   "z88",      "(C) 2000 - 2003 Dominic Morris & Dennis Groning",
       "Generates .63 and .62 files suitable for burning to EPROM",
       z88_exec,     &z88_options },
@@ -180,7 +186,7 @@ struct {
       zx81_exec,    &zx81_options },
 
 };
-#define APPMAKE_TARGETS 25
+#define APPMAKE_TARGETS 26
 #endif
 
 

@@ -1,0 +1,6 @@
+stdio/trs80/fgetc_cons
+stdio/trs80/fputc_cons
+stdio/trs80/getk
+stdio/puts_cons
+games/joystick
+@z80.lst
