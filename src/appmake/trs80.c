@@ -3,7 +3,7 @@
  *
  *        Stefano Bodrato,  April 2008
  *
- *        $Id: trs80.c,v 1.1 2008-04-07 07:44:23 stefano Exp $
+ *        $Id: trs80.c,v 1.2 2008-04-07 07:55:17 stefano Exp $
  */
 
 #include "appmake.h"
@@ -95,28 +95,23 @@ int trs80_exec()
  */
     
     for (i=0; i<len;i++) {
-    	if ( i%254 == 0 ) {
-            writebyte (1,fpout);	/* Signature byte */
+        if ( i%254 == 0 ) {
+            writebyte (1,fpout);        /* Signature byte */
             if ( i+254 > len )
-    	        writebyte (len-i+2,fpout);	/* last block length (remainder) */
-    	    else
-    	        writebyte (0,fpout);		/* block length (256 bytes) */
-    	    
-    	    writeword (pos+i,fpout);	/* block memory location */
-
-    	    //if ( i == 0 ) {
-            //    writeword (pos,fpout);	/* Program location */
-            //    i+=2;
-            //}
-    	}
-    	
+                writebyte (len-i+2,fpout);      /* last block length (remainder) */
+            else
+                writebyte (0,fpout);            /* block length (256 bytes) */
+            
+            writeword (pos+i,fpout);    /* block memory location */
+        }
+        
         c=getc(fpin);
         fputc(c,fpout);
     }
 
-    writebyte (2,fpout);	/* Two bytes end marker */
+    writebyte (2,fpout);        /* Two bytes end marker */
     writebyte (2,fpout);
-    writeword (pos,fpout);	/* Start address */
+    writeword (pos,fpout);      /* Start address */
 
     fclose(fpin);
     fclose(fpout);
