@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: trs80_crt0.asm,v 1.2 2008-04-07 17:43:30 stefano Exp $
+;       $Id: trs80_crt0.asm,v 1.3 2008-04-08 16:49:27 stefano Exp $
 ;
 
 
@@ -28,15 +28,15 @@
         XDEF    exitsp          ;atexit() variables
         XDEF    exitcount
 
-       	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+        XDEF    heaplast        ;Near malloc heap variables
+        XDEF    heapblocks
 
         XDEF    __sgoioblk      ;stdio info block
 
         XDEF    base_graphics   ;Graphical variables
-	XDEF	coords		;Current xy position
+        XDEF    coords          ;Current xy position
 
-	XDEF	snd_tick	;Sound variable
+        XDEF    snd_tick        ;Sound variable
 
 
 ;--------
@@ -49,9 +49,9 @@
                 org     myzorg
 
 .start
-        ld      (start1+1),sp	;Save entry stack
-IF 	STACKPTR
-	ld	sp,STACKPTR
+        ld      (start1+1),sp   ;Save entry stack
+IF      STACKPTR
+        ld      sp,STACKPTR
 ENDIF
         ld      hl,-64
         add     hl,sp
@@ -61,16 +61,16 @@ ENDIF
 IF !DEFINED_nostreams
  IF DEFINED_ANSIstdio
 ; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
+        ld      hl,__sgoioblk+2
+        ld      (hl),19 ;stdin
+        ld      hl,__sgoioblk+6
+        ld      (hl),21 ;stdout
+        ld      hl,__sgoioblk+10
+        ld      (hl),21 ;stderr
  ENDIF
 ENDIF
 
-        call    _main		;Call user program
+        call    _main           ;Call user program
 
 .cleanup
 ;
@@ -78,8 +78,8 @@ ENDIF
 ;
 IF !DEFINED_nostreams
  IF DEFINED_ANSIstdio
-	LIB	closeall
-	call	closeall
+        LIB     closeall
+        call    closeall
  ENDIF
 ENDIF
 
@@ -87,7 +87,7 @@ ENDIF
 .start1 ld      sp,0            ;Restore stack to entry value
         ret
 
-.l_dcal	jp	(hl)		;Used for function pointer calls
+.l_dcal jp      (hl)            ;Used for function pointer calls
 
 
 ;-----------
@@ -96,7 +96,7 @@ ENDIF
 ;-----------
 .__sgoioblk
 IF DEFINED_ANSIstdio
-	INCLUDE	"#stdio_fp.asm"
+        INCLUDE "#stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
 ENDIF
@@ -108,18 +108,18 @@ ENDIF
 ;---------------------------------
 ._vfprintf
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
-	jp	vfprintf_fp
+        LIB     vfprintf_fp
+        jp      vfprintf_fp
 ELSE
-	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
-		jp	vfprintf_comp
-	ELSE
-		IF DEFINED_ministdio
-			LIB	vfprintf_mini
-			jp	vfprintf_mini
-		ENDIF
-	ENDIF
+        IF DEFINED_complexstdio
+                LIB     vfprintf_comp
+                jp      vfprintf_comp
+        ELSE
+                IF DEFINED_ministdio
+                        LIB     vfprintf_mini
+                        jp      vfprintf_mini
+                ENDIF
+        ENDIF
 ENDIF
 
 
@@ -130,7 +130,7 @@ ENDIF
 .base_graphics  defw    $3c00   ; Address of the Graphics map
 
 IF !DEFINED_HAVESEED
-		XDEF    _std_seed        ;Integer rand() seed
+                XDEF    _std_seed        ;Integer rand() seed
 ._std_seed       defw    0       ; Seed for integer rand() routines
 ENDIF
 
@@ -142,7 +142,7 @@ ENDIF
 .heapblocks     defw    0       ; Number of blocks
 
 IF DEFINED_NEED1bitsound
-.snd_tick	defb	0	; Sound variable
+.snd_tick       defb    0       ; Sound variable
 ENDIF
 
 ;-----------------------
@@ -150,14 +150,14 @@ ENDIF
 ;-----------------------
 IF NEED_floatpack
         INCLUDE         "#float.asm"
-.fp_seed        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
-.extra          defs    6		;FP register
-.fa             defs    6		;FP Accumulator
-.fasign         defb    0		;FP register
+.fp_seed        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
+.extra          defs    6               ;FP register
+.fa             defs    6               ;FP Accumulator
+.fasign         defb    0               ;FP register
 
 ENDIF
 
-		defm	"Small C+ TRS80"	;Unnecessary file signature
-		defb	0
+                defm    "Small C+ TRS80"        ;Unnecessary file signature
+                defb    0
 
 

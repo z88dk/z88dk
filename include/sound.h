@@ -9,7 +9,7 @@
  *	         Dec 2001 - Added Mattel Aquarius
  *               Dec 2007 - Various fixes and improvements
  *
- *	$Id: sound.h,v 1.10 2008-03-31 17:16:17 stefano Exp $
+ *	$Id: sound.h,v 1.11 2008-04-08 16:49:26 stefano Exp $
  */
 
 
@@ -40,7 +40,12 @@ extern __LIB__ bit_frequency(float duration, float frequency);
 extern __LIB__ bit_play(unsigned char melody[]);
 
 
-/* Platform specific parameters (mainly timing stuff) */
+/* Platform specific parameters (mainly timing stuff) 
+
+   The BEEP_TSTATES constant is obtained by dividing the
+   CPU clock frequency by eight
+*/
+
 
 #ifdef ACE
   #define BEEP_TSTATES 406250.0 /* 3.25 Mhz */
@@ -63,6 +68,10 @@ extern __LIB__ bit_play(unsigned char melody[]);
   #define BEEP_TSTATES 750000.0 /* 6 Mhz */
   /* TI-83 Plus should have 1875000.0 (15 Mhz) if Silver Edition */
   /* #define BEEP_TSTATES 1875000.0 */
+#endif
+
+#ifdef TRS80
+  #define BEEP_TSTATES 221750.0 /* 1.774 Mhz */
 #endif
 
 /* Clock timing is not perfect, here we have a slightly different 

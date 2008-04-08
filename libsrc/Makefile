@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.118 2008-04-07 17:43:30 stefano Exp $
+# $Id: Makefile,v 1.119 2008-04-08 16:49:27 stefano Exp $
 
 
 include Make.config
@@ -1110,6 +1110,7 @@ trs80_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) ltrs80 ; cd ..
 	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
 
 # SP1 sprite library - aralbrec

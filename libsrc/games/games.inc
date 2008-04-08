@@ -2,81 +2,87 @@
 ;       Game functions parameters
 ;
 ;       Written by Stefano Bodrato  1/10/2001
-;	based on the Dominic's sound routines
+;       based on the Dominic's sound routines
 ;
 ;
-;	$Id: games.inc,v 1.9 2008-03-31 17:16:19 stefano Exp $
+;       $Id: games.inc,v 1.10 2008-04-08 16:49:27 stefano Exp $
 ;
 
 IF FORzx
-	defc sndbit_port   = 254
-	defc sndbit_bit    = 4
-	defc sndbit_mask   = 16		; (2^sndbit_bit)
+        defc sndbit_port   = 254
+        defc sndbit_bit    = 4
+        defc sndbit_mask   = 16         ; (2^sndbit_bit)
 ENDIF
 
 IF FORmsx
-	defc sndbit_port   = 170
-	defc sndbit_bit    = 7
-	defc sndbit_mask   = 158	; bit 7 (key click) and 5 (tape)
+        defc sndbit_port   = 170
+        defc sndbit_bit    = 7
+        defc sndbit_mask   = 158        ; bit 7 (key click) and 5 (tape)
 ENDIF
 
 IF FORsam
-	defc sndbit_port   = 254
-	defc sndbit_bit    = 4
-	defc sndbit_mask   = 16		; (2^sndbit_bit)
+        defc sndbit_port   = 254
+        defc sndbit_bit    = 4
+        defc sndbit_mask   = 16         ; (2^sndbit_bit)
 ENDIF
 
 IF FORz88
-	defc sndbit_port   = $B0
-	defc sndbit_bit    = 6
-	defc sndbit_mask   = 64
+        defc sndbit_port   = $B0
+        defc sndbit_bit    = 6
+        defc sndbit_mask   = 64
 ENDIF
 
 IF FORjupiter
-	defc sndbit_port   = $FE
-	defc sndbit_bit    = 0
-	defc sndbit_mask   = 1
+        defc sndbit_port   = $FE
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 1
 ENDIF
 
 IF FORaquarius
-	defc sndbit_port   = $FC
-	defc sndbit_bit    = 0
-	defc sndbit_mask   = 1
+        defc sndbit_port   = $FC
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 1
 ENDIF
 
 IF FORti82
-	defc sndbit_port   = 0
-	defc sndbit_bit    = 2
-	defc sndbit_mask   = @00111100
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 2
+        defc sndbit_mask   = @00111100
 ENDIF
 
 IF FORti83
-	defc sndbit_port   = 0
-	defc sndbit_bit    = 0
-	defc sndbit_mask   = 3
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 3
 ENDIF
 
 IF FORti83p
-	defc sndbit_port   = 0
-	defc sndbit_bit    = 0
-	defc sndbit_mask   = 3
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 3
 ENDIF
 
 IF FORti85
-	defc sndbit_port   = 7
-	defc sndbit_bit    = 2
-	defc sndbit_mask   = @00111100
+        defc sndbit_port   = 7
+        defc sndbit_bit    = 2
+        defc sndbit_mask   = @00111100
 ENDIF
 
 
 IF FORti86
-	defc sndbit_port   = 7
-	defc sndbit_bit    = 2
-	defc sndbit_mask   = @00111100
+        defc sndbit_port   = 7
+        defc sndbit_bit    = 2
+        defc sndbit_mask   = @00111100
+ENDIF
+
+IF FORtrs80
+        defc sndbit_port   = $FF
+        defc sndbit_bit    = 1
+        defc sndbit_mask   = 3
 ENDIF
 
 IF FORvz
-	defc sndbit_port   = 26624	; yes, this is a memory address !
-	defc sndbit_bit    = 0
-	defc sndbit_mask   = 33		; bit 0 (Speaker A) and 5 (Speaker B)
+        defc sndbit_port   = 26624      ; yes, this is a memory address !
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 33         ; bit 0 (Speaker A) and 5 (Speaker B)
 ENDIF
