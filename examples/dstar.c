@@ -1,17 +1,8 @@
-/* Ported to the Ti82/83/83+ (rest will follow) by Henk Poley
+/* 
+ *  Ported to the Ti82/83/83+ (rest will follow) by Henk Poley
  * Extended with different sprite sizes and sound by Stefano Bodrato
  *
- *
- *  up,down,left,right - move ball/box
- *  [Enter]            - toggle ball/box
- *  7                  - Quit
- *  9                  - Restart level
- *  +,-                - CHEAT....
- *
- * 
- *
- * For the key usage on other platforms read the original docs:
- *
+ * * * * * * *
  *
  *      dstar.c
  *
@@ -19,6 +10,8 @@
  *		Original TI game By A Von Dollen
  *		Converted to Z88 By D Morris
  *		Keys: Q,A,O,P,SPACE,H,G
+ *
+ * * * * * * *
  *
  *      dstarz88 is a conversion of a TI86 game I found with
  *      source on www.ticalc.org.
@@ -34,6 +27,8 @@
  *      Both objects carry on moving until they hit something else
  *      (except for the dark bubble in the case of clear bubbles).
  *
+ * * * * * * *
+ *
  *      The keys are defined in #define statements, and default thus:
  *
  *      Up:     Q
@@ -46,31 +41,52 @@
  *
  *      Switch changes between the dark bubble and the solid box.
  *
+ *
+ *      On the TI Calculators the keyboard mapping is:
+ *
+ *      up,down,left,right - move ball/box
+ *      [Enter]            - toggle ball/box
+ *      7                  - Quit
+ *      9                  - Restart level
+ *      +,-                - CHEAT....
+ *
+ * * * * * * *
+ *
  *      This is the first game ever produced with the Small C compiler -
  *      it was written as a statement saying that it is possible to
  *      write something easily, quickly and efficiently using the
  *      compiler. Hopefully it will be an encouragement for others to
  *      do likewise!
  *
+ * * * * * * *
+ *
+ *      Compile examples :
+ *
+ *      To get a TI82 version of the game (optionally you could add sound):
+ *      zcc +ti82 -create-app dstar.c
+ *   
+ *      To get a TI85 version of the game (optionally you could add sound):
+ *      zcc +ti85 -Dspritesize=7 -create-app dstar.c
+ *   
+ *      To get a Spectrum 16K version of the game:
+ *      zcc +zx -Dspritesize=16 -DSOUND -create-app -zorg=24300 dstar.c
+ *   
+ *      To get a VZ200 version:
+ *      zcc +vz -Dspritesize=7 -DSOUND -odztar.vz dstar.c
+ *   
+ *      To get an 80 pixel graphics version of the game (Mattel Aquarius, TRS80, etc):
+ *      zcc +aquarius -Dspritesize=5 -create-app dstar.c
+ *   
+ *      (in the above examples the sprite size can be set to 5,6,7,8 or 16 
+ *      and sound can optionally be added with some target)
+ *
+ * * * * * * *
+ *
  *      Enough twaddle, enjoy the game and study the source!
  *
  *      d. <djm@jb.man.ac.uk> 1/12/98
  *
  * * * * * * *
-
-   Compile examples:
-   
-   To get a TI82 version of the game (optionally you could add sound):
-   zcc +ti82 -create-app dstar.c
-
-   To get a TI85 version of the game (optionally you could add sound):
-   zcc +ti85 -Dspritesize=7 -create-app dstar.c
-
-   To get a Spectrum 16K version of the game:
-   zcc +zx -Dspritesize=16 -DSOUND -create-app -zorg=24300 dstar.c
-
-   To get an 80 pixel graphics version of the game (Mattel Aquarius, etc):
-   zcc +aquarius -Dspritesize=5 -create-app dstar.c
  
  */
 
@@ -85,6 +101,7 @@
 
 /* #define spritesize 5   -->  very low resolutions, 80x45 pixels  */
 /* #define spritesize 6   -->  TI mode, 96x54  */
+/* #define spritesize 7   -->  TI85/86, VZ200  */
 /* #define spritesize 8   -->  128x72 pixels   */
 /* #define spritesize 16  -->  Big screen mode 256x144  */
 
