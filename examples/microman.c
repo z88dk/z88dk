@@ -7,10 +7,17 @@
         How to compile
         ==============
         
-        SOUND is optional, the game board size can be set with the
-        "COMPACT" global variable (values 1 to 4).
+        SOUND is an optional environment variable, and the 
+        game board size can be reduced with the "COMPACT" global 
+        variable (valid presets are 1 to 4).
+        
+        At compile time you can also specify the number of ghosts
+        (by setting the env variable GHOSTS with a value up to 5),
+        the number of lives (variable MAXLIVES), and the way the
+        ghosts will move (GHOSTMODE [1..3]).
 
         Sprite size can be 6 or 8 (value of 10 is experimental).
+
 
         Examples follow...
 
@@ -35,7 +42,7 @@
         zcc +aquarius -lndos -create-app -DSOUND -DSIZE=6 -DCOMPACT=3 -omicroman microman.c
         
 
-        $Id: microman.c,v 1.1 2008-04-14 08:56:37 stefano Exp $
+        $Id: microman.c,v 1.2 2008-04-15 14:39:14 stefano Exp $
 
 */
 
@@ -57,8 +64,19 @@
 
 //#define SOUND 1
 
-#define MAXLIVES 3
-#define GHOSTS   4
+// Ghosts brain mode
+#ifndef GHOSTMODE
+  #define GHOSTMODE 1
+#endif
+
+#ifndef MAXLIVES
+  #define MAXLIVES 3
+#endif
+
+// Valid values for GHOSTS: 1 to 5
+#ifndef GHOSTS
+  #define GHOSTS 4
+#endif
 
 #ifndef SIZE
   #define SIZE 8
@@ -372,7 +390,7 @@ char bgh[] = {
 
 #define DOTROW   64
 #define BLANKROW 0
-#define PILL  14
+#define PILL  448
 
 
 char man_right[] = { 
@@ -589,7 +607,7 @@ typedef struct {
   char *pic;
 } ghost;
 
-ghost g[4];
+ghost g[GHOSTS];
 
 char *basepic;
 
@@ -634,9 +652,9 @@ void showlives ()
     else
       putsprite (spr_and, 1+SIZE2*19+i*SIZE, SIZE3*2, &man_right[SIZE3*2]);
 #elif SIZE==10
-      putsprite (spr_or, SIZE2*20+i*15, 38, &man_right[SIZE3*2]);
+      putsprite (spr_or, SIZE2*19+i*14+3, 38, &man_right[SIZE3*2]);
     else
-      putsprite (spr_and, SIZE2*20+i*15, 38, &man_right[SIZE3*2]);
+      putsprite (spr_and, SIZE2*19+i*14+3, 38, &man_right[SIZE3*2]);
 #else
       putsprite (spr_or, SIZE2*20+i*SIZE3, SIZE3*2, &man_right[SIZE3*2]);
     else
@@ -753,7 +771,15 @@ void move_ghost()
   }
 
 // change ghost direction "randomly"
-  b = (cycle2+cycle3)&3
+  b = (cycle2+cycle3)&3;
+#if GHOSTMODE==2
+  if (b==rand()&3)	// insert some fuzzyness
+    b=rand()&3;
+#endif
+#if GHOSTMODE==3
+  if (b==rand()&a)	// insert some fuzzyness
+    b=rand()&3;
+#endif
   //b = rand()&3;
   g[a].direction = 1<< b ;
 
@@ -829,17 +855,22 @@ draw_board:
 #if SIZE==10
           plot (i*SIZE2+(SIZE2/2)-MPMARGIN+2, j*SIZE2+(SIZE2/2));
           plot ((18-i)*SIZE2+(SIZE2/2)-MPMARGIN+2, j*SIZE2+(SIZE2/2));
-        if ( (j==2 || j==14) && (i == 1) ) {
+        if ( (j==2 ) && (i == 1) ) {
+          putsprite (spr_or, i*SIZE2+1, j*SIZE2+1, pill);
+          putsprite (spr_or, (18-i)*SIZE2+1, j*SIZE2+1, pill);
+        }
+        if ( (j==14) && (i == 1) ) {
           putsprite (spr_or, i*SIZE2+1, j*SIZE2, pill);
           putsprite (spr_or, (18-i)*SIZE2+1, j*SIZE2, pill);
+        }
 #else
           plot (i*SIZE2+(SIZE2/2)-MPMARGIN+1, j*SIZE2+(SIZE2/2));
           plot ((18-i)*SIZE2+(SIZE2/2)-MPMARGIN+1, j*SIZE2+(SIZE2/2));
         if ( (j==2 || j==14) && (i == 1) ) {
           putsprite (spr_or, i*SIZE2, j*SIZE2, pill);
           putsprite (spr_or, (18-i)*SIZE2, j*SIZE2, pill);
-#endif
         }
+#endif
       }
     }
   }
@@ -891,7 +922,7 @@ do_game:
 #endif
 
     direction=MOVE_RIGHT;
-  
+
     basepic=bgh;
 
 #if COMPACT!=3
@@ -1017,7 +1048,11 @@ do_game:
           }
           if (b == PILL) {
             eatpill();
+#if SIZE==10
+            putsprite (spr_xor, (x+SIZE2+2)/SIZE2*SIZE2+1, (y+SIZE2)/SIZE2*SIZE2, pill);
+#else
             putsprite (spr_xor, (x+SIZE2)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
+#endif
           }
           x++;
           a++;
@@ -1030,7 +1065,7 @@ do_game:
           if (b == DOTROW) {
             eatdot();
 #if SIZE==10
-            unplot(x-MPMARGIN, y+(MPSIZE/2)-1);
+            unplot(x-MPMARGIN+1, y+(MPSIZE/2));
 #else
             unplot(x-MPMARGIN, y+(SIZE/2));
 #endif
@@ -1040,7 +1075,11 @@ do_game:
 #if SIZE==6
             putsprite (spr_xor, (x-1)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
 #else
+  #if SIZE==10
+            putsprite (spr_xor, x/SIZE2*SIZE2+1, (y+SIZE2)/SIZE2*SIZE2, pill);
+  #else
             putsprite (spr_xor, x/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
+  #endif
 #endif
           }
           x--;
@@ -1065,7 +1104,11 @@ do_game:
 #if SIZE==6
             putsprite (spr_xor, (x+SIZE2-1)/SIZE2*SIZE2, (y+SIZE2+1)/SIZE2*SIZE2, pill);
 #else
-            putsprite (spr_xor, (x+SIZE2)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
+  #if SIZE==10
+            putsprite (spr_xor, (x+SIZE2-1)/SIZE2*SIZE2+1, (y+SIZE2+2)/SIZE2*SIZE2+1, pill);
+  #else
+            putsprite (spr_xor, (x+SIZE2-1)/SIZE2*SIZE2, (y+SIZE2+2)/SIZE2*SIZE2, pill);
+  #endif
 #endif
           }
           y++;
@@ -1089,7 +1132,11 @@ do_game:
 #if SIZE==6
             putsprite (spr_xor, (x+SIZE2-1)/SIZE2*SIZE2, y/SIZE2*SIZE2, pill);
 #else
+  #if SIZE==10
+            putsprite (spr_xor, (x+SIZE2)/SIZE2*SIZE2+1, y/SIZE2*SIZE2+1, pill);
+  #else
             putsprite (spr_xor, (x+SIZE2)/SIZE2*SIZE2, y/SIZE2*SIZE2, pill);
+  #endif
 #endif
           }
           y--;
@@ -1127,10 +1174,18 @@ do_game:
           g[a].pic=basepic;
         if (b) {
           g[a].x++;
-#ifdef COMPACT
-          if ( (g[a].y==(SIZE2*8-1)) && (g[a].x==(SIZE2*9-1)) )
+#if SIZE==10
+  #ifdef COMPACT
+          if ( (g[a].y==(SIZE2*8-2)) && (g[a].x==(SIZE2*9-1)) )
+  #else
+          if ( (g[a].y==(SIZE2*10-2)) && (g[a].x==(SIZE2*9-1)) )
+  #endif
 #else
+  #ifdef COMPACT
+          if ( (g[a].y==(SIZE2*8-1)) && (g[a].x==(SIZE2*9-1)) )
+  #else
           if ( (g[a].y==(SIZE2*10-1)) && (g[a].x==(SIZE2*9-1)) )
+  #endif
 #endif
           g[a].direction=MOVE_UP;
         }
@@ -1187,8 +1242,13 @@ do_game:
       if ( (abs((g[a].x+CENTER) - (x+CENTER)) <= (SIZE)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (1)) ||
         (abs((g[a].x+CENTER) - (x+CENTER)) <= (1)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (SIZE)) )
     #else
-      if ( ((abs((g[a].x+CENTER) - (x+CENTER)) <= (SIZE+MPMARGIN)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (2))) ||
-        (abs((g[a].x+CENTER) - (x+CENTER)) <= (2)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (SIZE+MPMARGIN)) )
+      #if SIZE == 10
+        if ( ((abs((g[a].x+CENTER) - (x+CENTER)) <= (MPSIZE+MPMARGIN)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (2))) ||
+          (abs((g[a].x+CENTER) - (x+CENTER)) <= (2)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (MPSIZE+MPMARGIN)) )
+      #else
+        if ( ((abs((g[a].x+CENTER) - (x+CENTER)) <= (SIZE+MPMARGIN)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (2))) ||
+          (abs((g[a].x+CENTER) - (x+CENTER)) <= (2)) && (abs((g[a].y+CENTER) - (y+CENTER)) <= (SIZE+MPMARGIN)) )
+      #endif
     #endif
         if ((scared>0)&&(g[a].eaten==0)) {
           // Ghost has been eaten
