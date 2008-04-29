@@ -32,7 +32,7 @@ graphics/xorplot
 graphics/xorpixl
 graphics/setxy
 graphics/cpc/fill
-graphics/cpc/putsprite3
+graphics/cpc/putsprite
 graphics/getsprite
 graphics/bksave
 graphics/bkrestore
