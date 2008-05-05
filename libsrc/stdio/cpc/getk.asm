@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - 8/6/2001
 ;
 ;
-;	$Id: getk.asm,v 1.3 2007-07-21 21:28:22 dom Exp $
+;	$Id: getk.asm,v 1.4 2008-05-05 14:14:02 stefano Exp $
 ;
 
         XLIB	getk
@@ -17,6 +17,10 @@
 .getk
         call    firmware
         defw    km_read_char
+        push	af
+        call    firmware
+        defw    km_initialise	; clear buffer for next reading
+        pop	af
         ld      hl,0
         ret     nc
         ld      l,a

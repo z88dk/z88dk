@@ -6,7 +6,7 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.8 2007-12-03 16:05:18 stefano Exp $
+ *	$Id: games.h,v 1.9 2008-05-05 14:14:02 stefano Exp $
  *
  */
 
@@ -46,6 +46,16 @@ extern __LIB__ joystick(int game_device);
 #define MOVE_FIRE4 128
 
 
+#ifdef CPC
+	unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "QAOP-MN"};
+	#define GAME_DEVICES 3
+#endif
+
+#ifdef MSX
+	unsigned char *joystick_type[] = { "QAOP-MN", "Joystick 1", "Joystick 2"};
+	#define GAME_DEVICES 3
+#endif
+
 #ifdef SPECTRUM
 	unsigned char *joystick_type[] = {"Kempston","Sinclair 1","Sinclair 2","Cursor","Fuller"};
 	#define GAME_DEVICES 5
@@ -74,11 +84,6 @@ extern __LIB__ joystick(int game_device);
 #ifdef ZXVGS
 	unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "Joystick 2", "Joystick 3"};
 	#define GAME_DEVICES 4
-#endif
-
-#ifdef MSX
-	unsigned char *joystick_type[] = { "QAOP-MN", "Joystick 1", "Joystick 2"};
-	#define GAME_DEVICES 3
 #endif
 
 #ifndef GAME_DEVICES

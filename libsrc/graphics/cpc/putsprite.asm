@@ -6,7 +6,7 @@
 ; Amstrad CPC version
 ;
 ;
-; $Id: putsprite.asm,v 1.1 2008-04-29 16:43:28 stefano Exp $
+; $Id: putsprite.asm,v 1.2 2008-05-05 14:14:02 stefano Exp $
 ;
 
         XLIB    putsprite
@@ -34,12 +34,15 @@
         pop     ix
 
         inc     hl
-        ld      e,(hl)  
+        ld      a,maxy
+        sub	(hl)	; y position
+        ld      c,a
+        ld	b,0
         inc     hl
         inc     hl
-        ld      d,(hl)  ; x and y coords
-
+        ld      e,(hl)  ; x position
         inc     hl
+        ld	d,(hl)
 
         inc     hl
         ld      a,(hl)  ; and/or/xor mode
@@ -51,14 +54,8 @@
         ld      (ortype),a      ; Self modifying code
         ld      (ortype2),a     ; Self modifying code
 
-        ;ld     (actcoord),de   ; save current coordinates
-
-        ld      a,maxy
-        sub     e
-        ld      e,d
-        ld      h,0
-        ld      l,a
-        ld      d,h
+        ld	h,b	; x position
+        ld	l,c
 
         call    firmware
         defw    scr_dot_position
@@ -86,7 +83,7 @@
          inc      ix
 ._smc1   ld       a,1               ;Load pixel mask
 ._iloop  sla      c                 ;Test leftmost pixel
-         jr       nc,_noplot        ;See if a plot is needed
+         jp       nc,_noplot        ;See if a plot is needed
          ld       e,a
 
 .ortype
@@ -96,7 +93,7 @@
          ld       (hl),a
          ld       a,e
 ._noplot rrca
-         jr       nc,_notedge       ;Test if edge of byte reached
+         jp       nc,_notedge       ;Test if edge of byte reached
          ld       a,8               ;Re-set the edge of byte
          inc      hl                ;Go to next byte
 ._notedge djnz     _iloop
@@ -123,7 +120,7 @@
 	 ld	  e,2
 
 .wiloop  sla      c                 ;Test leftmost pixel
-         jr       nc,wnoplot        ;See if a plot is needed
+         jp       nc,wnoplot        ;See if a plot is needed
 
          push     af
 .ortype2
@@ -134,13 +131,13 @@
          pop      af
          
 .wnoplot rrca
-         jr       nc,wnotedge       ;Test if edge of byte reached
+         jp       nc,wnotedge       ;Test if edge of byte reached
          inc      hl                ;Go to next byte
          ld	  a,8
 
 .wnotedge
 .wsmc2   cp       1
-         jr       nz,wnotedge2
+         jp       nz,wnotedge2
          
          dec	  e
          jr	  z,wover_1

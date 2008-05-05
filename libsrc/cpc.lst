@@ -39,5 +39,5 @@ graphics/bkrestore
 graphics/cpc/pixladdr
 graphics/cpc/swapgfxbk
 graphics/clsgraph
-games/joystick
+games/cpc/joystick
 @z80.lst
