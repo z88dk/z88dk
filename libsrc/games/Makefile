@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.13 2008-04-08 16:49:27 stefano Exp $
+# $Id: Makefile,v 1.14 2008-05-09 10:35:56 stefano Exp $
 
 include	../Make.config
 
@@ -42,4 +42,5 @@ lvz:
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o*
-	$(RM) ace/*.o aquarius/*.o msx/*.o sam/*.o spectrum/*.o	vz/*.o z88/*.o
+	$(RM) ace/*.o cpc/*.o aquarius/*.o msx/*.o 
+	$(RM) sam/*.o spectrum/*.o trs80/*.o vz/*.o z88/*.o

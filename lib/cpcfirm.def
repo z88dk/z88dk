@@ -3,10 +3,10 @@ lstoff
 ; CPC Firmware Calculations
 ;
 ; September 2003
-; $Id: cpcfirm.def,v 1.3 2007-07-21 21:27:23 dom Exp $
+; $Id: cpcfirm.def,v 1.4 2008-05-09 10:35:55 stefano Exp $
 ;
 
-    XREF    firmware    ; Interposer for firmware routines
+    LIB     firmware    ; Interposer for firmware routines
 
     defc    kl_choke_off    = $bcc8
     defc    kl_rom_walk     = $bccb

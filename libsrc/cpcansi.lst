@@ -50,4 +50,7 @@ graphics/cpc/pixladdr
 graphics/cpc/swapgfxbk
 graphics/clsgraph
 games/cpc/joystick
+cpc/cpc_fdc
+cpc/cpc_model
+cpc/firmware
 @z80.lst

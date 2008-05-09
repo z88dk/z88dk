@@ -1,7 +1,3 @@
-stdio/cpc/fgetc_cons
-stdio/cpc/fputc_cons
-stdio/cpc/getk
-stdio/puts_cons
 graphics/circle
 graphics/cpc/clg
 graphics/clga
@@ -41,6 +37,4 @@ graphics/cpc/swapgfxbk
 graphics/clsgraph
 games/cpc/joystick
 cpc/cpc_fdc
-cpc/cpc_model
-cpc/firmware
-@z80.lst
+cpc/cpmfirmware

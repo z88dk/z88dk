@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.119 2008-04-08 16:49:27 stefano Exp $
+# $Id: Makefile,v 1.120 2008-05-09 10:35:56 stefano Exp $
 
 
 include Make.config
@@ -981,6 +981,7 @@ cpc_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpc_clib @$(LISTFILE_DIRECTORY)/cpc.lst
+	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpccpm @$(LISTFILE_DIRECTORY)/cpccpm.lst
 
 cpcansi_clib.lib:
 	@echo ''
@@ -1186,6 +1187,7 @@ clean:
 	cd ts2068 ; $(RM) *.o ; cd ..
 	cd vz ; $(RM) *.o ; cd ..
 	cd zx81 ; $(RM) *.o ; cd ..
+	cd cpc ; $(RM) *.o ; cd ..
 	$(MAKE) -C sms clean
 	cd sprites/software/sp1 ; $(MAKE) clean ; cd ../../..
 
