@@ -25,6 +25,8 @@ void tempoutput(void)
    #endasm
 }
 
+char buf[128];
+
 main()
 {
    int a, b, c, d;
@@ -40,5 +42,13 @@ main()
    c = t_printf("|%5u|%5o|%5x|%5b|%#5o|%#5x|%#5b|%#10.8x|\n", 12345, 12345, 12345, 12345, 12345, 12345, 12345, 12345);
    d = t_printf("|%3s%-6s|%-10.5s|%c|%3c|%-3c|\n", "no", "where", "Oh no you didn't!", '$', '*', '@');
    t_printf("Chars output: %d, %d, %d, %d\n\n", a, b, c, d);
+   
+   a = t_sprintf(buf, "Did it work number %d?\n", 6);
+   b = t_printf("%s", buf);
+   t_printf("Chars output: %d, %d\n\n", a, b);
+
+   a = t_snprintf(buf, 10, "Did it work number %d?\n", 6);
+   b = t_printf("%s\n", buf);
+   t_printf("Chars output: %d, %d\n\n", a, b-1);
 }
 
