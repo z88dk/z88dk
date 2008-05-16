@@ -31,9 +31,11 @@ XREF LIBDISP_VFPRINTF_CALLEE
    
    exx
    xor a
-   ld (de),0                   ; terminate string with '\0'
+   ld (de),a                   ; terminate string with '\0'
+   push bc
    exx
-   ret                         ; ret with hl = # chars written to string
+   pop hl                      ; hl = # chars written to string
+   ret
 
 .snprintf_outchar
 
@@ -58,3 +60,5 @@ XREF LIBDISP_VFPRINTF_CALLEE
    ld (de),a
    inc de
    ret
+
+defc ASMDISP_VSNPRINTF_CALLEE = asmentry - t_vsnprintf_callee
