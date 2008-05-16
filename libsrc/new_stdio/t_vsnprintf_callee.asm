@@ -42,9 +42,7 @@ XREF LIBDISP_VFPRINTF_CALLEE
    exx
    xor a
    ld (de),a                   ; terminate string with '\0'
-   push bc
    exx
-   pop hl                      ; hl = # chars written to string
    ret
 
 .snprintf_outchar
@@ -56,18 +54,15 @@ XREF LIBDISP_VFPRINTF_CALLEE
    ;         de = char *s
    ;         hl = space remaining in buffer
    ; exit  : no carry to indicate no error
-   ;         carry if string buffer full
 
    ld (de),a
 
    ld a,h                      ; if there's no space left in buffer
    or l                        ; (buffer write above goes into '\0' slot)
-   scf
-   ret z                       ; return indicating error
+   ret z                       ; return without advancing buffer ptr (to find out how many chars are actually printed)
    dec hl
    
    inc de
-   ccf
    ret
 
 defc ASMDISP_VSNPRINTF_CALLEE = asmentry - t_vsnprintf_callee
