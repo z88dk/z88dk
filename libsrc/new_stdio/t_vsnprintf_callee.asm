@@ -26,6 +26,16 @@ XREF LIBDISP_VFPRINTF_CALLEE
    ;         hl' = max size (including '\0')
    ; exit  : hl  = number of chars output to stream
 
+   exx
+   ld a,h                      ; reduce buffer size by 1 if possible for the '\0' char
+   or l
+   jr z, dontadj
+   dec hl
+
+.dontadj
+
+   exx
+
    ld ix,snprintf_outchar       ; address of 'stream' output function
    call t_vfprintf_callee + LIBDISP_VFPRINTF_CALLEE
    
@@ -44,21 +54,20 @@ XREF LIBDISP_VFPRINTF_CALLEE
    ;
    ; enter :  a = char to write to string
    ;         de = char *s
-   ;         hl = size
-   ;         bc = number of chars written so far
+   ;         hl = space remaining in buffer
    ; exit  : no carry to indicate no error
    ;         carry if string buffer full
 
-   inc bc                      ; increment char count to accommodate '\0'
-   
-   push hl
-   scf
-   sbc hl,bc                   ; if buf.size < num.out + 2
-   pop hl
-   ret c                       ; then there is no more room in buff so return with error
-   
    ld (de),a
+
+   ld a,h                      ; if there's no space left in buffer
+   or l                        ; (buffer write above goes into '\0' slot)
+   scf
+   ret z                       ; return indicating error
+   dec hl
+   
    inc de
+   ccf
    ret
 
 defc ASMDISP_VSNPRINTF_CALLEE = asmentry - t_vsnprintf_callee
