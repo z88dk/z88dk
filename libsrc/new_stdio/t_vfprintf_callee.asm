@@ -1,9 +1,9 @@
-; int t_vfprintf_callee(FILE *stream, const char *format, void *arg_ptr)
+; int __CALLEE__ t_vfprintf_callee(FILE *stream, const char *format, void *arg_ptr)
 ; 05.2008 aralbrec
 
 XLIB t_vfprintf_callee
 LIB stdio_outchar, stdio_atou, vfprintf_jumptbl
-XDEF ASMDISP_VFPRINTF_CALLEE
+XDEF ASMDISP_VFPRINTF_CALLEE, LIBDISP_VFPRINTF_CALLEE
 
 INCLUDE "stdio.def"
 
@@ -24,6 +24,16 @@ INCLUDE "stdio.def"
    ;         carry if stream error: ERRNO set and hl=-1
 
    ; *** do something with ix to point at output function
+
+.libentry
+
+   ; second entry point with ix equal to function address
+   ;
+   ; enter : ix  = = & attached file / device output function
+   ;         de  = format string
+   ;         bc  = & parameter list (arg_ptr)
+   ; exit  : hl  = number of chars output to stream
+   ;         carry if stream error: ERRNO set and hl=-1
 
    ld hl,-STDIO_TEMPBUFSZ
    add hl,sp
@@ -46,7 +56,7 @@ INCLUDE "stdio.def"
    
    ld a,(de)                   ; next format char
    or a                        ; reached the end of the format string?
-   jp z, exitnoerror
+   jr z, exitnoerror
    
    inc de
    cp '%'                     
@@ -69,14 +79,14 @@ INCLUDE "stdio.def"
 
 .exitnoerror
 
-   exx
-
    ld hl,STDIO_TEMPBUFSZ + 2   ; remove items from stack
    add hl,sp
    ld sp,hl
 
-   ld l,c
-   ld h,b                      ; hl = number of chars written on stream
+   exx
+   push bc
+   exx
+   pop hl                      ; hl = number of chars written on stream
    or a
    ret
 
@@ -296,3 +306,4 @@ INCLUDE "stdio.def"
    defb '#', 8
 
 defc ASMDISP_VFPRINTF_CALLEE = asmentry - t_vfprintf_callee
+defc LIBDISP_VFPRINTF_CALLEE = libentry - t_vfprintf_callee
