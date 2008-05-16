@@ -45,3 +45,5 @@ XREF LIBDISP_VFPRINTF_CALLEE
    inc hl
    or a
    ret
+
+defc ASMDISP_VSPRINTF_CALLEE = asmentry - t_vsprintf_callee
