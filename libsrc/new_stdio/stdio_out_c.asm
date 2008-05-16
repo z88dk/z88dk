@@ -28,7 +28,7 @@ LIB stdio_outchar, stdio_outpad
    
 .widthok
 
-   bit 7,e
+   bit 7,c
    jr z, rightjustified
 
 .leftjustified
