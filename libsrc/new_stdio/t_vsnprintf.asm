@@ -11,10 +11,10 @@ XREF ASMDISP_VSNPRINTF_CALLEE
    pop bc
    pop de
    exx
-   pop hl
    pop de
-   push de
+   pop hl
    push hl
+   push de
    exx
    push de
    push bc

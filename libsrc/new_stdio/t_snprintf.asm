@@ -27,8 +27,8 @@ XREF ASMDISP_VSNPRINTF_CALLEE
    push de
    
    exx
-   pop hl
    pop de
+   pop hl
    exx
    
    ld d,(hl)
