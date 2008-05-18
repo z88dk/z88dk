@@ -53,6 +53,7 @@ main()
    t_printf("Chars output: %d\n\n", a-1);
 
    a = t_printf("Ready to handle a long one %ld mixed with a short one %d?\n", -123456789L, -14);
-   t_printf("Chars output: %d\n\n", a-1);
+   b = t_printf("Here's a double %%, a couple unknowns %-#5.t %j. and a very bad thing %");
+   t_printf("\nChars output: %d %d\n\n", a-1, b);
 }
 

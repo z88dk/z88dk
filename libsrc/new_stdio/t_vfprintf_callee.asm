@@ -234,13 +234,14 @@ INCLUDE "stdio.def"
 .fmtcharerror
 
    ; unrecognized format char
-   ; output '%' and consume bad char so that '%%' works
-   ; bad things will happen if the format string terminates in '%'
    
    pop af
    ex de,hl
-   inc de
+   ld a,(de)
+   cp '%'                      ; did we see %%
    ld a,'%'
+   jp nz, ordinarychar         ; if no, output % but don't advance past the unknown fmt char
+   inc de                      ; if %% advance past the second %
    jp ordinarychar
 
 .fmtcharfound
