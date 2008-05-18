@@ -98,7 +98,7 @@ INCLUDE "stdio.def"
    ld c,0
    
    ; de = pointer in format string
-   ;  c = flags [-+ O#P0N]
+   ;  c = flags [-+ O#PLN]
    ; stack = & parameter list
    
 .flagloop
@@ -119,7 +119,7 @@ INCLUDE "stdio.def"
 
    ;  a = current format string char
    ; de = pointer in format string
-   ;  c = flags [-+ O#P0N]
+   ;  c = flags [-+ O#PLN]
    ; stack = & parameter list
 
    cp '*'
@@ -156,7 +156,7 @@ INCLUDE "stdio.def"
 
    ;  b = width
    ; de = pointer in format string
-   ;  c = flags [-+ O#P0N]
+   ;  c = flags [-+ O#PLN]
    ; stack = & parameter list
 
    ld h,1                      ; h = default precision = 1
@@ -195,8 +195,16 @@ INCLUDE "stdio.def"
    ;  b = width
    ;  h = precision
    ; de = pointer in format string
-   ;  c = flags [-+ O#P0N]
+   ;  c = flags [-+ O#PLN]
    ; stack = & parameter list
+
+   ld a,(de)                   ; check for long specifier
+   cp 'l'
+   jr nz, nolongspec
+   inc de                      ; consume the 'l'
+   set 1,c                     ; set long flag
+
+.nolongspec
 
    push hl
    ld hl,vfprintf_jumptbl
@@ -204,7 +212,7 @@ INCLUDE "stdio.def"
 
    ;  b = width
    ; hl = pointer in format string
-   ;  c = flags [-+ O#P0N]
+   ;  c = flags [-+ O#PLN]
    ; de = & vfprintf_jumptbl
    ; stack = & parameter list, precision (MSB)
 
@@ -241,7 +249,7 @@ INCLUDE "stdio.def"
 
    ;  b = width
    ; hl = pointer in format string
-   ;  c = flags [-+ O#P0N]
+   ;  c = flags [-+ O#PLN]
    ; de = & vfprintf_jumptbl.fmtchar
    ; stack = & parameter list, precision (MSB)
 
@@ -250,13 +258,13 @@ INCLUDE "stdio.def"
    call doformat
 
    ; return here after formatted output done
-   ; stack = pointer in formatted string, & parameter list
-   ;         carry set if error on stream, a = (errorno) set appropriately
+   ;    hl = & parameter list
+   ; stack = pointer in format string
+   ;         carry set if error on stream, ERRNO set appropriately
 
-   pop hl
-   ex (sp),hl
-   ex de,hl
-
+   pop de
+   push hl
+   
    ; de = format string
    ; stack = & parameter list
 
@@ -270,33 +278,37 @@ INCLUDE "stdio.def"
    
    ;  a = precision
    ;  b = width
+   ;  c = flags [-+ O#PLN]
    ; hl = & parameter list
-   ;  c = flags [-+ O#P0N]
-   ; stack = pointer in format string, return address, jump address
-
-   ld d,(hl)                   ; de = 16-bit parameter
+   ; stack = pointer in format string, ret, format function address
+   
+   ld d,(hl)                   ; get first 16-bit parameter
    dec hl
    ld e,(hl)
    dec hl
+   
+.callfmtfunc
 
    ; set-up for formatted output functions
    ;
    ; enter :     ix  = & attached file / device output function
    ;               a = precision
    ;               b = width
-   ;               c = flags [-+ O#P0N]
-   ;              de = 16-bit parameter
+   ;               c = flags [-+ O#PLN]
+   ;              de = 16-bit parameter (most significant word if long)
    ;              hl = & parameter list
    ;             bc' = total num chars output on stream thus far
+   ;             carry flag reset (important for %x, %lx)
    ; on exit :   bc' = total num chars output on stream thus far
-   ;         stack = & parameter list
-   ;         carry set if error on stream, a = (errorno) set appropriately
+   ;              hl = & parameter list
+   ;         carry set if error on stream, ERRNO set appropriately
 
+   or a                        ; clear carry
    bit 7,d                     ; set negative flag if de < 0
    ret z                       ; doing it here saves a few bytes
    set 0,c
    ret                         ; ret calls formatted output function
-   
+
 .flags
 
    defb '-', 128
@@ -307,3 +319,4 @@ INCLUDE "stdio.def"
 
 defc ASMDISP_VFPRINTF_CALLEE = asmentry - t_vfprintf_callee
 defc LIBDISP_VFPRINTF_CALLEE = libentry - t_vfprintf_callee
+ 

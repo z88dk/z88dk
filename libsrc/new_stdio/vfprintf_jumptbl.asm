@@ -9,8 +9,8 @@ XLIB vfprintf_jumptbl
 .vfprintf_jumptbl
 
    defb 'd', 195
-   LIB stdio_out_d
-   defw stdio_out_d
+   LIB stdio_out_ld
+   defw stdio_out_ld
    
    defb 'c', 195
    LIB stdio_out_c
@@ -21,34 +21,36 @@ XLIB vfprintf_jumptbl
    defw stdio_out_s
    
    defb 'u', 195
-   LIB stdio_out_u
-   defw stdio_out_u
+   LIB stdio_out_lu
+   defw stdio_out_lu
    
    defb 'x', 195
-   LIB stdio_out_x
-   defw stdio_out_x
+   LIB stdio_out_lx
+   defw stdio_out_lx
    
    defb 'i', 195
-   LIB stdio_out_d
-   defw stdio_out_d
+   LIB stdio_out_ld
+   defw stdio_out_ld
    
-;   defb 'X', 195
-;   defw
+   defb 'X', 195
+   LIB stdio_out_caplx
+   defw stdio_out_caplx
    
    defb 'b', 195
    LIB stdio_out_b
    defw stdio_out_b
    
    defb 'o', 195
-   LIB stdio_out_o
-   defw stdio_out_o
+   LIB stdio_out_lo
+   defw stdio_out_lo
    
    defb 'p', 195
-   LIB stdio_out_p
-   defw stdio_out_p
+   LIB stdio_out_lp
+   defw stdio_out_lp
    
-;   defb 'P', 195
-;   defw
+   defb 'P', 195
+   LIB stdio_out_caplp
+   defw stdio_out_caplp
    
    defb 'n', 195
    LIB stdio_out_n
@@ -67,4 +69,4 @@ XLIB vfprintf_jumptbl
 ;   defw
    
    defb 0                      ; end of table
- 
+  

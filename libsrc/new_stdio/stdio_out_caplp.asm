@@ -1,10 +1,10 @@
-; stdio_out_p
+; stdio_out_caplp
 ; 05.2008 aralbrec
 
-XLIB stdio_out_p
-LIB stdio_out_x
+XLIB stdio_out_caplp
+LIB stdio_out_lx
 
-; output %p parameter
+; output %lP parameter, handles 16-bit %P and 24-bit %lP
 ;
 ; enter :    ix  = & attached file / device output function
 ;             a = precision
@@ -19,8 +19,9 @@ LIB stdio_out_x
 ;         carry set if error on stream, ERRNO set appropriately
 ; uses  : af, bc, de, hl, exx
 
-.stdio_out_p
+.stdio_out_caplp
 
    set 3,c
-   jp stdio_out_x
+   scf
+   jp stdio_out_lx
 

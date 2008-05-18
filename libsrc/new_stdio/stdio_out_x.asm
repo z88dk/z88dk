@@ -2,8 +2,7 @@
 ; 05.2008 aralbrec
 
 XLIB stdio_out_x
-LIB stdio_numprec, stdio_out_u
-XREF DISP_STDIO_OUT_U_COMMON
+LIB stdio_numprec, stdio_outcommon, stdio_buff2caps
 
 INCLUDE "stdio.def"
 
@@ -12,31 +11,51 @@ INCLUDE "stdio.def"
 ; enter :    ix  = & attached file / device output function
 ;             a = precision
 ;             b = width
-;             c = flags [-+ O#PCN]
+;             c = flags [-+ O#PLN]
 ;            de = integer
 ;            hl = & parameter list
 ;           bc' = total num chars output on stream thus far
+;           carry flag set = want capitals
 ; exit  :   bc' = total num chars output on stream thus far
-;         stack = & parameter list
-;         carry set if error on stream, a = (errorno) set appropriately
+;            hl = & parameter list
+;         carry set if error on stream, ERRNO set appropriately
 ; uses  : af, bc, de, hl, exx, bc'
 
 .stdio_out_x
 
-   ex (sp),hl
-   push hl
-   push bc                     ; save width and flags
+   push hl                     ; save & parameter list
+   jr nc, notcaps
    
+.capitalize
+   
+   call dox
+   call stdio_buff2caps        ; capitalize buffer
+   call stdio_outcommon
+   pop hl                      ; hl = & parameter list
+   ret
+
+.notcaps
+
+   call dox
+   call stdio_outcommon
+   pop hl                      ; hl = & parameter list
+   ret
+
+.dox
+
+   push bc                     ; save width and flags
    ld bc,16                    ; num chars in buffer = 0, radix = 16
+
    ld hl,STDIO_TEMPBUFSZ + 7
    add hl,sp                   ; hl = & last char in temporary buffer
    
    call stdio_numprec          ; write number to buffer including precision digits
+   
    pop de
    
    ;     b = num chars written to buffer
    ;     d = width
-   ;     e = flags [-+ O#P0N]
+   ;     e = flags [-+ O#PLN]
    ;    hl = & next free position in destination buffer
 
    inc b                       ; no digits written to buffer means precision and integer == 0
@@ -46,7 +65,7 @@ INCLUDE "stdio.def"
 .noadj
 
    bit 3,e
-   jp z, stdio_out_u + DISP_STDIO_OUT_U_COMMON
+   ret z
 
 .addbaseindicator
 
@@ -56,5 +75,4 @@ INCLUDE "stdio.def"
    dec hl
    inc b
    inc b
-
-   jp stdio_out_u + DISP_STDIO_OUT_U_COMMON
+   ret

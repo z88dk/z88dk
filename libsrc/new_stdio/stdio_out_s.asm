@@ -9,19 +9,23 @@ LIB stdio_outchar, stdio_outpad, strlen
 ; enter :    ix  = & attached file / device output function
 ;             a = precision
 ;             b = width
-;             c = flags [-+ O#P0N]
+;             c = flags [-+ O#PLN]
 ;            de = char *s
 ;            hl = & parameter list
 ;           bc' = total num chars output on stream thus far
 ; exit  :   bc' = total num chars output on stream thus far
-;         stack = & parameter list
-;         carry set if error on stream, a = (errorno) set appropriately
+;            hl = & parameter list
+;         carry set if error on stream, ERRNO set appropriately
 ; uses  : af, bc, de, hl, exx, bc'
 
 .stdio_out_s
 
-   ex (sp),hl
-   push hl
+   push hl                     ; save & parameter list
+   call dorest
+   pop hl                      ; hl = & parameter list
+   ret
+
+.dorest
 
    push de                     ; save char *s
    push af                     ; save precision
@@ -33,13 +37,13 @@ LIB stdio_outchar, stdio_outpad, strlen
    call strlen                 ; hl = string length
    
    pop bc
-   
+
    ;    ix = & attached file / device output function
    ;     b = precision
    ;     d = width
-   ;     e = flags [-+ O#P0N]
+   ;     e = flags [-+ O#PLN]
    ;    hl = string length
-   ; stack = char *s
+   ; stack = & parameter list, char *s
 
    bit 2,e
    jr z, noprec
@@ -63,9 +67,9 @@ LIB stdio_outchar, stdio_outpad, strlen
 
    ;    ix = & attached file / device output function
    ;     d = width
-   ;     e = flags [-+ O#P0N]
+   ;     e = flags [-+ O#PLN]
    ;    hl = num chars from string to output
-   ; stack = char *s
+   ; stack = & parameter list, char *s
 
    ld a,h                      ; determine number of padding chars required
    or a
@@ -85,9 +89,9 @@ LIB stdio_outchar, stdio_outpad, strlen
 
    ;    ix = & attached file / device output function
    ;     d = number of padding chars required
-   ;     e = flags [-+ O#P0N]
+   ;     e = flags [-+ O#PLN]
    ;    hl = num chars from string to output
-   ; stack = char *s
+   ; stack = & parameter list, ret, char *s
 
    bit 7,e
    jr z, rightjustified

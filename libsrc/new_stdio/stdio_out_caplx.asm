@@ -1,26 +1,27 @@
-; stdio_out_p
+; stdio_out_caplx
 ; 05.2008 aralbrec
 
-XLIB stdio_out_p
-LIB stdio_out_x
+XLIB stdio_out_caplx
+LIB stdio_out_lx
 
-; output %p parameter
+INCLUDE "stdio.def"
+
+; output %lX parameter, handles 16-bit %X and 32-bit %lX
 ;
 ; enter :    ix  = & attached file / device output function
 ;             a = precision
 ;             b = width
 ;             c = flags [-+ O#PLN]
-;            de = void *
+;            de = integer
 ;            hl = & parameter list
 ;           bc' = total num chars output on stream thus far
 ;           carry flag set = want capitals
 ; exit  :   bc' = total num chars output on stream thus far
 ;            hl = & parameter list
 ;         carry set if error on stream, ERRNO set appropriately
-; uses  : af, bc, de, hl, exx
+; uses  : af, bc, de, hl, exx, bc'
 
-.stdio_out_p
+.stdio_out_caplx
 
-   set 3,c
-   jp stdio_out_x
-
+   scf
+   jp stdio_out_lx

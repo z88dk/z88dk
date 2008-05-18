@@ -3,11 +3,11 @@
 
 XLIB stdio_buff2caps
 
-; output string of chars to file / device from temporary buffer
+; capitalize all letters in buffer
 ;
-; enter :  b = number of chars from buffer to output
+; enter :  b = number of chars in buffer
 ;         hl = & buffer - 1
-; uses  : af, exx
+; uses  : af
 
 .stdio_buff2caps
 

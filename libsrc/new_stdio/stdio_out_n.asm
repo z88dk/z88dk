@@ -10,14 +10,14 @@ XLIB stdio_out_n
 ;            hl = & parameter list
 ;           bc' = total num chars output on stream thus far
 ; exit  :   bc' = total num chars output on stream thus far
-;         stack = & parameter list
+;            hl = & parameter list
 ;         carry reset (no error on stream)
 ; uses  : f, de, hl
 
 .stdio_out_n
 
-   ex (sp),hl
-   push hl
+   push hl                     ; save & parameter list
+   
    ex de,hl                    ; hl = int *
 
    exx
@@ -29,5 +29,6 @@ XLIB stdio_out_n
    inc hl
    ld (hl),d
    
+   pop hl                      ; hl = & parameter list
    or a
    ret

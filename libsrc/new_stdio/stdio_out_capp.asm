@@ -1,7 +1,7 @@
-; stdio_out_p
+; stdio_out_capp
 ; 05.2008 aralbrec
 
-XLIB stdio_out_p
+XLIB stdio_out_capp
 LIB stdio_out_x
 
 ; output %p parameter
@@ -19,8 +19,9 @@ LIB stdio_out_x
 ;         carry set if error on stream, ERRNO set appropriately
 ; uses  : af, bc, de, hl, exx
 
-.stdio_out_p
+.stdio_out_capp
 
    set 3,c
+   scf
    jp stdio_out_x
 
