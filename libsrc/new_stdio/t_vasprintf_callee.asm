@@ -7,9 +7,6 @@ XDEF ASMDISP_VASPRINTF_CALLEE
 LIB t_vsnprintf_callee, malloc
 XREF ASMDISP_VSNPRINTF_CALLEE
 
-LIB t_vsprintf_callee
-XREF ASMDISP_VSPRINTF_CALLEE
-
 .t_vasprintf_callee
 
    pop hl
@@ -47,9 +44,10 @@ XREF ASMDISP_VSPRINTF_CALLEE
    inc hl
    ld (hl),d
    ex de,hl                    ; hl = destination buffer address
+   ld de,$ffff                 ; size of buffer (we know there's enough space)
    exx
    
-   jp t_vsprintf_callee + ASMDISP_VSPRINTF_CALLEE   ; at a cost of 20 bytes the faster sprintf is called
+   jp t_vsnprintf_callee + ASMDISP_VSNPRINTF_CALLEE
 
 .fail
 
