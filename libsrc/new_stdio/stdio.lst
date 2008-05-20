@@ -12,6 +12,7 @@ stdio_out_p
 stdio_out_s
 stdio_out_u
 stdio_out_x
+stdio_out_lb
 stdio_out_ld
 stdio_out_lo
 stdio_out_lp
@@ -28,9 +29,12 @@ stdio_outpad
 stdio_outsign
 stdio_ultoa_any
 stdio_utoa_any
+t_asprintf
 t_printf
 t_snprintf
 t_sprintf
+t_vasprintf
+t_vasprintf_callee
 t_vfprintf
 t_vfprintf_callee
 t_vsnprintf

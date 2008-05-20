@@ -37,8 +37,8 @@ XLIB vfprintf_jumptbl
    defw stdio_out_caplx
    
    defb 'b', 195
-   LIB stdio_out_b
-   defw stdio_out_b
+   LIB stdio_out_lb
+   defw stdio_out_lb
    
    defb 'o', 195
    LIB stdio_out_lo
