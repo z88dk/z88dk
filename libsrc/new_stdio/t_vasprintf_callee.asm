@@ -47,9 +47,7 @@ XREF ASMDISP_VSNPRINTF_CALLEE
    ld de,$ffff                 ; de = length of buffer (we know there is sufficient space)
    exx
    
-   call t_vsnprintf_callee + ASMDISP_VSNPRINTF_CALLEE
-   inc hl                      ; return size of malloced buffer (output length + one for \0)
-   ret
+   jp t_vsnprintf_callee + ASMDISP_VSNPRINTF_CALLEE
 
 .fail
 
