@@ -7,6 +7,9 @@ XDEF ASMDISP_VASPRINTF_CALLEE
 LIB t_vsnprintf_callee, malloc
 XREF ASMDISP_VSNPRINTF_CALLEE
 
+LIB t_vsprintf_callee
+XREF ASMDISP_VSPRINTF_CALLEE
+
 .t_vasprintf_callee
 
    pop hl
@@ -24,7 +27,7 @@ XREF ASMDISP_VSNPRINTF_CALLEE
    ;         bc  = & parameter list (arg_ptr)
    ;         hl' = char **s
    ;         de' = 0
-   ; exit  : hl  = number of chars allocated for buffer, -1 if error
+   ; exit  : hl  = number of chars written to destination string not incl \0, -1 if error
 
    push bc                     ; save & parameter list
    push de                     ; save format string
@@ -44,10 +47,9 @@ XREF ASMDISP_VSNPRINTF_CALLEE
    inc hl
    ld (hl),d
    ex de,hl                    ; hl = destination buffer address
-   ld de,$ffff                 ; de = length of buffer (we know there is sufficient space)
    exx
    
-   jp t_vsnprintf_callee + ASMDISP_VSNPRINTF_CALLEE
+   jp t_vsprintf_callee + ASMDISP_VSPRINTF_CALLEE   ; at a cost of 20 bytes the faster sprintf is called
 
 .fail
 
