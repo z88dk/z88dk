@@ -2,6 +2,9 @@
  *			    C P P 5 . C
  *		E x p r e s s i o n   E v a l u a t i o n
  *
+ * $Id: cpp5.c,v 1.2 2008-05-26 06:53:01 stefano Exp $
+ *
+ *
  * Edit History
  * 31-Aug-84	MM	USENET net.sources release
  * 04-Oct-84	MM	__LINE__ and __FILE__ must call ungetstring()
@@ -13,6 +16,7 @@
  * 31-Oct-84	ado/MM	Added token concatenation
  *  6-Nov-84	MM	Split from #define stuff, added sizeof stuff
  * 19-Nov-84	ado	#if error returns TRUE for (sigh) compatibility
+ *
  */
 
 #include	<stdio.h>
@@ -105,7 +109,7 @@ register int	op;
 #define	isbinary(op)	(op >= FIRST_BINOP && op <= LAST_BINOP)
 #define	isunary(op)	(op >= FIRST_UNOP  && op <= LAST_UNOP)
 #endif
-
+
 /*
  * The following definitions are used to specify basic variable sizes.
  */
@@ -149,7 +153,7 @@ register int	op;
 #ifndef	S_PFPTR
 #define S_PFPTR		(sizeof (int (*)()))
 #endif
-
+
 typedef struct types {
     short	type;			/* This is the bit if		*/
     char	*name;			/* this is the token word	*/
@@ -194,7 +198,7 @@ SIZES size_table[] = {
     { T_FPTR,	0,		S_PFPTR		},	/* int (*()) 	*/
     { 0,	0,		0		},	/* End of table	*/
 };
-
+
 int
 eval()
 /*
@@ -363,7 +367,7 @@ again:	;
 	    }					/* op1 switch end	*/
 	}					/* Stack unwind loop	*/
 }
-
+
 FILE_LOCAL int
 evallex(skip)
 int		skip;		/* TRUE if short-circuit evaluation	*/
@@ -483,7 +487,7 @@ again:  do {					/* Collect the token	*/
 	}
 	return (t);
 }
-
+
 FILE_LOCAL int
 dosizeof()
 /*
@@ -606,7 +610,7 @@ bittest(value)
 	return (value == 0 || value ^ (value - 1) == (value * 2 - 1));
 #endif
 }
-
+
 FILE_LOCAL int
 evalnum(c)
 register int	c;
@@ -647,7 +651,7 @@ register int	c;
 	unget();
 	return (value);
 }
-
+
 FILE_LOCAL int
 evalchar(skip)
 int		skip;		/* TRUE if short-circuit evaluation	*/
@@ -750,7 +754,7 @@ int		skip;		/* TRUE if short-circuit evaluation	*/
 	instring = FALSE;
 	return (value);
 }
-
+
 FILE_LOCAL int *
 evaleval(valp, op, skip)
 register int	*valp;
@@ -891,7 +895,7 @@ int		skip;		/* TRUE if short-circuit evaluation	*/
 	*valp++ = v1;
 	return (valp);
 }
-
+
 #ifdef	DEBUG_EVAL
 dumpstack(opstack, opp, value, valp)
 OPTAB		opstack[NEXP];	/* Operand stack		*/

@@ -1,6 +1,9 @@
 /*
  * CPP main program.
  *
+ * $Id: cpp1.c,v 1.3 2008-05-26 06:53:01 stefano Exp $
+ *
+ *
  * Edit history
  * 21-May-84	MM	"Field test" release
  * 23-May-84	MM	Some minor hacks.
@@ -80,6 +83,7 @@
  * 26-Nov-94    MH      -P problem of outputting a newline after leading
  *                      white space in order to correct counter if fixed 
  *                      now.  Several other fixes for -P, too.
+ *
  */
 
 #include	<stdio.h>
@@ -235,7 +239,7 @@ char	*magic[] = {			/* Note: order is important	*/
 	"__FILE__",
 	NULL				/* Must be last			*/
 };
-
+
 main(argc, argv)
 int		argc;
 char		*argv[];
@@ -316,7 +320,7 @@ char		*argv[];
 	}
 	exit(IO_NORMAL);		/* No errors or -E option set	*/
 }
-
+
 FILE_LOCAL
 cppmain()
 /*
@@ -446,7 +450,7 @@ end_line:   if (c == '\n') {			/* Compiling at EOL?	*/
 	    }
 	}					/* Continue until EOF	*/
 }
-
+
 int join=0;
 
 output(c)

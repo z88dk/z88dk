@@ -2,6 +2,9 @@
  *			    C P P 4 . C
  *		M a c r o  D e f i n i t i o n s
  *
+ * $Id: cpp4.c,v 1.2 2008-05-26 06:53:01 stefano Exp $
+ *
+ *
  * Edit History
  * 31-Aug-84	MM	USENET net.sources release
  * 04-Oct-84	MM	__LINE__ and __FILE__ must call ungetstring()
@@ -12,6 +15,7 @@
  *			#if !defined(FOO) && FOO != 0 && 10 / FOO ...
  * 31-Oct-84	ado/MM	Added token concatenation
  *  6-Nov-84	MM	Split off eval stuff
+ *
  */
 
 #include	<stdio.h>
@@ -217,7 +221,7 @@ bad_define:
 	cerror("#define syntax error", NULLST);
 	inmacro = FALSE;			/* Stop <newline> hack	*/
 }
-
+
 checkparm(c, dp)
 register int	c;
 DEFBUF		*dp;
@@ -244,7 +248,7 @@ DEFBUF		*dp;
 	for (cp = token; *cp != EOS;)		/* And save		*/
 	    save(*cp++);			/* The token itself	*/
 }
-
+
 #if STRING_FORMAL
 stparmscan(delim, dp)
 int		delim;
@@ -310,7 +314,7 @@ int		delim;
 	workp[-1] = wp[-1];		/* Nope, reset end quote.	*/
 }
 #endif
-
+
 doundef()
 /*
  * Remove the symbol from the defined list.
@@ -360,7 +364,7 @@ register int	c;
 	    *parmp++ = c;
 	}
 }
-
+
 /*
  *		M a c r o   E x p a n s i o n
  */
@@ -467,7 +471,7 @@ register DEFBUF	*tokenp;
 	    expstuff(tokenp);		/* Do actual parameters		*/
 	}				/* nargs switch			*/
 }
-
+
 FILE_LOCAL int
 expcollect()
 /*
@@ -530,7 +534,7 @@ expcollect()
 	}					/* Collect all args.	*/
 	return (TRUE);				/* Normal return	*/
 }
-
+
 FILE_LOCAL
 expstuff(tokenp)
 DEFBUF		*tokenp;		/* Current macro being expanded	*/
@@ -600,7 +604,7 @@ nospace:	    cfatal("Out of space in macro \"%s\" arg expansion",
 	    printf("macroline: \"%s\"\n", file->buffer);
 #endif
 }
-
+
 #if DEBUG
 dumpparm(why)
 char		*why;

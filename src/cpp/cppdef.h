@@ -1,3 +1,5 @@
+/*  $Id: cppdef.h,v 1.3 2008-05-26 06:53:01 stefano Exp $  */
+
 #define	TRUE			1
 #define	FALSE			0
 

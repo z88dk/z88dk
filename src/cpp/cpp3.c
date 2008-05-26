@@ -3,8 +3,12 @@
  *
  *		    File open and command line options
  *
+ * $Id: cpp3.c,v 1.4 2008-05-26 06:53:01 stefano Exp $
+ *
+ *
  * Edit history
  * 13-Nov-84	MM	Split from cpp1.c
+ *
  */
 
 #include	<stdio.h>
@@ -63,7 +67,7 @@ char		*filename;		/* Name of the file		*/
 	line = 1;			/* Working on line 1 now	*/
 	wrongline = TRUE;		/* Force out initial #line	*/
 }
-
+
 setincdirs()
 /*
  * Append system-specific directories to the include directory list.
@@ -136,7 +140,7 @@ setincdirs()
 #define	MAXINCLUDE	(NINCLUDE - 0 - IS_INCLUDE)
 #endif
 }
-
+
 int
 dooptions(argc, argv)
 int		argc;
@@ -280,7 +284,7 @@ char		*argv[];
 	}
 	return (j);			/* Return new argc		*/
 }
-
+
 #if HOST != SYS_UNIX
 FILE_LOCAL
 zap_uc(ap)
@@ -374,7 +378,7 @@ initdefines()
 #endif
 	}
 }
-
+
 #if HOST == SYS_VMS
 /*
  * getredirection() is intended to aid in porting C programs

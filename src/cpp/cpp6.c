@@ -2,6 +2,9 @@
  *			    C P P 6 . C
  *		S u p p o r t   R o u t i n e s
  *
+ * $Id: cpp6.c,v 1.4 2008-05-26 06:53:01 stefano Exp $
+ *
+ *
  * Edit History
  * 25-May-84 MM		Added 8-bit support to type table.
  * 30-May-84 ARF	sharp() should output filename in quotes
@@ -16,6 +19,7 @@
  *  2-Nov-84 MM		Token concatenation is messier than I thought
  *  6-Dec-84 MM		\<nl> is everywhere invisible.
  * 22-Apr-00 djm	Support for C++ // style comments
+ *
  */
 
 #include	<stdio.h>
@@ -73,7 +77,7 @@
  *		cierror & ciwarn take a format and a single int (char) argument.
  *		cfatal takes a format and a single string argument.
  */
-
+
 /*
  * This table must be rewritten for a non-Ascii machine.
  *
@@ -118,7 +122,7 @@ OP_LPA,OP_RPA,OP_MUL,OP_ADD,   000,OP_SUB,   DOT,OP_DIV, /* 28 ()*+,-./	*/
    000,   000,   000,   000,   000,   000,   000,   000, /*   80 .. FF	*/
    000,   000,   000,   000,   000,   000,   000,   000, /*   80 .. FF	*/
 };
-
+
 skipnl()
 /*
  * Skip to the end of the current input line.
@@ -148,7 +152,7 @@ skipws()
 #endif
 	return (c);
 }
-
+
 scanid(c)
 register int	c;				/* First char of id	*/
 /*
@@ -191,7 +195,7 @@ register int		c;
 	}
 	return (c);
 }
-
+
 int
 catenate()
 /*
@@ -257,7 +261,7 @@ catenate()
 	return (FALSE);				/* Not supported	*/
 #endif
 }
-
+
 int
 scanstring(delim, outfun)
 register int	delim;			/* ' or "			*/
@@ -292,7 +296,7 @@ int		(*outfun)();		/* Output function		*/
 	    return (FALSE);
 	}
 }
-
+
 scannumber(c, outfun)
 register int	c;				/* First char of number	*/
 register int	(*outfun)();			/* Output/store func	*/
@@ -418,7 +422,7 @@ nomore:	unget();				/* Not part of a number	*/
 	if (octal89 && radix == 8)
 	    cwarn("Illegal digit in octal number", NULLST);
 }
-
+
 save(c)
 register int	c;
 {
@@ -484,7 +488,7 @@ int		size;
 	    cfatal("Out of memory", NULLST);
 	return (result);
 }
-
+
 /*
  *			C P P   S y m b o l   T a b l e s
  */
@@ -542,7 +546,7 @@ int	c;				/* First character of token	*/
 	}
 	return ((temp == 0) ? dp : NULL);
 }
-
+
 DEFBUF *
 defendel(name, delete)
 char		*name;
@@ -592,7 +596,7 @@ int		delete;			/* TRUE to delete a symbol	*/
 	}
 	return (dp);
 }
-
+
 #if DEBUG
 
 dumpdef(why)
@@ -643,7 +647,7 @@ register DEFBUF	*dp;
 	putchar('\n');
 }
 #endif
-
+
 /*
  *			G E T
  */
@@ -839,7 +843,7 @@ test:		if (keepcomments && c != EOF_CHAR)
 	    c = ' ';				/* Tab are whitespace	*/
 	return (c);				/* Just return the char	*/
 }
-
+
 unget()
 /*
  * Backup the pointer to reread the last character.  Fatal error
@@ -890,7 +894,7 @@ cget()
 #endif
 	return (c);
 }
-
+
 /*
  * Error messages and other hacks.  The first byte of severity
  * is 'S' for string arguments and 'I' for int arguments.  This

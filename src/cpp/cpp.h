@@ -3,6 +3,10 @@
  *	I n t e r n a l   D e f i n i t i o n s    f o r   C P P
  *
  * In general, definitions in this file should not be changed.
+ *
+ *
+ * $Id: cpp.h,v 1.2 2008-05-26 06:53:01 stefano Exp $
+ *
  */
 
 #ifndef	TRUE
