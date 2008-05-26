@@ -24,7 +24,7 @@
 ;    2 - Vortex FDC
 
 
-;; $Id: cpc_fdc.asm,v 1.1 2008-05-09 10:38:32 stefano Exp $
+;; $Id: cpc_fdc.asm,v 1.2 2008-05-26 06:38:07 stefano Exp $
 
 
         XDEF cpc_fdc

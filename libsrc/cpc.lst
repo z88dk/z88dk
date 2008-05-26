@@ -40,7 +40,13 @@ graphics/cpc/pixladdr
 graphics/cpc/swapgfxbk
 graphics/clsgraph
 games/cpc/joystick
+cpc/bios_msg
 cpc/cpc_fdc
 cpc/cpc_model
+cpc/cpc_rsx
+cpc/cpc_rsx_str
+cpc/cpc_rsx_strcpy
+cpc/cpc_rsx_strcpy_callee
 cpc/firmware
+cpc/fdc_address
 @z80.lst

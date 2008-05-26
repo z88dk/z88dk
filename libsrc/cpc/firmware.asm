@@ -15,7 +15,7 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: firmware.asm,v 1.1 2008-05-09 10:38:33 stefano Exp $
+; $Id: firmware.asm,v 1.2 2008-05-26 06:38:08 stefano Exp $
 ;
 
         XLIB firmware

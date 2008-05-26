@@ -7,18 +7,22 @@
 ;    2 - 6128
 
 
-; $Id: cpc_model.asm,v 1.1 2008-05-09 10:38:32 stefano Exp $
+; $Id: cpc_model.asm,v 1.2 2008-05-26 06:38:08 stefano Exp $
 
+
+        INCLUDE "#cpcfirm.def"              
 
         XDEF cpc_model
 
 .cpc_model
-        ld      a,($BD65)
-        ld      hl,0
-        cp      158
-        ret     z
-        inc     hl
-        cp      200
-        ret     z
-        inc     hl
-        ret
+	call	firmware
+	defb	kl_probe_rom	; 0B915H
+	ld	a,h		; version
+	ld	hl,1
+	rra
+	ret	c	; 664
+	ld	l,2
+	rra
+	ret	c	; 6128
+	ld	l,h
+	ret		; 464

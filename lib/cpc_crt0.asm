@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.12 2008-05-09 10:35:55 stefano Exp $
+;       $Id: cpc_crt0.asm,v 1.13 2008-05-26 06:38:07 stefano Exp $
 ;
 
         MODULE  cpc_crt0
@@ -157,6 +157,9 @@ ENDIF
                 defw    $C000
 .coords         defw    0
 .firmware_bc    defw    0
+
+.heaplast       defw    0       ; Address of last block on heap
+.heapblocks     defw    0       ; Number of blocks
 
                 defm    "Small C+ CPC"
                 defb    0
