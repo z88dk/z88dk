@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.120 2008-05-09 10:35:56 stefano Exp $
+# $Id: Makefile,v 1.121 2008-05-26 20:25:18 dom Exp $
 
 
 include Make.config
@@ -13,7 +13,6 @@ include Make.config
 # - SP1 (build depends on customization and machine target, "make sp1" for options)
 
 all:	genlibs z88libs tilibs zxlibs \
-	
 	abc80_clib.lib abc80ansi_clib.lib abc800_clib.lib \
 	aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib c128ansi_clib.lib \
 	cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib cpcgray.lib \
