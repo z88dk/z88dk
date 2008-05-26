@@ -23,8 +23,11 @@ INCLUDE "stdio.def"
    ; exit  : hl  = number of chars output to stream
    ;         carry if stream error: ERRNO set and hl=-1
 
-   ; *** do something with ix to point at output function
-
+   bit 2,(ix+0)                ; is this an output stream?
+   jr z, immediateexit
+   inc ix
+   inc ix  
+   
 .libentry
 
    ; second entry point with ix equal to function address
@@ -72,7 +75,9 @@ INCLUDE "stdio.def"
    ld hl,STDIO_TEMPBUFSZ + 2   ; remove items from stack
    add hl,sp
    ld sp,hl
-   
+
+.immediateexit
+
    ld hl,-1                    ; hl = error value, ERRNO set by stream already
    scf
    ret

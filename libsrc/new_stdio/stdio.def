@@ -2,3 +2,13 @@
 defc STDIO_MAXPREC   = 16                    ; maximum precision prevents buffer overflow
 defc STDIO_TEMPBUFSZ = STDIO_MAXPREC + 2     ; size of temporary buffer allocated on stack
 
+; current FILE structure:
+;
+; flags      defb 0      ; bit 0 = 1 if unget char present
+;                        ; bit 1 = 1 if this is an input stream
+;                        ; bit 2 = 1 if this is an output stream
+; ungetch    defb 0      ; a single unget char
+; output     defb 195
+;            defw 0      ; address of out char function for stream
+; input      defb 195
+;            defw 0      ; address of in char function for stream

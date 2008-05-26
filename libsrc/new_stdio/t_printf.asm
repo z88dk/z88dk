@@ -5,11 +5,11 @@ XLIB t_printf
 
 LIB t_vfprintf_callee
 XREF ASMDISP_VFPRINTF_CALLEE
-XREF _tempoutput
+XREF _t_stdout
 
 .t_printf
 
-   ld ix,_tempoutput
+   ld ix,_t_stdout
 
    add a,a
    inc a
