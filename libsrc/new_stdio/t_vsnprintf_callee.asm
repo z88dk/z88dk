@@ -47,6 +47,8 @@ XREF LIBDISP_VFPRINTF_CALLEE
    call t_vfprintf_callee + LIBDISP_VFPRINTF_CALLEE
    ret
 
+   defw 0                       ; really aggravating hack: stdio_outchar wants to res 0,(ix-2)
+
 .snprintf_outchar
 
    ; called by vfprintf()

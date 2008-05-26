@@ -22,7 +22,7 @@ XREF LIBDISP_VFPRINTF_CALLEE
    ; enter : de  = format string
    ;         bc  = & parameter list (arg_ptr)
    ;         hl' = char *s
-   ; exit  : hl  = number of chars output to stream
+   ; exit  : hl  = number of chars output to string not including \0
 
    ld ix,sprintf_outchar       ; address of 'stream' output function
    call t_vfprintf_callee + LIBDISP_VFPRINTF_CALLEE
@@ -31,6 +31,8 @@ XREF LIBDISP_VFPRINTF_CALLEE
    ld (hl),0                   ; terminate string with '\0'
    exx
    ret                         ; ret with hl = # chars written to string
+
+   defw 0                      ; really aggravating hack: stdio_outchar wants to res 0,(ix-2)
 
 .sprintf_outchar
 
