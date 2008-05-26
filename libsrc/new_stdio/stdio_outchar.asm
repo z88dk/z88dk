@@ -19,9 +19,10 @@ LIB l_jpix
    push bc
    call l_jpix
    pop bc
-   
    jr c, error
+   
    inc bc
+   res 0,(ix-2)                ; no unget char available
 
 .error
 
