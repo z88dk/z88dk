@@ -17,13 +17,13 @@ XDEF _t_stdout
    defb $04                    ; flags: 0000 0OIU (Output stream, Input stream, Unget char)
    
    defb 0                      ; space for single unget char
-   
+ 
+   defb 195                    ; jp
+   defw 0                      ; address of character input function
+  
    defb 195                    ; jp
    defw _tempoutput            ; address of character output function
    
-   defb 195                    ; jp
-   defw 0                      ; address of character input function
-
 ; stdin FILE structure as of now, still no connection to low level file descriptors
 
 XDEF _t_stdin
@@ -33,12 +33,12 @@ XDEF _t_stdin
    defb $02                    ; flags: 0000 0OIU (Output stream, Input stream, Unget char)
    
    defb 0                      ; space for single unget char
+
+   defb 195                    ; jp
+   defw _tempinput             ; address of character input function
    
    defb 195                    ; jp
    defw 0                      ; address of character output function
-   
-   defb 195                    ; jp
-   defw _tempinput             ; address of character input function
 
 #endasm
 
@@ -93,8 +93,6 @@ void tempoutput(void)
    ; the idea is that the stdio front end uses the main set
    ; of registers and the back end (low level io) uses the
    ; alternate set
-   
-   ; using fputc_cons so need to save all registers
    
    cp 13
    jr nz, notcr

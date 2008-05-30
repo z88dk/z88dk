@@ -32,8 +32,6 @@ XREF LIBDISP_VFPRINTF_CALLEE
    exx
    ret                         ; ret with hl = # chars written to string
 
-   defw 0                      ; really aggravating hack: stdio_outchar wants to res 0,(ix-2)
-
 .sprintf_outchar
 
    ; called by vfprintf()

@@ -22,7 +22,6 @@ LIB l_jpix
    jr c, error
    
    inc bc
-   res 0,(ix-2)                ; no unget char available
 
 .error
 

@@ -25,8 +25,10 @@ INCLUDE "stdio.def"
 
    bit 2,(ix+0)                ; is this an output stream?
    jr z, immediateexit
-   inc ix
-   inc ix  
+   ex de,hl
+   ld de,5
+   add ix,de
+   ex de,hl
    
 .libentry
 
