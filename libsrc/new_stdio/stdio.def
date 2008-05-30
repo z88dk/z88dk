@@ -1,6 +1,6 @@
 
 defc STDIO_MAXPREC   = 16                    ; maximum precision prevents buffer overflow
-defc STDIO_TEMPBUFSZ = STDIO_MAXPREC + 2     ; size of temporary buffer allocated on stack
+defc STDIO_TEMPBUFSZ = STDIO_MAXPREC + 3     ; size of temporary buffer allocated on stack
 
 ; current FILE structure:
 ;
