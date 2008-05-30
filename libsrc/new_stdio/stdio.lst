@@ -48,6 +48,7 @@ stdio_outcommon
 stdio_outpad
 stdio_outsign
 stdio_ultoa_any
+stdio_ungetchar
 stdio_utoa_any
 stdio_zeroonstream
 t_asprintf
