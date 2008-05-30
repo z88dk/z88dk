@@ -1,7 +1,7 @@
 ; stdio_incommon1
 ; 05.2008 aralbrec
 
-XLIB incommon1
+XLIB stdio_incommon1
 LIB stdio_consumews, stdio_consumesign, stdio_getchar
 
 ; common code for number scan converters

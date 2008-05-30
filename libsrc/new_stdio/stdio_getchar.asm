@@ -17,11 +17,11 @@ LIB l_jpix
 
 .stdio_getchar
 
-   bit 0,(ix-5)                ; is an unget char available?
+   bit 0,(ix-2)                ; is an unget char available?
    jr z, readfromstream
 
-   ld a,(ix-4)                 ; return unget char
-   res 0,(ix-5)                ; unget char no longer available
+   ld a,(ix-1)                 ; return unget char
+   res 0,(ix-2)                ; unget char no longer available
 
    exx
    inc bc                      ; increase number of bytes read from stream

@@ -16,8 +16,8 @@ XLIB stdio_ungetchar
 
 .stdio_ungetchar
 
-   ld (ix-4),a                 ; store unget char
-   set 0,(ix-5)                ; indicate unget char present
+   ld (ix-1),a                 ; store unget char
+   set 0,(ix-2)                ; indicate unget char present
    
    exx
    dec bc                      ; decrease number of bytes read from stream

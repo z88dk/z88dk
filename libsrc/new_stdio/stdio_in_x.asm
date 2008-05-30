@@ -2,7 +2,7 @@
 ; 05.2008 aralbrec
 
 XLIB stdio_in_x
-LIB stdio_incommon1, stdio_incommon2, stdio_ungetchar, stdioisxdigit, stdio_zeroonstream
+LIB stdio_incommon1, stdio_incommon2, stdio_ungetchar, stdio_getchar, stdio_isxdigit, stdio_zeroonstream
 
 ; input %x parameter
 ;

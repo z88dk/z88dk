@@ -4,11 +4,10 @@
 XLIB t_vfscanf_callee
 XDEF ASMDISP_VFSCANF_CALLEE, LIBDISP_VFSCANF_CALLEE
 
+LIB stdio_atou
 LIB stdio_isspace, stdio_isdigit
 LIB stdio_getchar, stdio_ungetchar
-LIB vfscanf_jumptbl
-
-INCLUDE "stdio.def"
+LIB vfscanf_jumptbl, stdio_consumews
 
 .t_vfscanf_callee
 
@@ -28,10 +27,8 @@ INCLUDE "stdio.def"
 
    bit 1,(ix+0)                ; is this an input stream?
    jr z, immediateexit
-   ex de,hl
-   ld de,5
-   add ix,de
-   ex de,hl
+   inc ix
+   inc ix
 
 .libentry
 

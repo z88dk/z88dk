@@ -2,8 +2,8 @@
 ; 05.2008 aralbrec
 
 XLIB stdio_in_i
-LIB stdio_incommon1, stdio_incommon2, stdio_ungetchar
-LIB stdioisxdigit, stdioisodigit, stdio_isbdigit, stdio_zeroonstream
+LIB stdio_incommon1, stdio_incommon2, stdio_ungetchar, stdio_getchar
+LIB stdio_isdigit, stdio_isxdigit, stdio_isodigit, stdio_isbdigit, stdio_zeroonstream
 
 ; input %i parameter, read a binary / octal / hex / decimal number
 ;
@@ -72,7 +72,7 @@ LIB stdioisxdigit, stdioisodigit, stdio_isbdigit, stdio_zeroonstream
    ; octal number
 
    ld b,8
-   call isodigit
+   call stdio_isodigit
    jr nc, join                 ; this digit is an octal digit so join number loop
 
    call stdio_ungetchar        ; otherwise return it

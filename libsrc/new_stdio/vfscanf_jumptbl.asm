@@ -28,9 +28,9 @@ XLIB vfscanf_jumptbl
    LIB stdio_in_d
    defw stdio_in_d
 
-;   defb '[', 195
-;   LIB stdio_in_bkt
-;   defw stdio_in_bkt
+   defb '[', 195
+   LIB stdio_in_bkt
+   defw stdio_in_bkt
 
    defb 'x', 195
    LIB stdio_in_x
