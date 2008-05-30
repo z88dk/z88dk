@@ -169,13 +169,15 @@ void tempinput(void)
    XREF ASMDISP_ZX_CYX2AADDR_CALLEE
    
    call zx_cyx2aaddr_callee + ASMDISP_ZX_CYX2AADDR_CALLEE
-   ld (hl),135                 ; flashing white on black
+   ld (hl),130                 ; flashing red on black
    
 .inloop
 
    ld a,(23560)                ; block until a char is read
    or a
    jr z, inloop
+   
+   ld (hl),0                   ; undo flashing cursor here
    
    push af
    call _tempoutput   
@@ -211,9 +213,10 @@ main()
    a = t_printf("|%5u|%5o|%5x|%5X|%#5o|%#5x|%#5X|%#10.8x|\n", 0, 0, 0, 0, 0, 0, 0, 0);
    b = t_printf("|%5u|%5o|%5x|%5X|%#5o|%#5x|%#5X|%#10.8x|\n", 1, 1, 1, 1, 1, 1, 1, 1);
    c = t_printf("|%5u|%5o|%5x|%5X|%#5o|%#5x|%#5X|%#10.8x|\n", 0xb93c, 0xb93c, 0xb93c, 0xb93c, 0xb93c, 0xb93c, 0xb93c, 0xb93c);
+
    d = t_printf("|%3s%-6s|%-10.5s|%c|%3c|%-3c|\n", "no", "where", "Oh no you didn't!", '$', '*', '@');
    t_printf("Chars output: %d, %d, %d, %d\n\n", a, b, c, d);
-   
+
    a = t_sprintf(buf, "Did it work number %d?\n", 6);
    b = t_printf("%s", buf);
    c = t_snprintf(buf, 10, "Did it work number %d?\n", 6);
@@ -226,5 +229,13 @@ main()
    a = t_printf("Ready to handle a long one %ld mixed with a short one %d?\n", -123456789L, -14);
    b = t_printf("Here's a double %%, a couple unknowns %-#5.t %j, and a very bad thing %");
    t_printf("\nChars output: %d %d\n\n", a-1, b);
+  
+   for (a=1; a<11; ++a)
+   {
+      t_printf("(%d of 10) Enter a number: \n-> ", a);
+      t_scanf("%i", &b);
+      t_printf("%#5b ; %#5o ; %#5x ; %5u\n", b, b, b, b);
+   }
+   
 }
 
