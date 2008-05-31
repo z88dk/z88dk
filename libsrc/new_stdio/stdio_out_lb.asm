@@ -25,6 +25,16 @@ INCLUDE "stdio.def"
 
 .stdio_out_lb
 
+   bit 1,c                     ; check if %lb or %b
+   jr z, notlong
+
+   ld d,(hl)                   ; only doing 16-bit output
+   dec hl                      ; grab the least significant 16-bits of
+   ld e,(hl)                   ; the 32-bit long argument in de
+   dec hl
+
+.notlong
+
    push hl                     ; save & parameter list
    ex de,hl                    ; generate unsigned long in dehl
    ld de,0
