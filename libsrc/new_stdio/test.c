@@ -197,6 +197,7 @@ char buf[128];
 
 main()
 {
+   long l;
    int a, b, c, d;
    
    #asm
@@ -232,10 +233,13 @@ main()
   
    for (a=1; a<11; ++a)
    {
-      t_printf("(%d of 10) Enter a number: \n-> ", a);
+      t_printf("(%d of 10) Enter a 16-bit number: \n-> ", a);
       t_scanf("%i", &b);
       t_printf("%#5b ; %#5o ; %#5x ; %5u\n", b, b, b, b);
-   }
+      t_printf("(%d of 10) Enter a 32-bit number: \n-> ", a);
+      t_scanf("%li", &l);
+      t_printf("%#5lb ; %#5lo ; %#5lx ; %5lu\n", l, l, l, l);
+  }
    
 }
 

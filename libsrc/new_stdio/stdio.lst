@@ -1,5 +1,6 @@
 stdio_atou
 stdio_atou_any_stream
+stdio_atoul_any_stream
 stdio_basechar
 stdio_buff2caps
 stdio_consumesign
@@ -14,8 +15,14 @@ stdio_in_n
 stdio_in_o
 stdio_in_s
 stdio_in_x
+stdio_in_lb
+stdio_in_ld
+stdio_in_li
+stdio_in_lo
+stdio_in_lx
 stdio_incommon1
 stdio_incommon2
+stdio_incommon3
 stdio_isbdigit
 stdio_isdigit
 stdio_isodigit
