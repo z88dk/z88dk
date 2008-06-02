@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.3 2007-06-17 12:07:43 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.4 2008-06-02 19:03:12 dom Exp $ */
 /* $History: EXPRPRSR.C $ */
 /*  */
 /* *****************  Version 15  ***************** */
@@ -342,64 +342,64 @@ Expression (struct expr *pfixexpr)
 int 
 Condition (struct expr *pfixexpr)
 {
-  enum symbols relsym = nil;
+    enum symbols relsym = nil;
 
-  if (!Expression (pfixexpr))
-    return 0;
+    if (!Expression (pfixexpr))
+        return 0;
 
-  relsym = sym;
+    relsym = sym;
 
-  switch (sym)
+    switch (sym)
     {
     case less:
-      *pfixexpr->infixptr++ = '<';
-      GetSym ();
+        *pfixexpr->infixptr++ = '<';
+        GetSym ();
 
-      switch (sym)
-	{
-	case greater:
-	  *pfixexpr->infixptr++ = '>';
-	  relsym = notequal;	/* '<>' */
-	  GetSym ();
-	  break;
+        switch (sym)
+        {
+        case greater:
+            *pfixexpr->infixptr++ = '>';
+            relsym = notequal;	/* '<>' */
+            GetSym ();
+            break;
 
-	case assign:
-	  *pfixexpr->infixptr++ = '=';
-	  relsym = lessequal;	/* '<=' */
-	  GetSym ();
-	  break;
+        case assign:
+            *pfixexpr->infixptr++ = '=';
+            relsym = lessequal;	/* '<=' */
+            GetSym ();
+            break;
 
         default:
-          break;
-	}
-      break;
+            break;
+        }
+        break;
 
     case assign:
-      *pfixexpr->infixptr++ = '=';
-      GetSym ();
-      break;
+        *pfixexpr->infixptr++ = '=';
+        GetSym ();
+        break;
 
     case greater:
-      *pfixexpr->infixptr++ = '>';
+        *pfixexpr->infixptr++ = '>';
 
-      if (GetSym () == assign)
-	{
-	  *pfixexpr->infixptr++ = '=';
-	  relsym = greatequal;
-	  GetSym ();
-	}
-      break;
+        if (GetSym () == assign)
+        {
+            *pfixexpr->infixptr++ = '=';
+            relsym = greatequal;
+            GetSym ();
+        }
+        break;
 
     default:
-      return 1;			/* implicit (left side only) expression */
+        return 1;			/* implicit (left side only) expression */
     }
 
-  if (!Expression (pfixexpr))
-    return 0;
-  else
-    NewPfixSymbol (pfixexpr, 0, relsym, NULL, 0);	/* condition... */
+    if (!Expression (pfixexpr))
+        return 0;
+    else
+        NewPfixSymbol (pfixexpr, 0, relsym, NULL, 0);	/* condition... */
 
-  return (1);
+    return (1);
 }
 
 
@@ -648,6 +648,14 @@ CalcExpression (enum symbols opr, struct pfixstack **stackptr)
       PushItem ((leftoperand == rightoperand), stackptr);
       break;
 
+    case less:
+      PushItem ((leftoperand < rightoperand), stackptr);
+      break;
+
+    case greater:
+      PushItem ((leftoperand > rightoperand), stackptr);
+      break;
+
     case lessequal:
       PushItem ((leftoperand <= rightoperand), stackptr);
       break;
@@ -662,6 +670,7 @@ CalcExpression (enum symbols opr, struct pfixstack **stackptr)
 
     default:
       PushItem (0, stackptr);
+      break;
     }
 }
 
