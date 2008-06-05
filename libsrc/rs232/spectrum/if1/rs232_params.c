@@ -1,111 +1,85 @@
 /*
- *	z88dk RS232 Function
+ *      z88dk RS232 Function
  *
- *	ZX Spectrum (interface 1) version
+ *      ZX Spectrum (interface 1) version
  *
- *	unsigned char rs232_params(unsigned char param, unsigned char parity)
+ *      unsigned char rs232_params(unsigned char param, unsigned char parity)
  *
- *	Specify the serial interface parameters
+ *      Specify the serial interface parameters
  *
- *	Later on, this should set panel values
+ *      Later on, this should set panel values
+ *
+ *      $Id: rs232_params.c,v 1.3 2008-06-05 14:31:24 stefano Exp $
  */
 
-	/* BAUD system variable: 23747
-		Value = (3500000/(26*BaudRate))-2 */
+        /* BAUD system variable: 23747
+                Value = (3500000/(26*BaudRate))-2 */
 
 #include <rs232.h>
 
 
-u8_t __FASTCALL__ rs232_params(unsigned char param, unsigned char parity)
-{
-#if 0
-    {
-	/* Unfinished code */
-	unsigned u16_t baud;
-
-	switch ( param & 0x0F ) {
-	case RS_BAUD_50:
-	    baud = 50;
-	    break;
-	case RS_BAUD_110:
-	    baud = 110;
-	    break;
-	case RS_BAUD_300:
-	    baud = 300;
-	    break;
-	case RS_BAUD_600:
-	    baud = 600;
-	    break;
-	case RS_BAUD_1200:
-	    baud = 1200;
-	    break;
-	case RS_BAUD_2400:
-	    baud = 2400;
-	    break;
-	case RS_BAUD_4800:
-	    baud = 4800;
-	    break;
-	case RS_BAUD_9600:
-	    baud = 9600;
-	    break;
-	case RS_BAUD_19200:     /* Not perfect but works */
-	    baud = 19200;
-	    break;
-	case RS_BAUD_38400:     /* Let's try... ! */
-	    baud = 38400;
-	    break;
-	case RS_BAUD_57600:
-	case RS_BAUD_115200:
-	case RS_BAUD_230400:
-	    return  RS_ERR_BAUD_TOO_FAST;
-
-	default:
-	case RS_BAUD_134_5:
-	    return RS_ERR_BAUD_NOT_AVAIL;
-	}
-	baud = (unsigned int) (3500000.0 / (26 * baud) ) - 2;
-	rs232_setbaud(&baud);
-    }
-    /*
-    {
-	u8_t  par;
-
-	if ( ( parity & 0xE0) != RS_PAR_NONE)
-	    return RS_ERR_PARITY_NOT_AVAIL;
-
-	switch ( parity ) {
-	case RS_PAR_NONE:
-	    par = 'N';
-	    break;
-	case RS_PAR_ODD:
-	    par = 'O';
-	    break;
-	case RS_PAR_EVEN:
-	    par = 'E';
-	    break;
-	case RS_PAR_MARK:
-	    par = 'M';
-	    break;
-	case RS_PAR_SPACE:
-	    par = 'S';
-	    break;
-	}
-    */
-    }	      
-#endif
-    return RS_ERR_OK;
-}
-
-#if 0
-static void rs232_setbaud(u16_t *baud)
+u8_t rs232_params(unsigned char param, unsigned char parity)
 {
 #asm
-    pop  bc
-    pop  hl
-    push hl
-    push bc
-    ld	(23747),hl
+        ;rst     8
+        ;defb    $31             ; Create the IF1 system variables area
+        ;xor     a
+        ;ld      ($5cc7),a       ; Reset SER-FL to clean the input buffer
+
+        pop     bc
+        pop     de
+        pop     hl
+        push    hl
+        push    de
+        push    bc
+        
+        xor     a
+        and     e
+        jr      z,noparity      ; parity not supported
+        ld      hl,1            ; RS_ERR_NOT_INITIALIZED
+        ret
+noparity:
+        ld      a,$f0
+        and     l
+        jr      z,noextra
+        ld      hl,1            ; RS_ERR_NOT_INITIALIZED
+        ret
+noextra:
+        ; baud rate
+        ld      a,$0f
+        and     l
+        cp      14              ; max 38400 baud
+        jr      c,avail
+        ld      hl,2            ; RS_ERR_BAUD_TOO_FAST
+        ret
+avail:
+        add     a,a
+        ld      e,a
+        ld      d,0
+        ld      hl,tabell
+        add     hl,de
+        ld      a,(hl)
+        inc     hl
+        ld      h,(hl)
+        ld      l,a
+        ld      (23747),hl
+        ld      hl,0            ; RS_ERR_OK
+        ret
+
+tabell:
+        defw    $0A82   ;RS_BAUD_50
+        defw    $0701   ;RS_BAUD_75             ; experimental
+        defw    $04C5   ;RS_BAUD_110
+        defw    $03E6   ;RS_BAUD_134_5          ; experimental
+        defw    $037F   ;RS_BAUD_150            ; experimental
+        defw    $01BE   ;RS_BAUD_300
+        defw    $00DE   ;RS_BAUD_600
+        defw    $006E   ;RS_BAUD_1200
+        defw    $0036   ;RS_BAUD_2400
+        defw    $001A   ;RS_BAUD_4800
+        defw    $000C   ;RS_BAUD_9600
+        defw    $0005   ;RS_BAUD_19200
+        defw    $0002   ;RS_BAUD_38400          ; experimental
+
 #endasm
 }
-#endif
-

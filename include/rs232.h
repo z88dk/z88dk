@@ -1,9 +1,11 @@
 /*
- *  rs232.h
+ * rs232.h
  *
  * RS232 prototypes for z88dk - not all machines supported!
  *
  * Based on the API from cc65
+ *
+ * $Id: rs232.h,v 1.2 2008-06-05 14:31:23 stefano Exp $
  */
 
 
@@ -14,19 +16,21 @@
 
 /* Baudrate settings */
 #define RS_BAUD_50                      0x00
-#define RS_BAUD_110                     0x01
-#define RS_BAUD_134_5                   0x02
-#define RS_BAUD_300                     0x03
-#define RS_BAUD_600                     0x04
-#define RS_BAUD_1200                    0x05
-#define RS_BAUD_2400                    0x06
-#define RS_BAUD_4800                    0x07
-#define RS_BAUD_9600                    0x08
-#define RS_BAUD_19200                   0x09
-#define RS_BAUD_38400                   0x0A
-#define RS_BAUD_57600                   0x0B
-#define RS_BAUD_115200                  0x0C
-#define RS_BAUD_230400                  0x0D
+#define RS_BAUD_75                      0x01
+#define RS_BAUD_110                     0x02
+#define RS_BAUD_134_5                   0x03
+#define RS_BAUD_150                     0x04
+#define RS_BAUD_300                     0x05
+#define RS_BAUD_600                     0x06
+#define RS_BAUD_1200                    0x07
+#define RS_BAUD_2400                    0x08
+#define RS_BAUD_4800                    0x09
+#define RS_BAUD_9600                    0x0A
+#define RS_BAUD_19200                   0x0B
+#define RS_BAUD_38400                   0x0C
+#define RS_BAUD_57600                   0x0D
+#define RS_BAUD_115200                  0x0E
+#define RS_BAUD_230400                  0x0F
 
 /* Stop bit settings */
 #define RS_STOP_1                       0x00
@@ -53,6 +57,7 @@
 #define RS_ERR_BAUD_NOT_AVAIL           0x03    /* Baud rate not available */
 #define RS_ERR_NO_DATA                  0x04    /* Nothing to read */
 #define RS_ERR_OVERFLOW                 0x05    /* No room in send buffer */
+
 
 /* The functions: Call params, then init then put/get finally close */
 

@@ -5,6 +5,7 @@
 ;
 ;       unsigned char rs232_put(char)
 ;
+;       $Id: rs232_put.asm,v 1.2 2008-06-05 14:31:24 stefano Exp $
 
 ; Fastcall so implicit push
 

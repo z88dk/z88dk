@@ -7,6 +7,7 @@
 ;
 ;       Specify the serial interface parameters
 ;
+;       $Id: rs232_params.asm,v 1.2 2008-06-05 14:31:24 stefano Exp $
 
                 XLIB   rs232_params
                 
@@ -85,7 +86,7 @@ stop1:          set  3,a
                 ; baud rate
                 ld   a,$0f
                 and  e
-                cp   9                  ; max 4800 baud
+                cp   12                 ; max 9600 baud
                 jr   c,avail
                 ld   hl,2               ; RS_ERR_BAUD_TOO_FAST
                 ret
@@ -124,7 +125,7 @@ avail:
                 ret
 ;
 tabell:         defb $27,$55    ;  50 bps
-                ;; defb $1a,$55    ;  75 bps
+                defb $1a,$55    ;  75 bps
                 defb $47,$33    ; 110 bps
                 defb $3a,$33    ; 134.5 bps     ; experimental
                 defb $34,$33    ; 150 bps

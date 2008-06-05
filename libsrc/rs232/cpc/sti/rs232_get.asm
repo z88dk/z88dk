@@ -5,8 +5,9 @@
 ;
 ;       unsigned char rs232_get(char *)
 ;
+;       $Id: rs232_get.asm,v 1.2 2008-06-05 14:31:24 stefano Exp $
 
-;	fastcall so implicit push
+;       fastcall so implicit push
 
 
                 XLIB   rs232_get
@@ -24,9 +25,9 @@ nowort:         in   a,(c)
                 ld   e,1
                 out  (c),e
 
-		ld	(hl),a
-		ld	hl,0		; RS_ERR_OK
+                ld      (hl),a
+                ld      hl,0            ; RS_ERR_OK
 
-		;;; ld	hl,RS_ERR_NO_DATA
+                ;;; ld  hl,RS_ERR_NO_DATA
 
-		ret
+                ret
