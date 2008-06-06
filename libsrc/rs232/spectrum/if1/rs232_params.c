@@ -9,7 +9,7 @@
  *
  *      Later on, this should set panel values
  *
- *      $Id: rs232_params.c,v 1.3 2008-06-05 14:31:24 stefano Exp $
+ *      $Id: rs232_params.c,v 1.4 2008-06-06 16:07:33 stefano Exp $
  */
 
         /* BAUD system variable: 23747
@@ -21,8 +21,8 @@
 u8_t rs232_params(unsigned char param, unsigned char parity)
 {
 #asm
-        ;rst     8
-        ;defb    $31             ; Create the IF1 system variables area
+        rst     8
+        defb    $31             ; Create the IF1 system variables area
         ;xor     a
         ;ld      ($5cc7),a       ; Reset SER-FL to clean the input buffer
 
