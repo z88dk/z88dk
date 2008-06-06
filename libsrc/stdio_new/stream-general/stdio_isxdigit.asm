@@ -1,0 +1,28 @@
+; stdio_isxdigit
+; 05.2008 aralbrec
+
+XLIB stdio_isxdigit
+
+; determine whether ascii char is a hexadecimal digit
+
+; enter : a = char
+; exit  : carry = not a digit
+; uses  : f
+
+.stdio_isxdigit
+
+   cp '0'
+   ret c
+   cp '9'+1
+   ccf
+   ret nc
+   cp 'A'
+   ret c
+   cp 'F'+1
+   ccf
+   ret nc
+   cp 'a'
+   ret c
+   cp 'f'+1
+   ccf
+   ret

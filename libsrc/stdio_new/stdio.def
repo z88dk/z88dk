@@ -1,0 +1,23 @@
+;
+; FILE STRUCTURE
+;
+; offset   size    description
+;  +0       1      jump instruction (195)
+;  +1/2     2      i/o service function address
+;  +3       1      flags V000 000U (valid FILE *, Unget char available)
+;  +4       1      unget char
+
+
+defc STDIO_MAXPRECISION = 16                       ; maximum precision for numbers on output stream
+defc STDIO_TEMPBUFSIZE  = STDIO_MAXPRECISION + 3   ; size of temp buffer allocated on stack for output stream
+
+;
+; SERVICE CODES
+;
+
+;defc STDIO_SERVICE_STATUS        = 255
+;defc STDIO_SERVICE_CAPABILITIES  = 254
+
+defc STDIO_SERVICE_GETFD         = 253
+defc STDIO_SERVICE_PUTCHAR       = 0
+defc STDIO_SERVICE_GETCHAR       = 1
