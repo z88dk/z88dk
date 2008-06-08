@@ -325,6 +325,8 @@ LIB stdio_getchar, stdio_ungetchar
 
    push de
    call computebitsetaddr
+   inc hl                      ; undershoot by 2 bytes because of extra item on stack
+   inc hl
    ld a,(hl)
    or d
    ld (hl),a
