@@ -59,133 +59,128 @@ LIB stdio_getchar, stdio_ungetchar
 
    ; look for the special leading chars in the %[ char set
 
-
    ld a,(de)
    cp '^'                      ; is '^' a leading char?
-   jr nz, leading0
+   jr nz, leading
    
    set 7,c                     ; set carat flag
    inc de
    ld a,(de)                   ; on to next char in format string
 
-.leading0
+.leading
 
    push bc                     ; save width + flags (done after ^ flag set)
 
    cp ']'                      ; is ']' a leading char?
-   jr nz, fillcharsetlp
-   
-   push de
-   sub 16
-   call addcharA               ; add ']' to bitset
-   pop de
+   jr nz, fillcharset0
+
+   call addcharA
    inc de                      ; on to next char in format string
    
    ; '-' will be caught in regular loop
    
-.fillcharsetlp
+.fillcharset0
 
-   ;     b = left char in range
-   ;     c = flags [^VRa*WL0] (bit 6 = 1 if left char is valid, bit 5 = 1 if range '-' seen)
+   ; here we are starting from a blank slate... have no pending left char
+   ;     b = nothing
+   ;     c = flags [^00a*WL0]
    ;    de = format string
    ; stack = & parameter list, ret, char set bitmap (32 bytes), width + flags
 
    ld a,(de)
    or a
-   jr z, endcharset            ; premature end of format string should be an error but taken as ']'
+   jr z, endcharset0           ; premature end of format string should be an error but taken as ']'
    
    inc de
    cp ']'                      ; reached end of char set?
-   jr z, endcharset
+   jr z, endcharset0
+
+   ld b,a                      ; got our left char
+
+.fillcharset1
+
+   ; we've seen a left char
+   ;     b = left char
+   ;     c = flags [^00a*WL0]
+   ;    de = format string
+   ; stack = & parameter list, ret, char set bitmap (32 bytes), width + flags
+
+   ld a,(de)                   ; premature end of format string should be an error but taken as ']'
+   or a
+   jr z, endcharset1
+
+   inc de
+   cp ']'                      ; end of char set?
+   jr z, endcharset1
 
    cp '-'                      ; range char?
-   jr nz, validchar
+   jr z, fillcharset2
 
-   bit 6,c                     ; if left char not seen place into left char
-   jr z, validchar
+   ; seen a left char in 'b' and have a following char in 'a'
+   ; add left char to character set and make char in 'a' the new left char
    
-   set 5,c                     ; left char and range seen
-   jr fillcharsetlp
-
-.validchar
-
-   bit 5,c                     ; have we seen a left char followed by a '-'?
-   jr nz, dorange
-
-   bit 6,c                     ; have we seen a left char yet?
-   jr nz, haveleft
-
-   ld b,a                      ; place char read into left char
-   set 6,c
-   jr fillcharsetlp
-
-.haveleft
-
-   push de                     ; save format string ptr
-
-   ; have left char and char just read but no range so add left char to charset bitmap
-   
-   ld e,a
-   ld a,b
-   ld b,e                      ; char just read becomes new left char
+   ld l,b
+   ld b,a                      ; latest char becomes left char
+   ld a,l
    
    call addcharA
+   jr fillcharset1
 
-   pop de                     ; de = format string
-   jr fillcharsetlp
+.fillcharset2
 
-.dorange
+   ; we've seen a left char and a range char '-'
+   ;     b = left char in range
+   ;     c = flags [^00a*WL0]
+   ;    de = format string
+   ; stack = & parameter list, ret, char set bitmap (32 bytes), width + flags
 
+   ld a,(de)                   ; premature end of format string should be an error but taken as ']'
+   or a
+   jr z, endcharset2
+
+   inc de
+   cp ']'                      ; end of char set?
+   jr z, endcharset2
+   
    cp b                       ; make sure right char (A) > left char (B)
-   jr nc, orderok
+   jr nc, rangelp
 
    ld l,a                     ; if not swap left and right to get increasing order in range
    ld a,b
    ld b,l
 
-.orderok
+.rangelp
 
-   push de                    ; save format string ptr
-
-.rangeaddlp
-
-   push af                    ; save current char in range
-   add a,16
    call addcharA   
-   pop af
-   
    dec a                      ; move to next char in range
    cp b                       ; check if end of range reached
-   jr nc, rangeaddlp
-   
-   ld a,c
-   and $9f                    ; clear left char and range flags
-   ld c,a
-   
-   pop de
-   jr fillcharsetlp
+   jr nc, rangelp
+   jr fillcharset0
 
-.endcharset
+.endcharset2
 
-   push de
-
-   ; must see if there is a pending left char and range indicator
+   ; we've seen a left char and a range char '-'
+   ;     b = left char in range
+   ;     c = flags [^00a*WL0]
+   ;    de = format string
+   ; stack = & parameter list, ret, char set bitmap (32 bytes), width + flags
    
-   bit 6,c                    ; left char present?
-   jr nz, donecharsetfill
-
-   ld a,b
-   call addcharA
-   
-   bit 5,c                    ; range char seen?
-   jr nz, donecharsetfill
-   
-   ld a,'-'
+   ld a,'-'                    ; add the minus to the charset
    call addcharA
 
-.donecharsetfill
+.endcharset1
 
-   pop de
+   ; we've seen a left char
+   ;     b = left char
+   ;     c = flags [^00a*WL0]
+   ;    de = format string
+   ; stack = & parameter list, ret, char set bitmap (32 bytes), width + flags
+   
+   ld a,b                      ; add the left char to the charset
+   call addcharA
+
+.endcharset0
+
    pop bc
    
    ;     b = width
@@ -193,7 +188,7 @@ LIB stdio_getchar, stdio_ungetchar
    ;    de = format string
    ; stack = & parameter list, ret, char set bitmap (32 bytes)
    
-   ;  write format string into stack before return address in stack
+   ;  swap format string and parameter list on stack
    
    ld hl,34
    add hl,sp
@@ -205,10 +200,10 @@ LIB stdio_getchar, stdio_ungetchar
    ld l,a
    ld h,e
 
-   ; *******************************************************************
+   ; ***********************************************************************
    ; PART 2
-   ; Match characters from stream to set and write to destination buffer
-   ; *******************************************************************
+   ; Match characters from stream to charset and write to destination buffer
+   ; ***********************************************************************
 
    ;     b = width
    ;     c = flags [^00a*WL0]
@@ -295,7 +290,7 @@ LIB stdio_getchar, stdio_ungetchar
 .computebitsetaddr
 
    ; enter :  a = char
-   ;         stack = ..., char set bitmap (32 bytes), something, something
+   ;         stack = ..., char set bitmap (32 bytes), something, something, ret
    ; exit  :  d = mask
    ;          e = char
    ;         hl = bitset addr
@@ -308,7 +303,7 @@ LIB stdio_getchar, stdio_ungetchar
    rra                         ; a = char / 8
    
    and $1f
-   add a,4
+   add a,6
    ld l,a
    ld h,0
    add hl,sp                   ; hl = corresponding & in char set bitmap
@@ -322,15 +317,18 @@ LIB stdio_getchar, stdio_ungetchar
 
    rl d
    dec a
-   jp nz, bitrot
+   jr nz, bitrot
 
    ret
 
 .addcharA
 
+   push de
    call computebitsetaddr
    ld a,(hl)
    or d
    ld (hl),a
+   ld a,e
+   pop de
    ret
-
+ 
