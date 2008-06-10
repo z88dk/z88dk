@@ -7,6 +7,8 @@
  *	unsigned char rs232_put(char)
  *
  *	No error checking, for now.
+ *
+ *      $Id: rs232_put.c,v 1.2 2008-06-10 07:59:10 stefano Exp $
  */
 
 
@@ -23,7 +25,6 @@ u8_t rs232_put(i8_t char)
 	defc	bank678 = $5b67
 
 .sendchar
-
 	ld	a,l	;get byte
 
         push    hl

@@ -6,6 +6,8 @@
  *	unsigned char rs232_close()
  *
  *	Specify the serial interface parameters
+ *
+ *      $Id: rs232_close.c,v 1.2 2008-06-10 07:59:10 stefano Exp $
  */
 
 

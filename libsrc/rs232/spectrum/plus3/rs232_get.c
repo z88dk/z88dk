@@ -7,21 +7,24 @@
  *	unsigned char rs232_get(char *)
  *
  *	Returns RS_ERROR_OVERFLOW on error (and sets carry)
+ *
+ *      $Id: rs232_get.c,v 1.2 2008-06-10 07:59:10 stefano Exp $
  */
 
 
 #include <rs232.h>
 
 
-u8_t rs232_get(i8_t *char)
+u8_t __FASTCALL__ rs232_get(i8_t *char)
 {	/* fastcall so implicit push */
 #asm
 .getchar
-
 	defc	romsend = $205b
 	defc	romrecv = $1e78
 	defc	bank2	= $1ffd
 	defc	bank678 = $5b67
+	
+	push	hl
 
 	push	af
 	call	brkcheck
@@ -37,7 +40,6 @@ u8_t rs232_get(i8_t *char)
 	ret	c
 	ld	(de),a
 	ld	hl,RS_ERR_OK
-	push	bc		;any rubbish will do
 
         ret
 

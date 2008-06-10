@@ -8,6 +8,8 @@
  *	Initialise the serial interface
  *
  *	Still nothing, here!
+ *
+ *      $Id: rs232_init.c,v 1.2 2008-06-10 07:59:10 stefano Exp $
  */
 
 
