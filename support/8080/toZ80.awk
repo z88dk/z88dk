@@ -5,25 +5,24 @@
 #
 # Re-arranged for Z88DK by Stefano Bodrato
 #
-# There's an experimental section specific for z80asm (labels); 
-# remove the whole section for a more classic output
-#
-# $Id: toZ80.awk,v 1.2 2007-12-21 08:39:01 stefano Exp $
+# $Id: toZ80.awk,v 1.3 2008-06-12 17:23:49 stefano Exp $
 #
 
 
 BEGIN {
  temp_xyz = "zyx"     # temporary replacement for Mnemonic
- temp_label = "zz" # temporary replacement for ^LABEL
+ temp_label = "zzz" # temporary replacement for ^LABEL
  label = "?"          # storage for label during conversion
  label_reg_exp = "^[^; \t]+"
  instr_tabulator = "\t" # space between operator and operand on some converted
 
  # Record separator
- RS = "\r\n"		# CRLF ...comment out for newline only or alter as required
- #RS = "\n"		# CR only ...sometimes this is the right option
+ RS = "\r\n|\n"		# try first CRLF then CR alone
+ # RS = "\r\n|\n|!"	# try this one to split if one liners are used
 
 }
+
+############ FUNCTIONS ############
 
 function save_label() {
     if (match($0,/^[^; \t]+/)) {
@@ -80,24 +79,34 @@ function sub_bdh() {
 }
 
 
+############ MAIN LOOP ############
+
 #### Z80ASM label redefinition
-#### EQU to "defc"
+#### EQU to "DEFC"
     (/^[^;]*[ \t]+[eE][qQ][uU][ \t]/) {
-        match_counter=match($0,";");
+    	#save_label()
+        #restore_label()
+        match_counter=match($0,/;/);
         match_result="";
         if (match_counter>0) match_result=substr($0,match_counter);
-        print "defc", $1, " = " ,$3, match_result;
+        # get rid of terminating ":" if any
+        if (match($1,/:$/)) {
+          print "DEFC", substr($1,0,RSTART-1), " = " ,$3, match_result
+        }
+        else {
+          print "DEFC", $1, " = " ,$3, match_result
+        }
         next
     }
     
-#### db to "defm"
+#### db to "DEFM"
     (/^[^; \t]*[ \t]+([Dd][Bb])[ \t]+[^ \t]+([; \t]|$)/) {
         save_label()
         sub(/''/,"zpicettaz");
 
 	sub(/'/,"\"");
 	sub(/'/,"\"");
-        sub(/[Dd][Bb]/,"defm");
+        sub(/[Dd][Bb]/,"DEFM");
 
         sub("zpicettaz","'");
         restore_label()
@@ -105,19 +114,19 @@ function sub_bdh() {
         next
     }
 
-#### ds to "defs"
+#### ds to "DEFS"
     (/^[^; \t]*[ \t]+([Dd][Ss])[ \t]+[^ \t]+([; \t]|$)/) {
         save_label()
-        sub(/[Dd][Ss]/,"defs");
+        sub(/[Dd][Ss]/,"DEFS");
         restore_label()
         print $0
         next
     }
 
-#### dw to "defw"
+#### dw to "DEFW"
     (/^[^; \t]*[ \t]+([Dd][Ww])[ \t]+[^ \t]+([; \t]|$)/) {
         save_label()
-        sub(/[Dd][Ww]/,"defw");
+        sub(/[Dd][Ww]/,"DEFW");
         restore_label()
         print $0
         next
@@ -915,14 +924,14 @@ function sub_bdh() {
         next
     }
 
-###### END
-#    (/^[^; \t]*[ \t]+([Ee][Nn][Dd])/) {
-#        save_label()
-#        sub(/[Ee][Nn][Dd]/,";END of program");
-#        restore_label()
-#        print $0
-#        next
-#    }
+#### Make END be the last line, 
+#### so we get rid of some CP/M rubbish
+###########################################
+    (/^[^; \t]*[ \t]+([eE][nN][dD])([; \t]|$)/) {
+        print $0
+        exit
+    }
+
 
 ###### Default
 (/^.*/) {
