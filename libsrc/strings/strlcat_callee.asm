@@ -52,7 +52,6 @@ XDEF ASMDISP_STRLCAT_CALLEE
    ; incomplete appending of string src
    
    ex de,hl
-   dec hl
    ld (hl),0                   ; terminate string dst
 
 .szexceeded1
