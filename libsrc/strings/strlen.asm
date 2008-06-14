@@ -3,9 +3,6 @@
 ; 12.2006 aralbrec
 
 XLIB strlen
-XDEF ASMDISP_STRLEN
-LIB     rcmx_cpir
-
 
 ; A funky version that's quicker than the
 ; usual implementation for lengths > 1
@@ -23,5 +20,3 @@ LIB     rcmx_cpir
    ld hl,$ffff
    sbc hl,bc
    ret
-
-DEFC ASMDISP_STRLEN = 0
