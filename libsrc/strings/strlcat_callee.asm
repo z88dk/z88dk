@@ -24,7 +24,6 @@ XDEF ASMDISP_STRLCAT_CALLEE
    ;         bc = uint size
 
    push hl                     ; save dst to compute strlen(dst) later
-   push de                     ; save src to compute strlen(src) later
    
    ld a,b                      ; catch degenerate case where size==0
    or c
@@ -51,29 +50,30 @@ XDEF ASMDISP_STRLCAT_CALLEE
    
    ; incomplete appending of string src
    
-   ex de,hl
-   ld (hl),0                   ; terminate string dst
+   xor a
+   ld (de),a                   ; terminate string dst
 
 .szexceeded1
 
-   ; hl = end of char *dst (pointing at \0)
-   ; de = somewhere in char *src
+   ; de = end of char *dst (pointing at \0)
+   ; hl = somewhere in char *src
    ; bc = 0
-   ; stack = char *dst, char *src
-   
-   ex de,hl
-   xor a
+   ;  a = 0
+   ; carry reset
+   ; stack = char *dst
+
+   push hl                     ; save current position in src to compute strlens later   
    cpir
-   dec hl                       ; hl = end of char *src (pointing at \0)
+   dec hl                      ; hl = end of char *src (pointing at \0)
    
    pop bc
    sbc hl,bc
-   ex de,hl                     ; de = strlen(src)
+   ex de,hl                    ; de = strlen(src remnant)
    
    pop bc
-   sbc hl,bc                    ; hl = strlen(dst)
+   sbc hl,bc                   ; hl = strlen(dst augment)
    
-   add hl,de                    ; return strlen(src)+strlen(dst)
+   add hl,de                   ; return strlen(src)+strlen(dst)
    ret
 
 .szexceeded0
@@ -81,7 +81,7 @@ XDEF ASMDISP_STRLCAT_CALLEE
    ; hl = somewhere in char *dst
    ; de = somewhere in char *src
    ; bc = 0
-   ; stack = char *dst, char *src
+   ; stack = char *dst
 
    xor a
    cpir
@@ -89,6 +89,7 @@ XDEF ASMDISP_STRLCAT_CALLEE
    
    ld c,a
    ld b,a
+   ex de,hl
    jp szexceeded1
 
 .success
@@ -98,9 +99,8 @@ XDEF ASMDISP_STRLCAT_CALLEE
 
    ; hl = end of char *dst (pointing at \0)
    ; carry flag reset
-   ; stack = char *dst, char *src
+   ; stack = char *dst
 
-   pop bc
    pop bc
    sbc hl,bc                    ; hl = strlen(final dst)
    ret
