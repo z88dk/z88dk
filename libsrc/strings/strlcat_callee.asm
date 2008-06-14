@@ -44,9 +44,9 @@ XDEF ASMDISP_STRLCAT_CALLEE
 .cpyloop
 
    ld a,(hl)
-   ldi
    or a
    jr z, success
+   ldi
    jp pe, cpyloop
    
    ; incomplete appending of string src
@@ -95,7 +95,7 @@ XDEF ASMDISP_STRLCAT_CALLEE
 .success
 
    ex de,hl
-   dec hl
+   ld (hl),a                    ; terminate dst with \0
 
    ; hl = end of char *dst (pointing at \0)
    ; carry flag reset
