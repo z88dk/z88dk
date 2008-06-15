@@ -14,6 +14,6 @@ XREF _stdout
    ld c,l
    ld b,h                      ; bc = top of parameter list
 
-   ld ix,(_stdout)             ; ix = FILE *
+   ld ix,(_stdout)
 
    jp vfprintf_callee + ASMDISP_VFPRINTF_CALLEE

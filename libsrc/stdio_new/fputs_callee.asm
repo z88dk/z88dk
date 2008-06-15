@@ -17,11 +17,11 @@ INCLUDE "stdio.def"
 
    ; enter : hl = char *s
    ;         ix = FILE *stream
-   ; exit  : hl = 1 carry reset for success
+   ; exit  : hl = 0 carry reset for success
    ;         hl = -1 carry set for fail
    ; uses  : af, bc, de, hl, ix
    
-   bit 7,(ix+3)                ; valid FILE* ?
+   bit 1,(ix+3)                ; open for output?
    jp z, stdio_error
    
 .loop
@@ -33,7 +33,7 @@ INCLUDE "stdio.def"
 
    push hl
    ld b,a
-   ld c,STDIO_SERVICE_PUTCHAR
+   ld c,STDIO_MSG_PUTC
    call l_jpix
    pop hl
    jr nc, loop

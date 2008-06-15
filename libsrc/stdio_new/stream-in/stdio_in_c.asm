@@ -2,7 +2,7 @@
 ; 05.2008 aralbrec
 
 XLIB stdio_in_c
-LIB stdio_getchar
+LIB stdio_getchar, stdio_nextarg
 
 ; input %c parameter
 ;
@@ -27,12 +27,9 @@ LIB stdio_getchar
 
    bit 3,c                     ; suppressing assignment?
    jr nz, suppress
+   
+   call stdio_nextarg          ; de = char * (destination buffer)
 
-   ld d,(hl)                   ; get destination buffer from parameter list
-   dec hl
-   ld e,(hl)                   ; de = char * (destination buffer)
-   dec hl
-      
 .loop
 
    call stdio_getchar

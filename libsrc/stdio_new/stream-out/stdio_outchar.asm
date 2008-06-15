@@ -20,7 +20,7 @@ INCLUDE "stdio.def"
    exx
    push bc
    ld b,a
-   ld c,STDIO_SERVICE_PUTCHAR
+   ld c,STDIO_MSG_PUTC
    call l_jpix
    pop bc
    jr c, error

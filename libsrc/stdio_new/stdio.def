@@ -3,21 +3,55 @@
 ;
 ; offset   size    description
 ;  +0       1      jump instruction (195)
-;  +1/2     2      i/o service function address
-;  +3       1      flags V000 000U (valid FILE *, Unget char available)
+;  +1/2     2      file descriptor struct address
+;  +3       1      flags 0000 0IOU (open for input, open for output, unget char available)
 ;  +4       1      unget char
 
+defc FILESTR_SZ = 5
+
+;
+; FILE DESCRIPTOR STRUCTURE
+;
+; offset   size    description
+;  +0       1      call instruction (205)
+;  +1/2     2      device message interpretter
+;  +3       1      flags0
+;  +4       1      flags1
+;  +5       1      reference count
+;  +any number of bytes for device to maintain state for open file
+
+; _fd_table[MAXFILE]
+
+;
+; DUP FD STRUCTURE
+; a runt file descriptor structure
+;
+; offset   size    description
+;  +0       1      jump instruction (195)
+;  +1/2     2      source file descriptor struct address
+;  +3       1      flags0 (single bit indicates a dup fd)
+
+defc DUPFDSTR_SZ = 4
+
+;
+; FORMATTED I/O CONSTANTS
+;
 
 defc STDIO_MAXPRECISION = 16                       ; maximum precision for numbers on output stream
 defc STDIO_TEMPBUFSIZE  = STDIO_MAXPRECISION + 3   ; size of temp buffer allocated on stack for output stream
 
 ;
-; SERVICE CODES
+; STDIO MESSAGES
+; message id passed in c register
+; called function must preserve ix and exx registers
 ;
 
-;defc STDIO_SERVICE_STATUS        = 255
-;defc STDIO_SERVICE_CAPABILITIES  = 254
+; mandatory
 
-defc STDIO_SERVICE_GETFD         = 253
-defc STDIO_SERVICE_PUTCHAR       = 0
-defc STDIO_SERVICE_GETCHAR       = 1
+defc STDIO_MSG_OPEN       = 1
+defc STDIO_MSG_PUTC       = 2                      ; enter   b = char
+defc STDIO_MSG_GETC       = 3                      ; return  a = char
+
+; optionally handled by default msg interpretter
+
+; optional

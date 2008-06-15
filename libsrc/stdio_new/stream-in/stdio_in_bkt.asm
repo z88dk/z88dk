@@ -2,7 +2,7 @@
 ; 05.2008 aralbrec
 
 XLIB stdio_in_bkt
-LIB stdio_getchar, stdio_ungetchar
+LIB stdio_getchar, stdio_ungetchar, stdio_nextarg
 
 ; input %[ parameter
 ;
@@ -210,16 +210,9 @@ LIB stdio_getchar, stdio_ungetchar
    ;    hl = & parameter list
    ; stack = format string, ret, char set bitmap (32 bytes)
 
-   bit 3,c
-   jr nz, suppress0
+   bit 3,c                     ; suppress assignment?
+   call z, stdio_nextarg       ; if not de = char *s
    
-   ld d,(hl)
-   dec hl
-   ld e,(hl)                   ; de = char *s
-   dec hl
-
-.suppress0
-
    push hl                     ; save & parameter list
    push de                     ; save char *s
 

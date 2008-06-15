@@ -37,7 +37,7 @@ INCLUDE "stdio.def"
    exx
    push bc
    push de
-   ld c,STDIO_SERVICE_GETCHAR
+   ld c,STDIO_MSG_GETC
    call l_jpix
    pop de
    pop bc

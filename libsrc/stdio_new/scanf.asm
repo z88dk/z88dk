@@ -14,6 +14,6 @@ XREF _stdin
    ld c,l
    ld b,h                      ; bc = top of parameter list
    
-   ld ix,(_stdin)              ; ix = FILE *
+   ld ix,(_stdin)
    
    jp vfscanf_callee + ASMDISP_VFSCANF_CALLEE

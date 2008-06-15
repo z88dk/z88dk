@@ -25,7 +25,7 @@ LIB jumptbl_scanf, stdio_consumews
    ; exit  : hl  = number of conversions done
    ;         if stream unreadable carry set and hl=-1
 
-   bit 7,(ix+3)                ; valid FILE * ?
+   bit 2,(ix+3)                ; open for input?
    jp z, stdio_error
 
 .libentry

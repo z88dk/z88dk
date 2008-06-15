@@ -25,7 +25,7 @@ INCLUDE "stdio.def"
    ;         hl = 0 and carry for fail
    ; uses  : af, bc, de, hl, ix
    
-   bit 7,(ix+3)                ; valid FILE* ?
+   bit 2,(ix+3)                ; open for input?
    jr z, fail1
    
    ld a,b
@@ -49,9 +49,6 @@ INCLUDE "stdio.def"
    
 .loop
 
-   cp 10                       ; deal with '\r\n' by ignoring '\r'
-   jr z, ignore
-
    or a                        ; avoid dropping stream chars
    jr z, success
 
@@ -66,11 +63,9 @@ INCLUDE "stdio.def"
    or c
    jr z, success
 
-.ignore
-
    push bc
    push hl
-   ld c,STDIO_SERVICE_GETCHAR
+   ld c,STDIO_MSG_GETC
    call l_jpix
    pop hl
    pop bc

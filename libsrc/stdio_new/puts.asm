@@ -13,7 +13,7 @@ INCLUDE "stdio.def"
    ; put string and a '\n' to stdout
    ;
    ; enter : hl = char *s
-   ; exit  : hl = 1 carry reset for success
+   ; exit  : hl = 0 carry reset for success
    ;         hl = -1 carry set for fail
    ; uses  : af, bc, de, hl, ix
 
@@ -24,7 +24,7 @@ INCLUDE "stdio.def"
    ; ix = FILE *
    
    ld b,13
-   ld c,STDIO_SERVICE_PUTCHAR
+   ld c,STDIO_MSG_PUTC
    call l_jpix
    jp nc, stdio_success
    jp stdio_error

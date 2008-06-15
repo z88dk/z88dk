@@ -11,7 +11,7 @@ struct _stdio_file {
 
    uchar  byte0;               // +0  195
    void  *svc_func;            // +1  i/o service function
-   uchar  flags;               // +3  V000 000U (V = open FILE *, U = unget char avail)
+   uchar  flags;               // +3  0000 0IOU (I = open for input, O = open for output, U = unget char avail)
    uchar  ungetc;              // +4  available unget char
 
 };
@@ -22,7 +22,7 @@ typedef struct _stdio_file FILE;
 #define NULL 0
 
 #undef EOF
-#define EOF -1
+#define EOF (-1)
 
 extern FILE *stdin;
 extern FILE *stdout;

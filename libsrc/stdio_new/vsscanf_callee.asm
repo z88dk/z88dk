@@ -25,7 +25,7 @@ XREF LIBDISP_VFSCANF_CALLEE
    ; exit  : hl  = number of conversions done
    ;         if string empty carry set and hl=-1
    
-   ld hl,$8000        ; construct a truncated FILE struct on the stack
+   ld hl,$0404        ; construct a truncated FILE struct on the stack
    push hl
    ld hl,sscanf_getchar
    push hl

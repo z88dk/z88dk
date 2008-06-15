@@ -19,21 +19,21 @@ INCLUDE "stdio.def"
    ;         hl = -1 and carry set for fail
    ; uses  : af, bc, de, hl, ix
 
-   bit 7,(ix+3)                ; valid FILE*?
+   bit 2,(ix+3)                ; open for input?
    jp z, stdio_error
 
    bit 0,(ix+3)                ; is an unget char available?
    jr z, readfromstream
-   
-   res 0,(ix+3)                ; unget char no longer available
+
    ld l,(ix+4)
    ld h,0                      ; hl = unget char  
+   res 0,(ix+3)                ; unget char no longer available
    or a
    ret
 
 .readfromstream
 
-   ld c,STDIO_SERVICE_GETCHAR
+   ld c,STDIO_MSG_GETC
    call l_jpix
    jp c, stdio_error
    

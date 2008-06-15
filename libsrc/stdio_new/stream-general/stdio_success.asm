@@ -5,10 +5,10 @@ XLIB stdio_success
 
 ; common code indicating success
 ;
-; exit : hl = 1 and carry reset
+; exit : hl = 0 and carry reset
 
 .stdio_success
 
-   ld hl,1
+   ld hl,0
    or a
    ret

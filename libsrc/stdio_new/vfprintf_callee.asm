@@ -23,7 +23,7 @@ INCLUDE "stdio.def"
    ; exit  : hl  = number of chars output to stream
    ;         carry if stream error: ERRNO set and hl=-1
 
-   bit 7,(ix+3)                ; valid FILE* ?
+   bit 1,(ix+3)                ; open for output?
    jp z, stdio_error
    
 .libentry

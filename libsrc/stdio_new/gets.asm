@@ -3,7 +3,7 @@
 
 XLIB gets
 LIB fgetc, l_jpix
-XREF _stdin, ASMDISP_FGETC
+XREF ASMDISP_FGETC, _stdin
 
 INCLUDE "stdio.def"
 
@@ -28,9 +28,6 @@ INCLUDE "stdio.def"
    
 .loop
 
-   cp 10                       ; deal with '\r\n' by ignoring '\r'
-   jr z, ignore
-
    or a                        ; avoid dropping stream chars
    jr z, success
    
@@ -40,10 +37,8 @@ INCLUDE "stdio.def"
    ld (hl),a                   ; write stream char into string
    inc hl
    
-.ignore
-
    push hl
-   ld c,STDIO_SERVICE_GETCHAR
+   ld c,STDIO_MSG_GETC
    call l_jpix
    pop hl
    

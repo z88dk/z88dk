@@ -4,7 +4,7 @@
 XLIB getchar
 
 LIB fgetc
-XREF _stdin, ASMDISP_FGETC
+XREF ASMDISP_FGETC, _stdin
 
 .getchar
 

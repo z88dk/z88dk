@@ -14,7 +14,7 @@ extern struct FILE f_stdout;
 
    defb 195                    ; jp
    defw _tempoutput            ; stream i/o function address
-   defb $80                    ; flags: V000 000U (Valid FILE *, Unget char available)
+   defb $02                    ; flags: 0000 0IOU
    defb 0                      ; space for single unget char
 
 #endasm
@@ -28,7 +28,7 @@ extern struct FILE f_stdin;
 
    defb 195                    ; jp
    defw _tempinput             ; stream i/o function address
-   defb $80                    ; flags: V000 000U (Valid FILE *, Unget char available)
+   defb $04                    ; flags: 0000 0IOU
    defb 0                      ; space for single unget char
 
 #endasm

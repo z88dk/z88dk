@@ -19,10 +19,10 @@ LIB stdio_error
    ;         hl = -1 and carry set for fail
    ; uses  : af, hl, ix
    
-   bit 7,(ix+3)                ; valid FILE *?
+   bit 2,(ix+3)                ; open for input?
    jp z, stdio_error
    
-   ld a,h                      ; allowing pushback EOF would be bad
+   ld a,h                      ; not allowed to pushback EOF
    and l
    inc a
    jp z, stdio_error

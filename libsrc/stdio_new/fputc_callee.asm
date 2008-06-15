@@ -21,12 +21,12 @@ INCLUDE "stdio.def"
    ;         hl = -1, carry set for fail
    ; uses  : af, bc, de, hl, ix
    
-   bit 7,(ix+3)                ; valid FILE* ?
+   bit 1,(ix+3)                ; open for output?
    jp z, stdio_error
    
    push hl                     ; save char
    ld b,l
-   ld c,STDIO_SERVICE_PUTCHAR
+   ld c,STDIO_MSG_PUTC
    call l_jpix
    pop hl
    jp c, stdio_error
