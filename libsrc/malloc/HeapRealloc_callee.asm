@@ -41,7 +41,12 @@ XREF ASMDISP_HEAPALLOC_CALLEE, ASMDISP_HEAPFREE_CALLEE
 
    ld a,h
    or l
-   ret z
+   jr nz, checksize
+
+   ex de,hl                    ; ISO C wants a malloc to occur if realloc block == 0
+   jp HeapAlloc_callee + ASMDISP_HEAPALLOC_CALLEE
+
+.checksize
 
    ld a,b
    or a
