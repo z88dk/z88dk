@@ -22,6 +22,8 @@ XDEF ASMDISP_STRLCAT_CALLEE
    ; enter : hl = char *dst
    ;         de = char *src
    ;         bc = uint size
+   ; exit  : hl = strlen(dst) + strlen(src)
+   ;         carry set if complete strcat not possible
 
    push hl                     ; save dst to compute strlen(dst) later
    
@@ -74,6 +76,7 @@ XDEF ASMDISP_STRLCAT_CALLEE
    sbc hl,bc                   ; hl = strlen(dst augment)
    
    add hl,de                   ; return strlen(src)+strlen(dst)
+   scf
    ret
 
 .szexceeded0
