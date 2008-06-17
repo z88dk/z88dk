@@ -1,13 +1,10 @@
-fd/fileno
 stream-general/stdio_atou
-stream-general/stdio_error
 stream-general/stdio_isbdigit
 stream-general/stdio_isdigit
 stream-general/stdio_isodigit
 stream-general/stdio_isspace
 stream-general/stdio_isxdigit
 stream-general/stdio_nextarg
-stream-general/stdio_success
 stream-general/stdio_ultoa_any
 stream-general/stdio_utoa_any
 stream-general/stdio_varg

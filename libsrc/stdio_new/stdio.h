@@ -28,6 +28,8 @@ extern FILE *stdin;
 extern FILE *stdout;
 extern FILE *stderr;
 
+extern int errno;
+
 ///////////////////
 /// FILE OPERATIONS
 ///////////////////
@@ -100,12 +102,12 @@ extern int  __LIB__               fputc(int c, FILE *stream);
 extern int  __LIB__               fputs(char *s, FILE *stream);
 extern int  __LIB__               getchar(void);
 extern char __LIB__ __FASTCALL__ *gets(char *s);
-extern int  __LIB__               putc(int c, FILE *stream);
 extern int  __LIB__ __FASTCALL__  putchar(int c);
 extern int  __LIB__ __FASTCALL__  puts(char *s);
 extern int  __LIB__               ungetc(int c, FILE *stream);
 
 #define getc fgetc
+#define putc fputc
 
 extern char __LIB__ __CALLEE__   *fgets_callee(char *s, uint n, FILE *stream);
 extern int  __LIB__ __CALLEE__    fputc_callee(int c, FILE *stream);

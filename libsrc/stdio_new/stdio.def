@@ -1,5 +1,6 @@
-;
+; **************
 ; FILE STRUCTURE
+; **************
 ;
 ; offset   size    description
 ;  +0       1      jump instruction (195)
@@ -9,39 +10,45 @@
 
 defc FILESTR_SZ = 5
 
-;
+; *************************
 ; FILE DESCRIPTOR STRUCTURE
+; *************************
 ;
 ; offset   size    description
 ;  +0       1      call instruction (205)
 ;  +1/2     2      device message interpretter
-;  +3       1      flags0
+;  +3       1      flags0 DF00 0IOA (dup, filter, open for input, open for output, writes append)
 ;  +4       1      flags1
 ;  +5       1      reference count
 ;  +any number of bytes for device to maintain state for open file
 
-; _fd_table[MAXFILE]
+defc MAXFILES = 10
 
-;
-; DUP FD STRUCTURE
-; a runt file descriptor structure
-;
-; offset   size    description
-;  +0       1      jump instruction (195)
-;  +1/2     2      source file descriptor struct address
-;  +3       1      flags0 (single bit indicates a dup fd)
+; _fd_table[MAXFILES]
 
-defc DUPFDSTR_SZ = 4
-
-;
+; ***********************
 ; FORMATTED I/O CONSTANTS
-;
+; ***********************
 
 defc STDIO_MAXPRECISION = 16                       ; maximum precision for numbers on output stream
 defc STDIO_TEMPBUFSIZE  = STDIO_MAXPRECISION + 3   ; size of temp buffer allocated on stack for output stream
 
+; *************
+; ERROR NUMBERS
+; *************
 ;
+; keep codes less than 255
+
+defc ENONE   = 0
+defc EACCES  = 1
+defc EBADF   = 2
+defc EINVAL  = 3
+defc ENOMEM  = 4
+
+; **************
 ; STDIO MESSAGES
+; **************
+;
 ; message id passed in c register
 ; called function must preserve ix and exx registers
 ;
@@ -49,8 +56,11 @@ defc STDIO_TEMPBUFSIZE  = STDIO_MAXPRECISION + 3   ; size of temp buffer allocat
 ; mandatory
 
 defc STDIO_MSG_OPEN       = 1
+defc STDIO_MSG_CLOS
 defc STDIO_MSG_PUTC       = 2                      ; enter   b = char
 defc STDIO_MSG_GETC       = 3                      ; return  a = char
+defc STDIO_MSG_READ       = 4                      ; enter  de = dst buffer hl = size!=0, return hl = number of bytes transferred
+defc STDIO_MSG_WRIT                                ; enter  de = src buffer hl = size!=0, return hl = number of bytes transferred
 
 ; optionally handled by default msg interpretter
 
