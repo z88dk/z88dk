@@ -3,7 +3,7 @@
 
 XLIB fputs_callee
 XDEF ASMDISP_FPUTS_CALLEE
-LIB l_jpix, stdio_error, stdio_success
+LIB l_jpix, stdio_error_mc, stdio_success_znc, stdio_error_eacces_mc
 
 INCLUDE "stdio.def"
 
@@ -22,13 +22,13 @@ INCLUDE "stdio.def"
    ; uses  : af, bc, de, hl, ix
    
    bit 1,(ix+3)                ; open for output?
-   jp z, stdio_error
-   
+   jp z, stdio_error_eacces_mc
+
 .loop
 
    ld a,(hl)   
    or a
-   jp z, stdio_success
+   jp z, stdio_success_znc
    inc hl
 
    push hl
@@ -37,6 +37,6 @@ INCLUDE "stdio.def"
    call l_jpix
    pop hl
    jr nc, loop
-   jp stdio_error
+   jp stdio_error_mc
 
 defc ASMDISP_FPUTS_CALLEE = asmentry - fputs_callee

@@ -2,7 +2,7 @@
 ; 05.2008 aralbrec
 
 XLIB vfprintf_callee
-LIB stdio_outchar, stdio_atou, jumptbl_printf, stdio_nextarg, stdio_error
+LIB stdio_outchar, stdio_atou, jumptbl_printf, stdio_nextarg, stdio_error_eacces_mc, stdio_error_mc
 XDEF ASMDISP_VFPRINTF_CALLEE, LIBDISP_VFPRINTF_CALLEE
 
 INCLUDE "stdio.def"
@@ -20,11 +20,11 @@ INCLUDE "stdio.def"
    ; enter : ix  = FILE *
    ;         de  = format string
    ;         bc  = & parameter list (arg_ptr)
-   ; exit  : hl  = number of chars output to stream
-   ;         carry if stream error: ERRNO set and hl=-1
+   ; exit  : hl  = number of chars output to stream, carry reset
+   ;         hl  = -1 and carry if error
 
    bit 1,(ix+3)                ; open for output?
-   jp z, stdio_error
+   jp z, stdio_error_eacces_mc
    
 .libentry
 
@@ -34,7 +34,7 @@ INCLUDE "stdio.def"
    ;         de  = format string
    ;         bc  = & parameter list (arg_ptr)
    ; exit  : hl  = number of chars output to stream
-   ;         carry if stream error: ERRNO set and hl=-1
+   ;         hl  = -1 and carry if error
 
    ld hl,-STDIO_TEMPBUFSIZE
    add hl,sp
@@ -73,7 +73,7 @@ INCLUDE "stdio.def"
    ld hl,STDIO_TEMPBUFSIZE + 2 ; remove items from stack
    add hl,sp
    ld sp,hl
-   jp stdio_error
+   jp stdio_error_mc
 
 .exitnoerror
 

@@ -4,7 +4,7 @@
 XLIB vfscanf_callee
 XDEF ASMDISP_VFSCANF_CALLEE, LIBDISP_VFSCANF_CALLEE
 
-LIB stdio_atou, stdio_error
+LIB stdio_atou, stdio_error_mc, stdio_error_eacces_mc
 LIB stdio_isspace, stdio_isdigit
 LIB stdio_getchar, stdio_ungetchar
 LIB jumptbl_scanf, stdio_consumews
@@ -22,11 +22,11 @@ LIB jumptbl_scanf, stdio_consumews
    ; enter : ix  = FILE *
    ;         de  = format string
    ;         bc  = & parameter list (arg_ptr)
-   ; exit  : hl  = number of conversions done
-   ;         if stream unreadable carry set and hl=-1
+   ; exit  : hl  = number of conversions done, carry reset
+   ;         hl  = -1 and carry if error
 
    bit 2,(ix+3)                ; open for input?
-   jp z, stdio_error
+   jp z, stdio_error_eacces_mc
 
 .libentry
 
@@ -36,7 +36,7 @@ LIB jumptbl_scanf, stdio_consumews
    ;         de  = format string
    ;         bc  = & parameter list (arg_ptr)
    ; exit  : hl  = number of conversions done
-   ;         if stream unreadable carry set and hl=-1
+   ;         hl  = -1 and carry if error
 
    push bc
 
@@ -92,7 +92,7 @@ LIB jumptbl_scanf, stdio_consumews
    exx
    pop hl                      ; hl = number of conversions done
    ret nz                      ; if at least one char read from stream, return # conversions
-   jp stdio_error
+   jp stdio_error_mc
    
 .consumews
 

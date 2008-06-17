@@ -3,7 +3,7 @@
 
 XLIB fputc_callee
 XDEF ASMDISP_FPUTC_CALLEE
-LIB l_jpix, stdio_error
+LIB l_jpix, stdio_error_mc, stdio_error_eacces_mc
 
 INCLUDE "stdio.def"
 
@@ -22,14 +22,14 @@ INCLUDE "stdio.def"
    ; uses  : af, bc, de, hl, ix
    
    bit 1,(ix+3)                ; open for output?
-   jp z, stdio_error
+   jp z, stdio_error_eacces_mc
    
    push hl                     ; save char
    ld b,l
    ld c,STDIO_MSG_PUTC
    call l_jpix
    pop hl
-   jp c, stdio_error
+   jp c, stdio_error_mc
    
    ld h,0                      ; hl = char
    ret

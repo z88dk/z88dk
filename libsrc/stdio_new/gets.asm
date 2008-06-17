@@ -2,7 +2,7 @@
 ; 06.2008 aralbrec
 
 XLIB gets
-LIB fgetc, l_jpix
+LIB fgetc, l_jpix, stdio_error_zc
 XREF ASMDISP_FGETC, _stdin
 
 INCLUDE "stdio.def"
@@ -22,15 +22,15 @@ INCLUDE "stdio.def"
    call fgetc + ASMDISP_FGETC  ; fgetc handles the unget char for us
    ld a,l
    pop hl
-   jr c, fail
+   jp c, stdio_error_zc
 
    push hl                     ; char *s on stack   
    
 .loop
 
-   or a                        ; avoid dropping stream chars
+   or a                        ; avoid NULs causing trouble
    jr z, success
-   
+
    cp 13                       ; stop if end of line seen
    jr z, success
    
@@ -49,9 +49,4 @@ INCLUDE "stdio.def"
 
    ld (hl),0                   ; terminate string with '\0'
    pop hl                      ; return char *s
-   ret
-
-.fail
-
-   ld hl,0
    ret

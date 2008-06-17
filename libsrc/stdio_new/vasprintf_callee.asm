@@ -4,7 +4,7 @@
 XLIB vasprintf_callee
 XDEF ASMDISP_VASPRINTF_CALLEE
 
-LIB vsnprintf_callee, malloc, stdio_error
+LIB vsnprintf_callee, malloc, stdio_error_enomem_mc
 XREF ASMDISP_VSNPRINTF_CALLEE
 
 .vasprintf_callee
@@ -58,6 +58,6 @@ XREF ASMDISP_VSNPRINTF_CALLEE
    inc hl
    ld (hl),d
    exx
-   jp stdio_error
+   jp stdio_error_enomem_mc
    
 defc ASMDISP_VASPRINTF_CALLEE = asmentry - vasprintf_callee

@@ -5,6 +5,7 @@ XLIB fgets_callee
 XDEF ASMDISP_FGETS_CALLEE
 
 LIB fgetc, l_jpix
+LIB stdio_error_eacces_zc, stdio_error_einval_zc, stdio_error_zc
 XREF ASMDISP_FGETC
 
 INCLUDE "stdio.def"
@@ -25,12 +26,9 @@ INCLUDE "stdio.def"
    ;         hl = 0 and carry for fail
    ; uses  : af, bc, de, hl, ix
    
-   bit 2,(ix+3)                ; open for input?
-   jr z, fail1
-   
    ld a,b
    or c
-   jr z, fail1
+   jp z, stdio_error_einval_zc
 
    push hl                     ; save string address
 
@@ -39,17 +37,15 @@ INCLUDE "stdio.def"
    or c
    jr z, success
    
-   push bc
-   push hl
+   exx
    call fgetc + ASMDISP_FGETC  ; use fgetc to grab possible unget char
    ld a,l
-   pop hl
-   pop bc
-   jr c, fail0
+   exx
+   jp c, stdio_error_zc - 1
    
 .loop
 
-   or a                        ; avoid dropping stream chars
+   or a                        ; avoid NULs causing trouble
    jr z, success
 
    ld (hl),a                   ; write stream char into string
@@ -63,13 +59,10 @@ INCLUDE "stdio.def"
    or c
    jr z, success
 
-   push bc
-   push hl
+   exx
    ld c,STDIO_MSG_GETC
    call l_jpix
-   pop hl
-   pop bc
-   
+   exx
    jp nc, loop
    ccf
 
@@ -77,16 +70,6 @@ INCLUDE "stdio.def"
 
    ld (hl),0                   ; terminate string with '\0'
    pop hl                      ; return char *s
-   ret
-   
-.fail0
-
-   pop de                      ; pop string address
-
-.fail1
-
-   ld hl,0
-   scf
    ret
    
 defc ASMDISP_FGETS_CALLEE = asmentry - fgets_callee

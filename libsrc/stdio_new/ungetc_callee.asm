@@ -3,7 +3,7 @@
 
 XLIB ungetc_callee
 XDEF ASMDISP_UNGETC_CALLEE
-LIB stdio_error
+LIB stdio_error_eacces_mc, stdio_error_einval_mc
 
 .ungetc_callee
 
@@ -20,18 +20,17 @@ LIB stdio_error
    ; uses  : af, hl, ix
    
    bit 2,(ix+3)                ; open for input?
-   jp z, stdio_error
+   jp z, stdio_error_eacces_mc
    
    ld a,h                      ; not allowed to pushback EOF
    and l
    inc a
-   jp z, stdio_error
-   
+   jp z, stdio_error_einval_mc
+  
+   ld (ix+4),l                 ; store unget char 
    set 0,(ix+3)                ; indicate unget char available
-   ld (ix+4),l                 ; store unget char
    
    ld h,0
-   or a
    ret
 
 defc ASMDISP_UNGETC_CALLEE = asmentry - ungetc_callee
