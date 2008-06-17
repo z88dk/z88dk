@@ -33,7 +33,7 @@ XREF LIBDISP_FILENO
    ; fd table if it is there
    
    call fileno + LIBDISP_FILENO
-   ret c                       ; fdstruct not in the fd table
+   jp c, stdio_success_znc     ; fdstruct not in the fd table
    
    ; de = MSB of entry in fd table
    
