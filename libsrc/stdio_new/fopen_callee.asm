@@ -2,7 +2,7 @@
 ; 06.2008 aralbrec
 
 XLIB fopen_callee
-XDEF ASMDISP_FOPEN_CALLEE
+XDEF ASMDISP_FOPEN_CALLEE, LIBDISP_FOPEN_CALLEE
 
 LIB open_callee, stdio_parseperm, stdio_malloc, stdio_free
 LIB stdio_error_enomem_zc, stdio_error_einval_zc, stdio_error_zc
@@ -36,7 +36,9 @@ XREF ASMDISP_OPEN_CALLEE
    ;
    ; hl = char *mode
    ; stack = char *filename, FILE *
-   
+
+.libentry
+
    call stdio_parseperm        ; a = b = mode flags
    pop hl
    pop de
@@ -80,3 +82,4 @@ XREF ASMDISP_OPEN_CALLEE
    jp stdio_error_zc
 
 defc ASMDISP_FOPEN_CALLEE = asmentry - fopen_callee
+defc LIBDISP_FOPEN_CALLEE = libentry - fopen_callee
