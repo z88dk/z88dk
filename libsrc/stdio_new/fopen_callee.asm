@@ -4,9 +4,9 @@
 XLIB fopen_callee
 XDEF ASMDISP_FOPEN_CALLEE
 
-LIB open, stdio_malloc, stdio_free, stdio_parseperm
-LIB stdio_error_einval_zc, stdio_error_enomem_zc, stdio_error_zc
-XREF ASMDISP_OPEN
+LIB open_callee, stdio_parseperm, stdio_malloc, stdio_free
+LIB stdio_error_enomem_zc, stdio_error_einval_zc, stdio_error_zc
+XREF ASMDISP_OPEN_CALLEE
 
 .fopen_callee
 
@@ -20,7 +20,9 @@ XREF ASMDISP_OPEN
    ;         de = char *mode
    ; exit  : hl = FILE * and carry reset for success
    ;         hl = 0 and carry set for fail
-   
+
+   ; 1. get memory for new struct FILE
+
    push hl                     ; save char *filename
    push de                     ; save char *mode
    
@@ -30,29 +32,34 @@ XREF ASMDISP_OPEN
    
    ex (sp),hl
    
+   ; 2. parse mode flags
+   ;
    ; hl = char *mode
    ; stack = char *filename, FILE *
    
    call stdio_parseperm        ; a = b = mode flags
-   jp z, stdio_error_einval_zc - 2
-   
    pop hl
-   ex (sp),hl
-   
-   ; hl = char *filename
+   pop de
+   jp z, stdio_error_einval_zc ; mode flags not understood
+
+   ; 3. open file
+   ;
    ;  b = a = mode flags 0000 CIOA
-   ; stack = FILE *
-   
+   ; de = char *filename
+   ; hl = FILE *
+
+   push hl
    push af
-   call open + ASMDISP_OPEN    ; returns de = fdstruct *
+   call open_callee + ASMDISP_OPEN_CALLEE  ; returns de = fdstruct *
    pop af                      ; a = mode flags
    pop hl                      ; hl = FILE *
-   jr nc, allgood
+   jr c, fail
 
-   call stdio_free             ; free struct FILE
-   jp stdio_error_zc
-   
-.allgood
+   ; 4. fill in struct FILE
+   ;
+   ; de = fdstruct (0 offset)
+   ;  a = mode flags 0000 0CIOA
+   ; hl = FILE *
 
    ld (hl),195                 ; fill in the FILE struct
    inc hl
@@ -64,8 +71,12 @@ XREF ASMDISP_OPEN
    ld (hl),a
    dec hl
    dec hl
-   dec hl
-   
+   dec hl 
    ret
-   
+
+.fail
+
+   call stdio_free             ; free struct FILE
+   jp stdio_error_zc
+
 defc ASMDISP_FOPEN_CALLEE = asmentry - fopen_callee

@@ -2,44 +2,44 @@
 ; 06.2008 aralbrec
 
 XLIB fclose
+XDEF LIBDISP_fclose
 
-LIB close_fdstruct, fileno, stdio_free
-XREF LIBDISP_FILENO
+LIB close, fileno, stdio_free
+LIB stdio_success_znc
+XREF LIBDISP_CLOSE, LIBDISP_FILENO
 
 .fclose
 
+   ; 1. get attached fdstruct and free memory associated with FILE
+   ; 
    ; hl = FILE *
 
-   push hl                     ; save FILE* for freeing later
-   
    inc hl
-   ld a,(hl)
+   ld e,(hl)
    inc hl
-   ld h,(hl)
-   ld l,a                      ; hl = fdstruct *
+   ld d,(hl)                   ; de = fdstruct
    
-   ex (sp),hl
-   call stdio_free             ; free the FILE struct now
-   pop hl                      ; hl = fdstruct *
-   
-   push hl
-   call close_fdstruct         ; carry = error, z = reference count reached zero
+   dec hl
+   dec hl
+   push de
+   call stdio_free             ; free FILE
    pop hl
-   jp c, stdio_error_mc
-   jp nz, stdio_success_znc    ; if reference count did not reach zero
    
-   ; reference count of underlying fd reached zero
-   ; which means we must remove the fdstruct from the
-   ; fd table if it is there
+   ; 2. determine if fd struct has an entry in the fdtbl
+   ;
+   ; hl = fdstruct
+
+.libentry
+
+   push hl
+   call fileno + LIBDISP_FILENO  ; l = fd
+   pop de                      ; de = fdstruct
+   jp nc, close                ; if there is an entry use close(fd)
+
+   ; 3. close(fdstruct)
+   ;
+   ; de = fdstruct
    
-   call fileno + LIBDISP_FILENO
-   jp c, stdio_success_znc     ; fdstruct not in the fd table
-   
-   ; de = MSB of entry in fd table
-   
-   xor a
-   ld (de),a
-   dec de
-   ld (de),a                   ; remove fd table entry
-   
-   jp stdio_success_znc
+   jp close + LIBDISP_CLOSE
+
+defc LIBDISP_FCLOSE = libentry - fclose

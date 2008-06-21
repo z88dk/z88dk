@@ -4,9 +4,8 @@
 XLIB fdopen_callee
 XDEF ASMDISP_FDOPEN_CALLEE
 
-LIB stdio_parseperm, stdio_malloc
+LIB stdio_parseperm, stdio_malloc, fd_fdtblindex
 LIB stdio_error_ebadf_zc, stdio_error_einval_zc, stdio_error_enomem_zc
-XREF _fd_table
 
 INCLUDE "stdio.def"
 
@@ -27,11 +26,7 @@ INCLUDE "stdio.def"
    cp MAXFILES
    jp nc, stdio_error_ebadf_zc
 
-   add a,a
-   ld l,a
-   ld h,0
-   ld bc,_fd_table
-   add hl,bc
+   call fd_fdtblindex
    
    ld c,(hl)
    inc hl
@@ -85,7 +80,7 @@ INCLUDE "stdio.def"
    
    ld hl,5
    add hl,bc
-   inc (hl)                    ; increase reference count in fd struct
+   inc (hl)                    ; increase reference count in fdstruct
    
    ex de,hl
    or a

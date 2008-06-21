@@ -5,7 +5,7 @@ XLIB fileno
 XDEF LIBDISP_FILENO
 
 LIB stdio_error_ebadf_mc
-XREF _fd_table
+XREF _fdtbl
 
 include "stdio.def"
 
@@ -27,8 +27,8 @@ include "stdio.def"
 
    ; hl = fdstruct *
 
-   ld de,_fd_table
-   ld b,MAXFILES               ; max number of files in fdtable[]
+   ld de,_fdtbl
+   ld b,MAXFILES               ; max number of files in fdtbl
    
 .loop
 

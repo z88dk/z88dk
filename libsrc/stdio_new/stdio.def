@@ -22,27 +22,30 @@ defc FILESTR_SZ = 5
 ;  +5       1      reference count
 ;  +any number of bytes for device to maintain state for open file
 
+defc FDSTR_SZ = 6
 defc MAXFILES = 10
 
-; _fd_table[MAXFILES]
+; _fdtbl[MAXFILES]
+; _zdevtbl  defb 'a' defw msg_int defb 0
+; _zdefdev  defw msg_int
 
 ; ***********************
 ; FORMATTED I/O CONSTANTS
 ; ***********************
 
-defc STDIO_MAXPRECISION = 16                       ; maximum precision for numbers on output stream
+defc STDIO_MAXPRECISION = 32                       ; maximum precision for numbers on output stream
 defc STDIO_TEMPBUFSIZE  = STDIO_MAXPRECISION + 3   ; size of temp buffer allocated on stack for output stream
 
 ; *************
 ; ERROR NUMBERS
 ; *************
-;
-; keep codes less than 255
 
 defc ENONE   = 0
 defc EACCES  = 1
 defc EBADF   = 2
+defc EDEVNF
 defc EINVAL  = 3
+defc ENFILE
 defc ENOMEM  = 4
 
 ; **************
@@ -53,15 +56,9 @@ defc ENOMEM  = 4
 ; called function must preserve ix and exx registers
 ;
 
-; mandatory
-
-defc STDIO_MSG_OPEN       = 1
-defc STDIO_MSG_CLOS
+defc STDIO_MSG_OPEN       = 1                      ; enter   b = flags (0000 0CIOA) de = char *filename
+defc STDIO_MSG_CLOS                                ; none
 defc STDIO_MSG_PUTC       = 2                      ; enter   b = char
 defc STDIO_MSG_GETC       = 3                      ; return  a = char
 defc STDIO_MSG_READ       = 4                      ; enter  de = dst buffer hl = size!=0, return hl = number of bytes transferred
 defc STDIO_MSG_WRIT                                ; enter  de = src buffer hl = size!=0, return hl = number of bytes transferred
-
-; optionally handled by default msg interpretter
-
-; optional
