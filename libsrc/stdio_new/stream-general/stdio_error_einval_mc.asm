@@ -2,10 +2,9 @@
 ; 06.2008 aralbrec
 
 XLIB stdio_error_einval_mc
-LIB stdio_error_einval_zc
+LIB stdio_errno_mc
 
 .stdio_error_einval_mc
 
-   call stdio_error_einval_zc
-   dec hl
-   ret
+   ld hl,EINVAL
+   jp stdio_errno_mc

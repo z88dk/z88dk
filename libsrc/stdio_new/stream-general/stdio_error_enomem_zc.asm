@@ -2,7 +2,7 @@
 ; 06.2008 aralbrec
 
 XLIB stdio_error_enomem_zc
-XREF _errno
+LIB stdio_errno_zc
 
 INCLUDE "stdio.def"
 
@@ -12,7 +12,4 @@ INCLUDE "stdio.def"
 .stdio_error_enomem_zc
 
    ld hl,ENOMEM
-   ld (_errno),hl
-   ld l,0
-   scf
-   ret
+   jp stdio_errno_zc

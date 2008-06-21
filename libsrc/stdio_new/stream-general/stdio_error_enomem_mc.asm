@@ -2,10 +2,11 @@
 ; 06.2008 aralbrec
 
 XLIB stdio_error_enomem_mc
-LIB stdio_error_enomem_zc
+LIB stdio_errorno_mc
+
+INCLUDE "stdio.def"
 
 .stdio_error_enomem_mc
 
-   call stdio_error_enomem_zc
-   dec hl
-   ret
+   ld hl,ENOMEM
+   jp stdio_errno_mc

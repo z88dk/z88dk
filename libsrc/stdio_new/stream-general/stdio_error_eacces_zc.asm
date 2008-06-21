@@ -2,14 +2,11 @@
 ; 06.2008 aralbrec
 
 XLIB stdio_error_eacces_zc
-XREF _errno
+LIB stdio_errno_zc
 
 INCLUDE "stdio.def"
 
 .stdio_error_eacces_zc
 
    ld hl,EACCES
-   ld (_errno),hl
-   ld l,0
-   scf
-   ret
+   jp stdio_errno_zc
