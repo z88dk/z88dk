@@ -78,10 +78,6 @@ INCLUDE "stdio.def"
    and $06                     ; clear A bit
    ld (hl),a
    
-   ld hl,5
-   add hl,bc
-   inc (hl)                    ; increase reference count in fdstruct
-   
    ex de,hl
    or a
    ret
