@@ -4,8 +4,8 @@
 XLIB freopen_callee
 XDEF ASMDISP_FREOPEN_CALLEE
 
-LIB fopen_callee, fclose
-XREF LIBDISP_FOPEN_CALLEE, LIBDISP_FCLOSE
+LIB fopen_callee, close
+XREF LIBDISP_FOPEN_CALLEE, LIBDISP_CLOSE
 
 .freopen_callee
 
@@ -35,12 +35,11 @@ XREF LIBDISP_FOPEN_CALLEE, LIBDISP_FCLOSE
    ; stack = ret addr, char *filename, FILE *stream, char *mode
    
    inc hl
-   ld a,(hl)
+   ld e,(hl)
    inc hl
-   ld h,(hl)
-   ld l,a                      ; hl = fdstruct
+   ld d,(hl)                   ; de = fdstruct
    
-   call fclose + LIBDISP_FCLOSE
+   call close + LIBDISP_CLOSE
 
    ; 3. fopen using existing struct FILE
    ;
