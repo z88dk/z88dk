@@ -5,7 +5,7 @@ XLIB close
 XDEF LIBDISP_CLOSE
 
 LIB stdio_free, l_jphl, fclose, fd_fdtblindex
-LIB stdio_success_znc, stdio_error_ebadf_mc
+LIB stdio_success_znc, stdio_error_ebadf_mc, stdio_error_mc
 XREF LIBDISP_FCLOSE
 
 INCLUDE "stdio.def"
@@ -78,6 +78,7 @@ INCLUDE "stdio.def"
    ld c,STDIO_MSG_CLOS
    call l_jphl
    pop hl
+   jr c, dev_error             ; device indicates close error
    
    ; 5. release memory taken by fdstruct
    ; 
@@ -85,5 +86,10 @@ INCLUDE "stdio.def"
    
    call stdio_free
    jp stdio_success_znc
+
+.dev_error
+
+   call stdio_free
+   jp stdio_error_mc
 
 defc LIBDISP_CLOSE = libentry - close
