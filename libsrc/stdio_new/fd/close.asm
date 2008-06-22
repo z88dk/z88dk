@@ -23,10 +23,10 @@ INCLUDE "stdio.def"
    call fd_fdtblindex          ; hl = fdtable entry for fd
 
    ld e,(hl)
-   ld (hl),d                   ; zero out the fdtable entry
+   ld (hl),0                   ; zero out the fdtable entry
    inc hl
    ld a,(hl)
-   ld (hl),d
+   ld (hl),0
    ld d,a                      ; de = fdstruct associated with fd
 
    or e                        ; if fdstruct==0 the fd is not used
