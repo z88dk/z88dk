@@ -19,7 +19,7 @@ LIB stdio_success_znc, stdio_error_mc, l_jpix, l_declong
 .asmentry
 
    ; enter : dehl = offset
-   ;            b = whence (1=SET, 2=CUR, 3=END)
+   ;            b = whence (1=END, 2=CUR, 3=SET)
    ;           ix = FILE *stream
    
    ld a,b                      ; if this is a relative seek from current pos
