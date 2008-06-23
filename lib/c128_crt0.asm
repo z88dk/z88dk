@@ -2,60 +2,51 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.9 2007-06-27 20:49:27 dom Exp $
+;	$Id: c128_crt0.asm,v 1.10 2008-06-23 17:34:31 stefano Exp $
 ;
 
 
                 MODULE  c128_crt0
 
-;
-; Initially include the zcc_opt.def file to find out lots of lovely
-; information about what we should do..
-;
+;--------
+; Include zcc_opt.def to find out some info
+;--------
+        INCLUDE "zcc_opt.def"
 
-                INCLUDE "zcc_opt.def"
+;--------
+; Some scope definitions
+;--------
 
-; No matter what set up we have, main is always, always external to
-; this file
+        XREF    _main           ;main() is always external to crt0 code
 
-                XREF    _main
+        XDEF    cleanup         ;jp'd to by exit()
+        XDEF    l_dcal          ;jp(hl)
 
-;
-; Some variables which are needed for both app and basic startup
-;
 
-        XDEF    cleanup
-        XDEF    l_dcal
+        XDEF    _vfprintf       ;jp to the printf() core
 
-; Integer rnd seed
-
-        XDEF    _std_seed
-
-; vprintf is internal to this file so we only ever include one of the set
-; of routines
-
-	XDEF	_vfprintf
-
-;Exit variables
-
-        XDEF    exitsp
+        XDEF    exitsp          ;atexit() variables
         XDEF    exitcount
-
-; Graphics (pseudo)
-        XDEF    base_graphics   ;Graphical variables
-	XDEF	coords		;Current xy position
-
-;For stdin, stdout, stder
 
        	XDEF	heaplast	;Near malloc heap variables
 	XDEF	heapblocks
 
         XDEF    __sgoioblk
 
+; Graphics (pseudo)
+        XDEF    base_graphics   ;Graphical variables
+	XDEF	coords		;Current xy position
+
+	XDEF	snd_tick	;Sound variable
+
+
 ; Now, getting to the real stuff now!
 
+IF      !myzorg
+        defc    myzorg  = $3000
+ENDIF
+        org     myzorg
 
-        org     $3000
 
 .start
 
@@ -158,13 +149,11 @@ ELSE
 ENDIF
 
 
-;Seed for integer rand() routines
+IF !DEFINED_HAVESEED
+		XDEF    _std_seed        ;Integer rand() seed
+._std_seed       defw    0       ; Seed for integer rand() routines
+ENDIF
 
-.defltdsk       defb    0
-
-;Seed for integer rand() routines
-
-._std_seed       defw    0
 
 ;Atexit routine
 

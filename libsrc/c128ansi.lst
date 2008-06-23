@@ -48,4 +48,5 @@ graphics/xorborder
 graphics/xorplot
 graphics/setxy
 games/joystick
+@c128cpm.lst
 @z80.lst

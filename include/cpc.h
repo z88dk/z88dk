@@ -1,7 +1,7 @@
 /*
  * Headerfile for Amstrad CPC specific functions
  *
- * $Id: cpc.h,v 1.2 2008-05-26 06:38:07 stefano Exp $
+ * $Id: cpc.h,v 1.3 2008-06-23 17:34:30 stefano Exp $
  */
 
 #ifndef __CPC_H__
@@ -24,11 +24,15 @@ extern int  __LIB__ cpc_model(void);
 // MISC FUNCTIONS
 ///////////////////////////////////////////
 
+// Tiny ROM based console gets implementation
+extern int __LIB__ cpc_gets(char *s);
+
 // Copies a string to a CPC RSX compatible one
 extern char __LIB__ __FASTCALL__ *cpc_rsx_str(char *str);    // (malloc lib is required)
 extern char __LIB__              *cpc_rsx_strcpy(char *, char *);
 extern char __LIB__ __CALLEE__   *cpc_rsx_strcpy_callee(char *, char *);
 
+#define cpc_rsx_strcpy(a,b) cpc_rsx_strcpy_callee(a,b)
 
 // Call RSX/Bar command
 extern int __LIB__ cpc_rsx(char *cmd,...);
