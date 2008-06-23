@@ -87,7 +87,7 @@ INCLUDE "stdio.def"
    ld h,0                      ; hl = num ready fds
    ret
 
-.ebdaf
+.ebadf
 
    ld b,$40
    jr reenter
