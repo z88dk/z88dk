@@ -43,10 +43,10 @@ defc STDIO_TEMPBUFSIZE  = STDIO_MAXPRECISION + 3   ; size of temp buffer allocat
 defc ENONE   = 0
 defc EACCES  = 1
 defc EBADF   = 2
-defc EDEVNF
-defc EINVAL  = 3
-defc ENFILE
-defc ENOMEM  = 4
+defc EDEVNF  = 3
+defc EINVAL  = 4
+defc ENFILE  = 5
+defc ENOMEM  = 6
 
 ; **************
 ; STDIO MESSAGES
@@ -56,9 +56,22 @@ defc ENOMEM  = 4
 ; called function must preserve ix and exx registers
 ;
 
-defc STDIO_MSG_OPEN       = 1                      ; enter   b = flags (0000 0CIOA) de = char *filename
-defc STDIO_MSG_CLOS                                ; none
+defc STDIO_MSG_OPEN       = 0                      ; enter   b = flags (0000 0CIOA) de = char *filename
+defc STDIO_MSG_CLOS       = 1                      ; none
 defc STDIO_MSG_PUTC       = 2                      ; enter   b = char
 defc STDIO_MSG_GETC       = 3                      ; return  a = char
 defc STDIO_MSG_READ       = 4                      ; enter  de = dst buffer hl = size!=0, return hl = number of bytes transferred
-defc STDIO_MSG_WRIT                                ; enter  de = src buffer hl = size!=0, return hl = number of bytes transferred
+defc STDIO_MSG_WRIT       = 5                      ; enter  de = src buffer hl = size!=0, return hl = number of bytes transferred
+defc STDIO_MSG_POLL       = 6                      ; enter   b = events, return b = revents or carry set if unsupported
+defc STDIO_MSG_SEEK       = 7                      ; enter  dehl = file pos b = 1:END 2:CUR 3:SET, return dehl = new file pos
+defc STDIO_MSG_ICTL       = 8                      ; enter  de = request hl = arg, return value in hl
+defc STDIO_MSG_SYNC       = 9                      ; none   transfer any buffered data to device
+
+; information messages that can be handled by library supplied routines
+
+defc STDIO_MSG_FEOF       = 10                     ; return carry set if end-of-file reached or if not applicable
+defc STDIO_MSG_FERR       = 11                     ; return  l = error flags
+
+; should be ignored by most low level drivers except possibly tty drivers
+
+defc STDIO_MSG_FLSH       = 12                     ; enter   b = 1 for input 2 for output : flush high level buffers
