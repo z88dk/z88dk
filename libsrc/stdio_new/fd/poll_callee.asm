@@ -74,7 +74,7 @@ INCLUDE "stdio.def"
    
    pop bc                      ; b = num fds, c = ready fds
    
-   and $1f
+   or a
    jr z, fdnotrdy
 
    inc c
