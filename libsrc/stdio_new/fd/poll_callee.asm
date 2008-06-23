@@ -37,7 +37,7 @@ INCLUDE "stdio.def"
    jp nc, stdio_error_einval_mc
    
    or a                        ; check if struct pollfd is empty
-   jp z, stdio_success_znc
+   jp z, stdio_error_einval_mc
    
    ld b,c                      ; b = nfds
    ld c,0                      ; c = number of ready fds
