@@ -21,7 +21,7 @@ INCLUDE "stdio.def"
    jr c, error
 
    bit 0,(ix+3)                ; if an unget char is pending
-   call nz, l_declong          ;  decrement file position
+   jp nz, l_declong            ;  decrement file position
    
    ret
 
