@@ -36,6 +36,8 @@ XDEF ASMDISP_STRLCPY_CALLEE
    xor a                       ; one too many bytes copied...
    dec de                      ; need to place \0 into dst
    ld (de),a
+   
+   dec hl                      ; in case last char copied was \0
 
 .szexceeded1
 
