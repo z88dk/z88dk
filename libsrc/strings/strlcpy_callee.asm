@@ -26,9 +26,10 @@ XDEF ASMDISP_STRLCPY_CALLEE
    
 .cpyloop
 
-   ld a,(hl)
    or a
-   jr z, done                  ; if end of src string reached...
+   jr z, done                  ; if end of src string was reached...
+   
+   ld a,(hl)
    ldi                         ; copy src byte to dst
    jp pe, cpyloop              ; repeat until size reaches zero
 
@@ -44,11 +45,11 @@ XDEF ASMDISP_STRLCPY_CALLEE
    cpir                        ; find end of char *src
    dec hl
  
-.done
-
    ; hl = pointing at \0 at end of char *src
    ; carry flag reset
-   
+
+.done
+
    pop de                      ; de = char *src
    sbc hl,de                   ; hl = strlen(src)
    ret
