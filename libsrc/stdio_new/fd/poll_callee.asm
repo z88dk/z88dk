@@ -5,14 +5,15 @@ XLIB poll_callee
 XDEF ASMDISP_POLL_CALLEE
 
 LIB fd_common1
-LIB stdio_error_einval_mc, stdio_error_success_znc
+LIB stdio_error_einval_mc
 
 INCLUDE "stdio.def"
 
 ; struct pollfd {
 ;    int  fd;
 ;    char events;
-;    char revents;             // bit 7 = POLLERR, bit 6 = POLLNVAL, bit 5 = POLLNSUP
+;    char revents;             // bit 7 = POLLERR, bit 6 = POLLNVAL, bit 5 = POLLNSUP, bit 4 = ERROR
+;                              // bit 3 = OOBWRITE, bit 2 = WRITE, bit 1 = OOBREAD, bit 0 = READ
 ; };
 ;
 ; timeout is ignored in this implementation
