@@ -12,5 +12,6 @@ INCLUDE "stdio.def"
    call l_jphl
    
    ld h,0
+   ld l,a
    or a
    ret
