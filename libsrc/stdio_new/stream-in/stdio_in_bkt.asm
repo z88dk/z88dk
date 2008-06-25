@@ -206,7 +206,7 @@ LIB stdio_getchar, stdio_ungetchar, stdio_nextarg
    ; ***********************************************************************
 
    ;     b = width
-   ;     c = flags [^00a*WL0]
+   ;     c = flags [^00a*WLM], M = matched at least one char
    ;    hl = & parameter list
    ; stack = format string, ret, char set bitmap (32 bytes)
 
@@ -232,6 +232,8 @@ LIB stdio_getchar, stdio_ungetchar, stdio_nextarg
    
    ; char is in bitset so add to string
    
+   set 0,c                     ; matched at least one char
+   
    bit 3,c
    jr nz, suppress1
    
@@ -253,11 +255,10 @@ LIB stdio_getchar, stdio_ungetchar, stdio_nextarg
    pop de                      ; de = char *s
    pop hl                      ; hl = & parameter list
 
-   xor a                       ; also clears carry flag
-   
    bit 3,c
    jr nz, adjuststack
    
+   xor a
    ld (de),a                   ; write terminating \0 to string
    
    exx
@@ -272,6 +273,10 @@ LIB stdio_getchar, stdio_ungetchar, stdio_nextarg
    ld sp,hl
    ex de,hl
 
+   or a                        ; clear carry flag
+   bit 0,c                     ; if at least one char matched
+   ret nz                      ;   return with no carry
+   scf
    ret
 
 .finished
