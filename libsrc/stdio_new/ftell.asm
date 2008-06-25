@@ -2,6 +2,8 @@
 ; 06.2008 aralbrec
 
 XLIB ftell
+XDEF ASMDISP_FTELL
+
 LIB stdio_error_mc, l_declong, l_jpix
 
 INCLUDE "stdio.def"
@@ -10,12 +12,14 @@ INCLUDE "stdio.def"
 
    push hl
    pop ix                      ; ix = FILE *
-   
-   ld hl,0
-   ld e,l
-   ld d,h                      ; relative seek by 0 bytes
-   
-   ld b,2                      ; seek from current position
+
+.asmentry
+
+   ; enter : ix = FILE *
+   ; exit  : dehl = file position and carry reset for success
+   ;         dehl = -1 and carry if fail
+
+   ld b,0                      ; report file pos, no change
    ld c,STDIO_MSG_SEEK
    call l_jpix
    jr c, error
@@ -32,3 +36,5 @@ INCLUDE "stdio.def"
    ld d,h
    
    ret
+
+defc ASMDISP_FTELL = asmentry - ftell
