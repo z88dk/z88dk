@@ -2,6 +2,7 @@
 ; 05.2008 aralbrec
 
 XLIB stdio_buff2caps
+LIB asm_toupper
 
 ; capitalize all letters in buffer
 ;
@@ -22,15 +23,8 @@ XLIB stdio_buff2caps
 
    inc hl
    ld a,(hl)
-   
-   cp 'a'
-   jr c, skip
-   
-   and $df
+   call asm_toupper
    ld (hl),a
-
-.skip
-
    djnz loop
 
    pop hl

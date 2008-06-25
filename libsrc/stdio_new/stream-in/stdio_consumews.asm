@@ -2,7 +2,7 @@
 ; 05.2008 aralbrec
 
 XLIB stdio_consumews
-LIB stdio_getchar, stdio_ungetchar, stdio_isspace
+LIB stdio_getchar, stdio_ungetchar, asm_isspace
 
 ; consume whitespace chars from the input stream
 
@@ -14,7 +14,7 @@ LIB stdio_getchar, stdio_ungetchar, stdio_isspace
    call stdio_getchar
    ret c                       ; ret if EOF reached
    
-   call stdio_isspace          ; is it a whitespace char?
+   call asm_isspace          ; is it a whitespace char?
    jr z, stdio_consumews
    
    jp stdio_ungetchar          ; place non-whitespace char back on stream

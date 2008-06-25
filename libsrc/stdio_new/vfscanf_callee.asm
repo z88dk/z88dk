@@ -5,7 +5,7 @@ XLIB vfscanf_callee
 XDEF ASMDISP_VFSCANF_CALLEE, LIBDISP_VFSCANF_CALLEE
 
 LIB stdio_atou, stdio_error_mc, stdio_error_eacces_mc
-LIB stdio_isspace, stdio_isdigit
+LIB asm_isspace, asm_isdigit
 LIB stdio_getchar, stdio_ungetchar
 LIB jumptbl_scanf, stdio_consumews
 
@@ -66,7 +66,7 @@ LIB jumptbl_scanf, stdio_consumews
    jr z, specifier
 
    ld c,a
-   call stdio_isspace          ; is it a whitespace char?
+   call asm_isspace          ; is it a whitespace char?
    jr z, consumews
 
 .ordinarychar
@@ -136,7 +136,7 @@ LIB jumptbl_scanf, stdio_consumews
 
    ld b,0                      ; infinite width is default
    ld a,(de)
-   call stdio_isdigit
+   call asm_isdigit
    jr c, formatchar            ; if width field is not present
    
    set 2,c                     ; set width flag

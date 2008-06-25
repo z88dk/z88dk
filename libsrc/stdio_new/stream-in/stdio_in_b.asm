@@ -2,7 +2,7 @@
 ; 05.2008 aralbrec
 
 XLIB stdio_in_b
-LIB stdio_incommon1, stdio_incommon2, stdio_isbdigit
+LIB stdio_incommon1, stdio_incommon2, asm_isbdigit
 LIB stdio_getchar, stdio_ungetchar, stdio_inexit
 
 ; input %b parameter
@@ -37,7 +37,7 @@ LIB stdio_getchar, stdio_ungetchar, stdio_inexit
 
 .notbasespecifier
 
-   call stdio_isbdigit
+   call asm_isbdigit
    jp c, stdio_inexit
 
    ; now we know we have a valid binary number on the stream

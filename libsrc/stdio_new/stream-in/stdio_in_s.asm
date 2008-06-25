@@ -2,7 +2,7 @@
 ; 05.2008 aralbrec
 
 XLIB stdio_in_s
-LIB stdio_getchar, stdio_ungetchar, stdio_consumews, stdio_isspace, stdio_nextarg
+LIB stdio_getchar, stdio_ungetchar, stdio_consumews, asm_isspace, stdio_nextarg
 
 ; input %s parameter
 ;
@@ -34,7 +34,7 @@ LIB stdio_getchar, stdio_ungetchar, stdio_consumews, stdio_isspace, stdio_nextar
    call stdio_getchar          ; read char from stream
    jr c, done
    
-   call stdio_isspace          ; if whitespace then end of string reached
+   call asm_isspace          ; if whitespace then end of string reached
    jr z, success
 
 .join

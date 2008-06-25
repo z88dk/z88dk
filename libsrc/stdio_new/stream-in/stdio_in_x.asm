@@ -2,7 +2,7 @@
 ; 05.2008 aralbrec
 
 XLIB stdio_in_x
-LIB stdio_incommon1, stdio_incommon2, stdio_ungetchar, stdio_getchar, stdio_isxdigit, stdio_zeroonstream, stdio_inexit
+LIB stdio_incommon1, stdio_incommon2, stdio_ungetchar, stdio_getchar, asm_isxdigit, stdio_zeroonstream, stdio_inexit
 
 ; input %x parameter
 ;
@@ -42,7 +42,7 @@ LIB stdio_incommon1, stdio_incommon2, stdio_ungetchar, stdio_getchar, stdio_isxd
    cp 'X'
    jr z, hexleaderfound
    
-   call stdio_isxdigit
+   call asm_isxdigit
    jp nc, join
    
    call stdio_ungetchar
@@ -55,7 +55,7 @@ LIB stdio_incommon1, stdio_incommon2, stdio_ungetchar, stdio_getchar, stdio_isxd
 
 .nobasespecifier
 
-   call stdio_isxdigit         ; is first char a hexadecimal digit?
+   call asm_isxdigit         ; is first char a hexadecimal digit?
    jp c, stdio_inexit
 
    ; now we know we have a valid hexadecimal number on the stream

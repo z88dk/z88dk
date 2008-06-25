@@ -2,7 +2,7 @@
 ; 05.2008 aralbrec
 
 XLIB stdio_in_o
-LIB stdio_incommon1, stdio_incommon2, stdio_isodigit, stdio_ungetchar, stdio_inexit
+LIB stdio_incommon1, stdio_incommon2, asm_isodigit, stdio_ungetchar, stdio_inexit
 
 ; input %o parameter
 ;
@@ -28,7 +28,7 @@ LIB stdio_incommon1, stdio_incommon2, stdio_isodigit, stdio_ungetchar, stdio_ine
    ; de = int *
    ;  a = next char from stream
       
-   call stdio_isodigit         ; is first char an octal digit?
+   call asm_isodigit         ; is first char an octal digit?
    jp c, stdio_inexit
    
    ; now we know we have a valid octal number on the stream

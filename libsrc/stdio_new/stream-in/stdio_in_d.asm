@@ -2,7 +2,7 @@
 ; 05.2008 aralbrec
 
 XLIB stdio_in_d
-LIB stdio_incommon1, stdio_incommon2, stdio_isdigit, stdio_ungetchar, stdio_inexit
+LIB stdio_incommon1, stdio_incommon2, asm_isdigit, stdio_ungetchar, stdio_inexit
 
 ; input %d parameter
 ;
@@ -28,7 +28,7 @@ LIB stdio_incommon1, stdio_incommon2, stdio_isdigit, stdio_ungetchar, stdio_inex
    ; de = int *
    ;  a = next char from stream
       
-   call stdio_isdigit          ; is first char a decimal digit?
+   call asm_isdigit          ; is first char a decimal digit?
    jp c, stdio_inexit
    
    ; now we know we have a valid decimal number on the stream
