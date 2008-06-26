@@ -6,6 +6,9 @@ LIB stdio_errorno_mc
 
 INCLUDE "stdio.def"
 
+   pop hl
+   pop hl
+
 .stdio_error_enomem_mc
 
    ld hl,ENOMEM
