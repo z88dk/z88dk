@@ -6,6 +6,7 @@ XLIB stdio_error_mc
 ; exit : hl = -1 and carry set
 
    pop hl
+   pop hl
 
 .stdio_error_mc
 
