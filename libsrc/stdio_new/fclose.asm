@@ -3,12 +3,20 @@
 
 XLIB fclose
 
-LIB close, stdio_free
+LIB close, fflush, stdio_free
 XREF LIBDISP_CLOSE
 
 .fclose
 
-   ; 1. get attached fdstruct and free memory associated with FILE
+   ; 1. flush the stream
+   ;
+   ; hl = FILE *
+
+   push hl
+   call fflush
+   pop hl
+   
+   ; 2. get attached fdstruct and free memory associated with FILE
    ; 
    ; hl = FILE *
 
