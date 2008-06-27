@@ -2,7 +2,7 @@
 ; 06.2008 aralbrec
 
 XLIB open_callee
-XDEF ASMDISP_OPEN_CALLEE
+XDEF ASMDISP_OPEN_CALLEE, LIBDISP_OPEN_CALLEE
 
 LIB stdio_malloc, stdio_free, l_jphl, fd_findslot
 LIB stdio_error_enfile_mc, stdio_error_edevnf_mc, stdio_error_enomem_mc, stdio_error_mc
@@ -72,6 +72,7 @@ INCLUDE "stdio.def"
    ld ixh,a                    ; ix = device message interpretter
 
 .driverfound
+.libentry
    
    ; 2. locate empty slot in fd table
    ;
@@ -191,3 +192,4 @@ INCLUDE "stdio.def"
    jp stdio_error_mc
 
 defc ASMDISP_OPEN_CALLEE = asmentry - open_callee
+defc LIBDISP_OPEN_CALLEE = libentry - open_callee
