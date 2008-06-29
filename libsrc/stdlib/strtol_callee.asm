@@ -6,18 +6,18 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol_callee.asm,v 1.6 2008-03-08 11:28:15 aralbrec Exp $
+; * $Id: strtol_callee.asm,v 1.7 2008-06-29 06:43:03 aralbrec Exp $
 ; *
 ; */
 ;
 ; rewritten in asm and lost the overflow check in process
 ; 12.2006 aralbrec
 
-; Uses all registers except iy
+; Uses all registers except iy, afp
 ; long result in dehl
 
 XLIB strtol_callee
-LIB l_long_neg, l_long_mult
+LIB l_long_neg, l_long_mult, asm_isspace
 XDEF ASMDISP_STRTOL_CALLEE
 
 .strtol_callee
@@ -67,13 +67,7 @@ XDEF ASMDISP_STRTOL_CALLEE
    ld a,(hl)                 ; eat whitespace
    inc hl
 
-   cp 32                     ; inlined isspace
-   jr z, eatws
-   cp 7
-   jr z, eatws
-   cp 10
-   jr z, eatws
-   cp 13
+   call asm_isspace
    jr z, eatws
 
    ; ate up one too many chars, see if it's a sign
@@ -97,31 +91,40 @@ XDEF ASMDISP_STRTOL_CALLEE
    ld a,b                    ; base must be in [0,2-36]
    or a
    jp nz, fail
+   
    ld a,c
    cp 37
    jp nc, fail
+   
    dec a
    jp z, fail
+   
    inc a
    jr nz, checkhex
 
    ; base=0 so need to figure out if it's oct, dec or hex
 
    ld a,(hl)
+   
    ld c,10
    cp '0'                    ; if leading digit not '0' must be decimal
    jr nz, knownbase
+   
    inc hl
    ld a,(hl)                 ; if next char is a digit must be oct
+   
    ld c,8
    cp '0'
    jp c, fail
+   
    cp '7'+1
    jr c, knownbase
+   
    and $df                   ; toupper(a)
    ld c,16
    cp 'X'                    ; leading 0x indicates hex
    jr nz, fail
+   
    inc hl
    jp knownbase
 
@@ -135,13 +138,16 @@ XDEF ASMDISP_STRTOL_CALLEE
    ld a,(hl)
    cp '0'
    jr nz, knownbase
+   
    inc hl
    ld a,(hl)
    inc hl
    cp 'x'
    jr z, knownbase
+   
    cp 'X'
    jr z, knownbase
+   
    dec hl
    dec hl
 
@@ -150,12 +156,15 @@ XDEF ASMDISP_STRTOL_CALLEE
    ld a,(hl)                 ; make sure there's at least one
    sub '0'                   ; digit else fail
    jr c, fail
+   
    cp 10
    jr c, noadj1
+   
    add a,'0'
    and $df
    sub 'A'
    jr c, fail
+   
    add a,10
    
 .noadj1
@@ -194,14 +203,19 @@ XDEF ASMDISP_STRTOL_CALLEE
 
    sub '0'
    ret c
+   
    cp 10
    jr c, noadj2
+   
    add a,'0'
    and $df
    sub 'A'
    ret c
+   
    add a,10
+   
 .noadj2
+
    cp ixl                    ; base
    ret nc
 
@@ -239,43 +253,3 @@ XDEF ASMDISP_STRTOL_CALLEE
    ret
 
 DEFC ASMDISP_STRTOL_CALLEE = asmentry - strtol_callee
-
-;#include <stdio.h>
-;#include <ctype.h>
-;#include <limits.h>
-;#include <stdlib.h>
-;
-;
-;signed long strtol(
-;char *nptr,
-;char **endptr,
-;int base)
-;{ 
-;
-;  unsigned long r;
-;  unsigned char *q;
-;  unsigned char *p;
-;
-;  p=nptr;
-;
-;  while(isspace(*p))
-;    p++;
-;  r=strtoul(p,(signed char **)&q,base);
-;  if(endptr!=NULL)
-;  { if(q==p)
-;      *endptr=(char *)nptr;
-;    else
-;      *endptr=q;
-;  }
-;  if(*p=='-') {
-;    if((signed long)r>0)
-;      return LONG_MIN;
-;    else
-;      return r;
-;  } else {
-;   if((signed long)r<0)
-;      return LONG_MAX;
-;    else
-;      return r;
-;  }
-;}
