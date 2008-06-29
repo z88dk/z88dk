@@ -5,6 +5,8 @@
 XLIB stricmp_callee
 XDEF ASMDISP_STRICMP_CALLEE
 
+LIB asm_tolower
+
 .stricmp_callee
 
    pop hl
@@ -21,28 +23,18 @@ XDEF ASMDISP_STRICMP_CALLEE
 .asmentry
 .stricmp1
 
-   ld a,(hl)
-   inc hl
-   
-   cp 'A'
-   jr c, ASMPC+8
-   cp 'Z'+1
-   jr nc, ASMPC+4
-   or $20
-   
+   ld a,(hl)   
+   call asm_tolower
    ld c,a
    
-   ld a,(de)
-   inc de
+   ld a,(de)   
+   call asm_tolower
    
-   cp 'A'
-   jr c, ASMPC+8
-   cp 'Z'+1
-   jr nc, ASMPC+4
-   or $20
-
    cp c
    jr nz, different
+   
+   inc de
+   inc hl
    
    or a
    jp nz, stricmp1
@@ -55,6 +47,9 @@ XDEF ASMDISP_STRICMP_CALLEE
 
 .different
 
+   ld a,(de)                   ; redo mismatch compare without tolower modification
+   cp (hl)
+   
    ; effectively performed *s2 - *s1
 
    ld h,$80

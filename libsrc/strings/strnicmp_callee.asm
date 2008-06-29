@@ -5,6 +5,8 @@
 XLIB strnicmp_callee
 XDEF ASMDISP_STRNICMP_CALLEE
 
+LIB asm_tolower
+
 .strnicmp_callee
 
    pop hl
@@ -30,39 +32,35 @@ XDEF ASMDISP_STRNICMP_CALLEE
    push bc
    
    ld a,(hl)
-   inc hl
-   
-   cp 'A'
-   jr c, ASMPC+8
-   cp 'Z'+1
-   jr nc, ASMPC+4
-   or $20
-   
+   call asm_tolower
    ld c,a
    
    ld a,(de)
-   inc de
-   
-   cp 'A'
-   jr c, ASMPC+8
-   cp 'Z'+1
-   jr nc, ASMPC+4
-   or $20
+   call asm_tolower
    
    cp c
    pop bc
    jr nz, different
    
    dec bc
+   inc de
+   inc hl
+   
    or a
    jp nz, strnicmp1
-   
+
+   ; here strings are equal
+
 .equal
 
-   ld hl,0
+   ld l,a
+   ld h,a
    ret
 
 .different
+
+   ld a,(de)                   ; redo mismatch compare without tolower modification
+   cp (hl)
 
    ; effectively performed *s2 - *s1
 
