@@ -22,5 +22,9 @@ LIB stdio_out_lx
 .stdio_out_lp
 
    set 3,c
+   bit 2,c
+   jp nz, stdio_out_lx
+   
+   set 2,c
+   ld a,6
    jp stdio_out_lx
-

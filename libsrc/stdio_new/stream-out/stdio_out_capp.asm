@@ -23,5 +23,10 @@ LIB stdio_out_x
 
    set 3,c
    scf
+   bit 2,c
+   jp nz, stdio_out_x
+   
+   set 2,c
+   ld a,4
    jp stdio_out_x
 
