@@ -1,19 +1,20 @@
 #
 # Makefile for +3 file support
 #
-# $Id: Makefile,v 1.6 2008-03-25 12:48:12 stefano Exp $
+# $Id: Makefile,v 1.7 2008-06-29 08:25:41 aralbrec Exp $
 
 include ../Make.config
 
 
-all:	tape_save.o
-
-.c.o:
-	zcc +zx $(CFLAGS) $*.c
+all:	
+	cd tape ; $(MAKE) ; cd ..
 
 clean:
 	$(RM) *.o* zcc_opt.def
-	cd beta ; $(RM) *.o* ; cd ..
-	cd disciple ; $(RM) *.o* ; cd ..
-	cd microdrive ; $(RM) *.o* ; cd ..
+	cd basic ; $(RM) *.o* ; cd ..
+	cd diagnostic ; $(RM) *.o* ; cd ..
+	cd display ; $(RM) *.o* ; cd ..
+	cd if1 ; $(RM) *.o* ; cd ..
 	cd opus ; $(RM) *.o* ; cd ..
+	cd tape ; $(RM) *.o* ; cd ..
+	cd uspeech ; $(RM) *.o* ; cd ..
