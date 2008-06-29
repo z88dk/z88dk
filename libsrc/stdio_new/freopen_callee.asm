@@ -4,8 +4,10 @@
 XLIB freopen_callee
 XDEF ASMDISP_FREOPEN_CALLEE
 
-LIB fopen_callee, close
+LIB fopen_callee, close, l_jpix
 XREF LIBDISP_FOPEN_CALLEE, LIBDISP_CLOSE
+
+INCLUDE "stdio.def"
 
 .freopen_callee
 
@@ -29,7 +31,18 @@ XREF LIBDISP_FOPEN_CALLEE, LIBDISP_CLOSE
    push hl
    push bc
 
-   ; 2. close FILE *stream
+   ; 2. flush the stream and deallocate high level buffers
+   
+   push hl
+   call fflush
+   
+   ; ix = FILE *
+   
+   ld c,STDIO_MSG_FCLS
+   call l_jpix
+   pop hl
+
+   ; 3. close FILE *stream
    ;
    ; hl = FILE *
    ; stack = ret addr, char *filename, FILE *stream, char *mode

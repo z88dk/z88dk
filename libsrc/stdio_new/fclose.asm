@@ -3,17 +3,24 @@
 
 XLIB fclose
 
-LIB close, fflush, stdio_free, stdio_rmfilefromlist
+LIB close, fflush, stdio_free, stdio_rmfilefromlist, l_jpix
 XREF LIBDISP_CLOSE
+
+INCLUDE "stdio.def"
 
 .fclose
 
-   ; 1. flush the stream
+   ; 1. flush the stream and deallocate high level buffers
    ;
    ; hl = FILE *
 
    push hl
    call fflush
+   
+   ; ix = FILE *
+   
+   ld c,STDIO_MSG_FCLS
+   call l_jpix
    pop hl
    
    ; 2. get attached fdstruct and free memory associated with FILE

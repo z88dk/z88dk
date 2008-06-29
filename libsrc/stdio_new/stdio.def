@@ -74,6 +74,7 @@ defc STDIO_MSG_SYNC       = 9                      ; none   transfer any buffere
 
 defc STDIO_MSG_FERR       = 11                     ; return  a = error flags
 
-; should be ignored by most low level drivers except possibly tty drivers
+; should be ignored by most low level drivers except special circumstances
 
 defc STDIO_MSG_FLSH       = 12                     ; enter   b = 1 for input 2 for output : flush high level buffers
+defc STDIO_MSG_FCLS       = 13                     ; none   deallocate high level buffers
