@@ -90,9 +90,9 @@ XREF ASMDISP_OPEN_CALLEE
 
 .einval
 
-   push hl
+   ex de,hl
    call stdio_error_einval_zc
-   pop hl
+   ex de,hl
    jr fail
    
 defc ASMDISP_FOPEN_CALLEE = asmentry - fopen_callee
