@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.33 2007-11-02 12:51:33 stefano Exp $
+ * $Id: stdlib.h,v 1.34 2008-06-29 06:47:49 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -25,19 +25,19 @@
 extern int  __LIB__ __FASTCALL__  atoi(char *s);
 extern long __LIB__ __FASTCALL__  atol(char *s);
 
-extern char __LIB__              *itoa(char *s, int n);
-extern char __LIB__ __CALLEE__   *itoa_callee(char *s, int n);
-extern char __LIB__              *utoa(char *s, uint n);
-extern char __LIB__ __CALLEE__   *utoa_callee(char *s, uint n);
-extern char __LIB__              *ltoa(char *s, long n);
-extern char __LIB__ __CALLEE__   *ltoa_callee(char *s, long n);
-extern char __LIB__              *ultoa(char *s, unsigned long n);
-extern char __LIB__ __CALLEE__   *ultoa_callee(char *s, unsigned long n);
+extern char __LIB__              *itoa(int n, char *s, uchar radix);
+extern char __LIB__ __CALLEE__   *itoa_callee(int n, char *s, uchar radix);
+extern char __LIB__              *utoa(uint n, char *s, uchar radix);
+extern char __LIB__ __CALLEE__   *utoa_callee(uint n, char *s, uchar radix);
+extern char __LIB__              *ltoa(long n, char *s, uchar radix);
+extern char __LIB__ __CALLEE__   *ltoa_callee(long n, char *s, uchar radix);
+extern char __LIB__              *ultoa(unsigned long n, char *s, uchar radix);
+extern char __LIB__ __CALLEE__   *ultoa_callee(unsigned long n, char *s, uchar radix);
 
-#define itoa(a,b)  itoa_callee(a,b)
-#define utoa(a,b)  utoa_callee(a,b)
-#define ltoa(a,b)  ltoa_callee(a,b)
-#define ultoa(a,b) ultoa_callee(a,b)
+#define itoa(a,b,c)  itoa_callee(a,b,c)
+#define utoa(a,b,c)  utoa_callee(a,b,c)
+#define ltoa(a,b,c)  ltoa_callee(a,b,c)
+#define ultoa(a,b,c) ultoa_callee(a,b,c)
 
 // double strtod(char *s, char **endp);     /* check math library for availability */
 
@@ -138,30 +138,6 @@ extern long __LIB__ __CALLEE__   labs_callee(long n);
 
 #define labs(a) labs_callee(a)
 
-struct div_t {
-   int quot;
-   int rem;
-};
-
-struct ldiv_t {
-   long quot;
-   long rem;
-};
-
-typedef struct div_t div_t;
-typedef struct ldiv_t ldiv_t;
-
-// div_t div(int num, int denom);           /* not implemented because can't return structs! */
-// ldiv_t ldiv(long num, long denom);       /* not implemented because can't return structs! */
-
-extern void __LIB__            div(div_t *d, int num, int denom);
-extern void __LIB__ __CALLEE__ div_callee(div_t *d, int num, int denom);
-extern void __LIB__            ldiv(ldiv_t *d, long num, long denom);
-extern void __LIB__ __CALLEE__ ldiv_callee(ldiv_t *d, long num, long denom);
-
-#define div(a,b,c)  div_callee(a,b,c)
-#define ldiv(a,b,c) ldiv_callee(a,b,c)
-
 extern uint __LIB__ __FASTCALL__ isqrt(uint n);
 
 
@@ -184,7 +160,9 @@ extern void          __LIB__ __CALLEE__   outp_callee(unsigned int port, unsigne
 #define outp(a,b) outp_callee(a,b)
 
 #define M_INP(port) asm("ld\tbc,"#port"\nin\tl,(c)\nld\th,0\n");
+#define M_INP8(port) asm("in\ta,("#port")\nld\tl,a\nld\th,0\n");
 #define M_OUTP(port,byte) asm("ld\tbc,"#port"\nld\ta,"#byte"\nout\t(c),a\n");
+#define M_OUTP8(port,byte) asm("ld\ta,"#byte"\nout\t("#port"),a\n");
 
 ///////////////////////////////
 //// Direct Memory Manipulation
@@ -213,7 +191,7 @@ extern unsigned int  __LIB__ __FASTCALL__ wpeek(void *addr);
 // ACCURATE T-STATE DELAY
 /////////////////////////
 
-extern void          __LIB__ __FASTCALL__ delay(unsigned int tstates);   // at least 160 T
+extern void          __LIB__ __FASTCALL__ delay(unsigned int tstates);   // at least 141 T
 
 
 /*********/
