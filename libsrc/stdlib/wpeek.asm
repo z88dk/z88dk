@@ -5,8 +5,8 @@ XLIB wpeek
 
 .wpeek
 
-   ld e,(hl)
+   ld a,(hl)
    inc hl
-   ld d,(hl)
-   ex de,hl
+   ld h,(hl)
+   ld l,a
    ret
