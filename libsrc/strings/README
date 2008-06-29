@@ -1,6 +1,6 @@
 All routines in this directory are machine independent!
 
-strtok contains a static variable!!! This routine CANNOT be ROM'd as is!
+strtok contains a static variable -- this routine CANNOT be ROM'd as is!
 A ROMable version would refer to a global C variable declared by the user.
 
 There are two entry points for each function: the usual CALLER linkage
