@@ -9,7 +9,7 @@ XLIB jumptbl_scanf
 .jumptbl_scanf
 
    defb 'd', 195
-   LIB stdio_in_ld
+   LIB stdio_in_ld             ; stdio_in_d
    defw stdio_in_ld
    
    defb 's', 195
@@ -17,7 +17,7 @@ XLIB jumptbl_scanf
    defw stdio_in_s
    
    defb 'i', 195
-   LIB stdio_in_li
+   LIB stdio_in_li             ; stdio_in_i
    defw stdio_in_li
    
    defb 'c', 195
@@ -25,7 +25,7 @@ XLIB jumptbl_scanf
    defw stdio_in_c
    
    defb 'u', 195
-   LIB stdio_in_ld
+   LIB stdio_in_ld             ; stdio_in_d
    defw stdio_in_ld
 
    defb '[', 195
@@ -33,7 +33,7 @@ XLIB jumptbl_scanf
    defw stdio_in_bkt
 
    defb 'x', 195
-   LIB stdio_in_lx
+   LIB stdio_in_lx             ; stdio_in_x
    defw stdio_in_lx
  
    defb 'n', 195
@@ -41,23 +41,23 @@ XLIB jumptbl_scanf
    defw stdio_in_n
 
    defb 'o', 195
-   LIB stdio_in_lo
+   LIB stdio_in_lo             ; stdio_in_o
    defw stdio_in_lo
      
    defb 'b', 195
-   LIB stdio_in_lb
+   LIB stdio_in_lb             ; stdio_in_b
    defw stdio_in_lb
    
    defb 'p', 195
-   LIB stdio_in_lx
+   LIB stdio_in_lx             ; stdio_in_x
    defw stdio_in_lx
    
    defb 'X', 195
-   LIB stdio_in_lx
+   LIB stdio_in_lx             ; stdio_in_x
    defw stdio_in_lx
 
    defb 'P', 195
-   LIB stdio_in_lx
+   LIB stdio_in_lx             ; stdio_in_x
    defw stdio_in_lx
    
 ;   defb 'f', 195
