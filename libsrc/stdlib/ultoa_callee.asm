@@ -3,17 +3,33 @@
 ; 04.2007 aralbrec
 
 XLIB ultoa_callee
+XDEF ASMDISP_ULTOA_CALLEE
 
-LIB ltoa_callee
-XREF ASMDISP2_LTOA_CALLEE
+LIB ltoa_callee, stdio_error_zc
+XREF LIBDISP_LTOA_CALLEE
 
 .ultoa_callee
 
    pop af
+   pop bc
+   pop ix
    pop hl
    pop de
-   pop bc
    push af
+
+.asmentry
+
+   ld a,c
+   or a
+   jp z, stdio_error_zc        ; divide by zero
+
+   dec a
+   jp z, stdio_error_zc        ; radix = 1 makes no sense
+
+   cp 36
+   jp nc, stdio_error_zc       ; max radix (37 - 1!)
    
-   push bc
-   jp ltoa_callee + ASMDISP2_LTOA_CALLEE
+   ld b,0
+   jp ltoa_callee + LIBDISP_LTOA_CALLEE
+
+defc ASMDISP_ULTOA_CALLEE = asmentry - ultoa_callee

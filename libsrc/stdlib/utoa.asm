@@ -2,17 +2,19 @@
 
 XLIB utoa
 
-LIB itoa_callee
-XREF ASMDISP2_ITOA_CALLEE
+LIB utoa_callee
+XREF ASMDISP_UTOA_CALLEE
 
 .utoa
 
+   pop af
    pop bc
-   pop de
    pop hl
-   push hl
+   pop de
    push de
-   push bc
-   
    push hl
-   jp itoa_callee + ASMDISP2_UTOA_CALLEE
+   push bc
+   push af
+   
+   jp utoa_callee + ASMDISP_UTOA_CALLEE
+

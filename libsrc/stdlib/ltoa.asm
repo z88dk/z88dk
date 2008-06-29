@@ -8,12 +8,14 @@ XREF ASMDISP_LTOA_CALLEE
 .ltoa
 
    pop af
+   pop bc
+   pop ix
    pop hl
    pop de
-   pop bc
-   push bc
    push de
    push hl
+   push hl
+   push bc
    push af
    
    jp ltoa_callee + ASMDISP_LTOA_CALLEE

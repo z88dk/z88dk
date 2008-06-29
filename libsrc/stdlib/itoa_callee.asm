@@ -1,113 +1,132 @@
-; char __CALLEE__ *itoa_callee(char *s, int num)
-; convert int to string and store in s
-; 12.2006 aralbrec
+; uint __CALLEE__ itoa_callee(int num, char *s, uchar radix)
+; convert int to string and store in s, return size of string
+; 06.2008 aralbrec
+; redone to be more in line with modern versions of this function
 
 XLIB itoa_callee
 XDEF ASMDISP_ITOA_CALLEE
 XDEF ASMDISP2_ITOA_CALLEE
 
-LIB l_deneg
+LIB l_deneg, l_div_u, strrev
+LIB stdio_basechar, stdio_error_zc
 
 .itoa_callee
 
+   pop af
+   pop bc
    pop hl
    pop de
-   ex (sp),hl
-   
+   push af
+
    ; enter : de = int num
-   ;         hl = char *s
-   ; exit  : hl = char *s
-   ;         de = addr of terminating '\0' in s
-   ; uses  : af, bc, de
+   ;         hl = char *s (if NULL no chars are written)
+   ;          c = radix (0 < c <= 36)
+   ; exit  : hl = number of digits in written number (zero and carry set for error)
+   ;         de = addr of terminating '\0' in s (or NULL)
+   ; uses  : af, bc, de, hl
 
 .asmentry
 
-   push hl
+   ld a,c
+   or a                      ; divide by zero
+   jp z, stdio_error_zc
    
+   dec a
+   jp z, stdio_error_zc      ; radix = 1 makes no sense
+   
+   cp 36                     ; max radix (37 - 1!)
+   jp nc, stdio_error_zc
+
+   ld b,0                    ; num chars output = 0
+
    bit 7,d                   ; is num negative?
    jr z, notneg
+
+.negative
+
+   call l_deneg              ; de = -de
+   
+   ld a,h
+   or l
+   jr z, notneg
+
+   inc b                     ; count++
    ld (hl),'-'               ; write negative sign
    inc hl
-   call l_deneg              ; negate number
 
+.libentry
 .notneg
 
+   ; enter : de = unsigned num
+   ;         hl = char *s (if NULL no chars are written)
+   ;          b = 0
+   ;          c = 0 < radix <= 36
+   ; exit  : hl = number of digits in written number (0 and carry set for error)
+   ;         de = addr of terminating '\0' in s
+
+   push hl                   ; save char *s (skip leading '-')
+
+.loop
+
+   inc b                     ; count++
+   push bc                   ; save count, radix
+   push hl                   ; save buff address
+   
+   ld l,c
+   ld h,0                    ; hl = radix
+   call l_div_u              ; hl = num / radix, de = num % radix
+   
    ex de,hl
-   ld bc,constants
-   push bc
-   
-   ; de = char *
-   ; hl = int
-   ; stack = constants
-
-.skipleading0
-
-   ex (sp),hl                  ; hl = & constant
-   ld c,(hl)
-   inc hl
-   ld b,(hl)                   ; bc = constant
-   
-   ld a,b
-   or c
-   jr z, write1                ; if constant == 0, reached end
-   
-   inc hl
-   ex (sp),hl                  ; hl = int, stack = & next constant
-   
-   call divide                 ; a = hl/bc + '0', hl = hl%bc
-   cp '0'
-   jp z, skipleading0
-
-.write
-
-   ld (de),a                   ; write digit into string
-   inc de
-   
-   ex (sp),hl
-   ld c,(hl)
-   inc hl
-   ld b,(hl)
-   
-   ld a,b
-   or c
-   jr z, write1
-
-   inc hl
-   ex (sp),hl
-
-   call divide
-   jp write
-
-.write1                        ; reached 1s position, write out last digit
-
-   pop hl                      ; hl = int
-   ld a,l
-   add a,'0'
-   ld (de),a                   ; write last digit
-   inc de
-   
-   xor a                       ; terminate string with '\0'
-   ld (de),a
-   
-   pop hl                      ; hl = char *s
-   ret
-
-.divide
-
-   ld a,'0'-1
-   
-.divloop
-
-   inc a
-   sbc hl,bc
-   jr nc, divloop
+   ld bc,stdio_basechar
    add hl,bc
+   ld c,(hl)                 ; c = ascii digit
+   
+   pop hl                    ; hl = buffer address
+   
+   ld a,h                    ; if buff == NULL, not writing anything
+   or l
+   jr z, nowrite0
+   
+   ld (hl),c
+   inc hl
+   
+.nowrite0
+
+   pop bc                    ; b = count, c = radix
+
+   ld a,d
+   or e
+   jr nz, loop
+
+   ;  b = count
+   ; hl = address of soon-to-be-written '\0' in buffer
+   ; stack = char *s
+
+   ld a,h
+   or l
+   jr z, exit1
+   
+   ld (hl),e                   ; terminate string
+
+   ; now we have a backward string in the buffer so we need to reverse it!
+
+   ex (sp),hl                  ; hl = char *s, stack = end of char *s
+   push bc
+   call strrev
+   pop bc
+   pop de
+
+.exit0
+
+   ld l,b
+   xor a                       ; clears carry flag
+   ld h,a
    ret
 
-.constants
+.exit1
 
-   defw 10000, 1000, 100, 10, 0
+   pop hl
+   jr exit0
 
 DEFC ASMDISP_ITOA_CALLEE = asmentry - itoa_callee
-DEFC ASMDISP2_ITOA_CALLEE = notneg - itoa_callee
-
+DEFC LIBDISP_ITOA_CALLEE = libentry - itoa_callee

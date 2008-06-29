@@ -1,18 +1,35 @@
-; char __CALLEE__ *utoa_callee(char *s, uint num)
-; convert unsigned int to string and store in s
-; 04.2007 aralbrec
+; uint __CALLEE__ utoa_callee(uint num, char *s, uchar radix)
+; convert unsigned int to string and store in s, return size of string
+; 06.2008 aralbrec
+; redone to be more in line with modern versions of this function
 
 XLIB utoa_callee
+XDEF ASMDISP_UTOA_CALLEE
 
-LIB itoa_callee
-XREF ASMDISP2_ITOA_CALLEE
+LIB itoa_callee, stdio_error_zc
+XREF LIBDISP_ITOA_CALLEE
 
 .utoa_callee
 
+   pop af
+   pop bc
    pop hl
    pop de
-   ex (sp),hl
-   
-   push hl
-   jp itoa_callee + ASMDISP2_ITOA_CALLEE
+   push af
 
+.asmentry
+
+   ld a,c
+   or a
+   jp z, stdio_error_zc        ; divide by zero
+   
+   dec a
+   jp z, stdio_error_zc        ; radix = 1 makes no sense
+   
+   cp 36
+   jp nc, stdio_error_zc       ; max radix (37 - 1!)
+   
+   ld b,0
+   jp itoa_callee + LIBDISP_ITOA_CALLEE
+
+defc ASMDISP_UTOA_CALLEE = asmentry - utoa_callee

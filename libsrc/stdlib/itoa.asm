@@ -6,12 +6,14 @@ XREF ASMDISP_ITOA_CALLEE
 
 .itoa
 
+   pop af
    pop bc
-   pop de
    pop hl
-   push hl
+   pop de
    push de
+   push hl
    push bc
+   push af
    
    jp itoa_callee + ASMDISP_ITOA_CALLEE
 
