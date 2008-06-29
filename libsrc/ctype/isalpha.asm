@@ -5,25 +5,19 @@
 ;
 ;	17/2/99 djm
 ;
-;	$Id: isalpha.asm,v 1.3 2006-12-31 21:44:58 aralbrec Exp $
+;	$Id: isalpha.asm,v 1.4 2008-06-29 06:38:24 aralbrec Exp $
 ;
 
 XLIB isalpha
+LIB asm_isalpha
 
 ; FASTCALL
 
 .isalpha
 
    ld a,l
-   ld hl,0
-   cp 'A'
-   ret c
-   cp 'z'+1
+   call asm_isalpha
+   ld hl,1
    ret nc
-   and 223
-   cp 'A'
-   ret c
-   cp 'Z'+1
-   ret nc
-   inc l
+   dec l
    ret

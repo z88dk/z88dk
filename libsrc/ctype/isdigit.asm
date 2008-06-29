@@ -5,20 +5,19 @@
 ;
 ;	17/2/99 djm rewritten to be shorter
 ;
-;	$Id: isdigit.asm,v 1.3 2006-12-31 21:44:58 aralbrec Exp $
+;	$Id: isdigit.asm,v 1.4 2008-06-29 06:38:24 aralbrec Exp $
 ;
 
 XLIB isdigit
+LIB asm_isdigit
 
 ; FASTCALL
 
 .isdigit
 
    ld a,l
+   call asm_isdigit
    ld hl,0
-   cp '0'
    ret c
-   cp '9'+1
-   ret nc
    inc l
    ret

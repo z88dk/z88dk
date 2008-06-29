@@ -1,12 +1,12 @@
 
 XLIB isgraph
-LIB isprint
+LIB asm_isgraph
 
 .isgraph
 
    ld a,l
-   ld hl,0
-   cp 32
-   ret z
-   inc l
-   jp isprint+4
+   call asm_isgraph
+   ld hl,1
+   ret nc
+   dec l
+   ret

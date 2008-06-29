@@ -6,26 +6,18 @@
 ;
 ;	Hurrah, this is our first table for our isxxx routines!
 ;
-;	$Id: ispunct.asm,v 1.3 2006-12-31 21:45:26 aralbrec Exp $
+;	$Id: ispunct.asm,v 1.4 2008-06-29 06:38:24 aralbrec Exp $
 ;
 
 XLIB ispunct
+LIB asm_ispunct
 
 ; FASTCALL
 
 .ispunct
 
    ld a,l
-   ld hl,punctbl
-   ld bc,punctend - punctbl
-   cpir                      ; use it or lose it!
-   ld h,b
+   call asm_ispunct
    ld l,c
+   ld h,b
    ret
-
-.punctbl
-
-   defm "!$%^&*()_+={[]}#~'@;:/?.>,<\|"
-   defb 34,163,163           ; quote and pound, must repeat last one
-
-.punctend

@@ -3,20 +3,18 @@
 ;	Written by Dominic Morris <djm@jb.man.ac.uk>
 ;	22 August 1998
 ;
-;	$Id: toupper.asm,v 1.3 2006-12-31 21:44:58 aralbrec Exp $
+;	$Id: toupper.asm,v 1.4 2008-06-29 06:38:24 aralbrec Exp $
 ;
 
 XLIB toupper
+LIB asm_toupper
 
 ; FASTCALL
 
 .toupper
 
    ld a,l
+   call asm_toupper
+   ld l,a
    ld h,0
-   cp 'a'
-   ret c
-   cp 'z'+1
-   ret nc
-   res 5,l
    ret

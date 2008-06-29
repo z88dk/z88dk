@@ -5,20 +5,19 @@
 ;
 ;	17/2/99 djm Rewritten to remove the jp and thus be shorter
 ;
-;	$Id: islower.asm,v 1.3 2006-12-31 21:44:58 aralbrec Exp $
+;	$Id: islower.asm,v 1.4 2008-06-29 06:38:24 aralbrec Exp $
 ;
 
 XLIB islower
+LIB asm_islower
 
 ; FASTCALL
 
 .islower
 
    ld a,l
+   call asm_islower
    ld hl,0
-   cp 'a'
    ret c
-   cp 'z'+1
-   ret nc
    inc l
    ret

@@ -5,20 +5,19 @@
 ;
 ;	17/2/99 djm - rewritten to remove jp - shorter
 ;
-;	$Id: isupper.asm,v 1.3 2006-12-31 21:44:58 aralbrec Exp $
+;	$Id: isupper.asm,v 1.4 2008-06-29 06:38:24 aralbrec Exp $
 ;
 
 XLIB isupper
+LIB asm_isupper
 
 ; FASTCALL
 
 .isupper
 
    ld a,l
+   call asm_isupper
    ld hl,0
-   cp 'A'
    ret c
-   cp 'Z'+1
-   ret nc
    inc l
    ret

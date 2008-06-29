@@ -6,39 +6,19 @@
 ;
 ;	This routine is a little bit unwieldy to say the least
 ;
-;	$Id: isalnum.asm,v 1.3 2006-12-31 21:44:58 aralbrec Exp $
+;	$Id: isalnum.asm,v 1.4 2008-06-29 06:38:24 aralbrec Exp $
 ;
 
 XLIB isalnum
+LIB asm_isalnum
 
 ; FASTCALL
 
 .isalnum
 
    ld a,l
-   ld hl,0
-
-   ; check digits [09]
-
-   cp '0'
-   ret c
-   inc l
-   cp '9'+1
-   ret c
-
-   ; now check chars [azAZ]
-   
+   call asm_isalnum
+   ld hl,1
+   ret nc
    dec l
-   cp 'A'
-   ret c
-   cp 'z'+1
-   ret nc
-   
-   and 223
-   cp 'A'
-   ret c
-   cp 'Z'+1
-   ret nc
-   
-   inc l
    ret

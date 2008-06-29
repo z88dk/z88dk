@@ -4,39 +4,19 @@
 ;
 ;	1/3/99 djm
 ;
-;	This routine is a little bit unwieldy to say the least
-;
-;	$Id: isxdigit.asm,v 1.3 2006-12-31 21:44:58 aralbrec Exp $
+;	$Id: isxdigit.asm,v 1.4 2008-06-29 06:38:24 aralbrec Exp $
 ;
 
 XLIB isxdigit
+LIB asm_isxdigit
 
 ; FASTCALL
 
 .isxdigit
 
    ld a,l
+   call asm_isxdigit
    ld hl,0
-   
-   ; match digit [09]
-   
-   cp '0'
    ret c
-   inc l
-   cp '9'+1
-   ret c
-   
-   ; match [afAF]
-   
-   dec l
-   cp 'A'
-   ret c
-   cp 'f'+1
-   ret nc
-   and 223
-   cp 'A'
-   ret c
-   cp 'F'+1
-   ret nc
    inc l
    ret
