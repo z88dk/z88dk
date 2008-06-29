@@ -9,6 +9,8 @@
 XLIB strlwr
 XDEF ASMDISP_STRLWR
 
+LIB asm_tolower
+
 .strlwr
 
    push hl
@@ -21,12 +23,9 @@ XDEF ASMDISP_STRLWR
    or a
    jr z, exit
 
-   cp 'A'
-   jr c, loop
-   cp 'Z'+1
-   jr nc, loop
-   or 32
+   call asm_tolower
    ld (hl),a
+   
    jp loop
 
 .exit

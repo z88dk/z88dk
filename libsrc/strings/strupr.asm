@@ -9,24 +9,22 @@
 XLIB strupr
 XDEF ASMDISP_STRUPR
 
+LIB asm_toupper
+
 .strupr
 
    push hl
-   dec hl
 
 .loop
 
-   inc hl
    ld a,(hl)
    or a
    jr z, exit
 
-   cp 'a'
-   jr c, loop
-   cp 'z'+1
-   jr nc, loop
-   and $df
+   call asm_toupper
    ld (hl),a
+   
+   inc hl
    jp loop
 
 .exit
