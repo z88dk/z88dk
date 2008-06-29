@@ -3,14 +3,42 @@
 
 XLIB fflush
 LIB stdio_error_ebadf_mc, stdio_error_mc, stdio_success_znc, l_jpix
+XREF _filelist
 
 INCLUDE "stdio.def"
 
 .fflush
 
-   ld a,h                      ; cannot fflush(NULL) since we
-   or l                        ; do not keep track of open FILE*
-   jp z, stdio_error_ebadf_mc
+   ld a,h                      ; fflush(NULL)?
+   or l
+   jr nz, notnull
+
+   ; fflush(NULL)
+   ; must flush all open FILEs
+   
+   ld hl,(_filelist)
+
+.loop
+
+   ; hl = & next FILE (offset -4) to flush
+   
+   ld a,h                      ; are we done yet?
+   or l
+   jp z, stdio_success_znc
+   
+   inc hl
+   inc hl
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   
+   push de                     ; save & next FILE (offset -4)
+   call notnull                ; flush this FILE
+   pop hl
+   jr loop
+
+.notnull
    
    push hl
    pop ix                      ; ix = FILE *

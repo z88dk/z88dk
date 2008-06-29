@@ -5,6 +5,7 @@ XLIB fopen_callee
 XDEF ASMDISP_FOPEN_CALLEE, LIBDISP_FOPEN_CALLEE
 
 LIB open_callee, stdio_parseperm, stdio_malloc, stdio_free
+LIB stdio_addfiletolist, stdio_rmfilefromlist
 LIB stdio_error_enomem_zc, stdio_error_einval_zc, stdio_error_zc
 XREF ASMDISP_OPEN_CALLEE
 
@@ -21,7 +22,7 @@ XREF ASMDISP_OPEN_CALLEE
    ; exit  : hl = FILE * and carry reset for success
    ;         hl = 0 and carry set for fail
 
-   ; 1. get memory for new struct FILE
+   ; 1. get memory for new struct FILE and add it to the open FILE list
 
    push hl                     ; save char *filename
    push de                     ; save char *mode
@@ -30,6 +31,9 @@ XREF ASMDISP_OPEN_CALLEE
    call stdio_malloc           ; get memory for new FILE*
    jp nc, stdio_error_enomem_zc - 2
    
+   ; hl = FILE * (offset -4)
+   
+   call stdio_addfiletolist    ; hl = FILE * (offset 0)
    ex (sp),hl
    
    ; 2. parse mode flags
@@ -42,7 +46,7 @@ XREF ASMDISP_OPEN_CALLEE
    call stdio_parseperm        ; a = b = mode flags
    pop hl
    pop de
-   jp z, stdio_error_einval_zc ; mode flags not understood
+   jr z, einval                ; mode flags not understood
 
    ; 3. open file
    ;
@@ -78,8 +82,16 @@ XREF ASMDISP_OPEN_CALLEE
 
 .fail
 
+   ; hl = FILE *
+   
+   call stdio_rmfilefromlist   ; hl = FILE * (offset -4)
    call stdio_free             ; free struct FILE
    jp stdio_error_zc
 
+.einval
+
+   call stdio_error_einval_zc
+   jr fail
+   
 defc ASMDISP_FOPEN_CALLEE = asmentry - fopen_callee
 defc LIBDISP_FOPEN_CALLEE = libentry - fopen_callee

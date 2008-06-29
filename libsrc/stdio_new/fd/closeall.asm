@@ -3,20 +3,46 @@
 
 XLIB closeall
 
-LIB close
-XREF LIBDISP_CLOSE
+LIB close, fclose
+XREF LIBDISP_CLOSE, _filelist
 
 INCLUDE "stdio.def"
 
 .closeall
 
    ; close all open files, typically called before program exit
-   ; does not deallocate FILE* but does deallocate low-level fdstructs
+
+   ; 1. close open FILE*
    
+   ld hl,(_filelist)
+   
+.loop0
+
+   ld a,h                      ; done with open FILEs?
+   or l
+   jr z, closefds
+   
+   inc hl
+   inc hl
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   
+   push de
+   call fclose
+   pop hl
+   
+   jr loop0
+      
+   ; 2. close any remaining open fds
+
+.closefds
+
    ld hl,_fdtbl
    ld b,MAXFILES
 
-.loop
+.loop1
 
    ld e,(hl)
    ld (hl),0
@@ -33,5 +59,5 @@ INCLUDE "stdio.def"
    pop bc
    pop hl
    
-   djnz loop
+   djnz loop1
    ret

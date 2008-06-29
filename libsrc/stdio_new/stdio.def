@@ -3,12 +3,14 @@
 ; **************
 ;
 ; offset   size    description
+;  -3/4     2      prev (& next in previous FILE struct in open FILEs list)
+;  -1/2     2      next (& prev in next FILE struct in open FILEs list)
 ;  +0       1      jump instruction (195)
 ;  +1/2     2      file descriptor struct address
 ;  +3       1      flags 0000 0IOU (open for input, open for output, unget char available)
 ;  +4       1      unget char
 
-defc FILESTR_SZ = 5
+defc FILESTR_SZ = 9
 
 ; *************************
 ; FILE DESCRIPTOR STRUCTURE
@@ -18,13 +20,14 @@ defc FILESTR_SZ = 5
 ;  +0       1      call instruction (205)
 ;  +1/2     2      device message interpretter
 ;  +3       1      flags0 DF00 0IOA (dup, filter, open for input, open for output, writes append)
-;  +4       1      flags1
+;  +4       1      flags1 EOF|R|R|R 0000 (error flags, lower nibble defined by driver)
 ;  +5       1      reference count
 ;  +any number of bytes for device to maintain state for open file
 
 defc FDSTR_SZ = 6
 defc MAXFILES = 10
 
+; _filelist defw 0
 ; _fdtbl[MAXFILES]
 ; _zdevtbl  defb 'a' defw msg_int defb 0
 ; _zdefdev  defw msg_int
@@ -63,14 +66,13 @@ defc STDIO_MSG_GETC       = 3                      ; return  a = char
 defc STDIO_MSG_READ       = 4                      ; enter  de = dst buffer hl = size!=0, return hl = number of bytes transferred
 defc STDIO_MSG_WRIT       = 5                      ; enter  de = src buffer hl = size!=0, return hl = number of bytes transferred
 defc STDIO_MSG_POLL       = 6                      ; enter   b = events, return b = revents or carry set if unsupported
-defc STDIO_MSG_SEEK       = 7                      ; enter  dehl = file pos b = 1:END 2:CUR 3:SET, return dehl = new file pos
-defc STDIO_MSG_ICTL       = 8                      ; enter  de = request hl = arg, return value in hl
+defc STDIO_MSG_SEEK       = 7                      ; enter  dehl = file pos b = 0:REP 1:END 2:CUR 3:SET else:REP, return dehl = new file pos
+defc STDIO_MSG_ICTL       = 8                      ; enter  de = request hl = arg, return value in (de)hl
 defc STDIO_MSG_SYNC       = 9                      ; none   transfer any buffered data to device
 
 ; information messages that can be handled by library supplied routines
 
-defc STDIO_MSG_FEOF       = 10                     ; return carry set if end-of-file reached or if not applicable
-defc STDIO_MSG_FERR       = 11                     ; return  l = error flags
+defc STDIO_MSG_FERR       = 11                     ; return  a = error flags
 
 ; should be ignored by most low level drivers except possibly tty drivers
 

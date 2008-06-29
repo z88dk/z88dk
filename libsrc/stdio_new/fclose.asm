@@ -3,7 +3,7 @@
 
 XLIB fclose
 
-LIB close, fflush, stdio_free
+LIB close, fflush, stdio_free, stdio_rmfilefromlist
 XREF LIBDISP_CLOSE
 
 .fclose
@@ -28,6 +28,7 @@ XREF LIBDISP_CLOSE
    dec hl
    dec hl
    push de
+   call stdio_rmfilefromlist   ; remove from open FILE list
    call stdio_free             ; free FILE
    pop de
    

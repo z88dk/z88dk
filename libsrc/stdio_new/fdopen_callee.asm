@@ -4,7 +4,7 @@
 XLIB fdopen_callee
 XDEF ASMDISP_FDOPEN_CALLEE
 
-LIB stdio_parseperm, stdio_malloc, fd_fdtblindex
+LIB stdio_parseperm, stdio_malloc, fd_fdtblindex, stdio_addfiletolist
 LIB stdio_error_ebadf_zc, stdio_error_einval_zc, stdio_error_enomem_zc
 
 INCLUDE "stdio.def"
@@ -66,6 +66,10 @@ INCLUDE "stdio.def"
    pop af                      ; a = 0000 0IOA
    pop bc                      ; bc = fdstruct *
    jp nc, stdio_error_enomem_zc
+   
+   ; hl = FILE * (offset -4)
+   
+   call stdio_addfiletolist    ; hl = FILE * (offset 0)
    
    ld e,l
    ld d,h
