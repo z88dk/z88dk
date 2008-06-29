@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.19 2007-07-04 03:22:36 aralbrec Exp $
+ *	$Id: string.h,v 1.20 2008-06-29 06:47:15 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -42,6 +42,8 @@ extern int  __LIB__               strnicmp(char *, char *, uint);
 extern int  __LIB__               strncasecmp(char *, char *, uint);
 extern char __LIB__ __FASTCALL__ *strlwr(char *);
 extern char __LIB__ __FASTCALL__ *strupr(char *);
+extern uint __LIB__               strlcat(char *, char *, uint);
+extern uint __LIB__               strlcpy(char *, char *, uint);
 
 extern void __LIB__              *memset(void *, unsigned char, uint);
 extern void __LIB__              *memcpy(void *, void *,uint);
@@ -75,6 +77,8 @@ extern int  __LIB__ __CALLEE__    strcspn_callee(char *, char *);
 extern int  __LIB__ __CALLEE__    strspn_callee(char *, char *);
 extern int  __LIB__ __CALLEE__    stricmp_callee(char *, char *);
 extern int  __LIB__ __CALLEE__    strnicmp_callee(char *, char *, uint);
+extern uint __LIB__ __CALLEE__    strlcat_callee(char *, char *, uint);
+extern uint __LIB__ __CALLEE__    strlcpy_callee(char *, char *, uint);
 
 extern void __LIB__ __CALLEE__   *memset_callee(void *, unsigned char, uint);
 extern void __LIB__ __CALLEE__   *memcpy_callee(void *, void *,uint);
@@ -109,6 +113,8 @@ extern void __LIB__ __CALLEE__   *memopd_callee(void *, void *, uint, uint);
 #define strnicmp(a,b,c)     strnicmp_callee(a,b,c)
 #define strcasecmp(a,b)     stricmp_callee(a,b)
 #define strncasecmp(a,b,c)  strnicmp_callee(a,b,c)
+#define strlcat(a,b,c)      strlcat_callee(a,b,c)
+#define strlcpy(a,b,c)      strlcpy_callee(a,b,c)
 
 #define memset(a,b,c)   memset_callee(a,b,c)
 #define memcpy(a,b,c)   memcpy_callee(a,b,c)
