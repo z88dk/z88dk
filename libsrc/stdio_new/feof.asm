@@ -2,7 +2,7 @@
 ; 06.2008 aralbrec
 
 XLIB feof
-LIB stdio_error_mc, stdio_success_znc, l_jpix
+LIB stdio_error_mc, stdio_success_znc, l_jphl
 
 INCLUDE "stdio.def"
 
@@ -11,14 +11,11 @@ INCLUDE "stdio.def"
    push hl
    pop ix
 
-   bit 2,(ix+3)                ; open for input?
-   jp z, stdio_success_znc     ; if no indicate not eof
-   
    bit 0,(ix+3)                ; unget char available?
    jp nz, stdio_success_znc    ; if yes indicate not eof
    
    ld c,STDIO_MSG_FERR
-   call l_jpix
+   call l_jphl
 
    rla
    jp c, stdio_error_mc        ; return eof true
