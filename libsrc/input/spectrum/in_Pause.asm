@@ -18,20 +18,19 @@ LIB in_WaitForNoKey, in_WaitForKey, delay
    or l
    jr z, waitforkey
    
-   ld c,l
-   ld b,h
-
 .loop
 
 ; wait 1ms then sample keyboard, in loop
 ; at 3.5MHz, 1ms = 3500 T states
 
-   ld hl,3500 - 67
+   ex de,hl
+   ld hl,3500 - 78
    call delay                  ; wait exactly HL t-states
+   ex de,hl
    
-   dec bc
-   ld a,b
-   or c
+   dec hl
+   ld a,h
+   or l
    ret z
    
    xor a
