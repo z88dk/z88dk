@@ -5,17 +5,17 @@ XLIB delay
 ; Z80 delay routine
 ; by Jan Bobrowski, license GPL
 ; wait hl T (including call; hl>=141)
-; destroys: af, de, hl
+; destroys: af, bc, hl
 
 .delay
 
-        ld      de,-141
-        add     hl,de
-        ld      de,-23
+        ld      bc,-141
+        add     hl,bc
+        ld      bc,-23
         
 .loop
 
-        add     hl,de
+        add     hl,bc
         jr      c, loop
         
         ld      a,l
