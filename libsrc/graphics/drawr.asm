@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: drawr.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;	$Id: drawr.asm,v 1.4 2008-06-30 16:43:00 stefano Exp $
 ;
 
 
@@ -29,8 +29,9 @@
 		ld	d,(ix+3)
 		ld	l,(ix+4)	;px
 		ld	h,(ix+5)
-                ld      ix,plotpixel
+
                 call    swapgfxbk
+                ld      ix,plotpixel
                 call    line_r
                 jp      swapgfxbk1
 

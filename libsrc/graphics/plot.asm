@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: plot.asm,v 1.4 2001-04-18 13:21:37 stefano Exp $
+;	$Id: plot.asm,v 1.5 2008-06-30 16:43:00 stefano Exp $
 ;
 
 ;Usage: plot(struct *pixel)
@@ -15,7 +15,7 @@
 
                 XLIB    plot
                 LIB     swapgfxbk
-                LIB     swapgfxbk1
+                XREF    swapgfxbk1
 
                 LIB     plotpixel
 

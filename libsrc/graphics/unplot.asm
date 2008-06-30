@@ -6,16 +6,17 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: unplot.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+;	$Id: unplot.asm,v 1.4 2008-06-30 16:43:00 stefano Exp $
 ;
 
 
-;Usage: plot(struct *pixel)
+;Usage: unplot(struct *pixel)
 
 
 
                 XLIB    unplot
                 LIB     swapgfxbk
+                XREF    swapgfxbk1
 
                 LIB     respixel
 
@@ -28,5 +29,5 @@
 		ld	h,(ix+4)
                 call    swapgfxbk
                 call    respixel
-                jp      swapgfxbk
+                jp      swapgfxbk1
 
