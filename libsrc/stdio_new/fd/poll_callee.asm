@@ -12,8 +12,8 @@ INCLUDE "stdio.def"
 ; struct pollfd {
 ;    int  fd;
 ;    char events;
-;    char revents;             // bit 7 = POLLERR, bit 6 = POLLNVAL, bit 5 = POLLNSUP, bit 4 = ERROR
-;                              // bit 3 = OOBWRITE, bit 2 = WRITE, bit 1 = OOBREAD, bit 0 = READ
+;    char revents;             // bit 7 = POLLNSUP, bit 6 = POLLNVAL, bit 5 = OOB_ERR, bit 4 = ERR
+;                              // bit 3 = OOB_WRITE, bit 2 = WRITE, bit 1 = OOB_READ, bit 0 = READ
 ; };
 ;
 ; timeout is ignored in this implementation
@@ -51,7 +51,7 @@ INCLUDE "stdio.def"
    inc hl
    inc hl
    ld a,(hl)
-   and $1f
+   and $3f
    ld b,a                      ; b = events to test
    inc hl
 
@@ -95,7 +95,7 @@ INCLUDE "stdio.def"
 
 .unsupported
 
-   ld b,$20
+   ld b,$80
    jr reenter
 
 defc ASMDISP_POLL_CALLEE = asmentry - poll_callee
