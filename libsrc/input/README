@@ -1,9 +1,0 @@
-These functions are machine-dependent and are therefore
-compiled into each target machine's standard library.  The
-lst files here list all functions for each machine but
-the contents of these files are copied into the machine-specific
-lst files found in the libsrc directory.
-
-Eg:  spectrum.lst lists the functions implemented for the
-ZX spectrum target.  Its contents are copied into zx.lst
-and zxansi.lst in the libsrc directory.
