@@ -12,6 +12,8 @@ stdio_new/fd/open
 stdio_new/fd/open_callee
 stdio_new/fd/poll
 stdio_new/fd/poll_callee
+stdio_new/fd/pollfd
+stdio_new/fd/pollfd_callee
 stdio_new/fd/read
 stdio_new/fd/read_callee
 stdio_new/fd/readbyte
