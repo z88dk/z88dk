@@ -125,7 +125,7 @@ LIB stdio_basechar, stdio_error_zc
 
 .exit1
 
-   pop hl
+   pop de
    jr exit0
 
 DEFC ASMDISP_ITOA_CALLEE = asmentry - itoa_callee

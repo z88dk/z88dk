@@ -117,13 +117,14 @@ LIB stdio_basechar, stdio_error_zc
    
    ; now we have a backward string in the buffer so we need to reverse it!
 
-   push ix                     ; stack = end of char *s
    push bc
    call strrev
    pop bc
-   pop de
 
 .exit
+
+   ld e,ixl
+   ld d,ixh                    ; de = end of char *s
 
    ld l,b
    xor a                       ; clears carry flag
