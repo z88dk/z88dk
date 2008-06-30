@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.34 2008-06-29 06:47:49 aralbrec Exp $
+ * $Id: stdlib.h,v 1.35 2008-06-30 20:45:52 aralbrec Exp $
  */
 
 #include <sys/types.h>
@@ -25,14 +25,14 @@
 extern int  __LIB__ __FASTCALL__  atoi(char *s);
 extern long __LIB__ __FASTCALL__  atol(char *s);
 
-extern char __LIB__              *itoa(int n, char *s, uchar radix);
-extern char __LIB__ __CALLEE__   *itoa_callee(int n, char *s, uchar radix);
-extern char __LIB__              *utoa(uint n, char *s, uchar radix);
-extern char __LIB__ __CALLEE__   *utoa_callee(uint n, char *s, uchar radix);
-extern char __LIB__              *ltoa(long n, char *s, uchar radix);
-extern char __LIB__ __CALLEE__   *ltoa_callee(long n, char *s, uchar radix);
-extern char __LIB__              *ultoa(unsigned long n, char *s, uchar radix);
-extern char __LIB__ __CALLEE__   *ultoa_callee(unsigned long n, char *s, uchar radix);
+extern int  __LIB__               itoa(int n, char *s, uchar radix);
+extern int  __LIB__ __CALLEE__    itoa_callee(int n, char *s, uchar radix);
+extern int  __LIB__               utoa(uint n, char *s, uchar radix);
+extern int  __LIB__ __CALLEE__    utoa_callee(uint n, char *s, uchar radix);
+extern int  __LIB__               ltoa(long n, char *s, uchar radix);
+extern int  __LIB__ __CALLEE__    ltoa_callee(long n, char *s, uchar radix);
+extern int  __LIB__               ultoa(unsigned long n, char *s, uchar radix);
+extern int  __LIB__ __CALLEE__    ultoa_callee(unsigned long n, char *s, uchar radix);
 
 #define itoa(a,b,c)  itoa_callee(a,b,c)
 #define utoa(a,b,c)  utoa_callee(a,b,c)
