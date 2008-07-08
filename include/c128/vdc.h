@@ -3,13 +3,14 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: vdc.h,v 1.1 2008-06-23 17:34:31 stefano Exp $
+$Id: vdc.h,v 1.2 2008-07-08 13:10:23 stefano Exp $
 
 */
 
 #ifndef __C128VDC_H__
 #define __C128VDC_H__
 
+#include <graphics.h>
 
 #ifndef uchar
   #define uchar unsigned char
@@ -144,7 +145,10 @@ extern void __LIB__ printstrvdc(uchar X, uchar Y, uchar Attr, char *TextStr);
 extern void __LIB__ setbitmapvdc(ushort DispMem, ushort AttrMem, uchar F, uchar B);
 extern void __LIB__ clrbitmapvdc(uchar Filler);
 extern void __LIB__ setpixvdc(int X, int Y);
+//#define setpixvdc(x,y) plot(x,y)
 extern void __LIB__ linevdc(int X1, int Y1, int X2, int Y2);
+//#define linevdc(x1,y1,x2,y2) draw(x1,y1,x2,y2)
+
 extern void __LIB__ ellipsevdc(int XC, int YC, int A, int B);
 extern void __LIB__ printbmvdc(uchar X, uchar Y, uchar Attr, char *TextStr);
 

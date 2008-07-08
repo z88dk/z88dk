@@ -3,12 +3,37 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: mapvdc.c,v 1.1 2008-06-23 17:34:34 stefano Exp $
+$Id: mapvdc.c,v 1.2 2008-07-08 13:10:24 stefano Exp $
 
 */
 
 #include <c128/vdc.h>
 
+extern uchar  vdcScrHorz;
+extern uchar  vdcScrVert;
+extern ushort vdcScrSize;
+extern ushort vdcAttrMem;
+extern ushort vdcCharMem;
+extern ushort vdcCharMemSize;
+extern uchar  vdcCharBytes;
+extern uchar  vdcCharVert;
+extern ushort vdcBitMapMemSize;
+
+#asm
+
+._vdcScrHorz	defw	0
+._vdcScrVert	defw	0
+._vdcScrSize	defw	0
+._vdcAttrMem	defw	0
+._vdcCharMem	defw	$2000
+._vdcCharMemSize	defw	0
+._vdcCharBytes	defw	0
+._vdcCharVert	defw	0
+._vdcBitMapMemSize	defw	16000
+
+#endasm
+
+/*
 uchar  vdcScrHorz;
 uchar  vdcScrVert;
 ushort vdcScrSize;
@@ -19,6 +44,7 @@ ushort vdcCharMemSize;
 uchar  vdcCharBytes;
 uchar  vdcCharVert;
 ushort vdcBitMapMemSize = 16000;
+*/
 
 /*
 set global 'vdc' prefixed vars from current vdc settings.  vdc register 28

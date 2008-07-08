@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: scrollupvdc.c,v 1.1 2008-06-23 17:34:34 stefano Exp $
+$Id: scrollupvdc.c,v 1.2 2008-07-08 13:10:25 stefano Exp $
 
 */
 
@@ -11,7 +11,7 @@ $Id: scrollupvdc.c,v 1.1 2008-06-23 17:34:34 stefano Exp $
 #include <c128/vdc.h>
 
 extern uchar  vdcScrHorz;
-extern ushort vdcDispMem;
+//extern ushort vdcDispMem;
 extern ushort vdcAttrMem;
 
 /* scroll window up given x1, y1, x2, y2 rectangle in current page */

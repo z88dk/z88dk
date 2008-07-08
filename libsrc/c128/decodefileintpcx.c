@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: decodefileintpcx.c,v 1.1 2008-06-23 17:34:32 stefano Exp $
+$Id: decodefileintpcx.c,v 1.2 2008-07-08 13:10:24 stefano Exp $
 
 */
 
@@ -12,8 +12,8 @@ $Id: decodefileintpcx.c,v 1.1 2008-06-23 17:34:32 stefano Exp $
 #include <c128/pcx.h>
 
 extern uchar   vdcScrHorz;
-extern ushort  vdcDispMem;
-extern FILE    *pcxFile;
+//extern ushort  vdcDispMem;
+//extern FILE    *pcxFile;
 extern pcxHead pcxHeader;
 extern ushort  pcxYSize;
 
