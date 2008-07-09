@@ -1,7 +1,5 @@
 
 OBJS = zcc.o
-CC = gcc
-
 
 all: zcc 
 

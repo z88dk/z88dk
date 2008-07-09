@@ -1,6 +1,5 @@
 
 OBJS = copt.o
-CC = gcc
 
 
 all: copt 
