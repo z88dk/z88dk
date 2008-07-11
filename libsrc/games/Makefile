@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.14 2008-05-09 10:35:56 stefano Exp $
+# $Id: Makefile,v 1.15 2008-07-11 15:10:57 stefano Exp $
 
 include	../Make.config
 
@@ -40,7 +40,12 @@ lvz:
 	zcc +vz	$(CFLAGS) -DVZ bit_frequency.c
 	zcc +vz	$(CFLAGS) -DVZ bit_play.c
 
+# Access to SID (single bit resolution) with a full word address
+lc128:
+	zcc +c128ansi $(CFLAGS) -DC128 bit_frequency.c
+	zcc +c128ansi $(CFLAGS) -DC128 bit_play.c
+
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o*
-	$(RM) ace/*.o cpc/*.o aquarius/*.o msx/*.o 
+	$(RM) ace/*.o c128/*.o cpc/*.o aquarius/*.o msx/*.o 
 	$(RM) sam/*.o spectrum/*.o trs80/*.o vz/*.o z88/*.o

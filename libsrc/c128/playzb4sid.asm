@@ -2,7 +2,7 @@
 ;Based on the SG C Tools 1.7
 ;(C) 1993 Steve Goldsmith
 ;
-;$Id: playzb4sid.asm,v 1.1 2008-06-23 17:34:34 stefano Exp $
+;$Id: playzb4sid.asm,v 1.2 2008-07-11 15:10:57 stefano Exp $
 ;
 
 ; extern void __LIB__ playzb4sid(uchar *SamStart, ushort SamLen);
@@ -24,6 +24,28 @@ pop	hl	;sample start addr
 push	hl
 push	de
 push	bc
+
+;-----
+; Stefano Bodrato - fix for new SID, version 8580
+push	de
+ld	e,7	; voice address offset
+ld	bc,$d406
+ld	a,$ff
+out	(c),a	; Set sustain to $F
+add	c,e	; next voice
+out	(c),a
+add	c,e	; next voice..
+out	(c),a
+
+ld	bc,$d404
+ld	a,$49	; Set SID test bit
+out	(c),a
+add	c,e	; next voice
+out	(c),a
+add	c,e	; next voice..
+out	(c),a
+pop	de
+;-----
 
 rep1:                   ;repeat
 
@@ -58,5 +80,17 @@ dec     e               ;
 jr      nz,rep1         ;
 dec     d               ; de = de-1
 jr      nz,rep1         ;until de = 0
-;jp      cret
+
+;-----
+; Stefano Bodrato - fix for new SID, version 8580
+ld	bc,$d404
+ld	e,0
+resetsid:
+out	(c),e
+inc	c
+ld	a,c
+cp	$15	; loop up to $d414 (all three oscillators)
+jr	nz,resetsid
+;-----
+
 ret

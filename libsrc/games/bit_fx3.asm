@@ -1,4 +1,4 @@
-; $Id: bit_fx3.asm,v 1.1 2006-05-23 20:42:52 stefano Exp $
+; $Id: bit_fx3.asm,v 1.2 2008-07-11 15:10:57 stefano Exp $
 ;
 ; Generic platform sound effects module.
 ; Alternate sound library by Stefano Bodrato
@@ -19,7 +19,13 @@
           pop  de
           push de
           push bc
-          
+
+        IF sndbit_port >= 256
+          exx
+          ld   bc,sndbit_port
+          exx
+        ENDIF
+
           ld    a,e  
           cp    8
           ret   nc  
@@ -55,7 +61,14 @@
           ld      l,a
           pop     af
           xor     l
-          out     (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
 
           push    bc
 .dly      nop
@@ -70,7 +83,14 @@
           ld      l,a
           pop     af
           xor     l
-          out     (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
 
           push    bc
           push    af
@@ -100,7 +120,14 @@
           ld      l,a
           pop     af
           xor     l
-          out     (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
 
           push    bc
           push    af
@@ -113,7 +140,14 @@
           pop     bc
 
           xor     sndbit_mask
-          out     (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
 
           push    bc
 .dlya     nop
@@ -138,7 +172,14 @@
           ld      b,a
           pop     af
           xor     b
-          out     (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
 
           ld      b,(hl)
 .cdly          
@@ -164,7 +205,14 @@
           ld      l,a
           pop     af
           xor     l
-          out     (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
 
           push    af
           ld      a,(hl)
@@ -189,7 +237,14 @@
           rl      h
           jr      nc,desc3
           xor     sndbit_mask
-          out     (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
 
 .desc3
           ld      e,5
@@ -221,7 +276,14 @@
           rl      h
           jr      nc,hdesc3
           xor     sndbit_mask
-          out     (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
 
 .hdesc3
           djnz    hdesc2
@@ -250,7 +312,14 @@
           rl      h
           jr      c,asc3
           xor     sndbit_mask
-          out     (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
 
 .asc3
           djnz    asc2
@@ -279,8 +348,15 @@
           ld      l,a
           pop     af
           xor     l
-          out     (sndbit_port),a
-          
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
+
           pop     hl
           dec     hl
           ld      c,a

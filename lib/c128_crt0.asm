@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.10 2008-06-23 17:34:31 stefano Exp $
+;	$Id: c128_crt0.asm,v 1.11 2008-07-11 15:10:56 stefano Exp $
 ;
 
 
@@ -35,8 +35,10 @@
 
 ; Graphics (pseudo)
         XDEF    base_graphics   ;Graphical variables
+        XDEF    _vdcDispMem
 	XDEF	coords		;Current xy position
 
+; Sound
 	XDEF	snd_tick	;Sound variable
 
 
@@ -51,6 +53,7 @@ ENDIF
 .start
 
 	di
+	
 	;ld	bc,$d018
 	;ld	a,$45
 	;out	(c),a	; 40 columns text at $2000
@@ -171,7 +174,14 @@ ENDIF
 ; Graph
 
 .coords         defw    0       ; Current graphics xy coordinates
+		defw	0
+._vdcDispMem
 .base_graphics  defw    $2000   ; Address of the Graphics map
+
+
+IF DEFINED_NEED1bitsound
+.snd_tick	defb	0	; Sound variable
+ENDIF
 
 ; mem stuff
 
@@ -202,4 +212,3 @@ IF NEED_floatpack
 .fasign         defb    0
 
 ENDIF
-

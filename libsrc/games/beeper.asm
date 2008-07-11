@@ -1,4 +1,4 @@
-; $Id: beeper.asm,v 1.2 2002-04-17 21:30:23 dom Exp $
+; $Id: beeper.asm,v 1.3 2008-07-11 15:10:57 stefano Exp $
 ;
 ; Generic 1 bit sound functions
 ;
@@ -20,6 +20,11 @@
 
 
 .beeper
+        IF sndbit_port >= 256
+          exx
+          ld   bc,sndbit_port
+          exx
+        ENDIF
           ld   a,l
           srl  l
           srl  l
@@ -42,7 +47,15 @@
           dec  b
           jp   nz,behllp
           xor  sndbit_mask
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
           out  (sndbit_port),a
+        ENDIF
+
           ld   b,h
           ld   c,a
           bit  sndbit_bit,a            ;if o/p go again!

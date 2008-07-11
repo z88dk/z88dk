@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.10 2008-05-09 10:35:55 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.11 2008-07-11 15:10:56 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -48,6 +48,12 @@
 
 	XDEF	__fcb		;file control block
 
+;-----------------------
+; Target specific labels
+;-----------------------
+
+        XDEF    _vdcDispMem	; pointer to disp. memory for C128
+	XDEF	snd_tick	; for sound code, if any
 
         org     $100
 
@@ -214,9 +220,14 @@ IF !DEFINED_HAVESEED
 ._std_seed       defw    0       ; Seed for integer rand() routines
 ENDIF
 
+IF DEFINED_NEED1bitsound
+.snd_tick	defb	0	; Sound variable
+ENDIF
+
 ;----------------------------
 ; Unneccessary file signature
 ;----------------------------
+._vdcDispMem					; Label used by "c128cpm.lib" only
          	defm  	"Small C+ CP/M"
 .end		defb	0
 

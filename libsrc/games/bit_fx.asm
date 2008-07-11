@@ -1,4 +1,4 @@
-; $Id: bit_fx.asm,v 1.4 2006-05-23 20:42:52 stefano Exp $
+; $Id: bit_fx.asm,v 1.5 2008-07-11 15:10:57 stefano Exp $
 ;
 ; Generic platform sound effects module.
 ;
@@ -32,7 +32,13 @@
           pop  de
           push de
           push bc
-          
+
+        IF sndbit_port >= 256
+          exx
+          ld   bc,sndbit_port
+          exx
+        ENDIF
+
           ld    a,e  
           cp    8  
           ret   nc  
@@ -47,14 +53,14 @@
           ld    l,a  
           jp    (hl)  
           
-.table    defw    fx2		; effect #0
+.table    defw    fx2           ; effect #0
           defw    fx5
           defw    fx6
           defw    zap0
           defw    zap1
           defw    clackson
           defw    zap3
-          defw    warpcall	; effect #7
+          defw    warpcall      ; effect #7
           
           
 ;Strange squeak hl=300,de=2
@@ -83,7 +89,15 @@
           
 .fx2      call  bit_open_di
           ld    e,150  
-.fx2_1    out   (sndbit_port),a  
+.fx2_1
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
+
           xor   sndbit_mask  
           ld    b,e  
 .fx2_2    djnz  fx2_2  
@@ -118,13 +132,21 @@
 .zap0_1   ld    b,(hl)  
           dec   hl  
 .zap0_2   djnz  zap0_2  
-          out   (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
+
           xor   sndbit_mask
-          ex	af,af
+          ex    af,af
           ld    a,h  
-          or	l
+          or    l
           jr    z,zap0_3
-          ex	af,af
+          ex    af,af
           jr    zap0_1  
 .zap0_3   jp    bit_close_ei
           
@@ -135,23 +157,41 @@
           call  bit_open_di
 .clackson_LENGHT
           ld      b,90
+        IF sndbit_port <= 255
           ld      c,sndbit_port
+        ENDIF
 .clackson_loop
           dec     h
           jr      nz,clackson_jump
           xor     sndbit_mask
-          out     (c),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;8 T slower
+          exx
+        ELSE
+          out  (c),a
+        ENDIF
+
 .clackson_FR_1
           ld      h,230
 .clackson_jump
           dec     l
           jr      nz,clackson_loop
           xor     sndbit_mask
-          out     (c),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;8 T slower
+          exx
+        ELSE
+          out  (c),a
+        ENDIF
+
 .clackson_FR_2
           ld      l,255
           djnz    clackson_loop
-          call	bit_close_ei
+          call  bit_close_ei
           ret
           
           
@@ -160,7 +200,15 @@
 .zap3     call  bit_open_di
 .zap3_1   push  bc
           xor   sndbit_mask
-          out   (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
+
           push  af
           xor   a
           sub   b
@@ -169,7 +217,15 @@
 .zap3_2   nop
           djnz  zap3_2
           xor   sndbit_mask
-          out   (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
+
           pop   bc
           push  bc
 .zap3_3   nop
@@ -220,7 +276,15 @@
           ld    b,0  
 .zap1_1   push  bc  
           xor   sndbit_mask  ;oscillate between high and low bits...
-          out   (sndbit_port),a  
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
+
 .zap1_2   nop
           nop
           djnz  zap1_2

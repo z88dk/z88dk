@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.123 2008-06-23 17:34:31 stefano Exp $
+# $Id: Makefile,v 1.124 2008-07-11 15:10:56 stefano Exp $
 
 
 include	Make.config
@@ -1032,8 +1032,11 @@ c128ansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	cd c128 ; $(MAKE) ; cd ..
+	cd graphics ; $(MAKE) lc128 ; cd ..
+	$(MAKE)	gamesdeps
+	cd games ; $(MAKE) lc128 ; cd ..
 	$(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
-	$(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm_clib @$(LISTFILE_DIRECTORY)/c128cpm.lst
+	$(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(LISTFILE_DIRECTORY)/c128cpm.lst
 
 # Grundy NewBrain library - Stefano
 newbrain_clib.lib:

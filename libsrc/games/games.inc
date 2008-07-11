@@ -5,8 +5,14 @@
 ;       based on the Dominic's sound routines
 ;
 ;
-;       $Id: games.inc,v 1.10 2008-04-08 16:49:27 stefano Exp $
+;       $Id: games.inc,v 1.11 2008-07-11 15:10:57 stefano Exp $
 ;
+
+IF FORc128
+        defc sndbit_port   = 54296	; $D418: addres is a word: uses a special lib version
+        defc sndbit_bit    = 3
+        defc sndbit_mask   = 15
+ENDIF
 
 IF FORzx
         defc sndbit_port   = 254
@@ -33,13 +39,13 @@ IF FORz88
 ENDIF
 
 IF FORjupiter
-        defc sndbit_port   = $FE
+        defc sndbit_port   = 254
         defc sndbit_bit    = 0
         defc sndbit_mask   = 1
 ENDIF
 
 IF FORaquarius
-        defc sndbit_port   = $FC
+        defc sndbit_port   = 252
         defc sndbit_bit    = 0
         defc sndbit_mask   = 1
 ENDIF
@@ -76,13 +82,13 @@ IF FORti86
 ENDIF
 
 IF FORtrs80
-        defc sndbit_port   = $FF
+        defc sndbit_port   = 255
         defc sndbit_bit    = 1
         defc sndbit_mask   = 3
 ENDIF
 
 IF FORvz
-        defc sndbit_port   = 26624      ; yes, this is a memory address !
+        defc sndbit_port   = 26624      ; this is a memory address, not a port !
         defc sndbit_bit    = 0
         defc sndbit_mask   = 33         ; bit 0 (Speaker A) and 5 (Speaker B)
 ENDIF

@@ -1,4 +1,4 @@
-; $Id: bit_click.asm,v 1.2 2002-04-17 21:30:23 dom Exp $
+; $Id: bit_click.asm,v 1.3 2008-07-11 15:10:57 stefano Exp $
 ;
 ; Generic 1 bit sound functions
 ;
@@ -16,7 +16,14 @@
 
           ld   a,(snd_tick)
           xor  sndbit_mask
+
+        IF sndbit_port > 255
+          ld   bc,sndbit_port
+          out  (c),a
+        ELSE
           out  (sndbit_port),a
+        ENDIF
+
           ld   (snd_tick),a
           ret
 

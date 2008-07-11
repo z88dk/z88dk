@@ -9,7 +9,7 @@
  *	         Dec 2001 - Added Mattel Aquarius
  *               Dec 2007 - Various fixes and improvements
  *
- *	$Id: sound.h,v 1.11 2008-04-08 16:49:26 stefano Exp $
+ *	$Id: sound.h,v 1.12 2008-07-11 15:10:56 stefano Exp $
  */
 
 
@@ -53,6 +53,10 @@ extern __LIB__ bit_play(unsigned char melody[]);
 
 #ifdef AQUARIUS
   #define BEEP_TSTATES 500000.0  /* 4 Mhz */
+#endif
+
+#ifdef C128
+  #define BEEP_TSTATES 250000.0  /* 2 Mhz.. VIC-II steals time */
 #endif
 
 #ifdef MSX

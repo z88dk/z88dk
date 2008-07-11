@@ -1,4 +1,4 @@
-; $Id: bit_synth.asm,v 1.1 2006-05-23 20:42:52 stefano Exp $
+; $Id: bit_synth.asm,v 1.2 2008-07-11 15:10:57 stefano Exp $
 ;
 ; void bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4);
 ;
@@ -20,6 +20,13 @@
           LIB      bit_close_ei
 
 .bit_synth
+
+        IF sndbit_port >= 256
+          exx
+          ld   bc,sndbit_port
+          exx
+        ENDIF
+
           ld      ix,2
           add     ix,sp
           ld      a,(ix+8)
@@ -67,7 +74,15 @@
           jr      nz,jump
 .FR1_tick
           xor     sndbit_mask
-          out     (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
+
 .FR_1
           ld      h,80
 .jump
@@ -75,7 +90,15 @@
           jr      nz,jump2
 .FR2_tick
           xor     sndbit_mask
-          out     (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
+
 .FR_2
           ld      l,81
 .jump2
@@ -83,7 +106,15 @@
           jr      nz,jump3
 .FR3_tick
           xor     sndbit_mask
-          out     (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
+
 .FR_3
           ld      d,162
 .jump3
@@ -91,7 +122,15 @@
           jr      nz,loop2
 .FR4_tick
           xor     sndbit_mask
-          out     (sndbit_port),a
+
+        IF sndbit_port >= 256
+          exx
+          out  (c),a                   ;9 T slower
+          exx
+        ELSE
+          out  (sndbit_port),a
+        ENDIF
+
 .FR_4
           ld      e,163
           
