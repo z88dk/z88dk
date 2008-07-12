@@ -35,9 +35,8 @@ XDEF ASMDISP_STRLCPY_CALLEE
 
    xor a                       ; one too many bytes copied...
    dec de                      ; need to place \0 into dst
-   ld (de),a
-   
-   dec hl                      ; in case last char copied was \0
+   ld (de),a 
+   dec hl                      ; in case last char copied was \0 for cpir following
 
 .szexceeded1
 
@@ -45,12 +44,13 @@ XDEF ASMDISP_STRLCPY_CALLEE
    ; bc = 0
 
    cpir                        ; find end of char *src
+
+.done
+
    dec hl
  
    ; hl = pointing at \0 at end of char *src
    ; carry flag reset
-
-.done
 
    pop de                      ; de = char *src
    sbc hl,de                   ; hl = strlen(src)

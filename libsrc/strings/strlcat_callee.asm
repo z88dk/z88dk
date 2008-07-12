@@ -38,7 +38,7 @@ XDEF ASMDISP_STRLCAT_CALLEE
    dec hl                      ; hl parked on \0 and bc decr by one extra for the \0
    jp po, szexceeded0          ; oops, size exceeded within string dst
    
-   ; append string dst with chars from string src
+   ; append to string dst with chars from string src
    
    ex de,hl                    ; de = dst, hl = src
 
@@ -54,6 +54,7 @@ XDEF ASMDISP_STRLCAT_CALLEE
    
    xor a
    ld (de),a                   ; terminate string dst
+   dec hl                      ; last src byte not copied, to get final strlen correct
 
 .szexceeded1
 
