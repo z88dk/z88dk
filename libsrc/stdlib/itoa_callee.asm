@@ -45,12 +45,12 @@ LIB stdio_basechar, stdio_error_zc
 .negative
 
    call l_deneg              ; de = -de
-   
+   inc b                     ; count++
+
    ld a,h
    or l
    jr z, notneg
 
-   inc b                     ; count++
    ld (hl),'-'               ; write negative sign
    inc hl
 
@@ -60,7 +60,7 @@ LIB stdio_basechar, stdio_error_zc
    ; enter : de = unsigned num
    ;         hl = char *s (if NULL no chars are written)
    ;          b = 0
-   ;          c = 0 < radix <= 36
+   ;          c = 1 < radix <= 36
    ; exit  : hl = number of digits in written number (0 and carry set for error)
    ;         de = addr of terminating '\0' in s
 

@@ -46,12 +46,12 @@ LIB stdio_basechar, stdio_error_zc
 .negative
 
    call l_long_neg             ; dehl = -dehl
-   
+   inc b                       ; count++
+
    ld a,ixh
    or ixl
    jr z, notneg
    
-   inc b                       ; count++
    ld (ix+0),'-'               ; write negative sign
    inc ix
 
@@ -61,7 +61,7 @@ LIB stdio_basechar, stdio_error_zc
    ; enter : dehl = long num
    ;           ix = char *s (if NULL no chars are written)
    ;            b = 0
-   ;            c = radix (0 < c <= 36)
+   ;            c = radix (1 < c <= 36)
    ; exit:     hl = number of digits in written number (zero and carry set for error)
    ;           de = addr of terminating '\0' in s (or NULL)
    ; uses  : af, bc, de, hl, exx, ix
