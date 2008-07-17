@@ -1,0 +1,77 @@
+
+        XLIB    w_pixeladdress
+
+        INCLUDE "graphics/grafix.inc"
+
+        ;XREF   base_graphics
+        XREF    _vdcDispMem
+
+;
+;       $Id: w_pixladdr.asm,v 1.1 2008-07-17 15:39:56 stefano Exp $
+;
+
+; ******************************************************************
+;
+; Get absolute  pixel address in map of virtual (x,y) coordinate.
+;
+; in:  hl,de    = (x,y) coordinate of pixel
+;
+; out: hl=de    = address of pixel byte
+;          a    = bit number of byte where pixel is to be placed
+;         fz    = 1 if bit number is 0 of pixel position
+;
+; registers changed     after return:
+;  ......hl/ixiy same
+;  afbcde../.... different
+;
+
+.w_pixeladdress
+
+        ld      b,h
+        ld      c,l
+                                ;calc (y * 80) + (x / 8) + bit map start
+        ld      l,e             ;hl = y
+        ld      h,d
+
+        add     hl,hl           ;hl = y * 64;
+        add     hl,hl
+        add     hl,hl
+        add     hl,hl
+        add     hl,hl
+        add     hl,hl
+
+        ex      de,hl           ;de = y * 64; hl = y
+
+        add     hl,hl           ;hl = y * 16
+        add     hl,hl
+        add     hl,hl
+        add     hl,hl
+
+        add     hl,de           ;hl = (y * 64)+(y * 16)
+
+        ld      e,c             ;de = x
+        ld      d,b
+
+        srl     d               ;de = x / 8
+        rr      e
+        srl     d
+        rr      e
+        srl     d
+        rr      e
+
+        add     hl,de           ;hl = (y * 80) + (x / 8)
+        ld      de,(_vdcDispMem)
+        add     hl,de           ;hl = (y * 80) + (x / 8) + bit map offset
+
+        ld      a,c             ;a = x low byte
+        and     07h             ;a = x mod 8
+        ;ld      d,0             ;de = x mod 8
+        ;ld      e,a
+        
+        ld	d,h
+        ld	e,l
+        
+        xor     7
+
+        ret
+        

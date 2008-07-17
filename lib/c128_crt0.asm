@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.11 2008-07-11 15:10:56 stefano Exp $
+;	$Id: c128_crt0.asm,v 1.12 2008-07-17 15:39:56 stefano Exp $
 ;
 
 
@@ -53,6 +53,10 @@ ENDIF
 .start
 
 	di
+	
+	;ld	bc,$d030
+	;ld	a,1
+	;out	(c),a	; high speed clock
 	
 	;ld	bc,$d018
 	;ld	a,$45
@@ -114,6 +118,10 @@ IF DEFINED_ANSIstdio
 	call	closeall
 ENDIF
 ENDIF
+
+	;ld	bc,$d030
+	;xor	a
+	;out	(c),a	; back to slow speed clock
 
 .start1
         ld      sp,0

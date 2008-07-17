@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.124 2008-07-11 15:10:56 stefano Exp $
+# $Id: Makefile,v 1.125 2008-07-17 15:39:56 stefano Exp $
 
 
 include	Make.config
@@ -15,7 +15,7 @@ include	Make.config
 all:	genlibs	z88libs	tilibs zxlibs \
 	abc80_clib.lib abc80ansi_clib.lib abc800_clib.lib \
 	aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
-	c128ansi_clib.lib cpclibs cpm_clib.lib \
+	c128libs cpclibs cpm_clib.lib \
 	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib	nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
 	ozansi_clib.lib	pps_clib.lib ppsansi_clib.lib \
@@ -27,6 +27,8 @@ all:	genlibs	z88libs	tilibs zxlibs \
 
 genlibs: debug.lib gen_math.lib	malloc.lib z80_crt0.lib	ndos.lib adt.lib balloc.lib \
 	 im2.lib rect.lib algorithm.lib	lib3d.lib x11.lib
+
+c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
 
 cpclibs: cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib cpcgray.lib
 
@@ -52,6 +54,7 @@ gamesdeps:
 #  short script	to sort	out gfx	dependencies
 gfxdeps:
 	$(RM) -f graphics/*.o
+	$(RM) -f graphics/c128/*.o
 	$(RM) -f graphics/ticalc/*.o
 	$(RM) -f graphics/gray/*.o
 	$(RM) -f graphics/gray/ticalc/*.o
@@ -1024,7 +1027,6 @@ c128ansi_clib.lib:
 	@echo ''
 	@echo '--- Building Commodore 128 ANSI Library	---'
 	@echo ''
-	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) gen	; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
@@ -1032,11 +1034,36 @@ c128ansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	cd c128 ; $(MAKE) ; cd ..
-	cd graphics ; $(MAKE) lc128 ; cd ..
 	$(MAKE)	gamesdeps
 	cd games ; $(MAKE) lc128 ; cd ..
 	$(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
 	$(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(LISTFILE_DIRECTORY)/c128cpm.lst
+
+# C128 Base text mode graphics lib - Stefano
+gfx128.lib:
+	@echo ''
+	@echo '--- Building Commodore 128 Base Graphics Library  ---'
+	@echo ''
+	$(MAKE)	gfxdeps
+	$(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/gfx128 @$(LISTFILE_DIRECTORY)/gfx128.lst
+
+# C128 HRG graphics lib - Stefano
+gfx128hr.lib:
+	@echo ''
+	@echo '--- Building Commodore 128 High Resolution Graphics Library  ---'
+	@echo ''
+	$(MAKE)	gfxdeps
+	cd graphics ; $(MAKE) lc128 ; cd ..
+	$(LIBLINKER) -DFORc128hr -x$(OUTPUT_DIRECTORY)/gfx128hr @$(LISTFILE_DIRECTORY)/gfx128hr.lst
+
+# C128 640x480 HRG graphics lib - Stefano
+gfx128hr480.lib:
+	@echo ''
+	@echo '--- Building Commodore 128 640x480 HRG Library  ---'
+	@echo ''
+	$(MAKE)	gfxdeps
+	cd graphics ; $(MAKE) lc128 ; cd ..
+	$(LIBLINKER) -DFORc128hr480 -x$(OUTPUT_DIRECTORY)/gfx128hr480 @$(LISTFILE_DIRECTORY)/gfx128hr480.lst
 
 # Grundy NewBrain library - Stefano
 newbrain_clib.lib:
