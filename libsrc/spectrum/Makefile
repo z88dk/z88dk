@@ -1,7 +1,7 @@
 #
-# Makefile for +3 file support
+# Makefile for ZX Spectrum target specific lib
 #
-# $Id: Makefile,v 1.7 2008-06-29 08:25:41 aralbrec Exp $
+# $Id: Makefile,v 1.8 2008-07-18 15:38:51 stefano Exp $
 
 include ../Make.config
 
