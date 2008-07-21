@@ -1,7 +1,7 @@
 #
 # Makefile for ZX Spectrum target specific lib
 #
-# $Id: Makefile,v 1.8 2008-07-18 15:38:51 stefano Exp $
+# $Id: Makefile,v 1.9 2008-07-21 10:09:25 stefano Exp $
 
 include ../Make.config
 
@@ -16,5 +16,5 @@ clean:
 	cd display ; $(RM) *.o* ; cd ..
 	cd if1 ; $(RM) *.o* ; cd ..
 	cd opus ; $(RM) *.o* ; cd ..
-	cd tape ; $(RM) *.o* ; cd ..
+	cd tape ; $(MAKE) clean ; cd ..
 	cd uspeech ; $(RM) *.o* ; cd ..

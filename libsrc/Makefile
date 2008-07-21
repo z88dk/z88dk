@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.125 2008-07-17 15:39:56 stefano Exp $
+# $Id: Makefile,v 1.126 2008-07-21 10:09:24 stefano Exp $
 
 
 include	Make.config
@@ -412,7 +412,7 @@ vz_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -428,7 +428,7 @@ vzansi_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -444,7 +444,7 @@ zx81_clib.lib:
 	@echo ''
 	$(MAKE)	zx81deps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic_iy ;	cd ..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -460,7 +460,7 @@ zx81ansi_clib.lib:
 	$(MAKE)	zx81deps
 	$(RM) stdio/ansi/zx81/f_ansi_char.o
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic_iy ;	cd ..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -516,7 +516,7 @@ ti82ansi_clib.lib:
 	@echo ''
 	$(MAKE)	tideps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -531,7 +531,7 @@ ti82_clib.lib:
 	@echo ''
 	$(MAKE)	tideps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -554,7 +554,7 @@ ti83ansi_clib.lib:
 	@echo ''
 	$(MAKE)	tideps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -569,7 +569,7 @@ ti83_clib.lib:
 	@echo ''
 	$(MAKE)	tideps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -591,7 +591,7 @@ ti83pansi_clib.lib:
 	@echo ''
 	$(MAKE)	tideps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -606,7 +606,7 @@ ti83p_clib.lib:
 	@echo ''
 	$(MAKE)	tideps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -628,7 +628,7 @@ ti85ansi_clib.lib:
 	@echo ''
 	$(MAKE)	tideps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -643,7 +643,7 @@ ti85_clib.lib:
 	@echo ''
 	$(MAKE)	tideps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -665,7 +665,7 @@ ti86ansi_clib.lib:
 	@echo ''
 	$(MAKE)	tideps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -680,7 +680,7 @@ ti86_clib.lib:
 	@echo ''
 	$(MAKE)	tideps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -705,7 +705,7 @@ ozansi_clib.lib:
 	$(RM) -f stdio/ansi/oz/f_ansi_char.o
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -722,7 +722,7 @@ cpm_clib.lib:
 	@echo ''
 	cd fcntl ; $(MAKE) lcpm	; cd ..
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) lcpm	; cd ..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -736,7 +736,7 @@ mz_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -750,7 +750,7 @@ mzansi_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -764,7 +764,7 @@ abc80_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -778,7 +778,7 @@ abc80ansi_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -792,7 +792,7 @@ abc800_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -806,7 +806,7 @@ aceansi_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -822,7 +822,7 @@ aquarius_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -838,7 +838,7 @@ aquansi_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -853,7 +853,7 @@ rex_clib.lib:
 	@echo '--- Building Xircom Rex Library	---'
 	@echo ''
 	cd strings; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd rex	  ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORrex -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(LISTFILE_DIRECTORY)/rex6000.lst
@@ -865,7 +865,7 @@ sam_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -881,7 +881,7 @@ samansi_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -896,7 +896,7 @@ svi_clib.lib:
 	@echo '--- Building Spectravideo Library  ---'
 	@echo ''
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -910,7 +910,7 @@ msx_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -926,7 +926,7 @@ nascom_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -939,7 +939,7 @@ nasansi_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -952,7 +952,7 @@ m5_clib.lib:
 	@echo '--- Building SORD M5 Library  ---'
 	@echo ''
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -965,7 +965,7 @@ nc_clib.lib:
 	@echo '--- Building Amstrad NC100 Library  ---'
 	@echo ''
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -979,7 +979,7 @@ cpc_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -994,7 +994,7 @@ cpcansi_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -1028,7 +1028,7 @@ c128ansi_clib.lib:
 	@echo '--- Building Commodore 128 ANSI Library	---'
 	@echo ''
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -1072,7 +1072,7 @@ newbrain_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd fcntl ; $(MAKE) lnewbrain ; cd ..
 	cd printflike ;	$(MAKE)	; cd ..
@@ -1087,12 +1087,12 @@ rcmx000_clib.lib:
 	@echo ''
 	@echo '--- Building RCM2/3000 Library  ---'
 	@echo ''
-	make -C	strings	clean all
-	cd stdlib ; $(MAKE) gen
-	cd stdio ; $(MAKE) gen
-	cd printflike ;	$(MAKE)
-	cd setjmp ; $(MAKE)
-	cd assert ; $(MAKE)
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd	..
+	cd printflike ;	$(MAKE)	; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
 	z80asm -RCMX000	-d -ns -nm -Mo -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
 
 # embedded target - contributed	by Daniel Wallner
@@ -1101,7 +1101,7 @@ embedded_clib.lib:
 	@echo '--- Building Embedded (ns16450) Library	---'
 	@echo ''
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) gen ; cd ..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -1141,7 +1141,7 @@ trs80_clib.lib:
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) gen	; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..

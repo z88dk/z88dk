@@ -2,6 +2,10 @@
 
 XLIB asm_ispunct
 
+IF FORrcmx000
+LIB  rcmx_cpir
+ENDIF
+
 ; determine if the char is punctuation
 
 ; enter : a = char
@@ -12,7 +16,11 @@ XLIB asm_ispunct
 
    ld hl,punc_tbl
    ld bc,punc_end - punc_tbl
+IF FORrcmx000
+   call rcmx_cpir
+ELSE
    cpir
+ENDIF
    ret
 
 .punc_tbl

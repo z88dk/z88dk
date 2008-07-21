@@ -4,6 +4,10 @@
 XLIB strlcat_callee
 XDEF ASMDISP_STRLCAT_CALLEE
 
+IF FORrcmx000
+LIB  rcmx_cpir
+ENDIF
+
 ; The openBSD implementation returns an oddball value when size
 ; is less than strlen(dst).  Instead this version always returns
 ; the length of the string that would be created without size
@@ -34,7 +38,13 @@ XDEF ASMDISP_STRLCAT_CALLEE
    ; find end of string dst
    
    xor a
+
+IF FORrcmx000
+   call rcmx_cpir
+ELSE
    cpir
+ENDIF
+   
    dec hl                      ; hl parked on \0 and bc decr by one extra for the \0
    jp po, szexceeded0          ; oops, size exceeded within string dst
    
@@ -66,7 +76,13 @@ XDEF ASMDISP_STRLCAT_CALLEE
    ; stack = char *dst
 
    push hl                     ; save current position in src to compute strlens later   
+
+IF FORrcmx000
+   call rcmx_cpir
+ELSE
    cpir
+ENDIF
+
    dec hl                      ; hl = end of char *src (pointing at \0)
    
    pop bc
@@ -88,7 +104,13 @@ XDEF ASMDISP_STRLCAT_CALLEE
    ; stack = char *dst
 
    xor a
+
+IF FORrcmx000
+   call rcmx_cpir
+ELSE
    cpir
+ENDIF
+
    dec hl                       ; hl = end of char *dst (pointing at \0)
    
    ld c,a

@@ -4,6 +4,10 @@
 XLIB strlcpy_callee
 XDEF ASMDISP_STRLCPY_CALLEE
 
+IF FORrcmx000
+LIB  rcmx_cpir
+ENDIF
+
 .strlcpy_callee
 
    pop af
@@ -43,7 +47,11 @@ XDEF ASMDISP_STRLCPY_CALLEE
    ;  a = 0
    ; bc = 0
 
+IF FORrcmx000
+   call rcmx_cpir
+ELSE
    cpir                        ; find end of char *src
+ENDIF
 
 .done
 

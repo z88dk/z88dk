@@ -7,7 +7,7 @@
 ;       void randomize() - randomize the seed for rand()
 ;
 ; -----
-; $Id: randomize.asm,v 1.1 2007-11-02 12:51:33 stefano Exp $
+; $Id: randomize.asm,v 1.2 2008-07-21 10:09:26 stefano Exp $
 
 XLIB randomize
 XREF _std_seed
@@ -31,7 +31,13 @@ XREF cleanup
    call	agarble
    
    ld	h,a
+
+IF FORrcmx000
+   ld	a,eir
+ELSE
    ld	a,r
+ENDIF
+
    xor	e
    ld	l,a
    

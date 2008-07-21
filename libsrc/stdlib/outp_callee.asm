@@ -16,7 +16,20 @@ XDEF ASMDISP_OUTP_CALLEE
    ; bc = port
    ; e = byte
 
+IF FORrcmx000
+
+   ld h,b
+   ld l,c
+   ld a,e
+   defb 0d3h ; ioi
+   ld (hl),a
+
+ELSE
+
    out (c),e
+
+ENDIF
+
    ret
 
 DEFC ASMDISP_OUTP_CALLEE = asmentry - outp_callee
