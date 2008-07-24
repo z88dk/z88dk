@@ -6,6 +6,9 @@ XLIB dup_common1
 LIB fd_fdtblindex, stdio_malloc
 LIB stdio_error_ebadf_mc, stdio_error_enomem_mc
 
+INCLUDE "stdio.def"
+
+
 .dup_common1
 
    ; 3. lookup src fdstruct

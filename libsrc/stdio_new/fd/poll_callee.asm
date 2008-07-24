@@ -4,8 +4,7 @@
 XLIB poll_callee
 XDEF ASMDISP_POLL_CALLEE
 
-LIB fd_common1
-LIB stdio_error_einval_mc
+LIB fd_common1, l_jpix, stdio_error_einval_mc
 
 INCLUDE "stdio.def"
 
@@ -59,7 +58,7 @@ INCLUDE "stdio.def"
    
    ld l,c
    call fd_common1             ; ix = fdstruct for fd
-   jr c, ebadf                 ; bad fd number
+   jr c, e_ebadf                 ; bad fd number
    
    ld c,STDIO_MSG_POLL
    call l_jpix                 ; return carry if poll is unsupported
@@ -88,7 +87,7 @@ INCLUDE "stdio.def"
    ld h,0                      ; hl = num ready fds
    ret
 
-.ebadf
+.e_ebadf
 
    ld b,$40
    jr reenter

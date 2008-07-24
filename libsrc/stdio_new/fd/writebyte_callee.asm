@@ -4,7 +4,9 @@
 XLIB writebyte_callee
 XDEF ASMDISP_WRITEBYTE_CALLEE
 
-LIB fd_common1, stdio_error_eacces_mc, stdio_error_mc, stdio_success_znc
+LIB fd_common1, l_jpix, stdio_error_eacces_mc, stdio_error_mc, stdio_success_znc
+
+INCLUDE "stdio.def"
 
 .writebyte_callee
 

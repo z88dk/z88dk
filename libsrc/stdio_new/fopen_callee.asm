@@ -9,6 +9,8 @@ LIB stdio_addfiletolist, stdio_rmfilefromlist
 LIB stdio_error_enomem_zc, stdio_error_einval_zc, stdio_error_zc
 XREF ASMDISP_OPEN_CALLEE
 
+INCLUDE "stdio.def"
+
 .fopen_callee
 
    pop hl
@@ -46,7 +48,7 @@ XREF ASMDISP_OPEN_CALLEE
    call stdio_parseperm        ; a = b = mode flags
    pop hl
    pop de
-   jr z, einval                ; mode flags not understood
+   jr z,e_einval                 ; mode flags not understood
 
    ; 3. open file
    ;
@@ -88,7 +90,7 @@ XREF ASMDISP_OPEN_CALLEE
    call stdio_free             ; free struct FILE
    jp stdio_error_zc
 
-.einval
+.e_einval
 
    ex de,hl
    call stdio_error_einval_zc

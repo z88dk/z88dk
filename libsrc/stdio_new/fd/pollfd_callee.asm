@@ -4,7 +4,7 @@
 XLIB pollfd_callee
 XDEF ASMDISP_POLLFD_CALLEE
 
-LIB l_jpix, stdio_error_eacces_mc
+LIB fd_common1, l_jpix, stdio_error_eacces_mc
 
 INCLUDE "stdio.def"
 

@@ -3,7 +3,7 @@
 
 XLIB fread_callee
 XDEF ASMDISP_FREAD_CALLEE
-LIB l_mult, l_div_u, l_jpix, stdio_error_mc, stdio_success_znc
+LIB fgetc, l_mult, l_div_u, l_jpix, stdio_error_mc, stdio_success_znc
 
 include "stdio.def"
 

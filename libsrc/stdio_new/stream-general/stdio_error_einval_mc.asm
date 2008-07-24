@@ -4,6 +4,9 @@
 XLIB stdio_error_einval_mc
 LIB stdio_errno_mc
 
+INCLUDE "stdio.def"
+
+
 .stdio_error_einval_mc
 
    ld hl,EINVAL

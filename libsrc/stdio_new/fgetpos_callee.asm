@@ -5,7 +5,7 @@
 XLIB fgetpos_callee
 XDEF ASMDISP_FGETPOS_CALLEE
 
-LIB l_declong
+LIB l_declong, l_jpix
 LIB stdio_error_mc, stdio_success_znc
 
 INCLUDE "stdio.def"

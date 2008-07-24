@@ -3,6 +3,7 @@
 
 XLIB stdio_errno_mc
 LIB stdio_error_mc
+
 XREF _errno
 
 .stdio_errno_mc

@@ -4,7 +4,7 @@
 XLIB closeall
 
 LIB close, fclose
-XREF LIBDISP_CLOSE, _filelist
+XREF LIBDISP_CLOSE, _filelist, _fdtbl
 
 INCLUDE "stdio.def"
 

@@ -4,7 +4,7 @@
 XLIB getdelim_callee
 XDEF ASMDISP_GETDELIM_CALLEE
 
-LIB realloc_callee, fgetc, stdio_error_mc, stdio_error_enomem_mc
+LIB realloc_callee, fgetc, stdio_error_mc, stdio_error_enomem_mc, l_jpix
 XREF ASMDISP_REALLOC_CALLEE, ASMDISP_FGETC
 
 INCLUDE "stdio.def"

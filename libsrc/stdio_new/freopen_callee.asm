@@ -4,7 +4,7 @@
 XLIB freopen_callee
 XDEF ASMDISP_FREOPEN_CALLEE
 
-LIB fopen_callee, close, l_jpix
+LIB fopen_callee, close, fflush, l_jpix
 XREF LIBDISP_FOPEN_CALLEE, LIBDISP_CLOSE
 
 INCLUDE "stdio.def"

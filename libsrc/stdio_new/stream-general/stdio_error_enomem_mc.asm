@@ -2,12 +2,10 @@
 ; 06.2008 aralbrec
 
 XLIB stdio_error_enomem_mc
-LIB stdio_errorno_mc
+LIB stdio_errno_mc
 
 INCLUDE "stdio.def"
 
-   pop hl
-   pop hl
 
 .stdio_error_enomem_mc
 

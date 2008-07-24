@@ -6,6 +6,8 @@ XDEF ASMDISP_FSEEK_CALLEE
 
 LIB stdio_success_znc, stdio_error_mc, l_jpix, l_declong
 
+INCLUDE "stdio.def"
+
 .fseek_callee
 
    pop af
