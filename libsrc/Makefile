@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.126 2008-07-21 10:09:24 stefano Exp $
+# $Id: Makefile,v 1.127 2008-07-24 17:02:15 stefano Exp $
 
 
 include	Make.config
@@ -76,9 +76,15 @@ tideps:
 	$(RM) -f graphics/gray/ticalc/*.o
 
 zx81deps:
+	$(RM) -f assert/*.o
+	$(RM) -f setjmp/*.o
+	$(RM) -f printflike/*.o
 	$(RM) -f strings/*.o
 	$(RM) -f stdlib/*.o
 	$(RM) -f stdio/*.o
+	$(RM) -f stdio_new/stream-general/*.o
+	$(RM) -f stdio_new/stream-out/stdio_basechar.o
+	$(RM) -f stdio_new/stream-general/stdio_atou.o
 	$(RM) -f stdio/ansi/zx81/*.o
 	$(RM) -f input/spectrum/*.o
 	$(RM) -f input/zx81/*.o
@@ -446,9 +452,9 @@ zx81_clib.lib:
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic_iy ;	cd ..
-	cd printflike ;	$(MAKE)	; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
+	cd printflike ;	$(MAKE)	generic_iy ; cd ..
+	cd setjmp ; $(MAKE) generic_iy ; cd ..
+	cd assert ; $(MAKE) generic_iy ; cd ..
 	$(LIBLINKER) -IXIY -DFORzx81 -x$(OUTPUT_DIRECTORY)/zx81_clib @$(LISTFILE_DIRECTORY)/zx81.lst
 	$(MAKE)	zx81deps
 

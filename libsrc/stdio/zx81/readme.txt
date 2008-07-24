@@ -1,17 +1,12 @@
-$Id: readme.txt,v 1.2 2001-04-13 14:14:00 stefano Exp $
+$Id: readme.txt,v 1.3 2008-07-24 17:02:17 stefano Exp $
 
 
 Tah-da !!
 The ZX81 support.
+Note that this file is a bit outdated, refer to http://www.z88dk.org/wiki
 
 You can choose between a VT emulation (white text on black background, 
-scrolling, ESC sequences) and the (tiny and puny) ROM code (the execution
-stops when last line is reached, so do frequent CLS !).
-The ANSI VT support still corrupts something on the BASIC memory, so
-probably you won't be able to return cleanly to the prompt if you use it.
-
-After compiling you can use the bin2p utility to create a loadable basic 
-program with your code included in a rem line.
+scrolling, ESC sequences) and the tiny console code.
 
 Such program can be saved on tape also, using the ZXtape utility.
 Take your copy at:

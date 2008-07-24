@@ -13,6 +13,10 @@ OBJECTS = $(CFILES:.c=.o)
 
 all: $(OBJECTS)
 
+generic_iy:
+	zcc +test $(CFLAGS) -Ca-IXIY longjmp.c
+	zcc +test $(CFLAGS) -Ca-IXIY setjmp.c
+
 .c.o:
 	zcc +test $(CFLAGS) $*.c
 

@@ -8,6 +8,9 @@ include ../Make.config
 
 all: assert.o
 
+generic_iy:
+	zcc +test $(CFLAGS) -Ca-IXIY assert.c
+
 .c.o:
 	zcc +test $(CFLAGS) $*.c
 
