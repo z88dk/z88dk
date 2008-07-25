@@ -172,3 +172,5 @@ vsprintf
 vsprintf_callee
 vsscanf
 vsscanf_callee
+jumptbl_printf
+jumptbl_scanf

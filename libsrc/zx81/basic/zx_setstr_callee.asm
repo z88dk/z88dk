@@ -7,7 +7,7 @@
 ;	int __CALLEE__ zx_setstr_callee(char variable, char *value);
 ;
 ;
-;	$Id: zx_setstr_callee.asm,v 1.2 2007-10-23 20:33:49 stefano Exp $
+;	$Id: zx_setstr_callee.asm,v 1.1 2008-07-25 15:31:25 stefano Exp $
 ;
 
 XLIB	zx_setstr_callee

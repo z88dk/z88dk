@@ -4,7 +4,7 @@
 ;
 ; 	This routine gives the size of memory used by BASIC variables
 ;
-;	$Id: zx_var_length.asm,v 1.1 2007-10-22 17:06:13 stefano Exp $
+;	$Id: zx_var_length.asm,v 1.1 2008-07-25 15:31:25 stefano Exp $
 ;
 
 	XLIB	zx_var_length
