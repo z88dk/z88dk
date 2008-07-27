@@ -1,0 +1,38 @@
+$Id: README,v 1.1 2008-07-27 21:44:58 aralbrec Exp $
+
+
+
+ZX ROM based math library - Stefano Bodrato - 24/3/2003
+
+
+
+*** WARNING: the ZX81 stuff is still broken ***
+
+
+
+
+
+This is a first release of the library, just to put my work in a safe place :o)
+
+It is much smaller than the default library but slower and slightly less complete.
+
+
+
+The "TINYMODE" flag cuts away the long integers handling and the precision parameter handling of the atof function (BTW no leading zeroes are put even if you prefer the full version).
+
+
+
+
+
+I think that this stuff can be useful for the following:
+
+
+
+- Make the FP math stuff work on the ZX81 (in the future.. I hope!)
+
+- Being a reference for future math libraries on other platforms.
+
+- Document the similarities between the ZX81 and the Spectrum, and give the guidelines to use the FP calculator on a ZX machine (see /lib/zxfp.def, /lib/81fp.def, sinh.asm, cosh.asm and tanh.asm).
+
+- Save memory
+
