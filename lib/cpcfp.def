@@ -1,141 +1,282 @@
 lstoff
 
+
+
 ; CPC Calculator Functions
+
 ;
+
 ; August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
-; $Id: cpcfp.def,v 1.2 2003-08-30 17:28:31 dom Exp $
+
+; $Id: cpcfp.def,v 1.3 2008-07-27 21:55:37 aralbrec Exp $
+
 ;	
 
 
+
+
+
 ; We define constants for 464 and 664 and also a default set
+
 ; The default set is normally for the 6128, but with the 
+
 ; appropriate "for" define we can switch to a different target
+
 ; this is used to generate the individual libraries for each
+
 ; target
 
 
+
+
+
 ; Definitions for CPC464
+
 		defc	CPCFP464_INT_2_FLO	= $40
+
 		defc	CPCFP464_BIN_2_FLO	= $43
+
 		defc	CPCFP464_FLO_BINFIX	= $4C
+
 		defc	CPCFP464_FLO_2_INT	= $46
+
 		defc	CPCFP464_FLO_ADD	= $58
+
 		defc	CPCFP464_FLO_REV_SUB	= $5E
+
 		defc	CPCFP464_FLO_MUL	= $61
+
 		defc	CPCFP464_FLO_DIV	= $64
+
 		defc	CPCFP464_FLO_INV_SGN	= $6D
+
 		defc	CPCFP464_FLO_CMP	= $6A
+
 		defc	CPCFP464_FLO_DEG_RAD	= $73
+
 		defc	CPCFP464_FLO_PI	= $76
+
 		defc	CPCFP464_FLO_SQRT	= $79
+
 		defc	CPCFP464_FLO_POW	= $7C
+
 		defc	CPCFP464_FLO_POW10	= $55
+
 		defc	CPCFP464_FLO_LOG	= $7F
+
 		defc	CPCFP464_FLO_LOG10	= $82
+
 		defc	CPCFP464_FLO_EXP	= $85
+
 		defc	CPCFP464_FLO_SIN	= $88
+
 		defc	CPCFP464_FLO_COS	= $8B
+
 		defc	CPCFP464_FLO_TAN	= $8E
+
 		defc	CPCFP464_FLO_ATAN	= $91
+
 		defc	CPCFP464_FLO_RND	= $9D
 
+
+
 ; Definitions for CPC664
+
 		defc	CPCFP664_INT_2_FLO	= $61
+
 		defc	CPCFP664_BIN_2_FLO	= $64
+
 		defc	CPCFP664_FLO_BINFIX	= $6D
+
 		defc	CPCFP664_FLO_2_INT	= $67
+
 		defc	CPCFP664_FLO_ADD	= $79
+
 		defc	CPCFP664_FLO_REV_SUB	= $7F
+
 		defc	CPCFP664_FLO_MUL	= $82
+
 		defc	CPCFP664_FLO_DIV	= $85
+
 		defc	CPCFP664_FLO_INV_SGN	= $8E
+
 		defc	CPCFP664_FLO_CMP	= $91
+
 		defc	CPCFP664_FLO_DEG_RAD	= $94
+
 		defc	CPCFP664_FLO_PI	= $97
+
 		defc	CPCFP664_FLO_SQRT	= $9A
+
 		defc	CPCFP664_FLO_POW	= $9D
+
 		defc	CPCFP664_FLO_POW10	= $76
+
 		defc	CPCFP664_FLO_LOG	= $A0
+
 		defc	CPCFP664_FLO_LOG10	= $A3
+
 		defc	CPCFP664_FLO_EXP	= $A6
+
 		defc	CPCFP664_FLO_SIN	= $A9
+
 		defc	CPCFP664_FLO_COS	= $AC
+
 		defc	CPCFP664_FLO_TAN	= $AF
+
 		defc	CPCFP664_FLO_ATAN	= $B2
+
 		defc	CPCFP664_FLO_RND	= $7C
 
+
+
 IF forCPC464
+
 		defc	CPCFP_INT_2_FLO	= $40
+
 		defc	CPCFP_BIN_2_FLO	= $43
+
 		defc	CPCFP_FLO_BINFIX	= $4C
+
 		defc	CPCFP_FLO_2_INT	= $46
+
 		defc	CPCFP_FLO_ADD	= $58
+
 		defc	CPCFP_FLO_REV_SUB	= $5E
+
 		defc	CPCFP_FLO_MUL	= $61
+
 		defc	CPCFP_FLO_DIV	= $64
+
 		defc	CPCFP_FLO_INV_SGN	= $6D
+
 		defc	CPCFP_FLO_CMP	= $6A
+
 		defc	CPCFP_FLO_DEG_RAD	= $73
+
 		defc	CPCFP_FLO_PI	= $76
+
 		defc	CPCFP_FLO_SQRT	= $79
+
 		defc	CPCFP_FLO_POW	= $7C
+
 		defc	CPCFP_FLO_POW10	= $55
+
 		defc	CPCFP_FLO_LOG	= $7F
+
 		defc	CPCFP_FLO_LOG10	= $82
+
 		defc	CPCFP_FLO_EXP	= $85
+
 		defc	CPCFP_FLO_SIN	= $88
+
 		defc	CPCFP_FLO_COS	= $8B
+
 		defc	CPCFP_FLO_TAN	= $8E
+
 		defc	CPCFP_FLO_ATAN	= $91
+
 		defc	CPCFP_FLO_RND	= $9D
+
 ELSE
+
    IF forCPC664
+
 		defc	CPCFP_INT_2_FLO	= $61
+
 		defc	CPCFP_BIN_2_FLO	= $64
+
 		defc	CPCFP_FLO_BINFIX	= $6D
+
 		defc	CPCFP_FLO_2_INT	= $67
+
 		defc	CPCFP_FLO_ADD	= $79
+
 		defc	CPCFP_FLO_REV_SUB	= $7F
+
 		defc	CPCFP_FLO_MUL	= $82
+
 		defc	CPCFP_FLO_DIV	= $85
+
 		defc	CPCFP_FLO_INV_SGN	= $8E
+
 		defc	CPCFP_FLO_CMP	= $91
+
 		defc	CPCFP_FLO_DEG_RAD	= $94
+
 		defc	CPCFP_FLO_PI	= $97
+
 		defc	CPCFP_FLO_SQRT	= $9A
+
 		defc	CPCFP_FLO_POW	= $9D
+
 		defc	CPCFP_FLO_POW10	= $76
+
 		defc	CPCFP_FLO_LOG	= $A0
+
 		defc	CPCFP_FLO_LOG10	= $A3
+
 		defc	CPCFP_FLO_EXP	= $A6
+
 		defc	CPCFP_FLO_SIN	= $A9
+
 		defc	CPCFP_FLO_COS	= $AC
+
 		defc	CPCFP_FLO_TAN	= $AF
+
 		defc	CPCFP_FLO_ATAN	= $B2
+
 		defc	CPCFP_FLO_RND	= $7C
+
    ELSE
+
 		defc	CPCFP_INT_2_FLO	= $BD64
+
 		defc	CPCFP_BIN_2_FLO	= $BD67
+
 		defc	CPCFP_FLO_BINFIX	= $BD70
+
 		defc	CPCFP_FLO_2_INT	= $BD6A
+
 		defc	CPCFP_FLO_ADD	= $BD7C
+
 		defc	CPCFP_FLO_REV_SUB	= $BD82
+
 		defc	CPCFP_FLO_MUL	= $BD85
+
 		defc	CPCFP_FLO_DIV	= $BD88
+
 		defc	CPCFP_FLO_INV_SGN	= $BD91
+
 		defc	CPCFP_FLO_CMP	= $BD8E
+
 		defc	CPCFP_FLO_DEG_RAD	= $BD97
+
 		defc	CPCFP_FLO_PI	= $BD9A
+
 		defc	CPCFP_FLO_SQRT	= $BD9D
+
 		defc	CPCFP_FLO_POW	= $BDA0
+
 		defc	CPCFP_FLO_POW10	= $BD79
+
 		defc	CPCFP_FLO_LOG	= $BDA3
+
 		defc	CPCFP_FLO_LOG10	= $BDA6
+
 		defc	CPCFP_FLO_EXP	= $BDA9
+
 		defc	CPCFP_FLO_SIN	= $BDAC
+
 		defc	CPCFP_FLO_COS	= $BDAF
+
 		defc	CPCFP_FLO_TAN	= $BDB2
+
 		defc	CPCFP_FLO_ATAN	= $BDB5
+
 		defc	CPCFP_FLO_RND	= $BD7F
+
 ENDIF
+
 lston
+
