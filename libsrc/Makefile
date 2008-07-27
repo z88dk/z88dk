@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.128 2008-07-25 15:31:23 stefano Exp $
+# $Id: Makefile,v 1.129 2008-07-27 21:48:25 aralbrec Exp $
 
 
 include	Make.config
@@ -141,14 +141,14 @@ gen_math.lib:
 	@echo ''
 	@echo '--- Building Z80	Generic	Maths Library  ---'
 	@echo ''
-	cd genmath; $(MAKE) ; cd ..
+	cd math/genmath; $(MAKE) ; cd ../..
 
 # Z88 maths build - dom
 z88_math.lib:
 	@echo ''
 	@echo '--- Building Z88	Maths Library  ---'
 	@echo ''
-	cd z88math; $(MAKE) ; cd ..
+	cd math/z88math; $(MAKE) ; cd ../..
 
 # Graphics library (for	both app and basic - diff libs though!)	- dom
 gfx.lib:
@@ -363,13 +363,13 @@ mzx.lib:
 	@echo ''
 	@echo '--- Building ZX Spectrum	Maths Library ---'
 	@echo ''
-	cd zxmath ; $(MAKE) mzx	; cd ..
+	cd math/zxmath ; $(MAKE) mzx	; cd ../..
 
 mzx_tiny.lib:
 	@echo ''
 	@echo '--- Building ZX Spectrum	Tiny Maths Library ---'
 	@echo ''
-	cd zxmath ; $(MAKE) mzx_tiny ; cd ..
+	cd math/zxmath ; $(MAKE) mzx_tiny ; cd ../..
 
 # Native for sprinter -	dom
 pps_clib.lib:
@@ -505,13 +505,13 @@ m81.lib:
 	@echo ''
 	@echo '--- Building ZX 81 Maths	Library	---'
 	@echo ''
-	cd zxmath ; $(MAKE) m81	; cd ..
+	cd math/zxmath ; $(MAKE) m81	; cd ../..
 
 m81_tiny.lib:
 	@echo ''
 	@echo '--- Building ZX 81 Tiny Maths Library ---'
 	@echo ''
-	cd zxmath ; $(MAKE) m81_tiny ; cd ..
+	cd math/zxmath ; $(MAKE) m81_tiny ; cd ../..
 
 # Texas	Instrument's calculators: - stefano/henk
 # almost the same lib code with	different -D flag set
@@ -1026,7 +1026,7 @@ cpc_math.lib:
 	@echo ''
 	@echo '--- Building Amstrad CPC	Maths Libraries	 ---'
 	@echo ''
-	cd cpcmath ; $(MAKE) ; cd ..
+	cd math/cpcmath ; $(MAKE) ; cd ../..
 
 # Commodore 128	(Z80 mode) library - Stefano
 c128ansi_clib.lib:
@@ -1193,7 +1193,10 @@ clean:
 	cd ctype ; $(MAKE) clean ; cd ..
 	cd farz88 ; $(MAKE) clean ; cd ..
 	cd fcntl ; $(MAKE) clean ; cd ..
-	cd genmath ; $(MAKE) clean ; cd	..
+	cd math/genmath ; $(MAKE) clean ; cd ../..
+	cd math/z88math ; $(MAKE) clean ; cd ../..
+	cd math/cpcmath ; $(MAKE) clean ; cd ../..
+	cd math/zxmath ; $(MAKE) clean ; cd ../..
 	cd graphics ; $(MAKE) clean ; cd ..
 	cd malloc ; $(MAKE) clean ; cd ..
 	cd net	  ; $(MAKE) clean ; cd ..
@@ -1208,12 +1211,9 @@ clean:
 	cd time	; $(MAKE) clean	; cd ..
 	cd z80_crt0s; $(MAKE) clean ; cd ..
 	cd z88 ; $(MAKE) clean ; cd ..
-	cd z88math ; $(MAKE) clean ; cd	..
 	cd zxvgs ; $(MAKE) clean ; cd ..
 	$(RM) *.lib
 	cd games ; $(MAKE) clean ; cd ..
-	cd cpcmath ; $(MAKE) clean ; cd	..
-	cd zxmath ; $(MAKE) clean ; cd ..
 	cd adt ; $(MAKE) clean ; cd ..
 	cd balloc ; $(MAKE) clean ; cd ..
 	cd im2 ; $(MAKE) clean ; cd ..
