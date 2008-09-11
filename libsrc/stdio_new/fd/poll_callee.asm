@@ -84,7 +84,7 @@ INCLUDE "stdio.def"
    djnz loop
    
    ld l,c
-   ld h,0                      ; hl = num ready fds
+   ld h,b                      ; hl = num ready fds
    ret
 
 .e_ebadf
