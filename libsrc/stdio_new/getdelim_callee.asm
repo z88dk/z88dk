@@ -26,7 +26,7 @@ INCLUDE "stdio.def"
    ; exit  : hl = num bytes written to buffer, carry reset for success
    ;         hl = -1, carry set for fail
 
-   push hl                     ; stack = char **lineptr
+   push hl
    push de                     ; stack = char **lineptr, uint *n
    
    ld a,(hl)
@@ -189,7 +189,7 @@ INCLUDE "stdio.def"
    ; will need a good realloc implementation for this to work well
 
    ;  ix = FILE *
-   ;  de = bytes remaining in char *ptr
+   ;  de = bytes remaining in char *ptr = 0
    ;  bc = size of string generated thus far
    ;  hl'= end of char *ptr
    ;   c'= delimeter
@@ -202,13 +202,12 @@ INCLUDE "stdio.def"
 
    ; stack = char **lineptr, uint *n, ret, char *ptr
 
-   push de
    push bc
    inc bc
    inc bc                      ; bc = size requested, including space for \0
    call realloc_callee + ASMDISP_REALLOC_CALLEE
    pop bc
-   pop de
+   ld de,0
    ccf
    jr c, nomem                 ; must stop cant get bigger buffer
    
