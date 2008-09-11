@@ -295,6 +295,7 @@ INCLUDE "stdio.def"
    ;              hl = & parameter list
    ;             bc' = total num chars output on stream thus far
    ;             carry flag reset (important for %x, %lx)
+   ;           stack = output buffer, ptr in format string, ret
    ; on exit :   bc' = total num chars output on stream thus far
    ;              hl = & parameter list
    ;         carry set if error on stream, ERRNO set appropriately
