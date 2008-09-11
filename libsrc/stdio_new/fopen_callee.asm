@@ -58,6 +58,7 @@ INCLUDE "stdio.def"
 
    push hl
    push af
+   ld c,a
    call open_callee + ASMDISP_OPEN_CALLEE  ; returns de = fdstruct *
    pop af                      ; a = mode flags
    pop hl                      ; hl = FILE *
