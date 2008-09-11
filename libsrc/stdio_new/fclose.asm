@@ -4,11 +4,16 @@
 XLIB fclose
 
 LIB close, fflush, stdio_free, stdio_rmfilefromlist, l_jpix
+LIB stdio_error_ebadf_mc
 XREF LIBDISP_CLOSE
 
 INCLUDE "stdio.def"
 
 .fclose
+
+   ld a,h
+   or l
+   jp z, stdio_error_ebadf_mc
 
    ; 1. flush the stream and deallocate high level buffers
    ;
