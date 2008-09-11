@@ -63,14 +63,14 @@ INCLUDE "stdio.def"
    push af                     ; a = 0000 0IOA
    ld bc,FILESTR_SZ            ; sizeof(FILE)
    call stdio_malloc
-   pop af                      ; a = 0000 0IOA
-   pop bc                      ; bc = fdstruct *
-   jp nc, stdio_error_enomem_zc
+   jp nc, stdio_error_enomem_zc - 2
    
    ; hl = FILE * (offset -4)
    
    call stdio_addfiletolist    ; hl = FILE * (offset 0)
-   
+   pop af                      ; a = 0000 0IOA
+   pop bc                      ; bc = fdstruct *
+
    ld e,l
    ld d,h
    ld (hl),195                 ; fill in the FILE struct
@@ -83,7 +83,6 @@ INCLUDE "stdio.def"
    ld (hl),a
    
    ex de,hl
-   or a
    ret
 
 defc ASMDISP_FDOPEN_CALLEE = asmentry - fdopen_callee
