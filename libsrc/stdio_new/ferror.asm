@@ -16,7 +16,6 @@ INCLUDE "stdio.def"
    
    ld h,0
    ld l,a
-   or a
    
    bit 0,(ix+3)                ; unget char available?
    ret z                       ; if no return
