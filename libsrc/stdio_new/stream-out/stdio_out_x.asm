@@ -46,7 +46,7 @@ INCLUDE "stdio.def"
    push bc                     ; save width and flags
    ld bc,16                    ; num chars in buffer = 0, radix = 16
 
-   ld hl,STDIO_TEMPBUFSIZE + 7
+   ld hl,STDIO_TEMPBUFSIZE + 9
    add hl,sp                   ; hl = & last char in temporary buffer
    
    call stdio_numprec          ; write number to buffer including precision digits

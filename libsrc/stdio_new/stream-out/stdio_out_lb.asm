@@ -6,9 +6,7 @@ LIB stdio_longnumprec, stdio_outcommon, stdio_nextarg
 
 INCLUDE "stdio.def"
 
-; output %lb parameter, only does 16-bit binary for now.  Thought
-; better not to do 32-bit as this would involve doubling the
-; size of the temporary buffer allocated on the stack.
+; output %lb parameter, handles both 16-bit %b and 32-bit %lb
 ;
 ; enter :    ix  = FILE *
 ;             a = precision
@@ -28,19 +26,11 @@ INCLUDE "stdio.def"
    bit 1,c                     ; check if %lb or %b
    jr z, notlong
 
-if STDIO_MAXPRECISION <= 31
-
-   call stdio_nextarg          ; only doing 16-bits, grab least sig 16-bits of 32-bit parameter
-
-else
-
    push de                     ; save most sig 16-bits
    call stdio_nextarg          ; get next 16-bit word from parameter list
    ex (sp),hl                  ; save & parameter list
    ex de,hl                    ; dehl = long
    jr doneparam
-
-endif
 
 .notlong
 
@@ -59,7 +49,7 @@ endif
    push bc                     ; save width and flags
    ld bc,2                     ; num chars in buffer = 0, radix = 2
    
-   ld ix,STDIO_TEMPBUFSIZE + 7
+   ld ix,STDIO_TEMPBUFSIZE + 9
    add ix,sp                   ; ix = & last char in temporary buffer
    
    call stdio_longnumprec      ; write number to buffer including precision digits

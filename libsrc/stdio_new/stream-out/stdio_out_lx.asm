@@ -69,7 +69,7 @@ INCLUDE "stdio.def"
    push bc                     ; save width and flags
    ld bc,16                    ; num chars in buffer = 0, radix = 16
    
-   ld ix,STDIO_TEMPBUFSIZE + 7
+   ld ix,STDIO_TEMPBUFSIZE + 11
    add ix,sp                   ; ix = & last char in temporary buffer
    
    call stdio_longnumprec      ; write number to buffer including precision digits
