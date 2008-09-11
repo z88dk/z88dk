@@ -3,10 +3,6 @@
 
 XLIB stdio_error_mc
 
-XDEF _errno
-
-._errno defb 0
-
 ; exit : hl = -1 and carry set
 
 .stdio_error_mc
