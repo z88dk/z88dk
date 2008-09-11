@@ -53,9 +53,13 @@ INCLUDE "stdio.def"
 
    bit 2,(ix+3)                ; reading from this stream?
    jr z, flushout
+
+   ld b,1                      ; flush input buffers further down stream
+   ld c,STDIO_MSG_FLSH
+   call l_jpix
    
    bit 0,(ix+3)                ; unget char available?
-   jr z, skipunget
+   jr z, flushout
 
    ld b,2                      ; move file position back 1 char
    ld hl,-1
@@ -66,13 +70,7 @@ INCLUDE "stdio.def"
    
    res 0,(ix+3)                ; unget char is gone now
    
-.skipunget
-
-   ld b,1                      ; flush any input buffers in this stream
-   ld c,STDIO_MSG_FLSH
-   call l_jpix
-   
-   ; next we flush any buffered writes to the device
+   ; next we flush any buffered writes to the driver
    ;
    ; note that this is not the same as an fsync -- an fsync tells the
    ; driver to dump its buffers to the device whereas this tells
@@ -89,5 +87,4 @@ INCLUDE "stdio.def"
 
 .exit
 
-   jp c, stdio_error_mc
    jp stdio_success_znc
