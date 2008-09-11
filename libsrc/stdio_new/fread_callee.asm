@@ -50,9 +50,9 @@ include "stdio.def"
 
    ld c,STDIO_MSG_READ
    call l_jpix
+   inc hl                      ; one more byte actually read by fgetc call above
    pop de                      ; de = size
-   jp c, stdio_error_mc
-   
+
    ex de,hl                    ; hl = size, de = number bytes read
    call l_div_u                ; hl = numbytes / size
    
