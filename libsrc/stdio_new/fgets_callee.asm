@@ -5,7 +5,7 @@ XLIB fgets_callee
 XDEF ASMDISP_FGETS_CALLEE
 
 LIB fgetc, l_jpix
-LIB stdio_error_eacces_zc, stdio_error_einval_zc, stdio_error_zc
+LIB stdio_error_einval_zc, stdio_error_zc
 XREF ASMDISP_FGETC
 
 INCLUDE "stdio.def"
