@@ -12,8 +12,8 @@ INCLUDE "stdio.def"
 
    pop af
    pop bc
-   pop de
    pop hl
+   pop de
    exx
    pop hl
    push af

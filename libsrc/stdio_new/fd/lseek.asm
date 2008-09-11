@@ -9,8 +9,8 @@ XREF ASMDISP_LSEEK_CALLEE
 
    pop af
    pop bc
-   pop de
    pop hl
+   pop de
    exx
    pop hl
    push hl
