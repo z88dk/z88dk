@@ -15,6 +15,7 @@ LIB stdio_atoul_any_stream, l_long_neg
 ;             de' = number of conversions done thus far
 ; on exit :   bc' = total num chars read from stream thus far
 ;             de' = number of conversions done thus far
+;              de = LSW of number (assignment suppression only, not negated)
 ;              hl = & parameter list
 ;             carry set if EOF reached
 
@@ -64,6 +65,7 @@ LIB stdio_atoul_any_stream, l_long_neg
 
 .suppress0
 
-   pop de
+   ex de,hl
+   pop hl
    pop hl
    ret
