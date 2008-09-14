@@ -2,6 +2,8 @@
 ; 05.2008 aralbrec
 
 XLIB stdio_in_i
+XDEF LIBDISP_STDIO_IN_I
+
 LIB stdio_incommon1, stdio_incommon2, stdio_ungetchar, stdio_getchar, stdio_inexit
 LIB asm_isdigit, asm_isxdigit, asm_isodigit, asm_isbdigit, stdio_zeroonstream
 
@@ -23,7 +25,9 @@ LIB asm_isdigit, asm_isxdigit, asm_isodigit, asm_isbdigit, stdio_zeroonstream
 
    call stdio_incommon1        ; leading ws, sign, int *
    ret c
-   
+
+.libentry
+
    ; ix = FILE *
    ;  c = flags [000a*WLN]
    ; hl = & parameter list
@@ -92,3 +96,6 @@ LIB asm_isdigit, asm_isxdigit, asm_isodigit, asm_isbdigit, stdio_zeroonstream
 
    call stdio_ungetchar        ; place first digit back on stream
    jp stdio_incommon2          ; do the rest
+
+
+defc LIBDISP_STDIO_IN_I = libentry - stdio_in_i
