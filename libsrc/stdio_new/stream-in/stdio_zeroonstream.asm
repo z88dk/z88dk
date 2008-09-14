@@ -13,7 +13,7 @@ XLIB stdio_zeroonstream
    xor a                       ; clear carry (no error)
 
    bit 3,c                     ; return if assignment is suppressed
-   ret nz
+   jr nz, skip
    
    ld (de),a                   ; integer = 0
    inc de
@@ -22,4 +22,9 @@ XLIB stdio_zeroonstream
    exx
    inc de                      ; number of conversions increased by one
    exx
+
+.skip
+
+   ld e,a
+   ld d,a                      ; de = 0 (%I requires it)
    ret

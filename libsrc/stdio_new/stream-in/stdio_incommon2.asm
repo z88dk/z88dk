@@ -15,6 +15,7 @@ LIB stdio_atou_any_stream, l_neg
 ;             de' = number of conversions done thus far
 ; on exit :   bc' = total num chars read from stream thus far
 ;             de' = number of conversions done thus far
+;              de = scanned number (not negated)
 ;              hl = & parameter list
 ;             carry set if EOF reached
 
@@ -50,7 +51,8 @@ LIB stdio_atou_any_stream, l_neg
 
 .suppress0
 
-   pop de
+   ex de,hl
+   pop hl
    pop hl
    ret
 
