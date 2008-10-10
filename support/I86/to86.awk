@@ -6,7 +6,7 @@
 #
 # Re-arranged for Z88DK by Stefano Bodrato
 #
-# $Id: to86.awk,v 1.1 2008-10-09 14:54:45 stefano Exp $
+# $Id: to86.awk,v 1.2 2008-10-10 13:36:44 stefano Exp $
 #
 
 
@@ -52,6 +52,9 @@ function save_label() {
         label = substr($0,RSTART,RLENGTH)
         #printf("%d %d",RSTART,RLENGTH)
         sub(label_reg_exp,temp_label)
+        if (match(label,/[.]/)) {
+            if (RSTART == 1) { label = substr(label,2) ":" }
+        }
     }
   #save symbols
         sub(/@/,"czhzi")
@@ -197,12 +200,18 @@ function sub_reg_comma() {
 
 #### look for "(BC),r"
     if (match($0,/^[^; \t]*[ \t]+[^; \t]+[ \t]+[(][Bb][Cc][)],[^; \t]+([; \t]|$)/)) {
-        sub(/[(][Bb][Cc][)],/,"{CX},")
+        if (label != " ") { print label }
+        print instr_tabulator "MOV" instr_tabulator "BP,CX"
+        sub(/[(][Bb][Cc][)],/,"{BP},")
+        reset_label()
     }
 
 #### look for "(DE),r"
     else if (match($0,/^[^; \t]*[ \t]+[^; \t]+[ \t]+[(][Dd][Ee][)],[^; \t]+([; \t]|$)/)) {
-        sub(/[(][Dd][Ee][)],/,"{DX},")
+        if (label != " ") { print label }
+        print instr_tabulator "MOV" instr_tabulator "BP,DX"
+        sub(/[(][Dd][Ee][)],/,"{BP},")
+        reset_label()
     }
 
 #### look for "(HL),r"
@@ -297,12 +306,18 @@ function sub_reg_comma() {
 
 #### look for "r,(BC)"
     if (match($0,/^[^; \t]*[ \t]+[^; \t]+[ \t]+[^; \t]+,[(][Bb][Cc][)]+([; \t]|$)/)) {
-        sub(/,[(][Bb][Cc][)]/,",{CX}")
+        if (label != " ") { print label }
+        print instr_tabulator "MOV" instr_tabulator "BP,CX"
+        sub(/,[(][Bb][Cc][)]/,",{BP}")
+        reset_label()
     }
 
 #### look for "r,(DE)"
     else if (match($0,/^[^; \t]*[ \t]+[^; \t]+[ \t]+[^; \t]+,[(][Dd][Ee][)]+([; \t]|$)/)) {
-        sub(/,[(][Dd][Ee][)]/,",{DX}")
+        if (label != " ") { print label }
+        print instr_tabulator "MOV" instr_tabulator "BP,DX"
+        sub(/,[(][Dd][Ee][)]/,",{BP}")
+        reset_label()
     }
 
 #### look for "r,(HL)"
@@ -356,7 +371,6 @@ function sub_reg_comma() {
 
 #### look for "..,F"
     else if (match($0,/^[^; \t]*[ \t]+[^; \t]+[ \t]+[^; \t]+,[Ff]+([; \t]|$)/)) {
-        save_label()
         if (label != " ") { print label }
         print instr_tabulator "LAHF"
         sub(/,[Ff]/,",AH")
@@ -427,13 +441,13 @@ function sub_bdh(wkg_operand,wkg_str) {
 
     # ToDo: what about AF ?
 
-    wkg_match = wkg_operand "[ \t][Bb][Cc]+([; \t]|$)"
+    wkg_match = wkg_operand "[ \t]+[Bb][Cc]+([; \t]|$)"
     if (match($0,wkg_match)) {
     	    wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "CX")
             return
         }
-    wkg_match = wkg_operand "[ \t][Dd][Ee]+([; \t]|$)"
+    wkg_match = wkg_operand "[ \t]+[Dd][Ee]+([; \t]|$)"
     if (match($0,wkg_match)) {
     	    wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "DX")
@@ -445,13 +459,13 @@ function sub_bdh(wkg_operand,wkg_str) {
             sub(wkg_match,wkg_operand instr_tabulator "BX")
             return
         }
-    wkg_match = wkg_operand "[ \t][Ii][Xx]+([; \t]|$)"
+    wkg_match = wkg_operand "[ \t]+[Ii][Xx]+([; \t]|$)"
     if (match($0,wkg_match)) {
     	    wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "SI")
             return
         }
-    wkg_match = wkg_operand "[ \t][Ii][Yy]+([; \t]|$)"
+    wkg_match = wkg_operand "[ \t]+[Ii][Yy]+([; \t]|$)"
     if (match($0,wkg_match)) {
     	    wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "DI")
@@ -463,31 +477,31 @@ function sub_bdh(wkg_operand,wkg_str) {
             sub(wkg_match,wkg_operand instr_tabulator "AL")
             return
         }
-    wkg_match = wkg_operand "[ \t][Bb]+([; \t]|$)"
+    wkg_match = wkg_operand "[ \t]+[Bb]+([; \t]|$)"
     if (match($0,wkg_match)) {
     	    wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "CH")
             return
         }
-    wkg_match = wkg_operand "[ \t][Cc]+([; \t]|$)"
+    wkg_match = wkg_operand "[ \t]+[Cc]+([; \t]|$)"
     if (match($0,wkg_match)) {
     	    wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "CL")
             return
         }
-    wkg_match = wkg_operand "[ \t][Dd]+([; \t]|$)"
+    wkg_match = wkg_operand "[ \t]+[Dd]+([; \t]|$)"
     if (match($0,wkg_match)) {
     	    wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "DH")
             return
         }
-    wkg_match = wkg_operand "[ \t][Ee]+([; \t]|$)"
+    wkg_match = wkg_operand "[ \t]+[Ee]+([; \t]|$)"
     if (match($0,wkg_match)) {
     	    wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "DL")
             return
         }
-    wkg_match = wkg_operand "[ \t][Ff]+([; \t]|$)"
+    wkg_match = wkg_operand "[ \t]+[Ff]+([; \t]|$)"
     if (match($0,wkg_match)) {
     	    wkg_match = wkg_operand "[ \t]+" wkg_str
             # Todo: fix the label stuff for 'F'
@@ -496,13 +510,13 @@ function sub_bdh(wkg_operand,wkg_str) {
             sub(wkg_match,wkg_operand instr_tabulator "AH")
             return
         }
-    wkg_match = wkg_operand "[ \t][Hh]+([; \t]|$)"
+    wkg_match = wkg_operand "[ \t]+[Hh]+([; \t]|$)"
     if (match($0,wkg_match)) {
     	    wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "BH")
             return
         }
-    wkg_match = wkg_operand "[ \t][Ll]+([; \t]|$)"
+    wkg_match = wkg_operand "[ \t]+[Ll]+([; \t]|$)"
     if (match($0,wkg_match)) {
     	    wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "BL")
@@ -514,7 +528,8 @@ function sub_bdh(wkg_operand,wkg_str) {
 ############ MAIN LOOP ############
 
 
-#### Z80ASM label redefinition
+#### NASM directives redefinition
+
 #### EQU to "DEFC"
     (/^[^;]*[ \t]+[eE][qQ][uU][ \t]/) {
         #save_label()
@@ -758,6 +773,7 @@ function sub_bdh(wkg_operand,wkg_str) {
         
         sub(wkg_str,"" )
 
+	sub(/[Rr][Ee][Tt]/,"RET  ;")
         restore_label()
         print $0
         print new_label ":"
@@ -799,8 +815,8 @@ function sub_bdh(wkg_operand,wkg_str) {
                 sub(/[Aa][Ff],[Aa][Ff]/,"EAX")
                 sub(/EX/,"BSWAP")
             } else {
-            	# Todo: check the best way for non-486 CPU
-                sub(/[Aa][Ff],[Aa][Ff]/,"AX,BP")
+            	# ToDo: check the best way for non-486 CPU
+                sub(/[Aa][Ff],[Aa][Ff]/,"ES,AX")
                 sub(/[Ee][Xx]/,"XCHG")
             }
             print $0
@@ -808,12 +824,13 @@ function sub_bdh(wkg_operand,wkg_str) {
             next
         } else
         {
-            sub(/[Ee][Xx]/,"XCHG"instr_tabulator"DX,BX  ; was: EX")
-            
-	    #wkg_match="[Ee][Xx]"
-	    #wkg_operand="XCHG"
-	    #wkg_oplen=4
-	    #convert_line_comma(wkg_operand, wkg_match, wkg_oplen)
+            # ToDo:  test "EX (SP),HL"
+
+            if (label != " ") { print label }
+            reset_label()
+            print instr_tabulator "POP" instr_tabulator "BP"
+            print instr_tabulator "PUSH" instr_tabulator "BX"
+            print instr_tabulator "MOV" instr_tabulator "BX,BP"
         }
 
         restore_label()
