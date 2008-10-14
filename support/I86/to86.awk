@@ -6,7 +6,7 @@
 #
 # Re-arranged for Z88DK by Stefano Bodrato
 #
-# $Id: to86.awk,v 1.2 2008-10-10 13:36:44 stefano Exp $
+# $Id: to86.awk,v 1.3 2008-10-14 09:15:54 stefano Exp $
 #
 
 
@@ -18,6 +18,7 @@ BEGIN {
  instr_tabulator = "\t" # space between operator and operand on some converted
  lblcnt = 0
  new_label = "L86L0"
+ another_label = "L86L0"
 
  # Record separator
  RS = "\r\n|\n"         # try first CRLF then CR alone
@@ -32,8 +33,8 @@ BEGIN {
 
 function al_comma(wkg_str) {
     if (!match($0,/^[^; \t]*[ \t]+[^; \t]+[ \t]*+[^; \t]+[,]+[^; \t]+*([; \t]|$)/)) {
-	sub(wkg_str,"AL,"wkg_str )
-	return 0
+        sub(wkg_str,"AL,"wkg_str )
+        return 0
     }
     return 1
 }
@@ -123,7 +124,7 @@ function get_operand_block(op_regexp,op_len) {
 function convert_line(wkg_operand, wkg_match, wkg_oplen) {
         save_label()
 
-	sub(wkg_match,wkg_operand)
+        sub(wkg_match,wkg_operand)
 
         wkg_str=get_operand_block(wkg_operand,wkg_oplen)
         if (!sub_ptr(wkg_str)) {
@@ -136,7 +137,7 @@ function convert_line(wkg_operand, wkg_match, wkg_oplen) {
 function convert_line_comma(wkg_operand, wkg_match, wkg_oplen) {
         save_label()
 
-	sub(wkg_match,wkg_operand)
+        sub(wkg_match,wkg_operand)
 
         wkg_str =  get_operand_block(wkg_operand,wkg_oplen)
         al_comma(wkg_str)
@@ -148,7 +149,7 @@ function convert_line_comma(wkg_operand, wkg_match, wkg_oplen) {
 function convert_line_al(wkg_operand, wkg_match, wkg_oplen) {
         save_label()
 
-	sub(wkg_match,wkg_operand)
+        sub(wkg_match,wkg_operand)
 
         wkg_str=get_operand_block(wkg_operand,wkg_oplen)
         if (!sub_ptr(wkg_str)) {
@@ -156,11 +157,11 @@ function convert_line_al(wkg_operand, wkg_match, wkg_oplen) {
         }
 
         wkg_str =  get_operand_block(wkg_operand,wkg_oplen)
-	sub_reg_comma()
-	
+        sub_reg_comma()
+
         wkg_str =  get_operand(wkg_operand,wkg_oplen)
         al_comma(wkg_str)
-        
+
 
         restore_label()
 }
@@ -188,7 +189,7 @@ function sub_reg_comma() {
     if (!match($0,/^[^; \t]*[ \t]+[^; \t]+[ \t]*+[^; \t]+[,]+[^; \t]+*([; \t]|$)/)) {
         sub(/[(]/,"{")
         sub(/[)]/,"}")
-    	return 0
+        return 0
     }
 
 # Substitute CX for BC, DX for DE, or BX for HL in operand field
@@ -443,67 +444,67 @@ function sub_bdh(wkg_operand,wkg_str) {
 
     wkg_match = wkg_operand "[ \t]+[Bb][Cc]+([; \t]|$)"
     if (match($0,wkg_match)) {
-    	    wkg_match = wkg_operand "[ \t]+" wkg_str
+            wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "CX")
             return
         }
     wkg_match = wkg_operand "[ \t]+[Dd][Ee]+([; \t]|$)"
     if (match($0,wkg_match)) {
-    	    wkg_match = wkg_operand "[ \t]+" wkg_str
+            wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "DX")
             return
         }
     wkg_match = wkg_operand "[ \t]+[Hh][Ll]+([; \t]|$)"
     if (match($0,wkg_match)) {
-    	    wkg_match = wkg_operand "[ \t]+" wkg_str
+            wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "BX")
             return
         }
     wkg_match = wkg_operand "[ \t]+[Ii][Xx]+([; \t]|$)"
     if (match($0,wkg_match)) {
-    	    wkg_match = wkg_operand "[ \t]+" wkg_str
+            wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "SI")
             return
         }
     wkg_match = wkg_operand "[ \t]+[Ii][Yy]+([; \t]|$)"
     if (match($0,wkg_match)) {
-    	    wkg_match = wkg_operand "[ \t]+" wkg_str
+            wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "DI")
             return
         }
     wkg_match = wkg_operand "[ \t]+[Aa]+([; \t]|$)"
     if (match($0,wkg_match)) {
-    	    wkg_match = wkg_operand "[ \t]+" wkg_str
+            wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "AL")
             return
         }
     wkg_match = wkg_operand "[ \t]+[Bb]+([; \t]|$)"
     if (match($0,wkg_match)) {
-    	    wkg_match = wkg_operand "[ \t]+" wkg_str
+            wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "CH")
             return
         }
     wkg_match = wkg_operand "[ \t]+[Cc]+([; \t]|$)"
     if (match($0,wkg_match)) {
-    	    wkg_match = wkg_operand "[ \t]+" wkg_str
+            wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "CL")
             return
         }
     wkg_match = wkg_operand "[ \t]+[Dd]+([; \t]|$)"
     if (match($0,wkg_match)) {
-    	    wkg_match = wkg_operand "[ \t]+" wkg_str
+            wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "DH")
             return
         }
     wkg_match = wkg_operand "[ \t]+[Ee]+([; \t]|$)"
     if (match($0,wkg_match)) {
-    	    wkg_match = wkg_operand "[ \t]+" wkg_str
+            wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "DL")
             return
         }
     wkg_match = wkg_operand "[ \t]+[Ff]+([; \t]|$)"
     if (match($0,wkg_match)) {
-    	    wkg_match = wkg_operand "[ \t]+" wkg_str
+            wkg_match = wkg_operand "[ \t]+" wkg_str
             # Todo: fix the label stuff for 'F'
             print label
             print instr_tabulator "LAHF"
@@ -512,13 +513,13 @@ function sub_bdh(wkg_operand,wkg_str) {
         }
     wkg_match = wkg_operand "[ \t]+[Hh]+([; \t]|$)"
     if (match($0,wkg_match)) {
-    	    wkg_match = wkg_operand "[ \t]+" wkg_str
+            wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "BH")
             return
         }
     wkg_match = wkg_operand "[ \t]+[Ll]+([; \t]|$)"
     if (match($0,wkg_match)) {
-    	    wkg_match = wkg_operand "[ \t]+" wkg_str
+            wkg_match = wkg_operand "[ \t]+" wkg_str
             sub(wkg_match,wkg_operand instr_tabulator "BL")
             return
         }
@@ -547,12 +548,11 @@ function sub_bdh(wkg_operand,wkg_str) {
         convert_dollar()
         next
     }
-    
+
 #### "DEFM"/"DEFB" to "db"
     (/^[^; \t]*[ \t]+([Dd][Ee][Ff][MmBb])[ \t]+[^ \t]+([; \t]|$)/) {
         save_label()
-        sub(/''/,"zpcttz")
-        sub("\"",/'/)
+        sub("'","zpcttz")
         sub(/[Dd][Ee][Ff][MmBb]/,"db")
         sub("zpcttz","'")
         restore_label()
@@ -594,7 +594,7 @@ function sub_bdh(wkg_operand,wkg_str) {
 #### Label section end
 
 
-###### DI / EI - let's do it first, because DI is also a register, 
+###### DI / EI - let's do it first, because DI is also a register,
 ###############  and we want to avoid confusion
 
     (/^[^; \t]*[ \t]+([DdEe][Ii])([; \t]|$)/) {
@@ -675,35 +675,35 @@ function sub_bdh(wkg_operand,wkg_str) {
 
         if (match(wkg_str,/[Nn][Zz]$/)) {
            make_new_label()
-           print instr_tabulator "JZ" instr_tabulator new_label           
+           print instr_tabulator "JZ" instr_tabulator new_label
         }
         else if (match(wkg_str,/[Nn][Cc]$/)) {
            make_new_label()
-           print instr_tabulator "JC" instr_tabulator new_label           
+           print instr_tabulator "JC" instr_tabulator new_label
         }
         else if (match(wkg_str,/[Pp][Oo]$/)) {
            make_new_label()
-           print instr_tabulator "JPE" instr_tabulator new_label           
+           print instr_tabulator "JPE" instr_tabulator new_label
         }
         else if (match(wkg_str,/[Pp][Ee]$/)) {
            make_new_label()
-           print instr_tabulator "JPO" instr_tabulator new_label           
+           print instr_tabulator "JPO" instr_tabulator new_label
         }
         else if (match(wkg_str,/[Zz]$/)) {
            make_new_label()
-           print instr_tabulator "JNZ" instr_tabulator new_label           
+           print instr_tabulator "JNZ" instr_tabulator new_label
         }
         else if (match(wkg_str,/[Cc]$/)) {
            make_new_label()
-           print instr_tabulator "JNC" instr_tabulator new_label           
+           print instr_tabulator "JNC" instr_tabulator new_label
         }
         else if (match(wkg_str,/[Pp]$/)) {
            make_new_label()
-           print instr_tabulator "JS" instr_tabulator new_label           
+           print instr_tabulator "JS" instr_tabulator new_label
         }
         else if (match(wkg_str,/[Mm]$/)) {
            make_new_label()
-           print instr_tabulator "JNS" instr_tabulator new_label           
+           print instr_tabulator "JNS" instr_tabulator new_label
         }
         else {
            wkg_str =  get_operand("CALL",3)
@@ -712,7 +712,7 @@ function sub_bdh(wkg_operand,wkg_str) {
            print $0
            next
         }
-        
+
         wkg_str = wkg_str ","
         sub(wkg_str,"" )
 
@@ -723,7 +723,7 @@ function sub_bdh(wkg_operand,wkg_str) {
         print new_label ":"
         next
     }
-    
+
 ###### RET cond,..  else no cond
 ####################################
     (/^[^; \t]*[ \t]+[Rr][Ee][Tt][ \t]+[^ \t]+([; \t]|$)/) {
@@ -735,48 +735,59 @@ function sub_bdh(wkg_operand,wkg_str) {
 
         if (match(wkg_str,/[Nn][Zz]$/)) {
            make_new_label()
-           print instr_tabulator "JZ" instr_tabulator new_label           
+           print instr_tabulator "JZ" instr_tabulator new_label
         }
         else if (match(wkg_str,/[Nn][Cc]$/)) {
            make_new_label()
-           print instr_tabulator "JC" instr_tabulator new_label           
+           print instr_tabulator "JC" instr_tabulator new_label
         }
         else if (match(wkg_str,/[Pp][Oo]$/)) {
            make_new_label()
-           print instr_tabulator "JPE" instr_tabulator new_label           
+           print instr_tabulator "JPE" instr_tabulator new_label
         }
         else if (match(wkg_str,/[Pp][Ee]$/)) {
            make_new_label()
-           print instr_tabulator "JPO" instr_tabulator new_label           
+           print instr_tabulator "JPO" instr_tabulator new_label
         }
         else if (match(wkg_str,/[Zz]$/)) {
            make_new_label()
-           print instr_tabulator "JNZ" instr_tabulator new_label           
+           print instr_tabulator "JNZ" instr_tabulator new_label
         }
         else if (match(wkg_str,/[Cc]$/)) {
            make_new_label()
-           print instr_tabulator "JNC" instr_tabulator new_label           
+           print instr_tabulator "JNC" instr_tabulator new_label
         }
         else if (match(wkg_str,/[Pp]$/)) {
            make_new_label()
-           print instr_tabulator "JS" instr_tabulator new_label           
+           print instr_tabulator "JS" instr_tabulator new_label
         }
         else if (match(wkg_str,/[Mm]$/)) {
            make_new_label()
-           print instr_tabulator "JNS" instr_tabulator new_label           
+           print instr_tabulator "JNS" instr_tabulator new_label
         }
         else {
+           print "; Conversion Error: return condition not understood"
            restore_label()
            print $0
            next
         }
-        
+
         sub(wkg_str,"" )
 
-	sub(/[Rr][Ee][Tt]/,"RET  ;")
+        sub(/[Rr][Ee][Tt]/,"RET  ;")
         restore_label()
         print $0
         print new_label ":"
+        next
+    }
+
+###### RET
+############################
+    (/^[^; \t]*[ \t]+([[Rr][Ee][Tt])([; \t]|$)/) {
+        save_label()
+        sub(/[Rr][Ee][Tt]/,"RET")
+        restore_label()
+        print $0
         next
     }
 
@@ -788,26 +799,95 @@ function sub_bdh(wkg_operand,wkg_str) {
 ## ## ## ##
 
 
+###### LDIR
+############################
+    (/^[^; \t]*[ \t]+([Ll][Dd][Ii][Rr])([; \t]|$)/) {
+        wkg_match="[Ll][Dd][Ii][Rr]"
+        sub(wkg_match,"XCHG" instr_tabulator "BX,SI  ; Was LDIR - ")
+        print $0
+        print instr_tabulator "XCHG" instr_tabulator "DX,DI"
+        # CX is the counter, already..
+        print instr_tabulator "STD"
+        print instr_tabulator "REP" instr_tabulator "MOVSB"
+        print instr_tabulator "XCHG" instr_tabulator "BX,SI"
+        print instr_tabulator "XCHG" instr_tabulator "DX,DI"
+        
+        next
+    }
+
+###### LDDR
+############################
+    (/^[^; \t]*[ \t]+([Ll][Dd][Dd][Rr])([; \t]|$)/) {
+        wkg_match="[Ll][Dd][Dd][Rr]"
+        sub(wkg_match,"XCHG" instr_tabulator "BX,SI  ; Was LDDR - ")
+        print $0
+        print instr_tabulator "XCHG" instr_tabulator "DX,DI"
+        # CX is the counter, already..
+        print instr_tabulator "CLD"
+        print instr_tabulator "REP" instr_tabulator "MOVSB"
+        print instr_tabulator "XCHG" instr_tabulator "BX,SI"
+        print instr_tabulator "XCHG" instr_tabulator "DX,DI"
+        
+        next
+    }
+
+###### LDI
+############################
+    (/^[^; \t]*[ \t]+([Ll][Dd][Ii])([; \t]|$)/) {
+        wkg_match="[Ll][Dd][Ii]"
+        sub(wkg_match,"MOV" instr_tabulator "BP,DX  ; Was LDI - ")
+        print $0
+        print instr_tabulator "MOV" instr_tabulator "AH,[BX]"
+        print instr_tabulator "MOV" instr_tabulator "[BP],AH"
+        print instr_tabulator "INC" instr_tabulator "BX"
+        print instr_tabulator "INC" instr_tabulator "DX"
+        print instr_tabulator "DEC" instr_tabulator "CX"
+        next
+    }
+
+###### LDD
+############################
+    (/^[^; \t]*[ \t]+([Ll][Dd][Dd])([; \t]|$)/) {
+        wkg_match="[Ll][Dd][Dd]"
+        sub(wkg_match,"MOV" instr_tabulator "BP,DX  ; Was LDD - ")
+        print $0
+        print instr_tabulator "MOV" instr_tabulator "AH,[BX]"
+        print instr_tabulator "MOV" instr_tabulator "[BP],AH"
+        print instr_tabulator "DEC" instr_tabulator "BX"
+        print instr_tabulator "DEC" instr_tabulator "DX"
+        print instr_tabulator "DEC" instr_tabulator "CX"
+        next
+    }
 
 #### LD
 ############################
     (/^[^; \t]*[ \t]+([Ll][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
-	wkg_match="[Ll][Dd]"
-	wkg_operand="MOV"
-	wkg_oplen=3
-	convert_line_comma(wkg_operand, wkg_match, wkg_oplen)
+        wkg_match="[Ll][Dd]"
+        wkg_operand="MOV"
+        wkg_oplen=3
+        convert_line_comma(wkg_operand, wkg_match, wkg_oplen)
+        print $0
+        next
+    }
+
+###### EX DE,HL
+    (/^[^; \t]*[ \t]+([Ee][Xx])[ \t]+([HhDd][LlEe][,][DdHh][EeLl])+([; \t]|$)/) {
+        wkg_match="[Ee][Xx]"
+        wkg_operand="XCHG"
+        wkg_oplen=4
+        convert_line_comma(wkg_operand, wkg_match, wkg_oplen)
         print $0
         next
     }
 
 ###### EX - exchange instructions
     (/^[^; \t]*[ \t]+([Ee][Xx])[ \t]+[^ \t]+([; \t]|$)/) {
-        save_label()
-
         sub(/[Ee][Xx]/,"EX")
         wkg_str =  get_operand("EX",2)
-        
+
         if (match(wkg_str,/[Aa][Ff]/)) {
+            ## EX AF,AF
+            save_label()
             if (label != " ") { print label }
             reset_label()
             print instr_tabulator "LAHF"
@@ -815,22 +895,33 @@ function sub_bdh(wkg_operand,wkg_str) {
                 sub(/[Aa][Ff],[Aa][Ff]/,"EAX")
                 sub(/EX/,"BSWAP")
             } else {
-            	# ToDo: check the best way for non-486 CPU
+                # ToDo: check the best way for non-486 CPU
                 sub(/[Aa][Ff],[Aa][Ff]/,"ES,AX")
                 sub(/[Ee][Xx]/,"XCHG")
             }
             print $0
             print instr_tabulator "SAHF"
             next
-        } else
-        {
-            # ToDo:  test "EX (SP),HL"
-
+        } else if (match(wkg_str,/[Dd][Ee]/)) {
+            ## EX DE,HL
+            wkg_match="EX"
+            wkg_operand="XCHG"
+            wkg_oplen=4
+            convert_line_comma(wkg_operand, wkg_match, wkg_oplen)
+            print $0
+            next
+        } else {
+            ## EX (SP),HL
+            # ToDo: Test this one
+            save_label()
             if (label != " ") { print label }
             reset_label()
-            print instr_tabulator "POP" instr_tabulator "BP"
+            sub(/EX/,"POP"instr_tabulator"BP  ; Was: EX")
             print instr_tabulator "PUSH" instr_tabulator "BX"
             print instr_tabulator "MOV" instr_tabulator "BX,BP"
+            restore_label()
+            print $0
+            next
         }
 
         restore_label()
@@ -851,7 +942,7 @@ function sub_bdh(wkg_operand,wkg_str) {
         reset_label()
         print instr_tabulator"DEC"instr_tabulator"CH"
         sub(/[Dd][Jj][Nn][Zz]/,"JNZ")
-	# restore_label has to do the final conversions
+        # restore_label has to do the final conversions
         restore_label()
         print $0
         next
@@ -881,6 +972,17 @@ function sub_bdh(wkg_operand,wkg_str) {
         }
         next
     }
+
+
+###### DAA
+    (/^[^; \t]*[ \t]+([Dd][Aa][Aa])/) {
+        save_label()
+        sub(/[Dd][Aa][Aa]/,"DAA")
+        restore_label()
+        print $0
+        next
+    }
+
 
 ###### HALT
     (/^[^; \t]*[ \t]+([Hh][Aa][Ll][Tt])/) {
@@ -930,7 +1032,7 @@ function sub_bdh(wkg_operand,wkg_str) {
         print $0
         next
     }
-    
+
 ###### RLCA
 ############################
     (/^[^; \t]*[ \t]+([Rr][Ll][Cc][Aa])([; \t]|$)/) {
@@ -938,7 +1040,7 @@ function sub_bdh(wkg_operand,wkg_str) {
         sub(/[Rr][Ll][Cc][Aa]/,"ROL"instr_tabulator"AL,1")
         restore_label()
         print $0
-        
+
         next
     }
 
@@ -972,7 +1074,7 @@ function sub_bdh(wkg_operand,wkg_str) {
         next
     }
 
-###### RLD 
+###### RLD
 ############################
     # ToDo: implement RLD
 
@@ -980,11 +1082,11 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### RLC o
 ############################
     (/^[^; \t]*[ \t]+([Rr][Ll][Cc])([; \t]|$)/) {
-	wkg_match="[Rr][Ll][Cc]"
-	wkg_operand="ROL"
-	wkg_oplen=3
-	convert_line_al(wkg_operand, wkg_match, wkg_oplen)
-	comma_one(wkg_operand, wkg_oplen)
+        wkg_match="[Rr][Ll][Cc]"
+        wkg_operand="ROL"
+        wkg_oplen=3
+        convert_line_al(wkg_operand, wkg_match, wkg_oplen)
+        comma_one(wkg_operand, wkg_oplen)
         print $0
         next
     }
@@ -992,11 +1094,11 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### RRC o
 ############################
     (/^[^; \t]*[ \t]+([Rr][Rr][Cc])([; \t]|$)/) {
-	wkg_match="[Rr][Rr][Cc]"
-	wkg_operand="ROR"
-	wkg_oplen=3
-	convert_line_al(wkg_operand, wkg_match, wkg_oplen)
-	comma_one(wkg_operand, wkg_oplen)
+        wkg_match="[Rr][Rr][Cc]"
+        wkg_operand="ROR"
+        wkg_oplen=3
+        convert_line_al(wkg_operand, wkg_match, wkg_oplen)
+        comma_one(wkg_operand, wkg_oplen)
         print $0
         next
     }
@@ -1006,11 +1108,11 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### SLA o
 ############################
     (/^[^; \t]*[ \t]+([Ss][Ll][Aa])([; \t]|$)/) {
-	wkg_match="[Ss][Ll][Aa]"
-	wkg_operand="SHL"
-	wkg_oplen=3
-	convert_line_al(wkg_operand, wkg_match, wkg_oplen)
-	comma_one(wkg_operand, wkg_oplen)
+        wkg_match="[Ss][Ll][Aa]"
+        wkg_operand="SHL"
+        wkg_oplen=3
+        convert_line_al(wkg_operand, wkg_match, wkg_oplen)
+        comma_one(wkg_operand, wkg_oplen)
         print $0
         next
     }
@@ -1018,11 +1120,11 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### SRL o
 ############################
     (/^[^; \t]*[ \t]+([Ss][Rr][Ll])([; \t]|$)/) {
-	wkg_match="[Ss][Rr][Ll]"
-	wkg_operand="SHR"
-	wkg_oplen=3
-	convert_line_al(wkg_operand, wkg_match, wkg_oplen)
-	comma_one(wkg_operand, wkg_oplen)
+        wkg_match="[Ss][Rr][Ll]"
+        wkg_operand="SHR"
+        wkg_oplen=3
+        convert_line_al(wkg_operand, wkg_match, wkg_oplen)
+        comma_one(wkg_operand, wkg_oplen)
         print $0
         next
     }
@@ -1030,11 +1132,11 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### RL o
 ############################
     (/^[^; \t]*[ \t]+([Rr][Ll])([; \t]|$)/) {
-	wkg_match="[Rr][Ll]"
-	wkg_operand="RCL"
-	wkg_oplen=3
-	convert_line_al(wkg_operand, wkg_match, wkg_oplen)
-	comma_one(wkg_operand, wkg_oplen)
+        wkg_match="[Rr][Ll]"
+        wkg_operand="RCL"
+        wkg_oplen=3
+        convert_line_al(wkg_operand, wkg_match, wkg_oplen)
+        comma_one(wkg_operand, wkg_oplen)
         print $0
         next
     }
@@ -1042,11 +1144,11 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### RR o
 ############################
     (/^[^; \t]*[ \t]+([Rr][Rr])([; \t]|$)/) {
-	wkg_match="[Rr][Rr]"
-	wkg_operand="RCR"
-	wkg_oplen=3
-	convert_line_al(wkg_operand, wkg_match, wkg_oplen)
-	comma_one(wkg_operand, wkg_oplen)
+        wkg_match="[Rr][Rr]"
+        wkg_operand="RCR"
+        wkg_oplen=3
+        convert_line_al(wkg_operand, wkg_match, wkg_oplen)
+        comma_one(wkg_operand, wkg_oplen)
         print $0
         next
     }
@@ -1054,10 +1156,10 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### ADD
 ############################
     (/^[^; \t]*[ \t]+([Aa][Dd][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
-	wkg_match="[Aa][Dd][Dd]"
-	wkg_operand="ADD"
-	wkg_oplen=3
-	convert_line_al(wkg_operand, wkg_match, wkg_oplen)
+        wkg_match="[Aa][Dd][Dd]"
+        wkg_operand="ADD"
+        wkg_oplen=3
+        convert_line_al(wkg_operand, wkg_match, wkg_oplen)
         print $0
         next
     }
@@ -1065,10 +1167,10 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### ADC
 ############################
     (/^[^; \t]*[ \t]+([Aa][Dd][Cc])[ \t]+[^ \t]+([; \t]|$)/) {
-	wkg_match="[Aa][Dd][Cc]"
-	wkg_operand="ADC"
-	wkg_oplen=3
-	convert_line_al(wkg_operand, wkg_match, wkg_oplen)
+        wkg_match="[Aa][Dd][Cc]"
+        wkg_operand="ADC"
+        wkg_oplen=3
+        convert_line_al(wkg_operand, wkg_match, wkg_oplen)
         print $0
         next
     }
@@ -1076,10 +1178,10 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### SUB
 ############################
     (/^[^; \t]*[ \t]+([Ss][Uu][Bb])[ \t]+[^ \t]+([; \t]|$)/) {
-	wkg_match="[Ss][Uu][Bb]"
-	wkg_operand="SUB"
-	wkg_oplen=3
-	convert_line_al(wkg_operand, wkg_match, wkg_oplen)
+        wkg_match="[Ss][Uu][Bb]"
+        wkg_operand="SUB"
+        wkg_oplen=3
+        convert_line_al(wkg_operand, wkg_match, wkg_oplen)
         print $0
         next
     }
@@ -1087,10 +1189,10 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### SBC
 ############################
     (/^[^; \t]*[ \t]+([Ss][Bb][Cc])[ \t]+[^ \t]+([; \t]|$)/) {
-	wkg_match="[Ss][Bb][Cc]"
-	wkg_operand="SBB"
-	wkg_oplen=3
-	convert_line_al(wkg_operand, wkg_match, wkg_oplen)
+        wkg_match="[Ss][Bb][Cc]"
+        wkg_operand="SBB"
+        wkg_oplen=3
+        convert_line_al(wkg_operand, wkg_match, wkg_oplen)
         print $0
         next
     }
@@ -1098,10 +1200,10 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### INC
 ############################
     (/^[^; \t]*[ \t]+([Ii][Nn][Cc])[ \t]/) {
-	wkg_match="[Ii][Nn][Cc]"
-	wkg_operand="INC"
-	wkg_oplen=3
-    	convert_line(wkg_operand, wkg_match, wkg_oplen)
+        wkg_match="[Ii][Nn][Cc]"
+        wkg_operand="INC"
+        wkg_oplen=3
+        convert_line(wkg_operand, wkg_match, wkg_oplen)
         print $0
         next
     }
@@ -1109,10 +1211,10 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### DEC
 ############################
     (/^[^; \t]*[ \t]+([Dd][Ee][Cc])[ \t]/) {
-	wkg_match="[Dd][Ee][Cc]"
-	wkg_operand="DEC"
-	wkg_oplen=3
-    	convert_line(wkg_operand, wkg_match, wkg_oplen)
+        wkg_match="[Dd][Ee][Cc]"
+        wkg_operand="DEC"
+        wkg_oplen=3
+        convert_line(wkg_operand, wkg_match, wkg_oplen)
         print $0
         next
     }
@@ -1120,10 +1222,10 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### AND
 ############################
     (/^[^; \t]*[ \t]+([Aa][Nn][Dd])[ \t]/) {
-	wkg_match="[Aa][Nn][Dd]"
-	wkg_operand="AND"
-	wkg_oplen=3
-	convert_line_al(wkg_operand, wkg_match, wkg_oplen)
+        wkg_match="[Aa][Nn][Dd]"
+        wkg_operand="AND"
+        wkg_oplen=3
+        convert_line_al(wkg_operand, wkg_match, wkg_oplen)
         print $0
         next
     }
@@ -1131,10 +1233,10 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### XOR
 ############################
     (/^[^; \t]*[ \t]+([Xx][Oo][Rr])[ \t]/) {
-	wkg_match="[Xx][Oo][Rr]"
-	wkg_operand="XOR"
-	wkg_oplen=3
-	convert_line_al(wkg_operand, wkg_match, wkg_oplen)
+        wkg_match="[Xx][Oo][Rr]"
+        wkg_operand="XOR"
+        wkg_oplen=3
+        convert_line_al(wkg_operand, wkg_match, wkg_oplen)
         print $0
         next
     }
@@ -1142,21 +1244,89 @@ function sub_bdh(wkg_operand,wkg_str) {
 ###### OR
 ############################
     (/^[^; \t]*[ \t]+([Oo][Rr])[ \t]/) {
-	wkg_match="[Oo][Rr]"
-	wkg_operand="OR"
-	wkg_oplen=2
-	convert_line_al(wkg_operand, wkg_match, wkg_oplen)
+        wkg_match="[Oo][Rr]"
+        wkg_operand="OR"
+        wkg_oplen=2
+        convert_line_al(wkg_operand, wkg_match, wkg_oplen)
         print $0
+        next
+    }
+
+###### CPIR
+############################
+    (/^[^; \t]*[ \t]+([Cc][Pp][Ii][Rr])([; \t]|$)/) {
+        wkg_match="[Cc][Pp][Ii][Rr]"
+        make_new_label()
+        another_label=new_label
+        print another_label ":"
+        sub(wkg_match,"CMP" instr_tabulator "AL,[BX]  ; Was CPIR - ")
+        print $0
+        make_new_label()
+        print instr_tabulator "JZ" instr_tabulator new_label
+        print instr_tabulator "INC" instr_tabulator "BX"
+        print instr_tabulator "DEC" instr_tabulator "CX"
+        print instr_tabulator "JNZ" instr_tabulator another_label
+        print new_label ":"
+        next
+    }
+
+###### CPDR
+############################
+    (/^[^; \t]*[ \t]+([Cc][Pp][Dd][Rr])([; \t]|$)/) {
+        wkg_match="[Cc][Pp][Dd][Rr]"
+        make_new_label()
+        another_label=new_label
+        print another_label ":"
+        sub(wkg_match,"CMP" instr_tabulator "AL,[BX]  ; Was CPDR - ")
+        print $0
+        make_new_label()
+        print instr_tabulator "JZ" instr_tabulator new_label
+        print instr_tabulator "DEC" instr_tabulator "BX"
+        print instr_tabulator "DEC" instr_tabulator "CX"
+        print instr_tabulator "JNZ" instr_tabulator another_label
+        print new_label ":"
+        next
+    }
+
+###### CPI
+############################
+    (/^[^; \t]*[ \t]+([Cc][Pp][Ii])([; \t]|$)/) {
+        wkg_match="[Cc][Pp][Ii]"
+        save_label()
+        sub(wkg_match,"CMP" instr_tabulator "AL,[BX]  ; Was CPI - ")
+        restore_label()
+        print $0
+        make_new_label()
+        print instr_tabulator "JZ" instr_tabulator new_label
+        print instr_tabulator "INC" instr_tabulator "BX"
+        print instr_tabulator "DEC" instr_tabulator "CX"
+        print new_label ":"
+        next
+    }
+
+###### CPD
+############################
+    (/^[^; \t]*[ \t]+([Cc][Pp][Dd])([; \t]|$)/) {
+        wkg_match="[Cc][Pp][Dd]"
+        save_label()
+        sub(wkg_match,"CMP" instr_tabulator "AL,[BX]  ; Was CPD - ")
+        restore_label()
+        print $0
+        make_new_label()
+        print instr_tabulator "JZ" instr_tabulator new_label
+        print instr_tabulator "DEC" instr_tabulator "BX"
+        print instr_tabulator "DEC" instr_tabulator "CX"
+        print new_label ":"
         next
     }
 
 ###### CP
 ############################
     (/^[^; \t]*[ \t]+([Cc][Pp])[ \t]/) {
-	wkg_match="[Cc][Pp]"
-	wkg_operand="CMP"
-	wkg_oplen=3
-	convert_line_al(wkg_operand, wkg_match, wkg_oplen)
+        wkg_match="[Cc][Pp]"
+        wkg_operand="CMP"
+        wkg_oplen=3
+        convert_line_al(wkg_operand, wkg_match, wkg_oplen)
         print $0
         next
     }
@@ -1170,7 +1340,7 @@ function sub_bdh(wkg_operand,wkg_str) {
         wkg_str =  get_operand("[Rr][Ss][Tt]",4)
 
         sub(/[Rr][Ss][Tt]/,temp_xyz)
-        sub(wkg_str,"I_" wkg_str )
+        #sub(wkg_str,"I_" wkg_str )
         sub(temp_xyz,"INT")
 
         restore_label()
@@ -1197,7 +1367,7 @@ function sub_bdh(wkg_operand,wkg_str) {
             wkg_str = get_operand_block("PUSH",4)
             sub_bdh(wkg_operand,wkg_str)
         }
-        
+
         restore_label()
         print $0
         next
@@ -1259,16 +1429,16 @@ function sub_bdh(wkg_operand,wkg_str) {
 
         sub(/[Bb][Ii][Tt]/,"TEST")
 
-	sub_reg_comma()
-	
+        sub_reg_comma()
+
         wkg_str =  get_operand("TEST",4)
         wkg_exponent = 2^wkg_str
-        wkg_str = wkg_str "," 
+        wkg_str = wkg_str ","
         sub(wkg_str,"")
-        
+
         wkg_str =  get_operand("TEST",4)
-	sub(wkg_str,wkg_str "," wkg_exponent "  ; Was a 'bit test' command")
-	
+        sub(wkg_str,wkg_str "," wkg_exponent "  ; Was a 'bit test' command - ")
+
         restore_label()
         print $0
         next
@@ -1281,23 +1451,23 @@ function sub_bdh(wkg_operand,wkg_str) {
 
         sub(/[Ss][Ee][Tt]/,"OR")
 
-	sub_reg_comma()
-	
+        sub_reg_comma()
+
         wkg_str =  get_operand("OR",2)
         wkg_exponent = 2^wkg_str
-        wkg_str = wkg_str "," 
+        wkg_str = wkg_str ","
         sub(wkg_str,"")
-        
+
         wkg_str =  get_operand("OR",2)
-	sub(wkg_str,wkg_str "," wkg_exponent "  ; Was a 'bit set' command")
-	
+        sub(wkg_str,wkg_str "," wkg_exponent "  ; Was a 'bit set' command - ")
+
         restore_label()
         print $0
         next
     }
 
 
-#### Make END be the last line, 
+#### Make END be the last line,
 #### so we get rid of some CP/M rubbish
 ###########################################
     (/^[^; \t]*[ \t]+([eE][nN][dD])([; \t]|$)/) {
