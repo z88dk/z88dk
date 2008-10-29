@@ -5,7 +5,7 @@
 #
 # Re-arranged for Z88DK by Stefano Bodrato
 #
-# $Id: toZ80.awk,v 1.3 2008-06-12 17:23:49 stefano Exp $
+# $Id: toZ80.awk,v 1.4 2008-10-29 18:39:40 stefano Exp $
 #
 
 
@@ -879,12 +879,12 @@ function sub_bdh() {
         save_label()
 
         wkg_str =  get_operand("[Pp][Oo][Pp]",3);
-        #sub(/[Pp][Oo][Pp]/,temp_xyz);
+        sub(/[Pp][Oo][Pp]/,temp_xyz);
         sub_bdh()
         if (match(wkg_str,/[Pp][Ss][Ww]/)) {
             sub(/[Pp][Ss][Ww]/,"AF");
         }
-        #sub(temp_xyz,"POP")
+        sub(temp_xyz,"POP")
 
         restore_label()
         print $0
