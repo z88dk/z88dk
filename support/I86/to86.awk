@@ -6,7 +6,7 @@
 #
 # Re-arranged for Z88DK by Stefano Bodrato
 #
-# $Id: to86.awk,v 1.4 2008-10-29 18:39:40 stefano Exp $
+# $Id: to86.awk,v 1.5 2008-10-30 17:25:36 stefano Exp $
 #
 
 
@@ -30,9 +30,12 @@ BEGIN {
  # At the very beginning, write a header and force the assembler 
  # to produce uppercase global object names
 
- print "; Converted with 'to68.awk', part of the z88dk suite"
+ print
+ print "; Converted with 'to86.awk', part of the z88dk Developement Kit"
+ print "; -------------------------------------------------------------"
  print
  print instr_tabulator "UPPERCASE  ; force 'nasm' to produce uppercase global object names"
+ print
  print
 }
 
@@ -71,8 +74,14 @@ function save_label() {
         sub(/*/,"mzuzl")  #*/  just to fix the colouring of some editor :o)
         sub("/","dzizv")
         sub(/[$]/,"dzozl")
+        sub(/[?]/,"qzezs")
         sub(/[\[]/,"zlzspz")
         sub(/[\]]/,"zrzspz")
+        sub(/['][(][']/,"zlzprz")
+        sub(/['][)][']/,"zrzprz")
+        sub(/['][,][']/,"zczmaz")
+        sub(/['][|][']/,"zpzpez")
+        sub("\\&","zazndz")
 }
 
 function convert_dollar() {
@@ -91,9 +100,15 @@ function restore_label() {
         sub("mzizn","-")
         sub("mzuzl","*")
         sub("dzizv","/")
-        sub("dzozl",/[$]/)
-        sub("zlzspz",/[\[]/)
-        sub("zrzspz",/[\[]/)
+        sub("dzozl","\x24")	# dollar sign
+        sub("qzezs","?")
+        sub("zlzspz","[")
+        sub("zrzspz","]")
+        sub("zlzprz","'('")
+        sub("zrzprz","')'")
+        sub("zczmaz","','")
+        sub("zpzpez","'|'")
+        sub("zazndz","\\&")	# & symbol
   #convert brackets
         sub(/[{]/,"[")
         sub(/[}]/,"]")
@@ -111,9 +126,15 @@ function reset_label() {
         sub("mzizn","-")
         sub("mzuzl","*")
         sub("dzizv","/")
-        sub("dzozl",/[$]/)
-        sub("zlzspz",/[\[]/)
-        sub("zrzspz",/[\[]/)
+        sub("dzozl","\x24")	# dollar sign
+        sub("qzezs","?")
+        sub("zlzspz","[")
+        sub("zrzspz","]")
+        sub("zlzprz","'('")
+        sub("zrzprz","')'")
+        sub("zczmaz","','")
+        sub("zpzpez","'|'")
+        sub("zazndz","\\&")	# & symbol
 }
 
 function get_operand(op_regexp,op_len) {
