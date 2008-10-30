@@ -6,7 +6,7 @@
 #
 # Re-arranged for Z88DK by Stefano Bodrato
 #
-# $Id: to86.awk,v 1.5 2008-10-30 17:25:36 stefano Exp $
+# $Id: to86.awk,v 1.6 2008-10-30 17:44:13 stefano Exp $
 #
 
 
@@ -1356,7 +1356,7 @@ function sub_bdh(wkg_operand,wkg_str) {
             print instr_tabulator "LAHF"
 
             wkg_match="[Dd][Ee][Cc]"
-            wkg_operand="INC"
+            wkg_operand="DEC"
             wkg_oplen=3
 
             convert_line(wkg_operand, wkg_match, wkg_oplen)
