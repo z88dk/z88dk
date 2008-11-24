@@ -221,18 +221,31 @@ int tixx_exec(char *target)
         fwrite("**TI85**\x1a\x0c\x00", 11, 1, fp);
     else if ((ext == E_86P) || (ext == E_86S))
         fwrite("**TI86**\x1a\x0a\x00", 11, 1, fp);
+
+    /* COMMENT */
     writecomment(fp, comment);
+
+    /* DATA SECTION LENGTH */
     if ((ext == E_82P) || (ext == E_83P))
         i = n + 17;
     else if (ext == E_8XP)
-        i = n + 19;
+        //i = n + 19;
+        i = n + 21;
     else if (ext == E_85S)
         i = n + 10 + strlen(str);
     else
         i = n + 18;
     writeword(i, fp);
-    if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP))
+
+    /****************/
+    /* DATA SECTION */
+    /****************/
+
+    /* VARIABLE TYPE MARKER */
+    if ((ext == E_82P) || (ext == E_83P))
         cfwrite("\x0b\0x00", 2, fp, &chk);
+    else if (ext == E_8XP)
+        cfwrite("\x0d\0x00", 2, fp, &chk);
     else if (ext == E_85S)
     {
         i = 4 + strlen(str);
@@ -241,12 +254,16 @@ int tixx_exec(char *target)
     }
     else
         cfwrite("\x0c\0x00", 2, fp, &chk);
+
+
+    /* VARIABLE LENGTH */
     if(ext == E_8XP)
         i = n + 4;
     else
         i = n + 2;
-
     cfwriteword(i, fp, &chk);
+
+    /* VARIABLE TYPE ID BYTE */
     if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP))
         cfwrite("\x06", 1, fp, &chk);
     else if (ext == E_86P)
@@ -254,6 +271,7 @@ int tixx_exec(char *target)
     else if ((ext == E_85S) || (ext == E_86S))
         cfwrite("\x0c", 1, fp, &chk);
 
+    /* VARIABLE NAME */
     i = strlen(str);
     if ((ext == E_85S) || (ext == E_86P) || (ext == E_86S))
         cfwritebyte(i, fp, &chk);
@@ -261,6 +279,16 @@ int tixx_exec(char *target)
     memset(str, 0, 8);
     if (ext != E_85S)
         cfwrite(str, 8 - i, fp, &chk);
+
+    if (ext == E_8XP)
+    {
+        /* VERSION */
+        cfwritebyte(0, fp, &chk);
+        /* FLAG */
+        cfwritebyte(0, fp, &chk);
+    }    
+    
+    /* VARIABLE LENGTH */
     if (ext == E_8XP)
     {
         i = n + 4;
@@ -271,7 +299,6 @@ int tixx_exec(char *target)
         i = n + 2;
         n2 = n;
     }
-
     cfwriteword(i, fp, &chk);
     cfwriteword(n2, fp, &chk);
 
