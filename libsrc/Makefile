@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.129 2008-07-27 21:48:25 aralbrec Exp $
+# $Id: Makefile,v 1.130 2008-12-08 20:58:17 stefano Exp $
 
 
 include	Make.config
@@ -15,7 +15,7 @@ include	Make.config
 all:	genlibs	z88libs	tilibs zxlibs \
 	abc80_clib.lib abc80ansi_clib.lib abc800_clib.lib \
 	aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
-	c128libs cpclibs cpm_clib.lib \
+	c128libs cpclibs cpm_clib.lib m10_clib.lib \
 	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib	nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
 	ozansi_clib.lib	pps_clib.lib ppsansi_clib.lib \
@@ -1113,6 +1113,20 @@ embedded_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORembedded -x$(OUTPUT_DIRECTORY)/embedded_clib @$(LISTFILE_DIRECTORY)/embedded.lst
+
+# Kyocera/Olivetti/TRS/NEC M10/M100 library - Stefano
+m10_clib.lib:
+	@echo ''
+	@echo '--- Building Kyocera M10/M100 Library ---'
+	@echo ''
+	$(MAKE)	gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd	..
+	cd printflike ;	$(MAKE)	; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/m10_clib @$(LISTFILE_DIRECTORY)/m10.lst
 
 # Sega Master system - contributed by Haroldo O. Pinheiro
 sms_clib.lib:

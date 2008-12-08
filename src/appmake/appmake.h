@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.12 2008-04-07 07:44:23 stefano Exp $
+ *   $Id: appmake.h,v 1.13 2008-12-08 20:58:17 stefano Exp $
  */
 
 
@@ -49,6 +49,9 @@ extern option_t  c128_options;
 
 extern int       cpc_exec(char *target);
 extern option_t  cpc_options;
+
+extern int       gal_exec(char *target);
+extern option_t  gal_options;
 
 extern int       hex_exec(char *target);
 extern option_t  hex_options;
@@ -124,6 +127,9 @@ struct {
     { "bin2cpc",  "cpc",      "(C) 2003 Dominic Morris",
       "Creates an AMSDOS file suitable for writing to a .DSK image",
       cpc_exec,   &cpc_options },
+    { "bin2gtp",  "gal",      "(C) 2007 - 2008 Tomaz Solc & Stefano Bodrato",
+      "Creates a tape file image for the Galaksija micro",
+      gal_exec,   &gal_options },
     { "bin2hex",  "hex",      "(C) 2001 Dominic Morris & Jeff Brown",
       "Creates an intel hex record suitable for embedded devices",
       hex_exec,     &hex_options },
@@ -186,7 +192,7 @@ struct {
       zx81_exec,    &zx81_options },
 
 };
-#define APPMAKE_TARGETS 26
+#define APPMAKE_TARGETS 27
 #endif
 
 
@@ -207,3 +213,4 @@ extern void         writestring_p(char *mystring, FILE *fp,unsigned char *p);
 
 extern void         writebyte_cksum(unsigned char c, FILE *fp, unsigned long *cksum);
 extern void         writeword_cksum(unsigned int i, FILE *fp, unsigned long *cksum);
+

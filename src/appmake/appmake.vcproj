@@ -218,6 +218,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\galaksija.c"
+				>
+			</File>
+			<File
 				RelativePath=".\hex.c"
 				>
 			</File>

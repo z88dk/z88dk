@@ -27,6 +27,12 @@ strcasecmp
 
 #include "appmake.h"
 
+#if !defined(__MSDOS__) && !defined(__TURBOC__)
+#ifndef _WIN32
+#define stricmp strcasecmp
+#endif
+#endif
+
 static char             *conf_comment = NULL;
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
@@ -40,10 +46,6 @@ option_t tixx_options[] = {
 {  0,  "comment",  "File comment (42 chars)",    OPT_STR,   &conf_comment },
 {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
-
-#ifndef WIN32
-#define stricmp strcasecmp
-#endif
 
 enum EXT { E_82P, E_83P, E_8XP, E_85S, E_86P, E_86S };
 
