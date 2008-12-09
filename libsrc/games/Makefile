@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.15 2008-07-11 15:10:57 stefano Exp $
+# $Id: Makefile,v 1.16 2008-12-09 17:48:18 stefano Exp $
 
 include	../Make.config
 
@@ -39,6 +39,11 @@ ltrs80:
 lvz:
 	zcc +vz	$(CFLAGS) -DVZ bit_frequency.c
 	zcc +vz	$(CFLAGS) -DVZ bit_play.c
+
+# As for VZ..
+lgal:
+	zcc +gal $(CFLAGS) -DGAL bit_frequency.c
+	zcc +gal $(CFLAGS) -DGAL bit_play.c
 
 # Access to SID (single bit resolution) with a full word address
 lc128:
