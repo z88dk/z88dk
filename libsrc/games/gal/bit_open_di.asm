@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.1 2008-12-09 17:48:18 stefano Exp $
+; $Id: bit_open_di.asm,v 1.2 2008-12-11 16:42:22 stefano Exp $
 ;
 ; Galaksija 1 bit sound functions
 ;
@@ -14,4 +14,5 @@
           ld   a,@10111000
           ld   (snd_tick),a
           di
+          ld   (8248),a
           ret

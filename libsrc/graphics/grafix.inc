@@ -7,9 +7,10 @@
 ;
 ;
 ;       Define for graphics and other standard library functions
+;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,v 1.17 2008-07-17 15:39:56 stefano Exp $
+;	$Id: grafix.inc,v 1.18 2008-12-11 16:42:22 stefano Exp $
 ;
 
 
@@ -122,12 +123,6 @@ IF FORnascom
 	defc maxy	= 48
 ENDIF
 
-IF FORc128
-	DEFINE gotgfx
-	defc maxx	= 80
-	defc maxy	= 50
-ENDIF
-
 IF FORc128hr
 	DEFINE gotgfx
 	defc maxx	= 640
@@ -140,35 +135,66 @@ IF FORc128hr480
 	defc maxy	= 480
 ENDIF
 
-IF FORaquarius
-	DEFINE gotgfx
-	defc maxx	= 80
-	defc maxy	= 72
-ENDIF
 
 IF FORz88
 	DEFINE gotgfx
 	defc	maxx	= 256
 	defc	maxy 	= 64
-
-IF !APPZ88
+   IF !APPZ88
         defc    map_seg	= 192
         defc    map_bk	= $4D3
-ELSE
+   ELSE
         defc    map_seg	= 64     
         defc    map_bk	= $4D1
+   ENDIF
 ENDIF
 
 
+; === Definitions copied from textgfx.inc ===
+
+IF FORaquarius
+	DEFINE gotgfx
+	defc maxx	= 80
+	defc maxy	= 72
+	defc blankch	= 160
 ENDIF
+
+IF FORgal
+	DEFINE gotgfx
+	defc maxx	= 64
+	defc maxy	= 48
+	defc blankch	= 32
+ENDIF
+
+IF FORnascom
+	DEFINE gotgfx
+	defc maxx	= 96
+	defc maxy	= 48
+	defc blankch	= 32
+ENDIF
+
+IF FORtrs80
+	DEFINE gotgfx
+	defc maxx	= 128
+	defc maxy	= 48
+	defc blankch	= 128
+ENDIF
+
+IF FORc128
+	DEFINE gotgfx
+	defc maxx	= 80
+	defc maxy	= 50
+	defc blankch	= 32
+ENDIF
+
+; =============================================
+
 
 ; Catch all to sort things out
 
 IF !gotgfx
 	defc	maxx = 256
 	defc	maxy = 192
-ELSE
-	UNDEFINE gotgfx
 ENDIF
 
 

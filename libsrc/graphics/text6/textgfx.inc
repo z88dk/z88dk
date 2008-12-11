@@ -5,15 +5,9 @@
 ;       Written by Stefano Bodrato 13/12/2006
 ;
 ;
-;	$Id: textgfx.inc,v 1.3 2008-04-07 17:43:30 stefano Exp $
+;	$Id: textgfx.inc,v 1.4 2008-12-11 16:42:22 stefano Exp $
 ;
 
-IF FORtrs80
-	DEFINE gotgfx
-	defc maxx	= 128
-	defc maxy	= 48
-	defc blankch	= 128
-ENDIF
 
 IF FORaquarius
 	DEFINE gotgfx
@@ -22,17 +16,29 @@ IF FORaquarius
 	defc blankch	= 160
 ENDIF
 
+IF FORgal
+	DEFINE gotgfx
+	defc maxx	= 64
+	defc maxy	= 48
+	defc blankch	= 32
+ENDIF
+
 IF FORnascom
 	DEFINE gotgfx
 	defc maxx	= 96
 	defc maxy	= 48
-	defc blankch	= $C0
+	defc blankch	= 32
+ENDIF
+
+IF FORtrs80
+	DEFINE gotgfx
+	defc maxx	= 128
+	defc maxy	= 48
+	defc blankch	= 128
 ENDIF
 
 IF !gotgfx
-	defc	maxx 	= 80
-	defc	maxy 	= 72
-	defc 	blankch	= 32
-ELSE
-	UNDEFINE gotgfx
+	defc	maxx 	= 80	; 40*2
+	defc	maxy 	= 72	; 24*3
+	defc 	blankch	= 32	; SPACE
 ENDIF

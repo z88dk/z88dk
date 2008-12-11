@@ -7,7 +7,7 @@
 ;       Define for graphics and other standard library functions
 ;
 ;
-;	$Id: textgfx.inc,v 1.3 2002-04-17 21:30:25 dom Exp $
+;	$Id: textgfx.inc,v 1.4 2008-12-11 16:42:22 stefano Exp $
 ;
 
 IF FORc128
@@ -25,9 +25,7 @@ IF FORaquarius
 ENDIF
 
 IF !gotgfx
-	defc	maxx 	= 80
-	defc	maxy 	= 48
-	defc 	blankch	= 32
-ELSE
-	UNDEFINE gotgfx
+	defc	maxx 	= 80	; 40*2
+	defc	maxy 	= 48	; 24*2
+	defc 	blankch	= 32	; SPACE
 ENDIF

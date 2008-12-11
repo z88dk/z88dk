@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: gal_crt0.asm,v 1.1 2008-12-09 17:48:18 stefano Exp $
+;       $Id: gal_crt0.asm,v 1.2 2008-12-11 16:42:22 stefano Exp $
 ;
 
 

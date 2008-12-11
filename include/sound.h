@@ -5,11 +5,7 @@
 /*
  *	Sound support code
  *
- *	Stefano, Oct 2001 - First release
- *	         Dec 2001 - Added Mattel Aquarius
- *               Dec 2007 - Various fixes and improvements
- *
- *	$Id: sound.h,v 1.12 2008-07-11 15:10:56 stefano Exp $
+ *	$Id: sound.h,v 1.13 2008-12-11 16:42:21 stefano Exp $
  */
 
 
@@ -57,6 +53,10 @@ extern __LIB__ bit_play(unsigned char melody[]);
 
 #ifdef C128
   #define BEEP_TSTATES 250000.0  /* 2 Mhz.. VIC-II steals time */
+#endif
+
+#ifdef GAL
+  #define BEEP_TSTATES 384000.0  /* 3.072 MHz*/
 #endif
 
 #ifdef MSX

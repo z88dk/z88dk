@@ -5,7 +5,7 @@
 ;       based on the Dominic's sound routines
 ;
 ;
-;       $Id: games.inc,v 1.12 2008-12-09 17:48:18 stefano Exp $
+;       $Id: games.inc,v 1.13 2008-12-11 16:42:22 stefano Exp $
 ;
 
 IF FORc128
@@ -97,4 +97,6 @@ IF FORgal
         defc sndbit_port   = 8248       ; this is a memory address, not a port !
         defc sndbit_bit    = 2
         defc sndbit_mask   = @01000100
+        ;defc sndbit_mask   = 4
 ENDIF
+
