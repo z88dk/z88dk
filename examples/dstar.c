@@ -77,7 +77,7 @@
  *      To get an 80 pixel graphics version of the game (Mattel Aquarius, TRS80, etc):
  *      zcc +aquarius -Dspritesize=5 -create-app dstar.c
  *   
- *      (in the above examples the sprite size can be set to 5,6,7,8 or 16 
+ *      (in the above examples the sprite size can be set to 4,5,6,7,8 or 16 
  *      and sound can optionally be added with some target)
  *
  * * * * * * *
@@ -99,6 +99,7 @@
 #include <sound.h>
 #endif
 
+/* #define spritesize 4   -->  minimalistic, 64x36 pixels  */
 /* #define spritesize 5   -->  very low resolutions, 80x45 pixels  */
 /* #define spritesize 6   -->  TI mode, 96x54  */
 /* #define spritesize 7   -->  TI85/86, VZ200  */

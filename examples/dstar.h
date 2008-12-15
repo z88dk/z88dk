@@ -40,7 +40,7 @@ char Board[144];        /* Space for decompressed Level */
 #define K_CLEAR   '9'
 #endif
 
-#if defined __ZX81__ || defined __VZ200__ || defined __NASCOM__ || defined __TRS80__
+#if defined __ZX81__ || defined __VZ200__ || defined __NASCOM__ || defined __TRS80__ || defined __GAL__
 #define K_UP       'Q'  /* arrow up     */
 #define K_DOWN     'A' /* arrow down   */
 #define K_LEFT     'O'  /* arrow left   */
@@ -63,6 +63,41 @@ char Board[144];        /* Space for decompressed Level */
 
 extern char levels[];
 extern char sprites[];
+
+#if (spritesize == 4)
+#asm
+._sprites
+ defb    4,4
+ defb    @00000000 ; empty sprite
+ defb    @00000000
+ defb    @00000000
+ defb    @00000000
+ 
+ defb    4,4
+ defb    @11100000	;1=edge,
+ defb    @11100000
+ defb    @11100000
+ defb    @00000000
+ 
+ defb    4,4
+ defb    @01000000	;2=bubble
+ defb    @10100000
+ defb    @01000000
+ defb    @00000000
+ 
+ defb    4,4
+ defb    @01000000	;3=moveable ball
+ defb    @11100000
+ defb    @01000000
+ defb    @00000000
+
+ defb    4,4
+ defb    @11100000	;4=moveable block
+ defb    @10100000
+ defb    @11100000
+ defb    @00000000
+#endasm
+#endif
 
 #if (spritesize == 5)
 #asm
