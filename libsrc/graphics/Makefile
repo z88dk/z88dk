@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.19 2008-12-11 16:42:22 stefano Exp $
+# $Id: Makefile,v 1.20 2008-12-31 13:58:11 stefano Exp $
 
 
 lx11:
@@ -9,7 +9,7 @@ lx11:
 
 lc128:
 	cd c128 ; $(MAKE) ; cd ..
-	cd c128_64K ; $(MAKE) ; cd ..
+	cd c128_64k ; $(MAKE) ; cd ..
 
 clean:
 	$(RM) *.o
@@ -18,7 +18,7 @@ clean:
 	$(RM) ace/*.o
 	$(RM) aquarius/*.o
 	cd c128 ; $(MAKE) clean ; cd ..
-	cd c128_64K ; $(MAKE) clean ; cd ..
+	cd c128_64k ; $(MAKE) clean ; cd ..
 	$(RM) cpc/*.o
 	$(RM) gal/*.o
 	$(RM) gray/*.o

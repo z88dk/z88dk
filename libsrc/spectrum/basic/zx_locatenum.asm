@@ -1,6 +1,7 @@
 ;
 ;	ZX Spectrum specific routines
 ;	by Stefano Bodrato, 28/06/2006
+;	Fixed by Antonio Schifano, Dec 2008
 ;
 ;	Locate the numeric variable having name pointed by HL
 ;	Internal routine used by zx_getint and zx_setint
@@ -8,21 +9,26 @@
 ;	Carry flag is set on error
 ;
 ;
-;	$Id: zx_locatenum.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $
+;	$Id: zx_locatenum.asm,v 1.2 2008-12-31 13:58:11 stefano Exp $
 ;
+;	vars format:
+;
+;	single char name:	a fp5 (a lower case)
+;	multi char name: 	a1+$40 a2 ... an|$80 v (ak lower case)
+;	for single char name:	a|$80 v vt vs (a lower case)
 
 	XLIB	zx_locatenum
 	
 zx_locatenum:
 
-	ld	a,(hl)
+	ex	de,hl
+	ld	a,(de)
 	
 	and	a
-	jr	nz,notempty
 	scf
-	ret
-notempty:
-	or	32
+	ret	z		; Return with carry set if Z
+
+	or	32		; make it lower case
 	ld	c,a		; keep the first letter
 	
 	push	hl
