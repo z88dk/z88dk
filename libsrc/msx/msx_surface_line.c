@@ -7,7 +7,7 @@
 
 	Draw a line on a surface
 	
-	$Id: msx_surface_line.c,v 1.1 2009-01-07 09:50:15 stefano Exp $
+	$Id: msx_surface_line.c,v 1.2 2009-01-07 18:27:22 stefano Exp $
 */
 
 #include <msx.h>
@@ -20,7 +20,7 @@ void msx_surface_line(surface_t *s, int x1, int y1, int x2, int y2) {
 	unsigned int addr;
 	unsigned char* data, bit;
 
-	msx_compute_line(x1, y1, x2, y2, (line_t *)&LINE_T_FIRST);
+	msx_compute_line(x1, y1, x2, y2, (line_t *)(&LINE_T_FIRST));
 
 	data = s->data.ram;
 	addr = map_pixel(x1, y1);

@@ -7,7 +7,7 @@
 
 	Draw a line on video (slow)
 	
-	$Id: msx_line_slow.c,v 1.1 2009-01-07 09:50:15 stefano Exp $
+	$Id: msx_line_slow.c,v 1.2 2009-01-07 18:27:22 stefano Exp $
 */
 
 #include <msx.h>
@@ -22,7 +22,7 @@ void msx_line_slow(int x1, int y1, int x2, int y2)
 	unsigned int addr, last;
 	unsigned char value;
 
-	msx_compute_line(x1, y1, x2, y2, (line_t *)&LINE_T_FIRST);
+	msx_compute_line(x1, y1, x2, y2, (line_t *)(&LINE_T_FIRST));
 
 	x = x1;
 	y = y1;

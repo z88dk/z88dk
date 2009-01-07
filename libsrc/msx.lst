@@ -5,6 +5,7 @@ fcntl/cpm/bdos
 fcntl/cpm/close
 fcntl/cpm/creat
 fcntl/cpm/getfcb
+fcntl/cpm/lseek
 fcntl/cpm/open
 fcntl/cpm/open_z88
 fcntl/cpm/parsefcb

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.11 2009-01-07 09:50:15 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.12 2009-01-07 18:27:22 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -61,6 +61,7 @@ IF (!DEFINED_startup | (startup=1))
         ENDIF
                 org     myzorg
 ELSE
+	XDEF	__fcb		;file control block
         org     $100		; MSXDOS
 ENDIF
 
@@ -111,8 +112,9 @@ ENDIF
 
 ; ** IF MSXDOS mode, handle argv, argc... **
 IF (startup=2)
-	ld	c,25		;Set the default disc
-	call	5
+	;ld	c,25		;Save the default disc
+	;call	5
+	ld	a,($F306)
 	ld	(defltdsk),a
 
 ; Push pointers to argv[n] onto the stack now
@@ -165,9 +167,10 @@ IF (startup=2)
 	pop	bc	;kill argc
 
 	ld	a,(defltdsk)	;Restore default disc
-	ld	e,a
-	ld	c,14
-	call	5
+	ld	($F306),a
+	;ld	e,a
+	;ld	c,14
+	;call	5
 ELSE
 ;** If NOT MSXDOS mode, just get rid of BASIC screen behaviour **
 	ld	ix,$CC	; Hide function key strings
@@ -251,10 +254,15 @@ IF DEFINED_NEED1bitsound
 ENDIF
 
 ;Seed for integer rand() routines
-
 IF !DEFINED_HAVESEED
 		XDEF    _std_seed        ;Integer rand() seed
 ._std_seed       defw    0       ; Seed for integer rand() routines
+ENDIF
+
+IF (startup=2)
+  IF !DEFINED_nofileio
+.__fcb		defs	420,0	;file control block (10 files) (MAXFILE)
+  ENDIF
 ENDIF
 
 ;Atexit routine
