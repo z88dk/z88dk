@@ -4,17 +4,21 @@
 ;
 ;	void msx_vpoke(int address, int value);
 ;
-;	Write the MSX video memory
+;	Improved functions by Rafael de Oliveira Jannone
+;	Originally released in 2004 for GFX - a small graphics library
 ;
-;	$Id: msx_vpoke.asm,v 1.2 2007-12-07 11:28:59 stefano Exp $
+;	$Id: msx_vpoke.asm,v 1.3 2009-01-07 09:50:15 stefano Exp $
 ;
 
 	XLIB	msx_vpoke
 	LIB	msxbios
 	
-        INCLUDE "#msxbios.def"
+        ;INCLUDE "#msxbios.def"
+        INCLUDE "#msx.def"
+
 
 msx_vpoke:
+
 	pop	bc
 	pop	de
 	pop	hl
@@ -22,5 +26,22 @@ msx_vpoke:
 	push	de	; value
 	push	bc	; RET address
 	ld	a,e
-	ld	ix,WRTVRM
-	jp	msxbios
+	;ld	ix,WRTVRM
+	;jp	msxbios
+
+	; enter vdp address pointer
+	push	af
+	ld a,l
+	di
+	out (VDP_CMD), a
+	ld a,h
+	and @00111111
+	or  @01000000
+	ei
+	out (VDP_CMD), a
+
+	; enter data
+	pop  af
+	out (VDP_DATA), a
+
+	ret

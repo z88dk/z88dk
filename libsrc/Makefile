@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.131 2008-12-09 17:48:18 stefano Exp $
+# $Id: Makefile,v 1.132 2009-01-07 09:50:15 stefano Exp $
 
 
 include	Make.config
@@ -915,6 +915,7 @@ msx_clib.lib:
 	@echo '--- Building MSX	Library	 ---'
 	@echo ''
 	$(MAKE)	gfxdeps
+	cd fcntl ; $(MAKE) lcpm	; cd ..
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
@@ -923,6 +924,7 @@ msx_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE)	gamesdeps
 	cd games ; $(MAKE) lmsx	; cd ..
+	cd msx ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
 # NASCOM library - Stefano

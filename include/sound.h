@@ -5,7 +5,7 @@
 /*
  *	Sound support code
  *
- *	$Id: sound.h,v 1.13 2008-12-11 16:42:21 stefano Exp $
+ *	$Id: sound.h,v 1.14 2009-01-07 09:50:15 stefano Exp $
  */
 
 

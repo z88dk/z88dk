@@ -7,7 +7,7 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: msx_sound.asm,v 1.1 2007-12-13 11:28:42 stefano Exp $
+;	$Id: msx_sound.asm,v 1.2 2009-01-07 09:50:15 stefano Exp $
 ;
 
 	XLIB	msx_sound
@@ -16,14 +16,15 @@
         INCLUDE "#msxbios.def"
 
 msx_sound:
-	pop	hl
-	pop	de	; value in E
+
 	pop	bc
-	push	bc
 	pop	de
 	pop	hl
+	push	hl
+	push	de
+	push	bc
 	
-	ld	a,c	; register number
+	ld	a,l
 	
-	ld	ix,WRTPSG
+	ld	ix, WRTPSG
 	jp	msxbios

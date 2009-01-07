@@ -5,7 +5,7 @@
  *
  *      djm 9/1/2000
  *
- *	$Id: time.h,v 1.11 2008-12-11 16:42:22 stefano Exp $
+ *	$Id: time.h,v 1.12 2009-01-07 09:50:15 stefano Exp $
  */
 
 

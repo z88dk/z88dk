@@ -1,0 +1,15 @@
+lstoff
+
+; MSX related constants
+;
+; December 2008
+; $Id: msx.def,v 1.1 2009-01-07 09:50:15 stefano Exp $
+;
+
+
+; VDP 
+defc VDP_DATA = $98
+defc VDP_CMD  = $99
+
+
+lston

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.10 2007-12-18 13:17:41 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.11 2009-01-07 09:50:15 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -109,9 +109,72 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
+; ** IF MSXDOS mode, handle argv, argc... **
+IF (startup=2)
+	ld	c,25		;Set the default disc
+	call	5
+	ld	(defltdsk),a
+
+; Push pointers to argv[n] onto the stack now
+; We must start from the end 
+	ld	hl,0	;NULL pointer at end, just in case
+	push	hl
+	ld	hl,$80
+	ld	a,(hl)
+	ld	b,0
+	and	a
+	jr	z,argv_done
+	ld	c,a
+	add	hl,bc	;now points to the end
+; Try to find the end of the arguments
+.argv_loop_1
+	ld	a,(hl)
+	cp	' '
+	jr	nz,argv_loop_2
+	ld	(hl),0
+	dec	hl
+	dec	c
+	jr	nz,argv_loop_1
+; We've located the end of the last argument, try to find the start
+.argv_loop_2
+	ld	a,(hl)
+	cp	' '
+	jr	nz,argv_loop_3
+	ld	(hl),0
+	inc	hl
+	push	hl
+	inc	b
+	dec	hl
+.argv_loop_3
+	dec	hl
+	dec	c
+	jr	nz,argv_loop_2
+
+.argv_done
+	ld	hl,end	;name of program (NULL)
+	push	hl
+	inc	b
+	ld	hl,0
+	add	hl,sp	;address of argv
+	ld	c,b
+	ld	b,0
+	push	bc	;argc
+	push	hl	;argv
+        call    _main		;Call user code
+	pop	bc	;kill argv
+	pop	bc	;kill argc
+
+	ld	a,(defltdsk)	;Restore default disc
+	ld	e,a
+	ld	c,14
+	call	5
+ELSE
+;** If NOT MSXDOS mode, just get rid of BASIC screen behaviour **
 	ld	ix,$CC	; Hide function key strings
 	call	msxbios
         call    _main
+ENDIF
+;**
 	
 .cleanup
 ;
@@ -179,7 +242,7 @@ ENDIF
 ; ---------------
 ; Misc Variables
 ; ---------------
-
+.defltdsk       defb    0	; Default disc
 .coords         defw    0       ; Current graphics xy coordinates
 
 
@@ -189,7 +252,10 @@ ENDIF
 
 ;Seed for integer rand() routines
 
-._std_seed	 defw    0
+IF !DEFINED_HAVESEED
+		XDEF    _std_seed        ;Integer rand() seed
+._std_seed       defw    0       ; Seed for integer rand() routines
+ENDIF
 
 ;Atexit routine
 
@@ -207,7 +273,7 @@ ENDIF
 ; mem stuff
 
          defm  "Small C+ MSX"
-	 defb	0
+.end	 defb	0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library
