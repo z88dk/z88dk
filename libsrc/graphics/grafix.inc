@@ -10,7 +10,7 @@
 ;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,v 1.18 2008-12-11 16:42:22 stefano Exp $
+;	$Id: grafix.inc,v 1.19 2009-01-09 08:36:53 stefano Exp $
 ;
 
 
@@ -115,12 +115,6 @@ IF FORoz
 	defc row_bytes	= 30
 	defc maxx	= 239
 	defc maxy	= 80
-ENDIF
-
-IF FORnascom
-	DEFINE gotgfx
-	defc maxx	= 96
-	defc maxy	= 48
 ENDIF
 
 IF FORc128hr

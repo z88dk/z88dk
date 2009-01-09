@@ -1,7 +1,7 @@
 #
 # Build the MSX target libraries
 #
-# $Id: Makefile,v 1.1 2009-01-07 09:50:15 stefano Exp $
+# $Id: Makefile,v 1.2 2009-01-09 08:36:53 stefano Exp $
 #
 
 include ../Make.config
@@ -48,4 +48,4 @@ all:    $(AOBJECTS)
 	zcc +msx $(CFLAGS) $*.c
 
 clean:
-	$(RM) *.o* *.sym *.map zcc_opt.def *.i $(AFILES)
+	$(RM) *.o* *.sym *.map zcc_opt.def *.i
