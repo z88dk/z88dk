@@ -5,6 +5,7 @@ stdio/puts_cons
 fcntl/cpm/bdos
 fcntl/cpm/close
 fcntl/cpm/creat
+fcntl/cpm/fdtell
 fcntl/cpm/getfcb
 fcntl/cpm/lseek
 fcntl/cpm/open

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.6 2009-01-07 18:27:22 stefano Exp $
+# $Id: Makefile,v 1.7 2009-01-12 12:27:11 stefano Exp $
 
 include ../../Make.config
 
@@ -10,6 +10,7 @@ CFILES = \
 	bdos.c \
 	close.c \
 	creat.c \
+	fdtell.c \
 	getfcb.c \
 	lseek.c \
 	open.c \

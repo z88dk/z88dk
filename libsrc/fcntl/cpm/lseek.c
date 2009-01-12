@@ -1,32 +1,70 @@
 /*
  *	long lseek(int fd, long posn, int whence)
  *
- *	Generic version, crap: it is slow and it will work well
- *	only if we are at beginning of file (i.e. file newly opened) !
- *
  *	0	SEEK_SET from start of file
  *	1	SEEK_CUR from current position
  *	2	SEEK_END from end of file (always -ve)
  *
- *	$Id: lseek.c,v 1.1 2009-01-07 18:27:22 stefano Exp $
+ *	$Id: lseek.c,v 1.2 2009-01-12 12:27:11 stefano Exp $
 */
 
 #include <fcntl.h>
 #include <stdio.h>
+#include <cpm.h>
 
 
-long lseek(int handle, long posn, int whence)
+long
+_fsize(fd)
+uchar	fd;
 {
-	long	position;
+	struct	fcb *fc;
+	long	tmp;
+	int	luid;
+
+	if(fd >= MAXFILE)
+		return -1;
 	
-	if (whence == SEEK_END) {
-		position=0;
-		// Move up to end of file
-		while (readbyte(handle) != EOF)
-			position++;
-	}
-	else {
-		for ( position=0; (position!=posn) && (readbyte(handle) != EOF); position++);
-	}
-	return (position);
+	fc = &_fcb[fd];
+	
+	luid = getuid();
+	setuid(fc->uid);
+	bdos(CPM_CFS, fc);
+	setuid(luid);
+	
+	tmp = (long)fc->ranrec[0] + ((long)fc->ranrec[1] << 8) + ((long)fc->ranrec[2] << 16);
+	tmp *= SECSIZE;
+	if(tmp > fc->rwptr)
+		return tmp;
+	return fc->rwptr;
 }
+
+
+long lseek(int fd,long posn, int whence)
+{
+	struct	fcb *fc;
+	long	pos;
+
+	if(fd >= MAXFILE)
+		return -1;
+	fc = &_fcb[fd];
+	switch(whence) {
+
+	default:
+		pos = posn;
+		break;
+
+	case 1:
+		pos = fc->rwptr + posn;
+		break;
+
+	case 2:
+		pos = posn + _fsize(fd);
+		break;
+	}
+	if(pos >= 0) {
+		fc->rwptr = pos;
+		return fc->rwptr;
+	}
+	return -1;
+}
+

@@ -5,5 +5,5 @@ open_z88
 readbyte
 remove
 rename
-tell
+fdtell
 writebyte
