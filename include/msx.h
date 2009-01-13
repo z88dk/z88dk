@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.5 2009-01-07 09:50:15 stefano Exp $
+ * $Id: msx.h,v 1.6 2009-01-13 20:58:07 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -159,7 +159,7 @@ extern void __LIB__ msx_vmerge(unsigned int addr, unsigned char value);
 extern void __LIB__ msx_set_vdp(int reg, int value);
 
 // Get a value from a VDP register
-extern int __LIB__ __FASTCALL__ msx_get_vdp(int reg);
+extern unsigned char __LIB__ __FASTCALL__ msx_get_vdp(unsigned char);
 
 // Set point at the given position on VRAM
 extern void __LIB__ msx_pset(int x, int y);
@@ -268,6 +268,13 @@ extern void __LIB__ msx_blit_fill_vram(unsigned int dest, unsigned char value, u
 // Set the sprite mode
 extern void __LIB__ msx_set_sprite_mode(unsigned char mode);
 
+// Sprite modes
+enum sprite_mode {
+	sprite_default = 0,
+	sprite_scaled = 1,
+	sprite_large = 2
+};
+
 // Set the sprite handle with the shape from data (small size)
 extern void __LIB__ msx_set_sprite_8(unsigned char handle, void* data);
 
@@ -287,13 +294,6 @@ typedef struct {
         unsigned char handle;	///< internal vdp handle
         unsigned char color;	///< sprite color
 } sprite_t;
-
-// Sprite modes
-enum sprite_mode {
-	sprite_default = 0,
-	sprite_scaled = 1,
-	sprite_large = 2
-};
 
 
 
@@ -391,11 +391,15 @@ extern void __LIB__ msx_compute_line(int x1, int y1, int x2, int y2, line_t *r);
 /************************************************************************/
 /************************************************************************/
 
-extern unsigned char dithpat[];
+extern unsigned char *dithpat;
+// Now force the linking of the external data structure
+#asm
+LIB _dithpat
+#endasm
 
 // get a dithered pattern of intensity \a I on the screen line \a Y
 //#define DITHER(I, Y)	(dithpat[I][Y & 1])
-#define DITHER(I, Y)	(dithpat[(I<<1)+(Y & 1)))
+#define DITHER(I, Y)	(dithpat[(I<<1)+(Y & 1)])
 
 // Draw a line on a surface
 extern void __LIB__ msx_surface_line(surface_t *s, int x1, int y1, int x2, int y2);
