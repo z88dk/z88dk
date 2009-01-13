@@ -13,7 +13,7 @@ Contact the author:
 	ICQ UIN   : 10115284
 
 
-$Id: gfx.h,v 1.1 2009-01-07 09:50:15 stefano Exp $
+$Id: gfx.h,v 1.2 2009-01-13 17:48:01 stefano Exp $
 
 
 =========================================================================*/
@@ -35,9 +35,10 @@ $Id: gfx.h,v 1.1 2009-01-07 09:50:15 stefano Exp $
 #define MSXGFX_H
 
 
-#include <stdlib.h>
 #include <msx/defs.h>
+#include <stdlib.h>
 #include <msx.h>
+#include <string.h>
 
 // --- library functions / enums
 

@@ -7,10 +7,11 @@
 
 	Calculate a triangle side
 	
-	$Id: msx_calculate_side.c,v 1.1 2009-01-07 09:50:15 stefano Exp $
+	$Id: msx_calculate_side.c,v 1.2 2009-01-13 17:48:01 stefano Exp $
 */
 
 #include <msx.h>
+#include <msx/defs.h>
 
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))

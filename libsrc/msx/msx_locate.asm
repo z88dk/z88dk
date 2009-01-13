@@ -8,9 +8,9 @@
 ;
 ;	extern void msx_locate(unsigned char x, unsigned char y);
 ;
-;	Fills a VRAM portion with the given value
+;	Move the screen cursor to a given position
 ;
-;	$Id: msx_locate.asm,v 1.1 2009-01-07 09:50:15 stefano Exp $
+;	$Id: msx_locate.asm,v 1.2 2009-01-13 17:48:01 stefano Exp $
 ;
 
 

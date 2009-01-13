@@ -5,7 +5,7 @@
  *
  *      djm 27/4/99
  *
- *	$Id: fcntl.h,v 1.9 2008-05-13 20:24:40 stefano Exp $
+ *	$Id: fcntl.h,v 1.10 2009-01-13 17:48:01 stefano Exp $
  */
 
 
@@ -36,7 +36,6 @@ extern int __LIB__ close(int fd);
 extern size_t __LIB__ read(int fd, void *ptr, size_t len);
 extern size_t __LIB__ write(int fd, void *ptr, size_t len);
 extern long __LIB__ lseek(int fd,long posn, int whence);
-extern long __LIB__ tell(int fd);
 
 extern int __LIB__ __FASTCALL__ readbyte(int fd);
 extern int __LIB__ writebyte(int fd, int c);
