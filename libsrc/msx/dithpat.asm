@@ -6,14 +6,14 @@
 ;
 ;	Public pattern for variable intensity dither
 ;
-;	$Id: dithpat.asm,v 1.1 2009-01-07 09:50:15 stefano Exp $
+;	$Id: dithpat.asm,v 1.2 2009-01-13 17:52:06 stefano Exp $
 ;
 
 
-	XLIB	dithpat
+	XLIB	_dithpat
 	
 
-dithpat:
+_dithpat:
 	
 	defb	00000000B
 	defb	00000000B
