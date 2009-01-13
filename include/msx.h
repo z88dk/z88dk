@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.6 2009-01-13 20:58:07 stefano Exp $
+ * $Id: msx.h,v 1.7 2009-01-13 21:23:17 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -133,6 +133,7 @@ extern void __LIB__ msx_vpoke(int address, int value);
 
 // VRAM block write
 extern void __LIB__ msx_vwrite(void* source, unsigned int dest, unsigned int count);
+extern void __LIB__ msx_vwrite_direct(void* source, unsigned int dest, unsigned int count);
 
 // VRAM fill
 extern void __LIB__ msx_vfill(unsigned int addr, unsigned char value, unsigned int count);

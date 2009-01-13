@@ -108,6 +108,7 @@ msx/msx_vfill
 msx/msx_vfill_v
 msx/msx_vread
 msx/msx_vwrite
+msx/msx_vwrite_direct
 msx/msx_vmerge
 msx/msx_vpeek
 msx/msx_vpoke
