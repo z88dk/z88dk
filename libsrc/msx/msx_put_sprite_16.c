@@ -7,7 +7,7 @@
 
 	Set screen to mangled mode (screen 1 + 2)
 	
-	$Id: msx_put_sprite_16.c,v 1.1 2009-01-07 09:50:15 stefano Exp $
+	$Id: msx_put_sprite_16.c,v 1.2 2009-01-14 07:07:21 stefano Exp $
 */
 
 #include <msx.h>
@@ -22,5 +22,5 @@ void msx_put_sprite_16(unsigned char id, int x, int y, unsigned char handle, uns
 	sp.x = x;
 	sp.handle = (handle << 2);
 	sp.color = color;
-	msx_vwrite(&sp, 6912 + (id << 2), 4);
+	msx_vwrite_direct(&sp, 6912 + (id << 2), 4);
 }

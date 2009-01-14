@@ -4,11 +4,11 @@
 ;	GFX - a small graphics library 
 ;	Copyright (C) 2004  Rafael de Oliveira Jannone
 ;
-;	extern void msx_vwrite(void *source, u_int dest, u_int count)
+;	extern void msx_vwrite_direct(void *source, u_int dest, u_int count)
 ;
-;	Transfer count bytes from RAM to VRAM (current memory page)
+;	Transfer count bytes from RAM (current memory page) to VRAM
 ;
-;	$Id: msx_vwrite_direct.asm,v 1.1 2009-01-13 21:24:29 stefano Exp $
+;	$Id: msx_vwrite_direct.asm,v 1.2 2009-01-14 07:07:21 stefano Exp $
 ;
 
 
