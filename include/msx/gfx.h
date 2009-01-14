@@ -13,7 +13,7 @@ Contact the author:
 	ICQ UIN   : 10115284
 
 
-$Id: gfx.h,v 1.2 2009-01-13 17:48:01 stefano Exp $
+$Id: gfx.h,v 1.3 2009-01-14 16:07:40 stefano Exp $
 
 
 =========================================================================*/
@@ -136,7 +136,7 @@ extern void *put_sprite(unsigned char, int, int, unsigned char, unsigned char);
 
 
 /// set the sprite \a handle, with the shape from \a data (big size)
-#define set_sprite_16(handle,data) msx_set_sprite_8(handle,data)
+#define set_sprite_16(handle,data) msx_set_sprite_16(handle,data)
 
 /// put the sprite with \a id and shape from \a handle, into the given position with \a color (small size)
 #define put_sprite_8(id,x,y,handle,color) msx_put_sprite_8(id,x,y,handle,color)
