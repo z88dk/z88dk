@@ -16,6 +16,11 @@ Contact the author:
 	homepage  : http://jannone.org/gfxlib
 	ICQ UIN   : 10115284
 
+=========================================================================
+	
+Z88DK Version.
+Compile with:   zcc +msx -lm -startup=2 ex5.c
+
 =========================================================================*/
 
 #include <stdlib.h>
@@ -55,7 +60,7 @@ main() {
 
 	// clear the off-screen surface
 	printf("clearing buffer...\n");
-	memset(buf, MODE2_MAX, 0);
+	memset(buf, 0, MODE2_MAX);
 
 	printf("drawing...\n");
 	surf.data.ram = buf;
