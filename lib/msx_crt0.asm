@@ -2,13 +2,14 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.12 2009-01-07 18:27:22 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.13 2009-01-21 16:32:34 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
 ;
 ;	#pragma no-streams      - No stdio disc files
+;	#pragma no-fileio       - No fileio at all
 ;	#pragma no-protectmsdos - strip the MS-DOS protection header
 ;
 ;	These can cut down the size of the resultant executable
@@ -45,8 +46,10 @@
 
         XDEF    __sgoioblk
 
+; Graphics stuff
+	XDEF	pixelbyte	;Temp store for non-buffered mode
         XDEF    coords          ;Current xy position
-;
+
 ; MSX platform specific stuff
 ;
         XDEF    msxbios
@@ -177,6 +180,9 @@ ELSE
 	call	msxbios
         call    _main
 ENDIF
+	ld	ix,$5F	; CHGMOD - set graphics mode
+	ld	a,0	; Text mode
+	call	msxbios
 ;**
 	
 .cleanup
@@ -247,6 +253,8 @@ ENDIF
 ; ---------------
 .defltdsk       defb    0	; Default disc
 .coords         defw    0       ; Current graphics xy coordinates
+.pixelbyte
+		defb	0
 
 
 IF DEFINED_NEED1bitsound
