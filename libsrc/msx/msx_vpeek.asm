@@ -8,7 +8,7 @@
 ;
 ;	Read the MSX video memory
 ;
-;	$Id: msx_vpeek.asm,v 1.3 2009-01-07 09:50:15 stefano Exp $
+;	$Id: msx_vpeek.asm,v 1.4 2009-01-21 16:00:09 stefano Exp $
 ;
 
 	XLIB	msx_vpeek
@@ -29,7 +29,7 @@ msx_vpeek:
 	di
 	out (VDP_CMD), a
 	ld a,h
-	and 00111111B
+	and @00111111
 	ei
 	out (VDP_CMD), a
 

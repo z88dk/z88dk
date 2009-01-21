@@ -74,8 +74,17 @@
  *      To get a VZ200 version:
  *      zcc +vz -Dspritesize=7 -DSOUND -odztar.vz dstar.c
  *   
+ *      MSXDOS:
+ *      zcc +msx -Dspritesize=16 -DSOUND -startup=2 dstar.c
+ *
+ *      MSX:
+ *      zcc +msx -Dspritesize=16 -DSOUND -create-app dstar.c
+ *
  *      To get an 80 pixel graphics version of the game (Mattel Aquarius, TRS80, etc):
  *      zcc +aquarius -Dspritesize=5 -create-app dstar.c
+ *
+ *      Even smaller version of the game:
+ *      zcc +gal -Dspritesize=4 -create-app dstar.c
  *   
  *      (in the above examples the sprite size can be set to 4,5,6,7,8 or 16 
  *      and sound can optionally be added with some target)
@@ -158,7 +167,7 @@ void Gamekeys(void)
 		  #ifdef SOUND
 		    bit_fx4 (5);
 		  #endif
-		  while (getk() != 0) {}
+		  while (getk() == K_SWITCH) {}
 		  break;
 		case K_EXIT:
 		  exit(0);

@@ -10,44 +10,32 @@
 ;
 ;	Compute address of a gfx block position on VRAM (mode 2)
 ;
-;	$Id: msx_map_m2_block.asm,v 1.1 2009-01-07 09:50:15 stefano Exp $
+;	$Id: msx_map_m2_block.asm,v 1.2 2009-01-21 16:00:09 stefano Exp $
 ;
 
 	XLIB	msx_map_m2_block
 	
 msx_map_m2_block:
+
+;; ((((y) & ~(7)) << 5) + ((x) & ~(7)))
+
 	pop	bc
-	pop	hl	; Y
-	pop	de	; X
-	push	de
+	pop	de	; Y in e
+	pop	hl	; X in l
 	push	hl
+	push	de
 	push	bc
-	
-	ld	c,l	; this will be useful in map_pixel
-	
-	ld	a,@11111000	; Y = Y & ~(7)
-	and	l
+
+	ld	a,l		; X
+	and	@11111000
 	ld	l,a
 
-	ld	a,@11111000	; X = X & ~(7)
-	and	e
-	ld	e,a
+	ld	a,e		; Y
+	rra
+	rra
+	rra
+	and	@00011111
 
-	rl	l		; (Y <<5)
-	rl	h
+	ld	h,a		; + ((Y & @11111000) << 5)
 	
-	rl	l
-	rl	h
-	
-	rl	l
-	rl	h
-	
-	rl	l
-	rl	h
-	
-	rl	l
-	rl	h
-	
-	add	hl,de		; + X
-
 	ret

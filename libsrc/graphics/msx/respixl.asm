@@ -1,57 +1,48 @@
-;
-;	MSX basic graphics routines
-;	by Stefano Bodrato, December 2007
-;
-
-	XLIB	respixel
-	XREF	COORDS
-
 	INCLUDE	"graphics/grafix.inc"
 
-	LIB	msxbasic
-        INCLUDE "#msxbasic.def"
+	XLIB	respixel
+
+	LIB pixeladdress
+	XREF	COORDS
+	XREF	pix_return
 
 ;
-;	$Id: respixl.asm,v 1.1 2007-12-18 09:00:44 stefano Exp $
+;	$Id: respixl.asm,v 1.2 2009-01-21 16:00:08 stefano Exp $
 ;
+
 ; ******************************************************************
 ;
-; Clear pixel at (x,y) coordinate.
+; Reset pixel at (x,y) coordinate
 ;
+; Design & programming by Gunther Strube, Copyright (C) InterLogic 1995
 ;
+; in:  hl = (x,y) coordinate of pixel (h,l)
+;
+; registers changed	after return:
+;  ..bc..../ixiy same
+;  af..dehl/.... different
 ;
 .respixel
-	ld	a,l
-	cp	maxy
-	ret	nc		; y0	out of range
-	push	bc
-	push	ix
+			IF maxx <> 256
+				ld	a,h
+				cp	maxx
+				ret	nc
+			ENDIF
 
-	ld	(COORDS),hl
-	ld	b,0
-	ld	c,h
-	ld	(GRPACX),bc
-	ld	d,b
-	ld	e,l
-	ld	(GRPACY),de
+				ld	a,l
+				cp	maxy
+				ret	nc			; y0	out of range
 
-	ld	hl,0F3E9h   ; fore color
-	ld	a,(hl)
-	push	af
-	ld	a,(0F3EBh)  ; border (for bck color)
-	;;ld	a,bcolor
-	ld	(hl),a
-	ld	(ATRBYT),a
-	push	hl
+				ld	(COORDS),hl
 
-	ld	ix,DOPSET
-	call	msxbasic
-
-	pop	hl
-	pop	af
-	ld	(hl),a
-	ld	(ATRBYT),a
-
-	pop	ix
-	pop	bc
-	ret
+				push	bc
+				call	pixeladdress
+				ld	b,a
+				ld	a,1
+				jr	z, reset_pixel
+.reset_position			rlca
+				djnz	reset_position
+.reset_pixel			;ex	de,hl
+				cpl
+				and	(hl)
+				jp	pix_return

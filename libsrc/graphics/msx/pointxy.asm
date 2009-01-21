@@ -1,21 +1,16 @@
-;
-;	MSX basic graphics routines
-;	by Stefano Bodrato, December 2007
-;
+	INCLUDE	"graphics/grafix.inc"
 
 	XLIB	pointxy
 
-	INCLUDE	"graphics/grafix.inc"
-
-	LIB	msxbios
-        INCLUDE "#msxbios.def"
+	LIB	pixeladdress
 
 ;
-;	$Id: pointxy.asm,v 1.1 2007-12-18 09:00:44 stefano Exp $
+;	$Id: pointxy.asm,v 1.2 2009-01-21 16:00:08 stefano Exp $
 ;
+
 ; ******************************************************************
 ;
-; Check if pixel at (x,y) coordinate is set or not.
+; Check if pixel at	(x,y) coordinate is	set or not.
 ;
 ; Design & programming by Gunther Strube, Copyright (C) InterLogic 1995
 ;
@@ -28,33 +23,30 @@
 ;  ..bcdehl/ixiy same
 ;  af....../.... different
 ;
-
 .pointxy
-	ld	a,l
-	cp	maxy
-	ret	nc			; y out of range
+			IF maxx <> 256
+				ld	a,h
+				cp	maxx
+				ret	nc
+			ENDIF
 
-	push	bc
-	push	de
-	push	hl
-	push	ix
+				ld	a,l
+				cp	maxy
+				ret	nc			; y0	out of range
 
+				push	bc
+				push	de
+				push	hl
 
-	ld	b,0
-	ld	c,h			; BC = x
-	ld	d,b
-	ld	e,l			; DE = y
-	ld	ix,SCALXY
-	call	msxbios
-	ld	ix,MAPXY
-	call	msxbios
-	ld	ix,READC
-	call	msxbios
-
-	cp	fcolor
-
-	pop	ix
-	pop	hl
-	pop	de
-	pop	bc
-	ret
+				call	pixeladdress
+				ld	b,a
+				ld	a,1
+				jr	z, test_pixel		; pixel is at bit 0...
+.pixel_position	rlca
+				djnz	pixel_position
+.test_pixel			;ex	de,hl
+				and	(hl)
+				pop	hl
+				pop	de
+				pop	bc
+				ret

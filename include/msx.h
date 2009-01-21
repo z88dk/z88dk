@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.7 2009-01-13 21:23:17 stefano Exp $
+ * $Id: msx.h,v 1.8 2009-01-21 16:00:08 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -207,14 +207,14 @@ extern int __LIB__ msx_color(int foreground, int background, int border);
 //extern unsigned int map_pixel(unsigned int x, unsigned int y);
 
 /// maps a block in the screen 2 model
-#define map_block(x,y)	((((y) & ~(7)) << 5) + ((x) & ~(7)))
-//extern int __LIB__ msx_map_m2_block(int x, int y);
-//#define map_block(x,y)	msx_map_m2_block(x,y)
+//#define map_block(x,y)	((((y) & ~(7)) << 5) + ((x) & ~(7)))
+extern int __LIB__ msx_map_m2_block(int x, int y);
+#define map_block(x,y)	msx_map_m2_block(x,y)
 
 /// maps a pixel coordinate to a vram address
-#define map_pixel(x,y)	(map_block(x,y) + ((y) & 7))
-//extern int __LIB__ msx_map_m2_pixel(int x, int y);
-//#define map_pixel(x,y)	msx_map_m2_pixel(x,y)
+//#define map_pixel(x,y)	(map_block(x,y) + ((y) & 7))
+extern int __LIB__ msx_map_m2_pixel(int x, int y);
+#define map_pixel(x,y)	msx_map_m2_pixel(x,y)
 
 /*
 	here is how it works:

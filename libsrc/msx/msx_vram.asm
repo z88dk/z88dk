@@ -6,7 +6,7 @@
 ;
 ;	Detects the VRAM size (in KB)
 ;
-;	$Id: msx_vram.asm,v 1.1 2007-12-03 07:29:40 stefano Exp $
+;	$Id: msx_vram.asm,v 1.2 2009-01-21 16:00:09 stefano Exp $
 ;
 
 	XLIB	msx_vram
@@ -14,10 +14,10 @@
 msx_vram:
 
 	ld	a,(0FAFCh)		; mode
-	and	00000110b		; extract VRAM size
+	and	@00000110		; extract VRAM size
 	ld	hl,16			; assume 16K (MSX1)
 	ret	z			; good assumption
-	cp	00000010b		; 64K?
+	cp	@00000010		; 64K?
 	ld	l,64			; assume so
 	ret	z			; good assumption
 	add	hl,hl			; 128K

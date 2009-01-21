@@ -8,7 +8,7 @@
 ;
 ;	Transfer count bytes from RAM (current memory page) to VRAM
 ;
-;	$Id: msx_vwrite_direct.asm,v 1.2 2009-01-14 07:07:21 stefano Exp $
+;	$Id: msx_vwrite_direct.asm,v 1.3 2009-01-21 16:00:09 stefano Exp $
 ;
 
 
@@ -17,6 +17,7 @@
 	LIB     msxbios
 	
         INCLUDE "#msxbios.def"
+        INCLUDE "#msx.def"
 
 
 msx_vwrite_direct:
@@ -38,7 +39,7 @@ msx_vwrite_direct:
 
 wrtloop:
 	ld	a,(de)
-	out	($98),a
+	out	(VDP_DATA),a
 	inc	de
 	dec	bc
 	ld	a,c

@@ -1,24 +1,57 @@
+	INCLUDE	"graphics/grafix.inc"
 
 	XLIB	xorpixel
 
+	LIB pixeladdress
 	XREF	COORDS
+	XREF	pix_return
 
 ;
-;	$Id: xorpixl.asm,v 1.1 2007-12-18 09:00:45 stefano Exp $
+;	$Id: xorpixl.asm,v 1.2 2009-01-21 16:00:08 stefano Exp $
 ;
 
 ; ******************************************************************
 ;
-; XORs pixel at (x,y) coordinate.
+; Plot pixel at (x,y) coordinate.
 ;
+; Design & programming by Gunther Strube, Copyright (C) InterLogic 1995
 ;
-	LIB	pointxy
-	LIB	plotpixel
-	LIB	respixel
+; The (0,0) origin is placed at the bottom left corner.
+;
+; in:  hl	= (x,y) coordinate of pixel (h,l)
+;
+; registers changed	after return:
+;  ..bc..../ixiy same
+;  af..dehl/.... different
+;
+; ******************************************************************
+;
+; MSX Version
+; XOR added by Stefano Bodrato (Feb 2001)
+;
+; **************
+;
 
 .xorpixel
-		push	hl
-		call	pointxy
-		pop	hl
-		jp	nz,plotpixel
-		jp	respixel
+			IF maxx <> 256
+				ld	a,h
+				cp	maxx
+				ret	nc
+			ENDIF
+
+				ld	a,l
+				cp	maxy
+				ret	nc			; y0	out of range
+				
+				ld	(COORDS),hl
+
+				push	bc
+				call	pixeladdress
+				ld	b,a
+				ld	a,1
+				jr	z, xor_pixel		; pixel is at bit 0...
+.plot_position			rlca
+				djnz	plot_position
+.xor_pixel			;ex	de,hl
+				xor	(hl)
+				jp	pix_return
