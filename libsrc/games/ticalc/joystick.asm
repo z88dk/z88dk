@@ -3,21 +3,17 @@
 ;	Stefano Bodrato - 21/8/2001
 ;	Henk Poley	- 03/9/2001
 ;
-;	$Id: joystick.asm,v 1.4 2002-04-17 21:30:24 dom Exp $
+;	$Id: joystick.asm,v 1.5 2009-01-23 08:22:27 stefano Exp $
 ;
 
 
         XLIB    joystick
 
 .joystick
-	pop	af		;
-	pop	bc		; game device
-	push	bc		;
-	push	af		;
+	;__FASTALL__ : joystick no. in HL
+		
+	ld	c,l
 
-	;xor	a		;
-	;cp	b		; Test high-byte (should be zero)
-	;jr	nz,error	;
 	ld	hl,-1		; HL = 'ERROR'
 	dec	c		; Test if device 1 is requested
 	jr	z,device1	;

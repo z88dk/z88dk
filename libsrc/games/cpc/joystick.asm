@@ -2,7 +2,7 @@
 ;	Game device library for the Amstrad CPC
 ;	Stefano Bodrato - May 2008
 ;
-;	$Id: joystick.asm,v 1.1 2008-05-05 14:14:02 stefano Exp $
+;	$Id: joystick.asm,v 1.2 2009-01-23 08:22:27 stefano Exp $
 ;
 
 
@@ -11,11 +11,9 @@
         INCLUDE "#cpcfirm.def"
 
 .joystick
-	pop	bc
-	pop	hl
+	;__FASTALL__ : joystick no. in HL
+		
 	ld	a,l
-	push	hl
-	push	bc
 
 	cp	1	 	; Joystick 0
 	jr	nz,j_no1

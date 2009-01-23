@@ -2,16 +2,17 @@
 ;	Game device library for the ZX Spectrum
 ;	Stefano Bodrato - 20/8/2001
 ;
-;	$Id: joystick.asm,v 1.2 2002-04-17 21:30:24 dom Exp $
+;	$Id: joystick.asm,v 1.3 2009-01-23 08:22:27 stefano Exp $
 ;
 
 
         XLIB    joystick
 
 .joystick
-	ld	ix,0
-	add	ix,sp
-	ld	a,(ix+2)
+	;__FASTALL__ : joystick no. in HL
+		
+	ld	a,l
+
 	cp	1	 ; Kempston Joystick
 	jr	nz,j_no1
 	in	a,(31)

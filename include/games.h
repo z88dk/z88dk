@@ -6,7 +6,7 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.9 2008-05-05 14:14:02 stefano Exp $
+ *	$Id: games.h,v 1.10 2009-01-23 08:22:27 stefano Exp $
  *
  */
 
@@ -33,7 +33,7 @@ extern __LIB__ putsprite(int ortype, int x, int y, void *sprite);
 
 
 /* Joystick (or whatever game device) control function */
-extern __LIB__ joystick(int game_device);
+extern __LIB__ __FASTCALL__ joystick(int game_device);
 
 #define MOVE_RIGHT 1
 #define MOVE_LEFT  2
@@ -52,7 +52,7 @@ extern __LIB__ joystick(int game_device);
 #endif
 
 #ifdef MSX
-	unsigned char *joystick_type[] = { "QAOP-MN", "Joystick 1", "Joystick 2"};
+	unsigned char *joystick_type[] = { "Cursor", "Joystick 1", "Joystick 2"};
 	#define GAME_DEVICES 3
 #endif
 
