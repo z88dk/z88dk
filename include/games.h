@@ -6,14 +6,14 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.10 2009-01-23 08:22:27 stefano Exp $
+ *	$Id: games.h,v 1.11 2009-01-23 13:48:11 stefano Exp $
  *
  */
 
 
 /* save the sprite background in another sprite */
 extern __LIB__ bksave(int x, int y, void *sprite);
-extern __LIB__ bkrestore(void *sprite);
+extern __LIB__ __FASTCALL__ bkrestore(void *sprite);
 
 /* pick up a sprite directly from the screen */
 extern __LIB__ getsprite(int x, int y, void *sprite); // This isn't still finished

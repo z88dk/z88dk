@@ -4,7 +4,7 @@
 ; VZ200/300 version
 ;
 ;
-; $Id: bkrestore.asm,v 1.4 2002-04-17 21:30:25 dom Exp $
+; $Id: bkrestore.asm,v 1.5 2009-01-23 13:48:12 stefano Exp $
 ;
 
 
@@ -13,14 +13,11 @@
 
 .bkrestore
 
-        ld      hl,2   
-        add     hl,sp
-        ld      e,(hl)
-        inc     hl
-        ld      d,(hl)  ;sprite address
-	push	de
-	pop	ix
+; __FASTCALL__ : sprite ptr in HL
 	
+	push	hl
+	pop	ix
+
 	ld	h,(ix+2) ; restore sprite position
 	ld	l,(ix+3)
 

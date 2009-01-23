@@ -9,7 +9,7 @@
 	INCLUDE	"#msx.def"
 
 ;
-;	$Id: pixladdr.asm,v 1.1 2009-01-21 16:00:08 stefano Exp $
+;	$Id: pixladdr.asm,v 1.2 2009-01-23 13:48:11 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -58,7 +58,7 @@
 	;di
 	out	(VDP_CMD), a
 	ld	a,h		; MSB of video mem ptr
-	and	00111111B	; masked with "read command" bits
+	and	@00111111	; masked with "read command" bits
 	;ei
 	out	(VDP_CMD), a
 	in	a, (VDP_DATA)

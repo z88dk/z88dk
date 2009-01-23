@@ -46,8 +46,8 @@ graphics/setxy
 graphics/msx/fill
 graphics/getsprite
 graphics/msx/putsprite
-graphics/bksave
-graphics/bkrestore
+graphics/msx/bksave
+graphics/msx/bkrestore
 graphics/msx/swapgfxbk
 graphics/xorborder
 graphics/xorplot

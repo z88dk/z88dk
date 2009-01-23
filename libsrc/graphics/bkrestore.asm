@@ -3,7 +3,7 @@
 ;
 ;	Generic version (just a bit slow)
 ;
-;	$Id: bkrestore.asm,v 1.5 2002-03-11 17:11:34 stefano Exp $
+;	$Id: bkrestore.asm,v 1.6 2009-01-23 13:48:11 stefano Exp $
 ;
 
 
@@ -13,12 +13,9 @@
 
 .bkrestore
 
-        ld      hl,2   
-        add     hl,sp
-        ld      e,(hl)
-        inc     hl
-        ld      d,(hl)  ;sprite address
-	push	de
+; __FASTCALL__ : sprite ptr in HL
+	
+	push	hl
 	pop	ix
 
 	ld	h,(ix+2)

@@ -4,7 +4,7 @@
 ; TI calculators version
 ;
 ;
-; $Id: bkrestore.asm,v 1.6 2002-04-17 21:30:25 dom Exp $
+; $Id: bkrestore.asm,v 1.7 2009-01-23 13:48:12 stefano Exp $
 ;
 
 	XLIB    bkrestore
@@ -15,12 +15,9 @@
 
 .bkrestore
 
-        ld      hl,2   
-        add     hl,sp
-        ld      e,(hl)
-        inc     hl
-        ld      d,(hl)  ;sprite address
-	push	de
+; __FASTCALL__ : sprite ptr in HL
+	
+	push	hl
 	pop	ix
 	
 	ld	h,(ix+2) ; restore sprite position
