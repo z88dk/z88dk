@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.14 2007-06-27 20:48:03 dom Exp $
+;       $Id: spec_crt0.asm,v 1.15 2009-02-19 09:33:39 stefano Exp $
 ;
 
 
@@ -17,28 +17,28 @@
 ; Some scope definitions
 ;--------
 
-        XREF    _main           ;main() is always external to crt0 code
+        XREF    _main           ; main() is always external to crt0 code
 
-        XDEF    cleanup         ;jp'd to by exit()
-        XDEF    l_dcal          ;jp(hl)
+        XDEF    cleanup         ; jp'd to by exit()
+        XDEF    l_dcal          ; jp(hl)
 
 
-        XDEF    _vfprintf       ;jp to the printf() core
+        XDEF    _vfprintf       ; jp to the printf() core
 
-        XDEF    exitsp          ;atexit() variables
+        XDEF    exitsp          ; atexit() variables
         XDEF    exitcount
 
-       	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+        XDEF    heaplast        ; Near malloc heap variables
+        XDEF    heapblocks
 
-        XDEF    __sgoioblk      ;stdio info block
+        XDEF    __sgoioblk      ; stdio info block
 
-        XDEF    base_graphics   ;Graphical variables
-	XDEF	coords		;Current xy position
+        XDEF    base_graphics   ; Graphical variables
+        XDEF    coords          ; Current xy position
 
-	XDEF	snd_tick	;Sound variable
+        XDEF    snd_tick        ; Sound variable
 
-        XDEF    call_rom3	;Interposer
+        XDEF    call_rom3       ; Interposer
 
 ;--------
 ; Set an origin for the application (-zorg=) default to 32768
@@ -46,93 +46,174 @@
 
         IF DEFINED_ZXVGS
         IF !myzorg
-                DEFC    myzorg = $5CCB  ;repleaces BASIC program
+                DEFC    myzorg = $5CCB     ; repleaces BASIC program
         ENDIF
         IF !STACKPTR
-                DEFC    STACKPTR = $FF57  ;below UDG, keep eye when using banks
+                DEFC    STACKPTR = $FF57   ; below UDG, keep eye when using banks
         ENDIF
         ENDIF
 
         
         IF      !myzorg
+            IF (startup=2)                 ; ROM ?
+                defc    myzorg  = 0
+                defc    STACKPTR = 32767
+            ELSE
                 defc    myzorg  = 32768
+            ENDIF
         ENDIF
-                org     myzorg
+
+
+        org     myzorg
 
 
 .start
-	ld	iy,23610	; restore the right iy value, fixes the self-relocating trick
-IF !DEFINED_ZXVGS
-        ld      (start1+1),sp	;Save entry stack
-ENDIF
-IF 	STACKPTR
-	ld	sp,STACKPTR
-ENDIF
+
+        ; --- startup=2 ---> build a ROM
+
+IF (startup=2)
+
+        di
+        im      1
+        ei
+        ld      sp,STACKPTR-64
+        jr      init            ; go over rst 8, bypass shadow ROM
+        
+        ; --- rst 8 ---
+        ld      hl,($5c5d)      ; It was the address reached by CH-ADD.
+        nop                     ; one byte still, to jump over the
+                                ; Opus Discovery and similar shadowing traps
+        ; --- nothing more ?
+
+.init
+        ld      a,@111000       ; White PAPER, black INK
+        call    zx_internal_cls
+        ld      (hl),0
+        ld      bc,42239
+        ldir
+
+        ld      hl,$8080
+        ld      (fp_seed),hl
+
+ELSE
+
+        ; --- startup=[default] ---
+
+        ld      iy,23610        ; restore the right iy value, 
+                                ; fixing the self-relocating trick, if any
+  IF !DEFINED_ZXVGS
+        ld      (start1+1),sp   ; Save entry stack
+  ENDIF
+  IF      STACKPTR
+        ld      sp,STACKPTR
+  ENDIF
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
-IF DEFINED_ZXVGS
+  IF DEFINED_ZXVGS
 ;setting variables needed for proper keyboard reading
-        LD      (IY+1),$CD      ;FLAGS #5C3B
-        LD      (IY+48),1       ;FLAGS2 #5C6A
-        EI                      ;ZXVGS starts with disabled interrupts
+        LD      (IY+1),$CD      ; FLAGS #5C3B
+        LD      (IY+48),1       ; FLAGS2 #5C6A
+        EI                      ; ZXVGS starts with disabled interrupts
+  ENDIF
+        ld      a,2             ; open the upper display (uneeded?)
+        call    5633
+
 ENDIF
-	ld	a,2		;open the upper display (uneeded?)
-	call	5633
+
+
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 ; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
+        ld      hl,__sgoioblk+2
+        ld      (hl),19 ;stdin
+        ld      hl,__sgoioblk+6
+        ld      (hl),21 ;stdout
+        ld      hl,__sgoioblk+10
+        ld      (hl),21 ;stderr
 ENDIF
 ENDIF
 IF DEFINED_NEEDresidos
-	call	residos_detect
-	jp	c,cleanup_exit
+        call    residos_detect
+        jp      c,cleanup_exit
 ENDIF
-        call    _main		;Call user program
+        call    _main           ; Call user program
 .cleanup
 ;
 ;       Deallocate memory which has been allocated here!
 ;
-	push	hl
+        push    hl
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-	LIB	closeall
-	call	closeall
+        LIB     closeall
+        call    closeall
 ENDIF
 ENDIF
-IF DEFINED_ZXVGS
+
+IF (startup=2)      ; ROM ?
+.cleanup_exit
+        jp      0
+        
+        defs    56-cleanup_exit-3
+        
+; ######## IM 1 MODE INTERRUPT ENTRY ########
+
+	INCLUDE "#spec_crt0_rom_isr.as1"
+
+; ########  END OF ROM INTERRUPT HANDLER ######## 
+
+
+.zx_internal_cls
+        ld      hl,$4000        ; cls
+        ld      d,h
+        ld      e,l
+        inc     de
+        ld      (hl),0
+        ld      bc,$1800
+        ldir
+        ld      (hl),a
+        ld      bc,768
+        ldir
+        ld      ($5c48),a       ; BORDCR
+        ld      ($5c8d),a       ; ATTR_P
+        ld      ($5c8f),a       ; ATTR_T
+        rrca
+        rrca
+        rrca
+        out     (254),a
+        ret
+
+ELSE
+  IF DEFINED_ZXVGS
         POP     BC              ;let's say exit code goes to BC
         RST     8
         DEFB    $FD             ;Program finished
-ELSE
+  ELSE
 .cleanup_exit
         ld      hl,10072        ;Restore hl' to what basic wants
         exx
         pop     bc
 .start1 ld      sp,0            ;Restore stack to entry value
         ret
+  ENDIF
 ENDIF
 
-.l_dcal	jp	(hl)		;Used for function pointer calls
+
+
+.l_dcal jp      (hl)            ;Used for function pointer calls
 
 
 ;-----------
 ; Define the stdin/out/err area. For the z88 we have two models - the
 ; classic (kludgey) one and "ANSI" model
 ;-----------
-.__sgoioblk
-IF DEFINED_ANSIstdio
-	INCLUDE	"#stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
-ENDIF
+;.__sgoioblk
+;IF DEFINED_ANSIstdio
+;       INCLUDE "#stdio_fp.asm"
+;ELSE
+;        defw    -11,-12,-10
+;ENDIF
 
 
 
@@ -141,43 +222,43 @@ ENDIF
 ;---------------------------------
 ._vfprintf
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
-	jp	vfprintf_fp
+        LIB     vfprintf_fp
+        jp      vfprintf_fp
 ELSE
-	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
-		jp	vfprintf_comp
-	ELSE
-		IF DEFINED_ministdio
-			LIB	vfprintf_mini
-			jp	vfprintf_mini
-		ENDIF
-	ENDIF
+        IF DEFINED_complexstdio
+                LIB     vfprintf_comp
+                jp      vfprintf_comp
+        ELSE
+                IF DEFINED_ministdio
+                        LIB     vfprintf_mini
+                        jp      vfprintf_mini
+                ENDIF
+        ENDIF
 ENDIF
 
 ;---------------------------------------------
 ; Some +3 stuff - this needs to be below 49152
 ;---------------------------------------------
 IF DEFINED_NEEDresidos
-	INCLUDE	"#idedos.def"
+        INCLUDE "#idedos.def"
 
         defc    ERR_NR=$5c3a            ; BASIC system variables
         defc    ERR_SP=$5c3d
 
-	XDEF	dodos
+        XDEF    dodos
 ;
 ; This is support for residos, we use the normal
 ; +3 -lplus3 library and rewrite the values so
 ; that they suit us somewhat
 .dodos
-	exx
-	push	iy
-	pop	hl
-	ld	b,PKG_IDEDOS
-	rst	RST_HOOK
-	defb	HOOK_PACKAGE
-	ld	iy,23610
-	ret
+        exx
+        push    iy
+        pop     hl
+        ld      b,PKG_IDEDOS
+        rst     RST_HOOK
+        defb    HOOK_PACKAGE
+        ld      iy,23610
+        ret
 
 ; Detect an installed version of ResiDOS.
 ;
@@ -235,70 +316,70 @@ ENDIF
 ; Some +3 stuff - this needs to be below 49152
 ;---------------------------------------------
 IF DEFINED_NEEDplus3dodos
-; 	Routine to call +3DOS Routines. Located in startup
-;	code to ensure we don't get paged out
-;	(These routines have to be below 49152)
-;	djm 17/3/2000 (after the manual!)
-	XDEF	dodos
+;       Routine to call +3DOS Routines. Located in startup
+;       code to ensure we don't get paged out
+;       (These routines have to be below 49152)
+;       djm 17/3/2000 (after the manual!)
+        XDEF    dodos
 .dodos
-	call	dodos2		;dummy routine to restore iy afterwards
-	ld	iy,23610
-	ret
+        call    dodos2          ;dummy routine to restore iy afterwards
+        ld      iy,23610
+        ret
 .dodos2
-	push	af
-	push	bc
-	ld	a,7
-	ld	bc,32765
-	di
-	ld	(23388),a
-	out	(c),a
-	ei
-	pop	bc
-	pop	af
-	call	cjumpiy
-	push	af
-	push	bc
-	ld	a,16
-	ld	bc,32765
-	di
-	ld	(23388),a
-	out	(c),a
-	ei
-	pop	bc
-	pop	af
-	ret
+        push    af
+        push    bc
+        ld      a,7
+        ld      bc,32765
+        di
+        ld      (23388),a
+        out     (c),a
+        ei
+        pop     bc
+        pop     af
+        call    cjumpiy
+        push    af
+        push    bc
+        ld      a,16
+        ld      bc,32765
+        di
+        ld      (23388),a
+        out     (c),a
+        ei
+        pop     bc
+        pop     af
+        ret
 .cjumpiy
-	jp	(iy)
+        jp      (iy)
 ENDIF
 
 IF 0
-;	Short routine to set up a +3 DOS header so files
-;	Can be accessed from BASIC, we set to type code
-;	load address 0 and length supplied
+;       Short routine to set up a +3 DOS header so files
+;       Can be accessed from BASIC, we set to type code
+;       load address 0 and length supplied
 ;
-;	Entry:	b = file handle
-;	       hl = file length
+;       Entry:  b = file handle
+;              hl = file length
 
 .setheader
-	ld	iy,setheader_r
-	call	dodos
-	ret
+        ld      iy,setheader_r
+        call    dodos
+        ret
 .setheader_r
-	push	hl
-	call	271	;DOS_RED_HEAD
-	pop	hl
-	ld	(ix+0),3	;CODE
-	ld	(ix+1),l	;Length
-	ld	(ix+2),h
-	ld	(ix+3),0	;Load address
-	ld	(ix+4),0
-	ret
+        push    hl
+        call    271     ;DOS_RED_HEAD
+        pop     hl
+        ld      (ix+0),3        ;CODE
+        ld      (ix+1),l        ;Length
+        ld      (ix+2),h
+        ld      (ix+3),0        ;Load address
+        ld      (ix+4),0
+        ret
 ENDIF
 
 ; Call a routine in the spectrum ROM
 ; The routine to call is stored in the two bytes following
 .call_rom3
-	exx			 ; Use alternate registers
+        exx                      ; Use alternate registers
         ex      (sp),hl          ; get return address
         ld      c,(hl)
         inc     hl
@@ -306,18 +387,57 @@ ENDIF
         inc     hl
         ex      (sp),hl          ; restore return address
         push    bc
-	exx			 ; Back to the regular set
-	ret
-	
+        exx                      ; Back to the regular set
+        ret
+        
 
-;-----------
-; Now some variables
-;-----------
+
+;--------
+; Variables: we have two options, to keep them in the program block or to
+; locate such stuff somewhere else in RAM (to make ROMable code).
+;--------
+
+;---------------------------------------------------------------------------
+IF (startup<=3) ; ROM
+;---------------------------------------------------------------------------
+
+
+IF !DEFINED_HAVESEED
+                XDEF    _std_seed         ; Integer rand() seed
+ENDIF
+
+IF !DEFINED_sysdefvarsaddr
+        defc sysdefvarsaddr = 23552-70   ; Just before the ZX system variables
+ENDIF
+DEFVARS sysdefvarsaddr
+{
+__sgoioblk      ds.b    40      ; stdio control block
+coords          ds.w    1       ; Graphics xy coordinates
+base_graphics   ds.w    1       ; Address of graphics map
+IF !DEFINED_HAVESEED
+  _std_seed     ds.w    1       ; Integer seed
+ENDIF
+exitsp          ds.w    1       ; atexit() stack
+exitcount       ds.b    1       ; Number of atexit() routines
+fp_seed         ds.w    3       ; Floating point seed (not used ATM)
+extra           ds.w    3       ; Floating point spare register
+fa              ds.w    3       ; Floating point accumulator
+fasign          ds.b    1       ; Floating point variable
+snd_tick        ds.b    1       ; Sound
+heaplast        ds.w    1       ; Address of last block on heap
+heapblocks      ds.w    1       ; Number of blocks
+}
+
+
+;---------------------------------------------------------------------------
+ELSE
+;---------------------------------------------------------------------------
+
 .coords         defw    0       ; Current graphics xy coordinates
 .base_graphics  defw    0       ; Address of the Graphics map
 
 IF !DEFINED_HAVESEED
-		XDEF    _std_seed        ;Integer rand() seed
+                XDEF    _std_seed        ;Integer rand() seed
 ._std_seed       defw    0       ; Seed for integer rand() routines
 ENDIF
 
@@ -329,21 +449,29 @@ ENDIF
 .heapblocks     defw    0       ; Number of blocks
 
 IF DEFINED_NEED1bitsound
-.snd_tick	defb	0	; Sound variable
+.snd_tick       defb    0       ; Sound variable
 ENDIF
 
-		defm	"Small C+ ZX"	;Unnecessary file signature
-		defb	0
+                defm    "Small C+ ZX"   ;Unnecessary file signature
+                defb    0
 
 ;-----------------------
 ; Floating point support
 ;-----------------------
 IF NEED_floatpack
         INCLUDE         "#float.asm"
-.fp_seed        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
-.extra          defs    6		;FP register
-.fa             defs    6		;FP Accumulator
-.fasign         defb    0		;FP register
+.fp_seed        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
+.extra          defs    6               ;FP register
+.fa             defs    6               ;FP Accumulator
+.fasign         defb    0               ;FP register
 
 ENDIF
+
+;---------------------------------------------------------------------------
+ENDIF
+;---------------------------------------------------------------------------
+
+
+                defm    "Small C+ ZX"   ;Unnecessary file signature
+                defb    0
 
