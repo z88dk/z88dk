@@ -8,10 +8,10 @@ XREF ASMDISP_STRNCAT_CALLEE
 
    pop af
    pop bc
-   pop hl
    pop de
-   push de
+   pop hl
    push hl
+   push de
    push bc
    push af
    

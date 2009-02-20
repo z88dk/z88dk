@@ -59,16 +59,16 @@ defc ENOMEM  = 6
 ; called function must preserve ix and exx registers
 ;
 
-defc STDIO_MSG_OPEN       = 0                      ; enter   b = flags (0000 0CIOA) de = char *filename
-defc STDIO_MSG_CLOS       = 1                      ; none
-defc STDIO_MSG_PUTC       = 2                      ; enter   b = char
-defc STDIO_MSG_GETC       = 3                      ; return  a = char
-defc STDIO_MSG_READ       = 4                      ; enter  de = dst buffer hl = size!=0, return hl = number of bytes transferred
-defc STDIO_MSG_WRIT       = 5                      ; enter  de = src buffer hl = size!=0, return hl = number of bytes transferred
+defc STDIO_MSG_OPEN       = 0                      ; enter   b = flags (0000 0CIOA) de = char *filename, carry set for error
+defc STDIO_MSG_CLOS       = 1                      ; none    carry set for error
+defc STDIO_MSG_PUTC       = 2                      ; enter   b = char, carry set for error
+defc STDIO_MSG_GETC       = 3                      ; return  a = char, carry set for error
+defc STDIO_MSG_READ       = 4                      ; enter  de = dst buffer hl = size!=0, return hl = number of bytes transferred (0, carry set for error)
+defc STDIO_MSG_WRIT       = 5                      ; enter  de = src buffer hl = size!=0, return hl = number of bytes transferred (0, carry set for error)
 defc STDIO_MSG_POLL       = 6                      ; enter   b = events, return b = revents or carry set if unsupported
-defc STDIO_MSG_SEEK       = 7                      ; enter  dehl = file pos b = 0:REP 1:END 2:CUR 3:SET else:REP, return dehl = new file pos
-defc STDIO_MSG_ICTL       = 8                      ; enter  de = request hl = arg, return value in (de)hl
-defc STDIO_MSG_SYNC       = 9                      ; none   transfer any buffered data to device
+defc STDIO_MSG_SEEK       = 7                      ; enter  dehl = file pos b = 0:REP 1:END 2:CUR 3:SET else:REP, return dehl = new file pos or carry for error
+defc STDIO_MSG_ICTL       = 8                      ; enter  de = request hl = arg, return value in (de)hl, carry for error
+defc STDIO_MSG_SYNC       = 9                      ; none   transfer any buffered data to device, carry for error
 
 ; information messages that can be handled by library supplied routines
 

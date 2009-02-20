@@ -72,4 +72,8 @@ XLIB jumptbl_scanf
 ;   defb 'E', 195
 ;   defw
    
+   defb 'I', 195
+   LIB stdio_in_capi
+   defw stdio_in_capi
+   
    defb 0                      ; end of table

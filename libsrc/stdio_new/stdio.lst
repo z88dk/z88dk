@@ -62,6 +62,7 @@ stream-in/stdio_getchar
 stream-in/stdio_in_b
 stream-in/stdio_in_bkt
 stream-in/stdio_in_c
+stream-in/stdio_in_capi
 stream-in/stdio_in_d
 stream-in/stdio_in_i
 stream-in/stdio_in_lb
@@ -86,6 +87,7 @@ stream-out/stdio_longnumprec
 stream-out/stdio_numprec
 stream-out/stdio_out_b
 stream-out/stdio_out_c
+stream-out/stdio_out_capi
 stream-out/stdio_out_caplp
 stream-out/stdio_out_caplx
 stream-out/stdio_out_capp
@@ -172,5 +174,3 @@ vsprintf
 vsprintf_callee
 vsscanf
 vsscanf_callee
-jumptbl_printf
-jumptbl_scanf

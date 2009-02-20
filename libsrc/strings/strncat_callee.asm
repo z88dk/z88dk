@@ -7,45 +7,44 @@ XDEF ASMDISP_STRNCAT_CALLEE
 
 .strncat_callee
 
-   pop af
-   pop bc
    pop hl
+   pop bc
    pop de
-   push af
+   ex (sp),hl
    
-   ; enter : hl = char *src
-   ;         de = char *dst
+   ; enter : de = char *src
+   ;         hl = char *dst
    ;         bc = uint n
    ; exit  : hl = char *dst
    ; uses  : af, bc, de, hl
 
 .asmentry
 
-   push de
+   push hl
 
    ld a,b
    or c                      ; if n=0 don't do anything
    jr z, exit
    
-   ; first find the end of string s1
+   ; first find the end of string dst
    
-.loop1
-
-   ld a,(de)
-   inc de
-   or a
-   jp nz, loop1
-   dec de
+   xor a
+   push bc
+   cpir
+   pop bc
+   dec hl
+      
+   ; now append src to dst but no more than n chars
    
-   ; now append s2 to s1 but no more than n chars
+   ex de,hl
 
-.loop2
+.loop
 
    ld a,(hl)
    or a
    jr z, done
    ldi
-   jp pe, loop2
+   jp pe, loop
 
    xor a
 

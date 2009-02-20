@@ -37,10 +37,10 @@ XDEF ASMDISP_STRCMP_CALLEE
 .strcmp1         
 
    ld a,(de)	
-   inc	de
-   
    cp (hl)                   ; compare with s1       
    jr nz,strcmp2
+
+   inc de
    inc hl
    
    and a                     ; check for end of strings         

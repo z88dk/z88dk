@@ -68,4 +68,8 @@ XLIB jumptbl_printf
 ;   defb 'E', 195
 ;   defw
    
+   defb 'I', 195
+   LIB stdio_out_capi
+   defw stdio_out_capi
+   
    defb 0                      ; end of table
