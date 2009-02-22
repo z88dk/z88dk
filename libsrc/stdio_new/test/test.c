@@ -1,9 +1,10 @@
 #include "../stdio.h"
 
-
 ///////////////////////////////////////
 // FILE STRUCTURES FOR STDIN, STDOUT //
 ///////////////////////////////////////
+
+// $Id: test.c,v 1.3 2009-02-22 08:33:25 stefano Exp $
 
 extern struct FILE f_stdout;
 #asm
@@ -64,8 +65,10 @@ extern struct FILE f_stdin;
    
    ld h,23
    ld (coords),hl
-   
-   call 3582                   ; ROM scroll up
+
+   XREF  call_rom3
+   call    call_rom3
+   defw	3582	; ROM scroll up
    
    ret
 

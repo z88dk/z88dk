@@ -8,15 +8,18 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.3 2009-02-22 08:33:25 stefano Exp $
 ;
 
 	XLIB	ansi_SCROLLUP
+
+	XREF  call_rom3
 
 
 .ansi_SCROLLUP
 	 ld     a,(23693)
 	 ld     (23624),a
-	 call 3582 ;scrollup
+	 call    call_rom3
+	 defw	3582	;scrollup
 	 ret
  

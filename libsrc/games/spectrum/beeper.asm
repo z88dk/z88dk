@@ -1,4 +1,4 @@
-; $Id: beeper.asm,v 1.2 2002-04-17 21:30:24 dom Exp $
+; $Id: beeper.asm,v 1.3 2009-02-22 08:33:25 stefano Exp $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
@@ -44,6 +44,9 @@
 ; 
 ; ----------------------------------------------------------------
 
+	XREF  call_rom3
 
 .beeper
-          jp   949
+	 call    call_rom3
+	 defw	949
+	 ret

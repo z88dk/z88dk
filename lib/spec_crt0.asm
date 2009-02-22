@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.15 2009-02-19 09:33:39 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.16 2009-02-22 08:33:25 stefano Exp $
 ;
 
 
@@ -92,6 +92,12 @@ IF (startup=2)
         ld      bc,42239
         ldir
 
+        ld      a,@111000       ; White PAPER, black INK
+        ld      ($5c48),a       ; BORDCR
+        ld      ($5c8d),a       ; ATTR_P
+        ld      ($5c8f),a       ; ATTR_T
+
+
         ld      hl,$8080
         ld      (fp_seed),hl
 
@@ -175,9 +181,6 @@ IF (startup=2)      ; ROM ?
         ld      (hl),a
         ld      bc,768
         ldir
-        ld      ($5c48),a       ; BORDCR
-        ld      ($5c8d),a       ; ATTR_P
-        ld      ($5c8f),a       ; ATTR_T
         rrca
         rrca
         rrca
