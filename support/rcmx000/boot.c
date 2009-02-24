@@ -21,11 +21,38 @@
 
 static int debug_hex=0;
 static int debug_dtr=0;
+static int debug_rts=0;
 static int debug_flush=0;
 
 static int debug_poll=0;
 
 static int debug_rw=0;
+
+static void rts_ctl(int fd, int val)
+{
+    int flags=0;
+
+    ioctl(fd, TIOCMGET, &flags);
+    if (debug_rts) fprintf(stderr, "Flags are %x.\n", flags);
+
+    if (val)
+    {
+	flags |= TIOCM_RTS;
+    }
+    else
+    {
+	flags &= ~TIOCM_RTS;
+    }
+
+    ioctl(fd, TIOCMSET, &flags);
+    if (debug_rts) fprintf(stderr, "Setting %x.\n", flags);
+
+    ioctl(fd, TIOCMGET, &flags);
+    if (debug_rts) fprintf(stderr, "Flags are %x.\n", flags);
+
+    return;
+}
+
 
 static void dtr_ctl(int fd, int dtrval)
 {
@@ -143,9 +170,21 @@ static int check_fd(int anfd)
 
 static void usage(const char* argv0)
 {
+  fprintf(stderr, "Boot mode: (Normal load of program to flash)\n");
+  fprintf(stderr, "Usage: %s -b <ttydev> <divisor> <binfile>\n", argv0);
+  fprintf(stderr, "   or\n", argv0);
+  fprintf(stderr, "Raw mode: (Only used to get the baudrate division number)\n");
   fprintf(stderr, "Usage: %s -r <ttydev> <coldload binfile>\n", argv0);
   fprintf(stderr, "   or\n", argv0);
-  fprintf(stderr, "Usage: %s -b <ttydev> <divisor> <binfile>\n", argv0);
+
+  fprintf(stderr, "Flash mode: (Will store program permanently in flash)\n");
+  fprintf(stderr, "Usage: %s -f <ttydev> <divisor> <binfile>\n", argv0);
+  fprintf(stderr, "   or\n", argv0);
+  
+  fprintf(stderr, "Direct mode: (Will copy a preloaded image from the flash to the ram and then run it\n");
+  fprintf(stderr, "Usage: %s -d <ttydev> <divisor> <binfile>\n", argv0);
+
+
   exit(1);
 }
 
@@ -211,8 +250,7 @@ static void talk(int tty)
 
 int main(int argc, char *argv[])
 {
-  /** Assume hex-ascii */
-  int is_bin=0;
+  int do_flash=0;
 
   /** This flag is set if we communicate raw with the target */
   int is_raw=0;
@@ -240,7 +278,7 @@ int main(int argc, char *argv[])
 
   int i;
 
-  if (argc!=4 && argc!=5)
+  if (argc!=3 && argc!=4 && argc!=5)
     {
       usage(argv[0]);
     }
@@ -252,7 +290,6 @@ int main(int argc, char *argv[])
       ttyname=argv[2];
       divisor=atoi(argv[3]);
       binfilename=argv[4];
-      is_bin=1;
 
       binfile=fopen(binfilename, "rb");
       
@@ -272,6 +309,95 @@ int main(int argc, char *argv[])
       binfile=NULL;
 
       is_raw=1;
+    }
+  else if (0==strncmp(argv[1], "-d", 2))
+    {
+      if (argc!=3) usage(argv[0]);
+
+      ttyname=argv[2];
+      /** Runs directly from flash with no download */
+      tty=open(ttyname, O_RDWR|O_NOCTTY);
+
+      dtr_ctl(tty,0);
+      rts_ctl(tty,0);
+
+      if (tty==-1)
+	{
+	  fprintf(stderr, "Could not open device: %s\n", ttyname);
+	  exit(1);      
+	}
+
+      /** User handles reset directly on target */
+      
+      change_baudrate(tty, 57600);
+      
+      talk(tty);
+      
+      return 0;
+    }
+  else if (0==strncmp(argv[1], "-s", 2))
+    {
+      /** Silent (hidden) option, this requires a special modified cable to be useful 
+          It lets you manipulate smode0/1  with RTS of serial line, thus starting
+	  from flash remotedly via cable.
+	  
+	  Mainly useful when debugging the -d option...
+      */
+
+      if (argc!=3) usage(argv[0]);
+
+      ttyname=argv[2];
+      tty=open(ttyname, O_RDWR|O_NOCTTY);
+      if (tty==-1)
+	{
+	  fprintf(stderr, "Could not open device: %s\n", ttyname);
+	  exit(1);      
+	}
+
+      printf("Pulling rts(smode) = 0\n");
+      rts_ctl(tty, 0);
+      
+      sleep(1);
+      printf("Asserting dtr(reset)=0\n");
+      dtr_ctl(tty, 0);
+      
+      sleep(1);
+      printf("Pulling dtr(reset)=1\n");
+      dtr_ctl(tty, 1);
+      
+      sleep(1);
+      printf("Pulling dtr(reset)=0\n");
+      dtr_ctl(tty, 0);
+
+      change_baudrate(tty, 57600);
+
+      /** Vaccum out any characters accumulated during reset */
+      {
+	char ch;
+	while (check_fd(tty)) read(tty, &ch, 1);
+      }
+
+      talk(tty);
+      
+      return 0;
+    }
+  else if (0==strncmp(argv[1], "-f", 2))
+    {
+      if (argc!=5) usage(argv[0]);
+
+      ttyname=argv[2];
+      divisor=atoi(argv[3]);
+      binfilename=argv[4];
+
+      binfile=fopen(binfilename, "rb");
+
+      do_flash=1;
+      
+      if (binfile==NULL)
+	{
+	  fprintf(stderr, "Could not open %s\n", binfilename);
+	  exit(1);
+	}
     }
   else
     {
@@ -358,17 +484,18 @@ int main(int argc, char *argv[])
 	{
 	  ch=s_lodfile[i];
 
+
 	  /** Patch the divisor in... */
 	  if (i==0x23)
 	    {
 	      if (ch==42)
 		{
 		  ch=divisor-1;
-		  fprintf(stderr, "Changing divisor to: %d\n", ch);
+		  fprintf(stderr, "Changing stored divisor to: %d\n", ch);
 		}
 	      else
 		{
-		  fprintf(stderr, "Wrong magic pattern in .LOD file, have you changed rcmx000_boot.asm???\n");
+		  fprintf(stderr, "Wrong magic pattern in baud rate coeff, have you changed rcmx000_boot.asm??? addr=%x\n", i);
 		  exit(1);
 		}
 	    }
@@ -470,6 +597,38 @@ int main(int argc, char *argv[])
     {
       fread(&ch, 1, 1, binfile);
 
+      if (do_flash)
+	{
+
+	  /** If we store this image we need to note the baudrate
+	      and since baud register is write-only it must be in ram 
+	      The reason we patch here is that we dont know this
+	      value until boot is run with its baud rate divisor
+	      argument.
+	  */
+	  if (i==0xae)
+	    {
+	      if (ch==42)
+		{
+		  fprintf(stderr, "Patching the correct baudrate into the image file for later use\n");
+		  ch=divisor/24-1;
+		}
+	      else
+		{
+		  fprintf(stderr, "**Wrong magic number, did you change rcmx000_boot.asm???");
+		  exit(1);
+		}
+	    }
+
+	  /** Patch in flashing command if do_flash is set */
+	  if (i==0x8 && do_flash) 
+	    {
+	      printf ("ch=%d\n", ch);
+	      
+	      printf("Doing flashing of target...\n");
+	      ch=1;
+	    }
+	}
       csum += ch;
       
       if (feof(binfile))

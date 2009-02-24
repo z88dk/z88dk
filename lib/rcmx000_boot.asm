@@ -3,7 +3,7 @@
 ;
 ; This module is included by rcmx000_crt0.asm
 ;
-; $Id: rcmx000_boot.asm,v 1.2 2007-05-18 06:36:50 stefano Exp $
+; $Id: rcmx000_boot.asm,v 1.3 2009-02-24 16:53:29 mimarob Exp $
 ;
 
 
@@ -22,9 +22,15 @@
 	; If we are not in raw option, this will not do anything useful
 	ld hl, __end_prog
 
+	jr skip_data_bytes
+
+	; The command byte should be at 8
+.command   defb 0
+
 	; N.B: The "end_prog" is the end of this file's program but the
 	; beginning of the users stuff
 
+.skip_data_bytes
 	; Tell host we have loaded!! Send the 'babe' magic pattern
 	ld a,0bah
 	call __sendchar
@@ -40,7 +46,7 @@
 
 	; Save the divisor for later echoing back to host
 	ld b,a
-		
+
 	; This character is used for the baudrate divisor,
 	; the host must know this in some way, the best is to use 
 	; the meassurebaud.asm utility for each new target connected
@@ -162,21 +168,22 @@
 .__endbootstrap
 	
 .__prefix
-	defb 080h, 000h, 008h			; GCSR Clock select, bit 4-2: 010 (osc)
 
+	defb 080h, 000h, 008h			; GCSR Clock select, bit 4-2: 010 (osc)
 	defb 080h, 009h, 051h			; Watchdog
 	defb 080h, 009h, 054h
 
 
-	defb 080h, 010h, 000h			; MMU
-	defb 080h, 014h, 045h			; Memory bank
-	defb 080h, 015h, 045h			; Memory bank
-	defb 080h, 016h, 040h			; Memory bank
-	defb 080h, 017h, 040h			; Memory bank
-	defb 080h, 013h, 0c6h			; MMU
-	defb 080h, 011h, 074h			; MMU
-	defb 080h, 012h, 03ah			; MMU
-	
+	defb 080h, 010h, 000h			; MMU            MMIDR
+	defb 080h, 014h, 045h			; Memory bank    MB0CR
+	defb 080h, 015h, 045h			; Memory bank    MB1CR
+	defb 080h, 016h, 040h			; Memory bank    MB2CR
+	defb 080h, 017h, 040h			; Memory bank    MB3CR
+	defb 080h, 013h, 0c8h			; MMU            SEGSIZE
+	defb 080h, 011h, 074h			; MMU            STACKSEG
+	defb 080h, 012h, 03ah			; MMU            DATASEG
+
+
 
 	defb 080h
 	defb 0a9h
@@ -202,3 +209,17 @@
 	defb 080h, 024h, 080h			; SPCR <= 80h
 
 .__end_prog
+
+	; Here we put some utils for flashing and start from flash
+	; We do not want them in the 2400 baud loader since we dont need
+	; them for the baudrate change so we put them here instead
+
+
+	; TODO: Here we should include and "ifdef" so
+	; we dont download this part when doing raw mode
+	; (raw mode is slow @2400 bps and 3 bytes per byte :-)
+
+	;; 
+IF !DEFINED_NOFLASH
+	INCLUDE	"#rcmx000_flash.asm"
+ENDIF

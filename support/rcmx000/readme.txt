@@ -9,22 +9,21 @@ Welcome to this readme about the rabbit 2-3-4000 processors
 
       Retro-computing in itself is great fun, but the reason I put some (ok a
       lot) of effort into supporting these boards is because these near-Z80
-      compatible boards are still manufactured (as of winter 2007) you can
+      compatible boards are still manufactured (as of winter 2009) you can
       even say that they are doing good!!!
 
       The boards are manufactured by a California based company called Z-World
-      and you can look it up yourself on www.zworld.com. For notes on the
+      and you can look it up yourself on www.rabbit.com. For notes on the
       processors themselves, lookup www.rabbitsemiconductor.com and no, this
       is NOT a sales-pitch ;-)
 
 
 1) Software
 
-   Installing and patching
+   Installing
 
-      (stefano note: removed most of this section, the patch is now part of the kit)
 
-      If you have a Unix(Linux system you can compile the utilities in
+      If you have a Unix/Linux system you can compile the utilities in
       <wd>/z88dk/support/rcmx000 with the make command.
 
 
@@ -87,6 +86,12 @@ Welcome to this readme about the rabbit 2-3-4000 processors
        The final example program will flash the diodes on the Rabbit 3000 dev
        boards, located on port PGx, surprisingly named twinkle3000.c ;-)
 
+       There is now also support for persisten storage (flash)
+       The options -f and -d are used to program the flash and to 
+       run off of it.
+
+       
+
 2) Hardware
 
    Rabbit development boards
@@ -107,7 +112,7 @@ Welcome to this readme about the rabbit 2-3-4000 processors
       Just solder together the adapter wings that convert from the Core
       modules 1.0 mm spacing to 0.1" suitable for a breadbord.
 
-      The only pins on the breadboard that need connecting for the Core module to start is
+      The only pins on the breadboard that need connecting for the Core module to start are
       the VCC and GND pins (and the programming cable of course ;-)
 
       Beware!! the voltage required is different for different Core modules
@@ -139,13 +144,6 @@ Welcome to this readme about the rabbit 2-3-4000 processors
       not used since I have made no alterations to the compiler, (it seems to
       require the hands of an expert ;-)
 
-   Persistent storage (flash)
-      When using the almost-native compiler, Dynamic-C, for the Rabbit boards,
-      it automatically stores any program written into the on-board flash so
-      that if the rabbit is disconnected from the programming cable it will
-      start to execute that code by itself when power is applied. No code to
-      handle the flash has so far been written.
-
    >64k memory model
       The Rabbit processors are capable of adressing 1M of total memory using
       an efficient bank-switching scheme. This is not used currently and the
@@ -159,11 +157,8 @@ Welcome to this readme about the rabbit 2-3-4000 processors
       the z88dk can be used for writing to registers setting up interrupts etc.
 
    Debugging
-      Always a hot issue, my plan is to implement the NoICE protocol 
-      ( http://www.noicedebugger.com ) to enable assembler, or at least
-      hex-monitor debugging.
-      This is not so much work, but one also might want C-level debugging
-      which is a larger project.
+      There is now an experimental debugger for the "test" plattform.
+      It needs further development and porting to the rabbit :-)
 
    Support for other host-OS than Linux
       It should not be that hard to make this run on any machine with a decent
