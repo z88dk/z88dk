@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.16 2009-02-22 08:33:25 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.17 2009-02-26 13:21:32 stefano Exp $
 ;
 
 
@@ -401,7 +401,7 @@ ENDIF
 ;--------
 
 ;---------------------------------------------------------------------------
-IF (startup<=3) ; ROM
+IF (startup=2) ; ROM
 ;---------------------------------------------------------------------------
 
 
@@ -409,9 +409,11 @@ IF !DEFINED_HAVESEED
                 XDEF    _std_seed         ; Integer rand() seed
 ENDIF
 
+
 IF !DEFINED_sysdefvarsaddr
         defc sysdefvarsaddr = 23552-70   ; Just before the ZX system variables
 ENDIF
+
 DEFVARS sysdefvarsaddr
 {
 __sgoioblk      ds.b    40      ; stdio control block
@@ -432,9 +434,20 @@ heapblocks      ds.w    1       ; Number of blocks
 }
 
 
+IF !DEFINED_defvarsaddr
+        defc defvarsaddr = 24576
+ENDIF
+
+DEFVARS defvarsaddr
+{
+dummydummy        ds.b    1 
+}
+
+
 ;---------------------------------------------------------------------------
 ELSE
 ;---------------------------------------------------------------------------
+
 
 .coords         defw    0       ; Current graphics xy coordinates
 .base_graphics  defw    0       ; Address of the Graphics map
@@ -469,6 +482,7 @@ IF NEED_floatpack
 .fasign         defb    0               ;FP register
 
 ENDIF
+
 
 ;---------------------------------------------------------------------------
 ENDIF
