@@ -13,7 +13,7 @@ Contact the author:
 	ICQ UIN   : 10115284
 
 
-$Id: gfx.h,v 1.3 2009-01-14 16:07:40 stefano Exp $
+$Id: gfx.h,v 1.4 2009-02-27 18:20:42 stefano Exp $
 
 
 =========================================================================*/
@@ -39,6 +39,7 @@ $Id: gfx.h,v 1.3 2009-01-14 16:07:40 stefano Exp $
 #include <stdlib.h>
 #include <msx.h>
 #include <string.h>
+#include <graphics.h>
 
 // --- library functions / enums
 
@@ -57,8 +58,16 @@ $Id: gfx.h,v 1.3 2009-01-14 16:07:40 stefano Exp $
 /// set screen color
 #define set_color(front,back,border) msx_color(front,back,border)
 
+
+// SORRY, WE HAVE A FUNCTION NAME CONFLICT.
+// GET RID OF THE "DEFAULT" FILL FUNCTION (FILLS GRAPHICS AREA)
+// AND DEFINE THE NEW ONE (VRAM FILL)
+
+#undef fill
+
 /// fill vram from \a addr, with \a value, for \a count bytes
 #define fill(addr,value,count) msx_vfill(addr,value,count)
+
 
 /// set \a value at a given vram address \a addr
 #define vpoke(addr,value) msx_vpoke(addr,value)

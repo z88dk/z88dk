@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.8 2009-01-21 16:00:08 stefano Exp $
+ * $Id: msx.h,v 1.9 2009-02-27 18:20:42 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -260,6 +260,9 @@ typedef struct {
 	int width, height;
 } rect_t; 
 
+// Draw a line on a surface
+extern __LIB__ surface_draw(surface_t *s, int x1, int y1, int x2, int y2);
+
 extern void __LIB__ msx_blit(surface_t *source, surface_t *dest, rect_t *from, rect_t *to);
 extern void __LIB__ msx_blit_ram_vram(unsigned char* source, unsigned int dest, unsigned char w, unsigned char h, int sjmp, int djmp);
 extern void __LIB__ msx_blit_fill_vram(unsigned int dest, unsigned char value, unsigned char w, unsigned char h, int djmp);
@@ -376,8 +379,7 @@ extern void __LIB__ msx_compute_line(int x1, int y1, int x2, int y2, line_t *r);
 	
 	** STEFANO NOTE: STILL DON'T KNOW WHAT WILL HAPPEN IN Z88K !! **
 
-	that's why we need REVERSE_LINE_T_MEMBERS and all this
-	crap
+	that's why we need REVERSE_LINE_T_MEMBERS and all this crap
 */
 
 #define LINE_T_FIRST	dinc1

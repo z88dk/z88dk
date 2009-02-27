@@ -1,7 +1,7 @@
 #
 # Build the MSX target libraries
 #
-# $Id: Makefile,v 1.2 2009-01-09 08:36:53 stefano Exp $
+# $Id: Makefile,v 1.3 2009-02-27 18:20:42 stefano Exp $
 #
 
 include ../Make.config
@@ -16,13 +16,7 @@ AFILES = \
 	msx_blit.c \
 	msx_blit_fill_vram.c \
 	msx_blit_ram_vram.c \
-	msx_compute_line.c \
-	msx_surface_line.c \
-	msx_line.c \
-	msx_line_slow.c \
 	msx_calculate_side.c \
-	msx_hline.c \
-	msx_surface_hline.c \
 	msx_pset.c \
 	msx_set_sprite_mode.c \
 	msx_set_sprite_8.c \

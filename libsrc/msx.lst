@@ -51,6 +51,9 @@ graphics/msx/bkrestore
 graphics/msx/swapgfxbk
 graphics/xorborder
 graphics/xorplot
+graphics/msx/surface/surface_draw
+graphics/msx/surface/surface_pixladdr
+graphics/msx/surface/surface_plotpixl
 games/msx/joystick
 games/msx/bit_open
 games/msx/bit_open_di
@@ -121,13 +124,7 @@ msx/msx_blit
 msx/msx_blit_fill_vram
 msx/msx_blit_ram_vram
 msx/dithpat
-msx/msx_compute_line
-msx/msx_surface_line
-msx/msx_line
-msx/msx_line_slow
 msx/msx_calculate_side
-msx/msx_hline
-msx/msx_surface_hline
 msx/msxbasic
 msx/msxextrom
 msx/msxrompage

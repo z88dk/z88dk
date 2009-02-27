@@ -13,7 +13,7 @@ Contact the author:
 	ICQ UIN   : 10115284
 
 
-$Id: defs.h,v 1.2 2009-01-13 17:48:01 stefano Exp $
+$Id: defs.h,v 1.3 2009-02-27 18:20:42 stefano Exp $
 
 
 =========================================================================*/
@@ -71,19 +71,19 @@ $Id: defs.h,v 1.2 2009-01-13 17:48:01 stefano Exp $
 // fixed point arithmetic
 
 /// integer to fixed-point
-#define i2f(v)	((v) << 6)
+#define i2f(v)	((v) *64 )
 //#define i2f(v)	((v) * 10000)
 
 /// fixed-point to integer
-#define f2i(v)	((v) >> 6)
+#define f2i(v)	((v) / 64)
 //#define f2i(v)	((v) / 10000)
 
 /// fixed-point multiplication
-#define mulfx(x,y)	((LONG(y) * LONG(x)) >> 6)
+#define mulfx(x,y)	((LONG(y) * LONG(x)) / 64)
 //#define mulfx(x,y)	((LONG(y) * LONG(x)) / 10000)
 
 /// fixed-point division
-#define divfx(x,y)	((LONG(x) << 6) / LONG(y))
+#define divfx(x,y)	((LONG(x) * 64) / LONG(y))
 //#define divfx(x,y)	((LONG(x) * 10000) / LONG(y))
 
 /// fixed-point square

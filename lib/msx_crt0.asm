@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.13 2009-01-21 16:32:34 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.14 2009-02-27 18:20:42 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -34,21 +34,22 @@
 
         XDEF    _std_seed
 
-	XDEF	snd_tick	;Sound variable
+	XDEF	snd_tick	; Sound variable
 
 	XDEF	_vfprintf
 
         XDEF    exitsp
         XDEF    exitcount
 
-       	XDEF	heaplast	;Near malloc heap variables
+       	XDEF	heaplast	; Near malloc heap variables
 	XDEF	heapblocks
 
         XDEF    __sgoioblk
 
 ; Graphics stuff
-	XDEF	pixelbyte	;Temp store for non-buffered mode
-        XDEF    coords          ;Current xy position
+	XDEF	pixelbyte	; Temp store for non-buffered mode
+        XDEF    base_graphics   ; Graphical variables
+        XDEF    coords          ; Current xy position
 
 ; MSX platform specific stuff
 ;
@@ -64,7 +65,7 @@ IF (!DEFINED_startup | (startup=1))
         ENDIF
                 org     myzorg
 ELSE
-	XDEF	__fcb		;file control block
+	XDEF	__fcb		; file control block
         org     $100		; MSXDOS
 ENDIF
 
@@ -252,6 +253,7 @@ ENDIF
 ; Misc Variables
 ; ---------------
 .defltdsk       defb    0	; Default disc
+.base_graphics  defw    0	; Location of current screen buffer
 .coords         defw    0       ; Current graphics xy coordinates
 .pixelbyte
 		defb	0
