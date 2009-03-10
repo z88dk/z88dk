@@ -1,0 +1,546 @@
+#!/usr/bin/expect
+
+# 
+log_user 0
+
+# Debug flag(s)
+set packet_dbg false
+
+
+
+
+# Other global variables
+set binfilename ""
+
+# Making multiple breakpoints is just a matter of extending
+# this to an associative array with addresses and saved original bytes
+set breakaddr ""
+set saved_opc ""
+set charbuff ""
+set n_brk ""
+set pidden ""
+
+
+# Will get the first whitespace separated token in a list
+proc getfirst { str } {
+
+    set str [string trimleft $str]
+    set str [string trimright $str]
+
+    if { $str=="" } { return  "" }
+    
+    set first_tok_end_ix [string first " " $str]
+
+    if { $first_tok_end_ix < 0 } { return $str }
+
+    set str [string range $str 0 $first_tok_end_ix]
+    
+    return [string trimright $str]
+}
+
+
+proc getrest { str } {
+    set str [string trimleft $str]
+    set str [string trimright $str]
+
+    set first_tok_end_ix [string first " " $str]
+
+    if { $first_tok_end_ix < 0 } { return "" }
+
+    set lnthm1 [ expr [string length $str] -1 ]
+
+    set str [string range $str $first_tok_end_ix $lnthm1]
+
+    return [string trimleft $str]
+}
+
+proc mk_patch_file { filename lineno } {
+    
+    set finhandle [open $filename r]
+    set fouthandle [open dbg_$filename w]
+
+    for { set i 0 } { $i<$lineno-1 } { incr i } {
+
+	set thisline [gets $finhandle]
+	puts $fouthandle $thisline
+    }
+
+    # If anyone else is using this label we will get a linker error
+    puts $fouthandle "\{\n#asm\n.dbgdontuse\n#endasm\n\}\n"
+    
+    for {} { [eof $finhandle] == 0 } {} {
+
+	set tmpeof [eof $finhandle]
+
+	set thisline [gets $finhandle]
+	puts $fouthandle $thisline
+    }
+
+    close $finhandle
+    close $fouthandle
+    
+}
+
+proc do_break { filename lineno } {
+    
+    global filh
+    global binf
+    global breakaddr
+    global saved_opc
+    global n_brk
+
+    set timeout -1
+
+    set spawn_id $filh
+
+    if { $breakaddr!="" } {
+	# Here we call debugger and remove current bp
+	# in favour of the next one...
+	set oldbphi [string range $breakaddr 0 1]
+	set oldbplo [string range $breakaddr 2 3]
+	
+	set post "00$saved_opc"
+	exch_data "0604$oldbplo$oldbphi$post"
+
+    }
+
+    mk_patch_file $filename $lineno
+
+    # Make a complete compilation with the breakpoint macro inserted
+    exec echo "#!/bin/bash" > sourcedbg.sh
+    exec sed "s/$filename/dbg_$filename/g" < source.sh >> sourcedbg.sh
+
+    exec chmod a+rx sourcedbg.sh
+    # here we should crash if we set the breakpoint so 
+    # the code does not compile...
+    set res [catch {exec ./sourcedbg.sh }  errMsg]
+    
+    # Now extract the hex address from the map file from the compiler output
+    catch { exec ./obtain_map } hexaddr
+
+    if { $res!=0 } {
+	puts "You have put the breakpoint on a line that is not start of a statement"
+    } else {
+	exec diff $binf dbg_$binf
+	
+	# remove all tmp files
+	exec rm -f /tmp/tmp*
+	if { $res!=0 } {
+	    puts "You have put the breakpoint on a line that has been altered by optimizer"
+	    puts "to break on this line you need to turn off optimization, at least for this file"
+	} else {
+	    # If we get here it is time to call the serial protocol on the target and set the 
+	    # breakpoint to the address kept in hexaddr
+
+	    set hexhi [string range $hexaddr 0 1]
+	    set hexlo [string range $hexaddr 2 3]
+
+
+	    set post "00"
+
+	    set msg [exch_data "0501$hexlo$hexhi$post"]
+
+	    set breakaddr $hexaddr
+
+	    puts "setting breakaddr to $breakaddr"
+
+	    set saved_opc [string range $msg 4 5 ]
+
+	    puts "do_break: msg=$msg"
+	    
+	    # This is the number of bytes in the packet i.e. 3 means 1 byte 
+	    set num_bytes [string range $msg 0 1 ]
+	    
+	    set n_brk [expr [expr 0x$num_bytes] - 2]
+	    
+	    if {$n_brk != "1"} {
+		puts "This debugger cant handle more than one byte opcode breakpoint instructions"
+		exit 1
+	    }
+	    
+	}
+    }
+
+}
+
+
+proc strip2 { str } {
+    return [string range $str 2 [string length $str] ]
+}
+
+# Will send str to target and return the return string value
+proc exch_data { str } {
+    global filh
+    global packet_dbg
+
+    set spawn_id $filh
+
+    set timeout -1
+    
+    # Carriage return is added here
+    send "$str\r"
+
+    if { $packet_dbg=="true" } {
+	puts "sent: <<$str>>\n"
+    }
+
+    # Here we catch the local echo
+    expect {
+	"$str\r"
+    }
+
+    expect {
+	"*\r" {
+	    set rpy $expect_out(0,string)
+	}
+    }
+
+    set ret [string range $rpy 1 [ expr [string length $rpy]-2] ]
+
+    if { $packet_dbg=="true" } {
+	puts "got: <<$ret>>\n"
+    }
+
+    return $ret
+}
+
+proc do_load { args } {
+
+    global binf
+    global filh
+    
+    global pidden
+    
+    if { [ string equal $filh not_loaded] } {
+	# ok load the file
+	puts "Loading...\n"
+	
+	# in fact we dont load the file, we spawn a process
+	# which does...
+	
+	set binf [getfirst $args]
+	
+	exec rm -f $pidden
+	
+	# The pid of this process is used to form a unique name
+	# in which to store the port of the debugger
+	#
+	exec xterm -e ./dbgbin -m $pidden $binf &
+	for {} -1 {} {
+	    if [ file exists $pidden ] {
+		break
+	    }
+	   sleep 1
+	}
+
+	set port [exec cat $pidden]
+
+	set pid [spawn ./client_debug $port]
+	
+	set filh $spawn_id
+	
+	expect  {
+	    "0200\r" {
+		puts "Got handshake from target...\n" 
+	    }
+	}
+	
+    } else {
+	puts "Only one binfile per run, this is a primitive debugger..\n"
+	exit 1
+    }
+    # Save a copy of this to use later for breakpoint compares
+    exec cp [getfirst $args] dbg_[getfirst $args]
+}
+
+proc do_run { args } {
+    set rpy [exch_data "0200"]
+    puts "Hit a breakpoint"
+}
+
+# Since the intelligence is here and not in the assembler monitor
+# the breakpoint is considered to be a normal instruction and so
+# return will be to the byte after the breakpoint
+# This will create chaos so here is the "intelligence" which 
+# backs off the PC by n_brk (usually one-byter)
+#
+proc backoff_pc {} {
+    global n_brk
+
+    # 2) Get current register values
+    set regs [exch_data "0203"]
+    
+    # Parse out the PC (small endian style)
+    # TODO: This is highly unportable, we might want a standard interface
+    # that gives us the PC and the max number of bytes in 
+    # one instruction in the future
+    set PC [string range $regs 44 45][string range $regs 46 47]
+    set PCPRINT [string range $PC 2 3][string range $PC 0 1]
+
+    # Here we need to set the PC to before it executed the breakpoint
+    # to make it work normal
+
+    set PCm1print [format %.4X [expr [expr 0x$PCPRINT] - $n_brk]]
+
+    set PCm1 [string range $PCm1print 2 3][string range $PCm1print 0 1]
+    set newregs [string range $regs 1 43]$PCm1[string range $regs 48 [string length $regs]]
+
+    set sendb "1A02[string range $newregs 3 50]"
+    exch_data $sendb    
+}
+
+proc do_continue { args } {
+
+    global breakaddr
+    global saved_opc
+    global filh
+    global n_brk
+
+    set timeout -1
+
+    # Continue requires some trickery 
+    # We need to figure out which address is next
+    # after substituting the current breakpoint with the
+    # original code.
+    # Then we need to set another breakpoint at the next
+    # mnemonic (finding out its size and also consider that
+    # it might be a jump somewhere)
+    # Put the break point there and then do run until 
+    # break. After that we need to restore the original
+    # breakpoint and set the temp bp to its original value
+    # (ptew).
+    
+    # 1) restore code in breakpoint
+    set addrhi [string range $breakaddr 0 1]
+    set addrlo [string range $breakaddr 2 3]
+
+    set tail "00$saved_opc"
+    set sendstr "0604$addrlo$addrhi$tail"
+    
+    set spawn_id $filh
+    
+    exch_data $sendstr
+
+    # 2) Get current register values
+    set regs [exch_data "0203"]
+    
+    # Parse out the PC (small endian style)
+    # TODO: This is highly unportable, we might want a standard interface
+    # that gives us the PC and the max number of bytes in 
+    # one instruction in the future
+    set PC [string range $regs 44 45][string range $regs 46 47]
+    set PCPRINT [string range $PC 2 3][string range $PC 0 1]
+
+    # Here we need to set the PC to before it executed the breakpoint
+    # to make it work normal
+
+    set PCm1print [format %.4X [expr [expr 0x$PCPRINT] - $n_brk]]
+
+    set PCm1 [string range $PCm1print 2 3][string range $PCm1print 0 1]
+
+
+    set newregs [string range $regs 1 43]$PCm1[string range $regs 48 [string length $regs]]
+
+    set sendb "1A02[string range $newregs 3 50]"
+
+    exch_data $sendb
+    
+    # 3) find out where to set next breakpoint
+    
+    
+    #   In order to do this we need to setup a quick scenario with
+    #   the emulator and a small max four byte program...
+
+    # Here we fetch those four bytes from real "target"
+    # We use 1 - 4 of these bytes depending on which instruction
+    set post "0004"
+
+    set msg "0605$PCm1$post"
+
+    set rpy [exch_data "$msg"]
+    set codemem [string range $rpy 4 11]
+
+    # Ok make codemem string into a binary max_opcode-byte file
+    set OP1 [string range $codemem 0 1]
+    set OP2 [string range $codemem 2 3]
+    set OP3 [string range $codemem 4 5]
+    set OP4 [string range $codemem 6 7]
+
+    set binstr [format "%c%c%c%c" 0x$OP1 0x$OP2 0x$OP3 0x$OP4 ]
+    
+    set tempbin [open "tmp.bin" w]
+    
+    puts -nonewline $tempbin $binstr
+    
+    close $tempbin
+
+    # Now run the emulator with the tailor made options ;-)
+    # We only care about PC and SP
+    catch {exec ./dbgbin -n 1 -r "0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 $PCm1print FFFF" tmp.bin} res
+
+    set PC [string range $res 85 88]
+    
+    set hexlo [string range $PC 2 3]
+    set hexhi [string range $PC 0 1]
+    
+    # 5) set next temp breakpoint
+    # Set breakpoint in debugger
+
+    set tail "00"
+    
+    set rpy [exch_data "0501$hexlo$hexhi$tail"]
+    set tmpopc [string range $rpy 4 5 ]
+
+    # 6) run program 'til it returns to "prompt" on "real" target
+
+    do_run
+    
+    # 7) restore temp breakpoint code and backoff PC by n_brk
+    set sendstr1 "0604$hexlo$hexhi"
+    set sendstr2 "00$tmpopc"
+    
+    exch_data "$sendstr1$sendstr2"
+
+    backoff_pc
+
+    # 8) Set breakpoint again at original place
+    set sendstr1 "0501$addrlo$addrhi"
+    set sendstr2 "00"
+    
+    exch_data $sendstr1$sendstr2
+    
+    # 9) Keep running (finally!)
+    do_run
+}
+
+proc do_macro { macrofile } {
+    set mf [open $macrofile r]
+    
+    for {} { [eof $mf] == 0 } {} {
+
+	set thisline [gets $mf]
+	puts "Executing macro cmd: $thisline"
+
+	decode_line $thisline
+	
+    }
+    close $mf
+}
+
+proc do_delete_bp { args } {
+    
+}
+
+
+proc do_munch { args } {
+    
+    global filh
+
+    set spawn_id $filh
+
+    expect "*\n" {
+    }
+
+}
+
+
+# Here we interpret the debugger commands
+proc decode_line { cmdline } {
+
+    global charbuff
+    global binf
+
+    set cmd [getfirst $cmdline]
+
+    set args [getrest $cmdline]
+
+    switch $cmd {
+	# breakpoint <filename> <lineno>
+	b { 
+
+	    set bpfile [getfirst $args]
+	    set lineno [getfirst [getrest $args]]
+	    do_break $bpfile $lineno
+	}
+
+	# load <binary file>
+	# In this case we fire up the emulator and keep its filehandle
+	# If emulator is run in debug mode it will wait for 
+	# us to send an inital hex string command
+	l {
+	    do_load $args
+
+	}
+	r {
+	    # This will hold unread stdin characters
+	    set charbuff ""
+	    
+	    do_run
+	}
+
+	d {
+	    # TODO: multiple breakpoints
+	    do_delete_bp $args
+	}
+
+	c {
+	    do_continue $args
+	}	
+	
+	q {
+	    exit
+	}
+
+	m {
+	    # Here we run this file line by line
+	    puts "Running macro file: $args"
+	    do_macro $args
+	}
+
+	p {
+	    # this is for internal debugging only
+	    do_munch 
+	}
+
+    }
+}
+
+
+proc getmypid {} {
+    global pidden
+
+    spawn ./getmypid
+    expect {
+	"*\r" {
+	    set pidden_nl "/tmp/PID_$expect_out(buffer)"
+
+	    set len [expr [string length $pidden_nl] - 2]
+
+	    set pidden [string range $pidden_nl 0 $len]
+
+	}
+    }
+}
+
+getmypid
+
+set filh not_loaded
+
+    # Check if user has supplied an macro file
+    if { $argv!="" } {
+	do_macro $argv
+    }
+
+for {} -1 {} {
+
+
+    puts -nonewline "DBG> "
+
+    flush stdout
+
+    set timeout -1
+    expect "*\n"
+
+    decode_line $expect_out(buffer)
+
+}

@@ -1,0 +1,146 @@
+
+
+This is an experimental debugger for the zcc/z88dk compiler.
+
+Compile & run
+-------------
+
+In order to compile it type "make" in this directory.
+
+It has currently only been tested on debian/lenny.
+
+
+In order to run it, you need the X-environment running.
+It should be possible to type "xterm" and get another terminal
+window.
+
+Besides this you need the zcc and also you must install "gcc" and "expect"
++ probably some more stuff I forgot :-)
+
+To start the debugger, use the "./hitnrun.exp" expect script.
+
+> ./hitnrun.exp
+
+ Then you should be able to load the file "hello.bin"
+
+DBG> l hello.bin
+Loading...
+
+Got handshake from target...
+
+  Here we also open a second xterm which will run the actual program
+  Set a breakpoint on line 13 in the middle of the loop
+
+DBG> b hello.c 13
+setting breakaddr to 0705
+do_break: msg=030021
+
+
+
+DBG> r
+Hit a breakpoint
+DBG>  
+DBG> c
+Hit a breakpoint
+Hit a breakpoint
+DBG> c
+Hit a breakpoint
+Hit a breakpoint
+DBG> c
+Hit a breakpoint
+Hit a breakpoint
+DBG> DBG>
+
+
+Each 'c' should output another
+i=0
+i=1
+i=2 etc.
+
+If the test/machine binary is compiled with the -DDEBUG macro one
+can also use the assembler debugger to see what happens on the 
+"target". This was a great aid in debugging the debugger :-)
+
+
+Porting to a real platform.
+--------------------------
+
+This is a matter of rewriting the "dbgbin" process so that it talks to a real
+platform.
+
+Here is a description of the "architecture":
+
+                                            program                              
+                                            input/output
+                    +----------+            +---------+
+                    |  dbg     |            |         | 
+                    |  term    |            | console |
+                    |          |            |         |
+                    +----------+            +---------+ 
+                         |                       |                             
+                         |                       |                             
+ +---------+ TCP/IP +----+----+ serial      +---------+
+ |         | socket |         | line        |         |
+ | hitnrun + -----> + dbgbin  + ----------> | target  |
+ | expect  |        |         |             |         |
+ | script  |        |         |             +---------+
+ +---------+        +---------+              debugger.c                             
+      |                                          +                             
+      |                                     serial drive
+      |
+      |
+ +-----------+
+ | zcc/antlr |
+ | question  |
+ | and       |
+ | evaluation|
+ | box       |
+ +-----------+
+
+The "hitnrun.exp" script is the starter command. It expects to
+find a valid compiler line in the file "source.sh". This will
+modify the sourcecode (must have same base as xyz.c) in the xyz.bin
+loaded with the 'l' command in the example above.
+
+To find out where to set the breakpoint for a line it inserts an
+assembler label at that line and recompiles. To obtain the machine
+address it simply looks up this label in the .map file.
+
+Obtaining variables (todo)
+-------------------
+I have made some experiments with antlr (www.antlr.org) a modern
+version of the infamous yacc and lex.
+The code I've written will give out the type for any variable in any
+scope (i.e. file and line).
+
+I recently had some issues with the Java so nothing is commitable yet..
+
+The good part is that if one doesn't need to modify the semantics of
+the compiler one needs never to touch the Java stuff (Not every one
+is a java fan ;-) One needs only use the pregenerated C-code and link
+with the libantlr (also pure C-code!!)
+
+After knowing which type the variable is we should insert a piece of code
+(again using the compiler on-the-fly to produce alternate code).
+This code should just put the variable bytes in a place where we can read
+it up to the debugger. By doing this we need not worry about any variables
+residing in a cpu register or somewhere else since the compiler will be used
+to place the value at a specified place. Hence eliminating the need for large
+debugging symbol tables, at the expense of running the compiler now and then!
+
+
+
+Future enhancements
+-------------------
+
+One thing I always wanted to do is a debugger which doesn't need to turn off
+optimization since this makes the beds for nasty "Heisenbugs" i.e., bugs that
+either disappears or do not pop-up when running the debugger.
+
+It should be a matter of setting the assembler breakpoint just before the diff
+between the optimised and original code.
+
+Then one should single step a few of the original instructions just to get to
+"our" breakpoint. Standing here we should be in the right state for reading
+any variables at this point.
+

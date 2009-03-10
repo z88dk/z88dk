@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#Old style with the /tmp/tmp***.map files
+#
+#MAPFILESTEM=`grep test_crt0.opt source.txt | awk '{print $3}' | sed 's/\/tmp\///g' | sed 's/.opt//g'`
+#grep DBGDONTUSE /tmp/$MAPFILESTEM.map | uniq | awk '{print $3}' | sed 's/,//g'
+
+# Now we dare to use the -m option directly...
+MAPFILESTEM=`cat source.txt | awk '{print $7}' | sed 's/\/tmp\///g' | sed 's/.c//g'`
+
+#echo "MAPFILESTEM=$MAPFILESTEM"
+
+grep DBGDONTUSE $MAPFILESTEM.map | uniq | awk '{print $3}' | sed 's/,//g'
+
+
+
+
