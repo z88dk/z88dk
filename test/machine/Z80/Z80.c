@@ -624,18 +624,18 @@ void IntZ80(Z80 *R,word Vector)
   }
 }
 
-/** RunZ80() *************************************************/
-/** This function will run Z80 code until an LoopZ80() call **/
-/** returns INT_QUIT. It will return the PC at which        **/
-/** emulation stopped, and current register values in R.    **/
-/*************************************************************/
 #ifndef EXECZ80
-word RunZ80(Z80 *R)
+/**
+ *  This function will execute num_instr instructions on the Z80 then return
+ */
+word InstrZ80(Z80 *R, int num_instr)
 {
   register byte I;
   register pair J;
 
-  for(;;)
+  int n;
+
+  for(n=1;n<=num_instr;n++)
   {
 #ifdef DEBUG
     /* Turn tracing on when reached trap address */
@@ -686,6 +686,25 @@ word RunZ80(Z80 *R)
       if(J.W==INT_QUIT) return(R->PC.W); /* Exit if INT_QUIT */
       if(J.W!=INT_NONE) IntZ80(R,J.W);   /* Int-pt if needed */
     }
+  }
+
+  /* Execution stopped */
+  return(R->PC.W);
+}
+
+/** RunZ80() *************************************************/
+/** This function will run Z80 code until an LoopZ80() call **/
+/** returns INT_QUIT. It will return the PC at which        **/
+/** emulation stopped, and current register values in R.    **/
+/*************************************************************/
+word RunZ80(Z80 *R)
+{
+  register byte I;
+  register pair J;
+
+  for(;;)
+  {
+    InstrZ80(R,1);
   }
 
   /* Execution stopped */

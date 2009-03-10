@@ -119,6 +119,13 @@ int ExecZ80(register Z80 *R,register int RunCycles);
 /*************************************************************/
 void IntZ80(register Z80 *R,register word Vector);
 
+/** InstrZ80
+ *  This function will execute num_instr instructions on the Z80 then return PC
+ */
+#ifndef EXECZ80
+word InstrZ80(Z80 *R, int num_instr);
+#endif
+
 /** RunZ80() *************************************************/
 /** This function will run Z80 code until an LoopZ80() call **/
 /** returns INT_QUIT. It will return the PC at which        **/
