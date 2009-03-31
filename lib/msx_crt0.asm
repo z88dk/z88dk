@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.15 2009-03-31 15:58:41 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.16 2009-03-31 16:00:32 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -255,8 +255,7 @@ ENDIF
 .defltdsk       defb    0	; Default disc
 .base_graphics  defw    0	; Location of current screen buffer
 .coords         defw    0       ; Current graphics xy coordinates
-.pixelbyte
-		defb	0
+.pixelbyte	defb	0
 
 
 IF DEFINED_NEED1bitsound
