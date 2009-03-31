@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.17 2009-02-26 13:21:32 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.18 2009-03-31 15:58:41 stefano Exp $
 ;
 
 
@@ -73,12 +73,12 @@
 
 IF (startup=2)
 
-        di
-        im      1
-        ei
-        ld      sp,STACKPTR-64
+        di			; put hardware in a stable state
+        ld      a,$3F
+        ld      i,a
         jr      init            ; go over rst 8, bypass shadow ROM
-        
+        nop
+
         ; --- rst 8 ---
         ld      hl,($5c5d)      ; It was the address reached by CH-ADD.
         nop                     ; one byte still, to jump over the
@@ -86,6 +86,8 @@ IF (startup=2)
         ; --- nothing more ?
 
 .init
+        im      1
+        ld      sp,STACKPTR-64
         ld      a,@111000       ; White PAPER, black INK
         call    zx_internal_cls
         ld      (hl),0
@@ -100,7 +102,7 @@ IF (startup=2)
 
         ld      hl,$8080
         ld      (fp_seed),hl
-
+        ei
 ELSE
 
         ; --- startup=[default] ---
@@ -157,12 +159,14 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
+
 IF (startup=2)      ; ROM ?
+
 .cleanup_exit
-        jp      0
-        
-        defs    56-cleanup_exit-3
-        
+        rst     0
+
+        defs    56-cleanup_exit-1
+
 ; ######## IM 1 MODE INTERRUPT ENTRY ########
 
 	INCLUDE "#spec_crt0_rom_isr.as1"
@@ -404,6 +408,11 @@ ENDIF
 IF (startup=2) ; ROM
 ;---------------------------------------------------------------------------
 
+;; ;## Bypass to prevent an accidental insertion of the Interface 1 ##
+;; ;## Requires a manual tuning, so it is commented out by default  ##
+;; .shadow_protect_filler
+;; defs    $1708-shadow_protect_filler
+;; defw    0
 
 IF !DEFINED_HAVESEED
                 XDEF    _std_seed         ; Integer rand() seed

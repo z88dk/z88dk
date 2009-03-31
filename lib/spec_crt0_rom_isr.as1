@@ -5,7 +5,7 @@
 ;
 ; Stefano Bodrato, 19/02/2009
 ;
-; $Id: spec_crt0_rom_isr.as1,v 1.1 2009-02-19 09:33:39 stefano Exp $
+; $Id: spec_crt0_rom_isr.as1,v 1.2 2009-03-31 15:58:42 stefano Exp $
 ;
 
 
