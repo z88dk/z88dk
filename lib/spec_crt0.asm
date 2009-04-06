@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.18 2009-03-31 15:58:41 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.19 2009-04-06 09:17:42 stefano Exp $
 ;
 
 
@@ -209,19 +209,6 @@ ENDIF
 
 
 .l_dcal jp      (hl)            ;Used for function pointer calls
-
-
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-;.__sgoioblk
-;IF DEFINED_ANSIstdio
-;       INCLUDE "#stdio_fp.asm"
-;ELSE
-;        defw    -11,-12,-10
-;ENDIF
-
 
 
 ;---------------------------------
@@ -457,7 +444,6 @@ dummydummy        ds.b    1
 ELSE
 ;---------------------------------------------------------------------------
 
-
 .coords         defw    0       ; Current graphics xy coordinates
 .base_graphics  defw    0       ; Address of the Graphics map
 
@@ -475,6 +461,17 @@ ENDIF
 
 IF DEFINED_NEED1bitsound
 .snd_tick       defb    0       ; Sound variable
+ENDIF
+
+;-----------
+; Define the stdin/out/err area. For the z88 we have two models - the
+; classic (kludgey) one and "ANSI" model
+;-----------
+.__sgoioblk
+IF DEFINED_ANSIstdio
+       INCLUDE "#stdio_fp.asm"
+ELSE
+        defw    -11,-12,-10
 ENDIF
 
                 defm    "Small C+ ZX"   ;Unnecessary file signature
