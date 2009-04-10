@@ -8,8 +8,7 @@ Copyright© 2002, Mark Hamilton
 */
 
 #include "lib3d.h"
-
-extern __LIB__ * memcpy(void *, void *, unsigned);
+#include "string.h"
 
 ozcopyvector(Vector_t *dest, Vector_t *src)
 {

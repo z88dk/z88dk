@@ -1,6 +1,5 @@
 restore_a000
 ozcopy
-memcpy
 ozdetectmodel
 ozinput/ozclick
 ozinput/ozeditline

@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.133 2009-01-09 08:36:52 stefano Exp $
+# $Id: Makefile,v 1.134 2009-04-10 12:47:42 stefano Exp $
 
 
 include	Make.config
@@ -165,7 +165,7 @@ lib3d.lib:
 	@echo ''
 	@echo '--- Building 3D Library	---'
 	@echo ''
-	cd oz ;	$(MAKE)	lib3d.lib ; cd ..
+	cd lib3d ; $(MAKE) ; cd ..
 
 # Xlib / X11 and tiny GUI portable library - stefano
 x11.lib:
@@ -1238,7 +1238,8 @@ clean:
 	cd rect	; $(MAKE) clean	; cd ..
 	cd algorithm ; $(MAKE) clean ; cd ..
 	cd debug ; $(MAKE) clean ; cd ..
-	cd oz ;	$(MAKE)	clean ;	cd ..
+	cd oz ; $(MAKE)	clean ;	cd ..
+	cd lib3d ; $(MAKE) clean ; cd ..
 	cd input ; $(MAKE) clean ; cd ..
 	cd abc80 ; $(RM) *.o ; cd ..
 	cd abc800 ; $(RM) *.o ;	cd ..
