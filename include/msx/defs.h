@@ -13,7 +13,7 @@ Contact the author:
 	ICQ UIN   : 10115284
 
 
-$Id: defs.h,v 1.3 2009-02-27 18:20:42 stefano Exp $
+$Id: defs.h,v 1.4 2009-04-15 21:00:57 stefano Exp $
 
 
 =========================================================================*/
@@ -23,13 +23,6 @@ $Id: defs.h,v 1.3 2009-02-27 18:20:42 stefano Exp $
 */
 // DEFS.H : shared defines
 
-/* === WARNING ==
-
-	This is a work-in-progress, meaning that most of this code is unstable
-	and it's subject to future changes.  Also, most of it is very hackish,
-	not properly cleaned up nor tested.
-
-   === WARNING == */
 
 #ifndef MSXDEFS_H
 #define MSXDEFS_H
@@ -65,38 +58,6 @@ $Id: defs.h,v 1.3 2009-02-27 18:20:42 stefano Exp $
 	#define NULL 0
 #endif
 
-
-#define LONG(v)	((long)(v))
-
-// fixed point arithmetic
-
-/// integer to fixed-point
-#define i2f(v)	((v) *64 )
-//#define i2f(v)	((v) * 10000)
-
-/// fixed-point to integer
-#define f2i(v)	((v) / 64)
-//#define f2i(v)	((v) / 10000)
-
-/// fixed-point multiplication
-#define mulfx(x,y)	((LONG(y) * LONG(x)) / 64)
-//#define mulfx(x,y)	((LONG(y) * LONG(x)) / 10000)
-
-/// fixed-point division
-#define divfx(x,y)	((LONG(x) * 64) / LONG(y))
-//#define divfx(x,y)	((LONG(x) * 10000) / LONG(y))
-
-/// fixed-point square
-#define sqrfx(x)	((LONG(x) * LONG(x)) >> 6)
-//#define sqrfx(x)	((LONG(x) * LONG(x)) / 10000)
-
-/// fixed-point square root
-#define sqrtfx(x)	(LONG(sqrt(x)) << 3)
-//#define sqrtfx(x)	(LONG(sqrt(x)) * 100)
-// formula: sqrt(N * 64) = sqrt(N) * sqrt(64) -> must compensate with 64/sqrt(64) = 8
-
-/// weighted average (w=0.0 -> x, w=0.5->average, w=1.0 ->y)
-#define wgavgfx(x, y, w)	(mulfx(i2f(1) - w, x) + mulfx(w, y))
 
 // malloc helpers
 

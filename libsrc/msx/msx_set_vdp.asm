@@ -8,7 +8,7 @@
 ;
 ;	Write data to a VDP register
 ;
-;	$Id: msx_set_vdp.asm,v 1.1 2009-01-07 09:50:15 stefano Exp $
+;	$Id: msx_set_vdp.asm,v 1.2 2009-04-15 21:00:58 stefano Exp $
 ;
 
 	XLIB	msx_set_vdp
@@ -17,7 +17,6 @@
         INCLUDE "#msxbios.def"
 
 msx_set_vdp:
-
 	pop	hl
 	pop	de
 	pop	bc

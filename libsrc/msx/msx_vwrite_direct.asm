@@ -8,7 +8,7 @@
 ;
 ;	Transfer count bytes from RAM (current memory page) to VRAM
 ;
-;	$Id: msx_vwrite_direct.asm,v 1.3 2009-01-21 16:00:09 stefano Exp $
+;	$Id: msx_vwrite_direct.asm,v 1.4 2009-04-15 21:00:58 stefano Exp $
 ;
 
 

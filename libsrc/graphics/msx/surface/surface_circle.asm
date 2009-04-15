@@ -11,25 +11,25 @@
 ;	compatibility layer for "GFX",
 ;	 a small graphics library by Rafael de Oliveira Jannone
 ;
-;	Stefano Bodrato - 27/02/2009
+;	Stefano Bodrato - 18/03/2009
 ;
 ;
-;	$Id: surface_draw.asm,v 1.2 2009-04-15 21:00:58 stefano Exp $
+;	$Id: surface_circle.asm,v 1.1 2009-04-15 21:00:58 stefano Exp $
 ;
 
 
-                XLIB    surface_draw
+                XLIB    surface_circle
                 
                 ;LIB     swapgfxbk
                 ;XREF    swapgfxbk1
                 
 		XREF	base_graphics
 
-                LIB     line
+                LIB     draw_circle
                 LIB     surface_plotpixel
 
 
-.surface_draw
+.surface_circle
 		ld	ix,0
 		add	ix,sp
 
@@ -42,17 +42,13 @@
 		ld	d,(hl)
 		ld	(base_graphics),de
 
-		ld	l,(ix+6)	;y0
-		ld	h,(ix+8)	;x0
-		ld	e,(ix+2)	;y1
-		ld	d,(ix+4)	;x1
+		ld	e,(ix+2)	;skip
+		ld	d,(ix+4)	;radius
+		ld	c,(ix+6)	;y
+		ld	b,(ix+8)	;x
+
 		;call    swapgfxbk
-		push	hl
-		push    de
-		call	surface_plotpixel
-		pop     de
-		pop	hl
                 ld      ix,surface_plotpixel
-                call    line
+                call    draw_circle
                 ;jp      swapgfxbk1
                 ret

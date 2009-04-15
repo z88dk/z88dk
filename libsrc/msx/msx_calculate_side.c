@@ -7,7 +7,7 @@
 
 	Calculate a triangle side
 	
-	$Id: msx_calculate_side.c,v 1.2 2009-01-13 17:48:01 stefano Exp $
+	$Id: msx_calculate_side.c,v 1.3 2009-04-15 21:00:58 stefano Exp $
 */
 
 #include <msx.h>

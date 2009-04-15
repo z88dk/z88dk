@@ -1,36 +1,35 @@
 #
 # Build the MSX target libraries
 #
-# $Id: Makefile,v 1.3 2009-02-27 18:20:42 stefano Exp $
+# $Id: Makefile,v 1.4 2009-04-15 21:00:58 stefano Exp $
 #
 
 include ../Make.config
 
+
 AFILES = \
-	msx_set_mangled_mode.c \
-	msx_set_char_form.c \
-	msx_set_char_color.c \
-	msx_set_char_attr.c \
-	msx_set_char.c \
-	msx_vfill_v.c \
 	msx_blit.c \
 	msx_blit_fill_vram.c \
 	msx_blit_ram_vram.c \
 	msx_calculate_side.c \
-	msx_pset.c \
-	msx_set_sprite_mode.c \
-	msx_set_sprite_8.c \
-	msx_set_sprite_16.c \
-	msx_put_sprite_8.c \
-	msx_put_sprite_16.c \
 	msx_psg_channels.c \
 	msx_psg_envelope.c \
 	msx_psg_noise.c \
 	msx_psg_noise_channels.c \
 	msx_psg_tone.c \
 	msx_psg_tone_channels.c \
-	msx_psg_volume.c
-
+	msx_psg_volume.c \
+	msx_put_sprite_16.c \
+	msx_put_sprite_8.c \
+	msx_set_char.c \
+	msx_set_char_attr.c \
+	msx_set_char_color.c \
+	msx_set_char_form.c \
+	msx_set_mangled_mode.c \
+	msx_set_sprite_16.c \
+	msx_set_sprite_8.c \
+	msx_set_sprite_mode.c \
+	msx_vfill_v.c
 
 AOBJECTS = $(AFILES:.c=.o)
 

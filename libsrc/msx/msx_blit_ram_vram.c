@@ -7,7 +7,7 @@
 
 	Blit - Under development
 	
-	$Id: msx_blit_ram_vram.c,v 1.2 2009-01-14 07:07:21 stefano Exp $
+	$Id: msx_blit_ram_vram.c,v 1.3 2009-04-15 21:00:58 stefano Exp $
 */
 
 #include <msx.h>

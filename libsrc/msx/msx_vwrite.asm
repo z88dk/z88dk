@@ -8,7 +8,7 @@
 ;
 ;	Transfer count bytes from RAM to VRAM (BIOS paged version)
 ;
-;	$Id: msx_vwrite.asm,v 1.4 2009-01-21 16:00:09 stefano Exp $
+;	$Id: msx_vwrite.asm,v 1.5 2009-04-15 21:00:58 stefano Exp $
 ;
 
 

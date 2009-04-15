@@ -13,7 +13,7 @@ Contact the author:
 	ICQ UIN   : 10115284
 
 
-$Id: line.h,v 1.3 2009-02-27 18:20:42 stefano Exp $
+$Id: line.h,v 1.4 2009-04-15 21:00:57 stefano Exp $
 
 
 =========================================================================*/
@@ -35,24 +35,5 @@ $Id: line.h,v 1.3 2009-02-27 18:20:42 stefano Exp $
 #define MSXLINE_H
 
 #include <msx/gfx.h>
-
-// Draw a line on a surface
-#define surface_line(s,x1,y1,x2,y2) surface_draw(s,x1,y1,x2,y2)
-
-// Draw a line on video
-#define line(x1,y1,x2,y2) draw(x1,y1,x2,y2) 
-
-// Draw a line on video (was a slow and smaller version, now it is the same)
-#define line_slow(x1,y1,x2,y2) draw(x1,y1,x2,y2) 
-
-// Calculate a triangle side
-#define calculate_side(x1,y1,x2,y2,low,high) msx_calculate_side(x1,y1,x2,y2,low,high)
-
-// Draw horizontal line on video. \a value can be a bit pattern. note: x1 <= x2
-#define hline(x1,y1,x2,value) msx_hline(x1,y1,x2,value) 
-
-// Draw horizontal line on surface. \a value can be a bit pattern. note: x1 <= x2
-#define surface_hline(s,x1,y1,x2,value) msx_surface_hline(s,x1,y1,x2,value) 
-
 
 #endif

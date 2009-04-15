@@ -4,13 +4,14 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.9 2009-02-27 18:20:42 stefano Exp $
+ * $Id: msx.h,v 1.10 2009-04-15 21:00:57 stefano Exp $
  */
 
 #ifndef __MSX_H__
 #define __MSX_H__
 
 #include <sys/types.h>
+#include <lib3d.h>
 
 
 // PSG register, sound, ...
@@ -163,7 +164,7 @@ extern void __LIB__ msx_set_vdp(int reg, int value);
 extern unsigned char __LIB__ __FASTCALL__ msx_get_vdp(unsigned char);
 
 // Set point at the given position on VRAM
-extern void __LIB__ msx_pset(int x, int y);
+//extern void __LIB__ msx_pset(int x, int y);
 
 // Switch to text mode
 extern void __LIB__ msx_text();
@@ -207,12 +208,12 @@ extern int __LIB__ msx_color(int foreground, int background, int border);
 //extern unsigned int map_pixel(unsigned int x, unsigned int y);
 
 /// maps a block in the screen 2 model
-//#define map_block(x,y)	((((y) & ~(7)) << 5) + ((x) & ~(7)))
+//xdefine map_block(x,y)	((((y) & ~(7)) << 5) + ((x) & ~(7)))
 extern int __LIB__ msx_map_m2_block(int x, int y);
 #define map_block(x,y)	msx_map_m2_block(x,y)
 
 /// maps a pixel coordinate to a vram address
-//#define map_pixel(x,y)	(map_block(x,y) + ((y) & 7))
+//xdefine map_pixel(x,y)	(map_block(x,y) + ((y) & 7))
 extern int __LIB__ msx_map_m2_pixel(int x, int y);
 #define map_pixel(x,y)	msx_map_m2_pixel(x,y)
 
@@ -232,7 +233,7 @@ extern int __LIB__ msx_map_m2_pixel(int x, int y);
 /// maps the subpixel (bit) inside the vram byte
 #define map_subpixel(x)	(128 >> ((x) & 7))
 //extern int __LIB__ __FASTCALL__ msx_map_m2_subpixel(int x);
-//#define map_subpixel(x)	msx_map_m2_subpixel(x)
+//xdefine map_subpixel(x)	msx_map_m2_subpixel(x)
 
 /************************************************************************/
 
@@ -250,6 +251,8 @@ typedef struct {
 	} data;
 } surface_t;
 
+
+
 enum surface_type {
 	surface_ram,
 	surface_vram
@@ -260,8 +263,12 @@ typedef struct {
 	int width, height;
 } rect_t; 
 
-// Draw a line on a surface
-extern __LIB__ surface_draw(surface_t *s, int x1, int y1, int x2, int y2);
+
+/// create / destroy lookup tables aren't necessary: 
+/// we use the existing sin/cos functions
+#define create_lookup_tables() asm("nop\n");
+#define destroy_lookup_tables() asm("nop\n");
+
 
 extern void __LIB__ msx_blit(surface_t *source, surface_t *dest, rect_t *from, rect_t *to);
 extern void __LIB__ msx_blit_ram_vram(unsigned char* source, unsigned int dest, unsigned char w, unsigned char h, int sjmp, int djmp);
@@ -363,64 +370,43 @@ typedef struct {
 	LINE_T_MEMBERS;
 } line_t;
 
-// Internal use function to prepare line coordinates
-extern void __LIB__ msx_compute_line(int x1, int y1, int x2, int y2, line_t *r);
-
 /*
-	ok, what follows is quite an evil hack. lemme explain.
-
-	we are using a kludge here, using local variables
-	as if they were inside a struct.
-	normally, you would do something like (line_t*)&dinc1 to
-	accomplish that, however the HT compiler actually maps
-	the variables backwards, meaning that we should point
-	to the last local variable as if it were the first member
-	of the struct.
-	
-	** STEFANO NOTE: STILL DON'T KNOW WHAT WILL HAPPEN IN Z88K !! **
-
-	that's why we need REVERSE_LINE_T_MEMBERS and all this crap
+ NOTE: the REVERSE_LINE_T_MEMBERS trick seems not to be necessary with z88dk **
 */
 
-#define LINE_T_FIRST	dinc1
-
-#define REVERSE_LINE_T_MEMBERS \
-	int d;			\
-	int numpixels;		\
-	char yinc2, yinc1;	\
-	char xinc2, xinc1;	\
-	int dinc2, dinc1
-
 /************************************************************************/
 /************************************************************************/
 
-extern unsigned char *dithpat;
-// Now force the linking of the external data structure
-#asm
-LIB _dithpat
-#endasm
 
-// get a dithered pattern of intensity \a I on the screen line \a Y
-//#define DITHER(I, Y)	(dithpat[I][Y & 1])
-#define DITHER(I, Y)	(dithpat[(I<<1)+(Y & 1)])
+// set point at the given position on vram
+//xdefine pset(x,y) msx_pset(x,y)
+#define pset(x,y) plot(x,y)
 
 // Draw a line on a surface
-extern void __LIB__ msx_surface_line(surface_t *s, int x1, int y1, int x2, int y2);
-	
+#define surface_line(s,x1,y1,x2,y2) surface_draw(s,x1,y1,x2,y2)
+
+/* Render an area in a specified buffer (in surface), with the specified dither intensity (0..11) */
+extern __LIB__ surface_stencil_render(surface_t *s, unsigned char *stencil, unsigned char intensity);
+
 // Draw a line on video
-extern void __LIB__ msx_line(int x1, int y1, int x2, int y2);
+#define line(x1,y1,x2,y2) draw(x1,y1,x2,y2) 
 
-// Draw a line on video (slow)
-extern void __LIB__ msx_line_slow(int x1, int y1, int x2, int y2);
+// Draw a line on video (was a slow and smaller version, now it is the same)
+#define line_slow(x1,y1,x2,y2) draw(x1,y1,x2,y2) 
 
-// Calculate a triangle side
-extern void __LIB__ msx_calculate_side(int x1, int y1, int x2, int y2, int low[], int high[]);
+// Draw a line on a surface
+extern void __LIB__ surface_draw(surface_t *s, int x1, int y1, int x2, int y2);
 
-// Draw horizontal line on video. \a value can be a bit pattern. note: x1 <= x2
-extern void __LIB__ msx_hline(int x1, int y1, int x2, unsigned char value);
+// Draw a circle on a surface
+extern void __LIB__ surface_circle(surface_t *s, int x, int y, int radius, int skip);
 
-// Draw horizontal line on surface. \a value can be a bit pattern. note: x1 <= x2
-extern void __LIB__ msx_surface_hline(surface_t *s, int x1, int y1, int x2, unsigned char value);
+/// render object obj with flat-shading, requires a normalized source of light
+//extern void __LIB__ object_render_flatshading(surface_t* s, object_t* obj, vector_t* pbuffer, int* low, int* high, vector_t* light);
+extern void __LIB__ object_render_flatshading(surface_t* s, object_t* obj, vector_t* pbuffer, char* stencil, vector_t* light);
+
+/// render object obj with wireframes
+extern void __LIB__ object_render_wireframe(surface_t* s, object_t* obj, vector_t* pbuffer);
+
 
 
 #endif

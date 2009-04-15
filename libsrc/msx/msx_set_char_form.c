@@ -7,7 +7,7 @@
 
 	Set char \a c shape, from \a form, at the given screen map \a place
 	
-	$Id: msx_set_char_form.c,v 1.2 2009-01-13 21:23:17 stefano Exp $
+	$Id: msx_set_char_form.c,v 1.3 2009-04-15 21:00:58 stefano Exp $
 */
 
 #include <msx.h>

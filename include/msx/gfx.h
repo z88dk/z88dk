@@ -13,7 +13,7 @@ Contact the author:
 	ICQ UIN   : 10115284
 
 
-$Id: gfx.h,v 1.4 2009-02-27 18:20:42 stefano Exp $
+$Id: gfx.h,v 1.5 2009-04-15 21:00:57 stefano Exp $
 
 
 =========================================================================*/
@@ -100,27 +100,20 @@ $Id: gfx.h,v 1.4 2009-02-27 18:20:42 stefano Exp $
 /// vertical fill on vram starting at adress \a addr, of a given \a value, for \a count lines
 #define fill_v(addr,value,count) msx_vfill_v(addr,value,count)
 
-/// set point at the given position on vram
-#define pset(x,y) msx_pset(x,y)
-
 
 
 // mangled mode chars
 
 /// set char \a c shape, from \a form, at the given screen map \a place
-//void set_char_form(char c, void* form, unsigned char place);
 #define set_char_form(c,form,place) msx_set_char_form(c,form,place)
 
 /// set char \a c attributes, from \a attr, at the given screen map \a place
-//void set_char_attr(char c, void *attr, unsigned char place);
 #define set_char_attr(c,attr,place) msx_set_char_attr(c,attr,place)
 
 /// set char \a c with \a color, at the given screen map \a place
-//void set_char_color(char c, unsigned char color, unsigned char place);
 #define set_char_color(c,color,place) msx_set_char_color(c,color,place) 
 
 // set char \a c shape, attributes and color, all in one
-//void set_char(char c, void* form, void *attr, unsigned char color, unsigned char place);
 #define set_char(c,form,attr,color,place) msx_set_char(c,form,attr,color,place)
 
 //@}

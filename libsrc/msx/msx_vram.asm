@@ -6,7 +6,7 @@
 ;
 ;	Detects the VRAM size (in KB)
 ;
-;	$Id: msx_vram.asm,v 1.2 2009-01-21 16:00:09 stefano Exp $
+;	$Id: msx_vram.asm,v 1.3 2009-04-15 21:00:58 stefano Exp $
 ;
 
 	XLIB	msx_vram

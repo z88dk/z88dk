@@ -6,7 +6,7 @@
 ; MSX version
 ;
 ;
-; $Id: putsprite.asm,v 1.1 2009-01-21 16:00:08 stefano Exp $
+; $Id: putsprite.asm,v 1.2 2009-04-15 21:00:58 stefano Exp $
 ;
 
 	XLIB    putsprite
