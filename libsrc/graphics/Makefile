@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.20 2008-12-31 13:58:11 stefano Exp $
+# $Id: Makefile,v 1.21 2009-04-16 06:11:09 stefano Exp $
 
 
 lx11:
@@ -26,6 +26,7 @@ clean:
 	$(RM) gray/cpc/*.o
 	$(RM) gray/zx81/*.o
 	$(RM) msx/*.o
+	$(RM) msx/surface/*.o
 	$(RM) mz/*.o
 	$(RM) nascom/*.o
 	$(RM) oz/*.o

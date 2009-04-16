@@ -28,9 +28,7 @@ Contact the author:
 // cursor shape
 extern void *square;
 
-
-// binary data
-
+// binary data for cursor shape
 #asm
 ._square
 	defb @11100111

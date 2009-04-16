@@ -26,8 +26,8 @@ Compile with:   zcc +msx -lm -startup=2 ex5.c
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "msx/gfx.h"
-#include "msx/line.h"
+#include <msx/gfx.h>
+#include <msx/line.h>
 
 typedef struct {
 	int x;
@@ -38,7 +38,9 @@ typedef struct {
 
 u_char* buf[MODE2_MAX];
 
+
 main() {
+	
 	//u_char* buf = (u_char*)malloc(MODE2_MAX);
 
 	double	M_PI;

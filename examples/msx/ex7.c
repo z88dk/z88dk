@@ -70,21 +70,21 @@ void show_map(u_char *map, int line_start) {
 	}
 }
 
-void map_fill_line(u_char* line, int river_width, int river_offs) {
+void map_fill_line(u_char* myline, int river_width, int river_offs) {
 	int river_left;
 	u_char *last;
 
 	river_left = (MAP_WIDTH - river_width) / 2 + river_offs;
-	last = line + MAP_WIDTH;
+	last = myline + MAP_WIDTH;
 
 	while (river_left--)
-		*line++ = (get_rnd() & 1) + '%';
+		*myline++ = (get_rnd() & 1) + '%';
 
 	while (river_width--)
-		*line++ = (get_rnd() % 3) + '"';
+		*myline++ = (get_rnd() % 3) + '"';
 
-	while (line < last)
-		*line++ = (get_rnd() & 1) + '%';
+	while (myline < last)
+		*myline++ = (get_rnd() & 1) + '%';
 }
 
 void randomize_river(int *width, int *offs) {

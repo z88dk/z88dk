@@ -10,7 +10,7 @@
  *      Stefano has converted many of these routines to the new ports
  *      Some will work, some will not. djm 6/6/2000
  *
- *	$Id: graphics.h,v 1.6 2007-08-17 13:52:33 stefano Exp $
+ *	$Id: graphics.h,v 1.7 2009-04-16 06:11:09 stefano Exp $
  */
 
 #ifndef __GFX_H__
@@ -31,6 +31,7 @@ struct window {
         char    type;
         char    graph;
 } ;
+
 
 /* Fills an area */
 extern __LIB__ fill(int x, int y);
@@ -66,6 +67,26 @@ extern __LIB__ uncircle(int x, int y, int radius, int skip);
 extern __LIB__ clg(void);
 /* Clear area of map */
 extern __LIB__ clga(int tlx, int tly, int width, int height);
+/* Draw an horizontal dithered line */
+//extern __LIB__ hline_dither(int x1, int y1, int x2, unsigned char intensity);
+
+/* The "stencil" object is an evolution of a base concept introduced 
+ * by Rafael de Oliveira Jannone in his gfx library: 
+ * a convex area is defined by two byte vectors, pointing 
+ * respectivelty to the leftmost and the rightmost X coordinates.
+ * They're stuffed in a single byte vector, long at least twice the 
+ * resolution of the Y axis.
+ */
+ 
+/* Set/Reset the couple of vectors being part of a "stencil" */
+extern __LIB__ __FASTCALL__ stencil_init(unsigned char *stencil);
+/* Add a side to a figure defined inside an area object */
+extern __LIB__ stencil_add_side(int x1, int y1, int x2, int y2, unsigned char *stencil);
+/* Add a circular shape to a figure defined inside an area object */
+extern __LIB__ stencil_add_circle(int x, int y, int radius, int skip, unsigned char *stencil);
+/* Render an area with the specified dither intensity (0..11) */
+//extern __LIB__ stencil_render(unsigned char *stencil, unsigned char intensity);
+
 
 #ifndef SPECTRUM
 /* Open a z88 window..either graphics or text */
