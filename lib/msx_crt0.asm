@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.17 2009-04-15 21:00:57 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.18 2009-04-17 06:15:18 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -181,9 +181,8 @@ ELSE
 	call	msxbios
         call    _main
 ENDIF
-	;ld	ix,$5F	; CHGMOD - set graphics mode
-	;ld	a,0	; Text mode
-	;call	msxbios
+	ld	ix,$d2	; TOTEXT - force text mode on exit
+	call	msxbios
 ;**
 	
 .cleanup
