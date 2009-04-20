@@ -3,6 +3,7 @@ stdio/ticalc/fgetc_cons
 stdio/ticalc/getk
 stdio/ticalc/getk_decode
 stdio/puts_cons
+@tigray.lst
 @gfxbase.lst
 graphics/dcircle
 graphics/ticalc/clg

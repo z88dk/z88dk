@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.134 2009-04-10 12:47:42 stefano Exp $
+# $Id: Makefile,v 1.135 2009-04-20 09:58:31 stefano Exp $
 
 
 include	Make.config
@@ -30,15 +30,14 @@ genlibs: debug.lib gen_math.lib	malloc.lib z80_crt0.lib	ndos.lib adt.lib balloc.
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
 
-cpclibs: cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib cpcgray.lib
+cpclibs: cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib
 
 z88libs: z88_math.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib \
 	 z88ansi_clib.lib gfx.lib 
 
 tilibs:	ti82ansi_clib.lib ti82_clib.lib	ti83ansi_clib.lib ti83_clib.lib	\
 	ti83pansi_clib.lib ti83p_clib.lib ti85ansi_clib.lib ti85_clib.lib \
-	ti86ansi_clib.lib ti86_clib.lib	\
-	tigray82.lib tigray83.lib tigray83p.lib	tigray85.lib tigray86.lib
+	ti86ansi_clib.lib ti86_clib.lib
 
 zxlibs:	ts2068_clib.lib	zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib
 
@@ -546,14 +545,6 @@ ti82_clib.lib:
 	cd games ; $(MAKE) lticalc ; cd	..
 	$(LIBLINKER) -DFORti82 -x$(OUTPUT_DIRECTORY)/ti82_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
-tigray82.lib:
-	@echo ''
-	@echo '--- Building TI82 Grey Library  ---'
-	@echo ''
-	$(MAKE)	tideps
-	$(LIBLINKER) -DFORti82 -x$(OUTPUT_DIRECTORY)/tigray82 @$(LISTFILE_DIRECTORY)/tigray.lst
-
-
 ti83ansi_clib.lib:
 	@echo ''
 	@echo '--- Building TI83 ANSI Library  ---'
@@ -583,13 +574,6 @@ ti83_clib.lib:
 	$(MAKE)	gamesdeps
 	cd games ; $(MAKE) lticalc ; cd	..
 	$(LIBLINKER) -DFORti83 -x$(OUTPUT_DIRECTORY)/ti83_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
-
-tigray83.lib:
-	@echo ''
-	@echo '--- Building TI83 Grey Library  ---'
-	@echo ''
-	$(MAKE)	tideps
-	$(LIBLINKER) -DFORti83 -x$(OUTPUT_DIRECTORY)/tigray83 @$(LISTFILE_DIRECTORY)/tigray.lst
 
 ti83pansi_clib.lib:
 	@echo ''
@@ -621,13 +605,6 @@ ti83p_clib.lib:
 	cd games ; $(MAKE) lticalc ; cd	..
 	$(LIBLINKER) -DFORti83p	-x$(OUTPUT_DIRECTORY)/ti83p_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
-tigray83p.lib:
-	@echo ''
-	@echo '--- Building TI83+ Grey Library	---'
-	@echo ''
-	$(MAKE)	tideps
-	$(LIBLINKER) -DFORti83p	-x$(OUTPUT_DIRECTORY)/tigray83p	@$(LISTFILE_DIRECTORY)/tigray.lst
-
 ti85ansi_clib.lib:
 	@echo ''
 	@echo '--- Building TI85 ANSI Library  ---'
@@ -658,13 +635,6 @@ ti85_clib.lib:
 	cd games ; $(MAKE) lticalc ; cd	..
 	$(LIBLINKER) -DFORti85 -x$(OUTPUT_DIRECTORY)/ti85_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
 
-tigray85.lib:
-	@echo ''
-	@echo '--- Building TI85 Grey Library  ---'
-	@echo ''
-	$(MAKE)	tideps
-	$(LIBLINKER) -DFORti85 -x$(OUTPUT_DIRECTORY)/tigray85 @$(LISTFILE_DIRECTORY)/tigray.lst
-
 ti86ansi_clib.lib:
 	@echo ''
 	@echo '--- Building TI86 ANSI Library  ---'
@@ -694,13 +664,6 @@ ti86_clib.lib:
 	$(MAKE)	gamesdeps
 	cd games ; $(MAKE) lticalc ; cd	..
 	$(LIBLINKER) -DFORti86 -x$(OUTPUT_DIRECTORY)/ti86_clib @$(LISTFILE_DIRECTORY)/ticalc.lst
-
-tigray86.lib:
-	@echo ''
-	@echo '--- Building TI86 Grey Library  ---'
-	@echo ''
-	$(MAKE)	tideps
-	$(LIBLINKER) -DFORti86 -x$(OUTPUT_DIRECTORY)/tigray86 @$(LISTFILE_DIRECTORY)/tigray.lst
 
 # vt100	C lib for the Sharp OZ family -	stefano
 # use -DPACKEDFONT for tiny 50->80 column modes
@@ -1009,12 +972,6 @@ cpcansi_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd rs232 ; $(MAKE) lcpc	; cd ..
 	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpcansi_clib @$(LISTFILE_DIRECTORY)/cpcansi.lst
-
-cpcgray.lib:
-	@echo ''
-	@echo '--- Building CPC	Pseudo Grey Library  ---'
-	@echo ''
-	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpcgray @$(LISTFILE_DIRECTORY)/cpcgray.lst
 
 cpcfs.lib:
 	@echo ''

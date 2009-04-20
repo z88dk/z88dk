@@ -13,6 +13,7 @@ stdio/ansi/ticalc/f_ansi_char
 stdio/ansi/ticalc/f_ansi_cls
 stdio/ansi/ticalc/f_ansi_dline
 stdio/ansi/ticalc/f_ansi_scrollup
+@tigray.lst
 @gfxbase.lst
 graphics/dcircle
 graphics/ticalc/clg

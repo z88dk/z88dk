@@ -12,6 +12,7 @@ stdio/ansi/cpc/f_ansi_char
 stdio/ansi/cpc/f_ansi_cls
 stdio/ansi/cpc/f_ansi_dline
 stdio/ansi/cpc/f_ansi_scrollup
+@cpcgray.lst
 graphics/circle
 graphics/cpc/clg
 graphics/clga

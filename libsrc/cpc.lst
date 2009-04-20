@@ -2,6 +2,7 @@ stdio/cpc/fgetc_cons
 stdio/cpc/fputc_cons
 stdio/cpc/getk
 stdio/puts_cons
+@cpcgray.lst
 graphics/circle
 graphics/cpc/clg
 graphics/clga
