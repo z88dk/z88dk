@@ -6,7 +6,7 @@
 ;       Stefano Bodrato - Jan 2007
 ;
 ;
-;	$Id: swapgfxbk_foo.asm,v 1.1 2007-01-04 17:41:34 stefano Exp $
+;	$Id: swapgfxbk_foo.asm,v 1.2 2009-04-20 07:17:09 stefano Exp $
 ;
 
                 XLIB    swapgfxbk
@@ -16,7 +16,6 @@
 
 
 .swapgfxbk
-		ret
 .swapgfxbk1
                 ret
 
