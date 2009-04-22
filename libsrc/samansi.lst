@@ -28,12 +28,13 @@ graphics/pointxy
 graphics/fill
 graphics/dfill
 graphics/getsprite
+graphics/liner
 graphics/spectrum/putsprite
 graphics/spectrum/bksave
 graphics/spectrum/bkrestore
 graphics/spectrum/rowtab
 graphics/spectrum/pixladdr
-graphics/spectrum/swapgfxbk
+graphics/stencil_render
 graphics/sam/swapgfxbk
 games/joystick
 games/sam/bit_open

@@ -33,7 +33,9 @@ graphics/getsprite
 graphics/msx/putsprite
 graphics/msx/bksave
 graphics/msx/bkrestore
+graphics/liner
 graphics/msx/swapgfxbk
+graphics/msx/stencil_render
 graphics/msx/surface/surface_circle
 graphics/msx/surface/surface_draw
 graphics/msx/surface/surface_pixladdr

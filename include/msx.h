@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.10 2009-04-15 21:00:57 stefano Exp $
+ * $Id: msx.h,v 1.11 2009-04-22 17:12:26 stefano Exp $
  */
 
 #ifndef __MSX_H__

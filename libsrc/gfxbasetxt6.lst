@@ -7,6 +7,8 @@ graphics/dcircle
 graphics/draw
 graphics/drawb
 graphics/drawr
+graphics/getmaxx
+graphics/getmaxy
 graphics/lbitmask
 graphics/line
 graphics/liner
@@ -37,3 +39,4 @@ graphics/text6/xorpixl
 graphics/text6/div3
 graphics/text6/swapgfxbk
 graphics/text6/pointxy
+graphics/stencil_render

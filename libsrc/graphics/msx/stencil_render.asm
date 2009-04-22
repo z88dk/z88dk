@@ -1,43 +1,35 @@
 ;
 ;	z88dk GFX library
 ;
-;	Render the "stencil" surface onto the specified screen buffer.
+;	Render the "stencil".
 ;	The dithered horizontal lines base their pattern on the Y coordinate
 ;	and on an 'intensity' parameter (0..11).
 ;	Basic concept by Rafael de Oliveira Jannone
 ;	
-;	Machine code version by Stefano Bodrato, 18/3/2009
+;	Machine code version by Stefano Bodrato, 22/4/2009
 ;
-;	surface_stencil_render(surface_t *s, unsigned char *stencil, unsigned char intensity)
+;	stencil_render(unsigned char *stencil, unsigned char intensity)
 ;
 
 	INCLUDE	"graphics/grafix.inc"
+	INCLUDE	"#msx.def"
 
-	XLIB	surface_stencil_render
-	XREF	base_graphics
+	XLIB	stencil_render
 	LIB	dither_pattern
 
 	;LIB swapgfxbk
-	LIB surface_pixeladdress
+	LIB pixeladdress
+	XREF pixelbyte
 	LIB leftbitmask, rightbitmask
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.1 2009-04-15 21:00:58 stefano Exp $
+;	$Id: stencil_render.asm,v 1.2 2009-04-22 17:12:27 stefano Exp $
 ;
 
-.surface_stencil_render
-		ld	ix,0
+.stencil_render
+		ld	ix,2
 		add	ix,sp
-				
-		ld	l,(ix+6)	; surface struct
-		ld	h,(ix+7)
-		ld	de,6		; shift to screen buffer ptr
-		add	hl,de
-		ld	e,(hl)
-		inc	hl
-		ld	d,(hl)
-		ld	(base_graphics),de
 
 		;call	swapgfxbk
 
@@ -52,8 +44,8 @@
 		ld	d,0
 		ld	e,c
 
-		ld	l,(ix+4)	; stencil
-		ld	h,(ix+5)
+		ld	l,(ix+2)	; stencil
+		ld	h,(ix+3)
 		add	hl,de
 		ld	a,(hl)		;X1
 		
@@ -67,22 +59,22 @@
 		ld	a,(hl)
 		ld	b,a		; X2
 		
-		ld	a,(ix+2)	; intensity
+		ld	a,(ix+0)	; intensity
 		call	dither_pattern
 		ld	(pattern1+1),a
 		ld	(pattern2+1),a
-
+		
 			pop	af
 			ld	h,a	; X1
 			ld	l,c	; Y
 			
 			push	bc
-			call	surface_pixeladdress	; bitpos0 = surface_pixeladdress(x,y)
+			call	pixeladdress		; bitpos0 = pixeladdress(x,y)
 			call	leftbitmask		; LeftBitMask(bitpos0)
 			pop	bc
 			push	de			
 			
-			ld	h,d
+			ld	h,d	;;;
 			ld	l,e
 
 			call	mask_pattern
@@ -92,7 +84,7 @@
 			ld	h,b		; X2
 			ld	l,c		; Y
 
-			call	surface_pixeladdress	; bitpos1 = surface_pixeladdress(x+width-1,y)
+			call	pixeladdress		; bitpos1 = pixeladdress(x+width-1,y)
 			call	rightbitmask		; RightBitMask(bitpos1)
 			ld	(bitmaskr+1),a		; bitmask1 = LeftBitMask(bitpos0)
 
@@ -117,7 +109,8 @@
 			
 			ld	de,8
 
-			ld	(hl),a			; (offset) = (offset) AND bitmask0
+			call	store_byte
+			
 			add	hl,de
 			;inc	hl			; offset += 1 (8 bits)
 
@@ -126,7 +119,7 @@
 				jr	z,bitmaskr
 
 .fill_row_loop							; do
-				ld	(hl),a			; (offset) = pattern
+				call	store_byte
 				add	hl,de
 				;inc	hl			; offset += 1 (8 bits)
 				djnz	fill_row_loop		; while ( r-- != 0 )
@@ -134,7 +127,7 @@
 
 .bitmaskr		ld	a,0
 			call	mask_pattern
-			ld	(hl),a
+			call	store_byte
 
 			jr	yloop
 
@@ -148,10 +141,30 @@
 		; and on the pattern being set in (pattern1+1)
 .mask_pattern
 		ld	d,a		; keep a copy of mask
-		and	(hl)		; mask data on screen
+		ld	a,(pixelbyte)	; mask data taken from screen
+		and	d
 		ld	e,a		; save masked data
 		ld	a,d		; retrieve mask
 		cpl			; invert it
 .pattern1	and	0		; prepare fill pattern portion
 		or	e		; mix with masked data
 		ret
+
+
+;--- --- --- --- --- --- --- --- --- --- --- --- 
+.store_byte
+		;ld	(hl),a			; (offset) = pattern
+		
+		 push     af
+		 ld       a,l		; LSB of video memory ptr
+		 out      (VDP_CMD),a
+		 ld       a,h		; MSB of video mem ptr
+		 and      @00111111	; masked with "write command" bits
+		 or       @01000000
+		 ;ei
+		 out      (VDP_CMD), a
+		 pop      af
+		 ;;;ld       a,(pattern2+1) ; pattern
+		 out      (VDP_DATA), a
+		 ret
+;--- --- --- --- --- --- --- --- --- --- --- --- 

@@ -26,6 +26,8 @@ graphics/xorpixl
 graphics/pointxy
 graphics/fill
 graphics/getsprite
+graphics/liner
+graphics/stencil_render
 graphics/ticalc/putsprite
 graphics/ticalc/bksave
 graphics/ticalc/bkrestore

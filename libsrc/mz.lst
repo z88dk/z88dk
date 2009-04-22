@@ -13,6 +13,8 @@ graphics/mz/respixl
 graphics/mz/xorpixl
 graphics/mz/pointxy
 graphics/putsprite2
+graphics/liner
+graphics/stencil_render
 graphics/swapgfxbk_foo
 games/joystick
 @z80.lst

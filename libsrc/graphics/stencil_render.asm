@@ -1,43 +1,33 @@
 ;
 ;	z88dk GFX library
 ;
-;	Render the "stencil" surface onto the specified screen buffer.
+;	Render the "stencil".
 ;	The dithered horizontal lines base their pattern on the Y coordinate
 ;	and on an 'intensity' parameter (0..11).
 ;	Basic concept by Rafael de Oliveira Jannone
 ;	
-;	Machine code version by Stefano Bodrato, 18/3/2009
+;	Machine code version by Stefano Bodrato, 22/4/2009
 ;
-;	surface_stencil_render(surface_t *s, unsigned char *stencil, unsigned char intensity)
+;	stencil_render(unsigned char *stencil, unsigned char intensity)
 ;
 
 	INCLUDE	"graphics/grafix.inc"
 
-	XLIB	surface_stencil_render
-	XREF	base_graphics
+	XLIB	stencil_render
 	LIB	dither_pattern
 
 	;LIB swapgfxbk
-	LIB surface_pixeladdress
+	LIB pixeladdress
 	LIB leftbitmask, rightbitmask
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: surface_stencil_render.asm,v 1.2 2009-04-22 17:12:28 stefano Exp $
+;	$Id: stencil_render.asm,v 1.1 2009-04-22 17:12:27 stefano Exp $
 ;
 
-.surface_stencil_render
-		ld	ix,0
+.stencil_render
+		ld	ix,2
 		add	ix,sp
-				
-		ld	l,(ix+6)	; surface struct
-		ld	h,(ix+7)
-		ld	de,6		; shift to screen buffer ptr
-		add	hl,de
-		ld	e,(hl)
-		inc	hl
-		ld	d,(hl)
-		ld	(base_graphics),de
 
 		;call	swapgfxbk
 
@@ -52,8 +42,8 @@
 		ld	d,0
 		ld	e,c
 
-		ld	l,(ix+4)	; stencil
-		ld	h,(ix+5)
+		ld	l,(ix+2)	; stencil
+		ld	h,(ix+3)
 		add	hl,de
 		ld	a,(hl)		;X1
 		
@@ -67,7 +57,7 @@
 		ld	a,(hl)
 		ld	b,a		; X2
 		
-		ld	a,(ix+2)	; intensity
+		ld	a,(ix+0)	; intensity
 		call	dither_pattern
 		ld	(pattern1+1),a
 		ld	(pattern2+1),a
@@ -77,10 +67,10 @@
 			ld	l,c	; Y
 			
 			push	bc
-			call	surface_pixeladdress	; bitpos0 = surface_pixeladdress(x,y)
+			call	pixeladdress		; bitpos0 = pixeladdress(x,y)
 			call	leftbitmask		; LeftBitMask(bitpos0)
 			pop	bc
-			push	de
+			push	de			
 			
 			ld	h,d
 			ld	l,e
@@ -92,7 +82,7 @@
 			ld	h,b		; X2
 			ld	l,c		; Y
 
-			call	surface_pixeladdress	; bitpos1 = surface_pixeladdress(x+width-1,y)
+			call	pixeladdress		; bitpos1 = pixeladdress(x+width-1,y)
 			call	rightbitmask		; RightBitMask(bitpos1)
 			ld	(bitmaskr+1),a		; bitmask1 = LeftBitMask(bitpos0)
 
@@ -103,24 +93,24 @@
 			and	a
 			sbc	hl,de
 
-			rr	h
-			rr	l
-			rr	h
-			rr	l
-			rr	h
-			rr	l
+			;rr	h
+			;rr	l
+			;rr	h
+			;rr	l
+			;rr	h
+			;rr	l
 
 			jr	z,onebyte	; area is within the same address...
 
 			ld	b,l		; number of full bytes in a row
 			pop	hl
 			
-			ld	de,8
+			;ld	de,8
 
 			ld	(hl),a			; (offset) = (offset) AND bitmask0
-			
-			add	hl,de
-			;inc	hl			; offset += 1 (8 bits)
+
+			;add	hl,de
+			inc	hl			; offset += 1 (8 bits)
 
 .pattern2			ld	a,0
 				dec	b
@@ -128,8 +118,8 @@
 
 .fill_row_loop							; do
 				ld	(hl),a			; (offset) = pattern
-				add	hl,de
-				;inc	hl			; offset += 1 (8 bits)
+				;add	hl,de
+				inc	hl			; offset += 1 (8 bits)
 				djnz	fill_row_loop		; while ( r-- != 0 )
 
 

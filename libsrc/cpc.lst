@@ -11,6 +11,8 @@ graphics/dcircle2
 graphics/cpc/draw
 graphics/drawb
 graphics/cpc/drawr
+graphics/getmaxx
+graphics/getmaxy
 graphics/lbitmask
 graphics/lftscrol
 graphics/lscroll
@@ -40,6 +42,7 @@ graphics/bkrestore
 graphics/cpc/pixladdr
 graphics/cpc/swapgfxbk
 graphics/clsgraph
+graphics/stencil_render
 games/cpc/joystick
 cpc/bios_msg
 cpc/cpc_fdc

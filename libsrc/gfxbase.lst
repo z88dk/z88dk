@@ -3,9 +3,10 @@ graphics/clga
 graphics/draw
 graphics/drawb
 graphics/drawr
+graphics/getmaxx
+graphics/getmaxy
 graphics/lbitmask
 graphics/line
-graphics/liner
 graphics/lscroll
 graphics/plot
 graphics/point

@@ -24,6 +24,8 @@ graphics/respixl_smc
 graphics/xorpixl_smc
 graphics/pointxy
 graphics/putsprite_smc
+graphics/liner
+graphics/stencil_render
 graphics/swapgfxbk_foo
 games/joystick
 abc80/abc_inv

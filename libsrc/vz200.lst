@@ -16,6 +16,8 @@ graphics/pointxy
 graphics/fill
 graphics/dfill
 graphics/getsprite
+graphics/liner
+graphics/stencil_render
 graphics/vz200/putsprite
 graphics/vz200/bksave
 graphics/vz200/bkrestore

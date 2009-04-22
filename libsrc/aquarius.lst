@@ -3,6 +3,7 @@ stdio/aquarius/getk
 stdio/aquarius/fputc_cons
 stdio/puts_cons
 @gfxbasetxt6.lst
+graphics/aquarius/textpixl6
 games/aquarius/bit_open
 games/aquarius/bit_open_di
 games/aquarius/bit_close

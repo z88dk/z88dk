@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.27 2008-12-11 16:42:22 stefano Exp $
+# $Id: Makefile,v 1.28 2009-04-22 17:12:28 stefano Exp $
 #
 
 include ../Make.config
@@ -155,6 +155,7 @@ clean:
 	$(RM) sms/*.o
 	$(RM) spectrum/*.o
 	$(RM) test/*.o
+	$(RM) ticalc/*.o
 	$(RM) trs80/*.o
 	$(RM) ts2068/*.o
 	$(RM) sprinter/*.o

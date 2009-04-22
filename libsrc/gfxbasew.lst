@@ -3,6 +3,8 @@ graphics/clga
 graphics/w_draw
 graphics/drawb
 graphics/w_drawr
+graphics/getmaxx
+graphics/getmaxy
 graphics/lbitmask
 graphics/w_line
 graphics/w_liner
@@ -13,6 +15,7 @@ graphics/stencil_add_circle
 graphics/stencil_add_side
 graphics/stencil_add_pixel
 graphics/stencil_init
+graphics/stencil_render
 graphics/dither_pattern
 graphics/w_multipoint
 graphics/rbitmask
