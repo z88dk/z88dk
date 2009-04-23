@@ -3,7 +3,7 @@
 ;
 ;       Written around the Interlogic Standard Library
 ;
-;	$Id: getmaxy.asm,v 1.1 2009-04-22 17:12:27 stefano Exp $
+;	$Id: getmaxy.asm,v 1.2 2009-04-23 10:16:22 stefano Exp $
 ;
 
 
@@ -13,5 +13,5 @@
                 XLIB    getmaxy
 
 .getmaxy
-		ld	hl,maxy
+		ld	hl,maxy-1
 		ret
