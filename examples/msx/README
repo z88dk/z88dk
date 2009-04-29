@@ -1,0 +1,4 @@
+Examples for the MSX target platform.
+To make the examples in a form to be loaded and run via BASIC, use the default Makefile.
+To create MSXDOS executables, issue the following command:
+make -f Makefile.msd
