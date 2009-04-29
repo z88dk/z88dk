@@ -24,7 +24,7 @@ Contact the author:
 #include <msx/line.h>
 
 
-	unsigned char polyarea[MODE2_HEIGHT*2];
+	unsigned char stencil[MODE2_HEIGHT*2];
 	//unsigned char high[MODE2_HEIGHT];
 //u_char *buf;
 
@@ -50,52 +50,22 @@ main() {
 	for (;;) {	
 		memset(buf, 0, MODE2_MAX);	// yeah... crap
 		
-		//memset(low, 64, MODE2_HEIGHT << 1);	// yeah... crap
-		//memset(low, 255, MODE2_HEIGHT);	// yeah... crap
-		//memset(high, 0, MODE2_HEIGHT << 1);	// yeah... crap
-		//memset(high, 0, MODE2_HEIGHT);	// yeah... crap
-/*
-		for (i=6;i<20;i++) {
-			polyarea_init(polyarea);
-			polyarea_add_circle(128, 170 - i*4, 40-i*2 ,1, polyarea);
-			surface_polyarea_render(&surf, polyarea, i/c);
-		}
-*/			
-
 		for (i=4;i>0;i--) {
 			// fake light source
-			polyarea_init(polyarea);
-			polyarea_add_circle(80+c*3-i, 42+i, i*3+5, 1, polyarea);
-			surface_polyarea_render(&surf, polyarea, 14-(i*2));
+			stencil_init(stencil);
+			stencil_add_circle(80+c*3-i, 42+i, i*3+5, 1, stencil);
+			surface_stencil_render(&surf, stencil, 14-(i*2));
 		}
 
 		for (i=11;i>0;i--) {
-			polyarea_init(polyarea);
-			polyarea_add_circle(128+(11-i), 150 - i, i*3 ,1, polyarea);
-			polyarea_add_side(128-i*3+(11-i), 150 - i, 128, 30+i, polyarea);
-			polyarea_add_side(128+i*3+(11-i), 150 - i, 128, 30+i, polyarea);
-			surface_polyarea_render(&surf, polyarea, 6*(12-i)/(c+1));
+			stencil_init(stencil);
+			stencil_add_circle(128+(11-i), 150 - i, i*3 ,1, stencil);
+			stencil_add_side(128-i*3+(11-i), 150 - i, 128, 30+i, stencil);
+			stencil_add_side(128+i*3+(11-i), 150 - i, 128, 30+i, stencil);
+			surface_stencil_render(&surf, stencil, 6*(12-i)/(c+1));
 		}
 
-		// calculate polygon
-		//calculate_side
-		//polyarea_add_side(128 + c, c + 20, 40, 180 - c, polyarea);
-		//polyarea_add_side(128 + c, c + 20, 255 - c, 96, polyarea);
-		//polyarea_add_side(255 - c, 96, 40, 180 - c, polyarea);
 		c = (c+1) & 15;
-		//i = (c + 15) >> 4;
-		//i = (c + 15) /6-2;
-		//i++;
-
-		//for (l = 20; l < 180; l++) {
-			//surface_hline(&surf, low[l], l, high[l], DITHER(i, l));
-			//surface_hline_dither(&surf, low[l], l, high[l], i);
-			//surface_hline_dither(&surf, polyarea[l], l, polyarea[l+MODE2_HEIGHT], i);
-		//}
-		
-		//polyarea_add_circle(64 + c*2, 64 + c/2, 60-c ,1, polyarea);
-
-		//surface_polyarea_render(&surf, polyarea, i);
 
 		msx_vwrite_direct(surf.data.ram, 0, MODE2_MAX);
 		if (get_trigger(0))
