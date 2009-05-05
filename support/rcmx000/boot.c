@@ -423,6 +423,9 @@ int main(int argc, char *argv[])
 
   change_baudrate(tty, 2400);
 
+  /** Set smode0,1 to high in this normal case */
+  rts_ctl(tty, 0);
+
   /** Reset active **/
   dtr_ctl(tty, 1);
 
