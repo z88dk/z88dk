@@ -110,7 +110,7 @@ Welcome to this readme about the rabbit 2-3-4000 processors
       simple for the average home-electronic-hobbyist.
 
       Just solder together the adapter wings that convert from the Core
-      modules 1.0 mm spacing to 0.1" suitable for a breadbord.
+      modules 2.0 mm spacing to 0.1" suitable for a breadbord.
 
       The only pins on the breadboard that need connecting for the Core module to start are
       the VCC and GND pins (and the programming cable of course ;-)
