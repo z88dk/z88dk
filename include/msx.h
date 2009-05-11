@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.11 2009-04-22 17:12:26 stefano Exp $
+ * $Id: msx.h,v 1.12 2009-05-11 06:17:53 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -316,7 +316,7 @@ extern int __FASTCALL__ __LIB__ msx_get_stick(unsigned char id);
 // Get state of joystick button (trigger) number \a id, true = pressed
 extern int __FASTCALL__ __LIB__ msx_get_trigger(unsigned char id);
 
-extern unsigned char *st_dir;
+extern unsigned char st_dir[];
 
 enum stick_direction {
 	st_up = 1,

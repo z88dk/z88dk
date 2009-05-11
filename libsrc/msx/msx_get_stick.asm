@@ -6,17 +6,30 @@
 ;
 ;	extern int __FASTCALL__ msx_get_stick(unsigned char id);
 ;
-;	get state of joystick number \a id
+;	Get state of a specified joystick number id
 ;
-;	$Id: msx_get_stick.asm,v 1.1 2009-01-07 09:50:15 stefano Exp $
+;	$Id: msx_get_stick.asm,v 1.2 2009-05-11 06:17:53 stefano Exp $
 ;
 
 
 	XLIB	msx_get_stick
+	XDEF	_st_dir
 	
 	LIB	msxbios
 
         INCLUDE "#msxbios.def"
+
+
+_st_dir:
+	defb @0000 ; 0
+	defb @0001 ; 1
+	defb @0011 ; 2
+	defb @0010 ; 3
+	defb @0110 ; 4
+	defb @0100 ; 5
+	defb @1100 ; 6
+	defb @1000 ; 7
+	defb @1001 ; 8
 
 
 msx_get_stick:
