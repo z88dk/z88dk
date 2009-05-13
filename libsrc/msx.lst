@@ -59,6 +59,8 @@ games/beeper
 msx/msxbasic
 msx/msxextrom
 msx/msxrompage
+msx/set_vdp_reg
+msx/get_vdp_reg
 msx/msx_blank
 msx/msx_blit
 msx/msx_blit_fill_vram
@@ -71,7 +73,6 @@ msx/msx_clearkey
 msx/msx_color
 msx/msx_get_stick
 msx/msx_get_trigger
-msx/msx_get_vdp
 msx/msx_initpsg
 msx/msx_locate
 msx/msx_lpt
@@ -100,7 +101,6 @@ msx/msx_set_mode
 msx/msx_set_sprite_16
 msx/msx_set_sprite_8
 msx/msx_set_sprite_mode
-msx/msx_set_vdp
 msx/msx_sound
 msx/msx_text
 msx/msx_type

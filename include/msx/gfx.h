@@ -13,7 +13,7 @@ Contact the author:
 	ICQ UIN   : 10115284
 
 
-$Id: gfx.h,v 1.5 2009-04-15 21:00:57 stefano Exp $
+$Id: gfx.h,v 1.6 2009-05-13 14:41:11 stefano Exp $
 
 
 =========================================================================*/
@@ -85,10 +85,10 @@ $Id: gfx.h,v 1.5 2009-04-15 21:00:57 stefano Exp $
 #define vread(source,dest,count) msx_vread(source,dest,count)
 
 /// set a vdp register with a \a value
-#define set_vdp(reg,value) msx_set_vdp(reg,value) 
+#define set_vdp(reg,value) set_vdp_reg(reg,value) 
 
 /// get a vdp value from register \a reg
-#define get_vdp(reg) msx_get_vdp(reg)
+#define get_vdp(reg) get_vdp_reg(reg)
 
 /// move the screen cursor to a given position
 #define locate(x,y) msx_locate(x,y)

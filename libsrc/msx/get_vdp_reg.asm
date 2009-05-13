@@ -8,13 +8,13 @@
 ;
 ;	Get a VDP register value
 ;
-;	$Id: msx_get_vdp.asm,v 1.1 2009-01-07 09:50:15 stefano Exp $
+;	$Id: get_vdp_reg.asm,v 1.1 2009-05-13 14:41:11 stefano Exp $
 ;
 
-	XLIB	msx_get_vdp
+	XLIB	get_vdp_reg
 	
 
-msx_get_vdp:
+get_vdp_reg:
 	
 	;;return *(u_char*)(0xF3DF + reg);
 	

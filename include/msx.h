@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.12 2009-05-11 06:17:53 stefano Exp $
+ * $Id: msx.h,v 1.13 2009-05-13 14:41:11 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -158,10 +158,10 @@ extern void __LIB__ msx_vmerge(unsigned int addr, unsigned char value);
 #define MODE2_HEIGHT	192
 
 // Set a VDP register with a value
-extern void __LIB__ msx_set_vdp(int reg, int value);
+extern void __LIB__ set_vdp_reg(int reg, int value);
 
 // Get a value from a VDP register
-extern unsigned char __LIB__ __FASTCALL__ msx_get_vdp(unsigned char);
+extern unsigned char __LIB__ __FASTCALL__ get_vdp_reg(unsigned char);
 
 // Set point at the given position on VRAM
 //extern void __LIB__ msx_pset(int x, int y);
