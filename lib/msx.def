@@ -3,13 +3,25 @@ lstoff
 ; MSX related constants
 ;
 ; December 2008
-; $Id: msx.def,v 1.1 2009-01-07 09:50:15 stefano Exp $
+;
+; $Id: msx.def,v 1.2 2009-05-20 06:57:25 stefano Exp $
 ;
 
-
 ; VDP 
-defc VDP_DATA = $98
-defc VDP_CMD  = $99
+defc VDP_DATA    = $98
+defc VDP_DATAIN  = $98
+defc VDP_CMD     = $99
 
+; PSG
+defc PSG_ADDR    = $88
+defc PSG_DATA    = $8C
+defc PSG_DATAIN  = $90
+
+; PPI
+defc PPI_A    = $A8
+defc PPI_B    = $A9
+defc PPI_C    = $AA
+defc PPI_MOUT = $AB
+defc PPI_MIN  = $AB
 
 lston

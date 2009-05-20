@@ -1,0 +1,151 @@
+lstoff
+
+; MSX BASIC and SYSTEM VARIABLES definitions
+;
+; December 2007
+; $Id: svibasic.def,v 1.1 2009-05-20 06:57:25 stefano Exp $
+;
+
+
+; System variables
+
+defc VDP_RP  = $373A	; address of vdp READ port
+defc VDP_WP  = $3732	; address of vdp WRITE port
+;;;; defc MSX_VER = $????    ; MSX version (0 = MSX1, 1 = MSX2)
+;; defc RDPRIM = $????	;5 Routine that reads from a primary slot 
+;; defc WRPRIM = $????	;7 Routine that writes to a primary slot 
+;; defc CLPRIM = $????	;14 Routine that calls a routine in a primary slot 
+defc USRTAB = $F52B	;2 Address to call with Basic USR0 
+defc USR0 = $F52B	;2 Address to call with Basic USR0 
+defc USR1 = $F52C	;2 Address to call with Basic USR1 
+defc USR2 = $F52D	;2 Address to call with Basic USR2 
+defc USR3 = $F52E	;2 Address to call with Basic USR3 
+defc USR4 = $F52F	;2 Address to call with Basic USR4 
+defc USR5 = $F530	;2 Address to call with Basic USR5 
+defc USR6 = $F531	;2 Address to call with Basic USR6 
+defc USR7 = $F532	;2 Address to call with Basic USR7 
+defc USR8 = $F533	;2 Address to call with Basic USR8 
+defc USR9 = $F534	;2 Address to call with Basic USR9 
+;; defc LINL40 = $????	;1 Width for SCREEN 0 (default 37) 
+;; defc LINL32 = $????	;1 Width for SCREEN 1 (default 29) 
+defc LINLEN = $F543	;1 Width for the current text mode 
+;; defc CRTCNT = $????	;1 Number of lines on screen 
+;; defc CLMLST = $????	;1 Column space. It’s uncertain what this address actually stores 
+;; defc TXTNAM = $????	;2 BASE(0) - SCREEN 0 name table 
+;; defc TXTCOL = $????	;2 BASE(1) - SCREEN 0 color table 
+;; defc TXTCGP = $0800	;2 BASE(2) - SCREEN 0 character pattern table 
+;; defc TXTATR = $????	;2 BASE(3) - SCREEN 0 Sprite Attribute Table 
+;; defc TXTPAT = $????	;2 BASE(4) - SCREEN 0 Sprite Pattern Table 
+;; defc T32NAM = $????	;2 BASE(5) - SCREEN 1 name table 
+;; defc T32COL = $????	;2 BASE(6) - SCREEN 1 color table 
+;; defc T32CGP = $????	;2 BASE(7) - SCREEN 1 character pattern table 
+;; defc T32ATR = $????	;2 BASE(8) - SCREEN 1 sprite attribute table 
+;; defc T32PAT = $????	;2 BASE(9) - SCREEN 1 sprite pattern table 
+;; defc GRPNAM = $1800	;2 BASE(10) - SCREEN 2 name table 
+;; defc GRPCOL = $2000	;2 BASE(11) - SCREEN 2 color table 
+;; defc GRPCGP = $????	;2 BASE(12) - SCREEN 2 character pattern table 
+;; defc GRPATR = $????	;2 BASE(13) - SCREEN 2 sprite attribute table 
+;; defc GRPPAT = $????	;2 BASE(14) - SCREEN 2 sprite pattern table 
+;; defc MLTNAM = $0800	;2 BASE(15) - SCREEN 3 name table 
+;; defc MLTCOL = $????	;2 BASE(16) - SCREEN 3 color table 
+;; defc MLTCGP = $????	;2 BASE(17) - SCREEN 3 character pattern table 
+;; defc MLTATR = $????	;2 BASE(18) - SCREEN 3 sprite attribute table 
+;; defc MLTPAT = $????	;2 BASE(19) - SCREEN 3 sprite pattern table 
+defc CLIKSW = $FA02	;press click status (CLICK)
+defc CSRY = $FA03	;1 Current row-position of the cursor 
+defc CSRX = $FA04	;1 Current column-position of the cursor 
+defc CNSDFG = $FA06	;function keys status
+defc RG0SAV = $FE3C	;1 Content of VDP(0) register (R#0) 
+defc RG1SAV = $FE3D	;1 Content of VDP(1) register (R#1) 
+defc RG2SAV = $FE3E	;1 Content of VDP(2) register (R#2) 
+defc RG3SAV = $FE3F	;1 Content of VDP(3) register (R#3) 
+defc RG4SAV = $FE40	;1 Content of VDP(4) register (R#4) 
+defc RG5SAV = $FE41	;1 Content of VDP(5) register (R#5) 
+defc RG6SAV = $FE42	;1 Content of VDP(6) register (R#6) 
+defc RG7SAV = $FE43	;1 Content of VDP(7) register (R#7) 
+defc STATFL = $FE3D	;1 Content of VDP(8) status register (S#0) 
+defc TRGFLG = $FA08	;1 Information about trigger buttons and space bar state 
+defc FORCLR = $FA0A	;1 Foreground color 
+defc BAKCLR = $FA0B	;1 Background color 
+defc BDRCLR = $FA0C	;1 Border color (BORCLR)
+defc MAXUPD = $FA0D	;3 Jump instruction used by Basic LINE command. The routines used are: RIGHTC, LEFTC, UPC and DOWNC 
+defc MINUPD = $FA10	;3 Jump instruction used by Basic LINE command. The routines used are: RIGHTC, LEFTC, UPC and DOWNC 
+defc ATRBYT = $FA13	;1 Attribute byte (for graphical routines it’s used to read the color) 
+defc QUEUES = $FA17	;2 Address of the queue table 
+defc FRCNEW = $FD4B	;1 CLOAD flag
+defc SCNCNT = $FE78	;1 Key scan timing
+defc REPCNT = $FA19	;1 This is the key repeat delay counter
+defc PUTPNT = $FA1A	;2 Address in the keyboard buffer where a character will be written 
+defc GETPNT = $FA1C	;2 Address in the keyboard buffer where the next character is read 
+;; defc CS120 = $????	;5 Cassette I/O parameters to use for 1200 baud 
+;; defc CS240 = $????	;5 Cassette I/O parameters to use for 2400 baud 
+;; defc LOW = $????	;2 Signal delay when writing a 0 to tape 
+;; defc HIGH = $????	;2 Signal delay when writing a 1 to tape 
+;; defc HEADER = $????	;1 Delay of tape header (sync.) block 
+;; defc ASPCT1 = $????	;2 Horizontal / Vertical aspect for CIRCLE command 
+;; defc ASPCT2 = $????	;2 Horizontal / Vertical aspect for CIRCLE command 
+defc ENDPRG = $F7DB	;5 Pointer for the RESUME NEXT command (SAVTXT)
+defc ERRFLG = $F53F	;1 Basic Error code 
+;; defc LPTPOS = $????	;1 Position of the printer head
+;; defc PRTFLG = $????	;1 Printer output flag is read by OUTDO
+;; defc NTMSXP = $????	;1 Printer type is read by OUTDO. SCREEN ,,,n writes to this address
+;; defc RAWPRT = $????	;1 Raw printer output is read by OUTDO
+defc VLZADR = $F54C	;2 Address of data that is temporarilly replaced by ‘O’ when Basic function VAL("") is running 
+defc VLZDAT = $F8E8	;1 Original value that was in the address pointed to with VLZADR 
+defc CURLIN = $F54B	;2 Line number the Basic interpreter is working on, in direct mode it will be filled with #FFFF
+defc KBUF   = $F54F
+defc STREND = $F7F2
+;; defc SLOTID = $????	;1 Character set SlotID 
+;; defc CHFONT = $????	;2 Character set address 
+;; defc ACPAGE = $????
+;; defc EXBRSA = $????	;1 Slot address of the SUBROM (EXtended Bios-Rom Slot Address) 
+;; defc DRVINF = $????	;1 Nr. of drives connected to disk interface 1 
+;; defc DRVINF1 = $????	;1 Nr. of drives connected to disk interface 1 
+;; defc DISKIF1 = $????	;1 Slot address of disk interface 1 
+;; defc DRVINF2 = $????	;1 Nr. of drives connected to disk interface 2 
+;; defc DISKIF2 = $????	;1 Slot address of disk interface 2 
+;; defc DRVINF3 = $????	;1 Nr. of drives connected to disk interface 3 
+;; defc DISKIF3 = $????	;1 Slot address of disk interface 3 
+;; defc DRVINF4 = $????	;1 Nr. of drives connected to disk interface 4 
+;; defc DISKIF4 = $????	;1 Slot address of disk interface 4 
+
+defc BASROM = $0000
+;; defc SYSMEM = $????	;start address of system memory
+
+defc SCRMOD = $FE3A
+defc BRDATR = $FE41
+defc GRPACX = $FE46
+defc GRPACY = $FE48
+
+; FCC1H  --  slot-address of main-ROM
+;; defc EXPTBL = $????	;1 Slot 0: #80 = expanded, 0 = not expanded. Also slot address of the main BIOS-ROM. 
+;; defc EXP0 = $????	;1 Expansion Slot 0
+;; defc EXP1 = $????	;1 Expansion Slot 1
+;; defc EXP2 = $????	;1 Expansion Slot 2
+;; defc EXP3 = $????	;1 Expansion Slot 3
+;; defc SLTTBL = $????	;1 Mirror of slot 0 secondary slot selection register. 
+;; defc SLT0 = $????	;1 Mirror of slot 0...
+;; defc SLT1 = $????	;1 Mirror of slot 1...
+;; defc SLT2 = $????	;1 Mirror of slot 2...
+;; defc SLT3 = $????	;1 Mirror of slot 3...
+
+
+
+; BASIC locations
+
+;; defc WARM_BT = $????	; address of "warm boot" BASIC interpreter
+
+;; defc DOTLINE = $????
+;; defc DOBOXF  = $????
+;; defc BOXLIN  = $????
+;; defc DO_CIRC = $????
+
+;; defc PSET    = $????	; (X = (BC), Y = (DE))
+;; defc DOPSET  = $????
+
+;; defc N_PAINT = $????	; (color = (A), X = (BC), Y = (DE)) -
+;; defc O_PAINT = $????	; - init: CALL 0129H (PNTINI in msxbios), then CALL PAINT
+
+
+lston
+

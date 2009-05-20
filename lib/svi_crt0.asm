@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;       $Id: svi_crt0.asm,v 1.6 2007-06-27 20:49:28 dom Exp $
+;       $Id: svi_crt0.asm,v 1.7 2009-05-20 06:57:25 stefano Exp $
 ;
 
 
@@ -15,38 +15,40 @@
 
                 INCLUDE "zcc_opt.def"
 
-; No matter what set up we have, main is always, always external to
-; this file
+;--------
+; Some scope definitions
+;--------
 
-                XREF    _main
-
-;
-; Some variables which are needed for both app and basic startup
-;
+	XREF    _main
 
         XDEF    cleanup
         XDEF    l_dcal
 
-; Integer rnd seed
-
         XDEF    _std_seed
 
-; vprintf is internal to this file so we only ever include one of the set
-; of routines
+	XDEF	snd_tick	; Sound variable
 
 	XDEF	_vfprintf
-
-;Exit variables
 
         XDEF    exitsp
         XDEF    exitcount
 
-       	XDEF	heaplast	;Near malloc heap variables
+       	XDEF	heaplast	; Near malloc heap variables
 	XDEF	heapblocks
 
-;For stdin, stdout, stder
-
         XDEF    __sgoioblk
+
+; Graphics stuff
+	XDEF	pixelbyte	; Temp store for non-buffered mode
+        XDEF    base_graphics   ; Graphical variables
+        XDEF    coords          ; Current xy position
+
+; MSX platform specific stuff
+;
+        XDEF    msxbios
+        ;; XDEF    brksave
+        
+
 
 ; Now, getting to the real stuff now!
 
@@ -125,13 +127,25 @@ ELSE
 ENDIF
 
 
+; ---------------
+; Misc Variables
+; ---------------
+;;.defltdsk       defb    0	; Default disc
+.base_graphics  defw    0	; Location of current screen buffer
+.coords         defw    0       ; Current graphics xy coordinates
+.pixelbyte	defb	0
+
+
+IF DEFINED_NEED1bitsound
+.snd_tick	defb	0	; Sound variable
+ENDIF
+
 ;Seed for integer rand() routines
+IF !DEFINED_HAVESEED
+		XDEF    _std_seed        ;Integer rand() seed
+._std_seed       defw    0       ; Seed for integer rand() routines
+ENDIF
 
-.defltdsk       defb    0
-
-;Seed for integer rand() routines
-
-._std_seed       defw    0
 
 ;Atexit routine
 
@@ -145,10 +159,21 @@ ENDIF
 .heaplast	defw	0
 .heapblocks	defw	0
 
-; mem stuff
+; ---------------
+; MSX specific stuff
+; ---------------
 
-         defm  "Small C+ MSX"
+; Safe BIOS call
+.msxbios
+	push	ix
+	ret
+
+
+; Signature in resulting binary
+
+         defm  "Small C+ SVI"
 	 defb	0
+
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

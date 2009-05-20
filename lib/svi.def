@@ -1,0 +1,27 @@
+lstoff
+
+; Spectravideo SVI related constants
+;
+; Spring 2009
+;
+; $Id: svi.def,v 1.1 2009-05-20 06:57:25 stefano Exp $
+;
+
+; VDP 
+defc VDP_DATA    = $80
+defc VDP_DATAIN  = $84
+defc VDP_CMD     = $81
+
+; PSG
+defc PSG_ADDR    = $88
+defc PSG_DATA    = $8C
+defc PSG_DATAIN  = $90
+
+; PPI
+defc PPI_A    = $98
+defc PPI_B    = $99
+defc PPI_C    = $96
+defc PPI_MOUT = $97
+defc PPI_MIN  = $9A
+
+lston

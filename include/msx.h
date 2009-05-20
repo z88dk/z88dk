@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.13 2009-05-13 14:41:11 stefano Exp $
+ * $Id: msx.h,v 1.14 2009-05-20 06:57:24 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -87,14 +87,24 @@ extern int __LIB__ msx_screenmode();
 extern void __LIB__ __FASTCALL__ msx_set_mode(int mode);
 
 // Video modes for set_mode
+
+#ifdef __SVI__
+enum video_mode {
+	mode_0 = 0x47,
+	mode_1 = 0x4A,
+	mode_2 = 0x4A,
+	mode_3 = 0x4D
+};
+#endif
+
+#ifdef __MSX__
 enum video_mode {
 	mode_0 = 0x6C,
 	mode_1 = 0x6F,
 	mode_2 = 0x72,
 	mode_3 = 0x75
 };
-
-
+#endif
 
 // Set screen to mangled mode (screen 1 + 2)
 extern void __LIB__ msx_set_mangled_mode();
@@ -330,7 +340,12 @@ enum stick_direction {
 
 // Misc functions
 
-// Check if MSX 1 or MSX 2
+// Check the current MSX type:
+// 1: MSX 1
+// 2: MSX 2
+// 3: SVI-318
+// 4: SVI-328
+// 5: SVI-328 MKII
 extern int __LIB__ msx_type();
 
 // Detect the VRAM size (in KB)

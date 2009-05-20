@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.135 2009-04-20 09:58:31 stefano Exp $
+# $Id: Makefile,v 1.136 2009-05-20 06:57:25 stefano Exp $
 
 
 include	Make.config
@@ -73,6 +73,15 @@ tideps:
 	$(RM) -f graphics/ticalc/*.o
 	$(RM) -f graphics/gray/*.o
 	$(RM) -f graphics/gray/ticalc/*.o
+
+#  short script	to sort	out ticalc dependencies
+msxdeps:
+	$(RM) -f games/*.o
+	$(RM) -f games/msx/*.o
+	$(RM) -f graphics/*.o
+	$(RM) -f graphics/msx/*.o
+	$(RM) -f graphics/msx/surface/*.o
+	$(RM) -f msx/*.o
 
 zx81deps:
 	$(RM) -f assert/*.o
@@ -864,12 +873,15 @@ svi_clib.lib:
 	@echo ''
 	@echo '--- Building Spectravideo Library  ---'
 	@echo ''
+	$(MAKE)	msxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lmsx	; cd ..
+	cd msx ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
 
 # MSX library -	Stefano
@@ -877,7 +889,7 @@ msx_clib.lib:
 	@echo ''
 	@echo '--- Building MSX	Library	 ---'
 	@echo ''
-	$(MAKE)	gfxdeps
+	$(MAKE)	msxdeps
 	cd fcntl ; $(MAKE) lcpm	; cd ..
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) generic ; cd ..
@@ -885,7 +897,6 @@ msx_clib.lib:
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
-	$(MAKE)	gamesdeps
 	cd games ; $(MAKE) lmsx	; cd ..
 	cd msx ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst

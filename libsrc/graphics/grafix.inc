@@ -10,7 +10,7 @@
 ;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,v 1.21 2009-04-15 21:00:58 stefano Exp $
+;	$Id: grafix.inc,v 1.22 2009-05-20 06:57:26 stefano Exp $
 ;
 
 
@@ -98,6 +98,13 @@ IF FORcpc
 ENDIF
 
 IF FORmsx
+	DEFINE gotgfx
+	defc maxx	= 256
+	defc maxy	= 192
+	defc fcolor	= 1
+ENDIF
+
+IF FORsvi
 	DEFINE gotgfx
 	defc maxx	= 256
 	defc maxy	= 192
