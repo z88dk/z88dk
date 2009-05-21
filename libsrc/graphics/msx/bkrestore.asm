@@ -3,14 +3,20 @@
 ;
 ;	MSX version
 ;
-;	$Id: bkrestore.asm,v 1.2 2009-04-15 21:00:58 stefano Exp $
+;	$Id: bkrestore.asm,v 1.3 2009-05-21 06:58:11 stefano Exp $
 ;
 
 
 	XLIB    bkrestore
 	XREF	bkpixeladdress
 
+
+IF FORmsx
 	INCLUDE "#msx.def"
+ELSE
+	INCLUDE "#svi.def"
+ENDIF
+
 
 .bkrestore
 

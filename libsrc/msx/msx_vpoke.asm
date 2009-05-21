@@ -7,7 +7,7 @@
 ;	Improved functions by Rafael de Oliveira Jannone
 ;	Originally released in 2004 for GFX - a small graphics library
 ;
-;	$Id: msx_vpoke.asm,v 1.3 2009-01-07 09:50:15 stefano Exp $
+;	$Id: msx_vpoke.asm,v 1.4 2009-05-21 06:58:11 stefano Exp $
 ;
 
 	XLIB	msx_vpoke
@@ -31,17 +31,17 @@ msx_vpoke:
 
 	; enter vdp address pointer
 	push	af
-	ld a,l
+	ld	a,l
 	di
-	out (VDP_CMD), a
-	ld a,h
-	and @00111111
-	or  @01000000
+	out	(VDP_CMD), a
+	ld	a,h
+	and	@00111111
+	or 	@01000000
 	ei
-	out (VDP_CMD), a
+	out	(VDP_CMD), a
 
 	; enter data
-	pop  af
-	out (VDP_DATA), a
+	pop 	af
+	out	(VDP_DATA), a
 
 	ret

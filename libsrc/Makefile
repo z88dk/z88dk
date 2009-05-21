@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.136 2009-05-20 06:57:25 stefano Exp $
+# $Id: Makefile,v 1.137 2009-05-21 06:58:11 stefano Exp $
 
 
 include	Make.config
@@ -76,6 +76,7 @@ tideps:
 
 #  short script	to sort	out ticalc dependencies
 msxdeps:
+	$(RM) -f stdio/msx/*.o
 	$(RM) -f games/*.o
 	$(RM) -f games/msx/*.o
 	$(RM) -f graphics/*.o

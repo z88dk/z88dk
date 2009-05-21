@@ -23,7 +23,7 @@
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: surface_stencil_render.asm,v 1.2 2009-04-22 17:12:28 stefano Exp $
+;	$Id: surface_stencil_render.asm,v 1.3 2009-05-21 06:58:11 stefano Exp $
 ;
 
 .surface_stencil_render

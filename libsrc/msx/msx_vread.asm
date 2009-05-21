@@ -8,7 +8,7 @@
 ;
 ;	Transfer count bytes from VRAM to RAM
 ;
-;	$Id: msx_vread.asm,v 1.3 2009-04-15 21:00:58 stefano Exp $
+;	$Id: msx_vread.asm,v 1.4 2009-05-21 06:58:11 stefano Exp $
 ;
 
 
@@ -16,7 +16,14 @@
 	
 	LIB     msxbios
 	
+
+IF FORmsx
         INCLUDE "#msxbios.def"
+        INCLUDE "#msx.def"
+ELSE
+        INCLUDE "#svibios.def"
+        INCLUDE "#svi.def"
+ENDIF
 
 
 msx_vread:
@@ -42,7 +49,7 @@ msx_vread:
 	ex	(sp),hl		; VDP Timing
 
 rdloop:
-	in	a,($98)
+	in	a,(VDP_DATAIN)
 	ld	(de),a
 	inc	de
 	dec	bc

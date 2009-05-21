@@ -8,7 +8,7 @@
 ;
 ;	Transfer count bytes from RAM to VRAM (BIOS paged version)
 ;
-;	$Id: msx_vwrite.asm,v 1.5 2009-04-15 21:00:58 stefano Exp $
+;	$Id: msx_vwrite.asm,v 1.6 2009-05-21 06:58:11 stefano Exp $
 ;
 
 
@@ -16,7 +16,11 @@
 	
 	LIB     msxbios
 	
+IF FORmsx
         INCLUDE "#msxbios.def"
+ELSE
+        INCLUDE "#svibios.def"
+ENDIF
 
 
 msx_vwrite:

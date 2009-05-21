@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;       $Id: svi_crt0.asm,v 1.7 2009-05-20 06:57:25 stefano Exp $
+;       $Id: svi_crt0.asm,v 1.8 2009-05-21 06:58:11 stefano Exp $
 ;
 
 
@@ -92,6 +92,9 @@ ENDIF
 
 .start1
         ld      sp,0
+
+	ld	ix,$3768	; TOTEXT - force text mode on exit
+	call	msxbios
         ret
 
 .l_dcal

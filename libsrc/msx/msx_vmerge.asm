@@ -8,13 +8,17 @@
 ;
 ;	set \a value at a given vram address \a addr, merging bits (OR) with the existing value
 ;
-;	$Id: msx_vmerge.asm,v 1.1 2009-01-07 09:50:15 stefano Exp $
+;	$Id: msx_vmerge.asm,v 1.2 2009-05-21 06:58:11 stefano Exp $
 ;
 
 
 	XLIB	msx_vmerge
 	
+IF FORmsx
         INCLUDE "#msx.def"
+ELSE
+        INCLUDE "#svi.def"
+ENDIF
 
 
 msx_vmerge:
@@ -28,31 +32,31 @@ msx_vmerge:
 	push	de	; value
 	push	bc	; RET address
 
-	ld c, VDP_CMD
-	ld b, c
+	ld	c,VDP_CMD
+	ld	b,c
 
 	di
-	out (c), l
-	ld a, h
-	and @00111111
+	out	(c),l
+	ld	a,h
+	and	@00111111
 	ei
-	out (c), a
+	out	(c),a
 
 	; read data
 
-	ld c, VDP_DATA
-	in h, (c)
-	ld c, b
+	ld	c,VDP_DATAIN
+	in	h,(c)
+	ld	c,b
 
 	; enter same address
 
 	di
-	out (c), l
-	or  @01000000
+	out	(c),l
+	or	@01000000
 	ei
-	out (c), a
+	out	(c),a
 
-	ld a,e
-	out (VDP_DATA), a
+	ld	a,e
+	out	(VDP_DATA), a
 
 	ret

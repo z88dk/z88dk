@@ -6,23 +6,30 @@
 ;
 ;	Change the MSX color attributes
 ;
-;	$Id: msx_color.asm,v 1.2 2007-12-07 11:28:59 stefano Exp $
+;	$Id: msx_color.asm,v 1.3 2009-05-21 06:58:11 stefano Exp $
 ;
 
 	XLIB	msx_color
 	LIB	msxbios
 	
+IF FORmsx
         INCLUDE "#msxbios.def"
+        INCLUDE "#msxbasic.def"
+ELSE
+        INCLUDE "#svibios.def"
+        INCLUDE "#svibasic.def"
+ENDIF
+
 
 msx_color:
 	ld	ix,0
 	add	ix,sp
 	ld	a,(ix+2)	;border
-	ld	(0F3EBh),a
+	ld	(BDRCLR),a
 	ld	a,(ix+4)	;background
-	ld	(0F3EAh),a
+	ld	(BAKCLR),a
 	ld	a,(ix+6)	;foreground
-	ld	(0F3E9h),a
+	ld	(FORCLR),a
 	ld	a,(0FCAFh)	;SCRMOD
 	ld	ix,CHGCLR
 	jp	msxbios

@@ -3,28 +3,36 @@
 ;
 ;       MSX version by Stefano Bodrato, December 2007
 ;
-;	$Id: clg.asm,v 1.3 2009-04-15 21:00:58 stefano Exp $
+;	$Id: clg.asm,v 1.4 2009-05-21 06:58:11 stefano Exp $
 ;
 
         XLIB    clg
         LIB	msxbios
         LIB	msx_color
 
-        INCLUDE "#msxbios.def"
         INCLUDE	"graphics/grafix.inc"
-       
-.clg
 
+
+IF FORmsx
+        INCLUDE "#msxbios.def"
+        INCLUDE "#msxbasic.def"
+ELSE
+        INCLUDE "#svibios.def"
+        INCLUDE "#svibasic.def"
+ENDIF
+
+
+.clg
 	ld	ix,CHGMOD
-	ld	a,2		; set graphics mode
+	ld	a,1		; set graphics mode
+	ld	(SCRMOD),a
 	call	msxbios
 
 	ld	a,15
-	ld	(0F3EBh),a	;border
-	ld	a,2
+	ld	(BDRCLR),a	;border
 	ld	ix,CHGCLR
 	call	msxbios
-	
+
 	ld bc,6144
 
 	ld a,$1F
@@ -33,4 +41,3 @@
 
 	ld ix,FILVRM
 	jp msxbios
-

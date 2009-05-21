@@ -8,7 +8,7 @@
 ;
 ;	Fills a VRAM portion with the given value
 ;
-;	$Id: msx_vfill.asm,v 1.1 2009-01-07 09:50:15 stefano Exp $
+;	$Id: msx_vfill.asm,v 1.2 2009-05-21 06:58:11 stefano Exp $
 ;
 
 
@@ -16,7 +16,12 @@
 	
 	LIB	msxbios
 
+	
+IF FORmsx
         INCLUDE "#msxbios.def"
+ELSE
+        INCLUDE "#svibios.def"
+ENDIF
 
 
 msx_vfill:

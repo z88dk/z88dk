@@ -8,7 +8,7 @@
 ;
 ;	Get a VDP register value
 ;
-;	$Id: get_vdp_reg.asm,v 1.1 2009-05-13 14:41:11 stefano Exp $
+;	$Id: get_vdp_reg.asm,v 1.2 2009-05-21 06:58:11 stefano Exp $
 ;
 
 	XLIB	get_vdp_reg
@@ -16,6 +16,7 @@
 
 get_vdp_reg:
 	
+IF FORmsx
 	;;return *(u_char*)(0xF3DF + reg);
 	
 	; (FASTCALL) -> HL = address
@@ -28,3 +29,10 @@ get_vdp_reg:
 	ld	h,0
 	ld	l,a
 	ret
+
+ELSE
+	ld	a,($FE3C)	; Spectravideo keeps only value for register #0
+	ld	h,0
+	ld	l,a
+	ret
+ENDIF

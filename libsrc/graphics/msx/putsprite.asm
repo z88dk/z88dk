@@ -6,7 +6,7 @@
 ; MSX version
 ;
 ;
-; $Id: putsprite.asm,v 1.2 2009-04-15 21:00:58 stefano Exp $
+; $Id: putsprite.asm,v 1.3 2009-05-21 06:58:11 stefano Exp $
 ;
 
 	XLIB    putsprite
@@ -16,7 +16,14 @@
         XREF	swapgfxbk1
 
 	INCLUDE	"graphics/grafix.inc"
-	INCLUDE	"#msx.def"
+
+
+IF FORmsx
+	INCLUDE "#msx.def"
+ELSE
+	INCLUDE "#svi.def"
+ENDIF
+
 
 ; coords: d,e (vert-horz)
 ; sprite: (ix)
@@ -194,7 +201,7 @@
          and      @00111111	; masked with "read command" bits
          ;ei
          out      (VDP_CMD), a
-         in       a, (VDP_DATA)
+         in       a, (VDP_DATAIN)
          ld       (pixelbyte),a
 ;**************
          pop      af

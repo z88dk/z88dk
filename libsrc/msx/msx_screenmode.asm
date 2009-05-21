@@ -7,12 +7,16 @@
 ;	Gets the current screen mode
 ;
 ;
-;	$Id: msx_screenmode.asm,v 1.1 2007-12-18 09:00:46 stefano Exp $
+;	$Id: msx_screenmode.asm,v 1.2 2009-05-21 06:58:11 stefano Exp $
 ;
 
 	XLIB	msx_screenmode
 	
+IF FORmsx
         INCLUDE "#msxbasic.def"
+ELSE
+        INCLUDE "#svibasic.def"
+ENDIF
 
 msx_screenmode:
 	ld	a,(SCRMOD)

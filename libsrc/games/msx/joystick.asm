@@ -2,16 +2,20 @@
 ;	Game device library for the MSX
 ;       Stefano Bodrato - 3/12/2007
 ;
-;	$Id: joystick.asm,v 1.2 2009-01-23 08:22:27 stefano Exp $
+;	$Id: joystick.asm,v 1.3 2009-05-21 06:58:11 stefano Exp $
 ;
 
         XLIB    joystick
         LIB	msxbios
 
-	INCLUDE "#msxbios.def"
+IF FORmsx
+        INCLUDE "#msx.def"
+ELSE
+        INCLUDE "#svi.def"
+ENDIF
 
 .joystick
-	;__FASTALL__ : joystick no. in HL
+	;__FASTCALL__ : joystick no. in HL
 		
 	ld	a,l
 
@@ -23,11 +27,11 @@
 	;ld	ix,SNSMAT
 	;call	msxbios
 
-	in	a,($AA)
+	in	a,(PPI_C)
 	and	$F0
 	or	8		; keyboard row number
-	out	($AA),a
-	in	a,($A9)
+	out	(PPI_C),a
+	in	a,(PPI_B)
 
 
 ;    RDUL---F	..got from MSX port
@@ -69,8 +73,8 @@
         di
 
         ld      a,15		; set PSG register #15
-        out     ($A0),a
-        in      a,($A2)		; read value
+        out     (PSG_ADDR),a
+        in      a,(PSG_DATAIN)		; read value
 
 	dec	e		; Joystick number
 	jr	z,joystick_2
@@ -88,11 +92,11 @@
 .joystick_1
 
         ; we still have PSG register #15 set
-        out     ($A1),a
+        out     (PSG_DATA),a
 
         ld      a,14		; set PSG register #14
-        out     ($A0),a
-        in      a,($A2)		; read value
+        out     (PSG_ADDR),a
+        in      a,(PSG_DATAIN)		; read value
 
         ei
 

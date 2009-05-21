@@ -8,14 +8,17 @@
 ;
 ;	Read the MSX video memory
 ;
-;	$Id: msx_vpeek.asm,v 1.5 2009-04-15 21:00:58 stefano Exp $
+;	$Id: msx_vpeek.asm,v 1.6 2009-05-21 06:58:11 stefano Exp $
 ;
 
 	XLIB	msx_vpeek
-	LIB	msxbios
 	
-        ;INCLUDE "#msxbios.def"
+	
+IF FORmsx
         INCLUDE "#msx.def"
+ELSE
+        INCLUDE "#svi.def"
+ENDIF
 
 
 msx_vpeek:
@@ -25,16 +28,16 @@ msx_vpeek:
 	;call	msxbios
 	
 	; enter vdp address pointer
-	ld a,l
+	ld	a,l
 	di
-	out (VDP_CMD), a
-	ld a,h
-	and @00111111
+	out	(VDP_CMD), a
+	ld	a,h
+	and	@00111111
 	ei
-	out (VDP_CMD), a
+	out	(VDP_CMD), a
 
 	; read data
-	in a, (VDP_DATA)
+	in	a,(VDP_DATAIN)
 	
 	ld	h,0
 	ld	l,a

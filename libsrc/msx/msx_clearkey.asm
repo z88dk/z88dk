@@ -6,13 +6,17 @@
 ;
 ;	Clears the keyboard buffer
 ;
-;	$Id: msx_clearkey.asm,v 1.1 2007-12-13 11:28:42 stefano Exp $
+;	$Id: msx_clearkey.asm,v 1.2 2009-05-21 06:58:11 stefano Exp $
 ;
 
 	XLIB	msx_clearkey
 	LIB     msxbios
 	
+IF FORmsx
         INCLUDE "#msxbios.def"
+ELSE
+        INCLUDE "#svibios.def"
+ENDIF
 
 msx_clearkey:
 	ld	ix,KILBUF

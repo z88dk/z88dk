@@ -12,7 +12,14 @@
 ;
 
 	INCLUDE	"graphics/grafix.inc"
-	INCLUDE	"#msx.def"
+
+
+IF FORmsx
+	INCLUDE "#msx.def"
+ELSE
+	INCLUDE "#svi.def"
+ENDIF
+
 
 	XLIB	stencil_render
 	LIB	dither_pattern
@@ -24,7 +31,7 @@
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.2 2009-04-22 17:12:27 stefano Exp $
+;	$Id: stencil_render.asm,v 1.3 2009-05-21 06:58:11 stefano Exp $
 ;
 
 .stencil_render

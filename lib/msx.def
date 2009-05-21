@@ -4,7 +4,7 @@ lstoff
 ;
 ; December 2008
 ;
-; $Id: msx.def,v 1.2 2009-05-20 06:57:25 stefano Exp $
+; $Id: msx.def,v 1.3 2009-05-21 06:58:11 stefano Exp $
 ;
 
 ; VDP 
@@ -13,9 +13,9 @@ defc VDP_DATAIN  = $98
 defc VDP_CMD     = $99
 
 ; PSG
-defc PSG_ADDR    = $88
-defc PSG_DATA    = $8C
-defc PSG_DATAIN  = $90
+defc PSG_ADDR    = $A0
+defc PSG_DATA    = $A1
+defc PSG_DATAIN  = $A2
 
 ; PPI
 defc PPI_A    = $A8
