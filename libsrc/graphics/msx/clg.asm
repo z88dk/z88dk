@@ -3,7 +3,7 @@
 ;
 ;       MSX version by Stefano Bodrato, December 2007
 ;
-;	$Id: clg.asm,v 1.4 2009-05-21 06:58:11 stefano Exp $
+;	$Id: clg.asm,v 1.5 2009-05-21 07:31:12 stefano Exp $
 ;
 
         XLIB    clg
@@ -24,7 +24,11 @@ ENDIF
 
 .clg
 	ld	ix,CHGMOD
-	ld	a,1		; set graphics mode
+IF FORmsx
+	ld	a,2		; set graphics mode
+ELSE
+	ld	a,1
+ENDIF
 	ld	(SCRMOD),a
 	call	msxbios
 
