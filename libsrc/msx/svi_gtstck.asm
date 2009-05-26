@@ -6,20 +6,13 @@
 ;	GTSTCK
 ;
 ;
-;	$Id: svi_gtstck.asm,v 1.1 2009-05-21 06:58:11 stefano Exp $
+;	$Id: svi_gtstck.asm,v 1.2 2009-05-26 20:38:14 stefano Exp $
 ;
 
 	XLIB	GTSTCK
 	
-	LIB	svi_kbdstick
 	LIB	svi_slstick
-
-
-IF FORmsx
-        INCLUDE "#msx.def"
-ELSE
-        INCLUDE "#svi.def"
-ENDIF
+	LIB	msxbios
 
 
 
@@ -28,7 +21,7 @@ GTSTCK:
 	jp	m,getkeys
 
 	call	svi_slstick
-
+stick0:
 	ld	hl,$3253	; Joystick table
 stick1:	and	$0f
 	ld	e,a
@@ -38,13 +31,29 @@ stick1:	and	$0f
 	ret
 
 getkeys:
-	call	svi_kbdstick
-	rrca
-	rrca
-	rrca
-	rrca
-	ld	hl,keystick_tb	; KeyboardStick table
-	jr	stick1
+	ld	a,1
+	ld	($fa19),a ;REPCNT
+	
+	ld	ix,$3dca	; CHSNS
+	call	msxbios
+	ret	z		; exit if no key in buffer
 
-keystick_tb:
-	defb	0,3,5,4,1,2,0,3,7,0,6,5,8,1,7,0
+	ld	ix,$403d	; CHGET
+	call	msxbios
+	
+	sub	27
+
+	ld	b,a
+	xor	a
+	scf
+.bitr	rra
+	djnz	bitr
+	rra
+	rra
+	rra
+	rra
+		
+.no_nothing
+	ld	l,a
+	ld	h,0
+	ret

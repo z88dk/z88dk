@@ -4,13 +4,14 @@ lstoff
 ;
 ; Spring 2009
 ;
-; $Id: svi.def,v 1.2 2009-05-21 06:58:11 stefano Exp $
+; $Id: svi.def,v 1.3 2009-05-26 20:38:04 stefano Exp $
 ;
 
 ; VDP 
 defc VDP_DATA    = $80
 defc VDP_DATAIN  = $84
 defc VDP_CMD     = $81
+defc VDP_STATUS  = $85
 
 ; PSG
 defc PSG_ADDR    = $88
@@ -20,8 +21,15 @@ defc PSG_DATAIN  = $90
 ; PPI
 defc PPI_A    = $98
 defc PPI_B    = $99
-defc PPI_C    = $96
+defc PPI_C    = $9A
+defc PPI_AOUT = $94
+defc PPI_BOUT = $95
+defc PPI_COUT = $96
 defc PPI_MOUT = $97
-defc PPI_MIN  = $9A
+
+; PRN
+defc PRN_DATA   = $10
+defc PRN_STB    = $11
+defc PRN_STATUS = $12
 
 lston

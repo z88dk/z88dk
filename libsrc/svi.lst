@@ -44,7 +44,6 @@ msx/svi_ldirvm
 msx/svi_ldirmv
 msx/svi_gttrig
 msx/svi_gtstck
-msx/svi_kbdstick
 msx/svi_slstick
 msx/set_vdp_reg
 msx/get_vdp_reg

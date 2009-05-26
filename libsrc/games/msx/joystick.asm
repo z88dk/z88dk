@@ -2,7 +2,7 @@
 ;	Game device library for the MSX
 ;       Stefano Bodrato - 3/12/2007
 ;
-;	$Id: joystick.asm,v 1.3 2009-05-21 06:58:11 stefano Exp $
+;	$Id: joystick.asm,v 1.4 2009-05-26 20:38:11 stefano Exp $
 ;
 
         XLIB    joystick
@@ -72,6 +72,10 @@ ENDIF
 	ld	e,a
         di
 
+;;  Exclude Joystick selection on Spectravideo,
+;;  reg #15 has other uses and would crash everything.
+
+IF FORmsx
         ld      a,15		; set PSG register #15
         out     (PSG_ADDR),a
         in      a,(PSG_DATAIN)		; read value
@@ -93,6 +97,7 @@ ENDIF
 
         ; we still have PSG register #15 set
         out     (PSG_DATA),a
+ENDIF
 
         ld      a,14		; set PSG register #14
         out     (PSG_ADDR),a

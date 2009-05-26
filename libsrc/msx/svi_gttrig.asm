@@ -6,21 +6,15 @@
 ;	GTTRIG
 ;
 ;
-;	$Id: svi_gttrig.asm,v 1.1 2009-05-21 06:58:11 stefano Exp $
+;	$Id: svi_gttrig.asm,v 1.2 2009-05-26 20:38:18 stefano Exp $
 ;
 
 	XLIB	GTTRIG
 	
-	LIB	svi_kbdstick
 	LIB	svi_slstick
 
 
-IF FORmsx
-        INCLUDE "#msx.def"
-ELSE
         INCLUDE "#svi.def"
-ENDIF
-
 
 	
 GTTRIG:
@@ -44,7 +38,15 @@ trig2:	sub	1	; 255 if a=0, otherwise 0
 	ret
 
 getspace:
-	call	svi_kbdstick
+	di
+	in	a,(PPI_C)
+	and	$f0
+	ld	c,a
+	add	8		; keyboard row #8
+	out	(PPI_COUT),a
+	in	a,(PPI_B)	; bits: RDULxxxF  Fire is the SPACE key
+	ei
+
 	and	1
 	jr	trig2
 

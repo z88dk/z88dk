@@ -4,13 +4,14 @@ lstoff
 ;
 ; December 2008
 ;
-; $Id: msx.def,v 1.3 2009-05-21 06:58:11 stefano Exp $
+; $Id: msx.def,v 1.4 2009-05-26 20:38:00 stefano Exp $
 ;
 
 ; VDP 
 defc VDP_DATA    = $98
 defc VDP_DATAIN  = $98
 defc VDP_CMD     = $99
+defc VDP_STATUS  = $99
 
 ; PSG
 defc PSG_ADDR    = $A0
@@ -21,7 +22,14 @@ defc PSG_DATAIN  = $A2
 defc PPI_A    = $A8
 defc PPI_B    = $A9
 defc PPI_C    = $AA
+defc PPI_AOUT = $A8
+defc PPI_BOUT = $A9
+defc PPI_COUT = $AA
 defc PPI_MOUT = $AB
-defc PPI_MIN  = $AB
+
+; PRN
+defc PRN_DATA   = $91
+defc PRN_STB    = $90
+defc PRN_STATUS = $90
 
 lston
