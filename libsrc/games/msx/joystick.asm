@@ -2,7 +2,7 @@
 ;	Game device library for the MSX
 ;       Stefano Bodrato - 3/12/2007
 ;
-;	$Id: joystick.asm,v 1.4 2009-05-26 20:38:11 stefano Exp $
+;	$Id: joystick.asm,v 1.5 2009-05-27 10:41:08 stefano Exp $
 ;
 
         XLIB    joystick
@@ -12,6 +12,8 @@ IF FORmsx
         INCLUDE "#msx.def"
 ELSE
         INCLUDE "#svi.def"
+        INCLUDE "#svibios.def"
+        LIB	svi_kbdstick
 ENDIF
 
 .joystick
@@ -22,20 +24,17 @@ ENDIF
         dec	a
         jr      nz,no_cursor
 
-        ld      a,$08
-	
+IF FORmsx
+        ;ld      a,$08
 	;ld	ix,SNSMAT
 	;call	msxbios
 
 	in	a,(PPI_C)
-	and	$F0
-	or	8		; keyboard row number
-	out	(PPI_C),a
+	and	$f0
+
+	or	8		; Keyboard row #8
+	out	(PPI_COUT),a
 	in	a,(PPI_B)
-
-
-;    RDUL---F	..got from MSX port
-;    ---FUDLR 	..to be converted to
 
 	cpl
 
@@ -61,10 +60,36 @@ ENDIF
 	
 	;; and	$1F	; commented out: let's keep extra fire buttons !
 
+ELSE
+
+	ld	a,1
+	ld	($fa19),a ;REPCNT
+	
+	ld	ix,CHSNS
+	call	msxbios
+	jr	z,no_nothing
+
+	ld	ix,CHGET
+	call	msxbios
+	
+	sub	27
+	ld	b,a
+	xor	a
+	scf
+.bitr	rla
+	djnz	bitr
+	
+	ld	b,a
+	and	@01100
+	ld	a,b
+	jr	z,noupdown
+	xor	@01100
+.noupdown
+	
+.no_nothing
 	ld	l,a
 	ld	h,0
 	ret
-
 
 
 .no_cursor
@@ -103,13 +128,40 @@ ENDIF
         out     (PSG_ADDR),a
         in      a,(PSG_DATAIN)		; read value
 
+IF FORsvi
+	dec	e		; Joystick number
+	jr	nz,joystick_2
+
+	and	$0F
+	ld	d,a
+	in      a,(PPI_A)
+	and	$10		; Stick #1 Trigger
+	or	d
+
+	jr	joystick_1
+
+.joystick_2
+	rra
+	rra
+	rra
+	rra
+	and	$0F
+	ld	d,a
+	in      a,(PPI_A)
+	rra
+	and	$10		; Stick #2 Trigger
+	or	d
+
+.joystick_1
+ENDIF
+
         ei
 
         cpl
         
         and	$1f
 
-;    00fFRLDU	..got from MSX port
+;    00fFRLDU	..got from MSX/SVI port
 ;    --fFUDLR 	..to be converted to
 
 	ld	l,a

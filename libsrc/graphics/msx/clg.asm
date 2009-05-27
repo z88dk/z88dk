@@ -3,7 +3,7 @@
 ;
 ;       MSX version by Stefano Bodrato, December 2007
 ;
-;	$Id: clg.asm,v 1.6 2009-05-26 20:38:12 stefano Exp $
+;	$Id: clg.asm,v 1.7 2009-05-27 10:41:08 stefano Exp $
 ;
 
         XLIB    clg

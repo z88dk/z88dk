@@ -6,7 +6,7 @@
 ;	read from joystick port
 ;
 ;
-;	$Id: svi_slstick.asm,v 1.2 2009-05-26 20:38:18 stefano Exp $
+;	$Id: svi_slstick.asm,v 1.3 2009-05-27 10:41:08 stefano Exp $
 ;
 
 	XLIB	svi_slstick

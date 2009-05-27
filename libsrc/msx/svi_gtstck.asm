@@ -6,7 +6,7 @@
 ;	GTSTCK
 ;
 ;
-;	$Id: svi_gtstck.asm,v 1.2 2009-05-26 20:38:14 stefano Exp $
+;	$Id: svi_gtstck.asm,v 1.3 2009-05-27 10:41:08 stefano Exp $
 ;
 
 	XLIB	GTSTCK

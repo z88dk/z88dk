@@ -7,7 +7,7 @@
 ;	Change the SVI screen mode; mode in HL (FASTCALL)
 ;	It should do for SVI what msx_screen does on an MSX
 ;
-;	$Id: svi_screen.asm,v 1.2 2009-05-26 20:38:18 stefano Exp $
+;	$Id: svi_screen.asm,v 1.3 2009-05-27 10:41:08 stefano Exp $
 ;
 
 	XLIB	msx_screen
