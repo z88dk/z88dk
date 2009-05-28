@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.10 2009-05-28 19:20:16 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.11 2009-05-28 20:33:58 dom Exp $ */
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -964,6 +964,11 @@ RETI (void)
 void 
 RETN (void)
 {
+  if (rcmX000)
+    {
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
+    }
   *codeptr++ = 237;
   *codeptr++ = 69;
   PC += 2;
