@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.8 2007-06-17 12:07:43 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.9 2009-05-28 18:49:54 dom Exp $ */
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -557,8 +557,7 @@ CPD (void)
     if (rcmX000)
     {
       SetTemporaryLine("\ncall rcmx_cpd\n");
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      return;
     }
 
   *codeptr++ = 237;
@@ -619,6 +618,11 @@ INDR (void)
 void 
 INI (void)
 {
+    if (rcmX000)
+    {
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	return;
+    }
   *codeptr++ = 237;
   *codeptr++ = 162;
   PC += 2;
