@@ -2,7 +2,7 @@
 ;	Game device library for the MSX
 ;       Stefano Bodrato - 3/12/2007
 ;
-;	$Id: joystick.asm,v 1.5 2009-05-27 10:41:08 stefano Exp $
+;	$Id: joystick.asm,v 1.6 2009-05-28 20:52:08 stefano Exp $
 ;
 
         XLIB    joystick
@@ -67,7 +67,7 @@ ELSE
 	
 	ld	ix,CHSNS
 	call	msxbios
-	jr	z,no_nothing
+	jr	z,noupdown
 
 	ld	ix,CHGET
 	call	msxbios
@@ -86,7 +86,7 @@ ELSE
 	xor	@01100
 .noupdown
 	
-.no_nothing
+ENDIF
 	ld	l,a
 	ld	h,0
 	ret

@@ -3,25 +3,35 @@
 ;
 ;	GFX - a small graphics library 
 ;	Copyright (C) 2004  Rafael de Oliveira Jannone
+;	Extended by Stefano Bodrato
 ;
 ;	int msx_getvdp(int reg);
 ;
 ;	Get a VDP register value
 ;
-;	$Id: get_vdp_reg.asm,v 1.2 2009-05-21 06:58:11 stefano Exp $
+;	$Id: get_vdp_reg.asm,v 1.3 2009-05-28 20:52:08 stefano Exp $
 ;
 
 	XLIB	get_vdp_reg
-	
+
+
+IF FORmsx
+        INCLUDE "#msxbasic.def"
+ELSE
+        INCLUDE "#svibasic.def"
+ENDIF
 
 get_vdp_reg:
 	
-IF FORmsx
 	;;return *(u_char*)(0xF3DF + reg);
 	
 	; (FASTCALL) -> HL = address
 
-	ld	de,$f3df
+IF FORmsx
+	ld	de,RG0SAV
+ELSE
+	ld	de,RG0SAV
+ENDIF
 	add	hl,de
 	
 	ld	a,(hl)
@@ -30,9 +40,6 @@ IF FORmsx
 	ld	l,a
 	ret
 
-ELSE
-	ld	a,($FE3C)	; Spectravideo keeps only value for register #0
 	ld	h,0
 	ld	l,a
 	ret
-ENDIF
