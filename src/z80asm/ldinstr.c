@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.1 2000-07-04 15:33:30 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.2 2009-05-28 19:20:16 dom Exp $ */
 /* $History: LDINSTR.C $ */
 /*  */
 /* *****************  Version 10  ***************** */
@@ -76,6 +76,8 @@ extern enum symbols sym, GetSym (void);
 extern enum flag relocfile;
 extern struct module *CURRENTMODULE;
 extern FILE *z80asmfile;
+extern int rcmX000;
+
 
 
 void 
@@ -192,11 +194,21 @@ LD (void)
 		  {		/* LD  r,n */
 		    if (destreg & 8)
 		      {
+                        if (rcmX000)
+                          {
+                            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                            return;
+                          }
 			*codeptr++ = 221;	/* LD IXl,n or LD IXh,n */
 			++PC;
 		      }
 		    else if (destreg & 16)
 		      {
+                        if (rcmX000)
+                          {
+                            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                            return;
+                          }
 			*codeptr++ = 253;	/* LD  IYl,n or LD  IYh,n */
 			++PC;
 		      }
@@ -228,11 +240,21 @@ LD (void)
 		  }
 		if ((destreg & 8) || (sourcereg & 8))
 		  {		/* IXl or IXh */
+                    if (rcmX000)
+                      {
+                        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                        return;
+                      }
 		    *codeptr++ = 221;
 		    ++PC;
 		  }
 		else if ((destreg & 16) || (sourcereg & 16))
 		  {		/* IYl or IYh */
+                    if (rcmX000)
+                      {
+                        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                        return;
+                      }
 		    *codeptr++ = 253;
 		    ++PC;
 		  }

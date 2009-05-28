@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.6 2007-06-24 14:46:24 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.7 2009-05-28 19:20:16 dom Exp $ */
 /* $History: Z80INSTR.C $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -1104,11 +1104,21 @@ ArithLog8_instr (int opcode)
 	default:
 	  if (reg & 8)
 	    {			/* IXl or IXh */
+              if (rcmX000)
+                {
+                  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                  return;
+                }
 	      *codeptr++ = 221;
 	      ++PC;
 	    }
 	  else if (reg & 16)
 	    {			/* IYl or IYh */
+              if (rcmX000)
+                {
+                  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                  return;
+                }
 	      *codeptr++ = 253;
 	      ++PC;
 	    }
@@ -1239,6 +1249,11 @@ IncDec_8bit_instr (int opcode)
 	  break;
 	case 12:
 	case 13:
+          if (rcmX000)
+            {
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+              return;
+            }
 	  *codeptr++ = 221;
 	  *codeptr++ = (reg & 7) * 8 + opcode;	/* INC/DEC  ixh,ixl */
 	  PC += 2;
@@ -1246,6 +1261,11 @@ IncDec_8bit_instr (int opcode)
 
 	case 20:
 	case 21:
+          if (rcmX000)
+            {
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+              return;
+            }
 	  *codeptr++ = 253;
 	  *codeptr++ = (reg & 7) * 8 + opcode;	/* INC/DEC  iyh,iyl */
 	  PC += 2;
