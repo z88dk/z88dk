@@ -3,14 +3,18 @@
 ;
 ;	(HL)=char to display
 ;
-;	$Id: fputc_cons.asm,v 1.2 2002-04-17 21:30:26 dom Exp $
+;	$Id: fputc_cons.asm,v 1.3 2009-06-05 05:57:44 stefano Exp $
 ;
 
 	XLIB	fputc_cons
+	LIB	msxbios
+
+	INCLUDE "#m5bios.def"
 
 .fputc_cons
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
 
-	jp	$1088
+	ld	ix,DSPCH
+	jp	msxbios

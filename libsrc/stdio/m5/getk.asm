@@ -6,13 +6,17 @@
 ;	Stefano Bodrato - 18/5/2001
 ;
 ;
-;	$Id: getk.asm,v 1.2 2002-04-17 21:30:26 dom Exp $
+;	$Id: getk.asm,v 1.3 2009-06-05 05:57:44 stefano Exp $
 ;
 
 	XLIB	getk
+	LIB	msxbios
+
+	INCLUDE "#m5bios.def"
 
 .getk
-	call	$845
+	ld	ix,ACECH
+	call	msxbios
 	ld	h,0
 	ld	l,a
 	ret

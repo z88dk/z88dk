@@ -1,0 +1,301 @@
+lstoff
+
+; Sord M5 BIOS functions definition
+;
+; June 2009
+; $Id: m5bios.def,v 1.1 2009-06-05 05:57:44 stefano Exp $
+;
+
+
+; General routines
+
+defc RESET   = $0000
+defc BOOT    = $0000
+defc STARTUP = $0000
+
+defc RST0    = $0000	; System reset
+defc RST1    = $0008	; Read DIFLGA (A=flag, HL=flag address)
+defc RST4    = $0020	; call $2005
+defc RST5    = $0028	; call $2008
+defc RST6    = $0030	; call $7008
+defc RST7    = $0038	; call $700B
+
+defc RBTCMT  = $0033	; Boot tape
+defc M5BOT   = $0058	; Init M5 system
+defc NMI     = $0066	; Performs non-maskable interrupt procedures.
+defc RSTSP   = $05FF	; 
+
+defc CHKRAM  = $008E	; 
+defc TSBYT   = $00BC	; Test RAM byte in HL (Z=0 if OK)
+defc RCCSMM  = $00C7	; 
+defc CHHALT  = $00DB	; 
+defc CHKROM  = $00E4	; 
+
+defc DIVIDS  = $0151	; HL=HL/A
+defc DIVID5  = $0152	; HL=HL/C
+defc MULTHD  = $142C	; HL=HL*DE
+defc MLTAL   = $1441	; HL=L*A
+
+defc CTC3SP  = $01DF	; 
+defc CTC3EX  = $023C	; 
+
+defc RETERR  = $002B	; SCF / POP HL / EI / RET
+defc EXRET   = $002E	; Just RET
+defc ERRRET  = $004D	; 
+defc JMPHL   = $05FE	; 
+defc EXTBL   = $1076	; Jump to address pointer by offset A on word table in HL
+
+defc ADJSTD  = $000D	; 
+defc ADJSTL  = $0016	; 
+defc ADJSTU  = $001E	; 
+defc ADJSTR  = $0023	; 
+defc KEYSP   = $0511	; 
+defc JOYSP   = $05A5	; 
+defc GTCAPC  = $0085	; 
+defc CHGCP   = $0707	; 
+defc PTKDT   = $0869	; 
+defc GTKDT   = $08AC	; 
+defc STRTKT  = $0992	; 
+defc LCPATB  = $0B86	; 
+defc BELK    = $116A	; Keyboard beep
+defc BEL     = $1176	; Beeps like CTRL-G
+
+
+; VDP control routines
+
+defc VDPINT = $0E0B	; VDP initialisation.
+defc VREGI  = $0CA3	; VDP registry initialization. Sets registers according to the VDP system variables in SCRNA
+defc VREGRI = $0471	; Similar to VREGI but connected to SVSSW.
+defc CMODE  = $0DD8	; Set screen mode GI		- CTRL/S
+defc GMODE  = $0B1F	; Set screen mode GII		- CTRL/R
+defc TMODE  = $0D04	; Set screen mode TEXT		- CTRL/T
+defc MMODE  = $0C44	; Set screen mode MULTICOLOR	- CTRL/Q
+defc NRMSC  = $0C5C	; Place the cursor in the View Page 0	- CTRL/U
+defc RVDSPP = $0C62	; Toggles the visible screen		- CTRL/Y
+defc RVWRTP = $0E31	; Switches the cursor on the opposite screen - CTRL/Z
+defc REVSC  = $0E2E	; Toggles the cursor and the visible screen  - CTRL/V
+defc WRTSC  = $0E33	; Put the cursor into a page.      Input: A - Page (0,1,2)
+defc DSPCS  = $0C64	; Make the specified page visible. Input: A - Page (0,1,2)
+defc FRMSC  = $0C77	; Make the specified page visible. Input: A - Page (0/1 - page in which the cursor is/isn't present)
+
+defc STCHR  = $0E59	; Define character set. Input: A = generator number (0-6), B = number of characters, HL = address of source font
+defc STCCHR = $0E55	; Define model 1 character set.   Input: B = number of characters, HL = address of source font
+defc IVDPCH = $0D2F	; Init character set
+defc LCPAT  = $0D89	; Define character set generator to 0 or 1 depending on defaults
+defc RDCHR  = $0E75	; Load the character font in RAM. Input: A = generator number (0-6), B = number of characters, C = first character, HL = RAM address
+
+defc STVWAD = $149F	; Prepare VDP address to write data
+defc STVRAD = $14A1	; Prepare VDP address to read data
+
+
+; Colors
+
+defc STICOL = $0ED3	; Set colors in GI mode. Input: B = number group of characters (0-31), bit 7 - just read color, C = color; Upper 4 bits = char fore color, lower 4 bits = back color
+defc STCTBL = $0DF8	; GI defaults
+defc ITG2M  = $0DFB	; GII mode. Input: BC (standard=$1800)
+defc STFCOL = $0C83	; Fore color in B
+defc STBCOL = $0C97	; Back color in B
+
+
+; Text output
+
+defc VIEWP  = $135C	; Set VIEW (H, D, L, E)
+defc VIEWRS = $1353	; Cancel VIEW settings and set it to full screen
+defc DSPCHA = $1083	; Print A character to the screen. CTRL codes are interpreted.
+defc DSPCHB = $1082	; Similar to DSPCHA, but CTRL codes are printed.
+defc DSPCH  = $1088	; Print A character to the screen. CTRL codes printed or interpreted depending on the system variable DIFLGA
+defc DSPLTA = $105C	; Print text in (HL) on the screen buffer. Text must be terminated with code 0 or 13. Output: (HL)-1 = last printed char.
+defc DSPLTB = $105B	; Similar to DSPLTA, but CTRL codes are printed.
+defc DSPLN  = $1063	; Print text in (HL) on the screen buffer based on counter (B) or termination code (0 or 13). Output: B=decremented counter, (HL)-1 = last printed char.
+defc DSPMX  = $11ED	; Put text in (HL) in a "window": top-left corner=current cursor pos., B=columns, C=rows
+
+
+; Text input
+
+defc ACSCH  = $0F00	; Read char from screen (position D,E) and moves the cursor. Output: A=char
+defc RDSCH  = $14B1	; Read char from screen (position D,E). Output: A=char
+defc RDSCHA = $14AC	; Read char in current cursor position. Output: A=char, HL = cursor address in VRAM
+defc RDSTM  = $0EEC	; Copy text (at D,E) from screen to (HL) until termination, max len.in B.
+defc RDSMX  = $120E	; Copy text from "window" (see DSPMX) to (HL) 
+
+defc DELTC  = $0FAB	; DELETE		- CTRL/H
+defc TABLT  = $1158	; TAB			- CTRL/I
+defc TABLAT = $115A	; Tabulation (in A)
+defc LFEED  = $10F0	; LF			- CTRL/J
+defc CRET   = $13CD	; CR			- CTRL/B
+defc CRETL  = $10ED	; CR+LF			- CTRL/M
+defc HOMEP  = $13B6	; HOME cursor		- CTRL/K
+defc MVACS  = $13DD	; Move cursor at (D,E)
+defc STPCU  = $1100	; Position cursor
+defc LFTAW  = $10FF	; Left			- CTRL/+
+defc RGTAW  = $10FC	; Right			- CTRL/*
+defc UPRAW  = $10F9	; Up			- CTRL/@
+defc LWRAW  = $10F6	; Down			- CTRL/?
+defc STPCUL = $1134	; Move left
+defc STPCUR = $1116	; Move right
+defc STPCUU = $1147	; Move up
+defc STPCUD = $1126	; Move down
+defc SIFTD  = $103C	; Insert line at position E (0-22)
+defc SCRLF  = $130A	; Scroll screen left	- CTRL/D
+defc SCRRG  = $12F9	; Scroll screen right	- CTRL/F
+defc SCRUP  = $12B3	; Scroll screen up	- CTRL/E
+defc SCRDW  = $12BF	; Scroll screen down	- CTRL/C
+defc STOVRM = $0F19	; Overwrite mode	- CTRL/O
+defc STINSM = $0F1E	; Insert mode		- CTRL/P
+defc SCTOSD = $13D5	; 			- CTRL/B
+defc SNTOSD = $13DA	; 			- CTRL/N
+
+defc EDTLN  = $0668	; 
+defc EDTST  = $0689	; 
+defc ACEST  = $066F	; 
+
+defc CANCL  = $13BB	; Delete right characters  - CTRL/X
+defc CLRSC  = $1393	; CLS 			- CTRL/L
+defc CLRSCX = $1394	; CLS filling the screen with the character code specified in A
+defc CLRSS  = $137E	; Resume normal VIEW, wipe the screen and its sprites. (only from/to text mode)
+defc CLRSS2 = $1381	; Resume normal VIEW, wipe the screen and its sprites.
+
+
+; Sprites
+
+defc STSCHR = $0E58	; 
+defc MAGFY  = $04C5	; 
+defc STSCOD = $0454	; 
+defc STSCOL = $0445	;
+defc GTSPOS = $042B	;
+defc MVSPA  = $03CE	; Get physical sprite pos. In: A=spr.#, (HL,DE)=logical pos.  Out: (D,E), B=ECB (7 bit)
+defc MVSPR  = $040B	; Move sprite. In: A=spr.#, B,C = X,Y increment (+/- 127). Out: (HL,DE)=logical pos.
+defc ERSSPR = $03CC	; Delete sprite # specified in A.
+defc DELSPR = $03C5	; Hide sprite # specified in A.
+defc ERSPRA = $1387	; Delete all the sprites
+
+defc GTSPLC = $03EE	; Compute physical position (D,E) basing on a logical one (HL,DE). Input B= ECB
+defc GTSPRC = $0377	; Compute logical position (HL,DE) basing on a physical one (D,E). Output B= ECB
+defc ADDVCT = $041B	; 
+defc GTSTEP = $049F	; 
+defc GTSATA = $0369	; Get sprite table. In: A= spr. #   Out: HL=VRAM address
+
+
+; RAM and VRAM
+
+defc PBVRID = $0010	; VPOKE (HL),A.  Uses DI.  RST call is possible.
+defc GBVRID = $0018	; A=VPEEK (HL).  Uses DI.  RST call is possible.
+defc PBVRAM = $14BD	; VPOKE (HL),A. (no DI)
+defc GBVRAM = $14C5	; A=VPEEK (HL). (no DI)
+defc WDVPM  = $1460	; RAM (HL) to VRAM (DE) copy of max 256 bytes (B).
+defc CVTIR  = $0E61	; RAM (HL) to VRAM (DE) copy of max 16384 bytes (BC).
+defc RDVPM  = $144B	; VRAM (HL) to RAM (DE) copy of max 256 bytes (B).
+defc VCTIR  = $0E7D	; VRAM (HL) to RAM (DE) copy of max 16384 bytes (BC).
+defc BLKMV  = $0B75	; VRAM (HL) to VRAM (DE) copy of max 16384 bytes (BC).
+defc BLKMV2 = $0B81	; VRAM (HL) to VRAM (DE) copy of max 2048 bytes.
+defc BLKMVC = $0DCB	; VRAM (HL) to VRAM (DE) copy and invert max 16384 bytes (BC).
+defc PADVRM = $0E01	; Fill BC bytes in VRAM (at location HL) with the byte specified in A.
+defc PAD    = $0861	; Fill BC bytes in RAM (at location HL) with the byte specified in A.
+defc NULPAD = $0860	; Fill BC bytes in RAM (at location HL) with 0.
+defc EXCLOP = $0E49	; Swap two memory blocks in RAM. Input: HL - beginning of block 1, DE - beginning of block 2, BC - block length
+
+
+; Keyboard
+
+defc SCNKB  = $0966	; Scan keyboard. Output: A=key code, B=AKI
+defc ACECH0 = $0827	;
+defc ACECHI = $0845	; Get char from keyboard buffer. Output: A=ASCII code (CY if no key), B=AKI
+defc CALKAD = $097B	; 
+defc DECTR  = $090B	; 
+defc DECFN  = $0933	; 
+defc DECAD  = $08DA	; 
+
+defc WTKDTC = $0756	; Wait for keypress. Output: A=ASCII code, B=AKI
+defc CHKYM  = $073F	; 
+defc STDM1  = $04FF	; 
+defc CLKBF  = $077B	; 
+defc ACELN  = $07A9	; Read line long max B bytes, put in HL
+
+
+; System
+
+defc CTCINT  = $01C2	; Initialize the Z80 CTC
+defc STSCLK  = $02CF	; Set Real-Time Clock. Input: A=hours, H=minutes, L=seconds
+defc GTSCLK  = $02DB	; Read Real-Time Clock. Output: A=hours, H=minutes, L=seconds
+defc STRTUC  = $02FB	; Init UPCOUNTER (A=time constant)
+defc STOPUC  = $0313	; Stop UPCOUNTER
+defc RSTRUC  = $030D	; Restart UPCOUNTER
+defc STRTDC  = $0319	; Init DOWNCOUNTER (A=time constant)
+defc STOPDC  = $0340	; Stop DOWNCOUNTER
+defc RSTRDC  = $0336	; Restart DOWNCOUNTER
+defc CLOCKSP = $0242	; 
+
+
+; Tape
+
+defc RDFID  = $1598	; 
+defc RFIDC  = $1587	; 
+defc BLOAD  = $153B	; 
+defc BLODD  = $1579	; 
+defc RATBLF = $164D	; 
+defc RATBL  = $1650	; 
+defc LOADC  = $1652	; 
+
+defc WTFID  = $15C3	; 
+defc BSAVE  = $1529	; 
+defc BSAVD  = $1563	; 
+defc WATBL  = $15EB	; 
+defc WATBLF = $15E8	; 
+defc STROC  = $15ED	; 
+
+defc STBYT  = $1626	; 
+defc OUTPS  = $163A	; 
+defc LDBYT  = $16B3	; 
+defc SRLAD  = $16D1	; 
+defc WAITST = $1717	; 
+defc RDCNT  = $1739	; 
+defc CPFNM  = $1765	; 
+defc MTRON  = $1776	; Motor ON
+defc MTROF  = $177E	; Motor OFF
+defc LFTBC  = $1556	; 
+defc BTCMT  = $010D	; 
+
+
+; Soundchip (SML)
+
+defc SGINT  = $1811	; Full SML initialization
+defc MPLAY  = $1861	; Serviced control of SML (connected to CTC channel #3)
+defc PLAY   = $186F	; Operate SML
+defc NOTA   = $191A	; Play note
+defc V0FAC  = $1A31	; Switch off all the three SGC channels
+
+
+
+; MSX equivalences
+
+; Accessing to the VDP (T19918)
+
+defc RDVRM  = $0018 ; GBVRID - Reads the VRAM address by [HL].
+defc WRTVRM = $0010 ; PBVRID - Write to the VRAM address by [HL].
+defc SETRD  = $14A1 ; STVRAD - Sets up the VDP for read.
+defc SETWRT = $149F ; STVWAD - Sets up the VDP for write.
+defc FILVRM = $0E01 ; PADVRM - Fill the vram with specified data
+defc LDIRMV = $0E7D ; VCTIR - Block transfer to memory from VRAM
+defc LDIRVM = $0E61 ; CVTIR - Block transfer to VRAM from memory
+defc CLRSPR = $1387 ; ERSPRA - Initializes all sprites.
+defc INITXT = $0D04 ; TMODE - Initializes screen for text mode (40*24) and sets the VDP.
+defc INIT32 = $0DD8 ; CMODE - Initializes screen for text mode (32*24) and sets the VDP.
+defc INIGRP = $0B1F ; GMODE - Initializes screen for high-resolution mode and sets the VDP.
+defc INIMLT = $0C44 ; MMODE - Initializes screen for multi-color mode and sets the VDP.
+
+
+; Accessing to the PSG.
+
+defc GICINI = $1811 ; SGINT - Initializes PSG (SML),and static data for PLAY
+
+
+; Console (i.e. the keyboard and the CRT)
+
+defc CHGET  = $0845 ; ACECHI - Waits for character being input and returns the character codes.
+defc CHPUT  = $1083 ; DSPCH - (w/CTRL codes) Outputs a character to the console.
+defc BEEP   = $1176 ; BEL - Sounds the buffer
+defc CLS    = $1393 ; CLRSC - Clear the screen.
+
+
+
+lston

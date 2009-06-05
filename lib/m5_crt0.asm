@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: m5_crt0.asm,v 1.6 2007-06-27 20:49:27 dom Exp $
+;       $Id: m5_crt0.asm,v 1.7 2009-06-05 05:57:44 stefano Exp $
 ;
 
 
@@ -51,8 +51,13 @@
         XDEF    __sgoioblk
 
 ; Graphics stuff
-	XDEF	base_graphics
-	XDEF	coords
+	XDEF	pixelbyte	; Temp store for non-buffered mode
+        XDEF    base_graphics   ; Graphical variables
+        XDEF    coords          ; Current xy position
+
+; MSX platform specific stuff
+;
+        XDEF    msxbios
 
 ; Now, getting to the real stuff now!
 
@@ -158,10 +163,22 @@ ENDIF
 .heaplast	defw	0
 .heapblocks	defw	0
 
-; mem stuff
-.base_graphics
-		defw	0
-.coords		defw	0
+; Graphics stuff
+
+.base_graphics  defw    0	; Location of current screen buffer
+.coords         defw    0       ; Current graphics xy coordinates
+.pixelbyte	defb	0
+
+
+; ---------------
+; MSX specific stuff
+; ---------------
+
+; Safe BIOS call
+.msxbios
+	push	ix
+	ret
+
 
          defm  "Small C+ SORD M5"
 	 defb	0

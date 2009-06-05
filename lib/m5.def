@@ -1,0 +1,16 @@
+lstoff
+
+; Sord M5 related constants
+;
+; Spring 2009
+;
+; $Id: m5.def,v 1.1 2009-06-05 05:57:44 stefano Exp $
+;
+
+; VDP 
+defc VDP_DATA    = $10
+defc VDP_DATAIN  = $10
+defc VDP_CMD     = $11
+defc VDP_STATUS  = $11
+
+lston
