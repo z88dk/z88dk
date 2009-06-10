@@ -6,7 +6,7 @@
 ; Recoded -because of strange problems- by Henk Poley - July 2001
 ; Based upon vnGrey, a Venus greyscale library (Ti83).
 ;
-; $Id: gray83p.asm,v 1.3 2002-04-10 20:31:10 dom Exp $
+; $Id: gray83p.asm,v 1.4 2009-06-10 17:26:04 stefano Exp $
 ;
 
 	INCLUDE "#int83p.asm"		; Put interrupt loader here
@@ -22,7 +22,7 @@ ENDIF
 ;-----------------
 ; Actual interrupt
 ;-----------------
-.IntProcStart
+IntProcStart:
 	push	af			;
 	ld	a,(intcount)		; Check if own interrupt has quited
 	bit	7,a			;  correctly, then bit 7 is zero
@@ -33,7 +33,7 @@ ENDIF
 	push	iy			;
 	ld	iy,_IY_TABLE		;
 					;
-.exit_interrupt				;
+exit_interrupt:
 	in	a,(3)			; check vbl int
 	and	@00000010		;
 	jr	z,exit_interrupt2	;
@@ -46,7 +46,7 @@ ENDIF
 	dec	a			; 2
 	jr	z,Display_pic2		;
 	ld	(hl),0			; reset counter
-.exit_interrupt2			;
+exit_interrupt2:
 	ld	hl,intcount		; If a 'direct interrupt' occures    
 	set	7,(hl)			;  right after the TIOS-int, then
 					;  we want bit 7 to be set...
@@ -78,7 +78,7 @@ ENDIF
 	ei				;
 	ret				;
 
-.int_fix				;
+int_fix:
 	pop	af			; Pop AF back
 	ex	af,af			; Fix shadowregs back
 	exx				;
@@ -87,26 +87,26 @@ ENDIF
 	jr	exit_interrupt		; Continue with interrupt
 
 
-.Display_pic1				;
+Display_pic1:
 	ld	hl,(graybit1)		;
 	jr	DisplayPicture		;
-.Display_pic2				;
+Display_pic2:
 	ld	hl,(graybit2)		;
-.DisplayPicture				;
+DisplayPicture:
 	ld	a,$80			; fastCopy routine
 	out	($10),a			; (Joe Wingbermuehle)
 	ld	a,$20			;
 	ld	c,a			;
 	ld	de,755			;
 	add	hl,de			;
-.fastCopyAgain				;
+fastCopyAgain:
 	ld	b,64			;
 	inc	c			;
 	ld	de,-(12*64)+1		;
 	out	($10),a			;
 	add	hl,de			;
 	ld	de,10			;
-.fastCopyLoop				;
+fastCopyLoop:
 	add	hl,de			;
 	inc	hl			;
 	inc	hl			;
@@ -119,7 +119,7 @@ ENDIF
 	cp	$2B+1			;
 	jr	nz,fastCopyAgain	;
 	jr	exit_interrupt2		;
-.IntProcEnd
+IntProcEnd:
 
 IF !TI83PLUSAPP
 	XDEF	graybit1
@@ -127,11 +127,11 @@ IF !TI83PLUSAPP
 	
 defc intcount = $8A8D			; 1 byte needed
 
-.graybit1	defw	plotSScreen
-.graybit2	defw	appBackUpScreen
+graybit1:	defw	plotSScreen
+graybit2:	defw	appBackUpScreen
 ENDIF
 
-.jump_over
+jump_over:
 
 ; Memory usage in statvars:
 ; ---------------------------------------------------------------

@@ -58,15 +58,15 @@
 
 
 	DEFB $80,$48		;Field: App Name
-.beginname
+beginname:
 	DEFINE NEED_AppName
 	INCLUDE	"zcc_opt.def"
 	UNDEFINE NEED_AppName
-.endname0
+endname0:
 IF !DEFINED_NEED_AppName | ((endname0-beginname)=0)
 	DEFS "TI83+APP"		;App Name (Needs to be 8 bytes)
 ENDIF
-.endname
+endname:
 	DEFINE NameLength = (endname-beginname)
 	IF NameLength < 2	; Padd spaces if not 8 bytes... (horrible)
 	defm ''
@@ -127,7 +127,7 @@ ENDIF
 ;--------------------------------------
 ; End of header, begin of startup part
 ;--------------------------------------
-.start
+start:
 IF DEFINED_GimmeSpeed		;
 	ld	a,1		; switch to 15MHz (extra fast)
 	rst	28		; bcall(SetExSpeed)
@@ -180,7 +180,7 @@ ENDIF
 
 	im	2		;
 	call	_main		;
-.cleanup			;
+cleanup:			;
 	ld	iy,$89F0	; Load IY (flags) with it's normal value
 	im	1		;
 IF DEFINED_GimmeSpeed		;
@@ -194,38 +194,37 @@ ENDIF				;
 ;-----------------------------------------
 ; End of startup part, routines following
 ;-----------------------------------------
-.l_dcal
+l_dcal:
 	jp	(hl)		; used as "call (hl)"
 
-.tiei	ei
+tiei:	ei
 IF DEFINED_GRAYlib
-.cpygraph
+cpygraph:
 ENDIF
-.tidi	ret
+tidi:	ret
 
-; Now, which of the vfprintf routines do we need?
-IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
- IF DEFINED_floatstdio
-._vfprintf
-	LIB vfprintf_fp
-	jp  vfprintf_fp
- ELSE
-  IF DEFINED_complexstdio
-._vfprintf
-	LIB vfprintf_comp
-	jp  vfprintf_comp
-  ELSE
-   IF DEFINED_ministdio
-._vfprintf
-	LIB vfprintf_mini
-	jp  vfprintf_mini
-   ENDIF
-  ENDIF
- ENDIF
+;---------------------------------
+; Select which printf core we want
+;---------------------------------
+_vfprintf:
+IF DEFINED_floatstdio
+        LIB     vfprintf_fp
+        jp      vfprintf_fp
+ELSE
+        IF DEFINED_complexstdio
+                LIB     vfprintf_comp
+                jp      vfprintf_comp
+        ELSE
+                IF DEFINED_ministdio
+                        LIB     vfprintf_mini
+                        jp      vfprintf_mini
+                ENDIF
+        ENDIF
 ENDIF
+
 
 IF !DEFINED_GRAYlib
-.cpygraph
+cpygraph:
 	call	$50		; B_JUMP(GrBufCpy)
 	defw	GrBufCpy	; Since we don't have any shellsupport...
 ENDIF				;  plus this is safe for possible

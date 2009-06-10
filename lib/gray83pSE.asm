@@ -14,7 +14,7 @@
 ;***** GreyLib version 1.0 (C) 1997 by Bill Nagel & Dines Justesen *********
 ;---------------------------------------------------------------------------
 ;
-; $Id: gray83pSE.asm,v 1.3 2002-04-10 20:31:10 dom Exp $
+; $Id: gray83pSE.asm,v 1.4 2009-06-10 17:26:04 stefano Exp $
 ;
 
 defc LCD_BUSY_QUICK  = $000B		; Faster entry then BCALLing
@@ -33,7 +33,7 @@ ENDIF
 ;-----------------
 ; Actual interrupt
 ;-----------------
-.IntProcStart
+IntProcStart:
 	push	af			;
 	ld	a,(intcount)		; Check if own interrupt has quited
 	bit	7,a			;  correctly, then bit 7 is zero
@@ -44,7 +44,7 @@ ENDIF
 	push	iy			;
 	ld	iy,_IY_TABLE		;
 					;
-.exit_interrupt				;
+exit_interrupt:
 	in	a,(3)			; check vbl int
 	and	@00000010		;
 	jr	z,exit_interrupt2	;
@@ -57,7 +57,7 @@ ENDIF
 	dec	a			; 2
 	jr	z,Display_pic2		;
 	ld	(hl),0			; reset counter
-.exit_interrupt2			;
+exit_interrupt2:
 	ld	hl,intcount		; If a 'direct interrupt' occures    
 	set	7,(hl)			;  right after the TIOS-int, then
 					;  we want bit 7 to be set...
@@ -89,7 +89,7 @@ ENDIF
 	ei				;
 	ret				;
 					;
-.int_fix				;
+int_fix:
 	pop	af			; Pop AF back
 	ex	af,af			; Fix shadowregs back
 	exx				;
@@ -97,18 +97,18 @@ ENDIF
 					;  from the stack
 	jr	exit_interrupt		; Continue with interrupt
 					;
-.Display_pic1				;
+Display_pic1:
 	ld	hl,(graybit1)		;
 	jr	DisplayPicture		;
-.Display_pic2				;
+Display_pic2:
 	ld	hl,(graybit2)		;
-.DisplayPicture				;
+DisplayPicture:
 	ld	a,7			;
 	call	LCDBusy			;
 	out	($10),a			; Select row number
 					;  
 	ld	a,$80			; Goto the left
-.LineLoop				;
+LineLoop:
 	ld	d,a			; Save currect coloum
 	call	LCDBusy			;
 	out	($10),a			;
@@ -116,7 +116,7 @@ ENDIF
 	call	LCDBusy			;
 	out	($10),a			;
 	ld	bc,$0C11		; 40 bytes to port 10
-.WriteLoop				; Write them
+WriteLoop:				; Write them
 	neg				;
 	neg				;
 	neg				;
@@ -128,7 +128,7 @@ ENDIF
 	cp	$C0			;
 	jr	nz,LineLoop		;
 	jr	exit_interrupt		;
-.IntProcEnd
+IntProcEnd:
 
 IF !TI83PLUSAPP
 	XDEF	graybit1
@@ -136,8 +136,8 @@ IF !TI83PLUSAPP
 	
 defc intcount = $8A8D			; 1 byte needed
 
-.graybit1	defw	plotSScreen
-.graybit2	defw	appBackUpScreen
+graybit1:	defw	plotSScreen
+graybit2:	defw	appBackUpScreen
 ENDIF
 
-.jump_over
+jump_over:

@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.2 2007-06-02 22:33:59 dom Exp $
+;	$Id: sms_crt0.asm,v 1.3 2009-06-10 17:26:05 stefano Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -63,9 +63,9 @@
 ;-------        
 ; Interrupt handlers
 ;-------
-.filler1
+filler1:
 	defs	(INT_Start - filler1)
-.int_RASTER	
+int_RASTER:
 	push	hl
 	
 	ld	a, ($BF)
@@ -73,11 +73,11 @@
 	jp	p, int_not_VBL	; Bit 7 not set
 	jr	int_VBL
 
-.int_not_VBL	
+int_not_VBL:
 	pop	hl
 	reti
 	
-.int_VBL	
+int_VBL:
 	ld	hl, timer
 	ld	a, (hl)
 	inc	a
@@ -90,9 +90,9 @@
 	ld	hl, raster_procs
 	jr	int_handler
 
-.filler2
+filler2:
 	defs	(NMI_Start - filler2)
-.int_PAUSE
+int_PAUSE:
 	push	hl
 	
 	ld	hl, _pause_flag
@@ -103,11 +103,11 @@
 	ld	hl, pause_procs
 	jr	int_handler	
 
-.int_handler
+int_handler:
 	push	af
 	push	bc
 	push	de
-.int_loop
+int_loop:
 	ld	a, (hl)
 	inc	hl
 	or	(hl)
@@ -121,7 +121,7 @@
 	pop	hl
 	inc	hl
 	jr	int_loop
-.int_done
+int_done:
 	pop	de
 	pop	bc
 	pop	af
@@ -131,16 +131,16 @@
 
 	reti
 
-.call_int_handler
+call_int_handler:
 	jp	(hl)
 
 ;-------        
 ; Beginning of the actual code
 ;-------
-.filler3
+filler3:
 	defs   (CODE_Start - filler3)
 
-.start
+start:
 ; Make room for the atexit() stack
 	ld	hl,Stack_Top-64
 	ld	sp,hl
@@ -177,7 +177,7 @@ ENDIF
 ; Entry to the user code
 	call    _main
 
-.cleanup
+cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
@@ -189,15 +189,15 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
-.endloop
+endloop:
 	jr	endloop
-.l_dcal
+l_dcal:
 	jp      (hl)
 	
 ;---------------------------------
 ; VDP Initialization
 ;---------------------------------
-.DefaultInitialiseVDP
+DefaultInitialiseVDP:
     push hl
     push bc
         ld hl,_Data
@@ -246,7 +246,7 @@ _End:
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
 	jp	vfprintf_fp

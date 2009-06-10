@@ -1,7 +1,7 @@
 ;
 ; Startup for Residos packages
 ;
-; $Id: zxr_crt0.asm,v 1.2 2007-06-27 20:49:28 dom Exp $
+; $Id: zxr_crt0.asm,v 1.3 2009-06-10 17:26:05 stefano Exp $
 ;
 
         MODULE	zxs_crt0
@@ -15,49 +15,49 @@
 if (ASMPC<>$0000)
         defs    CODE_ALIGNMENT_ERROR
 endif
-.restart0
+restart0:
         jp      call_rom3
         
         defs    $0008-ASMPC
 if (ASMPC<>$0008)
         defs    CODE_ALIGNMENT_ERROR
 endif
-.restart8
+restart8:
         ret
         
         defs    $0010-ASMPC
 if (ASMPC<>$0010)
         defs    CODE_ALIGNMENT_ERROR
 endif
-.restart16
+restart16:
         ret
         
         defs    $0018-ASMPC
 if (ASMPC<>$0018)
         defs    CODE_ALIGNMENT_ERROR
 endif
-.restart24
+restart24:
         ret
                             
         defs    $0020-ASMPC
 if (ASMPC<>$0020)
         defs    CODE_ALIGNMENT_ERROR
 endif
-.restart32
+restart32:
         ret        
         
         defs    $0028-ASMPC
 if (ASMPC<>$0028)
         defs    CODE_ALIGNMENT_ERROR
 endif
-.restart40
+restart40:
         ret
         
         defs    $0030-ASMPC
 if (ASMPC<>$0030)
         defs    CODE_ALIGNMENT_ERROR
 endif
-.restart48
+restart48:
         ret        
 
 ; Always remember to provide an IM1 routine. It should update FRAMES as with
@@ -68,7 +68,7 @@ endif
 if (ASMPC<>$0038)
         defs    CODE_ALIGNMENT_ERROR
 endif
-.im1routine
+im1routine:
         push    af
         push    hl
         ld      hl,(FRAMES)
@@ -80,7 +80,7 @@ endif
         ld      a,(FRAMES+2)
         inc     a
         ld      (FRAMES+2),a
-.im1end
+im1end:
         pop     hl
         pop     af
         ei
@@ -94,12 +94,12 @@ endif
 if (ASMPC<>$0066)
         defs    CODE_ALIGNMENT_ERROR
 endif
-.nmiroutine
+nmiroutine:
         retn
 
 
 ; Allow the calling of a ROM3 routine
-.call_rom3
+call_rom3:
         ex      (sp),hl          ; get return address
         ld      c,(hl)
         inc     hl
@@ -114,7 +114,7 @@ endif
         jp      PACKAGE_CALL_PKG ; do the package call, then return
 
 ; Allow calling of +3 dos routines
-.dodos
+dodos:
         exx
         ld      b,PKG_IDEDOS	 ; We want the IDEDOS package
         push    iy               ; Get the call into iy
@@ -122,14 +122,14 @@ endif
         ld      iy,23610        ; Restore IY
         jp      PACKAGE_CALL_PKG
         
-.l_dcal jp      (hl)            ;Used for function pointer calls
+l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 ;-----------
 ; Define the stdin/out/err area. For the z88 we have two models - the
 ; classic (kludgey) one and "ANSI" model
 ;-----------
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
         INCLUDE "#stdio_fp.asm"
 ELSE
@@ -141,7 +141,7 @@ ENDIF
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
         LIB     vfprintf_fp
         jp      vfprintf_fp
@@ -160,16 +160,16 @@ ENDIF
 ;-----------
 ; Now some variables
 ;-----------
-.coords         defw    0       ; Current graphics xy coordinates
-.base_graphics  defw    0       ; Address of the Graphics map
+coords:         defw    0       ; Current graphics xy coordinates
+base_graphics:  defw    0       ; Address of the Graphics map
 
-._std_seed       defw    0       ; Seed for integer rand() routines
+_std_seed:      defw    0       ; Seed for integer rand() routines
 
-.exitsp         defw    0       ; Address of where the atexit() stack is
-.exitcount      defb    0       ; How many routines on the atexit() stack
+exitsp:         defw    0       ; Address of where the atexit() stack is
+exitcount:      defb    0       ; How many routines on the atexit() stack
 
 IF DEFINED_NEED1bitsound
-.snd_tick       defb    0       ; Sound variable
+snd_tick:       defb    0       ; Sound variable
 ENDIF
 
                 defm    "Small C+ ZXR"   ;Unnecessary file signature
@@ -181,10 +181,10 @@ ENDIF
 IF NEED_floatpack
 	defs	FLOATING_POINT_NOT_SUPPORTED_FOR_RESIDOS_PACKAGES
         INCLUDE         "#float.asm"
-.fp_seed        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
-.extra          defs    6               ;FP register
-.fa             defs    6               ;FP Accumulator
-.fasign         defb    0               ;FP register
+fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
+extra:          defs    6               ;FP register
+fa:             defs    6               ;FP Accumulator
+fasign:         defb    0               ;FP register
 
 ENDIF
 

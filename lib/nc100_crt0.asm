@@ -9,7 +9,7 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: nc100_crt0.asm,v 1.6 2007-06-27 20:49:27 dom Exp $
+;       $Id: nc100_crt0.asm,v 1.7 2009-06-10 17:26:04 stefano Exp $
 ;
 
 
@@ -59,7 +59,7 @@
 	defm	"z88dk NC100"
 	defb	0,0
 
-.start				;Entry point at $c2220
+start:				;Entry point at $c2220
 	ld	(start+1),sp	;Save entry sp
         ld      hl,-64		;Create the atexit stack
         add     hl,sp
@@ -77,7 +77,7 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
         call    _main		;Call user code
-.cleanup
+cleanup:
 	push	hl
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -89,14 +89,14 @@ ENDIF
 	ld	hl,10072
 	exx
 	pop	bc
-.start1	ld	sp,0
+start1:	ld	sp,0
         ret
 
-.l_dcal	jp	(hl)
+l_dcal:	jp	(hl)
 
 ; Now, define some values for stdin, stdout, stderr
 
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
 ENDIF
@@ -105,7 +105,7 @@ ENDIF
 ;-------
 ; Now, which of the vfprintf routines do we need?
 ;-------
-._vfprintf
+_vfprintf:
 IF DEFINFED_floatstdio
 	LIB	vfprintf_fp
 	jp	vfprintf_fp
@@ -126,17 +126,17 @@ ENDIF
 ; Some variables
 ;-------
 
-._std_seed       defw    0	;Integer rand() seed
+_std_seed:       defw    0	;Integer rand() seed
 
 ;Atexit routine
 
-.exitsp		defw	0	;atexit() stack address
-.exitcount	defb	0	;Number of atexit() routines
-.heaplast	defw	0	;heap variables
-.heapblocks	defw	0
+exitsp:		defw	0	;atexit() stack address
+exitcount:	defb	0	;Number of atexit() routines
+heaplast:	defw	0	;heap variables
+heapblocks:	defw	0
 
-.base_graphics	defw	0	;Graphics variables
-.coords		defw	0
+base_graphics:	defw	0	;Graphics variables
+coords:		defw	0
 
 		defm	"Small C+ nc100"
 		defb	0
@@ -147,9 +147,9 @@ ENDIF
 IF NEED_floatpack
         INCLUDE         "#float.asm"
 
-.fp_seed        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
-.extra          defs    6		;FP spare register
-.fa             defs    6		;FP accumulator
-.fasign         defb    0		;FP variable
+fp_seed:        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
+extra:          defs    6		;FP spare register
+fa:             defs    6		;FP accumulator
+fasign:         defb    0		;FP variable
 
 ENDIF

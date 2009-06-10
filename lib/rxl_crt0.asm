@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rxl_crt0.asm,v 1.3 2007-06-27 20:49:28 dom Exp $
+;       $Id: rxl_crt0.asm,v 1.4 2009-06-10 17:26:05 stefano Exp $
 ;
 
 	MODULE rex_crt0
@@ -39,13 +39,13 @@
         org    $8000
 
 	jp	start		;addin signature jump
-.signature
+signature:
 	defm	"XXX"
-.lib
+lib:
 	ld	hl,farret
 	push	hl
 	jp	_LibMain
-.start
+start:
 ; Make room for the atexit() stack
 	ld	hl,65535-64	;Initialise sp
 	ld	sp,hl
@@ -62,14 +62,14 @@
         ld      (fp_seed),hl
 ; Entry to the user code
         call    _main		;Call the users code
-.cleanup
+cleanup:
 	ld	de,$42	;DS_ADDIN_TERMINATE
 	ld	($c000),de
 	rst	$10		;Exit the addin
-.endloop
+endloop:
 	jr	endloop
-.l_dcal	jp	(hl)		;Used for call by function pointer
-.farret				;Used for farcall logic
+l_dcal:	jp	(hl)		;Used for call by function pointer
+farret:				;Used for farcall logic
 	pop	bc
 	ld	a,c
 	jp	$26ea

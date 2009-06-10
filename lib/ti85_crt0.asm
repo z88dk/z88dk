@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti85_crt0.asm,v 1.20 2007-06-27 20:49:28 dom Exp $
+;	$Id: ti85_crt0.asm,v 1.21 2009-06-10 17:26:05 stefano Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -15,8 +15,6 @@
 
 	XDEF	cleanup		; used by exit()
 	XDEF	l_dcal		; used by calculated calls = "call (hl)"
-
-	XDEF	_std_seed	; Integer rnd seed
 
 	XDEF	_vfprintf	; vprintf is internal to this file so we
 				;  only ever include one of the set of
@@ -143,7 +141,7 @@ IF (startup=3)
 	defw	$5000		; This is a PhatOS program string
 	defb	enddesc-description+1
 	;org	$8E57		; Origin to PhatOS programs
-.description
+description:
 	DEFINE NEED_name
 	INCLUDE	"zcc_opt.def"	; Get namestring from zcc_opt.def
 	UNDEFINE NEED_name
@@ -151,7 +149,7 @@ IF (startup=3)
 	defm	"Z88DK Small C+ Program"
  ENDIF
 	defb	$0		; Termination zero
-.enddesc
+enddesc:
 	im	1
 ENDIF
 
@@ -164,7 +162,7 @@ IF !NOT_DEFAULT_SHELL
 	org	$9293		; 'real' origin to Rigel programs
 	defw	$FC00		; This is a Rigel program string
 	defb	enddesc-description-1
-.description			; = "official" origin adress
+description:			; = "official" origin adress
 	DEFINE NEED_name
 	INCLUDE	"zcc_opt.def"	; Get namestring from zcc_opt.def
 	UNDEFINE NEED_name
@@ -172,7 +170,7 @@ IF !NOT_DEFAULT_SHELL
 	defm	"Z88DK Small C+ Program"
  ENDIF
 	defb	$0		; Termination zero
-.enddesc
+enddesc:
 	defw	fixuptable-description	; Relative ptr to the fixup table
 	im	1
 ENDIF
@@ -180,7 +178,7 @@ ENDIF
 ;-------------------------------------
 ; End of header, begin of startup part
 ;-------------------------------------
-.start
+start:
 	ld	(start1+1),sp
 IF !DEFINED_atexit		; Less stack use
 	ld	hl,-6		; 3 pointers (more likely value)
@@ -207,32 +205,27 @@ ENDIF
 
 	call	tidi
 	call	_main
-.cleanup
+cleanup:
 IF DEFINED_GRAYlib
         ld	a,$3c
         out	(0),a    ;Set screen back to normal
 ENDIF
-.start1
+start1:
 	ld	sp,0
 	ld	iy,_IY_TABLE	; Restore flag-pointer
 	im	2
 	ei
-.cpygraph
+cpygraph:
 	ret
 
 ;----------------------------------------
 ; End of startup part, routines following
 ;----------------------------------------
-.l_dcal
+l_dcal:
 	jp	(hl)
 
-.tiei
-	;exx
-	;ld	hl,(hl1save)
-	;ld	bc,(bc1save)
-	;ld	de,(de1save)
-	;exx
-	;ld	iy,(iysave)
+tiei:
+
 IF DEFINED_GRAYlib
 	im	1
 ELSE
@@ -240,84 +233,80 @@ ELSE
 ENDIF
 	ret
 
-.tidi
+tidi:
 IF DEFINED_GRAYlib
 	im	2
 ELSE
 	di
 ENDIF
-	;exx
-	;ld	(hl1save),hl
-	;ld	(bc1save),bc
-	;ld	(de1save),de
-	;exx
-	;ld	(iysave),iy
 	ret
 
-;.hl1save defw	0
-;.de1save defw	0
-;.bc1save defw	0
-;.iysave  defw	0
 
-	
-; Now, define some values for stdin, stdout, stderr
-IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
-.__sgoioblk
+;-----------
+; Define the stdin/out/err area. For the z88 we have two models - the
+; classic (kludgey) one and "ANSI" model
+;-----------
+__sgoioblk:
+IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
+ELSE
+        defw    -11,-12,-10
 ENDIF
 
 
-; Now, which of the vfprintf routines do we need?
-IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
- IF DEFINED_floatstdio
-._vfprintf
-	LIB vfprintf_fp
-	jp  vfprintf_fp
- ELSE
-  IF DEFINED_complexstdio
-._vfprintf
-	LIB vfprintf_comp
-	jp  vfprintf_comp
-  ELSE
-   IF DEFINED_ministdio
-._vfprintf
-	LIB vfprintf_mini
-	jp  vfprintf_mini
-   ENDIF
-  ENDIF
- ENDIF
+;---------------------------------
+; Select which printf core we want
+;---------------------------------
+_vfprintf:
+IF DEFINED_floatstdio
+        LIB     vfprintf_fp
+        jp      vfprintf_fp
+ELSE
+        IF DEFINED_complexstdio
+                LIB     vfprintf_comp
+                jp      vfprintf_comp
+        ELSE
+                IF DEFINED_ministdio
+                        LIB     vfprintf_mini
+                        jp      vfprintf_mini
+                ENDIF
+        ENDIF
 ENDIF
+
 
 IF Rigel
-.fixuptable
+fixuptable:
 	defb	0,0	; zero fixups, zero ZShell libs
 ENDIF
 
 ;Seed for integer rand() routines
-._std_seed	defw	0
+IF !DEFINED_HAVESEED
+                XDEF    _std_seed        ;Integer rand() seed
+_std_seed:      defw    0       ; Seed for integer rand() routines
+ENDIF
 
 ;Atexit routine
-.exitsp		defw	0
-.exitcount	defb	0
+exitsp:		defw	0
+exitcount:	defb	0
 
 ; Heap stuff
-.heaplast	defw	0
-.heapblocks	defw	0
+heaplast:	defw	0
+heapblocks:	defw	0
 
 ; mem stuff
-.base_graphics	defw	VIDEO_MEM
-.coords		defw	0
+base_graphics:	defw	VIDEO_MEM
+coords:		defw	0
 
 IF DEFINED_NEED1bitsound
-.snd_tick	defb	0	; Sound variable
+snd_tick:	defb	0	; Sound variable
 ENDIF
 
 IF NEED_floatpack
 	INCLUDE	"#float.asm"
 ;seed for random number generator - not used yet..
-.fp_seed	defb	$80,$80,0,0,0,0
+fp_seed:	defb	$80,$80,0,0,0,0
 ;Floating point registers...
-.extra		defs	6
-.fa		defs	6
-.fasign		defb	0
+extra:		defs	6
+fa:		defs	6
+fasign:		defb	0
 ENDIF

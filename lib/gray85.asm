@@ -10,7 +10,7 @@
 ; Subject:  LZ: Graydraw source!
 ;------------------------------------------------------------
 ;
-; $Id: gray85.asm,v 1.4 2002-04-10 20:31:10 dom Exp $
+; $Id: gray85.asm,v 1.5 2009-06-10 17:26:04 stefano Exp $
 ;
 
 	XDEF	graybit1
@@ -44,20 +44,6 @@ defc	intcount = $8980
 	and	@00111111		;  send thrue port 0 to switch to our
 	ld	(page2),a		;  2nd screen
 ;----
-	;dec	h			; Set the IV for IM2 mode
-	;ld	a,h			;
-	;ld	i,a			;
-	
-	;ld      (hl),IntProcStart&$FF	; Set the IV table
-	;inc     hl			;
-	;ld      (hl),IntProcStart/256	;
-	;ld	d,h			;
-	;ld	e,l			;
-	;dec	hl			;
-	;inc	de			;
-	;ld	bc,$0100		;
-	;ldir				;
-;----
 	im	1			;
 	ld	a,$87			; locate vector table at $8700-$8800
 	ld	i,a			;
@@ -83,71 +69,7 @@ defc	intcount = $8980
 	im	2			; Enable int
 	jp	jump_over		; Jump over the interrupt code
 
-;.IntProcStart
-;	push	af			;
-;	ld	a,(intcount)		; Check if own interrupt has quited
-;	bit	7,a			;  correctly, then bit 7 is zero
-;	jr	nz,int_fix		; If not zero, fix stack...
-;	push	hl			;
-;	push	de			;
-;	push	bc			;
-;	push	iy			;
-;	ld	iy,_IY_TABLE		;
-;					;
-;.cont_interrupt			;
-;	in	a,(3)			;
-;	bit	1,a			; check that it is a vbl interrupt
-;	jr	z,EndInt		;
-;					;
-;	ld	a,(intcount)		;
-;	res	7,(hl)			;
-;	cp	2			;
-;	jr	z,Disp_2		;
-;					;
-;.Disp_1				;
-;	inc	a			;
-;	ld	(intcount),a		;
-;	ld	a,(page2)		;
-;	out	(0),a			;
-;	jr	EndInt			;
-;.Disp_2				;
-;	ld	a,$3c			;
-;	out	(0),a			;
-;	sub	a			;
-;	ld	(intcount),a		;
-;.EndInt				;
-;	ld	hl,intcount		; If a 'direct interrupt' occures    
-;	set	7,(hl)			;  right after the TIOS-int, then
-;					;  we want bit 7 to be set...
-;	exx				; Swap to shadow registers.
-;	ex	af,af			; So the TIOS swaps back to the
-;					;  normal ones... (the ones we saved
-;					;  with push/pops)
-;	rst	$38			;
-;	di				; 'BIG' HOLE HERE... (TIOS does ei...)
-;	ex	af,af			;
-;	exx				;
-;					;
-;	ld	hl,intcount		; Interrupt returned correctly, so
-;	res	7,(hl)			;  we reset our error-condition...
-;	pop	iy			;
-;	pop	bc			;
-;	pop	de			;
-;	pop	hl			;
-;	pop	af			;
-;	ei				;
-;	ret				; Return to program
-;					;
-;.int_fix				;
-;	pop	af			; Pop AF back
-;	ex	af,af			; Fix shadowregs back
-;	exx				;
-;	pop	bc			; Pop the returnpoint of RST $38
-;					;  from the stack
-;	jr	cont_interrupt		; Continue with interrupt
-;.IntProcEnd
-
-.IntProcStart
+IntProcStart:
 	push	af			;
 	in	a,(3)			;
 	bit	1,a			; check that it is a vbl interrupt
@@ -157,32 +79,25 @@ defc	intcount = $8980
 	cp	2			;
 	jr	z,Disp_2		;
 					;
-.Disp_1					;
+Disp_1:
 	inc	a			;
 	ld	(intcount),a		;
 	ld	a,(page2)		;
 	out	(0),a			;
 	jr	EndInt			;
-.Disp_2
+Disp_2:
 	ld	a,$3c			;
 	out	(0),a			;
 	sub	a			;
 	ld	(intcount),a		;
-.EndInt					;
+EndInt:
 	pop	af			;
 	ei				;
 	ret				; Skip standard interrupt
-.IntProcEnd
+IntProcEnd:
 
-.graybit1 defw VIDEO_MEM
-.graybit2 defw 0
-.page2    defb 0
+graybit1: defw VIDEO_MEM
+graybit2: defw 0
+page2:    defb 0
 
-.jump_over
-;	ld	hl,(graybit2)		; Whipe the 2nd screen clean
-;	ld	d,h
-;	ld	e,l
-;	inc	de
-;	ld	(hl),0
-;	ld	bc,1023
-;	ldir
+jump_over:

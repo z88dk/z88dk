@@ -1,12 +1,12 @@
 
-.fel
+fel:
 	ld hl,felstr
 	call outstr
-.endhere jr endhere
+endhere: jr endhere
 
-.felstr defm "Something went wrong while flashing"&10&0
+felstr: defm "Something went wrong while flashing"&10&0
 	
-.dot
+dot:
 	push hl
 	push de
 	push bc
@@ -27,17 +27,17 @@
 
 
 ; Temp storage for flashbytes and flashbyte
-.start_seg
+start_seg:
 	defb 0
-.offset
+offset:
 	defw 0
-.ramptr
+ramptr:
 	defw 0
-.numbytes
+numbytes:
 	defw 0
 
 
-.flashbytes
+flashbytes:
 	; a contains start segment
 	; hl contains offset
 	; bc contains pointer to bytes to burn (in RAM)
@@ -48,7 +48,7 @@
 	ld (ramptr),bc
 	ld (numbytes),de
 
-.morebytes
+morebytes:
 
 	ld hl,(ramptr)
 	ld c,(hl)
@@ -100,7 +100,7 @@
 
 	ret
 
-.checkseg
+checkseg:
 	; Here we should check so hl < 4096
 	; and if so set it back to 0 and increment segment reg (a)
 
@@ -116,15 +116,15 @@
 	inc a	
 	ret	
 
-.dontwrap
+dontwrap:
 	pop af
 	ret
 
 
-.frv 	
+frv:
 	defm "Done flashing! Now reset target!!!"&0
 
-.flashbyte
+flashbyte:
 
 	; a contains the start-segment
 	; hl contains the offset
@@ -170,7 +170,7 @@
 
 	;  A special optimised togglewait here for speed and granularity
 	ld bc,0
-.togglw
+togglw:
 	ld a,(hl)
 	ld d,a
 	ld a,(hl)
@@ -184,7 +184,7 @@
 
 	ret
 
-.erase  
+erase:
 	ld a,85h
 	ld hl,555h
 	ld c,0aah
@@ -216,7 +216,7 @@
 	call pokeb
 	ret
 
-.waittoggle
+waittoggle:
 	; a should contain segment of flash in memory, i.e 80h for most (all?) rabbits
 	; Will return number of waitloop turns in bc
 	push hl
@@ -224,7 +224,7 @@
 
 	ld bc,0
 
-.waittoggleloop
+waittoggleloop:
 
 	ld a,80h
 	ld hl,0
@@ -247,7 +247,7 @@
 
 	ret
 
-.pokeb  ; a is the segment, hl is the address and c is the data
+pokeb:  ; a is the segment, hl is the address and c is the data
 	push af
 	push bc
 	push de
@@ -268,7 +268,7 @@
 
 	ret
 
-.peekb  ; a is the segment, hl is the address and data is returned in a
+peekb:  ; a is the segment, hl is the address and data is returned in a
 	push bc
 	push de
 	push hl
@@ -285,15 +285,15 @@
 
 	ret
 	
-.fin_str
+fin_str:
 	defm 10&"Finnished flashing, now reset target..."&10&0
-.erase_str
+erase_str:
 	defm "Erased flash..."&10&0
 
-.dotstr	defm "."&0
+dotstr:	defm "."&0
 
 
-.outstr
+outstr:
 	ld (_s_ostr), hl
 	call _OUTSTR
 	ret

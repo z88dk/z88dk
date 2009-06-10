@@ -4,16 +4,16 @@
 	
 	
 
-.cmd_vector
+cmd_vector:
 	defw start_user_prog ; command=0
 	defw do_flash        ; command=1
 	defw transfer2ram    ; command=2
 
-.num_prog_bytes
+num_prog_bytes:
 	defw 0 ; Set by ix from download utility, then is flashed and 
 	       ; used by transfer2ram
 	
-.run_command
+run_command:
 	; Getting here we should not use the serial download any more
 	; so we patch a direct jump from adress __start_prog+3
 	ld a,0c3h ; jp mnemonic
@@ -33,20 +33,20 @@
 	
 
 	; We need this to be relocatable (i.e. only use jr) and not use any stack
-.blinkled
+blinkled:
 	ld c,10
 	ld hl,60000
-.blinkled_n       ; Jumping here means chl should contain speed (default 10, 60000)
+blinkled_n:       ; Jumping here means chl should contain speed (default 10, 60000)
 
 	ld a,84h ;
     	defb 0d3h; ioi ;
         ld (24h),a ;
-.again2
+again2:
 	ld b,c
-.loop
+loop:
 	ld d,h
 	ld e,l
-.loop2
+loop2:
 	dec de
 	ld a,d
 	or e
@@ -59,10 +59,10 @@
     	ld (030h),a ;
 
 	ld b,c
-.loopa
+loopa:
 	ld d,h
 	ld e,l
-.loopa2
+loopa2:
 	dec de
 	ld a,d
 	or e
@@ -76,7 +76,7 @@
 
 	jr again2
 
-.do_flash
+do_flash:
 	; Set the command to 2 (transfer2ram), next time
 	; we will start from flash at addr zero...
 	ld a,2
@@ -112,9 +112,9 @@
 	ld hl,10
 	jp blinkled_n
 	
-.freeze jr freeze
+freeze: jr freeze
 
-.transfer2ram
+transfer2ram:
 	; This routine should set all registers to same values as in
 	; serial download, move all code from flash to ram
 	; Then it should start program from RAM. It needs to 
@@ -137,7 +137,7 @@
 	add hl,de
 	jp (hl) ; This jump just makes the code "continue" at jump2ext
 
-.jump2ext
+jump2ext:
 	; We should now "be" in extended segment at E000h (just by magic ;-)
 
 	; Now we can take all the "pokes" from __prefix to __postfix (including
@@ -146,7 +146,7 @@
 
 	; Code now needs to be relocatable!!
 	ld hl,__prefix
-.loopio
+loopio:
 	ld a,(hl)
 	ld d,a  ; Save for later bit 7 testing
 	and 7fh  ; mask MSB indicating I/O in table (80h)
@@ -161,7 +161,7 @@
 	jr z, skipioprefix  ; Is this a memory write?
 
 	defb 0d3h ; ioi
-.skipioprefix
+skipioprefix:
 	ld (bc),a
 
 	ld de,__postfix
@@ -182,7 +182,7 @@
 	
 	; Now the RAM should be mapped to address zero
 	jp back2ram0 ; This is an absolute jump so it has beed assembled to ram0
-.back2ram0 
+back2ram0 :
 
 
 	; We are now back into the ram bottom and need not be relocatable!!
@@ -227,19 +227,19 @@
 
 	jp 0 ;
 
-.dbg_skip2here		
+dbg_skip2here:
 	ld c,1
 	ld hl,60000
 	; Remember here that we do not have a stack (yet) since we 
 	; run in flash!!
 	jp blinkled_n
 
-.transfstr defm "This is the transfer 2 ram function"&0
+transfstr: defm "This is the transfer 2 ram function"&0
 
 
-._s_ostr defw 0
+_s_ostr: defw 0
 	; Send pointer to null terminated string in hl
-._outstr
+_outstr:
 	ld a,(hl)
 	cp 0
 	ret z	
@@ -248,4 +248,4 @@
 	jr _outstr
 
 	include "#rcmx000_flutil.asm"
-.start_user_prog
+start_user_prog:

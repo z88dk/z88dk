@@ -1,7 +1,7 @@
 ;
 ;	Startup for test emulator
 ;
-;	$Id: test_crt0.asm,v 1.1 2007-10-07 17:49:34 dom Exp $
+;	$Id: test_crt0.asm,v 1.2 2009-06-10 17:26:05 stefano Exp $
 
 
     module test_crt0
@@ -85,19 +85,19 @@ endif
 	ei
 	ret
 
-.restart08
+restart08:
 	; a = command to execute
 	defb	$ED, $FE	;trap
 	ret
 ; Restart routines, nothing sorted yet
-.restart10
-.restart18
-.restart20
-.restart28
-.restart30
+restart10:
+restart18:
+restart20:
+restart28:
+restart30:
 	ret
 
-.program
+program:
 	ld	sp,65535
 	ld	hl,-64
 	add	hl,sp
@@ -105,19 +105,19 @@ endif
 	ld	(exitsp),sp
     ei
 	call	_main
-.cleanup
+cleanup:
 	ld	a,CMD_EXIT	;exit
 	rst	8
 
 
-.l_dcal jp      (hl)            ;Used for function pointer calls
+l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 ;-----------
 ; Define the stdin/out/err area. For the z88 we have two models - the
 ; classic (kludgey) one and "ANSI" model
 ;-----------
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
         INCLUDE "#stdio_fp.asm"
 ELSE
@@ -127,7 +127,7 @@ ENDIF
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
         LIB     vfprintf_fp
         jp      vfprintf_fp
@@ -147,20 +147,20 @@ ENDIF
 ;-----------
 ; Now some variables
 ;-----------
-.coords         defw    0       ; Current graphics xy coordinates
-.base_graphics  defw    0       ; Address of the Graphics map
+coords:         defw    0       ; Current graphics xy coordinates
+base_graphics:  defw    0       ; Address of the Graphics map
 
 IF !DEFINED_HAVESEED
                 XDEF    _std_seed        ;Integer rand() seed
-._std_seed       defw    0       ; Seed for integer rand() routines
+_std_seed:      defw    0       ; Seed for integer rand() routines
 ENDIF
 
-.exitsp         defw    0       ; Address of where the atexit() stack is
-.exitcount      defb    0       ; How many routines on the atexit() stack
+exitsp:         defw    0       ; Address of where the atexit() stack is
+exitcount:      defb    0       ; How many routines on the atexit() stack
 
 
-.heaplast       defw    0       ; Address of last block on heap
-.heapblocks     defw    0       ; Number of blocks
+heaplast:       defw    0       ; Address of last block on heap
+heapblocks:     defw    0       ; Number of blocks
 
                 defm    "Small C+ TEST"   ;Unnecessary file signature
                 defb    0
@@ -170,10 +170,10 @@ ENDIF
 ;-----------------------
 IF NEED_floatpack
         INCLUDE         "#float.asm"
-.fp_seed        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
-.extra          defs    6               ;FP register
-.fa             defs    6               ;FP Accumulator
-.fasign         defb    0               ;FP register
+fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
+extra:          defs    6               ;FP register
+fa:             defs    6               ;FP Accumulator
+fasign:         defb    0               ;FP register
 
 ENDIF
 

@@ -3,7 +3,7 @@
 ;
 ; This module is included by rcmx000_crt0.asm
 ;
-; $Id: rcmx000_boot.asm,v 1.3 2009-02-24 16:53:29 mimarob Exp $
+; $Id: rcmx000_boot.asm,v 1.4 2009-06-10 17:26:04 stefano Exp $
 ;
 
 
@@ -13,7 +13,7 @@
 
 	org 0
 
-.__start_prog
+__start_prog:
 
 	ld sp,8000h
 
@@ -25,12 +25,12 @@
 	jr skip_data_bytes
 
 	; The command byte should be at 8
-.command   defb 0
+command:   defb 0
 
 	; N.B: The "end_prog" is the end of this file's program but the
 	; beginning of the users stuff
 
-.skip_data_bytes
+skip_data_bytes:
 	; Tell host we have loaded!! Send the 'babe' magic pattern
 	ld a,0bah
 	call __sendchar
@@ -108,7 +108,7 @@
 	ld e,b
 	add iy,de
 	
-.again
+again:
 	call __recvchar
 	nop
 	ld e,a
@@ -134,7 +134,7 @@
 	call __end_prog 	; This will jump to main
 	jp 0
 
-.__recvchar
+__recvchar:
 	defb 0d3h ; ioi
 	ld a,(0c3h)		; SASR  Serial status
 	bit 7,a
@@ -143,10 +143,10 @@
 	ld a,(0c0h)		; SADR  Serial data read
 	ret
 
-.__sendchar
+__sendchar:
 	push hl
 	ld hl,0c3h
-.__waitready
+__waitready:
 	defb 0d3h ; ioi
 	bit 3,(hl)		; SASR, Serial status, bit 3
 	jr nz,__waitready
@@ -165,9 +165,9 @@
 	; Remember, a program starts with the crt0 file,
 	; which then includes this file!!
 
-.__endbootstrap
+__endbootstrap:
 	
-.__prefix
+__prefix:
 
 	defb 080h, 000h, 008h			; GCSR Clock select, bit 4-2: 010 (osc)
 	defb 080h, 009h, 051h			; Watchdog
@@ -193,7 +193,7 @@
 	; we set them at a later point in the bootstrap code
 	; obtained via meassurebaud.c, we have it set here to an insane value
 	; so this it not forgotten...
-.__patch_baudrate
+__patch_baudrate:
 	defb 42					; TAT4R <= baud divisor
 
 	defb 080h, 0a0h, 001h			; TACSR <= 1
@@ -205,10 +205,10 @@
 
 
 	;; This is the standard final I/O operation that kick starts the Rabbit from address zero in RAM
-.__postfix
+__postfix:
 	defb 080h, 024h, 080h			; SPCR <= 80h
 
-.__end_prog
+__end_prog:
 
 	; Here we put some utils for flashing and start from flash
 	; We do not want them in the 2400 baud loader since we dont need

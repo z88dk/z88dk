@@ -3,7 +3,7 @@
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.21 2007-06-27 20:49:28 dom Exp $
+;	$Id: ti83p_crt0.asm,v 1.22 2009-06-10 17:26:05 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells
@@ -27,8 +27,6 @@
 
 	XDEF	cleanup		; used by exit()
 	XDEF	l_dcal		; used by calculated calls = "call (hl)"
-
-	XDEF	_std_seed	; Integer rnd seed
 
 	XDEF	_vfprintf	; vprintf is internal to this file so we
 				;  only ever include one of the set of
@@ -161,7 +159,7 @@ ENDIF
 ;-------------------------------------
 ; End of header, begin of startup part
 ;-------------------------------------
-.start
+start:
 IF DEFINED_GimmeSpeed
 	ld	a,1		; switch to 15MHz (extra fast)
 	rst	28		; bcall(SetExSpeed)
@@ -200,7 +198,7 @@ ENDIF
 
 	im	2		; enable IM2 interrupt
 	call	_main		; call main()
-.cleanup			; exit() jumps to this point
+cleanup:			; exit() jumps to this point
 	ld	iy,_IY_TABLE	; Restore flag pointer
 	im	1		;
 IF DEFINED_GimmeSpeed		;
@@ -208,69 +206,77 @@ IF DEFINED_GimmeSpeed		;
 	rst	28		; bcall(SetExSpeed)
 	defw	SetExSpeed	;
 ENDIF				;
-.start1	ld	sp,0		; Restore SP
+start1:	ld	sp,0		; Restore SP
 IF TSE				; TSE Kernel
 	call	_tseForceYield	; Task-switch back to shell (can return...)
 	jp	start		; begin again if needed...
 ENDIF				;
-.tiei	ei			;
+tiei:	ei			;
 IF DEFINED_GRAYlib		;
-.cpygraph			;
+cpygraph:
 ENDIF				;
-.tidi	ret			;
+tidi:	ret			;
 
 ;----------------------------------------
 ; End of startup part, routines following
 ;----------------------------------------
-.l_dcal
+l_dcal:
 	jp	(hl)		; used as "call (hl)"
 
-; Now, define some values for stdin, stdout, stderr
-IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
-.__sgoioblk
+
+;-----------
+; Define the stdin/out/err area. For the z88 we have two models - the
+; classic (kludgey) one and "ANSI" model
+;-----------
+__sgoioblk:
+IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
+ELSE
+        defw    -11,-12,-10
 ENDIF
 
 
-; Now, which of the vfprintf routines do we need?
-IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
- IF DEFINED_floatstdio
-._vfprintf
-	LIB vfprintf_fp
-	jp  vfprintf_fp
- ELSE
-  IF DEFINED_complexstdio
-._vfprintf
-	LIB vfprintf_comp
-	jp  vfprintf_comp
-  ELSE
-   IF DEFINED_ministdio
-._vfprintf
-	LIB vfprintf_mini
-	jp  vfprintf_mini
-   ENDIF
-  ENDIF
- ENDIF
+;---------------------------------
+; Select which printf core we want
+;---------------------------------
+_vfprintf:
+IF DEFINED_floatstdio
+        LIB     vfprintf_fp
+        jp      vfprintf_fp
+ELSE
+        IF DEFINED_complexstdio
+                LIB     vfprintf_comp
+                jp      vfprintf_comp
+        ELSE
+                IF DEFINED_ministdio
+                        LIB     vfprintf_mini
+                        jp      vfprintf_mini
+                ENDIF
+        ENDIF
 ENDIF
+
 
 ;Seed for integer rand() routines
-._std_seed	defw	0
+IF !DEFINED_HAVESEED
+                XDEF    _std_seed        ;Integer rand() seed
+_std_seed:      defw    0       ; Seed for integer rand() routines
+ENDIF
 
 ;Atexit routine
-.exitsp		defw	0
-.exitcount	defb	0
+exitsp:		defw	0
+exitcount:	defb	0
 
 ; Heap stuff
-.heaplast	defw	0
-.heapblocks	defw	0
+heaplast:	defw	0
+heapblocks:	defw	0
 
 ; mem stuff
-.base_graphics	defw	plotSScreen
-.coords		defw	0
+base_graphics:	defw	plotSScreen
+coords:		defw	0
 
 IF !DEFINED_GRAYlib
  IF DEFINED_GimmeSpeed
-.cpygraph
+cpygraph:
 	call	$50		; bjump(GrBufCpy)
 	defw	GrBufCpy	; FastCopy is far too fast at 15MHz...
  ELSE
@@ -284,7 +290,7 @@ IF !DEFINED_GRAYlib
 	defc	cpygraph = $8A3A+18	; TSE FastCopy call
   ENDIF
   IF ASM
-.cpygraph
+cpygraph:
 ;(ion)FastCopy from Joe Wingbermuehle
 	di
 	ld	a,$80				; 7
@@ -321,9 +327,9 @@ ENDIF
 IF NEED_floatpack
 	INCLUDE	"#float.asm"
 ;seed for random number generator - not used yet..
-.fp_seed	defb	$80,$80,0,0,0,0
+fp_seed:	defb	$80,$80,0,0,0,0
 ;Floating point registers...
-.extra		defs	6
-.fa		defs	6
-.fasign		defb	0
+extra:		defs	6
+fa:		defs	6
+fasign:		defb	0
 ENDIF

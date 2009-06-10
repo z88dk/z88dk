@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: trs80_crt0.asm,v 1.3 2008-04-08 16:49:27 stefano Exp $
+;       $Id: trs80_crt0.asm,v 1.4 2009-06-10 17:26:05 stefano Exp $
 ;
 
 
@@ -48,7 +48,7 @@
         ENDIF
                 org     myzorg
 
-.start
+start:
         ld      (start1+1),sp   ;Save entry stack
 IF      STACKPTR
         ld      sp,STACKPTR
@@ -72,7 +72,7 @@ ENDIF
 
         call    _main           ;Call user program
 
-.cleanup
+cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
@@ -83,18 +83,18 @@ IF !DEFINED_nostreams
  ENDIF
 ENDIF
 
-.cleanup_exit
-.start1 ld      sp,0            ;Restore stack to entry value
+cleanup_exit:
+start1: ld      sp,0            ;Restore stack to entry value
         ret
 
-.l_dcal jp      (hl)            ;Used for function pointer calls
+l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 ;-----------
 ; Define the stdin/out/err area. For the z88 we have two models - the
 ; classic (kludgey) one and "ANSI" model
 ;-----------
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
         INCLUDE "#stdio_fp.asm"
 ELSE
@@ -106,7 +106,7 @@ ENDIF
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-._vfprintf
+_vfprintf
 IF DEFINED_floatstdio
         LIB     vfprintf_fp
         jp      vfprintf_fp
@@ -126,23 +126,23 @@ ENDIF
 ;-----------
 ; Now some variables
 ;-----------
-.coords         defw    0       ; Current graphics xy coordinates
-.base_graphics  defw    $3c00   ; Address of the Graphics map
+coords:         defw    0       ; Current graphics xy coordinates
+base_graphics:  defw    $3c00   ; Address of the Graphics map
 
 IF !DEFINED_HAVESEED
                 XDEF    _std_seed        ;Integer rand() seed
-._std_seed       defw    0       ; Seed for integer rand() routines
+_std_seed:       defw    0       ; Seed for integer rand() routines
 ENDIF
 
-.exitsp         defw    0       ; Address of where the atexit() stack is
-.exitcount      defb    0       ; How many routines on the atexit() stack
+exitsp:         defw    0       ; Address of where the atexit() stack is
+exitcount:      defb    0       ; How many routines on the atexit() stack
 
 
-.heaplast       defw    0       ; Address of last block on heap
-.heapblocks     defw    0       ; Number of blocks
+heaplast:       defw    0       ; Address of last block on heap
+heapblocks:     defw    0       ; Number of blocks
 
 IF DEFINED_NEED1bitsound
-.snd_tick       defb    0       ; Sound variable
+snd_tick:       defb    0       ; Sound variable
 ENDIF
 
 ;-----------------------
@@ -150,10 +150,10 @@ ENDIF
 ;-----------------------
 IF NEED_floatpack
         INCLUDE         "#float.asm"
-.fp_seed        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
-.extra          defs    6               ;FP register
-.fa             defs    6               ;FP Accumulator
-.fasign         defb    0               ;FP register
+fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
+extra:          defs    6               ;FP register
+fa:             defs    6               ;FP Accumulator
+fasign:         defb    0               ;FP register
 
 ENDIF
 

@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.11 2008-07-11 15:10:56 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.12 2009-06-10 17:26:04 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -60,7 +60,7 @@
 ;----------------------
 ; Execution starts here
 ;----------------------
-.start
+start:
 IF !DEFINED_noprotectmsdos
 	defb	$eb,$04		;DOS protection... JMPS LABE
 	ex	de,hl
@@ -71,11 +71,11 @@ IF !DEFINED_noprotectmsdos
 	defb	$cd,$21		;DOS protection... INT 21h.
 	defb	$cd,$20		;DOS protection... INT 20h.
 
-.dosmessage
+dosmessage:
 	defm	"This program is for a CP/M system."
 	defb	13,10,'$'
 
-.begin
+begin:
 ENDIF
 	ld      (start1+1),sp	;Save entry stack
 	ld	a,($80)		;byte count of length of args
@@ -116,7 +116,7 @@ ENDIF
 	ld	c,a
 	add	hl,bc	;now points to the end
 ; Try to find the end of the arguments
-.argv_loop_1
+argv_loop_1:
 	ld	a,(hl)
 	cp	' '
 	jr	nz,argv_loop_2
@@ -125,7 +125,7 @@ ENDIF
 	dec	c
 	jr	nz,argv_loop_1
 ; We've located the end of the last argument, try to find the start
-.argv_loop_2
+argv_loop_2:
 	ld	a,(hl)
 	cp	' '
 	jr	nz,argv_loop_3
@@ -134,12 +134,12 @@ ENDIF
 	push	hl
 	inc	b
 	dec	hl
-.argv_loop_3
+argv_loop_3:
 	dec	hl
 	dec	c
 	jr	nz,argv_loop_2
 
-.argv_done
+argv_done:
 	ld	hl,end	;name of program (NULL)
 	push	hl
 	inc	b
@@ -158,7 +158,7 @@ ENDIF
 	ld	c,14
 	call	5
 
-.cleanup
+cleanup:
 	push	hl		;Save return value
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -167,15 +167,15 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 	pop	bc		;Get exit() value into bc
-.start1	ld      sp,0		;Pick up entry sp
+start1:	ld      sp,0		;Pick up entry sp
         jp	0
 
-.l_dcal	jp	(hl)		;Used for call by function ptr
+l_dcal:	jp	(hl)		;Used for call by function ptr
 
 ;------------------------
 ; The stdio control block
 ;------------------------
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
 ELSE
@@ -186,7 +186,7 @@ ENDIF
 ;----------------------------------------
 ; Work out which vfprintf routine we need
 ;----------------------------------------
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
 	jp	vfprintf_fp
@@ -207,29 +207,29 @@ ENDIF
 ; Some startup variables
 ;-----------------------
 
-.defltdsk       defb    0	;Default disc
-.exitsp		defw	0	;Address of atexit() stack
-.exitcount	defb	0	;Number of atexit() routinens
-.heaplast	defw	0	;Pointer to last free heap block
-.heapblocks	defw	0	;Number of heap blocks available
+defltdsk:       defb    0	;Default disc
+exitsp:		defw	0	;Address of atexit() stack
+exitcount:	defb	0	;Number of atexit() routinens
+heaplast:	defw	0	;Pointer to last free heap block
+heapblocks:	defw	0	;Number of heap blocks available
 IF !DEFINED_nofileio
-.__fcb		defs	420,0	;file control block (10 files) (MAXFILE)
+__fcb:		defs	420,0	;file control block (10 files) (MAXFILE)
 ENDIF
 IF !DEFINED_HAVESEED
 		XDEF    _std_seed        ;Integer rand() seed
-._std_seed       defw    0       ; Seed for integer rand() routines
+_std_seed:       defw    0      ; Seed for integer rand() routines
 ENDIF
 
 IF DEFINED_NEED1bitsound
-.snd_tick	defb	0	; Sound variable
+snd_tick:	defb	0	; Sound variable
 ENDIF
 
 ;----------------------------
 ; Unneccessary file signature
 ;----------------------------
-._vdcDispMem					; Label used by "c128cpm.lib" only
+_vdcDispMem:					; Label used by "c128cpm.lib" only
          	defm  	"Small C+ CP/M"
-.end		defb	0
+end:		defb	0
 
 ;----------------------------------------------
 ; Floating point support routines and variables
@@ -237,9 +237,9 @@ ENDIF
 IF NEED_floatpack
         INCLUDE         "#float.asm"
 
-.fp_seed        defb    $80,$80,0,0,0,0	; FP seed (unused ATM)
-.extra          defs    6		; FP spare register
-.fa             defs    6		; FP accumulator
-.fasign         defb    0		; FP variable
+fp_seed:        defb    $80,$80,0,0,0,0	; FP seed (unused ATM)
+extra:          defs    6		; FP spare register
+fa:             defs    6		; FP accumulator
+fasign:         defb    0		; FP variable
 
 ENDIF

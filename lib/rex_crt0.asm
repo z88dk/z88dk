@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.14 2007-06-27 20:49:28 dom Exp $
+;       $Id: rex_crt0.asm,v 1.15 2009-06-10 17:26:05 stefano Exp $
 ;
 
 	MODULE rex_crt0
@@ -37,7 +37,7 @@
         org    $8000
 
 	jp	start		;addin signature jump
-.start
+start:
 ; Make room for the atexit() stack
 	ld	hl,65535-64	;Initialise sp
 	ld	sp,hl
@@ -54,13 +54,13 @@
         ld      (fp_seed),hl
 ; Entry to the user code
         call    _main		;Call the users code
-.cleanup
+cleanup:
 	ld	de,$42	;DS_ADDIN_TERMINATE
 	ld	($c000),de
 	rst	$10		;Exit the addin
-.endloop
+endloop:
 	jr	endloop
-.l_dcal	jp	(hl)		;Used for call by function pointer
+l_dcal:	jp	(hl)		;Used for call by function pointer
 
 ;--------
 ; Static variables are kept in RAM in high memory

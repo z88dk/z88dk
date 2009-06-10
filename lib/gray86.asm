@@ -10,7 +10,7 @@
 ; Subject:  LZ: Graydraw source!
 ;------------------------------------------------------------
 ;
-; $Id: gray86.asm,v 1.3 2002-04-10 20:31:10 dom Exp $
+; $Id: gray86.asm,v 1.4 2009-06-10 17:26:04 stefano Exp $
 ;
 
 	XDEF	graybit1
@@ -52,7 +52,7 @@
 	ld	(intcount),a
 	jp	jump_over
 
-.IntProcStart
+IntProcStart:
 	push	af
 	in	a,(3)
 	bit	1,a			; check that it is a vbl interrupt
@@ -62,18 +62,18 @@
 	cp	2
 	jr	z,Disp_2
 
-.Disp_1
+Disp_1:
 	inc	a
 	ld	(intcount),a
 	ld	a,(page2)
 	out	(0),a
 	jr	EndInt
-.Disp_2
+Disp_2:
 	ld	a,$3c
 	out	(0),a
 	xor	a
 	ld	(intcount),a
-.EndInt
+EndInt:
 	;in a,(3)			;this stuff must be done or calc crashes
 	;rra				;mysterious stuff from the ROM
 	;ld a,0
@@ -86,12 +86,12 @@
 	ei
 	reti
 	;jp $38
-.IntProcEnd
+IntProcEnd:
 
-.graybit1 defw $fc00	;GRAPH_MEM
-.graybit2 defw 0
-.page2    defb 0
-.intcount defb 0
+graybit1: defw $fc00	;GRAPH_MEM
+graybit2: defw 0
+page2:    defb 0
+intcount: defb 0
 
-.jump_over
+jump_over:
 

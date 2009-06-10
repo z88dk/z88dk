@@ -3,7 +3,7 @@
 ;	Stefano Bodrato	- Dec 2000
 ;	Henk Poley	- Apr 2001 Fixed and add some things
 ;
-;	$Id: ti83_crt0.asm,v 1.20 2007-06-27 20:49:28 dom Exp $
+;	$Id: ti83_crt0.asm,v 1.21 2009-06-10 17:26:05 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -32,8 +32,6 @@
 
 	XDEF	cleanup		; used by exit()
 	XDEF	l_dcal		; used by calculated calls = "call (hl)"
-
-	XDEF	_std_seed	; Integer rnd seed
 
 	XDEF	_vfprintf	; vprintf is internal to this file so we
 				;  only ever include one of the set of
@@ -76,7 +74,7 @@ IF (startup=2) | (startup=8)
  	DEFINE V_Explorer
 	defb	$1
 	defb	enddesc-description+1	; lengthOfDescription+1
-.description
+description:
 	DEFINE NEED_name	; The next time we'll include zcc_opt.def
 				;  it will have the programs namestring.
 				; Usage in C file:
@@ -87,9 +85,9 @@ IF (startup=2) | (startup=8)
   	; If no namestring provided, display full compiler ident
 	defm	"Z88DK Small C+ Program"
     ENDIF
-.enddesc
+enddesc:
 	defb	endicon-icon+1	; heightOfIcon+1
-.icon
+icon:
 	DEFINE NEED_icon
 	INCLUDE	"zcc_opt.def"	; Get icon from zcc_opt.def
 	UNDEFINE NEED_icon
@@ -102,8 +100,8 @@ IF (startup=2) | (startup=8)
 	defb	@00110000
 	defb	@00000000
     ENDIF
-.endicon
-.externals
+endicon:
+externals:
   ENDIF
   IF DEFINED_GRAYlib
 	defb	$1		; numberOfExternals+1 (maximum = 11d)
@@ -140,7 +138,7 @@ IF (startup=4)
 	defw	0		; pointer to libs, 0 if no libs used
 	defw	description	; pointer to a description
 	defw	icon		; pointer to an 8x5 icon
-.description
+description:
 	DEFINE NEED_name
 	INCLUDE	"zcc_opt.def"
 	UNDEFINE NEED_name
@@ -148,7 +146,7 @@ IF (startup=4)
 	defm	"Z88DK Small C+ Program"
  ENDIF
 	defb	$0
-.icon
+icon:
 	DEFINE NEED_icon
 	INCLUDE	"zcc_opt.def"
 	UNDEFINE NEED_icon
@@ -173,7 +171,7 @@ IF (startup=5) | (startup=6)
 	defw	0		; pointer to libs, 0 if no libs used
 	defw	description	; pointer to a description
 	defw	icon		; pointer to an 8x8 icon.description
-.description
+description:
 	DEFINE NEED_name
 	INCLUDE	"zcc_opt.def"
 	UNDEFINE NEED_name
@@ -181,7 +179,7 @@ IF (startup=5) | (startup=6)
 	defm	"Z88DK Small C+ Program"
  ENDIF
 	defb	$0
-.icon
+icon:
 	DEFINE NEED_icon
 	INCLUDE	"zcc_opt.def"
 	UNDEFINE NEED_icon
@@ -208,7 +206,7 @@ IF (startup=7)
 	jr	start
 	defw	0		; pointer to libs, 0 if no libs used
 	defw	description	; pointer to a description
-.description
+description:
 	DEFINE NEED_name
 	INCLUDE	"zcc_opt.def"
 	UNDEFINE NEED_name
@@ -260,7 +258,7 @@ IF !NOT_DEFAULT_SHELL
 	ret			; We use the Ionlibs (doesn't matter)
  ENDIF
 	jr	nc,start 	; Ion identifier
-.description
+description:
 	DEFINE NEED_name
 	INCLUDE	"zcc_opt.def"
 	UNDEFINE NEED_name
@@ -274,7 +272,7 @@ ENDIF
 ;-------------------------------------
 ; End of header, begin of startup part
 ;-------------------------------------
-.start
+start:
 IF ZASMLOAD
 	call	_runindicoff	; stop anoing run-indicator
 ENDIF
@@ -315,8 +313,8 @@ ENDIF
 
 	im	2
 	call	_main
-.cleanup			; exit() jumps to this point
-.start1	ld	sp,0		; writeback
+cleanup:			; exit() jumps to this point
+start1:	ld	sp,0		; writeback
 	ld	iy,_IY_TABLE	; Restore flag-pointer
 IF !(Ion | SOS | Ti_Explorer | V_Explorer | Anova)
  IF NONANSI
@@ -327,57 +325,67 @@ IF !(Ion | SOS | Ti_Explorer | V_Explorer | Anova)
 	res	oninterrupt,(iy+onflags) ; Reset [On]-flag (stops "ERR:Break")
 ENDIF
 	im	1
-.tiei	ei
+tiei:	ei
 IF DEFINED_GRAYlib
-.cpygraph
+cpygraph:
 ENDIF
-.tidi	ret
+tidi:	ret
 
 ;----------------------------------------
 ; End of startup part, routines following
 ;----------------------------------------
 defc l_dcal = $52E8		; jp (hl)
 
-IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
-.__sgoioblk
+
+;-----------
+; Define the stdin/out/err area. For the z88 we have two models - the
+; classic (kludgey) one and "ANSI" model
+;-----------
+__sgoioblk:
+IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
+ELSE
+        defw    -11,-12,-10
 ENDIF
 
-; Now, which of the vfprintf routines do we need?
-IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
- IF DEFINED_floatstdio
-._vfprintf
-	LIB vfprintf_fp
-	jp  vfprintf_fp
- ELSE
-  IF DEFINED_complexstdio
-._vfprintf
-	LIB vfprintf_comp
-	jp  vfprintf_comp
-  ELSE
-   IF DEFINED_ministdio
-._vfprintf
-	LIB vfprintf_mini
-	jp  vfprintf_mini
-   ENDIF
-  ENDIF
- ENDIF
+
+;---------------------------------
+; Select which printf core we want
+;---------------------------------
+_vfprintf:
+IF DEFINED_floatstdio
+        LIB     vfprintf_fp
+        jp      vfprintf_fp
+ELSE
+        IF DEFINED_complexstdio
+                LIB     vfprintf_comp
+                jp      vfprintf_comp
+        ELSE
+                IF DEFINED_ministdio
+                        LIB     vfprintf_mini
+                        jp      vfprintf_mini
+                ENDIF
+        ENDIF
 ENDIF
+
 
 ;Seed for integer rand() routines
-._std_seed	defw	0
+IF !DEFINED_HAVESEED
+                XDEF    _std_seed        ;Integer rand() seed
+_std_seed:      defw    0       ; Seed for integer rand() routines
+ENDIF
 
 ;Atexit routine
-.exitsp		defw	0
-.exitcount	defb	0
+exitsp:		defw	0
+exitcount:	defb	0
 
 ; Heap stuff
-.heaplast	defw	0
-.heapblocks	defw	0
+heaplast:	defw	0
+heapblocks:	defw	0
 
 ; mem stuff
-.base_graphics	defw	plotSScreen
-.coords		defw	0
+base_graphics:	defw	plotSScreen
+coords:		defw	0
 
 IF !DEFINED_GRAYlib
  IF Ion
@@ -391,7 +399,7 @@ IF !DEFINED_GRAYlib
  ENDIF
  
  IF !Do_Not_Include_FastCopy
-.cpygraph
+cpygraph:
 ;(ion)FastCopy from Joe Wingbermuehle
 	di
 	ld	a,$80				; 7
@@ -427,9 +435,9 @@ ENDIF
 IF NEED_floatpack
 	INCLUDE		"#float.asm"
 ;seed for random number generator - not used yet..
-.fp_seed	defb	$80,$80,0,0,0,0
-;Floating point registers...
-.extra		defs	6
-.fa		defs	6
-.fasign		defb	0
+fp_seed:	defb	$80,$80,0,0,0,0
+Floating point registers...
+extra:		defs	6
+fa:		defs	6
+fasign:		defb	0
 ENDIF

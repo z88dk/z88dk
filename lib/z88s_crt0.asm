@@ -3,7 +3,7 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.8 2007-06-27 20:49:28 dom Exp $
+;	$Id: z88s_crt0.asm,v 1.9 2009-06-10 17:26:05 stefano Exp $
 
 
 
@@ -14,13 +14,13 @@
 
 	org	shell_loadaddr-shell_headerlen
 
-.header_start
+header_start:
         defm    "!bin"
 	defb	shell_verh
 	defb	shell_verm
 	defb	shell_verl
 	defb	13
-.shell_length
+shell_length:
         defw    0		; Fill in by make program
         defw    start
 
@@ -28,7 +28,7 @@
 ;-----------
 ; Code starts executing from here
 ;-----------
-.start
+start:
 	push	bc		; Preserve registers that need to be
 	push	de	
 	ld	(saveix),ix
@@ -78,7 +78,7 @@ ENDIF
 	jr	z,argv_none
 	dec	hl
 	dec	de		; available length
-.argv_loop
+argv_loop:
 	ld	a,d
 	or	e
 	jr	z,argv_exit
@@ -90,14 +90,14 @@ ENDIF
 	inc	c
 	push	hl
 	dec	hl
-.argv_loop2
+argv_loop2:
 	dec	hl
 	dec	de
 	jr	argv_loop
-.argv_exit
+argv_exit:
 	push	hl		; first real argument
 	inc	c
-.argv_none
+argv_none:
 	ld	hl,end		; program name
 	inc	c
 	push	hl		
@@ -119,14 +119,14 @@ ENDIF
 	pop	bc		; kill argv
 	pop	bc		; kill argc
 	
-.cleanup			;Jump back here from exit() if needed
+cleanup:			;Jump back here from exit() if needed
 IF DEFINED_ANSIstdio
 	LIB	closeall
 	call	closeall	;Close any open files (fopen)
 ENDIF
         call    resterrhan	;Restore the original error handler
 	
-.start1	ld	sp,0		;Restore stack to entry value
+start1:	ld	sp,0		;Restore stack to entry value
 	ld	ix,(saveix)	;Get back those registers
 	ld	iy,(saveiy)
 	pop	de
@@ -136,7 +136,7 @@ ENDIF
 ;-----------
 ; Install the error handler
 ;-----------
-.doerrhan
+doerrhan:
         xor     a
         ld      (exitcount),a
         ld      b,0
@@ -149,12 +149,12 @@ ENDIF
 ;-----------
 ; Restore BASICs error handler
 ;-----------
-.resterrhan
+resterrhan:
         ld      hl,(l_erraddr)
         ld      a,(l_errlevel)
         ld      b,0
         call_oz(os_erh)
-.processcmd			;processcmd is called after os_tin
+processcmd:			;processcmd is called after os_tin
         ld      hl,0
         ret
 
@@ -162,15 +162,15 @@ ENDIF
 ;-----------
 ; The error handler
 ;-----------
-.errhand
+errhand:
         ret     z   		;Fatal error
         cp      rc_esc
         jr     z,errescpressed
         ld      hl,(l_erraddr)	;Pass everything to BASIC's handler
         scf
-.l_dcal	jp	(hl)		;Used for function pointer calls also
+l_dcal:	jp	(hl)		;Used for function pointer calls also
 
-.errescpressed
+errescpressed:
         call_oz(os_esc)		;Acknowledge escape pressed
         jr      cleanup		;Exit the program
 
@@ -178,7 +178,7 @@ ENDIF
 ;-----------
 ; Select which vfprintf routine is needed
 ;-----------
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
 	jp	vfprintf_fp
@@ -207,8 +207,8 @@ IF DEFINED_farheapsz
         INCLUDE "#init_far.asm"
 
 ; Variables that can't be place in the normal defvars
-.copybuff	defs	258
-.actual_malloc-table
+copybuff:	defs	258
+actual_malloc-table:
 		defs	((farheapsz/256)+1)*2
 
 ; Now some memory shared with Forth - same as application setup
@@ -229,7 +229,7 @@ ENDIF
 ;--------
 IF DEFINED_farheapsz
         LIB     strcpy_far
-._cpfar2near
+_cpfar2near:
         pop     bc      ;ret address
         pop     hl
         pop     de      ;far ptr
@@ -254,7 +254,7 @@ IF DEFINED_farheapsz
         ret
 ELSE
 ; We have no far code installed so all we have to do is fix the stack
-._cpfar2near
+_cpfar2near:
         pop     bc
         pop     hl
         pop     de
@@ -267,7 +267,7 @@ ENDIF
 ; The system() function for the shell 
 ;----------
 	XDEF	_system
-._system
+_system:
 	pop	de		; DE=return address
 	pop	bc		; BC=command address
 	push	bc
@@ -279,7 +279,7 @@ ENDIF
 	pop	hl		; HL=0 or error code
 	ret
 
-.system_forthcode
+system_forthcode:
 	defw	shell_also,shell_internal,shell_ztos,shell_eval,shell_previous
 	defw	shellapi_back
 
@@ -288,7 +288,7 @@ ENDIF
 ;----------
 	XDEF	_shellapi
 
-._shellapi
+_shellapi:
 	push	hl
 	call	resterrhan	;restore forth error handler
 	pop	de		; DE=Forth's IP
@@ -301,7 +301,7 @@ ENDIF
 	ld	(ix+0),l
 	pop	bc		; BC=TOS
 	jp	shell_next	; execute Forth code
-.shellapi_back
+shellapi_back:
 	push	bc		; stack TOS
 	ld	e,(ix+0)
 	ld	d,(ix+1)
@@ -314,7 +314,7 @@ ENDIF
 ; Define the stdin/out/err area. For the z88 we have two models - the
 ; classic (kludgey) one and "ANSI" model
 ;-----------
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
 ELSE
@@ -325,39 +325,39 @@ ENDIF
 ;-----------
 ; Now some variables
 ;-----------
-.l_erraddr	defw	0	; BASIC error handler address
-.l_errlevel	defb	0	; And error level
+l_erraddr:	defw	0	; BASIC error handler address
+l_errlevel:	defb	0	; And error level
 
 
-.coords         defw	0	; Current graphics xy coordinates
-.base_graphics  defw	0	; Address of the Graphics map
-.gfx_bank       defb    0	; And the bank
+coords:         defw	0	; Current graphics xy coordinates
+base_graphics:  defw	0	; Address of the Graphics map
+gfx_bank:       defb    0	; And the bank
 
-._std_seed       defw    0	; Seed for integer rand() routines
+_std_seed:       defw    0	; Seed for integer rand() routines
 
-.exitsp		defw	0	; Address of where the atexit() stack is
-.exitcount	defb	0	; How many routines on the atexit() stack
+exitsp:		defw	0	; Address of where the atexit() stack is
+exitcount:	defb	0	; How many routines on the atexit() stack
 
 IF DEFINED_NEED1bitsound
-.snd_asave      defb    0	; Sound variable
-.snd_tick       defb    0	;  "      "
+snd_asave:      defb    0	; Sound variable
+snd_tick:       defb    0	;  "      "
 ENDIF
 
 
-.heaplast	defw	0	; Address of last block on heap
-.heapblocks	defw 	0	; Number of blocks
+heaplast:	defw	0	; Address of last block on heap
+heapblocks:	defw 	0	; Number of blocks
 
-.packintrout	defw	0	; Address of user interrupt routine
+packintrout:	defw	0	; Address of user interrupt routine
 
-.saveix		defw	0	; Save ix for system() calls
-.saveiy		defw	0	; Save iy for system() calls
+saveix:		defw	0	; Save ix for system() calls
+saveiy:		defw	0	; Save iy for system() calls
 
 
 ;-----------
 ; Unnecessary file signature
 ;-----------
 		defm	"Small C+ z88shell"
-.end		defb	0
+end:		defb	0
 
 ;-----------
 ; Floating point
@@ -365,10 +365,10 @@ ENDIF
 IF NEED_floatpack
         INCLUDE         "#float.asm"
 
-.fp_seed        defb    $80,$80,0,0,0,0	; FP seed (unused ATM)
-.extra          defs    6		; Extra register temp store
-.fa             defs    6		; ""
-.fasign         defb    0		; ""
+fp_seed:        defb    $80,$80,0,0,0,0	; FP seed (unused ATM)
+extra:          defs    6		; Extra register temp store
+fa:             defs    6		; ""
+fasign:         defb    0		; ""
 
 ENDIF
 

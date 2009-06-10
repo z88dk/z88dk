@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.22 2007-10-25 14:53:04 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.23 2009-06-10 17:26:05 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -66,8 +66,8 @@
 
         ld      a,(hl)          ; hide the first 6 bytes of REM line
         jp      start           ; invisible
-._base_graphics                 ; Address of the Graphics map..
-.base_graphics			; it is POKEable at address 16518/16519
+_base_graphics:                 ; Address of the Graphics map..
+base_graphics:			; it is POKEable at address 16518/16519
 IF DEFINED_hrgpage
 		defw	hrgpage
 ELSE
@@ -83,7 +83,7 @@ ENDIF
         defb    149     ; '+'
         defb    118,255         ; block further listing
 
-.start
+start:
 
         call    save81
 
@@ -127,7 +127,7 @@ ENDIF
 
         call    _main   ;Call user program
         
-.cleanup
+cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
@@ -157,14 +157,14 @@ ELSE
 ENDIF
 
         pop     bc		; return code (for BASIC)
-.start1 ld      sp,0            ;Restore stack to entry value
+start1: ld      sp,0            ;Restore stack to entry value
         ret
 
-.l_dcal jp      (hl)            ;Used for function pointer calls
+l_dcal: jp      (hl)            ;Used for function pointer calls
         jp      (hl)
 
 
-.restore81
+restore81:
 IF (!DEFINED_startup | (startup=1))
         ex      af,af
         ld      a,(a1save)
@@ -178,7 +178,7 @@ ENDIF
         ld      ix,16384	; IT WILL BECOME IY  !!
         ret
         
-.save81
+save81:
 IF (!DEFINED_startup | (startup=1))
         ex      af,af
         ld      (a1save),a
@@ -192,17 +192,17 @@ ENDIF
         ret
 
 IF (!DEFINED_startup | (startup=1))
-.a1save         defb    0
+a1save: 	defb    0
 ENDIF
-.hl1save	defw	0
-;.bc1save	defw	0
-.de1save	defw	0
+hl1save:	defw	0
+;bc1save:	defw	0
+de1save:	defw	0
 
 ;-----------
 ; Define the stdin/out/err area. For the z88 we have two models - the
 ; classic (kludgey) one and "ANSI" model
 ;-----------
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
         INCLUDE "#stdio_fp.asm"
 ELSE
@@ -213,7 +213,7 @@ ENDIF
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
         LIB     vfprintf_fp
         jp      vfprintf_fp
@@ -251,9 +251,9 @@ ENDIF
 ; Now some variables
 ;-----------
 IF (startup>=3)
-.text_rows
-.hr_rows
-._hr_rows
+text_rows:
+hr_rows:
+_hr_rows:
  IF (startup>=5)
 		defw	8	; Current number of text rows in graphics mode
  ELSE
@@ -261,20 +261,20 @@ IF (startup>=3)
  ENDIF
 ENDIF
 
-.coords         defw    0       ; Current graphics xy coordinates
+coords:         defw    0       ; Current graphics xy coordinates
 
 IF !DEFINED_HAVESEED
 		XDEF    _std_seed        ;Integer rand() seed
-._std_seed       defw    0      ; Seed for integer rand() routines
+_std_seed:      defw    0       ; Seed for integer rand() routines
 ENDIF
 
-.exitsp         defw    0       ; Address of where the atexit() stack is
-.exitcount      defb    0       ; How many routines on the atexit() stack
+exitsp:         defw    0       ; Address of where the atexit() stack is
+exitcount:      defb    0       ; How many routines on the atexit() stack
 
 
-.heaplast       defw    0       ; Address of last block on heap
-.heapblocks     defw    0       ; Number of blocks
-.frames         defw    0       ; counter handled with new interrupt
+heaplast:       defw    0       ; Address of last block on heap
+heapblocks:     defw    0       ; Number of blocks
+frames:         defw    0       ; counter handled with new interrupt
 		defb	0	; third byte for "frames"
 
                 defm  "Small C+ ZX81"   ;Unnecessary file signature
@@ -285,9 +285,9 @@ ENDIF
 ;-----------------------
 IF NEED_floatpack
         INCLUDE         "#float.asm"
-.fp_seed        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
-.extra          defs    6               ;FP register
-.fa             defs    6               ;FP Accumulator
-.fasign         defb    0               ;FP register
+fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
+extra:          defs    6               ;FP register
+fa:             defs    6               ;FP Accumulator
+fasign:         defb    0               ;FP register
 ENDIF
 

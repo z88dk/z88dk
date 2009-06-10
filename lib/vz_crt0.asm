@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: vz_crt0.asm,v 1.9 2008-03-31 17:16:17 stefano Exp $
+;       $Id: vz_crt0.asm,v 1.10 2009-06-10 17:26:05 stefano Exp $
 ;
 
 
@@ -85,10 +85,10 @@ ELSE
 
 ENDIF
 
-.start
+start:
 
         call    _main
-.cleanup
+cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
@@ -103,18 +103,18 @@ ENDIF
         ld      hl,10072
         exx
         pop     bc
-.start1
+start1:
         ld      sp,0
         jp      1A19h
 
-.l_dcal
+l_dcal:
         jp      (hl)
 
 ;-----------
 ; Define the stdin/out/err area. For the z88 we have two models - the
 ; classic (kludgey) one and "ANSI" model
 ;-----------
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
 ELSE
@@ -126,7 +126,7 @@ ENDIF
 ; Select which printf core we want
 ;---------------------------------
 
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
         LIB     vfprintf_fp
         jp      vfprintf_fp
@@ -146,24 +146,24 @@ ENDIF
 ;-----------
 ; Now some variables
 ;-----------
-.coords         defw    0       ; Current graphics xy coordinates
-.base_graphics  defw    0       ; Address of the Graphics map
-.gfx_bank       defb    0
+coords:         defw    0       ; Current graphics xy coordinates
+base_graphics:  defw    0       ; Address of the Graphics map
+gfx_bank:       defb    0
 
 IF !DEFINED_HAVESEED
 		XDEF    _std_seed        ;Integer rand() seed
-._std_seed       defw    0       ; Seed for integer rand() routines
+_std_seed:      defw    0       ; Seed for integer rand() routines
 ENDIF
 
-.exitsp         defw    0       ; Address of where the atexit() stack is
-.exitcount      defb    0       ; How many routines on the atexit() stack
+exitsp:         defw    0       ; Address of where the atexit() stack is
+exitcount:      defb    0       ; How many routines on the atexit() stack
 
 
-.heaplast       defw    0       ; Address of last block on heap
-.heapblocks     defw    0       ; Number of blocks
+heaplast:       defw    0       ; Address of last block on heap
+heapblocks:     defw    0       ; Number of blocks
 
 IF DEFINED_NEED1bitsound
-.snd_tick	defb	0	; Sound variable
+snd_tick:	defb	0	; Sound variable
 ENDIF
 
          defm  "Small C+ VZ"
@@ -186,11 +186,11 @@ IF NEED_floatpack
         INCLUDE         "#float.asm"
 
 ;seed for random number generator - not used yet..
-.fp_seed        defb    $80,$80,0,0,0,0
+fp_seed:        defb    $80,$80,0,0,0,0
 ;Floating point registers...
-.extra          defs    6
-.fa             defs    6
-.fasign         defb    0
+extra:          defs    6
+fa:             defs    6
+fasign:         defb    0
 
 ENDIF
 

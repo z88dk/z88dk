@@ -2,7 +2,7 @@
 ;
 ;	Daniel Wallner March 2002
 ;
-;	$Id: embedded_crt0.asm,v 1.3 2007-06-27 20:49:27 dom Exp $
+;	$Id: embedded_crt0.asm,v 1.4 2009-06-10 17:26:04 stefano Exp $
 ;
 ; (DM) Could this do with a cleanup to ensure rstXX functions are
 ; available?
@@ -44,7 +44,7 @@
 	org    ROM_Start
 
 	jp	start
-.start
+start:
 ; Make room for the atexit() stack
 	ld	hl,Stack_Top-64
 	ld	sp,hl
@@ -76,7 +76,7 @@ ENDIF
 ; Entry to the user code
 	call    _main
 
-.cleanup
+cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
@@ -88,15 +88,15 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
-.endloop
+endloop:
 	jr	endloop
-.l_dcal
+l_dcal:
 	jp      (hl)
 
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
 	jp	vfprintf_fp

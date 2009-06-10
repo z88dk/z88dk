@@ -11,7 +11,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_altint.def,v 1.7 2007-12-18 13:35:51 stefano Exp $
+;       $Id: zx81_altint.def,v 1.8 2009-06-10 17:26:05 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -170,6 +170,6 @@ L0292:  POP     IY              ; return address to IX register (-IXIY swap).
         jp	nz,nofr1
         ld	hl,frames+1
         inc	(hl)
-.nofr1
+nofr1:
 	jp	$2A4
 

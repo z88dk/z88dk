@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato May 2000
 ;
-;       $Id: abc80_crt0.asm,v 1.7 2007-11-05 07:54:53 stefano Exp $
+;       $Id: abc80_crt0.asm,v 1.8 2009-06-10 17:26:04 stefano Exp $
 ;
 
                 MODULE  abc80_crt0
@@ -60,7 +60,7 @@ ENDIF
         org     myzorg
 
 
-.start
+start:
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
@@ -82,7 +82,7 @@ ENDIF
 ENDIF
         call    _main
         
-.cleanup
+cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
@@ -95,16 +95,16 @@ ENDIF
 ENDIF
 
 	pop	bc
-.start1
+start1:
         ld      sp,0
         ret
 
-.l_dcal
+l_dcal:
         jp      (hl)
 
 ; Now, define some values for stdin, stdout, stderr
 
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
 ELSE
@@ -115,7 +115,7 @@ ENDIF
 ; Now, which of the vfprintf routines do we need?
 
 
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
 	jp	vfprintf_fp
@@ -134,24 +134,24 @@ ENDIF
 
 ;Seed for integer rand() routines
 
-._std_seed       defw    0
+_std_seed:      defw    0
 
 ;Atexit routine
 
-.exitsp
+exitsp:
                 defw    0
-.exitcount
+exitcount:
                 defb    0
 
 ; Heap stuff
 
-.heaplast	defw	0
-.heapblocks	defw	0
+heaplast:	defw	0
+heapblocks:	defw	0
 
 ; mem stuff
-.base_graphics
+base_graphics:
 		defw	0
-.coords		defw	0
+coords: 	defw	0
 
          defm  "Small C+ ABC80"
 	 defb  0
@@ -173,11 +173,11 @@ IF NEED_floatpack
         INCLUDE         "#float.asm"
 
 ;seed for random number generator - not used yet..
-.fp_seed        defb    $80,$80,0,0,0,0
+fp_seed:        defb    $80,$80,0,0,0,0
 ;Floating point registers...
-.extra          defs    6
-.fa             defs    6
-.fasign         defb    0
+extra:          defs    6
+fa:             defs    6
+fasign:         defb    0
 
 ENDIF
 

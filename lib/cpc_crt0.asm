@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.13 2008-05-26 06:38:07 stefano Exp $
+;       $Id: cpc_crt0.asm,v 1.14 2009-06-10 17:26:04 stefano Exp $
 ;
 
         MODULE  cpc_crt0
@@ -58,7 +58,7 @@
 ; REAL CODE
 ;--------
 
-.start
+start:
         ld      hl,($39)        ; Original Interrupt code
         ld      (oldint),hl
         ld      hl,newint       ; Point to a null handler (increase stability)
@@ -93,7 +93,7 @@ ENDIF
 
         call    _main
 
-.cleanup
+cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
@@ -111,14 +111,14 @@ ENDIF
         ld      hl,(oldint)
         ld      ($39),hl
         
-.start1 ld      sp,0
+start1: ld      sp,0
         ret
 
-.l_dcal jp      (hl)
+l_dcal: jp      (hl)
 
 ; Now, define some values for stdin, stdout, stderr
 
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
         INCLUDE "#stdio_fp.asm"
 ELSE
@@ -129,7 +129,7 @@ ENDIF
 ; Now, which of the vfprintf routines do we need?
 
 
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
         LIB     vfprintf_fp
         jp      vfprintf_fp
@@ -148,40 +148,40 @@ ENDIF
         
 IF !DEFINED_HAVESEED
                 XDEF    _std_seed        ;Integer rand() seed
-._std_seed       defw    0       ; Seed for integer rand() routines
+_std_seed:       defw    0       ; Seed for integer rand() routines
 ENDIF
 
-.exitsp         defw    0       ;  atexit       
-.exitcount      defb    0
-.base_graphics
+exitsp:         defw    0       ;  atexit       
+exitcount:      defb    0
+base_graphics:
                 defw    $C000
-.coords         defw    0
-.firmware_bc    defw    0
+coords:         defw    0
+firmware_bc:    defw    0
 
-.heaplast       defw    0       ; Address of last block on heap
-.heapblocks     defw    0       ; Number of blocks
+heaplast:       defw    0       ; Address of last block on heap
+heapblocks:     defw    0       ; Number of blocks
 
                 defm    "Small C+ CPC"
                 defb    0
 
 IF NEED_floatpack
         INCLUDE         "#float.asm"
-;.init_floatpack
+;init_floatpack:
 ;       ret
 
 ;seed for random number generator - not used yet..
-.fp_seed        defb    $80,$80,0,0,0,0
+fp_seed:        defb    $80,$80,0,0,0,0
 ;Floating point registers...
-.extra          defs    6
-.fa             defs    6
-.fasign         defb    0
+extra:          defs    6
+fa:             defs    6
+fasign:         defb    0
 
 ENDIF
 
 
-.newint
+newint:
         ei
         reti
 
-.oldint
+oldint:
         defw 0

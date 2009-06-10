@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: rcmx000_crt0.asm,v 1.4 2007-06-27 20:49:27 dom Exp $
+;       $Id: rcmx000_crt0.asm,v 1.5 2009-06-10 17:26:05 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -54,7 +54,7 @@
 	XDEF	heapblocks
 
 	org 0
-.start
+start:
 	; On this platform we are king of the road and may use
 	; any register for any purpose Wheee!!
 
@@ -74,7 +74,7 @@ ENDIF
 ENDIF
         call    _main	;Call user program
         
-.cleanup
+cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
@@ -87,12 +87,12 @@ ENDIF
 ENDIF
 
 	pop	bc
-.start1	ld	sp,0		;Restore stack to some sane value
+start1:	ld	sp,0		;Restore stack to some sane value
 
 	; Puts us back into the monitor
 	call 8
 
-.l_dcal	jp	(hl)		;Used for function pointer calls
+l_dcal:	jp	(hl)		;Used for function pointer calls
         jp      (hl)
 
 
@@ -101,7 +101,7 @@ ENDIF
 ; Define the stdin/out/err area. For the z88 we have two models - the
 ; classic (kludgey) one and "ANSI" model
 ;-----------
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
 ELSE
@@ -113,7 +113,7 @@ ENDIF
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-._vfprintf			
+_vfprintf:			
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
 	jp	vfprintf_fp
@@ -135,9 +135,9 @@ ENDIF
 ;-----------
 
 	; Here is a great place to store temp variables and stuff!!
-.acme	defw 4711 			; useless arbitrarily choosen number
+acme:	defw 4711 			; useless arbitrarily choosen number
 	defm  "Small C+ RCM2/3000"&0	;Unnecessary file signature
-._std_seed
+_std_seed:
 	defw 0          		; Needed for rand and srand
 
 ;-----------------------
@@ -145,8 +145,8 @@ ENDIF
 ;-----------------------
 IF NEED_floatpack
         INCLUDE         "#float.asm"
-.fp_seed        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
-.extra          defs    6               ;FP register
-.fa             defs    6               ;FP Accumulator
-.fasign         defb    0               ;FP register
+fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
+extra:          defs    6               ;FP register
+fa:             defs    6               ;FP Accumulator
+fasign:         defb    0               ;FP register
 ENDIF

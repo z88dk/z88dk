@@ -3,7 +3,7 @@
 ; 21/5/00 Modified for more flexible CF-compatible structure arrangement
 ;
 
-.init_far
+init_far:
 
 IF DEFINED_far_mmset
 	ld	a,MM_S1+MM_FIX

@@ -14,7 +14,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.6 2007-06-27 20:49:27 dom Exp $
+;       $Id: oz_crt0.asm,v 1.7 2009-06-10 17:26:04 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -219,7 +219,7 @@ ENDIF
 ; __ozspare1end:
 
 ;------- Z88DK specific code (begin) -------
-.cleanup
+cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
@@ -231,7 +231,7 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
-.start1	ld	sp,0		;Restore stack to entry value
+start1:	ld	sp,0		;Restore stack to entry value
         ;ret
 ;-------- Z88DK specific code (end) -------
 
@@ -250,7 +250,7 @@ s_init_unblank:			; ozblankscreen or ozfast might have hidden everything;
 
         di
 ;intset  equ    $+1
-.intset        ld     a,0ffh
+intset:        ld     a,0ffh
         out    (7),a
         im     1
 
@@ -342,7 +342,7 @@ s_swapupperpages:       ;; must be called with interrupts disabled
         ex      de,hl
         ld      sp,hl
 
-.s_swapupperpages_ret        jp      0
+s_swapupperpages_ret:        jp      0
 ;s_swapupperpages_ret equ $-2
 
 s_swappage:   ;; must be called with interrupts disabled!
@@ -385,14 +385,14 @@ top:
         cp h
         jp nz,top
 
-.s_saved_sp       ld      hl,0000   ;;
+s_saved_sp:       ld      hl,0000   ;;
 ;s_saved_sp equ $-2         ;; self-mod
         ld      sp,hl
         ld      a,7
         out     (3),a
 ;;        ld      a,4
 ;;        out     (4),a     ; page in second code page
-.s_swappage_ret        jp      0
+s_swappage_ret:        jp      0
 ;$swappage_ret equ $-2
 
 s_32kintoff:
@@ -472,21 +472,26 @@ defb 0,0,0,0
 ;------------------------------------------
 ;------------------------------------------
 
-.l_dcal
+l_dcal:
 	jp	(hl)
 
 
-; Now, define some values for stdin, stdout, stderr
-IF (!DEFINED_nostreams) ~ (DEFINED_ANSIstdio) ; ~ = AND
-.__sgoioblk
+;-----------
+; Define the stdin/out/err area. For the z88 we have two models - the
+; classic (kludgey) one and "ANSI" model
+;-----------
+__sgoioblk:
+IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
+ELSE
+        defw    -11,-12,-10
 ENDIF
 
 
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
 	jp	vfprintf_fp
@@ -506,23 +511,23 @@ ENDIF
 ;-----------
 ; Now some variables
 ;-----------
-.coords         defw    0       ; Current graphics xy coordinates
+coords:         defw    0       ; Current graphics xy coordinates
 
 base_graphics:	defw A000h	; Address of the Graphics map
 ozactivepage:	defw 0400h	; Page number for the graph map (0400h for A000h)
 ozmodel:	defb    -1	; Set with "ozdetectmodel" (see libraries)
 s_filetypetable: defw    0c089h
 
-._std_seed       defw    0       ; Seed for integer rand() routines
+_std_seed:      defw    0       ; Seed for integer rand() routines
 
-.exitsp         defw    0       ; Address of where the atexit() stack is
-.exitcount      defb    0       ; How many routines on the atexit() stack
+exitsp:         defw    0       ; Address of where the atexit() stack is
+exitcount:      defb    0       ; How many routines on the atexit() stack
 
 
-.heaplast       defw    0       ; Address of last block on heap
-.heapblocks     defw    0       ; Number of blocks
-.saved_hl	defw	0	; Temp store for hl
-.saved_de	defw	0	; Temp store for de
+heaplast:       defw    0       ; Address of last block on heap
+heapblocks:     defw    0       ; Number of blocks
+saved_hl:       defw	0	; Temp store for hl
+saved_de:       defw	0	; Temp store for de
 
          	defm  "Small C+ OZ"	;Unnecessary file signature
 		defb	0
@@ -532,9 +537,9 @@ s_filetypetable: defw    0c089h
 ;-----------------------
 IF NEED_floatpack
         INCLUDE         "#float.asm"
-.fp_seed        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
-.extra          defs    6               ;FP register
-.fa             defs    6               ;FP Accumulator
-.fasign         defb    0               ;FP register
+fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
+extra:          defs    6               ;FP register
+fa:             defs    6               ;FP Accumulator
+fasign:         defb    0               ;FP register
 ENDIF
 

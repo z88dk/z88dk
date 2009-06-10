@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.3 2008-02-25 18:49:27 aralbrec Exp $
+;       $Id: ts2068_crt0.asm,v 1.4 2009-06-10 17:26:05 stefano Exp $
 ;
 
 
@@ -55,7 +55,7 @@
                 org     myzorg
 
 
-.start
+start:
 	ld	iy,23610	; restore the right iy value, fixes the self-relocating trick
 IF !DEFINED_ZXVGS
         ld      (start1+1),sp	;Save entry stack
@@ -94,7 +94,7 @@ IF DEFINED_NEEDresidos
 	jp	c,cleanup_exit
 ENDIF
         call    _main		;Call user program
-.cleanup
+cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
@@ -110,24 +110,24 @@ IF DEFINED_ZXVGS
         RST     8
         DEFB    $FD             ;Program finished
 ELSE
-.cleanup_exit
-.hl1save
+cleanup_exit:
+hl1save:
 	ld	hl,0
 	exx
 
         pop     bc
-.start1 ld      sp,0            ;Restore stack to entry value
+start1: ld      sp,0            ;Restore stack to entry value
         ret
 ENDIF
 
-.l_dcal	jp	(hl)		;Used for function pointer calls
+l_dcal:	jp	(hl)		;Used for function pointer calls
 
 
 ;-----------
 ; Define the stdin/out/err area. For the z88 we have two models - the
 ; classic (kludgey) one and "ANSI" model
 ;-----------
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
 ELSE
@@ -139,7 +139,7 @@ ENDIF
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
 	jp	vfprintf_fp
@@ -169,7 +169,7 @@ IF DEFINED_NEEDresidos
 ; This is support for residos, we use the normal
 ; +3 -lplus3 library and rewrite the values so
 ; that they suit us somewhat
-.dodos
+dodos:
 	exx
 	push	iy
 	pop	hl
@@ -193,7 +193,7 @@ IF DEFINED_NEEDresidos
 ; which will cause an error on Speccies without ResiDOS v1.20+ installed,
 ; or error 0 (OK) if ResiDOS v1.20+ is present. Therefore, we need
 ; to trap any errors here.
-.residos_detect
+residos_detect:
         ld      hl,(ERR_SP)
         push    hl                      ; save the existing ERR_SP
         ld      hl,detect_error
@@ -205,7 +205,7 @@ IF DEFINED_NEEDresidos
         defb    HOOK_VERSION
         pop     hl                      ; ResiDOS doesn't return, so if we get
         jr      noresidos               ; here, some other hardware is present
-.detect_error
+detect_error:
         pop     hl
         ld      (ERR_SP),hl             ; restore the old ERR_SP
         ld      a,(ERR_NR)
@@ -218,7 +218,7 @@ IF DEFINED_NEEDresidos
         sbc     hl,de
         pop     bc                      ; restore the version to BC
        ret     nc                      ; and return with it if at least v1.40
-.noresidos
+noresidos:
         ld      bc,0                    ; no ResiDOS
         ld      a,$ff
         ld      (ERR_NR),a              ; clear error
@@ -240,11 +240,11 @@ IF DEFINED_NEEDplus3dodos
 ;	(These routines have to be below 49152)
 ;	djm 17/3/2000 (after the manual!)
 	XDEF	dodos
-.dodos
+dodos:
 	call	dodos2		;dummy routine to restore iy afterwards
 	ld	iy,23610
 	ret
-.dodos2
+dodos2:
 	push	af
 	push	bc
 	ld	a,7
@@ -267,7 +267,7 @@ IF DEFINED_NEEDplus3dodos
 	pop	bc
 	pop	af
 	ret
-.cjumpiy
+cjumpiy:
 	jp	(iy)
 ENDIF
 
@@ -279,11 +279,11 @@ IF 0
 ;	Entry:	b = file handle
 ;	       hl = file length
 
-.setheader
+setheader:
 	ld	iy,setheader_r
 	call	dodos
 	ret
-.setheader_r
+setheader_r:
 	push	hl
 	call	271	;DOS_RED_HEAD
 	pop	hl
@@ -299,23 +299,23 @@ ENDIF
 ;-----------
 ; Now some variables
 ;-----------
-.coords         defw    0       ; Current graphics xy coordinates
-.base_graphics  defw    0       ; Address of the Graphics map
+coords:         defw    0       ; Current graphics xy coordinates
+base_graphics:  defw    0       ; Address of the Graphics map
 
 IF !DEFINED_HAVESEED
 		XDEF    _std_seed        ;Integer rand() seed
-._std_seed       defw    0       ; Seed for integer rand() routines
+_std_seed:       defw    0       ; Seed for integer rand() routines
 ENDIF
 
-.exitsp         defw    0       ; Address of where the atexit() stack is
-.exitcount      defb    0       ; How many routines on the atexit() stack
+exitsp:         defw    0       ; Address of where the atexit() stack is
+exitcount:      defb    0       ; How many routines on the atexit() stack
 
 
-.heaplast       defw    0       ; Address of last block on heap
-.heapblocks     defw    0       ; Number of blocks
+heaplast:       defw    0       ; Address of last block on heap
+heapblocks:     defw    0       ; Number of blocks
 
 IF DEFINED_NEED1bitsound
-.snd_tick	defb	0	; Sound variable
+snd_tick:	defb	0	; Sound variable
 ENDIF
 
 		defm	"Small C+ ZX"	;Unnecessary file signature
@@ -326,10 +326,10 @@ ENDIF
 ;-----------------------
 IF NEED_floatpack
         INCLUDE         "#float.asm"
-.fp_seed        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
-.extra          defs    6		;FP register
-.fa             defs    6		;FP Accumulator
-.fasign         defb    0		;FP register
+fp_seed:        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
+extra:          defs    6		;FP register
+fa:             defs    6		;FP Accumulator
+fasign:         defb    0		;FP register
 
 ENDIF
 

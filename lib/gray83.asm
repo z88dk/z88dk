@@ -6,7 +6,7 @@
 ; Recoded -because of strange problems- by Henk Poley - July 2001
 ; Based upon vnGrey, a Venus greyscale library (Ti83).
 ;
-; $Id: gray83.asm,v 1.3 2002-04-10 20:31:10 dom Exp $
+; $Id: gray83.asm,v 1.4 2009-06-10 17:26:04 stefano Exp $
 ;
 
 defc intcount    = $878A        ; 1 byte needed
@@ -21,7 +21,7 @@ defc intcount    = $878A        ; 1 byte needed
 ;-----------------
 ; Actual interrupt
 ;-----------------
-.IntProcStart
+IntProcStart:
 	push	af			;
 	ld	a,(intcount)		; Check if own interrupt has quited
 	bit	7,a			;  correctly, then bit 7 is zero
@@ -32,7 +32,7 @@ defc intcount    = $878A        ; 1 byte needed
 	push	iy			;
 	ld	iy,_IY_TABLE		;
 					;
-.exit_interrupt				;
+exit_interrupt:
 	in	a,(3)			; check vbl int
 	and	@00000010		;
 	jr	z,exit_interrupt2	;
@@ -45,7 +45,7 @@ defc intcount    = $878A        ; 1 byte needed
 	dec	a			; 2
 	jr	z,Display_pic2		;
 	ld	(hl),0			; reset counter
-.exit_interrupt2			;
+exit_interrupt2:
 	ld	hl,intcount		; If a 'direct interrupt' occures    
 	set	7,(hl)			;  right after the TIOS-int, then
 					;  we want bit 7 to be set...
@@ -77,7 +77,7 @@ defc intcount    = $878A        ; 1 byte needed
 	ei				;
 	ret				;
 
-.int_fix				;
+int_fix:
 	pop	af			; Pop AF back
 	ex	af,af			; Fix shadowregs back
 	exx				;
@@ -86,26 +86,26 @@ defc intcount    = $878A        ; 1 byte needed
 	jr	exit_interrupt		; Continue with interrupt
 
 
-.Display_pic1				;
+Display_pic1:
 	ld	hl,(graybit1)		;
 	jr	DisplayPicture		;
-.Display_pic2				;
+Display_pic2:
 	ld	hl,(graybit2)		;
-.DisplayPicture				;
+DisplayPicture:
 	ld	a,$80			; fastCopy routine
 	out	($10),a			; (Joe Wingbermuehle)
 	ld	a,$20			;
 	ld	c,a			;
 	ld	de,755			;
 	add	hl,de			;
-.fastCopyAgain				;
+fastCopyAgain:
 	ld	b,64			;
 	inc	c			;
 	ld	de,-(12*64)+1		;
 	out	($10),a			;
 	add	hl,de			;
 	ld	de,10			;
-.fastCopyLoop				;
+fastCopyLoop:
 	add	hl,de			;
 	inc	hl			;
 	inc	hl			;
@@ -118,20 +118,20 @@ defc intcount    = $878A        ; 1 byte needed
 	cp	$2B+1			;
 	jr	nz,fastCopyAgain	;
 	jr	exit_interrupt2		;
-.IntProcEnd
+IntProcEnd:
 
 	XDEF	graybit1
 	XDEF	graybit2
 
-.graybit1	defw	plotSScreen
+graybit1:	defw	plotSScreen
 IF DEFINED_DontUseApdRam
-.graybit2	defw	gbuf2
-.gbuf2		DEFS	768
+graybit2:	defw	gbuf2
+gbuf2:		defs	768
 ELSE
-.graybit2	defw	saveSScreen
+graybit2:	defw	saveSScreen
 ENDIF
 
-.jump_over
+jump_over:
 
 ; Memory usage in statvars:
 ; -------------------------------------------

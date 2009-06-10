@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.19 2009-05-21 06:58:11 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.20 2009-06-10 17:26:04 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -72,7 +72,7 @@ ENDIF
 ;----------------------
 ; Execution starts here
 ;----------------------
-.start
+start:
 
 IF (startup=2)
 IF !DEFINED_noprotectmsdos
@@ -86,11 +86,11 @@ IF !DEFINED_noprotectmsdos
 	defb	$cd,$21		;DOS protection... INT 21h.
 	defb	$cd,$20		;DOS protection... INT 20h.
 
-.dosmessage
+dosmessage:
 	defm	"This program is for MSXDOS."
 	defb	13,10,'$'
 
-.begin
+begin:
 ENDIF
 ENDIF
 
@@ -133,7 +133,7 @@ IF (startup=2)
 	ld	c,a
 	add	hl,bc	;now points to the end
 ; Try to find the end of the arguments
-.argv_loop_1
+argv_loop_1:
 	ld	a,(hl)
 	cp	' '
 	jr	nz,argv_loop_2
@@ -142,7 +142,7 @@ IF (startup=2)
 	dec	c
 	jr	nz,argv_loop_1
 ; We've located the end of the last argument, try to find the start
-.argv_loop_2
+argv_loop_2:
 	ld	a,(hl)
 	cp	' '
 	jr	nz,argv_loop_3
@@ -151,12 +151,12 @@ IF (startup=2)
 	push	hl
 	inc	b
 	dec	hl
-.argv_loop_3
+argv_loop_3:
 	dec	hl
 	dec	c
 	jr	nz,argv_loop_2
 
-.argv_done
+argv_done:
 	ld	hl,end	;name of program (NULL)
 	push	hl
 	inc	b
@@ -185,7 +185,7 @@ ENDIF
 	call	msxbios
 ;**
 	
-.cleanup
+cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
@@ -197,16 +197,16 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
-.start1
+start1:
         ld      sp,0
         ret
 
-.l_dcal
+l_dcal:
         jp      (hl)
 
 ; Now, define some values for stdin, stdout, stderr
 
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
 ELSE
@@ -217,7 +217,7 @@ ENDIF
 ; Now, which of the vfprintf routines do we need?
 
 
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
 	jp	vfprintf_fp
@@ -238,58 +238,58 @@ ENDIF
 ; ---------------
 
 ; Safe BIOS call
-.msxbios
+msxbios:
 	ld	iy,($FCC0)	; slot address of BIOS ROM
 	call	001Ch		; CALSLT
 	ei			; make sure interrupts are enabled
 	ret
 
 ; Keeping the BREAK status
-.brksave	defb	1
+brksave:	defb	1
 
 
 ; ---------------
 ; Misc Variables
 ; ---------------
-.defltdsk       defb    0	; Default disc
-.base_graphics  defw    0	; Location of current screen buffer
-.coords         defw    0       ; Current graphics xy coordinates
-.pixelbyte	defb	0
+defltdsk:       defb    0	; Default disc
+base_graphics:  defw    0	; Location of current screen buffer
+coords:         defw    0       ; Current graphics xy coordinates
+pixelbyte:      defb	0
 
 
 IF DEFINED_NEED1bitsound
-.snd_tick	defb	0	; Sound variable
+snd_tick:	defb	0	; Sound variable
 ENDIF
 
 ;Seed for integer rand() routines
 IF !DEFINED_HAVESEED
 		XDEF    _std_seed        ;Integer rand() seed
-._std_seed       defw    0       ; Seed for integer rand() routines
+_std_seed:       defw    0       ; Seed for integer rand() routines
 ENDIF
 
 IF (startup=2)
   IF !DEFINED_nofileio
-.__fcb		defs	420,0	;file control block (10 files) (MAXFILE)
+__fcb:		defs	420,0	;file control block (10 files) (MAXFILE)
   ENDIF
 ENDIF
 
 ;Atexit routine
 
-.exitsp
+exitsp:
                 defw    0
-.exitcount
+exitcount:
                 defb    0
 
 ; Heap stuff
 
-.heaplast	defw	0
-.heapblocks	defw	0
+heaplast:	defw	0
+heapblocks:	defw	0
 
 
 ; mem stuff
 
          defm  "Small C+ MSX"
-.end	 defb	0
+end:	 defb	0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library
@@ -308,11 +308,11 @@ IF NEED_floatpack
         INCLUDE         "#float.asm"
 
 ;seed for random number generator - not used yet..
-.fp_seed        defb    $80,$80,0,0,0,0
+fp_seed:        defb    $80,$80,0,0,0,0
 ;Floating point registers...
-.extra          defs    6
-.fa             defs    6
-.fasign         defb    0
+extra:          defs    6
+fa:             defs    6
+fasign:         defb    0
 
 ENDIF
 

@@ -39,7 +39,7 @@ defc intcount    = $878A		; 1 byte needed
 ;-----------------
 ; Actual interrupt
 ;-----------------
-.IntProcStart
+IntProcStart:
 	push	af			;
 	ld	a,(intcount)		; Check if own interrupt has quited
 	bit	7,a			;  correctly, then bit 7 is zero
@@ -52,7 +52,7 @@ defc intcount    = $878A		; 1 byte needed
 	ld	hl,intcount		; If a 'direct interrupt' occures    
 	set	7,(hl)			;  right after the TIOS-int, then
 					;  we want bit 7 to be set...
-.exit_interrupt				;
+exit_interrupt:
 	exx				; Swap to shadow registers.
 	ex	af,af			; So the TIOS swaps back to the
 					;  normal ones... (the ones we saved
@@ -73,15 +73,15 @@ defc intcount    = $878A		; 1 byte needed
 	pop	af			;
 	ei				;
 	ret				;
-.int_fix				;
+int_fix:
 	pop	af			; Pop AF back
 	ex	af,af			; Fix shadowregs back
 	exx				;
 	pop	bc			; Pop the returnpoint of RST $38
 					;  from the stack
 	jr	exit_interrupt		; Continue with interrupt
-.IntProcEnd
-.jump_over
+IntProcEnd:
+jump_over:
 
 ; Memory usage in statvars:
 ; -------------------------------------------

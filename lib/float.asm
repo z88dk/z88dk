@@ -11,7 +11,7 @@
 ;
 ;       djm 7/12/98
 ;
-;	$Id: float.asm,v 1.8 2002-08-20 13:58:08 dom Exp $
+;	$Id: float.asm,v 1.9 2009-06-10 17:26:04 stefano Exp $
 
 ;-------------------------------------------------
 ; Some scope defintionons for the crt0 float stuff
@@ -49,7 +49,7 @@
 ;--------------
 ; Copy FA to de
 ;--------------
-.dstore ld      de,fa
+dstore: ld      de,fa
         ld      bc,6
         ex      de,hl
         ldir
@@ -60,7 +60,7 @@
 ;----------------
 ; Load FA from hl
 ;----------------
-.dload	ld	de,fa
+dload:	ld	de,fa
         ld      bc,6
         ldir
         ret
@@ -68,13 +68,13 @@
 ;-----------------------------------------
 ; Load FA from (hl) and push FA onto stack
 ;-----------------------------------------
-.dldpsh	ld      de,fa
+dldpsh:	ld      de,fa
         ld      bc,6
         ldir
 ;------------------------------------------
 ; Push FA onto stack (under return address)
 ;------------------------------------------
-.dpush	pop	de
+dpush:	pop	de
         ld      hl,(fa+4)
         push    hl
         ld      hl,(fa+2)
@@ -87,7 +87,7 @@
 ;------------------------------------------------------
 ; Push FA onto stack under ret address and stacked word
 ;------------------------------------------------------
-.dpush2 pop     de      ;save return address
+dpush2: pop     de      ;save return address
         pop     bc      ;save next word
         ld      hl,(fa+4)
         push    hl
@@ -103,7 +103,7 @@ IF DEFINED_math_atof
 ;---------------------------------------------------------
 ; Convert string to FP number in FA calls the library atof
 ;---------------------------------------------------------
-.__atof2
+__atof2:
 	push	hl
 	call	atof
 	pop	bc

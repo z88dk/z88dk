@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.12 2008-07-17 15:39:56 stefano Exp $
+;	$Id: c128_crt0.asm,v 1.13 2009-06-10 17:26:04 stefano Exp $
 ;
 
 
@@ -50,7 +50,7 @@ ENDIF
         org     myzorg
 
 
-.start
+start:
 
 	di
 	
@@ -96,7 +96,7 @@ ENDIF
         call    _main
 
 	; Loop border color and wait for the RUNSTOP key
-;.brdloop	ld	bc,$d020  ;border colour
+;brdloop:	ld	bc,$d020  ;border colour
 ;		in	a,(c)
 ;		inc	a
 ;		out	(c),a
@@ -107,7 +107,7 @@ ENDIF
 ;		cp	b
 ;		jr	z,brdloop ;no key pressed
 		
-.cleanup
+cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
@@ -123,16 +123,16 @@ ENDIF
 	;xor	a
 	;out	(c),a	; back to slow speed clock
 
-.start1
+start1:
         ld      sp,0
         jp	$FFE0
 
-.l_dcal
+l_dcal:
         jp      (hl)
 
 ; Now, define some values for stdin, stdout, stderr
 
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
 ELSE
@@ -143,7 +143,7 @@ ENDIF
 ; Now, which of the vfprintf routines do we need?
 
 
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
 	jp	vfprintf_fp
@@ -162,33 +162,33 @@ ENDIF
 
 IF !DEFINED_HAVESEED
 		XDEF    _std_seed        ;Integer rand() seed
-._std_seed       defw    0       ; Seed for integer rand() routines
+_std_seed:      defw    0       ; Seed for integer rand() routines
 ENDIF
 
 
 ;Atexit routine
 
-.exitsp
+exitsp:
                 defw    0
-.exitcount
+exitcount:
                 defb    0
 
 ; Heap stuff
 
-.heaplast	defw	0
-.heapblocks	defw	0
+heaplast:	defw	0
+heapblocks:	defw	0
 
 
 ; Graph
 
-.coords         defw    0       ; Current graphics xy coordinates
+coords:         defw    0       ; Current graphics xy coordinates
 		defw	0
-._vdcDispMem
-.base_graphics  defw    $2000   ; Address of the Graphics map
+_vdcDispMem:
+base_graphics:  defw    $2000   ; Address of the Graphics map
 
 
 IF DEFINED_NEED1bitsound
-.snd_tick	defb	0	; Sound variable
+snd_tick:	defb	0	; Sound variable
 ENDIF
 
 ; mem stuff
@@ -213,10 +213,10 @@ IF NEED_floatpack
         INCLUDE         "#float.asm"
 
 ;seed for random number generator - not used yet..
-.fp_seed        defb    $80,$80,0,0,0,0
+fp_seed:        defb    $80,$80,0,0,0,0
 ;Floating point registers...
-.extra          defs    6
-.fa             defs    6
-.fasign         defb    0
+extra:          defs    6
+fa:             defs    6
+fasign:         defb    0
 
 ENDIF

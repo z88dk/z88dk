@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.7 2007-06-27 20:49:27 dom Exp $
+;	$Id: app_crt0.asm,v 1.8 2009-06-10 17:26:04 stefano Exp $
 
 
 ;--------
@@ -72,7 +72,7 @@
 ; Start of execution. We enter with ix pointing to info table about
 ; memory allocated to us by OZ. 
 ;--------
-.app_entrypoint
+app_entrypoint:
 ;-------
 ; If we want to debug, then intuition is set, so call $2000
 ; This assumes several things...no bad memory required, and we've
@@ -107,7 +107,7 @@ IF NEED_expanded <> 0
 ENDIF
 
 IF (reqpag<>0) | (NEED_expanded<>0)
-.init_error			;Code to deal with an initialisation error
+init_error:			;Code to deal with an initialisation error
         push    hl		;The text that we are printing
         ld      hl,clrscr	;Clear the screen
         call_oz(gn_sop)
@@ -121,7 +121,7 @@ IF (reqpag<>0) | (NEED_expanded<>0)
         call_oz(os_bye)		;Exit
 ENDIF
 
-.init_continue			;We had enough memory
+init_continue:			;We had enough memory
         ld   a,sc_dis		;Disable escape 
         call_oz(os_esc)
         xor     a		;Setup our error handler
@@ -165,7 +165,7 @@ IF DEFINED_farheapsz
 ENDIF
         call    _main		;Call the users code
         xor     a		;Exit with zero 
-.cleanup			;Jump back to here from exit()
+cleanup:			;Jump back to here from exit()
 IF DEFINED_ANSIstdio
 	push	af		;Save exit value
 	LIB	closeall
@@ -184,12 +184,12 @@ ENDIF	;ANSIstdio
 
         call_oz(os_bye)		;Exit back to OZ
 
-.l_dcal	jp	(hl)		;Used by various things
+l_dcal:	jp	(hl)		;Used by various things
 
 ;-------
 ; Process a <> command, we call the users handlecmds APPFUNC
 ;-------
-.processcmd
+processcmd:
 IF DEFINED_handlecmds
         XREF    _handlecmds
         ld      l,a
@@ -205,7 +205,7 @@ ENDIF
 ;--------
 ; Fairly simple error handler
 ;--------
-.errhan	ret	z		;Fatal error - far mem probs?
+errhan:	ret	z		;Fatal error - far mem probs?
 IF DEFINED_redrawscreen
         XREF    _redrawscreen
         cp      rc_draw		;(Rc_susp for BASIC!)
@@ -214,7 +214,7 @@ IF DEFINED_redrawscreen
         call    _redrawscreen
         pop     af
 ENDIF
-.errhan2
+errhan2:
         cp      rc_quit		;they don't like us!
         jr      nz,keine_error
 IF DEFINED_applicationquit
@@ -224,7 +224,7 @@ ENDIF
         xor     a		;Standard cleanup
         jr      cleanup
 
-.keine_error
+keine_error:
         xor     a
         ret
 
@@ -250,7 +250,7 @@ ENDIF
 ;--------
 IF DEFINED_farheapsz
 	LIB	strcpy_far
-._cpfar2near
+_cpfar2near:
 	pop	bc	;ret address
 	pop	hl
 	pop	de	;far ptr
@@ -275,7 +275,7 @@ IF DEFINED_farheapsz
 	ret
 ELSE
 ; We have no far code installed so all we have to do is fix the stack
-._cpfar2near
+_cpfar2near:
 	pop	bc
 	pop	hl
 	pop	de
@@ -286,7 +286,7 @@ ENDIF
 ;--------
 ; Which printf core routine do we need?
 ;--------
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
 	jp	vfprintf_fp
@@ -305,12 +305,12 @@ ENDIF
 ;-------
 ; Text to define the BASIC style window
 ;-------
-.clrscr		defb    1,'7','#','1',32,32,32+94,32+8,128,1,'2','C','1',0
-.clrscr2		defb    1,'2','+','S',1,'2','+','C',0
+clrscr:		defb    1,'7','#','1',32,32,32+94,32+8,128,1,'2','C','1',0
+clrscr2:	defb    1,'2','+','S',1,'2','+','C',0
           
 
 IF (NEED_expanded <> 0 )  | (reqpag <>0)
-.windini
+windini:
           defb   1,'7','#','3',32+7,32+1,32+34,32+7,131     ;dialogue box
           defb   1,'2','C','3',1,'4','+','T','U','R',1,'2','J','C'
           defb   1,'3','@',32,32  ;reset to (0,0)
@@ -323,7 +323,7 @@ IF (NEED_expanded <> 0 )  | (reqpag <>0)
 ENDIF
 
 IF reqpag <> 0
-.nomemory
+nomemory:
         defb    1,'3','@',32,32,1,'2','J','C'
         defm    "Not enough memory allocated to run application"
         defb    13,10,13,10
@@ -332,7 +332,7 @@ IF reqpag <> 0
 ENDIF
 
 IF (NEED_expanded <> 0 )
-.need_expanded_text
+need_expanded_text:
         defb    1,'3','@',32,32,1,'2','J','C'
         defm    "Sorry, application needs an expanded machine"
         defb    13,10,13,10
@@ -344,7 +344,7 @@ ENDIF
 ; Include the stdio handle defaults if we need them
 ;--------
 IF DEFINED_ANSIstdio
-.sgoprotos
+sgoprotos:
 	INCLUDE	"#stdio_fp.asm"
 ENDIF
 

@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: pps_crt0.asm,v 1.4 2007-06-27 20:49:27 dom Exp $
+;       $Id: pps_crt0.asm,v 1.5 2009-06-10 17:26:04 stefano Exp $
 ;
 
 
@@ -56,7 +56,7 @@
 	defs	490		;Reserved space
 
 
-.start
+start:
         ld      (start1+1),sp	;Save entry stack
         ld      hl,-64
         add     hl,sp
@@ -91,7 +91,7 @@ ENDIF
 	ld	c,a
 	add	hl,bc		;now points to end of arguments
 ; Try to find the end of the arguments
-.argv_loop_1
+argv_loop_1:
         ld      a,(hl)
         cp      ' '
         jr      nz,argv_loop_2
@@ -100,7 +100,7 @@ ENDIF
         dec     c
         jr      nz,argv_loop_1
 ; We've located the end of the last argument, try to find the start
-.argv_loop_2
+argv_loop_2:
         ld      a,(hl)
         cp      ' '
         jr      nz,argv_loop_3
@@ -109,11 +109,11 @@ ENDIF
         push    hl
         inc     b
         dec     hl
-.argv_loop_3
+argv_loop_3:
         dec     hl
         dec     c
         jr      nz,argv_loop_2
-.argv_done
+argv_done:
         ld      hl,end  ;name of program (NULL)
         push    hl
         inc     b
@@ -126,7 +126,7 @@ ENDIF
         call    _main           ;Call user code
         pop     bc      ;kill argv
         pop     bc      ;kill argc
-.cleanup
+cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
@@ -138,19 +138,19 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 	pop	bc
-.start1	ld	sp,0		;Restore stack to entry value
+start1:	ld	sp,0		;Restore stack to entry value
 	ld	bc,$41		;exit with - error code
 	rst	$10
         ret
 
-.l_dcal	jp	(hl)		;Used for function pointer calls
+l_dcal:	jp	(hl)		;Used for function pointer calls
 
 
 ;-----------
 ; Define the stdin/out/err area. For the z88 we have two models - the
 ; classic (kludgey) one and "ANSI" model
 ;-----------
-.__sgoioblk
+__sgoioblk:
 IF DEFINED_ANSIstdio
 	INCLUDE	"#stdio_fp.asm"
 ELSE
@@ -162,7 +162,7 @@ ENDIF
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-._vfprintf
+_vfprintf:
 IF DEFINED_floatstdio
 	LIB	vfprintf_fp
 	jp	vfprintf_fp
@@ -182,36 +182,36 @@ ENDIF
 ;-----------
 ; Now some variables
 ;-----------
-.coords         defw    0       ; Current graphics xy coordinates
-.base_graphics  defw    0       ; Address of the Graphics map
+coords:         defw    0       ; Current graphics xy coordinates
+base_graphics:  defw    0       ; Address of the Graphics map
 
-._std_seed       defw    0       ; Seed for integer rand() routines
+_std_seed:      defw    0       ; Seed for integer rand() routines
 
-.exitsp         defw    0       ; Address of where the atexit() stack is
-.exitcount      defb    0       ; How many routines on the atexit() stack
+exitsp:         defw    0       ; Address of where the atexit() stack is
+exitcount:      defb    0       ; How many routines on the atexit() stack
 
 
-.heaplast       defw    0       ; Address of last block on heap
-.heapblocks     defw    0       ; Number of blocks
+heaplast:       defw    0       ; Address of last block on heap
+heapblocks:     defw    0       ; Number of blocks
 
-.start_prefix	defw	0	; Entry handle from OS
+start_prefix:   defw	0	; Entry handle from OS
 
 IF DEFINED_NEED1bitsound
-.snd_tick	defb	0	; Sound variable
+snd_tick:       defb	0	; Sound variable
 ENDIF
 
 		defm	"Small C+ PPS"	;Unnecessary file signature
-.end		defb	0
+end:		defb	0
 
 ;-----------------------
 ; Floating point support
 ;-----------------------
 IF NEED_floatpack
         INCLUDE         "#float.asm"
-.fp_seed        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
-.extra          defs    6		;FP register
-.fa             defs    6		;FP Accumulator
-.fasign         defb    0		;FP register
+fp_seed:        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
+extra:          defs    6		;FP register
+fa:             defs    6		;FP Accumulator
+fasign:         defb    0		;FP register
 
 ENDIF
 

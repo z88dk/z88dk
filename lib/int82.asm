@@ -27,13 +27,13 @@
 	call	$8D91			; CALL CR_KHAND (Wait for a key)
 	jp	cleanup			;  -> quit
 					;
-.UnloadStr				;
+UnloadStr:
 	defm	"Please disable  "	;
 	defm	"the interrupt   "	;
 	defm	"that is running."	;
 	defb	0
 					;
-.OK					;
+OK:
 	im	1			; For safety reasons...
 	ld	a,$84			;
 	ld	i,a			; IV table will be at $8400-$8500

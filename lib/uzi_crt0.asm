@@ -29,17 +29,17 @@
 		ld	(system_stack),sp
 		jp	_start_init
 ; Jump back to quit application (user shutdown)
-.user_shutdown
+user_shutdown:
 		ld	sp,(system_stack)
 		xor	a
 		call_oz(os_bye)
 
 ;Save a byte here, byte there! This has label because it's used for
 ;calculated calls etc
-.l_dcal
+l_dcal:
         jp      (hl)
 
-.system_stack
+system_stack:
 	defw	0
 
 	defm	"UZIz88"
