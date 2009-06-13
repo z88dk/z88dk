@@ -3,7 +3,7 @@
  *
  *  djm 21/6/2001 after Damjan Marion
  *
- *  $Id: rex6000.c,v 1.3 2005-07-10 11:39:31 dom Exp $
+ *  $Id: rex6000.c,v 1.4 2009-06-13 19:16:42 dom Exp $
  */
 
 #include "appmake.h"
@@ -122,7 +122,7 @@ int rex_exec(char *target)
 
 
     if ( (binfile = fopen(binname,"rb")) == NULL ) {
-        fprintf(stderr,"Couldn't open binary file: %s\n",binfile[1]);
+        fprintf(stderr,"Couldn't open binary file: %s\n",binname);
         myexit(NULL,1);
     }
 
@@ -249,10 +249,10 @@ char *cleanup_string(char *orig)
 
     copy = strdup(orig);
 
-    if ( ptr = strchr(copy,'\n') )
+    if ( (ptr = strchr(copy,'\n')) )
 	*ptr = 0;
 
-    if ( ptr = strchr(copy,'\r') )
+    if ( (ptr = strchr(copy,'\r')) )
 	*ptr = 0;
 
     return(copy);

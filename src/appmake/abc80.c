@@ -3,7 +3,7 @@
  *
  *        Stefano Bodrato 5/2000
  *
- *        $Id: abc80.c,v 1.3 2007-11-05 07:54:53 stefano Exp $
+ *        $Id: abc80.c,v 1.4 2009-06-13 19:16:42 dom Exp $
  */
 
 #include "appmake.h"
@@ -172,5 +172,7 @@ int abc80_exec()
 
     fclose(fpin);
     fclose(fpout);
+
+    return 0;
 }
 

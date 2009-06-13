@@ -153,7 +153,7 @@ int tixx_exec(char *target)
     char  filename[FILENAME_MAX+1];
     char  comment[45];
     FILE *fp;
-    char *buf, str[256], *c;
+    char *buf, str[256];
     char *suffix;
     int i, n, ext, n2;
     unsigned short chk;
@@ -231,7 +231,6 @@ int tixx_exec(char *target)
     if ((ext == E_82P) || (ext == E_83P))
         i = n + 17;
     else if (ext == E_8XP)
-        //i = n + 19;
         i = n + 21;
     else if (ext == E_85S)
         i = n + 10 + strlen(str);

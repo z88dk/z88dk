@@ -5,7 +5,7 @@
  *
  *	By Stefano Bodrato
  *
- *	$Id: svi.c,v 1.1 2003-03-13 14:50:30 dom Exp $
+ *	$Id: svi.c,v 1.2 2009-06-13 19:16:42 dom Exp $
  */
 
 #include "appmake.h"
@@ -115,6 +115,7 @@ int svi_exec(char *target)
 
 	fclose(fpin);
 	fclose(fpout);
+        return 0;
 }
 
 

@@ -3,7 +3,7 @@
  *
  *        Based on the original "bin2gtp" program by Tomaz Solc
  *
- *        $Id: galaksija.c,v 1.1 2008-12-08 20:58:17 stefano Exp $
+ *        $Id: galaksija.c,v 1.2 2009-06-13 19:16:42 dom Exp $
  */
 
 #include "appmake.h"
@@ -32,7 +32,6 @@ option_t gal_options[] = {
 int gal_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
-    char    name[11];
     int     i,c;
     int     len;
 
@@ -60,10 +59,12 @@ int gal_exec(char *target)
 
 /* Tomaz's code insertion starts here */
 
+#if 0
     /* basic start addr */
-//    h2le_short(0x2c3a+len, &data[0]);    
+    h2le_short(0x2c3a+len, &data[0]);    
     /* basic end addr */
-//    h2le_short(0x2c3a+len+basiclen, &data[2]);
+    h2le_short(0x2c3a+len+basiclen, &data[2]);
+#endif
 
 
     if ( (fpin=fopen(binname,"rb") ) == NULL ) {

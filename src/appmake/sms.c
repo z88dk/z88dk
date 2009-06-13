@@ -4,7 +4,7 @@
  *    Harold O. Pinheiro - 2006 - pascal
  *    Dominic Morris - 02/06/2007 - rewritten and placed into appmake
  *
- *    $Id: sms.c,v 1.2 2007-06-24 15:32:04 dom Exp $
+ *    $Id: sms.c,v 1.3 2009-06-13 19:16:42 dom Exp $
  *
  *    Figure out what this does exactly!
  */
@@ -15,7 +15,6 @@
 #define OFFSET 0x7ff0
 
 static char             *binname      = NULL;
-static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static char              help         = 0;
 static char              noop         = 0;
@@ -104,6 +103,7 @@ int sms_exec(char *target)
 
     fclose(fpin);
     fclose(fpout);
+    return 0;
 }
 
 

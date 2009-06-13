@@ -11,7 +11,7 @@
  *
  * djm 26/6/2001
  *
- * $Id: hex.c,v 1.1 2003-03-13 14:50:29 dom Exp $
+ * $Id: hex.c,v 1.2 2009-06-13 19:16:42 dom Exp $
  */
 
 #include "appmake.h"
@@ -21,11 +21,9 @@
 #define RECSIZE 16
 
 static char             *binname      = NULL;
-static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static int               origin       = -1;
 static char              help         = 0;
-static unsigned char     parity;
 
 
 /* Options that are available for this module */

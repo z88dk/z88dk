@@ -3,7 +3,7 @@
  *
  *        Stefano Bodrato,  April 2008
  *
- *        $Id: trs80.c,v 1.2 2008-04-07 07:55:17 stefano Exp $
+ *        $Id: trs80.c,v 1.3 2009-06-13 19:16:42 dom Exp $
  */
 
 #include "appmake.h"
@@ -34,12 +34,8 @@ int trs80_exec()
     int     c;
     int     i;
     int     len;
-    int     lnum;
     int     blocks;
-    int     blcount;
     int     pos;
-    int     flag;
-    char    name[7];
     
     if ( help || binname == NULL || ( crtfile == NULL && origin == -1 ) )
         return -1;
@@ -115,5 +111,7 @@ int trs80_exec()
 
     fclose(fpin);
     fclose(fpout);
+ 
+    return 0;
 }
 

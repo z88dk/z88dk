@@ -12,7 +12,7 @@
  *        Creates a new TAP file (overwriting if necessary) just ready to run.
  *        Use tapmaker to customize your work.
  *
- *        $Id: zx.c,v 1.2 2007-06-19 09:20:50 stefano Exp $
+ *        $Id: zx.c,v 1.3 2009-06-13 19:16:42 dom Exp $
  */
 
 #include "appmake.h"
@@ -153,7 +153,7 @@ int zx_exec(char *target)
     writeword_p(26,fpout,&parity);         /* BASIC line length */
     writebyte_p(0xfd,fpout,&parity);       /* CLEAR */
     writebyte_p(0xb0,fpout,&parity);       /* VAL */
-    sprintf(mybuf,"\"%i\":",pos-1);        /* location for CLEAR */
+    sprintf(mybuf,"\"%i\":",(int)pos-1);        /* location for CLEAR */
     writestring_p(mybuf,fpout,&parity);
     writebyte_p(0xef,fpout,&parity);       /* LOAD */
     writebyte_p('"',fpout,&parity);
@@ -163,7 +163,7 @@ int zx_exec(char *target)
     writebyte_p(0xf9,fpout,&parity);       /* RANDOMIZE */
     writebyte_p(0xc0,fpout,&parity);       /* USR */
     writebyte_p(0xb0,fpout,&parity);       /* VAL */
-    sprintf(mybuf,"\"%i\"",pos);           /* Location for USR */
+    sprintf(mybuf,"\"%i\"",(int)pos);           /* Location for USR */
     writestring_p(mybuf,fpout,&parity);
     writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
 
@@ -214,6 +214,8 @@ int zx_exec(char *target)
     writebyte_p(parity,fpout,&parity);
     fclose(fpin);
     fclose(fpout);
+
+    return 0;
 }
 
 

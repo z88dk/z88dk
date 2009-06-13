@@ -4,7 +4,7 @@
  *      This simply adds in the length of the program
  *      
  *      
- *      $Id: z88shell.c,v 1.3 2007-06-24 15:32:04 dom Exp $
+ *      $Id: z88shell.c,v 1.4 2009-06-13 19:16:42 dom Exp $
  */
 
 
@@ -18,7 +18,6 @@ static char             *outfile      = NULL;
 static char              help         = 0;
 
 static unsigned char    *memory;      /* Pointer to Z80 memory */
-static long              zorg;        /* Origin of compiler program */
 
 /* Options that are available for this module */
 option_t z88shell_options[] = {
@@ -126,7 +125,6 @@ void save_block(long filesize, char *base, char *ext)
 {
     char    name[FILENAME_MAX+1];
     char    buffer[LINEMAX+1];
-    int     length;
     FILE    *fp;
 
     strcpy(name,base);

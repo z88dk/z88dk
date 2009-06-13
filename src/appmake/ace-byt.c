@@ -6,7 +6,7 @@
  *   s l bload <name> loades l bytes to the memory starting at address s as <name>. If s or l is zero will their value be taken from the file. 
  *   addr call will call Z80 machine code at addr, should be terminated with a jp (iy) Z80 instruction. 
  *
- *   $Id: ace-byt.c,v 1.1 2003-03-13 14:50:29 dom Exp $
+ *   $Id: ace-byt.c,v 1.2 2009-06-13 19:16:42 dom Exp $
  */
 
 
@@ -29,11 +29,11 @@ option_t acebyt_options[] = {
 int acebyt_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
-	char	name[11];
-	FILE	*fpin, *fpout;
-	int	c;
-	int	i;
-	int	len;
+    char    name[11];
+    FILE    *fpin, *fpout;
+    int     c;
+    int     i;
+    int     len;
 
     if ( help || binname == NULL )
         return -1;
@@ -46,63 +46,65 @@ int acebyt_exec(char *target)
     }
 
 
-	if ( (fpin=fopen(binname,"rb") ) == NULL ) {
-		printf("Can't open input file %s\n");
-		myexit(NULL,1);
-	}
+    if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+        printf("Can't open input file %s\n",binname);
+        myexit(NULL,1);
+    }
 
 
 /*
- *	Now we try to determine the size of the file
- *	to be converted
+ *      Now we try to determine the size of the file
+ *      to be converted
  */
-	if	(fseek(fpin,0,SEEK_END)) {
-		fclose(fpin);
-		myexit("Couldn't determine size of file\n",1);
-	}
+    if      (fseek(fpin,0,SEEK_END)) {
+        fclose(fpin);
+        myexit("Couldn't determine size of file\n",1);
+    }
 
-	len=ftell(fpin);
+    len=ftell(fpin);
 
-	fseek(fpin,0L,SEEK_SET);
+    fseek(fpin,0L,SEEK_SET);
 
-	if ( (fpout=fopen(filename,"wb") ) == NULL ) {
-		printf("Can't open output file %s\n",filename);
-		myexit(NULL,1);
-	}
+    if ( (fpout=fopen(filename,"wb") ) == NULL ) {
+        printf("Can't open output file %s\n",filename);
+        myexit(NULL,1);
+    }
 
 
 /* Write out the header file */
-	writeword(26,fpout);
-	fputc(' ',fpout);
+    writeword(26,fpout);
+    fputc(' ',fpout);
 
 /* Deal with the filename */
-	if (strlen(binname) >= 10 ) {
-		strncpy(name,binname,10);
-	} else {
-		strcpy(name,binname);
-		strncat(name,"          ",10-strlen(binname));
-	}
-	for	(i=0;i<=9;i++)
-		writebyte(name[i],fpout);
+    if (strlen(binname) >= 10 ) {
+        strncpy(name,binname,10);
+    } else {
+        strcpy(name,binname);
+        strncat(name,"          ",10-strlen(binname));
+    }
+    for     (i=0;i<=9;i++)
+        writebyte(name[i],fpout);
 
-	writeword(len,fpout);	/* Length */
-	writeword(16384,fpout);	/* Start Address */
+    writeword(len,fpout);   /* Length */
+    writeword(16384,fpout); /* Start Address */
 
 /* I'm not sure what is it for */
-	for	(i=0;i<=10;i++)
-		writebyte(' ',fpout);
+    for     (i=0;i<=10;i++)
+        writebyte(' ',fpout);
 
-	writeword(len+1,fpout);
+    writeword(len+1,fpout);
 
 
 /* We append the binary file */
 
-	for (i=0; i<len;i++) {
-		c=getc(fpin);
-		writebyte(c,fpout);
-	}
+    for (i=0; i<len;i++) {
+        c=getc(fpin);
+        writebyte(c,fpout);
+    }
 
-	fclose(fpin);
-	fclose(fpout);
+    fclose(fpin);
+    fclose(fpout);
+
+    return 0;
 }
-		
+                

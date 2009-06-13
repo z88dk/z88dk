@@ -121,7 +121,8 @@ int zxvgs_exec(char *target)
     if ( fwrite(&header,1,3,fp) != 3 ) 
         myexit(buffer,1);
     fclose(fp);
-    myexit(0,0);
+
+    return 0;
 }
 
 

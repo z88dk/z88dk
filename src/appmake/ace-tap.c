@@ -12,7 +12,7 @@
  *                         - Modified for the Jupiter ACE
  *		It's probably buggy but works !
  *
- *	$Id: ace-tap.c,v 1.1 2003-03-13 14:50:29 dom Exp $
+ *	$Id: ace-tap.c,v 1.2 2009-06-13 19:16:42 dom Exp $
  */
 
 #include "appmake.h"
@@ -127,5 +127,6 @@ int acetap_exec(char *target)
 	writebyte_p(parity,fpout,&parity);
 	fclose(fpin);
 	fclose(fpout);
+        return 0;
 }
 		

@@ -18,7 +18,6 @@ static char             *outfile      = NULL;
 static int               origin       = -1;
 static int               exec         = -1;
 static char              help         = 0;
-static unsigned char     parity;
 
 
 /* Options that are available for this module */

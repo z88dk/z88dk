@@ -28,7 +28,7 @@
  *        djm 12/1/2000
  *        Add option to disallow page truncation
  *      
- *      $Id: z88.c,v 1.2 2005-07-10 11:39:33 dom Exp $
+ *      $Id: z88.c,v 1.3 2009-06-13 19:16:42 dom Exp $
  */
 
 
@@ -248,7 +248,7 @@ int z88_exec(char *target)
         SaveBlock(32768,outfile,".62");
     SaveBlock(49152,outfile,".63");
 
-    myexit(0,0);
+    return 0;
 }
 
 static void SaveBlock(unsigned offset, char *base, char *ext)

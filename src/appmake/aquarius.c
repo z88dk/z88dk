@@ -9,7 +9,7 @@
  *
  *   Stefano Bodrato - December 2001: first release
  *
- *   $Id: aquarius.c,v 1.1 2003-03-13 14:50:29 dom Exp $
+ *   $Id: aquarius.c,v 1.2 2009-06-13 19:16:42 dom Exp $
  */
 
 #include "appmake.h"
@@ -73,7 +73,6 @@ int aquarius_exec(char *target)
 	}
 	
 	len=ftell(fpin);
-	//dlen=(len+72)/4;
 	dlen=(len)/4;
 	
 	fseek(fpin,0L,SEEK_SET);
@@ -193,7 +192,6 @@ int aquarius_exec(char *target)
 	for	(i=1;i<=6;i++)
 		writebyte('#',fpout);
 
-//	writebyte(0,fpout);
 /*	for	(i=1;i<=6;i++)
 		writebyte(0,fpout);*/
 
@@ -252,5 +250,6 @@ int aquarius_exec(char *target)
 	fclose(fpin);
 	fclose(fpout);
 
+    return 0;
 }
 		

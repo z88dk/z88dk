@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.3 2007-05-10 20:03:25 stefano Exp $
+ *   $Id: appmake.c,v 1.4 2009-06-13 19:16:42 dom Exp $
  */
 
 #define MAIN_C
@@ -74,6 +74,8 @@ int main(int argc, char *argv[])
 
     fprintf(stderr,"Unknown machine target \"%s\"\n\n",target);
     main_usage();
+
+    return 0;
 }
 
 
@@ -180,6 +182,7 @@ int option_parse(int argc, char *argv[], option_t *options)
             } while ( opt->type != OPT_NONE );
         }
     }    
+    return 0;
 }
 
 
@@ -205,6 +208,8 @@ static int option_set(int pos, int max, char *argv[], option_t *option)
             *(char **)(option->dest) = strdup(argv[pos+1]);
             ret = pos + 1;
         }
+        break;
+    case OPT_NONE:
         break;
     }
     return ret;
@@ -237,6 +242,8 @@ static void option_print(char *execname, char *ident, char *copyright, char *des
             break;
         case OPT_STR:
             fprintf(stderr,"%s   --%-15s (string)  %s\n",optstr,opt->lopt,opt->desc);
+            break;
+        case OPT_NONE:
             break;
         }
         opt++;

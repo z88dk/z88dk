@@ -5,7 +5,7 @@
  *
  *        By Stefano Bodrato
  *
- *        $Id: msx.c,v 1.1 2003-03-13 14:50:30 dom Exp $
+ *        $Id: msx.c,v 1.2 2009-06-13 19:16:42 dom Exp $
  */
 
 
@@ -29,7 +29,6 @@ option_t msx_options[] = {
 int msx_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
-    char        name[11];
     FILE        *fpin, *fpout;
     int        c;
     int        i;
@@ -87,6 +86,8 @@ int msx_exec(char *target)
 
     fclose(fpin);
     fclose(fpout);
+
+    return 0;
 }
                 
 

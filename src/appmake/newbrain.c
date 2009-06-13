@@ -3,7 +3,7 @@
  *
  *        Stefano Bodrato 4/2007
  *
- *        $Id: newbrain.c,v 1.3 2007-06-04 17:13:14 stefano Exp $
+ *        $Id: newbrain.c,v 1.4 2009-06-13 19:16:42 dom Exp $
  */
 
 #include "appmake.h"
@@ -39,8 +39,6 @@ int newbrain_exec()
     int        i,p,l,b;
     int        len;
     int        lnum;
-    int        blocks;
-    int        blcount;
 
     unsigned long       checksum;
 
@@ -101,7 +99,7 @@ int newbrain_exec()
             fprintf(fpout,"10 IF TOP>%i THEN RESERVE TOP-%i\n",pos-1,pos-1);
             fprintf(fpout,"20 FOR i=0TO%i:READa:POKE%i+i,a:NEXT i\n",len-1,pos);
             fprintf(fpout,"30 CALL%i\n",pos);
-            fprintf(fpout,"40 END",pos);
+            fprintf(fpout,"40 END");
             lnum=100;
             /* ... M/C ...*/
             for (i=0; i<len;i++) {
@@ -261,7 +259,7 @@ int newbrain_exec()
 
             fprintf(fpout,"40 ");
             fputc(0x97,fpout);        /* OPEN */
-            //fputc(' ',fpout);
+            /* fputc(' ',fpout); */
             fputc(0xb3,fpout);        /* # */
             fprintf(fpout,"1,");
             fputc('"',fpout);
@@ -310,7 +308,7 @@ int newbrain_exec()
             fputc (0,fpout2);
             writeword_cksum(strlen(filename), fpout2, &checksum);
             for (i=0; i<strlen(filename); i++) {
-                fputc (filename[i],fpout2);             // +1 ??
+                fputc (filename[i],fpout2);             /* +1 ?? */
                 checksum += filename[i];
             }
             writebyte_cksum(0x81, fpout2, &checksum);
@@ -356,5 +354,5 @@ int newbrain_exec()
             remove(filename);
 
     }    
-
+    return 0;
 }
