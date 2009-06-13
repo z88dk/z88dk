@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.33 2007-10-07 15:59:39 dom Exp $
+ *      $Id: zcc.c,v 1.34 2009-06-13 17:59:25 dom Exp $
  */
 
 
@@ -160,12 +160,11 @@ void SetShortObj(char *);
 void SetLateAssemble(char *);
 void SetMPM(char *);
 
-void *mustmalloc(int);
+void *mustmalloc(size_t );
 int  hassuffix(char *, char *);
 char *changesuffix(char *, char *);
 int  process(char *, char *, char *, char *, enum iostyle, int, int);
 int  linkthem(char *);
-int  main(int, char **);
 int  FindSuffix(char *);
 void BuildAsmLine(char *, char *);
 void ParseArgs(char *);
@@ -256,9 +255,6 @@ struct confs myconf[]={
     {"",NULL,NULL}
 };
 
-/*
- * Oh, I know these could be chars, but I'm lazy!
- */
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
 /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
@@ -312,116 +308,103 @@ char    *defaultbin="a.bin";
 
 /* Okay! Off we Go! */
 
-void *mustmalloc(n)
-        int     n;
+void *mustmalloc(size_t n)
 {
-        void    *p;
+    void    *p;
 
-        if ((p = malloc(n)) == 0)
-        {
-                fprintf(stderr, "malloc failed\n");
-                exit(1);
-        }
-        return (p);
+    if ((p = malloc(n)) == 0) {
+        fprintf(stderr, "malloc failed\n");
+        exit(1);
+    }
+    return (p);
 }
 
-int hassuffix(name, suffix)
-        char    *name, *suffix;
+int hassuffix(char *name, char *suffix)
 {
-        int     nlen, slen;
+    int     nlen, slen;
 
-        nlen = strlen(name);
-        slen = strlen(suffix);
+    nlen = strlen(name);
+    slen = strlen(suffix);
 
-        if (slen > nlen)
-                return (0);
-        return (strcmp(&name[nlen-slen], suffix) == 0);
+    if (slen > nlen)
+        return (0);
+    return (strcmp(&name[nlen-slen], suffix) == 0);
 }
 
-char *changesuffix(name, suffix)
-        char    *name, *suffix;
+char *changesuffix(char *name, char *suffix)
 {
-        char    *p, *r;
+    char    *p, *r;
 
-        if ((p = strrchr(name, '.')) == 0)
-        {
-                r = mustmalloc(strlen(name) + strlen(suffix) + 1);
-                sprintf(r, "%s%s", name, suffix);
-        }
-        else
-        {
-                r = mustmalloc(p - name + strlen(suffix) + 1);
-                r[0] = '\0';
-                strncat(r, name, p - name);
-                strcat(r, suffix);
-        }
-        return (r);
+    if ((p = strrchr(name, '.')) == 0) {
+        r = mustmalloc(strlen(name) + strlen(suffix) + 1);
+        sprintf(r, "%s%s", name, suffix);
+    } else {
+        r = mustmalloc(p - name + strlen(suffix) + 1);
+        r[0] = '\0';
+        strncat(r, name, p - name);
+        strcat(r, suffix);
+    }
+    return (r);
 }
 
 int process(suffix, nextsuffix, processor, extraargs, ios,number,needsuffix)
-        char    *suffix, *nextsuffix, *processor, *extraargs;
-        enum iostyle    ios;
-        int     number;
-        int     needsuffix;     /* Should dump suffix (z80) oi! */
+    char    *suffix, *nextsuffix, *processor, *extraargs;
+    enum iostyle    ios;
+    int     number;
+    int     needsuffix;     /* Should dump suffix (z80) oi! */
 {
-        int     status, errs;
-        int     tstore;
-        char    *buffer, *outname;
+    int     status, errs;
+    int     tstore;
+    char    *buffer, *outname;
 
-        errs = 0;
-         if (!hassuffix(filelist[number], suffix)) return(0);
+    errs = 0;
+    if (!hassuffix(filelist[number], suffix)) return(0);
 
-         switch (ios) {
-                case outimplied:
-                        buffer = mustmalloc(strlen(processor) + strlen(extraargs)+ strlen(filelist[number]) + 3);
+    switch (ios) {
+    case outimplied:
+        buffer = mustmalloc(strlen(processor) + strlen(extraargs)+ strlen(filelist[number]) + 3);
 
-/* Dropping the suffix for Z80..cheating! */
-                        tstore=strlen(filelist[number])-strlen(suffix);
+        /* Dropping the suffix for Z80..cheating! */
+        tstore=strlen(filelist[number])-strlen(suffix);
 
-                        if (!needsuffix)
-                                filelist[number][tstore]=0;
+        if (!needsuffix)
+            filelist[number][tstore]=0;
 
-                        sprintf(buffer, "%s %s %s", processor, extraargs,
-                                filelist[number]);
-                        filelist[number][tstore]='.';
-                        break;
-                case outspecified:
-/* This is only used for preprocessor, so, a quicj change here and
- * there..
- */
-                        outname = changesuffix(filelist[number], nextsuffix);
-                        buffer = mustmalloc(strlen(processor) + strlen(extraargs)
-                                + strlen(orgfiles[number]) + strlen(outname) + 4);
-                        sprintf(buffer, "%s %s %s %s", processor, extraargs,
-                                orgfiles[number], outname);
-                        free(outname);
-                        break;
-                case filter:
-                        outname = changesuffix(filelist[number], nextsuffix);
-                        buffer = mustmalloc(strlen(processor) + strlen(extraargs)
-                                + strlen(filelist[number]) + strlen(outname) + 8);
-                        sprintf(buffer, "%s %s < %s > %s", processor, extraargs,
-                                filelist[number], outname);
-                        free(outname);
-           }
-           if (verbose)         puts(buffer);
-                status = system(buffer);
-                if (status  != 0)
-                        errs = 1;
-                else {
-/*
- * Free up the allocated memory
- */
-                   outname = changesuffix(filelist[number], nextsuffix);
-                   free(filelist[number]);
-                   filelist[number]=outname;
-                }
-                free(buffer);
-        return (errs);
+        sprintf(buffer, "%s %s %s", processor, extraargs,
+                filelist[number]);
+        filelist[number][tstore]='.';
+        break;
+    case outspecified:
+        outname = changesuffix(filelist[number], nextsuffix);
+        buffer = mustmalloc(strlen(processor) + strlen(extraargs)
+                            + strlen(orgfiles[number]) + strlen(outname) + 4);
+        sprintf(buffer, "%s %s %s %s", processor, extraargs,
+                orgfiles[number], outname);
+        free(outname);
+        break;
+    case filter:
+        outname = changesuffix(filelist[number], nextsuffix);
+        buffer = mustmalloc(strlen(processor) + strlen(extraargs)
+                            + strlen(filelist[number]) + strlen(outname) + 8);
+        sprintf(buffer, "%s %s < %s > %s", processor, extraargs,
+                filelist[number], outname);
+        free(outname);
+    }
+    if (verbose)         puts(buffer);
+    status = system(buffer);
+    if (status  != 0)
+        errs = 1;
+    else {
+        /* Free up the allocated memory */
+        outname = changesuffix(filelist[number], nextsuffix);
+        free(filelist[number]);
+        filelist[number]=outname;
+    }
+    free(buffer);
+    return (errs);
 }
 
-int linkthem(linker)
-    char    *linker;
+int linkthem(char *linker)
 {
     int     i, n, status;
     char    *p;
@@ -472,10 +455,8 @@ int linkthem(linker)
     strcat(p,myconf[CRT0].def);
 	strcat(p,ext);
 
-    for (i = 0; i < nfiles; ++i)
-    {
-        if ( (!lateassemble && hassuffix(filelist[i], OBJEXT) ) || lateassemble )
-        {
+    for (i = 0; i < nfiles; ++i) {
+        if ( (!lateassemble && hassuffix(filelist[i], OBJEXT) ) || lateassemble ) {
             strcat(p, " ");
             //filelist[i][strlen(filelist[i])-strlen(OBJEXT)]='\0';
             strcat(p, filelist[i]);
@@ -488,20 +469,13 @@ int linkthem(linker)
     return (status);
 }
 
-int main(argc, argv)
-    int     argc;
-    char    **argv;
+int main(int argc, char **argv)
 {
     int     i, gc;
     char    *temp,*temp2;
     char    asmarg[4096];      /* Hell, that should be long enough! */
     char    buffer[LINEMAX+1]; /* For reading in option file */
     FILE    *fp;
-
-/*
- * Okay, the fun begins now, first of all, lets use atexit so we can
- * cleanup after ourselves..
- */
 
     if (( atexit(CleanUpFiles)) != 0)
 		printf("Couldn't register atexit() routine\n");
@@ -515,33 +489,28 @@ int main(argc, argv)
     filelist = (char **)mustmalloc(sizeof(char *) * argc);
     orgfiles = (char **)mustmalloc(sizeof(char *) * argc);
 
-/* Now, find the environmental variable ZCCFILE which contains the
- * filename of our config file..
- */
+    /* Now, find the environmental variable ZCCFILE which contains the
+     * filename of our config file..
+     */
     gc=1;           /* Set for the first argument to scan for */
 
-/*
- * If we only have one parameter, we don't want to go any further..
- * (Linux quite rightly baulks..)
- */
+    /* If we only have one parameter, we don't want to go any further..
+     * (Linux quite rightly baulks..)
+     */
     if (argc == 1 ) { DispInfo(); exit(1); }
 
 	gc=FindConfigFile(argv[gc],gc);
 
 
 
-/*
- * Okay, so now we read in the options file and get some info for us
- */
+    /* Okay, so now we read in the options file and get some info for us */
 
-    if ( (fp=fopen(outfilename,"r") ) == NULL )  
-    {
+    if ( (fp=fopen(outfilename,"r") ) == NULL ) {
         fprintf(stderr,"Can't open config file %s\n",outfilename);
         exit(1);
     }
 
-    while (fgets(buffer,LINEMAX,fp) != NULL) 
-    {
+    while (fgets(buffer,LINEMAX,fp) != NULL) {
         if (!isupper(buffer[0])) continue;
         ParseOpts(buffer);
     }
@@ -764,10 +733,10 @@ int main(argc, argv)
 
 int CopyFile(char *name1,char *ext1, char *name2, char *ext2)
 {
-        char    buffer[LINEMAX+1];
-		snprintf(buffer,sizeof(buffer),"%s %s%s %s%s",myconf[COPYCMD].def, name1,ext1,name2,ext2);
-		if (verbose) printf("%s\n",buffer);
-        return(system(buffer));
+    char    buffer[LINEMAX+1];
+    snprintf(buffer,sizeof(buffer),"%s %s%s %s%s",myconf[COPYCMD].def, name1,ext1,name2,ext2);
+    if (verbose) printf("%s\n",buffer);
+    return(system(buffer));
 }
 
 
@@ -777,18 +746,18 @@ int CopyFile(char *name1,char *ext1, char *name2, char *ext2)
 
 int FindSuffix(char *name)
 {
-        int     j;
-        j=strlen(name);
-        while(j && name[j]!='.') j--;
+    int     j;
+    j=strlen(name);
+    while(j && name[j]!='.') j--;
 
-        if      (!j) return 0;
+    if      (!j) return 0;
 
-        j++;
-        if (strcmp(&name[j],".c")) return CFILE;
-        if (strcmp(&name[j],".i")) return PFILE;
-        if (strcmp(&name[j],".asm")) return AFILE;
-        if (strcmp(&name[j],".opt")) return OFILE;
-        return 0;
+    j++;
+    if (strcmp(&name[j],".c")) return CFILE;
+    if (strcmp(&name[j],".i")) return PFILE;
+    if (strcmp(&name[j],".asm")) return AFILE;
+    if (strcmp(&name[j],".opt")) return OFILE;
+    return 0;
 }
 
 
@@ -798,12 +767,12 @@ void BuildAsmLine(char *dest, char *prefix)
 		strcpy(dest,asmargs);
 	else
 		strcpy(dest,"");
-        strcat(dest,prefix);
-        if (z80verbose)
-                strcat(dest," -v ");   
-        if      (!symbolson)
-                strcat(dest," -ns ");
-        strcat(dest,myconf[ASMOPTS].def);
+    strcat(dest,prefix);
+    if (z80verbose)
+        strcat(dest," -v ");   
+    if      (!symbolson)
+        strcat(dest," -ns ");
+    strcat(dest,myconf[ASMOPTS].def);
 }
 
 /*
@@ -813,19 +782,19 @@ void BuildAsmLine(char *dest, char *prefix)
 void SetLibMake(char *arg)
 {
 	makelib=YES;
-        compileonly=YES;        /* Get to object file */
-        peepholeopt=2*YES;
-        AddComp(arg);
+    compileonly=YES;        /* Get to object file */
+    peepholeopt=2*YES;
+    AddComp(arg);
 }
 
 void SetPreserve(char *arg)
 {
-        preserve=YES;
+    preserve=YES;
 }
 
 void SetCreateApp(char *arg)
 {
-        createapp=YES;
+    createapp=YES;
 }
 
 void SetLateAssemble(char *arg)
@@ -850,64 +819,65 @@ void SetCompileOnly(char *arg)
 
 void SetAssembleOnly(char *arg)
 {
-        assembleonly=YES;
+    assembleonly=YES;
 }
 
 void SetOutputMap(char *arg)
 {
-        mapon=YES;
+    mapon=YES;
 }
 
 void SetOutputSym(char *arg)
 {
-        symbolson=YES;
+    symbolson=YES;
 }
 
 void SetOutputFile(char *arg)
 {
 	*outfilename=0;
-        sscanf(&arg[1],"%s",outfilename);
-        outputfile=outfilename;
-        if (!strlen(outputfile) ) {
-/* Invalid filename specified (null) try next argument up */
+    sscanf(&arg[1],"%s",outfilename);
+    outputfile=outfilename;
+    if (!strlen(outputfile) ) {
+        /* Invalid filename specified (null) try next argument up */
 		if ( gargv[gargc+1][0] != '-' ) {
-		/* Aha...non option comes next... */
+            /* Aha...non option comes next... */
 			gargc++;
 			strncpy(outfilename,gargv[gargc],sizeof(outfilename));
-		} else
-                	outputfile=defaultout;
+		} else {
+            outputfile=defaultout;
         }
+    }
 }
 
 void SetPeepHole(char *arg)
 {
-        if ((arg[1]) == '2') peepholeopt=2*YES;
-        else if ((arg[1]) == '0' ) peepholeopt=NO;
-        else peepholeopt=arg[1]-'0';
+    if ((arg[1]) == '2') peepholeopt=2*YES;
+    else if ((arg[1]) == '0' ) peepholeopt=NO;
+    else peepholeopt=arg[1]-'0';
 }
 
 void SetTemp(char *arg)
 {
 #if !defined(__MSDOS__) || !defined(__TURBOC__)
 /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
-		usetemp=YES;
+    usetemp=YES;
 #endif
 }
 
 void UnSetTemp(char *arg)
 {
-		usetemp=NO;
+    usetemp=NO;
 }
 
 
 void SetPreProcessOnly(char *arg)
 {
-        preprocessonly=YES;
+    preprocessonly=YES;
 }
 
 void SetZ80Verb(char *arg)
 {
-        z80verbose=YES;
+    z80verbose=YES;
 }
 
 void AddToAssembler(char *arg)
@@ -934,35 +904,35 @@ void AddToPreProc(char *arg)
 
 void AddPreProc(char *arg)
 {
-        BuildOptions(&cpparg,arg-1);
+    BuildOptions(&cpparg,arg-1);
 }
 
 void SetCleanUp(char *arg)
 {
-        cleanup=YES;
+    cleanup=YES;
 }
 
 void UnSetCleanUp(char *arg)
 {
-        cleanup=NO;
+    cleanup=NO;
 }
 
 void AddLink(char *arg)
 {
-        char    buffer[LINEMAX+1];      /* A little large! */
+    char    buffer[LINEMAX+1];      /* A little large! */
 /*
  * We still have the "problem" of switching between maths literals,
  * so if -lmz is supplied (custom lib) then add in the special option
  * this way we can be as generic as possible
  */
-        if (strcmp(arg,"lmz")==0) {
-			parse_option(myconf[Z88MATHFLG].def);
-			snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[Z88MATHLIB].def);
-			BuildOptions_start(&linkargs,buffer);
+    if (strcmp(arg,"lmz")==0) {
+        parse_option(myconf[Z88MATHFLG].def);
+        snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[Z88MATHLIB].def);
+        BuildOptions_start(&linkargs,buffer);
 		return;
 	} else if (strcmp(arg,"lm") == 0 ) {
-			snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[GENMATHLIB].def);
-			BuildOptions_start(&linkargs,buffer);
+        snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[GENMATHLIB].def);
+        BuildOptions_start(&linkargs,buffer);
 		return;
 	}
 
@@ -971,8 +941,8 @@ void AddLink(char *arg)
  * zlib: directory so all the libraries have simple names
  * Build what the option will be and stick it in..
  */
-		snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,arg+1);
-		BuildOptions_start(&linkargs,buffer);
+    snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,arg+1);
+    BuildOptions_start(&linkargs,buffer);
 
 }
 
@@ -983,100 +953,100 @@ void AddLink(char *arg)
 
 void BuildOptions(char **list, char *arg)
 {
-		char    *temparg;
-		int     len;
-        temparg=*list;
+    char    *temparg;
+    int     len;
+    temparg=*list;
 
-        len=2+strlen(arg)+( temparg ? strlen(temparg) : 0 );
-        temparg=realloc(temparg,len);
-        if (temparg) {
-                if (*list==0) *temparg=0;
-                *list=temparg;
-        } else {
-                fprintf(stderr,"Out of memory\n");
-                exit(1);
-        }
-        strcat(temparg,arg);
-        strcat(temparg," ");
+    len=2+strlen(arg)+( temparg ? strlen(temparg) : 0 );
+    temparg=realloc(temparg,len);
+    if (temparg) {
+        if (*list==0) *temparg=0;
+        *list=temparg;
+    } else {
+        fprintf(stderr,"Out of memory\n");
+        exit(1);
+    }
+    strcat(temparg,arg);
+    strcat(temparg," ");
 }
 
 void BuildOptions_start(char **list, char *arg)
 {
-     char      *temparg;
-     int        len;
-     char      *orig = *list;
+    char      *temparg;
+    int        len;
+    char      *orig = *list;
  
-     len = 2 + strlen(arg) + ( orig ? strlen(orig) : 0 );
+    len = 2 + strlen(arg) + ( orig ? strlen(orig) : 0 );
  
-     if ( ( temparg = malloc(len) ) == NULL ) {
-         fprintf(stderr,"Out of memory\n");
-         exit(1);
-     }
+    if ( ( temparg = malloc(len) ) == NULL ) {
+        fprintf(stderr,"Out of memory\n");
+        exit(1);
+    }
  
-     *list = temparg;  /* Set the pointer to the new string */
-     strcpy(temparg,arg);
-     strcat(temparg," ");
-     strcat(temparg,orig);
+    *list = temparg;  /* Set the pointer to the new string */
+    strcpy(temparg,arg);
+    strcat(temparg," ");
+    strcat(temparg,orig);
  
-     free(orig);
+    free(orig);
 }
 
 
 
 void AddComp(char *arg)
 {
-        BuildOptions(&comparg,arg-1);
+    BuildOptions(&comparg,arg-1);
 }
 
 void AddToFileList(char *arg)
 {
-        char    filen[FILENAME_MAX+1];
-        char *ptr;
-        int     j;
-        if (isspace(arg[0]) || arg[0] == 0 ) return;
+    char    filen[FILENAME_MAX+1];
+    char *ptr;
+    int     j;
+    if (isspace(arg[0]) || arg[0] == 0 ) return;
 /*
  *      First of all, copy the original filenames to orgfiles
  */
-        ptr=mustmalloc(strlen(arg)+1);
-        strcpy(ptr,arg);
-        orgfiles[nfiles] = ptr;
+    ptr=mustmalloc(strlen(arg)+1);
+    strcpy(ptr,arg);
+    orgfiles[nfiles] = ptr;
 /*
  *      Now, create a temporary filename, and copy from the original
  *      file, to the temporary file
  */
-		if (usetemp) {
-                tempname(filen);
-                j=strlen(arg);
-                while(j && arg[j]!='.') j--;
+    if (usetemp) {
+        tempname(filen);
+        j=strlen(arg);
+        while(j && arg[j]!='.') j--;
 
-                if      (j==0) {
-                        fprintf(stderr,"Unrecognised filetype\n");
-                        return;
-                }
-                strcat(filen,&arg[j]);
+        if      (j==0) {
+            fprintf(stderr,"Unrecognised filetype\n");
+            return;
+        }
+        strcat(filen,&arg[j]);
 /*
  * Copy the file over
  */
-                if (!hassuffix(arg,".c") ){
-                        if (CopyFile(arg,"",filen,"")) {
-                                fprintf(stderr,"Cannot copy input file\n");
-                                exit(1);
-                        }
-                }
-        } else {
-/* Not using temporary files.. */
-                strcpy(filen,arg);
+        if (!hassuffix(arg,".c") ){
+            if (CopyFile(arg,"",filen,"")) {
+                fprintf(stderr,"Cannot copy input file\n");
+                exit(1);
+            }
         }
+    } else {
+/* Not using temporary files.. */
+        strcpy(filen,arg);
+    }
 /* Allocate space for it and dump it in the filelist */
-        ptr=mustmalloc(strlen(filen)+1);
-        strcpy(ptr,filen);
-        filelist[nfiles++] = ptr;
+    ptr=mustmalloc(strlen(filen)+1);
+    strcpy(ptr,filen);
+    filelist[nfiles++] = ptr;
 }
 
 void SetVerbose(char *arg)
 {
-        if (arg[1] == 'n') verbose = NO;
-        else verbose=YES;
+    if (arg[1] == 'n') verbose = NO;
+    else verbose=YES;
 }
 
 void DispVer(char *arg)
@@ -1096,7 +1066,7 @@ void DispVer(char *arg)
 
 void SetRelocate(char *arg)
 {
-        relocate=YES;
+    relocate=YES;
 }
 
 
@@ -1109,58 +1079,54 @@ void SetShortObj(char *arg)
 
 void DispInfo(void)
 {
-        printf("zcc - Frontend for the z88dk Cross-C Compiler\n");
-        printf(version);
+    printf("zcc - Frontend for the z88dk Cross-C Compiler\n");
+    printf(version);
 }
 
 
 void ParseArgs(char *arg)
 {
-        struct args *pargs;
-        int     flag;
-        pargs=myargs;
-        flag=0;
-        while(pargs->setfunc)
-        {
-                switch(pargs->more) {
-
-/* More info follows the initial thing.. */
-                case YES:
-                        if (strncmp(arg,pargs->name,strlen(pargs->name))==0) {
-                                (*pargs->setfunc)(arg);
-                                flag=1;
-                        }
-                        break;
-                case NO:
-
-                        if (strcmp(arg,pargs->name)==0) {
-                                (*pargs->setfunc)(arg);
-                                flag=1;
-                        }
-                }
-                if (flag) return;
-                pargs++;
+    struct args *pargs;
+    int     flag;
+    pargs=myargs;
+    flag=0;
+    while(pargs->setfunc) {
+        switch(pargs->more) {
+        case YES:
+            /* More info follows the initial thing.. */
+            if (strncmp(arg,pargs->name,strlen(pargs->name))==0) {
+                (*pargs->setfunc)(arg);
+                flag=1;
+            }
+            break;
+        case NO:
+            if (strcmp(arg,pargs->name)==0) {
+                (*pargs->setfunc)(arg);
+                flag=1;
+            }
         }
-        AddComp(arg);
+        if (flag) return;
+        pargs++;
+    }
+    AddComp(arg);
 }
 
 void ParseOpts(char *arg)
 {
-        struct confs *pargs;
-        int     num=0;
-        pargs=myconf;
+    struct confs *pargs;
+    int     num=0;
+    pargs=myconf;
 
-        while(pargs->setfunc)
-        {
-                if (strncmp(arg,pargs->name,strlen(pargs->name))==0) {
-                        (*pargs->setfunc)(arg,num);
-                        return;
-                }
-                num++;
-                pargs++;
+    while(pargs->setfunc) {
+        if (strncmp(arg,pargs->name,strlen(pargs->name))==0) {
+            (*pargs->setfunc)(arg,num);
+            return;
         }
-        printf("Unrecognised config option: %s\n",arg);
-        return;
+        num++;
+        pargs++;
+    }
+    printf("Unrecognised config option: %s\n",arg);
+    return;
 }
 
 /* 
@@ -1170,12 +1136,12 @@ void ParseOpts(char *arg)
 
 void SetConfig(char *arg, int num)
 {
-        if (myconf[num].def == NULL ) {
-                myconf[num].def=(char *) mustmalloc(strlen(arg)+1);
-                strcpy(myconf[num].def,arg);
-        } else {
-                fprintf(stderr,"%s already defined as %s",myconf[num].name,myconf[num].def);
-        }
+    if (myconf[num].def == NULL ) {
+        myconf[num].def=(char *) mustmalloc(strlen(arg)+1);
+        strcpy(myconf[num].def,arg);
+    } else {
+        fprintf(stderr,"%s already defined as %s",myconf[num].name,myconf[num].def);
+    }
 }
         
 /*
@@ -1185,11 +1151,11 @@ void SetConfig(char *arg, int num)
 
 void SetNumber(char *arg,int num)
 {
-        char name[LINEMAX+1];
+    char name[LINEMAX+1];
 	int	style;
-        sscanf(arg,"%s%d",name,&style);
-		if (style) 
-			myconf[num].def=(char *)(style-1);
+    sscanf(arg,"%s%d",name,&style);
+    if (style) 
+        myconf[num].def=(char *)(style-1);
 }
 
 void SetNormal(char *arg,int num)
@@ -1293,9 +1259,7 @@ void CleanUpFiles(void)
 
     if (cleanup && usetemp) {       /* Default is yes */
 
-/*
- * Remove the temporary files, if they don't exist, it doesn't matter!
- */
+        /* Remove the temporary files, if they don't exist, it doesn't matter! */
         for (j=0; j<nfiles; j++ ) {
             CleanFile(filelist[j],".i");
             CleanFile(filelist[j],".asm");
@@ -1306,9 +1270,7 @@ void CleanUpFiles(void)
             CleanFile(filelist[j],OBJEXT);
             CleanFile(filelist[j],".sym");
         }
-/*
- * Remove all files associated with startup file, if necessary 
- */
+        /* Remove all files associated with startup file, if necessary */
         if ( (myconf[CRT0].def!=0) && (crtcopied!=0) ) {
             CleanFile(myconf[CRT0].def,".asm");
             CleanFile(myconf[CRT0].def,".opt");
@@ -1344,10 +1306,10 @@ void CleanUpFiles(void)
 
 void CleanFile(char *file,char *ext)
 {
-        char *temp;
-        temp=changesuffix(file,ext);
-        remove(temp);
-        free(temp);     /* Being nice for once! */
+    char *temp;
+    temp=changesuffix(file,ext);
+    remove(temp);
+    free(temp);     /* Being nice for once! */
 }
 
 /*
@@ -1358,29 +1320,29 @@ void CleanFile(char *file,char *ext)
 
 void CopyCrt0(void)
 {
-        char    filen[FILENAME_MAX+1];
-        char    *oldptr, *newptr;
+    char    filen[FILENAME_MAX+1];
+    char    *oldptr, *newptr;
 
-        if (compileonly || assembleonly || preprocessonly) return;
-		if (usetemp) {
-                tempname(filen);  /* Temporary nane..get it in filen */
-        } else {
+    if (compileonly || assembleonly || preprocessonly) return;
+    if (usetemp) {
+        tempname(filen);  /* Temporary nane..get it in filen */
+    } else {
 /* If not using temporary file then the gumph goes into crt0.#? */
-                strcpy(filen,"crt0");
-        }
+        strcpy(filen,"crt0");
+    }
 
 /* Now to the copying the files over, used for both usetemp and !usetemp*/
 
-        oldptr=myconf[CRT0].def;
-        if ( CopyFile(oldptr,".opt",filen,".opt") || CopyFile(filen,".opt",filen,".asm") ) {
-                fprintf(stderr,"Cannot copy crt0 file\n");
-                exit(1);
-        }
-        crtcopied=1;
-        newptr=mustmalloc(strlen(filen)+1);
-        strcpy(newptr,filen);
-        free(oldptr);   /* Free old startup */
-        myconf[CRT0].def=newptr;
+    oldptr=myconf[CRT0].def;
+    if ( CopyFile(oldptr,".opt",filen,".opt") || CopyFile(filen,".opt",filen,".asm") ) {
+        fprintf(stderr,"Cannot copy crt0 file\n");
+        exit(1);
+    }
+    crtcopied=1;
+    newptr=mustmalloc(strlen(filen)+1);
+    strcpy(newptr,filen);
+    free(oldptr);   /* Free old startup */
+    myconf[CRT0].def=newptr;
 }
 
 /*
@@ -1390,27 +1352,27 @@ void CopyCrt0(void)
 
 void ShowErrors(char *filen, char *orig)
 {
-        char    *temp;
-        char    buffer[LINEMAX+1];
-        int     j;
-        FILE    *fp;
+    char    *temp;
+    char    buffer[LINEMAX+1];
+    int     j;
+    FILE    *fp;
 
-        temp=changesuffix(filen,".err");
-        if ( (fp=fopen(temp,"r") ) != 0 ) {
-                if (orig) fprintf(stderr,"Errors in source file %s:\n",orig);
-                else {
+    temp=changesuffix(filen,".err");
+    if ( (fp=fopen(temp,"r") ) != 0 ) {
+        if (orig) fprintf(stderr,"Errors in source file %s:\n",orig);
+        else {
 /* We're printing linking errors, better print a key! */
-                        fprintf(stderr,"Key to filenames:\n");
-                        for (j=0;j<nfiles;j++) {
-                                fprintf(stderr,"%s = %s\n",filelist[j],orgfiles[j]);
-                        }
-                }
-                while (fgets(buffer,LINEMAX,fp) != NULL )
-                        fprintf(stderr,"%s",buffer);
-                fclose(fp);
-
+            fprintf(stderr,"Key to filenames:\n");
+            for (j=0;j<nfiles;j++) {
+                fprintf(stderr,"%s = %s\n",filelist[j],orgfiles[j]);
+            }
         }
-        free(temp);     /* Free temp buffer */
+        while (fgets(buffer,LINEMAX,fp) != NULL )
+            fprintf(stderr,"%s",buffer);
+        fclose(fp);
+
+    }
+    free(temp);     /* Free temp buffer */
 
 }
 
@@ -1442,12 +1404,12 @@ void tempname(char *filen)
 	}                                /* Allways starts at TMP1.$$$. Does not */
 	else                             /* check if file already exists. So is  */
 		tmpnam(filen);               /* not suitable for executing zcc more  */
-		if(ptr=strrchr(filen,'.'))   /* than once without cleaning out files.*/
-			*ptr=0;  /* Don't want to risk too long filenames */
+    if(ptr=strrchr(filen,'.'))   /* than once without cleaning out files.*/
+        *ptr=0;  /* Don't want to risk too long filenames */
 
 #else
-        strcpy(filen,"/tmp/tmpXXXXXXXX");
-        mktemp(filen);
+    strcpy(filen,"/tmp/tmpXXXXXXXX");
+    mktemp(filen);
 #endif
 }
 
@@ -1469,15 +1431,10 @@ int FindConfigFile(char *arg, int gc)
 	FILE	*fp;
 	char	*cfgfile;
 
-/*
- * Scan for an option file on the command line
- */
-        if ( arg[0]=='+' ) {
-/*
- *      Trapped the +
- */
-                strcpy(outfilename,arg+1);
-                gc++;   /* Increment first arg to search from */
+    /* Scan for an option file on the command line */
+    if ( arg[0]=='+' ) {
+        strcpy(outfilename,arg+1);
+        gc++;   /* Increment first arg to search from */
 		if (strstr(arg,".cfg") != NULL ) {
 			if	( (fp=fopen(outfilename,"r")) != NULL ) {
 				/* Local config file */
@@ -1489,50 +1446,48 @@ int FindConfigFile(char *arg, int gc)
 		if	(cfgfile != NULL ) {
 			if (strlen(cfgfile) > FILENAME_MAX) {
 				fprintf(stderr,"Possibly corrupt env variable ZCCCFG\n");
-                       		exit(1);
-               		}
-		/* Config file in config directory */
+                exit(1);
+            }
+            /* Config file in config directory */
 			strcpy(outfilename,cfgfile);
 			strcat(outfilename,arg+1);
 			strcat(outfilename,".cfg");
 			return(gc);
 		} else {
 #ifdef __MSDOS__
-		snprintf(outfilename,sizeof(outfilename),"%s\\lib\\config\\%s.cfg",PREFIX,arg+1);
+            snprintf(outfilename,sizeof(outfilename),"%s\\lib\\config\\%s.cfg",PREFIX,arg+1);
 #else
 #ifdef AMIGA
-		snprintf(outfilename,sizeof(outfilename),"%slib/config/%s.cfg",PREFIX,arg+1);
+            snprintf(outfilename,sizeof(outfilename),"%slib/config/%s.cfg",PREFIX,arg+1);
 #else
-		snprintf(outfilename,sizeof(outfilename),"%s/lib/config/%s.cfg",PREFIX,arg+1);
+            snprintf(outfilename,sizeof(outfilename),"%s/lib/config/%s.cfg",PREFIX,arg+1);
 #endif
 #endif
 		}
 		/* User supplied invalid config file, let it fall over
 		   back when */
 		return(gc);
-        } 
-/*
- * Okay, nowt specified so get the old style entry
- */
+    } 
+    /* Okay, nowt specified so get the old style entry */
 	cfgfile=getenv("ZCCFILE");
-        if (cfgfile != NULL ) {
+    if (cfgfile != NULL ) {
 		if (strlen(cfgfile) > FILENAME_MAX) {
 			fprintf(stderr,"Possibly corrupt env variable ZCCFILE\n");
-                       	exit(1);
-               	}
-               	strcpy(outfilename,cfgfile);
+            exit(1);
+        }
+        strcpy(outfilename,cfgfile);
 		return  (gc);
 	}
-/*
- * Last resort! 
- * New style config take ZCCCFG/zcc.cfg
- */
+    /*
+     * Last resort! 
+     * New style config take ZCCCFG/zcc.cfg
+     */
 	cfgfile=getenv("ZCCCFG");
 	if (cfgfile !=NULL ) {
 		if (strlen(cfgfile) > FILENAME_MAX) {
 			fprintf(stderr,"Possibly corrupt env variable ZCCCFG\n");
-                       	exit(1);
-               	}
+            exit(1);
+        }
 		strcpy(outfilename,cfgfile);
 		strcat(outfilename,"zcc.cfg");
 	} else {
@@ -1611,3 +1566,17 @@ void linkargs_mangle()
          ptr[1] = 'l';
      }
 }
+
+
+/*
+ * Local Variables:
+ *  indent-tabs-mode:nil
+ *  require-final-newline:t
+ *  c-basic-offset: 4
+ *  eval: (c-set-offset 'case-label 0)
+ *  eval: (c-set-offset 'substatement-open 0)
+ *  eval: (c-set-offset 'access-label 0)
+ *  eval: (c-set-offset 'class-open 4)
+ *  eval: (c-set-offset 'class-close 4)
+ * End:
+ */
