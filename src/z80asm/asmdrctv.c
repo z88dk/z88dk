@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.6 2003-10-11 15:41:04 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.7 2009-06-13 17:36:24 dom Exp $ */
 /* $History: Asmdrctv.c $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -74,6 +74,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include    <stdlib.h>
 #include    "config.h"
 #include    "symbol.h"
+#include    "z80asm.h"
 
 
 /* external functions */
@@ -106,7 +107,6 @@ symbol *FindSymbol (char *identifier, avltree * treeptr);
 
 /* local functions */
 void DeclModuleName (void);
-void Fetchfilename (FILE *fptr);
 void DefSym (void);
 void UnDefineSym (void);
 
@@ -771,61 +771,63 @@ DEFM (void)
 void 
 IncludeFile (void)
 {
+  char    *filename;
+
   if (GetSym () == dquote)
     {				/* fetch filename of include file */
-      Fetchfilename (z80asmfile);
+      filename = Fetchfilename (z80asmfile);
 
-      if (FindFile(CURRENTFILE,ident) != NULL)
+      if (FindFile(CURRENTFILE,filename) != NULL)
         {
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 31);
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 31);
           return; 
         }
 
       CURRENTFILE->filepointer = ftell (z80asmfile);	/* get file position of current source file */
       fclose (z80asmfile);	/* close current source file */
 
-      if ((z80asmfile = fopen (ident, "rb")) == NULL)
-	{			/* Open include file */
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 0);
-	  z80asmfile = fopen (CURRENTFILE->fname, "rb");		/* re-open current source file */
-	  fseek (z80asmfile, CURRENTFILE->filepointer, SEEK_SET);	/* file position to beginning of line
-			 						 * following INCLUDE line */
-	  return;
-	}
+      if ((z80asmfile = fopen (filename, "rb")) == NULL)
+        {			/* Open include file */
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 0);
+          z80asmfile = fopen (CURRENTFILE->fname, "rb");		/* re-open current source file */
+          fseek (z80asmfile, CURRENTFILE->filepointer, SEEK_SET);	/* file position to beginning of line
+                                                                     * following INCLUDE line */
+          return;
+        }
       else
-	{
-	  sourcefile_open = 1;
-	  CURRENTFILE = Newfile (CURRENTFILE, ident);	/* Allocate new file into file information list */
+        {
+          sourcefile_open = 1;
+          CURRENTFILE = Newfile (CURRENTFILE, filename);	/* Allocate new file into file information list */
 
-	  if (ASSEMBLE_ERROR == 3)
-	    return;		/* No room... */
-	  if (verbose)
-	    puts (CURRENTFILE->fname);	/* display name of INCLUDE file */
+          if (ASSEMBLE_ERROR == 3)
+            return;		/* No room... */
+          if (verbose)
+            puts (CURRENTFILE->fname);	/* display name of INCLUDE file */
 
-	  Z80pass1 ();		/* parse include file */
+          Z80pass1 ();		/* parse include file */
 
-	  CURRENTFILE = Prevfile ();	/* Now get back to current file... */
+          CURRENTFILE = Prevfile ();	/* Now get back to current file... */
 
-	  switch (ASSEMBLE_ERROR)
-	    {
-	    case 0:
-	    case 3:
-	    case 12:
-	      return;		/* Fatal errors, return immediatly... */
-	    }
+          switch (ASSEMBLE_ERROR)
+            {
+            case 0:
+            case 3:
+            case 12:
+              return;		/* Fatal errors, return immediatly... */
+            }
 
-	  sourcefile_open = fclose (z80asmfile);
+          sourcefile_open = fclose (z80asmfile);
 
-	  if ((z80asmfile = fopen (CURRENTFILE->fname, "rb")) == NULL)
-	    {			/* re-open current source file */
-	      ReportIOError(CURRENTFILE->fname);
-	    }
-	  else
-	    {
-	      fseek (z80asmfile, CURRENTFILE->filepointer, 0);	/* file position to beginning of */
-	      sourcefile_open = 1;
-	    }
-	}			/* line following INCLUDE line */
+          if ((z80asmfile = fopen (CURRENTFILE->fname, "rb")) == NULL)
+            {			/* re-open current source file */
+              ReportIOError(CURRENTFILE->fname);
+            }
+          else
+            {
+              fseek (z80asmfile, CURRENTFILE->filepointer, 0);	/* file position to beginning of */
+              sourcefile_open = 1;
+            }
+        }			/* line following INCLUDE line */
     }
   else
     ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
@@ -838,18 +840,19 @@ IncludeFile (void)
 void 
 BINARY (void)
 {
+  char      *filename;
   FILE		*binfile;
   long		Codesize;
 
   if (GetSym () == dquote)
     {
-      Fetchfilename (z80asmfile);
+      filename = Fetchfilename (z80asmfile);
 
-      if ((binfile = fopen (ident, "rb")) == NULL)
-	  {
-	  	ReportIOError (ident);
-	  	return;
-	  }
+      if ((binfile = fopen (filename, "rb")) == NULL)
+        {
+          ReportIOError (filename);
+          return;
+        }
 		
 	  fseek(binfile, 0L, SEEK_END);	/* file pointer to end of file */
 	  Codesize = ftell(binfile);
@@ -857,8 +860,8 @@ BINARY (void)
 	  
 	  if ((codeptr - codearea + Codesize) <= MAXCODESIZE)
 	    {
-	    	 fread (codeptr, sizeof (char), Codesize, binfile);	/* read binary code */
-		 codeptr += Codesize;							/* codeptr updated */
+          fread (codeptr, sizeof (char), Codesize, binfile);	/* read binary code */
+          codeptr += Codesize;							/* codeptr updated */
 	      PC += Codesize;
 	    }
 	  else
@@ -866,69 +869,54 @@ BINARY (void)
 
 	  fclose (binfile);
 	}
-   else
+  else
 	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
 }
 
 
 
-void 
+char * 
 Fetchfilename (FILE *fptr)
 {
-  int l, c = 0;
+  char   filename[FILENAME_MAX+1];
+  char  *ptr;
+  int    l, c = 0;
 
   char *stdpath;
 
   do {
-      for (l = 0;l<255; l++) 
-        {
-	   if (!feof (fptr)) 
-             {
-		c = GetChar (fptr);
-		if ((c == '\n') || (c == EOF))
-		    break;
+    for (l = 0;l<255; l++) 
+      {
+        if (!feof (fptr)) 
+          {
+            c = GetChar (fptr);
+            if ((c == '\n') || (c == EOF))
+              break;
 
-		if (c != '"') 
-		  {
-		     ident[l] = (char) c;
-		  } 
-		else 
-		  {
-		     break;       /* fatal - end of file reached! */
-		  }
-	     } 
-	   else 
-	     {
+            if (c != '"') 
+              {
+                ident[l] = (char) c;
+              } 
+            else 
+              {
+                break;       /* fatal - end of file reached! */
+              }
+          } 
+        else 
+          {
 	        break;
-	     }
-	}
-      ident[l] = '\0';		/* null-terminate file name */
+          }
+      }
+    ident[l] = '\0';		/* null-terminate file name */
   } while (strlen(ident) == 0 && !feof(fptr) );
 	
   if (c != '\n') Skipline (fptr); /* prepare for next line */
+  ptr = ident;
+  if ( *ptr =='#' ) {
+    ptr++;
+  }
 
-  if (ident[0] == '#')
-    {
-      stdpath = getenv("Z80_OZFILES");
-  /* djm 3/1/2000 try to use the default path.. */
-      if ( stdpath == NULL ) 
-	  stdpath = DEFLIBDIR; 
-      if ( stdpath != NULL)
-	{
-	  strncpy (stringconst, stdpath, 255);	/* copy   standard path */
-
-	  if (255 - strlen (stringconst) - strlen (ident) > 0)
-	    {
-	      strcat (stringconst, ident + 1);	/* concatenate path and filename */
-	      strcpy (ident, stringconst);	/* new filename generated */
-	    }
-	}
-      else
-	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 30);
-	  strcpy (ident, (ident + 1));	/* remove '#' from file name */
-	}
-    }
+  return SearchFile(ptr, 1);
 }
 
 
@@ -951,3 +939,18 @@ DeclModuleName (void)
   else
     ReportError (CURRENTFILE->fname, CURRENTFILE->line, 15);
 }
+
+
+/*
+ * Local Variables:
+ *  indent-tabs-mode:nil
+ *  require-final-newline:t
+ *  c-basic-offset: 2
+ *  eval: (c-set-offset 'case-label 0)
+ *  eval: (c-set-offset 'substatement-open 2)
+ *  eval: (c-set-offset 'access-label 0)
+ *  eval: (c-set-offset 'class-open 2)
+ *  eval: (c-set-offset 'class-close 2)
+ * End:
+ */
+

@@ -14,7 +14,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.19 2007-07-21 22:43:35 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.20 2009-06-13 17:36:24 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -108,6 +108,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include <ctype.h>
 #include "config.h"
 #include "symbol.h"
+#include "z80asm.h"
 
 /* external functions */
 char *AllocIdentifier (size_t len);
@@ -123,7 +124,6 @@ void CreateDeffile (void);
 void WriteGlobal (symbol * node);
 void WriteMapFile (void);
 void CreateBinFile (void);
-void Fetchfilename(FILE *fptr);
 struct sourcefile *Newfile (struct sourcefile *curfile, char *fname);
 enum symbols GetSym (void);
 long GetConstant (char *evalerr);
@@ -167,8 +167,8 @@ struct JRPC_Hdr *AllocJRaddrHdr (void);
 #include <qdos.h>
 
 char _prog_name[] = "Z80asm";
-char _version[] = "1.0.30";
-char _copyright[] = "\x7f InterLogic 1993-2007";
+char _version[] = "1.0.31";
+char _copyright[] = "\x7f InterLogic 1993-2009";
 
 void consetup_title ();
 void (*_consetup) () = consetup_title;
@@ -179,14 +179,19 @@ struct WINDOWDEF _condetails =
 #endif
 
 #ifdef AMIGA
-char amiver[] = "$VER: z80asm v1.0.30, (c) InterLogic 1993-2007";
+char amiver[] = "$VER: z80asm v1.0.31, (c) InterLogic 1993-2000";
 #endif
 
 
-char copyrightmsg[] = "Z80 Module Assembler V1.0.30 (21.7.2007), (c) InterLogic 1993-2007";
+char copyrightmsg[] = "Z80 Module Assembler V1.0.31 (13.6.2009), (c) InterLogic 1993-2009";
 
 FILE *z80asmfile, *listfile, *errfile, *objfile, *mapfile, *modsrcfile, *deffile, *libfile;
 long	clineno;
+
+static int      include_dir_num = 0;
+static char   **include_dir = NULL;
+static int      lib_dir_num = 0;
+static char   **lib_dir = NULL;
 
 char *errmsg[] =
 {"File open/read error",	/* 0  */
@@ -241,7 +246,7 @@ int sourcefile_open;
 char PAGELEN;
 int TAB_DIST = 8, COLUMN_WIDTH;
 char separators[] = " &\"\';,.({[]})+-*/%^=~|:<>!#:";
-char line[255], stringconst[255], ident[255];
+char line[255], stringconst[255], ident[FILENAME_MAX+1];
 char *srcfilename, *lstfilename, *objfilename, *errfilename, *libfilename;
 
 #ifdef QDOS
@@ -523,46 +528,46 @@ CreateLibfile (char *filename)
   if (l)
     {
       if (strcmp (filename + (l - 4), libext) != 0)
-	{			/* 'lib' extension not specified */
-	  if ((libfilename = AllocIdentifier (l + 4 + 1)) != NULL)
-	    {
-	      strcpy (libfilename, filename);
-	      strcat (libfilename, libext);	/* add '_lib' extension */
-	    }
-	  else
-	    {
-	      ReportError (NULL, 0, 3);
-	      return;
-	    }
-	}
+        {			/* 'lib' extension not specified */
+          if ((libfilename = AllocIdentifier (l + 4 + 1)) != NULL)
+            {
+              strcpy (libfilename, filename);
+              strcat (libfilename, libext);	/* add '_lib' extension */
+            }
+          else
+            {
+              ReportError (NULL, 0, 3);
+              return;
+            }
+        }
       else
-	{
-	  if ((libfilename = AllocIdentifier (l + 1)) != NULL)	/* 'lib' extension specified */
-	    strcpy (libfilename, filename);
-	  else
-	    {
-	      ReportError (NULL, 0, 3);
-	      return;
-	    }
-	}
+        {
+          if ((libfilename = AllocIdentifier (l + 1)) != NULL)	/* 'lib' extension specified */
+            strcpy (libfilename, filename);
+          else
+            {
+              ReportError (NULL, 0, 3);
+              return;
+            }
+        }
     }
   else
     {
       if ((filename = getenv ("Z80_STDLIB")) != NULL)
-	{
-	  if ((libfilename = AllocIdentifier (strlen (filename))) != NULL)
-	    strcpy (libfilename, filename);
-	  else
-	    {
-	      ReportError (NULL, 0, 3);
-	      return;
-	    }
-	}
+        {
+          if ((libfilename = AllocIdentifier (strlen (filename))) != NULL)
+            strcpy (libfilename, filename);
+          else
+            {
+              ReportError (NULL, 0, 3);
+              return;
+            }
+        }
       else
-	{
-	  ReportError (NULL, 0, 30);
-	  return;
-	}
+        {
+          ReportError (NULL, 0, 30);
+          return;
+        }
     }
 
   if ((libfile = fopen (libfilename, "w+b")) == NULL)
@@ -582,7 +587,10 @@ CreateLibfile (char *filename)
 void 
 GetLibfile (char *filename)
 {
+  char            tempbuf[FILENAME_MAX+1];
   struct libfile *newlib;
+  char           *ptr;
+  char           *ext = "";
   char *f, fheader[9];
   int l;
 
@@ -596,47 +604,42 @@ GetLibfile (char *filename)
   if (l)
     {
       if (strcmp (filename + (l - 4), libext) != 0)
-	{			/* 'lib' extension not specified */
-	  if ((f = AllocIdentifier (l + 4 + 1)) != NULL)
-	    {
-	      strcpy (f, filename);
-	      strcat (f, libext);	/* add '_lib' extension */
-	    }
-	  else
-	    {
-	      ReportError (NULL, 0, 3);
-	      return;
-	    }
-	}
+        {
+          ext = libext;
+        }
+      snprintf(tempbuf, sizeof(tempbuf),"%s%s",filename, ext);
+
+      ptr = SearchFile(tempbuf, 0);
+
+      l = strlen(ptr);
+      if ((f = AllocIdentifier (l + 1)) != NULL)
+        {
+          strcpy (f, ptr);
+        }
       else
-	{
-	  if ((f = AllocIdentifier (l + 1)) != NULL)	/* 'lib' extension specified */
-	    strcpy (f, filename);
-	  else
-	    {
-	      ReportError (NULL, 0, 3);
-	      return;
-	    }
-	}
+        {
+          ReportError (NULL, 0, 3);
+          return;
+        }
     }
   else
     {
       filename = getenv ("Z80_STDLIB");
       if (filename != NULL)
-	{
-	  if ((f = AllocIdentifier (strlen (filename))) != NULL)
-	    strcpy (f, filename);
-	  else
-	    {
-	      ReportError (NULL, 0, 3);
-	      return;
-	    }
-	}
+        {
+          if ((f = AllocIdentifier (strlen (filename))) != NULL)
+            strcpy (f, filename);
+          else
+            {
+              ReportError (NULL, 0, 3);
+              return;
+            }
+        }
       else
-	{
-	  ReportError (NULL, 0, 30);
-	  return;
-	}
+        {
+          ReportError (NULL, 0, 30);
+          return;
+        }
     }
 
   newlib->libfilename = f;
@@ -679,10 +682,10 @@ SetAsmFlag (char *flagid)
   /* djm: mod to get .o files produced instead of .obj */
   /* gbs: extended to use argument as definition, e.g. -Mo, which defines .o extension */
   if (*flagid == 'M')
-   {
-	strncpy ((objext + 1), (flagid + 1), 3);	/* copy argument string (append after '.') */
-     objext[4] = '\0';						/* max. 3 letters extension */
-   }
+    {
+      strncpy ((objext + 1), (flagid + 1), 3);	/* copy argument string (append after '.') */
+      objext[4] = '\0';						/* max. 3 letters extension */
+    }
 
   /** Check whether this is for the RCM2000/RCM3000 series of Z80-like CPU's */
 
@@ -730,23 +733,23 @@ SetAsmFlag (char *flagid)
     {
       listing_CPY = listing = ON;
       if (symtable)
-	symfile = OFF;
+        symfile = OFF;
       return;
     }
   if (strcmp (flagid, "nl") == 0)
     {
       listing_CPY = listing = OFF;
       if (symtable)
-	symfile = ON;
+        symfile = ON;
       return;
     }
   if (strcmp (flagid, "s") == 0)
     {
       symtable = ON;
       if (listing_CPY)
-	symfile = OFF;
+        symfile = OFF;
       else
-	symfile = ON;
+        symfile = ON;
       return;
     }
   if (strcmp (flagid, "ns") == 0)
@@ -847,39 +850,53 @@ SetAsmFlag (char *flagid)
       sscanf (flagid + 1, "%d", &TAB_DIST);
       return;
     }
+  if (*flagid == 'I')
+    {
+      i = include_dir_num++;
+      include_dir = realloc(include_dir, include_dir_num * sizeof(include_dir[0]));
+      include_dir[i] = strdup(flagid+1);
+    }
+  if (*flagid == 'L')
+    {
+      i = lib_dir_num++;
+      lib_dir = realloc(lib_dir, lib_dir_num * sizeof(lib_dir[0]));
+      lib_dir[i] = strdup(flagid+1);
+    }
+
+
   if (*flagid == 'D')
     {
       strcpy (ident, (flagid + 1));	/* copy argument string */
       if (!isalpha (ident[0]))
-	{
-	  ReportError (NULL, 0, 11);	/* symbol must begin with alpha */
-	  return;
-	}
+        {
+          ReportError (NULL, 0, 11);	/* symbol must begin with alpha */
+          return;
+        }
       i = 0;
       while (ident[i] != '\0')
-	{
-	  if (strchr (separators, ident[i]) == NULL)
-	    {
-	      if (!isalnum (ident[i]))
-		{
-		  if (ident[i] != '_')
-		    {
-		      ReportError (NULL, 0, 11);	/* illegal char in identifier */
-		      return;
-		    }
-		  else
-		    ident[i] = '_';	/* underscore in identifier */
-		}
-	      else
-		ident[i] = toupper (ident[i]);
-	    }
-	  else
-	    {
-	      ReportError (NULL, 0, 11);	/* illegal char in identifier */
-	      return;
-	    }
-	  ++i;
-	}
+        {
+          if (strchr (separators, ident[i]) == NULL)
+            {
+              if (!isalnum (ident[i]))
+                {
+                  if (ident[i] != '_')
+                    {
+                      ReportError (NULL, 0, 11);	/* illegal char in identifier */
+                      return;
+                    }
+                  else
+                    ident[i] = '_';	/* underscore in identifier */
+                }
+              else
+                ident[i] = toupper (ident[i]);
+            }
+          else
+            {
+              ReportError (NULL, 0, 11);	/* illegal char in identifier */
+              return;
+            }
+          ++i;
+        }
       DefineDefSym (ident, 1, 0, &staticroot);
     }
 }
@@ -1203,6 +1220,8 @@ int
 main (int argc, char *argv[])
 {
   int asmflag;
+  int    i;
+  char  *ptr;
   int    include_level = 0;
   FILE  *includes[10];   /* 10 levels of inclusion should be enough */
 
@@ -1253,6 +1272,22 @@ main (int argc, char *argv[])
       ReportError (NULL, 0, 3);	/* this   is needed during command line parsing */
       exit (1);
     }
+
+  /* Setup some default search paths */
+  i = include_dir_num++;
+  include_dir = realloc(include_dir, include_dir_num * sizeof(include_dir[0]));
+  include_dir[i] = strdup(".");
+  if ( ( ptr = getenv("Z80_OZFILES") ) != NULL ) {
+    i = include_dir_num++;
+    include_dir = realloc(include_dir, include_dir_num * sizeof(include_dir[0]));
+    include_dir[i] = strdup(ptr);
+  }
+
+  i = lib_dir_num++;
+  lib_dir = realloc(lib_dir, lib_dir_num * sizeof(lib_dir[0]));
+  lib_dir[i] = strdup(".");
+
+
   while (--argc > 0)
     {				/* Get options first */
       ++argv;
@@ -1315,7 +1350,9 @@ main (int argc, char *argv[])
       else
         {
         again:          
-          Fetchfilename(modsrcfile);
+          ptr = Fetchfilename(modsrcfile);
+          strcpy(ident, ptr);
+
           if (strlen (ident) == 0)
             {
               fclose (modsrcfile);
@@ -1518,6 +1555,8 @@ usage (void)
   printf ("-i<library> include <library> LIB modules with %s modules during linking\n", objext);
   puts ("-x<library> create library from specified modules ( e.g. with @<modules> )");
   printf ("-t<n> tabulator width for %s, %s, %s files. Column width is 4 times -t\n", mapext, defext, symext);
+  printf ("-I<path> additional path to search for includes\n");
+  printf ("-L<path> path to search for libraries\n");
   puts ("Default options: -nv -nd -nb -nl -s -m -ng -nc -nR -t8");
 }
 
@@ -1564,6 +1603,45 @@ AllocLib (void)
 {
   return (struct libfile *) malloc (sizeof (struct libfile));
 }
+
+/** \brief Search for a filename in the include path
+ *
+ *  \param base - The filename to search for
+ *  
+ *  \return Filename (static buffer)
+ */
+char *SearchFile(char *base, int is_include)
+{
+  static char  filename[FILENAME_MAX+1];
+  char       **paths = lib_dir;
+  int          paths_num = lib_dir_num;
+  struct stat  sb;
+  int          i;
+
+  if ( is_include ) 
+    {
+      paths = include_dir;
+      paths_num = include_dir_num;
+    }
+
+  if ( stat(base,&sb) == 0 )
+    {
+      snprintf(filename, sizeof(filename),"%s",base);
+      return filename;
+    }
+
+  for ( i = 0; i < paths_num; i++ )
+    {
+      snprintf(filename, sizeof(filename),"%s/%s",paths[i], base);
+      if ( stat(filename,&sb) == 0 ) 
+        {
+          return filename;
+        }
+    }
+  snprintf(filename, sizeof(filename),"%s",base);
+  return filename;
+}
+
 
 /*
  * Local Variables:
