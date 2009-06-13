@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.23 2007-10-07 15:59:39 dom Exp $
+ * $Id: zcc.h,v 1.24 2009-06-13 18:23:28 dom Exp $
  */
 
 /* Very contrived, if not a Windows target then include the config file */
@@ -80,9 +80,9 @@ struct args {
 };
 
 struct confs {
-        char *name;
-        void (*setfunc)(char *,int);
-        char *def;
+    char *name;
+    void (*setfunc)(char *,int);
+    char *def;
 };
 
 enum iostyle { outimplied=0, outspecified, filter };

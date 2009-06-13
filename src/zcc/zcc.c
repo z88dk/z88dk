@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.34 2009-06-13 17:59:25 dom Exp $
+ *      $Id: zcc.c,v 1.35 2009-06-13 18:23:28 dom Exp $
  */
 
 
@@ -134,9 +134,11 @@ void AddComp(char *);
 void AddPreProc(char *);
 void AddToPreProc(char *);
 void AddToAssembler(char *);
+void AddToLinker(char *);
 void AddAppmake(char *);
 void AddToAppmake(char *);
-void AddLink(char *);
+void AddLinkLibrary(char *);
+void AddLinkOption(char *);
 void DispInfo(void);
 void DispVer(char *);
 void SetVerbose(char *);
@@ -207,13 +209,15 @@ struct args myargs[]= {
     {"mpm", NO, SetMPM, "Use MPM rather than Z80asm as the assembler"},
 	{"Cp",YES,AddToPreProc, "Add an option to the preprocessor" },
 	{"Ca",YES,AddToAssembler, "Add an option to the assembler" },
+	{"Cl",YES,AddToLinker, "Add an option to the linker" },
     {"Cz",YES,AddToAppmake, "Add an option to appmake" },
     {"E",NO,SetPreProcessOnly, "Only preprocess files" },
     {"R",NO,SetRelocate, "Generate relocatable code"},
     {"D",YES,AddPreProc, "Define a preprocessor option"},
     {"U",YES,AddPreProc, "Undefine a preprocessor option"},
     {"I",YES,AddPreProc, "Add an include directory for the preprocessor"},
-    {"l",YES,AddLink,  "Add a library" },
+    {"L",YES,AddLinkOption,  "Add a library search path" },
+    {"l",YES,AddLinkLibrary,  "Add a library" },
     {"O",YES,SetPeepHole, "Set the peephole optimiser setting" },
     {"h",NO,DispVer, "Display this text"},
     {"v",YES,SetVerbose, "Output all commands that are run (-vn suppresses)" },
@@ -709,9 +713,8 @@ int main(int argc, char **argv)
     if (linkthem(usempm ? myconf[MPMEXE].def : myconf[LINKER].def)) exit(1);
 
     if      (createapp ) {
-/*
- * Building an application - run the appmake command on it
- */
+
+        /* Building an application - run the appmake command on it */
         snprintf(buffer,sizeof(buffer),"%s %s -b %s -c %s",myconf[APPMAKE].def,appmakeargs ? appmakeargs : "",outputfile,myconf[CRT0].def);	
         if (verbose) 
             printf("%s\n",buffer);
@@ -739,9 +742,6 @@ int CopyFile(char *name1,char *ext1, char *name2, char *ext2)
     return(system(buffer));
 }
 
-
-
-/* New djm Functions start here! */
 
 
 int FindSuffix(char *name)
@@ -883,8 +883,19 @@ void SetZ80Verb(char *arg)
 void AddToAssembler(char *arg)
 {
 	BuildOptions(&asmargs,arg+2);
+    /* If the linker and assembler are the same application then add assembler
+     * options to the linker
+     */
+    if ( strcmp(myconf[LINKER].def, myconf[Z80EXE].def) == 0 || usempm ) {
+        BuildOptions(&linkargs,arg+2);
+    }
+}
+
+void AddToLinker(char *arg)
+{
 	BuildOptions(&linkargs,arg+2);
 }
+
 
 void AddToAppmake(char *arg)
 {
@@ -917,7 +928,7 @@ void UnSetCleanUp(char *arg)
     cleanup=NO;
 }
 
-void AddLink(char *arg)
+void AddLinkLibrary(char *arg)
 {
     char    buffer[LINEMAX+1];      /* A little large! */
 /*
@@ -936,15 +947,16 @@ void AddLink(char *arg)
 		return;
 	}
 
-/*
- * Dump the changing of -ls into -i - we'll change the setup in the
- * zlib: directory so all the libraries have simple names
- * Build what the option will be and stick it in..
- */
+    /* Add on the necessary prefix for libraries */
     snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,arg+1);
     BuildOptions_start(&linkargs,buffer);
-
 }
+
+void AddLinkOption(char *arg)
+{
+    BuildOptions_start(&linkargs,arg);
+}
+
 
 /*
  * This routine appends the option arg onto the arglist specified
@@ -1543,17 +1555,15 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...)
 /* Parse options - rewritten to use strtok cos that's nice and easy */
 void parse_option(char *option)
 {
-    char   *ptr;
+    char   *ptr = option;
 
-    ptr = strtok(option," \t\r\n");
-
-    while ( ptr != NULL ) {
-	if ( ptr[0] == '-' ) {
-	    ParseArgs(ptr+1);
-	} else {
-	    AddToFileList(ptr);
-	}
-	ptr = strtok(NULL," \r\n");
+    while ( ( ptr = strtok(ptr," \t\r\n")) != NULL ) {
+        if ( ptr[0] == '-' ) {
+            ParseArgs(ptr+1);
+        } else {
+            AddToFileList(ptr);
+        }
+        ptr++;
     }
 }
 
