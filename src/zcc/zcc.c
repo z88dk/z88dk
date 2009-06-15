@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.35 2009-06-13 18:23:28 dom Exp $
+ *      $Id: zcc.c,v 1.36 2009-06-15 16:58:04 stefano Exp $
  */
 
 
@@ -1555,15 +1555,17 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...)
 /* Parse options - rewritten to use strtok cos that's nice and easy */
 void parse_option(char *option)
 {
-    char   *ptr = option;
+    char   *ptr;
 
-    while ( ( ptr = strtok(ptr," \t\r\n")) != NULL ) {
-        if ( ptr[0] == '-' ) {
-            ParseArgs(ptr+1);
-        } else {
-            AddToFileList(ptr);
-        }
-        ptr++;
+    ptr = strtok(option," \t\r\n");
+
+    while ( ptr != NULL ) {
+	if ( ptr[0] == '-' ) {
+	    ParseArgs(ptr+1);
+	} else {
+	    AddToFileList(ptr);
+	}
+	ptr = strtok(NULL," \r\n");
     }
 }
 
