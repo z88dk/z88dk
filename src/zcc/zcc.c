@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.36 2009-06-15 16:58:04 stefano Exp $
+ *      $Id: zcc.c,v 1.37 2009-06-21 21:50:42 dom Exp $
  */
 
 
@@ -160,7 +160,7 @@ void SetPreserve(char *);
 void SetCreateApp(char *);
 void SetShortObj(char *);
 void SetLateAssemble(char *);
-void SetMPM(char *);
+void SetAssembler(char *);
 
 void *mustmalloc(size_t );
 int  hassuffix(char *, char *);
@@ -206,7 +206,7 @@ struct args myargs[]= {
     {"create-app",NO,SetCreateApp,   "Run appmake on the resulting binary to create emulator usable file" },
     {"usetemp",NO,SetTemp, "(default) Use the temporary directory for intermediate files"},
     {"notemp",NO,UnSetTemp, "Don't use the temporary directory for intermediate files"},
-    {"mpm", NO, SetMPM, "Use MPM rather than Z80asm as the assembler"},
+    {"asm",YES,SetAssembler, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm"},
 	{"Cp",YES,AddToPreProc, "Add an option to the preprocessor" },
 	{"Ca",YES,AddToAssembler, "Add an option to the assembler" },
 	{"Cl",YES,AddToLinker, "Add an option to the linker" },
@@ -233,6 +233,7 @@ struct args myargs[]= {
 };
 
 
+
 struct confs myconf[]={
     {"OPTIONS",SetOptions,NULL},
     {"Z80EXE",SetNormal,NULL},
@@ -255,7 +256,7 @@ struct confs myconf[]={
     {"STARTUPLIB",SetNormal,NULL},
     {"GENMATHLIB",SetNormal,NULL},
 	{"STYLECPP",SetNumber,NULL},
-    {"MPMEXE",SetNormal,NULL},
+	{"MPMEXE",SetNumber,NULL},
     {"",NULL,NULL}
 };
 
@@ -287,7 +288,6 @@ int	gargc;		     /* Copies of argc and argv */
 char	**gargv;	
 /* filelist has to stay as ** because we change suffix all the time */
 int     nfiles          = 0;
-int     usempm          = 0;
 char    **filelist;
 char    **orgfiles;             /* Original filenames... */
 int     ncompargs       = 0;
@@ -298,10 +298,19 @@ char    *linkargs;
 char	*asmargs;
 char	*appmakeargs;
 
+
 char    outfilename[FILENAME_MAX+1];
 char	extension[5];
 
 #define OBJEXT extension
+
+#define ASM_Z80ASM 0
+#define ASM_ASXX   1
+#define ASM_VASM   2
+int      assembler_type = ASM_Z80ASM;
+
+#define IS_ASM(x)  ( assembler_type == (x) ) 
+
 
 /*
  * Default output binary filename - why mess with genius?!?!
@@ -412,16 +421,20 @@ int linkthem(char *linker)
 {
     int     i, n, status;
     char    *p;
-    char    *asmline;    /* patch for z80asm */
+    char    *asmline = "";    /* patch for z80asm */
 	char    *ext;
     char    *linkprog = myconf[LINKER].def;
 
     /* patch for z80asm */
     if (peepholeopt)  {
-        asmline="-eopt ";
+        if ( IS_ASM(ASM_Z80ASM) ) {
+            asmline="-eopt ";
+        }
         ext=".opt";
     } else {
-        asmline="-easm ";
+        if ( IS_ASM(ASM_Z80ASM) ) {
+            asmline="-easm ";
+        }
         ext=".asm";
     } 
 
@@ -442,14 +455,14 @@ int linkthem(char *linker)
     sprintf(p, "%s %s -o%s ", linker,myconf[LINKOPTS].def,outputfile);
     if      (lateassemble)             /* patch */
         strcat(p,asmline);      /* patch */
-    if      (z80verbose)
+    if      (z80verbose )
         strcat(p,"-v ");
     if      (relocate) {
         if (lateassemble) 
             fprintf(stderr,"Cannot relocate an application..\n");
         else strcat(p,"-R ");
     }
-    if ( usempm ) {
+    if ( !IS_ASM(ASM_Z80ASM) ) {
         linkargs_mangle(linkargs);
     }
     strcat(p,linkargs);
@@ -618,10 +631,6 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    if ( usempm && myconf[MPMEXE].def == NULL ) {
-        fprintf(stderr,"Missing definition for %s\n",myconf[MPMEXE].name);
-        exit(1);
-    }
 
 /*
  * Kill \n on the end of certain option lines
@@ -639,7 +648,8 @@ int main(int argc, char **argv)
     if (createapp && outputfile==defaultout ) 
         outputfile=defaultbin;
 
-	if ( createapp && makeapp )
+    /* We only have to do a late assembly hack for z80asm family */
+	if ( createapp && makeapp && IS_ASM(ASM_Z80ASM) )
 		lateassemble = YES;
 
 
@@ -690,12 +700,12 @@ int main(int argc, char **argv)
             default:
                 BuildAsmLine(asmarg,"-easm");
                 if (!assembleonly && !lateassemble)
-                    if (process(".asm", OBJEXT, myconf[usempm ? MPMEXE : Z80EXE].def, asmarg , outimplied,i,YES)) exit(1);
+                    if (process(".asm", OBJEXT, myconf[Z80EXE].def, asmarg , outimplied,i,YES)) exit(1);
             }
         case OFILE:
             BuildAsmLine(asmarg,"-eopt");
             if (!assembleonly && !lateassemble)
-                if (process(".opt", OBJEXT, myconf[usempm ? MPMEXE : Z80EXE].def, asmarg , outimplied,i,YES)) exit(1);
+                if (process(".opt", OBJEXT, myconf[Z80EXE].def, asmarg , outimplied,i,YES)) exit(1);
             break;
         }
     }
@@ -710,7 +720,7 @@ int main(int argc, char **argv)
 
 /* Link them, if errors, atexit() deals with them! */
 
-    if (linkthem(usempm ? myconf[MPMEXE].def : myconf[LINKER].def)) exit(1);
+    if (linkthem(myconf[LINKER].def)) exit(1);
 
     if      (createapp ) {
 
@@ -767,10 +777,12 @@ void BuildAsmLine(char *dest, char *prefix)
 		strcpy(dest,asmargs);
 	else
 		strcpy(dest,"");
-    strcat(dest,prefix);
+    if ( IS_ASM(ASM_Z80ASM) ) {
+        strcat(dest,prefix);
+    }
     if (z80verbose)
         strcat(dest," -v ");   
-    if      (!symbolson)
+    if      (!symbolson && IS_ASM(ASM_Z80ASM))
         strcat(dest," -ns ");
     strcat(dest,myconf[ASMOPTS].def);
 }
@@ -804,12 +816,6 @@ void SetLateAssemble(char *arg)
     AddComp(temp + 1);
 }
 
-void SetMPM(char *arg)
-{
-    char   *temp = " -mpm";
-    usempm = YES;
-    AddComp(temp+1);
-}
 
 
 void SetCompileOnly(char *arg)
@@ -880,13 +886,15 @@ void SetZ80Verb(char *arg)
     z80verbose=YES;
 }
 
+
+
 void AddToAssembler(char *arg)
 {
 	BuildOptions(&asmargs,arg+2);
     /* If the linker and assembler are the same application then add assembler
      * options to the linker
      */
-    if ( strcmp(myconf[LINKER].def, myconf[Z80EXE].def) == 0 || usempm ) {
+    if ( strcmp(myconf[LINKER].def, myconf[Z80EXE].def) == 0  ) {
         BuildOptions(&linkargs,arg+2);
     }
 }
@@ -1189,6 +1197,59 @@ void SetNormal(char *arg,int num)
     if (strncmp(name,myconf[num].name,strlen(myconf[num].name)) != 0 ) {
         SetConfig(ptr,num);
     } 
+}
+
+
+
+
+
+static int SetAssemblerType(char *name)
+{
+    char  *assembler = NULL;
+    char  *linker = NULL;
+    int    style = ASM_Z80ASM;
+
+    if ( strcasecmp(name,"z80asm") == 0 ) {
+        style = ASM_Z80ASM;
+        linker = "z80asm";
+        assembler = "z80asm";
+    } else if ( strcasecmp(name,"mpm") == 0 ) {
+        style = ASM_Z80ASM;
+        linker = "mpm";
+        assembler = "mpm";
+    } else if ( strcasecmp(name,"asxx") == 0 ) {
+        style = ASM_ASXX;
+        linker = "alink";
+        assembler = "asz80";
+    } else if ( strcasecmp(name,"vasm") == 0 ) {
+        style = ASM_VASM;
+        linker = "vlink";
+        assembler = "vasm";
+    }
+    assembler_type = style;
+    if ( assembler ) {
+        if ( myconf[Z80EXE].def ) {
+            free(myconf[Z80EXE].def);
+        }
+        myconf[Z80EXE].def = strdup(assembler);
+    }
+    if ( linker ) {
+        if ( myconf[LINKER].def ) {
+            free(myconf[LINKER].def);
+        }
+        myconf[LINKER].def = strdup(linker);
+    }
+
+    return style;
+}
+
+void SetAssembler(char *arg)
+{
+    /* Set the assembler type */
+    SetAssemblerType(arg + 4);  
+
+    /* Add to the compiler as well */
+    AddComp(arg);
 }
 
 void SetOptions(char *arg,int num)
