@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.18 2007-10-07 16:16:03 dom Exp $
+ *      $Id: main.c,v 1.19 2009-06-21 21:16:52 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -40,7 +40,6 @@ int	sharedfile;	/* File contains routines which are to be
 			 */
 
 int     noaltreg;       /* No alternate registers */
-int     usempm;         /* We're using mpm */
 
 /*
  * Some external data
@@ -59,6 +58,7 @@ void    SetExpand(char *);
 void    UnSetExpand(char *);
 void    SetMakeShared(char *);
 void    SetUseShared(char *);
+void SetAssembler(char *arg);
 
 
 /*
@@ -161,8 +161,7 @@ int main(int argc, char **argv)
 	shareoffset=SHAREOFFSET;	/* Offset for shared libs */
 	debuglevel=NO;
 	farheapsz=-1;			/* Size of far heap */
-	asxx=NO;
-    usempm = NO;
+    assemtype = ASM_Z80ASM;
 	printflevel=0;
 #ifdef USEFRAME
 	indexix=YES;
@@ -697,57 +696,47 @@ void
 
 dumpvars()
 {
-        int ident,type,storage;
-        SYMBOL *ptr;
+    int ident,type,storage;
+    SYMBOL *ptr;
 
-        if (!glbcnt)
-                return;
+    if (!glbcnt)
+        return;
 
 /* Start at the start! */
-        glbptr=STARTGLB;
-        outstr("; --- Start of Static Variables ---\n\n");
+    glbptr=STARTGLB;
+    outstr("; --- Start of Static Variables ---\n\n");
 /* Two different handlings, if an application then use defvars construct
  * if not, then just drop em using defs!
  *
  * Even more handlings...if asz80 used we dump into data sectio
  */
 
-	if (asxx)
-		ol(".area _BSS");
+    output_section("bss");
 
-        if (appz88 && !asxx ) {
-                outstr("DEFVARS\t");
-#if 0
-                if (defvars) outdec(defvars);
-                else outstr("-1");
-                outstr("\n{\n");
-#else
-		outstr("-1\n{\n");
-#endif
-	}
-        ptr=STARTGLB;
-        while (ptr < ENDGLB)
+
+    ptr=STARTGLB;
+    while (ptr < ENDGLB)
+    {
+        if (ptr->name[0] != 0 && ptr->name[0] != '0' )
         {
-                if (ptr->name[0] != 0 && ptr->name[0] != '0' )
-                {
-                        ident=ptr->ident;
-                        type =ptr->type;
-                        storage=ptr->storage;
-                        if (ident !=ENUM && type !=ENUM && ident != MACRO && ident != FUNCTION && storage != EXTERNAL && storage != DECLEXTN && storage != EXTERNP && storage != LSTKEXT && storage!=TYPDEF )
-                        {
-                        if (!appz88) prefix();
-                        outname(ptr->name,1);
-			col();
-                        if (appz88 && !asxx) outstr("\n\tds.b\t");
-                        else  defstorage();
-                        outdec(ptr->size);
-                        nl();
-                        }
-                }
-        ++ptr;
+            ident=ptr->ident;
+            type =ptr->type;
+            storage=ptr->storage;
+            if (ident !=ENUM && type !=ENUM && ident != MACRO && ident != FUNCTION && storage != EXTERNAL && storage != DECLEXTN && storage != EXTERNP && storage != LSTKEXT && storage!=TYPDEF )
+            {
+                prefix();
+                outname(ptr->name,1);
+                col();
+                defstorage();
+                outdec(ptr->size);
+                nl();
+            }
         }
+        ++ptr;
+    }
 
-        if (appz88 && !asxx) outstr("}\n");      /* close defvars statement */
+    /* Switch back to standard section */
+    output_section("code");
 }
 
 /*
@@ -766,7 +755,7 @@ void dumplits(
 
     if ( queueptr ) {
         if ( pr_label ) {
-			if (asxx) ol(".area _TEXT");
+            output_section("text");
             prefix(); queuelabel(queuelab) ;
             col() ; nl();
         }
@@ -784,28 +773,11 @@ void dumplits(
                     lit=getint(queue+k,1);
                     if (lit >= 32 && lit <= 126  && lit != '"' ) outbyte(lit);
                     else {
-						if (asxx) {
-							outstr("\"\n");
-							defbyte();
-							outdec(lit);
-							nl();
-							lit=0;
-						} else {
-                            /* Now z80asm */
-                            if ( usempm ) {
-                                outstr("\",");
-                            } else {
-                                outstr("\"&");
-                            }
-                            outdec(lit);
-                            if (lit) {
-                                if ( usempm ) {
-                                    outstr(",\"");
-                                } else {
-                                    outstr("&\"");
-                                }
-                            }
-						}
+                        outstr("\"\n");
+                        defbyte();
+                        outdec(lit);
+                        nl();
+                        lit=0;
                     }
                     k++;
                     if ( j == 0 || k >=queueptr || lit == 0 ) {
@@ -824,6 +796,7 @@ void dumplits(
                 }
             }
         }
+        output_section("code");
     }
     nl();
 }
@@ -1057,6 +1030,7 @@ struct args myargs[]= {
     {"no-expandz88",NO,UnSetExpand, "Enable use on non-expanded z88"},
 	{"farheap=",YES,SetFarHeap, "Set the size of the far heap (z88)"},
 	{"debug=",YES,SetDebug, "Enable some extra logging" },
+	{"asm=",YES,SetAssembler, "Set the assembler mode to use" },
 	{"asxx",NO,SetASXX, "Use asxx as the output format"},
 	{"doublestr",NO,SetDoubleStrings, "Convert fp strings to values at runtime"},
 	{"noaltreg",NO,SetNoAltReg, "Don't use alternate registers" },
@@ -1068,7 +1042,6 @@ struct args myargs[]= {
 /* Compatibility Modes.. */
     {"f",NO,SetUnsigned, NULL},
     {"l",NO,SetFarPtrs, NULL},
-    {"mpm",NO,SetMPM, "Enable MPM output mode"},
     {"",0, NULL, NULL}
 };
 
@@ -1092,10 +1065,6 @@ void SetFrameIY(char *arg)
 }
 #endif
 
-void SetMPM(char *arg)
-{
-    usempm = YES;
-}
 
 void SetDoubleStrings(char *arg)
 {
@@ -1109,7 +1078,7 @@ void SetNoAltReg(char *arg)
 
 void SetASXX(char *arg)
 {
-	asxx=YES;
+    assemtype = ASM_ASXX;
 }
 
 /* farheap= */
@@ -1373,6 +1342,21 @@ void SetUndefine(char *arg)
 {
         strcpy(line,arg+1);
         delmac();
+}
+
+void SetAssembler(char *arg)
+{
+    char  assembler[128];
+
+    if ( 1 == sscanf(arg+4,"%s",assembler) ) {
+        if ( strcmp(assembler,"z80asm") == 0 || strcmp(assembler,"mpm") == 0 ) {
+            assemtype = ASM_Z80ASM;
+        } else if ( strcmp(assembler,"asxx") == 0 ) {
+            assemtype = ASM_ASXX;
+        } else if ( strcmp(assembler,"vasm") == 0 ) {
+            assemtype = ASM_VASM;
+        }
+    }
 }
 
 void DispInfo(char *arg)

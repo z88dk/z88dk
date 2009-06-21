@@ -1,6 +1,6 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.9 2007-01-10 09:43:24 stefano Exp $
+ * $Id: define.h,v 1.10 2009-06-21 21:16:52 dom Exp $
  */
 
 /*      Stand-alone definitions                 */
@@ -349,3 +349,11 @@ struct varid {
 #define DBG_ALL  99
 
 #define Z80ASM_PREFIX "_"
+
+
+/* Assembler modes */
+#define ASM_Z80ASM  0
+#define ASM_ASXX    1
+#define ASM_VASM    2
+
+#define ISASM(x) ( assemtype == (x) )

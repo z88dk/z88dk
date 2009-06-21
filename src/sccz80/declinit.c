@@ -10,7 +10,7 @@
  * 
  *      3/2/02 djm - Unspecified structure members are now padded out
  *
- *      $Id: declinit.c,v 1.12 2004-03-26 22:06:09 denniz Exp $
+ *      $Id: declinit.c,v 1.13 2009-06-21 21:16:52 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -20,92 +20,92 @@
  * initialise global object
  */
 int initials(char *sname,
-	     int type, int ident, int dim, int more,
-	     TAG_SYMBOL * tag, char zfar)
+             int type, int ident, int dim, int more,
+             TAG_SYMBOL * tag, char zfar)
 {
     int size, desize = 0;
     int olddim = dim;
 
 
     if (cmatch('=')) {
-	/* initialiser present */
-	defstatic = 1;		/* So no 2nd redefine djm */
-	gltptr = 0;
-	glblab = getlabel();
-	if (dim == 0)
-	    dim = -1;
-	switch (type) {
-	case CCHAR:
-	    size = 1;
-	    break;
-	case LONG:
-	    size = 4;
-	    break;
-	case CINT:
-	default:
-	    size = 2;
-	}
+        /* initialiser present */
+        defstatic = 1;		/* So no 2nd redefine djm */
+        gltptr = 0;
+        glblab = getlabel();
+        if (dim == 0)
+            dim = -1;
+        switch (type) {
+        case CCHAR:
+            size = 1;
+            break;
+        case LONG:
+            size = 4;
+            break;
+        case CINT:
+        default:
+            size = 2;
+        }
 	    
-	if (asxx)
-	    ol(".area _TEXT");
-	prefix();
-	outname(sname, YES);
-	nl();
+        output_section("text");
+        prefix();
+        outname(sname, YES);
+        col();
+        nl();
 
-	if (cmatch('{')) {
-	    /* aggregate initialiser */
-	    if ((ident == POINTER || ident == VARIABLE) && type == STRUCT) {
-		/* aggregate is structure or pointer to structure */
+        if (cmatch('{')) {
+            /* aggregate initialiser */
+            if ((ident == POINTER || ident == VARIABLE) && type == STRUCT) {
+                /* aggregate is structure or pointer to structure */
                 dim = 0; olddim = 1;
-		if (ident == POINTER)
-		    point();
-		str_init(tag);
-	    } else {
-		/* aggregate is not struct or struct pointer */
-		agg_init(size, type, ident, &dim, more, tag);
-	    }
-	    needchar('}');
-	} else {
-	    /* single initialiser */
-	    init(size, ident, &dim, more, 0, 0);
-	}
+                if (ident == POINTER)
+                    point();
+                str_init(tag);
+            } else {
+                /* aggregate is not struct or struct pointer */
+                agg_init(size, type, ident, &dim, more, tag);
+            }
+            needchar('}');
+        } else {
+            /* single initialiser */
+            init(size, ident, &dim, more, 0, 0);
+        }
 
 
-	/* dump literal queue and fill tail of array with zeros */
-	if ((ident == ARRAY && more == CCHAR) || type == STRUCT) {
+        /* dump literal queue and fill tail of array with zeros */
+        if ((ident == ARRAY && more == CCHAR) || type == STRUCT) {
             if (type == STRUCT) {
-		dumpzero(tag->size, dim);
+                dumpzero(tag->size, dim);
                 desize = dim < 0 ? abs(dim+1)*tag->size : olddim * tag->size;
             } else { /* Handles unsized arrays of chars */
-		dumpzero(size, dim);
+                dumpzero(size, dim);
                 dim = dim < 0 ? abs(dim+1) : olddim;
                 cscale(type,tag,&dim);
                 desize = dim;
             }
             dumplits(0, YES, gltptr, glblab, glbq);
-	} else {
-	    if (!(ident == POINTER && type == CCHAR)) {
-		dumplits(((size == 1) ? 0 : size), NO, gltptr, glblab,glbq);
-		if ( type != CCHAR )  /* Already dumped by init? */
-		    desize = dumpzero(size, dim);
+        } else {
+            if (!(ident == POINTER && type == CCHAR)) {
+                dumplits(((size == 1) ? 0 : size), NO, gltptr, glblab,glbq);
+                if ( type != CCHAR )  /* Already dumped by init? */
+                    desize = dumpzero(size, dim);
                 dim = dim < 0 ? abs(dim+1) : olddim;
                 cscale(type,tag,&dim);
                 desize = dim;
             }             
-                
-	}
+        }
+        output_section("code");
     } else {
-	char *dosign, *typ;
-	dosign = "";
-	if (ident == ARRAY && (dim == 0)) {
-	    typ = ExpandType(more, &dosign, (tag - tagtab));
-	    warning(W_NULLARRAY, dosign, typ);
-	}
-	/* no initialiser present, let loader insert zero */
-	if (ident == POINTER)
-	    type = (zfar ? CPTR : CINT);
-	cscale(type, tag, &dim);
-	desize = dim;
+        char *dosign, *typ;
+        dosign = "";
+        if (ident == ARRAY && (dim == 0)) {
+            typ = ExpandType(more, &dosign, (tag - tagtab));
+            warning(W_NULLARRAY, dosign, typ);
+        }
+        /* no initialiser present, let loader insert zero */
+        if (ident == POINTER)
+            type = (zfar ? CPTR : CINT);
+        cscale(type, tag, &dim);
+        desize = dim;
     }
     return (desize);
 }

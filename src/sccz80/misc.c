@@ -10,14 +10,6 @@
 
 
 
-/* Prefix for assembler */
-
-
-void prefix()
-{
-	if (!asxx)
-        	outbyte('.');
-}
 
 /* Generic change suffix routine */
 

@@ -6,7 +6,7 @@
  *      I'm starting to split these up once more and stick them in
  *      the relevant files..
  *
- *      $Id: data.c,v 1.33 2007-09-09 15:29:33 dom Exp $
+ *      $Id: data.c,v 1.34 2009-06-21 21:16:52 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -147,10 +147,10 @@ int shareoffset;
 int debuglevel;	
 
 /*
- * Using asxxx?
+ * Assembler type
  */
 
-int asxx;
+int assemtype;
 
 /*
  * Enums defined

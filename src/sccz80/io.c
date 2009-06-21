@@ -3,10 +3,11 @@
  *
  *      Various compiler file i/o routines
  *
- *      $Id: io.c,v 1.6 2006-06-18 13:03:13 dom Exp $
+ *      $Id: io.c,v 1.7 2009-06-21 21:16:52 dom Exp $
  */
 
 #include "ccdefs.h"
+#include <stdarg.h>
 
 #ifdef INBUILT_OPTIMIZER
 int opt_outc(char c);
@@ -86,17 +87,7 @@ void queuelabel(int label)
 
 
 
-/* Print specified number as label */
-void printlabel(int label)
-{
-	if (asxx) {
-		outdec(label);
-		outstr("$");
-	} else {
-        	outstr("i_");
-        	outdec(label);
-	}
-}
+
 
 /* print label with colon and newline */
 void postlabel(int label)
@@ -287,6 +278,18 @@ void outstr(char ptr[])
 		while(outbyte(*ptr++));
 }
 
+void outfmt(char *fmt,...)
+{
+    char   buf[1024];
+    va_list ap;
+
+    va_start(ap,fmt);
+
+    vsnprintf(buf,sizeof(buf),fmt,ap);
+    va_end(ap);
+    outstr(buf);
+}
+
 void nl()
 {
 		outbyte('\n');
@@ -297,11 +300,6 @@ void tab()
 		outbyte('\t');
 }
 
-void col()
-{
-	if (asxx)
-		  outbyte(58);
-}
 
 void bell()
 {

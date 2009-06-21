@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.10 2009-06-13 20:10:37 dom Exp $
+ *      $Id: declfunc.c,v 1.11 2009-06-21 21:16:52 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -363,6 +363,8 @@ void setlocvar(SYMBOL *prevarg,SYMBOL *currfn)
         tofile();
     }
 
+    output_section("code");
+
     nl();prefix();outname(currfn->name,dopref(currfn));col();nl();  /* print function name */
 
     infunc=1;       /* In a function for sure! */
@@ -451,13 +453,9 @@ void setlocvar(SYMBOL *prevarg,SYMBOL *currfn)
         leave(NO,NO) ;
     }
     CleanGoto();
-    /* Asz80 needs a label at the end to sort out local symbols */
-	if (asxx) {
-        nl();prefix();
-		outstr("smce_");
-		outname(currfn->name,NO);
-		col();nl();
-	}
+    function_appendix(currfn);
+
+
 #ifdef INBUILT_OPTIMIZER
     generate();
 #endif

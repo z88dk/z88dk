@@ -1,3 +1,4 @@
+
 /* io.c */
 extern int getint(unsigned char *addr, int len);
 extern void putint(int i, unsigned char *addr, int len);
@@ -17,6 +18,7 @@ extern void tofile(void);
 extern int outbyte(char c);
 extern int outstage(char c);
 extern void outstr(char ptr[]);
+extern void outfmt(char *fmt,...);
 extern void nl(void);
 extern void tab(void);
 extern void col(void);

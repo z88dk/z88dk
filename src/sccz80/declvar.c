@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.16 2007-07-05 18:39:00 dom Exp $
+ *      $Id: declvar.c,v 1.17 2009-06-21 21:16:52 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -573,9 +573,9 @@ char zfar)               /* Far pointer thing.. */
             }
             if (rcmatch('=') ) {
                 /*
-                 *      Insert the jump in...
+                 *      Insert the jump in... (remove this z80asm hack)
                  */
-                if (lstdecl++ == 0 ) {
+                if (lstdecl++ == 0 && ISASM(ASM_Z80ASM) ) {
                     jump(lstlab=getlabel());
                 }
                 initials(sname2, type, ident, dsize, more, otag,zfar);

@@ -93,7 +93,7 @@ extern int  lstdecl;
 extern int  lstlab;
 extern int shareoffset;
 extern int debuglevel;
-extern int asxx;
+extern int assemtype;
 extern int indexix;
 extern int useframe;
 extern int defdenums;

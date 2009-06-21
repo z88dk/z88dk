@@ -126,4 +126,4 @@ extern void savehl(void);
 extern void savede(void);
 extern void restorehl(void);
 extern void restorede(void);
-
+extern void output_section(char *section_name);
