@@ -14,7 +14,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.20 2009-06-13 17:36:24 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.21 2009-06-22 22:12:53 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -109,6 +109,10 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "config.h"
 #include "symbol.h"
 #include "z80asm.h"
+
+#ifdef WIN32
+#define snprintf _snprintf
+#endif
 
 /* external functions */
 char *AllocIdentifier (size_t len);

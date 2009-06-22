@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.38 2009-06-22 21:13:19 dom Exp $
+ *      $Id: zcc.c,v 1.39 2009-06-22 22:12:53 dom Exp $
  */
 
 
@@ -125,7 +125,9 @@
 #include        <ctype.h>
 #include        "zcc.h"
 
-
+#ifdef WIN32
+#define strcasecmp(a,b) stricmp(a,b)
+#endif
 
 /* All our function prototypes */
 

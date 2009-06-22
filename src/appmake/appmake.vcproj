@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="appmake"
 	ProjectGUID="{36242CB0-B746-49EF-AC14-66E2F8085784}"
+	RootNamespace="appmake"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -255,6 +256,10 @@
 			</File>
 			<File
 				RelativePath=".\tixx.c"
+				>
+			</File>
+			<File
+				RelativePath=".\trs80.c"
 				>
 			</File>
 			<File
