@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.25 2009-06-21 21:50:42 dom Exp $
+ * $Id: zcc.h,v 1.26 2009-06-22 21:13:20 dom Exp $
  */
 
 /* Very contrived, if not a Windows target then include the config file */
@@ -15,10 +15,10 @@
 
 /* Some machine specific definitions (paths etc!) */
 
-char *version = "v2.57 (C) 7.10.2007 D.J.Morris\n";
+char *version = "v2.58 (C) 22.6.2009 D.J.Morris\n";
 
 #ifdef AMIGA
-char *amiver="$VER: zcc v2.57 (7.10.2007)";
+char *amiver="$VER: zcc v2.58 (22.06.2009)";
 #endif
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
@@ -81,11 +81,12 @@ struct args {
 
 struct confs {
     char *name;
+    char *alias;
     void (*setfunc)(char *,int);
     char *def;
 };
 
-enum iostyle { outimplied=0, outspecified, filter };
+enum iostyle { outimplied=0, outspecified, filter, outspecified_flag };
 
-enum conf { OPTIONS, Z80EXE, CPP, LINKER, COMPILER, COPTEXE, COPYCMD, INCPATH, COPTRULES1, COPTRULES2, COPTRULES3, CRT0, LIBPATH,  LINKOPTS, ASMOPTS, APPMAKE, Z88MATHLIB,  Z88MATHFLG, STARTUPLIB, GENMATHLIB, CPPSTYLE  };
+enum conf { OPTIONS, Z80EXE, CPP, LINKER, COMPILER, COPTEXE, COPYCMD, INCPATH, COPTRULES1, COPTRULES2, COPTRULES3, CRT0, LINKOPTS, ASMOPTS, APPMAKE, Z88MATHLIB,  Z88MATHFLG, STARTUPLIB, GENMATHLIB, CPPSTYLE, VASMOPTS, ASZ80OPTS, VLINKOPTS, ASLINKOPTS, MPMEXE, LIBPATH };
 

@@ -115,7 +115,7 @@
  *	29/1/2001 - Added in -Ca flag to pass commands to assembler on
  *	assemble pass (matches -Cp for preprocessor)
  *
- *      $Id: zcc.c,v 1.37 2009-06-21 21:50:42 dom Exp $
+ *      $Id: zcc.c,v 1.38 2009-06-22 21:13:19 dom Exp $
  */
 
 
@@ -178,6 +178,7 @@ void SetNormal(char *,int);
 void SetOptions(char *,int);
 void SetNumber(char *,int);
 void SetConfig(char *, int);
+static void       Deprecated(char *arg, int num);
 void KillEOL(char *);
 
 void CleanUpFiles(void);
@@ -235,28 +236,32 @@ struct args myargs[]= {
 
 
 struct confs myconf[]={
-    {"OPTIONS",SetOptions,NULL},
-    {"Z80EXE",SetNormal,NULL},
-    {"CPP",SetNormal,NULL},
-    {"LINKER",SetNormal,NULL},
-    {"COMPILER",SetNormal,NULL},
-    {"COPTEXE",SetNormal,NULL},
-    {"COPYCMD",SetNormal,NULL},
-    {"INCPATH",SetNormal,NULL},
-    {"COPTRULES1",SetNormal,NULL},
-    {"COPTRULES2",SetNormal,NULL},
-	{"COPTRULES3",SetNormal,NULL},
-    {"CRT0",SetNormal,NULL},
-    {"LIBPATH",SetNormal,NULL},
-    {"LINKOPTS",SetOptions,NULL},
-    {"ASMOPTS",SetOptions,NULL},
-    {"APPMAKE",SetNormal,NULL},
-    {"Z88MATHLIB",SetNormal,NULL},
-    {"Z88MATHFLG",SetNormal,NULL},
-    {"STARTUPLIB",SetNormal,NULL},
-    {"GENMATHLIB",SetNormal,NULL},
-	{"STYLECPP",SetNumber,NULL},
-	{"MPMEXE",SetNumber,NULL},
+    {"OPTIONS",NULL,SetOptions,NULL},
+    {"Z80EXE","ASSEMBLER", SetNormal,NULL},
+    {"CPP",NULL,SetNormal,NULL},
+    {"LINKER",NULL,SetNormal,NULL},
+    {"COMPILER",NULL,SetNormal,NULL},
+    {"COPTEXE",NULL,SetNormal,NULL},
+    {"COPYCMD",NULL,SetNormal,NULL},
+    {"INCPATH",NULL,SetNormal,NULL},
+    {"COPTRULES1",NULL,SetNormal,NULL},
+    {"COPTRULES2",NULL,SetNormal,NULL},
+	{"COPTRULES3",NULL,SetNormal,NULL},
+    {"CRT0",NULL,SetNormal,NULL},
+    {"LINKOPTS",NULL,SetOptions,NULL},
+    {"ASMOPTS",NULL,SetOptions,NULL},
+    {"APPMAKE",NULL,SetNormal,NULL},
+    {"Z88MATHLIB",NULL,SetNormal,NULL},
+    {"Z88MATHFLG",NULL,SetNormal,NULL},
+    {"STARTUPLIB",NULL,SetNormal,NULL},
+    {"GENMATHLIB",NULL,SetNormal,NULL},
+	{"STYLECPP",NULL,SetNumber,NULL},
+    {"VASMOPTS",NULL,SetOptions,NULL},
+    {"ASZ80OPTS",NULL,SetOptions,NULL},
+    {"VLINKOPTS",NULL,SetOptions,NULL},
+    {"ASLINKOPTS",NULL,SetOptions,NULL},
+	{"MPMEXE",NULL,Deprecated,NULL},
+    {"LIBPATH",NULL,Deprecated,NULL },
     {"",NULL,NULL}
 };
 
@@ -308,6 +313,8 @@ char	extension[5];
 #define ASM_ASXX   1
 #define ASM_VASM   2
 int      assembler_type = ASM_Z80ASM;
+enum iostyle assembler_style = outimplied;
+int linker_output_separate_arg = 0;
 
 #define IS_ASM(x)  ( assembler_type == (x) ) 
 
@@ -395,6 +402,14 @@ int process(suffix, nextsuffix, processor, extraargs, ios,number,needsuffix)
                 orgfiles[number], outname);
         free(outname);
         break;
+    case outspecified_flag:
+        outname = changesuffix(filelist[number], nextsuffix);
+        buffer = mustmalloc(strlen(processor) + strlen(extraargs)
+                            + strlen(orgfiles[number]) + strlen(outname) + 4);
+        sprintf(buffer, "%s %s %s -o %s", processor, extraargs,
+                filelist[number], outname);
+        free(outname);
+        break;
     case filter:
         outname = changesuffix(filelist[number], nextsuffix);
         buffer = mustmalloc(strlen(processor) + strlen(extraargs)
@@ -452,7 +467,7 @@ int linkthem(char *linker)
     p = mustmalloc(n);
 
 
-    sprintf(p, "%s %s -o%s ", linker,myconf[LINKOPTS].def,outputfile);
+    sprintf(p, "%s %s -o%s%s ", linker,myconf[LINKOPTS].def,linker_output_separate_arg ? " " : "", outputfile);
     if      (lateassemble)             /* patch */
         strcat(p,asmline);      /* patch */
     if      (z80verbose )
@@ -462,9 +477,8 @@ int linkthem(char *linker)
             fprintf(stderr,"Cannot relocate an application..\n");
         else strcat(p,"-R ");
     }
-    if ( !IS_ASM(ASM_Z80ASM) ) {
-        linkargs_mangle(linkargs);
-    }
+
+    linkargs_mangle(linkargs);
     strcat(p,linkargs);
 /* Now insert the 0crt file (so main doesn't have to be the first file
  * linkargs last character is space..
@@ -550,7 +564,7 @@ int main(int argc, char **argv)
  *      Now, set the linkargs list up to initially consist of
  *      the startuplib
  */
-    snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[STARTUPLIB].def);
+    snprintf(buffer,sizeof(buffer),"-l%s ",myconf[STARTUPLIB].def);
     BuildOptions(&linkargs,buffer);
 
 /*
@@ -700,12 +714,12 @@ int main(int argc, char **argv)
             default:
                 BuildAsmLine(asmarg,"-easm");
                 if (!assembleonly && !lateassemble)
-                    if (process(".asm", OBJEXT, myconf[Z80EXE].def, asmarg , outimplied,i,YES)) exit(1);
+                    if (process(".asm", OBJEXT, myconf[Z80EXE].def, asmarg , assembler_style,i,YES)) exit(1);
             }
         case OFILE:
             BuildAsmLine(asmarg,"-eopt");
             if (!assembleonly && !lateassemble)
-                if (process(".opt", OBJEXT, myconf[Z80EXE].def, asmarg , outimplied,i,YES)) exit(1);
+                if (process(".opt", OBJEXT, myconf[Z80EXE].def, asmarg , assembler_style ,i,YES)) exit(1);
             break;
         }
     }
@@ -782,8 +796,12 @@ void BuildAsmLine(char *dest, char *prefix)
     }
     if (z80verbose)
         strcat(dest," -v ");   
-    if      (!symbolson && IS_ASM(ASM_Z80ASM))
-        strcat(dest," -ns ");
+    if ( IS_ASM(ASM_Z80ASM) ) {
+        if ( !symbolson ) {
+            strcat(dest," -ns ");
+        }
+    }
+
     strcat(dest,myconf[ASMOPTS].def);
 }
 
@@ -946,17 +964,17 @@ void AddLinkLibrary(char *arg)
  */
     if (strcmp(arg,"lmz")==0) {
         parse_option(myconf[Z88MATHFLG].def);
-        snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[Z88MATHLIB].def);
+        snprintf(buffer,sizeof(buffer),"-l%s ",myconf[Z88MATHLIB].def);
         BuildOptions_start(&linkargs,buffer);
 		return;
 	} else if (strcmp(arg,"lm") == 0 ) {
-        snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,myconf[GENMATHLIB].def);
+        snprintf(buffer,sizeof(buffer),"-l%s ",myconf[GENMATHLIB].def);
         BuildOptions_start(&linkargs,buffer);
 		return;
 	}
 
     /* Add on the necessary prefix for libraries */
-    snprintf(buffer,sizeof(buffer),"%s%s ",myconf[LIBPATH].def,arg+1);
+    snprintf(buffer,sizeof(buffer),"-l%s ",arg+1);
     BuildOptions_start(&linkargs,buffer);
 }
 
@@ -1138,7 +1156,8 @@ void ParseOpts(char *arg)
     pargs=myconf;
 
     while(pargs->setfunc) {
-        if (strncmp(arg,pargs->name,strlen(pargs->name))==0) {
+        if (strncmp(arg,pargs->name,strlen(pargs->name))==0 ||
+            (pargs->alias && strncmp(arg,pargs->alias,strlen(pargs->alias))==0) ) {
             (*pargs->setfunc)(arg,num);
             return;
         }
@@ -1178,15 +1197,23 @@ void SetNumber(char *arg,int num)
         myconf[num].def=(char *)(style-1);
 }
 
+/** \brief Handler for a deprecated option in the config file
+ *
+ *  \param arg - Argument
+ *  \param num - Argument number to set
+ */
+static void Deprecated(char *arg, int num)
+{
+    /* Deprecated, ignore */
+}
+
 void SetNormal(char *arg,int num)
 {
     char name[LINEMAX+1];
 	char *ptr,*ptr2;
-    sscanf(arg,"%s%s",name,name);
+    sscanf(arg,"%s %s",name,name);
 
-	ptr = &arg[strlen(myconf[num].name)+1];
-	while (*ptr && isspace(*ptr))
-		++ptr;
+    ptr = name;
 
 	if ( ptr2 = strchr(ptr,'\n') )
 		*ptr2 = 0;
@@ -1207,26 +1234,48 @@ static int SetAssemblerType(char *name)
 {
     char  *assembler = NULL;
     char  *linker = NULL;
-    int    style = ASM_Z80ASM;
+    char  *ptr;
+    int    type = ASM_Z80ASM;
+    enum iostyle style = outimplied;
 
     if ( strcasecmp(name,"z80asm") == 0 ) {
-        style = ASM_Z80ASM;
+        type = ASM_Z80ASM;
         linker = "z80asm";
         assembler = "z80asm";
     } else if ( strcasecmp(name,"mpm") == 0 ) {
-        style = ASM_Z80ASM;
+        type = ASM_Z80ASM;
         linker = "mpm";
         assembler = "mpm";
     } else if ( strcasecmp(name,"asxx") == 0 ) {
-        style = ASM_ASXX;
+        type = ASM_ASXX;
         linker = "alink";
         assembler = "asz80";
+        ptr = myconf[ASMOPTS].def;
+        myconf[ASMOPTS].def = myconf[ASZ80OPTS].def ? myconf[ASZ80OPTS].def : strdup("");
+        myconf[ASZ80OPTS].def = ptr;
+        ptr = myconf[LINKOPTS].def;
+        myconf[LINKOPTS].def = myconf[ASLINKOPTS].def ? myconf[ASLINKOPTS].def : strdup("");
+        myconf[ASLINKOPTS].def = ptr;
     } else if ( strcasecmp(name,"vasm") == 0 ) {
-        style = ASM_VASM;
+        type = ASM_VASM;
         linker = "vlink";
         assembler = "vasm";
+
+        /* Switch config around */
+        ptr = myconf[ASMOPTS].def;
+        myconf[ASMOPTS].def = myconf[VASMOPTS].def ? myconf[VASMOPTS].def : strdup("");
+        myconf[VASMOPTS].def = ptr;
+        ptr = myconf[LINKOPTS].def;
+        myconf[LINKOPTS].def = myconf[VLINKOPTS].def ? myconf[VLINKOPTS].def : strdup("");
+        myconf[VLINKOPTS].def = ptr;
+
+        printf("Assembler opts = %s\n",myconf[ASMOPTS].def);
+
+        style = outspecified_flag;
+        linker_output_separate_arg = 1;
     }
-    assembler_type = style;
+    assembler_type = type;
+    assembler_style = style;
     if ( assembler ) {
         if ( myconf[Z80EXE].def ) {
             free(myconf[Z80EXE].def);
@@ -1240,7 +1289,7 @@ static int SetAssemblerType(char *name)
         myconf[LINKER].def = strdup(linker);
     }
 
-    return style;
+    return type;
 }
 
 void SetAssembler(char *arg)
@@ -1630,13 +1679,15 @@ void parse_option(char *option)
     }
 }
 
-/* Check link arguments (-i) to -l for mpm */
+/* Check link arguments (-l) to -i for z80asm */
 void linkargs_mangle()
 {
      char *ptr = linkargs;
 
-     while ( ( ptr = strstr(linkargs,"-i") ) != NULL ) {
-         ptr[1] = 'l';
+     if ( IS_ASM(ASM_Z80ASM) && strstr(myconf[LINKER].def,"z80asm") ) {
+         while ( ( ptr = strstr(linkargs,"-l") ) != NULL ) {
+             ptr[1] = 'i';
+         }
      }
 }
 
