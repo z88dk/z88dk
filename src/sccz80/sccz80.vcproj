@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="sccz80"
 	ProjectGUID="{F132AE45-BCBF-4B5A-A61A-8816E4A88941}"
+	RootNamespace="sccz80"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -16,7 +17,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
+			OutputDirectory="$(SolutionDir)\$(ConfigurationName)"
 			IntermediateDirectory="Debug"
 			ConfigurationType="1"
 			UseOfMFC="1"
@@ -92,7 +93,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
+			OutputDirectory="$(SolutionDir)\$(ConfigurationName)"
 			IntermediateDirectory="Release"
 			ConfigurationType="1"
 			>
