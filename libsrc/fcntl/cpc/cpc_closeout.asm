@@ -3,13 +3,13 @@
 ;
 ;	Donated by **_warp6_** <kbaccam@free.fr>
 ;
-;	$Id: cpc_closeout.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
+;	$Id: cpc_closeout.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
 
 
 
 		XLIB		cpc_closeout
 
-		INCLUDE		"#cpcfirm.def"
+		INCLUDE		"cpcfirm.def"
 
 
 .cpc_closeout

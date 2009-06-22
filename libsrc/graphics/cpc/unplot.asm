@@ -4,7 +4,7 @@
 ;	by Stefano Bodrato  - Jul 2004
 ;
 ;
-;	$Id: unplot.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
+;	$Id: unplot.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
 ;
 
 ;Usage: unplot(struct *pixel)
@@ -23,7 +23,7 @@
                 
         XLIB    unplot
 
-        INCLUDE "#cpcfirm.def"
+        INCLUDE "cpcfirm.def"
         INCLUDE	"graphics/grafix.inc"
 
 

@@ -9,16 +9,16 @@
 ;
 ;	Get a VDP register value
 ;
-;	$Id: get_vdp_reg.asm,v 1.3 2009-05-28 20:52:08 stefano Exp $
+;	$Id: get_vdp_reg.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	get_vdp_reg
 
 
 IF FORmsx
-        INCLUDE "#msxbasic.def"
+        INCLUDE "msxbasic.def"
 ELSE
-        INCLUDE "#svibasic.def"
+        INCLUDE "svibasic.def"
 ENDIF
 
 get_vdp_reg:

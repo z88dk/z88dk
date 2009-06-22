@@ -10,7 +10,7 @@
 ;double cos(double)
 ;Number in FA..
 
-                INCLUDE  "#fpp.def"
+                INCLUDE  "fpp.def"
 
                 XLIB    cos
 

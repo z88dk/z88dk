@@ -12,8 +12,8 @@
 
 	LIB	no_zsock
 
-	INCLUDE	"#packages.def"
-	INCLUDE	"#zsock.def"
+	INCLUDE	"packages.def"
+	INCLUDE	"zsock.def"
 
 .GoTCP
 	call_pkg(tcp_GoTCP)

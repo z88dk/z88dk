@@ -2,7 +2,7 @@
 ; 26/3/00 GWL
 
 	XLIB	opwin
-	include	"#stdio.def"
+	include	"stdio.def"
 
 .opwin	ld	hl,windef
 	call_oz(gn_sop)

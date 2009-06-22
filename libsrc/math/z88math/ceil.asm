@@ -12,7 +12,7 @@
 ;
 ;This is implemented as  -(floor(-x))
 
-                INCLUDE  "#fpp.def"
+                INCLUDE  "fpp.def"
 
                 XLIB    ceil
 

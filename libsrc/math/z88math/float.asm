@@ -11,7 +11,7 @@
 ;Convert from integer to FP..
 ;We could enter in here with a long in dehl, so, mod to compiler I think!
 
-                INCLUDE  "#fpp.def"
+                INCLUDE  "fpp.def"
 
                 XLIB    float
                 XREF    fa

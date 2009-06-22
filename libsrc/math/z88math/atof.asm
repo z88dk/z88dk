@@ -10,7 +10,7 @@
 ;double atof(char *)     - convert string to number, leave in fa
 
 
-                INCLUDE  "#fpp.def"
+                INCLUDE  "fpp.def"
 
                 XLIB    atof
 

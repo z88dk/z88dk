@@ -6,7 +6,7 @@
 ;	read from joystick port
 ;
 ;
-;	$Id: svi_slstick.asm,v 1.3 2009-05-27 10:41:08 stefano Exp $
+;	$Id: svi_slstick.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	svi_slstick
@@ -14,9 +14,9 @@
 	
 
 IF FORmsx
-        INCLUDE "#msx.def"
+        INCLUDE "msx.def"
 ELSE
-        INCLUDE "#svi.def"
+        INCLUDE "svi.def"
 ENDIF
 
 

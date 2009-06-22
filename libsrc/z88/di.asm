@@ -13,7 +13,7 @@
 
                XLIB    di
 
-                INCLUDE "#interrpt.def"
+                INCLUDE "interrpt.def"
 
 .di
         call    oz_di

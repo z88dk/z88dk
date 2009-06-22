@@ -7,7 +7,7 @@
 ;
 ;       djm 2/4/99
 
-                INCLUDE "#stdio.def"
+                INCLUDE "stdio.def"
 
                 XLIB    putconsole
 

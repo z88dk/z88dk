@@ -8,7 +8,7 @@
 ;
 ;       But still not working!
 
-        INCLUDE "#stdio.def"
+        INCLUDE "stdio.def"
 
         XLIB    sqrt
 

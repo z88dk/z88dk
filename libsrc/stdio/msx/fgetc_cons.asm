@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - Apr. 2001
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.5 2009-05-21 06:58:11 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.6 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	fgetc_cons
@@ -14,9 +14,9 @@
 
 
 IF FORmsx
-        INCLUDE "#msxbios.def"
+        INCLUDE "msxbios.def"
 ELSE
-        INCLUDE "#svibios.def"
+        INCLUDE "svibios.def"
 ENDIF
 
 

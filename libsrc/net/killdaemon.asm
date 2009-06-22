@@ -12,8 +12,8 @@
 
 	LIB	no_zsock
 
-	INCLUDE	"#packages.def"
-	INCLUDE	"#zsock.def"
+	INCLUDE	"packages.def"
+	INCLUDE	"zsock.def"
 
 .killdaemon
 	ld	a,r_killdaemon

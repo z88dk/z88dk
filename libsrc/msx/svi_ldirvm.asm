@@ -6,12 +6,12 @@
 ;	FILVRM
 ;
 ;
-;	$Id: svi_ldirvm.asm,v 1.1 2009-05-21 06:58:11 stefano Exp $
+;	$Id: svi_ldirvm.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	LDIRVM
 	
-        INCLUDE "#svi.def"
+        INCLUDE "svi.def"
 	
 LDIRVM:
 	ex	de,hl

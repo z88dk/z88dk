@@ -17,7 +17,7 @@
 
                XLIB    freescr
 
-                INCLUDE "#saverst.def"
+                INCLUDE "saverst.def"
 
 .freescr
         pop     bc

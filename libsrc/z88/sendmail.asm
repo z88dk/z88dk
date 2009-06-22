@@ -17,7 +17,7 @@
 
                 XLIB    sendmail
 
-                INCLUDE "#saverst.def"
+                INCLUDE "saverst.def"
 
 .sendmail
         ld      hl,2

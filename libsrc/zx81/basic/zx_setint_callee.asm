@@ -6,7 +6,7 @@
 ; 
 ;	int __CALLEE__ zx_setint_callee(char *variable, int value); 
 ; 
-;	$Id: zx_setint_callee.asm,v 1.1 2008-07-29 09:19:46 stefano Exp $ 
+;	$Id: zx_setint_callee.asm,v 1.2 2009-06-22 21:44:17 dom Exp $ 
 ;  	
 
 XLIB	zx_setint_callee
@@ -14,7 +14,7 @@ XDEF 	ASMDISP_ZX_SETINT_CALLEE
 
 LIB	zx_locatenum
 
-INCLUDE  "#81fp.def"
+INCLUDE  "81fp.def"
 
 zx_setint_callee:
 

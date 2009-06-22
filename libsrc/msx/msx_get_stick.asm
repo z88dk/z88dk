@@ -8,7 +8,7 @@
 ;
 ;	Get state of a specified joystick number id
 ;
-;	$Id: msx_get_stick.asm,v 1.3 2009-05-21 06:58:11 stefano Exp $
+;	$Id: msx_get_stick.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
 ;
 
 
@@ -18,9 +18,9 @@
 	LIB	msxbios
 
 IF FORmsx
-        INCLUDE "#msxbios.def"
+        INCLUDE "msxbios.def"
 ELSE
-        INCLUDE "#svibios.def"
+        INCLUDE "svibios.def"
 ENDIF
 
 _st_dir:

@@ -12,14 +12,14 @@
 ;	djm 6/6/2000
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.3 2001-05-02 09:21:51 dom Exp $
+;	$Id: f_ansi_attr.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	ansi_attr
 
 	XREF	invrs
 
-	INCLUDE	"#stdio.def"
+	INCLUDE	"stdio.def"
 
 .ansi_attr
         and     a

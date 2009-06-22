@@ -4,12 +4,12 @@
 ;
 ;       void bios_msg(int status)
 ;
-;       $Id: bios_msg.asm,v 1.1 2008-05-26 06:38:07 stefano Exp $
+;       $Id: bios_msg.asm,v 1.2 2009-06-22 21:44:16 dom Exp $
 ;
 
         XLIB    bios_msg
 
-        INCLUDE "#cpcfirm.def"              
+        INCLUDE "cpcfirm.def"              
 
 
 .bios_msg

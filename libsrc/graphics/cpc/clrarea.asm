@@ -1,11 +1,11 @@
 
 	xlib	cleararea
 
-        INCLUDE "#cpcfirm.def"
+        INCLUDE "cpcfirm.def"
         INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: clrarea.asm,v 1.1 2008-03-27 08:26:40 stefano Exp $
+;	$Id: clrarea.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
 ;
 
 ; ***********************************************************************

@@ -10,10 +10,10 @@
 ; If we can't have usleep we'll have csleep instead!
 ;
 ; -----
-; $Id: csleep.asm,v 1.3 2007-01-03 22:23:48 aralbrec Exp $
+; $Id: csleep.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
 
 
-                INCLUDE "#time.def"
+                INCLUDE "time.def"
 
                 XLIB    csleep
                 XDEF    ASMDISP_CSLEEP

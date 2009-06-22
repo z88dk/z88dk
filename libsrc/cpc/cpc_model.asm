@@ -7,10 +7,10 @@
 ;    2 - 6128
 
 
-; $Id: cpc_model.asm,v 1.2 2008-05-26 06:38:08 stefano Exp $
+; $Id: cpc_model.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
 
 
-        INCLUDE "#cpcfirm.def"              
+        INCLUDE "cpcfirm.def"              
 
         XDEF cpc_model
 

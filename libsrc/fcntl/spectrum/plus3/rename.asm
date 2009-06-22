@@ -6,13 +6,13 @@
 ;
 ;	int rename(char *source, char *dest)
 ;
-;	$Id: rename.asm,v 1.2 2003-10-10 11:05:02 dom Exp $
+;	$Id: rename.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
 
 
 		XLIB	rename
 		XREF	dodos
 
-		INCLUDE "#p3dos.def"
+		INCLUDE "p3dos.def"
 
 
 .rename

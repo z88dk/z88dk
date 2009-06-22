@@ -6,12 +6,12 @@
 ;	Stefano Bodrato - Jul. 2004
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
+;	$Id: f_ansi_cls.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
 ;
 
         XLIB	ansi_cls
 
-        INCLUDE "#cpcfirm.def"
+        INCLUDE "cpcfirm.def"
 
  .ansi_cls	
 	;ld	a,0	; 20x25x16 text mode

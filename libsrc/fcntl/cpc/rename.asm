@@ -8,7 +8,7 @@
 ;       source:  http://www.cepece.info/amstrad/source/rsxcall.html
 ;       ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
 ;
-;       $Id: rename.asm,v 1.1 2008-05-26 06:38:08 stefano Exp $
+;       $Id: rename.asm,v 1.2 2009-06-22 21:44:16 dom Exp $
 ;
 
         XLIB    rename
@@ -16,7 +16,7 @@
         LIB	cpc_rsx
         LIB	bios_msg
 
-        INCLUDE "#cpcfirm.def"              
+        INCLUDE "cpcfirm.def"              
 
 .rename
 

@@ -11,7 +11,7 @@
 ;Number in FA..
 
 
-                INCLUDE  "#fpp.def"
+                INCLUDE  "fpp.def"
 
                 XLIB    log
 

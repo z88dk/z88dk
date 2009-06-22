@@ -6,13 +6,13 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.3 2009-06-05 05:57:44 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	fgetc_cons
 	LIB	msxbios
 
-	INCLUDE "#m5bios.def"
+	INCLUDE "m5bios.def"
 
 .fgetc_cons
 	ld	ix,ACECHI

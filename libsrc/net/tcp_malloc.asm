@@ -12,8 +12,8 @@
 
 	LIB	no_zsock
 
-	INCLUDE	"#packages.def"
-	INCLUDE	"#zsock.def"
+	INCLUDE	"packages.def"
+	INCLUDE	"zsock.def"
 
 .tcp_malloc
 	ld	a,r_tcp_malloc

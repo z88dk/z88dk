@@ -8,7 +8,7 @@
 ; 11/3/99 Visited to fix, jp nz,feof_abort was jp z,feof_abort
 ; if we enter in with a std* stream then we exit with error
 ;
-                INCLUDE "#fileio.def"
+                INCLUDE "fileio.def"
 
                 XLIB    fdfeof
                 LIB     fhand_ck

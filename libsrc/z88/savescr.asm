@@ -17,7 +17,7 @@
 
                XLIB    savescr
 
-                INCLUDE "#saverst.def"
+                INCLUDE "saverst.def"
 
 .savescr
         ld      a,SR_SUS

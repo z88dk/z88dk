@@ -7,8 +7,8 @@
 ;
 ; Few little bugs sorted out 13/10/98
 
-                INCLUDE "#fileio.def"
-                INCLUDE "#stdio.def"
+                INCLUDE "fileio.def"
+                INCLUDE "stdio.def"
                 INCLUDE "libdefs.def"
 
                 XLIB    fdfputs

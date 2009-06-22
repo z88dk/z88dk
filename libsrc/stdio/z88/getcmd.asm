@@ -8,13 +8,13 @@
 ;       file can just be a ret
 ;
 ;
-;	$Id: getcmd.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;	$Id: getcmd.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
 ;
 
                 XLIB    getcmd
                 XREF    processcmd
 
-                INCLUDE "#stdio.def"
+                INCLUDE "stdio.def"
 
 
 .getcmd

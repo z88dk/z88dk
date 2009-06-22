@@ -3,7 +3,7 @@
 ;	by Stefano Bodrato, December 2007
 ;
 ;
-;	$Id: fill.asm,v 1.1 2007-12-18 09:00:43 stefano Exp $
+;	$Id: fill.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
 ;
 
 ;Usage: fill(struct *pixel)
@@ -15,7 +15,7 @@
 
 	LIB	msxextrom
 	LIB	msxbasic
-        INCLUDE "#msxbasic.def"
+        INCLUDE "msxbasic.def"
 
 	LIB	msx_breakoff
 	LIB	msx_breakon

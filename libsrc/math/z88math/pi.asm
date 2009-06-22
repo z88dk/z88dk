@@ -6,12 +6,12 @@
 ;
 ;	30th August 2003
 ;
-;	$Id: pi.asm,v 1.1 2008-07-27 21:44:58 aralbrec Exp $
+;	$Id: pi.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
 
 
 ;double pi(void) - returns the value of pi
 
-                INCLUDE  "#fpp.def"
+                INCLUDE  "fpp.def"
 
                 XLIB    pi
 

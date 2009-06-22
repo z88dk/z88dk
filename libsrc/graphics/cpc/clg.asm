@@ -4,13 +4,13 @@
 ;       Amstrad CPC version by Stefano Bodrato  15/6/2001
 ;
 ;
-;	$Id: clg.asm,v 1.6 2008-03-27 08:26:40 stefano Exp $
+;	$Id: clg.asm,v 1.7 2009-06-22 21:44:17 dom Exp $
 ;
 
 
         XLIB    clg
 
-        INCLUDE "#cpcfirm.def"
+        INCLUDE "cpcfirm.def"
         
         INCLUDE	"graphics/grafix.inc"
 

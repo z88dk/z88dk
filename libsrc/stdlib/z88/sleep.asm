@@ -10,10 +10,10 @@
 ;		 - Return number of seconds left
 ;
 ; -----
-; $Id: sleep.asm,v 1.3 2007-01-03 22:23:49 aralbrec Exp $
+; $Id: sleep.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
 
 
-		INCLUDE "#time.def"
+		INCLUDE "time.def"
 
                 XLIB    sleep
 		LIB	l_mult

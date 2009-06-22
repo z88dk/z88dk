@@ -13,7 +13,7 @@
 ;
 ;returns the smaller of x and y
 
-                INCLUDE  "#fpp.def"
+                INCLUDE  "fpp.def"
 
                 XLIB    amin
 

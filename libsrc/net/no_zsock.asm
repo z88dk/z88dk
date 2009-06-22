@@ -9,7 +9,7 @@
 
 	LIB	exit
 
-	INCLUDE	"#stdio.def"
+	INCLUDE	"stdio.def"
 
 
 .no_zsock

@@ -10,8 +10,8 @@
 ; 22/3/2000 Now calls getchar() for stdin stuff instead of doing
 ;	    os_in itself
 
-                INCLUDE "#fileio.def"
-                INCLUDE "#stdio.def"
+                INCLUDE "fileio.def"
+                INCLUDE "stdio.def"
                 INCLUDE "libdefs.def"
 
 

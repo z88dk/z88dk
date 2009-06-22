@@ -12,11 +12,11 @@
 ; Now goes back to the correct print position
 ;
 ;
-;	$Id: gets.asm,v 1.1 2003-01-26 17:39:48 dom Exp $
+;	$Id: gets.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
 ;
 
-                INCLUDE "#stdio.def"
-		INCLUDE	"#syspar.def"
+                INCLUDE "stdio.def"
+		INCLUDE	"syspar.def"
 
                 XLIB    gets
                 XREF    processcmd

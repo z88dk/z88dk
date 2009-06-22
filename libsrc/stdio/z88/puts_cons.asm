@@ -8,10 +8,10 @@
 ;       djm 2/4/99
 ;
 ;
-;	$Id: puts_cons.asm,v 1.2 2001-04-13 14:14:00 stefano Exp $
+;	$Id: puts_cons.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
 ;
 
-                INCLUDE "#stdio.def"
+                INCLUDE "stdio.def"
 
                 XLIB    puts_cons
 

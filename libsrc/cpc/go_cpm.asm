@@ -4,12 +4,12 @@
 ;
 ;       void go_cpm()
 ;
-;       $Id: go_cpm.asm,v 1.1 2008-05-26 06:38:08 stefano Exp $
+;       $Id: go_cpm.asm,v 1.2 2009-06-22 21:44:16 dom Exp $
 ;
 
         XLIB    go_cpm
 
-        INCLUDE "#cpcfirm.def"              
+        INCLUDE "cpcfirm.def"              
 
 .go_cpm
 

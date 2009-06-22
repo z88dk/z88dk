@@ -14,7 +14,7 @@
 ;y is in the FA
 ;x is on the stack +8 (+2=y) 
 
-                INCLUDE  "#fpp.def"
+                INCLUDE  "fpp.def"
 
                 XLIB    atan2
 

@@ -8,16 +8,16 @@
 ;
 ;	Read the MSX video memory
 ;
-;	$Id: msx_vpeek.asm,v 1.6 2009-05-21 06:58:11 stefano Exp $
+;	$Id: msx_vpeek.asm,v 1.7 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	msx_vpeek
 	
 	
 IF FORmsx
-        INCLUDE "#msx.def"
+        INCLUDE "msx.def"
 ELSE
-        INCLUDE "#svi.def"
+        INCLUDE "svi.def"
 ENDIF
 
 

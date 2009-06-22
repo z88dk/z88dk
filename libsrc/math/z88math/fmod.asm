@@ -16,7 +16,7 @@
 ;x is in the FA
 ;z is on the stack +8 (+2=x)
 
-                INCLUDE  "#fpp.def"
+                INCLUDE  "fpp.def"
 
                 XLIB    fmod
 

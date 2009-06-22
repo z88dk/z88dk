@@ -10,7 +10,7 @@
 ;double asin(double)
 ;Number in FA..
 
-                INCLUDE  "#fpp.def"
+                INCLUDE  "fpp.def"
 
                 XLIB    asin
 

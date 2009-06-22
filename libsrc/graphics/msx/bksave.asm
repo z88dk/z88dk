@@ -3,7 +3,7 @@
 ;
 ;	MSX version
 ;
-;	$Id: bksave.asm,v 1.3 2009-05-21 06:58:11 stefano Exp $
+;	$Id: bksave.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
 ;
 
 
@@ -12,9 +12,9 @@
 
 
 IF FORmsx
-	INCLUDE "#msx.def"
+	INCLUDE "msx.def"
 ELSE
-	INCLUDE "#svi.def"
+	INCLUDE "svi.def"
 ENDIF
 
 	

@@ -5,7 +5,7 @@
 ;
 ;	Draw a line between two points
 ;
-;	$Id: draw.asm,v 1.2 2007-07-21 21:28:22 dom Exp $
+;	$Id: draw.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
 ;
 
 ;&BBC0 - GRA MOVE ABSOLUTE - Move to an absolute position
@@ -28,7 +28,7 @@
 
         XLIB    draw
 
-        INCLUDE "#cpcfirm.def"
+        INCLUDE "cpcfirm.def"
         INCLUDE	"graphics/grafix.inc"
 
 .draw

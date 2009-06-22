@@ -8,16 +8,16 @@
 ;
 ;	set \a value at a given vram address \a addr, merging bits (OR) with the existing value
 ;
-;	$Id: msx_vmerge.asm,v 1.2 2009-05-21 06:58:11 stefano Exp $
+;	$Id: msx_vmerge.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
 ;
 
 
 	XLIB	msx_vmerge
 	
 IF FORmsx
-        INCLUDE "#msx.def"
+        INCLUDE "msx.def"
 ELSE
-        INCLUDE "#svi.def"
+        INCLUDE "svi.def"
 ENDIF
 
 

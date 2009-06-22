@@ -3,11 +3,11 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: float.asm,v 1.1 2008-07-27 21:44:56 aralbrec Exp $
+;	$Id: float.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
 ;
 
-		INCLUDE		"#cpcfp.def"
-		INCLUDE		"#cpcfirm.def"
+		INCLUDE		"cpcfp.def"
+		INCLUDE		"cpcfirm.def"
 
 		XLIB		float
 		LIB         int_inv_sgn

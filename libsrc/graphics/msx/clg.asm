@@ -3,7 +3,7 @@
 ;
 ;       MSX version by Stefano Bodrato, December 2007
 ;
-;	$Id: clg.asm,v 1.7 2009-05-27 10:41:08 stefano Exp $
+;	$Id: clg.asm,v 1.8 2009-06-22 21:44:17 dom Exp $
 ;
 
         XLIB    clg
@@ -14,11 +14,11 @@
 
 
 IF FORmsx
-        INCLUDE "#msxbios.def"
-        INCLUDE "#msxbasic.def"
+        INCLUDE "msxbios.def"
+        INCLUDE "msxbasic.def"
 ELSE
-        INCLUDE "#svibios.def"
-        INCLUDE "#svibasic.def"
+        INCLUDE "svibios.def"
+        INCLUDE "svibasic.def"
 ENDIF
 
 

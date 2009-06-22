@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: closegfx.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;	$Id: closegfx.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
 ;
 
 
@@ -16,7 +16,7 @@
 
 
                 INCLUDE "graphics/grafix.inc"    /* Contains fn defs */
-                INCLUDE "#map.def"
+                INCLUDE "map.def"
 
                 XLIB    closegfx
 

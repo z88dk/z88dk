@@ -8,13 +8,13 @@
 ;
 ;	Write data to a VDP register
 ;
-;	$Id: set_vdp_reg.asm,v 1.2 2009-05-21 06:58:11 stefano Exp $
+;	$Id: set_vdp_reg.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	set_vdp_reg
 	LIB	msxbios
 	
-        INCLUDE "#msxbios.def"
+        INCLUDE "msxbios.def"
 
 set_vdp_reg:
 	pop	hl

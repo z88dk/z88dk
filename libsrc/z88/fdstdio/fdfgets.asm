@@ -7,8 +7,8 @@
 ;
 ; *** THIS IS A Z88 SPECIFIC ROUTINE!!! ***
 
-                INCLUDE "#fileio.def"
-                INCLUDE "#stdio.def"
+                INCLUDE "fileio.def"
+                INCLUDE "stdio.def"
                 INCLUDE "libdefs.def"
 
                 XLIB    fdfgets

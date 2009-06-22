@@ -6,14 +6,14 @@
 ; 	This routine tries to query the Opus ROM to fetch its version
 ;	It gives a float containg the version, otherwise a float containing zero.. 
 ;
-;	$Id: opus_version.asm,v 1.2 2008-03-11 09:56:15 stefano Exp $
+;	$Id: opus_version.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
 ;
 
 		XLIB	opus_version
 		LIB	zx_opus
 		XREF	fa
 
-		INCLUDE  "#zxfp.def"
+		INCLUDE  "zxfp.def"
 
 .opus_version
 		ld	hl,fa

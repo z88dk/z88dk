@@ -7,12 +7,12 @@
 ;       It accepts the command name (it will be adapted "on the fly"),
 ;       and a list of pointers to variables.
 ;
-;       $Id: cpc_rsx.asm,v 1.1 2008-05-26 06:38:08 stefano Exp $
+;       $Id: cpc_rsx.asm,v 1.2 2009-06-22 21:44:16 dom Exp $
 ;
 
         XLIB    cpc_rsx
 
-        INCLUDE "#cpcfirm.def"              
+        INCLUDE "cpcfirm.def"              
 
 
 .cmd_buff  defs 12      ; max command name lenght

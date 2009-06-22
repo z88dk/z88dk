@@ -10,7 +10,7 @@
 
 ;Convert fp in FA to an integer 
 
-                INCLUDE  "#fpp.def"
+                INCLUDE  "fpp.def"
 
                 XLIB    ifix
 		XREF	fa

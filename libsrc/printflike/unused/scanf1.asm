@@ -8,7 +8,7 @@
 
         XLIB    scanf1
 
-        INCLUDE "#z88_crt0.hdr"
+        INCLUDE "z88_crt0.hdr"
         LIB     sf_getc;
         LIB     sf_ungetc
         LIB     utoi

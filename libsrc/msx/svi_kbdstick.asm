@@ -6,15 +6,15 @@
 ;	read keyboard line for cursor keys + space
 ;
 ;
-;	$Id: svi_kbdstick.asm,v 1.1 2009-05-21 06:58:11 stefano Exp $
+;	$Id: svi_kbdstick.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	svi_kbdstick
 	
 IF FORmsx
-        INCLUDE "#msx.def"
+        INCLUDE "msx.def"
 ELSE
-        INCLUDE "#svi.def"
+        INCLUDE "svi.def"
 ENDIF
 
 

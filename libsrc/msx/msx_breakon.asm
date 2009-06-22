@@ -7,13 +7,13 @@
 ;	Restore disabled BREAK
 ;
 ;
-;	$Id: msx_breakon.asm,v 1.1 2007-12-18 09:00:45 stefano Exp $
+;	$Id: msx_breakon.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	msx_breakon
 	XREF	brksave
 	
-        INCLUDE "#msxbasic.def"
+        INCLUDE "msxbasic.def"
 
 msx_breakon:
 	ld	hl,brksave

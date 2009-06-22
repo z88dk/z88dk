@@ -7,8 +7,8 @@
 ;
 ; 11/3/99 djm - revised
 
-                INCLUDE "#fileio.def"
-                INCLUDE "#stdio.def"
+                INCLUDE "fileio.def"
+                INCLUDE "stdio.def"
                 INCLUDE "libdefs.def"
 
 

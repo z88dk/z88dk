@@ -11,12 +11,12 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.3 2008-03-27 18:24:42 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	ansi_CHAR
 
-    INCLUDE "#cpcfirm.def"
+    INCLUDE "cpcfirm.def"
                
 	
 	XREF	ansi_ROW

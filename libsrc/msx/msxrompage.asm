@@ -9,13 +9,13 @@
 ;	These perhaps could be optimized when in non-MSXDOS environment.
 ;
 ;
-;	$Id: msxrompage.asm,v 1.1 2007-12-13 11:28:42 stefano Exp $
+;	$Id: msxrompage.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	msxrompage
 	LIB	msxbios
 
-        INCLUDE "#msxbios.def"
+        INCLUDE "msxbios.def"
 
 	defc H_NMI  = $fdd6
 

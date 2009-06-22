@@ -8,7 +8,7 @@
 ;
 ;	set screen mode
 ;
-;	$Id: msx_set_mode.asm,v 1.1 2009-01-07 09:50:15 stefano Exp $
+;	$Id: msx_set_mode.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
 ;
 
 
@@ -16,7 +16,7 @@
 	
 	LIB	msxbios
 
-        INCLUDE "#msxbios.def"
+        INCLUDE "msxbios.def"
 
 
 msx_set_mode:

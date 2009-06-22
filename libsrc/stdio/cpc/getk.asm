@@ -6,12 +6,12 @@
 ;	Stefano Bodrato - 8/6/2001
 ;
 ;
-;	$Id: getk.asm,v 1.4 2008-05-05 14:14:02 stefano Exp $
+;	$Id: getk.asm,v 1.5 2009-06-22 21:44:17 dom Exp $
 ;
 
         XLIB	getk
 
-        INCLUDE "#cpcfirm.def"
+        INCLUDE "cpcfirm.def"
 
 
 .getk

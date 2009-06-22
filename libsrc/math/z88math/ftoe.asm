@@ -10,7 +10,7 @@
 
 		XLIB	ftoe
 
-		INCLUDE	"#fpp.def"
+		INCLUDE	"fpp.def"
 
 .ftoe
 	ld	ix,0

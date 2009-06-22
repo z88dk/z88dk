@@ -6,12 +6,12 @@
 ;	Stefano Bodrato - 8/6/2001
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.3 2007-07-21 21:28:22 dom Exp $
+;	$Id: fgetc_cons.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
 ;
 
         XLIB	fgetc_cons
         
-        INCLUDE "#cpcfirm.def"
+        INCLUDE "cpcfirm.def"
         
         
 .fgetc_cons

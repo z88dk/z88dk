@@ -6,18 +6,18 @@
 ;
 ;	Change the MSX color attributes
 ;
-;	$Id: msx_color.asm,v 1.3 2009-05-21 06:58:11 stefano Exp $
+;	$Id: msx_color.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	msx_color
 	LIB	msxbios
 	
 IF FORmsx
-        INCLUDE "#msxbios.def"
-        INCLUDE "#msxbasic.def"
+        INCLUDE "msxbios.def"
+        INCLUDE "msxbasic.def"
 ELSE
-        INCLUDE "#svibios.def"
-        INCLUDE "#svibasic.def"
+        INCLUDE "svibios.def"
+        INCLUDE "svibasic.def"
 ENDIF
 
 

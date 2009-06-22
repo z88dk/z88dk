@@ -6,12 +6,12 @@
 ;	LIDRMV
 ;
 ;
-;	$Id: svi_ldirmv.asm,v 1.1 2009-05-21 06:58:11 stefano Exp $
+;	$Id: svi_ldirmv.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	LIDRMV
 	
-        INCLUDE "#svi.def"
+        INCLUDE "svi.def"
 	
 LIDRMV:
 	call	$3747	;SETRD

@@ -17,7 +17,7 @@
 
                XLIB    restscr
 
-                INCLUDE "#saverst.def"
+                INCLUDE "saverst.def"
 
 .restscr
         pop     bc

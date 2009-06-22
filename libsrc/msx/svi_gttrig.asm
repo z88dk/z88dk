@@ -6,7 +6,7 @@
 ;	GTTRIG
 ;
 ;
-;	$Id: svi_gttrig.asm,v 1.3 2009-05-27 10:41:08 stefano Exp $
+;	$Id: svi_gttrig.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	GTTRIG
@@ -14,7 +14,7 @@
 	LIB	svi_slstick
 
 
-        INCLUDE "#svi.def"
+        INCLUDE "svi.def"
 
 	
 GTTRIG:

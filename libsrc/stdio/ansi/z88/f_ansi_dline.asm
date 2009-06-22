@@ -6,10 +6,10 @@
 ;	Entry: a = row
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.3 2001-05-02 09:21:51 dom Exp $
+;	$Id: f_ansi_dline.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
 ;
 
-	INCLUDE	"#stdio.def"
+	INCLUDE	"stdio.def"
 
 
 	XLIB	ansi_del_line

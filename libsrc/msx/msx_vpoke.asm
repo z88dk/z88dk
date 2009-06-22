@@ -7,14 +7,14 @@
 ;	Improved functions by Rafael de Oliveira Jannone
 ;	Originally released in 2004 for GFX - a small graphics library
 ;
-;	$Id: msx_vpoke.asm,v 1.4 2009-05-21 06:58:11 stefano Exp $
+;	$Id: msx_vpoke.asm,v 1.5 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	msx_vpoke
 	LIB	msxbios
 	
-        ;INCLUDE "#msxbios.def"
-        INCLUDE "#msx.def"
+        ;INCLUDE "msxbios.def"
+        INCLUDE "msx.def"
 
 
 msx_vpoke:

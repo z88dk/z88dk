@@ -6,12 +6,12 @@
 ;	djm 6/6/2000
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_cls.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
 ;
 
 		XLIB	ansi_CLS
 
-		INCLUDE	"#stdio.def"
+		INCLUDE	"stdio.def"
 
 .ansi_CLS
 	ld	a,$0c

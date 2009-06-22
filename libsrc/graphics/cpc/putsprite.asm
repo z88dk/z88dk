@@ -6,13 +6,13 @@
 ; Amstrad CPC version
 ;
 ;
-; $Id: putsprite.asm,v 1.2 2008-05-05 14:14:02 stefano Exp $
+; $Id: putsprite.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
 ;
 
         XLIB    putsprite
         LIB     pixeladdress
 
-        INCLUDE "#cpcfirm.def"
+        INCLUDE "cpcfirm.def"
         INCLUDE "graphics/grafix.inc"
 
 ; coords: d,e (vert-horz)

@@ -12,11 +12,11 @@
 ; 15/4/2000 Takes a near again (can change but effort!)
 ;
 ;
-;	$Id: remove.asm,v 1.1 2001-05-01 13:55:21 dom Exp $
+;	$Id: remove.asm,v 1.2 2009-06-22 21:44:16 dom Exp $
 ;
 
-                INCLUDE "#fileio.def"
-                INCLUDE "#stdio.def"
+                INCLUDE "fileio.def"
+                INCLUDE "stdio.def"
 
                 XLIB    remove
 

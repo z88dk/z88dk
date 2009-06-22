@@ -2,17 +2,17 @@
 ;	Game device library for the MSX
 ;       Stefano Bodrato - 3/12/2007
 ;
-;	$Id: joystick.asm,v 1.6 2009-05-28 20:52:08 stefano Exp $
+;	$Id: joystick.asm,v 1.7 2009-06-22 21:44:16 dom Exp $
 ;
 
         XLIB    joystick
         LIB	msxbios
 
 IF FORmsx
-        INCLUDE "#msx.def"
+        INCLUDE "msx.def"
 ELSE
-        INCLUDE "#svi.def"
-        INCLUDE "#svibios.def"
+        INCLUDE "svi.def"
+        INCLUDE "svibios.def"
         LIB	svi_kbdstick
 ENDIF
 

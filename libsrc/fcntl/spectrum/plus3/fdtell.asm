@@ -5,11 +5,11 @@
 ;
 ; Not written as yet!
 ;
-; $Id: fdtell.asm,v 1.3 2003-10-10 11:05:02 dom Exp $
+; $Id: fdtell.asm,v 1.4 2009-06-22 21:44:16 dom Exp $
 
 		XLIB	fdtell
 
-	        INCLUDE "#p3dos.def"
+	        INCLUDE "p3dos.def"
 
 		XREF	dodos
 

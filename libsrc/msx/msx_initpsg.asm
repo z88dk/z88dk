@@ -7,16 +7,16 @@
 ;	Init the PSG (reset sound etc..)
 ;
 ;
-;	$Id: msx_initpsg.asm,v 1.2 2009-05-21 06:58:11 stefano Exp $
+;	$Id: msx_initpsg.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
 ;
 
 	XLIB	msx_initpsg
 	LIB     msxbios
 	
 IF FORmsx
-        INCLUDE "#msxbios.def"
+        INCLUDE "msxbios.def"
 ELSE
-        INCLUDE "#svibios.def"
+        INCLUDE "svibios.def"
 ENDIF
 
 msx_initpsg:

@@ -2,13 +2,13 @@
 ;	Game device library for the Amstrad CPC
 ;	Stefano Bodrato - May 2008
 ;
-;	$Id: joystick.asm,v 1.2 2009-01-23 08:22:27 stefano Exp $
+;	$Id: joystick.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
 ;
 
 
         XLIB    joystick
 
-        INCLUDE "#cpcfirm.def"
+        INCLUDE "cpcfirm.def"
 
 .joystick
 	;__FASTALL__ : joystick no. in HL

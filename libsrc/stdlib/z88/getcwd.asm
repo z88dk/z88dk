@@ -11,10 +11,10 @@
 ;
 ;
 ; -----
-; $Id: getcwd.asm,v 1.5 2007-01-03 22:23:49 aralbrec Exp $
+; $Id: getcwd.asm,v 1.6 2009-06-22 21:44:17 dom Exp $
 
-                INCLUDE "#syspar.def"
-		INCLUDE	"#memory.def"
+                INCLUDE "syspar.def"
+		INCLUDE	"memory.def"
 
                 XLIB    getcwd
                 LIB    readbyte        ;standard.lib

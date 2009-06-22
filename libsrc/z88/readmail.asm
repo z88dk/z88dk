@@ -17,7 +17,7 @@
 
                 XLIB    readmail
 
-                INCLUDE "#saverst.def"
+                INCLUDE "saverst.def"
 
 .readmail
         ld      hl,2

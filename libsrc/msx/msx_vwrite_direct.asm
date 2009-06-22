@@ -8,7 +8,7 @@
 ;
 ;	Transfer count bytes from RAM (current memory page) to VRAM
 ;
-;	$Id: msx_vwrite_direct.asm,v 1.5 2009-05-21 06:58:11 stefano Exp $
+;	$Id: msx_vwrite_direct.asm,v 1.6 2009-06-22 21:44:17 dom Exp $
 ;
 
 
@@ -17,11 +17,11 @@
 	LIB     msxbios
 	
 IF FORmsx
-        INCLUDE "#msxbios.def"
-        INCLUDE "#msx.def"
+        INCLUDE "msxbios.def"
+        INCLUDE "msx.def"
 ELSE
-        INCLUDE "#svibios.def"
-        INCLUDE "#svi.def"
+        INCLUDE "svibios.def"
+        INCLUDE "svi.def"
 ENDIF
 
 

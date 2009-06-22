@@ -13,7 +13,7 @@
 ;
 ;returns the larger of x and y
 
-                INCLUDE  "#fpp.def"
+                INCLUDE  "fpp.def"
 
                 XLIB    amax
 

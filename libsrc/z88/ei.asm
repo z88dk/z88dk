@@ -13,7 +13,7 @@
 
                XLIB    ei
 
-                INCLUDE "#interrpt.def"
+                INCLUDE "interrpt.def"
 
 .ei
         pop     bc

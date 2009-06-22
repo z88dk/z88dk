@@ -5,10 +5,10 @@
 ; 11/3/99 djm ***UNTESTED***
 ;
 ;
-;	$Id: fdgetpos.asm,v 1.2 2003-10-13 22:58:01 dom Exp $
+;	$Id: fdgetpos.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
 ;
 
-                INCLUDE "#fileio.def"
+                INCLUDE "fileio.def"
 
                 XLIB    fdgetpos
 

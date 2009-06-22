@@ -8,13 +8,13 @@
 ;	int __FASTCALL__ zx_getint(char *variable);
 ;
 ;
-;	$Id: zx_getint.asm,v 1.1 2008-07-29 09:19:45 stefano Exp $
+;	$Id: zx_getint.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
 ;	
 
 XLIB	zx_getint
 LIB	zx_locatenum
 
-INCLUDE  "#81fp.def"
+INCLUDE  "81fp.def"
 
 ; hl = char *variable
 

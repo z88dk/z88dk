@@ -17,7 +17,7 @@
 
                XLIB    pagewait
 
-                INCLUDE "#saverst.def"
+                INCLUDE "saverst.def"
 
 .pagewait
         ld      a,SR_pwt
