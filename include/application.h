@@ -19,7 +19,7 @@
  *
  *	Packages are now supported (work for 16k packages)
  *
- *	$Id: application.h,v 1.3 2007-06-25 19:15:22 dom Exp $
+ *	$Id: application.h,v 1.4 2009-06-22 21:33:57 dom Exp $
  */
 
 #ifndef HELP1
@@ -86,7 +86,7 @@
 
 #pragma asm
 ; Here we go, with lots of assembler!
-        INCLUDE "#dor.def"
+        INCLUDE "dor.def"
         INCLUDE "zcc_opt.def"   ; The universal saviour file!
 
         XREF    app_entrypoint  ; The real starting point for our apps

@@ -5,7 +5,7 @@
  *
  *	djm 9/2/2000
  *
- *	$Id: package.h,v 1.2 2001-04-20 16:04:24 dom Exp $
+ *	$Id: package.h,v 1.3 2009-06-22 21:33:57 dom Exp $
  */
 
 #ifdef MAKE_PACKAGE
@@ -17,8 +17,8 @@ typedef struct  {
 #define PKGNAME_MAC(b) defm b & 0
 
 #pragma asm
-	INCLUDE	"#error.def"
-	INCLUDE "#packages.def"
+	INCLUDE	"error.def"
+	INCLUDE "packages.def"
 
 ; Some needed routines
 
