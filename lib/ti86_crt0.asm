@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.22 2009-06-10 17:26:05 stefano Exp $
+;	$Id: ti86_crt0.asm,v 1.23 2009-06-22 21:20:05 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -53,7 +53,7 @@
 ; Begin of (shell) headers
 ;-------------------------
 
-	INCLUDE "#Ti86.def"	; ROM / RAM adresses on Ti86
+	INCLUDE "Ti86.def"	; ROM / RAM adresses on Ti86
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 
 ;-----------------------------
@@ -244,7 +244,7 @@ ENDIF
 	pop	hl
 
 IF DEFINED_GRAYlib
-	INCLUDE	"#gray86.asm"
+	INCLUDE	"gray86.asm"
 ENDIF
 
 	;im	2
@@ -307,7 +307,7 @@ l_dcal
 ;-----------
 __sgoioblk:
 IF DEFINED_ANSIstdio
-	INCLUDE	"#stdio_fp.asm"
+	INCLUDE	"stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
 ENDIF
@@ -356,7 +356,7 @@ snd_tick:	defb	0	; Sound variable
 ENDIF
 
 IF NEED_floatpack
-	INCLUDE	"#float.asm"
+	INCLUDE	"float.asm"
 ;seed for random number generator - not used yet..
 fp_seed:	defb	$80,$80,0,0,0,0
 ;Floating point registers...

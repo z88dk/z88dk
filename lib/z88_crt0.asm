@@ -16,7 +16,7 @@
 ;
 ; - - - - - - - -
 ;
-; $Id: z88_crt0.asm,v 1.6 2007-06-27 20:49:28 dom Exp $
+; $Id: z88_crt0.asm,v 1.7 2009-06-22 21:20:05 dom Exp $
 ;
 ; - - - - - - - -
 
@@ -71,27 +71,27 @@ IF DEFINED_startup
 ;     -startup=2 for app        } use them!)
 ;     -startup=3 for code snippets
         IF (startup=1)
-                INCLUDE "#bas_crt0.asm"
+                INCLUDE "bas_crt0.asm"
         ENDIF
         IF (startup=2)
-                INCLUDE "#app_crt0.asm"
+                INCLUDE "app_crt0.asm"
         ENDIF
         IF (startup=3)
-                INCLUDE "#rel_crt0.asm"
+                INCLUDE "rel_crt0.asm"
         ENDIF
 	IF (startup=4)
-		INCLUDE "#dev_crt0.asm"
+		INCLUDE "dev_crt0.asm"
 	ENDIF
 	IF (startup=5)
-		INCLUDE "#z88s_crt0.asm"
+		INCLUDE "z88s_crt0.asm"
 	ENDIF
 
 ELSE 
 
 ELSE 
         IF NEED_appstartup
-                INCLUDE "#app_crt0.asm"
+                INCLUDE "app_crt0.asm"
         ELSE
-                INCLUDE "#bas_crt0.asm"
+                INCLUDE "bas_crt0.asm"
         ENDIF
 ENDIF

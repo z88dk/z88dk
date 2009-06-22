@@ -3,7 +3,7 @@
 ;
 ; This module is included by rcmx000_crt0.asm
 ;
-; $Id: rcmx000_boot.asm,v 1.4 2009-06-10 17:26:04 stefano Exp $
+; $Id: rcmx000_boot.asm,v 1.5 2009-06-22 21:20:05 dom Exp $
 ;
 
 
@@ -221,5 +221,5 @@ __end_prog:
 
 	;; 
 IF !DEFINED_NOFLASH
-	INCLUDE	"#rcmx000_flash.asm"
+	INCLUDE	"rcmx000_flash.asm"
 ENDIF

@@ -1,2 +1,2 @@
 
-	INCLUDE	"#sms_crt0.asm"
+	INCLUDE	"sms_crt0.asm"

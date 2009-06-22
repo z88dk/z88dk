@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti85_crt0.asm,v 1.21 2009-06-10 17:26:05 stefano Exp $
+;	$Id: ti85_crt0.asm,v 1.22 2009-06-22 21:20:05 dom Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -42,7 +42,7 @@
 ;-------------------------
 
 	LSTOFF
-	INCLUDE "#Ti85.def"	; ROM / RAM adresses on Ti85
+	INCLUDE "Ti85.def"	; ROM / RAM adresses on Ti85
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 	LSTON
 
@@ -199,7 +199,7 @@ ENDIF
 	pop	hl
 
 IF DEFINED_GRAYlib
-	INCLUDE	"#gray85.asm"
+	INCLUDE	"gray85.asm"
 	;im	2
 ENDIF
 
@@ -248,7 +248,7 @@ ENDIF
 ;-----------
 __sgoioblk:
 IF DEFINED_ANSIstdio
-	INCLUDE	"#stdio_fp.asm"
+	INCLUDE	"stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
 ENDIF
@@ -302,7 +302,7 @@ snd_tick:	defb	0	; Sound variable
 ENDIF
 
 IF NEED_floatpack
-	INCLUDE	"#float.asm"
+	INCLUDE	"float.asm"
 ;seed for random number generator - not used yet..
 fp_seed:	defb	$80,$80,0,0,0,0
 ;Floating point registers...

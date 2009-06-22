@@ -12,7 +12,7 @@
 
 defc intcount   = $8501			; 1   byte  - interrupt variable
 
-	INCLUDE "#int82.asm"		; Put interrupt loader here
+	INCLUDE "int82.asm"		; Put interrupt loader here
 					;
 	xor	a			; We need to intialize variables
 	ld	(intcount),a		;  by ourself.

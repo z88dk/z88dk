@@ -9,7 +9,7 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: nc100_crt0.asm,v 1.7 2009-06-10 17:26:04 stefano Exp $
+;       $Id: nc100_crt0.asm,v 1.8 2009-06-22 21:20:05 dom Exp $
 ;
 
 
@@ -98,7 +98,7 @@ l_dcal:	jp	(hl)
 
 __sgoioblk:
 IF DEFINED_ANSIstdio
-	INCLUDE	"#stdio_fp.asm"
+	INCLUDE	"stdio_fp.asm"
 ENDIF
 
 
@@ -145,7 +145,7 @@ coords:		defw	0
 ; Floating point
 ;-------
 IF NEED_floatpack
-        INCLUDE         "#float.asm"
+        INCLUDE         "float.asm"
 
 fp_seed:        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
 extra:          defs    6		;FP spare register

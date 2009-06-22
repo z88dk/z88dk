@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti82_crt0.asm,v 1.20 2009-06-10 17:26:05 stefano Exp $
+;	$Id: ti82_crt0.asm,v 1.21 2009-06-22 21:20:05 dom Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -39,7 +39,7 @@
 ; Begin of (shell) headers
 ;-------------------------
 
-	INCLUDE "#Ti82.def"	; ROM / RAM adresses on Ti82
+	INCLUDE "Ti82.def"	; ROM / RAM adresses on Ti82
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 	
 ;OS82Head:
@@ -93,9 +93,9 @@ ENDIF
 
 
 IF DEFINED_GRAYlib
-	INCLUDE	"#gray82.asm"
+	INCLUDE	"gray82.asm"
 ELSE
-	INCLUDE "#intwrap82.asm"
+	INCLUDE "intwrap82.asm"
 ENDIF
 
 	im	2
@@ -123,7 +123,7 @@ l_dcal:
 ;-----------
 __sgoioblk:
 IF DEFINED_ANSIstdio
-	INCLUDE	"#stdio_fp.asm"
+	INCLUDE	"stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
 ENDIF
@@ -172,7 +172,7 @@ IF !DEFINED_GRAYlib
 ENDIF
 
 IF NEED_floatpack
-	INCLUDE	"#float.asm"
+	INCLUDE	"float.asm"
 ;seed for random number generator - not used yet..
 fp_seed:	defb	$80,$80,0,0,0,0
 ;Floating point registers...

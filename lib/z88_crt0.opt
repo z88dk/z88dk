@@ -1,2 +1,2 @@
 
-	INCLUDE		"#z88_crt0.asm"
+	INCLUDE		"z88_crt0.asm"

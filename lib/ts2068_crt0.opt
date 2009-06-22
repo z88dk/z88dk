@@ -1,2 +1,2 @@
 
-	INCLUDE	"#ts2068_crt0.asm"
+	INCLUDE	"ts2068_crt0.asm"

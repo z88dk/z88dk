@@ -14,13 +14,13 @@
 ;***** GreyLib version 1.0 (C) 1997 by Bill Nagel & Dines Justesen *********
 ;---------------------------------------------------------------------------
 ;
-; $Id: gray83pSE.asm,v 1.4 2009-06-10 17:26:04 stefano Exp $
+; $Id: gray83pSE.asm,v 1.5 2009-06-22 21:20:05 dom Exp $
 ;
 
 defc LCD_BUSY_QUICK  = $000B		; Faster entry then BCALLing
 defc LCDBusy         = LCD_BUSY_QUICK	;
 
-	INCLUDE "#int83p.asm"		; Put interrupt loader here
+	INCLUDE "int83p.asm"		; Put interrupt loader here
 IF TI83PLUSAPP
 					; Statvars is already zeroed
 ELSE

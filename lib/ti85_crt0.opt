@@ -1,2 +1,2 @@
 
-	INCLUDE	"#ti85_crt0.asm"
+	INCLUDE	"ti85_crt0.asm"

@@ -6,12 +6,12 @@
 ; Recoded -because of strange problems- by Henk Poley - July 2001
 ; Based upon vnGrey, a Venus greyscale library (Ti83).
 ;
-; $Id: gray83.asm,v 1.4 2009-06-10 17:26:04 stefano Exp $
+; $Id: gray83.asm,v 1.5 2009-06-22 21:20:05 dom Exp $
 ;
 
 defc intcount    = $878A        ; 1 byte needed
 	
-	INCLUDE "#int83.asm"		; Put interrupt loader here
+	INCLUDE "int83.asm"		; Put interrupt loader here
 					; HL = $8789
 	inc	hl			; We need to intialize variables
 	ld	(hl),0			;  by ourself.

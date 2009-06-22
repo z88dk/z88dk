@@ -2,16 +2,16 @@
 ;
 ;       Created 1/4/99 djm
 ;
-;	$Id: bas_crt0.asm,v 1.6 2009-06-10 17:26:04 stefano Exp $
+;	$Id: bas_crt0.asm,v 1.7 2009-06-22 21:20:05 dom Exp $
 
 
 ;-----------
 ; The .def files that we need here
 ;-----------
-	INCLUDE "#bastoken.def"
-	INCLUDE "#ctrlchar.def"
-	INCLUDE "#error.def"
-	INCLUDE "#stdio.def"
+	INCLUDE "bastoken.def"
+	INCLUDE "ctrlchar.def"
+	INCLUDE "error.def"
+	INCLUDE "stdio.def"
 
 
         org $2300
@@ -152,7 +152,7 @@ _cpfar2near:
 ;-----------
 __sgoioblk:
 IF DEFINED_ANSIstdio
-	INCLUDE	"#stdio_fp.asm"
+	INCLUDE	"stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
 ENDIF
@@ -196,7 +196,7 @@ packintrout:	defw	0	; Address of user interrupt routine
 ; Floating point
 ;-----------
 IF NEED_floatpack
-        INCLUDE         "#float.asm"
+        INCLUDE         "float.asm"
 
 fp_seed:        defb    $80,$80,0,0,0,0	; FP seed (unused ATM)
 extra:          defs    6		; Extra register temp store

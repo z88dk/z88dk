@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: aquarius_crt0.asm,v 1.7 2009-06-10 17:26:04 stefano Exp $
+;       $Id: aquarius_crt0.asm,v 1.8 2009-06-22 21:20:05 dom Exp $
 ;
 
 
@@ -88,7 +88,7 @@ l_dcal:	jp	(hl)		;Used for function pointer calls
 ;-----------
 __sgoioblk:
 IF DEFINED_ANSIstdio
-	INCLUDE	"#stdio_fp.asm"
+	INCLUDE	"stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
 ENDIF
@@ -141,7 +141,7 @@ ENDIF
 ; Floating point support
 ;-----------------------
 IF NEED_floatpack
-        INCLUDE         "#float.asm"
+        INCLUDE         "float.asm"
 fp_seed:        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
 extra:          defs    6		;FP register
 fa:             defs    6		;FP Accumulator

@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rxl_crt0.asm,v 1.4 2009-06-10 17:26:05 stefano Exp $
+;       $Id: rxl_crt0.asm,v 1.5 2009-06-22 21:20:05 dom Exp $
 ;
 
 	MODULE rex_crt0
@@ -96,5 +96,5 @@ heaplast	ds.w	1	;Pointer to linked list of free malloc blocks
 ;--------
 
 IF NEED_floatpack
-        INCLUDE "#float.asm"
+        INCLUDE "float.asm"
 ENDIF

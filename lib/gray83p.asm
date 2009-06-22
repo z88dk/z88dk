@@ -6,10 +6,10 @@
 ; Recoded -because of strange problems- by Henk Poley - July 2001
 ; Based upon vnGrey, a Venus greyscale library (Ti83).
 ;
-; $Id: gray83p.asm,v 1.4 2009-06-10 17:26:04 stefano Exp $
+; $Id: gray83p.asm,v 1.5 2009-06-22 21:20:05 dom Exp $
 ;
 
-	INCLUDE "#int83p.asm"		; Put interrupt loader here
+	INCLUDE "int83p.asm"		; Put interrupt loader here
 IF TI83PLUSAPP
 					; Statvars is already zeroed
 ELSE

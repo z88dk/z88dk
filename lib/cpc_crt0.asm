@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.14 2009-06-10 17:26:04 stefano Exp $
+;       $Id: cpc_crt0.asm,v 1.15 2009-06-22 21:20:05 dom Exp $
 ;
 
         MODULE  cpc_crt0
@@ -120,7 +120,7 @@ l_dcal: jp      (hl)
 
 __sgoioblk:
 IF DEFINED_ANSIstdio
-        INCLUDE "#stdio_fp.asm"
+        INCLUDE "stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
 ENDIF
@@ -165,7 +165,7 @@ heapblocks:     defw    0       ; Number of blocks
                 defb    0
 
 IF NEED_floatpack
-        INCLUDE         "#float.asm"
+        INCLUDE         "float.asm"
 ;init_floatpack:
 ;       ret
 

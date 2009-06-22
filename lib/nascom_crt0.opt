@@ -1,2 +1,2 @@
 
-	INCLUDE	"#nascom_crt0.asm"
+	INCLUDE	"nascom_crt0.asm"

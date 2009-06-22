@@ -3,7 +3,7 @@
 ;	Stefano Bodrato	- Dec 2000
 ;	Henk Poley	- Apr 2001 Fixed and add some things
 ;
-;	$Id: ti83_crt0.asm,v 1.21 2009-06-10 17:26:05 stefano Exp $
+;	$Id: ti83_crt0.asm,v 1.22 2009-06-22 21:20:05 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -56,7 +56,7 @@
 ; Begin of (shell) headers
 ;-------------------------
 	LSTOFF			; Don't list these (huge) files
-	INCLUDE "#Ti83.def"	; ROM / RAM adresses on Ti83
+	INCLUDE "Ti83.def"	; ROM / RAM adresses on Ti83
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 	LSTON			; List again
 
@@ -306,9 +306,9 @@ IF ZASMLOAD
 ENDIF
 
 IF DEFINED_GRAYlib
-	INCLUDE	"#gray83.asm"
+	INCLUDE	"gray83.asm"
 ELSE
-	INCLUDE "#intwrap83.asm"
+	INCLUDE "intwrap83.asm"
 ENDIF
 
 	im	2
@@ -343,7 +343,7 @@ defc l_dcal = $52E8		; jp (hl)
 ;-----------
 __sgoioblk:
 IF DEFINED_ANSIstdio
-	INCLUDE	"#stdio_fp.asm"
+	INCLUDE	"stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
 ENDIF
@@ -433,7 +433,7 @@ fastCopyLoop:
 ENDIF
 
 IF NEED_floatpack
-	INCLUDE		"#float.asm"
+	INCLUDE		"float.asm"
 ;seed for random number generator - not used yet..
 fp_seed:	defb	$80,$80,0,0,0,0
 Floating point registers...

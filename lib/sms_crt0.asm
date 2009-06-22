@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.3 2009-06-10 17:26:05 stefano Exp $
+;	$Id: sms_crt0.asm,v 1.4 2009-06-22 21:20:05 dom Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -292,5 +292,5 @@ _pause_flag		ds.b	1	;This alternates between 0 and 1 every time pause is pressed
 ; Now, include the math routines if needed..
 ;--------
 IF NEED_floatpack
-;        INCLUDE "#float.asm"
+;        INCLUDE "float.asm"
 ENDIF

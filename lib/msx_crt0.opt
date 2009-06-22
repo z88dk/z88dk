@@ -1,2 +1,2 @@
 
-	INCLUDE	"#msx_crt0.asm"
+	INCLUDE	"msx_crt0.asm"

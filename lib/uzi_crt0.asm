@@ -12,7 +12,7 @@
 
 
 
-		INCLUDE	"#director.def"
+		INCLUDE	"director.def"
 
 
 		XDEF	_start_init

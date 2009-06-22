@@ -1,7 +1,7 @@
 ;
 ; Startup for Residos packages
 ;
-; $Id: zxr_crt0.asm,v 1.3 2009-06-10 17:26:05 stefano Exp $
+; $Id: zxr_crt0.asm,v 1.4 2009-06-22 21:20:05 dom Exp $
 ;
 
         MODULE	zxs_crt0
@@ -131,7 +131,7 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 ;-----------
 __sgoioblk:
 IF DEFINED_ANSIstdio
-        INCLUDE "#stdio_fp.asm"
+        INCLUDE "stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
 ENDIF
@@ -180,7 +180,7 @@ ENDIF
 ;-----------------------
 IF NEED_floatpack
 	defs	FLOATING_POINT_NOT_SUPPORTED_FOR_RESIDOS_PACKAGES
-        INCLUDE         "#float.asm"
+        INCLUDE         "float.asm"
 fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
 extra:          defs    6               ;FP register
 fa:             defs    6               ;FP Accumulator

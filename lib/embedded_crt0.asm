@@ -2,7 +2,7 @@
 ;
 ;	Daniel Wallner March 2002
 ;
-;	$Id: embedded_crt0.asm,v 1.4 2009-06-10 17:26:04 stefano Exp $
+;	$Id: embedded_crt0.asm,v 1.5 2009-06-22 21:20:05 dom Exp $
 ;
 ; (DM) Could this do with a cleanup to ensure rstXX functions are
 ; available?
@@ -133,5 +133,5 @@ heaplast        ds.w    1       ;Pointer to linked blocks
 ; Now, include the math routines if needed..
 ;--------
 IF NEED_floatpack
-        INCLUDE "#float.asm"
+        INCLUDE "float.asm"
 ENDIF

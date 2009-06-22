@@ -19,19 +19,19 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.8 2009-06-10 17:26:04 stefano Exp $
+;	$Id: app_crt0.asm,v 1.9 2009-06-22 21:20:05 dom Exp $
 
 
 ;--------
 ; Call up some header files (probably too many but...)
 ;--------
-	INCLUDE "#stdio.def"
-	INCLUDE "#fileio.def"
-	INCLUDE "#memory.def"
-	INCLUDE "#error.def"
-	INCLUDE "#time.def"
-	INCLUDE "#syspar.def"
-	INCLUDE "#director.def"
+	INCLUDE "stdio.def"
+	INCLUDE "fileio.def"
+	INCLUDE "memory.def"
+	INCLUDE "error.def"
+	INCLUDE "time.def"
+	INCLUDE "syspar.def"
+	INCLUDE "director.def"
 
 ;--------
 ; Set some scope variables
@@ -238,7 +238,7 @@ IF DEFINED_farheapsz
 	XDEF	farmemspec
 	XDEF	pool_table
 ; All far memory variables now in init_far.asm
-	INCLUDE	"#init_far.asm"
+	INCLUDE	"init_far.asm"
 
 ENDIF
 
@@ -345,7 +345,7 @@ ENDIF
 ;--------
 IF DEFINED_ANSIstdio
 sgoprotos:
-	INCLUDE	"#stdio_fp.asm"
+	INCLUDE	"stdio_fp.asm"
 ENDIF
 
 ;--------
@@ -394,7 +394,7 @@ ENDIF
 ; Now, include the math routines if needed..
 ;--------
 IF NEED_floatpack
-        INCLUDE "#float.asm"
+        INCLUDE "float.asm"
 ENDIF
 
 ;-------
@@ -415,7 +415,7 @@ IF !safedata
         }
 
         IF DEFINED_farheapsz
-                INCLUDE         "#app_crt0.as1"
+                INCLUDE         "app_crt0.as1"
         ENDIF
 ENDIF
 

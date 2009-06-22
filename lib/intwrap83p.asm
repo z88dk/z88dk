@@ -14,7 +14,7 @@ IF !TI83PLUSAPP				; Else already in DEFVAR block
 defc intcount = $8A8D			; 1 byte needed
 ENDIF
 
-	INCLUDE "#int83p.asm"		; Put interrupt loader here
+	INCLUDE "int83p.asm"		; Put interrupt loader here
 					;
 	xor	a			; We need to intialize variables
 	ld	(intcount),a		;  by ourself.

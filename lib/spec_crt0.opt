@@ -1,2 +1,2 @@
 
-	INCLUDE	"#spec_crt0.asm"
+	INCLUDE	"spec_crt0.asm"

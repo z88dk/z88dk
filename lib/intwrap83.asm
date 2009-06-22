@@ -29,7 +29,7 @@
 
 defc intcount    = $878A		; 1 byte needed
 
-	INCLUDE "#int83.asm"		; Put interrupt loader here
+	INCLUDE "int83.asm"		; Put interrupt loader here
 					; HL = $8789
 	inc	hl			; We need to intialize variables
 	ld	(hl),0			;  by ourself.

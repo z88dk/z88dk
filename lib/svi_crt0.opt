@@ -1,2 +1,2 @@
 
-	INCLUDE	"#svi_crt0.asm"
+	INCLUDE	"svi_crt0.asm"

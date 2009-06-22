@@ -1,2 +1,2 @@
 
-	INCLUDE	"#cpm_crt0.asm"
+	INCLUDE	"cpm_crt0.asm"

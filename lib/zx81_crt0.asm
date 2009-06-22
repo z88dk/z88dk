@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.23 2009-06-10 17:26:05 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.24 2009-06-22 21:20:05 dom Exp $
 ;
 ; - - - - - - -
 
@@ -204,7 +204,7 @@ de1save:	defw	0
 ;-----------
 __sgoioblk:
 IF DEFINED_ANSIstdio
-        INCLUDE "#stdio_fp.asm"
+        INCLUDE "stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
 ENDIF
@@ -235,7 +235,7 @@ ENDIF
 ;---------------------------------------
 
 IF (startup=2)
-        INCLUDE "#zx81_altint.def"
+        INCLUDE "zx81_altint.def"
 ENDIF
 
 ;---------------------------------------
@@ -244,7 +244,7 @@ ENDIF
 ;---------------------------------------
 
 IF (startup>=3)
-        INCLUDE "#zx81_hrg.def"
+        INCLUDE "zx81_hrg.def"
 ENDIF
 
 ;-----------
@@ -284,7 +284,7 @@ frames:         defw    0       ; counter handled with new interrupt
 ; Floating point support
 ;-----------------------
 IF NEED_floatpack
-        INCLUDE         "#float.asm"
+        INCLUDE         "float.asm"
 fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
 extra:          defs    6               ;FP register
 fa:             defs    6               ;FP Accumulator

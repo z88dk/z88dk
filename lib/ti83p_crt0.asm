@@ -3,7 +3,7 @@
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.22 2009-06-10 17:26:05 stefano Exp $
+;	$Id: ti83p_crt0.asm,v 1.23 2009-06-22 21:20:05 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells
@@ -51,7 +51,7 @@
 ; Begin of (shell) headers
 ;-------------------------
 
-	INCLUDE "#Ti83p.def"	; ROM / RAM adresses on Ti83+[SE]
+	INCLUDE "Ti83p.def"	; ROM / RAM adresses on Ti83+[SE]
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 	
 ;-----------------------------
@@ -188,12 +188,12 @@ ENDIF
 
 IF DEFINED_GRAYlib
  IF DEFINED_GimmeSpeed
-	INCLUDE "#gray83pSE.asm"	; 15MHz grayscale interrupt
+	INCLUDE "gray83pSE.asm"	; 15MHz grayscale interrupt
  ELSE
-	INCLUDE	"#gray83p.asm"		;  6MHz grayscale interrupt
+	INCLUDE	"gray83p.asm"		;  6MHz grayscale interrupt
  ENDIF
 ELSE
-	INCLUDE	"#intwrap83p.asm"	; Interrupt Wrapper
+	INCLUDE	"intwrap83p.asm"	; Interrupt Wrapper
 ENDIF
 
 	im	2		; enable IM2 interrupt
@@ -230,7 +230,7 @@ l_dcal:
 ;-----------
 __sgoioblk:
 IF DEFINED_ANSIstdio
-	INCLUDE	"#stdio_fp.asm"
+	INCLUDE	"stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
 ENDIF
@@ -325,7 +325,7 @@ fastCopyLoop:
 ENDIF
 
 IF NEED_floatpack
-	INCLUDE	"#float.asm"
+	INCLUDE	"float.asm"
 ;seed for random number generator - not used yet..
 fp_seed:	defb	$80,$80,0,0,0,0
 ;Floating point registers...

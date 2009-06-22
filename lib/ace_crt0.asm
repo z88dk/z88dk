@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.8 2009-06-10 17:26:04 stefano Exp $
+;	$Id: ace_crt0.asm,v 1.9 2009-06-22 21:20:05 dom Exp $
 ;
 
 
@@ -100,7 +100,7 @@ l_dcal:
 
 __sgoioblk:
 IF DEFINED_ANSIstdio
-	INCLUDE	"#stdio_fp.asm"
+	INCLUDE	"stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
 ENDIF
@@ -166,7 +166,7 @@ snd_tick:	defb	0
 ;way we only include the package if we *really* need it!
 
 IF NEED_floatpack
-        INCLUDE         "#float.asm"
+        INCLUDE         "float.asm"
 
 ;seed for random number generator - not used yet..
 fp_seed:        defb    $80,$80,0,0,0,0

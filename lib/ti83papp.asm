@@ -39,7 +39,7 @@
 ; Begin of Application header:
 ;------------------------------
 
-	INCLUDE "#Ti83p.def"	; ROM / RAM adresses on Ti83+[SE]
+	INCLUDE "Ti83p.def"	; ROM / RAM adresses on Ti83+[SE]
 	INCLUDE "zcc_opt.def"	;Get compiler defines
 
 	org $4000
@@ -172,9 +172,9 @@ ENDIF				;
 
 IF DEFINED_GRAYlib
  IF DEFINED_GimmeSpeed
-	INCLUDE "#gray83pSE.asm"	; 15MHz grayscale interrupt
+	INCLUDE "gray83pSE.asm"	; 15MHz grayscale interrupt
  ELSE
-	INCLUDE	"#gray83p.asm"		;  6MHz grayscale interrupt
+	INCLUDE	"gray83p.asm"		;  6MHz grayscale interrupt
  ENDIF
 ENDIF
 
@@ -231,7 +231,7 @@ ENDIF				;  plus this is safe for possible
 				;  Ti83+ Silver Edition at 15MHz
 
 IF NEED_floatpack
-	INCLUDE	"#float.asm"
+	INCLUDE	"float.asm"
 ENDIF
 
 defc intuse = IntProcEnd-IntProcStart

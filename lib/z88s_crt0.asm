@@ -3,14 +3,14 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.9 2009-06-10 17:26:05 stefano Exp $
+;	$Id: z88s_crt0.asm,v 1.10 2009-06-22 21:20:05 dom Exp $
 
 
 
-	INCLUDE	"#stdio.def"
-	INCLUDE "#error.def"
+	INCLUDE	"stdio.def"
+	INCLUDE "error.def"
 
-	INCLUDE	"#shellapi.def"
+	INCLUDE	"shellapi.def"
 
 	org	shell_loadaddr-shell_headerlen
 
@@ -204,7 +204,7 @@ IF DEFINED_farheapsz
         XDEF    malloc_table
         XDEF    farmemspec
         XDEF    pool_table
-        INCLUDE "#init_far.asm"
+        INCLUDE "init_far.asm"
 
 ; Variables that can't be place in the normal defvars
 copybuff:	defs	258
@@ -316,7 +316,7 @@ shellapi_back:
 ;-----------
 __sgoioblk:
 IF DEFINED_ANSIstdio
-	INCLUDE	"#stdio_fp.asm"
+	INCLUDE	"stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
 ENDIF
@@ -363,7 +363,7 @@ end:		defb	0
 ; Floating point
 ;-----------
 IF NEED_floatpack
-        INCLUDE         "#float.asm"
+        INCLUDE         "float.asm"
 
 fp_seed:        defb    $80,$80,0,0,0,0	; FP seed (unused ATM)
 extra:          defs    6		; Extra register temp store
