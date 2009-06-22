@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.7 2009-06-13 17:36:24 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.8 2009-06-22 21:26:28 dom Exp $ */
 /* $History: Asmdrctv.c $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -916,7 +916,7 @@ Fetchfilename (FILE *fptr)
     ptr++;
   }
 
-  return SearchFile(ptr, 1);
+  return strlen(ptr) ? SearchFile(ptr, 1) : "";
 }
 
 
