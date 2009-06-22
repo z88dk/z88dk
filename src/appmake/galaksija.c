@@ -3,7 +3,7 @@
  *
  *        Based on the original "bin2gtp" program by Tomaz Solc
  *
- *        $Id: galaksija.c,v 1.2 2009-06-13 19:16:42 dom Exp $
+ *        $Id: galaksija.c,v 1.3 2009-06-22 22:09:27 dom Exp $
  */
 
 #include "appmake.h"
