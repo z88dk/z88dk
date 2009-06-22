@@ -50,7 +50,7 @@ INCPATH		-IDESTDIR/include
 #
 # (Leave alone!)
 
-ASMOPTS		-Mo
+ASMOPTS		-Mo -IDESTDIR/lib
 
 #
 # Options for the optimizer
@@ -83,16 +83,16 @@ CRT0		DESTDIR/lib/cpc_crt0
 #
 # Linker Options
 #
-# LIBPATH   = where the linker libraries or stored
-# Keep the -i before the path in LIBPATH - (this is a z80asm flag for
+# 
+# Keep the -i before the path in 
 # libraries)
 #
-# LINKOPTS  = Options required when linking (leave alone!)
+# LINKOPTS  = Options required when linking (leave alone!) -LDESTDIR/lib
 #
 
 
-LIBPATH		-iDESTDIR/lib/clibs/
-LINKOPTS	-a -m -Mo
+
+LINKOPTS	-a -m -Mo -LDESTDIR/lib
 
 #
 # Names of the libraries
@@ -123,3 +123,18 @@ GENMATHLIB	gen_math
 
 OPTIONS		 -// -v -O2 -I. -lnascom_clib -lndos -DZ80 -DSMALL_C -DNASCOM -D__NASCOM__ -M -DSCCZ80 -Cz+nas
 
+
+# Additional config options for the alternate assemblers
+# these override ASMOPTS and LINKOPTS defined above which take
+# effect for z80asm/mpm
+#
+# The choice of assembler can be specified using -asm=XXX by default
+# z88dk uses z80asm but this may change in the future
+
+# First of all for vasm/vlink
+VASMOPTS	-quiet -Fvobj -IDESTDIR/lib
+VLINKOPTS	-LDESTDIR/lib/vlink/
+
+# The toolchain can also output for the asxx suite 
+ASZ80OPTS
+ASLINKOPTS
