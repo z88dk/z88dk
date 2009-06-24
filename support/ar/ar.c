@@ -126,7 +126,6 @@ void object_dump(FILE *fp, unsigned long start, char flags)
     libname = read_intel32(fp,&red);
     code    = read_intel32(fp,&red);
 
-    printf("%x %x %x %x\n",modname,expr,name,libname);
 
     fseek(fp,start+modname,SEEK_SET);
     len = fgetc(fp);
