@@ -137,8 +137,10 @@ void object_dump(FILE *fp, unsigned long start, char flags)
     }
     fseek(fp,start+code,SEEK_SET);
     len = read_intel16(fp,&red);
-    /* Now print any dependencies under that */
+    printf("\t\t@%08x (%d bytes)\n",start,len);
 
+
+    /* Now print any dependencies under that */
     if ( name != 0 ) {
         char   scope,type;
         unsigned long temp;
