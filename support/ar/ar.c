@@ -152,7 +152,6 @@ void object_dump(FILE *fp, unsigned long start, char flags)
         
         fseek(fp,start+name,SEEK_SET);
         red = 0;
-        printf("%d %d\n",name+red,end);
         while ( name + red < end ) {
             scope = fgetc(fp); red++;
             type = fgetc(fp); red++;
