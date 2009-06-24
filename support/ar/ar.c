@@ -15,8 +15,6 @@
 #include <getopt.h>
 
 
-#define min(a,b) ( (a) < (b) ? (a) : (b))
-
 static FILE *open_library(char *name);
 
 static unsigned long read_intel32(FILE *fp, unsigned long *offs);
@@ -128,6 +126,7 @@ void object_dump(FILE *fp, unsigned long start, char flags)
     libname = read_intel32(fp,&red);
     code    = read_intel32(fp,&red);
 
+    printf("%x %x %x %x\n",modname,expr,name,libname);
 
     fseek(fp,start+modname,SEEK_SET);
     len = fgetc(fp);
@@ -139,7 +138,6 @@ void object_dump(FILE *fp, unsigned long start, char flags)
     }
     fseek(fp,start+code,SEEK_SET);
     len = read_intel16(fp,&red);
-    printf("\t\t@%08x (%d bytes)\n",start,len);
     /* Now print any dependencies under that */
 
     if ( name != 0 ) {
@@ -147,24 +145,30 @@ void object_dump(FILE *fp, unsigned long start, char flags)
         unsigned long temp;
         unsigned long end;
 
-        end = min(modname,expr);
+        if ( libname == 0xffffffff ) {
+            end = modname;
+        } else {
+            end = expr;
+        }
         
         fseek(fp,start+name,SEEK_SET);
         red = 0;
+        printf("%d %d\n",name+red,end);
         while ( name + red < end ) {
             scope = fgetc(fp); red++;
             type = fgetc(fp); red++;
             temp = read_intel32(fp,&red);
             len = fgetc(fp); red++;
-            if ( type == 'A' && ( ( flags & showlocal) || scope != 'L' ) )
-                printf("  %c  ",scope);
+            if ( ( ( flags & showlocal) || scope != 'L' ) ) {
+                printf("  %c%c ",scope, type == 'C' ? 'C' : ' ' );
+            }
             for ( i = 0; i < len; i++ ) {
                 c = fgetc(fp);
-                if ( type == 'A' && ( (flags & showlocal) || scope != 'L' ) )
+                if (  ( (flags & showlocal) || scope != 'L' ) )
                     fputc(c,stdout);
                 red++;
             }
-            if ( type == 'A' && ( (flags & showlocal) || scope != 'L' ) ) 
+            if (( (flags & showlocal) || scope != 'L' ) ) 
                 printf("\t+%04x\n",temp);
         }
     }
