@@ -15,6 +15,8 @@
 #include <getopt.h>
 
 
+#define min(a,b) ( (a) < (b) ? (a) : (b))
+
 static FILE *open_library(char *name);
 
 static unsigned long read_intel32(FILE *fp, unsigned long *offs);
@@ -89,6 +91,22 @@ int main(int argc, char *argv[])
     fclose(fp);
 }
 
+static char *patch_type(int type)
+{
+    switch ( type ) {
+    case 'U':
+        return "8U";
+    case 'S':
+        return "8S";
+    case 'C':
+        return "16S";
+    case 'L':
+        return "32S";
+        break;
+    }
+    return "??";
+}
+
 void object_dump(FILE *fp, unsigned long start, char flags)
 {
     char     buf[8];
@@ -100,7 +118,7 @@ void object_dump(FILE *fp, unsigned long start, char flags)
     fread(buf,8,1,fp);
 
     if ( strncmp(buf,"Z80RMF01",8) != 0 ) {
-	return;
+        return;
     }
 
     org     = read_intel16(fp,&red);
@@ -113,79 +131,83 @@ void object_dump(FILE *fp, unsigned long start, char flags)
 
     fseek(fp,start+modname,SEEK_SET);
     len = fgetc(fp);
-    
+
     for ( i = 0; i < len; i++ ) {
-	c = fgetc(fp);
-	fputc(c,stdout);
-	red++;
+        c = fgetc(fp);
+        fputc(c,stdout);
+        red++;
     }
     fseek(fp,start+code,SEEK_SET);
     len = read_intel16(fp,&red);
     printf("\t\t@%08x (%d bytes)\n",start,len);
     /* Now print any dependencies under that */
+
     if ( name != 0 ) {
-	char   scope,type;
-	unsigned long temp;
-	fseek(fp,start+name,SEEK_SET);
-	red = 0;
-	while ( red < ( modname - name ) ) {
-	    scope = fgetc(fp); red++;
-	    type = fgetc(fp); red++;
-	    temp = read_intel32(fp,&red);
-	    len = fgetc(fp); red++;
-	    if ( type == 'A' && ( ( flags & showlocal) || scope != 'L' ) )
-		printf("  %c  ",scope);
-	    for ( i = 0; i < len; i++ ) {
-		c = fgetc(fp);
-		if ( type == 'A' && ( (flags & showlocal) || scope != 'L' ) )
-		    fputc(c,stdout);
-		red++;
-	    }
-	    if ( type == 'A' && ( (flags & showlocal) || scope != 'L' ) ) 
-		printf("\t+%04x\n",temp);
-	}
+        char   scope,type;
+        unsigned long temp;
+        unsigned long end;
+
+        end = min(modname,expr);
+        
+        fseek(fp,start+name,SEEK_SET);
+        red = 0;
+        while ( name + red < end ) {
+            scope = fgetc(fp); red++;
+            type = fgetc(fp); red++;
+            temp = read_intel32(fp,&red);
+            len = fgetc(fp); red++;
+            if ( type == 'A' && ( ( flags & showlocal) || scope != 'L' ) )
+                printf("  %c  ",scope);
+            for ( i = 0; i < len; i++ ) {
+                c = fgetc(fp);
+                if ( type == 'A' && ( (flags & showlocal) || scope != 'L' ) )
+                    fputc(c,stdout);
+                red++;
+            }
+            if ( type == 'A' && ( (flags & showlocal) || scope != 'L' ) ) 
+                printf("\t+%04x\n",temp);
+        }
     }
 	
-
     if ( libname != 0xFFFFFFFF ) {
-	fseek(fp,start+libname,SEEK_SET);
-	red = 0;
-	while ( red < (modname - libname) ) {
-	    len = fgetc(fp); red++;
-	    printf("  U  ");
-	    for ( i = 0; i < len; i++ ) {
-		c = fgetc(fp);
-		fputc(c,stdout);
-		red++;
-	    }
-	    printf("\n");
-	}
+        fseek(fp,start+libname,SEEK_SET);
+        red = 0;
+        while ( red < (modname - libname) ) {
+            len = fgetc(fp); red++;
+            printf("  U  ");
+            for ( i = 0; i < len; i++ ) {
+                c = fgetc(fp);
+                fputc(c,stdout);
+                red++;
+            }
+            printf("\n");
+        }
     }
 
     if ( expr != 0xFFFFFFFF && (flags & showexpr ) ) {
-	char type;
-	int  patch;
-	unsigned long end;
-	fseek(fp,start+expr,SEEK_SET);
-	red = 0;
-	end = name;
-	if (end == 0xFFFFFFFF )
-	    end = code;
-	while ( red < ( end - expr) ) {
-	    type = fgetc(fp); red++;
-	    patch = read_intel16(fp,&red);
-	    len = fgetc(fp); red++;
-	    printf("  E  ");
-	    for ( i = 0; i < len; i++ ) {
-		c = fgetc(fp);
-		fputc(c,stdout);
-		red++;
-	    }
-	    printf(" %c @ %04x\n",type,patch);
-	    c = fgetc(fp); red++;
-	    if ( c != 0 )
-		break;
-	}
+        char type;
+        int  patch;
+        unsigned long end;
+        fseek(fp,start+expr,SEEK_SET);
+        red = 0;
+        end = name;
+        if (end == 0xFFFFFFFF )
+            end = code;
+        while ( red < ( end - expr) ) {
+            type = fgetc(fp); red++;
+            patch = read_intel16(fp,&red);
+            len = fgetc(fp); red++;
+            printf("  E  ");
+            for ( i = 0; i < len && ( red < ( end-expr)); i++ ) {
+                c = fgetc(fp);
+                fputc(c,stdout);
+                red++;
+            }
+            printf(" %c(%s) @ %04x\n",type,patch_type(type),patch);
+            c = fgetc(fp); red++;
+            if ( c != 0 )
+                break;
+        }
     }
 
 }
