@@ -8,6 +8,10 @@
 
 #include "iolib.h"
 
+#ifdef IOLIB_DEBUG
+#include <stdio.h>
+#endif
+
 static int iolib_has_inited=0;
 
 static /* const */ unsigned char address_table[]={
@@ -21,7 +25,7 @@ static /* const */ unsigned char address_table[]={
   0x4e, /* PGDCR    */
   0x4f, /* PGDDR    */
   0x2   /* RTC0R    */
-  };
+};
 
 
 static unsigned char shadow_value[]={
@@ -94,15 +98,37 @@ void iolib_outb(unsigned register, unsigned char data)
   ioi_addr=iolib_physical(register);
   ioi_data=data;
   ioi_outb_impl();
+  shadow_value[register]=data;
 }
 
-void iolib_setbit(unsigned addr, unsigned char bit, unsigned char val)
+void iolib_setbit(unsigned register, unsigned char bit, unsigned char val)
 {
+  ioi_addr=iolib_physical(register);
+
+  /** Now we modify shadow reg */
+  if (val)
+    {
+      /** Or the value of the bit */
+      shadow_value[register] |= (1<<bit);
+    }
+  else
+    {
+      /** And the complement value of the bit */
+      shadow_value[register] &= (0xfe<<bit);
+      
+    }
+
+  ioi_data=shadow_value[register];
   
+#ifdef IOLIB_DEBUG
+  printf("iolib_setbit data=%x\n", ioi_data);
+#endif
+
+  ioi_outb_impl();  
 }
 
 unsigned char iolib_getbit(unsigned addr, unsigned char bit)
 {
-  return 0;
+  return (  iolib_inb(addr) & (1<<bit) ? 1 : 0);
 }
 
