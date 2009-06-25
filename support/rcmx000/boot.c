@@ -17,6 +17,8 @@
 
 #include <sys/poll.h>
 
+#include "mysock.h"
+
 #include "bootbytes.h"
 
 static int debug_hex=0;
@@ -120,9 +122,9 @@ static void msleep(int msec)
 
 
 /** Will wait indefinately for either stdin or serial data */
-static void do_poll(int serfd)
+static void do_poll(int serfd, int sockaccp_fd, int socktraf_fd)
 {
-  struct pollfd fds[2];
+  struct pollfd fds[4];
 
   memset(fds, 0, 2*sizeof(struct pollfd));
 
@@ -130,14 +132,22 @@ static void do_poll(int serfd)
 
   fds[0].fd=serfd;
   fds[1].fd=0; /* stdin */
+  fds[2].fd=sockaccp_fd;
+  fds[3].fd=socktraf_fd;
 
   fds[0].events=POLLIN;
   fds[1].events=POLLIN;
+  fds[2].events=POLLIN;
+  fds[3].events=POLLIN;
 
   fds[0].revents=0;
   fds[1].revents=0;
+  fds[2].revents=0;
+  fds[3].revents=0;
 
-  poll(fds, 2, -1);
+  /** If sockaccp_fd is zero we only check serial and stdin */
+  /** If sockaccp_fd=1 we also check socktraf_fd if it is non-zero */
+  poll(fds, sockaccp_fd==0?2:(socktraf_fd==0?3:4), -1);
 
   if (debug_poll) fprintf(stderr, "Leaving do_poll()\n");
 }
@@ -170,11 +180,11 @@ static int check_fd(int anfd)
 
 static void usage(const char* argv0)
 {
-  fprintf(stderr, "Boot mode: (Normal load of program to flash)\n");
-  fprintf(stderr, "Usage: %s -b <ttydev> <divisor> <binfile>\n", argv0);
+  fprintf(stderr, "Boot mode: (Normal load and execution of program to ram)\n");
+  fprintf(stderr, "Usage: %s [-p <num>] -b <ttydev> <divisor> <binfile>\n", argv0);
   fprintf(stderr, "   or\n", argv0);
   fprintf(stderr, "Raw mode: (Only used to get the baudrate division number)\n");
-  fprintf(stderr, "Usage: %s -r <ttydev> <coldload binfile>\n", argv0);
+  fprintf(stderr, "Usage: %s [-p <num>] -r <ttydev> <coldload binfile>\n", argv0);
   fprintf(stderr, "   or\n", argv0);
 
   fprintf(stderr, "Flash mode: (Will store program permanently in flash)\n");
@@ -182,7 +192,7 @@ static void usage(const char* argv0)
   fprintf(stderr, "   or\n", argv0);
   
   fprintf(stderr, "Direct mode: (Will copy a preloaded image from the flash to the ram and then run it\n");
-  fprintf(stderr, "Usage: %s -d <ttydev> <divisor> <binfile>\n", argv0);
+  fprintf(stderr, "Usage: %s [-p <num>] -d <ttydev> <divisor> <binfile>\n", argv0);
 
 
   exit(1);
@@ -190,16 +200,43 @@ static void usage(const char* argv0)
 
 
 
-static void talk(int tty)
+static void sendbuff(int tty, int traf_fd, const char* msg, unsigned len)
+{
+  /** If traf_fd is set we send to it instead of stdout */
+  if (debug_rw) fprintf(stderr, "traf_fd=%d\n", traf_fd);
+  if (traf_fd)
+    {
+      mysock_write_persist(traf_fd, msg, len);
+    }
+  else
+    {
+      if (debug_rw) fprintf(stderr, "Before fwrite\n");
+      fwrite(msg, len, sizeof(char), stdout);
+      fflush(stdout);
+    }
+}
+
+
+static void talk(int tty, int sockport)
 {
   unsigned char ch;
+  int accp_fd=0;
+  int traf_fd=0;
+
+  if (sockport!=0)
+    {
+      /** We set up listener on this port */
+      accp_fd=mysock_create_listener(sockport);
+    }
 
   while(1)
     {
-      do_poll(tty); /** Infinite wait for either stdin or data from serial */
+      do_poll(tty, accp_fd, traf_fd); /** Infinite wait for either stdin, socket or data from serial */
       
       if (check_fd(tty))
 	{
+	  char spbuf[1024];
+
 	  if (debug_rw) fprintf(stderr, "   Before read serial...\n");
 	  read(tty, &ch, 1);
 	  if (debug_rw) fprintf(stderr, "   After read serial...\n");
@@ -209,47 +246,83 @@ static void talk(int tty)
 	  /** Print unprintables as stars '*' */
 	  if (ch>=' ' && ch<='~')
 	    {
-	      printf("%c", ch);
+	      sprintf(spbuf, "%c", ch);
+	      sendbuff(tty, traf_fd, spbuf, 1);
 	    }
 	  else if (ch==13)
 	    {
-	      printf("\n");
+	      sprintf(spbuf, "\n");
+	      sendbuff(tty, traf_fd, spbuf, 1);
 	    }
 	  else if (ch==10)
 	    {
-	      printf("\n");
+	      sprintf(spbuf, "\n");
+	      sendbuff(tty, traf_fd, spbuf, 1);
 	    }
 	  else
 	    {
-	      printf("<%.2X>", ch);
+	      sprintf(spbuf, "<%.2X>", ch);
+	      sendbuff(tty, traf_fd, spbuf, 4);
 	    }
-	  fflush(stdout);
 	}
-      else if (check_fd(0))
+      else if (traf_fd==0)
 	{
-	  if (debug_rw) fprintf(stderr, "   Before read stdin...\n");
+	  /** Only run this code if we have not yet connected socket */
 
-	  read(0, &ch, 1);
-	  
-	  if (debug_rw) fprintf(stderr, "   After read stdin...\n");
-	  
-	  if (debug_rw) fprintf(stderr, "   Read stdin=%d\n", ch);
-	  
-	  write(tty, &ch, 1);
-
-	  if (!check_fd(tty))
+	  if (check_fd(0))
 	    {
-	      msleep(100); /** Just sleep to give target a chance to respond */
+	      if (debug_rw) fprintf(stderr, "   Before read stdin...\n");
+	      
+	      read(0, &ch, 1);
+	      
+	      if (debug_rw) fprintf(stderr, "   After read stdin...\n");
+	      
+	      if (debug_rw) fprintf(stderr, "   Read stdin=%d\n", ch);
+	      
+	      write(tty, &ch, 1);
+	      
+	      if (!check_fd(tty))
+		{
+		  msleep(100); /** Just sleep to give target a chance to respond */
+		}
 	    }
 
+	  if (accp_fd>0)
+	    {
+	      if (check_fd(accp_fd))
+		{
+		  if (debug_rw) fprintf(stderr,"accp_fd=%d\n", accp_fd);
+		  
+		  traf_fd=mysock_get_incoming_connection(accp_fd);
+		}
+	    }
 	}
-
+      else
+	{
+	  /** Here we talk (and respond) via the socket instead */
+	  if (check_fd(traf_fd))
+	    {
+	      if (debug_rw) fprintf(stderr, "   Before read socket...\n");
+	      
+	      read(traf_fd, &ch, 1);
+	      
+	      if (debug_rw) fprintf(stderr, "   After read socket...\n");
+	      
+	      if (debug_rw) fprintf(stderr, "   Read socket=%d\n", ch);
+	      
+	      write(tty, &ch, 1);
+	    }
+	}
     }
 }
 
 
 int main(int argc, char *argv[])
 {
+  char **argvp=argv;
+
+  char *argv0=argv[0];
+
   int do_flash=0;
 
   /** This flag is set if we communicate raw with the target */
@@ -277,19 +350,40 @@ int main(int argc, char *argv[])
   unsigned csum;
 
   int i;
+  
+  /** If this is set to non-zero we listen for characters here 
+   *  to take over from terminal
+   */
+  int sockport=0;
 
-  if (argc!=3 && argc!=4 && argc!=5)
+  if (argc<4 || argc>7)
     {
-      usage(argv[0]);
+      usage(argv0);
     }
 
-  if (0==strncmp(argv[1], "-b", 2))
+  if (0==strncmp(argvp[1], "-p", 2))
     {
-      if (argc!=5) usage(argv[0]);
+      /** We should have a socket listener, all other arguments pushed two steps... */
 
-      ttyname=argv[2];
-      divisor=atoi(argv[3]);
-      binfilename=argv[4];
+      /** We demand at least two more arguments (i.e. argc six or greater) */
+      if (argc<6)
+	{
+	  usage(argv0);
+	}
+
+      sockport=atoi(argvp[2]);
+      argvp += 2;
+
+      argc-=2;
+    }
+  
+  if (0==strncmp(argvp[1], "-b", 2))
+    {
+      if (argc!=5) usage(argv0);
+      
+      ttyname=argvp[2];
+      divisor=atoi(argvp[3]);
+      binfilename=argvp[4];
 
       binfile=fopen(binfilename, "rb");
       
@@ -299,22 +393,22 @@ int main(int argc, char *argv[])
 	  exit(1);
 	}
     }
-  else if (0==strncmp(argv[1], "-r", 2))
+  else if (0==strncmp(argvp[1], "-r", 2))
     {
-      if (argc!=4) usage(argv[0]);
+      if (argc!=4) usage(argv0);
 
-      ttyname=argv[2];
-      fname=argv[3];
+      ttyname=argvp[2];
+      fname=argvp[3];
 
       binfile=NULL;
 
       is_raw=1;
     }
-  else if (0==strncmp(argv[1], "-d", 2))
+  else if (0==strncmp(argvp[1], "-d", 2))
     {
-      if (argc!=3) usage(argv[0]);
+      if (argc!=3) usage(argv0);
 
-      ttyname=argv[2];
+      ttyname=argvp[2];
       /** Runs directly from flash with no download */
       tty=open(ttyname, O_RDWR|O_NOCTTY);
 
@@ -331,11 +425,11 @@ int main(int argc, char *argv[])
       
       change_baudrate(tty, 57600);
       
-      talk(tty);
+      talk(tty, sockport);
       
       return 0;
     }
-  else if (0==strncmp(argv[1], "-s", 2))
+  else if (0==strncmp(argvp[1], "-s", 2))
     {
       /** Silent (hidden) option, this requires a special modified cable to be useful 
           It lets you manipulate smode0/1  with RTS of serial line, thus starting
@@ -344,9 +438,9 @@ int main(int argc, char *argv[])
 	  Mainly useful when debugging the -d option...
       */
 
-      if (argc!=3) usage(argv[0]);
+      if (argc!=3) usage(argv0);
 
-      ttyname=argv[2];
+      ttyname=argvp[2];
       tty=open(ttyname, O_RDWR|O_NOCTTY);
       if (tty==-1)
 	{
@@ -377,17 +471,17 @@ int main(int argc, char *argv[])
 	while (check_fd(tty)) read(tty, &ch, 1);
       }
 
-      talk(tty);
+      talk(tty, sockport);
       
       return 0;
     }
-  else if (0==strncmp(argv[1], "-f", 2))
+  else if (0==strncmp(argvp[1], "-f", 2))
     {
-      if (argc!=5) usage(argv[0]);
+      if (argc!=5) usage(argv0);
 
-      ttyname=argv[2];
-      divisor=atoi(argv[3]);
-      binfilename=argv[4];
+      ttyname=argvp[2];
+      divisor=atoi(argvp[3]);
+      binfilename=argvp[4];
 
       binfile=fopen(binfilename, "rb");
 
@@ -401,7 +495,7 @@ int main(int argc, char *argv[])
     }
   else
     {
-      usage(argv[0]);
+      usage(argv0);
     }
   
   if (is_raw)
@@ -512,7 +606,7 @@ int main(int argc, char *argv[])
   if (is_raw) 
     {
       fprintf(stderr, "Waiting indefinately for reply...\n");
-      talk(tty);
+      talk(tty, sockport);
       exit(0);
     }
 
@@ -665,5 +759,5 @@ int main(int argc, char *argv[])
     }
   
   /** Start conversation with stdin/stdout of target */
-  talk(tty);
+  talk(tty, sockport);
 }

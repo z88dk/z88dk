@@ -78,4 +78,5 @@ int main(int argc, char *argv[])
   
   free(chs);
 
+  return 0;
 }

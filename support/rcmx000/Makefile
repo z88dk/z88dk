@@ -4,10 +4,10 @@ SERDEVICE=/dev/ttyXXX
 
 all: boot mk_boot_code RCMX000_BOOT.LOD BAUDMEAS.LOD
 
-boot: boot.c bootbytes.h
-	gcc -o boot boot.c
+boot: boot.c bootbytes.h mysock.c mysock.h
+	gcc -o boot boot.c mysock.c
 
-OPTS=-DDEFINED_NOFLASH
+OPTS=-DDEFINED_NOFLASH 
 
 
 mk_coldboot_hfile: mk_coldboot_hfile.c
