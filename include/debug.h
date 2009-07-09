@@ -1,7 +1,7 @@
 /*
  *      Debugging Routines
  *
- *	$Id: debug.h,v 1.1 2002-06-10 10:14:07 stefano Exp $
+ *	$Id: debug.h,v 1.2 2009-07-09 17:21:14 stefano Exp $
  */
 
 #ifndef __DEBUG_H__
@@ -18,6 +18,28 @@ extern unsigned int __LIB__ disz80(unsigned int address, unsigned int lines);
    bytes and returns the address reached */
 extern unsigned int __LIB__ dump(unsigned int address,unsigned int count);
 
+/* TRUE if Z80 supports undocumented instructions.
+   Otherwise, FALSE (or, in worst cases.. crash !) */
+extern int __LIB__ z80undoc(void);
+
+/* TRUE if Z80 supports strange undocumented flag behaviours
+   Otherwise, FALSE */
+extern int __LIB__ z80genuine(void);
+
+/* TRUE if Z80 supports strange undocumented flag behaviours
+   Otherwise, FALSE */
+extern int __LIB__ z80rabbit(void);
+
+/* Z80 type detection (cross fingers!) 
+	0 - Z80                  
+	1 - Z180 / HD6140 / Other
+	2 - Z280                 
+	3 - Z380                 
+	4 - R800
+	5 - Rabbit Control Module
+*/
+
+extern int __LIB__ z80type(void);
 
 #endif
 
