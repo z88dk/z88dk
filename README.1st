@@ -1,4 +1,4 @@
-z88dk - v1.8 XX Mar 2008
+z88dk - v1.8 12 Jul 2009
 ========================
 
 z88dk is a Z80 cross compiler producing binaries for over 20 different z80
@@ -64,9 +64,13 @@ You should be ready to go!
 
 CHANGES (brief)
 
-z88dkv1.8 XX.3.2008
+z88dkv1.8 12.7.2009
 
 - [sccz80] Bug fixes
+- [z80asm] Supports -I and -L directives to specify library and include paths
+- [z80asm] Bug fixes for rabbit support
+- [sccz80] Support for alternate assemblers
+- [zcc] Support for alternate assembler/linkers 
 - [cpp] DATE directive now outputs the date in a sensible format
 - [lib] crt0: Different versions of the library are built to avoid index
   registers or alternate registers depending on the target
