@@ -114,8 +114,7 @@ void iolib_setbit(unsigned register, unsigned char bit, unsigned char val)
   else
     {
       /** And the complement value of the bit */
-      shadow_value[register] &= (0xfe<<bit);
-      
+      shadow_value[register] &= ((1<<bit)^0xff);      
     }
 
   ioi_data=shadow_value[register];
