@@ -2,7 +2,7 @@ lstoff
 
 ; ZX 81 stack calculator functions (ZX81 version of ZXFP)
 
-; $Id: 81fp.def,v 1.5 2003-03-27 09:34:55 stefano Exp $
+; $Id: 81fp.def,v 1.6 2009-07-15 21:04:54 stefano Exp $
 
 ; function codes:
 
@@ -17,8 +17,9 @@ lstoff
 		DEFC	ZXFP_STK_FETCH	= $13F8
 		DEFC	ZXFP_STACK_A	= $151D
 		DEFC	ZXFP_STACK_BC	= $1520
-		DEFC	ZXFP_FP_TO_BC	= $0BF5
-		DEFC	ZXFP_FP_TO_A	= $0C02
+		DEFC	ZXFP_FP_TO_BC	= $158A
+		DEFC	ZXFP_FP_TO_A	= $15CD
+		
 		DEFC	ZXFP_INT_TO_FP	= $1548
 		DEFC	ZXFP_DEC_TO_FP	= $14D9
 
