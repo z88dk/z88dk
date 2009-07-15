@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.26 2008-02-12 14:43:57 stefano Exp $
+ * $Id: spectrum.h,v 1.27 2009-07-15 16:48:41 stefano Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -179,10 +179,12 @@ extern int  __LIB__              zx_getstr(char variable, char *value);
 extern void __LIB__              zx_setstr(char variable, char *value);
 extern int  __LIB__ __FASTCALL__ zx_getint(char *variable);
 extern void __LIB__              zx_setint(char *variable, int value);
+extern void __LIB__              zx_setfloat(char *variable, float value);
 
 extern int  __LIB__ __CALLEE__   zx_getstr_callee(char variable, char *value);
 extern void __LIB__ __CALLEE__   zx_setstr_callee(char variable, char *value);
 extern void __LIB__ __CALLEE__   zx_setint_callee(char *variable, int value);
+extern void __LIB__ __CALLEE__   zx_setfloat_callee(char *variable, float value);
 
 #define zx_getstr(a,b)           zx_getstr_callee(a,b)
 #define zx_setstr(a,b)           zx_setstr_callee(a,b)
