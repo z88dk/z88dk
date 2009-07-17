@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.4 2002-11-05 11:45:56 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.5 2009-07-17 22:06:48 dom Exp $ */
 /* $History: MODLINK.C $ */
 /*  */
 /* *****************  Version 16  ***************** */
@@ -126,6 +126,7 @@ void CreateDeffile (void);
 void ReleaseLinkInfo (void);
 struct linklist *AllocLinkHdr (void);
 struct linkedmod *AllocTracedModule (void);
+static char *         CheckIfModuleWanted(FILE *z80asmfile, long currentlibmodule, char *modname);
 
 /* global variables */
 extern FILE *listfile, *mapfile, *z80asmfile, *errfile, *deffile, *libfile;
@@ -173,68 +174,68 @@ ReadNames (long nextname, long endnames)
       nextname += 1 + 1 + 4 + 1 + strlen (line);
 
       switch (symtype)
-	{
-	case 'A':
-	  symtype = SYMADDR | SYMDEFINED;
-	  value += modulehdr->first->origin + CURRENTMODULE->startoffset;	/* Absolute address */
-	  break;
+        {
+        case 'A':
+          symtype = SYMADDR | SYMDEFINED;
+          value += modulehdr->first->origin + CURRENTMODULE->startoffset;	/* Absolute address */
+          break;
 
-	case 'C':
-	  symtype = SYMDEFINED;
-	  break;
-	}
+        case 'C':
+          symtype = SYMDEFINED;
+          break;
+        }
 
       switch (scope)
-	{
-	case 'L':
-	  if ((foundsymbol = FindSymbol (line, CURRENTMODULE->localroot)) == NULL)
-	    {
-	      foundsymbol = CreateSymbol (line, value, symtype | SYMLOCAL, CURRENTMODULE);
-	      if (foundsymbol != NULL)
-		insert (&CURRENTMODULE->localroot, foundsymbol, (int (*)()) cmpidstr);
-	    }
-	  else
-	    {
-	      foundsymbol->symvalue = value;
-	      foundsymbol->type |= symtype | SYMLOCAL;
-	      foundsymbol->owner = CURRENTMODULE;
-	      redefinedmsg ();
-	    }
-	  break;
+        {
+        case 'L':
+          if ((foundsymbol = FindSymbol (line, CURRENTMODULE->localroot)) == NULL)
+            {
+              foundsymbol = CreateSymbol (line, value, symtype | SYMLOCAL, CURRENTMODULE);
+              if (foundsymbol != NULL)
+                insert (&CURRENTMODULE->localroot, foundsymbol, (int (*)()) cmpidstr);
+            }
+          else
+            {
+              foundsymbol->symvalue = value;
+              foundsymbol->type |= symtype | SYMLOCAL;
+              foundsymbol->owner = CURRENTMODULE;
+              redefinedmsg ();
+            }
+          break;
 
-	case 'G':
-	  if ((foundsymbol = FindSymbol (line, globalroot)) == NULL)
-	    {
-	      foundsymbol = CreateSymbol (line, value, symtype | SYMXDEF, CURRENTMODULE);
-	      if (foundsymbol != NULL)
-		insert (&globalroot, foundsymbol, (int (*)()) cmpidstr);
-	    }
-	  else
-	    {
-	      foundsymbol->symvalue = value;
-	      foundsymbol->type |= symtype | SYMXDEF;
-	      foundsymbol->owner = CURRENTMODULE;
-	      redefinedmsg ();
-	    }
-	  break;
+        case 'G':
+          if ((foundsymbol = FindSymbol (line, globalroot)) == NULL)
+            {
+              foundsymbol = CreateSymbol (line, value, symtype | SYMXDEF, CURRENTMODULE);
+              if (foundsymbol != NULL)
+                insert (&globalroot, foundsymbol, (int (*)()) cmpidstr);
+            }
+          else
+            {
+              foundsymbol->symvalue = value;
+              foundsymbol->type |= symtype | SYMXDEF;
+              foundsymbol->owner = CURRENTMODULE;
+              redefinedmsg ();
+            }
+          break;
 
-	case 'X':
-	  if ((foundsymbol = FindSymbol (line, globalroot)) == NULL)
-	    {
-	      foundsymbol = CreateSymbol (line, value, symtype | SYMXDEF | SYMDEF, CURRENTMODULE);
-	      if (foundsymbol != NULL)
-		insert (&globalroot, foundsymbol, (int (*)()) cmpidstr);
-	    }
-	  else
-	    {
-	      foundsymbol->symvalue = value;
-	      foundsymbol->type |= symtype | SYMXDEF | SYMDEF;
-	      foundsymbol->owner = CURRENTMODULE;
-	      redefinedmsg ();
-	    }
+        case 'X':
+          if ((foundsymbol = FindSymbol (line, globalroot)) == NULL)
+            {
+              foundsymbol = CreateSymbol (line, value, symtype | SYMXDEF | SYMDEF, CURRENTMODULE);
+              if (foundsymbol != NULL)
+                insert (&globalroot, foundsymbol, (int (*)()) cmpidstr);
+            }
+          else
+            {
+              foundsymbol->symvalue = value;
+              foundsymbol->type |= symtype | SYMXDEF | SYMDEF;
+              foundsymbol->owner = CURRENTMODULE;
+              redefinedmsg ();
+            }
 
-	  break;
-	}
+          break;
+        }
     }
   while (nextname < endnames);
 }
@@ -260,6 +261,7 @@ ReadExpr (long nextexpr, long endexpr)
 
   do
     {
+      int parsed = 0;
       type = fgetc (z80asmfile);
       lowbyte = fgetc (z80asmfile);
       highbyte = fgetc (z80asmfile);
@@ -276,94 +278,96 @@ ReadExpr (long nextexpr, long endexpr)
       fseek (z80asmfile, fptr, SEEK_SET);	/* reset file pointer to start of expression */
       nextexpr += 1 + 1 + 1 + 1 + i + 1;
 
+
       EOL = OFF;		/* reset end of line parsing flag - a line is to be parsed... */
 
       GetSym ();
-
       if ((postfixexpr = ParseNumExpr ()) != NULL)
-	{			/* parse numerical expression */
-	  if (postfixexpr->rangetype & NOTEVALUABLE)
-	    {
-	      ReportError (CURRENTFILE->fname, 0, 2);
-	      WriteExprMsg ();
-	    }
-	  else
-	    {
-	      constant = EvalPfixExpr (postfixexpr);
-	      patchptr = codearea + CURRENTMODULE->startoffset + offsetptr;	/* absolute patch pos.
-										   * in memory buffer */
-	      switch (type)
-		{
-		case 'U':
-		    *patchptr = (unsigned char) constant;
-		  break;
+        {			/* parse numerical expression */
+          if (postfixexpr->rangetype & NOTEVALUABLE)
+            {
+              ReportError (CURRENTFILE->fname, 0, 2);
+              WriteExprMsg ();
+            }
+          else
+            {
+              constant = EvalPfixExpr (postfixexpr);
+              patchptr = codearea + CURRENTMODULE->startoffset + offsetptr;	/* absolute patch pos.
+                                                                             * in memory buffer */
+              switch (type)
+                {
+                case 'U':
+                  *patchptr = (unsigned char) constant;
+                  break;
 
-		case 'S':
-		  if ((constant >= -128) && (constant <= 255))
-		    *patchptr = (char) constant;	/* opcode is stored, now store
-							   * relative jump */
-		  else
-		    {
-		      ReportError (CURRENTFILE->fname, 0, 7);
-		      WriteExprMsg ();
-		    }
-		  break;
+                case 'S':
+                  if ((constant >= -128) && (constant <= 255))
+                    *patchptr = (char) constant;	/* opcode is stored, now store
+                                                     * relative jump */
+                  else
+                    {
+                      ReportError (CURRENTFILE->fname, 0, 7);
+                      WriteExprMsg ();
+                    }
+                  break;
 
-		case 'C':
-		  if ((constant >= -32768) && (constant <= 65535))
-		    {
-		      *patchptr++ = (unsigned short) constant % 256U;
-		      *patchptr = (unsigned short) constant / 256U;
-		    }
-		  else
-		    {
-		      ReportError (CURRENTFILE->fname, 0, 7);
-		      WriteExprMsg ();
-		    }
+                case 'C':
+                  if ((constant >= -32768) && (constant <= 65535))
+                    {
+                      *patchptr++ = (unsigned short) constant % 256U;
+                      *patchptr = (unsigned short) constant / 256U;
+                    }
+                  else
+                    {
+                      ReportError (CURRENTFILE->fname, 0, 7);
+                      WriteExprMsg ();
+                    }
 
-		  if (autorelocate)
-		    if (postfixexpr->rangetype & SYMADDR)
-		      {
-			/* Expression contains relocatable address */
-			constant = PC - curroffset;
+                  if (autorelocate)
+                    if (postfixexpr->rangetype & SYMADDR)
+                      {
+                        /* Expression contains relocatable address */
+                        constant = PC - curroffset;
 
-			if ((constant >= 0) && (constant <= 255))
-			  {
-			    *relocptr++ = (unsigned char) constant;
-			    sizeof_reloctable++;
-			  }
-			else
-			  {
-			    *relocptr++ = 0;
-			    *relocptr++ = (unsigned short) (PC - curroffset) % 256U;
-			    *relocptr++ = (unsigned short) (PC - curroffset) / 256U;
-			    sizeof_reloctable += 3;
-			  }
+                        if ((constant >= 0) && (constant <= 255))
+                          {
+                            *relocptr++ = (unsigned char) constant;
+                            sizeof_reloctable++;
+                          }
+                        else
+                          {
+                            *relocptr++ = 0;
+                            *relocptr++ = (unsigned short) (PC - curroffset) % 256U;
+                            *relocptr++ = (unsigned short) (PC - curroffset) / 256U;
+                            sizeof_reloctable += 3;
+                          }
 
-			totaladdr++;
-			curroffset = PC;
-		      }
-		  break;
+                        totaladdr++;
+                        curroffset = PC;
+                      }
+                  break;
 
-		case 'L':
-		  if (constant >= LONG_MIN && constant <= LONG_MAX)
-		    for (i = 0; i < 4; i++)
-		      {
-			*patchptr++ = constant & 255;
-			constant >>= 8;
-		      }
-		  else
-		    {
-		      ReportError (CURRENTFILE->fname, 0, 7);
-		      WriteExprMsg ();
-		    }
-		  break;
-		}
-	    }
-	  RemovePfixlist (postfixexpr);
-	}
-      else
-	WriteExprMsg ();
+                case 'L':
+                  if (constant >= LONG_MIN && constant <= LONG_MAX)
+                    for (i = 0; i < 4; i++)
+                      {
+                        *patchptr++ = constant & 255;
+                        constant >>= 8;
+                      }
+                  else
+                    {
+                      ReportError (CURRENTFILE->fname, 0, 7);
+                      WriteExprMsg ();
+                    }
+                  break;
+                }
+            }
+          RemovePfixlist (postfixexpr);
+        }
+      else 
+        {
+          WriteExprMsg ();
+        }
     }
   while (nextexpr < endexpr);
 }
@@ -393,18 +397,18 @@ LinkModules (void)
     {
       reloctable = (char *) malloc (32768U);
       if (reloctable == NULL)
-	{
-	  ReportError (NULL, 0, 3);
-	  return;		/* No more room     */
-	}
+        {
+          ReportError (NULL, 0, 3);
+          return;		/* No more room     */
+        }
       else
-	{
-	  relocptr = reloctable;
-	  relocptr += 4;	/* point at first offset to store */
-	  totaladdr = 0;
-	  sizeof_reloctable = 0;	/* relocation table, still 0 elements .. */
-	  curroffset = 0;
-	}
+        {
+          relocptr = reloctable;
+          relocptr += 4;	/* point at first offset to store */
+          totaladdr = 0;
+          sizeof_reloctable = 0;	/* relocation table, still 0 elements .. */
+          curroffset = 0;
+        }
     }
 
   CURRENTMODULE = modulehdr->first;	/* begin with first module */
@@ -440,64 +444,64 @@ LinkModules (void)
   do
     {				/* link machine code & read symbols in all modules */
       if (library)
-	{
-	  CURRENTLIB = libraryhdr->firstlib;	/* begin library search  from first library for each
-						   * module */
-	  CURRENTLIB->nextobjfile = 8;	/* point at first library module (past header) */
-	}
+        {
+          CURRENTLIB = libraryhdr->firstlib;	/* begin library search  from first library for each
+                                                 * module */
+          CURRENTLIB->nextobjfile = 8;	/* point at first library module (past header) */
+        }
       CURRENTFILE->line = 0;	/* no line references on errors    during link processing */
 
       if ((objfilename = AllocIdentifier (strlen (CURRENTFILE->fname) + 1)) != NULL)
-	{
-	  strcpy (objfilename, CURRENTFILE->fname);
-	  strcpy (objfilename + strlen (objfilename) - 4, objext);	/* overwrite '_asm' extension with
-									   * '_obj' */
-	}
+        {
+          strcpy (objfilename, CURRENTFILE->fname);
+          strcpy (objfilename + strlen (objfilename) - 4, objext);	/* overwrite '_asm' extension with
+                                                                     * '_obj' */
+        }
       else
-	{
-	  ReportError (NULL, 0, 3);
-	  break;		/* No more room */
-	}
+        {
+          ReportError (NULL, 0, 3);
+          break;		/* No more room */
+        }
 
       if ((z80asmfile = fopen (objfilename, "rb")) != NULL)
-	{								/* open relocatable file for reading */
-	  fread (fheader, 1U, 8U, z80asmfile);	/* read first 6 chars from file into array */
-	  fheader[8] = '\0';
-	}
+        {								/* open relocatable file for reading */
+          fread (fheader, 1U, 8U, z80asmfile);	/* read first 6 chars from file into array */
+          fheader[8] = '\0';
+        }
       else
-	{
-	  ReportIOError (objfilename);	/* couldn't open relocatable file */
-	  break;
-	}
+        {
+          ReportIOError (objfilename);	/* couldn't open relocatable file */
+          break;
+        }
 
       if (strcmp (fheader, Z80objhdr) != 0)
-	{			/* compare header of file */
-	  ReportError (objfilename, 0, 26);	/* not a object     file */
-	  fclose (z80asmfile);
-	  z80asmfile = NULL;
-	  break;
-	}
+        {			/* compare header of file */
+          ReportError (objfilename, 0, 26);	/* not a object     file */
+          fclose (z80asmfile);
+          z80asmfile = NULL;
+          break;
+        }
       lowbyte = fgetc (z80asmfile);
       highbyte = fgetc (z80asmfile);
 
       if (modulehdr->first == CURRENTMODULE)
-	{			/* origin of first module */
-	  if (autorelocate)
-	    CURRENTMODULE->origin = 0;	/* ORG 0 on auto relocation */
-	  else
-	    {
-	      if (deforigin)
-		CURRENTMODULE->origin = EXPLICIT_ORIGIN;	/* use origin from command line    */
-	      else
-		{
-		  CURRENTMODULE->origin = highbyte * 256U + lowbyte;
-		  if (CURRENTMODULE->origin == 65535U)
-		    DefineOrigin ();	/* Define origin of first module from the keyboard */
-		}
-	    }
-	  if (verbose == ON)
-	    printf ("ORG address for code is %04lX\n", CURRENTMODULE->origin);
-	}
+        {			/* origin of first module */
+          if (autorelocate)
+            CURRENTMODULE->origin = 0;	/* ORG 0 on auto relocation */
+          else
+            {
+              if (deforigin)
+                CURRENTMODULE->origin = EXPLICIT_ORIGIN;	/* use origin from command line    */
+              else
+                {
+                  CURRENTMODULE->origin = highbyte * 256U + lowbyte;
+                  if (CURRENTMODULE->origin == 65535U)
+                    DefineOrigin ();	/* Define origin of first module from the keyboard */
+                }
+            }
+          if (verbose == ON)
+            printf ("ORG address for code is %04lX\n", CURRENTMODULE->origin);
+        }
       fclose (z80asmfile);
 
       LinkModule (objfilename, 0);	/* link   code & read name definitions */
@@ -551,25 +555,25 @@ LinkModule (char *filename, long fptr_base)
       highbyte = fgetc (z80asmfile);
       size = lowbyte + highbyte * 256U;
       if (CURRENTMODULE->startoffset + size > MAXCODESIZE)
-	{
-	  ReportError (filename, 0, 12);
-	  return 0;
-	}
+        {
+          ReportError (filename, 0, 12);
+          return 0;
+        }
       else
-	fread (codearea + CURRENTMODULE->startoffset, sizeof (char), size, z80asmfile);	/* read module code */
+        fread (codearea + CURRENTMODULE->startoffset, sizeof (char), size, z80asmfile);	/* read module code */
 
       if (CURRENTMODULE->startoffset == CODESIZE)
-	CODESIZE += size;	/* a new module has been added */
+        CODESIZE += size;	/* a new module has been added */
     }
 
   if (fptr_namedecl != -1)
     {
       fseek (z80asmfile, fptr_base + fptr_namedecl, SEEK_SET);	/* set file pointer to point at name
-								   * declarations */
+                                                                 * declarations */
       if (fptr_libnmdecl != -1)
-	ReadNames (fptr_namedecl, fptr_libnmdecl);	/* Read symbols until library declarations */
+        ReadNames (fptr_namedecl, fptr_libnmdecl);	/* Read symbols until library declarations */
       else
-	ReadNames (fptr_namedecl, fptr_modname);	/* Read symbol suntil module name */
+        ReadNames (fptr_namedecl, fptr_modname);	/* Read symbol suntil module name */
     }
 
   fclose (z80asmfile);
@@ -577,12 +581,12 @@ LinkModule (char *filename, long fptr_base)
   if (fptr_libnmdecl != -1)
     {
       if (library)
-	{			/* search in libraries, if present */
-	  flag = LinkLibModules (filename, fptr_base, fptr_libnmdecl, fptr_modname);	/* link library modules */
+        {			/* search in libraries, if present */
+          flag = LinkLibModules (filename, fptr_base, fptr_libnmdecl, fptr_modname);	/* link library modules */
 
-	  if (!flag)
-	    return 0;
-	}
+          if (!flag)
+            return 0;
+        }
     }
 
   return LinkTracedModule (filename, fptr_base);	/* Remember module for pass2 */
@@ -602,25 +606,25 @@ LinkLibModules (char *filename, long fptr_base, long nextname, long endnames)
     {
       z80asmfile = fopen (filename, "rb");	/* open object file for reading */
       fseek (z80asmfile, fptr_base + nextname, SEEK_SET);	/* set file pointer to point at library name
-								   * declarations */
+                                                             * declarations */
       ReadName ();		/* read library reference name */
       fclose (z80asmfile);
 
       l = strlen (line);
       nextname += 1 + l;	/* remember module pointer to next name in this   object module */
       if (FindSymbol (line, globalroot) == NULL)
-	{
-	  modname = AllocIdentifier ((size_t) l + 1);
-	  if (modname == NULL)
-	    {
-	      ReportError (NULL, 0, 3);	/* Ups - system out of memory! */
-	      return 0;
-	    }
+        {
+          modname = AllocIdentifier ((size_t) l + 1);
+          if (modname == NULL)
+            {
+              ReportError (NULL, 0, 3);	/* Ups - system out of memory! */
+              return 0;
+            }
 
-	  strcpy (modname, line);
-	  SearchLibraries (modname);	/* search name in libraries */
-	  free (modname);	/* remove copy of module name */
-	}
+          strcpy (modname, line);
+          SearchLibraries (modname);	/* search name in libraries */
+          free (modname);	/* remove copy of module name */
+        }
     }
   while (nextname < endnames);
 
@@ -639,15 +643,15 @@ SearchLibraries (char *modname)
   for (i = 0; i < 2; i++)
     {				/* Libraries searched in max. 2 passes */
       while (CURRENTLIB != NULL)
-	{
-	  if (SearchLibfile (CURRENTLIB, modname))
-	    return;
+        {
+          if (SearchLibfile (CURRENTLIB, modname))
+            return;
 
-	  CURRENTLIB = CURRENTLIB->nextlib;
-	  if (CURRENTLIB != NULL)
-	    if (CURRENTLIB->nextobjfile != 8)
-	      CURRENTLIB->nextobjfile = 8;	/* search at start of next lib */
-	}
+          CURRENTLIB = CURRENTLIB->nextlib;
+          if (CURRENTLIB != NULL)
+            if (CURRENTLIB->nextobjfile != 8)
+              CURRENTLIB->nextobjfile = 8;	/* search at start of next lib */
+        }
 
       /* last library read ... */
       CURRENTLIB = libraryhdr->firstlib;	/* start at the beginning of the first module */
@@ -660,45 +664,101 @@ SearchLibraries (char *modname)
 int 
 SearchLibfile (struct libfile *curlib, char *modname)
 {
-
-  long currentlibmodule, modulesize, fptr_mname;
-  int flag;
+  long currentlibmodule, modulesize;
+  int ret;
   char *mname;
 
   z80asmfile = fopen (curlib->libfilename, "rb");
-  flag = 0;
 
   while (curlib->nextobjfile != -1)
     {				/* search name in all available library modules */
       do
-	{			/* point at first available module in library */
-	  fseek (z80asmfile, curlib->nextobjfile, SEEK_SET);	/* point at beginning of a module */
-	  currentlibmodule = curlib->nextobjfile;
-	  curlib->nextobjfile = ReadLong (z80asmfile);	/* get file pointer to next module in library */
-	  modulesize = ReadLong (z80asmfile);	/* get size of current module */
-	}
+        {			/* point at first available module in library */
+          fseek (z80asmfile, curlib->nextobjfile, SEEK_SET);	/* point at beginning of a module */
+          currentlibmodule = curlib->nextobjfile;
+          curlib->nextobjfile = ReadLong (z80asmfile);	/* get file pointer to next module in library */
+          modulesize = ReadLong (z80asmfile);	/* get size of current module */
+        }
       while (modulesize == 0 && curlib->nextobjfile != -1);
 
       if (modulesize != 0)
-	{			/* found module name? */
-	  fseek (z80asmfile, currentlibmodule + 4 + 4 + 8 + 2, SEEK_SET);	/* point at module name  file
-										   * pointer */
-	  fptr_mname = ReadLong (z80asmfile);	/* get module name file  pointer   */
-	  fseek (z80asmfile, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET);	/* point at module name  */
-	  mname = ReadName ();			/* read module name */
-	  if (strcmp (mname, modname) == 0)
-	    {
-	      fclose (z80asmfile);
-	      return LinkLibModule (curlib, currentlibmodule + 4 + 4, modname);
-	    }
-	}
+        {
+          if ( ( mname = CheckIfModuleWanted(z80asmfile, currentlibmodule, modname) ) != NULL )
+            {
+              fclose (z80asmfile);
+              ret =  LinkLibModule (curlib, currentlibmodule + 4 + 4, mname);
+              free(mname);
+              return ret;
+            }
+        }
     }
 
   fclose (z80asmfile);
-  return flag;
+  return 0;
 }
 
 
+/** \brief Check to see if a library module is required
+ *
+ *  \param z80asmfile - File to read from
+ *  \param currentlibmodule - Current offset in file
+ *  \param modname - Module/symbol to search for
+
+ */
+static char *
+CheckIfModuleWanted(FILE *z80asmfile, long currentlibmodule, char *modname)
+{
+  long fptr_mname, fptr_expr, fptr_name, fptr_libname;
+  char *mname;
+  char *name;
+
+  /* found module name? */
+  fseek (z80asmfile, currentlibmodule + 4 + 4 + 8 + 2, SEEK_SET);	/* point at module name  file
+                                                                     * pointer */
+  fptr_mname = ReadLong (z80asmfile);	/* get module name file  pointer   */
+  fptr_expr = ReadLong(z80asmfile);
+  fptr_name = ReadLong(z80asmfile);
+  fptr_libname = ReadLong(z80asmfile);
+  fseek (z80asmfile, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET);	/* point at module name  */
+  mname = strdup(ReadName ());			/* read module name */
+  if (strcmp (mname, modname) == 0)
+    {
+      return mname;
+    }
+
+
+  /* We didn't find the module name, lets have a look through the exported symbol list */
+  if ( fptr_name != 0 ) 
+    {
+      long end = fptr_expr;
+      long red = 0;
+      if ( fptr_libname == 0xffffffff )
+        {
+          end = fptr_mname;
+        }
+      /* Move to the name section */
+      fseek(z80asmfile,currentlibmodule + 4 + 4 + fptr_name,SEEK_SET);
+      red = fptr_name;
+      while ( red < end ) 
+        {
+          char scope, type;
+          long temp;
+
+          scope = fgetc(z80asmfile); red++;
+          type = fgetc(z80asmfile); red++;
+          temp = ReadLong(z80asmfile); red += 4;
+          name = ReadName();
+          red += strlen(mname);
+          red++; /* Length byte */
+          if ( (scope == 'X' || scope == 'G') && strcmp(name, modname) == 0 ) 
+            {
+              return mname;
+            }
+        }
+    }
+  free(mname);
+  return NULL;
+}
 
 int 
 LinkLibModule (struct libfile *library, long curmodule, char *modname)
@@ -713,21 +773,21 @@ LinkLibModule (struct libfile *library, long curmodule, char *modname)
     {
       mname = AllocIdentifier (strlen (modname) + 1);	/* get a copy of module name */
       if (mname != NULL)
-	{
-	  strcpy (mname, modname);
-	  CURRENTMODULE->mname = mname;		/* create new module for library */
-	  CURRENTFILE = Newfile (NULL, library->libfilename);	/* filename for 'module' */
+        {
+          strcpy (mname, modname);
+          CURRENTMODULE->mname = mname;		/* create new module for library */
+          CURRENTFILE = Newfile (NULL, library->libfilename);	/* filename for 'module' */
 
-	  if (verbose)
-	    printf ("Linking library module <%s>\n", modname);
+          if (verbose)
+            printf ("Linking library module <%s>\n", modname);
 
-	  flag = LinkModule (library->libfilename, curmodule);	/* link   module & read names */
-	}
+          flag = LinkModule (library->libfilename, curmodule);	/* link   module & read names */
+        }
       else
-	{
-	  ReportError (NULL, 0, 3);
-	  flag = 0;
-	}
+        {
+          ReportError (NULL, 0, 3);
+          flag = 0;
+        }
     }
   else
     flag = 0;
@@ -769,31 +829,31 @@ ModuleExpr (void)
       fptr_base = curlink->modulestart;
 
       if ((z80asmfile = fopen (curlink->objfilename, "rb")) != NULL)
-	{			/* open relocatable file for reading */
-	  fseek (z80asmfile, fptr_base + 10, SEEK_SET);		/* point at module name  pointer   */
-	  fptr_modname = ReadLong (z80asmfile);		/* get file pointer to module name */
-	  fptr_exprdecl = ReadLong (z80asmfile);	/* get file pointer to expression declarations */
-	  fptr_namedecl = ReadLong (z80asmfile);	/* get file pointer to name declarations */
-	  fptr_libnmdecl = ReadLong (z80asmfile);	/* get file pointer to library name declarations */
-	}
+        {			/* open relocatable file for reading */
+          fseek (z80asmfile, fptr_base + 10, SEEK_SET);		/* point at module name  pointer   */
+          fptr_modname = ReadLong (z80asmfile);		/* get file pointer to module name */
+          fptr_exprdecl = ReadLong (z80asmfile);	/* get file pointer to expression declarations */
+          fptr_namedecl = ReadLong (z80asmfile);	/* get file pointer to name declarations */
+          fptr_libnmdecl = ReadLong (z80asmfile);	/* get file pointer to library name declarations */
+        }
       else
-	{
-	  ReportIOError (curlink->objfilename);		/* couldn't open relocatable file */
-	  return;
-	}
+        {
+          ReportIOError (curlink->objfilename);		/* couldn't open relocatable file */
+          return;
+        }
 
       if (fptr_exprdecl != -1)
-	{
-	  fseek (z80asmfile, fptr_base + fptr_exprdecl, SEEK_SET);
-	  if (fptr_namedecl != -1)
-	    ReadExpr (fptr_exprdecl, fptr_namedecl);	/* Evaluate until beginning of name
-							   * declarations     */
-	  else if (fptr_libnmdecl != -1)
-	    ReadExpr (fptr_exprdecl, fptr_libnmdecl);	/* Evaluate until beginning of library
-							   * reference declarations */
-	  else
-	    ReadExpr (fptr_exprdecl, fptr_modname);	/* Evaluate until beginning of module name */
-	}
+        {
+          fseek (z80asmfile, fptr_base + fptr_exprdecl, SEEK_SET);
+          if (fptr_namedecl != -1)
+            ReadExpr (fptr_exprdecl, fptr_namedecl);	/* Evaluate until beginning of name
+                                                         * declarations     */
+          else if (fptr_libnmdecl != -1)
+            ReadExpr (fptr_exprdecl, fptr_libnmdecl);	/* Evaluate until beginning of library
+                                                         * reference declarations */
+          else
+            ReadExpr (fptr_exprdecl, fptr_modname);	/* Evaluate until beginning of module name */
+        }
       fclose (z80asmfile);
 
       z80asmfile = NULL;
@@ -984,15 +1044,15 @@ LinkTracedModule (char *filename, long baseptr)
   if (linkhdr == NULL)
     {
       if ((linkhdr = AllocLinkHdr ()) == NULL)
-	{
-	  ReportError (NULL, 0, 3);
-	  return 0;
-	}
+        {
+          ReportError (NULL, 0, 3);
+          return 0;
+        }
       else
-	{
-	  linkhdr->firstlink = NULL;
-	  linkhdr->lastlink = NULL;	/* Library header initialised */
-	}
+        {
+          linkhdr->firstlink = NULL;
+          linkhdr->lastlink = NULL;	/* Library header initialised */
+        }
     }
 
   fname = AllocIdentifier (strlen (filename) + 1);	/* get a copy module file name */
@@ -1268,3 +1328,16 @@ AllocTracedModule (void)
 {
   return (struct linkedmod *) malloc (sizeof (struct linkedmod));
 }
+
+/*
+ * Local Variables:
+ *  indent-tabs-mode:nil
+ *  require-final-newline:t
+ *  c-basic-offset: 2
+ *  eval: (c-set-offset 'case-label 0)
+ *  eval: (c-set-offset 'substatement-open 2)
+ *  eval: (c-set-offset 'access-label 0)
+ *  eval: (c-set-offset 'class-open 2)
+ *  eval: (c-set-offset 'class-close 2)
+ * End:
+ */
