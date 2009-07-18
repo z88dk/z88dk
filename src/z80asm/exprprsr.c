@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.4 2008-06-02 19:03:12 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.5 2009-07-18 23:23:15 dom Exp $ */
 /* $History: EXPRPRSR.C $ */
 /*  */
 /* *****************  Version 15  ***************** */
@@ -123,131 +123,131 @@ extern FILE *z80asmfile, *objfile;
 int 
 Factor (struct expr *pfixexpr)
 {
-  long constant;
-  symbol *symptr;
-  char eval_err;
+    long constant;
+    symbol *symptr;
+    char eval_err;
 
-  switch (sym)
+    switch (sym)
     {
     case name:
-      symptr = GetSymPtr (ident);
-      if (symptr != NULL)
-	{
-	  if (symptr->type & SYMDEFINED)
-	    {
-	      pfixexpr->rangetype |= (symptr->type & SYMTYPE);	/* copy appropriate type bits */
-	      NewPfixSymbol (pfixexpr, symptr->symvalue, number, NULL, symptr->type);
-	    }
-	  else
-	    {
-	      pfixexpr->rangetype |= ((symptr->type & SYMTYPE) | NOTEVALUABLE);	
-              /* copy appropriate declaration bits */
+        symptr = GetSymPtr (ident);
+        if (symptr != NULL)
+        {
+            if (symptr->type & SYMDEFINED)
+            {
+                pfixexpr->rangetype |= (symptr->type & SYMTYPE);	/* copy appropriate type bits */
+                NewPfixSymbol (pfixexpr, symptr->symvalue, number, NULL, symptr->type);
+            }
+            else
+            {
+                pfixexpr->rangetype |= ((symptr->type & SYMTYPE) | NOTEVALUABLE);	
+                /* copy appropriate declaration bits */
 
-	      NewPfixSymbol (pfixexpr, 0, number, ident, symptr->type);		
-              /* symbol only declared, store symbol name */
-	    }
-	}
-      else
-	{
-	  pfixexpr->rangetype |= NOTEVALUABLE;	/* expression not evaluable */
-	  NewPfixSymbol (pfixexpr, 0, number, ident, SYM_NOTDEFINED);	/* symbol not found */
-	}
-      strcpy (pfixexpr->infixptr, ident);	/* add identifier to infix expr */
-      pfixexpr->infixptr += strlen (ident);	/* update pointer */
+                NewPfixSymbol (pfixexpr, 0, number, ident, symptr->type);		
+                /* symbol only declared, store symbol name */
+            }
+        }
+        else
+        {
+            pfixexpr->rangetype |= NOTEVALUABLE;	/* expression not evaluable */
+            NewPfixSymbol (pfixexpr, 0, number, ident, SYM_NOTDEFINED);	/* symbol not found */
+        }
+        strcpy (pfixexpr->infixptr, ident);	/* add identifier to infix expr */
+        pfixexpr->infixptr += strlen (ident);	/* update pointer */
 
-      GetSym ();
-      break;
+        GetSym ();
+        break;
 
     case hexconst:
     case binconst:
     case decmconst:
-      strcpy (pfixexpr->infixptr, ident);	/* add constant to infix expr */
-      pfixexpr->infixptr += strlen (ident);	/* update pointer */
-      constant = GetConstant (&eval_err);
+        strcpy (pfixexpr->infixptr, ident);	/* add constant to infix expr */
+        pfixexpr->infixptr += strlen (ident);	/* update pointer */
+        constant = GetConstant (&eval_err);
 
-      if (eval_err == 1)
-	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 5);
-	  return 0;		/* syntax error in expression */
-	}
-      else
-	NewPfixSymbol (pfixexpr, constant, number, NULL, 0);
+        if (eval_err == 1)
+        {
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 5);
+            return 0;		/* syntax error in expression */
+        }
+        else
+            NewPfixSymbol (pfixexpr, constant, number, NULL, 0);
 
-      GetSym ();
-      break;
+        GetSym ();
+        break;
 
     case lparen:
     case lsquare:
-      *pfixexpr->infixptr++ = separators[sym];	/* store '(' or '[' in infix expr */
-      GetSym ();
+        *pfixexpr->infixptr++ = separators[sym];	/* store '(' or '[' in infix expr */
+        GetSym ();
 
-      if (Condition (pfixexpr))
-	{
-	  if (sym == rparen || sym == rsquare)
-	    {
-	      *pfixexpr->infixptr++ = separators[sym];	/* store ')' or ']' in infix expr */
-	      GetSym ();
-	      break;
-	    }
-	  else
-	    {
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 6);
-	      return 0;
-	    }
-	}
-      else
-	return 0;
+        if (Condition (pfixexpr))
+        {
+            if (sym == rparen || sym == rsquare)
+            {
+                *pfixexpr->infixptr++ = separators[sym];	/* store ')' or ']' in infix expr */
+                GetSym ();
+                break;
+            }
+            else
+            {
+                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 6);
+                return 0;
+            }
+        }
+        else
+            return 0;
 
     case log_not:
-      *pfixexpr->infixptr++ = '!';
-      GetSym ();
+        *pfixexpr->infixptr++ = '!';
+        GetSym ();
 
-      if (!Factor (pfixexpr))
-	return 0;
-      else
-	NewPfixSymbol (pfixexpr, 0, log_not, NULL, 0);	/* logical NOT...  */
-      break;
+        if (!Factor (pfixexpr))
+            return 0;
+        else
+            NewPfixSymbol (pfixexpr, 0, log_not, NULL, 0);	/* logical NOT...  */
+        break;
 
     case squote:
-      *pfixexpr->infixptr++ = '\'';	/* store single quote in infix expr */
-      if (feof (z80asmfile))
-	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	  return 0;
-	}
-      else
-	{
-	  constant = GetChar (z80asmfile);
-	  if (constant == EOF)
-	    {
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	      return 0;
-	    }
-	  else
-	    {
-	      *pfixexpr->infixptr++ = constant;		/* store char in infix expr */
-	      if (GetSym () == squote)
-		{
-		  *pfixexpr->infixptr++ = '\'';
-		  NewPfixSymbol (pfixexpr, constant, number, NULL, 0);
-		}
-	      else
-		{
-		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 5);
-		  return 0;
-		}
-	    }
-	}
+        *pfixexpr->infixptr++ = '\'';	/* store single quote in infix expr */
+        if (feof (z80asmfile))
+        {
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+            return 0;
+        }
+        else
+        {
+            constant = GetChar (z80asmfile);
+            if (constant == EOF)
+            {
+                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+                return 0;
+            }
+            else
+            {
+                *pfixexpr->infixptr++ = constant;		/* store char in infix expr */
+                if (GetSym () == squote)
+                {
+                    *pfixexpr->infixptr++ = '\'';
+                    NewPfixSymbol (pfixexpr, constant, number, NULL, 0);
+                }
+                else
+                {
+                    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 5);
+                    return 0;
+                }
+            }
+        }
 
-      GetSym ();
-      break;
+        GetSym ();
+        break;
 
     default:
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 5);	/* syntax error */
-      return 0;
+        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 5);	/* syntax error */
+        return 0;
     }
 
-  return 1;			/* syntax OK */
+    return 1;			/* syntax OK */
 }
 
 
@@ -408,53 +408,53 @@ Condition (struct expr *pfixexpr)
 struct expr *
 ParseNumExpr (void)
 {
-  struct expr *pfixhdr;
-  enum symbols constant_expression = nil;
+    struct expr *pfixhdr;
+    enum symbols constant_expression = nil;
 
-  if ((pfixhdr = Allocexpr ()) == NULL)
+    if ((pfixhdr = Allocexpr ()) == NULL)
     {
-      ReportError (NULL, 0, 3);
-      return NULL;
+        ReportError (NULL, 0, 3);
+        return NULL;
     }
-  else
+    else
     {
-      pfixhdr->firstnode = NULL;
-      pfixhdr->currentnode = NULL;
-      pfixhdr->rangetype = 0;
-      pfixhdr->stored = OFF;
-      pfixhdr->codepos = codeptr - codearea;
-      pfixhdr->infixexpr = NULL;
-      pfixhdr->infixptr = NULL;
+        pfixhdr->firstnode = NULL;
+        pfixhdr->currentnode = NULL;
+        pfixhdr->rangetype = 0;
+        pfixhdr->stored = OFF;
+        pfixhdr->codepos = codeptr - codearea;
+        pfixhdr->infixexpr = NULL;
+        pfixhdr->infixptr = NULL;
 
-      if ((pfixhdr->infixexpr = (char *) calloc (128,sizeof (char))) == NULL)
-	{
-	  ReportError (NULL, 0, 3);
-	  free (pfixhdr);
-	  return NULL;
-	}
-      else
-	pfixhdr->infixptr = pfixhdr->infixexpr;		/* initialise pointer to start of buffer */
-    }
-
-  if (sym == constexpr)
-    {
-      GetSym ();		/* leading '#' : ignore relocatable address expression */
-      constant_expression = constexpr;	/* convert to constant expression */
-      *pfixhdr->infixptr++ = '#';
+        if ((pfixhdr->infixexpr = (char *) calloc (128,sizeof (char))) == NULL)
+        {
+            ReportError (NULL, 0, 3);
+            free (pfixhdr);
+            return NULL;
+        }
+        else
+            pfixhdr->infixptr = pfixhdr->infixexpr;		/* initialise pointer to start of buffer */
     }
 
-  if (Condition (pfixhdr))
+    if (sym == constexpr)
+    {
+        GetSym ();		/* leading '#' : ignore relocatable address expression */
+        constant_expression = constexpr;	/* convert to constant expression */
+        *pfixhdr->infixptr++ = '#';
+    }
+
+    if (Condition (pfixhdr))
     {				/* parse expression... */
-      if (constant_expression == constexpr)
-	NewPfixSymbol (pfixhdr, 0, constexpr, NULL, 0);	/* convert to constant expression */
+        if (constant_expression == constexpr)
+            NewPfixSymbol (pfixhdr, 0, constexpr, NULL, 0);	/* convert to constant expression */
 
-      *pfixhdr->infixptr = '\0';			/* terminate infix expression */
-      return pfixhdr;
+        *pfixhdr->infixptr = '\0';			/* terminate infix expression */
+        return pfixhdr;
     }
-  else
+    else
     {
-      RemovePfixlist (pfixhdr);
-      return NULL;		/* syntax error in expression or no room */
+        RemovePfixlist (pfixhdr);
+        return NULL;		/* syntax error in expression or no room */
     }				/* for postfix expression */
 }
 
@@ -1005,3 +1005,16 @@ AllocStackItem (void)
 {
   return (struct pfixstack *) malloc (sizeof (struct pfixstack));
 }
+
+/*
+ * Local Variables:
+ *  indent-tabs-mode:nil
+ *  require-final-newline:t
+ *  c-basic-offset: 2
+ *  eval: (c-set-offset 'case-label 0)
+ *  eval: (c-set-offset 'substatement-open 2)
+ *  eval: (c-set-offset 'access-label 0)
+ *  eval: (c-set-offset 'class-open 2)
+ *  eval: (c-set-offset 'class-close 2)
+ * End:
+ */

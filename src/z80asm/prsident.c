@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.11 2009-05-28 20:33:58 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.12 2009-07-18 23:23:15 dom Exp $ */
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -68,6 +68,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include <string.h>
 #include <stdlib.h>
 #include "config.h"
+#include "z80asm.h"
 #include "symbol.h"
 
 
@@ -128,7 +129,6 @@ extern unsigned char *codeptr;
 extern struct module *CURRENTMODULE;
 extern long clineno;
 
-extern enum flag rcmX000;
 
 typedef void (*ptrfunc) (void);	/* ptr to function returning void */
 typedef int (*fptr) (const void *, const void *);
@@ -467,10 +467,10 @@ NOP (void)
 void 
 HALT (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
     }
 
   *codeptr++ = 118;
@@ -522,7 +522,7 @@ LDDR (void)
 void 
 CPI (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
       SetTemporaryLine("\ncall rcmx_cpi\n");
       return;
@@ -538,7 +538,7 @@ CPI (void)
 void 
 CPIR (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
       SetTemporaryLine("\ncall rcmx_cpir\n");
       return;
@@ -554,7 +554,7 @@ CPIR (void)
 void 
 CPD (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
       SetTemporaryLine("\ncall rcmx_cpd\n");
       return;
@@ -570,11 +570,11 @@ CPD (void)
 void 
 CPDR (void)
 {
-  if (rcmX000)
-  {
+  if ( (cpu_type & CPU_RABBIT) )
+    {
       SetTemporaryLine("\ncall rcmx_cpdr\n");
       return;
-  }
+    }
 
   *codeptr++ = 237;
   *codeptr++ = 185;
@@ -586,10 +586,10 @@ CPDR (void)
 void 
 IND (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
     }
 
   *codeptr++ = 237;
@@ -602,10 +602,10 @@ IND (void)
 void 
 INDR (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
     }
 
   *codeptr++ = 237;
@@ -618,10 +618,10 @@ INDR (void)
 void 
 INI (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
     }
   *codeptr++ = 237;
   *codeptr++ = 162;
@@ -633,10 +633,10 @@ INI (void)
 void 
 INIR (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
     }
 
   *codeptr++ = 237;
@@ -649,10 +649,10 @@ INIR (void)
 void 
 OUTI (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
     }
 
   *codeptr++ = 237;
@@ -665,10 +665,10 @@ OUTI (void)
 void 
 OUTD (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
     }
 
   *codeptr++ = 237;
@@ -681,10 +681,10 @@ OUTD (void)
 void 
 OTIR (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
     }
 
   *codeptr++ = 237;
@@ -697,10 +697,10 @@ OTIR (void)
 void 
 OTDR (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
     }
 
   *codeptr++ = 237;
@@ -862,10 +862,10 @@ SRA (void)
 void 
 SLL (void)
 {
-  if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
     }
   RotShift_instr (6);
 }
@@ -964,7 +964,7 @@ RETI (void)
 void 
 RETN (void)
 {
-  if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
       ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
       return;
@@ -979,10 +979,10 @@ RETN (void)
 void 
 RLD (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
       SetTemporaryLine("\ncall rcmx_rld\n");
-	return;
+      return;
     }
 
   *codeptr++ = 237;
@@ -995,10 +995,10 @@ RLD (void)
 void 
 RRD (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
       SetTemporaryLine("\ncall rcmx_rrd\n");
-	return;
+      return;
     }
 
   *codeptr++ = 237;
@@ -1055,10 +1055,10 @@ SCF (void)
 void 
 DI (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
     }
 
   *codeptr++ = 243;
@@ -1070,10 +1070,10 @@ DI (void)
 void 
 EI (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
     }
 
   *codeptr++ = 251;
@@ -1085,12 +1085,27 @@ EI (void)
 void 
 DAA (void)
 {
-    if (rcmX000)
+  if ( (cpu_type & CPU_RABBIT) )
     {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
     }
 
-    *codeptr++ = 39;
-    ++PC;
+  *codeptr++ = 39;
+  ++PC;
 }
+
+/*
+ * Local Variables:
+ *  indent-tabs-mode:nil
+ *  require-final-newline:t
+ *  c-basic-offset: 2
+ *  eval: (c-set-offset 'case-label 0)
+ *  eval: (c-set-offset 'substatement-open 2)
+ *  eval: (c-set-offset 'access-label 0)
+ *  eval: (c-set-offset 'class-open 2)
+ *  eval: (c-set-offset 'class-close 2)
+ * End:
+ */
+
+

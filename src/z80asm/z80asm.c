@@ -14,7 +14,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.21 2009-06-22 22:12:53 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.22 2009-07-18 23:23:15 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -241,9 +241,8 @@ enum flag pass1, listing, listing_CPY, symtable, z80bin, writeline, mapref, glob
 enum flag deforigin, verbose, ASMERROR, EOL, symfile, library, createlibrary, autorelocate;
 enum flag smallc_source, codesegment, expl_binflnm, clinemode, swapIXIY;
 
-enum flag rcmX000;
 
-
+int cpu_type = CPU_Z80;
 int ASSEMBLE_ERROR, ERRORS, TOTALERRORS, PAGENR, LINENR;
 long TOTALLINES;
 int sourcefile_open;
@@ -695,7 +694,7 @@ SetAsmFlag (char *flagid)
 
   if (strcmp (flagid, "RCMX000") == 0)
     {
-      rcmX000=ON;
+      cpu_type = CPU_RCM2000;
       return;
     }
 
@@ -1232,7 +1231,7 @@ main (int argc, char *argv[])
   symtable = symfile = writeline = mapref = ON;
   verbose = smallc_source = listing = listing_CPY = z80bin = datestamp = ASMERROR = codesegment = clinemode = OFF;
   deforigin = globaldef = library = createlibrary = autorelocate = clineno = OFF;
-  rcmX000=OFF;
+  cpu_type = CPU_Z80;
 
 
   libfilename = NULL;
@@ -1356,7 +1355,6 @@ main (int argc, char *argv[])
         again:          
           ptr = Fetchfilename(modsrcfile);
           strcpy(ident, ptr);
-
           if (strlen (ident) == 0)
             {
               fclose (modsrcfile);

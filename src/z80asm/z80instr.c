@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.7 2009-05-28 19:20:16 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.8 2009-07-18 23:23:15 dom Exp $ */
 /* $History: Z80INSTR.C $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -61,6 +61,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include <stdlib.h>
 #include <string.h>
 #include "config.h"
+#include "z80asm.h"
 #include "symbol.h"
 
 /* external functions */
@@ -98,7 +99,6 @@ extern struct module *CURRENTMODULE;
 extern enum symbols GetSym (void), sym;
 extern enum flag relocfile, ti83plus;
 
-extern int rcmX000;
 
 void 
 PushPop_instr (int opcode)
@@ -108,35 +108,37 @@ PushPop_instr (int opcode)
   if (GetSym () == name)
     switch (qq = CheckRegister16 ())
       {
-      case 0:
-      case 1:
-      case 2:
-	*codeptr++ = opcode + qq * 16;
-	++PC;
-	break;
+      case REG16_BC:
+      case REG16_DE:
+      case REG16_HL:
+        *codeptr++ = opcode + qq * 16;
+        ++PC;
+        break;
 
-      case 4:
-	*codeptr++ = opcode + 48;
-	++PC;
-	break;
+      case REG16_AF:
+        *codeptr++ = opcode + 48;
+        ++PC;
+        break;
 
-      case 5:
-	*codeptr++ = 221;
-	*codeptr++ = opcode + 32;
-	PC += 2;
-	break;
+      case REG16_IX:
+        *codeptr++ = 221;
+        *codeptr++ = opcode + 32;
+        PC += 2;
+        break;
 
-      case 6:
-	*codeptr++ = 253;
-	*codeptr++ = opcode + 32;
-	PC += 2;
-	break;
+      case REG16_IY:
+        *codeptr++ = 253;
+        *codeptr++ = opcode + 32;
+        PC += 2;
+        break;
 
       default:
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
       }
   else
-    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+    {
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+    }
 }
 
 
@@ -149,9 +151,9 @@ RET (void)
     {
     case name:
       if ((constant = CheckCondition ()) != -1)
-	*codeptr++ = 192 + constant * 8;	/* RET cc  instruction opcode */
+        *codeptr++ = 192 + constant * 8;	/* RET cc  instruction opcode */
       else
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
       break;
 
     case newline:
@@ -172,91 +174,91 @@ EX (void)
 {
   if (GetSym () == lparen)
     if (GetSym () == name)
-      if (CheckRegister16 () == 3)	/* EX  (SP) */
-	if (GetSym () == rparen)
-	  if (GetSym () == comma)
-	    if (GetSym () == name)
-	      switch (CheckRegister16 ())
-		{
-		case 2:
-		    if (rcmX000)
-		    {
-			/* Instruction code changed */
-			*codeptr++ = 0xED;
-			*codeptr++ = 0x54;
-			PC+=2;
-		    }
-		    else
-		    {
-			*codeptr++ = 227;	/* EX  (SP),HL  */
-			++PC;
-		    }
-		  break;
+      if (CheckRegister16 () == REG16_SP)	/* EX  (SP) */
+        if (GetSym () == rparen)
+          if (GetSym () == comma)
+            if (GetSym () == name)
+              switch (CheckRegister16 ())
+                {
+                case REG16_HL:
+                  if ( (cpu_type & CPU_RABBIT) )
+                    {
+                      /* Instruction code changed */
+                      *codeptr++ = 0xED;
+                      *codeptr++ = 0x54;
+                      PC+=2;
+                    }
+                  else
+                    {
+                      *codeptr++ = 227;	/* EX  (SP),HL  */
+                      ++PC;
+                    }
+                  break;
 
-		case 5:
-		  *codeptr++ = 221;
-		  *codeptr++ = 227;	/* EX  (SP),IX  */
-		  PC += 2;
-		  break;
+                case REG16_IX:
+                  *codeptr++ = 221;
+                  *codeptr++ = 227;	/* EX  (SP),IX  */
+                  PC += 2;
+                  break;
 
-		case 6:
-		  *codeptr++ = 253;
-		  *codeptr++ = 227;	/* EX  (SP),IY  */
-		  PC += 2;
-		  break;
+                case REG16_IY:
+                  *codeptr++ = 253;
+                  *codeptr++ = 227;	/* EX  (SP),IY  */
+                  PC += 2;
+                  break;
 
-		default:
-		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-		}
-	    else
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	else
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+                default:
+                  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                }
+            else
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+          else
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+        else
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
       else
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
     else
       ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
   else if (sym == name)
     {
       switch (CheckRegister16 ())
-	{
-	case 1:
-	  if (GetSym () == comma)	/* EX  DE,HL   */
-	    if (GetSym () == name)
-	      if (CheckRegister16 () == 2)
-		{
-		  *codeptr++ = 235;
-		  ++PC;
-		}
-	      else
-		ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	    else
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	  break;
+        {
+        case REG16_DE:
+          if (GetSym () == comma)	/* EX  DE,HL   */
+            if (GetSym () == name)
+              if (CheckRegister16 () == 2)
+                {
+                  *codeptr++ = 235;
+                  ++PC;
+                }
+              else
+                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+            else
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+          else
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+          break;
 
-	case 4:
-	  if (GetSym () == comma)	/* EX  AF,AF'   */
-	    if (GetSym () == name)
-	      if (CheckRegister16 () == 4)
-		{
-		  *codeptr++ = 8;
-		  ++PC;
-		}
-	      else
-		ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	    else
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	  break;
+        case 4:
+          if (GetSym () == comma)	/* EX  AF,AF'   */
+            if (GetSym () == name)
+              if (CheckRegister16 () == 4)
+                {
+                  *codeptr++ = 8;
+                  ++PC;
+                }
+              else
+                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+            else
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+          else
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+          break;
 
-	default:
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	}
+        default:
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+        }
     }
   else
     ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
@@ -269,62 +271,62 @@ OUT (void)
 {
   long reg;
 
-  if (rcmX000)
-  {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	return;
-  }
+  if ( (cpu_type & CPU_RABBIT) )
+    {
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      return;
+    }
 
   if (GetSym () == lparen)
     {
       GetSym ();
       if (CheckRegister8 () == 1)
-	{			/* OUT (C) */
-	  if (GetSym () == rparen)
-	    if (GetSym () == comma)
-	      if (GetSym () == name)
-		switch (reg = CheckRegister8 ())
-		  {
-		  case 6:
-		  case 8:
-		  case 9:
-		  case -1:
-		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-		    break;
+        {			/* OUT (C) */
+          if (GetSym () == rparen)
+            if (GetSym () == comma)
+              if (GetSym () == name)
+                switch (reg = CheckRegister8 ())
+                  {
+                  case 6:
+                  case 8:
+                  case 9:
+                  case -1:
+                    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                    break;
 
-		  default:
-		    *codeptr++ = 237;
-		    *codeptr++ = 65 + reg * 8;	/* OUT (C),r  */
-		    PC += 2;
-		    break;
-		  }
-	      else
-		ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	    else
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	}
+                  default:
+                    *codeptr++ = 237;
+                    *codeptr++ = 65 + reg * 8;	/* OUT (C),r  */
+                    PC += 2;
+                    break;
+                  }
+              else
+                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+            else
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+          else
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+        }
       else
-	{
-	  *codeptr++ = 211;
-	  if (!ExprUnsigned8 (1))
-	    return;
-	  PC += 2;
-	  if (sym == rparen)
-	    if (GetSym () == comma)
-	      if (GetSym () == name)
-		{
-		  if (CheckRegister8 () != 7)
-		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-		}
-	      else
-		ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	    else
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	}
+        {
+          *codeptr++ = 211;
+          if (!ExprUnsigned8 (1))
+            return;
+          PC += 2;
+          if (sym == rparen)
+            if (GetSym () == comma)
+              if (GetSym () == name)
+                {
+                  if (CheckRegister8 () != 7)
+                    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                }
+              else
+                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+            else
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+          else
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+        }
     }
   else
     ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
@@ -336,61 +338,61 @@ IN (void)
 {
   long inreg;
 
-  if (rcmX000)
-  {
+  if ( (cpu_type & CPU_RABBIT) )
+    {
       ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
       return;
-  }
+    }
   
   if (GetSym () == name)
     {
       switch (inreg = CheckRegister8 ())
-	{
-	case 8:
-	case 9:
-	case -1:
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	  break;
+        {
+        case 8:
+        case 9:
+        case -1:
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+          break;
 
-	default:
-	  if (GetSym () != comma)
-	    {
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	      break;
-	    }
-	  if (GetSym () != lparen)
-	    {
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	      break;
-	    }
-	  GetSym ();
-	  switch (CheckRegister8 ())
-	    {
-	    case 1:
-	      *codeptr++ = 237;
-	      *codeptr++ = 64 + inreg * 8;	/* IN r,(C) */
-	      PC += 2;
-	      break;
+        default:
+          if (GetSym () != comma)
+            {
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+              break;
+            }
+          if (GetSym () != lparen)
+            {
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+              break;
+            }
+          GetSym ();
+          switch (CheckRegister8 ())
+            {
+            case 1:
+              *codeptr++ = 237;
+              *codeptr++ = 64 + inreg * 8;	/* IN r,(C) */
+              PC += 2;
+              break;
 
-	    case -1:
-	      if (inreg == 7)
-		{
-		  *codeptr++ = 219;
-		  if (ExprUnsigned8 (1))
-		    if (sym != rparen)
-		      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-		  PC += 2;
-		}
-	      else
-		ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	      break;
+            case -1:
+              if (inreg == 7)
+                {
+                  *codeptr++ = 219;
+                  if (ExprUnsigned8 (1))
+                    if (sym != rparen)
+                      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+                  PC += 2;
+                }
+              else
+                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+              break;
 
-	    default:
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	      break;
-	    }
-	  break;
-	}
+            default:
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+              break;
+            }
+          break;
+        }
     }
   else
     ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
@@ -403,37 +405,37 @@ IM (void)
   long constant;
   struct expr *postfixexpr;
 
-  if (rcmX000)
-  {
+  if ( (cpu_type & CPU_RABBIT) )
+    {
       ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
       return;
-  }
+    }
 
   GetSym ();
   if ((postfixexpr = ParseNumExpr ()) != NULL)
     {
       if (postfixexpr->rangetype & NOTEVALUABLE)
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 2);
+        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 2);
       else
-	{
-	  constant = EvalPfixExpr (postfixexpr);
-	  switch (constant)
-	    {
-	    case 0:
-	      *codeptr++ = 237;
-	      *codeptr++ = 70;	/* IM 0   */
-	      break;
-	    case 1:
-	      *codeptr++ = 237;
-	      *codeptr++ = 86;	/* IM 1  */
-	      break;
-	    case 2:
-	      *codeptr++ = 237;
-	      *codeptr++ = 94;	/* IM 2  */
-	      break;
-	    }
-	  PC += 2;
-	}
+        {
+          constant = EvalPfixExpr (postfixexpr);
+          switch (constant)
+            {
+            case 0:
+              *codeptr++ = 237;
+              *codeptr++ = 70;	/* IM 0   */
+              break;
+            case 1:
+              *codeptr++ = 237;
+              *codeptr++ = 86;	/* IM 1  */
+              break;
+            case 2:
+              *codeptr++ = 237;
+              *codeptr++ = 94;	/* IM 2  */
+              break;
+            }
+          PC += 2;
+        }
       RemovePfixlist (postfixexpr);	/* remove linked list, because expr. was evaluated */
     }
 }
@@ -449,26 +451,26 @@ RST (void)
   if ((postfixexpr = ParseNumExpr ()) != NULL)
     {
       if (postfixexpr->rangetype & NOTEVALUABLE)
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 2);
+        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 2);
       else
-	{
-	  constant = EvalPfixExpr (postfixexpr);
-	  if ((constant >= 0 && constant <= 56) && (constant % 8 == 0))
-	    {
-		if ( (rcmX000) && 
-		     ((constant == 0) || (constant == 8) || (constant == 0x30)))
-		{
-		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-		}
-		else
-		{
-		    *codeptr++ = 199 + constant;	/* RST  00H, ... 38H */
-		    ++PC;
-		}
-	    }
-	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 4);
-	}
+        {
+          constant = EvalPfixExpr (postfixexpr);
+          if ((constant >= 0 && constant <= 56) && (constant % 8 == 0))
+            {
+              if ( (cpu_type & CPU_RABBIT) && 
+                   ((constant == 0) || (constant == 8) || (constant == 0x30)))
+                {
+                  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                }
+              else
+                {
+                  *codeptr++ = 199 + constant;	/* RST  00H, ... 38H */
+                  ++PC;
+                }
+            }
+          else
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 4);
+        }
       RemovePfixlist (postfixexpr);
     }
 }
@@ -615,105 +617,106 @@ FPP (void)
 void 
 Subroutine_addr (int opcode0, int opcode)
 {
-    long constant;
-    extern enum flag EOL;
+  long constant;
+  extern enum flag EOL;
 
-    GetSym ();
-    if ((constant = CheckCondition ()) != -1) { /* Check for condition */
+  GetSym ();
+  if ((constant = CheckCondition ()) != -1) { /* Check for condition */
            
-        if (GetSym () != comma) {
-            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-            return;
-        }
+    if (GetSym () != comma) {
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+      return;
+    }
 
-        if (opcode0==205 && rcmX000)
-        {
-            static char buffer[200];
-            extern char *ident;
+
+    if (opcode0==205 && (cpu_type & CPU_RABBIT) ) 
+      {
+        static char buffer[200];
+        extern char *ident;
 
 #if 0
-            if ( constant >= 4 ) 
-            {
-                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-                return;
-            }
+        if ( constant >= 4 ) 
+          {
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+            return;
+          }
 #endif
 
-            switch ( constant ) {
-            case 0:  /* nz */
-                *codeptr++ =  0x28;  /* jr z */
-                *codeptr++ = 0x03;
-                *codeptr++ = opcode0;           
-                PC += 2;
-                break;
-            case 1:  /* z */
-                *codeptr++ = 0x20;  /* jr nz */
-                *codeptr++ = 0x03;
-                *codeptr++ = opcode0;           
-                PC += 2;
-                break;
-            case 2:  /* nc */
-                *codeptr++ = 0x38;  /* jr c */
-                *codeptr++ = 0x03;
-                *codeptr++ = opcode0;           
-                PC += 2;
-                break;
-            case 3:  /* c */
-                *codeptr++ = 0x30;  /* jr nc */
-                *codeptr++ = 0x03;
-                *codeptr++ = opcode0;           
-                PC += 2;
-                break;
-            case 4:  /* po */
-                *codeptr++ =  0xea; /* jp pe */
-                sprintf(buffer,"ASMPC+6\n");
-                SetTemporaryLine(buffer);
-                GetSym();
-                ExprAddress (1);
-                EOL = OFF;
-                *codeptr++ = 205;
-                PC += 3;
-                break;
-            case 5:  /* pe */
-                *codeptr++ = 0xe2; /* jp po */
-                sprintf(buffer,"ASMPC+6\n");
-                SetTemporaryLine(buffer);
-                GetSym();
-                ExprAddress (1);
-                EOL = OFF;
-                *codeptr++ = 205;
-                PC += 3;
-                break;
-            case 6:  /* p */
-                *codeptr++ =  0xfa; /* jp m */
-                sprintf(buffer,"ASMPC+6\n");
-                SetTemporaryLine(buffer);
-                GetSym();
-                ExprAddress (1);
-                EOL = OFF;
-                *codeptr++ = 205;
-                PC += 3;
-                break;
-            case 7:  /* m */
-                *codeptr++ = 0xf2; /* jp p */
-                sprintf(buffer,"ASMPC+6\n");
-                SetTemporaryLine(buffer);
-                GetSym();
-                ExprAddress (1);
-                EOL = OFF;
-                *codeptr++ = 205;
-                PC += 3;
-                break;
-            }
-        } else {
-            *codeptr++ = opcode + constant * 8;	/* get instruction opcode */
+        switch ( constant ) {
+        case FLAGS_NZ:  /* nz */
+          *codeptr++ =  0x28;  /* jr z */
+          *codeptr++ = 0x03;
+          *codeptr++ = opcode0;           
+          PC += 2;
+          break;
+        case FLAGS_Z:  /* z */
+          *codeptr++ = 0x20;  /* jr nz */
+          *codeptr++ = 0x03;
+          *codeptr++ = opcode0;           
+          PC += 2;
+          break;
+        case FLAGS_NC:  /* nc */
+          *codeptr++ = 0x38;  /* jr c */
+          *codeptr++ = 0x03;
+          *codeptr++ = opcode0;           
+          PC += 2;
+          break;
+        case FLAGS_C:  /* c */
+          *codeptr++ = 0x30;  /* jr nc */
+          *codeptr++ = 0x03;
+          *codeptr++ = opcode0;           
+          PC += 2;
+          break;
+        case FLAGS_PO:  /* po */
+          *codeptr++ =  0xea; /* jp pe */
+          sprintf(buffer,"ASMPC+6\n");
+          SetTemporaryLine(buffer);
+          GetSym();
+          ExprAddress (1);
+          EOL = OFF;
+          *codeptr++ = 205;
+          PC += 3;
+          break;
+        case FLAGS_PE:  /* pe */
+          *codeptr++ = 0xe2; /* jp po */
+          sprintf(buffer,"ASMPC+6\n");
+          SetTemporaryLine(buffer);
+          GetSym();
+          ExprAddress (1);
+          EOL = OFF;
+          *codeptr++ = 205;
+          PC += 3;
+          break;
+        case FLAGS_P:  /* p */
+          *codeptr++ =  0xfa; /* jp m */
+          sprintf(buffer,"ASMPC+6\n");
+          SetTemporaryLine(buffer);
+          GetSym();
+          ExprAddress (1);
+          EOL = OFF;
+          *codeptr++ = 205;
+          PC += 3;
+          break;
+        case FLAGS_M:  /* m */
+          *codeptr++ = 0xf2; /* jp p */
+          sprintf(buffer,"ASMPC+6\n");
+          SetTemporaryLine(buffer);
+          GetSym();
+          ExprAddress (1);
+          EOL = OFF;
+          *codeptr++ = 205;
+          PC += 3;
+          break;
         }
-        GetSym();
-    } else {
-        *codeptr++ = opcode0;	/* JP nn, CALL nn */
+      } else {
+      *codeptr++ = opcode + constant * 8;	/* get instruction opcode */
     }
-    ExprAddress (1);
-    PC += 3;
+    GetSym();
+  } else {
+    *codeptr++ = opcode0;	/* JP nn, CALL nn */
+  }
+  ExprAddress (1);
+  PC += 3;
 }
 
 
@@ -771,52 +774,52 @@ JR (void)
   if (GetSym () == name)
     {
       switch (constant = CheckCondition ())
-	{			/* check for a condition */
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-	  *codeptr++ = 32 + constant * 8;
-	  if (GetSym () == comma)
-	    {
-	      GetSym ();	/* point at start of address expression */
-	      break;
-	    }
-	  else
-	    {
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);	/* comma missing */
-	      return;
-	    }
+        {			/* check for a condition */
+        case FLAGS_NZ:
+        case FLAGS_Z:
+        case FLAGS_NC:
+        case FLAGS_C:
+          *codeptr++ = 32 + constant * 8;
+          if (GetSym () == comma)
+            {
+              GetSym ();	/* point at start of address expression */
+              break;
+            }
+          else
+            {
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);	/* comma missing */
+              return;
+            }
 
-	case -1:
-	  *codeptr++ = 24;	/* opcode for JR  e */
-	  break;		/* identifier not a condition id - check for legal expression */
+        case -1:
+          *codeptr++ = 24;	/* opcode for JR  e */
+          break;		/* identifier not a condition id - check for legal expression */
 
-	default:
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);	/* illegal condition, syntax
-									 * error  */
-	  return;
-	}
+        default:
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);	/* illegal condition, syntax
+                                                                     * error  */
+          return;
+        }
     }
   PC += 2;			/* assembler PC points at next instruction */
   if ((postfixexpr = ParseNumExpr ()) != NULL)
     {				/* get numerical expression */
       if (postfixexpr->rangetype & NOTEVALUABLE)
-	{
-	  NewJRaddr ();		/* Amend another JR PC address to the list */
-	  Pass2info (postfixexpr, RANGE_JROFFSET, 1);
-	  ++codeptr;		/* update code pointer */
-	}
+        {
+          NewJRaddr ();		/* Amend another JR PC address to the list */
+          Pass2info (postfixexpr, RANGE_JROFFSET, 1);
+          ++codeptr;		/* update code pointer */
+        }
       else
-	{
-	  constant = EvalPfixExpr (postfixexpr);
-	  constant -= PC;
-	  RemovePfixlist (postfixexpr);		/* remove linked list - expression evaluated. */
-	  if ((constant >= -128) && (constant <= 127))
-	    *codeptr++ = constant;	/* opcode is stored, now store relative jump */
-	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 7);
-	}
+        {
+          constant = EvalPfixExpr (postfixexpr);
+          constant -= PC;
+          RemovePfixlist (postfixexpr);		/* remove linked list - expression evaluated. */
+          if ((constant >= -128) && (constant <= 127))
+            *codeptr++ = constant;	/* opcode is stored, now store relative jump */
+          else
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 7);
+        }
     }
 }
 
@@ -830,27 +833,29 @@ DJNZ (void)
   *codeptr++ = 16;		/* DJNZ opcode */
 
   if (GetSym () == comma)
-    GetSym ();			/* optional comma */
+    {
+      GetSym ();			/* optional comma */
+    }
 
   PC += 2;
   if ((postfixexpr = ParseNumExpr ()) != NULL)
     {				/* get numerical expression */
       if (postfixexpr->rangetype & NOTEVALUABLE)
-	{
-	  NewJRaddr ();		/* Amend another JR PC address to the list */
-	  Pass2info (postfixexpr, RANGE_JROFFSET, 1);
-	  ++codeptr;		/* update code pointer */
-	}
+        {
+          NewJRaddr ();		/* Amend another JR PC address to the list */
+          Pass2info (postfixexpr, RANGE_JROFFSET, 1);
+          ++codeptr;		/* update code pointer */
+        }
       else
-	{
-	  constant = EvalPfixExpr (postfixexpr);
-	  constant -= PC;
-	  RemovePfixlist (postfixexpr);		/* remove linked list - expression evaluated. */
-	  if ((constant >= -128) && (constant <= 127))
-	    *codeptr++ = constant;	/* opcode is stored, now store relative jump */
-	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 7);
-	}
+        {
+          constant = EvalPfixExpr (postfixexpr);
+          constant -= PC;
+          RemovePfixlist (postfixexpr);		/* remove linked list - expression evaluated. */
+          if ((constant >= -128) && (constant <= 127))
+            *codeptr++ = constant;	/* opcode is stored, now store relative jump */
+          else
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 7);
+        }
     }
 }
 
@@ -909,58 +914,58 @@ ADD (void)
 
     case 2:
       if (GetSym () == comma)
-	{
-	  GetSym ();
-	  reg16 = CheckRegister16 ();
-	  if (reg16 >= 0 && reg16 <= 3)
-	    {
-	      *codeptr++ = 9 + 16 * reg16;	/* ADD HL,rr */
-	      ++PC;
-	    }
-	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	}
+        {
+          GetSym ();
+          reg16 = CheckRegister16 ();
+          if (reg16 >= 0 && reg16 <= 3)
+            {
+              *codeptr++ = 9 + 16 * reg16;	/* ADD HL,rr */
+              ++PC;
+            }
+          else
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+        }
       else
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
       break;
 
     case 5:
     case 6:
       if (GetSym () == comma)
-	{
-	  GetSym ();
-	  reg16 = CheckRegister16 ();
-	  switch (reg16)
-	    {
-	    case 0:
-	    case 1:
-	    case 3:
-	      break;
+        {
+          GetSym ();
+          reg16 = CheckRegister16 ();
+          switch (reg16)
+            {
+            case 0:
+            case 1:
+            case 3:
+              break;
 
-	    case 5:
-	    case 6:
-	      if (acc16 == reg16)
-		reg16 = 2;
-	      else
-		{
-		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-		  return;
-		}
-	      break;
+            case 5:
+            case 6:
+              if (acc16 == reg16)
+                reg16 = 2;
+              else
+                {
+                  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                  return;
+                }
+              break;
 
-	    default:
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	      return;
-	    }
-	  if (acc16 == 5)
-	    *codeptr++ = 221;
-	  else
-	    *codeptr++ = 253;
-	  *codeptr++ = 9 + 16 * reg16;
-	  PC += 2;
-	}
+            default:
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+              return;
+            }
+          if (acc16 == 5)
+            *codeptr++ = 221;
+          else
+            *codeptr++ = 253;
+          *codeptr++ = 9 + 16 * reg16;
+          PC += 2;
+        }
       else
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
       break;
 
     default:
@@ -1064,70 +1069,70 @@ ArithLog8_instr (int opcode)
     switch (reg = IndirectRegisters ())
       {
       case 2:
-	*codeptr++ = 128 + opcode * 8 + 6;	/* xxx  A,(HL) */
-	++PC;
-	break;
+        *codeptr++ = 128 + opcode * 8 + 6;	/* xxx  A,(HL) */
+        ++PC;
+        break;
 
       case 5:			/* xxx A,(IX+d) */
       case 6:
-	if (reg == 5)
-	  *codeptr++ = 221;
-	else
-	  *codeptr++ = 253;	/* xxx A,(IY+d) */
-	*codeptr++ = 128 + opcode * 8 + 6;
-	ExprSigned8 (2);
-	PC += 3;
-	break;
+        if (reg == 5)
+          *codeptr++ = 221;
+        else
+          *codeptr++ = 253;	/* xxx A,(IY+d) */
+        *codeptr++ = 128 + opcode * 8 + 6;
+        ExprSigned8 (2);
+        PC += 3;
+        break;
 
       default:
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	break;
+        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+        break;
       }
   else
     {				/* no indirect addressing, try to get an 8bit register */
       reg = CheckRegister8 ();
       switch (reg)
-	{
-	  /* 8bit register wasn't found, try to evaluate an expression */
-	case -1:
-	  *codeptr++ = 192 + opcode * 8 + 6;	/* xxx  A,n */
-	  ExprUnsigned8 (1);
-	  PC += 2;
-	  break;
+        {
+          /* 8bit register wasn't found, try to evaluate an expression */
+        case -1:
+          *codeptr++ = 192 + opcode * 8 + 6;	/* xxx  A,n */
+          ExprUnsigned8 (1);
+          PC += 2;
+          break;
 
-	case 6:		/* xxx A,F illegal */
-	case 8:		/* xxx A,I illegal */
-	case 9:		/* xxx A,R illegal */
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	  break;
+        case 6:		/* xxx A,F illegal */
+        case 8:		/* xxx A,I illegal */
+        case 9:		/* xxx A,R illegal */
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+          break;
 
-	default:
-	  if (reg & 8)
-	    {			/* IXl or IXh */
-              if (rcmX000)
+        default:
+          if (reg & 8)
+            {			/* IXl or IXh */
+              if ( (cpu_type & CPU_RABBIT) )
                 {
                   ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
                   return;
                 }
-	      *codeptr++ = 221;
-	      ++PC;
-	    }
-	  else if (reg & 16)
-	    {			/* IYl or IYh */
-              if (rcmX000)
+              *codeptr++ = 221;
+              ++PC;
+            }
+          else if (reg & 16)
+            {			/* IYl or IYh */
+              if ( (cpu_type & CPU_RABBIT) )
                 {
                   ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
                   return;
                 }
-	      *codeptr++ = 253;
-	      ++PC;
-	    }
-	  reg &= 7;
+              *codeptr++ = 253;
+              ++PC;
+            }
+          reg &= 7;
 
-	  *codeptr++ = 128 + opcode * 8 + reg;	/* xxx  A,r */
-	  ++PC;
-	  break;
-	}
+          *codeptr++ = 128 + opcode * 8 + reg;	/* xxx  A,r */
+          ++PC;
+          break;
+        }
     }
 }
 
@@ -1213,69 +1218,69 @@ IncDec_8bit_instr (int opcode)
   if (sym == lparen)
     {
       switch (reg = IndirectRegisters ())
-	{
-	case 2:
-	  *codeptr++ = 48 + opcode;	/* INC/DEC (HL) */
-	  ++PC;
-	  break;
+        {
+        case 2:
+          *codeptr++ = 48 + opcode;	/* INC/DEC (HL) */
+          ++PC;
+          break;
 
-	case 5:		/* INC/DEC (IX+d) */
-	case 6:
-	  if (reg == 5)
-	    *codeptr++ = 221;
-	  else
-	    *codeptr++ = 253;	/* INC/DEC (IY+d) */
-	  *codeptr++ = 48 + opcode;
-	  ExprSigned8 (2);
-	  PC += 3;
-	  break;
+        case 5:		/* INC/DEC (IX+d) */
+        case 6:
+          if (reg == 5)
+            *codeptr++ = 221;
+          else
+            *codeptr++ = 253;	/* INC/DEC (IY+d) */
+          *codeptr++ = 48 + opcode;
+          ExprSigned8 (2);
+          PC += 3;
+          break;
 
 
-	default:
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	  break;
-	}
+        default:
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+          break;
+        }
     }
   else
     {				/* no indirect addressing, try to get an 8bit register */
       reg = CheckRegister8 ();
       switch (reg)
-	{
-	case 6:
-	case 8:
-	case 9:
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);	/* INC/DEC I ;  INC/DEC R
-									 * illegal */
-	  break;
-	case 12:
-	case 13:
-          if (rcmX000)
+        {
+        case 6:
+        case 8:
+        case 9:
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);	/* INC/DEC I ;  INC/DEC R
+                                                                     * illegal */
+          break;
+        case 12:
+        case 13:
+          if ( (cpu_type & CPU_RABBIT) )
             {
               ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
               return;
             }
-	  *codeptr++ = 221;
-	  *codeptr++ = (reg & 7) * 8 + opcode;	/* INC/DEC  ixh,ixl */
-	  PC += 2;
-	  break;
+          *codeptr++ = 221;
+          *codeptr++ = (reg & 7) * 8 + opcode;	/* INC/DEC  ixh,ixl */
+          PC += 2;
+          break;
 
-	case 20:
-	case 21:
-          if (rcmX000)
+        case 20:
+        case 21:
+          if ( (cpu_type & CPU_RABBIT) )
             {
               ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
               return;
             }
-	  *codeptr++ = 253;
-	  *codeptr++ = (reg & 7) * 8 + opcode;	/* INC/DEC  iyh,iyl */
-	  PC += 2;
-	  break;
+          *codeptr++ = 253;
+          *codeptr++ = (reg & 7) * 8 + opcode;	/* INC/DEC  iyh,iyl */
+          PC += 2;
+          break;
 
-	default:
-	  *codeptr++ = reg * 8 + opcode;	/* INC/DEC  r */
-	  ++PC;
-	  break;
-	}
+        default:
+          *codeptr++ = reg * 8 + opcode;	/* INC/DEC  r */
+          ++PC;
+          break;
+        }
     }
 }
 
@@ -1407,3 +1412,16 @@ RotShift_instr (int opcode)
 	}
     }
 }
+
+/*
+ * Local Variables:
+ *  indent-tabs-mode:nil
+ *  require-final-newline:t
+ *  c-basic-offset: 2
+ *  eval: (c-set-offset 'case-label 0)
+ *  eval: (c-set-offset 'substatement-open 2)
+ *  eval: (c-set-offset 'access-label 0)
+ *  eval: (c-set-offset 'class-open 2)
+ *  eval: (c-set-offset 'class-close 2)
+ * End:
+ */

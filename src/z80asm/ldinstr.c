@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.2 2009-05-28 19:20:16 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.3 2009-07-18 23:23:15 dom Exp $ */
 /* $History: LDINSTR.C $ */
 /*  */
 /* *****************  Version 10  ***************** */
@@ -46,6 +46,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 #include    <stdio.h>
 #include    "config.h"
+#include    "z80asm.h"
 #include    "symbol.h"
 
 
@@ -76,7 +77,6 @@ extern enum symbols sym, GetSym (void);
 extern enum flag relocfile;
 extern struct module *CURRENTMODULE;
 extern FILE *z80asmfile;
-extern int rcmX000;
 
 
 
@@ -90,184 +90,185 @@ LD (void)
     {
       exprptr = ftell (z80asmfile);	/* remember start of expression */
       switch (destreg = IndirectRegisters ())
-	{
-	case 2:
-	  LD_HL8bit_indrct ();	/* LD  (HL),  */
-	  break;
+        {
+        case 2:
+          LD_HL8bit_indrct ();	/* LD  (HL),  */
+          break;
 
-	case 5:
-	case 6:
-	  LD_index8bit_indrct (destreg);	/* LD  (IX|IY+d),  */
-	  break;
+        case 5:
+        case 6:
+          LD_index8bit_indrct (destreg);	/* LD  (IX|IY+d),  */
+          break;
 
-	case 0:
-	  if (sym == comma)
-	    {			/* LD  (BC),A  */
-	      GetSym ();
-	      if (CheckRegister8 () == 7)
-		{
-		  *codeptr++ = 2;
-		  ++PC;
-		}
-	      else
-		ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	    }
-	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	  break;
+        case 0:
+          if (sym == comma)
+            {			/* LD  (BC),A  */
+              GetSym ();
+              if (CheckRegister8 () == 7)
+                {
+                  *codeptr++ = 2;
+                  ++PC;
+                }
+              else
+                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+            }
+          else
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+          break;
 
-	case 1:
-	  if (sym == comma)
-	    {			/* LD  (DE),A  */
-	      GetSym ();
-	      if (CheckRegister8 () == 7)
-		{
-		  *codeptr++ = 18;
-		  ++PC;
-		}
-	      else
-		ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	    }
-	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	  break;
+        case 1:
+          if (sym == comma)
+            {			/* LD  (DE),A  */
+              GetSym ();
+              if (CheckRegister8 () == 7)
+                {
+                  *codeptr++ = 18;
+                  ++PC;
+                }
+              else
+                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+            }
+          else
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+          break;
 
-	case 7:
-	  LD_address_indrct (exprptr);	/* LD  (nn),rr  ;  LD  (nn),A  */
-	  break;
-	}
+        case 7:
+          LD_address_indrct (exprptr);	/* LD  (nn),rr  ;  LD  (nn),A  */
+          break;
+        }
     }
   else
     switch (destreg = CheckRegister8 ())
       {
       case -1:
-	LD_16bit_reg ();	/* LD rr,(nn)   ;  LD  rr,nn   ;   LD  SP,HL|IX|IY   */
-	break;
+        LD_16bit_reg ();	/* LD rr,(nn)   ;  LD  rr,nn   ;   LD  SP,HL|IX|IY   */
+        break;
 
       case 6:
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);	/* LD F,? */
-	break;
+        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);	/* LD F,? */
+        break;
 
       case 8:
-	if (GetSym () == comma)
-	  {
-	    GetSym ();
-	    if (CheckRegister8 () == 7)
-	      {			/* LD  I,A */
-		*codeptr++ = 237;
-		*codeptr++ = 71;
-		PC += 2;
-	      }
-	    else
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	  }
-	else
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	break;
+        if (GetSym () == comma)
+          {
+            GetSym ();
+            if (CheckRegister8 () == 7)
+              {			/* LD  I,A */
+                *codeptr++ = 237;
+                *codeptr++ = 71;
+                PC += 2;
+              }
+            else
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+          }
+        else
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+        break;
 
       case 9:
-	if (GetSym () == comma)
-	  {
-	    GetSym ();
-	    if (CheckRegister8 () == 7)
-	      {			/* LD  R,A */
-		*codeptr++ = 237;
-		*codeptr++ = 79;
-		PC += 2;
-	      }
-	    else
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-	  }
-	else
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	break;
+        if (GetSym () == comma)
+          {
+            GetSym ();
+            if (CheckRegister8 () == 7)
+              {			/* LD  R,A */
+                *codeptr++ = 237;
+                *codeptr++ = 79;
+                PC += 2;
+              }
+            else
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+          }
+        else
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+        break;
 
       default:
-	if (GetSym () == comma)
-	  {
-	    if (GetSym () == lparen)
-	      LD_r_8bit_indrct (destreg);	/* LD  r,(HL)  ;   LD  r,(IX|IY+d)  */
-	    else
-	      {
-		sourcereg = CheckRegister8 ();
-		if (sourcereg == -1)
-		  {		/* LD  r,n */
-		    if (destreg & 8)
-		      {
-                        if (rcmX000)
-                          {
-                            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-                            return;
-                          }
-			*codeptr++ = 221;	/* LD IXl,n or LD IXh,n */
-			++PC;
-		      }
-		    else if (destreg & 16)
-		      {
-                        if (rcmX000)
-                          {
-                            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-                            return;
-                          }
-			*codeptr++ = 253;	/* LD  IYl,n or LD  IYh,n */
-			++PC;
-		      }
-		    destreg &= 7;
-		    *codeptr++ = destreg * 8 + 6;
-		    ExprUnsigned8 (1);
-		    PC += 2;
-		    return;
-		  }
-		if (sourcereg == 6)
-		  {
-		    /* LD x, F */
-		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-		    return;
-		  }
-		if ((sourcereg == 8) && (destreg == 7))
-		  {		/* LD A,I */
-		    *codeptr++ = 237;
-		    *codeptr++ = 87;
-		    PC += 2;
-		    return;
-		  }
-		if ((sourcereg == 9) && (destreg == 7))
-		  {		/* LD A,R */
-		    *codeptr++ = 237;
-		    *codeptr++ = 95;
-		    PC += 2;
-		    return;
-		  }
-		if ((destreg & 8) || (sourcereg & 8))
-		  {		/* IXl or IXh */
-                    if (rcmX000)
+        if (GetSym () == comma)
+          {
+            if (GetSym () == lparen)
+              LD_r_8bit_indrct (destreg);	/* LD  r,(HL)  ;   LD  r,(IX|IY+d)  */
+            else
+              {
+                sourcereg = CheckRegister8 ();
+                if (sourcereg == -1)
+                  {		/* LD  r,n */
+                    if (destreg & 8)
                       {
-                        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-                        return;
-                      }
-		    *codeptr++ = 221;
-		    ++PC;
-		  }
-		else if ((destreg & 16) || (sourcereg & 16))
-		  {		/* IYl or IYh */
-                    if (rcmX000)
-                      {
-                        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
-                        return;
-                      }
-		    *codeptr++ = 253;
-		    ++PC;
-		  }
-		sourcereg &= 7;
-		destreg &= 7;
+                        if ( (cpu_type & CPU_RABBIT) )
 
-		*codeptr++ = 64 + destreg * 8 + sourcereg;	/* LD  r,r  */
-		++PC;
-	      }
-	  }
-	else
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
-	break;
+                          {
+                            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                            return;
+                          }
+                        *codeptr++ = 221;	/* LD IXl,n or LD IXh,n */
+                        ++PC;
+                      }
+                    else if (destreg & 16)
+                      {
+                        if ( (cpu_type & CPU_RABBIT) )
+                          {
+                            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                            return;
+                          }
+                        *codeptr++ = 253;	/* LD  IYl,n or LD  IYh,n */
+                        ++PC;
+                      }
+                    destreg &= 7;
+                    *codeptr++ = destreg * 8 + 6;
+                    ExprUnsigned8 (1);
+                    PC += 2;
+                    return;
+                  }
+                if (sourcereg == 6)
+                  {
+                    /* LD x, F */
+                    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                    return;
+                  }
+                if ((sourcereg == 8) && (destreg == 7))
+                  {		/* LD A,I */
+                    *codeptr++ = 237;
+                    *codeptr++ = 87;
+                    PC += 2;
+                    return;
+                  }
+                if ((sourcereg == 9) && (destreg == 7))
+                  {		/* LD A,R */
+                    *codeptr++ = 237;
+                    *codeptr++ = 95;
+                    PC += 2;
+                    return;
+                  }
+                if ((destreg & 8) || (sourcereg & 8))
+                  {		/* IXl or IXh */
+                    if ( (cpu_type & CPU_RABBIT) )
+                      {
+                        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                        return;
+                      }
+                    *codeptr++ = 221;
+                    ++PC;
+                  }
+                else if ((destreg & 16) || (sourcereg & 16))
+                  {		/* IYl or IYh */
+                    if ( (cpu_type & CPU_RABBIT) )
+                      {
+                        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                        return;
+                      }
+                    *codeptr++ = 253;
+                    ++PC;
+                  }
+                sourcereg &= 7;
+                destreg &= 7;
+
+                *codeptr++ = 64 + destreg * 8 + sourcereg;	/* LD  r,r  */
+                ++PC;
+              }
+          }
+        else
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+        break;
       }
 }
 
@@ -615,3 +616,17 @@ LD_16bit_reg (void)
   else
     ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
 }
+
+/*
+ * Local Variables:
+ *  indent-tabs-mode:nil
+ *  require-final-newline:t
+ *  c-basic-offset: 2
+ *  eval: (c-set-offset 'case-label 0)
+ *  eval: (c-set-offset 'substatement-open 2)
+ *  eval: (c-set-offset 'access-label 0)
+ *  eval: (c-set-offset 'class-open 2)
+ *  eval: (c-set-offset 'class-close 2)
+ * End:
+ */
+
