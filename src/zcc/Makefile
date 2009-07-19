@@ -1,16 +1,16 @@
 
 OBJS = zcc.o
 
-all: zcc 
+all: zcc$(EXESUFFIX)
 
 zcc:	$(OBJS)
-	${CC} -o zcc ${CFLAGS} ${CCOPT} ${OBJS}
+	${CC} -o zcc$(EXESUFFIX) ${CFLAGS} ${CCOPT} ${OBJS}
 
 install:
-	install zcc $(PREFIX)/bin/
+	install zcc$(EXESUFFIX) $(PREFIX)/bin/
 
 clean:
-	$(RM) zcc zcc.o core
+	$(RM) zcc$(EXESUFFIX) zcc.o core
 
 
 #Dependencies

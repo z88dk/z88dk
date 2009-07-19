@@ -1,8 +1,9 @@
 #
 # Makefile for sccz80
 #
-# $Id: Makefile,v 1.8 2003-01-24 21:48:52 dom Exp $
+# $Id: Makefile,v 1.9 2009-07-19 18:54:51 dom Exp $
 #
+
 
 OBJS =	callfunc.o     	\
 	codegen.o	\
@@ -26,16 +27,16 @@ OBJS =	callfunc.o     	\
 	sym.o		\
 	while.o
 
-all: sccz80
+all: sccz80$(EXESUFFIX)
 
-sccz80: $(OBJS)
-	$(CC) $(LDFLAGS) -o sccz80 $(OBJS)
+sccz80$(EXESUFFIX): $(OBJS)
+	$(CC) $(LDFLAGS) -o sccz80$(EXESUFFIX) $(OBJS)
 
 install:
-	install -m 755 sccz80 $(PREFIX)/bin/sccz80
+	install -m 755 sccz80$(EXESUFFIX) $(PREFIX)/bin/sccz80
 
 clean :
-	$(RM) *.o *~ core sccz80
+	$(RM) *.o *~ core sccz80$(EXESUFFIX)
 
 # Dependencies (gcc -MM)
 callfunc.o: callfunc.c ccdefs.h define.h lvalue.h callfunc.h codegen.h \

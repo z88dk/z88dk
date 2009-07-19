@@ -2,16 +2,16 @@
 OBJS = copt.o
 
 
-all: copt 
+all: copt$(EXESUFFIX)
 
 copt:	$(OBJS)
-	$(CC) -o copt $(LDFLAGS) $(OBJS)
+	$(CC) -o copt$(EXESUFFIX) $(LDFLAGS) $(OBJS)
 
 install:
-	install copt $(PREFIX)/bin
+	install copt$(EXESUFFIX) $(PREFIX)/bin
 
 clean:
-	$(RM) copt copt.o core
+	$(RM) copt copt.o core$(EXESUFFIX)
 
 
 #Dependencies

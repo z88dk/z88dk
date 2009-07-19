@@ -16,18 +16,18 @@ OBJS = 	asmdrctv.o 	\
 	z80instr.o	\
 	z80pass.o
 	
-all: z80asm
+all: z80asm$(EXESUFFIX)
 
 
-z80asm : $(OBJS)
-	$(CC) $(LDFLAGS) -o z80asm  $(OBJS)
+z80asm$(EXESUFFIX): $(OBJS)
+	$(CC) $(LDFLAGS) -o z80asm$(EXESUFFIX)  $(OBJS)
 
 install:
-	install  z80asm $(PREFIX)/bin/
+	install  z80asm$(EXESUFFIX) $(PREFIX)/bin/
 
 
 clean :
-	$(RM) *.o *~ core z80asm
+	$(RM) *.o *~ core z80asm$(EXESUFFIX)
 
 # Dependencies
 asmdrctv.o: asmdrctv.c symbol.h avltree.h config.h
