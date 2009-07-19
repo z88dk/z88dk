@@ -3,7 +3,7 @@ OBJS = zcc.o
 
 all: zcc$(EXESUFFIX)
 
-zcc:	$(OBJS)
+zcc$(EXESUFFIX):	$(OBJS)
 	${CC} -o zcc$(EXESUFFIX) ${CFLAGS} ${CCOPT} ${OBJS}
 
 install:

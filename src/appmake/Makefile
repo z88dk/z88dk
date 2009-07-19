@@ -9,7 +9,7 @@ all: appmake$(EXESUFFIX)
 %.o: %.c appmake.h
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
-appmake: $(OBJS)
+appmake$(EXESUFFIX): $(OBJS)
 	${CC} -o appmake$(EXESUFFIX) $(LDFLAGS) $(OBJS)
 
 install:

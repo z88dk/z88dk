@@ -4,7 +4,7 @@ OBJS = copt.o
 
 all: copt$(EXESUFFIX)
 
-copt:	$(OBJS)
+copt$(EXESUFFIX):	$(OBJS)
 	$(CC) -o copt$(EXESUFFIX) $(LDFLAGS) $(OBJS)
 
 install:
