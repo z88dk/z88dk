@@ -1,19 +1,16 @@
 
 
-#include <stdio.h>
+#include "stdio_tests.h"
 
 /** \test Test %d handling of scanf() Test takes about 40 seconds to run
  */
-int test_scanf_d()
+void test_scanf_d()
 {
-
-    char    buf[20];
+    char    buf[100];
     int     i,j;
     unsigned int     failures = 0;
     unsigned int     success = 0;
         
-
-    printf("Starting scanf %%d test\n");
 
     for ( i = -32767; i < 32767; i++ ) {
         if ( i % 1000 == 0 ) {
@@ -21,14 +18,18 @@ int test_scanf_d()
         }
         sprintf(buf,"%d",i);
         sscanf(buf,"%d",&j);
-        if ( i != j ) {
-            printf("Failed conversion for %d != %d\n",i,j);
-            failures++;
-        } else {
-            success++;
+        if ( i != j ) {            
+            sprintf(buf,"Failed conversion for %d != %d",i,j);
+            Assert(0, buf);
         }
     }
-    printf("%u cases, %u success, %u failures\n",success + failures, success, failures);
+}
 
-    return failures;
+int test_scanf()
+{
+    suite_setup("Scanf Tests");
+
+    suite_add_test(test_scanf_d);
+
+    return suite_run();
 }

@@ -6,5 +6,7 @@ int main(int argc, char *argv[])
 {
     int  res = 0;
 
-    res += test_scanf_d();
+    res += test_scanf();
+
+    return res;
 }
