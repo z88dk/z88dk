@@ -16,8 +16,6 @@ int setjmp(jmp_buf env)
 #pragma asm
 	pop	bc	;return address
 	pop	de	;&env
-	push	de
-	push	bc
 	ld	hl,0
 	add	hl,sp	;stack pointer
 	ex	de,hl
@@ -28,6 +26,8 @@ int setjmp(jmp_buf env)
 	ld	(hl),c	;pc
 	inc	hl
 	ld	(hl),b	
+	push	de
+	push	bc
 
 	ld	hl,0	;Have to return 0
 #pragma endasm
