@@ -29,7 +29,10 @@ test5.bin: $(SOURCES) test_iscntrl.c test_isascii.c main.c
 test6.bin: $(SOURCES) test_isalpha.c test_isalnum.c main.c
 	zcc +test -vn $(CFLAGS) -DHAVE_ISALPHA -DHAVE_ISALNUM $^ -o $@ -lndos
 
-run: run-test1 run-test2 run-test3 run-test4 run-test5 run-test6
+test7.bin: $(SOURCES) test_isbdigit.c test_isodigit.c main.c
+	zcc +test -vn $(CFLAGS) -DHAVE_ISBDIGIT -DHAVE_ISODIGIT $^ -o $@ -lndos
+
+run: run-test1 run-test2 run-test3 run-test4 run-test5 run-test6 run-test7
 
 run-test1: test1.bin
 	$(MACHINE) test1.bin
@@ -43,6 +46,8 @@ run-test5: test5.bin
 	$(MACHINE) test5.bin
 run-test6: test6.bin
 	$(MACHINE) test6.bin
+run-test7: test7.bin
+	$(MACHINE) test7.bin
 
 
 clean:

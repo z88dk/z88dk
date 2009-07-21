@@ -42,6 +42,12 @@ int main(int argc, char *argv[])
 #ifdef HAVE_ISALNUM
     res += test_isalnum();
 #endif
+#ifdef HAVE_ISBDIGIT
+    res += test_isbdigit();
+#endif
+#ifdef HAVE_ISODIGIT
+    res += test_isodigit();
+#endif
 
     return res;
 }
