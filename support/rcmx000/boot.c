@@ -30,6 +30,14 @@ static int debug_poll=0;
 
 static int debug_rw=0;
 
+
+/** In this debug mode, all chars 10,13,32-255 are sent to console, while the
+ *  chars 0-9, 11-12, 14-31 are sent to the tcp/ip connection
+ *  so we can get information but not confuse our xmodem client
+ *  with debug garbage
+ */
+static int debug_xmodem=0;
+
 static void rts_ctl(int fd, int val)
 {
     int flags=0;
@@ -200,18 +208,60 @@ static void usage(const char* argv0)
 
 
 
-static void sendbuff(int tty, int traf_fd, const char* msg, unsigned len)
+static void sendchar(int tty, int traf_fd, char ch)
 {
-  /** If traf_fd is set we send to it instead of stdout */
+  /** If traf_fd is set we send to socket */
   if (debug_rw) fprintf(stderr, "traf_fd=%d\n", traf_fd);
   if (traf_fd)
     {
-      mysock_write_persist(traf_fd, msg, len);
+      if (debug_xmodem)
+	{
+	  /** Filter out control chars 0-31 and send them to socket
+	   *  i.e. xmodem client, the rest is debug to stdout
+	   */
+	  if (ch==10 || ch==13)
+	    {
+	      char tmp='\n';
+	      fwrite(&tmp, 1, sizeof(char), stdout);
+	    }	      
+	  else if (ch>31)
+	    {
+	      fwrite(&ch, 1, sizeof(char), stdout);
+	    }
+	  else
+	    {
+	      mysock_write_persist(traf_fd, &ch, 1);
+	    }
+	}
+      else
+	{
+	  mysock_write_persist(traf_fd, &ch, 1);
+	}
+      fflush(stdout);
     }
   else
     {
       if (debug_rw) fprintf(stderr, "Before fwrite\n");
-      fwrite(msg, len, sizeof(char), stdout);
+
+      if (ch>=' ' && ch<='~')
+	{
+	  fwrite(&ch, 1, sizeof(char), stdout);
+	}
+      else if (ch==13)
+	{
+	  fwrite("\n", 1, sizeof(char), stdout);
+	}
+      else if (ch==10)
+	{
+	  fwrite("\n", 1, sizeof(char), stdout);
+	}
+      else
+	{
+	  char spbuf[100];
+	  sprintf(spbuf, "<%.2X>", ch);
+	  fwrite(spbuf, 4, sizeof(char), stdout);
+	}
+      
       fflush(stdout);
     }
 }
@@ -235,35 +285,15 @@ static void talk(int tty, int sockport)
       
       if (check_fd(tty))
 	{
-	  char spbuf[1024];
-
 	  if (debug_rw) fprintf(stderr, "   Before read serial...\n");
 	  read(tty, &ch, 1);
 	  if (debug_rw) fprintf(stderr, "   After read serial...\n");
 	  
 	  if (debug_hex) fprintf(stderr, "Got: %.2x (hex))\n", ch);
       
-	  /** Print unprintables as stars '*' */
-	  if (ch>=' ' && ch<='~')
-	    {
-	      sprintf(spbuf, "%c", ch);
-	      sendbuff(tty, traf_fd, spbuf, 1);
-	    }
-	  else if (ch==13)
-	    {
-	      sprintf(spbuf, "\n");
-	      sendbuff(tty, traf_fd, spbuf, 1);
-	    }
-	  else if (ch==10)
-	    {
-	      sprintf(spbuf, "\n");
-	      sendbuff(tty, traf_fd, spbuf, 1);
-	    }
-	  else
-	    {
-	      sprintf(spbuf, "<%.2X>", ch);
-	      sendbuff(tty, traf_fd, spbuf, 4);
-	    }
+
+	  sendchar(tty, traf_fd, ch);
+
 	}
       else if (traf_fd==0)
 	{
