@@ -36,7 +36,7 @@ static int debug_rw=0;
  *  so we can get information but not confuse our xmodem client
  *  with debug garbage
  */
-static int debug_xmodem=0;
+static int debug_xmodem=1;
 
 static void rts_ctl(int fd, int val)
 {
@@ -189,10 +189,10 @@ static int check_fd(int anfd)
 static void usage(const char* argv0)
 {
   fprintf(stderr, "Boot mode: (Normal load and execution of program to ram)\n");
-  fprintf(stderr, "Usage: %s [-p <num>] -b <ttydev> <divisor> <binfile>\n", argv0);
+  fprintf(stderr, "Usage: %s [-p/-x <num>] -b <ttydev> <divisor> <binfile>\n", argv0);
   fprintf(stderr, "   or\n", argv0);
   fprintf(stderr, "Raw mode: (Only used to get the baudrate division number)\n");
-  fprintf(stderr, "Usage: %s [-p <num>] -r <ttydev> <coldload binfile>\n", argv0);
+  fprintf(stderr, "Usage: %s [-p/-x <num>] -r <ttydev> <coldload binfile>\n", argv0);
   fprintf(stderr, "   or\n", argv0);
 
   fprintf(stderr, "Flash mode: (Will store program permanently in flash)\n");
@@ -200,7 +200,8 @@ static void usage(const char* argv0)
   fprintf(stderr, "   or\n", argv0);
   
   fprintf(stderr, "Direct mode: (Will copy a preloaded image from the flash to the ram and then run it\n");
-  fprintf(stderr, "Usage: %s [-p <num>] -d <ttydev> <divisor> <binfile>\n", argv0);
+  fprintf(stderr, "Usage: %s [-p/-x <num>] -d <ttydev> <divisor> <binfile>\n", argv0);
+  fprintf(stderr, "-x is same as -p but characters will get piped to both socket and stdout\n", argv0);
 
 
   exit(1);
@@ -391,7 +392,7 @@ int main(int argc, char *argv[])
       usage(argv0);
     }
 
-  if (0==strncmp(argvp[1], "-p", 2))
+  if ( (0==strncmp(argvp[1], "-p", 2)) ||(0==strncmp(argvp[1], "-x", 2)) )
     {
       /** We should have a socket listener, all other arguments pushed two steps... */
 
@@ -405,6 +406,12 @@ int main(int argc, char *argv[])
       argvp += 2;
 
       argc-=2;
+
+      if (0==strncmp(argvp[1], "-x", 2))
+	{
+	  debug_xmodem=1;
+	}
+
     }
   
   if (0==strncmp(argvp[1], "-b", 2))
