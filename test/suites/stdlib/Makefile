@@ -3,8 +3,8 @@ include ../make.config
 
 
 SOURCES += $(wildcard *.c) 
-OBJECTS := $(SOURCES:.c=.o)
 
+CFLAGS += -DMAX_TESTS=300 -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 all:	test.bin run
 
