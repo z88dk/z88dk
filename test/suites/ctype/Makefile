@@ -1,0 +1,51 @@
+include ../make.config
+
+
+
+#SOURCES += $(wildcard test_*.c) main.c
+
+SOURCE1 = $(SOURCES) test_isalpha.c test_isupper.c  main.c
+
+all:	bin run
+bin:	test1.bin test2.bin test3.bin test4.bin test5.bin test6.bin 
+
+
+
+test1.bin: $(SOURCES) test_isxdigit.c test_isupper.c main.c
+	zcc +test -vn $(CFLAGS) -DHAVE_ISXDIGIT -DHAVE_ISUPPER $^ -o $@ -lndos
+
+test2.bin: $(SOURCES) test_isspace.c test_ispunct.c main.c
+	zcc +test -vn $(CFLAGS) -DHAVE_ISSPACE -DHAVE_ISPUNCT $^ -o $@ -lndos
+
+test3.bin: $(SOURCES) test_isprint.c test_islower.c main.c
+	zcc +test -vn $(CFLAGS) -DHAVE_ISPRINT -DHAVE_ISLOWER $^ -o $@ -lndos
+
+test4.bin: $(SOURCES) test_isgraph.c test_isdigit.c main.c
+	zcc +test -vn $(CFLAGS) -DHAVE_ISGRAPH -DHAVE_ISDIGIT $^ -o $@ -lndos
+
+test5.bin: $(SOURCES) test_iscntrl.c test_isascii.c main.c
+	zcc +test -vn $(CFLAGS) -DHAVE_ISCNTRL -DHAVE_ISASCII $^ -o $@ -lndos
+
+test6.bin: $(SOURCES) test_isalpha.c test_isalnum.c main.c
+	zcc +test -vn $(CFLAGS) -DHAVE_ISALPHA -DHAVE_ISALNUM $^ -o $@ -lndos
+
+run: bin run-bin
+
+run-bin: run-test1 run-test2 run-test3 run-test4 run-test5 run-test6
+
+run-test1:
+	$(MACHINE) test1.bin
+run-test2:
+	$(MACHINE) test2.bin
+run-test3:
+	$(MACHINE) test3.bin
+run-test4:
+	$(MACHINE) test4.bin
+run-test5:
+	$(MACHINE) test5.bin
+run-test6:
+	$(MACHINE) test6.bin
+
+
+clean:
+	rm -f test.bin $(OBJECTS) zcc_opt.def *~
