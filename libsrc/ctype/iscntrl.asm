@@ -6,7 +6,7 @@
 ;
 ;	Stylish, this returned the wrong way! (djm 17/5/99)
 ;
-;	$Id: iscntrl.asm,v 1.3 2006-12-31 21:44:58 aralbrec Exp $
+;	$Id: iscntrl.asm,v 1.4 2009-07-21 21:14:57 dom Exp $
 ;
 
 XLIB iscntrl
@@ -16,8 +16,11 @@ XLIB iscntrl
 .iscntrl
 
    ld a,l
-   ld hl,0
+   ld hl,1
+   cp 127
+   ccf
+   ret z
    cp 32
-   ret nc
-   inc l
+   ret c
+   dec l
    ret

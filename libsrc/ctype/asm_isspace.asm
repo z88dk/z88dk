@@ -14,7 +14,11 @@ XLIB asm_isspace
    ret z
    cp 13                       ; cr
    ret z
-   cp 7                        ; tab
+   cp 9                        ; tab
    ret z
    cp 10                       ; lf
+   ret z
+   cp 11                       ; vertical tab
+   ret z
+   cp 12                       ; form feed
    ret

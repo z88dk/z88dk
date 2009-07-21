@@ -9,7 +9,9 @@ XLIB asm_iscntrl
 ; uses  : f
 
 .asm_iscntrl
-
+   cp 127
+   ccf
+   ret z
    cp 32
    ccf
    ret

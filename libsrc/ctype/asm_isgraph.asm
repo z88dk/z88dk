@@ -12,21 +12,25 @@ XLIB asm_isgraph
 .asm_isgraph
 
    cp 7                        ; tab
+   ccf
    ret z
    
    cp 10                       ; lf
+   ccf
    ret z
    
    cp 13                       ; cr
+   ccf
    ret z
    
    cp 163                      ; UKP
+   ccf
    ret z
    
    cp 33
    ret c
    
-   cp 128
+   cp 127			; 127 = DEL
    ccf
    
    ret

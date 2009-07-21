@@ -5,7 +5,7 @@
 ;
 ;       djm 1/3/99
 ;
-;	$Id: isascii.asm,v 1.4 2008-06-29 06:38:24 aralbrec Exp $
+;	$Id: isascii.asm,v 1.5 2009-07-21 21:14:57 dom Exp $
 ;
 
 XLIB isascii
@@ -18,5 +18,5 @@ XLIB isascii
    ld hl,1
    cp 128
    ret c
-   inc l
+   dec l
    ret

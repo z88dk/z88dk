@@ -10,6 +10,5 @@ XLIB asm_isascii
 
 .asm_isascii
 
-   rlca
-   rrca
+   cp 128
    ret

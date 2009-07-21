@@ -25,7 +25,7 @@ ENDIF
 
 .punc_tbl
 
-   defm "!$%^&*()_+={[]}#~'@;:/?.>,<\|"
-   defb 34,163,163           ; quote and pound, must repeat last one
+   defm "!$%^&*()_-+={[]}#~'`@;:/?.>,<\|"
+   defb 34,34		; quote (pound isn't punctuation)
 
 .punc_end
