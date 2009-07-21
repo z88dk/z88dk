@@ -15,7 +15,6 @@ extern int __LIB__ __FASTCALL__ isodigit(int);
 extern int __LIB__ __FASTCALL__ isprint(int);
 extern int __LIB__ __FASTCALL__ ispunct(int);
 extern int __LIB__ __FASTCALL__ isspace(int);
-extern int __LIB__ __FASTCALL__ isupper(int);
 extern int __LIB__ __FASTCALL__ isxdigit(int);
 extern int __LIB__ __FASTCALL__ toascii(int);
 extern int __LIB__ __FASTCALL__ tolower(int);
