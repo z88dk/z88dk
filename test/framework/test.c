@@ -45,12 +45,22 @@ int suite_run()
 
     for ( i = 0; i < suite.num_tests; i++ ) {
         if ( setjmp(jmpbuf) == 0 ) {
+#ifndef NO_LOG_RUNNING
             printf("Running test %s..",suite.testnames[i]);
+#endif
             func = suite.tests[i];
             func();
+#ifndef NO_LOG_PASSED
+#ifdef NO_LOG_RUNNING
+            printf("Running test %s..",suite.testnames[i]);
+#endif
             printf("...passed\n");
+#endif
             passed++;
         } else {
+#ifdef NO_LOG_RUNNING
+            printf("Running test %s..",suite.testnames[i]);
+#endif
             printf("...failed %s:%d (%s)\n",failed_file, failed_line, failed_message);
             failed++;
         }

@@ -3,7 +3,9 @@
 #ifndef TEST_H
 #define TEST_H
 
-#define MAX_TESTS 300
+#ifndef MAX_TESTS
+#define MAX_TESTS 50
+#endif
 
 #define Assert(r,m) Assert_real((r), __FILE__, __LINE__, (m))
 extern void         Assert_real(int result, char *file, int line,  char *message);

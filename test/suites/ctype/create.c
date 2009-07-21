@@ -28,7 +28,7 @@ void build_file(char *name, int (*func)(int))
             }
             fprintf(fp,"void t_%s()\n{\n", fname);
             res = func(i) ? 1 : 0;
-            fprintf(fp,"    Assert(%s(%d) == %d,\"%s should be %d for %s\");",name, i, res, name, res, ident);
+            fprintf(fp,"    Assert(%s(%d) %s,\"%s should be %d for %s\");\n",name, i, res == 0 ? " == 0 " : "", name, res, ident);
             fprintf(fp,"}\n\n");
 
         }

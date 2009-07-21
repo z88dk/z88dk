@@ -18,8 +18,8 @@ int main(int argc, char *argv[])
 #ifdef HAVE_ISPUNCT
     res += test_ispunct();
 #endif
-#ifdef HAVE_ISLOWER
-    res += test_islower();
+#ifdef HAVE_ISPRINT
+    res += test_isprint();
 #endif
 #ifdef HAVE_ISLOWER
     res += test_islower();
@@ -36,8 +36,8 @@ int main(int argc, char *argv[])
 #ifdef HAVE_ISASCII
     res += test_isascii();
 #endif
-#ifdef HAVE_ALPHA
-    res += test_islower();
+#ifdef HAVE_ISALPHA
+    res += test_isalpha();
 #endif
 #ifdef HAVE_ISALNUM
     res += test_isalnum();

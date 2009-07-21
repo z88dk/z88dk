@@ -5,9 +5,9 @@ include ../make.config
 #SOURCES += $(wildcard test_*.c) main.c
 
 SOURCE1 = $(SOURCES) test_isalpha.c test_isupper.c  main.c
+CFLAGS += -DMAX_TESTS=300 -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
-all:	bin run
-bin:	test1.bin test2.bin test3.bin test4.bin test5.bin test6.bin 
+all:	run
 
 
 
