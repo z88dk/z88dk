@@ -9,15 +9,15 @@ HEADERS =
 CFLAGS = -DZ88DK -DJUMPZ80  -DDEBUG2 -DLSB_FIRST
 
 
-all: machine
+all: machine$(EXESUFFIX)
 
 
 %.o: %.c $(HEADERS)
-	gcc -c -o $@ $(CFLAGS) $<
+	$(CC) -c -o $@ $(CFLAGS) $<
 
-machine: $(OBJECTS)
-	gcc -o $@ $(OBJECTS)
+machine$(EXESUFFIX): $(OBJECTS)
+	$(CC) -o $@ $(OBJECTS)
 
 
 clean:
-	rm -f $(OBJECTS) machine *~
+	rm -f $(OBJECTS) machine$(EXESUFFIX) *~

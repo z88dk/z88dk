@@ -1,9 +1,8 @@
+include ../make.config
 
 
 
-
-SOURCES := $(wildcard *.c) ../../framework/test.c
-CFLAGS = -I../../framework
+SOURCES += $(wildcard *.c) 
 
 
 all:	test.bin 
@@ -11,7 +10,7 @@ all:	test.bin
 
 test.bin: $(SOURCES)
 	zcc +test -vn $(CFLAGS) $(SOURCES) -o $@ -lndos
-	../../machine/machine -w 60 test.bin
+	$(MACHINE) -w 60 test.bin
 
 
 clean:
