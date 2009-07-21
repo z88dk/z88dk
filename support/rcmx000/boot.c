@@ -31,12 +31,12 @@ static int debug_poll=0;
 static int debug_rw=0;
 
 
-/** In this debug mode, all chars 10,13,32-255 are sent to console, while the
+/** In this mode, all chars 10,13,32-255 are sent to console, while the
  *  chars 0-9, 11-12, 14-31 are sent to the tcp/ip connection
  *  so we can get information but not confuse our xmodem client
  *  with debug garbage
  */
-static int debug_xmodem=1;
+static int option_xmodem=0;
 
 static void rts_ctl(int fd, int val)
 {
@@ -215,7 +215,7 @@ static void sendchar(int tty, int traf_fd, char ch)
   if (debug_rw) fprintf(stderr, "traf_fd=%d\n", traf_fd);
   if (traf_fd)
     {
-      if (debug_xmodem)
+      if (option_xmodem)
 	{
 	  /** Filter out control chars 0-31 and send them to socket
 	   *  i.e. xmodem client, the rest is debug to stdout
@@ -394,6 +394,14 @@ int main(int argc, char *argv[])
 
   if ( (0==strncmp(argvp[1], "-p", 2)) ||(0==strncmp(argvp[1], "-x", 2)) )
     {
+
+      if (0==strncmp(argvp[1], "-x", 2))
+	{
+	  printf("Setting for xmodem\n");
+
+	  option_xmodem=1;
+	}
+
       /** We should have a socket listener, all other arguments pushed two steps... */
 
       /** We demand at least two more arguments (i.e. argc six or greater) */
@@ -407,10 +415,7 @@ int main(int argc, char *argv[])
 
       argc-=2;
 
-      if (0==strncmp(argvp[1], "-x", 2))
-	{
-	  debug_xmodem=1;
-	}
+
 
     }
   
