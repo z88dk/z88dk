@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.32 2008-03-01 15:06:51 dom Exp $
+#	$Id: Makefile,v 1.33 2009-07-21 22:02:56 dom Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -109,6 +109,9 @@ install:
 	find $(DESTDIR)/$(prefix_share)/z88dk -type f -exec chmod 644 {} \;
 	find $(DESTDIR)/$(prefix_share)/z88dk -type d -exec chmod 755 {} \;
 
+test:
+	$(MAKE) -C test
+
 clean: clean-bins
 	cd libsrc ; $(MAKE) clean
 	cd lib/config ; $(RM) *.cfg
@@ -122,3 +125,5 @@ clean-bins:
 	cd src/sccz80 ; $(MAKE) clean
 	cd src/z80asm ; $(MAKE) clean
 	cd src/zcc ; $(MAKE) clean
+
+.PHONY: test
