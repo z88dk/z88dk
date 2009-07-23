@@ -45,45 +45,45 @@ int main(int argc, char *argv[])
     int     opt;
 
     while ((opt = getopt(argc,argv,"hle")) != -1 ) {
-	switch (opt ) {
-	case 'l':
-	    flags |= showlocal;
-	    break;
-	case 'e':
-	    flags |= showexpr;
-	    break;
-	default:
-	    usage(argv[0]);
-	}
+        switch (opt ) {
+        case 'l':
+            flags |= showlocal;
+            break;
+        case 'e':
+            flags |= showexpr;
+            break;
+        default:
+            usage(argv[0]);
+        }
     }
 
     if ( optind == argc ) {
-	usage(argv[0]);
+        usage(argv[0]);
     }
 
     file = argv[optind++];
     if ( ( fp = open_library(file) ) == NULL ) {
-	if ( ( fp = fopen(file,"rb")  ) != NULL ) {	   
-	    object_dump(fp,0,flags);
-	    exit(0);
-	} else {
-	    exit(1);
-	}
+        if ( ( fp = fopen(file,"rb")  ) != NULL ) {	   
+            object_dump(fp,0,flags);
+            exit(0);
+        } else {
+            exit(1);
+        }
     }
 
 
     next = 8;
 
     do {
-	start = next + 8;
-	fseek(fp,next,SEEK_SET);
-	next = read_intel32(fp,NULL);
-	len  = read_intel32(fp,NULL);
-	if ( len == 0xFFFFFFFF ) 
-	    break;
-	if ( len == 0x0 )
-	    printf("Deleted...");
-	object_dump(fp,start,flags);
+        start = next + 8;
+        fseek(fp,next,SEEK_SET);
+        next = read_intel32(fp,NULL);
+        len  = read_intel32(fp,NULL);
+        if ( len == 0xFFFFFFFF ) 
+            break;
+        if ( len == 0x0 )
+            printf("Deleted...");
+        object_dump(fp,start,flags);
     } while ( next != 0xFFFFFFFF );
 
     fclose(fp);
@@ -149,7 +149,7 @@ void object_dump(FILE *fp, unsigned long start, char flags)
         if ( libname == 0xffffffff ) {
             end = modname;
         } else {
-            end = expr;
+            end = libname;
         }
         
         fseek(fp,start+name,SEEK_SET);
