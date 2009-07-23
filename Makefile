@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.34 2009-07-23 21:01:06 dom Exp $
+#	$Id: Makefile,v 1.35 2009-07-23 21:09:51 dom Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -38,7 +38,6 @@ sccz80:
 	$(MAKE) -C src/sccz80 PREFIX=`pwd` install
 
 z80asm:
-	echo 'Configure z80asm for ENDIAN status!!'
 	$(MAKE) -C src/z80asm
 	$(MAKE) -C src/z80asm PREFIX=`pwd` install
 
