@@ -64,7 +64,6 @@ ENDIF
    
    xor a
    ld (de),a                   ; terminate string dst
-   dec hl                      ; last src byte not copied, to get final strlen correct
 
 .szexceeded1
 
