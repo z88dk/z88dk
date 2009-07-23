@@ -1,11 +1,23 @@
 
+OBJS = ar.o 
 
+ifeq ($(EXEPREFIX),.exe)
+OBJS += getopt/getopt.o
+CFLAGS += -Igetopt
+endif
 
-all: z80nm
+all: z80nm$(EXESUFFIX)
 
-z80nm:	ar.c
-	$(CC) -o z80nm $(CFLAGS) ar.c
+z80nm$(EXESUFFIX):	$(OBJS)
+	${CC} -o z80nm$(EXESUFFIX) ${CFLAGS} ${CCOPT} ${OBJS}
 
+install: 
+	install z80nm$(EXESUFFIX) $(PREFIX)/bin/
 
 clean:
-	$(RM)  ar.o z80nm *~ core
+	$(RM) z80nm$(EXESUFFIX) ar.o getopt/*.o core
+
+
+#Dependencies
+
+ar.o: ar.c

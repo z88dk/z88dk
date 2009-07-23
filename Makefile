@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.33 2009-07-21 22:02:56 dom Exp $
+#	$Id: Makefile,v 1.34 2009-07-23 21:01:06 dom Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -15,40 +15,7 @@ DEFAULT = z88
 
 # --> End of Configurable Options
 
-all: setup appmake copt zcpp sccz80 z80asm zcc config
-
-# setenv CC "dcc -unixrc -mC -mD"
-# make -e amiga
-amiga:  clean-bins
-	# Now build the Amiga binaries
-	echo '#define PREFIX "zcc:"' > src/config.h
-	echo '#define AMIGA 1' >> src/config.h
-	mkdir -p z88dk/bin 
-	$(MAKE) -C src/appmake 
-	$(MAKE) -C src/appmake install PREFIX=`pwd`/z88dk
-	$(MAKE) -C src/appmake clean
-	$(MAKE) -C src/copt 
-	$(MAKE) -C src/copt install PREFIX=`pwd`/z88dk
-	$(MAKE) -C src/copt clean
-	$(MAKE) -C src/cpp 
-	$(MAKE) -C src/cpp install PREFIX=`pwd`/z88dk
-	$(MAKE) -C src/cpp clean
-	$(MAKE) -C src/sccz80 
-	$(MAKE) -C src/sccz80 install PREFIX=`pwd`/z88dk
-	$(MAKE) -C src/sccz80 clean
-	$(MAKE) -C src/z80asm 
-	$(MAKE) -C src/z80asm install PREFIX=`pwd`/z88dk
-	$(MAKE) -C src/z80asm clean
-	$(MAKE) -C src/zcc  
-	$(MAKE) -C src/zcc install PREFIX=`pwd`/z88dk
-	$(MAKE) -C src/zcc clean
-	$(MAKE) -C libsrc clean
-	./config.sh zcc: z88
-	cp -R  libsrc/ include/ lib/ examples/ doc/ support/ src/ z88dk/
-	cp amiga.patch EXTENSIONS LICENSE Makefile amigabuild.sh z88dk/
-	cp README.1st z88dk/
-	cd z88dk ; patch -p0 < amiga.patch
-
+all: setup appmake copt zcpp sccz80 z80asm zcc z80nm config
 
 setup:
 	echo '#define PREFIX "${prefix}$"/lib/z88dk"' > src/config.h
@@ -78,6 +45,10 @@ z80asm:
 zcc:
 	$(MAKE) -C src/zcc
 	$(MAKE) -C src/zcc PREFIX=`pwd` install
+
+z80nm:
+	$(MAKE) -C support/ar
+	$(MAKE) -C support/ar PREFIX=`pwd` install
 
 config:
 	./config.sh `pwd`/ $(DEFAULT)
@@ -125,5 +96,6 @@ clean-bins:
 	cd src/sccz80 ; $(MAKE) clean
 	cd src/z80asm ; $(MAKE) clean
 	cd src/zcc ; $(MAKE) clean
+	$(MAKE) -C support/ar clean
 
 .PHONY: test
