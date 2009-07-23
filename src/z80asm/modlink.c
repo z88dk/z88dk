@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.5 2009-07-17 22:06:48 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.6 2009-07-23 20:35:14 dom Exp $ */
 /* $History: MODLINK.C $ */
 /*  */
 /* *****************  Version 16  ***************** */
@@ -730,7 +730,7 @@ CheckIfModuleWanted(FILE *z80asmfile, long currentlibmodule, char *modname)
   /* We didn't find the module name, lets have a look through the exported symbol list */
   if ( fptr_name != 0 ) 
     {
-      long end = fptr_expr;
+      long end = fptr_libname;
       long red = 0;
       if ( fptr_libname == 0xffffffff )
         {
