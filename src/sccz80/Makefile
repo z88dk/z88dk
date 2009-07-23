@@ -1,7 +1,7 @@
 #
 # Makefile for sccz80
 #
-# $Id: Makefile,v 1.9 2009-07-19 18:54:51 dom Exp $
+# $Id: Makefile,v 1.10 2009-07-23 21:05:20 dom Exp $
 #
 
 
@@ -33,7 +33,7 @@ sccz80$(EXESUFFIX): $(OBJS)
 	$(CC) $(LDFLAGS) -o sccz80$(EXESUFFIX) $(OBJS)
 
 install:
-	install -m 755 sccz80$(EXESUFFIX) $(PREFIX)/bin/sccz80
+	install -m 755 sccz80$(EXESUFFIX) $(PREFIX)/bin/
 
 clean :
 	$(RM) *.o *~ core sccz80$(EXESUFFIX)
