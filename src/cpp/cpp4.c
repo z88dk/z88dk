@@ -2,7 +2,7 @@
  *			    C P P 4 . C
  *		M a c r o  D e f i n i t i o n s
  *
- * $Id: cpp4.c,v 1.2 2008-05-26 06:53:01 stefano Exp $
+ * $Id: cpp4.c,v 1.3 2009-07-23 20:48:32 dom Exp $
  *
  *
  * Edit History
@@ -453,7 +453,9 @@ register DEFBUF	*tokenp;
 		 * just write foo to the output stream.
 		 */
 		unget();
+#if 0
 		cwarn("Macro \"%s\" needs arguments", tokenp->name);
+#endif
 		fputs(tokenp->name, stdout);
 		return;
 	    }
