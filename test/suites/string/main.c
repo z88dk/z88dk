@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
 
     res += test_strcmp();
     res += test_strncmp();
+    res += test_strstr();
 
     return res;
 }

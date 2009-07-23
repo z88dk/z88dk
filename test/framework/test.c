@@ -13,6 +13,8 @@ typedef struct {
     char     *testnames[MAX_TESTS];
     void     *tests[MAX_TESTS];
     int       num_tests;
+    void    (*setup)();
+    void    (*teardown)();
 } Suite;
 
 
@@ -36,7 +38,7 @@ void Assert_real(int result, char *file, int line, char *message)
 
 int suite_run()
 {
-    int      i;
+    int      i, stage;
     void    (*func)();
 
     passed = failed = 0;
@@ -48,8 +50,17 @@ int suite_run()
 #ifndef NO_LOG_RUNNING
             printf("Running test %s..",suite.testnames[i]);
 #endif
+            stage = 0;
+            if ( suite.setup ) {
+                suite.setup();
+            }
             func = suite.tests[i];
+            stage++;
             func();
+            stage++;
+            if ( suite.teardown ) {
+                suite.teardown();
+            }
 #ifndef NO_LOG_PASSED
 #ifdef NO_LOG_RUNNING
             printf("Running test %s..",suite.testnames[i]);
@@ -58,10 +69,17 @@ int suite_run()
 #endif
             passed++;
         } else {
+            char  *extra = "";
+
+            if ( stage == 0 ) {
+                extra = "(in setup) ";
+            } else if ( stage == 2 ) {
+                extra = "(in teardown) ";
+            }
 #ifdef NO_LOG_RUNNING
             printf("Running test %s..",suite.testnames[i]);
 #endif
-            printf("...failed %s:%d (%s)\n",failed_file, failed_line, failed_message);
+            printf("...failed %s%s:%d (%s)\n",extra,failed_file, failed_line, failed_message);
             failed++;
         }
     }
@@ -76,6 +94,7 @@ void suite_setup(char *suitename)
 {
     suite.name  = suitename;
     suite.num_tests = 0;
+    suite.setup = suite.teardown = NULL;
 }
 
 
@@ -89,3 +108,8 @@ void suite_add_test_real(char *testname, void (*test)())
 }
 
 
+void suite_add_fixture(void (*setup)(), void (*teardown)())
+{
+    suite.setup = setup;
+    suite.teardown = teardown;
+}

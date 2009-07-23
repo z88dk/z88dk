@@ -1,7 +1,7 @@
 
 
 
-SUBDIRS = string ctype stdio 
+SUBDIRS = string ctype stdio stdlib
 
 all: subdirs-all
 
