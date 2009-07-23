@@ -18,7 +18,7 @@
 ;  is slower than cp (hl) + inc hl combination!
 
 XLIB strcmp_callee
-XDEF ASMDISP_STRCMP_CALLEE
+XDEF strcmp1
 
 .strcmp_callee
 
@@ -58,4 +58,3 @@ XDEF ASMDISP_STRCMP_CALLEE
    dec h 	
    ret
 
-DEFC ASMDISP_STRCMP_CALLEE = asmentry - strcmp_callee

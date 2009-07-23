@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
 XLIB strcmp
-LIB strcmp_callee
-XREF ASMDISP_STRCMP_CALLEE
+LIB strcmp1
+
 
 .strcmp
 
@@ -13,5 +13,5 @@ XREF ASMDISP_STRCMP_CALLEE
    push de
    push bc
    
-   jp strcmp_callee + ASMDISP_STRCMP_CALLEE
+   jp strcmp1
 

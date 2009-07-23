@@ -3,7 +3,7 @@
 ; 12.2006 aralbrec
 
 XLIB stricmp_callee
-XDEF ASMDISP_STRICMP_CALLEE
+XDEF stricmp1
 
 LIB asm_tolower
 
@@ -57,4 +57,3 @@ LIB asm_tolower
    dec h
    ret
 
-DEFC ASMDISP_STRICMP_CALLEE = asmentry - stricmp_callee
