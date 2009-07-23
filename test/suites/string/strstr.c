@@ -27,7 +27,6 @@ void strstr_end()
 {
     char *string = "TestString";
     Assert(strstr(string,"ing") == string + 7, "String should be found at end");
-
 }
 
 void strstr_repeated()
