@@ -5,7 +5,7 @@
 XLIB strlen
 
 ; enter: hl = char *s
-; exit : hl = length
+; exit : hl = length, z flag set if 0 length
 ; uses : af, bc, hl
 
 .strlen
@@ -13,17 +13,23 @@ XLIB strlen
 
 IF FORrcmx000
 
-	ld   d,h
-	ld   e,l
-	ld   hl,0    ; our counter
+	ld   b,h
+	ld   c,l
+	dec bc
+	ld   hl,-1    ; our counter
+	
 .strlen1
-	ld   a,(de)
-	and  a
-	ret  z
-	inc  de
-	inc  hl
-	jr   strlen1
 
+        inc bc
+        inc hl
+	ld   a,(bc)
+	and  a
+	jp nz, strlen1
+	
+	ld a,h
+	or l
+	ret
+	
 ELSE
 
 ; A funky version that's quicker than the
