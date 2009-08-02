@@ -45,7 +45,7 @@ stdio/puts
 stdio/ungetc
 stdio/vfprintf_mini
 @stdlib/stdlib.lst
-stdio_new/stream-general/stdio_error_zc
-stdio_new/stream-out/stdio_basechar
-stdio_new/stream-general/stdio_atou
+stdio_new/error/stdio_error_zc
+stdio_new/general/stdio_basechar
+stdio_new/general/stdio_atou
 @strings/string.lst
