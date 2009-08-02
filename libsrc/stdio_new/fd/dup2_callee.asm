@@ -1,13 +1,17 @@
 ; int __CALLEE__ dup2_callee(int fdsrc, int fddst)
-; 06.2008 aralbrec
+; 07.2009 aralbrec
 
 XLIB dup2_callee
 XDEF ASMDISP_DUP2_CALLEE
 
-LIB close, dup_common1, dup_common2
-LIB stdio_error_ebadf_mc
+LIB stdio_fdcommon1, stdio_getfdtblentry, stdio_getfdstruct
+LIB close, stdio_dupcommon1, stdio_dupcommon2, stdio_error_ebadf_mc
+XREF LIBDISP2_CLOSE
 
-INCLUDE "stdio.def"
+INCLUDE "../stdio.def"
+
+; dup existing source fd into specific destination fd
+; close any file open on destination fd
 
 .dup2_callee
 
@@ -17,47 +21,74 @@ INCLUDE "stdio.def"
 
 .asmentry
 
-   ; 1. check fd numbers are valid
+   ; 1. verify source fd is valid
    ;
-   ;  l = fd src
-   ;  c = fd dst
+   ; l = source fd
+   ; c = destination fd
    
-   ld a,l
-   cp MAXFILES
-   jp nc, stdio_error_ebadf_mc
+   ld b,l
+   call stdio_dupcommon2       ; ix = source fdstruct
+   jp c, stdio_error_ebadf_mc  ; problem with source fd
 
+   ; 2. check if source fd == destination fd
+   ;
+   ;  b = source fd
+   ;  c = destination fd
+   ; ix = source fdstruct
+   
    ld a,c
-   cp MAXFILES
-   jp nc, stdio_error_ebadf_mc
+   cp b
+   jr z, fdmatch
    
-   ; 2. check if the two fd numbers are equal
+   ; 3. check destination fd is in range
    ;
-   ;  l = fd src
-   ;  a = c = fd dst
+   ;  a = c = destination fd
+   ; ix = source fdstruct
    
-   cp l                        ; if fddst == fdsrc, just return fdsrc
-   ret z
-
-   call dup_common1
-   ret c
+   call stdio_getfdtblentry    ; hl = & stdio_fdtbl[dest fd]
+   jp c, stdio_error_ebadf_mc
    
-   ; 6. close fd dst if necessary
+   ; 4. see if destination fd is an open file
    ;
-   ;  c = fd dst
-   ; hl = dup fdstruct
-
-   push bc
+   ;  c = destination fd
+   ; hl = & stdio_fdtbl[dest fd]
+   ; ix = source fdstruct
+   
+   push ix                     ; save source fdstruct
+   call stdio_getfdstruct      ; ix = destination fdstruct
+   
+   ; 5. if destination fd holds an open file we need to close it
+   ;
+   ;  c = destination fd
+   ; hl = & stdio_fdtbl[dest fd] + 1
+   ; ix = destination fdstruct
+   ; carry set if no open file
+   ; stack = source fdstruct
+   
+   jr c, noclose
+   
    push hl
+   exx
+   pop hl
+   call close + LIBDISP2_CLOSE
+   exx
+
+.noclose
+
+   ; 6. create dup in destination fd
+   ;
+   ;  c = destination fd
+   ; hl = & stdio_fdtbl[dest fd] + 1
+   ; stack = source fdstruct
    
-   ld l,c
-   call close
-
-   pop de
-   pop bc
-
-   ;  c = fd dst
-   ; de = dup fdstruct
-
-   jp dup_common2
-
+   ld b,c                      ; b = destination fd
+   pop ix                      ; ix = source fdstruct
+   jp stdio_dupcommon1   
+ 
+ .fdmatch
+ 
+   ld l,a
+   ld h,0
+   ret
+ 
 defc ASMDISP_DUP2_CALLEE = asmentry - dup2_callee

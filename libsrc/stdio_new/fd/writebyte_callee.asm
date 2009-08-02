@@ -4,31 +4,32 @@
 XLIB writebyte_callee
 XDEF ASMDISP_WRITEBYTE_CALLEE
 
-LIB fd_common1, l_jpix, stdio_error_eacces_mc, stdio_error_mc, stdio_success_znc
+LIB stdio_fdcommon1, l_jpix
+LIB stdio_error_ebadf_mc, stdio_error_eacces_mc, stdio_error_mc, stdio_success_znc
 
-INCLUDE "stdio.def"
+INCLUDE "../stdio.def"
 
 .writebyte_callee
 
    pop hl
    pop bc
    ex (sp),hl
-   ld b,c
 
 .asmentry
 
    ; enter :  l = fd
-   ;          b = char
+   ;          c = char
    
-   call fd_common1             ; ix = fdstruct
-   ret c
+   call stdio_fdcommon1        ; ix = fdstruct *
+   jp c, stdio_error_ebadf_mc  ; problem with fd
    
    bit 1,(ix+3)                ; open for writing?
    jp z, stdio_error_eacces_mc
 
-   ld c,STDIO_MSG_PUTC
+   ld a,STDIO_MSG_PUTC
    call l_jpix
-   jp c, stdio_error_mc
-   jp stdio_success_znc
+   jp nc, stdio_success_znc
+   
+   jp stdio_error_mc
 
 defc ASMDISP_WRITEBYTE_CALLEE = asmentry - writebyte_callee

@@ -3,56 +3,56 @@
 
 XLIB jumptbl_printf
 
-; output format specifiers: "bcdeEfFinopPsuxX"
-; place most common first
+; output format specifiers: "bcdeEfFiInopPsuxX"
+; place most common first, library alternatives in comments
 
 .jumptbl_printf
 
-   defb 'd', 195
+   defb 'd', 195               ; signed integer
    LIB stdio_out_ld            ; stdio_out_d
    defw stdio_out_ld
    
-   defb 'c', 195
+   defb 'c', 195               ; character
    LIB stdio_out_c
    defw stdio_out_c
    
-   defb 's', 195
+   defb 's', 195               ; string
    LIB stdio_out_s
    defw stdio_out_s
    
-   defb 'u', 195
+   defb 'u', 195               ; unsigned integer
    LIB stdio_out_lu            ; stdio_out_u
    defw stdio_out_lu
    
-   defb 'x', 195
+   defb 'x', 195               ; unsigned hexadecimal integer
    LIB stdio_out_lx            ; stdio_out_x
    defw stdio_out_lx
    
-   defb 'i', 195
+   defb 'i', 195               ; signed integer
    LIB stdio_out_ld            ; stdio_out_d
    defw stdio_out_ld
    
-   defb 'X', 195
+   defb 'X', 195               ; unsigned hexadecimal integer using capitals
    LIB stdio_out_caplx         ; stdio_out_capx
    defw stdio_out_caplx
    
-   defb 'b', 195
+   defb 'b', 195               ; unsigned binary integer
    LIB stdio_out_lb            ; stdio_out_b
    defw stdio_out_lb
    
-   defb 'o', 195
+   defb 'o', 195               ; unsigned octal integer
    LIB stdio_out_lo            ; stdio_out_o
    defw stdio_out_lo
    
-   defb 'p', 195
+   defb 'p', 195               ; pointer value
    LIB stdio_out_lp            ; stdio_out_p
    defw stdio_out_lp
    
-   defb 'P', 195
+   defb 'P', 195               ; pointer value using capitals
    LIB stdio_out_caplp         ; stdio_out_capp
    defw stdio_out_caplp
    
-   defb 'n', 195
+   defb 'n', 195               ; store number of bytes output thus far
    LIB stdio_out_n
    defw stdio_out_n
    
@@ -68,7 +68,7 @@ XLIB jumptbl_printf
 ;   defb 'E', 195
 ;   defw
    
-   defb 'I', 195
+   defb 'I', 195               ; IPv4 address
    LIB stdio_out_capi
    defw stdio_out_capi
    

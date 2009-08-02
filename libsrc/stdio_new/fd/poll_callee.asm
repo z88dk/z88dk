@@ -4,19 +4,19 @@
 XLIB poll_callee
 XDEF ASMDISP_POLL_CALLEE
 
-LIB fd_common1, l_jpix, stdio_error_einval_mc
+LIB stdio_fdcommon1, l_jpix, stdio_error_einval_mc
 
-INCLUDE "stdio.def"
+INCLUDE "../stdio.def"
 
 ; struct pollfd {
 ;    int  fd;
 ;    char events;
-;    char revents;             // bit 7 = POLLNSUP, bit 6 = POLLNVAL, bit 5 = OOB_ERR, bit 4 = ERR
-;                              // bit 3 = OOB_WRITE, bit 2 = WRITE, bit 1 = OOB_READ, bit 0 = READ
+;    char revents;             // bit 7 = POLLNVAL/POLLNSUP, bit 6 = POLLHUP, bit 5 = POLLERR_OOB, bit 4 = POLLERR
+;                              // bit 3 = POLLOUT_OOB, bit 2 = POLLOUT, bit 1 = POLLIN_OOB, bit 0 = POLLIN
 ; };
 ;
 ; timeout is ignored in this implementation
-; poll always immediately returns after polling all fds
+; poll always immediately returns after polling all fds once
 
 .poll_callee
 
@@ -33,7 +33,7 @@ INCLUDE "stdio.def"
    ;         hl = -1, carry set if nfds too large
    
    ld a,c                      ; check if nfds > max number of open files
-   cp MAXFILES
+   cp STDIO_NUMFD
    jp nc, stdio_error_einval_mc
    
    or a                        ; check if struct pollfd is empty
@@ -46,21 +46,21 @@ INCLUDE "stdio.def"
 
    push bc                     ; save b = num fds, c = ready fds
 
-   ld c,(hl)                   ; e = fd
+   ld b,(hl)                   ; b = fd
    inc hl
    inc hl
    ld a,(hl)
-   and $3f
-   ld b,a                      ; b = events to test
+   or $f0
+   ld c,a                      ; c = events to test
    inc hl
 
    push hl                     ; save pollfd.revents
    
-   ld l,c
-   call fd_common1             ; ix = fdstruct for fd
-   jr c, e_ebadf                 ; bad fd number
+   ld l,b
+   call stdio_fdcommon1        ; ix = fdstruct for fd
+   jr c, e_ebadf               ; bad fd number
    
-   ld c,STDIO_MSG_POLL
+   ld a,STDIO_MSG_POLL
    call l_jpix                 ; return carry if poll is unsupported
    jr c, unsupported
 
@@ -68,9 +68,9 @@ INCLUDE "stdio.def"
 
    pop hl                      ; hl = pollfd.revents
 
-   ld (hl),b
+   ld (hl),c
    inc hl                      ; hl = next struct pollfd
-   ld a,b
+   ld a,c
    
    pop bc                      ; b = num fds, c = ready fds
    
@@ -89,12 +89,13 @@ INCLUDE "stdio.def"
 
 .e_ebadf
 
-   ld b,$40
-   jr reenter
-
+   bit 7,b                     ; if fd < 0 must return 0 in revents
+   ld c,0
+   jr nz, reenter
+   
 .unsupported
 
-   ld b,$80
-   jr reenter
+   ld c,$80
+   jp reenter
 
 defc ASMDISP_POLL_CALLEE = asmentry - poll_callee

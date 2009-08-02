@@ -3,20 +3,20 @@
 
 XLIB readbyte
 
-LIB stdio_error_eacces_mc, stdio_error_mc
-LIB l_jpix, fd_common1
+LIB stdio_error_eacces_mc, stdio_error_ebadf_mc, stdio_error_mc
+LIB l_jpix, stdio_fdcommon1
 
-INCLUDE "stdio.def"
+INCLUDE "../stdio.def"
 
 .readbyte
 
-   call fd_common1             ; ix = fdstruct
-   ret c
+   call stdio_fdcommon1        ; ix = fdstruct *
+   jp c, stdio_error_ebadf_mc  ; problem with fd
    
    bit 2,(ix+3)                ; open for reading?
    jp z, stdio_error_eacces_mc
 
-   ld c,STDIO_MSG_GETC
+   ld a,STDIO_MSG_GETC
    call l_jpix
    jp c, stdio_error_mc
    

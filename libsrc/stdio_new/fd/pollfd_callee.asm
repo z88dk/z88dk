@@ -4,32 +4,36 @@
 XLIB pollfd_callee
 XDEF ASMDISP_POLLFD_CALLEE
 
-LIB fd_common1, l_jpix, stdio_error_eacces_mc
+LIB stdio_fdcommon1, l_jpix
+LIB stdio_error_eacces_mc, stdio_error_ebadf_mc
 
-INCLUDE "stdio.def"
+INCLUDE "../stdio.def"
 
 .pollfd_callee
 
    pop hl
    pop bc
    ex (sp),hl
-   ld b,c
 
 .asmentry
 
    ; enter : l = fd
-   ;         b = event (see poll_callee.asm)
-   ; exit  : hl = revent, carry reset for success
+   ;         c = event
+   ; exit  : c = hl = revent, carry reset for success
    ;         hl = -1, carry set for fail
    
-   call fd_common1             ; ix = fdstruct
-   ret c
+   call stdio_fdcommon1        ; ix = fdstruct *
+   jp c, stdio_error_ebadf_mc  ; problem with fd
    
-   ld c,STDIO_MSG_POLL
+   ld a,c                      ; poll always checks for errors
+   or $f0
+   ld c,a
+   
+   ld a,STDIO_MSG_POLL
    call l_jpix
    jp c, stdio_error_eacces_mc
 
-   ld l,b
+   ld l,c
    ld h,0
    ret
    

@@ -2,17 +2,17 @@
 ; 06.2008 aralbrec
 
 XLIB setdefdev
-XREF _zdefdev
+XREF _stdio_defdev
 
 .setdefdev
 
    ; set a new default device
    ;
-   ; enter : hl = void *driver_function (message interpretter)
+   ; enter : hl = void *driver_function
    ; exit  : hl = former default driver function
    
-   ld de,(_zdefdev)
-   ld (_zdefdev),hl
+   ld de,(_stdio_defdev)
+   ld (_stdio_defdev),hl
    ex de,hl
 
    ret

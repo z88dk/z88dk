@@ -4,11 +4,11 @@
 XLIB open_callee
 XDEF ASMDISP_OPEN_CALLEE, LIBDISP_OPEN_CALLEE
 
-LIB stdio_malloc, stdio_free, l_jphl, fd_findslot
+LIB stdio_malloc, stdio_free, l_jpix, stdio_findfdslot
 LIB stdio_error_enfile_mc, stdio_error_edevnf_mc, stdio_error_enomem_mc, stdio_error_mc
-XREF _zdevtbl, _zdefdev
+XREF _stdio_devtbl, _stdio_defdev
 
-INCLUDE "stdio.def"
+INCLUDE "../stdio.def"
 
 .open_callee
 
@@ -29,7 +29,7 @@ INCLUDE "stdio.def"
    ;               I =  1, file open for reading
    ;               O =  1, file open for writing
    ;               A =  1, writes append to end of file
-   ; exit  : hl = fd, de = fdstruct, carry reset if successful
+   ; exit  : hl = fd, ix = fdstruct *, carry reset if successful
    ;         hl = -1, carry set for fail
    ; uses  : all except iy, af'
 
@@ -50,7 +50,7 @@ INCLUDE "stdio.def"
    jr nz, usedefault          ; if not use the default device
    
    inc de                     ; advance past "X>" in filename
-   ld hl,_zdevtbl-1           ; devices table
+   ld hl,_stdio_devtbl - 1    ; devices table
 
 .loop0
 
@@ -69,7 +69,7 @@ INCLUDE "stdio.def"
    
    ld ixl,a
    ld a,(hl)
-   ld ixh,a                    ; ix = device message interpretter
+   ld ixh,a                    ; ix = device driver
 
 .driverfound
 .libentry
@@ -78,25 +78,25 @@ INCLUDE "stdio.def"
    ;
    ;  c = flags
    ; de = char *filename
-   ; ix = device msg interpretter
+   ; ix = device driver
    
-   call fd_findslot
+   call stdio_findfdslot
    jp c, stdio_error_enfile_mc ; fd table is full
 
    ; 3. create fdstruct
    ;
-   ;  b = MAXFILES - fd
+   ;  b = STDIO_NUMFD - fd
    ;  c = flags
    ; hl = MSB of fdtbl entry
    ; de = char *filename
-   ; ix = device msg int
+   ; ix = device driver
 
    exx
    
-   ld b,(ix-1)
-   ld c,(ix-2)                 ; bc = bytes required by driver to maintain state
+   ld c,(ix-2)
+   ld b,(ix-1)                 ; bc = bytes required by driver to maintain state
    
-   ld a,FDSTR_SZ               ; a = sizeof(fdstruct)
+   ld a,STDIO_SIZEOF_FDSTRUCT
    add a,c
    ld c,a
    jr nc, noinc
@@ -108,67 +108,61 @@ INCLUDE "stdio.def"
    jp nc, stdio_error_enomem_mc
    
    ; hl = fdstruct
-   ; ix = device message interpretter
+   ; ix = device driver
+   
+   push hl
    
    ld (hl),205                 ; write call instruction
    inc hl
    ld a,ixl
-   ld (hl),a                   ; store message interpretter address
+   ld (hl),a                   ; store device driver address
    inc hl
    ld a,ixh
    ld (hl),a
-   inc hl
 
-   push hl
+   pop ix                      ; ix = fdstruct
    exx
 
-   ;  b = MAXFILES - fd
+   ;  b = STDIO_NUMFD - fd
    ;  c = flags
    ; hl = MSB of fdtbl entry
    ; de = char *filename
-   ; stack = fdstruct.flags0
-
-   ex (sp),hl                  ; hl = fdstruct.flags0
-   push bc
+   ; ix = fdstruct
 
    ld a,c
    and $07
-   ld (hl),a                   ; fdstruct.flags0
-   inc hl
-   ld (hl),0                   ; fdstruct.flags1
-   inc hl
-   ld (hl),1                   ; reference count = 1
+   ld (ix+3),a                 ; store fdstruct flags
+   ld (ix+4),1                 ; store reference count = 1
    
    ; 4. get device driver to open file
    ;
+   ;  b = STDIO_NUMFD - fd
    ;  c = flags
    ; de = char *filename
-   ; hl = fdstruct.refcount
-   ; stack = MSB of fdtbl entry, MSB = MAXFILES - fd
+   ; hl = MSB of fdtbl entry
+   ; ix = fdstruct
  
-   ld a,c
-   ld bc,-5
-   add hl,bc
-   ld b,a
-   ld c,STDIO_MSG_OPEN
+   push bc
    push hl
-   call l_jphl                 ; call device driver
-   pop de                      ; de = fdstruct
-   pop bc
+   ld a,STDIO_MSG_OPEN
+   call l_jpix                 ; call device driver
    pop hl
+   pop bc
    jr c, fail                  ; device driver returned error
 
    ; 5. make entry in fdtable
    ;
-   ; de = fdstruct
+   ; ix = fdstruct
    ; hl = MSB of fdtbl entry
-   ;  b = MAXFILES - fd
+   ;  b = STDIO_NUMFD - fd
 
-   ld (hl),d                   ; write fdstruct into fdtbl
+   ld a,ixh
+   ld (hl),a                   ; write fdstruct into fdtbl
    dec hl
-   ld (hl),e
+   ld a,ixl
+   ld (hl),a
 
-   ld a,MAXFILES
+   ld a,STDIO_NUMFD
    sub b
    ld l,a
    ld h,0                      ; hl = fd number
@@ -178,7 +172,7 @@ INCLUDE "stdio.def"
 
    dec de
    
-   ld ix,(_zdefdev)
+   ld ix,(_stdio_defdev)
    ld a,ixh
    or ixl
    jr nz, driverfound
@@ -187,7 +181,8 @@ INCLUDE "stdio.def"
 
 .fail
 
-   ex de,hl
+   push ix
+   pop hl
    call stdio_free             ; free the fdstruct
    jp stdio_error_mc
 

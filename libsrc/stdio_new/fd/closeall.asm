@@ -1,63 +1,42 @@
 ; void closeall(void)
-; 06.2008 aralbrec
+; 07.2009 aralbrec
 
 XLIB closeall
 
-LIB close, fclose
-XREF LIBDISP_CLOSE, _filelist, _fdtbl
+LIB close
+XREF LIBDISP2_CLOSE
 
-INCLUDE "stdio.def"
+INCLUDE "../stdio.def"
+
+; close all open fds
+; does not close any open FILEs -- for that see fcloseall
+; fcloseall should always be called before closeall
+; running closeall without first running fcloseall can
+; orphan open FILEs with bad consequences.
 
 .closeall
 
-   ; close all open files, typically called before program exit
-
-   ; 1. close open FILE*
+   ld hl,_stdio_fdtbl
+   ld b,STDIO_NUMFD
    
-   ld hl,(_filelist)
-   
-.loop0
-
-   ld a,h                      ; done with open FILEs?
-   or l
-   jr z, closefds
-   
-   inc hl
-   inc hl
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   inc hl
-   
-   push de
-   call fclose
-   pop hl
-   
-   jr loop0
-      
-   ; 2. close any remaining open fds
-
-.closefds
-
-   ld hl,_fdtbl
-   ld b,MAXFILES
-
-.loop1
+.loop
 
    ld e,(hl)
-   ld (hl),0
+   ld ixl,e
    inc hl
-   ld d,(hl)
-   ld (hl),0
-   inc hl
+   ld a,(hl)
+   ld ixh,a                    ; ix = fdstruct*
    
    push hl
    push bc
-   ld a,d
+   
    or e
-   call nz, close + LIBDISP_CLOSE
+   call nz, close + LIBDISP2_CLOSE
+   
    pop bc
    pop hl
    
-   djnz loop1
+   inc hl
+   djnz loop
+   
    ret

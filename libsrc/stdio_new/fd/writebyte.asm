@@ -14,5 +14,4 @@ XREF ASMDISP_WRITEBYTE_CALLEE
    push bc
    push de
    
-   ld b,c
    jp writebyte_callee + ASMDISP_WRITEBYTE_CALLEE

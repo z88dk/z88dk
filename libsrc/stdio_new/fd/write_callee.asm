@@ -4,10 +4,10 @@
 XLIB write_callee
 XDEF ASMDISP_WRITE_CALLEE
 
-LIB stdio_success_znc, stdio_error_eacces_mc, stdio_error_mc
-LIB l_jpix, fd_common1
+LIB stdio_success_znc, stdio_error_ebadf_mc, stdio_error_eacces_mc, stdio_error_mc
+LIB l_jpix, stdio_fdcommon1
 
-INCLUDE "stdio.def"
+INCLUDE "../stdio.def"
 
 .write_callee
 
@@ -24,8 +24,8 @@ INCLUDE "stdio.def"
    ; exit  : hl = num bytes written, carry reset if success
    ;         hl = -1, carry set if fail
 
-   call fd_common1             ; ix = fdstruct
-   ret c
+   call stdio_fdcommon1        ; ix = fdstruct *
+   jp c, stdio_error_ebadf_mc  ; problem with fd
 
    bit 1,(ix+3)                ; open for writing?
    jp z, stdio_error_eacces_mc
@@ -36,7 +36,7 @@ INCLUDE "stdio.def"
    
    ld l,c
    ld h,b                      ; hl = size
-   ld c,STDIO_MSG_WRIT
+   ld a,STDIO_MSG_WRIT
    call l_jpix
    
    ret nc                      ; ret with hl = bytes written if success

@@ -14,5 +14,4 @@ XREF ASMDISP_POLLFD_CALLEE
    push bc
    push de
    
-   ld b,c
    jp pollfd_callee + ASMDISP_POLLFD_CALLEE

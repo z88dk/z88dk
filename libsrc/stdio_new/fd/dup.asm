@@ -1,30 +1,43 @@
 ; int __FASTCALL__ dup(int fd)
-; 06.2008 aralbrec
+; 07.2009 aralbrec
 
 XLIB dup
 
-LIB fd_findslot, dup_common1, dup_common2
-LIB stdio_error_enfile_mc, stdio_error_ebadf_mc
+LIB stdio_fdcommon1, stdio_findfdslot, stdio_dupcommon1, stdio_dupcommon2
+LIB stdio_error_ebadf_mc, stdio_error_enfile_mc
 
-INCLUDE "stdio.def"
+INCLUDE "../stdio.def"
+
+; create a duplicate fd for an existing fd
+; the duplicate will forward messages to the existing fd
+;
+; enter: l = fd to dup
 
 .dup
 
-   ld e,l
-   call fd_findslot
-   jp c, stdio_error_enfile_mc ; fdtbl is full
+   ; 1. look up source fdstruct *, verify it is okay
+   ;
+   ; l = source fd
+
+   call stdio_dupcommon2       ; ix = source fdstruct *
+   jp c, stdio_error_ebadf_mc  ; problem with source fd
+
+   ; 2a. find first available fd slot for dup
+   ;
+   ; ix = source fdstruct *
+
+   call stdio_findfdslot       ; find first available fd
+   jp c, stdio_error_enfile_mc ; no slot available
    
-   ld a,MAXFILES
+   ; 2b. correct destination fd number
+   ;
+   ; ix = source fdstruct *
+   ;  b = STDIO_NUMFD - fd (available fd)
+   ; hl = MSB of fdtbl entry (available fd)
+
+   ld a,STDIO_NUMFD
    sub b
-   ld c,a                      ; c = fd dst
-   ld l,e                      ; l = fd src
+   ld b,a
 
-   ld a,l
-   cp MAXFILES
-   jp nc, stdio_error_ebadf_mc ; src fd is out of range
+   jp stdio_dupcommon1
    
-   call dup_common1
-   ret c
-
-   ex de,hl
-   jp dup_common2

@@ -4,9 +4,10 @@
 XLIB lseek_callee
 XDEF ASMDISP_LSEEK_CALLEE
 
-LIB stdio_error_mc, l_jpix, fd_common1
+LIB l_jpix, stdio_fdcommon1
+LIB stdio_error_ebadf_mc, stdio_error_mc
 
-INCLUDE "stdio.def"
+INCLUDE "../stdio.def"
 
 .lseek_callee
 
@@ -25,20 +26,23 @@ INCLUDE "stdio.def"
    ;             l  = fd
    ; exit  : dehl = new file pos, carry reset
    ;         dehl = -1, carry set for fail
+   
+   call stdio_fdcommon1        ; ix = fdstruct *
+   jp nc, cont
+   
+   call stdio_error_ebadf_mc   ; problem with fd
+   ld e,l
+   ld d,h
+   ret
 
-   call fd_common1             ; ix = fdstruct
-   jr c, error
+.cont
 
    exx
-   ld b,c
-   ld c,STDIO_MSG_SEEK
+   ld a,STDIO_MSG_SEEK
    call l_jpix
    ret nc
    
    call stdio_error_mc
-
-.error
-
    ld e,l
    ld d,h
    ret
