@@ -59,6 +59,7 @@ file/stream-in/stdio_in_b
 file/stream-in/stdio_in_bkt
 file/stream-in/stdio_in_c
 file/stream-in/stdio_in_capi
+file/stream-in/stdio_in_capm
 file/stream-in/stdio_in_d
 file/stream-in/stdio_in_i
 file/stream-in/stdio_in_lb
@@ -82,6 +83,7 @@ file/stream-out/stdio_out_c
 file/stream-out/stdio_out_capi
 file/stream-out/stdio_out_caplp
 file/stream-out/stdio_out_caplx
+file/stream-out/stdio_out_capm
 file/stream-out/stdio_out_capp
 file/stream-out/stdio_out_capx
 file/stream-out/stdio_out_d

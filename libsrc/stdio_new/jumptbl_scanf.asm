@@ -3,7 +3,7 @@
 
 XLIB jumptbl_scanf
 
-; scan converters: "[bcdeEfFiIonpPsuxX"
+; scan converters: "[bcdeEfFiIMonpPsuxX"
 ; place most common first, library alternatives in comments
 
 .jumptbl_scanf
@@ -75,5 +75,9 @@ XLIB jumptbl_scanf
    defb 'I', 195               ; IPv4 address
    LIB stdio_in_capi
    defw stdio_in_capi
+   
+   defb 'M', 195               ; EUI-48 / MAC-48 address
+   LIB stdio_in_capm
+   defw stdio_in_capm
    
    defb 0                      ; end of table

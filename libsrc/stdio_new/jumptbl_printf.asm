@@ -3,7 +3,7 @@
 
 XLIB jumptbl_printf
 
-; output format specifiers: "bcdeEfFiInopPsuxX"
+; output format specifiers: "bcdeEfFiIMnopPsuxX"
 ; place most common first, library alternatives in comments
 
 .jumptbl_printf
@@ -71,5 +71,9 @@ XLIB jumptbl_printf
    defb 'I', 195               ; IPv4 address
    LIB stdio_out_capi
    defw stdio_out_capi
-   
+
+   defb 'M', 195               ; EUI-48 / MAC-48 address
+   LIB stdio_out_capm
+   defw stdio_out_capm
+
    defb 0                      ; end of table
