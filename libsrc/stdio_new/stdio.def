@@ -1,6 +1,4 @@
 
-; **** THIS FILE INCOMPLETE
-
 
 ; ****************************
 ; FORMATTED OUTPUT BUFFER SIZE
@@ -46,31 +44,44 @@ defc STDIO_NUMFILE = 8         ; maximum number of open FILEs, not including std
 ; message id passed in A register
 ; called function must preserve ix and exx registers
 
+; FUNDAMENTAL MESSAGES
+
 defc STDIO_MSG_PUTC        = 0   ; enter: c = char, exit: carry set = error
 defc STDIO_MSG_GETC        = 1   ; exit: a = char, carry set = error
-defc STDIO_MSG_SEEK        = 7   ; enter: dehl = file pos c = STDIO_SEEK_*, exit: dehl = new file pos or carry set = error
-defc STDIO_MSG_WRIT        = 5   ; enter: de = src buffer hl = size!=0, exit: hl = number of bytes transferred (0, carry set = error)
-defc STDIO_MSG_FERR        = 11  ; exit: a = error flags (bit 7 = EOF)
+defc STDIO_MSG_FERR        = 2   ; exit: a = error flags (bit 7 = EOF)
+defc STDIO_MSG_WRIT        = 3   ; enter: de = src buffer hl = size!=0, exit: hl = number of bytes transferred (0, carry set = error)
 defc STDIO_MSG_READ        = 4   ; enter: de = dst buffer hl = size!=0, exit: hl = number of bytes transferred (0, carry set = error)
-defc STDIO_MSG_SYNC        = 9   ; transfer any buffered data to device, exit: carry set = error
-defc STDIO_MSG_ICTL        = 8   ; enter: de = request bc = arg, exit: hl = return value or carry set = error
-defc STDIO_MSG_POLL        = 6   ; enter: c = events, exit: c = revents or carry set = unsupported
-defc STDIO_MSG_OPEN        = 0   ; enter: c = flags (???? ?CIOA) de = char *filename, exit: carry set = error, fd must not forward message
-defc STDIO_MSG_CLOS        = 1   ; fd must not forward message
+defc STDIO_MSG_SEEK        = 5   ; enter: dehl = file pos c = STDIO_SEEK_*, exit: dehl = new file pos or carry set = error
 
-defc STDIO_MSG_FOPN        =     ; initialize high level buffer (fd-level should ignore, message should not be forwarded)
-defc STDIO_MSG_FCLS        = 13  ; deallocate high level buffers (fd-level should ignore)
-defc STDIO_MSG_FLSH        = 12  ; enter: c = STDIO_FLUSH_* (fd-level should ignore)
+defc STDIO_MSG_GROUP_0     = 6   ; all drivers likely have to implement the messages above
+
+defc STDIO_MSG_POLL        = 6   ; enter: c = events, exit: c = revents or carry set = unsupported
+defc STDIO_MSG_OPEN        = 7   ; enter: c = flags (???? ?CIOA) de = char *filename, exit: carry set = error, fd must not forward message
+defc STDIO_MSG_CLOS        = 8   ; fd must not forward message
+defc STDIO_MSG_ICTL        = 9   ; enter: de = request bc = arg, exit: hl = return value or carry set = error
+defc STDIO_MSG_SYNC        = 10  ; transfer any buffered data to device, exit: carry set = error
+
+defc STDIO_MSG_GROUP_1     = 11  ; high level FILE* (eg buffers) can likely ignore messages above
+
+defc STDIO_MSG_FOPN        = 11  ; initialize high level buffer (fd-level should ignore, message should not be forwarded)
+defc STDIO_MSG_FCLS        = 12  ; deallocate high level buffers (fd-level should ignore)
+defc STDIO_MSG_FLSH        = 13  ; enter: c = STDIO_FLUSH_* (fd-level should ignore)
+
+defc STDIO_MSG_GROUP_2     = 14  ; low level fd drivers must ignore messages above
+
+; SOCKET MESSAGES
+
+; FILESYSTEM MESSAGES
 
 ; message constants
 
-defc STDIO_SEEK_SET        =     ; set file pointer to indicated absolute file position
-defc STDIO_SEEK_CUR        =     ; set file pointer relative to current file position
-defc STDIO_SEEK_END        =     ; set file pointer relative to end of file
-defc STDIO_SEEK_REP        =     ; report current file position
+defc STDIO_SEEK_SET        =  0  ; set file pointer to indicated absolute file position
+defc STDIO_SEEK_END        =  1  ; set file pointer relative to end of file
+defc STDIO_SEEK_CUR        =  2  ; set file pointer relative to current file position
+defc STDIO_SEEK_REP        =  3  ; report current file position
 
-defc STDIO_FLUSH_INBUF     =     ; flush high level input buffer
-defc STDIO_FLUSH_OUTBUF    =     ; flush high level output buffer
+defc STDIO_FLUSH_INBUF     =  0  ; flush high level input buffer
+defc STDIO_FLUSH_OUTBUF    =  1  ; flush high level output buffer
 
 ; *************
 ; ERROR NUMBERS
