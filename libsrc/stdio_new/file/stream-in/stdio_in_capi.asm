@@ -41,6 +41,7 @@ XREF LIBDISP_STDIO_IN_I
    ;  a = next char from stream
 
    ld c,8                      ; assignment suppression on
+   push hl                     ; dummy MSW of IPv4 address
 
    call getoctet2
    ld h,e                      ; h = first octet
@@ -50,7 +51,7 @@ XREF LIBDISP_STDIO_IN_I
    ld l,e                      ; l = second octet
    call consumedot
    
-   push hl                     ; save MSW of IPv4 address
+   ex (sp),hl                  ; save MSW of IPv4 address
    
    call getoctet
    ld h,e                      ; h = third octet
@@ -103,13 +104,14 @@ XREF LIBDISP_STDIO_IN_I
 
    call stdio_in_i + LIBDISP_STDIO_IN_I
    jr c, error
-   inc d
+   inc d                       ; octet de should be < 256
    dec d
    ret z
 
 .error
 
    pop bc                      ; ret address
+   pop bc                      ; MSW of IPv4 address
    pop bc                      ; flags
    pop de                      ; long *
    pop hl                      ; & parameter list
