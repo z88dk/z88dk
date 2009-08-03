@@ -86,5 +86,5 @@ XREF ASMDISP_STRCHR_CALLEE
    defb 'w', $0a
    defb 'a', $03
    defb '+', $06
-   defb 'b'                    ; binary flag ignored (shares terminating NUL char)
+   defb 'b', $00               ; there is no distinction between binary and text mode
    defb 0
