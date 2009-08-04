@@ -7,6 +7,7 @@ spectrum/zx_screenstr_callee
 spectrum/basic/zx_basemem
 spectrum/basic/zx_basic_length
 spectrum/basic/zx_extsys
+spectrum/basic/zx_getfloat
 spectrum/basic/zx_getint
 spectrum/basic/zx_getstr
 spectrum/basic/zx_getstr_callee

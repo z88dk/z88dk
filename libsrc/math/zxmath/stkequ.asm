@@ -3,7 +3,7 @@
 ;
 ;       10/12/02 - Stefano Bodrato
 ;
-;       $Id: stkequ.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: stkequ.asm,v 1.3 2009-08-04 14:07:17 stefano Exp $
 ;
 ; Equalise the ZX FP stack and put the calculated value into FA
 ; the "real" stack has been already fixed in fsetup.
@@ -40,13 +40,8 @@ ENDIF
 
 	ld	(ZXFP_STK_PTR),hl	;update the FP stack pointer (equalise)
 	
-	ld	a,(hl)		;exponent
 	ld	de,fa+5
-	ld	(de),a
-	inc	hl
-	dec	de
-	
-	ld	b,4
+	ld	b,5
 .bloop2
 	ld	a,(hl)
 	ld	(de),a
