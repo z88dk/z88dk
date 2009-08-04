@@ -5,8 +5,8 @@ XLIB fclose
 XDEF ASMDISP_FCLOSE, LIBDISP_FCLOSE, LIBDISP2_FCLOSE
 
 LIB fflush, close, stdio_free, l_jpix, stdio_descendchain
-LIB stdio_findfilestruct, stdio_error_ebadf_mc
-XREF LIBDISP_CLOSE, ASMDISP_FFLUSH
+LIB stdio_findfilestruct, stdio_findfdstruct, stdio_error_ebadf_mc
+XREF LIBDISP_CLOSE, LIBDISP2_CLOSE, ASMDISP_FFLUSH
 
 INCLUDE "../stdio.def"
 
@@ -74,7 +74,10 @@ INCLUDE "../stdio.def"
    ;
    ; ix = first fdstruct in stdio chain
    
-   jp close + LIBDISP_CLOSE
+   call stdio_findfdstruct     ; locate fd table entry
+   
+   jp c, close + LIBDISP_CLOSE ; not in fd table
+   jp close + LIBDISP2_CLOSE   ; remove from fd table too
    
 defc ASMDISP_FCLOSE = asmentry - fclose
 defc LIBDISP_FCLOSE = libentry - fclose

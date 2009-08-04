@@ -6,7 +6,7 @@ XDEF ASMDISP_FREOPEN_CALLEE
 
 LIB fclose, close, stdio_parseperm, fopen_callee, stdio_findfilestruct, stdio_free, fflush
 LIB stdio_error_einval_zc, stdio_error_zc, stdio_error_ebadf_zc, l_jpix, stdio_descendchain
-XREF LIBDISP_FCLOSE, LIBDISP_CLOSE, LIBDISP_FOPEN_CALLEE, ASMDISP_FFLUSH
+XREF LIBDISP_FCLOSE, LIBDISP_CLOSE, LIBDISP2_CLOSE, LIBDISP_FOPEN_CALLEE, ASMDISP_FFLUSH
 
 INCLUDE "../stdio.def"
 
@@ -56,7 +56,17 @@ INCLUDE "../stdio.def"
    bit 3,(ix+3)                ; is it a FILE struct?
    jr nz, isfile
 
-   call close + LIBDISP_close  ; close underlying fd
+   ; ix = fdstruct *
+   
+   call stdio_findfdstruct     ; locate fd table entry corresponding to ix fdstruct
+   jr nc, remove_fdtbl         ; if fdstruct was found in fd table
+   
+   call close + LIBDISP_CLOSE
+   jp rejoin
+
+.remove_fdtbl
+
+   call close + LIBDISP2_CLOSE ; remove from fd table too
 
 .rejoin
 
