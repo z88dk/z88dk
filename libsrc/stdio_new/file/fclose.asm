@@ -4,7 +4,7 @@
 XLIB fclose
 XDEF ASMDISP_FCLOSE, LIBDISP_FCLOSE, LIBDISP2_FCLOSE
 
-LIB fflush, close, stdio_free, l_jpix
+LIB fflush, close, stdio_free, l_jpix, stdio_descendchain
 LIB stdio_findfilestruct, stdio_error_ebadf_mc
 XREF LIBDISP_CLOSE, ASMDISP_FFLUSH
 
@@ -63,12 +63,7 @@ INCLUDE "../stdio.def"
 .loop
 
    push ix                     ; save FILE*
-   
-   ld e,(ix+1)
-   ld d,(ix+2)
-   ld ixl,e
-   ld ixh,d                    ; ix = next FILE* struct in chain
-   
+   call stdio_descendchain     ; ix = next file struct in chain
    pop hl                      ; hl = FILE*
    call stdio_free
    
