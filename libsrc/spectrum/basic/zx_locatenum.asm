@@ -9,7 +9,7 @@
 ;	Carry flag is set on error
 ;
 ;
-;	$Id: zx_locatenum.asm,v 1.3 2009-08-04 14:07:18 stefano Exp $
+;	$Id: zx_locatenum.asm,v 1.4 2009-08-05 07:14:47 stefano Exp $
 ;
 ;	vars format:
 ;
@@ -41,9 +41,9 @@ notempty:
 	and	a		; only 1 char for var name ?
 	ld	hl,($5c4b)	; VARS
 	jr	z,onechar
-	ld	a,@00111111	; first letter of a long numeric variable name
+	ld	a,@00011111	; first letter of a long numeric variable name
 	and	c		; has those odd bits added
-	or	@10100000		
+	or	@10100000
 	ld	c,a
 	jr	vp
 
@@ -60,6 +60,11 @@ vp:	ld	a,(hl)
 
 	cp	c
 	jr	z,v2
+	xor	128		; modify the var name format
+	cp	c		; to see if it is a FOR-NEXT type var
+	jr	z,v2
+	;xor	128		; restore the original value
+	ld	a,(hl)
 	
 v1:	push	bc
 	call	$19b8		; find next variable

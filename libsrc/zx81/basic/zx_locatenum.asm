@@ -8,7 +8,7 @@
 ;	Carry flag is set on error
 ;
 ;
-;	$Id: zx_locatenum.asm,v 1.2 2009-08-04 14:07:18 stefano Exp $
+;	$Id: zx_locatenum.asm,v 1.3 2009-08-05 07:14:47 stefano Exp $
 ;
 
 	XLIB	zx_locatenum
@@ -45,6 +45,11 @@ vp:	ld	a,(hl)
 
 	cp	c
 	jr	z,v2
+	xor	128		; modify the var name format
+	cp	c		; to see if it is a FOR-NEXT type var
+	jr	z,v2
+	;xor	128		; restore the original value
+	ld	a,(hl)
 	
 v1:	push	bc
 	call	$09f2		; find next variable
