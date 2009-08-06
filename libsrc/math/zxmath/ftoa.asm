@@ -4,7 +4,7 @@
 ;
 ;       8/12/02 - Stefano Bodrato
 ;
-;       $Id: ftoa.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: ftoa.asm,v 1.3 2009-08-06 08:37:01 stefano Exp $
 ;
 ;
 ;void ftoa(x,prec,str)   -> Convert double to string
@@ -105,14 +105,19 @@ ENDIF
 
 IF FORzx
 		ldir
+		xor	a
+		ld	(de),a
 		ret
 ELSE
 
 .nloop
 		ld	a,(hl)
 		cp	$76
-		ret	z
-		
+		jr	nz,fcont
+		xor	a
+		ld	(de),a
+		ret
+.fcont
 		add	20
 		cp	42
 		jr	nz,nodash
