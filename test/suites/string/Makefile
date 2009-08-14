@@ -4,6 +4,7 @@ include ../make.config
 
 SOURCES += $(wildcard *.c) 
 OBJECTS := $(SOURCES:.c=.o)
+CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 
 all:	test.bin run

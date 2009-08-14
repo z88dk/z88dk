@@ -1,20 +1,25 @@
 
 
 
-#include "Z80/Z80.h"
 
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
+#include "machine.h"
+
+
 #include "cmds.h"
 
+
+static hook_command  hooks[256];
 
 static Z80 z80;
 static int quitting;
 
 byte RAM[65536];
+
 
 #if 0
 byte DebugZ80(register Z80 *R)
@@ -36,30 +41,26 @@ word LoopZ80(Z80 *R)
 }
 
 
+void cmd_exit(Z80 *R)
+{
+    exit(R->HL.B.l);
+}
+
+
+
 void PatchZ80(Z80 *R)
 {
     int   val;
 
-    switch (R->AF.B.h ) {
-    case CMD_EXIT:
-        exit(R->HL.B.l);
-    case CMD_PRINTCHAR:
-        if ( R->HL.B.l == '\n' || R->HL.B.l == '\r' ) {
-            fputc('\n',stdout);
-        } else {
-            fputc(R->HL.B.l,stdout);
-        }
-        fflush(stdout);
-        break;
-    case CMD_READKEY:
-        val = getchar();
-        R->HL.W = val;
-        break;
-    default:
+
+    if ( hooks[R->AF.B.h] != NULL ) {
+        hooks[R->AF.B.h](R);
+    } else {
         printf("Unknown code %d\n",R->AF.B.h);
         exit(1);
     }
 }
+
 
 /* Patching instruction:
  *
@@ -93,6 +94,7 @@ static void sighandler(int sig)
 int main(int argc, char *argv[])
 {
     int   ch;
+    int   i;
     int   alarmtime = 30;
     char *progname = argv[0];
 
@@ -115,6 +117,14 @@ int main(int argc, char *argv[])
 
     /* Clear memory */
     memset(RAM,0,sizeof(RAM));
+    for ( i = 0; i < sizeof(hooks) / sizeof(hooks[0]); i++ ) {
+        hooks[i] = NULL;
+    }
+
+    hooks[CMD_EXIT] = cmd_exit;
+    hook_io_init(hooks);
+    hook_console_init(hooks);
+
 
     signal(SIGALRM, sighandler);
 

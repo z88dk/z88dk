@@ -1,7 +1,7 @@
 
 
 
-SOURCES = main.c Z80/Debug.c Z80/Z80.c
+SOURCES = main.c Z80/Debug.c Z80/Z80.c hook_io.c hook_console.c
 OBJECTS = $(SOURCES:.c=.o)
 HEADERS = 
 

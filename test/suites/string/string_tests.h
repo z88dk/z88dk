@@ -9,6 +9,7 @@
 
 extern int test_strcmp();
 extern int test_stricmp();
+extern int test_strcasecmp();
 extern int test_strncmp();
 extern int test_strstr();
 extern int test_strrstr();
