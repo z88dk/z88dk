@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.19 2009-06-21 21:16:52 dom Exp $
+ *      $Id: main.c,v 1.20 2009-08-14 20:10:03 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -1021,7 +1021,7 @@ struct args myargs[]= {
     {"safedata=",YES,SetSafeData, "Amount of safedata (z88)" },
     {"startup=",YES,SetStartUp, "Switch between startups" },
 	{"shareoffset=",YES,SetShareOffset, "Define the shared offset (use with -make-shared" },
-    {"version",NO,DispVersion, "Display the this"},
+    {"version",NO,DispVersion, "Display the version of sccz80"},
     {"intuition",NO,SetIntuition, "Enable intuition debugging (z88)" },
     {"smartpf",NO,SetSmart, "Enable smart printf format handling" },
     {"no-smartpf",NO,UnSetSmart, "Disable smart printf format handling" },
@@ -1368,7 +1368,7 @@ void DispInfo(char *arg)
 
     while ( cur->setfunc ) {
         if ( cur->help ) {
-            printf("%-15s %s\n",cur->name, cur->help);
+            fprintf(stderr, "-%-15s %s\n",cur->name, cur->help);
         }
         cur++;
     }
