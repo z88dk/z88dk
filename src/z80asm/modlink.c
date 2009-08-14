@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.6 2009-07-23 20:35:14 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.7 2009-08-14 22:23:12 dom Exp $ */
 /* $History: MODLINK.C $ */
 /*  */
 /* *****************  Version 16  ***************** */
@@ -261,7 +261,6 @@ ReadExpr (long nextexpr, long endexpr)
 
   do
     {
-      int parsed = 0;
       type = fgetc (z80asmfile);
       lowbyte = fgetc (z80asmfile);
       highbyte = fgetc (z80asmfile);
@@ -513,7 +512,7 @@ LinkModules (void)
   while (CURRENTMODULE != lastobjmodule->nextmodule);	/* parse only object modules, not added library modules */
 
   if (verbose == ON)
-    printf ("Code size of linked modules is %d bytes\n", CODESIZE);
+    printf ("Code size of linked modules is %d bytes\n", (int)CODESIZE);
 
   if (ASMERROR == OFF)
     ModuleExpr ();		/*  Evaluate expressions in  all modules */
@@ -897,7 +896,7 @@ CreateBinFile (void)
 	  *(reloctable + 3) = (unsigned short) sizeof_reloctable / 256U;/* total size of relocation table elements */
 
 	  fwrite (reloctable, 1U, sizeof_reloctable + 4, binaryfile);	/* write relocation table, inclusive 4 byte header */
-	  printf ("Relocation header is %d bytes.\n", sizeof_relocroutine + sizeof_reloctable + 4);
+	  printf ("Relocation header is %d bytes.\n", (int)(sizeof_relocroutine + sizeof_reloctable + 4));
 	  fwrite (codearea, sizeof (char), CODESIZE, binaryfile);	/* write code as one big chunk */
 	  fclose (binaryfile);
 	}

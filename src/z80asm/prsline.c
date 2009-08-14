@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.11 2009-07-18 23:23:15 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.12 2009-08-14 22:23:12 dom Exp $ */
 /* $History: PRSLINE.C $ */
 /*  */
 /* *****************  Version 8  ***************** */
@@ -141,7 +141,7 @@ enum symbols
 GetSym (void)
 {
   char *instr;
-  int c, i, chcount = 0;
+  int c, chcount = 0;
 
   ident[0] = '\0';
 
@@ -416,7 +416,7 @@ flags[] =
 int 
 CheckCondition(void)
 {
-    int     i, index;
+    int     i;
     char   *text = ident;
     int     len = strlen(text);
 
@@ -538,7 +538,7 @@ CheckRegister8 (void)
 int 
 CheckRegister16 (void)
 {
-  if (sym == name)
+  if (sym == name) {
     if ( strcmp(ident,"HL") == 0 ) 
       {
         return REG16_HL;
@@ -567,6 +567,7 @@ CheckRegister16 (void)
       {
         return swapIXIY == ON ? REG16_IX : REG16_IY;
       }
+    }
   return -1;
 }
 

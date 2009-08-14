@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.8 2009-06-22 21:26:28 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.9 2009-08-14 22:23:12 dom Exp $ */
 /* $History: Asmdrctv.c $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -878,11 +878,8 @@ BINARY (void)
 char * 
 Fetchfilename (FILE *fptr)
 {
-  char   filename[FILENAME_MAX+1];
   char  *ptr;
   int    l, c = 0;
-
-  char *stdpath;
 
   do {
     for (l = 0;l<255; l++) 

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.3 2002-05-11 20:09:38 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.4 2009-08-14 22:23:12 dom Exp $ */
 /* $History: Z80PASS.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -853,9 +853,9 @@ WriteHeader (void)
   fprintf (listfile, "%*.*s", 122 - strlen (_prog_name) - strlen (_version) - strlen (_copyright) - 3, strlen (date), date);
 #else
   fprintf (listfile, "%s", copyrightmsg);
-  fprintf (listfile, "%*.*s", (int) 122 - strlen (copyrightmsg), (int) strlen (date), date);
+  fprintf (listfile, "%*.*s", (int)(122 - strlen (copyrightmsg)), (int) strlen (date), date);
 #endif
-  fprintf (listfile, "Page %03d%*s'%s'\n\n\n", ++PAGENR, (int) 122 - 9 - 2 - strlen (lstfilename), "", lstfilename);
+  fprintf (listfile, "Page %03d%*s'%s'\n\n\n", ++PAGENR, (int) (122 - 9 - 2 - strlen (lstfilename)), "", lstfilename);
 }
 
 

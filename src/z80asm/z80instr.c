@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.8 2009-07-18 23:23:15 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.9 2009-08-14 22:23:12 dom Exp $ */
 /* $History: Z80INSTR.C $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -78,6 +78,7 @@ int CheckRegister16 (void);
 int ExprUnsigned8 (int listoffset);
 int ExprAddress (int listoffset);
 void ExtAccumulator(int opcode);
+extern void SetTemporaryLine(char *line);
 
 /* local functions */
 struct JRPC *AllocJRPC (void);
@@ -632,7 +633,6 @@ Subroutine_addr (int opcode0, int opcode)
     if (opcode0==205 && (cpu_type & CPU_RABBIT) ) 
       {
         static char buffer[200];
-        extern char *ident;
 
 #if 0
         if ( constant >= 4 ) 
