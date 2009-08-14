@@ -1,6 +1,6 @@
 #
 # Config file for zcc (front end for Small C+ compiler)
-# $Id: zx81ansi.lnx,v 1.11 2009-06-22 21:16:13 dom Exp $
+# $Id: zx81ansi.lnx,v 1.12 2009-08-14 17:58:13 dom Exp $
 #
 
 #
@@ -94,7 +94,7 @@ CRT0		DESTDIR/lib/zx81_crt0
 
 
 
-LINKOPTS	-a -m -Mo -LDESTDIR/lib/clibs
+LINKOPTS	-a -m -Mo -LDESTDIR/lib/clibs -IDESTDIR/lib
 
 #
 # Names of the libraries
