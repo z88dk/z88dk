@@ -8,13 +8,18 @@
 #include "cmds.h"
 
 #define SET_ERROR(R,error) do {                   \
-        if ( (error) == 0 ) {                     \
+        if ( (error) == Z88DK_ENONE ) {           \
             (R)->AF.B.l &= ~C_FLAG;               \
         } else {                                  \
             (R)->AF.B.l |= C_FLAG;                \
             (R)->AF.B.h = (error);                \
         }                                         \
     } while (0)
+
+
+#define Z88DK_SEEK_SET 0
+#define Z88DK_SEEK_END 1
+#define Z88DK_SEEK_CUR 2
 
 
 #define Z88DK_ENONE    0
@@ -33,6 +38,7 @@ extern byte RAM[65536];
 
 extern void      hook_io_init(hook_command *cmds);
 
+extern void      hook_console_init(hook_command *cmds);
 
 
 #endif

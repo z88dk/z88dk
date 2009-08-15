@@ -22,6 +22,8 @@ static void cmd_readkey(Z80 *R)
 
     val = getchar();
     R->HL.W = val;
+
+    SET_ERROR(R, Z88DK_ENONE);
 }
 
 void hook_console_init(hook_command *cmds)
