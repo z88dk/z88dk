@@ -3,7 +3,7 @@
  *	
  *	32x48 or (defining the "ALTLOWGFX" variable) 64x24 pixels.
  *
- *	$Id: zxlowgfx.h,v 1.2 2007-01-17 19:32:50 stefano Exp $
+ *	$Id: zxlowgfx.h,v 1.3 2009-08-20 16:44:25 stefano Exp $
  */
 
 #ifndef __ZXLOGFX_H__
@@ -80,13 +80,14 @@ bandloop:
 	ldir
 
 #if bufferedgfx
-	ld	hl,64600
-	ld	d,h
-	ld	e,l
-	inc	de
-	ld	(hl),a		; color
-	ld	bc,767
-	ldir
+	jp	cclgbuf1
+	;ld	hl,64600
+	;ld	d,h
+	;ld	e,l
+	;inc	de
+	;ld	(hl),a		; color
+	;ld	bc,767
+	;ldir
 #endif
 	#endasm	
 }
@@ -124,6 +125,26 @@ cplotpixel:
 	ret	nc
 #endif
 
+	call	lgfxaddr
+	
+	jr	nc,cevenrow
+
+	and	7
+	rl	c
+	rl	c
+	rl	c
+	or	c
+	ld	(hl),a
+	ret
+
+cevenrow:
+	and	@111000
+	or	c
+	ld	(hl),a
+	ret
+
+
+lgfxaddr:
 #if ALTLOWGFX
 	ld	b,a
 	ld	a,h
@@ -166,22 +187,8 @@ cplotpixel:
 	pop	af
 
 	ld	a,(hl)
-	jr	nc,cevenrow
-
-	and	7
-	rl	c
-	rl	c
-	rl	c
-	or	c
-	ld	(hl),a
 	ret
-
-cevenrow:
-	and	@111000
-	or	c
-	ld	(hl),a
-	ret
-
+	
 	#endasm
 }
 
@@ -216,48 +223,8 @@ getpixel:
 	ret	nc
 #endif
 	
-#if ALTLOWGFX
-	ld	b,a
-	ld	a,h
-	srl	a
-	ld	h,a
-#else
-	srl	a	; every "row" has two pixels
-	ld	b,a	; row count
-#endif
+	call	lgfxaddr
 	
-	push	af	; save the even/odd bit in carry
-
-	ld	d,0
-	ld	e,h	; column
-	
-;#if bufferedgfx
-;	ld	hl,64600
-;#else
-	ld	hl,22528
-;#endif
-	add	hl,de
-
-	ld	e,b
-
-	rl	e	;2
-
-	rl	e	;4
-
-	rl	e
-	rl	d	;8
-
-	rl	e
-	rl	d	;16
-
-	rl	e
-	rl	d	;32
-	
-	add	hl,de
-
-	pop	af
-
-	ld	a,(hl)
 	jr	nc,gcevenrow
 
 	rra
@@ -267,7 +234,6 @@ gcevenrow:
 	and	7
 	ld	h,0
 	ld	l,a
-	ret
 
 	#endasm
 }
@@ -473,10 +439,11 @@ void cclgbuffer(int color)
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
-	and	7
 
+	and	7
 	out	(254),a
 
+cclgbuf1:
 	ld	hl,64600
 	ld	d,h
 	ld	e,l

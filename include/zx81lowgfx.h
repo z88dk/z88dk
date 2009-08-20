@@ -4,7 +4,7 @@
  *	
  *	32x48 pixels.
  *
- *	$Id: zx81lowgfx.h,v 1.1 2009-08-20 05:59:09 stefano Exp $
+ *	$Id: zx81lowgfx.h,v 1.2 2009-08-20 16:44:24 stefano Exp $
  */
 
 #ifndef __ZXLOGFX_H__
@@ -40,7 +40,7 @@ void ccopybuffer(void);
 void cclg(int color)
 {
 	#asm
-
+cclgstart:
 	pop	af
 	pop	bc
 	push	bc
@@ -65,7 +65,7 @@ cnoblack:
 cdocls:
 
 #if bufferedgfx
-	ld	hl,32768
+	ld	hl,15200
 #else
 	ld	hl,(16396)
 	inc	hl
@@ -168,7 +168,7 @@ caddr:
 	ld	b,a	; row count
 
 #if bufferedgfx
-	ld	hl,32768
+	ld	hl,15200
 #else
 	ld	hl,(16396)
 	inc	hl
@@ -436,19 +436,29 @@ void ccopybuffer(void)
 	XREF frames
 	
 	; Sync to avoid screen flickering
-	xor	a
-	ld	(frames),a
-wsync:
-	ld	a,(frames)
-	and	a
-	jr	z,wsync
+;	xor	a
+;	ld	(frames),a
+;wsync:
+;	ld	a,(frames)
+;	and	a
+;	jr	z,wsync
 
 	; copy the buffer
-	ld	hl,32768
+	ld	hl,15200
 	ld	de,(16396)
 	inc	de
-	ld	bc,33*23
+	;;ld	bc,33*24
+
+	ld	b,24
+ccloop:
+	push	bc
+	ld	bc,32
 	ldir
+	;;ld	(hl),76		; EOL marker (CR equals to the HALT instruction in the ZX81)
+	inc	hl
+	inc	de
+	pop	bc
+	djnz ccloop
 #endif
 
 #endasm
@@ -461,31 +471,7 @@ void cclgbuffer(int color)
 #asm
 
 #if bufferedgfx
-	pop	af
-	pop	bc
-	push	bc
-	push	af
-
-	ld	a,c
-cbcmod3:	sub	3
-	jr	nc,cbcmod3
-	add	3
-	
-	jr	nz,cbcnoblack
-	ld	a,128     ; 0 = black
-	jr	cbcdocls
-
-cbcnoblack:
-	dec	a
-	dec	a
-	jr	z,cbcdocls  ; 2= white
-	
-	ld	a,8       ; 1= gray
-
-cbcdocls:
-	ld	hl,32768
-	ld	b,24
-	jp	crloop
+	jp	cclgstart
 #endif
 	
 #endasm	
