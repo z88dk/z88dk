@@ -2,19 +2,19 @@
 	XLIB	clg
 
 ;
-;	$Id: clg.asm,v 1.2 2007-10-04 20:16:12 stefano Exp $
+;	$Id: clg.asm,v 1.3 2009-08-20 05:59:11 stefano Exp $
 ;
 
 ; ******************************************************************
 ;
 ;	Clear graphics area, 
 ;
-;	In text mode we can just happily call the ROM
-;
-;	Registers	changed after return:
-;		a.bcdehl/ixiy	same
-;		.f....../....	different
-;
+
+		LIB	filltxt
 
 .clg
-		jp	2602	
+		ld	l,0
+		jp	filltxt
+		
+		;call	restore81
+		;jp	2602	

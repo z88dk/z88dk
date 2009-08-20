@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.12 2009-08-04 14:07:17 stefano Exp $
+ * $Id: zx81.h,v 1.13 2009-08-20 05:59:09 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -126,6 +126,9 @@ extern void __LIB__ invtxt();
 // Mirror screen in text mode
 extern void __LIB__ mirrortxt();
 
+// Fill text screen in text mode with specified character code
+extern void __LIB__ __FASTCALL__ filltxt(char character);
+
 // Activates / Deactivates the ZX81 <-> ASCII converter,
 // used in some output routine and interfacing to the BASIC strings
 extern void __LIB__ __FASTCALL__ zx_asciimode();
@@ -170,6 +173,7 @@ extern void __LIB__ __CALLEE__   zx_setint_callee(char *variable, int value);
 #define zx_getstr(a,b)           zx_getstr_callee(a,b)
 #define zx_setstr(a,b)           zx_setstr_callee(a,b)
 #define zx_setint(a,b)           zx_setint_callee(a,b)
+#define zx_setfloat(a,b)         zx_setfloat_callee(a,b)
 
 
 #endif

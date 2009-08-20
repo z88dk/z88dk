@@ -16,9 +16,9 @@ stdio/ansi/zx81/f_ansi_scrollup
 time/zx81/clock
 games/joystick
 zx81/cnvtab
-zx81/copytxt
 zx81/invtxt
 zx81/mirrortxt
+zx81/filltxt
 zx81/_clg_hr
 zx81/basic/zx_basemem
 zx81/basic/zx_basic_length
