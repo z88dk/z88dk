@@ -4,7 +4,7 @@
  *	
  *	32x48 pixels.
  *
- *	$Id: zx81lowgfx.h,v 1.2 2009-08-20 16:44:24 stefano Exp $
+ *	$Id: zx81lowgfx.h,v 1.3 2009-08-21 12:33:08 stefano Exp $
  */
 
 #ifndef __ZXLOGFX_H__
@@ -230,14 +230,14 @@ int cpoint(int x, int y)
 
 	call	caddr
 
-	jr	nc,cpevenrow
+	jr	c,cpevenrow
 	
 	and	@0011
 	jr	cdecoded
 	
 cpevenrow:
-	srl	e
-	srl	e
+	srl	a
+	srl	a
 
 cdecoded:
 	
