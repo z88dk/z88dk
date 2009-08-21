@@ -1,10 +1,14 @@
 /*
- *      LO REZ graphics functions for the ZX Spectrum
+ *      LO REZ graphics functions for the ZX Spectrum (8 colors) and ZX 81 (black, gray, white)
  *	
- *	32x48 or (defining the "ALTLOWGFX" variable) 64x24 pixels.
+ *	32x48 or (defining the "ALTLOWGFX" variable) 64x24 pixels (Spectrum only).
  *
- *	$Id: zxlowgfx.h,v 1.3 2009-08-20 16:44:25 stefano Exp $
+ *	$Id: zxlowgfx.h,v 1.4 2009-08-21 15:24:38 stefano Exp $
  */
+
+#ifdef __ZX81__
+#include <zx81lowgfx.h>
+#endif
 
 #ifndef __ZXLOGFX_H__
 #define __ZXLOGFX_H__
@@ -457,5 +461,4 @@ cclgbuf1:
 }
 
 #endif
-
 
