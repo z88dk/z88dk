@@ -38,16 +38,20 @@ INCLUDE "../stdio.def"
    ; de = char *filename
    ;  c = flags
    
-   ld a,(de)
-   inc de
+   ld a,d                     ; NULL filename?
+   or e
+   jr z, usedefault
    
+   ld a,(de)
    or a                       ; filename empty?
    jr z, usedefault           ; if so use the default device
+   
+   inc de
    ld b,a                     ; b = device id
    
    ld a,(de)
    cp '>'                     ; device sentinel present?
-   jr nz, usedefault          ; if not use the default device
+   jr nz, usedefault - 1      ; if not use the default device
    
    inc de                     ; advance past "X>" in filename
    ld hl,_stdio_devtbl - 1    ; devices table
@@ -168,10 +172,10 @@ INCLUDE "../stdio.def"
    ld h,0                      ; hl = fd number
    ret
 
-.usedefault
-
    dec de
    
+.usedefault
+
    ld ix,(_stdio_defdev)
    ld a,ixh
    or ixl
