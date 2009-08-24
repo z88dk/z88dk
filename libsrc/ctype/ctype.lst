@@ -7,6 +7,7 @@ ctype/asm_isdigit
 ctype/asm_isgraph
 ctype/asm_islower
 ctype/asm_isodigit
+ctype/asm_isoob
 ctype/asm_isprint
 ctype/asm_ispunct
 ctype/asm_isspace
@@ -24,6 +25,7 @@ ctype/isdigit
 ctype/isgraph
 ctype/islower
 ctype/isodigit
+ctype/isoob
 ctype/isprint
 ctype/ispunct
 ctype/isspace

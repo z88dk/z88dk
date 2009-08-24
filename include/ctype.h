@@ -12,6 +12,7 @@ extern int __LIB__ __FASTCALL__ isgraph(int);
 extern int __LIB__ __FASTCALL__ isupper(int);
 extern int __LIB__ __FASTCALL__ islower(int);
 extern int __LIB__ __FASTCALL__ isodigit(int);
+extern int __LIB__ __FASTCALL__ isoob(int);
 extern int __LIB__ __FASTCALL__ isprint(int);
 extern int __LIB__ __FASTCALL__ ispunct(int);
 extern int __LIB__ __FASTCALL__ isspace(int);
