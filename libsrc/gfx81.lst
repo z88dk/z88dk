@@ -1,5 +1,6 @@
 graphics/circle
 graphics/zx81/clg
+graphics/zx81/clsgraph
 graphics/clga
 graphics/clrarea
 graphics/dcircle2
@@ -17,7 +18,7 @@ graphics/zx81/respixl
 graphics/zx81/xorpixl
 graphics/putsprite3
 graphics/point
-graphics/pointxy
+graphics/zx81/pointxy
 graphics/multipoint
 graphics/rbitmask
 graphics/rscroll
