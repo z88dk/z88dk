@@ -51,7 +51,7 @@ INCPATH		-IDESTDIR/include
 #
 # (Leave alone!)
 
-ASMOPTS		-Mo  -IDESTDIR/lib
+ASMOPTS		-Mo -IDESTDIR/lib
 
 #
 # Options for the optimizer
