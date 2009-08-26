@@ -25,7 +25,7 @@ LIB kbd_getkey
    ld bc,6
    add hl,bc                   ; hl = & struct kbd_state
    
-   call kbd_inkey              ; a = ascii code of keypress
+   call kbd_getkey             ; a = ascii code of keypress
    ret nc                      ; jump to tty driver push code if key pressed
    
    pop hl
