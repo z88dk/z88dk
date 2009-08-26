@@ -6,7 +6,7 @@
 	XREF	base_graphics
 
 ;
-;	$Id: pixladdr.asm,v 1.5 2002-04-17 21:30:25 dom Exp $
+;	$Id: pixladdr.asm,v 1.6 2009-08-26 15:21:34 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -40,7 +40,6 @@
 ;		ret
 
 
-		LD	C,H
 		LD	A,L
 	        LD      B,A
 	        AND     A
@@ -53,7 +52,7 @@
 	        AND     @11111000
 	        XOR     B
 	        LD      D,A
-	        LD      A,C
+	        LD      A,H
 	        RLCA
 	        RLCA
 	        RLCA
@@ -63,7 +62,7 @@
 	        RLCA
 	        RLCA
 	        LD      E,A
-	        LD      A,C
+	        LD      A,H
 	        AND     @00000111
 	        XOR	@00000111
 	        

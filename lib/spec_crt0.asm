@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.21 2009-06-22 21:20:05 dom Exp $
+;       $Id: spec_crt0.asm,v 1.22 2009-08-26 15:21:33 stefano Exp $
 ;
 
 
@@ -77,7 +77,7 @@ IF (startup=2)
         ld      a,$3F
         ld      i,a
         jr      init            ; go over rst 8, bypass shadow ROM
-        nop
+        nop			; (probably not necessary)
 
         ; --- rst 8 ---
         ld      hl,($5c5d)      ; It was the address reached by CH-ADD.
@@ -93,15 +93,7 @@ init:
         ld      (hl),0
         ld      bc,42239
         ldir
-
-        ld      a,@111000       ; White PAPER, black INK
-        ld      ($5c48),a       ; BORDCR
-        ld      ($5c8d),a       ; ATTR_P
-        ld      ($5c8f),a       ; ATTR_T
-
-
-        ld      hl,$8080
-        ld      (fp_seed),hl
+        call	zx_internal_init
         ei
 ELSE
 
@@ -189,6 +181,16 @@ zx_internal_cls:
         rrca
         rrca
         out     (254),a
+        ret
+
+zx_internal_init:
+        ld      a,@111000       ; White PAPER, black INK
+        ld      ($5c48),a       ; BORDCR
+        ld      ($5c8d),a       ; ATTR_P
+        ld      ($5c8f),a       ; ATTR_T
+
+        ld      hl,$8080
+        ld      (fp_seed),hl
         ret
 
 ELSE
@@ -397,6 +399,10 @@ IF (startup=2) ; ROM
 
 ;; ;## Bypass to prevent an accidental insertion of the Interface 1 ##
 ;; ;## Requires a manual tuning, so it is commented out by default  ##
+;; ;## Note that the original Interface II hardware should anyway   ##
+;; ;## protect the Interface 1 from inserting anyway.. tuning could ##
+;; ;## be useful in few special cases only.                         ##
+;;
 ;; .shadow_protect_filler
 ;; defs    $1708-shadow_protect_filler
 ;; defw    0
