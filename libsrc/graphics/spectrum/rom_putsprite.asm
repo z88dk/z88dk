@@ -3,17 +3,17 @@
 ; original code by Patrick Davidson (TI 85)
 ; modified by Stefano Bodrato - Jan 2001
 ;
-; ZX Spectrum version
-; new version using Alvin's offset tricks,
-; no need anymore of the row table, saving a lot of memory.
+; ZX Spectrum ROM version, a bit slower
 ;
 ;
-; $Id: putsprite.asm,v 1.4 2009-08-27 16:51:17 stefano Exp $
+; $Id: rom_putsprite.asm,v 1.1 2009-08-27 16:51:17 stefano Exp $
 ;
 
 	XLIB    putsprite
 	LIB	pixeladdress
 	LIB	zx_saddrpdown
+
+	XREF	romsvc
 
 	INCLUDE	"graphics/grafix.inc"
 
@@ -44,14 +44,13 @@
 
         inc     hl
         ld      a,(hl)  ; and/or/xor mode
-        ld	(ortype+1),a	; Self modifying code
-        ld	(ortype2+1),a	; Self modifying code
-
+        ld	(romsvc+1),a	; Self modifying code
         inc     hl
         ld      a,(hl)
-        ld	(ortype),a	; Self modifying code
-        ld	(ortype2),a	; Self modifying code
-
+        ld	(romsvc),a	; Self modifying code
+        ld	a,201		; ret
+        ld	(romsvc+2),a
+        
 	ld	a,d
 
 	push	af
@@ -60,9 +59,7 @@
 	call	pixeladdress	
 	ld	h,d
 	ld	l,e
-	ld	(rowadr1+1),hl	; store current row
-	ld	(rowadr2+1),hl
-	ld	(rowadr3+1),hl
+	ld	(romsvc+3),hl	; store current row
 	pop	af
 	
 	push	hl
@@ -74,9 +71,7 @@
          ld       b,0
          add      hl,bc
          ld       a,(hl)
-         ld       (wsmc1+1),a
-         ld       (wsmc2+1),a
-	 ld       (_smc1+1),a
+         ld       (romsvc+5),a
 
 	pop	hl
 
@@ -91,14 +86,13 @@
          ld       b,d               ;Load width
          ld       c,(ix+2)          ;Load one line of image
          inc      ix
-._smc1   ld       a,1               ;Load pixel mask
+         ld       a,(romsvc+5)               ;Load pixel mask
 ._iloop  sla      c                 ;Test leftmost pixel
          jr       nc,_noplot        ;See if a plot is needed
          ld       e,a
+	
+	call	romsvc
 
-.ortype
-	nop	; changed into nop / cpl
-         nop	; changed into and/or/xor (hl)
          ld       (hl),a
          ld       a,e
 ._noplot rrca
@@ -107,10 +101,9 @@
 ._notedge djnz     _iloop
 
 	; ---------
-.rowadr1
-	ld	hl,0	; current address
+	ld	hl,(romsvc+3)	; current address
 	call	zx_saddrpdown
-	ld	(rowadr1+1),hl
+	ld	(romsvc+3),hl
 	; ---------
 
          pop      bc                ;Restore data
@@ -127,30 +120,31 @@
          ld       b,d               ;Load width
          ld       c,(ix+2)          ;Load one line of image
          inc      ix
-.wsmc1    ld       a,1               ;Load pixel mask
+         ld       a,(romsvc+5)               ;Load pixel mask
 .wiloop  sla      c                 ;Test leftmost pixel
          jr       nc,wnoplot         ;See if a plot is needed
          ld       e,a
 
-.ortype2
-	nop	; changed into nop / cpl
-         nop	; changed into and/or/xor (hl)
+	call	romsvc
+
          ld       (hl),a
          ld       a,e
 .wnoplot rrca
          jr       nc,wnotedge        ;Test if edge of byte reached
          inc      hl                ;Go to next byte
 .wnotedge
-.wsmc2   cp       1
+	ld	e,a
+	ld	a,(romsvc+5)               ;pixel mask
+	cp	e
+	ld	a,e
          jr       z,wover_1
 
          djnz     wiloop
 
 	; ---------
-.rowadr2
-	ld	hl,0	; current address
+	ld	hl,(romsvc+3)	; current address
 	call	zx_saddrpdown
-	ld	(rowadr2+1),hl
+	ld	(romsvc+3),hl
 	; ---------
 
          pop      bc                ;Restore data
@@ -164,10 +158,9 @@
          dec      ix
 
 	; ---------
-.rowadr3
-	ld	hl,0	; current address
+	ld	hl,(romsvc+3)	; current address
 	call	zx_saddrpdown
-	ld	(rowadr3+1),hl
+	ld	(romsvc+3),hl
 	; ---------
 
          pop      bc

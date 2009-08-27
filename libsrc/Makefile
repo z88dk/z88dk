@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.137 2009-05-21 06:58:11 stefano Exp $
+# $Id: Makefile,v 1.138 2009-08-27 16:51:17 stefano Exp $
 
 
 include	Make.config
@@ -39,7 +39,7 @@ tilibs:	ti82ansi_clib.lib ti82_clib.lib	ti83ansi_clib.lib ti83_clib.lib	\
 	ti83pansi_clib.lib ti83p_clib.lib ti85ansi_clib.lib ti85_clib.lib \
 	ti86ansi_clib.lib ti86_clib.lib
 
-zxlibs:	ts2068_clib.lib	zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib
+zxlibs:	ts2068_clib.lib	zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib zxrom.lib
 
 zx81libs: zx81_clib.lib	zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib
 
@@ -357,6 +357,13 @@ ts2068an_clib.lib:
 	cd spectrum ; $(MAKE) ;	cd ..
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx $(COLDEFS)	-x$(OUTPUT_DIRECTORY)/ts2068an_clib @$(LISTFILE_DIRECTORY)/ts2068an.lst
+
+# ZXROM	- stefano
+zxrom.lib:
+	@echo ''
+	@echo '--- Building ZXROM Library  ---'
+	@echo ''
+	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zxrom @$(LISTFILE_DIRECTORY)/zxrom.lst
 
 # ZXVGS	- yarek
 zxvgs.lib:

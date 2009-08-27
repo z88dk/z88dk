@@ -6,7 +6,7 @@
 	XREF	base_graphics
 
 ;
-;	$Id: pixladdr.asm,v 1.6 2009-08-26 15:21:34 stefano Exp $
+;	$Id: pixladdr.asm,v 1.7 2009-08-27 16:51:17 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -41,24 +41,23 @@
 
 
 		LD	A,L
-	        LD      B,A
 	        AND     A
 	        RRA
 	        SCF			; Set Carry Flag
 	        RRA
 	        AND     A
 	        RRA
-	        XOR     B
+	        XOR     L
 	        AND     @11111000
-	        XOR     B
+	        XOR     L
 	        LD      D,A
 	        LD      A,H
 	        RLCA
 	        RLCA
 	        RLCA
-	        XOR     B
+	        XOR     L
 	        AND     @11000111
-	        XOR     B
+	        XOR     L
 	        RLCA
 	        RLCA
 	        LD      E,A

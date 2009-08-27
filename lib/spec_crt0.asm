@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.22 2009-08-26 15:21:33 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.23 2009-08-27 16:51:16 stefano Exp $
 ;
 
 
@@ -39,6 +39,7 @@
         XDEF    snd_tick        ; Sound variable
 
         XDEF    call_rom3       ; Interposer
+       
 
 ;--------
 ; Set an origin for the application (-zorg=) default to 32768
@@ -165,7 +166,7 @@ cleanup_exit:
 
 ; ########  END OF ROM INTERRUPT HANDLER ######## 
 
-
+XDEF zx_internal_cls
 zx_internal_cls:
         ld      hl,$4000        ; cls
         ld      d,h
@@ -397,6 +398,8 @@ call_rom3:
 IF (startup=2) ; ROM
 ;---------------------------------------------------------------------------
 
+        XDEF    romsvc		; service space for ROM
+
 ;; ;## Bypass to prevent an accidental insertion of the Interface 1 ##
 ;; ;## Requires a manual tuning, so it is commented out by default  ##
 ;; ;## Note that the original Interface II hardware should anyway   ##
@@ -433,6 +436,8 @@ fasign          ds.b    1       ; Floating point variable
 snd_tick        ds.b    1       ; Sound
 heaplast        ds.w    1       ; Address of last block on heap
 heapblocks      ds.w    1       ; Number of blocks
+romsvc		ds.b	1	; Pointer to the end of the sysdefvars
+				; used by the ROM version of some library
 }
 
 
@@ -464,6 +469,7 @@ exitcount:      defb    0       ; How many routines on the atexit() stack
 
 heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
+
 
 IF DEFINED_NEED1bitsound
 snd_tick:       defb    0       ; Sound variable
