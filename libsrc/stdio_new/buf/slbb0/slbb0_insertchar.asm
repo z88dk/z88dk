@@ -54,7 +54,7 @@ XREF slbb0_appendchar_lib
    scf                         ; success!
    ret
 
-.append
+.appendchar
 
    add a,e
    jp slbb0_appendchar_lib
