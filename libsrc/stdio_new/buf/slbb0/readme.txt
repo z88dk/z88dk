@@ -14,7 +14,7 @@ The slbb0 data structure:
 
 offset   size    description
 
-  +0      1      end    (index of last unoccupied position in buffer)
+  +0      1      end    (index of first unoccupied position in buffer)
   +1      1      len    (length of buffer in bytes)
  +2/3     2      buffer (base buffer address)
 
