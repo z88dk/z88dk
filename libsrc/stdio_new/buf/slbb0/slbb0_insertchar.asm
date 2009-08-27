@@ -23,36 +23,41 @@ XREF slbb0_appendchar_lib
    cp (hl)                     ; compare to len
    jr nc, full                 ; return if buffer full
    
+   ld b,a                      ; b = end
    sub e                       ; a = end - cursor = num bytes to move
-   jp c, slbb0_appendchar_lib  ; if cursor is past end of last byte in buffer
-   jp z, slbb0_appendchar_lib  ;   we are appending not inserting
+   jr c, appendchar            ; if cursor is past end of last byte in buffer
+   jr z, appendchar            ;   we are appending not inserting
    ld c,a                      ; c = num bytes to move
    
    inc hl
    ld a,(hl)                   ; a = LSB start of linear buffer
-   add a,e                     ; add cursor position
+   add a,b                     ; add end
    inc hl
    ld h,(hl)
    ld l,a
    jp nc, noinc
    inc h
 
-.noinc                         ; hl = insert position in linear buffer
+.noinc                         ; hl = one byte past end of data in buffer
 
    ld a,d                      ; a = char being inserted
 
    ld e,l
    ld d,h
-   inc de                      ; de = insert position + 1
+   dec de                      ; de = last data byte in buffer
+   ex de,hl
    
    ld b,0                      ; bc = num bytes to move
-   push hl
-   ldir                        ; make space for one insert char
-   pop hl
-   
-   ld (hl),a                   ; write insert char  
+   lddr                        ; make space for one insert char
+    
+   ld (de),a                   ; write insert char  
    scf                         ; success!
    ret
+
+.append
+
+   add a,e
+   jp slbb0_appendchar_lib
 
 .full
 
