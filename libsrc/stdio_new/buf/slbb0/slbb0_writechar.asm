@@ -2,6 +2,7 @@
 ; 08.2009 aralbrec
 
 XLIB slbb0_writechar
+LIB slbb0_appendchar
 
 ; write a char to the index specified
 ;
@@ -15,7 +16,7 @@ XLIB slbb0_writechar
 .slbb0_writechar
 
    cp (hl)                     ; index - end
-   ret nc                      ; return if index out of bounds
+   jp nc, slbb0_appendchar     ; if index out of bounds we're appending to the end
    
    inc hl
    inc hl
