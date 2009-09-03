@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.4 2009-08-14 22:23:12 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.5 2009-09-03 17:54:55 dom Exp $ */
 /* $History: Z80PASS.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -94,7 +94,7 @@ char *AllocIdentifier (size_t len);
 /* local functions */
 void ifstatement (enum flag interpret);
 void parseline (enum flag interpret);
-void getline (void);
+void getasmline (void);
 void Pass2info (struct expr *expression, char constrange, long lfileptr);
 void Z80pass1 (void);
 void Z80pass2 (void);
@@ -165,7 +165,7 @@ Z80pass1 (void)
 
 
 void 
-getline (void)
+getasmline (void)
 {
   long fptr;
   int l,c;
@@ -198,7 +198,7 @@ parseline (enum flag interpret)
       ++CURRENTFILE->line;
       ++TOTALLINES;
       if (listing)
-	getline ();		/* get a copy of current source line */
+	getasmline ();		/* get a copy of current source line */
 
       EOL = OFF;		/* reset END OF LINE flag */
       GetSym ();
