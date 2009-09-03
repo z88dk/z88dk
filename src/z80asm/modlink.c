@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.7 2009-08-14 22:23:12 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.8 2009-09-03 17:42:12 dom Exp $ */
 /* $History: MODLINK.C $ */
 /*  */
 /* *****************  Version 16  ***************** */
@@ -1098,25 +1098,15 @@ long
 ReadLong (FILE * fileid)
 {
 
-#ifdef ENDIAN			/* high byte, low byte order... */
   int i;
-  unsigned long c, fptr = 0;
-
-  for (i = 1; i <= 3; i++)
-    {
-      fptr |= fgetc (fileid) << 24;
-      fptr >>= 8;
-    }
-  fptr |= fgetc (fileid) << 24;
-
-  return fptr;
-#else /* low byte, high byte order...    */
   long fptr = 0;
 
-  /* long is *at least* 4 bytes long, and we have to write exactly 4 bytes */
-  fread (&fptr, 4, 1, fileid);
+  fptr = fgetc(fileid);
+  fptr |= (fgetc(fileid) << 8);
+  fptr |= (fgetc(fileid) << 16);
+  fptr |= (fgetc(fileid) << 24);
+
   return fptr;
-#endif  
 }
 
 
@@ -1124,7 +1114,6 @@ ReadLong (FILE * fileid)
 void 
 WriteLong (long fptr, FILE * fileid)
 {
-#ifdef ENDIAN			/* high byte, low byte order... */
   int i;
 
   for (i = 0; i < 4; i++)
@@ -1132,11 +1121,6 @@ WriteLong (long fptr, FILE * fileid)
       fputc (fptr & 255, fileid);
       fptr >>= 8;
     }
-#else 
-  /* low byte, high byte order... */
-  /* long is *at least* 4 bytes long, and we have to write exactly 4 bytes */
-  fwrite (&fptr, 4, 1, fileid);
-#endif 
 }
 
 
