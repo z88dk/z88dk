@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.138 2009-08-27 16:51:17 stefano Exp $
+# $Id: Makefile,v 1.139 2009-09-04 05:56:39 stefano Exp $
 
 
 include	Make.config
@@ -363,6 +363,7 @@ zxrom.lib:
 	@echo ''
 	@echo '--- Building ZXROM Library  ---'
 	@echo ''
+	$(MAKE)	gamesdeps
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zxrom @$(LISTFILE_DIRECTORY)/zxrom.lst
 
 # ZXVGS	- yarek
