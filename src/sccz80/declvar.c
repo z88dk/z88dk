@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.17 2009-06-21 21:16:52 dom Exp $
+ *      $Id: declvar.c,v 1.18 2009-09-06 18:58:37 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -130,7 +130,7 @@ void defenum(char *sname, char storage)
 {
     SYMBOL  *ptr;
     char    name[NAMEMAX];
-    long    value;
+    int32_t value;
     /* Add it into the symbol table, we do not need to keep track of the
      * tag because we treat enums as constants
      */
@@ -198,7 +198,7 @@ char zfar )                      /* TRUE if far */
 {
     char sname[NAMESIZE];
     int size, ident, more, itag, type, size_st;
-    long addr = -1;
+    int32_t addr = -1;
     char    flagdef,match,ptrtofn;
     char    libdef,fastcall,callee;
     SYMBOL *myptr ;
@@ -745,7 +745,7 @@ ptrerror (int ident)
 int 
 needsub (void)
 {
-        long num;
+        int32_t num;
 
         if ( cmatch(']') ) return (0);   /* null size */
         if ( constexpr(&num,1) == 0 ) {
@@ -850,7 +850,7 @@ TAG_SYMBOL *GetVarID(struct varid *var,char storage)
 void 
 BitFieldSwallow (void)
 {
-        long    val;
+        int32_t val;
         if      (cmatch(':')) {
                 constexpr(&val,1);
                 warning(W_BITFIELD);

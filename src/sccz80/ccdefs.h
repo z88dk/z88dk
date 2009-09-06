@@ -4,13 +4,16 @@
  *      The master header file
  *      Includes everything else!!!
  *
- *      $Id: ccdefs.h,v 1.1 2000-07-04 15:33:30 dom Exp $
+ *      $Id: ccdefs.h,v 1.2 2009-09-06 18:58:36 dom Exp $
  */
 
 /*
  *      System wide definitions
  */
 
+
+#include <sys/types.h>
+#include <stdint.h>
 
 #include "define.h"
 #include "lvalue.h"

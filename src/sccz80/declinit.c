@@ -10,7 +10,7 @@
  * 
  *      3/2/02 djm - Unspecified structure members are now padded out
  *
- *      $Id: declinit.c,v 1.13 2009-06-21 21:16:52 dom Exp $
+ *      $Id: declinit.c,v 1.14 2009-09-06 18:58:37 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -222,8 +222,8 @@ void agg_init(int size, int type, int ident, int *dim, int more, TAG_SYMBOL *tag
  */
 void init(int size, int ident, int *dim, int more, int dump, int is_struct)
 {
-    long value;
-    int sz;			/* number of chars in queue */
+    int32_t value;
+    int     sz;			/* number of chars in queue */
 /*
  * djm 14/3/99 We have to rewrite this bit (ugh!) so that we store
  * our literal in a temporary queue, then if needed, we then dump

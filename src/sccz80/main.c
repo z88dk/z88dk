@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.20 2009-08-14 20:10:03 dom Exp $
+ *      $Id: main.c,v 1.21 2009-09-06 18:58:37 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -622,7 +622,7 @@ void PragmaBytes(int flag)
 {
     FILE   *fp;
     char   sname[NAMESIZE];
-    long    value;
+    int32_t value;
     int     count;
 
     if ( symname(sname) ) {
@@ -641,7 +641,7 @@ void PragmaBytes(int flag)
 	    else
 		fprintf(fp,",");
 	    if ( number(&value) ) {
-		fprintf(fp,"%ld",value);
+		fprintf(fp,"%d",value);
 	    } else {
 		warning(W_EXPARG);
 	    }

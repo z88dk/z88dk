@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.19 2007-07-05 18:39:00 dom Exp $
+ *      $Id: primary.c,v 1.20 2009-09-06 18:58:37 dom Exp $
  */
 
 
@@ -649,7 +649,7 @@ void test(int label,int parens)
  * evaluate constant expression
  * return TRUE if it is a constant expression
  */
-int constexpr(long *val,int flag)
+int constexpr(int32_t *val,int flag)
 {
         char *before, *start ;
         int con, valtemp ;
@@ -794,7 +794,7 @@ int docast(LVALUE *lval,char df)
  * returning pointers - to do this, we will define dummy symbols in
  * the local symbol table so that they do what we want them to do!
  */
-    sprintf(nam,"0dptr%d",(int)locptr);
+    sprintf(nam,"0dptr%p",locptr);
     temp_type = ( (lval->c_flags&FARPTR) ? CPTR : CINT );
     itag=0;
     if ( lval->c_tag) 

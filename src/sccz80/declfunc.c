@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.11 2009-06-21 21:16:52 dom Exp $
+ *      $Id: declfunc.c,v 1.12 2009-09-06 18:58:37 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -68,7 +68,7 @@ char zfar,
 char sign,
 TAG_SYMBOL *otag,
 int ident,
-long *addr)
+int32_t *addr)
 {
     SYMBOL *ptr;
     int     more;
@@ -134,7 +134,7 @@ long *addr)
 void newfunc()
 {
         char n[NAMESIZE];               /* ptr => currfn */
-        long addr;
+        int32_t addr;
 
         if ( symname(n) == 0 ) {
                 error(E_ILLEGAL);
@@ -155,7 +155,7 @@ void newfunc()
 SYMBOL *
 #endif
 
-AddFuncCode(char *n, char type, char ident, char sign,char zfar, int storage, int more, char check,char simple,TAG_SYMBOL *otag, long *addr)
+AddFuncCode(char *n, char type, char ident, char sign,char zfar, int storage, int more, char check,char simple,TAG_SYMBOL *otag, int32_t *addr)
 {
     unsigned char tvalue;           /* Used to hold protot value */
     char    typ;                    /* Temporary type */
@@ -466,7 +466,7 @@ void setlocvar(SYMBOL *prevarg,SYMBOL *currfn)
 #ifndef SMALL_C
 SYMBOL *
 #endif
-dofnansi(SYMBOL *currfn, long *addr)
+dofnansi(SYMBOL *currfn, int32_t *addr)
 {
         SYMBOL *prevarg;       /* ptr to symbol table entry of most recent argument */
         SYMBOL *argptr;        /* Temporary holder.. */

@@ -1,6 +1,6 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.10 2009-06-21 21:16:52 dom Exp $
+ * $Id: define.h,v 1.11 2009-09-06 18:58:37 dom Exp $
  */
 
 /*      Stand-alone definitions                 */
@@ -205,7 +205,7 @@ struct tag_symbol {
 
 struct sw_tab {
         int label ;             /* label for start of case */
-        long value ;             /* value associated with case */
+        int32_t value ;             /* value associated with case */
 } ;
 
 #define SW_TAB struct sw_tab

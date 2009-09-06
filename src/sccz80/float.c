@@ -3,7 +3,7 @@
  *
  *      Routines to float an string
  *
- *      $Id: float.c,v 1.5 2002-02-20 11:11:54 dom Exp $
+ *      $Id: float.c,v 1.6 2009-09-06 18:58:37 dom Exp $
  *
  *      This code has been largely rewritten. It now produces numbers
  *      to about 4 decimal places - there's an inaccuracy creeping in
@@ -40,7 +40,7 @@
  * Entry: val=value fa=pointer to 6 byte area for number */
 void qfloat(int va, unsigned char *fa)
 {
-    unsigned long val;
+    uint32_t val;
     int      i,minus,exp;
 
     val = va;
@@ -58,9 +58,9 @@ void qfloat(int va, unsigned char *fa)
 }
 
 
-void norm(unsigned long a, 
-	  unsigned long b, 
-	  unsigned long c, 
+void norm(uint32_t a, 
+	  uint32_t b, 
+	  uint32_t c, 
 	  int minus,
 	  unsigned char *fa, 
 	  int exp)
@@ -183,7 +183,7 @@ void fltmult(unsigned char *i1, unsigned char *i2)
 
     unsigned char fa1[EXPONENT+2], fa2[EXPONENT+2], fa3[EXPONENT+2];
     int i, j, k, temp, mask, carry;
-    unsigned long a, b, c;
+    uint32_t a, b, c;
     int     exp;
 
     unpack(i1, fa1);
@@ -256,7 +256,7 @@ void fltmult(unsigned char *i1, unsigned char *i2)
 void fltadd(unsigned char *i1,unsigned char *i2)
 {
     unsigned char fa1[EXPONENT+2], fa2[EXPONENT+2];
-    unsigned long temp, carry;
+    uint32_t temp, carry;
     int i;
 
 

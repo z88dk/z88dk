@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.24 2009-06-21 21:16:52 dom Exp $
+ *      $Id: codegen.c,v 1.25 2009-09-06 18:58:37 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -37,8 +37,6 @@ int donelibheader;
 static char *current_section = "";  /**< Name of the current section */
 
 
-
-void constbc(long val);
 
 /* Begin a comment line for the assembler */
 
@@ -1876,13 +1874,13 @@ void DoubSwap(void)
  * to have -1 entered correctly
  */
 
-void vlongconst(unsigned long val)
+void vlongconst(uint32_t val)
 {
     vconst(val%65536);
     const2(val/65536);
 }
 
-void vlongconst_noalt(unsigned long val)
+void vlongconst_noalt(uint32_t val)
 {
     constbc(val%65536);
     ol("push\tbc");
@@ -1894,7 +1892,7 @@ void vlongconst_noalt(unsigned long val)
 /*
  * load constant into primary register
  */
-void vconst(long val)
+void vconst(int32_t val)
 {
 	if ( val < 0 )
 		val += 65536;
@@ -1906,7 +1904,7 @@ void vconst(long val)
 /*
  * load constant into secondary register
  */
-void const2(long val)
+void const2(int32_t val)
 {
 	if ( val < 0 )
 		val += 65536;
@@ -1915,7 +1913,7 @@ void const2(long val)
     nl();
 }
 
-void constbc(long val)
+void constbc(int32_t val)
 {
 	if ( val < 0 )
 		val += 65536;

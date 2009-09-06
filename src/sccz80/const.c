@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.16 2006-06-18 13:03:13 dom Exp $
+ *      $Id: const.c,v 1.17 2009-09-06 18:58:37 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -54,8 +54,8 @@ int constant(LVALUE *lval)
                 return(1);
         }
         else if ( number(&lval->const_val) || pstr(&lval->const_val) ) {
-/* Insert long stuff/long pointer here? */
-		if ( (unsigned long )lval->const_val >= 65536LU )
+/* Insert int32_t stuff/int32_t pointer here? */
+		if ( (uint32_t )lval->const_val >= 65536LU )
 			constype = LONG;
 
                 lval->val_type = constype ;
@@ -81,7 +81,7 @@ int constant(LVALUE *lval)
 }
 
 
-int fnumber(long *val)
+int fnumber(int32_t *val)
 {
     unsigned char sum[6];
     unsigned char sum2[6];
@@ -169,7 +169,7 @@ int fnumber(long *val)
 
     if( cmatch('e') ) {                       /* interpret exponent */
 	int neg;                        /* nonzero if exp is negative */
-	long expon;                     /* the exponent */
+	int32_t expon;                     /* the exponent */
 
 	if( number(&expon) == 0 ) {
 	    error(E_EXPON);
@@ -234,7 +234,7 @@ int fnumber(long *val)
 int stash_double_str(char *start, char *end)
 {
     int  len;
-    long val;
+    int32_t val;
     unsigned char  *buf;
 
     len = end-start;
@@ -259,7 +259,7 @@ int stash_double_str(char *start, char *end)
  * number - saves space etc etc
  */
 
-long searchdub(unsigned char *num)
+int32_t searchdub(unsigned char *num)
 {
         unsigned char *tempdub;
         int dubleft, k,match;
@@ -290,11 +290,11 @@ long searchdub(unsigned char *num)
 
 
 
-int number(long *val)
+int number(int32_t *val)
 {
         char c ;
         int minus;
-        long  k ;
+        int32_t  k ;
 /*
  * djm, set the type specifiers to normal
  */
@@ -362,14 +362,14 @@ void address(SYMBOL *ptr)
         immed() ;
         outname(ptr->name,dopref(ptr)) ;
         nl();
-/* djm if we're using long pointers, use of e=0 means absolute address,
+/* djm if we're using int32_t pointers, use of e=0 means absolute address,
  * this covers up a bit of a problem in deref() which can't distinguish
  * between ptrtoptr and ptr
  */
         if (ptr->flags&FARPTR) { const2(0); }
 }
 
-int pstr(long *val)
+int pstr(int32_t *val)
 {
         int k ;
 
@@ -390,7 +390,7 @@ int pstr(long *val)
  * check to see if present elsewhere, if so do the merge as for doubles
  */
 
-int tstr(long *val)
+int tstr(int32_t *val)
 {
         int k,j;
 
@@ -414,7 +414,7 @@ int tstr(long *val)
  * internally, but to the asm file show it to start from 0
  */
 
-int storeq(int length, unsigned char *queue,long *val)
+int storeq(int length, unsigned char *queue,int32_t *val)
 {
         int     j,k,len;
 /* Have stashed it in our temporary queue, we know the length, so lets
@@ -432,7 +432,7 @@ int storeq(int length, unsigned char *queue,long *val)
                 j++;
         }
 /* If we get here, then dump it in the queue as per normal... */
-        *val=(long) litptr-1;
+        *val=(int32_t) litptr-1;
         for (j=0; j<k; j++) {
 /* Have to dump it in our special queue here for function literals */
                 if ( (litptr+1) >= FNMAX ) {
@@ -445,7 +445,7 @@ int storeq(int length, unsigned char *queue,long *val)
 }
 
 
-int qstr(long *val)
+int qstr(int32_t *val)
 {
     int c;
     int cnt=0;
@@ -453,7 +453,7 @@ int qstr(long *val)
     if ( cmatch('"') == 0 ) 
 	return(-1) ;
 
-    *val=(long)gltptr;
+    *val=(int32_t)gltptr;
     do {
 	while ( ch() !='"' ) {
 	    if ( ch() == 0 ) break ;

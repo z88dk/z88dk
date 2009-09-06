@@ -1,7 +1,7 @@
 /*
  * structure for lvalue's - (cclvalue.h)
  *
- * $Id: lvalue.h,v 1.3 2007-06-24 14:43:45 dom Exp $
+ * $Id: lvalue.h,v 1.4 2009-09-06 18:58:37 dom Exp $
  */
 
 struct lvalue {
@@ -9,7 +9,7 @@ struct lvalue {
     int indirect ;                  /* type of indirect object, 0 for static object */
     int ptr_type ;                  /* type of pointer or array, 0 for other idents */
     int is_const ;                  /* true if constant expression */
-    signed long const_val ;                        /* value of constant expression (& other uses) */
+    int32_t const_val ;                        /* value of constant expression (& other uses) */
     TAG_SYMBOL *tagsym ;    /* tag symbol address, 0 if not struct */
     void (*binop)() ;                /* function address of highest/last binary operator */
     char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
