@@ -219,6 +219,7 @@ static void sendchar(int tty, int traf_fd, char ch)
 	{
 	  /** Filter out control chars 0-31 and send them to socket
 	   *  i.e. xmodem client, the rest is debug to stdout
+	   * Newline (10 & 13) are also sent to stdout!
 	   */
 	  if (ch==10 || ch==13)
 	    {
@@ -333,15 +334,25 @@ static void talk(int tty, int sockport)
 	  /** Here we talk (and respond) via the socket instead */
 	  if (check_fd(traf_fd))
 	    {
+	      int status;
+
 	      if (debug_rw) fprintf(stderr, "   Before read socket...\n");
 	      
-	      read(traf_fd, &ch, 1);
+	      status=read(traf_fd, &ch, 1);
 	      
-	      if (debug_rw) fprintf(stderr, "   After read socket...\n");
-	      
-	      if (debug_rw) fprintf(stderr, "   Read socket=%d\n", ch);
-	      
-	      write(tty, &ch, 1);
+	      /** socket connection closed, wait for new (or stdin) */
+	      if (status==0)
+		{
+		  traf_fd=0;
+		}
+	      else
+		{
+		  if (debug_rw) fprintf(stderr, "   After read socket...\n");
+		  
+		  if (debug_rw) fprintf(stderr, "   Read socket=%d\n", ch);
+		  
+		  write(tty, &ch, 1);
+		}
 	    }
 	}
     }
