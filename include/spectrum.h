@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.29 2009-08-20 05:59:08 stefano Exp $
+ * $Id: spectrum.h,v 1.30 2009-09-18 20:37:42 stefano Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -291,7 +291,11 @@ extern void __LIB__ __CALLEE__  in_MouseKempSetPos_callee(uint xcoord, uint ycoo
 // DISPLAY FILE FUNCTIONS
 //////////////////////////
 
+// Set the border color
 extern void  __LIB__ __FASTCALL__ zx_border(uchar colour);
+// Quickly set the whole screen color attributes
+extern void  __LIB__ __FASTCALL__ zx_colour(uchar colour);
+// Get color attribute at given position
 extern uint  __LIB__              zx_attr(uchar row, uchar col);
 extern uint  __LIB__              zx_screenstr(uchar row, uchar col);
 

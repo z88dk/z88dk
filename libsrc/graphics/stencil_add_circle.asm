@@ -9,7 +9,7 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: stencil_add_circle.asm,v 1.1 2009-04-15 21:00:58 stefano Exp $
+;	$Id: stencil_add_circle.asm,v 1.2 2009-09-18 20:37:43 stefano Exp $
 ;
 
 ;; void stencil_add_circle(int x1, int y1, int x2, int y2, unsigned char *stencil)
@@ -21,8 +21,8 @@
                 LIB     draw_circle
                 LIB	stencil_add_pixel 
 
-                ;LIB     swapgfxbk
-                ;XREF    swapgfxbk1
+                LIB     swapgfxbk
+                XREF    swapgfxbk1
 
                 XREF	stencil_ptr
 
@@ -43,11 +43,11 @@
 		ld	c,(ix+8)	;y
 		ld	b,(ix+10)	;x
 
-		;call    swapgfxbk
+		call    swapgfxbk
 		
                 ld      ix,stencil_add_pixel
                 call    draw_circle
                 ret
                 
-                ;jp      swapgfxbk1
+                jp      swapgfxbk1
 
