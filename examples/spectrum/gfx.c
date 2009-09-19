@@ -46,12 +46,12 @@ main()
         
         // now a filled diamond via stencil
 			stencil_init(stencil);
-			stencil_add_side(stencil,10,50,30,30);
-			stencil_add_side(stencil,30,30,50,50);
-			stencil_add_side(stencil,50,50,30,70);
-			stencil_add_side(stencil,10,50,30,70);
+			stencil_add_side(10,50,30,30,stencil);
+			stencil_add_side(30,30,50,50,stencil);
+			stencil_add_side(50,50,30,70,stencil);
+			stencil_add_side(10,50,30,70,stencil);
 			stencil_render(stencil, 9);
-		}
+		
 
 }
 
