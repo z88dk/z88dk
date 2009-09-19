@@ -44,14 +44,17 @@ main()
         
         fill(148,24);
         
+        undraw(0,50,135,50);
+        
+        for (i=0;i<12;i++) {
         // now a filled diamond via stencil
 			stencil_init(stencil);
-			stencil_add_side(10,50,30,30,stencil);
-			stencil_add_side(30,30,50,50,stencil);
-			stencil_add_side(50,50,30,70,stencil);
-			stencil_add_side(10,50,30,70,stencil);
-			stencil_render(stencil, 9);
-		
+			stencil_add_side(10+i*8,50,30+i*8,30,stencil);
+			stencil_add_side(30+i*8,30,50+i*8,50,stencil);
+			stencil_add_side(50+i*8,50,30+i*8,70,stencil);
+			stencil_add_side(10+i*8,50,30+i*8,70,stencil);
+			stencil_render(stencil, i);
+		}
 
 }
 
