@@ -29,9 +29,11 @@ static int     failed;
 void Assert_real(int result, char *file, int line, char *message)
 {
     if ( result == 0 ) {
-        failed_file = file;
-        failed_line = line;
-        failed_message = message;
+        if ( failed_message == NULL ) {
+            failed_file = file;
+            failed_line = line;
+            failed_message = message;
+        }
         longjmp(jmpbuf, 1);
     }
 }
@@ -39,6 +41,7 @@ void Assert_real(int result, char *file, int line, char *message)
 int suite_run()
 {
     int      i, stage;
+    char     *extra;
     void    (*func)();
 
     passed = failed = 0;
@@ -50,6 +53,7 @@ int suite_run()
 #ifndef NO_LOG_RUNNING
             printf("Running test %s..",suite.testnames[i]);
 #endif
+            failed_message = NULL;
             stage = 0;
             if ( suite.setup ) {
                 suite.setup();
@@ -69,17 +73,29 @@ int suite_run()
 #endif
             passed++;
         } else {
-            char  *extra = "";
-
-            if ( stage == 0 ) {
-                extra = "(in setup) ";
-            } else if ( stage == 2 ) {
+            extra = "";
+            switch ( stage ) {
+            case 0:
+                extra = "(in setup)";
+                /* Fall through */
+            case 1:
+                /* Protect outselves again */
+                if ( setjmp(jmpbuf) == 0 ) {
+                    if ( suite.teardown() ) {
+                        suite.teardown();
+                    }
+                } else {
+                    stage = 3;
+                }
+                break;
+            case 2:
                 extra = "(in teardown) ";
+                break;
             }
 #ifdef NO_LOG_RUNNING
             printf("Running test %s..",suite.testnames[i]);
 #endif
-            printf("...failed %s%s:%d (%s)\n",extra,failed_file, failed_line, failed_message);
+            printf("...failed %s%s:%d (%s)%s\n",extra,failed_file, failed_line, failed_message,stage == 3 ? " (and in teardown)" : "");
             failed++;
         }
     }
