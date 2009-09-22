@@ -79,7 +79,7 @@ int suite_run()
                 extra = "(in setup)";
                 /* Fall through */
             case 1:
-                /* Protect outselves again */
+                /* Protect ourselves against teardown failing */
                 if ( setjmp(jmpbuf) == 0 ) {
                     if ( suite.teardown() ) {
                         suite.teardown();
