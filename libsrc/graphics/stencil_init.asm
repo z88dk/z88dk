@@ -9,7 +9,7 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: stencil_init.asm,v 1.1 2009-04-15 21:00:58 stefano Exp $
+;	$Id: stencil_init.asm,v 1.2 2009-09-23 17:33:44 stefano Exp $
 ;
 
 	INCLUDE	"graphics/grafix.inc"
@@ -24,7 +24,6 @@
 		inc	de
 		ld	(hl),255
 		ld	bc,maxy
-		ld	a,b
 		push	bc
 		ldir
 		pop	bc

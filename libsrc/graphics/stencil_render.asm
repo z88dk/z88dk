@@ -22,7 +22,7 @@
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.1 2009-04-22 17:12:27 stefano Exp $
+;	$Id: stencil_render.asm,v 1.2 2009-09-23 17:33:44 stefano Exp $
 ;
 
 .stencil_render
@@ -77,7 +77,6 @@
 
 			call	mask_pattern
 			push	af
-			;ld	(hl),a
 			
 			ld	h,b		; X2
 			ld	l,c		; Y
@@ -93,23 +92,13 @@
 			and	a
 			sbc	hl,de
 
-			;rr	h
-			;rr	l
-			;rr	h
-			;rr	l
-			;rr	h
-			;rr	l
-
 			jr	z,onebyte	; area is within the same address...
 
 			ld	b,l		; number of full bytes in a row
 			pop	hl
 			
-			;ld	de,8
-
 			ld	(hl),a			; (offset) = (offset) AND bitmask0
 
-			;add	hl,de
 			inc	hl			; offset += 1 (8 bits)
 
 .pattern2			ld	a,0
@@ -118,7 +107,6 @@
 
 .fill_row_loop							; do
 				ld	(hl),a			; (offset) = pattern
-				;add	hl,de
 				inc	hl			; offset += 1 (8 bits)
 				djnz	fill_row_loop		; while ( r-- != 0 )
 
