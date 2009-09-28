@@ -105,7 +105,7 @@ LINKOPTS	-a -m -Mo -LDESTDIR/lib/clibs -IDESTDIR/lib
 # (Leave alone!)
 #
 
-Z88MATHLIB 	zx_math
+Z88MATHLIB 	gen_math
 STARTUPLIB 	z80_crt0
 GENMATHLIB	gen_math
 
