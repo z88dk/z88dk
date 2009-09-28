@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.8 2009-09-03 17:42:12 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.9 2009-09-28 23:14:13 dom Exp $ */
 /* $History: MODLINK.C $ */
 /*  */
 /* *****************  Version 16  ***************** */
@@ -638,6 +638,7 @@ SearchLibraries (char *modname)
 {
 
   int i;
+ 
 
   for (i = 0; i < 2; i++)
     {				/* Libraries searched in max. 2 passes */
@@ -747,7 +748,7 @@ CheckIfModuleWanted(FILE *z80asmfile, long currentlibmodule, char *modname)
           type = fgetc(z80asmfile); red++;
           temp = ReadLong(z80asmfile); red += 4;
           name = ReadName();
-          red += strlen(mname);
+          red += strlen(name);
           red++; /* Length byte */
           if ( (scope == 'X' || scope == 'G') && strcmp(name, modname) == 0 ) 
             {
