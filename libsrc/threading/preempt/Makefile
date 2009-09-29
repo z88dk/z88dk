@@ -9,17 +9,17 @@ OBJECTS = $(CFILES:.c=.o)
 DESTDIR=../../$(OUTPUT_DIRECTORY)/
 
 
-all: $(DESTDIR)multi.lib
+all: $(DESTDIR)preempt.lib
 
 .c.o:
 	zcc +test $(CFLAGS) $*.c
 
 
-$(DESTDIR)multi.lib: $(OBJECTS)
-	$(LIBLINKER) -x$(DESTDIR)multi $(OBJECTS)
+$(DESTDIR)preempt.lib: $(OBJECTS)
+	$(LIBLINKER) -x$(DESTDIR)preempt $(OBJECTS)
 
 clean:
-	rm -f *.o $(DESTDIR)multi
+	rm -f *.o $(DESTDIR)preempt.lib
 
 
 
