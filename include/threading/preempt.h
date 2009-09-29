@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- *  $Id: preempt.h,v 1.1 2009-09-29 21:41:13 dom Exp $
+ *  $Id: preempt.h,v 1.2 2009-09-29 22:20:53 dom Exp $
  */
 
 
@@ -9,7 +9,7 @@
 #define THREADING_PREEMPT_H
 
 #ifndef MAX_THREADS
-#define MAX_THREADS 2 /* Make it a power of 2 */
+#define MAX_THREADS 16  /* Make it a power of 2 - if this changes recompile library */
 #endif
 
 
@@ -62,8 +62,6 @@ typedef struct _threadbase threadbase_t;
 extern threadbase_t  threadbase;
 
 struct _threadbase {
-    unsigned char  max_threads;            /**< Maximum number of threads */
-    unsigned char  last_pid;               /**< Last allocated pid */
     thread_t      *current;                /**< Current thread */
     void         (*generic_func)();        /**< Function called on every interrupt */
     void         (*task_save_func)();      /**< For system specific task saving */
@@ -72,13 +70,11 @@ struct _threadbase {
     int            system_stack[25];       /**< Some storage for a system stack */
     void          *temp_sp;                /**< Temporary storage */
     int            schedule_data;          /**< Any data for scheduling (opaque) */
-    char           threads;                /**< Allocated with extra memory here */
+    thread_t       threads[MAX_THREADS];   /**< Allocated with extra memory here */
 };
 
 #asm
 DEFVARS 0 {
-    max_threads         ds.b    1
-    last_pid            ds.b    1
     current             ds.w    1
     generic_func        ds.w    1
     task_save_func      ds.w    1       
@@ -96,8 +92,8 @@ DEFVARS 0 {
  *
  *  \param schedule - The scheduler to use
  */
-#define thread_manager_init(schedule) thread_manager_init_real(MAX_THREADS, schedule)
-extern void __LIB__ thread_manager_init_real(int num_threads, scheduler_t *scheduler);
+#define thread_manager_init(schedule) thread_manager_init_real(schedule)
+extern void __LIB__ thread_manager_init_real(scheduler_t *scheduler);
 
 
 /** \brief Create a thread
