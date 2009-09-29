@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.139 2009-09-04 05:56:39 stefano Exp $
+# $Id: Makefile,v 1.140 2009-09-29 21:45:00 dom Exp $
 
 
 include	Make.config
@@ -23,7 +23,7 @@ all:	genlibs	z88libs	tilibs zxlibs \
 	svi_clib.lib sam_clib.lib samansi_clib.lib \
 	trs80_clib.lib vz_clib.lib vzansi_clib.lib \
 	embedded_clib.lib test_clib.lib	\
-	zx81libs
+	zx81libs preempt.lib
 
 genlibs: debug.lib gen_math.lib	malloc.lib z80_crt0.lib	ndos.lib adt.lib balloc.lib \
 	 im2.lib rect.lib algorithm.lib	lib3d.lib x11.lib
@@ -1150,6 +1150,13 @@ trs80_clib.lib:
 	cd games ; $(MAKE) ltrs80 ; cd ..
 	$(LIBLINKER) -DFORtrs80	-x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
 
+# Z88 maths build - dom
+preempt.lib:
+	@echo ''
+	@echo '--- Building Preemptive threading Library  ---'
+	@echo ''
+	$(MAKE) -C threading/preempt
+
 # SP1 sprite library - aralbrec
 sp1:
 	@echo
@@ -1181,6 +1188,7 @@ sp1-zx81hr:
 
 sp1-clean:
 	cd sprites/software/sp1	; $(MAKE) clean; cd ../../..
+
 
 clean:
 	cd assert ; $(MAKE) clean ; cd ..
@@ -1227,6 +1235,7 @@ clean:
 	cd zx81	; $(MAKE) clean ; cd ..
 	cd cpc ; $(RM) *.o ; cd	..
 	$(MAKE)	-C sms clean
+	$(MAKE) -C threading/preempt clean
 	cd sprites/software/sp1	; $(MAKE) clean	; cd ../../..
 
 install:
