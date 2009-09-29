@@ -32,7 +32,7 @@ int main()
  
    printf("Manager init\n"); 
    thread_manager_init(roundrobin_scheduler());
-   printf("Manager start %x\n",&threadbase.threads); 
+   printf("Manager start\n");
    thread_manager_start();          // Create the main thread, this will start the manager up and enable interrupts
  
    // From here we'll be running in multi-task mode
