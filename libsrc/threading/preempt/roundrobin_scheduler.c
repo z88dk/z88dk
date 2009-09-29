@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- *  $Id: roundrobin_scheduler.c,v 1.1 2009-09-29 21:39:37 dom Exp $
+ *  $Id: roundrobin_scheduler.c,v 1.2 2009-09-29 22:20:21 dom Exp $
  *
  *  A simple roundrobin scheduler
  */
@@ -58,7 +58,7 @@ scheduler_t *roundrobin_scheduler()
         bit     7,(ix + thread_flags)	        ; No task there
         jr      z,roundrobin_loop
         bit     0,(ix + thread_flags)           ; Check if sleeping
-        jr      z,roundrobin_loop               ; It was sleeping
+        jr      nz,roundrobin_loop               ; It was sleeping
         dec     (ix + thread_extra)             ; Decrement the counter
         jp      nz,roundrobin_loop              ; Not ready to run yet
         ld      a,(ix + thread_priority)        ; Reset the run counter
@@ -66,6 +66,9 @@ scheduler_t *roundrobin_scheduler()
         ret                                     ; Exit with a ready task
 .roundrobin_noneready
         xor     a                             ; Task zero is the standard task i.e. main() so runs whenever
-        jp      get_task
+        call    get_task
+        ld      a,(ix + thread_priority)        ; Reset the run counter
+        ld      (ix + thread_extra),a
+        ret
 #endasm
         

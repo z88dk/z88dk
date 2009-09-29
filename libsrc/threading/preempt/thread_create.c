@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- * $Id: thread_create.c,v 1.1 2009-09-29 21:39:37 dom Exp $
+ * $Id: thread_create.c,v 1.2 2009-09-29 22:20:22 dom Exp $
  */
  
 #include <threading/preempt.h>
@@ -16,7 +16,7 @@ thread_t *thread_create(void (*entry)(), void *stack, int priority)
 ; sp + 6 = entry
 ; Find a free task
     ld          de,THREAD_SIZE
-    ld          a,(_threadbase + max_threads)
+    ld          a,MAX_THREADS
     ld          b,a
     xor         a
     ld          ix,_threadbase + threads 

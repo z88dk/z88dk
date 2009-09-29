@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- * $Id: thread_manager.c,v 1.1 2009-09-29 21:39:37 dom Exp $
+ * $Id: thread_manager.c,v 1.2 2009-09-29 22:20:22 dom Exp $
  */
  
 
@@ -64,7 +64,6 @@ void thread_manager()
           pop   de  
           pop   bc  
           pop   af  
-.enable_point
           ei    
           reti
 #endasm     
