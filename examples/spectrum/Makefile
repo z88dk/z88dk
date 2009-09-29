@@ -33,5 +33,9 @@ zxbasic:
 zxcurrah:
 	zcc +zx -vn zxbasic.c -lndos -create-app -ozxcurrah.bin
 
+threading:
+	zcc +zx -vn preempt.c -lndos -create-app -othreading.bin -lpreempt
+
 clean:
 	$(RM) *.bin *.i *.asm *.tap *.op* *.o *~ zcc_opt.def
+
