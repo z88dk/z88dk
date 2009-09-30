@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- *  $Id: preempt.h,v 1.2 2009-09-29 22:20:53 dom Exp $
+ *  $Id: preempt.h,v 1.3 2009-09-30 19:05:49 dom Exp $
  */
 
 
@@ -70,6 +70,7 @@ struct _threadbase {
     int            system_stack[25];       /**< Some storage for a system stack */
     void          *temp_sp;                /**< Temporary storage */
     int            schedule_data;          /**< Any data for scheduling (opaque) */
+    thread_t       idle;		   /**< Place holder for idle task */
     thread_t       threads[MAX_THREADS];   /**< Allocated with extra memory here */
 };
 
@@ -83,6 +84,7 @@ DEFVARS 0 {
     system_stack        ds.w    25
     temp_sp             ds.w    1
     schedule_data       ds.w    1
+    threadbase_idle	ds.b    THREAD_SIZE
     threads             ds.b    1
 }
 #endasm
