@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- *  $Id: preempt.h,v 1.4 2009-09-30 21:30:43 dom Exp $
+ *  $Id: preempt.h,v 1.5 2009-09-30 23:03:31 dom Exp $
  */
 
 
@@ -11,6 +11,11 @@
 #ifndef MAX_THREADS
 #define MAX_THREADS 16  /* Make it a power of 2 - if this changes recompile library */
 #endif
+
+
+/* Range of priorities */
+#define PRIORITY_MIN	(-20)
+#define PRIORITY_MAX	20
 
 
 
@@ -40,7 +45,7 @@ DEFVARS 0
     thread_nice         ds.b    1
     thread_flags        ds.b    1
     thread_name         ds.b    10
-    thread_sp           ds.w    2
+    thread_sp           ds.w    1
     thread_extra        ds.b    4
     THREAD_SIZE         ds.b    1
 }
@@ -130,6 +135,15 @@ extern void __LIB__ thread_manager();
  */
 extern scheduler_t __LIB__ *roundrobin_scheduler(int ticks);
 
+/** \brief The priority scheduler
+ *
+ *  \param ticks - Number of ticks per timeslice
+ *
+ * In the priority model, we allocate each task a timeslice according
+ * to its priority and nice level
+ */
+extern scheduler_t __LIB__ *priority_scheduler(int ticks);
+
 /** \brief Return the thread structure for the current thread
  *
  * \return The current thread
@@ -172,6 +186,13 @@ extern scheduler_t __LIB__ *roundrobin_scheduler(int ticks);
 /** \brief Exit the current running thread
  */
 extern void __LIB__ thread_exit();
+
+/** \brief Renice a given thread
+ *
+ *  \param thread - Thread to renice
+ *  \param nice   - Adjustment to nice level
+ */
+extern void __LIB__ thread_renice(thread_t *thread, int nice);
 
 
 #endif  /* THREADING_PREEMPT_H */
