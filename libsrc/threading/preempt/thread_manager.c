@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- * $Id: thread_manager.c,v 1.2 2009-09-29 22:20:22 dom Exp $
+ * $Id: thread_manager.c,v 1.3 2009-09-30 21:32:10 dom Exp $
  */
  
 
@@ -16,13 +16,13 @@ void thread_manager()
           push  bc  
           push  de  
           push  hl  
+          push  ix  
           ex    af,af  
           exx   
           push  af  
           push  bc  
           push  de  
           push  hl  
-          push  ix  
           push  iy  
 ;Save the process stack
 .thread_manager_first_entry
@@ -53,13 +53,13 @@ void thread_manager()
           ld    h,(ix + thread_sp + 1)
           ld    sp,hl  
           pop   iy  
-          pop   ix  
           pop   hl  
           pop   de  
           pop   bc  
           pop   af  
           ex    af,af  
           exx   
+          pop   ix  
           pop   hl  
           pop   de  
           pop   bc  

@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- *  $Id: thread_manager_start.c,v 1.1 2009-09-29 21:39:37 dom Exp $
+ *  $Id: thread_manager_start.c,v 1.2 2009-09-30 21:32:10 dom Exp $
  *
  *  Start the task manager up - creating a task for the thread we started on
  */
@@ -17,13 +17,13 @@ void thread_manager_start()
         push    bc
         push    de
         push    hl
+	push	ix
         ex      af,af
         exx
         push    af      
         push    bc
         push    de     
         push    hl
-        push    ix
         push    iy
 	ex	af,af
 	exx

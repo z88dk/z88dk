@@ -1,16 +1,20 @@
 /*
  *  z88dk z80 multi-task library
  *
- *  $Id: roundrobin_scheduler.c,v 1.2 2009-09-29 22:20:21 dom Exp $
+ *  $Id: roundrobin_scheduler.c,v 1.3 2009-09-30 21:32:10 dom Exp $
  *
  *  A simple roundrobin scheduler
  */
 
 #include <threading/preempt.h>
 
-scheduler_t *roundrobin_scheduler()
+scheduler_t *roundrobin_scheduler(int ticks)
 {
 #asm
+	ld	hl,2
+	add	hl,sp
+	call	l_gint
+	ld	(_threadbase + schedule_data),a	; Store tick count
 	ld	hl,roundrobin
 #endasm
 }
@@ -29,7 +33,14 @@ scheduler_t *roundrobin_scheduler()
         
 ; Initialise threadbase for the roundrobin scheduler
 .roundrobin_schedule_init
-        xor     a                       ; Start from task 0
+	ld	a,(_threadbase + schedule_data)
+	and	a
+	jr	nz, roundrobin_slice_setup
+	ld	a,2		; Default timeslice interval
+	ld	(_threadbase + schedule_data),a
+.roundrobin_slice_setup
+	ld	a,1
+	ld	(_threadbase + schedule_data + 1),a
         ret
 
 ; Initialise a roundrobin task
@@ -37,8 +48,6 @@ scheduler_t *roundrobin_scheduler()
 ; Entry:        ix = task
 ;                a = task number
 .roundrobin_task_init
-        ld      a,(ix + thread_priority)
-        ld      (ix + thread_extra),a
         ret
 
 
@@ -47,6 +56,15 @@ scheduler_t *roundrobin_scheduler()
 ; Entry:        ix = current task
 ; Exit:         ix = new task to run        
 .roundrobin_task_schedule
+	; Check to see if we have reached the right number of ticks before swapping
+	; out
+	ld	hl,_threadbase + schedule_data + 1
+	dec	(hl)
+	ret	nz
+	ld	a,(_threadbase + schedule_data)
+	ld	(hl),a
+
+	; Now we can select the next task to run
         ld      a,(ix + thread_pid)
         ld      c,a
 .roundrobin_loop
@@ -59,16 +77,11 @@ scheduler_t *roundrobin_scheduler()
         jr      z,roundrobin_loop
         bit     0,(ix + thread_flags)           ; Check if sleeping
         jr      nz,roundrobin_loop               ; It was sleeping
-        dec     (ix + thread_extra)             ; Decrement the counter
-        jp      nz,roundrobin_loop              ; Not ready to run yet
-        ld      a,(ix + thread_priority)        ; Reset the run counter
-        ld      (ix + thread_extra),a
+	; So we have a task that is ready to run
         ret                                     ; Exit with a ready task
 .roundrobin_noneready
         xor     a                             ; Task zero is the standard task i.e. main() so runs whenever
         call    get_task
-        ld      a,(ix + thread_priority)        ; Reset the run counter
-        ld      (ix + thread_extra),a
         ret
 #endasm
         
