@@ -1,7 +1,7 @@
 #ifndef __MATH_H__
 #define __MATH_H__
 
-/* $Id: math.h,v 1.11 2008-03-14 12:23:57 stefano Exp $ */
+/* $Id: math.h,v 1.12 2009-09-30 09:55:31 stefano Exp $ */
 
 
 extern double __LIB__ acos(double);  /* arc cosine */
@@ -40,7 +40,7 @@ extern double __LIB__ atof(char *);
 
 /* More (unoptimized) functions */
 
-#define cbrt(x) pow(x,.3333333)
+#define cbrt(x) ((x)==0.?0.:(x)>0.?pow(x,.33333333):-pow(-x,.33333333))
 #define ldexp(x,y) (pow(2.,(int)(y))*x)
 #define hypot(x,y) sqrt(x*x+y*y)
 #define asinh(x) log(2.*fabs(x)+1./(sqrt(x*x+1.)+fabs(x)))
