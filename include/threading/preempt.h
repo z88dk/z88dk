@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- *  $Id: preempt.h,v 1.3 2009-09-30 19:05:49 dom Exp $
+ *  $Id: preempt.h,v 1.4 2009-09-30 21:30:43 dom Exp $
  */
 
 
@@ -16,6 +16,8 @@
 
 #define THREAD_SLEEP   1        /* Thread is sleeping */
 #define THREAD_SYSTEM  2	/* System thread, can't be killed */
+#define THREAD_USED   128       /* Thread slot is in use */
+
 
 typedef struct _thread thread_t;
 
@@ -70,7 +72,6 @@ struct _threadbase {
     int            system_stack[25];       /**< Some storage for a system stack */
     void          *temp_sp;                /**< Temporary storage */
     int            schedule_data;          /**< Any data for scheduling (opaque) */
-    thread_t       idle;		   /**< Place holder for idle task */
     thread_t       threads[MAX_THREADS];   /**< Allocated with extra memory here */
 };
 
@@ -84,7 +85,6 @@ DEFVARS 0 {
     system_stack        ds.w    25
     temp_sp             ds.w    1
     schedule_data       ds.w    1
-    threadbase_idle	ds.b    THREAD_SIZE
     threads             ds.b    1
 }
 #endasm
@@ -123,8 +123,12 @@ extern void __LIB__ thread_manager();
 
 
 /** \brief The roundrobin scheduler
+ *
+ *  \param ticks - Number of ticks per timeslice
+ *
+ * In the roundrobin model, each thread gets the same amount of time
  */
-extern scheduler_t __LIB__ *roundrobin_scheduler(void);
+extern scheduler_t __LIB__ *roundrobin_scheduler(int ticks);
 
 /** \brief Return the thread structure for the current thread
  *
