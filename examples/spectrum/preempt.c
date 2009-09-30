@@ -50,7 +50,7 @@ int main()
    wpoke(0xd4d5, thread_manager);   // POKE isr address following the jump instruction
  
    printf("Manager init\n"); 
-   thread_manager_init(roundrobin_scheduler());
+   thread_manager_init(roundrobin_scheduler(4));
    printf("Manager start\n");
    thread_manager_start();          // Create the main thread, this will start the manager up and enable interrupts
  
