@@ -4,15 +4,33 @@
 #include <im2.h>
 #include <stdlib.h>
 #include <threading/preempt.h>
+#include <threading/semaphore.h>
 
 
 threadbase_t   threadbase;              // Global threadbase
+sem_t sem;
 
 
 void thread1()
 {
     while(1) {
-        printf("thread 1\n");
+	sem_wait(&sem);
+        printf("thread 1  ");
+	sem_post(&sem);
+    }
+    /* A thread mustn't exit! or thread_exit() must be called beforehand */
+}
+
+void thread2()
+{
+    while(1) {
+#asm
+	ld	a,r
+	out	(254),a
+#endasm
+	sem_wait(&sem);
+        printf("thread 2 ");
+	sem_post(&sem);
     }
     /* A thread mustn't exit! or thread_exit() must be called beforehand */
 }
@@ -21,6 +39,7 @@ int main()
 {
 
     /* Disable interrupts to start off with */
+   sem_init(&sem,0,1);
 #asm
    di
 #endasm
@@ -41,7 +60,9 @@ int main()
    printf("Create thread\n"); 
    thread_create(thread1,65000,1);
    while ( 1) {
-        printf("Main thread\n");
+	sem_wait(&sem);
+        printf("main thread ");
+	sem_post(&sem);
    }
 
 }
