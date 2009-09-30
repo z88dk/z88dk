@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- *  $Id: thread_manager_start.c,v 1.2 2009-09-30 21:32:10 dom Exp $
+ *  $Id: thread_manager_start.c,v 1.3 2009-09-30 23:03:03 dom Exp $
  *
  *  Start the task manager up - creating a task for the thread we started on
  */
@@ -42,6 +42,7 @@ void thread_manager_start()
         inc     hl
         inc     hl
         inc     hl
+        ld      c,0				; Nice adjustment
         call    l_jphl
 	ld	(_threadbase + current),ix
         jp      thread_manager_first_entry

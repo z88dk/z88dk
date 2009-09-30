@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- * $Id: thread_create.c,v 1.2 2009-09-29 22:20:22 dom Exp $
+ * $Id: thread_create.c,v 1.3 2009-09-30 23:03:03 dom Exp $
  */
  
 #include <threading/preempt.h>
@@ -15,7 +15,7 @@ thread_t *thread_create(void (*entry)(), void *stack, int priority)
 ; sp + 4 = stack
 ; sp + 6 = entry
 ; Find a free task
-    ld          de,THREAD_SIZE
+    ld          de,THREAD_SIZE 
     ld          a,MAX_THREADS
     ld          b,a
     xor         a
@@ -71,7 +71,10 @@ thread_t *thread_create(void (*entry)(), void *stack, int priority)
     inc         hl
     inc         hl
     inc         hl
+    ld          c,0			; Adjust ment for nice
     call        l_jphl                  ; Initialise the task for the scheduler
+    push	ix
+    pop		hl
     ei                                  ; Allow manager to carry on
 #endasm          
 }
