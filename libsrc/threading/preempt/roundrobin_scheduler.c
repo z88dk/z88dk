@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- *  $Id: roundrobin_scheduler.c,v 1.3 2009-09-30 21:32:10 dom Exp $
+ *  $Id: roundrobin_scheduler.c,v 1.4 2009-09-30 23:16:07 dom Exp $
  *
  *  A simple roundrobin scheduler
  */
@@ -41,6 +41,8 @@ scheduler_t *roundrobin_scheduler(int ticks)
 .roundrobin_slice_setup
 	ld	a,1
 	ld	(_threadbase + schedule_data + 1),a
+	xor	a
+	ld	(_threadbase + schedule_data + 2),a
         ret
 
 ; Initialise a roundrobin task
@@ -65,7 +67,7 @@ scheduler_t *roundrobin_scheduler(int ticks)
 	ld	(hl),a
 
 	; Now we can select the next task to run
-        ld      a,(ix + thread_pid)
+        ld      a,(_threadbase + schedule_data + 2)
         ld      c,a
 .roundrobin_loop
         inc     a
@@ -77,7 +79,7 @@ scheduler_t *roundrobin_scheduler(int ticks)
         jr      z,roundrobin_loop
         bit     0,(ix + thread_flags)           ; Check if sleeping
         jr      nz,roundrobin_loop               ; It was sleeping
-	; So we have a task that is ready to run
+	ld	(_threadbase + schedule_data + 2),a ; Store our last selected task
         ret                                     ; Exit with a ready task
 .roundrobin_noneready
         xor     a                             ; Task zero is the standard task i.e. main() so runs whenever
