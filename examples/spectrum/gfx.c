@@ -1,6 +1,23 @@
 
+/*
+ * Graphics demo - not for the Spectrum only but tuned for a 256x192 resolution
+ * Shows the capability of several graphics functions.
+ * 
+ * To build:
+ * 	zcc +zx -lm -lndos -create-app gfx.c
+ * -or-
+ *	zcc +zx -lmzx -lndos -create-app gfx.c
+ * The latter is optimized for size calling the Spectrum ROM,
+ * but runs slower.
+ * 
+ * 
+ * $Id: gfx.c,v 1.5 2009-10-02 10:17:18 stefano Exp $
+ * 
+ */
+
 #include <graphics.h>
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
 
 struct window mine;     /* Window structure */
@@ -8,7 +25,8 @@ unsigned char stencil[192*2];
 
 main()
 {
-        int     j,i;
+        float  x;
+        int     i,j,k,l;
 
 	clg();
 
@@ -44,8 +62,6 @@ main()
         
         fill(148,24);
         
-        undraw(0,50,135,50);
-        
         for (i=0;i<12;i++) {
         // now a filled diamond via stencil
 			stencil_init(stencil);
@@ -56,5 +72,21 @@ main()
 			stencil_render(stencil, i);
 		}
 
+/* Draw a sort of 3D cone, based on an ellipse */
+		k=0;
+        for (x=7.2 ; x>2.0; x=x-0.1)
+        {
+			i=170+(int)(sin(x)*50.0);
+			j=160+(int)(cos(x)*20.0);
+			stencil_init(stencil);
+			
+			if (k!=0) {
+				stencil_add_side(170,60,k,l,stencil);
+				stencil_add_side(170,60,i,j,stencil);
+				stencil_add_side(i,j,k,l,stencil);
+			}
+			stencil_render(stencil, x*1.6);
+			k=i;l=j;
+        }
 }
 
