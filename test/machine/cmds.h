@@ -29,4 +29,6 @@
 
 #define CMD_GETTIME       30    /*< Get unix time (ret=dehl = 32 bit seconds)  */
 
+#define CMD_DBG       255  /**< Debugger build */
+
 #endif
