@@ -21,17 +21,6 @@ static int quitting;
 byte RAM[65536];
 
 
-#if 0
-byte DebugZ80(register Z80 *R)
-{
-	printf("\tAF=%04x BC=%04x DE=%04x HL=%04x IX=%04x IY=%04x\n"
-           "\tAF'%04x BC'%04x DE'%04x HL'%04x PC=%04x SP=%04x\n",
-           R->AF.W,  R->BC.W,  R->DE.W,  R->HL.W,  R->IX.W, R->IY.W,
-		   R->AF1.W, R->BC1.W, R->DE1.W, R->HL1.W, R->PC.W, R->SP.W); 
-
-}
-#endif
-
 word LoopZ80(Z80 *R)
 {
     if ( quitting ) {
@@ -96,12 +85,16 @@ int main(int argc, char *argv[])
     int   ch;
     int   i;
     int   alarmtime = 30;
+    word  breakaddr = 65535;
     char *progname = argv[0];
 
-    while ( ( ch = getopt(argc, argv, "w:")) != -1 ) {
+    while ( ( ch = getopt(argc, argv, "w:b:")) != -1 ) {
         switch ( ch ) {
         case 'w':
             alarmtime = atoi(optarg);
+            break;
+        case 'b':
+            breakaddr = atoi(optarg);
             break;
         }
     }
@@ -111,6 +104,8 @@ int main(int argc, char *argv[])
 
     if ( argc < 1 ) {
         printf("Usage: %s [program to run]\n", progname);
+        printf("Options: -w timeout - timeout time\n");
+        printf("         -b break address - disables timeout\n");
         exit(1);
     }
 
@@ -125,8 +120,10 @@ int main(int argc, char *argv[])
     hook_io_init(hooks);
     hook_console_init(hooks);
 
-
-    signal(SIGALRM, sighandler);
+    if ( breakaddr != 65535 ) {
+        signal(SIGALRM, sighandler);
+    }
+    z80.Trap = breakaddr;
 
     if ( alarmtime != -1 ) {
         alarm(alarmtime);  /* Abort a test run if it's been too long */

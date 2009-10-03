@@ -6,7 +6,7 @@ OBJECTS = $(SOURCES:.c=.o)
 HEADERS = machine.h cmds.h
 
 # add -DDEBUG to include the debugger
-CFLAGS = -DZ88DK -DJUMPZ80  -DDEBUG2 -DLSB_FIRST
+CFLAGS = -DZ88DK -DJUMPZ80  -DDEBUG -DLSB_FIRST
 
 
 all: machine$(EXESUFFIX)
