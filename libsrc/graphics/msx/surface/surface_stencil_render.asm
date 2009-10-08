@@ -23,7 +23,7 @@
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: surface_stencil_render.asm,v 1.3 2009-05-21 06:58:11 stefano Exp $
+;	$Id: surface_stencil_render.asm,v 1.4 2009-10-08 09:48:54 stefano Exp $
 ;
 
 .surface_stencil_render
@@ -60,8 +60,9 @@
 		ld	e,maxy
 		add	hl,de
 		cp	(hl)		; if x1>x2, return
+		jr	z,xequal
 		jr	nc,yloop
-		
+.xequal		
 					; C still holds Y
 		push	af		; X1
 		ld	a,(hl)

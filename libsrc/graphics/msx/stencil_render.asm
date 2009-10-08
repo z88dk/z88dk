@@ -31,7 +31,7 @@ ENDIF
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+;	$Id: stencil_render.asm,v 1.5 2009-10-08 09:48:53 stefano Exp $
 ;
 
 .stencil_render
@@ -59,8 +59,9 @@ ENDIF
 		ld	e,maxy
 		add	hl,de
 		cp	(hl)		; if x1>x2, return
+		jr	z,xequal
 		jr	nc,yloop
-		
+.xequal
 					; C still holds Y
 		push	af		; X1
 		ld	a,(hl)
