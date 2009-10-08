@@ -16,7 +16,7 @@ hello.bin: source.sh
 	sh source.sh
 
 dbgbin:
-	gcc -I../../test/machine -o dbgbin -DZ88DK -DJUMPZ80  -DDEBUG -DLSB_FIRST dbgbin.c ../../test/machine/Z80/Z80.o ../../test/machine/Z80/Debug.o mysock.c
+	gcc -g -I../../test/machine -o dbgbin -DZ88DK -DJUMPZ80  -DDEBUG -DLSB_FIRST dbgbin.c ../../test/machine/Z80/Z80.o ../../test/machine/Z80/Debug.o mysock.c
 
 
 clean:

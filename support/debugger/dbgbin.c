@@ -476,10 +476,16 @@ int main(int argc, char *argv[])
       {
 	if (num_instr==0)
 	  {
+	    /** Set this to zero (address) 
+		if you want the binary to step out directly into the assembler debugger, useful
+		for debugging the debugger :-) */
+	    z80.Trap=-1;
+
 	    RunZ80(&z80);
 	  }
 	else
 	  {
+
 	    InstrZ80(&z80, num_instr);
 	  }
       }
