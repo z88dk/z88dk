@@ -10,7 +10,7 @@ getmypid:
 # We could turn it on for all files which we do not debug (i.e. debugger.c)
 #
 source.sh: hello.c debugger.c
-	echo "zcc +test -m -O0 -o hello.bin debugger.c hello.c -lndos" > source.sh
+	echo "zcc +test -I../../test/machine -m -O0 -o hello.bin debugger.c hello.c -lndos" > source.sh
 
 hello.bin: source.sh
 	sh source.sh

@@ -468,6 +468,8 @@ int main(int argc, char *argv[])
 	write_pid_and_port(dodbg, "debug");
       }
 
+    z80.Trap=-1;
+
     if (doasm!=-1)
       {
 	/*run_asm(&z80);*/
@@ -479,7 +481,6 @@ int main(int argc, char *argv[])
 	    /** Set this to zero (address) 
 		if you want the binary to step out directly into the assembler debugger, useful
 		for debugging the debugger :-) */
-	    z80.Trap=-1;
 
 	    RunZ80(&z80);
 	  }
