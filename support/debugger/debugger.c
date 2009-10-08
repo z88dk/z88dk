@@ -32,7 +32,7 @@ int exchange_str(void *ptr, int len)
   push hl ; balance stack
   push de ;
 
-  ld a,3 ; CMD_DBG ;
+  ld a,255 ; CMD_DBG ;
   rst 8 ;
 
   /** Result string in ptr and len in return value, HL */
