@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.12 2009-07-18 23:23:15 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.13 2009-10-11 00:24:38 dom Exp $ */
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -329,10 +329,12 @@ ListingOff (void)
 void LINE(void)
 {
 	char	err;
+        char    name[128];
 	GetSym();
 	clineno=GetConstant(&err);
 	line[0]='\0';
-
+        snprintf(name, sizeof(name),"__C_LINE_%d",clineno);
+        DefineSymbol (name, PC, SYMADDR | SYMTOUCHED);
 }
 
 
