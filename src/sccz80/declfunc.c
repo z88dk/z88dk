@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.12 2009-09-06 18:58:37 dom Exp $
+ *      $Id: declfunc.c,v 1.13 2009-10-11 01:12:59 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -481,6 +481,7 @@ dofnansi(SYMBOL *currfn, int32_t *addr)
         proto=YES;
 
         swallow("__TD__");      /* kludge to get round typedef problem */
+	swallow("register");
 /* Master loop, checking for end of function */
 
         while ( cmatch(')') == 0 ) {  
