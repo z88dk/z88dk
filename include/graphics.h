@@ -10,7 +10,7 @@
  *      Stefano has converted many of these routines to the new ports
  *      Some will work, some will not. djm 6/6/2000
  *
- *	$Id: graphics.h,v 1.8 2009-04-22 17:12:26 stefano Exp $
+ *	$Id: graphics.h,v 1.9 2009-10-13 11:40:14 stefano Exp $
  */
 
 #ifndef __GFX_H__
@@ -53,6 +53,10 @@ extern __LIB__ undraw(int x1, int y1, int x2, int y2);
 extern __LIB__ drawr(int px, int py);
 /* Remove a relative draw */
 extern __LIB__ undrawr(int px, int py);
+/* Draw up to a sprcified point */
+extern __LIB__ drawto(int x2, int y2);
+/* Undraw up to a sprcified point */
+extern __LIB__ undrawto(int x2, int y2);
 /* Draw a box */
 extern __LIB__ drawb(int tlx, int tly, int width, int height);
 /* Undraw a box */
@@ -82,9 +86,15 @@ extern int __LIB__ getmaxy(void);
  
 /* Set/Reset the couple of vectors being part of a "stencil" */
 extern __LIB__ __FASTCALL__ stencil_init(unsigned char *stencil);
-/* Add a side to a figure defined inside an area object */
+/* Add a pixel to a figure defined inside a stencil object */
+extern __LIB__ stencil_add_point(int x, int y, unsigned char *stencil);
+/* Trace a relative line into a stencil object (extend shape) */
+extern __LIB__ stencil_add_liner(int dx, int dy, unsigned char *stencil);
+/* Trace a line into a stencil object up to a given coordinate (extend shape) */
+extern __LIB__ stencil_add_lineto(int x2, int y2, unsigned char *stencil);
+/* Add a side to a figure defined inside a stencil object */
 extern __LIB__ stencil_add_side(int x1, int y1, int x2, int y2, unsigned char *stencil);
-/* Add a circular shape to a figure defined inside an area object */
+/* Add a circular shape to a figure defined inside a stencil object */
 extern __LIB__ stencil_add_circle(int x, int y, int radius, int skip, unsigned char *stencil);
 /* Render an area delimited by a stencil object, with the specified dither intensity (0..11) */
 extern __LIB__ stencil_render(unsigned char *stencil, unsigned char intensity);
