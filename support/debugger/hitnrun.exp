@@ -531,7 +531,7 @@ getmypid
 
 set filh not_loaded
 
-    # Check if user has supplied an macro file
+    # Check if user has supplied a macro file
     if { $argv!="" } {
 	do_macro $argv
     }

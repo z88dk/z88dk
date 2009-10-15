@@ -7,14 +7,6 @@
 
 
 
-/*
-#asm
-  XREF _debugger_exchange_str
-  XREF _debugger_set_break
-#endasm
-*/
-
-
 /** Protocol like this:
     Query (from host)
  *  <LEN> <CMD> <Byte> <Byte> ... <Bytes>  
