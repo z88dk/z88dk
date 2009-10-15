@@ -9,14 +9,14 @@ getmypid:
 # Here we turn off optimization, -O0
 # We could turn it on for all files which we do not debug (i.e. debugger.c)
 #
-source.sh: hello.c debugger.c
-	echo "zcc +test -I../../test/machine -m -O0 -o hello.bin debugger.c hello.c -lndos" > source.sh
+source.sh: hello.c debugger.c debugger_test.c
+	echo "zcc +test -I../../test/machine -m -O0 -o hello.bin debugger_test.c debugger.c hello.c -lndos" > source.sh
 
 hello.bin: source.sh
 	sh source.sh
 
 dbgbin:
-	gcc -g -I../../test/machine -o dbgbin -DZ88DK -DJUMPZ80  -DDEBUG -DLSB_FIRST dbgbin.c ../../test/machine/Z80/Z80.o ../../test/machine/Z80/Debug.o mysock.c
+	gcc -g -I../../test/machine -o dbgbin -DZ88DK -DJUMPZ80  -DDEBUG -DLSB_FIRST dbgbin.c debugtarget_test.c ../../test/machine/Z80/Z80.o ../../test/machine/Z80/Debug.o mysock.c
 
 
 clean:

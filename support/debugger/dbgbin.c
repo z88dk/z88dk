@@ -1,7 +1,3 @@
-
-
-
-#include "Z80/Z80.h"
 #include "mysock.h"
 
 #include <signal.h>
@@ -9,21 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
-#include "cmds.h"
 
-
-/*
-int DAsm(char *S,word A)
-{
-  fprintf(stderr, "Disassembly is not working at present\n");
-  exit(1);
-}
-*/
-
-
-static Z80 z80;
-static int quitting;
-static int doasm=-1;
 static int dodbg=-1;
 
 static int sock_debug=0;
@@ -35,7 +17,6 @@ static char* portfile=NULL;
 
 static int dbg_sock=0;
 
-byte RAM[65536];
 
 static FILE* logf=NULL;
 
@@ -75,164 +56,9 @@ static void mach_exit(int val)
   exit (val);
 }
 
-static void dump_regs(char *buff, Z80 *R)
-{
-  sprintf(buff, "\tAF=%04x BC=%04x DE=%04x HL=%04x IX=%04x IY=%04x\n"
-	 "\tAF'%04x BC'%04x DE'%04x HL'%04x PC=%04x SP=%04x\n",
-	 R->AF.W,  R->BC.W,  R->DE.W,  R->HL.W,  R->IX.W, R->IY.W,
-	 R->AF1.W, R->BC1.W, R->DE1.W, R->HL1.W, R->PC.W, R->SP.W); 
-}
-
-
-
-void JumpZ80(word PC)
-{
-    // printf("Jumping to %d\n",(int)PC);
-}
-
-
-word LoopZ80(Z80 *R)
-{
-    if ( quitting ) {
-        return INT_QUIT;
-    }
-    return INT_NONE;
-}
-
-
-
-void PatchZ80(Z80 *R)
-{
-    int   val;
-
-    switch (R->AF.B.h ) {
-    case CMD_EXIT:
-        mach_exit(R->HL.B.l);
-    case CMD_PRINTCHAR:
-        if ( R->HL.B.l == '\n' || R->HL.B.l == '\r' ) {
-            fputc('\n',stdout);
-        } else {
-            fputc(R->HL.B.l,stdout);
-        }
-        fflush(stdout);
-        break;
-    case CMD_DBG:
-      /** 
-	  The user is supposed to
-	  provide a nl terminated hex string with an even
-	  number of chars
-      */
-      if (dodbg!=-1)
-	{
-	  /** We limit this protocol to 255 bytes */
-	  char bf[1024];
-
-	  char linebf[512];
-	  char tmp[3]; /** trick to make sscanf %x do what we want */
-	  int i,hexval;
-	  int strlen_linebf, n_read;
-
-	  /** the buffer is pointed to by HL, E is len */
-	  
-	  for (i=0;i<R->DE.B.l;i++)
-	    {
-	      /** Mysterios instant "DMA" read of our "hardware" memory ;-) */
-	      sprintf(bf, "%.2X", RAM[R->HL.W+i]);
-
-	      mysock_write_persist(dbg_sock, bf, strlen(bf));
-	    }
-	  fflush(stdout);
-
-	  mysock_write_persist(dbg_sock, "\r", 1);
-	  
-	  /** Here we are at the actual debug prompt where we just wait */
-	  
-	  for (i=0;;i++)
-	    {
-	      n_read=mysock_read_data(dbg_sock, &linebf[i], 1, -1);
-
-	      if (n_read!=1)
-		{
-		  fprintf(stderr, "main.c: PatchZ80, unexpected read of != 1 byte =%d\n", n_read);
-		  exit(1);
-		}
-
-	      if (linebf[i]==10)
-		{
-		  break;
-		}
-	    }
-
-	  linebf[i]='\0';
-	  strlen_linebf=i;
-
-	  for (i=0;i<strlen_linebf/2;i++)
-	    {
-	      tmp[0]=linebf[i*2];
-	      tmp[1]=linebf[i*2+1];
-	      sscanf(tmp,"%x",&hexval);
-	      
-	      /** Yet another time mysterious modifications are done
-	       *  with memory and registers
-	       */
-	      RAM[R->HL.W+i]=hexval;
-	    }
-
-	  /** Return string length in E */
-	  R->DE.B.l=strlen_linebf/2;
-	}
-      break;
- case CMD_READKEY:
-        val = getchar();
-        R->HL.W = val;
-        break;
-    default:
-        printf("Unknown code %d\n",R->AF.B.h);
-        mach_exit(1);
-    }
-}
-
-
-
-
-
-
-static char *load_file(char *filename, int addr_offset)
-{
-    FILE     *fp;
-    
-    if ( ( fp = fopen(filename,"rb") ) == NULL ) {
-      fprintf(stderr, "Cannot load file %s\n",filename);
-        mach_exit(1);
-    }
-    fread(&RAM[addr_offset], sizeof(RAM[0]), 65536-addr_offset, fp);
-
-    fclose(fp);
-}
-
 static void sighandler(int sig)
 {
-    quitting = 1;
-}
-
-void dumpmem4(int conn, int pc, int len)
-{
-  char tmp[1024];
-  int i;
-  sprintf(tmp, "%.4X ", pc);
-  mysock_write_persist(conn, tmp, strlen(tmp));
-  
-  for (i=0;i<len;i++)
-    {
-      sprintf(tmp, "%.2X ", RAM[pc+i]);
-      mysock_write_persist(conn, tmp, strlen(tmp));
-    }
-  
-  for (i=len;i<=4;i++)
-    {
-      sprintf(tmp, "   ");
-      mysock_write_persist(conn, tmp, strlen(tmp));
-    }
+  void debug_target_quit_next();
 }
 
 /** It is up to caller to make this unique in global wide system,
@@ -277,6 +103,8 @@ static void listen_dbg()
     }
   
   dbg_sock=mysock_get_incoming_connection(accp);
+
+  debug_target_set_socket(dbg_sock);
 
   if (dbg_sock < 0)
     {
@@ -384,13 +212,6 @@ int main(int argc, char *argv[])
 	  alarmtime = atoi(optarg);
 	  break;
 	  
-	case 'a':
-	  {
-	    /** If non-zero this will wait for a socket connect on dbg port */
-	    doasm=atoi(optarg);
-	    break;
-	  }
-
 	case 'l':
 	  {
 	    char fname[1024];
@@ -438,28 +259,19 @@ int main(int argc, char *argv[])
         mach_exit(1);
     }
 
-    /* Clear memory */
-    memset(RAM,0,sizeof(RAM));
-
     signal(SIGALRM, sighandler);
 
     if ( alarmtime != -1 ) {
         alarm(alarmtime);  /* Abort a test run if it's been too long */
     }
 
-    /* Reset the machine */
-    ResetZ80(&z80);
+    /* Reset the target */
+    debug_target_reset();
 
     /** init regs, this is only necessary if we use the r option */
-    sscanf(regs, "%x %x %x %x %x %x %x %x %x %x %x %x",
-	   &z80.AF.W,  &z80.BC.W,  &z80.DE.W, &z80.HL.W, 
-	   &z80.IX.W, &z80.IY.W, &z80.AF1.W, &z80.BC1.W,
-	   &z80.DE1.W, &z80.HL1.W, &z80.PC.W, &z80.SP.W);
+    debug_target_init_regs(regs);
 
-    load_file(argv[0], z80.PC.W);
-
-    /** For debugging etc */
-    write_pid_and_port(doasm, "asm");
+    debug_target_load_file(argv[0]);
 
     if (dodbg!=-1)
       {
@@ -468,33 +280,19 @@ int main(int argc, char *argv[])
 	write_pid_and_port(dodbg, "debug");
       }
 
-    z80.Trap=-1;
-
-    if (doasm!=-1)
+    if (num_instr==0)
       {
-	/*run_asm(&z80);*/
+	debug_target_run();
       }
     else
       {
-	if (num_instr==0)
-	  {
-	    /** Set this to zero (address) 
-		if you want the binary to step out directly into the assembler debugger, useful
-		for debugging the debugger :-) */
-
-	    RunZ80(&z80);
-	  }
-	else
-	  {
-
-	    InstrZ80(&z80, num_instr);
-	  }
+	debug_target_instr(num_instr);
       }
 
     if (do_dump_reg_flag)
       {
 	char buf[1024];
-	dump_regs(buf, &z80);
+	debug_target_dump_regs(buf, 1024);
 	
 	printf(buf);
       }

@@ -65,8 +65,28 @@ can also use the assembler debugger to see what happens on the
 Porting to a real platform.
 --------------------------
 
-This is a matter of rewriting the "dbgbin" process so that it talks to a real
+This is a matter of implementing the "dbgbin" process so that it talks to a real
 platform.
+
+Most of the porting is in making your own version of the debugtarget_test.c file,
+by implementing the procedures prototyped in debugtarget.h
+
+You also need to implement a serial line or similar to talk to "your" target
+platform.
+
+In the debug_target_run() procedure  in debugtarget_test.c, in the CMD_DBG case clause
+you can see how this is done in the simulator. The simulator has a "secret" instruction
+(EDh DBh) that breaks out from the simulator and into the C-code. Only the implementer
+for a new target, will know how this to be done.
+
+Also some code has to be added to the crt0 file for that target (see the test_crt0.asm
+for how it is done on simulator)
+
+The file debugger.c is supposed to contain code that is generic for all platforms
+
+You are supposed to make a debugger_<yourtarget>.c to implement the  debugger_set_break, 
+debugger_num_break_bytes and debugger_exchange_str methods.
+
 
 Here is a description of the "architecture":
 

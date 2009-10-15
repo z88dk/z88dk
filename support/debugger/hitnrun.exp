@@ -255,7 +255,6 @@ proc do_load { args } {
 
 proc do_run { args } {
     set rpy [exch_data "0200"]
-    puts "Hit a breakpoint"
 }
 
 # Since the intelligence is here and not in the assembler monitor
@@ -376,6 +375,7 @@ proc do_continue { args } {
 
     # Now run the emulator with the tailor made options ;-)
     # We only care about PC and SP
+
     catch {exec ./dbgbin -n 1 -r "0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 $PCm1print FFFF" tmp.bin} res
 
     set PC [string range $res 85 88]
@@ -392,6 +392,8 @@ proc do_continue { args } {
     set tmpopc [string range $rpy 4 5 ]
 
     # 6) run program 'til it returns to "prompt" on "real" target
+
+    puts "Hit a breakpoint"
 
     do_run
     
@@ -410,8 +412,10 @@ proc do_continue { args } {
     exch_data $sendstr1$sendstr2
     
     # 9) Keep running (finally!)
+
     do_run
 }
+
 
 proc do_macro { macrofile } {
     set mf [open $macrofile r]
@@ -475,6 +479,7 @@ proc decode_line { cmdline } {
 	    # This will hold unread stdin characters
 	    set charbuff ""
 	    
+	    puts "Hit a breakpoint"
 	    do_run
 	}
 

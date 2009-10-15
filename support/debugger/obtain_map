@@ -6,7 +6,7 @@
 #grep DBGDONTUSE /tmp/$MAPFILESTEM.map | uniq | awk '{print $3}' | sed 's/,//g'
 
 # Now we dare to use the -m option directly...
-MAPFILESTEM=`cat source.sh | awk '{print $9}' | sed 's/\/tmp\///g' | sed 's/.c//g'`
+MAPFILESTEM=`cat source.sh | awk '{print $10}' | sed 's/\/tmp\///g' | sed 's/.c//g'`
 
 #echo "MAPFILESTEM=$MAPFILESTEM"
 

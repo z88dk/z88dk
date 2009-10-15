@@ -1,57 +1,19 @@
 
-#include "cmds.h"
-
-/** TODO: We ideally want this to be the symbol ._dbg_registers in
-    test_crt0.asm but that seems to give wrong result
-    compiler bug???
-*/
-static unsigned char* kludge_dbg_registers=0x3A;
-
-
-static int cmd_debug_as_int=CMD_DBG;
-
-
-extern unsigned* dbg_registers;
-
 /** Only for debugging of debugger ;-) */
 #include <stdio.h>
 
-void set_break(unsigned char* addr)
-{
-  /** Here we know this is rst 10h, to make this portable, move this function to separate file */
-  (*addr)=0xd7;
-}
+#include "debugger.h"
+#include "cmds.h"
 
-int num_break_bytes()
-{
-  return 1;  /** So we know how many bytes to save */
-}
 
-int exchange_str(void *ptr, int len)
-{
+
+/*
 #asm
-  pop bc ; save return ;
-  pop de ; len ;
-  pop hl ; pointer to string ;
-
-  push hl ; balance stack
-  push de ;
-
-
-  ld a,(_cmd_debug_as_int) ; CMD_DBG ;
-
-  rst 8 ;
-
-
-
-  /** Result string in ptr and len in return value, HL */
-  ld h,0 ;
-  ld l,e ;
-    
-  push bc ;
-
+  XREF _debugger_exchange_str
+  XREF _debugger_set_break
 #endasm
-}
+*/
+
 
 /** Protocol like this:
     Query (from host)
@@ -127,7 +89,7 @@ void debugger()
     {
       /** send and wait here for ever for a command */
 
-      len=exchange_str(str, str[0]);
+      len=debugger_exchange_str(str, str[0]);
 
       if (len!=str[0])
 	{
@@ -184,7 +146,7 @@ void debugger()
 	       N+2 0 <opcode1> [<opcode2>] ... [<opcodeN>] 
 	    **/
 	    unsigned char *addr=str[2];
-	    unsigned n=num_break_bytes();
+	    unsigned n=debugger_num_break_bytes();
 	    
 	    addr|=(str[3]<<8);
 
@@ -196,7 +158,7 @@ void debugger()
 		str[i+2]=*(addr+i);
 	      }
 	    
-	    set_break(addr);
+	    debugger_set_break(addr);
 
 	    break;
 	  }
@@ -211,8 +173,8 @@ void debugger()
 	    **/
 	    unsigned n;
 
-	    /** From crt0 */
-	    unsigned char *addr=kludge_dbg_registers;
+	    /** From crt0, it should have saved away the registers here, when entering breakpoint */
+	    unsigned char *addr=debugger_get_registers();
 	    
 	    n=str[0]-2;
 
@@ -237,7 +199,7 @@ void debugger()
 	    **/
 	    
 	    /** From crt0 */
-	    unsigned char *addr=kludge_dbg_registers;
+	    unsigned char *addr=debugger_get_registers();
 
 	    for (i=0;i<24;i++)
 	      {

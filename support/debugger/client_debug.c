@@ -5,6 +5,7 @@
 #include "mysock.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/select.h>
 
 int main(int argc, const char *argv[])
