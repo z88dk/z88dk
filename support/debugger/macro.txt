@@ -1,0 +1,6 @@
+l hello.bin
+b hello.c 13
+r
+c
+c
+c
