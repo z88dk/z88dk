@@ -10,13 +10,11 @@
  *      Stefano has converted many of these routines to the new ports
  *      Some will work, some will not. djm 6/6/2000
  *
- *	$Id: graphics.h,v 1.9 2009-10-13 11:40:14 stefano Exp $
+ *	$Id: graphics.h,v 1.10 2009-10-23 14:25:37 stefano Exp $
  */
 
 #ifndef __GFX_H__
 #define __GFX_H__
-
-
 
 /* Structure to use when opening a window - as per usual, if graph <> 0
  * then open graphics window number with width (pixels) width 
@@ -99,6 +97,9 @@ extern __LIB__ stencil_add_circle(int x, int y, int radius, int skip, unsigned c
 /* Render an area delimited by a stencil object, with the specified dither intensity (0..11) */
 extern __LIB__ stencil_render(unsigned char *stencil, unsigned char intensity);
 
+/* 'Graphic Profiles' are byte streams containing vector and surface descriptions
+   they are detailed in <gfxprofile.h> */
+extern __LIB__ draw_profile(int dx, int dy, int scale, unsigned char *metapic);
 
 #ifndef SPECTRUM
 /* Open a z88 window..either graphics or text */

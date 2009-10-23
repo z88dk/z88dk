@@ -1,6 +1,7 @@
 graphics/circle
 graphics/clga
 graphics/draw
+graphics/draw_profile
 graphics/drawb
 graphics/drawr
 graphics/drawto

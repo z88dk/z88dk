@@ -8,7 +8,7 @@
 ;       Stefano Bodrato - 08/10/2009
 ;
 ;
-;	$Id: stencil_add_lineto.asm,v 1.1 2009-10-13 11:41:43 stefano Exp $
+;	$Id: stencil_add_lineto.asm,v 1.2 2009-10-23 14:25:51 stefano Exp $
 ;
 
 ;; void stencil_add_lineto(int x, int y, unsigned char *stencil)
