@@ -5,7 +5,7 @@
 ;
 ;		void draw_profile(int dx, int dy, int scale, unsigned char *metapic);
 ;
-;	$Id: draw_profile.asm,v 1.1 2009-10-23 14:25:51 stefano Exp $
+;	$Id: draw_profile.asm,v 1.2 2009-10-26 12:35:46 stefano Exp $
 ;
 
 
@@ -28,6 +28,11 @@
                 LIB		l_mult
                 LIB		l_div
 
+;
+; DE > HL [unsigned]
+; set carry if true
+;
+;.l_ugt
                 ;;XREF    COORDS
 
 _percent:	defw	0
@@ -43,8 +48,9 @@ _cy1:		defw	0
 
 _pic:		defw	0
 
-_stencil:	defs	maxy*2
-
+; moved into stack
+;;_stencil:	defs	maxy*2
+_stencil:	defw	0
 
 getx:
 	ld	hl,(_vx)
@@ -70,14 +76,17 @@ getparm:		;cx=vx+percent*pic[x++]/100;
 	ex	de,hl
 	call l_div
 	pop	de
-	ld b,d
-	ld c,e
-	sub a
-	adc	hl,de
-	ret nc
-	ld d,b
-	ld e,c
+	add	hl,de
+;	ld	a,$F0	; negative value ?
+;	and	h
+;	ret z
+;	ld	hl,0
 	ret
+
+
+; *************************
+;    MAIN FUNCTION ENTRY
+; *************************
 
 draw_profile:
 	ld	ix,0
@@ -93,14 +102,27 @@ draw_profile:
 	ld	l,(ix+8)
 	ld	(_vx),hl
 	
+	ld      hl,-maxy*2	; create space for stencil on stack
+	add     hl,sp		; The stack usage depends on the display height.
+	ld      sp,hl
+	ld		(_stencil),hl
+
 picture_loop:
 	ld	hl,(_pic)
 	ld	a,(hl)
 	inc	hl
 	ld	(_pic),hl
 	and	a		; CMD_END ?
-	ret	z
-	
+	jr		nz,noend
+	;******
+	; EXIT
+	;******
+	ld      hl,maxy*2	; release the stack space for _stencil
+	add     hl,sp
+	ld      sp,hl
+	ret
+
+noend:
 	ld	e,a
 	and $0F		; 'dithering level'
 	ld  h,0
@@ -109,7 +131,7 @@ picture_loop:
 	ld	a,e
 	and $F0		; command
 
-	ld	hl,_stencil
+	ld	hl,(_stencil)
 
 	cp  $80		; CMD_AREA_INIT (no parameters)
 	jr	nz,noinit
@@ -134,7 +156,7 @@ noinit:
 	call stencil_render
 	pop	de
 	pop hl
-	ld	hl,_stencil	; 'render' can destroy the current parameter
+	ld	hl,(_stencil)	; 'render' can destroy the current parameter
 	push hl
 	ld	e,1		; left side border
 	call resize
@@ -143,7 +165,10 @@ noinit:
 	;pop hl
 	;push hl
 	;call vshrink	; upper side border
-	;ld	hl,_stencil+maxy
+	;;;ld	hl,_stencil+maxy
+	;ld	hl,_stencil
+	;ld	de,maxy
+	;add	hl,de
 	;call vshrink	; lower side border
 	ld	hl,(_dith)
 	ld	a,l
@@ -180,7 +205,7 @@ twoparms:
 	
 	cp	$90	; CMD_AREA_PLOT (x,y)
 	jr	nz,noaplot
-	ld	hl,_stencil
+	ld	hl,(_stencil)
 	push hl
 	call stencil_add_point
 	jr  go_end3
@@ -188,7 +213,7 @@ noaplot:
 
 	cp	$A0	; CMD_AREA_LINETO (x,y)
 	jr	nz,noalineto
-	ld	hl,_stencil
+	ld	hl,(_stencil)
 	push hl
 	call stencil_add_lineto
 	jr	go_end3
@@ -200,7 +225,7 @@ noalineto:
 	push hl
 	ld	hl,(_cy1)
 	push hl
-	ld	hl,_stencil
+	ld	hl,(_stencil)
 	push hl
 	call stencil_add_side
 	pop hl
@@ -217,7 +242,7 @@ noaline:
 
 	cp $10 ; CMD_PLOT (x,y,dither),
 	jr	nz,noplot
-	ld	hl,_stencil
+	ld	hl,(_stencil)
 	ld	a,(_dith)
 	and	a			; when possible drawto/undrawto are faster
 	jr	nz,nopwhite
@@ -244,22 +269,32 @@ plend2:
 	jr	c,nothick	; the surface to be drawn
 
 	push hl
-	ld hl,_stencil+maxy	; adjust the right side
+	ld hl,(_stencil)	; adjust the right side
+	ld	de,maxy
+	add	hl,de
 	ld e,1				; 1 bit larger
 	call resize
 	pop hl
 	ld	a,l
 	sub 4	; adjust color (8..11)
 	ld	l,a
-
 nothick:
-	jr	dorender
+dorender:
+	push hl
+	call stencil_render
+	pop	hl
+	pop hl
+	ld	hl,(_stencil)	; 'render' can destroy the current parameter
+	push hl
+	call stencil_init
+	pop	hl
+	jp	picture_loop
 
 noplot:
 
 	cp $20 ; CMD_LINETO (x,y,dither),
 	jr	nz,nolineto
-	ld	hl,_stencil
+	ld	hl,(_stencil)
 	ld	a,(_dith)
 	and	a				; when possible drawto/undrawto are faster
 	jr	nz,nodtwhite
@@ -283,7 +318,7 @@ nolineto:
 	push hl
 	ld	hl,(_cy1)
 	push hl
-	ld	hl,_stencil
+	ld	hl,(_stencil)
 	ld	a,(_dith)
 	and	a			; when possible draw/undraw are faster
 	jr	nz,nolwhite
@@ -301,20 +336,12 @@ nolblack:
 	pop de
 	pop	hl
 	pop hl
-	jr plend2
+	jp plend2
 
-
-dorender:
-	push hl
-	call stencil_render
-	pop	hl
-	pop hl
-	ld	hl,_stencil	; 'render' can destroy the current parameter
-	push hl
-	call stencil_init
-	pop	hl
-	jp	picture_loop
-
+;
+; Adjust right or left margin
+; of a stencil object by 'e' dots
+;
 
 resize:
 	ld b,maxy-1
@@ -331,6 +358,9 @@ slimit:
 	djnz rslp
 	ret
 
+;
+; Cut 1st and last line from a stencil object
+;
 
 ;vshrink:
 ;	ld	b,maxy-1
