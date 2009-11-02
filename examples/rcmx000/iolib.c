@@ -12,8 +12,6 @@
 #include <stdio.h>
 #endif
 
-static int iolib_has_inited=0;
-
 static /* const */ unsigned char address_table[]={
   0x30, /* PADR     */
   0x70, /* PEDR     */
@@ -24,7 +22,9 @@ static /* const */ unsigned char address_table[]={
   0x4d, /* PGFR     */
   0x4e, /* PGDCR    */
   0x4f, /* PGDDR    */
-  0x2   /* RTC0R    */
+  0x2,  /* RTC0R    */
+  0x40, /* PBDR     */
+  0x47, /* PBDDR    */
 };
 
 
@@ -38,7 +38,9 @@ static unsigned char shadow_value[]={
   0,     /* PGFR    xxxxxxxx */
   0,     /* PGDCR   xxxxxxxx */
   0,     /* PGDDR   00000000 */
-  0      /* RTC0R   xxxxxxxx */
+  0,     /* RTC0R   xxxxxxxx */
+  0,     /* PBDR    00xxxxxx */
+  192    /* PBDDR   11000000 */
 };
 
 

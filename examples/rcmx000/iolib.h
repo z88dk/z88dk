@@ -26,6 +26,8 @@
 #define IOLIB_PGDCR 7
 #define IOLIB_PGDDR 8
 #define IOLIB_RTC0R 9
+#define IOLIB_PBDR 10
+#define IOLIB_PBDDR 11
 
 /** Returns physical io address of register */
 extern unsigned iolib_physical(unsigned register);
