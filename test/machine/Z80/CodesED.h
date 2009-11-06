@@ -75,6 +75,7 @@ case LD_SP_xWORDe:
   R->SP.B.h=RdZ80(J.W);
   break;
 
+#ifndef RCMX000
 case RRD:
   I=RdZ80(R->HL.W);
   J.B.l=(I>>4)|(R->AF.B.h<<4);
@@ -89,6 +90,7 @@ case RLD:
   R->AF.B.h=(I>>4)|(R->AF.B.h&0xF0);
   R->AF.B.l=PZSTable[R->AF.B.h]|(R->AF.B.l&C_FLAG);
   break;
+#endif
 
 case LD_A_I:
   R->AF.B.h=R->I;
@@ -104,6 +106,7 @@ case LD_A_R:
 case LD_I_A:   R->I=R->AF.B.h;break;
 case LD_R_A:   break;
 
+#ifndef RCMX000
 case IM_0:     R->IFF&=~(IFF_IM1|IFF_IM2);break;
 case IM_1:     R->IFF=(R->IFF&~IFF_IM2)|IFF_IM1;break;
 case IM_2:     R->IFF=(R->IFF&~IFF_IM1)|IFF_IM2;break;
@@ -111,9 +114,11 @@ case IM_2:     R->IFF=(R->IFF&~IFF_IM1)|IFF_IM2;break;
 case RETI:
 case RETN:     if(R->IFF&IFF_2) R->IFF|=IFF_1; else R->IFF&=~IFF_1;
                M_RET;break;
+#endif
 
 case NEG:      I=R->AF.B.h;R->AF.B.h=0;M_SUB(I);break;
 
+#ifndef RCMX000
 case IN_B_xC:  M_IN(R->BC.B.h);break;
 case IN_C_xC:  M_IN(R->BC.B.l);break;
 case IN_D_xC:  M_IN(R->DE.B.h);break;
@@ -220,6 +225,7 @@ case OTDR:
     R->ICount+=5;
   }
   break;
+#endif
 
 case LDI:
   WrZ80(R->DE.W++,RdZ80(R->HL.W++));
@@ -257,6 +263,7 @@ case LDDR:
   else R->ICount+=5;
   break;
 
+#ifndef RCMX000
 case CPI:
   I=RdZ80(R->HL.W++);
   J.B.l=R->AF.B.h-I;
@@ -302,3 +309,12 @@ case CPDR:
     ((R->AF.B.h^I^J.B.l)&H_FLAG)|(R->BC.W? P_FLAG:0);
   if(R->BC.W&&J.B.l) R->PC.W-=2; else R->ICount+=5;
   break;
+#endif
+
+/** This is rabbits opcode for EX (sp),hl */
+#ifdef RCMX000
+case EX_HL_SPx:
+  J.B.l=RdZ80(R->SP.W);WrZ80(R->SP.W++,R->HL.B.l);
+  J.B.h=RdZ80(R->SP.W);WrZ80(R->SP.W--,R->HL.B.h);
+  R->HL.W=J.W;
+#endif

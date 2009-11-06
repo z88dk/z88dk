@@ -135,6 +135,14 @@ word InstrZ80(Z80 *R, int num_instr);
 word RunZ80(register Z80 *R);
 #endif
 
+/** RdZ80Dbg()/WrZ80Dbg() ************************************/
+/** These functions are called when access to RAM outside   **/
+/** the actual processor accesses, such as debug, memory    **/
+/** dump etc.                                               **/
+/************************************ TO BE WRITTEN BY USER **/
+void WrZ80Dbg(register word Addr,register byte Value);
+byte RdZ80Dbg(register word Addr);
+
 /** RdZ80()/WrZ80() ******************************************/
 /** These functions are called when access to RAM occurs.   **/
 /** They allow to control memory access.                    **/

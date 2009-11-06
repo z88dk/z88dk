@@ -47,12 +47,71 @@ INLINE void WrZ80(word A,byte V) { if(Page[A>>13]<ROM) Page[A>>13][A&0x1FFF]=V; 
 
 #ifdef Z88DK
 extern byte RAM[65536];
-//#define RdZ80 RDZ80
-//#define WrZ80 WRZ80
+
+INLINE byte RdZ80Dbg(word A) { return(RAM[A]); }
+INLINE void WrZ80Dbg(word A, byte V) { RAM[A] = V; }
+
+
+#ifndef RCMX000
+
+/** If we don't have the rabbit I/O handler we don't need 
+    to separate Debug readings from real (cpu) memory reading
+*/
 INLINE byte RdZ80(word A) { return(RAM[A]); }
 INLINE void WrZ80(word A, byte V) { RAM[A] = V; }
+
+
 #define InZ80(a) (0xFF)
 #define OutZ80(a,v)
+
+#else
+
+/** This is set by the ioi instruction so following mem access goes to io instead */
+static int ioi_flag=0;
+static int ioe_flag=0;
+
+
+/** This is a read, either from I/O or memory */
+INLINE byte RdZ80(word A)
+{
+  if (ioi_flag || ioe_flag)
+    {
+      if (ioi_flag)
+	{
+	  ioi_flag=0;
+	  return rcmx_io_internal_in(A);
+	}
+      if (ioe_flag)
+	{
+	  ioe_flag=0;
+	  return rcmx_io_external_in(A);
+	}
+    }
+  return(RAM[A]); 
+}
+
+/** This is a write, either to I/O or memory */
+INLINE void WrZ80(word A, byte V)
+{
+  if (ioi_flag || ioe_flag)
+    {
+      if (ioi_flag)
+	{
+	  ioi_flag=0;
+	  rcmx_io_internal_out(A, V);
+	}
+      if (ioe_flag)
+	{
+	  ioe_flag=0;
+	  rcmx_io_external_out(A, V);
+	}
+      return;
+    }
+  RAM[A] = V;
+}
+
+#endif
+
 #endif
 
 #ifdef MG
@@ -72,7 +131,20 @@ INLINE byte OpZ80(word A) { return(RAM[A>>13][A&0x1FFF]); }
 /** the functions of OpZ80().                               **/
 /*************************************************************/
 #ifndef FAST_RDOP
+#ifdef RCMX000
+
+/** We need this in order to not reset the ioi / ioe flags
+ *  when fetching instructions
+ */
+INLINE byte OpZ80(word A) {
+  return RAM[A]; 
+}
+
+#else
+
 #define OpZ80(A) RdZ80(A)
+
+#endif
 #endif
 
 #define S(Fl)        R->AF.B.l|=Fl
@@ -257,8 +329,22 @@ enum Codes
   CP_B,CP_C,CP_D,CP_E,CP_H,CP_L,CP_xHL,CP_A,
   RET_NZ,POP_BC,JP_NZ,JP,CALL_NZ,PUSH_BC,ADD_BYTE,RST00,
   RET_Z,RET,JP_Z,PFX_CB,CALL_Z,CALL,ADC_BYTE,RST08,
-  RET_NC,POP_DE,JP_NC,OUTA,CALL_NC,PUSH_DE,SUB_BYTE,RST10,
-  RET_C,EXX,JP_C,INA,CALL_C,PFX_DD,SBC_BYTE,RST18,
+
+  RET_NC,POP_DE,JP_NC,
+#ifdef RCMX000
+  IOI,
+#else
+  OUTA,
+#endif
+  CALL_NC,PUSH_DE,SUB_BYTE,RST10,
+
+  RET_C,EXX,JP_C,
+#ifdef RCMX000
+  IOE,
+#else
+  INA,  
+#endif
+  CALL_C,PFX_DD,SBC_BYTE,RST18,
   RET_PO,POP_HL,JP_PO,EX_HL_xSP,CALL_PO,PUSH_HL,AND_BYTE,RST20,
   RET_PE,LD_PC_HL,JP_PE,EX_DE_HL,CALL_PE,PFX_ED,XOR_BYTE,RST28,
   RET_P,POP_AF,JP_P,DI,CALL_P,PUSH_AF,OR_BYTE,RST30,
@@ -313,7 +399,13 @@ enum CodesED
   DB_38,DB_39,DB_3A,DB_3B,DB_3C,DB_3D,DB_3E,DB_3F,
   IN_B_xC,OUT_xC_B,SBC_HL_BC,LD_xWORDe_BC,NEG,RETN,IM_0,LD_I_A,
   IN_C_xC,OUT_xC_C,ADC_HL_BC,LD_BC_xWORDe,DB_4C,RETI,DB_,LD_R_A,
-  IN_D_xC,OUT_xC_D,SBC_HL_DE,LD_xWORDe_DE,DB_54,DB_55,IM_1,LD_A_I,
+  IN_D_xC,OUT_xC_D,SBC_HL_DE,LD_xWORDe_DE,
+#ifdef RCMX000
+  EX_HL_SPx,
+#else
+  DB_54,
+#endif
+  DB_55,IM_1,LD_A_I,
   IN_E_xC,OUT_xC_E,ADC_HL_DE,LD_DE_xWORDe,DB_5C,DB_5D,IM_2,LD_A_R,
   IN_H_xC,OUT_xC_H,SBC_HL_HL,LD_xWORDe_HL,DB_64,DB_65,DB_66,RRD,
   IN_L_xC,OUT_xC_L,ADC_HL_HL,LD_HL_xWORDe,DB_6C,DB_6D,DB_6E,RLD,
@@ -504,6 +596,13 @@ void ResetZ80(Z80 *R)
   R->IBackup  = 0;
 
   JumpZ80(R->PC.W);
+
+#ifdef RCMX000
+  ioi_flag=0;
+  ioe_flag=0;
+  
+#endif
+
 }
 
 /** ExecZ80() ************************************************/
@@ -688,6 +787,16 @@ word InstrZ80(Z80 *R, int num_instr)
     }
   }
 
+#ifdef RCMX000
+  if (I==IOI || I==IOE)
+    {
+      /** The ioi/ioe and the following "memory" instruction is to be regarded as one 
+       *  instruction
+       */
+      InstrZ80(R, 1);
+    }
+#endif
+
   /* Execution stopped */
   return(R->PC.W);
 }
@@ -701,6 +810,12 @@ word RunZ80(Z80 *R)
 {
   register byte I;
   register pair J;
+
+#ifdef RCMX000
+
+  rcmx_io_init();
+
+#endif
 
   for(;;)
   {

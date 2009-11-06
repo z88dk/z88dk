@@ -226,8 +226,11 @@ case RET:  M_RET;break;
 case SCF:  S(C_FLAG);R(N_FLAG|H_FLAG);break;
 case CPL:  R->AF.B.h=~R->AF.B.h;S(N_FLAG|H_FLAG);break;
 case NOP:  break;
+
+#ifndef RCMX000
 case OUTA: I=OpZ80(R->PC.W++);OutZ80(I|(R->AF.W&0xFF00),R->AF.B.h);break;
 case INA:  I=OpZ80(R->PC.W++);R->AF.B.h=InZ80(I|(R->AF.W&0xFF00));break;
+#endif
 
 case HALT:
   R->PC.W--;

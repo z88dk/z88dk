@@ -131,9 +131,9 @@ byte DebugZ80(Z80 *R)
           CONSetColor(CLR_TEXT,CLR_BACK);
           sprintf(S,
             "%02X %02X %02X %02X %c%c%c%c",
-            RdZ80(A),RdZ80(A+1),RdZ80(A+2),RdZ80(A+3),
-            ChrDump(RdZ80(A)),ChrDump(RdZ80(A+1)),
-            ChrDump(RdZ80(A+2)),ChrDump(RdZ80(A+3))
+            RdZ80Dbg(A),RdZ80Dbg(A+1),RdZ80Dbg(A+2),RdZ80Dbg(A+3),
+            ChrDump(RdZ80Dbg(A)),ChrDump(RdZ80Dbg(A+1)),
+            ChrDump(RdZ80Dbg(A+2)),ChrDump(RdZ80Dbg(A+3))
           );
           CONPrint(X+7,Y+J+2,S);
         }

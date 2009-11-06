@@ -34,6 +34,7 @@ case RET_C:   if(R->AF.B.l&C_FLAG)    { R->ICount-=6;M_RET; } break;
 case RET_PE:  if(R->AF.B.l&P_FLAG)    { R->ICount-=6;M_RET; } break;
 case RET_M:   if(R->AF.B.l&S_FLAG)    { R->ICount-=6;M_RET; } break;
 
+#ifndef RCMX000
 case CALL_NZ: if(R->AF.B.l&Z_FLAG) R->PC.W+=2; else { R->ICount-=7;M_CALL; } break;
 case CALL_NC: if(R->AF.B.l&C_FLAG) R->PC.W+=2; else { R->ICount-=7;M_CALL; } break;
 case CALL_PO: if(R->AF.B.l&P_FLAG) R->PC.W+=2; else { R->ICount-=7;M_CALL; } break;
@@ -42,6 +43,7 @@ case CALL_Z:  if(R->AF.B.l&Z_FLAG) { R->ICount-=7;M_CALL; } else R->PC.W+=2; bre
 case CALL_C:  if(R->AF.B.l&C_FLAG) { R->ICount-=7;M_CALL; } else R->PC.W+=2; break;
 case CALL_PE: if(R->AF.B.l&P_FLAG) { R->ICount-=7;M_CALL; } else R->PC.W+=2; break;
 case CALL_M:  if(R->AF.B.l&S_FLAG) { R->ICount-=7;M_CALL; } else R->PC.W+=2; break;
+#endif
 
 case ADD_B:    M_ADD(R->BC.B.h);break;
 case ADD_C:    M_ADD(R->BC.B.l);break;
@@ -187,13 +189,17 @@ case RRA:
   R->AF.B.l=(R->AF.B.l&~(C_FLAG|N_FLAG|H_FLAG))|I;
   break;
 
+#ifndef RCMX000
 case RST00:    M_RST(0x0000);break;
 case RST08:    M_RST(0x0008);break;
+#endif
 case RST10:    M_RST(0x0010);break;
 case RST18:    M_RST(0x0018);break;
 case RST20:    M_RST(0x0020);break;
 case RST28:    M_RST(0x0028);break;
+#ifndef RCMX000
 case RST30:    M_RST(0x0030);break;
+#endif
 case RST38:    M_RST(0x0038);break;
 
 case PUSH_BC:  M_PUSH(BC);break;
@@ -214,6 +220,11 @@ case RET:  M_RET;break;
 case SCF:  S(C_FLAG);R(N_FLAG|H_FLAG);break;
 case CPL:  R->AF.B.h=~R->AF.B.h;S(N_FLAG|H_FLAG);break;
 case NOP:  break;
+
+#ifdef RCMX000
+ case IOI: ioi_flag=1; break;
+ case IOE: ioe_flag=1; break;
+#else
 case OUTA: I=OpZ80(R->PC.W++);OutZ80(I|(R->AF.W&0xFF00),R->AF.B.h);break;
 case INA:  I=OpZ80(R->PC.W++);R->AF.B.h=InZ80(I|(R->AF.W&0xFF00));break;
 
@@ -237,6 +248,8 @@ case EI:
     R->ICount=1;
   }
   break;
+
+#endif
 
 case CCF:
   R->AF.B.l^=C_FLAG;R(N_FLAG|H_FLAG);
@@ -361,6 +374,7 @@ case LD_xWORD_A:
   WrZ80(J.W,R->AF.B.h);
   break;
 
+#ifndef RCMX000
 case EX_HL_xSP:
   J.B.l=RdZ80(R->SP.W);WrZ80(R->SP.W++,R->HL.B.l);
   J.B.h=RdZ80(R->SP.W);WrZ80(R->SP.W--,R->HL.B.h);
@@ -374,6 +388,7 @@ case DAA:
   if(R->AF.B.l&N_FLAG) J.W|=1024;
   R->AF.W=DAATable[J.W];
   break;
+#endif
 
 default:
   if(R->TrapBadOps)

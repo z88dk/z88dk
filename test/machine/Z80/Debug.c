@@ -253,27 +253,27 @@ static int DAsm(char *S,word A)
   C='\0';
   J=0;
 
-  switch(RdZ80(B))
+  switch(RdZ80Dbg(B))
   {
-    case 0xCB: B++;T=MnemonicsCB[RdZ80(B++)];break;
-    case 0xED: B++;T=MnemonicsED[RdZ80(B++)];break;
+    case 0xCB: B++;T=MnemonicsCB[RdZ80Dbg(B++)];break;
+    case 0xED: B++;T=MnemonicsED[RdZ80Dbg(B++)];break;
     case 0xDD: B++;C='X';
-               if(RdZ80(B)!=0xCB) T=MnemonicsXX[RdZ80(B++)];
+               if(RdZ80Dbg(B)!=0xCB) T=MnemonicsXX[RdZ80Dbg(B++)];
                else
-               { B++;Offset=RdZ80(B++);J=1;T=MnemonicsXCB[RdZ80(B++)]; }
+               { B++;Offset=RdZ80Dbg(B++);J=1;T=MnemonicsXCB[RdZ80Dbg(B++)]; }
                break;
     case 0xFD: B++;C='Y';
-               if(RdZ80(B)!=0xCB) T=MnemonicsXX[RdZ80(B++)];
+               if(RdZ80Dbg(B)!=0xCB) T=MnemonicsXX[RdZ80Dbg(B++)];
                else
-               { B++;Offset=RdZ80(B++);J=1;T=MnemonicsXCB[RdZ80(B++)]; }
+               { B++;Offset=RdZ80Dbg(B++);J=1;T=MnemonicsXCB[RdZ80Dbg(B++)]; }
                break;
-    default:   T=Mnemonics[RdZ80(B++)];
+    default:   T=Mnemonics[RdZ80Dbg(B++)];
   }
 
   if(P=strchr(T,'^'))
   {
     strncpy(R,T,P-T);R[P-T]='\0';
-    sprintf(H,"%02X",RdZ80(B++));
+    sprintf(H,"%02X",RdZ80Dbg(B++));
     strcat(R,H);strcat(R,P+1);
   }
   else strcpy(R,T);
@@ -282,14 +282,14 @@ static int DAsm(char *S,word A)
   if(P=strchr(R,'*'))
   {
     strncpy(S,R,P-R);S[P-R]='\0';
-    sprintf(H,"%02X",RdZ80(B++));
+    sprintf(H,"%02X",RdZ80Dbg(B++));
     strcat(S,H);strcat(S,P+1);
   }
   else
     if(P=strchr(R,'@'))
     {
       strncpy(S,R,P-R);S[P-R]='\0';
-      if(!J) Offset=RdZ80(B++);
+      if(!J) Offset=RdZ80Dbg(B++);
       strcat(S,Offset&0x80? "-":"+");
       J=Offset&0x80? 256-Offset:Offset;
       sprintf(H,"%02X",J);
@@ -299,7 +299,7 @@ static int DAsm(char *S,word A)
       if(P=strchr(R,'#'))
       {
         strncpy(S,R,P-R);S[P-R]='\0';
-        sprintf(H,"%04X",RdZ80(B)+256*RdZ80(B+1));
+        sprintf(H,"%04X",RdZ80Dbg(B)+256*RdZ80Dbg(B+1));
         strcat(S,H);strcat(S,P+1);
         B+=2;
       }
@@ -331,7 +331,7 @@ byte DebugZ80(Z80 *R)
   printf
   ( 
     "AT PC: [%02X - %s]   AT SP: [%04X]   FLAGS: [%s]   %s: %s\n\n",
-    RdZ80(R->PC.W),S,RdZ80(R->SP.W)+RdZ80(R->SP.W+1)*256,T,
+    RdZ80Dbg(R->PC.W),S,RdZ80Dbg(R->SP.W)+RdZ80Dbg(R->SP.W+1)*256,T,
     R->IFF&0x04? "IM2":R->IFF&0x02? "IM1":"IM0",
     R->IFF&0x01? "EI":"DI"
   );
@@ -389,10 +389,10 @@ byte DebugZ80(Z80 *R)
           {
             printf("%04X: ",Addr);
             for(I=0;I<16;I++,Addr++)
-              printf("%02X ",RdZ80(Addr));
+              printf("%02X ",RdZ80Dbg(Addr));
             printf(" | ");Addr-=16;
             for(I=0;I<16;I++,Addr++)
-              putchar(isprint(RdZ80(Addr))? RdZ80(Addr):'.');
+              putchar(isprint(RdZ80Dbg(Addr))? RdZ80Dbg(Addr):'.');
             puts("");
           }
         }
