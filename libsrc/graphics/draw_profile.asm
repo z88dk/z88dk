@@ -5,7 +5,7 @@
 ;
 ;		void draw_profile(int dx, int dy, int scale, unsigned char *metapic);
 ;
-;	$Id: draw_profile.asm,v 1.2 2009-10-26 12:35:46 stefano Exp $
+;	$Id: draw_profile.asm,v 1.3 2009-11-13 11:09:38 stefano Exp $
 ;
 
 
@@ -34,6 +34,8 @@
 ;
 ;.l_ugt
                 ;;XREF    COORDS
+
+_areaptr:	defw	0
 
 _percent:	defw	0
 _cmd:		defb	0
@@ -136,6 +138,16 @@ noend:
 	cp  $80		; CMD_AREA_INIT (no parameters)
 	jr	nz,noinit
 	push hl		; _stencil
+	ld	hl,0
+	ld	(_areaptr),hl
+	ld	a,(_dith)
+	and a			; no parameters ?
+	jr	z,just_init	; then, don't keep ptr for border
+	ld	hl,(_pic)	; >0, so save current pic ptr
+	ld	(_areaptr),hl
+just_init:
+	pop	hl
+	push hl		; _stencil
 	call stencil_init
 	pop	hl
 	jr	picture_loop
@@ -143,6 +155,17 @@ noinit:
 
 	cp  $F0		; CMD_AREA_CLOSE (no parameters ?)
 	jr	nz,noclose
+;----
+	call is_areamode
+	jr	z,noclsamode
+	push hl
+	ld	hl,(_areaptr)
+	ld	(_pic),hl	; update picture pointer to pass the area
+	ld	hl,0		; twice and draw the border
+	ld	(_areaptr),hl
+	pop hl
+noclsamode:
+;----
 	push hl		; _stencil
 	ld	hl,(_dith)
 	ld	a,l
@@ -178,6 +201,15 @@ doclose:
 	jp	dorender
 noclose:
 	push af
+
+;----
+	call is_areamode
+	jr	z,noamode	; if in 'area mode', we are doing twice;
+	pop	af			; in the first pass, plot/line CMDs 
+	or $80			; are changed to the equivalent area ones
+	push af
+noamode:
+;----
 
 	cp  $30		; CMD_LINE (4 parameters ?)
 	jr	z,fourparms
@@ -358,6 +390,15 @@ slimit:
 	djnz rslp
 	ret
 
+; NZ if we have prepared a ptr for two-pass mode
+is_areamode:
+	push hl		; _stencil
+	ld	hl,_areaptr
+	ld	a,(hl)
+	inc	hl
+	cp	(hl)
+	pop	hl
+	ret
 ;
 ; Cut 1st and last line from a stencil object
 ;

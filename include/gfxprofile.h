@@ -7,7 +7,7 @@
  * When necessary two or four bytes for coordinate follow.
  *
  *
- *	$Id: gfxprofile.h,v 1.2 2009-10-23 14:25:36 stefano Exp $
+ *	$Id: gfxprofile.h,v 1.3 2009-11-13 11:09:09 stefano Exp $
  */
 
 #ifndef __GFXPF_H__
@@ -20,6 +20,7 @@
 #define	CMD_LINE 		0x30	/* (dither),x1,y1,x2,y2 */
 
 #define CMD_AREA_INIT	0x80	/* no parms */
+#define CMD_AREA_INITB	0x81	/* activate border mode */
 
 #define CMD_AREA_PLOT	0x90	/*   x,y */
 #define CMD_AREA_LINETO	0xA0	/*   x,y */

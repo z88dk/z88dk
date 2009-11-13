@@ -1,12 +1,13 @@
 
 /*
    Z80SVG
+   by Stefano Bodrato
 
    This program translates an SVG vector file 
    in a C source data declaration to be used
    in z88dk with the "draw_profile" function.
 
-   $Id: z80svg.c,v 1.1 2009-11-11 07:46:44 stefano Exp $
+   $Id: z80svg.c,v 1.2 2009-11-13 11:12:35 stefano Exp $
 */
 
 
@@ -15,14 +16,20 @@
 #include <math.h>
 #include <libxml/parser.h>
 
+//#include "../include/gfxprofile.h"
 #include "gfxprofile.h"
 
 //#ifdef LIBXML_READER_ENABLED
 
 /* Global variables */
-int wireframe;
+/* colors */
 unsigned char pen;
+unsigned char fill;
+/* default */
+unsigned char color;
+/* fill flags */
 unsigned char area;
+unsigned char line;
 
 
 int gethex(char hexval) {
@@ -46,52 +53,128 @@ char *skip_num(char *p) {
 	return (p);
 }
 
+int get_color(char *style) {
+	if(!strcmp(style, "black"))
+		return(DITHER_BLACK);
+	else if(!strcmp(style, "white"))
+		return(DITHER_WHITE);
+	else if (style[0] == '#')
+		return(11-11*(16*gethex(style[1])+gethex(style[2])+
+		  16*gethex(style[3])+gethex(style[4])+
+		  16*gethex(style[5])+gethex(style[6]))/765);
+	else return (-1);  /* "none" */
+}
+
 /* Pick pen and area style */
 void chkstyle (xmlNodePtr node)
 {
 	xmlChar *attr;
-	char *style;
+	int retcode;
 
-	if (wireframe != 1) {
 	  attr = xmlGetProp(node, (const xmlChar *) "fill");
 	  if(attr != NULL) {
-			if(xmlStrcmp(attr, (const xmlChar *) "none") == 0) {
-				if (area == 1) {
-					area=0;
-					fprintf(stderr,"\n  Back to line mode");
+			retcode=get_color((const char *)attr);
+			if ((retcode == -1) && (area == 1)) {
+				area=0;
+				fprintf(stderr,"\n  Disabling area mode");
 				}
-			}
-			else if(xmlStrcmp(attr, (const xmlChar *) "black") == 0) {
+			else {
 				area=1;
-				pen=DITHER_BLACK;
-				fprintf(stderr,"\n  Black area mode selected");
-			}
-			else if(xmlStrcmp(attr, (const xmlChar *) "white") == 0) {
-				area=1;
-				pen=DITHER_WHITE;
-				fprintf(stderr,"\n  White area mode selected");
-			}
-			else if ((unsigned char)attr[0] == '#') {
-				area=1;
-				//convert the RGB color to a value between 11 and 0
-				pen=(unsigned char) (11-11*(16*gethex((const char)attr[1])+gethex((const char)attr[2])+
-				  16*gethex((const char)attr[3])+gethex((const char)attr[4])+
-				  16*gethex((const char)attr[5])+gethex((const char)attr[6]))/765);
-				fprintf(stderr,"\n  Area mode selected, fill dither code: %i",pen);
+				fill=(unsigned char)retcode;
+				fprintf(stderr,"\n  Area mode enabled, dither level: %i",fill);
 			}
 	  }
 	  xmlFree(attr);
-	  if (area == 0) {
+	  /* Now the line properties */
+	  attr = xmlGetProp(node, (const xmlChar *) "stroke");
+	  if(attr != NULL) {
+			retcode=get_color((const char *)attr);
+			if ((retcode == -1) && (line == 1)) {
+				line=0;
+				fprintf(stderr,"\n  Disabling line mode");
+				}
+			else {
+				line=1;
+				pen=(unsigned char)retcode;
+				fprintf(stderr,"\n  Line mode enabled, dither level: %i",fill);
+			}
+	  }
+	  xmlFree(attr);
+	  if (line == 1) {
 		  attr = xmlGetProp(node, (const xmlChar *) "stroke-width");
 		  if(attr != NULL) {
-			  pen=DITHER_BLACK+atoi((unsigned char *)attr);
-		  	  fprintf(stderr,"\n  Extra pen width: %i", pen);
-		  }
+			  pen=atoi((unsigned char *)attr);
+			  if ((pen>1)&&(pen!=0)) {
+				pen=DITHER_BLACK+(pen)/2;
+				if (pen>15) pen=15;
+				fprintf(stderr,"\n  Extra pen width: %i", pen);
+			  } else pen = color;
+		  } //else pen = color;
 		  xmlFree(attr);
 	  }
-	}
 }
 
+
+void chkstyle2(xmlNodePtr node)
+{
+	xmlChar *attr;
+	char *myattr;
+	char *style;
+	char *sstyle;
+	int retcode;
+
+	  attr = xmlGetProp(node, (const xmlChar *) "style");
+	  if(attr != NULL) {
+		sstyle=strdup((const char *)attr);
+		style=sstyle;
+		strtok(style,";:");
+		while (style != NULL) {
+			if (!strcmp(style,"fill")) {
+				style=strtok(NULL,";:");
+				retcode=get_color(style);
+				if ((retcode == -1) && (area == 1)) {
+					area=0;
+					fprintf(stderr,"\n  Disabling area mode");
+					}
+				else {
+					area=1;
+					fill=(unsigned char)retcode;
+					fprintf(stderr,"\n  Area mode enabled, dither level: %i",fill);
+				}
+			}
+
+			if (!strcmp(style,"stroke")) {
+				style=strtok(NULL,";:");
+				retcode=get_color(style);
+				if ((retcode == -1) && (line == 1)) {
+					line=0;
+					fprintf(stderr,"\n  Disabling line mode");
+					}
+				else {
+					line=1;
+					pen=(unsigned char)retcode;
+					fprintf(stderr,"\n  Line mode enabled, dither level: %i",fill);
+				}
+			}
+			
+			if (!strcmp(style,"stroke-width")) {
+				style=strtok(NULL,";:");
+				if (line == 1) {
+					pen=atoi((unsigned char *)attr);
+					  if ((pen>1)&&(pen!=0)) {
+						pen=DITHER_BLACK+(pen)/2;
+						if (pen>15) pen=15;
+						fprintf(stderr,"\n  Extra pen width: %i", pen);
+					  } else pen = color;
+				}
+			}
+
+			style=strtok(NULL,";:");
+		}
+	  }
+	//free(sstyle);
+	xmlFree(attr);
+}
 
 int main( int argc, char *argv[] )
 {
@@ -108,7 +191,8 @@ int main( int argc, char *argv[] )
 	int xshift=0;
 	int yshift=0;
 	int pathdetails=0;
-	unsigned char color=DITHER_BLACK;  /* 11 (black thin pen) is default */
+	int wireframe=0;
+	int autosize=0;
 	char hexval[3]="00";
 	int inipath;
 
@@ -136,6 +220,8 @@ int main( int argc, char *argv[] )
       fprintf(stderr,"\nParameter error, use 'z80svg -h' for help.\n\n");
       exit(1);
     }
+
+	color=DITHER_BLACK;  /* 11 (black thin pen) is default */
     
 	for (i = 1; i < argc; i++) {
 	 arg = argv[i];
@@ -149,6 +235,7 @@ int main( int argc, char *argv[] )
 			fprintf(stderr,"\n      The default name is 'svg_picture'");
 			fprintf(stderr,"\n   -oTARGET: output file name. '.h' is always added.");
 			fprintf(stderr,"\n      Default is the source SVG file name with trailing '.h'.");
+			fprintf(stderr,"\n   -a: run twice and resize the picture automatically.");
 			fprintf(stderr,"\n   -sSCALE: optional percentage to resize the picture size.");
 			fprintf(stderr,"\n   -xXSHIFT: optional top-left corner shifting, X coordinate.");
 			fprintf(stderr,"\n      Negative values are allowed.");
@@ -214,6 +301,9 @@ int main( int argc, char *argv[] )
 				exit(1);
 			}
 			break;
+	   case 'a' :
+			autosize=1;
+			break;
 	   default :
 			if (*p != arg) *p = arg;
 			p++;
@@ -231,6 +321,10 @@ int main( int argc, char *argv[] )
     /* Initialize the XML library */
     /* (do we really need this?) */
     LIBXML_TEST_VERSION
+
+	if (autosize==1)
+		fprintf(stderr,"\n------\nAutosize mode, FIRST PASS\n------\n");
+autoloop:
 
 	doc = xmlParseFile(sname);
 	
@@ -274,7 +368,6 @@ int main( int argc, char *argv[] )
 			return 1;
 		}
 
-		wireframe = 0;
 		width = height = 255;
 		x = y = inix = iniy = 0;
 
@@ -315,6 +408,7 @@ int main( int argc, char *argv[] )
 		node = node->xmlChildrenNode;
 		// Show all nodes in the current pos
 		pathcnt=0;
+		inipath=0;
 		while(node != NULL) {
 			if(xmlStrcmp(node->name, (const xmlChar *) "g") == 0) {
 
@@ -326,9 +420,13 @@ int main( int argc, char *argv[] )
 				xmlFree(attr);
 
 				pen=color;
+				fill=color;
 				area=0;
 
-				chkstyle (node);
+				if (wireframe != 1) {
+					chkstyle (node);
+					chkstyle2 (node);
+				}
 
 				node = node->xmlChildrenNode;
 			}
@@ -339,7 +437,10 @@ int main( int argc, char *argv[] )
 				fprintf(stderr,"\n  Processing path group #%u, id: %s",pathcnt,(const char *)attr);
 				xmlFree(attr);
 
-				chkstyle (node);
+				if (wireframe != 1) {
+					chkstyle (node);
+					chkstyle2 (node);
+				}
 
 				attr = xmlGetProp(node, (const xmlChar *) "d");
 
@@ -376,14 +477,14 @@ int main( int argc, char *argv[] )
 						/* End of path block */
 						if ((cmd == 'Z')||(cmd == 'z')) {
 							if ( (x != inix) || (y != iniy) )
-							  if (area==1)
+							  if ((area==1) && (line==0))
 								fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_AREA_LINETO, inix, iniy);
 							  else
 								fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_LINETO|pen, inix, iniy);
-							if ((area == 1) && (inipath==1)) {
-								fprintf(dest,"\n\t0x%2X,", CMD_AREA_CLOSE|pen);
-							}
-							inipath=0;
+							//if ((area == 1) && (inipath==1)) {
+							//	fprintf(dest,"\n\t0x%2X,", CMD_AREA_CLOSE|pen);
+							//}
+							//inipath=0;
 							if (pathdetails>0) printf("\n%c", cmd);
 							if (strlen(path)>0) {
 								//oldcmd=*path;
@@ -453,17 +554,20 @@ The following commands are available for path data:
 
 							switch (cmd) {
 								case 'M':
+								case 'm':
+									if ((inipath==0) && (area==1) && (line==1))
+										fprintf( dest,"\n\t0x%2X,", CMD_AREA_INITB );
 									inipath=1;
 									inix=x;
 									iniy=y;
-									if (area==1)
+									if ((area==1) && (line==0))
 									  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,", CMD_AREA_PLOT, x, y);
 									else
 									  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,", CMD_PLOT|pen, x, y);
 									break;
 								default:
 									if ( (x != oldx) || (y != oldy) )
-									  if (area==1)
+									  if ((area==1) && (line==0))
 										fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_AREA_LINETO, x, y);
 									  else
 									    fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_LINETO|pen, x, y);
@@ -481,7 +585,7 @@ The following commands are available for path data:
 					}
 					if (pathdetails>0) printf("\n");
 					if ((area == 1) && (inipath==1)) {
-						fprintf(dest,"\n\t0x%2X,", CMD_AREA_CLOSE|pen);
+						fprintf(dest,"\n\t0x%2X,", CMD_AREA_CLOSE|fill);
 					}
 					inipath=0;
 				}
@@ -521,6 +625,26 @@ The following commands are available for path data:
 	}
 
     (void)fcloseall();
+
+	if (autosize==1) {
+		autosize++;
+		fprintf(stderr,"\n\n\n------\nAutosize mode, SECOND PASS\n------\n");
+		if ((arm-alm)>(abm-atm)) {
+			scale=100*255/(arm-alm);
+			fprintf(stderr,"Autosizing in landscape mode (max x = 255)\n");
+		} else {
+			scale=100*255/(abm-atm);
+			fprintf(stderr,"Autosizing in portrait mode (max y = 255)\n");
+		}
+		xshift=scale*(xshift-alm)/100;
+		yshift=scale*(yshift-atm)/100;
+		fprintf(stderr,"X shift: %i\n", xshift);
+		fprintf(stderr,"Y shift: %i\n", yshift);
+		fprintf(stderr,"Scale factor: %f%%\n", scale);
+		fprintf(stderr,"\n------\n------\n");
+
+		goto autoloop;
+	}
 
 	fprintf(stderr,"\n\nConversion done.\n");
 }
