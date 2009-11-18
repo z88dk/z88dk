@@ -7,7 +7,7 @@
    in a C source data declaration to be used
    in z88dk with the "draw_profile" function.
 
-   $Id: z80svg.c,v 1.2 2009-11-13 11:12:35 stefano Exp $
+   $Id: z80svg.c,v 1.3 2009-11-18 08:16:43 stefano Exp $
 */
 
 
@@ -27,6 +27,7 @@ unsigned char pen;
 unsigned char fill;
 /* default */
 unsigned char color;
+int color_balance;
 /* fill flags */
 unsigned char area;
 unsigned char line;
@@ -54,14 +55,21 @@ char *skip_num(char *p) {
 }
 
 int get_color(char *style) {
+	int color;
+	if(!strncmp(style, "url",3))
+		return(3);
 	if(!strcmp(style, "black"))
 		return(DITHER_BLACK);
 	else if(!strcmp(style, "white"))
 		return(DITHER_WHITE);
-	else if (style[0] == '#')
-		return(11-11*(16*gethex(style[1])+gethex(style[2])+
+	else if (style[0] == '#') {
+		color = color_balance+(11-11*(16*gethex(style[1])+gethex(style[2])+
 		  16*gethex(style[3])+gethex(style[4])+
-		  16*gethex(style[5])+gethex(style[6]))/765);
+		  16*gethex(style[5])+gethex(style[6]))/(255*3));
+		if (color > 11) color=11;
+		if (color < 0) color=0;
+		return (color);
+	  }
 	else return (-1);  /* "none" */
 }
 
@@ -70,28 +78,49 @@ void chkstyle (xmlNodePtr node)
 {
 	xmlChar *attr;
 	int retcode;
+	float opacity;
+	char *style;
 
+	  opacity = 1;
+	  attr = xmlGetProp(node, (const xmlChar *) "fill-opacity");
+	  if(attr != NULL) {
+			opacity=atof((const char *)attr);
+	  }
+	  xmlFree(attr);
 	  attr = xmlGetProp(node, (const xmlChar *) "fill");
 	  if(attr != NULL) {
-			retcode=get_color((const char *)attr);
-			if ((retcode == -1) && (area == 1)) {
+			style=strdup((const char *)attr);
+			retcode=get_color(style);
+			free(style);
+			if (retcode == -1) {
+				if (area == 1) fprintf(stderr,"\n  Disabling area mode");
 				area=0;
-				fprintf(stderr,"\n  Disabling area mode");
 				}
-			else {
+			else if (opacity > 0.65) {
 				area=1;
 				fill=(unsigned char)retcode;
 				fprintf(stderr,"\n  Area mode enabled, dither level: %i",fill);
+			} else {
+				if (area == 1) fprintf(stderr,"\n  Disabling area mode (too transparent)");
+				area=0;
 			}
 	  }
 	  xmlFree(attr);
 	  /* Now the line properties */
+	  attr = xmlGetProp(node, (const xmlChar *) "stroke-opacity");
+	  if(attr != NULL) {
+			opacity=atof((const char *)attr);
+	  } else opacity=0;
+	  xmlFree(attr);
 	  attr = xmlGetProp(node, (const xmlChar *) "stroke");
 	  if(attr != NULL) {
-			retcode=get_color((const char *)attr);
-			if ((retcode == -1) && (line == 1)) {
+			style=strdup((const char *)attr);
+			retcode=get_color(style);
+			free(style);
+			if (opacity > 0.9) retcode=DITHER_BLACK;
+			if (retcode == -1) {
 				line=0;
-				fprintf(stderr,"\n  Disabling line mode");
+				if (line == 1) fprintf(stderr,"\n  Disabling line mode");
 				}
 			else {
 				line=1;
@@ -122,6 +151,7 @@ void chkstyle2(xmlNodePtr node)
 	char *style;
 	char *sstyle;
 	int retcode;
+	float opacity;
 
 	  attr = xmlGetProp(node, (const xmlChar *) "style");
 	  if(attr != NULL) {
@@ -132,9 +162,9 @@ void chkstyle2(xmlNodePtr node)
 			if (!strcmp(style,"fill")) {
 				style=strtok(NULL,";:");
 				retcode=get_color(style);
-				if ((retcode == -1) && (area == 1)) {
+				if (retcode == -1) {
 					area=0;
-					fprintf(stderr,"\n  Disabling area mode");
+					if (area == 1) fprintf(stderr,"\n  Disabling area mode");
 					}
 				else {
 					area=1;
@@ -143,12 +173,27 @@ void chkstyle2(xmlNodePtr node)
 				}
 			}
 
+			if (!strcmp(style,"fill-opacity")) {
+				style=strtok(NULL,";:");
+				opacity=atof(style);
+				if (opacity <= 0.66) {
+					if (area == 1) fprintf(stderr,"\n  Disabling area mode (too transparent)");
+					area=0;
+				}
+			}
+
+			opacity=0;
+			if (!strcmp(style,"stroke-opacity")) {
+				style=strtok(NULL,";:");
+				opacity=atof(style);
+			}
+
 			if (!strcmp(style,"stroke")) {
 				style=strtok(NULL,";:");
 				retcode=get_color(style);
-				if ((retcode == -1) && (line == 1)) {
+				if ((retcode == -1) && (opacity>0.9)) {
 					line=0;
-					fprintf(stderr,"\n  Disabling line mode");
+					if (line == 1) fprintf(stderr,"\n  Disabling line mode");
 					}
 				else {
 					line=1;
@@ -179,7 +224,7 @@ void chkstyle2(xmlNodePtr node)
 int main( int argc, char *argv[] )
 {
     FILE *source,*dest;
-    unsigned char Dummy[100];
+    unsigned char Dummy[300];
     int i,c;
     char** p = argv+1;
 	char *arg;
@@ -193,6 +238,8 @@ int main( int argc, char *argv[] )
 	int pathdetails=0;
 	int wireframe=0;
 	int autosize=0;
+	int grouping=0;
+	int rotate=0;
 	char hexval[3]="00";
 	int inipath;
 
@@ -200,6 +247,10 @@ int main( int argc, char *argv[] )
 	xmlNodePtr node;
 	xmlChar *attr;
 	xmlNodePtr gnode[100];
+	/*unsigned char nodecolor[500];
+	unsigned char nodefill[500];
+	unsigned char nodearea[500];
+	unsigned char nodeline[500];*/
 	unsigned int gcount=0;
 
 	char *path;
@@ -222,6 +273,7 @@ int main( int argc, char *argv[] )
     }
 
 	color=DITHER_BLACK;  /* 11 (black thin pen) is default */
+	color_balance=0;
     
 	for (i = 1; i < argc; i++) {
 	 arg = argv[i];
@@ -229,8 +281,8 @@ int main( int argc, char *argv[] )
 	   switch (arg[1]) {
 	   case 'h' :
 			fprintf(stderr,"\nz80svg - SVG vector format conversion tool for z88dk \n");
-			fprintf(stderr,"USAGE: z80svg  [opts] <SVG file>\n");
-			fprintf(stderr,"\nopts:");
+			fprintf(stderr,"USAGE: z80svg [options] <SVG file>\n");
+			fprintf(stderr,"\noptions:");
 			fprintf(stderr,"\n   -nSTRUCTNAME: name of the C structure being created.");
 			fprintf(stderr,"\n      The default name is 'svg_picture'");
 			fprintf(stderr,"\n   -oTARGET: output file name. '.h' is always added.");
@@ -243,7 +295,10 @@ int main( int argc, char *argv[] )
 			fprintf(stderr,"\n      Negative values are allowed.");
 			fprintf(stderr,"\n   -cCOLOR: Change pen color, default is black (11).");
 			fprintf(stderr,"\n      (0-11) white to black, (12-15) thicker gray to black.");
+			fprintf(stderr,"\n   -lSHIFT: Adjust color brightness, +/- 10.");
+			fprintf(stderr,"\n   -r: Rotate the picture.");
 			fprintf(stderr,"\n   -w: Enable wireframe mode.");
+			fprintf(stderr,"\n   -g: Group paths forming the same area in a single stencil block.");
 			fprintf(stderr,"\n   -p1: List path details to stdout (original float values).");
 			fprintf(stderr,"\n   -p2: List path details to stdout (converted int values).");
 			fprintf(stderr,"\n\n");
@@ -291,8 +346,21 @@ int main( int argc, char *argv[] )
 				exit(1);
 			}
 			break;
+	   case 'l' :
+			color_balance=atoi(arg+2);
+			if ((color_balance > 10)||(color_balance < -10)) {
+				fprintf(stderr,"\nInvalid color brightness shift.\n");
+				exit(1);
+			}
+			break;
 	   case 'w' :
 			wireframe=1;
+			break;
+	   case 'r' :
+			rotate=1;
+			break;
+	   case 'g' :
+			grouping=1;
 			break;
 	   case 'p' :
 			pathdetails=atoi(arg+2);
@@ -370,6 +438,8 @@ autoloop:
 
 		width = height = 255;
 		x = y = inix = iniy = 0;
+		pen=color;
+		fill=color;
 
 		// Width
 		attr = xmlGetProp(node, (const xmlChar *) "width");
@@ -422,6 +492,7 @@ autoloop:
 				pen=color;
 				fill=color;
 				area=0;
+				line=1;
 
 				if (wireframe != 1) {
 					chkstyle (node);
@@ -432,9 +503,16 @@ autoloop:
 			}
 			if(xmlStrcmp(node->name, (const xmlChar *) "path") == 0) {
 
+/*				nodecolor[pathcnt]=pen;
+				nodecolor[pathcnt]=fill;
+				nodearea[pathcnt]=area;
+				nodeline[pathcnt]=line;
+*/
 				pathcnt++;
 				attr = xmlGetProp(node, (const xmlChar *) "id");
-				fprintf(stderr,"\n  Processing path group #%u, id: %s",pathcnt,(const char *)attr);
+				strcpy(Dummy,"(no name)");
+				sprintf(Dummy,"%s",(const char *)attr);
+				fprintf(stderr,"\n  Processing path group #%u, id: %s",pathcnt,Dummy);
 				xmlFree(attr);
 
 				if (wireframe != 1) {
@@ -445,7 +523,7 @@ autoloop:
 				attr = xmlGetProp(node, (const xmlChar *) "d");
 
 				nodecnt=0; skipcnt=0;
-				fprintf(dest,"\n\n\t/* Group #%u */\t", pathcnt);
+				fprintf(dest,"\n\n\t// Group #%u - %s\n", pathcnt,Dummy);
 
 				// Init rel margin limits (inverted)
 				lm = width;
@@ -460,7 +538,6 @@ autoloop:
 					/* ************************* */
 					spath=strdup((const char *)attr);
 					path=spath;
-					//strtok(path," ,");
 					oldx=0; oldy=0;
 					svcx=0; svcy=0;
 
@@ -477,14 +554,12 @@ autoloop:
 						/* End of path block */
 						if ((cmd == 'Z')||(cmd == 'z')) {
 							if ( (x != inix) || (y != iniy) )
-							  if ((area==1) && (line==0))
-								fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_AREA_LINETO, inix, iniy);
-							  else
-								fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_LINETO|pen, inix, iniy);
-							//if ((area == 1) && (inipath==1)) {
-							//	fprintf(dest,"\n\t0x%2X,", CMD_AREA_CLOSE|pen);
-							//}
-							//inipath=0;
+							  if ((area==1)||(line==1)) {
+								  if ((area==1) && (line==0))
+									fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_AREA_LINETO, inix, iniy);
+								  else
+									fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_LINETO|pen, inix, iniy);
+							  }
 							if (pathdetails>0) printf("\n%c", cmd);
 							if (strlen(path)>0) {
 								//oldcmd=*path;
@@ -495,11 +570,17 @@ autoloop:
 							nodecnt++;
 							/* Vertical and Horizontal lines take 1 parameter only */
 							if (toupper(cmd) != 'V') {
-								cx=scale*(atof(path)-xx)/100;
+								if (rotate==1)
+									cy=scale*(atof(path)-xx)/100;
+								else
+									cx=scale*(atof(path)-xx)/100;
 								path=skip_num(path);
 							}
 							if (toupper(cmd) != 'H') {
-								cy=scale*(atof(path)-yy)/100;
+								if (rotate==1)
+									cx=scale*(atof(path)-yy)/100;
+								else
+									cy=scale*(atof(path)-yy)/100;
 								path=skip_num(path);
 							}
 							/* don't consider the second parameter of a relative curve*/
@@ -519,10 +600,20 @@ autoloop:
 							
 							sprintf (tmpstr,"%0.f",(255*cx/width));
 							fx=atof(tmpstr)+xshift;
+							if (autosize==2) {
+								if (fx<=0) fx=0;
+								if (fx>=255) fx=255;
+								sprintf (tmpstr,"%0.f",fx-xshift);
+							}
 							x=atoi(tmpstr)+xshift;
 							sprintf (tmpstr,"%0.f",(255*cy/height));
 							fy=atof(tmpstr)+yshift;	
-							y=atoi(tmpstr)+yshift;							
+							if (autosize==2) {
+								if (fy<=0) fy=0;
+								if (fy>=255) fy=255;
+								sprintf (tmpstr,"%0.f",fy-yshift);
+							}
+							y=atoi(tmpstr)+yshift;				
 
 							/* keep track of margins */
 							if (lm>fx) lm=fx;
@@ -531,7 +622,8 @@ autoloop:
 							if (bm<fy) bm=fy;
 
 							//printf("|%c| 0x%02X 0x%02X",cmd, x, y);
-							if (pathdetails==2) printf("\n%c %03u %03u",cmd, x, y);
+							if ((area==1)||(line==1))
+								if (pathdetails==2) printf("\n%c %03u %03u",cmd, x, y);
 							
 /*
   The <path> Tag
@@ -557,36 +649,47 @@ The following commands are available for path data:
 								case 'm':
 									if ((inipath==0) && (area==1) && (line==1))
 										fprintf( dest,"\n\t0x%2X,", CMD_AREA_INITB );
-									inipath=1;
+									else if (grouping == 0) {
+										if ((inipath==1) && (area==1) && (line==1))
+											fprintf(dest,"\t0x%2X,", CMD_AREA_CLOSE|fill);
+										if ((area==1) && (line==1))
+											fprintf( dest,"\n\t0x%2X,", CMD_AREA_INITB );
+									}
 									inix=x;
 									iniy=y;
-									if ((area==1) && (line==0))
-									  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,", CMD_AREA_PLOT, x, y);
-									else
-									  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,", CMD_PLOT|pen, x, y);
+									if ((area==1)||(line==1)) {
+										if ((area==1) && (line==0)) {
+										  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,", CMD_AREA_PLOT, x, y);
+									    }
+										else
+										  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,", CMD_PLOT|pen, x, y);
+									}
+									inipath=1;
 									break;
 								default:
 									if ( (x != oldx) || (y != oldy) )
+									if ((area==1)||(line==1)) {
 									  if ((area==1) && (line==0))
 										fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_AREA_LINETO, x, y);
 									  else
 									    fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_LINETO|pen, x, y);
+									}
 									else
 									skipcnt++;
-									//	printf (" (skipping)");
 									break;
 							}
-							//printf ("\n");
 							oldx=x; oldy=y;
 						}
 						
 						path=skip_spc(path);
-						//path=strtok(NULL," ,");
 					}
-					if (pathdetails>0) printf("\n");
+
 					if ((area == 1) && (inipath==1)) {
-						fprintf(dest,"\n\t0x%2X,", CMD_AREA_CLOSE|fill);
+						fprintf(dest,"\t0x%2X,", CMD_AREA_CLOSE|fill);
 					}
+
+					if (pathdetails>0) printf("\n");					
+						
 					inipath=0;
 				}
 				xmlFree(attr);
@@ -606,6 +709,12 @@ The following commands are available for path data:
 				fprintf(stderr,"\n    bottom : %f\n",bm);
 			} /* path */
 
+/*
+			pen=nodecolor[pathcnt-1];
+			fill=nodecolor[pathcnt-1];
+			area=nodearea[pathcnt-1];
+			line=nodeline[pathcnt-1];
+*/
 			node = node->next;
 			if ((node == NULL) && (gcount>0)) {
 				gcount--;
@@ -627,7 +736,7 @@ The following commands are available for path data:
     (void)fcloseall();
 
 	if (autosize==1) {
-		autosize++;
+		autosize=2;
 		fprintf(stderr,"\n\n\n------\nAutosize mode, SECOND PASS\n------\n");
 		if ((arm-alm)>(abm-atm)) {
 			scale=100*255/(arm-alm);
@@ -638,12 +747,18 @@ The following commands are available for path data:
 		}
 		xshift=scale*(xshift-alm)/100;
 		yshift=scale*(yshift-atm)/100;
-		fprintf(stderr,"X shift: %i\n", xshift);
-		fprintf(stderr,"Y shift: %i\n", yshift);
-		fprintf(stderr,"Scale factor: %f%%\n", scale);
 		fprintf(stderr,"\n------\n------\n");
 
 		goto autoloop;
+	}
+
+	if (autosize==2) {
+		fprintf(stderr,"\n------\n");
+		fprintf(stderr,"Autosize summary:\n");
+		fprintf(stderr,"X shift: %i\n", xshift);
+		fprintf(stderr,"Y shift: %i\n", yshift);
+		fprintf(stderr,"Scale factor: %f%%\n", scale);
+		fprintf(stderr,"------");
 	}
 
 	fprintf(stderr,"\n\nConversion done.\n");
