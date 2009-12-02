@@ -5,7 +5,7 @@
 ;
 ;		void draw_profile(int dx, int dy, int scale, unsigned char *metapic);
 ;
-;	$Id: draw_profile.asm,v 1.3 2009-11-13 11:09:38 stefano Exp $
+;	$Id: draw_profile.asm,v 1.4 2009-12-02 13:20:59 stefano Exp $
 ;
 
 
@@ -50,9 +50,19 @@ _cy1:		defw	0
 
 _pic:		defw	0
 
+repcmd:		defb	0
+repcnt:		defb	0
+
 ; moved into stack
 ;;_stencil:	defs	maxy*2
 _stencil:	defw	0
+
+getbyte:
+	ld	hl,(_pic)
+	ld	a,(hl)
+	inc	hl
+	ld	(_pic),hl
+	ret
 
 getx:
 	ld	hl,(_vx)
@@ -67,10 +77,7 @@ gety:
 getparm:		;cx=vx+percent*pic[x++]/100;
 	push hl
 	ld	de,(_percent)
-	ld	hl,(_pic)
-	ld	a,(hl)
-	inc	hl
-	ld	(_pic),hl
+	call	getbyte
 	ld	h,0
 	ld	l,a
 	call l_mult
@@ -110,10 +117,15 @@ draw_profile:
 	ld		(_stencil),hl
 
 picture_loop:
-	ld	hl,(_pic)
-	ld	a,(hl)
-	inc	hl
-	ld	(_pic),hl
+	ld		a,(repcnt)
+	and		a
+	jr		z,norepeat
+	dec		a
+	ld		(repcnt),a
+	ld		a,(repcmd)
+	jr		noend
+norepeat:
+	call	getbyte
 	and	a		; CMD_END ?
 	jr		nz,noend
 	;******
@@ -135,22 +147,37 @@ noend:
 
 	ld	hl,(_stencil)
 
+;#define CMD_AREA_INIT		0x80	/* no parms */
+;#define CMD_AREA_INITB		0x81	/* activate border mode */
+;#define REPEAT_COMMAND		0x82	/* times, command */
+
 	cp  $80		; CMD_AREA_INIT (no parameters)
 	jr	nz,noinit
 	push hl		; _stencil
+	ld	a,(_dith)
+	cp	2
+	jr	z,do_repeat
 	ld	hl,0
 	ld	(_areaptr),hl
-	ld	a,(_dith)
 	and a			; no parameters ?
 	jr	z,just_init	; then, don't keep ptr for border
+	dec	a
+	jr	z,init_loop		;$81 ?
+	; else (82..) REPEAT_COMMAND
+do_repeat:
+	call getbyte
+	ld	(repcnt),a
+	call getbyte
+	ld	(repcmd),a
+	jp	go_end1
+init_loop:	
 	ld	hl,(_pic)	; >0, so save current pic ptr
 	ld	(_areaptr),hl
 just_init:
 	pop	hl
 	push hl		; _stencil
 	call stencil_init
-	pop	hl
-	jr	picture_loop
+	jp	go_end1
 noinit:
 
 	cp  $F0		; CMD_AREA_CLOSE (no parameters ?)
@@ -211,9 +238,32 @@ noclose:
 noamode:
 ;----
 
-	cp  $30		; CMD_LINE (4 parameters ?)
+	pop	af
+	push af
+	
+	cp	$30		; CMD_HLINETO (1 parameter)
+	jr	z,xparm
+	cp	$B0		; CMD_AREA_HLINETO (1 parameter)
+	jr	nz,noxparm
+xparm:
+	call getx
+	ld	(_cx),hl
+	jr	twoparms
+noxparm:
+
+	cp	$40		; CMD_VLINETO (1 parameter)
+	jr	z,yparm
+	cp	$C0		; CMD_AREA_VLINETO (1 parameter)
+	jr	nz,noyparm
+yparm:
+	call gety
+	ld	(_cy),hl
+	jr	twoparms
+noyparm:
+
+	cp  $50		; CMD_LINE (4 parameters ?)
 	jr	z,fourparms
-	cp  $B0		; CMD_AREA_LINE (4 parameters ?)
+	cp  $D0		; CMD_AREA_LINE (4 parameters ?)
 fourparms:
 	push af		; keep zero flag
 	call getx
@@ -234,7 +284,7 @@ twoparms:
 	push hl
 	ld	hl,(_cy)
 	push hl
-	
+
 	cp	$90	; CMD_AREA_PLOT (x,y)
 	jr	nz,noaplot
 	ld	hl,(_stencil)
@@ -244,18 +294,24 @@ twoparms:
 noaplot:
 
 	cp	$A0	; CMD_AREA_LINETO (x,y)
-	jr	nz,noalineto
+	jr	c,noaline
+	cp	$D0
+	jr	z,aline
+	jr	nc,noaline ; >= CMD_AREA_VLINETO
+	; AREA_LINETO stuff
 	ld	hl,(_stencil)
 	push hl
 	call stencil_add_lineto
 	jr	go_end3
-noalineto:
 
-	cp $B0 ; CMD_AREA_LINE (x1,x2,y1,y2)
-	jr	nz,noaline
+aline:
+	;cp $D0 ; CMD_AREA_LINE (x1,x2,y1,y2)
+	;jr	nz,noaline
 	ld	hl,(_cx1)
+	ld	(_cx),hl	; update also the first parameter couple...
 	push hl
 	ld	hl,(_cy1)
+	ld	(_cy),hl	; ..so VLINE and HLINE behave correctly
 	push hl
 	ld	hl,(_stencil)
 	push hl
@@ -319,17 +375,20 @@ dorender:
 	ld	hl,(_stencil)	; 'render' can destroy the current parameter
 	push hl
 	call stencil_init
-	pop	hl
-	jp	picture_loop
+	jr go_end1
 
 noplot:
 
-	cp $20 ; CMD_LINETO (x,y,dither),
-	jr	nz,nolineto
-	ld	hl,(_stencil)
-	ld	a,(_dith)
-	and	a				; when possible drawto/undrawto are faster
-	jr	nz,nodtwhite
+	cp $20		; CMD_LINETO (x,y,dither),
+	jr c,go_end2
+	cp $50		; CMD_LINE
+	jr z,line
+	jr nc,go_end2
+	; LINETO stuff
+	ld hl,(_stencil)
+	ld a,(_dith)
+	and a				; when possible drawto/undrawto are faster
+	jr nz,nodtwhite
 	call undrawto
 	jr	go_end2
 nodtwhite:
@@ -342,13 +401,15 @@ nodtblack:
 	call stencil_init
 	call stencil_add_lineto
 	jr plend
-nolineto:
 
-	cp $30 ; CMD_LINE (x,y,x2,y2,dither),
-	jr	nz,go_end2
+line:
+	;cp $50 ; CMD_LINE (x,y,x2,y2,dither),
+	;jr	nz,go_end2
 	ld	hl,(_cx1)
+	ld	(_cx),hl	; update also the first parameter couple...
 	push hl
 	ld	hl,(_cy1)
+	ld	(_cy),hl	; ..so VLINE and HLINE behave correctly
 	push hl
 	ld	hl,(_stencil)
 	ld	a,(_dith)

@@ -7,7 +7,7 @@
    in a C source data declaration to be used
    in z88dk with the "draw_profile" function.
 
-   $Id: z80svg.c,v 1.3 2009-11-18 08:16:43 stefano Exp $
+   $Id: z80svg.c,v 1.4 2009-12-02 13:21:00 stefano Exp $
 */
 
 
@@ -240,6 +240,8 @@ int main( int argc, char *argv[] )
 	int autosize=0;
 	int grouping=0;
 	int rotate=0;
+	int expanded=0;
+	int maxelements=0;
 	char hexval[3]="00";
 	int inipath;
 
@@ -256,6 +258,7 @@ int main( int argc, char *argv[] )
 	char *path;
 	char *spath;
 	char tmpstr[10];
+	char destline[2048];
 	unsigned char cmd, oldcmd;
 	unsigned char x,y,inix,iniy;
 	unsigned char oldx, oldy;
@@ -266,6 +269,7 @@ int main( int argc, char *argv[] )
 	float lm,rm,tm,bm;
 	float alm,arm,atm,abm;
 	unsigned int pathcnt,nodecnt,skipcnt;
+	int	elementcnt;
 	
     if ( (argc < 2) ) {
       fprintf(stderr,"\nParameter error, use 'z80svg -h' for help.\n\n");
@@ -280,9 +284,9 @@ int main( int argc, char *argv[] )
 	 if (arg && *arg == '-') {
 	   switch (arg[1]) {
 	   case 'h' :
-			fprintf(stderr,"\nz80svg - SVG vector format conversion tool for z88dk \n");
-			fprintf(stderr,"USAGE: z80svg [options] <SVG file>\n");
-			fprintf(stderr,"\noptions:");
+			fprintf(stderr,"\n\nz80svg - SVG vector format conversion tool for z88dk \n");
+			fprintf(stderr,"Usage: z80svg [options] <SVG file>");
+			fprintf(stderr,"\nOptions:");
 			fprintf(stderr,"\n   -nSTRUCTNAME: name of the C structure being created.");
 			fprintf(stderr,"\n      The default name is 'svg_picture'");
 			fprintf(stderr,"\n   -oTARGET: output file name. '.h' is always added.");
@@ -295,13 +299,15 @@ int main( int argc, char *argv[] )
 			fprintf(stderr,"\n      Negative values are allowed.");
 			fprintf(stderr,"\n   -cCOLOR: Change pen color, default is black (11).");
 			fprintf(stderr,"\n      (0-11) white to black, (12-15) thicker gray to black.");
-			fprintf(stderr,"\n   -lSHIFT: Adjust color brightness, +/- 10.");
+			fprintf(stderr,"\n   -bSHIFT: Adjust 'color' brightness, +/- 10.");
 			fprintf(stderr,"\n   -r: Rotate the picture.");
 			fprintf(stderr,"\n   -w: Enable wireframe mode.");
+			fprintf(stderr,"\n   -e<1,2>: Encode in expanded form, repeating every command.");
+			fprintf(stderr,"\n   -l<1-255>: Force max number of 'lineto' elements in a row.");
 			fprintf(stderr,"\n   -g: Group paths forming the same area in a single stencil block.");
 			fprintf(stderr,"\n   -p1: List path details to stdout (original float values).");
 			fprintf(stderr,"\n   -p2: List path details to stdout (converted int values).");
-			fprintf(stderr,"\n\n");
+			fprintf(stderr,"\n");
 			exit(1);
 			break;
 	   case 'n' :
@@ -347,6 +353,13 @@ int main( int argc, char *argv[] )
 			}
 			break;
 	   case 'l' :
+			maxelements=atoi(arg+2);
+			if (maxelements > 255) {
+				fprintf(stderr,"\nInvalid max. number of line elements per row.\n");
+				exit(1);
+			}
+			break;
+	   case 'b' :
 			color_balance=atoi(arg+2);
 			if ((color_balance > 10)||(color_balance < -10)) {
 				fprintf(stderr,"\nInvalid color brightness shift.\n");
@@ -369,6 +382,13 @@ int main( int argc, char *argv[] )
 				exit(1);
 			}
 			break;
+	   case 'e' :
+			expanded=atoi(arg+2);
+			if (expanded>2) {
+				fprintf(stderr,"\nInvalid option for expanded format.\n");
+				exit(1);
+			}
+			break;
 	   case 'a' :
 			autosize=1;
 			break;
@@ -384,6 +404,12 @@ int main( int argc, char *argv[] )
 	 }
 	}
 	
+	if (maxelements==0)
+		if (expanded == 0)
+			maxelements=64;
+		else
+			maxelements=30;
+
 	sprintf(sname,"%s", arg);
 
     /* Initialize the XML library */
@@ -480,13 +506,18 @@ autoloop:
 		pathcnt=0;
 		inipath=0;
 		while(node != NULL) {
+
 			if(xmlStrcmp(node->name, (const xmlChar *) "g") == 0) {
 
 				gnode[gcount]=node;
 				gcount++;
 
 				attr = xmlGetProp(node, (const xmlChar *) "id");
-				fprintf(stderr,"\nEntering subnode (%u), id: %s",gcount,(const char *)attr);
+				if (attr == NULL)
+					strcpy(Dummy,"(missing)");
+				else
+					sprintf(Dummy,"%s",(const char *)attr);
+				fprintf(stderr,"\nEntering subnode (%u), id: %s",gcount,Dummy);
 				xmlFree(attr);
 
 				pen=color;
@@ -510,8 +541,10 @@ autoloop:
 */
 				pathcnt++;
 				attr = xmlGetProp(node, (const xmlChar *) "id");
-				strcpy(Dummy,"(no name)");
-				sprintf(Dummy,"%s",(const char *)attr);
+				if (attr == NULL)
+					strcpy(Dummy,"(no name)");
+				else
+					sprintf(Dummy,"%s",(const char *)attr);
 				fprintf(stderr,"\n  Processing path group #%u, id: %s",pathcnt,Dummy);
 				xmlFree(attr);
 
@@ -530,6 +563,8 @@ autoloop:
 				rm = 0;
 				tm = height;
 				bm = 0;
+				
+				elementcnt = 0;
 
 				if(attr != NULL) {
 					
@@ -647,35 +682,81 @@ The following commands are available for path data:
 							switch (cmd) {
 								case 'M':
 								case 'm':
+									if ((expanded==0)&&(elementcnt > 0)) {
+										fprintf(dest,"\t0x%2X,0x%02X, %s\n", REPEAT_COMMAND, elementcnt, destline);
+									}
+									elementcnt=0;
+									sprintf(destline,"");
 									if ((inipath==0) && (area==1) && (line==1))
-										fprintf( dest,"\n\t0x%2X,", CMD_AREA_INITB );
+										fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
 									else if (grouping == 0) {
 										if ((inipath==1) && (area==1) && (line==1))
-											fprintf(dest,"\t0x%2X,", CMD_AREA_CLOSE|fill);
+											fprintf(dest,"\t0x%2X,\n", CMD_AREA_CLOSE|fill);
 										if ((area==1) && (line==1))
-											fprintf( dest,"\n\t0x%2X,", CMD_AREA_INITB );
+											fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
 									}
 									inix=x;
 									iniy=y;
 									if ((area==1)||(line==1)) {
 										if ((area==1) && (line==0)) {
-										  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,", CMD_AREA_PLOT, x, y);
+										  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_AREA_PLOT, x, y);
 									    }
 										else
-										  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,", CMD_PLOT|pen, x, y);
+										  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_PLOT|pen, x, y);
 									}
 									inipath=1;
 									break;
 								default:
-									if ( (x != oldx) || (y != oldy) )
-									if ((area==1)||(line==1)) {
-									  if ((area==1) && (line==0))
-										fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_AREA_LINETO, x, y);
-									  else
-									    fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_LINETO|pen, x, y);
+									if (expanded == 0) {
+										if ((x != oldx) || (y != oldy)) {
+										  if ((area==1) && (line==0))
+											if (elementcnt == 0)
+												sprintf(destline,"%s 0x%2X,0x%02X,0x%02X,", destline, CMD_AREA_LINETO, x, y);
+											else
+												sprintf(destline,"%s 0x%02X,0x%02X,", destline, x, y);
+										  else if ((area==1)||(line==1))
+											if (elementcnt == 0)
+												sprintf(destline,"%s 0x%2X,0x%02X,0x%02X,", destline, CMD_LINETO|pen, x, y);
+											else
+												sprintf(destline,"%s 0x%02X,0x%02X,", destline, x, y);
+										}
+										else {elementcnt--; skipcnt++;}
+									} else {
+										if (((expanded == 1) && ((x != oldx) && (y != oldy))) ||
+											((expanded == 2) && ((x != oldx) || (y != oldy)))) {
+										  if ((area==1) && (line==0))
+											fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_AREA_LINETO, x, y);
+										  else if ((area==1)||(line==1))
+											fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_LINETO|pen, x, y);
+										} 
+										else if ((x != oldx) && (y == oldy)) {
+										  if ((area==1) && (line==0))
+											fprintf(dest," 0x%2X,0x%02X,", CMD_AREA_HLINETO, x);
+										  else if ((area==1)||(line==1))
+											fprintf(dest," 0x%2X,0x%02X,", CMD_HLINETO|pen, x);
+										} 
+										else if ((x == oldx) && (y != oldy)) {
+										  if ((area==1) && (line==0))
+											fprintf(dest," 0x%2X,0x%02X,", CMD_AREA_VLINETO, y);
+										  else if  ((area==1)||(line==1))
+											fprintf(dest," 0x%2X,0x%02X,", CMD_VLINETO|pen, y);
+										} 
+										else {elementcnt--; skipcnt++;}
 									}
-									else
-									skipcnt++;
+									elementcnt++;
+
+									if (expanded == 0) {
+										if (elementcnt >= maxelements) {
+											fprintf(dest,"\t0x%2X,0x%02X, %s\n\t", REPEAT_COMMAND, elementcnt, destline);
+											elementcnt=0;
+											sprintf(destline,"");
+										}
+									} else {
+										if (elementcnt>maxelements) {
+											fprintf(dest,"\n\t");
+											elementcnt=0;
+										}
+									}
 									break;
 							}
 							oldx=x; oldy=y;
@@ -684,11 +765,14 @@ The following commands are available for path data:
 						path=skip_spc(path);
 					}
 
+					if ((expanded == 0)&&(elementcnt>0))
+						fprintf(dest,"\t0x%2X,0x%02X, %s\n\t", REPEAT_COMMAND, elementcnt, destline);
+
 					if ((area == 1) && (inipath==1)) {
-						fprintf(dest,"\t0x%2X,", CMD_AREA_CLOSE|fill);
+						fprintf(dest,"\t0x%2X,\n", CMD_AREA_CLOSE|fill);
 					}
 
-					if (pathdetails>0) printf("\n");					
+					if (pathdetails>0) printf("\n");
 						
 					inipath=0;
 				}
