@@ -7,7 +7,7 @@
    in a C source data declaration to be used
    in z88dk with the "draw_profile" function.
 
-   $Id: z80svg.c,v 1.4 2009-12-02 13:21:00 stefano Exp $
+   $Id: z80svg.c,v 1.5 2009-12-09 16:35:55 stefano Exp $
 */
 
 
@@ -16,8 +16,8 @@
 #include <math.h>
 #include <libxml/parser.h>
 
-//#include "../include/gfxprofile.h"
-#include "gfxprofile.h"
+#include "../include/gfxprofile.h"
+//#include "gfxprofile.h"
 
 //#ifdef LIBXML_READER_ENABLED
 
@@ -31,6 +31,12 @@ int color_balance;
 /* fill flags */
 unsigned char area;
 unsigned char line;
+/* Counters */
+int	elementcnt;
+unsigned int pathcnt,nodecnt,skipcnt;
+/* File and string buffer pointers */
+char *destline;
+FILE *source,*dest;
 
 
 int gethex(char hexval) {
@@ -81,7 +87,7 @@ void chkstyle (xmlNodePtr node)
 	float opacity;
 	char *style;
 
-	  opacity = 1;
+	  opacity = 0;
 	  attr = xmlGetProp(node, (const xmlChar *) "fill-opacity");
 	  if(attr != NULL) {
 			opacity=atof((const char *)attr);
@@ -106,21 +112,24 @@ void chkstyle (xmlNodePtr node)
 			}
 	  }
 	  xmlFree(attr);
+	  
 	  /* Now the line properties */
 	  attr = xmlGetProp(node, (const xmlChar *) "stroke-opacity");
 	  if(attr != NULL) {
 			opacity=atof((const char *)attr);
 	  } else opacity=0;
 	  xmlFree(attr);
+
 	  attr = xmlGetProp(node, (const xmlChar *) "stroke");
 	  if(attr != NULL) {
 			style=strdup((const char *)attr);
 			retcode=get_color(style);
 			free(style);
+			
 			if (opacity > 0.9) retcode=DITHER_BLACK;
 			if (retcode == -1) {
-				line=0;
 				if (line == 1) fprintf(stderr,"\n  Disabling line mode");
+				line=0;
 				}
 			else {
 				line=1;
@@ -151,10 +160,15 @@ void chkstyle2(xmlNodePtr node)
 	char *style;
 	char *sstyle;
 	int retcode;
+	float forceline;
 	float opacity;
+	float stroke_opacity;
 
 	  attr = xmlGetProp(node, (const xmlChar *) "style");
 	  if(attr != NULL) {
+		stroke_opacity = 0;
+		opacity = 0;
+		forceline = 0;
 		sstyle=strdup((const char *)attr);
 		style=sstyle;
 		strtok(style,";:");
@@ -162,9 +176,9 @@ void chkstyle2(xmlNodePtr node)
 			if (!strcmp(style,"fill")) {
 				style=strtok(NULL,";:");
 				retcode=get_color(style);
-				if (retcode == -1) {
-					area=0;
+				if ((retcode == -1)||(forceline == 1)) {
 					if (area == 1) fprintf(stderr,"\n  Disabling area mode");
+					area=0;
 					}
 				else {
 					area=1;
@@ -182,23 +196,31 @@ void chkstyle2(xmlNodePtr node)
 				}
 			}
 
-			opacity=0;
 			if (!strcmp(style,"stroke-opacity")) {
 				style=strtok(NULL,";:");
-				opacity=atof(style);
+				stroke_opacity=atof(style);
+			}
+
+			if (!strcmp(style,"opacity")) {
+				style=strtok(NULL,";:");
+				forceline=atof(style);
 			}
 
 			if (!strcmp(style,"stroke")) {
 				style=strtok(NULL,";:");
 				retcode=get_color(style);
-				if ((retcode == -1) && (opacity>0.9)) {
-					line=0;
-					if (line == 1) fprintf(stderr,"\n  Disabling line mode");
+				// Second condition happens only when opacity is definded *before* the stroke color
+				if ((retcode != -1) || (stroke_opacity>0.6) || (forceline == 1)) {
+					line=1;
+					if (retcode == -1)
+						pen = DITHER_BLACK;
+					else
+						pen=(unsigned char)retcode;
+					fprintf(stderr,"\n  Line mode enabled, dither level: %i",fill);
 					}
 				else {
-					line=1;
-					pen=(unsigned char)retcode;
-					fprintf(stderr,"\n  Line mode enabled, dither level: %i",fill);
+					if (line == 1) fprintf(stderr,"\n  Disabling line mode");
+					line=0;
 				}
 			}
 			
@@ -221,9 +243,52 @@ void chkstyle2(xmlNodePtr node)
 	xmlFree(attr);
 }
 
+
+
+void line_to (unsigned char x,unsigned char y,unsigned char oldx,unsigned char oldy,int expanded) {
+	if (expanded == 0) {
+		if ((x != oldx) || (y != oldy)) {
+		  if ((area==1) && (line==0))
+			if (elementcnt == 0)
+				sprintf(destline,"%s 0x%2X,0x%02X,0x%02X,", destline, CMD_AREA_LINETO, x, y);
+			else
+				sprintf(destline,"%s 0x%02X,0x%02X,", destline, x, y);
+		  else if ((area==1)||(line==1))
+			if (elementcnt == 0)
+				sprintf(destline,"%s 0x%2X,0x%02X,0x%02X,", destline, CMD_LINETO|pen, x, y);
+			else
+				sprintf(destline,"%s 0x%02X,0x%02X,", destline, x, y);
+		}
+		else {elementcnt--; skipcnt++;}
+	} else {
+		if (((expanded == 1) && ((x != oldx) && (y != oldy))) ||
+			((expanded == 2) && ((x != oldx) || (y != oldy)))) {
+		  if ((area==1) && (line==0))
+			fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_AREA_LINETO, x, y);
+		  else if ((area==1)||(line==1))
+			fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_LINETO|pen, x, y);
+		} 
+		else if ((x != oldx) && (y == oldy)) {
+		  if ((area==1) && (line==0))
+			fprintf(dest," 0x%2X,0x%02X,", CMD_AREA_HLINETO, x);
+		  else if ((area==1)||(line==1))
+			fprintf(dest," 0x%2X,0x%02X,", CMD_HLINETO|pen, x);
+		} 
+		else if ((x == oldx) && (y != oldy)) {
+		  if ((area==1) && (line==0))
+			fprintf(dest," 0x%2X,0x%02X,", CMD_AREA_VLINETO, y);
+		  else if  ((area==1)||(line==1))
+			fprintf(dest," 0x%2X,0x%02X,", CMD_VLINETO|pen, y);
+		} 
+		else {elementcnt--; skipcnt++;}
+	}
+	elementcnt++;
+}
+
+
+
 int main( int argc, char *argv[] )
 {
-    FILE *source,*dest;
     unsigned char Dummy[300];
     int i,c;
     char** p = argv+1;
@@ -258,7 +323,6 @@ int main( int argc, char *argv[] )
 	char *path;
 	char *spath;
 	char tmpstr[10];
-	char destline[2048];
 	unsigned char cmd, oldcmd;
 	unsigned char x,y,inix,iniy;
 	unsigned char oldx, oldy;
@@ -268,8 +332,6 @@ int main( int argc, char *argv[] )
 	float xx,yy,cx,cy,fx,fy;
 	float lm,rm,tm,bm;
 	float alm,arm,atm,abm;
-	unsigned int pathcnt,nodecnt,skipcnt;
-	int	elementcnt;
 	
     if ( (argc < 2) ) {
       fprintf(stderr,"\nParameter error, use 'z80svg -h' for help.\n\n");
@@ -462,6 +524,7 @@ autoloop:
 			return 1;
 		}
 
+		destline=malloc(5000);
 		width = height = 255;
 		x = y = inix = iniy = 0;
 		pen=color;
@@ -501,7 +564,9 @@ autoloop:
 			width=height;
 		
 		//go one step deeper
-		node = node->xmlChildrenNode;
+		if (node->xmlChildrenNode != NULL)	// This protection is probably not necessary
+			node = node->xmlChildrenNode;
+
 		// Show all nodes in the current pos
 		pathcnt=0;
 		inipath=0;
@@ -529,9 +594,12 @@ autoloop:
 					chkstyle (node);
 					chkstyle2 (node);
 				}
-
-				node = node->xmlChildrenNode;
+				if (node->xmlChildrenNode != NULL)
+					node = node->xmlChildrenNode;
+				else
+					fprintf(stderr," -> (empty subnode)",gcount,Dummy);
 			}
+
 			if(xmlStrcmp(node->name, (const xmlChar *) "path") == 0) {
 
 /*				nodecolor[pathcnt]=pen;
@@ -586,15 +654,24 @@ autoloop:
 							path++;
 							skip_spc(path);
 						}
-						/* End of path block */
+/*
+		  The <path> Tag - The following commands are available for path data:
+
+			* M = moveto
+			* L = lineto
+			* H = horizontal lineto
+			* V = vertical lineto
+			* C = curveto
+			* S = smooth curveto
+			* Q = quadratic Belzier curve
+			* T = smooth quadratic Belzier curveto
+			* A = elliptical Arc
+			* Z = closepath
+*/
 						if ((cmd == 'Z')||(cmd == 'z')) {
 							if ( (x != inix) || (y != iniy) )
-							  if ((area==1)||(line==1)) {
-								  if ((area==1) && (line==0))
-									fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_AREA_LINETO, inix, iniy);
-								  else
-									fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_LINETO|pen, inix, iniy);
-							  }
+								line_to (inix,iniy,oldx,oldy,expanded);
+
 							if (pathdetails>0) printf("\n%c", cmd);
 							if (strlen(path)>0) {
 								//oldcmd=*path;
@@ -660,37 +737,19 @@ autoloop:
 							if ((area==1)||(line==1))
 								if (pathdetails==2) printf("\n%c %03u %03u",cmd, x, y);
 							
-/*
-  The <path> Tag
-
-The <path> tag is used to define a path.
-
-The following commands are available for path data:
-
-    * M = moveto
-    * L = lineto
-    * H = horizontal lineto
-    * V = vertical lineto
-    * C = curveto
-    * S = smooth curveto
-    * Q = quadratic Belzier curve
-    * T = smooth quadratic Belzier curveto
-    * A = elliptical Arc
-    * Z = closepath
-*/
-
+							
 							switch (cmd) {
 								case 'M':
 								case 'm':
-									if ((expanded==0)&&(elementcnt > 0)) {
-										fprintf(dest,"\t0x%2X,0x%02X, %s\n", REPEAT_COMMAND, elementcnt, destline);
-									}
+									if ((expanded==0)&&(elementcnt > 0))
+										if ((area==1)||(line==1))
+											fprintf(dest,"\t0x%2X,0x%02X, %s\n", REPEAT_COMMAND, elementcnt, destline);
 									elementcnt=0;
 									sprintf(destline,"");
 									if ((inipath==0) && (area==1) && (line==1))
 										fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
 									else if (grouping == 0) {
-										if ((inipath==1) && (area==1) && (line==1))
+										if ((inipath==1) && (area==1))
 											fprintf(dest,"\t0x%2X,\n", CMD_AREA_CLOSE|fill);
 										if ((area==1) && (line==1))
 											fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
@@ -707,47 +766,12 @@ The following commands are available for path data:
 									inipath=1;
 									break;
 								default:
-									if (expanded == 0) {
-										if ((x != oldx) || (y != oldy)) {
-										  if ((area==1) && (line==0))
-											if (elementcnt == 0)
-												sprintf(destline,"%s 0x%2X,0x%02X,0x%02X,", destline, CMD_AREA_LINETO, x, y);
-											else
-												sprintf(destline,"%s 0x%02X,0x%02X,", destline, x, y);
-										  else if ((area==1)||(line==1))
-											if (elementcnt == 0)
-												sprintf(destline,"%s 0x%2X,0x%02X,0x%02X,", destline, CMD_LINETO|pen, x, y);
-											else
-												sprintf(destline,"%s 0x%02X,0x%02X,", destline, x, y);
-										}
-										else {elementcnt--; skipcnt++;}
-									} else {
-										if (((expanded == 1) && ((x != oldx) && (y != oldy))) ||
-											((expanded == 2) && ((x != oldx) || (y != oldy)))) {
-										  if ((area==1) && (line==0))
-											fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_AREA_LINETO, x, y);
-										  else if ((area==1)||(line==1))
-											fprintf(dest," 0x%2X,0x%02X,0x%02X,", CMD_LINETO|pen, x, y);
-										} 
-										else if ((x != oldx) && (y == oldy)) {
-										  if ((area==1) && (line==0))
-											fprintf(dest," 0x%2X,0x%02X,", CMD_AREA_HLINETO, x);
-										  else if ((area==1)||(line==1))
-											fprintf(dest," 0x%2X,0x%02X,", CMD_HLINETO|pen, x);
-										} 
-										else if ((x == oldx) && (y != oldy)) {
-										  if ((area==1) && (line==0))
-											fprintf(dest," 0x%2X,0x%02X,", CMD_AREA_VLINETO, y);
-										  else if  ((area==1)||(line==1))
-											fprintf(dest," 0x%2X,0x%02X,", CMD_VLINETO|pen, y);
-										} 
-										else {elementcnt--; skipcnt++;}
-									}
-									elementcnt++;
+									line_to (x,y,oldx,oldy,expanded);
 
 									if (expanded == 0) {
 										if (elementcnt >= maxelements) {
-											fprintf(dest,"\t0x%2X,0x%02X, %s\n\t", REPEAT_COMMAND, elementcnt, destline);
+											if ((area==1)||(line==1))
+												fprintf(dest,"\t0x%2X,0x%02X, %s\n\t", REPEAT_COMMAND, elementcnt, destline);
 											elementcnt=0;
 											sprintf(destline,"");
 										}
@@ -766,7 +790,8 @@ The following commands are available for path data:
 					}
 
 					if ((expanded == 0)&&(elementcnt>0))
-						fprintf(dest,"\t0x%2X,0x%02X, %s\n\t", REPEAT_COMMAND, elementcnt, destline);
+						if ((area==1)||(line==1))
+							fprintf(dest,"\t0x%2X,0x%02X, %s\n\t", REPEAT_COMMAND, elementcnt, destline);
 
 					if ((area == 1) && (inipath==1)) {
 						fprintf(dest,"\t0x%2X,\n", CMD_AREA_CLOSE|fill);
@@ -833,6 +858,7 @@ The following commands are available for path data:
 		yshift=scale*(yshift-atm)/100;
 		fprintf(stderr,"\n------\n------\n");
 
+		free (destline);
 		goto autoloop;
 	}
 
