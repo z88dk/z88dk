@@ -7,7 +7,7 @@
    in a C source data declaration to be used
    in z88dk with the "draw_profile" function.
 
-   $Id: z80svg.c,v 1.5 2009-12-09 16:35:55 stefano Exp $
+   $Id: z80svg.c,v 1.6 2009-12-15 08:01:30 stefano Exp $
 */
 
 
@@ -87,7 +87,7 @@ void chkstyle (xmlNodePtr node)
 	float opacity;
 	char *style;
 
-	  opacity = 0;
+	  opacity = 0.6;
 	  attr = xmlGetProp(node, (const xmlChar *) "fill-opacity");
 	  if(attr != NULL) {
 			opacity=atof((const char *)attr);
@@ -102,7 +102,7 @@ void chkstyle (xmlNodePtr node)
 				if (area == 1) fprintf(stderr,"\n  Disabling area mode");
 				area=0;
 				}
-			else if (opacity > 0.65) {
+			else if (opacity > 0.5) {
 				area=1;
 				fill=(unsigned char)retcode;
 				fprintf(stderr,"\n  Area mode enabled, dither level: %i",fill);
@@ -167,6 +167,7 @@ void chkstyle2(xmlNodePtr node)
 	  attr = xmlGetProp(node, (const xmlChar *) "style");
 	  if(attr != NULL) {
 		stroke_opacity = 0;
+		retcode = 0;
 		opacity = 0;
 		forceline = 0;
 		sstyle=strdup((const char *)attr);
@@ -190,7 +191,7 @@ void chkstyle2(xmlNodePtr node)
 			if (!strcmp(style,"fill-opacity")) {
 				style=strtok(NULL,";:");
 				opacity=atof(style);
-				if (opacity <= 0.66) {
+				if (opacity <= 0.5) {
 					if (area == 1) fprintf(stderr,"\n  Disabling area mode (too transparent)");
 					area=0;
 				}
@@ -199,6 +200,10 @@ void chkstyle2(xmlNodePtr node)
 			if (!strcmp(style,"stroke-opacity")) {
 				style=strtok(NULL,";:");
 				stroke_opacity=atof(style);
+				if ((retcode == -1) && (stroke_opacity > 0.6)) {
+					fprintf(stderr,"\n  Restoring line mode");
+					line=1;
+				}
 			}
 
 			if (!strcmp(style,"opacity")) {
@@ -305,10 +310,12 @@ int main( int argc, char *argv[] )
 	int autosize=0;
 	int grouping=0;
 	int rotate=0;
+	int forcedmode=0;
 	int expanded=0;
 	int maxelements=0;
 	char hexval[3]="00";
 	int inipath;
+	int was_skipped;
 
 	xmlDocPtr doc;
 	xmlNodePtr node;
@@ -367,8 +374,8 @@ int main( int argc, char *argv[] )
 			fprintf(stderr,"\n   -e<1,2>: Encode in expanded form, repeating every command.");
 			fprintf(stderr,"\n   -l<1-255>: Force max number of 'lineto' elements in a row.");
 			fprintf(stderr,"\n   -g: Group paths forming the same area in a single stencil block.");
-			fprintf(stderr,"\n   -p1: List path details to stdout (original float values).");
-			fprintf(stderr,"\n   -p2: List path details to stdout (converted int values).");
+			fprintf(stderr,"\n   -f1..7: Force line/area modes (1/0 0/1 1/1 1/X X/1 0/X X/0).");
+			fprintf(stderr,"\n   -p1/-p2: List path details to stdout (float or converted int values).");
 			fprintf(stderr,"\n");
 			exit(1);
 			break;
@@ -441,6 +448,13 @@ int main( int argc, char *argv[] )
 			pathdetails=atoi(arg+2);
 			if ((pathdetails==0)||(pathdetails>2)) {
 				fprintf(stderr,"\nInvalid path detail listing option.\n");
+				exit(1);
+			}
+			break;
+	   case 'f' :
+			forcedmode=atoi(arg+2);
+			if ((forcedmode==0)||(forcedmode>7)) {
+				fprintf(stderr,"\nInvalid 'force mode' option.\n");
 				exit(1);
 			}
 			break;
@@ -593,6 +607,29 @@ autoloop:
 				if (wireframe != 1) {
 					chkstyle (node);
 					chkstyle2 (node);
+					switch (forcedmode) {
+						case 1:
+							line=1;	area=0;
+							break;
+						case 2:
+							line=0;	area=1;
+							break;
+						case 3:
+							line=1;	area=1;
+							break;
+						case 4:
+							line=1;
+							break;
+						case 5:
+							area=1;
+							break;
+						case 6:
+							line=0;
+							break;
+						case 7:
+							area=0;
+							break;
+					}
 				}
 				if (node->xmlChildrenNode != NULL)
 					node = node->xmlChildrenNode;
@@ -619,6 +656,29 @@ autoloop:
 				if (wireframe != 1) {
 					chkstyle (node);
 					chkstyle2 (node);
+					switch (forcedmode) {
+						case 1:
+							line=1;	area=0;
+							break;
+						case 2:
+							line=0;	area=1;
+							break;
+						case 3:
+							line=1;	area=1;
+							break;
+						case 4:
+							line=1;
+							break;
+						case 5:
+							area=1;
+							break;
+						case 6:
+							line=0;
+							break;
+						case 7:
+							area=0;
+							break;
+					}
 				}
 
 				attr = xmlGetProp(node, (const xmlChar *) "d");
@@ -641,6 +701,7 @@ autoloop:
 					/* ************************* */
 					spath=strdup((const char *)attr);
 					path=spath;
+					was_skipped=0;
 					oldx=0; oldy=0;
 					svcx=0; svcy=0;
 
@@ -648,7 +709,16 @@ autoloop:
 						path=skip_spc(path);
 						cmd=*path;
 						if ((isdigit(cmd))||(cmd=='-'))
-							cmd=oldcmd;
+							switch (oldcmd) {
+								case 'm':
+									cmd = 'l';
+									break;
+								case 'M':
+									cmd = 'L';
+									break;
+								default:
+									cmd=oldcmd;
+							}
 						else {
 							oldcmd=cmd;
 							path++;
@@ -669,7 +739,8 @@ autoloop:
 			* Z = closepath
 */
 						if ((cmd == 'Z')||(cmd == 'z')) {
-							if ( (x != inix) || (y != iniy) )
+							was_skipped=0;
+							if ((x != inix) || (y != iniy))
 								line_to (inix,iniy,oldx,oldy,expanded);
 
 							if (pathdetails>0) printf("\n%c", cmd);
@@ -695,16 +766,21 @@ autoloop:
 									cy=scale*(atof(path)-yy)/100;
 								path=skip_num(path);
 							}
+							////fprintf(stderr,"\n%s",path);
 							/* don't consider the second parameter of a relative curve*/
 							if ((cmd == 'c')||(cmd == 's')||(cmd == 'q')||(cmd == 't')||(cmd == 'a')) {
-								path=skip_num(path);
-								path=skip_num(path);
-							}
+								if (was_skipped==0) {
+									path=skip_num(path);
+									path=skip_num(path);
+									was_skipped=1;
+									}
+								else was_skipped=0;
+							} else was_skipped=0;
 							/* Lower case commands take relative coordinates */
 							if (toupper(cmd)!=cmd) {
+								if (cmd != 'v') cx=cx+svcx;
+								if (cmd != 'h') cy=cy+svcy;
 								cmd=toupper(cmd);
-								if (cmd != 'V') cx=cx+svcx;
-								if (cmd != 'H') cy=cy+svcy;
 							}
 							svcx=cx; svcy=cy;
 							
@@ -737,7 +813,6 @@ autoloop:
 							if ((area==1)||(line==1))
 								if (pathdetails==2) printf("\n%c %03u %03u",cmd, x, y);
 							
-							
 							switch (cmd) {
 								case 'M':
 								case 'm':
@@ -766,6 +841,7 @@ autoloop:
 									inipath=1;
 									break;
 								default:
+									if ((oldx!=0) && (oldy!=0))
 									line_to (x,y,oldx,oldy,expanded);
 
 									if (expanded == 0) {
