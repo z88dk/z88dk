@@ -7,7 +7,7 @@
    in a C source data declaration to be used
    in z88dk with the "draw_profile" function.
 
-   $Id: z80svg.c,v 1.6 2009-12-15 08:01:30 stefano Exp $
+   $Id: z80svg.c,v 1.7 2009-12-17 07:07:42 stefano Exp $
 */
 
 
@@ -16,8 +16,8 @@
 #include <math.h>
 #include <libxml/parser.h>
 
-#include "../include/gfxprofile.h"
-//#include "gfxprofile.h"
+//#include "../include/gfxprofile.h"
+#include "gfxprofile.h"
 
 //#ifdef LIBXML_READER_ENABLED
 
@@ -315,7 +315,7 @@ int main( int argc, char *argv[] )
 	int maxelements=0;
 	char hexval[3]="00";
 	int inipath;
-	int was_skipped;
+	int curves_cnt;
 
 	xmlDocPtr doc;
 	xmlNodePtr node;
@@ -336,7 +336,7 @@ int main( int argc, char *argv[] )
 	float svcx,svcy;
 
 	float width, height;
-	float xx,yy,cx,cy,fx,fy;
+	float xx,yy,cx,cy,fx,fy,ax;
 	float lm,rm,tm,bm;
 	float alm,arm,atm,abm;
 	
@@ -701,7 +701,7 @@ autoloop:
 					/* ************************* */
 					spath=strdup((const char *)attr);
 					path=spath;
-					was_skipped=0;
+					curves_cnt=0;
 					oldx=0; oldy=0;
 					svcx=0; svcy=0;
 
@@ -720,6 +720,7 @@ autoloop:
 									cmd=oldcmd;
 							}
 						else {
+							curves_cnt=0;
 							oldcmd=cmd;
 							path++;
 							skip_spc(path);
@@ -739,7 +740,6 @@ autoloop:
 			* Z = closepath
 */
 						if ((cmd == 'Z')||(cmd == 'z')) {
-							was_skipped=0;
 							if ((x != inix) || (y != iniy))
 								line_to (inix,iniy,oldx,oldy,expanded);
 
@@ -753,29 +753,23 @@ autoloop:
 							nodecnt++;
 							/* Vertical and Horizontal lines take 1 parameter only */
 							if (toupper(cmd) != 'V') {
-								if (rotate==1)
-									cy=scale*(atof(path)-xx)/100;
-								else
-									cx=scale*(atof(path)-xx)/100;
+								cx=cy=atof(path)-xx;
 								path=skip_num(path);
 							}
 							if (toupper(cmd) != 'H') {
-								if (rotate==1)
-									cx=scale*(atof(path)-yy)/100;
-								else
-									cy=scale*(atof(path)-yy)/100;
+								cy=atof(path)-yy;
 								path=skip_num(path);
 							}
 							////fprintf(stderr,"\n%s",path);
 							/* don't consider the second parameter of a relative curve*/
 							if ((cmd == 'c')||(cmd == 's')||(cmd == 'q')||(cmd == 't')||(cmd == 'a')) {
-								if (was_skipped==0) {
+								curves_cnt++;
+								if ((curves_cnt % 3)==1) {
 									path=skip_num(path);
 									path=skip_num(path);
-									was_skipped=1;
+									curves_cnt++;
 									}
-								else was_skipped=0;
-							} else was_skipped=0;
+							} else curves_cnt=0;
 							/* Lower case commands take relative coordinates */
 							if (toupper(cmd)!=cmd) {
 								if (cmd != 'v') cx=cx+svcx;
@@ -783,6 +777,12 @@ autoloop:
 								cmd=toupper(cmd);
 							}
 							svcx=cx; svcy=cy;
+							/* Now scale and shift the picture */
+							cx=(scale*(cx-xx)/100);
+							cy=(scale*(cy-yy)/100);
+							if (rotate==1) {
+								ax=cx;	cx=cy;	cy=ax;
+							}
 							
 							if (pathdetails==1) printf("\n%c %f %f",cmd,cx,cy);
 							
