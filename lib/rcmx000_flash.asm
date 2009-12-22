@@ -182,9 +182,8 @@ skipioprefix:
 	
 	; Now the RAM should be mapped to address zero
 	jp back2ram0 ; This is an absolute jump so it has beed assembled to ram0
-back2ram0 :
-
-
+back2ram0:
+	
 	; We are now back into the ram bottom and need not be relocatable!!
 	; Set flash up in extended segment
 	; Set xpc so flash addr zero (physical address 80000) 
