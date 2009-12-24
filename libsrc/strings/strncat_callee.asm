@@ -5,6 +5,8 @@
 XLIB strncat_callee
 XDEF ASMDISP_STRNCAT_CALLEE
 
+LIB  rcmx_cpir
+
 .strncat_callee
 
    pop hl
