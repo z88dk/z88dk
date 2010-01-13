@@ -7,19 +7,24 @@
    in a C source data declaration to be used
    in z88dk with the "draw_profile" function.
 
-   $Id: z80svg.c,v 1.7 2009-12-17 07:07:42 stefano Exp $
+   $Id: z80svg.c,v 1.8 2010-01-13 14:15:06 stefano Exp $
 */
 
 
 #include <stdio.h>
+#include <fcntl.h>
 #include <string.h>
 #include <math.h>
 #include <libxml/parser.h>
 
-//#include "../include/gfxprofile.h"
-#include "gfxprofile.h"
+#include "../include/gfxprofile.h"
+//#include "gfxprofile.h"
 
 //#ifdef LIBXML_READER_ENABLED
+
+#ifdef __MINGW32__
+#define fcloseall _fcloseall
+#endif
 
 /* Global variables */
 /* colors */
@@ -92,7 +97,7 @@ void chkstyle (xmlNodePtr node)
 	  if(attr != NULL) {
 			opacity=atof((const char *)attr);
 	  }
-	  xmlFree(attr);
+	  //xmlFree(attr);
 	  attr = xmlGetProp(node, (const xmlChar *) "fill");
 	  if(attr != NULL) {
 			style=strdup((const char *)attr);
@@ -111,14 +116,14 @@ void chkstyle (xmlNodePtr node)
 				area=0;
 			}
 	  }
-	  xmlFree(attr);
+	  //xmlFree(attr);
 	  
 	  /* Now the line properties */
 	  attr = xmlGetProp(node, (const xmlChar *) "stroke-opacity");
 	  if(attr != NULL) {
 			opacity=atof((const char *)attr);
 	  } else opacity=0;
-	  xmlFree(attr);
+	  //xmlFree(attr);
 
 	  attr = xmlGetProp(node, (const xmlChar *) "stroke");
 	  if(attr != NULL) {
@@ -137,7 +142,7 @@ void chkstyle (xmlNodePtr node)
 				fprintf(stderr,"\n  Line mode enabled, dither level: %i",fill);
 			}
 	  }
-	  xmlFree(attr);
+	  //xmlFree(attr);
 	  if (line == 1) {
 		  attr = xmlGetProp(node, (const xmlChar *) "stroke-width");
 		  if(attr != NULL) {
@@ -148,7 +153,7 @@ void chkstyle (xmlNodePtr node)
 				fprintf(stderr,"\n  Extra pen width: %i", pen);
 			  } else pen = color;
 		  } //else pen = color;
-		  xmlFree(attr);
+		  //xmlFree(attr);
 	  }
 }
 
@@ -245,7 +250,7 @@ void chkstyle2(xmlNodePtr node)
 		}
 	  }
 	//free(sstyle);
-	xmlFree(attr);
+	//xmlFree(attr);
 }
 
 
@@ -328,7 +333,8 @@ int main( int argc, char *argv[] )
 	unsigned int gcount=0;
 
 	char *path;
-	char *spath;
+	// Static line buffer, to make it compatible to MinGW32
+	char spath[2000000];
 	char tmpstr[10];
 	unsigned char cmd, oldcmd;
 	unsigned char x,y,inix,iniy;
@@ -548,22 +554,23 @@ autoloop:
 		attr = xmlGetProp(node, (const xmlChar *) "width");
 		if(attr != NULL)
 			width = atoi((const char *)attr);
-		xmlFree(attr);
+		//xmlFree(attr);
+
 		// Height
 		attr = xmlGetProp(node, (const xmlChar *) "height");
 		if(attr != NULL)
 			height = atoi((const char *)attr);
-		xmlFree(attr);
+		//xmlFree(attr);
 		// X
 		attr = xmlGetProp(node, (const xmlChar *) "x");
 		if(attr != NULL)
 			xx = atoi((const char *)attr);
-		xmlFree(attr);
+		//xmlFree(attr);
 		// Y
 		attr = xmlGetProp(node, (const xmlChar *) "y");
 		if(attr != NULL)
 			yy = atoi((const char *)attr);
-		xmlFree(attr);
+		//xmlFree(attr);
 
 		// Init abs margin limits (inverted)
 		alm = width;
@@ -597,7 +604,7 @@ autoloop:
 				else
 					sprintf(Dummy,"%s",(const char *)attr);
 				fprintf(stderr,"\nEntering subnode (%u), id: %s",gcount,Dummy);
-				xmlFree(attr);
+				//xmlFree(attr);
 
 				pen=color;
 				fill=color;
@@ -651,7 +658,7 @@ autoloop:
 				else
 					sprintf(Dummy,"%s",(const char *)attr);
 				fprintf(stderr,"\n  Processing path group #%u, id: %s",pathcnt,Dummy);
-				xmlFree(attr);
+				//xmlFree(attr);
 
 				if (wireframe != 1) {
 					chkstyle (node);
@@ -699,7 +706,8 @@ autoloop:
 					/* ************************* */
 					/* MAIN PATH CONVERSION LOOP */
 					/* ************************* */
-					spath=strdup((const char *)attr);
+					//spath=strdup((char *)attr);
+					sprintf (spath,"%s",(const char *)attr);
 					path=spath;
 					curves_cnt=0;
 					oldx=0; oldy=0;
@@ -877,7 +885,7 @@ autoloop:
 						
 					inipath=0;
 				}
-				xmlFree(attr);
+				//xmlFree(attr);
 				//free(spath);
 				fprintf(stderr,"\n    Extracted %u nodes, (%u ovelaps skipped)\n",nodecnt-skipcnt, skipcnt);
 
