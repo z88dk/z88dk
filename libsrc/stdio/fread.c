@@ -12,7 +12,7 @@
  *	djm 1/4/2000
  *
  * --------
- * $Id: fread.c,v 1.6 2003-10-13 22:43:56 dom Exp $
+ * $Id: fread.c,v 1.7 2010-01-15 07:12:05 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -21,7 +21,7 @@
 
 int fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
 {
-	if ( (fp->flags&(_IOUSE|_IOREAD)==(_IOUSE|_IOREAD))  && \
+	if ( (fp->flags&(_IOUSE|_IOREAD)==(_IOUSE|_IOREAD))  && 
 			fchkstd(fp)== 0) {
 		int	readen = size*nmemb;
 		int     count  = 0;
