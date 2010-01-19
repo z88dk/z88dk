@@ -1,8 +1,11 @@
 ;       Kludgey startup for Spectra
+;       Options:
+;          startup=2  --> ROM mode (position code at location 0 and provide minimal interrupt services)
+;          startup=3  --> Place variables in printer buffer to save memory (may be dangerous !)
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.23 2009-08-27 16:51:16 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.24 2010-01-19 15:57:41 stefano Exp $
 ;
 
 
@@ -395,7 +398,7 @@ call_rom3:
 ;--------
 
 ;---------------------------------------------------------------------------
-IF (startup=2) ; ROM
+IF (startup=2) | (startup=3) ; ROM or moved system variables
 ;---------------------------------------------------------------------------
 
         XDEF    romsvc		; service space for ROM
@@ -417,6 +420,14 @@ ENDIF
 
 IF !DEFINED_sysdefvarsaddr
         defc sysdefvarsaddr = 23552-70   ; Just before the ZX system variables
+ENDIF
+
+IF NEED_floatpack
+        INCLUDE         "float.asm"
+ENDIF
+
+IF DEFINED_ANSIstdio
+       INCLUDE "stdio_fp.asm"
 ENDIF
 
 DEFVARS sysdefvarsaddr

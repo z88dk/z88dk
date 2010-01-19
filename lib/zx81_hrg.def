@@ -6,7 +6,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.13 2009-06-10 17:26:05 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.14 2010-01-19 15:57:41 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -288,10 +288,9 @@ IF !DEFINED_hrgpage
 ;
 ; checks if RAMTOP is set to 16k ram pack
 ; if so it lowers RAMTOP, copies stack and adapts all
-; needed variables so that the program can coninue without
-; NEW.
-; And of course it sets HRG base to the location over
-; RAMTOP
+; needed variables so that the program can continue with
+; no need to issue a NEW command to redirect pointers.
+; HRG base is set to the location over RAMTOP
 ;
 ;--------------------------------------------------------------
 HRG_Interface_BaseRamtop:
