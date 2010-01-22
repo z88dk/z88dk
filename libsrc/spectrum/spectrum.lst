@@ -84,9 +84,11 @@ spectrum/if1/if1_checkblock
 spectrum/if1/if1_checksum
 spectrum/if1/if1_find_sector
 spectrum/if1/if1_find_sector_map
+spectrum/if1/if1_free_sectors
 spectrum/if1/if1_from_mdv
 spectrum/if1/if1_getname
 spectrum/if1/if1_init_file
+spectrum/if1/if1_edition
 spectrum/if1/if1_load_record
 spectrum/if1/if1_load_sector
 spectrum/if1/if1_mdv_status

@@ -11,7 +11,7 @@
 ;       MAKE_M can't be called with the 'hook code' system because
 ;       the first issue of the interface one just doesn't have it.
 ;       
-;       $Id: if1_rommap.asm,v 1.1 2008-06-29 08:25:48 aralbrec Exp $
+;       $Id: if1_rommap.asm,v 1.2 2010-01-22 16:00:38 stefano Exp $
 ;
 
 
@@ -48,12 +48,22 @@ paged:
                 ld      a,(10A5h)
                 or      a
                 jr      z,rom1
+                ld      hl,rom2tab      ; JP table for ROM 2
 
+                ld		a,(1d79h)		; basing on an old paper, it should be the
+										; first byte of SCAN_M in issue 3 IF1
+                cp		205
+                jr		z,rom2
+                
+                ld		hl,rom3tab
+
+rom2:
                 ld      bc,24           ; 8 jumps * 3 bytes
                 ;ld     bc,30           ; 10 jumps * 3 bytes
                 ld      de,jptab        ; JP table dest addr
-                ld      hl,rom2tab      ; JP table for ROM 2
                 ldir
+                
+
 rom1:
                 
                 pop     bc              ; throw away some garbage
@@ -86,10 +96,8 @@ DEL_S_1:        JP 1867h        ; 1ms delay
 ;SVBYTS:                JP 14EEh        ;
 
 
-; Jump table image (rom2 and rom3)
+; Jump table image (rom2)
 ;
-; Luckily the routines we need are in the same
-; location for both the shadow ROM versions
 
 rom2tab:
                 JP 10A5h
@@ -104,6 +112,21 @@ rom2tab:
                 ;JP 199Dh ;LDBYTS
                 ;JP 18DFh ;SVBYTS
 
+; Jump table image (rom3)  ..based on the Pennel's book
+;
+
+rom3tab:
+                JP 10A5h
+                JP 138Eh
+                JP 13A9h
+                JP 1532h ;MOTOR
+                JP 15EBh ;RD_BUFF
+                JP 1D7Bh ;ERASEM
+                JP 1D45h ;FREESECT	; - ?? we just suppose this one
+                JP 15A2h ;DEL_S_1
+
+                ;JP 199Dh ;LDBYTS ???
+                ;JP 18DFh ;SVBYTS ???
 
 IF !OLDIF1MOTOR
 
