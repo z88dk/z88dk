@@ -6,12 +6,13 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.14 2010-01-19 15:57:41 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.15 2010-02-03 11:08:15 stefano Exp $
 ;
 ; - - - - - - -
 
 XDEF	hrg_on
 XDEF	hrg_off
+XDEF	HRG_LineStart
 
 IF (startup>=5)
  IF (startup=7)

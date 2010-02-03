@@ -9,7 +9,7 @@
 	XREF	base_graphics
 
 ;
-;	$Id: pixladdr.asm,v 1.1 2007-10-04 10:28:47 stefano Exp $
+;	$Id: pixladdr.asm,v 1.2 2010-02-03 11:08:15 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -29,45 +29,37 @@
 
 .pixeladdress
 
-	push	hl
-
 	; add y-times the nuber of bytes per line (32)
 	; or just multiply y by 32 and the add
-	ld	d,0
 	ld	e,l
-	ld	c,h
-	
-	or	a
-	rl	e
-	rl	d
-	or	a
-	rl	e
-	rl	d
-	or	a
-	rl	e
-	rl	d
-	or	a
-	rl	e
-	rl	d
-	or	a
-	rl	e
-	rl	d
-	ld	hl,(base_graphics)
+	ld	a,h
+	ld	b,a
+
+	ld	h,0
+
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+
+	ld	de,(base_graphics)
 	add	hl,de
 
 	; add x divided by 8
-	or	a
-	srl	c
-	srl	c
-	srl	c
-	ld	b,0
-	add	hl,bc
 	
-	ex	de,hl
+	;or	a
+	rra
+	srl a
+	srl a
+	ld	e,a
+	ld	d,0
+	add	hl,de
+	
+	ld	d,h
+	ld	e,l
 
-	pop	hl
-
-	ld	a,h
+	ld	a,b
 	and	7
 	xor	7
 	

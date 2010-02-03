@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.13 2009-08-20 05:59:09 stefano Exp $
+ * $Id: zx81.h,v 1.14 2010-02-03 11:08:14 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -101,6 +101,9 @@ extern void __LIB__ _clg_hr();
 // Enable/disable High Resolution Graphics mode
 extern void __LIB__ hrg_off();
 extern void __LIB__ hrg_on();
+
+// Invert HRG display ("hardware" way)
+extern void __LIB__ invhrg();
 
 // Copies text to HRG screen
 extern void __LIB__ __FASTCALL__ copytxt(int ovmode);
