@@ -11,7 +11,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_altint.def,v 1.8 2009-06-10 17:26:05 stefano Exp $
+;       $Id: zx81_altint.def,v 1.9 2010-02-05 14:33:16 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -21,6 +21,8 @@
 
 XDEF	hrg_on
 XDEF	hrg_off
+XDEF	MTCH_P1
+XDEF	MTCH_P2
 
 ;========
 ; Not HRG really, but switches the new interrupt handler with no sighs
@@ -122,6 +124,7 @@ L026A:  DJNZ    L026A           ; to LOOP-B
         RRA                     ;
         LD      (HL),A          ;
         OUT     ($FF),A         ;
+MTCH_P1:
         LD      HL,($400C)      ; sv D_FILE_lo
         SET     7,H             ;
 
@@ -131,6 +134,7 @@ L026A:  DJNZ    L026A           ; to LOOP-B
 
 ;; R-IX-1
 L0281:  LD      A,R             ;
+MTCH_P2:
         LD      BC,$1901        ;
         LD      A,$F5           ;
         CALL    $2B5           ; routine DISPLAY-5
