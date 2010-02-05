@@ -122,7 +122,7 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -// -v -O2 -I. -lcpc_clib  -DZ80 -DSMALL_C -DCPC -D__CPC__ -M -DSCCZ80 -Cz+cpc
+OPTIONS		 -v -O2 -I. -lcpc_clib  -DZ80 -DSMALL_C -DCPC -D__CPC__ -M -DSCCZ80 -Cz+cpc
 
 
 # Additional config options for the alternate assemblers

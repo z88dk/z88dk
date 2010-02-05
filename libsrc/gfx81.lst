@@ -7,6 +7,9 @@ graphics/dcircle2
 graphics/draw
 graphics/drawb
 graphics/drawr
+graphics/drawto
+graphics/getmaxx
+graphics/getmaxy
 graphics/lbitmask
 graphics/lftscrol
 graphics/line

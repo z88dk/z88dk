@@ -121,7 +121,7 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -// -v -O2 -I. -lnascom_clib -lndos -DZ80 -DSMALL_C -DNASCOM -D__NASCOM__ -M -DSCCZ80 -Cz+nas
+OPTIONS		 -v -O2 -I. -lnascom_clib -lndos -DZ80 -DSMALL_C -DNASCOM -D__NASCOM__ -M -DSCCZ80 -Cz+nas
 
 
 # Additional config options for the alternate assemblers

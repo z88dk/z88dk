@@ -122,7 +122,7 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -// -v -O2 -I. -lsms_clib -lndos  -DZ80 -DSMALL_C -DSMS -D__SMS__ -DSCCZ80 -M -make-app -D__HAVESEED -Cz+sms -Cz-n
+OPTIONS		 -v -O2 -I. -lsms_clib -lndos  -DZ80 -DSMALL_C -DSMS -D__SMS__ -DSCCZ80 -M -make-app -D__HAVESEED -Cz+sms -Cz-n
 
 
 # Additional config options for the alternate assemblers
