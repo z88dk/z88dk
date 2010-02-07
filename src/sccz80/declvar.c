@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.18 2009-09-06 18:58:37 dom Exp $
+ *      $Id: declvar.c,v 1.19 2010-02-07 00:41:18 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -523,22 +523,7 @@ char zfar)               /* Far pointer thing.. */
             dsize=size = (zfar ? 3 : 2 );
         }
         else {
-            switch ( type ) {
-            case CCHAR :
-                size = 1 ;
-                break ;
-            case LONG :
-                size = 4;
-                break ;
-            case DOUBLE :
-                size = 6 ;
-                break ;
-            case STRUCT :
-                size = otag->size ;
-                break ;
-            default :
-                size = 2 ;
-            }
+            size = get_type_size(type, otag);
         }
         /* Check to see if far has been defined when we haven't got a pointer */
         if (zfar && !(ident==POINTER || (ident==ARRAY && more))) {
@@ -855,4 +840,28 @@ BitFieldSwallow (void)
                 constexpr(&val,1);
                 warning(W_BITFIELD);
         }
+}
+
+int
+get_type_size(int type, TAG_SYMBOL *otag)
+{
+    int size;
+
+    switch ( type ) {
+    case CCHAR :
+        size = 1 ;
+        break ;
+    case LONG :
+        size = 4;
+        break ;
+    case DOUBLE :
+        size = 6 ;
+        break ;
+    case STRUCT :
+        size = otag->size ;
+        break ;
+    default :
+        size = 2 ;
+    }
+    return size;
 }

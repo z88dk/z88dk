@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.17 2009-09-06 18:58:37 dom Exp $
+ *      $Id: const.c,v 1.18 2010-02-07 00:41:18 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -619,6 +619,14 @@ void size_of(LVALUE *lval)
 		    lval->const_val=GetMembSize(tagtab+ptr->tag_idx);
 		    if (lval->const_val == 0 ) lval->const_val=ptr->size;
 		}
+        	/* Check for index operator on array */
+                if ( ptr->ident == ARRAY && rcmatch('[') ) {
+                   int val;
+                   needchar('[');
+                   constexpr(&val, 1);
+                   needchar(']');
+                   lval->const_val = get_type_size(ptr->type,tagtab+ptr->tag_idx);
+	        }
 	    } else {
 		warning(W_SIZEOF);
                                 /* good enough default? */

@@ -12,3 +12,4 @@ extern int needsub(void);
 extern TAG_SYMBOL *GetVarID(struct varid *var,char storage);
 extern void BitFieldSwallow(void);
 extern char *ExpandType(int type, char **sign, char tagidx);
+extern int get_type_size(int type, TAG_SYMBOL *otag);
