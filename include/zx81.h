@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.14 2010-02-03 11:08:14 stefano Exp $
+ * $Id: zx81.h,v 1.15 2010-02-10 16:15:35 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -99,8 +99,14 @@ extern int base_graphics;
 extern void __LIB__ _clg_hr();
 
 // Enable/disable High Resolution Graphics mode
+// if startup=2, disables/enables the new interrupt handler (dangerous!)
 extern void __LIB__ hrg_off();
 extern void __LIB__ hrg_on();
+
+// Enable/disable High Resolution Graphics mode for Memotech board
+// gfx81mt192.lib or gfx81mt64.lib and "startup=2" mode required
+extern void __LIB__ mt_hrg_off();
+extern void __LIB__ mt_hrg_on();
 
 // Invert HRG display ("hardware" way)
 extern void __LIB__ invhrg();
