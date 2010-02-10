@@ -5,7 +5,7 @@
 ;
 ;   Set HRG mode
 ;
-;	$Id: mt_hrg_on.asm,v 1.1 2010-02-10 16:15:35 stefano Exp $
+;	$Id: mt_hrg_on.asm,v 1.2 2010-02-10 16:37:48 stefano Exp $
 ;
 
 	XLIB	mt_hrg_on
@@ -29,7 +29,7 @@ hrgmode:	defb	2
 ; Patch the shadow rom
 	ld	a,$7b
 	ld	($0075),a
-	;;ld	($027a),a
+	ld	($027a),a
 	ld	(MTCH_P1+1),a	; patch our custom interrupt handler
 
 	; Force row-in-a-text-line-counter from 8 to 1
@@ -42,7 +42,7 @@ IF FORzx81hr64
 ELSE
 		ld	a,193	; new row counter
 ENDIF
-	;;ld	($0285),a
+	ld	($0285),a
 	ld	(MTCH_P2+2),a	; patch also our custom interrupt handler
 
 	ld		hl,(base_graphics)
