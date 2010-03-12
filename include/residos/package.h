@@ -1,7 +1,7 @@
 /*
  *  Header for defining Residos Packages
  *
- *  $Id: package.h,v 1.1 2007-06-24 19:57:41 dom Exp $
+ *  $Id: package.h,v 1.2 2010-03-12 15:21:13 stefano Exp $
  */
 
 
@@ -16,7 +16,7 @@
 #define PACKAGE_END static char package_call_end = 0xff
     
 #asm
-        INCLUDE     "#zxsysvar48.def"
+        INCLUDE     "zxsysvar48.def"
 
 ; INSTALL has no entry parameters, and may corrupt any registers.
 ; Most packages simply return Fc=1 to indicate success. However, if your

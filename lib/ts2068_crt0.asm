@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.5 2009-06-22 21:20:05 dom Exp $
+;       $Id: ts2068_crt0.asm,v 1.6 2010-03-12 15:21:13 stefano Exp $
 ;
 
 
@@ -316,6 +316,11 @@ heapblocks:     defw    0       ; Number of blocks
 
 IF DEFINED_NEED1bitsound
 snd_tick:	defb	0	; Sound variable
+ENDIF
+
+IF DEFINED_NEED_ZXMMC
+	XDEF card_select
+card_select:       defb    0    ; Currently selected MMC/SD slot for ZXMMC
 ENDIF
 
 		defm	"Small C+ ZX"	;Unnecessary file signature

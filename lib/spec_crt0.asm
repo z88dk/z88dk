@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.24 2010-01-19 15:57:41 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.25 2010-03-12 15:21:13 stefano Exp $
 ;
 
 
@@ -380,6 +380,10 @@ ENDIF
 ; The routine to call is stored in the two bytes following
 call_rom3:
         exx                      ; Use alternate registers
+IF DEFINED_NEED_ZXMMC
+		xor		a                ; standard ROM
+		out		($7F),a          ; ZXMMC FASTPAGE
+ENDIF
         ex      (sp),hl          ; get return address
         ld      c,(hl)
         inc     hl
@@ -412,6 +416,10 @@ IF (startup=2) | (startup=3) ; ROM or moved system variables
 ;; .shadow_protect_filler
 ;; defs    $1708-shadow_protect_filler
 ;; defw    0
+
+IF DEFINED_NEED_ZXMMC
+                XDEF card_select
+ENDIF
 
 IF !DEFINED_HAVESEED
                 XDEF    _std_seed         ; Integer rand() seed
@@ -447,6 +455,7 @@ fasign          ds.b    1       ; Floating point variable
 snd_tick        ds.b    1       ; Sound
 heaplast        ds.w    1       ; Address of last block on heap
 heapblocks      ds.w    1       ; Number of blocks
+card_select		ds.b	1		; Currently selected MMC/SD slot for ZXMMC
 romsvc		ds.b	1	; Pointer to the end of the sysdefvars
 				; used by the ROM version of some library
 }
@@ -485,6 +494,14 @@ heapblocks:     defw    0       ; Number of blocks
 IF DEFINED_NEED1bitsound
 snd_tick:       defb    0       ; Sound variable
 ENDIF
+
+
+; ZXMMC SD/MMC interface
+IF DEFINED_NEED_ZXMMC
+	XDEF card_select
+card_select:       defb    0    ; Currently selected MMC/SD slot for ZXMMC
+ENDIF
+
 
 ;-----------
 ; Define the stdin/out/err area. For the z88 we have two models - the

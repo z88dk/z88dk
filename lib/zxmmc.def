@@ -1,0 +1,52 @@
+lstoff
+
+; ZX MMC definitions
+
+; $Id: zxmmc.def,v 1.1 2010-03-12 15:21:13 stefano Exp $
+
+
+;	DEFC	BLOCKSIZE	= 512	; SD/MMC block size (bytes)
+
+
+; CPLD REGISTERS
+
+	DEFC	SPI_PORT	= $3F
+	DEFC	OUT_PORT	= $1F	; port for CS control (D1:D0) - For input is also known as Kempston stick  ;)
+	
+	DEFC	TXREG		= $7F	; TX register
+	DEFC	RXREG		= $7F	; RX register
+	DEFC	STATUS		= $5F	; STATUS register
+	DEFC	FASTPAGE	= $7F	; page reg (output only)
+	
+	DEFC	MMC_0		= $F6	; D0 LOW = SLOT0 active; D3 low = NMI disabled
+	DEFC	MMC_1		= $F5	; D1 LOW = SLOT1 active; D3 low = NMI disabled
+	
+	
+; SD/MMC RELATED DEFINES:
+
+	;DEFC	MMC_SNAP16	= 1		; Flag value to state that a 16K snapshot is into a cluster
+
+	DEFC	MMC_GO_IDLE_STATE			= $40
+	DEFC	MMC_SEND_OP_COND			= $41
+	DEFC	MMC_READ_CSD				= $49
+	DEFC	MMC_READ_CID				= $4A
+	DEFC	MCC_TERMINATE_MULTI_READ	= $4C
+
+	DEFC	MCC_STATUS					= $4D
+
+	DEFC	MMC_SET_BLOCK_SIZE			= $50
+	DEFC	MMC_READ_SINGLE_BLOCK		= $51
+	DEFC	MMC_READ_MULTIPLE_BLOCK		= $52
+	DEFC	MMC_WRITE_SINGLE_BLOCK		= $58
+	DEFC	MMC_WRITE_MULTIPLE_BLOCK	= $59
+
+	DEFC	MMC_START_TAG				= $60
+	DEFC	MMC_END_TAG					= $61
+	DEFC	MMC_ERASE_BLOCK				= $66
+
+	DEFC	MMC_STOP_TRAN				= $FD
+
+lston
+
+
+
