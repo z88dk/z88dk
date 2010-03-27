@@ -6,7 +6,7 @@
 ;	+ specific display metrics
 ;
 ;
-;	$Id: ticalc.inc,v 1.7 2002-04-17 21:30:26 dom Exp $
+;	$Id: ticalc.inc,v 1.8 2010-03-27 18:59:25 stefano Exp $
 ;
 
 	defc columns	= 32
@@ -47,13 +47,13 @@ ENDIF
 IF FORti83p
 	defc row_bytes	= 12
 	defc char_dots	= 3
-	defc TIALPHAKEY	= $30	; To be checked
+	defc TIALPHAKEY	= $30
 	defc getkey	= $4972
 	
 	defc ti_putchar = $4504
 	defc ti_scroll  = $452E
-	defc ti_x_text	= $800D
-	defc ti_y_text	= $800C
+	defc ti_x_text	= $844C
+	defc ti_y_text	= $844B
 	defc ti_maxx_t	= 15
 	defc ti_maxy_t	= 7
 ENDIF

@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.30 2009-09-18 20:37:42 stefano Exp $
+ * $Id: spectrum.h,v 1.31 2010-03-27 18:59:25 stefano Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -164,6 +164,7 @@ extern int  __LIB__ zx_mb02(void);
 extern int  __LIB__ zx_multiface(void);
 extern int  __LIB__ zx_disciple(void);
 extern int  __LIB__ zx_plus3fdc(void);
+extern int  __LIB__ zx_zxmmc(void);
 extern int  __LIB__ zx_extsys(void);
 extern int  __LIB__ zx_basemem(void);
 extern int  __LIB__ zx_break(void);
