@@ -44,6 +44,7 @@ spectrum/diagnostic/zx_soundchip
 spectrum/diagnostic/zx_timexsound
 spectrum/diagnostic/zx_type
 spectrum/diagnostic/zx_zxmmc
+spectrum/diagnostic/zx_ulaplus
 spectrum/display/zx_aaddr2cx
 spectrum/display/zx_aaddr2cy
 spectrum/display/zx_aaddr2px
