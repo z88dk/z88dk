@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.32 2010-03-29 17:29:31 stefano Exp $
+ * $Id: spectrum.h,v 1.33 2010-04-02 09:05:06 stefano Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -169,6 +169,17 @@ extern int  __LIB__ zx_extsys(void);
 extern int  __LIB__ zx_basemem(void);
 extern int  __LIB__ zx_break(void);
 extern int  __LIB__ zx_ulaplus(void);
+
+
+/////////////////////////////////////////
+// ULAPLUS/Arlequin palette mode project
+/////////////////////////////////////////
+
+extern int  __LIB__ ula_plus_mode(void);
+extern void __LIB__ ula_normal_mode(void);
+extern void __LIB__ ula_sync(void);
+extern int __LIB__ ulaplus_set(unsigned char attribute, unsigned char rgbcolor);
+extern int  __LIB__ __FASTCALL__ ulaplus_get(unsigned char attribute);
 
 
 ///////////////////////////////

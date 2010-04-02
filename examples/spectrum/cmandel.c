@@ -10,14 +10,17 @@
 	              - or -
 	              zcc +zx -lndos -lm -create-app -Dlr64x48 cmandel.c
 
-	$Id: cmandel.c,v 1.2 2007-01-17 19:32:50 stefano Exp $
+	$Id: cmandel.c,v 1.3 2010-04-02 09:05:06 stefano Exp $
 */
 
 //#define DALTLOWGFX  1
+
+// This flag is not necessary if demo runs only in ULAPLUS mode
 #define bufferedgfx 1
 
 #include <stdio.h>
 #include <zxlowgfx.h>
+#include <spectrum.h>
 #include <math.h>
 
 void main()
@@ -80,19 +83,27 @@ l110:	     k++;
 	}
 
 
-// color cycling
-for(k=100; k>=0; k--) {
-	for(y=ymax; y>=0; y--)
-	{
-	  for(x=xmax; x>=0; x--) cplot (x,y,cpoint(x,y)+1)
+if (ula_plus_mode()) {
+	// color cycling - ulaplus mode
+	for(k=0; k<240; k++) {
+		ula_sync();
+		for (x=0; x<8; x++) {
+			ulaplus_set(x,x+k);
+			ulaplus_set(x+8,x+k);
+		}
+		for(y=0; y<1600; y++) {}
 	}
-	ccopybuffer();
-
+} else {
+	// color cycling - standard mode
+	for(k=100; k>=0; k--) {
+		for(y=ymax; y>=0; y--)
+		{
+		  for(x=xmax; x>=0; x--) cplot (x,y,cpoint(x,y)+1)
+		}
+		ccopybuffer();
+	}
 }
 
 
-
-
 	ccopybuffer();
 }
-

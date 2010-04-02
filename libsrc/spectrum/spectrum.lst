@@ -116,6 +116,11 @@ spectrum/tape/tape_load_block_callee
 spectrum/tape/tape_save
 spectrum/tape/tape_save_block
 spectrum/tape/tape_save_block_callee
+spectrum/ulaplus/ula_normal_mode
+spectrum/ulaplus/ula_plus_mode
+spectrum/ulaplus/ula_sync
+spectrum/ulaplus/ulaplus_set
+spectrum/ulaplus/ulaplus_get
 spectrum/uspeech/currah_detect
 spectrum/uspeech/currah_direct
 spectrum/uspeech/currah_speech
