@@ -996,16 +996,45 @@
 	or	l
 	jp	z,%3
 
+# static unsigned char j
+# while (j--) or while (--j)
+
 	ld	hl,(%1)
 	ld	h,0
 	dec	hl
 	ld	a,l
 	ld	(%1),a
+	inc	hl
+	ld	a,h
+	or	l
+	jp	%2,%3
+	ld	hl,%4
+=
+	ld	hl,%1
+	ld	a,(hl)
+	dec	(hl)
+	and	a
+	jp	%2,%3
+	ld	hl,%4
+
+	ld	hl,(%1)
+	ld	h,0
+	dec	hl
+	ld	a,l
+	ld	(%1),a
+	ld	a,h
+	or	l
+	jp	%2,%3
+	ld	hl,%4
 =
 	ld	hl,%1
 	dec	(hl)
-	ld	l,(hl)
-	ld	h,0
+	ld	a,(hl)
+	and	a
+	jp	%2,%3
+	ld	hl,%4
+
+# 
 
 	ld	hl,(%1)
 	ld	h,0
