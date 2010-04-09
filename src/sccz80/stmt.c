@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.16 2010-04-09 23:41:37 dom Exp $
+ *      $Id: stmt.c,v 1.17 2010-04-09 23:47:45 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -523,11 +523,7 @@ void leave(int vartype,char type)
     if ( noaltreg ) {
         if ( vartype == LONG )
             savehl();
-        if ( vartype )
-            swap();
         modstk(0,0,NO);
-        if ( vartype )
-            swap();
     } else {
         modstk(0,vartype,NO);
     }
@@ -543,8 +539,6 @@ void leave(int vartype,char type)
         if ( noaltreg ) {
             if ( vartype == LONG )      /* If long, then dump de somewhere */
                 savede();
-            if ( vartype )
-                swap();
         } else if ( vartype == LONG ) {
             doexx();	   
         }
@@ -555,8 +549,6 @@ void leave(int vartype,char type)
         if ( noaltreg ) {
             if ( vartype == LONG )
                 restorede();
-            if ( vartype )
-                swap();
         } else if ( vartype == LONG ) {
             doexx();
         }

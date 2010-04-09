@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.25 2009-09-06 18:58:37 dom Exp $
+ *      $Id: codegen.c,v 1.26 2010-04-09 23:47:45 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -976,6 +976,7 @@ int modstk(int newsp,int save,int saveaf)
     int k,flag=NO;
 
     k = newsp - Zsp ;
+
     if ( k == 0 ) return newsp ;
 	/* Yes this goto could be an if but this is a dev compiler! */
 #ifdef USEFRAME
@@ -2005,7 +2006,7 @@ void restorehl(void)
 
 void restorede(void)
 {
-    ol("ld\thl,(saved_de)");
+    ol("ld\tde,(saved_de)");
 }
 
 /* Prefix for assembler */
