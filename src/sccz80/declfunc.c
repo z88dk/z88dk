@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.13 2009-10-11 01:12:59 dom Exp $
+ *      $Id: declfunc.c,v 1.14 2010-04-10 00:34:15 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -384,6 +384,8 @@ void setlocvar(SYMBOL *prevarg,SYMBOL *currfn)
     while ( prevarg ) {
         lgh = 2 ;      /* Default length */
         /* This is strange, previously double check for ->type */
+        if ( prevarg->type == VOID && prevarg->ident != POINTER )
+            lgh=0;
         if ( prevarg->type == LONG && prevarg->ident != POINTER )
             lgh=4;
         if ( prevarg->type == DOUBLE && prevarg->ident != POINTER )
