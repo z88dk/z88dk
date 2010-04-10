@@ -243,11 +243,6 @@
 	call	z,%2
 .%1
 
-	call	_%1
-	ret
-=
-	jp	_%1
-
 	jp	z,%1
 	jp	%2
 .%1
@@ -996,55 +991,30 @@
 	or	l
 	jp	z,%3
 
-# static unsigned char j
-# while (j--) or while (--j)
-
 	ld	hl,(%1)
 	ld	h,0
 	dec	hl
 	ld	a,l
 	ld	(%1),a
 	inc	hl
-	ld	a,h
-	or	l
-	jp	%2,%3
-	ld	hl,%4
 =
 	ld	hl,%1
 	ld	a,(hl)
 	dec	(hl)
-	and	a
-	jp	%2,%3
-	ld	hl,%4
-
-	ld	hl,(%1)
+	ld	l,a
 	ld	h,0
-	dec	hl
-	ld	a,l
-	ld	(%1),a
-	ld	a,h
-	or	l
-	jp	%2,%3
-	ld	hl,%4
-=
-	ld	hl,%1
-	dec	(hl)
-	ld	a,(hl)
-	and	a
-	jp	%2,%3
-	ld	hl,%4
-
-# 
 
 	ld	hl,(%1)
 	ld	h,0
 	inc	hl
 	ld	a,l
 	ld	(%1),a
+	dec	hl
 =
 	ld	hl,%1
+	ld	a,(hl)
 	inc	(hl)
-	ld	l,(hl)
+	ld	l,a
 	ld	h,0
 
 	ld	l,a
