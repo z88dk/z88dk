@@ -2,7 +2,7 @@
  *			    C P P 4 . C
  *		M a c r o  D e f i n i t i o n s
  *
- * $Id: cpp4.c,v 1.3 2009-07-23 20:48:32 dom Exp $
+ * $Id: cpp4.c,v 1.4 2010-04-10 23:48:47 dom Exp $
  *
  *
  * Edit History
@@ -139,7 +139,9 @@ dodefine()
 		    while (type[c] == DIG) {	/* Stuff the digits	*/
 			save(c);
 			c = get();
-		    }
+		    } 
+                    unget(c);
+                    c = TOK_SEP;
 		    if (!q) save(TOK_SEP);		/* Delimit 2nd token	*/
 		}
 		else {
