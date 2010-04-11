@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.25 2010-03-12 15:21:13 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.26 2010-04-11 02:08:40 dom Exp $
 ;
 
 
@@ -376,6 +376,7 @@ setheader_r:
         ret
 ENDIF
 
+IF !DEFINED_norom3
 ; Call a routine in the spectrum ROM
 ; The routine to call is stored in the two bytes following
 call_rom3:
@@ -393,6 +394,7 @@ ENDIF
         push    bc
         exx                      ; Back to the regular set
         ret
+ENDIF
         
 
 
@@ -507,11 +509,13 @@ ENDIF
 ; Define the stdin/out/err area. For the z88 we have two models - the
 ; classic (kludgey) one and "ANSI" model
 ;-----------
+IF !DEFINED_nostreams
 __sgoioblk:
 IF DEFINED_ANSIstdio
        INCLUDE "stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
+ENDIF
 ENDIF
 
                 defm    "Small C+ ZX"   ;Unnecessary file signature
@@ -533,8 +537,3 @@ ENDIF
 ;---------------------------------------------------------------------------
 ENDIF
 ;---------------------------------------------------------------------------
-
-
-                defm    "Small C+ ZX"   ;Unnecessary file signature
-                defb    0
-
