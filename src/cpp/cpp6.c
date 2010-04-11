@@ -2,7 +2,7 @@
  *			    C P P 6 . C
  *		S u p p o r t   R o u t i n e s
  *
- * $Id: cpp6.c,v 1.4 2008-05-26 06:53:01 stefano Exp $
+ * $Id: cpp6.c,v 1.5 2010-04-11 00:20:31 dom Exp $
  *
  *
  * Edit History
@@ -229,6 +229,9 @@ catenate()
 		workp = work + strlen(work);
 		do {
 		    save(c);
+                    /* This feels like the wrong fix */
+                    if ( c == '\n' ) 
+                        break;
 		} while ((c = get()) != TOK_SEP);
 		/*
 		 * The trailing TOK_SEP is no longer needed.
