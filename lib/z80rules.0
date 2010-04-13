@@ -553,6 +553,7 @@
 	ld	a,(hl)
 	pop	de
 	ld	(de),a
+	ld	hl,%1
 
 	ld	l,a
 	ld	a,l
