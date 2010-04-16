@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.26 2009-06-22 21:13:20 dom Exp $
+ * $Id: zcc.h,v 1.27 2010-04-16 00:46:51 dom Exp $
  */
 
 /* Very contrived, if not a Windows target then include the config file */
@@ -15,10 +15,10 @@
 
 /* Some machine specific definitions (paths etc!) */
 
-char *version = "v2.58 (C) 22.6.2009 D.J.Morris\n";
+char *version = "v2.59 (C) 16.4.2010 D.J.Morris\n";
 
 #ifdef AMIGA
-char *amiver="$VER: zcc v2.58 (22.06.2009)";
+char *amiver="$VER: zcc v2.59 (16.04.2010)";
 #endif
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
@@ -72,12 +72,7 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 #define DEFFILE "zcc_opt.def"
 
 
-struct args {
-    char  *name;
-    char   more;
-    void (*setfunc)(char *);
-    char  *help;   
-};
+
 
 struct confs {
     char *name;

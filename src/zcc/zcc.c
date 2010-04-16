@@ -10,112 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      3/12/98 djm
- *
- *      16/2/99 djm
- *      Reworking so that we read a config file which tells us all we
- *      need to know about paths etc - removes the variable things
- *      from the executable - and makes it more portable - thanks
- *      to Dennis for suggesting this one!
- *
- *      28/2/99 djm
- *      Added an extra option CRT0 - this allows us to do wildcard
- *      compiles such that main() doesn't have to be in the first
- *      file. We also have the parameter COPYCMD which is whatever
- *      the commmand is for copy files (COPYCMD [source] [dest]),
- *      this is needed because the output file gets dumped in
- *      {zcc}/lib/{CRT0}.bin because Z80 doesn't like being
- *      specified an output filename.
- *
- *      Also added the cleanup routines, these are a bit nasty, so
- *      perhaps we could create temporary files (using tmpnam) -
- *      but we'll leave that for the moment (till a later release!)
- *
- *      An unwanted side effect of the cleanup routines is that if
- *      you supply a filename which isn't .c and you compile all
- *      the way through then the file will be zapped - for safety
- *      don't use -cleanup if you have non .c files!
- *
- *      30/3/99
- *      Another rejig! This time we pass any unknown options through
- *      to the compiler - so we can support other maths targets
- *      without recompiling this thing all the time.
- *
- *      Also, all specific references to the Z88 are out - we use the
- *      config file to specify if what the flag is if -lmz is supplied
- *      All libraries are now linked in via their name after -l after
- *      being appended to the LIBPATH flag - so we don't have to
- *      specify ghastly long paths
- *
- *      I've dumped all the ** stuff for argument lists - now everything
- *      is appended to one whopper of a line in memory - makes the code
- *      quite a bit simpler - not possible for files since we change
- *      the suffices constantly
- *
- *      Just one slight problem still, this kit can't really be used
- *      on a multiuser system because we assemble in zlib - sorting
- *      this out might require a few changes to the system so that
- *      we link pre-compiled object files for the maths files
- *
- *      1/4/99 More changes, this time allowing us to preserve zcc_opt.def
- *      and to go the next stage and create applications, well, it would
- *      except for my misunderstanding of the -g flag in z80asm - I
- *      thought that it outputted .def files at link time of objects, but
- *      I can't quite get it do it...pesky kids!
- *
- *      5/4/99 z80asm it seems doesn't treat DEFVARS -1 statements
- *      correctly if they aren't assembled together, so, a temporary
- *      patch to allow this to be done is not to assemble before linking
- *      (this ensures DEFVARS are treated correctly)
- *
- *      15/4/99 Fixed it so temporary files are created in /tmp where
- *      all the processing will take place, we can cleanup with a clear
- *      conscience..we can cleanup with a clear consience, if we specify
- *      -a the program won't compile because of the header file thing..
- *      Still dependent on zlib: but if Gunther implements -o function
- *      then I think we might be able to get around it...
- *
- *
- *      19/4/99 We now copy the crt0 file to /tmp so multiusers and also
- *      gets around removing the file problems..total bonus!
- *
- *      26/4/99 Tidied up a few things, made all errors printable, though
- *      we do use a bizarre method to do it!
- *
- *      29/4/99 Fixed output name to be a.bin for apps (default name)
- *
- *      3/5/99  Made -make-lib pass through -make-lib to compiler (now
- *      it accepts it, remove all references to .hdr files)
- *
- *      10/5/99 New option -notemp does all processing in the current
- *      directory (copies CRT0 files over to a.#?) map files copied over
- *      if required in the case of usetemp and requested.
- *
- *      18/5/99 -notemp copies over to crt0.#? instead of a.#?
- *
- *    12/1/2000 - Added -nt option for appmake to avoid page
- *    truncation when making an app
- *
- *    23/1/2000 - Adding kludge for z80asm and removing any '.'
- *    in the temporary name and replacing with '_'
- *
- *    27/1/2000 - Third level of optimization
- *
- *    28/1/2000 - Added MSDOS tmpnam() code and decided to make
- *    zcc Makefile compatible by allow the -o option to come in
- *    the next argument
- *
- *    31/1/2000 - Added the STYLECPP command, works for outspec'd
- *    dunno about the others..
- *
- *    17/4/2000 - Added in the ability to have a config directory
- *    and made the + operator a tad more useful in specifying machines
- *    within that directory
- *
- *    29/1/2001 - Added in -Ca flag to pass commands to assembler on
- *    assemble pass (matches -Cp for preprocessor)
- *
- *      $Id: zcc.c,v 1.40 2010-04-11 01:02:44 dom Exp $
+ *      $Id: zcc.c,v 1.41 2010-04-16 00:46:51 dom Exp $
  */
 
 
@@ -129,115 +24,68 @@
 #define strcasecmp(a,b) stricmp(a,b)
 #endif
 
+typedef struct arg_s arg_t;
+
+
 /* All our function prototypes */
 
-void            ParseArgs(char *);
-void            AddComp(char *);
-void            AddPreProc(char *);
-void            AddToPreProc(char *);
-void            AddToAssembler(char *);
-void            AddToLinker(char *);
-void            AddAppmake(char *);
-void            AddToAppmake(char *);
-void            AddLinkLibrary(char *);
-void            AddLinkOption(char *);
-void            DispInfo(void);
-void            DispVer(char *);
-void            SetVerbose(char *);
-void            SetCompileOnly(char *);
-void            SetAssembleOnly(char *);
-void            SetOutputMap(char *);
-void            SetOutputSym(char *);
-void            SetPeepHole(char *);
-void            AddToFileList(char *);
-void            SetPeepHole(char *);
-void            SetZ80Verb(char *);
-void            SetOutputFile(char *);
-void            SetCleanUp(char *);
-void            UnSetCleanUp(char *);
-void            SetPreProcessOnly(char *);
-void            SetShowErrs(char *);
-void            SetLibMake(char *);
-void            SetPreserve(char *);
-void            SetCreateApp(char *);
-void            SetShortObj(char *);
-void            SetLateAssemble(char *);
-void            SetAssembler(char *);
+static void            AddComp(char *);
+static void            AddToFileList(char *);
 
-void           *mustmalloc(size_t);
-int             hassuffix(char *, char *);
-char           *changesuffix(char *, char *);
-int             process(char *, char *, char *, char *, enum iostyle, int, int);
-int             linkthem(char *);
-int             FindSuffix(char *);
-void            BuildAsmLine(char *, char *);
-void            ParseArgs(char *);
-void            BuildOptions(char **, char *);
-void            BuildOptions_start(char **, char *);
-void            CopyOutFiles(char *);
-void            ParseOpts(char *);
-void            SetNormal(char *, int);
-void            SetOptions(char *, int);
-void            SetNumber(char *, int);
-void            SetConfig(char *, int);
-static void     Deprecated(char *arg, int num);
-void            KillEOL(char *);
+static void            ParseArgs(char *);
+static void            SetBoolean(arg_t *arg, char *val);
+static void            AddPreProc(arg_t *arg,char *);
+static void            AddToPreProc(arg_t *arg,char *);
+static void            AddToAssembler(arg_t *arg,char *);
+static void            AddToLinker(arg_t *arg,char *);
+static void            AddAppmake(arg_t *arg,char *);
+static void            AddToAppmake(arg_t *arg,char *);
+static void            AddLinkLibrary(arg_t *arg,char *);
+static void            AddLinkOption(arg_t *arg,char *);
+static void            DispInfo(void);
+static void            DispVer(arg_t *arg,char *);
+static void            SetPeepHole(arg_t *arg,char *);
+static void            SetString(arg_t *arg,char *);
+static void            SetLibMake(arg_t *arg,char *);
+static void            SetShortObj(arg_t *arg,char *);
+static void            SetLateAssemble(arg_t *arg,char *);
+static void            SetAssembler(arg_t *arg,char *);
 
-void            CleanUpFiles(void);
-void            CleanFile(char *, char *);
-void            CopyCrt0(void);
-void            ShowErrors(char *, char *);
-void            SetTemp(char *);
-void            UnSetTemp(char *);
-void            SetRelocate(char *);
-int             CopyFile(char *, char *, char *, char *);
-void            tempname(char *);
-int             FindConfigFile(char *, int);
-void            parse_option(char *option);
-void            linkargs_mangle();
+static void           *mustmalloc(size_t);
+static int             hassuffix(char *, char *);
+static char           *changesuffix(char *, char *);
+static int             process(char *, char *, char *, char *, enum iostyle, int, int);
+static int             linkthem(char *);
+static int             FindSuffix(char *);
+static void            BuildAsmLine(char *, char *);
+static void            ParseArgs(char *);
+static void            BuildOptions(char **, char *);
+static void            BuildOptions_start(char **, char *);
+static void            CopyOutFiles(char *);
+static void            ParseOpts(char *);
+static void            SetNormal(char *, int);
+static void            SetOptions(char *, int);
+static void            SetNumber(char *, int);
+static void            SetConfig(char *, int);
+static void            Deprecated(char *arg, int num);
+static void            KillEOL(char *);
+
+static void            CleanUpFiles(void);
+static void            CleanFile(char *, char *);
+static void            CopyCrt0(void);
+static void            ShowErrors(char *, char *);
+static int             CopyFile(char *, char *, char *, char *);
+static void            tempname(char *);
+static int             FindConfigFile(char *, int);
+static void            parse_option(char *option);
+static void            linkargs_mangle(char *linkargs);
 
 /* Mode Options, used for parsing arguments */
 
 
-struct args     myargs[] = {
-    {"z80-verb", NO, SetZ80Verb, "Make the assembler more verbose"},
-    {"cleanup", NO, SetCleanUp, "(default) Cleanup temporary files"},
-    {"no-cleanup", NO, UnSetCleanUp, "Don't cleanup temporary files"},
-    {"make-lib", NO, SetLibMake, "Compile as if to make a library"},
-    {"preserve", NO, SetPreserve, "Don't remove zcc_opt.def and start of run"},
-    {"make-app", NO, SetLateAssemble, "Create binary suitable for generated application"},
-    {"create-app", NO, SetCreateApp, "Run appmake on the resulting binary to create emulator usable file"},
-    {"usetemp", NO, SetTemp, "(default) Use the temporary directory for intermediate files"},
-    {"notemp", NO, UnSetTemp, "Don't use the temporary directory for intermediate files"},
-    {"asm", YES, SetAssembler, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm"},
-    {"Cp", YES, AddToPreProc, "Add an option to the preprocessor"},
-    {"Ca", YES, AddToAssembler, "Add an option to the assembler"},
-    {"Cl", YES, AddToLinker, "Add an option to the linker"},
-    {"Cz", YES, AddToAppmake, "Add an option to appmake"},
-    {"E", NO, SetPreProcessOnly, "Only preprocess files"},
-    {"R", NO, SetRelocate, "Generate relocatable code"},
-    {"D", YES, AddPreProc, "Define a preprocessor option"},
-    {"U", YES, AddPreProc, "Undefine a preprocessor option"},
-    {"I", YES, AddPreProc, "Add an include directory for the preprocessor"},
-    {"L", YES, AddLinkOption, "Add a library search path"},
-    {"l", YES, AddLinkLibrary, "Add a library"},
-    {"O", YES, SetPeepHole, "Set the peephole optimiser setting"},
-    {"h", NO, DispVer, "Display this text"},
-    {"v", YES, SetVerbose, "Output all commands that are run (-vn suppresses)"},
-    {"c", NO, SetCompileOnly, "Only compile the .c files to .o files"},
-    {"a", NO, SetAssembleOnly, "Only compile the .c files to .asm/.opt files"},
-    {"m", NO, SetOutputMap, "Generate an output map of the final executable"},
-    {"s", NO, SetOutputSym, "Generate a symbol map of the final executable"},
-    {"o", YES, SetOutputFile, "Set the output files"},
-    {"nt", NO, AddAppmake, "Set notruncate on the appmake options"},
-    {"M", NO, SetShortObj, "Define the suffix of the object files (eg -Mo)"},
-    {"+", NO, AddPreProc, NULL},    /* Strips // comments in vcpp */
-    {"", 0, NULL, NULL}
-};
 
 
-
-struct confs    myconf[] = {
+static struct confs    myconf[] = {
     {"OPTIONS", NULL, SetOptions, NULL},
     {"Z80EXE", "ASSEMBLER", SetNormal, NULL},
     {"CPP", NULL, SetNormal, NULL},
@@ -268,65 +116,109 @@ struct confs    myconf[] = {
 };
 
 
-#if defined(__MSDOS__) && defined(__TURBOC__)
-/* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
-int             usetemp = 0;
-#else
-int             usetemp = 1;
-#endif
-int             preserve = 0;    /* don't destroy zcc_opt */
-int             createapp = 0;    /* Go the next stage and create the app */
-int             makelib = 0;
-int             lateassemble = 0;
-int             makeapp = 0;
-int             z80verbose = 0;
-int             cleanup = 1;
-int             assembleonly = 0;
-int             compileonly = 0;
-int             verbose = 0;
-int             peepholeopt = 0;
-int             symbolson = 0;
-int             mapon = 0;
-int             ncppargs = 0;
-int             preprocessonly = 0;
-int             relocate = 0;
-int             crtcopied = 0;    /* Copied the crt0 code over? */
-int             gargc;        /* Copies of argc and argv */
-char          **gargv;
+static int             usetemp = 1;
+static int             preserve = 0;    /* don't destroy zcc_opt */
+static int             createapp = 0;    /* Go the next stage and create the app */
+static int             makelib = 0;
+static int             lateassemble = 0;
+static int             makeapp = 0;
+static int             z80verbose = 0;
+static int             cleanup = 1;
+static int             assembleonly = 0;
+static int             compileonly = 0;
+static int             verbose = 0;
+static int             peepholeopt = 0;
+static int             symbolson = 0;
+static int             mapon = 0;
+static int             preprocessonly = 0;
+static int             relocate = 0;
+static int             crtcopied = 0;    /* Copied the crt0 code over? */
+static int             gargc;        /* Copies of argc and argv */
+static char          **gargv;
 /* filelist has to stay as ** because we change suffix all the time */
-int             nfiles = 0;
-char          **filelist;
-char          **orgfiles;    /* Original filenames... */
-int             ncompargs = 0;
-char           *outputfile;
-char           *cpparg;
-char           *comparg;
-char           *linkargs;
-char           *asmargs;
-char           *appmakeargs;
+static int             nfiles = 0;
+static char          **filelist;
+static char          **orgfiles;    /* Original filenames... */
+static char           *outputfile = NULL;
+static char           *linkeroutputfile = NULL;
+static char           *cpparg;
+static char           *comparg;
+static char           *linkargs;
+static char           *asmargs;
+static char           *appmakeargs;
 
 
-char            outfilename[FILENAME_MAX + 1];
-char            extension[5];
+static char            filenamebuf[FILENAME_MAX + 1];
+static char            extension[5];
 
 #define OBJEXT extension
 
 #define ASM_Z80ASM 0
 #define ASM_ASXX   1
 #define ASM_VASM   2
-int             assembler_type = ASM_Z80ASM;
-enum iostyle    assembler_style = outimplied;
-int             linker_output_separate_arg = 0;
+static int             assembler_type = ASM_Z80ASM;
+static enum iostyle    assembler_style = outimplied;
+static int             linker_output_separate_arg = 0;
 
 #define IS_ASM(x)  ( assembler_type == (x) )
 
 
-/*
- * Default output binary filename - why mess with genius?!?!
- */
+static char           *defaultout = "a.bin";
+static char           *defaultbin = "a.bin";
 
-char           *defaultout = "a.bin";
-char           *defaultbin = "a.bin";
+
+struct arg_s {
+    char  *name;
+    int    flags;
+    void (*setfunc)(arg_t *arg, char *);
+    void  *data;
+    char  *help;   
+};
+
+#define AF_BOOL_TRUE      1
+#define AF_BOOL_FALSE     2
+#define AF_MORE           4
+
+
+static arg_t     myargs[] = {
+    {"z80-verb", AF_BOOL_TRUE, SetBoolean, &z80verbose, "Make the assembler more verbose"},
+    {"cleanup",  AF_BOOL_TRUE, SetBoolean, &cleanup,     "(default) Cleanup temporary files"},
+    {"no-cleanup", AF_BOOL_FALSE, SetBoolean, &cleanup,  "Don't cleanup temporary files"},
+    {"make-lib", 0, SetLibMake, NULL, "Compile as if to make a library"},
+    {"preserve", AF_BOOL_TRUE, SetBoolean, &preserve, "Don't remove zcc_opt.def and start of run"},
+    {"make-app", 0, SetLateAssemble, NULL, "Create binary suitable for generated application"},
+    {"create-app", AF_BOOL_TRUE, SetBoolean, &createapp, "Run appmake on the resulting binary to create emulator usable file"},
+    {"usetemp", AF_BOOL_TRUE, SetBoolean, &usetemp, "(default) Use the temporary directory for intermediate files"},
+    {"notemp", AF_BOOL_FALSE, SetBoolean, &usetemp, "Don't use the temporary directory for intermediate files"},
+    {"asm", AF_MORE, SetAssembler, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm"},
+    {"Cp", AF_MORE, AddToPreProc, NULL, "Add an option to the preprocessor"},
+    {"Ca", AF_MORE, AddToAssembler, NULL, "Add an option to the assembler"},
+    {"Cl", AF_MORE, AddToLinker, NULL, "Add an option to the linker"},
+    {"Cz", AF_MORE, AddToAppmake, NULL, "Add an option to appmake"},
+    {"E", AF_BOOL_TRUE, SetBoolean, &preprocessonly, "Only preprocess files"},
+    {"R", AF_BOOL_TRUE, SetBoolean, &relocate, "Generate relocatable code"},
+    {"D", AF_MORE, AddPreProc, NULL, "Define a preprocessor option"},
+    {"U", AF_MORE, AddPreProc, NULL, "Undefine a preprocessor option"},
+    {"I", AF_MORE, AddPreProc, NULL, "Add an include directory for the preprocessor"},
+    {"L", AF_MORE, AddLinkOption, NULL, "Add a library search path"},
+    {"l", AF_MORE, AddLinkLibrary, NULL, "Add a library"},
+    {"O", AF_MORE, SetPeepHole, NULL, "Set the peephole optimiser setting"},
+    {"h", 0, DispVer, NULL, "Display this text"},
+    {"v", AF_BOOL_TRUE, SetBoolean, &verbose, "Output all commands that are run (-vn suppresses)"},
+    {"bn", AF_MORE, SetString, &linkeroutputfile,"Set the output file for the linker stage"},
+    {"vn", AF_BOOL_FALSE, SetBoolean, &verbose, "Run the compile stages silently" },
+    {"c", AF_BOOL_TRUE, SetBoolean, &compileonly, "Only compile the .c files to .o files"},
+    {"a", AF_BOOL_TRUE, SetBoolean, &assembleonly,"Only compile the .c files to .asm/.opt files"},
+    {"m", AF_BOOL_TRUE, SetBoolean, &mapon, "Generate an output map of the final executable"},
+    {"s", AF_BOOL_TRUE, SetBoolean, &symbolson, "Generate a symbol map of the final executable"},
+    {"o", AF_MORE, SetString, &outputfile, "Set the output files"},
+    {"nt", 0, AddAppmake, NULL, "Set notruncate on the appmake options"},
+    {"M",  0, SetShortObj, NULL, "Define the suffix of the object files (eg -Mo)"},
+    {"+", NO, AddPreProc, NULL, NULL},    /* Strips // comments in vcpp */
+    {"", 0, NULL, NULL}
+};
+
+
 
 /* Okay! Off we Go! */
 
@@ -447,7 +339,6 @@ linkthem(char *linker)
     char           *p;
     char           *asmline = "";    /* patch for z80asm */
     char           *ext;
-    char           *linkprog = myconf[LINKER].def;
 
     /* patch for z80asm */
     if (peepholeopt) {
@@ -513,7 +404,6 @@ int
 main(int argc, char **argv)
 {
     int             i, gc;
-    char           *temp, *temp2;
     char            asmarg[4096];    /* Hell, that should be long enough! */
     char            buffer[LINEMAX + 1];    /* For reading in option file */
     FILE           *fp;
@@ -530,16 +420,8 @@ main(int argc, char **argv)
     filelist = (char **) mustmalloc(sizeof(char *) * argc);
     orgfiles = (char **) mustmalloc(sizeof(char *) * argc);
 
-    /*
-     * Now, find the environmental variable ZCCFILE which contains the
-     * filename of our config file..
-     */
-    gc = 1;            /* Set for the first argument to scan for */
 
-    /*
-     * If we only have one parameter, we don't want to go any further..
-     * (Linux quite rightly baulks..)
-     */
+    gc = 1;            /* Set for the first argument to scan for */
     if (argc == 1) {
         DispInfo();
         exit(1);
@@ -549,9 +431,8 @@ main(int argc, char **argv)
 
 
     /* Okay, so now we read in the options file and get some info for us */
-
-    if ((fp = fopen(outfilename, "r")) == NULL) {
-        fprintf(stderr, "Can't open config file %s\n", outfilename);
+    if ((fp = fopen(filenamebuf, "r")) == NULL) {
+        fprintf(stderr, "Can't open config file %s\n", filenamebuf);
         exit(1);
     }
     while (fgets(buffer, LINEMAX, fp) != NULL) {
@@ -565,7 +446,6 @@ main(int argc, char **argv)
      *      Check to see if we are missing any definitions, if we are
      *      exit..
      */
-
     for (i = Z80EXE; i <= GENMATHLIB; i++) {
         if (myconf[i].def == NULL) {
             fprintf(stderr, "Missing definition for %s\n", myconf[i].name);
@@ -581,12 +461,7 @@ main(int argc, char **argv)
     snprintf(buffer, sizeof(buffer), "-l%s ", myconf[STARTUPLIB].def);
     BuildOptions(&linkargs, buffer);
 
-    /*
-     *      Set the default output file
-     */
-
-    outputfile = defaultout;
-    strcpy(outfilename, defaultout);
+ 
 
     /*
      *    Copy the .obj into the extension var (used for linking &c)
@@ -631,7 +506,7 @@ main(int argc, char **argv)
      *      Apologies for the indentation here!
      *
      */
-    if (preserve == 0) {
+    if (preserve == NO) {
         if ((fp = fopen(DEFFILE, "w")) != NULL) {
             fclose(fp);
             if (remove(DEFFILE) < 0) {
@@ -650,20 +525,18 @@ main(int argc, char **argv)
                 fprintf(stderr, "Could not create %s: File in use?\n", DEFFILE);
                 exit(1);
             }
-
-
         } else {
             fprintf(stderr, "Cannot open %s: File in use?\n", DEFFILE);
             exit(1);
         }
     }
+
     if (nfiles <= 0) {
         DispInfo();
         exit(0);
     }
-    /*
-     * Kill \n on the end of certain option lines
-     */
+
+    /* Kill \n on the end of certain option lines */
     KillEOL(myconf[LINKOPTS].def);
     KillEOL(myconf[ASMOPTS].def);
 
@@ -671,11 +544,7 @@ main(int argc, char **argv)
     if (createapp && makelib)
         createapp = NO;
 
-    /*
-     * If we're making an app, we want the default name to be a.bin not a.out
-     */
-    if (createapp && outputfile == defaultout)
-        outputfile = defaultbin;
+  
 
     /* We only have to do a late assembly hack for z80asm family */
     if (createapp && makeapp && IS_ASM(ASM_Z80ASM))
@@ -688,16 +557,9 @@ main(int argc, char **argv)
      * Copy the z88_crt0.opt file over to /tmp or t: and use it as the
      * startup code...trickery ahoy!!!
      */
-    CopyCrt0();        /* Cop out and use a function to do it -
-                 * main() is too large! */
+    CopyCrt0();       
 
-
-
-
-    /*
-     * Parse through the files, handling each one in turn
-     */
-
+    /* Parse through the files, handling each one in turn */
     for (i = 0; i < nfiles; i++) {
         switch (FindSuffix(filelist[i])) {
         case CFILE:
@@ -762,13 +624,28 @@ main(int argc, char **argv)
         }
         exit(0);
     }
+
+    /*
+     *      Set the default output file
+     */
+    if ( outputfile == NULL ) {
+        outputfile = linkeroutputfile ? linkeroutputfile : defaultout;
+        /*
+         * If we're making an app, we want the default name to be a.bin not a.out
+         */
+        if (createapp ) {
+            outputfile = defaultbin;
+        }
+    }
+
+   
+
     /* Link them, if errors, atexit() deals with them! */
 
     if (linkthem(myconf[LINKER].def))
         exit(1);
 
     if (createapp) {
-
         /* Building an application - run the appmake command on it */
         snprintf(buffer, sizeof(buffer), "%s %s -b %s -c %s", myconf[APPMAKE].def, appmakeargs ? appmakeargs : "", outputfile, myconf[CRT0].def);
         if (verbose)
@@ -780,9 +657,11 @@ main(int argc, char **argv)
     }
     if (mapon && usetemp) {
         char           *oldptr;
-        if ((oldptr = strrchr(outfilename, '.')))
+
+        strcpy(filenamebuf, outputfile);
+        if ((oldptr = strrchr(filenamebuf, '.')))
             *oldptr = 0;
-        if (CopyFile(myconf[CRT0].def, ".map", outfilename, ".map")) {
+        if (CopyFile(myconf[CRT0].def, ".map", filenamebuf, ".map")) {
             fprintf(stderr, "Cannot copy map file\n");
             exit(1);
         }
@@ -851,28 +730,26 @@ BuildAsmLine(char *dest, char *prefix)
  */
 
 void 
-SetLibMake(char *arg)
+SetLibMake(arg_t *argument, char *arg)
 {
     makelib = YES;
     compileonly = YES;    /* Get to object file */
-    peepholeopt = 2 * YES;
+    peepholeopt = 2;
     AddComp(arg);
 }
 
-void 
-SetPreserve(char *arg)
+void
+SetBoolean(arg_t *arg, char *val)
 {
-    preserve = YES;
+    if ((arg->flags & AF_BOOL_TRUE)) {
+        *(int *)arg->data = YES;
+    } else {
+        *(int *)arg->data = NO;
+    }
 }
 
 void 
-SetCreateApp(char *arg)
-{
-    createapp = YES;
-}
-
-void 
-SetLateAssemble(char *arg)
+SetLateAssemble(arg_t *argument, char *arg)
 {
     char           *temp = " -make-app";
     makeapp = YES;
@@ -882,90 +759,31 @@ SetLateAssemble(char *arg)
 
 
 void 
-SetCompileOnly(char *arg)
+SetString(arg_t *argument, char *arg)
 {
-    compileonly = YES;
-}
-
-void 
-SetAssembleOnly(char *arg)
-{
-    assembleonly = YES;
-}
-
-void 
-SetOutputMap(char *arg)
-{
-    mapon = YES;
-}
-
-void 
-SetOutputSym(char *arg)
-{
-    symbolson = YES;
-}
-
-void 
-SetOutputFile(char *arg)
-{
-    *outfilename = 0;
-    sscanf(&arg[1], "%s", outfilename);
-    outputfile = outfilename;
-    if (!strlen(outputfile)) {
-        /* Invalid filename specified (null) try next argument up */
+    *filenamebuf = 0;
+    sscanf(&arg[strlen(argument->name)], "%s", filenamebuf);
+    *(char **)argument->data = filenamebuf;
+    if (strlen(*(char **)argument->data) == 0) {
+        *(char **)argument->data = NULL;
+        /* Try the next argument up */
         if (gargv[gargc + 1][0] != '-') {
             /* Aha...non option comes next... */
             gargc++;
-            strncpy(outfilename, gargv[gargc], sizeof(outfilename));
-        } else {
-            outputfile = defaultout;
+            *(char **)argument->data = gargv[gargc];
         }
     }
 }
 
 void 
-SetPeepHole(char *arg)
+SetPeepHole(arg_t *argument, char *arg)
 {
-    if ((arg[1]) == '2')
-        peepholeopt = 2 * YES;
-    else if ((arg[1]) == '0')
-        peepholeopt = NO;
-    else
-        peepholeopt = arg[1] - '0';
-}
-
-void 
-SetTemp(char *arg)
-{
-#if !defined(__MSDOS__) || !defined(__TURBOC__)
-    /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
-    usetemp = YES;
-#endif
-}
-
-void 
-UnSetTemp(char *arg)
-{
-    usetemp = NO;
+    peepholeopt = arg[1] - '0';
 }
 
 
 void 
-SetPreProcessOnly(char *arg)
-{
-    preprocessonly = YES;
-}
-
-void 
-SetZ80Verb(char *arg)
-{
-    z80verbose = YES;
-}
-
-
-
-void 
-AddToAssembler(char *arg)
+AddToAssembler(arg_t *argument, char *arg)
 {
     BuildOptions(&asmargs, arg + 2);
     /*
@@ -978,51 +796,40 @@ AddToAssembler(char *arg)
 }
 
 void 
-AddToLinker(char *arg)
+AddToLinker(arg_t *argument, char *arg)
 {
     BuildOptions(&linkargs, arg + 2);
 }
 
 
 void 
-AddToAppmake(char *arg)
+AddToAppmake(arg_t *argument, char *arg)
 {
     BuildOptions(&appmakeargs, arg + 2);
 }
 
 void 
-AddAppmake(char *arg)
+AddAppmake(arg_t *argument, char *arg)
 {
     BuildOptions(&appmakeargs, arg - 1);
 }
 
 
 void 
-AddToPreProc(char *arg)
+AddToPreProc(arg_t *argument, char *arg)
 {
     BuildOptions(&cpparg, arg + 2);
 }
 
 void 
-AddPreProc(char *arg)
+AddPreProc(arg_t *argument, char *arg)
 {
     BuildOptions(&cpparg, arg - 1);
 }
 
-void 
-SetCleanUp(char *arg)
-{
-    cleanup = YES;
-}
 
 void 
-UnSetCleanUp(char *arg)
-{
-    cleanup = NO;
-}
-
-void 
-AddLinkLibrary(char *arg)
+AddLinkLibrary(arg_t *argument, char *arg)
 {
     char            buffer[LINEMAX + 1];    /* A little large! */
     /*
@@ -1046,9 +853,9 @@ AddLinkLibrary(char *arg)
 }
 
 void 
-AddLinkOption(char *arg)
+AddLinkOption(arg_t *arg, char *val)
 {
-    BuildOptions_start(&linkargs, arg);
+    BuildOptions_start(&linkargs, val);
 }
 
 
@@ -1156,18 +963,10 @@ AddToFileList(char *arg)
 }
 
 void 
-SetVerbose(char *arg)
+DispVer(arg_t *arg, char *val)
 {
-    if (arg[1] == 'n')
-        verbose = NO;
-    else
-        verbose = YES;
-}
+    arg_t      *cur = &myargs[0];
 
-void 
-DispVer(char *arg)
-{
-    struct args    *cur = &myargs[0];
     DispInfo();
 
     printf("\nOptions:\n\n");
@@ -1180,16 +979,9 @@ DispVer(char *arg)
     exit(0);
 }
 
-void 
-SetRelocate(char *arg)
-{
-    relocate = YES;
-}
-
-
 
 void 
-SetShortObj(char *arg)
+SetShortObj(arg_t *arg,char *val)
 {
     strcpy(extension, ".o");
 }
@@ -1206,22 +998,22 @@ DispInfo(void)
 void 
 ParseArgs(char *arg)
 {
-    struct args    *pargs;
+    arg_t          *pargs;
     int             flag;
+
     pargs = myargs;
     flag = 0;
+
     while (pargs->setfunc) {
-        switch (pargs->more) {
-        case YES:
-            /* More info follows the initial thing.. */
+        if ((pargs->flags & AF_MORE) ) {
+            /* More info follows the option */
             if (strncmp(arg, pargs->name, strlen(pargs->name)) == 0) {
-                (*pargs->setfunc) (arg);
+                (*pargs->setfunc) (pargs, arg);
                 flag = 1;
             }
-            break;
-        case NO:
+        } else {
             if (strcmp(arg, pargs->name) == 0) {
-                (*pargs->setfunc) (arg);
+                (*pargs->setfunc) (pargs, arg);
                 flag = 1;
             }
         }
@@ -1303,9 +1095,9 @@ SetNormal(char *arg, int num)
 
     ptr = name;
 
-    if (ptr2 = strchr(ptr, '\n'))
+    if ((ptr2 = strchr(ptr, '\n')))
         *ptr2 = 0;
-    if (ptr2 = strchr(ptr, '\r'))
+    if ((ptr2 = strchr(ptr, '\r')))
         *ptr2 = 0;
 
 
@@ -1381,13 +1173,13 @@ SetAssemblerType(char *name)
 }
 
 void 
-SetAssembler(char *arg)
+SetAssembler(arg_t *argument, char *val)
 {
     /* Set the assembler type */
-    SetAssemblerType(arg + 4);
+    SetAssemblerType(val + 4);
 
     /* Add to the compiler as well */
-    AddComp(arg);
+    AddComp(val);
 }
 
 void 
@@ -1401,9 +1193,9 @@ SetOptions(char *arg, int num)
     while (*ptr && isspace(*ptr))
         ++ptr;
 
-    if (ptr2 = strchr(ptr, '\n'))
+    if ((ptr2 = strchr(ptr, '\n')))
         *ptr2 = 0;
-    if (ptr2 = strchr(ptr, '\r'))
+    if ((ptr2 = strchr(ptr, '\r')))
         *ptr2 = 0;
 
 
@@ -1442,7 +1234,11 @@ CopyOutFiles(char *suffix)
 
     for (j = 0; j < nfiles; j++) {
         ptr1 = changesuffix(filelist[j], suffix);
-        ptr2 = changesuffix(orgfiles[j], suffix);
+        if ( outputfile != NULL ) {
+            ptr2 = strdup(outputfile);
+        } else {
+            ptr2 = changesuffix(orgfiles[j], suffix);
+        }
         k = CopyFile(ptr1, "", ptr2, "");
         free(ptr1);
         free(ptr2);
@@ -1453,13 +1249,6 @@ CopyOutFiles(char *suffix)
     }
 }
 
-
-/*
- *      Functions to clean up after the compiler - these are called
- *      courtesy of atexit()
- *
- *      Cleanup mem now in here as well - to avoid crashes!
- */
 
 
 void 
@@ -1519,19 +1308,19 @@ CleanUpFiles(void)
             free(orgfiles[j]);
         }
         free(filelist);
-        filelist = 0;
+        filelist = NULL;
     }
     if (linkargs) {
         free(linkargs);
-        linkargs = 0;
+        linkargs = NULL;
     }
     if (comparg) {
         free(comparg);
-        comparg = 0;
+        comparg = NULL;
     }
     if (cpparg) {
         free(cpparg);
-        cpparg = 0;
+        cpparg = NULL;
     }
 }
 
@@ -1626,9 +1415,10 @@ ShowErrors(char *filen, char *orig)
 void 
 tempname(char *filen)
 {
-    char           *ptr;
 
 #ifdef _WIN32
+    char           *ptr;
+
     /* Predefined in 32-bit MS Visual C/C++ and Borland Builder C/C++ */
     if (ptr = getenv("TEMP")) {    /* Under Windows 95 usually
                      * C:\WINDOWS\TEMP */
@@ -1688,10 +1478,10 @@ FindConfigFile(char *arg, int gc)
 
     /* Scan for an option file on the command line */
     if (arg[0] == '+') {
-        strcpy(outfilename, arg + 1);
+        strcpy(filenamebuf, arg + 1);
         gc++;        /* Increment first arg to search from */
         if (strstr(arg, ".cfg") != NULL) {
-            if ((fp = fopen(outfilename, "r")) != NULL) {
+            if ((fp = fopen(filenamebuf, "r")) != NULL) {
                 /* Local config file */
                 fclose(fp);
                 return (gc);
@@ -1704,18 +1494,18 @@ FindConfigFile(char *arg, int gc)
                 exit(1);
             }
             /* Config file in config directory */
-            strcpy(outfilename, cfgfile);
-            strcat(outfilename, arg + 1);
-            strcat(outfilename, ".cfg");
+            strcpy(filenamebuf, cfgfile);
+            strcat(filenamebuf, arg + 1);
+            strcat(filenamebuf, ".cfg");
             return (gc);
         } else {
 #ifdef __MSDOS__
-            snprintf(outfilename, sizeof(outfilename), "%s\\lib\\config\\%s.cfg", PREFIX, arg + 1);
+            snprintf(filenamebuf, sizeof(filenamebuf), "%s\\lib\\config\\%s.cfg", PREFIX, arg + 1);
 #else
 #ifdef AMIGA
-            snprintf(outfilename, sizeof(outfilename), "%slib/config/%s.cfg", PREFIX, arg + 1);
+            snprintf(filenamebuf, sizeof(filenamebuf), "%slib/config/%s.cfg", PREFIX, arg + 1);
 #else
-            snprintf(outfilename, sizeof(outfilename), "%s/lib/config/%s.cfg", PREFIX, arg + 1);
+            snprintf(filenamebuf, sizeof(filenamebuf), "%s/lib/config/%s.cfg", PREFIX, arg + 1);
 #endif
 #endif
         }
@@ -1732,28 +1522,28 @@ FindConfigFile(char *arg, int gc)
             fprintf(stderr, "Possibly corrupt env variable ZCCFILE\n");
             exit(1);
         }
-        strcpy(outfilename, cfgfile);
+        strcpy(filenamebuf, cfgfile);
         return (gc);
     }
     /*
-         * Last resort!
-         * New style config take ZCCCFG/zcc.cfg
-         */
+     * Last resort!
+     * New style config take ZCCCFG/zcc.cfg
+     */
     cfgfile = getenv("ZCCCFG");
     if (cfgfile != NULL) {
         if (strlen(cfgfile) > FILENAME_MAX) {
             fprintf(stderr, "Possibly corrupt env variable ZCCCFG\n");
             exit(1);
         }
-        strcpy(outfilename, cfgfile);
-        strcat(outfilename, "zcc.cfg");
+        strcpy(filenamebuf, cfgfile);
+        strcat(filenamebuf, "zcc.cfg");
     } else {
 #if 1
 #if defined(__MSDOS__) && defined(__TURBOC__)
         /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
-        snprintf(outfilename, sizeof(outfilename), "%s\\lib\\config\\zcc.cfg", PREFIX);
+        snprintf(filenamebuf, sizeof(filenamebuf), "%s\\lib\\config\\zcc.cfg", PREFIX);
 #else
-        snprintf(outfilename, sizeof(outfilename), "%s/lib/config/zcc.cfg", PREFIX);
+        snprintf(filenamebuf, sizeof(filenamebuf), "%s/lib/config/zcc.cfg", PREFIX);
 #endif
 #else
         fprintf(stderr, "Couldn't find env variable ZCCCFG\n");
@@ -1819,7 +1609,7 @@ parse_option(char *option)
 
 /* Check link arguments (-l) to -i for z80asm */
 void 
-linkargs_mangle()
+linkargs_mangle(char *linkargs)
 {
     char           *ptr = linkargs;
 
