@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.9 2009-08-14 22:23:12 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.10 2010-04-16 17:34:37 dom Exp $ */
 /* $History: Z80INSTR.C $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -66,7 +66,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 /* external functions */
 struct expr *ParseNumExpr (void);
-void ReportError (char *filename, short linenr, int errnum);
+void ReportError (char *filename, int linenr, int errnum);
 void RemovePfixlist (struct expr *pfixexpr);
 void Pass2info (struct expr *expression, char constrange, long lfileptr);
 long EvalPfixExpr (struct expr *pfixexpr);

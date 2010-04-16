@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.2 2007-07-13 09:03:10 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.3 2010-04-16 17:34:37 dom Exp $ */
 /* $History: SYMBOLS.C $ */
 /*  */
 /* *****************  Version 9  ***************** */
@@ -54,7 +54,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 
 /* external functions */
-void ReportError (char *filename, short linenr, int errnum);
+void ReportError (char *filename, int linenr, int errnum);
 
 /* local functions */
 struct symref *AllocSymRef (void);

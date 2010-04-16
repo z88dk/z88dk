@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.9 2009-08-14 22:23:12 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.10 2010-04-16 17:34:37 dom Exp $ */
 /* $History: Asmdrctv.c $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -91,7 +91,7 @@ char *AllocIdentifier (size_t len);
 long EvalPfixExpr (struct expr *pfixexpr);
 long GetConstant (char *evalerr);
 void Pass2info (struct expr *expression, char constrange, long lfileptr);
-void ReportError (char *filename, short linenr, int errnum);
+void ReportError (char *filename, int linenr, int errnum);
 void ReportIOError(char *filename);
 void RemovePfixlist (struct expr *pfixexpr);
 void Z80pass1 (void);

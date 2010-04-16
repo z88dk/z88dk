@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.13 2009-10-11 00:24:38 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.14 2010-04-16 17:34:37 dom Exp $ */
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -74,7 +74,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 /* external functions */
 void Skipline (FILE *fptr);
-void ReportError (char *filename, short linenr, int errnum);
+void ReportError (char *filename, int linenr, int errnum);
 void Subroutine_addr (int opc0, int opc);
 void JP_instr (int opc0, int opc);
 void PushPop_instr (int opcode);

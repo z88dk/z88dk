@@ -14,7 +14,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.22 2009-07-18 23:23:15 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.23 2010-04-16 17:34:37 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -141,7 +141,7 @@ symbol *CreateSymbol (char *identifier, long value, unsigned char symboltype, st
 /* local functions */
 void prompt (void);
 void usage (void);
-void ReportError (char *filename, short linenr, int errnum);
+void ReportError (char *filename, int linenr, int errnum);
 void ReportIOError (char *filename);
 void SetAsmFlag (char *flagid);
 void WriteHeader (void);
@@ -1109,7 +1109,7 @@ ReleaseOwnedFile (struct usedfile *ownedfile)
 
 
 void 
-ReportError (char *filename, short lineno, int errnum)
+ReportError (char *filename, int lineno, int errnum)
 {
   char	errstr[256], errflnmstr[128], errmodstr[128], errlinestr[64];
   

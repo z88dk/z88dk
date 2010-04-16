@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.12 2009-08-14 22:23:12 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.13 2010-04-16 17:34:37 dom Exp $ */
 /* $History: PRSLINE.C $ */
 /*  */
 /* *****************  Version 8  ***************** */
@@ -50,7 +50,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 
 /* external functions */
-void ReportError (char *filename, short linenr, int errnum);
+void ReportError (char *filename, int linenr, int errnum);
 
 /* local functions */
 long GetConstant (char *evalerr);
@@ -68,7 +68,7 @@ extern FILE *z80asmfile;
 extern char ident[];
 extern char separators[];
 extern enum symbols sym, ssym[];
-extern short currentline;
+extern int currentline;
 extern struct module *CURRENTMODULE;
 extern enum flag EOL, swapIXIY;
 

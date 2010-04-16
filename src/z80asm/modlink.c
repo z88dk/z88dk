@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.9 2009-09-28 23:14:13 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.10 2010-04-16 17:34:37 dom Exp $ */
 /* $History: MODLINK.C $ */
 /*  */
 /* *****************  Version 16  ***************** */
@@ -83,7 +83,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 /* external functions */
 void FreeSym (symbol * node);
-void ReportError (char *filename, short linenr, int errnum);
+void ReportError (char *filename, int linenr, int errnum);
 void ReportIOError (char *filename);
 void RemovePfixlist (struct expr *pfixexpr);
 char *AllocIdentifier (size_t len);

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.5 2009-07-18 23:23:15 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.6 2010-04-16 17:34:37 dom Exp $ */
 /* $History: EXPRPRSR.C $ */
 /*  */
 /* *****************  Version 15  ***************** */
@@ -77,7 +77,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 /* external functions */
 enum symbols GetSym (void);
-void ReportError (char *filename, short linenr, int errnum);
+void ReportError (char *filename, int linenr, int errnum);
 void Pass2info (struct expr *expression, char constrange, long lfileptr);
 long GetConstant (char *evalerr);
 symbol *GetSymPtr (char *identifier);

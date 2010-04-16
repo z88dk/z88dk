@@ -55,7 +55,7 @@ struct expr         { struct expr        *nextexpr;         /* pointer to next e
                       char               *infixptr;         /* pointer to current char in infix expression */
                       int                codepos;           /* rel. position in module code to patch (in pass 2) */
                       char               *srcfile;          /* expr. in file 'srcfile' - allocated name area deleted by ReleaseFile */
-                      short              curline;           /* expression in line of source file */
+                      int                 curline;           /* expression in line of source file */
                       long               listpos;           /* position in listing file to patch (in pass 2) */
                     };
 
@@ -72,7 +72,7 @@ struct sourcefile   { struct sourcefile  *prevsourcefile;   /* pointer to previo
                       struct sourcefile  *newsourcefile;    /* pointer to new source file to be parsed */
                       struct usedfile    *usedsourcefile;   /* list of pointers to used files owned by this file */
                       long               filepointer;       /* file pointer of current source file */
-                      short              line;              /* current line number of current source file */
+                      int		line;              /* current line number of current source file */
                       char               *fname;            /* pointer to file name of current source file */
                     };
 
