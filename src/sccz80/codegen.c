@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.26 2010-04-09 23:47:45 dom Exp $
+ *      $Id: codegen.c,v 1.27 2010-04-16 00:48:28 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -62,7 +62,7 @@ void header(void)
         assembler = "vasm";
     }
         
-    outfmt(";\tReconstucted for %s\n", assembler);
+    outfmt(";\tReconstructed for %s\n", assembler);
 
     donelibheader=0;
     if ( (tim=time(NULL) ) != -1 ) {
