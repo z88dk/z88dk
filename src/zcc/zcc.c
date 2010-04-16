@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.41 2010-04-16 00:46:51 dom Exp $
+ *      $Id: zcc.c,v 1.42 2010-04-16 01:19:44 dom Exp $
  */
 
 
@@ -35,11 +35,8 @@ static void            AddToFileList(char *);
 static void            ParseArgs(char *);
 static void            SetBoolean(arg_t *arg, char *val);
 static void            AddPreProc(arg_t *arg,char *);
-static void            AddToPreProc(arg_t *arg,char *);
-static void            AddToAssembler(arg_t *arg,char *);
-static void            AddToLinker(arg_t *arg,char *);
+static void            AddToArgs(arg_t *arg,char *);
 static void            AddAppmake(arg_t *arg,char *);
-static void            AddToAppmake(arg_t *arg,char *);
 static void            AddLinkLibrary(arg_t *arg,char *);
 static void            AddLinkOption(arg_t *arg,char *);
 static void            DispInfo(void);
@@ -164,7 +161,6 @@ static int             linker_output_separate_arg = 0;
 
 
 static char           *defaultout = "a.bin";
-static char           *defaultbin = "a.bin";
 
 
 struct arg_s {
@@ -191,10 +187,10 @@ static arg_t     myargs[] = {
     {"usetemp", AF_BOOL_TRUE, SetBoolean, &usetemp, "(default) Use the temporary directory for intermediate files"},
     {"notemp", AF_BOOL_FALSE, SetBoolean, &usetemp, "Don't use the temporary directory for intermediate files"},
     {"asm", AF_MORE, SetAssembler, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm"},
-    {"Cp", AF_MORE, AddToPreProc, NULL, "Add an option to the preprocessor"},
-    {"Ca", AF_MORE, AddToAssembler, NULL, "Add an option to the assembler"},
-    {"Cl", AF_MORE, AddToLinker, NULL, "Add an option to the linker"},
-    {"Cz", AF_MORE, AddToAppmake, NULL, "Add an option to appmake"},
+    {"Cp", AF_MORE, AddToArgs, &cpparg, "Add an option to the preprocessor"},
+    {"Ca", AF_MORE, AddToArgs, &asmargs, "Add an option to the assembler"},
+    {"Cl", AF_MORE, AddToArgs, &linkargs, "Add an option to the linker"},
+    {"Cz", AF_MORE, AddToArgs, &appmakeargs, "Add an option to appmake"},
     {"E", AF_BOOL_TRUE, SetBoolean, &preprocessonly, "Only preprocess files"},
     {"R", AF_BOOL_TRUE, SetBoolean, &relocate, "Generate relocatable code"},
     {"D", AF_MORE, AddPreProc, NULL, "Define a preprocessor option"},
@@ -630,12 +626,6 @@ main(int argc, char **argv)
      */
     if ( outputfile == NULL ) {
         outputfile = linkeroutputfile ? linkeroutputfile : defaultout;
-        /*
-         * If we're making an app, we want the default name to be a.bin not a.out
-         */
-        if (createapp ) {
-            outputfile = defaultbin;
-        }
     }
 
    
@@ -783,32 +773,6 @@ SetPeepHole(arg_t *argument, char *arg)
 
 
 void 
-AddToAssembler(arg_t *argument, char *arg)
-{
-    BuildOptions(&asmargs, arg + 2);
-    /*
-     * If the linker and assembler are the same application then add
-     * assembler options to the linker
-     */
-    if (strcmp(myconf[LINKER].def, myconf[Z80EXE].def) == 0) {
-        BuildOptions(&linkargs, arg + 2);
-    }
-}
-
-void 
-AddToLinker(arg_t *argument, char *arg)
-{
-    BuildOptions(&linkargs, arg + 2);
-}
-
-
-void 
-AddToAppmake(arg_t *argument, char *arg)
-{
-    BuildOptions(&appmakeargs, arg + 2);
-}
-
-void 
 AddAppmake(arg_t *argument, char *arg)
 {
     BuildOptions(&appmakeargs, arg - 1);
@@ -816,9 +780,16 @@ AddAppmake(arg_t *argument, char *arg)
 
 
 void 
-AddToPreProc(arg_t *argument, char *arg)
+AddToArgs(arg_t *argument, char *arg)
 {
-    BuildOptions(&cpparg, arg + 2);
+    BuildOptions(argument->data, arg + 2);
+
+    /* If this is the assembler and the linker is the same program then add to both */
+    if ( argument->data == &asmargs ) {
+        if (strcmp(myconf[LINKER].def, myconf[Z80EXE].def) == 0) {
+            BuildOptions(&linkargs, arg + 2);
+        }
+    }
 }
 
 void 
@@ -1095,11 +1066,7 @@ SetNormal(char *arg, int num)
 
     ptr = name;
 
-    if ((ptr2 = strchr(ptr, '\n')))
-        *ptr2 = 0;
-    if ((ptr2 = strchr(ptr, '\r')))
-        *ptr2 = 0;
-
+    KillEOL(ptr);
 
     if (strncmp(name, myconf[num].name, strlen(myconf[num].name)) != 0) {
         SetConfig(ptr, num);
@@ -1193,11 +1160,7 @@ SetOptions(char *arg, int num)
     while (*ptr && isspace(*ptr))
         ++ptr;
 
-    if ((ptr2 = strchr(ptr, '\n')))
-        *ptr2 = 0;
-    if ((ptr2 = strchr(ptr, '\r')))
-        *ptr2 = 0;
-
+    KillEOL(ptr);
 
     if (strncmp(name, myconf[num].name, strlen(myconf[num].name)) != 0) {
         SetConfig(ptr, num);
@@ -1218,6 +1181,8 @@ KillEOL(char *str)
 {
     char           *ptr;
     if ((ptr = strrchr(str, '\n')))
+        *ptr = 0;
+    if ((ptr = strrchr(str, '\r')))
         *ptr = 0;
 }
 
