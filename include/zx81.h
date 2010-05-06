@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.15 2010-02-10 16:15:35 stefano Exp $
+ * $Id: zx81.h,v 1.16 2010-05-06 14:42:38 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -137,6 +137,12 @@ extern void __LIB__ mirrortxt();
 
 // Fill text screen in text mode with specified character code
 extern void __LIB__ __FASTCALL__ filltxt(char character);
+
+// Scroll up text screen
+extern void __LIB__ scrolluptxt();
+
+// Scroll down text screen
+extern void __LIB__ scrolldowntxt();
 
 // Activates / Deactivates the ZX81 <-> ASCII converter,
 // used in some output routine and interfacing to the BASIC strings

@@ -1,7 +1,10 @@
 zx81/cnvtab
 zx81/copytxt
+zx81/filltxt
 zx81/invtxt
 zx81/mirrortxt
+zx81/scrolluptxt
+zx81/scrolldowntxt
 zx81/_clg_hr
 zx81/basic/zx_basemem.asm
 zx81/basic/zx_basic_length.asm
@@ -9,8 +12,8 @@ zx81/basic/zx_getint.asm
 zx81/basic/zx_getstr.asm
 zx81/basic/zx_getstr_callee.asm
 zx81/basic/zx_line.asm
-zx81/basic/zx_locatenum.asm
 zx81/basic/zx_setint.asm
+zx81/basic/zx_locatenum.asm
 zx81/basic/zx_setint_callee.asm
 zx81/basic/zx_setstr.asm
 zx81/basic/zx_setstr_callee.asm
