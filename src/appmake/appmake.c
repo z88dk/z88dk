@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.4 2009-06-13 19:16:42 dom Exp $
+ *   $Id: appmake.c,v 1.5 2010-05-13 16:00:20 stefano Exp $
  */
 
 #define MAIN_C
@@ -272,6 +272,11 @@ void writestring(char *mystring, FILE *fp)
 	}
 }
 
+void writelong(unsigned long i, FILE *fp)
+{
+    writeword(i%65536,fp);
+    writeword(i/65536,fp);
+}
 
 void writeword_p(unsigned int i, FILE *fp,unsigned char *p)
 {

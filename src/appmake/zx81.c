@@ -5,8 +5,9 @@
  *        The M/C start address of must be 16514
  *
  *        Stefano Bodrato Apr. 2000
+ *        May 2010, added support for wave file
  *
- *        $Id: zx81.c,v 1.2 2007-06-24 15:32:04 dom Exp $
+ *        $Id: zx81.c,v 1.3 2010-05-13 16:00:20 stefano Exp $
  */
 
 #include "appmake.h"
@@ -14,6 +15,8 @@
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
 static char              help         = 0;
+static char              audio        = 0;
+static char              fast         = 0;
 
 
 /* Options that are available for this module */
@@ -21,14 +24,54 @@ option_t zx81_options[] = {
     { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
+    {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
 
+void zx81_rawpeak (FILE *fpout)
+{
+  int i;
+  for (i=0; i < 7; i++)
+	fputc (0xe0,fpout);
+  for (i=0; i < 7; i++)
+	fputc (0x20,fpout);
+}
+
+void zx81_rawout (FILE *fpout, unsigned char b)
+{
+  static unsigned char c[8] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
+  int i,j,peaks;
+
+  for (i=0; i < 8; i++)
+  {
+    if (b & c[i])
+	  if ( fast ) peaks = 7; else peaks = 9;
+    else
+      if ( fast ) peaks = 3; else peaks = 4;
+
+    for (j=0; j < peaks; j++)
+	  zx81_rawpeak(fpout);
+	  
+    if ( fast ) {
+	  // bit interval at std speed: about 67
+      for (j=0; j < 50; j++)
+	    fputc (0x20,fpout);
+	} else {
+	  // bit interval at std speed: about 67
+      for (j=0; j < 60; j++)
+	    fputc (0x20,fpout);
+	}
+  }
+}
+
+
 int zx81_exec(char *target)
 {
-    char    filename[FILENAME_MAX+1];
-    FILE        *fpin, *fpout;
+    char       filename[FILENAME_MAX+1];
+    char       wavfile[FILENAME_MAX+1];
+    FILE       *fpin, *fpout;
     int        c;
     int        i;
     int        len;
@@ -56,7 +99,7 @@ int zx81_exec(char *target)
  *        Now we try to determine the size of the file
  *        to be converted
  */
-    if        (fseek(fpin,0,SEEK_END)) {
+    if (fseek(fpin,0,SEEK_END)) {
         fclose(fpin);
         myexit("Couldn't determine size of file\n",1);
     }
@@ -148,10 +191,10 @@ int zx81_exec(char *target)
     fputc(118,fpout);
 
     /* At last the DISPLAY FILE */
-    for        (c=0;c<24;c++)
+    for (c=0;c<24;c++)
     {
         fputc(118,fpout);
-        for        (i=0;i<32;i++)
+        for (i=0;i<32;i++)
             fputc(0,fpout);
     }
     fputc(118,fpout);
@@ -159,6 +202,112 @@ int zx81_exec(char *target)
     fputc(128,fpout);
     fclose(fpin);
     fclose(fpout);
+
+	/* ***************************************** */
+	/*  Now, if requested, create the audio file */
+	/* ***************************************** */
+	if ( audio ) {
+		if ( (fpin=fopen(filename,"rb") ) == NULL ) {
+			printf("Can't open file %s for wave conversion\n",filename);
+			myexit(NULL,1);
+		}
+
+        if (fseek(fpin,0,SEEK_END)) {
+           fclose(fpin);
+           myexit("Couldn't determine size of file\n",1);
+        }
+        len=ftell(fpin);
+        fseek(fpin,0L,SEEK_SET);
+
+        strcpy(wavfile,filename);
+		suffix_change(wavfile,".RAW");
+		if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
+			printf("Can't open output raw audio file %s\n",wavfile);
+			myexit(NULL,1);
+		}
+
+		/* leading silence */
+	    for (i=0; i < 0x3000; i++)
+			fputc(0x20, fpout);
+
+		/* The program has to  */
+		zx81_rawout(fpout,'Z'-27);
+		zx81_rawout(fpout,'8'-20);
+		zx81_rawout(fpout,'8'-20);
+		zx81_rawout(fpout,'D'-27);
+		zx81_rawout(fpout,'K'-27+128);
+
+        for (i=0; i<len;i++) {
+          c=getc(fpin);
+		  zx81_rawout(fpout,c);
+        }
+
+		/* trailing silence */
+	    for (i=0; i < 0x1000; i++)
+			fputc(0x20, fpout);
+
+        fclose(fpin);
+        fclose(fpout);
+
+		
+		/* Now let's think at the WAV file */
+
+		if ( (fpin=fopen(wavfile,"rb") ) == NULL ) {
+			printf("Can't open file %s for wave conversion\n",wavfile);
+			myexit(NULL,1);
+		}
+		if (fseek(fpin,0,SEEK_END)) {
+		   fclose(fpin);
+		   myexit("Couldn't determine size of file\n",1);
+		}
+		len=ftell(fpin);
+		fseek(fpin,0L,SEEK_SET);
+		suffix_change(wavfile,".wav");
+		if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
+			printf("Can't open output raw audio file %s\n",wavfile);
+			myexit(NULL,1);
+		}
+
+		/* Now let's think at the WAV file */
+		writestring("RIFF",fpout);
+
+		writelong(len+36,fpout);
+
+		writestring("WAVEfmt ",fpout);
+		writelong(0x10,fpout);
+		writeword(1,fpout);
+		writeword(1,fpout);
+		writelong(44100,fpout);
+		writelong(44100,fpout);
+		writeword(1,fpout);
+		writeword(8,fpout);
+		writestring("data",fpout);
+		
+		writelong(len,fpout);
+		
+		for (i=0; i<63;i++) {
+		  fputc(0x20,fpout);
+		}
+		/*
+		//writestring(wav_table,fpout);
+		for (i=0; i<28;i++) {
+		  fputc(0x20,fpout);
+		}
+		*/
+
+		for (i=0; i<len;i++) {
+		  c=getc(fpin);
+		  fputc(c,fpout);
+		}
+		
+        fclose(fpin);
+        fclose(fpout);
+
+		suffix_change(wavfile,".RAW");
+		remove (wavfile);
+
+	}
+	
     exit(0);
 }
                 
