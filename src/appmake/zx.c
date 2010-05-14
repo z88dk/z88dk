@@ -12,7 +12,7 @@
  *        Creates a new TAP file (overwriting if necessary) just ready to run.
  *        Use tapmaker to customize your work.
  *
- *        $Id: zx.c,v 1.4 2010-05-14 12:57:43 stefano Exp $
+ *        $Id: zx.c,v 1.5 2010-05-14 13:14:11 stefano Exp $
  */
 
 #include "appmake.h"
@@ -86,9 +86,9 @@ void zx_rawout (FILE *fpout, unsigned char b)
   for (i=0; i < 8; i++)
   {
     if (b & c[i])
-	  if ( fast ) period = 20; else period = 22;
+	  if ( fast ) period = 18; else period = 22;
     else
-      if ( fast ) period = 9; else period = 11;
+      if ( fast ) period = 7; else period = 11;
 
     zx_rawbit(fpout, period);
   }
