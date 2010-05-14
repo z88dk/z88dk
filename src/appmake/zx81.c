@@ -7,7 +7,7 @@
  *        Stefano Bodrato Apr. 2000
  *        May 2010, added support for wave file
  *
- *        $Id: zx81.c,v 1.3 2010-05-13 16:00:20 stefano Exp $
+ *        $Id: zx81.c,v 1.4 2010-05-14 12:57:43 stefano Exp $
  */
 
 #include "appmake.h"
@@ -90,7 +90,7 @@ int zx81_exec(char *target)
 
 
     if ( (fpin=fopen(binname,"rb") ) == NULL ) {
-        printf("Can't open input file %s\n",binname);
+        fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }
 
@@ -110,7 +110,7 @@ int zx81_exec(char *target)
 
   
     if ( (fpout=fopen(filename,"wb") ) == NULL ) {
-        printf("Can't open output file %s\n",filename);
+        fprintf(stderr,"Can't open output file %s\n",filename);
         myexit(NULL,1);
     }
 
@@ -194,8 +194,12 @@ int zx81_exec(char *target)
     for (c=0;c<24;c++)
     {
         fputc(118,fpout);
-        for (i=0;i<32;i++)
+        //if ( fast ) {
+        //    fputc(0,fpout);
+		//} else {
+		  for (i=0;i<32;i++)
             fputc(0,fpout);
+		//}
     }
     fputc(118,fpout);
 
@@ -206,9 +210,9 @@ int zx81_exec(char *target)
 	/* ***************************************** */
 	/*  Now, if requested, create the audio file */
 	/* ***************************************** */
-	if ( audio ) {
+	if (( audio ) || ( fast )) {
 		if ( (fpin=fopen(filename,"rb") ) == NULL ) {
-			printf("Can't open file %s for wave conversion\n",filename);
+			fprintf(stderr,"Can't open file %s for wave conversion\n",filename);
 			myexit(NULL,1);
 		}
 
@@ -222,7 +226,7 @@ int zx81_exec(char *target)
         strcpy(wavfile,filename);
 		suffix_change(wavfile,".RAW");
 		if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
-			printf("Can't open output raw audio file %s\n",wavfile);
+			fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
 			myexit(NULL,1);
 		}
 
@@ -230,7 +234,7 @@ int zx81_exec(char *target)
 	    for (i=0; i < 0x3000; i++)
 			fputc(0x20, fpout);
 
-		/* The program has to  */
+		/* The program on tape has to have a leading name */
 		zx81_rawout(fpout,'Z'-27);
 		zx81_rawout(fpout,'8'-20);
 		zx81_rawout(fpout,'8'-20);
@@ -253,7 +257,7 @@ int zx81_exec(char *target)
 		/* Now let's think at the WAV file */
 
 		if ( (fpin=fopen(wavfile,"rb") ) == NULL ) {
-			printf("Can't open file %s for wave conversion\n",wavfile);
+			fprintf(stderr,"Can't open file %s for wave conversion\n",wavfile);
 			myexit(NULL,1);
 		}
 		if (fseek(fpin,0,SEEK_END)) {
@@ -264,47 +268,12 @@ int zx81_exec(char *target)
 		fseek(fpin,0L,SEEK_SET);
 		suffix_change(wavfile,".wav");
 		if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
-			printf("Can't open output raw audio file %s\n",wavfile);
+			fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
 			myexit(NULL,1);
 		}
 
-		/* Now let's think at the WAV file */
-		writestring("RIFF",fpout);
-
-		writelong(len+36,fpout);
-
-		writestring("WAVEfmt ",fpout);
-		writelong(0x10,fpout);
-		writeword(1,fpout);
-		writeword(1,fpout);
-		writelong(44100,fpout);
-		writelong(44100,fpout);
-		writeword(1,fpout);
-		writeword(8,fpout);
-		writestring("data",fpout);
-		
-		writelong(len,fpout);
-		
-		for (i=0; i<63;i++) {
-		  fputc(0x20,fpout);
-		}
-		/*
-		//writestring(wav_table,fpout);
-		for (i=0; i<28;i++) {
-		  fputc(0x20,fpout);
-		}
-		*/
-
-		for (i=0; i<len;i++) {
-		  c=getc(fpin);
-		  fputc(c,fpout);
-		}
-		
-        fclose(fpin);
-        fclose(fpout);
-
-		suffix_change(wavfile,".RAW");
-		remove (wavfile);
+		/* Now let's think at the WAV format */
+		raw2wav(wavfile);
 
 	}
 	

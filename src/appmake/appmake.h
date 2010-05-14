@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.14 2010-05-13 16:00:20 stefano Exp $
+ *   $Id: appmake.h,v 1.15 2010-05-14 12:57:43 stefano Exp $
  */
 
 
@@ -215,3 +215,4 @@ extern void         writestring_p(char *mystring, FILE *fp,unsigned char *p);
 extern void         writebyte_cksum(unsigned char c, FILE *fp, unsigned long *cksum);
 extern void         writeword_cksum(unsigned int i, FILE *fp, unsigned long *cksum);
 
+extern void			raw2wav(char *rawfilename);

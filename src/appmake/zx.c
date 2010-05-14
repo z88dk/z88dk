@@ -12,7 +12,7 @@
  *        Creates a new TAP file (overwriting if necessary) just ready to run.
  *        Use tapmaker to customize your work.
  *
- *        $Id: zx.c,v 1.3 2009-06-13 19:16:42 dom Exp $
+ *        $Id: zx.c,v 1.4 2010-05-14 12:57:43 stefano Exp $
  */
 
 #include "appmake.h"
@@ -26,6 +26,8 @@ static char             *blockname    = NULL;
 static char             *merge        = NULL;
 static int               origin       = -1;
 static char              help         = 0;
+static char              audio        = 0;
+static char              fast         = 0;
 static unsigned char     parity;
 
 
@@ -35,22 +37,73 @@ option_t zx_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
-    {  0 , "merge",    "Merge an external TAPE block",        OPT_STR,   &merge },
+    {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
+    {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
+    {  0 , "merge",    "Merge an external TAPE block",      OPT_STR,   &merge },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0 , "blockname", "Name of the code block in tap file", OPT_STR, &blockname},
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
+void zx_pilot(FILE *fpout)
+{
+  int i,j;
+
+  /* First a short gap.. */
+  for (i=0; i < 200; i++)
+    fputc (0x20,fpout);
+
+  /* Then the beeeep */
+  for (j=0; j<2000; j++) {
+    for (i=0; i < 27; i++)
+	  fputc (0x20,fpout);
+    for (i=0; i < 27; i++)
+	  fputc (0xe0,fpout);
+  }
+
+  /* On audio output we force the carry flag to zero */
+  for (i=0; i < 8; i++)
+	fputc (0x20,fpout);
+  for (i=0; i < 8; i++)
+	fputc (0xe0,fpout);
+}
+
+void zx_rawbit(FILE *fpout, int period)
+{
+  int i;
+
+  for (i=0; i < period; i++)
+	fputc (0x20,fpout);
+  for (i=0; i < period; i++)
+	fputc (0xe0,fpout);
+}
+
+void zx_rawout (FILE *fpout, unsigned char b)
+{
+  static unsigned char c[8] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
+  int i,period;
+
+  for (i=0; i < 8; i++)
+  {
+    if (b & c[i])
+	  if ( fast ) period = 20; else period = 22;
+    else
+      if ( fast ) period = 9; else period = 11;
+
+    zx_rawbit(fpout, period);
+  }
+}
 
 int zx_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
+    char    wavfile[FILENAME_MAX+1];
     char    name[11];
     char    mybuf[20];
     FILE    *fpin, *fpout, *fpmerge;
     long    pos;
     int     c;
-    int     i;
+    int     i,blocklen;
     int     len, mlen;
 
     if ( help )
@@ -110,7 +163,7 @@ int zx_exec(char *target)
     mlen=0;
     if ( merge != NULL ) {
         if ( (fpmerge=fopen(merge,"rb") ) == NULL ) {
-            printf("File for 'merge' not found: %s\n",merge);
+            fprintf(stderr,"File for 'merge' not found: %s\n",merge);
             fclose(fpin);
             fclose(fpout);
             myexit(NULL,1);
@@ -145,7 +198,7 @@ int zx_exec(char *target)
 
 
 /* Write out the BASIC loader program */
-    writeword_p(32 + mlen,fpout,&parity);         /* block lenght: works if ORG is between 10001 and 65536 (4 digit numbers) */
+    writeword_p(32 + mlen,fpout,&parity);         /* block lenght */
     parity=0;
     writebyte_p(255,fpout,&parity);        /* Data has a block type of 255 */
     writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
@@ -214,6 +267,55 @@ int zx_exec(char *target)
     writebyte_p(parity,fpout,&parity);
     fclose(fpin);
     fclose(fpout);
+
+
+	/* ***************************************** */
+	/*  Now, if requested, create the audio file */
+	/* ***************************************** */
+	if ( audio ) {
+		if ( (fpin=fopen(filename,"rb") ) == NULL ) {
+			fprintf(stderr,"Can't open file %s for wave conversion\n",filename);
+			myexit(NULL,1);
+		}
+
+        if (fseek(fpin,0,SEEK_END)) {
+           fclose(fpin);
+           myexit("Couldn't determine size of file\n",1);
+        }
+        len=ftell(fpin);
+        fseek(fpin,0L,SEEK_SET);
+
+        strcpy(wavfile,filename);
+		suffix_change(wavfile,".RAW");
+		if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
+			fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
+			myexit(NULL,1);
+		}
+
+		/* leading silence */
+	    for (i=0; i < 0x500; i++)
+			fputc(0x20, fpout);
+
+			/* Data blocks */
+		while (ftell(fpin) < len) {
+		  blocklen = (getc(fpin) + 256 * getc(fpin));
+		  zx_pilot(fpout);
+          for (i=0; (i < blocklen); i++) {
+            c=getc(fpin);
+		    zx_rawout(fpout,c);
+          }
+		}
+
+		/* trailing silence */
+	    for (i=0; i < 0x1000; i++)
+			fputc(0x20, fpout);
+
+        fclose(fpin);
+        fclose(fpout);
+		
+		/* Now let's think at the WAV format */
+		raw2wav(wavfile);
+	}
 
     return 0;
 }
