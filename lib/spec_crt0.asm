@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.26 2010-04-11 02:08:40 dom Exp $
+;       $Id: spec_crt0.asm,v 1.27 2010-05-15 01:21:47 dom Exp $
 ;
 
 
@@ -123,6 +123,12 @@ ELSE
   ENDIF
         ld      a,2             ; open the upper display (uneeded?)
         call    5633
+	ld	a,(23624)
+	rrca
+	rrca
+	rrca
+	and	7
+	ld	(snd_tick),a
 
 ENDIF
 
