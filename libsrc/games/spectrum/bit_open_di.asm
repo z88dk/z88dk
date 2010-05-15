@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.2 2002-04-17 21:30:24 dom Exp $
+; $Id: bit_open_di.asm,v 1.3 2010-05-15 01:20:58 dom Exp $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
@@ -12,10 +12,5 @@
 
 .bit_open_di
           di
-          ld    a,(23624)  
-          rrca
-          rrca
-          rrca
-          or	8
-          ld   (snd_tick),a
+          ld  a,(snd_tick)
           ret

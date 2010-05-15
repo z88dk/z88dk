@@ -10,8 +10,4 @@ XREF snd_tick
    ld a,l
    out (254),a
    ld (snd_tick),a
-   add a
-   add a
-   add a
-   ld (23624),a
    ret
