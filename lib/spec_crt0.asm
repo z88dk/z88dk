@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.27 2010-05-15 01:21:47 dom Exp $
+;       $Id: spec_crt0.asm,v 1.28 2010-05-17 22:40:54 dom Exp $
 ;
 
 
@@ -123,12 +123,14 @@ ELSE
   ENDIF
         ld      a,2             ; open the upper display (uneeded?)
         call    5633
+IF DEFINED_NEED1bitsound
 	ld	a,(23624)
 	rrca
 	rrca
 	rrca
 	and	7
 	ld	(snd_tick),a
+ENDIF
 
 ENDIF
 
