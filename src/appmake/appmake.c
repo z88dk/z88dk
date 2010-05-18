@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.6 2010-05-14 12:57:43 stefano Exp $
+ *   $Id: appmake.c,v 1.7 2010-05-18 07:11:59 stefano Exp $
  */
 
 #define MAIN_C
@@ -317,7 +317,8 @@ void raw2wav(char *wavfile)
 {
 	char    rawfilename[FILENAME_MAX+1];
 	FILE    *fpin, *fpout;
-	int		i, c, len;
+	int		c;
+	long	i, len;
 	
 	strcpy(rawfilename,wavfile);
 	

@@ -7,7 +7,7 @@
  *        Stefano Bodrato Apr. 2000
  *        May 2010, added support for wave file
  *
- *        $Id: zx81.c,v 1.4 2010-05-14 12:57:43 stefano Exp $
+ *        $Id: zx81.c,v 1.5 2010-05-18 07:12:00 stefano Exp $
  */
 
 #include "appmake.h"
@@ -119,8 +119,8 @@ int zx81_exec(char *target)
     fputc(0,fpout);
     fputc(1,fpout);
     fputc(0,fpout);
-    writeword(16530+len,fpout);
-    writeword(16531+len,fpout);
+    writeword(16530+len,fpout);  // ERR_SP: $4002  - differenza: 144 bytes
+    writeword(16531+len,fpout);  // ? forse err_sp ?
     writeword(17323+len,fpout);
     writeword(0,fpout);
     writeword(17324+len,fpout);
@@ -253,25 +253,6 @@ int zx81_exec(char *target)
         fclose(fpin);
         fclose(fpout);
 
-		
-		/* Now let's think at the WAV file */
-
-		if ( (fpin=fopen(wavfile,"rb") ) == NULL ) {
-			fprintf(stderr,"Can't open file %s for wave conversion\n",wavfile);
-			myexit(NULL,1);
-		}
-		if (fseek(fpin,0,SEEK_END)) {
-		   fclose(fpin);
-		   myexit("Couldn't determine size of file\n",1);
-		}
-		len=ftell(fpin);
-		fseek(fpin,0L,SEEK_SET);
-		suffix_change(wavfile,".wav");
-		if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
-			fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
-			myexit(NULL,1);
-		}
-
 		/* Now let's think at the WAV format */
 		raw2wav(wavfile);
 
@@ -280,7 +261,3 @@ int zx81_exec(char *target)
     exit(0);
 }
                 
-
-
-
-
