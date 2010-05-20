@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.7 2010-05-18 07:11:59 stefano Exp $
+ *   $Id: appmake.c,v 1.8 2010-05-20 07:28:21 stefano Exp $
  */
 
 #define MAIN_C
@@ -375,3 +375,53 @@ void raw2wav(char *wavfile)
 
 	remove (rawfilename);
 }
+
+void zx_pilot(FILE *fpout)
+{
+  int i,j;
+
+  /* First a short gap.. */
+  for (i=0; i < 200; i++)
+    fputc (0x20,fpout);
+
+  /* Then the beeeep */
+  for (j=0; j<2000; j++) {
+    for (i=0; i < 27; i++)
+	  fputc (0x20,fpout);
+    for (i=0; i < 27; i++)
+	  fputc (0xe0,fpout);
+  }
+
+  /* On audio output we force the carry flag to zero */
+  for (i=0; i < 8; i++)
+	fputc (0x20,fpout);
+  for (i=0; i < 8; i++)
+	fputc (0xe0,fpout);
+}
+
+void zx_rawbit(FILE *fpout, int period)
+{
+  int i;
+
+  for (i=0; i < period; i++)
+	fputc (0x20,fpout);
+  for (i=0; i < period; i++)
+	fputc (0xe0,fpout);
+}
+
+void zx_rawout (FILE *fpout, unsigned char b, char fast)
+{
+  static unsigned char c[8] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
+  int i,period;
+
+  for (i=0; i < 8; i++)
+  {
+    if (b & c[i])
+	  if ( fast ) period = 18; else period = 22;
+    else
+      if ( fast ) period = 7; else period = 11;
+
+    zx_rawbit(fpout, period);
+  }
+}
+

@@ -12,7 +12,7 @@
  *        Creates a new TAP file (overwriting if necessary) just ready to run.
  *        Use tapmaker to customize your work.
  *
- *        $Id: zx.c,v 1.5 2010-05-14 13:14:11 stefano Exp $
+ *        $Id: zx.c,v 1.6 2010-05-20 07:28:21 stefano Exp $
  */
 
 #include "appmake.h"
@@ -45,54 +45,6 @@ option_t zx_options[] = {
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
-void zx_pilot(FILE *fpout)
-{
-  int i,j;
-
-  /* First a short gap.. */
-  for (i=0; i < 200; i++)
-    fputc (0x20,fpout);
-
-  /* Then the beeeep */
-  for (j=0; j<2000; j++) {
-    for (i=0; i < 27; i++)
-	  fputc (0x20,fpout);
-    for (i=0; i < 27; i++)
-	  fputc (0xe0,fpout);
-  }
-
-  /* On audio output we force the carry flag to zero */
-  for (i=0; i < 8; i++)
-	fputc (0x20,fpout);
-  for (i=0; i < 8; i++)
-	fputc (0xe0,fpout);
-}
-
-void zx_rawbit(FILE *fpout, int period)
-{
-  int i;
-
-  for (i=0; i < period; i++)
-	fputc (0x20,fpout);
-  for (i=0; i < period; i++)
-	fputc (0xe0,fpout);
-}
-
-void zx_rawout (FILE *fpout, unsigned char b)
-{
-  static unsigned char c[8] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
-  int i,period;
-
-  for (i=0; i < 8; i++)
-  {
-    if (b & c[i])
-	  if ( fast ) period = 18; else period = 22;
-    else
-      if ( fast ) period = 7; else period = 11;
-
-    zx_rawbit(fpout, period);
-  }
-}
 
 int zx_exec(char *target)
 {
@@ -302,7 +254,7 @@ int zx_exec(char *target)
 		  zx_pilot(fpout);
           for (i=0; (i < blocklen); i++) {
             c=getc(fpin);
-		    zx_rawout(fpout,c);
+		    zx_rawout(fpout,c,fast);
           }
 		}
 
@@ -319,8 +271,4 @@ int zx_exec(char *target)
 
     return 0;
 }
-
-
-
-
 

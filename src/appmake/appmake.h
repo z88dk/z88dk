@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.15 2010-05-14 12:57:43 stefano Exp $
+ *   $Id: appmake.h,v 1.16 2010-05-20 07:28:21 stefano Exp $
  */
 
 
@@ -112,10 +112,10 @@ struct {
     { "bin2bas",  "abc80",    "(C) 2000 Stefano Bodrato",
       "Creates a BASIC loader and a tape file for the ABC computers",
       abc80_exec,   &abc80_options },
-    { "bin2byt",  "ace",      "(C) 2001 Stefano Bodrato",
+    { "bin2byt",  "acebyt",      "(C) 2001 Stefano Bodrato",
       "Generates a .byt file suitable for loading into emulators",
       acebyt_exec,   &acebyt_options },
-    { "acetap",  "acetap",    "(C) 2001 Stefano Bodrato",
+    { "acetap",  "ace",    "(C) 2001 Stefano Bodrato",
       "Generates a .TAP for the Ace32 emulator",
       acetap_exec,   &acetap_options },
     { "bin2caq",  "aquarius", "(C) 2001 Stefano Bodrato",
@@ -216,3 +216,8 @@ extern void         writebyte_cksum(unsigned char c, FILE *fp, unsigned long *ck
 extern void         writeword_cksum(unsigned int i, FILE *fp, unsigned long *cksum);
 
 extern void			raw2wav(char *rawfilename);
+
+extern void			zx_pilot(FILE *fpout);
+extern void			zx_rawbit(FILE *fpout, int period);
+extern void			zx_rawout (FILE *fpout, unsigned char b, char fast);
+

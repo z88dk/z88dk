@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.141 2010-02-10 16:15:35 stefano Exp $
+# $Id: Makefile,v 1.142 2010-05-20 07:28:21 stefano Exp $
 
 
 include	Make.config
@@ -14,7 +14,7 @@ include	Make.config
 
 all:	genlibs	z88libs	tilibs zxlibs \
 	abc80_clib.lib abc80ansi_clib.lib abc800_clib.lib \
-	aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
+	ace_clib.lib aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
 	c128libs cpclibs cpm_clib.lib gal_clib.lib \
 	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib	nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
@@ -788,6 +788,22 @@ abc800_clib.lib:
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/abc800_clib @$(LISTFILE_DIRECTORY)/abc800.lst
 
 # Jupiter ACE library -	Stefano
+ace_clib.lib:
+	@echo ''
+	@echo '--- Building Jupiter Ace	Library ---'
+	@echo ''
+	$(MAKE)	gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd	..
+	cd printflike ;	$(MAKE)	; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(MAKE)	gamesdeps
+	cd games ; $(MAKE) lace	; cd ..
+	$(LIBLINKER) -DFORjupiter -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
+
+# Jupiter ACE ANSI library -	Stefano
 aceansi_clib.lib:
 	@echo ''
 	@echo '--- Building Jupiter Ace	ANSI Library ---'

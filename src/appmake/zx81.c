@@ -7,7 +7,7 @@
  *        Stefano Bodrato Apr. 2000
  *        May 2010, added support for wave file
  *
- *        $Id: zx81.c,v 1.5 2010-05-18 07:12:00 stefano Exp $
+ *        $Id: zx81.c,v 1.6 2010-05-20 07:28:21 stefano Exp $
  */
 
 #include "appmake.h"
@@ -56,7 +56,7 @@ void zx81_rawout (FILE *fpout, unsigned char b)
 	  
     if ( fast ) {
 	  // bit interval at std speed: about 67
-      for (j=0; j < 50; j++)
+      for (j=0; j < 55; j++)
 	    fputc (0x20,fpout);
 	} else {
 	  // bit interval at std speed: about 67
