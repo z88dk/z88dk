@@ -7,7 +7,7 @@
  *        Stefano Bodrato Apr. 2000
  *        May 2010, added support for wave file
  *
- *        $Id: zx81.c,v 1.6 2010-05-20 07:28:21 stefano Exp $
+ *        $Id: zx81.c,v 1.7 2010-05-21 13:38:23 stefano Exp $
  */
 
 #include "appmake.h"
@@ -17,6 +17,7 @@ static char             *outfile      = NULL;
 static char              help         = 0;
 static char              audio        = 0;
 static char              fast         = 0;
+static char              collapsed    = 0;
 
 
 /* Options that are available for this module */
@@ -26,6 +27,7 @@ option_t zx81_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
+    {  0,  "collapsed",  "Collapse display to save loading time",  OPT_BOOL,  &collapsed },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -75,6 +77,7 @@ int zx81_exec(char *target)
     int        c;
     int        i;
     int        len;
+	int        screen_size;
 
     if ( help || binname == NULL )
         return -1;
@@ -116,28 +119,28 @@ int zx81_exec(char *target)
 
 
 /* Write out the .P file */
-    fputc(0,fpout);
-    fputc(1,fpout);
-    fputc(0,fpout);
-    writeword(16530+len,fpout);  // ERR_SP: $4002  - differenza: 144 bytes
-    writeword(16531+len,fpout);  // ? forse err_sp ?
-    writeword(17323+len,fpout);
-    writeword(0,fpout);
-    writeword(17324+len,fpout);
-    writeword(17328+len,fpout);
-    writeword(0,fpout);
-    writeword(17329+len,fpout);
-    writeword(17329+len,fpout);
-    fputc(0,fpout);
-    writeword(16477,fpout);
-    fputc(0,fpout);
-    fputc(2,fpout);
-    writeword(0,fpout);
-    fputc(191,fpout);
-    fputc(253,fpout);
+	if ( collapsed ) screen_size = 25; else screen_size = 793;	
+    fputc(0,fpout);								// VERSN ($4009)
+    writeword(1,fpout);							// E_PPC
+    writeword(16530+len,fpout);					// D_FILE
+    writeword(16531+len,fpout);					// DF_CC
+	writeword(16530+len+screen_size,fpout);		// VARS
+    writeword(0,fpout);							// DEST
+	writeword(16531+len+screen_size,fpout);		// E_LINE
+	writeword(16535+len+screen_size,fpout);		// CH_ADD ($4016)
+    writeword(0,fpout);							// X_PTR
+	writeword(16536+len+screen_size,fpout);		// STKBOT
+	writeword(16536+len+screen_size,fpout);		// STKEND
+    fputc(0,fpout);								// BERG
+    writeword(16477,fpout);						// MEM
+    fputc(0,fpout);								// not used
+    fputc(2,fpout);								// DF_SZ
+    writeword(0,fpout);							// S_TOP
+    fputc(191,fpout);							// LAST_K
+    fputc(253,fpout);							// 
     fputc(255,fpout);
-    fputc(55,fpout);
-    writeword(16530+len,fpout);
+    fputc(55,fpout);							// MARGIN (55 if 50hz, 31 if 60 hz)
+    writeword(16530+len,fpout);					// NXTLIN
     fputc(0,fpout);
     fputc(0,fpout);
     fputc(0,fpout);
@@ -151,14 +154,14 @@ int zx81_exec(char *target)
     writeword(0,fpout);
     writeword(8636,fpout);
     writeword(16408,fpout);
-    for        (i=0;i<16;i++)
+    for (i=0;i<16;i++)
         writeword(0,fpout);
     fputc(118,fpout);
-    for        (i=0;i<5;i++)
+    for (i=0;i<5;i++)
         writeword(0,fpout);
     fputc(132,fpout);
     fputc(32,fpout);
-    for        (i=0;i<10;i++)
+    for (i=0;i<10;i++)
         writeword(0,fpout);
     /* Now, the basic program, here.*/
     /* 1 REM.... */
@@ -194,12 +197,10 @@ int zx81_exec(char *target)
     for (c=0;c<24;c++)
     {
         fputc(118,fpout);
-        //if ( fast ) {
-        //    fputc(0,fpout);
-		//} else {
+        if ( !collapsed ) {
 		  for (i=0;i<32;i++)
             fputc(0,fpout);
-		//}
+		}
     }
     fputc(118,fpout);
 
