@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.9 2009-06-22 21:20:05 dom Exp $
+;	$Id: ace_crt0.asm,v 1.10 2010-05-24 14:48:57 stefano Exp $
 ;
 
 
@@ -54,7 +54,17 @@
 
 ; Now, getting to the real stuff now!
 
-        org     16384
+;--------
+; Set an origin for the application (-zorg=) default to $4000
+;--------
+
+        IF      !myzorg
+                defc    myzorg  = $4000
+        ENDIF   
+                org     myzorg
+
+
+        org     myzorg
 
 start:
         ld      hl,0

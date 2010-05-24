@@ -6,7 +6,7 @@
  *                         - Modified for the Jupiter ACE
  *	Stefano 19/5/2010 - Heavily updated
  *
- *	$Id: ace-tap.c,v 1.3 2010-05-20 07:28:21 stefano Exp $
+ *	$Id: ace-tap.c,v 1.4 2010-05-24 14:48:57 stefano Exp $
  */
 
 #include "appmake.h"
@@ -62,42 +62,44 @@ int acetap_exec(char *target)
         strcpy(filename,outfile);
     }
 
-    if ( blockname == NULL ) {
+    if ( blockname == NULL )
         blockname = binname;
-	}
+
+		
 
     if ( origin != -1 ) {
         pos = origin;
     } else {
-		pos = 16384;
-        //if ( ( pos = parameter_search(crtfile,".sym","MYZORG") ) == -1 ) {
-        //    myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
+        if ( ( pos = parameter_search(crtfile,".sym","MYZORG") ) == -1 ) {
+            myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
         }
-
-	if ( (fpin=fopen(binname,"rb") ) == NULL ) {
-		printf("Can't open input file\n");
-		exit(1);
 	}
+	
+
+    if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+        fprintf(stderr,"Can't open input file %s\n",binname);
+        myexit(NULL,1);
+    }
 
 
 /*
- *	Now we try to determine the size of the file
- *	to be converted
+ *        Now we try to determine the size of the file
+ *        to be converted
  */
-	if	(fseek(fpin,0,SEEK_END)) {
-		printf("Couldn't determine size of file\n");
-		fclose(fpin);
-		exit(1);
-	}
+    if ( fseek(fpin,0,SEEK_END) ) {
+        fprintf(stderr,"Couldn't determine size of file\n");
+        fclose(fpin);
+        myexit(NULL,1);
+    }
 
 	len=ftell(fpin);
 
 	fseek(fpin,0L,SEEK_SET);
 
-	if ( (fpout=fopen(filename,"wb") ) == NULL ) {
-		printf("Can't open output file\n");
-		exit(1);
-	}
+    if ( (fpout=fopen(filename,"wb") ) == NULL ) {
+        fclose(fpin);
+        myexit("Can't open output file\n",1);
+    }
 
 
 /* Write out the header file */
