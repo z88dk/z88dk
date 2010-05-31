@@ -11,15 +11,15 @@ XDEF ASMDISP_TAPE_LOAD_BLOCK_CALLEE
 
 .tape_load_block_callee
 
-	pop hl
+	pop ix
 	pop bc
 	pop de
-	pop ix
-	push hl
+	pop hl
+	push ix
 
 .asmentry
 
-; enter : ix = addr
+; enter : hl = addr
 ;         de = len
 ;          c = type
 

@@ -1,6 +1,7 @@
 stdio/ace/fputc_cons
 stdio/ace/fgetc_cons
 stdio/ace/getk
+time/ace/clock
 @gfxbase.lst
 graphics/dcircle
 graphics/clg

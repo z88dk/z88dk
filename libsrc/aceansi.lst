@@ -12,6 +12,7 @@ stdio/ansi/ace/f_ansi_char
 stdio/ansi/ace/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/ace/f_ansi_scrollup
+time/ace/clock
 @gfxbase.lst
 graphics/dcircle
 graphics/clg

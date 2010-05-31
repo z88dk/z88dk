@@ -3,7 +3,7 @@
 ;
 ;	Print character to the screen
 ;
-;	$Id: fputc_cons.asm,v 1.2 2010-05-31 08:29:06 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.3 2010-05-31 10:32:57 stefano Exp $
 ;
 
 	XLIB  fputc_cons
@@ -21,6 +21,8 @@
 	jp	z,$a24
 	cp	8		; BACKSPACE
 	jr	nz,nobs
-	ld	a,5
+	ld	hl,$3C1C
+	dec (hl)
+	ret
 .nobs
 	jp	$3ff

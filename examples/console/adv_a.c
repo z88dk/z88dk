@@ -30,6 +30,10 @@
 #include <string.h>
 #include <ctype.h>
 
+#ifdef ACE
+#include <ace.h>
+#endif
+
 #ifdef SPECTRUM
 #define KEY_DEL 12
 #endif
@@ -2530,7 +2534,8 @@ void SH_QUIT()
 	if (i_GetCh() == 'Y')
 	{
 		/* save */
-		/* PrintStr("Save not supported\n"); */
+		PrintStr("Start tape, then press a key\n");
+		i_GetCh();
 		tape_save_block(GVARS, sizeof(GVARS), 1);
 		tape_save_block(&nScore, sizeof(nScore), 2);
 		tape_save_block(naItemLoc, sizeof(naItemLoc), 3);

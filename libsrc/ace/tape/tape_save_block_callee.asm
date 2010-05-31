@@ -12,7 +12,6 @@ XDEF ASMDISP_TAPE_SAVE_BLOCK_CALLEE
 
 	pop ix
 	pop bc
-	ld a,c
 	pop de
 	pop hl
 	push ix

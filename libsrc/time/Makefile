@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.14 2008-03-05 20:35:48 dom Exp $
+# $Id: Makefile,v 1.15 2010-05-31 10:32:57 stefano Exp $
 
 include ../Make.config
 
@@ -28,6 +28,7 @@ spectrum_time:
 clean:
 	$(RM) *.o* *.i *.sym *.map zcc_opt.def
 	$(RM) zx81/*.o*
+	$(RM) ace/*.o*
 	$(RM) newbrain/*.o*
 	$(RM) rcmx000/*.o*
 	cd z88 ; $(MAKE) clean ; cd ..

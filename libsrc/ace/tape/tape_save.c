@@ -26,7 +26,7 @@ int tape_save(char *name, size_t loadstart,void *start, size_t len)
 	for (i=0 ; i < 10 ; i++ )
 		hdr.name2[i] = 32;
 
-        hdr.type    = 3;
+        hdr.type    = 32;
         hdr.length  = len;
         hdr.address = loadstart;
         hdr.offset  = len;

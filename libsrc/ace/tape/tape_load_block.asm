@@ -8,13 +8,13 @@ XREF ASMDISP_TAPE_LOAD_BLOCK_CALLEE
 
 .tape_load_block
 
-   pop hl
+   pop ix
    pop bc
    pop de
-   pop ix
+   pop hl
    push hl
    push de
    push bc
-   push hl
+   push ix
    
    jp tape_load_block_callee + ASMDISP_TAPE_LOAD_BLOCK_CALLEE
