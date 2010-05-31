@@ -1,0 +1,6 @@
+ace/tape/tape_load_block
+ace/tape/tape_load_block_callee
+ace/tape/tape_save
+ace/tape/tape_save_block
+ace/tape/tape_save_block_callee
+ace/ace_freemem

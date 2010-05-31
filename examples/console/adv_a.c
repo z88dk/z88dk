@@ -5,16 +5,16 @@
  *	Compiled under z88dk by djm especially for gwl
  *
  *	djm 19/3/2000
+ *  stefano 31/05/2010
  *
  *	Very few changes were needed to get this to work under
  *	z88dk (many changes were made to sccz80 though(!))
  *
  *	Changes to standard source:
- *	 -  \ continuation in the strings
  *	 - casts removed in structures
  *	 - Few defines to make life easier
- *
- *	Only tested on a ZX...it should work on Z88 (BASIC) though
+ *   - tape save
+ *   - lowercase text taken from the oz700 port in the 'ozdev' web site
  *
  *	Found at: http://www.penelope.demon.co.uk/pod/
  *
@@ -56,7 +56,6 @@ typedef unsigned char BYTE;
 
 #define TRUE 1
 #define FALSE 0
-//enum blah { FALSE, TRUE };
 
 
 /*****
@@ -84,27 +83,6 @@ SCRCT	.equ	$5c8c	; remaining scroll count (system variable)
 #define ITEM_WORN	0xfd
 #define ITEM_HELD	0xfe
 
-/*
-; offsets of ZX Spectrum system variables
-
-#define	SVAR_KEYBUF		-$32
-
-*/
-int F_NTYET;
-int		PARAM1;
-int CMDFLG;
-/*
-PREDIX	.equ	$-$29	; PREDIX points here
-*/
-int VERB_TK;
-int NOUN_TK;
-BOOL	FLAG;
-int		CUR_RM;
-/*
-
-*/
-
-int GVARS[0x1e];		/* workspace of $1e bytes of game variables*/
 
 /* offsets of game variables */
 
@@ -139,19 +117,34 @@ int GVARS[0x1e];		/* workspace of $1e bytes of game variables*/
 #define	GVAR_1d			0x1d
 #define	GVAR_1e			0x1e
 
+
+
+int GVARS[0x1e];		/* workspace of $1e bytes of game variables*/
+
+int F_NTYET;
+int		PARAM1;
+int CMDFLG;
+/*
+PREDIX	.equ	$-$29	; PREDIX points here
+*/
+int VERB_TK;
+int NOUN_TK;
+BOOL	FLAG;
+int		CUR_RM;
+
 char	strTokenBuf[4];		/* workspace of $04 bytes to hold a token*/
 
 int nScore;
 
 #ifdef SPECTRUM
-#define MAX_COL 64
+#define MAX_COL 63
 #endif
 #ifdef Z88
-#define MAX_COL 80
+#define MAX_COL 79
 #endif
 
 #ifndef MAX_COL
-#define MAX_COL 32
+#define MAX_COL 31
 #endif
 
 char chaEditLine[MAX_COL + 1];
@@ -182,29 +175,20 @@ BYTE* pPredicateCurrent;
 BYTE* pActionCurrent;
 
 
+
+
 /* ======================================================================
 // game instructions
 // ======================================================================
 */
 
-char *strInstructions = 
-	"WELCOME TO ADVENTURE 'A'\n"
-	"THE PLANET OF DEATH\n\n"
-	"IN THIS ADVENTURE YOU FIND "
-	"YOURSELF STRANDED ON AN "
-	"ALIEN PLANET. YOUR AIM IS "
-	"TO ESCAPE FROM THIS PLANET "
-	"BY FINDING YOUR, NOW "
-	"CAPTURED AND DISABLED, "
-	"SPACE SHIP\n"
-	"YOU WILL MEET VARIOUS "
-	"HAZARDS AND DANGERS ON YOUR "
-	"ADVENTURE, SOME NATURAL, "
-	"SOME NOT, ALL OF WHICH YOU "
-	"MUST OVERCOME TO SUCCEED\n\n"
-	"GOOD LUCK, YOU WILL NEED IT!\n\n"
+char *strInstructions =
+    "Welcome to Adventure 'A' - The Planet of Death.\n"
+	"In this adventure you find yourself stranded on an alien planet. "
+	"Your aim is to escape from this planet by finding your, now captured and disabled, space ship."
+	"You will meet varius hazards and dangers on your adventure, some natural, some not, all of which you must overcome to succeed.\n"
+	"Good luck, you will need it!\n\n"
 	"PRESS ANY KEY TO START\n";
-
 
 /*
 // ======================================================================
@@ -214,45 +198,46 @@ char *strInstructions =
 
 char* straMsg[] =
 {
-	"IT SHOWS A MAN CLIMBING DOWN A PIT USING A ROPE\n",
-	"HOW? I CANT REACH\n",
-	"IT HAS FALLEN TO THE FLOOR\n",
-	"HOW?\n",
-	"ITS TOO WIDE.I FELL AND BROKE MY NECK\n",
-	"UGH! HE IS ALL SLIMY\n",
-	"HE VANISHED IN A PUFF OF SMOKE\n",
-	"YOU ALSO BROKE THE MIRROR\n",
-	"COMPUTER SAYS: 2 WEST,2 SOUTH FOR SPACE FLIGHT\n",
-	"IT HAS WEAKENED IT\n",
-	"IT HAD NO EFFECT\n",
-	"I FELL AND KNOCKED MYSELF OUT.\n",
-	"THE BARS LOOK LOOSE\n",
-	"WHAT WITH?\n",
-	"I SEE A GOLD COIN\n",
-	"BRRR.THE WATERS TOO COLD\n",
-	"THE FUSE HAS JUST BLOWN\n",
-	"THE LIFT HAS BEEN ACTIVATED\n",
-	"I SEE NOTHING SPECIAL\n",
-	"KEEP OFF THE MIDDLE MEN,ONE MAY BE SHOCKING!\n",
-	"VANITY WALTZ!\n",
-	"TRY HELP\n",
-	"POINTS OF COMPASS\n",
-	"TRY LOOKING AROUND\n",
-	"I CAN SEE A STEEP SLOPE\n",
-	"AN ALARM SOUNDS.THE SECURITY GUARD SHOT ME FOR TRESPASSING.\n",
-	"I CAN SEE A ROPE HANGING DOWN THE CHIMNEY.\n",
-	"I AM NOT THAT DAFT.IT IS TOO DEEP.\n",
-	"THE SPACE SHIP BLEW UP AND KILLED ME.\n",
-	"THE SHIP HAS FLOWN INTO THE LARGE LIFT AND IS HOVERING THERE.\nTHERE ARE FOUR BUTTONS OUTSIDE THE WINDOW MARKED 1,2,3 AND 4\n",
-	"THE LIFT HAS TAKEN ME UP TO A PLATEAU.\nCONGRATULATIONS, YOU HAVE MANAGED TO COMPLETE THIS ADVENTURE\nWITHOUT GETTING KILLED.\n",
-	"THE LIFT HAS BECOME ELECTRIFIED\n",
-	"I HAVE BEEN ELECTROCUTED\n",
-	"IT IS A GOOD JOB I WAS WEARING RUBBER SOLED BOOTS.\n",
-	"I WOULD KILL MYSELF IF I DID.\n",
-	"I HAVE TURNED GREEN AND DROPPED DEAD.\n",
-	"THE GREEN MAN AWOKE AND THROTTLED ME.\n",
-	"THE GUARD WOKE AND SHOT ME.\n",
-	"WHAT AT?\n"};
+	"It shows a man climbing down a pit using a rope\n",
+	"How? I can't reach\n",
+	"It has fallen to the floor\n",
+	"How?\n",
+	"Its too wide. I fell and broke my neck\n",
+	"Ugh! He is all slimy\n",
+	"He vanished in a puff of smoke\n",
+	"You also broke the mirror\n",
+	"Computer says: 2 west,2 south for space flight\n",
+	"It has weakened it\n",
+	"It had no effect\n",
+	"I fell and knocked myself out.\n",
+	"The bars look loose\n",
+	"What with?\n",
+	"I see a gold coin\n",
+	"Brrr. The waters too cold\n",
+	"The fuse has just blown\n",
+	"The lift has been activated\n",
+	"I see nothing special\n",
+	"Keep off the middle men, one may be shocking!\n",
+	"Vanity waltz!\n",
+	"Try help\n",
+	"Points of compass\n",
+	"Try looking around\n",
+	"I can see a steep slope\n",
+	"An alarm sounds. The security guard shot me for trespassing.\n",
+	"I can see a rope hanging down the chimney.\n",
+	"I am not that daft. It is too deep.\n",
+	"The space ship blew up and killed me.\n",
+	"The ship has flown into the large lift and is hovering there.\nThere are four buttons outside the window marked 1,2,3 and 4\n",
+	"The lift has taken me up to a plateau.\nCongratulations, you have managed to complete this adventure\nwithout getting killed.\n",
+	"The lift has become electrified\n",
+	"I have been electrocuted\n",
+	"It is a good job i was wearing rubber soled boots.\n",
+	"I would kill myself if i did.\n",
+	"I have turned green and dropped dead.\n",
+	"The green man awoke and throttled me.\n",
+	"The guard woke and shot me.\n",
+	"What at?\n"};
+
 
 
 /*
@@ -263,73 +248,47 @@ char* straMsg[] =
 
 char* straRoom[] =
 {
-	"I AM ON A MOUNTAIN PLATEAU\n"
-	"TO THE NORTH THERE IS A STEEP CLIFF\n"
-	"OBVIOUS EXITS ARE DOWN,EAST AND WEST\n",
+    "I am on a mountain plateau\nTo the north there is a steep cliff.\nObvious exits are down, east and west.\n",
 
-	"I AM AT THE EDGE OF A DEEP PIT\n"
-	"OBVIOUS EXITS ARE EAST\n",
+    "I am at the edge of a deep pit\nObvious exits are east\n",
 
-	"I AM IN A DAMP LIMESTONE CAVE WITH STALACTITES HANGING DOWN.\n"
-	"THE EXIT IS TO THE WEST\n"
-	"THERE IS A PASSAGE TO THE NORTH\n",
+    "I am in a damp limestone cave with stalactites hanging down.\nThe exit is to the west\nThere is a passage to the north\n",
 
-	"I AM IN A DENSE FOREST\n"
-	"THERE IS A ROPE HANGING FROM ONE TREE\n"
-	"OBVIOUS EXITS ARE SOUTH AND WEST\n",
+    "I am in a dense forest\nThere is a rope hanging from one tree\nObvious exits are south and west\n",
 
-	"I AM BESIDE A LAKE\n"
-	"EXITS ARE EAST AND NORTH.THERE IS A RAVINE TO THE WEST\n",
+    "I am beside a lake\nExits are east and north. There is a ravine to the west\n",
 
-	"I AM IN A STRANGE HOUSE\n"
-	"THE DOOR IS TO THE NORTH\n",
+    "I am in a strange house\nThe door is to the north\n",
 
-	"I AM IN AN OLD SHED\n"
-	"THE EXIT IS TO THE EAST\n",
+	"I am in an old shed\nThe exit is to the east\n",
 
-	"I AM IN A MAZE.THERE ARE PASSAGES EVERYWHERE\n",
+	"I am in a maze. There are passages everywhere.\n",
 
-	"I AM IN A MAZE.THERE ARE PASSAGES EVERYWHERE\n",
+	"I am in a maze. There are passages everywhere.\n",
 
-	"I AM IN A MAZE.THERE ARE PASSAGES EVERYWHERE\n",
+	"I am in a maze. There are passages everywhere.\n",
 
-	"I AM IN A MAZE.THERE ARE PASSAGES EVERYWHERE\n",
+	"I am in a maze. There are passages everywhere.\n",
 
-	"I AM IN AN ICE CAVERN\n"
-	"THERE IS AN EXIT TO THE EAST\n",
+	"I am in an ice cavern.\nThere is an exit to the east.\n",
 
-	"I AM IN A QUIET CAVERN\n"
-	"THERE ARE EXITS WEST,EAST AND SOUTH\n",
+	"I am in a quiet cavern.\nThere are exits west, east and south.\n",
 
-	"I AM IN A WIND TUNNEL\n"
-	"THERE IS A CLOSED DOOR AT THE END\n"
-	"THERE IS ALSO AN EXIT TO THE WEST\n",
+	"I am in a wind tunnel.\nThere is a closed door at the end.\nThere is also an exit to the west.\n",
 
-	"I AM IN A ROOM WITH A COMPUTER IN\n"
-	"THE COMPUTER IS WORKING AND HAS A KEYBOARD\n"
-	"THE EXIT IS WEST\n",
+	"I am in a room with a computer in\nThe computer is working and has a keyboard\nThe exit is west\n",
 
-	"I AM IN A PASSAGE\n"
-	"THERE IS A FORCE FIELD TO THE SOUTH : BEWARE OF SECURITY\n"
-	"THERE ARE EXITS TO NORTH,EAST AND WEST\n",
+	"I am in a passage\nThere is a force field to the south : beware of security\nThere are exits to north,east and west\n",
 
-	"I AM IN A LARGE HANGER\n"
-	"THERE IS A LOCKED DOOR TO THE WEST\n"
-	"THERE ARE ALSO EXITS EAST,NORTH AND SOUTH\n",
+    "I am in a large hanger\nThere is a locked door to the west\nThere are also exits east,north and south\n",
 
-	"I AM IN A TALL LIFT.THE BUTTONS ARE VERY HIGH\n"
-	"THE EXIT IS WEST\n",
+	"I am in a tall lift. The buttons are very high\nThe exit is west\n",
 
-	"I AM IN THE LIFT CONTROL ROOM\n"
-	"THERE ARE THREE SWITCHES ON THE WALL.THEY ARE ALL OFF\n"
-	"A SIGN SAYS : 5,4 NO DUSTY BIN RULES\n"
-	"THE EXIT IS EAST\n",
+	"I am in the lift control room\nThere are three switches on the wall. They are all off\nA sign says : 5,4 no dusty bin rules\nThe exit is east\n",
 
-	"I AM IN A PRISON CELL\n",
+	"I am in a prison cell\n",
 
-	"I AM IN A SPACE SHIP.THERE IS NO VISIBLE EXIT\n"
-	"THERE IS A SMALL OPEN WINDOW IN THE SIDE\n"
-	"THERE ARE ALSO TWO BUTTONS,ONE MARKED MAIN AND THE OTHER AUX.\n"};
+	"I am in a space ship. There is no visible exit\nThere is a small open window in the side\nThere are also two buttons,one marked main and the other aux.\n"};
 
 
 
@@ -343,34 +302,34 @@ char* straRoom[] =
 
 char* straItem[MAX_ITEM] =
 {
-	"A PAIR OF BOOTS",
-	"A STARTER MOTOR",
-	"A KEY",
-	"A LASER GUN",
-	"AN OUT OF ORDER SIGN",
-	"A METAL BAR",
-	"A GOLD COIN",
-	"A MIRROR",
-	"BROKEN GLASS",
-	"A PAIR OF SLIMY GLOVES",
-	"A ROPE",
-	"A FLOOR BOARD",
-	"A BROKEN FLOOR BOARD",
-	"STALACTITES",
-	"A BLOCK OF ICE",
-	"A POOL OF WATER",
-	"A SMALL GREEN MAN SLEEPING ON THE MIRROR",
-	"A SLEEPING GREEN MAN",
-	"A LOCKED DOOR",
-	"AN OPEN DOOR",
-	"A BARRED WINDOW",
-	"A HOLE IN THE WALL",
-	"A SMALL BUT POWERFULL SPACE SHIP",
-	"A SLEEPING SECURITY MAN",
-	"A PIECE OF SHARP FLINT",
-	"SOME STONES",
-	"A DRAWING ON THE WALL",
-	"A LOUDSPEAKER WITH DANCE MUSIC COMING OUT"};
+	"a pair of boots",
+	"a starter motor",
+	"a key",
+	"a laser gun",
+	"an out of order sign",
+	"a metal bar",
+	"a gold coin",
+	"a mirror",
+	"broken glass",
+	"a pair of slimy gloves",
+	"a rope",
+	"a floor board",
+	"a broken floor board",
+	"stalactites",
+	"a block of ice",
+	"a pool of water",
+	"a small green man sleeping on the mirror",
+	"a sleeping green man",
+	"a locked door",
+	"an open door",
+	"a barred window",
+	"a hole in the wall",
+	"a small but powerfull space ship",
+	"a sleeping security man",
+	"a piece of sharp flint",
+	"some stones",
+	"a drawing on the wall",
+	"a loudspeaker with dance music coming out"};
 
 
 
@@ -389,7 +348,6 @@ int naItemStart[MAX_ITEM] =
 	0x00, 0x01, 0x02, 0x0f
 };
 
-
 /*
 // ======================================================================
 // current positions of items - 1 int per item, holds room number
@@ -399,8 +357,6 @@ int naItemStart[MAX_ITEM] =
 */
 
 int naItemLoc[MAX_ITEM];
-
-
 
 
 
@@ -1293,24 +1249,24 @@ BYTE A_PSH_ONE_2[] =
 */
 BYTE A_CHGRN[] =
 {
-	COM_TSTGVAR,GVAR_05,0x01,		// if game variable 0x05 = 1
-	COM_CHKSETF,GVAR_06,			// and game variable 0x06 is set
+	COM_TSTGVAR,GVAR_05,0x01,		/* if game variable 0x05 = 1     */
+	COM_CHKSETF,GVAR_06,			/* and game variable 0x06 is set */
 	0xff
 };
 
 /* check if the small green man is to throttle us (version 1) */
 BYTE A_CHTHR[] =
 {
-	COM_TSTGVAR,GVAR_02,0x01,		// if game variable 0x02 = 1
-	COM_CHKHERE,0x10,			// and is-present the small green man sleeping on the mirror
+	COM_TSTGVAR,GVAR_02,0x01,		/* if game variable 0x02 = 1 */
+	COM_CHKHERE,0x10,			/* and is-present the small green man sleeping on the mirror */
 	0xff
 };
 
 /* check if the small green man is to throttle us (version 2) */
 BYTE A_C2THR[] =
 {
-	COM_TSTGVAR,GVAR_02,0x01,		// if game variable 0x02 = 1
-	COM_CHKHERE,0x11,				// and is-present the sleeping green man (moved off mirror)
+	COM_TSTGVAR,GVAR_02,0x01,		/* if game variable 0x02 = 1 */
+	COM_CHKHERE,0x11,				/* and is-present the sleeping green man (moved off mirror) */
 	0xff
 };
 
@@ -1862,7 +1818,7 @@ void ShowRoom()
 		{
 			if (!FLAG)
 			{
-				PrintStr("I CAN ALSO SEE :\n");
+				PrintStr("I can also see :\n");
 				FLAG = TRUE;
 			}
 			PrintStr(straItem[nItem]);
@@ -1873,7 +1829,6 @@ void ShowRoom()
 	nNextParseAction = NA_DO_AUTO;
 }
 /*****
-
 
 // ======================================================================
 // perform regular automatic functions, e.g. the little green man
@@ -1912,7 +1867,7 @@ void SH_TELL()
 	}
 	***/
 
-	PrintStr("TELL ME WHAT TO DO \n");
+	PrintStr("Tell me what to do \n");
 
 	GetLine();
 	F_NTYET = FALSE;
@@ -1954,7 +1909,7 @@ void SH_TELL()
 
 			if (bDont)
 			{
-				PrintStr("I DONT UNDERSTAND\n");
+				PrintStr("I don't understand\n");
 				nNextParseAction = NA_DO_AUTO;
 				return;
 			}
@@ -2062,11 +2017,11 @@ void PARSE_LP()
 		if (!CMDFLG)
 		{
 			if (VERB_TK < TOK_GET)		/* direction? */
-				PrintStr("I CANT GO IN THAT DIRECTION\n");
+				PrintStr("I can't go in that direction\n");
 			else if (F_NTYET)
-				PrintStr("I CANT DO THAT YET\n");
+				PrintStr("I can't do that yet\n");
 			else
-				PrintStr("I CANT\n");
+				PrintStr("I can't\n");
 		}
 		nNextParseAction = NA_DO_AUTO;
 		return;
@@ -2279,7 +2234,7 @@ void SH_INVE()
 	int nItem;
 	int nLoc;
 
-	PrintStr("I HAVE WITH ME THE FOLLOWING:\n");
+	PrintStr("I have with me the following:\n");
 
 	for (nItem = 0; nItem < MAX_ITEM; ++nItem)
 	{
@@ -2290,13 +2245,13 @@ void SH_INVE()
 			bNothing = FALSE;
 			PrintStr(straItem[nItem]);
 			if (nLoc == ITEM_WORN)
-				PrintStr(" WHICH I AM WEARING");
+				PrintStr(" which i am wearing");
 			PrintCR();
 		}
 	}
 
 	if (bNothing)
-		PrintStr("NOTHING AT ALL\n");
+		PrintStr("Nothing at all\n");
 
 	nNextParseAction = NA_DO_AUTO;
 }
@@ -2315,7 +2270,7 @@ void SH_REMO()
 	{
 		if (GVARS[GVAR_NO_ITEMS] == 6)
 		{
-			PrintStr("I CANT. MY HANDS ARE FULL\n");
+			PrintStr("I cant. My hands are full\n");
 			nNextParseAction = NA_DO_AUTO;
 		}
 		else
@@ -2326,7 +2281,7 @@ void SH_REMO()
 	}
 	else
 	{
-		PrintStr("I AM NOT WEARING IT\n");
+		PrintStr("I am not wearing it\n");
 		nNextParseAction = NA_DO_AUTO;
 	}
 }
@@ -2345,7 +2300,7 @@ void SH_GET()
 {
 	if (GVARS[GVAR_NO_ITEMS] == 6)
 	{
-		PrintStr("I CANT CARRY ANY MORE\n");
+		PrintStr("I can't carry any more\n");
 		nNextParseAction = NA_DO_AUTO;
 	}
 	else if (naItemLoc[PARAM1] == CUR_RM)
@@ -2355,12 +2310,12 @@ void SH_GET()
 	}
 	else if ((naItemLoc[PARAM1] == ITEM_WORN) || (naItemLoc[PARAM1] == ITEM_HELD))
 	{
-		PrintStr("I ALREADY HAVE IT\n");
+		PrintStr("I already have it\n");
 		nNextParseAction = NA_DO_AUTO;
 	}
 	else
 	{
-		PrintStr("I DON'T SEE IT HERE\n");
+		PrintStr("I don't see it here\n");
 		nNextParseAction = NA_DO_AUTO;
 	}
 }
@@ -2376,7 +2331,7 @@ void SH_DROP()
 {
 	if (naItemLoc[PARAM1] == CUR_RM)
 	{
-		PrintStr("I DONT HAVE IT\n");
+		PrintStr("I don't have it\n");
 		nNextParseAction = NA_DO_AUTO;
 	}
 	else if (naItemLoc[PARAM1] == ITEM_WORN)
@@ -2390,7 +2345,7 @@ void SH_DROP()
 	}
 	else
 	{
-		PrintStr("I DONT HAVE IT\n");
+		PrintStr("I don't have it\n");
 		nNextParseAction = NA_DO_AUTO;
 	}
 }
@@ -2412,12 +2367,12 @@ void SH_WEAR()
 	}
 	else if (naItemLoc[PARAM1] == ITEM_WORN)
 	{
-		PrintStr("I AM ALREADY WEARING IT\n");
+		PrintStr("I am already wearing it\n");
 		nNextParseAction = NA_DO_AUTO;
 	}
 	else
 	{
-		PrintStr("I DONT HAVE IT\n");
+		PrintStr("I don't have it\n");
 		nNextParseAction = NA_DO_AUTO;
 	}
 }
@@ -2527,13 +2482,13 @@ void SH_SWAP()
 void SH_DEAD()
 {
 
-	PrintStr("DO YOU WISH TO TRY AGAIN?\n");
+	PrintStr("Do you wish to try again?\n");
 
 	for (;;)
 	{
 		char ch;
 
-		PrintStr("ANSWER YES OR NO\n");
+		PrintStr("Answer yes or no\n");
 		ch = i_GetCh();
 		if (ch == 'Y')
 		{
@@ -2569,21 +2524,28 @@ void SH_OK()
 
 void SH_QUIT()
 {
-
-	PrintStr("DO YOU WANT TO SAVE THE GAME?\n");
+#if TAPE
+	PrintStr("Do you want to save the game?\n");
 
 	if (i_GetCh() == 'Y')
 	{
 		/* save */
-		PrintStr("SAVE NOT SUPPORTED\n");
-		PrintStr("DO YOU WISH TO CONTINUE?\n");
+		/* PrintStr("Save not supported\n"); */
+		tape_save_block(GVARS, sizeof(GVARS), 1);
+		tape_save_block(&nScore, sizeof(nScore), 2);
+		tape_save_block(naItemLoc, sizeof(naItemLoc), 3);
+		tape_save_block(&CUR_RM, sizeof(CUR_RM), 4);
+#endif
+		PrintStr("Do you wish to continue?\n");
 
 		if (i_GetCh() == 'Y')
 		{
 			nNextParseAction = NA_DO_AUTO;
 			return;
 		}
+#if TAPE
 	}
+#endif
 
 	SH_DEAD();
 }
@@ -2663,7 +2625,7 @@ void SH_SCOR()
 {
 	char szScore[32];
 	
-	PrintStr("YOU HAVE A SCORE OF ");
+	PrintStr("You have a score of ");
 	
 #ifdef SMALL_C
 	printn(nScore,16,stdout);
@@ -2952,15 +2914,23 @@ int main()
 
 		CUR_RM = 0;
 
-		PrintStr("WANT TO RESTORE A GAME?\n");
+#if TAPE
+		PrintStr("Want to restore a game?\n");
 		if (i_GetCh() == 'Y')
 		{
 			/* restore */
-			PrintStr("RESTORE NOT SUPPORTED\n");
-			PrintStr("PRESS A KEY");
-			i_GetCh();
-		}
+			tape_load_block(GVARS, sizeof(GVARS), 1);
+			tape_load_block(&nScore, sizeof(nScore), 2);
+			tape_load_block(naItemLoc, sizeof(naItemLoc), 3);
+			tape_load_block(&CUR_RM, sizeof(CUR_RM), 4);
 
+/*
+			PrintStr("Restore not supported\n");
+			PrintStr("Press a key");
+			i_GetCh();
+*/
+		}
+#endif
 		for (;;)		/* main loop */
 		{
 			ClearScr();
@@ -2980,7 +2950,7 @@ int main()
 				}
 				else
 				{
-					PrintStr("EVERYTHING IS DARK.I CANT SEE.\n");
+					PrintStr("Everything is dark. I can't see.\n");
 					if (GVARS[4] > 0)
 						--GVARS[4];
 
@@ -3005,7 +2975,7 @@ int main()
 				case NA_BEGIN:
 					break;
 				default:
-					PrintStr("ERROR\n");
+					PrintStr("Error\n");
 					++pvndCurrent;
 					break;
 				}

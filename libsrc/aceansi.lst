@@ -41,4 +41,5 @@ games/bit_synth
 games/bit_frequency
 games/bit_beep
 games/beeper
+@ace/ace.lst
 @z80.lst

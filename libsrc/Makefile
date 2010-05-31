@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.142 2010-05-20 07:28:21 stefano Exp $
+# $Id: Makefile,v 1.143 2010-05-31 08:29:06 stefano Exp $
 
 
 include	Make.config
@@ -800,6 +800,7 @@ ace_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE)	gamesdeps
+	cd ace ; $(MAKE) ;	cd ..
 	cd games ; $(MAKE) lace	; cd ..
 	$(LIBLINKER) -DFORjupiter -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
 
@@ -816,6 +817,7 @@ aceansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(MAKE)	gamesdeps
+	cd ace ; $(MAKE) ;	cd ..
 	cd games ; $(MAKE) lace	; cd ..
 	$(LIBLINKER) -DFORjupiter -x$(OUTPUT_DIRECTORY)/aceansi_clib.lib @$(LISTFILE_DIRECTORY)/aceansi.lst
 
@@ -1208,6 +1210,7 @@ sp1-clean:
 
 
 clean:
+	cd ace ; $(MAKE) clean ; cd ..
 	cd assert ; $(MAKE) clean ; cd ..
 	cd c128 ; $(MAKE) clean ; cd ..
 	cd ctype ; $(MAKE) clean ; cd ..
