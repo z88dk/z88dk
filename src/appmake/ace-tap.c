@@ -6,7 +6,7 @@
  *                         - Modified for the Jupiter ACE
  *	Stefano 19/5/2010 - Heavily updated
  *
- *	$Id: ace-tap.c,v 1.4 2010-05-24 14:48:57 stefano Exp $
+ *	$Id: ace-tap.c,v 1.5 2010-06-03 09:32:06 stefano Exp $
  */
 
 #include "appmake.h"
@@ -19,6 +19,7 @@ static int               origin       = -1;
 static char              help         = 0;
 static char              audio        = 0;
 static char              fast         = 0;
+static char              noloader     = 0;
 static unsigned char     parity;
 
 
@@ -30,6 +31,7 @@ option_t acetap_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
+    {  0,  "noloader",  "Don't create the loader block",  OPT_BOOL,  &noloader },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0 , "blockname", "Name of the code block in tap file", OPT_STR, &blockname},
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
@@ -41,6 +43,11 @@ int acetap_exec(char *target)
     char    filename[FILENAME_MAX+1];
     char    wavfile[FILENAME_MAX+1];
 	char	name[11];
+	/* The following cmd is exactly 31 characters long */
+	/* address begins at position 21 and is long 5 */
+	char    command[]="0 0 BLOAD z88dk_code       CALL";
+	char    codename[]="z88dk_code";
+	char    address[10];
 	FILE	*fpin, *fpout;
 	int	c;
 	int	i;
@@ -101,6 +108,50 @@ int acetap_exec(char *target)
         myexit("Can't open output file\n",1);
     }
 
+	/* ===============
+		Loader block
+	   =============== */
+
+   if ( !noloader ) {
+
+	/* Write out the loader header */
+		writeword_p(26,fpout,&parity);	/* Header len */
+
+		parity=0;
+		writebyte_p(32,fpout,&parity);	/* ACE header block type */
+
+	/* deal with the filename */
+		if (strlen(blockname) >= 10 ) {
+			strncpy(name,blockname,10);
+		} else {
+			strcpy(name,blockname);
+			strncat(name,"          ",10-strlen(blockname));
+		}
+		blockname=codename;			/* Next block will be named z88dk_code */
+		for	(i=0;i<=9;i++)
+			writebyte_p(name[i],fpout,&parity);
+		writeword_p(32,fpout,&parity);		/* loader program size: a full txt line */
+		writeword_p(0x22e0,fpout,&parity);		/* loader address for autorun: 24th screen line */
+		for	(i=0;i<=9;i++)
+			writebyte_p(' ',fpout,&parity);	/*  */
+		writebyte_p(parity,fpout,&parity);
+		
+	/* Autorun loader data block */
+		writeword_p(33,fpout,&parity);	/* block len */
+		parity=0;
+		writebyte_p(0,fpout,&parity);	/* Input buffer start marker */
+		sprintf(address,"%i  ",pos);
+		for	(i=0;i<5;i++)
+			command[i+21]=address[i];	/* String substitution with the updated address */
+		for	(i=0;i<31;i++)
+			writebyte_p(command[i],fpout,&parity);	
+		writebyte_p(parity,fpout,&parity);
+	}
+		
+
+/* ===============
+    Program block
+   =============== */
 
 /* Write out the header file */
 	writeword_p(26,fpout,&parity);	/* Header len */

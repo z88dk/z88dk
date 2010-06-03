@@ -12,7 +12,7 @@
  *        Creates a new TAP file (overwriting if necessary) just ready to run.
  *        Use tapmaker to customize your work.
  *
- *        $Id: zx.c,v 1.6 2010-05-20 07:28:21 stefano Exp $
+ *        $Id: zx.c,v 1.7 2010-06-03 09:32:06 stefano Exp $
  */
 
 #include "appmake.h"
@@ -28,6 +28,7 @@ static int               origin       = -1;
 static char              help         = 0;
 static char              audio        = 0;
 static char              fast         = 0;
+static char              noloader     = 0;
 static unsigned char     parity;
 
 
@@ -39,7 +40,8 @@ option_t zx_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
-    {  0 , "merge",    "Merge an external TAPE block",      OPT_STR,   &merge },
+    {  0,  "noloader",  "Don't create the loader block",  OPT_BOOL,  &noloader },
+    {  0 , "merge",    "Merge a custom loader from an external TAP file",  OPT_STR,   &merge },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0 , "blockname", "Name of the code block in tap file", OPT_STR, &blockname},
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
@@ -111,79 +113,94 @@ int zx_exec(char *target)
         myexit("Can't open output file\n",1);
     }
 
-/* Open and check the optional "merge file" */
-    mlen=0;
-    if ( merge != NULL ) {
-        if ( (fpmerge=fopen(merge,"rb") ) == NULL ) {
-            fprintf(stderr,"File for 'merge' not found: %s\n",merge);
-            fclose(fpin);
-            fclose(fpout);
-            myexit(NULL,1);
-        }
-        /* check the header type (first block must be BASIC) */
-        fseek(fpmerge,3,SEEK_SET);
-        c=getc(fpmerge);
-        if ( c != 0 ) {
-            fprintf(stderr,"BASIC block not found in file %s\n",merge);
-            fclose(fpin);
-            fclose(fpout);
-            myexit(NULL,1);
-        }
-        fseek(fpmerge,21,SEEK_SET);
-        mlen=getc(fpmerge)+256*getc(fpmerge);  /* get block length */
-        getc(fpmerge);                         /* skip block type */
-    }
+	/* ===============
+		Loader block
+	   =============== */
 
-/* BASIC loader */
+   if ( !noloader ) {
+		/* If requested, merge an external loader */
+		mlen=0;
+		if ( merge != NULL ) {
+			if ( (fpmerge=fopen(merge,"rb") ) == NULL ) {
+				fprintf(stderr,"File for 'merge' not found: %s\n",merge);
+				fclose(fpin);
+				fclose(fpout);
+				myexit(NULL,1);
+			}
+			/* check the header type (first block must be BASIC) */
+			fseek(fpmerge,3,SEEK_SET);
+			c=getc(fpmerge);
+			if ( c != 0 ) {
+				fprintf(stderr,"BASIC block not found in file %s\n",merge);
+				fclose(fpin);
+				fclose(fpout);
+				myexit(NULL,1);
+			}
 
-/* Write out the BASIC header file */
-    writeword_p(19,fpout,&parity);         /* Header len */
-    writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
+			fseek(fpmerge,21,SEEK_SET);
+			mlen=getc(fpmerge)+256*getc(fpmerge);  /* get block length */
 
-    parity=0;
-    writebyte_p(0,fpout,&parity);             /* Filetype (Basic) */
-    writestring_p("Loader    ",fpout,&parity);
-    writeword_p(0x1e + mlen,fpout,&parity);   /* length */
-    writeword_p(10,fpout,&parity);            /* line for auto-start */
-    writeword_p(0x1e + mlen,fpout,&parity);   /* length (?) */
-    writebyte_p(parity,fpout,&parity);
+			fseek(fpmerge,0,SEEK_SET);
+			blocklen=getc(fpmerge)+256*getc(fpmerge);  /* get block length */
+			if ( blocklen != 19 ) {
+				fprintf(stderr,"Error locating the external loader header in file %s\n",merge);
+				fclose(fpin);
+				fclose(fpout);
+				myexit(NULL,1);
+			}
+			fseek(fpmerge,0,SEEK_SET);
+			/* Total ext. loader size (headerblock + data block) */
+			blocklen+=mlen+4;
+			/* Now import the external BASIC loader */
+			for (i=0; (i < blocklen); i++) {
+				c=getc(fpmerge);
+				writebyte_p(c,fpout,&parity);
+			}
+			fclose (fpmerge);
+
+		} else {
 
 
-/* Write out the BASIC loader program */
-    writeword_p(32 + mlen,fpout,&parity);         /* block lenght */
-    parity=0;
-    writebyte_p(255,fpout,&parity);        /* Data has a block type of 255 */
-    writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
-    writebyte_p(10,fpout,&parity);         /* LSB... */
-    writeword_p(26,fpout,&parity);         /* BASIC line length */
-    writebyte_p(0xfd,fpout,&parity);       /* CLEAR */
-    writebyte_p(0xb0,fpout,&parity);       /* VAL */
-    sprintf(mybuf,"\"%i\":",(int)pos-1);        /* location for CLEAR */
-    writestring_p(mybuf,fpout,&parity);
-    writebyte_p(0xef,fpout,&parity);       /* LOAD */
-    writebyte_p('"',fpout,&parity);
-    writebyte_p('"',fpout,&parity);
-    writebyte_p(0xaf,fpout,&parity);       /* CODE */
-    writebyte_p(':',fpout,&parity);
-    writebyte_p(0xf9,fpout,&parity);       /* RANDOMIZE */
-    writebyte_p(0xc0,fpout,&parity);       /* USR */
-    writebyte_p(0xb0,fpout,&parity);       /* VAL */
-    sprintf(mybuf,"\"%i\"",(int)pos);           /* Location for USR */
-    writestring_p(mybuf,fpout,&parity);
-    writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
+		/* BASIC loader */
 
-/* Optionally merge a BASIC block from a TAP file */
+		/* Write out the BASIC header file */
+			writeword_p(19,fpout,&parity);         /* Header len */
+			writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
 
-    if ( merge != NULL ) {
-      for (i=0; i<mlen;i++) {
-        c=getc(fpmerge);
-        writebyte_p(c,fpout,&parity);
-      }
-      fclose (fpmerge);
-    }
+			parity=0;
+			writebyte_p(0,fpout,&parity);             /* Filetype (Basic) */
+			writestring_p("Loader    ",fpout,&parity);
+			writeword_p(0x1e + mlen,fpout,&parity);   /* length */
+			writeword_p(10,fpout,&parity);            /* line for auto-start */
+			writeword_p(0x1e + mlen,fpout,&parity);   /* length (?) */
+			writebyte_p(parity,fpout,&parity);
 
-/* Common tail for the BASIC block */
-    writebyte_p(parity,fpout,&parity);
+
+		/* Write out the BASIC loader program */
+			writeword_p(32 + mlen,fpout,&parity);         /* block lenght */
+			parity=0;
+			writebyte_p(255,fpout,&parity);        /* Data has a block type of 255 */
+			writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
+			writebyte_p(10,fpout,&parity);         /* LSB... */
+			writeword_p(26,fpout,&parity);         /* BASIC line length */
+			writebyte_p(0xfd,fpout,&parity);       /* CLEAR */
+			writebyte_p(0xb0,fpout,&parity);       /* VAL */
+			sprintf(mybuf,"\"%i\":",(int)pos-1);        /* location for CLEAR */
+			writestring_p(mybuf,fpout,&parity);
+			writebyte_p(0xef,fpout,&parity);       /* LOAD */
+			writebyte_p('"',fpout,&parity);
+			writebyte_p('"',fpout,&parity);
+			writebyte_p(0xaf,fpout,&parity);       /* CODE */
+			writebyte_p(':',fpout,&parity);
+			writebyte_p(0xf9,fpout,&parity);       /* RANDOMIZE */
+			writebyte_p(0xc0,fpout,&parity);       /* USR */
+			writebyte_p(0xb0,fpout,&parity);       /* VAL */
+			sprintf(mybuf,"\"%i\"",(int)pos);           /* Location for USR */
+			writestring_p(mybuf,fpout,&parity);
+			writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
+			writebyte_p(parity,fpout,&parity);
+		}
+	}
 
 
 /* M/C program */
