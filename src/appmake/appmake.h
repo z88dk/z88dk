@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.16 2010-05-20 07:28:21 stefano Exp $
+ *   $Id: appmake.h,v 1.17 2010-06-22 13:57:08 stefano Exp $
  */
 
 
@@ -34,9 +34,6 @@ typedef struct {
 #ifdef MAIN_C
 extern int       abc80_exec(char *target);
 extern option_t  abc80_options;
-
-extern int       acebyt_exec(char *target);
-extern option_t  acebyt_options;
 
 extern int       acetap_exec(char *target);
 extern option_t  acetap_options;
@@ -70,6 +67,9 @@ extern option_t  newbrain_options;
 
 extern int       rex_exec(char *target);
 extern option_t  rex_options;
+
+extern int       sc3000_exec(char *target);
+extern option_t  sc3000_options;
 
 extern int       sms_exec(char *target);
 extern option_t  sms_options;
@@ -112,11 +112,8 @@ struct {
     { "bin2bas",  "abc80",    "(C) 2000 Stefano Bodrato",
       "Creates a BASIC loader and a tape file for the ABC computers",
       abc80_exec,   &abc80_options },
-    { "bin2byt",  "acebyt",      "(C) 2001 Stefano Bodrato",
-      "Generates a .byt file suitable for loading into emulators",
-      acebyt_exec,   &acebyt_options },
     { "acetap",  "ace",    "(C) 2001 Stefano Bodrato",
-      "Generates a .TAP for the Ace32 emulator",
+      "Generates a .TAP for the Ace32 emulator and optionally a WAV file",
       acetap_exec,   &acetap_options },
     { "bin2caq",  "aquarius", "(C) 2001 Stefano Bodrato",
       "Creates a BASIC loader file and binary stored in variable array format",
@@ -175,6 +172,9 @@ struct {
     { "bin2cmd",  "trs80",    "(C) 2008 Stefano Bodrato",
       "Creates a CMD file for the TRS 80",
       trs80_exec,   &trs80_options },
+    { "bin2sc",   "sc3000",      "(C) 2010 Stefano Bodrato",
+      "Generates a tape file, optionally a WAV file",
+      sc3000_exec,   &sc3000_options },
     { "appz88",   "z88",      "(C) 2000 - 2003 Dominic Morris & Dennis Groning",
       "Generates .63 and .62 files suitable for burning to EPROM",
       z88_exec,     &z88_options },
@@ -185,10 +185,10 @@ struct {
       "Creates a zxvgs application file",
       zxvgs_exec,   &zxvgs_options},
     { "bin2tap",  "zx",       "(C) 2000 - 2003 Dominic Morris & Stefano Bodrato", 
-      "Generates a .TAP file complete with BASIC header",
+      "Generates a .TAP file complete with BASIC header, optionally a WAV file",
       zx_exec,      &zx_options },
     { "bin2p",    "zx81",     "(C) 2000 Stefano Bodrato",                         
-      "Generates a .P file suitable for use by emulators",
+      "Generates a .P file suitable for use by emulators, optionally a WAV file",
       zx81_exec,    &zx81_options },
 
 };

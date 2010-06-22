@@ -12,7 +12,7 @@
  *        Creates a new TAP file (overwriting if necessary) just ready to run.
  *        Use tapmaker to customize your work.
  *
- *        $Id: zx.c,v 1.7 2010-06-03 09:32:06 stefano Exp $
+ *        $Id: zx.c,v 1.8 2010-06-22 13:57:08 stefano Exp $
  */
 
 #include "appmake.h"

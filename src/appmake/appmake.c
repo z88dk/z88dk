@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.8 2010-05-20 07:28:21 stefano Exp $
+ *   $Id: appmake.c,v 1.9 2010-06-22 13:57:08 stefano Exp $
  */
 
 #define MAIN_C
