@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.143 2010-05-31 08:29:06 stefano Exp $
+# $Id: Makefile,v 1.144 2010-06-24 09:05:51 stefano Exp $
 
 
 include	Make.config
@@ -19,7 +19,7 @@ all:	genlibs	z88libs	tilibs zxlibs \
 	m5_clib.lib msx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib	nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
 	ozansi_clib.lib	pps_clib.lib ppsansi_clib.lib \
-	rex_clib.lib rcmx000_clib.lib sms_clib.lib \
+	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib \
 	trs80_clib.lib vz_clib.lib vzansi_clib.lib \
 	embedded_clib.lib test_clib.lib	\
@@ -515,7 +515,8 @@ gfx81hr192.lib:
 	@echo ''
 	$(MAKE)	zx81deps
 	$(LIBLINKER) -IXIY -DFORzx81hr192 -x$(OUTPUT_DIRECTORY)/gfx81hr192 @$(LISTFILE_DIRECTORY)/gfx81hr.lst
-	$(LIBLINKER) -IXIY -DFORzx81hr192 -x$(OUTPUT_DIRECTORY)/gfx81mt192 @$(LISTFILE_DIRECTORY)/gfx81mt.lst
+	$(MAKE)	zx81deps
+	$(LIBLINKER) -IXIY -DFORzx81mt192 -x$(OUTPUT_DIRECTORY)/gfx81mt192 @$(LISTFILE_DIRECTORY)/gfx81mt.lst
 	$(MAKE)	zx81deps
 
 # ZX81 maths library - Stefano
@@ -1140,6 +1141,19 @@ sms_clib.lib:
 	$(MAKE)	-C setjmp
 	$(MAKE)	-C assert
 	$(LIBLINKER) -DFORsms -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
+
+# Sega SC-3000 - stefano
+sc3000_clib.lib:
+	@echo ''
+	@echo '--- Building SC-3000 System Library ---'
+	@echo ''
+	$(MAKE)	-C strings
+	$(MAKE)	-C stdlib
+	$(MAKE)	-C stdio
+	$(MAKE)	-C printflike
+	$(MAKE)	-C setjmp
+	$(MAKE)	-C assert
+	$(LIBLINKER) -DFORsc3000 -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst
 
 # Test platform	- dom
 test_clib.lib:

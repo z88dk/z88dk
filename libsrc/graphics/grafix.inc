@@ -10,7 +10,7 @@
 ;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,v 1.22 2009-05-20 06:57:26 stefano Exp $
+;	$Id: grafix.inc,v 1.23 2010-06-24 09:05:51 stefano Exp $
 ;
 
 
@@ -72,6 +72,12 @@ ENDIF
 IF FORzx81hr192
 	DEFINE gotgfx
 	defc maxx	= 256
+	defc maxy	= 192
+ENDIF
+
+IF FORzx81mt192
+	DEFINE gotgfx
+	defc maxx	= 248
 	defc maxy	= 192
 ENDIF
 

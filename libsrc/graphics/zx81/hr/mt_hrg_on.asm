@@ -5,7 +5,7 @@
 ;
 ;   Set HRG mode
 ;
-;	$Id: mt_hrg_on.asm,v 1.2 2010-02-10 16:37:48 stefano Exp $
+;	$Id: mt_hrg_on.asm,v 1.3 2010-06-24 09:05:51 stefano Exp $
 ;
 
 	XLIB	mt_hrg_on
@@ -20,6 +20,16 @@
 hrgmode:	defb	2
 
 .mt_hrg_on
+
+; if hrgpage has not been specified, then set a default value
+	ld      hl,(base_graphics)
+	ld      a,h
+	or      l
+	jr		nz,gotpage
+	ld		hl,24900		; on a 16K system we leave a space of about 1500 bytes for stack
+	ld		(base_graphics),hl
+gotpage:
+
 ; Prepare shadow ROM (remapped 1K RAM) for HRG
 	ld	hl,0
 	ld	de,0
@@ -56,9 +66,6 @@ ELSE
 	call	$2464		; PAGE
 ENDIF
 
-	ld	a,$1f	; ROM address $1F00
-	ld	i,a
-
 	; wait for video sync to reduce flicker
 HRG_Sync:
         ld      hl,$4034        ; FRAMES counter
@@ -66,6 +73,9 @@ HRG_Sync:
 HRG_Sync1:
         cp      (hl)            ; compare to new FRAMES
         jr      z,HRG_Sync1     ; exit after a change is detected
+
+	ld	a,$1f	; ROM address $1F00
+	ld	i,a
 
 	ld	a,(hrgmode)
 	in	a,($5f)

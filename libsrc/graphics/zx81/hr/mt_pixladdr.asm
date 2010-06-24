@@ -3,7 +3,7 @@
 ; by Stefano Bodrato, Feb. 2010
 ;--------------------------------------------------------------
 ;
-;	$Id: mt_pixladdr.asm,v 1.1 2010-02-10 16:15:35 stefano Exp $
+;	$Id: mt_pixladdr.asm,v 1.2 2010-06-24 09:05:51 stefano Exp $
 ;
 
 	XLIB	pixeladdress
@@ -42,6 +42,7 @@
 	add	hl,hl
 	add	hl,hl
 	add	hl,de
+	inc	hl
 	inc	hl
 
 	ld		de,($407B)

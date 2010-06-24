@@ -1,0 +1,6 @@
+stdio/sc3000/fputc_cons
+stdio/sc3000/fgetc_cons
+stdio/sc3000/getk
+stdio/sc3000/puts_cons
+sms/set_vdp_reg
+@z80.lst
