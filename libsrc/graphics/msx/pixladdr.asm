@@ -6,15 +6,10 @@
 	XDEF	pix_return
 
 	INCLUDE	"graphics/grafix.inc"
-
-IF FORmsx
-	INCLUDE "msx.def"
-ELSE
-	INCLUDE "svi.def"
-ENDIF
+	INCLUDE	"msx/vdp.inc"
 
 ;
-;	$Id: pixladdr.asm,v 1.5 2009-06-22 21:44:17 dom Exp $
+;	$Id: pixladdr.asm,v 1.6 2010-06-30 13:21:38 stefano Exp $
 ;
 
 ; ******************************************************************

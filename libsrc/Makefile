@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.144 2010-06-24 09:05:51 stefano Exp $
+# $Id: Makefile,v 1.145 2010-06-30 13:21:38 stefano Exp $
 
 
 include	Make.config
@@ -1134,12 +1134,14 @@ sms_clib.lib:
 	@echo ''
 	@echo '--- Building Sega Master	System Library	---'
 	@echo ''
+	$(MAKE)	msxdeps
 	$(MAKE)	-C strings
 	$(MAKE)	-C stdlib
 	$(MAKE)	-C stdio
 	$(MAKE)	-C printflike
 	$(MAKE)	-C setjmp
 	$(MAKE)	-C assert
+	cd msx ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORsms -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
 
 # Sega SC-3000 - stefano
@@ -1147,12 +1149,14 @@ sc3000_clib.lib:
 	@echo ''
 	@echo '--- Building SC-3000 System Library ---'
 	@echo ''
+	$(MAKE)	msxdeps
 	$(MAKE)	-C strings
 	$(MAKE)	-C stdlib
 	$(MAKE)	-C stdio
 	$(MAKE)	-C printflike
 	$(MAKE)	-C setjmp
 	$(MAKE)	-C assert
+	cd msx ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORsc3000 -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst
 
 # Test platform	- dom

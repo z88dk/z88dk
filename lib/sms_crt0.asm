@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.4 2009-06-22 21:20:05 dom Exp $
+;	$Id: sms_crt0.asm,v 1.5 2010-06-30 13:21:38 stefano Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -53,18 +53,28 @@
 	
 	XDEF	timer		;This is incremented every time a VBL/HBL interrupt happens
 	XDEF	_pause_flag	;This alternates between 0 and 1 every time pause is pressed
+	
+	XDEF	RG0SAV		;keeping track of VDP register values
+	XDEF	RG1SAV
+	XDEF	RG2SAV
+	XDEF	RG3SAV
+	XDEF	RG4SAV
+	XDEF	RG5SAV
+	XDEF	RG6SAV
+	XDEF	RG7SAV
 
 	org    ROM_Start
 
 	jp	start
 	
-	defm    "Sega Master System"
+	defm    "Sega Master System - Small C+"
 	
 ;-------        
 ; Interrupt handlers
 ;-------
 filler1:
 	defs	(INT_Start - filler1)
+
 int_RASTER:
 	push	hl
 	
@@ -285,6 +295,14 @@ raster_procs		ds.w	8	;Raster interrupt handlers
 pause_procs		ds.w	8	;Pause interrupt handlers
 timer			ds.w	1	;This is incremented every time a VBL/HBL interrupt happens
 _pause_flag		ds.b	1	;This alternates between 0 and 1 every time pause is pressed
+RG0SAV			ds.b	1	;keeping track of VDP register values
+RG1SAV			ds.b	1
+RG2SAV			ds.b	1
+RG3SAV			ds.b	1
+RG4SAV			ds.b	1
+RG5SAV			ds.b	1
+RG6SAV			ds.b	1
+RG7SAV			ds.b	1
 }
 
 

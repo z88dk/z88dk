@@ -12,13 +12,7 @@
 ;
 
 	INCLUDE	"graphics/grafix.inc"
-
-
-IF FORmsx
-	INCLUDE "msx.def"
-ELSE
-	INCLUDE "svi.def"
-ENDIF
+	INCLUDE	"msx/vdp.inc"
 
 
 	XLIB	stencil_render
@@ -31,7 +25,7 @@ ENDIF
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.5 2009-10-08 09:48:53 stefano Exp $
+;	$Id: stencil_render.asm,v 1.6 2010-06-30 13:21:38 stefano Exp $
 ;
 
 .stencil_render
@@ -59,9 +53,8 @@ ENDIF
 		ld	e,maxy
 		add	hl,de
 		cp	(hl)		; if x1>x2, return
-		jr	z,xequal
 		jr	nc,yloop
-.xequal
+		
 					; C still holds Y
 		push	af		; X1
 		ld	a,(hl)

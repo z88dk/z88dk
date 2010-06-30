@@ -6,7 +6,7 @@
 ; MSX version
 ;
 ;
-; $Id: putsprite.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+; $Id: putsprite.asm,v 1.5 2010-06-30 13:21:38 stefano Exp $
 ;
 
 	XLIB    putsprite
@@ -16,13 +16,7 @@
         XREF	swapgfxbk1
 
 	INCLUDE	"graphics/grafix.inc"
-
-
-IF FORmsx
-	INCLUDE "msx.def"
-ELSE
-	INCLUDE "svi.def"
-ENDIF
+	INCLUDE	"msx/vdp.inc"
 
 
 ; coords: d,e (vert-horz)

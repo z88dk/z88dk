@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.14 2009-05-20 06:57:24 stefano Exp $
+ * $Id: msx.h,v 1.15 2010-06-30 13:21:38 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -106,6 +106,24 @@ enum video_mode {
 };
 #endif
 
+#ifdef __SC3000__
+enum video_mode {
+	mode_0 = 0,
+	mode_1 = 1,
+	mode_2 = 2,
+	mode_3 = 3
+};
+#endif
+
+#ifdef __SMS__
+enum video_mode {
+	mode_0 = 0,
+	mode_1 = 1,
+	mode_2 = 2,
+	mode_3 = 3
+};
+#endif
+
 // Set screen to mangled mode (screen 1 + 2)
 extern void __LIB__ msx_set_mangled_mode();
 
@@ -169,9 +187,11 @@ extern void __LIB__ msx_vmerge(unsigned int addr, unsigned char value);
 
 // Set a VDP register with a value
 extern void __LIB__ set_vdp_reg(int reg, int value);
+#define msx_set_vdp(reg, value) set_vdp_reg(reg, value)
 
 // Get a value from a VDP register
 extern unsigned char __LIB__ __FASTCALL__ get_vdp_reg(unsigned char);
+#define msx_get_vdp(reg) get_vdp_reg(reg)
 
 // Set point at the given position on VRAM
 //extern void __LIB__ msx_pset(int x, int y);
