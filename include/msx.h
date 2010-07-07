@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.16 2010-07-07 15:23:56 stefano Exp $
+ * $Id: msx.h,v 1.17 2010-07-07 16:36:37 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -89,6 +89,7 @@ extern void __LIB__ __FASTCALL__ msx_set_mode(int mode);
 // Video modes for set_mode
 
 #ifdef __SVI__
+#define vmode_defined 1
 enum video_mode {
 	mode_0 = 0x47,
 	mode_1 = 0x4A,
@@ -98,6 +99,7 @@ enum video_mode {
 #endif
 
 #ifdef __MSX__
+#define vmode_defined 1
 enum video_mode {
 	mode_0 = 0x6C,
 	mode_1 = 0x6F,
@@ -106,7 +108,7 @@ enum video_mode {
 };
 #endif
 
-#ifndef mode_0
+#ifndef vmode_defined
 enum video_mode {
 	mode_0 = 0,
 	mode_1 = 1,
