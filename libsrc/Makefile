@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.145 2010-06-30 13:21:38 stefano Exp $
+# $Id: Makefile,v 1.146 2010-07-07 15:23:56 stefano Exp $
 
 
 include	Make.config
@@ -930,6 +930,21 @@ msx_clib.lib:
 	cd msx ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
+# SORD M5 library - Stefano
+m5_clib.lib:
+	@echo ''
+	@echo '--- Building SORD M5 Library  ---'
+	@echo ''
+	$(MAKE)	msxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd	..
+	cd printflike ;	$(MAKE)	; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	cd msx ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORm5 -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
+
 # NASCOM library - Stefano
 nascom_clib.lib:
 	@echo ''
@@ -956,19 +971,6 @@ nasansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORnascom -x$(OUTPUT_DIRECTORY)/nasansi_clib @$(LISTFILE_DIRECTORY)/nasansi.lst
-
-# SORD M5 library - Stefano
-m5_clib.lib:
-	@echo ''
-	@echo '--- Building SORD M5 Library  ---'
-	@echo ''
-	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd	..
-	cd printflike ;	$(MAKE)	; cd ..
-	cd setjmp ; $(MAKE) ; cd ..
-	cd assert ; $(MAKE) ; cd ..
-	$(LIBLINKER) -DFORm5 -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
 
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:

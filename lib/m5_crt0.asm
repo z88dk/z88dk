@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: m5_crt0.asm,v 1.9 2009-06-22 21:20:05 dom Exp $
+;       $Id: m5_crt0.asm,v 1.10 2010-07-07 15:23:56 stefano Exp $
 ;
 
 
@@ -36,7 +36,7 @@
 ; vprintf is internal to this file so we only ever include one of the set
 ; of routines
 
-	XDEF	_vfprintf
+        XDEF	_vfprintf
 
 ;Exit variables
 
@@ -44,14 +44,14 @@
         XDEF    exitcount
 
        	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+        XDEF	heapblocks
 
 ;For stdin, stdout, stder
 
         XDEF    __sgoioblk
 
 ; Graphics stuff
-	XDEF	pixelbyte	; Temp store for non-buffered mode
+        XDEF	pixelbyte	; Temp store for non-buffered mode
         XDEF    base_graphics   ; Graphical variables
         XDEF    coords          ; Current xy position
 
@@ -59,11 +59,22 @@
 ;
         XDEF    msxbios
 
+		XDEF	RG0SAV		;keeping track of VDP register values
+		XDEF	RG1SAV
+		XDEF	RG2SAV
+		XDEF	RG3SAV
+		XDEF	RG4SAV
+		XDEF	RG5SAV
+		XDEF	RG6SAV
+		XDEF	RG7SAV
+
 ; Now, getting to the real stuff now!
 
+IF      !myzorg
+		defc    myzorg  = $7300
+ENDIF
 
-        org     $7400
-
+        org     myzorg
 
 start:
         ld      hl,0
@@ -74,8 +85,8 @@ start:
         ld      sp,hl
         ld      (exitsp),sp
 
-	exx
-	push	hl
+        exx
+        push	hl
 
 
 IF !DEFINED_nostreams
@@ -169,6 +180,15 @@ base_graphics:  defw    0	; Location of current screen buffer
 coords:         defw    0       ; Current graphics xy coordinates
 pixelbyte:	defb	0
 
+RG0SAV:		defb	0	;keeping track of VDP register values
+RG1SAV:		defb	0
+RG2SAV:		defb	0
+RG3SAV:		defb	0
+RG4SAV:		defb	0
+RG5SAV:		defb	0
+RG6SAV:		defb	0
+RG7SAV:		defb	0
+
 
 ; ---------------
 ; MSX specific stuff
@@ -180,8 +200,8 @@ msxbios:
 	ret
 
 
-         defm  "Small C+ SORD M5"
-	 defb	0
+    defm  "Small C+ SORD M5"
+    defb	0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

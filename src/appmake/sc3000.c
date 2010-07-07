@@ -5,7 +5,7 @@
  *
  *        Stefano Bodrato Jun 2010
  *
- *        $Id: sc3000.c,v 1.1 2010-06-22 13:57:08 stefano Exp $
+ *        $Id: sc3000.c,v 1.2 2010-07-07 15:23:56 stefano Exp $
  */
 
 #include "appmake.h"
@@ -235,8 +235,8 @@ int sc3000_exec(char *target)
 			writebyte_cksum(name[i],fpout,&checksum);
 		
 		/* len */
-		writebyte_cksum((22+len)/256,fpout,&checksum);   /* MSB */
-		writebyte_cksum((22+len)%256,fpout,&checksum);   /* LSB */
+		writebyte_cksum((24+len)/256,fpout,&checksum);   /* MSB */
+		writebyte_cksum((24+len)%256,fpout,&checksum);   /* LSB */
 		
 		fputc((checksum%256)^0xff,fpout);
 		/* extra dummy data to prevent read overflows */
@@ -245,7 +245,7 @@ int sc3000_exec(char *target)
 
 
 	/* BASIC loader body */
-		writeword(22+len+4,fpout);              /* header block size */
+		writeword(24+len+4,fpout);              /* header block size */
 		fputc(0x17,fpout);                      /* BASIC block type */
 
 		checksum = 255;
@@ -264,7 +264,9 @@ int sc3000_exec(char *target)
 		writebyte_cksum('9',fpout,&checksum);
 		writebyte_cksum('8',fpout,&checksum);
 		writebyte_cksum('1',fpout,&checksum);
-		writebyte_cksum('5',fpout,&checksum);
+		writebyte_cksum('7',fpout,&checksum);
+		writebyte_cksum(':',fpout,&checksum);
+		writebyte_cksum(151,fpout,&checksum);   /* STOP */
 		/* Line size count ends here */
 		writebyte_cksum(13,fpout,&checksum);     /* CR */
 
@@ -277,7 +279,7 @@ int sc3000_exec(char *target)
 		/* Line size count starts here */
 		writebyte_cksum(144,fpout,&checksum);    /* REM */
 		writebyte_cksum(' ',fpout,&checksum);
-		/* CODE (location $9815) */
+		/* CODE (location $9817) */
 	    for (i=0; i<len;i++) {
 			c=getc(fpin);
 			writebyte_cksum(c,fpout,&checksum);

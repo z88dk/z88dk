@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.17 2010-06-22 13:57:08 stefano Exp $
+ *   $Id: appmake.h,v 1.18 2010-07-07 15:23:56 stefano Exp $
  */
 
 
@@ -52,6 +52,9 @@ extern option_t  gal_options;
 
 extern int       hex_exec(char *target);
 extern option_t  hex_options;
+
+extern int       m5_exec(char *target);
+extern option_t  m5_options;
 
 extern int       msx_exec(char *target);
 extern option_t  msx_options;
@@ -130,6 +133,9 @@ struct {
     { "bin2hex",  "hex",      "(C) 2001 Dominic Morris & Jeff Brown",
       "Creates an intel hex record suitable for embedded devices",
       hex_exec,     &hex_options },
+    { "bin2m5",   "m5",      "(C) 2010 Stefano Bodrato",
+      "Generates a tape file for the Sord M5, optionally a WAV file",
+      m5_exec,   &m5_options },
     { "bin2msx",  "msx",      "(C) 2001 Stefano Bodrato",
       "Adds a file header to enable the program to be loaded using 'bload \"file.bin\",r",
       msx_exec,     &msx_options },
@@ -173,7 +179,7 @@ struct {
       "Creates a CMD file for the TRS 80",
       trs80_exec,   &trs80_options },
     { "bin2sc",   "sc3000",      "(C) 2010 Stefano Bodrato",
-      "Generates a tape file, optionally a WAV file",
+      "Packager for the SEGA SC-3000 / SF-7000",
       sc3000_exec,   &sc3000_options },
     { "appz88",   "z88",      "(C) 2000 - 2003 Dominic Morris & Dennis Groning",
       "Generates .63 and .62 files suitable for burning to EPROM",

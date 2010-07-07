@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jun 2010
 ;
-;	$Id: sc3000_crt0.asm,v 1.2 2010-06-30 13:21:38 stefano Exp $
+;	$Id: sc3000_crt0.asm,v 1.3 2010-07-07 15:23:56 stefano Exp $
 ;
 
 	; Constants for ROM mode (-startup=2)
@@ -88,14 +88,14 @@
 ; Now, getting to the real stuff now!
 
 ;--------
-; Set an origin for the application (-zorg=) default to $9815 (just after a CALL in a BASIC program)
+; Set an origin for the application (-zorg=) default to $9817 (just after a CALL in a BASIC program)
 ;--------
 
 IF (startup=2)
 	defc    myzorg  = ROM_Start
 ELSE
 	IF      !myzorg
-		defc    myzorg  = $9815
+		defc    myzorg  = $9817
 	ENDIF
 ENDIF
         org     myzorg
@@ -300,6 +300,11 @@ msxbios:
 	ret
 
 IF (startup=2)
+
+	IF !DEFINED_sysdefvarsaddr
+			defc sysdefvarsaddr = RAM_Start+1024
+	ENDIF
+
 	DEFVARS RAM_Start
 	{
 	__sgoioblk      	ds.b    40      ;stdio control block
