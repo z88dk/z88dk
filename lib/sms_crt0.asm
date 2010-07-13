@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.5 2010-06-30 13:21:38 stefano Exp $
+;	$Id: sms_crt0.asm,v 1.6 2010-07-13 06:16:53 stefano Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -274,6 +274,10 @@ ENDIF
 
 ; Static variables kept in safe workspace
 
+IF !DEFINED_sysdefvarsaddr
+		defc sysdefvarsaddr = RAM_Start+1024
+ENDIF
+
 DEFVARS RAM_Start
 {
 __sgoioblk      	ds.b    40      ;stdio control block
@@ -303,6 +307,15 @@ RG4SAV			ds.b	1
 RG5SAV			ds.b	1
 RG6SAV			ds.b	1
 RG7SAV			ds.b	1
+}
+
+IF !DEFINED_defvarsaddr
+		defc defvarsaddr = RAM_Start+1024+256
+ENDIF
+
+DEFVARS defvarsaddr
+{
+dummydummy        ds.b    1 
 }
 
 

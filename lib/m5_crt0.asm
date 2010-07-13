@@ -4,23 +4,24 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: m5_crt0.asm,v 1.10 2010-07-07 15:23:56 stefano Exp $
+;       $Id: m5_crt0.asm,v 1.11 2010-07-13 06:16:53 stefano Exp $
 ;
 
 
-                MODULE  m5_crt0
+        MODULE  m5_crt0
+
 
 ;
 ; Initially include the zcc_opt.def file to find out lots of lovely
 ; information about what we should do..
 ;
 
-                INCLUDE "zcc_opt.def"
+        INCLUDE "zcc_opt.def"
 
 ; No matter what set up we have, main is always, always external to
 ; this file
 
-                XREF    _main
+        XREF    _main
 
 ;
 ; Some variables which are needed for both app and basic startup
@@ -117,16 +118,16 @@ ENDIF
 
 	pop	bc
 	exx
-        pop	hl
-        exx
+	pop	hl
+	exx
 
 start1:
-        ld      sp,0
-        
-        ret
+	ld      sp,0
+	ret
+
 
 l_dcal:
-        jp      (hl)
+	jp      (hl)
 
 ; Now, define some values for stdin, stdout, stderr
 

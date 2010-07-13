@@ -5,12 +5,13 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.28 2010-05-17 22:40:54 dom Exp $
+;       $Id: spec_crt0.asm,v 1.29 2010-07-13 06:16:53 stefano Exp $
 ;
 
 
+        MODULE  zx82_crt0
 
-                MODULE  zx82_crt0
+        
 ;--------
 ; Include zcc_opt.def to find out some info
 ;--------
@@ -123,14 +124,6 @@ ELSE
   ENDIF
         ld      a,2             ; open the upper display (uneeded?)
         call    5633
-IF DEFINED_NEED1bitsound
-	ld	a,(23624)
-	rrca
-	rrca
-	rrca
-	and	7
-	ld	(snd_tick),a
-ENDIF
 
 ENDIF
 
@@ -173,7 +166,7 @@ cleanup_exit:
 
 ; ######## IM 1 MODE INTERRUPT ENTRY ########
 
-	INCLUDE "spec_crt0_rom_isr.as1"
+      INCLUDE "spec_crt0_rom_isr.as1"
 
 ; ########  END OF ROM INTERRUPT HANDLER ######## 
 
@@ -317,9 +310,6 @@ noresidos:
 ENDIF
 
 
-
-
-
 ;---------------------------------------------
 ; Some +3 stuff - this needs to be below 49152
 ;---------------------------------------------
@@ -384,7 +374,6 @@ setheader_r:
         ret
 ENDIF
 
-IF !DEFINED_norom3
 ; Call a routine in the spectrum ROM
 ; The routine to call is stored in the two bytes following
 call_rom3:
@@ -402,7 +391,6 @@ ENDIF
         push    bc
         exx                      ; Back to the regular set
         ret
-ENDIF
         
 
 
@@ -428,24 +416,24 @@ IF (startup=2) | (startup=3) ; ROM or moved system variables
 ;; defw    0
 
 IF DEFINED_NEED_ZXMMC
-                XDEF card_select
+      XDEF card_select
 ENDIF
 
 IF !DEFINED_HAVESEED
-                XDEF    _std_seed         ; Integer rand() seed
+      XDEF    _std_seed         ; Integer rand() seed
 ENDIF
 
 
 IF !DEFINED_sysdefvarsaddr
-        defc sysdefvarsaddr = 23552-70   ; Just before the ZX system variables
+      defc sysdefvarsaddr = 23552-70   ; Just before the ZX system variables
 ENDIF
 
 IF NEED_floatpack
-        INCLUDE         "float.asm"
+      INCLUDE   "float.asm"
 ENDIF
 
 IF DEFINED_ANSIstdio
-       INCLUDE "stdio_fp.asm"
+      INCLUDE   "stdio_fp.asm"
 ENDIF
 
 DEFVARS sysdefvarsaddr
@@ -466,7 +454,7 @@ snd_tick        ds.b    1       ; Sound
 heaplast        ds.w    1       ; Address of last block on heap
 heapblocks      ds.w    1       ; Number of blocks
 card_select		ds.b	1		; Currently selected MMC/SD slot for ZXMMC
-romsvc		ds.b	1	; Pointer to the end of the sysdefvars
+romsvc          ds.b	1	; Pointer to the end of the sysdefvars
 				; used by the ROM version of some library
 }
 
@@ -509,7 +497,7 @@ ENDIF
 ; ZXMMC SD/MMC interface
 IF DEFINED_NEED_ZXMMC
 	XDEF card_select
-card_select:       defb    0    ; Currently selected MMC/SD slot for ZXMMC
+card_select:    defb    0    ; Currently selected MMC/SD slot for ZXMMC
 ENDIF
 
 
@@ -517,13 +505,11 @@ ENDIF
 ; Define the stdin/out/err area. For the z88 we have two models - the
 ; classic (kludgey) one and "ANSI" model
 ;-----------
-IF !DEFINED_nostreams
 __sgoioblk:
 IF DEFINED_ANSIstdio
        INCLUDE "stdio_fp.asm"
 ELSE
         defw    -11,-12,-10
-ENDIF
 ENDIF
 
                 defm    "Small C+ ZX"   ;Unnecessary file signature
@@ -541,7 +527,10 @@ fasign:         defb    0               ;FP register
 
 ENDIF
 
-
 ;---------------------------------------------------------------------------
 ENDIF
 ;---------------------------------------------------------------------------
+
+                defm    "Small C+ ZX"   ;Unnecessary file signature
+                defb    0
+
