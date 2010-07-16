@@ -9,7 +9,6 @@ XLIB in_JoyKempston
 .in_JoyKempston
 
    in a,($1f)
-   cpl
    and $1f
    ld e,a
    ld d,0
@@ -21,11 +20,12 @@ XLIB in_JoyKempston
 
 .kemptbl
 
-   defb $8f,$87,$8b,$83
+   defb $00,$08,$04,$0c
+   defb $02,$0a,$06,$0e
+   defb $01,$09,$05,$0d
+   defb $03,$0b,$07,$0f
+
+   defb $80,$88,$84,$8c
    defb $82,$8a,$86,$8e
    defb $81,$89,$85,$8d
-   defb $8c,$84,$88,$80
-   defb $0f,$07,$0b,$03
-   defb $0d,$05,$09,$01
-   defb $0e,$06,$0a,$02
-   defb $02,$04,$08,$00
+   defb $83,$8b,$87,$8f
