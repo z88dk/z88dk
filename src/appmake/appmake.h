@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.18 2010-07-07 15:23:56 stefano Exp $
+ *   $Id: appmake.h,v 1.19 2010-07-30 06:18:43 stefano Exp $
  */
 
 
@@ -86,6 +86,9 @@ extern option_t  tixx_options;
 extern int       trs80_exec(char *target);
 extern option_t  trs80_options;
 
+extern int       vz_exec(char *target);
+extern option_t  vz_options;
+
 extern int       z88_exec(char *target);
 extern option_t  z88_options;
 
@@ -152,23 +155,23 @@ struct {
       "Creates a .rex application using data from a .res file and a .bin file",
       rex_exec,     &rex_options },
     { "bin2var",   "ti82",       "(C) 2000 - 2003 David Phillips et al",
-        "Creates a .82p file",
-        tixx_exec,      &tixx_options },
+      "Creates a .82p file",
+      tixx_exec,      &tixx_options },
     { "bin2var",   "ti83",       "(C) 2000 - 2003 David Phillips et al",
-        "Creates a .83p file",
-        tixx_exec,      &tixx_options },
+      "Creates a .83p file",
+      tixx_exec,      &tixx_options },
     { "bin2var",   "ti8x",       "(C) 2000 - 2003 David Phillips et al",
-        "Creates a .8xp file",
-        tixx_exec,      &tixx_options },
+      "Creates a .8xp file",
+      tixx_exec,      &tixx_options },
     { "bin2var",   "ti85",       "(C) 2000 - 2003 David Phillips et al",
-        "Creates a .85p file",
-        tixx_exec,      &tixx_options },
+      "Creates a .85p file",
+      tixx_exec,      &tixx_options },
     { "bin2var",   "ti86",       "(C) 2000 - 2003 David Phillips et al",
-        "Creates a .86p file",
-        tixx_exec,      &tixx_options },
+      "Creates a .86p file",
+      tixx_exec,      &tixx_options },
     { "bin2var",   "ti86s",       "(C) 2000 - 2003 David Phillips et al",
-        "Creates a .86s file",
-        tixx_exec,      &tixx_options },
+      "Creates a .86s file",
+      tixx_exec,      &tixx_options },
     { "bin2svi",  "svi",       "(C) 2001 Stefano Bodrato",
       "Creates a .cas file loadable with the SVI emulator",
       svi_exec,      &svi_options },
@@ -181,6 +184,9 @@ struct {
     { "bin2sc",   "sc3000",      "(C) 2010 Stefano Bodrato",
       "Packager for the SEGA SC-3000 / SF-7000",
       sc3000_exec,   &sc3000_options },
+    { "vz2cas",    "vz",     "(C) 2010 Stefano Bodrato",
+      "Convert the Laser 200 .vz file to .cas, optionally to WAV",
+      vz_exec,    &vz_options },
     { "appz88",   "z88",      "(C) 2000 - 2003 Dominic Morris & Dennis Groning",
       "Generates .63 and .62 files suitable for burning to EPROM",
       z88_exec,     &z88_options },
@@ -195,10 +201,9 @@ struct {
       zx_exec,      &zx_options },
     { "bin2p",    "zx81",     "(C) 2000 Stefano Bodrato",                         
       "Generates a .P file suitable for use by emulators, optionally a WAV file",
-      zx81_exec,    &zx81_options },
-
+      zx81_exec,    &zx81_options }
 };
-#define APPMAKE_TARGETS 27
+#define APPMAKE_TARGETS 29
 #endif
 
 

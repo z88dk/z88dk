@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: vz_crt0.asm,v 1.11 2009-06-22 21:20:05 dom Exp $
+;       $Id: vz_crt0.asm,v 1.12 2010-07-30 06:18:43 stefano Exp $
 ;
 
 
@@ -48,7 +48,7 @@
 ; Now, getting to the real stuff now!
 
 
-IF (startup=2)
+IF (startup=3)
 
         org     32768
 
@@ -59,9 +59,18 @@ ELSE
   defb  $20,$20,0,0
   defm  "z80.mc"
   defb  0,0,0,0,0,0,0,0,0,0,0
+  
+IF (startup=2)
+  ; BASIC startup mode
   defb $f0
+ELSE
+  ; native M/C startup mode
+  defb $f1
+ENDIF
+
   defw $7ae9            ; 24 bytes so far
   
+IF (startup=2)
   defw $7b04
   defw 1
   defb $B1              ;POKE
@@ -82,6 +91,7 @@ ELSE
   defb 4
   
 ; Header ends here: 65 bytes
+ENDIF
 
 ENDIF
 

@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.10 2010-07-07 15:23:56 stefano Exp $
+ *   $Id: appmake.c,v 1.11 2010-07-30 06:18:43 stefano Exp $
  */
 
 #define MAIN_C
@@ -341,7 +341,7 @@ void raw2wav(char *wavfile)
 	/* Now let's think at the WAV file */
 	writestring("RIFF",fpout);
 
-	writelong(len+36,fpout);
+	writelong(len+63,fpout);
 
 	writestring("WAVEfmt ",fpout);
 	writelong(0x10,fpout);
