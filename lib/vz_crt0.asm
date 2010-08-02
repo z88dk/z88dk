@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: vz_crt0.asm,v 1.12 2010-07-30 06:18:43 stefano Exp $
+;       $Id: vz_crt0.asm,v 1.13 2010-08-02 12:58:03 stefano Exp $
 ;
 
 
@@ -32,7 +32,7 @@
         XDEF    exitcount
 
        	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+       	XDEF	heapblocks
 
         XDEF    __sgoioblk      ;stdio info block
 
@@ -42,19 +42,30 @@
         XDEF    base_graphics   ;GFX memory related variables
         XDEF    gfx_bank
 
-	XDEF	snd_tick	;Sound variable
+       	XDEF	snd_tick	;Sound variable
+
+        IF      !myzorg
+            IF (startup=3)
+				defc    myzorg  = 32768  ; clean binary block
+            ELSE
+				IF (startup=2)
+					defc    myzorg  = $7ae9	; BASIC startup mode
+				ELSE
+					defc    myzorg  = $7b00  ; Direct M/C mode
+                ENDIF
+            ENDIF
+        ENDIF
 
 
 ; Now, getting to the real stuff now!
 
 
-IF (startup=3)
+		org     myzorg-24
 
-        org     32768
+IF (startup=3)
+;  STARTUP=3 -> plain binary block
 
 ELSE
-
-  org $7ae9-24
 
   defb  $20,$20,0,0
   defm  "z80.mc"
@@ -68,8 +79,8 @@ ELSE
   defb $f1
 ENDIF
 
-  defw $7ae9            ; 24 bytes so far
-  
+  defw myzorg
+
 IF (startup=2)
   defw $7b04
   defw 1
