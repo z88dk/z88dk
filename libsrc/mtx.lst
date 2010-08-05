@@ -1,0 +1,5 @@
+stdio/mtx/fputc_cons
+stdio/mtx/fgetc_cons
+stdio/mtx/getk
+stdio/mtx/puts_cons
+@z80.lst

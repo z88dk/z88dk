@@ -9,6 +9,7 @@ graphics/getmaxx
 graphics/getmaxy
 graphics/lbitmask
 graphics/line
+graphics/liner
 graphics/lscroll
 graphics/plot
 graphics/point
