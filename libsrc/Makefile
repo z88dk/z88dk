@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.147 2010-08-05 06:14:09 stefano Exp $
+# $Id: Makefile,v 1.148 2010-08-13 07:00:04 stefano Exp $
 
 
 include	Make.config
@@ -1152,12 +1152,12 @@ sms_clib.lib:
 	@echo '--- Building Sega Master	System Library	---'
 	@echo ''
 	$(MAKE)	msxdeps
-	$(MAKE)	-C strings
-	$(MAKE)	-C stdlib
-	$(MAKE)	-C stdio
-	$(MAKE)	-C printflike
-	$(MAKE)	-C setjmp
-	$(MAKE)	-C assert
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd	..
+	cd printflike ;	$(MAKE)	; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
 	cd msx ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORsms -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
 
@@ -1167,12 +1167,12 @@ sc3000_clib.lib:
 	@echo '--- Building SC-3000 System Library ---'
 	@echo ''
 	$(MAKE)	msxdeps
-	$(MAKE)	-C strings
-	$(MAKE)	-C stdlib
-	$(MAKE)	-C stdio
-	$(MAKE)	-C printflike
-	$(MAKE)	-C setjmp
-	$(MAKE)	-C assert
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd	..
+	cd printflike ;	$(MAKE)	; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
 	cd msx ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORsc3000 -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst
 
@@ -1181,12 +1181,12 @@ test_clib.lib:
 	@echo ''
 	@echo '--- Building Test System	Library	 ---'
 	@echo ''
-	$(MAKE)	-C strings
-	$(MAKE)	-C stdlib
-	$(MAKE)	-C stdio
-	$(MAKE)	-C printflike
-	$(MAKE)	-C setjmp
-	$(MAKE)	-C assert
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd	..
+	cd printflike ;	$(MAKE)	; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/test_clib @$(LISTFILE_DIRECTORY)/test.lst
 
 # TRS 80 - stefano
@@ -1209,7 +1209,7 @@ preempt.lib:
 	@echo ''
 	@echo '--- Building Preemptive threading Library  ---'
 	@echo ''
-	$(MAKE) -C threading/preempt
+	cd threading/preempt; $(MAKE) ; cd ../..
 
 # SP1 sprite library - aralbrec
 sp1:
@@ -1289,8 +1289,8 @@ clean:
 	cd vz ;	$(RM) *.o ; cd ..
 	cd zx81	; $(MAKE) clean ; cd ..
 	cd cpc ; $(RM) *.o ; cd	..
-	$(MAKE)	-C sms clean
-	$(MAKE) -C threading/preempt clean
+	cd sms ; $(MAKE) clean ; cd	..
+	cd threading/preempt	; $(MAKE) clean	; cd ../..
 	cd sprites/software/sp1	; $(MAKE) clean	; cd ../../..
 
 install:
