@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.13 2009-06-22 21:20:05 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.14 2010-09-14 14:28:44 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -41,8 +41,8 @@
 	XDEF    exitsp		;atexit() variables
 	XDEF    exitcount
 
-        XDEF    heaplast        ;Near malloc heap variables
-        XDEF    heapblocks      ;
+	XDEF    heaplast        ;Near malloc heap variables
+	XDEF    heapblocks      ;
 
 	XDEF    __sgoioblk	;std* control block
 
@@ -52,8 +52,12 @@
 ; Target specific labels
 ;-----------------------
 
-        XDEF    _vdcDispMem	; pointer to disp. memory for C128
+	XDEF    _vdcDispMem	; pointer to disp. memory for C128
 	XDEF	snd_tick	; for sound code, if any
+	XDEF	RG0SAV		; keeping track of VDP register values (Einstein)
+	XDEF	pixelbyte	; VDP gfx driver, byte temp storage
+	XDEF	coords
+
 
         org     $100
 
@@ -224,12 +228,16 @@ IF DEFINED_NEED1bitsound
 snd_tick:	defb	0	; Sound variable
 ENDIF
 
-;----------------------------
-; Unneccessary file signature
-;----------------------------
-_vdcDispMem:					; Label used by "c128cpm.lib" only
+;-----------------------------------------------------
+; Unneccessary file signature + target specific stuff
+;-----------------------------------------------------
+_vdcDispMem:				; Label used by "c128cpm.lib" only
+base_graphics:				; various gfx drivers
          	defm  	"Small C+ CP/M"
-end:		defb	0
+end:		defb	0		; null file name
+RG0SAV:		defb	0		; VDP graphics driver (Einstein)
+pixelbyte:	defb	0		; temp byte storage for VDP driver
+coords:		defw    0       ; Current graphics xy coordinates
 
 ;----------------------------------------------
 ; Floating point support routines and variables

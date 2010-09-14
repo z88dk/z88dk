@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.148 2010-08-13 07:00:04 stefano Exp $
+# $Id: Makefile,v 1.149 2010-09-14 14:28:44 stefano Exp $
 
 
 include	Make.config
@@ -15,7 +15,7 @@ include	Make.config
 all:	genlibs	z88libs	tilibs zxlibs \
 	abc80_clib.lib abc80ansi_clib.lib abc800_clib.lib \
 	ace_clib.lib aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
-	c128libs cpclibs cpm_clib.lib gal_clib.lib \
+	c128libs cpclibs cpm_clib.lib einstein.lib gal_clib.lib \
 	m5_clib.lib msx_clib.lib mtx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib	nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
 	ozansi_clib.lib	pps_clib.lib ppsansi_clib.lib \
@@ -916,7 +916,7 @@ svi_clib.lib:
 # MSX library - Stefano
 msx_clib.lib:
 	@echo ''
-	@echo '--- Building MSX	Library	 ---'
+	@echo '--- Building MSX Library ---'
 	@echo ''
 	$(MAKE)	msxdeps
 	cd fcntl ; $(MAKE) lcpm	; cd ..
@@ -944,6 +944,16 @@ mtx_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd msx ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
+
+# Einstein library - Stefano
+einstein.lib:
+	@echo ''
+	@echo '--- Building Tatung Einstein Library ---'
+	@echo ''
+	$(MAKE)	msxdeps
+	cd games ; $(MAKE) lmsx	; cd ..
+	cd msx ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
 
 # SORD M5 library - Stefano
 m5_clib.lib:
