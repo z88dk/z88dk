@@ -5,7 +5,7 @@
 ;
 ;	set screen mode
 ;
-;	$Id: gen_set_mode.asm,v 1.1 2010-06-30 13:21:38 stefano Exp $
+;	$Id: gen_set_mode.asm,v 1.2 2010-09-15 09:00:39 stefano Exp $
 ;
 
 
@@ -65,7 +65,11 @@ inigrp:
     
     
     ld    c,$00
+IF FORm5
+    ld    a,$03
+ELSE
     ld    a,$02
+ENDIF
     call    VDPreg_Write    ; reg0
     
     ld    a,$E2
@@ -84,12 +88,14 @@ inimlt:
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
 VDPreg_Write:  
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
+
+
 	push    af
-	out     (VDP_CMD),a            ; VDP registro comandi
+	out     (VDP_CMD),a
 	ld      a,c
 	and     $07
 	or      $80
-	out     (VDP_CMD),a            ; VDP registro comandi
+	out     (VDP_CMD),a
 	inc    c
 	pop     af
 	ret     

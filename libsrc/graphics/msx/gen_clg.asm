@@ -2,7 +2,7 @@
 ;	z88dk library: Generic VDP support code
 ;
 ;
-;	$Id: gen_clg.asm,v 1.1 2010-06-30 13:21:38 stefano Exp $
+;	$Id: gen_clg.asm,v 1.2 2010-09-15 09:00:39 stefano Exp $
 ;
 
         XLIB  clg
@@ -25,7 +25,13 @@
 	pop hl
 	pop hl
 	
-	ld bc,6144
+	ld bc,6144	; set VRAM attribute area
 	ld a,$1F
 	ld hl,8192
-	jp FILVRM
+	push bc
+	call FILVRM
+	pop bc		; clear VRAM picture area
+	xor a
+	ld	h,a
+	ld	l,a
+	jp	FILVRM

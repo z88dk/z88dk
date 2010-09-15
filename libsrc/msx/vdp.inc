@@ -1,7 +1,7 @@
 ;
 ;   Define constants for VDP in different platforms of the SEGA/MSX generation
 ;
-;	$Id: vdp.inc,v 1.3 2010-09-14 14:28:44 stefano Exp $
+;	$Id: vdp.inc,v 1.4 2010-09-15 09:00:39 stefano Exp $
 ;
 
 IF FORsms
@@ -42,6 +42,14 @@ IF FORm5
 	defc VDP_CMD     = $11
 	defc VDP_STATUS  = $11
 	defc VRAM_SIZE   = 16
+ENDIF
+
+IF FORmtx
+	defc VDP_DATA    = 1
+	defc VDP_DATAIN  = 1
+	defc VDP_CMD     = 2
+	defc VDP_STATUS  = 2
+	defc VRAM_SIZE   = 16		; extended are able to get the right size
 ENDIF
 
 IF FOReinstein

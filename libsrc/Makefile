@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.149 2010-09-14 14:28:44 stefano Exp $
+# $Id: Makefile,v 1.150 2010-09-15 09:00:39 stefano Exp $
 
 
 include	Make.config
@@ -942,6 +942,7 @@ mtx_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lmsx	; cd ..
 	cd msx ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
 
