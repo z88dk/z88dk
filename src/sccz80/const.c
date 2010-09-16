@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.18 2010-02-07 00:41:18 dom Exp $
+ *      $Id: const.c,v 1.19 2010-09-16 21:37:36 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -374,7 +374,7 @@ int pstr(int32_t *val)
         int k ;
 
         constype=CINT;
-        constype=dosigned;
+        conssign=dosigned;
         if (cmatch('\'')) {
                 k = 0 ;
                 while ( ch() != 39 )
