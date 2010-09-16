@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.19 2010-02-07 00:41:18 dom Exp $
+ *      $Id: declvar.c,v 1.20 2010-09-16 21:41:31 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -825,6 +825,8 @@ TAG_SYMBOL *GetVarID(struct varid *var,char storage)
                         ++ptr;
                 }
         }
+        if (swallow("const") )
+                warning(W_CONST);
         return(0);
 }
 
