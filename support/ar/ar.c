@@ -146,7 +146,7 @@ void object_dump(FILE *fp, unsigned long start, char flags)
         unsigned long temp;
         unsigned long end;
 
-        if ( libname == 0xffffffff ) {
+        if ( libname == -1 ) {
             end = modname;
         } else {
             end = libname;
