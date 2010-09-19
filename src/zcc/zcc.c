@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.43 2010-09-19 00:01:39 dom Exp $
+ *      $Id: zcc.c,v 1.44 2010-09-19 00:02:44 dom Exp $
  */
 
 
@@ -810,7 +810,6 @@ AddToArgs(arg_t *argument, char *arg)
 
     /* If this is the assembler and the linker is the same program then add to both */
     if ( argument->data == &asmargs ) {
-        printf("Assembler args are now %s\n",asmargs);
         if (strcmp(myconf[LINKER].def, myconf[Z80EXE].def) == 0) {
             BuildOptions(&linkargs, arg + 2);
         }
