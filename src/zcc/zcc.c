@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.44 2010-09-19 00:02:44 dom Exp $
+ *      $Id: zcc.c,v 1.45 2010-09-19 02:52:44 dom Exp $
  */
 
 
@@ -303,14 +303,6 @@ process(suffix, nextsuffix, processor, extraargs, ios, number, needsuffix)
             orgfiles[number], outname);
         free(outname);
         break;
-    case outspecified_original_flag:
-        outname = changesuffix(filelist[number], nextsuffix);
-        buffer = mustmalloc(strlen(processor) + strlen(extraargs)
-              + strlen(orgfiles[number]) + strlen(outname) + 4);
-        sprintf(buffer, "%s %s %s -o %s", processor, extraargs,
-            orgfiles[number], outname);
-        free(outname);
-        break;
     case outspecified_flag:
         outname = changesuffix(filelist[number], nextsuffix);
         buffer = mustmalloc(strlen(processor) + strlen(extraargs)
@@ -326,6 +318,15 @@ process(suffix, nextsuffix, processor, extraargs, ios, number, needsuffix)
         sprintf(buffer, "%s %s < %s > %s", processor, extraargs,
             filelist[number], outname);
         free(outname);
+        break;
+    case filter_outspecified_flag:
+        outname = changesuffix(filelist[number], nextsuffix);
+        buffer = mustmalloc(strlen(processor) + strlen(extraargs)
+              + strlen(filelist[number]) + strlen(outname) + 8);
+        sprintf(buffer, "%s %s < %s -o %s", processor, extraargs,
+            filelist[number], outname);
+        free(outname);
+        break;
     }
     if (verbose)
         puts(buffer);
@@ -574,23 +575,21 @@ main(int argc, char **argv)
     for (i = 0; i < nfiles; i++) {
         switch (FindSuffix(filelist[i])) {
         case CFILE:
-            if ( compiler_type == CC_SCCZ80 ) {
-                if (process(".c", ".i", myconf[CPP].def, cpparg, (int) myconf[CPPSTYLE].def, i, YES))
-                    exit(1);
-                if (preprocessonly) {
-                    if (usetemp)
-                        CopyOutFiles(".i");
-                    exit(0);
-                }
-            } else {
-                /* SDCC just goes directly */
-                AddComp(cpparg+1);
-                if (process(".c", ".asm", myconf[COMPILER].def, comparg, outspecified_original_flag, i, YES))
-                    exit(1);
+            if (process(".c", ".i", myconf[CPP].def, cpparg, (int) myconf[CPPSTYLE].def, i, YES))
+                exit(1);
+            if (preprocessonly) {
+                if (usetemp)
+                    CopyOutFiles(".i");
+                exit(0);
             }
         case PFILE:
-            if (process(".i", ".asm", myconf[COMPILER].def, comparg, outimplied, i, YES))
-                exit(1);
+            if ( compiler_type == CC_SCCZ80 ) {
+                if (process(".i", ".asm", myconf[COMPILER].def, comparg, outimplied, i, YES))
+                    exit(1);
+            } else {
+                if (process(".i", ".asm", myconf[COMPILER].def, comparg, filter_outspecified_flag, i, YES))
+                    exit(1);
+            }
 
         case AFILE:
             switch (peepholeopt) {
@@ -1177,7 +1176,8 @@ SetAssembler(arg_t *argument, char *val)
 static void
 SetCompiler(arg_t *argument, char *val)
 {
-    char *arg = " -S -DZ88DK_USES_SDCC=1";
+    char *arg = " --c1mode";
+    char *preprocarg = " -DZ88DK_USES_SDCC=1";
     char *asmarg = "Ca-sdcc";
 
     compiler_type = CC_SCCZ80;
@@ -1186,6 +1186,7 @@ SetCompiler(arg_t *argument, char *val)
     if ( strcmp(val+9,"sdcc") == 0 ) {
         compiler_type = CC_SDCC;
         AddComp(arg+1);
+        BuildOptions(&cpparg, preprocarg);
         ParseArgs(asmarg);
     }
 
