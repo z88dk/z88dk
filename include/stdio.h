@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.15 2010-09-19 00:24:08 dom Exp $ */
+/* $Id: stdio.h,v 1.16 2010-09-19 03:17:10 dom Exp $ */
 
 #undef __STDIO_BINARY        /* By default don't consider binary files */
 
@@ -235,7 +235,7 @@ extern int __LIB__ remove(char *name);
  */
 extern int __LIB__ getk();
 #define getkey() fgetc_cons()
-extern void __LIB__ puts_cons();
+extern void __LIB__ puts_cons(char *message);
 extern void __LIB__ printk(char *fmt,...);
 
 
