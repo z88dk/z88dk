@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.28 2010-09-19 00:01:39 dom Exp $
+ * $Id: zcc.h,v 1.29 2010-09-19 03:14:33 dom Exp $
  */
 
 /* Very contrived, if not a Windows target then include the config file */
@@ -81,7 +81,7 @@ struct confs {
     char *def;
 };
 
-enum iostyle { outimplied=0, outspecified,  filter, outspecified_flag, outspecified_original_flag };
+enum iostyle { outimplied=0, outspecified,  filter, outspecified_flag, filter_outspecified_flag };
 
 enum conf { OPTIONS, Z80EXE, CPP, LINKER, COMPILER, COPTEXE, COPYCMD, INCPATH, COPTRULES1, COPTRULES2, COPTRULES3, CRT0, LINKOPTS, ASMOPTS, APPMAKE, Z88MATHLIB,  Z88MATHFLG, STARTUPLIB, GENMATHLIB, CPPSTYLE, VASMOPTS, ASZ80OPTS, VLINKOPTS, ASLINKOPTS, MPMEXE, LIBPATH };
 

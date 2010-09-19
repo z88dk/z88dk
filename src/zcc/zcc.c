@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.45 2010-09-19 02:52:44 dom Exp $
+ *      $Id: zcc.c,v 1.46 2010-09-19 03:14:33 dom Exp $
  */
 
 
@@ -156,6 +156,7 @@ static char            extension[5];
 #define ASM_VASM   2
 static int             assembler_type = ASM_Z80ASM;
 static enum iostyle    assembler_style = outimplied;
+static char           *sdcc_assemblernames[] = { "z80asm", "asxxxx", "vasm" };
 static int             linker_output_separate_arg = 0;
 
 #define CC_SCCZ80 0 
@@ -985,7 +986,7 @@ void
 DispInfo(void)
 {
     printf("zcc - Frontend for the z88dk Cross-C Compiler\n");
-    printf(version);
+    printf("%s",version);
 }
 
 
@@ -1176,20 +1177,25 @@ SetAssembler(arg_t *argument, char *val)
 static void
 SetCompiler(arg_t *argument, char *val)
 {
-    char *arg = " --c1mode";
     char *preprocarg = " -DZ88DK_USES_SDCC=1";
-    char *asmarg = "Ca-sdcc";
+    char  buf[256];
 
     compiler_type = CC_SCCZ80;
     
     /* compiler= */
     if ( strcmp(val+9,"sdcc") == 0 ) {
         compiler_type = CC_SDCC;
-        AddComp(arg+1);
+        snprintf(buf,sizeof(buf)," -mz80 --c1mode --asm=%s",sdcc_assemblernames[assembler_type]);                 
+        AddComp(buf+1);
         BuildOptions(&cpparg, preprocarg);
-        ParseArgs(asmarg);
+        if ( assembler_type == ASM_Z80ASM ) {
+            ParseArgs("Ca-sdcc");
+        }
+        if (myconf[COMPILER].def) {
+            free(myconf[COMPILER].def);
+        }
+        myconf[COMPILER].def = strdup("sdcc");
     }
-
 }
 
 void 
