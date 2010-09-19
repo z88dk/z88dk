@@ -1,0 +1,9 @@
+crt0_sdcc/divmixed
+crt0_sdcc/divsigned
+crt0_sdcc/divunsigned
+crt0_sdcc/modmixed
+crt0_sdcc/modsigned
+crt0_sdcc/modunsigned
+crt0_sdcc/mul
+crt0_sdcc/mulchar
+crt0_sdcc/shift
