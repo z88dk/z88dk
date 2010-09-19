@@ -5,13 +5,14 @@
  *
  *      Stefano Bodrato - 7/6/2006
  *
- *	$Id: zxopus.h,v 1.4 2008-02-08 08:20:24 stefano Exp $
+ *	$Id: zxopus.h,v 1.5 2010-09-19 00:24:08 dom Exp $
  */
 
 
 #ifndef __ZXOPUS_H__
 #define __ZXOPUS_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 #include <fcntl.h>
 

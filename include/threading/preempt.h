@@ -1,12 +1,15 @@
 /*
  *  z88dk z80 multi-task library
  *
- *  $Id: preempt.h,v 1.6 2009-09-30 23:15:45 dom Exp $
+ *  $Id: preempt.h,v 1.7 2010-09-19 00:24:08 dom Exp $
  */
 
 
 #ifndef THREADING_PREEMPT_H
 #define THREADING_PREEMPT_H
+
+#include <sys/compiler.h>
+
 
 #ifndef MAX_THREADS
 #define MAX_THREADS 16  /* Make it a power of 2 - if this changes recompile library */

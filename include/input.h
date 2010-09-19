@@ -4,7 +4,7 @@
 /*
  * Functions for Reading Keyboards, Joysticks and Mice
  */
-
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 /*

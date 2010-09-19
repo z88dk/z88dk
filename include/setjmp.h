@@ -3,12 +3,14 @@
  *
  *	Routines for dealing with longjmps
  *
- *	$Id: setjmp.h,v 1.4 2007-06-25 19:17:45 dom Exp $
+ *	$Id: setjmp.h,v 1.5 2010-09-19 00:24:08 dom Exp $
  */
 
 
 #ifndef __SETJMP_H__
 #define __SETJMP_H__
+
+#include <sys/compiler.h>
 
 /*
  * We have no register variables so we just need to

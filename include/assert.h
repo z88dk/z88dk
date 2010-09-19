@@ -12,12 +12,14 @@
  *
  *      djm 28/2/2000
  *
- *	$Id: assert.h,v 1.3 2001-10-16 18:30:31 dom Exp $
+ *	$Id: assert.h,v 1.4 2010-09-19 00:24:08 dom Exp $
  *
  */
 
 #ifndef __ASSERT_H__
 #define __ASSERT_H__
+
+#include <sys/compiler.h>
 
 #ifndef NDEBUG
 extern void __LIB__ l_assert(int, char *, char *);

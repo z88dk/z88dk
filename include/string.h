@@ -10,9 +10,10 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.20 2008-06-29 06:47:15 aralbrec Exp $
+ *	$Id: string.h,v 1.21 2010-09-19 00:24:08 dom Exp $
  */
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 // First a list of functions using CALLER and FASTCALL linkage

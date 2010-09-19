@@ -1,11 +1,14 @@
 /*
  *      Debugging Routines
  *
- *	$Id: debug.h,v 1.2 2009-07-09 17:21:14 stefano Exp $
+ *	$Id: debug.h,v 1.3 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __DEBUG_H__
 #define __DEBUG_H__
+
+#include <sys/compiler.h>
+
 
 #define MYSELF = 0xFFFF
 

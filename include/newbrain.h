@@ -1,12 +1,13 @@
 /*
  *      Grundy Newbrain specific functions
  *
- *      $Id: newbrain.h,v 1.8 2007-06-19 09:20:49 stefano Exp $
+ *      $Id: newbrain.h,v 1.9 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __NEWBRAIN_H__
 #define __NEWBRAIN_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 

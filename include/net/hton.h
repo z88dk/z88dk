@@ -7,7 +7,7 @@
  *
  *      djm 24/4/99
  *
- *	$Id: hton.h,v 1.4 2003-10-19 21:36:35 dom Exp $
+ *	$Id: hton.h,v 1.5 2010-09-19 00:24:08 dom Exp $
  */
 
 
@@ -15,7 +15,7 @@
 #define __HTON_H__
 
 /* Get the types */
-
+#include <sys/compiler.h>
 #include <sys/types.h>
 #include <net/inet.h>
 

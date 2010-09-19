@@ -7,9 +7,10 @@
  *    Many of these values have been obtained via reference to
  *    Hitech C
  *
- *    $Id: cpm.h,v 1.5 2002-06-09 15:13:57 dom Exp $
+ *    $Id: cpm.h,v 1.6 2010-09-19 00:24:08 dom Exp $
  */
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 /* Maximum number of open files. If you want to change this then you

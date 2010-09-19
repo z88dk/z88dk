@@ -1,9 +1,11 @@
 #ifndef __OZ_H__
 #define __OZ_H__
 
+#include <sys/compiler.h>
+
 /* Control file for include OZ7xx stuff */
 
-/* $Id: oz.h,v 1.7 2003-10-29 11:37:11 stefano Exp $ */
+/* $Id: oz.h,v 1.8 2010-09-19 00:24:08 dom Exp $ */
 
 //#include <oz700/ozfont.h>
 #include <oz700/ozgfx.h>

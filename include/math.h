@@ -1,7 +1,9 @@
 #ifndef __MATH_H__
 #define __MATH_H__
 
-/* $Id: math.h,v 1.12 2009-09-30 09:55:31 stefano Exp $ */
+#include <sys/compiler.h>
+
+/* $Id: math.h,v 1.13 2010-09-19 00:24:08 dom Exp $ */
 
 
 extern double __LIB__ acos(double);  /* arc cosine */

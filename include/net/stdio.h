@@ -1,12 +1,15 @@
 #ifndef __NET_STDIO_H__
 #define __NET_STDIO_H__
 
+#include <sys/compiler.h>
+
+
 /*
  * Some hooks for the stdio style routines
  *
  * Do not include yourself - system file!!
  *
- * $Id: stdio.h,v 1.3 2001-10-16 18:30:32 dom Exp $
+ * $Id: stdio.h,v 1.4 2010-09-19 00:24:08 dom Exp $
  */
 
 

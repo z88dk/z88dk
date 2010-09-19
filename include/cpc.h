@@ -1,12 +1,13 @@
 /*
  * Headerfile for Amstrad CPC specific functions
  *
- * $Id: cpc.h,v 1.3 2008-06-23 17:34:30 stefano Exp $
+ * $Id: cpc.h,v 1.4 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __CPC_H__
 #define __CPC_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 ///////////////////////////////////////////

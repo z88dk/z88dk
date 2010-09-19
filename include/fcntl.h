@@ -5,13 +5,14 @@
  *
  *      djm 27/4/99
  *
- *	$Id: fcntl.h,v 1.10 2009-01-13 17:48:01 stefano Exp $
+ *	$Id: fcntl.h,v 1.11 2010-09-19 00:24:08 dom Exp $
  */
 
 
 #ifndef __FCNTL_H__
 #define __FCNTL_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 

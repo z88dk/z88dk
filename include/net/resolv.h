@@ -9,12 +9,13 @@
  *
  *	djm 13/2/2000
  *
- *	$Id: resolv.h,v 1.5 2002-01-27 16:19:03 dom Exp $
+ *	$Id: resolv.h,v 1.6 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __NET_RESOLV_H__
 #define __NET_RESOLV_H__
 
+#include <sys/compiler.h>
 #include <net/inet.h>
 
 /* A couple of macros to make life easier... */

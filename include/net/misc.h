@@ -6,12 +6,13 @@
  *
  *	djm 13/2/2000
  *
- *	$Id: misc.h,v 1.5 2001-10-16 18:30:32 dom Exp $
+ *	$Id: misc.h,v 1.6 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __NET_MISC_H__
 #define __NET_MISC_H__
 
+#include <sys/compiler.h>
 #include <net/inet.h>
 
 /*

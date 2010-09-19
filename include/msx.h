@@ -4,12 +4,13 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.17 2010-07-07 16:36:37 stefano Exp $
+ * $Id: msx.h,v 1.18 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __MSX_H__
 #define __MSX_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 #include <lib3d.h>
 

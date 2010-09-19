@@ -5,13 +5,14 @@
  *
  *      djm 24/4/99
  *
- *	$Id: tcpsock.h,v 1.5 2002-06-09 15:13:57 dom Exp $
+ *	$Id: tcpsock.h,v 1.6 2010-09-19 00:24:08 dom Exp $
  */
 
 
 #ifndef _NET_TCPSOCK_H
 #define _NET_TCPSOCK_H
 
+#include <sys/compiler.h>
 #include <net/inet.h>
 
 /* UDP Socket */

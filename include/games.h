@@ -1,12 +1,15 @@
 #ifndef __GAMES_H__
 #define __GAMES_H__
 
+#include <sys/compiler.h>
+
+
 /*
  *	Videogames support code
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.12 2009-05-21 06:58:11 stefano Exp $
+ *	$Id: games.h,v 1.13 2010-09-19 00:24:08 dom Exp $
  *
  */
 

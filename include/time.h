@@ -5,13 +5,14 @@
  *
  *      djm 9/1/2000
  *
- *	$Id: time.h,v 1.12 2009-01-07 09:50:15 stefano Exp $
+ *	$Id: time.h,v 1.13 2010-09-19 00:24:08 dom Exp $
  */
 
 
 #ifndef __TIME_H__
 #define __TIME_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 #ifdef __Z88__

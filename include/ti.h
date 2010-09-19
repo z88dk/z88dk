@@ -1,10 +1,11 @@
 /* Control file for include relevent TIXX stuff */
 
-/* $Id: ti.h,v 1.4 2007-11-16 14:52:45 stefano Exp $ */
+/* $Id: ti.h,v 1.5 2010-09-19 00:24:08 dom Exp $ */
 
 #ifndef __TICALC_H__
 #define __TICALC_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 #ifdef __TI82__

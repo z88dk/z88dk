@@ -5,13 +5,14 @@
  *
  *      Stefano Bodrato - 31/01/2008
  *
- *	$Id: zxbeta.h,v 1.1 2008-02-01 10:36:39 stefano Exp $
+ *	$Id: zxbeta.h,v 1.2 2010-09-19 00:24:08 dom Exp $
  */
 
 
 #ifndef __ZXBETA_H__
 #define __ZXBETA_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 #include <fcntl.h>
 

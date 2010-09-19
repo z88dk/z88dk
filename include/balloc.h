@@ -36,6 +36,7 @@
  *   (one hidden byte is used to identify the queue a block belongs to)
  */
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 /*

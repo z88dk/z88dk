@@ -10,6 +10,8 @@ Copyright© 2002, Mark Hamilton
 #ifndef __LIB3D_H__
 #define __LIB3D_H__
 
+#include <sys/compiler.h>
+
 
 // fixed point arithmetic
 

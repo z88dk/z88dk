@@ -6,7 +6,7 @@
  * 04.2004, 11.2006, 02.2008 aralbrec
  *
  */
-
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 #define M_BEGIN_ISR(name) void name(void) { asm("push\taf\npush\tbc\npush\tde\npush\thl\nex\taf,af\nexx\npush\taf\npush\tbc\npush\tde\npush\thl\npush\tix\npush\tiy\n");

@@ -3,13 +3,14 @@
  *
  *      Stefano Bodrato - 6/9/2004
  *
- *	$Id: zxinterface1.h,v 1.9 2010-01-22 16:00:37 stefano Exp $
+ *	$Id: zxinterface1.h,v 1.10 2010-09-19 00:24:08 dom Exp $
  */
 
 
 #ifndef __ZXINTERFACE1_H__
 #define __ZXINTERFACE1_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 #include <fcntl.h>
 

@@ -1,7 +1,9 @@
 #ifndef __STDIO_H__
 #define __STDIO_H__
 
-/* $Id: stdio.h,v 1.14 2007-10-18 10:12:40 stefano Exp $ */
+#include <sys/compiler.h>
+
+/* $Id: stdio.h,v 1.15 2010-09-19 00:24:08 dom Exp $ */
 
 #undef __STDIO_BINARY        /* By default don't consider binary files */
 

@@ -7,13 +7,14 @@
  *
  *      djm 24/4/99
  *
- *	$Id: inet.h,v 1.9 2002-06-05 22:12:28 dom Exp $
+ *	$Id: inet.h,v 1.10 2010-09-19 00:24:08 dom Exp $
  */
 
 
 #ifndef __NET_INET_H__
 #define __NET_INET_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 typedef u32_t ipaddr_t;

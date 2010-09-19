@@ -3,12 +3,13 @@
 #ifndef __GUI_H__
 #define __GUI_H__
 
-#include "malloc.h"
-#include "stdio.h"
-#include "graphics.h"
+#include <sys/compiler.h>
+#include <malloc.h>
+#include <stdio.h>
+#include <graphics.h>
 
 #ifdef ALTGUI
-#include "games.h"
+#include <games.h>
 #endif
 
 #define WIN_BORDER	1

@@ -1,12 +1,13 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.33 2010-04-02 09:05:06 stefano Exp $
+ * $Id: spectrum.h,v 1.34 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __SPECTRUM_H__
 #define __SPECTRUM_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 /////////////

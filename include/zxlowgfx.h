@@ -3,7 +3,7 @@
  *	
  *	32x48 or (defining the "ALTLOWGFX" variable) 64x24 pixels (Spectrum only).
  *
- *	$Id: zxlowgfx.h,v 1.4 2009-08-21 15:24:38 stefano Exp $
+ *	$Id: zxlowgfx.h,v 1.5 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifdef __ZX81__
@@ -12,6 +12,10 @@
 
 #ifndef __ZXLOGFX_H__
 #define __ZXLOGFX_H__
+
+#include <sys/compiler.h>
+
+
 
 /* Clear and init pseudo-graph screen */
 void cclg(int color);

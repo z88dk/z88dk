@@ -3,11 +3,14 @@
  *
  *	djm 25/1/2000
  *
- *	$Id: device.h,v 1.7 2002-05-14 22:31:15 dom Exp $
+ *	$Id: device.h,v 1.8 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __NET_DEVICE_H__
 #define __NET_DEVICE_H__
+
+#include <sys/compiler.h>
+
 
 /* Address to which a plugin device is loaded */
 

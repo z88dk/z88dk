@@ -3,6 +3,7 @@
 #define THREADING_SEMAPHORE_T
 
 #include <threading/preempt.h>
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 typedef struct {

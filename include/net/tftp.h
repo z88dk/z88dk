@@ -1,4 +1,4 @@
-/* $Id: tftp.h,v 1.3 2001-10-16 18:30:32 dom Exp $ */
+/* $Id: tftp.h,v 1.4 2010-09-19 00:24:08 dom Exp $ */
 
 /*
  * Copyright (c) 1983 Regents of the University of California.
@@ -38,6 +38,7 @@
 #ifndef __NET_TFTP_H__
 #define __NET_TFTP_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 /*

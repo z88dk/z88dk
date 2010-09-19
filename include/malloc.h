@@ -1,11 +1,12 @@
 #ifndef __MALLOC_H__
 #define __MALLOC_H__
 
+#include <sys/compiler.h>
 
 /*
  * Now some trickery to link in the correct routines for far
  *
- * $Id: malloc.h,v 1.11 2007-06-12 23:58:58 aralbrec Exp $
+ * $Id: malloc.h,v 1.12 2010-09-19 00:24:08 dom Exp $
  */
 
 

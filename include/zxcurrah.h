@@ -3,13 +3,14 @@
  *
  *      Stefano Bodrato - 3/7/2006
  *
- *	$Id: zxcurrah.h,v 1.1 2006-07-03 15:06:22 stefano Exp $
+ *	$Id: zxcurrah.h,v 1.2 2010-09-19 00:24:08 dom Exp $
  */
 
 
 #ifndef __ZXCURRAH_H__
 #define __ZXCURRAH_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 #include <fcntl.h>
 

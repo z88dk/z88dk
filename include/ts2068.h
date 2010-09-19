@@ -2,6 +2,7 @@
 #ifndef __TS2068_H__
 #define __TS2068_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 #include <spectrum.h>          // for now anyway
 

@@ -1,11 +1,14 @@
 #ifndef __FLOAT_H__
 #define __FLOAT_H__
 
+#include <sys/compiler.h>
+
+
 /*
  *	Some more floating point routines..I can't remember
  *	why these are separated out..
  *
- *	$Id: float.h,v 1.7 2003-08-22 21:14:40 dom Exp $
+ *	$Id: float.h,v 1.8 2010-09-19 00:24:08 dom Exp $
  */
 
 

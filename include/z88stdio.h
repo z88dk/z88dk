@@ -20,10 +20,10 @@
  *
  * djm 4/4/2000
  *
- * $Id: z88stdio.h,v 1.4 2001-10-16 18:30:32 dom Exp $
+ * $Id: z88stdio.h,v 1.5 2010-09-19 00:24:08 dom Exp $
  */
 
-
+#include <sys/compiler.h>
 #include <sys/types.h>
 #include <fcntl.h>
 

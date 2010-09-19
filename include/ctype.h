@@ -1,6 +1,8 @@
 #ifndef __CTYPE_H__
 #define __CTYPE_H__
 
+#include <sys/compiler.h>
+
 
 extern int __LIB__ __FASTCALL__ isalnum(int);
 extern int __LIB__ __FASTCALL__ isalpha(int);

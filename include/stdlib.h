@@ -5,9 +5,10 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.35 2008-06-30 20:45:52 aralbrec Exp $
+ * $Id: stdlib.h,v 1.36 2010-09-19 00:24:08 dom Exp $
  */
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 

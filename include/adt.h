@@ -32,6 +32,7 @@
  *
  */
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 /*** DOUBLY LINKED LIST

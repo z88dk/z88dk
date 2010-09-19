@@ -8,13 +8,14 @@
  *
  *      stefano - 18/3/2004
  *
- *	$Id: conio.h,v 1.1 2004-03-20 11:16:23 stefano Exp $
+ *	$Id: conio.h,v 1.2 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __CONIO_H__
 #define __CONIO_H__
 
 // this is used by getch, putch and ungetch.
+#include <sys/compiler.h>
 #include <stdio.h>
 
 #define getch()  fgetc(stdin)

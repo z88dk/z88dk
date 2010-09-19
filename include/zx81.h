@@ -1,12 +1,13 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.16 2010-05-06 14:42:38 stefano Exp $
+ * $Id: zx81.h,v 1.17 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __ZX81_H__
 #define __ZX81_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 

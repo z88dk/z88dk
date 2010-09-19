@@ -3,13 +3,16 @@
  *
  *      Stefano Bodrato - Feb. 2010
  *
- *		$Id: zxmmc.h,v 1.1 2010-03-12 15:21:14 stefano Exp $
+ *		$Id: zxmmc.h,v 1.2 2010-09-19 00:24:08 dom Exp $
  * 
  */
 
 
 #ifndef __ZXMMC_H__
 #define __ZXMMC_H__
+
+#include <sys/compiler.h>
+
 
 // Commands for the SD/MMC card
 #define	MMC_GO_IDLE_STATE			0x40

@@ -10,11 +10,14 @@
  *      Stefano has converted many of these routines to the new ports
  *      Some will work, some will not. djm 6/6/2000
  *
- *	$Id: graphics.h,v 1.10 2009-10-23 14:25:37 stefano Exp $
+ *	$Id: graphics.h,v 1.11 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __GFX_H__
 #define __GFX_H__
+
+#include <sys/compiler.h>
+
 
 /* Structure to use when opening a window - as per usual, if graph <> 0
  * then open graphics window number with width (pixels) width 

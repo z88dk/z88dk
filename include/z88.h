@@ -5,13 +5,13 @@
  *
  *      Link using -lz88
  *
- *	$Id: z88.h,v 1.5 2002-04-20 08:32:54 dom Exp $
+ *	$Id: z88.h,v 1.6 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __Z88_H__
 #define __Z88_H__
 
-
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 /*

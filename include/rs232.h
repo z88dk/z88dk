@@ -5,13 +5,14 @@
  *
  * Based on the API from cc65
  *
- * $Id: rs232.h,v 1.2 2008-06-05 14:31:23 stefano Exp $
+ * $Id: rs232.h,v 1.3 2010-09-19 00:24:08 dom Exp $
  */
 
 
 #ifndef __RS232_H__
 #define __RS232_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 /* Baudrate settings */

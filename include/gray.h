@@ -1,11 +1,14 @@
 #ifndef __GRAY_H__
 #define __GRAY_H__
 
+#include <sys/compiler.h>
+
+
 /*
  * Gray Library.  Originally written for TI calcs but
  * hopefully it will grow in the future...
  *
- * $Id: gray.h,v 1.4 2001-10-16 18:30:31 dom Exp $
+ * $Id: gray.h,v 1.5 2010-09-19 00:24:08 dom Exp $
  */
 
 #pragma output GRAYlib

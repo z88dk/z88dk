@@ -1,11 +1,13 @@
 /*
  *  Sega Master System
  *
- *  $Id: sms.h,v 1.2 2007-06-02 22:33:59 dom Exp $
+ *  $Id: sms.h,v 1.3 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __SMS_H__
 #define __SMS_H__
+
+#include <sys/compiler.h>
 
 #define VDP_REG_FLAGS0 0x80
 // Screen sync off

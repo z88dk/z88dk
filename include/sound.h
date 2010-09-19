@@ -1,11 +1,12 @@
 #ifndef __SOUND_H__
 #define __SOUND_H__
 
+#include <sys/compiler.h>
 
 /*
  *	Sound support code
  *
- *	$Id: sound.h,v 1.14 2009-01-07 09:50:15 stefano Exp $
+ *	$Id: sound.h,v 1.15 2010-09-19 00:24:08 dom Exp $
  */
 
 

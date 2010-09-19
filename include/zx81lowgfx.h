@@ -4,11 +4,13 @@
  *	
  *	32x48 pixels.
  *
- *	$Id: zx81lowgfx.h,v 1.3 2009-08-21 12:33:08 stefano Exp $
+ *	$Id: zx81lowgfx.h,v 1.4 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __ZXLOGFX_H__
 #define __ZXLOGFX_H__
+
+#include <sys/compiler.h>
 
 /* Clear and init pseudo-graph screen */
 void cclg(int color);

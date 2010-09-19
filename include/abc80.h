@@ -1,12 +1,13 @@
 /*
  * Headerfile for ABC80 specific stuff
  *
- * $Id: abc80.h,v 1.2 2007-11-02 09:31:39 stefano Exp $
+ * $Id: abc80.h,v 1.3 2010-09-19 00:24:08 dom Exp $
  */
 
 #ifndef __ABC80_H__
 #define __ABC80_H__
 
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 

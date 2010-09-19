@@ -1,6 +1,9 @@
 #ifndef _VZ
 #define _VZ
 
+#include <sys/compiler.h>
+
+
 // VZ Specific Library
 // 01.2007 aralbrec
 

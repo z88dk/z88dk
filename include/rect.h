@@ -6,7 +6,7 @@
  * 05.2006 aralbrec
  *
  */
-
+#include <sys/compiler.h>
 #include <sys/types.h>
 
 /*
