@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.11 2010-09-19 00:06:20 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.12 2010-09-19 02:37:57 dom Exp $ */
 /* $History: MODLINK.C $ */
 /*  */
 /* *****************  Version 16  ***************** */
@@ -741,7 +741,7 @@ CheckIfModuleWanted(FILE *z80asmfile, long currentlibmodule, char *modname)
     {
       long end = fptr_libname;
       long red = 0;
-      if ( fptr_libname == 0xffffffff )
+      if ( fptr_libname == -1 )
         {
           end = fptr_mname;
         }
