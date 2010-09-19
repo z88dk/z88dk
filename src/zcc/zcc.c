@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.42 2010-04-16 01:19:44 dom Exp $
+ *      $Id: zcc.c,v 1.43 2010-09-19 00:01:39 dom Exp $
  */
 
 
@@ -47,6 +47,7 @@ static void            SetLibMake(arg_t *arg,char *);
 static void            SetShortObj(arg_t *arg,char *);
 static void            SetLateAssemble(arg_t *arg,char *);
 static void            SetAssembler(arg_t *arg,char *);
+static void            SetCompiler(arg_t *arg,char *);
 
 static void           *mustmalloc(size_t);
 static int             hassuffix(char *, char *);
@@ -157,6 +158,10 @@ static int             assembler_type = ASM_Z80ASM;
 static enum iostyle    assembler_style = outimplied;
 static int             linker_output_separate_arg = 0;
 
+#define CC_SCCZ80 0 
+#define CC_SDCC   1
+static int             compiler_type = CC_SCCZ80;
+
 #define IS_ASM(x)  ( assembler_type == (x) )
 
 
@@ -186,7 +191,8 @@ static arg_t     myargs[] = {
     {"create-app", AF_BOOL_TRUE, SetBoolean, &createapp, "Run appmake on the resulting binary to create emulator usable file"},
     {"usetemp", AF_BOOL_TRUE, SetBoolean, &usetemp, "(default) Use the temporary directory for intermediate files"},
     {"notemp", AF_BOOL_FALSE, SetBoolean, &usetemp, "Don't use the temporary directory for intermediate files"},
-    {"asm", AF_MORE, SetAssembler, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm"},
+    {"asm", AF_MORE, SetAssembler, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm)"},
+    {"compiler", AF_MORE, SetCompiler, NULL, "Set the compiler type from the command line (sccz80, sdcc)"},
     {"Cp", AF_MORE, AddToArgs, &cpparg, "Add an option to the preprocessor"},
     {"Ca", AF_MORE, AddToArgs, &asmargs, "Add an option to the assembler"},
     {"Cl", AF_MORE, AddToArgs, &linkargs, "Add an option to the linker"},
@@ -297,6 +303,14 @@ process(suffix, nextsuffix, processor, extraargs, ios, number, needsuffix)
             orgfiles[number], outname);
         free(outname);
         break;
+    case outspecified_original_flag:
+        outname = changesuffix(filelist[number], nextsuffix);
+        buffer = mustmalloc(strlen(processor) + strlen(extraargs)
+              + strlen(orgfiles[number]) + strlen(outname) + 4);
+        sprintf(buffer, "%s %s %s -o %s", processor, extraargs,
+            orgfiles[number], outname);
+        free(outname);
+        break;
     case outspecified_flag:
         outname = changesuffix(filelist[number], nextsuffix);
         buffer = mustmalloc(strlen(processor) + strlen(extraargs)
@@ -404,13 +418,14 @@ main(int argc, char **argv)
     char            buffer[LINEMAX + 1];    /* For reading in option file */
     FILE           *fp;
 
+    asmargs = linkargs = cpparg = 0;
+
     if ((atexit(CleanUpFiles)) != 0)
         printf("Couldn't register atexit() routine\n");
 
     strcpy(buffer, "  ");
 
     AddComp(buffer + 1);
-    asmargs = linkargs = cpparg = 0;
 
     /* allocate enough pointers for all files, slight overestimate */
     filelist = (char **) mustmalloc(sizeof(char *) * argc);
@@ -559,12 +574,19 @@ main(int argc, char **argv)
     for (i = 0; i < nfiles; i++) {
         switch (FindSuffix(filelist[i])) {
         case CFILE:
-            if (process(".c", ".i", myconf[CPP].def, cpparg, (int) myconf[CPPSTYLE].def, i, YES))
-                exit(1);
-            if (preprocessonly) {
-                if (usetemp)
-                    CopyOutFiles(".i");
-                exit(0);
+            if ( compiler_type == CC_SCCZ80 ) {
+                if (process(".c", ".i", myconf[CPP].def, cpparg, (int) myconf[CPPSTYLE].def, i, YES))
+                    exit(1);
+                if (preprocessonly) {
+                    if (usetemp)
+                        CopyOutFiles(".i");
+                    exit(0);
+                }
+            } else {
+                /* SDCC just goes directly */
+                AddComp(cpparg+1);
+                if (process(".c", ".asm", myconf[COMPILER].def, comparg, outspecified_original_flag, i, YES))
+                    exit(1);
             }
         case PFILE:
             if (process(".i", ".asm", myconf[COMPILER].def, comparg, outimplied, i, YES))
@@ -722,10 +744,12 @@ BuildAsmLine(char *dest, char *prefix)
 void 
 SetLibMake(arg_t *argument, char *arg)
 {
+    char   *asmarg = "Ca-forcexlib";
     makelib = YES;
     compileonly = YES;    /* Get to object file */
     peepholeopt = 2;
     AddComp(arg);
+    ParseArgs(asmarg);
 }
 
 void
@@ -786,6 +810,7 @@ AddToArgs(arg_t *argument, char *arg)
 
     /* If this is the assembler and the linker is the same program then add to both */
     if ( argument->data == &asmargs ) {
+        printf("Assembler args are now %s\n",asmargs);
         if (strcmp(myconf[LINKER].def, myconf[Z80EXE].def) == 0) {
             BuildOptions(&linkargs, arg + 2);
         }
@@ -1139,6 +1164,7 @@ SetAssemblerType(char *name)
     return type;
 }
 
+
 void 
 SetAssembler(arg_t *argument, char *val)
 {
@@ -1147,6 +1173,23 @@ SetAssembler(arg_t *argument, char *val)
 
     /* Add to the compiler as well */
     AddComp(val);
+}
+
+static void
+SetCompiler(arg_t *argument, char *val)
+{
+    char *arg = " -S -DZ88DK_USES_SDCC=1";
+    char *asmarg = "Ca-sdcc";
+
+    compiler_type = CC_SCCZ80;
+    
+    /* compiler= */
+    if ( strcmp(val+9,"sdcc") == 0 ) {
+        compiler_type = CC_SDCC;
+        AddComp(arg+1);
+        ParseArgs(asmarg);
+    }
+
 }
 
 void 
