@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.10 2010-04-16 17:34:37 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.11 2010-09-19 00:06:20 dom Exp $ */
 /* $History: MODLINK.C $ */
 /*  */
 /* *****************  Version 16  ***************** */
@@ -135,7 +135,7 @@ extern char *lstfilename, *objfilename, *errfilename, *libfilename;
 extern char objext[], segmbinext[], binext[], mapext[], errext[], defext[], binfilename[];
 extern char Z80objhdr[];
 extern enum symbols sym, GetSym (void);
-extern enum flag listing, writeline, symtable, mapref, z80bin, autorelocate, codesegment;
+extern enum flag listing, writeline, symtable, mapref, z80bin, autorelocate, codesegment, sdcc_hacks;
 extern enum flag verbose, deforigin, globaldef, EOL, library, ASMERROR, expl_binflnm;
 extern long PC;
 extern long EXPLICIT_ORIGIN;
@@ -623,7 +623,7 @@ LinkLibModules (char *filename, long fptr_base, long nextname, long endnames)
           strcpy (modname, line);
           SearchLibraries (modname);	/* search name in libraries */
           free (modname);	/* remove copy of module name */
-        }
+        }                          
     }
   while (nextname < endnames);
 
@@ -690,6 +690,13 @@ SearchLibfile (struct libfile *curlib, char *modname)
               free(mname);
               return ret;
             }
+          else if ( sdcc_hacks == ON && modname[0] == '_' && ( mname = CheckIfModuleWanted(z80asmfile, currentlibmodule, modname + 1) ) != NULL )
+            {
+              fclose (z80asmfile);
+              ret =  LinkLibModule (curlib, currentlibmodule + 4 + 4, mname);
+              free(mname);
+              return ret;
+            }
         }
     }
 
@@ -712,6 +719,7 @@ CheckIfModuleWanted(FILE *z80asmfile, long currentlibmodule, char *modname)
   char *mname;
   char *name;
 
+
   /* found module name? */
   fseek (z80asmfile, currentlibmodule + 4 + 4 + 8 + 2, SEEK_SET);	/* point at module name  file
                                                                      * pointer */
@@ -721,6 +729,7 @@ CheckIfModuleWanted(FILE *z80asmfile, long currentlibmodule, char *modname)
   fptr_libname = ReadLong(z80asmfile);
   fseek (z80asmfile, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET);	/* point at module name  */
   mname = strdup(ReadName ());			/* read module name */
+
   if (strcmp (mname, modname) == 0)
     {
       return mname;

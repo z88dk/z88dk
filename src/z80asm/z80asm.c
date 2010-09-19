@@ -14,7 +14,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.23 2010-04-16 17:34:37 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.24 2010-09-19 00:06:20 dom Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -237,9 +237,9 @@ enum symbols sym, ssym[] =
  lparen, lcurly, lsquare, rsquare, rcurly, rparen, plus, minus, multiply, divi, mod, power,
  assign, bin_and, bin_or, bin_xor, less, greater, log_not, constexpr};
 
-enum flag pass1, listing, listing_CPY, symtable, z80bin, writeline, mapref, globaldef, datestamp, ti83plus;
+enum flag pass1, listing, listing_CPY, symtable, z80bin, writeline, mapref, globaldef, datestamp, ti83plus, sdcc_hacks;
 enum flag deforigin, verbose, ASMERROR, EOL, symfile, library, createlibrary, autorelocate;
-enum flag smallc_source, codesegment, expl_binflnm, clinemode, swapIXIY;
+enum flag smallc_source, codesegment, expl_binflnm, clinemode, swapIXIY, force_xlib;
 
 
 int cpu_type = CPU_Z80;
@@ -730,6 +730,16 @@ SetAsmFlag (char *flagid)
     {
       z80bin = ON;
       datestamp = ON;
+      return;
+    }
+  if ( strcmp(flagid, "sdcc") == 0 ) 
+    {
+      sdcc_hacks = ON;
+      return;
+    }
+  if ( strcmp(flagid, "forcexlib") == 0 ) 
+    {
+      force_xlib = ON;
       return;
     }
   if (strcmp (flagid, "l") == 0)

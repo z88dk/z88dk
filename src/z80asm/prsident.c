@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.14 2010-04-16 17:34:37 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.15 2010-09-19 00:06:20 dom Exp $ */
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -122,7 +122,7 @@ void SetTemporaryLine(char *line);
 /* global variables */
 extern FILE *z80asmfile;
 extern enum symbols sym, GetSym (void);
-extern enum flag listing, writeline, listing_CPY, EOL;
+extern enum flag listing, writeline, listing_CPY, EOL, sdcc_hacks, force_xlib;
 extern char ident[], line[];
 extern long PC;
 extern unsigned char *codeptr;
@@ -408,6 +408,11 @@ DeclGlobalLibIdent (void)
 void 
 DeclExternIdent (void)
 {
+  if ( sdcc_hacks == ON ) 
+    {
+      DeclLibIdent();
+      return;
+    }
   do
     {
       if (GetSym () == name)
@@ -452,8 +457,15 @@ DeclLibIdent (void)
 void 
 DeclModule (void)
 {
-  GetSym ();
-  DeclModuleName ();
+  if ( force_xlib == ON )
+    {
+      DeclGlobalLibIdent();
+    }
+  else
+    {
+      GetSym ();
+      DeclModuleName ();
+    }
 }
 
 

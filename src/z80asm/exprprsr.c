@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.6 2010-04-16 17:34:37 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.7 2010-09-19 00:06:20 dom Exp $ */
 /* $History: EXPRPRSR.C $ */
 /*  */
 /* *****************  Version 15  ***************** */
@@ -113,7 +113,7 @@ struct pfixstack *AllocStackItem (void);
 extern struct module *CURRENTMODULE;
 extern avltree *globalroot;
 extern enum symbols sym, pass1;
-extern enum flag listing;
+extern enum flag listing, sdcc_hacks;
 extern char ident[], separators[];
 extern unsigned char *codearea, *codeptr;
 extern long PC;
@@ -131,6 +131,12 @@ Factor (struct expr *pfixexpr)
     {
     case name:
         symptr = GetSymPtr (ident);
+
+        /* Bodge for handling underscores (sdcc hack) */
+        if ( sdcc_hacks == ON && ident[0] == '_' && symptr == NULL ) 
+          {
+            symptr = GetSymPtr(ident+1);
+          }
         if (symptr != NULL)
         {
             if (symptr->type & SYMDEFINED)
@@ -435,7 +441,6 @@ ParseNumExpr (void)
         else
             pfixhdr->infixptr = pfixhdr->infixexpr;		/* initialise pointer to start of buffer */
     }
-
     if (sym == constexpr)
     {
         GetSym ();		/* leading '#' : ignore relocatable address expression */
