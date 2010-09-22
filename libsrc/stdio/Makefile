@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.28 2009-04-22 17:12:28 stefano Exp $
+# $Id: Makefile,v 1.29 2010-09-22 09:28:25 stefano Exp $
 #
 
 include ../Make.config
@@ -21,7 +21,6 @@ STDCFILES = \
 	freopen.c \
 	fseek.c \
 	ftell.c \
-	gets.c  \
 	fwrite.c \
 	printk.c \
 	printn.c \
@@ -97,7 +96,6 @@ generic_iy:
 	zcc +test $(CFLAGS) -Ca-IXIY freopen.c
 	zcc +test $(CFLAGS) -Ca-IXIY fseek.c
 	zcc +test $(CFLAGS) -Ca-IXIY ftell.c
-	zcc +test $(CFLAGS) -Ca-IXIY gets.c
 	zcc +test $(CFLAGS) -Ca-IXIY fwrite.c
 	zcc +test $(CFLAGS) -Ca-IXIY printk.c
 	zcc +test $(CFLAGS) -Ca-IXIY printn.c
