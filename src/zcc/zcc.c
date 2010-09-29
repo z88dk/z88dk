@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.46 2010-09-19 03:14:33 dom Exp $
+ *      $Id: zcc.c,v 1.47 2010-09-29 09:24:57 stefano Exp $
  */
 
 
@@ -307,7 +307,7 @@ process(suffix, nextsuffix, processor, extraargs, ios, number, needsuffix)
     case outspecified_flag:
         outname = changesuffix(filelist[number], nextsuffix);
         buffer = mustmalloc(strlen(processor) + strlen(extraargs)
-              + strlen(orgfiles[number]) + strlen(outname) + 4);
+              + strlen(orgfiles[number]) + strlen(outname) + 7);
         sprintf(buffer, "%s %s %s -o %s", processor, extraargs,
             filelist[number], outname);
         free(outname);
@@ -323,7 +323,7 @@ process(suffix, nextsuffix, processor, extraargs, ios, number, needsuffix)
     case filter_outspecified_flag:
         outname = changesuffix(filelist[number], nextsuffix);
         buffer = mustmalloc(strlen(processor) + strlen(extraargs)
-              + strlen(filelist[number]) + strlen(outname) + 8);
+              + strlen(filelist[number]) + strlen(outname) + 9);
         sprintf(buffer, "%s %s < %s -o %s", processor, extraargs,
             filelist[number], outname);
         free(outname);
@@ -368,7 +368,7 @@ linkthem(char *linker)
     n = (strlen(linker) + 1);
     if (lateassemble)
         n += strlen(asmline);    /* patch for z80asm */
-    n += (strlen("-nm -nv -o -R -M ") + strlen(outputfile));
+    n += (48 + strlen(outputfile));
     n += (strlen(linkargs) + 1);
     n += (strlen(myconf[CRT0].def) + strlen(ext) + 2);
     n += (2 * strlen(myconf[LINKOPTS].def));
@@ -570,7 +570,7 @@ main(int argc, char **argv)
      * Copy the z88_crt0.opt file over to /tmp or t: and use it as the
      * startup code...trickery ahoy!!!
      */
-    CopyCrt0();       
+    CopyCrt0();   
 
     /* Parse through the files, handling each one in turn */
     for (i = 0; i < nfiles; i++) {
