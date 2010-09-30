@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.49 2010-09-30 20:10:28 dom Exp $
+ *      $Id: zcc.c,v 1.50 2010-09-30 20:30:16 dom Exp $
  */
 
 
@@ -51,6 +51,7 @@ static void            SetAssembler(arg_t *arg,char *);
 static void            SetCompiler(arg_t *arg,char *);
 static void            PragmaDefine(arg_t *arg,char *);
 static void            PragmaNeed(arg_t *arg,char *);
+static void            PragmaBytes(arg_t *arg,char *);
 
 static void           *mustmalloc(size_t);
 static int             hassuffix(char *, char *);
@@ -200,6 +201,7 @@ static arg_t     myargs[] = {
     {"compiler", AF_MORE, SetCompiler, NULL, "Set the compiler type from the command line (sccz80, sdcc)"},
     { "pragma-define",AF_MORE,PragmaDefine,NULL,"Define the option in zcc_opt.def" },
     { "pragma-need",AF_MORE,PragmaNeed,NULL,"NEED the option in zcc_opt.def" },
+    { "pragma-bytes",AF_MORE,PragmaBytes,NULL,"Dump a string of bytes zcc_opt.def" },
     {"Cp", AF_MORE, AddToArgs, &cpparg, "Add an option to the preprocessor"},
     {"Ca", AF_MORE, AddToArgs, &asmargs, "Add an option to the assembler"},
     {"Cl", AF_MORE, AddToArgs, &linkargs, "Add an option to the linker"},
@@ -1249,6 +1251,22 @@ void PragmaNeed(arg_t *arg,char *val)
 }
 
 
+void PragmaBytes(arg_t *arg,char *val)
+{
+    char *ptr = val + strlen(arg->name) + 1;
+    char *value;
+
+    if ( (value = strchr(ptr,'=') ) != NULL ) {
+        *value++ = 0;
+    } else {
+        return;
+    }
+
+    add_zccopt("\nIF NEED_%s\n",ptr);
+    add_zccopt("\tDEFINED\tDEFINED_NEED_%s\n",ptr);
+    add_zccopt("\tdefb\t%s\n",value);
+    add_zccopt("ENDIF\n\n");
+}
 
 /*
  * If there's a \n in the option line then kill it
