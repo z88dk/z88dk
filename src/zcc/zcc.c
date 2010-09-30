@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.48 2010-09-30 20:09:07 dom Exp $
+ *      $Id: zcc.c,v 1.49 2010-09-30 20:10:28 dom Exp $
  */
 
 
@@ -1669,7 +1669,7 @@ add_zccopt(char *fmt,...)
 {
     char   buf[4096];
     size_t len = zccopt ? strlen(zccopt) : 0;
-    size_t extra = zccopt ? strlen(zccopt) : 0;
+    size_t extra;
     va_list ap;
 
     va_start(ap, fmt);
