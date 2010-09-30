@@ -10,13 +10,14 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.47 2010-09-29 09:24:57 stefano Exp $
+ *      $Id: zcc.c,v 1.48 2010-09-30 20:09:07 dom Exp $
  */
 
 
 #include        <stdio.h>
 #include        <string.h>
 #include        <stdlib.h>
+#include        <stdarg.h>
 #include        <ctype.h>
 #include        "zcc.h"
 
@@ -48,6 +49,8 @@ static void            SetShortObj(arg_t *arg,char *);
 static void            SetLateAssemble(arg_t *arg,char *);
 static void            SetAssembler(arg_t *arg,char *);
 static void            SetCompiler(arg_t *arg,char *);
+static void            PragmaDefine(arg_t *arg,char *);
+static void            PragmaNeed(arg_t *arg,char *);
 
 static void           *mustmalloc(size_t);
 static int             hassuffix(char *, char *);
@@ -77,7 +80,7 @@ static void            tempname(char *);
 static int             FindConfigFile(char *, int);
 static void            parse_option(char *option);
 static void            linkargs_mangle(char *linkargs);
-
+static void            add_zccopt(char *fmt,...);
 /* Mode Options, used for parsing arguments */
 
 
@@ -144,6 +147,7 @@ static char           *comparg;
 static char           *linkargs;
 static char           *asmargs;
 static char           *appmakeargs;
+static char           *zccopt = NULL;
 
 
 static char            filenamebuf[FILENAME_MAX + 1];
@@ -187,13 +191,15 @@ static arg_t     myargs[] = {
     {"cleanup",  AF_BOOL_TRUE, SetBoolean, &cleanup,     "(default) Cleanup temporary files"},
     {"no-cleanup", AF_BOOL_FALSE, SetBoolean, &cleanup,  "Don't cleanup temporary files"},
     {"make-lib", 0, SetLibMake, NULL, "Compile as if to make a library"},
-    {"preserve", AF_BOOL_TRUE, SetBoolean, &preserve, "Don't remove zcc_opt.def and start of run"},
+    {"preserve", AF_BOOL_TRUE, SetBoolean, &preserve, "Don't remove zcc_opt.def at start of run"},
     {"make-app", 0, SetLateAssemble, NULL, "Create binary suitable for generated application"},
     {"create-app", AF_BOOL_TRUE, SetBoolean, &createapp, "Run appmake on the resulting binary to create emulator usable file"},
     {"usetemp", AF_BOOL_TRUE, SetBoolean, &usetemp, "(default) Use the temporary directory for intermediate files"},
     {"notemp", AF_BOOL_FALSE, SetBoolean, &usetemp, "Don't use the temporary directory for intermediate files"},
     {"asm", AF_MORE, SetAssembler, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm)"},
     {"compiler", AF_MORE, SetCompiler, NULL, "Set the compiler type from the command line (sccz80, sdcc)"},
+    { "pragma-define",AF_MORE,PragmaDefine,NULL,"Define the option in zcc_opt.def" },
+    { "pragma-need",AF_MORE,PragmaNeed,NULL,"NEED the option in zcc_opt.def" },
     {"Cp", AF_MORE, AddToArgs, &cpparg, "Add an option to the preprocessor"},
     {"Ca", AF_MORE, AddToArgs, &asmargs, "Add an option to the assembler"},
     {"Cl", AF_MORE, AddToArgs, &linkargs, "Add an option to the linker"},
@@ -525,24 +531,21 @@ main(int argc, char **argv)
             if (remove(DEFFILE) < 0) {
                 fprintf(stderr, "Cannot remove %s: File in use?\n", DEFFILE);
                 exit(1);
-            }
-            /*
-             *      It's the merry go round, here we try to open it again, so that
-             *      if we specify non .c files compiling doesn't barf, ah, if only
-             *      we could do a touch [filename]!
-             */
-
-            if ((fp = fopen(DEFFILE, "w")) != NULL)
-                fclose(fp);
-            else {
-                fprintf(stderr, "Could not create %s: File in use?\n", DEFFILE);
-                exit(1);
-            }
+            }          
         } else {
             fprintf(stderr, "Cannot open %s: File in use?\n", DEFFILE);
             exit(1);
         }
     }
+
+    if ((fp = fopen(DEFFILE, "w")) != NULL) {
+        fprintf(fp,"%s", zccopt ? zccopt : "");
+        fclose(fp);
+    } else {
+        fprintf(stderr, "Could not create %s: File in use?\n", DEFFILE);
+        exit(1);
+    }
+    
 
     if (nfiles <= 0) {
         DispInfo();
@@ -1219,6 +1222,33 @@ SetOptions(char *arg, int num)
 }
 
 
+void PragmaDefine(arg_t *arg,char *val)
+{
+    char *ptr = val + strlen(arg->name) + 1;
+    int   value = 0;
+    char *eql;
+
+    if ( (eql = strchr(ptr,'=') ) != NULL ) {
+        *eql = 0;
+        value = atoi(eql+1);
+    }
+
+    add_zccopt("\nIF !DEFINED_%s\n",ptr);
+    add_zccopt("\tdefc\tDEFINED_%s = 1\n",ptr);
+    if (value) add_zccopt("\tdefc %s = %d\n",ptr,value);
+    add_zccopt("ENDIF\n\n");
+}
+
+void PragmaNeed(arg_t *arg,char *val)
+{
+    char *ptr = val + strlen(arg->name) + 1;
+
+    add_zccopt("\nIF !NEED_%s\n",ptr);
+    add_zccopt("\tDEFINE\tNEED_%s\n",ptr);
+    add_zccopt("ENDIF\n\n");
+}
+
+
 
 /*
  * If there's a \n in the option line then kill it
@@ -1632,6 +1662,22 @@ linkargs_mangle(char *linkargs)
             ptr[1] = 'i';
         }
     }
+}
+
+void            
+add_zccopt(char *fmt,...)
+{
+    char   buf[4096];
+    size_t len = zccopt ? strlen(zccopt) : 0;
+    size_t extra = zccopt ? strlen(zccopt) : 0;
+    va_list ap;
+
+    va_start(ap, fmt);
+    extra = vsnprintf(buf,sizeof(buf),fmt,ap);
+    va_end(ap);
+
+    zccopt = realloc(zccopt, len + extra + 1);
+    strcpy(zccopt + len, buf);   
 }
 
 
