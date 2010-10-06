@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.29 2010-09-22 09:28:25 stefano Exp $
+# $Id: Makefile,v 1.30 2010-10-06 06:04:26 stefano Exp $
 #
 
 include ../Make.config
@@ -62,12 +62,15 @@ net:
 	zcc +z88 $(CFLAGS) -DNET_STDIO fread.c
 	cd zsock ; $(MAKE) ; cd ..
 
+
+# It can't be +cpm, otherwise the bin output filename
+# could be forced to 'a.com' !!
 cpm:	$(GENCOBJECTS)
-	zcc +cpm $(CFLAGS) -D__CPM__ fclose.c
-	zcc +cpm $(CFLAGS) -D__CPM__ fgetc.c
-	zcc +cpm $(CFLAGS) -D__CPM__ fputc.c
-	zcc +cpm $(CFLAGS) -D__CPM__ freopen_z88.c
-	zcc +cpm $(CFLAGS) -D__CPM__ fread.c
+	zcc +test $(CFLAGS) -D__CPM__ fclose.c
+	zcc +test $(CFLAGS) -D__CPM__ fgetc.c
+	zcc +test $(CFLAGS) -D__CPM__ fputc.c
+	zcc +test $(CFLAGS) -D__CPM__ freopen_z88.c
+	zcc +test $(CFLAGS) -D__CPM__ fread.c
 
 
 gen:
