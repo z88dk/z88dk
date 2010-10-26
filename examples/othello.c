@@ -1,5 +1,5 @@
 /*
- *   $Id: othello.c,v 1.1 2010-10-22 06:43:25 stefano Exp $
+ *   $Id: othello.c,v 1.2 2010-10-26 12:46:18 stefano Exp $
  * 
  *   z88dk port of the 'historical' game by Leor Zolman
  *
@@ -94,6 +94,7 @@ commands may be typed:
 #define fputc_cons putchar
 #endif
 
+
 int handicap;
 char selfplay;		/* true if computer playing with itself */
 //int h[4][2];		/* handicap position table */
@@ -107,7 +108,6 @@ struct mt {
 		int c;
 		int s;
 	 };
-
 
 #ifdef GRAPHICS
 
@@ -190,6 +190,25 @@ char numbers[] = {
 #endasm
 #endif
 
+#ifndef qsort
+void qsort(char *base, unsigned int nel, unsigned int width, void *compar)
+{	int i, j;
+	unsigned gap, ngap, t1;
+	int jd, t2;
+
+	t1 = nel * width;
+	for (ngap = nel / 2; ngap > 0; ngap /= 2) {
+	   gap = ngap * width;
+	   t2 = gap + width;
+	   jd = (unsigned int) base + gap;
+	   for (i = t2; i <= t1; i += width)
+	      for (j =  i - t2; j >= 0; j -= gap) {
+		if ((*compar)(base+j, jd+j) <=0) break;
+			 memswap(base+j, jd+j, width);
+	      }
+	}
+}
+#endif
 
 char skipbl()
 {
@@ -499,8 +518,7 @@ int my_mov(char b[64], char p,char o,char e,int *m,int *n)
 	//int cmpmov();
 	k = fillmt(b,p,o,e,t);
 	if (!k) return 0;
-	// TEMP
-	//qsort (&t, k, 8, &cmpmov);
+	qsort (t, k, sizeof(struct mt), cmpmov);
 	for (i=1; i<k; i++)
 		if (t[i].s != t[0].s || t[i].c != t[0].c)
 						break;
@@ -549,7 +567,7 @@ int game(char b[64],int n)
 		case 'H': if (n>(unsigned int)(handicap)+4)
 				printf("Illegal!\n");
 			else for (j=0; i!=0; j++) {
-			 b[h[j*4]*8+h[j*4+2]]= i>0?BLACK:WHITE;
+			 b[h[j*2]*8+h[j*2+2]]= i>0?BLACK:WHITE;
 			 handicap += i>0 ? 1 : -1;
 			 ++n;
 			 i += i>0 ? -1 : 1;
@@ -601,8 +619,13 @@ int main()
 {
 	char b[64];
 	int i;
-	h[0] = h[2] = h[8] = h[13] = 0;
-	h[4] = h[5] = h[9] = h[12] = 7;
+/*
+	h[0][0] = h[0][1] = h[2][0] = h[3][1] = 0;
+	h[1][0] = h[1][1] = h[2][1] = h[3][0] = 7;
+*/
+	h[0] = h[1] = h[4] = h[7] = 0;
+	h[2] = h[3] = h[5] = h[6] = 7;
+
 	printf("\nWelcome to the OTHELLO program!\n");
 	printf("\nNote: BLACK always goes first...Good luck!!!\n\n");
 

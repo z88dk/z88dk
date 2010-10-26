@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.34 2010-09-19 00:24:08 dom Exp $
+ * $Id: spectrum.h,v 1.35 2010-10-26 12:46:18 stefano Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -15,7 +15,7 @@
 /////////////
 
 // Attributes
-
+/*
 #define BLACK          0x00
 #define BLUE           0x01
 #define RED            0x02
@@ -24,7 +24,7 @@
 #define CYAN           0x05
 #define YELLOW         0x06
 #define WHITE          0x07
-
+*/
 #define INK_BLACK      0x00
 #define INK_BLUE       0x01
 #define INK_RED        0x02
