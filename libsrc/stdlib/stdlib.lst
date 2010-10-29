@@ -23,6 +23,7 @@ stdlib/ltoa
 stdlib/ltoa_callee
 stdlib/outp
 stdlib/outp_callee
+stdlib/qsort
 stdlib/rand
 stdlib/randomize
 stdlib/srand

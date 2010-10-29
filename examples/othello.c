@@ -1,19 +1,22 @@
 /*
- *   $Id: othello.c,v 1.2 2010-10-26 12:46:18 stefano Exp $
+ *   $Id: othello.c,v 1.3 2010-10-29 10:20:17 stefano Exp $
  * 
  *   z88dk port of the 'historical' game by Leor Zolman
  *
  *   This adaption shows how to translate a bi-dimensional
  *   array (not supported by sccz80) into a vector.
  * 
- *   The 'qsort' call is at the moment commented out, so
- *   the game port is still not perfect.
- *
  *   Note that this program is recursive and requires
  *   a lot of stack space, thus it could need to be properly located.
  * 
- *   Example on how to compile in graphics mode:
- *   zcc +zxansi -lndos -create-app -zorg=50000 -DGRAPHICS othello.c
+ *   Examples on how to compile in text mode:
+ *   zcc +zxansi -lndos -create-app -zorg=50000 othello.c
+ *   zcc +zx81 -startup=2 -create-app othello.c
+ *
+ *   Examples on how to compile in graphics mode:
+ *   zcc +zx -lndos -create-app -zorg=50000 -DGRAPHICS othello.c
+ *   zcc +zx81ansi -startup=3 -create-app -DGRAPHICS -lgfx81hr192 othello.c
+ * 
  */
 
 
@@ -75,9 +78,12 @@ commands may be typed:
 
 */
 
+/* Declare GFX bitmap location for the expanded ZX81 */
+#pragma output hrgpage = 36096
+
 
 #define BLACK '*'
-#define WHITE '@'
+#define WHITE 'O'
 #define EMPTY '-'
 
 #include <stdio.h>
@@ -94,10 +100,13 @@ commands may be typed:
 #define fputc_cons putchar
 #endif
 
+#ifndef getk
+#define getk getchar
+#endif
 
 int handicap;
 char selfplay;		/* true if computer playing with itself */
-//int h[4][2];		/* handicap position table */
+/* int h[4][2];	*/	/* handicap position table */
 int h[8];		/* handicap position table */
 char mine, his;		/* who has black (*) and white (@) in current game */
 char mefirst;		/* true if computer goes first in current game */
@@ -188,26 +197,6 @@ char numbers[] = {
  defb    @00000000, @00000000
 
 #endasm
-#endif
-
-#ifndef qsort
-void qsort(char *base, unsigned int nel, unsigned int width, void *compar)
-{	int i, j;
-	unsigned gap, ngap, t1;
-	int jd, t2;
-
-	t1 = nel * width;
-	for (ngap = nel / 2; ngap > 0; ngap /= 2) {
-	   gap = ngap * width;
-	   t2 = gap + width;
-	   jd = (unsigned int) base + gap;
-	   for (i = t2; i <= t1; i += width)
-	      for (j =  i - t2; j >= 0; j -= gap) {
-		if ((*compar)(base+j, jd+j) <=0) break;
-			 memswap(base+j, jd+j, width);
-	      }
-	}
-}
 #endif
 
 char skipbl()
@@ -327,9 +316,8 @@ char getmov(int *i, int *j)
 	char a,c;
 	int n;
 	char *p;
-	//char skipbl();
+	/* char skipbl(); */
 	if (selfplay == 'G') {
-		return 'G';
 		if (getk()==0) return 'G';
 		selfplay = ' ';
 		getchar();
@@ -430,10 +418,6 @@ char notake(char b[64],char p,char o,char e,int x,int y)
 }
 
 
-
-
-
-
 char s_move(char b[64], char p, char o, char e, int i, int j)
 {
 	char a[64];
@@ -515,7 +499,6 @@ int my_mov(char b[64], char p,char o,char e,int *m,int *n)
 	struct mt  t[64];
 	int i,k;
 
-	//int cmpmov();
 	k = fillmt(b,p,o,e,t);
 	if (!k) return 0;
 	qsort (t, k, sizeof(struct mt), cmpmov);
@@ -612,9 +595,6 @@ Istart:		if (cntbrd(b,EMPTY) == 0) return 'D';
 }
 
 
-//main(argc,argv)
-//int argc;
-//char **argv;
 int main()
 {
 	char b[64];
@@ -623,10 +603,11 @@ int main()
 	h[0][0] = h[0][1] = h[2][0] = h[3][1] = 0;
 	h[1][0] = h[1][1] = h[2][1] = h[3][0] = 7;
 */
+
 	h[0] = h[1] = h[4] = h[7] = 0;
 	h[2] = h[3] = h[5] = h[6] = 7;
 
-	printf("\nWelcome to the OTHELLO program!\n");
+	printf("%c\nWelcome to the OTHELLO program!\n",12);
 	printf("\nNote: BLACK always goes first...Good luck!!!\n\n");
 
 	printf("Do you want to go first? ");

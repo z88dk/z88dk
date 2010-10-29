@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.36 2010-09-19 00:24:08 dom Exp $
+ * $Id: stdlib.h,v 1.37 2010-10-29 10:20:17 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -126,8 +126,17 @@ extern void __LIB__ __CALLEE__ *l_bsearch_callee(void *key, void *base, unsigned
 extern void __LIB__            l_qsort(void *base, unsigned int size, void *cmp);
 extern void __LIB__ __CALLEE__ l_qsort_callee(void *base, unsigned int size, void *cmp);
 
+extern void __LIB__ __CALLEE__ qsort(char *base, unsigned int nel, unsigned int width, void *compar);
+
 #define l_bsearch(a,b,c,d) l_bsearch_callee(a,b,c,d)
+
+#ifdef __ZX81__
+#define l_qsort(a,b,c) qsort(a,b,2,c)
+#else
 #define l_qsort(a,b,c) l_qsort_callee(a,b,c)
+#endif
+
+
 
 //////////////////////////
 //// Misc Number Functions
