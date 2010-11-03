@@ -24,6 +24,7 @@ stdlib/ltoa_callee
 stdlib/outp
 stdlib/outp_callee
 stdlib/qsort
+stdlib/qsort_callee
 stdlib/rand
 stdlib/randomize
 stdlib/srand

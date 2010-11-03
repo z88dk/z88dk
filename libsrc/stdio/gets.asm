@@ -4,7 +4,7 @@
 ;	gets(char *s) - get string from console
 ;
 ;
-;	$Id: gets.asm,v 1.1 2010-09-22 09:28:25 stefano Exp $
+;	$Id: gets.asm,v 1.2 2010-11-03 10:03:49 stefano Exp $
 ;
 
 
@@ -65,6 +65,10 @@
 	xor	a
 	ld	(hl),a
 	ld	a,13	; end with CR
+	call conout
+	ld h,d	; set ptr to string
+	ld l,e
+	ret
 
 .conout
 	push	hl
