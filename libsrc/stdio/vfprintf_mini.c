@@ -10,8 +10,11 @@
  *	djm 3/3/2000
  *	This routine is infact a vfprintf, so naming as such...
  *
+ *	stefano 8/11/2010
+ *	Rewrote 'miniprintn' in assembler, less usage of stack and save 180 bytes
+ * 
  * --------
- * $Id: vfprintf_mini.c,v 1.3 2002-02-17 22:00:57 dom Exp $
+ * $Id: vfprintf_mini.c,v 1.4 2010-11-08 11:10:26 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -25,7 +28,7 @@
  * to step to the next one..
  */
 
-static void miniprintn(long number, FILE *fil, unsigned char flag);
+static void __CALLEE__ miniprintn(long number, FILE *fil, unsigned char flag);
 
 int vfprintf_mini(FILE *fp, unsigned char *fmt,void *ap)
 {
@@ -56,10 +59,18 @@ int vfprintf_mini(FILE *fp, unsigned char *fmt,void *ap)
                                 miniprintn((long)*(int *)ap,fp,1);
                                 ap -= sizeof(int);
                                 break;
-			case 'u':
+
+                        case 'u':
                                 miniprintn((unsigned long)*(unsigned int *)ap,fp,0);
                                 ap -= sizeof(int);
                                 break;
+
+/*
+                        case 'x':
+                                miniprintn((unsigned long)*(unsigned int *)ap,fp,2);
+                                ap -= sizeof(int);
+                                break;
+*/
 
                         case 's':
                                 s = *(char **)ap;
@@ -82,9 +93,11 @@ int vfprintf_mini(FILE *fp, unsigned char *fmt,void *ap)
 }
 
 
-static void miniprintn(long number, FILE *file, unsigned char flag)
+static void __CALLEE__ miniprintn(long number, FILE *file, unsigned char flag)
 {
+		/*
         unsigned long i;
+
         if (flag && number < 0 ){
                 fputc('-', file);
                 number = -number;
@@ -92,5 +105,106 @@ static void miniprintn(long number, FILE *file, unsigned char flag)
         if ((i =(unsigned long) number / 10L) != 0)
                 miniprintn(i,file,flag);
         fputc((unsigned long)number%10+'0', file);
+        */
+#asm
+LIB l_long_neg
+LIB l_long_div_u
+LIB fputc
+
+.printn2
+	pop af	; ret addr.
+	pop hl	; flag
+	pop bc	; FILE ptr
+	exx
+	pop hl	; number LSW
+	pop de	; number MSW
+	push af	; ret addr.
+	
+	ld a,d
+	rlca		; shift sign bit in first pos..
+	and 1
+	exx
+	and l	; flag
+	push bc
+	exx
+	jr	z,noneg
+	
+	call	l_long_neg
+	pop bc
+	push bc
+	push hl
+	push de
+	ld	l,'-'
+	call	doprint
+	pop de
+	pop hl
+
+.noneg
+	pop bc
+	xor a
+	push af	; set terminator
+
+.divloop
+	push	bc
+	push	de	; number MSW
+	push	hl	; number LSW
+
+;	ld	a,(flag)
+;	and	2	; bit 2 of flag set->hex mode
+;	ld	a,10
+;	jr	z,nohexdiv
+;	add 6
+;.nohexdiv
+;	ld	h,0
+;	ld	l,a
+
+	ld hl,10
+	ld d,h
+	ld e,h
+	call	l_long_div_u
+	pop	bc
+	exx
+	ld	a,l
+	cp 255  ; force flag to non-zero
+	push af	; save reminder as a digit in stack
+	exx
+
+	ld a,h
+	or d
+	or e
+	or l			; is integer part of last division  zero ?
+	jr nz,divloop	; not still ?.. loop
+	
+	
+	; now recurse for the single digit
+	; pick all from stack until you get the terminator
+.printloop
+	pop	af
+	ld l,a
+	ret	z
+	
+;	cp 10
+;	jr c,nohex
+;	; hex digits handling
+;	add 17		; 49 for lowercase
+;.nohex
+	add '0'
+	ld l,a
+	
+	call	doprint
+	jr	printloop
+
+
+.doprint
+	ld	h,0
+	push	hl
+	push	bc	; FILE ptr
+	call	fputc
+	pop bc
+	pop		hl
+	ret
+
+#endasm
+
 }
 
