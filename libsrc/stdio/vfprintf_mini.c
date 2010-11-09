@@ -14,7 +14,7 @@
  *	Rewrote 'miniprintn' in assembler, less usage of stack and save 180 bytes
  * 
  * --------
- * $Id: vfprintf_mini.c,v 1.4 2010-11-08 11:10:26 stefano Exp $
+ * $Id: vfprintf_mini.c,v 1.5 2010-11-09 16:13:44 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -32,6 +32,7 @@ static void __CALLEE__ miniprintn(long number, FILE *fil, unsigned char flag);
 
 int vfprintf_mini(FILE *fp, unsigned char *fmt,void *ap)
 {
+	/*
         unsigned char c;
         unsigned char k;
         unsigned char   *s;
@@ -65,13 +66,6 @@ int vfprintf_mini(FILE *fp, unsigned char *fmt,void *ap)
                                 ap -= sizeof(int);
                                 break;
 
-/*
-                        case 'x':
-                                miniprintn((unsigned long)*(unsigned int *)ap,fp,2);
-                                ap -= sizeof(int);
-                                break;
-*/
-
                         case 's':
                                 s = *(char **)ap;
                                 while ((k = *s++) != '\0')
@@ -90,6 +84,180 @@ int vfprintf_mini(FILE *fp, unsigned char *fmt,void *ap)
                 }
         }
 	return(0);
+*/
+#asm
+
+LIB	fputc
+LIB _miniprintn
+LIB	l_glong
+LIB	l_int2long_s
+
+.vfprintf_callee
+
+; int vfprintf_mini(FILE *fp, unsigned char *fmt,void *ap)
+
+	pop af
+	pop de	; arg_ptr
+	pop hl	; format string
+	pop bc	; fp
+	push bc
+	push hl
+	push de
+	push af
+
+.fmtloop
+	ld	a,(hl)
+	inc hl
+	and a
+	jr	nz,cont
+	ld	hl,0
+	ret
+	
+.cont
+	cp	'%'
+	jr z,get_arg
+
+; default
+.nochar
+	call _put_char
+	jr	fmtloop	
+
+.get_arg
+	ld	a,(hl)
+	inc hl
+	cp	'l'
+	jr nz,nol
+
+		ld	a,(hl)
+		inc hl
+		push hl
+		ld	hl,1	; flag set
+		cp	'd'
+		jr z,longnum
+.nold
+		dec	hl		; flag reset
+		cp	'u'
+		jr	z,longnum
+		pop hl
+		jr fmtloop
+.longnum
+		push hl
+		pop	af
+		push de
+		;; push hl
+		ex	de,hl
+		call l_gint
+		push bc
+		push af
+		call	l_glong
+		pop af
+		pop bc
+		call do_miniprintn
+
+		pop de
+		pop hl
+		dec de
+		dec	de
+		jr dec_loop
+
+.nol
+	cp	'd'
+	jr	z,isd
+	cp	'f'		; fake.. we have an integer here !
+	jr nz,nod
+.isd
+	push hl
+	push de
+	ex	de,hl
+	call l_gint
+	push bc
+	call	l_int2long_s
+	ld	bc,1
+	push bc
+	pop af	; flag for signed output
+	pop bc
+	call do_miniprintn
+	pop de
+	pop hl
+	jr dec_loop
+
+
+
+.nod
+	cp	'u'
+	jr nz,nou
+
+	push hl
+	push de
+	ex	de,hl
+	call l_gint
+	ld	de,0
+	push de
+	pop af	; flag for unsigned output
+	call do_miniprintn
+	pop de
+	pop hl
+.dec_loop
+	dec de
+	dec de
+	jr	fmtloop
+
+.nou
+	cp	's'
+	jr	nz,nostring
+
+	push hl
+	push de
+	ex	de,hl
+	call l_gint
+.printstr
+	ld	a,(hl)
+	inc hl
+	and	a
+	jr	nz,contstr
+	pop de
+	pop hl
+	jr dec_loop
+.contstr
+	call _put_char
+	jr	printstr
+
+.nostring
+	cp	'c'
+	jp	nz,nochar
+	ld	a,(de)
+	call _put_char
+	jr	dec_loop
+
+
+._put_char
+	push de
+	push hl
+;	ld	h,0
+;	ld	l,a
+;	push hl
+;	push	bc
+;	call	fputc
+;	pop	bc
+;	pop	hl
+
+	ld		l,a
+	call	doprint	; awful trick to save few bytes
+
+	pop hl
+	pop de
+	ret
+
+
+.do_miniprintn
+	push de	; num msw
+	push hl	; num lsw
+	push bc	; fp
+	push af	; flag
+	call	_miniprintn
+	ret
+
+#endasm
 }
 
 
@@ -119,7 +287,7 @@ LIB fputc
 	pop hl	; number LSW
 	pop de	; number MSW
 	push af	; ret addr.
-	
+.printn3	
 	ld a,d
 	rlca		; shift sign bit in first pos..
 	and 1
@@ -132,12 +300,16 @@ LIB fputc
 	call	l_long_neg
 	pop bc
 	push bc
-	push hl
-	push de
-	ld	l,'-'
-	call	doprint
-	pop de
-	pop hl
+
+	;push hl
+	;push de
+	;ld	l,'-'
+	;call	doprint
+	;pop de
+	;pop hl
+
+	ld	a,'-'
+	call	_put_char 	; awful trick to save few bytes
 
 .noneg
 	pop bc
