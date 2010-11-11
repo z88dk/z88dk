@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.150 2010-09-15 09:00:39 stefano Exp $
+# $Id: Makefile,v 1.151 2010-11-11 18:01:39 stefano Exp $
 
 
 include	Make.config
@@ -39,7 +39,7 @@ tilibs:	ti82ansi_clib.lib ti82_clib.lib	ti83ansi_clib.lib ti83_clib.lib	\
 	ti83pansi_clib.lib ti83p_clib.lib ti85ansi_clib.lib ti85_clib.lib \
 	ti86ansi_clib.lib ti86_clib.lib
 
-zxlibs:	ts2068_clib.lib	zx_clib.lib zxan_clib.lib ts2068an_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib zxrom.lib
+zxlibs:	zxfcntl ts2068_clib.lib ts2068an_clib.lib gfx2068hr.lib zx_clib.lib zxan_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib zxrom.lib
 
 zx81libs: zx81_clib.lib	zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib
 
@@ -272,6 +272,13 @@ z88net_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/z88net_clib @$(LISTFILE_DIRECTORY)/z88net.lst
 
+# ZX Spectrum fcntl - dom/stefano
+zxfcntl:
+	@echo ''
+	@echo '--- Building ZX Spectrum fcntl libraries ---'
+	@echo ''
+	cd fcntl ; $(MAKE) lzx ; cd ..
+
 # 64/32	column library for ZX Spectrum - dom/stefano
 zx_clib.lib:
 	@echo ''
@@ -281,7 +288,6 @@ zx_clib.lib:
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) lzx	; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
-	cd fcntl ; $(MAKE) lzx ; cd ..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
@@ -304,7 +310,6 @@ zxan_clib.lib:
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) lzx	; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
-	cd fcntl ; $(MAKE) lzx ; cd ..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
@@ -324,7 +329,6 @@ ts2068_clib.lib:
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) lzx	; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
-	cd fcntl ; $(MAKE) lzx ; cd ..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
@@ -334,6 +338,16 @@ ts2068_clib.lib:
 	cd spectrum ; $(MAKE) ;	cd ..
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
+
+# C128 HRG graphics lib - Stefano
+gfx2068hr.lib:
+	@echo ''
+	@echo '--- Building TS2068 High Resolution Graphics Library  ---'
+	@echo ''
+	$(MAKE)	gfxdeps
+	cd graphics ; $(MAKE) lgfx2068 ; cd ..
+	$(LIBLINKER) -DFORgfx2068hr -x$(OUTPUT_DIRECTORY)/gfx2068hr @$(LISTFILE_DIRECTORY)/gfx2068hr.lst
+
 
 # vt100	C lib for TS2068 - stefano/dom
 # use -DROMFONT	for a tiny 36 columns mode
@@ -347,7 +361,6 @@ ts2068an_clib.lib:
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) lzx	; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
-	cd fcntl ; $(MAKE) lzx ; cd ..
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..

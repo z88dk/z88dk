@@ -1,0 +1,13 @@
+@gfxbasew.lst
+graphics/dcircle
+graphics/clg
+graphics/spectrum/rowtab
+graphics/ts2068hr/w_pixladdr
+graphics/clrarea
+graphics/w_plotpixl
+graphics/w_respixl
+graphics/w_xorpixl
+graphics/lftscrol
+graphics/swapgfxbk_foo
+graphics/w_putsprite2.asm
+graphics/w_pointxy
