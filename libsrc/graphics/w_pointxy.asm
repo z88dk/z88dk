@@ -1,11 +1,13 @@
 	INCLUDE	"graphics/grafix.inc"
 
 	XLIB	pointxy
+	LIB		l_cmp
+
 
 	LIB	w_pixeladdress
 
 ;
-;	$Id: w_pointxy.asm,v 1.1 2008-07-17 15:39:56 stefano Exp $
+;	$Id: w_pointxy.asm,v 1.2 2010-11-11 18:06:17 stefano Exp $
 ;
 
 ; ******************************************************************
