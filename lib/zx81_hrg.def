@@ -6,7 +6,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.15 2010-02-03 11:08:15 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.16 2010-11-11 09:17:09 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -213,10 +213,11 @@ ENDIF
         pop     ix
 
 IF ((startup=3)|(startup=5))
+		jp		c,nobrkk2
         ld      a,$1e           ; the I register is restored with the MSB address
         ld      i,a             ; of the ROM pattern table in case of BREAK key down
-
-        jp      nc,$02A4
+        jp      $02A4
+nobrkk2:
 ENDIF
 
 IF (startup=7)

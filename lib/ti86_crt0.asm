@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.23 2009-06-22 21:20:05 dom Exp $
+;	$Id: ti86_crt0.asm,v 1.24 2010-11-11 09:17:09 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -297,7 +297,7 @@ cpygraph:
 ;----------------------------------------
 ; End of startup part, routines following
 ;----------------------------------------
-l_dcal
+l_dcal:
 	jp	(hl)
 
 
