@@ -16,9 +16,11 @@ crt0/l_div
 crt0/l_div_u
 crt0/l_eq
 crt0/l_gchar
+crt0/l_gcharsp
 crt0/l_ge
 crt0/l_getptr
 crt0/l_gint
+crt0/l_gintsp
 crt0/l_gint_eq
 crt0/l_ghtonsint
 crt0/l_glong
@@ -87,3 +89,4 @@ crt0_long/l_long_ult
 crt0_long/l_long_xor
 crt0_long/long2int_s
 crt0_long/lpush2
+@sdcc.lst

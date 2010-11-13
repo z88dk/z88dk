@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.151 2010-11-11 18:01:39 stefano Exp $
+# $Id: Makefile,v 1.152 2010-11-13 10:05:54 stefano Exp $
 
 
 include	Make.config
@@ -23,7 +23,7 @@ all:	genlibs	z88libs	tilibs zxlibs \
 	svi_clib.lib sam_clib.lib samansi_clib.lib \
 	trs80_clib.lib vz_clib.lib vzansi_clib.lib \
 	embedded_clib.lib test_clib.lib	\
-	zx81libs preempt.lib
+	preempt.lib zx81libs
 
 genlibs: debug.lib gen_math.lib	malloc.lib z80_crt0.lib	ndos.lib adt.lib balloc.lib \
 	 im2.lib rect.lib algorithm.lib	lib3d.lib x11.lib
@@ -345,7 +345,6 @@ gfx2068hr.lib:
 	@echo '--- Building TS2068 High Resolution Graphics Library  ---'
 	@echo ''
 	$(MAKE)	gfxdeps
-	cd graphics ; $(MAKE) lgfx2068 ; cd ..
 	$(LIBLINKER) -DFORgfx2068hr -x$(OUTPUT_DIRECTORY)/gfx2068hr @$(LISTFILE_DIRECTORY)/gfx2068hr.lst
 
 
@@ -417,7 +416,7 @@ pps_clib.lib:
 	cd time	; $(MAKE) lpps ; cd ..
 	cd rs232 ; $(MAKE) lzx ; cd ..
 	$(MAKE)	gamesdeps
-	cd spectrum ; $(MAKE) lzx ; cd ..
+	cd spectrum ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
 
