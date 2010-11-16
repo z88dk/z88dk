@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.152 2010-11-13 10:05:54 stefano Exp $
+# $Id: Makefile,v 1.153 2010-11-16 15:49:12 stefano Exp $
 
 
 include	Make.config
@@ -339,7 +339,7 @@ ts2068_clib.lib:
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
-# C128 HRG graphics lib - Stefano
+# TS2068 HRG graphics lib - Stefano
 gfx2068hr.lib:
 	@echo ''
 	@echo '--- Building TS2068 High Resolution Graphics Library  ---'
