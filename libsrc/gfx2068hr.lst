@@ -1,8 +1,12 @@
 @gfxbasew.lst
+graphics/ts2068hr/drawb
+graphics/ts2068hr/undrawb
+graphics/ts2068hr/xorborder
 graphics/dcircle
-graphics/clg
+graphics/ts2068hr/clg
 graphics/spectrum/rowtab
 graphics/ts2068hr/w_pixladdr
+graphics/ts2068hr/fill
 graphics/clrarea
 graphics/w_plotpixl
 graphics/w_respixl

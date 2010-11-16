@@ -1,7 +1,6 @@
 graphics/circle
 graphics/clga
 graphics/w_draw
-graphics/drawb
 graphics/w_drawr
 graphics/getmaxx
 graphics/getmaxy
@@ -22,10 +21,8 @@ graphics/rbitmask
 graphics/rscroll
 graphics/uncircle
 graphics/w_undraw
-graphics/undrawb
 graphics/w_undrawr
 graphics/w_unplot
 graphics/drawbox
 graphics/w_setxy
-graphics/xorborder
 graphics/w_xorplot
