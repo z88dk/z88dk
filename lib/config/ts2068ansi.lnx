@@ -79,7 +79,7 @@ COPTRULES3	DESTDIR/lib/z80rules.0
 # CRT0	   = Full path and name of the startup code file (omit suffix!)
 #
 
-CRT0		DESTDIR/lib/ts2068an_crt0
+CRT0		DESTDIR/lib/ts2068_crt0
 
 
 #

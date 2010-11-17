@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.153 2010-11-16 15:49:12 stefano Exp $
+# $Id: Makefile,v 1.154 2010-11-17 07:03:57 stefano Exp $
 
 
 include	Make.config
@@ -39,7 +39,7 @@ tilibs:	ti82ansi_clib.lib ti82_clib.lib	ti83ansi_clib.lib ti83_clib.lib	\
 	ti83pansi_clib.lib ti83p_clib.lib ti85ansi_clib.lib ti85_clib.lib \
 	ti86ansi_clib.lib ti86_clib.lib
 
-zxlibs:	zxfcntl ts2068_clib.lib ts2068an_clib.lib gfx2068hr.lib zx_clib.lib zxan_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib zxrom.lib
+zxlibs:	zxfcntl zx232 ts2068_clib.lib ts2068an_clib.lib gfx2068hr.lib zx_clib.lib zxan_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib zxrom.lib
 
 zx81libs: zx81_clib.lib	zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib
 
@@ -292,7 +292,6 @@ zx_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	cd time	; $(MAKE) lzx ;	cd ..
-	cd rs232 ; $(MAKE) lzx ; cd ..
 	$(MAKE)	gamesdeps
 	cd spectrum ; $(MAKE) ;	cd ..
 	cd games ; $(MAKE) lzx ; cd ..
@@ -314,11 +313,14 @@ zxan_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	cd time	; $(MAKE) lzx ;	cd ..
-	cd rs232 ; $(MAKE) lzx ; cd ..
 	$(MAKE)	gamesdeps
 	cd spectrum ; $(MAKE) ;	cd ..
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx $(COLDEFS)	-x$(OUTPUT_DIRECTORY)/zxan_clib	@$(LISTFILE_DIRECTORY)/zxansi.lst
+
+# ZX Spectrum RS232 libraries - stefano
+zx232:
+	cd rs232 ; $(MAKE) lzx ; cd ..
 
 # 64/32	column library for TS2068 - dom/stefano/alvin
 ts2068_clib.lib:
@@ -333,7 +335,6 @@ ts2068_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	cd time	; $(MAKE) lzx ;	cd ..
-	cd rs232 ; $(MAKE) lzx ; cd ..
 	$(MAKE)	gamesdeps
 	cd spectrum ; $(MAKE) ;	cd ..
 	cd games ; $(MAKE) lzx ; cd ..
@@ -364,7 +365,6 @@ ts2068an_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	cd time	; $(MAKE) lzx ;	cd ..
-	cd rs232 ; $(MAKE) lzx ; cd ..
 	$(MAKE)	gamesdeps
 	cd spectrum ; $(MAKE) ;	cd ..
 	cd games ; $(MAKE) lzx ; cd ..
@@ -414,7 +414,6 @@ pps_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	cd time	; $(MAKE) lpps ; cd ..
-	cd rs232 ; $(MAKE) lzx ; cd ..
 	$(MAKE)	gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lzx ; cd ..
@@ -434,7 +433,6 @@ ppsansi_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	cd time	; $(MAKE) lpps ; cd ..
-	cd rs232 ; $(MAKE) lzx ; cd ..
 	$(MAKE)	gamesdeps
 	cd spectrum ; $(MAKE) ;	cd ..
 	cd games ; $(MAKE) lzx ; cd ..
