@@ -1,11 +1,11 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.6 2010-03-12 15:21:13 stefano Exp $
+;       $Id: ts2068_crt0.asm,v 1.7 2010-11-18 15:42:20 stefano Exp $
 ;
 
 
 
-                MODULE  zx82_crt0
+                MODULE  ts2068_crt0
 ;--------
 ; Include zcc_opt.def to find out some info
 ;--------
@@ -15,25 +15,30 @@
 ; Some scope definitions
 ;--------
 
-        XREF    _main           ;main() is always external to crt0 code
+        XREF    _main           ; main() is always external to crt0 code
 
-        XDEF    cleanup         ;jp'd to by exit()
-        XDEF    l_dcal          ;jp(hl)
+        XDEF    cleanup         ; jp'd to by exit()
+        XDEF    l_dcal          ; jp(hl)
 
-        XDEF    _vfprintf       ;jp to the printf() core
 
-        XDEF    exitsp          ;atexit() variables
+        XDEF    _vfprintf       ; jp to the printf() core
+
+        XDEF    exitsp          ; atexit() variables
         XDEF    exitcount
 
-       	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+       	XDEF	heaplast        ; Near malloc heap variables
+        XDEF	heapblocks
 
-        XDEF    __sgoioblk      ;stdio info block
+        XDEF    __sgoioblk      ; stdio info block
 
-        XDEF    base_graphics   ;Graphical variables
-	XDEF	coords		;Current xy position
+        XDEF    base_graphics   ; Graphical variables
+        XDEF	coords          ; Current xy position
 
-	XDEF	snd_tick	;Sound variable
+        XDEF	snd_tick        ; Sound variable
+
+        XDEF    call_rom3       ; Interposer
+
+
 
 ;--------
 ; Set an origin for the application (-zorg=) default to 32768
@@ -41,7 +46,7 @@
 
         IF DEFINED_ZXVGS
         IF !myzorg
-                DEFC    myzorg = $5CCB  ;repleaces BASIC program
+                DEFC    myzorg = $5CCB    ;repleaces BASIC program
         ENDIF
         IF !STACKPTR
                 DEFC    STACKPTR = $FF57  ;below UDG, keep eye when using banks
@@ -56,15 +61,15 @@
 
 
 start:
-	ld	iy,23610	; restore the right iy value, fixes the self-relocating trick
+        ld	iy,23610	; restore the right iy value, fixes the self-relocating trick
 IF !DEFINED_ZXVGS
         ld      (start1+1),sp	;Save entry stack
 ENDIF
 IF 	STACKPTR
-	ld	sp,STACKPTR
+        ld	sp,STACKPTR
 ENDIF
-	exx
-	ld	(hl1save + 1),hl
+        exx
+        ld	(hl1save + 1),hl
 
         ld      hl,-64
         add     hl,sp
@@ -303,8 +308,8 @@ coords:         defw    0       ; Current graphics xy coordinates
 base_graphics:  defw    0       ; Address of the Graphics map
 
 IF !DEFINED_HAVESEED
-		XDEF    _std_seed        ;Integer rand() seed
-_std_seed:       defw    0       ; Seed for integer rand() routines
+                XDEF    _std_seed        ;Integer rand() seed
+_std_seed:      defw    0       ; Seed for integer rand() routines
 ENDIF
 
 exitsp:         defw    0       ; Address of where the atexit() stack is
@@ -314,14 +319,18 @@ exitcount:      defb    0       ; How many routines on the atexit() stack
 heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
 
+
 IF DEFINED_NEED1bitsound
-snd_tick:	defb	0	; Sound variable
+snd_tick:       defb	0	; Sound variable
 ENDIF
 
+
+; ZXMMC SD/MMC interface
 IF DEFINED_NEED_ZXMMC
 	XDEF card_select
-card_select:       defb    0    ; Currently selected MMC/SD slot for ZXMMC
+card_select:    defb    0    ; Currently selected MMC/SD slot for ZXMMC
 ENDIF
+
 
 		defm	"Small C+ ZX"	;Unnecessary file signature
 		defb	0

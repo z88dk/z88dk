@@ -1,5 +1,6 @@
 @gfxbasew.lst
 graphics/drawb
+graphics/drawbox
 graphics/undrawb
 graphics/xorborder
 graphics/dcircle

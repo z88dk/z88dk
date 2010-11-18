@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.154 2010-11-17 07:03:57 stefano Exp $
+# $Id: Makefile,v 1.155 2010-11-18 15:42:20 stefano Exp $
 
 
 include	Make.config
@@ -39,7 +39,7 @@ tilibs:	ti82ansi_clib.lib ti82_clib.lib	ti83ansi_clib.lib ti83_clib.lib	\
 	ti83pansi_clib.lib ti83p_clib.lib ti85ansi_clib.lib ti85_clib.lib \
 	ti86ansi_clib.lib ti86_clib.lib
 
-zxlibs:	zxfcntl zx232 ts2068_clib.lib ts2068an_clib.lib gfx2068hr.lib zx_clib.lib zxan_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib zxrom.lib
+zxlibs:	zxfcntl zx232 ts2068_clib.lib ts2068an_clib.lib gfx2068hr.lib gfxspectrum.lib zx_clib.lib zxan_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib zxrom.lib
 
 zx81libs: zx81_clib.lib	zx81ansi_clib.lib gfx81.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib
 
@@ -282,7 +282,7 @@ zxfcntl:
 # 64/32	column library for ZX Spectrum - dom/stefano
 zx_clib.lib:
 	@echo ''
-	@echo '--- Building ZX Spectrum	Library	 ---'
+	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''
 	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
@@ -302,7 +302,7 @@ zx_clib.lib:
 # or -DPACKEDFONT for tiny 64->85 column modes
 zxan_clib.lib:
 	@echo ''
-	@echo '--- Building ZX Spectrum	ANSI Library  ---'
+	@echo '--- Building ZX Spectrum ANSI Library ---'
 	@echo ''
 	$(RM) stdio/ansi/spectrum/f_ansi_char.o
 	$(MAKE)	gfxdeps
@@ -340,15 +340,6 @@ ts2068_clib.lib:
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
-# TS2068 HRG graphics lib - Stefano
-gfx2068hr.lib:
-	@echo ''
-	@echo '--- Building TS2068 High Resolution Graphics Library  ---'
-	@echo ''
-	$(MAKE)	gfxdeps
-	$(LIBLINKER) -DFORgfx2068hr -x$(OUTPUT_DIRECTORY)/gfx2068hr @$(LISTFILE_DIRECTORY)/gfx2068hr.lst
-
-
 # vt100	C lib for TS2068 - stefano/dom
 # use -DROMFONT	for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
@@ -370,6 +361,22 @@ ts2068an_clib.lib:
 	cd games ; $(MAKE) lzx ; cd ..
 	$(LIBLINKER) -DFORzx $(COLDEFS)	-x$(OUTPUT_DIRECTORY)/ts2068an_clib @$(LISTFILE_DIRECTORY)/ts2068an.lst
 
+# TS2068 HRG graphics lib - Stefano
+gfx2068hr.lib:
+	@echo ''
+	@echo '--- Building TS2068 High Resolution Graphics Library  ---'
+	@echo ''
+	$(MAKE)	gfxdeps
+	$(LIBLINKER) -DFORgfx2068hr -x$(OUTPUT_DIRECTORY)/gfx2068hr @$(LISTFILE_DIRECTORY)/gfx2068hr.lst
+
+# TS2068 HRG graphics lib - Stefano
+gfxspectrum.lib:
+	@echo ''
+	@echo '--- Building ZX Spectrum Graphics Library  ---'
+	@echo ''
+	$(MAKE)	gfxdeps
+	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/gfxspectrum @$(LISTFILE_DIRECTORY)/gfxspectrum.lst
+
 # ZXROM	- stefano
 zxrom.lib:
 	@echo ''
@@ -390,13 +397,13 @@ zxvgs.lib:
 # ZX Spectrum maths library - Stefano
 mzx.lib:
 	@echo ''
-	@echo '--- Building ZX Spectrum	Maths Library ---'
+	@echo '--- Building ZX Spectrum Maths Library ---'
 	@echo ''
 	cd math/zxmath ; $(MAKE) mzx	; cd ../..
 
 mzx_tiny.lib:
 	@echo ''
-	@echo '--- Building ZX Spectrum	Tiny Maths Library ---'
+	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
 	@echo ''
 	cd math/zxmath ; $(MAKE) mzx_tiny ; cd ../..
 

@@ -23,6 +23,5 @@ graphics/uncircle
 graphics/w_undraw
 graphics/w_undrawr
 graphics/w_unplot
-graphics/drawbox
 graphics/w_setxy
 graphics/w_xorplot
