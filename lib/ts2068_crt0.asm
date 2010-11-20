@@ -1,11 +1,12 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.7 2010-11-18 15:42:20 stefano Exp $
+;       $Id: ts2068_crt0.asm,v 1.8 2010-11-20 14:23:16 stefano Exp $
 ;
 
 
-
                 MODULE  ts2068_crt0
+
+
 ;--------
 ; Include zcc_opt.def to find out some info
 ;--------
@@ -55,7 +56,14 @@
 
         
         IF      !myzorg
+        IF (startup=2)
+                defc    myzorg  = 35000
+        ELSE
                 defc    myzorg  = 32768
+        ENDIF
+        ENDIF
+        IF !STACKPTR
+                DEFC    STACKPTR = myzorg-1  ;below UDG, keep eye when using banks
         ENDIF
                 org     myzorg
 
@@ -75,6 +83,14 @@ ENDIF
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
+        
+IF (startup=2)
+		di
+		ld      a,@01000110
+		out     (255),a
+ENDIF
+        
+        
 IF DEFINED_ZXVGS
 ;setting variables needed for proper keyboard reading
         LD      (IY+1),$CD      ;FLAGS #5C3B
@@ -299,6 +315,35 @@ setheader_r:
 	ld	(ix+4),0
 	ret
 ENDIF
+
+banksv: defb 0
+
+; Call a routine in the spectrum ROM
+; The routine to call is stored in the two bytes following
+call_rom3:
+		in      a,($f4)
+		ld      (banksv),a
+		and     @11111100
+		out     ($f4),a
+		
+        exx                      ; Use alternate registers
+ENDIF
+IF DEFINED_NEED_ZXMMC
+		xor		a                ; standard ROM
+		out		($7F),a          ; ZXMMC FASTPAGE
+ENDIF
+        ex      (sp),hl          ; get return address
+        ld      c,(hl)
+        inc     hl
+        ld      b,(hl)           ; BC=BASIC address
+        inc     hl
+        ex      (sp),hl          ; restore return address
+        push    bc
+        exx                      ; Back to the regular set
+
+        ld      a,(banksv)
+		out ($f4),a
+        ret
 
 
 ;-----------
