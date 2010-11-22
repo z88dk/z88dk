@@ -1,5 +1,5 @@
-graphics/circle
-graphics/clga
+graphics/w_circle
+graphics/w_dcircle
 graphics/w_draw
 graphics/w_drawr
 graphics/getmaxx
@@ -19,7 +19,7 @@ graphics/dither_pattern
 graphics/w_multipoint
 graphics/rbitmask
 graphics/rscroll
-graphics/uncircle
+graphics/w_uncircle
 graphics/w_undraw
 graphics/w_undrawr
 graphics/w_unplot

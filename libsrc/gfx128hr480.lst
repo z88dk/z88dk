@@ -3,7 +3,6 @@ graphics/drawb
 graphics/drawbox
 graphics/undrawb
 graphics/xorborder
-graphics/dcircle
 graphics/c128_64k/clg
 graphics/clrarea
 graphics/c128_64k/w_pixladdr
