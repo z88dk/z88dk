@@ -70,6 +70,9 @@
  *   
  *      To get a Spectrum 16K version of the game:
  *      zcc +zx -Dspritesize=16 -DSOUND -create-app -zorg=24300 dstar.c
+ *
+ *      To get a TS2068 HRG version of the game:
+ *      zcc +ts2068 -startup=2 -Dspritesize=21 -DSOUND -create-app dstar.c
  *   
  *      To get a VZ200 version:
  *      zcc +vz -Dspritesize=7 -DSOUND -odztar.vz dstar.c
@@ -114,6 +117,7 @@
 /* #define spritesize 7   -->  TI85/86, VZ200  */
 /* #define spritesize 8   -->  128x72 pixels   */
 /* #define spritesize 16  -->  Big screen mode 256x144  */
+/* #define spritesize 21  -->  Wide screen mode 512x192 */
 
 #ifndef spritesize
 #define spritesize 6
@@ -122,7 +126,11 @@
 /* Single sprite memory usage, including bytes for its size */
 #if (spritesize == 16)
   #define spritemem 34
-#else
+#endif
+#if (spritesize == 21)
+  #define spritemem 90
+#endif
+#ifndef spritemem
   #define spritemem (spritesize+2)
 #endif
 
@@ -247,7 +255,11 @@ void DrawBoard(void)
 	{
 		for (x=0 ; x!=16 ; x++)
 		{
+#if (spritesize == 21)
+			putsprite(spr_or,(x*32),(y*spritesize),sprites + (spritemem * (*ptr++)));
+#else
 			putsprite(spr_or,(x*spritesize),(y*spritesize),sprites + (spritemem * (*ptr++)));
+#endif
 		}
 	}
 }
@@ -305,12 +317,20 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		if(TestNextPosIsStop(*(locn+temp2))) return; /* till edge */
 
 		y = (*(ptr) / 16);
+#if (spritesize == 21)
+		x = (*(ptr) - (y * 16)) * 32;
+#else
 		x = (*(ptr) - (y * 16)) * spritesize;
+#endif
 		y *= spritesize;
 		
 		if(*(locn+temp2)==BUBB)
 		{
+#if (spritesize == 21)
+			putsprite(spr_xor,x+(plusx*32),y+(plusy*spritesize),sprites + (spritemem * BUBB));
+#else
 			putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
+#endif
 
 			#ifdef SOUND
 			bit_fx2 (5);
@@ -323,7 +343,11 @@ void MovePiece(char *ptr, char plusx, char plusy)
  		/* remove old */
 		putsprite(spr_xor,x,y,sprites + (spritemem * temp));
 		/* put new */
+#if (spritesize == 21)
+		putsprite(spr_xor,x+(plusx*32),y+(plusy*spritesize),sprites + (spritemem * temp));
+#else
 		putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * temp));
+#endif
 		
 		#ifdef SOUND
 		bit_fx2 (2);

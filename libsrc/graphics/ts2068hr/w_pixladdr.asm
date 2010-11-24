@@ -2,17 +2,16 @@
 ; posted by rdk77, 11/11/2010
 
         XLIB    w_pixeladdress
-        LIB     zx_rowtab
 
         INCLUDE "graphics/grafix.inc"
 ;
-;       $Id: w_pixladdr.asm,v 1.1 2010-11-11 18:01:40 stefano Exp $
+;       $Id: w_pixladdr.asm,v 1.2 2010-11-24 18:00:21 stefano Exp $
 ;
 ; ******************************************************************
 ; Get absolute  pixel address in map of virtual (x,y) coordinate.
 ; in: (x,y) coordinate of pixel (hl,de)
 ; 
-; out: de       = address       of pixel byte
+; out: de       = address of pixel byte
 ;          a    = bit number of byte where pixel is to be placed
 ;         fz    = 1 if bit number is 0 of pixel position
 ;
@@ -21,31 +20,39 @@
 ;  af..dehl/.... different
 
 .w_pixeladdress
-                ex      de,hl
-                add     hl,hl
-                push    de
-                ld      de,zx_rowtab
-                add     hl,de
-                ld      e,(hl)
-                inc     hl
-                ld      d,(hl)
-                pop     hl
-                bit     3,l
-                jr      z,first
-                set     5,d
-.first
-                ld      a,l
-                srl     l
-                srl     l
-                srl     l
-                srl     l
-                bit     0,h
-                jr      z,nset
-                set     4,l
-.nset
-                ld      h,0
-                add     hl,de
-                ex      de,hl
-                and     @00000111
-                xor     @00000111
-                ret
+	        LD	A,E
+	        LD      B,A
+	        AND     A
+	        RRA
+	        SCF			; Set Carry Flag
+	        RRA
+	        AND     A
+	        RRA
+	        XOR     B
+	        AND     @11111000
+	        XOR     B
+	        LD      D,A
+	        LD      A,l
+
+	        bit		3,a
+	        jp		z,isfirst
+	        set		5,d
+.isfirst
+	        rr h
+	        rra
+
+	        RLCA
+	        RLCA
+	        RLCA
+
+	        XOR     B
+	        AND     @11000111
+	        XOR     B
+	        RLCA
+	        RLCA
+	        LD      E,A
+	        LD      A,L
+	        AND     @00000111
+	        XOR	@00000111
+	        ret
+

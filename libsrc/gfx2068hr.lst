@@ -4,7 +4,6 @@ graphics/ts2068hr/undrawb
 graphics/ts2068hr/xorborder
 graphics/ts2068hr/clg
 graphics/ts2068hr/clga2
-graphics/spectrum/rowtab
 graphics/ts2068hr/w_pixladdr
 graphics/ts2068hr/fill
 graphics/clrarea
@@ -12,6 +11,6 @@ graphics/ts2068hr/w_plotpixl
 graphics/ts2068hr/w_respixl
 graphics/ts2068hr/w_xorpixl
 graphics/lftscrol
-graphics/swapgfxbk_foo
+graphics/spectrum/swapgfxbk
 graphics/ts2068hr/w_putsprite
 graphics/w_pointxy

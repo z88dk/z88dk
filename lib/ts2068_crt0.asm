@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.9 2010-11-22 18:25:52 stefano Exp $
+;       $Id: ts2068_crt0.asm,v 1.10 2010-11-24 18:00:21 stefano Exp $
 ;
 
 
@@ -85,13 +85,13 @@ ENDIF
         ld      (exitsp),sp
         
 IF (startup=2)
-		di
 		ld		hl,$6000
 		ld		de,$6001
 		ld		(hl),0
 		ld		bc,6143
 		ldir
-		ld      a,@01000110
+		;ld      a,@01000110	; disable interrupts
+		ld      a,@00000110
 		out     (255),a
 ENDIF
         
