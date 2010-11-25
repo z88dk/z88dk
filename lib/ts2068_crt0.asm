@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.10 2010-11-24 18:00:21 stefano Exp $
+;       $Id: ts2068_crt0.asm,v 1.11 2010-11-25 13:46:39 stefano Exp $
 ;
 
 
@@ -321,13 +321,11 @@ setheader_r:
 	ret
 ENDIF
 
-banksv: defb 0
-
 ; Call a routine in the spectrum ROM
 ; The routine to call is stored in the two bytes following
 call_rom3:
 		in      a,($f4)
-		ld      (banksv),a
+		ld      (banksv+1),a
 		and     @11111100
 		out     ($f4),a
 		
@@ -345,8 +343,8 @@ ENDIF
         ex      (sp),hl          ; restore return address
         push    bc
         exx                      ; Back to the regular set
-
-        ld      a,(banksv)
+.banksv
+        ld      a,0
 		out ($f4),a
         ret
 
