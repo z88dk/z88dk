@@ -9,9 +9,9 @@ stdio/ansi/puts_cons
 stdio/ansi/f_ansi_dsr6
 stdio/ansi/spectrum/f_ansi_attr
 stdio/ansi/spectrum/f_ansi_bel
-stdio/ansi/spectrum/f_ansi_char
-stdio/ansi/spectrum/f_ansi_cls
-stdio/ansi/spectrum/f_ansi_dline
+stdio/ansi/ts2068/f_ansi_char
+stdio/ansi/ts2068/f_ansi_cls
+stdio/ansi/ts2068/f_ansi_dline
 stdio/ansi/ts2068/f_ansi_scrollup
 time/spectrum/clock
 games/spectrum/joystick

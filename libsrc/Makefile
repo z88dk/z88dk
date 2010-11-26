@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.155 2010-11-18 15:42:20 stefano Exp $
+# $Id: Makefile,v 1.156 2010-11-26 11:37:32 stefano Exp $
 
 
 include	Make.config
@@ -359,7 +359,7 @@ ts2068an_clib.lib:
 	$(MAKE)	gamesdeps
 	cd spectrum ; $(MAKE) ;	cd ..
 	cd games ; $(MAKE) lzx ; cd ..
-	$(LIBLINKER) -DFORzx $(COLDEFS)	-x$(OUTPUT_DIRECTORY)/ts2068an_clib @$(LISTFILE_DIRECTORY)/ts2068an.lst
+	$(LIBLINKER) -DFORzx -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068an_clib @$(LISTFILE_DIRECTORY)/ts2068an.lst
 
 # TS2068 HRG graphics lib - Stefano
 gfx2068hr.lib:
