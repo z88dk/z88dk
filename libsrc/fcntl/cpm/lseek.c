@@ -5,7 +5,7 @@
  *	1	SEEK_CUR from current position
  *	2	SEEK_END from end of file (always -ve)
  *
- *	$Id: lseek.c,v 1.2 2009-01-12 12:27:11 stefano Exp $
+ *	$Id: lseek.c,v 1.3 2010-11-26 17:33:50 stefano Exp $
 */
 
 #include <fcntl.h>
@@ -14,8 +14,7 @@
 
 
 long
-_fsize(fd)
-uchar	fd;
+fsize(int fd)
 {
 	struct	fcb *fc;
 	long	tmp;
@@ -58,7 +57,7 @@ long lseek(int fd,long posn, int whence)
 		break;
 
 	case 2:
-		pos = posn + _fsize(fd);
+		pos = posn + fsize(fd);
 		break;
 	}
 	if(pos >= 0) {
