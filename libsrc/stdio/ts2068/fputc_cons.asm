@@ -12,11 +12,13 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.1 2007-03-21 21:21:37 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.2 2010-11-26 10:17:05 stefano Exp $
 ;
 
 
           XLIB  fputc_cons
+          XREF  call_rom3
+          LIB	zx_rowtab
 
 ;
 ; Entry:        a= char to print
@@ -24,6 +26,15 @@
 
 
 .fputc_cons
+	in    a,(255)
+	ld    hl,hrgmode
+	ld    (hl),0
+	and   7
+	cp    6
+	jr    nz,normal
+	dec   (hl)
+	call  doswitch32	; with the 512 dots mode we always have 64 columns
+.normal
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
@@ -93,8 +104,8 @@
           exx   
 ;Get screen address in hl from
 ;64 column position in bc
-          ld    bc,(chrloc)  
-	  srl   c  
+          ld    bc,(chrloc)
+          srl   c  
           ex    af,af'  
           ld    a,b  
           and   248  
@@ -108,9 +119,9 @@
           add   a,c  
           ld    l,a  
           ex    af,af'  
-          ld    a,240  
+          ld    a,@11110000
           jr    c,gotpos  
-          ld    a,15  
+          ld    a,@00001111
 .gotpos   ld    c,a  
           exx   
           cpl   
@@ -133,90 +144,173 @@
           djnz  char1  
           exx   
           ld    a,h  
-	  dec   a
+          dec   a
           rrca  
           rrca  
           rrca  
           and   3  
           or    88  
           ld    h,a  
-	  ld    a,(attr)
-	  ld    (hl),a
+          ld    a,(attr)
+          ld    (hl),a
 
 .cbak     ld    hl,(chrloc)  
           inc   l  
 .posncheck
-          bit   6,l  
+          bit   6,l
           jr    z,char4
 .cbak1    ld    l,0  
           inc   h  
-	ld	a,h
-	cp	24
-	jr	nz,char4
-	call	scrollup
-	ld	hl,23*256
+          ld	a,h
+          cp	24
+          jr	nz,char4
+          call	scrollup
+          ld	hl,23*256
 .char4    ld    (chrloc),hl  
           ret   
 
 ; 32 column print routine..quick 'n' dirty..we take
 ; x posn and divide by two to get our real position
-
+; If HRG it works in 64 columns mode.
+	
 .print32
-	sub	32	;subtract 32 to get space = 0
-	ld	l,a
-	ld	h,0
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
+          sub	32	;subtract 32 to get space = 0
+          ld	l,a
+          ld	h,0
+          add	hl,hl
+          add	hl,hl
+          add	hl,hl
 .fontaddr
-	ld	bc,15616
-	add	hl,bc
+          ld	bc,15616
+          add	hl,bc	; HL now points to the current char shape
 .print32_entry
-          ld    bc,(chrloc)  
-	  srl   c  
-          ex    af,af'  
-          ld    a,b  
-          and   248  
-          add   a,64  
-          ld    d,a  
-          ld    a,b  
-          and   7  
-          rrca  
-          rrca  
-          rrca  
-          add   a,c  
-	  ld	e,a
-; Screen posn in de, now get font
-	  ex	af,af
+          ld    bc,(chrloc)
 
-	ld	b,8
+          srl   c
+          ex    af,af'
+
+          ld    a,b
+          and   @11111000
+          add   a,$40
+          ld    d,a
+          ld    a,b
+          and   7
+          rrca
+          rrca
+          rrca
+          add   a,c
+          ld    e,a
+
+          ex    af,af' 
+          jr    nc,cry
+          ld	a,(hrgmode)
+          and	$20
+          add   d
+          ld    d,a
+.cry
+
+; Screen posn in de, now get font
+
+          ld	b,8
 .loop32
-	ld	a,(hl)
-.invers2 defb	0
-	ld	(de),a
-	inc	d	;down screen row
-	inc	hl
-	djnz	loop32
-        ld      a,d  
-	dec     a
-        rrca  
-        rrca  
-        rrca  
-        and     3  
-        or      88  
-        ld      d,a  
-	ld      a,(attr)
-	ld      (de),a
-	ld	hl,(chrloc)
-	inc	l
-	inc	l
-	jp	posncheck
+          ld	a,(hl)
+.invers2  defb	0
+          ld	(de),a
+          inc	d	;down screen row
+          inc	hl
+          djnz	loop32
+          ld	a,d  
+          dec	a
+          rrca  
+          rrca  
+          rrca  
+          and	3  
+          or	88  
+          ld	d,a  
+	      ld	a,(attr)
+	      ld	(de),a
+          ld	hl,(chrloc)
+          ld	a,(hrgmode)
+          and   a
+          jr	nz,count64
+          inc	l
+.count64
+          inc	l
+          jp	posncheck
+
 
 ; Ooops..ain't written this yet!
 ; We should scroll the screen up one character here
 ; Blanking the bottom row..
 .scrollup
-	jp	$939
+	ld	    a,(hrgmode)
+	and     a
+	jr      nz,hrgscroll
+	call    call_rom3
+	defw	$939
+	ret
+
+.hrgscroll
+	ld      ix,zx_rowtab
+	ld	a,8
+.outer_loop
+	push	af
+	push	ix
+	ld	a,23
+.inner_loop
+	ld      e,(ix+16)
+	ld      d,(ix+17)
+	ex	de,hl
+	ld	e,(ix+0)
+	ld	d,(ix+1)
+	ld	bc,32
+	ldir
+; second display
+	dec	de
+	dec	hl
+	set	5,d
+	set	5,h
+	ld	bc,32
+	lddr
+	ld	bc,16
+	add	ix,bc
+	dec	a
+	jr	nz,inner_loop
+	pop	ix
+	pop	af
+	inc	ix
+	inc	ix
+	dec	a
+	jr	nz,outer_loop
+; clear
+	ld	ix,zx_rowtab + (192 - 8) * 2
+	ld	a,8
+.clear_loop
+	push	ix
+	ld	e,(ix+0)
+	ld	d,(ix+1)
+	ld	h,d
+	ld	l,e
+	ld	(hl),0
+	inc	de
+	ld	bc,31
+	ldir
+; second display
+	dec hl
+	dec de
+	set	5,d
+	set	5,h
+	ex	de,hl
+	ld	(hl),0
+	ld	bc,31
+	lddr
+	pop	ix
+	inc	ix
+	inc	ix
+	dec	a
+	jr	nz,clear_loop
+	ret
+
 
 ; This nastily inefficient table is the code table for the routines
 ; Done this way for future! Expansion
@@ -306,12 +400,24 @@
         ld      bc,6144
         ld      (hl),l
         ldir
-	ld	a,(attr)
-	ld	(hl),a
-	ld	bc,767
-	ldir
+        ld	a,(attr)
+        ld	(hl),a
+        ld	bc,767
+        ldir
         ld      hl,0
         ld      (chrloc),hl
+        ld	a,(hrgmode)
+        and a
+        ret z
+        ld      hl,$6000
+        ld      de,$6001
+        ld      bc,6144
+        ld      (hl),l
+        ldir
+        ld	a,(attr)
+        ld	(hl),a
+        ld	bc,767
+        ldir
         ret
 
 ;Move to new line
@@ -319,9 +425,9 @@
 .cr
         ld      a,h
         cp      23
-	jr	nz,cr_1
-	call	scrollup
-	ld	h,22
+        jr	nz,cr_1
+        call	scrollup
+        ld	h,22
 .cr_1
         inc     h
         ld      l,0
@@ -468,6 +574,7 @@
 	ld	(print1+1),hl
 	cp	64
 	ret	z
+.doswitch32
 	ld	hl,print32
 	ld	(print1+1),hl
 	ret
@@ -478,6 +585,8 @@
 
 ; Variables
 ; Because we're on a Spectrum we can scatter statics all over the place!
+.hrgmode
+        defb	0
 
 .chrloc
         defw    0
