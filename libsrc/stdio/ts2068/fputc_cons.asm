@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.2 2010-11-26 10:17:05 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.3 2010-11-29 08:48:11 stefano Exp $
 ;
 
 
@@ -219,20 +219,20 @@
           inc	d	;down screen row
           inc	hl
           djnz	loop32
-          ld	a,d  
+          ld	a,d
           dec	a
-          rrca  
-          rrca  
-          rrca  
-          and	3  
-          or	88  
-          ld	d,a  
-	      ld	a,(attr)
-	      ld	(de),a
+          rrca
+          rrca
+          rrca
+          and	3
+          or	88
+          ld	d,a
           ld	hl,(chrloc)
           ld	a,(hrgmode)
           and   a
           jr	nz,count64
+	      ld	a,(attr)
+	      ld	(de),a
           inc	l
 .count64
           inc	l
@@ -395,29 +395,30 @@
 ; Clear screen and move to home
 
 .cls
+        ld      hl,0
+        ld      (chrloc),hl
+
         ld      hl,16384
         ld      de,16385
         ld      bc,6144
         ld      (hl),l
         ldir
+        ld	a,(hrgmode)
+        and a
+        jr nz,hrgnoatt
+
         ld	a,(attr)
         ld	(hl),a
         ld	bc,767
         ldir
-        ld      hl,0
-        ld      (chrloc),hl
-        ld	a,(hrgmode)
-        and a
-        ret z
+        ret
+.hrgnoatt
         ld      hl,$6000
         ld      de,$6001
         ld      bc,6144
         ld      (hl),l
         ldir
-        ld	a,(attr)
-        ld	(hl),a
-        ld	bc,767
-        ldir
+        ; no attributes in hrg mode
         ret
 
 ;Move to new line
