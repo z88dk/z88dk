@@ -26,6 +26,7 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 	XLIB __divsuchar_rrx_s
+	XDEF __divuschar_rrx_s
 	LIB	__div16
 	LIB __div_signexte
 

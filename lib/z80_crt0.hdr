@@ -10,20 +10,20 @@
 ;       routines in different modules, we have got rid of
 ;       the conditional assembly around the float routines
 ;
-;	$Id: z80_crt0.hdr,v 1.6 2005-08-27 00:09:31 aralbrec Exp $
+;	$Id: z80_crt0.hdr,v 1.7 2010-11-30 16:23:12 stefano Exp $
 
-        XREF    base_graphics	; Address of graphics screen
+	XREF    base_graphics	; Address of graphics screen
 
 	XREF	_cpfar2near	; Far->near conversion (z88)
 	XREF	packintrout	; Process interrupt (z88 apps)
 
-        XREF    l_dcal		; jp(hl)
-        XREF    cleanup		; cleanup before program exit
+	XREF    l_dcal		; jp(hl)
+	XREF    cleanup		; cleanup before program exit
 
 
-        LIB     l_jphl        ; another jp(hl)
-        LIB     l_jpix        ; jp(ix)
-        LIB     l_jpiy        ; jp(iy)
+	LIB     l_jphl        ; another jp(hl)
+	LIB     l_jpix        ; jp(ix)
+	LIB     l_jpiy        ; jp(iy)
         
 
 ;------------------------------------
@@ -32,52 +32,54 @@
 
 	LIB    l_getptr		;Get 3 byte pointer
 	LIB    l_putptr		;Put 3 byte pointer
-        LIB    l_gchar		;Get signed char
-        LIB    l_sxt		;Sign extend char
-        LIB    l_gint		;Get int
+	LIB    l_gchar		;Get signed char
+	LIB    l_gcharsp	;Get signed char
+	LIB    l_sxt		;Sign extend char
+	LIB    l_gint		;Get int
+	LIB    l_gintsp		;Get int and push
 	LIB    l_gint_eq	;Get int and test == 0
 	LIB    l_ghtonsint	;Get reverse order int
-        LIB    l_pint		;Put int
+	LIB    l_pint		;Put int
 	LIB    l_pint_eq	;Put int and test == 0
 	LIB    l_pint_pop	;Put int and pop place address
 	LIB    l_pint_ex	;Put int hl to addr de return addr in hl
-        LIB    l_or		;Int logical or
-        LIB    l_xor		;Int logical xor
-        LIB    l_and		;Int logical and
-        LIB    l_eq		;Int equality
-        LIB    l_ne		;Int inequality
-        LIB    l_gt		;Int signed >
-        LIB    l_le		;Int signed <=
-        LIB    l_ge		;Int signed >=
-        LIB    l_lt		;Int signed <
-        LIB    l_uge		;Int unsigned >=
-        LIB    l_ult		;Int unsigned <
-        LIB    l_ugt		;Int unsigned >
-        LIB    l_ule		;Int unsigned <=
-        LIB    l_cmp		;Int signed compare
-        LIB    l_ucmp		;Int unsigned compare
-        LIB    l_asr		;Int signed >>
+	LIB    l_or		;Int logical or
+	LIB    l_xor		;Int logical xor
+	LIB    l_and		;Int logical and
+	LIB    l_eq		;Int equality
+	LIB    l_ne		;Int inequality
+	LIB    l_gt		;Int signed >
+	LIB    l_le		;Int signed <=
+	LIB    l_ge		;Int signed >=
+	LIB    l_lt		;Int signed <
+	LIB    l_uge		;Int unsigned >=
+	LIB    l_ult		;Int unsigned <
+	LIB    l_ugt		;Int unsigned >
+	LIB    l_ule		;Int unsigned <=
+	LIB    l_cmp		;Int signed compare
+	LIB    l_ucmp		;Int unsigned compare
+	LIB    l_asr		;Int signed >>
 	LIB    l_asr_u		;Int unsigned >>
-        LIB    l_asl		;Int <<
-        LIB    l_sub		;Int subtract
-        LIB    l_neg		;Int negate
-        LIB    l_com		;Int ~
-        LIB    l_lneg		;Int logical negate
-        LIB    l_bool		;Int boolean tetst
-        LIB    l_cm_de		;
-        LIB    l_cm_bc
-        LIB    l_deneg
-        LIB    l_bcneg
-        LIB    l_case		;Integer case
-        LIB    l_mult		;Integer *
-        LIB    l_div		;Integer signed /
-        LIB    l_div_u		;Integer unsigned /
+	LIB    l_asl		;Int <<
+	LIB    l_sub		;Int subtract
+	LIB    l_neg		;Int negate
+	LIB    l_com		;Int ~
+	LIB    l_lneg		;Int logical negate
+	LIB    l_bool		;Int boolean tetst
+	LIB    l_cm_de		;
+	LIB    l_cm_bc
+	LIB    l_deneg
+	LIB    l_bcneg
+	LIB    l_case		;Integer case
+	LIB    l_mult		;Integer *
+	LIB    l_div		;Integer signed /
+	LIB    l_div_u		;Integer unsigned /
 
 ;------------------
 ;Long functions now
 ;------------------
 
-	LIB	lpush2		;Push a long under the stack
+	LIB     lpush2		;Push a long under the stack
 	LIB     l_int2long_s	;Int->long signed conversion
 	LIB     l_long2int_s	;Long->int signed conversion
 	LIB     l_glong		;Get long
@@ -135,9 +137,9 @@
 	LIB	minusfa		;FA=-FA
 
 	LIB	dswap		;Exchange FA with top of stack
-        LIB   	float		;Convert int to float
+	LIB   	float		;Convert int to float
 	LIB   	ufloat		;unsigned int to float
-        LIB   	ifix		;Convert float to int
+	LIB   	ifix		;Convert float to int
 
 	XREF	dstore		;FA->(de)
 	XREF	dload		;FA<-(hl)
@@ -166,3 +168,44 @@
 	LIB	lp_pptr
 
 
+;-------------------
+; Routines for SDCC
+;-------------------
+
+	LIB     __divsint_rrx_s
+	LIB     __divsint_rrx_hds
+	LIB     __divuint_rrx_s
+	LIB     __divuint_rrx_hds
+	LIB     __divsuchar_rrx_s
+	LIB     __divuschar_rrx_s
+	LIB     __divuchar_rrx_s
+	LIB     __divuchar_rrx_hds
+	LIB     __moduchar_rrx_s
+	LIB     __moduchar_rrx_hds
+	LIB     __moduschar_rrx_s
+	LIB     __modsuchar_rrx_s
+    LIB     __modschar_rrx_s
+	LIB     __modschar_rrx_hds
+	LIB     __modsint_rrx_s
+	LIB     __modsint_rrx_hds
+	LIB     __moduint_rrx_s
+	LIB     __moduint_rrx_hds
+	LIB     __get_remainder
+	LIB     __divunsigned
+    LIB     __div_signexte
+	LIB     __divu16
+	LIB     __div16
+	LIB     __div8
+	LIB     __muluchar_rrx_s
+	LIB     __muluchar_rrx_hds
+	LIB     __mulsuchar_rrx_s
+	LIB     __muluschar_rrx_s
+	LIB     __mulschar_rrx_s
+	LIB     __mulschar_rrx_hds
+	LIB     __mulint_rrx_s
+	LIB     __mulint_rrx_hds
+	LIB     __mul16
+	LIB    	__rrulong_rrx_s
+	LIB    	__rrslong_rrx_s
+	LIB    	__rlslong_rrx_s
+	LIB    	__rlulong_rrx_s

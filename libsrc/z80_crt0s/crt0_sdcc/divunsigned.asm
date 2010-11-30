@@ -29,6 +29,7 @@
         ;; Originally from GBDK by Pascal Felber.
 
 	XLIB __divuint_rrx_s
+	XDEF __divuchar_rrx_s
 	XDEF __divuchar_rrx_hds
 	XDEF __divu8
 	XDEF __divuint_rrx_hds

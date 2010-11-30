@@ -1146,7 +1146,6 @@
 	push	hl
 =
 	ld	hl,%1	;const
-	LIB l_gintsp
 	call	l_gintsp	;
 
 	ld	hl,%1	;const
@@ -1155,13 +1154,7 @@
 	push	hl
 =
 	ld	hl,%1	;const
-	LIB l_gcharsp
 	call	l_gcharsp	;
-
-	call	__%1
-=
-	LIB	__%1
-	call		__%1
 
 	.optsdcc %1
 =

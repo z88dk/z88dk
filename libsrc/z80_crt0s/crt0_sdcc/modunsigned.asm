@@ -32,7 +32,6 @@
 	LIB __divunsigned
         LIB __divu8
         LIB  __divu16
-	XDEF __moduint_rrx_s
 	XDEF __moduint_rrx_hds
 
 

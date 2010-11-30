@@ -12,19 +12,19 @@
 ;
 ;	(Used by asxxx)
 ;
-;	$Id: z80_crt0.hdx,v 1.4 2005-08-27 00:10:09 aralbrec Exp $
+;	$Id: z80_crt0.hdx,v 1.5 2010-11-30 16:23:12 stefano Exp $
 
-        .globl    base_graphics	; Address of graphics screen
+	.globl    base_graphics	; Address of graphics screen
 
 	.globl	_cpfar2near	; Far->near conversion (z88)
 	.globl	packintrout	; Process interrupt (z88 apps)
 
-        .globl    l_dcal		; jp(hl)
-        .globl    cleanup		; cleanup before program exit
+	.globl    l_dcal		; jp(hl)
+	.globl    cleanup		; cleanup before program exit
 
-        .globl    l_jphl
-        .globl    l_jpix
-        .globl    l_jpiy
+	.globl    l_jphl
+	.globl    l_jpix
+	.globl    l_jpiy
 
 ;------------------------------------
 ; Scopes for integer library routines
@@ -32,46 +32,48 @@
 
 	.globl    l_getptr		;Get 3 byte pointer
 	.globl    l_putptr		;Put 3 byte pointer
-        .globl    l_gchar		;Get signed char
-        .globl    l_sxt		;Sign extend char
-        .globl    l_gint		;Get int
+	.globl    l_gchar		;Get signed char
+	.globl    l_gcharsp		;Get signed char
+	.globl    l_sxt		;Sign extend char
+	.globl    l_gint		;Get int
+	.globl    l_gintsp		;Get int
 	.globl    l_gint_eq	;Get int and test == 0
 	.globl    l_ghtonsint	;Get reverse order int
-        .globl    l_pint		;Put int
+	.globl    l_pint		;Put int
 	.globl    l_pint_eq	;Put int and test == 0
 	.globl    l_pint_pop	;Put int and pop place address
 	.globl    l_pint_ex	;Put int hl to addr de return addr in hl
-        .globl    l_or		;Int logical or
-        .globl    l_xor		;Int logical xor
-        .globl    l_and		;Int logical and
-        .globl    l_eq		;Int equality
-        .globl    l_ne		;Int inequality
-        .globl    l_gt		;Int signed >
-        .globl    l_le		;Int signed <=
-        .globl    l_ge		;Int signed >=
-        .globl    l_lt		;Int signed <
-        .globl    l_uge		;Int unsigned >=
-        .globl    l_ult		;Int unsigned <
-        .globl    l_ugt		;Int unsigned >
-        .globl    l_ule		;Int unsigned <=
-        .globl    l_cmp		;Int signed compare
-        .globl    l_ucmp		;Int unsigned compare
-        .globl    l_asr		;Int signed >>
+	.globl    l_or		;Int logical or
+	.globl    l_xor		;Int logical xor
+	.globl    l_and		;Int logical and
+	.globl    l_eq		;Int equality
+	.globl    l_ne		;Int inequality
+	.globl    l_gt		;Int signed >
+	.globl    l_le		;Int signed <=
+	.globl    l_ge		;Int signed >=
+	.globl    l_lt		;Int signed <
+	.globl    l_uge		;Int unsigned >=
+	.globl    l_ult		;Int unsigned <
+	.globl    l_ugt		;Int unsigned >
+	.globl    l_ule		;Int unsigned <=
+	.globl    l_cmp		;Int signed compare
+	.globl    l_ucmp		;Int unsigned compare
+	.globl    l_asr		;Int signed >>
 	.globl    l_asr_u		;Int unsigned >>
-        .globl    l_asl		;Int <<
-        .globl    l_sub		;Int subtract
-        .globl    l_neg		;Int negate
-        .globl    l_com		;Int ~
-        .globl    l_lneg		;Int logical negate
-        .globl    l_bool		;Int boolean tetst
-        .globl    l_cm_de		;
-        .globl    l_cm_bc
-        .globl    l_deneg
-        .globl    l_bcneg
-        .globl    l_case		;Integer case
-        .globl    l_mult		;Integer *
-        .globl    l_div		;Integer signed /
-        .globl    l_div_u		;Integer unsigned /
+	.globl    l_asl		;Int <<
+	.globl    l_sub		;Int subtract
+	.globl    l_neg		;Int negate
+	.globl    l_com		;Int ~
+	.globl    l_lneg		;Int logical negate
+	.globl    l_bool		;Int boolean tetst
+	.globl    l_cm_de		;
+	.globl    l_cm_bc
+	.globl    l_deneg
+	.globl    l_bcneg
+	.globl    l_case		;Integer case
+	.globl    l_mult		;Integer *
+	.globl    l_div		;Integer signed /
+	.globl    l_div_u		;Integer unsigned /
 
 ;------------------
 ;Long functions now
@@ -181,4 +183,45 @@
 	.globl	lp_plong
 	.globl	lp_pptr
 
+;-------------------
+; Routines for SDCC
+;-------------------
+
+	.globl     __divsint_rrx_s
+	.globl     __divsint_rrx_hds
+	.globl     __divuint_rrx_s
+	.globl     __divuint_rrx_hds
+	.globl     __divsuchar_rrx_s
+	.globl     __divuschar_rrx_s
+	.globl     __divuchar_rrx_s
+	.globl     __divuchar_rrx_hds
+	.globl     __moduchar_rrx_s
+	.globl     __moduchar_rrx_hds
+	.globl     __moduschar_rrx_s
+	.globl     __modsuchar_rrx_s
+    .globl     __modschar_rrx_s
+	.globl     __modschar_rrx_hds
+	.globl     __modsint_rrx_s
+	.globl     __modsint_rrx_hds
+	.globl     __moduint_rrx_s
+	.globl     __moduint_rrx_hds
+	.globl     __get_remainder
+	.globl     __divunsigned
+    .globl     __div_signexte
+	.globl     __divu16
+	.globl     __div16
+	.globl     __div8
+	.globl     __muluchar_rrx_s
+	.globl     __muluchar_rrx_hds
+	.globl     __mulsuchar_rrx_s
+	.globl     __muluschar_rrx_s
+	.globl     __mulschar_rrx_s
+	.globl     __mulschar_rrx_hds
+	.globl     __mulint_rrx_s
+	.globl     __mulint_rrx_hds
+	.globl     __mul16
+	.globl     __rrulong_rrx_s
+	.globl     __rrslong_rrx_s
+	.globl     __rlslong_rrx_s
+	.globl     __rlulong_rrx_s
 

@@ -2188,3 +2188,35 @@
 	dec	(hl)
 	ld	h,(hl)
 	ld	l,a
+
+	jp	%1
+.%2
+	jp	%1
+.%3
+=
+.%2
+	jp	%1
+.%3
+
+	jp	z,%1
+	jp	%2
+.%1
+=
+	jp	nz,%2
+.%1
+
+	jp	%1
+.%2
+.%1
+=
+.%2
+.%1
+
+	ld	hl,%1	;const
+	ld	(%2),hl
+	ld	hl,%1	;const
+	ld	(%3),hl
+=
+	ld	hl,%1	;const
+	ld	(%2),hl
+	ld	(%3),hl
