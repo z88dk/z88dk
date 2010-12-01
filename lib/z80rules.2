@@ -1158,5 +1158,32 @@
 
 	.optsdcc %1
 =
-	; SDCC option %1
-INCLUDE "zcc_opt.def"
+	; SDCC options: %1
+	INCLUDE "zcc_opt.def"
+	INCLUDE "z80_crt0.hdr"
+
+	ld	hl,%1
+	ld	(hl),%2
+	ld	hl,0x0001 + %1
+=
+	ld	hl,%1
+	ld	(hl),%2
+	inc	hl
+
+._main%1
+._main%2
+=
+; Z88DK moved the 'main' before 'GSINIT'
+
+; global & static %1
+=
+._main
+
+	ld	hl,%0	;const
+	ld	(%1),hl
+	ld	hl,%0	;const
+	ld	(%2),hl
+=
+	ld	hl,%0	;const
+	ld	(%1),hl
+	ld	(%2),hl
