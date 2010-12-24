@@ -6,7 +6,7 @@
 ; TS2068 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.1 2010-11-23 15:45:33 stefano Exp $
+; $Id: w_putsprite.asm,v 1.2 2010-12-24 11:59:35 stefano Exp $
 ;
 
         XLIB    putsprite

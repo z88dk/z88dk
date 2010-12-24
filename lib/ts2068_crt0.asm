@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.11 2010-11-25 13:46:39 stefano Exp $
+;       $Id: ts2068_crt0.asm,v 1.12 2010-12-24 11:59:35 stefano Exp $
 ;
 
 
@@ -57,7 +57,7 @@
         
         IF      !myzorg
         IF (startup=2)
-                defc    myzorg  = 35000
+                defc    myzorg  = 40000
         ELSE
                 defc    myzorg  = 32768
         ENDIF
@@ -354,6 +354,8 @@ ENDIF
 ;-----------
 coords:         defw    0       ; Current graphics xy coordinates
 base_graphics:  defw    0       ; Address of the Graphics map
+                                ; probably unusef, but we keep it to extend
+                                ; COORDS for the 'wide' mode
 
 IF !DEFINED_HAVESEED
                 XDEF    _std_seed        ;Integer rand() seed

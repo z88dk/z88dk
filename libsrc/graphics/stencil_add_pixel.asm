@@ -11,7 +11,7 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: stencil_add_pixel.asm,v 1.1 2009-04-15 21:00:58 stefano Exp $
+;	$Id: stencil_add_pixel.asm,v 1.2 2010-12-24 11:59:35 stefano Exp $
 ;
 
 ; registers changed after return:
@@ -23,7 +23,6 @@
 
                 XLIB    stencil_add_pixel
                 XDEF	stencil_ptr
-                XREF	gfx_area
                 XREF	COORDS
 
 .stencil_ptr	defw	0

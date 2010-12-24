@@ -5,7 +5,7 @@
 
         INCLUDE "graphics/grafix.inc"
 ;
-;       $Id: w_pixladdr.asm,v 1.2 2010-11-24 18:00:21 stefano Exp $
+;       $Id: w_pixladdr.asm,v 1.3 2010-12-24 11:59:35 stefano Exp $
 ;
 ; ******************************************************************
 ; Get absolute  pixel address in map of virtual (x,y) coordinate.

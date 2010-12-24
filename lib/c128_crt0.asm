@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.14 2009-06-22 21:20:05 dom Exp $
+;	$Id: c128_crt0.asm,v 1.15 2010-12-24 11:59:35 stefano Exp $
 ;
 
 
@@ -175,26 +175,26 @@ exitcount:
 
 ; Heap stuff
 
-heaplast:	defw	0
-heapblocks:	defw	0
+heaplast:       defw	0
+heapblocks:     defw	0
 
 
 ; Graph
 
 coords:         defw    0       ; Current graphics xy coordinates
-		defw	0
+                defw	0
 _vdcDispMem:
 base_graphics:  defw    $2000   ; Address of the Graphics map
 
 
 IF DEFINED_NEED1bitsound
-snd_tick:	defb	0	; Sound variable
+snd_tick:       defb	0	; Sound variable
 ENDIF
 
 ; mem stuff
 
-         defm  "Small C+ C128"
-	 defb  0
+                defm  "Small C+ C128"
+                defb  0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

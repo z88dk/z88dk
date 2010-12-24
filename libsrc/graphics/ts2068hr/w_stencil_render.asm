@@ -15,14 +15,15 @@
 
 	XLIB	stencil_render
 	LIB	dither_pattern
+	;LIB	l_cmp
 
 	;LIB swapgfxbk
-	LIB pixeladdress
+	LIB w_pixeladdress
 	LIB leftbitmask, rightbitmask
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.4 2010-12-24 11:59:35 stefano Exp $
+;	$Id: w_stencil_render.asm,v 1.1 2010-12-24 11:59:35 stefano Exp $
 ;
 
 .stencil_render
@@ -31,58 +32,92 @@
 
 		;call	swapgfxbk
 
-		ld	c,maxy
+		ld	bc,maxy
 		push	bc
 .yloop		pop	bc
-		dec	c
+		dec	bc
+		ld	a,b
+		and	c
+		cp 255
 		;jp	z,swapgfxbk1
 		ret	z
 		push	bc
 		
-		ld	d,0
+		ld	d,b
 		ld	e,c
 
 		ld	l,(ix+2)	; stencil
 		ld	h,(ix+3)
-		add	hl,de
-		ld	a,(hl)		;X1
+
+		;push hl
+		add	hl,bc
+		add	hl,bc
+;;;		ld	a,(hl)		;X1
+		ld	e,(hl)
+		inc hl
+		ld	d,(hl)
+		dec hl
+		;ex	(sp),hl
+
+		ld	a,d			; check left side for current Y position..
+		and	e
+		cp	127
+		jr	z,yloop		; ...loop if nothing to be drawn
 		
-		ld	e,maxy
-		add	hl,de
-		cp	(hl)		; if x1>x2, return
-		jr	nc,yloop
-		
-					; C still holds Y
-		push	af		; X1
+		ld	bc,maxy*2
+		add	hl,bc
 		ld	a,(hl)
-		ld	b,a		; X2
+		inc hl
+		ld	h,(hl)
+		ld	l,a
+		;ex	(sp),hl		;X2 <-> X1
+
+;		cp	(hl)		; if x1>x2, return
+;		jr	nc,yloop
+
+		;call	l_cmp	; [carry set if DE < HL]
+		pop bc
+		push bc
+
+		push hl
+		
+		;			; C still holds Y
+		;push	af		; X1
+		;ld	a,(hl)
+		;ld	b,a		; X2
 		
 		ld	a,(ix+0)	; intensity
+		push de		; X1
 		call	dither_pattern
+		pop hl		; X1
 		ld	(pattern1+1),a
 		ld	(pattern2+1),a
 
-			pop	af
-			ld	h,a	; X1
-			ld	l,c	; Y
+		;	pop	af
+		;	ld	h,a	; X1
+		;	ld	l,c	; Y
 			
 			push	bc
-			call	pixeladdress		; bitpos0 = pixeladdress(x,y)
+			ld	d,b
+			ld	e,c
+			call	w_pixeladdress		; bitpos0 = pixeladdress(x,y)
 			call	leftbitmask		; LeftBitMask(bitpos0)
 			pop	bc
-			push	de			
 			
 			ld	h,d
 			ld	l,e
-
 			call	mask_pattern
-			push	af
+			ex	(sp),hl	; X2 <-> adr0
+			push	af	; mask
 			;ld	(hl),a
 			
-			ld	h,b		; X2
-			ld	l,c		; Y
+			;ld	h,b		; X2
+			;ld	l,c		; Y
+			
+			ld	d,b
+			ld	e,c
 
-			call	pixeladdress		; bitpos1 = pixeladdress(x+width-1,y)
+			call	w_pixeladdress		; bitpos1 = pixeladdress(x+width-1,y)
 			call	rightbitmask		; RightBitMask(bitpos1)
 			ld	(bitmaskr+1),a		; bitmask1 = LeftBitMask(bitpos0)
 
@@ -92,13 +127,6 @@
 			ex	de,hl
 			and	a
 			sbc	hl,de
-
-			;rr	h
-			;rr	l
-			;rr	h
-			;rr	l
-			;rr	h
-			;rr	l
 
 			jr	z,onebyte	; area is within the same address...
 
@@ -110,7 +138,17 @@
 			ld	(hl),a			; (offset) = (offset) AND bitmask0
 
 			;add	hl,de
-			inc	hl			; offset += 1 (8 bits)
+
+			;inc	hl			; offset += 1 (8 bits)
+         ex     af,af
+         ld     a,h
+         xor    @00100000
+         cp     h
+         ld     h,a
+         jp     nc,gonehi
+         inc	hl
+.gonehi
+         ex     af,af
 
 .pattern2			ld	a,0
 				dec	b
@@ -119,7 +157,16 @@
 .fill_row_loop							; do
 				ld	(hl),a			; (offset) = pattern
 				;add	hl,de
-				inc	hl			; offset += 1 (8 bits)
+				;inc	hl			; offset += 1 (8 bits)
+         ex     af,af
+			 ld     a,h
+			 xor    @00100000
+			 cp     h
+			 ld     h,a
+			 jp     nc,gonehi2
+			 inc	hl
+.gonehi2
+         ex     af,af
 				djnz	fill_row_loop		; while ( r-- != 0 )
 
 
@@ -127,7 +174,7 @@
 			call	mask_pattern
 			ld	(hl),a
 
-			jr	yloop
+			jp	yloop
 
 
 .onebyte	pop	hl

@@ -7,7 +7,7 @@
 	XREF	COORDS
 
 ;
-;	$Id: w_line.asm,v 1.1 2008-07-17 15:39:56 stefano Exp $
+;	$Id: w_line.asm,v 1.2 2010-12-24 11:59:35 stefano Exp $
 ;
 
 ; ******************************************************************************
@@ -24,9 +24,9 @@
 		or	a
 		sbc	hl,bc
 		ex	de,hl
-		
+
 		ld	bc,(COORDS)
 		or	a
-		sbc	hl,bc		
-
+		sbc	hl,bc
+.nocrossx
 		jp	w_line_r
