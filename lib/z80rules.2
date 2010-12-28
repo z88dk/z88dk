@@ -1144,17 +1144,21 @@
 	add	hl,sp
 	call	l_gint	;
 	push	hl
+	ld	hl,%2	;const
 =
 	ld	hl,%1	;const
 	call	l_gintsp	;
+	ld	hl,%2	;const
 
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gchar
 	push	hl
+	ld	hl,%2	;const
 =
 	ld	hl,%1	;const
 	call	l_gcharsp	;
+	ld	hl,%2	;const
 
 	.optsdcc %1
 =

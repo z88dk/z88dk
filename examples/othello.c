@@ -1,5 +1,5 @@
 /*
- *   $Id: othello.c,v 1.3 2010-10-29 10:20:17 stefano Exp $
+ *   $Id: othello.c,v 1.4 2010-12-28 06:55:29 stefano Exp $
  * 
  *   z88dk port of the 'historical' game by Leor Zolman
  *
@@ -15,7 +15,8 @@
  *
  *   Examples on how to compile in graphics mode:
  *   zcc +zx -lndos -create-app -zorg=50000 -DGRAPHICS othello.c
- *   zcc +zx81ansi -startup=3 -create-app -DGRAPHICS -lgfx81hr192 othello.c
+ *   zcc +zx81ansi -startup=4 -create-app -DGRAPHICS -lgfx81hr192 othello.c
+ *   zcc +zx81ansi -startup=6 -create-app -DSMALLGRAPHICS -lgfx81hr64 othello.c
  * 
  */
 
@@ -79,7 +80,6 @@ commands may be typed:
 */
 
 /* Declare GFX bitmap location for the expanded ZX81 */
-#pragma output hrgpage = 36096
 
 
 #define BLACK '*'
@@ -91,7 +91,14 @@ commands may be typed:
 #include <ctype.h>
 #include <stdlib.h>
 #include <time.h>   /* Needed just for srand seed */
+
 #ifdef GRAPHICS
+#include <graphics.h>
+#include <games.h>
+#pragma output hrgpage = 36096
+#endif
+
+#ifdef SMALLGRAPHICS
 #include <graphics.h>
 #include <games.h>
 #endif
@@ -199,6 +206,59 @@ char numbers[] = {
 #endasm
 #endif
 
+#ifdef SMALLGRAPHICS
+
+extern char whitepiece[];
+extern char blackpiece[];
+extern char frame[];
+
+char numbers[] = {
+        3, 5, 0xE0 , 0xA0 , 0xA0 , 0xA0 , 0xE0,
+        3, 5, 0x40 , 0x40 , 0x40 , 0x40 , 0x40,
+        3, 5, 0xE0 , 0x20 , 0xE0 , 0x80 , 0xE0,
+        3, 5, 0xE0 , 0x20 , 0xE0 , 0x20 , 0xE0,
+        3, 5, 0xA0 , 0xA0 , 0xE0 , 0x20 , 0x20,
+        3, 5, 0xE0 , 0x80 , 0xE0 , 0x20 , 0xE0,
+        3, 5, 0xE0 , 0x80 , 0xE0 , 0xA0 , 0xE0,
+        3, 5, 0xE0 , 0x20 , 0x20 , 0x20 , 0x20,
+        3, 5, 0xE0 , 0xA0 , 0xE0 , 0xA0 , 0xE0,
+        3, 5, 0xE0 , 0xA0 , 0xE0 , 0x20 , 0xE0 };
+
+
+#asm
+
+._frame
+ defb    6,5
+ defb    @00000100
+ defb    @00000000
+ defb    @00000100
+ defb    @00000000
+ defb    @01010100
+
+._whitepiece
+ defb    4,4
+ defb    @01100000
+ defb    @10010000
+ defb    @10010000
+ defb    @01100000
+
+._blackpiece
+ defb    4,4
+ defb    @01100000
+ defb    @11110000
+ defb    @11110000
+ defb    @01100000
+ 
+#endasm
+#endif
+
+/*
+void shift_right()
+{
+	printf("%c[%uC",27,17);
+}
+*/
+
 char skipbl()
 {
 	char c;
@@ -271,26 +331,48 @@ void clrbrd(char b[64])
 void prtbrd(char b[64])
 {
 	int i,j;
+#define TEXT 1
 #ifdef GRAPHICS
+#undef TEXT
 	clg();
-	printf("%c\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",12);
-	for (i=0; i<8; i++)
-		putsprite(spr_or,16+i*16,2,&numbers[(i+1)*7]);
+	printf("%c",12);
 	for (i=0; i<8; i++) {
-		putsprite(spr_or,2,16+i*16,&numbers[(i+1)*7]);
+		putsprite(spr_or,127+i*16,2,&numbers[(i+1)*7]);
+		putsprite(spr_or,112,16+i*16,&numbers[(i+1)*7]);
 		for (j=0; j<8; j++) {
-			putsprite(spr_or,10+i*16,10+j*16,frame);
+			putsprite(spr_or,120+i*16,10+j*16,frame);
 			switch(b[i*8+j]) {
 				case BLACK:
-					putsprite(spr_or,10+j*16,10+i*16,blackpiece);
+					putsprite(spr_or,120+j*16,10+i*16,blackpiece);
 					break;
 				case WHITE:
-					putsprite(spr_or,10+j*16,10+i*16,whitepiece);
+					putsprite(spr_or,120+j*16,10+i*16,whitepiece);
 					break;
 			}
 		 }
 	 }
-#else
+#endif
+#ifdef SMALLGRAPHICS
+#undef TEXT
+	printf ("%c",12);
+
+	for (i=0; i<8; i++) {
+		putsprite(spr_or,157+i*7,0,&numbers[(i+1)*7]);
+		putsprite(spr_or,151,6+i*7,&numbers[(i+1)*7]);
+		for (j=0; j<8; j++) {
+			putsprite(spr_or,155+i*7,7+j*7,frame);
+			switch(b[i*8+j]) {
+				case BLACK:
+					putsprite(spr_or,155+j*7,6+i*7,blackpiece);
+					break;
+				case WHITE:
+					putsprite(spr_or,155+j*7,6+i*7,whitepiece);
+					break;
+			}
+		 }
+	 }
+#endif
+#ifdef TEXT
 	printf("   1 2 3 4 5 6 7 8\n");
 	for (i=0; i<8; i++) {
 		printf(" %u",i+1);
@@ -317,6 +399,7 @@ char getmov(int *i, int *j)
 	int n;
 	char *p;
 	/* char skipbl(); */
+	//shift_right();
 	if (selfplay == 'G') {
 		if (getk()==0) return 'G';
 		selfplay = ' ';
@@ -521,15 +604,16 @@ int game(char b[64],int n)
 	handicap = 0;
 	selfplay = ' ';
 	ff=0;
-
+	
 	if (mefirst) {
 		mine = BLACK; his = WHITE;
-		printf("\nI go first:\n\n");
+		printf("I go first:\n");
 	}
 	else {
 		mine = WHITE; his = BLACK;
-		printf("\nYou go first:\n\n");
+		printf("You go first:\n");
 	}
+
 
 	while(1) {
 		if (cntbrd(b,EMPTY)==0) return 'D';
@@ -573,7 +657,7 @@ int game(char b[64],int n)
 			printf ("Illegal!\n");
 			continue;
 			 }
-			else printf(!mefirst ? "Forfeit" :
+			else  printf(!mefirst ? "Forfeit" :
 						 "   ...Forfeit\n");
 		}
 Istart:		if (cntbrd(b,EMPTY) == 0) return 'D';
@@ -599,6 +683,7 @@ int main()
 {
 	char b[64];
 	int i;
+
 /*
 	h[0][0] = h[0][1] = h[2][0] = h[3][1] = 0;
 	h[1][0] = h[1][1] = h[2][1] = h[3][0] = 7;
@@ -607,8 +692,8 @@ int main()
 	h[0] = h[1] = h[4] = h[7] = 0;
 	h[2] = h[3] = h[5] = h[6] = 7;
 
-	printf("%c\nWelcome to the OTHELLO program!\n",12);
-	printf("\nNote: BLACK always goes first...Good luck!!!\n\n");
+	printf("%c\nWelcome to the %c[7m OTHELLO %c[27m program!\n",12,27,27);
+	printf("\nNote: %c[4m BLACK ALWAYS GOES FIRST %c[24m ...Good luck!!!\n\n\n",27,27);
 
 	printf("Do you want to go first? ");
 	if (toupper(getchar()) == 'Y') 
@@ -620,7 +705,7 @@ int main()
 
 	do {
 		clrbrd(b);
-		printf("\n\n");
+		printf("\n");
 		prtbrd(b);
 		i = game(b,4);
 		mefirst = !mefirst;
