@@ -7,7 +7,7 @@
    in a C source data declaration to be used
    in z88dk with the "draw_profile" function.
 
-   $Id: z80svg.c,v 1.8 2010-01-13 14:15:06 stefano Exp $
+   $Id: z80svg.c,v 1.9 2011-01-14 14:20:13 stefano Exp $
 */
 
 
@@ -17,7 +17,7 @@
 #include <math.h>
 #include <libxml/parser.h>
 
-#include "../include/gfxprofile.h"
+#include "../../include/gfxprofile.h"
 //#include "gfxprofile.h"
 
 //#ifdef LIBXML_READER_ENABLED

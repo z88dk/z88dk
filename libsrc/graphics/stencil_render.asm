@@ -22,7 +22,7 @@
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.4 2010-12-24 11:59:35 stefano Exp $
+;	$Id: stencil_render.asm,v 1.5 2011-01-14 14:20:13 stefano Exp $
 ;
 
 .stencil_render
@@ -92,13 +92,6 @@
 			ex	de,hl
 			and	a
 			sbc	hl,de
-
-			;rr	h
-			;rr	l
-			;rr	h
-			;rr	l
-			;rr	h
-			;rr	l
 
 			jr	z,onebyte	; area is within the same address...
 

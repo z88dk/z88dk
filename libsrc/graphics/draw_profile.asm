@@ -5,7 +5,7 @@
 ;
 ;		void draw_profile(int dx, int dy, int scale, unsigned char *metapic);
 ;
-;	$Id: draw_profile.asm,v 1.4 2009-12-02 13:20:59 stefano Exp $
+;	$Id: draw_profile.asm,v 1.5 2011-01-14 14:20:13 stefano Exp $
 ;
 
 
@@ -66,6 +66,9 @@ getbyte:
 
 getx:
 	ld	hl,(_vx)
+IF (maxx > 256)
+	add hl,hl	; double size for X in wide mode !
+ENDIF
 	call getparm
 	ret
 
@@ -111,7 +114,11 @@ draw_profile:
 	ld	l,(ix+8)
 	ld	(_vx),hl
 	
+IF (maxx > 256)
+	ld      hl,-maxy*4	; create space for stencil on stack
+ELSE
 	ld      hl,-maxy*2	; create space for stencil on stack
+ENDIF
 	add     hl,sp		; The stack usage depends on the display height.
 	ld      sp,hl
 	ld		(_stencil),hl
@@ -131,7 +138,11 @@ norepeat:
 	;******
 	; EXIT
 	;******
+IF (maxx > 256)
+	ld      hl,maxy*4	; release the stack space for _stencil
+ELSE
 	ld      hl,maxy*2	; release the stack space for _stencil
+ENDIF
 	add     hl,sp
 	ld      sp,hl
 	ret
@@ -199,7 +210,7 @@ noclsamode:
 	sub 12
 	jr	c,doclose
 	; if color > 11 we roughly leave a black border by shrinking
-	; the stencil boudaries, then we subtract 7 and fill with the
+	; the stencil boundaries, then we subtract 7 and fill with the
 	; resulting dithering level (12..15 -> 4..7)
 	ld	l,11	; black border
 	push hl
@@ -358,7 +369,11 @@ plend2:
 
 	push hl
 	ld hl,(_stencil)	; adjust the right side
+IF (maxx > 256)
+	ld	de,maxy*2
+ELSE
 	ld	de,maxy
+ENDIF
 	add	hl,de
 	ld e,1				; 1 bit larger
 	call resize
@@ -437,6 +452,15 @@ nolblack:
 ;
 
 resize:
+
+IF (maxx > 256)
+
+	;LIB  l_cmp
+	; TODO
+	ret
+
+ELSE
+
 	ld b,maxy-1
 rslp:
 	ld a,(hl)
@@ -450,6 +474,8 @@ slimit:
 	inc hl
 	djnz rslp
 	ret
+
+ENDIF
 
 ; NZ if we have prepared a ptr for two-pass mode
 is_areamode:
