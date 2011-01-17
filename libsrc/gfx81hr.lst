@@ -11,6 +11,7 @@ graphics/fill
 graphics/dfill2
 graphics/getsprite
 graphics/putsprite
+graphics/stencil_render
 graphics/bksave
 graphics/bkrestore
 graphics/xorpixl
