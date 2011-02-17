@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.156 2010-11-26 11:37:32 stefano Exp $
+# $Id: Makefile,v 1.157 2011-02-17 20:44:23 stefano Exp $
 
 
 include	Make.config
@@ -15,7 +15,7 @@ include	Make.config
 all:	genlibs	z88libs	tilibs zxlibs \
 	abc80_clib.lib abc80ansi_clib.lib abc800_clib.lib \
 	ace_clib.lib aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
-	c128libs cpclibs cpm_clib.lib einstein.lib gal_clib.lib \
+	c128libs cpclibs cpm_clib.lib einstein.lib enterprise_clib.lib gal_clib.lib \
 	m5_clib.lib msx_clib.lib mtx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib	nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
 	ozansi_clib.lib	pps_clib.lib ppsansi_clib.lib \
@@ -943,7 +943,7 @@ msx_clib.lib:
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lmsx	; cd ..
+	cd games ; $(MAKE) lmsx ; cd ..
 	cd msx ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
@@ -959,9 +959,25 @@ mtx_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lmsx	; cd ..
+	cd games ; $(MAKE) lmsx ; cd ..
 	cd msx ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
+
+# Enterprise library - Stefano
+enterprise_clib.lib:
+	@echo ''
+	@echo '--- Building Enterprise 64/128 Library ---'
+	@echo ''
+	$(MAKE)	msxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd	..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	cd games ; $(MAKE) lmsx ; cd ..
+	cd msx ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(LISTFILE_DIRECTORY)/enterprise.lst
 
 # Einstein library - Stefano
 einstein.lib:
