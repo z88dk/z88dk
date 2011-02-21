@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.19 2010-07-30 06:18:43 stefano Exp $
+ *   $Id: appmake.h,v 1.20 2011-02-21 21:01:57 stefano Exp $
  */
 
 
@@ -46,6 +46,9 @@ extern option_t  c128_options;
 
 extern int       cpc_exec(char *target);
 extern option_t  cpc_options;
+
+extern int       enterprise_exec(char *target);
+extern option_t  enterprise_options;
 
 extern int       gal_exec(char *target);
 extern option_t  gal_options;
@@ -125,11 +128,14 @@ struct {
       "Creates a BASIC loader file and binary stored in variable array format",
       aquarius_exec,   &aquarius_options },
     { "bin3000",  "c128",      "(C) 2001 Stefano Bodrato",
-      "Creates a bin3000 for binary transfer",
+      "Adds a c128 style disk file header",
       c128_exec,   &c128_options },
     { "bin2cpc",  "cpc",      "(C) 2003 Dominic Morris",
       "Creates an AMSDOS file suitable for writing to a .DSK image",
       cpc_exec,   &cpc_options },
+    { "bin2ep",   "enterprise",      "(C) 2011 Stefano Bodrato",
+      "Adds a type 5 header to make a .app file",
+      enterprise_exec,   &enterprise_options },
     { "bin2gtp",  "gal",      "(C) 2007 - 2008 Tomaz Solc & Stefano Bodrato",
       "Creates a tape file image for the Galaksija micro",
       gal_exec,   &gal_options },
@@ -203,7 +209,7 @@ struct {
       "Generates a .P file suitable for use by emulators, optionally a WAV file",
       zx81_exec,    &zx81_options }
 };
-#define APPMAKE_TARGETS 29
+#define APPMAKE_TARGETS 30
 #endif
 
 
