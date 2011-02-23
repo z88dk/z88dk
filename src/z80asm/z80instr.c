@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.10 2010-04-16 17:34:37 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.11 2011-02-23 16:27:39 stefano Exp $ */
 /* $History: Z80INSTR.C $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -538,6 +538,43 @@ CALLPKG (void)
 	    {
 	      *codeptr++ = constant % 256;	/* 2 byte parameter always */
 	      *codeptr++ = constant / 256;
+	      PC += 2;
+	    }
+	  else
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 4);
+	}
+      RemovePfixlist (postfixexpr);	/* remove linked list, because expr. was evaluated */
+    }
+}
+
+void 
+EXOS (void)
+{
+  long constant;
+  struct expr *postfixexpr;
+
+  *codeptr++ = 255;		/* RST 30H instruction */
+  ++PC;
+
+  if (GetSym () == lparen)
+    GetSym ();			/* Optional parenthesis around expression */
+
+  if ((postfixexpr = ParseNumExpr ()) != NULL)
+    {
+      if (postfixexpr->rangetype & NOTEVALUABLE)
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 2);		/* CALL_OZ like expression must be evaluable */
+      else
+	{
+	  constant = EvalPfixExpr (postfixexpr);
+	  if ((constant > 0) && (constant <= 255))
+	    {
+	      *codeptr++ = constant;	/* 1 byte parameter */
+	      ++PC;
+	    }
+	  else if ((constant > 255) && (constant <= 65535))
+	    {
+	      *codeptr++ = constant & 255;	/* 2 byte parameter */
+	      *codeptr++ = constant >> 8;
 	      PC += 2;
 	    }
 	  else

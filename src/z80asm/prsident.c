@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.15 2010-09-19 00:06:20 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.16 2011-02-23 16:27:39 stefano Exp $ */
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -86,7 +86,7 @@ void DeclSymExtern (char *identifier, unsigned char libtype);
 void DeclModuleName (void);
 void DefSym (void);
 void ifstatement (enum flag interpret);
-void DEFVARS (void), DEFS (void), ORG (void), IncludeFile (void), BINARY (void), CALLOZ (void), CALLPKG (void), FPP (void);
+void DEFVARS (void), DEFS (void), ORG (void), IncludeFile (void), BINARY (void), CALLOZ (void), EXOS (void), CALLPKG (void), FPP (void);
 void ADC (void), ADD (void), DEC (void), IM (void), IN (void), INC (void), INVOKE (void);
 void JR (void), LD (void), OUT (void), RET (void), SBC (void);
 void DEFB (void), DEFC (void), DEFM (void), DEFW (void), DEFL (void), DEFP (void);
@@ -147,96 +147,98 @@ struct Z80sym Z80ident[] = {
  {"BINARY", BINARY},
  {"BIT", BIT},
  {"CALL", CALL},		/* 5 */
+ {"CALL_EXOS", EXOS},
  {"CALL_OZ", CALLOZ},
  {"CALL_PKG", CALLPKG},
  {"CCF", CCF},
- {"CP", CP},
- {"CPD", CPD},			/* 10 */
+ {"CP", CP},			/* 10 */
+ {"CPD", CPD},
  {"CPDR", CPDR},		
  {"CPI", CPI},
  {"CPIR", CPIR},
- {"CPL", CPL},
- {"DAA", DAA},			/* 15 */
+ {"CPL", CPL},			/* 15 */
+ {"DAA", DAA},
  {"DEC", DEC},			
  {"DEFB", DEFB},
  {"DEFC", DEFC},
- {"DEFGROUP", DEFGROUP},
- {"DEFINE", DefSym},		/* 20 */
+ {"DEFGROUP", DEFGROUP},		/* 20 */
+ {"DEFINE", DefSym},
  {"DEFL", DEFL},		
  {"DEFM", DEFM},
  {"DEFP", DEFP},
- {"DEFS", DEFS},
- {"DEFVARS", DEFVARS},		/* 25 */
+ {"DEFS", DEFS},		/* 25 */
+ {"DEFVARS", DEFVARS},
  {"DEFW", DEFW},
  {"DI", DI},			
  {"DJNZ", DJNZ},
- {"EI", EI},
- {"ELSE", ELSEstat},		/* 30 */
- {"ENDIF", ENDIFstat},	
- {"EX", EX},			
- {"EXX", EXX},
+ {"EI", EI},		/* 30 */
+ {"ELSE", ELSEstat},
+ {"ENDIF", ENDIFstat},
+ {"EX", EX},
+ {"EXOS", EXOS},
+ {"EXX", EXX},		/* 35 */
  {"FPP", FPP},
- {"HALT", HALT},		/* 35 */
+ {"HALT", HALT},
  {"IF", IFstat},
- {"IM", IM},			
- {"IN", IN},
+ {"IM", IM},
+ {"IN", IN},	/* 40 */
  {"INC", INC},
- {"INCLUDE", IncludeFile},	/* 40 */
+ {"INCLUDE", IncludeFile},
  {"IND", IND},
  {"INDR", INDR},
- {"INI", INI},
+ {"INI", INI},		/* 45 */
  {"INIR", INIR},
- {"INVOKE", INVOKE},		/* 45 */
+ {"INVOKE", INVOKE},
  {"JP", JP},
  {"JR", JR},
- {"LD", LD},
+ {"LD", LD},		/* 50 */
  {"LDD", LDD},
- {"LDDR", LDDR},		/* 50 */
+ {"LDDR", LDDR},
  {"LDI", LDI},
  {"LDIR", LDIR},
- {"LIB", DeclLibIdent},
+ {"LIB", DeclLibIdent},	/* 55 */
  {"LINE", LINE},
- {"LSTOFF", ListingOff},	/* 55 */
+ {"LSTOFF", ListingOff},
  {"LSTON", ListingOn},
  {"MODULE", DeclModule},
- {"NEG", NEG},
+ {"NEG", NEG},			/* 60 */
  {"NOP", NOP},
- {"OR", OR},			/* 60 */
+ {"OR", OR},
  {"ORG", ORG},
  {"OTDR", OTDR},
- {"OTIR", OTIR},
+ {"OTIR", OTIR},		/* 65 */
  {"OUT", OUT},
- {"OUTD", OUTD},		/* 65 */
+ {"OUTD", OUTD},
  {"OUTI", OUTI},
- {"OZ", CALLOZ},		
- {"POP", POP},
+ {"OZ", CALLOZ},
+ {"POP", POP},			/* 70 */
  {"PUSH", PUSH},
- {"RES", RES},			/* 70 */
+ {"RES", RES},
  {"RET", RET},
  {"RETI", RETI},
- {"RETN", RETN},
+ {"RETN", RETN},			/* 75 */
  {"RL", RL},
- {"RLA", RLA},			/* 75 */
+ {"RLA", RLA},
  {"RLC", RLC},
  {"RLCA", RLCA},
- {"RLD", RLD},
+ {"RLD", RLD},			/* 80 */
  {"RR", RR},
- {"RRA", RRA},			/* 80 */
+ {"RRA", RRA},
  {"RRC", RRC},
  {"RRCA", RRCA},
- {"RRD", RRD},
+ {"RRD", RRD},			/* 85 */
  {"RST", RST},
- {"SBC", SBC},			/* 85 */
+ {"SBC", SBC},
  {"SCF", SCF},
  {"SET", SET},
- {"SLA", SLA},
+ {"SLA", SLA},			/* 90 */
  {"SLL", SLL},
- {"SRA", SRA},			/* 90 */
+ {"SRA", SRA},
  {"SRL", SRL},
  {"SUB", SUB},
- {"UNDEFINE",UnDefineSym},
+ {"UNDEFINE",UnDefineSym},	/* 95 */
  {"XDEF", DeclGlobalIdent},
- {"XLIB", DeclGlobalLibIdent},	/* 95 */
+ {"XLIB", DeclGlobalLibIdent},
  {"XOR", XOR},
  {"XREF", DeclExternIdent}
 };
