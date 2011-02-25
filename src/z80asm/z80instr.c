@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.11 2011-02-23 16:27:39 stefano Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.12 2011-02-25 17:14:43 stefano Exp $ */
 /* $History: Z80INSTR.C $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -553,7 +553,7 @@ EXOS (void)
   long constant;
   struct expr *postfixexpr;
 
-  *codeptr++ = 255;		/* RST 30H instruction */
+  *codeptr++ = 0xF7;		/* RST 30H instruction */
   ++PC;
 
   if (GetSym () == lparen)
@@ -566,7 +566,7 @@ EXOS (void)
       else
 	{
 	  constant = EvalPfixExpr (postfixexpr);
-	  if ((constant > 0) && (constant <= 255))
+	  if ((constant >= 0) && (constant <= 255))
 	    {
 	      *codeptr++ = constant;	/* 1 byte parameter */
 	      ++PC;
