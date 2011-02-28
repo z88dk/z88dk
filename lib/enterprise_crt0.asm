@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 2011
 ;
-;	$Id: enterprise_crt0.asm,v 1.2 2011-02-27 12:01:43 stefano Exp $
+;	$Id: enterprise_crt0.asm,v 1.3 2011-02-28 07:02:02 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -51,12 +51,13 @@
         XDEF    base_graphics   ; Graphical variables
         XDEF    coords          ; Current xy position
 
-		XDEF	__fcb		; file control block
+		XDEF    __fcb		; file control block
 
 ; Enterprise 64/128 specific stuff
-		XDEF	warmreset
-		XDEF	setEXOSVariables
-		
+		XDEF    warmreset
+		XDEF    setEXOSVariables
+		XDEF    __videoDeviceName
+		XDEF    __keyboardDeviceName
 
 IF      !myzorg
 		defc    myzorg  = 100h
@@ -68,7 +69,7 @@ ENDIF
 ; Execution starts here
 ;----------------------
 start:
-IF (!DEFINED_startup | (startup=1))
+IF (startup=2)
 IF !DEFINED_noprotectmsdos
 	; This protection takes little less than 50 bytes
 	defb	$eb,$04		;MS DOS protection... JMPS to MS-DOS message if Intel
@@ -92,7 +93,7 @@ ENDIF
         di
         ld    a, 004h
         out   (0bfh), a
-        ld    sp, 03F00h
+        ld    sp, 07F00h
         ld    a, 0ffh
         out   (0b2h), a
 
@@ -124,14 +125,7 @@ ENDIF
         ld    bc, 00101h                ; @@DISP, from first line
         ld    de, 01901h                ; to line 25, at screen line 1
         rst   30h
-        defb  11						; set 40x35 characters window
-
-        ld    de, __scrinitBegin
-        ld    bc, __scrinitEnd - __scrinitBegin
-
-		ld      a,66h	; output channel (video)
-		rst     30h		; EXOS
-		defb    8		; write block
+        defb  11						; set 40x25 characters window
 
 
 ;        ld      hl,0
@@ -158,7 +152,6 @@ ENDIF
         call    _main
 	
 cleanup:
-;jr cleanup
 ;
 ;       Deallocate memory which has been allocated here!
 ;
@@ -170,8 +163,7 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
-start1:
-;        ld      sp,0
+IF (!DEFINED_startup | (startup=1))
 warmreset:
         ld      sp, 0100h
         ld      a, 0ffh
@@ -190,6 +182,11 @@ warmreset:
 _basiccmd:
         defb    5
         defm    "BASIC"
+ENDIF
+
+start1:
+        ld      sp,0
+        ret
 
 
 l_dcal:
@@ -329,16 +326,3 @@ __videoVariables:
         defb  25, 25                    ; Y_SIZ_VID
         ;defb  27, 0                    ; BORD_VID
         defb  0
-
-__scrinitBegin:
-        ; SET COLOR 7, 2
-;        defb  01bh, 'c', 007h, 002h
-        ; set character
-;        defb  01bh, 'K', 080h
-;        defb  001h, 003h, 006h, 00ch, 018h, 030h, 060h, 0c0h, 080h
-        ; SET INK 5
-;        defb  01bh, 'I', 005h
-        ; set cursor position to 5,6
-;        defb  01bh, '=', 025h, 026h
-        defm  "Dizzy Lord\r\n"
-__scrinitEnd:
