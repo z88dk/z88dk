@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 2011
 ;
-;	$Id: enterprise_crt0.asm,v 1.3 2011-02-28 07:02:02 stefano Exp $
+;	$Id: enterprise_crt0.asm,v 1.4 2011-03-07 06:53:00 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -56,6 +56,7 @@
 ; Enterprise 64/128 specific stuff
 		XDEF    warmreset
 		XDEF    setEXOSVariables
+		XDEF	daveReset
 		XDEF    __videoDeviceName
 		XDEF    __keyboardDeviceName
 
@@ -91,11 +92,18 @@ ENDIF
 
 ; Inspired by the DizzyLord loader by ORKSOFT
         di
-        ld    a, 004h
-        out   (0bfh), a
+        
+IF (!DEFINED_startup | (startup=1))
         ld    sp, 07F00h
-        ld    a, 0ffh
-        out   (0b2h), a
+ENDIF
+        ld    a, 004h
+        out   (0bfh), a		; RAM/frequency/waiting for setting
+
+        ld    a, 0ffh		; system segment
+        out   (0b2h), a	; page 2
+
+;        ld    a,1
+;        out   (0b3h), a	; page 3
 
         ld    c, 060h
         rst   30h
@@ -105,6 +113,15 @@ ENDIF
         call  setEXOSVariables
         halt
         halt
+
+        ld    a, 66h
+        ld    b, 4                      ; @@FONT
+        rst   30h
+        defb  11
+
+        ld    a, 1
+        rst   30h
+        defb  3
 
         ld    a, 66h
         ld    de, __videoDeviceName
@@ -126,6 +143,8 @@ ENDIF
         ld    de, 01901h                ; to line 25, at screen line 1
         rst   30h
         defb  11						; set 40x25 characters window
+        
+        call  daveReset
 
 
 ;        ld      hl,0
@@ -166,16 +185,16 @@ ENDIF
 IF (!DEFINED_startup | (startup=1))
 warmreset:
         ld      sp, 0100h
-        ld      a, 0ffh
-        out     (0b2h), a
+        ld      a, 0ffh		; system segment
+        out     (0b2h), a	; page 2
         ld      c, 60h
         rst		30h
         defb	0
         ld      de, _basiccmd
         rst		30h
         defb	26
-        ld      a, 01h
-        out     (0b3h), a
+        ld      a, 01h		; BASIC ROM
+        out     (0b3h), a	; page 3
         ld      a, 6
         jp      0c00dh
 
@@ -301,6 +320,7 @@ _l1:    ld    b, 1
         rst   30h
         defb  16
         jr    _l1
+
 daveReset:
         push  bc
         xor   a
@@ -320,8 +340,9 @@ __keyboardDeviceName:
         defm  "KEYBOARD:"
 
 __videoVariables:
-       defb  22, 0                      ; MODE_VID
-        defb  23, 2                     ; COLR_VID
+        ;defb  22, 1                      ; MODE_VID = TEXT over graphics
+        defb  22, 0                      ; MODE_VID = true TEXT
+        defb  23, 0                     ; COLR_VID
         defb  24, 40                    ; X_SIZ_VID
         defb  25, 25                    ; Y_SIZ_VID
         ;defb  27, 0                    ; BORD_VID
