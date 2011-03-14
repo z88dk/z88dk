@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.157 2011-02-17 20:44:23 stefano Exp $
+# $Id: Makefile,v 1.158 2011-03-14 11:36:48 stefano Exp $
 
 
 include	Make.config
@@ -968,15 +968,13 @@ enterprise_clib.lib:
 	@echo ''
 	@echo '--- Building Enterprise 64/128 Library ---'
 	@echo ''
-	$(MAKE)	msxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
-	cd games ; $(MAKE) lmsx ; cd ..
-	cd msx ; $(MAKE) ; cd ..
+	cd enterprise ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(LISTFILE_DIRECTORY)/enterprise.lst
 
 # Einstein library - Stefano
@@ -1327,6 +1325,7 @@ clean:
 	cd input ; $(MAKE) clean ; cd ..
 	cd abc80 ; $(RM) *.o ; cd ..
 	cd abc800 ; $(RM) *.o ;	cd ..
+	cd enterprise	; $(MAKE) clean ; cd ..
 	cd msx	; $(MAKE) clean ; cd ..
 	cd newbrain ; $(RM) *.o	; cd ..
 	cd ts2068 ; $(RM) *.o ;	cd ..

@@ -1,0 +1,105 @@
+lstoff
+
+; Enterprise 64/128 related constants
+;
+; March 2011
+;
+; $Id: enterprise.def,v 1.1 2011-03-14 11:36:48 stefano Exp $
+;
+
+
+; Memory segments
+defc SYSTEM_SEGMENT = $FF
+
+; Byte values
+defc USR_P3         = $BFFF   ; These are the four segments which
+defc USR_P2         = $BFFE   ; were paged in when EXOS was last
+defc USR_P1         = $BFFD   ; called.
+defc USR_P0         = $BFFC   ; Undefined when not in EXOS.
+defc PORTB5         = $BFF3   ; Current contents of Z80 port 0B5h, used if any bits are modified.
+defc FLAG_SOFT_IRQ  = $BFF2   ; Set to non­zero to cause a software interrupt. The value will become the sw interrupt code.
+defc CRDISP_FLAG    = $BFEF   ; Can be set non­zero by an extension ROM to suppress the startup 'enterprise' logo
+
+; Word values
+defc STACK_LIMIT    = $BFFA   ; Lower limit of the system stack which devices may ues. Allows a safety margin for interrupts.
+defc RST_ADDR       = $BFF8   ; Warm reset address, must be in page zero.
+defc ST_POINTER     = $BFF6   ; Z80 address of the status­line RAM.
+defc LP_POINTER     = $BFF4   ; Z80 address of the start of the video line parameter table.
+defc SECOND_COUNTER = $BFF0   ; 16­bit seconds counter, never read by EXOS or built in devices.
+defc USER_ISR       = $BFED   ; Address of user interrupt routine, must be in page 0.  Set to 0 for no user ISR.
+
+; Warnings
+defc ERR_SHARE   = $7F  ; Warn for a shared segment allocation
+
+; Kernel error codes
+defc ERR_IFUNC   = $FF  ; Invalid EXOS function code
+defc ERR_ILLFN   = $FE  ; EXOS function call not allowed
+defc ERR_INAME   = $FD  ; Invalid EXOS string
+defc ERR_STACK   = $FC  ; Stack overflow
+defc ERR_ICHAN   = $FB  ; Channel does not exist
+defc ERR_NODEV   = $FA  ; Device does not exist
+defc ERR_CHANX   = $F9  ; Channel exists
+defc ERR_NOBUF   = $F8  ; No channel RAM allocated
+defc ERR_NORAM   = $F7  ; Insufficient Memory
+defc ERR_NOVID   = $F6  ; Insufficient Video Memory
+defc ERR_NOSEG   = $F5  ; No segment available when an allocate segment call is made
+defc ERR_ISEG    = $F4  ; Attempt to free a segment which is not allocated to the user or device.
+defc ERR_IBOUND  = $F3  ; Attempt to set the user boundary above the EXOS boundary in the shared segment.
+defc ERR_IVAR    = $F2  ; Unknown EXOS variable number
+defc ERR_IDESC   = $F1  ; Invalid device descriptor
+defc ERR_NOSTR   = $F0  ; Unrecognised command string
+defc ERR_ASCII   = $EF  ; Invalid file header
+defc ERR_ITYPE   = $EE  ; Unknown module type
+defc ERR_IREL    = $ED  ; Invalid relocatable module
+defc ERR_NOMOD   = $EC  ; Indicates that the "load module" has finished in a controlled manner.
+defc ERR_ITIME   = $EB  ; Invalid date or time value
+
+; General Device Errors
+defc ERR_ISPEC   = $EA  ; Invalid special function call
+defc ERR_2NDCH   = $E9  ; Attempt to open a further channel to a device which only allows one channel.
+defc ERR_IUNIT   = $E8  ; Invalid unit number
+defc ERR_NOFN    = $E7  ; Call not supported by this device
+defc ERR_ESC     = $E6  ; Invalid escape sequence
+defc ERR_STOP    = $E5  ; STOP key pressed
+defc ERR_EOF     = $E4  ; End Of File
+defc ERR_PROT    = $E3  ; Protection violation
+
+; Device Specific Errors
+defc ERR_KFSPC   = $E2  ; KEYBOARD - Function key string too long
+defc ERR_SENV    = $E1  ; SOUND    - Envelope too big
+defc ERR_SENBF   = $E0  ; SOUND    - Envelope storage full
+defc ERR_SQFUK   = $DF  ; SOUND    - Sound queue full
+defc ERR_VSIZE   = $DE  ; VIDEO    - Invalid video page size
+defc ERR_VMODE   = $DD  ; VIDEO    - Invalid video mode
+defc ERR_VDISP   = $DC  ; VIDEO    - Invalid display parameters
+defc ERR_VROW    = $DA  ; VIDEO    - Invalid row number to scroll 
+defc ERR_VCURS   = $D9  ; VIDEO    - (+ EDITOR) Invalid cursor coordinates
+defc ERR_VBEAM   = $D8  ; VIDEO    - Invalid beam position
+defc ERR_SEROP   = $D7  ; NET      - (+ SERIAL) Cannot use both serial and network
+defc ERR_NOADR   = $D6  ; NET      - Network address not set
+defc ERR_NETOP   = $D5  ; NET      - Network link exists
+defc ERR_EVID    = $D4  ; EDITOR   - Editor video channel error
+defc ERR_EKEY    = $D3  ; EDITOR   - Editor keyboard channel error
+defc ERR_EDINV   = $D2  ; EDITOR   - Editor load file error
+defc ERR_EDBUF   = $D1  ; EDITOR   - Editor load file too big
+defc ERR_CCRC    = $D0  ; CASSETTE - Cassette CRC error
+
+; Declarations for exos fn 11 (special device related calls)
+; Video
+defc FN_DISP =  1    ; Display page
+defc FN_SIZE =  2    ; Return page size and mode
+defc FN_ADDR =  3    ; Return video page address
+defc FN_FONT =  4    ; Reset character font
+;Keyboard 
+defc FN_FKEY =  8    ; Program function key
+defc FN_JOY  =  9    ; Read joystick directly
+; Network 
+defc FN_FLSH = 16    ; Flush output buffer
+defc FN_CLR  = 17    ; Clear input and output buffers
+; Editor 
+defc FN_MARG = 24    ; Set margins
+defc FN_CHLD = 25    ; Load a document
+defc FN_CHSV = 26    ; Save a document
+
+
+lston

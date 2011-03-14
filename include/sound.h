@@ -6,7 +6,7 @@
 /*
  *	Sound support code
  *
- *	$Id: sound.h,v 1.15 2010-09-19 00:24:08 dom Exp $
+ *	$Id: sound.h,v 1.16 2011-03-14 11:36:48 stefano Exp $
  */
 
 
@@ -54,6 +54,10 @@ extern __LIB__ bit_play(unsigned char melody[]);
 
 #ifdef C128
   #define BEEP_TSTATES 250000.0  /* 2 Mhz.. VIC-II steals time */
+#endif
+
+#ifdef ENTERPRISE
+  #define BEEP_TSTATES 500000.0  /* 4 Mhz */
 #endif
 
 #ifdef GAL
