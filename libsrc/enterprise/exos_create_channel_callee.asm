@@ -5,7 +5,7 @@
 ;	exos_create_channel(unsigned char ch_number, char *device);
 ;
 ;
-;	$Id: exos_create_channel_callee.asm,v 1.1 2011-03-14 11:36:48 stefano Exp $
+;	$Id: exos_create_channel_callee.asm,v 1.2 2011-03-15 14:34:08 stefano Exp $
 ;
 
 

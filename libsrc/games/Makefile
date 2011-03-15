@@ -1,6 +1,10 @@
-# $Id: Makefile,v 1.18 2009-04-22 17:12:27 stefano Exp $
+# $Id: Makefile,v 1.19 2011-03-15 14:34:08 stefano Exp $
 
 include	../Make.config
+
+lenterprise:
+	zcc +enterprise $(CFLAGS) -DENTERPRISE bit_frequency.c
+	zcc +enterprise $(CFLAGS) -DENTERPRISE bit_play.c
 
 lz88:
 	zcc +z88 $(CFLAGS) -DZ88 bit_frequency.c

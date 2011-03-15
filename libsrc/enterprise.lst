@@ -2,6 +2,10 @@ stdio/enterprise/fgetc_cons
 stdio/enterprise/getk
 stdio/enterprise/fputc_cons
 stdio/enterprise/puts_cons
+games/enterprise/joystick
+enterprise/exos_capture_channel
+enterprise/exos_capture_channel_callee
+enterprise/exos_channel_read_status
 enterprise/exos_close_channel.asm
 enterprise/exos_create_channel.asm
 enterprise/exos_create_channel_callee.asm
@@ -9,8 +13,13 @@ enterprise/exos_destroy_channel.asm
 enterprise/exos_display_page.asm
 enterprise/exos_open_channel.asm
 enterprise/exos_open_channel_callee.asm
+enterprise/exos_read_block.asm
 enterprise/exos_read_character.asm
+enterprise/exos_redirect_channel
+enterprise/exos_redirect_channel_callee
 enterprise/exos_system_reset
+enterprise/exos_system_status
+enterprise/exos_write_block.asm
 enterprise/exos_write_character.asm
 enterprise/exos_write_character_callee.asm
 enterprise/get_exos_variable.asm

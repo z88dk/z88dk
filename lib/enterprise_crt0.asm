@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 2011
 ;
-;	$Id: enterprise_crt0.asm,v 1.5 2011-03-14 11:36:48 stefano Exp $
+;	$Id: enterprise_crt0.asm,v 1.6 2011-03-15 14:34:08 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect

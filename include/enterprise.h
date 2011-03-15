@@ -1,7 +1,7 @@
 /*
  * Headerfile for Enterprise 64/128 specific stuff
  *
- * $Id: enterprise.h,v 1.1 2011-03-14 11:36:48 stefano Exp $
+ * $Id: enterprise.h,v 1.2 2011-03-15 14:34:08 stefano Exp $
  */
 
 #ifndef __ENTERPRISE_H__
@@ -118,31 +118,72 @@ extern char DEV_NET[];
 extern char DEV_EDITOR[];
 
 
-
 // Kernel Functions
+
 extern int __LIB__              set_exos_variable(unsigned char variable, unsigned char value);
 extern int __LIB__ __CALLEE__   set_exos_variable_callee(unsigned char variable, unsigned char value);
+#define set_exos_variable(a,b)      set_exos_variable_callee(a,b)
+
 extern int __LIB__ __FASTCALL__ get_exos_variable(unsigned char variable);
 extern int __LIB__ __FASTCALL__ toggle_exos_variable(unsigned char variable);
 extern int __LIB__ __FASTCALL__ set_exos_multi_variables(char *vlist);
 
+extern int __LIB__              exos_capture_channel(unsigned char main_channel, unsigned char secondary_channel);
+extern int __LIB__ __CALLEE__   exos_capture_channel_callee(unsigned char main_channel, unsigned char secondary_channel);
+#define exos_capture_channel(a,b)   exos_capture_channel_callee(a,b)
+
+extern int __LIB__ __FASTCALL__ exos_channel_read_status(unsigned char channel);
+
 extern int __LIB__              exos_create_channel(unsigned char channel, char *device);
 extern int __LIB__ __CALLEE__   exos_create_channel_callee(unsigned char channel, char *device);
+#define exos_create_channel(a,b)    exos_create_channel_callee(a,b)
+
 extern int __LIB__              exos_open_channel(unsigned char channel, char *device);
 extern int __LIB__ __CALLEE__   exos_open_channel_callee(unsigned char channel, char *device);
+#define exos_open_channel(a,b)      exos_open_channel_callee(a,b)
+
 extern int __LIB__ __FASTCALL__ exos_close_channel(unsigned char channel);
 extern int __LIB__ __FASTCALL__ exos_destroy_channel(unsigned char channel);
+
+extern int __LIB__              exos_redirect_channel(unsigned char main_channel, unsigned char secondary_channel);
+extern int __LIB__ __CALLEE__   exos_redirect_channel_callee(unsigned char main_channel, unsigned char secondary_channel);
+#define exos_redirect_channel(a,b)  exos_redirect_channel_callee(a,b)
+
+
 extern int __LIB__ __FASTCALL__ exos_read_character(unsigned char channel);
+
 extern int __LIB__              exos_write_character(unsigned char channel, unsigned char character);
 extern int __LIB__ __CALLEE__   exos_write_character_callee(unsigned char channel, unsigned char character);
-
-extern void __LIB__ __CALLEE__  exos_system_reset();
-
-
-#define set_exos_variable(a,b)      set_exos_variable_callee(a,b)
-#define exos_create_channel(a,b)    exos_create_channel_callee(a,b)
-#define exos_open_channel(a,b)      exos_open_channel_callee(a,b)
 #define exos_write_character(a,b)   exos_read_character_callee(a,b)
+
+extern int __LIB__              exos_read_block(unsigned char channel, unsigned int byte_count, unsigned char *address);
+extern int __LIB__              exos_write_block(unsigned char channel, unsigned int byte_count, unsigned char *address);
+
+
+
+// EXOS System Reset flags
+#define WARM_RESET_KEEPUSR   16 // Forcibly de­allocate all channel RAM, and re-initialise all devices. User device will be retained. 
+#define WARM_RESET_KEEPDEV   32	// User devices will be lost. Device segments are not de-allocated. 
+#define WARM_RESET           64 // De­allocate all user RAM segments
+#define COLD_RESET          128
+
+extern void __LIB__ __FASTCALL__  exos_system_reset(unsigned char flags);
+
+// EXOS System Information
+
+struct EXOS_INFO {
+	unsigned char	shared_segments;		// Shared segment number (0 if no shared segment) 
+	unsigned char	free_segments;			// Number of free segments 
+	unsigned char	user_segments;			// ...excluding the page­zero segment and the shared segment (if any)
+	unsigned char	devices_segments;		// Segments allocated to devices.
+	unsigned char	system_segments;		// ..including the shared segment (if any)
+	unsigned char	working_segments;		// Total number of working RAM segments 
+	unsigned char	nonworking_segments;	// Total number of non working RAM segments 
+	unsigned char	unused;					// Total number of non working RAM segments 
+};
+
+// Updates status struct and returns the EXOS version number
+extern int __LIB__ __FASTCALL__  exos_system_status(struct EXOS_INFO info);
 
 
 // Sound functions
@@ -171,15 +212,33 @@ extern void __LIB__ __CALLEE__  exos_system_reset();
 #define keyboard_click_off()          set_exos_variable_callee(EV_CLICK_KEY,255)
 #define keyboard_click_toggle()       toggle_exos_variable(EV_CLICK_KEY)
 
+
+// Video constants
+// video modes
+#define VM_HW_TXT       0	// Hardware text mode (up to 42 columns)
+#define VM_SW_TXT       2	// Software text mode (up to 84 columns)
+#define VM_LRG          5	// Low Resolution Graphics
+#define VM_HRG          1	// High Resolution Graphics
+#define VM_ATTR        15	// Colour attribute mode
+// color modes
+#define CM_2            0	// Two colour mode 
+#define CM_4            1	// Four colour mode 
+#define CM_16           2	// Sixteen colour mode 
+#define CM_256          3	// colour mode 
+
+
 // Video functions
 
 #define status_line_on()              set_exos_variable_callee(EV_ST_FLAG,0)
 #define status_line_off()             set_exos_variable_callee(EV_ST_FLAG,255)
 #define status_line_toggle()          toggle_exos_variable(EV_ST_FLAG)
 
+// Set video mode (see the video constants above) 
+// Size is char units y_size = 1..255 (max 27 visible at once),  x_size = 1..42
+extern void __LIB__             exos_set_vmode(unsigned char video_mode, unsigned char color_mode, unsigned char x_size, unsigned char y_size);
+// Set the visible boundaries for video page 
 extern int __LIB__              exos_display_page(unsigned char channel, unsigned char first_row, unsigned char rows, unsigned char first_row_position);
 extern int __LIB__ __FASTCALL__ exos_reset_font(unsigned char channel);
-extern void __LIB__             exos_set_vmode(unsigned char mode, unsigned char color, unsigned char x_size, unsigned char y_size);
 
 
 

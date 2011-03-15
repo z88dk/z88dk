@@ -5,7 +5,7 @@
 ;	set_exos_variable(unsigned char variable, unsigned char value);
 ;
 ;
-;	$Id: set_exos_variable_callee.asm,v 1.1 2011-03-14 11:36:48 stefano Exp $
+;	$Id: set_exos_variable_callee.asm,v 1.2 2011-03-15 14:34:08 stefano Exp $
 ;
 
 
