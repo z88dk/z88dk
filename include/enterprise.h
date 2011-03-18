@@ -1,7 +1,7 @@
 /*
  * Headerfile for Enterprise 64/128 specific stuff
  *
- * $Id: enterprise.h,v 1.2 2011-03-15 14:34:08 stefano Exp $
+ * $Id: enterprise.h,v 1.3 2011-03-18 07:12:41 stefano Exp $
  */
 
 #ifndef __ENTERPRISE_H__
@@ -116,6 +116,24 @@ extern char DEV_VIDEO[];
 extern char DEV_KEYBOARD[];
 extern char DEV_NET[];
 extern char DEV_EDITOR[];
+extern char DEV_SERIAL[];
+extern char DEV_TAPE[];
+extern char DEV_PRINTER[];
+extern char DEV_SOUND[];
+
+// Default EXOS channel numbers
+#define DEFAULT_VIDEO    0x66
+#define DEFAULT_KEYBOARD 0x69
+
+
+// Structure to support the ESC sequences with exos_write_block
+
+struct EXOS_ESCCMD {
+	unsigned char	escape;
+	unsigned char	esccmd;
+	int	x;
+	int	y;
+};
 
 
 // Kernel Functions
@@ -154,11 +172,13 @@ extern int __LIB__ __FASTCALL__ exos_read_character(unsigned char channel);
 
 extern int __LIB__              exos_write_character(unsigned char channel, unsigned char character);
 extern int __LIB__ __CALLEE__   exos_write_character_callee(unsigned char channel, unsigned char character);
-#define exos_write_character(a,b)   exos_read_character_callee(a,b)
+#define exos_write_character(a,b)   exos_write_character_callee(a,b)
 
 extern int __LIB__              exos_read_block(unsigned char channel, unsigned int byte_count, unsigned char *address);
 extern int __LIB__              exos_write_block(unsigned char channel, unsigned int byte_count, unsigned char *address);
 
+// Check if the line printer is ready (1=ready, 0 if not)
+extern int __LIB__ lpt_ready();
 
 
 // EXOS System Reset flags
@@ -211,6 +231,13 @@ extern int __LIB__ __FASTCALL__  exos_system_status(struct EXOS_INFO info);
 #define keyboard_click_on()           set_exos_variable_callee(EV_CLICK_KEY,0)
 #define keyboard_click_off()          set_exos_variable_callee(EV_CLICK_KEY,255)
 #define keyboard_click_toggle()       toggle_exos_variable(EV_CLICK_KEY)
+
+#define KL_UNLOCKED    0
+#define KL_CAPSLOCK    1
+#define KL_SHIFTLOCK   2
+#define KL_ALTLOCK     3
+
+#define get_keylock_status()          get_exos_variable(EV_LOCK_KEY)
 
 
 // Video constants

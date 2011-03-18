@@ -9,7 +9,7 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.14 2011-03-15 14:34:08 stefano Exp $
+ *	$Id: games.h,v 1.15 2011-03-18 07:12:41 stefano Exp $
  *
  */
 

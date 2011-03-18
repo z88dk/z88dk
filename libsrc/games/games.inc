@@ -5,7 +5,7 @@
 ;       based on the Dominic's sound routines
 ;
 ;
-;       $Id: games.inc,v 1.15 2010-11-24 18:00:21 stefano Exp $
+;       $Id: games.inc,v 1.16 2011-03-18 07:12:41 stefano Exp $
 ;
 
 IF FORc128
@@ -54,6 +54,12 @@ IF FORaquarius
         defc sndbit_port   = 252
         defc sndbit_bit    = 0
         defc sndbit_mask   = 1
+ENDIF
+
+IF FORenterprise
+        defc sndbit_port   = $A8
+        defc sndbit_bit    = 5
+        defc sndbit_mask   = 32
 ENDIF
 
 IF FORti82

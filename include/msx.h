@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.18 2010-09-19 00:24:08 dom Exp $
+ * $Id: msx.h,v 1.19 2011-03-18 07:12:41 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -367,6 +367,7 @@ extern int __LIB__ msx_vram();
 
 // Check if the line printer is ready (1=ready, 0 if not)
 extern int __LIB__ msx_lpt();
+#define lpt_ready() msx_lpt()
 
 // Check if Ctrl-STOP is being pressed (1=if pressed, 0 if not)
 extern int __LIB__ msx_break();

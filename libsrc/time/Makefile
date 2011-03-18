@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.16 2010-11-18 15:42:20 stefano Exp $
+# $Id: Makefile,v 1.17 2011-03-18 07:12:41 stefano Exp $
 
 include ../Make.config
 
@@ -12,6 +12,8 @@ lpps: time pps_time
 lzx: spectrum_time
 
 lnewbrain: newbrain_time
+
+lenterprise: enterprise_time
 
 time: gmtime.o localtime.o mktime.o
 
@@ -30,10 +32,14 @@ spectrum_time:
 newbrain_time:
 	cd newbrain ; $(MAKE) ; cd ..
 
+enterprise_time:
+	cd enterprise ; $(MAKE) ; cd ..
+
 clean:
 	$(RM) *.o* *.i *.sym *.map zcc_opt.def
 	$(RM) zx81/*.o*
 	$(RM) ace/*.o*
+	$(RM) enterprise/*.o*
 	$(RM) newbrain/*.o*
 	$(RM) rcmx000/*.o*
 	cd z88 ; $(MAKE) clean ; cd ..

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 2011
 ;
-;	$Id: enterprise_crt0.asm,v 1.6 2011-03-15 14:34:08 stefano Exp $
+;	$Id: enterprise_crt0.asm,v 1.7 2011-03-18 07:12:41 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -60,6 +60,10 @@
 		XDEF    _DEV_KEYBOARD
 		XDEF    _DEV_NET
 		XDEF    _DEV_EDITOR
+		XDEF    _DEV_SERIAL
+		XDEF    _DEV_TAPE
+		XDEF    _DEV_PRINTER
+		XDEF    _DEV_SOUND
 
 IF      !myzorg
 		defc    myzorg  = 100h
@@ -92,7 +96,7 @@ ENDIF
 ENDIF
 
 ; Inspired by the DizzyLord loader by ORKSOFT
-        di
+        ;di
         ld    a, 004h
         out   (0bfh), a
         ld    sp, 07F00h
@@ -324,13 +328,29 @@ _DEV_KEYBOARD:
         defb  9
         defm  "KEYBOARD:"
 
+_DEV_EDITOR:
+        defb  4
+        defm  "EDITOR:"
+
 _DEV_NET:
         defb  4
         defm  "NET:"
 
-_DEV_EDITOR:
-        defb  4
-        defm  "EDITOR:"
+_DEV_SERIAL:
+        defb  7
+        defm  "SERIAL:"
+
+_DEV_TAPE:
+        defb  5
+        defm  "TAPE:"
+
+_DEV_PRINTER:
+        defb  8
+        defm  "PRINTER:"
+
+_DEV_SOUND:
+        defb  6
+        defm  "SOUND:"
 
 __videoVariables:
 ;        defb  22, 2                      ; MODE_VID - sw text mode

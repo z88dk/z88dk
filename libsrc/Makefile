@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.158 2011-03-14 11:36:48 stefano Exp $
+# $Id: Makefile,v 1.159 2011-03-18 07:12:41 stefano Exp $
 
 
 include	Make.config
@@ -973,7 +973,10 @@ enterprise_clib.lib:
 	cd stdio ; $(MAKE) generic ; cd	..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
+	cd time	; $(MAKE) lenterprise ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	$(MAKE)	gamesdeps
+	cd games ; $(MAKE) lenterprise ; cd	..
 	cd enterprise ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(LISTFILE_DIRECTORY)/enterprise.lst
 

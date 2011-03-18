@@ -2,7 +2,7 @@
 ;	Game device library for the Enterprise 64/128
 ;	Stefano Bodrato - Mar 2011
 ;
-;	$Id: joystick.asm,v 1.1 2011-03-15 14:34:08 stefano Exp $
+;	$Id: joystick.asm,v 1.2 2011-03-18 07:12:41 stefano Exp $
 ;
 
 
