@@ -1,9 +1,12 @@
+;
 ;       Enterprise 64/128 C stub
 ;
 ;       Stefano Bodrato - 2011
 ;
-;	$Id: enterprise_crt0.asm,v 1.7 2011-03-18 07:12:41 stefano Exp $
 ;
+;	$Id: enterprise_crt0.asm,v 1.8 2011-03-22 06:45:51 stefano Exp $
+;
+
 
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -64,6 +67,37 @@
 		XDEF    _DEV_TAPE
 		XDEF    _DEV_PRINTER
 		XDEF    _DEV_SOUND
+
+		XDEF    _esccmd
+		XDEF    _esccmd_cmd
+		XDEF    _esccmd_x
+		XDEF    _esccmd_y
+		XDEF    _esccmd_p1
+		XDEF    _esccmd_p2
+		XDEF    _esccmd_p3
+		XDEF    _esccmd_p4
+		XDEF    _esccmd_p5
+		XDEF    _esccmd_p6
+		XDEF    _esccmd_p7
+		XDEF    _esccmd_p8
+		XDEF    _esccmd_p9
+		XDEF    _esccmd_env
+		XDEF    _esccmd_p
+		XDEF    _esccmd_vl
+		XDEF    _esccmd_vr
+		XDEF    _esccmd_sty
+		XDEF    _esccmd_ch
+		XDEF    _esccmd_d
+		XDEF    _esccmd_f
+		XDEF    _esccmd_en
+		XDEF    _esccmd_ep
+		XDEF    _esccmd_er
+		XDEF    _esccmd_phase
+		XDEF    _esccmd_cp
+		XDEF    _esccmd_cl
+		XDEF    _esccmd_cr
+		XDEF    _esccmd_pd
+
 
 IF      !myzorg
 		defc    myzorg  = 100h
@@ -310,6 +344,7 @@ _l1:    ld    b, 1
         jr    _l1
         ret
 
+
 daveReset:
         push  bc
         xor   a
@@ -319,6 +354,7 @@ _l2:    out   (c), a
         djnz  _l2
         pop   bc
         ret 
+
 
 _DEV_VIDEO:
         defb  6
@@ -352,14 +388,52 @@ _DEV_SOUND:
         defb  6
         defm  "SOUND:"
 
+_esccmd:
+        defb  27
+_esccmd_cmd:
+        defb  0
+_esccmd_x:
+_esccmd_p1:
+_esccmd_env:
+_esccmd_en:
+        defb  0
+_esccmd_p2:
+_esccmd_p:
+_esccmd_ep:
+        defb  0
+_esccmd_y:
+_esccmd_p3:
+_esccmd_er:
+        defb  0
+_esccmd_phase:
+_esccmd_p4:
+_esccmd_vl:
+_esccmd_cp:
+        defb  0
+_esccmd_p5:
+_esccmd_vr:
+        defb  0
+_esccmd_p6:
+_esccmd_sty:
+_esccmd_cl:
+        defb  0
+_esccmd_p7:
+_esccmd_ch:
+        defb  0
+_esccmd_p8:
+_esccmd_d:
+_esccmd_cr:
+        defb  0
+_esccmd_p9:
+_esccmd_pd:
+        defb  0
+_esccmd_f:
+        defb  0
+
+
 __videoVariables:
-;        defb  22, 2                      ; MODE_VID - sw text mode
-;        defb  23, 0                     ; COLR_VID
-;        defb  24, 40                    ; X_SIZ_VID
-        defb  22, 0                      ; MODE_VID	- hw text mode
-        ;defb  22, 15                      ; MODE_VID	- attribute gfx mode
+        defb  22, 0                     ; MODE_VID	- hw text mode
         defb  23, 0                     ; COLR_VID	- mono
         defb  24, 40                    ; X_SIZ_VID
         defb  25, 25                    ; Y_SIZ_VID
-        ;defb  27, 0                    ; BORD_VID
         defb  0

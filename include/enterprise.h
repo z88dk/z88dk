@@ -1,7 +1,7 @@
 /*
  * Headerfile for Enterprise 64/128 specific stuff
  *
- * $Id: enterprise.h,v 1.3 2011-03-18 07:12:41 stefano Exp $
+ * $Id: enterprise.h,v 1.4 2011-03-22 06:45:51 stefano Exp $
  */
 
 #ifndef __ENTERPRISE_H__
@@ -128,12 +128,40 @@ extern char DEV_SOUND[];
 
 // Structure to support the ESC sequences with exos_write_block
 
-struct EXOS_ESCCMD {
-	unsigned char	escape;
-	unsigned char	esccmd;
-	int	x;
-	int	y;
-};
+// Video related / generic sequences
+extern char          esccmd[];
+extern unsigned char esccmd_cmd;
+extern int           esccmd_x;
+extern int           esccmd_y;
+extern unsigned char esccmd_p1;
+extern unsigned char esccmd_p2;
+extern unsigned char esccmd_p3;
+extern unsigned char esccmd_p4;
+extern unsigned char esccmd_p5;
+extern unsigned char esccmd_p6;
+extern unsigned char esccmd_p7;
+extern unsigned char esccmd_p8;
+extern unsigned char esccmd_p9;
+// Sound production (esc S)
+extern unsigned char esccmd_env;
+extern unsigned int  esccmd_p;
+extern unsigned char esccmd_vl;
+extern unsigned char esccmd_vr;
+extern unsigned char esccmd_sty;
+extern unsigned char esccmd_ch;
+extern unsigned int  esccmd_d;
+extern unsigned char esccmd_f;
+// Envelope definition (esc E)
+extern unsigned char esccmd_en;
+extern unsigned char esccmd_ep;
+extern unsigned char esccmd_er;
+// Single phase sequence (6 bytes)
+extern char          esccmd_phase[];
+extern int           esccmd_cp;
+extern char          esccmd_cl;
+extern char          esccmd_cr;
+extern unsigned int  esccmd_pd;
+
 
 
 // Kernel Functions

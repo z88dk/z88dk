@@ -20,13 +20,8 @@ int xmax,ymax;
 int k;
 float l,m,n,o,p;
 
-struct EXOS_ESCCMD esc_cmd;
-
 void main()
 {
-
-	// Init the first charact for the ESC sequences
-	esc_cmd.escape=27;
 
 	//	Initialize a custom video mode
 	exos_set_vmode(VM_HRG,CM_16,40,24);
@@ -35,8 +30,8 @@ void main()
 	exos_write_character(DEFAULT_VIDEO, 0x1A);
 
 	// set beam on
-	esc_cmd.esccmd='S';
-	exos_write_block(DEFAULT_VIDEO, 2, esc_cmd);
+	esccmd_cmd='S';
+	exos_write_block(DEFAULT_VIDEO, 2, esccmd);
 
 
 	xmax=210;
@@ -69,20 +64,20 @@ l110:	     k++;
 			
 			if ((n+o)<e) goto l110;
 
-			esc_cmd.esccmd='I';	// INK colour
-			esc_cmd.x=k;
-			exos_write_block(DEFAULT_VIDEO, 3, esc_cmd);
+			esccmd_cmd='I';	// INK colour
+			esccmd_x=k;
+			exos_write_block(DEFAULT_VIDEO, 3, esccmd);
 
-			esc_cmd.esccmd='s'; // set beam off
-			exos_write_block(DEFAULT_VIDEO, 2, esc_cmd);
+			esccmd_cmd='s'; // set beam off
+			exos_write_block(DEFAULT_VIDEO, 2, esccmd);
 
-			esc_cmd.esccmd='A'; // set beam position
-			esc_cmd.x=x*4;
-			esc_cmd.y=y*4;
-			exos_write_block(DEFAULT_VIDEO, 6, esc_cmd);
+			esccmd_cmd='A'; // set beam position
+			esccmd_x=x*4;
+			esccmd_y=y*4;
+			exos_write_block(DEFAULT_VIDEO, 6, esccmd);
 
-			esc_cmd.esccmd='S'; // set beam on
-			exos_write_block(DEFAULT_VIDEO, 2, esc_cmd);
+			esccmd_cmd='S'; // set beam on
+			exos_write_block(DEFAULT_VIDEO, 2, esccmd);
 
 	     }
 	  }
