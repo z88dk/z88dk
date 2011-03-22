@@ -1,7 +1,7 @@
 /*
  * Headerfile for Enterprise 64/128 specific stuff
  *
- * $Id: enterprise.h,v 1.4 2011-03-22 06:45:51 stefano Exp $
+ * $Id: enterprise.h,v 1.5 2011-03-22 21:28:53 stefano Exp $
  */
 
 #ifndef __ENTERPRISE_H__
