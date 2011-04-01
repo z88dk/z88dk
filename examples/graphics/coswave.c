@@ -11,7 +11,7 @@
 	  zcc +zx -lm -lndos -create-app sinwave.c
 	  zcc +aquarius -lm -create-app sinwave.c
 	
-	$Id: coswave.c,v 1.3 2009-05-21 06:58:11 stefano Exp $
+	$Id: coswave.c,v 1.4 2011-04-01 06:50:45 stefano Exp $
 
 */
 
@@ -24,7 +24,7 @@ main()
 {
 
 float x,y,incr,yenlarge;
-unsigned char z,buf;
+int z,buf;
 
 	clg();
 	incr=2.0/(float)getmaxx();
@@ -40,8 +40,8 @@ unsigned char z,buf;
 			if (buf>z)
 			{
 				buf = z;
-				plot ( (unsigned char) ((float)getmaxx() / 6.0 * (x + 3.0)), (unsigned char) z);
-				plot ( (unsigned char) ((float)getmaxx() / 6.0 * (3.0 - x)), (unsigned char) z);
+				plot ( (int) ((float)getmaxx() / 6.0 * (x + 3.0)),  z);
+				plot ( (int) ((float)getmaxx() / 6.0 * (3.0 - x)),  z);
 			}
 		}
 	}

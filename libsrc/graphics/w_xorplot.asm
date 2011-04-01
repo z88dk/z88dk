@@ -7,7 +7,7 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_xorplot.asm,v 1.1 2008-07-17 15:39:56 stefano Exp $
+;	$Id: w_xorplot.asm,v 1.2 2011-04-01 06:50:45 stefano Exp $
 ;
 
 ;Usage: xorplot(int x, int y)
@@ -17,7 +17,7 @@
                 LIB     swapgfxbk
                 XREF    swapgfxbk1
 
-                LIB     xorpixel
+                LIB     w_xorpixel
 
 .xorplot
 		pop	bc
@@ -28,6 +28,6 @@
 		push	bc
 
                 call    swapgfxbk
-                call    xorpixel
+                call    w_xorpixel
                 jp      swapgfxbk1
 

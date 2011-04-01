@@ -4,7 +4,7 @@
 ;       Stefano Bodrato - 2011
 ;
 ;
-;	$Id: enterprise_crt0.asm,v 1.10 2011-03-24 15:56:54 stefano Exp $
+;	$Id: enterprise_crt0.asm,v 1.11 2011-04-01 06:50:45 stefano Exp $
 ;
 
 
@@ -48,13 +48,6 @@
         XDEF	heapblocks
 
         XDEF    __sgoioblk
-
-; Graphics stuff
-        XDEF	pixelbyte	; Temp store for non-buffered mode
-        XDEF    base_graphics   ; Graphical variables
-        XDEF    coords          ; Current xy position
-
-		XDEF    __fcb		; file control block
 
 ; Enterprise 64/128 specific stuff
 		XDEF    warmreset
@@ -266,11 +259,6 @@ ENDIF
 ; ---------------
 ; Misc Variables
 ; ---------------
-defltdsk:       defb    0	; Default disc
-base_graphics:  defw    0	; Location of current screen buffer
-coords:         defw    0       ; Current graphics xy coordinates
-pixelbyte:      defb	0
-
 
 IF DEFINED_NEED1bitsound
 snd_tick:	defb	0	; Sound variable
@@ -280,10 +268,6 @@ ENDIF
 IF !DEFINED_HAVESEED
 		XDEF    _std_seed        ;Integer rand() seed
 _std_seed:       defw    0       ; Seed for integer rand() routines
-ENDIF
-
-IF !DEFINED_nofileio
-__fcb:		defs	420,0	;file control block (10 files) (MAXFILE)
 ENDIF
 
 ;Atexit routine

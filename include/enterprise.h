@@ -1,7 +1,7 @@
 /*
  * Headerfile for Enterprise 64/128 specific stuff
  *
- * $Id: enterprise.h,v 1.6 2011-03-24 15:56:54 stefano Exp $
+ * $Id: enterprise.h,v 1.7 2011-04-01 06:50:45 stefano Exp $
  */
 
 #ifndef __ENTERPRISE_H__
@@ -124,6 +124,7 @@ extern char DEV_SOUND[];
 // Default EXOS channel numbers
 #define DEFAULT_VIDEO    0x66
 #define DEFAULT_SOUND    0x67
+#define DEFAULT_PRINTER  0x68
 #define DEFAULT_KEYBOARD 0x69
 
 

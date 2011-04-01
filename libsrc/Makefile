@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.159 2011-03-18 07:12:41 stefano Exp $
+# $Id: Makefile,v 1.160 2011-04-01 06:50:45 stefano Exp $
 
 
 include	Make.config
@@ -12,11 +12,11 @@ include	Make.config
 # LIBRARIES not	built by the global list below:
 # - SP1	(build depends on customization	and machine target, "make sp1" for options)
 
-all:	genlibs	z88libs	tilibs zxlibs \
+all:	genlibs	z88libs	tilibs zxlibs eplibs c128libs cpclibs \
 	abc80_clib.lib abc80ansi_clib.lib abc800_clib.lib \
 	ace_clib.lib aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
-	c128libs cpclibs cpm_clib.lib einstein.lib enterprise_clib.lib gal_clib.lib \
-	m5_clib.lib msx_clib.lib mtx_clib.lib mz_clib.lib mzansi_clib.lib \
+	cpm_clib.lib einstein.lib gal_clib.lib m5_clib.lib \
+	msx_clib.lib mtx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib	nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
 	ozansi_clib.lib	pps_clib.lib ppsansi_clib.lib \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib \
@@ -29,6 +29,8 @@ genlibs: debug.lib gen_math.lib	malloc.lib z80_crt0.lib	ndos.lib adt.lib balloc.
 	 im2.lib rect.lib algorithm.lib	lib3d.lib x11.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
+
+eplibs: enterprise_clib.lib gfxep.lib gfxephr.lib
 
 cpclibs: cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib
 
@@ -968,6 +970,7 @@ enterprise_clib.lib:
 	@echo ''
 	@echo '--- Building Enterprise 64/128 Library ---'
 	@echo ''
+	$(MAKE)	gfxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd	..
@@ -979,6 +982,24 @@ enterprise_clib.lib:
 	cd games ; $(MAKE) lenterprise ; cd	..
 	cd enterprise ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(LISTFILE_DIRECTORY)/enterprise.lst
+
+# Enterprise graphics lib - Stefano
+gfxep.lib:
+	@echo ''
+	@echo '--- Building Enterprise 64/128 Graphics Library  ---'
+	@echo ''
+	$(MAKE)	gfxdeps
+	cd graphics ; $(MAKE) lenterprise ; cd ..
+	$(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/gfxep @$(LISTFILE_DIRECTORY)/gfxep.lst
+
+# Enterprise HRG graphics lib - Stefano
+gfxephr.lib:
+	@echo ''
+	@echo '--- Building Enterprise 64/128 High Resolution Graphics Library  ---'
+	@echo ''
+	$(MAKE)	gfxdeps
+	cd graphics ; $(MAKE) lenterprisehr ; cd ..
+	$(LIBLINKER) -DFORenterprisehr -x$(OUTPUT_DIRECTORY)/gfxephr @$(LISTFILE_DIRECTORY)/gfxephr.lst
 
 # Einstein library - Stefano
 einstein.lib:
