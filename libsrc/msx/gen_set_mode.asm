@@ -5,7 +5,7 @@
 ;
 ;	set screen mode
 ;
-;	$Id: gen_set_mode.asm,v 1.2 2010-09-15 09:00:39 stefano Exp $
+;	$Id: gen_set_mode.asm,v 1.3 2011-04-05 19:44:40 stefano Exp $
 ;
 
 
@@ -40,40 +40,40 @@ init32:
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
 inigrp:
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
+
     ld    c,$01
     ld    a,$80
-    call    VDPreg_Write    ; reg1
+    call    VDPreg_Write    ; reg1  - GRAPH MODE
     
-        
-    ld    a,$0E
-    call    VDPreg_Write    ; reg2
+    ld    a,$0E   ; ($F0 for MTX ?)
+    call    VDPreg_Write    ; reg2  -  NAME TABLE
     
-    ld    a,$FF
-    call    VDPreg_Write    ; reg3
+    ld    a,$FF				;
+    call    VDPreg_Write    ; reg3  -  COLOUR TABLE
     
     ld    a,$03
-    call    VDPreg_Write    ; reg4
+    call    VDPreg_Write    ; reg4  -  PT./TXT/MCOL-GEN.TAB.
     
     ld    a,$76
-    call    VDPreg_Write    ; reg5
+    call    VDPreg_Write    ; reg5  -  SPRITE ATTR. TAB.
     
     ld    a,$03
-    call    VDPreg_Write    ; reg6
+    call    VDPreg_Write    ; reg6  -  SPRITE PATTERN GEN. TAB.
     
     ld    a,$00
-    call    VDPreg_Write    ; reg7
+    call    VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
     
     
     ld    c,$00
 IF FORm5
-    ld    a,$03
+    ld    a,$03		; reg0  - GRAPH MODE
 ELSE
-    ld    a,$02
+    ld    a,$02		; reg0  - GRAPH MODE
 ENDIF
-    call    VDPreg_Write    ; reg0
+    call    VDPreg_Write
     
-    ld    a,$E2
-    call    VDPreg_Write    ; reg1
+    ld    a,$E2   ; ($C0 for MTX ?)  ; reg1 - GRAPH MODE
+    call    VDPreg_Write
     ret
 
 
