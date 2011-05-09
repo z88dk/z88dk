@@ -3,7 +3,7 @@
 ;
 ;	(HL)=char to display
 ;
-;	$Id: fputc_cons.asm,v 1.1 2010-08-05 06:14:09 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.2 2011-05-09 14:31:38 stefano Exp $
 ;
 
 	XLIB	fputc_cons
@@ -13,6 +13,13 @@
 	ld	b,h		; zero
 	add	hl,sp
 	ld	a,(hl)
+	cp	13
+	jr	nz,nocrlf
+	ld	c,a
+	rst 10h
+	defb 192
+	ld	a,10
+.nocrlf
 	ld	c,a
 	rst 10h
 	defb 192

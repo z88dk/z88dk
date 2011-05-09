@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.20 2011-02-21 21:01:57 stefano Exp $
+ *   $Id: appmake.h,v 1.21 2011-05-09 14:31:38 stefano Exp $
  */
 
 
@@ -61,6 +61,9 @@ extern option_t  m5_options;
 
 extern int       msx_exec(char *target);
 extern option_t  msx_options;
+
+extern int       mtx_exec(char *target);
+extern option_t  mtx_options;
 
 extern int       mz_exec(char *target);
 extern option_t  mz_options;
@@ -148,6 +151,9 @@ struct {
     { "bin2msx",  "msx",      "(C) 2001 Stefano Bodrato",
       "Adds a file header to enable the program to be loaded using 'bload \"file.bin\",r",
       msx_exec,     &msx_options },
+    { "bin2mtx",  "mtx",      "(C) 2011 Stefano Bodrato",
+      "Memotech MTX file format packaging",
+      mtx_exec,     &mtx_options },
     { "bin2m12",  "mz",       "(C) 2000 Stefano Bodrato",
       "Generates a tape file for the Sharp MZ computers",
       mz_exec,      &mz_options },
@@ -209,7 +215,7 @@ struct {
       "Generates a .P file suitable for use by emulators, optionally a WAV file",
       zx81_exec,    &zx81_options }
 };
-#define APPMAKE_TARGETS 30
+#define APPMAKE_TARGETS 31
 #endif
 
 

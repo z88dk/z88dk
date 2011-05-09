@@ -5,7 +5,7 @@
 ;
 ;	set screen mode
 ;
-;	$Id: gen_set_mode.asm,v 1.3 2011-04-05 19:44:40 stefano Exp $
+;	$Id: gen_set_mode.asm,v 1.4 2011-05-09 14:31:38 stefano Exp $
 ;
 
 
@@ -28,6 +28,36 @@ msx_set_mode:
 
 ; Switch 2 Video Mode n. 0
 initxt:
+    ld    c,$01
+    ld    a,$D0
+    call    VDPreg_Write    ; reg1  - text MODE
+    
+    ld    a,$07   ; ($F0 for MTX ?)
+    call    VDPreg_Write    ; reg2  -  NAME TABLE
+    
+    ld    a,0				;
+    call    VDPreg_Write    ; reg3  -  COLOUR TABLE
+    
+    ld    a,$03
+    call    VDPreg_Write    ; reg4  -  PT./TXT/MCOL-GEN.TAB.
+    
+    ld    a,$7E
+    call    VDPreg_Write    ; reg5  -  SPRITE ATTR. TAB.
+    
+    ld    a,$07
+    call    VDPreg_Write    ; reg6  -  SPRITE PATTERN GEN. TAB.
+    
+    ld    a,$f5 (00 ?)
+    call    VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
+    
+    
+    ld    c,$00
+    ld    a,0		; reg0  - TEXT MODE
+    call    VDPreg_Write
+    
+    ld    a,$D0   ; ($C0 for MTX ?)  ; reg1 - TEXT MODE
+    call    VDPreg_Write
+    ret
 
 ; Switch 2 Video Mode n. 1
 init32:
@@ -68,7 +98,11 @@ inigrp:
 IF FORm5
     ld    a,$03		; reg0  - GRAPH MODE
 ELSE
+IF FORmtx
+    ld    a,$03		; reg0  - GRAPH MODE
+ELSE
     ld    a,$02		; reg0  - GRAPH MODE
+ENDIF
 ENDIF
     call    VDPreg_Write
     

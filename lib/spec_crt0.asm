@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.29 2010-07-13 06:16:53 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.30 2011-05-09 14:31:38 stefano Exp $
 ;
 
 
@@ -511,9 +511,6 @@ IF DEFINED_ANSIstdio
 ELSE
         defw    -11,-12,-10
 ENDIF
-
-                defm    "Small C+ ZX"   ;Unnecessary file signature
-                defb    0
 
 ;-----------------------
 ; Floating point support
