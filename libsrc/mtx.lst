@@ -24,6 +24,7 @@ graphics/msx/surface/surface_draw
 graphics/msx/surface/surface_pixladdr
 graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
+games/mtx/joystick
 sms/clear_vram
 sms/load_palette
 sms/VRAMToHL

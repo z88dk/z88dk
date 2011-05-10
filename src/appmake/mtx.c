@@ -1,7 +1,7 @@
 /*
  *      Memotech MTX application packager
  *      
- *      $Id: mtx.c,v 1.1 2011-05-09 14:31:38 stefano Exp $
+ *      $Id: mtx.c,v 1.2 2011-05-10 12:15:08 stefano Exp $
  */
 
 
@@ -11,7 +11,9 @@
 
 
 static char             *binname      = NULL;
+static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
+static int               origin       = -1;
 static char              audio        = 0;
 static char              fast         = 0;
 static char              mtb          = 0;
@@ -27,12 +29,14 @@ static char              mtx_l_lvl;
 option_t mtx_options[] = {
     { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
+    { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
     {  0,  "mtb",      "MTB output file mode",       OPT_BOOL,  &mtb },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
+    {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -108,7 +112,8 @@ int mtx_exec(char *target)
     FILE   *fpin;
     FILE   *fpout;
     FILE   *fpout2;
-    int     len, prglen, rampos, pos;
+    int     len, prglen, rampos;
+    long    pos;
     int     c,i;
 
     unsigned int       stklim;
@@ -143,6 +148,15 @@ int mtx_exec(char *target)
 			  suffix_change(filename,".");
 		} else {
 			strcpy(filename,outfile);
+		}
+
+
+		if ( origin != -1 ) {
+			pos = origin;
+		} else {
+			if ( ( pos = parameter_search(crtfile,".sym","MYZORG") ) == -1 ) {
+				myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
+			}
 		}
 
 		if ( (fpin=fopen(binname,"rb") ) == NULL ) {
@@ -187,8 +201,13 @@ int mtx_exec(char *target)
 			writeword(0x0259,fpout);
 		}
 
-		rampos=0x8000;
+		if (pos<0x8000)
+			rampos=0x4000;
+		else
+			rampos=0x8000;
+
 		prglen=len+20;
+
 
 /* $0 ($F8F2)*/
 		for	(i=1;i<=(353);i++)

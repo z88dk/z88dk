@@ -1,6 +1,6 @@
 ;       Memotech MTX CRT0 stub
 ;
-;       $Id: mtx_crt0.asm,v 1.1 2011-05-09 14:31:38 stefano Exp $
+;       $Id: mtx_crt0.asm,v 1.2 2011-05-10 12:15:08 stefano Exp $
 ;
 
 

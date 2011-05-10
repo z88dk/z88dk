@@ -5,7 +5,7 @@
 ;
 ;	set screen mode
 ;
-;	$Id: gen_set_mode.asm,v 1.4 2011-05-09 14:31:38 stefano Exp $
+;	$Id: gen_set_mode.asm,v 1.5 2011-05-10 12:15:08 stefano Exp $
 ;
 
 
@@ -32,7 +32,11 @@ initxt:
     ld    a,$D0
     call    VDPreg_Write    ; reg1  - text MODE
     
-    ld    a,$07   ; ($F0 for MTX ?)
+IF FORmtx
+    ld    a,$0e   ; untested
+ELSE
+    ld    a,$07
+ENDIF
     call    VDPreg_Write    ; reg2  -  NAME TABLE
     
     ld    a,0				;
@@ -75,7 +79,11 @@ inigrp:
     ld    a,$80
     call    VDPreg_Write    ; reg1  - GRAPH MODE
     
-    ld    a,$0E   ; ($F0 for MTX ?)
+IF FORmtx
+    ld    a,$0f
+ELSE
+    ld    a,$0E
+ENDIF
     call    VDPreg_Write    ; reg2  -  NAME TABLE
     
     ld    a,$FF				;
@@ -98,11 +106,7 @@ inigrp:
 IF FORm5
     ld    a,$03		; reg0  - GRAPH MODE
 ELSE
-IF FORmtx
-    ld    a,$03		; reg0  - GRAPH MODE
-ELSE
     ld    a,$02		; reg0  - GRAPH MODE
-ENDIF
 ENDIF
     call    VDPreg_Write
     
@@ -113,6 +117,16 @@ ENDIF
 
 ; Switch 2 Video Mode n. 3
 inimlt:
+; On MTX, a game sets the 16 colours mode as follows:
+; -- graph mode (reg0=2)
+; reg1 - c2
+; reg2 - 06		-- bit 0 and 3 are toggled ??
+; reg3 - ff
+; reg4 - 03
+; reg5 - 38
+; reg6 - 07
+; reg7 - 01
+
 	ret
 
 
