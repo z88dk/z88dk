@@ -1,7 +1,7 @@
 /*
  *      Memotech MTX application packager
  *      
- *      $Id: mtx.c,v 1.2 2011-05-10 12:15:08 stefano Exp $
+ *      $Id: mtx.c,v 1.3 2011-05-10 12:22:39 stefano Exp $
  */
 
 
@@ -331,7 +331,7 @@ int mtx_exec(char *target)
 		writeword(10,fpout);       /* 10   */
 		writebyte(0xAE, fpout);    /* RAND */
 		writebyte(0xEB, fpout);    /* USR  */
-		sprintf(mybuf,"(%i)",(int)pos);    /* Location for USR, should always be 5 digits long */
+			sprintf(mybuf,"(%i)",(int)pos);    /* Location for USR, should always be 5 digits long */
 		for ( i = 0; i < 7; i++)
 			writebyte(mybuf[i],fpout);
 		writebyte(0xff,fpout);
