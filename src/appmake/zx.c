@@ -12,7 +12,7 @@
  *        Creates a new TAP file (overwriting if necessary) just ready to run.
  *        Use tapmaker to customize your work.
  *
- *        $Id: zx.c,v 1.9 2011-05-11 16:48:49 stefano Exp $
+ *        $Id: zx.c,v 1.10 2011-05-12 09:49:23 stefano Exp $
  */
 
 #include "appmake.h"
@@ -82,7 +82,11 @@ int zx_exec(char *target)
 
 		if ( blockname == NULL )
 			blockname = binname;
-			
+		
+		if ( strcmp(binname,filename) == 0 ) {
+			fprintf(stderr,"Input and output file names must be different\n");
+			myexit(NULL,1);
+		}
 
 
 		if ( origin != -1 ) {
@@ -277,15 +281,18 @@ int zx_exec(char *target)
 		  blocklen = (getc(fpin) + 256 * getc(fpin));
 		  if (dumb) {
 			if (blocklen==19)
-				printf("\n  Header found");
+				printf("\n  Header found: ");
 			else
 				printf("\n  Block found, length: %d Byte(s) ",blocklen);
 		  }
 		  zx_pilot(fpout);
           for (i=0; (i < blocklen); i++) {
             c=getc(fpin);
+			if ((dumb) && (blocklen==19) && (c>=32) && (c<=126) && (i>1) && (i<12) )
+				printf("%c",c);
 		    zx_rawout(fpout,c,fast);
           }
+		  if (dumb) printf("\n");
 		}
 
 		/* trailing silence */

@@ -1,7 +1,7 @@
 /*
  *      Memotech MTX application packager
  *      
- *      $Id: mtx.c,v 1.3 2011-05-10 12:22:39 stefano Exp $
+ *      $Id: mtx.c,v 1.4 2011-05-12 09:49:23 stefano Exp $
  */
 
 
@@ -148,6 +148,11 @@ int mtx_exec(char *target)
 			  suffix_change(filename,".");
 		} else {
 			strcpy(filename,outfile);
+		}
+		
+		if ( strcmp(binname,filename) == 0 ) {
+			fprintf(stderr,"Input and output file names must be different\n");
+			myexit(NULL,1);
 		}
 
 
