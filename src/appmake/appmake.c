@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.11 2010-07-30 06:18:43 stefano Exp $
+ *   $Id: appmake.c,v 1.12 2011-05-23 07:10:39 stefano Exp $
  */
 
 #define MAIN_C
@@ -101,6 +101,9 @@ long parameter_search(char *filen, char *ext,char *target)
     long    val=-1;
     FILE    *fp;
 
+    if (filen == NULL) {
+        myexit("CRT file name not specified (not z88dk compiled?)\n",1);
+    }
     /* Create the filename very quickly */
     strcpy(name,filen);
     strcat(name,ext);
@@ -109,7 +112,7 @@ long parameter_search(char *filen, char *ext,char *target)
         myexit(name,1);
     }
     
-    /* Successfully opened the file so search through it.. */
+     /* Successfully opened the file so search through it.. */
     while ( fgets(buffer,LINEMAX,fp) != NULL ) {
         if      (strncmp(buffer,target,strlen(target)) == 0 ) {
             sscanf(buffer,"%s%s%lx",name,name,&val);
@@ -284,11 +287,27 @@ void writeword_p(unsigned int i, FILE *fp,unsigned char *p)
     writebyte_p(i/256,fp,p);
 }
 
+/* Parity in kansas-city mode (Sorcerer Exidy) */
+void writeword_pk(unsigned int i, FILE *fp,unsigned char *p)
+{
+    writebyte_pk(i%256,fp,p);
+    writebyte_pk(i/256,fp,p);
+}
 
+/* Parity in checksum mode (Spectrum, Newbrain..) */
 void writebyte_p(unsigned char c, FILE *fp,unsigned char *p)
 {
     fputc(c,fp);
     *p^=c;
+}
+
+/* Parity in kansas-city mode (Sorcerer Exidy) */
+void writebyte_pk(unsigned char c, FILE *fp,unsigned char *p)
+{
+	unsigned char a,b;
+	
+    fputc(c,fp);
+    *p=0xff^(c-*p);
 }
 
 void writestring_p(char *mystring, FILE *fp,unsigned char *p)
@@ -297,6 +316,15 @@ void writestring_p(char *mystring, FILE *fp,unsigned char *p)
 
     for (c=0; c < strlen(mystring); c++) {
         writebyte_p(mystring[c],fp,p);
+    }
+}
+
+void writestring_pk(char *mystring, FILE *fp,unsigned char *p)
+{
+    int  c;
+
+    for (c=0; c < strlen(mystring); c++) {
+        writebyte_pk(mystring[c],fp,p);
     }
 }
 

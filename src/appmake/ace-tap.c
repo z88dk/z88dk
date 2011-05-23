@@ -6,7 +6,7 @@
  *                         - Modified for the Jupiter ACE
  *	Stefano 19/5/2010 - Heavily updated
  *
- *	$Id: ace-tap.c,v 1.7 2011-05-12 16:55:09 stefano Exp $
+ *	$Id: ace-tap.c,v 1.8 2011-05-23 07:10:39 stefano Exp $
  */
 
 #include "appmake.h"

@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.21 2011-05-09 14:31:38 stefano Exp $
+ *   $Id: appmake.h,v 1.22 2011-05-23 07:10:39 stefano Exp $
  */
 
 
@@ -70,6 +70,9 @@ extern option_t  mz_options;
 
 extern int       nascom_exec(char *target);
 extern option_t  nascom_options;
+
+extern int       sorcerer_exec(char *target);
+extern option_t  sorcerer_options;
 
 extern int       newbrain_exec(char *target);
 extern option_t  newbrain_options;
@@ -152,7 +155,7 @@ struct {
       "Adds a file header to enable the program to be loaded using 'bload \"file.bin\",r",
       msx_exec,     &msx_options },
     { "bin2mtx",  "mtx",      "(C) 2011 Stefano Bodrato",
-      "Memotech MTX file format packaging",
+      "Memotech MTX file format packaging, optional WAV format",
       mtx_exec,     &mtx_options },
     { "bin2m12",  "mz",       "(C) 2000 Stefano Bodrato",
       "Generates a tape file for the Sharp MZ computers",
@@ -160,6 +163,9 @@ struct {
     { "bin2nas",   "nas",       "(C) 2003 Stefano Bodrato",
       "Generates a .NAS file suitable for use by emulators",
       nascom_exec,    &nascom_options },
+    { "bin2srr",   "srr",       "(C) 2011 Stefano Bodrato",
+      "Packaging for Sorcerer Exidy, --audio for WAV format",
+      sorcerer_exec,    &sorcerer_options },
     { "bin2nwbn",   "newbrain",       "(C) 2007 Stefano Bodrato",
       "BASIC loader + data block in Tape format or plain TXT (less efficient)",
       newbrain_exec,    &newbrain_options },
@@ -215,7 +221,7 @@ struct {
       "Generates a .P file suitable for use by emulators, optionally a WAV file",
       zx81_exec,    &zx81_options }
 };
-#define APPMAKE_TARGETS 31
+#define APPMAKE_TARGETS 32
 #endif
 
 
@@ -233,7 +239,9 @@ extern void         writelong(unsigned long i, FILE *fp);
 extern void         writestring(char *mystring, FILE *fp);
 extern void         writeword_p(unsigned int i, FILE *fp,unsigned char *p);
 extern void         writebyte_p(unsigned char c, FILE *fp,unsigned char *p);
-extern void         writestring_p(char *mystring, FILE *fp,unsigned char *p);
+extern void         writeword_pk(unsigned int i, FILE *fp,unsigned char *p);
+extern void         writebyte_pk(unsigned char c, FILE *fp,unsigned char *p);
+extern void         writestring_pk(char *mystring, FILE *fp,unsigned char *p);
 
 extern void         writebyte_cksum(unsigned char c, FILE *fp, unsigned long *cksum);
 extern void         writeword_cksum(unsigned int i, FILE *fp, unsigned long *cksum);

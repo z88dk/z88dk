@@ -12,7 +12,7 @@
  *        Creates a new TAP file (overwriting if necessary) just ready to run.
  *        Use tapmaker to customize your work.
  *
- *        $Id: zx.c,v 1.10 2011-05-12 09:49:23 stefano Exp $
+ *        $Id: zx.c,v 1.11 2011-05-23 07:10:39 stefano Exp $
  */
 
 #include "appmake.h"
@@ -30,7 +30,7 @@ static char              audio        = 0;
 static char              fast         = 0;
 static char              dumb         = 0;
 static char              noloader     = 0;
-static unsigned char     parity;
+static unsigned char     parity = 0;
 
 
 /* Options that are available for this module */

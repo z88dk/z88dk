@@ -7,7 +7,7 @@
  *        Stefano Bodrato Apr. 2000
  *        May 2010, added support for wave file
  *
- *        $Id: zx81.c,v 1.10 2011-05-12 09:49:23 stefano Exp $
+ *        $Id: zx81.c,v 1.11 2011-05-23 07:10:39 stefano Exp $
  */
 
 #include "appmake.h"

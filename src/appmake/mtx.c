@@ -1,7 +1,7 @@
 /*
  *      Memotech MTX application packager
  *      
- *      $Id: mtx.c,v 1.4 2011-05-12 09:49:23 stefano Exp $
+ *      $Id: mtx.c,v 1.5 2011-05-23 07:10:39 stefano Exp $
  */
 
 
@@ -111,7 +111,6 @@ int mtx_exec(char *target)
     char    mybuf[20];
     FILE   *fpin;
     FILE   *fpout;
-    FILE   *fpout2;
     int     len, prglen, rampos;
     long    pos;
     int     c,i;
@@ -122,10 +121,9 @@ int mtx_exec(char *target)
     if ( help )
         return -1;
 
-    if ( binname == NULL ) {
+    if ( binname == NULL || !dumb && ( crtfile == NULL && origin == -1 ) ) {
         return -1;
     }
-
 
 	if (loud) {
 		mtx_h_lvl = 0xFF;
