@@ -3,7 +3,7 @@
  *      Sorcerer Exidy application packager
  * 		Kansas City Standard
  *      
- *      $Id: sorcerer.c,v 1.1 2011-05-23 07:10:39 stefano Exp $
+ *      $Id: sorcerer.c,v 1.2 2011-05-24 18:11:10 stefano Exp $
  */
 
 
@@ -143,7 +143,7 @@ int sorcerer_exec(char *target)
     FILE   *fpout;
     int     len;
     long    pos;
-    int     c,i;
+    int     c,i,j;
 
 
     if ( help )
@@ -237,27 +237,30 @@ int sorcerer_exec(char *target)
 		writebyte_pk(0,fpout,&parity);         /* ... */
 		writebyte_pk(0,fpout,&parity);         /* ... */
 
-		writebyte_p(parity,fpout,&parity);		/* Checksum */
-
-
-		/* PROGRAM BLOCK */
+		writebyte_p(parity,fpout,&parity);		/* Checksum for header and middle blocks*/
 
 		/* Leader */
-		for (i=0; (i < 100); i++)
+		for (j=0; (j < 100); j++)
 			writebyte_pk(0,fpout,&parity);
 		writebyte_pk(1,fpout,&parity);      /* leading SOH */
 		parity=0;
 
+		/* PROGRAM BLOCK */
+
 		for ( i = 0; i < len; i++) {
+			if (i>0 && (i%256 == 0))			
+				writebyte_p(parity,fpout,&parity);		/* Checksum for header and middle blocks*/
 			c = getc(fpin);
-			writebyte_pk(name[i],fpout,&parity);
+			writebyte_pk(c,fpout,&parity);
 		}
 
-		writebyte_p(parity,fpout,&parity);
+		if ((i-1)%256 != 0)
+			writebyte_p(parity,fpout,&parity);		/* Checksum for last block */
 
-		for (i=0; (i < 100); i++)
+		/* Trailing sequence */
+		for (j=0; (j < 100); j++)
 			writebyte_pk(0,fpout,&parity);
-		writebyte_pk(1,fpout,&parity);      /* trailing SOH */
+		writebyte_pk(1,fpout,&parity);      /* leading SOH */
 
 
 		fclose(fpin);
@@ -298,10 +301,14 @@ int sorcerer_exec(char *target)
 		if (dumb) printf("\nInfo: Program Name found in header: ");
 		for (i=0; (i < 118); i++) {
 			c=getc(fpin);
-			if (dumb && (c>101 || c<106)) printf("%c",c);
+			if (dumb && i>100 && i<106) printf("%c",c);
+			if (dumb && i==107) printf("\nInfo: File type $%x",c);
+			if (dumb && (i==108 || i==110 || i==112)) j=c;
+			if (dumb && i==109) printf("\nInfo: File Size $%x",c*256+j);
+			if (dumb && i==111) printf("\nInfo: Start location $%x",c*256+j);
+			if (dumb && i==113) printf("\nInfo: Go address $%x",c*256+j);
 			sorcerer_rawout(fpout,c);
 		}
-		if (dumb) printf("\n\n");
 
 		len-=118;
 
@@ -313,11 +320,13 @@ int sorcerer_exec(char *target)
 			}
 		}
 
-		/* trailing tone and silence */
+		/* trailing tone and silence (probably not necessary) */
+/*
+		sorcerer_bit(fpout,0);
 		sorcerer_tone(fpout);
 		for (i=0; i < 0x1000; i++)
 			fputc(0x80, fpout);
-
+*/
         fclose(fpin);
         fclose(fpout);
 

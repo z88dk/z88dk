@@ -1,0 +1,6 @@
+stdio/sorcerer/fgetc_cons
+stdio/sorcerer/fputc_cons
+stdio/sorcerer/getk
+stdio/puts_cons
+games/joystick
+@z80.lst
