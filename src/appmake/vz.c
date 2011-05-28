@@ -1,7 +1,8 @@
 /*
- *        Laser 200/300 VZ file and WAV generator/converter
+ *        Laser 200/300 VZ to CAS file converter
+ *        and WAV generator (dumb mode is not necessary)
  *
- *        $Id: vz.c,v 1.2 2011-05-28 09:52:45 stefano Exp $
+ *        $Id: vz.c,v 1.3 2011-05-28 10:13:25 stefano Exp $
  */
 
 #include "appmake.h"
