@@ -1,7 +1,7 @@
 /*
  *        Laser 200/300 VZ file and WAV generator/converter
  *
- *        $Id: vz.c,v 1.1 2010-07-30 06:18:43 stefano Exp $
+ *        $Id: vz.c,v 1.2 2011-05-28 09:52:45 stefano Exp $
  */
 
 #include "appmake.h"
@@ -45,10 +45,10 @@ void vz_bit (FILE *fpout, unsigned char bit)
 
 	if ( fast ) {
 		bip = 11;
-		bop = 22;
+		bop = 23;
 	} else {
 		bip = 12;
-		bop = 24;
+		bop = 25;
 	}
 
 	if (bit) {
@@ -197,7 +197,7 @@ int vz_exec(char *target)
 		hdlen=128 + 5 + 1 + strlen(name) + 1;
 
 		/* leading silence */
-	    for (i=0; i < 0x6000; i++)
+	    for (i=0; i < 0x20000; i++)
 			fputc(0x20, fpout);
 		
 		/* header+filename */
