@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.22 2011-05-23 07:10:39 stefano Exp $
+ *   $Id: appmake.h,v 1.23 2011-06-07 06:15:33 stefano Exp $
  */
 
 
@@ -157,7 +157,7 @@ struct {
     { "bin2mtx",  "mtx",      "(C) 2011 Stefano Bodrato",
       "Memotech MTX file format packaging, optional WAV format",
       mtx_exec,     &mtx_options },
-    { "bin2m12",  "mz",       "(C) 2000 Stefano Bodrato",
+    { "bin2m12",  "mz",       "(C) 2000,2003 S. Bodrato, J.F.J. Laros, M. Nemecek",
       "Generates a tape file for the Sharp MZ computers",
       mz_exec,      &mz_options },
     { "bin2nas",   "nas",       "(C) 2003 Stefano Bodrato",

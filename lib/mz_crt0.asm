@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 5/5/2000
 ;
-;       $Id: mz_crt0.asm,v 1.10 2009-06-22 21:20:05 dom Exp $
+;       $Id: mz_crt0.asm,v 1.11 2011-06-07 06:15:33 stefano Exp $
 ;
 
 
@@ -48,7 +48,12 @@
 
 ; Now, getting to the real stuff now!
 
-        org     4608
+        IF      !myzorg
+                defc    myzorg  = $1300
+        ENDIF
+
+
+        org     myzorg
 
 start:
         ld      (start1+1),sp	;Save entry stack
