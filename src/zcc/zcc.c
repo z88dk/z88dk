@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.50 2010-09-30 20:30:16 dom Exp $
+ *      $Id: zcc.c,v 1.51 2011-06-08 21:49:23 dom Exp $
  */
 
 
@@ -1190,7 +1190,7 @@ SetCompiler(arg_t *argument, char *val)
     /* compiler= */
     if ( strcmp(val+9,"sdcc") == 0 ) {
         compiler_type = CC_SDCC;
-        snprintf(buf,sizeof(buf)," -mz80 --c1mode --asm=%s",sdcc_assemblernames[assembler_type]);                 
+        snprintf(buf,sizeof(buf)," -mz80 --reserve-regs-iy --no-peep --no-optsdcc-in-asm --c1mode --asm=%s",sdcc_assemblernames[assembler_type]);                 
         AddComp(buf+1);
         BuildOptions(&cpparg, preprocarg);
         if ( assembler_type == ASM_Z80ASM ) {
