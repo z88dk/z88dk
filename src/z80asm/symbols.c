@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.3 2010-04-16 17:34:37 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.4 2011-06-08 22:03:35 dom Exp $ */
 /* $History: SYMBOLS.C $ */
 /*  */
 /* *****************  Version 9  ***************** */
@@ -79,7 +79,7 @@ void FreeSym (symbol * node);
 
 /* global variables */
 extern int PAGENR;
-extern enum flag symtable, listing, listing_CPY, pass1;
+extern enum flag symtable, listing, listing_CPY, pass1, sdcc_hacks;
 extern struct module *CURRENTMODULE;	/* pointer to current module */
 extern avltree *globalroot;
 
@@ -420,7 +420,10 @@ DeclSymExtern (char *identifier, unsigned char libtype)
 	}
       else if (foundsym->owner == CURRENTMODULE) {
 	if ( (foundsym->type & (SYMXREF | libtype)) != (SYMXREF |libtype) )
-     	   ReportError (CURRENTFILE->fname, CURRENTFILE->line, 23);	/* Re-declaration not allowed */
+           if (sdcc_hacks) 
+             foundsym->type=SYMXREF|libtype ;
+           else
+     	     ReportError (CURRENTFILE->fname, CURRENTFILE->line, 23);	/* Re-declaration not allowed */
       }
     }
   else
