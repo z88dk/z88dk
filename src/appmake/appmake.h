@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.23 2011-06-07 06:15:33 stefano Exp $
+ *   $Id: appmake.h,v 1.24 2011-06-14 07:36:01 stefano Exp $
  */
 
 
@@ -98,6 +98,9 @@ extern option_t  trs80_options;
 extern int       vz_exec(char *target);
 extern option_t  vz_options;
 
+extern int       x07_exec(char *target);
+extern option_t  x07_options;
+
 extern int       z88_exec(char *target);
 extern option_t  z88_options;
 
@@ -142,7 +145,7 @@ struct {
     { "bin2ep",   "enterprise",      "(C) 2011 Stefano Bodrato",
       "Adds a type 5 header to make a .app file",
       enterprise_exec,   &enterprise_options },
-    { "bin2gtp",  "gal",      "(C) 2007 - 2008 Tomaz Solc & Stefano Bodrato",
+    { "bin2gtp",  "gal",      "(C) 2007,2008 Tomaz Solc & Stefano Bodrato",
       "Creates a tape file image for the Galaksija micro",
       gal_exec,   &gal_options },
     { "bin2hex",  "hex",      "(C) 2001 Dominic Morris & Jeff Brown",
@@ -172,22 +175,22 @@ struct {
     { "mkaddin",   "rex",       "(C) 2001 Dominic Morris",
       "Creates a .rex application using data from a .res file and a .bin file",
       rex_exec,     &rex_options },
-    { "bin2var",   "ti82",       "(C) 2000 - 2003 David Phillips et al",
+    { "bin2var",   "ti82",       "(C) 2000,2003 David Phillips et al",
       "Creates a .82p file",
       tixx_exec,      &tixx_options },
-    { "bin2var",   "ti83",       "(C) 2000 - 2003 David Phillips et al",
+    { "bin2var",   "ti83",       "(C) 2000,2003 David Phillips et al",
       "Creates a .83p file",
       tixx_exec,      &tixx_options },
-    { "bin2var",   "ti8x",       "(C) 2000 - 2003 David Phillips et al",
+    { "bin2var",   "ti8x",       "(C) 2000,2003 David Phillips et al",
       "Creates a .8xp file",
       tixx_exec,      &tixx_options },
-    { "bin2var",   "ti85",       "(C) 2000 - 2003 David Phillips et al",
+    { "bin2var",   "ti85",       "(C) 2000,2003 David Phillips et al",
       "Creates a .85p file",
       tixx_exec,      &tixx_options },
-    { "bin2var",   "ti86",       "(C) 2000 - 2003 David Phillips et al",
+    { "bin2var",   "ti86",       "(C) 2000,2003 David Phillips et al",
       "Creates a .86p file",
       tixx_exec,      &tixx_options },
-    { "bin2var",   "ti86s",       "(C) 2000 - 2003 David Phillips et al",
+    { "bin2var",   "ti86s",       "(C) 2000,2003 David Phillips et al",
       "Creates a .86s file",
       tixx_exec,      &tixx_options },
     { "bin2svi",  "svi",       "(C) 2001 Stefano Bodrato",
@@ -205,23 +208,26 @@ struct {
     { "vz2cas",    "vz",     "(C) 2010 Stefano Bodrato",
       "Convert the Laser 200 .vz file to .cas, optionally to WAV",
       vz_exec,    &vz_options },
-    { "appz88",   "z88",      "(C) 2000 - 2003 Dominic Morris & Dennis Groning",
+    { "appz88",   "z88",      "(C) 2000,2003 Dominic Morris & Dennis Groning",
       "Generates .63 and .62 files suitable for burning to EPROM",
       z88_exec,     &z88_options },
-    { "shellmak", "z88shell", "(C) 2002 - 2003 Dominic Morris",   
+    { "x07cas",    "x07",     "(C) 2011 Stefano Bodrato",
+      "Prapares a .cas file for the Canon X-07, optional WAV format",
+      x07_exec,    &x07_options },
+    { "shellmak", "z88shell", "(C) 2002,2003 Dominic Morris",   
       "Patches the header to ensure that the program is recognised by the shell",
       z88shell_exec,&z88shell_options },
     { "appzxvgs", "zxvgs",    "(C) 2003 Yarek",
       "Creates a zxvgs application file",
       zxvgs_exec,   &zxvgs_options},
-    { "bin2tap",  "zx",       "(C) 2000 - 2003 Dominic Morris & Stefano Bodrato", 
+    { "bin2tap",  "zx",       "(C) 2000,2003 Dominic Morris & Stefano Bodrato", 
       "Generates a .TAP file complete with BASIC header, optionally a WAV file",
       zx_exec,      &zx_options },
     { "bin2p",    "zx81",     "(C) 2000 Stefano Bodrato",                         
       "Generates a .P file suitable for use by emulators, optionally a WAV file",
       zx81_exec,    &zx81_options }
 };
-#define APPMAKE_TARGETS 32
+#define APPMAKE_TARGETS 33
 #endif
 
 
