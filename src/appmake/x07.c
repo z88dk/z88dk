@@ -6,7 +6,7 @@
  *
  *        Stefano Bodrato Jun 2011
  *
- *        $Id: x07.c,v 1.1 2011-06-14 07:36:01 stefano Exp $
+ *        $Id: x07.c,v 1.2 2011-06-15 15:22:59 stefano Exp $
  */
 
 #include "appmake.h"
@@ -189,19 +189,21 @@ int x07_exec(char *target)
 		if (pos==1380) {
 		/* Code in a REM statement mode, multiple zeroes seem not to be allowed */ 
 
-			writeword(1374,fpout);       /* Address of next program line */
+			writeword(1375,fpout);       /* Address of next program line */
 			writebyte(1,fpout);          /* 1 */
 			writebyte(0,fpout);
-			writebyte(168,fpout);        /* EXEC 1380 */
-			writebyte(' ',fpout);
-			writestring("1380",fpout);
+			writebyte(168,fpout);        /* EXEC1380: */
+			//writebyte(' ',fpout);
+			writestring("1380:",fpout);
+			writebyte(0x80,fpout);       /* END */
+
 			writebyte(0,fpout);
 
 			writeword(1381+len,fpout);   /* Address of next program line */
 			writebyte(2,fpout);          /* 2 */
 			writebyte(0,fpout);
-			writebyte(168,fpout);        /* REM */
-			writebyte(' ',fpout);
+			writebyte(0x8E,fpout);        /* REM */
+			//writebyte(' ',fpout);
 
 			for (i=0; i<len;i++) {
 				c=getc(fpin);
