@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.161 2011-05-24 18:11:10 stefano Exp $
+# $Id: Makefile,v 1.162 2011-06-15 20:15:00 stefano Exp $
 
 
 include	Make.config
@@ -21,7 +21,7 @@ all:	genlibs	z88libs	tilibs zxlibs eplibs c128libs cpclibs \
 	ozansi_clib.lib	pps_clib.lib ppsansi_clib.lib \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib \
-	trs80_clib.lib vz_clib.lib vzansi_clib.lib \
+	trs80_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib\
 	embedded_clib.lib test_clib.lib	\
 	preempt.lib zx81libs
 
@@ -1282,6 +1282,19 @@ trs80_clib.lib:
 	cd assert ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) ltrs80 ; cd ..
 	$(LIBLINKER) -DFORtrs80	-x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
+
+# Canon X-07 lib - Stefano
+x07_clib.lib:
+	@echo ''
+	@echo '--- Building Canon X-07 Library ---'
+	@echo ''
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic	; cd ..
+	cd printflike ;	$(MAKE)	; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/x07_clib @$(LISTFILE_DIRECTORY)/x07.lst
 
 # Z88 maths build - dom
 preempt.lib:

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.30 2010-10-06 06:04:26 stefano Exp $
+# $Id: Makefile,v 1.31 2011-06-15 20:15:00 stefano Exp $
 #
 
 include ../Make.config
@@ -154,6 +154,7 @@ clean:
 	$(RM) oz/*.o
 	$(RM) sam/*.o
 	$(RM) sms/*.o
+	$(RM) sorcerer/*.o
 	$(RM) spectrum/*.o
 	$(RM) test/*.o
 	$(RM) ticalc/*.o
@@ -162,6 +163,7 @@ clean:
 	$(RM) sprinter/*.o
 	$(RM) svi/*.o
 	$(RM) vz200/*.o
+	$(RM) x07/*.o
 	$(RM) z88/*.o
 	$(RM) zx81/*.o
 	$(RM) rcmx000/*.o
