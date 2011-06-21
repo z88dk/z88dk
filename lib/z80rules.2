@@ -1160,6 +1160,10 @@
 	call	l_gcharsp	;
 	ld	hl,%2	;const
 
+	MODULE %1
+=
+	; MODULE %1
+
 	.optsdcc %1
 =
 	; SDCC options: %1
@@ -1174,10 +1178,14 @@
 	ld	(hl),%2
 	inc	hl
 
+	LIB _main
+=
+	XLIB _main
+
 ._main%1
 ._main%2
 =
-; Z88DK moved the 'main' before 'GSINIT'
+; Z88DK moved 'main' before 'GSINIT'
 
 ; global & static %1
 =
