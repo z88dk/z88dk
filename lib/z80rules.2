@@ -1167,8 +1167,6 @@
 	.optsdcc %1
 =
 	; SDCC options: %1
-	INCLUDE "zcc_opt.def"
-	INCLUDE "z80_crt0.hdr"
 
 	ld	hl,%1
 	ld	(hl),%2
@@ -1181,6 +1179,8 @@
 	LIB _main
 =
 	XLIB _main
+	INCLUDE "zcc_opt.def"
+	INCLUDE "z80_crt0.hdr"
 
 ._main%1
 ._main%2
