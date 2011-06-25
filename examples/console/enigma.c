@@ -13,23 +13,23 @@
 
 /* Rotor Wirings */
 
-unsigned char rotor[] =
+const unsigned char rotor[] =
     "EKMFLGDQVZNTOWYHXUSPAIBRCJAJDKSIRUXBLHWTMCQGZNPYFVOEBDFHJLCPRTXVZNYEIWGAKMUSQOESOVPZJAYQUIRHXLNFTGKDCMWBVZBRGITYUPSDNHLXAWMJQOFECK";
 
-unsigned char ref[] = "YRUHQSLDPXNGOKMIEBFZCWVJAT";
+const unsigned char ref[] = "YRUHQSLDPXNGOKMIEBFZCWVJAT";
 
-unsigned char notch[] = "QEVJZ";
+const unsigned char notch[] = "QEVJZ";
 unsigned int flag = 0;
 
 /*Encryption parameters */
 
-unsigned char order[3] = { 3, 1, 2 };
-unsigned char rings[3] = { 'W', 'X', 'T' };
-unsigned char pos[3] = { 'A', 'W', 'E' };
-unsigned char plug[] = "AMTE";
+const unsigned char order[3] = { 3, 1, 2 };
+const unsigned char rings[3] = { 'W', 'X', 'T' };
+unsigned char pos[3];
+const unsigned char plug[] = "AMTE";
 
 #ifdef CPM
-#define ARGC
+//#define ARGC
 #endif
 #ifdef Z88_SHELL
 #define ARGC
@@ -42,9 +42,10 @@ int main()
 #endif
 {
     unsigned int i, j, n = 0;
-    unsigned int ch;
+    int ch;
 #ifdef ARGC
     int len, posn;
+
 
     if (argc != 2) {
 	puts("Usage: enigma [text to be encoded]");
@@ -56,6 +57,9 @@ int main()
 #else
     puts("Enter text to be (de)coded, finish with a .");
 #endif
+    pos[0] = 'A';
+    pos[1] = 'W';
+    pos[2] = 'E';
 
 #ifdef ARGC
     while (posn++ < len) {
@@ -67,7 +71,7 @@ int main()
 #endif
 	if (ch == '.')
 	    exit(0);
-	if (!isalpha(ch))
+	if (isalpha(ch) == 0)
 	    continue;
 
 
