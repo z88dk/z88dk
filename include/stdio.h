@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.16 2010-09-19 03:17:10 dom Exp $ */
+/* $Id: stdio.h,v 1.17 2011-06-25 22:48:17 dom Exp $ */
 
 #undef __STDIO_BINARY        /* By default don't consider binary files */
 
@@ -125,7 +125,7 @@ extern void __LIB__ closeall();
 
 extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp);
 extern int __LIB__ fputs(unsigned char *s,  FILE *fp);
-extern int __LIB__ fputc(int c, FILE *fp);
+extern int __LIB__ fputc(int c, FILE *fp) __SMALLCDECL;
 #define getc(f) fgetc(f)
 extern int __LIB__ fgetc(FILE *fp);
 extern int __LIB__ ungetc(int c, FILE *);
