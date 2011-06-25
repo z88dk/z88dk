@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.20 2010-09-16 21:41:31 dom Exp $
+ *      $Id: declvar.c,v 1.21 2011-06-25 22:59:16 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -766,8 +766,9 @@ TAG_SYMBOL *GetVarID(struct varid *var,char storage)
         var->type=NO;
         var->sflag=NO;
 
-        if (swallow("const") )
-                warning(W_CONST);
+        if (swallow("const") ) {
+        //        warning(W_CONST);
+        }
         else if (swallow("volatile") )
                 warning(W_VOLATILE);
 
@@ -825,8 +826,9 @@ TAG_SYMBOL *GetVarID(struct varid *var,char storage)
                         ++ptr;
                 }
         }
-        if (swallow("const") )
-                warning(W_CONST);
+        if (swallow("const") ) {
+        //        warning(W_CONST);
+        }
         return(0);
 }
 
