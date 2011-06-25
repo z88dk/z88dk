@@ -8,7 +8,10 @@
 #define __FASTCALL__
 #define __CALLEE__
 #define __LIB__
+#define __SMALLCDECL __smallc
 #define far
+#else
+#define __SMALLCDECL
 #endif
 
 #endif
