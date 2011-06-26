@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.21 2009-09-06 18:58:37 dom Exp $
+ *      $Id: main.c,v 1.22 2011-06-26 16:07:29 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -1355,6 +1355,8 @@ void SetAssembler(char *arg)
             assemtype = ASM_ASXX;
         } else if ( strcmp(assembler,"vasm") == 0 ) {
             assemtype = ASM_VASM;
+        } else if ( strcmp(assembler,"gnu") == 0 ) {
+            assemtype = ASM_GNU;
         }
     }
 }

@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.51 2011-06-08 21:49:23 dom Exp $
+ *      $Id: zcc.c,v 1.52 2011-06-26 16:07:29 dom Exp $
  */
 
 
@@ -114,6 +114,8 @@ static struct confs    myconf[] = {
     {"ASLINKOPTS", NULL, SetOptions, NULL},
     {"MPMEXE", NULL, Deprecated, NULL},
     {"LIBPATH", NULL, Deprecated, NULL},
+    {"GNUASOPTS", NULL, SetOptions, NULL},
+    {"GNULINKOPTS", NULL, SetOptions, NULL},
     {"", NULL, NULL}
 };
 
@@ -159,9 +161,10 @@ static char            extension[5];
 #define ASM_Z80ASM 0
 #define ASM_ASXX   1
 #define ASM_VASM   2
+#define ASM_GNU    3
 static int             assembler_type = ASM_Z80ASM;
 static enum iostyle    assembler_style = outimplied;
-static char           *sdcc_assemblernames[] = { "z80asm", "asxxxx", "vasm" };
+static char           *sdcc_assemblernames[] = { "z80asm", "asxxxx", "vasm", "gnu" };
 static int             linker_output_separate_arg = 0;
 
 #define CC_SCCZ80 0 
@@ -1148,6 +1151,19 @@ SetAssemblerType(char *name)
 
         printf("Assembler opts = %s\n", myconf[ASMOPTS].def);
 
+        style = outspecified_flag;
+        linker_output_separate_arg = 1;
+    } else if (strcasecmp(name, "gnu") == 0 ) {
+        type = ASM_GNU;
+        linker = "z80-unknown-coff-ld";
+        assembler = "z80-unknown-coff-as";
+
+        ptr = myconf[ASMOPTS].def;
+        myconf[ASMOPTS].def = myconf[GNUASOPTS].def ? myconf[GNUASOPTS].def : strdup("");
+        myconf[GNUASOPTS].def = ptr;
+        ptr = myconf[LINKOPTS].def;
+        myconf[LINKOPTS].def = myconf[GNULINKOPTS].def ? myconf[GNULINKOPTS].def : strdup("");
+        myconf[GNULINKOPTS].def = ptr;
         style = outspecified_flag;
         linker_output_separate_arg = 1;
     }

@@ -20,7 +20,7 @@ all: z80asm$(EXESUFFIX)
 
 
 z80asm$(EXESUFFIX): $(OBJS)
-	$(CC) $(LDFLAGS) -o z80asm$(EXESUFFIX)  $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o z80asm$(EXESUFFIX)  $(OBJS)
 
 install:
 	install  z80asm$(EXESUFFIX) $(PREFIX)/bin/

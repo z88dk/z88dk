@@ -1,6 +1,6 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.11 2009-09-06 18:58:37 dom Exp $
+ * $Id: define.h,v 1.12 2011-06-26 16:07:29 dom Exp $
  */
 
 /*      Stand-alone definitions                 */
@@ -355,5 +355,6 @@ struct varid {
 #define ASM_Z80ASM  0
 #define ASM_ASXX    1
 #define ASM_VASM    2
+#define ASM_GNU     3
 
 #define ISASM(x) ( assemtype == (x) )

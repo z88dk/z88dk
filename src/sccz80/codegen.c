@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.27 2010-04-16 00:48:28 dom Exp $
+ *      $Id: codegen.c,v 1.28 2011-06-26 16:07:29 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -60,6 +60,8 @@ void header(void)
         assembler = "asxx";
     } else if ( ISASM(ASM_VASM) ) {
         assembler = "vasm";
+    } else if ( ISASM(ASM_GNU) ) {
+        assembler = "binutils";
     }
         
     outfmt(";\tReconstructed for %s\n", assembler);
@@ -125,6 +127,7 @@ void DoLibHeader(void)
             outstr("scp_");  /* alpha id incase tmpfile is numeric */
 			outstr(segment);
 		}
+        nl();
     } else {
 /* Library function */
         outstr("\n;\tSmall C+ Library Function\n");
@@ -135,6 +138,8 @@ void DoLibHeader(void)
 			outstr("\n\tXLIB\t");
         } else if ( ISASM(ASM_VASM) ) {
             outstr("\n\tGLOBAL\t");
+        } else if ( ISASM(ASM_GNU) ) {
+            outstr("\n\t.global\t");
         }
         outstr(filen);
     }
@@ -149,6 +154,8 @@ void DoLibHeader(void)
 		    ol(".globl\tsaved_hl");
 		    ol(".globl\tsaved_de");
 		}
+    } else if (ISASM(ASM_GNU) ) {
+
 	} else {
         outstr("\n\n\tINCLUDE \"z80_crt0.hdr\"\n\n\n");
 		if ( noaltreg ) {
@@ -888,7 +895,11 @@ void zerojump(
         } else if (oper==le0) { /* <=0 */
             LoadAccum();
             ol("and\ta");
-            ol("jr\tz,ASMPC+5");
+            if ( IS_ASM(ASM_Z80ASM) ) {
+                ol("jr\tz,ASMPC+5");
+            } else {
+                ol("jr\tz,$+5");
+            }
             opjump("p,",label);
             return;
         } else if (oper==ge0 ) { /* > 0 */
@@ -954,7 +965,7 @@ void deflong(void)
 /* Print pseudo-op to define a string */
 void defmesg(void)
 {
-	if (ISASM(ASM_ASXX))
+	if (ISASM(ASM_ASXX) || ISASM(ASM_GNU))
 		ot(".ascii\t\"");
 	else
         ot("defm\t\"");
@@ -1515,7 +1526,11 @@ void le0(LVALUE *lval, int label)
     ol("or\tl");
     if (lval->oldval_type==LONG) { ol("or\td"); ol("or\te"); }
     if (lval->oldval_type==CPTR) { ol("or\te"); }
-    ol("jr\tz,ASMPC+7");
+    if ( ISASM(ASM_Z80ASM) ) {
+        ol("jr\tz,ASMPC+7");
+    } else {
+        ol("jr\tz,$+7");
+    }
     lt0(lval,label);
 }
 
@@ -1569,7 +1584,11 @@ void zeq(LVALUE *lval)
             ol("ld\ta,l");
             ol("sub\te");
             ol("and\ta");
-            ol("jr\tnz,ASMPC+3");
+            if ( ISASM(ASM_Z80ASM) ) {
+                ol("jr\tnz,ASMPC+3");
+            } else {
+                ol("jr\tnz,$+3");
+            }
             ol("scf");
             break;
         }   
@@ -1601,7 +1620,11 @@ void zne(LVALUE *lval)
             ol("ld\ta,l");
             ol("sub\te");
             ol("and\ta");
-            ol("jr\tz,ASMPC+3");
+            if ( ISASM(ASM_Z80ASM) ) {
+                ol("jr\tz,ASMPC+3");
+            } else {
+                ol("jr\tz,$+3");
+            }
             ol("scf");
             break;
         }
@@ -1674,7 +1697,11 @@ void zle(LVALUE *lval)
             if ( utype(lval) ) { /* unsigned */
                 ol("ld\ta,e");
                 ol("sub\tl");          /* If l < e then carry set */
-                ol("jr\tnz,ASMPC+3");  /* If zero, then set carry */
+                if ( ISASM(ASM_Z80ASM) ) {
+                    ol("jr\tnz,ASMPC+3");  /* If zero, then set carry */
+                } else {
+                    ol("jr\tnz,$+3");  /* If zero, then set carry */
+                }
                 ol("scf");
             } else {
                 int label = getlabel();
@@ -1722,7 +1749,11 @@ void zgt(LVALUE *lval)
             if ( utype(lval) ) {
                 ol("ld\ta,e");
                 ol("sub\tl");
-                ol("jr\tz,ASMPC+3");  /* If zero, nc */
+                if ( ISASM(ASM_Z80ASM) ) {
+                    ol("jr\tz,ASMPC+3");  /* If zero, nc */
+                } else {
+                    ol("jr\tz,$+3");  /* If zero, nc */
+                }
                 ol("ccf");
             } else {
                 ol("ld\ta,e");
@@ -1765,7 +1796,11 @@ void zge(LVALUE *lval)
             if ( utype(lval) ) {
                 ol("ld\ta,l");
                 ol("sub\te");         /* If l > e, carry set */
-                ol("jr\tnz,ASMPC+3"); /* If l == e then we need to set carry */
+                if ( ISASM(ASM_Z80ASM) ) {
+                    ol("jr\tnz,ASMPC+3"); /* If l == e then we need to set carry */
+                } else {
+                    ol("jr\tnz,$+3"); /* If l == e then we need to set carry */
+                }
                 ol("scf");
             } else {
                 int label = getlabel();
@@ -1959,6 +1994,9 @@ void GlobalPrefix(char type)
 	} else if ( ISASM(ASM_VASM) ) {
         ot("GLOBAL\t");
         return;
+    } else if ( ISASM(ASM_GNU) ) {
+        ot(".global\t");
+        return;
     }
     switch(type) {
     case XDEF:
@@ -2059,6 +2097,7 @@ void output_section(char *section_name)
     if ( ISASM(ASM_ASXX) ) {
         outfmt("\t.area\t%s\n\n",section_name);
     } else if ( ISASM(ASM_Z80ASM) ) {
+        outfmt(";\tSECTION\t%s\n\n",section_name);
         /* For z80asm we have to map bss into defvars if we're in appz88 mode */
         if ( strcmp(current_section,"bss") == 0 && appz88 ) {
             outstr("}\n");
@@ -2069,6 +2108,8 @@ void output_section(char *section_name)
         }
     } else if ( ISASM(ASM_VASM) ) {
         outfmt("\tSECTION\t%s\n",section_name);
+    } else if ( ISASM(ASM_GNU) ) {
+        outfmt("\t.section\t%s\n",section_name);
     }
     current_section = section_name;
 }
