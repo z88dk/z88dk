@@ -8,11 +8,21 @@
  *        Stefano Bodrato - 29/05/2001 - ORG parameter added
  *        Dominic Morris  - 10/03/2003 - integrated into appmake & options
  *        Stefano Bodrato - 19/07/2007 - BASIC block 'merge' feature
+ *        Stefano Bodrato - 2010,2011  - AUDIO options and single BASIC block mode
  *
  *        Creates a new TAP file (overwriting if necessary) just ready to run.
- *        Use tapmaker to customize your work.
+ *        You can use tapmaker to customize your work.
+ * 
+ *        If zorg=23760 the code is embedded in the BASIC program.
+ *        (take care of the BASIC extension, 
+ *              I.E. zorg=23813 if Interface 1 is activated).
+ *        To know the exact location after the insertion of your disk interface,
+ *        activate it (CLS #, CAT, RUN or similar), then type:
+ *            PRINT PEEK 23635+256*PEEK 23636+5
+ *        Advanced users can also see bin2bas-rem in the 'support/zx' directory
+ *        and take benefit of the self-relocating code.
  *
- *        $Id: zx.c,v 1.11 2011-05-23 07:10:39 stefano Exp $
+ *        $Id: zx.c,v 1.12 2011-06-28 11:24:19 stefano Exp $
  */
 
 #include "appmake.h"
@@ -48,6 +58,7 @@ option_t zx_options[] = {
     {  0 , "blockname", "Name of the code block in tap file", OPT_STR, &blockname},
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
+
 
 
 int zx_exec(char *target)
@@ -123,85 +134,46 @@ int zx_exec(char *target)
 			myexit("Can't open output file\n",1);
 		}
 
-		/* ===============
-			Loader block
-		   =============== */
-
-	   if ( !noloader ) {
-			/* If requested, merge an external loader */
-			mlen=0;
-			if ( merge != NULL ) {
-				if ( (fpmerge=fopen(merge,"rb") ) == NULL ) {
-					fprintf(stderr,"File for 'merge' not found: %s\n",merge);
-					fclose(fpin);
-					fclose(fpout);
-					myexit(NULL,1);
-				}
-				/* check the header type (first block must be BASIC) */
-				fseek(fpmerge,3,SEEK_SET);
-				c=getc(fpmerge);
-				if ( c != 0 ) {
-					fprintf(stderr,"BASIC block not found in file %s\n",merge);
-					fclose(fpin);
-					fclose(fpout);
-					myexit(NULL,1);
-				}
-
-				fseek(fpmerge,21,SEEK_SET);
-				mlen=getc(fpmerge)+256*getc(fpmerge);  /* get block length */
-
-				fseek(fpmerge,0,SEEK_SET);
-				blocklen=getc(fpmerge)+256*getc(fpmerge);  /* get block length */
-				if ( blocklen != 19 ) {
-					fprintf(stderr,"Error locating the external loader header in file %s\n",merge);
-					fclose(fpin);
-					fclose(fpout);
-					myexit(NULL,1);
-				}
-				fseek(fpmerge,0,SEEK_SET);
-				/* Total ext. loader size (headerblock + data block) */
-				blocklen+=mlen+4;
-				/* Now import the external BASIC loader */
-				for (i=0; (i < blocklen); i++) {
-					c=getc(fpmerge);
-					writebyte_p(c,fpout,&parity);
-				}
-				fclose (fpmerge);
-
-			} else {
-
-
-			/* BASIC loader */
-
+		if ((pos>23700)&&(pos<24000)) {
+			/* All in a BASIC line */
 			/* Write out the BASIC header file */
 				writeword_p(19,fpout,&parity);         /* Header len */
 				writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
-
 				parity=0;
 				writebyte_p(0,fpout,&parity);             /* Filetype (Basic) */
-				writestring_p("Loader    ",fpout,&parity);
-				writeword_p(0x1e + mlen,fpout,&parity);   /* length */
+
+			/* Deal with the filename */
+				if (strlen(blockname) >= 10 ) {
+					strncpy(name,blockname,10);
+				} else {
+					strcpy(name,blockname);
+					strncat(name,"          ",10-strlen(blockname));
+				}
+				for        (i=0;i<=9;i++)
+					writebyte_p(name[i],fpout,&parity);
+				writeword_p(21 +len,fpout,&parity);   /* length */
 				writeword_p(10,fpout,&parity);            /* line for auto-start */
-				writeword_p(0x1e + mlen,fpout,&parity);   /* length (?) */
+				writeword_p(21 + len,fpout,&parity);   /* length (?) */
 				writebyte_p(parity,fpout,&parity);
 
-
-			/* Write out the BASIC loader program */
-				writeword_p(32 + mlen,fpout,&parity);         /* block lenght */
+			/* Write out the 'BASIC' program */
+				writeword_p(23 + len,fpout,&parity);         /* block lenght */
 				parity=0;
 				writebyte_p(255,fpout,&parity);        /* Data has a block type of 255 */
+
 				writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
-				writebyte_p(10,fpout,&parity);         /* LSB... */
-				writeword_p(26,fpout,&parity);         /* BASIC line length */
-				writebyte_p(0xfd,fpout,&parity);       /* CLEAR */
-				writebyte_p(0xb0,fpout,&parity);       /* VAL */
-				sprintf(mybuf,"\"%i\":",(int)pos-1);        /* location for CLEAR */
-				writestring_p(mybuf,fpout,&parity);
-				writebyte_p(0xef,fpout,&parity);       /* LOAD */
-				writebyte_p('"',fpout,&parity);
-				writebyte_p('"',fpout,&parity);
-				writebyte_p(0xaf,fpout,&parity);       /* CODE */
-				writebyte_p(':',fpout,&parity);
+				writebyte_p(1,fpout,&parity);          /* LSB... */
+				writeword_p(2+len,fpout,&parity);         /* BASIC line length */
+				writebyte_p(0xea,fpout,&parity);       /* REM */
+				for (i=0; i<len;i++) {
+					c=getc(fpin);
+					writebyte_p(c,fpout,&parity);
+				}
+				writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
+
+				writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
+				writebyte_p(10,fpout,&parity);          /* LSB... */
+				writeword_p(11,fpout,&parity);         /* BASIC line length */
 				writebyte_p(0xf9,fpout,&parity);       /* RANDOMIZE */
 				writebyte_p(0xc0,fpout,&parity);       /* USR */
 				writebyte_p(0xb0,fpout,&parity);       /* VAL */
@@ -209,45 +181,132 @@ int zx_exec(char *target)
 				writestring_p(mybuf,fpout,&parity);
 				writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
 				writebyte_p(parity,fpout,&parity);
+			} else {
+			/* ===============
+				Loader block
+			   =============== */
+
+		   if ( !noloader ) {
+				/* If requested, merge an external loader */
+				mlen=0;
+				if ( merge != NULL ) {
+					if ( (fpmerge=fopen(merge,"rb") ) == NULL ) {
+						fprintf(stderr,"File for 'merge' not found: %s\n",merge);
+						fclose(fpin);
+						fclose(fpout);
+						myexit(NULL,1);
+					}
+					/* check the header type (first block must be BASIC) */
+					fseek(fpmerge,3,SEEK_SET);
+					c=getc(fpmerge);
+					if ( c != 0 ) {
+						fprintf(stderr,"BASIC block not found in file %s\n",merge);
+						fclose(fpin);
+						fclose(fpout);
+						myexit(NULL,1);
+					}
+
+					fseek(fpmerge,21,SEEK_SET);
+					mlen=getc(fpmerge)+256*getc(fpmerge);  /* get block length */
+
+					fseek(fpmerge,0,SEEK_SET);
+					blocklen=getc(fpmerge)+256*getc(fpmerge);  /* get block length */
+					if ( blocklen != 19 ) {
+						fprintf(stderr,"Error locating the external loader header in file %s\n",merge);
+						fclose(fpin);
+						fclose(fpout);
+						myexit(NULL,1);
+					}
+					fseek(fpmerge,0,SEEK_SET);
+					/* Total ext. loader size (headerblock + data block) */
+					blocklen+=mlen+4;
+					/* Now import the external BASIC loader */
+					for (i=0; (i < blocklen); i++) {
+						c=getc(fpmerge);
+						writebyte_p(c,fpout,&parity);
+					}
+					fclose (fpmerge);
+
+				} else {
+
+
+				/* BASIC loader */
+
+				/* Write out the BASIC header file */
+					writeword_p(19,fpout,&parity);         /* Header len */
+					writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
+
+					parity=0;
+					writebyte_p(0,fpout,&parity);             /* Filetype (Basic) */
+					writestring_p("Loader    ",fpout,&parity);
+					writeword_p(0x1e + mlen,fpout,&parity);   /* length */
+					writeword_p(10,fpout,&parity);            /* line for auto-start */
+					writeword_p(0x1e + mlen,fpout,&parity);   /* length (?) */
+					writebyte_p(parity,fpout,&parity);
+
+
+				/* Write out the BASIC loader program */
+					writeword_p(32 + mlen,fpout,&parity);         /* block lenght */
+					parity=0;
+					writebyte_p(255,fpout,&parity);        /* Data has a block type of 255 */
+					writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
+					writebyte_p(10,fpout,&parity);         /* LSB... */
+					writeword_p(26,fpout,&parity);         /* BASIC line length */
+					writebyte_p(0xfd,fpout,&parity);       /* CLEAR */
+					writebyte_p(0xb0,fpout,&parity);       /* VAL */
+					sprintf(mybuf,"\"%i\":",(int)pos-1);        /* location for CLEAR */
+					writestring_p(mybuf,fpout,&parity);
+					writebyte_p(0xef,fpout,&parity);       /* LOAD */
+					writebyte_p('"',fpout,&parity);
+					writebyte_p('"',fpout,&parity);
+					writebyte_p(0xaf,fpout,&parity);       /* CODE */
+					writebyte_p(':',fpout,&parity);
+					writebyte_p(0xf9,fpout,&parity);       /* RANDOMIZE */
+					writebyte_p(0xc0,fpout,&parity);       /* USR */
+					writebyte_p(0xb0,fpout,&parity);       /* VAL */
+					sprintf(mybuf,"\"%i\"",(int)pos);           /* Location for USR */
+					writestring_p(mybuf,fpout,&parity);
+					writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
+					writebyte_p(parity,fpout,&parity);
+				}
 			}
+
+
+		/* M/C program */
+
+		/* Write out the code header file */
+			writeword_p(19,fpout,&parity);         /* Header len */
+			writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
+			parity=0;
+			writebyte_p(3,fpout,&parity);          /* Filetype (Code) */
+		/* Deal with the filename */
+			if (strlen(blockname) >= 10 ) {
+				strncpy(name,blockname,10);
+			} else {
+				strcpy(name,blockname);
+				strncat(name,"          ",10-strlen(blockname));
+			}
+			for        (i=0;i<=9;i++)
+				writebyte_p(name[i],fpout,&parity);
+			writeword_p(len,fpout,&parity);
+			writeword_p(pos,fpout,&parity);        /* load address */
+			writeword_p(0,fpout,&parity);          /* offset */
+			writebyte_p(parity,fpout,&parity);
+
+		/* Now onto the data bit */
+			writeword_p(len+2,fpout,&parity);      /* Length of next block */
+				
+			parity=0;
+			writebyte_p(255,fpout,&parity);        /* Data has a block type of 255 */
+			for (i=0; i<len;i++) {
+				c=getc(fpin);
+				writebyte_p(c,fpout,&parity);
+			}
+			writebyte_p(parity,fpout,&parity);
 		}
-
-
-	/* M/C program */
-
-	/* Write out the code header file */
-		writeword_p(19,fpout,&parity);         /* Header len */
-		writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
-		parity=0;
-		writebyte_p(3,fpout,&parity);          /* Filetype (Code) */
-	/* Deal with the filename */
-		if (strlen(blockname) >= 10 ) {
-			strncpy(name,blockname,10);
-		} else {
-			strcpy(name,blockname);
-			strncat(name,"          ",10-strlen(blockname));
-		}
-		for        (i=0;i<=9;i++)
-			writebyte_p(name[i],fpout,&parity);
-		writeword_p(len,fpout,&parity);
-		writeword_p(pos,fpout,&parity);        /* load address */
-		writeword_p(0,fpout,&parity);          /* offset */
-		writebyte_p(parity,fpout,&parity);
-
-	/* Now onto the data bit */
-		writeword_p(len+2,fpout,&parity);      /* Length of next block */
-			
-		parity=0;
-		writebyte_p(255,fpout,&parity);        /* Data has a block type of 255 */
-		for (i=0; i<len;i++) {
-			c=getc(fpin);
-			writebyte_p(c,fpout,&parity);
-		}
-		writebyte_p(parity,fpout,&parity);
 		fclose(fpin);
 		fclose(fpout);
 	}
-
 
 	/* ***************************************** */
 	/*  Now, if requested, create the audio file */
