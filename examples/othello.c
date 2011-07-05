@@ -1,5 +1,5 @@
 /*
- *   $Id: othello.c,v 1.4 2010-12-28 06:55:29 stefano Exp $
+ *   $Id: othello.c,v 1.5 2011-07-05 14:47:35 stefano Exp $
  * 
  *   z88dk port of the 'historical' game by Leor Zolman
  *
@@ -79,12 +79,35 @@ commands may be typed:
 
 */
 
-/* Declare GFX bitmap location for the expanded ZX81 */
 
-
+/* UDG */
 #define BLACK '*'
 #define WHITE 'O'
 #define EMPTY '-'
+
+#ifdef __SPECTRUM__
+#define G_BLACK 128
+#define G_WHITE 129
+#define G_EMPTY 130
+#endif
+
+#ifdef __ACE__
+#define G_BLACK 0
+#define G_WHITE 1
+#define G_EMPTY 2
+#endif
+
+#ifdef __SORCERER__
+#define G_BLACK 193
+#define G_WHITE 194
+#define G_EMPTY 195
+#endif
+
+#ifndef G_BLACK
+#define G_BLACK '*'
+#define G_WHITE 'O'
+#define G_EMPTY '.'
+#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -95,6 +118,7 @@ commands may be typed:
 #ifdef GRAPHICS
 #include <graphics.h>
 #include <games.h>
+/* Declare GFX bitmap location for the expanded ZX81 */
 #pragma output hrgpage = 36096
 #endif
 
@@ -124,6 +148,46 @@ struct mt {
 		int c;
 		int s;
 	 };
+
+#ifdef  REDEFINED_FONT
+
+extern char whitepiece[];
+extern char blackpiece[];
+extern char frame[];
+
+#asm
+._whitepiece
+ defb    @11111110
+ defb    @11000011
+ defb    @10001000
+ defb    @10000101
+ defb    @10000100
+ defb    @10000001
+ defb    @11000010
+ defb    @01010101
+
+._blackpiece
+ defb    @11111110
+ defb    @11000011
+ defb    @10110100
+ defb    @10111001
+ defb    @10111100
+ defb    @10111101
+ defb    @11000010
+ defb    @01010101
+
+._frame
+ defb    @11111110
+ defb    @11111111
+ defb    @11111110
+ defb    @11111111
+ defb    @11111110
+ defb    @11111111
+ defb    @11111110
+ defb    @01010101
+#endasm
+
+#endif
 
 #ifdef GRAPHICS
 
@@ -354,6 +418,7 @@ void prtbrd(char b[64])
 #endif
 #ifdef SMALLGRAPHICS
 #undef TEXT
+	clg();
 	printf ("%c",12);
 
 	for (i=0; i<8; i++) {
@@ -373,17 +438,56 @@ void prtbrd(char b[64])
 	 }
 #endif
 #ifdef TEXT
+	#if defined (REDEFINED_FONT) || defined (ZX81_FONT)
+		printf("  12345678\n");
+		for (i=0; i<8; i++) {
+			printf(" %u",i+1);
+			for (j=0; j<8; j++) {
+			#ifdef ZX81_FONT
+				zx_asciimode(0);
+				switch(b[i*8+j]) {
+					case BLACK:
+						putchar (151);
+						break;
+					case WHITE:
+						putchar (180);
+						break;
+					default:
+						putchar (128+8*((i+j)&1));
+						break;
+				}
+				zx_asciimode(1);
+			#else
+				switch(b[i*8+j]) {
+					case BLACK:
+						putchar (G_BLACK);
+						break;
+					case WHITE:
+						putchar (G_WHITE);
+						break;
+					default:
+						putchar (G_EMPTY);
+						break;
+				}
+			#endif
+			}
+			putchar('\n');
+		 }
+	#else
 	printf("   1 2 3 4 5 6 7 8\n");
 	for (i=0; i<8; i++) {
 		printf(" %u",i+1);
 		for (j=0; j<8; j++) {
+//#ifdef ANSITEXT
+//#endif
 			putchar(' ');
 			putchar(b[i*8+j]);
 		 }
 		putchar('\n');
 	 }
-	putchar('\n');
+	 #endif
 #endif
+	putchar('\n');
 }
 
 int prtscr(char b[64])
@@ -684,6 +788,7 @@ int main()
 	char b[64];
 	int i;
 
+
 /*
 	h[0][0] = h[0][1] = h[2][0] = h[3][1] = 0;
 	h[1][0] = h[1][1] = h[2][1] = h[3][0] = 7;
@@ -692,9 +797,37 @@ int main()
 	h[0] = h[1] = h[4] = h[7] = 0;
 	h[2] = h[3] = h[5] = h[6] = 7;
 
+#ifdef  REDEFINED_FONT
+
+	#ifdef __SPECTRUM__
+		/* set console driver for 32 columns mode */
+		printf("%c%c",1,32);
+		/* INK 7 */
+		printf("%c7",16);
+		/* PAPER 0 */
+		printf("%c0",17);
+		/* Copy graphics in UDG area */
+		memcpy(65368, whitepiece,24);	
+		zx_border(0);	
+	#endif
+
+	#ifdef __ACE__
+		memcpy(0x2c00, whitepiece,24);
+	#endif
+
+	#ifdef __SORCERER
+		memcpy(0xfe08, whitepiece,24);
+	#endif
+
+#endif
+
+#ifdef ANSITEXT
 	printf("%c\nWelcome to the %c[7m OTHELLO %c[27m program!\n",12,27,27);
 	printf("\nNote: %c[4m BLACK ALWAYS GOES FIRST %c[24m ...Good luck!!!\n\n\n",27,27);
-
+#else
+	printf("%c\nWelcome to the OTHELLO program!\n",12);
+	printf("\nNote: BLACK ALWAYS GOES FIRST   ...Good luck!!!\n\n\n");
+#endif
 	printf("Do you want to go first? ");
 	if (toupper(getchar()) == 'Y') 
 		mefirst = 0;

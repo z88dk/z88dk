@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.30 2011-05-09 14:31:38 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.31 2011-07-05 14:47:36 stefano Exp $
 ;
 
 
@@ -489,9 +489,7 @@ heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
 
 
-IF DEFINED_NEED1bitsound
 snd_tick:       defb    0       ; Sound variable
-ENDIF
 
 
 ; ZXMMC SD/MMC interface
