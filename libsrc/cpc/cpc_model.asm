@@ -7,7 +7,7 @@
 ;    2 - 6128
 
 
-; $Id: cpc_model.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
+; $Id: cpc_model.asm,v 1.4 2011-07-05 18:32:50 dom Exp $
 
 
         INCLUDE "cpcfirm.def"              
@@ -16,7 +16,7 @@
 
 .cpc_model
 	call	firmware
-	defb	kl_probe_rom	; 0B915H
+	defw	kl_probe_rom	; 0B915H
 	ld	a,h		; version
 	ld	hl,1
 	rra
