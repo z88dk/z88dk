@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.4 2011-06-08 22:03:35 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.5 2011-07-09 01:30:14 pauloscustodio Exp $ */
 /* $History: SYMBOLS.C $ */
 /*  */
 /* *****************  Version 9  ***************** */
@@ -198,7 +198,7 @@ DefLocalSymbol (char *identifier,
       if (foundsymbol == NULL)
 	return 0;
       else
-	insert (&CURRENTMODULE->localroot, foundsymbol, (int (*)()) cmpidstr);
+        insert (&CURRENTMODULE->localroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
 
       if (pass1 && symtable && listing)
 	MovePageRefs (identifier, foundsymbol);		/* Move page references from forward referenced symbol */
@@ -266,7 +266,7 @@ MovePageRefs (char *identifier, symbol * definedsym)
       free (forwardsym->references);	/* remove pointer information to forward page reference list */
       forwardsym->references = NULL;
       /* symbol is not needed anymore, remove from symbol table of forward references */
-      delete (&CURRENTMODULE->notdeclroot, forwardsym, (int (*)()) cmpidstr, (void (*)()) FreeSym);
+      delete (&CURRENTMODULE->notdeclroot, forwardsym, (int (*)(void*,void*)) cmpidstr, (void (*)(void*)) FreeSym);
     }
 }
 
@@ -290,7 +290,7 @@ GetSymPtr (char *identifier)
 		{
 		  symbolptr = CreateSymbol (identifier, 0, SYM_NOTDEFINED, CURRENTMODULE);
 		  if (symbolptr != NULL)
-		    insert (&CURRENTMODULE->notdeclroot, symbolptr, (int (*)()) cmpidstr);
+                    insert (&CURRENTMODULE->notdeclroot, symbolptr, (int (*)(void*,void*)) cmpidstr);
 		}
 	      else
 		AppendPageRef (symbolptr);	/* symbol found in forward referenced tree,
@@ -335,7 +335,7 @@ FindSymbol (char *identifier,	/* pointer to current identifier */
     return NULL;
   else
     {
-      found = find (treeptr, identifier, (int (*)()) compidentifier);
+      found = find (treeptr, identifier, (int (*)(void*,void*)) compidentifier);
       if (found == NULL)
 	return NULL;
       else
@@ -359,7 +359,7 @@ DeclSymGlobal (char *identifier, unsigned char libtype)
 	{
 	  foundsym = CreateSymbol (identifier, 0, SYM_NOTDEFINED | SYMXDEF | libtype, CURRENTMODULE);
 	  if (foundsym != NULL)
-	    insert (&globalroot, foundsym, (int (*)()) cmpidstr);	/* declare symbol as global */
+            insert (&globalroot, foundsym, (int (*)(void*,void*)) cmpidstr);    /* declare symbol as global */
 	}
       else
 	{
@@ -390,10 +390,10 @@ DeclSymGlobal (char *identifier, unsigned char libtype)
           clonedsym = CreateSymbol (foundsym->symname, foundsym->symvalue, foundsym->type, CURRENTMODULE);
 	  if (clonedsym != NULL)
             {
-	      insert (&globalroot, clonedsym, (int (*)()) cmpidstr);
+              insert (&globalroot, clonedsym, (int (*)(void*,void*)) cmpidstr);
 
               /* original local symbol cloned as global symbol, now delete old local ... */
-              delete (&CURRENTMODULE->localroot, foundsym, (int (*)()) cmpidstr, (void (*)()) FreeSym);
+              delete (&CURRENTMODULE->localroot, foundsym, (int (*)(void*,void*)) cmpidstr, (void (*)(void*)) FreeSym);
             }
         }
       else
@@ -416,15 +416,18 @@ DeclSymExtern (char *identifier, unsigned char libtype)
 	{
 	  foundsym = CreateSymbol (identifier, 0, SYM_NOTDEFINED | SYMXREF | libtype, CURRENTMODULE);
 	  if (foundsym != NULL)
-	    insert (&globalroot, foundsym, (int (*)()) cmpidstr);	/* declare symbol as extern */
+            insert (&globalroot, foundsym, (int (*)(void*,void*)) cmpidstr);    /* declare symbol as extern */
 	}
-      else if (foundsym->owner == CURRENTMODULE) {
+      else 
+        {
+          if (foundsym->owner == CURRENTMODULE) {
 	if ( (foundsym->type & (SYMXREF | libtype)) != (SYMXREF |libtype) )
            if (sdcc_hacks) 
              foundsym->type=SYMXREF|libtype ;
            else
      	     ReportError (CURRENTFILE->fname, CURRENTFILE->line, 23);	/* Re-declaration not allowed */
       }
+    }
     }
   else
    {
@@ -439,10 +442,10 @@ DeclSymExtern (char *identifier, unsigned char libtype)
 	      extsym = CreateSymbol (identifier, 0, foundsym->type, CURRENTMODULE);
 	      if (extsym != NULL)
                 {
-	          insert (&globalroot, extsym, (int (*)()) cmpidstr);
+                  insert (&globalroot, extsym, (int (*)(void*,void*)) cmpidstr);
 
                   /* original local symbol cloned as external symbol, now delete old local ... */
-                  delete (&CURRENTMODULE->localroot, foundsym, (int (*)()) cmpidstr, (void (*)()) FreeSym);
+                  delete (&CURRENTMODULE->localroot, foundsym, (int (*)(void*,void*)) cmpidstr, (void (*)(void*)) FreeSym);
                 }
             }
           else
@@ -542,7 +545,7 @@ DefineDefSym (char *identifier, long value, unsigned char symtype, avltree ** ro
       staticsym = CreateSymbol (identifier, value, symtype | SYMDEF | SYMDEFINED, NULL);
       if (staticsym != NULL)
 	{
-	  insert (root, staticsym, (int (*)()) cmpidstr);
+          insert (root, staticsym, (int (*)(void*,void*)) cmpidstr);
 	  return 1;
 	}
       else

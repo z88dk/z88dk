@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.13 2011-02-27 11:58:46 stefano Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.14 2011-07-09 01:32:27 pauloscustodio Exp $ */
 /* $History: Z80INSTR.C $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -152,7 +152,7 @@ RET (void)
     {
     case name:
       if ((constant = CheckCondition ()) != -1)
-        *codeptr++ = 192 + constant * 8;	/* RET cc  instruction opcode */
+        *codeptr++ = (unsigned char)(192 + constant * 8);        /* RET cc  instruction opcode */
       else
         ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
       break;
@@ -297,7 +297,7 @@ OUT (void)
 
                   default:
                     *codeptr++ = 237;
-                    *codeptr++ = 65 + reg * 8;	/* OUT (C),r  */
+                    *codeptr++ = (unsigned char)(65 + reg * 8);  /* OUT (C),r  */
                     PC += 2;
                     break;
                   }
@@ -371,7 +371,7 @@ IN (void)
             {
             case 1:
               *codeptr++ = 237;
-              *codeptr++ = 64 + inreg * 8;	/* IN r,(C) */
+              *codeptr++ = (unsigned char)(64 + inreg * 8);      /* IN r,(C) */
               PC += 2;
               break;
 
@@ -465,7 +465,7 @@ RST (void)
                 }
               else
                 {
-                  *codeptr++ = 199 + constant;	/* RST  00H, ... 38H */
+                  *codeptr++ = (unsigned char)(199 + constant);  /* RST  00H, ... 38H */
                   ++PC;
                 }
             }
@@ -498,13 +498,13 @@ CALLOZ (void)
 	  constant = EvalPfixExpr (postfixexpr);
 	  if ((constant > 0) && (constant <= 255))
 	    {
-	      *codeptr++ = constant;	/* 1 byte OZ parameter */
+              *codeptr++ = (unsigned char)constant;    /* 1 byte OZ parameter */
 	      ++PC;
 	    }
 	  else if ((constant > 255) && (constant <= 65535))
 	    {
-	      *codeptr++ = constant & 255;	/* 2 byte OZ parameter */
-	      *codeptr++ = constant >> 8;
+              *codeptr++ = (unsigned char)(constant & 255);      /* 2 byte OZ parameter */
+              *codeptr++ = (unsigned char)(constant >> 8);
 	      PC += 2;
 	    }
 	  else
@@ -536,8 +536,8 @@ CALLPKG (void)
 	  constant = EvalPfixExpr (postfixexpr);
 	  if ((constant >= 0) && (constant <= 65535))
 	    {
-	      *codeptr++ = constant % 256;	/* 2 byte parameter always */
-	      *codeptr++ = constant / 256;
+              *codeptr++ = (unsigned char)(constant % 256);      /* 2 byte parameter always */
+              *codeptr++ = (unsigned char)(constant / 256);
 	      PC += 2;
 	    }
 	  else
@@ -572,8 +572,8 @@ INVOKE (void)
 	  constant = EvalPfixExpr (postfixexpr);
 	  if ((constant >= 0) && (constant <= 65535))
 	    {
-	      *codeptr++ = constant % 256;	/* 2 byte parameter always */
-	      *codeptr++ = constant / 256;
+              *codeptr++ = (unsigned char)(constant % 256);      /* 2 byte parameter always */
+              *codeptr++ = (unsigned char)(constant / 256);
 	      PC += 2;
 	    }
 	  else
@@ -604,7 +604,7 @@ FPP (void)
 	  constant = EvalPfixExpr (postfixexpr);
 	  if ((constant > 0) && (constant < 255))
 	    {
-	      *codeptr++ = constant;	/* 1 byte OZ parameter */
+              *codeptr++ = (unsigned char)constant;    /* 1 byte OZ parameter */
 	      ++PC;
 	    }
 	  else
@@ -709,7 +709,7 @@ Subroutine_addr (int opcode0, int opcode)
           break;
         }
       } else {
-      *codeptr++ = opcode + constant * 8;	/* get instruction opcode */
+      *codeptr++ = (unsigned char)(opcode + constant * 8);       /* get instruction opcode */
     }
     GetSym();
   } else {
@@ -779,7 +779,7 @@ JR (void)
         case FLAGS_Z:
         case FLAGS_NC:
         case FLAGS_C:
-          *codeptr++ = 32 + constant * 8;
+          *codeptr++ = (unsigned char)(32 + constant * 8);
           if (GetSym () == comma)
             {
               GetSym ();	/* point at start of address expression */
@@ -816,7 +816,7 @@ JR (void)
           constant -= PC;
           RemovePfixlist (postfixexpr);		/* remove linked list - expression evaluated. */
           if ((constant >= -128) && (constant <= 127))
-            *codeptr++ = constant;	/* opcode is stored, now store relative jump */
+            *codeptr++ = (unsigned char)(constant);      /* opcode is stored, now store relative jump */
           else
             ReportError (CURRENTFILE->fname, CURRENTFILE->line, 7);
         }
@@ -852,7 +852,7 @@ DJNZ (void)
           constant -= PC;
           RemovePfixlist (postfixexpr);		/* remove linked list - expression evaluated. */
           if ((constant >= -128) && (constant <= 127))
-            *codeptr++ = constant;	/* opcode is stored, now store relative jump */
+            *codeptr++ = (unsigned char)(constant);      /* opcode is stored, now store relative jump */
           else
             ReportError (CURRENTFILE->fname, CURRENTFILE->line, 7);
         }
@@ -873,7 +873,7 @@ NewJRaddr (void)
   else
     {
       newJRPC->nextref = NULL;
-      newJRPC->PCaddr = PC;
+      newJRPC->PCaddr = (unsigned short)PC;
     }
 
   if (CURRENTMODULE->JRaddr->firstref == NULL)
@@ -1129,7 +1129,7 @@ ArithLog8_instr (int opcode)
             }
           reg &= 7;
 
-          *codeptr++ = 128 + opcode * 8 + reg;	/* xxx  A,r */
+          *codeptr++ = (unsigned char)(128 + opcode * 8 + reg);  /* xxx  A,r */
           ++PC;
           break;
         }
@@ -1260,7 +1260,7 @@ IncDec_8bit_instr (int opcode)
               return;
             }
           *codeptr++ = 221;
-          *codeptr++ = (reg & 7) * 8 + opcode;	/* INC/DEC  ixh,ixl */
+          *codeptr++ = (unsigned char)((reg & 7) * 8 + opcode);  /* INC/DEC  ixh,ixl */
           PC += 2;
           break;
 
@@ -1272,12 +1272,12 @@ IncDec_8bit_instr (int opcode)
               return;
             }
           *codeptr++ = 253;
-          *codeptr++ = (reg & 7) * 8 + opcode;	/* INC/DEC  iyh,iyl */
+          *codeptr++ = (unsigned char)((reg & 7) * 8 + opcode);  /* INC/DEC  iyh,iyl */
           PC += 2;
           break;
 
         default:
-          *codeptr++ = reg * 8 + opcode;	/* INC/DEC  r */
+          *codeptr++ = (unsigned char)(reg * 8 + opcode);        /* INC/DEC  r */
           ++PC;
           break;
         }
@@ -1312,7 +1312,7 @@ BitTest_instr (int opcode)
 			{
 			case 2:
 			  *codeptr++ = 203;	/* (HL)  */
-			  *codeptr++ = opcode + bitnumber * 8 + 6;
+                          *codeptr++ = (unsigned char)(opcode + bitnumber * 8 + 6);
 			  PC += 2;
 			  break;
 
@@ -1324,7 +1324,7 @@ BitTest_instr (int opcode)
 			    *codeptr++ = 253;
 			  *codeptr++ = 203;
 			  ExprSigned8 (2);
-			  *codeptr++ = opcode + bitnumber * 8 + 6;
+                          *codeptr++ = (unsigned char)(opcode + bitnumber * 8 + 6);
 			  PC += 4;
 			  break;
 
@@ -1347,7 +1347,7 @@ BitTest_instr (int opcode)
 
 			default:
 			  *codeptr++ = 203;
-			  *codeptr++ = opcode + bitnumber * 8 + reg;
+                          *codeptr++ = (unsigned char)(opcode + bitnumber * 8 + reg);
 			  PC += 2;
 			}
 		    }
@@ -1407,7 +1407,7 @@ RotShift_instr (int opcode)
 
 	default:
 	  *codeptr++ = 203;
-	  *codeptr++ = opcode * 8 + reg;
+          *codeptr++ = (unsigned char)(opcode * 8 + reg);
 	  PC += 2;
 	}
     }
