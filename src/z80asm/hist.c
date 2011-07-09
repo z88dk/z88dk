@@ -488,4 +488,85 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  *
  * 22.04.2002 [no version increment] (Stefano)
  * IX <-> IY swap option added (-IXIY)
+ *
+ * 04.07.2011 [1.1.1] (psc)
+ * ========================
+ * Based on 1.0.31
+ *
+ * Compiled with Visual C++ 2010, added casts to clean up warnings.
+ * Moved version strings to this file, created hist.h, for easy maintenance.
+ * Created HTML version of doc/z80asm.txt as doc/z80asm.html:
+ *   - added table of contents to help looking up information
+ *   - added documentation for options: 
+ *          -RCMX000, -plus, -IXIY, -C, -h, -I, -L, -sdcc, -forcexlib
+ *   - added documentation for commands: INVOKE, LINE
+ *   - added notes on deprecated error messages
+ * Started to build test suite in t/ *.t unsing Perl prove. Included test for all standard
+ * Z80 opcodes; need to be extended with directives and opcodes for Z80 variants.
+ *
+ * BUG_0001 : Error in expression during link, expression garbled - memory corruption?
+ *      Simple asm program: "org 0 \n jp NN \n jp NN \n NN: \n", 
+ *      compile with "z80asm -t4 -b test.asm"
+ *      fails with: "File 'test.asm', Module 'TEST', Syntax error in expression \n 
+ *                   Error in expression +¶+≤+-;æ?.π“¶“≤Ÿ+v›F›V›^›x¶ ›@›H›P›".
+ *
+ *      Problem cause: lexer GetSym() is not prepared to read '\0' bytes.
+ *      When the expression is read from the OBJ file at the link phase, the '\0' 
+ *      at the end of the expression field is interpreted as a random separator 
+ *      because ssym[] contains fewer elements (27) than the separators string (28);
+ *      hence in some cases the expression is parsed correctly, e.g. without -t4 
+ *      the program assembles correctly. 
+ *      If the random separator is a semicolon, GetSym() calls Skipline() to go past
+ *      the comment, and reads past the end of the expression in the OBJ file,
+ *      causing the parse of the next expression to fail.
+ *
+ * BUG_0002 : CreateLibFile and GetLibFile: buffer overrun
+ *      When the Z80_STDLIB variable is defined, libfilename is allocated with one byte
+ *      too short (strlen(filename) instead of strlen(filename)+1).
+ *
+ * BUG_0003 : Illegal options are ignored, although ReportError 9 (Illegal Option) exists
+ *      SetAsmFlag(): Some options were missing the 'return' statement, following through
+ *      to the next tests; inserted 'return' in options 'M', 'I', 'L' and 'D'.
+ *      Added ReportError 9 (Illegal Option) if the option is not recognized.
+ *
+ * CH_0001 : Assembly error messages should appear on stderr
+ *      It's cumbersome to have to open .err files to see assembly errors.
+ *      Changed ReportError() to Write error messages to stderr in addition to the .err file.
+ *
+ * BUG_0004 : 8bit unsigned constants are not checked for out-of-range
+ *      Added the check to ExprUnsigned8() and Z80pass2().
+ *
+ * BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary
+ *      ExprSigned8(): Accept (ix) and (iy), use offset zero.
+ *      Raise syntax error for (ix 4), was accepting as (ix+4).
+ *
+ * CH_0002 : Unary plus and unary minus added to Factor()
+ *      Accept unary minus and unary plus in factor to allow (ix+ -3) to be
+ *      parsed as (ix-3).
  */
+
+#include "hist.h"
+
+#define DATE        "09.07.2011"
+#define VERSION     "1.1.1"
+#define COPYRIGHT   "InterLogic 1993-2009"
+
+#ifdef QDOS
+#include <qdos.h>
+
+char _prog_name[] = "Z80asm";
+char _version[] = VERSION;
+char _copyright[] = "\x7f " COPYRIGHT;
+
+void consetup_title ();
+void (*_consetup) () = consetup_title;
+int (*_readkbd) (chanid_t, timeout_t, char *) = readkbd_move;
+struct WINDOWDEF _condetails =
+{2, 1, 0, 7, 484, 256, 0, 0};
+#endif
+
+#ifdef AMIGA
+char amiver[] = "$VER: z80asm " VERSION ", (c) " COPYRIGHT;
+#endif
+
+char copyrightmsg[] = "Z80 Module Assembler " VERSION " (" DATE "), (c) " COPYRIGHT;
