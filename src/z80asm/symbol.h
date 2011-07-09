@@ -13,13 +13,17 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.5 2011-07-09 01:29:10 pauloscustodio Exp $ */
+/* $History: Z80ASM.C $ */
+
 #include "avltree.h"    /* base symbol data structures and routines */
 
 /* Structured data types : */
 
 enum flag           { OFF, ON };
 
-enum symbols        { space, strconq, dquote, squote, semicolon, comma, fullstop, lparen, lcurly, lsquare, rsquare, rcurly, rparen,
+/* BUG_0001 - add colon symbol */
+enum symbols        { space, strconq, dquote, squote, colon, semicolon, comma, fullstop, lparen, lcurly, lsquare, rsquare, rcurly, rparen,
                       plus, minus, multiply, divi, mod, power, assign, bin_and, bin_or, bin_xor, less,
                       greater, log_not, constexpr, newline, lessequal, greatequal, notequal, name, number,
                       decmconst, hexconst, binconst, charconst, negated, nil,
