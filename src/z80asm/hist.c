@@ -19,9 +19,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.12 2011-07-09 17:36:09 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.13 2011-07-09 17:40:37 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.12  2011-07-09 17:36:09  pauloscustodio
+/* Revision 1.13  2011-07-09 17:40:37  pauloscustodio
+/* fix version 1.1.1 date
+/*
+/* Revision 1.12  2011/07/09 17:36:09  pauloscustodio
 /* Copied cvs log into $Log$ history
 /*
 /* Revision 1.11  2011/07/09 01:46:00  pauloscustodio
@@ -547,8 +550,9 @@ C-style 0x prefix for hex digits is permitted
 22.04.2002 [no version increment] (Stefano)
 IX <-> IY swap option added (-IXIY)
 
-09.07.2011 [1.1.1] (psc)
-========================
+===================================
+09.07.2011 [1.1.1] (pauloscustodio)
+===================================
 Based on 1.0.31
 
 Compiled with Visual C++ 2010, added casts to clean up warnings.
@@ -601,6 +605,13 @@ BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary
 CH_0002 : Unary plus and unary minus added to Factor()
      Accept unary minus and unary plus in factor to allow (ix+ -3) to be
      parsed as (ix-3).
+
+
+===================================
+XX.XX.XXXX [1.1.2] (pauloscustodio)
+===================================
+
+- Copied cvs log into Log history of each file
 
 */
 
