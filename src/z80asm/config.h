@@ -13,6 +13,9 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.12 2011-07-09 01:16:47 pauloscustodio Exp $ */
+/* $History: Z80ASM.C $ */
+
 /* Pick up the default installation path */
 #ifndef WIN32
 #include "../config.h"
