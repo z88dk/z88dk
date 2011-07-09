@@ -14,7 +14,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.24 2010-09-19 00:06:20 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.25 2011-07-09 01:27:34 pauloscustodio Exp $ */
 /* $History: Z80ASM.C $ */
 /*  */
 /* *****************  Version 22  ***************** */
@@ -109,10 +109,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "config.h"
 #include "symbol.h"
 #include "z80asm.h"
-
-#ifdef WIN32
-#define snprintf _snprintf
-#endif
+#include "hist.h"
 
 /* external functions */
 char *AllocIdentifier (size_t len);
@@ -167,28 +164,6 @@ struct expression *AllocExprHdr (void);
 struct JRPC_Hdr *AllocJRaddrHdr (void);
 
 
-#ifdef QDOS
-#include <qdos.h>
-
-char _prog_name[] = "Z80asm";
-char _version[] = "1.0.31";
-char _copyright[] = "\x7f InterLogic 1993-2009";
-
-void consetup_title ();
-void (*_consetup) () = consetup_title;
-int (*_readkbd) (chanid_t, timeout_t, char *) = readkbd_move;
-struct WINDOWDEF _condetails =
-{2, 1, 0, 7, 484, 256, 0, 0};
-
-#endif
-
-#ifdef AMIGA
-char amiver[] = "$VER: z80asm v1.0.31, (c) InterLogic 1993-2000";
-#endif
-
-
-char copyrightmsg[] = "Z80 Module Assembler V1.0.31 (13.6.2009), (c) InterLogic 1993-2009";
-
 FILE *z80asmfile, *listfile, *errfile, *objfile, *mapfile, *modsrcfile, *deffile, *libfile;
 long	clineno;
 
@@ -232,10 +207,14 @@ char *errmsg[] =
  "Cannot include file recursively",	/* 31 */
 };
 
+/* BUG_0001 array ssym[] needs to have one element per character in 
+ * separators, plus one newline to match the final '\0' just in case it is
+ * not caught before */
 enum symbols sym, ssym[] =
 {space, strconq, dquote, squote, semicolon, comma, fullstop,
  lparen, lcurly, lsquare, rsquare, rcurly, rparen, plus, minus, multiply, divi, mod, power,
- assign, bin_and, bin_or, bin_xor, less, greater, log_not, constexpr};
+ assign, bin_and, bin_or, bin_xor, less, greater, log_not, constexpr, colon, newline};
+char separators[] = " &\"\';,.({[]})+-*/%^=~|:<>!#:";
 
 enum flag pass1, listing, listing_CPY, symtable, z80bin, writeline, mapref, globaldef, datestamp, ti83plus, sdcc_hacks;
 enum flag deforigin, verbose, ASMERROR, EOL, symfile, library, createlibrary, autorelocate;
@@ -246,9 +225,8 @@ int cpu_type = CPU_Z80;
 int ASSEMBLE_ERROR, ERRORS, TOTALERRORS, PAGENR, LINENR;
 long TOTALLINES;
 int sourcefile_open;
-char PAGELEN;
+unsigned char PAGELEN;
 int TAB_DIST = 8, COLUMN_WIDTH;
-char separators[] = " &\"\';,.({[]})+-*/%^=~|:<>!#:";
 char line[255], stringconst[255], ident[FILENAME_MAX+1];
 char *srcfilename, *lstfilename, *objfilename, *errfilename, *libfilename;
 
@@ -332,7 +310,7 @@ AssembleSourceFile (void)
     }
 
   PC = oldPC = 0;
-  copy (staticroot, &CURRENTMODULE->localroot, (int (*)()) cmpidstr, (void *(*)()) createsym);
+  copy (staticroot, &CURRENTMODULE->localroot, (int (*)(void*,void*)) cmpidstr, (void *(*)(void*)) createsym);
   if (DefineDefSym (ASSEMBLERPC, PC, 0, &globalroot) == 0)
     {				/* Create standard 'ASMPC' identifier */
       ReportError (NULL, 0, 3);
@@ -407,11 +385,11 @@ AssembleSourceFile (void)
   if (globaldef)
     {
       fputc ('\n', deffile);	/* separate DEFC lines for each module */
-      inorder (globalroot, (void (*)()) WriteGlobal);
+      inorder (globalroot, (void (*)(void*)) WriteGlobal);
     }
-  deleteall (&CURRENTMODULE->localroot, (void (*)()) FreeSym);
-  deleteall (&CURRENTMODULE->notdeclroot, (void (*)()) FreeSym);
-  deleteall (&globalroot, (void (*)()) FreeSym);
+  deleteall (&CURRENTMODULE->localroot, (void (*)(void*)) FreeSym);
+  deleteall (&CURRENTMODULE->notdeclroot, (void (*)(void*)) FreeSym);
+  deleteall (&globalroot, (void (*)(void*)) FreeSym);
 
   return 1;
 }
@@ -558,7 +536,8 @@ CreateLibfile (char *filename)
     {
       if ((filename = getenv ("Z80_STDLIB")) != NULL)
         {
-          if ((libfilename = AllocIdentifier (strlen (filename))) != NULL)
+	   /* BUG_0002 - off by one alloc */
+          if ((libfilename = AllocIdentifier (strlen (filename) + 1)) != NULL)
             strcpy (libfilename, filename);
           else
             {
@@ -630,7 +609,8 @@ GetLibfile (char *filename)
       filename = getenv ("Z80_STDLIB");
       if (filename != NULL)
         {
-          if ((f = AllocIdentifier (strlen (filename))) != NULL)
+	  /* BUG_0002 - off by one alloc */
+          if ((f = AllocIdentifier (strlen (filename) + 1)) != NULL)
             strcpy (f, filename);
           else
             {
@@ -688,6 +668,7 @@ SetAsmFlag (char *flagid)
     {
       strncpy ((objext + 1), (flagid + 1), 3);	/* copy argument string (append after '.') */
       objext[4] = '\0';						/* max. 3 letters extension */
+      return;                                       /* BUG_0003 was falling through */
     }
 
   /** Check whether this is for the RCM2000/RCM3000 series of Z80-like CPU's */
@@ -783,12 +764,12 @@ SetAsmFlag (char *flagid)
     }
   if (strcmp (flagid, "v") == 0)
     {
-      verbose = ON;		/* perform address relocation & linking */
+      verbose = ON;
       return;
     }
   if (strcmp (flagid, "nv") == 0)
     {
-      verbose = OFF;		/* perform address relocation & linking */
+      verbose = OFF;
       return;
     }
   if (strcmp (flagid, "d") == 0)
@@ -868,15 +849,15 @@ SetAsmFlag (char *flagid)
       i = include_dir_num++;
       include_dir = realloc(include_dir, include_dir_num * sizeof(include_dir[0]));
       include_dir[i] = strdup(flagid+1);
+      return;                                       /* BUG_0003 was falling through */
     }
   if (*flagid == 'L')
     {
       i = lib_dir_num++;
       lib_dir = realloc(lib_dir, lib_dir_num * sizeof(lib_dir[0]));
       lib_dir[i] = strdup(flagid+1);
+      return;                                       /* BUG_0003 was falling through */
     }
-
-
   if (*flagid == 'D')
     {
       strcpy (ident, (flagid + 1));	/* copy argument string */
@@ -911,7 +892,11 @@ SetAsmFlag (char *flagid)
           ++i;
         }
       DefineDefSym (ident, 1, 0, &staticroot);
+      return;                                       /* BUG_0003 was falling through */
     }
+
+    /* BUG_0003 was missing Illegal Option error */
+    ReportError (NULL, 0, 9);                   /* Illegal option */
 }
 
 
@@ -1035,8 +1020,8 @@ ReleaseModules (void)
     {
       if (curptr->cfile != NULL)
 	ReleaseFile (curptr->cfile);
-      deleteall (&curptr->localroot, (void (*)()) FreeSym);
-      deleteall (&curptr->notdeclroot, (void (*)()) FreeSym);
+      deleteall (&curptr->localroot, (void (*)(void*)) FreeSym);
+      deleteall (&curptr->notdeclroot, (void (*)(void*)) FreeSym);
       if (curptr->mexpr != NULL)
 	ReleaseExprns (curptr->mexpr);
       if (curptr->mname != NULL)
@@ -1150,14 +1135,13 @@ ReportError (char *filename, int lineno, int errnum)
   strcat(errstr, errlinestr);
   strcat(errstr, errmsg[errnum]);
  
+  /* CH_0001 : Assembly error messages should appear on stderr */  
   switch(errnum)
     {
       case 12:
-        if (errfile == NULL) { 
           fprintf (stderr, errstr, MAXCODESIZE);
           fputc ('\n',stderr);
-        }
-        else {
+	  if (errfile != NULL) { 
           fprintf (errfile, errstr, MAXCODESIZE);
           fputc ('\n',errfile);
         }
@@ -1168,9 +1152,8 @@ ReportError (char *filename, int lineno, int errnum)
         break;
 
       default:
-        if (errfile == NULL) 
           fprintf (stderr, "%s\n", errstr);
-        else
+	  if (errfile != NULL) 
 	  fprintf (errfile, "%s\n", errstr);
      }
 
@@ -1507,8 +1490,8 @@ main (int argc, char *argv[])
   CloseFiles ();
 
 #ifndef QDOS
-  deleteall (&globalroot, (void (*)()) FreeSym);
-  deleteall (&staticroot, (void (*)()) FreeSym);
+  deleteall (&globalroot, (void (*)(void*)) FreeSym);
+  deleteall (&staticroot, (void (*)(void*)) FreeSym);
 
   if (modulehdr != NULL)
     ReleaseModules ();		/* Release module information (symbols, etc.) */
