@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.10 2010-04-16 17:34:37 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.11 2011-07-09 01:14:13 pauloscustodio Exp $ */
 /* $History: Asmdrctv.c $ */
 /*  */
 /* *****************  Version 13  ***************** */
@@ -257,7 +257,7 @@ DEFVARS (void)
 
       if ((offset != -1) && (offset != 0))
 	{
-	  DEFVPC = offset;
+          DEFVPC = (unsigned short)offset;
 	  globaldefv = ON;
 	}
       else
@@ -301,7 +301,7 @@ DEFVARS (void)
 
       if (globaldefv == ON)
 	{
-	  DEFVPC = offset;
+          DEFVPC = (unsigned short)offset;
 	}
     }
 }
@@ -421,7 +421,7 @@ DEFS ()
 		{
 		  PC += constant;
 
-		  while (constant--) *codeptr++ = val;
+                  while (constant--) *codeptr++ = (unsigned char)val;
 		}
 	      else
 		{
@@ -449,7 +449,7 @@ UnDefineSym(void)
       if (GetSym () == name)
 	sym = FindSymbol(ident,CURRENTMODULE->localroot);
 	if ( sym != NULL ) {
-		delete (&CURRENTMODULE->localroot, sym, (int (*)()) cmpidstr, (void (*)()) FreeSym);
+                delete (&CURRENTMODULE->localroot, sym, (int (*)(void*,void*)) cmpidstr, (void (*)(void*)) FreeSym);
 	}
       else
 	{
@@ -724,7 +724,7 @@ DEFM (void)
 		{
 		  if (constant != '\"')
 		    {
-		      *codeptr++ = constant;
+                      *codeptr++ = (unsigned char)constant;
 		      ++bytepos;
 		      ++PC;
 		    }
