@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.7 2010-09-19 00:06:20 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.8 2011-07-09 01:19:18 pauloscustodio Exp $ */
 /* $History: EXPRPRSR.C $ */
 /*  */
 /* *****************  Version 15  ***************** */
@@ -231,7 +231,7 @@ Factor (struct expr *pfixexpr)
             }
             else
             {
-                *pfixexpr->infixptr++ = constant;		/* store char in infix expr */
+                *pfixexpr->infixptr++ = (unsigned char)constant;               /* store char in infix expr */
                 if (GetSym () == squote)
                 {
                     *pfixexpr->infixptr++ = '\'';
@@ -246,6 +246,23 @@ Factor (struct expr *pfixexpr)
         }
 
         GetSym ();
+        break;
+
+    /* CH_0002 accept and ignore unary plus */
+    case plus:
+	GetSym ();
+	return Factor (pfixexpr);
+
+    /* CH_0002 accept and parse unary minus */
+    case minus:
+        GetSym ();
+        *pfixexpr->infixptr++ = '-';
+        if (Factor (pfixexpr)) {
+	    NewPfixSymbol (pfixexpr, 0, negated, NULL, 0);
+	}
+        else {
+	    return 0;
+	}
         break;
 
     default:
@@ -931,8 +948,15 @@ ExprUnsigned8 (int listoffset)
 		{
 		  constant = EvalPfixExpr (pfixexpr);
 		  RemovePfixlist (pfixexpr);
-	       *codeptr = (unsigned char) constant;
-		}
+
+                  /* BUG_0004 add test Integer out of range error */
+                  if (constant >= -128 && constant <= 255) {
+	       	      *codeptr = (unsigned char) constant;
+		  }
+		  else {
+		      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 4);
+		  }
+                }
 	    }
 	}
     }
@@ -951,6 +975,22 @@ ExprSigned8 (int listoffset)
   struct expr *pfixexpr;
   long constant;
   int flag = 1;
+
+  /* BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary */
+  switch (sym)
+    {
+    case rparen:
+	*codeptr++ = 0;	    /* offset zero */
+	return 1; 	    /* OK */
+	  
+    case plus:
+    case minus: 	    /* + or - expected */
+	break;		    /* continue into parsing expression */
+
+    default:		    /* Syntax error, e.g. (ix 4) */
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);	
+	return 0; 	    /* FAIL */
+    }
 
   if ((pfixexpr = ParseNumExpr ()) != NULL)
     {				/* parse numerical expression */
