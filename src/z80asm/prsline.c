@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.13 2010-04-16 17:34:37 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.14 2011-07-09 01:23:13 pauloscustodio Exp $ */
 /* $History: PRSLINE.C $ */
 /*  */
 /* *****************  Version 8  ***************** */
@@ -161,7 +161,8 @@ GetSym (void)
       else
         {
           c = GetChar (z80asmfile);
-          if ((c == '\n') || (c == EOF) || (c == '\x1A'))
+          if ((c == '\n') || (c == EOF) || (c == '\x1A')
+              || (c == '\0'))	        /* BUG_0001 Bugfix read overrun in OBJ file expression */
             {
               sym = newline;
               EOL = ON;
