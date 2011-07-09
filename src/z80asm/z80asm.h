@@ -13,10 +13,26 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.5 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.6 2011-07-09 17:36:09 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.5  2011-07-09 01:46:00  pauloscustodio
+/* Revision 1.6  2011-07-09 17:36:09  pauloscustodio
+/* Copied cvs log into $Log$ history
+/*
+/* Revision 1.5  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword
+/* 
+/* Revision 1.4  2011/07/09 01:38:02  pauloscustodio
+/* *** empty log message ***
+/* 
+/* Revision 1.3  2011/07/09 01:31:24  pauloscustodio
+/* Moved snprintf macro to z80asm.h
+/* 
+/* Revision 1.2  2009/07/18 23:23:15  dom
+/* clean up the code a bit more (Formatting and a fewer magic numbers)
+/* 
+/* Revision 1.1  2009/06/13 17:36:24  dom
+/* Add -I and -L to specify search paths for libraries and includes
+/* 
 /* */
 
 /* $History: Z80ASM.C $ */

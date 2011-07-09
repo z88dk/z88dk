@@ -1,6 +1,14 @@
 ; TITLE	'Z80 Instruction Set in alphabetical order'
 ;
-; $Id: z80ops.asm,v 1.1 2011-07-09 01:06:38 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/data/Attic/z80ops.asm,v 1.2 2011-07-09 17:36:09 pauloscustodio Exp $
+; $Log: z80ops.asm,v $
+; Revision 1.2  2011-07-09 17:36:09  pauloscustodio
+; Copied cvs log into $Log$ history
+;
+; Revision 1.1  2011/07/09 01:06:38  pauloscustodio
+; Started to build test suite in t/ *.t unsing Perl prove. Included test for all standard
+; Z80 opcodes; need to be extended with directives and opcodes for Z80 variants.
+;
 ;
 ; Adapted from z80pack-1.17.tgz http://www.autometer.de/unix4fun/z80pack/ftp/
 ; 

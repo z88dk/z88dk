@@ -13,10 +13,83 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.15 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.16 2011-07-09 17:36:09 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.15  2011-07-09 01:46:00  pauloscustodio
+/* Revision 1.16  2011-07-09 17:36:09  pauloscustodio
+/* Copied cvs log into $Log$ history
+/*
+/* Revision 1.15  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword
+/* 
+/* Revision 1.14  2011/07/09 01:23:13  pauloscustodio
+/* BUG_0001 : Error in expression during link, expression garbled - memory corruption?
+/*      Simple asm program: "org 0 \n jp NN \n jp NN \n NN: \n",
+/*      compile with "z80asm -t4 -b test.asm"
+/*      fails with: "File 'test.asm', Module 'TEST', Syntax error in expression \n
+/*                   Error in expression +¶+≤+-;æ?.π“¶“≤Ÿ+v›F›V›^›x¶ ›@›H›P›".
+/*      Problem cause: lexer GetSym() is not prepared to read '\0' bytes.
+/*      When the expression is read from the OBJ file at the link phase, the '\0'
+/*      at the end of the expression field is interpreted as a random separator
+/*      because ssym[] contains fewer elements (27) than the separators string (28);
+/*      hence in some cases the expression is parsed correctly, e.g. without -t4
+/*      the program assembles correctly.
+/*      If the random separator is a semicolon, GetSym() calls Skipline() to go past
+/*      the comment, and reads past the end of the expression in the OBJ file,
+/*      causing the parse of the next expression to fail.
+/* 
+/* Revision 1.13  2010/04/16 17:34:37  dom
+/* Make line number an int - 32768 lines isn't big enough...
+/* 
+/* Revision 1.12  2009/08/14 22:23:12  dom
+/* clean up some compiler warnings
+/* 
+/* Revision 1.11  2009/07/18 23:23:15  dom
+/* clean up the code a bit more (Formatting and a fewer magic numbers)
+/* 
+/* Revision 1.10  2007/06/17 12:07:43  dom
+/* Commit the rabbit emulation code including rrd, rld
+/* 
+/* Add a .vcproj for visual studio
+/* 
+/* Revision 1.9  2007/02/28 11:23:24  stefano
+/* New platform !
+/* Rabbit Control Module 2000/3000.
+/* 
+/* Revision 1.8  2002/04/22 14:45:51  stefano
+/* Removed the SLL L undocumented instructions from the Graph library.
+/* NEW startup=2 mode for the ZX81 (SLOW mode... hoping we'll make it work in the future).
+/* MS Visual C compiler related fixes
+/* -IXIY option on Z80ASM to swap the IX and IY registers
+/* 
+/* Revision 1.7  2002/01/18 21:12:17  dom
+/* 0x prefix allowed for hex constants
+/* 
+/* Revision 1.6  2002/01/18 16:55:40  dom
+/* minor bug fix on the previous commit
+/* 
+/* Revision 1.5  2002/01/18 16:53:13  dom
+/* added 'd' and 'b' identifiers for constants - decimal and binary
+/* respectively.
+/* 
+/* Revision 1.4  2002/01/16 21:56:43  dom
+/* we now accept h as a post modifier for hex numbers eg:
+/* 	ld	a,20h == ld a,$20 == ld a,32
+/* 
+/* Revision 1.3  2001/04/11 09:48:18  dom
+/* Minor fix to allow labels to end in ':'
+/* 
+/* Revision 1.2  2001/03/21 16:34:01  dom
+/* Added changes to allow labels to end in ':' and the prefix '.' isn't
+/* necessarily needed..this isn't guaranteed to be perfect so let me know
+/* of any problems and drop back to 1.0.18
+/* 
+/* Revision 1.1  2000/07/04 15:33:30  dom
+/* branches:  1.1.1;
+/* Initial revision
+/* 
+/* Revision 1.1.1.1  2000/07/04 15:33:30  dom
+/* First import of z88dk into the sourceforge system <gulp>
+/* 
 /* */
 
 /* $History: PRSLINE.C $ */

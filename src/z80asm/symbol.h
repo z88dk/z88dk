@@ -13,10 +13,55 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.7 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.8 2011-07-09 17:36:09 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.7  2011-07-09 01:46:00  pauloscustodio
+/* Revision 1.8  2011-07-09 17:36:09  pauloscustodio
+/* Copied cvs log into $Log$ history
+/*
+/* Revision 1.7  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword
+/* 
+/* Revision 1.6  2011/07/09 01:38:02  pauloscustodio
+/* *** empty log message ***
+/* 
+/* Revision 1.5  2011/07/09 01:29:10  pauloscustodio
+/* BUG_0001 : Error in expression during link, expression garbled - memory corruption?
+/*      Simple asm program: "org 0 \n jp NN \n jp NN \n NN: \n",
+/*      compile with "z80asm -t4 -b test.asm"
+/*      fails with: "File 'test.asm', Module 'TEST', Syntax error in expression \n
+/*                   Error in expression +¦+²+-;¾?.¹Ò¦Ò²Ù+vÝFÝVÝ^Ýx¦ Ý@ÝHÝPÝ".
+/*      Problem cause: lexer GetSym() is not prepared to read '\0' bytes.
+/*      When the expression is read from the OBJ file at the link phase, the '\0'
+/*      at the end of the expression field is interpreted as a random separator
+/*      because ssym[] contains fewer elements (27) than the separators string (28);
+/*      hence in some cases the expression is parsed correctly, e.g. without -t4
+/*      the program assembles correctly.
+/*      If the random separator is a semicolon, GetSym() calls Skipline() to go past
+/*      the comment, and reads past the end of the expression in the OBJ file,
+/*      causing the parse of the next expression to fail.
+/* 
+/* Revision 1.4  2010/04/16 17:34:37  dom
+/* Make line number an int - 32768 lines isn't big enough...
+/* 
+/* Revision 1.3  2003/10/11 15:41:04  dom
+/* changes from garry
+/* 
+/* - support for defp -> defp addr,bank
+/* - square brackets can be used in expressions
+/* - comma can be used in defm
+/* 
+/* Revision 1.2  2001/03/21 16:34:01  dom
+/* Added changes to allow labels to end in ':' and the prefix '.' isn't
+/* necessarily needed..this isn't guaranteed to be perfect so let me know
+/* of any problems and drop back to 1.0.18
+/* 
+/* Revision 1.1  2000/07/04 15:33:29  dom
+/* branches:  1.1.1;
+/* Initial revision
+/* 
+/* Revision 1.1.1.1  2000/07/04 15:33:29  dom
+/* First import of z88dk into the sourceforge system <gulp>
+/* 
 /* */
 
 /* $History: Z80ASM.C $ */

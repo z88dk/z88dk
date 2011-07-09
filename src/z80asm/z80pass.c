@@ -13,10 +13,52 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.8 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.9 2011-07-09 17:36:09 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.8  2011-07-09 01:46:00  pauloscustodio
+/* Revision 1.9  2011-07-09 17:36:09  pauloscustodio
+/* Copied cvs log into $Log$ history
+/*
+/* Revision 1.8  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword
+/* 
+/* Revision 1.7  2011/07/09 01:34:12  pauloscustodio
+/* added casts to clean up warnings
+/* BUG_0004 : 8bit unsigned constants are not checked for out-of-range
+/*      Added the check to ExprUnsigned8() and Z80pass2().
+/* 
+/* Revision 1.6  2010/04/16 17:34:37  dom
+/* Make line number an int - 32768 lines isn't big enough...
+/* 
+/* Revision 1.5  2009/09/03 17:54:55  dom
+/* Fix name conflict with the getline function in POSIX 2008
+/* 
+/* Nabbed via Fedora/Kevin Kofler
+/* 
+/* Revision 1.4  2009/08/14 22:23:12  dom
+/* clean up some compiler warnings
+/* 
+/* Revision 1.3  2002/05/11 20:09:38  dom
+/* A patch around the appalling IF ELSE ENDIF handling of z80asm where it
+/* tries to evaluate FALSE clauses and gets completely in a twist.
+/* 
+/* These patches turn off the output to the two errors that I've seen pop
+/* up in this state: Syntax error and unknown identifier. Please test this
+/* one quite hard if you get a change... - it was done to allow even more
+/* complicated logic in the z88 app startup to actually work - as soon as I'm
+/* happy with that I'll commit it as well
+/* 
+/* Revision 1.2  2001/03/21 16:34:01  dom
+/* Added changes to allow labels to end in ':' and the prefix '.' isn't
+/* necessarily needed..this isn't guaranteed to be perfect so let me know
+/* of any problems and drop back to 1.0.18
+/* 
+/* Revision 1.1  2000/07/04 15:33:29  dom
+/* branches:  1.1.1;
+/* Initial revision
+/* 
+/* Revision 1.1.1.1  2000/07/04 15:33:29  dom
+/* First import of z88dk into the sourceforge system <gulp>
+/* 
 /* */
 
 /* $History: Z80PASS.C $ */

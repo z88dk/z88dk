@@ -13,10 +13,31 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.5 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.6 2011-07-09 17:36:09 pauloscustodio Exp $ */
 /* $Log: ldinstr.c,v $
-/* Revision 1.5  2011-07-09 01:46:00  pauloscustodio
+/* Revision 1.6  2011-07-09 17:36:09  pauloscustodio
+/* Copied cvs log into $Log$ history
+/*
+/* Revision 1.5  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword
+/* 
+/* Revision 1.4  2010/04/16 17:34:37  dom
+/* Make line number an int - 32768 lines isn't big enough...
+/* 
+/* Revision 1.3  2009/07/18 23:23:15  dom
+/* clean up the code a bit more (Formatting and a fewer magic numbers)
+/* 
+/* Revision 1.2  2009/05/28 19:20:16  dom
+/* For the RCM SLL isn't a valid opcode, neither is anything using ixh,ixl,iyh
+/* or iyl.
+/* 
+/* Revision 1.1  2000/07/04 15:33:30  dom
+/* branches:  1.1.1;
+/* Initial revision
+/* 
+/* Revision 1.1.1.1  2000/07/04 15:33:30  dom
+/* First import of z88dk into the sourceforge system <gulp>
+/* 
 /* */
 
 /* $History: LDINSTR.C $ */

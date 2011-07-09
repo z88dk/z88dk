@@ -13,10 +13,73 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.15 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.16 2011-07-09 17:36:09 pauloscustodio Exp $ */
 /* $Log: z80instr.c,v $
-/* Revision 1.15  2011-07-09 01:46:00  pauloscustodio
+/* Revision 1.16  2011-07-09 17:36:09  pauloscustodio
+/* Copied cvs log into $Log$ history
+/*
+/* Revision 1.15  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword
+/* 
+/* Revision 1.14  2011/07/09 01:32:27  pauloscustodio
+/* added casts to clean up warnings
+/* 
+/* Revision 1.13  2011/02/27 11:58:46  stefano
+/* Rolled back z80asm changes (I must have messed up something!!)
+/* Slightly updated console output for Enterprise..
+/* 
+/* Revision 1.12  2011/02/25 17:14:43  stefano
+/* EXOS directive fixed on z80asm
+/* 
+/* Revision 1.11  2011/02/23 16:27:39  stefano
+/* *** empty log message ***
+/* 
+/* Revision 1.10  2010/04/16 17:34:37  dom
+/* Make line number an int - 32768 lines isn't big enough...
+/* 
+/* Revision 1.9  2009/08/14 22:23:12  dom
+/* clean up some compiler warnings
+/* 
+/* Revision 1.8  2009/07/18 23:23:15  dom
+/* clean up the code a bit more (Formatting and a fewer magic numbers)
+/* 
+/* Revision 1.7  2009/05/28 19:20:16  dom
+/* For the RCM SLL isn't a valid opcode, neither is anything using ixh,ixl,iyh
+/* or iyl.
+/* 
+/* Revision 1.6  2007/06/24 14:46:24  dom
+/* remove the erroneous debug line
+/* 
+/* Revision 1.5  2007/06/17 12:07:43  dom
+/* Commit the rabbit emulation code including rrd, rld
+/* 
+/* Add a .vcproj for visual studio
+/* 
+/* Revision 1.4  2007/02/28 11:23:24  stefano
+/* New platform !
+/* Rabbit Control Module 2000/3000.
+/* 
+/* Revision 1.3  2002/01/18 16:22:11  dom
+/* for add,adc,sbc the a, for 8 bit operations is optional
+/* 
+/* Revision 1.2  2001/01/23 10:00:09  dom
+/* Changes by x1cygnus:
+/* 
+/* just added a harcoded macro Invoke, similar to callpkg except that the
+/* instruction 'Invoke' resolves to a call by default (ti83) and to a RST if
+/* the parameter -plus is specified on the command line.
+/* 
+/* Changes by dom:
+/* Added in a rudimentary default directory set up (Defined at compile time)
+/* a bit kludgy and not very nice!
+/* 
+/* Revision 1.1  2000/07/04 15:33:29  dom
+/* branches:  1.1.1;
+/* Initial revision
+/* 
+/* Revision 1.1.1.1  2000/07/04 15:33:29  dom
+/* First import of z88dk into the sourceforge system <gulp>
+/* 
 /* */
 
 /* $History: Z80INSTR.C $ */

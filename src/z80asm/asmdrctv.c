@@ -13,10 +13,67 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.12 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.13 2011-07-09 17:36:09 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.12  2011-07-09 01:46:00  pauloscustodio
+/* Revision 1.13  2011-07-09 17:36:09  pauloscustodio
+/* Copied cvs log into $Log$ history
+/*
+/* Revision 1.12  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword
+/*
+/* Revision 1.11  2011/07/09 01:14:13  pauloscustodio
+/* added casts to clean up warnings
+/* 
+/* Revision 1.10  2010/04/16 17:34:37  dom
+/* Make line number an int - 32768 lines isn't big enough...
+/* 
+/* Revision 1.9  2009/08/14 22:23:12  dom
+/* clean up some compiler warnings
+/* 
+/* Revision 1.8  2009/06/22 21:26:28  dom
+/* don't expand a zero length file
+/* 
+/* Revision 1.7  2009/06/13 17:36:24  dom
+/* Add -I and -L to specify search paths for libraries and includes
+/* 
+/* Revision 1.6  2003/10/11 15:41:04  dom
+/* changes from garry
+/* 
+/* - support for defp -> defp addr,bank
+/* - square brackets can be used in expressions
+/* - comma can be used in defm
+/* 
+/* Revision 1.5  2002/02/20 21:37:57  dom
+/* merged in changes from rc1.4 branch to handle empty lines in list files
+/* 
+/* Revision 1.4  2001/06/27 08:53:28  dom
+/* branches:  1.4.2;
+/* Added a second parameter to defs to indicate what the filler byte should be
+/* 
+/* Revision 1.3  2001/02/28 17:59:22  dom
+/* Added UNDEFINE for undefining symbols, bumped version to 1.0.18
+/* 
+/* Revision 1.2  2001/01/23 10:00:08  dom
+/* Changes by x1cygnus:
+/* 
+/* just added a harcoded macro Invoke, similar to callpkg except that the
+/* instruction 'Invoke' resolves to a call by default (ti83) and to a RST if
+/* the parameter -plus is specified on the command line.
+/* 
+/* Changes by dom:
+/* Added in a rudimentary default directory set up (Defined at compile time)
+/* a bit kludgy and not very nice!
+/* 
+/* Revision 1.1  2000/07/04 15:33:30  dom
+/* branches:  1.1.1;
+/* Initial revision
+/* 
+/* Revision 1.1.1.1  2000/07/04 15:33:30  dom
+/* First import of z88dk into the sourceforge system <gulp>
+/* 
+/* Revision 1.4.2.1  2002/02/20 21:35:19  dom
+/* changes from dennis to handle blank lines in file list files
+/* 
 /* */
 
 /* $History: Asmdrctv.c $ */
