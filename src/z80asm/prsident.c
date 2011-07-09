@@ -13,10 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.20 2011-07-09 17:36:09 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.21 2011-07-09 18:25:35 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.20  2011-07-09 17:36:09  pauloscustodio
-/* Copied cvs log into $Log$ history
+/* Revision 1.21  2011-07-09 18:25:35  pauloscustodio
+/* Log keyword in checkin comment was expanded inside Log expansion... recursive
+/* Added Z80asm banner to all source files
+/*
+/* Revision 1.20  2011/07/09 17:36:09  pauloscustodio
+/* Copied cvs log into Log history
 /*
 /* Revision 1.19  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword

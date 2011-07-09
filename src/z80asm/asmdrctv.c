@@ -13,10 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.13 2011-07-09 17:36:09 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.14 2011-07-09 18:25:35 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.13  2011-07-09 17:36:09  pauloscustodio
-/* Copied cvs log into $Log$ history
+/* Revision 1.14  2011-07-09 18:25:35  pauloscustodio
+/* Log keyword in checkin comment was expanded inside Log expansion... recursive
+/* Added Z80asm banner to all source files
+/*
+/* Revision 1.13  2011/07/09 17:36:09  pauloscustodio
+/* Copied cvs log into Log history
 /*
 /* Revision 1.12  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword

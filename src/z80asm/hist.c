@@ -19,13 +19,17 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.13 2011-07-09 17:40:37 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.14 2011-07-09 18:25:35 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.13  2011-07-09 17:40:37  pauloscustodio
+/* Revision 1.14  2011-07-09 18:25:35  pauloscustodio
+/* Log keyword in checkin comment was expanded inside Log expansion... recursive
+/* Added Z80asm banner to all source files
+/*
+/* Revision 1.13  2011/07/09 17:40:37  pauloscustodio
 /* fix version 1.1.1 date
 /*
 /* Revision 1.12  2011/07/09 17:36:09  pauloscustodio
-/* Copied cvs log into $Log$ history
+/* Copied cvs log into history
 /*
 /* Revision 1.11  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword
