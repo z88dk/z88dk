@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.12 2010-09-19 02:37:57 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.13 2011-07-09 01:20:55 pauloscustodio Exp $ */
 /* $History: MODLINK.C $ */
 /*  */
 /* *****************  Version 16  ***************** */
@@ -138,7 +138,7 @@ extern enum symbols sym, GetSym (void);
 extern enum flag listing, writeline, symtable, mapref, z80bin, autorelocate, codesegment, sdcc_hacks;
 extern enum flag verbose, deforigin, globaldef, EOL, library, ASMERROR, expl_binflnm;
 extern long PC;
-extern long EXPLICIT_ORIGIN;
+extern size_t EXPLICIT_ORIGIN;
 extern size_t CODESIZE;
 extern unsigned char *codearea, PAGELEN;
 extern unsigned char reloc_routine[];
@@ -192,7 +192,7 @@ ReadNames (long nextname, long endnames)
             {
               foundsymbol = CreateSymbol (line, value, symtype | SYMLOCAL, CURRENTMODULE);
               if (foundsymbol != NULL)
-                insert (&CURRENTMODULE->localroot, foundsymbol, (int (*)()) cmpidstr);
+                insert (&CURRENTMODULE->localroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
             }
           else
             {
@@ -208,7 +208,7 @@ ReadNames (long nextname, long endnames)
             {
               foundsymbol = CreateSymbol (line, value, symtype | SYMXDEF, CURRENTMODULE);
               if (foundsymbol != NULL)
-                insert (&globalroot, foundsymbol, (int (*)()) cmpidstr);
+                insert (&globalroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
             }
           else
             {
@@ -224,7 +224,7 @@ ReadNames (long nextname, long endnames)
             {
               foundsymbol = CreateSymbol (line, value, symtype | SYMXDEF | SYMDEF, CURRENTMODULE);
               if (foundsymbol != NULL)
-                insert (&globalroot, foundsymbol, (int (*)()) cmpidstr);
+                insert (&globalroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
             }
           else
             {
@@ -342,7 +342,7 @@ ReadExpr (long nextexpr, long endexpr)
                           }
 
                         totaladdr++;
-                        curroffset = PC;
+                        curroffset = (unsigned short)PC;
                       }
                   break;
 
@@ -1107,8 +1107,6 @@ LinkTracedModule (char *filename, long baseptr)
 long 
 ReadLong (FILE * fileid)
 {
-
-  int i;
   long fptr = 0;
 
   fptr = fgetc(fileid);
@@ -1199,23 +1197,23 @@ WriteMapFile (void)
 
       do
 	{
-	  move (&cmodule->localroot, &maproot, (int (*)()) cmpidstr);	/* move all  local address symbols alphabetically */
+          move (&cmodule->localroot, &maproot, (int (*)(void*,void*)) cmpidstr);        /* move all  local address symbols alphabetically */
 	  cmodule = cmodule->nextmodule;	/* alphabetically */
 	}
       while (cmodule != NULL);
 
-      move (&globalroot, &maproot, (int (*)()) cmpidstr);	/* move all global address symbols alphabetically */
+      move (&globalroot, &maproot, (int (*)(void*,void*)) cmpidstr);    /* move all global address symbols alphabetically */
 
       if (maproot == NULL)
 	fputs ("None.\n", mapfile);
       else
 	{
-	  inorder (maproot, (void (*)()) WriteMapSymbol);	/* Write map symbols alphabetically */
-	  move (&maproot, &newmaproot, (int (*)()) cmpidval);	/* then re-order symbols numerically */
+          inorder (maproot, (void (*)(void*)) WriteMapSymbol);  /* Write map symbols alphabetically */
+          move (&maproot, &newmaproot, (int (*)(void*,void*)) cmpidval);        /* then re-order symbols numerically */
 	  fputs ("\n\n", mapfile);
 
-	  inorder (newmaproot, (void (*)()) WriteMapSymbol);	/* Write map symbols numerically */
-	  deleteall (&newmaproot, (void (*)()) FreeSym);	/* then release all map symbols */
+          inorder (newmaproot, (void (*)(void*)) WriteMapSymbol);       /* Write map symbols numerically */
+          deleteall (&newmaproot, (void (*)(void*)) FreeSym);   /* then release all map symbols */
 	}
 
       fclose (mapfile);
