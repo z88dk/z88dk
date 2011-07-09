@@ -13,8 +13,9 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.5 2011-07-09 01:29:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.6 2011-07-09 01:38:02 pauloscustodio Exp $ */
 /* $History: Z80ASM.C $ */
+/*  */
 
 #include "avltree.h"    /* base symbol data structures and routines */
 

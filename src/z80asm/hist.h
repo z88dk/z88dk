@@ -13,8 +13,11 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.h,v 1.2 2011-07-09 01:38:02 pauloscustodio Exp $ */
-/* $History: Z80ASM.C $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.h,v 1.3 2011-07-09 01:40:15 pauloscustodio Exp $ */
+/* $Log: hist.h,v $
+/* Revision 1.3  2011-07-09 01:40:15  pauloscustodio
+/* *** empty log message ***
+/* */
 /*  */
 
 #ifndef HIST_H

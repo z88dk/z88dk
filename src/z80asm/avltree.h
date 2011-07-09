@@ -1,5 +1,6 @@
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.h,v 1.2 2011-07-09 01:15:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.h,v 1.3 2011-07-09 01:38:02 pauloscustodio Exp $ */
 /* $History: Z80ASM.C $ */
+/*  */
 
 typedef struct avlnode {
                         short           height;         /* height of avltree (max search levels from node) */
