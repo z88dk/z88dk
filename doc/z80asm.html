@@ -1,0 +1,2706 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>THE Z80 CROSS ASSEMBLER, V1.0.16 (30th January 2000)</title></head>
+<body style="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
+<h1>
+<center>Z88 Development Kit
+</center>
+</h1>
+<h5>
+<center>THE Z80 CROSS ASSEMBLER, v1.0.31
+</center>
+</h5>
+<center>
+<hr width="20%"></center>
+<br>
+<ul>
+<li><a href="#1">1 Running the asssembler</a></li>
+<ul>
+<li><a href="#1.1">1.1 The help page</a></li>
+<li><a href="#1.2">1.2 The command line</a></li>
+<li><a href="#1.3">1.3 The assembler options</a></li><ul><li><a href="#1.3-h">-h : Show help screen</a></li></ul>
+<ul>
+<li><a href="#1.3-v">-v : Information during
+assembly</a></li>
+<li><a href="#1.3-eEXT">-e&lt;ext&gt;
+: Use alternative source file extension</a></li>
+<li><a href="#1.3-MEXT">-M&lt;ext&gt;
+: Use alternative object file extension</a></li>
+<li><a href="#1.3-l">-l : Create listing file
+output</a></li>
+<li><a href="#1.3-s">-s : Create symbol table</a></li>
+<li><a href="#1.3-d">-d : Assemble only
+updated files</a></li>
+<li><a href="#1.3-b">-b : Link/relocate object
+files</a></li>
+<li><a href="#1.3-a">-a : Combine -d and -b</a></li>
+<li><a href="#1.3-oFILE">-o&lt;binary
+filename&gt; : Binary filename</a></li>
+<li><a href="#1.3-c">-c : Splitting completed
+machine code into 16K segments</a></li>
+<li><a href="#1.3-m">-m : Create address map
+information file</a></li>
+<li><a href="#1.3-rADDR">-r&lt;address&gt;
+: Re-define the ORG relocation address</a></li>
+<li><a href="#1.3-R">-R : Generate address
+independent code</a></li>
+<li><a href="#1.3-g">-g : Create global
+address definition file</a></li>
+<li><a href="#1.3-Dsymbol">-D&lt;symbol&gt;
+: Define a static symbol (logically true)</a></li>
+<li><a href="#1.3-@FILE">@&lt;project
+file&gt; : Using a project file</a></li>
+<li><a href="#1.3-iLIB">-i&lt;library
+file&gt; : Include library modules during linking/relocation</a></li><li><a href="z80asm.html#1.3-Lpath">-L&lt;library path&gt; : Add directory to search path for libaries</a></li><li><a href="#1.3-Ipath">-I&lt;include path&gt; : Add directory to search path for INCLUDE</a></li><li><a href="#1.3-x">-x : Create a library</a></li>
+<li><a href="#1.3-tN">-t&lt;number&gt;
+: Define tabulator distance (for text output files)</a></li>
+<li><a href="#1.3-RCMX000">-RCMX000 : Support
+the RCM2000/RCM3000 series of Z80-like CPU's</a></li>
+<li><a href="#1.3-plus">-plus : Support for
+the Ti83Plus</a></li>
+<li><a href="#1.3-IXIY">-IXIY : Swap IX and IY
+registers</a></li>
+<li><a href="#1.3-CC">-C : Enable LINE
+directive</a></li><li><a href="#1.3-sdcc">-sdcc : Force SDCC hacks</a></li><li><a href="#1.3-forcexlib">-forcexlib : Force XLIB call on MODULE directive</a></li>
+</ul>
+</ul>
+<li><a href="#2">2 An overview of assembler
+features and related files</a></li>
+<ul>
+<li><a href="#2.1">2.1 The Z88 operating system
+definition files</a></li>
+<li><a href="#2.2">2.2 The supplied standard
+library Z80 source files</a></li>
+<li><a href="#2.3">2.3 Z88 module assembler
+application source</a></li>
+<li><a href="#2.4">2.4 File based compilation</a></li>
+<li><a href="#2.5">2.5 Modular source file design</a></li>
+<li><a href="#2.6">2.6 Scope of symbols in
+source modules</a></li>
+<li><a href="#2.7">2.7 Using arithmetic and
+relational expressions</a></li>
+<li><a href="#2.8">2.8 Source file manipulation</a></li>
+<li><a href="#2.9">2.9 Free format of assembler
+source files</a></li>
+<li><a href="#2.10">2.10 Specification of
+filenames</a></li>
+<li><a href="#2.11">2.11 Including other source
+files into the current source file</a></li>
+<li><a href="#2.12">2.12 Conditional assembly in
+source file modules</a></li>
+<li><a href="#2.13">2.13 Undocumented Z80
+instruction code generation</a></li>
+<li><a href="#2.14">2.14 Object file generation</a></li>
+<li><a href="#2.15">2.15 Transfer of object
+files across platforms</a></li>
+<li><a href="#2.16">2.16 Date stamp controlled
+assembly</a></li>
+<li><a href="#2.17">2.17 Listing files</a></li>
+<li><a href="#2.18">2.18 Symbol information</a></li>
+<li><a href="#2.19">2.19 Linking &amp;
+relocation of object modules into executable Z80 machine code</a></li>
+<li><a href="#2.20">2.20 Address map files</a></li>
+<li><a href="#2.21">2.21 Symbol address
+definition files</a></li>
+<li><a href="#2.22">2.22 Error files</a></li>
+<li><a href="#2.23">2.23 Creating and using
+object file libraries for standard routines</a></li>
+</ul>
+<li><a href="#3">3 Executing the cross assembler
+and environment variables</a></li>
+<ul>
+<li><a href="#3.1">3.1 The environment variables</a></li>
+<li><a href="#3.2">3.2 Running in the QDOS/SMSQ
+operating system environment</a></li>
+<li><a href="#3.3">3.3 Running in the LINUX/UNIX
+operating system environment</a></li>
+<li><a href="#3.4">3.4 Running in the MS-DOS
+operating system environment</a></li>
+</ul>
+<li><a href="#4">4 Z80 module assembler file
+types</a></li>
+<ul>
+<li><a href="#4.1">4.1 The assembler file types
+and their extension names</a></li>
+<li><a href="#4.2">4.2 The file name extension
+identifier</a></li>
+<li><a href="#4.3">4.3 File types</a></li>
+<ul>
+<li><a href="#4.3.1">4.3.1 The source file
+extension, asm</a></li>
+<li><a href="#4.3.2">4.3.2 The object file
+extension, obj</a></li>
+<li><a href="#4.3.3">4.3.3 The error file
+extension, err</a></li>
+<li><a href="#4.3.4">4.3.4 The listing file
+extension, lst</a></li>
+<li><a href="#4.3.5">4.3.5 The symbol file
+extension, sym</a></li>
+<li><a href="#4.3.6">4.3.6 The executable file
+extension, bin</a></li>
+<li><a href="#4.3.7">4.3.7 The address map
+file extension, map</a></li>
+<li><a href="#4.3.8">4.3.8 The definition file
+extension, def</a></li>
+<li><a href="#4.3.9">4.3.9 The library file
+extension, lib</a></li>
+</ul>
+</ul>
+<li><a href="#5">5 Compiling files</a></li>
+<ul>
+<li><a href="#5.1">5.1 The assembler compiling
+process</a></li>
+<ul>
+<li><a href="#5.1.1">5.1.1 Stage 1, parsing
+&amp; code generation of all source files, object file generation</a></li>
+<li><a href="#5.1.2">5.1.2 Stage 2, linking
+object files and library modules, producing executable code</a></li>
+</ul>
+<li><a href="#5.2">5.2 File names</a></li>
+<li><a href="#5.3">5.3 Portability of
+assembler file names</a></li>
+<li><a href="#5.4">5.4 The standard platform
+identifier</a></li>
+<li><a href="#5.5">5.5 Source file structure</a></li>
+<li><a href="#5.6">5.6 Using local, global and
+external symbols</a></li>
+<li><a href="#5.7">5.7 Defining symbol names</a></li>
+<li><a href="#5.8">5.8 Comments in source files</a></li>
+<li><a href="#5.9">5.9 Defining symbolic
+address labels</a></li>
+<li><a href="#5.10">5.10 Writing Z80 mnemonic
+instructions</a></li>
+<li><a href="#5.11">5.11 Optional Z80 mnemonic
+instruction syntax</a></li>
+<li><a href="#5.12">5.12 The undocumented Z80
+instructions</a></li>
+<li><a href="#5.13">5.13 Referencing library
+routines</a></li>
+<li><a href="#5.14">5.14 Creating/updating
+libraries</a></li>
+<li><a href="#5.15">5.15 Referencing routines
+in other compiled projects</a></li>
+</ul>
+<li><a href="#6">6 Using expressions</a></li>
+<ul>
+<li><a href="#6.1">6.1 Constant identifiers</a></li>
+<li><a href="#6.2">6.2 Arithmetic operators</a></li>
+<li><a href="#6.3">6.3 The # operator</a></li>
+<li><a href="#6.4">6.4 Relational operators</a></li>
+<li><a href="#6.5">6.5 The ASMPC standard
+function</a></li>
+<li><a href="#6.6">6.6 The &amp; operator</a></li>
+<li><a href="#6.7">6.7 Symbol identifiers in
+expressions</a></li>
+</ul>
+<li><a href="#7">7 Directive reference</a></li>
+<ul>
+<li><a href="#7-BINARY">BINARY "filename"</a></li>
+<li><a href="#7-CALL_OZ">CALL_OZ['(']
+&lt;expression&gt; [')']</a></li>
+<li><a href="#7-DEFB">DEFB &lt;8bit
+expr&gt;,{&lt;8bit expr&gt;} (-128; 255)</a></li>
+<li><a href="#7-DEFW">DEFW &lt;16bit
+expr&gt;,{&lt;16bit expr&gt;} (-32768; 65535)</a></li>
+<li><a href="#7-DEFL">DEFL &lt;32bit
+expr&gt;,{&lt;32bit expr&gt;} (-2147483647; 4294967295)</a></li>
+<li><a href="#7-DEFC">DEFC name=&lt;32bit
+expression&gt;{, name=&lt;32bit expression&gt;}</a></li>
+<li><a href="#7-DEFM">DEFM &lt;string
+expression&gt;</a></li>
+<li><a href="#7-DEFGROUP">DEFGROUP
+'{' name {',' name ['=' &lt;8bit expression&gt;]} '}'</a></li>
+<li><a href="#7-DEFINE">DEFINE name,{name}</a></li>
+<li><a href="#7-DEFS">DEFS &lt;16bit
+expression&gt;</a></li>
+<li><a href="#7-DEFVARS">DEFVARS &lt;16bit
+expression&gt; '{' [&lt;name&gt;]
+[&lt;storage_size&gt; &lt;size_multiplier&gt;] {
+[&lt;name&gt;] [&lt;storage_size&gt;
+&lt;size_multiplier&gt;] } '}'</a></li>
+<li><a href="#7-FPP">FPP['('] &lt;8bit
+expression&gt; [')']</a></li>
+<li><a href="#7-IF">IF &lt;logical
+expression&gt; [ELSE] ENDIF</a></li>
+<li><a href="#7-INCLUDE">INCLUDE "filename"</a></li>
+<li><a href="#7-INVOKE">INVOKE </a><a href="#7-INVOKE">['('] &lt;16bit
+expression&gt; [')']</a></li>
+<li><a href="#7-LIB">LIB name {,name}</a></li>
+<li><a href="#7-LINE">LINE &lt;32bit
+expr&gt;</a></li>
+<li><a href="#7-LSTOFF">LSTOFF</a></li>
+<li><a href="#7-LSTON">LSTON</a></li>
+<li><a href="#7-MODULE">MODULE name</a></li>
+<li><a href="#7-ORG">ORG &lt;16bit
+expression&gt;</a></li>
+<li><a href="#7-XDEF">XDEF name {, name}</a></li>
+<li><a href="#7-XLIB">XLIB name</a></li>
+<li><a href="#7-XREF">XREF name {, name}</a></li>
+</ul>
+<li><a href="#8">8 Run time error messages</a></li>
+<ul>
+<li><a href="#8.0">0, "File open/read error"</a></li>
+<li><a href="#8.1">1, "Syntax error"</a></li>
+<li><a href="#8.2">2, "Symbol not defined"</a></li>
+<li><a href="#8.3">3, "Not enough memory" / "No
+room in Z88"</a></li>
+<li><a href="#8.4">4, "Integer out of range"</a></li>
+<li><a href="#8.5">5, "Syntax error in
+expression"</a></li>
+<li><a href="#8.6">6, "Right bracket missing"</a></li>
+<li><a href="#8.7">7, "Out of range"</a></li>
+<li><a href="#8.8">8, "Source filename missing"</a></li>
+<li><a href="#8.9">9, "Illegal option"</a></li>
+<li><a href="#8.10">10, "Unknown identifier"</a></li>
+<li><a href="#8.11">11, "Illegal identifier"</a></li>
+<li><a href="#8.12">12, "Max. code size reached"</a></li>
+<li><a href="#8.13">13, "errors occurred during
+assembly"</a></li>
+<li><a href="#8.14">14, "Symbol already defined"</a></li>
+<li><a href="#8.15">15, "Module name already
+defined"</a></li>
+<li><a href="#8.16">16, "Module name not defined" [DEPRECATED]</a></li>
+<li><a href="#8.17">17, "Symbol already declared
+local"</a></li>
+<li><a href="#8.18">18, "Symbol already declared
+global"</a></li>
+<li><a href="#8.19">19, "Symbol already declared
+external" [DEPRECATED]</a></li>
+<li><a href="#8.20">20, "No command line
+arguments" [DEPRECATED]</a></li>
+<li><a href="#8.21">21, "Illegal source filename"</a></li>
+<li><a href="#8.22">22, "Symbol declared global
+in another module"</a></li>
+<li><a href="#8.23">23, "Re-declaration not
+allowed"</a></li>
+<li><a href="#8.24">24, "ORG already defined" [DEPRECATED]</a></li>
+<li><a href="#8.25">25, "Relative jump address
+must be local"</a></li>
+<li><a href="#8.26">26, "Not a relocatable file"
+/ "Not an object file"</a></li>
+<li><a href="#8.27">27, "Reserved name" [DEPRECATED]</a></li>
+<li><a href="#8.28">28, "Couldn't open library
+file"</a></li>
+<li><a href="#8.29">29, "Not a library file"</a></li>
+<li><a href="#8.30">30, "Environment variable
+not defined"</a></li>
+<li><a href="#8.31">31, "Cannot include file
+recursively"</a></li>
+</ul>
+<li><a href="#9">9 Compiling the Z80 Module
+Assembler ANSI C source files</a></li>
+<ul>
+<li><a href="#9.1">9.1 The assember program
+supplied as ANSI C source files</a></li>
+<li><a href="#9.2">9.2 The format of the source
+files</a></li>
+<li><a href="#9.3">9.3 Defining the current
+platform</a></li>
+<li><a href="#9.4">9.4 The C source files</a></li>
+<li><a href="#9.5">9.5 Using a Make utility or a
+compiler front end</a></li>
+<li><a href="#9.6">9.6 Future platform
+implementations</a></li>
+</ul>
+<li><a href="#10">10 File formats</a></li>
+<ul>
+<li><a href="#10.1">10.1 Object file format
+documentation</a></li>
+<li><a href="#10.2">10.2 Library file format
+documentation</a></li>
+</ul>
+</ul>
+<hr>
+<p style="text-align: justify;">Thank you for purchasing a
+copy of this cross assembler. We
+have made an effort
+to program an easy user interface and efficient assembler source file
+compiling.
+The object file and library format is an invention of our own and has
+also been
+included in this documentation. We hope that you will enjoy your Z80
+machine
+code programming with our assembler.
+</p>
+<p style="text-align: justify;">
+We have made an effort to produce a fairly easy-to-understand
+documentation. If
+you have any comments or corrections, please don't hesitate to contact
+us:
+</p>
+<pre>Gunther Strube<br>Gl. Kongevej 37, 4.tv.<br>DK-1610 Kobenhavn V<br>Denmark<br><br>e-mail gbs@image.dk<br></pre>
+<hr>
+<h2><a name="1"></a>1 Running the
+asssembler
+</h2>
+<p style="text-align: justify;">
+Since assemblers are developed for programmers the user interface have
+been
+implemented according to the standard command line environment (CLI)
+used in
+most operating systems; however, if only a GUI interface is available
+(as in
+MacOS) then a command shell must be executed to allow standard command
+line
+input. The Z80 Module Asssembler command line interface may change if
+other
+programmers wish to implement a different interface to the assembler.
+You have
+the opportunity!</p>
+<hr>
+<h2><a name="1.1"></a>1.1 The help
+page
+</h2>
+<p style="text-align: justify;">When executing the
+assembler
+from the command line without
+parameters, i.e.
+pressing &lt;ENTER&gt; after the assembler program name, a help
+page is automatically
+displayed whereafter control is returned to the operating system
+command line.
+The page shortly explains the syntax of parameter specification and
+which
+parameters are available.</p>
+<hr>
+<h2><a name="1.2"></a>1.2 The command
+line
+</h2>
+<p style="text-align: justify;">The syntax of the
+assembler
+parameters is a
+streightforward design. Filenames or
+a project file are always specified. The options may be left out:</p>
+<pre>z80asm [options] &lt;filename {filename}&gt; | &lt;@modulesfile&gt;</pre>
+<p style="text-align: justify;">As seen above
+&lt;options&gt; must be
+specified first.
+Then you enter the names of all files to be assembled. You either
+choose to specify all file names or a @&lt;projectfile&gt;
+containing all file names. File name may be specified with or without
+the 'asm extension. The correct filename parsing is handled
+automatically by the assembler. As seen on the syntax at least on
+source file must be specified and may be repeated with several file
+names. Only one project file may be specified if no source file names
+are given.</p>
+<p style="text-align: justify;">Many of the parameters are
+preset with default values
+which
+gives an easy user interface when specifying the assembly parameters.
+Only advanced parameters need to be specified explicitly. The help page
+displays the default parameter values at the bottom of the page.</p>
+<hr>
+<h2><a name="1.3"></a>1.3 The
+assembler
+options
+</h2>
+<p style="text-align: justify;">Options are used to
+control the assembly process and
+output.
+They are recognized by the assembler when you specify a leading minus
+before the option identifier ('-'). Options are always specified before
+file names or project files.</p>
+<p style="text-align: justify;">When the assembler is
+executed options are all preset
+with
+default values and are either switched ON or OFF (active or not). All
+options have a single letter identification. Upper and lower case
+letters are distinguished, which means that 'a' might be different
+command than 'A'. If an option is to be turned off, you simply specify
+a 'n' before the identification, e.g. -nl which selects listing files
+not to be created by the assembler.</p><hr style="width: 100%; height: 2px;"><h3><a name="1.3-h"></a>-h : Show help screen</h3><p style="text-align: justify;">Shows a help screen with the available options.</p>
+<hr>
+<h3><a name="1.3-v"></a>-v : Information
+during assembly</h3>
+<p style="text-align: justify;">The assembler writes a
+certain amount of information to its
+program window (or on the command line screen) to let the user know
+what is happening. For each source file both the current assembler pass
+and include file names are displayed. During linking all object file
+names and specified names of library modules are displayed. When all
+files have been processed and the necessary output generated, a status
+message is displayed which informs you of how many errors occurred (or
+none). You will also be reported with a message of how many source
+lines that have been parsed during a compilation. This information can
+be very convenient during a large compilation project, especially on
+relatively smaller computers (with less powerful processors) and no
+harddisk. If you own a powerful 32bit computer equipped with a fast
+harddisk, assembly information is displayed at high speed (and almost
+impossible to read); it may then be useful to turn this information off
+specifying a -nv option at the command line.</p>
+<hr>
+<h3><a name="1.3-eEXT"></a>-e&lt;ext&gt;
+: Use alternative source file extension</h3>
+<p style="text-align: justify;">The default assembler
+source file extension is ".asm". Using
+this option, you force the assembler to use another default extension,
+like ".opt" or ".as" for the source file.</p>
+<p style="text-align: justify;">The extension is specified
+without the ".". Only three letters
+are accepted - the rest is discarded.</p>
+<hr>
+<h3><a name="1.3-MEXT"></a>-M&lt;ext&gt;
+: Use alternative object file extension</h3>
+<p style="text-align: justify;">The default assembler
+object file extension is ".obj". Using
+this option, you force the assembler to use another default extension,
+like ".o" as the object file name extension.</p>
+<p style="text-align: justify;">The extension is specified
+without the ".". Only three letters
+are accepted - the rest is discarded.</p>
+<hr>
+<h3><a name="1.3-l"></a>-l : Create listing
+file output</h3>
+<p style="text-align: justify;">The information in listing
+files is a combination of the
+original source file and additional information of the generated
+machine code. Further, the listing file is page formatted with a header
+specifying the date and time of the compilation, the file name of the
+listing and a page number.</p>
+<p style="text-align: justify;">For each line of the
+source file the following information is
+written:</p>
+<pre>&lt;source file line number&gt; &lt;assembler address&gt; &lt;machine code hex dump&gt; &lt;source line&gt;</pre>
+<p style="text-align: justify;">The machine code and
+assembler address output are written in
+hexadecimal notation. If the machine code uses more the 4 bytes, the
+source file line is written on the following line. This usually happens
+when you have defined a string constant or a relatively large amount of
+constant definitions.</p>
+<p style="text-align: justify;">The assembler address is
+always beginning at zero, i.e. the
+beginning of the current modules' machine code. In a relocated context
+of the machine code, where all code is positioned at fixed addresses,
+you will have the opportunity to view the addresses of your code
+relative to the start of individual modules using the assembler output
+addresses. Further, the last assembler address can be interpreted as
+the size of the modules' generated machine code.</p>
+<p style="text-align: justify;">Listing files also serves
+the purpose of a hard copy on paper
+of yourprograms, and are useful in a debugging phase (identifying
+opcodes versus the mnemonic representation of instructions).</p>
+<p style="text-align: justify;">The creation of listing
+files imposes much more processing
+work of theassembler. If you want to compile your code as quickly as
+possible then don't create listing files. Listing files obtain their
+file name from the base of the source file name, and is added with the
+'lst' extension.</p>
+<hr>
+<h3><a name="1.3-s"></a>-s : Create symbol
+table</h3>
+<p style="text-align: justify;">Symbol tables contains the
+integer form of symbolical names
+and constants that has been parsed and generated during a compilation
+of a source file. The structure of the symbol table is divided into two
+columns. The first contains the parsed symbol names, converted to upper
+case. The second column contains the generated value of the symbol name.</p>
+<p style="text-align: justify;">All symbol values are
+displayed in signed 32 bit hexadecimal
+notation.</p>
+<p style="text-align: justify;">The two columns are
+separated by tabulators which represents a
+default
+value of
+8 spaces per tabulator. The width of the symbol name column is defined
+as the
+tabulator distance multiplied by 4. The default with of the name column
+is 4 * 8
+= 32 spaces.</p>
+<p style="text-align: justify;">The symbol table will be
+written to the end of the appropriate
+listing
+file, if
+listing file and symbol table output is enabled. If no listing file
+output is
+enabled, the symbol table will be written to a separate file,
+identified with
+the base name of the source file module and given the 'sym' extension.</p>
+<hr>
+<h3><a name="1.3-d"></a>-d : Assemble only
+updated files</h3>
+<p style="text-align: justify;">Assemblers usually force
+compiles all specified files. This is
+also possible (as default) for the Z80 Module Assembler. In large
+application project with 15 modules or more it can be quite frustrating
+to compile all every time. The solution is to only assemble updated
+files and leave the rest (since they have been compiled to the
+programmers knowledge).</p>
+<p style="text-align: justify;">But in a long term view it
+is better to just compile a project
+without thinking of which files need to be compiled or not. That can be
+done with the Z80 Module Assembler. By simply specifying the -d
+parameter at the command line, only updated source files are assembled
+into object files - the rest are ignored.</p>
+<p style="text-align: justify;">Using the -d option in
+combination with a project file gives
+the best project setup for a large compilation; compile your projects
+without worrying about which module is updated or not.</p>
+<hr>
+<h3><a name="1.3-b"></a>-b : Link/relocate
+object files</h3>
+<p style="text-align: justify;">The -b option must be used
+if you want to create an executable
+Z80 machine code output file of your previosly created object files.
+You may also use the -a option which is identical in functionality but
+also includes the -d option. In other words assemble only updated
+source modules and perform linking/relocation of the code afterwards.</p>
+<ul>
+<li>Pass 1
+<p style="text-align: justify;">When the linking
+process begins with the first
+object module, it is examined for an <a href="#7-ORG">ORG</a> address to perform the
+absolute address relocation of all the object module machine code. The
+<a href="#7-ORG">ORG</a> (loading address for memory) will have to be defined in the first
+source file module. If not, the assembler will prompt you for it on the
+command line. The <a href="v">ORG</a> address must be typed in hexadecimal notation. If
+you never use the <a href="v">ORG</a> directive in your source files, you can always
+explicitly define one at the command line with the -r option. The next
+step in the linking process is loading of the machine code from each
+object module, in the order of the specified modules. Pass 1 is
+completed with loading all local and global symbol definitions of the
+object modules. All relocatable address symbols are assigned the
+correct absolute memory location (based on <a href="#7-ORG">ORG</a>).</p>
+</li>
+<li>Pass 2
+<p style="text-align: justify;">The address patching
+process. All expressions are
+now read and evaluated, then patched into the appropriate positions of
+the linked machine code.</p>
+<p style="text-align: justify;">When all expressions
+have been evaluated the machine code
+is completed and saved to a file named as the first source file module,
+and assigned the 'bin' extension.<br>
+</p>
+</li>
+</ul>
+<hr style="width: 100%; height: 2px;">
+<h3><a name="1.3-a"></a>-a : Combine -d and -b</h3>
+<p style="text-align: justify;">Same as providing both -b (link/relocate object files) and -d
+(assemble only updated files).</p>
+<hr>
+<h3><a name="1.3-oFILE"></a>-o&lt;binary
+filename&gt; : Binary filename</h3>
+<p style="text-align: justify;">Define another filename
+for the compiled binary output than
+the default source filename of the project, appended with the .bin
+extension.</p>
+<hr>
+<h3><a name="1.3-c"></a>-c : Splitting
+completed machine code into 16K segments</h3>
+<p style="text-align: justify;">This feature has only
+meaning to the Z88. Since the Z88 memory
+organisation is based on 16K memory banks to be paged into the 4
+segments of the Z80 address space, it may be necessary to split your
+code into 16K blocks if it exceeds 16K in size. Due to the size of the
+Z88 Assembler application, it is necessary to position it as to
+separate blocks on the EPROM; in segment 2 and 3.</p>
+<hr>
+<h3><a name="1.3-m"></a>-m : Create address
+map information file</h3>
+<p style="text-align: justify;">When the linking process
+has been completed and the machine
+code saved to a file, the address map file is produced. This file
+contains the information of all relocated address symbols with their
+assigned absolute addresses. Further, an id is written that displays
+the scope of the symbols; local ('L') or global ('G'). The last item of
+each address map line, identified after the colon, is the name of the
+module which the symbol name belongs to.</p>
+<p style="text-align: justify;">The address map file is
+divided into two sections; the first
+produces the symbol list in alphabetical order (fast lookup of symbol
+names), the second in order of their address counterparts. The section
+is more used during a debugging session when an address in a
+dissassembly needs to be identified with a name. The second list also
+gives a chronological view (composition) of the linked modules. </p>
+<hr>
+<h3><a name="1.3-rADDR"></a>-r&lt;address&gt;
+: Re-define the ORG relocation address</h3>
+<p style="text-align: justify;">During the linking phase
+of the assembler the <a href="#7-ORG">ORG</a> address that
+defines the position in memory where the code is to be loaded and
+executed, is fetched from the first object module file. You can
+override this by specifying an explicit address origin by entering the
+-r option followed by an address in hexadecimal notation at the command
+line, e.g.:</p>
+<pre>-r4000</pre>
+<p style="text-align: justify;">which specifies that your
+code is to be relocated for address
+4000h (16384d) onwards.</p>
+<p style="text-align: justify;">Using the -r option
+superseeds a defined <a href="#7-ORG">ORG</a> in an object
+file. You could for example have defined the <a href="#7-ORG">ORG</a> to 8000h (32768d) in
+your first source file, then compiled the project. This would have
+generated machine code for memory location 8000h (segment 2 in the
+Cambridge Z88). Since the object files are generated it is easy to link
+them again with another <a href="#7-ORG">ORG</a> address by just using the -r option. The
+linking process does not alter the information in object files - they
+are only read. The same project could then easily be re-linked to
+another address, e.g. -r2000. </p>
+<hr>
+<h3><a name="1.3-R"></a>-R : Generate address
+independent code</h3>
+<p style="text-align: justify;">The Z80 processor
+instruction set allows only relative jumps
+in maximum +/- 128 bytes using the JR and DJNZ instructions. Further,
+there is no program counter relative call-to-subroutine or
+jump-to-subroutine instruction. If you want a program to be
+address-independent no absolute address references may be used in jump
+or call instructions. If you want to program Z80 address independent
+code you can only write small routines using the JR and DJNZ
+instructions. With a restricted interval of 128 bytes you can imagine
+the size of those routines! Programming of large applications using
+address independency is simply impossible on the Z80 processor with the
+basic instruction set available. You can only define a fixed address
+origin (<a href="#7-ORG">ORG</a>) for your machine code to be loaded and executed from.
+However, there is one solution: before the code is executed an
+automatical address-relocation is performed to the current position in
+memory. This is done only once. The penalty is that the program fills
+more space in memory. This is unavoidable since information must be
+available to define where the address relocation has to be performed in
+the program. Further, a small routine must be included with the program
+to read the relocation information and patch it into the specified
+locations of the program. It is impossible to determine the extra size
+generated with a relocation table. We assume an extra size of 3 - 3.5K
+for a typical 16K application program.</p>
+<p style="text-align: justify;">You can generate address
+independent code using the -R option
+accompanied with the -a or -b option. There is no other requirements.
+The relocatable code may be useful for programmers using the Cambridge
+Z88 who want to use machine code in the BBC BASIC application
+environment. This can easily be interfaced with the DIM statement to
+allocate memory for the machine code program, and issue a CALL or USR()
+to execute the machine code.</p>
+<p style="text-align: justify;">Please note that the
+linking process with the -R option
+addresses your code from 0 onwards. This is necessary when the runtime
+relocation is performed by the relocater (just before your program is
+executed). This can be examined by loading the address map file into a
+text editor.</p>
+<p style="text-align: justify;">The principle of
+relocation is in fact a self-modifying
+program. You cannot relocate a program that has been blown into an
+EPROM (cannot be modified). You may only execute relocatable programs
+in dynamic memory (RAM).</p>
+<p style="text-align: justify;">The relocater is built
+into the Z80 Module Assembler. The
+relocation table is created during the linking phase. When all object
+modules have been linked and the appropriate machine code generated,
+the process is ended with first copying the relocater routine into the
+executable file, then a relocation table and finally the compiled
+machine code program. Any defined <a href="#7-ORG">ORG</a> in your code is superseeded -
+this is not necessary in a relocatable program!</p>
+<p style="text-align: justify;">Two rules must be obeyed
+when using relocatable programs:</p>
+<ol>
+<li>
+<p style="text-align: justify;">The IY register must
+have been set up to point at the
+address where your program resides. The first code is in fact the
+relocater which manipulates your code on the basis of the IY register.
+If IY is not setup properly your machine code program will be relocated
+for an address it is not resided at. On execution your might then call
+a random address (on the basis of the random IY register).</p>
+</li>
+<li>
+<p style="text-align: justify;">Don't use the
+alternate register set for parameter passing
+between
+the caller
+(of your code) in the main code and the relocated program. The
+following
+registers are affected by the initial relocation process:</p>
+<pre>AFBCDEHL/IXIY/........ same<br>......../..../afbcdehl different<br></pre>
+</li>
+</ol>
+<p style="text-align: justify;">You still have all the
+main registers for parameter passing
+which is more than sufficient for average programming.</p>
+<p style="text-align: justify;">When your
+address-independent code is stored to the file, a
+message
+is displayed which informs the user of how many bytes the relocation
+header consists of. This constant is useful since it informs you of the
+distance between the relocation header and the start of your code. The
+map file automatically reflects the relocation header. All addresses of
+your code has been modified to include the relocation header. Please
+note that all addresses in the map file are defined from address 0.
+When your code is placed in an absolute memory address, and you need to
+perform a debugging session, you can find your specific label address
+by adding the constant from the map file to the memory origin of your
+code. The inbuilt relocator routine may be examined by extracting the
+"relocate.asm" file from the "Z80src.zip" comressed file resource.</p>
+<hr>
+<h3><a name="1.3-g"></a>-g : Create global
+address definition file</h3>
+<p style="text-align: justify;">With this option it is
+possible to generate a <a href="#7-DEFC">DEFC</a> directive
+definition file of all globally declared identifiers in a file project
+(declared with the <a href="#7-XDEF">XDEF</a> directive). These global definitions are
+calculated from the specified <a href="#7-ORG">ORG</a> address (from first module or the -r
+option). This feature is very useful, if you want to get access to
+routines from a separate compilation. If the two code compilation were
+placed in different banks of the Z88, it would be possible to know the
+correct address of a routine just by using the <a href="#7-DEFC">DEFC</a> address definition
+previously compiled. We used this facility to access routines in the
+two 8K halves of the segment 0 debugge version. This debugger actually
+swaps one of the two 8K blocks in and out of segment 0 when needed to
+call an 'external' routine. Applications on the Z88 may only acces the
+upper 8K of segment 0. A 16K application therefore needs to be split in
+8K halves and paged in when needed to be run in this area. Tuff!</p>
+<hr>
+<h3><a name="1.3-Dsymbol"></a>-D&lt;symbol&gt;
+: Define a static symbol (logically true)</h3>
+<p style="text-align: justify;">This option is useful if
+you want to produce conditional
+compilations.
+The
+symbol defined here will be active throughout the compilation. We used
+this
+feature to compile machine code on different computer platforms (QL,
+IBM, LINUX
+or Z88). Specify the symbol immediatly after the option identifier,
+i.e.&nbsp;</p>
+<pre>-Dsymbol</pre>
+<hr>
+<h3><a name="1.3-@FILE"></a>@&lt;project
+file&gt; : Using a project file</h3>
+<p style="text-align: justify;">Project files defines all
+file names of a project. The file
+name
+standard stored
+in a project file obeyes the operating system notation.</p>
+<p style="text-align: justify;">Instead
+of specifying every module file name at the command line, a simple
+reference of a project file can be made instead. According to the rules
+of the specification of parameters you specify either your source file
+modules or use a project file. The project file specification is of
+cource much faster. An example:</p>
+<pre>z80asm -a main pass1 pass2 link asmdrctv z80instr</pre>
+<p style="text-align: justify;">This
+command line will compile all specified module file names into a single
+executable file called 'main.bin'. However if a project file
+'assembler' were created already containing the same file names, the
+command line would have been:</p>
+<p style="text-align: justify;">z80asm -a @assembler</p>
+<p style="text-align: justify;">- much easier!</p>
+<p style="text-align: justify;">A
+project file only contains file names. Each file name is separated by a
+new line character \n. The new line character may be different on
+various computer platforms - but the assembler interprets it correctly.
+The contents of a project file may look like this:</p>
+<pre>z80asm\n<br>z80pass1\n<br>z80pass1\n<br>modlink\n</pre>
+<p style="text-align: justify;">The \n identifies a new
+line in the file
+(&lt;CR&gt;&lt;LF&gt; in MSDOS or &lt;LF&gt; in
+LINUX).</p>
+<p style="text-align: justify;">Project
+files are easily created using a simple text editor. Always define
+project files on the platform you are going to use for the assembly
+process - this assures that you use the correct new line character;
+e.g. MSDOS uses &lt;CR&gt;&lt;LF&gt; for new line, and
+QDOS uses only
+&lt;LF&gt; for new line.</p>
+<hr>
+<h3><a name="1.3-iLIB"></a>-i&lt;library
+file&gt; : Include library modules during linking/relocation</h3>
+<p style="text-align: justify;">This option allows
+compilation time linking of external
+machine
+code, better known as library routines. Much, much programming time can
+be saved by producing a set of standard routines compiled into library
+files. These may then be included later in application project
+compilations.&nbsp;The command line option allows specification of
+several library files. For each library reference in an application
+module, all library files will be scanned for that particular module.
+The filename (inclusive directory path) of the library may be specified
+explicitly on the command line immedialty after the -i identifier.&nbsp;</p><p style="text-align: justify;">If
+you ommit the filename, a default library filename will be used by the
+assembler. This default filename is defined by creating the environment
+variable "Z80_STDLIB=..." ("..." refers to your filename). Please refer
+to your operating system documentation on how to create environment
+variables.</p><p style="text-align: justify;"> Library files are recognised by the ".LIB" extension.</p><hr style="width: 100%; height: 2px;"><h3><a name="1.3-Lpath"></a>-L&lt;library path&gt; : Add directory to search path for libaries</h3><p style="text-align: justify;">Tells the assembler where to look for library files.</p><hr style="width: 100%; height: 2px;"><h3><a name="1.3-Ipath"></a>-I&lt;include path&gt; : Add directory to search path for INCLUDE</h3><p style="text-align: justify;">Tells the assembler where to look for <a href="#7-INCLUDE">INCLUDE</a> files.</p>
+<hr>
+<h3><a name="1.3-x"></a>-x : Create a library</h3>
+<p style="text-align: justify;">A library file is composed
+of object files surrounded by a few
+file
+structures. The library file format (and object file format) may be
+found at the end of this documentation. A library is simply a set of
+independent routines (that may refer to each other) put together in a
+sequential form. You may only specify a single -x option on the command
+line. A filename may be explicitly defined (including device and path
+information) to determine the storage location of the library.&nbsp;</p><p style="text-align: justify;">As in -i
+you may ommit the filename to use the default filename identified by
+the "Z80_STDLIB" environment variable.</p><p style="text-align: justify;"> A library routine must be
+defined using a simple <a href="#7-XLIB">XLIB</a> directive with an identical address name
+label definition. Please refer to further information later in this
+documentation. The "Z80lib.zip" contains the standard library with all
+corrseponding source files. Have a look at them - they clearly displays
+how to compose a library routine.</p>
+<p style="text-align: justify;">One very important aspect
+of
+libraries is the time that the assembler spends searching through them.
+To optimize the search you should place your routines in a
+"topological" order, i.e. routines that acces other library routines
+should be placed first. In most situations you avoid redundant
+sequential searching through the library.</p>
+<hr>
+<h3><a name="1.3-tN"></a>-t&lt;number&gt;
+: Define tabulator distance (for text output files)</h3>
+<p style="text-align: justify;">To save storage space the
+Z80 cross assembler output files
+(listing,
+map, symbol and <a href="#7-XDEF">XDEF</a> definition files) uses a tabulator control
+character instead of spaces. The benefit is about 30% compressed files.</p>
+<p style="text-align: justify;">The
+tabulator distance defines the distance of space between each tabulator
+it represents. The default value is 8 spaces per tabulator.</p>
+<p style="text-align: justify;">The
+tabulators are used to separate two columns of information. The first
+column contains a name of some sort. Since names have variable length,
+a size of the column is defined. The Assembler defines the size of the
+column by multiplying the current tabulator distance with 4, i.e.
+giving a default size of 4*8 = 32 'spaces'. This is usually more than
+enough for most name definitions parsed from source files.</p>
+<p style="text-align: justify;">You
+may redefine the tabulator distance by usign the -t option immediatly
+followed by a decimal number, e.g. -t4 for defining a tabulator
+distance of 4. The with of the first column will then be 4*4 = 16
+'spaces'.</p>
+<hr>
+<h3><a name="1.3-RCMX000"></a>-RCMX000 :
+Support the RCM2000/RCM3000 series of Z80-like CPU's</h3>
+<p style="text-align: justify;">This option disables
+assembly opcodes not available in the RCM2000/RCM3000 series of
+Z80-like CPU's.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="1.3-plus"></a>-plus : Support for
+the Ti83Plus</h2>
+<p style="text-align: justify;">Defines how the <a href="#7-INVOKE">INVOKE</a> command is coded: either
+as a RST 28H instruction (option on) or as a regular CALL instruction
+(option off).</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="1.3-IXIY"></a>-IXIY : Swap IX and
+IY registers</h2>
+<p style="text-align: justify;">Swaps the IX and IY
+registers; references to IX are coded as IY and vice versa. Usefull
+when the assembler is used as a back-end of a compiler that uses one of
+the index registers that is used in the target platform.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="1.3-CC"></a>-C : Enable LINE
+directive</h2>
+<p style="text-align: justify;">Enables the <a href="#7-LINE">LINE</a> directive to synchronize error
+message line numbers with the line numbers from the source file.</p><br><hr style="width: 100%; height: 2px;"><h2><a name="1.3-sdcc"></a>-sdcc : Force SDCC hacks</h2><p style="text-align: justify;">Enable hacks to be able to use the assembler as the back-end for the Small Device C Compiler (SDCC).</p><hr style="width: 100%; height: 2px;"><h2><a name="1.3-forcexlib"></a>-forcexlib : Force XLIB call on MODULE directive </h2><p>Changes the <a href="#7-MODULE">MODULE</a> directive to do the same as the <a href="#7-XLIB">XLIB</a> directive.</p>
+<hr>
+<h1><a name="2"></a>2 An overview of
+assembler features and related files</h1>
+<h2><a name="2.1"></a>2.1 The Z88 operating
+system definition files</h2>
+<p style="text-align: justify;">You will find header files
+containing all operating system
+definitions as defined in the Z88 Developers' Notes V3 in the
+"OZdefc.zip" file. This makes the operating system interface
+programming a lot easier.</p>
+<hr>
+<h2><a name="2.2"></a>2.2 The supplied
+standard library Z80 source files</h2>
+<p style="text-align: justify;">We have supplied a
+standard library with useful routines for
+both beginners and professional machine code programmers. All source
+files are supplied for having the opportunity to study and improve the
+routines. However some routines are programmed especially for the Z88
+operating system and may not be of use for other Z80 based computers
+unless thorougly rewritten. The standard library source files may be
+found in the "Z80lib.zip" file.</p>
+<hr>
+<h2><a name="2.3"></a>2.3 Z88 module assembler
+application source&nbsp;</h2>
+<p style="text-align: justify;">We have supplied the
+complete source of the Z88 module
+assembler application. This allowes you to evaluate many aspects of
+programming applications on the Z88. Further, most features of the
+assembler are mirrored in these source files; using directives, the
+free format of Z80 mnemonics, library routine access, modular file
+design, labels, using expressions, comments, data structure
+manipulation and good programming design.</p>
+<hr>
+<h2><a name="2.4"></a>2.4 File based
+compilation</h2>
+<p style="text-align: justify;">This assembler is
+completely file based, i.e. all parsing and
+code generation is manipulated via files on storage medias such as
+harddisks or floppy discs (or file based RAM-discs).</p>
+<hr>
+<h2><a name="2.5"></a>2.5 Modular source file
+design</h2>
+<p style="text-align: justify;">A compilation may be split
+into individual source files that
+either can be linked together during assembly as a single module or
+assembled as separate source file modules. Separate source file modules
+saves compilation time and memory. Further, this design is much more
+straightforward and much more logically clear in a design phase of a
+large compilation project than one huge kludge of a source file.</p>
+<hr>
+<h2><a name="2.6"></a>2.6 Scope of symbols in
+source modules</h2>
+<p style="text-align: justify;">All source modules may
+refer to each others symbols by using
+<a href="#7-XREF">XREF</a> directives. This means that you refer to external information
+outside the current source module. The opposite of an external module
+reference is to declare symbols globally available using a <a href="#7-XDEF">XDEF</a>
+directive, i.e. making symbols available to other source modules.
+Finally it is possible to have local symbols that is not known to other
+source modules than the current. A label or constant that has not been
+declared with <a href="#7-XREF">XREF</a>, <a href="#7-XDEF">XDEF</a> or <a href="#7-XLIB">XLIB</a> is local to the module.</p>
+<hr>
+<h2><a name="2.7"></a>2.7 Using arithmetic and
+relational expressions</h2>
+<p style="text-align: justify;">All directives that
+require a numerical parameter or Z80
+mnemonics that use an integer argument may use expressions. Expressions
+may be formed by all standard arithmetic operators and relational
+operators. Even binary operators are implemented. All expressions may
+contain external identifiers and is automatically resolved during the
+linking phase. Only certain directives require compilation time
+evaluable expressions.</p>
+<hr>
+<h2><a name="2.8"></a>2.8 Source file
+manipulation</h2>
+<p style="text-align: justify;">To allow the Assembler to
+execute in multitasking environments
+such as LINUX and QDOS, all source input files are opened as shared
+I/O. This allows other programs to access the source files while the
+assembler is working. All output files (both text and binary files) are
+opened/created for exclusive use; other programs will have no access to
+those files until they have been closed.</p>
+<hr>
+<h2><a name="2.9"></a>2.9 Free format of
+assembler source files</h2>
+<p style="text-align: justify;">The source files may be
+written in a free format. No fixed
+position columns as needed as in the COBOL programming language. All
+text may be typed in mixed case (the assembler converts all text input
+to upper case). Tabulators may be used freely (instead of spaces which
+also saves source file space) to suit the programmers own habits of
+structured text layouts. However, one rule must be obeyed: syntax of
+Z80 assembler mnemonics and most directives must be completed on
+individual lines. Text files using different OS dependant line feed
+standard are parsed properly; line feed types CR, LF or CRLF are
+automatically recognized. So you can easily compile your sources from
+Linux/UNIX on an MSDOS platform.</p>
+<hr>
+<h2><a name="2.10"></a>2.10 Specification of
+filenames</h2>
+<p style="text-align: justify;">Specification of filenames
+in source files are always enclosed
+in double quotes. The assembler just collects the filename string and
+uses this to open a file. This way all filename standards may be used
+as defined on different operating system platforms.</p>
+<hr>
+<h2><a name="2.11"></a>2.11 Including other
+source files into the current source file</h2>
+<p style="text-align: justify;">The need for header file
+information such as operating system
+constants or data structures is often indispensable for source file
+modules. Instead of copying the contents of those files into each
+module, it is possible to include them at run time (during parsing).
+Infinite include file levels are permitted, i.e. included files calling
+other files.</p>
+<hr>
+<h2><a name="2.12"></a>2.12 Conditional
+assembly in source file modules</h2>
+<p style="text-align: justify;">Large compilation projects
+often need to compile the
+application in several variations. This can be achieved with enclosing
+parts of the source with conditional directives for the different
+variations of the application. This may also be useful if the assembler
+source is ported to several platforms, where inclusion of other source
+files (such as header files) are using different filename standards.
+The conditional directives <a href="#7-IF">IF</a>, <a href="#7-IF">ELSE</a>, and <a href="#7-IF">ENDIF</a> may be nested into
+infinite levels.</p>
+<hr>
+<h2><a name="2.13"></a>2.13 Undocumented Z80
+instruction code generation</h2>
+We have included the syntax parsing and code generation of the
+undocumented Z80 instructions for the sake of completeness. However, IM
+2 interrupts must be disabled before they are executed (an interrupt
+may otherwise occur in the middle of the instruction execution).
+<p style="text-align: justify;">Many games on the ZX
+Spectrum have used them to protect the
+code from prying eyes. The Z88 native debugger code uses some of the
+un-documented instructions for fast access to register variables.</p>
+<hr>
+<h2><a name="2.14"></a>2.14 Object file
+generation</h2>
+<p style="text-align: justify;">The Z80 Module Assembler
+generates object files that contains
+the compressed version of an assembled source module. The information
+herein contains declared symbols (local, global and external),
+expressions, address origin, module name and machine code. The object
+file modules are much smaller than their source file counterparts
+(often smaller than 2K).</p>
+<hr>
+<h2><a name="2.15"></a>2.15 Transfer of object
+files across platforms</h2>
+<p style="text-align: justify;">The Z80 Module Assembler
+is already implemented on several
+different computer platforms. You may freely transfer the object files
+and use them as a part of another cross-compilation. There is no
+system-dependent information in the object files.</p>
+<hr>
+<h2><a name="2.16"></a>2.16 Date stamp
+controlled assembly</h2>
+<p style="text-align: justify;">To avoid unnecessary
+compilation of source file modules, it is
+possible to let the assembler compile only recently updated source file
+modules by comparing the date stamp of the source and the object file
+modules. Source file modules that are older than object file modules
+are ignored. This facility is indispensable in large compilation
+projects.</p>
+<hr>
+<h2><a name="2.17"></a>2.17 Listing files</h2>
+<p style="text-align: justify;">The assembler may generate
+listing files that contain a copy
+of the source file with additional code generation information of Z80
+mnemonics dumped in hexadecimal format. The listing files are formatted
+with page headers containg time of assembly and the filename. Line
+numbers are included which corresponds to the source file lines.</p>
+<hr>
+<h2><a name="2.18"></a>2.18 Symbol information</h2>
+<p style="text-align: justify;">All symbol generated
+values used in source modules may be
+dumped to the end of the listing file or as a separate symbol file. If
+the symbol table is dumped into the listing file, each symbol will be
+written with page references of all occurences in the listing file.
+Address symbols (labels) are addressed relative to the start of the
+module. Symbol constants are written as defined in the source. The
+symbol table are written in alphabetical order with corresponding
+values in hexadecimal format.</p>
+<hr>
+<h2><a name="2.19"></a>2.19 Linking &amp;
+relocation of object modules into executable Z80 machine code</h2>
+<p style="text-align: justify;">To obtain an executable
+Z80 machine code file it is necessary
+to link all assembled object modules and relocate them at a defined
+address, where the code is to be executed at in the computers' memory.
+The linking &amp; relocation is performed automatically after
+completed assembly of all specified source file modules. The <a href="#7-ORG">ORG</a>
+relocation address is specified in the first object module.</p>
+<hr>
+<h2><a name="2.20"></a>2.20 Address map files</h2>
+<p style="text-align: justify;">The address map is an
+invaluable information during a
+debugging session of your compiled program. This file contains all
+symbolical address labels with their generated address constants after
+a completed linking/relocation of all modules into executable machine
+code. The map file is ordered in two groups; the first list contains
+all symbol names ordered alphabetically with corresponding address
+constants, the second list contains all symbols ordered by their
+address value (in chronological order).</p>
+<hr>
+<h2><a name="2.21"></a>2.21 Symbol address
+definition files</h2>
+<p style="text-align: justify;">As with address map files
+this contains information of
+globally declared symbolical address labels, relocated to their
+absolute position as for the compiled machine code file. However, the
+format is completely different; all symbols are created as constant
+definitions to be included as a header file into another source file
+and assembled. This is useful if you want to call subroutines compiled
+separately in another project (originated in a different memory setup).</p>
+<hr>
+<h2><a name="2.22"></a>2.22 Error files</h2>
+<p style="text-align: justify;">Error files are created by
+the assembler during processing. If
+any errors should occur, they will be written to this file containing
+information of where the error occurred in the source module. If no
+errors were found, the error file is automatically closed and deleted.</p><p style="text-align: justify;">Errors are also written to stderr.</p>
+<hr>
+<h2><a name="2.23"></a>2.23 Creating and using
+object file libraries for standard routines</h2>
+<p style="text-align: justify;">Machine programmers often
+re-use their standard routines. We
+have implemented a file format for generating libraries using the
+existing object file modules. Using a simple set of rules makes it very
+easy to create your own libraries from your source file modules.
+Documentation of the library file format is included in this
+documentation. At command line infinite number of libraries may be
+specified. All will be searched during linking of your object modules
+for referenced library routines.</p>
+<hr>
+<h1><a name="3"></a>3 Executing the cross
+assembler and environment variables</h1>
+<p style="text-align: justify;">The following text
+describes how to execute the assembler and
+defining the environment variables used by the assembler.</p>
+<hr>
+<h2><a name="3.1"></a>3.1 The environment
+variables</h2>
+<p style="text-align: justify;">The assembler uses two
+environment variables:</p>
+<ul>
+<li>"Z80_STDLIB" define the default filename of the standard
+library filename.</li>
+<li>"Z80_OZFILES" define the default path of the standard Z88
+OZ system headers.</li>
+</ul>
+<hr>
+<h2><a name="3.2"></a>3.2 Running in the
+QDOS/SMSQ operating system environment</h2>
+<p style="text-align: justify;">z80asm may be compiled
+using the C68 compiler developed by the
+Walker brothers. You also need the 'env_bin' file. This is necessary to
+install into the operating system before using the assembler. It
+contains the environment variable facility integrated on UNIX, MS-DOS
+and many other operating systems. Include the following line into your
+BOOT upstart program:</p>
+<pre>LRESPR win1_ext_env_bin</pre>
+<p style="text-align: justify;">The device and path
+'win1_ext_' is just an example of where to
+store your system extension file. You may have it on your BOOT disk as
+well. If you don't have ToolKit 2 on your system use the following line
+in your BOOT program:</p>
+<pre>envext = RESPR(1024): LBYTES win1_ext_env_bin, envext: CALL envext</pre>
+<p style="text-align: justify;">Use the following in your
+BOOT file to set the environment
+variables:</p>
+<pre>SETENV "Z80_OZFILES=win1_z80_src_oz_" <br>SETENV "Z80_STDLIB=win1_z80_standard_lib"</pre>
+<p style="text-align: justify;">The example filenames are
+only a demonstration. Change them as
+necessary.</p>
+<hr>
+<h2><a name="3.3"></a>3.3 Running in the
+LINUX/UNIX operating system environment</h2>
+<p style="text-align: justify;">This program can be
+executed on the LINUX operating system and
+any other UNIX. The sources are strictly ANSI C and uses only library
+calls that are described in Brian W. Kernigham and Dennis M. Ritchie's
+C books.&nbsp;</p>
+<p style="text-align: justify;">The important thing to
+remember before compiling it under
+UNIX, is in which direction the integers are stored by the processor
+architecture; the famous Big Endian and Little endian concept. The
+config.h file uses a "ENDIAN" definition when z80asm must interpretate
+integers in big endian order. Please set this definition according to
+your system's processor architecture. Most people uses the Intel
+processor when running Linux - this is a little endian architecture (so
+you don't need the ENDIAN define...).&nbsp;</p>
+<p style="text-align: justify;">You can compile z80asm
+using GNU C compiler simply by entering
+the following on your command line:</p>
+<pre>gcc -o z80asm -O2 *.c</pre>
+<p style="text-align: justify;">The environment variables
+needed by z80asm are easily added in
+your accounts login script, ".profile" or ".bash_profile" in your home
+directory.</p>
+<hr>
+<h2><a name="3.4"></a>3.4 Running in the
+MS-DOS operating system environment</h2>
+<p style="text-align: justify;">This program can be
+executed on all MSDOS operating systems
+using the INTEL 8086 processor up to high speed 80386/80486/Pentium
+processors on IBM &amp; compatible computers. Add the source files
+to your favorite C compiler system in MSDOS or Windows (here you need
+to specify compilation options of a console appliction).</p>
+<p style="text-align: justify;">The environment variables
+are easily put into your
+AUTOEXEC.BAT file. Simply specify:</p>
+<pre>SET Z80_OZFILES=C:\Z80\OZ\<br>SET Z80_STDLIB=C:\Z80\STANDARD.LIB</pre>
+<p style="text-align: justify;">Choose your own settings
+if you like. If you want the
+assembler to be accessible in any path, add the path location of the
+assembler in the PATH search line:</p>
+<pre>SET PATH=%PATH%;C:\Z80</pre>
+<hr>
+<h1><a name="4"></a>4 Z80 module assembler
+file types</h1>
+<h2><a name="4.1"></a>4.1 The assembler file
+types and their extension names</h2>
+<p style="text-align: justify;">The Z80 Module Assembler
+uses several different file name
+extensions to distinguish the type of files processed. The base name of
+the source file is used to create the various assembler output file
+types. The following chapters explain the available files.</p>
+<hr>
+<h2><a name="4.2"></a>4.2 The file name
+extension identifier</h2>
+<p style="text-align: justify;">The file name extension
+identifier may be different from
+platform to platform. UNIX has no defined standard. MSDOS and TOS uses
+'.'. QDOS uses the '_' identifier. SMSQ also allows the '.' extension
+identifer.</p>
+<p style="text-align: justify;">The Assembler implemented
+on the supplied platforms are
+defined with the correct extension identifier. You can see this on the
+Assembler help page (executing the program with no parameters).</p>
+<hr>
+<h2><a name="4.3"></a>4.3 File types</h2>
+<h3><a name="4.3.1"></a>4.3.1 The source file
+extension, asm</h3>
+<p style="text-align: justify;">The extension for
+assembler mnemonic source files is 'asm'.
+Source
+files are specified by the user with or without the extension -
+whatever chosen, the assembler will investigate automatically what is
+needed to read the source files.</p>
+<hr>
+<h3><a name="4.3.2"></a>4.3.2 The object file
+extension, obj</h3>
+<p style="text-align: justify;">The
+extension for object files is 'obj'. The base file name is taken from
+the corresponding source file name. This file is generated by the
+assembler from parsing the source file and contains intermediate
+generated machine code, an address origin of the machine code, symbol
+information and expressions.</p>
+<hr>
+<h3><a name="4.3.3"></a>4.3.3 The error file
+extension, err</h3>
+<p style="text-align: justify;">The extension
+for error files is 'err'. Before beginning processing the source
+files, an error file is created. If any errors should occur, they will
+be written to this file containing information of where the error
+occurred. If no error were found, the error file is automatically
+closed and deleted.</p>
+<p style="text-align: justify;">Error files are simple
+text files that can be
+loaded by any text editor for evaluation.</p>
+<hr>
+<h3><a name="4.3.4"></a>4.3.4 The listing file
+extension, lst</h3>
+<p style="text-align: justify;">The extension for listing
+files is 'lst'. The base file name
+is taken
+from the corresponding source file name. This file is generated by the
+assembler and contains a hexadecimal output of the generated machine
+code that corresponds to the Z80 mnemonic instruction or directive,
+followed by a copy of the original source line. If selected, the symbol
+table is dumped at the end of the listing file.</p>
+<hr>
+<h3><a name="4.3.5"></a>4.3.5 The symbol file
+extension, sym</h3>
+<p style="text-align: justify;">The extension for symbol
+table files is 'sym'. The base file
+name is taken from the corresponding source file name. The symbol table
+file contains information about the defined and used symbols of the
+source file and their generated values (labels and constants). The
+symbol file is only created if listing file output is disabled.</p>
+<hr>
+<h3><a name="4.3.6"></a>4.3.6 The executable
+file extension, bin</h3>
+<p style="text-align: justify;">The extension for
+executable Z80 machine code
+files is 'bin'. The base file name is taken from the first specified
+source file name at the command line (or project file). This is the
+linked and relocated output of object files and may be executed by the
+Z80 processor.</p>
+<p style="text-align: justify;">You may override this
+default behaviour by using the -o
+option and specify your own output filename (and extension).</p>
+<hr>
+<h3><a name="4.3.7"></a>4.3.7 The address map
+file extension, map</h3>
+<p style="text-align: justify;">The extension for address
+map files is
+'map'. The basefile name is taken from the first specified source file
+name at the command line (or project file). This file is generated by
+the assembler and contains a list of all defined address labels from
+all linked/relocated modules with their calculated (absolute) address
+in memory. Used for debugging reference.</p>
+<hr>
+<h3><a name="4.3.8"></a>4.3.8 The definition
+file extension, def</h3>
+<p style="text-align: justify;">The extension for global
+address label definition files is
+'def'. The base file name is taken from the first specified source file
+name at the command line (or project file). This file is generated by
+the assembler and contains a list of all globally declared address
+labels with their calculated (absolute) origin address, fetched only
+during assembly of source file modules.</p>
+<p style="text-align: justify;">The format of the list
+contains
+constant definitions (addresses) and may be parsed e.g. as include
+files for other projects.</p>
+<hr>
+<h3><a name="4.3.9"></a>4.3.9 The library file
+extension, lib</h3>
+<p style="text-align: justify;">Library files
+are identified with the 'lib' extension. Library files may be created
+using the -x option. Library may be included into application code
+during linking of object modules.</p>
+<hr>
+<h1><a name="5"></a>5 Compiling files</h1>
+<h2><a name="5.1"></a>5.1 The assembler
+compiling process</h2>
+<p style="text-align: justify;">The Z80 Module Assembler
+uses a two stage compilation process;
+stage 1 parses source files and generates object files. Stage 2 reads
+the object files and links the object file code, completes with address
+patching and finishes with storing the executable code.</p>
+<hr>
+<h3><a name="5.1.1"></a>5.1.1 Stage 1, parsing
+&amp; code generation of all source files, object file generation</h3>
+<p style="text-align: justify;">A source file is being
+parsed for Z80 mnemonics and
+directives. An object file is created to hold information of module
+name, local, global and external symbol identifiers, expressions and
+the intermediate code generation (but address and other constant
+information). During pass 1 all Z80 mnemonics are parsed and code is
+generated appropriately. All expression are evaluated; expressions that
+contain relocatable address symbols or external symbol are
+automatically stored into the object file. Expressions that didn't
+evaluate are preserved for pass 2. When a source file has been read
+successfully to the end, pass 2 is started.&nbsp;</p>
+<p style="text-align: justify;">During pass 2 all
+non-evaluated expressions from pass 1 are re-evaluated and stored to
+the object file if necessary. Errors are reported if symbols are stil
+missing in expressions. When all expressions are evaluated and no
+errors occurred, all "touched" symbols (used in expressions) are stored
+into the object file, with scope, type and value. Then, the module name
+and generated code is stored to the object file. Various file pointers
+to sub-sections of the object file is resolved. The completion of stage
+1 is to produce the symbol table output (either appended to listing
+file if selected or as a separate file).</p>
+<p style="text-align: justify;">This process is performed
+for all specified source modules in
+a project.</p>
+<hr>
+<h3><a name="5.1.2"></a>5.1.2 Stage 2, linking
+object files and library modules, producing executable code</h3>
+<p style="text-align: justify;">Pass 1 of the linking
+loads information from each object file
+in the project; the <a href="#7-ORG">ORG</a> address is fetched, identifiers (resolving
+scope, and absolute values) loaded, and machine code linked. During
+this pass all external library modules are fetched and linked with the
+object modules (if a library is specified from the command line). When
+all modules have been loaded, pass 2 begins.&nbsp;</p>
+<p style="text-align: justify;">Pass 2 then reads each
+expression section from all object
+modules (including library modules), evaluates them and patches the
+value into the appropriate position of the linked machine code. When
+all expressions have been evaluated successfully the executable code is
+stored. If selected, the address map file is produces from the current
+symbol table resided in the data structures of the assembler's memory
+is stored to a text file.</p>
+<hr>
+<h2><a name="5.2"></a>5.2 File names</h2>
+<p style="text-align: justify;">Specification of file
+names follow the convention used on the
+various platforms that the assembler is ported to. Please read your
+operating systems manual for more information.</p>
+<hr>
+<h2><a name="5.3"></a>5.3 Portability of
+assembler file names</h2>
+<p style="text-align: justify;">If you are going to port
+your Z80 Module Assembler files
+across several platforms a few hints may be worth considering:</p>
+<p style="text-align: justify;">Avoid special symbols in
+file names like '_', '#' and '.' .
+They may have special meaning on some operating system platforms. Use
+only 7 bit standard ASCII letters in file names ('A' to 'z'). Non
+english language letters are not always allowed, and further they may
+not be interpreted correctly when ported to another platform. Avoid too
+long file names. Some operating systems have boundaries for length of
+file names in a directory path. For example MS-DOS only allows 8
+characters in a file name (followed by an extension). Others may have
+no boundaries.</p>
+<hr>
+<h2><a name="5.4"></a>5.4 The standard
+platform identifier</h2>
+<p style="text-align: justify;">When the Z80 Module
+Assembler is running a standard platform
+identifier is made available. The identifier reflects the name of the
+platform:</p>
+<ul>
+<li>"Z88" - the assembler is running on the Z88 portable
+computer.</li>
+<li>"QDOS" - the assembler is running on the QDOS/SMSQ platform
+(QL &amp; compatibles)</li>
+<li>"MSDOS" - the assembler is running on the IBM MS-DOS
+platform of computers</li>
+<li>"UNIX" - the assembler is running on the LINUX/UNIX
+platform.</li>
+</ul>
+<p style="text-align: justify;">The identifier might be
+very handy when you need to port your
+source files to different computer platforms. We use them in for
+loading header files. Have a look on the <a href="#7-INCLUDE">INCLUDE</a> directive example in
+the Directive Reference section.</p>
+<hr>
+<h2><a name="5.5"></a>5.5 Source file structure</h2>
+<p style="text-align: justify;">The composition of a
+source file module is completely free to
+the programmer. How he chooses to place the source code on a text line
+has no effect of the parsing process of the assembler. The linefeed
+interpretation is also handled by z80asm - it understands the following
+formats:</p>
+<ul>
+<li>&lt;LF&gt; (used by QDOS/SMSQ/UNIX/AMIGA),</li>
+<li>&lt;CR&gt;&lt;LF&gt; (used by MSDOS),</li>
+<li>&lt;CR&gt; (used by Z88/MacIntosh).</li>
+</ul>
+<hr>
+<h2><a name="5.6"></a>5.6 Using local, global
+and external symbols</h2>
+<p style="text-align: justify;">In larger application
+projects it is unavoidable to use a
+modular programming design, i.e. splitting the source into several
+individual files. This approaches the popular top - down design where
+you can isolate the problem solving into single modules. The outside
+world just needs to know where the routine is to be called by linking
+the modules with a few directives.</p>
+<p style="text-align: justify;">In the Z80 Module
+Assembler you only need two directives to
+accomplish just that: the <a href="#7-XREF">XREF</a> and <a href="#7-XDEF">XDEF</a> directives.</p>
+<p style="text-align: justify;"><a href="#7-XREF">XREF</a> declares a symbol to
+be external to the current source
+file module. This tells the assembler that all expressions using that
+symbol is not to be evaluated until the compiled object modules are to
+linked and relocated together. Expressions that contains this symbol is
+simply stored into the object file.</p>
+<p style="text-align: justify;"><a href="#7-XDEF">XDEF</a> declares a symbol to
+be created in this module and made
+globally available to other modules during the linking/relocation
+phase. All expressions that contain a globally declared symbol are
+automatically stored into the object file.</p>
+<p style="text-align: justify;">When a symbol is created
+and is neither declared external or
+global, it is implicitly defined as local to the current source module.
+The symbol is then only available to the current module during
+linking/relocation.</p>
+<p style="text-align: justify;">If you want to access
+(external) library modules from a
+library, use the <a href="#7-LIB">LIB</a> directive followed by the name of the routine.
+Several routine names may be specified separated by a comma.</p>
+<p style="text-align: justify;">During the linking process
+all external and corresponding
+global symbols are resolved. If two identical global identifier are
+loaded by the linking process, the most recently loaded identifier is
+used by the linker.</p>
+<hr>
+<h2><a name="5.7"></a>5.7 Defining symbol names</h2>
+<p style="text-align: justify;">Good programming involves
+a structured approach to mnemonic
+identification of names in subroutines, variables, data structures and
+other constants. The Z80 Module Assembler gives you several
+possibilities. The easiest and frequently used one is <a href="#7-DEFC">DEFC</a> (Define
+Constant). We have supplied a complete set of header files (the
+"OZdefc.zip" file) containing the Z88 operating system manifests as
+defined in the Developers' Notes V3 (the "devnotes.zip" file) which
+just contains <a href="#7-DEFC">DEFC</a> directives.</p>
+<p style="text-align: justify;">Each <a href="#7-DEFC">DEFC</a> directive is
+followed by a an identifier name,
+followed by a = symbol and then an evaluable constant expression
+(usually just a constant). Constant definitions are usually operating
+system manifest or other frequently used items. They are put into
+separate source files and later inserted into main source files using
+the <a href="#7-INCLUDE">INCLUDE</a> directive.</p>
+<p style="text-align: justify;">Though <a href="#7-DEFC">DEFC</a> resolves most
+needs, it may be necessary to define
+variable areas or templates containing names with an appropriate size
+tag (byte, word or long word). This is possible using the <a href="#7-DEFVARS">DEFVARS</a>
+directive. Here you may specify as many names as needed in the group.
+Then, it is easy to add, re-arrange or delete any of the variable names
+- only a few modifications and then just re-compiling the necessary
+source files that use the templates. This would be a nightmare with
+<a href="#7-DEFC">DEFC</a>, since you have to keep track of the previous and next name in the
+group in addition to count the size of all names. All this is managed
+by <a href="#7-DEFVARS">DEFVARS</a> automatically. Have a look at the syntax in the Directive
+Reference section.</p>
+<p style="text-align: justify;">With advanced Z80
+programming you cannot avoid dynamic data
+structures like linked lists or binary trees. The fundamentals for this
+are known as records in PASCAL or strucures in C. <a href="#7-DEFVARS">DEFVARS</a> is well
+suited for this purpose. Defining each <a href="#7-DEFVARS">DEFVARS</a> group with 0
+automatically generates offset variables. The last name then
+automatically defines the size of the data structure. Again, refer to
+the directive reference for a good example.</p>
+<p style="text-align: justify;">A third possibility for an
+easy definition of symbols is to
+use the <a href="#7-DEFGROUP">DEFGROUP</a> directive. Here you're able to define a set of symbols
+equal to an enumeration. It follows the same principles as for C's ENUM
+facility. The default starts at 0 and increases by 1. If you choose, a
+specific identifier may be set to a value, which then can set the next
+enumeration sequense. Again, this directive have been made to implement
+an easy way of defining symbols and providing a simple method to alter
+the identifier group. Please refer to the directive reference for an
+example.</p>
+<hr>
+<h2><a name="5.8"></a>5.8 Comments in source
+files</h2>
+<p style="text-align: justify;">As always, good
+programming requires good documentation.
+Without comments your programs loose overview and logic. Machine code
+is especially hard to follow - have you trid to look at a piece of code
+2 years after implementation AND without any comments? HORRIBLE! There
+is never too many comments in machine code - we especially like to use
+high level language as comments - it avoids un-necessary text and logic
+is much more clear.</p>
+<p style="text-align: justify;">Comments in Z80 source
+files are possible using a semicolon.
+When the assembler meets a semicolon the rest of the current source
+line is ignored until the linefeed. Parsing will then commence from the
+beginning of the line. The semicolon may be placed anywhere in a source
+line. As stated you cannot place mnemonics after the semicolon - they
+will be ignored. The Z80 parser will in many places accept comments
+without a semicolon has been set - but don't rely on it. Better use a
+semicolon. The context is much more clear. The following is an example
+on how to use comments in Z80 source files:</p>
+<pre>; **********************<br>; main menu<br>;<br>.mainmenu call window ; display menu<br> &nbsp;call getkey ; read keyboard<br> &nbsp;ret ; action in register A</pre>
+<hr>
+<h2><a name="5.9"></a>5.9 Defining symbolic
+address labels</h2>
+<p style="text-align: justify;">The main reason for using
+an assembler is to be able to
+determine symbolical addresses and use them as reference in the code.
+These are defined by a name preceeded with a full stop. It is allowed
+to place a mnemonic or directive after an address label. An address
+label may be left as a single statement on a line - you may of course
+use comment after the label. The following is a label definition:</p>
+<pre>; *****************<br>; routine definition<br>.mainmenu call xxx ; mainmenu is the label preceeded with '.'</pre>
+<p style="text-align: justify;">It is not allowed to
+position two labels on the same line.
+However, you may place as many label after each other - even though no
+code is between them. They just receive the same assembler
+address.&nbsp;</p>
+<p style="text-align: justify;">It is not allowed to
+specify two identical address labels in
+the same source file.&nbsp;</p>
+<p style="text-align: justify;">If you want to declare an
+address globally accessible to other
+modules, then use <a href="#7-XDEF">XDEF</a> for the address label definition, otherwise the
+label definition will be interpreted as a local address label.</p>
+<pre>XDEF mainmenu<br>...<br>.mainmenu ; this label is accessible from other modules with XREF</pre>
+<p style="text-align: justify;">You may use before or
+after the label - z80asm automatically
+handles the scope resolution as long as you use <a href="#7-XDEF">XDEF</a> to define it as
+globally accessible.</p>
+<hr>
+<h2><a name="5.10"></a>5.10 Writing Z80
+mnemonic instructions</h2>
+<p style="text-align: justify;">All Z80 instructions may
+be written in mixed case, lower or
+upper case - you decide! How you separate opcode words, register names
+and operands is your choice. Only a few rules must be obeyed:</p>
+<ol>
+<li>each instruction mnemonic must be completed on a single
+line.</li>
+<li>the instruction identifier must be a word, i.e. don't use
+space between CALL</li>
+<li>register identifiers must be a word, ie. HL not H L</li>
+</ol>
+<p style="text-align: justify;">A few examples which all
+are legal syntax:</p>
+<pre>Ld HL , 0<br>ld hl, $fFFF<br>caLL ttttt</pre>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="5.11"></a>5.11&nbsp;Optional
+Z80 mnemonic instruction syntax</h2>
+<p style="text-align: justify;"> We have added some
+syntactical option on a few Z80 mnemonics.
+They are:</p>
+<pre>DJNZ label (the comma is not needed)<br>IN F,(C) (special case instruction which only affects the flags)</pre>
+<p style="text-align: justify;"> The instructions below
+allow additional specification of the
+accumulator register. Zilog standard convention is to only specify the
+source operand. Sometimes it is better to specify the accumulator to
+make the instruction look more clear, and to avoid confusion. After
+all, they specified it for "add", "adc" and "sbc".</p>
+<pre>sub a,r<br>sub a,n<br>sub a,(hl)<br>sub a,(ix+0)<br>sub a,(iy+0)</pre>
+<p style="text-align: justify;">this syntax applies also to</p>
+<pre>"and",<br>"or",<br>"xor" &amp;<br>"cp"</pre>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="5.12"></a>5.12 The undocumented
+Z80 instructions</h2>
+<p style="text-align: justify;">We have included the
+parsing and code generation of the
+undocumented Z80 instructions. They are as follows:</p>
+<pre>LD r,IXL r = A,B,C,D,E,IXL,IXH<br>LD r,IXH<br>LD IXL,n n = 8bit operand<br>LD IXH,n<br><br>ADC A,IXL<br>ADC A,IXH<br>ADD, AND, CP, DEC, INC, OR, SBC, SUB, XOR ...<br><br>SLL A, B, C, D, E, H, L<br>SLL (HL), (IX+d), (IY+d)<br></pre>
+<p style="text-align: justify;">SLL (SLL = [S]hift
+[L]ogical [L]eft) does shift leftwards but
+insert a '1' in bit 0 instead of a '0'.</p>
+<p style="text-align: justify;">Except for the SLL
+instruction all have bugs related to an
+interrupt being able to occur while the instructions are decoded by the
+processor. They are implemented on the chip, but are reported to be
+unreliable. We have used some of them in our debugger software for the
+Z88. Until now the code has been running successfully on all our Z88
+computers.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="5.13"></a>5.13 Referencing
+library routines</h2>
+<p style="text-align: justify;">When you need to use a
+library routine in your application
+code, you need to do two things; include a library file at the
+assembler command line with the -i option and refer to the library
+routine in your source file using the <a href="#7-LIB">LIB</a> directive followed by the
+name of the library routine, e.g.</p>
+<pre>LIB malloc, mfree</pre>
+<p style="text-align: justify;">which will declare the two
+names "malloc" and "mfree" as
+external identifiers to the current source file module. Please note
+that you can declare the names before or after they actually are
+referred in your program source. Failing to use the <a href="#7-LIB">LIB</a> directive will
+interprete labels as local symbols to that source file module. When the
+parser meets the instruction that uses one of the above names in a
+parameter, the parameter "expression" is automatically saved to the
+object file for later processing.</p>
+<p style="text-align: justify;">During the linking phase
+of all the object files the specified
+library file is automatically scanned for "malloc" and "free" and
+included into the application code when found.</p>
+<p style="text-align: justify;">Much application
+programming can be saved in "re-inventing the
+wheel" if you store frequently used standard routines in libraries. We
+have supplied a comprehensive set of library routines that were created
+along the development of the Assembler Workbench application EPROM. Use
+them as appropriate and add new ones. We are interested in your work -
+if you feel that you have made some good routines that others may
+benefit from, e-mail them to us and we will include them into the
+standard library.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="5.14"></a>5.14 Creating/updating
+libraries</h2>
+<p style="text-align: justify;">Creating libraries is an
+inbuilt feature of the assembler. The
+following steps are necessary to create a library:</p>
+<ol>
+<li>
+<p style="text-align: justify;">Define a project file
+containing all filenames (without
+extensions) in your directory that contains all library routines (the
+easiest method since you later can move all files to another
+directory). Remember to arrange the filename in a topological order,
+i.e. library routines that access other routines must pe placed first.
+This optimizes the searching through a library during the linking
+process.</p>
+</li>
+<li>
+<p style="text-align: justify;">Each library source
+module uses the <a href="#7-XLIB">XLIB</a> directive to
+define the name of the routine. The same name must be used for the
+address label definition. If your library uses other library routines
+then declare them with the <a href="#7-LIB">LIB</a> directive. Please note that a library
+routine creates the module name itself (performed by <a href="#7-XLIB">XLIB</a>
+automatically). The module name is used to search for routines in a
+library.</p>
+</li>
+<li>
+<p style="text-align: justify;">The command line
+contains the -x option immediately
+followed by your filename.&nbsp;If you don't specify a filename, the default
+standard filename is used (defined by the Z80_STDLIB environment
+variable). Then you need to specify your project filename preceeded by
+@.</p>
+</li>
+</ol>
+<p style="text-align: justify;">For example:&nbsp;</p>
+<pre>Z80asm -xiofunctions @iofunctions</pre>
+<p style="text-align: justify;">will create a library
+"iofunctions.lib" in the current directory (also containing all library
+source files). The project file is "iofunctions" also in the current
+directory.</p>
+<p style="text-align: justify;">Please note that no binary
+file is created (a library is NOT
+an executable file), but a collection of object files sequentially
+organized in a file.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="5.15"></a>5.15 Referencing
+routines in
+other compiled projects</h2>
+<p style="text-align: justify;">It may be
+necessary in some situations to get access to routines previously
+compiled in another project. This implies however a knowledge of their
+absolute addresses during linking. This information is stored in the
+map file, but not accessible in a form suitable to be parsed by the
+assembler. However, this is possible in using the -g option at the
+assembler command line. The action performed creates a <a href="#7-DEFC">DEFC</a> list file
+of address labels that have been declared as globally available (using
+the <a href="#7-XDEF">XDEF</a> directive).&nbsp;</p>
+<p style="text-align: justify;">Only compiled source files
+are included in the
+list. If you were using the -a option (compile only updated source
+files) and no files were updated then the -g file would be empty. If
+you would like a complete list of all global routines then it is needed
+to compile the whole project (using the -b command line option).</p>
+<p style="text-align: justify;">When
+the file is generated, it can easily be <a href="#7-INCLUDE">INCLUDE</a>'d in another project
+where your routines may access the external routines. You might do this
+in two ways:</p>
+<p style="text-align: justify;">
+1) including the file in every source module that needs to
+access external routines. This may be the easiest solution if you're
+only going to need external acces in one or two source modules. With
+many external calls in different module of the current project it
+requires much altering of files.</p>
+<p style="text-align: justify;">
+2) creating a new source file that is part of your project. This file
+could easily be the first file in your project but could just as well
+be placed anywhere in your project. Declare each external name that is
+needed somewhere in your project as <a href="#7-XDEF">XDEF</a>, meaning that all names to be
+included are globally accessible from this module. Then specify the
+<a href="#7-INCLUDE">INCLUDE</a> of the <a href="#7-DEFC">DEFC</a> list of the other project file. As the names get
+loaded, they become global defintions. All other definitions will be
+ignored and not stored to the object file (they are not referref in the
+source module). All your other modules just needs to specify the
+external names as <a href="#7-XREF">XREF</a>. During linking they all get resolved and your
+code has access to external routines from a previosly compiled project.</p>
+<p style="text-align: justify;">Whenever the previous
+project has been re-compiled (and issued with -g option) there is a
+possibility that routine addresses has changed. You therefore need to
+recompile the extra source module in your project to get the new
+identifier values - the rest of your compilation is unaffected (due to
+the <a href="#7-XREF">XREF</a> directives). Only the linking process gets the new proper
+addresses.</p>
+<p style="text-align: justify;">In example 1) you had to
+recompile all source files that
+would have used an <a href="#7-INCLUDE">INCLUDE</a> of the <a href="#7-DEFC">DEFC</a> list file.</p>
+<p style="text-align: justify;">In example 2) only
+one file had to be recompiled.</p>
+<p style="text-align: justify;">The principle of external
+addresses was
+used to compile the debugger version to be resided in segment 0 (into
+the upper 8K). The actual size of the debugger code uses 16K, but was
+split into two separate halfes to fit into the upper 8K of segment 0.
+Each of the 8K code-segments had to get access to the other 8K block.
+The solution was the -g option and cross referencing using <a href="#7-XREF">XREF</a> and an
+additional source module (containing the <a href="#7-XDEF">XDEF</a> declarations) that
+included the -g list file of the other project compilation.</p>
+<hr style="width: 100%; height: 2px;">
+<h1><a name="6"></a>6 Using
+expressions</h1>
+<p style="text-align: justify;">Expressions is almost
+unavoidable in source files. They
+define and explain things much clearer than just using a constant. The
+Z80 Module Assembler allows expressions whereever a parameter is
+needed. This applies to Z80 mnemonic instructions, directives and even
+in character strings. The resulting value from an evaluated expression
+is always an integer. All expressions are calculated internall as 32
+bit signed integers. However, the parameter type defines the true range
+of the expression. E.g. you cannot store a 32 bit signed integer at an
+8 bit LD instruction like LD A, &lt;n&gt; . If a parameter is
+outside an allowed integer range an assemble error is reported.
+Finally, no floating point operations are needed by the assembler.
+There is no real standard on Z80 based computers.</p>
+<p style="text-align: justify;">Whenever an integer
+is stored in a Z80 file, the standard Zilog notation is used, i.e.
+storing the integer in low byte, high byte order (this also applies to
+32bit integers). This standard is also known as little endian notation
+(also used by INTEL processors).</p>
+<p style="text-align: justify;">Expressions may be formed
+as
+arithmetic and relational expressions. Several components are
+supported: symbol names (identifiers), constants, ASCII characters and
+various arithmetic operators.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="6.1"></a>6.1 Constant identifiers</h2>
+<p style="text-align: justify;">Apart from
+specifying decimal integer numbers, you are allowed to use hexadecimal
+constants, binary constants and ASCII characters. The following symbols
+are put in front of the constant to identify the type:</p>
+<pre>$ hexadecimal constant, e.g. $4000 (16384).<br>@ binary constant, e.g. @11000000 (192).<br>' ' ASCII character, e.g. 'a'.</pre>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="6.2"></a>6.2 Arithmetic operators</h2>
+<p style="text-align: justify;">All basic
+arithmetic operators are supported: addition, subtraction,
+multiplication, division and modulus. In addition binary logical
+operators are implemented: binary AND, OR and XOR.</p>
+<pre>+ addition, e.g. 12+13<br>- unary minus, subtraction. e.g. -10, 12-45<br>* multiplication, e.g. 45*2 (90)<br>/ division, e.g. 256/8 (32)<br>% modulus, e.g. 256%8 (0)<br>^ power, e.g. 2^7 (128)<br>~ Binary AND, e.g. 255 ~ 7 (7)<br>| Binary OR, e.g. 128 | 64 (192)<br>: Binary XOR, e.g. 128 ~ 128 (0)<br># Truncate expression as constant (remove relocatable address flag)</pre>
+<p style="text-align: justify;">Arithmetic
+operators use the standard operator precedence, shown from highest to
+lowest:</p>
+<pre>$@' (constant identifiers)<br>() ^ */% +-~|:</pre>
+<p style="text-align: justify;">If you want to
+overide the default operator precedence rules, use brackets ().</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="6.3"></a>6.3 The #
+operator</h2>
+<p style="text-align: justify;">This is not a real
+operator, though. It is only used as the
+first symbol in an expression to identify that this expression
+evaluates to a constant, i.e. containing no relocatable information.
+This feature may be necessary when you have to calculate a distance
+between two address labels without letting the assembler think it is a
+relocatable address. The assembler thinks that expressions containing
+address labels are relocatable items. In 99% of any expression used
+this is perfectly adequate.</p>
+<p style="text-align: justify;">During the linking phase
+such an expression
+may have undiserable side effect when you want to produce relocatable
+machine code using the -R option. The relocator identifies the
+expression as an relocatable item and will add a constant to the
+evaluated value of the expression. This is a perfectly correct handling
+in normal address references for relocatable code. However, since the
+assembler cannot see this as a constant expression, you have to force
+it as one.</p>
+<pre>LD BC, end_relocator-relocator ; the relocator will add an ORG constant<br>LD BC, #end_relocator-relocator ; the relocator sees a constant expression</pre>
+<p style="text-align: justify;">Normal executable code,
+compiled for&nbsp;an absolute
+address, won't conflict with the above problem, since no constants are
+added to expressions. All address information is calculated during
+loading of the address labels in pass 1 of the linking process. Pass 2
+of the linking process just evaluates expressions (thereby using the
+proper values of labels and other constants) and patches them into the
+corresponding locations of the code.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="6.4"></a>6.4 Relational operators</h2>
+<p style="text-align: justify;">With
+relational operators you may form logical expressions resulting in true
+or false conditions. The resulting value of a true expression is 1. The
+resulting value of a false expression is 0. These operators are quite
+handy when you need to perform complex logic for conditional assembly
+in <a href="#7-IF">IF</a>-<a href="#7-IF">ELSE</a>-<a href="#7-IF">ENDIF</a> statements. The following relational operators are
+available:</p>
+<pre>= equal to<br>&lt;&gt; not equal to<br>&lt; less than<br>&gt; larger than<br>&lt;= less than or equal to<br>&gt;= larger than or equal to<br>! not</pre>
+<p style="text-align: justify;">You may link several
+relational expressions with
+the binary operators AND, OR and XOR. You have all the possibilities
+available!</p>
+<p style="text-align: justify;">It is perfectly legal to
+use relational expressions in
+parameters requiring an arithmetic value. For example:</p>
+<pre>LD A, (USING_IBM = 1) | RTMFLAGS</pre>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="6.5"></a>6.5 The ASMPC standard
+function</h2>
+<p style="text-align: justify;">In occasional
+circumstances it may be necessary to use the current location of the
+assembler program counter in an expression e.g. calculating a relative
+distance. This may be done with the help of the ASMPC identifier. An
+example:</p>
+<pre>.errmsg0 DEFM errmsg1 - ASMPC - 1 &amp; "File open error"<br>.errmsg1 DEFM errmsg2 - ASMPC - 1 &amp; "Syntax error"<br>.errmsg2&nbsp;</pre>
+<p style="text-align: justify;">Here, a length byte of the
+following string (excluding the length byte)
+is calculated by using the current ASMPC address value.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="6.6"></a>6.6 The &amp;
+operator</h2>
+<p style="text-align: justify;">You may use expressions in
+string definitions when using the
+<a href="#7-DEFM">DEFM</a> directive. String constants are enclosed in double quotes, e.g.
+"abcdefgh". Several strings and byte expressions may be concatanated
+using the &amp; operator. The resulting type of an expression in
+strings are an unsigned byte of the range of 0 to 255, e.g.:</p>
+<pre>DEFM "string_a" &amp; "string_b" &amp; 'X' &amp; CR &amp; LF &amp; 0</pre>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="6.7"></a>6.7 Symbol identifiers
+in expressions</h2>
+<p style="text-align: justify;">Apart from using integer
+constants in your expressions, names are allowed as well. This is
+frequently used for symbolical address label references (both external
+and local).</p>
+<p style="text-align: justify;">Forward referencing of
+symbols is not really something that
+is important in evaluating expressions. The logic is built into the
+assembler parser. If an expression cannot be resolved in pass 1 of
+source file parsing, it will try to re-evaluate the failed expression
+in pass 2 of the parsing. If it still fails a symbol has not been found
+(<a href="v">XREF</a> and <a href="#7-LIB">LIB</a> external symbols are handled during the linking phase).</p>
+<hr style="width: 100%; height: 2px;">
+<h1><a name="7"></a>7 Directive reference</h1>
+<p style="text-align: justify;">The Z80 Module Assembler
+directives are used to
+manipulate the Z80 assembler mnemonics and to generate data structures,
+variables and constants. You are even permitted to include binary files
+while code generation is performed.</p>
+<p style="text-align: justify;">As the name imply they
+direct the
+assembler to perform other tasks than just parsing and compiling Z80
+instruction mnemonics. All directives are treated as mnemonics by the
+assembler, i.e. it is necessary that they appear as the first command
+identifier on the source line (NOT necessarily the first character).
+Only one directive is allowed at a single source line. Even though they
+are written as CAPITALS in this documentation they may be written in
+mixed case letters in your source files.</p>
+<p style="text-align: justify;">Since the directives cover
+very different topics of assembler processing, each directive will be
+explained in detail, identified with a header description for each text
+section. The following syntax is used:</p>
+<pre>&lt;&gt; defines an entity, i.e. a number, character or string.<br>{} defines a an optional repetition of an entity.<br>[] defines an option that may be left out.</pre>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-BINARY"></a>BINARY "filename"</h2>
+<p style="text-align: justify;">Loads a binary file at the
+assembler PC. This could
+for example be a static data structure or an executable machine code
+routine. The loaded binary file information is included into the object
+file code section. The assembler PC is updated to the end of the loaded
+binary code.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-CALL_OZ"></a>CALL_OZ['(']
+&lt;expression&gt; [')']</h2>
+<p style="text-align: justify;">The
+&lt;expression&gt; may be a 16bit expression and must evaluate
+to a constant. This is an easy interface call to the Z88 operating
+system. This is an advanced RST 20H instruction which automatically
+allocates space for the size of the specified parameter (either 8 bit
+or 16 bit). Code is internally generated as follows:</p>
+<pre>RST $20<br>DEFB x ; 8bit parameter</pre>
+<p style="text-align: justify;">or</p>
+<pre>RST $20<br>DEFW x ; 16bit parameter</pre>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-DEFB"></a>DEFB &lt;8bit
+expr&gt;,{&lt;8bit expr&gt;} (-128; 255)</h2>
+<p style="text-align: justify;">Stores a
+&lt;B&gt;yte (8 bit) at the current
+assembler PC. Expressions may be used to calculate the constant. All
+constant are stored in low byte - high byte order (little endian).</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-DEFW"></a>DEFW &lt;16bit
+expr&gt;,{&lt;16bit expr&gt;} (-32768; 65535)</h2>
+<p style="text-align: justify;">Stores
+a&nbsp;&lt;W&gt;ord
+(16 bit) at the current
+assembler PC. Expressions may be used to calculate the constant. All
+constant are stored in low byte - high byte order (little
+endian).&nbsp;</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-DEFL"></a>DEFL
+&lt;32bit expr&gt;,{&lt;32bit expr&gt;} (-2147483647;
+4294967295)</h2>
+<p style="text-align: justify;">Stores a
+&lt;L&gt;ong word (32 bit) at the current
+assembler PC. Expressions may be used to calculate the constant. All
+constant are stored in low byte - high byte order (little endian).</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-DEFC"></a>DEFC
+name=&lt;32bit expression&gt;{, name=&lt;32bit
+expression&gt;}</h2>
+<p style="text-align: justify;">Define a symbol constant.
+The allowed range is a
+signed 32bit integer value. The expression must be evaluable, i.e. no
+forward referencing identifiers. All standard Z88 operating system
+header files use <a href="#7-DEFC">DEFC</a>.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-DEFM"></a>DEFM &lt;string
+expression&gt;</h2>
+<p style="text-align: justify;">Stores a
+string constant at the current assembler PC. Strings are enclosed in
+double quotes. Strings may be concatanated with byte constants using
+the &amp; operator. This is useful if control characters need to be
+a part of the string and cannot be typed from the keyboard.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-DEFGROUP"></a>DEFGROUP
+'{' name {',' name ['=' &lt;8bit expression&gt;]} '}'</h2>
+<pre>DEFGROUP<br>'{'<br> name {',' name ['=' &lt;8bit expression&gt;]}<br>'}'</pre>
+<p style="text-align: justify;">Defines a
+group of identifier symbols with implicit values. This is similiar to
+the enumeration principles used in C and PASCAL. The initial symbol
+value is 0, increased by 1 for each new symbol in the list. You may
+include a &lt;name = expression&gt; which breaks the linear
+enumeration from that constant. The <a href="#7-DEFGROUP">DEFGROUP</a> directive may be spanned
+across several lines and MUST be enclosed with { and }. <a href="#7-DEFGROUP">DEFGROUP</a> is
+just a more easy way than: <a href="v">DEFC</a> name0 = 0, name1 = name0, ...</p>
+<p style="text-align: justify;">The
+following example illustrates a useful example of defining symbol
+values:</p>
+<pre>DEFGROUP<br>{<br> sym_null, sym_dquote, sym_squote, sym_semicolon,<br> sym_comma, sym_fullstop, sym_lparen, sym_lcurly, sym_rcurly,<br> sym_rparen, sym_plus, sym_minus, sym_multiply, sym_divi, sym_mod,<br> sym_power, sym_assign, sym_strconq, sym_and, sym_or, sym_xor, sym_not<br> sym_less, sym_greater, sym_constexpr, sym_newline, sym_lf, sym_name,<br> sym_number, sym_decmconst, sym_hexconst, sym_binconst, sym_charconst,<br> sym_lessequal, sym_greatequal, sym_notequal sym_negated, sym_nil,<br> sym_ifstatm, sym_elsestatm, sym_endifstatm<br>}</pre>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-DEFINE"></a>DEFINE name,{name}</h2>
+<p style="text-align: justify;">Defines
+a symbol identifier as logically true (integer &lt;&gt; 0). The
+symbol will be created as a local variable and disappears when assembly
+is finished on the current source file module. Nice feature for
+conditional assembly.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-DEFS"></a>DEFS &lt;16bit
+expression&gt;</h2>
+<p style="text-align: justify;">Allocates
+storage. The size of the area will be filled with zero bytes. The
+expression must be [1; 65535].</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-DEFVARS"></a>DEFVARS
+&lt;16bit expression&gt;
+'{' [&lt;name&gt;] [&lt;storage_size&gt;
+&lt;size_multiplier&gt;] { [&lt;name&gt;]
+[&lt;storage_size&gt; &lt;size_multiplier&gt;] } '}'</h2>
+<pre>DEFVARS &lt;16bit expression&gt;<br>'{'<br> [&lt;name&gt;] [&lt;storage_size&gt; &lt;size_multiplier&gt;]<br>&nbsp; { [&lt;name&gt;] [&lt;storage_size&gt; &lt;size_multiplier&gt;] }<br>'}'<br><br>&lt;name&gt; ::= 'a' .. 'z' <br>&lt;storage_size&gt; ::= 'ds.b' | 'ds.w' | 'ds.p' | 'ds.l'</pre>
+<p style="text-align: justify;">Defines variable address
+area or
+offsets. First you define the origin of a variabe area. This may be
+defined using an evaluable 16bit expression (positive). Each variable
+name is followed by a size specifier which can be a byte, word, pointer
+(3 bytes) or long word size. This is particularly useful for defining
+dynamic data strucures in linked lists and binary search trees.
+Defining variable areas are only template definitions not allocations.
+An example:</p>
+<pre>DEFVARS Z80asm_vars<br>{<br> RuntimeFlags1 ds.b 1 ; space for next variable is 1 byte<br> RuntimeFlags2 ds.b 1<br> RuntimeFlags3 ds.b 1<br> ds.w 1 ; space not defined<br> explicitORIG ds.w 1 ; 2 bytes space<br> asmtime ds.b 3 ; 3 bytes space<br> datestamp_src ds.b 6 ; 6 bytes space<br> datestamp_obj ds.b 6<br> TOTALERRORS ds.l 1 ; 4 bytes space<br>}</pre>
+<p style="text-align: justify;">the following is useful
+for
+defining dynamic data structures:</p>
+<pre>DEFVARS 0<br>; 'PfixStack' structure (used for postfix expressions):<br>{<br> pfixstack_const ds.l 1 ; The stack item value<br> pfixstack_previtem ds.p 1 ; Pointer to previous element on stack<br> SIZEOF_pfixstack ; total size of data structure<br>}</pre>
+<p style="text-align: justify;">This type of
+variable declaration makes it very easy for modifications, e.g.
+deleting or inserting variable definitions.</p>
+<p style="text-align: justify;">A special logic is
+available too which can be used throughout individual source files
+during compilation. If you specify -1 as the starting address, the last
+offset from the previous <a href="#7-DEFVARS">DEFVARS</a> which was not specified as 0 will be
+used.</p>
+<p style="text-align: justify;">This enables you to
+gradually build up a list of identifier name
+offsets across <a href="#7-DEFVARS">DEFVARS</a> areas in different source files. The following
+example explains everything:</p>
+<pre>defvars $4000<br>{<br> aaa ds.b 1<br> bbb ds.b 100<br>}<br><br>defvars -1<br>{<br> ccc ds.b 100<br> ddd ds.b 1<br> eee ds.b 10<br>}<br><br>defvars 0<br>{<br> fff ds.p 1<br> ggg ds.b 1<br> hhh ds.w 1<br> iii ds.p 1<br>}<br><br>defvars -1<br>{<br> jjj ds.b 100<br>}</pre>
+<p style="text-align: justify;">Some
+of the symbols will look like this:</p>
+<pre>BBB = 00004001<br>CCC = 00004065<br>GGG = 00000003<br>JJJ = 000040D4</pre>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-FPP"></a>FPP['(']
+&lt;8bit expression&gt; [')']</h2>
+<p style="text-align: justify;">Interface call to the Z88
+operating systems' floating point library.
+This is easier than writing:</p>
+<pre>RST $18<br>DEFB mnemonic</pre>
+<p style="text-align: justify;">This is an advanced
+RST 18H instruction which automatically allocates space for the
+specified parameter. All Z88 floating point call mnemonics are defined
+in the "fpp.def" file.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-IF"></a>IF &lt;logical
+expression&gt; [ELSE]
+ENDIF</h2>
+<pre>IF &lt;logical expression&gt;<br>[ELSE]<br>ENDIF</pre>
+<p style="text-align: justify;">Multi-line-directive. This
+allows to assemble particular source
+lines between the <a href="#7-IF">IF</a>, <a href="#7-IF">ELSE</a> and <a href="#7-IF">ENDIF</a> directives. The logical truth of
+the <a href="#7-IF">IF</a> condition depends on which source lines will be assembled inside
+the directive construction. <a href="#7-IF">ELSE</a> is optional. Infinite nesting of <a href="#7-IF">IF</a>
+directives are allowed. Each directive must be specified on separate
+lines. An example:</p>
+<pre>if QDOS<br> INCLUDE "defs_h"<br> INCLUDE "symbol_def"<br> INCLUDE "#stdio_def"<br> INCLUDE "#fileio_def"<br> INCLUDE "#memory_def"<br>else<br> INCLUDE "defs.h"<br> INCLUDE "symbol.def"<br> if MSDOS | UNIX<br>  INCLUDE "#stdio.def"<br>  INCLUDE "#fileio.def"<br>  INCLUDE "#memory.def"<br> endif<br> if Z88<br>  INCLUDE ":*//stdio.def"<br>  INCLUDE ":*//fileio.def"<br>  INCLUDE ":*//memory.def"<br> endif<br>endif</pre>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-INCLUDE"></a>INCLUDE "filename"</h2>
+<p style="text-align: justify;">Another component that
+is frequently used is to 'link' an additional source file together with
+the current source file. Usually this contains variable definitions
+that is commonly used by several modules in a project. This makes sense
+since there is no idea in copying the same information into several
+files - it simply uses redundant space of your storage media. This is
+certainly important on the Z88 which not always has huge amounts of
+installed user/system RAM (usually 128K). The external source file will
+be included at the position of the <a href="#7-INCLUDE">INCLUDE</a> directive. You specify an
+include file as with the following example:</p>
+<pre>INCLUDE "#stdio.def"</pre>
+<p style="text-align: justify;">The
+format of the filename depends on the operating system platform. As
+with the current source file, you may also insert files in include
+files. There is no limit of how many levels (of files) you specify of
+include files. Recursive or mutual recursive <a href="#7-INCLUDE">INCLUDE</a> files (an <a href="#7-INCLUDE">INCLUDE</a>
+file calling it self) is not possible - the assembler program will
+immediately return an error message back to you!</p>
+<p style="text-align: justify;">Include files are
+usually put at the start of the source file module but may be placed
+anywhere in the source text. The current source file will be continued
+after the <a href="#7-INCLUDE">INCLUDE</a> directive when the included file has been parsed to
+the end of file.</p>
+<p style="text-align: justify;">If you specifiy a leading
+'#' in the filename (as
+shown above) the assembler automatically preceeds a default directory
+path, defined from the Z80_OZFILES environment variable. Most of the
+time <a href="#7-INCLUDE">INCLUDE</a> is used for including Z88 operating system manifests -
+which enables you to place them in a particular place on your system.
+Using the '#' also enables you to have these OZ header files placed
+anywhere on any computer platform. The '#' resolves this for you.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-INVOKE"></a>INVOKE ['(']
+&lt;16bit expression&gt; [')']</h2>
+<p style="text-align: justify;">Special CALL instruction
+for the Ti83 calculator; it is coded as a RST 28H followed by the 16bit
+expression, if the <a href="#1.3-plus">-plus</a>
+option is passed on the command line (for the Ti83Plus), or as a normal
+CALL instruction if the option is not passed.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-LIB"></a>LIB
+name {,name}</h2>
+<p style="text-align: justify;">Declares symbol as
+external to the current module. The
+symbol name will be defined as the name of a library routine which will
+be automatically linked into the application code from a library during
+the linking/relocation phase of the compilation process (if a library
+has been specified at the command line with the -i option).</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-LINE"></a>LINE &lt;32bit
+expr&gt;</h2>
+<p style="text-align: justify;">Used when the assembler is
+used as the back-end of a compiler to synchronize the line numbers in
+error messages to the lines from the compiled source. Needs the <a href="#1.3-CC">-C</a> option to enable.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-LSTOFF"></a>LSTOFF</h2>
+<p style="text-align: justify;">Switches listing output to
+file off temporarily. The listing file is
+not closed.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-LSTON"></a>LSTON</h2>
+<p style="text-align: justify;">Enables listing output
+(usually from a previous
+<a href="#7-LSTOFF">LSTOFF</a>). Both directives may be useful when information from <a href="#7-INCLUDE">INCLUDE</a>
+files is redundant in the listing file, e.g. operating system
+definitions.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-MODULE"></a>MODULE name</h2>
+<p style="text-align: justify;">Defines the name of the
+current module. This
+may be defined only once for a module. All source file modules contain
+a module name. This name is used by the assembler when creating address
+map files and for searching routines in libraries. Further, it allows
+the programmer to choose a well defined name for the source file
+module. The position of the module name is of no importance; it may be
+placed at the end or the start of the source file. However, it has more
+sense to put it at the top. The syntax is simple - specify a legal
+identifier name after the <a href="#7-MODULE">MODULE</a> directive, e.g. <a href="#7-MODULE">MODULE</a> main_module</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-ORG"></a>ORG
+&lt;16bit expression&gt;</h2>
+<p style="text-align: justify;">Define address origin of
+compiled
+machine code - the position in memory where the machine is to be loaded
+and executed. The expression must be evaluable (containing no forward
+or external references). All address references will be calculated from
+the defined <a href="#7-ORG">ORG</a> value. The <a href="#7-ORG">ORG</a> address will be placed in the current
+module that is being compiled. However, during linking only the first
+object module is being read for an <a href="#7-ORG">ORG</a> address. The <a href="#7-ORG">ORG</a> is ignored
+during linking if you have specified an -r option on the command line.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-XDEF"></a>XDEF name {, name}</h2>
+<p style="text-align: justify;">Declares symbol globally
+available to other
+specified source file modules during the linking phase of the
+compilation process.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-XLIB"></a>XLIB name</h2>
+<p style="text-align: justify;">When you need to create a
+library
+routine, it is necessary to declare the routine with <a href="#7-XLIB">XLIB</a>. In
+fuctionality it declares the name globally available to all other
+modules in project, but also serves as a searchable item in libraries.
+A library routine does not contain a <a href="#7-MODULE">MODULE</a> directive, since the <a href="#7-XLIB">XLIB</a>
+name is also identified as the module name (you only specify one
+library routine per module).</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="7-XREF"></a>XREF name {, name}</h2>
+<p style="text-align: justify;">Declares symbol as
+external to the current module. The name must have been defined as <a href="#7-XDEF">XDEF</a>
+in another module to let this module reach the value of the symbol
+during the linking phase.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="8"></a>8
+Run time error messages</h2>
+<p style="text-align: justify;">The following
+error messages will be written in corresponding error files (related to
+a source file). Each error message will contain the name of the source
+file and a line number where the error occurred in the file.</p>
+<hr>
+<h2><a name="8.0"></a>0, "File
+open/read error"</h2>
+<p style="text-align: justify;">You have tried to access a
+file that either was not
+found, already opened by other resources, or the assembler wasn't able
+to create output files (object file, listing-, symbol-, map- or
+executable binary file).</p>
+<hr>
+<h2><a name="8.1"></a>1, "Syntax error"</h2>
+<p style="text-align: justify;">This is a message used by
+many routines - hence the general but descriptive message. You have
+tried to use illegal registers in Z80 mnemonic instructions, specified
+an illegal parameter type (string instead of integer), omitted a
+parameter (<a href="#7-DEFB">DEFB</a> without constant).</p>
+<hr>
+<h2><a name="8.2"></a>2, "Symbol not defined"</h2>
+<p style="text-align: justify;">This error
+is given if you are referring to an identifier (usually in an address
+reference) that was not declared. Either a label definition is missing
+in the current module or you have forgotten to declare an identifier as
+external using the <a href="v">XREF</a> directive.</p>
+<hr>
+<h2><a name="8.3"></a>3, "Not enough memory" /
+"No room in
+Z88"</h2>
+<p style="text-align: justify;">Well, well. It seems that
+there wasn't enough room to hold the
+internal data structures during parsing or linking your code. Delete
+any unnecessary running applications/jobs then try again. If you got
+the message on the Z88, try also to delete un-necessary files from the
+filing system of your current RAM card.</p>
+<hr>
+<h2><a name="8.4"></a>4, "Integer out of range"</h2>
+<p style="text-align: justify;">You
+have an expression which evaluates into a constant that are beyond the
+legal integer range (e.g. trying to store a 16bit value into an 8bit
+parameter).</p>
+<hr>
+<h2><a name="8.5"></a>5, "Syntax error in
+expression"</h2>
+<p style="text-align: justify;">Quite clearly you ahve
+made
+an illegal expression, e.g. specifying two following operands without
+an operator to separate them, used an illegal constant specifier or
+using illegal characters that aren't a legal identifier.</p>
+<hr>
+<h2><a name="8.6"></a>6, "Right
+bracket missing"</h2>
+<p style="text-align: justify;">Your expression is using
+brackets and is not properly
+balanced, i.e. too many beginning brackets or to few ending brackets...</p>
+<hr>
+<h2><a name="8.7"></a>7, "Out of range"</h2>
+<p style="text-align: justify;">Same as 4.</p>
+<hr>
+<h2><a name="8.8"></a>8, "Source filename
+missing"</h2>
+<p style="text-align: justify;">There has not
+been specified any source file modules or project file to start a
+compilation.</p>
+<hr>
+<h2><a name="8.9"></a>9, "Illegal option"</h2>
+<p style="text-align: justify;">The command line parser
+couldn't
+recognise the -option. Remember to specify your option in EXACT case
+size. You have probably used a space between an option and a filename
+parameter.</p>
+<hr>
+<h2><a name="8.10"></a>10, "Unknown identifier"</h2>
+<p style="text-align: justify;">The parser expected a
+legal
+identifier, i.e. a directiver or Z80 mnemonic. You have probably
+omitted the '.' in front of a label definition, misspelled a name or
+used a comment without a leading ';'.</p>
+<hr>
+<h2><a name="8.11"></a>11, "Illegal identifier"</h2>
+<p style="text-align: justify;">You have
+been trying to use a name that is either not known to the parser or an
+illegal identifier. This might happen if you try to use a register that
+is not allowed in a LD instruction, e.g. LD A,F.</p>
+<hr>
+<h2><a name="8.12"></a>12, "Max. code size
+reached"</h2>
+<p style="text-align: justify;">Is that really possible?
+Very interesting code of yours! Z80
+machine code program tend to be in the 32K range (at least on the
+Z88)... Well, the Z80 processor cannot address more than 64K. Start
+changing your code to a smaller size!</p>
+<hr>
+<h2><a name="8.13"></a>13, "errors occurred
+during
+assembly"</h2>
+<p style="text-align: justify;">Status error message
+displayed on the screen when the
+assembler has completed its parsing on all modules. You have one or
+more errors to correct in your source files before the assembler
+continues with linking the next time.</p>
+<hr>
+<h2><a name="8.14"></a>14, "Symbol already
+defined"</h2>
+<p style="text-align: justify;">In
+the current source file, you have tried to create two identical address
+label definitions, or other name identifier creators (using <a href="#7-DEFC">DEFC</a>,
+<a href="#7-DEFVARS">DEFVARS</a>, <a href="#7-DEFGROUP">DEFGROUP</a>).</p>
+<hr>
+<h2><a name="8.15"></a>15, "Module name
+already defined"</h2>
+<p style="text-align: justify;">You have used the
+<a href="#7-MODULE">MODULE</a> directive more than once in your source file, or used both a
+<a href="#7-MODULE">MODULE</a> and <a href="#7-XLIB">XLIB</a> directive (library modules only need an <a href="#7-XLIB">XLIB</a>).</p>
+<hr>
+<h2><a name="8.16"></a>16,
+"Module name not defined" [DEPRECATED]</h2>
+<p style="text-align: justify;">Not used.&nbsp;[A <a href="#7-MODULE">MODULE</a> directive is
+missing in your source
+file (or <a href="#7-XLIB">XLIB</a> directive in a library source file routine).]</p>
+<hr>
+<h2><a name="8.17"></a>17, "Symbol
+already declared local"</h2>
+<p style="text-align: justify;">You have tried to declare
+a symbol as <a href="#7-XREF">XREF</a>, but
+it was already defined local, eg. using a ".lbaddr" in your source.</p>
+<hr>
+<h2><a name="8.18"></a>18,
+"Symbol already declared global"</h2>
+<p style="text-align: justify;">You have two identical
+<a href="v">XDEF</a> symbol
+declarations in your source file module.</p>
+<hr>
+<h2><a name="8.19"></a>19, "Symbol already
+declared
+external" [DEPRECATED]</h2>
+<p style="text-align: justify;">Not used. [You have two identical
+<a href="#7-XREF">XREF</a> symbol declarations in your
+source file module.]</p>
+<hr>
+<h2><a name="8.20"></a>20, "No command line
+arguments" [DEPRECATED]</h2>
+<p style="text-align: justify;">Not used. [Ups - display Z80
+Module Assembler help text.]</p>
+<hr>
+<h2><a name="8.21"></a>21, "Illegal source
+filename"</h2>
+<p style="text-align: justify;">You have
+tried to specify an option after having begun to specify filenames.
+Options must always be specified before filenames or project files.</p>
+<hr>
+<h2><a name="8.22"></a>22,
+"Symbol declared global in another module"</h2>
+<p style="text-align: justify;">You have two identical
+<a href="v">XDEF</a>
+definitions in separate modules. One of them should probably be an <a href="#7-XREF">XREF</a>
+instead.</p>
+<hr>
+<h2><a name="8.23"></a>23, "Re-declaration not
+allowed"</h2>
+<p style="text-align: justify;">You are trying to specify
+an
+<a href="v">XDEF</a> for a name that has already been <a href="#7-XREF">XREF</a>'ed in the same module (or
+the other way around).</p>
+<hr>
+<h2><a name="8.24"></a>24, "ORG already
+defined" [DEPRECATED]</h2>
+<p style="text-align: justify;">Not used.</p>
+<hr>
+<h2><a name="8.25"></a>25,
+"Relative jump address must be local"</h2>
+<p style="text-align: justify;">You have tried to JR to a
+label
+address that is declared as external (with <a href="#7-XREF">XREF</a> or <a href="#7-LIB">LIB</a>). JR must be
+performed in the current source file module.</p>
+<hr>
+<h2><a name="8.26"></a>26, "Not a relocatable
+file" / "Not an object file"</h2>
+<p style="text-align: justify;">The assembler opened a
+supposed object
+file (with the proper ".obj" extension) but realised it wasn't
+conforming to the Z80 assembler standard object file format.</p>
+<hr>
+<h2><a name="8.27"></a>27,
+"Reserved name" [DEPRECATED]</h2>
+<p style="text-align: justify;">Not used. [You have tried to create a
+label or other name as
+"ASMPC".]</p>
+<hr>
+<h2><a name="8.28"></a>28, "Couldn't open
+library file"</h2>
+<p style="text-align: justify;">The library file was found
+but couldn't be opened (probably already opened by another application
+resource)</p>
+<hr>
+<h2><a name="8.29"></a>29, "Not a library file"</h2>
+<p style="text-align: justify;">Your library file is not a
+library
+file (at least is not of the correct file format used by this
+assembler). Have you maybe used another "library" file? The Z80 library
+file could also be corrupted (at least in the header)...</p>
+<hr>
+<h2><a name="8.30"></a>30,
+"Environment variable not defined"</h2>
+<p style="text-align: justify;">The assembler reports that
+either
+the "Z80_OZFILES" or "Z80_STDLIB" environment variables wasn't found in
+the operating system.</p>
+<hr>
+<h2><a name="8.31"></a>31, "Cannot include
+file recursively"</h2>
+<p style="text-align: justify;">A file
+was tried to be included which was already included at a previous
+include level. <a href="#7-INCLUDE">INCLUDE</a> "a.h" cannot contain an <a href="#7-INCLUDE">INCLUDE</a> "a.h"...</p>
+<hr style="width: 100%; height: 2px;">
+<h1><a name="9"></a>9
+Compiling the Z80 Module Assembler ANSI C source files</h1>
+<p style="text-align: justify;">If it is needed
+to re-compile the assembler for the current platform or compiling it
+for a new platform, two files must be stored together with the source
+files present in the same source directory:</p>
+<ol>
+<li>The 'config.h' file<br>
+<br>
+This
+file contains three components:<br>
+</li>
+<ol>
+<li>A constant string (name) to identfiy
+the name of the platform the assembler is running in. The name may be
+used in assembly source texts as an identifier e.g. for conditional
+assembly of your compilation project.<br>
+</li>
+<li>A C compiler identifier to
+control #ifdef conditional compilation of the assembler source files.
+If new platforms are added to the source files the compiler identifier
+is added to the 'config.h' file. Please choose a well defined name of
+the operating system.<br>
+</li>
+<li>If your processor architecture uses Big Endian
+integer storage (high byte - low byte order), then it is necessary to
+use the "ENDIAN" directive (e.g. for MC68000). The 'config.h' file must
+be in the same directory as the C source files.<br>
+</li>
+</ol>
+<li>The 'symbol.h' file<br>
+<br>
+This file contains all data structures (linked lists for expressions,
+AVL binary trees for symbol tables, source module specifications, etc.)
+used by the assembler C source files. Almost all C source files include
+this file. The 'symbol.h' file must be in the same directory as the C
+source files.</li>
+</ol>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="9.1"></a>9.1 The assember program
+supplied as ANSI C source files</h2>
+<p style="text-align: justify;">The Z80 Module Assembler
+is already established on several computer
+platforms. However, other programmers wishing to use the assembler on a
+another platform must port the source files and compile them on a local
+ANSI C compiler. We chose the ANSI C language because it is a widely
+known language, standardized and well suited for text processing and
+compiler oriented applications. Further, a ANSI C compiler is almost
+always available on various computer platforms.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="9.2"></a>9.2 The format of the
+source files</h2>
+<p style="text-align: justify;">The source files contain
+no binary information, such as
+internal data structures for specific wordprocessors or editors. All
+source files are stored as 7 bit ASCII characters using only new line
+(\n) and tabulators (\t) as control characters. The syntax layout of
+the sources use the GNU programming style.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="9.3"></a>9.3 Defining the current
+platform</h2>
+<p style="text-align: justify;">As seen on the supplied
+'config.h' file only one platform
+identification can be active at one time. All other platform
+identifications are commented out (not active). Setting more than one
+platform active may result in the C compiler failing with unknown
+identifier errors or generating fatal code.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="9.4"></a>9.4 The C source files</h2>
+<p style="text-align: justify;">The
+Z80 Module Assembler is composed of the following ANSI C source files:</p>
+<ul>
+<li>z80asm.c<br>
+This file contains the main entry of the assembler. Command
+line parsing, assembler file control, calling of pass1, pass2, linking,
+relocating, code generation. Various assembler output files are created
+from this source module.<br>
+<br>
+</li>
+<li>z80pass.c<br>
+Control of pass1: source file
+parsing, inclusion of files, conditional assembly and code generation
+to object files. Listing file generation.<br>
+Control of pass2: expression
+evaluation, patching and completion of object files. Patching in
+listing files and symbol table generation (to separate file or at end
+of listing file).<br>
+</li>
+<li>modlink.c<br>
+Control of linking and relocating of object
+module machine code. Also automatic library inclusion and relocating of
+code modules. Creation of object module libraries and executable Z80
+machine code files. Creation of mapfiles (sorting of symbols and
+writing to file).<br>
+</li>
+<li>symbols.c<br>
+Symbol table management of local, global
+and external assembler source module symbols.<br>
+<br>
+</li>
+<li>exprprsr.c<br>
+Expression parsing and evaluation. Storing of expressions in infix
+notation to object files.<br>
+<br>
+</li>
+<li>prsline.c<br>
+Source line parsing functions. These recognize identifiers, constants
+and Z80 standard mnemonics.<br>
+</li>
+<li>prsident.c<br>
+Here,
+all standard mnemonics and directives are found and executed to begin
+parsing, generate machine code and store information into the object
+file.<br>
+</li>
+<li>asmdrctv.c<br>
+All function logic routines (<a href="#7-DEFB">DEFB</a>, <a href="#7-INCLUDE">INCLUDE</a>, <a href="#7-ORG">ORG</a>, <a href="#7-DEFVARS">DEFVARS</a>, etc.) that
+parse and code generate Z80 assembler directives.<br>
+<br>
+</li>
+<li>ldinstr.c<br>
+All functions that parse and code generate the Z80 LD instruction group
+to the object file.<br>
+<br>
+</li>
+<li>z80instr.c<br>
+All functions that parse and code generate the rest of the Z80
+instructions to the object file.<br>
+<br>
+</li>
+<li>hist.c<br>
+This
+contains the development history of z80asm, right from the start, with
+more or less interesting details. if you make any changes, please
+specify them here, supplied with your name (and maybe an email
+address). This file uses c format multi-line comments. It is not needed
+to include this file in the compilation project.</li>
+</ul>
+<hr style="width: 100%; height: 2px;">
+<h2> <a name="9.5"></a>9.5 Using a
+Make utility or a compiler front end</h2>
+<p style="text-align: justify;">Most C compilers accept
+the
+following command line:</p>
+<pre>cc -oz80asm *.c</pre>
+<p style="text-align: justify;">which will identify the
+execute
+filename as "z80asm". All c files will automatically be compiled, and
+the main() function is automatically resolved in the appropriate "main"
+source during compilation. You may however be forced to use a make
+utility.</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="9.6"></a>9.6 Future platform
+implementations</h2>
+<p style="text-align: justify;">If you have ported this
+assembler to a new platform, please send us a disc with the appropriate
+files. PLEASE SPECIFY WHERE YOU HAVE MADE THE CHANGES. We prefer MSDOS
+discs (since almost everybody can read/write them). If otherwise,
+please specify the format. Send the discs to:</p>
+<p style="text-align: justify;">Gunther Strube<br>
+Gl.
+Kongevej 37, 4.tv.<br>
+DK-1610 Kobenhavn V<br>
+Denmark</p>
+<p style="text-align: justify;">I can also be reached by
+email: gbs@image.dk</p>
+<p style="text-align: justify;">The Z80 Module Assembler
+may have been further
+developed in parallel with your port. It is of extreme importance that
+we know of all your changes to be able to put them into a new release.
+Write a file with your programming changes, the executable program, and
+which platform the assembler is running on. Make sure that the compiled
+program may be distributed freely - some companies expect royalties for
+selling/ distributing software that was compiled with their C
+compilers. We take NO responsibility for illegally distributed
+programs! The Z80 Module Assembler is a GPL'ed program and should be
+kept that way to the benefit of all developers...</p>
+<hr style="width: 100%; height: 2px;">
+<h1><a name="10"></a>10 File formats</h1>
+<h2><a name="10.1"></a>10.1 Object file format
+documentation</h2>
+<p style="text-align: justify;">The structure of the
+object file
+format is designed exclusively for the Z80 Module Assembler. However,
+it may be useful for other programmers if they wish to use the file
+format for other purposes. We have included the documentation of the
+object file structure in this document. Improvement suggestions are
+welcome. We hope to have designed a simple and straightforward file
+format. The documentation may be necessary if you want to use the
+object file format in other systems.</p>
+<p style="text-align: justify;">I have created the design
+structure of the object file format to be suitable for future
+expansion. The primary aim of the design has been to maintain structure
+simplicity and load efficiency during link processing. The format of
+the object file is as follows:</p>
+<pre>0 [ 'Z80RMF01' &lt;ORG Address&gt; ]<br> [ &lt;F.ptr to Module Name&gt; ]<br> [ &lt;F.ptr to Expression Declarations&gt; ]<br> [ &lt;F.ptr to Name Declarations&gt; ]<br> [ &lt;F.ptr to Library Name Declarations&gt; ]<br> [ &lt;F.ptr to Machine Code Block&gt; ]<br><br> [ &lt;Expression Declaration&gt; ]<br> [ ... ] <br><br> [ &lt;Name Declaration&gt; ] <br> [ ... ]<br><br> [ &lt;Library Name Declaration&gt; ]<br> [ ... ]<br><br> [ &lt;Module Name&gt; ]<br> [ &lt;Machine Code&gt; ]<br>n<br></pre>
+<p style="text-align: justify;">The 0 (null) -
+&lt;n&gt;
+defines start to &lt;n&gt; total of bytes file length. The
+above figure has deliberately been split into sections to clarify the
+file structure, allthough there is no actual physical separation
+between the sections in the file; each section is immediatly followed
+by the next.</p>
+<p style="text-align: justify;">The file pointers are
+32bit integers stored in low byte -
+high byte order (Little endian format - Z80/Intel notation).</p>
+<ul>
+<li>&lt;ORG Address&gt;<br>
+Contains the <a href="#7-ORG">ORG</a> address for the linked
+machine code or FFFFh for no <a href="v">ORG</a> address defined.<br>
+</li>
+<li>&lt;Expression
+Declaration&gt;<br>
+Contains the following:
+&lt;type&gt;&lt;patchptr&gt;&lt;length&gt;&lt;expression_string&gt;<br>
+</li>
+<li>&lt;type&gt;<br>
+defines the resulting evaluation type range:<br>
+'U':
+8bit integer (0 to 255)<br>
+'S': 8bit signed integer (-128 to 127)<br>
+'C':
+16bit integer (-32768 to 65535)<br>
+'L': 32bit signed integer<br>
+</li>
+<li>&lt;patchptr&gt;<br>
+defines the 16bit relative module code patch
+pointer to store result.<br>
+</li>
+<li>&lt;length&gt;<br>
+defines byte length of
+expression string.<br>
+</li>
+<li>&lt;expression_string&gt;<br>
+contains the infix
+expression parsed from the source file.<br>
+</li>
+<li>&lt;Name
+Declaration&gt;<br>
+Contains the following:
+&lt;Scope&gt;&lt;Type&gt;&lt;Value&gt;&lt;Length&gt;&lt;Name&gt;<br>
+</li>
+<li>&lt;Scope&gt;<br>
+defines the scope of the name:<br>
+'L' is local,<br>
+'G'
+is global,<br>
+'X' global library<br>
+</li>
+<li>&lt;Type&gt;<br>
+defines whether it
+is a:<br>
+'A' relocatable address,<br>
+'C' a constant'<br>
+</li>
+<li>&lt;Length&gt;<br>
+defines length byte of the following &lt;Name&gt; string.<br>
+</li>
+<li>&lt;Library Name Declaration&gt;<br>
+Contains the following which
+defines library reference names:
+&lt;Length&gt;&lt;Name&gt;<br>
+</li>
+<li>&lt;Length&gt;<br>
+defines length byte of the following &lt;Name&gt; string.<br>
+</li>
+<li>&lt;Module Name&gt;<br>
+Contains a preceeding byte identifying the
+length of the following string<br>
+</li>
+<li>&lt;Machine Code&gt;<br>
+Contains a
+preceeding 16bit integer identifying the total length of the following
+machine code block.</li>
+</ul>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="10.2"></a>10.2 Library file
+format documentation</h2>
+<p style="text-align: justify;">The library
+file format is a sequense of object files with additional structures.</p>
+<pre>0 [ 'Z80LMF01' ]<br> [ &lt;Object File Block&gt; ]<br> [ ... ] <br>n<br></pre>
+<ul>
+<li>&lt;Object File Block&gt;<br>
+Contains the following: &lt;Next
+Object File&gt;&lt;Object File Length&gt;&lt;'Z80RMF01'
+Object File&gt;<br>
+</li>
+<li>&lt;Next Object File&gt;<br>
+is a 32bit integer
+file pointer to the next<br>
+</li>
+<li>&lt;Object File Block&gt;<br>
+If this file
+pointer is -1 (FFFFFFFFh) then the current &lt;Object File
+Block&gt; is the last in the library file.<br>
+</li>
+<li>&lt;Object File
+Length&gt;<br>
+is 32bit length integer of &lt;'Z80RMF01' Object
+File&gt;<br>
+If this integer is 0 then it is indicated that the current
+&lt;Object File Block&gt; has been marked "deleted" and will
+not be used.</li>
+</ul>
+<p></p>
+</body></html>
