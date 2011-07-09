@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.6 2010-04-16 17:34:37 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.7 2011-07-09 01:34:12 pauloscustodio Exp $ */
 /* $History: Z80PASS.C $ */
 /*  */
 /* *****************  Version 14  ***************** */
@@ -72,7 +72,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include <time.h>
 #include "config.h"
 #include "symbol.h"
-
+#include "hist.h"
 
 /* external functions */
 void Skipline (FILE *fptr);
@@ -124,7 +124,7 @@ extern char *lstfilename, *objfilename, objext[], binext[];
 extern enum symbols sym;
 extern enum flag listing, listing_CPY, verbose, writeline, symtable, z80bin, deforigin, EOL;
 extern long PC, oldPC;
-extern long EXPLICIT_ORIGIN;
+extern size_t EXPLICIT_ORIGIN;
 extern unsigned char *codearea, *codeptr, PAGELEN;
 extern size_t CODESIZE;
 extern int ASSEMBLE_ERROR;
@@ -134,13 +134,6 @@ extern struct module *CURRENTMODULE;
 extern int PAGENR, LINENR, TOTALERRORS;
 extern int COLUMN_WIDTH, TAB_DIST;
 extern avltree *globalroot;
-
-#ifdef QDOS
-extern char _prog_name[], _version[], _copyright[];
-#else
-extern char copyrightmsg[];
-#endif
-
 
 void 
 Z80pass1 (void)
@@ -435,7 +428,13 @@ Z80pass2 (void)
 		  break;
 
 		case RANGE_8UNSIGN:
+                    /* BUG_0004 add test Integer out of range error */
+                    if (constant >= -128 && constant <= 255) {
 	       *patchptr = (unsigned char) constant;	/* opcode is stored, now store byte */
+                    }
+                    else {
+                        ReportError (pass2expr->srcfile, pass2expr->curline, 7);
+                    }
 		  break;
 
 		case RANGE_8SIGN:
@@ -493,11 +492,11 @@ Z80pass2 (void)
       WriteSymbolTable ("Global Module Symbols:", globalroot);
     }
   fptr_namedecl = ftell (objfile);
-  inorder (CURRENTMODULE->localroot, (void (*)()) StoreLocalName);	/* Store Local Name declarations to relocatable file */
-  inorder (globalroot, (void (*)()) StoreGlobalName);	/* Store Global name declarations to relocatable file */
+  inorder (CURRENTMODULE->localroot, (void (*)(void*)) StoreLocalName); /* Store Local Name declarations to relocatable file */
+  inorder (globalroot, (void (*)(void*)) StoreGlobalName);      /* Store Global name declarations to relocatable file */
 
   fptr_libnmdecl = ftell (objfile);	/* Store library reference names */
-  inorder (globalroot, (void (*)()) StoreLibReference);	/* Store library reference name declarations to relocatable file */
+  inorder (globalroot, (void (*)(void*)) StoreLibReference);    /* Store library reference name declarations to relocatable file */
 
   fptr_modname = ftell (objfile);
   constant = strlen (CURRENTMODULE->mname);
@@ -919,7 +918,7 @@ WriteSymbolTable (char *msg, avltree * root)
   fputc ('\n', listfile);
   LineCounter ();
 
-  inorder (root, (void (*)()) WriteSymbol);	/* write symbol table */
+  inorder (root, (void (*)(void*)) WriteSymbol);        /* write symbol table */
 }
 
 
