@@ -13,7 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.6 2011-07-09 01:38:02 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.7 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Log: symbol.h,v $
+/* Revision 1.7  2011-07-09 01:46:00  pauloscustodio
+/* Added Log keyword
+/* */
+
 /* $History: Z80ASM.C $ */
 /*  */
 

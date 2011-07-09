@@ -1,5 +1,10 @@
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.c,v 1.1 2000-07-04 15:33:30 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.c,v 1.2 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Log: avltree.c,v $
+/* Revision 1.2  2011-07-09 01:46:00  pauloscustodio
+/* Added Log keyword
+/* */
+
 /* $History: AVLTREE.C $ */
 /*  */
 /* *****************  Version 4  ***************** */

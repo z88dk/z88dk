@@ -13,7 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.18 2011-07-09 01:21:55 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.19 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Log: prsident.c,v $
+/* Revision 1.19  2011-07-09 01:46:00  pauloscustodio
+/* Added Log keyword
+/* */
+
 /* $History: PRSIDENT.C $ */
 /*  */
 /* *****************  Version 14  ***************** */

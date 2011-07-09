@@ -13,7 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.5 2011-07-09 01:30:14 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.6 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Log: symbols.c,v $
+/* Revision 1.6  2011-07-09 01:46:00  pauloscustodio
+/* Added Log keyword
+/* */
+
 /* $History: SYMBOLS.C $ */
 /*  */
 /* *****************  Version 9  ***************** */

@@ -13,6 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.11 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Log: hist.c,v $
+/* Revision 1.11  2011-07-09 01:46:00  pauloscustodio
+/* Added Log keyword
+/* */
+
 /*
  * Z80 Module Assembler       - C version, by Gunther Strube - InterLogic 1992-1999
  *

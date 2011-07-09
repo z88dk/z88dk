@@ -13,9 +13,11 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.13 2011-07-09 01:38:02 pauloscustodio Exp $ */
-/* $History: Z80ASM.C $ */
-/*  */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.14 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Log: config.h,v $
+/* Revision 1.14  2011-07-09 01:46:00  pauloscustodio
+/* Added Log keyword
+/* */
 
 /* Pick up the default installation path */
 #ifndef WIN32

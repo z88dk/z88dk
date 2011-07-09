@@ -1,5 +1,9 @@
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.10 2011-07-09 01:12:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.11 2011-07-09 01:46:00 pauloscustodio Exp $
+# $Log: Makefile,v $
+# Revision 1.11  2011-07-09 01:46:00  pauloscustodio
+# Added Log keyword
+# 
 #
 
 

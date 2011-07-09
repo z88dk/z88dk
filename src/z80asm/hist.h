@@ -13,12 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.h,v 1.3 2011-07-09 01:40:15 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.h,v 1.4 2011-07-09 01:46:00 pauloscustodio Exp $ */
 /* $Log: hist.h,v $
-/* Revision 1.3  2011-07-09 01:40:15  pauloscustodio
+/* Revision 1.4  2011-07-09 01:46:00  pauloscustodio
+/* Added Log keyword
+/*
+/* Revision 1.3  2011/07/09 01:40:15  pauloscustodio
 /* *** empty log message ***
 /* */
-/*  */
 
 #ifndef HIST_H
 #define HIST_H

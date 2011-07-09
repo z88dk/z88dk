@@ -13,7 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.13 2011-07-09 01:20:55 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.14 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Log: modlink.c,v $
+/* Revision 1.14  2011-07-09 01:46:00  pauloscustodio
+/* Added Log keyword
+/* */
+
 /* $History: MODLINK.C $ */
 /*  */
 /* *****************  Version 16  ***************** */

@@ -13,7 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.14 2011-07-09 01:23:13 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.15 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Log: prsline.c,v $
+/* Revision 1.15  2011-07-09 01:46:00  pauloscustodio
+/* Added Log keyword
+/* */
+
 /* $History: PRSLINE.C $ */
 /*  */
 /* *****************  Version 8  ***************** */

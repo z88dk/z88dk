@@ -13,7 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.14 2011-07-09 01:32:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.15 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Log: z80instr.c,v $
+/* Revision 1.15  2011-07-09 01:46:00  pauloscustodio
+/* Added Log keyword
+/* */
+
 /* $History: Z80INSTR.C $ */
 /*  */
 /* *****************  Version 13  ***************** */

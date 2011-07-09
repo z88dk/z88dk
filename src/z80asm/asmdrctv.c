@@ -13,7 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.11 2011-07-09 01:14:13 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.12 2011-07-09 01:46:00 pauloscustodio Exp $ */
+/* $Log: asmdrctv.c,v $
+/* Revision 1.12  2011-07-09 01:46:00  pauloscustodio
+/* Added Log keyword
+/* */
+
 /* $History: Asmdrctv.c $ */
 /*  */
 /* *****************  Version 13  ***************** */
