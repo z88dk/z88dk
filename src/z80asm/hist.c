@@ -19,9 +19,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.14 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.15 2011-07-11 16:27:44 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.14  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.15  2011-07-11 16:27:44  pauloscustodio
+/* Version 1.1.2
+/*
+/* Revision 1.14  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -554,9 +557,8 @@ C-style 0x prefix for hex digits is permitted
 22.04.2002 [no version increment] (Stefano)
 IX <-> IY swap option added (-IXIY)
 
-===================================
+
 09.07.2011 [1.1.1] (pauloscustodio)
-===================================
 Based on 1.0.31
 
 Compiled with Visual C++ 2010, added casts to clean up warnings.
@@ -611,18 +613,29 @@ CH_0002 : Unary plus and unary minus added to Factor()
      parsed as (ix-3).
 
 
-===================================
-XX.XX.XXXX [1.1.2] (pauloscustodio)
-===================================
+11.07.2011 [1.1.2] (pauloscustodio)
 
-- Copied cvs log into Log history of each file
+- Copied cvs log into Log history of each file, added Z80asm banner to all sources.
+
+- Moved all option variables and option handling code to a separate module options.c,
+  replaced all extern declarations of these variables by include options.h.
+
+- Added test scripts for all z80asm options.
+
+- Created declarations in z80asm.h of objects defined in z80asm.c.
+
+- Created declarations in symbols.h of objects defined in symbols.c.
+
+- Updated z80asm.html: indication of deprecated error messages, links within the document.
+
+- Removed references to dead variable 'relocfile'.
 
 */
 
 #include "hist.h"
 
-#define DATE        "09.07.2011"
-#define VERSION     "1.1.1"
+#define DATE        "11.07.2011"
+#define VERSION     "1.1.2"
 #define COPYRIGHT   "InterLogic 1993-2009"
 
 #ifdef QDOS
