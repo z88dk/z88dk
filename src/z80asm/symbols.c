@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.8 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.9 2011-07-11 16:07:16 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.8  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.9  2011-07-11 16:07:16  pauloscustodio
+/* Moved all option variables and option handling code to a separate module options.c,
+/* replaced all extern declarations of these variables by include options.h.
+/*
+/* Revision 1.8  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -83,7 +87,8 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include <string.h>
 #include "config.h"
 #include "symbol.h"
-
+#include "symbols.h"
+#include "options.h"
 
 /* external functions */
 void ReportError (char *filename, int linenr, int errnum);
@@ -111,7 +116,7 @@ void FreeSym (symbol * node);
 
 /* global variables */
 extern int PAGENR;
-extern enum flag symtable, listing, listing_CPY, pass1, sdcc_hacks;
+extern enum flag pass1;
 extern struct module *CURRENTMODULE;	/* pointer to current module */
 extern avltree *globalroot;
 
