@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.9 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.10 2011-07-11 16:14:47 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.9  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.10  2011-07-11 16:14:47  pauloscustodio
+/* Protect against multiple inclusion
+/*
+/* Revision 1.9  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -70,6 +73,9 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 /* $History: Z80ASM.C $ */
 /*  */
+
+#ifndef SYMBOL_H
+#define SYMBOL_H
 
 #include "avltree.h"    /* base symbol data structures and routines */
 
@@ -219,3 +225,6 @@ struct linkedmod    { struct linkedmod  *nextlink;          /* pointer to next m
 #define RANGE_8SIGN     2
 #define RANGE_16CONST   3
 #define RANGE_32SIGN    4
+
+
+#endif /* ndef SYMBOL_H */
