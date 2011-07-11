@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0002.t,v 1.3 2011-07-09 18:25:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0002.t,v 1.4 2011-07-11 16:23:44 pauloscustodio Exp $
 # $Log: BUG_0002.t,v $
-# Revision 1.3  2011-07-09 18:25:35  pauloscustodio
+# Revision 1.4  2011-07-11 16:23:44  pauloscustodio
+# Factor capture code in t_z80asm_capture() in test_utils.pl
+#
+# Revision 1.3  2011/07/09 18:25:35  pauloscustodio
 # Log keyword in checkin comment was expanded inside Log expansion... recursive
 # Added Z80asm banner to all source files
 #
@@ -30,7 +33,6 @@
 
 use strict;
 use warnings;
-use Capture::Tiny::Extended 'capture';
 use File::Slurp;
 use File::Copy;
 use Test::More;
@@ -48,12 +50,7 @@ one:
 	ld a,1
 	ret
 ");
-my($stdout, $stderr, $return) = capture {
-	system z80asm()." -x".lib_file()." ".asm_file();
-};
-is $stdout, "", "stdout";
-is $stderr, "", "stderr";
-ok $return == 0, "retval";
+t_z80asm_capture("-x".lib_file()." ".asm_file(), "", "", 0);
 ok -f obj_file(), obj_file()." created";
 ok -f lib_file(), lib_file()." created";
 is unlink(obj_file(), lib_file()), 2, "delete old obj and lib";
@@ -61,12 +58,7 @@ is unlink(obj_file(), lib_file()), 2, "delete old obj and lib";
 # create the same library with Z80_STDLIB
 # cause the buffer overrun, detected in MSVC debug version
 $ENV{Z80_STDLIB} = lib_file();
-($stdout, $stderr, $return) = capture {
-	system z80asm()." -x ".asm_file();
-};
-is $stdout, "", "stdout";
-is $stderr, "", "stderr";
-ok $return == 0, "retval";
+t_z80asm_capture("-x ".asm_file(), "", "", 0);
 ok -f obj_file(), obj_file()." created";
 ok -f lib_file(), lib_file()." created";
 
@@ -86,7 +78,5 @@ t_z80asm_ok(0, "
 	jp one
 ", "\xC3\x03\x00\x3E\x01\xC9", "-i");
 
-
-unlink_testfiles();
-is unlink($lib), 1, "delete $lib";
+unlink_testfiles($lib);
 done_testing();

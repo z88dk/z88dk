@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0003.t,v 1.3 2011-07-09 18:25:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0003.t,v 1.4 2011-07-11 16:23:44 pauloscustodio Exp $
 # $Log: BUG_0003.t,v $
-# Revision 1.3  2011-07-09 18:25:35  pauloscustodio
+# Revision 1.4  2011-07-11 16:23:44  pauloscustodio
+# Factor capture code in t_z80asm_capture() in test_utils.pl
+#
+# Revision 1.3  2011/07/09 18:25:35  pauloscustodio
 # Log keyword in checkin comment was expanded inside Log expansion... recursive
 # Added Z80asm banner to all source files
 #
@@ -30,17 +33,13 @@
 
 use strict;
 use warnings;
-use Capture::Tiny::Extended 'capture';
 use Test::More;
 require 't/test_utils.pl';
 
 write_file(asm_file(), "");
-my($stdout, $stderr, $return) = capture {
-	system z80asm()." -Zillegaloption ".asm_file();
-};
-is $stdout, "", "stdout";
-is $stderr, "Illegal option\n1 errors occurred during assembly\n", "stderr";
-ok $return != 0, "retval";
+t_z80asm_capture("-Zillegaloption ".asm_file(), "",
+		"Illegal option\n1 errors occurred during assembly\n",
+		1);
 
 unlink_testfiles();
 done_testing();
