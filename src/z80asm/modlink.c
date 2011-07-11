@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.16 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.17 2011-07-11 16:00:34 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.16  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.17  2011-07-11 16:00:34  pauloscustodio
+/* Moved all option variables and option handling code to a separate module options.c,
+/* replaced all extern declarations of these variables by include options.h.
+/* Created declarations in z80asm.h of objects defined in z80asm.c.
+/*
+/* Revision 1.16  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -145,7 +150,9 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include <stdlib.h>
 #include <string.h>
 #include "config.h"
+#include "options.h"
 #include "symbol.h"
+#include "z80asm.h"
 
 
 /* external functions */
@@ -199,13 +206,12 @@ static char *         CheckIfModuleWanted(FILE *z80asmfile, long currentlibmodul
 extern FILE *listfile, *mapfile, *z80asmfile, *errfile, *deffile, *libfile;
 extern char line[], ident[];
 extern char *lstfilename, *objfilename, *errfilename, *libfilename;
-extern char objext[], segmbinext[], binext[], mapext[], errext[], defext[], binfilename[];
+extern char objext[], segmbinext[], binext[], mapext[], errext[], defext[];
 extern char Z80objhdr[];
 extern enum symbols sym, GetSym (void);
-extern enum flag listing, writeline, symtable, mapref, z80bin, autorelocate, codesegment, sdcc_hacks;
-extern enum flag verbose, deforigin, globaldef, EOL, library, ASMERROR, expl_binflnm;
+extern enum flag writeline;
+extern enum flag EOL, library, ASMERROR;
 extern long PC;
-extern size_t EXPLICIT_ORIGIN;
 extern size_t CODESIZE;
 extern unsigned char *codearea, PAGELEN;
 extern unsigned char reloc_routine[];
@@ -214,7 +220,6 @@ extern struct modules *modulehdr;
 extern struct liblist *libraryhdr;
 extern struct module *CURRENTMODULE;
 extern int PAGENR, TOTALERRORS;
-extern int TAB_DIST, COLUMN_WIDTH;
 extern avltree *globalroot;
 extern char *reloctable, *relocptr;
 extern size_t sizeof_relocroutine;
