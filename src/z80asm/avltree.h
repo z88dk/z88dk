@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.h,v 1.6 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.h,v 1.7 2011-07-11 15:57:45 pauloscustodio Exp $ */
 /* $Log: avltree.h,v $
-/* Revision 1.6  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.7  2011-07-11 15:57:45  pauloscustodio
+/* Protect against multiple inclusion
+/*
+/* Revision 1.6  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -40,6 +43,9 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* 
 /* */
 
+#ifndef AVLTREE_H
+#define AVLTREE_H
+
 typedef struct avlnode {
                         short           height;         /* height of avltree (max search levels from node) */
                         void            *data;          /* pointer to data of node */
@@ -55,3 +61,5 @@ void    *find(avltree *p, void *key, int  (*comp)(void *,void *));
 void    *reorder(avltree *p, int  (*symcmp)(void *,void *));
 void    inorder(avltree *p, void  (*action)(void *));
 void    preorder(avltree *p, void  (*action)(void *));
+
+#endif /* ndef AVLTREE_H */
