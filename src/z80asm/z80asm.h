@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.7 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.8 2011-07-11 16:16:45 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.7  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.8  2011-07-11 16:16:45  pauloscustodio
+/* Moved all option variables and option handling code to a separate module options.c,
+/* replaced all extern declarations of these variables by include options.h.
+/* Created declarations in z80asm.h of objects defined in z80asm.c.
+/*
+/* Revision 1.7  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -44,6 +49,10 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 #ifndef Z80ASM_H
 #define Z80ASM_H
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "avltree.h"
 
 /* snprintf is _snprintf in WIN32 */
 #ifdef WIN32
@@ -74,17 +83,30 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #define CPU_RCM3000 4
 #define CPU_Z180    8
 
-
 #define CPU_RABBIT (CPU_RCM2000|CPU_RCM3000)
 #define CPU_ZILOG (CPU_Z80|CPU_Z180)
 #define CPU_ALL ( CPU_ZILOG |  CPU_RABBIT )
 
-
 extern int   cpu_type;
 
+extern char  srcext[];
+extern char  objext[];
+extern size_t EXPLICIT_ORIGIN;
+extern int TAB_DIST, COLUMN_WIDTH;
+extern char ident[];
+extern char separators[];
+extern avltree *globalroot, *staticroot;
+
+extern int      include_dir_num;
+extern char   **include_dir;
+extern int      lib_dir_num;
+extern char   **lib_dir;
 
 extern char *Fetchfilename (FILE *fptr);
-
+extern void ReportError (char *filename, int linenr, int errnum);
 extern char *SearchFile(char *base, int is_include);
+extern void CreateLibfile (char *filename);
+extern void GetLibfile (char *filename);
+extern void usage (void);
 
 #endif

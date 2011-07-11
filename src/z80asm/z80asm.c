@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.28 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.29 2011-07-11 16:16:44 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.28  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.29  2011-07-11 16:16:44  pauloscustodio
+/* Moved all option variables and option handling code to a separate module options.c,
+/* replaced all extern declarations of these variables by include options.h.
+/* Created declarations in z80asm.h of objects defined in z80asm.c.
+/*
+/* Revision 1.28  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -269,6 +274,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "symbol.h"
 #include "z80asm.h"
 #include "hist.h"
+#include "options.h"
 
 /* external functions */
 char *AllocIdentifier (size_t len);
@@ -296,10 +302,8 @@ symbol *CreateSymbol (char *identifier, long value, unsigned char symboltype, st
 
 /* local functions */
 void prompt (void);
-void usage (void);
 void ReportError (char *filename, int linenr, int errnum);
 void ReportIOError (char *filename);
-void SetAsmFlag (char *flagid);
 void WriteHeader (void);
 void ReleaseFile (struct sourcefile *srcfile);
 void ReleaseLibraries (void);
@@ -308,7 +312,6 @@ void ReleaseModules (void);
 void ReleaseFilenames (void);
 void ReleaseExprns (struct expression *express);
 void CloseFiles (void);
-void CreateLibfile (char *libfilename);
 int AssembleSourceFile (void);
 int TestAsmFile (void);
 int GetModuleSize (void);
@@ -324,12 +327,11 @@ struct JRPC_Hdr *AllocJRaddrHdr (void);
 
 
 FILE *z80asmfile, *listfile, *errfile, *objfile, *mapfile, *modsrcfile, *deffile, *libfile;
-long	clineno;
 
-static int      include_dir_num = 0;
-static char   **include_dir = NULL;
-static int      lib_dir_num = 0;
-static char   **lib_dir = NULL;
+int      include_dir_num = 0;
+char   **include_dir = NULL;
+int      lib_dir_num = 0;
+char   **lib_dir = NULL;
 
 char *errmsg[] =
 {"File open/read error",	/* 0  */
@@ -375,10 +377,8 @@ enum symbols sym, ssym[] =
  assign, bin_and, bin_or, bin_xor, less, greater, log_not, constexpr, colon, newline};
 char separators[] = " &\"\';,.({[]})+-*/%^=~|:<>!#:";
 
-enum flag pass1, listing, listing_CPY, symtable, z80bin, writeline, mapref, globaldef, datestamp, ti83plus, sdcc_hacks;
-enum flag deforigin, verbose, ASMERROR, EOL, symfile, library, createlibrary, autorelocate;
-enum flag smallc_source, codesegment, expl_binflnm, clinemode, swapIXIY, force_xlib;
-
+enum flag pass1, writeline;
+enum flag ASMERROR, EOL, library, createlibrary;
 
 int cpu_type = CPU_Z80;
 int ASSEMBLE_ERROR, ERRORS, TOTALERRORS, PAGENR, LINENR;
@@ -401,7 +401,6 @@ char segmbinext[] = ".bn0";
 
 char srcext[5];			/* contains default source file extension */
 char objext[5];			/* contains default object file extension */
-char binfilename[64];		/* -o explicit filename buffer */
 char Z80objhdr[] = "Z80RMF01";
 char objhdrprefix[] = "oomodnexprnamelibnmodc";
 char Z80libhdr[] = "Z80LMF01";
@@ -807,259 +806,6 @@ GetLibfile (char *filename)
 
 
 
-void 
-SetAsmFlag (char *flagid)
-{
-  int i;
-
-  if (*flagid == 'e')
-    {
-      smallc_source = ON;	/* use ".xxx" as source file in stead of ".asm" */
-      srcext[0] = '.';
-      strncpy ((srcext + 1), (flagid + 1), 3);	/* copy argument string */
-      srcext[4] = '\0';		/* max. 3 letters extension */
-      return;
-    }
-
-  /* djm: mod to get .o files produced instead of .obj */
-  /* gbs: extended to use argument as definition, e.g. -Mo, which defines .o extension */
-  if (*flagid == 'M')
-    {
-      strncpy ((objext + 1), (flagid + 1), 3);	/* copy argument string (append after '.') */
-      objext[4] = '\0';						/* max. 3 letters extension */
-      return;                                       /* BUG_0003 was falling through */
-    }
-
-  /** Check whether this is for the RCM2000/RCM3000 series of Z80-like CPU's */
-
-  if (strcmp (flagid, "RCMX000") == 0)
-    {
-      cpu_type = CPU_RCM2000;
-      return;
-    }
-
-  /* check weather to use an RST or CALL when Invoke is used */
-  if (strcmp(flagid, "plus") == 0 ) 
-    {
-      ti83plus = ON;
-      return;
-    }
-
-  /* (stefano) IX and IY swap option */
-
-  if (strcmp (flagid, "IXIY") == 0)
-    {
-      swapIXIY = ON;
-      return;
-    }
-
-  /* djm turn on c line mode to report line number of C source */
-
-  if (strcmp(flagid, "C") == 0 ) 
-    {
-      clinemode = ON;
-      return;
-    }
-
-  if (strcmp(flagid, "c") == 0)
-    {
-      codesegment = ON;
-      return;
-    }
-  if (strcmp (flagid, "a") == 0)
-    {
-      z80bin = ON;
-      datestamp = ON;
-      return;
-    }
-  if ( strcmp(flagid, "sdcc") == 0 ) 
-    {
-      sdcc_hacks = ON;
-      return;
-    }
-  if ( strcmp(flagid, "forcexlib") == 0 ) 
-    {
-      force_xlib = ON;
-      return;
-    }
-  if (strcmp (flagid, "l") == 0)
-    {
-      listing_CPY = listing = ON;
-      if (symtable)
-        symfile = OFF;
-      return;
-    }
-  if (strcmp (flagid, "nl") == 0)
-    {
-      listing_CPY = listing = OFF;
-      if (symtable)
-        symfile = ON;
-      return;
-    }
-  if (strcmp (flagid, "s") == 0)
-    {
-      symtable = ON;
-      if (listing_CPY)
-        symfile = OFF;
-      else
-        symfile = ON;
-      return;
-    }
-  if (strcmp (flagid, "ns") == 0)
-    {
-      symtable = symfile = OFF;
-      return;
-    }
-  if (strcmp (flagid, "nb") == 0)
-    {
-      z80bin = OFF;
-      mapref = OFF;
-      return;
-    }
-  if (strcmp (flagid, "b") == 0)
-    {
-      z80bin = ON;		/* perform address relocation & linking */
-      return;
-    }
-  if (strcmp (flagid, "v") == 0)
-    {
-      verbose = ON;
-      return;
-    }
-  if (strcmp (flagid, "nv") == 0)
-    {
-      verbose = OFF;
-      return;
-    }
-  if (strcmp (flagid, "d") == 0)
-    {
-      datestamp = ON;		/* assemble only if source > object file */
-      return;
-    }
-  if (strcmp (flagid, "nd") == 0)
-    {
-      datestamp = OFF;
-      return;
-    }
-  if (strcmp (flagid, "m") == 0)
-    {
-      mapref = ON;
-      return;
-    }
-  if (strcmp (flagid, "g") == 0)
-    {
-      globaldef = ON;
-      return;
-    }
-  if (strcmp (flagid, "ng") == 0)
-    {
-      globaldef = OFF;
-      return;
-    }
-  if (strcmp (flagid, "nm") == 0)
-    {
-      mapref = OFF;
-      return;
-    }
-  if (strcmp (flagid, "nR") == 0)
-    {
-      autorelocate = OFF;
-      return;
-    }
-  if (*flagid == 'h')
-    {
-      usage();
-      exit(1);
-    }
-  if (*flagid == 'i')
-    {
-      GetLibfile ((flagid + 1));
-      return;
-    }
-  if (*flagid == 'x')
-    {
-      CreateLibfile ((flagid + 1));
-      return;
-    }
-  if (*flagid == 'r')
-    {
-      sscanf (flagid + 1, "%x", &EXPLICIT_ORIGIN);
-      deforigin = ON;		/* explicit origin has been defined */
-      return;
-    }
-  if (*flagid == 'o')
-    {
-      sscanf (flagid + 1, "%s", binfilename); /* store explicit filename for .BIN file */
-      expl_binflnm = ON;      
-      return;
-    }
-  if (*flagid == 'R')
-    {
-      autorelocate = ON;
-      return;
-    }
-  if (*flagid == 't')
-    {
-      sscanf (flagid + 1, "%d", &TAB_DIST);
-      return;
-    }
-  if (*flagid == 'I')
-    {
-      i = include_dir_num++;
-      include_dir = realloc(include_dir, include_dir_num * sizeof(include_dir[0]));
-      include_dir[i] = strdup(flagid+1);
-      return;                                       /* BUG_0003 was falling through */
-    }
-  if (*flagid == 'L')
-    {
-      i = lib_dir_num++;
-      lib_dir = realloc(lib_dir, lib_dir_num * sizeof(lib_dir[0]));
-      lib_dir[i] = strdup(flagid+1);
-      return;                                       /* BUG_0003 was falling through */
-    }
-  if (*flagid == 'D')
-    {
-      strcpy (ident, (flagid + 1));	/* copy argument string */
-      if (!isalpha (ident[0]))
-        {
-          ReportError (NULL, 0, 11);	/* symbol must begin with alpha */
-          return;
-        }
-      i = 0;
-      while (ident[i] != '\0')
-        {
-          if (strchr (separators, ident[i]) == NULL)
-            {
-              if (!isalnum (ident[i]))
-                {
-                  if (ident[i] != '_')
-                    {
-                      ReportError (NULL, 0, 11);	/* illegal char in identifier */
-                      return;
-                    }
-                  else
-                    ident[i] = '_';	/* underscore in identifier */
-                }
-              else
-                ident[i] = toupper (ident[i]);
-            }
-          else
-            {
-              ReportError (NULL, 0, 11);	/* illegal char in identifier */
-              return;
-            }
-          ++i;
-        }
-      DefineDefSym (ident, 1, 0, &staticroot);
-      return;                                       /* BUG_0003 was falling through */
-    }
-
-    /* BUG_0003 was missing Illegal Option error */
-    ReportError (NULL, 0, 9);                   /* Illegal option */
-}
-
-
-
 struct module *
 NewModule (void)
 {
@@ -1380,11 +1126,12 @@ main (int argc, char *argv[])
   int    include_level = 0;
   FILE  *includes[10];   /* 10 levels of inclusion should be enough */
 
-  symtable = symfile = writeline = mapref = ON;
-  verbose = smallc_source = listing = listing_CPY = z80bin = datestamp = ASMERROR = codesegment = clinemode = OFF;
-  deforigin = globaldef = library = createlibrary = autorelocate = clineno = OFF;
+  writeline = ON;
+  ASMERROR = OFF;
+  library = createlibrary = OFF;
   cpu_type = CPU_Z80;
 
+  ResetOptions();
 
   libfilename = NULL;
   modsrcfile = NULL;

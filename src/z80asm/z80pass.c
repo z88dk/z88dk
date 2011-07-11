@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.10 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.11 2011-07-11 16:19:37 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.10  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.11  2011-07-11 16:19:37  pauloscustodio
+/* Moved all option variables and option handling code to a separate module options.c,
+/* replaced all extern declarations of these variables by include options.h.
+/* Created declarations in z80asm.h of objects defined in z80asm.c.
+/*
+/* Revision 1.10  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -124,6 +129,8 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "config.h"
 #include "symbol.h"
 #include "hist.h"
+#include "options.h"
+#include "z80asm.h"
 
 /* external functions */
 void Skipline (FILE *fptr);
@@ -173,9 +180,8 @@ extern FILE *z80asmfile, *listfile, *objfile, *mapfile;
 extern char *date, line[], ident[], separators[];
 extern char *lstfilename, *objfilename, objext[], binext[];
 extern enum symbols sym;
-extern enum flag listing, listing_CPY, verbose, writeline, symtable, z80bin, deforigin, EOL;
+extern enum flag writeline, EOL;
 extern long PC, oldPC;
-extern size_t EXPLICIT_ORIGIN;
 extern unsigned char *codearea, *codeptr, PAGELEN;
 extern size_t CODESIZE;
 extern int ASSEMBLE_ERROR;
@@ -183,7 +189,6 @@ extern long listfileptr, TOTALLINES;
 extern struct modules *modulehdr;	/* pointer to module header */
 extern struct module *CURRENTMODULE;
 extern int PAGENR, LINENR, TOTALERRORS;
-extern int COLUMN_WIDTH, TAB_DIST;
 extern avltree *globalroot;
 
 void 
