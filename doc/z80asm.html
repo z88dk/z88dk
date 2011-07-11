@@ -6,7 +6,7 @@
 </center>
 </h1>
 <h5>
-<center>THE Z80 CROSS ASSEMBLER, v1.0.31
+<center>THE Z80 CROSS ASSEMBLER, v1.1.2
 </center>
 </h5>
 <center>
@@ -50,7 +50,7 @@ address definition file</a></li>
 <li><a href="#1.3-@FILE">@&lt;project
 file&gt; : Using a project file</a></li>
 <li><a href="#1.3-iLIB">-i&lt;library
-file&gt; : Include library modules during linking/relocation</a></li><li><a href="z80asm.html#1.3-Lpath">-L&lt;library path&gt; : Add directory to search path for libaries</a></li><li><a href="#1.3-Ipath">-I&lt;include path&gt; : Add directory to search path for INCLUDE</a></li><li><a href="#1.3-x">-x : Create a library</a></li>
+file&gt; : Include library modules during linking/relocation</a></li><li><a href="#1.3-Lpath">-L&lt;library path&gt; : Add directory to search path for libaries</a></li><li><a href="#1.3-Ipath">-I&lt;include path&gt; : Add directory to search path for INCLUDE</a></li><li><a href="#1.3-x">-x : Create a library</a></li>
 <li><a href="#1.3-tN">-t&lt;number&gt;
 : Define tabulator distance (for text output files)</a></li>
 <li><a href="#1.3-RCMX000">-RCMX000 : Support
@@ -262,12 +262,12 @@ defined"</a></li>
 <li><a href="#8.17">17, "Symbol already declared
 local"</a></li>
 <li><a href="#8.18">18, "Symbol already declared
-global"</a></li>
+global" [DEPRECATED]</a></li>
 <li><a href="#8.19">19, "Symbol already declared
 external" [DEPRECATED]</a></li>
 <li><a href="#8.20">20, "No command line
 arguments" [DEPRECATED]</a></li>
-<li><a href="#8.21">21, "Illegal source filename"</a></li>
+<li><a href="#8.21">21, "Illegal source filename" &nbsp;[DEPRECATED]</a></li>
 <li><a href="#8.22">22, "Symbol declared global
 in another module"</a></li>
 <li><a href="#8.23">23, "Re-declaration not
@@ -352,9 +352,7 @@ page
 </h2>
 <p style="text-align: justify;">When executing the
 assembler
-from the command line without
-parameters, i.e.
-pressing &lt;ENTER&gt; after the assembler program name, a help
+from the command line with the <a href="#1.3-h">-h</a> option, a help
 page is automatically
 displayed whereafter control is returned to the operating system
 command line.
@@ -375,7 +373,7 @@ a project file are always specified. The options may be left out:</p>
 &lt;options&gt; must be
 specified first.
 Then you enter the names of all files to be assembled. You either
-choose to specify all file names or a @&lt;projectfile&gt;
+choose to specify all file names or a <a href="#1.3-@FILE">@</a>&lt;projectfile&gt;
 containing all file names. File name may be specified with or without
 the 'asm extension. The correct filename parsing is handled
 automatically by the assembler. As seen on the syntax at least on
@@ -527,21 +525,21 @@ programmers knowledge).</p>
 <p style="text-align: justify;">But in a long term view it
 is better to just compile a project
 without thinking of which files need to be compiled or not. That can be
-done with the Z80 Module Assembler. By simply specifying the -d
+done with the Z80 Module Assembler. By simply specifying the <a href="#1.3-d">-d</a>
 parameter at the command line, only updated source files are assembled
 into object files - the rest are ignored.</p>
-<p style="text-align: justify;">Using the -d option in
+<p style="text-align: justify;">Using the <a href="#1.3-d">-d</a> option in
 combination with a project file gives
 the best project setup for a large compilation; compile your projects
 without worrying about which module is updated or not.</p>
 <hr>
 <h3><a name="1.3-b"></a>-b : Link/relocate
 object files</h3>
-<p style="text-align: justify;">The -b option must be used
+<p style="text-align: justify;">The <a href="#1.3-b">-b</a> option must be used
 if you want to create an executable
 Z80 machine code output file of your previosly created object files.
-You may also use the -a option which is identical in functionality but
-also includes the -d option. In other words assemble only updated
+You may also use the <a href="#1.3-a">-a</a> option which is identical in functionality but
+also includes the <a href="#1.3-d">-d</a> option. In other words assemble only updated
 source modules and perform linking/relocation of the code afterwards.</p>
 <ul>
 <li>Pass 1
@@ -553,7 +551,7 @@ absolute address relocation of all the object module machine code. The
 source file module. If not, the assembler will prompt you for it on the
 command line. The <a href="v">ORG</a> address must be typed in hexadecimal notation. If
 you never use the <a href="v">ORG</a> directive in your source files, you can always
-explicitly define one at the command line with the -r option. The next
+explicitly define one at the command line with the <a href="#1.3-rADDR">-r</a> option. The next
 step in the linking process is loading of the machine code from each
 object module, in the order of the specified modules. Pass 1 is
 completed with loading all local and global symbol definitions of the
@@ -574,7 +572,7 @@ and assigned the 'bin' extension.<br>
 </ul>
 <hr style="width: 100%; height: 2px;">
 <h3><a name="1.3-a"></a>-a : Combine -d and -b</h3>
-<p style="text-align: justify;">Same as providing both -b (link/relocate object files) and -d
+<p style="text-align: justify;">Same as providing both <a href="#1.3-b">-b</a> (link/relocate object files) and <a href="#1.3-d">-d</a>
 (assemble only updated files).</p>
 <hr>
 <h3><a name="1.3-oFILE"></a>-o&lt;binary
@@ -619,19 +617,19 @@ of the assembler the <a href="#7-ORG">ORG</a> address that
 defines the position in memory where the code is to be loaded and
 executed, is fetched from the first object module file. You can
 override this by specifying an explicit address origin by entering the
--r option followed by an address in hexadecimal notation at the command
+<a href="#1.3-rADDR">-r</a> option followed by an address in hexadecimal notation at the command
 line, e.g.:</p>
 <pre>-r4000</pre>
 <p style="text-align: justify;">which specifies that your
 code is to be relocated for address
 4000h (16384d) onwards.</p>
-<p style="text-align: justify;">Using the -r option
+<p style="text-align: justify;">Using the <a href="#1.3-rADDR">-r</a> option
 superseeds a defined <a href="#7-ORG">ORG</a> in an object
 file. You could for example have defined the <a href="#7-ORG">ORG</a> to 8000h (32768d) in
 your first source file, then compiled the project. This would have
 generated machine code for memory location 8000h (segment 2 in the
 Cambridge Z88). Since the object files are generated it is easy to link
-them again with another <a href="#7-ORG">ORG</a> address by just using the -r option. The
+them again with another <a href="#7-ORG">ORG</a> address by just using the <a href="#1.3-rADDR">-r</a> option. The
 linking process does not alter the information in object files - they
 are only read. The same project could then easily be re-linked to
 another address, e.g. -r2000. </p>
@@ -662,15 +660,15 @@ locations of the program. It is impossible to determine the extra size
 generated with a relocation table. We assume an extra size of 3 - 3.5K
 for a typical 16K application program.</p>
 <p style="text-align: justify;">You can generate address
-independent code using the -R option
-accompanied with the -a or -b option. There is no other requirements.
+independent code using the <a href="#1.3-R">-R</a> option
+accompanied with the <a href="#1.3-a">-a</a> or <a href="#1.3-b">-b</a> option. There is no other requirements.
 The relocatable code may be useful for programmers using the Cambridge
 Z88 who want to use machine code in the BBC BASIC application
 environment. This can easily be interfaced with the DIM statement to
 allocate memory for the machine code program, and issue a CALL or USR()
 to execute the machine code.</p>
 <p style="text-align: justify;">Please note that the
-linking process with the -R option
+linking process with the <a href="#1.3-R">-R</a> option
 addresses your code from 0 onwards. This is necessary when the runtime
 relocation is performed by the relocater (just before your program is
 executed). This can be examined by loading the address map file into a
@@ -735,7 +733,7 @@ address definition file</h3>
 possible to generate a <a href="#7-DEFC">DEFC</a> directive
 definition file of all globally declared identifiers in a file project
 (declared with the <a href="#7-XDEF">XDEF</a> directive). These global definitions are
-calculated from the specified <a href="#7-ORG">ORG</a> address (from first module or the -r
+calculated from the specified <a href="#7-ORG">ORG</a> address (from first module or the <a href="#1.3-rADDR">-r</a>
 option). This feature is very useful, if you want to get access to
 routines from a separate compilation. If the two code compilation were
 placed in different banks of the Z88, it would be possible to know the
@@ -780,7 +778,7 @@ command line will compile all specified module file names into a single
 executable file called 'main.bin'. However if a project file
 'assembler' were created already containing the same file names, the
 command line would have been:</p>
-<p style="text-align: justify;">z80asm -a @assembler</p>
+<pre>z80asm -a @assembler</pre>
 <p style="text-align: justify;">- much easier!</p>
 <p style="text-align: justify;">A
 project file only contains file names. Each file name is separated by a
@@ -812,7 +810,7 @@ compilations.&nbsp;The command line option allows specification of
 several library files. For each library reference in an application
 module, all library files will be scanned for that particular module.
 The filename (inclusive directory path) of the library may be specified
-explicitly on the command line immedialty after the -i identifier.&nbsp;</p><p style="text-align: justify;">If
+explicitly on the command line immedialty after the <a href="#1.3-iLIB">-i</a> identifier.&nbsp;</p><p style="text-align: justify;">If
 you ommit the filename, a default library filename will be used by the
 assembler. This default filename is defined by creating the environment
 variable "Z80_STDLIB=..." ("..." refers to your filename). Please refer
@@ -826,9 +824,9 @@ file
 structures. The library file format (and object file format) may be
 found at the end of this documentation. A library is simply a set of
 independent routines (that may refer to each other) put together in a
-sequential form. You may only specify a single -x option on the command
+sequential form. You may only specify a single <a href="#1.3-x">-x</a> option on the command
 line. A filename may be explicitly defined (including device and path
-information) to determine the storage location of the library.&nbsp;</p><p style="text-align: justify;">As in -i
+information) to determine the storage location of the library.&nbsp;</p><p style="text-align: justify;">As in <a href="#1.3-iLIB">-i</a>
 you may ommit the filename to use the default filename identified by
 the "Z80_STDLIB" environment variable.</p><p style="text-align: justify;"> A library routine must be
 defined using a simple <a href="#7-XLIB">XLIB</a> directive with an identical address name
@@ -862,7 +860,7 @@ column by multiplying the current tabulator distance with 4, i.e.
 giving a default size of 4*8 = 32 'spaces'. This is usually more than
 enough for most name definitions parsed from source files.</p>
 <p style="text-align: justify;">You
-may redefine the tabulator distance by usign the -t option immediatly
+may redefine the tabulator distance by usign the <a href="#1.3-tN">-t</a> option immediatly
 followed by a decimal number, e.g. -t4 for defining a tabulator
 distance of 4. The with of the first column will then be 4*4 = 16
 'spaces'.</p>
@@ -1293,7 +1291,7 @@ source file name at the command line (or project file). This is the
 linked and relocated output of object files and may be executed by the
 Z80 processor.</p>
 <p style="text-align: justify;">You may override this
-default behaviour by using the -o
+default behaviour by using the <a href="#1.3-oFILE">-o</a>
 option and specify your own output filename (and extension).</p>
 <hr>
 <h3><a name="4.3.7"></a>4.3.7 The address map
@@ -1324,7 +1322,7 @@ files for other projects.</p>
 extension, lib</h3>
 <p style="text-align: justify;">Library files
 are identified with the 'lib' extension. Library files may be created
-using the -x option. Library may be included into application code
+using the <a href="#1.3-x">-x</a> option. Library may be included into application code
 during linking of object modules.</p>
 <hr>
 <h1><a name="5"></a>5 Compiling files</h1>
@@ -1629,7 +1627,7 @@ library routines</h2>
 <p style="text-align: justify;">When you need to use a
 library routine in your application
 code, you need to do two things; include a library file at the
-assembler command line with the -i option and refer to the library
+assembler command line with the <a href="#1.3-iLIB">-i</a> option and refer to the library
 routine in your source file using the <a href="#7-LIB">LIB</a> directive followed by the
 name of the library routine, e.g.</p>
 <pre>LIB malloc, mfree</pre>
@@ -1684,11 +1682,11 @@ library.</p>
 </li>
 <li>
 <p style="text-align: justify;">The command line
-contains the -x option immediately
+contains the <a href="#1.3-x">-x</a> option immediately
 followed by your filename.&nbsp;If you don't specify a filename, the default
 standard filename is used (defined by the Z80_STDLIB environment
 variable). Then you need to specify your project filename preceeded by
-@.</p>
+<a href="#1.3-@FILE">@</a>.</p>
 </li>
 </ol>
 <p style="text-align: justify;">For example:&nbsp;</p>
@@ -1710,16 +1708,16 @@ necessary in some situations to get access to routines previously
 compiled in another project. This implies however a knowledge of their
 absolute addresses during linking. This information is stored in the
 map file, but not accessible in a form suitable to be parsed by the
-assembler. However, this is possible in using the -g option at the
+assembler. However, this is possible in using the <a href="#1.3-g">-g</a> option at the
 assembler command line. The action performed creates a <a href="#7-DEFC">DEFC</a> list file
 of address labels that have been declared as globally available (using
 the <a href="#7-XDEF">XDEF</a> directive).&nbsp;</p>
 <p style="text-align: justify;">Only compiled source files
 are included in the
-list. If you were using the -a option (compile only updated source
-files) and no files were updated then the -g file would be empty. If
+list. If you were using the <a href="#1.3-a">-a</a> option (compile only updated source
+files) and no files were updated then the <a href="#1.3-g">-g</a> file would be empty. If
 you would like a complete list of all global routines then it is needed
-to compile the whole project (using the -b command line option).</p>
+to compile the whole project (using the <a href="#1.3-b">-b</a> command line option).</p>
 <p style="text-align: justify;">When
 the file is generated, it can easily be <a href="#7-INCLUDE">INCLUDE</a>'d in another project
 where your routines may access the external routines. You might do this
@@ -1743,7 +1741,7 @@ source module). All your other modules just needs to specify the
 external names as <a href="#7-XREF">XREF</a>. During linking they all get resolved and your
 code has access to external routines from a previosly compiled project.</p>
 <p style="text-align: justify;">Whenever the previous
-project has been re-compiled (and issued with -g option) there is a
+project has been re-compiled (and issued with <a href="#1.3-g">-g</a> option) there is a
 possibility that routine addresses has changed. You therefore need to
 recompile the extra source module in your project to get the new
 identifier values - the rest of your compilation is unaffected (due to
@@ -1760,9 +1758,9 @@ used to compile the debugger version to be resided in segment 0 (into
 the upper 8K). The actual size of the debugger code uses 16K, but was
 split into two separate halfes to fit into the upper 8K of segment 0.
 Each of the 8K code-segments had to get access to the other 8K block.
-The solution was the -g option and cross referencing using <a href="#7-XREF">XREF</a> and an
+The solution was the <a href="#1.3-g">-g</a> option and cross referencing using <a href="#7-XREF">XREF</a> and an
 additional source module (containing the <a href="#7-XDEF">XDEF</a> declarations) that
-included the -g list file of the other project compilation.</p>
+included the <a href="#1.3-g">-g</a> list file of the other project compilation.</p>
 <hr style="width: 100%; height: 2px;">
 <h1><a name="6"></a>6 Using
 expressions</h1>
@@ -1824,7 +1822,7 @@ this is perfectly adequate.</p>
 <p style="text-align: justify;">During the linking phase
 such an expression
 may have undiserable side effect when you want to produce relocatable
-machine code using the -R option. The relocator identifies the
+machine code using the <a href="#1.3-R">-R</a> option. The relocator identifies the
 expression as an relocatable item and will add a constant to the
 evaluated value of the expression. This is a perfectly correct handling
 in normal address references for relocatable code. However, since the
@@ -2114,7 +2112,7 @@ external to the current module. The
 symbol name will be defined as the name of a library routine which will
 be automatically linked into the application code from a library during
 the linking/relocation phase of the compilation process (if a library
-has been specified at the command line with the -i option).</p>
+has been specified at the command line with the <a href="#1.3-iLIB">-i</a> option).</p>
 <hr style="width: 100%; height: 2px;">
 <h2><a name="7-LINE"></a>LINE &lt;32bit
 expr&gt;</h2>
@@ -2156,7 +2154,7 @@ or external references). All address references will be calculated from
 the defined <a href="#7-ORG">ORG</a> value. The <a href="#7-ORG">ORG</a> address will be placed in the current
 module that is being compiled. However, during linking only the first
 object module is being read for an <a href="#7-ORG">ORG</a> address. The <a href="#7-ORG">ORG</a> is ignored
-during linking if you have specified an -r option on the command line.</p>
+during linking if you have specified an <a href="#1.3-rADDR">-r</a> option on the command line.</p>
 <hr style="width: 100%; height: 2px;">
 <h2><a name="7-XDEF"></a>XDEF name {, name}</h2>
 <p style="text-align: justify;">Declares symbol globally
@@ -2251,7 +2249,7 @@ compilation.</p>
 <h2><a name="8.9"></a>9, "Illegal option"</h2>
 <p style="text-align: justify;">The command line parser
 couldn't
-recognise the -option. Remember to specify your option in EXACT case
+recognise the&nbsp;option. Remember to specify your option in EXACT case
 size. You have probably used a space between an option and a filename
 parameter.</p>
 <hr>
@@ -2311,10 +2309,10 @@ a symbol as <a href="#7-XREF">XREF</a>, but
 it was already defined local, eg. using a ".lbaddr" in your source.</p>
 <hr>
 <h2><a name="8.18"></a>18,
-"Symbol already declared global"</h2>
-<p style="text-align: justify;">You have two identical
+"Symbol already declared global" [DEPRECATED]</h2>
+<p style="text-align: justify;">Not used. [You have two identical
 <a href="v">XDEF</a> symbol
-declarations in your source file module.</p>
+declarations in your source file module.]</p>
 <hr>
 <h2><a name="8.19"></a>19, "Symbol already
 declared
@@ -2329,10 +2327,10 @@ arguments" [DEPRECATED]</h2>
 Module Assembler help text.]</p>
 <hr>
 <h2><a name="8.21"></a>21, "Illegal source
-filename"</h2>
-<p style="text-align: justify;">You have
+filename" [DEPRECATED]</h2>
+<p style="text-align: justify;">Not used. [You have
 tried to specify an option after having begun to specify filenames.
-Options must always be specified before filenames or project files.</p>
+Options must always be specified before filenames or project files.]</p>
 <hr>
 <h2><a name="8.22"></a>22,
 "Symbol declared global in another module"</h2>
@@ -2388,9 +2386,8 @@ file could also be corrupted (at least in the header)...</p>
 <h2><a name="8.30"></a>30,
 "Environment variable not defined"</h2>
 <p style="text-align: justify;">The assembler reports that
-either
-the "Z80_OZFILES" or "Z80_STDLIB" environment variables wasn't found in
-the operating system.</p>
+the "Z80_STDLIB" environment variable wasn't found in
+the operating system, when used by options <a href="#1.3-x">-x</a> and <a href="#1.3-iLIB">-i</a>.</p>
 <hr>
 <h2><a name="8.31"></a>31, "Cannot include
 file recursively"</h2>
