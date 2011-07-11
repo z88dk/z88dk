@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.21 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.22 2011-07-11 16:02:04 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.21  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.22  2011-07-11 16:02:04  pauloscustodio
+/* Moved all option variables and option handling code to a separate module options.c,
+/* replaced all extern declarations of these variables by include options.h.
+/*
+/* Revision 1.21  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -172,7 +176,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "config.h"
 #include "z80asm.h"
 #include "symbol.h"
-
+#include "options.h"
 
 /* external functions */
 void Skipline (FILE *fptr);
@@ -225,12 +229,11 @@ void SetTemporaryLine(char *line);
 /* global variables */
 extern FILE *z80asmfile;
 extern enum symbols sym, GetSym (void);
-extern enum flag listing, writeline, listing_CPY, EOL, sdcc_hacks, force_xlib;
+extern enum flag writeline, EOL;
 extern char ident[], line[];
 extern long PC;
 extern unsigned char *codeptr;
 extern struct module *CURRENTMODULE;
-extern long clineno;
 
 
 typedef void (*ptrfunc) (void);	/* ptr to function returning void */

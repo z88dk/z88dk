@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.14 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.15 2011-07-11 15:56:46 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.14  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.15  2011-07-11 15:56:46  pauloscustodio
+/* Moved all option variables and option handling code to a separate module options.c,
+/* replaced all extern declarations of these variables by include options.h.
+/*
+/* Revision 1.14  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -134,14 +138,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* Improvements on defm() and Fetchfilename(): */
 /* fgetc() logic now handled better according to EOF events. */
 
-#include    <stdio.h>
-#include    <string.h>
-#include    <ctype.h>
-#include    <stdlib.h>
-#include    "config.h"
-#include    "symbol.h"
-#include    "z80asm.h"
-
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include "config.h"
+#include "options.h"
+#include "symbol.h"
+#include "z80asm.h"
 
 /* external functions */
 enum symbols GetSym (void);
@@ -184,7 +188,7 @@ extern char ident[], stringconst[];
 extern unsigned short DEFVPC;
 extern long PC;
 extern enum symbols sym;
-extern enum flag verbose, writeline, EOL;
+extern enum flag writeline, EOL;
 extern struct modules *modulehdr;
 extern struct module *CURRENTMODULE;
 extern int ASSEMBLE_ERROR;

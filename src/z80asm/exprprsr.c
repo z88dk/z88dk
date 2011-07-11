@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.11 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.12 2011-07-11 15:59:51 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.11  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.12  2011-07-11 15:59:51  pauloscustodio
+/* Moved all option variables and option handling code to a separate module options.c,
+/* replaced all extern declarations of these variables by include options.h.
+/*
+/* Revision 1.11  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -136,7 +140,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include <string.h>
 #include "config.h"
 #include "symbol.h"
-
+#include "options.h"
 
 /* external functions */
 enum symbols GetSym (void);
@@ -176,7 +180,6 @@ struct pfixstack *AllocStackItem (void);
 extern struct module *CURRENTMODULE;
 extern avltree *globalroot;
 extern enum symbols sym, pass1;
-extern enum flag listing, sdcc_hacks;
 extern char ident[], separators[];
 extern unsigned char *codearea, *codeptr;
 extern long PC;
