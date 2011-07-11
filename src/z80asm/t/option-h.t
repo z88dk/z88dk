@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-h.t,v 1.1 2011-07-11 15:46:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-h.t,v 1.2 2011-07-11 16:49:31 pauloscustodio Exp $
 # $Log: option-h.t,v $
-# Revision 1.1  2011-07-11 15:46:33  pauloscustodio
+# Revision 1.2  2011-07-11 16:49:31  pauloscustodio
+# Get copyright information from hist.c
+#
+# Revision 1.1  2011/07/11 15:46:33  pauloscustodio
 # Added test scripts for all z80asm options
 #
 #
@@ -23,11 +26,18 @@
 
 use strict;
 use warnings;
+use File::Slurp;
 use Test::More;
 require 't/test_utils.pl';
 
-t_z80asm_capture("-h", <<'END', "", 1);
-Z80 Module Assembler 1.1.1 (09.07.2011), (c) InterLogic 1993-2009
+# get version and date from hist.c
+my $hist = read_file("hist.c");
+my($version) = 	 $hist =~ /\#define \s+ VERSION   \s+ \" (.*?) \"/x;
+my($date) = 	 $hist =~ /\#define \s+ DATE      \s+ \" (.*?) \"/x;
+my($copyright) = $hist =~ /\#define \s+ COPYRIGHT \s+ \" (.*?) \"/x;
+my $copyrightmsg = "Z80 Module Assembler ".$version." (".$date."), (c) ".$copyright."\n";
+
+t_z80asm_capture("-h", $copyrightmsg . <<'END', "", 1);
 z80asm [options] [ @<modulefile> | {<filename>} ]
 [] = may be ignored. {} = may be repeated. | = OR clause.
 To assemble 'fred.asm' use 'fred' or 'fred.asm'
