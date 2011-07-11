@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.18 2011-07-11 16:19:37 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.19 2011-07-11 16:21:12 pauloscustodio Exp $ */
 /* $Log: z80instr.c,v $
-/* Revision 1.18  2011-07-11 16:19:37  pauloscustodio
+/* Revision 1.19  2011-07-11 16:21:12  pauloscustodio
+/* Removed references to dead variable 'relocfile'.
+/*
+/* Revision 1.18  2011/07/11 16:19:37  pauloscustodio
 /* Moved all option variables and option handling code to a separate module options.c,
 /* replaced all extern declarations of these variables by include options.h.
 /* Created declarations in z80asm.h of objects defined in z80asm.c.
@@ -176,7 +179,6 @@ extern unsigned char *codeptr, *codearea;
 extern long PC;
 extern struct module *CURRENTMODULE;
 extern enum symbols GetSym (void), sym;
-extern enum flag relocfile;
 
 
 void 

@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.7 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.8 2011-07-11 16:21:12 pauloscustodio Exp $ */
 /* $Log: ldinstr.c,v $
-/* Revision 1.7  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.8  2011-07-11 16:21:12  pauloscustodio
+/* Removed references to dead variable 'relocfile'.
+/*
+/* Revision 1.7  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -104,7 +107,6 @@ void LD_r_8bit_indrct (int reg);
 extern unsigned char *codeptr, *codearea;
 extern long PC;
 extern enum symbols sym, GetSym (void);
-extern enum flag relocfile;
 extern struct module *CURRENTMODULE;
 extern FILE *z80asmfile;
 
