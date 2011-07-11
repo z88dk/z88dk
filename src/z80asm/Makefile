@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.13 2011-07-09 18:25:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.14 2011-07-11 15:54:37 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.13  2011-07-09 18:25:35  pauloscustodio
+# Revision 1.14  2011-07-11 15:54:37  pauloscustodio
+# new module options.o
+#
+# Revision 1.13  2011/07/09 18:25:35  pauloscustodio
 # Log keyword in checkin comment was expanded inside Log expansion... recursive
 # Added Z80asm banner to all source files
 #
@@ -78,8 +81,9 @@ OBJS = 	asmdrctv.o 	\
 	symbols.o	\
 	z80asm.o	\
 	z80instr.o	\
-	z80pass.o
-	
+	z80pass.o	\
+	options.o
+
 all: z80asm$(EXESUFFIX)
 
 
@@ -106,15 +110,16 @@ depend:
 
 # DO NOT DELETE
 
-asmdrctv.o: config.h ../config.h symbol.h avltree.h z80asm.h
+asmdrctv.o: config.h ../config.h options.h symbol.h avltree.h z80asm.h
 avltree.o: avltree.h
-exprprsr.o: config.h ../config.h symbol.h avltree.h
+exprprsr.o: config.h ../config.h symbol.h avltree.h options.h
 hist.o: hist.h
-ldinstr.o: config.h ../config.h z80asm.h symbol.h avltree.h
-modlink.o: config.h ../config.h symbol.h avltree.h
-prsident.o: config.h ../config.h z80asm.h symbol.h avltree.h
-prsline.o: config.h ../config.h z80asm.h symbol.h avltree.h
-symbols.o: config.h ../config.h symbol.h avltree.h
-z80asm.o: config.h ../config.h symbol.h avltree.h z80asm.h hist.h
-z80instr.o: config.h ../config.h z80asm.h symbol.h avltree.h
-z80pass.o: config.h ../config.h symbol.h avltree.h hist.h
+ldinstr.o: config.h ../config.h z80asm.h avltree.h symbol.h
+modlink.o: config.h ../config.h options.h symbol.h avltree.h z80asm.h
+prsident.o: config.h ../config.h z80asm.h avltree.h symbol.h options.h
+prsline.o: config.h ../config.h z80asm.h avltree.h symbol.h options.h
+symbols.o: config.h ../config.h symbol.h avltree.h symbols.h options.h
+z80asm.o: config.h ../config.h symbol.h avltree.h z80asm.h hist.h options.h
+z80instr.o: config.h ../config.h z80asm.h avltree.h symbol.h options.h
+z80pass.o: config.h ../config.h symbol.h avltree.h hist.h options.h z80asm.h
+options.o: z80asm.h avltree.h options.h symbol.h symbols.h
