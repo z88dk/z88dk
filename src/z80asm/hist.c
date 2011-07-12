@@ -19,9 +19,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.15 2011-07-11 16:27:44 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.16 2011-07-12 22:47:59 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.15  2011-07-11 16:27:44  pauloscustodio
+/* Revision 1.16  2011-07-12 22:47:59  pauloscustodio
+/* - Moved all error variables and error reporting code to a separate module errors.c,
+/*   replaced all extern declarations of these variables by include errors.h,
+/*   created symbolic constants for error codes.
+/* - Added test scripts for error messages.
+/*
+/* Revision 1.15  2011/07/11 16:27:44  pauloscustodio
 /* Version 1.1.2
 /*
 /* Revision 1.14  2011/07/09 18:25:35  pauloscustodio
@@ -612,23 +618,21 @@ CH_0002 : Unary plus and unary minus added to Factor()
      Accept unary minus and unary plus in factor to allow (ix+ -3) to be
      parsed as (ix-3).
 
-
 11.07.2011 [1.1.2] (pauloscustodio)
-
 - Copied cvs log into Log history of each file, added Z80asm banner to all sources.
-
 - Moved all option variables and option handling code to a separate module options.c,
   replaced all extern declarations of these variables by include options.h.
-
 - Added test scripts for all z80asm options.
-
 - Created declarations in z80asm.h of objects defined in z80asm.c.
-
 - Created declarations in symbols.h of objects defined in symbols.c.
-
 - Updated z80asm.html: indication of deprecated error messages, links within the document.
-
 - Removed references to dead variable 'relocfile'.
+
+XX.XX.XXXX [1.1.3] (pauloscustodio)
+- Moved all error variables and error reporting code to a separate module errors.c,
+  replaced all extern declarations of these variables by include errors.h, 
+  created symbolic constants for error codes.
+- Added test scripts for error messages.
 
 */
 

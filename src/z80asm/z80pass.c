@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.11 2011-07-11 16:19:37 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.12 2011-07-12 22:47:59 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.11  2011-07-11 16:19:37  pauloscustodio
+/* Revision 1.12  2011-07-12 22:47:59  pauloscustodio
+/* - Moved all error variables and error reporting code to a separate module errors.c,
+/*   replaced all extern declarations of these variables by include errors.h,
+/*   created symbolic constants for error codes.
+/* - Added test scripts for error messages.
+/*
+/* Revision 1.11  2011/07/11 16:19:37  pauloscustodio
 /* Moved all option variables and option handling code to a separate module options.c,
 /* replaced all extern declarations of these variables by include options.h.
 /* Created declarations in z80asm.h of objects defined in z80asm.c.
@@ -131,6 +137,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "hist.h"
 #include "options.h"
 #include "z80asm.h"
+#include "errors.h"
 
 /* external functions */
 void Skipline (FILE *fptr);
@@ -138,7 +145,6 @@ void WriteLong (long fptr, FILE * fileid);
 void LinkModules (void);
 void DefineOrigin (void);
 void ParseIdent (enum flag interpret);
-void ReportError (char *filename, int linenr, int errnum);
 void RemovePfixlist (struct expr *pfixexpr);
 void StoreExpr (struct expr *pfixexpr, char range);
 int DefineSymbol (char *identifier, long value, unsigned char symboltype);
@@ -184,11 +190,10 @@ extern enum flag writeline, EOL;
 extern long PC, oldPC;
 extern unsigned char *codearea, *codeptr, PAGELEN;
 extern size_t CODESIZE;
-extern int ASSEMBLE_ERROR;
 extern long listfileptr, TOTALLINES;
 extern struct modules *modulehdr;	/* pointer to module header */
 extern struct module *CURRENTMODULE;
-extern int PAGENR, LINENR, TOTALERRORS;
+extern int PAGENR, LINENR;
 extern avltree *globalroot;
 
 void 
@@ -204,8 +209,8 @@ Z80pass1 (void)
 
       switch (ASSEMBLE_ERROR)
 	{
-	case 3:
-	case 12:
+	case ERR_NO_MEMORY:
+	case ERR_MAX_CODESIZE:
 	  return;		/* Fatal errors, return immediatly... */
 	}
     }
@@ -264,7 +269,7 @@ parseline (enum flag interpret)
 		}
 	      else
 		{
-		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);	/* a name must follow a
+		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);	/* a name must follow a
 										 * label declaration */
 		  return;	/* read in a new source line */
 		}
@@ -286,14 +291,14 @@ parseline (enum flag interpret)
 
 	default:
 	    if ( interpret == ON )
-	       ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);	/* Syntax error */
+	       ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);	/* Syntax error */
 	}
 
       if (listing && writeline)
 	WriteListFile ();	/* Write current source line to list file, if allowed */
     }
   else
-    ReportError (NULL, 0, 12);	/* no more room in machine code area */
+    ReportError (NULL, 0, ERR_MAX_CODESIZE);	/* no more room in machine code area */
 }
 
 
@@ -453,16 +458,16 @@ Z80pass2 (void)
 	      if ((pass2expr->rangetype & RANGE) == RANGE_JROFFSET)
 		{
 		  if (pass2expr->rangetype & EXPREXTERN)
-		    ReportError (pass2expr->srcfile, pass2expr->curline, 25);	/* JR, DJNZ used an
+		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_JR_NOT_LOCAL);	/* JR, DJNZ used an
 										 * external label - */
 		  else
-		    ReportError (pass2expr->srcfile, pass2expr->curline, 2);
+		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_NOT_DEFINED);
 		  prevJR = curJR;
 		  curJR = curJR->nextref;	/* get ready for next JR instruction */
 		  free (prevJR);
 		}
 	      else
-		ReportError (pass2expr->srcfile, pass2expr->curline, 2);
+		ReportError (pass2expr->srcfile, pass2expr->curline, ERR_NOT_DEFINED);
 	    }
 	  else
 	    {
@@ -477,7 +482,7 @@ Z80pass2 (void)
 							 * relative jump */
 		    }
 		  else
-		    ReportError (pass2expr->srcfile, pass2expr->curline, 7);
+		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_RANGE);
 		  prevJR = curJR;
 		  curJR = curJR->nextref;	/* get ready for JR instruction */
 		  free (prevJR);
@@ -489,7 +494,7 @@ Z80pass2 (void)
 	       *patchptr = (unsigned char) constant;	/* opcode is stored, now store byte */
                     }
                     else {
-                        ReportError (pass2expr->srcfile, pass2expr->curline, 7);
+                        ReportError (pass2expr->srcfile, pass2expr->curline, ERR_RANGE);
                     }
 		  break;
 
@@ -500,7 +505,7 @@ Z80pass2 (void)
 							 * signed operand */
 		    }
 		  else
-		    ReportError (pass2expr->srcfile, pass2expr->curline, 7);
+		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_RANGE);
 		  break;
 
 		case RANGE_16CONST:
@@ -510,7 +515,7 @@ Z80pass2 (void)
 		      *patchptr = (unsigned short) constant >> 8;	/* div 256 */
 		    }
 		  else
-		    ReportError (pass2expr->srcfile, pass2expr->curline, 7);
+		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_RANGE);
 		  break;
 
 		case RANGE_32SIGN:
@@ -523,7 +528,7 @@ Z80pass2 (void)
 			}
 		    }
 		  else
-		    ReportError (pass2expr->srcfile, pass2expr->curline, 7);
+		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_RANGE);
 		  break;
 		}
 	    }
@@ -708,7 +713,7 @@ Prevfile (void)
 
   if ((newusedfile = AllocUsedFile ()) == NULL)
     {
-      ReportError (NULL, 0, 3);	/* No room in operating system - stop assembler */
+      ReportError (NULL, 0, ERR_NO_MEMORY);	/* No room in operating system - stop assembler */
       return (CURRENTFILE);	/* return parameter pointer - nothing happended! */
     }
   ownedfile = CURRENTFILE;
@@ -733,7 +738,7 @@ Newfile (struct sourcefile *curfile, char *fname)
     {				/* file record has not yet been created */
       if ((curfile = AllocFile ()) == NULL)
 	{
-	  ReportError (NULL, 0, 3);
+	  ReportError (NULL, 0, ERR_NO_MEMORY);
 	  return (NULL);
 	}
       else
@@ -741,7 +746,7 @@ Newfile (struct sourcefile *curfile, char *fname)
     }
   else if ((nfile = AllocFile ()) == NULL)
     {
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       return (curfile);
     }
   else
@@ -757,7 +762,7 @@ Setfile (struct sourcefile *curfile,	/* pointer to record of current source file
 {				/* pointer to filename string */
   if ((nfile->fname = AllocIdentifier (strlen (filename) + 1)) == NULL)
     {
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       return (nfile);
     }
   nfile->prevsourcefile = curfile;

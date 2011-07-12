@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.17 2011-07-11 16:00:34 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.18 2011-07-12 22:47:59 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.17  2011-07-11 16:00:34  pauloscustodio
+/* Revision 1.18  2011-07-12 22:47:59  pauloscustodio
+/* - Moved all error variables and error reporting code to a separate module errors.c,
+/*   replaced all extern declarations of these variables by include errors.h,
+/*   created symbolic constants for error codes.
+/* - Added test scripts for error messages.
+/*
+/* Revision 1.17  2011/07/11 16:00:34  pauloscustodio
 /* Moved all option variables and option handling code to a separate module options.c,
 /* replaced all extern declarations of these variables by include options.h.
 /* Created declarations in z80asm.h of objects defined in z80asm.c.
@@ -153,12 +159,10 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "options.h"
 #include "symbol.h"
 #include "z80asm.h"
-
+#include "errors.h"
 
 /* external functions */
 void FreeSym (symbol * node);
-void ReportError (char *filename, int linenr, int errnum);
-void ReportIOError (char *filename);
 void RemovePfixlist (struct expr *pfixexpr);
 char *AllocIdentifier (size_t len);
 struct module *NewModule (void);
@@ -210,16 +214,16 @@ extern char objext[], segmbinext[], binext[], mapext[], errext[], defext[];
 extern char Z80objhdr[];
 extern enum symbols sym, GetSym (void);
 extern enum flag writeline;
-extern enum flag EOL, library, ASMERROR;
+extern enum flag EOL, library;
 extern long PC;
 extern size_t CODESIZE;
 extern unsigned char *codearea, PAGELEN;
 extern unsigned char reloc_routine[];
-extern int ASSEMBLE_ERROR, listfileptr;
+extern int listfileptr;
 extern struct modules *modulehdr;
 extern struct liblist *libraryhdr;
 extern struct module *CURRENTMODULE;
-extern int PAGENR, TOTALERRORS;
+extern int PAGENR;
 extern avltree *globalroot;
 extern char *reloctable, *relocptr;
 extern size_t sizeof_relocroutine;
@@ -357,7 +361,7 @@ ReadExpr (long nextexpr, long endexpr)
         {			/* parse numerical expression */
           if (postfixexpr->rangetype & NOTEVALUABLE)
             {
-              ReportError (CURRENTFILE->fname, 0, 2);
+              ReportError (CURRENTFILE->fname, 0, ERR_NOT_DEFINED);
               WriteExprMsg ();
             }
           else
@@ -377,7 +381,7 @@ ReadExpr (long nextexpr, long endexpr)
                                                      * relative jump */
                   else
                     {
-                      ReportError (CURRENTFILE->fname, 0, 7);
+                      ReportError (CURRENTFILE->fname, 0, ERR_RANGE);
                       WriteExprMsg ();
                     }
                   break;
@@ -390,7 +394,7 @@ ReadExpr (long nextexpr, long endexpr)
                     }
                   else
                     {
-                      ReportError (CURRENTFILE->fname, 0, 7);
+                      ReportError (CURRENTFILE->fname, 0, ERR_RANGE);
                       WriteExprMsg ();
                     }
 
@@ -427,7 +431,7 @@ ReadExpr (long nextexpr, long endexpr)
                       }
                   else
                     {
-                      ReportError (CURRENTFILE->fname, 0, 7);
+                      ReportError (CURRENTFILE->fname, 0, ERR_RANGE);
                       WriteExprMsg ();
                     }
                   break;
@@ -469,7 +473,7 @@ LinkModules (void)
       reloctable = (char *) malloc (32768U);
       if (reloctable == NULL)
         {
-          ReportError (NULL, 0, 3);
+          ReportError (NULL, 0, ERR_NO_MEMORY);
           return;		/* No more room     */
         }
       else
@@ -492,7 +496,7 @@ LinkModules (void)
     }
   else
     {
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       return;			/* No more room     */
     }
 
@@ -507,7 +511,7 @@ LinkModules (void)
   PC = 0;
   if (DefineDefSym (ASSEMBLERPC, PC, 0, &globalroot) == 0)
     {				/* Create standard 'ASMPC' identifier */
-      ReportError (NULL, 0, 3);	/* no more room     */
+      ReportError (NULL, 0, ERR_NO_MEMORY);	/* no more room     */
       free (errfilename);
       return;
     }
@@ -530,7 +534,7 @@ LinkModules (void)
         }
       else
         {
-          ReportError (NULL, 0, 3);
+          ReportError (NULL, 0, ERR_NO_MEMORY);
           break;		/* No more room */
         }
 
@@ -547,7 +551,7 @@ LinkModules (void)
 
       if (strcmp (fheader, Z80objhdr) != 0)
         {			/* compare header of file */
-          ReportError (objfilename, 0, 26);	/* not a object     file */
+          ReportError (objfilename, 0, ERR_NOT_OBJ_FILE);	/* not a object     file */
           fclose (z80asmfile);
           z80asmfile = NULL;
           break;
@@ -627,7 +631,7 @@ LinkModule (char *filename, long fptr_base)
       size = lowbyte + highbyte * 256U;
       if (CURRENTMODULE->startoffset + size > MAXCODESIZE)
         {
-          ReportError (filename, 0, 12);
+          ReportError (filename, 0, ERR_MAX_CODESIZE);
           return 0;
         }
       else
@@ -688,7 +692,7 @@ LinkLibModules (char *filename, long fptr_base, long nextname, long endnames)
           modname = AllocIdentifier ((size_t) l + 1);
           if (modname == NULL)
             {
-              ReportError (NULL, 0, 3);	/* Ups - system out of memory! */
+              ReportError (NULL, 0, ERR_NO_MEMORY);	/* Ups - system out of memory! */
               return 0;
             }
 
@@ -866,7 +870,7 @@ LinkLibModule (struct libfile *library, long curmodule, char *modname)
         }
       else
         {
-          ReportError (NULL, 0, 3);
+          ReportError (NULL, 0, ERR_NO_MEMORY);
           flag = 0;
         }
     }
@@ -1038,7 +1042,7 @@ CreateLib (void)
     }
   else
     {
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       return;			/* No more room     */
     }
 
@@ -1063,7 +1067,7 @@ CreateLib (void)
 	     filebuffer = (char *) malloc ((size_t) Codesize);
 	     if (filebuffer == NULL)
 	       {
-	          ReportError (CURRENTFILE->fname, 0, 3);
+	          ReportError (CURRENTFILE->fname, 0, ERR_NO_MEMORY);
 	          fclose (objectfile);
 	          break;
 	       }
@@ -1090,13 +1094,13 @@ CreateLib (void)
 	     else
 	       {
 	         free (filebuffer);
-	         ReportError (CURRENTFILE->fname, 0, 26);
+	         ReportError (CURRENTFILE->fname, 0, ERR_NOT_OBJ_FILE);
 	         break;
 	       }
 	   }
       else
 	   {
-	     ReportError (CURRENTFILE->fname, 0, 0);
+	     ReportError (CURRENTFILE->fname, 0, ERR_FILE_OPEN);
 	     break;
 	   }
 
@@ -1126,7 +1130,7 @@ LinkTracedModule (char *filename, long baseptr)
     {
       if ((linkhdr = AllocLinkHdr ()) == NULL)
         {
-          ReportError (NULL, 0, 3);
+          ReportError (NULL, 0, ERR_NO_MEMORY);
           return 0;
         }
       else
@@ -1141,14 +1145,14 @@ LinkTracedModule (char *filename, long baseptr)
     strcpy (fname, filename);
   else
     {
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       return 0;
     }
 
   if ((newm = AllocTracedModule ()) == NULL)
     {
       free (fname);		/* release redundant copy of filename */
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       return 0;
     }
   else
@@ -1233,7 +1237,7 @@ CreateDeffile (void)
     }
   else
     {
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       globaldef = OFF;
     }
 
@@ -1258,7 +1262,7 @@ WriteMapFile (void)
     }
   else
     {
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       return;			/* No more room */
     }
 

@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.15 2011-07-11 15:56:46 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.16 2011-07-12 22:47:59 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.15  2011-07-11 15:56:46  pauloscustodio
+/* Revision 1.16  2011-07-12 22:47:59  pauloscustodio
+/* - Moved all error variables and error reporting code to a separate module errors.c,
+/*   replaced all extern declarations of these variables by include errors.h,
+/*   created symbolic constants for error codes.
+/* - Added test scripts for error messages.
+/*
+/* Revision 1.15  2011/07/11 15:56:46  pauloscustodio
 /* Moved all option variables and option handling code to a separate module options.c,
 /* replaced all extern declarations of these variables by include options.h.
 /*
@@ -146,6 +152,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "options.h"
 #include "symbol.h"
 #include "z80asm.h"
+#include "errors.h"
 
 /* external functions */
 enum symbols GetSym (void);
@@ -161,8 +168,6 @@ char *AllocIdentifier (size_t len);
 long EvalPfixExpr (struct expr *pfixexpr);
 long GetConstant (char *evalerr);
 void Pass2info (struct expr *expression, char constrange, long lfileptr);
-void ReportError (char *filename, int linenr, int errnum);
-void ReportIOError(char *filename);
 void RemovePfixlist (struct expr *pfixexpr);
 void Z80pass1 (void);
 void Skipline (FILE *fptr);
@@ -191,7 +196,6 @@ extern enum symbols sym;
 extern enum flag writeline, EOL;
 extern struct modules *modulehdr;
 extern struct module *CURRENTMODULE;
-extern int ASSEMBLE_ERROR;
 extern int sourcefile_open;
 
 
@@ -219,12 +223,12 @@ DEFSP (void)
 	}
     else
       {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 	return -1;
       }
   else
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
       return -1;
     }
 }
@@ -240,11 +244,11 @@ Parsevarsize (void)
   long offset = 0, varsize, size_multiplier;
 
   if (strcmp (ident, "DS") != 0)
-    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
   else
     {
       if ((varsize = DEFSP ()) == -1)
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 10);
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_UNKNOWN_IDENT);
       else
 	{
 	  GetSym ();
@@ -253,7 +257,7 @@ Parsevarsize (void)
 	    {
 	      if (postfixexpr->rangetype & NOTEVALUABLE)
 		{
-		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 2);
+		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED);
 		  RemovePfixlist (postfixexpr);
 		}
 	      else
@@ -263,7 +267,7 @@ Parsevarsize (void)
 		  if (size_multiplier > 0 && size_multiplier <= MAXCODESIZE)
 		    offset = varsize * size_multiplier;
 		  else
-		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 4);
+		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
 		}
 	    }
 	}
@@ -292,7 +296,7 @@ Parsedefvarsize (long offset)
       break;
 
     default:
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
     }
 
   return varoffset;
@@ -315,7 +319,7 @@ DEFVARS (void)
     {				/* expr. must not be stored in relocatable file */
       if (postfixexpr->rangetype & NOTEVALUABLE)
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 2);
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED);
 	  RemovePfixlist (postfixexpr);
 	  return;
 	}
@@ -423,7 +427,7 @@ DEFGROUP (void)
 			  if ((postfixexpr = ParseNumExpr ()) != NULL)
 			    {
 			      if (postfixexpr->rangetype & NOTEVALUABLE)
-				ReportError (CURRENTFILE->fname, CURRENTFILE->line, 2);
+				ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED);
 			      else
 				{
 				  constant = EvalPfixExpr (postfixexpr);
@@ -439,7 +443,7 @@ DEFGROUP (void)
 		      break;
 
 		    default:
-		      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+		      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 		      break;
 		    }
 		}
@@ -464,7 +468,7 @@ DEFS ()
   if ((postfixexpr = ParseNumExpr ()) != NULL)
     {				/* expr. must not be stored in relocatable file */
       if (postfixexpr->rangetype & NOTEVALUABLE)
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 2);
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED);
       else
 	{
 	  constant = EvalPfixExpr (postfixexpr);
@@ -479,7 +483,7 @@ DEFS ()
 		if ( (constexpr = ParseNumExpr ()) != NULL ) 
 		  {
 		    if ( constexpr->rangetype & NOTEVALUABLE )
-			ReportError(CURRENTFILE->fname,CURRENTFILE->line,2);
+			ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED);
 		    else
 			val = EvalPfixExpr(constexpr);
 		    RemovePfixlist(constexpr);
@@ -495,13 +499,13 @@ DEFS ()
 		}
 	      else
 		{
-		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 12);
+		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
 		  return;
 		}
 	    }
 	  else
 	    {
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 7);
+	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_RANGE);
 	      return;
 	    }
 	}
@@ -523,7 +527,7 @@ UnDefineSym(void)
 	}
       else
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 	  break;
 	}
     }
@@ -539,7 +543,7 @@ DefSym (void)
 	DefineDefSym (ident, 1, 0, &CURRENTMODULE->localroot);
       else
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 	  break;
 	}
     }
@@ -567,7 +571,7 @@ DEFC (void)
 				   * relocatable file */
 		  if (postfixexpr->rangetype & NOTEVALUABLE)
 		    {
-		      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 2);
+		      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED);
 		      break;
 		    }
 		  else
@@ -583,13 +587,13 @@ DEFC (void)
 	    }
 	  else
 	    {
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 	      break;
 	    }
 	}
       else
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 	  break;
 	}
     }
@@ -610,14 +614,14 @@ ORG (void)
   if ((postfixexpr = ParseNumExpr ()) != NULL)
     {
       if (postfixexpr->rangetype & NOTEVALUABLE)
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 2);
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED);
       else
 	{
 	  constant = EvalPfixExpr (postfixexpr);	/* ORG expression must not contain undefined symbols */
 	  if (constant >= 0 && constant <= 65535U)
 	    CURRENTMODULE->origin = constant;
 	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 7);
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_RANGE);
 	}
       RemovePfixlist (postfixexpr);
     }
@@ -633,7 +637,7 @@ DEFB (void)
     {
       if ((PC+1) > MAXCODESIZE) 
         {
-           ReportError (CURRENTFILE->fname, CURRENTFILE->line, 12);
+           ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
            return;
         }
 
@@ -647,7 +651,7 @@ DEFB (void)
 	break;
       else if (sym != comma)
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 	  break;
 	}
     }
@@ -665,7 +669,7 @@ DEFW (void)
     {
       if ((PC+2) > MAXCODESIZE) 
         {
-           ReportError (CURRENTFILE->fname, CURRENTFILE->line, 12);
+           ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
            return;
         }
 
@@ -679,7 +683,7 @@ DEFW (void)
 	break;
       else if (sym != comma)
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 	  break;
 	}
     }
@@ -697,7 +701,7 @@ DEFP (void)
     {
       if ((PC+3) > MAXCODESIZE) 
         {
-           ReportError (CURRENTFILE->fname, CURRENTFILE->line, 12);
+           ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
            return;
         }
 
@@ -710,7 +714,7 @@ DEFP (void)
 		/* Pointers must be specified as WORD,BYTE pairs separated by commas */ 
 		if (sym != comma)
 		{
-			ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+			ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 		}
 
       GetSym ();
@@ -723,7 +727,7 @@ DEFP (void)
 	break;
       else if (sym != comma)
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 	  break;
 	}
     }
@@ -741,7 +745,7 @@ DEFL (void)
     {
       if ((PC+4) > MAXCODESIZE) 
         {
-           ReportError (CURRENTFILE->fname, CURRENTFILE->line, 12);
+           ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
            return;
         }
 
@@ -755,7 +759,7 @@ DEFL (void)
 	break;
       else if (sym != comma)
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 	  break;
 	}
     }
@@ -778,7 +782,7 @@ DEFM (void)
 	    {
               if ((PC+1) > MAXCODESIZE) 
                 {
-                  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 12);
+                  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
                   return;
                 }
 
@@ -787,7 +791,7 @@ DEFM (void)
 		{
 		  sym = newline;
 		  EOL = ON;
-		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 		  return;
 		}
 	      else
@@ -804,7 +808,7 @@ DEFM (void)
 
 		      if (sym != strconq && sym != comma && sym != newline && sym != semicolon)
 			{
-			  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+			  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 			  return;
 			}
 		      break;	/* get out of loop */
@@ -816,7 +820,7 @@ DEFM (void)
 	{ 
           if ((PC+1) > MAXCODESIZE) 
             {
-              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 12);
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
               return;
             }
 
@@ -825,7 +829,7 @@ DEFM (void)
 
 	  if (sym != strconq && sym != comma && sym != newline && sym != semicolon)
 	    {
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);	/* expression separator not found */
+	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);	/* expression separator not found */
 	      break;
 	    }
 	  ++bytepos;
@@ -849,7 +853,7 @@ IncludeFile (void)
 
       if (FindFile(CURRENTFILE,filename) != NULL)
         {
-          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 31);
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INCLUDE_RECURSION);
           return; 
         }
 
@@ -858,7 +862,7 @@ IncludeFile (void)
 
       if ((z80asmfile = fopen (filename, "rb")) == NULL)
         {			/* Open include file */
-          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 0);
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_FILE_OPEN);
           z80asmfile = fopen (CURRENTFILE->fname, "rb");		/* re-open current source file */
           fseek (z80asmfile, CURRENTFILE->filepointer, SEEK_SET);	/* file position to beginning of line
                                                                      * following INCLUDE line */
@@ -869,7 +873,7 @@ IncludeFile (void)
           sourcefile_open = 1;
           CURRENTFILE = Newfile (CURRENTFILE, filename);	/* Allocate new file into file information list */
 
-          if (ASSEMBLE_ERROR == 3)
+          if (ASSEMBLE_ERROR == ERR_NO_MEMORY)
             return;		/* No room... */
           if (verbose)
             puts (CURRENTFILE->fname);	/* display name of INCLUDE file */
@@ -880,9 +884,9 @@ IncludeFile (void)
 
           switch (ASSEMBLE_ERROR)
             {
-            case 0:
-            case 3:
-            case 12:
+            case ERR_FILE_OPEN:
+            case ERR_NO_MEMORY:
+            case ERR_MAX_CODESIZE:
               return;		/* Fatal errors, return immediatly... */
             }
 
@@ -900,7 +904,7 @@ IncludeFile (void)
         }			/* line following INCLUDE line */
     }
   else
-    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 
   sym = newline;
   writeline = OFF;		/* don't write current source line to listing file (empty line of INCLUDE file) */
@@ -935,12 +939,12 @@ BINARY (void)
 	      PC += Codesize;
 	    }
 	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 12);
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
 
 	  fclose (binfile);
 	}
   else
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 }
 
 
@@ -998,13 +1002,13 @@ DeclModuleName (void)
 	  if ((CURRENTMODULE->mname = AllocIdentifier (strlen (ident) + 1)) != NULL)
 	    strcpy (CURRENTMODULE->mname, ident);
 	  else
-	    ReportError (NULL, 0, 3);
+	    ReportError (NULL, 0, ERR_NO_MEMORY);
 	}
       else
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
     }
   else
-    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 15);
+    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MODULE_REDEFINED);
 }
 
 

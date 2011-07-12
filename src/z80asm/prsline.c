@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.18 2011-07-11 16:07:16 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.19 2011-07-12 22:47:59 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.18  2011-07-11 16:07:16  pauloscustodio
+/* Revision 1.19  2011-07-12 22:47:59  pauloscustodio
+/* - Moved all error variables and error reporting code to a separate module errors.c,
+/*   replaced all extern declarations of these variables by include errors.h,
+/*   created symbolic constants for error codes.
+/* - Added test scripts for error messages.
+/*
+/* Revision 1.18  2011/07/11 16:07:16  pauloscustodio
 /* Moved all option variables and option handling code to a separate module options.c,
 /* replaced all extern declarations of these variables by include options.h.
 /*
@@ -134,9 +140,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "z80asm.h"
 #include "symbol.h"
 #include "options.h"
-
-/* external functions */
-void ReportError (char *filename, int linenr, int errnum);
+#include "errors.h"
 
 /* local functions */
 long GetConstant (char *evalerr);
@@ -549,7 +553,7 @@ CheckRegister8 (void)
             {
               if ( (cpu_type & CPU_RABBIT) )
                 {
-                  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
                   return -1;
                 }	
               return 8;
@@ -558,7 +562,7 @@ CheckRegister8 (void)
             {
               if ( (cpu_type & CPU_RABBIT) )
                 {
-                  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
                   return -1;
                 }	
               return 9;
@@ -686,7 +690,7 @@ IndirectRegisters (void)
         }
       else
         {
-          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);	/* Right bracket missing! */
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);	/* Right bracket missing! */
           return -1;
         }
 
@@ -699,7 +703,7 @@ IndirectRegisters (void)
       return 7;
 
     default:
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return -1;
     }
 }

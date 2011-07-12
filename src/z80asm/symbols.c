@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.9 2011-07-11 16:07:16 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.10 2011-07-12 22:47:59 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.9  2011-07-11 16:07:16  pauloscustodio
+/* Revision 1.10  2011-07-12 22:47:59  pauloscustodio
+/* - Moved all error variables and error reporting code to a separate module errors.c,
+/*   replaced all extern declarations of these variables by include errors.h,
+/*   created symbolic constants for error codes.
+/* - Added test scripts for error messages.
+/*
+/* Revision 1.9  2011/07/11 16:07:16  pauloscustodio
 /* Moved all option variables and option handling code to a separate module options.c,
 /* replaced all extern declarations of these variables by include options.h.
 /*
@@ -89,9 +95,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "symbol.h"
 #include "symbols.h"
 #include "options.h"
-
-/* external functions */
-void ReportError (char *filename, int linenr, int errnum);
+#include "errors.h"
 
 /* local functions */
 struct symref *AllocSymRef (void);
@@ -128,7 +132,7 @@ CreateSymbol (char *identifier, long value, unsigned char symboltype, struct mod
 
   if ((newsym = AllocSymbol ()) == NULL)
     {				/* Create area for a new symbol structure */
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       return NULL;
     }
   newsym->symname = AllocIdentifier (strlen (identifier) + 1);	/* Allocate area for a new symbol identifier */
@@ -137,7 +141,7 @@ CreateSymbol (char *identifier, long value, unsigned char symboltype, struct mod
   else
     {
       free (newsym);		/* Ups no more memory left.. */
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       return NULL;
     }
   if (symtable && listing_CPY)
@@ -146,7 +150,7 @@ CreateSymbol (char *identifier, long value, unsigned char symboltype, struct mod
 	{			/* Create area for a new symbol structure */
 	  free (newsym->symname);
 	  free (newsym);	/* release created records */
-	  ReportError (NULL, 0, 3);
+	  ReportError (NULL, 0, ERR_NO_MEMORY);
 	  return NULL;
 	}
       newsym->references->firstref = NULL;
@@ -210,7 +214,7 @@ DefineSymbol (char *identifier,
 	}
       else
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 14);	/* global symbol already defined */
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED);	/* global symbol already defined */
 	  return 0;
 	}
     }
@@ -257,7 +261,7 @@ DefLocalSymbol (char *identifier,
     }
   else
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 14);	/* local symbol already defined */
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED);	/* local symbol already defined */
       return 0;
     }
 }
@@ -409,11 +413,11 @@ DeclSymGlobal (char *identifier, unsigned char libtype)
 		  foundsym->type |= SYMXDEF | libtype;	/* declared extern in another module */
 		}
 	      else								/* cannot declare two identical global's */
-		ReportError (CURRENTFILE->fname, CURRENTFILE->line, 22);	/* Already declared global */
+		ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL_GLOBAL);	/* Already declared global */
 	    }
 	  else if ( (foundsym->type & (SYMXDEF|libtype)) != (SYMXDEF|libtype) )
 	    {
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 23);	/* re-declaration not allowed */
+	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL);	/* re-declaration not allowed */
 	    }
 	}
     }
@@ -435,7 +439,7 @@ DeclSymGlobal (char *identifier, unsigned char libtype)
         }
       else
        {
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 18);	/* already declared global */
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_GLOBAL);	/* already declared global */
        }
    }
 }
@@ -462,7 +466,7 @@ DeclSymExtern (char *identifier, unsigned char libtype)
            if (sdcc_hacks) 
              foundsym->type=SYMXREF|libtype ;
            else
-     	     ReportError (CURRENTFILE->fname, CURRENTFILE->line, 23);	/* Re-declaration not allowed */
+     	     ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL);	/* Re-declaration not allowed */
       }
     }
     }
@@ -486,11 +490,11 @@ DeclSymExtern (char *identifier, unsigned char libtype)
                 }
             }
           else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 17);	/* already declared local */
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_LOCAL);	/* already declared local */
         }
       else if ( (foundsym->type & (SYMXREF|libtype)) != (SYMXREF|libtype) ) 
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 23);	/* re-declaration not allowed */
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL);	/* re-declaration not allowed */
 	}
    }
 }
@@ -509,7 +513,7 @@ AppendPageRef (symbol * symptr)
 
   if ((newref = AllocPageRef ()) == NULL)
     {				/* new page reference of symbol - allocate... */
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       return;
     }
   else
@@ -542,7 +546,7 @@ InsertPageRef (symbol * symptr)
 
   if ((newref = AllocPageRef ()) == NULL)
     {				/* new page reference of symbol - allocate... */
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       return;
     }
   else
@@ -590,7 +594,7 @@ DefineDefSym (char *identifier, long value, unsigned char symtype, avltree ** ro
     }
   else
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 14);	/* Symbol already defined */
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED);	/* Symbol already defined */
       return 0;
     }
 }

@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.12 2011-07-11 15:59:51 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.13 2011-07-12 22:47:59 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.12  2011-07-11 15:59:51  pauloscustodio
+/* Revision 1.13  2011-07-12 22:47:59  pauloscustodio
+/* - Moved all error variables and error reporting code to a separate module errors.c,
+/*   replaced all extern declarations of these variables by include errors.h,
+/*   created symbolic constants for error codes.
+/* - Added test scripts for error messages.
+/*
+/* Revision 1.12  2011/07/11 15:59:51  pauloscustodio
 /* Moved all option variables and option handling code to a separate module options.c,
 /* replaced all extern declarations of these variables by include options.h.
 /*
@@ -141,10 +147,10 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "config.h"
 #include "symbol.h"
 #include "options.h"
+#include "errors.h"
 
 /* external functions */
 enum symbols GetSym (void);
-void ReportError (char *filename, int linenr, int errnum);
 void Pass2info (struct expr *expression, char constrange, long lfileptr);
 long GetConstant (char *evalerr);
 symbol *GetSymPtr (char *identifier);
@@ -239,7 +245,7 @@ Factor (struct expr *pfixexpr)
 
         if (eval_err == 1)
         {
-            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 5);
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_EXPR_SYNTAX);
             return 0;		/* syntax error in expression */
         }
         else
@@ -263,7 +269,7 @@ Factor (struct expr *pfixexpr)
             }
             else
             {
-                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 6);
+                ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_UNBALANCED_PAREN);
                 return 0;
             }
         }
@@ -284,7 +290,7 @@ Factor (struct expr *pfixexpr)
         *pfixexpr->infixptr++ = '\'';	/* store single quote in infix expr */
         if (feof (z80asmfile))
         {
-            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
             return 0;
         }
         else
@@ -292,7 +298,7 @@ Factor (struct expr *pfixexpr)
             constant = GetChar (z80asmfile);
             if (constant == EOF)
             {
-                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+                ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
                 return 0;
             }
             else
@@ -305,7 +311,7 @@ Factor (struct expr *pfixexpr)
                 }
                 else
                 {
-                    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 5);
+                    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_EXPR_SYNTAX);
                     return 0;
                 }
             }
@@ -332,7 +338,7 @@ Factor (struct expr *pfixexpr)
         break;
 
     default:
-        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 5);	/* syntax error */
+        ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_EXPR_SYNTAX);	/* syntax error */
         return 0;
     }
 
@@ -502,7 +508,7 @@ ParseNumExpr (void)
 
     if ((pfixhdr = Allocexpr ()) == NULL)
     {
-        ReportError (NULL, 0, 3);
+        ReportError (NULL, 0, ERR_NO_MEMORY);
         return NULL;
     }
     else
@@ -517,7 +523,7 @@ ParseNumExpr (void)
 
         if ((pfixhdr->infixexpr = (char *) calloc (128,sizeof (char))) == NULL)
         {
-            ReportError (NULL, 0, 3);
+            ReportError (NULL, 0, ERR_NO_MEMORY);
             free (pfixhdr);
             return NULL;
         }
@@ -815,7 +821,7 @@ NewPfixSymbol (struct expr *pfixexpr,
 	  if (newnode->id == NULL)
 	    {
 	      free (newnode);
-	      ReportError (NULL, 0, 3);
+	      ReportError (NULL, 0, ERR_NO_MEMORY);
 	      return;
 	    }
 	  strcpy (newnode->id, symident);
@@ -825,7 +831,7 @@ NewPfixSymbol (struct expr *pfixexpr,
     }
   else
     {
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
 
       return;
     }
@@ -856,7 +862,7 @@ PushItem (long oprconst, struct pfixstack **stackpointer)
       *stackpointer = newitem;	/* update stackpointer to new item */
     }
   else
-    ReportError (NULL, 0, 3);
+    ReportError (NULL, 0, ERR_NO_MEMORY);
 }
 
 
@@ -925,7 +931,7 @@ ExprLong (int listoffset)
 			}
 		    }
 		  else
-		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 4);
+		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
 		}
 	    }
 	}
@@ -973,7 +979,7 @@ ExprAddress (int listoffset)
 		      *(codeptr + 1) = (unsigned short) constant / 256U;
 		    }
 		  else
-		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 4);
+		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
 		}
 	    }
 	}
@@ -1020,7 +1026,7 @@ ExprUnsigned8 (int listoffset)
 	       	      *codeptr = (unsigned char) constant;
 		  }
 		  else {
-		      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 4);
+		      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
 		  }
                 }
 	    }
@@ -1054,7 +1060,7 @@ ExprSigned8 (int listoffset)
 	break;		    /* continue into parsing expression */
 
     default:		    /* Syntax error, e.g. (ix 4) */
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);	
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);	
 	return 0; 	    /* FAIL */
     }
 
@@ -1081,7 +1087,7 @@ ExprSigned8 (int listoffset)
 		  if (constant >= -128 && constant <= 255)
 		    *codeptr = (char) constant;
 		  else
-		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 4);
+		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
 		}
 	    }
 	}

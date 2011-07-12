@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.22 2011-07-11 16:02:04 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.23 2011-07-12 22:47:59 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.22  2011-07-11 16:02:04  pauloscustodio
+/* Revision 1.23  2011-07-12 22:47:59  pauloscustodio
+/* - Moved all error variables and error reporting code to a separate module errors.c,
+/*   replaced all extern declarations of these variables by include errors.h,
+/*   created symbolic constants for error codes.
+/* - Added test scripts for error messages.
+/*
+/* Revision 1.22  2011/07/11 16:02:04  pauloscustodio
 /* Moved all option variables and option handling code to a separate module options.c,
 /* replaced all extern declarations of these variables by include options.h.
 /*
@@ -177,11 +183,11 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "z80asm.h"
 #include "symbol.h"
 #include "options.h"
+#include "errors.h"
 
 /* external functions */
 void Skipline (FILE *fptr);
 int DefineSymbol (char *identifier, long value, unsigned char symboltype);
-void ReportError (char *filename, int linenr, int errnum);
 void Subroutine_addr (int opc0, int opc);
 void JP_instr (int opc0, int opc);
 void PushPop_instr (int opcode);
@@ -378,7 +384,7 @@ ParseIdent (enum flag interpret)
   int id;
 
   if ((id = SearchId ()) == -1 && interpret == ON) {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 10);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_UNKNOWN_IDENT);
   } else
     {
       switch (id)
@@ -482,14 +488,14 @@ DeclGlobalIdent (void)
 	DeclSymGlobal (ident, 0);
       else
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 	  return;
 	}
     }
   while (GetSym () == comma);
 
   if (sym != newline)
-    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 }
 
 
@@ -504,7 +510,7 @@ DeclGlobalLibIdent (void)
     }
   else
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
       return;
     }
 }
@@ -525,14 +531,14 @@ DeclExternIdent (void)
 	DeclSymExtern (ident, 0);	/* Define symbol as extern */
       else
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 	  return;
 	}
     }
   while (GetSym () == comma);
 
   if (sym != newline)
-    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 }
 
 
@@ -548,14 +554,14 @@ DeclLibIdent (void)
         }
         else
         {
-            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
             return;
         }
     }
     while (GetSym () == comma);
 
     if (sym != newline)
-        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+        ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 }
 
 
@@ -589,7 +595,7 @@ HALT (void)
 {
   if ( (cpu_type & CPU_RABBIT) )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
 
@@ -708,7 +714,7 @@ IND (void)
 {
   if ( (cpu_type & CPU_RABBIT) )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
 
@@ -724,7 +730,7 @@ INDR (void)
 {
   if ( (cpu_type & CPU_RABBIT) )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
 
@@ -740,7 +746,7 @@ INI (void)
 {
   if ( (cpu_type & CPU_RABBIT) )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
   *codeptr++ = 237;
@@ -755,7 +761,7 @@ INIR (void)
 {
   if ( (cpu_type & CPU_RABBIT) )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
 
@@ -771,7 +777,7 @@ OUTI (void)
 {
   if ( (cpu_type & CPU_RABBIT) )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
 
@@ -787,7 +793,7 @@ OUTD (void)
 {
   if ( (cpu_type & CPU_RABBIT) )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
 
@@ -803,7 +809,7 @@ OTIR (void)
 {
   if ( (cpu_type & CPU_RABBIT) )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
 
@@ -819,7 +825,7 @@ OTDR (void)
 {
   if ( (cpu_type & CPU_RABBIT) )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
 
@@ -984,7 +990,7 @@ SLL (void)
 {
   if ( (cpu_type & CPU_RABBIT) )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
   RotShift_instr (6);
@@ -1086,7 +1092,7 @@ RETN (void)
 {
   if ( (cpu_type & CPU_RABBIT) )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
   *codeptr++ = 237;
@@ -1177,7 +1183,7 @@ DI (void)
 {
   if ( (cpu_type & CPU_RABBIT) )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
 
@@ -1192,7 +1198,7 @@ EI (void)
 {
   if ( (cpu_type & CPU_RABBIT) )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
 
@@ -1207,7 +1213,7 @@ DAA (void)
 {
   if ( (cpu_type & CPU_RABBIT) )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
 

@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.1 2011-07-11 15:40:46 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.2 2011-07-12 22:47:59 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.1  2011-07-11 15:40:46  pauloscustodio
+/* Revision 1.2  2011-07-12 22:47:59  pauloscustodio
+/* - Moved all error variables and error reporting code to a separate module errors.c,
+/*   replaced all extern declarations of these variables by include errors.h,
+/*   created symbolic constants for error codes.
+/* - Added test scripts for error messages.
+/*
+/* Revision 1.1  2011/07/11 15:40:46  pauloscustodio
 /* Moved all option variables and option handling code to a separate module options.c
 /*
 /* */
@@ -26,6 +32,7 @@ Copyright (C) Paulo Custodio, 2011
 #include "z80asm.h"
 #include "options.h"
 #include "symbols.h"
+#include "errors.h"
 
 /* global option variables */
 enum flag smallc_source;
@@ -54,7 +61,7 @@ char binfilename[64];		/* -o explicit filename buffer */
 *   ResetOptions
 *	Reset globals to defaults
 *----------------------------------------------------------------------------*/
-void ResetOptions() 
+void ResetOptions (void) 
 {
     smallc_source   = OFF;
     ti83plus	    = OFF;
@@ -253,7 +260,7 @@ void SetAsmFlag (char *flagid)
 
 	strcpy (ident, (flagid + 1));	/* copy argument string */
 	if (!isalpha (ident[0])) {
-	    ReportError (NULL, 0, 11);	/* symbol must begin with alpha */
+	    ReportError (NULL, 0, ERR_ILLEGAL_IDENT);	/* symbol must begin with alpha */
 	    return;
 	}
 	i = 0;
@@ -261,7 +268,7 @@ void SetAsmFlag (char *flagid)
 	    if (strchr (separators, ident[i]) == NULL) {
 		if (!isalnum (ident[i])) {
 		    if (ident[i] != '_') {
-			ReportError (NULL, 0, 11);	/* illegal char in identifier */
+			ReportError (NULL, 0, ERR_ILLEGAL_IDENT);	/* illegal char in identifier */
 			return;
 		    }
 		    else {
@@ -273,13 +280,12 @@ void SetAsmFlag (char *flagid)
 		}
 	    }
 	    else {
-		ReportError (NULL, 0, 11);		/* illegal char in identifier */
+		ReportError (NULL, 0, ERR_ILLEGAL_IDENT);		/* illegal char in identifier */
 		return;
 	    }
 	    ++i;
 	}
 	DefineDefSym (ident, 1, 0, &staticroot);
-	return;                                       /* BUG_0003 was falling through */
     }
 
     else if (strcmp (flagid, "h") == 0) {
@@ -289,7 +295,7 @@ void SetAsmFlag (char *flagid)
 
     else {
 	/* BUG_0003 was missing Illegal Option error */
-	ReportError (NULL, 0, 9);                   /* Illegal option */
+	ReportError (NULL, 0, ERR_ILLEGAL_OPTION);
     }
 }
 

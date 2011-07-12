@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.8 2011-07-11 16:21:12 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.9 2011-07-12 22:47:59 pauloscustodio Exp $ */
 /* $Log: ldinstr.c,v $
-/* Revision 1.8  2011-07-11 16:21:12  pauloscustodio
+/* Revision 1.9  2011-07-12 22:47:59  pauloscustodio
+/* - Moved all error variables and error reporting code to a separate module errors.c,
+/*   replaced all extern declarations of these variables by include errors.h,
+/*   created symbolic constants for error codes.
+/* - Added test scripts for error messages.
+/*
+/* Revision 1.8  2011/07/11 16:21:12  pauloscustodio
 /* Removed references to dead variable 'relocfile'.
 /*
 /* Revision 1.7  2011/07/09 18:25:35  pauloscustodio
@@ -77,15 +83,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* Updated in $/Z80asm */
 /* SourceSafe Version History Comment Block added. */
 
-#include    <stdio.h>
-#include    "config.h"
-#include    "z80asm.h"
-#include    "symbol.h"
-
+#include <stdio.h>
+#include "config.h"
+#include "z80asm.h"
+#include "symbol.h"
+#include "errors.h"
 
 /* external functions */
 enum symbols GetSym (void);
-void ReportError (char *filename, int linenr, int errnum);
 void RemovePfixlist (struct expr *pfixexpr);
 int ExprUnsigned8 (int listoffset);
 int ExprSigned8 (int listoffset);
@@ -142,10 +147,10 @@ LD (void)
                   ++PC;
                 }
               else
-                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
             }
           else
-            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
           break;
 
         case 1:
@@ -158,10 +163,10 @@ LD (void)
                   ++PC;
                 }
               else
-                ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
             }
           else
-            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
           break;
 
         case 7:
@@ -177,7 +182,7 @@ LD (void)
         break;
 
       case 6:
-        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);	/* LD F,? */
+        ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);	/* LD F,? */
         break;
 
       case 8:
@@ -191,10 +196,10 @@ LD (void)
                 PC += 2;
               }
             else
-              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
           }
         else
-          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
         break;
 
       case 9:
@@ -208,10 +213,10 @@ LD (void)
                 PC += 2;
               }
             else
-              ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+              ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
           }
         else
-          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
         break;
 
       default:
@@ -229,7 +234,7 @@ LD (void)
                         if ( (cpu_type & CPU_RABBIT) )
 
                           {
-                            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
                             return;
                           }
                         *codeptr++ = 221;	/* LD IXl,n or LD IXh,n */
@@ -239,7 +244,7 @@ LD (void)
                       {
                         if ( (cpu_type & CPU_RABBIT) )
                           {
-                            ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
                             return;
                           }
                         *codeptr++ = 253;	/* LD  IYl,n or LD  IYh,n */
@@ -254,7 +259,7 @@ LD (void)
                 if (sourcereg == 6)
                   {
                     /* LD x, F */
-                    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
                     return;
                   }
                 if ((sourcereg == 8) && (destreg == 7))
@@ -275,7 +280,7 @@ LD (void)
                   {		/* IXl or IXh */
                     if ( (cpu_type & CPU_RABBIT) )
                       {
-                        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                        ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
                         return;
                       }
                     *codeptr++ = 221;
@@ -285,7 +290,7 @@ LD (void)
                   {		/* IYl or IYh */
                     if ( (cpu_type & CPU_RABBIT) )
                       {
-                        ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+                        ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
                         return;
                       }
                     *codeptr++ = 253;
@@ -299,7 +304,7 @@ LD (void)
               }
           }
         else
-          ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
         break;
       }
 }
@@ -321,7 +326,7 @@ LD_HL8bit_indrct (void)
 	case 6:
 	case 8:
 	case 9:
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
 	  break;
 
 	case -1:		/* LD  (HL),n  */
@@ -337,7 +342,7 @@ LD_HL8bit_indrct (void)
 	}
     }
   else
-    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 }
 
 
@@ -362,7 +367,7 @@ LD_index8bit_indrct (int destreg)
     return;			/* IX/IY offset expression */
   if (sym != rparen)
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);	/* ')' wasn't found in line */
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);	/* ')' wasn't found in line */
       return;
     }
   if (GetSym () == comma)
@@ -373,7 +378,7 @@ LD_index8bit_indrct (int destreg)
 	case 6:
 	case 8:
 	case 9:
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
 	  break;
 
 	case -1:
@@ -388,7 +393,7 @@ LD_index8bit_indrct (int destreg)
 	}			/* end switch */
     }
   else
-    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 }
 
 
@@ -426,7 +431,7 @@ LD_r_8bit_indrct (int destreg)
 	  PC += 3;
 	}
       else
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       break;
 
     case 0:
@@ -436,7 +441,7 @@ LD_r_8bit_indrct (int destreg)
 	  ++PC;
 	}
       else
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       break;
 
     case 1:
@@ -446,11 +451,11 @@ LD_r_8bit_indrct (int destreg)
 	  ++PC;
 	}
       else
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       break;
 
     default:
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       break;
     }
 }
@@ -470,7 +475,7 @@ LD_address_indrct (long exprptr)
 
   if (sym != rparen)
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);	/* Right bracket missing! */
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);	/* Right bracket missing! */
       return;
     }
   if (GetSym () == comma)
@@ -513,19 +518,19 @@ LD_address_indrct (long exprptr)
 	    }
 	  else
 	    {
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
 	      return;
 	    }
 	  break;
 
 	default:
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
 	  return;
 	}
     }
   else
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
       return;
     }
 
@@ -550,7 +555,7 @@ LD_16bit_reg (void)
 	  switch (destreg)
 	    {
 	    case 4:
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
 	      return;
 
 	    case 2:
@@ -589,7 +594,7 @@ LD_16bit_reg (void)
 	    switch (destreg)
 	      {
 	      case 4:
-		ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+		ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
 		return;
 
 	      case 5:
@@ -621,7 +626,7 @@ LD_16bit_reg (void)
 		++PC;
 	      }
 	    else
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
 	    break;
 
 	  case 5:		/* LD  SP,IX    LD  SP,IY  */
@@ -636,17 +641,17 @@ LD_16bit_reg (void)
 		PC += 2;
 	      }
 	    else
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
 	    break;
 
 	  default:
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 11);
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
 	    break;
 	  }
     else
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
   else
-    ReportError (CURRENTFILE->fname, CURRENTFILE->line, 1);
+    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 }
 
 /*

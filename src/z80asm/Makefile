@@ -12,9 +12,15 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.14 2011-07-11 15:54:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.15 2011-07-12 22:47:59 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.14  2011-07-11 15:54:37  pauloscustodio
+# Revision 1.15  2011-07-12 22:47:59  pauloscustodio
+# - Moved all error variables and error reporting code to a separate module errors.c,
+#   replaced all extern declarations of these variables by include errors.h,
+#   created symbolic constants for error codes.
+# - Added test scripts for error messages.
+#
+# Revision 1.14  2011/07/11 15:54:37  pauloscustodio
 # new module options.o
 #
 # Revision 1.13  2011/07/09 18:25:35  pauloscustodio
@@ -82,7 +88,8 @@ OBJS = 	asmdrctv.o 	\
 	z80asm.o	\
 	z80instr.o	\
 	z80pass.o	\
-	options.o
+	options.o	\
+	errors.o
 
 all: z80asm$(EXESUFFIX)
 
@@ -111,15 +118,24 @@ depend:
 # DO NOT DELETE
 
 asmdrctv.o: config.h ../config.h options.h symbol.h avltree.h z80asm.h
+asmdrctv.o: errors.h
 avltree.o: avltree.h
-exprprsr.o: config.h ../config.h symbol.h avltree.h options.h
+exprprsr.o: config.h ../config.h symbol.h avltree.h options.h errors.h
 hist.o: hist.h
-ldinstr.o: config.h ../config.h z80asm.h avltree.h symbol.h
+ldinstr.o: config.h ../config.h z80asm.h avltree.h symbol.h errors.h
 modlink.o: config.h ../config.h options.h symbol.h avltree.h z80asm.h
+modlink.o: errors.h
 prsident.o: config.h ../config.h z80asm.h avltree.h symbol.h options.h
+prsident.o: errors.h
 prsline.o: config.h ../config.h z80asm.h avltree.h symbol.h options.h
+prsline.o: errors.h
 symbols.o: config.h ../config.h symbol.h avltree.h symbols.h options.h
+symbols.o: errors.h
 z80asm.o: config.h ../config.h symbol.h avltree.h z80asm.h hist.h options.h
+z80asm.o: errors.h
 z80instr.o: config.h ../config.h z80asm.h avltree.h symbol.h options.h
+z80instr.o: errors.h
 z80pass.o: config.h ../config.h symbol.h avltree.h hist.h options.h z80asm.h
-options.o: z80asm.h avltree.h options.h symbol.h symbols.h
+z80pass.o: errors.h
+options.o: z80asm.h avltree.h options.h symbol.h symbols.h errors.h
+errors.o: errors.h symbol.h avltree.h options.h z80asm.h config.h ../config.h

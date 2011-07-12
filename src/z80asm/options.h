@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.1 2011-07-11 15:40:46 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.2 2011-07-12 22:47:59 pauloscustodio Exp $ */
 /* $Log: options.h,v $
-/* Revision 1.1  2011-07-11 15:40:46  pauloscustodio
+/* Revision 1.2  2011-07-12 22:47:59  pauloscustodio
+/* - Moved all error variables and error reporting code to a separate module errors.c,
+/*   replaced all extern declarations of these variables by include errors.h,
+/*   created symbolic constants for error codes.
+/* - Added test scripts for error messages.
+/*
+/* Revision 1.1  2011/07/11 15:40:46  pauloscustodio
 /* Moved all option variables and option handling code to a separate module options.c
 /*
 /* */
@@ -50,7 +56,7 @@ extern enum flag expl_binflnm;
 extern char binfilename[];		/* -o explicit filename buffer */
 
 /* reset default options */
-extern void ResetOptions();
+extern void ResetOptions (void);
 
 /* parse one command line option */
 extern void SetAsmFlag (char *flagid);

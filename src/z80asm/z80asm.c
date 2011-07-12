@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.29 2011-07-11 16:16:44 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.30 2011-07-12 22:47:59 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.29  2011-07-11 16:16:44  pauloscustodio
+/* Revision 1.30  2011-07-12 22:47:59  pauloscustodio
+/* - Moved all error variables and error reporting code to a separate module errors.c,
+/*   replaced all extern declarations of these variables by include errors.h,
+/*   created symbolic constants for error codes.
+/* - Added test scripts for error messages.
+/*
+/* Revision 1.29  2011/07/11 16:16:44  pauloscustodio
 /* Moved all option variables and option handling code to a separate module options.c,
 /* replaced all extern declarations of these variables by include options.h.
 /* Created declarations in z80asm.h of objects defined in z80asm.c.
@@ -275,6 +281,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "z80asm.h"
 #include "hist.h"
 #include "options.h"
+#include "errors.h"
 
 /* external functions */
 char *AllocIdentifier (size_t len);
@@ -302,8 +309,6 @@ symbol *CreateSymbol (char *identifier, long value, unsigned char symboltype, st
 
 /* local functions */
 void prompt (void);
-void ReportError (char *filename, int linenr, int errnum);
-void ReportIOError (char *filename);
 void WriteHeader (void);
 void ReleaseFile (struct sourcefile *srcfile);
 void ReleaseLibraries (void);
@@ -333,41 +338,6 @@ char   **include_dir = NULL;
 int      lib_dir_num = 0;
 char   **lib_dir = NULL;
 
-char *errmsg[] =
-{"File open/read error",	/* 0  */
- "Syntax error",		/* 1  */
- "Symbol not defined",		/* 2  */
- "Not enough memory",		/* 3  */
- "Integer out of range",	/* 4  */
- "Syntax error in expression",	/* 5  */
- "Right bracket missing",	/* 6  */
- "Out of range",		/* 7  */
- "Source filename missing",	/* 8  */
- "Illegal option",		/* 9  */
- "Unknown identifier",		/* 10 */
- "Illegal identifier",		/* 11 */
- "Max. code size of %ld bytes reached",	/* 12 */
- "errors occurred during assembly",	/* 13 */
- "Symbol already defined",	/* 14 */
- "Module name already defined",	/* 15 */
- "Module name not defined",	/* 16 */
- "Symbol already declared local",	/* 17 */
- "Symbol already declared global",	/* 18 */
- "Symbol already declared external",	/* 19 */
- "No command line arguments",	/* 20 */
- "Illegal source filename",	/* 21 */
- "Symbol declared global in another module",	/* 22 */
- "Re-declaration not allowed",	/* 23 */
- "ORG already defined",		/* 24 */
- "Relative jump address must be local",		/* 25 */
- "Not an object file",		/* 26 */
- "Reserved name",		/* 27 */
- "Couldn't open library file",	/* 28 */
- "Not a library file",		/* 29 */
- "Environment variable not defined",	/* 30 */
- "Cannot include file recursively",	/* 31 */
-};
-
 /* BUG_0001 array ssym[] needs to have one element per character in 
  * separators, plus one newline to match the final '\0' just in case it is
  * not caught before */
@@ -378,10 +348,10 @@ enum symbols sym, ssym[] =
 char separators[] = " &\"\';,.({[]})+-*/%^=~|:<>!#:";
 
 enum flag pass1, writeline;
-enum flag ASMERROR, EOL, library, createlibrary;
+enum flag EOL, library, createlibrary;
 
 int cpu_type = CPU_Z80;
-int ASSEMBLE_ERROR, ERRORS, TOTALERRORS, PAGENR, LINENR;
+int PAGENR, LINENR;
 long TOTALLINES;
 int sourcefile_open;
 unsigned char PAGELEN;
@@ -471,7 +441,7 @@ AssembleSourceFile (void)
   copy (staticroot, &CURRENTMODULE->localroot, (int (*)(void*,void*)) cmpidstr, (void *(*)(void*)) createsym);
   if (DefineDefSym (ASSEMBLERPC, PC, 0, &globalroot) == 0)
     {				/* Create standard 'ASMPC' identifier */
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       return 0;
     }
 
@@ -509,7 +479,7 @@ AssembleSourceFile (void)
 	dotptr++;
       }
     DeclModuleName();
-    /* ReportError (CURRENTFILE->fname, 0, 16); */
+    /* ReportError (CURRENTFILE->fname, 0, ERR_MODULE_NOT_DEFINED); */
   }
     
 
@@ -614,7 +584,7 @@ GetModuleSize (void)
 
       if (strcmp (fheader, Z80objhdr) != 0)
 	{			/* compare header of file */
-	  ReportError (objfilename, 0, 26);	/* not an object file */
+	  ReportError (objfilename, 0, ERR_NOT_OBJ_FILE);	/* not an object file */
 	  fclose (objfile);
 	  objfile = NULL;
 	  return -1;
@@ -628,7 +598,7 @@ GetModuleSize (void)
       line[size] = '\0';
       if ((CURRENTMODULE->mname = AllocIdentifier (size + 1)) == NULL)
 	{
-	  ReportError (NULL, 0, 3);
+	  ReportError (NULL, 0, ERR_NO_MEMORY);
 	  return -1;
 	}
       else
@@ -643,7 +613,7 @@ GetModuleSize (void)
 	  highbyte = fgetc (objfile);
 	  size = lowbyte + highbyte * 256;
 	  if (CURRENTMODULE->startoffset + size > MAXCODESIZE)
-	    ReportError (objfilename, 0, 12);
+	    ReportError (objfilename, 0, ERR_MAX_CODESIZE);
 	  else
 	    CODESIZE += size;
 	}
@@ -675,7 +645,7 @@ CreateLibfile (char *filename)
             }
           else
             {
-              ReportError (NULL, 0, 3);
+              ReportError (NULL, 0, ERR_NO_MEMORY);
               return;
             }
         }
@@ -685,7 +655,7 @@ CreateLibfile (char *filename)
             strcpy (libfilename, filename);
           else
             {
-              ReportError (NULL, 0, 3);
+              ReportError (NULL, 0, ERR_NO_MEMORY);
               return;
             }
         }
@@ -699,13 +669,13 @@ CreateLibfile (char *filename)
             strcpy (libfilename, filename);
           else
             {
-              ReportError (NULL, 0, 3);
+              ReportError (NULL, 0, ERR_NO_MEMORY);
               return;
             }
         }
       else
         {
-          ReportError (NULL, 0, 30);
+          ReportError (NULL, 0, ERR_ENV_NOT_DEFINED);
           return;
         }
     }
@@ -714,7 +684,7 @@ CreateLibfile (char *filename)
     {				/* create library as BINARY file */
       free (libfilename);
       libfilename = NULL;
-      ReportError (libfilename, 0, 28);
+      ReportError (libfilename, 0, ERR_OPEN_LIB);
     }
   else
     {
@@ -736,7 +706,7 @@ GetLibfile (char *filename)
 
   if ((newlib = NewLibrary ()) == NULL)
     {
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       return;
     }
 
@@ -758,7 +728,7 @@ GetLibfile (char *filename)
         }
       else
         {
-          ReportError (NULL, 0, 3);
+          ReportError (NULL, 0, ERR_NO_MEMORY);
           return;
         }
     }
@@ -772,13 +742,13 @@ GetLibfile (char *filename)
             strcpy (f, filename);
           else
             {
-              ReportError (NULL, 0, 3);
+              ReportError (NULL, 0, ERR_NO_MEMORY);
               return;
             }
         }
       else
         {
-          ReportError (NULL, 0, 30);
+          ReportError (NULL, 0, ERR_ENV_NOT_DEFINED);
           return;
         }
     }
@@ -786,7 +756,7 @@ GetLibfile (char *filename)
   newlib->libfilename = f;
   if ((z80asmfile = fopen (f, "rb")) == NULL)
     {				/* Does file exist? */
-      ReportError (f, 0, 28);
+      ReportError (f, 0, ERR_OPEN_LIB);
       return;
     }
   else
@@ -796,7 +766,7 @@ GetLibfile (char *filename)
     }
 
   if (strcmp (fheader, Z80libhdr) != 0)		/* compare header of file */
-    ReportError (f, 0, 29);	/* not a library file */
+    ReportError (f, 0, ERR_NOT_LIB_FILE);	/* not a library file */
   else
     library = ON;
 
@@ -1009,82 +979,6 @@ ReleaseOwnedFile (struct usedfile *ownedfile)
 
 
 void 
-ReportError (char *filename, int lineno, int errnum)
-{
-  char	errstr[256], errflnmstr[128], errmodstr[128], errlinestr[64];
-  
-
-  ASSEMBLE_ERROR = errnum;	/* set the global error variable for general error trapping */
-  ASMERROR = ON;
- 
-  errflnmstr[0] = '\0';
-  errmodstr[0] = '\0'; 
-  errlinestr[0] = '\0';
-  errstr[0] = '\0';
-
-
-  if (clinemode && clineno ) lineno=clineno;
-
-  if (filename != NULL)
-    sprintf (errflnmstr,"File '%s', ", filename);
-
-  if (CURRENTMODULE != NULL)
-    if ( CURRENTMODULE->mname != NULL )
-      sprintf(errmodstr,"Module '%s', ", CURRENTMODULE->mname);
-
-  if (lineno != 0)
-    sprintf (errlinestr, "at line %d, ", lineno);
-     
-  strcpy(errstr, errflnmstr);
-  strcat(errstr, errmodstr);
-  strcat(errstr, errlinestr);
-  strcat(errstr, errmsg[errnum]);
- 
-  /* CH_0001 : Assembly error messages should appear on stderr */  
-  switch(errnum)
-    {
-      case 12:
-          fprintf (stderr, errstr, MAXCODESIZE);
-          fputc ('\n',stderr);
-	  if (errfile != NULL) { 
-          fprintf (errfile, errstr, MAXCODESIZE);
-          fputc ('\n',errfile);
-        }
-        break;
-
-      case 13:
-        fprintf (stderr, "%d %s\n", TOTALERRORS, errmsg[errnum]);
-        break;
-
-      default:
-          fprintf (stderr, "%s\n", errstr);
-	  if (errfile != NULL) 
-	  fprintf (errfile, "%s\n", errstr);
-     }
-
-  ++ERRORS;
-  ++TOTALERRORS;
-}
-
-
-void 
-ReportIOError (char *filename)
-{
-  ASSEMBLE_ERROR = 0;
-  ASMERROR = ON;
-
-  if (CURRENTMODULE != NULL)
-    if ( CURRENTMODULE->mname != NULL )
-       fprintf(stderr,"Module '%s', ", CURRENTMODULE->mname);
-  fprintf (stderr,"file '%s' couldn't be opened or created\n", filename);
-
-  ++ERRORS;
-  ++TOTALERRORS;
-}
-
-
-
-void 
 display_options (void)
 {
   if (datestamp == ON)
@@ -1127,11 +1021,11 @@ main (int argc, char *argv[])
   FILE  *includes[10];   /* 10 levels of inclusion should be enough */
 
   writeline = ON;
-  ASMERROR = OFF;
   library = createlibrary = OFF;
   cpu_type = CPU_Z80;
 
   ResetOptions();
+  ResetErrors();
 
   libfilename = NULL;
   modsrcfile = NULL;
@@ -1160,7 +1054,7 @@ main (int argc, char *argv[])
   codearea = (unsigned char *) calloc (MAXCODESIZE, sizeof (char));	/* Allocate Memory for Z80 machine code */
   if (codearea == NULL)
     {
-      ReportError (NULL, 0, 3);
+      ReportError (NULL, 0, ERR_NO_MEMORY);
       exit (1);
     }
   CODESIZE = 0;
@@ -1171,7 +1065,7 @@ main (int argc, char *argv[])
   
   if ((CURRENTMODULE = NewModule ()) == NULL)
     {				/* then create a dummy module */
-      ReportError (NULL, 0, 3);	/* this   is needed during command line parsing */
+      ReportError (NULL, 0, ERR_NO_MEMORY);	/* this   is needed during command line parsing */
       exit (1);
     }
 
@@ -1209,7 +1103,7 @@ main (int argc, char *argv[])
 
   if (!argc && modsrcfile == NULL)
     {
-      ReportError (NULL, 0, 8);
+      ReportError (NULL, 0, ERR_NO_SRC_FILE);
       exit (1);
     }
   COLUMN_WIDTH = 4 * TAB_DIST;	/* define column width   for output files */
@@ -1228,7 +1122,7 @@ main (int argc, char *argv[])
 
       codeptr = codearea;	/* Pointer (PC)     to store z80 instruction */
       ERRORS = 0;
-      ASSEMBLE_ERROR = -1;	/* General error flag */
+      ASSEMBLE_ERROR = ERR_NO_ERR;	/* General error flag */
 
       if (modsrcfile == NULL)
         {
@@ -1242,7 +1136,7 @@ main (int argc, char *argv[])
                 }
               else
                 {
-                  ReportError (NULL, 0, 21);	/* Illegal source file name */
+                  ReportError (NULL, 0, ERR_ILLEGAL_SRC_FILE);	/* Illegal source file name */
                   break;
                 }
             }
@@ -1293,7 +1187,7 @@ main (int argc, char *argv[])
         }
       else
         {
-          ReportError (NULL, 0, 3);
+          ReportError (NULL, 0, ERR_NO_MEMORY);
           break;
         }
       if ((objfilename = AllocIdentifier (strlen (srcfilename) + 1)) != NULL)
@@ -1304,7 +1198,7 @@ main (int argc, char *argv[])
         }
       else
         {
-          ReportError (NULL, 0, 3);
+          ReportError (NULL, 0, ERR_NO_MEMORY);
           break;		/* No more room     */
         }
 
@@ -1320,7 +1214,7 @@ main (int argc, char *argv[])
         }
       else
         {
-          ReportError (NULL, 0, 3);
+          ReportError (NULL, 0, ERR_NO_MEMORY);
           break;		/* No more room     */
         }
 
@@ -1332,13 +1226,13 @@ main (int argc, char *argv[])
         }
       else
         {
-          ReportError (NULL, 0, 3);
+          ReportError (NULL, 0, ERR_NO_MEMORY);
           break;		/* No more room     */
         }
 
       if ((CURRENTMODULE = NewModule ()) == NULL)
         {			/* Create module data structures for new file */
-          ReportError (NULL, 0, 3);
+          ReportError (NULL, 0, ERR_NO_MEMORY);
           break;
         }
       if ((CURRENTFILE = Newfile (NULL, srcfilename)) == NULL)
@@ -1412,7 +1306,7 @@ main (int argc, char *argv[])
 #endif
 
   if (ASMERROR)
-    ReportError (NULL, 0, 13);
+    ReportError (NULL, 0, ERR_TOTALERRORS);
 
   /* <djm>, if errors, then we really want to return an error number
    * surely?
