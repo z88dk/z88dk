@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/error-04.t,v 1.2 2011-07-14 01:32:09 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/error-04.t,v 1.3 2011-07-14 23:49:50 pauloscustodio Exp $
 # $Log: error-04.t,v $
-# Revision 1.2  2011-07-14 01:32:09  pauloscustodio
+# Revision 1.3  2011-07-14 23:49:50  pauloscustodio
+#     BUG_0001(a) : during correction of BUG_0001, new symbol colon was introduced in enum symbols,
+# 	causing expressions stored in object files to be wrong, e.g. VALUE-1 was stored as
+# 	VALUE*1. This caused problems in expression evaluation in link phase.
+#
+# Revision 1.2  2011/07/14 01:32:09  pauloscustodio
 #     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 #     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 #     CH_0003 : Error messages should be more informative
@@ -147,8 +152,8 @@ my $obj2 = obj_file(); $obj2 =~ s/\.obj$/2.obj/i;
 my $sym2 = sym_file(); $sym2 =~ s/\.sym$/2.sym/i;
 
 SKIP: {
-    diag "This test should not fail, BUG in z80asm"; 
-    skip "This test should not fail, BUG in z80asm", 1; 
+    diag "This test should not fail, BUG in z80asm?"; 
+    skip "This test should not fail, BUG in z80asm?", 1; 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = -129");
 write_file(asm_file(), 	"xref value \n ld a,value");
@@ -159,8 +164,8 @@ t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "",
 };
 
 SKIP: {
-    diag "This test should not fail, BUG in z80asm"; 
-    skip "This test should not fail, BUG in z80asm", 1; 
+    diag "This test should not fail, BUG in z80asm?"; 
+    skip "This test should not fail, BUG in z80asm?", 1; 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 0");
 write_file(asm_file(), 	"xref value \n ld a,value-129");
@@ -176,15 +181,11 @@ write_file(asm_file(), 	"xref value \n ld a,value");
 t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "", "", 0);
 t_binary(read_file(bin_file(), binary => ':raw'), "\x3E\x80");
 
-SKIP: {
-    diag "This test should not fail, BUG in z80asm"; 
-    skip "This test should not fail, BUG in z80asm", 1; 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 0");
 write_file(asm_file(), 	"xref value \n ld a,value-128");
 t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "", "", 0);
 t_binary(read_file(bin_file(), binary => ':raw'), "\x3E\x80");
-};
 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 255");
@@ -192,19 +193,15 @@ write_file(asm_file(), 	"xref value \n ld a,value");
 t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "", "", 0);
 t_binary(read_file(bin_file(), binary => ':raw'), "\x3E\xFF");
 
-SKIP: {
-    diag "This test should not fail, BUG in z80asm"; 
-    skip "This test should not fail, BUG in z80asm", 1; 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 0");
 write_file(asm_file(), 	"xref value \n ld a,value+255");
 t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "", "", 0);
 t_binary(read_file(bin_file(), binary => ':raw'), "\x3E\xFF");
-};
 
 SKIP: {
-    diag "This test should not fail, BUG in z80asm"; 
-    skip "This test should not fail, BUG in z80asm", 1; 
+    diag "This test should not fail, BUG in z80asm?"; 
+    skip "This test should not fail, BUG in z80asm?", 1; 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 256");
 write_file(asm_file(), 	"xref value \n ld a,value");
@@ -215,8 +212,8 @@ t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "",
 };
 
 SKIP: {
-    diag "This test should not fail, BUG in z80asm"; 
-    skip "This test should not fail, BUG in z80asm", 1; 
+    diag "This test should not fail, BUG in z80asm?"; 
+    skip "This test should not fail, BUG in z80asm?", 1; 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 0");
 write_file(asm_file(), 	"xref value \n ld a,value+256");
@@ -234,9 +231,6 @@ t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "",
 		"1 errors occurred during assembly\n", 
 		1);
 
-SKIP: {
-    diag "This test should not fail, BUG in z80asm"; 
-    skip "This test should not fail, BUG in z80asm", 1; 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 0");
 write_file(asm_file(), 	"xref value \n ld bc,value-32769");
@@ -244,7 +238,6 @@ t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "",
 		"Error: File 'test.asm', Module 'TEST', Integer '-32769' out of range\n".
 		"1 errors occurred during assembly\n", 
 		1);
-};
 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = -32768");
@@ -252,15 +245,11 @@ write_file(asm_file(), 	"xref value \n ld bc,value");
 t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "", "", 0);
 t_binary(read_file(bin_file(), binary => ':raw'), "\x01\x00\x80");
 
-SKIP: {
-    diag "This test should not fail, BUG in z80asm"; 
-    skip "This test should not fail, BUG in z80asm", 1; 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 0");
 write_file(asm_file(), 	"xref value \n ld bc,value-32768");
 t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "", "", 0);
 t_binary(read_file(bin_file(), binary => ':raw'), "\x01\x00\x80");
-};
 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 65535");
@@ -268,15 +257,11 @@ write_file(asm_file(), 	"xref value \n ld bc,value");
 t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "", "", 0);
 t_binary(read_file(bin_file(), binary => ':raw'), "\x01\xFF\xFF");
 
-SKIP: {
-    diag "This test should not fail, BUG in z80asm"; 
-    skip "This test should not fail, BUG in z80asm", 1; 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 0");
 write_file(asm_file(), 	"xref value \n ld bc,value+65535");
 t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "", "", 0);
 t_binary(read_file(bin_file(), binary => ':raw'), "\x01\xFF\xFF");
-};
 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 65536");
@@ -286,9 +271,6 @@ t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "",
 		"1 errors occurred during assembly\n", 
 		1);
 
-SKIP: {
-    diag "This test should not fail, BUG in z80asm"; 
-    skip "This test should not fail, BUG in z80asm", 1; 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 0");
 write_file(asm_file(), 	"xref value \n ld bc,value+65536");
@@ -296,7 +278,6 @@ t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "",
 		"Error: File 'test.asm', Module 'TEST', Integer '65536' out of range\n".
 		"1 errors occurred during assembly\n", 
 		1);
-}
 
 # JR
 t_z80asm_error("jr asmpc+2-129", "Error: File 'test.asm', at line 1, Integer '-129' out of range");

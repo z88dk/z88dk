@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.10 2011-07-11 16:14:47 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.11 2011-07-14 23:49:50 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.10  2011-07-11 16:14:47  pauloscustodio
+/* Revision 1.11  2011-07-14 23:49:50  pauloscustodio
+/*     BUG_0001(a) : during correction of BUG_0001, new symbol colon was introduced in enum symbols,
+/* 	causing expressions stored in object files to be wrong, e.g. VALUE-1 was stored as
+/* 	VALUE*1. This caused problems in expression evaluation in link phase.
+/*
+/* Revision 1.10  2011/07/11 16:14:47  pauloscustodio
 /* Protect against multiple inclusion
 /*
 /* Revision 1.9  2011/07/09 18:25:35  pauloscustodio
@@ -84,11 +89,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 enum flag           { OFF, ON };
 
 /* BUG_0001 - add colon symbol */
-enum symbols        { space, strconq, dquote, squote, colon, semicolon, comma, fullstop, lparen, lcurly, lsquare, rsquare, rcurly, rparen,
+/* BUG_0001(a) : during correction of BUG_0001, new symbol colon was introduced in enum symbols,
+	causing expressions stored in object files to be wrong, e.g. VALUE-1 was stored as
+	VALUE*1. This caused problems in expression evaluation in link phase. */
+enum symbols        { space, strconq, dquote, squote, semicolon, comma, fullstop, lparen, lcurly, lsquare, rsquare, rcurly, rparen,
                       plus, minus, multiply, divi, mod, power, assign, bin_and, bin_or, bin_xor, less,
                       greater, log_not, constexpr, newline, lessequal, greatequal, notequal, name, number,
                       decmconst, hexconst, binconst, charconst, negated, nil,
-                      ifstatm, elsestatm, endifstatm, label
+                      ifstatm, elsestatm, endifstatm, label, colon
                     };
 
 struct pageref      { struct pageref     *nextref;          /* pointer to next page reference of symbol */
