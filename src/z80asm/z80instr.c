@@ -13,9 +13,17 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.20 2011-07-12 22:47:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.21 2011-07-14 01:32:08 pauloscustodio Exp $ */
 /* $Log: z80instr.c,v $
-/* Revision 1.20  2011-07-12 22:47:59  pauloscustodio
+/* Revision 1.21  2011-07-14 01:32:08  pauloscustodio
+/*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
+/*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+/*     CH_0003 : Error messages should be more informative
+/*         - Added printf-args to error messages, added "Error:" prefix.
+/*     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+/*         - Raise ERR_UNBALANCED_PAREN instead
+/*
+/* Revision 1.20  2011/07/12 22:47:59  pauloscustodio
 /* - Moved all error variables and error reporting code to a separate module errors.c,
 /*   replaced all extern declarations of these variables by include errors.h,
 /*   created symbolic constants for error codes.
@@ -556,7 +564,7 @@ RST (void)
                 }
             }
           else
-            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
         }
       RemovePfixlist (postfixexpr);
     }
@@ -594,7 +602,7 @@ CALLOZ (void)
 	      PC += 2;
 	    }
 	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
 	}
       RemovePfixlist (postfixexpr);	/* remove linked list, because expr. was evaluated */
     }
@@ -627,7 +635,7 @@ CALLPKG (void)
 	      PC += 2;
 	    }
 	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
 	}
       RemovePfixlist (postfixexpr);	/* remove linked list, because expr. was evaluated */
     }
@@ -663,7 +671,7 @@ INVOKE (void)
 	      PC += 2;
 	    }
 	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
 	}
       RemovePfixlist (postfixexpr);	/* remove linked list, because expr. was evaluated */
     }
@@ -694,7 +702,7 @@ FPP (void)
 	      ++PC;
 	    }
 	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
 	}
       RemovePfixlist (postfixexpr);	/* remove linked list, because expr. was evaluated */
     }
@@ -904,7 +912,7 @@ JR (void)
           if ((constant >= -128) && (constant <= 127))
             *codeptr++ = (unsigned char)(constant);      /* opcode is stored, now store relative jump */
           else
-            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_RANGE);
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
         }
     }
 }
@@ -940,7 +948,7 @@ DJNZ (void)
           if ((constant >= -128) && (constant <= 127))
             *codeptr++ = (unsigned char)(constant);      /* opcode is stored, now store relative jump */
           else
-            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_RANGE);
+            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
         }
     }
 }
@@ -1442,7 +1450,7 @@ BitTest_instr (int opcode)
 		ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
 	    }
 	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, bitnumber);
 	}
       RemovePfixlist (postfixexpr);
     }

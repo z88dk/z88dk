@@ -13,9 +13,17 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.18 2011-07-12 22:47:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.19 2011-07-14 01:32:08 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.18  2011-07-12 22:47:59  pauloscustodio
+/* Revision 1.19  2011-07-14 01:32:08  pauloscustodio
+/*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
+/*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+/*     CH_0003 : Error messages should be more informative
+/*         - Added printf-args to error messages, added "Error:" prefix.
+/*     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+/*         - Raise ERR_UNBALANCED_PAREN instead
+/*
+/* Revision 1.18  2011/07/12 22:47:59  pauloscustodio
 /* - Moved all error variables and error reporting code to a separate module errors.c,
 /*   replaced all extern declarations of these variables by include errors.h,
 /*   created symbolic constants for error codes.
@@ -377,11 +385,10 @@ ReadExpr (long nextexpr, long endexpr)
 
                 case 'S':
                   if ((constant >= -128) && (constant <= 255))
-                    *patchptr = (char) constant;	/* opcode is stored, now store
-                                                     * relative jump */
+                    *patchptr = (char) constant;	/* opcode is stored, now store signed 8bit value */
                   else
                     {
-                      ReportError (CURRENTFILE->fname, 0, ERR_RANGE);
+                      ReportError (CURRENTFILE->fname, 0, ERR_INT_RANGE, constant);
                       WriteExprMsg ();
                     }
                   break;
@@ -394,7 +401,7 @@ ReadExpr (long nextexpr, long endexpr)
                     }
                   else
                     {
-                      ReportError (CURRENTFILE->fname, 0, ERR_RANGE);
+                      ReportError (CURRENTFILE->fname, 0, ERR_INT_RANGE, constant);
                       WriteExprMsg ();
                     }
 
@@ -431,7 +438,7 @@ ReadExpr (long nextexpr, long endexpr)
                       }
                   else
                     {
-                      ReportError (CURRENTFILE->fname, 0, ERR_RANGE);
+                      ReportError (CURRENTFILE->fname, 0, ERR_INT_RANGE, constant);
                       WriteExprMsg ();
                     }
                   break;
@@ -502,7 +509,7 @@ LinkModules (void)
 
   if ((errfile = fopen (errfilename, "w")) == NULL)
     {				/* open error file */
-      ReportIOError (errfilename);	/* couldn't open relocatable file */
+      ReportError (NULL, 0, ERR_FILE_OPEN, errfilename);	/* couldn't open relocatable file */
       free (errfilename);
       errfilename = NULL;
       return;
@@ -545,13 +552,13 @@ LinkModules (void)
         }
       else
         {
-          ReportIOError (objfilename);	/* couldn't open relocatable file */
+          ReportError (NULL, 0, ERR_FILE_OPEN, objfilename);	/* couldn't open relocatable file */
           break;
         }
 
       if (strcmp (fheader, Z80objhdr) != 0)
         {			/* compare header of file */
-          ReportError (objfilename, 0, ERR_NOT_OBJ_FILE);	/* not a object     file */
+          ReportError (NULL, 0, ERR_NOT_OBJ_FILE, objfilename);	/* not a object     file */
           fclose (z80asmfile);
           z80asmfile = NULL;
           break;
@@ -923,7 +930,7 @@ ModuleExpr (void)
         }
       else
         {
-          ReportIOError (curlink->objfilename);		/* couldn't open relocatable file */
+          ReportError (NULL, 0, ERR_FILE_OPEN, curlink->objfilename);		/* couldn't open relocatable file */
           return;
         }
 
@@ -1017,7 +1024,7 @@ CreateBinFile (void)
 	puts ("Code generation completed.");
     }
   else
-    ReportIOError (tmpstr);
+    ReportError (NULL, 0, ERR_FILE_OPEN, tmpstr);
 }
 
 
@@ -1048,7 +1055,7 @@ CreateLib (void)
 
   if ((errfile = fopen (errfilename, "w")) == NULL)
     {				/* open error file */
-      ReportIOError (errfilename);
+      ReportError (NULL, 0, ERR_FILE_OPEN, errfilename);
       free (errfilename);
       errfilename = NULL;
       return;
@@ -1094,13 +1101,13 @@ CreateLib (void)
 	     else
 	       {
 	         free (filebuffer);
-	         ReportError (CURRENTFILE->fname, 0, ERR_NOT_OBJ_FILE);
+	         ReportError (NULL, 0, ERR_NOT_OBJ_FILE, CURRENTFILE->fname);
 	         break;
 	       }
 	   }
       else
 	   {
-	     ReportError (CURRENTFILE->fname, 0, ERR_FILE_OPEN);
+	     ReportError (NULL, 0, ERR_FILE_OPEN, CURRENTFILE->fname);
 	     break;
 	   }
 
@@ -1231,7 +1238,7 @@ CreateDeffile (void)
 									   * '_def' */
       if ((deffile = fopen (globaldefname, "w")) == NULL)
 	{			/* Create DEFC file with global label declarations */
-	  ReportIOError (globaldefname);
+	  ReportError (NULL, 0, ERR_FILE_OPEN, globaldefname);
 	  globaldef = OFF;
 	}
     }
@@ -1296,7 +1303,7 @@ WriteMapFile (void)
     }
   else
     {
-      ReportIOError (mapfilename);
+      ReportError (NULL, 0, ERR_FILE_OPEN, mapfilename);
       return;
     }
 

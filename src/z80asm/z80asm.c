@@ -13,9 +13,17 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.30 2011-07-12 22:47:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.31 2011-07-14 01:32:08 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.30  2011-07-12 22:47:59  pauloscustodio
+/* Revision 1.31  2011-07-14 01:32:08  pauloscustodio
+/*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
+/*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+/*     CH_0003 : Error messages should be more informative
+/*         - Added printf-args to error messages, added "Error:" prefix.
+/*     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+/*         - Raise ERR_UNBALANCED_PAREN instead
+/*
+/* Revision 1.30  2011/07/12 22:47:59  pauloscustodio
 /* - Moved all error variables and error reporting code to a separate module errors.c,
 /*   replaced all extern declarations of these variables by include errors.h,
 /*   created symbolic constants for error codes.
@@ -408,7 +416,7 @@ AssembleSourceFile (void)
 
   if ((errfile = fopen (errfilename, "w")) == NULL)
     {				/* Create error file */
-      ReportIOError (errfilename);
+      ReportError (NULL, 0, ERR_FILE_OPEN, errfilename);
       return 0;
     }
   if (listing_CPY || symfile)
@@ -422,7 +430,7 @@ AssembleSourceFile (void)
 	}
       else
 	{
-	  ReportIOError (lstfilename);
+	  ReportError (NULL, 0, ERR_FILE_OPEN, lstfilename);
 	  return 0;
 	}
     }
@@ -433,7 +441,7 @@ AssembleSourceFile (void)
     }
   else
     {
-      ReportIOError (objfilename);
+      ReportError (NULL, 0, ERR_FILE_OPEN, objfilename);
       return 0;
     }
 
@@ -560,7 +568,7 @@ TestAsmFile (void)
     }
   if ((z80asmfile = fopen (srcfilename, "rb")) == NULL)
     {				/* Open source file */
-      ReportIOError (srcfilename);		/* Object module is not found or */
+      ReportError (NULL, 0, ERR_FILE_OPEN, srcfilename);		/* Object module is not found or */
       return -1;		/* source is has recently been updated */
     }
   sourcefile_open = 1;
@@ -584,7 +592,7 @@ GetModuleSize (void)
 
       if (strcmp (fheader, Z80objhdr) != 0)
 	{			/* compare header of file */
-	  ReportError (objfilename, 0, ERR_NOT_OBJ_FILE);	/* not an object file */
+	  ReportError (NULL, 0, ERR_NOT_OBJ_FILE, objfilename);	/* not an object file */
 	  fclose (objfile);
 	  objfile = NULL;
 	  return -1;
@@ -622,7 +630,7 @@ GetModuleSize (void)
     }
   else
     {
-      ReportIOError (objfilename);
+      ReportError (NULL, 0, ERR_FILE_OPEN, objfilename);
       return -1;
     }
 }
@@ -675,7 +683,7 @@ CreateLibfile (char *filename)
         }
       else
         {
-          ReportError (NULL, 0, ERR_ENV_NOT_DEFINED);
+          ReportError (NULL, 0, ERR_ENV_NOT_DEFINED, "Z80_STDLIB");
           return;
         }
     }
@@ -684,7 +692,7 @@ CreateLibfile (char *filename)
     {				/* create library as BINARY file */
       free (libfilename);
       libfilename = NULL;
-      ReportError (libfilename, 0, ERR_OPEN_LIB);
+      ReportError (NULL, 0, ERR_OPEN_LIB, libfilename);
     }
   else
     {
@@ -748,7 +756,7 @@ GetLibfile (char *filename)
         }
       else
         {
-          ReportError (NULL, 0, ERR_ENV_NOT_DEFINED);
+          ReportError (NULL, 0, ERR_ENV_NOT_DEFINED, "Z80_STDLIB");
           return;
         }
     }
@@ -756,7 +764,7 @@ GetLibfile (char *filename)
   newlib->libfilename = f;
   if ((z80asmfile = fopen (f, "rb")) == NULL)
     {				/* Does file exist? */
-      ReportError (f, 0, ERR_OPEN_LIB);
+      ReportError (NULL, 0, ERR_OPEN_LIB, f);
       return;
     }
   else
@@ -766,7 +774,7 @@ GetLibfile (char *filename)
     }
 
   if (strcmp (fheader, Z80libhdr) != 0)		/* compare header of file */
-    ReportError (f, 0, ERR_NOT_LIB_FILE);	/* not a library file */
+    ReportError (NULL, 0, ERR_NOT_LIB_FILE, f);	/* not a library file */
   else
     library = ON;
 
@@ -1094,7 +1102,7 @@ main (int argc, char *argv[])
         {
           if ((*argv)[0] == '@')
             if ((modsrcfile = fopen ((*argv + 1), "rb")) == NULL)
-              ReportIOError ((*argv + 1));
+              ReportError (NULL, 0, ERR_FILE_OPEN, (*argv + 1));
           break;
         }
     }
@@ -1136,7 +1144,7 @@ main (int argc, char *argv[])
                 }
               else
                 {
-                  ReportError (NULL, 0, ERR_ILLEGAL_SRC_FILE);	/* Illegal source file name */
+                  ReportError (NULL, 0, ERR_ILLEGAL_SRC_FILENAME, *argv);	/* Illegal source file name */
                   break;
                 }
             }
@@ -1164,7 +1172,7 @@ main (int argc, char *argv[])
               includes[include_level++] = modsrcfile;
               if ( ( modsrcfile = fopen(ident + 1, "rb") ) == NULL )
                 {
-                  ReportIOError(ident+1);
+                  ReportError (NULL, 0, ERR_FILE_OPEN, ident+1);
                 }
               else
                 {

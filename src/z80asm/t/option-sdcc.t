@@ -13,9 +13,17 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-sdcc.t,v 1.1 2011-07-11 15:46:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-sdcc.t,v 1.2 2011-07-14 01:32:09 pauloscustodio Exp $
 # $Log: option-sdcc.t,v $
-# Revision 1.1  2011-07-11 15:46:33  pauloscustodio
+# Revision 1.2  2011-07-14 01:32:09  pauloscustodio
+#     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
+#     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+#     CH_0003 : Error messages should be more informative
+#         - Added printf-args to error messages, added "Error:" prefix.
+#     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+#         - Raise ERR_UNBALANCED_PAREN instead
+#
+# Revision 1.1  2011/07/11 15:46:33  pauloscustodio
 # Added test scripts for all z80asm options
 #
 #
@@ -27,7 +35,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 t_z80asm_error("defc main = 0x1234\ncall _main", 
-		"File 'test.asm', Module 'TEST', at line 2, Symbol not defined");
+		"Error: File 'test.asm', Module 'TEST', at line 2, Symbol not defined");
 t_z80asm_ok(0, "defc main = 0x1234\ncall _main", "\xCD\x34\x12", "-sdcc");
 
 unlink_testfiles();

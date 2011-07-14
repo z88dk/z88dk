@@ -13,9 +13,17 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.10 2011-07-12 22:47:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.11 2011-07-14 01:32:08 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.10  2011-07-12 22:47:59  pauloscustodio
+/* Revision 1.11  2011-07-14 01:32:08  pauloscustodio
+/*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
+/*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+/*     CH_0003 : Error messages should be more informative
+/*         - Added printf-args to error messages, added "Error:" prefix.
+/*     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+/*         - Raise ERR_UNBALANCED_PAREN instead
+/*
+/* Revision 1.10  2011/07/12 22:47:59  pauloscustodio
 /* - Moved all error variables and error reporting code to a separate module errors.c,
 /*   replaced all extern declarations of these variables by include errors.h,
 /*   created symbolic constants for error codes.
@@ -214,7 +222,8 @@ DefineSymbol (char *identifier,
 	}
       else
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED);	/* global symbol already defined */
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier);
+							/* global symbol already defined */
 	  return 0;
 	}
     }
@@ -261,7 +270,8 @@ DefLocalSymbol (char *identifier,
     }
   else
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED);	/* local symbol already defined */
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier);
+							/* local symbol already defined */
       return 0;
     }
 }
@@ -412,12 +422,14 @@ DeclSymGlobal (char *identifier, unsigned char libtype)
 		  foundsym->type &= XREF_OFF;		/* re-declare symbol as global if symbol was */
 		  foundsym->type |= SYMXDEF | libtype;	/* declared extern in another module */
 		}
-	      else								/* cannot declare two identical global's */
-		ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL_GLOBAL);	/* Already declared global */
+	      else					/* cannot declare two identical global's */
+		ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL_GLOBAL, identifier);
+							/* Already declared global */
 	    }
 	  else if ( (foundsym->type & (SYMXDEF|libtype)) != (SYMXDEF|libtype) )
 	    {
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL);	/* re-declaration not allowed */
+	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL, identifier);
+							/* re-declaration not allowed */
 	    }
 	}
     }
@@ -439,7 +451,8 @@ DeclSymGlobal (char *identifier, unsigned char libtype)
         }
       else
        {
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_GLOBAL);	/* already declared global */
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_GLOBAL, identifier);
+							/* already declared global */
        }
    }
 }
@@ -466,7 +479,8 @@ DeclSymExtern (char *identifier, unsigned char libtype)
            if (sdcc_hacks) 
              foundsym->type=SYMXREF|libtype ;
            else
-     	     ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL);	/* Re-declaration not allowed */
+     	     ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL, identifier);
+							/* Re-declaration not allowed */
       }
     }
     }
@@ -490,11 +504,13 @@ DeclSymExtern (char *identifier, unsigned char libtype)
                 }
             }
           else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_LOCAL);	/* already declared local */
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_LOCAL, identifier);
+								    /* already declared local */
         }
       else if ( (foundsym->type & (SYMXREF|libtype)) != (SYMXREF|libtype) ) 
 	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL);	/* re-declaration not allowed */
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL, identifier);	
+								    /* re-declaration not allowed */
 	}
    }
 }
@@ -594,7 +610,8 @@ DefineDefSym (char *identifier, long value, unsigned char symtype, avltree ** ro
     }
   else
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED);	/* Symbol already defined */
+      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier);	
+						    /* Symbol already defined */
       return 0;
     }
 }

@@ -13,9 +13,17 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.4 2011-07-11 16:23:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.5 2011-07-14 01:32:09 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.4  2011-07-11 16:23:44  pauloscustodio
+# Revision 1.5  2011-07-14 01:32:09  pauloscustodio
+#     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
+#     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+#     CH_0003 : Error messages should be more informative
+#         - Added printf-args to error messages, added "Error:" prefix.
+#     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+#         - Raise ERR_UNBALANCED_PAREN instead
+#
+# Revision 1.4  2011/07/11 16:23:44  pauloscustodio
 # Factor capture code in t_z80asm_capture() in test_utils.pl
 #
 # Revision 1.3	2011/07/09 18:25:35  pauloscustodio
@@ -135,7 +143,7 @@ sub t_binary {
 	my $addr = 0;
 	$addr++ while (substr($binary, $addr, 1) eq substr($expected_binary, $addr, 1));
 	diag sprintf("$test_name Assembly differs at %04X:\n".
-		     "	   got: %s\n".
+		     "     got: %s\n".
 		     "expected: %s\n", 
 		     $addr, 
 		     hexdump(substr($binary, $addr, 16)),

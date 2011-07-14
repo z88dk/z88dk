@@ -13,9 +13,17 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.16 2011-07-12 22:47:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.17 2011-07-14 01:32:08 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.16  2011-07-12 22:47:59  pauloscustodio
+/* Revision 1.17  2011-07-14 01:32:08  pauloscustodio
+/*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
+/*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+/*     CH_0003 : Error messages should be more informative
+/*         - Added printf-args to error messages, added "Error:" prefix.
+/*     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+/*         - Raise ERR_UNBALANCED_PAREN instead
+/*
+/* Revision 1.16  2011/07/12 22:47:59  pauloscustodio
 /* - Moved all error variables and error reporting code to a separate module errors.c,
 /*   replaced all extern declarations of these variables by include errors.h,
 /*   created symbolic constants for error codes.
@@ -267,7 +275,7 @@ Parsevarsize (void)
 		  if (size_multiplier > 0 && size_multiplier <= MAXCODESIZE)
 		    offset = varsize * size_multiplier;
 		  else
-		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
+		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, size_multiplier);
 		}
 	    }
 	}
@@ -349,7 +357,7 @@ DEFVARS (void)
 	}
     }
   else
-    return;			/* syntax error - get next line from file... */
+    return;			/* syntax error raised in ParseNumExpr() - get next line from file... */
 
   while (!feof (z80asmfile) && sym != lcurly)
     {
@@ -505,7 +513,7 @@ DEFS ()
 	    }
 	  else
 	    {
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_RANGE);
+	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
 	      return;
 	    }
 	}
@@ -621,7 +629,7 @@ ORG (void)
 	  if (constant >= 0 && constant <= 65535U)
 	    CURRENTMODULE->origin = constant;
 	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_RANGE);
+	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
 	}
       RemovePfixlist (postfixexpr);
     }
@@ -853,7 +861,7 @@ IncludeFile (void)
 
       if (FindFile(CURRENTFILE,filename) != NULL)
         {
-          ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INCLUDE_RECURSION);
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INCLUDE_RECURSION, filename);
           return; 
         }
 
@@ -862,7 +870,7 @@ IncludeFile (void)
 
       if ((z80asmfile = fopen (filename, "rb")) == NULL)
         {			/* Open include file */
-          ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_FILE_OPEN);
+          ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_FILE_OPEN, filename);
           z80asmfile = fopen (CURRENTFILE->fname, "rb");		/* re-open current source file */
           fseek (z80asmfile, CURRENTFILE->filepointer, SEEK_SET);	/* file position to beginning of line
                                                                      * following INCLUDE line */
@@ -894,7 +902,7 @@ IncludeFile (void)
 
           if ((z80asmfile = fopen (CURRENTFILE->fname, "rb")) == NULL)
             {			/* re-open current source file */
-              ReportIOError(CURRENTFILE->fname);
+              ReportError(NULL, 0, ERR_FILE_OPEN, CURRENTFILE->fname);
             }
           else
             {
@@ -924,7 +932,7 @@ BINARY (void)
 
       if ((binfile = fopen (filename, "rb")) == NULL)
         {
-          ReportIOError (filename);
+          ReportError (NULL, 0, ERR_FILE_OPEN, filename);
           return;
         }
 		

@@ -13,9 +13,17 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/error-00.t,v 1.1 2011-07-12 22:47:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/error-00.t,v 1.2 2011-07-14 01:32:09 pauloscustodio Exp $
 # $Log: error-00.t,v $
-# Revision 1.1  2011-07-12 22:47:59  pauloscustodio
+# Revision 1.2  2011-07-14 01:32:09  pauloscustodio
+#     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
+#     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+#     CH_0003 : Error messages should be more informative
+#         - Added printf-args to error messages, added "Error:" prefix.
+#     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+#         - Raise ERR_UNBALANCED_PAREN instead
+#
+# Revision 1.1  2011/07/12 22:47:59  pauloscustodio
 # - Moved all error variables and error reporting code to a separate module errors.c,
 #   replaced all extern declarations of these variables by include errors.h,
 #   created symbolic constants for error codes.
@@ -31,7 +39,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 unlink_testfiles();
-t_z80asm_error('include "'.inc_file().'"', "File 'test.asm', at line 1, File open/read error");
+t_z80asm_error('include "'.inc_file().'"', "Error: File 'test.asm', at line 1, File 'test.inc' open error");
 
 unlink_testfiles();
 done_testing();

@@ -13,9 +13,17 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.12 2011-07-12 22:47:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.13 2011-07-14 01:32:08 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.12  2011-07-12 22:47:59  pauloscustodio
+/* Revision 1.13  2011-07-14 01:32:08  pauloscustodio
+/*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
+/*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+/*     CH_0003 : Error messages should be more informative
+/*         - Added printf-args to error messages, added "Error:" prefix.
+/*     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+/*         - Raise ERR_UNBALANCED_PAREN instead
+/*
+/* Revision 1.12  2011/07/12 22:47:59  pauloscustodio
 /* - Moved all error variables and error reporting code to a separate module errors.c,
 /*   replaced all extern declarations of these variables by include errors.h,
 /*   created symbolic constants for error codes.
@@ -482,7 +490,7 @@ Z80pass2 (void)
 							 * relative jump */
 		    }
 		  else
-		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_RANGE);
+		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
 		  prevJR = curJR;
 		  curJR = curJR->nextref;	/* get ready for JR instruction */
 		  free (prevJR);
@@ -491,10 +499,10 @@ Z80pass2 (void)
 		case RANGE_8UNSIGN:
                     /* BUG_0004 add test Integer out of range error */
                     if (constant >= -128 && constant <= 255) {
-	       *patchptr = (unsigned char) constant;	/* opcode is stored, now store byte */
+			*patchptr = (unsigned char) constant;	/* opcode is stored, now store byte */
                     }
                     else {
-                        ReportError (pass2expr->srcfile, pass2expr->curline, ERR_RANGE);
+                        ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
                     }
 		  break;
 
@@ -505,7 +513,7 @@ Z80pass2 (void)
 							 * signed operand */
 		    }
 		  else
-		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_RANGE);
+		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
 		  break;
 
 		case RANGE_16CONST:
@@ -515,7 +523,7 @@ Z80pass2 (void)
 		      *patchptr = (unsigned short) constant >> 8;	/* div 256 */
 		    }
 		  else
-		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_RANGE);
+		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
 		  break;
 
 		case RANGE_32SIGN:
@@ -528,7 +536,7 @@ Z80pass2 (void)
 			}
 		    }
 		  else
-		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_RANGE);
+		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
 		  break;
 		}
 	    }
