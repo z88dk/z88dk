@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.13 2011-07-12 22:47:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.14 2011-07-14 01:28:17 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.13  2011-07-12 22:47:59  pauloscustodio
+/* Revision 1.14  2011-07-14 01:28:17  pauloscustodio
+/*     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+/*         - Raise ERR_UNBALANCED_PAREN instead
+/*     CH_0003 : Error messages should be more informative
+/*         - Added printf-args to error messages, added "Error:" prefix.
+/*
+/* Revision 1.13  2011/07/12 22:47:59  pauloscustodio
 /* - Moved all error variables and error reporting code to a separate module errors.c,
 /*   replaced all extern declarations of these variables by include errors.h,
 /*   created symbolic constants for error codes.
@@ -198,6 +204,7 @@ Factor (struct expr *pfixexpr)
     long constant;
     symbol *symptr;
     char eval_err;
+    enum symbols open_paren;
 
     switch (sym)
     {
@@ -256,12 +263,15 @@ Factor (struct expr *pfixexpr)
 
     case lparen:
     case lsquare:
-        *pfixexpr->infixptr++ = separators[sym];	/* store '(' or '[' in infix expr */
+	open_paren = sym;			    /* BUG_0006 : check correct balance */
+        *pfixexpr->infixptr++ = separators[sym];    /* store '(' or '[' in infix expr */
         GetSym ();
 
         if (Condition (pfixexpr))
         {
-            if (sym == rparen || sym == rsquare)
+	    /* BUG_0006 : check correct balance */
+            if (open_paren == lparen  && sym == rparen ||
+		open_paren == lsquare && sym == rsquare)
             {
                 *pfixexpr->infixptr++ = separators[sym];	/* store ')' or ']' in infix expr */
                 GetSym ();
@@ -931,7 +941,7 @@ ExprLong (int listoffset)
 			}
 		    }
 		  else
-		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
+		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
 		}
 	    }
 	}
@@ -979,7 +989,7 @@ ExprAddress (int listoffset)
 		      *(codeptr + 1) = (unsigned short) constant / 256U;
 		    }
 		  else
-		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
+		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
 		}
 	    }
 	}
@@ -1026,7 +1036,7 @@ ExprUnsigned8 (int listoffset)
 	       	      *codeptr = (unsigned char) constant;
 		  }
 		  else {
-		      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
+		      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
 		  }
                 }
 	    }
@@ -1087,7 +1097,7 @@ ExprSigned8 (int listoffset)
 		  if (constant >= -128 && constant <= 255)
 		    *codeptr = (char) constant;
 		  else
-		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE);
+		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
 		}
 	    }
 	}
