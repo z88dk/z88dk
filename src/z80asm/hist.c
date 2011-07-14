@@ -19,9 +19,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.17 2011-07-14 01:36:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.18 2011-07-14 23:49:55 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.17  2011-07-14 01:36:17  pauloscustodio
+/* Revision 1.18  2011-07-14 23:49:55  pauloscustodio
+/* 15.07.2011 [1.1.4]
+/*
+/* Revision 1.17  2011/07/14 01:36:17  pauloscustodio
 /* Version 1.1.3
 /*
 /* Revision 1.16  2011/07/12 22:47:59  pauloscustodio
@@ -642,13 +645,18 @@ Based on 1.0.31
         - Added printf-args to error messages, added "Error:" prefix.
     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
         - Raise ERR_UNBALANCED_PAREN instead
+
+15.07.2011 [1.1.4] (pauloscustodio)
+    BUG_0001(a) : during correction of BUG_0001, new symbol colon was introduced in enum symbols,
+	causing expressions stored in object files to be wrong, e.g. VALUE-1 was stored as
+	VALUE*1. This caused problems in expression evaluation in link phase.
     
 */
 
 #include "hist.h"
 
-#define DATE        "14.07.2011"
-#define VERSION     "1.1.3"
+#define DATE        "15.07.2011"
+#define VERSION     "1.1.4"
 #define COPYRIGHT   "InterLogic 1993-2009"
 
 #ifdef QDOS
