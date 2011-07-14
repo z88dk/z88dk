@@ -19,9 +19,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.16 2011-07-12 22:47:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.17 2011-07-14 01:36:17 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.16  2011-07-12 22:47:59  pauloscustodio
+/* Revision 1.17  2011-07-14 01:36:17  pauloscustodio
+/* Version 1.1.3
+/*
+/* Revision 1.16  2011/07/12 22:47:59  pauloscustodio
 /* - Moved all error variables and error reporting code to a separate module errors.c,
 /*   replaced all extern declarations of these variables by include errors.h,
 /*   created symbolic constants for error codes.
@@ -567,79 +570,85 @@ IX <-> IY swap option added (-IXIY)
 09.07.2011 [1.1.1] (pauloscustodio)
 Based on 1.0.31
 
-Compiled with Visual C++ 2010, added casts to clean up warnings.
-Moved version strings to this file, created hist.h, for easy maintenance.
-Created HTML version of doc/z80asm.txt as doc/z80asm.html:
-  - added table of contents to help looking up information
-  - added documentation for options: 
-         -RCMX000, -plus, -IXIY, -C, -h, -I, -L, -sdcc, -forcexlib
-  - added documentation for commands: INVOKE, LINE
-  - added notes on deprecated error messages
-Started to build test suite in t/ *.t unsing Perl prove. Included test for all standard
-Z80 opcodes; need to be extended with directives and opcodes for Z80 variants.
-
-BUG_0001 : Error in expression during link, expression garbled - memory corruption?
-     Simple asm program: "org 0 \n jp NN \n jp NN \n NN: \n", 
-     compile with "z80asm -t4 -b test.asm"
-     fails with: "File 'test.asm', Module 'TEST', Syntax error in expression \n 
-                  Error in expression +¶+≤+-;æ?.π“¶“≤Ÿ+v›F›V›^›x¶ ›@›H›P›".
-
-     Problem cause: lexer GetSym() is not prepared to read '\0' bytes.
-     When the expression is read from the OBJ file at the link phase, the '\0' 
-     at the end of the expression field is interpreted as a random separator 
-     because ssym[] contains fewer elements (27) than the separators string (28);
-     hence in some cases the expression is parsed correctly, e.g. without -t4 
-     the program assembles correctly. 
-     If the random separator is a semicolon, GetSym() calls Skipline() to go past
-     the comment, and reads past the end of the expression in the OBJ file,
-     causing the parse of the next expression to fail.
-
-BUG_0002 : CreateLibFile and GetLibFile: buffer overrun
-     When the Z80_STDLIB variable is defined, libfilename is allocated with one byte
-     too short (strlen(filename) instead of strlen(filename)+1).
-
-BUG_0003 : Illegal options are ignored, although ReportError 9 (Illegal Option) exists
-     SetAsmFlag(): Some options were missing the 'return' statement, following through
-     to the next tests; inserted 'return' in options 'M', 'I', 'L' and 'D'.
-     Added ReportError 9 (Illegal Option) if the option is not recognized.
-
-CH_0001 : Assembly error messages should appear on stderr
-     It's cumbersome to have to open .err files to see assembly errors.
-     Changed ReportError() to Write error messages to stderr in addition to the .err file.
-
-BUG_0004 : 8bit unsigned constants are not checked for out-of-range
-     Added the check to ExprUnsigned8() and Z80pass2().
-
-BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary
-     ExprSigned8(): Accept (ix) and (iy), use offset zero.
-     Raise syntax error for (ix 4), was accepting as (ix+4).
-
-CH_0002 : Unary plus and unary minus added to Factor()
-     Accept unary minus and unary plus in factor to allow (ix+ -3) to be
-     parsed as (ix-3).
-
+    Compiled with Visual C++ 2010, added casts to clean up warnings.
+    Moved version strings to this file, created hist.h, for easy maintenance.
+    Created HTML version of doc/z80asm.txt as doc/z80asm.html:
+      - added table of contents to help looking up information
+      - added documentation for options: 
+             -RCMX000, -plus, -IXIY, -C, -h, -I, -L, -sdcc, -forcexlib
+      - added documentation for commands: INVOKE, LINE
+      - added notes on deprecated error messages
+    Started to build test suite in t/ *.t unsing Perl prove. Included test for all standard
+    Z80 opcodes; need to be extended with directives and opcodes for Z80 variants.
+    
+    BUG_0001 : Error in expression during link, expression garbled - memory corruption?
+         Simple asm program: "org 0 \n jp NN \n jp NN \n NN: \n", 
+         compile with "z80asm -t4 -b test.asm"
+         fails with: "File 'test.asm', Module 'TEST', Syntax error in expression \n 
+                      Error in expression +¶+≤+-;æ?.π“¶“≤Ÿ+v›F›V›^›x¶ ›@›H›P›".
+    
+         Problem cause: lexer GetSym() is not prepared to read '\0' bytes.
+         When the expression is read from the OBJ file at the link phase, the '\0' 
+         at the end of the expression field is interpreted as a random separator 
+         because ssym[] contains fewer elements (27) than the separators string (28);
+         hence in some cases the expression is parsed correctly, e.g. without -t4 
+         the program assembles correctly. 
+         If the random separator is a semicolon, GetSym() calls Skipline() to go past
+         the comment, and reads past the end of the expression in the OBJ file,
+         causing the parse of the next expression to fail.
+    
+    BUG_0002 : CreateLibFile and GetLibFile: buffer overrun
+         When the Z80_STDLIB variable is defined, libfilename is allocated with one byte
+         too short (strlen(filename) instead of strlen(filename)+1).
+    
+    BUG_0003 : Illegal options are ignored, although ReportError 9 (Illegal Option) exists
+         SetAsmFlag(): Some options were missing the 'return' statement, following through
+         to the next tests; inserted 'return' in options 'M', 'I', 'L' and 'D'.
+         Added ReportError 9 (Illegal Option) if the option is not recognized.
+    
+    CH_0001 : Assembly error messages should appear on stderr
+         It's cumbersome to have to open .err files to see assembly errors.
+         Changed ReportError() to Write error messages to stderr in addition to the .err file.
+    
+    BUG_0004 : 8bit unsigned constants are not checked for out-of-range
+         Added the check to ExprUnsigned8() and Z80pass2().
+    
+    BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary
+         ExprSigned8(): Accept (ix) and (iy), use offset zero.
+         Raise syntax error for (ix 4), was accepting as (ix+4).
+    
+    CH_0002 : Unary plus and unary minus added to Factor()
+         Accept unary minus and unary plus in factor to allow (ix+ -3) to be
+         parsed as (ix-3).
+    
 11.07.2011 [1.1.2] (pauloscustodio)
-- Copied cvs log into Log history of each file, added Z80asm banner to all sources.
-- Moved all option variables and option handling code to a separate module options.c,
-  replaced all extern declarations of these variables by include options.h.
-- Added test scripts for all z80asm options.
-- Created declarations in z80asm.h of objects defined in z80asm.c.
-- Created declarations in symbols.h of objects defined in symbols.c.
-- Updated z80asm.html: indication of deprecated error messages, links within the document.
-- Removed references to dead variable 'relocfile'.
+    - Copied cvs log into Log history of each file, added Z80asm banner to all sources.
+    - Moved all option variables and option handling code to a separate module options.c,
+      replaced all extern declarations of these variables by include options.h.
+    - Added test scripts for all z80asm options.
+    - Created declarations in z80asm.h of objects defined in z80asm.c.
+    - Created declarations in symbols.h of objects defined in symbols.c.
+    - Updated z80asm.html: indication of deprecated error messages, links within the document.
+    - Removed references to dead variable 'relocfile'.
 
-XX.XX.XXXX [1.1.3] (pauloscustodio)
-- Moved all error variables and error reporting code to a separate module errors.c,
-  replaced all extern declarations of these variables by include errors.h, 
-  created symbolic constants for error codes.
-- Added test scripts for error messages.
-
+14.07.2011 [1.1.3] (pauloscustodio)
+    - Moved all error variables and error reporting code to a separate module errors.c,
+      replaced all extern declarations of these variables by include errors.h, 
+      created symbolic constants for error codes.
+    - Added test scripts for error messages.
+    - Unified "Integer out of range" and "Out of range" errors; they are the same error.
+    - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+    CH_0003 : Error messages should be more informative
+        - Added printf-args to error messages, added "Error:" prefix.
+    BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+        - Raise ERR_UNBALANCED_PAREN instead
+    
 */
 
 #include "hist.h"
 
-#define DATE        "11.07.2011"
-#define VERSION     "1.1.2"
+#define DATE        "14.07.2011"
+#define VERSION     "1.1.3"
 #define COPYRIGHT   "InterLogic 1993-2009"
 
 #ifdef QDOS
