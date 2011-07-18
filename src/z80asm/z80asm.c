@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.31 2011-07-14 01:32:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.32 2011-07-18 00:53:26 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.31  2011-07-14 01:32:08  pauloscustodio
+/* Revision 1.32  2011-07-18 00:53:26  pauloscustodio
+/* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
+/* BUG_0007 : memory leaks - Cleaned memory leaks in main(), ReleaseModules()
+/*
+/* Revision 1.31  2011/07/14 01:32:08  pauloscustodio
 /*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 /*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 /*     CH_0003 : Error messages should be more informative
@@ -277,6 +281,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 /* Oops, screw up! exit(0) (was exit(-1))  should be exit(1) - djm 29/2/99 */
 
+#include "memalloc.h"	/* before any other include to enable memory leak detection */
 
 #include <stdio.h>
 #include <time.h>
@@ -894,6 +899,7 @@ void
 ReleaseModules (void)
 {
   struct module *tmpptr, *curptr;
+  struct JRPC *curJR, *prevJR;
 
   if (modulehdr == NULL)
     return;
@@ -907,6 +913,18 @@ ReleaseModules (void)
       deleteall (&curptr->notdeclroot, (void (*)(void*)) FreeSym);
       if (curptr->mexpr != NULL)
 	ReleaseExprns (curptr->mexpr);
+
+      /* BUG_0007 : memory leaks */
+      if (curptr->JRaddr != NULL) {
+	  curJR = curptr->JRaddr->firstref;
+	  while (curJR) {
+	      prevJR = curJR;
+	      curJR = curJR->nextref;	/* get ready for next JR instruction */
+	      free (prevJR);
+	  }
+	  free(curptr->JRaddr); curptr->JRaddr = NULL;
+      }
+
       if (curptr->mname != NULL)
 	free (curptr->mname);
       tmpptr = curptr;
@@ -1015,7 +1033,6 @@ display_options (void)
 }
 
 
-
 /***************************************************************************************************
  * Main entry of Z80asm
  ***************************************************************************************************/
@@ -1027,6 +1044,8 @@ main (int argc, char *argv[])
   char  *ptr;
   int    include_level = 0;
   FILE  *includes[10];   /* 10 levels of inclusion should be enough */
+
+  init_memalloc();
 
   writeline = ON;
   library = createlibrary = OFF;
@@ -1311,6 +1330,26 @@ main (int argc, char *argv[])
   if (autorelocate)
     if (reloctable != NULL)
       free (reloctable);
+
+  /* BUG_0007 : memory leaks */
+  if (include_dir) {
+      int i;
+      for (i = 0; i < include_dir_num; i++) {
+	  free(include_dir[i]);
+      }
+      free(include_dir);
+  }
+  include_dir = NULL;
+  
+  /* BUG_0007 : memory leaks */
+  if (lib_dir) {
+      int i;
+      for (i = 0; i < lib_dir_num; i++) {
+	  free(lib_dir[i]);
+      }
+      free(lib_dir);
+  }
+  lib_dir = NULL;
 #endif
 
   if (ASMERROR)
