@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.17 2011-07-14 01:32:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.18 2011-07-18 00:52:01 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.17  2011-07-14 01:32:08  pauloscustodio
+/* Revision 1.18  2011-07-18 00:52:01  pauloscustodio
+/* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
+/* BUG_0007 : memory leaks - Cleaned memory leaks in DEFS()
+/*
+/* Revision 1.17  2011/07/14 01:32:08  pauloscustodio
 /*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 /*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 /*     CH_0003 : Error messages should be more informative
@@ -151,6 +155,8 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* Created in $/Z80asm */
 /* Improvements on defm() and Fetchfilename(): */
 /* fgetc() logic now handled better according to EOF events. */
+
+#include "memalloc.h"	/* before any other include to enable memory leak detection */
 
 #include <stdio.h>
 #include <string.h>
@@ -480,6 +486,8 @@ DEFS ()
       else
 	{
 	  constant = EvalPfixExpr (postfixexpr);
+	  /* BUG_0007 : memory leaks - was not being released in case of error */
+	  RemovePfixlist (postfixexpr);	/* remove linked list, expression evaluated */
 
 	  if ( sym != comma ) 
 	    {
@@ -517,7 +525,6 @@ DEFS ()
 	      return;
 	    }
 	}
-      RemovePfixlist (postfixexpr);	/* remove linked list, expression evaluated */
     }
 }
 
