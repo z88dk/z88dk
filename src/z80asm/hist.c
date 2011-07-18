@@ -19,9 +19,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.18 2011-07-14 23:49:55 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.19 2011-07-18 00:54:01 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.18  2011-07-14 23:49:55  pauloscustodio
+/* Revision 1.19  2011-07-18 00:54:01  pauloscustodio
+/* Version 1.1.5
+/*
+/* Revision 1.18  2011/07/14 23:49:55  pauloscustodio
 /* 15.07.2011 [1.1.4]
 /*
 /* Revision 1.17  2011/07/14 01:36:17  pauloscustodio
@@ -650,13 +653,21 @@ Based on 1.0.31
     BUG_0001(a) : during correction of BUG_0001, new symbol colon was introduced in enum symbols,
 	causing expressions stored in object files to be wrong, e.g. VALUE-1 was stored as
 	VALUE*1. This caused problems in expression evaluation in link phase.
-    
+
+18.07.2011 [1.1.5] (pauloscustodio)
+    BUG_0007 : memory leaks
+	Included code to run MS Visual Studio memory leak detection on a DEBUG build.
+	Cleaned memory leaks in main(), ReleaseModules(), DEFS().
+	Still memory leaks in main() in case of premature exit due to fatal errors; need
+	to include exception mechanism to solve.
 */
+
+#include "memalloc.h"	/* before any other include to enable memory leak detection */
 
 #include "hist.h"
 
-#define DATE        "15.07.2011"
-#define VERSION     "1.1.4"
+#define DATE        "18.07.2011"
+#define VERSION     "1.1.5"
 #define COPYRIGHT   "InterLogic 1993-2009"
 
 #ifdef QDOS
