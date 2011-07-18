@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.c,v 1.4 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.c,v 1.5 2011-07-18 00:48:25 pauloscustodio Exp $ */
 /* $Log: avltree.c,v $
-/* Revision 1.4  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.5  2011-07-18 00:48:25  pauloscustodio
+/* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
+/*
+/* Revision 1.4  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -47,6 +50,8 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* User: Gbs          Date: 20-06-98   Time: 15:10 */
 /* Updated in $/Z80asm */
 /* SourceSafe Version History Comment Block added. */
+
+#include "memalloc.h"	/* before any other include to enable memory leak detection */
 
 #include <stdlib.h>
 #include "avltree.h"

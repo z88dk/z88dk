@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.19 2011-07-14 01:32:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.20 2011-07-18 00:48:25 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.19  2011-07-14 01:32:08  pauloscustodio
+/* Revision 1.20  2011-07-18 00:48:25  pauloscustodio
+/* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
+/*
+/* Revision 1.19  2011/07/14 01:32:08  pauloscustodio
 /*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 /*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 /*     CH_0003 : Error messages should be more informative
@@ -158,6 +161,8 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* SourceSafe Version History Comment Block added. */
 
 /* ifdef QDOS changed to ifdef ENDIAN to sort ENDIAN djm 26/6/98 */
+
+#include "memalloc.h"	/* before any other include to enable memory leak detection */
 
 #include <stdio.h>
 #include <limits.h>

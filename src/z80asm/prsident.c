@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.23 2011-07-12 22:47:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.24 2011-07-18 00:48:25 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.23  2011-07-12 22:47:59  pauloscustodio
+/* Revision 1.24  2011-07-18 00:48:25  pauloscustodio
+/* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
+/*
+/* Revision 1.23  2011/07/12 22:47:59  pauloscustodio
 /* - Moved all error variables and error reporting code to a separate module errors.c,
 /*   replaced all extern declarations of these variables by include errors.h,
 /*   created symbolic constants for error codes.
@@ -175,6 +178,8 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* "<instr> [A,]xxx", allowing for specification of accumulator. This */
 /* makes all accumulator related instructions equal in syntax and removes */
 /* ambiguity. */
+
+#include "memalloc.h"	/* before any other include to enable memory leak detection */
 
 #include <stdio.h>
 #include <string.h>

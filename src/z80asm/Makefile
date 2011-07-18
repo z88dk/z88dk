@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.16 2011-07-14 01:32:08 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.17 2011-07-18 00:48:25 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.16  2011-07-14 01:32:08  pauloscustodio
+# Revision 1.17  2011-07-18 00:48:25  pauloscustodio
+# Initialize MS Visual Studio DEBUG build to show memory leaks on exit
+#
+# Revision 1.16  2011/07/14 01:32:08  pauloscustodio
 #     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 #     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 #     CH_0003 : Error messages should be more informative
@@ -97,7 +100,8 @@ OBJS = 	asmdrctv.o 	\
 	z80instr.o	\
 	z80pass.o	\
 	options.o	\
-	errors.o
+	errors.o	\
+	memalloc.o
 
 all: z80asm$(EXESUFFIX)
 
@@ -125,25 +129,30 @@ depend:
 
 # DO NOT DELETE
 
-asmdrctv.o: config.h ../config.h options.h symbol.h avltree.h z80asm.h
-asmdrctv.o: errors.h
-avltree.o: avltree.h
-exprprsr.o: config.h ../config.h symbol.h avltree.h options.h errors.h
-hist.o: hist.h
-ldinstr.o: config.h ../config.h z80asm.h avltree.h symbol.h errors.h
-modlink.o: config.h ../config.h options.h symbol.h avltree.h z80asm.h
-modlink.o: errors.h
-prsident.o: config.h ../config.h z80asm.h avltree.h symbol.h options.h
-prsident.o: errors.h
-prsline.o: config.h ../config.h z80asm.h avltree.h symbol.h options.h
-prsline.o: errors.h
-symbols.o: config.h ../config.h symbol.h avltree.h symbols.h options.h
-symbols.o: errors.h
-z80asm.o: config.h ../config.h symbol.h avltree.h z80asm.h hist.h options.h
-z80asm.o: errors.h
-z80instr.o: config.h ../config.h z80asm.h avltree.h symbol.h options.h
-z80instr.o: errors.h
-z80pass.o: config.h ../config.h symbol.h avltree.h hist.h options.h z80asm.h
-z80pass.o: errors.h
-options.o: z80asm.h avltree.h options.h symbol.h symbols.h errors.h
-errors.o: errors.h symbol.h avltree.h options.h z80asm.h config.h ../config.h
+asmdrctv.o: memalloc.h config.h ../config.h options.h symbol.h avltree.h
+asmdrctv.o: z80asm.h errors.h
+avltree.o: memalloc.h avltree.h
+exprprsr.o: memalloc.h config.h ../config.h symbol.h avltree.h options.h
+exprprsr.o: errors.h
+hist.o: memalloc.h hist.h
+ldinstr.o: memalloc.h config.h ../config.h z80asm.h avltree.h symbol.h
+ldinstr.o: errors.h
+modlink.o: memalloc.h config.h ../config.h options.h symbol.h avltree.h
+modlink.o: z80asm.h errors.h
+prsident.o: memalloc.h config.h ../config.h z80asm.h avltree.h symbol.h
+prsident.o: options.h errors.h
+prsline.o: memalloc.h config.h ../config.h z80asm.h avltree.h symbol.h
+prsline.o: options.h errors.h
+symbols.o: memalloc.h config.h ../config.h symbol.h avltree.h symbols.h
+symbols.o: options.h errors.h
+z80asm.o: memalloc.h config.h ../config.h symbol.h avltree.h z80asm.h hist.h
+z80asm.o: options.h errors.h
+z80instr.o: memalloc.h config.h ../config.h z80asm.h avltree.h symbol.h
+z80instr.o: options.h errors.h
+z80pass.o: memalloc.h config.h ../config.h symbol.h avltree.h hist.h
+z80pass.o: options.h z80asm.h errors.h
+options.o: memalloc.h z80asm.h avltree.h options.h symbol.h symbols.h
+options.o: errors.h
+errors.o: memalloc.h errors.h symbol.h avltree.h options.h z80asm.h config.h
+errors.o: ../config.h
+memalloc.o: memalloc.h

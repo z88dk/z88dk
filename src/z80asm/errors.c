@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.2 2011-07-14 01:32:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.3 2011-07-18 00:48:25 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.2  2011-07-14 01:32:08  pauloscustodio
+/* Revision 1.3  2011-07-18 00:48:25  pauloscustodio
+/* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
+/*
+/* Revision 1.2  2011/07/14 01:32:08  pauloscustodio
 /*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 /*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 /*     CH_0003 : Error messages should be more informative
@@ -31,6 +34,8 @@ Copyright (C) Paulo Custodio, 2011
 /* - Added test scripts for error messages.
 /*
 /* */
+
+#include "memalloc.h"	/* before any other include to enable memory leak detection */
 
 #include <stdio.h>
 #include <stdarg.h>

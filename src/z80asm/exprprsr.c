@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.14 2011-07-14 01:28:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.15 2011-07-18 00:48:25 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.14  2011-07-14 01:28:17  pauloscustodio
+/* Revision 1.15  2011-07-18 00:48:25  pauloscustodio
+/* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
+/*
+/* Revision 1.14  2011/07/14 01:28:17  pauloscustodio
 /*     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
 /*         - Raise ERR_UNBALANCED_PAREN instead
 /*     CH_0003 : Error messages should be more informative
@@ -144,6 +147,8 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* Updated in $/Z80asm */
 /* Improved handling of fgetc() character reading in relation to premature */
 /* EOF handling (for character constants in expressions). */
+
+#include "memalloc.h"	/* before any other include to enable memory leak detection */
 
 #include <stdio.h>
 #include <limits.h>
