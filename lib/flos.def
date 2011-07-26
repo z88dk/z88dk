@@ -1,0 +1,93 @@
+lstoff
+
+; FLOS - v6z80p
+;
+; Jul 2011
+;
+; $Id: flos.def,v 1.1 2011-07-26 13:24:27 stefano Exp $
+;
+
+defc FLOS_location = $1000
+
+defc kjt_print_string         = $1013
+defc kjt_clear_screen         = $1016
+defc kjt_page_in_video        = $1019
+defc kjt_page_out_video       = $101c
+defc kjt_wait_vrt             = $101f
+defc kjt_keyboard_irq_code    = $1022
+defc kjt_hex_byte_to_ascii    = $1025
+defc kjt_ascii_to_hex_word    = $1028
+defc kjt_dont_store_registers = $102b
+defc kjt_get_input_string     = $102e
+defc kjt_check_volume_format  = $1031
+defc kjt_change_volume        = $1034
+;; defc kjt_check_disk_available  = $1037 ; obsoleted in v565
+defc kjt_get_volume_info      = $103a
+defc kjt_format_device        = $103d
+defc kjt_make_dir             = $1040
+defc kjt_change_dir           = $1043
+defc kjt_parent_dir           = $1046
+defc kjt_root_dir             = $1049
+defc kjt_delete_dir	          = $104c
+defc kjt_find_file	          = $104f
+defc kjt_load_file	          = $1052
+defc kjt_save_file	          = $1055
+defc kjt_erase_file           = $1058
+defc kjt_get_total_sectors    = $105b
+defc kjt_wait_key_press	      = $105e
+defc kjt_get_key              = $1061
+defc kjt_forcebank            = $1064
+defc kjt_getbank              = $1067
+defc kjt_create_file          = $106a
+defc kjt_incbank              = $106d
+defc kjt_compare_strings      = $1070
+defc kjt_write_bytes_to_file  = $1073
+defc kjt_bchl_memfill         = $1076
+defc kjt_force_load           = $1079
+defc kjt_set_file_pointer     = $107c
+defc kjt_set_load_length      = $107f
+defc kjt_serial_receive_header = $1082
+defc kjt_serial_receive_file  = $1085
+defc kjt_serial_send_file     = $1088
+defc kjt_enable_mouse         = $108b
+defc kjt_get_mouse_position   = $108e
+defc kjt_get_version          = $1091
+defc kjt_set_cursor_position  = $1094
+defc kjt_serial_tx_byte	      = $1097
+defc kjt_serial_rx_byte	      = $109a
+defc kjt_dir_list_first_entry = $109d ; (added in v537)
+defc kjt_dir_list_get_entry   = $10a0 ; ""
+defc kjt_dir_list_next_entry  = $10a3 ; ""
+defc kjt_get_cursor_position  = $10a6 ; (added in v538)
+defc kjt_read_sector          = $10a9 ; (updated in v565)
+defc kjt_write_sector         = $10ac ; ""
+defc kjt_not_used_one         = $10af ; obsoleted in V565
+defc kjt_plot_char            = $10b2 ; (added in v539)
+defc kjt_set_pen              = $10b5 ; ("")
+defc kjt_background_colours   = $10b8 ; ("")
+defc kjt_draw_cursor          = $10bb ; (added in v541)
+defc kjt_get_pen              = $10be ; (added in v544)
+defc kjt_scroll_up            = $10c1 ; ("")
+defc kjt_flos_display         = $10c4 ; (added in v547)
+defc kjt_get_dir_name         = $10c7 ; (added in v555)
+defc kjt_get_key_mod_flags    = $10ca ; (added in v555)
+defc kjt_get_display_size     = $10cd ; (added in v559)
+defc kjt_timer_wait           = $10d0 ; (added in v559)
+defc kjt_get_charmap_addr_xy  = $10d3 ; (added in v559)
+defc kjt_store_dir_position   = $10d6 ; (added in v560)
+defc kjt_restore_dir_position = $10d9 ; (added in v560)
+defc kjt_mount_volumes        = $10dc ; (added in v562)
+defc kjt_get_device_info      = $10df ; (added in v565)
+defc kjt_read_sysram_flat     = $10e2 ; (added in v570)
+defc kjt_write_sysram_flat    = $10e5 ; (added in v570)
+defc kjt_get_mouse_disp       = $10e8 ; (added in v571)
+defc kjt_get_dir_cluster      = $10eb ; (added in v572)
+defc kjt_set_dir_cluster      = $10ee ; (added in v572)
+defc kjt_rename_file          = $10f1 ; (added in v572)
+defc kjt_set_envar            = $10f4 ; (added in v575)
+defc kjt_get_envar            = $10f7 ; (added in v572)
+defc kjt_delete_envar         = $10fa ; (added in v572)
+defc kjt_file_sector_list     = $10fd ; (added in v575)
+defc kjt_mouse_irq_code	      = $1100 ; (added in v579)
+
+lston

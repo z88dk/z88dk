@@ -1,0 +1,4 @@
+stdio/osca/fputc_cons
+stdio/osca/fgetc_cons
+stdio/osca/getk
+@z80.lst

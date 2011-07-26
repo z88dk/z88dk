@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.162 2011-06-15 20:15:00 stefano Exp $
+# $Id: Makefile,v 1.163 2011-07-26 13:24:27 stefano Exp $
 
 
 include	Make.config
@@ -18,7 +18,7 @@ all:	genlibs	z88libs	tilibs zxlibs eplibs c128libs cpclibs \
 	cpm_clib.lib einstein.lib gal_clib.lib m5_clib.lib \
 	msx_clib.lib mtx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib	nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
-	ozansi_clib.lib	pps_clib.lib ppsansi_clib.lib \
+	osca_clib.lib ozansi_clib.lib	pps_clib.lib ppsansi_clib.lib \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib \
 	trs80_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib\
@@ -1295,6 +1295,19 @@ x07_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/x07_clib @$(LISTFILE_DIRECTORY)/x07.lst
+
+# OSCA / FLOS - Stefano
+osca_clib.lib:
+	@echo ''
+	@echo '--- Building Old School Computer Architecture Library ---'
+	@echo ''
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd	..
+	cd printflike ;	$(MAKE)	; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORosca -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst
 
 # Z88 maths build - dom
 preempt.lib:
