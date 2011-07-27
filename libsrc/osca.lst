@@ -1,4 +1,5 @@
 stdio/osca/fputc_cons
 stdio/osca/fgetc_cons
 stdio/osca/getk
+osca/flos_version
 @z80.lst

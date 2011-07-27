@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jul. 2011
 ;
-;	$Id: osca_crt0.asm,v 1.1 2011-07-26 13:24:27 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.2 2011-07-27 15:11:27 stefano Exp $
 ;
 
 
@@ -60,19 +60,27 @@
 
         IF      !myzorg
                 defc    myzorg  = $5000
-        ENDIF   
-                org     myzorg
+        ENDIF
 
 
-        org     myzorg
-
+	IF (myzorg = $5000)
+                org		myzorg
+	ELSE
+				; optional Program Location File Header
+				org		myzorg-9
+				defb	$ed
+				defb	$00
+				jr	start
+				defw	myzorg
+				defb	$0e	; bank
+				defb	$00				
+	ENDIF
+	
 start:
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
-        ld      hl,-64
-        add     hl,sp
-        ld      sp,65536
+        ld      sp,-64
         ld      (exitsp),sp
 
 IF !DEFINED_nostreams

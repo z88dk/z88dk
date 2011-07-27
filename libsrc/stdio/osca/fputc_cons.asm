@@ -5,7 +5,7 @@
 ;	Print character to the screen
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.1 2011-07-26 13:24:27 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.2 2011-07-27 15:11:27 stefano Exp $
 ;
 
 
