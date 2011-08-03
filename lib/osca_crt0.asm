@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jul. 2011
 ;
-;	$Id: osca_crt0.asm,v 1.2 2011-07-27 15:11:27 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.3 2011-08-03 08:13:40 stefano Exp $
 ;
 
 

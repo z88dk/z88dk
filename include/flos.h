@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2011
  *
- *		$Id: flos.h,v 1.1 2011-07-27 15:11:27 stefano Exp $
+ *		$Id: flos.h,v 1.2 2011-08-03 08:13:40 stefano Exp $
  * 
  */
 
@@ -12,6 +12,7 @@
 #define __FLOS_H__
 
 #include <sys/compiler.h>
+#include <sys/types.h>
 
 
 // Commands for the SD/MMC card
@@ -101,9 +102,111 @@
 #define SPI_PARAMETER			0x40
 
 
+// Errors coming from drivers are put in the highest byte, thus having values > than 0xFF
+
+#define FERR_OK              0x00	// no errors 
+#define FERR_DISK_FULL       0x01	// Volume Full
+#define FERR_FILE_NOT_FOUND  0x02	// File Not Found
+#define FERR_DIR_FULL        0x03	// Directory Full
+#define FERR_NOT_DIR         0x04	// Not A Dir
+#define FERR_DIR_NOT_EMPTY   0x05	// Dir Is Not Empty
+#define FERR_NOT_FILE        0x06	// Not A File
+#define FERR_EMPTY_FILE      0x07	// File Length Is Zero
+#define FERR_OUT_OF_RANGE    0x08	// Address out of range
+#define FERR_FILE_EXISTS     0x09	// File Name Already Exists
+#define FERR_ROOT            0x0A	// Already at root
+#define FERR_NO_FILE_NAME    0x0D	// No file name
+#define FERR_INVALID_VOLUME  0x0E	// Invalid Volume
+//#define FERR_INVALID_VOLUME  0x21	// Invalid Volume
+#define FERR_NOT_FAT16       0x13	// not FAT16
+#define FERR_NAME_TOO_LONG   0x15	// file name too long
+#define FERR_EOF             0x1b	// requested bytes beyond end of file
+#define FERR_NOT_PRESENT     0x22	// Device not present
+#define FERR_DIR_NOT_FOUND   0x23	// Dir not found
+#define FERR_FILE_NAME       0x25	// File name mismatch
+#define FERR_NO_VOLUMES      0x28	// No Volumes
+
+
+struct flos_capacity {
+	u16_t	lsw;
+	u8_t	msb;
+};
+	
+
+struct flos_volume {
+	u8_t	present;       //  1 = Volume is present, else zero (note: this does not mean it is a valid FAT16 volume.)
+	u8_t	driver;        // Volume's host driver number
+	u16_t	foo1;
+	struct flos_capacity sectors;  // Volume's total capacity in sectors (3 bytes)
+	u8_t	partition;     // Partition number on host drive (0/1/2/3)
+	u8_t    boot_offset;   // Offset in sectors from MBR to partition boot sector (2 words, little endian)
+	u16_t	foo2;
+	u16_t	foo3;
+};
+
+struct flos_device {
+	u8_t	driver;         // Device host driver number
+	unsigned long capacity; // Device's TOTAL capacity in sectors (4 bytes)
+	char    name[23];       // Zero terminated hardware name (22 ASCII bytes max followed by $00)
+	char	foo[4];
+};
+
+struct flos_driver {
+	char    name[8];       // 7 ASCII bytes, name of driver EG: "SD_CARD" + zero termination
+	char	rd_sect[3];    // JP read_sector routine  
+	char	wr_sect[3];    // JP write_sector routine  
+	char	get_id[2];     // "get_id" routine starts here.  
+};
+
+struct flos_driver_table {
+	struct flos_driver *driver0;
+	struct flos_driver *driver1;
+	struct flos_driver *driver2;
+	struct flos_driver *driver3;
+};
 
 // Get the FLOS OS version
-extern void __LIB__ flos_version();
+extern unsigned int __LIB__ flos_version();
+
+// Get the OSCA architecture version
+extern unsigned int __LIB__ osca_version();
+
+// Video control
+extern void __LIB__ page_in_video();
+extern void __LIB__ page_out_video();
+// Wait video HW to be ready
+extern void __LIB__ wait_vrt();
+extern int __LIB__ __FASTCALL__ flos_paper(int color);
+
+// Disk control
+extern int __LIB__ __FASTCALL__ change_volume(int volume);
+extern struct flos_volume __LIB__ get_volume_list();
+// Total number of 'drives' (1..n)
+extern int __LIB__ get_volume_count();
+// Current 'drive' (0..n)
+extern int __LIB__ get_current_volume();
+extern int __LIB__ check_volume_format();
+extern int __LIB__ __FASTCALL__ create_file(char * filename);
+extern int __LIB__ __FASTCALL__ erase_file(char * filename);
+extern int __LIB__ rename_file(char * filea, char * fileb);
+extern int __LIB__ __FASTCALL__ delete_dir(char * dirname);
+extern int __LIB__ parent_dir();
+extern int __LIB__ root_dir();
+extern int __LIB__ dir_move_first();
+extern int __LIB__ dir_move_next();
+extern int __LIB__ change_dir(char * dirname);
+// 0=normal, 1=directory
+extern int __LIB__ dir_get_entry_type();
+extern int __LIB__ dir_get_entry_name();
+extern unsigned long __LIB__ dir_get_entry_size();
+extern void __LIB__ store_dir_position();
+extern void __LIB__ restore_dir_position();
+
+// Drivers
+extern struct flos_device __LIB__ get_device_list();
+extern struct flos_driver_table __LIB__ get_driver_list();
+extern int __LIB__ get_device_info();
+extern int __LIB__ get_device_count();
 
 
 #endif /* __FLOS_H__ */

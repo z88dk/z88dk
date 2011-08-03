@@ -14,7 +14,7 @@
  *	Rewrote 'miniprintn' in assembler, less usage of stack and save 180 bytes
  * 
  * --------
- * $Id: vfprintf_mini.c,v 1.5 2010-11-09 16:13:44 stefano Exp $
+ * $Id: vfprintf_mini.c,v 1.6 2011-08-03 08:13:40 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -143,57 +143,49 @@ LIB	l_int2long_s
 .longnum
 		push hl
 		pop	af
+
+		dec de
+		dec de
 		push de
-		;; push hl
 		ex	de,hl
-		call l_gint
-		push bc
+		;call l_gint
 		push af
 		call	l_glong
 		pop af
-		pop bc
 		call do_miniprintn
 
 		pop de
 		pop hl
-		dec de
-		dec	de
 		jr dec_loop
 
 .nol
-	cp	'd'
-	jr	z,isd
-	cp	'f'		; fake.. we have an integer here !
-	jr nz,nod
-.isd
-	push hl
-	push de
-	ex	de,hl
-	call l_gint
-	push bc
-	call	l_int2long_s
-	ld	bc,1
-	push bc
-	pop af	; flag for signed output
-	pop bc
-	call do_miniprintn
-	pop de
-	pop hl
-	jr dec_loop
-
-
-
-.nod
 	cp	'u'
-	jr nz,nou
-
+	jr z,isint
+	cp	'd'
+	jr	z,isint
+	cp	'f'		; fake.. we have an integer here !
+	jr nz,noint
+.isint
 	push hl
 	push de
 	ex	de,hl
+	push af
 	call l_gint
-	ld	de,0
-	push de
-	pop af	; flag for unsigned output
+	pop af
+	push bc
+	ld	bc,0	; flag
+	ld	d,b		; highest byte in case it is 'unsigned int'
+	ld	e,c
+	cp 'u'
+	jr z,is_unsigned
+
+	call	l_int2long_s	; adjust highest byte for negative sign
+	inc bc	; flag
+
+.is_unsigned
+	push bc
+	pop af	; signed/unsigned flag
+	pop bc	; fp
 	call do_miniprintn
 	pop de
 	pop hl
@@ -202,7 +194,7 @@ LIB	l_int2long_s
 	dec de
 	jr	fmtloop
 
-.nou
+.noint
 	cp	's'
 	jr	nz,nostring
 

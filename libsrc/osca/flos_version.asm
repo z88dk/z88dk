@@ -5,7 +5,7 @@
 ;	int flos_version();
 ;
 ;
-;	$Id: flos_version.asm,v 1.1 2011-07-27 15:11:27 stefano Exp $
+;	$Id: flos_version.asm,v 1.2 2011-08-03 08:13:40 stefano Exp $
 ;
 
     INCLUDE "flos.def"
