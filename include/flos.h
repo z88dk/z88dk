@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2011
  *
- *		$Id: flos.h,v 1.2 2011-08-03 08:13:40 stefano Exp $
+ *		$Id: flos.h,v 1.3 2011-08-04 14:10:12 stefano Exp $
  * 
  */
 
@@ -181,26 +181,28 @@ extern int __LIB__ __FASTCALL__ flos_paper(int color);
 // Disk control
 extern int __LIB__ __FASTCALL__ change_volume(int volume);
 extern struct flos_volume __LIB__ get_volume_list();
-// Total number of 'drives' (1..n)
-extern int __LIB__ get_volume_count();
-// Current 'drive' (0..n)
-extern int __LIB__ get_current_volume();
+extern int __LIB__ get_volume_count();     // Total number of 'drives' (1..n)
+extern int __LIB__ get_current_volume();   // Current 'drive' (0..n)
 extern int __LIB__ check_volume_format();
-extern int __LIB__ __FASTCALL__ create_file(char * filename);
-extern int __LIB__ __FASTCALL__ erase_file(char * filename);
-extern int __LIB__ rename_file(char * filea, char * fileb);
+extern unsigned long __LIB__ get_total_sectors();
+// Directory related commands
 extern int __LIB__ __FASTCALL__ delete_dir(char * dirname);
 extern int __LIB__ parent_dir();
 extern int __LIB__ root_dir();
 extern int __LIB__ dir_move_first();
 extern int __LIB__ dir_move_next();
 extern int __LIB__ change_dir(char * dirname);
-// 0=normal, 1=directory
-extern int __LIB__ dir_get_entry_type();
+extern int __LIB__ dir_get_entry_type();  // 0=normal, 1=directory
 extern int __LIB__ dir_get_entry_name();
 extern unsigned long __LIB__ dir_get_entry_size();
 extern void __LIB__ store_dir_position();
 extern void __LIB__ restore_dir_position();
+// FAT16 file handling
+extern int __LIB__ __FASTCALL__ create_file(char * filename);
+extern int __LIB__ __FASTCALL__ erase_file(char * filename);
+extern int __LIB__ rename_file(char * filea, char * fileb);
+extern unsigned long __LIB__ __FASTCALL__ get_file_size(char * filename);
+extern unsigned int __LIB__ __FASTCALL__ get_first_file_cluster(char * filename);
 
 // Drivers
 extern struct flos_device __LIB__ get_device_list();
