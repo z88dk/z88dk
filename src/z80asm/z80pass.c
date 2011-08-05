@@ -13,9 +13,22 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.14 2011-07-18 00:48:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.15 2011-08-05 20:20:45 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.14  2011-07-18 00:48:25  pauloscustodio
+/* Revision 1.15  2011-08-05 20:20:45  pauloscustodio
+/* CH_0004 : Exception mechanism to handle fatal errors
+/* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
+/* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
+/* macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated,
+/* removing all the test code after each memory allocation.
+/* Replaced all functions that allocated memory structures by the new xcalloc_struct().
+/* Replaced all free() by xfree0() macro which only frees if the pointer in non-null, and
+/* sets the poiter to NULL afterwards, to avoid any used of the freed memory.
+/* Created try/catch sequences to clean-up partially created memory structures and rethrow the
+/* exception, to cleanup memory leaks.
+/* Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
+/*
+/* Revision 1.14  2011/07/18 00:48:25  pauloscustodio
 /* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
 /*
 /* Revision 1.13  2011/07/14 01:32:08  pauloscustodio
@@ -166,7 +179,6 @@ long EvalPfixExpr (struct expr *pass2expr);
 struct expr *ParseNumExpr (void);
 enum symbols GetSym (void);
 symbol *FindSymbol (char *identifier, avltree * treeptr);
-char *AllocIdentifier (size_t len);
 
 /* local functions */
 void ifstatement (enum flag interpret);
@@ -190,8 +202,6 @@ struct sourcefile *Prevfile (void);
 struct sourcefile *Newfile (struct sourcefile *curfile, char *fname);
 struct sourcefile *Setfile (struct sourcefile *curfile, struct sourcefile *newfile, char *fname);
 struct sourcefile *FindFile (struct sourcefile *srcfile, char *fname);
-struct sourcefile *AllocFile (void);
-struct usedfile *AllocUsedFile (void);
 
 
 /* global variables */
@@ -212,19 +222,18 @@ extern avltree *globalroot;
 void 
 Z80pass1 (void)
 {
-  line[0] = '\0';		/* reset contents of list buffer */
+  line[0] = '\0';		    /* reset contents of list buffer */
 
   while (!feof (z80asmfile))
     {
       if (listing)
 	writeline = ON;
-      parseline (ON);		/* before parsing it */
+      parseline (ON);		    /* before parsing it */
 
       switch (ASSEMBLE_ERROR)
 	{
-	case ERR_NO_MEMORY:
 	case ERR_MAX_CODESIZE:
-	  return;		/* Fatal errors, return immediatly... */
+	  return;		    /* Fatal errors, return immediatly... */
 	}
     }
 }
@@ -235,20 +244,20 @@ void
 getasmline (void)
 {
   long fptr;
-  int l,c;
+  int len,c;
 
   fptr = ftell (z80asmfile);		/* remember file position */
 
   c = '\0';
-  for (l=0; (l<254) && (c!='\n'); l++) 
+  for (len=0; (len<254) && (c!='\n'); len++) 
     {
       c = GetChar(z80asmfile); 
       if (c != EOF)
-        line[l] = c;	/* line feed inclusive */
+        line[len] = c;	/* line feed inclusive */
       else
         break;
     }
-  line[l] = '\0'; 
+  line[len] = '\0'; 
 
   fseek (z80asmfile, fptr, SEEK_SET);	/* resume file position */
 }
@@ -477,7 +486,7 @@ Z80pass2 (void)
 		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_NOT_DEFINED);
 		  prevJR = curJR;
 		  curJR = curJR->nextref;	/* get ready for next JR instruction */
-		  free (prevJR);
+		  xfree0(prevJR);
 		}
 	      else
 		ReportError (pass2expr->srcfile, pass2expr->curline, ERR_NOT_DEFINED);
@@ -498,7 +507,7 @@ Z80pass2 (void)
 		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
 		  prevJR = curJR;
 		  curJR = curJR->nextref;	/* get ready for JR instruction */
-		  free (prevJR);
+		  xfree0(prevJR);
 		  break;
 
 		case RANGE_8UNSIGN:
@@ -555,8 +564,8 @@ Z80pass2 (void)
 	}
       while (pass2expr != NULL);	/* re-evaluate expressions and patch in code */
 
-      free (CURRENTMODULE->mexpr);	/* Release header of expressions list */
-      free (CURRENTMODULE->JRaddr);	/* Release header of relative jump address list */
+      xfree0(CURRENTMODULE->mexpr);	/* Release header of expressions list */
+      xfree0(CURRENTMODULE->JRaddr);	/* Release header of relative jump address list */
       CURRENTMODULE->mexpr = NULL;
       CURRENTMODULE->JRaddr = NULL;
     }
@@ -724,11 +733,7 @@ Prevfile (void)
   struct usedfile *newusedfile;
   struct sourcefile *ownedfile;
 
-  if ((newusedfile = AllocUsedFile ()) == NULL)
-    {
-      ReportError (NULL, 0, ERR_NO_MEMORY);	/* No room in operating system - stop assembler */
-      return (CURRENTFILE);	/* return parameter pointer - nothing happended! */
-    }
+  newusedfile = xcalloc_struct(struct usedfile);
   ownedfile = CURRENTFILE;
   CURRENTFILE = CURRENTFILE->prevsourcefile;	/* get back to owner file - now the current */
   CURRENTFILE->newsourcefile = NULL;	/* current file is now the last in the list */
@@ -742,28 +747,23 @@ Prevfile (void)
 }
 
 
+/* CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
 struct sourcefile *
 Newfile (struct sourcefile *curfile, char *fname)
 {
-  struct sourcefile *nfile;
+    struct sourcefile *nfile;
+    struct sourcefile *ret;
 
-  if (curfile == NULL)
-    {				/* file record has not yet been created */
-      if ((curfile = AllocFile ()) == NULL)
-	{
-	  ReportError (NULL, 0, ERR_NO_MEMORY);
-	  return (NULL);
-	}
-      else
-	return (Setfile (NULL, curfile, fname));
+    nfile = xcalloc_struct(struct sourcefile);
+    try {
+	ret = Setfile(curfile, nfile, fname);
     }
-  else if ((nfile = AllocFile ()) == NULL)
-    {
-      ReportError (NULL, 0, ERR_NO_MEMORY);
-      return (curfile);
+    catch(RuntimeException) {
+	xfree0(nfile);
+	rethrow("");
     }
-  else
-    return (Setfile (curfile, nfile, fname));
+
+    return ret;
 }
 
 
@@ -772,18 +772,13 @@ Setfile (struct sourcefile *curfile,	/* pointer to record of current source file
 	 struct sourcefile *nfile,	/* pointer to record of new
 					 * source file */
 	 char *filename)
-{				/* pointer to filename string */
-  if ((nfile->fname = AllocIdentifier (strlen (filename) + 1)) == NULL)
-    {
-      ReportError (NULL, 0, ERR_NO_MEMORY);
-      return (nfile);
-    }
+{
+  nfile->fname = xstrdup(filename);	/* pointer to filename string */
   nfile->prevsourcefile = curfile;
   nfile->newsourcefile = NULL;
   nfile->usedsourcefile = NULL;
   nfile->filepointer = 0;
-  nfile->line = 0;		/* Reset to 0 as line counter during parsing */
-  nfile->fname = strcpy (nfile->fname, filename);
+  nfile->line = 0;			/* Reset to 0 as line counter during parsing */
   return (nfile);
 }
 
@@ -870,30 +865,30 @@ PatchListFile (struct expr *pass2expr, long c)
 void 
 WriteListFile (void)
 {
-  int l, k;
+  int len, k;
 
   if (strlen (line) == 0)
     strcpy (line, "\n");
 
-  l = PC - oldPC;
-  if (l == 0)
+  len = PC - oldPC;
+  if (len == 0)
     fprintf (listfile, "%-4d  %04X%14s%s", CURRENTFILE->line, (unsigned short) oldPC, "", line);		/* no bytes generated */
-  else if (l <= 4)
+  else if (len <= 4)
     {
       fprintf (listfile, "%-4d  %04X  ", CURRENTFILE->line, (unsigned short) oldPC);
-      for (; l; l--)
-	fprintf (listfile, "%02X ", *(codeptr - l));
+      for (; len; len--)
+	fprintf (listfile, "%02X ", *(codeptr - len));
       fprintf (listfile, "%*s%s", (unsigned short) (4 - (PC - oldPC)) * 3, "", line);
     }
   else
     {
-      while (l)
+      while (len)
 	{
 	  LineCounter ();
-	  if (l)
-	    fprintf (listfile, "%-4d  %04X  ", CURRENTFILE->line, (unsigned short) (PC - l));
-	  for (k = (l - 32 > 0) ? 32 : l; k; k--)
-	    fprintf (listfile, "%02X ", *(codeptr - l--));
+	  if (len)
+	    fprintf (listfile, "%-4d  %04X  ", CURRENTFILE->line, (unsigned short) (PC - len));
+	  for (k = (len - 32 > 0) ? 32 : len; k; k--)
+	    fprintf (listfile, "%02X ", *(codeptr - len--));
 	  fprintf (listfile, "\n");
 	}
       fprintf (listfile, "%18s%s", "", line);
@@ -997,15 +992,3 @@ WriteSymbolTable (char *msg, avltree * root)
 
 
 
-struct usedfile *
-AllocUsedFile (void)
-{
-  return (struct usedfile *) malloc (sizeof (struct usedfile));
-}
-
-
-struct sourcefile *
-AllocFile (void)
-{
-  return (struct sourcefile *) malloc (sizeof (struct sourcefile));
-}
