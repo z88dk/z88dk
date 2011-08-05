@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.20 2011-07-18 00:48:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.21 2011-08-05 19:59:51 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.20  2011-07-18 00:48:25  pauloscustodio
+/* Revision 1.21  2011-08-05 19:59:51  pauloscustodio
+/* Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
+/*
+/* Revision 1.20  2011/07/18 00:48:25  pauloscustodio
 /* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
 /*
 /* Revision 1.19  2011/07/12 22:47:59  pauloscustodio
@@ -717,7 +720,7 @@ IndirectRegisters (void)
 long 
 GetConstant (char *evalerr)
 {
-  long size, l, intresult = 0;
+  long size, len, intresult = 0;
   unsigned short bitvalue = 1;
 
   *evalerr = 0;			/* preset to no errors */
@@ -743,24 +746,24 @@ GetConstant (char *evalerr)
           *evalerr = 1;
           return (0);		/* max 8 bit */
         }
-      for (l = 1; l <= size; l++)
-        if (strchr ("01", ident[l]) == NULL)
+      for (len = 1; len <= size; len++)
+        if (strchr ("01", ident[len]) == NULL)
           {
             *evalerr = 1;
             return (0);
           }
       /* convert ASCII binary to integer */
-      for (l = size; l >= 1; l--)
+      for (len = size; len >= 1; len--)
         {
-          if (ident[l] == '1')
+          if (ident[len] == '1')
             intresult += bitvalue;
           bitvalue <<= 1;	/* logical shift left & 16 bit 'adder' */
         }
       return (intresult);
 
     case '$':
-      for (l = 1; l <= size; l++)
-        if (isxdigit (ident[l]) == 0)
+      for (len = 1; len <= size; len++)
+        if (isxdigit (ident[len]) == 0)
           {
             *evalerr = 1;
             return (0);
@@ -769,8 +772,8 @@ GetConstant (char *evalerr)
       return (intresult);
 
     default:
-      for (l = 0; l <= (size - 1); l++)
-        if (isdigit (ident[l]) == 0)
+      for (len = 0; len <= (size - 1); len++)
+        if (isdigit (ident[len]) == 0)
           {
             *evalerr = 1;
             return (0);
