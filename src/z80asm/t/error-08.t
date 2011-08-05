@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/error-08.t,v 1.2 2011-07-14 01:32:09 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/error-08.t,v 1.3 2011-08-05 20:22:57 pauloscustodio Exp $
 # $Log: error-08.t,v $
-# Revision 1.2  2011-07-14 01:32:09  pauloscustodio
+# Revision 1.3  2011-08-05 20:22:57  pauloscustodio
+# Source file missing error was exiting with exit(1) and did not report number of errors; now fixed.
+#
+# Revision 1.2  2011/07/14 01:32:09  pauloscustodio
 #     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 #     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 #     CH_0003 : Error messages should be more informative
@@ -38,7 +41,9 @@ use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-t_z80asm_capture("-b", "", "Error: Source filename missing\n", 1);
+t_z80asm_capture("-b", "", 
+		"Error: Source filename missing\n".
+		"1 errors occurred during assembly\n", 1);
 
 unlink_testfiles();
 done_testing();
