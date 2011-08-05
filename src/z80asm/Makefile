@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.17 2011-07-18 00:48:25 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.18 2011-08-05 19:30:57 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.17  2011-07-18 00:48:25  pauloscustodio
+# Revision 1.18  2011-08-05 19:30:57  pauloscustodio
+# CH_0004 : Exception mechanism to handle fatal errors
+#
+# Revision 1.17  2011/07/18 00:48:25  pauloscustodio
 # Initialize MS Visual Studio DEBUG build to show memory leaks on exit
 #
 # Revision 1.16  2011/07/14 01:32:08  pauloscustodio
@@ -101,7 +104,8 @@ OBJS = 	asmdrctv.o 	\
 	z80pass.o	\
 	options.o	\
 	errors.o	\
-	memalloc.o
+	memalloc.o	\
+	except.o
 
 all: z80asm$(EXESUFFIX)
 
@@ -129,30 +133,31 @@ depend:
 
 # DO NOT DELETE
 
-asmdrctv.o: memalloc.h config.h ../config.h options.h symbol.h avltree.h
-asmdrctv.o: z80asm.h errors.h
-avltree.o: memalloc.h avltree.h
-exprprsr.o: memalloc.h config.h ../config.h symbol.h avltree.h options.h
-exprprsr.o: errors.h
-hist.o: memalloc.h hist.h
-ldinstr.o: memalloc.h config.h ../config.h z80asm.h avltree.h symbol.h
-ldinstr.o: errors.h
-modlink.o: memalloc.h config.h ../config.h options.h symbol.h avltree.h
-modlink.o: z80asm.h errors.h
-prsident.o: memalloc.h config.h ../config.h z80asm.h avltree.h symbol.h
-prsident.o: options.h errors.h
-prsline.o: memalloc.h config.h ../config.h z80asm.h avltree.h symbol.h
-prsline.o: options.h errors.h
-symbols.o: memalloc.h config.h ../config.h symbol.h avltree.h symbols.h
-symbols.o: options.h errors.h
-z80asm.o: memalloc.h config.h ../config.h symbol.h avltree.h z80asm.h hist.h
-z80asm.o: options.h errors.h
-z80instr.o: memalloc.h config.h ../config.h z80asm.h avltree.h symbol.h
-z80instr.o: options.h errors.h
-z80pass.o: memalloc.h config.h ../config.h symbol.h avltree.h hist.h
-z80pass.o: options.h z80asm.h errors.h
-options.o: memalloc.h z80asm.h avltree.h options.h symbol.h symbols.h
-options.o: errors.h
-errors.o: memalloc.h errors.h symbol.h avltree.h options.h z80asm.h config.h
-errors.o: ../config.h
-memalloc.o: memalloc.h
+asmdrctv.o: memalloc.h except.h e4c.h config.h ../config.h options.h symbol.h
+asmdrctv.o: avltree.h z80asm.h errors.h
+avltree.o: memalloc.h except.h e4c.h avltree.h
+exprprsr.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
+exprprsr.o: options.h errors.h
+hist.o: memalloc.h except.h e4c.h hist.h
+ldinstr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
+ldinstr.o: symbol.h errors.h
+modlink.o: memalloc.h except.h e4c.h config.h ../config.h options.h symbol.h
+modlink.o: avltree.h z80asm.h errors.h
+prsident.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
+prsident.o: symbol.h options.h errors.h
+prsline.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
+prsline.o: symbol.h options.h errors.h
+symbols.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
+symbols.o: symbols.h options.h errors.h
+z80asm.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
+z80asm.o: z80asm.h hist.h options.h errors.h
+z80instr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
+z80instr.o: symbol.h options.h errors.h
+z80pass.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
+z80pass.o: hist.h options.h z80asm.h errors.h
+options.o: memalloc.h except.h e4c.h z80asm.h avltree.h options.h symbol.h
+options.o: symbols.h errors.h
+errors.o: memalloc.h except.h e4c.h errors.h symbol.h avltree.h options.h
+errors.o: z80asm.h config.h ../config.h
+memalloc.o: memalloc.h except.h e4c.h
+except.o: except.h memalloc.h e4c.h e4c.c
