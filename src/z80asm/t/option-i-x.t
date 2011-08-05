@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-i-x.t,v 1.1 2011-07-11 15:46:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-i-x.t,v 1.2 2011-08-05 20:23:53 pauloscustodio Exp $
 # $Log: option-i-x.t,v $
-# Revision 1.1  2011-07-11 15:46:33  pauloscustodio
+# Revision 1.2  2011-08-05 20:23:53  pauloscustodio
+# test case where .lib is not passed in -i, -x, e.g "-itest"
+#
+# Revision 1.1  2011/07/11 15:46:33  pauloscustodio
 # Added test scripts for all z80asm options
 #
 #
@@ -28,17 +31,32 @@ use Test::More;
 require 't/test_utils.pl';
 
 my $lib = lib_file(); $lib =~ s/\.lib$/2.lib/i;
+my $lib2 = $lib; $lib2 =~ s/\.lib$//i;
 
-# -x
+# -x with .lib
 unlink_testfiles();
 write_file(asm_file(), "xlib main \n main: ret");
 t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
 ok -f $lib;
 
-# -i
+# -i with .lib
 t_z80asm_ok(0, "lib main \n call main", 
 		"\xCD\x03\x00\xC9",
 		"-i".$lib);
 
-unlink_testfiles($lib);
+unlink_testfiles($lib, $lib2);
+
+# -x without .lib
+unlink_testfiles();
+write_file(asm_file(), "xlib main \n main: ret");
+t_z80asm_capture("-x".$lib2." ".asm_file(), "", "", 0);
+ok -f $lib;
+
+# -i without .lib
+t_z80asm_ok(0, "lib main \n call main", 
+		"\xCD\x03\x00\xC9",
+		"-i".$lib2);
+
+unlink_testfiles($lib, $lib2);
+
 done_testing();
