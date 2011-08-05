@@ -13,9 +13,24 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.32 2011-07-18 00:53:26 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.33 2011-08-05 20:07:49 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.32  2011-07-18 00:53:26  pauloscustodio
+/* Revision 1.33  2011-08-05 20:07:49  pauloscustodio
+/* CH_0004 : Exception mechanism to handle fatal errors
+/* Included exceptions4c 2.4, Copyright (c) 2011 Guillermo Calvo
+/* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
+/* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
+/* macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated,
+/* removing all the test code after each memory allocation.
+/* Replaced all functions that allocated memory structures by the new xcalloc_struct().
+/* Replaced all free() by xfree0() macro which only frees if the pointer in non-null, and
+/* sets the poiter to NULL afterwards, to avoid any used of the freed memory.
+/* Created try/catch sequences to clean-up partially created memory structures and rethrow the
+/* exception, to cleanup memory leaks.
+/* Replaced all exit(1) by an exception.
+/* Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
+/*
+/* Revision 1.32  2011/07/18 00:53:26  pauloscustodio
 /* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
 /* BUG_0007 : memory leaks - Cleaned memory leaks in main(), ReleaseModules()
 /*
@@ -297,7 +312,6 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "errors.h"
 
 /* external functions */
-char *AllocIdentifier (size_t len);
 void RemovePfixlist (struct expr *pfixexpr);
 void Z80pass1 (void);
 void Z80pass2 (void);
@@ -334,14 +348,8 @@ int AssembleSourceFile (void);
 int TestAsmFile (void);
 int GetModuleSize (void);
 symbol *createsym (symbol * symptr);
-struct modules *AllocModuleHdr (void);
-struct module *AllocModule (void);
-struct liblist *AllocLibHdr (void);
-struct libfile *AllocLib (void);
 struct module *NewModule (void);
 struct libfile *NewLibrary (void);
-struct expression *AllocExprHdr (void);
-struct JRPC_Hdr *AllocJRaddrHdr (void);
 
 
 FILE *z80asmfile, *listfile, *errfile, *objfile, *mapfile, *modsrcfile, *deffile, *libfile;
@@ -453,9 +461,8 @@ AssembleSourceFile (void)
   PC = oldPC = 0;
   copy (staticroot, &CURRENTMODULE->localroot, (int (*)(void*,void*)) cmpidstr, (void *(*)(void*)) createsym);
   if (DefineDefSym (ASSEMBLERPC, PC, 0, &globalroot) == 0)
-    {				/* Create standard 'ASMPC' identifier */
-      ReportError (NULL, 0, ERR_NO_MEMORY);
-      return 0;
+    {					/* Create standard 'ASMPC' identifier */
+      return 0;				/* ERR_SYMBOL_REDEFINED - not expected */
     }
 
   if (verbose)
@@ -539,10 +546,10 @@ AssembleSourceFile (void)
 void 
 ReleaseFilenames (void)
 {
-  if (srcfilename != NULL) free (srcfilename);
-  if (lstfilename != NULL) free (lstfilename);
-  if (objfilename != NULL) free (objfilename);
-  if (errfilename != NULL) free (errfilename);
+  if (srcfilename != NULL) xfree0(srcfilename);
+  if (lstfilename != NULL) xfree0(lstfilename);
+  if (objfilename != NULL) xfree0(objfilename);
+  if (errfilename != NULL) xfree0(errfilename);
   srcfilename = lstfilename = objfilename = errfilename = NULL;
 }
 
@@ -609,13 +616,7 @@ GetModuleSize (void)
       size = fgetc (objfile);
       fread (line, sizeof (char), size, objfile);	/* read module name */
       line[size] = '\0';
-      if ((CURRENTMODULE->mname = AllocIdentifier (size + 1)) == NULL)
-	{
-	  ReportError (NULL, 0, ERR_NO_MEMORY);
-	  return -1;
-	}
-      else
-	strcpy (CURRENTMODULE->mname, line);
+      CURRENTMODULE->mname = xstrdup(line);
 
       fseek (objfile, 26, SEEK_SET);	/* set file pointer to point at module code pointer */
       fptr_modcode = ReadLong (objfile);	/* get file pointer to module code */
@@ -644,47 +645,27 @@ GetModuleSize (void)
 void 
 CreateLibfile (char *filename)
 {
-  size_t l;
+  size_t len;
 
-  l = strlen (filename);
-  if (l)
+  len = strlen (filename);
+  if (len)
     {
-      if (strcmp (filename + (l - 4), libext) != 0)
-        {			/* 'lib' extension not specified */
-          if ((libfilename = AllocIdentifier (l + 4 + 1)) != NULL)
-            {
-              strcpy (libfilename, filename);
-              strcat (libfilename, libext);	/* add '_lib' extension */
-            }
-          else
-            {
-              ReportError (NULL, 0, ERR_NO_MEMORY);
-              return;
-            }
+      if (strcmp (filename + (len - 4), libext) != 0)
+        {				    /* 'lib' extension not specified */
+	  libfilename = xstrdup_add(filename, 4);
+          strcat (libfilename, libext);	    /* add '_lib' extension */
         }
       else
         {
-          if ((libfilename = AllocIdentifier (l + 1)) != NULL)	/* 'lib' extension specified */
-            strcpy (libfilename, filename);
-          else
-            {
-              ReportError (NULL, 0, ERR_NO_MEMORY);
-              return;
-            }
+          libfilename = xstrdup(filename);	/* 'lib' extension specified */
         }
     }
   else
     {
       if ((filename = getenv ("Z80_STDLIB")) != NULL)
         {
-	   /* BUG_0002 - off by one alloc */
-          if ((libfilename = AllocIdentifier (strlen (filename) + 1)) != NULL)
-            strcpy (libfilename, filename);
-          else
-            {
-              ReportError (NULL, 0, ERR_NO_MEMORY);
-              return;
-            }
+	  /* BUG_0002 - off by one alloc */
+	  libfilename = xstrdup(filename);
         }
       else
         {
@@ -695,7 +676,7 @@ CreateLibfile (char *filename)
 
   if ((libfile = fopen (libfilename, "w+b")) == NULL)
     {				/* create library as BINARY file */
-      free (libfilename);
+      xfree0(libfilename);
       libfilename = NULL;
       ReportError (NULL, 0, ERR_OPEN_LIB, libfilename);
     }
@@ -715,18 +696,15 @@ GetLibfile (char *filename)
   char           *ptr;
   char           *ext = "";
   char *f, fheader[9];
-  int l;
+  int len;
 
-  if ((newlib = NewLibrary ()) == NULL)
-    {
-      ReportError (NULL, 0, ERR_NO_MEMORY);
-      return;
-    }
+  newlib = NewLibrary ();
+  e4c_assert(newlib != NULL);
 
-  l = strlen (filename);
-  if (l)
+  len = strlen (filename);
+  if (len)
     {
-      if (strcmp (filename + (l - 4), libext) != 0)
+      if (strcmp (filename + (len - 4), libext) != 0)
         {
           ext = libext;
         }
@@ -734,16 +712,7 @@ GetLibfile (char *filename)
 
       ptr = SearchFile(tempbuf, 0);
 
-      l = strlen(ptr);
-      if ((f = AllocIdentifier (l + 1)) != NULL)
-        {
-          strcpy (f, ptr);
-        }
-      else
-        {
-          ReportError (NULL, 0, ERR_NO_MEMORY);
-          return;
-        }
+      f = xstrdup(ptr);
     }
   else
     {
@@ -751,13 +720,7 @@ GetLibfile (char *filename)
       if (filename != NULL)
         {
 	  /* BUG_0002 - off by one alloc */
-          if ((f = AllocIdentifier (strlen (filename) + 1)) != NULL)
-            strcpy (f, filename);
-          else
-            {
-              ReportError (NULL, 0, ERR_NO_MEMORY);
-              return;
-            }
+	  f = xstrdup(filename);
         }
       else
         {
@@ -788,73 +751,70 @@ GetLibfile (char *filename)
 }
 
 
-
+/* CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
 struct module *
 NewModule (void)
 {
-  struct module *newm;
+    struct module *newm;
 
-  if (modulehdr == NULL)
-    {
-      if ((modulehdr = AllocModuleHdr ()) == NULL)
-	return NULL;
-      else
-	{
-	  modulehdr->first = NULL;
-	  modulehdr->last = NULL;	/* Module header initialised */
-	}
-    }
-  if ((newm = AllocModule ()) == NULL)
-    return NULL;
-  else
-    {
-      newm->nextmodule = NULL;
-      newm->mname = NULL;
-      newm->startoffset = CODESIZE;
-      newm->origin = 65535;
-      newm->cfile = NULL;
-      newm->localroot = NULL;
-      newm->notdeclroot = NULL;
-
-      if ((newm->mexpr = AllocExprHdr ()) != NULL)
-	{			/* Allocate room for expression header */
-	  newm->mexpr->firstexpr = NULL;
-	  newm->mexpr->currexpr = NULL;		/* Module expression header initialised */
-	}
-      else
-	{
-	  free (newm);		/* remove partial module definition */
-	  return NULL;		/* No room for header */
-	}
-
-      if ((newm->JRaddr = AllocJRaddrHdr ()) != NULL)
-	{
-	  newm->JRaddr->firstref = NULL;
-	  newm->JRaddr->lastref = NULL;		/* Module JRaddr list header initialised */
-	}
-      else
-	{
-	  free (newm->mexpr);	/* remove expression header */
-	  free (newm);		/* remove partial module definition */
-	  return NULL;		/* No room for header */
-	}
+    if (modulehdr == NULL) {
+	modulehdr = xcalloc_struct(struct modules);
+	modulehdr->first = NULL;
+	modulehdr->last = NULL;	/* Module header initialised */
     }
 
-  if (modulehdr->first == NULL)
-    {
-      modulehdr->first = newm;
-      modulehdr->last = newm;	/* First module     in list   */
+    newm = xcalloc_struct(struct module);
+    try {
+	newm->nextmodule = NULL;
+	newm->mname = NULL;
+	newm->startoffset = CODESIZE;
+	newm->origin = 65535;
+	newm->cfile = NULL;
+	newm->localroot = NULL;
+	newm->notdeclroot = NULL;
+
+	newm->mexpr = xcalloc_struct(struct expression);
+					/* Allocate room for expression header */
+	try {
+	    newm->mexpr->firstexpr = NULL;
+	    newm->mexpr->currexpr = NULL;
+					/* Module expression header initialised */
+
+	    newm->JRaddr = xcalloc_struct(struct JRPC_Hdr);
+	    try {
+		newm->JRaddr->firstref = NULL;
+		newm->JRaddr->lastref = NULL;
+    					/* Module JRaddr list header initialised */
+	    }
+	    catch(RuntimeException) {
+		xfree0(newm->JRaddr);
+		rethrow("");
+	    }
+	}
+	catch(RuntimeException) {
+	    xfree0(newm->mexpr);
+	    rethrow("");
+	}
     }
-  else
-    {
-      modulehdr->last->nextmodule = newm;	/* current/last module points now at new current */
-      modulehdr->last = newm;			/* pointer to current module updated */
+    catch(RuntimeException) {
+	xfree0(newm);
+	rethrow("");
     }
 
-  return newm;
+    if (modulehdr->first == NULL) {
+	modulehdr->first = newm;
+	modulehdr->last = newm;		/* First module     in list   */
+    }
+    else {
+	modulehdr->last->nextmodule = newm;	/* current/last module points now at new current */
+	modulehdr->last = newm;			/* pointer to current module updated */
+    }
+
+    return newm;
 }
 
 
+/* CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
 struct libfile *
 NewLibrary (void)
 {
@@ -862,22 +822,15 @@ NewLibrary (void)
 
   if (libraryhdr == NULL)
     {
-      if ((libraryhdr = AllocLibHdr ()) == NULL)
-	return NULL;
-      else
-	{
-	  libraryhdr->firstlib = NULL;
-	  libraryhdr->currlib = NULL;	/* Library header initialised */
-	}
+      libraryhdr = xcalloc_struct(struct liblist);
+      libraryhdr->firstlib = NULL;
+      libraryhdr->currlib = NULL;	/* Library header initialised */
     }
-  if ((newl = AllocLib ()) == NULL)
-    return NULL;
-  else
-    {
-      newl->nextlib = NULL;
-      newl->libfilename = NULL;
-      newl->nextobjfile = -1;
-    }
+
+  newl = xcalloc_struct(struct libfile);
+  newl->nextlib = NULL;
+  newl->libfilename = NULL;
+  newl->nextobjfile = -1;
 
   if (libraryhdr->firstlib == NULL)
     {
@@ -904,8 +857,10 @@ ReleaseModules (void)
   if (modulehdr == NULL)
     return;
 
+  /* if exception happened at first module creation, we may have a header an no modules
+   * move while check to top of loop */
   curptr = modulehdr->first;
-  do
+  while (curptr != NULL)	/* until all modules are released */
     {
       if (curptr->cfile != NULL)
 	ReleaseFile (curptr->cfile);
@@ -920,20 +875,19 @@ ReleaseModules (void)
 	  while (curJR) {
 	      prevJR = curJR;
 	      curJR = curJR->nextref;	/* get ready for next JR instruction */
-	      free (prevJR);
+	      xfree0(prevJR);
 	  }
-	  free(curptr->JRaddr); curptr->JRaddr = NULL;
+	  xfree0(curptr->JRaddr); curptr->JRaddr = NULL;
       }
 
       if (curptr->mname != NULL)
-	free (curptr->mname);
+	xfree0(curptr->mname);
       tmpptr = curptr;
       curptr = curptr->nextmodule;
-      free (tmpptr);		/* Release module */
+      xfree0(tmpptr);		/* Release module */
     }
-  while (curptr != NULL);	/* until all modules are released */
 
-  free (modulehdr);
+  xfree0(modulehdr);
   modulehdr = NULL;
   CURRENTMODULE = NULL;
 }
@@ -946,17 +900,16 @@ ReleaseLibraries (void)
   struct libfile *curptr, *tmpptr;
 
   curptr = libraryhdr->firstlib;
-  do
+  while (curptr != NULL)	/* while there are libraries */
     {
       if (curptr->libfilename != NULL)
-	free (curptr->libfilename);
+	xfree0(curptr->libfilename);
       tmpptr = curptr;
       curptr = curptr->nextlib;
-      free (tmpptr);		/* release library */
+      xfree0(tmpptr);		/* release library */
     }
-  while (curptr != NULL);	/* until all libraries are released */
 
-  free (libraryhdr);		/* Release library header */
+  xfree0(libraryhdr);		/* Release library header */
   libraryhdr = NULL;
 }
 
@@ -975,7 +928,7 @@ ReleaseExprns (struct expression *express)
       curexpr = tmpexpr;
     }
 
-  free (express);
+  xfree0(express);
 }
 
 
@@ -984,8 +937,8 @@ ReleaseFile (struct sourcefile *srcfile)
 {
   if (srcfile->usedsourcefile != NULL)
     ReleaseOwnedFile (srcfile->usedsourcefile);
-  free (srcfile->fname);	/* Release allocated area for filename */
-  free (srcfile);		/* Release file information record for this file */
+  xfree0(srcfile->fname);	/* Release allocated area for filename */
+  xfree0(srcfile);		/* Release file information record for this file */
 }
 
 
@@ -1000,7 +953,7 @@ ReleaseOwnedFile (struct usedfile *ownedfile)
   if (ownedfile->ownedsourcefile != NULL)
     ReleaseFile (ownedfile->ownedsourcefile);
 
-  free (ownedfile);		/* Then release this owned file */
+  xfree0(ownedfile);		/* Then release this owned file */
 }
 
 
@@ -1045,8 +998,12 @@ main (int argc, char *argv[])
   int    include_level = 0;
   FILE  *includes[10];   /* 10 levels of inclusion should be enough */
 
-  init_memalloc();
+    init_memalloc();			/* init memory leak detection */
+    e4c_context_begin(e4c_false, e4c_print_exception);
+					/* init exception mechanism */
 
+    /* start try..catch with finally to cleanup any allocated memory */
+    try {
   writeline = ON;
   library = createlibrary = OFF;
   cpu_type = CPU_Z80;
@@ -1065,7 +1022,7 @@ main (int argc, char *argv[])
 
   asmflag = DefineDefSym (OS_ID, 1, 0, &staticroot);
   if (!asmflag)
-    exit (1);
+    throw(IllegalArgumentException, "Failed OS_ID definition");
 
   strcpy (objext, objext_templ);	/* use ".obj" as default object file extension */
 
@@ -1073,42 +1030,35 @@ main (int argc, char *argv[])
   if (argc == 1)
     {
       prompt ();
-      exit (1);
+      throw(IllegalArgumentException, "No arguments");
     }
   time (&asmtime);
   date = asctime (localtime (&asmtime));	/* get current system time for date in list file */
 
-  codearea = (unsigned char *) calloc (MAXCODESIZE, sizeof (char));	/* Allocate Memory for Z80 machine code */
-  if (codearea == NULL)
-    {
-      ReportError (NULL, 0, ERR_NO_MEMORY);
-      exit (1);
-    }
+  codearea = (unsigned char *) xcalloc (MAXCODESIZE, sizeof (char));	/* Allocate Memory for Z80 machine code */
   CODESIZE = 0;
 
   PAGELEN = 66;
   TOTALERRORS = 0;
   TOTALLINES = 0;
   
-  if ((CURRENTMODULE = NewModule ()) == NULL)
-    {				/* then create a dummy module */
-      ReportError (NULL, 0, ERR_NO_MEMORY);	/* this   is needed during command line parsing */
-      exit (1);
-    }
+  CURRENTMODULE = NewModule ();		/* then create a dummy module */
+					/* this is needed during command line parsing */
+  e4c_assert(CURRENTMODULE != NULL);
 
   /* Setup some default search paths */
   i = include_dir_num++;
-  include_dir = realloc(include_dir, include_dir_num * sizeof(include_dir[0]));
-  include_dir[i] = strdup(".");
+  include_dir = xrealloc(include_dir, include_dir_num * sizeof(include_dir[0]));
+  include_dir[i] = xstrdup(".");
   if ( ( ptr = getenv("Z80_OZFILES") ) != NULL ) {
     i = include_dir_num++;
-    include_dir = realloc(include_dir, include_dir_num * sizeof(include_dir[0]));
-    include_dir[i] = strdup(ptr);
+    include_dir = xrealloc(include_dir, include_dir_num * sizeof(include_dir[0]));
+    include_dir[i] = xstrdup(ptr);
   }
 
   i = lib_dir_num++;
-  lib_dir = realloc(lib_dir, lib_dir_num * sizeof(lib_dir[0]));
-  lib_dir[i] = strdup(".");
+  lib_dir = xrealloc(lib_dir, lib_dir_num * sizeof(lib_dir[0]));
+  lib_dir[i] = xstrdup(".");
 
 
   while (--argc > 0)
@@ -1131,7 +1081,7 @@ main (int argc, char *argv[])
   if (!argc && modsrcfile == NULL)
     {
       ReportError (NULL, 0, ERR_NO_SRC_FILE);
-      exit (1);
+      throw(IllegalArgumentException, "no source file");
     }
   COLUMN_WIDTH = 4 * TAB_DIST;	/* define column width   for output files */
 
@@ -1207,63 +1157,32 @@ main (int argc, char *argv[])
       if (strrchr(ident,'.') != NULL) *(strrchr(ident, '.')) ='\0';
 #endif
 
-      if ((srcfilename = AllocIdentifier (strlen (ident) + 5)) != NULL)
-        {
-          strcpy (srcfilename, ident);
-          strcat (srcfilename, srcext);		/* add '_asm' or '_opt' extension   */
-        }
-      else
-        {
-          ReportError (NULL, 0, ERR_NO_MEMORY);
-          break;
-        }
-      if ((objfilename = AllocIdentifier (strlen (srcfilename) + 1)) != NULL)
-        {
-          strcpy (objfilename, srcfilename);
-          strcpy (objfilename + strlen (srcfilename) - 4, objext);	/* overwrite '_asm' extension with
-                                                                     * '_obj' */
-        }
-      else
-        {
-          ReportError (NULL, 0, ERR_NO_MEMORY);
-          break;		/* No more room     */
-        }
+      srcfilename = xstrdup_add(ident, 4);
+      strcat (srcfilename, srcext);		/* add '_asm' or '_opt' extension   */
 
-      if ((lstfilename = AllocIdentifier (strlen (srcfilename) + 1)) != NULL)
-        {
-          strcpy (lstfilename, srcfilename);
-          if (listing)
-            strcpy (lstfilename + strlen (srcfilename) - 4, lstext);	/* overwrite '_asm' extension
-                                                                         * with   '_lst' */
-          else
-            strcpy (lstfilename + strlen (srcfilename) - 4, symext);	/* overwrite '_asm' extension
-                                                                         * with   '_sym' */
-        }
-      else
-        {
-          ReportError (NULL, 0, ERR_NO_MEMORY);
-          break;		/* No more room     */
-        }
+      objfilename = xstrdup(srcfilename);
+      strcpy (objfilename + strlen (srcfilename) - 4, objext);	
+						/* overwrite '_asm' extension with '_obj' */
 
-      if ((errfilename = AllocIdentifier (strlen (srcfilename) + 1)) != NULL)
-        {
-          strcpy (errfilename, srcfilename);
-          strcpy (errfilename + strlen (srcfilename) - 4, errext);	/* overwrite '_asm' extension with
+      lstfilename = xstrdup(srcfilename);
+      if (listing) {
+          strcpy (lstfilename + strlen (srcfilename) - 4, lstext);	/* overwrite '_asm' extension
+                                                                        * with   '_lst' */
+      }
+      else {
+          strcpy (lstfilename + strlen (srcfilename) - 4, symext);	/* overwrite '_asm' extension
+                                                                        * with   '_sym' */
+      }
+
+      errfilename = xstrdup(srcfilename);
+      strcpy (errfilename + strlen (srcfilename) - 4, errext);	    /* overwrite '_asm' extension with
                                                                      * '_err' */
-        }
-      else
-        {
-          ReportError (NULL, 0, ERR_NO_MEMORY);
-          break;		/* No more room     */
-        }
 
-      if ((CURRENTMODULE = NewModule ()) == NULL)
-        {			/* Create module data structures for new file */
-          ReportError (NULL, 0, ERR_NO_MEMORY);
-          break;
-        }
-      if ((CURRENTFILE = Newfile (NULL, srcfilename)) == NULL)
-        break;			/* Create first     file record, if     possible */
+      CURRENTMODULE = NewModule ();		    /* Create module data structures for new file */
+      e4c_assert(CURRENTMODULE != NULL);
+
+      CURRENTFILE = Newfile (NULL, srcfilename);    /* Create first file record */
+      e4c_assert(CURRENTFILE != NULL);
 
       if (globaldef && CURRENTMODULE == modulehdr->first)
         CreateDeffile ();
@@ -1294,7 +1213,7 @@ main (int argc, char *argv[])
       fclose (libfile);
       if (ASMERROR)
         remove (libfilename);
-      free (libfilename);
+      xfree0(libfilename);
       libfilename = NULL;
     }
 
@@ -1313,8 +1232,25 @@ main (int argc, char *argv[])
     }
 
 
+  }
+
+  /* catch and report fatal errors */
+  catch(NotEnoughMemoryException) {
+      ReportError(NULL, 0, ERR_NO_MEMORY);
+  }
+
+  catch(IllegalArgumentException) {
+      ASMERROR = ON;
+  }
+
+  /* cleanup all allocated memory */
+  finally {
   ReleaseFilenames ();
   CloseFiles ();
+
+  if (libfilename) {			/* memory leak in case of exception */
+      xfree0(libfilename);
+  }
 
 #ifndef QDOS
   deleteall (&globalroot, (void (*)(void*)) FreeSym);
@@ -1325,19 +1261,20 @@ main (int argc, char *argv[])
 
   if (libraryhdr != NULL)
     ReleaseLibraries ();	/* Release library information */
-  free (codearea);		/* Release area for machine code */
+  if (codearea != NULL)
+    xfree0(codearea);		/* Release area for machine code */
 
   if (autorelocate)
     if (reloctable != NULL)
-      free (reloctable);
+      xfree0(reloctable);
 
   /* BUG_0007 : memory leaks */
   if (include_dir) {
       int i;
       for (i = 0; i < include_dir_num; i++) {
-	  free(include_dir[i]);
+	  xfree0(include_dir[i]);
       }
-      free(include_dir);
+      xfree0(include_dir);
   }
   include_dir = NULL;
   
@@ -1345,14 +1282,17 @@ main (int argc, char *argv[])
   if (lib_dir) {
       int i;
       for (i = 0; i < lib_dir_num; i++) {
-	  free(lib_dir[i]);
+	  xfree0(lib_dir[i]);
       }
-      free(lib_dir);
+      xfree0(lib_dir);
   }
   lib_dir = NULL;
 #endif
+  }
 
-  if (ASMERROR)
+  e4c_context_end();			/* end exception mechanism */
+
+  if (ASMERROR && TOTALERRORS > 0)
     ReportError (NULL, 0, ERR_TOTALERRORS);
 
   /* <djm>, if errors, then we really want to return an error number
@@ -1409,42 +1349,6 @@ createsym (symbol * symptr)
   return CreateSymbol (symptr->symname, symptr->symvalue, symptr->type, symptr->owner);
 }
 
-
-struct expression *
-AllocExprHdr (void)
-{
-  return (struct expression *) malloc (sizeof (struct expression));
-}
-
-struct JRPC_Hdr *
-AllocJRaddrHdr (void)
-{
-  return (struct JRPC_Hdr *) malloc (sizeof (struct JRPC_Hdr));
-}
-
-struct modules *
-AllocModuleHdr (void)
-{
-  return (struct modules *) malloc (sizeof (struct modules));
-}
-
-struct module *
-AllocModule (void)
-{
-  return (struct module *) malloc (sizeof (struct module));
-}
-
-struct liblist *
-AllocLibHdr (void)
-{
-  return (struct liblist *) malloc (sizeof (struct liblist));
-}
-
-struct libfile *
-AllocLib (void)
-{
-  return (struct libfile *) malloc (sizeof (struct libfile));
-}
 
 /** \brief Search for a filename in the include path
  *
