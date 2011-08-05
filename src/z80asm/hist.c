@@ -19,9 +19,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.19 2011-07-18 00:54:01 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.20 2011-08-05 20:26:42 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.19  2011-07-18 00:54:01  pauloscustodio
+/* Revision 1.20  2011-08-05 20:26:42  pauloscustodio
+/* Version 1.1.6
+/*
+/* Revision 1.19  2011/07/18 00:54:01  pauloscustodio
 /* Version 1.1.5
 /*
 /* Revision 1.18  2011/07/14 23:49:55  pauloscustodio
@@ -660,14 +663,30 @@ Based on 1.0.31
 	Cleaned memory leaks in main(), ReleaseModules(), DEFS().
 	Still memory leaks in main() in case of premature exit due to fatal errors; need
 	to include exception mechanism to solve.
+
+05.08.2011 [1.1.6] (pauloscustodio)
+    CH_0004 : Exception mechanism to handle fatal errors
+	Included exceptions4c 2.4, Copyright (c) 2011 Guillermo Calvo
+	Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
+	Replaced all the memory allocation functions malloc, calloc, ... by corresponding 
+	macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated, 
+	removing all the test code after each memory allocation.
+	Replaced all functions that allocated memory structures by the new xcalloc_struct().
+	Replaced all free() by xfree0() macro which only frees if the pointer in non-null, and 
+	sets the poiter to NULL afterwards, to avoid any used of the freed memory.
+	Created try/catch sequences to clean-up partially created memory structures and rethrow the 
+	exception, to cleanup memory leaks.
+	Replaced all exit(1) by an exception.
+	Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
+
 */
 
 #include "memalloc.h"	/* before any other include to enable memory leak detection */
 
 #include "hist.h"
 
-#define DATE        "18.07.2011"
-#define VERSION     "1.1.5"
+#define DATE        "05.08.2011"
+#define VERSION     "1.1.6"
 #define COPYRIGHT   "InterLogic 1993-2009"
 
 #ifdef QDOS
