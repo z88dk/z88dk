@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.18 2011-07-18 00:52:01 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.19 2011-08-05 19:37:38 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.18  2011-07-18 00:52:01  pauloscustodio
+/* Revision 1.19  2011-08-05 19:37:38  pauloscustodio
+/* CH_0004 : Exception mechanism to handle fatal errors
+/* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
+/* Replaced all functions that allocated memory structures by the new xcalloc_struct().
+/* Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
+/*
+/* Revision 1.18  2011/07/18 00:52:01  pauloscustodio
 /* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
 /* BUG_0007 : memory leaks - Cleaned memory leaks in DEFS()
 /*
@@ -178,7 +184,6 @@ int ExprLong (int listoffset);
 int DefineDefSym (char *identifier, long value, unsigned char symtype, avltree ** root);
 int DEFSP (void);
 int GetChar (FILE *fptr);
-char *AllocIdentifier (size_t len);
 long EvalPfixExpr (struct expr *pfixexpr);
 long GetConstant (char *evalerr);
 void Pass2info (struct expr *expression, char constrange, long lfileptr);
@@ -887,9 +892,6 @@ IncludeFile (void)
         {
           sourcefile_open = 1;
           CURRENTFILE = Newfile (CURRENTFILE, filename);	/* Allocate new file into file information list */
-
-          if (ASSEMBLE_ERROR == ERR_NO_MEMORY)
-            return;		/* No room... */
           if (verbose)
             puts (CURRENTFILE->fname);	/* display name of INCLUDE file */
 
@@ -900,7 +902,6 @@ IncludeFile (void)
           switch (ASSEMBLE_ERROR)
             {
             case ERR_FILE_OPEN:
-            case ERR_NO_MEMORY:
             case ERR_MAX_CODESIZE:
               return;		/* Fatal errors, return immediatly... */
             }
@@ -968,10 +969,10 @@ char *
 Fetchfilename (FILE *fptr)
 {
   char  *ptr;
-  int    l, c = 0;
+  int    len, c = 0;
 
   do {
-    for (l = 0;l<255; l++) 
+    for (len = 0;len<255; len++) 
       {
         if (!feof (fptr)) 
           {
@@ -981,7 +982,7 @@ Fetchfilename (FILE *fptr)
 
             if (c != '"') 
               {
-                ident[l] = (char) c;
+                ident[len] = (char) c;
               } 
             else 
               {
@@ -993,7 +994,7 @@ Fetchfilename (FILE *fptr)
 	        break;
           }
       }
-    ident[l] = '\0';		/* null-terminate file name */
+    ident[len] = '\0';		/* null-terminate file name */
   } while (strlen(ident) == 0 && !feof(fptr) );
 	
   if (c != '\n') Skipline (fptr); /* prepare for next line */
@@ -1013,14 +1014,9 @@ DeclModuleName (void)
   if (CURRENTMODULE->mname == NULL)
     {
       if (sym == name)
-	{
-	  if ((CURRENTMODULE->mname = AllocIdentifier (strlen (ident) + 1)) != NULL)
-	    strcpy (CURRENTMODULE->mname, ident);
-	  else
-	    ReportError (NULL, 0, ERR_NO_MEMORY);
-	}
+	  CURRENTMODULE->mname = xstrdup(ident);
       else
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
+	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
     }
   else
     ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MODULE_REDEFINED);
