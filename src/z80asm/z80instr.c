@@ -13,9 +13,17 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.22 2011-07-18 00:48:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.23 2011-08-05 20:11:02 pauloscustodio Exp $ */
 /* $Log: z80instr.c,v $
-/* Revision 1.22  2011-07-18 00:48:25  pauloscustodio
+/* Revision 1.23  2011-08-05 20:11:02  pauloscustodio
+/* CH_0004 : Exception mechanism to handle fatal errors
+/* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
+/* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
+/* macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated,
+/* removing all the test code after each memory allocation.
+/* Replaced all functions that allocated memory structures by the new xcalloc_struct().
+/*
+/* Revision 1.22  2011/07/18 00:48:25  pauloscustodio
 /* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
 /*
 /* Revision 1.21  2011/07/14 01:32:08  pauloscustodio
@@ -181,7 +189,6 @@ void ExtAccumulator(int opcode);
 extern void SetTemporaryLine(char *line);
 
 /* local functions */
-struct JRPC *AllocJRPC (void);
 void ADD_8bit_instr (void);
 void ADC_8bit_instr (void);
 void SBC_8bit_instr (void);
@@ -962,37 +969,24 @@ DJNZ (void)
 void 
 NewJRaddr (void)
 {
-  struct JRPC *newJRPC;
+    struct JRPC *newJRPC;
 
-  if ((newJRPC = AllocJRPC ()) == NULL)
-    {
-      ReportError (NULL, 0, ERR_NO_MEMORY);
-      return;
-    }
-  else
-    {
-      newJRPC->nextref = NULL;
-      newJRPC->PCaddr = (unsigned short)PC;
-    }
+    newJRPC = xcalloc_struct(struct JRPC);
+    newJRPC->nextref = NULL;
+    newJRPC->PCaddr = (unsigned short)PC;
 
-  if (CURRENTMODULE->JRaddr->firstref == NULL)
+    if (CURRENTMODULE->JRaddr->firstref == NULL)
     {				/* no list yet */
-      CURRENTMODULE->JRaddr->firstref = newJRPC;	/* initialise first reference */
-      CURRENTMODULE->JRaddr->lastref = newJRPC;
+	CURRENTMODULE->JRaddr->firstref = newJRPC;	/* initialise first reference */
+	CURRENTMODULE->JRaddr->lastref = newJRPC;
     }
-  else
+    else
     {
-      CURRENTMODULE->JRaddr->lastref->nextref = newJRPC;	/* update last entry with new entry */
-      CURRENTMODULE->JRaddr->lastref = newJRPC;		/* point to new entry */
+	CURRENTMODULE->JRaddr->lastref->nextref = newJRPC;	/* update last entry with new entry */
+	CURRENTMODULE->JRaddr->lastref = newJRPC;		/* point to new entry */
     }
 }
 
-
-struct JRPC *
-AllocJRPC (void)
-{
-  return (struct JRPC *) malloc (sizeof (struct JRPC));		/* allocate new JR PC address */
-}
 
 
 void 
