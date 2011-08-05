@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.4 2011-07-18 00:48:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.5 2011-08-05 19:58:28 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.4  2011-07-18 00:48:25  pauloscustodio
+/* Revision 1.5  2011-08-05 19:58:28  pauloscustodio
+/* CH_0004 : Exception mechanism to handle fatal errors
+/* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
+/* macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated,
+/* removing all the test code after each memory allocation.
+/* Replaced all exit(1) by an exception.
+/*
+/* Revision 1.4  2011/07/18 00:48:25  pauloscustodio
 /* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
 /*
 /* Revision 1.3  2011/07/14 01:32:08  pauloscustodio
@@ -258,14 +265,14 @@ void SetAsmFlag (char *flagid)
 
     else if (*flagid == 'I') {
 	int i = include_dir_num++;
-	include_dir = realloc(include_dir, include_dir_num * sizeof(include_dir[0]));
-	include_dir[i] = strdup(flagid+1);
+	include_dir = xrealloc(include_dir, include_dir_num * sizeof(include_dir[0]));
+	include_dir[i] = xstrdup(flagid+1);
     }
 
     else if (*flagid == 'L') {
 	int i = lib_dir_num++;
-	lib_dir = realloc(lib_dir, lib_dir_num * sizeof(lib_dir[0]));
-	lib_dir[i] = strdup(flagid+1);
+	lib_dir = xrealloc(lib_dir, lib_dir_num * sizeof(lib_dir[0]));
+	lib_dir[i] = xstrdup(flagid+1);
     }
 
     else if (*flagid == 'D') {
@@ -303,7 +310,7 @@ void SetAsmFlag (char *flagid)
 
     else if (strcmp (flagid, "h") == 0) {
 	usage();
-	exit(1);
+	throw(IllegalArgumentException, "usage");
     }
 
     else {
