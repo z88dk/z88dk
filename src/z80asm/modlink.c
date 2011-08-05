@@ -13,9 +13,22 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.20 2011-07-18 00:48:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.21 2011-08-05 19:56:37 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.20  2011-07-18 00:48:25  pauloscustodio
+/* Revision 1.21  2011-08-05 19:56:37  pauloscustodio
+/* CH_0004 : Exception mechanism to handle fatal errors
+/* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
+/* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
+/* macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated,
+/* removing all the test code after each memory allocation.
+/* Replaced all functions that allocated memory structures by the new xcalloc_struct().
+/* Replaced all free() by xfree0() macro which only frees if the pointer in non-null, and
+/* sets the poiter to NULL afterwards, to avoid any used of the freed memory.
+/* Created try/catch sequences to clean-up partially created memory structures and rethrow the
+/* exception, to cleanup memory leaks.
+/* Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
+/*
+/* Revision 1.20  2011/07/18 00:48:25  pauloscustodio
 /* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
 /*
 /* Revision 1.19  2011/07/14 01:32:08  pauloscustodio
@@ -177,7 +190,6 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* external functions */
 void FreeSym (symbol * node);
 void RemovePfixlist (struct expr *pfixexpr);
-char *AllocIdentifier (size_t len);
 struct module *NewModule (void);
 struct libfile *NewLibrary (void);
 struct sourcefile *Newfile (struct sourcefile *curfile, char *fname);
@@ -215,8 +227,6 @@ void WriteMapSymbol (symbol * mapnode);
 void WriteGlobal (symbol * node);
 void CreateDeffile (void);
 void ReleaseLinkInfo (void);
-struct linklist *AllocLinkHdr (void);
-struct linkedmod *AllocTracedModule (void);
 static char *         CheckIfModuleWanted(FILE *z80asmfile, long currentlibmodule, char *modname);
 
 /* global variables */
@@ -280,8 +290,8 @@ ReadNames (long nextname, long endnames)
           if ((foundsymbol = FindSymbol (line, CURRENTMODULE->localroot)) == NULL)
             {
               foundsymbol = CreateSymbol (line, value, symtype | SYMLOCAL, CURRENTMODULE);
-              if (foundsymbol != NULL)
-                insert (&CURRENTMODULE->localroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
+              e4c_assert(foundsymbol != NULL);
+              insert (&CURRENTMODULE->localroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
             }
           else
             {
@@ -296,8 +306,8 @@ ReadNames (long nextname, long endnames)
           if ((foundsymbol = FindSymbol (line, globalroot)) == NULL)
             {
               foundsymbol = CreateSymbol (line, value, symtype | SYMXDEF, CURRENTMODULE);
-              if (foundsymbol != NULL)
-                insert (&globalroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
+              e4c_assert(foundsymbol != NULL);
+              insert (&globalroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
             }
           else
             {
@@ -312,8 +322,8 @@ ReadNames (long nextname, long endnames)
           if ((foundsymbol = FindSymbol (line, globalroot)) == NULL)
             {
               foundsymbol = CreateSymbol (line, value, symtype | SYMXDEF | SYMDEF, CURRENTMODULE);
-              if (foundsymbol != NULL)
-                insert (&globalroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
+              e4c_assert(foundsymbol != NULL);
+              insert (&globalroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
             }
           else
             {
@@ -471,149 +481,128 @@ WriteExprMsg (void)
 void 
 LinkModules (void)
 {
-  char fheader[9];
-  size_t lowbyte, highbyte;
-  struct module *lastobjmodule;
-  symtable = listing = OFF;
-  linkhdr = NULL;
+    char fheader[9];
+    size_t lowbyte, highbyte;
+    struct module *lastobjmodule;
+    symtable = listing = OFF;
+    linkhdr = NULL;
 
-  if (verbose)
-    puts ("linking module(s)...\nPass1...");
+    if (verbose)
+	puts ("linking module(s)...\nPass1...");
 
-  if (autorelocate == ON)
-    {
-      reloctable = (char *) malloc (32768U);
-      if (reloctable == NULL)
-        {
-          ReportError (NULL, 0, ERR_NO_MEMORY);
-          return;		/* No more room     */
-        }
-      else
-        {
-          relocptr = reloctable;
-          relocptr += 4;	/* point at first offset to store */
-          totaladdr = 0;
-          sizeof_reloctable = 0;	/* relocation table, still 0 elements .. */
-          curroffset = 0;
-        }
+    if (autorelocate == ON) {
+	reloctable = (char *) xmalloc(32768U);
+	relocptr = reloctable;
+	relocptr += 4;	/* point at first offset to store */
+	totaladdr = 0;
+	sizeof_reloctable = 0;	/* relocation table, still 0 elements .. */
+	curroffset = 0;
     }
+    else
+	reloctable = NULL;
+  
+    try {
+	CURRENTMODULE = modulehdr->first;	/* begin with first module */
+	lastobjmodule = modulehdr->last;	/* remember this last module, further modules are libraries */
+	
+	errfilename = xstrdup(CURRENTFILE->fname);
+	strcpy (errfilename + strlen (errfilename) - 4, errext);	
+					/* overwrite '_asm' extension with '_err' */
 
-  CURRENTMODULE = modulehdr->first;	/* begin with first module */
-  lastobjmodule = modulehdr->last;	/* remember this last module, further modules are libraries */
+	if ((errfile = fopen(errfilename, "w")) == NULL) {	/* open error file */
+	    ReportError(NULL, 0, ERR_FILE_OPEN, errfilename);	/* couldn't open error file */
+	    throw(EarlyReturnException, "cant open errfilename");
+	}
 
-  if ((errfilename = AllocIdentifier (strlen (CURRENTFILE->fname) + 1)) != NULL)
-    {
-      strcpy (errfilename, CURRENTFILE->fname);
-      strcpy (errfilename + strlen (errfilename) - 4, errext);	/* overwrite '_asm' extension with '_err' */
+	PC = 0;
+	DefineDefSym(ASSEMBLERPC, PC, 0, &globalroot);	/* Create standard 'ASMPC' identifier */
+
+	do {				/* link machine code & read symbols in all modules */
+	    if (library) {
+		CURRENTLIB = libraryhdr->firstlib;	/* begin library search  from first library for each
+							* module */
+		CURRENTLIB->nextobjfile = 8;		/* point at first library module (past header) */
+	    }
+	    CURRENTFILE->line = 0;	/* no line references on errors during link processing */
+
+	    objfilename = xstrdup(CURRENTFILE->fname);
+	    strcpy (objfilename + strlen (objfilename) - 4, objext);	
+					/* overwrite '_asm' extension with * '_obj' */
+
+	    /* open relocatable file for reading */
+	    if ((z80asmfile = fopen (objfilename, "rb")) != NULL) {
+		fread (fheader, 1U, 8U, z80asmfile);		/* read first 6 chars from file into array */
+		fheader[8] = '\0';
+	    }
+	    else {
+		ReportError (NULL, 0, ERR_FILE_OPEN, objfilename);	/* couldn't open relocatable file */
+		break;
+	    }
+
+	    /* compare header of file */
+	    if (strcmp (fheader, Z80objhdr) != 0) {			
+		ReportError (NULL, 0, ERR_NOT_OBJ_FILE, objfilename);	/* not a object     file */
+		fclose (z80asmfile);
+		z80asmfile = NULL;
+		break;
+	    }
+
+	    lowbyte = fgetc (z80asmfile);
+	    highbyte = fgetc (z80asmfile);
+
+	    if (modulehdr->first == CURRENTMODULE) {		/* origin of first module */
+		if (autorelocate)
+		    CURRENTMODULE->origin = 0;			/* ORG 0 on auto relocation */
+		else {
+		    if (deforigin)
+			CURRENTMODULE->origin = EXPLICIT_ORIGIN;	/* use origin from command line    */
+		    else {
+			CURRENTMODULE->origin = highbyte * 256U + lowbyte;
+			if (CURRENTMODULE->origin == 65535U)
+    			    DefineOrigin ();	/* Define origin of first module from the keyboard */
+		    }
+		}
+		if (verbose == ON)
+		    printf ("ORG address for code is %04lX\n", CURRENTMODULE->origin);
+	    }
+	    fclose (z80asmfile);
+
+	    LinkModule (objfilename, 0);	/* link code & read name definitions */
+	    xfree0(objfilename);		/* release allocated file name */
+	    objfilename = NULL;
+
+	    CURRENTMODULE = CURRENTMODULE->nextmodule;	/* get next module, if any */
+	
+	} while (CURRENTMODULE != lastobjmodule->nextmodule);	
+					/* parse only object modules, not added library modules */
+
+	if (verbose == ON)
+	    printf ("Code size of linked modules is %d bytes\n", (int)CODESIZE);
+
+	if (ASMERROR == OFF)
+	    ModuleExpr ();		/*  Evaluate expressions in  all modules */
+
     }
-  else
-    {
-      ReportError (NULL, 0, ERR_NO_MEMORY);
-      return;			/* No more room     */
+    catch(EarlyReturnException) {
+					/* do nothing, just for early return */
     }
-
-  if ((errfile = fopen (errfilename, "w")) == NULL)
-    {				/* open error file */
-      ReportError (NULL, 0, ERR_FILE_OPEN, errfilename);	/* couldn't open relocatable file */
-      free (errfilename);
-      errfilename = NULL;
-      return;
+    finally {
+	ReleaseLinkInfo ();		/* Release module link information */
+	if (errfile) {
+	    fclose(errfile);
+	    errfile = NULL;
+	}
+	if (TOTALERRORS == 0)
+	    remove(errfilename);
+	if (errfilename) {
+	    xfree0(errfilename);
+	    errfilename = NULL;
+	}
+	if (objfilename) {
+	    xfree0(objfilename);
+	    objfilename = NULL;
+	}
     }
-
-  PC = 0;
-  if (DefineDefSym (ASSEMBLERPC, PC, 0, &globalroot) == 0)
-    {				/* Create standard 'ASMPC' identifier */
-      ReportError (NULL, 0, ERR_NO_MEMORY);	/* no more room     */
-      free (errfilename);
-      return;
-    }
-
-  do
-    {				/* link machine code & read symbols in all modules */
-      if (library)
-        {
-          CURRENTLIB = libraryhdr->firstlib;	/* begin library search  from first library for each
-                                                 * module */
-          CURRENTLIB->nextobjfile = 8;	/* point at first library module (past header) */
-        }
-      CURRENTFILE->line = 0;	/* no line references on errors    during link processing */
-
-      if ((objfilename = AllocIdentifier (strlen (CURRENTFILE->fname) + 1)) != NULL)
-        {
-          strcpy (objfilename, CURRENTFILE->fname);
-          strcpy (objfilename + strlen (objfilename) - 4, objext);	/* overwrite '_asm' extension with
-                                                                     * '_obj' */
-        }
-      else
-        {
-          ReportError (NULL, 0, ERR_NO_MEMORY);
-          break;		/* No more room */
-        }
-
-      if ((z80asmfile = fopen (objfilename, "rb")) != NULL)
-        {								/* open relocatable file for reading */
-          fread (fheader, 1U, 8U, z80asmfile);	/* read first 6 chars from file into array */
-          fheader[8] = '\0';
-        }
-      else
-        {
-          ReportError (NULL, 0, ERR_FILE_OPEN, objfilename);	/* couldn't open relocatable file */
-          break;
-        }
-
-      if (strcmp (fheader, Z80objhdr) != 0)
-        {			/* compare header of file */
-          ReportError (NULL, 0, ERR_NOT_OBJ_FILE, objfilename);	/* not a object     file */
-          fclose (z80asmfile);
-          z80asmfile = NULL;
-          break;
-        }
-      lowbyte = fgetc (z80asmfile);
-      highbyte = fgetc (z80asmfile);
-
-      if (modulehdr->first == CURRENTMODULE)
-        {			/* origin of first module */
-          if (autorelocate)
-            CURRENTMODULE->origin = 0;	/* ORG 0 on auto relocation */
-          else
-            {
-              if (deforigin)
-                CURRENTMODULE->origin = EXPLICIT_ORIGIN;	/* use origin from command line    */
-              else
-                {
-                  CURRENTMODULE->origin = highbyte * 256U + lowbyte;
-                  if (CURRENTMODULE->origin == 65535U)
-                    DefineOrigin ();	/* Define origin of first module from the keyboard */
-                }
-            }
-          if (verbose == ON)
-            printf ("ORG address for code is %04lX\n", CURRENTMODULE->origin);
-        }
-      fclose (z80asmfile);
-
-      LinkModule (objfilename, 0);	/* link   code & read name definitions */
-      free (objfilename);	/* release allocated file name */
-      objfilename = NULL;
-
-      CURRENTMODULE = CURRENTMODULE->nextmodule;	/* get next module, if any */
-    }
-  while (CURRENTMODULE != lastobjmodule->nextmodule);	/* parse only object modules, not added library modules */
-
-  if (verbose == ON)
-    printf ("Code size of linked modules is %d bytes\n", (int)CODESIZE);
-
-  if (ASMERROR == OFF)
-    ModuleExpr ();		/*  Evaluate expressions in  all modules */
-
-  ReleaseLinkInfo ();		/* Release module link information */
-  fclose (errfile);
-
-  if (TOTALERRORS == 0)
-    remove (errfilename);
-
-  free (errfilename);
-  errfilename = NULL;
-  errfile = NULL;
 }
 
 
@@ -685,8 +674,7 @@ LinkModule (char *filename, long fptr_base)
 int 
 LinkLibModules (char *filename, long fptr_base, long nextname, long endnames)
 {
-
-  long l;
+  long len;
   char *modname;
 
   do
@@ -697,20 +685,17 @@ LinkLibModules (char *filename, long fptr_base, long nextname, long endnames)
       ReadName ();		/* read library reference name */
       fclose (z80asmfile);
 
-      l = strlen (line);
-      nextname += 1 + l;	/* remember module pointer to next name in this   object module */
+      len = strlen (line);
+      nextname += 1 + len;	/* remember module pointer to next name in this   object module */
       if (FindSymbol (line, globalroot) == NULL)
         {
-          modname = AllocIdentifier ((size_t) l + 1);
-          if (modname == NULL)
-            {
-              ReportError (NULL, 0, ERR_NO_MEMORY);	/* Ups - system out of memory! */
-              return 0;
-            }
-
-          strcpy (modname, line);
-          SearchLibraries (modname);	/* search name in libraries */
-          free (modname);	/* remove copy of module name */
+	  modname = xstrdup(line);
+	  try {
+	      SearchLibraries (modname);	/* search name in libraries */
+	  }
+	  finally {
+	      xfree0(modname);	/* remove copy of module name */
+	  }
         }                          
     }
   while (nextname < endnames);
@@ -773,17 +758,25 @@ SearchLibfile (struct libfile *curlib, char *modname)
         {
           if ( ( mname = CheckIfModuleWanted(z80asmfile, currentlibmodule, modname) ) != NULL )
             {
-              fclose (z80asmfile);
-              ret =  LinkLibModule (curlib, currentlibmodule + 4 + 4, mname);
-              free(mname);
-              return ret;
+		try {
+		  fclose (z80asmfile);
+		  ret =  LinkLibModule (curlib, currentlibmodule + 4 + 4, mname);
+		} 
+		finally {
+		  xfree0(mname);
+		}
+                return ret;
             }
           else if ( sdcc_hacks == ON && modname[0] == '_' && ( mname = CheckIfModuleWanted(z80asmfile, currentlibmodule, modname + 1) ) != NULL )
             {
-              fclose (z80asmfile);
-              ret =  LinkLibModule (curlib, currentlibmodule + 4 + 4, mname);
-              free(mname);
-              return ret;
+		try {
+		  fclose (z80asmfile);
+		  ret =  LinkLibModule (curlib, currentlibmodule + 4 + 4, mname);
+		}
+		finally {
+		  xfree0(mname);
+		}
+                return ret;
             }
         }
     }
@@ -803,94 +796,85 @@ SearchLibfile (struct libfile *curlib, char *modname)
 static char *
 CheckIfModuleWanted(FILE *z80asmfile, long currentlibmodule, char *modname)
 {
-  long fptr_mname, fptr_expr, fptr_name, fptr_libname;
-  char *mname;
-  char *name;
+    long fptr_mname, fptr_expr, fptr_name, fptr_libname;
+    char *mname;
+    char *name;
+    enum flag found = OFF;
 
 
-  /* found module name? */
-  fseek (z80asmfile, currentlibmodule + 4 + 4 + 8 + 2, SEEK_SET);	/* point at module name  file
-                                                                     * pointer */
-  fptr_mname = ReadLong (z80asmfile);	/* get module name file  pointer   */
-  fptr_expr = ReadLong(z80asmfile);
-  fptr_name = ReadLong(z80asmfile);
-  fptr_libname = ReadLong(z80asmfile);
-  fseek (z80asmfile, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET);	/* point at module name  */
-  mname = strdup(ReadName ());			/* read module name */
+    /* found module name? */
+    fseek (z80asmfile, currentlibmodule + 4 + 4 + 8 + 2, SEEK_SET);	/* point at module name  file
+									* pointer */
+    fptr_mname = ReadLong (z80asmfile);	/* get module name file  pointer   */
+    fptr_expr = ReadLong(z80asmfile);
+    fptr_name = ReadLong(z80asmfile);
+    fptr_libname = ReadLong(z80asmfile);
+    fseek (z80asmfile, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET);	/* point at module name  */
+    mname = xstrdup(ReadName ());			/* read module name */
+    try {
+	if (strcmp (mname, modname) == 0) {
+	    found = ON;
+	}
+	else {
+	    /* We didn't find the module name, lets have a look through the exported symbol list */
+	    if ( fptr_name != 0 ) {
+		long end = fptr_libname;
+		long red = 0;
+		if ( fptr_libname == -1 ) {
+		    end = fptr_mname;
+		}
+		/* Move to the name section */
+		fseek(z80asmfile,currentlibmodule + 4 + 4 + fptr_name,SEEK_SET);
+		red = fptr_name;
+		while ( ! found && red < end ) {
+		    char scope, type;
+		    long temp;
 
-  if (strcmp (mname, modname) == 0)
-    {
-      return mname;
+		    scope = fgetc(z80asmfile); red++;
+		    type = fgetc(z80asmfile); red++;
+		    temp = ReadLong(z80asmfile); red += 4;
+		    name = ReadName();
+		    red += strlen(name);
+		    red++; /* Length byte */
+		    if ( (scope == 'X' || scope == 'G') && strcmp(name, modname) == 0 ) {
+			found = ON;
+		    }
+		}
+	    }
+	}
+    }
+    catch(RuntimeException) {
+	xfree0(mname);
+	rethrow("");
     }
 
-
-  /* We didn't find the module name, lets have a look through the exported symbol list */
-  if ( fptr_name != 0 ) 
-    {
-      long end = fptr_libname;
-      long red = 0;
-      if ( fptr_libname == -1 )
-        {
-          end = fptr_mname;
-        }
-      /* Move to the name section */
-      fseek(z80asmfile,currentlibmodule + 4 + 4 + fptr_name,SEEK_SET);
-      red = fptr_name;
-      while ( red < end ) 
-        {
-          char scope, type;
-          long temp;
-
-          scope = fgetc(z80asmfile); red++;
-          type = fgetc(z80asmfile); red++;
-          temp = ReadLong(z80asmfile); red += 4;
-          name = ReadName();
-          red += strlen(name);
-          red++; /* Length byte */
-          if ( (scope == 'X' || scope == 'G') && strcmp(name, modname) == 0 ) 
-            {
-              return mname;
-            }
-        }
+    if (!found) {
+	xfree0(mname);
+	mname = NULL;
     }
-  free(mname);
-  return NULL;
+    return mname;
 }
 
 int 
 LinkLibModule (struct libfile *library, long curmodule, char *modname)
 {
-  struct module *tmpmodule;
-  int flag;
-  char *mname;
+    struct module *tmpmodule;
+    int flag;
 
-  tmpmodule = CURRENTMODULE;	/* remember current module */
+    tmpmodule = CURRENTMODULE;	/* remember current module */
 
-  if ((CURRENTMODULE = NewModule ()) != NULL)
-    {
-      mname = AllocIdentifier (strlen (modname) + 1);	/* get a copy of module name */
-      if (mname != NULL)
-        {
-          strcpy (mname, modname);
-          CURRENTMODULE->mname = mname;		/* create new module for library */
-          CURRENTFILE = Newfile (NULL, library->libfilename);	/* filename for 'module' */
+    CURRENTMODULE = NewModule();
+    CURRENTMODULE->mname = xstrdup(modname);	/* get a copy of module name */
+						/* create new module for library */
+    CURRENTFILE = Newfile(NULL, library->libfilename);	/* filename for 'module' */
 
-          if (verbose)
-            printf ("Linking library module <%s>\n", modname);
+    if (verbose)
+	printf ("Linking library module <%s>\n", modname);
 
-          flag = LinkModule (library->libfilename, curmodule);	/* link   module & read names */
-        }
-      else
-        {
-          ReportError (NULL, 0, ERR_NO_MEMORY);
-          flag = 0;
-        }
-    }
-  else
-    flag = 0;
+    flag = LinkModule (library->libfilename, curmodule);	/* link   module & read names */
 
-  CURRENTMODULE = tmpmodule;	/* restore previous current module */
-  return flag;
+    CURRENTMODULE = tmpmodule;	/* restore previous current module */
+    return flag;
 }
 
 
@@ -1037,97 +1021,87 @@ CreateBinFile (void)
 void 
 CreateLib (void)
 {
-  long Codesize;
-  FILE *objectfile = NULL;
-  long fptr;
-  char *filebuffer, *fname;
+    long Codesize;
+    FILE *objectfile = NULL;
+    long fptr;
+    char *filebuffer = NULL, *fname = NULL;
 
-  if (verbose)
-    puts ("Creating library...");
+    if (verbose)
+	puts ("Creating library...");
 
-  CURRENTMODULE = modulehdr->first;
+    CURRENTMODULE = modulehdr->first;
 
-  if ((errfilename = AllocIdentifier (strlen (libfilename) + 1)) != NULL)
-    {
-      strcpy (errfilename, libfilename);
-      strcpy (errfilename + strlen (errfilename) - 4, errext);	/* overwrite '_lib' extension with '_err' */
-    }
-  else
-    {
-      ReportError (NULL, 0, ERR_NO_MEMORY);
-      return;			/* No more room     */
-    }
+    errfilename = xstrdup(libfilename);
+    strcpy (errfilename + strlen (errfilename) - 4, errext);	/* overwrite '_lib' extension with '_err' */
 
-  if ((errfile = fopen (errfilename, "w")) == NULL)
-    {				/* open error file */
-      ReportError (NULL, 0, ERR_FILE_OPEN, errfilename);
-      free (errfilename);
-      errfilename = NULL;
-      return;
-    }
-  do
-    {
-      fname = CURRENTFILE->fname;
-      strcpy (fname + strlen (fname) - 4, objext);	/* overwrite '_asm' extension with '_obj' */
+    try {
+	if ((errfile = fopen (errfilename, "w")) == NULL) {
+					/* open error file */
+	    ReportError (NULL, 0, ERR_FILE_OPEN, errfilename);
+	    throw(EarlyReturnException, "cannot open errfilename");
+	}
 
-      if ((objectfile = fopen (CURRENTFILE->fname, "rb")) != NULL)
-        {
-          fseek(objectfile, 0L, SEEK_END);	/* file pointer to end of file */
-	     Codesize = ftell(objectfile);
-	     fseek(objectfile, 0L, SEEK_SET);	/* file pointer to start of file */
+	do {
+	    fname = CURRENTFILE->fname;
+	    strcpy (fname + strlen (fname) - 4, objext);	/* overwrite '_asm' extension with '_obj' */
+
+	    if ((objectfile = fopen (CURRENTFILE->fname, "rb")) == NULL) {
+		ReportError (NULL, 0, ERR_FILE_OPEN, CURRENTFILE->fname);
+		break;
+	    }
+
+	    fseek(objectfile, 0L, SEEK_END);	/* file pointer to end of file */
+	    Codesize = ftell(objectfile);
+	    fseek(objectfile, 0L, SEEK_SET);	/* file pointer to start of file */
         	
-	     filebuffer = (char *) malloc ((size_t) Codesize);
-	     if (filebuffer == NULL)
-	       {
-	          ReportError (CURRENTFILE->fname, 0, ERR_NO_MEMORY);
-	          fclose (objectfile);
-	          break;
-	       }
-          fread (filebuffer, sizeof (char), Codesize, objectfile);	/* load object file */
-  	     fclose (objectfile);
+	    filebuffer = (char *) xmalloc((size_t) Codesize);
+	    fread (filebuffer, sizeof (char), Codesize, objectfile);	/* load object file */
+	    fclose (objectfile);
+	    objectfile = NULL;
 
-	     if (memcmp (filebuffer, Z80objhdr, 8U) == 0)
-	       {
-	          if (verbose)
-                 printf ("<%s> module at %04lX.\n", CURRENTFILE->fname, ftell (libfile));
+	    if (memcmp (filebuffer, Z80objhdr, 8U) != 0) {
+		ReportError (NULL, 0, ERR_NOT_OBJ_FILE, CURRENTFILE->fname);
+		break;
+	    }
 
-	          if (CURRENTMODULE->nextmodule == NULL)
-		        WriteLong (-1, libfile);	/* this is the last module */
-	          else
-		       {
-		         fptr = ftell (libfile) + 4 + 4;
-		         WriteLong (fptr + Codesize, libfile);	/* file pointer to next module */
-		       }
+	    if (verbose)
+		printf ("<%s> module at %04lX.\n", CURRENTFILE->fname, ftell (libfile));
+
+	    if (CURRENTMODULE->nextmodule == NULL)
+		WriteLong (-1, libfile);	/* this is the last module */
+	    else {
+		fptr = ftell (libfile) + 4 + 4;
+		WriteLong (fptr + Codesize, libfile);	/* file pointer to next module */
+	    }
 		       
-	          WriteLong (Codesize, libfile);	/* size of this module */
-	          fwrite (filebuffer, sizeof (char), (size_t) Codesize, libfile);	/* write module to library */
-	          free (filebuffer);
-	       }
-	     else
-	       {
-	         free (filebuffer);
-	         ReportError (NULL, 0, ERR_NOT_OBJ_FILE, CURRENTFILE->fname);
-	         break;
-	       }
-	   }
-      else
-	   {
-	     ReportError (NULL, 0, ERR_FILE_OPEN, CURRENTFILE->fname);
-	     break;
-	   }
+	    WriteLong (Codesize, libfile);	/* size of this module */
+	    fwrite (filebuffer, sizeof (char), (size_t) Codesize, libfile);	/* write module to library */
+	    xfree0(filebuffer);
 
-      CURRENTMODULE = CURRENTMODULE->nextmodule;
+	    CURRENTMODULE = CURRENTMODULE->nextmodule;
+	} while (CURRENTMODULE != NULL);
     }
-  while (CURRENTMODULE != NULL);
-
-  fclose (errfile);
-  errfile = NULL;
-
-  if (ASMERROR == OFF)
-    remove (errfilename);	/*    no errors */
-
-  free (errfilename);
-  errfilename = NULL;
+    catch(EarlyReturnException) {
+					/* do nothing, just for early return */
+    }
+    finally {
+	if (errfile) {
+	    fclose (errfile);
+	    errfile = NULL;
+	}
+	if (errfilename) {
+	    if (ASMERROR == OFF)
+		remove (errfilename);	/*    no errors */
+	    xfree0(errfilename);
+	}
+	if (objectfile) {
+	    fclose(objectfile);
+	    objectfile = NULL;
+	}
+	if (filebuffer) {
+	    xfree0(filebuffer);
+	}
+    }
 }
 
 
@@ -1135,58 +1109,39 @@ CreateLib (void)
 int 
 LinkTracedModule (char *filename, long baseptr)
 {
-  struct linkedmod *newm;
-  char *fname;
+    struct linkedmod *newm;
+    char *fname;
 
-  if (linkhdr == NULL)
-    {
-      if ((linkhdr = AllocLinkHdr ()) == NULL)
-        {
-          ReportError (NULL, 0, ERR_NO_MEMORY);
-          return 0;
-        }
-      else
-        {
-          linkhdr->firstlink = NULL;
-          linkhdr->lastlink = NULL;	/* Library header initialised */
-        }
+    if (linkhdr == NULL) {
+	linkhdr = xcalloc_struct(struct linklist);
+	linkhdr->firstlink = NULL;
+	linkhdr->lastlink = NULL;	/* Library header initialised */
     }
 
-  fname = AllocIdentifier (strlen (filename) + 1);	/* get a copy module file name */
-  if (fname != NULL)
-    strcpy (fname, filename);
-  else
-    {
-      ReportError (NULL, 0, ERR_NO_MEMORY);
-      return 0;
+    fname = xstrdup(filename);		/* get a copy module file name */
+    try {
+	newm = xcalloc_struct(struct linkedmod);
+	newm->nextlink = NULL;
+	newm->objfilename = fname;
+	newm->modulestart = baseptr;
+	newm->moduleinfo = CURRENTMODULE;   /* pointer to current (active) module structure   */
+
+    }
+    catch(RuntimeException) {
+	xfree0(fname);
+	rethrow("");
     }
 
-  if ((newm = AllocTracedModule ()) == NULL)
-    {
-      free (fname);		/* release redundant copy of filename */
-      ReportError (NULL, 0, ERR_NO_MEMORY);
-      return 0;
+    if (linkhdr->firstlink == NULL) {
+	linkhdr->firstlink = newm;
+	linkhdr->lastlink = newm;	/* First module trace information */
     }
-  else
-    {
-      newm->nextlink = NULL;
-      newm->objfilename = fname;
-      newm->modulestart = baseptr;
-      newm->moduleinfo = CURRENTMODULE;		/* pointer to current (active) module structure   */
+    else {
+	linkhdr->lastlink->nextlink = newm;	/* current/last linked module points now at new current */
+	linkhdr->lastlink = newm;		/* pointer to current linked module updated */
     }
 
-  if (linkhdr->firstlink == NULL)
-    {
-      linkhdr->firstlink = newm;
-      linkhdr->lastlink = newm;	/* First module trace information */
-    }
-  else
-    {
-      linkhdr->lastlink->nextlink = newm;	/* current/last linked module points now at new current */
-      linkhdr->lastlink = newm;			/* pointer to current linked module updated */
-    }
-
-  return 1;
+    return 1;
 }
 
 
@@ -1232,87 +1187,70 @@ DefineOrigin (void)
 void 
 CreateDeffile (void)
 {
-  char *globaldefname;
+    char *globaldefname;
 
-  /* use first module filename to create global definition file */
-
-  if ((globaldefname = AllocIdentifier (strlen (modulehdr->first->cfile->fname) + 1)) != NULL)
-    {
-      strcpy (globaldefname, modulehdr->first->cfile->fname);
-      strcpy (globaldefname + strlen (globaldefname) - 4, defext);	/* overwrite '_asm' extension with
-									   * '_def' */
-      if ((deffile = fopen (globaldefname, "w")) == NULL)
+    /* use first module filename to create global definition file */
+    globaldefname = xstrdup(modulehdr->first->cfile->fname);
+    try {
+	strcpy (globaldefname + strlen (globaldefname) - 4, defext);	/* overwrite '_asm' extension with
+									    * '_def' */
+	if ((deffile = fopen (globaldefname, "w")) == NULL)
 	{			/* Create DEFC file with global label declarations */
-	  ReportError (NULL, 0, ERR_FILE_OPEN, globaldefname);
-	  globaldef = OFF;
+	    ReportError (NULL, 0, ERR_FILE_OPEN, globaldefname);
+	    globaldef = OFF;
 	}
     }
-  else
-    {
-      ReportError (NULL, 0, ERR_NO_MEMORY);
-      globaldef = OFF;
+    finally {
+	xfree0(globaldefname);
     }
-
-  free (globaldefname);
-  globaldefname = NULL;
 }
 
 
 void 
 WriteMapFile (void)
 {
-  avltree *maproot = NULL, *newmaproot = NULL;
-  struct module *cmodule;
-  char *mapfilename;
+    avltree *maproot = NULL, *newmaproot = NULL;
+    struct module *cmodule;
+    char *mapfilename;
 
-  cmodule = modulehdr->first;	/* begin with first module */
+    cmodule = modulehdr->first;	/* begin with first module */
 
-  if ((mapfilename = AllocIdentifier (strlen (cmodule->cfile->fname) + 1)) != NULL)
-    {
-      strcpy (mapfilename, cmodule->cfile->fname);
-      strcpy (mapfilename + strlen (mapfilename) - 4, mapext);	/* overwrite '_asm' extension with '_map' */
-    }
-  else
-    {
-      ReportError (NULL, 0, ERR_NO_MEMORY);
-      return;			/* No more room */
-    }
+    mapfilename = xstrdup(cmodule->cfile->fname);
+    strcpy (mapfilename + strlen (mapfilename) - 4, mapext);	/* overwrite '_asm' extension with '_map' */
+    try {
+	if ((mapfile = fopen (mapfilename, "w")) != NULL) {	/* Create MAP file */
+	    if (verbose)
+		puts ("Creating map...");
 
-  if ((mapfile = fopen (mapfilename, "w")) != NULL)
-    {				/* Create MAP file */
-      if (verbose)
-	puts ("Creating map...");
+	    do {
+		move (&cmodule->localroot, &maproot, (int (*)(void*,void*)) cmpidstr);        /* move all  local address symbols alphabetically */
+		cmodule = cmodule->nextmodule;	/* alphabetically */
+	    }
+	    while (cmodule != NULL);
 
-      do
-	{
-          move (&cmodule->localroot, &maproot, (int (*)(void*,void*)) cmpidstr);        /* move all  local address symbols alphabetically */
-	  cmodule = cmodule->nextmodule;	/* alphabetically */
+	    move (&globalroot, &maproot, (int (*)(void*,void*)) cmpidstr);    /* move all global address symbols alphabetically */
+
+	    if (maproot == NULL) {
+		fputs ("None.\n", mapfile);
+	    }
+	    else {
+		inorder (maproot, (void (*)(void*)) WriteMapSymbol);  /* Write map symbols alphabetically */
+		move (&maproot, &newmaproot, (int (*)(void*,void*)) cmpidval);        /* then re-order symbols numerically */
+		fputs ("\n\n", mapfile);
+
+		inorder (newmaproot, (void (*)(void*)) WriteMapSymbol);       /* Write map symbols numerically */
+		deleteall (&newmaproot, (void (*)(void*)) FreeSym);   /* then release all map symbols */
+	    }
+
+	    fclose (mapfile);
 	}
-      while (cmodule != NULL);
-
-      move (&globalroot, &maproot, (int (*)(void*,void*)) cmpidstr);    /* move all global address symbols alphabetically */
-
-      if (maproot == NULL)
-	fputs ("None.\n", mapfile);
-      else
-	{
-          inorder (maproot, (void (*)(void*)) WriteMapSymbol);  /* Write map symbols alphabetically */
-          move (&maproot, &newmaproot, (int (*)(void*,void*)) cmpidval);        /* then re-order symbols numerically */
-	  fputs ("\n\n", mapfile);
-
-          inorder (newmaproot, (void (*)(void*)) WriteMapSymbol);       /* Write map symbols numerically */
-          deleteall (&newmaproot, (void (*)(void*)) FreeSym);   /* then release all map symbols */
+	else {
+	    ReportError (NULL, 0, ERR_FILE_OPEN, mapfilename);
 	}
-
-      fclose (mapfile);
     }
-  else
-    {
-      ReportError (NULL, 0, ERR_FILE_OPEN, mapfilename);
-      return;
+    finally {
+	xfree0(mapfilename);
     }
-
-  free (mapfilename);
 }
 
 
@@ -1378,35 +1316,20 @@ ReleaseLinkInfo (void)
 
   m = linkhdr->firstlink;
 
-  do
-    {
+  while (m != NULL) {		    /* move test to start in case list is empty */
       if (m->objfilename != NULL)
-	free (m->objfilename);
+	xfree0(m->objfilename);
 
       n = m->nextlink;
-      free (m);
+      xfree0(m);
       m = n;
-    }
-  while (m != NULL);
+  }
 
-  free (linkhdr);
+  xfree0(linkhdr);
 
   linkhdr = NULL;
 }
 
-
-struct linklist *
-AllocLinkHdr (void)
-{
-  return (struct linklist *) malloc (sizeof (struct linklist));
-}
-
-
-struct linkedmod *
-AllocTracedModule (void)
-{
-  return (struct linkedmod *) malloc (sizeof (struct linkedmod));
-}
 
 /*
  * Local Variables:
