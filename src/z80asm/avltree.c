@@ -13,9 +13,17 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.c,v 1.5 2011-07-18 00:48:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.c,v 1.6 2011-08-05 19:42:06 pauloscustodio Exp $ */
 /* $Log: avltree.c,v $
-/* Revision 1.5  2011-07-18 00:48:25  pauloscustodio
+/* Revision 1.6  2011-08-05 19:42:06  pauloscustodio
+/* CH_0004 : Exception mechanism to handle fatal errors
+/* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
+/* macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated,
+/* removing all the test code after each memory allocation.
+/* Replaced all free() by xfree0() macro which only frees if the pointer in non-null, and
+/* sets the poiter to NULL afterwards, to avoid any used of the freed memory.
+/*
+/* Revision 1.5  2011/07/18 00:48:25  pauloscustodio
 /* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
 /*
 /* Revision 1.4  2011/07/09 18:25:35  pauloscustodio
@@ -229,7 +237,7 @@ deletemin (avltree ** n, void **dataptr)
       *dataptr = (*n)->data;	/* get pointer to data */
       temp = *n;
       *n = (*n)->right;		/* return pointer to right subtree */
-      free (temp);		/* of leftmost node                */
+      xfree0(temp);		/* of leftmost node                */
     }
 
   if (*n != NULL)
@@ -281,7 +289,7 @@ delete (avltree ** n, void *key, int (*comp) (void *, void *), void (*deletekey)
 		  else
 		    *n = (*n)->right;	/* node has right child only */
 		  deletekey (temp->data);	/* delete node data */
-		  free (temp);	/* delete avltree node */
+		  xfree0(temp);	/* delete avltree node */
 		}
 	    }
 	}
@@ -308,7 +316,7 @@ deleteall (avltree ** p, void (*deldata) (void *))
       deleteall (&(*p)->right, deldata);
 
       deldata ((*p)->data);
-      free (*p);
+      xfree0(*p);
       *p = NULL;
     }
 }
@@ -324,7 +332,7 @@ insert (avltree ** p, void *newdata, int (*comp) (void *, void *))
 
   if (*p == NULL)
     {
-      *p = (avltree *) malloc (sizeof (avltree));
+      *p = (avltree *) xmalloc (sizeof (avltree));
       if (*p != NULL)
 	{
 	  (*p)->height = 0;
@@ -389,7 +397,7 @@ move (avltree ** p, avltree ** newroot, int (*symcmp) (void *, void *))
       move (&(*p)->right, newroot, symcmp);
 
       insert (newroot, (*p)->data, symcmp);	/* insert node data by symcmp order */
-      free (*p);		/* release avl-node */
+      xfree0(*p);		/* release avl-node */
       *p = NULL;
     }
 }
