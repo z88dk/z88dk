@@ -13,9 +13,21 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.15 2011-07-18 00:48:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.16 2011-08-05 19:46:16 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.15  2011-07-18 00:48:25  pauloscustodio
+/* Revision 1.16  2011-08-05 19:46:16  pauloscustodio
+/* CH_0004 : Exception mechanism to handle fatal errors
+/* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
+/* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
+/* macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated,
+/* removing all the test code after each memory allocation.
+/* Replaced all functions that allocated memory structures by the new xcalloc_struct().
+/* Replaced all free() by xfree0() macro which only frees if the pointer in non-null, and
+/* sets the poiter to NULL afterwards, to avoid any used of the freed memory.
+/* Created try/catch sequences to clean-up partially created memory structures and rethrow the
+/* exception, to cleanup memory leaks.
+/*
+/* Revision 1.15  2011/07/18 00:48:25  pauloscustodio
 /* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
 /*
 /* Revision 1.14  2011/07/14 01:28:17  pauloscustodio
@@ -166,7 +178,6 @@ void Pass2info (struct expr *expression, char constrange, long lfileptr);
 long GetConstant (char *evalerr);
 symbol *GetSymPtr (char *identifier);
 symbol *FindSymbol (char *identifier, avltree * symbolptr);
-char *AllocIdentifier (size_t len);
 int GetChar (FILE *fptr);
 
 /* local functions */
@@ -188,10 +199,7 @@ int Factor (struct expr *pfixexpr);
 long EvalPfixExpr (struct expr *pfixexpr);
 long PopItem (struct pfixstack **stackpointer);
 long Pw (long x, long y);
-struct expr *Allocexpr (void);
 struct expr *ParseNumExpr (void);
-struct postfixlist *AllocPfixSymbol (void);
-struct pfixstack *AllocStackItem (void);
 
 /* global variables */
 extern struct module *CURRENTMODULE;
@@ -521,50 +529,51 @@ ParseNumExpr (void)
     struct expr *pfixhdr;
     enum symbols constant_expression = nil;
 
-    if ((pfixhdr = Allocexpr ()) == NULL)
-    {
-        ReportError (NULL, 0, ERR_NO_MEMORY);
-        return NULL;
-    }
-    else
-    {
-        pfixhdr->firstnode = NULL;
-        pfixhdr->currentnode = NULL;
-        pfixhdr->rangetype = 0;
-        pfixhdr->stored = OFF;
-        pfixhdr->codepos = codeptr - codearea;
-        pfixhdr->infixexpr = NULL;
-        pfixhdr->infixptr = NULL;
+    pfixhdr = xcalloc_struct(struct expr);
+    try {
+	pfixhdr->firstnode = NULL;
+	pfixhdr->currentnode = NULL;
+	pfixhdr->rangetype = 0;
+	pfixhdr->stored = OFF;
+	pfixhdr->codepos = codeptr - codearea;
+	pfixhdr->infixexpr = NULL;
+	pfixhdr->infixptr = NULL;
 
-        if ((pfixhdr->infixexpr = (char *) calloc (128,sizeof (char))) == NULL)
-        {
-            ReportError (NULL, 0, ERR_NO_MEMORY);
-            free (pfixhdr);
-            return NULL;
-        }
-        else
-            pfixhdr->infixptr = pfixhdr->infixexpr;		/* initialise pointer to start of buffer */
+	pfixhdr->infixexpr = xcalloc_n_struct(128, char);	/* TODO: make size a constant */
+	try {
+	    pfixhdr->infixptr = pfixhdr->infixexpr;		/* initialise pointer to start of buffer */
+
+	    if (sym == constexpr)
+	    {
+		GetSym ();		/* leading '#' : ignore relocatable address expression */
+		constant_expression = constexpr;	/* convert to constant expression */
+		*pfixhdr->infixptr++ = '#';
+	    }
+
+	    if (Condition (pfixhdr))
+	    {				/* parse expression... */
+		if (constant_expression == constexpr)
+		    NewPfixSymbol (pfixhdr, 0, constexpr, NULL, 0);	/* convert to constant expression */
+
+		*pfixhdr->infixptr = '\0';			/* terminate infix expression */
+	    }
+	    else
+	    {
+		RemovePfixlist (pfixhdr);
+		pfixhdr = NULL;		/* syntax error in expression or no room */
+	    }				/* for postfix expression */
+	}
+	catch(RuntimeException) {
+	    xfree0(pfixhdr->infixexpr);
+	    rethrow("");
+	}
     }
-    if (sym == constexpr)
-    {
-        GetSym ();		/* leading '#' : ignore relocatable address expression */
-        constant_expression = constexpr;	/* convert to constant expression */
-        *pfixhdr->infixptr++ = '#';
+    catch(RuntimeException) {
+	xfree0(pfixhdr);
+	rethrow("");
     }
 
-    if (Condition (pfixhdr))
-    {				/* parse expression... */
-        if (constant_expression == constexpr)
-            NewPfixSymbol (pfixhdr, 0, constexpr, NULL, 0);	/* convert to constant expression */
-
-        *pfixhdr->infixptr = '\0';			/* terminate infix expression */
-        return pfixhdr;
-    }
-    else
-    {
-        RemovePfixlist (pfixhdr);
-        return NULL;		/* syntax error in expression or no room */
-    }				/* for postfix expression */
+    return pfixhdr;
 }
 
 
@@ -595,101 +604,108 @@ EvalPfixExpr (struct expr *pfixlist)
   struct pfixstack *stackptr = NULL;
   struct postfixlist *pfixexpr;
   symbol *symptr;
+  long ret;
 
-  pfixlist->rangetype &= EVALUATED;	/* prefix expression as evaluated */
-  pfixexpr = pfixlist->firstnode;	/* initiate to first node */
+  try {
+      pfixlist->rangetype &= EVALUATED;	/* prefix expression as evaluated */
+      pfixexpr = pfixlist->firstnode;	/* initiate to first node */
 
-  do
-    {
-      switch (pfixexpr->operatortype)
+      do
 	{
-	case number:
-	  if (pfixexpr->id == NULL)	/* Is operand an identifier? */
-	    PushItem (pfixexpr->operandconst, &stackptr);
-	  else
-	    {			/* symbol was not defined and not declared */
-	      if (pfixexpr->type != SYM_NOTDEFINED)
-		{		/* if all bits are set to zero */
-		  if (pfixexpr->type & SYMLOCAL)
-		    {
-		      symptr = FindSymbol (pfixexpr->id, CURRENTMODULE->localroot);
-                      pfixlist->rangetype |= (symptr->type & SYMTYPE);	/* copy appropriate type
-									 * bits */
-		      PushItem (symptr->symvalue, &stackptr);
-		    }
-		  else
-		    {
-		      symptr = FindSymbol (pfixexpr->id, globalroot);
-		      if (symptr != NULL)
-                        {
+	  switch (pfixexpr->operatortype)
+	    {
+	    case number:
+	      if (pfixexpr->id == NULL)	/* Is operand an identifier? */
+		PushItem (pfixexpr->operandconst, &stackptr);
+	      else
+		{			/* symbol was not defined and not declared */
+		  if (pfixexpr->type != SYM_NOTDEFINED)
+		    {		/* if all bits are set to zero */
+		      if (pfixexpr->type & SYMLOCAL)
+			{
+			  symptr = FindSymbol (pfixexpr->id, CURRENTMODULE->localroot);
 			  pfixlist->rangetype |= (symptr->type & SYMTYPE);	/* copy appropriate type
-										 * bits */
-		          if (symptr->type & SYMDEFINED)
-			    PushItem (symptr->symvalue, &stackptr);
-		          else
+									     * bits */
+			  PushItem (symptr->symvalue, &stackptr);
+			}
+		      else
+			{
+			  symptr = FindSymbol (pfixexpr->id, globalroot);
+			  if (symptr != NULL)
+			    {
+			      pfixlist->rangetype |= (symptr->type & SYMTYPE);	/* copy appropriate type
+										     * bits */
+			      if (symptr->type & SYMDEFINED)
+				PushItem (symptr->symvalue, &stackptr);
+			      else
+				{
+				  pfixlist->rangetype |= NOTEVALUABLE;
+				  PushItem (0, &stackptr);
+				}
+			    }
+			  else
 			    {
 			      pfixlist->rangetype |= NOTEVALUABLE;
 			      PushItem (0, &stackptr);
 			    }
-                        }
+			}
+		    }
+		  else
+		    { /* try to find symbol now as either */
+
+		      symptr = GetSymPtr (pfixexpr->id);	/* declared local or global */
+		      if (symptr != NULL)
+			{
+			  pfixlist->rangetype |= (symptr->type & SYMTYPE);	/* copy appropriate type bits */
+			  if (symptr->type & SYMDEFINED)
+			    PushItem (symptr->symvalue, &stackptr);
+			  else
+			    {
+			      pfixlist->rangetype |= NOTEVALUABLE;
+			      PushItem (0, &stackptr);
+			    }
+			}
 		      else
-		        {
-		          pfixlist->rangetype |= NOTEVALUABLE;
-		          PushItem (0, &stackptr);
+			{
+			  pfixlist->rangetype |= NOTEVALUABLE;
+			  PushItem (0, &stackptr);
 			}
 		    }
 		}
-	      else
-		{ /* try to find symbol now as either */
+	      break;
 
-		  symptr = GetSymPtr (pfixexpr->id);	/* declared local or global */
-		  if (symptr != NULL)
-                    {
-		      pfixlist->rangetype |= (symptr->type & SYMTYPE);	/* copy appropriate type bits */
-                      if (symptr->type & SYMDEFINED)
-		        PushItem (symptr->symvalue, &stackptr);
-                      else
-                        {
-		          pfixlist->rangetype |= NOTEVALUABLE;
-		          PushItem (0, &stackptr);
-                        }
-                    }
-		  else
-		    {
-		      pfixlist->rangetype |= NOTEVALUABLE;
-		      PushItem (0, &stackptr);
-		    }
-		}
+	    case negated:
+	      stackptr->stackconstant = -stackptr->stackconstant;
+	      break;
+
+	    case log_not:
+	      stackptr->stackconstant = !(stackptr->stackconstant);
+	      break;
+
+	    case constexpr:
+	      pfixlist->rangetype &= CLEAR_EXPRADDR;	/* convert to constant expression */
+	      break;
+
+	    default:
+	      CalcExpression (pfixexpr->operatortype, &stackptr);	/* plus minus, multiply, div,
+								     * mod */
+	      break;
 	    }
-	  break;
 
-	case negated:
-	  stackptr->stackconstant = -stackptr->stackconstant;
-	  break;
-
-	case log_not:
-	  stackptr->stackconstant = !(stackptr->stackconstant);
-	  break;
-
-	case constexpr:
-	  pfixlist->rangetype &= CLEAR_EXPRADDR;	/* convert to constant expression */
-	  break;
-
-	default:
-	  CalcExpression (pfixexpr->operatortype, &stackptr);	/* plus minus, multiply, div,
-								 * mod */
-	  break;
+	  pfixexpr = pfixexpr->nextoperand;		/* get next operand in postfix expression */
 	}
+      while (pfixexpr != NULL);
 
-      pfixexpr = pfixexpr->nextoperand;		/* get next operand in postfix expression */
-    }
-  while (pfixexpr != NULL);
+      if (stackptr != NULL)
+	ret = PopItem (&stackptr);
+      else
+	ret = 0;			/* Unbalanced stack - probably during low memory... */
+  }
+  finally {
+      ClearEvalStack(&stackptr);	/* in case stack is not balanced */
+  }
 
-
-  if (stackptr != NULL)
-    return PopItem (&stackptr);
-  else
-    return 0;			/* Unbalanced stack - probably during low memory... */
+  return ret;
 }
 
 
@@ -798,16 +814,16 @@ RemovePfixlist (struct expr *pfixexpr)
     {
       tmpnode = node->nextoperand;
       if (node->id != NULL)
-	free (node->id);	/* Remove symbol id, if defined */
+	xfree0(node->id);	/* Remove symbol id, if defined */
       
-      free (node);
+      xfree0(node);
       node = tmpnode;
     }
 
   if (pfixexpr->infixexpr != NULL)
-    free (pfixexpr->infixexpr);	/* release infix expr. string */
+    xfree0(pfixexpr->infixexpr);	/* release infix expr. string */
 
-  free (pfixexpr);		/* release header of postfix expression */
+  xfree0(pfixexpr);		/* release header of postfix expression */
 }
 
 
@@ -822,34 +838,22 @@ NewPfixSymbol (struct expr *pfixexpr,
 {
   struct postfixlist *newnode;
 
-  if ((newnode = AllocPfixSymbol ()) != NULL)
-    {
+  newnode = xcalloc_struct(struct postfixlist);
+  try {
       newnode->operandconst = oprconst;
       newnode->operatortype = oprtype;
       newnode->nextoperand = NULL;
       newnode->type = symtype;
 
       if (symident != NULL)
-	{
-	  newnode->id = AllocIdentifier (strlen (symident) + 1);	/* Allocate symbol */
-
-	  if (newnode->id == NULL)
-	    {
-	      free (newnode);
-	      ReportError (NULL, 0, ERR_NO_MEMORY);
-	      return;
-	    }
-	  strcpy (newnode->id, symident);
-	}
+	  newnode->id = xstrdup(symident);	    /* Allocate symbol */
       else
-	newnode->id = NULL;
-    }
-  else
-    {
-      ReportError (NULL, 0, ERR_NO_MEMORY);
-
-      return;
-    }
+	  newnode->id = NULL;
+  }
+  catch(RuntimeException) {
+      xfree0(newnode);
+      rethrow("");
+  }
 
   if (pfixexpr->firstnode == NULL)
     {
@@ -868,16 +872,12 @@ NewPfixSymbol (struct expr *pfixexpr,
 void 
 PushItem (long oprconst, struct pfixstack **stackpointer)
 {
-  struct pfixstack *newitem;
+    struct pfixstack *newitem;
 
-  if ((newitem = AllocStackItem ()) != NULL)
-    {
-      newitem->stackconstant = oprconst;
-      newitem->prevstackitem = *stackpointer;	/* link new node to current node */
-      *stackpointer = newitem;	/* update stackpointer to new item */
-    }
-  else
-    ReportError (NULL, 0, ERR_NO_MEMORY);
+    newitem = xcalloc_struct(struct pfixstack);
+    newitem->stackconstant = oprconst;
+    newitem->prevstackitem = *stackpointer;	/* link new node to current node */
+    *stackpointer = newitem;			/* update stackpointer to new item */
 }
 
 
@@ -885,15 +885,15 @@ PushItem (long oprconst, struct pfixstack **stackpointer)
 long 
 PopItem (struct pfixstack **stackpointer)
 {
+    struct pfixstack *stackitem;
+    long constant;
 
-  struct pfixstack *stackitem;
-  long constant;
-
-  constant = (*stackpointer)->stackconstant;
-  stackitem = *stackpointer;
-  *stackpointer = (*stackpointer)->prevstackitem;	/* move stackpointer to previous item */
-  free (stackitem);					/* return old item memory to OS */
-  return (constant);
+    e4c_assert(*stackpointer);
+    constant = (*stackpointer)->stackconstant;
+    stackitem = *stackpointer;
+    *stackpointer = (*stackpointer)->prevstackitem;	/* move stackpointer to previous item */
+    xfree0(stackitem);					/* return old item memory to OS */
+    return (constant);
 }
 
 
@@ -1114,29 +1114,6 @@ ExprSigned8 (int listoffset)
   return flag;
 }
 
-
-
-struct expr *
-Allocexpr (void)
-{
-  return (struct expr *) malloc (sizeof (struct expr));
-}
-
-
-
-struct postfixlist *
-AllocPfixSymbol (void)
-{
-  return (struct postfixlist *) malloc (sizeof (struct postfixlist));
-}
-
-
-
-struct pfixstack *
-AllocStackItem (void)
-{
-  return (struct pfixstack *) malloc (sizeof (struct pfixstack));
-}
 
 /*
  * Local Variables:
