@@ -4,7 +4,7 @@
 ;
 ;       7/12/02 - Stefano Bodrato
 ;
-;       $Id: amax.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: amax.asm,v 1.3 2011-08-08 18:42:48 pauloscustodio Exp $
 ;
 
 
@@ -30,7 +30,7 @@ ENDIF
 	defb	ZXFP_JUMP_TRUE		; Don't exchange
 	defb	2			; [offset to go over the next byte]
 	defb	ZXFP_EXCHANGE
-	defb	ZXFP_STK_FETCH		; take away the smaller no from stack
 	defb	ZXFP_END_CALC
 
+	call	ZXFP_STK_FETCH		; take away the smaller no from stack
         jp      stkequ
