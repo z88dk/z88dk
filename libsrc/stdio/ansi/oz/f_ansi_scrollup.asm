@@ -5,7 +5,7 @@
 ;
 ;	Stefano Bodrato - Nov. 2002
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.2 2003-05-20 16:01:55 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.3 2011-08-12 20:42:23 pauloscustodio Exp $
 ;
 
 	XLIB	ansi_SCROLLUP
@@ -38,7 +38,7 @@
 	xor	a
 	ld	(hl),a
 	inc	de
-	ld	bc,(30*8)-1
+	ld	bc,+(30*8)-1
 	ldir
 
 	jp	swapgfxbk1
