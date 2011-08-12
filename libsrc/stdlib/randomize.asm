@@ -7,7 +7,7 @@
 ;       void randomize() - randomize the seed for rand()
 ;
 ; -----
-; $Id: randomize.asm,v 1.2 2008-07-21 10:09:26 stefano Exp $
+; $Id: randomize.asm,v 1.3 2011-08-12 18:53:50 pauloscustodio Exp $
 
 XLIB randomize
 XREF _std_seed
@@ -50,7 +50,7 @@ ENDIF
 .sloop
    add	(hl)
    inc	hl
-   djnz,sloop
+   djnz sloop
    dec	c
    jr	nz,sloop
    ret

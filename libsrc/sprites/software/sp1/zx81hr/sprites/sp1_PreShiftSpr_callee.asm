@@ -91,7 +91,7 @@ XDEF ASMDISP_SP1_PRESHIFTSPR_CALLEE
    
    pop bc
    exx
-   djnz, firstcolloop
+   djnz  firstcolloop
 
    pop bc
    exx
@@ -140,7 +140,7 @@ XDEF ASMDISP_SP1_PRESHIFTSPR_CALLEE
    
    pop bc
    exx
-   djnz, colloop
+   djnz  colloop
 
    pop bc
    exx
