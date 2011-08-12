@@ -7,7 +7,7 @@
 ;	Truncate or fill with blanks when necessary.
 ;	Return with the file name length
 ;
-;	$Id: if1_setname.asm,v 1.1 2008-06-29 08:25:48 aralbrec Exp $
+;	$Id: if1_setname.asm,v 1.2 2011-08-12 18:46:43 pauloscustodio Exp $
 ;
 
 		XLIB	if1_setname
@@ -37,7 +37,7 @@ strcpylp:
 strcopied:	pop	af
 scopied2:	push	af		; filename length
 
-		neg	a		;..now onto the trailing spaces
+		neg			;..now onto the trailing spaces
 		add	10
 		ld	b,a		
 		jr	z,nospaces
