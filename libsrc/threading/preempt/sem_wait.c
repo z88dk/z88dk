@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- * $Id: sem_wait.c,v 1.2 2009-09-30 23:03:03 dom Exp $
+ * $Id: sem_wait.c,v 1.3 2011-08-12 18:56:06 pauloscustodio Exp $
  */
 
 #include <threading/semaphore.h>
@@ -31,7 +31,7 @@ int sem_wait(sem_t *sem)
 	ld      ix,(_threadbase + current)	; Get current thread
 	set     0,(ix+thread_flags)		; We should sleep
 	pop     ix				; Get semaphore back
-	ld	a,(ix+semaphore_waiters_num
+	ld	a,(ix+semaphore_waiters_num)
 	inc	(ix+semaphore_waiters_num)
 	ld	l,a
 	ld	h,0
