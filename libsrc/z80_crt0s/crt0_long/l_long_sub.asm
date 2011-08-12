@@ -50,7 +50,7 @@ XLIB    l_long_sub
 ;        ld      h,a
 ;        exx             ;1st
 ;        ld      a,e
-;        exx             '2md
+;        exx             ;2nd
 ;        sbc     a,e
 ;        ld      e,a     
 ;        exx             ;1st
