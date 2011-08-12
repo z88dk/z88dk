@@ -3,7 +3,7 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: dleq.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: dleq.asm,v 1.3 2011-08-12 07:15:19 pauloscustodio Exp $
 ;
 
 		INCLUDE		"cpcfirm.def"
@@ -21,7 +21,7 @@
 .dleqc	defw	CPCFP_FLO_CMP		; comp (hl)?(de)	
 		cp      0			;(hl) <= (de)
 		jp      z,cmpfin
-		cp      $255
+		cp      255
 		jp      z,cmpfin
 		xor     a
 		jp      stkequcmp
