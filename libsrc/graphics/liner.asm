@@ -5,7 +5,7 @@
 	XREF	COORDS
 
 ;
-;	$Id: liner.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;	$Id: liner.asm,v 1.4 2011-08-12 17:04:59 pauloscustodio Exp $
 ;
 
 ; ******************************************************************************
@@ -122,7 +122,7 @@
 					jr	init_drawloop	; else
 .x_smaller_y			ld	a,h
 					ld	h,l			;	H = y
-					ld	l,a				L = x
+					ld	l,a			;	L = x
 					exx
 					ld	b,0			;	ddx = 0
 					ld	c,e			;	ddy = direc_y

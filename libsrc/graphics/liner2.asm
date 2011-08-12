@@ -5,7 +5,7 @@
 	XREF	COORDS
 
 ;
-;	$Id: liner2.asm,v 1.1 2004-07-09 08:57:09 stefano Exp $
+;	$Id: liner2.asm,v 1.2 2011-08-12 17:04:59 pauloscustodio Exp $
 ;
 
 ;	...SLLLOOOW Variant by Stefano Bodrato
@@ -169,7 +169,7 @@
 					jr	init_drawloop	; else
 .x_smaller_y			ld	a,h
 					ld	h,l			;	H = y
-					ld	l,a				L = x
+					ld	l,a			;	L = x
 					
 					;exx
 					push	hl
