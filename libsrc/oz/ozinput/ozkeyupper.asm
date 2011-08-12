@@ -9,7 +9,7 @@
 ;	returns key pressed bitmap for upper part of keyboard
 ;
 ; ------
-; $Id: ozkeyupper.asm,v 1.1 2003-10-22 13:55:49 stefano Exp $
+; $Id: ozkeyupper.asm,v 1.2 2011-08-12 18:40:25 pauloscustodio Exp $
 ;
 
 
@@ -24,7 +24,7 @@ ozkeyupper:
         ;pop     bc
 
 	pop	hl
-	pop	bc	: pick the mask
+	pop	bc	; pick the mask
 	push	bc
 	push	hl
 

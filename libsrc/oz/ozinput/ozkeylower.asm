@@ -9,7 +9,7 @@
 ;	returns key pressed bitmap for lower part of keyboard
 ;
 ; ------
-; $Id: ozkeylower.asm,v 1.1 2003-10-22 13:55:49 stefano Exp $
+; $Id: ozkeylower.asm,v 1.2 2011-08-12 18:38:11 pauloscustodio Exp $
 ;
 
 
@@ -24,7 +24,7 @@ ozkeylower:
         ;pop     bc
 
 	pop	hl
-	pop	bc	: pick the mask
+	pop	bc	; pick the mask
 	push	bc
 	push	hl
 
