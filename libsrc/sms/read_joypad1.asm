@@ -7,7 +7,7 @@
 ;==============================================================
 .read_joypad1
 	in	a, ($dc)	; Reads joystick 1
-	cpl	a		; Inverts all bits
+	cpl			; Inverts all bits
 	ld	h, 0
 	ld	l, a		; Puts the result in HL
 	ret

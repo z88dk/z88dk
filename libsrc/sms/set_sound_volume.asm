@@ -16,7 +16,7 @@
 	ld	c, (hl)		; C = Channel
 
 	ld	a, e
-	cpl	a		; The volume is actually an atenuation
+	cpl			; The volume is actually an atenuation
 	and	a, $0F
 	ld	b, a		; Only the 4 lower bits are significant
 	
