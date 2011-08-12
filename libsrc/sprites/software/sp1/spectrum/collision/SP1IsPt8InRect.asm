@@ -27,14 +27,14 @@ LIB RIsPtInRect8
    rra
    srl b
    rra
-   ex af,af                  // a' = 8-bit x coord
+   ex af,af                  ; a' = 8-bit x coord
    ld a,e
    srl d
    rra
    srl d
    rra
    srl d
-   rra                       // a = 8-bit y coord
+   rra                       ; a = 8-bit y coord
    ld d,(hl)
    inc hl
    ld b,(hl)

@@ -7,7 +7,7 @@
 ;       Simply does a swap...
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.1 2002-03-11 17:11:34 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.2 2011-08-12 18:24:13 pauloscustodio Exp $
 ;
 ; registers changed after return:
 ;  ..bcdejl/..iy same
@@ -27,7 +27,7 @@
 		ld      (accu+1),a
 		in      a,(250)
 	        ld      (swapgfxbk1+1),a
-		ld      a,($5a78) // in a,(252)
+		ld      a,($5a78) ; in a,(252)
 		and     @00011111
 		dec	a
 		out     (250),a
