@@ -5,7 +5,7 @@
 ;
 ;	set screen mode
 ;
-;	$Id: gen_set_mode.asm,v 1.5 2011-05-10 12:15:08 stefano Exp $
+;	$Id: gen_set_mode.asm,v 1.6 2011-08-12 18:35:05 pauloscustodio Exp $
 ;
 
 
@@ -51,7 +51,7 @@ ENDIF
     ld    a,$07
     call    VDPreg_Write    ; reg6  -  SPRITE PATTERN GEN. TAB.
     
-    ld    a,$f5 (00 ?)
+    ld    a,$f5 ; (00 ?)
     call    VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
     
     
