@@ -4,11 +4,11 @@
 ;       TI Calc version by Stefano Bodrato  Mar - 2000
 ;
 ;
-;	$Id: clg.asm,v 1.2 2001-04-18 13:21:38 stefano Exp $
+;	$Id: clg.asm,v 1.3 2011-08-12 16:57:41 pauloscustodio Exp $
 ;
 
 
-	INCLUDE "graphics/grafix.inc"    /* Contains fn defs */
+	INCLUDE "graphics/grafix.inc"    ; Contains fn defs
 
 	XLIB    clg
 	XREF	base_graphics

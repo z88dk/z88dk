@@ -4,12 +4,12 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
-;	$Id: g_clg.asm,v 1.4 2002-04-17 21:30:25 dom Exp $
+;	$Id: g_clg.asm,v 1.5 2011-08-12 16:55:07 pauloscustodio Exp $
 ;
 
 ;Usage: g_clg()
 
-		INCLUDE "graphics/grafix.inc"    /* Contains fn defs */
+		INCLUDE "graphics/grafix.inc"    ; Contains fn defs
 
 		XLIB    g_clg
 
