@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.21 2011-08-05 19:56:37 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.22 2011-08-14 19:42:07 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.21  2011-08-05 19:56:37  pauloscustodio
+/* Revision 1.22  2011-08-14 19:42:07  pauloscustodio
+/* - LinkModules(), ModuleExpr(), CreateBinFile(), CreateLib(): throw the new exception FatalErrorException for fatal error ERR_FILE_OPEN
+/*
+/* Revision 1.21  2011/08/05 19:56:37  pauloscustodio
 /* CH_0004 : Exception mechanism to handle fatal errors
 /* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
 /* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
@@ -511,7 +514,7 @@ LinkModules (void)
 
 	if ((errfile = fopen(errfilename, "w")) == NULL) {	/* open error file */
 	    ReportError(NULL, 0, ERR_FILE_OPEN, errfilename);	/* couldn't open error file */
-	    throw(EarlyReturnException, "cant open errfilename");
+	    throw(FatalErrorException, "cant open errfilename");
 	}
 
 	PC = 0;
@@ -920,7 +923,7 @@ ModuleExpr (void)
       else
         {
           ReportError (NULL, 0, ERR_FILE_OPEN, curlink->objfilename);		/* couldn't open relocatable file */
-          return;
+          throw(FatalErrorException, "ModuleExpr failed open objfile");
         }
 
       if (fptr_exprdecl != -1)
@@ -1012,8 +1015,10 @@ CreateBinFile (void)
       if (verbose)
 	puts ("Code generation completed.");
     }
-  else
+  else {
     ReportError (NULL, 0, ERR_FILE_OPEN, tmpstr);
+    throw(FatalErrorException, "CreateBinFile failed open binfile");
+  }
 }
 
 
@@ -1038,7 +1043,7 @@ CreateLib (void)
 	if ((errfile = fopen (errfilename, "w")) == NULL) {
 					/* open error file */
 	    ReportError (NULL, 0, ERR_FILE_OPEN, errfilename);
-	    throw(EarlyReturnException, "cannot open errfilename");
+	    throw(FatalErrorException, "cannot open errfilename");
 	}
 
 	do {
@@ -1047,7 +1052,7 @@ CreateLib (void)
 
 	    if ((objectfile = fopen (CURRENTFILE->fname, "rb")) == NULL) {
 		ReportError (NULL, 0, ERR_FILE_OPEN, CURRENTFILE->fname);
-		break;
+		throw(FatalErrorException, "cannot open objfile");
 	    }
 
 	    fseek(objectfile, 0L, SEEK_END);	/* file pointer to end of file */
@@ -1196,7 +1201,7 @@ CreateDeffile (void)
 									    * '_def' */
 	if ((deffile = fopen (globaldefname, "w")) == NULL)
 	{			/* Create DEFC file with global label declarations */
-	    ReportError (NULL, 0, ERR_FILE_OPEN, globaldefname);
+	    ReportError (NULL, 0, ERR_FILE_OPEN, globaldefname);	/* not fatal */
 	    globaldef = OFF;
 	}
     }
@@ -1245,7 +1250,7 @@ WriteMapFile (void)
 	    fclose (mapfile);
 	}
 	else {
-	    ReportError (NULL, 0, ERR_FILE_OPEN, mapfilename);
+	    ReportError (NULL, 0, ERR_FILE_OPEN, mapfilename);	    /* not fatal */
 	}
     }
     finally {
