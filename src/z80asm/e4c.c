@@ -644,7 +644,8 @@ void e4c_throw_exception(const e4c_exception * exception, const char * file, int
     DEBUG_PREVENT(frame == NULL, "e4c_throw_exception", DESC_INVALID_FRAME, RETURN_VOID);
 
     /* get the cause of this exception */
-    cause = ( frame->thrown ? malloc( sizeof(*cause) ) : NULL );
+    cause = NULL;   /* hack - solve memory leak on rethrow
+		    cause = ( frame->thrown ? malloc( sizeof(*cause) ) : NULL ); */
     /* (if there wasn't enough memory the cause will be lost) */
 
     /* copy the previous thrown exception in the newly allocated buffer */
