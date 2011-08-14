@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.3 2011-07-18 00:48:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.4 2011-08-14 19:27:52 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.3  2011-07-18 00:48:25  pauloscustodio
+/* Revision 1.4  2011-08-14 19:27:52  pauloscustodio
+/* - ReportError() raises the new exception FatalErrorException for fatal error ERR_MAX_CODESIZE
+/*
+/* Revision 1.3  2011/07/18 00:48:25  pauloscustodio
 /* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
 /*
 /* Revision 1.2  2011/07/14 01:32:08  pauloscustodio
@@ -166,5 +169,18 @@ void ReportError (char *filename, int lineno, int errnum, ...)
     /* increment error counters */
     ++ERRORS;
     ++TOTALERRORS;
+
+    /* raise fatal error exception for fatal errors, i.e. the assembly cannot continue */
+    /* NOTE: NotEnoughMemoryException is treaded differently - it is raised by the memory 
+       allocation functions, then captured in main(), and then main() calls ReportError();
+       therefore cannot raise the exception here
+    */ 
+    switch (errnum) {
+    case ERR_MAX_CODESIZE:
+	throw(FatalErrorException, errstr);
+	break;
+    default:
+	break;
+    }
 }
 
