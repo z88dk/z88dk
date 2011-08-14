@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.15 2011-08-05 20:20:45 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.16 2011-08-14 19:37:43 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.15  2011-08-05 20:20:45  pauloscustodio
+/* Revision 1.16  2011-08-14 19:37:43  pauloscustodio
+/* Z80pass1(): no need to check for fatal error and return; bypassed by exception mechanism
+/*
+/* Revision 1.15  2011/08/05 20:20:45  pauloscustodio
 /* CH_0004 : Exception mechanism to handle fatal errors
 /* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
 /* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
@@ -229,12 +232,6 @@ Z80pass1 (void)
       if (listing)
 	writeline = ON;
       parseline (ON);		    /* before parsing it */
-
-      switch (ASSEMBLE_ERROR)
-	{
-	case ERR_MAX_CODESIZE:
-	  return;		    /* Fatal errors, return immediatly... */
-	}
     }
 }
 
