@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.19 2011-08-05 19:37:38 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.20 2011-08-14 19:46:46 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.19  2011-08-05 19:37:38  pauloscustodio
+/* Revision 1.20  2011-08-14 19:46:46  pauloscustodio
+/* - IncludeFile(), BINARY(): throw the new exception FatalErrorException for fatal error ERR_FILE_OPEN, no need to re-open the original source file after the error
+/* - IncludeFile(): no need to check for fatal error and return; bypassed by exception mechanism
+/* - source_file_open flag removed; z80asmfile is used for the same purpose
+/*
+/* Revision 1.19  2011/08/05 19:37:38  pauloscustodio
 /* CH_0004 : Exception mechanism to handle fatal errors
 /* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
 /* Replaced all functions that allocated memory structures by the new xcalloc_struct().
@@ -215,7 +220,6 @@ extern enum symbols sym;
 extern enum flag writeline, EOL;
 extern struct modules *modulehdr;
 extern struct module *CURRENTMODULE;
-extern int sourcefile_open;
 
 
 int 
@@ -883,14 +887,10 @@ IncludeFile (void)
       if ((z80asmfile = fopen (filename, "rb")) == NULL)
         {			/* Open include file */
           ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_FILE_OPEN, filename);
-          z80asmfile = fopen (CURRENTFILE->fname, "rb");		/* re-open current source file */
-          fseek (z80asmfile, CURRENTFILE->filepointer, SEEK_SET);	/* file position to beginning of line
-                                                                     * following INCLUDE line */
-          return;
+	  throw(FatalErrorException, "IncludeFile failed open include file");
         }
       else
         {
-          sourcefile_open = 1;
           CURRENTFILE = Newfile (CURRENTFILE, filename);	/* Allocate new file into file information list */
           if (verbose)
             puts (CURRENTFILE->fname);	/* display name of INCLUDE file */
@@ -899,23 +899,17 @@ IncludeFile (void)
 
           CURRENTFILE = Prevfile ();	/* Now get back to current file... */
 
-          switch (ASSEMBLE_ERROR)
-            {
-            case ERR_FILE_OPEN:
-            case ERR_MAX_CODESIZE:
-              return;		/* Fatal errors, return immediatly... */
-            }
-
-          sourcefile_open = fclose (z80asmfile);
+          fclose (z80asmfile); 
+	  z80asmfile = NULL;
 
           if ((z80asmfile = fopen (CURRENTFILE->fname, "rb")) == NULL)
             {			/* re-open current source file */
               ReportError(NULL, 0, ERR_FILE_OPEN, CURRENTFILE->fname);
+	      throw(FatalErrorException, "IncludeFile failed open original file");
             }
           else
             {
               fseek (z80asmfile, CURRENTFILE->filepointer, 0);	/* file position to beginning of */
-              sourcefile_open = 1;
             }
         }			/* line following INCLUDE line */
     }
@@ -941,7 +935,7 @@ BINARY (void)
       if ((binfile = fopen (filename, "rb")) == NULL)
         {
           ReportError (NULL, 0, ERR_FILE_OPEN, filename);
-          return;
+          throw(FatalErrorException, "BINARY failed open file");
         }
 		
 	  fseek(binfile, 0L, SEEK_END);	/* file pointer to end of file */
