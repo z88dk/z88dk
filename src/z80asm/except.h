@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011
 Wrapper module for e4c to setup compile-time defines
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.1 2011-08-05 19:23:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.2 2011-08-14 19:25:55 pauloscustodio Exp $ */
 /* $Log: except.h,v $
-/* Revision 1.1  2011-08-05 19:23:53  pauloscustodio
+/* Revision 1.2  2011-08-14 19:25:55  pauloscustodio
+/* - New exception FatalErrorException to raise on fatal assembly errors
+/*
+/* Revision 1.1  2011/08/05 19:23:53  pauloscustodio
 /* CH_0004 : Exception mechanism to handle fatal errors
 /* Included exceptions4c 2.4, Copyright (c) 2011 Guillermo Calvo
 /*
@@ -40,6 +43,7 @@ Wrapper module for e4c to setup compile-time defines
 
 /* exceptions */
 E4C_DECLARE_EXCEPTION(EarlyReturnException);
+E4C_DECLARE_EXCEPTION(FatalErrorException);
 
 
 #endif /* ndef EXCEPT_H */
