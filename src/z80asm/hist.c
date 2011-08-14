@@ -19,9 +19,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.20 2011-08-05 20:26:42 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.21 2011-08-14 19:50:31 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.20  2011-08-05 20:26:42  pauloscustodio
+/* Revision 1.21  2011-08-14 19:50:31  pauloscustodio
+/* Version 1.1.7
+/*
+/* Revision 1.20  2011/08/05 20:26:42  pauloscustodio
 /* Version 1.1.6
 /*
 /* Revision 1.19  2011/07/18 00:54:01  pauloscustodio
@@ -679,14 +682,30 @@ Based on 1.0.31
 	Replaced all exit(1) by an exception.
 	Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
 
+14.08.2011 [1.1.7] (pauloscustodio)
+    CH_0004(a) : Exception mechanism to handle fatal errors
+	- New exception FatalErrorException to raise on fatal assembly errors
+	- ReportError(), LinkModules(), ModuleExpr(), CreateBinFile(), CreateLib(), IncludeFile(),
+	  BINARY(): throw the new exception FatalErrorException for fatal errors 
+	  ERR_FILE_OPEN and ERR_MAX_CODESIZE
+	- AssembleSourceFile(): added try-catch to delete incomplete files in case of fatal error, 
+	  throw FatalErrorException instead of early return
+	- main(): added try-catch to delete incomplete library file in case of fatal error
+	- Z80pass1(), IncludeFile(): no need to check for fatal errors and return; bypassed by the
+	  exception mechanism	
+    - AssembleSourceFile(): error return is never used; changed to void	
+    - source_file_open flag removed; z80asmfile is used for the same purpose
+    - Tests: Added test case to verify that incomplete files are deleted on error
+    - Hack to hide memory leak in e4c, line 647, when rethrow() is called.
+      Reported to Exceptions4c project page http://code.google.com/p/exceptions4c/
 */
 
 #include "memalloc.h"	/* before any other include to enable memory leak detection */
 
 #include "hist.h"
 
-#define DATE        "05.08.2011"
-#define VERSION     "1.1.6"
+#define DATE        "14.08.2011"
+#define VERSION     "1.1.7"
 #define COPYRIGHT   "InterLogic 1993-2009"
 
 #ifdef QDOS
