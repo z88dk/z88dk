@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.33 2011-08-05 20:07:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.34 2011-08-14 19:36:02 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.33  2011-08-05 20:07:49  pauloscustodio
+/* Revision 1.34  2011-08-14 19:36:02  pauloscustodio
+/* - AssembleSourceFile(): error return is never used; changed to void
+/* - AssembleSourceFile(): added try-catch to delete incomplete files in case of fatal error, throw FatalErrorException instead of early return
+/* - main(): added try-catch to delete incomplete library file in case of fatal error
+/* - source_file_open not needed; z80asmfile can be used for the same purpose
+/*
+/* Revision 1.33  2011/08/05 20:07:49  pauloscustodio
 /* CH_0004 : Exception mechanism to handle fatal errors
 /* Included exceptions4c 2.4, Copyright (c) 2011 Guillermo Calvo
 /* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
@@ -344,7 +350,7 @@ void ReleaseModules (void);
 void ReleaseFilenames (void);
 void ReleaseExprns (struct expression *express);
 void CloseFiles (void);
-int AssembleSourceFile (void);
+void AssembleSourceFile (void);
 int TestAsmFile (void);
 int GetModuleSize (void);
 symbol *createsym (symbol * symptr);
@@ -374,7 +380,6 @@ enum flag EOL, library, createlibrary;
 int cpu_type = CPU_Z80;
 int PAGENR, LINENR;
 long TOTALLINES;
-int sourcefile_open;
 unsigned char PAGELEN;
 int TAB_DIST = 8, COLUMN_WIDTH;
 char line[255], stringconst[255], ident[FILENAME_MAX+1];
@@ -422,124 +427,130 @@ struct liblist *libraryhdr;
 avltree *globalroot, *staticroot;
 
 
-int 
+void  
 AssembleSourceFile (void)
 {
   char  *dotptr;
 
-  if ((errfile = fopen (errfilename, "w")) == NULL)
-    {				/* Create error file */
-      ReportError (NULL, 0, ERR_FILE_OPEN, errfilename);
-      return 0;
-    }
-  if (listing_CPY || symfile)
-    {
-      if ((listfile = fopen (lstfilename, "w+")) != NULL)
-	{			/* Create LIST or SYMBOL file */
-	  PAGENR = 0;
-	  LINENR = 6;
-	  WriteHeader ();			/* Begin list file with a header */
-	  listfileptr = ftell (listfile);	/* Get file pos. of next line in list file */
+  /* try-catch to delete incomplete files in case of fatal error */
+  try {
+      if ((errfile = fopen (errfilename, "w")) == NULL)
+	{				/* Create error file */
+	  ReportError (NULL, 0, ERR_FILE_OPEN, errfilename);
+	  throw(FatalErrorException, "cannot open errfile");
+	}
+      if (listing_CPY || symfile)
+	{
+	  if ((listfile = fopen (lstfilename, "w+")) != NULL)
+	    {			/* Create LIST or SYMBOL file */
+	      PAGENR = 0;
+	      LINENR = 6;
+	      WriteHeader ();			/* Begin list file with a header */
+	      listfileptr = ftell (listfile);	/* Get file pos. of next line in list file */
+	    }
+	  else
+	    {
+	      ReportError (NULL, 0, ERR_FILE_OPEN, lstfilename);
+    	      throw(FatalErrorException, "cannot open lstfile");
+	    }
+	}
+      if ((objfile = fopen (objfilename, "w+b")) != NULL)
+	{				/* Create relocatable object file */
+	  fwrite (Z80objhdr, sizeof (char), strlen (Z80objhdr), objfile);
+	  fwrite (objhdrprefix, sizeof (char), strlen (objhdrprefix), objfile);
 	}
       else
 	{
-	  ReportError (NULL, 0, ERR_FILE_OPEN, lstfilename);
-	  return 0;
+	  ReportError (NULL, 0, ERR_FILE_OPEN, objfilename);
+	  throw(FatalErrorException, "cannot open objfile");
 	}
-    }
-  if ((objfile = fopen (objfilename, "w+b")) != NULL)
-    {				/* Create relocatable object file */
-      fwrite (Z80objhdr, sizeof (char), strlen (Z80objhdr), objfile);
-      fwrite (objhdrprefix, sizeof (char), strlen (objhdrprefix), objfile);
-    }
-  else
-    {
-      ReportError (NULL, 0, ERR_FILE_OPEN, objfilename);
-      return 0;
-    }
 
-  PC = oldPC = 0;
-  copy (staticroot, &CURRENTMODULE->localroot, (int (*)(void*,void*)) cmpidstr, (void *(*)(void*)) createsym);
-  if (DefineDefSym (ASSEMBLERPC, PC, 0, &globalroot) == 0)
-    {					/* Create standard 'ASMPC' identifier */
-      return 0;				/* ERR_SYMBOL_REDEFINED - not expected */
-    }
+      PC = oldPC = 0;
+      copy (staticroot, &CURRENTMODULE->localroot, (int (*)(void*,void*)) cmpidstr, (void *(*)(void*)) createsym);
+      if (DefineDefSym (ASSEMBLERPC, PC, 0, &globalroot) == 0)
+	{					/* Create standard 'ASMPC' identifier */
+						/* ERR_SYMBOL_REDEFINED - not expected */
+	  throw(EarlyReturnException, "unexpected return from DefineDefSym");
+	}
 
-  if (verbose)
-    printf ("Assembling '%s'...\nPass1...\n", srcfilename);
-
-  pass1 = ON;
-  Z80pass1 ();
-  pass1 = OFF;			/* GetSymPtr will only generate page references in Pass1 (if listing is ON) */
-
-  /*
-   * Source file no longer needed (file could already have been closed, if fatal error occurred during INCLUDE
-   * processing).
-   */
-  if (sourcefile_open)
-    {
-      fclose (z80asmfile);
-      z80asmfile = NULL;
-    }
-  if (CURRENTMODULE->mname == NULL) {	/* Module name must be defined */
-    dotptr = strrchr(srcfilename,'/');
-    if ( dotptr == NULL )
-	dotptr = strrchr(srcfilename,'\\');
-    if ( dotptr == NULL )
-	dotptr = srcfilename-1;
-    strcpy(ident,dotptr+1);
-    dotptr = strchr(ident,asmext[0]);
-    if ( dotptr )
-	*dotptr = 0;
-    sym = name;
-    dotptr = ident;
-    while ( *dotptr )
-     {
-	*dotptr = toupper(*dotptr);
-	dotptr++;
-      }
-    DeclModuleName();
-    /* ReportError (CURRENTFILE->fname, 0, ERR_MODULE_NOT_DEFINED); */
-  }
-    
-
-  if (ERRORS == 0)
-    {
       if (verbose)
-	puts ("Pass2...");
-      Z80pass2 ();
-    }
-  if (listing_CPY || symfile)
-    {
-      fseek (listfile, 0, SEEK_END);
-      fputc (12, listfile);	/* end listing with a FF */
-      fclose (listfile);
-      listfile = NULL;
+	printf ("Assembling '%s'...\nPass1...\n", srcfilename);
+
+      pass1 = ON;
+      Z80pass1 ();
+      pass1 = OFF;			/* GetSymPtr will only generate page references in Pass1 (if listing is ON) */
+
+      if (CURRENTMODULE->mname == NULL) {	/* Module name must be defined */
+	dotptr = strrchr(srcfilename,'/');
+	if ( dotptr == NULL )
+	    dotptr = strrchr(srcfilename,'\\');
+	if ( dotptr == NULL )
+	    dotptr = srcfilename-1;
+	strcpy(ident,dotptr+1);
+	dotptr = strchr(ident,asmext[0]);
+	if ( dotptr )
+	    *dotptr = 0;
+	sym = name;
+	dotptr = ident;
+	while ( *dotptr )
+	 {
+	    *dotptr = toupper(*dotptr);
+	    dotptr++;
+	  }
+	DeclModuleName();
+	/* ReportError (CURRENTFILE->fname, 0, ERR_MODULE_NOT_DEFINED); */
+      }
+
+      if (ERRORS == 0)
+	{
+	  if (verbose)
+	    puts ("Pass2...");
+	  Z80pass2 ();
+	}
+  }
+  catch (RuntimeException) {
+      rethrow("");
+  }
+  finally {
+      /*
+       * Source file no longer needed (file could already have been closed, if fatal error occurred during INCLUDE
+       * processing).
+       */
+      if (z80asmfile != NULL)
+	{
+	  fclose (z80asmfile);
+	  z80asmfile = NULL;
+	}
+      if (listing_CPY || symfile)
+	{
+	  fseek (listfile, 0, SEEK_END);
+	  fputc (12, listfile);	/* end listing with a FF */
+	  fclose (listfile);
+	  listfile = NULL;
+	  if (ERRORS)
+	    remove (lstfilename);	/* remove incomplete list file */
+	}
+      fclose (objfile);
+      objfile = NULL;
       if (ERRORS)
-	remove (lstfilename);	/* remove incomplete list file */
-    }
-  fclose (objfile);
-  objfile = NULL;
-  if (ERRORS)
-    remove (objfilename);	/* remove incomplete object file */
+	remove (objfilename);	/* remove incomplete object file */
 
-  if (errfile != NULL)
-    {
-      fclose (errfile);
-      errfile = NULL;
-      if (ERRORS == 0 && errfilename != NULL)
-	remove (errfilename);	/* remove empty error file */
-    }
-  if (globaldef)
-    {
-      fputc ('\n', deffile);	/* separate DEFC lines for each module */
-      inorder (globalroot, (void (*)(void*)) WriteGlobal);
-    }
-  deleteall (&CURRENTMODULE->localroot, (void (*)(void*)) FreeSym);
-  deleteall (&CURRENTMODULE->notdeclroot, (void (*)(void*)) FreeSym);
-  deleteall (&globalroot, (void (*)(void*)) FreeSym);
-
-  return 1;
+      if (errfile != NULL)
+	{
+	  fclose (errfile);
+	  errfile = NULL;
+	  if (ERRORS == 0 && errfilename != NULL)
+	    remove (errfilename);	/* remove empty error file */
+	}
+      if (globaldef)
+	{
+	  fputc ('\n', deffile);	/* separate DEFC lines for each module */
+	  inorder (globalroot, (void (*)(void*)) WriteGlobal);
+	}
+      deleteall (&CURRENTMODULE->localroot, (void (*)(void*)) FreeSym);
+      deleteall (&CURRENTMODULE->notdeclroot, (void (*)(void*)) FreeSym);
+      deleteall (&globalroot, (void (*)(void*)) FreeSym);
+  }
 }
 
 
@@ -583,7 +594,6 @@ TestAsmFile (void)
       ReportError (NULL, 0, ERR_FILE_OPEN, srcfilename);		/* Object module is not found or */
       return -1;		/* source is has recently been updated */
     }
-  sourcefile_open = 1;
   return 1;			/* assemble if no datestamp check */
 }
 
@@ -1205,17 +1215,25 @@ main (int argc, char *argv[])
   if (globaldef)
     fclose (deffile);
 
-  if (createlibrary && ASMERROR == OFF)
-    CreateLib ();
+  /* try-catch to delete lib file in case of error */
+  try {
+      if (createlibrary && ASMERROR == OFF)
+	CreateLib ();
+  }
+  catch (RuntimeException) {
+      rethrow("");
+  }
+  finally {
+      if (createlibrary)
+	{
+	  fclose (libfile);
+	  if (ASMERROR)
+	    remove (libfilename);
+	  xfree0(libfilename);
+	  libfilename = NULL;
+	}
+  }
 
-  if (createlibrary)
-    {
-      fclose (libfile);
-      if (ASMERROR)
-        remove (libfilename);
-      xfree0(libfilename);
-      libfilename = NULL;
-    }
 
   if ((ASMERROR == OFF) && verbose)
     printf ("Total of %ld lines assembled.\n", TOTALLINES);
@@ -1240,6 +1258,10 @@ main (int argc, char *argv[])
   }
 
   catch(IllegalArgumentException) {
+      ASMERROR = ON;
+  }
+
+  catch(FatalErrorException) {
       ASMERROR = ON;
   }
 
