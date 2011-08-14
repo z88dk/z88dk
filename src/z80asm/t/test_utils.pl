@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.5 2011-07-14 01:32:09 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.6 2011-08-14 19:49:05 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.5  2011-07-14 01:32:09  pauloscustodio
+# Revision 1.6  2011-08-14 19:49:05  pauloscustodio
+# - Added test case to verify that incomplete files are deleted on error
+#
+# Revision 1.5  2011/07/14 01:32:09  pauloscustodio
 #     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 #     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 #     CH_0003 : Error messages should be more informative
@@ -96,6 +99,15 @@ sub t_z80asm_error {
 		"1 errors occurred during assembly\n", "$line stderr";
     ok $return != 0, "$line exit value";
     ok -f err_file(), "$line error file found";
+    ok ! -f obj_file(), "$line object file deleted";
+    ok ! -f bin_file(), "$line binary file deleted";
+    if (defined($options) && $options =~ /-x(\S+)/) {
+	my $lib = $1;
+	$lib .= ".lib" unless $lib =~ /\.lib$/i;
+	
+	ok ! -f $1, "$line library file deleted";
+    }
+    
     is read_file(err_file(), err_mode => 'quiet'), 
 		$expected_err."\n", "$line error in error file";
 
