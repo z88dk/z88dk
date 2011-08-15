@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.16 2011-08-05 19:46:16 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.17 2011-08-15 17:12:31 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.16  2011-08-05 19:46:16  pauloscustodio
+/* Revision 1.17  2011-08-15 17:12:31  pauloscustodio
+/* Upgrade to Exceptions4c 2.8.9 to solve memory leak.
+/*
+/* Revision 1.16  2011/08/05 19:46:16  pauloscustodio
 /* CH_0004 : Exception mechanism to handle fatal errors
 /* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
 /* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
@@ -888,7 +891,7 @@ PopItem (struct pfixstack **stackpointer)
     struct pfixstack *stackitem;
     long constant;
 
-    e4c_assert(*stackpointer);
+    E4C_ASSERT(*stackpointer);
     constant = (*stackpointer)->stackconstant;
     stackitem = *stackpointer;
     *stackpointer = (*stackpointer)->prevstackitem;	/* move stackpointer to previous item */

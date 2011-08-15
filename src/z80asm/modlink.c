@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.22 2011-08-14 19:42:07 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.23 2011-08-15 17:12:31 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.22  2011-08-14 19:42:07  pauloscustodio
+/* Revision 1.23  2011-08-15 17:12:31  pauloscustodio
+/* Upgrade to Exceptions4c 2.8.9 to solve memory leak.
+/*
+/* Revision 1.22  2011/08/14 19:42:07  pauloscustodio
 /* - LinkModules(), ModuleExpr(), CreateBinFile(), CreateLib(): throw the new exception FatalErrorException for fatal error ERR_FILE_OPEN
 /*
 /* Revision 1.21  2011/08/05 19:56:37  pauloscustodio
@@ -293,7 +296,7 @@ ReadNames (long nextname, long endnames)
           if ((foundsymbol = FindSymbol (line, CURRENTMODULE->localroot)) == NULL)
             {
               foundsymbol = CreateSymbol (line, value, symtype | SYMLOCAL, CURRENTMODULE);
-              e4c_assert(foundsymbol != NULL);
+              E4C_ASSERT(foundsymbol != NULL);
               insert (&CURRENTMODULE->localroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
             }
           else
@@ -309,7 +312,7 @@ ReadNames (long nextname, long endnames)
           if ((foundsymbol = FindSymbol (line, globalroot)) == NULL)
             {
               foundsymbol = CreateSymbol (line, value, symtype | SYMXDEF, CURRENTMODULE);
-              e4c_assert(foundsymbol != NULL);
+              E4C_ASSERT(foundsymbol != NULL);
               insert (&globalroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
             }
           else
@@ -325,7 +328,7 @@ ReadNames (long nextname, long endnames)
           if ((foundsymbol = FindSymbol (line, globalroot)) == NULL)
             {
               foundsymbol = CreateSymbol (line, value, symtype | SYMXDEF | SYMDEF, CURRENTMODULE);
-              e4c_assert(foundsymbol != NULL);
+              E4C_ASSERT(foundsymbol != NULL);
               insert (&globalroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
             }
           else

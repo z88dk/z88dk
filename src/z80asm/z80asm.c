@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.34 2011-08-14 19:36:02 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.35 2011-08-15 17:12:31 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.34  2011-08-14 19:36:02  pauloscustodio
+/* Revision 1.35  2011-08-15 17:12:31  pauloscustodio
+/* Upgrade to Exceptions4c 2.8.9 to solve memory leak.
+/*
+/* Revision 1.34  2011/08/14 19:36:02  pauloscustodio
 /* - AssembleSourceFile(): error return is never used; changed to void
 /* - AssembleSourceFile(): added try-catch to delete incomplete files in case of fatal error, throw FatalErrorException instead of early return
 /* - main(): added try-catch to delete incomplete library file in case of fatal error
@@ -709,7 +712,7 @@ GetLibfile (char *filename)
   int len;
 
   newlib = NewLibrary ();
-  e4c_assert(newlib != NULL);
+  E4C_ASSERT(newlib != NULL);
 
   len = strlen (filename);
   if (len)
@@ -1009,7 +1012,7 @@ main (int argc, char *argv[])
   FILE  *includes[10];   /* 10 levels of inclusion should be enough */
 
     init_memalloc();			/* init memory leak detection */
-    e4c_context_begin(e4c_false, e4c_print_exception);
+    e4c_context_begin(E4C_FALSE, e4c_print_exception);
 					/* init exception mechanism */
 
     /* start try..catch with finally to cleanup any allocated memory */
@@ -1054,7 +1057,7 @@ main (int argc, char *argv[])
   
   CURRENTMODULE = NewModule ();		/* then create a dummy module */
 					/* this is needed during command line parsing */
-  e4c_assert(CURRENTMODULE != NULL);
+  E4C_ASSERT(CURRENTMODULE != NULL);
 
   /* Setup some default search paths */
   i = include_dir_num++;
@@ -1189,10 +1192,10 @@ main (int argc, char *argv[])
                                                                      * '_err' */
 
       CURRENTMODULE = NewModule ();		    /* Create module data structures for new file */
-      e4c_assert(CURRENTMODULE != NULL);
+      E4C_ASSERT(CURRENTMODULE != NULL);
 
       CURRENTFILE = Newfile (NULL, srcfilename);    /* Create first file record */
-      e4c_assert(CURRENTFILE != NULL);
+      E4C_ASSERT(CURRENTFILE != NULL);
 
       if (globaldef && CURRENTMODULE == modulehdr->first)
         CreateDeffile ();

@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.13 2011-08-05 20:02:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.14 2011-08-15 17:12:31 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.13  2011-08-05 20:02:32  pauloscustodio
+/* Revision 1.14  2011-08-15 17:12:31  pauloscustodio
+/* Upgrade to Exceptions4c 2.8.9 to solve memory leak.
+/*
+/* Revision 1.13  2011/08/05 20:02:32  pauloscustodio
 /* CH_0004 : Exception mechanism to handle fatal errors
 /* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
 /* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
@@ -264,7 +267,7 @@ DefLocalSymbol (char *identifier,
   if ((foundsymbol = FindSymbol (identifier, CURRENTMODULE->localroot)) == NULL)
     {				/* Symbol not declared as local */
       foundsymbol = CreateSymbol (identifier, value, symboltype | SYMLOCAL | SYMDEFINED, CURRENTMODULE);
-      e4c_assert(foundsymbol != NULL);
+      E4C_ASSERT(foundsymbol != NULL);
       insert (&CURRENTMODULE->localroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
 
       if (pass1 && symtable && listing)
@@ -357,7 +360,7 @@ GetSymPtr (char *identifier)
 	      if ((symbolptr = FindSymbol (identifier, CURRENTMODULE->notdeclroot)) == NULL)
 		{
 		  symbolptr = CreateSymbol (identifier, 0, SYM_NOTDEFINED, CURRENTMODULE);
-		  e4c_assert(symbolptr != NULL);
+		  E4C_ASSERT(symbolptr != NULL);
                   insert (&CURRENTMODULE->notdeclroot, symbolptr, (int (*)(void*,void*)) cmpidstr);
 		}
 	      else
@@ -426,7 +429,7 @@ DeclSymGlobal (char *identifier, unsigned char libtype)
       if ((foundsym = FindSymbol (identifier, globalroot)) == NULL)
 	{
 	  foundsym = CreateSymbol (identifier, 0, SYM_NOTDEFINED | SYMXDEF | libtype, CURRENTMODULE);
-	  e4c_assert(foundsym != NULL);
+	  E4C_ASSERT(foundsym != NULL);
           insert (&globalroot, foundsym, (int (*)(void*,void*)) cmpidstr);    /* declare symbol as global */
 	}
       else
@@ -458,7 +461,7 @@ DeclSymGlobal (char *identifier, unsigned char libtype)
           foundsym->type &= SYMLOCAL_OFF;
           foundsym->type |= SYMXDEF;
           clonedsym = CreateSymbol (foundsym->symname, foundsym->symvalue, foundsym->type, CURRENTMODULE);
-	  e4c_assert(clonedsym != NULL);
+	  E4C_ASSERT(clonedsym != NULL);
           insert (&globalroot, clonedsym, (int (*)(void*,void*)) cmpidstr);
 
           /* original local symbol cloned as global symbol, now delete old local ... */
@@ -484,7 +487,7 @@ DeclSymExtern (char *identifier, unsigned char libtype)
       if ((foundsym = FindSymbol (identifier, globalroot)) == NULL)
 	{
 	  foundsym = CreateSymbol (identifier, 0, SYM_NOTDEFINED | SYMXREF | libtype, CURRENTMODULE);
-	  e4c_assert(foundsym != NULL);
+	  E4C_ASSERT(foundsym != NULL);
           insert (&globalroot, foundsym, (int (*)(void*,void*)) cmpidstr);    /* declare symbol as extern */
 	}
       else 
@@ -510,7 +513,7 @@ DeclSymExtern (char *identifier, unsigned char libtype)
               foundsym->type &= SYMLOCAL_OFF;
 	      foundsym->type |= (SYMXREF | libtype);
 	      extsym = CreateSymbol (identifier, 0, foundsym->type, CURRENTMODULE);
-	      e4c_assert(extsym != NULL);
+	      E4C_ASSERT(extsym != NULL);
 	      insert (&globalroot, extsym, (int (*)(void*,void*)) cmpidstr);
 
 	      /* original local symbol cloned as external symbol, now delete old local ... */
@@ -600,7 +603,7 @@ DefineDefSym (char *identifier, long value, unsigned char symtype, avltree ** ro
   if (FindSymbol (identifier, *root) == NULL)
     {
       staticsym = CreateSymbol (identifier, value, symtype | SYMDEF | SYMDEFINED, NULL);
-      e4c_assert(staticsym != NULL);
+      E4C_ASSERT(staticsym != NULL);
       insert (root, staticsym, (int (*)(void*,void*)) cmpidstr);
       return 1;
     }
