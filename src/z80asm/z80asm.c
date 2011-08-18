@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.35 2011-08-15 17:12:31 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.36 2011-08-18 21:47:48 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.35  2011-08-15 17:12:31  pauloscustodio
+/* Revision 1.36  2011-08-18 21:47:48  pauloscustodio
+/* BUG_0008 : code block of 64K is read as zero
+/*
+/* Revision 1.35  2011/08/15 17:12:31  pauloscustodio
 /* Upgrade to Exceptions4c 2.8.9 to solve memory leak.
 /*
 /* Revision 1.34  2011/08/14 19:36:02  pauloscustodio
@@ -639,6 +642,11 @@ GetModuleSize (void)
 	  lowbyte = fgetc (objfile);
 	  highbyte = fgetc (objfile);
 	  size = lowbyte + highbyte * 256;
+
+	  /* BUG_0008 : fix size, if a zero was written, the moudule is actually 64K */
+	  if (size == 0) 
+	      size = 0x10000;
+
 	  if (CURRENTMODULE->startoffset + size > MAXCODESIZE)
 	    ReportError (objfilename, 0, ERR_MAX_CODESIZE);
 	  else

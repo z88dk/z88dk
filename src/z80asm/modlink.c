@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.23 2011-08-15 17:12:31 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.24 2011-08-18 21:46:54 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.23  2011-08-15 17:12:31  pauloscustodio
+/* Revision 1.24  2011-08-18 21:46:54  pauloscustodio
+/* BUG_0008 : code block of 64K is read as zero
+/*
+/* Revision 1.23  2011/08/15 17:12:31  pauloscustodio
 /* Upgrade to Exceptions4c 2.8.9 to solve memory leak.
 /*
 /* Revision 1.22  2011/08/14 19:42:07  pauloscustodio
@@ -636,6 +639,11 @@ LinkModule (char *filename, long fptr_base)
       lowbyte = fgetc (z80asmfile);
       highbyte = fgetc (z80asmfile);
       size = lowbyte + highbyte * 256U;
+
+      /* BUG_0008 : fix size, if a zero was written, the moudule is actually 64K */
+      if (size == 0) 
+	  size = 0x10000;
+
       if (CURRENTMODULE->startoffset + size > MAXCODESIZE)
         {
           ReportError (filename, 0, ERR_MAX_CODESIZE);
