@@ -13,9 +13,16 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.36 2011-08-18 21:47:48 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.37 2011-08-18 23:27:54 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.36  2011-08-18 21:47:48  pauloscustodio
+/* Revision 1.37  2011-08-18 23:27:54  pauloscustodio
+/* BUG_0009 : file read/write not tested for errors
+/* - In case of disk full file write fails, but assembler does not detect the error
+/*   and leaves back corruped object/binary files
+/* - Created new exception FileIOException and ERR_FILE_IO error.
+/* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
+/*
+/* Revision 1.36  2011/08/18 21:47:48  pauloscustodio
 /* BUG_0008 : code block of 64K is read as zero
 /*
 /* Revision 1.35  2011/08/15 17:12:31  pauloscustodio
@@ -322,6 +329,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "hist.h"
 #include "options.h"
 #include "errors.h"
+#include "file.h"
 
 /* external functions */
 void RemovePfixlist (struct expr *pfixexpr);
@@ -339,7 +347,6 @@ void CreateBinFile (void);
 struct sourcefile *Newfile (struct sourcefile *curfile, char *fname);
 enum symbols GetSym (void);
 long GetConstant (char *evalerr);
-long ReadLong (FILE * fileid);
 int cmpidstr (symbol * kptr, symbol * p);
 int DefineSymbol (char *identifier, long value, unsigned char symboltype);
 int DefineDefSym (char *ident, long value, unsigned char symtype, avltree ** root);
@@ -462,8 +469,8 @@ AssembleSourceFile (void)
 	}
       if ((objfile = fopen (objfilename, "w+b")) != NULL)
 	{				/* Create relocatable object file */
-	  fwrite (Z80objhdr, sizeof (char), strlen (Z80objhdr), objfile);
-	  fwrite (objhdrprefix, sizeof (char), strlen (objhdrprefix), objfile);
+	  xfwritec(Z80objhdr,    strlen(Z80objhdr),    objfile);
+	  xfwritec(objhdrprefix, strlen(objhdrprefix), objfile);
 	}
       else
 	{
@@ -530,7 +537,7 @@ AssembleSourceFile (void)
       if (listing_CPY || symfile)
 	{
 	  fseek (listfile, 0, SEEK_END);
-	  fputc (12, listfile);	/* end listing with a FF */
+	  xfputc(12, listfile);	/* end listing with a FF */
 	  fclose (listfile);
 	  listfile = NULL;
 	  if (ERRORS)
@@ -550,7 +557,7 @@ AssembleSourceFile (void)
 	}
       if (globaldef)
 	{
-	  fputc ('\n', deffile);	/* separate DEFC lines for each module */
+	  xfputc('\n', deffile);	/* separate DEFC lines for each module */
 	  inorder (globalroot, (void (*)(void*)) WriteGlobal);
 	}
       deleteall (&CURRENTMODULE->localroot, (void (*)(void*)) FreeSym);
@@ -615,7 +622,7 @@ GetModuleSize (void)
 
   if ((objfile = fopen (objfilename, "rb")) != NULL)
     {				/* open relocatable object file */
-      fread (fheader, 1U, 8U, objfile);		/* read first 8 chars from file into array */
+      xfreadc(fheader, 8U, objfile);		/* read first 8 chars from file into array */
       fheader[8] = '\0';
 
       if (strcmp (fheader, Z80objhdr) != 0)
@@ -626,21 +633,21 @@ GetModuleSize (void)
 	  return -1;
 	}
       fseek (objfile, 8 + 2, SEEK_SET);		/* set file pointer to point at module name */
-      fptr_modname = ReadLong (objfile);	/* get file pointer to module name */
+      fptr_modname = xfget_long(objfile);	/* get file pointer to module name */
       fseek (objfile, fptr_modname, SEEK_SET);	/* set file pointer to module name */
 
-      size = fgetc (objfile);
-      fread (line, sizeof (char), size, objfile);	/* read module name */
+      size = xfgetc(objfile);
+      xfreadc(line, size, objfile);	/* read module name */
       line[size] = '\0';
       CURRENTMODULE->mname = xstrdup(line);
 
       fseek (objfile, 26, SEEK_SET);	/* set file pointer to point at module code pointer */
-      fptr_modcode = ReadLong (objfile);	/* get file pointer to module code */
+      fptr_modcode = xfget_long(objfile);	/* get file pointer to module code */
       if (fptr_modcode != -1)
 	{
 	  fseek (objfile, fptr_modcode, SEEK_SET);	/* set file pointer to module code */
-	  lowbyte = fgetc (objfile);
-	  highbyte = fgetc (objfile);
+	  lowbyte = xfgetc(objfile);
+	  highbyte = xfgetc(objfile);
 	  size = lowbyte + highbyte * 256;
 
 	  /* BUG_0008 : fix size, if a zero was written, the moudule is actually 64K */
@@ -704,7 +711,7 @@ CreateLibfile (char *filename)
   else
     {
       createlibrary = ON;
-      fwrite (Z80libhdr, sizeof (char), 8U, libfile);	/* write library header */
+      xfwritec(Z80libhdr, 8U, libfile);	/* write library header */
     }
 }
 
@@ -758,7 +765,7 @@ GetLibfile (char *filename)
     }
   else
     {
-      fread (fheader, 1U, 8U, z80asmfile);	/* read first 8 chars from file into array */
+      xfreadc(fheader, 8U, z80asmfile);	/* read first 8 chars from file into array */
       fheader[8] = '\0';
     }
 
@@ -1266,6 +1273,9 @@ main (int argc, char *argv[])
   /* catch and report fatal errors */
   catch(NotEnoughMemoryException) {
       ReportError(NULL, 0, ERR_NO_MEMORY);
+  }
+  catch(FileIOException) {
+      ReportError(NULL, 0, ERR_FILE_IO);
   }
 
   catch(IllegalArgumentException) {

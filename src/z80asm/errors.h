@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.2 2011-07-14 01:32:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.3 2011-08-18 23:27:54 pauloscustodio Exp $ */
 /* $Log: errors.h,v $
-/* Revision 1.2  2011-07-14 01:32:08  pauloscustodio
+/* Revision 1.3  2011-08-18 23:27:54  pauloscustodio
+/* BUG_0009 : file read/write not tested for errors
+/* - In case of disk full file write fails, but assembler does not detect the error
+/*   and leaves back corruped object/binary files
+/* - Created new exception FileIOException and ERR_FILE_IO error.
+/* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
+/*
+/* Revision 1.2  2011/07/14 01:32:08  pauloscustodio
 /*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 /*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 /*     CH_0003 : Error messages should be more informative
@@ -72,6 +79,7 @@ enum {
     ERR_NOT_LIB_FILE		= 29,	/* args: %s filename */
     ERR_ENV_NOT_DEFINED		= 30,	/* args: %s envvar */
     ERR_INCLUDE_RECURSION	= 31,	/* args: %s filename */
+    ERR_FILE_IO			= 32,
 };
 
 /* global variables */

@@ -16,9 +16,16 @@ Copyright (C) Paulo Custodio, 2011
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.1 2011-08-18 21:42:05 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.2 2011-08-18 23:27:54 pauloscustodio Exp $ */
 /* $Log: file.h,v $
-/* Revision 1.1  2011-08-18 21:42:05  pauloscustodio
+/* Revision 1.2  2011-08-18 23:27:54  pauloscustodio
+/* BUG_0009 : file read/write not tested for errors
+/* - In case of disk full file write fails, but assembler does not detect the error
+/*   and leaves back corruped object/binary files
+/* - Created new exception FileIOException and ERR_FILE_IO error.
+/* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
+/*
+/* Revision 1.1  2011/08/18 21:42:05  pauloscustodio
 /* Utilities for file handling
 /*
 /* */
@@ -30,5 +37,21 @@ Utilities for file handling
 
 #include <stdio.h>
 
+/* raise FileIOException on error - dont use if EOF may be received */
+extern int xfputc (int c, FILE *stream);
+extern int xfgetc (       FILE *stream);
+
+extern size_t xfwrite (const void *buffer, size_t size, size_t count, FILE *stream);
+extern size_t xfread  (      void *buffer, size_t size, size_t count, FILE *stream);
+
+#define xfwritec(buffer, count, stream)	    xfwrite(buffer, sizeof(char), count, stream)
+#define xfreadc( buffer, count, stream)	    xfread( buffer, sizeof(char), count, stream)
+
+/* read/write words and longs */
+extern void   xfput_word (size_t word, FILE *stream);
+extern size_t xfget_word (             FILE *stream);
+
+extern void   xfput_long (long dword,  FILE *stream);
+extern long   xfget_long (             FILE *stream);
 
 #endif /* ndef FILE_H */

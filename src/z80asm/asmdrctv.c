@@ -13,9 +13,16 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.20 2011-08-14 19:46:46 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.21 2011-08-18 23:27:54 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.20  2011-08-14 19:46:46  pauloscustodio
+/* Revision 1.21  2011-08-18 23:27:54  pauloscustodio
+/* BUG_0009 : file read/write not tested for errors
+/* - In case of disk full file write fails, but assembler does not detect the error
+/*   and leaves back corruped object/binary files
+/* - Created new exception FileIOException and ERR_FILE_IO error.
+/* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
+/*
+/* Revision 1.20  2011/08/14 19:46:46  pauloscustodio
 /* - IncludeFile(), BINARY(): throw the new exception FatalErrorException for fatal error ERR_FILE_OPEN, no need to re-open the original source file after the error
 /* - IncludeFile(): no need to check for fatal error and return; bypassed by exception mechanism
 /* - source_file_open flag removed; z80asmfile is used for the same purpose
@@ -178,6 +185,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "symbol.h"
 #include "z80asm.h"
 #include "errors.h"
+#include "file.h"
 
 /* external functions */
 enum symbols GetSym (void);
@@ -944,7 +952,7 @@ BINARY (void)
 	  
 	  if ((codeptr - codearea + Codesize) <= MAXCODESIZE)
 	    {
-          fread (codeptr, sizeof (char), Codesize, binfile);	/* read binary code */
+          xfreadc(codeptr, Codesize, binfile);	/* read binary code */
           codeptr += Codesize;							/* codeptr updated */
 	      PC += Codesize;
 	    }

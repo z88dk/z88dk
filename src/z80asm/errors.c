@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.4 2011-08-14 19:27:52 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.5 2011-08-18 23:27:54 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.4  2011-08-14 19:27:52  pauloscustodio
+/* Revision 1.5  2011-08-18 23:27:54  pauloscustodio
+/* BUG_0009 : file read/write not tested for errors
+/* - In case of disk full file write fails, but assembler does not detect the error
+/*   and leaves back corruped object/binary files
+/* - Created new exception FileIOException and ERR_FILE_IO error.
+/* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
+/*
+/* Revision 1.4  2011/08/14 19:27:52  pauloscustodio
 /* - ReportError() raises the new exception FatalErrorException for fatal error ERR_MAX_CODESIZE
 /*
 /* Revision 1.3  2011/07/18 00:48:25  pauloscustodio
@@ -89,6 +96,7 @@ static char *errmsg[] = {
     /* 29 */    "File '%s' not a library file",		
     /* 30 */    "Environment variable '%s' not defined",	
     /* 31 */    "Cannot include file '%s' recursively",	
+    /* 32 */	"File I/O error",
 };
 
 /*-----------------------------------------------------------------------------

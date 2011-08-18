@@ -13,9 +13,16 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.16 2011-08-14 19:37:43 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.17 2011-08-18 23:27:54 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.16  2011-08-14 19:37:43  pauloscustodio
+/* Revision 1.17  2011-08-18 23:27:54  pauloscustodio
+/* BUG_0009 : file read/write not tested for errors
+/* - In case of disk full file write fails, but assembler does not detect the error
+/*   and leaves back corruped object/binary files
+/* - Created new exception FileIOException and ERR_FILE_IO error.
+/* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
+/*
+/* Revision 1.16  2011/08/14 19:37:43  pauloscustodio
 /* Z80pass1(): no need to check for fatal error and return; bypassed by exception mechanism
 /*
 /* Revision 1.15  2011/08/05 20:20:45  pauloscustodio
@@ -167,10 +174,10 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "options.h"
 #include "z80asm.h"
 #include "errors.h"
+#include "file.h"
 
 /* external functions */
 void Skipline (FILE *fptr);
-void WriteLong (long fptr, FILE * fileid);
 void LinkModules (void);
 void DefineOrigin (void);
 void ParseIdent (enum flag interpret);
@@ -580,17 +587,17 @@ Z80pass2 (void)
 
   fptr_modname = ftell (objfile);
   constant = strlen (CURRENTMODULE->mname);
-  fputc (constant, objfile);	/* write length of module name to relocatable file */
-  fwrite (CURRENTMODULE->mname, sizeof (char), (size_t) constant, objfile);	/* write module name to relocatable
+  xfputc(constant, objfile);	/* write length of module name to relocatable file */
+  xfwritec(CURRENTMODULE->mname, (size_t) constant, objfile);	/* write module name to relocatable
 										 * file       */
   if ((constant = codeptr - codearea) == 0)
     fptr_modcode = -1;		/* no code generated!  */
   else
     {
       fptr_modcode = ftell (objfile);
-      fputc (constant % 256, objfile);	/* low byte of module code size */
-      fputc (constant / 256, objfile);	/* high byte of module code size */
-      fwrite (codearea, sizeof (char), (size_t) constant, objfile);
+      xfputc(constant % 256, objfile);	/* low byte of module code size */
+      xfputc(constant / 256, objfile);	/* high byte of module code size */
+      xfwritec(codearea, (size_t) constant, objfile);
     }
   CODESIZE += constant;
 
@@ -603,8 +610,8 @@ Z80pass2 (void)
       if (deforigin)
 	CURRENTMODULE->origin = EXPLICIT_ORIGIN;	/* use origin from command line */
     }
-  fputc (CURRENTMODULE->origin % 256, objfile);		/* low byte of origin */
-  fputc (CURRENTMODULE->origin / 256, objfile);		/* high byte of origin */
+  xfputc(CURRENTMODULE->origin % 256, objfile);		/* low byte of origin */
+  xfputc(CURRENTMODULE->origin / 256, objfile);		/* high byte of origin */
 
   fptr_exprdecl = 30;		/* expressions always begins at file position 24 */
 
@@ -615,11 +622,11 @@ Z80pass2 (void)
   if (fptr_modname == fptr_libnmdecl)
     fptr_libnmdecl = -1;	/* no library reference declarations */
 
-  WriteLong (fptr_modname, objfile);	/* write fptr. to module name */
-  WriteLong (fptr_exprdecl, objfile);	/* write fptr. to name declarations */
-  WriteLong (fptr_namedecl, objfile);	/* write fptr. to name declarations */
-  WriteLong (fptr_libnmdecl, objfile);	/* write fptr. to library name declarations */
-  WriteLong (fptr_modcode, objfile);	/* write fptr. to module code */
+  xfput_long(fptr_modname, objfile);	/* write fptr. to module name */
+  xfput_long(fptr_exprdecl, objfile);	/* write fptr. to name declarations */
+  xfput_long(fptr_namedecl, objfile);	/* write fptr. to name declarations */
+  xfput_long(fptr_libnmdecl, objfile);	/* write fptr. to library name declarations */
+  xfput_long(fptr_modcode, objfile);	/* write fptr. to module code */
 }
 
 
@@ -647,26 +654,26 @@ StoreName (symbol * node, unsigned char scope)
   switch (scope)
     {
     case SYMLOCAL:
-      fputc ('L', objfile);
+      xfputc('L', objfile);
       break;
 
     case SYMXDEF:
       if (node->type & SYMDEF)
-	fputc ('X', objfile);
+	xfputc('X', objfile);
       else
-	fputc ('G', objfile);
+	xfputc('G', objfile);
       break;
     }
   if (node->type & SYMADDR)	/* then write type of symbol */
-    fputc ('A', objfile);	/* either a relocatable address */
+    xfputc('A', objfile);	/* either a relocatable address */
   else
-    fputc ('C', objfile);	/* or a constant */
+    xfputc('C', objfile);	/* or a constant */
 
-  WriteLong (node->symvalue, objfile);
+  xfput_long(node->symvalue, objfile);
 
   b = strlen (node->symname);
-  fputc (b, objfile);		/* write length of symbol name to relocatable file */
-  fwrite (node->symname, sizeof (char), (size_t) b, objfile);	/* write symbol name to relocatable file */
+  xfputc(b, objfile);		/* write length of symbol name to relocatable file */
+  xfwritec(node->symname, (size_t) b, objfile);	/* write symbol name to relocatable file */
 }
 
 
@@ -678,8 +685,8 @@ StoreLibReference (symbol * node)
   if ((node->type & SYMXREF) && (node->type & SYMDEF) && (node->type & SYMTOUCHED))
     {
       b = strlen (node->symname);
-      fputc ((int) b, objfile);	/* write length of symbol name to relocatable file */
-      fwrite (node->symname, sizeof (char), b, objfile);	/* write symbol name to relocatable file */
+      xfputc((int) b, objfile);	/* write length of symbol name to relocatable file */
+      xfwritec(node->symname, b, objfile);	/* write symbol name to relocatable file */
     }
 }
 
@@ -940,7 +947,7 @@ WriteSymbol (symbol * n)
 	      fprintf (listfile, "%s", n->symname);
 	      space = COLUMN_WIDTH - strlen (n->symname);
 	      for (tabulators = space % TAB_DIST ? space / TAB_DIST + 1 : space / TAB_DIST; tabulators > 0; tabulators--)
-		fputc ('\t', listfile);
+		xfputc('\t', listfile);
 	      fprintf (listfile, "= %08lX", n->symvalue);
 	      if (n->references != NULL)
 		{
@@ -973,15 +980,15 @@ WriteSymbolTable (char *msg, avltree * root)
 {
 
   fseek (listfile, 0, SEEK_END);	/* File position to end of file */
-  fputc ('\n', listfile);
+  xfputc('\n', listfile);
   LineCounter ();
-  fputc ('\n', listfile);
+  xfputc('\n', listfile);
   LineCounter ();
   fprintf (listfile, "%s", msg);
   LineCounter ();
-  fputc ('\n', listfile);
+  xfputc('\n', listfile);
   LineCounter ();
-  fputc ('\n', listfile);
+  xfputc('\n', listfile);
   LineCounter ();
 
   inorder (root, (void (*)(void*)) WriteSymbol);        /* write symbol table */

@@ -13,9 +13,16 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.17 2011-08-15 17:12:31 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.18 2011-08-18 23:27:54 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.17  2011-08-15 17:12:31  pauloscustodio
+/* Revision 1.18  2011-08-18 23:27:54  pauloscustodio
+/* BUG_0009 : file read/write not tested for errors
+/* - In case of disk full file write fails, but assembler does not detect the error
+/*   and leaves back corruped object/binary files
+/* - Created new exception FileIOException and ERR_FILE_IO error.
+/* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
+/*
+/* Revision 1.17  2011/08/15 17:12:31  pauloscustodio
 /* Upgrade to Exceptions4c 2.8.9 to solve memory leak.
 /*
 /* Revision 1.16  2011/08/05 19:46:16  pauloscustodio
@@ -174,6 +181,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "symbol.h"
 #include "options.h"
 #include "errors.h"
+#include "file.h"
 
 /* external functions */
 enum symbols GetSym (void);
@@ -586,15 +594,15 @@ StoreExpr (struct expr *pfixexpr, char range)
 {
   unsigned char b;
 
-  fputc (range, objfile);	/* range of expression */
+  xfputc(range, objfile);	/* range of expression */
   b = pfixexpr->codepos % 256U;
-  fputc (b, objfile);		/* low byte of patchptr */
+  xfputc(b, objfile);		/* low byte of patchptr */
   b = pfixexpr->codepos / 256U;
-  fputc (b, objfile);		/* high byte of patchptr */
+  xfputc(b, objfile);		/* high byte of patchptr */
   b = strlen (pfixexpr->infixexpr);
-  fputc (b, objfile);		/* length prefixed string */
-  fwrite (pfixexpr->infixexpr, sizeof (b), (size_t) b, objfile);
-  fputc (0, objfile);		/* nul-terminate expression */
+  xfputc(b, objfile);		/* length prefixed string */
+  xfwritec(pfixexpr->infixexpr, (size_t) b, objfile);
+  xfputc(0, objfile);		/* nul-terminate expression */
 
   pfixexpr->stored = ON;
 }
