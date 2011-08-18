@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.6 2011-08-14 19:49:05 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.7 2011-08-18 21:49:44 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.6  2011-08-14 19:49:05  pauloscustodio
+# Revision 1.7  2011-08-18 21:49:44  pauloscustodio
+# add objfile() to generate expected object file format
+#
+# Revision 1.6  2011/08/14 19:49:05  pauloscustodio
 # - Added test case to verify that incomplete files are deleted on error
 #
 # Revision 1.5  2011/07/14 01:32:09  pauloscustodio
@@ -180,6 +183,73 @@ sub t_z80asm_capture {
 
 sub hexdump {
     return join(' ', map { sprintf("%02X", ord($_)) } split(//, shift));
+}
+
+# return object file binary representation
+sub objfile {
+    my(%args) = @_;
+
+    my $obj = "Z80RMF01";
+    $obj .= pack("v", $args{ORG} // -1);
+
+    # store empty pointers; mark position for later
+    my $name_addr    = length($obj); $obj .= pack("V", -1);
+    my $expr_addr    = length($obj); $obj .= pack("V", -1);
+    my $symbols_addr = length($obj); $obj .= pack("V", -1);
+    my $lib_addr     = length($obj); $obj .= pack("V", -1);
+    my $code_addr    = length($obj); $obj .= pack("V", -1);
+
+    # store expressions
+    if ($args{EXPR}) {
+	store_ptr(\$obj, $expr_addr);
+	for (@{$args{EXPR}}) {
+	    my($type, $ptr, $string) = @$_;
+	    $obj .= $type . pack("v", $ptr) . pack_string($string) ."\0";
+	}
+    }
+
+    # store symbols
+    if ($args{SYMBOLS}) {
+	store_ptr(\$obj, $symbols_addr);
+	for (@{$args{SYMBOLS}}) {
+	    my($scope, $type, $value, $name) = @$_;
+	    $obj .= $scope . $type . pack("V", $value) . pack_string($name);
+	}
+    }
+
+    # store library
+    if ($args{LIBS}) {
+	store_ptr(\$obj, $lib_addr);
+	for my $name (@{$args{LIBS}}) {
+	    $obj .= pack_string($name);
+	}
+    }
+
+    # store name
+    store_ptr(\$obj, $name_addr);
+    $obj .= pack_string($args{NAME});
+
+    # store code
+    if (length($args{CODE}) > 0) {
+	store_ptr(\$obj, $code_addr);
+	$obj .= pack("v", length($args{CODE}));
+	$obj .= $args{CODE};
+    }
+
+    return $obj;
+}
+
+# store a pointer to the end of the binary object at the given address
+sub store_ptr {
+    my($robj, $addr) = @_;
+    my $ptr = length($$robj);
+    my $packed_ptr = pack("V", $ptr);
+    substr($$robj, $addr, length($packed_ptr)) = $packed_ptr;
+}
+
+sub pack_string {
+    my($string) = @_;
+    return pack("C", length($string)).uc($string);
 }
 
 1;
