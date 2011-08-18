@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.18 2011-08-05 19:30:57 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.19 2011-08-18 21:45:17 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.18  2011-08-05 19:30:57  pauloscustodio
+# Revision 1.19  2011-08-18 21:45:17  pauloscustodio
+# new object file.o
+#
+# Revision 1.18  2011/08/05 19:30:57  pauloscustodio
 # CH_0004 : Exception mechanism to handle fatal errors
 #
 # Revision 1.17  2011/07/18 00:48:25  pauloscustodio
@@ -105,7 +108,8 @@ OBJS = 	asmdrctv.o 	\
 	options.o	\
 	errors.o	\
 	memalloc.o	\
-	except.o
+	except.o	\
+	file.o
 
 all: z80asm$(EXESUFFIX)
 
@@ -161,3 +165,4 @@ errors.o: memalloc.h except.h e4c.h errors.h symbol.h avltree.h options.h
 errors.o: z80asm.h config.h ../config.h
 memalloc.o: memalloc.h except.h e4c.h
 except.o: except.h memalloc.h e4c.h e4c.c
+file.o: file.h memalloc.h except.h e4c.h
