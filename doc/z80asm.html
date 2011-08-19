@@ -1,5 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>THE Z80 CROSS ASSEMBLER, V1.0.16 (30th January 2000)</title></head>
+<html><head><title>THE Z80 CROSS ASSEMBLER, V1.0.16 (30th January 2000)</title>
+
+</head>
 <body style="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
 <h1>
 <center>Z88 Development Kit
@@ -17,7 +19,10 @@
 <ul>
 <li><a href="#1.1">1.1 The help page</a></li>
 <li><a href="#1.2">1.2 The command line</a></li>
-<li><a href="#1.3">1.3 The assembler options</a></li><ul><li><a href="#1.3-h">-h : Show help screen</a></li></ul>
+<li><a href="#1.3">1.3 The assembler options</a></li>
+<ul>
+<li><a href="#1.3-h">-h : Show help screen</a></li>
+</ul>
 <ul>
 <li><a href="#1.3-v">-v : Information during
 assembly</a></li>
@@ -50,7 +55,12 @@ address definition file</a></li>
 <li><a href="#1.3-@FILE">@&lt;project
 file&gt; : Using a project file</a></li>
 <li><a href="#1.3-iLIB">-i&lt;library
-file&gt; : Include library modules during linking/relocation</a></li><li><a href="#1.3-Lpath">-L&lt;library path&gt; : Add directory to search path for libaries</a></li><li><a href="#1.3-Ipath">-I&lt;include path&gt; : Add directory to search path for INCLUDE</a></li><li><a href="#1.3-x">-x : Create a library</a></li>
+file&gt; : Include library modules during linking/relocation</a></li>
+<li><a href="#1.3-Lpath">-L&lt;library
+path&gt; : Add directory to search path for libaries</a></li>
+<li><a href="#1.3-Ipath">-I&lt;include
+path&gt; : Add directory to search path for INCLUDE</a></li>
+<li><a href="#1.3-x">-x : Create a library</a></li>
 <li><a href="#1.3-tN">-t&lt;number&gt;
 : Define tabulator distance (for text output files)</a></li>
 <li><a href="#1.3-RCMX000">-RCMX000 : Support
@@ -60,7 +70,11 @@ the Ti83Plus</a></li>
 <li><a href="#1.3-IXIY">-IXIY : Swap IX and IY
 registers</a></li>
 <li><a href="#1.3-CC">-C : Enable LINE
-directive</a></li><li><a href="#1.3-sdcc">-sdcc : Force SDCC hacks</a></li><li><a href="#1.3-forcexlib">-forcexlib : Force XLIB call on MODULE directive</a></li>
+directive</a></li>
+<li><a href="#1.3-sdcc">-sdcc : Force SDCC
+hacks</a></li>
+<li><a href="#1.3-forcexlib">-forcexlib :
+Force XLIB call on MODULE directive</a></li>
 </ul>
 </ul>
 <li><a href="#2">2 An overview of assembler
@@ -258,7 +272,8 @@ assembly"</a></li>
 <li><a href="#8.14">14, "Symbol already defined"</a></li>
 <li><a href="#8.15">15, "Module name already
 defined"</a></li>
-<li><a href="#8.16">16, "Module name not defined" [DEPRECATED]</a></li>
+<li><a href="#8.16">16, "Module name not
+defined" [DEPRECATED]</a></li>
 <li><a href="#8.17">17, "Symbol already declared
 local"</a></li>
 <li><a href="#8.18">18, "Symbol already declared
@@ -267,17 +282,20 @@ global" [DEPRECATED]</a></li>
 external" [DEPRECATED]</a></li>
 <li><a href="#8.20">20, "No command line
 arguments" [DEPRECATED]</a></li>
-<li><a href="#8.21">21, "Illegal source filename" &nbsp;[DEPRECATED]</a></li>
+<li><a href="#8.21">21, "Illegal source
+filename" &nbsp;[DEPRECATED]</a></li>
 <li><a href="#8.22">22, "Symbol declared global
 in another module"</a></li>
 <li><a href="#8.23">23, "Re-declaration not
 allowed"</a></li>
-<li><a href="#8.24">24, "ORG already defined" [DEPRECATED]</a></li>
+<li><a href="#8.24">24, "ORG already defined"
+[DEPRECATED]</a></li>
 <li><a href="#8.25">25, "Relative jump address
 must be local"</a></li>
 <li><a href="#8.26">26, "Not a relocatable file"
 / "Not an object file"</a></li>
-<li><a href="#8.27">27, "Reserved name" [DEPRECATED]</a></li>
+<li><a href="#8.27">27, "Reserved name"
+[DEPRECATED]</a></li>
 <li><a href="#8.28">28, "Couldn't open library
 file"</a></li>
 <li><a href="#8.29">29, "Not a library file"</a></li>
@@ -352,7 +370,8 @@ page
 </h2>
 <p style="text-align: justify;">When executing the
 assembler
-from the command line with the <a href="#1.3-h">-h</a> option, a help
+from the command line with the <a href="#1.3-h">-h</a>
+option, a help
 page is automatically
 displayed whereafter control is returned to the operating system
 command line.
@@ -405,7 +424,11 @@ options have a single letter identification. Upper and lower case
 letters are distinguished, which means that 'a' might be different
 command than 'A'. If an option is to be turned off, you simply specify
 a 'n' before the identification, e.g. -nl which selects listing files
-not to be created by the assembler.</p><hr style="width: 100%; height: 2px;"><h3><a name="1.3-h"></a>-h : Show help screen</h3><p style="text-align: justify;">Shows a help screen with the available options.</p>
+not to be created by the assembler.</p>
+<hr style="width: 100%; height: 2px;">
+<h3><a name="1.3-h"></a>-h : Show help screen</h3>
+<p style="text-align: justify;">Shows a help screen with
+the available options.</p>
 <hr>
 <h3><a name="1.3-v"></a>-v : Information
 during assembly</h3>
@@ -535,22 +558,29 @@ without worrying about which module is updated or not.</p>
 <hr>
 <h3><a name="1.3-b"></a>-b : Link/relocate
 object files</h3>
-<p style="text-align: justify;">The <a href="#1.3-b">-b</a> option must be used
+<p style="text-align: justify;">The <a href="#1.3-b">-b</a>
+option must be used
 if you want to create an executable
 Z80 machine code output file of your previosly created object files.
-You may also use the <a href="#1.3-a">-a</a> option which is identical in functionality but
-also includes the <a href="#1.3-d">-d</a> option. In other words assemble only updated
+You may also use the <a href="#1.3-a">-a</a> option
+which is identical in functionality but
+also includes the <a href="#1.3-d">-d</a> option.
+In other words assemble only updated
 source modules and perform linking/relocation of the code afterwards.</p>
 <ul>
 <li>Pass 1
 <p style="text-align: justify;">When the linking
 process begins with the first
-object module, it is examined for an <a href="#7-ORG">ORG</a> address to perform the
+object module, it is examined for an <a href="#7-ORG">ORG</a>
+address to perform the
 absolute address relocation of all the object module machine code. The
-<a href="#7-ORG">ORG</a> (loading address for memory) will have to be defined in the first
+<a href="#7-ORG">ORG</a> (loading address for
+memory) will have to be defined in the first
 source file module. If not, the assembler will prompt you for it on the
-command line. The <a href="v">ORG</a> address must be typed in hexadecimal notation. If
-you never use the <a href="v">ORG</a> directive in your source files, you can always
+command line. The <a href="v">ORG</a> address must
+be typed in hexadecimal notation. If
+you never use the <a href="v">ORG</a> directive in
+your source files, you can always
 explicitly define one at the command line with the <a href="#1.3-rADDR">-r</a> option. The next
 step in the linking process is loading of the machine code from each
 object module, in the order of the specified modules. Pass 1 is
@@ -613,23 +643,29 @@ gives a chronological view (composition) of the linked modules. </p>
 <h3><a name="1.3-rADDR"></a>-r&lt;address&gt;
 : Re-define the ORG relocation address</h3>
 <p style="text-align: justify;">During the linking phase
-of the assembler the <a href="#7-ORG">ORG</a> address that
+of the assembler the <a href="#7-ORG">ORG</a>
+address that
 defines the position in memory where the code is to be loaded and
 executed, is fetched from the first object module file. You can
 override this by specifying an explicit address origin by entering the
-<a href="#1.3-rADDR">-r</a> option followed by an address in hexadecimal notation at the command
+<a href="#1.3-rADDR">-r</a> option followed by an
+address in hexadecimal notation at the command
 line, e.g.:</p>
 <pre>-r4000</pre>
 <p style="text-align: justify;">which specifies that your
 code is to be relocated for address
 4000h (16384d) onwards.</p>
 <p style="text-align: justify;">Using the <a href="#1.3-rADDR">-r</a> option
-superseeds a defined <a href="#7-ORG">ORG</a> in an object
-file. You could for example have defined the <a href="#7-ORG">ORG</a> to 8000h (32768d) in
+superseeds a defined <a href="#7-ORG">ORG</a> in an
+object
+file. You could for example have defined the <a href="#7-ORG">ORG</a>
+to 8000h (32768d) in
 your first source file, then compiled the project. This would have
 generated machine code for memory location 8000h (segment 2 in the
 Cambridge Z88). Since the object files are generated it is easy to link
-them again with another <a href="#7-ORG">ORG</a> address by just using the <a href="#1.3-rADDR">-r</a> option. The
+them again with another <a href="#7-ORG">ORG</a>
+address by just using the <a href="#1.3-rADDR">-r</a>
+option. The
 linking process does not alter the information in object files - they
 are only read. The same project could then easily be re-linked to
 another address, e.g. -r2000. </p>
@@ -648,7 +684,8 @@ instructions. With a restricted interval of 128 bytes you can imagine
 the size of those routines! Programming of large applications using
 address independency is simply impossible on the Z80 processor with the
 basic instruction set available. You can only define a fixed address
-origin (<a href="#7-ORG">ORG</a>) for your machine code to be loaded and executed from.
+origin (<a href="#7-ORG">ORG</a>) for your machine
+code to be loaded and executed from.
 However, there is one solution: before the code is executed an
 automatical address-relocation is performed to the current position in
 memory. This is done only once. The penalty is that the program fills
@@ -660,15 +697,18 @@ locations of the program. It is impossible to determine the extra size
 generated with a relocation table. We assume an extra size of 3 - 3.5K
 for a typical 16K application program.</p>
 <p style="text-align: justify;">You can generate address
-independent code using the <a href="#1.3-R">-R</a> option
-accompanied with the <a href="#1.3-a">-a</a> or <a href="#1.3-b">-b</a> option. There is no other requirements.
+independent code using the <a href="#1.3-R">-R</a>
+option
+accompanied with the <a href="#1.3-a">-a</a> or <a href="#1.3-b">-b</a> option. There is no other
+requirements.
 The relocatable code may be useful for programmers using the Cambridge
 Z88 who want to use machine code in the BBC BASIC application
 environment. This can easily be interfaced with the DIM statement to
 allocate memory for the machine code program, and issue a CALL or USR()
 to execute the machine code.</p>
 <p style="text-align: justify;">Please note that the
-linking process with the <a href="#1.3-R">-R</a> option
+linking process with the <a href="#1.3-R">-R</a>
+option
 addresses your code from 0 onwards. This is necessary when the runtime
 relocation is performed by the relocater (just before your program is
 executed). This can be examined by loading the address map file into a
@@ -684,7 +724,8 @@ relocation table is created during the linking phase. When all object
 modules have been linked and the appropriate machine code generated,
 the process is ended with first copying the relocater routine into the
 executable file, then a relocation table and finally the compiled
-machine code program. Any defined <a href="#7-ORG">ORG</a> in your code is superseeded -
+machine code program. Any defined <a href="#7-ORG">ORG</a>
+in your code is superseeded -
 this is not necessary in a relocatable program!</p>
 <p style="text-align: justify;">Two rules must be obeyed
 when using relocatable programs:</p>
@@ -730,14 +771,18 @@ code. The inbuilt relocator routine may be examined by extracting the
 <h3><a name="1.3-g"></a>-g : Create global
 address definition file</h3>
 <p style="text-align: justify;">With this option it is
-possible to generate a <a href="#7-DEFC">DEFC</a> directive
+possible to generate a <a href="#7-DEFC">DEFC</a>
+directive
 definition file of all globally declared identifiers in a file project
-(declared with the <a href="#7-XDEF">XDEF</a> directive). These global definitions are
-calculated from the specified <a href="#7-ORG">ORG</a> address (from first module or the <a href="#1.3-rADDR">-r</a>
+(declared with the <a href="#7-XDEF">XDEF</a>
+directive). These global definitions are
+calculated from the specified <a href="#7-ORG">ORG</a>
+address (from first module or the <a href="#1.3-rADDR">-r</a>
 option). This feature is very useful, if you want to get access to
 routines from a separate compilation. If the two code compilation were
 placed in different banks of the Z88, it would be possible to know the
-correct address of a routine just by using the <a href="#7-DEFC">DEFC</a> address definition
+correct address of a routine just by using the <a href="#7-DEFC">DEFC</a>
+address definition
 previously compiled. We used this facility to access routines in the
 two 8K halves of the segment 0 debugge version. This debugger actually
 swaps one of the two 8K blocks in and out of segment 0 when needed to
@@ -810,12 +855,25 @@ compilations.&nbsp;The command line option allows specification of
 several library files. For each library reference in an application
 module, all library files will be scanned for that particular module.
 The filename (inclusive directory path) of the library may be specified
-explicitly on the command line immedialty after the <a href="#1.3-iLIB">-i</a> identifier.&nbsp;</p><p style="text-align: justify;">If
+explicitly on the command line immedialty after the <a href="#1.3-iLIB">-i</a> identifier.&nbsp;</p>
+<p style="text-align: justify;">If
 you ommit the filename, a default library filename will be used by the
 assembler. This default filename is defined by creating the environment
 variable "Z80_STDLIB=..." ("..." refers to your filename). Please refer
 to your operating system documentation on how to create environment
-variables.</p><p style="text-align: justify;"> Library files are recognised by the ".LIB" extension.</p><hr style="width: 100%; height: 2px;"><h3><a name="1.3-Lpath"></a>-L&lt;library path&gt; : Add directory to search path for libaries</h3><p style="text-align: justify;">Tells the assembler where to look for library files.</p><hr style="width: 100%; height: 2px;"><h3><a name="1.3-Ipath"></a>-I&lt;include path&gt; : Add directory to search path for INCLUDE</h3><p style="text-align: justify;">Tells the assembler where to look for <a href="#7-INCLUDE">INCLUDE</a> files.</p>
+variables.</p>
+<p style="text-align: justify;"> Library files are
+recognised by the ".LIB" extension.</p>
+<hr style="width: 100%; height: 2px;">
+<h3><a name="1.3-Lpath"></a>-L&lt;library
+path&gt; : Add directory to search path for libaries</h3>
+<p style="text-align: justify;">Tells the assembler where
+to look for library files.</p>
+<hr style="width: 100%; height: 2px;">
+<h3><a name="1.3-Ipath"></a>-I&lt;include
+path&gt; : Add directory to search path for INCLUDE</h3>
+<p style="text-align: justify;">Tells the assembler where
+to look for <a href="#7-INCLUDE">INCLUDE</a> files.</p>
 <hr>
 <h3><a name="1.3-x"></a>-x : Create a library</h3>
 <p style="text-align: justify;">A library file is composed
@@ -824,12 +882,16 @@ file
 structures. The library file format (and object file format) may be
 found at the end of this documentation. A library is simply a set of
 independent routines (that may refer to each other) put together in a
-sequential form. You may only specify a single <a href="#1.3-x">-x</a> option on the command
+sequential form. You may only specify a single <a href="#1.3-x">-x</a>
+option on the command
 line. A filename may be explicitly defined (including device and path
-information) to determine the storage location of the library.&nbsp;</p><p style="text-align: justify;">As in <a href="#1.3-iLIB">-i</a>
+information) to determine the storage location of the library.&nbsp;</p>
+<p style="text-align: justify;">As in <a href="#1.3-iLIB">-i</a>
 you may ommit the filename to use the default filename identified by
-the "Z80_STDLIB" environment variable.</p><p style="text-align: justify;"> A library routine must be
-defined using a simple <a href="#7-XLIB">XLIB</a> directive with an identical address name
+the "Z80_STDLIB" environment variable.</p>
+<p style="text-align: justify;"> A library routine must be
+defined using a simple <a href="#7-XLIB">XLIB</a>
+directive with an identical address name
 label definition. Please refer to further information later in this
 documentation. The "Z80lib.zip" contains the standard library with all
 corrseponding source files. Have a look at them - they clearly displays
@@ -847,7 +909,8 @@ sequential searching through the library.</p>
 <p style="text-align: justify;">To save storage space the
 Z80 cross assembler output files
 (listing,
-map, symbol and <a href="#7-XDEF">XDEF</a> definition files) uses a tabulator control
+map, symbol and <a href="#7-XDEF">XDEF</a>
+definition files) uses a tabulator control
 character instead of spaces. The benefit is about 30% compressed files.</p>
 <p style="text-align: justify;">The
 tabulator distance defines the distance of space between each tabulator
@@ -860,7 +923,8 @@ column by multiplying the current tabulator distance with 4, i.e.
 giving a default size of 4*8 = 32 'spaces'. This is usually more than
 enough for most name definitions parsed from source files.</p>
 <p style="text-align: justify;">You
-may redefine the tabulator distance by usign the <a href="#1.3-tN">-t</a> option immediatly
+may redefine the tabulator distance by usign the <a href="#1.3-tN">-t</a>
+option immediatly
 followed by a decimal number, e.g. -t4 for defining a tabulator
 distance of 4. The with of the first column will then be 4*4 = 16
 'spaces'.</p>
@@ -887,7 +951,20 @@ the index registers that is used in the target platform.</p>
 <h2><a name="1.3-CC"></a>-C : Enable LINE
 directive</h2>
 <p style="text-align: justify;">Enables the <a href="#7-LINE">LINE</a> directive to synchronize error
-message line numbers with the line numbers from the source file.</p><br><hr style="width: 100%; height: 2px;"><h2><a name="1.3-sdcc"></a>-sdcc : Force SDCC hacks</h2><p style="text-align: justify;">Enable hacks to be able to use the assembler as the back-end for the Small Device C Compiler (SDCC).</p><hr style="width: 100%; height: 2px;"><h2><a name="1.3-forcexlib"></a>-forcexlib : Force XLIB call on MODULE directive </h2><p>Changes the <a href="#7-MODULE">MODULE</a> directive to do the same as the <a href="#7-XLIB">XLIB</a> directive.</p>
+message line numbers with the line numbers from the source file.</p>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="1.3-sdcc"></a>-sdcc : Force SDCC
+hacks</h2>
+<p style="text-align: justify;">Enable hacks to be able to
+use the assembler as the back-end for the Small Device C Compiler
+(SDCC).</p>
+<hr style="width: 100%; height: 2px;">
+<h2><a name="1.3-forcexlib"></a>-forcexlib :
+Force XLIB call on MODULE directive </h2>
+<p>Changes the <a href="#7-MODULE">MODULE</a>
+directive to do the same as the <a href="#7-XLIB">XLIB</a>
+directive.</p>
 <hr>
 <h1><a name="2"></a>2 An overview of
 assembler features and related files</h1>
@@ -942,13 +1019,15 @@ large compilation project than one huge kludge of a source file.</p>
 source modules</h2>
 <p style="text-align: justify;">All source modules may
 refer to each others symbols by using
-<a href="#7-XREF">XREF</a> directives. This means that you refer to external information
+<a href="#7-XREF">XREF</a> directives. This means
+that you refer to external information
 outside the current source module. The opposite of an external module
 reference is to declare symbols globally available using a <a href="#7-XDEF">XDEF</a>
 directive, i.e. making symbols available to other source modules.
 Finally it is possible to have local symbols that is not known to other
 source modules than the current. A label or constant that has not been
-declared with <a href="#7-XREF">XREF</a>, <a href="#7-XDEF">XDEF</a> or <a href="#7-XLIB">XLIB</a> is local to the module.</p>
+declared with <a href="#7-XREF">XREF</a>, <a href="#7-XDEF">XDEF</a> or <a href="#7-XLIB">XLIB</a>
+is local to the module.</p>
 <hr>
 <h2><a name="2.7"></a>2.7 Using arithmetic and
 relational expressions</h2>
@@ -1013,7 +1092,8 @@ parts of the source with conditional directives for the different
 variations of the application. This may also be useful if the assembler
 source is ported to several platforms, where inclusion of other source
 files (such as header files) are using different filename standards.
-The conditional directives <a href="#7-IF">IF</a>, <a href="#7-IF">ELSE</a>, and <a href="#7-IF">ENDIF</a> may be nested into
+The conditional directives <a href="#7-IF">IF</a>, <a href="#7-IF">ELSE</a>, and <a href="#7-IF">ENDIF</a>
+may be nested into
 infinite levels.</p>
 <hr>
 <h2><a name="2.13"></a>2.13 Undocumented Z80
@@ -1111,7 +1191,9 @@ separately in another project (originated in a different memory setup).</p>
 the assembler during processing. If
 any errors should occur, they will be written to this file containing
 information of where the error occurred in the source module. If no
-errors were found, the error file is automatically closed and deleted.</p><p style="text-align: justify;">Errors are also written to stderr.</p>
+errors were found, the error file is automatically closed and deleted.</p>
+<p style="text-align: justify;">Errors are also written to
+stderr.</p>
 <hr>
 <h2><a name="2.23"></a>2.23 Creating and using
 object file libraries for standard routines</h2>
@@ -1322,7 +1404,8 @@ files for other projects.</p>
 extension, lib</h3>
 <p style="text-align: justify;">Library files
 are identified with the 'lib' extension. Library files may be created
-using the <a href="#1.3-x">-x</a> option. Library may be included into application code
+using the <a href="#1.3-x">-x</a> option. Library
+may be included into application code
 during linking of object modules.</p>
 <hr>
 <h1><a name="5"></a>5 Compiling files</h1>
@@ -1365,7 +1448,8 @@ a project.</p>
 object files and library modules, producing executable code</h3>
 <p style="text-align: justify;">Pass 1 of the linking
 loads information from each object file
-in the project; the <a href="#7-ORG">ORG</a> address is fetched, identifiers (resolving
+in the project; the <a href="#7-ORG">ORG</a>
+address is fetched, identifiers (resolving
 scope, and absolute values) loaded, and machine code linked. During
 this pass all external library modules are fetched and linked with the
 object modules (if a library is specified from the command line). When
@@ -1420,7 +1504,8 @@ platform.</li>
 <p style="text-align: justify;">The identifier might be
 very handy when you need to port your
 source files to different computer platforms. We use them in for
-loading header files. Have a look on the <a href="#7-INCLUDE">INCLUDE</a> directive example in
+loading header files. Have a look on the <a href="#7-INCLUDE">INCLUDE</a>
+directive example in
 the Directive Reference section.</p>
 <hr>
 <h2><a name="5.5"></a>5.5 Source file structure</h2>
@@ -1447,14 +1532,17 @@ world just needs to know where the routine is to be called by linking
 the modules with a few directives.</p>
 <p style="text-align: justify;">In the Z80 Module
 Assembler you only need two directives to
-accomplish just that: the <a href="#7-XREF">XREF</a> and <a href="#7-XDEF">XDEF</a> directives.</p>
-<p style="text-align: justify;"><a href="#7-XREF">XREF</a> declares a symbol to
+accomplish just that: the <a href="#7-XREF">XREF</a>
+and <a href="#7-XDEF">XDEF</a> directives.</p>
+<p style="text-align: justify;"><a href="#7-XREF">XREF</a>
+declares a symbol to
 be external to the current source
 file module. This tells the assembler that all expressions using that
 symbol is not to be evaluated until the compiled object modules are to
 linked and relocated together. Expressions that contains this symbol is
 simply stored into the object file.</p>
-<p style="text-align: justify;"><a href="#7-XDEF">XDEF</a> declares a symbol to
+<p style="text-align: justify;"><a href="#7-XDEF">XDEF</a>
+declares a symbol to
 be created in this module and made
 globally available to other modules during the linking/relocation
 phase. All expressions that contain a globally declared symbol are
@@ -1466,7 +1554,8 @@ The symbol is then only available to the current module during
 linking/relocation.</p>
 <p style="text-align: justify;">If you want to access
 (external) library modules from a
-library, use the <a href="#7-LIB">LIB</a> directive followed by the name of the routine.
+library, use the <a href="#7-LIB">LIB</a> directive
+followed by the name of the routine.
 Several routine names may be specified separated by a comma.</p>
 <p style="text-align: justify;">During the linking process
 all external and corresponding
@@ -1484,7 +1573,8 @@ Constant). We have supplied a complete set of header files (the
 "OZdefc.zip" file) containing the Z88 operating system manifests as
 defined in the Developers' Notes V3 (the "devnotes.zip" file) which
 just contains <a href="#7-DEFC">DEFC</a> directives.</p>
-<p style="text-align: justify;">Each <a href="#7-DEFC">DEFC</a> directive is
+<p style="text-align: justify;">Each <a href="#7-DEFC">DEFC</a>
+directive is
 followed by a an identifier name,
 followed by a = symbol and then an evaluable constant expression
 (usually just a constant). Constant definitions are usually operating
@@ -1499,21 +1589,25 @@ directive. Here you may specify as many names as needed in the group.
 Then, it is easy to add, re-arrange or delete any of the variable names
 - only a few modifications and then just re-compiling the necessary
 source files that use the templates. This would be a nightmare with
-<a href="#7-DEFC">DEFC</a>, since you have to keep track of the previous and next name in the
+<a href="#7-DEFC">DEFC</a>, since you have to keep
+track of the previous and next name in the
 group in addition to count the size of all names. All this is managed
-by <a href="#7-DEFVARS">DEFVARS</a> automatically. Have a look at the syntax in the Directive
+by <a href="#7-DEFVARS">DEFVARS</a> automatically.
+Have a look at the syntax in the Directive
 Reference section.</p>
 <p style="text-align: justify;">With advanced Z80
 programming you cannot avoid dynamic data
 structures like linked lists or binary trees. The fundamentals for this
 are known as records in PASCAL or strucures in C. <a href="#7-DEFVARS">DEFVARS</a> is well
-suited for this purpose. Defining each <a href="#7-DEFVARS">DEFVARS</a> group with 0
+suited for this purpose. Defining each <a href="#7-DEFVARS">DEFVARS</a>
+group with 0
 automatically generates offset variables. The last name then
 automatically defines the size of the data structure. Again, refer to
 the directive reference for a good example.</p>
 <p style="text-align: justify;">A third possibility for an
 easy definition of symbols is to
-use the <a href="#7-DEFGROUP">DEFGROUP</a> directive. Here you're able to define a set of symbols
+use the <a href="#7-DEFGROUP">DEFGROUP</a>
+directive. Here you're able to define a set of symbols
 equal to an enumeration. It follows the same principles as for C's ENUM
 facility. The default starts at 0 and increases by 1. If you choose, a
 specific identifier may be set to a value, which then can set the next
@@ -1564,12 +1658,14 @@ specify two identical address labels in
 the same source file.&nbsp;</p>
 <p style="text-align: justify;">If you want to declare an
 address globally accessible to other
-modules, then use <a href="#7-XDEF">XDEF</a> for the address label definition, otherwise the
+modules, then use <a href="#7-XDEF">XDEF</a> for
+the address label definition, otherwise the
 label definition will be interpreted as a local address label.</p>
 <pre>XDEF mainmenu<br>...<br>.mainmenu ; this label is accessible from other modules with XREF</pre>
 <p style="text-align: justify;">You may use before or
 after the label - z80asm automatically
-handles the scope resolution as long as you use <a href="#7-XDEF">XDEF</a> to define it as
+handles the scope resolution as long as you use <a href="#7-XDEF">XDEF</a>
+to define it as
 globally accessible.</p>
 <hr>
 <h2><a name="5.10"></a>5.10 Writing Z80
@@ -1627,15 +1723,18 @@ library routines</h2>
 <p style="text-align: justify;">When you need to use a
 library routine in your application
 code, you need to do two things; include a library file at the
-assembler command line with the <a href="#1.3-iLIB">-i</a> option and refer to the library
-routine in your source file using the <a href="#7-LIB">LIB</a> directive followed by the
+assembler command line with the <a href="#1.3-iLIB">-i</a>
+option and refer to the library
+routine in your source file using the <a href="#7-LIB">LIB</a>
+directive followed by the
 name of the library routine, e.g.</p>
 <pre>LIB malloc, mfree</pre>
 <p style="text-align: justify;">which will declare the two
 names "malloc" and "mfree" as
 external identifiers to the current source file module. Please note
 that you can declare the names before or after they actually are
-referred in your program source. Failing to use the <a href="#7-LIB">LIB</a> directive will
+referred in your program source. Failing to use the <a href="#7-LIB">LIB</a>
+directive will
 interprete labels as local symbols to that source file module. When the
 parser meets the instruction that uses one of the above names in a
 parameter, the parameter "expression" is automatically saved to the
@@ -1672,18 +1771,22 @@ process.</p>
 </li>
 <li>
 <p style="text-align: justify;">Each library source
-module uses the <a href="#7-XLIB">XLIB</a> directive to
+module uses the <a href="#7-XLIB">XLIB</a>
+directive to
 define the name of the routine. The same name must be used for the
 address label definition. If your library uses other library routines
-then declare them with the <a href="#7-LIB">LIB</a> directive. Please note that a library
+then declare them with the <a href="#7-LIB">LIB</a>
+directive. Please note that a library
 routine creates the module name itself (performed by <a href="#7-XLIB">XLIB</a>
 automatically). The module name is used to search for routines in a
 library.</p>
 </li>
 <li>
 <p style="text-align: justify;">The command line
-contains the <a href="#1.3-x">-x</a> option immediately
-followed by your filename.&nbsp;If you don't specify a filename, the default
+contains the <a href="#1.3-x">-x</a> option
+immediately
+followed by your filename.&nbsp;If you don't specify a filename,
+the default
 standard filename is used (defined by the Z80_STDLIB environment
 variable). Then you need to specify your project filename preceeded by
 <a href="#1.3-@FILE">@</a>.</p>
@@ -1708,18 +1811,23 @@ necessary in some situations to get access to routines previously
 compiled in another project. This implies however a knowledge of their
 absolute addresses during linking. This information is stored in the
 map file, but not accessible in a form suitable to be parsed by the
-assembler. However, this is possible in using the <a href="#1.3-g">-g</a> option at the
+assembler. However, this is possible in using the <a href="#1.3-g">-g</a>
+option at the
 assembler command line. The action performed creates a <a href="#7-DEFC">DEFC</a> list file
 of address labels that have been declared as globally available (using
 the <a href="#7-XDEF">XDEF</a> directive).&nbsp;</p>
 <p style="text-align: justify;">Only compiled source files
 are included in the
-list. If you were using the <a href="#1.3-a">-a</a> option (compile only updated source
-files) and no files were updated then the <a href="#1.3-g">-g</a> file would be empty. If
+list. If you were using the <a href="#1.3-a">-a</a>
+option (compile only updated source
+files) and no files were updated then the <a href="#1.3-g">-g</a>
+file would be empty. If
 you would like a complete list of all global routines then it is needed
-to compile the whole project (using the <a href="#1.3-b">-b</a> command line option).</p>
+to compile the whole project (using the <a href="#1.3-b">-b</a>
+command line option).</p>
 <p style="text-align: justify;">When
-the file is generated, it can easily be <a href="#7-INCLUDE">INCLUDE</a>'d in another project
+the file is generated, it can easily be <a href="#7-INCLUDE">INCLUDE</a>'d
+in another project
 where your routines may access the external routines. You might do this
 in two ways:</p>
 <p style="text-align: justify;">
@@ -1732,24 +1840,30 @@ requires much altering of files.</p>
 2) creating a new source file that is part of your project. This file
 could easily be the first file in your project but could just as well
 be placed anywhere in your project. Declare each external name that is
-needed somewhere in your project as <a href="#7-XDEF">XDEF</a>, meaning that all names to be
+needed somewhere in your project as <a href="#7-XDEF">XDEF</a>,
+meaning that all names to be
 included are globally accessible from this module. Then specify the
-<a href="#7-INCLUDE">INCLUDE</a> of the <a href="#7-DEFC">DEFC</a> list of the other project file. As the names get
+<a href="#7-INCLUDE">INCLUDE</a> of the <a href="#7-DEFC">DEFC</a> list of the other project
+file. As the names get
 loaded, they become global defintions. All other definitions will be
 ignored and not stored to the object file (they are not referref in the
 source module). All your other modules just needs to specify the
-external names as <a href="#7-XREF">XREF</a>. During linking they all get resolved and your
+external names as <a href="#7-XREF">XREF</a>.
+During linking they all get resolved and your
 code has access to external routines from a previosly compiled project.</p>
 <p style="text-align: justify;">Whenever the previous
-project has been re-compiled (and issued with <a href="#1.3-g">-g</a> option) there is a
+project has been re-compiled (and issued with <a href="#1.3-g">-g</a>
+option) there is a
 possibility that routine addresses has changed. You therefore need to
 recompile the extra source module in your project to get the new
 identifier values - the rest of your compilation is unaffected (due to
-the <a href="#7-XREF">XREF</a> directives). Only the linking process gets the new proper
+the <a href="#7-XREF">XREF</a> directives). Only
+the linking process gets the new proper
 addresses.</p>
 <p style="text-align: justify;">In example 1) you had to
 recompile all source files that
-would have used an <a href="#7-INCLUDE">INCLUDE</a> of the <a href="#7-DEFC">DEFC</a> list file.</p>
+would have used an <a href="#7-INCLUDE">INCLUDE</a>
+of the <a href="#7-DEFC">DEFC</a> list file.</p>
 <p style="text-align: justify;">In example 2) only
 one file had to be recompiled.</p>
 <p style="text-align: justify;">The principle of external
@@ -1758,9 +1872,13 @@ used to compile the debugger version to be resided in segment 0 (into
 the upper 8K). The actual size of the debugger code uses 16K, but was
 split into two separate halfes to fit into the upper 8K of segment 0.
 Each of the 8K code-segments had to get access to the other 8K block.
-The solution was the <a href="#1.3-g">-g</a> option and cross referencing using <a href="#7-XREF">XREF</a> and an
-additional source module (containing the <a href="#7-XDEF">XDEF</a> declarations) that
-included the <a href="#1.3-g">-g</a> list file of the other project compilation.</p>
+The solution was the <a href="#1.3-g">-g</a> option
+and cross referencing using <a href="#7-XREF">XREF</a>
+and an
+additional source module (containing the <a href="#7-XDEF">XDEF</a>
+declarations) that
+included the <a href="#1.3-g">-g</a> list file of
+the other project compilation.</p>
 <hr style="width: 100%; height: 2px;">
 <h1><a name="6"></a>6 Using
 expressions</h1>
@@ -1822,7 +1940,8 @@ this is perfectly adequate.</p>
 <p style="text-align: justify;">During the linking phase
 such an expression
 may have undiserable side effect when you want to produce relocatable
-machine code using the <a href="#1.3-R">-R</a> option. The relocator identifies the
+machine code using the <a href="#1.3-R">-R</a>
+option. The relocator identifies the
 expression as an relocatable item and will add a constant to the
 evaluated value of the expression. This is a perfectly correct handling
 in normal address references for relocatable code. However, since the
@@ -1844,7 +1963,8 @@ relational operators you may form logical expressions resulting in true
 or false conditions. The resulting value of a true expression is 1. The
 resulting value of a false expression is 0. These operators are quite
 handy when you need to perform complex logic for conditional assembly
-in <a href="#7-IF">IF</a>-<a href="#7-IF">ELSE</a>-<a href="#7-IF">ENDIF</a> statements. The following relational operators are
+in <a href="#7-IF">IF</a>-<a href="#7-IF">ELSE</a>-<a href="#7-IF">ENDIF</a> statements. The following
+relational operators are
 available:</p>
 <pre>= equal to<br>&lt;&gt; not equal to<br>&lt; less than<br>&gt; larger than<br>&lt;= less than or equal to<br>&gt;= larger than or equal to<br>! not</pre>
 <p style="text-align: justify;">You may link several
@@ -1872,7 +1992,8 @@ is calculated by using the current ASMPC address value.</p>
 operator</h2>
 <p style="text-align: justify;">You may use expressions in
 string definitions when using the
-<a href="#7-DEFM">DEFM</a> directive. String constants are enclosed in double quotes, e.g.
+<a href="#7-DEFM">DEFM</a> directive. String
+constants are enclosed in double quotes, e.g.
 "abcdefgh". Several strings and byte expressions may be concatanated
 using the &amp; operator. The resulting type of an expression in
 strings are an unsigned byte of the range of 0 to 255, e.g.:</p>
@@ -1890,7 +2011,8 @@ is important in evaluating expressions. The logic is built into the
 assembler parser. If an expression cannot be resolved in pass 1 of
 source file parsing, it will try to re-evaluate the failed expression
 in pass 2 of the parsing. If it still fails a symbol has not been found
-(<a href="v">XREF</a> and <a href="#7-LIB">LIB</a> external symbols are handled during the linking phase).</p>
+(<a href="v">XREF</a> and <a href="#7-LIB">LIB</a>
+external symbols are handled during the linking phase).</p>
 <hr style="width: 100%; height: 2px;">
 <h1><a name="7"></a>7 Directive reference</h1>
 <p style="text-align: justify;">The Z80 Module Assembler
@@ -1982,9 +2104,11 @@ group of identifier symbols with implicit values. This is similiar to
 the enumeration principles used in C and PASCAL. The initial symbol
 value is 0, increased by 1 for each new symbol in the list. You may
 include a &lt;name = expression&gt; which breaks the linear
-enumeration from that constant. The <a href="#7-DEFGROUP">DEFGROUP</a> directive may be spanned
+enumeration from that constant. The <a href="#7-DEFGROUP">DEFGROUP</a>
+directive may be spanned
 across several lines and MUST be enclosed with { and }. <a href="#7-DEFGROUP">DEFGROUP</a> is
-just a more easy way than: <a href="v">DEFC</a> name0 = 0, name1 = name0, ...</p>
+just a more easy way than: <a href="v">DEFC</a>
+name0 = 0, name1 = name0, ...</p>
 <p style="text-align: justify;">The
 following example illustrates a useful example of defining symbol
 values:</p>
@@ -2029,11 +2153,13 @@ deleting or inserting variable definitions.</p>
 <p style="text-align: justify;">A special logic is
 available too which can be used throughout individual source files
 during compilation. If you specify -1 as the starting address, the last
-offset from the previous <a href="#7-DEFVARS">DEFVARS</a> which was not specified as 0 will be
+offset from the previous <a href="#7-DEFVARS">DEFVARS</a>
+which was not specified as 0 will be
 used.</p>
 <p style="text-align: justify;">This enables you to
 gradually build up a list of identifier name
-offsets across <a href="#7-DEFVARS">DEFVARS</a> areas in different source files. The following
+offsets across <a href="#7-DEFVARS">DEFVARS</a>
+areas in different source files. The following
 example explains everything:</p>
 <pre>defvars $4000<br>{<br> aaa ds.b 1<br> bbb ds.b 100<br>}<br><br>defvars -1<br>{<br> ccc ds.b 100<br> ddd ds.b 1<br> eee ds.b 10<br>}<br><br>defvars 0<br>{<br> fff ds.p 1<br> ggg ds.b 1<br> hhh ds.w 1<br> iii ds.p 1<br>}<br><br>defvars -1<br>{<br> jjj ds.b 100<br>}</pre>
 <p style="text-align: justify;">Some
@@ -2057,12 +2183,15 @@ ENDIF</h2>
 <pre>IF &lt;logical expression&gt;<br>[ELSE]<br>ENDIF</pre>
 <p style="text-align: justify;">Multi-line-directive. This
 allows to assemble particular source
-lines between the <a href="#7-IF">IF</a>, <a href="#7-IF">ELSE</a> and <a href="#7-IF">ENDIF</a> directives. The logical truth of
-the <a href="#7-IF">IF</a> condition depends on which source lines will be assembled inside
-the directive construction. <a href="#7-IF">ELSE</a> is optional. Infinite nesting of <a href="#7-IF">IF</a>
+lines between the <a href="#7-IF">IF</a>, <a href="#7-IF">ELSE</a> and <a href="#7-IF">ENDIF</a>
+directives. The logical truth of
+the <a href="#7-IF">IF</a> condition depends on
+which source lines will be assembled inside
+the directive construction. <a href="#7-IF">ELSE</a>
+is optional. Infinite nesting of <a href="#7-IF">IF</a>
 directives are allowed. Each directive must be specified on separate
 lines. An example:</p>
-<pre>if QDOS<br> INCLUDE "defs_h"<br> INCLUDE "symbol_def"<br> INCLUDE "#stdio_def"<br> INCLUDE "#fileio_def"<br> INCLUDE "#memory_def"<br>else<br> INCLUDE "defs.h"<br> INCLUDE "symbol.def"<br> if MSDOS | UNIX<br>  INCLUDE "#stdio.def"<br>  INCLUDE "#fileio.def"<br>  INCLUDE "#memory.def"<br> endif<br> if Z88<br>  INCLUDE ":*//stdio.def"<br>  INCLUDE ":*//fileio.def"<br>  INCLUDE ":*//memory.def"<br> endif<br>endif</pre>
+<pre>if QDOS<br> INCLUDE "defs_h"<br> INCLUDE "symbol_def"<br> INCLUDE "#stdio_def"<br> INCLUDE "#fileio_def"<br> INCLUDE "#memory_def"<br>else<br> INCLUDE "defs.h"<br> INCLUDE "symbol.def"<br> if MSDOS | UNIX<br> INCLUDE "#stdio.def"<br> INCLUDE "#fileio.def"<br> INCLUDE "#memory.def"<br> endif<br> if Z88<br> INCLUDE ":*//stdio.def"<br> INCLUDE ":*//fileio.def"<br> INCLUDE ":*//memory.def"<br> endif<br>endif</pre>
 <hr style="width: 100%; height: 2px;">
 <h2><a name="7-INCLUDE"></a>INCLUDE "filename"</h2>
 <p style="text-align: justify;">Another component that
@@ -2073,26 +2202,30 @@ since there is no idea in copying the same information into several
 files - it simply uses redundant space of your storage media. This is
 certainly important on the Z88 which not always has huge amounts of
 installed user/system RAM (usually 128K). The external source file will
-be included at the position of the <a href="#7-INCLUDE">INCLUDE</a> directive. You specify an
+be included at the position of the <a href="#7-INCLUDE">INCLUDE</a>
+directive. You specify an
 include file as with the following example:</p>
 <pre>INCLUDE "#stdio.def"</pre>
 <p style="text-align: justify;">The
 format of the filename depends on the operating system platform. As
 with the current source file, you may also insert files in include
 files. There is no limit of how many levels (of files) you specify of
-include files. Recursive or mutual recursive <a href="#7-INCLUDE">INCLUDE</a> files (an <a href="#7-INCLUDE">INCLUDE</a>
+include files. Recursive or mutual recursive <a href="#7-INCLUDE">INCLUDE</a>
+files (an <a href="#7-INCLUDE">INCLUDE</a>
 file calling it self) is not possible - the assembler program will
 immediately return an error message back to you!</p>
 <p style="text-align: justify;">Include files are
 usually put at the start of the source file module but may be placed
 anywhere in the source text. The current source file will be continued
-after the <a href="#7-INCLUDE">INCLUDE</a> directive when the included file has been parsed to
+after the <a href="#7-INCLUDE">INCLUDE</a>
+directive when the included file has been parsed to
 the end of file.</p>
 <p style="text-align: justify;">If you specifiy a leading
 '#' in the filename (as
 shown above) the assembler automatically preceeds a default directory
 path, defined from the Z80_OZFILES environment variable. Most of the
-time <a href="#7-INCLUDE">INCLUDE</a> is used for including Z88 operating system manifests -
+time <a href="#7-INCLUDE">INCLUDE</a> is used for
+including Z88 operating system manifests -
 which enables you to place them in a particular place on your system.
 Using the '#' also enables you to have these OZ header files placed
 anywhere on any computer platform. The '#' resolves this for you.</p>
@@ -2112,7 +2245,8 @@ external to the current module. The
 symbol name will be defined as the name of a library routine which will
 be automatically linked into the application code from a library during
 the linking/relocation phase of the compilation process (if a library
-has been specified at the command line with the <a href="#1.3-iLIB">-i</a> option).</p>
+has been specified at the command line with the <a href="#1.3-iLIB">-i</a>
+option).</p>
 <hr style="width: 100%; height: 2px;">
 <h2><a name="7-LINE"></a>LINE &lt;32bit
 expr&gt;</h2>
@@ -2128,7 +2262,8 @@ not closed.</p>
 <h2><a name="7-LSTON"></a>LSTON</h2>
 <p style="text-align: justify;">Enables listing output
 (usually from a previous
-<a href="#7-LSTOFF">LSTOFF</a>). Both directives may be useful when information from <a href="#7-INCLUDE">INCLUDE</a>
+<a href="#7-LSTOFF">LSTOFF</a>). Both directives may
+be useful when information from <a href="#7-INCLUDE">INCLUDE</a>
 files is redundant in the listing file, e.g. operating system
 definitions.</p>
 <hr style="width: 100%; height: 2px;">
@@ -2142,7 +2277,9 @@ the programmer to choose a well defined name for the source file
 module. The position of the module name is of no importance; it may be
 placed at the end or the start of the source file. However, it has more
 sense to put it at the top. The syntax is simple - specify a legal
-identifier name after the <a href="#7-MODULE">MODULE</a> directive, e.g. <a href="#7-MODULE">MODULE</a> main_module</p>
+identifier name after the <a href="#7-MODULE">MODULE</a>
+directive, e.g. <a href="#7-MODULE">MODULE</a>
+main_module</p>
 <hr style="width: 100%; height: 2px;">
 <h2><a name="7-ORG"></a>ORG
 &lt;16bit expression&gt;</h2>
@@ -2151,10 +2288,13 @@ compiled
 machine code - the position in memory where the machine is to be loaded
 and executed. The expression must be evaluable (containing no forward
 or external references). All address references will be calculated from
-the defined <a href="#7-ORG">ORG</a> value. The <a href="#7-ORG">ORG</a> address will be placed in the current
+the defined <a href="#7-ORG">ORG</a> value. The <a href="#7-ORG">ORG</a> address will be placed in the
+current
 module that is being compiled. However, during linking only the first
-object module is being read for an <a href="#7-ORG">ORG</a> address. The <a href="#7-ORG">ORG</a> is ignored
-during linking if you have specified an <a href="#1.3-rADDR">-r</a> option on the command line.</p>
+object module is being read for an <a href="#7-ORG">ORG</a>
+address. The <a href="#7-ORG">ORG</a> is ignored
+during linking if you have specified an <a href="#1.3-rADDR">-r</a>
+option on the command line.</p>
 <hr style="width: 100%; height: 2px;">
 <h2><a name="7-XDEF"></a>XDEF name {, name}</h2>
 <p style="text-align: justify;">Declares symbol globally
@@ -2168,7 +2308,8 @@ library
 routine, it is necessary to declare the routine with <a href="#7-XLIB">XLIB</a>. In
 fuctionality it declares the name globally available to all other
 modules in project, but also serves as a searchable item in libraries.
-A library routine does not contain a <a href="#7-MODULE">MODULE</a> directive, since the <a href="#7-XLIB">XLIB</a>
+A library routine does not contain a <a href="#7-MODULE">MODULE</a>
+directive, since the <a href="#7-XLIB">XLIB</a>
 name is also identified as the module name (you only specify one
 library routine per module).</p>
 <hr style="width: 100%; height: 2px;">
@@ -2198,7 +2339,8 @@ executable binary file).</p>
 many routines - hence the general but descriptive message. You have
 tried to use illegal registers in Z80 mnemonic instructions, specified
 an illegal parameter type (string instead of integer), omitted a
-parameter (<a href="#7-DEFB">DEFB</a> without constant).</p>
+parameter (<a href="#7-DEFB">DEFB</a> without
+constant).</p>
 <hr>
 <h2><a name="8.2"></a>2, "Symbol not defined"</h2>
 <p style="text-align: justify;">This error
@@ -2249,7 +2391,8 @@ compilation.</p>
 <h2><a name="8.9"></a>9, "Illegal option"</h2>
 <p style="text-align: justify;">The command line parser
 couldn't
-recognise the&nbsp;option. Remember to specify your option in EXACT case
+recognise the&nbsp;option. Remember to specify your option in EXACT
+case
 size. You have probably used a space between an option and a filename
 parameter.</p>
 <hr>
@@ -2293,14 +2436,17 @@ label definitions, or other name identifier creators (using <a href="#7-DEFC">DE
 <h2><a name="8.15"></a>15, "Module name
 already defined"</h2>
 <p style="text-align: justify;">You have used the
-<a href="#7-MODULE">MODULE</a> directive more than once in your source file, or used both a
-<a href="#7-MODULE">MODULE</a> and <a href="#7-XLIB">XLIB</a> directive (library modules only need an <a href="#7-XLIB">XLIB</a>).</p>
+<a href="#7-MODULE">MODULE</a> directive more than
+once in your source file, or used both a
+<a href="#7-MODULE">MODULE</a> and <a href="#7-XLIB">XLIB</a> directive (library modules
+only need an <a href="#7-XLIB">XLIB</a>).</p>
 <hr>
 <h2><a name="8.16"></a>16,
 "Module name not defined" [DEPRECATED]</h2>
 <p style="text-align: justify;">Not used.&nbsp;[A <a href="#7-MODULE">MODULE</a> directive is
 missing in your source
-file (or <a href="#7-XLIB">XLIB</a> directive in a library source file routine).]</p>
+file (or <a href="#7-XLIB">XLIB</a> directive in a
+library source file routine).]</p>
 <hr>
 <h2><a name="8.17"></a>17, "Symbol
 already declared local"</h2>
@@ -2310,20 +2456,24 @@ it was already defined local, eg. using a ".lbaddr" in your source.</p>
 <hr>
 <h2><a name="8.18"></a>18,
 "Symbol already declared global" [DEPRECATED]</h2>
-<p style="text-align: justify;">Not used. [You have two identical
+<p style="text-align: justify;">Not used. [You have two
+identical
 <a href="v">XDEF</a> symbol
 declarations in your source file module.]</p>
 <hr>
 <h2><a name="8.19"></a>19, "Symbol already
 declared
 external" [DEPRECATED]</h2>
-<p style="text-align: justify;">Not used. [You have two identical
-<a href="#7-XREF">XREF</a> symbol declarations in your
+<p style="text-align: justify;">Not used. [You have two
+identical
+<a href="#7-XREF">XREF</a> symbol declarations in
+your
 source file module.]</p>
 <hr>
 <h2><a name="8.20"></a>20, "No command line
 arguments" [DEPRECATED]</h2>
-<p style="text-align: justify;">Not used. [Ups - display Z80
+<p style="text-align: justify;">Not used. [Ups - display
+Z80
 Module Assembler help text.]</p>
 <hr>
 <h2><a name="8.21"></a>21, "Illegal source
@@ -2343,7 +2493,9 @@ instead.</p>
 allowed"</h2>
 <p style="text-align: justify;">You are trying to specify
 an
-<a href="v">XDEF</a> for a name that has already been <a href="#7-XREF">XREF</a>'ed in the same module (or
+<a href="v">XDEF</a> for a name that has already
+been <a href="#7-XREF">XREF</a>'ed in the same
+module (or
 the other way around).</p>
 <hr>
 <h2><a name="8.24"></a>24, "ORG already
@@ -2354,7 +2506,8 @@ defined" [DEPRECATED]</h2>
 "Relative jump address must be local"</h2>
 <p style="text-align: justify;">You have tried to JR to a
 label
-address that is declared as external (with <a href="#7-XREF">XREF</a> or <a href="#7-LIB">LIB</a>). JR must be
+address that is declared as external (with <a href="#7-XREF">XREF</a>
+or <a href="#7-LIB">LIB</a>). JR must be
 performed in the current source file module.</p>
 <hr>
 <h2><a name="8.26"></a>26, "Not a relocatable
@@ -2366,7 +2519,8 @@ conforming to the Z80 assembler standard object file format.</p>
 <hr>
 <h2><a name="8.27"></a>27,
 "Reserved name" [DEPRECATED]</h2>
-<p style="text-align: justify;">Not used. [You have tried to create a
+<p style="text-align: justify;">Not used. [You have tried
+to create a
 label or other name as
 "ASMPC".]</p>
 <hr>
@@ -2387,13 +2541,16 @@ file could also be corrupted (at least in the header)...</p>
 "Environment variable not defined"</h2>
 <p style="text-align: justify;">The assembler reports that
 the "Z80_STDLIB" environment variable wasn't found in
-the operating system, when used by options <a href="#1.3-x">-x</a> and <a href="#1.3-iLIB">-i</a>.</p>
+the operating system, when used by options <a href="#1.3-x">-x</a>
+and <a href="#1.3-iLIB">-i</a>.</p>
 <hr>
 <h2><a name="8.31"></a>31, "Cannot include
 file recursively"</h2>
 <p style="text-align: justify;">A file
 was tried to be included which was already included at a previous
-include level. <a href="#7-INCLUDE">INCLUDE</a> "a.h" cannot contain an <a href="#7-INCLUDE">INCLUDE</a> "a.h"...</p>
+include level. <a href="#7-INCLUDE">INCLUDE</a>
+"a.h" cannot contain an <a href="#7-INCLUDE">INCLUDE</a>
+"a.h"...</p>
 <hr style="width: 100%; height: 2px;">
 <h1><a name="9"></a>9
 Compiling the Z80 Module Assembler ANSI C source files</h1>
@@ -2511,7 +2668,9 @@ parsing, generate machine code and store information into the object
 file.<br>
 </li>
 <li>asmdrctv.c<br>
-All function logic routines (<a href="#7-DEFB">DEFB</a>, <a href="#7-INCLUDE">INCLUDE</a>, <a href="#7-ORG">ORG</a>, <a href="#7-DEFVARS">DEFVARS</a>, etc.) that
+All function logic routines (<a href="#7-DEFB">DEFB</a>,
+<a href="#7-INCLUDE">INCLUDE</a>, <a href="#7-ORG">ORG</a>, <a href="#7-DEFVARS">DEFVARS</a>,
+etc.) that
 parse and code generate Z80 assembler directives.<br>
 <br>
 </li>
@@ -2588,116 +2747,483 @@ object file format in other systems.</p>
 <p style="text-align: justify;">I have created the design
 structure of the object file format to be suitable for future
 expansion. The primary aim of the design has been to maintain structure
-simplicity and load efficiency during link processing. The format of
-the object file is as follows:</p>
-<pre>0 [ 'Z80RMF01' &lt;ORG Address&gt; ]<br> [ &lt;F.ptr to Module Name&gt; ]<br> [ &lt;F.ptr to Expression Declarations&gt; ]<br> [ &lt;F.ptr to Name Declarations&gt; ]<br> [ &lt;F.ptr to Library Name Declarations&gt; ]<br> [ &lt;F.ptr to Machine Code Block&gt; ]<br><br> [ &lt;Expression Declaration&gt; ]<br> [ ... ] <br><br> [ &lt;Name Declaration&gt; ] <br> [ ... ]<br><br> [ &lt;Library Name Declaration&gt; ]<br> [ ... ]<br><br> [ &lt;Module Name&gt; ]<br> [ &lt;Machine Code&gt; ]<br>n<br></pre>
-<p style="text-align: justify;">The 0 (null) -
-&lt;n&gt;
-defines start to &lt;n&gt; total of bytes file length. The
-above figure has deliberately been split into sections to clarify the
+simplicity and load efficiency during link processing.&nbsp;</p>
+<p style="text-align: justify;">The&nbsp;figure below
+has deliberately been split into sections to clarify the
 file structure, allthough there is no actual physical separation
 between the sections in the file; each section is immediatly followed
-by the next.</p>
-<p style="text-align: justify;">The file pointers are
-32bit integers stored in low byte -
-high byte order (Little endian format - Z80/Intel notation).</p>
-<ul>
-<li>&lt;ORG Address&gt;<br>
-Contains the <a href="#7-ORG">ORG</a> address for the linked
-machine code or FFFFh for no <a href="v">ORG</a> address defined.<br>
-</li>
-<li>&lt;Expression
-Declaration&gt;<br>
-Contains the following:
-&lt;type&gt;&lt;patchptr&gt;&lt;length&gt;&lt;expression_string&gt;<br>
-</li>
-<li>&lt;type&gt;<br>
-defines the resulting evaluation type range:<br>
+by the next. 16 bit and 32 bit values are&nbsp;stored in low byte -
+high byte order (Little endian format - Z80/Intel notation).&nbsp;</p>
+<p style="text-align: justify;">The format of
+the object file is as follows::</p>
+<table style="text-align: left;" border="1" cellpadding="2" cellspacing="0">
+<tbody>
+<tr>
+<th style="background-color: rgb(255, 255, 204);">Address</th>
+<th style="background-color: rgb(255, 255, 204);">Object</th>
+<th style="background-color: rgb(255, 255, 204);">Type</th>
+<th style="background-color: rgb(255, 255, 204);">Description</th>
+</tr>
+<tr align="center">
+<td style="background-color: rgb(255, 255, 204);" colspan="1" rowspan="1"><br>
+</td>
+<td style="background-color: rgb(255, 255, 204);" colspan="1"></td>
+<td style="background-color: rgb(255, 255, 204);" colspan="1"></td>
+<td style="text-align: left; font-weight: bold; background-color: rgb(255, 255, 204);">File
+header</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>0</pre>
+</td>
+<td style="text-align: center;">
+<pre>'Z80RMF01'</pre>
+</td>
+<td style="text-align: center;">
+<pre>8 chars</pre>
+</td>
+<td>File type identifier</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>8</pre>
+</td>
+<td style="text-align: center;">
+<pre>ORG Address</pre>
+</td>
+<td style="text-align: center;">
+<pre>16 bit</pre>
+</td>
+<td>
+Contains the <a href="z80asm.html#7-ORG">ORG</a>
+address for
+the linked
+machine code or 0xFFFF for no <a href="v">ORG</a>
+address defined.</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>10</pre>
+</td>
+<td style="text-align: center;">
+<pre>Module Name<br>pointer</pre>
+</td>
+<td style="text-align: center;">
+<pre>32 bit</pre>
+</td>
+<td>Points to the Module Name section in the file.</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>14</pre>
+</td>
+<td style="text-align: center;">
+<pre>Expression<br>Declaration<br>pointer</pre>
+</td>
+<td style="text-align: center;">
+<pre>32 bit</pre>
+</td>
+<td>Points to the Expression Declaration section in the
+file, 0xFFFFFFFF if no expressions exist.</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>18</pre>
+</td>
+<td style="text-align: center;">
+<pre>Name<br>Declaration<br>pointer</pre>
+</td>
+<td style="text-align: center;">
+<pre>32 bit</pre>
+</td>
+<td>Points to the Name Declaration section in the file,
+0xFFFFFFFF if no symbols exist.</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>22</pre>
+</td>
+<td style="text-align: center;">
+<pre>Library Name<br>Declaration<br>pointer</pre>
+</td>
+<td style="text-align: center;">
+<pre>32 bit</pre>
+</td>
+<td>Points to the Library Name Declaration&nbsp;section
+in the file, 0xFFFFFFFF if no library symbols imported.</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>26</pre>
+</td>
+<td style="text-align: center;">
+<pre>Machine Code<br>Block<br>pointer</pre>
+</td>
+<td style="text-align: center;">
+<pre>32 bit</pre>
+</td>
+<td>
+<p>Points to the Machine Code Block section in the file,
+0xFFFFFFFF if no code block exists.</p>
+</td>
+</tr>
+<tr>
+<td style="background-color: rgb(255, 255, 204);"></td>
+<td style="background-color: rgb(255, 255, 204);"></td>
+<td style="background-color: rgb(255, 255, 204);"></td>
+<td style="font-weight: bold; background-color: rgb(255, 255, 204);">Expression
+Declaration section - defines expressions that need to be computed at
+link time</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<p>Expression<br>
+Declaration<br>
+address</p>
+</td>
+<td style="text-align: center;">
+<pre></pre>
+</td>
+<td style="text-align: center;">
+<pre></pre>
+</td>
+<td>Start of Expression Declaration section.<br>
+End of the section is marked by the first defined pointer of the
+following list: Name Declaration pointer, Library Name Declaration
+pointer and Module Name pointer. The last one is always defined.</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="5" style="text-align: center;">
+<pre></pre>
+<pre></pre>
+<p>Repeated<br>
+for<br>
+each<br>
+expression</p>
+<pre></pre>
+<pre></pre>
+</td>
+<td style="text-align: center;">
+<pre>type</pre>
+</td>
+<td style="text-align: center;">
+<pre>char</pre>
+</td>
+<td>Type defines the resulting evaluation type range:<br>
 'U':
 8bit integer (0 to 255)<br>
 'S': 8bit signed integer (-128 to 127)<br>
 'C':
 16bit integer (-32768 to 65535)<br>
-'L': 32bit signed integer<br>
-</li>
-<li>&lt;patchptr&gt;<br>
-defines the 16bit relative module code patch
-pointer to store result.<br>
-</li>
-<li>&lt;length&gt;<br>
-defines byte length of
-expression string.<br>
-</li>
-<li>&lt;expression_string&gt;<br>
-contains the infix
-expression parsed from the source file.<br>
-</li>
-<li>&lt;Name
-Declaration&gt;<br>
-Contains the following:
-&lt;Scope&gt;&lt;Type&gt;&lt;Value&gt;&lt;Length&gt;&lt;Name&gt;<br>
-</li>
-<li>&lt;Scope&gt;<br>
-defines the scope of the name:<br>
+'L': 32bit signed integer</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>patchptr</pre>
+</td>
+<td style="text-align: center;">
+<pre>16 bit</pre>
+</td>
+<td>Defines the code patch
+pointer to store result, relative to the start of the code section.</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>length</pre>
+</td>
+<td style="text-align: center;">
+<pre>byte</pre>
+</td>
+<td>Defines byte length of
+expression string.</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>expression<br>string</pre>
+</td>
+<td style="text-align: center;">
+<pre>length<br>chars</pre>
+</td>
+<td>Contains the infix
+expression parsed from the source file&nbsp;in all UPPER CASE.</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>end marker</pre>
+</td>
+<td style="text-align: center;">
+<pre>byte</pre>
+</td>
+<td>Zero byte end marker.</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="1" style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="background-color: rgb(255, 255, 204);"><span style="font-weight: bold;">Name Declaration section -
+defines all the symbols defined in this module</span></td>
+</tr>
+<tr>
+<td style="text-align: center;">Name Declaration
+address</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td>Start of Name Declaration section.<br>
+End of the section is
+marked by the first defined pointer of the following list: Library Name
+Declaration pointer and Module Name
+pointer. The last one is always defined.</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="5" style="text-align: center;">Repeated<br>
+for<br>
+each<br>
+name</td>
+<td style="text-align: center;">
+<pre>scope</pre>
+</td>
+<td style="text-align: center;">
+<pre>char</pre>
+</td>
+<td>Scope defines the scope of the name:<br>
 'L' is local,<br>
 'G'
 is global,<br>
-'X' global library<br>
-</li>
-<li>&lt;Type&gt;<br>
-defines whether it
-is a:<br>
+'X' global library</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>type</pre>
+</td>
+<td style="text-align: center;">
+<pre>char</pre>
+</td>
+<td>Type defines whether it is a:<br>
 'A' relocatable address,<br>
-'C' a constant'<br>
-</li>
-<li>&lt;Length&gt;<br>
-defines length byte of the following &lt;Name&gt; string.<br>
-</li>
-<li>&lt;Library Name Declaration&gt;<br>
-Contains the following which
-defines library reference names:
-&lt;Length&gt;&lt;Name&gt;<br>
-</li>
-<li>&lt;Length&gt;<br>
-defines length byte of the following &lt;Name&gt; string.<br>
-</li>
-<li>&lt;Module Name&gt;<br>
-Contains a preceeding byte identifying the
-length of the following string<br>
-</li>
-<li>&lt;Machine Code&gt;<br>
-Contains a
-preceeding 16bit integer identifying the total length of the following
-machine code block.</li>
+'C' a constant</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>value</pre>
+</td>
+<td style="text-align: center;">
+<pre>32 bit</pre>
+</td>
+<td>Value of the symbol in 32 bit, relative to the start of
+the code block for type 'A'.</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>length</pre>
+</td>
+<td style="text-align: center;">
+<pre>byte</pre>
+</td>
+<td>Defines length byte of the following string.</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>name</pre>
+</td>
+<td style="text-align: center;">
+<pre>length<br>chars</pre>
+</td>
+<td>Name of the symbol in UPPER CASE.</td>
+</tr>
+<tr>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="font-weight: bold; background-color: rgb(255, 255, 204);">Library
+Name Declaration section - defines all the library reference names</td>
+</tr>
+<tr>
+<td style="text-align: center;">Library Name<br>
+Declaration address</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td>Start of Name Declaration section.<br>
+End of the section is
+marked by the Module Name
+pointer.</td>
+</tr>
+<tr>
+<td colspan="1" rowspan="2" style="text-align: center;">Repeated<br>
+for<br>
+each<br>
+name</td>
+<td style="text-align: center;">
+<pre>length</pre>
+</td>
+<td style="text-align: center;">
+<pre>byte</pre>
+</td>
+<td>Defines length byte of the following string.</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>name</pre>
+</td>
+<td style="text-align: center;">
+<pre>length<br>chars</pre>
+</td>
+<td>Name of the symbol in UPPER CASE.</td>
+</tr>
+<tr>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="background-color: rgb(255, 255, 204);"><span style="font-weight: bold;">Module Name section - defines the
+module name</span></td>
+</tr>
+<tr>
+<td style="text-align: center;">Module Name address</td>
+<td style="text-align: center;">
+<pre>length</pre>
+</td>
+<td style="text-align: center;">
+<pre>byte</pre>
+</td>
+<td>Defines length byte of the following string.</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">
+<pre>name</pre>
+</td>
+<td style="text-align: center;">
+<pre>length<br>chars</pre>
+</td>
+<td>Name of the module in UPPER CASE.</td>
+</tr>
+<tr>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="background-color: rgb(255, 255, 204);"><span style="font-weight: bold;">Machine Code section - contains
+the binary image of the compiled code</span></td>
+</tr>
+<tr>
+<td style="text-align: center;">Machine Code Block
+address</td>
+<td style="text-align: center;">
+<pre>length</pre>
+</td>
+<td style="text-align: center;">
+<pre>16 bit</pre>
+</td>
+<td>Total length of the following
+machine code block, 0x0000 for a 64 KByte block. A zero-length block is
+not stored in the file, i.e. the Machine Code pointer in the feader is
+set to 0xFFFFFFFF.</td>
+</tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">
+<pre>block</pre>
+</td>
+<td style="text-align: center;">
+<pre>length<br>bytes</pre>
+</td>
+<td>Machine code block.</td>
+</tr>
+<tr>
+<td style="text-align: center; background-color: rgb(255, 255, 204);">File
+length</td>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="background-color: rgb(255, 255, 204);"><span style="font-weight: bold;">End of file</span></td>
+</tr>
+</tbody>
+</table>
+<pre><br><br></pre>
+<ul>
 </ul>
 <hr style="width: 100%; height: 2px;">
 <h2><a name="10.2"></a>10.2 Library file
 format documentation</h2>
 <p style="text-align: justify;">The library
 file format is a sequense of object files with additional structures.</p>
-<pre>0 [ 'Z80LMF01' ]<br> [ &lt;Object File Block&gt; ]<br> [ ... ] <br>n<br></pre>
-<ul>
-<li>&lt;Object File Block&gt;<br>
-Contains the following: &lt;Next
-Object File&gt;&lt;Object File Length&gt;&lt;'Z80RMF01'
-Object File&gt;<br>
-</li>
-<li>&lt;Next Object File&gt;<br>
-is a 32bit integer
-file pointer to the next<br>
-</li>
-<li>&lt;Object File Block&gt;<br>
-If this file
-pointer is -1 (FFFFFFFFh) then the current &lt;Object File
-Block&gt; is the last in the library file.<br>
-</li>
-<li>&lt;Object File
-Length&gt;<br>
-is 32bit length integer of &lt;'Z80RMF01' Object
-File&gt;<br>
+<table style="text-align: left;" border="1" cellpadding="2" cellspacing="0">
+<tbody>
+<tr>
+<th>Address</th>
+<th>Object</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td style="background-color: rgb(255, 255, 204);"></td>
+<td style="background-color: rgb(255, 255, 204);"></td>
+<td style="background-color: rgb(255, 255, 204);"></td>
+<td style="background-color: rgb(255, 255, 204);"><span style="font-weight: bold;">File header</span></td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>0</pre>
+</td>
+<td style="text-align: center;">
+<pre>'Z80LMF01'</pre>
+</td>
+<td style="text-align: center;">
+<pre>8 chars</pre>
+</td>
+<td>File type identifier</td>
+</tr>
+<tr>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="background-color: rgb(255, 255, 204);"><span style="font-weight: bold;">Object Modules section</span></td>
+</tr>
+<tr>
+<td colspan="1" rowspan="3" style="text-align: center;">Repeated<br>
+for<br>
+each<br>
+Object<br>
+File</td>
+<td style="text-align: center;">
+<pre>next<br>object<br>file</pre>
+</td>
+<td style="text-align: center;">
+<pre>32 bit</pre>
+</td>
+<td>File pointer to the next object file, 0xFFFFFFFF if the
+current Object File
+Block is the last in the library file.</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>object<br>file<br>length</pre>
+</td>
+<td style="text-align: center;">
+<pre>32 bit</pre>
+</td>
+<td>Length&nbsp;of the Object
+File.<br>
 If this integer is 0 then it is indicated that the current
 &lt;Object File Block&gt; has been marked "deleted" and will
-not be used.</li>
-</ul>
+not be used.</td>
+</tr>
+<tr>
+<td style="text-align: center;">
+<pre>object<br>file</pre>
+</td>
+<td style="text-align: center;">
+<pre>lenght<br>bytes</pre>
+</td>
+<td>'Z80RMF01'
+Object File</td>
+</tr>
+<tr>
+<td style="text-align: center; background-color: rgb(255, 255, 204);">File
+length</td>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="text-align: center; background-color: rgb(255, 255, 204);"></td>
+<td style="background-color: rgb(255, 255, 204);"><span style="font-weight: bold;">End of file</span></td>
+</tr>
+</tbody>
+</table>
+<br>
 <p></p>
 </body></html>
