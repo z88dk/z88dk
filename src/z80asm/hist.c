@@ -19,9 +19,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.21 2011-08-14 19:50:31 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.22 2011-08-19 19:22:28 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.21  2011-08-14 19:50:31  pauloscustodio
+/* Revision 1.22  2011-08-19 19:22:28  pauloscustodio
+/* Version 1.1.8
+/*
+/* Revision 1.21  2011/08/14 19:50:31  pauloscustodio
 /* Version 1.1.7
 /*
 /* Revision 1.20  2011/08/05 20:26:42  pauloscustodio
@@ -650,8 +653,10 @@ Based on 1.0.31
     - Added test scripts for error messages.
     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+
     CH_0003 : Error messages should be more informative
         - Added printf-args to error messages, added "Error:" prefix.
+
     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
         - Raise ERR_UNBALANCED_PAREN instead
 
@@ -698,15 +703,43 @@ Based on 1.0.31
     - Tests: Added test case to verify that incomplete files are deleted on error
     - Hack to hide memory leak in e4c, line 647, when rethrow() is called.
       Reported to Exceptions4c project page http://code.google.com/p/exceptions4c/
+      
+19.08.2011 [1.1.8] (pauloscustodio)
+    BUG_0008 : code block of 64K is read as zero
+	- When linking a module with 64K of data no data is read from the object file, because 
+	  the code size is stored with two bytes = zero.
+	- Problem is masked if the module with 64K is the only module linked, because the linker 
+	  reuses the code block left by the assembler, that still contains the code.
+
+    BUG_0009 : file read/write not tested for errors
+	- In case of disk full file write fails, but assembler does not detect the error
+	  and leaves back corruped object/binary files
+	- Created new exception FileIOException and ERR_FILE_IO error.
+	- Created new functions xfputc, xfgetc, ... to raise the exception on error.
+
+    BUG_0010 : heap corruption when reaching MAXCODESIZE
+	- test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one
+	  byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted
+	  before the exception is raised.
+	- Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE
+	  on every write.
+	- Side effect of this fix: object files now store a zero on every location in code that 
+	  will be patched by the linker, before they stored dummy data - whatever was in memory 
+	  at that location in codearea.
+
+    - Upgrade to Exceptions4c 2.8.9 to solve memory leak.
+    - Factored code to read/write word from file into xfget_word/xfput_word. 
+    - Renamed ReadLong/WriteLong to xfget_long/xfput_long for symetry.
+
 */
 
 #include "memalloc.h"	/* before any other include to enable memory leak detection */
 
 #include "hist.h"
 
-#define DATE        "14.08.2011"
-#define VERSION     "1.1.7"
-#define COPYRIGHT   "InterLogic 1993-2009"
+#define DATE        "19.08.2011"
+#define VERSION     "1.1.8"
+#define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011"
 
 #ifdef QDOS
 #include <qdos.h>
