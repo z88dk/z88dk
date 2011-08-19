@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.10 2011-07-18 00:48:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.11 2011-08-19 15:53:58 pauloscustodio Exp $ */
 /* $Log: ldinstr.c,v $
-/* Revision 1.10  2011-07-18 00:48:25  pauloscustodio
+/* Revision 1.11  2011-08-19 15:53:58  pauloscustodio
+/* BUG_0010 : heap corruption when reaching MAXCODESIZE
+/* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+/* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
+/*
+/* Revision 1.10  2011/07/18 00:48:25  pauloscustodio
 /* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
 /*
 /* Revision 1.9  2011/07/12 22:47:59  pauloscustodio
@@ -93,6 +98,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "z80asm.h"
 #include "symbol.h"
 #include "errors.h"
+#include "codearea.h"
 
 /* external functions */
 enum symbols GetSym (void);
@@ -114,8 +120,6 @@ void LD_r_8bit_indrct (int reg);
 
 
 /* global variables */
-extern unsigned char *codeptr, *codearea;
-extern long PC;
 extern enum symbols sym, GetSym (void);
 extern struct module *CURRENTMODULE;
 extern FILE *z80asmfile;
@@ -148,8 +152,8 @@ LD (void)
               GetSym ();
               if (CheckRegister8 () == 7)
                 {
-                  *codeptr++ = 2;
-                  ++PC;
+                  append_byte(0x02);
+                  inc_PC(1);
                 }
               else
                 ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
@@ -164,8 +168,8 @@ LD (void)
               GetSym ();
               if (CheckRegister8 () == 7)
                 {
-                  *codeptr++ = 18;
-                  ++PC;
+                  append_byte(0x12);
+                  inc_PC(1);
                 }
               else
                 ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
@@ -196,9 +200,9 @@ LD (void)
             GetSym ();
             if (CheckRegister8 () == 7)
               {			/* LD  I,A */
-                *codeptr++ = 237;
-                *codeptr++ = 71;
-                PC += 2;
+                append_byte(0xED);
+                append_byte(0x47);
+                inc_PC(2);
               }
             else
               ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
@@ -213,9 +217,9 @@ LD (void)
             GetSym ();
             if (CheckRegister8 () == 7)
               {			/* LD  R,A */
-                *codeptr++ = 237;
-                *codeptr++ = 79;
-                PC += 2;
+                append_byte(0xED);
+                append_byte(0x4F);
+                inc_PC(2);
               }
             else
               ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
@@ -242,8 +246,8 @@ LD (void)
                             ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
                             return;
                           }
-                        *codeptr++ = 221;	/* LD IXl,n or LD IXh,n */
-                        ++PC;
+                        append_byte(0xDD);	/* LD IXl,n or LD IXh,n */
+                        inc_PC(1);
                       }
                     else if (destreg & 16)
                       {
@@ -252,13 +256,13 @@ LD (void)
                             ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
                             return;
                           }
-                        *codeptr++ = 253;	/* LD  IYl,n or LD  IYh,n */
-                        ++PC;
+                        append_byte(0xFD);	/* LD  IYl,n or LD  IYh,n */
+                        inc_PC(1);
                       }
                     destreg &= 7;
-                    *codeptr++ = destreg * 8 + 6;
+                    append_byte(destreg * 0x08 + 0x06);
                     ExprUnsigned8 (1);
-                    PC += 2;
+                    inc_PC(2);
                     return;
                   }
                 if (sourcereg == 6)
@@ -269,16 +273,16 @@ LD (void)
                   }
                 if ((sourcereg == 8) && (destreg == 7))
                   {		/* LD A,I */
-                    *codeptr++ = 237;
-                    *codeptr++ = 87;
-                    PC += 2;
+                    append_byte(0xED);
+                    append_byte(0x57);
+                    inc_PC(2);
                     return;
                   }
                 if ((sourcereg == 9) && (destreg == 7))
                   {		/* LD A,R */
-                    *codeptr++ = 237;
-                    *codeptr++ = 95;
-                    PC += 2;
+                    append_byte(0xED);
+                    append_byte(0x5F);
+                    inc_PC(2);
                     return;
                   }
                 if ((destreg & 8) || (sourcereg & 8))
@@ -288,8 +292,8 @@ LD (void)
                         ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
                         return;
                       }
-                    *codeptr++ = 221;
-                    ++PC;
+                    append_byte(0xDD);
+                    inc_PC(1);
                   }
                 else if ((destreg & 16) || (sourcereg & 16))
                   {		/* IYl or IYh */
@@ -298,14 +302,14 @@ LD (void)
                         ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
                         return;
                       }
-                    *codeptr++ = 253;
-                    ++PC;
+                    append_byte(0xFD);
+                    inc_PC(1);
                   }
                 sourcereg &= 7;
                 destreg &= 7;
 
-                *codeptr++ = 64 + destreg * 8 + sourcereg;	/* LD  r,r  */
-                ++PC;
+                append_byte(0x40 + destreg * 0x08 + sourcereg);	/* LD  r,r  */
+                inc_PC(1);
               }
           }
         else
@@ -335,14 +339,14 @@ LD_HL8bit_indrct (void)
 	  break;
 
 	case -1:		/* LD  (HL),n  */
-	  *codeptr++ = 54;
+	  append_byte(0x36);
 	  ExprUnsigned8 (1);
-	  PC += 2;
+	  inc_PC(2);
 	  break;
 
 	default:
-	  *codeptr++ = 112 + sourcereg;		/* LD  (HL),r  */
-	  ++PC;
+	  append_byte(0x70 + sourcereg);		/* LD  (HL),r  */
+	  inc_PC(1);
 	  break;
 	}
     }
@@ -358,14 +362,14 @@ void
 LD_index8bit_indrct (int destreg)
 {
   int sourcereg;
-  unsigned char *opcodeptr;
+  size_t opcodeptr;
 
   if (destreg == 5)
-    *codeptr++ = 221;
+    append_byte(0xDD);
   else
-    *codeptr++ = 253;
-  opcodeptr = codeptr;		/* pointer to instruction opcode */
-  *codeptr++ = 54;		/* preset 2. opcode to LD (IX|IY+d),n  */
+    append_byte(0xFD);
+  opcodeptr = get_code_size();	/* pointer to instruction opcode */
+  append_byte(0x36);		/* preset 2. opcode to LD (IX|IY+d),n  */
 
 
   if (!ExprSigned8 (2))
@@ -388,12 +392,12 @@ LD_index8bit_indrct (int destreg)
 
 	case -1:
 	  ExprUnsigned8 (3);	/* Execute, store & patch 8bit expression for <n> */
-	  PC += 4;
+	  inc_PC(4);
 	  break;
 
 	default:
-	  *opcodeptr = 112 + sourcereg;		/* LD  (IX|IY+d),r  */
-	  PC += 3;
+	  patch_byte(&opcodeptr, 112 + sourcereg);		/* LD  (IX|IY+d),r  */
+	  inc_PC(3);
 	  break;
 	}			/* end switch */
     }
@@ -413,27 +417,27 @@ LD_r_8bit_indrct (int destreg)
   switch (sourcereg = IndirectRegisters ())
     {
     case 2:
-      *codeptr++ = 64 + destreg * 8 + 6;	/* LD   r,(HL)  */
-      ++PC;
+      append_byte(0x40 + destreg * 0x08 + 0x06);	/* LD   r,(HL)  */
+      inc_PC(1);
       break;
 
     case 5:
     case 6:
       if (sourcereg == 5)
-	*codeptr++ = 221;
+	append_byte(0xDD);
       else
-	*codeptr++ = 253;
-      *codeptr++ = 64 + destreg * 8 + 6;
+	append_byte(0xFD);
+      append_byte(0x40 + destreg * 0x08 + 0x06);
       ExprSigned8 (2);
-      PC += 3;
+      inc_PC(3);
       break;
 
     case 7:			/* LD  A,(nn)  */
       if (destreg == 7)
 	{
-	  *codeptr++ = 58;
+	  append_byte(0x3A);
 	  ExprAddress (1);
-	  PC += 3;
+	  inc_PC(3);
 	}
       else
 	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
@@ -442,8 +446,8 @@ LD_r_8bit_indrct (int destreg)
     case 0:
       if (destreg == 7)
 	{			/* LD   A,(BC)  */
-	  *codeptr++ = 10;
-	  ++PC;
+	  append_byte(0x0A);
+	  inc_PC(1);
 	}
       else
 	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
@@ -452,8 +456,8 @@ LD_r_8bit_indrct (int destreg)
     case 1:
       if (destreg == 7)
 	{			/* LD   A,(DE)  */
-	  *codeptr++ = 26;
-	  ++PC;
+	  append_byte(0x1A);
+	  inc_PC(1);
 	}
       else
 	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
@@ -489,36 +493,36 @@ LD_address_indrct (long exprptr)
       switch (sourcereg = CheckRegister16 ())
 	{
 	case 2:
-	  *codeptr++ = 34;	/* LD  (nn),HL  */
+	  append_byte(0x22);	/* LD  (nn),HL  */
 	  bytepos = 1;
-	  ++PC;
+	  inc_PC(1);
 	  break;
 
 	case 0:
 	case 1:		/* LD  (nn),dd   => dd: BC,DE,SP  */
 	case 3:
-	  *codeptr++ = 237;
-	  *codeptr++ = 67 + sourcereg * 16;
+	  append_byte(0xED);
+	  append_byte(0x43 + sourcereg * 0x10);
 	  bytepos = 2;
-	  PC += 2;
+	  inc_PC(2);
 	  break;
 
 	case 5:		/* LD  (nn),IX    ;    LD  (nn),IY   */
 	case 6:
 	  if (sourcereg == 5)
-	    *codeptr++ = 221;
+	    append_byte(0xDD);
 	  else
-	    *codeptr++ = 253;
-	  *codeptr++ = 34;
+	    append_byte(0xFD);
+	  append_byte(0x22);
 	  bytepos = 2;
-	  PC += 2;
+	  inc_PC(2);
 	  break;
 
 	case -1:
 	  if (CheckRegister8 () == 7)
 	    {
-	      *codeptr++ = 50;	/* LD  (nn),A  */
-	      ++PC;
+	      append_byte(0x32);	/* LD  (nn),A  */
+	      inc_PC(1);
 	      bytepos = 1;
 	    }
 	  else
@@ -542,7 +546,7 @@ LD_address_indrct (long exprptr)
   fseek (z80asmfile, exprptr, SEEK_SET);	/* rewind fileptr to beginning of address expression */
   GetSym ();
   ExprAddress (bytepos);	/* re-parse, evaluate, etc. */
-  PC += 2;
+  inc_PC(2);
 }
 
 
@@ -564,33 +568,33 @@ LD_16bit_reg (void)
 	      return;
 
 	    case 2:
-	      *codeptr++ = 42;	/* LD   HL,(nn)  */
+	      append_byte(0x2A);	/* LD   HL,(nn)  */
 	      bytepos = 1;
-	      ++PC;
+	      inc_PC(1);
 	      break;
 
 	    case 5:		/* LD  IX,(nn)    LD  IY,(nn)  */
 	    case 6:
 	      if (destreg == 5)
-		*codeptr++ = 221;
+		append_byte(0xDD);
 	      else
-		*codeptr++ = 253;
-	      *codeptr++ = 42;
+		append_byte(0xFD);
+	      append_byte(0x2A);
 	      bytepos = 2;
-	      PC += 2;
+	      inc_PC(2);
 	      break;
 
 	    default:
-	      *codeptr++ = 237;
-	      *codeptr++ = 75 + destreg * 16;
+	      append_byte(0xED);
+	      append_byte(0x4B + destreg * 0x10);
 	      bytepos = 2;
-	      PC += 2;
+	      inc_PC(2);
 	      break;
 	    }
 
 	  GetSym ();
 	  ExprAddress (bytepos);
-	  PC += 2;
+	  inc_PC(2);
 	}
       else
 	switch (sourcereg = CheckRegister16 ())
@@ -605,30 +609,30 @@ LD_16bit_reg (void)
 	      case 5:
 	      case 6:
 		if (destreg == 5)
-		  *codeptr++ = 221;
+		  append_byte(0xDD);
 		else
-		  *codeptr++ = 253;
-		*codeptr++ = 33;
+		  append_byte(0xFD);
+		append_byte(0x21);
 		bytepos = 2;
-		PC += 2;
+		inc_PC(2);
 		break;
 
 	      default:
-		*codeptr++ = destreg * 16 + 1;
+		append_byte(destreg * 0x10 + 0x01);
 		bytepos = 1;
-		++PC;
+		inc_PC(1);
 		break;
 	      }
 
 	    ExprAddress (bytepos);
-	    PC += 2;
+	    inc_PC(2);
 	    break;
 
 	  case 2:
 	    if (destreg == 3)
 	      {			/* LD  SP,HL  */
-		*codeptr++ = 249;
-		++PC;
+		append_byte(0xF9);
+		inc_PC(1);
 	      }
 	    else
 	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
@@ -639,11 +643,11 @@ LD_16bit_reg (void)
 	    if (destreg == 3)
 	      {
 		if (sourcereg == 5)
-		  *codeptr++ = 221;
+		  append_byte(0xDD);
 		else
-		  *codeptr++ = 253;
-		*codeptr++ = 249;
-		PC += 2;
+		  append_byte(0xFD);
+		append_byte(0xF9);
+		inc_PC(2);
 	      }
 	    else
 	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);

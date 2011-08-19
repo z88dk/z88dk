@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.21 2011-08-18 23:27:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.22 2011-08-19 15:53:58 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.21  2011-08-18 23:27:54  pauloscustodio
+/* Revision 1.22  2011-08-19 15:53:58  pauloscustodio
+/* BUG_0010 : heap corruption when reaching MAXCODESIZE
+/* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+/* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
+/*
+/* Revision 1.21  2011/08/18 23:27:54  pauloscustodio
 /* BUG_0009 : file read/write not tested for errors
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
@@ -186,6 +191,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "z80asm.h"
 #include "errors.h"
 #include "file.h"
+#include "codearea.h"
 
 /* external functions */
 enum symbols GetSym (void);
@@ -220,10 +226,8 @@ void UnDefineSym (void);
 
 /* global variables */
 extern FILE *z80asmfile, *listfile;
-extern unsigned char *codeptr, *codearea;
 extern char ident[], stringconst[];
 extern unsigned short DEFVPC;
-extern long PC;
 extern enum symbols sym;
 extern enum flag writeline, EOL;
 extern struct modules *modulehdr;
@@ -524,11 +528,11 @@ DEFS ()
 	    }
 	  if (constant >= 0)
 	    {
-	      if ((PC + constant) <= MAXCODESIZE)
+	      if ((get_PC() + constant) <= MAXCODESIZE)
 		{
-		  PC += constant;
+		  inc_PC(constant);
 
-                  while (constant--) *codeptr++ = (unsigned char)val;
+                  while (constant--) append_byte((unsigned char)val);
 		}
 	      else
 		{
@@ -667,7 +671,7 @@ DEFB (void)
 
   do
     {
-      if ((PC+1) > MAXCODESIZE) 
+      if ((get_PC()+1) > MAXCODESIZE) 
         {
            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
            return;
@@ -676,7 +680,7 @@ DEFB (void)
       GetSym ();
       if (!ExprUnsigned8 (bytepos))
 	break;			/* syntax error - get next line from file... */
-      ++PC;			/* DEFB allocated, update assembler PC */
+      inc_PC(1);			/* DEFB allocated, update assembler PC */
       ++bytepos;
 
       if (sym == newline)
@@ -699,7 +703,7 @@ DEFW (void)
 
   do
     {
-      if ((PC+2) > MAXCODESIZE) 
+      if ((get_PC()+2) > MAXCODESIZE) 
         {
            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
            return;
@@ -708,7 +712,7 @@ DEFW (void)
       GetSym ();
       if (!ExprAddress (bytepos))
 	break;			/* syntax error - get next line from file... */
-      PC += 2;			/* DEFW allocated, update assembler PC */
+      inc_PC(2);			/* DEFW allocated, update assembler PC */
       bytepos += 2;
 
       if (sym == newline)
@@ -731,7 +735,7 @@ DEFP (void)
 
   do
     {
-      if ((PC+3) > MAXCODESIZE) 
+      if ((get_PC()+3) > MAXCODESIZE) 
         {
            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
            return;
@@ -740,7 +744,7 @@ DEFP (void)
       GetSym ();
       if (!ExprAddress (bytepos))
 	break;			/* syntax error - get next line from file... */
-      PC += 2;			/* DEFW allocated, update assembler PC */
+      inc_PC(2);			/* DEFW allocated, update assembler PC */
       bytepos += 2;
 
 		/* Pointers must be specified as WORD,BYTE pairs separated by commas */ 
@@ -752,7 +756,7 @@ DEFP (void)
       GetSym ();
       if (!ExprUnsigned8 (bytepos))
 	break;			/* syntax error - get next line from file... */
-      PC += 1;			/* DEFB allocated, update assembler PC */
+      inc_PC(1);			/* DEFB allocated, update assembler PC */
       bytepos += 1;
 
       if (sym == newline)
@@ -775,7 +779,7 @@ DEFL (void)
 
   do
     {
-      if ((PC+4) > MAXCODESIZE) 
+      if ((get_PC()+4) > MAXCODESIZE) 
         {
            ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
            return;
@@ -784,7 +788,7 @@ DEFL (void)
       GetSym ();
       if (!ExprLong (bytepos))
 	break;			/* syntax error - get next line from file... */
-      PC += 4;			/* DEFL allocated, update assembler PC */
+      inc_PC(4);			/* DEFL allocated, update assembler PC */
       bytepos += 4;
 
       if (sym == newline)
@@ -812,7 +816,7 @@ DEFM (void)
 	{
 	  while (!feof (z80asmfile))
 	    {
-              if ((PC+1) > MAXCODESIZE) 
+              if ((get_PC()+1) > MAXCODESIZE) 
                 {
                   ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
                   return;
@@ -830,9 +834,9 @@ DEFM (void)
 		{
 		  if (constant != '\"')
 		    {
-                      *codeptr++ = (unsigned char)constant;
+                      append_byte((unsigned char)constant);
 		      ++bytepos;
-		      ++PC;
+		      inc_PC(1);
 		    }
 		  else
 		    {
@@ -850,7 +854,7 @@ DEFM (void)
 	}
       else
 	{ 
-          if ((PC+1) > MAXCODESIZE) 
+          if ((get_PC()+1) > MAXCODESIZE) 
             {
               ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
               return;
@@ -865,7 +869,7 @@ DEFM (void)
 	      break;
 	    }
 	  ++bytepos;
-	  ++PC;
+	  inc_PC(1);
 	}
     }
   while (sym != newline && sym != semicolon);
@@ -950,11 +954,10 @@ BINARY (void)
 	  Codesize = ftell(binfile);
 	  fseek(binfile, 0L, SEEK_SET);	/* file pointer to start of file */
 	  
-	  if ((codeptr - codearea + Codesize) <= MAXCODESIZE)
+	  if ((get_code_size() + Codesize) <= MAXCODESIZE)
 	    {
-          xfreadc(codeptr, Codesize, binfile);	/* read binary code */
-          codeptr += Codesize;							/* codeptr updated */
-	      PC += Codesize;
+		fread_codearea(binfile, Codesize);	/* read binary code */
+    		inc_PC(Codesize);
 	    }
 	  else
 	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);

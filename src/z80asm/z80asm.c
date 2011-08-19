@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.38 2011-08-19 10:20:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.39 2011-08-19 15:53:58 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.38  2011-08-19 10:20:32  pauloscustodio
+/* Revision 1.39  2011-08-19 15:53:58  pauloscustodio
+/* BUG_0010 : heap corruption when reaching MAXCODESIZE
+/* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+/* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
+/*
+/* Revision 1.38  2011/08/19 10:20:32  pauloscustodio
 /* - Factored code to read/write word from file into xfget_word/xfput_word.
 /* - Renamed ReadLong/WriteLong to xfget_long/xfput_long for symetry.
 /*
@@ -334,6 +339,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "options.h"
 #include "errors.h"
 #include "file.h"
+#include "codearea.h"
 
 /* external functions */
 void RemovePfixlist (struct expr *pfixexpr);
@@ -430,9 +436,6 @@ size_t sizeof_relocroutine = 73;
 char *reloctable = NULL, *relocptr = NULL;
 
 long listfileptr;
-unsigned char *codearea, *codeptr;
-size_t CODESIZE;
-long PC, oldPC;			/* Program Counter */
 unsigned short DEFVPC;		/* DEFVARS address counter */
 size_t EXPLICIT_ORIGIN;		/* origin defined from command line */
 time_t asmtime;			/* time   of assembly in seconds */
@@ -482,9 +485,9 @@ AssembleSourceFile (void)
 	  throw(FatalErrorException, "cannot open objfile");
 	}
 
-      PC = oldPC = 0;
+      set_PC(0); set_oldPC();
       copy (staticroot, &CURRENTMODULE->localroot, (int (*)(void*,void*)) cmpidstr, (void *(*)(void*)) createsym);
-      if (DefineDefSym (ASSEMBLERPC, PC, 0, &globalroot) == 0)
+      if (DefineDefSym (ASSEMBLERPC, get_PC(), 0, &globalroot) == 0)
 	{					/* Create standard 'ASMPC' identifier */
 						/* ERR_SYMBOL_REDEFINED - not expected */
 	  throw(EarlyReturnException, "unexpected return from DefineDefSym");
@@ -657,8 +660,6 @@ GetModuleSize (void)
 
 	  if (CURRENTMODULE->startoffset + size > MAXCODESIZE)
 	    ReportError (objfilename, 0, ERR_MAX_CODESIZE);
-	  else
-	    CODESIZE += size;
 	}
       fclose (objfile);
       return 0;
@@ -796,7 +797,7 @@ NewModule (void)
     try {
 	newm->nextmodule = NULL;
 	newm->mname = NULL;
-	newm->startoffset = CODESIZE;
+	newm->startoffset = get_code_size();
 	newm->origin = 65535;
 	newm->cfile = NULL;
 	newm->localroot = NULL;
@@ -1033,6 +1034,9 @@ main (int argc, char *argv[])
 
     /* start try..catch with finally to cleanup any allocated memory */
     try {
+	init_codearea_module();		/* init data for object file creation */
+
+
   writeline = ON;
   library = createlibrary = OFF;
   cpu_type = CPU_Z80;
@@ -1064,8 +1068,8 @@ main (int argc, char *argv[])
   time (&asmtime);
   date = asctime (localtime (&asmtime));	/* get current system time for date in list file */
 
-  codearea = (unsigned char *) xcalloc (MAXCODESIZE, sizeof (char));	/* Allocate Memory for Z80 machine code */
-  CODESIZE = 0;
+  
+  
 
   PAGELEN = 66;
   TOTALERRORS = 0;
@@ -1126,7 +1130,7 @@ main (int argc, char *argv[])
     {				/* Module loop */
       z80asmfile = listfile = objfile = errfile = NULL;
 
-      codeptr = codearea;	/* Pointer (PC)     to store z80 instruction */
+      init_codearea();		/* Pointer (PC)     to store z80 instruction */
       ERRORS = 0;
       ASSEMBLE_ERROR = ERR_NO_ERR;	/* General error flag */
 
@@ -1305,8 +1309,6 @@ main (int argc, char *argv[])
 
   if (libraryhdr != NULL)
     ReleaseLibraries ();	/* Release library information */
-  if (codearea != NULL)
-    xfree0(codearea);		/* Release area for machine code */
 
   if (autorelocate)
     if (reloctable != NULL)

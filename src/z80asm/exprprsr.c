@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.18 2011-08-18 23:27:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.19 2011-08-19 15:53:58 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.18  2011-08-18 23:27:54  pauloscustodio
+/* Revision 1.19  2011-08-19 15:53:58  pauloscustodio
+/* BUG_0010 : heap corruption when reaching MAXCODESIZE
+/* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+/* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
+/*
+/* Revision 1.18  2011/08/18 23:27:54  pauloscustodio
 /* BUG_0009 : file read/write not tested for errors
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
@@ -182,6 +187,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "options.h"
 #include "errors.h"
 #include "file.h"
+#include "codearea.h"
 
 /* external functions */
 enum symbols GetSym (void);
@@ -217,8 +223,6 @@ extern struct module *CURRENTMODULE;
 extern avltree *globalroot;
 extern enum symbols sym, pass1;
 extern char ident[], separators[];
-extern unsigned char *codearea, *codeptr;
-extern long PC;
 extern FILE *z80asmfile, *objfile;
 
 
@@ -546,7 +550,7 @@ ParseNumExpr (void)
 	pfixhdr->currentnode = NULL;
 	pfixhdr->rangetype = 0;
 	pfixhdr->stored = OFF;
-	pfixhdr->codepos = codeptr - codearea;
+	pfixhdr->codepos = get_code_size();
 	pfixhdr->infixexpr = NULL;
 	pfixhdr->infixptr = NULL;
 
@@ -595,11 +599,8 @@ StoreExpr (struct expr *pfixexpr, char range)
   unsigned char b;
 
   xfputc(range, objfile);	/* range of expression */
-  b = pfixexpr->codepos % 256U;
-  xfputc(b, objfile);		/* low byte of patchptr */
-  b = pfixexpr->codepos / 256U;
-  xfputc(b, objfile);		/* high byte of patchptr */
-  b = strlen (pfixexpr->infixexpr);
+  xfput_word(pfixexpr->codepos, objfile);	/* patchptr */
+  b = strlen(pfixexpr->infixexpr);
   xfputc(b, objfile);		/* length prefixed string */
   xfwritec(pfixexpr->infixexpr, (size_t) b, objfile);
   xfputc(0, objfile);		/* nul-terminate expression */
@@ -924,8 +925,9 @@ ExprLong (int listoffset)
 {
 
   struct expr *pfixexpr;
-  long constant, i;
+  long constant;
   int flag = 1;
+  size_t exprptr = get_code_size();	/* address of expression */
 
   if ((pfixexpr = ParseNumExpr ()) != NULL)
     {				/* parse numerical expression */
@@ -942,19 +944,16 @@ ExprLong (int listoffset)
 	    RemovePfixlist (pfixexpr);	/* no listing - evaluate during linking... */
 	  else
 	    {
-	      if (pfixexpr->rangetype & NOTEVALUABLE)
+	      if (pfixexpr->rangetype & NOTEVALUABLE) {
 		Pass2info (pfixexpr, RANGE_32SIGN, listoffset);
+	        }
 	      else
 		{
 		  constant = EvalPfixExpr (pfixexpr);
 		  RemovePfixlist (pfixexpr);
 		  if (constant >= LONG_MIN && constant <= LONG_MAX)
 		    {
-		      for (i = 0; i < 4; i++)
-			{
-			  *(codeptr + i) = constant & 255;
-			  constant >>= 8;
-			}
+		      append_long(constant);
 		    }
 		  else
 		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
@@ -965,7 +964,9 @@ ExprLong (int listoffset)
   else
     flag = 0;
 
-  codeptr += 4;
+  if (get_code_size() == exprptr)
+      append_long(0);			/* reserve space if not yet reserved */
+
   return flag;
 }
 
@@ -977,6 +978,7 @@ ExprAddress (int listoffset)
   struct expr *pfixexpr;
   long constant;
   int flag = 1;
+  size_t exprptr = get_code_size();	/* address of expression */
 
   if ((pfixexpr = ParseNumExpr ()) != NULL)
     {				/* parse numerical expression */
@@ -993,16 +995,16 @@ ExprAddress (int listoffset)
 	    RemovePfixlist (pfixexpr);	/* no listing - evaluate during linking... */
 	  else
 	    {
-	      if (pfixexpr->rangetype & NOTEVALUABLE)
+	      if (pfixexpr->rangetype & NOTEVALUABLE) {
 		Pass2info (pfixexpr, RANGE_16CONST, listoffset);
+	        }
 	      else
 		{
 		  constant = EvalPfixExpr (pfixexpr);
 		  RemovePfixlist (pfixexpr);
 		  if (constant >= -32768 && constant <= 65535)
 		    {
-		      *codeptr = (unsigned short) constant % 256U;
-		      *(codeptr + 1) = (unsigned short) constant / 256U;
+		      append_word(constant);
 		    }
 		  else
 		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
@@ -1013,7 +1015,9 @@ ExprAddress (int listoffset)
   else
     flag = 0;
 
-  codeptr += 2;
+  if (get_code_size() == exprptr)
+      append_word(0);			/* reserve space if not yet reserved */
+
   return flag;
 }
 
@@ -1024,6 +1028,7 @@ ExprUnsigned8 (int listoffset)
   struct expr *pfixexpr;
   long constant;
   int flag = 1;
+  size_t exprptr = get_code_size();	/* address of expression */
 
   if ((pfixexpr = ParseNumExpr ()) != NULL)
     {				/* parse numerical expression */
@@ -1040,8 +1045,9 @@ ExprUnsigned8 (int listoffset)
 	    RemovePfixlist (pfixexpr);	/* no listing - evaluate during linking... */
 	  else
 	    {
-	      if (pfixexpr->rangetype & NOTEVALUABLE)
+	      if (pfixexpr->rangetype & NOTEVALUABLE) {
 		Pass2info (pfixexpr, RANGE_8UNSIGN, listoffset);
+	        }
 	      else
 		{
 		  constant = EvalPfixExpr (pfixexpr);
@@ -1049,7 +1055,7 @@ ExprUnsigned8 (int listoffset)
 
                   /* BUG_0004 add test Integer out of range error */
                   if (constant >= -128 && constant <= 255) {
-	       	      *codeptr = (unsigned char) constant;
+	       	      append_byte((unsigned char) constant);
 		  }
 		  else {
 		      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
@@ -1061,7 +1067,9 @@ ExprUnsigned8 (int listoffset)
   else
     flag = 0;
 
-  ++codeptr;
+  if (get_code_size() == exprptr)
+      append_byte(0);			/* reserve space if not yet reserved */
+
   return flag;
 }
 
@@ -1073,13 +1081,14 @@ ExprSigned8 (int listoffset)
   struct expr *pfixexpr;
   long constant;
   int flag = 1;
+  size_t exprptr = get_code_size();	/* address of expression */
 
   /* BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary */
   switch (sym)
     {
     case rparen:
-	*codeptr++ = 0;	    /* offset zero */
-	return 1; 	    /* OK */
+	append_byte(0);	    /* offset zero */
+	return 1; 	    /* OK, zero already stored */
 	  
     case plus:
     case minus: 	    /* + or - expected */
@@ -1104,14 +1113,15 @@ ExprSigned8 (int listoffset)
 	    RemovePfixlist (pfixexpr);	/* no listing - evaluate during linking... */
 	  else
 	    {
-	      if (pfixexpr->rangetype & NOTEVALUABLE)
+	      if (pfixexpr->rangetype & NOTEVALUABLE) {
 		Pass2info (pfixexpr, RANGE_8SIGN, listoffset);
+	      }
 	      else
 		{
 		  constant = EvalPfixExpr (pfixexpr);
 		  RemovePfixlist (pfixexpr);
 		  if (constant >= -128 && constant <= 255)
-		    *codeptr = (char) constant;
+		    append_byte((unsigned char) constant);
 		  else
 		    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
 		}
@@ -1121,7 +1131,9 @@ ExprSigned8 (int listoffset)
   else
     flag = 0;
 
-  ++codeptr;
+  if (get_code_size() == exprptr)
+      append_byte(0);			/* reserve space if not yet reserved */
+
   return flag;
 }
 

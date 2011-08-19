@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.23 2011-08-05 20:11:02 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.24 2011-08-19 15:53:58 pauloscustodio Exp $ */
 /* $Log: z80instr.c,v $
-/* Revision 1.23  2011-08-05 20:11:02  pauloscustodio
+/* Revision 1.24  2011-08-19 15:53:58  pauloscustodio
+/* BUG_0010 : heap corruption when reaching MAXCODESIZE
+/* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+/* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
+/*
+/* Revision 1.23  2011/08/05 20:11:02  pauloscustodio
 /* CH_0004 : Exception mechanism to handle fatal errors
 /* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
 /* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
@@ -172,6 +177,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "symbol.h"
 #include "options.h"
 #include "errors.h"
+#include "codearea.h"
 
 /* external functions */
 struct expr *ParseNumExpr (void);
@@ -201,8 +207,6 @@ void Subroutine_addr (int opc0, int opc);
 
 /* global variables */
 extern FILE *z80asmfile;
-extern unsigned char *codeptr, *codearea;
-extern long PC;
 extern struct module *CURRENTMODULE;
 extern enum symbols GetSym (void), sym;
 
@@ -218,25 +222,25 @@ PushPop_instr (int opcode)
       case REG16_BC:
       case REG16_DE:
       case REG16_HL:
-        *codeptr++ = opcode + qq * 16;
-        ++PC;
+        append_byte(opcode + qq * 0x10);
+        inc_PC(1);
         break;
 
       case REG16_AF:
-        *codeptr++ = opcode + 48;
-        ++PC;
+        append_byte(opcode + 0x30);
+        inc_PC(1);
         break;
 
       case REG16_IX:
-        *codeptr++ = 221;
-        *codeptr++ = opcode + 32;
-        PC += 2;
+        append_byte(0xDD);
+        append_byte(opcode + 0x20);
+        inc_PC(2);
         break;
 
       case REG16_IY:
-        *codeptr++ = 253;
-        *codeptr++ = opcode + 32;
-        PC += 2;
+        append_byte(0xFD);
+        append_byte(opcode + 0x20);
+        inc_PC(2);
         break;
 
       default:
@@ -258,20 +262,20 @@ RET (void)
     {
     case name:
       if ((constant = CheckCondition ()) != -1)
-        *codeptr++ = (unsigned char)(192 + constant * 8);        /* RET cc  instruction opcode */
+        append_byte((unsigned char)(0xC0 + constant * 0x08));        /* RET cc  instruction opcode */
       else
         ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       break;
 
     case newline:
-      *codeptr++ = 201;
+      append_byte(0xC9);
       break;
 
     default:
       ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
       return;
     }
-  ++PC;
+  inc_PC(1);
 }
 
 
@@ -291,27 +295,27 @@ EX (void)
                   if ( (cpu_type & CPU_RABBIT) )
                     {
                       /* Instruction code changed */
-                      *codeptr++ = 0xED;
-                      *codeptr++ = 0x54;
-                      PC+=2;
+                      append_byte(0xED);
+                      append_byte(0x54);
+                      inc_PC(2);
                     }
                   else
                     {
-                      *codeptr++ = 227;	/* EX  (SP),HL  */
-                      ++PC;
+                      append_byte(0xE3);	/* EX  (SP),HL  */
+                      inc_PC(1);
                     }
                   break;
 
                 case REG16_IX:
-                  *codeptr++ = 221;
-                  *codeptr++ = 227;	/* EX  (SP),IX  */
-                  PC += 2;
+                  append_byte(0xDD);
+                  append_byte(0xE3);	/* EX  (SP),IX  */
+                  inc_PC(2);
                   break;
 
                 case REG16_IY:
-                  *codeptr++ = 253;
-                  *codeptr++ = 227;	/* EX  (SP),IY  */
-                  PC += 2;
+                  append_byte(0xFD);
+                  append_byte(0xE3);	/* EX  (SP),IY  */
+                  inc_PC(2);
                   break;
 
                 default:
@@ -336,8 +340,8 @@ EX (void)
             if (GetSym () == name)
               if (CheckRegister16 () == 2)
                 {
-                  *codeptr++ = 235;
-                  ++PC;
+                  append_byte(0xEB);
+                  inc_PC(1);
                 }
               else
                 ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
@@ -352,8 +356,8 @@ EX (void)
             if (GetSym () == name)
               if (CheckRegister16 () == 4)
                 {
-                  *codeptr++ = 8;
-                  ++PC;
+                  append_byte(0x08);
+                  inc_PC(1);
                 }
               else
                 ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
@@ -402,9 +406,9 @@ OUT (void)
                     break;
 
                   default:
-                    *codeptr++ = 237;
-                    *codeptr++ = (unsigned char)(65 + reg * 8);  /* OUT (C),r  */
-                    PC += 2;
+                    append_byte(0xED);
+                    append_byte((unsigned char)(0x41 + reg * 0x08));  /* OUT (C),r  */
+                    inc_PC(2);
                     break;
                   }
               else
@@ -416,10 +420,10 @@ OUT (void)
         }
       else
         {
-          *codeptr++ = 211;
+          append_byte(0xD3);
           if (!ExprUnsigned8 (1))
             return;
-          PC += 2;
+          inc_PC(2);
           if (sym == rparen)
             if (GetSym () == comma)
               if (GetSym () == name)
@@ -476,19 +480,19 @@ IN (void)
           switch (CheckRegister8 ())
             {
             case 1:
-              *codeptr++ = 237;
-              *codeptr++ = (unsigned char)(64 + inreg * 8);      /* IN r,(C) */
-              PC += 2;
+              append_byte(0xED);
+              append_byte((unsigned char)(0x40 + inreg * 0x08));      /* IN r,(C) */
+              inc_PC(2);
               break;
 
             case -1:
               if (inreg == 7)
                 {
-                  *codeptr++ = 219;
+                  append_byte(0xDB);
                   if (ExprUnsigned8 (1))
                     if (sym != rparen)
                       ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
-                  PC += 2;
+                  inc_PC(2);
                 }
               else
                 ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
@@ -529,19 +533,19 @@ IM (void)
           switch (constant)
             {
             case 0:
-              *codeptr++ = 237;
-              *codeptr++ = 70;	/* IM 0   */
+              append_byte(0xED);
+              append_byte(0x46);	/* IM 0   */
               break;
             case 1:
-              *codeptr++ = 237;
-              *codeptr++ = 86;	/* IM 1  */
+              append_byte(0xED);
+              append_byte(0x56);	/* IM 1  */
               break;
             case 2:
-              *codeptr++ = 237;
-              *codeptr++ = 94;	/* IM 2  */
+              append_byte(0xED);
+              append_byte(0x5E);	/* IM 2  */
               break;
             }
-          PC += 2;
+          inc_PC(2);
         }
       RemovePfixlist (postfixexpr);	/* remove linked list, because expr. was evaluated */
     }
@@ -571,8 +575,8 @@ RST (void)
                 }
               else
                 {
-                  *codeptr++ = (unsigned char)(199 + constant);  /* RST  00H, ... 38H */
-                  ++PC;
+                  append_byte((unsigned char)(0xC7 + constant));  /* RST  00H, ... 38H */
+                  inc_PC(1);
                 }
             }
           else
@@ -589,8 +593,8 @@ CALLOZ (void)
   long constant;
   struct expr *postfixexpr;
 
-  *codeptr++ = 231;		/* RST 20H instruction */
-  ++PC;
+  append_byte(0xE7);		/* RST 20H instruction */
+  inc_PC(1);
 
   if (GetSym () == lparen)
     GetSym ();			/* Optional parenthesis around expression */
@@ -604,14 +608,13 @@ CALLOZ (void)
 	  constant = EvalPfixExpr (postfixexpr);
 	  if ((constant > 0) && (constant <= 255))
 	    {
-              *codeptr++ = (unsigned char)constant;    /* 1 byte OZ parameter */
-	      ++PC;
+              append_byte((unsigned char)constant);    /* 1 byte OZ parameter */
+	      inc_PC(1);
 	    }
 	  else if ((constant > 255) && (constant <= 65535))
 	    {
-              *codeptr++ = (unsigned char)(constant & 255);      /* 2 byte OZ parameter */
-              *codeptr++ = (unsigned char)(constant >> 8);
-	      PC += 2;
+              append_word(constant);	/* 2 byte OZ parameter */
+	      inc_PC(2);
 	    }
 	  else
 	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
@@ -627,8 +630,8 @@ CALLPKG (void)
   long constant;
   struct expr *postfixexpr;
 
-  *codeptr++ = 0xCF;		/* RST 08H instruction */
-  ++PC;
+  append_byte(0xCF);		/* RST 08H instruction */
+  inc_PC(1);
 
   if (GetSym () == lparen)
     GetSym ();			/* Optional parenthesis around expression */
@@ -642,9 +645,8 @@ CALLPKG (void)
 	  constant = EvalPfixExpr (postfixexpr);
 	  if ((constant >= 0) && (constant <= 65535))
 	    {
-              *codeptr++ = (unsigned char)(constant % 256);      /* 2 byte parameter always */
-              *codeptr++ = (unsigned char)(constant / 256);
-	      PC += 2;
+              append_word(constant);      /* 2 byte parameter always */
+	      inc_PC(2);
 	    }
 	  else
 	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
@@ -660,11 +662,11 @@ INVOKE (void)
   struct expr *postfixexpr;
 
   if (ti83plus == ON)
-    *codeptr++ = 0xEF;		/* Ti83Plus: RST 28H instruction */
+    append_byte(0xEF);		/* Ti83Plus: RST 28H instruction */
   else
-    *codeptr++ = 0xCD;		/* Ti83: CALL */
+    append_byte(0xCD);		/* Ti83: CALL */
 
-  ++PC;
+  inc_PC(1);
 
   if (GetSym () == lparen)
     GetSym ();			/* Optional parenthesis around expression */
@@ -678,9 +680,8 @@ INVOKE (void)
 	  constant = EvalPfixExpr (postfixexpr);
 	  if ((constant >= 0) && (constant <= 65535))
 	    {
-              *codeptr++ = (unsigned char)(constant % 256);      /* 2 byte parameter always */
-              *codeptr++ = (unsigned char)(constant / 256);
-	      PC += 2;
+              append_word(constant);      /* 2 byte parameter always */
+	      inc_PC(2);
 	    }
 	  else
 	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
@@ -695,8 +696,8 @@ FPP (void)
   long constant;
   struct expr *postfixexpr;
 
-  *codeptr++ = 223;		/* RST 18H instruction */
-  ++PC;
+  append_byte(0xDF);		/* RST 18H instruction */
+  inc_PC(1);
 
   if (GetSym () == lparen)
     GetSym ();			/* Optional parenthesis around expression */
@@ -710,8 +711,8 @@ FPP (void)
 	  constant = EvalPfixExpr (postfixexpr);
 	  if ((constant > 0) && (constant < 255))
 	    {
-              *codeptr++ = (unsigned char)constant;    /* 1 byte OZ parameter */
-	      ++PC;
+              append_byte((unsigned char)constant);    /* 1 byte OZ parameter */
+	      inc_PC(1);
 	    }
 	  else
 	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
@@ -750,79 +751,79 @@ Subroutine_addr (int opcode0, int opcode)
 
         switch ( constant ) {
         case FLAGS_NZ:  /* nz */
-          *codeptr++ =  0x28;  /* jr z */
-          *codeptr++ = 0x03;
-          *codeptr++ = opcode0;           
-          PC += 2;
+          append_byte(0x28);  /* jr z */
+          append_byte(0x03);
+          append_byte(opcode0);           
+          inc_PC(2);
           break;
         case FLAGS_Z:  /* z */
-          *codeptr++ = 0x20;  /* jr nz */
-          *codeptr++ = 0x03;
-          *codeptr++ = opcode0;           
-          PC += 2;
+          append_byte(0x20);  /* jr nz */
+          append_byte(0x03);
+          append_byte(opcode0);           
+          inc_PC(2);
           break;
         case FLAGS_NC:  /* nc */
-          *codeptr++ = 0x38;  /* jr c */
-          *codeptr++ = 0x03;
-          *codeptr++ = opcode0;           
-          PC += 2;
+          append_byte(0x38);  /* jr c */
+          append_byte(0x03);
+          append_byte(opcode0);           
+          inc_PC(2);
           break;
         case FLAGS_C:  /* c */
-          *codeptr++ = 0x30;  /* jr nc */
-          *codeptr++ = 0x03;
-          *codeptr++ = opcode0;           
-          PC += 2;
+          append_byte(0x30);  /* jr nc */
+          append_byte(0x03);
+          append_byte(opcode0);           
+          inc_PC(2);
           break;
         case FLAGS_PO:  /* po */
-          *codeptr++ =  0xea; /* jp pe */
+          append_byte(0xea); /* jp pe */
           sprintf(buffer,"ASMPC+6\n");
           SetTemporaryLine(buffer);
           GetSym();
           ExprAddress (1);
           EOL = OFF;
-          *codeptr++ = 205;
-          PC += 3;
+          append_byte(0xCD);
+          inc_PC(3);
           break;
         case FLAGS_PE:  /* pe */
-          *codeptr++ = 0xe2; /* jp po */
+          append_byte(0xe2); /* jp po */
           sprintf(buffer,"ASMPC+6\n");
           SetTemporaryLine(buffer);
           GetSym();
           ExprAddress (1);
           EOL = OFF;
-          *codeptr++ = 205;
-          PC += 3;
+          append_byte(0xCD);
+          inc_PC(3);
           break;
         case FLAGS_P:  /* p */
-          *codeptr++ =  0xfa; /* jp m */
+          append_byte(0xfa); /* jp m */
           sprintf(buffer,"ASMPC+6\n");
           SetTemporaryLine(buffer);
           GetSym();
           ExprAddress (1);
           EOL = OFF;
-          *codeptr++ = 205;
-          PC += 3;
+          append_byte(0xCD);
+          inc_PC(3);
           break;
         case FLAGS_M:  /* m */
-          *codeptr++ = 0xf2; /* jp p */
+          append_byte(0xf2); /* jp p */
           sprintf(buffer,"ASMPC+6\n");
           SetTemporaryLine(buffer);
           GetSym();
           ExprAddress (1);
           EOL = OFF;
-          *codeptr++ = 205;
-          PC += 3;
+          append_byte(0xCD);
+          inc_PC(3);
           break;
         }
       } else {
-      *codeptr++ = (unsigned char)(opcode + constant * 8);       /* get instruction opcode */
+      append_byte((unsigned char)(opcode + constant * 0x08));       /* get instruction opcode */
     }
     GetSym();
   } else {
-    *codeptr++ = opcode0;	/* JP nn, CALL nn */
+    append_byte(opcode0);	/* JP nn, CALL nn */
   }
   ExprAddress (1);
-  PC += 3;
+  inc_PC(3);
 }
 
 
@@ -838,20 +839,20 @@ JP_instr (int opc0, int opc)
       switch (CheckRegister16 ())
 	{
 	case 2:		/* JP (HL) */
-	  *codeptr++ = 233;
-	  ++PC;
+	  append_byte(0xE9);
+	  inc_PC(1);
 	  break;
 
 	case 5:		/* JP (IX) */
-	  *codeptr++ = 221;
-	  *codeptr++ = 233;
-	  PC += 2;
+	  append_byte(0xDD);
+	  append_byte(0xE9);
+	  inc_PC(2);
 	  break;
 
 	case 6:		/* JP (IY) */
-	  *codeptr++ = 253;
-	  *codeptr++ = 233;
-	  PC += 2;
+	  append_byte(0xFD);
+	  append_byte(0xE9);
+	  inc_PC(2);
 	  break;
 
 	case -1:
@@ -885,7 +886,7 @@ JR (void)
         case FLAGS_Z:
         case FLAGS_NC:
         case FLAGS_C:
-          *codeptr++ = (unsigned char)(32 + constant * 8);
+          append_byte((unsigned char)(0x20 + constant * 0x08));
           if (GetSym () == comma)
             {
               GetSym ();	/* point at start of address expression */
@@ -898,7 +899,7 @@ JR (void)
             }
 
         case -1:
-          *codeptr++ = 24;	/* opcode for JR  e */
+          append_byte(0x18);	/* opcode for JR  e */
           break;		/* identifier not a condition id - check for legal expression */
 
         default:
@@ -907,22 +908,22 @@ JR (void)
           return;
         }
     }
-  PC += 2;			/* assembler PC points at next instruction */
+  inc_PC(2);			/* assembler PC points at next instruction */
   if ((postfixexpr = ParseNumExpr ()) != NULL)
     {				/* get numerical expression */
       if (postfixexpr->rangetype & NOTEVALUABLE)
         {
           NewJRaddr ();		/* Amend another JR PC address to the list */
           Pass2info (postfixexpr, RANGE_JROFFSET, 1);
-          ++codeptr;		/* update code pointer */
+          append_byte(0);	/* update code pointer */
         }
       else
         {
           constant = EvalPfixExpr (postfixexpr);
-          constant -= PC;
+          constant -= get_PC();
           RemovePfixlist (postfixexpr);		/* remove linked list - expression evaluated. */
           if ((constant >= -128) && (constant <= 127))
-            *codeptr++ = (unsigned char)(constant);      /* opcode is stored, now store relative jump */
+            append_byte((unsigned char)(constant));      /* opcode is stored, now store relative jump */
           else
             ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
         }
@@ -936,29 +937,29 @@ DJNZ (void)
   struct expr *postfixexpr;
   long constant;
 
-  *codeptr++ = 16;		/* DJNZ opcode */
+  append_byte(0x10);		/* DJNZ opcode */
 
   if (GetSym () == comma)
     {
       GetSym ();			/* optional comma */
     }
 
-  PC += 2;
+  inc_PC(2);
   if ((postfixexpr = ParseNumExpr ()) != NULL)
     {				/* get numerical expression */
       if (postfixexpr->rangetype & NOTEVALUABLE)
         {
           NewJRaddr ();		/* Amend another JR PC address to the list */
           Pass2info (postfixexpr, RANGE_JROFFSET, 1);
-          ++codeptr;		/* update code pointer */
+          append_byte(0);	/* update code pointer */
         }
       else
         {
           constant = EvalPfixExpr (postfixexpr);
-          constant -= PC;
+          constant -= get_PC();
           RemovePfixlist (postfixexpr);		/* remove linked list - expression evaluated. */
           if ((constant >= -128) && (constant <= 127))
-            *codeptr++ = (unsigned char)(constant);      /* opcode is stored, now store relative jump */
+            append_byte((unsigned char)(constant));      /* opcode is stored, now store relative jump */
           else
             ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant);
         }
@@ -973,7 +974,7 @@ NewJRaddr (void)
 
     newJRPC = xcalloc_struct(struct JRPC);
     newJRPC->nextref = NULL;
-    newJRPC->PCaddr = (unsigned short)PC;
+    newJRPC->PCaddr = (unsigned short)get_PC();
 
     if (CURRENTMODULE->JRaddr->firstref == NULL)
     {				/* no list yet */
@@ -1012,8 +1013,8 @@ ADD (void)
           reg16 = CheckRegister16 ();
           if (reg16 >= 0 && reg16 <= 3)
             {
-              *codeptr++ = 9 + 16 * reg16;	/* ADD HL,rr */
-              ++PC;
+              append_byte(0x09 + 0x10 * reg16);	/* ADD HL,rr */
+              inc_PC(1);
             }
           else
             ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
@@ -1051,11 +1052,11 @@ ADD (void)
               return;
             }
           if (acc16 == 5)
-            *codeptr++ = 221;
+            append_byte(0xDD);
           else
-            *codeptr++ = 253;
-          *codeptr++ = 9 + 16 * reg16;
-          PC += 2;
+            append_byte(0xFD);
+          append_byte(0x09 + 0x10 * reg16);
+          inc_PC(2);
         }
       else
         ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);
@@ -1090,9 +1091,9 @@ SBC (void)
 	  reg16 = CheckRegister16 ();
 	  if (reg16 >= 0 && reg16 <= 3)
 	    {
-	      *codeptr++ = 237;
-	      *codeptr++ = 66 + 16 * reg16;
-	      PC += 2;
+	      append_byte(0xED);
+	      append_byte(0x42 + 0x10 * reg16);
+	      inc_PC(2);
 	    }
 	  else
 	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
@@ -1131,9 +1132,9 @@ ADC (void)
 	  reg16 = CheckRegister16 ();
 	  if (reg16 >= 0 && reg16 <= 3)
 	    {
-	      *codeptr++ = 237;
-	      *codeptr++ = 74 + 16 * reg16;
-	      PC += 2;
+	      append_byte(0xED);
+	      append_byte(0x4A + 0x10 * reg16);
+	      inc_PC(2);
 	    }
 	  else
 	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
@@ -1162,19 +1163,19 @@ ArithLog8_instr (int opcode)
     switch (reg = IndirectRegisters ())
       {
       case 2:
-        *codeptr++ = 128 + opcode * 8 + 6;	/* xxx  A,(HL) */
-        ++PC;
+        append_byte(0x80 + opcode * 0x08 + 0x06);	/* xxx  A,(HL) */
+        inc_PC(1);
         break;
 
       case 5:			/* xxx A,(IX+d) */
       case 6:
         if (reg == 5)
-          *codeptr++ = 221;
+          append_byte(0xDD);
         else
-          *codeptr++ = 253;	/* xxx A,(IY+d) */
-        *codeptr++ = 128 + opcode * 8 + 6;
+          append_byte(0xFD);	/* xxx A,(IY+d) */
+        append_byte(0x80 + opcode * 0x08 + 0x06);
         ExprSigned8 (2);
-        PC += 3;
+        inc_PC(3);
         break;
 
       default:
@@ -1188,9 +1189,9 @@ ArithLog8_instr (int opcode)
         {
           /* 8bit register wasn't found, try to evaluate an expression */
         case -1:
-          *codeptr++ = 192 + opcode * 8 + 6;	/* xxx  A,n */
+          append_byte(0xC0 + opcode * 0x08 + 0x06);	/* xxx  A,n */
           ExprUnsigned8 (1);
-          PC += 2;
+          inc_PC(2);
           break;
 
         case 6:		/* xxx A,F illegal */
@@ -1207,8 +1208,8 @@ ArithLog8_instr (int opcode)
                   ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
                   return;
                 }
-              *codeptr++ = 221;
-              ++PC;
+              append_byte(0xDD);
+              inc_PC(1);
             }
           else if (reg & 16)
             {			/* IYl or IYh */
@@ -1217,13 +1218,13 @@ ArithLog8_instr (int opcode)
                   ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
                   return;
                 }
-              *codeptr++ = 253;
-              ++PC;
+              append_byte(0xFD);
+              inc_PC(1);
             }
           reg &= 7;
 
-          *codeptr++ = (unsigned char)(128 + opcode * 8 + reg);  /* xxx  A,r */
-          ++PC;
+          append_byte((unsigned char)(0x80 + opcode * 0x08 + reg));  /* xxx  A,r */
+          inc_PC(1);
           break;
         }
     }
@@ -1248,20 +1249,20 @@ INC (void)
       break;
 
     case 5:
-      *codeptr++ = 221;
-      *codeptr++ = 35;
-      PC += 2;
+      append_byte(0xDD);
+      append_byte(0x23);
+      inc_PC(2);
       break;
 
     case 6:
-      *codeptr++ = 253;
-      *codeptr++ = 35;
-      PC += 2;
+      append_byte(0xFD);
+      append_byte(0x23);
+      inc_PC(2);
       break;
 
     default:
-      *codeptr++ = 3 + reg16 * 16;
-      ++PC;
+      append_byte(0x03 + reg16 * 0x10);
+      inc_PC(1);
       break;
     }
 }
@@ -1284,20 +1285,20 @@ DEC (void)
       break;
 
     case 5:
-      *codeptr++ = 221;
-      *codeptr++ = 43;
-      PC += 2;
+      append_byte(0xDD);
+      append_byte(0x2B);
+      inc_PC(2);
       break;
 
     case 6:
-      *codeptr++ = 253;
-      *codeptr++ = 43;
-      PC += 2;
+      append_byte(0xFD);
+      append_byte(0x2B);
+      inc_PC(2);
       break;
 
     default:
-      *codeptr++ = 11 + reg16 * 16;
-      ++PC;
+      append_byte(0x0B + reg16 * 0x10);
+      inc_PC(1);
       break;
     }
 }
@@ -1313,19 +1314,19 @@ IncDec_8bit_instr (int opcode)
       switch (reg = IndirectRegisters ())
         {
         case 2:
-          *codeptr++ = 48 + opcode;	/* INC/DEC (HL) */
-          ++PC;
+          append_byte(0x30 + opcode);	/* INC/DEC (HL) */
+          inc_PC(1);
           break;
 
         case 5:		/* INC/DEC (IX+d) */
         case 6:
           if (reg == 5)
-            *codeptr++ = 221;
+            append_byte(0xDD);
           else
-            *codeptr++ = 253;	/* INC/DEC (IY+d) */
-          *codeptr++ = 48 + opcode;
+            append_byte(0xFD);	/* INC/DEC (IY+d) */
+          append_byte(0x30 + opcode);
           ExprSigned8 (2);
-          PC += 3;
+          inc_PC(3);
           break;
 
 
@@ -1352,9 +1353,9 @@ IncDec_8bit_instr (int opcode)
               ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
               return;
             }
-          *codeptr++ = 221;
-          *codeptr++ = (unsigned char)((reg & 7) * 8 + opcode);  /* INC/DEC  ixh,ixl */
-          PC += 2;
+          append_byte(0xDD);
+          append_byte((unsigned char)((reg & 0x07) * 0x08 + opcode));  /* INC/DEC  ixh,ixl */
+          inc_PC(2);
           break;
 
         case 20:
@@ -1364,14 +1365,14 @@ IncDec_8bit_instr (int opcode)
               ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
               return;
             }
-          *codeptr++ = 253;
-          *codeptr++ = (unsigned char)((reg & 7) * 8 + opcode);  /* INC/DEC  iyh,iyl */
-          PC += 2;
+          append_byte(0xFD);
+          append_byte((unsigned char)((reg & 0x07) * 0x08 + opcode));  /* INC/DEC  iyh,iyl */
+          inc_PC(2);
           break;
 
         default:
-          *codeptr++ = (unsigned char)(reg * 8 + opcode);        /* INC/DEC  r */
-          ++PC;
+          append_byte((unsigned char)(reg * 0x08 + opcode));        /* INC/DEC  r */
+          inc_PC(1);
           break;
         }
     }
@@ -1404,21 +1405,21 @@ BitTest_instr (int opcode)
 		      switch ((reg = IndirectRegisters ()))
 			{
 			case 2:
-			  *codeptr++ = 203;	/* (HL)  */
-                          *codeptr++ = (unsigned char)(opcode + bitnumber * 8 + 6);
-			  PC += 2;
+			  append_byte(0xCB);	/* (HL)  */
+                          append_byte((unsigned char)(opcode + bitnumber * 0x08 + 0x06));
+			  inc_PC(2);
 			  break;
 
 			case 5:
 			case 6:
 			  if (reg == 5)
-			    *codeptr++ = 221;
+			    append_byte(0xDD);
 			  else
-			    *codeptr++ = 253;
-			  *codeptr++ = 203;
+			    append_byte(0xFD);
+			  append_byte(0xCB);
 			  ExprSigned8 (2);
-                          *codeptr++ = (unsigned char)(opcode + bitnumber * 8 + 6);
-			  PC += 4;
+                          append_byte((unsigned char)(opcode + bitnumber * 0x08 + 0x06));
+			  inc_PC(4);
 			  break;
 
 			default:
@@ -1439,9 +1440,9 @@ BitTest_instr (int opcode)
 			  break;
 
 			default:
-			  *codeptr++ = 203;
-                          *codeptr++ = (unsigned char)(opcode + bitnumber * 8 + reg);
-			  PC += 2;
+			  append_byte(0xCB);
+                          append_byte((unsigned char)(opcode + bitnumber * 0x08 + reg));
+			  inc_PC(2);
 			}
 		    }
 		}
@@ -1465,21 +1466,21 @@ RotShift_instr (int opcode)
     switch ((reg = IndirectRegisters ()))
       {
       case 2:
-	*codeptr++ = 203;
-	*codeptr++ = opcode * 8 + 6;
-	PC += 2;
+	append_byte(0xCB);
+	append_byte(opcode * 0x08 + 0x06);
+	inc_PC(2);
 	break;
 
       case 5:
       case 6:
 	if (reg == 5)
-	  *codeptr++ = 221;
+	  append_byte(0xDD);
 	else
-	  *codeptr++ = 253;
-	*codeptr++ = 203;
+	  append_byte(0xFD);
+	append_byte(0xCB);
 	ExprSigned8 (2);
-	*codeptr++ = opcode * 8 + 6;
-	PC += 4;
+	append_byte(opcode * 0x08 + 0x06);
+	inc_PC(4);
 	break;
 
       default:
@@ -1499,9 +1500,9 @@ RotShift_instr (int opcode)
 	  break;
 
 	default:
-	  *codeptr++ = 203;
-          *codeptr++ = (unsigned char)(opcode * 8 + reg);
-	  PC += 2;
+	  append_byte(0xCB);
+          append_byte((unsigned char)(opcode * 0x08 + reg));
+	  inc_PC(2);
 	}
     }
 }

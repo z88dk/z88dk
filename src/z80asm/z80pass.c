@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.18 2011-08-19 10:20:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.19 2011-08-19 15:53:58 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.18  2011-08-19 10:20:32  pauloscustodio
+/* Revision 1.19  2011-08-19 15:53:58  pauloscustodio
+/* BUG_0010 : heap corruption when reaching MAXCODESIZE
+/* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+/* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
+/*
+/* Revision 1.18  2011/08/19 10:20:32  pauloscustodio
 /* - Factored code to read/write word from file into xfget_word/xfput_word.
 /* - Renamed ReadLong/WriteLong to xfget_long/xfput_long for symetry.
 /*
@@ -179,6 +184,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "z80asm.h"
 #include "errors.h"
 #include "file.h"
+#include "codearea.h"
 
 /* external functions */
 void Skipline (FILE *fptr);
@@ -224,9 +230,7 @@ extern char *date, line[], ident[], separators[];
 extern char *lstfilename, *objfilename, objext[], binext[];
 extern enum symbols sym;
 extern enum flag writeline, EOL;
-extern long PC, oldPC;
-extern unsigned char *codearea, *codeptr, PAGELEN;
-extern size_t CODESIZE;
+extern unsigned char PAGELEN;
 extern long listfileptr, TOTALLINES;
 extern struct modules *modulehdr;	/* pointer to module header */
 extern struct module *CURRENTMODULE;
@@ -275,9 +279,9 @@ getasmline (void)
 void 
 parseline (enum flag interpret)
 {
-  FindSymbol (ASSEMBLERPC, globalroot)->symvalue = PC;	/* update assembler program counter */
+  FindSymbol (ASSEMBLERPC, globalroot)->symvalue = get_PC();	/* update assembler program counter */
 
-  if (PC <= MAXCODESIZE)
+  if (get_PC() <= MAXCODESIZE)
     {				/* room for z80 machine code? */
       ++CURRENTFILE->line;
       ++TOTALLINES;
@@ -292,7 +296,7 @@ parseline (enum flag interpret)
 	    {			/* Generate only possible label declaration if line parsing is allowed */
 	      if (sym == label || GetSym () == name)
 		{
-		  DefineSymbol (ident, PC, SYMADDR | SYMTOUCHED);	/* labels must always be
+		  DefineSymbol (ident, get_PC(), SYMADDR | SYMTOUCHED);	/* labels must always be
 									 * touched due to forward */
 		  	GetSym ();	/* check for another identifier *//* referencing problems in
 				   * expressions */
@@ -443,9 +447,9 @@ Z80pass2 (void)
 {
   struct expr *pass2expr, *prevexpr;
   struct JRPC *curJR, *prevJR;
-  long constant, i;
+  long constant;
   long fptr_exprdecl, fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
-  unsigned char *patchptr;
+  size_t patchptr;
 
 
   if ((pass2expr = CURRENTMODULE->mexpr->firstexpr) != NULL)
@@ -501,15 +505,15 @@ Z80pass2 (void)
 	    }
 	  else
 	    {
-	      patchptr = codearea + pass2expr->codepos;		/* absolute patch pos. in memory buffer */
+	      patchptr = pass2expr->codepos;		/* index in memory buffer */
 	      switch (pass2expr->rangetype & RANGE)
 		{
 		case RANGE_JROFFSET:
 		  constant -= curJR->PCaddr;	/* get module PC at JR instruction */
 		  if (constant >= -128 && constant <= 127)
 		    {
-		      *patchptr = (char) constant;	/* opcode is stored, now store
-							 * relative jump */
+		      patch_byte(&patchptr, (unsigned char) constant);	
+					   /* opcode is stored, now store relative jump */
 		    }
 		  else
 		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
@@ -521,7 +525,8 @@ Z80pass2 (void)
 		case RANGE_8UNSIGN:
                     /* BUG_0004 add test Integer out of range error */
                     if (constant >= -128 && constant <= 255) {
-			*patchptr = (unsigned char) constant;	/* opcode is stored, now store byte */
+			patch_byte(&patchptr, (unsigned char) constant);	
+					   /* opcode is stored, now store byte */
                     }
                     else {
                         ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
@@ -531,8 +536,8 @@ Z80pass2 (void)
 		case RANGE_8SIGN:
 		  if (constant >= -128 && constant <= 255)
 		    {
-		      *patchptr = (char) constant;	/* opcode is stored, now store
-							 * signed operand */
+		      patch_byte(&patchptr, (unsigned char) constant);	
+					   /* opcode is stored, now store signed operand */
 		    }
 		  else
 		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
@@ -541,8 +546,8 @@ Z80pass2 (void)
 		case RANGE_16CONST:
 		  if (constant >= -32768 && constant <= 65535)
 		    {
-		      *patchptr++ = (unsigned short) constant & 255;	/* modulus 256 */
-		      *patchptr = (unsigned short) constant >> 8;	/* div 256 */
+		      patch_word(&patchptr, (int) constant);	
+					   /* store two bytes */
 		    }
 		  else
 		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
@@ -551,11 +556,8 @@ Z80pass2 (void)
 		case RANGE_32SIGN:
 		  if (constant >= LONG_MIN && constant <= LONG_MAX)
 		    {
-		      for (i = 0; i < 4; i++)
-			{
-			  *patchptr++ = (unsigned char) constant & 255;
-			  constant >>= 8;
-			}
+		      patch_long(&patchptr, constant);	
+					   /* store 4 bytes */
 		    }
 		  else
 		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
@@ -594,15 +596,14 @@ Z80pass2 (void)
   xfputc(constant, objfile);	/* write length of module name to relocatable file */
   xfwritec(CURRENTMODULE->mname, (size_t) constant, objfile);	/* write module name to relocatable
 										 * file       */
-  if ((constant = codeptr - codearea) == 0)
+  if ((constant = get_code_size()) == 0)
     fptr_modcode = -1;		/* no code generated!  */
   else
     {
       fptr_modcode = ftell (objfile);
       xfput_word(constant, objfile);	/* two bytes of module code size */
-      xfwritec(codearea, (size_t) constant, objfile);
+      fwrite_codearea(objfile);
     }
-  CODESIZE += constant;
 
   if (verbose)
     printf ("Size of module is %ld bytes\n", constant);
@@ -872,19 +873,21 @@ void
 WriteListFile (void)
 {
   int len, k;
+  size_t byteptr;
 
   if (strlen (line) == 0)
     strcpy (line, "\n");
 
-  len = PC - oldPC;
+  len = get_PC() - get_oldPC();
+  byteptr = get_code_size() - len;
   if (len == 0)
-    fprintf (listfile, "%-4d  %04X%14s%s", CURRENTFILE->line, (unsigned short) oldPC, "", line);		/* no bytes generated */
+    fprintf (listfile, "%-4d  %04X%14s%s", CURRENTFILE->line, (unsigned short) get_oldPC(), "", line);		/* no bytes generated */
   else if (len <= 4)
     {
-      fprintf (listfile, "%-4d  %04X  ", CURRENTFILE->line, (unsigned short) oldPC);
-      for (; len; len--)
-	fprintf (listfile, "%02X ", *(codeptr - len));
-      fprintf (listfile, "%*s%s", (unsigned short) (4 - (PC - oldPC)) * 3, "", line);
+      fprintf (listfile, "%-4d  %04X  ", CURRENTFILE->line, (unsigned short) get_oldPC());
+      for (k = 0; k < len; k++)
+	fprintf (listfile, "%02X ", get_byte(&byteptr));
+      fprintf (listfile, "%*s%s", (unsigned short) (4 - len) * 3, "", line);
     }
   else
     {
@@ -892,9 +895,9 @@ WriteListFile (void)
 	{
 	  LineCounter ();
 	  if (len)
-	    fprintf (listfile, "%-4d  %04X  ", CURRENTFILE->line, (unsigned short) (PC - len));
-	  for (k = (len - 32 > 0) ? 32 : len; k; k--)
-	    fprintf (listfile, "%02X ", *(codeptr - len--));
+	    fprintf (listfile, "%-4d  %04X  ", CURRENTFILE->line, (unsigned short) (get_PC() - len));
+	  for (k = (len - 32 > 0) ? 32 : len; k; k--, len--)
+	    fprintf (listfile, "%02X ", get_byte(&byteptr));
 	  fprintf (listfile, "\n");
 	}
       fprintf (listfile, "%18s%s", "", line);
@@ -903,7 +906,7 @@ WriteListFile (void)
   LineCounter ();			/* Update list file line counter - check page boundary */
   listfileptr = ftell (listfile);	/* Get file position for beginning of next line in list file */
 
-  oldPC = PC;
+  set_oldPC();
 }
 
 

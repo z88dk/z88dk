@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.24 2011-07-18 00:48:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.25 2011-08-19 15:53:58 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.24  2011-07-18 00:48:25  pauloscustodio
+/* Revision 1.25  2011-08-19 15:53:58  pauloscustodio
+/* BUG_0010 : heap corruption when reaching MAXCODESIZE
+/* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+/* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
+/*
+/* Revision 1.24  2011/07/18 00:48:25  pauloscustodio
 /* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
 /*
 /* Revision 1.23  2011/07/12 22:47:59  pauloscustodio
@@ -189,6 +194,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "symbol.h"
 #include "options.h"
 #include "errors.h"
+#include "codearea.h"
 
 /* external functions */
 void Skipline (FILE *fptr);
@@ -242,8 +248,6 @@ extern FILE *z80asmfile;
 extern enum symbols sym, GetSym (void);
 extern enum flag writeline, EOL;
 extern char ident[], line[];
-extern long PC;
-extern unsigned char *codeptr;
 extern struct module *CURRENTMODULE;
 
 
@@ -451,7 +455,7 @@ void LINE(void)
 	clineno=GetConstant(&err);
 	line[0]='\0';
         snprintf(name, sizeof(name),"__C_LINE_%d",clineno);
-        DefineSymbol (name, PC, SYMADDR | SYMTOUCHED);
+        DefineSymbol (name, get_PC(), SYMADDR | SYMTOUCHED);
 }
 
 
@@ -589,8 +593,8 @@ DeclModule (void)
 void 
 NOP (void)
 {
-  *codeptr++ = 0;
-  ++PC;
+  append_byte(0x00);
+  inc_PC(1);
 }
 
 
@@ -604,8 +608,8 @@ HALT (void)
       return;
     }
 
-  *codeptr++ = 118;
-  ++PC;
+  append_byte(0x76);
+  inc_PC(1);
 }
 
 
@@ -613,9 +617,9 @@ HALT (void)
 void 
 LDI (void)
 {
-  *codeptr++ = 237;
-  *codeptr++ = 160;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xA0);
+  inc_PC(2);
 }
 
 
@@ -623,9 +627,9 @@ LDI (void)
 void 
 LDIR (void)
 {
-  *codeptr++ = 237;
-  *codeptr++ = 176;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xB0);
+  inc_PC(2);
 }
 
 
@@ -633,9 +637,9 @@ LDIR (void)
 void 
 LDD (void)
 {
-  *codeptr++ = 237;
-  *codeptr++ = 168;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xA8);
+  inc_PC(2);
 }
 
 
@@ -643,9 +647,9 @@ LDD (void)
 void 
 LDDR (void)
 {
-  *codeptr++ = 237;
-  *codeptr++ = 184;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xB8);
+  inc_PC(2);
 }
 
 
@@ -659,9 +663,9 @@ CPI (void)
       return;
     }
 
-  *codeptr++ = 237;
-  *codeptr++ = 161;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xA1);
+  inc_PC(2);
 }
 
 
@@ -675,9 +679,9 @@ CPIR (void)
       return;
     }
 
-  *codeptr++ = 237;
-  *codeptr++ = 177;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xB1);
+  inc_PC(2);
 }
 
 
@@ -691,9 +695,9 @@ CPD (void)
       return;
     }
 
-  *codeptr++ = 237;
-  *codeptr++ = 169;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xA9);
+  inc_PC(2);
 }
 
 
@@ -707,9 +711,9 @@ CPDR (void)
       return;
     }
 
-  *codeptr++ = 237;
-  *codeptr++ = 185;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xB9);
+  inc_PC(2);
 }
 
 
@@ -723,9 +727,9 @@ IND (void)
       return;
     }
 
-  *codeptr++ = 237;
-  *codeptr++ = 170;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xAA);
+  inc_PC(2);
 }
 
 
@@ -739,9 +743,9 @@ INDR (void)
       return;
     }
 
-  *codeptr++ = 237;
-  *codeptr++ = 186;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xBA);
+  inc_PC(2);
 }
 
 
@@ -754,9 +758,9 @@ INI (void)
       ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
-  *codeptr++ = 237;
-  *codeptr++ = 162;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xA2);
+  inc_PC(2);
 }
 
 
@@ -770,9 +774,9 @@ INIR (void)
       return;
     }
 
-  *codeptr++ = 237;
-  *codeptr++ = 178;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xB2);
+  inc_PC(2);
 }
 
 
@@ -786,9 +790,9 @@ OUTI (void)
       return;
     }
 
-  *codeptr++ = 237;
-  *codeptr++ = 163;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xA3);
+  inc_PC(2);
 }
 
 
@@ -802,9 +806,9 @@ OUTD (void)
       return;
     }
 
-  *codeptr++ = 237;
-  *codeptr++ = 171;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xAB);
+  inc_PC(2);
 }
 
 
@@ -818,9 +822,9 @@ OTIR (void)
       return;
     }
 
-  *codeptr++ = 237;
-  *codeptr++ = 179;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xB3);
+  inc_PC(2);
 }
 
 
@@ -834,9 +838,9 @@ OTDR (void)
       return;
     }
 
-  *codeptr++ = 237;
-  *codeptr++ = 187;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0xBB);
+  inc_PC(2);
 }
 
 
@@ -1014,8 +1018,8 @@ SRL (void)
 void 
 CPL (void)
 {
-  *codeptr++ = 47;
-  ++PC;
+  append_byte(0x2F);
+  inc_PC(1);
 }
 
 
@@ -1023,8 +1027,8 @@ CPL (void)
 void 
 RLA (void)
 {
-  *codeptr++ = 23;
-  ++PC;
+  append_byte(0x17);
+  inc_PC(1);
 }
 
 
@@ -1032,8 +1036,8 @@ RLA (void)
 void 
 RRA (void)
 {
-  *codeptr++ = 31;
-  ++PC;
+  append_byte(0x1F);
+  inc_PC(1);
 }
 
 
@@ -1041,8 +1045,8 @@ RRA (void)
 void 
 RRCA (void)
 {
-  *codeptr++ = 15;
-  ++PC;
+  append_byte(0x0F);
+  inc_PC(1);
 }
 
 
@@ -1050,8 +1054,8 @@ RRCA (void)
 void 
 RLCA (void)
 {
-  *codeptr++ = 7;
-  ++PC;
+  append_byte(0x07);
+  inc_PC(1);
 }
 
 
@@ -1059,8 +1063,8 @@ RLCA (void)
 void 
 EXX (void)
 {
-  *codeptr++ = 217;
-  ++PC;
+  append_byte(0xD9);
+  inc_PC(1);
 }
 
 
@@ -1085,9 +1089,9 @@ POP (void)
 void 
 RETI (void)
 {
-  *codeptr++ = 237;
-  *codeptr++ = 77;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0x4D);
+  inc_PC(2);
 }
 
 
@@ -1100,9 +1104,9 @@ RETN (void)
       ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
       return;
     }
-  *codeptr++ = 237;
-  *codeptr++ = 69;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0x45);
+  inc_PC(2);
 }
 
 
@@ -1116,9 +1120,9 @@ RLD (void)
       return;
     }
 
-  *codeptr++ = 237;
-  *codeptr++ = 111;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0x6F);
+  inc_PC(2);
 }
 
 
@@ -1132,9 +1136,9 @@ RRD (void)
       return;
     }
 
-  *codeptr++ = 237;
-  *codeptr++ = 103;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0x67);
+  inc_PC(2);
 }
 
 
@@ -1142,9 +1146,9 @@ RRD (void)
 void 
 NEG (void)
 {
-  *codeptr++ = 237;
-  *codeptr++ = 68;
-  PC += 2;
+  append_byte(0xED);
+  append_byte(0x44);
+  inc_PC(2);
 }
 
 
@@ -1168,8 +1172,8 @@ JP (void)
 void 
 CCF (void)
 {
-  *codeptr++ = 63;
-  ++PC;
+  append_byte(0x3F);
+  inc_PC(1);
 }
 
 
@@ -1177,8 +1181,8 @@ CCF (void)
 void 
 SCF (void)
 {
-  *codeptr++ = 55;
-  ++PC;
+  append_byte(0x37);
+  inc_PC(1);
 }
 
 
@@ -1192,8 +1196,8 @@ DI (void)
       return;
     }
 
-  *codeptr++ = 243;
-  ++PC;
+  append_byte(0xF3);
+  inc_PC(1);
 }
 
 
@@ -1207,8 +1211,8 @@ EI (void)
       return;
     }
 
-  *codeptr++ = 251;
-  ++PC;
+  append_byte(0xFB);
+  inc_PC(1);
 }
 
 
@@ -1222,8 +1226,8 @@ DAA (void)
       return;
     }
 
-  *codeptr++ = 39;
-  ++PC;
+  append_byte(0x27);
+  inc_PC(1);
 }
 
 /*

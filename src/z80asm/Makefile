@@ -12,9 +12,14 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.20 2011-08-18 23:16:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.21 2011-08-19 15:53:58 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.20  2011-08-18 23:16:10  pauloscustodio
+# Revision 1.21  2011-08-19 15:53:58  pauloscustodio
+# BUG_0010 : heap corruption when reaching MAXCODESIZE
+# - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+# - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
+#
+# Revision 1.20  2011/08/18 23:16:10  pauloscustodio
 # Dependencies
 #
 # Revision 1.19  2011/08/18 21:45:17  pauloscustodio
@@ -112,7 +117,9 @@ OBJS = 	asmdrctv.o 	\
 	errors.o	\
 	memalloc.o	\
 	except.o	\
-	file.o
+	file.o		\
+	codearea.o	\
+	objfile.o
 
 all: z80asm$(EXESUFFIX)
 
@@ -141,27 +148,27 @@ depend:
 # DO NOT DELETE
 
 asmdrctv.o: memalloc.h except.h e4c.h config.h ../config.h options.h symbol.h
-asmdrctv.o: avltree.h z80asm.h errors.h file.h
+asmdrctv.o: avltree.h z80asm.h errors.h file.h codearea.h
 avltree.o: memalloc.h except.h e4c.h avltree.h
 exprprsr.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
-exprprsr.o: options.h errors.h file.h
+exprprsr.o: options.h errors.h file.h codearea.h
 hist.o: memalloc.h except.h e4c.h hist.h
 ldinstr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
-ldinstr.o: symbol.h errors.h
+ldinstr.o: symbol.h errors.h codearea.h
 modlink.o: memalloc.h except.h e4c.h config.h ../config.h options.h symbol.h
-modlink.o: avltree.h z80asm.h errors.h file.h
+modlink.o: avltree.h z80asm.h errors.h file.h codearea.h
 prsident.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
-prsident.o: symbol.h options.h errors.h
+prsident.o: symbol.h options.h errors.h codearea.h
 prsline.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
-prsline.o: symbol.h options.h errors.h file.h
+prsline.o: symbol.h options.h errors.h
 symbols.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
 symbols.o: symbols.h options.h errors.h
 z80asm.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
-z80asm.o: z80asm.h hist.h options.h errors.h file.h
+z80asm.o: z80asm.h hist.h options.h errors.h file.h codearea.h
 z80instr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
-z80instr.o: symbol.h options.h errors.h
+z80instr.o: symbol.h options.h errors.h codearea.h
 z80pass.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
-z80pass.o: hist.h options.h z80asm.h errors.h file.h
+z80pass.o: hist.h options.h z80asm.h errors.h file.h codearea.h
 options.o: memalloc.h except.h e4c.h z80asm.h avltree.h options.h symbol.h
 options.o: symbols.h errors.h
 errors.o: memalloc.h except.h e4c.h errors.h symbol.h avltree.h options.h
@@ -169,3 +176,6 @@ errors.o: z80asm.h config.h ../config.h
 memalloc.o: memalloc.h except.h e4c.h
 except.o: except.h memalloc.h e4c.h e4c.c
 file.o: file.h memalloc.h except.h e4c.h
+codearea.o: codearea.h memalloc.h except.h e4c.h config.h ../config.h
+codearea.o: errors.h symbol.h avltree.h z80asm.h file.h
+objfile.o: objfile.h memalloc.h except.h e4c.h

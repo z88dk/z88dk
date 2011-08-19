@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.11 2011-07-14 23:49:50 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.12 2011-08-19 15:53:58 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.11  2011-07-14 23:49:50  pauloscustodio
+/* Revision 1.12  2011-08-19 15:53:58  pauloscustodio
+/* BUG_0010 : heap corruption when reaching MAXCODESIZE
+/* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+/* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
+/*
+/* Revision 1.11  2011/07/14 23:49:50  pauloscustodio
 /*     BUG_0001(a) : during correction of BUG_0001, new symbol colon was introduced in enum symbols,
 /* 	causing expressions stored in object files to be wrong, e.g. VALUE-1 was stored as
 /* 	VALUE*1. This caused problems in expression evaluation in link phase.
@@ -126,7 +131,7 @@ struct expr         { struct expr        *nextexpr;         /* pointer to next e
                       enum flag          stored;            /* Flag to indicate that expression has been stored to object file */
                       char               *infixexpr;        /* pointer to ASCII infix expression */
                       char               *infixptr;         /* pointer to current char in infix expression */
-                      int                codepos;           /* rel. position in module code to patch (in pass 2) */
+                      size_t             codepos;           /* rel. position in module code to patch (in pass 2) */
                       char               *srcfile;          /* expr. in file 'srcfile' - allocated name area deleted by ReleaseFile */
                       int                 curline;           /* expression in line of source file */
                       long               listpos;           /* position in listing file to patch (in pass 2) */

@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.26 2011-08-19 10:20:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.27 2011-08-19 15:53:58 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.26  2011-08-19 10:20:32  pauloscustodio
+/* Revision 1.27  2011-08-19 15:53:58  pauloscustodio
+/* BUG_0010 : heap corruption when reaching MAXCODESIZE
+/* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+/* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
+/*
+/* Revision 1.26  2011/08/19 10:20:32  pauloscustodio
 /* - Factored code to read/write word from file into xfget_word/xfput_word.
 /* - Renamed ReadLong/WriteLong to xfget_long/xfput_long for symetry.
 /*
@@ -207,6 +212,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "z80asm.h"
 #include "errors.h"
 #include "file.h"
+#include "codearea.h"
 
 /* external functions */
 void FreeSym (symbol * node);
@@ -257,9 +263,7 @@ extern char Z80objhdr[];
 extern enum symbols sym, GetSym (void);
 extern enum flag writeline;
 extern enum flag EOL, library;
-extern long PC;
-extern size_t CODESIZE;
-extern unsigned char *codearea, PAGELEN;
+extern unsigned char PAGELEN;
 extern unsigned char reloc_routine[];
 extern int listfileptr;
 extern struct modules *modulehdr;
@@ -372,10 +376,9 @@ void
 ReadExpr (long nextexpr, long endexpr)
 {
   char type;
-  long offsetptr;
   long constant, i, fptr;
   struct expr *postfixexpr;
-  unsigned char *patchptr;
+  size_t patchptr, offsetptr;
 
   do
     {
@@ -383,9 +386,9 @@ ReadExpr (long nextexpr, long endexpr)
       offsetptr = xfget_word(z80asmfile);
 
       /* assembler PC     as absolute address */
-      PC = modulehdr->first->origin + CURRENTMODULE->startoffset + offsetptr;
+      set_PC(modulehdr->first->origin + CURRENTMODULE->startoffset + offsetptr);
 
-      FindSymbol (ASSEMBLERPC, globalroot)->symvalue = PC;
+      FindSymbol (ASSEMBLERPC, globalroot)->symvalue = get_PC();
 
       i = xfgetc(z80asmfile);	/* get length of infix expression */
       fptr = ftell (z80asmfile);	/* file pointer is at start of expression */
@@ -407,17 +410,16 @@ ReadExpr (long nextexpr, long endexpr)
           else
             {
               constant = EvalPfixExpr (postfixexpr);
-              patchptr = codearea + CURRENTMODULE->startoffset + offsetptr;	/* absolute patch pos.
-                                                                             * in memory buffer */
+              patchptr = CURRENTMODULE->startoffset + offsetptr;	/* index to memory buffer */
               switch (type)
                 {
                 case 'U':
-                  *patchptr = (unsigned char) constant;
+                  patch_byte(&patchptr, (unsigned char) constant);
                   break;
 
                 case 'S':
                   if ((constant >= -128) && (constant <= 255))
-                    *patchptr = (char) constant;	/* opcode is stored, now store signed 8bit value */
+                    patch_byte(&patchptr, (unsigned char) constant);	/* opcode is stored, now store signed 8bit value */
                   else
                     {
                       ReportError (CURRENTFILE->fname, 0, ERR_INT_RANGE, constant);
@@ -428,8 +430,7 @@ ReadExpr (long nextexpr, long endexpr)
                 case 'C':
                   if ((constant >= -32768) && (constant <= 65535))
                     {
-                      *patchptr++ = (unsigned short) constant % 256U;
-                      *patchptr = (unsigned short) constant / 256U;
+                      patch_word(&patchptr, constant);
                     }
                   else
                     {
@@ -441,7 +442,7 @@ ReadExpr (long nextexpr, long endexpr)
                     if (postfixexpr->rangetype & SYMADDR)
                       {
                         /* Expression contains relocatable address */
-                        constant = PC - curroffset;
+                        constant = get_PC() - curroffset;
 
                         if ((constant >= 0) && (constant <= 255))
                           {
@@ -451,23 +452,19 @@ ReadExpr (long nextexpr, long endexpr)
                         else
                           {
                             *relocptr++ = 0;
-                            *relocptr++ = (unsigned short) (PC - curroffset) % 256U;
-                            *relocptr++ = (unsigned short) (PC - curroffset) / 256U;
+                            *relocptr++ = (unsigned short) (get_PC() - curroffset) % 256U;
+                            *relocptr++ = (unsigned short) (get_PC() - curroffset) / 256U;
                             sizeof_reloctable += 3;
                           }
 
                         totaladdr++;
-                        curroffset = (unsigned short)PC;
+                        curroffset = (unsigned short)get_PC();
                       }
                   break;
 
                 case 'L':
                   if (constant >= LONG_MIN && constant <= LONG_MAX)
-                    for (i = 0; i < 4; i++)
-                      {
-                        *patchptr++ = constant & 255;
-                        constant >>= 8;
-                      }
+                    patch_long(&patchptr, constant);
                   else
                     {
                       ReportError (CURRENTFILE->fname, 0, ERR_INT_RANGE, constant);
@@ -531,8 +528,8 @@ LinkModules (void)
 	    throw(FatalErrorException, "cant open errfilename");
 	}
 
-	PC = 0;
-	DefineDefSym(ASSEMBLERPC, PC, 0, &globalroot);	/* Create standard 'ASMPC' identifier */
+	set_PC(0);
+	DefineDefSym(ASSEMBLERPC, get_PC(), 0, &globalroot);	/* Create standard 'ASMPC' identifier */
 
 	do {				/* link machine code & read symbols in all modules */
 	    if (library) {
@@ -593,7 +590,7 @@ LinkModules (void)
 					/* parse only object modules, not added library modules */
 
 	if (verbose == ON)
-	    printf ("Code size of linked modules is %d bytes\n", (int)CODESIZE);
+	    printf ("Code size of linked modules is %d bytes\n", (int)get_code_size());
 
 	if (ASMERROR == OFF)
 	    ModuleExpr ();		/*  Evaluate expressions in  all modules */
@@ -655,10 +652,7 @@ LinkModule (char *filename, long fptr_base)
           return 0;
         }
       else
-        xfreadc(codearea + CURRENTMODULE->startoffset, size, z80asmfile);	/* read module code */
-
-      if (CURRENTMODULE->startoffset == CODESIZE)
-        CODESIZE += size;	/* a new module has been added */
+	fread_codearea(z80asmfile, size);			/* read module code */
     }
 
   if (fptr_namedecl != -1)
@@ -970,7 +964,7 @@ CreateBinFile (void)
   char *tmpstr;
   char binfilenumber = '0';
   FILE *binaryfile;
-  unsigned short codeblock, offset;
+  size_t codesize, codeblock, offset;
 
   if (expl_binflnm == ON)
     /* use predined output filename from command line */
@@ -979,7 +973,7 @@ CreateBinFile (void)
     { 
       /* create output filename, based on project filename */
       tmpstr = modulehdr->first->cfile->fname;	/* get source filename from first module */
-      if (codesegment == ON && CODESIZE > 16384)
+      if (codesegment == ON && get_code_size() > 16384)
         strcpy (tmpstr + strlen (tmpstr) - 4, segmbinext);	/* replace '.asm' with '.bn0' extension */
       else
         strcpy (tmpstr + strlen (tmpstr) - 4, binext);	/* replace '.asm' with '.bin' extension */
@@ -998,33 +992,34 @@ CreateBinFile (void)
 
 	  xfwritec(reloctable, sizeof_reloctable + 4, binaryfile);	/* write relocation table, inclusive 4 byte header */
 	  printf ("Relocation header is %d bytes.\n", (int)(sizeof_relocroutine + sizeof_reloctable + 4));
-	  xfwritec(codearea, CODESIZE, binaryfile);	/* write code as one big chunk */
+	  fwrite_codearea(binaryfile);					/* write code as one big chunk */
 	  fclose (binaryfile);
 	}
-      else if (codesegment == ON && CODESIZE > 16384)
+      else if (codesegment == ON && get_code_size() > 16384)
 	{
 	  fclose (binaryfile);
 	  offset = 0;
+	  codesize = get_code_size();
 	  do
 	    {
-	      codeblock = (CODESIZE / 16384U) ? 16384U : CODESIZE % 16384U;
-	      CODESIZE -= codeblock;
+	      codeblock = (codesize > 16384U) ? 16384U : codesize;
+	      codesize -= codeblock;
 	      tmpstr[strlen (tmpstr) - 1] = binfilenumber++;	/* path code file with number */
 	      binaryfile = fopen (tmpstr, "wb");
 
 	      if (binaryfile != NULL)
 		{
-		  xfwritec(codearea + offset, codeblock, binaryfile);	/* code in 16K chunks */
+		  fwrite_codearea_chunk(binaryfile, offset, codeblock);	/* code in 16K chunks */
 		  fclose (binaryfile);
 		}
 
 	      offset += codeblock;
 	    }
-	  while (CODESIZE);
+	  while (codesize);
 	}
       else
 	{
-	  xfwritec(codearea, CODESIZE, binaryfile);	/* write code as one big chunk */
+	  fwrite_codearea(binaryfile);					/* write code as one big chunk */
 	  fclose (binaryfile);
 	}
 
