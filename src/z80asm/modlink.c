@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.25 2011-08-18 23:27:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.26 2011-08-19 10:20:32 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.25  2011-08-18 23:27:54  pauloscustodio
+/* Revision 1.26  2011-08-19 10:20:32  pauloscustodio
+/* - Factored code to read/write word from file into xfget_word/xfput_word.
+/* - Renamed ReadLong/WriteLong to xfget_long/xfput_long for symetry.
+/*
+/* Revision 1.25  2011/08/18 23:27:54  pauloscustodio
 /* BUG_0009 : file read/write not tested for errors
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
@@ -368,7 +372,7 @@ void
 ReadExpr (long nextexpr, long endexpr)
 {
   char type;
-  long lowbyte, highbyte, offsetptr;
+  long offsetptr;
   long constant, i, fptr;
   struct expr *postfixexpr;
   unsigned char *patchptr;
@@ -376,9 +380,7 @@ ReadExpr (long nextexpr, long endexpr)
   do
     {
       type = xfgetc(z80asmfile);
-      lowbyte = xfgetc(z80asmfile);
-      highbyte = xfgetc(z80asmfile);
-      offsetptr = highbyte * 256U + lowbyte;
+      offsetptr = xfget_word(z80asmfile);
 
       /* assembler PC     as absolute address */
       PC = modulehdr->first->origin + CURRENTMODULE->startoffset + offsetptr;
@@ -497,7 +499,7 @@ void
 LinkModules (void)
 {
     char fheader[9];
-    size_t lowbyte, highbyte;
+    size_t origin;
     struct module *lastobjmodule;
     symtable = listing = OFF;
     linkhdr = NULL;
@@ -562,8 +564,7 @@ LinkModules (void)
 		break;
 	    }
 
-	    lowbyte = xfgetc(z80asmfile);
-	    highbyte = xfgetc(z80asmfile);
+	    origin = xfget_word(z80asmfile);
 
 	    if (modulehdr->first == CURRENTMODULE) {		/* origin of first module */
 		if (autorelocate)
@@ -572,7 +573,7 @@ LinkModules (void)
 		    if (deforigin)
 			CURRENTMODULE->origin = EXPLICIT_ORIGIN;	/* use origin from command line    */
 		    else {
-			CURRENTMODULE->origin = highbyte * 256U + lowbyte;
+			CURRENTMODULE->origin = origin;
 			if (CURRENTMODULE->origin == 65535U)
     			    DefineOrigin ();	/* Define origin of first module from the keyboard */
 		    }
@@ -627,7 +628,7 @@ int
 LinkModule (char *filename, long fptr_base)
 {
   long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
-  size_t lowbyte, highbyte, size;
+  size_t size;
   int flag = 0;
 
   z80asmfile = fopen (filename, "rb");	/* open object file for reading */
@@ -642,9 +643,7 @@ LinkModule (char *filename, long fptr_base)
   if (fptr_modcode != -1)
     {
       fseek (z80asmfile, fptr_base + fptr_modcode, SEEK_SET);	/* set file pointer to module code */
-      lowbyte = xfgetc(z80asmfile);
-      highbyte = xfgetc(z80asmfile);
-      size = lowbyte + highbyte * 256U;
+      size = xfget_word(z80asmfile);
 
       /* BUG_0008 : fix size, if a zero was written, the moudule is actually 64K */
       if (size == 0) 

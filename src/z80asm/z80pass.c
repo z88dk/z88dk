@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.17 2011-08-18 23:27:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.18 2011-08-19 10:20:32 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.17  2011-08-18 23:27:54  pauloscustodio
+/* Revision 1.18  2011-08-19 10:20:32  pauloscustodio
+/* - Factored code to read/write word from file into xfget_word/xfput_word.
+/* - Renamed ReadLong/WriteLong to xfget_long/xfput_long for symetry.
+/*
+/* Revision 1.17  2011/08/18 23:27:54  pauloscustodio
 /* BUG_0009 : file read/write not tested for errors
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
@@ -595,8 +599,7 @@ Z80pass2 (void)
   else
     {
       fptr_modcode = ftell (objfile);
-      xfputc(constant % 256, objfile);	/* low byte of module code size */
-      xfputc(constant / 256, objfile);	/* high byte of module code size */
+      xfput_word(constant, objfile);	/* two bytes of module code size */
       xfwritec(codearea, (size_t) constant, objfile);
     }
   CODESIZE += constant;
@@ -610,8 +613,7 @@ Z80pass2 (void)
       if (deforigin)
 	CURRENTMODULE->origin = EXPLICIT_ORIGIN;	/* use origin from command line */
     }
-  xfputc(CURRENTMODULE->origin % 256, objfile);		/* low byte of origin */
-  xfputc(CURRENTMODULE->origin / 256, objfile);		/* high byte of origin */
+  xfput_word(CURRENTMODULE->origin, objfile);		/* two bytes of origin */
 
   fptr_exprdecl = 30;		/* expressions always begins at file position 24 */
 
@@ -847,13 +849,13 @@ PatchListFile (struct expr *pass2expr, long c)
 	  break;
 
 	case RANGE_16CONST:
-	  fprintf (listfile, "%02X %02X", (unsigned int) (c % 256), (unsigned int) (c / 256) );
+	  fprintf (listfile, "%02X %02X", (unsigned int) (c & 0xFF), (unsigned int) (c >> 8) );
 	  break;
 
 	case RANGE_32SIGN:
 	  for (i = 0; i < 4; i++)
 	    {
-	      fprintf (listfile, "%02X ", (unsigned int) (c & 255) );
+	      fprintf (listfile, "%02X ", (unsigned int) (c & 0xFF) );
 	      c >>= 8;
 	    }
 	  break;

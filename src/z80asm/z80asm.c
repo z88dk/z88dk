@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.37 2011-08-18 23:27:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.38 2011-08-19 10:20:32 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.37  2011-08-18 23:27:54  pauloscustodio
+/* Revision 1.38  2011-08-19 10:20:32  pauloscustodio
+/* - Factored code to read/write word from file into xfget_word/xfput_word.
+/* - Renamed ReadLong/WriteLong to xfget_long/xfput_long for symetry.
+/*
+/* Revision 1.37  2011/08/18 23:27:54  pauloscustodio
 /* BUG_0009 : file read/write not tested for errors
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
@@ -617,7 +621,6 @@ GetModuleSize (void)
 {
   char fheader[9];
   long fptr_modcode, fptr_modname;
-  long highbyte, lowbyte;
   size_t size;
 
   if ((objfile = fopen (objfilename, "rb")) != NULL)
@@ -646,9 +649,7 @@ GetModuleSize (void)
       if (fptr_modcode != -1)
 	{
 	  fseek (objfile, fptr_modcode, SEEK_SET);	/* set file pointer to module code */
-	  lowbyte = xfgetc(objfile);
-	  highbyte = xfgetc(objfile);
-	  size = lowbyte + highbyte * 256;
+	  size = xfget_word(objfile);
 
 	  /* BUG_0008 : fix size, if a zero was written, the moudule is actually 64K */
 	  if (size == 0) 
