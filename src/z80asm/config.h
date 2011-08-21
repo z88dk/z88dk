@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.16 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.17 2011-08-21 20:19:47 pauloscustodio Exp $ */
 /* $Log: config.h,v $
-/* Revision 1.16  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.17  2011-08-21 20:19:47  pauloscustodio
+/* Define FILEEXT_SEPARATOR as ".", or "_" on QDOS
+/*
+/* Revision 1.16  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -142,3 +145,11 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #endif
 #endif	/* __GNUC__ */
 #endif
+
+/* File name extension separator */
+#ifdef QDOS
+#define FILEEXT_SEPARATOR "_"
+#else
+#define FILEEXT_SEPARATOR "."
+#endif
+
