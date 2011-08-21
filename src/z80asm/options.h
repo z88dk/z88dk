@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.2 2011-07-12 22:47:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.3 2011-08-21 20:25:31 pauloscustodio Exp $ */
 /* $Log: options.h,v $
-/* Revision 1.2  2011-07-12 22:47:59  pauloscustodio
+/* Revision 1.3  2011-08-21 20:25:31  pauloscustodio
+/* BUG_0012 : binfilename[] array is too short, should be FILENAME_MAX
+/* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
+/* - Factor all pathname manipulation into module file.c.
+/* - Make default extensions constants.
+/* - Move srcext[] and objext[] to the options.c module.
+/*
+/* Revision 1.2  2011/07/12 22:47:59  pauloscustodio
 /* - Moved all error variables and error reporting code to a separate module errors.c,
 /*   replaced all extern declarations of these variables by include errors.h,
 /*   created symbolic constants for error codes.
@@ -54,6 +61,8 @@ extern enum flag autorelocate;
 extern enum flag deforigin;
 extern enum flag expl_binflnm;
 extern char binfilename[];		/* -o explicit filename buffer */
+extern char srcext[];			/* ".asm"/"_asm" extension, or whatever defined by -e */
+extern char objext[];			/* ".obj"/"_obj" extension, or whatever defined by -M */
 
 /* reset default options */
 extern void ResetOptions (void);

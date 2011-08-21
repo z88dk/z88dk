@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.5 2011-08-05 19:58:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.6 2011-08-21 20:25:31 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.5  2011-08-05 19:58:28  pauloscustodio
+/* Revision 1.6  2011-08-21 20:25:31  pauloscustodio
+/* BUG_0012 : binfilename[] array is too short, should be FILENAME_MAX
+/* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
+/* - Factor all pathname manipulation into module file.c.
+/* - Make default extensions constants.
+/* - Move srcext[] and objext[] to the options.c module.
+/*
+/* Revision 1.5  2011/08/05 19:58:28  pauloscustodio
 /* CH_0004 : Exception mechanism to handle fatal errors
 /* Replaced all the memory allocation functions malloc, calloc, ... by corresponding
 /* macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated,
@@ -75,7 +82,9 @@ enum flag globaldef;
 enum flag autorelocate;
 enum flag deforigin;
 enum flag expl_binflnm;
-char binfilename[64];		/* -o explicit filename buffer */
+char binfilename[FILENAME_MAX];	/* -o explicit filename buffer (BUG_0012) */
+char srcext[FILEEXT_MAX];	/* contains default source file extension */
+char objext[FILEEXT_MAX];	/* contains default object file extension */
 
 /*-----------------------------------------------------------------------------
 *   ResetOptions
@@ -103,6 +112,9 @@ void ResetOptions (void)
     autorelocate    = OFF;
     deforigin	    = OFF; 
     expl_binflnm    = OFF;
+
+    strcpy(srcext, FILEEXT_ASM);	/* use ".asm" as default source file extension */
+    strcpy(objext, FILEEXT_OBJ);	/* use ".obj" as default source file extension */
 }
 
 /*-----------------------------------------------------------------------------
@@ -116,17 +128,23 @@ void SetAsmFlag (char *flagid)
 {
     if (*flagid == 'e') {
 	smallc_source = ON;			/* use ".xxx" as source file in stead of ".asm" */
+	
+	/* BUG - on QDOS separator is '_'
+	   Anyway there's no need to define, comes from default either '.' or '_'
 	srcext[0] = '.';
-	strncpy ((srcext + 1), (flagid + 1), 3);
-						/* copy argument string */
-	srcext[4] = '\0';			/* max. 3 letters extension */
+	*/
+
+	strncpy(srcext + 1, flagid + 1, FILEEXT_MAX - 2);
+						/* copy argument string after '.' */
+	srcext[FILEEXT_MAX - 1] = '\0';		/* max. 3 letters extension */
     }
 
     /* djm: mod to get .o files produced instead of .obj */
     /* gbs: extended to use argument as definition, e.g. -Mo, which defines .o extension */
     else if (*flagid == 'M') {
-	strncpy ((objext + 1), (flagid + 1), 3);/* copy argument string (append after '.') */
-	objext[4] = '\0';			/* max. 3 letters extension */
+	strncpy(objext + 1, flagid + 1, FILEEXT_MAX - 2);
+						/* copy argument string after '.' */
+	objext[FILEEXT_MAX - 1] = '\0';		/* max. 3 letters extension */
     }
 
     /** Check whether this is for the RCM2000/RCM3000 series of Z80-like CPU's */
@@ -255,7 +273,9 @@ void SetAsmFlag (char *flagid)
     }
 
     else if (*flagid == 'o') {
-	sscanf (flagid + 1, "%s", binfilename); /* store explicit filename for .BIN file */
+	/* store explicit filename for .BIN file (BUG_0012) */
+	strncpy(binfilename, flagid + 1, sizeof(binfilename) - 1);
+	binfilename[sizeof(binfilename) - 1] = '\0';
 	expl_binflnm = ON;      
     }
 
