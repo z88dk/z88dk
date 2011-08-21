@@ -16,9 +16,13 @@ Copyright (C) Paulo Custodio, 2011
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.2 2011-08-18 23:27:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.3 2011-08-21 20:21:21 pauloscustodio Exp $ */
 /* $Log: file.c,v $
-/* Revision 1.2  2011-08-18 23:27:54  pauloscustodio
+/* Revision 1.3  2011-08-21 20:21:21  pauloscustodio
+/* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
+/* - Factor all pathname manipulation into module file.c.
+/*
+/* Revision 1.2  2011/08/18 23:27:54  pauloscustodio
 /* BUG_0009 : file read/write not tested for errors
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
@@ -30,7 +34,9 @@ Utilities for file handling
 /*
 /* */
 
+#include <string.h>
 #include "file.h"
+#include "config.h"
 
 /*-----------------------------------------------------------------------------
 *   File IO with exception
@@ -100,3 +106,35 @@ long xfget_long (FILE *stream)
 
     return dword;
 }
+
+/*-----------------------------------------------------------------------------
+*   Pathname manipulation 
+*   All filenames are passed as char file[FILENAME_MAX] elements
+*----------------------------------------------------------------------------*/
+
+/* remove the extension of the passed filename, modifies the string */
+void path_remove_ext  (char *filename)
+{
+    char *sep_pos = strrchr(filename, FILEEXT_SEPARATOR[0]);
+
+    if (sep_pos != NULL) {
+	*sep_pos = '\0';		/* terminate the string */
+    }
+}
+
+/* make a copy of the file name, replacing the extension */
+void path_replace_ext (char *dest, const char *source, const char *new_ext)
+{
+    int length;
+
+    strncpy(dest, source, FILENAME_MAX-1);
+    dest[FILENAME_MAX-1] = '\0';
+
+    path_remove_ext(dest);		/* file without extension */
+
+    /* copy extension, make sure the final file fits in FILENAME_MAX-1 */
+    length = strlen(dest);
+    strncpy(dest + length, new_ext, FILENAME_MAX-1 - length);
+    dest[FILENAME_MAX-1] = '\0';
+}
+

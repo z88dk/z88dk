@@ -16,9 +16,13 @@ Copyright (C) Paulo Custodio, 2011
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.2 2011-08-18 23:27:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.3 2011-08-21 20:21:21 pauloscustodio Exp $ */
 /* $Log: file.h,v $
-/* Revision 1.2  2011-08-18 23:27:54  pauloscustodio
+/* Revision 1.3  2011-08-21 20:21:21  pauloscustodio
+/* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
+/* - Factor all pathname manipulation into module file.c.
+/*
+/* Revision 1.2  2011/08/18 23:27:54  pauloscustodio
 /* BUG_0009 : file read/write not tested for errors
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
@@ -53,5 +57,11 @@ extern size_t xfget_word (             FILE *stream);
 
 extern void   xfput_long (long dword,  FILE *stream);
 extern long   xfget_long (             FILE *stream);
+
+/* pathname manipulation 
+ * All filenames are passed as char file[FILENAME_MAX] elements, instead of always strdup'ing
+ */
+extern void path_remove_ext  (char *filename);
+extern void path_replace_ext (char *dest, const char *source, const char *new_ext);
 
 #endif /* ndef FILE_H */
