@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.27 2011-08-19 15:53:58 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.28 2011-08-21 20:37:20 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.27  2011-08-19 15:53:58  pauloscustodio
+/* Revision 1.28  2011-08-21 20:37:20  pauloscustodio
+/* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
+/* - Factor all pathname manipulation into module file.c.
+/* - Make default extensions constants.
+/* - Move srcext[] and objext[] to the options.c module.
+/*
+/* Revision 1.27  2011/08/19 15:53:58  pauloscustodio
 /* BUG_0010 : heap corruption when reaching MAXCODESIZE
 /* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
 /* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
@@ -257,8 +263,6 @@ static char *         CheckIfModuleWanted(FILE *z80asmfile, long currentlibmodul
 /* global variables */
 extern FILE *listfile, *mapfile, *z80asmfile, *errfile, *deffile, *libfile;
 extern char line[], ident[];
-extern char *lstfilename, *objfilename, *errfilename, *libfilename;
-extern char objext[], segmbinext[], binext[], mapext[], errext[], defext[];
 extern char Z80objhdr[];
 extern enum symbols sym, GetSym (void);
 extern enum flag writeline;
@@ -519,9 +523,8 @@ LinkModules (void)
 	CURRENTMODULE = modulehdr->first;	/* begin with first module */
 	lastobjmodule = modulehdr->last;	/* remember this last module, further modules are libraries */
 	
-	errfilename = xstrdup(CURRENTFILE->fname);
-	strcpy (errfilename + strlen (errfilename) - 4, errext);	
-					/* overwrite '_asm' extension with '_err' */
+	path_replace_ext(errfilename, CURRENTFILE->fname, FILEEXT_ERR);
+						/* overwrite '.asm' extension with '.err' */
 
 	if ((errfile = fopen(errfilename, "w")) == NULL) {	/* open error file */
 	    ReportError(NULL, 0, ERR_FILE_OPEN, errfilename);	/* couldn't open error file */
@@ -531,17 +534,16 @@ LinkModules (void)
 	set_PC(0);
 	DefineDefSym(ASSEMBLERPC, get_PC(), 0, &globalroot);	/* Create standard 'ASMPC' identifier */
 
-	do {				/* link machine code & read symbols in all modules */
+	do {					/* link machine code & read symbols in all modules */
 	    if (library) {
 		CURRENTLIB = libraryhdr->firstlib;	/* begin library search  from first library for each
 							* module */
 		CURRENTLIB->nextobjfile = 8;		/* point at first library module (past header) */
 	    }
-	    CURRENTFILE->line = 0;	/* no line references on errors during link processing */
+	    CURRENTFILE->line = 0;		/* no line references on errors during link processing */
 
-	    objfilename = xstrdup(CURRENTFILE->fname);
-	    strcpy (objfilename + strlen (objfilename) - 4, objext);	
-					/* overwrite '_asm' extension with * '_obj' */
+	    path_replace_ext(objfilename, CURRENTFILE->fname, objext);	
+						/* overwrite '.asm' extension with * '.obj' */
 
 	    /* open relocatable file for reading */
 	    if ((z80asmfile = fopen (objfilename, "rb")) != NULL) {
@@ -581,8 +583,6 @@ LinkModules (void)
 	    fclose (z80asmfile);
 
 	    LinkModule (objfilename, 0);	/* link code & read name definitions */
-	    xfree0(objfilename);		/* release allocated file name */
-	    objfilename = NULL;
 
 	    CURRENTMODULE = CURRENTMODULE->nextmodule;	/* get next module, if any */
 	
@@ -607,14 +607,6 @@ LinkModules (void)
 	}
 	if (TOTALERRORS == 0)
 	    remove(errfilename);
-	if (errfilename) {
-	    xfree0(errfilename);
-	    errfilename = NULL;
-	}
-	if (objfilename) {
-	    xfree0(objfilename);
-	    objfilename = NULL;
-	}
     }
 }
 
@@ -974,9 +966,9 @@ CreateBinFile (void)
       /* create output filename, based on project filename */
       tmpstr = modulehdr->first->cfile->fname;	/* get source filename from first module */
       if (codesegment == ON && get_code_size() > 16384)
-        strcpy (tmpstr + strlen (tmpstr) - 4, segmbinext);	/* replace '.asm' with '.bn0' extension */
+        strcpy (tmpstr + strlen (tmpstr) - 4, FILEEXT_SEGBIN);	/* replace '.asm' with '.bn0' extension */
       else
-        strcpy (tmpstr + strlen (tmpstr) - 4, binext);	/* replace '.asm' with '.bin' extension */
+        strcpy (tmpstr + strlen (tmpstr) - 4, FILEEXT_BIN);	/* replace '.asm' with '.bin' extension */
     }
 
   binaryfile = fopen (tmpstr, "wb");	/* binary output to srcfilename.bin */
@@ -1047,8 +1039,7 @@ CreateLib (void)
 
     CURRENTMODULE = modulehdr->first;
 
-    errfilename = xstrdup(libfilename);
-    strcpy (errfilename + strlen (errfilename) - 4, errext);	/* overwrite '_lib' extension with '_err' */
+    path_replace_ext(errfilename, libfilename, FILEEXT_ERR);	/* overwrite '.lib' extension with '.err' */
 
     try {
 	if ((errfile = fopen (errfilename, "w")) == NULL) {
@@ -1105,11 +1096,8 @@ CreateLib (void)
 	    fclose (errfile);
 	    errfile = NULL;
 	}
-	if (errfilename) {
-	    if (ASMERROR == OFF)
-		remove (errfilename);	/*    no errors */
-	    xfree0(errfilename);
-	}
+	if (ASMERROR == OFF)
+	    remove (errfilename);	/*    no errors */
 	if (objectfile) {
 	    fclose(objectfile);
 	    objectfile = NULL;
@@ -1180,7 +1168,7 @@ CreateDeffile (void)
     /* use first module filename to create global definition file */
     globaldefname = xstrdup(modulehdr->first->cfile->fname);
     try {
-	strcpy (globaldefname + strlen (globaldefname) - 4, defext);	/* overwrite '_asm' extension with
+	strcpy (globaldefname + strlen (globaldefname) - 4, FILEEXT_DEF);	/* overwrite '_asm' extension with
 									    * '_def' */
 	if ((deffile = fopen (globaldefname, "w")) == NULL)
 	{			/* Create DEFC file with global label declarations */
@@ -1204,7 +1192,7 @@ WriteMapFile (void)
     cmodule = modulehdr->first;	/* begin with first module */
 
     mapfilename = xstrdup(cmodule->cfile->fname);
-    strcpy (mapfilename + strlen (mapfilename) - 4, mapext);	/* overwrite '_asm' extension with '_map' */
+    strcpy (mapfilename + strlen (mapfilename) - 4, FILEEXT_MAP);	/* overwrite '_asm' extension with '_map' */
     try {
 	if ((mapfile = fopen (mapfilename, "w")) != NULL) {	/* Create MAP file */
 	    if (verbose)

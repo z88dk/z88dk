@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.39 2011-08-19 15:53:58 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.40 2011-08-21 20:37:20 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.39  2011-08-19 15:53:58  pauloscustodio
+/* Revision 1.40  2011-08-21 20:37:20  pauloscustodio
+/* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
+/* - Factor all pathname manipulation into module file.c.
+/* - Make default extensions constants.
+/* - Move srcext[] and objext[] to the options.c module.
+/*
+/* Revision 1.39  2011/08/19 15:53:58  pauloscustodio
 /* BUG_0010 : heap corruption when reaching MAXCODESIZE
 /* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
 /* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
@@ -370,7 +376,6 @@ void ReleaseFile (struct sourcefile *srcfile);
 void ReleaseLibraries (void);
 void ReleaseOwnedFile (struct usedfile *ownedfile);
 void ReleaseModules (void);
-void ReleaseFilenames (void);
 void ReleaseExprns (struct expression *express);
 void CloseFiles (void);
 void AssembleSourceFile (void);
@@ -406,20 +411,15 @@ long TOTALLINES;
 unsigned char PAGELEN;
 int TAB_DIST = 8, COLUMN_WIDTH;
 char line[255], stringconst[255], ident[FILENAME_MAX+1];
-char *srcfilename, *lstfilename, *objfilename, *errfilename, *libfilename;
 
-#ifdef QDOS
-char asmext[] = "_asm", lstext[] = "_lst", objext_templ[] = "_obj", defext[] = "_def", errext[] = "_err";
-char binext[] = "_bin", libext[] = "_lib", symext[] = "_sym", mapext[] = "_map";
-char segmbinext[] = "_bn0";
-#else
-char asmext[] = ".asm", lstext[] = ".lst", objext_templ[] = ".obj", defext[] = ".def", binext[] = ".bin";
-char mapext[] = ".map", errext[] = ".err", symext[] = ".sym", libext[] = ".lib";
-char segmbinext[] = ".bn0";
-#endif
+/* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation */
+char srcfilename[FILENAME_MAX];
+char lstfilename[FILENAME_MAX];
+char objfilename[FILENAME_MAX];
+char errfilename[FILENAME_MAX];
+char libfilename[FILENAME_MAX];
 
-char srcext[5];			/* contains default source file extension */
-char objext[5];			/* contains default object file extension */
+
 char Z80objhdr[] = "Z80RMF01";
 char objhdrprefix[] = "oomodnexprnamelibnmodc";
 char Z80libhdr[] = "Z80LMF01";
@@ -507,7 +507,7 @@ AssembleSourceFile (void)
 	if ( dotptr == NULL )
 	    dotptr = srcfilename-1;
 	strcpy(ident,dotptr+1);
-	dotptr = strchr(ident,asmext[0]);
+	dotptr = strchr(ident,FILEEXT_ASM[0]);
 	if ( dotptr )
 	    *dotptr = 0;
 	sym = name;
@@ -559,7 +559,7 @@ AssembleSourceFile (void)
 	{
 	  fclose (errfile);
 	  errfile = NULL;
-	  if (ERRORS == 0 && errfilename != NULL)
+	  if (ERRORS == 0)
 	    remove (errfilename);	/* remove empty error file */
 	}
       if (globaldef)
@@ -571,17 +571,6 @@ AssembleSourceFile (void)
       deleteall (&CURRENTMODULE->notdeclroot, (void (*)(void*)) FreeSym);
       deleteall (&globalroot, (void (*)(void*)) FreeSym);
   }
-}
-
-
-void 
-ReleaseFilenames (void)
-{
-  if (srcfilename != NULL) xfree0(srcfilename);
-  if (lstfilename != NULL) xfree0(lstfilename);
-  if (objfilename != NULL) xfree0(objfilename);
-  if (errfilename != NULL) xfree0(errfilename);
-  srcfilename = lstfilename = objfilename = errfilename = NULL;
 }
 
 
@@ -675,45 +664,31 @@ GetModuleSize (void)
 void 
 CreateLibfile (char *filename)
 {
-  size_t len;
+    size_t len;
 
-  len = strlen (filename);
-  if (len)
-    {
-      if (strcmp (filename + (len - 4), libext) != 0)
-        {				    /* 'lib' extension not specified */
-	  libfilename = xstrdup_add(filename, 4);
-          strcat (libfilename, libext);	    /* add '_lib' extension */
-        }
-      else
-        {
-          libfilename = xstrdup(filename);	/* 'lib' extension specified */
-        }
+    len = strlen (filename);
+    if (len) {
+	path_replace_ext(libfilename, filename, FILEEXT_LIB);	    /* add '.lib' extension */
     }
-  else
-    {
-      if ((filename = getenv ("Z80_STDLIB")) != NULL)
-        {
-	  /* BUG_0002 - off by one alloc */
-	  libfilename = xstrdup(filename);
+    else {
+	if ((filename = getenv ("Z80_STDLIB")) != NULL) {
+	    /* BUG_0002 - off by one alloc */
+	    strncpy(libfilename, filename, FILENAME_MAX-1);
+	    libfilename[FILENAME_MAX-1] = '\0';
         }
-      else
-        {
-          ReportError (NULL, 0, ERR_ENV_NOT_DEFINED, "Z80_STDLIB");
-          return;
+	else {
+	    ReportError (NULL, 0, ERR_ENV_NOT_DEFINED, "Z80_STDLIB");
+	    return;
         }
     }
 
-  if ((libfile = fopen (libfilename, "w+b")) == NULL)
-    {				/* create library as BINARY file */
-      xfree0(libfilename);
-      libfilename = NULL;
-      ReportError (NULL, 0, ERR_OPEN_LIB, libfilename);
+    if ((libfile = fopen (libfilename, "w+b")) == NULL) {
+    				/* create library as BINARY file */
+	ReportError (NULL, 0, ERR_OPEN_LIB, libfilename);
     }
-  else
-    {
-      createlibrary = ON;
-      xfwritec(Z80libhdr, 8U, libfile);	/* write library header */
+    else {
+	createlibrary = ON;
+	xfwritec(Z80libhdr, 8U, libfile);	/* write library header */
     }
 }
 
@@ -734,9 +709,9 @@ GetLibfile (char *filename)
   len = strlen (filename);
   if (len)
     {
-      if (strcmp (filename + (len - 4), libext) != 0)
+      if (strcmp (filename + (len - 4), FILEEXT_LIB) != 0)
         {
-          ext = libext;
+          ext = FILEEXT_LIB;
         }
       snprintf(tempbuf, sizeof(tempbuf),"%s%s",filename, ext);
 
@@ -1044,7 +1019,6 @@ main (int argc, char *argv[])
   ResetOptions();
   ResetErrors();
 
-  libfilename = NULL;
   modsrcfile = NULL;
   CURRENTMODULE = NULL;
   modulehdr = NULL;		/* initialise to no modules */
@@ -1056,8 +1030,6 @@ main (int argc, char *argv[])
   asmflag = DefineDefSym (OS_ID, 1, 0, &staticroot);
   if (!asmflag)
     throw(IllegalArgumentException, "Failed OS_ID definition");
-
-  strcpy (objext, objext_templ);	/* use ".obj" as default object file extension */
 
   /* Get command line arguments, if any... */
   if (argc == 1)
@@ -1121,11 +1093,6 @@ main (int argc, char *argv[])
   if (verbose == ON)
     display_options ();		/* display status messages of select assembler options */
 
-  if (smallc_source == OFF)
-    {
-      strcpy (srcext, asmext);	/* use ".asm" as default source file extension */
-    }
-
   for (;;)
     {				/* Module loop */
       z80asmfile = listfile = objfile = errfile = NULL;
@@ -1183,33 +1150,12 @@ main (int argc, char *argv[])
             }
         }
 
-#ifdef QDOS
-      /* explicit extension are automatically discarded */
-      if (strrchr(ident,'_') != NULL) *(strrchr(ident, '_')) ='\0';	
-#else
-      if (strrchr(ident,'.') != NULL) *(strrchr(ident, '.')) ='\0';
-#endif
-
-      srcfilename = xstrdup_add(ident, 4);
-      strcat (srcfilename, srcext);		/* add '_asm' or '_opt' extension   */
-
-      objfilename = xstrdup(srcfilename);
-      strcpy (objfilename + strlen (srcfilename) - 4, objext);	
-						/* overwrite '_asm' extension with '_obj' */
-
-      lstfilename = xstrdup(srcfilename);
-      if (listing) {
-          strcpy (lstfilename + strlen (srcfilename) - 4, lstext);	/* overwrite '_asm' extension
-                                                                        * with   '_lst' */
-      }
-      else {
-          strcpy (lstfilename + strlen (srcfilename) - 4, symext);	/* overwrite '_asm' extension
-                                                                        * with   '_sym' */
-      }
-
-      errfilename = xstrdup(srcfilename);
-      strcpy (errfilename + strlen (srcfilename) - 4, errext);	    /* overwrite '_asm' extension with
-                                                                     * '_err' */
+      path_replace_ext(srcfilename, ident, srcext);	    /* set '.asm' extension */
+      path_replace_ext(objfilename, ident, objext);	    /* set '.obj' extension */
+      path_replace_ext(errfilename, ident, FILEEXT_ERR);    /* set '.err' extension */
+      path_replace_ext(lstfilename, ident, 
+		       listing ? FILEEXT_LST		    /* set '.lst' extension */
+		               : FILEEXT_SYM);		    /* set '.sym' extension */
 
       CURRENTMODULE = NewModule ();		    /* Create module data structures for new file */
       E4C_ASSERT(CURRENTMODULE != NULL);
@@ -1229,10 +1175,8 @@ main (int argc, char *argv[])
       else if (asmflag == -1)
         break;			/* file open error - stop assembler */
 
-      ReleaseFilenames ();
     }				/* for */
 
-  ReleaseFilenames ();
   CloseFiles ();
 
   if (globaldef)
@@ -1252,8 +1196,6 @@ main (int argc, char *argv[])
 	  fclose (libfile);
 	  if (ASMERROR)
 	    remove (libfilename);
-	  xfree0(libfilename);
-	  libfilename = NULL;
 	}
   }
 
@@ -1293,12 +1235,7 @@ main (int argc, char *argv[])
 
   /* cleanup all allocated memory */
   finally {
-  ReleaseFilenames ();
   CloseFiles ();
-
-  if (libfilename) {			/* memory leak in case of exception */
-      xfree0(libfilename);
-  }
 
 #ifndef QDOS
   deleteall (&globalroot, (void (*)(void*)) FreeSym);
@@ -1362,14 +1299,14 @@ usage (void)
   printf ("%s\n", copyrightmsg);
   puts ("z80asm [options] [ @<modulefile> | {<filename>} ]");
   puts ("[] = may be ignored. {} = may be repeated. | = OR clause.");
-  printf ("To assemble 'fred%s' use 'fred' or 'fred%s'\n", asmext, asmext);
+  printf ("To assemble 'fred%s' use 'fred' or 'fred%s'\n", FILEEXT_ASM, FILEEXT_ASM);
   puts ("<modulefile> contains file names of all modules to be linked:");
   puts ("File names are put on separate lines ended with \\n. File types recognized or");
   puts ("created by z80asm (defined by the following extension):");
-  printf ("%s = source file (default), or alternative -e<ext>\n", asmext);
+  printf ("%s = source file (default), or alternative -e<ext>\n", FILEEXT_ASM);
   printf ("%s = object file (default), or alternative -M<ext>\n", objext);
-  printf ("%s = list file, %s = Z80 code file\n", lstext, binext);
-  printf ("%s = symbols file, %s = map file, %s = XDEF file, %s = error file\n", symext, mapext, defext, errext);
+  printf ("%s = list file, %s = Z80 code file\n", FILEEXT_LST, FILEEXT_BIN);
+  printf ("%s = symbols file, %s = map file, %s = XDEF file, %s = error file\n", FILEEXT_SYM, FILEEXT_MAP, FILEEXT_DEF, FILEEXT_ERR);
   puts ("Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)");
   printf ("-v verbose, -l listing file, -s symbol table, -m map listing file\n");
   puts ("-r<ORG> Explicit relocation <ORG> defined in hex (ignore ORG in first module)");
@@ -1382,7 +1319,7 @@ usage (void)
   puts ("-o<bin filename> expl. output filename, -g XDEF reloc. addr. from all modules");
   printf ("-i<library> include <library> LIB modules with %s modules during linking\n", objext);
   puts ("-x<library> create library from specified modules ( e.g. with @<modules> )");
-  printf ("-t<n> tabulator width for %s, %s, %s files. Column width is 4 times -t\n", mapext, defext, symext);
+  printf ("-t<n> tabulator width for %s, %s, %s files. Column width is 4 times -t\n", FILEEXT_MAP, FILEEXT_DEF, FILEEXT_SYM);
   printf ("-I<path> additional path to search for includes\n");
   printf ("-L<path> path to search for libraries\n");
   puts ("Default options: -nv -nd -nb -nl -s -m -ng -nc -nR -t8");

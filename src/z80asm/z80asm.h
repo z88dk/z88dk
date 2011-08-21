@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.10 2011-07-14 01:32:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.11 2011-08-21 20:37:20 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.10  2011-07-14 01:32:08  pauloscustodio
+/* Revision 1.11  2011-08-21 20:37:20  pauloscustodio
+/* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
+/* - Factor all pathname manipulation into module file.c.
+/* - Make default extensions constants.
+/* - Move srcext[] and objext[] to the options.c module.
+/*
+/* Revision 1.10  2011/07/14 01:32:08  pauloscustodio
 /*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 /*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 /*     CH_0003 : Error messages should be more informative
@@ -66,6 +72,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "config.h"
 #include "avltree.h"
 
 /* snprintf is _snprintf in WIN32 */
@@ -73,8 +80,33 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #define snprintf _snprintf
 #endif
 
-#define MAXLINE	    1024			/* maximum length of strings */
-#define NUM_ELEMS(x) (sizeof(x)/sizeof(x[0]))	/* number of elements of array */
+/* maximum length of strings */
+#define MAXLINE	    1024
+
+/* number of elements of an array */
+#define NUM_ELEMS(x) (sizeof(x)/sizeof(x[0]))
+
+/* default file name extensions */
+#define FILEEXT_MAX	(1+3+1)			/* size of fileext char[]: separator + 3 chars + null */
+
+#define FILEEXT_ASM	FILEEXT_SEPARATOR "asm"    /* ".asm" / "_asm" */
+#define FILEEXT_LST	FILEEXT_SEPARATOR "lst"    /* ".lst" / "_lst" */
+#define FILEEXT_OBJ	FILEEXT_SEPARATOR "obj"    /* ".obj" / "_obj" */
+#define FILEEXT_DEF	FILEEXT_SEPARATOR "def"    /* ".def" / "_def" */
+#define FILEEXT_ERR	FILEEXT_SEPARATOR "err"    /* ".err" / "_err" */
+#define FILEEXT_BIN	FILEEXT_SEPARATOR "bin"    /* ".bin" / "_bin" */
+#define FILEEXT_SEGBIN	FILEEXT_SEPARATOR "bn0"    /* ".bn0" / "_bn0" */
+#define FILEEXT_LIB	FILEEXT_SEPARATOR "lib"    /* ".lib" / "_lib" */
+#define FILEEXT_SYM	FILEEXT_SEPARATOR "sym"    /* ".sym" / "_sym" */
+#define FILEEXT_MAP	FILEEXT_SEPARATOR "map"    /* ".map" / "_map" */
+
+/* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation */
+extern char srcfilename[];
+extern char lstfilename[];
+extern char objfilename[];
+extern char errfilename[];
+extern char libfilename[];
+
 
 #define REG16_BC   0
 #define REG16_DE   1
@@ -103,10 +135,8 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #define CPU_ZILOG (CPU_Z80|CPU_Z180)
 #define CPU_ALL ( CPU_ZILOG |  CPU_RABBIT )
 
-extern int   cpu_type;
 
-extern char  srcext[];
-extern char  objext[];
+extern int   cpu_type;
 extern size_t EXPLICIT_ORIGIN;
 extern int TAB_DIST, COLUMN_WIDTH;
 extern char ident[];

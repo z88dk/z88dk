@@ -13,9 +13,15 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.19 2011-08-19 15:53:58 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.20 2011-08-21 20:37:20 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.19  2011-08-19 15:53:58  pauloscustodio
+/* Revision 1.20  2011-08-21 20:37:20  pauloscustodio
+/* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
+/* - Factor all pathname manipulation into module file.c.
+/* - Make default extensions constants.
+/* - Move srcext[] and objext[] to the options.c module.
+/*
+/* Revision 1.19  2011/08/19 15:53:58  pauloscustodio
 /* BUG_0010 : heap corruption when reaching MAXCODESIZE
 /* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
 /* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
@@ -227,7 +233,6 @@ struct sourcefile *FindFile (struct sourcefile *srcfile, char *fname);
 /* global variables */
 extern FILE *z80asmfile, *listfile, *objfile, *mapfile;
 extern char *date, line[], ident[], separators[];
-extern char *lstfilename, *objfilename, objext[], binext[];
 extern enum symbols sym;
 extern enum flag writeline, EOL;
 extern unsigned char PAGELEN;
