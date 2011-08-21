@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.21 2011-08-19 15:53:58 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.22 2011-08-21 20:18:33 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.21  2011-08-19 15:53:58  pauloscustodio
+# Revision 1.22  2011-08-21 20:18:33  pauloscustodio
+# Dependencies updated
+#
+# Revision 1.21  2011/08/19 15:53:58  pauloscustodio
 # BUG_0010 : heap corruption when reaching MAXCODESIZE
 # - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
 # - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
@@ -169,8 +172,8 @@ z80instr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 z80instr.o: symbol.h options.h errors.h codearea.h
 z80pass.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
 z80pass.o: hist.h options.h z80asm.h errors.h file.h codearea.h
-options.o: memalloc.h except.h e4c.h z80asm.h avltree.h options.h symbol.h
-options.o: symbols.h errors.h
+options.o: memalloc.h except.h e4c.h z80asm.h config.h ../config.h avltree.h
+options.o: options.h symbol.h symbols.h errors.h
 errors.o: memalloc.h except.h e4c.h errors.h symbol.h avltree.h options.h
 errors.o: z80asm.h config.h ../config.h
 memalloc.o: memalloc.h except.h e4c.h
