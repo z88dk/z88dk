@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jul. 2011
 ;
-;	$Id: osca_crt0.asm,v 1.3 2011-08-03 08:13:40 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.4 2011-09-02 12:43:56 stefano Exp $
 ;
 
 
@@ -110,6 +110,8 @@ ENDIF
 start1:
         ld  sp,0
         ;;ld  a,c	; return code (lowest byte only)
+        call	$10c4 ; kjt_flos_display (added in v547)
+
         xor a ; (set A and flags for RESULT=OK)
         ret
 
@@ -165,7 +167,7 @@ heapblocks:	defw	0
 ; mem stuff
 
 base_graphics:
-		defw	$2400
+		defw	$2000
 coords:		defw	0
 snd_tick:	defb	0
 

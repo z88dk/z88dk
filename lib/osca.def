@@ -1,0 +1,140 @@
+lstoff
+
+; OSCA - v6z80p
+;
+; Aug 2011
+;
+; $Id: osca.def,v 1.1 2011-09-02 12:43:56 stefano Exp $
+;
+
+;----- OSCA v659 Main system hardware control / peripheral ports -------------
+defc	sys_mem_select	= $00
+defc	sys_irq_ps2_flags	= $01
+defc	sys_irq_enable	= $01
+defc	sys_keyboard_data	= $02
+defc	sys_clear_irq_flags	= $02
+defc	sys_mouse_data	= $03
+defc	sys_ps2_joy_control	= $03
+defc	sys_serial_port	= $04
+defc	sys_joy_com_flags	= $05
+defc	sys_sdcard_ctrl1	= $05
+defc	sys_sdcard_ctrl2	= $06
+defc	sys_timer		= $07
+defc	sys_vreg_read	= $07
+defc	sys_audio_enable	= $08
+defc	sys_audio_flags	= $08
+defc	sys_hw_flags	= $09
+defc	sys_hw_settings	= $09
+defc	sys_spi_port	= $0a
+defc	sys_alt_write_page	= $0b
+defc	sys_baud_rate	= $0c
+defc	sys_pic_comms	= $0d
+defc	sys_eeprom_byte	= $0d
+defc	sys_io_pins	= $0e
+defc	sys_io_dir	= $0f
+
+defc	sys_low_page	= $20
+defc	sys_vram_location	= $21
+defc	sys_audio_panning	= $22
+
+;---- Sound system ports ---------------------------------------------------
+defc	audchan0_loc	= $10
+defc	audchan0_len	= $11
+defc	audchan0_per	= $12
+defc	audchan0_vol	= $13
+defc	audchan1_loc	= $14
+defc	audchan1_len	= $15
+defc	audchan1_per	= $16
+defc	audchan1_vol	= $17
+defc	audchan2_loc	= $18
+defc	audchan2_len	= $19
+defc	audchan2_per	= $1a
+defc	audchan2_vol	= $1b
+defc	audchan3_loc	= $1c
+defc	audchan3_len	= $1d
+defc	audchan3_per	= $1e
+defc	audchan3_vol	= $1f
+
+;------ Graphics registers -------------------------------------------------
+
+defc	palette 		= $0		
+
+defc	video_registers	= $200
+defc	vreg_xhws		= $200		; video control registers
+defc	vreg_vidctrl	= $201
+defc	vreg_window	= $202
+defc	vreg_yhws_bplcount	= $203
+defc	vreg_rasthi	= $204
+defc	vreg_rastlo	= $205
+defc	vreg_vidpage	= $206
+defc	vreg_sprctrl	= $207
+defc	mult_write	= $208		; SIGNED WORD
+defc	mult_index	= $20a		; BYTE
+defc	linedraw_colour	= $20b
+defc	vreg_ext_vidctrl	= $20c
+defc	vreg_linecop_lo	= $20d
+defc	vreg_linecop_hi	= $20e
+defc	vreg_palette_ctrl	= $20f
+
+defc	blit_src_loc	= $210		; blitter set-up registers
+defc	blit_dst_loc	= $212
+defc	blit_src_mod	= $214
+defc	blit_dst_mod	= $215
+defc	blit_height	= $216
+defc	blit_width	= $217
+defc	blit_misc		= $218
+defc	blit_src_msb	= $219
+defc	blit_dst_msb	= $21a
+
+defc	linedraw_reg0 	= $220		; line draw set-up registers (WORDS)
+defc	linedraw_reg1 	= $222
+defc	linedraw_reg2 	= $224
+defc	linedraw_reg3 	= $226
+defc	linedraw_reg4 	= $228		
+defc	linedraw_reg5 	= $22a
+defc	linedraw_reg6 	= $22c
+defc	linedraw_reg7 	= $22e
+defc	linedraw_lut0 	= $230		; line draw look-up table (WORDS)
+defc	linedraw_lut1 	= $232
+defc	linedraw_lut2 	= $234
+defc	linedraw_lut3 	= $236
+defc	linedraw_lut4 	= $238		
+defc	linedraw_lut5 	= $23a
+defc	linedraw_lut6 	= $23c
+defc	linedraw_lut7 	= $23e
+
+defc	bitplane0a_loc	= $240
+defc	bitplane1a_loc	= $244
+defc	bitplane2a_loc	= $248
+defc	bitplane3a_loc	= $24c
+defc	bitplane4a_loc	= $250
+defc	bitplane5a_loc	= $254
+defc	bitplane6a_loc	= $258
+defc	bitplane7a_loc	= $25c
+defc	bitplane0b_loc	= $260
+defc	bitplane1b_loc	= $264
+defc	bitplane2b_loc	= $268
+defc	bitplane3b_loc	= $26c
+defc	bitplane4b_loc	= $270
+defc	bitplane5b_loc	= $274
+defc	bitplane6b_loc	= $278
+defc	bitplane7b_loc	= $27c
+defc	bitplane_reset	= $243
+defc	bitplane_modulo	= $247
+
+defc	sprite_registers	= $400		; sprite coord/def/size registers
+defc	spr_registers	= $400		; alternate name
+
+defc	mult_table	= $600		; maths table (256 SIGNED WORDS)
+
+defc	vreg_read		= $700		; video status read register
+defc	mult_read		= $704		; SIGNED WORD
+
+;--------------------------------------------------------------------------
+
+defc	sprite_base	= $1000		; 4KB when banked in
+defc	video_base	= $2000		; 8KB when banked in
+
+;--------------------------------------------------------------------------
+
+lston
