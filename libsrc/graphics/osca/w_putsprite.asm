@@ -6,7 +6,7 @@
 ; TS2068 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.1 2011-09-02 12:43:57 stefano Exp $
+; $Id: w_putsprite.asm,v 1.2 2011-09-09 06:03:28 stefano Exp $
 ;
 
         XLIB    putsprite
@@ -24,10 +24,10 @@
 .offsets_table
          defb   1,2,4,8,16,32,64,128
 
-.oldx
+.curaddr
          defw   0
-.cury
-         defw   0
+;.cury
+;         defw   0
 
 
 .putsprite
@@ -63,9 +63,10 @@
         ; @@@@@@@@@@@@
         ld      h,b
         ld      l,c
-        ld      (oldx),hl
-        ld      (cury),de
+        ;ld      (oldx),hl
+        ;ld      (cury),de
         call    w_pixeladdress
+        ld      (curaddr),de
         ; ------
         ;ld		a,(hl)
         ; @@@@@@@@@@@@
@@ -117,13 +118,17 @@
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-         ld      hl,(oldx)
-         ld      de,(cury)
-         inc     de
-         ld      (cury),de
-         call    w_pixeladdress
-         ld      h,d
-         ld      l,e
+         ld hl,(curaddr)
+         ld	de,40
+         add hl,de
+         ld (curaddr),hl
+         ;ld      hl,(oldx)
+         ;ld      de,(cury)
+         ;inc     de
+         ;ld      (cury),de
+         ;call    w_pixeladdress
+         ;ld      h,d
+         ;ld      l,e
         ;@@@@@@@@@@
         pop     de
          pop      bc                ;Restore data
@@ -166,13 +171,17 @@
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-         ld      hl,(oldx)
-         ld      de,(cury)
-         inc     de
-         ld      (cury),de
-         call    w_pixeladdress
-         ld      h,d
-         ld      l,e
+         ld hl,(curaddr)
+         ld	de,40
+         add hl,de
+         ld (curaddr),hl
+;         ld      hl,(oldx)
+;         ld      de,(cury)
+;         inc     de
+;         ld      (cury),de
+;         call    w_pixeladdress
+;         ld      h,d
+;         ld      l,e
         ;@@@@@@@@@@
         pop     de
 
@@ -190,13 +199,17 @@
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-         ld      hl,(oldx)
-         ld      de,(cury)
-         inc     de
-         ld      (cury),de
-         call    w_pixeladdress
-         ld      h,d
-         ld      l,e
+         ld hl,(curaddr)
+         ld	de,40
+         add hl,de
+         ld (curaddr),hl
+;        ld      hl,(oldx)
+;         ld      de,(cury)
+;         inc     de
+;         ld      (cury),de
+;         call    w_pixeladdress
+;         ld      h,d
+;         ld      l,e
         ;@@@@@@@@@@
         pop     de
 
