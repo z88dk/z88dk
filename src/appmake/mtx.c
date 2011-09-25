@@ -1,12 +1,11 @@
 /*
  *      Memotech MTX application packager
  *      
- *      $Id: mtx.c,v 1.5 2011-05-23 07:10:39 stefano Exp $
+ *      $Id: mtx.c,v 1.6 2011-09-25 09:53:21 dom Exp $
  */
 
 
 #include "appmake.h"
-#include "malloc.h"
 
 
 
