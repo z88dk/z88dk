@@ -1,7 +1,7 @@
 /*
  *        BIN to MZ Sharp M/C file
  *
- *        $Id: mz.c,v 1.3 2011-06-07 06:15:33 stefano Exp $
+ *        $Id: mz.c,v 1.4 2011-09-26 15:43:29 stefano Exp $
  *
  *        bin2m12 by: Stefano Bodrato 4/5/2000
  *        portions from mzf2wav by: Jeroen F. J. Laros. Sep 11 2003.
@@ -55,7 +55,7 @@ option_t mz_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
-    {  0,  "mz80b",    "MZ80B mode (faster 1800bps)",   OPT_BOOL,  &fast },
+    {  0,  "mz80b",    "MZ80B mode (faster 1800bps)",   OPT_BOOL,  &mz80b },
     {  0,  "turbo",    "Turbo tape loader",          OPT_BOOL,  &turbo },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
@@ -126,7 +126,7 @@ void writecs(unsigned int cs) {
   lp();
 }
 
-/* Write a byte and count the ones for the checksum */
+/* Write a byte and count the bits set to 'one' for the checksum */
 unsigned int mz_rawout(unsigned char b) {
   unsigned int cs = 0;
   unsigned char i = 0;
@@ -370,7 +370,8 @@ int mz_exec(char *target)
 			strncpy(name,blockname,16);
 		} else {
 			strcpy(name,blockname);
-			strncat(name,"\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0",17-strlen(blockname));
+			//strncat(name,"\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0",17-strlen(blockname));
+			strncat(name,"\15\15\15\15\15\15\15\15\15\15\15\15\15\15\15\15\15",17-strlen(blockname));
 		}
 
 		for (i=0;i<17;i++)		/* File name */
@@ -378,15 +379,24 @@ int mz_exec(char *target)
 				fputc(13,fpout);
 			else
 				fputc(toupper(name[i]),fpout);
-
 		
 		writeword(len,fpout);	/* Block byte size */
 		writeword(pos,fpout);	/* Binary block location */
 		writeword(pos,fpout);	/* Execution address (autorun) */
+		if (mz80b) {
+			for (i=0;i<7;i++)
+				fputc(0,fpout);
+			fputc(0x3a,fpout);
 
-		/* Comment area in header */
-		for (i=0;i<104;i++)
-			fputc(0,fpout);
+			for (i=0;i<48;i++) {
+				fputc(0x00,fpout);
+				fputc(0xFF,fpout);
+				}
+		} else {
+			/* Comment area in header */
+			for (i=0;i<104;i++)
+				fputc(0,fpout);
+		}
 		
 		/* *********** */
 		/* ... M/C ... */
@@ -440,12 +450,17 @@ int mz_exec(char *target)
 				printf("%c",image[i]);
 		}
 		if (dumb) {
-			printf("\n\n");
-			printf("Info: file type:         %u\n", image[0]);
-			printf("Info: program location:  $%x\n", image[0x14] + (image[0x15] * 256));
-			printf("Info: binary block size: $%x\n", image[0x12] + (image[0x13] * 256));
-			if (image[0] == 1)
-				printf("Info: start address:     $%x\n", image[0x16] + (image[0x17] * 256));
+				printf("\n\n");
+				printf("Info: file type:         %u\n", image[0]);
+				printf("Info: program location:  $%x\n", image[0x14] + (image[0x15] * 256));
+				printf("Info: binary block size: $%x\n", image[0x12] + (image[0x13] * 256));
+				if (image[0] == 1) {
+					printf("Info: start address:     $%x\n", image[0x16] + (image[0x17] * 256));
+					if ((image[0x14] + image[0x15] + image[0x16] + image[0x17])==0) {
+						printf("Info: probably this is an MZ80B IPL file\n");
+						if (!mz80b) printf("Warning: use the '--mz80b' parameter\n");
+					}
+				}
 		}
 		fclose(fpin);
 
@@ -484,6 +499,12 @@ int mz_exec(char *target)
 			LONG_DOWN = 15;
 			SHORT_UP = 7;
 			SHORT_DOWN = 8;
+			if (fast) {
+				LONG_UP = 13;
+				LONG_DOWN = 14;
+				SHORT_UP = 6;
+				SHORT_DOWN = 7;
+			}
 		}
 		
 		if (turbo) {
