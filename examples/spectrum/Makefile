@@ -7,7 +7,7 @@ save:
 	zcc +zx -vn save.c -o save.bin -create-app 
 
 gfx:
-	zcc +zx -vn gfx.c -o gfx.bin -lndos -create-app
+	zcc +zx -vn gfx.c -o gfx.bin -lndos -create-app -lm
 
 dstar:
 	zcc +zx -vn dstar.c -o dstar.bin -create-app -lndos
@@ -28,10 +28,10 @@ csprite:
 	zcc +zx -vn csprite.c -lndos -create-app -ocsprite.bin
 
 zxbasic:
-	zcc +zx -vn zxbasic.c -lndos -create-app -ozxbasic.bin
+	zcc +zx -vn zxbasic.c -lndos -create-app -ozxbasic.bin -lm
 
 zxcurrah:
-	zcc +zx -vn zxbasic.c -lndos -create-app -ozxcurrah.bin
+	zcc +zx -vn zxbasic.c -lndos -create-app -ozxcurrah.bin -lm
 
 threading:
 	zcc +zx -vn preempt.c -lndos -create-app -othreading.bin -lpreempt
