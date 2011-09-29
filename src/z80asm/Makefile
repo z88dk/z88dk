@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.22 2011-08-21 20:18:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.23 2011-09-29 21:27:16 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.22  2011-08-21 20:18:33  pauloscustodio
+# Revision 1.23  2011-09-29 21:27:16  pauloscustodio
+# Updated depend
+#
+# Revision 1.22  2011/08/21 20:18:33  pauloscustodio
 # Dependencies updated
 #
 # Revision 1.21  2011/08/19 15:53:58  pauloscustodio
@@ -178,7 +181,7 @@ errors.o: memalloc.h except.h e4c.h errors.h symbol.h avltree.h options.h
 errors.o: z80asm.h config.h ../config.h
 memalloc.o: memalloc.h except.h e4c.h
 except.o: except.h memalloc.h e4c.h e4c.c
-file.o: file.h memalloc.h except.h e4c.h
+file.o: file.h memalloc.h except.h e4c.h config.h ../config.h
 codearea.o: codearea.h memalloc.h except.h e4c.h config.h ../config.h
 codearea.o: errors.h symbol.h avltree.h z80asm.h file.h
 objfile.o: objfile.h memalloc.h except.h e4c.h
