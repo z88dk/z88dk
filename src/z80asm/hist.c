@@ -19,9 +19,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.22 2011-08-19 19:22:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.23 2011-09-29 21:26:43 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.22  2011-08-19 19:22:28  pauloscustodio
+/* Revision 1.23  2011-09-29 21:26:43  pauloscustodio
+/* Version 1.1.9
+/*
+/* Revision 1.22  2011/08/19 19:22:28  pauloscustodio
 /* Version 1.1.8
 /*
 /* Revision 1.21  2011/08/14 19:50:31  pauloscustodio
@@ -731,14 +734,24 @@ Based on 1.0.31
     - Factored code to read/write word from file into xfget_word/xfput_word. 
     - Renamed ReadLong/WriteLong to xfget_long/xfput_long for symetry.
 
+29.09.2011 [1.1.9] (pauloscustodio)
+
+    CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
+	- Factor all pathname manipulation into module file.c.
+	- Make default extensions constants.
+	- Factor FILEEXT_SEPARATOR into config.h.
+	- Move srcext[] and objext[] to the options.c module.
+
+    BUG_0012 : binfilename[] array is too short, should be FILENAME_MAX
+
 */
 
 #include "memalloc.h"	/* before any other include to enable memory leak detection */
 
 #include "hist.h"
 
-#define DATE        "19.08.2011"
-#define VERSION     "1.1.8"
+#define DATE        "29.09.2011"
+#define VERSION     "1.1.9"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011"
 
 #ifdef QDOS
