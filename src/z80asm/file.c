@@ -16,9 +16,15 @@ Copyright (C) Paulo Custodio, 2011
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.3 2011-08-21 20:21:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.4 2011-09-30 10:30:06 pauloscustodio Exp $ */
 /* $Log: file.c,v $
-/* Revision 1.3  2011-08-21 20:21:21  pauloscustodio
+/* Revision 1.4  2011-09-30 10:30:06  pauloscustodio
+/* BUG_0014 : -x./zx_clib should create ./zx_clib.lib but actually creates .lib
+/* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
+/* path_remove_ext() removed everything after last ".", ignoring directory
+/*  separators. Fixed.
+/*
+/* Revision 1.3  2011/08/21 20:21:21  pauloscustodio
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
 /* - Factor all pathname manipulation into module file.c.
 /*
@@ -115,10 +121,20 @@ long xfget_long (FILE *stream)
 /* remove the extension of the passed filename, modifies the string */
 void path_remove_ext  (char *filename)
 {
-    char *sep_pos = strrchr(filename, FILEEXT_SEPARATOR[0]);
+    char *dot_pos = strrchr(filename, FILEEXT_SEPARATOR[0]);
+    char *dir_pos;
 
-    if (sep_pos != NULL) {
-	*sep_pos = '\0';		/* terminate the string */
+    if (dot_pos != NULL) {
+	/* BUG_0014 : need to ignore dot if before a directory separator */
+	dir_pos = strrchr(filename, '/');
+	if (dir_pos != NULL && dot_pos < dir_pos) 
+	    return;			/* dot before slash */
+
+	dir_pos = strrchr(filename, '\\');
+	if (dir_pos != NULL && dot_pos < dir_pos) 
+	    return;			/* dot before backslash */
+
+	*dot_pos = '\0';		/* terminate the string */
     }
 }
 

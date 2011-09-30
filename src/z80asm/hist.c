@@ -19,9 +19,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.23 2011-09-29 21:26:43 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.24 2011-09-30 10:30:06 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.23  2011-09-29 21:26:43  pauloscustodio
+/* Revision 1.24  2011-09-30 10:30:06  pauloscustodio
+/* BUG_0014 : -x./zx_clib should create ./zx_clib.lib but actually creates .lib
+/* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
+/* path_remove_ext() removed everything after last ".", ignoring directory
+/*  separators. Fixed.
+/*
+/* Revision 1.23  2011/09/29 21:26:43  pauloscustodio
 /* Version 1.1.9
 /*
 /* Revision 1.22  2011/08/19 19:22:28  pauloscustodio
@@ -744,14 +750,21 @@ Based on 1.0.31
 
     BUG_0012 : binfilename[] array is too short, should be FILENAME_MAX
 
+30.09.2011 [1.1.10] (pauloscustodio)
+
+    BUG_0014 : -x./zx_clib should create ./zx_clib.lib but actually creates .lib
+	(reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
+	- path_remove_ext() removed everything after last ".", ignoring directory
+	  separators. Fixed.
+
 */
 
 #include "memalloc.h"	/* before any other include to enable memory leak detection */
 
 #include "hist.h"
 
-#define DATE        "29.09.2011"
-#define VERSION     "1.1.9"
+#define DATE        "30.09.2011"
+#define VERSION     "1.1.10"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011"
 
 #ifdef QDOS
