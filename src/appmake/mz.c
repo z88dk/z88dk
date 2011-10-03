@@ -1,7 +1,7 @@
 /*
  *        BIN to MZ Sharp M/C file
  *
- *        $Id: mz.c,v 1.4 2011-09-26 15:43:29 stefano Exp $
+ *        $Id: mz.c,v 1.5 2011-10-03 15:22:20 stefano Exp $
  *
  *        bin2m12 by: Stefano Bodrato 4/5/2000
  *        portions from mzf2wav by: Jeroen F. J. Laros. Sep 11 2003.
@@ -32,7 +32,13 @@ static char              mz80b        = 0;
 static char              turbo        = 0;
 static char              dumb         = 0;
 static char              loud         = 0;
+static char             *src          = NULL;
+static char             *dst          = NULL;
+static char              foopatch     = 0;
 
+/* patching global variables */
+unsigned int *src_codes = 0;
+unsigned int *dst_codes = 0;
 
 /* mzf2wav global variables */
 
@@ -56,6 +62,9 @@ option_t mz_options[] = {
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
     {  0,  "mz80b",    "MZ80B mode (faster 1800bps)",   OPT_BOOL,  &mz80b },
+    {  0,  "src",      "Patch from (80B,700)",       OPT_STR,   &src },
+    {  0,  "dst",      "Patch to (80B,700)",         OPT_STR,   &dst },
+    {  0,  "foopatch", "Patch unknown locations with BEEP",    OPT_BOOL,  &foopatch },
     {  0,  "turbo",    "Turbo tape loader",          OPT_BOOL,  &turbo },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
@@ -64,8 +73,90 @@ option_t mz_options[] = {
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
-/* Code from mzf2wav (physical.c) */
 
+/* Tables for patching */
+
+unsigned int mz700_codes[] = {
+	0x003E,	// BEEP (keep always in first position)
+	0x0003,	// GETL - Get LINE (up to 80 characters)
+	0x0006,	// Double newline (1 line space)
+	0x0009,	// Newline
+	0x000c,	// print space
+	0x000f,	// print TAB
+	0x0012,	// print character
+	0x0015,	// print message	(control characters transcoding)
+	0x0018,	// print messageX
+	0x001B,	// GETKY - Get Key
+	0x001E,	// test BREAK
+	0x0030,	// SOUND
+	0x0033,	// set time
+	0x003b,	// read time
+	0x0041,	// set tempo (melody)
+
+	0x00AD,	// MONITOR entry
+
+	0x03ba,	// print hex value of HL
+	0x03c3,	// print hex value of A
+	0x03da,	// format hex digit to ascii
+	0x03E5,	// format ascii to hex digit
+	0x03F9,	// format ascii to hex digit
+	0x09b3,	// Wait for a key and get key code
+	0x0bcd,	// convert key code to ASCII
+	0x0bce,	// convert key code to ASCII
+	0x0ddc,	// screen control (scroll, cursor, etc..)
+	0
+/*
+	0x07e6,	// GETL - Get LINE (up to 80 characters)
+	0x090E,	// Double newline (1 line space)
+	0x0918,	// Newline
+	0x0920,	// print space
+	0x0924,	// print TAB
+	0x0935,	// print character
+	0x0893,	// print message	(control characters transcoding)
+	0x08A1,	// print messageX
+	0x08BD,	// GETKY - Get Key (ASCII code)
+	0x0A32,	// test BREAK
+	0x01C7,	// SOUND
+	0x0308,	// set time
+	0x0358,	// read time
+	0x0577,	// BEEP
+	0x02e5,	// set tempo (melody)
+*/
+};
+
+unsigned int mz80b_codes[] = {
+	0x0EBE,	// BEEP (keep always in first position)
+	0x06A4,	// GETL - Get LINE (up to 80 characters)
+	0x08b0,	// Double newline (1 line space)
+	0x08ab,	// Newline
+	0x08b9,	// print space
+	0x08be,	// print TAB
+	0x0916,	// print character
+	0x08cd,	// print message	(control characters transcoding)
+	0x08db,	// print messageX
+	0x0871,	// GETKY - Get Key
+	0x0562,	// test BREAK
+	0x0EC0,	// SOUND
+	0x0301,	// set time ($E51 ?)  ** RET **
+	0x0301,	// read time          ** RET **
+	0x0301,	// set tempo (melody) ** RET **
+
+	0x00B1,	// MONITOR entry
+	
+	0x05D8,	// print hex value of HL
+	0x05DD,	// print hex value of A
+	0x05f3,	// format hex digit to ascii
+	0x05fd,	// format ascii to hex digit
+	0x05fd,	// format ascii to hex digit
+	0x0871,	// Wait for a key and get key code
+	0x0301,	// convert key code to ASCII              ** RET **
+	0x0301,	// convert key code to ASCII              ** RET **
+	0x0301,	// screen control (scroll, cursor, etc..) ** RET **
+	0
+};
+
+
+/* Code from mzf2wav (physical.c) */
 
 /* Write a long pulse */
 void lp(void) {
@@ -143,6 +234,44 @@ unsigned int mz_rawout(unsigned char b) {
   lp();
   return cs;
 }
+
+
+/* Patch the code, locate static calls and jumps, fix locations */
+
+void mz_patch (unsigned char *image, unsigned int *src_table, unsigned int *dst_table) {
+
+	int i, len, x, patched;
+	unsigned int org_location, call_location;
+
+	/* Get the actual file length (header + data) */
+	len = (image[0x12] + (image[0x13] * 256) + 0x80);	
+	org_location = image[0x14] + image[0x15] * 256;
+
+	for (i = 0x80; i < len; i++) {   /* The mzf body. */
+		/* call or jump ? */
+		if ((image[i]==205) || (image[i]==195))  {
+			x=0; patched=0;
+			call_location = image[i+1] + image[i+2] * 256;
+			while (dst_table[x]!=0) {
+				if (call_location == src_table[x]) {
+					printf("\nInfo: Patching location %x, opcode '%x', address $%x->$%x", org_location + i - 0x80, image[i], call_location, dst_table[x]);
+					image[i+1]=dst_table[x]%256;
+					image[i+2]=dst_table[x]/256;
+					patched=1;
+				}
+				x++;
+			}
+			if ( !patched && (call_location < org_location) && (call_location != 0) ) {
+					printf("\nWarning: Location %x, opcode '%x', unknown address $%x", org_location + i - 0x80, image[i], call_location);
+					if (foopatch)
+						printf(" -> BEEP");
+						image[i+1]=dst_table[0]%256;
+						image[i+2]=dst_table[0]/256;
+				}
+		}
+	}
+}
+
 
 
 /* Generate the raw audio track from the program data  */
@@ -294,6 +423,47 @@ int mz_exec(char *target)
     if ( binname == NULL || !dumb && ( crtfile == NULL && origin == -1 ) ) {
         return -1;
     }
+
+	if ( dst != NULL )
+	{
+		if ( src == NULL ) {
+			fprintf(stderr,"Please specify the source model for patching\n");
+			return -1;
+		}
+		if ((strcmp(dst,"80b") == 0) || (strcmp(dst,"80b") == 0))
+			dst_codes = mz80b_codes;
+
+		if (strcmp(dst,"700") == 0)
+			dst_codes = mz700_codes;
+
+		if (dst_codes == 0) {
+			fprintf(stderr,"Specified dst model for patching is not valid\n");
+			return -1;
+		}
+	}
+
+	if ( src != NULL )
+	{
+		if ( dst == NULL ) {
+			fprintf(stderr,"Please specify the destination model for patching\n");
+			return -1;
+		}
+		if ((strcmp(src,"80b") == 0) || (strcmp(src,"80b") == 0))
+			src_codes = mz80b_codes;
+
+		if (strcmp(src,"700") == 0)
+			src_codes = mz700_codes;
+
+		if (src_codes == 0) {
+			fprintf(stderr,"Specified src model for patching is not valid\n");
+			return -1;
+		}
+
+		if (src_codes == dst_codes) {
+			fprintf(stderr,"MZ src and dst models must be different for patching\n");
+			return -1;
+		}
+	}
 
 	if (loud) {
 		mz_h_lvl = 0xFF;
@@ -470,6 +640,9 @@ int mz_exec(char *target)
 			myexit(NULL,1);
 		}
 
+
+		if (src_codes != 0)
+			mz_patch (image, src_codes, dst_codes);
 
 		if (turbo) {
 			fast = -1;

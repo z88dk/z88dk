@@ -9,15 +9,24 @@
 ;	Maybe someone wants to improve this ?
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.3 2011-10-03 15:22:20 stefano Exp $
 ;
 
 		XLIB	fgetc_cons
 
 .fgetc_cons
-		call	$9b3	; wait for a key
-		call	$bce	; convert it to ASCII
-		
+;		call	$9b3	; wait for a key
+;		call	$bce	; convert it to ASCII
+
+		call	$1B   ;get key
+		and	a
+		jr		nz,fgetc_cons
+
+.wkey
+		call	$1B   ;get key
+		and a
+		jr	z,wkey
+
 		cp	$66	; was it ENTER ?
 		jr	nz,noenter
 		ld	a,13
