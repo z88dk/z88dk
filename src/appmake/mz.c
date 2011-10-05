@@ -1,7 +1,7 @@
 /*
  *        BIN to MZ Sharp M/C file
  *
- *        $Id: mz.c,v 1.5 2011-10-03 15:22:20 stefano Exp $
+ *        $Id: mz.c,v 1.6 2011-10-05 17:23:27 stefano Exp $
  *
  *        bin2m12 by: Stefano Bodrato 4/5/2000
  *        portions from mzf2wav by: Jeroen F. J. Laros. Sep 11 2003.
@@ -35,6 +35,7 @@ static char              loud         = 0;
 static char             *src          = NULL;
 static char             *dst          = NULL;
 static char              foopatch     = 0;
+static char              aggressive_patch   = 0;
 
 /* patching global variables */
 unsigned int *src_codes = 0;
@@ -45,6 +46,7 @@ unsigned int *dst_codes = 0;
 static unsigned char     mz_h_lvl;
 static unsigned char     mz_l_lvl;
 
+static FILE *rawout;
 static FILE *mzfout;
 
 static int  LONG_UP    = 0,   /* These variables define the long wave */
@@ -65,6 +67,7 @@ option_t mz_options[] = {
     {  0,  "src",      "Patch from (80B,700)",       OPT_STR,   &src },
     {  0,  "dst",      "Patch to (80B,700)",         OPT_STR,   &dst },
     {  0,  "foopatch", "Patch unknown locations with BEEP",    OPT_BOOL,  &foopatch },
+    {  0,  "patchall", "Patch also the conditional JPs and CALLs",    OPT_BOOL,  &aggressive_patch },
     {  0,  "turbo",    "Turbo tape loader",          OPT_BOOL,  &turbo },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
@@ -92,20 +95,10 @@ unsigned int mz700_codes[] = {
 	0x0033,	// set time
 	0x003b,	// read time
 	0x0041,	// set tempo (melody)
+	0x0044,	// start continous sound
+	0x0047,	// stop continous sound
 
-	0x00AD,	// MONITOR entry
-
-	0x03ba,	// print hex value of HL
-	0x03c3,	// print hex value of A
-	0x03da,	// format hex digit to ascii
-	0x03E5,	// format ascii to hex digit
-	0x03F9,	// format ascii to hex digit
-	0x09b3,	// Wait for a key and get key code
-	0x0bcd,	// convert key code to ASCII
-	0x0bce,	// convert key code to ASCII
-	0x0ddc,	// screen control (scroll, cursor, etc..)
-	0
-/*
+	0x0577,	// BEEP
 	0x07e6,	// GETL - Get LINE (up to 80 characters)
 	0x090E,	// Double newline (1 line space)
 	0x0918,	// Newline
@@ -119,9 +112,28 @@ unsigned int mz700_codes[] = {
 	0x01C7,	// SOUND
 	0x0308,	// set time
 	0x0358,	// read time
-	0x0577,	// BEEP
 	0x02e5,	// set tempo (melody)
-*/
+	0x02ab,	// start continous sound
+	0x02be,	// stop continous sound
+
+	0x00AD,	// MONITOR entry
+
+	0x03ba,	// print hex value of HL
+	0x03c3,	// print hex value of A
+	0x03da,	// format hex digit to ascii
+	0x03E5,	// format ascii to hex digit
+	0x03F9,	// format ascii to hex digit
+	0x09b3,	// Wait for a key and get key code
+	
+	0x0bb9,	// console stuff ?
+	0x0fb1,	// console stuff ?
+	0x0946,	// console stuff ?	(8ee)
+	0x0939,	// console stuff ?  (91a)
+	0x096c,	// raw character output ?
+	0x0bcd,	// convert key code to ASCII
+	0x0bce,	// convert ASCII in 'display code'
+	0x0ddc,	// screen control (scroll, cursor, etc..)
+	0
 };
 
 unsigned int mz80b_codes[] = {
@@ -136,10 +148,30 @@ unsigned int mz80b_codes[] = {
 	0x08db,	// print messageX
 	0x0871,	// GETKY - Get Key
 	0x0562,	// test BREAK
-	0x0EC0,	// SOUND
-	0x0301,	// set time ($E51 ?)  ** RET **
-	0x0301,	// read time          ** RET **
-	0x0301,	// set tempo (melody) ** RET **
+	0x0301,	// SOUND                 ** RET **
+	0x0301,	// set time ($E51 ?)     ** RET **
+	0x0301,	// read time             ** RET **
+	0x0301,	// set tempo (melody)    ** RET **
+	0x0301,	// start continous sound ** RET **
+	0x0301,	// stop continous sound  ** RET **
+
+	0x0EBE,	// BEEP (keep always in first position)
+	0x06A4,	// GETL - Get LINE (up to 80 characters)
+	0x08b0,	// Double newline (1 line space)
+	0x08ab,	// Newline
+	0x08b9,	// print space
+	0x08be,	// print TAB
+	0x0916,	// print character
+	0x08cd,	// print message	(control characters transcoding)
+	0x08db,	// print messageX
+	0x0871,	// GETKY - Get Key
+	0x0562,	// test BREAK
+	0x0301,	// SOUND                 ** RET **
+	0x0301,	// set time ($E51 ?)     ** RET **
+	0x0301,	// read time             ** RET **
+	0x0301,	// set tempo (melody)    ** RET **
+	0x0301,	// start continous sound ** RET **
+	0x0301,	// stop continous sound  ** RET **
 
 	0x00B1,	// MONITOR entry
 	
@@ -149,9 +181,15 @@ unsigned int mz80b_codes[] = {
 	0x05fd,	// format ascii to hex digit
 	0x05fd,	// format ascii to hex digit
 	0x0871,	// Wait for a key and get key code
-	0x0301,	// convert key code to ASCII              ** RET **
-	0x0301,	// convert key code to ASCII              ** RET **
-	0x0301,	// screen control (scroll, cursor, etc..) ** RET **
+
+	0x0301,	// console stuff (bb9).. should we replace with 5f3 or a6e  ? ** RET **
+	0x0c53,	// console stuff ?
+	0x08EE,	// console stuff ?  (946)
+	0x091A,	// console stuff ?  (939)
+	0x0916,	// raw character output ? (normal putchar, 916)
+	0x0301,	// convert key code to ASCII                        ** RET **
+	0x0301,	// convert ASCII in 'display code' (not necessary)   ** RET **
+	0x0301,	// screen control (scroll, cursor, etc..)            ** RET **
 	0
 };
 
@@ -163,9 +201,9 @@ void lp(void) {
   int j = 0;
 
   for (j = 0; j < LONG_UP; j++)
-    fputc(mz_l_lvl, mzfout);
+    fputc(mz_l_lvl, rawout);
   for (j = 0; j < LONG_DOWN; j++)
-    fputc(mz_h_lvl, mzfout);
+    fputc(mz_h_lvl, rawout);
 }
 
 /* Write a short pulse */
@@ -173,9 +211,9 @@ void sp(void) {
   int j = 0;
 
   for (j = 0; j < SHORT_UP; j++)
-  	fputc (mz_l_lvl,mzfout);
+  	fputc (mz_l_lvl,rawout);
   for (j = 0; j < SHORT_DOWN; j++)
-    fputc (mz_h_lvl, mzfout);
+    fputc (mz_h_lvl, rawout);
 }
 
 /* Write a gap of i short pulses */
@@ -244,14 +282,22 @@ void mz_patch (unsigned char *image, unsigned int *src_table, unsigned int *dst_
 	unsigned int org_location, call_location;
 
 	/* Get the actual file length (header + data) */
-	len = (image[0x12] + (image[0x13] * 256) + 0x80);	
-	org_location = image[0x14] + image[0x15] * 256;
+	len = (image[0x12] + (image[0x13] * 256) + 0x80);
+	org_location = image[0x14] + (image[0x15] * 256);
 
 	for (i = 0x80; i < len; i++) {   /* The mzf body. */
 		/* call or jump ? */
-		if ((image[i]==205) || (image[i]==195))  {
+		if ( (image[i]==0xCD) || (image[i]==0xC3) || 
+			(aggressive_patch && (
+				(image[i]==0xDC) || (image[i]==0xFC) || (image[i]==0xD4) || 
+				(image[i]==0xC4) || (image[i]==0xF4) || (image[i]==0xEC) || 
+				(image[i]==0xE4) || (image[i]==0xCC) || 
+				(image[i]==0xDA) || (image[i]==0xFA) || (image[i]==0xD2) || 
+				(image[i]==0xC2) || (image[i]==0xF2) || (image[i]==0xEA) ||
+				(image[i]==0xE2) || (image[i]==0xCA)
+			)) ) {
 			x=0; patched=0;
-			call_location = image[i+1] + image[i+2] * 256;
+			call_location = image[i+1] + (image[i+2] * 256);
 			while (dst_table[x]!=0) {
 				if (call_location == src_table[x]) {
 					printf("\nInfo: Patching location %x, opcode '%x', address $%x->$%x", org_location + i - 0x80, image[i], call_location, dst_table[x]);
@@ -428,7 +474,7 @@ int mz_exec(char *target)
 	{
 		if ( src == NULL ) {
 			fprintf(stderr,"Please specify the source model for patching\n");
-			return -1;
+			myexit(NULL,1);
 		}
 		if ((strcmp(dst,"80b") == 0) || (strcmp(dst,"80b") == 0))
 			dst_codes = mz80b_codes;
@@ -438,7 +484,7 @@ int mz_exec(char *target)
 
 		if (dst_codes == 0) {
 			fprintf(stderr,"Specified dst model for patching is not valid\n");
-			return -1;
+			myexit(NULL,1);
 		}
 	}
 
@@ -446,7 +492,7 @@ int mz_exec(char *target)
 	{
 		if ( dst == NULL ) {
 			fprintf(stderr,"Please specify the destination model for patching\n");
-			return -1;
+			myexit(NULL,1);
 		}
 		if ((strcmp(src,"80b") == 0) || (strcmp(src,"80b") == 0))
 			src_codes = mz80b_codes;
@@ -456,12 +502,12 @@ int mz_exec(char *target)
 
 		if (src_codes == 0) {
 			fprintf(stderr,"Specified src model for patching is not valid\n");
-			return -1;
+			myexit(NULL,1);
 		}
 
 		if (src_codes == dst_codes) {
 			fprintf(stderr,"MZ src and dst models must be different for patching\n");
-			return -1;
+			myexit(NULL,1);
 		}
 	}
 
@@ -583,7 +629,10 @@ int mz_exec(char *target)
 	/* ************************************************** */
 	/*  Now, if requested, mzf2wav creates the audio file */
 	/* ************************************************** */
-	if ( audio ) {
+	if (( audio ) || (src_codes != 0)) {
+
+		strcpy(wavfile,filename);
+
 		if ( (fpin=fopen(filename,"rb") ) == NULL ) {
 			fprintf(stderr,"Can't open file %s for wave conversion\n",filename);
 			myexit(NULL,1);
@@ -595,14 +644,6 @@ int mz_exec(char *target)
         }
         len=ftell(fpin);
         fseek(fpin,0L,SEEK_SET);
-
-        strcpy(wavfile,filename);
-		suffix_change(wavfile,".RAW");
-		if ( (mzfout=fopen(wavfile,"wb") ) == NULL ) {
-			fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
-			myexit(NULL,1);
-		}
-
 
 		image = (unsigned char *) malloc(len+2);
 		i = 0;
@@ -640,66 +681,87 @@ int mz_exec(char *target)
 			myexit(NULL,1);
 		}
 
+		if (src_codes != 0) {
+			if ((image[0]) == 1) {
+				mz_patch (image, src_codes, dst_codes);
 
-		if (src_codes != 0)
-			mz_patch (image, src_codes, dst_codes);
-
-		if (turbo) {
-			fast = -1;
-			for (i = 0x1; i < 0x12; i++)    /* Copy the name.    */
-				turboldr[i] = image[i];
-			for (i = 0x1f; i < 0x80; i++)   /* Copy the comment. */
-				turboldr[i] = image[i];
-			for (i = 0x12; i < 0x1f; i++)   /* Copy the info.    */
-				turboldr[i + 0x3b + 0x80] = image[i];
-		}
-
-
-		if (fast) {
-			LONG_UP = 18;
-			LONG_DOWN = 21;
-			SHORT_UP = 9;
-			SHORT_DOWN = 11;
-		} else {
-			LONG_UP = 21;
-			LONG_DOWN = 22;
-			SHORT_UP = 11;
-			SHORT_DOWN = 12;
-		}
-
-		if (mz80b) {
-			LONG_UP = 14;
-			LONG_DOWN = 15;
-			SHORT_UP = 7;
-			SHORT_DOWN = 8;
-			if (fast) {
-				LONG_UP = 13;
-				LONG_DOWN = 14;
-				SHORT_UP = 6;
-				SHORT_DOWN = 7;
+				suffix_change(filename,"_patched.mzf");
+				if ( (fpout=fopen(filename,"wb") ) == NULL ) {
+					fprintf(stderr,"Can't open output patched file %s\n",filename);
+					myexit(NULL,1);
+				}
+				for (i=0; i<len; i++)	fputc (image[i],fpout);
+				fclose(fpout);
+			} else {
+				fprintf(stderr,"File %s is not an object file, cannot patch\n",filename);
 			}
 		}
-		
-		if (turbo) {
-			mz_encode(turboldr);
 
-			LONG_UP = 11;
-			LONG_DOWN = 12;
-			SHORT_UP = 5;
-			SHORT_DOWN = 6;
+		if ( audio ) {
 
-			mz_encode(image);
+			suffix_change(wavfile,".RAW");
+			if ( (rawout=fopen(wavfile,"wb") ) == NULL ) {
+				fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
+				myexit(NULL,1);
+			}
+
+			if (turbo) {
+				fast = -1;
+				for (i = 0x1; i < 0x12; i++)    /* Copy the name.    */
+					turboldr[i] = image[i];
+				for (i = 0x1f; i < 0x80; i++)   /* Copy the comment. */
+					turboldr[i] = image[i];
+				for (i = 0x12; i < 0x1f; i++)   /* Copy the info.    */
+					turboldr[i + 0x3b + 0x80] = image[i];
+			}
+
+
+			if (fast) {
+				LONG_UP = 18;
+				LONG_DOWN = 21;
+				SHORT_UP = 9;
+				SHORT_DOWN = 11;
+			} else {
+				LONG_UP = 21;
+				LONG_DOWN = 22;
+				SHORT_UP = 11;
+				SHORT_DOWN = 12;
+			}
+
+			if (mz80b) {
+				LONG_UP = 14;
+				LONG_DOWN = 15;
+				SHORT_UP = 7;
+				SHORT_DOWN = 8;
+				if (fast) {
+					LONG_UP = 13;
+					LONG_DOWN = 14;
+					SHORT_UP = 6;
+					SHORT_DOWN = 7;
+				}
+			}
 			
-		} else {
-			mz_encode(image);
+			if (turbo) {
+				mz_encode(turboldr);
+
+				LONG_UP = 11;
+				LONG_DOWN = 12;
+				SHORT_UP = 5;
+				SHORT_DOWN = 6;
+
+				mz_encode(image);
+				
+			} else {
+				mz_encode(image);
+			}
+
+
+			fclose(rawout);
+			free(image);
+			
+			/* Now let's think at the WAV format */
+			raw2wav(wavfile);
 		}
-
-
-		fclose(mzfout);
-		free(image);
-		
-		/* Now let's think at the WAV format */
-		raw2wav(wavfile);
 	}
     return 0;
 }
