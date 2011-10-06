@@ -1,7 +1,7 @@
 /*
  *        BIN to MZ Sharp M/C file
  *
- *        $Id: mz.c,v 1.6 2011-10-05 17:23:27 stefano Exp $
+ *        $Id: mz.c,v 1.7 2011-10-06 21:04:29 stefano Exp $
  *
  *        bin2m12 by: Stefano Bodrato 4/5/2000
  *        portions from mzf2wav by: Jeroen F. J. Laros. Sep 11 2003.
@@ -67,7 +67,7 @@ option_t mz_options[] = {
     {  0,  "src",      "Patch from (80B,700)",       OPT_STR,   &src },
     {  0,  "dst",      "Patch to (80B,700)",         OPT_STR,   &dst },
     {  0,  "foopatch", "Patch unknown locations with BEEP",    OPT_BOOL,  &foopatch },
-    {  0,  "patchall", "Patch also the conditional JPs and CALLs",    OPT_BOOL,  &aggressive_patch },
+    {  0,  "patchall", "Patch more types of JPs and CALLs",    OPT_BOOL,  &aggressive_patch },
     {  0,  "turbo",    "Turbo tape loader",          OPT_BOOL,  &turbo },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
@@ -91,7 +91,7 @@ unsigned int mz700_codes[] = {
 	0x0018,	// print messageX
 	0x001B,	// GETKY - Get Key
 	0x001E,	// test BREAK
-	0x0030,	// SOUND
+	0x0030,	// SOUND (play melody)
 	0x0033,	// set time
 	0x003b,	// read time
 	0x0041,	// set tempo (melody)
@@ -109,7 +109,7 @@ unsigned int mz700_codes[] = {
 	0x08A1,	// print messageX
 	0x08BD,	// GETKY - Get Key (ASCII code)
 	0x0A32,	// test BREAK
-	0x01C7,	// SOUND
+	0x01C7,	// SOUND (play melody)
 	0x0308,	// set time
 	0x0358,	// read time
 	0x02e5,	// set tempo (melody)
@@ -128,11 +128,16 @@ unsigned int mz700_codes[] = {
 	0x0bb9,	// console stuff ?
 	0x0fb1,	// console stuff ?
 	0x0946,	// console stuff ?	(8ee)
+	0x0947,	// console stuff ?	(8ef)
 	0x0939,	// console stuff ?  (91a)
+	0x0db5,	// console stuff ?
 	0x096c,	// raw character output ?
 	0x0bcd,	// convert key code to ASCII
 	0x0bce,	// convert ASCII in 'display code'
 	0x0ddc,	// screen control (scroll, cursor, etc..)
+	0x0822, // break in
+	0x0ee5, // POP HL,DE,BC,AF and ret
+	0x0ee6, // POP DE,BC,AF and ret
 	0
 };
 
@@ -148,7 +153,7 @@ unsigned int mz80b_codes[] = {
 	0x08db,	// print messageX
 	0x0871,	// GETKY - Get Key
 	0x0562,	// test BREAK
-	0x0301,	// SOUND                 ** RET **
+	0x0EE9,	// SOUND (play melody)
 	0x0301,	// set time ($E51 ?)     ** RET **
 	0x0301,	// read time             ** RET **
 	0x0301,	// set tempo (melody)    ** RET **
@@ -166,7 +171,7 @@ unsigned int mz80b_codes[] = {
 	0x08db,	// print messageX
 	0x0871,	// GETKY - Get Key
 	0x0562,	// test BREAK
-	0x0301,	// SOUND                 ** RET **
+	0x0EE9,	// SOUND (play melody)
 	0x0301,	// set time ($E51 ?)     ** RET **
 	0x0301,	// read time             ** RET **
 	0x0301,	// set tempo (melody)    ** RET **
@@ -185,11 +190,16 @@ unsigned int mz80b_codes[] = {
 	0x0301,	// console stuff (bb9).. should we replace with 5f3 or a6e  ? ** RET **
 	0x0c53,	// console stuff ?
 	0x08EE,	// console stuff ?  (946)
+	0x08EF,	// console stuff ?  (947)
 	0x091A,	// console stuff ?  (939)
+	0x0C7a,	// console stuff ?  (db5)
 	0x0916,	// raw character output ? (normal putchar, 916)
 	0x0301,	// convert key code to ASCII                        ** RET **
 	0x0301,	// convert ASCII in 'display code' (not necessary)   ** RET **
 	0x0301,	// screen control (scroll, cursor, etc..)            ** RET **
+	0x0872, // break in
+	0x078c, // POP HL,DE,BC,AF and ret
+	0x078d, // POP DE,BC,AF and ret
 	0
 };
 
@@ -287,14 +297,12 @@ void mz_patch (unsigned char *image, unsigned int *src_table, unsigned int *dst_
 
 	for (i = 0x80; i < len; i++) {   /* The mzf body. */
 		/* call or jump ? */
-		if ( (image[i]==0xCD) || (image[i]==0xC3) || 
-			(aggressive_patch && (
+		if ( (image[i]==0xCD) || (image[i]==0xC3) || (image[i]==0xCC) || (image[i]==0xCA) || 
+			( aggressive_patch && (
 				(image[i]==0xDC) || (image[i]==0xFC) || (image[i]==0xD4) || 
-				(image[i]==0xC4) || (image[i]==0xF4) || (image[i]==0xEC) || 
-				(image[i]==0xE4) || (image[i]==0xCC) || 
+				(image[i]==0xC4) || (image[i]==0xF4) || (image[i]==0xEC) || (image[i]==0xE4) ||
 				(image[i]==0xDA) || (image[i]==0xFA) || (image[i]==0xD2) || 
-				(image[i]==0xC2) || (image[i]==0xF2) || (image[i]==0xEA) ||
-				(image[i]==0xE2) || (image[i]==0xCA)
+				(image[i]==0xC2) || (image[i]==0xF2) || (image[i]==0xEA) || (image[i]==0xE2)
 			)) ) {
 			x=0; patched=0;
 			call_location = image[i+1] + (image[i+2] * 256);
