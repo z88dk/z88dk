@@ -1,7 +1,7 @@
 /*
  *        BIN to MZ Sharp M/C file
  *
- *        $Id: mz.c,v 1.7 2011-10-06 21:04:29 stefano Exp $
+ *        $Id: mz.c,v 1.8 2011-10-07 15:13:32 stefano Exp $
  *
  *        bin2m12 by: Stefano Bodrato 4/5/2000
  *        portions from mzf2wav by: Jeroen F. J. Laros. Sep 11 2003.
@@ -91,6 +91,11 @@ unsigned int mz700_codes[] = {
 	0x0018,	// print messageX
 	0x001B,	// GETKY - Get Key
 	0x001E,	// test BREAK
+	0x0021,	// write header info (located in $10f0)
+	0x0024,	// write data
+	0x0027,	// read header info (header is located in $10F0)
+	0x002A,	// read tape data
+	0x002D,	// verify tape data
 	0x0030,	// SOUND (play melody)
 	0x0033,	// set time
 	0x003b,	// read time
@@ -109,6 +114,11 @@ unsigned int mz700_codes[] = {
 	0x08A1,	// print messageX
 	0x08BD,	// GETKY - Get Key (ASCII code)
 	0x0A32,	// test BREAK
+	0x0436,	// write header info (located in $10f0)
+	0x0475,	// write data
+	0x04D8,	// read header info (header is located in $10F0)
+	0x04F8,	// read tape data
+	0x0588,	// verify tape data
 	0x01C7,	// SOUND (play melody)
 	0x0308,	// set time
 	0x0358,	// read time
@@ -125,19 +135,20 @@ unsigned int mz700_codes[] = {
 	0x03F9,	// format ascii to hex digit
 	0x09b3,	// Wait for a key and get key code
 	
-	0x0bb9,	// console stuff ?
-	0x0fb1,	// console stuff ?
-	0x0946,	// console stuff ?	(8ee)
-	0x0947,	// console stuff ?	(8ef)
-	0x0939,	// console stuff ?  (91a)
-	0x0db5,	// console stuff ?
-	0x096c,	// raw character output ?
-	0x0bcd,	// convert key code to ASCII
-	0x0bce,	// convert ASCII in 'display code'
+	0x0bb9,	// ASCII code to display code conversion
+//	0x0fb1,	// console stuff ?  (c53)
+//	0x0946,	// console stuff ?	(8ee)
+//	0x0947,	// console stuff ?	(8ef)
+//	0x0939,	// console stuff ?  (91a)
+//	0x0db5,	// console stuff ?  (c7a)
+//	0x096c,	// raw character output ?
+	0x0bcd,	// display code to ASCII conversion
+	0x0bce,	// display code to ASCII conversion
 	0x0ddc,	// screen control (scroll, cursor, etc..)
 	0x0822, // break in
 	0x0ee5, // POP HL,DE,BC,AF and ret
 	0x0ee6, // POP DE,BC,AF and ret
+	0x0700, // (0x4ce)
 	0
 };
 
@@ -150,15 +161,21 @@ unsigned int mz80b_codes[] = {
 	0x08be,	// print TAB
 	0x0916,	// print character
 	0x08cd,	// print message	(control characters transcoding)
+	//0x08cd,	// print messageX
 	0x08db,	// print messageX
 	0x0871,	// GETKY - Get Key
 	0x0562,	// test BREAK
+	0x0251,	// write header info (located in $10c0 ..was $10f0 on MZ80A)
+	0x0282,	// write data
+	0x028E,	// read header info (located in $10c0 ..was $10f0 on MZ80A)
+	0x02b2,	// read tape data
+	0x02BE,	// verify tape data
 	0x0EE9,	// SOUND (play melody)
-	0x0301,	// set time ($E51 ?)     ** RET **
-	0x0301,	// read time             ** RET **
-	0x0301,	// set tempo (melody)    ** RET **
-	0x0301,	// start continous sound ** RET **
-	0x0301,	// stop continous sound  ** RET **
+	0x0E06,	// set time
+	0x0e51,	// read time
+	0x0DF8,	// set tempo (melody)
+	0x0301,	// start continous sound  ** RET **
+	0x0301,	// stop continous sound   ** RET **
 
 	0x0EBE,	// BEEP (keep always in first position)
 	0x06A4,	// GETL - Get LINE (up to 80 characters)
@@ -168,15 +185,21 @@ unsigned int mz80b_codes[] = {
 	0x08be,	// print TAB
 	0x0916,	// print character
 	0x08cd,	// print message	(control characters transcoding)
+	//0x08cd,	// print messageX
 	0x08db,	// print messageX
 	0x0871,	// GETKY - Get Key
 	0x0562,	// test BREAK
+	0x0251,	// write header info (located in $10c0, ..was $10f0 on MZ80A)
+	0x0282,	// write data
+	0x028E,	// read header info (located in $10c0 ..was $10f0 on MZ80A)
+	0x02b2,	// read tape data
+	0x02BE,	// verify tape data
 	0x0EE9,	// SOUND (play melody)
-	0x0301,	// set time ($E51 ?)     ** RET **
-	0x0301,	// read time             ** RET **
-	0x0301,	// set tempo (melody)    ** RET **
-	0x0301,	// start continous sound ** RET **
-	0x0301,	// stop continous sound  ** RET **
+	0x0E06,	// set time
+	0x0e51,	// read time
+	0x0DF8,	// set tempo (melody)
+	0x0301,	// start continous sound  ** RET **
+	0x0301,	// stop continous sound   ** RET **
 
 	0x00B1,	// MONITOR entry
 	
@@ -187,19 +210,20 @@ unsigned int mz80b_codes[] = {
 	0x05fd,	// format ascii to hex digit
 	0x0871,	// Wait for a key and get key code
 
-	0x0301,	// console stuff (bb9).. should we replace with 5f3 or a6e  ? ** RET **
-	0x0c53,	// console stuff ?
-	0x08EE,	// console stuff ?  (946)
-	0x08EF,	// console stuff ?  (947)
-	0x091A,	// console stuff ?  (939)
-	0x0C7a,	// console stuff ?  (db5)
-	0x0916,	// raw character output ? (normal putchar, 916)
-	0x0301,	// convert key code to ASCII                        ** RET **
-	0x0301,	// convert ASCII in 'display code' (not necessary)   ** RET **
+	0x0301,	// console stuff (bb9)	; ASCII code to display code conversion.
+//	0x0c53,	// console stuff ?	(fb1)
+//	0x08EE,	// console stuff ?  (946)
+//	0x08EF,	// console stuff ?  (947)
+//	0x091A,	// console stuff ?  (939)
+//	0x0C7a,	// console stuff ?  (db5)
+//	0x0916,	// raw character output ? (normal putchar, 96c)
+	0x0301,	// display code to ASCII conversion
+	0x0301,	// display code to ASCII conversion
 	0x0301,	// screen control (scroll, cursor, etc..)            ** RET **
 	0x0872, // break in
 	0x078c, // POP HL,DE,BC,AF and ret
 	0x078d, // POP DE,BC,AF and ret
+	0x04ce, // (0x700)
 	0
 };
 
@@ -302,8 +326,8 @@ void mz_patch (unsigned char *image, unsigned int *src_table, unsigned int *dst_
 				(image[i]==0xDC) || (image[i]==0xFC) || (image[i]==0xD4) || 
 				(image[i]==0xC4) || (image[i]==0xF4) || (image[i]==0xEC) || (image[i]==0xE4) ||
 				(image[i]==0xDA) || (image[i]==0xFA) || (image[i]==0xD2) || 
-				(image[i]==0xC2) || (image[i]==0xF2) || (image[i]==0xEA) || (image[i]==0xE2)
-			)) ) {
+				(image[i]==0xC2) || (image[i]==0xF2) || (image[i]==0xEA) || (image[i]==0xE2) )) ) {
+					
 			x=0; patched=0;
 			call_location = image[i+1] + (image[i+2] * 256);
 			while (dst_table[x]!=0) {
@@ -315,6 +339,7 @@ void mz_patch (unsigned char *image, unsigned int *src_table, unsigned int *dst_
 				}
 				x++;
 			}
+			
 			if ( !patched && (call_location < org_location) && (call_location != 0) ) {
 					printf("\nWarning: Location %x, opcode '%x', unknown address $%x", org_location + i - 0x80, image[i], call_location);
 					if (foopatch)
@@ -322,6 +347,7 @@ void mz_patch (unsigned char *image, unsigned int *src_table, unsigned int *dst_
 						image[i+1]=dst_table[0]%256;
 						image[i+2]=dst_table[0]/256;
 				}
+
 		}
 	}
 }
