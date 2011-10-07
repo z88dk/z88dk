@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.7 2011-08-18 21:49:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.8 2011-10-07 17:29:10 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.7  2011-08-18 21:49:44  pauloscustodio
+# Revision 1.8  2011-10-07 17:29:10  pauloscustodio
+# Add test functions for lib file format
+#
+# Revision 1.7  2011/08/18 21:49:44  pauloscustodio
 # add objfile() to generate expected object file format
 #
 # Revision 1.6  2011/08/14 19:49:05  pauloscustodio
@@ -250,6 +253,29 @@ sub store_ptr {
 sub pack_string {
     my($string) = @_;
     return pack("C", length($string)).uc($string);
+}
+
+sub read_binfile {
+    my($file) = @_;
+    ok -f $file, "$file exists";
+    return scalar read_file($file, binmode => ':raw');
+}
+
+# return library file binary representation
+sub libfile {
+    my(@obj_files) = @_;
+    my $lib = 'Z80LMF01';
+    for my $i (0 .. $#obj_files) {
+	my $obj_file = $obj_files[$i];
+	my $next_ptr = ($i == $#obj_files) ?
+			-1 : length($lib) + 4 + 4 + length($obj_file);
+
+	$lib .= pack("V", $next_ptr);
+	$lib .= pack("V", length($obj_file));
+	$lib .= $obj_file;
+    }
+
+    return $lib;
 }
 
 1;
