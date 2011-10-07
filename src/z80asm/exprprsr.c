@@ -13,9 +13,19 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.19 2011-08-19 15:53:58 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.20 2011-10-07 17:53:04 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.19  2011-08-19 15:53:58  pauloscustodio
+/* Revision 1.20  2011-10-07 17:53:04  pauloscustodio
+/* BUG_0015 : Relocation issue - dubious addresses come out of linking
+/* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
+/* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
+/* - This caused the problem because CODESIZE keeps track of the start offset of each module in the sequence they will appear in the object file, and codeptr is reset to the start of the codearea for each module.
+/* The effect was that all address calculations at link phase were considering
+/*  a start offset of zero for all modules.
+/* - Moreover, when linking modules from a libary, the modules are pulled in to the code area as they are needed, and not in the sequence they will be in the object file. The start offset was being ignored and the modules were being loaded in the incorrect order
+/* - Consequence of these two issues were all linked addresses wrong.
+/*
+/* Revision 1.19  2011/08/19 15:53:58  pauloscustodio
 /* BUG_0010 : heap corruption when reaching MAXCODESIZE
 /* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
 /* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
@@ -550,7 +560,7 @@ ParseNumExpr (void)
 	pfixhdr->currentnode = NULL;
 	pfixhdr->rangetype = 0;
 	pfixhdr->stored = OFF;
-	pfixhdr->codepos = get_code_size();
+	pfixhdr->codepos = get_codeindex(); /* BUG_0015 */
 	pfixhdr->infixexpr = NULL;
 	pfixhdr->infixptr = NULL;
 
@@ -927,7 +937,7 @@ ExprLong (int listoffset)
   struct expr *pfixexpr;
   long constant;
   int flag = 1;
-  size_t exprptr = get_code_size();	/* address of expression */
+  size_t exprptr = get_codeindex();	/* address of expression - BUG_0015 */
 
   if ((pfixexpr = ParseNumExpr ()) != NULL)
     {				/* parse numerical expression */
@@ -964,7 +974,7 @@ ExprLong (int listoffset)
   else
     flag = 0;
 
-  if (get_code_size() == exprptr)
+  if (get_codeindex() == exprptr)	/* BUG_0015 */
       append_long(0);			/* reserve space if not yet reserved */
 
   return flag;
@@ -978,7 +988,7 @@ ExprAddress (int listoffset)
   struct expr *pfixexpr;
   long constant;
   int flag = 1;
-  size_t exprptr = get_code_size();	/* address of expression */
+  size_t exprptr = get_codeindex();	/* address of expression - BUG_0015 */
 
   if ((pfixexpr = ParseNumExpr ()) != NULL)
     {				/* parse numerical expression */
@@ -1015,7 +1025,7 @@ ExprAddress (int listoffset)
   else
     flag = 0;
 
-  if (get_code_size() == exprptr)
+  if (get_codeindex() == exprptr)	/* BUG_0015 */
       append_word(0);			/* reserve space if not yet reserved */
 
   return flag;
@@ -1028,7 +1038,7 @@ ExprUnsigned8 (int listoffset)
   struct expr *pfixexpr;
   long constant;
   int flag = 1;
-  size_t exprptr = get_code_size();	/* address of expression */
+  size_t exprptr = get_codeindex();	/* address of expression - BUG_0015 */
 
   if ((pfixexpr = ParseNumExpr ()) != NULL)
     {				/* parse numerical expression */
@@ -1067,7 +1077,7 @@ ExprUnsigned8 (int listoffset)
   else
     flag = 0;
 
-  if (get_code_size() == exprptr)
+  if (get_codeindex() == exprptr)	/* BUG_0015 */
       append_byte(0);			/* reserve space if not yet reserved */
 
   return flag;
@@ -1081,7 +1091,7 @@ ExprSigned8 (int listoffset)
   struct expr *pfixexpr;
   long constant;
   int flag = 1;
-  size_t exprptr = get_code_size();	/* address of expression */
+  size_t exprptr = get_codeindex();	/* address of expression - BUG_0015 */
 
   /* BUG_0005 : Offset of (ix+d) should be optional; '+' or '-' are necessary */
   switch (sym)
@@ -1131,7 +1141,7 @@ ExprSigned8 (int listoffset)
   else
     flag = 0;
 
-  if (get_code_size() == exprptr)
+  if (get_codeindex() == exprptr)	/* BUG_0015 */
       append_byte(0);			/* reserve space if not yet reserved */
 
   return flag;

@@ -16,9 +16,19 @@ Copyright (C) Paulo Custodio, 2011
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.1 2011-08-19 15:53:58 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.2 2011-10-07 17:53:04 pauloscustodio Exp $ */
 /* $Log: codearea.h,v $
-/* Revision 1.1  2011-08-19 15:53:58  pauloscustodio
+/* Revision 1.2  2011-10-07 17:53:04  pauloscustodio
+/* BUG_0015 : Relocation issue - dubious addresses come out of linking
+/* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
+/* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
+/* - This caused the problem because CODESIZE keeps track of the start offset of each module in the sequence they will appear in the object file, and codeptr is reset to the start of the codearea for each module.
+/* The effect was that all address calculations at link phase were considering
+/*  a start offset of zero for all modules.
+/* - Moreover, when linking modules from a libary, the modules are pulled in to the code area as they are needed, and not in the sequence they will be in the object file. The start offset was being ignored and the modules were being loaded in the incorrect order
+/* - Consequence of these two issues were all linked addresses wrong.
+/*
+/* Revision 1.1  2011/08/19 15:53:58  pauloscustodio
 /* BUG_0010 : heap corruption when reaching MAXCODESIZE
 /* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
 /* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
@@ -45,23 +55,28 @@ extern size_t set_oldPC (void);
 extern size_t get_oldPC (void);
 
 /* init the code area, return current size */
-extern void init_codearea (void);		// set code area to zeros
-extern size_t get_code_size (void);		// return number of bytes appended
+extern void init_codearea (void);		/* set code area to zeros */
+extern size_t get_codeindex (void);		/* return number of bytes appended */
+
+extern size_t get_codesize (void);		/* size of all modules before current, 
+						   i.e. base address of current module */
+extern size_t inc_codesize (size_t n);		/* increment loaded codesize */
 
 /* write code area to an open file */
 extern void fwrite_codearea       (FILE *stream);
 extern void fwrite_codearea_chunk (FILE *stream, size_t addr, size_t size);
-extern void fread_codearea        (FILE *stream, size_t size);	// append to codearea
+extern void fread_codearea        (FILE *stream, size_t size);	/* append to codearea */
+extern void fread_codearea_offset (FILE *stream, size_t offset, size_t size);	/* read to codearea at offset */
 
 /* patch a value at a position, or append to the end of the code area */
 /* the patch address is incremented after store */
-extern void  patch_byte    (size_t *paddr, unsigned char byte);	// one byte
+extern void  patch_byte    (size_t *paddr, unsigned char byte);	/* one byte */
 extern void append_byte    (               unsigned char byte);
 
-extern void  patch_word    (size_t *paddr, int word);		// 2-byte word
+extern void  patch_word    (size_t *paddr, int word);		/* 2-byte word */
 extern void append_word    (               int word);
 
-extern void  patch_long    (size_t *paddr, long dword);		// 4-byte long
+extern void  patch_long    (size_t *paddr, long dword);		/* 4-byte long */
 extern void append_long    (               long dword);
 
 /* get a byte at the given address */

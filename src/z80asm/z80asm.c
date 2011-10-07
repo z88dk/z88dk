@@ -13,9 +13,19 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.40 2011-08-21 20:37:20 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.41 2011-10-07 17:53:04 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.40  2011-08-21 20:37:20  pauloscustodio
+/* Revision 1.41  2011-10-07 17:53:04  pauloscustodio
+/* BUG_0015 : Relocation issue - dubious addresses come out of linking
+/* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
+/* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
+/* - This caused the problem because CODESIZE keeps track of the start offset of each module in the sequence they will appear in the object file, and codeptr is reset to the start of the codearea for each module.
+/* The effect was that all address calculations at link phase were considering
+/*  a start offset of zero for all modules.
+/* - Moreover, when linking modules from a libary, the modules are pulled in to the code area as they are needed, and not in the sequence they will be in the object file. The start offset was being ignored and the modules were being loaded in the incorrect order
+/* - Consequence of these two issues were all linked addresses wrong.
+/*
+/* Revision 1.40  2011/08/21 20:37:20  pauloscustodio
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
 /* - Factor all pathname manipulation into module file.c.
 /* - Make default extensions constants.
@@ -649,6 +659,8 @@ GetModuleSize (void)
 
 	  if (CURRENTMODULE->startoffset + size > MAXCODESIZE)
 	    ReportError (objfilename, 0, ERR_MAX_CODESIZE);
+	  else
+	    inc_codesize(size);		/* BUG_0015 : was not updating codesize */
 	}
       fclose (objfile);
       return 0;
@@ -772,7 +784,7 @@ NewModule (void)
     try {
 	newm->nextmodule = NULL;
 	newm->mname = NULL;
-	newm->startoffset = get_code_size();
+	newm->startoffset = get_codesize();
 	newm->origin = 65535;
 	newm->cfile = NULL;
 	newm->localroot = NULL;

@@ -13,9 +13,19 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.20 2011-08-21 20:37:20 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.21 2011-10-07 17:53:04 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.20  2011-08-21 20:37:20  pauloscustodio
+/* Revision 1.21  2011-10-07 17:53:04  pauloscustodio
+/* BUG_0015 : Relocation issue - dubious addresses come out of linking
+/* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
+/* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
+/* - This caused the problem because CODESIZE keeps track of the start offset of each module in the sequence they will appear in the object file, and codeptr is reset to the start of the codearea for each module.
+/* The effect was that all address calculations at link phase were considering
+/*  a start offset of zero for all modules.
+/* - Moreover, when linking modules from a libary, the modules are pulled in to the code area as they are needed, and not in the sequence they will be in the object file. The start offset was being ignored and the modules were being loaded in the incorrect order
+/* - Consequence of these two issues were all linked addresses wrong.
+/*
+/* Revision 1.20  2011/08/21 20:37:20  pauloscustodio
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
 /* - Factor all pathname manipulation into module file.c.
 /* - Make default extensions constants.
@@ -601,7 +611,7 @@ Z80pass2 (void)
   xfputc(constant, objfile);	/* write length of module name to relocatable file */
   xfwritec(CURRENTMODULE->mname, (size_t) constant, objfile);	/* write module name to relocatable
 										 * file       */
-  if ((constant = get_code_size()) == 0)
+  if ((constant = get_codeindex()) == 0)	/* BUG_0015 */
     fptr_modcode = -1;		/* no code generated!  */
   else
     {
@@ -609,6 +619,7 @@ Z80pass2 (void)
       xfput_word(constant, objfile);	/* two bytes of module code size */
       fwrite_codearea(objfile);
     }
+  inc_codesize(constant);		/* BUG_0015 */
 
   if (verbose)
     printf ("Size of module is %ld bytes\n", constant);
@@ -884,7 +895,7 @@ WriteListFile (void)
     strcpy (line, "\n");
 
   len = get_PC() - get_oldPC();
-  byteptr = get_code_size() - len;
+  byteptr = get_codeindex() - len;	/* BUG_0015 */
   if (len == 0)
     fprintf (listfile, "%-4d  %04X%14s%s", CURRENTFILE->line, (unsigned short) get_oldPC(), "", line);		/* no bytes generated */
   else if (len <= 4)

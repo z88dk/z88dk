@@ -13,9 +13,19 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.28 2011-08-21 20:37:20 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.29 2011-10-07 17:53:04 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.28  2011-08-21 20:37:20  pauloscustodio
+/* Revision 1.29  2011-10-07 17:53:04  pauloscustodio
+/* BUG_0015 : Relocation issue - dubious addresses come out of linking
+/* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
+/* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
+/* - This caused the problem because CODESIZE keeps track of the start offset of each module in the sequence they will appear in the object file, and codeptr is reset to the start of the codearea for each module.
+/* The effect was that all address calculations at link phase were considering
+/*  a start offset of zero for all modules.
+/* - Moreover, when linking modules from a libary, the modules are pulled in to the code area as they are needed, and not in the sequence they will be in the object file. The start offset was being ignored and the modules were being loaded in the incorrect order
+/* - Consequence of these two issues were all linked addresses wrong.
+/*
+/* Revision 1.28  2011/08/21 20:37:20  pauloscustodio
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
 /* - Factor all pathname manipulation into module file.c.
 /* - Make default extensions constants.
@@ -590,7 +600,7 @@ LinkModules (void)
 					/* parse only object modules, not added library modules */
 
 	if (verbose == ON)
-	    printf ("Code size of linked modules is %d bytes\n", (int)get_code_size());
+	    printf ("Code size of linked modules is %d bytes\n", (int)get_codesize());
 
 	if (ASMERROR == OFF)
 	    ModuleExpr ();		/*  Evaluate expressions in  all modules */
@@ -632,19 +642,27 @@ LinkModule (char *filename, long fptr_base)
   if (fptr_modcode != -1)
     {
       fseek (z80asmfile, fptr_base + fptr_modcode, SEEK_SET);	/* set file pointer to module code */
+
       size = xfget_word(z80asmfile);
 
       /* BUG_0008 : fix size, if a zero was written, the moudule is actually 64K */
       if (size == 0) 
 	  size = 0x10000;
 
-      if (CURRENTMODULE->startoffset + size > MAXCODESIZE)
-        {
+      if (CURRENTMODULE->startoffset + size > MAXCODESIZE) {
           ReportError (filename, 0, ERR_MAX_CODESIZE);
           return 0;
         }
-      else
-	fread_codearea(z80asmfile, size);			/* read module code */
+      else {
+	  /* read module code at startoffset of the module */
+	  /* BUG_0015: was reading at current position in code area, swaping order of modules */
+	  fread_codearea_offset(z80asmfile, CURRENTMODULE->startoffset, size);			
+      }
+
+      /* BUG_0015 : was no updating codesize */
+      if (CURRENTMODULE->startoffset == get_codesize())
+        inc_codesize(size);	/* a new module has been added */
+
     }
 
   if (fptr_namedecl != -1)
@@ -965,7 +983,7 @@ CreateBinFile (void)
     { 
       /* create output filename, based on project filename */
       tmpstr = modulehdr->first->cfile->fname;	/* get source filename from first module */
-      if (codesegment == ON && get_code_size() > 16384)
+      if (codesegment == ON && get_codesize() > 16384)
         strcpy (tmpstr + strlen (tmpstr) - 4, FILEEXT_SEGBIN);	/* replace '.asm' with '.bn0' extension */
       else
         strcpy (tmpstr + strlen (tmpstr) - 4, FILEEXT_BIN);	/* replace '.asm' with '.bin' extension */
@@ -987,11 +1005,11 @@ CreateBinFile (void)
 	  fwrite_codearea(binaryfile);					/* write code as one big chunk */
 	  fclose (binaryfile);
 	}
-      else if (codesegment == ON && get_code_size() > 16384)
+      else if (codesegment == ON && get_codesize() > 16384)
 	{
 	  fclose (binaryfile);
 	  offset = 0;
-	  codesize = get_code_size();
+	  codesize = get_codesize();
 	  do
 	    {
 	      codeblock = (codesize > 16384U) ? 16384U : codesize;
