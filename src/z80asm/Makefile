@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.23 2011-09-29 21:27:16 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.24 2011-10-07 17:23:57 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.23  2011-09-29 21:27:16  pauloscustodio
+# Revision 1.24  2011-10-07 17:23:57  pauloscustodio
+# Delete all *.exe in clean
+#
+# Revision 1.23  2011/09/29 21:27:16  pauloscustodio
 # Updated depend
 #
 # Revision 1.22  2011/08/21 20:18:33  pauloscustodio
@@ -139,7 +142,7 @@ install:
 
 
 clean :
-	$(RM) *.o *~ *.bak core z80asm$(EXESUFFIX) test.* test2.*
+	$(RM) *.o *.exe *~ *.bak core z80asm$(EXESUFFIX) test.* test2.*
 
 
 # test
