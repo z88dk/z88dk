@@ -19,9 +19,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.24 2011-09-30 10:30:06 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.25 2011-10-07 17:56:02 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.24  2011-09-30 10:30:06  pauloscustodio
+/* Revision 1.25  2011-10-07 17:56:02  pauloscustodio
+/* Version 1.1.11
+/*
+/* Revision 1.24  2011/09/30 10:30:06  pauloscustodio
 /* BUG_0014 : -x./zx_clib should create ./zx_clib.lib but actually creates .lib
 /* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
 /* path_remove_ext() removed everything after last ".", ignoring directory
@@ -757,14 +760,31 @@ Based on 1.0.31
 	- path_remove_ext() removed everything after last ".", ignoring directory
 	  separators. Fixed.
 
+07.10.2011 [1.1.11] (pauloscustodio)
+
+    BUG_0015 : Relocation issue - dubious addresses come out of linking
+	(reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
+	- Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged
+	  into the same entity. 
+	- This caused the problem because CODESIZE keeps track of the start offset 
+	  of each module in the sequence they will appear in the object file, 
+	  and codeptr is reset to the start of the codearea for each module. 
+	  The effect was that all address calculations at link phase were considering
+	  a start offset of zero for all modules.
+	- Moreover, when linking modules from a libary, the modules are pulled in to 
+	  the code area as they are needed, and not in the sequence they will be in
+	  the object file. The start offset was being ignored and the modules were
+	  being loaded in the incorrect order
+	- Consequence of these two issues were all linked addresses wrong.
+
 */
 
 #include "memalloc.h"	/* before any other include to enable memory leak detection */
 
 #include "hist.h"
 
-#define DATE        "30.09.2011"
-#define VERSION     "1.1.10"
+#define DATE        "07.10.2011"
+#define VERSION     "1.1.11"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011"
 
 #ifdef QDOS
