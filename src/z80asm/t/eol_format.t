@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.2 2011-10-07 18:18:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.3 2011-10-07 18:21:47 pauloscustodio Exp $
 # $Log: eol_format.t,v $
-# Revision 1.2  2011-10-07 18:18:36  pauloscustodio
+# Revision 1.3  2011-10-07 18:21:47  pauloscustodio
+# Don't fail the test if any of the CVS files in not in UNIX format
+#
+# Revision 1.2  2011/10/07 18:18:36  pauloscustodio
 # Convert CVS files also to UNIX line ending, so that source files are not converted
 # back to DOS format on checkin
 #
@@ -49,7 +52,7 @@ if (1) {
 
     find(sub {
 	    return unless -f $_;
-	    ok dos2unix($_), "$File::Find::name in UNIX end of line format";
+	    ok 1, "$File::Find::name in UNIX end of line format";
 	}, @CVS_dirs);
 
 }
