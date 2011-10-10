@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.3 2011-10-07 18:21:47 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.4 2011-10-10 18:24:18 pauloscustodio Exp $
 # $Log: eol_format.t,v $
-# Revision 1.3  2011-10-07 18:21:47  pauloscustodio
+# Revision 1.4  2011-10-10 18:24:18  pauloscustodio
+# convert CVS files to UNIX format : do not convert the CVS directories - only for internal
+#  use
+#
+# Revision 1.3  2011/10/07 18:21:47  pauloscustodio
 # Don't fail the test if any of the CVS files in not in UNIX format
 #
 # Revision 1.2  2011/10/07 18:18:36  pauloscustodio
@@ -42,7 +46,7 @@ find(sub {
     }, dirname($0)."/..");
 
 # convert CVS files to UNIX format
-if (1) {
+if (0) {
     my @CVS_dirs;
     find(sub {
 	    return unless -d $_;
