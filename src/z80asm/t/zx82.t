@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/zx82.t,v 1.1 2011-08-21 20:16:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/zx82.t,v 1.2 2011-10-10 18:27:58 pauloscustodio Exp $
 #
 # Build ZX Spectrum 48K ROM, compare result
 
@@ -30,6 +30,19 @@ my $obj = 	  "zx48.obj";
 my $bin = 	  "zx48.bin";
 my $map = 	  "zx48.map";
 my $sym = 	  "zx48.sym";
+my $project =	  "t/data/zx48_01.prj";
+
+# get project files
+my @prj_src = split(' ', scalar(read_file($project)));
+my @prj_err = @prj_src; for (@prj_err) { s/\.asm$/.err/i }
+my @prj_obj = @prj_src; for (@prj_obj) { s/\.asm$/.obj/i }
+my @prj_sym = @prj_src; for (@prj_sym) { s/\.asm$/.sym/i }
+my $prj_bin = $prj_src[0]; $prj_bin =~ s/\.asm$/.bin/i;
+my $prj_map = $prj_src[0]; $prj_map =~ s/\.asm$/.map/i;
+
+my @testfiles = ($patched_src, $err, $obj, $bin, $map, $sym,
+		 @prj_err, @prj_obj, @prj_sym, $prj_bin, $prj_map);
+unlink_testfiles(@testfiles);
 
 # patch original source to comply with z80asm syntax
 # Note: this step should not be required
@@ -50,7 +63,7 @@ while (<$in_src>) {
 ok close($in_src), "close $src";
 ok close($out_src), "close $patched_src";
 
-# assemble
+# assemble as one source file
 t_z80asm_capture("-r0 -b $patched_src", "", "", 0);
 ok ! -f $err, "no $err";
 ok -f $obj, "$obj exists";
@@ -58,5 +71,13 @@ ok -f $bin, "$bin exists";
 t_binary(scalar(read_file($bin, binmode => ':raw')),
 	 scalar(read_file($bmk_bin, binmode => ':raw')));
 
-unlink_testfiles($patched_src, $err, $obj, $bin, $map, $sym);
+# assemble with separate modules
+t_z80asm_capture("-r0 -b \@$project", "", "", 0);
+for (@prj_err) { ok ! -f $_, "no $_"; }
+for (@prj_obj) { ok -f $_, "$_ exists"; }
+ok -f $prj_bin, "$prj_bin exists";
+t_binary(scalar(read_file($prj_bin, binmode => ':raw')),
+	 scalar(read_file($bmk_bin, binmode => ':raw')));
+
+unlink_testfiles(@testfiles);
 done_testing();
