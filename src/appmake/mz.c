@@ -1,7 +1,7 @@
 /*
  *        BIN to MZ Sharp M/C file
  *
- *        $Id: mz.c,v 1.8 2011-10-07 15:13:32 stefano Exp $
+ *        $Id: mz.c,v 1.9 2011-10-11 16:45:32 stefano Exp $
  *
  *        bin2m12 by: Stefano Bodrato 4/5/2000
  *        portions from mzf2wav by: Jeroen F. J. Laros. Sep 11 2003.
@@ -64,8 +64,8 @@ option_t mz_options[] = {
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
     {  0,  "mz80b",    "MZ80B mode (faster 1800bps)",   OPT_BOOL,  &mz80b },
-    {  0,  "src",      "Patch from (80B,700)",       OPT_STR,   &src },
-    {  0,  "dst",      "Patch to (80B,700)",         OPT_STR,   &dst },
+    {  0,  "src",      "Patch from (80B,700,2000)",  OPT_STR,   &src },
+    {  0,  "dst",      "Patch to (80B,700,2000)",    OPT_STR,   &dst },
     {  0,  "foopatch", "Patch unknown locations with BEEP",    OPT_BOOL,  &foopatch },
     {  0,  "patchall", "Patch more types of JPs and CALLs",    OPT_BOOL,  &aggressive_patch },
     {  0,  "turbo",    "Turbo tape loader",          OPT_BOOL,  &turbo },
@@ -137,8 +137,8 @@ unsigned int mz700_codes[] = {
 	
 	0x0bb9,	// ASCII code to display code conversion
 //	0x0fb1,	// console stuff ?  (c53)
-//	0x0946,	// console stuff ?	(8ee)
-//	0x0947,	// console stuff ?	(8ef)
+	0x0946,	// console stuff ?	(8ee)
+	0x0947,	// console stuff ?	(8ef)
 //	0x0939,	// console stuff ?  (91a)
 //	0x0db5,	// console stuff ?  (c7a)
 //	0x096c,	// raw character output ?
@@ -149,6 +149,11 @@ unsigned int mz700_codes[] = {
 	0x0ee5, // POP HL,DE,BC,AF and ret
 	0x0ee6, // POP DE,BC,AF and ret
 	0x0700, // (0x4ce)
+	0x0da6, // (0x446)
+	0x0038,	// Interrupt handler
+	0x1038,	// Interrupt handler
+	0x038D,	// Interrupt handler
+	0x0EE9, // ??? = $D18 on mz80b = $CEE on mz2000
 	0
 };
 
@@ -174,8 +179,8 @@ unsigned int mz80b_codes[] = {
 	0x0E06,	// set time
 	0x0e51,	// read time
 	0x0DF8,	// set tempo (melody)
-	0x0301,	// start continous sound  ** RET **
-	0x0301,	// stop continous sound   ** RET **
+	0x0790,	// start continous sound  ** RET **
+	0x0790,	// stop continous sound   ** RET **
 
 	0x0EBE,	// BEEP (keep always in first position)
 	0x06A4,	// GETL - Get LINE (up to 80 characters)
@@ -194,12 +199,12 @@ unsigned int mz80b_codes[] = {
 	0x028E,	// read header info (located in $10c0 ..was $10f0 on MZ80A)
 	0x02b2,	// read tape data
 	0x02BE,	// verify tape data
-	0x0EE9,	// SOUND (play melody)
+	0x0EE9,	// SOUND (play melody)	** RET **
 	0x0E06,	// set time
 	0x0e51,	// read time
 	0x0DF8,	// set tempo (melody)
-	0x0301,	// start continous sound  ** RET **
-	0x0301,	// stop continous sound   ** RET **
+	0x0790,	// start continous sound  ** RET **
+	0x0790,	// stop continous sound   ** RET **
 
 	0x00B1,	// MONITOR entry
 	
@@ -210,20 +215,105 @@ unsigned int mz80b_codes[] = {
 	0x05fd,	// format ascii to hex digit
 	0x0871,	// Wait for a key and get key code
 
-	0x0301,	// console stuff (bb9)	; ASCII code to display code conversion.
+	0x0790,	// console stuff (bb9)	; ASCII code to display code conversion. ** RET **
 //	0x0c53,	// console stuff ?	(fb1)
-//	0x08EE,	// console stuff ?  (946)
-//	0x08EF,	// console stuff ?  (947)
+	0x08EE,	// console stuff ?  (946)
+	0x08EF,	// console stuff ?  (947)
 //	0x091A,	// console stuff ?  (939)
 //	0x0C7a,	// console stuff ?  (db5)
 //	0x0916,	// raw character output ? (normal putchar, 96c)
-	0x0301,	// display code to ASCII conversion
-	0x0301,	// display code to ASCII conversion
-	0x0301,	// screen control (scroll, cursor, etc..)            ** RET **
+	0x0790,	// display code to ASCII conversion	** RET **
+	0x0790,	// display code to ASCII conversion **RET **
+	0x0790,	// screen control (scroll, cursor, etc..)            ** RET **
 	0x0872, // break in
 	0x078c, // POP HL,DE,BC,AF and ret
 	0x078d, // POP DE,BC,AF and ret
 	0x04ce, // (0x700)
+	0x0446, // (0xda6)
+	0x0038,	// Interrupt handler
+	0x0D31,	// Interrupt handler
+	0x0D31,	// Interrupt handler
+	0x0d18, // ??? = $CEE on mz2000
+	0
+};
+
+unsigned int mz2000_codes[] = {
+	0x0F14,	// BEEP (keep always in first position)
+	0x06A4,	// GETL - Get LINE (up to 80 characters)
+	0x0A2E,	// Double newline (1 line space)
+	0x0A29,	// Newline
+	0x08c4,	// print space
+	0x086c,	// print TAB
+	0x08c6,	// print character
+	0x087B,	// print message	(control characters transcoding)
+	//0x087B,	// print messageX
+	0x0889,	// print messageX
+	0x0832,	// GETKY - Get Key
+	0x0562,	// test BREAK
+	0x0251,	// write header info (located in $1140)
+	0x0282,	// write data
+	0x028E,	// read header info (located in $1140)
+	0x02b2,	// read tape data
+	0x02BE,	// verify tape data
+	0x0F3F,	// SOUND (play melody)
+	0x0E5E,	// set time
+	0x0EA9,	// read time
+	0x0E50,	// set tempo (melody)
+	0x0768,	// start continous sound  ** RET **
+	0x0768,	// stop continous sound   ** RET **
+
+	0x0F14,	// BEEP (keep always in first position)
+	0x06A4,	// GETL - Get LINE (up to 80 characters)
+	0x0A2E,	// Double newline (1 line space)
+	0x0A29,	// Newline
+	0x08c4,	// print space
+	0x086c,	// print TAB
+	0x08c6,	// print character
+	0x087B,	// print message	(control characters transcoding)
+	//0x087B,	// print messageX
+	0x0889,	// print messageX
+	0x0832,	// GETKY - Get Key
+	0x0562,	// test BREAK
+	0x0251,	// write header info (located in $1140)
+	0x0282,	// write data
+	0x028E,	// read header info (located in $1140)
+	0x02b2,	// read tape data
+	0x02BE,	// verify tape data
+	0x0F3F,	// SOUND (play melody)
+	0x0E5E,	// set time
+	0x0EA9,	// read time
+	0x0E50,	// set tempo (melody)
+	0x0768,	// start continous sound  ** RET **
+	0x0768,	// stop continous sound   ** RET **
+
+	0x00B1,	// MONITOR entry
+	
+	0x05D8,	// print hex value of HL
+	0x05DD,	// print hex value of A
+	0x05f3,	// format hex digit to ascii
+	0x05fd,	// format ascii to hex digit
+	0x05fd,	// format ascii to hex digit
+	0x0832,	// Wait for a key and get key code
+
+	0x0768,	// console stuff (bb9)	; ASCII code to display code conversion. **RET**
+//	0x0c29,	// console stuff ?	(fb1)
+	0x089C,	// console stuff ?  (946)
+	0x089D,	// console stuff ?  (947)
+//	0x08cb,	// console stuff ?  (939)
+//	0x0C50,	// console stuff ?  (db5)
+//	0x08c6,	// raw character output ? (normal putchar, 96c)
+	0x0768,	// display code to ASCII conversion ** RET **
+	0x0768,	// display code to ASCII conversion ** RET **
+	0x0768,	// screen control (scroll, cursor, etc..)            ** RET **
+	0x0833, // break in
+	0x0764, // POP HL,DE,BC,AF and ret
+	0x0765, // POP DE,BC,AF and ret
+	0x04ce, // (0x700)
+	0x0446, // (0xda6)
+	0x0038,	// Interrupt handler
+	0x0D07,	// Interrupt handler
+	0x0D07,	// Interrupt handler
+	0x0CEE, // ??? = $D18 on mz80b
 	0
 };
 
@@ -516,6 +606,9 @@ int mz_exec(char *target)
 		if (strcmp(dst,"700") == 0)
 			dst_codes = mz700_codes;
 
+		if (strcmp(dst,"2000") == 0)
+			dst_codes = mz2000_codes;
+
 		if (dst_codes == 0) {
 			fprintf(stderr,"Specified dst model for patching is not valid\n");
 			myexit(NULL,1);
@@ -533,6 +626,9 @@ int mz_exec(char *target)
 
 		if (strcmp(src,"700") == 0)
 			src_codes = mz700_codes;
+
+		if (strcmp(src,"2000") == 0)
+			src_codes = mz2000_codes;
 
 		if (src_codes == 0) {
 			fprintf(stderr,"Specified src model for patching is not valid\n");
