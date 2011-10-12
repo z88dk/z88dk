@@ -1,7 +1,7 @@
 /*
  *        BIN to MZ Sharp M/C file
  *
- *        $Id: mz.c,v 1.9 2011-10-11 16:45:32 stefano Exp $
+ *        $Id: mz.c,v 1.10 2011-10-12 20:52:32 stefano Exp $
  *
  *        bin2m12 by: Stefano Bodrato 4/5/2000
  *        portions from mzf2wav by: Jeroen F. J. Laros. Sep 11 2003.
@@ -153,10 +153,11 @@ unsigned int mz700_codes[] = {
 	0x0038,	// Interrupt handler
 	0x1038,	// Interrupt handler
 	0x038D,	// Interrupt handler
-	0x0EE9, // ??? = $D18 on mz80b = $CEE on mz2000
+	0x0EE9, // ??? = $D18 on mz80b = $CEE on mz2000  ** RET **
 	0
 };
 
+// MZ-80B, MONITOR SB-1510
 unsigned int mz80b_codes[] = {
 	0x0EBE,	// BEEP (keep always in first position)
 	0x06A4,	// GETL - Get LINE (up to 80 characters)
@@ -199,7 +200,7 @@ unsigned int mz80b_codes[] = {
 	0x028E,	// read header info (located in $10c0 ..was $10f0 on MZ80A)
 	0x02b2,	// read tape data
 	0x02BE,	// verify tape data
-	0x0EE9,	// SOUND (play melody)	** RET **
+	0x0EE9,	// SOUND (play melody)    ** RET **
 	0x0E06,	// set time
 	0x0e51,	// read time
 	0x0DF8,	// set tempo (melody)
@@ -222,9 +223,9 @@ unsigned int mz80b_codes[] = {
 //	0x091A,	// console stuff ?  (939)
 //	0x0C7a,	// console stuff ?  (db5)
 //	0x0916,	// raw character output ? (normal putchar, 96c)
-	0x0790,	// display code to ASCII conversion	** RET **
-	0x0790,	// display code to ASCII conversion **RET **
-	0x0790,	// screen control (scroll, cursor, etc..)            ** RET **
+	0x0790,	// display code to ASCII conversion         ** RET **
+	0x0790,	// display code to ASCII conversion         ** RET **
+	0x0790,	// screen control (scroll, cursor, etc..)   ** RET **
 	0x0872, // break in
 	0x078c, // POP HL,DE,BC,AF and ret
 	0x078d, // POP DE,BC,AF and ret
@@ -237,6 +238,7 @@ unsigned int mz80b_codes[] = {
 	0
 };
 
+// MZ-2000, MONITOR MZ-1Z001M
 unsigned int mz2000_codes[] = {
 	0x0F14,	// BEEP (keep always in first position)
 	0x06A4,	// GETL - Get LINE (up to 80 characters)
@@ -259,8 +261,8 @@ unsigned int mz2000_codes[] = {
 	0x0E5E,	// set time
 	0x0EA9,	// read time
 	0x0E50,	// set tempo (melody)
-	0x0768,	// start continous sound  ** RET **
-	0x0768,	// stop continous sound   ** RET **
+	0x0768,	// start continous sound   ** RET **
+	0x0768,	// stop continous sound    ** RET **
 
 	0x0F14,	// BEEP (keep always in first position)
 	0x06A4,	// GETL - Get LINE (up to 80 characters)
@@ -283,8 +285,8 @@ unsigned int mz2000_codes[] = {
 	0x0E5E,	// set time
 	0x0EA9,	// read time
 	0x0E50,	// set tempo (melody)
-	0x0768,	// start continous sound  ** RET **
-	0x0768,	// stop continous sound   ** RET **
+	0x0768,	// start continous sound   ** RET **
+	0x0768,	// stop continous sound    ** RET **
 
 	0x00B1,	// MONITOR entry
 	
@@ -302,9 +304,9 @@ unsigned int mz2000_codes[] = {
 //	0x08cb,	// console stuff ?  (939)
 //	0x0C50,	// console stuff ?  (db5)
 //	0x08c6,	// raw character output ? (normal putchar, 96c)
-	0x0768,	// display code to ASCII conversion ** RET **
-	0x0768,	// display code to ASCII conversion ** RET **
-	0x0768,	// screen control (scroll, cursor, etc..)            ** RET **
+	0x0768,	// display code to ASCII conversion         ** RET **
+	0x0768,	// display code to ASCII conversion         ** RET **
+	0x0768,	// screen control (scroll, cursor, etc..)   ** RET **
 	0x0833, // break in
 	0x0764, // POP HL,DE,BC,AF and ret
 	0x0765, // POP DE,BC,AF and ret
