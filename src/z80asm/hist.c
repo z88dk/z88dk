@@ -19,16 +19,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.25 2011-10-07 17:56:02 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.26 2011-10-14 15:02:39 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.25  2011-10-07 17:56:02  pauloscustodio
+/* Revision 1.26  2011-10-14 15:02:39  pauloscustodio
+/* Version 1.1.12
+/*
+/* Revision 1.25  2011/10/07 17:56:02  pauloscustodio
 /* Version 1.1.11
 /*
 /* Revision 1.24  2011/09/30 10:30:06  pauloscustodio
-/* BUG_0014 : -x./zx_clib should create ./zx_clib.lib but actually creates .lib
-/* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
-/* path_remove_ext() removed everything after last ".", ignoring directory
-/*  separators. Fixed.
+/* Version 1.1.10
 /*
 /* Revision 1.23  2011/09/29 21:26:43  pauloscustodio
 /* Version 1.1.9
@@ -594,7 +594,9 @@ C-style 0x prefix for hex digits is permitted
 IX <-> IY swap option added (-IXIY)
 
 
+-------------------------------------------------------------------------------
 09.07.2011 [1.1.1] (pauloscustodio)
+-------------------------------------------------------------------------------
 Based on 1.0.31
 
     Compiled with Visual C++ 2010, added casts to clean up warnings.
@@ -605,8 +607,9 @@ Based on 1.0.31
              -RCMX000, -plus, -IXIY, -C, -h, -I, -L, -sdcc, -forcexlib
       - added documentation for commands: INVOKE, LINE
       - added notes on deprecated error messages
-    Started to build test suite in t/ *.t unsing Perl prove. Included test for all standard
-    Z80 opcodes; need to be extended with directives and opcodes for Z80 variants.
+    Started to build test suite in t/ *.t unsing Perl prove. Included test
+    for all standard Z80 opcodes; need to be extended with directives and 
+    opcodes for Z80 variants.
     
     BUG_0001 : Error in expression during link, expression garbled - memory corruption?
          Simple asm program: "org 0 \n jp NN \n jp NN \n NN: \n", 
@@ -615,27 +618,29 @@ Based on 1.0.31
                       Error in expression +¶+≤+-;æ?.π“¶“≤Ÿ+v›F›V›^›x¶ ›@›H›P›".
     
          Problem cause: lexer GetSym() is not prepared to read '\0' bytes.
-         When the expression is read from the OBJ file at the link phase, the '\0' 
-         at the end of the expression field is interpreted as a random separator 
-         because ssym[] contains fewer elements (27) than the separators string (28);
-         hence in some cases the expression is parsed correctly, e.g. without -t4 
-         the program assembles correctly. 
-         If the random separator is a semicolon, GetSym() calls Skipline() to go past
-         the comment, and reads past the end of the expression in the OBJ file,
-         causing the parse of the next expression to fail.
+         When the expression is read from the OBJ file at the link phase, 
+	 the '\0' at the end of the expression field is interpreted as a 
+	 random separator because ssym[] contains fewer elements (27) 
+	 than the separators string (28); hence in some cases the expression 
+	 is parsed correctly, e.g. without -t4 the program assembles correctly. 
+         If the random separator is a semicolon, GetSym() calls Skipline()
+	 to go past the comment, and reads past the end of the expression 
+	 in the OBJ file, causing the parse of the next expression to fail.
     
     BUG_0002 : CreateLibFile and GetLibFile: buffer overrun
-         When the Z80_STDLIB variable is defined, libfilename is allocated with one byte
-         too short (strlen(filename) instead of strlen(filename)+1).
+         When the Z80_STDLIB variable is defined, libfilename is allocated 
+	 with one byte too short (strlen(filename) instead of strlen(filename)+1).
     
     BUG_0003 : Illegal options are ignored, although ReportError 9 (Illegal Option) exists
-         SetAsmFlag(): Some options were missing the 'return' statement, following through
-         to the next tests; inserted 'return' in options 'M', 'I', 'L' and 'D'.
+         SetAsmFlag(): Some options were missing the 'return' statement, 
+	 following through to the next tests; inserted 'return' 
+	 in options 'M', 'I', 'L' and 'D'.
          Added ReportError 9 (Illegal Option) if the option is not recognized.
     
     CH_0001 : Assembly error messages should appear on stderr
          It's cumbersome to have to open .err files to see assembly errors.
-         Changed ReportError() to Write error messages to stderr in addition to the .err file.
+         Changed ReportError() to Write error messages to stderr in addition 
+	 to the .err file.
     
     BUG_0004 : 8bit unsigned constants are not checked for out-of-range
          Added the check to ExprUnsigned8() and Z80pass2().
@@ -648,102 +653,136 @@ Based on 1.0.31
          Accept unary minus and unary plus in factor to allow (ix+ -3) to be
          parsed as (ix-3).
     
+-------------------------------------------------------------------------------
 11.07.2011 [1.1.2] (pauloscustodio)
-    - Copied cvs log into Log history of each file, added Z80asm banner to all sources.
-    - Moved all option variables and option handling code to a separate module options.c,
-      replaced all extern declarations of these variables by include options.h.
+-------------------------------------------------------------------------------
+    - Copied cvs log into Log history of each file, added Z80asm banner 
+      to all sources.
+    - Moved all option variables and option handling code to a separate 
+      module options.c, replaced all extern declarations of these variables 
+      by include options.h.
     - Added test scripts for all z80asm options.
     - Created declarations in z80asm.h of objects defined in z80asm.c.
     - Created declarations in symbols.h of objects defined in symbols.c.
-    - Updated z80asm.html: indication of deprecated error messages, links within the document.
+    - Updated z80asm.html: indication of deprecated error messages, 
+      links within the document.
     - Removed references to dead variable 'relocfile'.
 
+-------------------------------------------------------------------------------
 14.07.2011 [1.1.3] (pauloscustodio)
-    - Moved all error variables and error reporting code to a separate module errors.c,
-      replaced all extern declarations of these variables by include errors.h, 
-      created symbolic constants for error codes.
+-------------------------------------------------------------------------------
+    - Moved all error variables and error reporting code to a separate module 
+      errors.c, replaced all extern declarations of these variables by include 
+      errors.h, created symbolic constants for error codes.
     - Added test scripts for error messages.
-    - Unified "Integer out of range" and "Out of range" errors; they are the same error.
-    - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+    - Unified "Integer out of range" and "Out of range" errors; they are the 
+      same error.
+    - Unified ReportIOError as ReportError(ERR_FILE_OPEN).
 
     CH_0003 : Error messages should be more informative
         - Added printf-args to error messages, added "Error:" prefix.
 
     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
-        - Raise ERR_UNBALANCED_PAREN instead
+        - Raise ERR_UNBALANCED_PAREN instead.
 
+-------------------------------------------------------------------------------
 15.07.2011 [1.1.4] (pauloscustodio)
-    BUG_0001(a) : during correction of BUG_0001, new symbol colon was introduced in enum symbols,
-	causing expressions stored in object files to be wrong, e.g. VALUE-1 was stored as
-	VALUE*1. This caused problems in expression evaluation in link phase.
+-------------------------------------------------------------------------------
+    BUG_0001(a) : during correction of BUG_0001, new symbol colon was introduced 
+	in enum symbols, causing expressions stored in object files to be wrong, 
+	e.g. VALUE-1 was stored as VALUE*1. This caused problems in expression 
+	evaluation in link phase.
 
+-------------------------------------------------------------------------------
 18.07.2011 [1.1.5] (pauloscustodio)
+-------------------------------------------------------------------------------
     BUG_0007 : memory leaks
-	Included code to run MS Visual Studio memory leak detection on a DEBUG build.
-	Cleaned memory leaks in main(), ReleaseModules(), DEFS().
-	Still memory leaks in main() in case of premature exit due to fatal errors; need
-	to include exception mechanism to solve.
+	- Included code to run MS Visual Studio memory leak detection on a DEBUG
+	  build.
+	- Cleaned memory leaks in main(), ReleaseModules(), DEFS().
+	- Still memory leaks in main() in case of premature exit due to fatal 
+	  errors; 
+	  need to include exception mechanism to solve.
 
+-------------------------------------------------------------------------------
 05.08.2011 [1.1.6] (pauloscustodio)
+-------------------------------------------------------------------------------
     CH_0004 : Exception mechanism to handle fatal errors
-	Included exceptions4c 2.4, Copyright (c) 2011 Guillermo Calvo
-	Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
-	Replaced all the memory allocation functions malloc, calloc, ... by corresponding 
-	macros xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated, 
-	removing all the test code after each memory allocation.
-	Replaced all functions that allocated memory structures by the new xcalloc_struct().
-	Replaced all free() by xfree0() macro which only frees if the pointer in non-null, and 
-	sets the poiter to NULL afterwards, to avoid any used of the freed memory.
-	Created try/catch sequences to clean-up partially created memory structures and rethrow the 
-	exception, to cleanup memory leaks.
-	Replaced all exit(1) by an exception.
-	Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
+	- Included exceptions4c 2.4, Copyright (c) 2011 Guillermo Calvo
+	- Replaced all ERR_NO_MEMORY/return sequences by an exception, 
+	  captured at main().
+	- Replaced all the memory allocation functions malloc, calloc, ... 
+	  by corresponding macros xmalloc, xcalloc, ... that raise an exception 
+	  if the memory cannot be allocated, removing all the test code after 
+	  each memory allocation.
+	- Replaced all functions that allocated memory structures by the new 
+	  xcalloc_struct().
+	- Replaced all free() by xfree0() macro which only frees if the pointer 
+	  is non-null, and sets the poiter to NULL afterwards, to avoid any use
+	  of the freed memory.
+	- Created try/catch sequences to clean-up partially created memory 
+	  structures and rethrow the exception, to cleanup memory leaks.
+	- Replaced all exit(1) by an exception.
+	- Replaced 'l' (lower case letter L) by 'len' - too easy to confuse 
+	  with numeral '1'.
 
+-------------------------------------------------------------------------------
 14.08.2011 [1.1.7] (pauloscustodio)
+-------------------------------------------------------------------------------
     CH_0004(a) : Exception mechanism to handle fatal errors
 	- New exception FatalErrorException to raise on fatal assembly errors
-	- ReportError(), LinkModules(), ModuleExpr(), CreateBinFile(), CreateLib(), IncludeFile(),
-	  BINARY(): throw the new exception FatalErrorException for fatal errors 
-	  ERR_FILE_OPEN and ERR_MAX_CODESIZE
-	- AssembleSourceFile(): added try-catch to delete incomplete files in case of fatal error, 
-	  throw FatalErrorException instead of early return
-	- main(): added try-catch to delete incomplete library file in case of fatal error
-	- Z80pass1(), IncludeFile(): no need to check for fatal errors and return; bypassed by the
-	  exception mechanism	
-    - AssembleSourceFile(): error return is never used; changed to void	
-    - source_file_open flag removed; z80asmfile is used for the same purpose
-    - Tests: Added test case to verify that incomplete files are deleted on error
+	- ReportError(), LinkModules(), ModuleExpr(), CreateBinFile(), 
+	  CreateLib(), IncludeFile(), BINARY(): throw the new exception 
+	  FatalErrorException for fatal errors ERR_FILE_OPEN and ERR_MAX_CODESIZE
+	- AssembleSourceFile(): added try-catch to delete incomplete files 
+	  in case of fatal error, throw FatalErrorException instead of early 
+	  return.
+	- main(): added try-catch to delete incomplete library file in case of 
+	  fatal error.
+	- Z80pass1(), IncludeFile(): no need to check for fatal errors and return; 
+	  bypassed by the exception mechanism.
+    - AssembleSourceFile(): error return is never used; changed to void.
+    - source_file_open flag removed; z80asmfile is used for the same purpose.
+    - Tests: Added test case to verify that incomplete files are deleted on error.
     - Hack to hide memory leak in e4c, line 647, when rethrow() is called.
       Reported to Exceptions4c project page http://code.google.com/p/exceptions4c/
       
+-------------------------------------------------------------------------------
 19.08.2011 [1.1.8] (pauloscustodio)
+-------------------------------------------------------------------------------
     BUG_0008 : code block of 64K is read as zero
-	- When linking a module with 64K of data no data is read from the object file, because 
-	  the code size is stored with two bytes = zero.
-	- Problem is masked if the module with 64K is the only module linked, because the linker 
-	  reuses the code block left by the assembler, that still contains the code.
+	- When linking a module with 64K of data no data is read from the 
+	  object file because the code size is stored with two bytes = zero.
+	- Problem is masked if the module with 64K is the only module linked
+	  because the linker reuses the code block left by the assembler, 
+	  which still contains the code.
 
     BUG_0009 : file read/write not tested for errors
-	- In case of disk full file write fails, but assembler does not detect the error
-	  and leaves back corruped object/binary files
+	- In case of disk full file write fails, but assembler does not 
+	  detect the error and leaves back corruped object/binary files
 	- Created new exception FileIOException and ERR_FILE_IO error.
-	- Created new functions xfputc, xfgetc, ... to raise the exception on error.
+	- Created new functions xfputc, xfgetc, ... to raise the 
+	  exception on error.
 
     BUG_0010 : heap corruption when reaching MAXCODESIZE
-	- test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one
-	  byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted
-	  before the exception is raised.
-	- Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE
-	  on every write.
-	- Side effect of this fix: object files now store a zero on every location in code that 
-	  will be patched by the linker, before they stored dummy data - whatever was in memory 
-	  at that location in codearea.
+	- test for overflow of MAXCODESIZE is done before each instruction at 
+	  parseline(); if only one byte is available in codearea, and a 2 byte 
+	  instruction is assembled, the heap is corrupted before the 
+	  exception is raised.
+	- Factored all the codearea-accessing code into a new module, checking 
+	  for MAXCODESIZE on every write.
+	- Side effect of this fix: object files now store a zero on every location 
+	  in code that will be patched by the linker, before they stored random 
+	  data - whatever was in memory at that location in codearea.
 
     - Upgrade to Exceptions4c 2.8.9 to solve memory leak.
     - Factored code to read/write word from file into xfget_word/xfput_word. 
     - Renamed ReadLong/WriteLong to xfget_long/xfput_long for symetry.
 
+-------------------------------------------------------------------------------
 29.09.2011 [1.1.9] (pauloscustodio)
+-------------------------------------------------------------------------------
+    BUG_0012 : binfilename[] array is too short, should be FILENAME_MAX
 
     CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
 	- Factor all pathname manipulation into module file.c.
@@ -751,31 +790,65 @@ Based on 1.0.31
 	- Factor FILEEXT_SEPARATOR into config.h.
 	- Move srcext[] and objext[] to the options.c module.
 
-    BUG_0012 : binfilename[] array is too short, should be FILENAME_MAX
-
+-------------------------------------------------------------------------------
 30.09.2011 [1.1.10] (pauloscustodio)
-
+-------------------------------------------------------------------------------
     BUG_0014 : -x./zx_clib should create ./zx_clib.lib but actually creates .lib
 	(reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
 	- path_remove_ext() removed everything after last ".", ignoring directory
 	  separators. Fixed.
 
+-------------------------------------------------------------------------------
 07.10.2011 [1.1.11] (pauloscustodio)
-
+-------------------------------------------------------------------------------
     BUG_0015 : Relocation issue - dubious addresses come out of linking
 	(reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
-	- Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged
-	  into the same entity. 
-	- This caused the problem because CODESIZE keeps track of the start offset 
-	  of each module in the sequence they will appear in the object file, 
-	  and codeptr is reset to the start of the codearea for each module. 
-	  The effect was that all address calculations at link phase were considering
-	  a start offset of zero for all modules.
-	- Moreover, when linking modules from a libary, the modules are pulled in to 
-	  the code area as they are needed, and not in the sequence they will be in
-	  the object file. The start offset was being ignored and the modules were
-	  being loaded in the incorrect order
-	- Consequence of these two issues were all linked addresses wrong.
+	- Introduced in version 1.1.8, when the CODESIZE and the codeptr
+	  were merged into the same entity. 
+	- This caused the problem because CODESIZE keeps track of the start 
+	  offset of each module in the sequence they will appear in the object 
+	  file, and codeptr is reset to the start of the codearea for each module. 
+	  The effect was that all address calculations at link phase were
+	  considering a start offset of zero for all modules.
+	- Moreover, when linking modules from a libary, the modules are pulled 
+	  in to the code area as they are needed, and not in the sequence they 
+	  will be in the object file. The start offset was being ignored and 
+	  the modules were being loaded in the incorrect order
+	- Consequence of these two issues were all linked addresses wrong for 
+	  programs with more that one module.
+
+-------------------------------------------------------------------------------
+14.10.2011 [1.1.12] (pauloscustodio)
+-------------------------------------------------------------------------------
+    BUG_0013 : defm check for MAX_CODESIZE incorrect
+	- The code: 
+		defs 65535, 'a'
+		defm "a"
+	  fails with: Error: File 'test.asm', at line 3, Max. code size of 
+	  65536 bytes reached
+
+    - Remove un-necessary tests for MAX_CODESIZE; all tests are concentrated in 
+      check_space() from codearea.c.
+    - Replace strncpy by strncat, when used to make a safe copy without buffer
+      overruns. The former pads the string with nulls.
+    - Move cpu_type to options.c.
+    - Factor strtoupper() to new module strutil.c.
+    - New path_basename() in file.c, change functions to return result string
+      pointer.
+    - Silence warnings with casts.
+      
+-------------------------------------------------------------------------------
+FUTURE CHANGES - require change of the object file format
+-------------------------------------------------------------------------------
+    BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
+	- Bug only happens with forward references to relative addresses in 
+	  expressions.
+	- See example from zx48.asm ROM image in t/BUG_0011.t test file.
+	- Need to change object file format to correct - need patchptr and 
+	  address of instruction start.
+
+    - Sections
+    - Standard operators in expressions
 
 */
 
@@ -783,8 +856,8 @@ Based on 1.0.31
 
 #include "hist.h"
 
-#define DATE        "07.10.2011"
-#define VERSION     "1.1.11"
+#define DATE        "14.10.2011"
+#define VERSION     "1.1.12"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011"
 
 #ifdef QDOS
