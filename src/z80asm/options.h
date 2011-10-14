@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.3 2011-08-21 20:25:31 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.4 2011-10-14 14:57:45 pauloscustodio Exp $ */
 /* $Log: options.h,v $
-/* Revision 1.3  2011-08-21 20:25:31  pauloscustodio
+/* Revision 1.4  2011-10-14 14:57:45  pauloscustodio
+/* - Move cpu_type to options.c.
+/* - Replace strncpy by strncat, when used to make a safe copy without buffer overruns. The former pads the string with nulls.
+/*
+/* Revision 1.3  2011/08/21 20:25:31  pauloscustodio
 /* BUG_0012 : binfilename[] array is too short, should be FILENAME_MAX
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
 /* - Factor all pathname manipulation into module file.c.
@@ -63,6 +67,18 @@ extern enum flag expl_binflnm;
 extern char binfilename[];		/* -o explicit filename buffer */
 extern char srcext[];			/* ".asm"/"_asm" extension, or whatever defined by -e */
 extern char objext[];			/* ".obj"/"_obj" extension, or whatever defined by -M */
+
+/* CPU type */
+#define CPU_Z80     1
+#define CPU_RCM2000 2
+#define CPU_RCM3000 4
+#define CPU_Z180    8
+
+#define CPU_RABBIT (CPU_RCM2000|CPU_RCM3000)
+#define CPU_ZILOG  (CPU_Z80    |CPU_Z180)
+#define CPU_ALL    (CPU_ZILOG  |CPU_RABBIT)
+
+extern int cpu_type;
 
 /* reset default options */
 extern void ResetOptions (void);

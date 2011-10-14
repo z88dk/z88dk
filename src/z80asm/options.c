@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.6 2011-08-21 20:25:31 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.7 2011-10-14 14:57:45 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.6  2011-08-21 20:25:31  pauloscustodio
+/* Revision 1.7  2011-10-14 14:57:45  pauloscustodio
+/* - Move cpu_type to options.c.
+/* - Replace strncpy by strncat, when used to make a safe copy without buffer overruns. The former pads the string with nulls.
+/*
+/* Revision 1.6  2011/08/21 20:25:31  pauloscustodio
 /* BUG_0012 : binfilename[] array is too short, should be FILENAME_MAX
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
 /* - Factor all pathname manipulation into module file.c.
@@ -85,6 +89,7 @@ enum flag expl_binflnm;
 char binfilename[FILENAME_MAX];	/* -o explicit filename buffer (BUG_0012) */
 char srcext[FILEEXT_MAX];	/* contains default source file extension */
 char objext[FILEEXT_MAX];	/* contains default object file extension */
+int  cpu_type;
 
 /*-----------------------------------------------------------------------------
 *   ResetOptions
@@ -112,6 +117,7 @@ void ResetOptions (void)
     autorelocate    = OFF;
     deforigin	    = OFF; 
     expl_binflnm    = OFF;
+    cpu_type	    = CPU_Z80;
 
     strcpy(srcext, FILEEXT_ASM);	/* use ".asm" as default source file extension */
     strcpy(objext, FILEEXT_OBJ);	/* use ".obj" as default source file extension */
@@ -274,8 +280,8 @@ void SetAsmFlag (char *flagid)
 
     else if (*flagid == 'o') {
 	/* store explicit filename for .BIN file (BUG_0012) */
-	strncpy(binfilename, flagid + 1, sizeof(binfilename) - 1);
-	binfilename[sizeof(binfilename) - 1] = '\0';
+	binfilename[0] = '\0';		/* prepare for strncat */
+	strncat(binfilename, flagid + 1, sizeof(binfilename) - 1);
 	expl_binflnm = ON;      
     }
 
