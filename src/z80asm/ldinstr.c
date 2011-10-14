@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.12 2011-10-07 17:53:04 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.13 2011-10-14 14:51:15 pauloscustodio Exp $ */
 /* $Log: ldinstr.c,v $
-/* Revision 1.12  2011-10-07 17:53:04  pauloscustodio
+/* Revision 1.13  2011-10-14 14:51:15  pauloscustodio
+/* - Silence warnings with casts.
+/*
+/* Revision 1.12  2011/10/07 17:53:04  pauloscustodio
 /* BUG_0015 : Relocation issue - dubious addresses come out of linking
 /* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
 /* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
@@ -109,6 +112,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "symbol.h"
 #include "errors.h"
 #include "codearea.h"
+#include "options.h"
 
 /* external functions */
 enum symbols GetSym (void);
@@ -270,7 +274,7 @@ LD (void)
                         inc_PC(1);
                       }
                     destreg &= 7;
-                    append_byte(destreg * 0x08 + 0x06);
+                    append_byte((unsigned char)(destreg * 0x08 + 0x06));
                     ExprUnsigned8 (1);
                     inc_PC(2);
                     return;
@@ -318,7 +322,7 @@ LD (void)
                 sourcereg &= 7;
                 destreg &= 7;
 
-                append_byte(0x40 + destreg * 0x08 + sourcereg);	/* LD  r,r  */
+                append_byte((unsigned char)(0x40 + destreg * 0x08 + sourcereg));	/* LD  r,r  */
                 inc_PC(1);
               }
           }
@@ -355,7 +359,7 @@ LD_HL8bit_indrct (void)
 	  break;
 
 	default:
-	  append_byte(0x70 + sourcereg);		/* LD  (HL),r  */
+	  append_byte((unsigned char)(0x70 + sourcereg));		/* LD  (HL),r  */
 	  inc_PC(1);
 	  break;
 	}
@@ -406,7 +410,7 @@ LD_index8bit_indrct (int destreg)
 	  break;
 
 	default:
-	  patch_byte(&opcodeptr, 112 + sourcereg);		/* LD  (IX|IY+d),r  */
+	  patch_byte(&opcodeptr, (unsigned char)(112 + sourcereg));		/* LD  (IX|IY+d),r  */
 	  inc_PC(3);
 	  break;
 	}			/* end switch */
@@ -427,7 +431,7 @@ LD_r_8bit_indrct (int destreg)
   switch (sourcereg = IndirectRegisters ())
     {
     case 2:
-      append_byte(0x40 + destreg * 0x08 + 0x06);	/* LD   r,(HL)  */
+      append_byte((unsigned char)(0x40 + destreg * 0x08 + 0x06));	/* LD   r,(HL)  */
       inc_PC(1);
       break;
 
@@ -437,7 +441,7 @@ LD_r_8bit_indrct (int destreg)
 	append_byte(0xDD);
       else
 	append_byte(0xFD);
-      append_byte(0x40 + destreg * 0x08 + 0x06);
+      append_byte((unsigned char)(0x40 + destreg * 0x08 + 0x06));
       ExprSigned8 (2);
       inc_PC(3);
       break;
@@ -512,7 +516,7 @@ LD_address_indrct (long exprptr)
 	case 1:		/* LD  (nn),dd   => dd: BC,DE,SP  */
 	case 3:
 	  append_byte(0xED);
-	  append_byte(0x43 + sourcereg * 0x10);
+	  append_byte((unsigned char)(0x43 + sourcereg * 0x10));
 	  bytepos = 2;
 	  inc_PC(2);
 	  break;
@@ -596,7 +600,7 @@ LD_16bit_reg (void)
 
 	    default:
 	      append_byte(0xED);
-	      append_byte(0x4B + destreg * 0x10);
+	      append_byte((unsigned char)(0x4B + destreg * 0x10));
 	      bytepos = 2;
 	      inc_PC(2);
 	      break;
@@ -628,7 +632,7 @@ LD_16bit_reg (void)
 		break;
 
 	      default:
-		append_byte(destreg * 0x10 + 0x01);
+		append_byte((unsigned char)(destreg * 0x10 + 0x01));
 		bytepos = 1;
 		inc_PC(1);
 		break;

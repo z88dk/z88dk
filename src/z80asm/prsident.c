@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.25 2011-08-19 15:53:58 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.26 2011-10-14 14:51:15 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.25  2011-08-19 15:53:58  pauloscustodio
+/* Revision 1.26  2011-10-14 14:51:15  pauloscustodio
+/* - Silence warnings with casts.
+/*
+/* Revision 1.25  2011/08/19 15:53:58  pauloscustodio
 /* BUG_0010 : heap corruption when reaching MAXCODESIZE
 /* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
 /* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
@@ -195,6 +198,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "options.h"
 #include "errors.h"
 #include "codearea.h"
+#include "options.h"
 
 /* external functions */
 void Skipline (FILE *fptr);
