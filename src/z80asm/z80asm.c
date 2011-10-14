@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.41 2011-10-07 17:53:04 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.42 2011-10-14 15:00:22 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.41  2011-10-07 17:53:04  pauloscustodio
+/* Revision 1.42  2011-10-14 15:00:22  pauloscustodio
+/* - Move cpu_type to options.c.
+/* - Replace strncpy by strncat, when used to make a safe copy without buffer overruns. The former pads the string with nulls.
+/* - Factor strtoupper() to new module strutil.c.
+/*
+/* Revision 1.41  2011/10/07 17:53:04  pauloscustodio
 /* BUG_0015 : Relocation issue - dubious addresses come out of linking
 /* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
 /* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
@@ -356,6 +361,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "errors.h"
 #include "file.h"
 #include "codearea.h"
+#include "strutil.h"
 
 /* external functions */
 void RemovePfixlist (struct expr *pfixexpr);
@@ -415,7 +421,6 @@ char separators[] = " &\"\';,.({[]})+-*/%^=~|:<>!#:";
 enum flag pass1, writeline;
 enum flag EOL, library, createlibrary;
 
-int cpu_type = CPU_Z80;
 int PAGENR, LINENR;
 long TOTALLINES;
 unsigned char PAGELEN;
@@ -460,8 +465,6 @@ avltree *globalroot, *staticroot;
 void  
 AssembleSourceFile (void)
 {
-  char  *dotptr;
-
   /* try-catch to delete incomplete files in case of fatal error */
   try {
       if ((errfile = fopen (errfilename, "w")) == NULL)
@@ -511,22 +514,10 @@ AssembleSourceFile (void)
       pass1 = OFF;			/* GetSymPtr will only generate page references in Pass1 (if listing is ON) */
 
       if (CURRENTMODULE->mname == NULL) {	/* Module name must be defined */
-	dotptr = strrchr(srcfilename,'/');
-	if ( dotptr == NULL )
-	    dotptr = strrchr(srcfilename,'\\');
-	if ( dotptr == NULL )
-	    dotptr = srcfilename-1;
-	strcpy(ident,dotptr+1);
-	dotptr = strchr(ident,FILEEXT_ASM[0]);
-	if ( dotptr )
-	    *dotptr = 0;
+	  path_basename(ident, srcfilename);
+	  path_remove_ext(ident);
+	  strtoupper(ident);
 	sym = name;
-	dotptr = ident;
-	while ( *dotptr )
-	 {
-	    *dotptr = toupper(*dotptr);
-	    dotptr++;
-	  }
 	DeclModuleName();
 	/* ReportError (CURRENTFILE->fname, 0, ERR_MODULE_NOT_DEFINED); */
       }
@@ -657,10 +648,12 @@ GetModuleSize (void)
 	  if (size == 0) 
 	      size = 0x10000;
 
-	  if (CURRENTMODULE->startoffset + size > MAXCODESIZE)
+	  if (CURRENTMODULE->startoffset + size > MAXCODESIZE) {
 	    ReportError (objfilename, 0, ERR_MAX_CODESIZE);
-	  else
+	  }
+	  else {
 	    inc_codesize(size);		/* BUG_0015 : was not updating codesize */
+	  }
 	}
       fclose (objfile);
       return 0;
@@ -685,8 +678,8 @@ CreateLibfile (char *filename)
     else {
 	if ((filename = getenv ("Z80_STDLIB")) != NULL) {
 	    /* BUG_0002 - off by one alloc */
-	    strncpy(libfilename, filename, FILENAME_MAX-1);
-	    libfilename[FILENAME_MAX-1] = '\0';
+	    libfilename[0] = '\0';		/* prepare for strncat */
+	    strncat(libfilename, filename, FILENAME_MAX-1);
         }
 	else {
 	    ReportError (NULL, 0, ERR_ENV_NOT_DEFINED, "Z80_STDLIB");
@@ -1026,7 +1019,6 @@ main (int argc, char *argv[])
 
   writeline = ON;
   library = createlibrary = OFF;
-  cpu_type = CPU_Z80;
 
   ResetOptions();
   ResetErrors();
@@ -1119,7 +1111,8 @@ main (int argc, char *argv[])
             {
               if ((*argv)[0] != '-')
                 {
-                  strncpy(ident, *argv, 254);
+		  ident[0] = '\0';		/* prepare for strncat */
+                  strncat(ident, *argv, 254);
                   --argc;
                   ++argv;	/* get ready for next filename */
                 }

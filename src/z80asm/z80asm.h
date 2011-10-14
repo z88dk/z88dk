@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.11 2011-08-21 20:37:20 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.12 2011-10-14 15:00:22 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.11  2011-08-21 20:37:20  pauloscustodio
+/* Revision 1.12  2011-10-14 15:00:22  pauloscustodio
+/* - Move cpu_type to options.c.
+/* - Replace strncpy by strncat, when used to make a safe copy without buffer overruns. The former pads the string with nulls.
+/* - Factor strtoupper() to new module strutil.c.
+/*
+/* Revision 1.11  2011/08/21 20:37:20  pauloscustodio
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
 /* - Factor all pathname manipulation into module file.c.
 /* - Make default extensions constants.
@@ -126,17 +131,6 @@ extern char libfilename[];
 #define FLAGS_M 7
 
 
-#define CPU_Z80     1
-#define CPU_RCM2000 2
-#define CPU_RCM3000 4
-#define CPU_Z180    8
-
-#define CPU_RABBIT (CPU_RCM2000|CPU_RCM3000)
-#define CPU_ZILOG (CPU_Z80|CPU_Z180)
-#define CPU_ALL ( CPU_ZILOG |  CPU_RABBIT )
-
-
-extern int   cpu_type;
 extern size_t EXPLICIT_ORIGIN;
 extern int TAB_DIST, COLUMN_WIDTH;
 extern char ident[];
