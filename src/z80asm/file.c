@@ -16,9 +16,13 @@ Copyright (C) Paulo Custodio, 2011
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.4 2011-09-30 10:30:06 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.5 2011-10-14 14:54:54 pauloscustodio Exp $ */
 /* $Log: file.c,v $
-/* Revision 1.4  2011-09-30 10:30:06  pauloscustodio
+/* Revision 1.5  2011-10-14 14:54:54  pauloscustodio
+/* - New path_basename() in file.c, change functions to return result string
+/*  pointer.
+/*
+/* Revision 1.4  2011/09/30 10:30:06  pauloscustodio
 /* BUG_0014 : -x./zx_clib should create ./zx_clib.lib but actually creates .lib
 /* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
 /* path_remove_ext() removed everything after last ".", ignoring directory
@@ -41,6 +45,7 @@ Utilities for file handling
 /* */
 
 #include <string.h>
+#include <stdlib.h>
 #include "file.h"
 #include "config.h"
 
@@ -116,10 +121,11 @@ long xfget_long (FILE *stream)
 /*-----------------------------------------------------------------------------
 *   Pathname manipulation 
 *   All filenames are passed as char file[FILENAME_MAX] elements
+*   return string is written to passed buffer and returned by the function
 *----------------------------------------------------------------------------*/
 
-/* remove the extension of the passed filename, modifies the string */
-void path_remove_ext  (char *filename)
+/* remove the extension of the passed filename, modifies the string in place */
+char * path_remove_ext  (char *filename)
 {
     char *dot_pos = strrchr(filename, FILEEXT_SEPARATOR[0]);
     char *dir_pos;
@@ -128,29 +134,55 @@ void path_remove_ext  (char *filename)
 	/* BUG_0014 : need to ignore dot if before a directory separator */
 	dir_pos = strrchr(filename, '/');
 	if (dir_pos != NULL && dot_pos < dir_pos) 
-	    return;			/* dot before slash */
+	    return filename;		/* dot before slash */
 
 	dir_pos = strrchr(filename, '\\');
 	if (dir_pos != NULL && dot_pos < dir_pos) 
-	    return;			/* dot before backslash */
+	    return filename;		/* dot before backslash */
 
 	*dot_pos = '\0';		/* terminate the string */
     }
+    return filename;
 }
 
 /* make a copy of the file name, replacing the extension */
-void path_replace_ext (char *dest, const char *source, const char *new_ext)
+char * path_replace_ext (char *dest, const char *source, const char *new_ext)
 {
     int length;
 
-    strncpy(dest, source, FILENAME_MAX-1);
-    dest[FILENAME_MAX-1] = '\0';
+    dest[0] = '\0';			/* prepare for strncat */
+    strncat(dest, source, FILENAME_MAX-1);
 
     path_remove_ext(dest);		/* file without extension */
 
     /* copy extension, make sure the final file fits in FILENAME_MAX-1 */
     length = strlen(dest);
-    strncpy(dest + length, new_ext, FILENAME_MAX-1 - length);
-    dest[FILENAME_MAX-1] = '\0';
+    strncat(dest + length, new_ext, FILENAME_MAX - 1 - length);
+
+    return dest;
+}
+
+/* make a copy of the file basename, skipping the directory part */
+char * path_basename (char *dest, const char *source)
+{
+    const char *path_sep1, *path_sep2, *basename;
+
+    path_sep1 = strrchr(source, '/');
+    if (path_sep1 == NULL) 
+	path_sep1 = source - 1;	    
+
+    path_sep2 = strrchr(source, '\\');
+    if (path_sep2 == NULL) 
+	path_sep2 = source - 1;	    
+
+    if (path_sep1 > path_sep2) 
+	basename = path_sep1 + 1;
+    else
+	basename = path_sep2 + 1;
+
+    dest[0] = '\0';			/* prepare for strncat */
+    strncat(dest, basename, FILENAME_MAX - 1);
+
+    return dest;
 }
 
