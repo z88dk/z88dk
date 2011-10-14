@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/error-12.t,v 1.2 2011-07-14 01:32:09 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/error-12.t,v 1.3 2011-10-14 14:02:23 pauloscustodio Exp $
 # $Log: error-12.t,v $
-# Revision 1.2  2011-07-14 01:32:09  pauloscustodio
+# Revision 1.3  2011-10-14 14:02:23  pauloscustodio
+# test each of the MAXCODESIZE conditions in the code
+#
+# Revision 1.2  2011/07/14 01:32:09  pauloscustodio
 #     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 #     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 #     CH_0003 : Error messages should be more informative
@@ -38,11 +41,102 @@ use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-my $code = "defb 0xAA\n" x 65537;
-t_z80asm_error($code, "Error: File 'test.asm', at line 65537, Max. code size of 65536 bytes reached");
+# test each of the MAXCODESIZE conditions in the code
 
-$code = "defb 0xAA\n" x 65536;
-t_z80asm_ok(0, $code, "\xAA" x 65536);
+# DEFB
+t_z80asm_ok(0, "defs 65535, 0xAA \n defb 0xAA \n",
+	    "\xAA" x 65536);
+t_z80asm_error("defs 65536, 0xAA \n defb 0xAA \n",
+	       "Error: File 'test.asm', at line 2, Max. code size of 65536 bytes reached");
 
-unlink_testfiles();
+t_z80asm_ok(0, "defs 65534, 0xAA \n defb 0xAA,0xAA \n",
+	    "\xAA" x 65536);
+t_z80asm_error("defs 65535, 0xAA \n defb 0xAA,0xAA \n",
+	       "Error: File 'test.asm', at line 2, Max. code size of 65536 bytes reached");
+
+# DEFW
+t_z80asm_ok(0, "defs 65534, 0xAA \n defw 0xAAAA \n",
+	    "\xAA" x 65536);
+t_z80asm_error("defs 65535, 0xAA \n defw 0xAAAA \n",
+	       "Error: File 'test.asm', at line 2, Max. code size of 65536 bytes reached");
+
+t_z80asm_ok(0, "defs 65532, 0xAA \n defw 0xAAAA, 0xAAAA \n",
+	    "\xAA" x 65536);
+t_z80asm_error("defs 65533, 0xAA \n defw 0xAAAA, 0xAAAA \n",
+	       "Error: File 'test.asm', at line 2, Max. code size of 65536 bytes reached");
+
+# DEFS
+t_z80asm_ok(0, "defs 65536,0xAA", "\xAA" x 65536);
+t_z80asm_error("defs 65537,0xAA", "Error: File 'test.asm', at line 1, Max. code size of 65536 bytes reached");
+
+# DEFP
+t_z80asm_ok(0, "defs 65533, 0xAA \n defp 0xAAAA,0xAA \n",
+	    "\xAA" x 65536);
+t_z80asm_error("defs 65534, 0xAA \n defp 0xAAAA,0xAA \n",
+	       "Error: File 'test.asm', at line 2, Max. code size of 65536 bytes reached");
+
+# DEFL
+t_z80asm_ok(0, "defs 65532, 0xAA \n defl 0xAAAAAAAA \n",
+	    "\xAA" x 65536);
+t_z80asm_error("defs 65533, 0xAA \n defl 0xAAAAAAAA \n",
+	       "Error: File 'test.asm', at line 2, Max. code size of 65536 bytes reached");
+
+# DEFM
+t_z80asm_ok(0, "defs 65535, 'a' \n defm \"a\" \n",
+	    "a" x 65536);
+t_z80asm_error("defs 65536, 'a' \n defm \"a\" \n",
+	       "Error: File 'test.asm', at line 2, Max. code size of 65536 bytes reached");
+
+t_z80asm_ok(0, "defs 65534, 'a' \n defm \"aa\" \n",
+	    "a" x 65536);
+t_z80asm_error("defs 65535, 'a' \n defm \"aa\" \n",
+	       "Error: File 'test.asm', at line 2, Max. code size of 65536 bytes reached");
+
+t_z80asm_ok(0, "defs 65534, 'a' \n defm 97, \"a\" \n",
+	    "a" x 65536);
+t_z80asm_error("defs 65535, 'a' \n defm 97, \"a\" \n",
+	       "Error: File 'test.asm', at line 2, Max. code size of 65536 bytes reached");
+
+t_z80asm_ok(0, "defs 65534, 'a' \n defm 97 & \"a\" \n",
+	    "a" x 65536);
+t_z80asm_error("defs 65535, 'a' \n defm 97 & \"a\" \n",
+	       "Error: File 'test.asm', at line 2, Max. code size of 65536 bytes reached");
+
+t_z80asm_ok(0, "defs 65534, 'a' \n defm \"a\" & 97 \n",
+	    "a" x 65536);
+t_z80asm_error("defs 65535, 'a' \n defm \"a\" & 97 \n",
+	       "Error: File 'test.asm', at line 2, Max. code size of 65536 bytes reached");
+
+# BINARY
+my $bin_file = bin_file(); $bin_file =~ s/\.bin$/2.bin/i;
+write_file($bin_file, {binmode => ':raw'}, "a" x 65536);
+t_z80asm_ok(0, 'binary "'.$bin_file.'"',
+	    "a" x 65536);
+
+write_file($bin_file, {binmode => ':raw'}, "a" x 65537);
+t_z80asm_error('binary "'.$bin_file.'"',
+	       "Error: File 'test.asm', at line 1, Max. code size of 65536 bytes reached");
+
+# Linker
+my $asm_file2 = asm_file(); $asm_file2 =~ s/\.asm$/2.asm/i;
+my $file2_base = $asm_file2; $file2_base =~ s/\.asm$//i;
+write_file($asm_file2, "defb 0xAA");
+
+write_file(asm_file(), "defs 65535, 0xAA");
+t_z80asm_capture("-r0 -b ".asm_file()." $asm_file2", "", "", 0);
+t_binary(scalar(read_file(bin_file(), binmode => ':raw')),
+	"\xAA" x 65536);
+
+write_file(asm_file(), "defs 65536, 0xAA");
+t_z80asm_capture("-r0 -b ".asm_file()." $asm_file2", "",
+	"Error: File 'test2.asm', Module 'TEST2', Max. code size of 65536 bytes reached\n".
+	"1 errors occurred during assembly\n", 1);
+
+# parseline
+t_z80asm_ok(0, "defs 65535, 0xAA \n defb 0xAA \n",
+	    "\xAA" x 65536);
+t_z80asm_error("defs 65536, 0xAA \n defb 0xAA \n",
+	       "Error: File 'test.asm', at line 2, Max. code size of 65536 bytes reached");
+
+unlink_testfiles($bin_file, "$file2_base.asm", "$file2_base.obj", "$file2_base.sym");
 done_testing();
