@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.23 2011-10-07 17:53:04 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.24 2011-10-14 14:46:03 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.23  2011-10-07 17:53:04  pauloscustodio
+/* Revision 1.24  2011-10-14 14:46:03  pauloscustodio
+/* -  BUG_0013 : defm check for MAX_CODESIZE incorrect
+/*  - Remove un-necessary tests for MAX_CODESIZE; all tests are concentrated in check_space() from codearea.c.
+/*
+/* Revision 1.23  2011/10/07 17:53:04  pauloscustodio
 /* BUG_0015 : Relocation issue - dubious addresses come out of linking
 /* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
 /* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
@@ -538,17 +542,9 @@ DEFS ()
 	    }
 	  if (constant >= 0)
 	    {
-	      if ((get_PC() + constant) <= MAXCODESIZE)
-		{
 		  inc_PC(constant);
 
-                  while (constant--) append_byte((unsigned char)val);
-		}
-	      else
-		{
-		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
-		  return;
-		}
+                  while (constant--) append_byte((unsigned char) val);
 	    }
 	  else
 	    {
@@ -681,12 +677,6 @@ DEFB (void)
 
   do
     {
-      if ((get_PC()+1) > MAXCODESIZE) 
-        {
-           ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
-           return;
-        }
-
       GetSym ();
       if (!ExprUnsigned8 (bytepos))
 	break;			/* syntax error - get next line from file... */
@@ -713,12 +703,6 @@ DEFW (void)
 
   do
     {
-      if ((get_PC()+2) > MAXCODESIZE) 
-        {
-           ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
-           return;
-        }
-
       GetSym ();
       if (!ExprAddress (bytepos))
 	break;			/* syntax error - get next line from file... */
@@ -745,12 +729,6 @@ DEFP (void)
 
   do
     {
-      if ((get_PC()+3) > MAXCODESIZE) 
-        {
-           ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
-           return;
-        }
-
       GetSym ();
       if (!ExprAddress (bytepos))
 	break;			/* syntax error - get next line from file... */
@@ -789,12 +767,6 @@ DEFL (void)
 
   do
     {
-      if ((get_PC()+4) > MAXCODESIZE) 
-        {
-           ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
-           return;
-        }
-
       GetSym ();
       if (!ExprLong (bytepos))
 	break;			/* syntax error - get next line from file... */
@@ -826,12 +798,6 @@ DEFM (void)
 	{
 	  while (!feof (z80asmfile))
 	    {
-              if ((get_PC()+1) > MAXCODESIZE) 
-                {
-                  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
-                  return;
-                }
-
 	      constant = GetChar (z80asmfile);
 	      if (constant == EOF)
 		{
@@ -844,7 +810,7 @@ DEFM (void)
 		{
 		  if (constant != '\"')
 		    {
-                      append_byte((unsigned char)constant);
+                      append_byte((unsigned char) constant);
 		      ++bytepos;
 		      inc_PC(1);
 		    }
@@ -864,12 +830,6 @@ DEFM (void)
 	}
       else
 	{ 
-          if ((get_PC()+1) > MAXCODESIZE) 
-            {
-              ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
-              return;
-            }
-
 	  if (!ExprUnsigned8 (bytepos))
 	    break;		/* syntax error - get next line from file... */
 
@@ -964,13 +924,8 @@ BINARY (void)
 	  Codesize = ftell(binfile);
 	  fseek(binfile, 0L, SEEK_SET);	/* file pointer to start of file */
 	  
-	  if ((get_codeindex() + Codesize) <= MAXCODESIZE) /* BUG_0015 */
-	    {
-		fread_codearea(binfile, Codesize);	/* read binary code */
-    		inc_PC(Codesize);
-	    }
-	  else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
+	  fread_codearea(binfile, Codesize);	/* read binary code */
+    	  inc_PC(Codesize);
 
 	  fclose (binfile);
 	}

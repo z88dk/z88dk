@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.29 2011-10-07 17:53:04 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.30 2011-10-14 14:46:03 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.29  2011-10-07 17:53:04  pauloscustodio
+/* Revision 1.30  2011-10-14 14:46:03  pauloscustodio
+/* -  BUG_0013 : defm check for MAX_CODESIZE incorrect
+/*  - Remove un-necessary tests for MAX_CODESIZE; all tests are concentrated in check_space() from codearea.c.
+/*
+/* Revision 1.29  2011/10/07 17:53:04  pauloscustodio
 /* BUG_0015 : Relocation issue - dubious addresses come out of linking
 /* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
 /* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
@@ -649,16 +653,9 @@ LinkModule (char *filename, long fptr_base)
       if (size == 0) 
 	  size = 0x10000;
 
-      if (CURRENTMODULE->startoffset + size > MAXCODESIZE) {
-          ReportError (filename, 0, ERR_MAX_CODESIZE);
-          return 0;
-        }
-      else {
-	  /* read module code at startoffset of the module */
-	  /* BUG_0015: was reading at current position in code area, swaping order of modules */
-	  fread_codearea_offset(z80asmfile, CURRENTMODULE->startoffset, size);			
-      }
-
+      /* read module code at startoffset of the module */
+      /* BUG_0015: was reading at current position in code area, swaping order of modules */
+      fread_codearea_offset(z80asmfile, CURRENTMODULE->startoffset, size);			
       /* BUG_0015 : was no updating codesize */
       if (CURRENTMODULE->startoffset == get_codesize())
         inc_codesize(size);	/* a new module has been added */

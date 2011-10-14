@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.5 2011-08-18 23:27:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.6 2011-10-14 14:46:03 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.5  2011-08-18 23:27:54  pauloscustodio
+/* Revision 1.6  2011-10-14 14:46:03  pauloscustodio
+/* -  BUG_0013 : defm check for MAX_CODESIZE incorrect
+/*  - Remove un-necessary tests for MAX_CODESIZE; all tests are concentrated in check_space() from codearea.c.
+/*
+/* Revision 1.5  2011/08/18 23:27:54  pauloscustodio
 /* BUG_0009 : file read/write not tested for errors
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
@@ -177,18 +181,5 @@ void ReportError (char *filename, int lineno, int errnum, ...)
     /* increment error counters */
     ++ERRORS;
     ++TOTALERRORS;
-
-    /* raise fatal error exception for fatal errors, i.e. the assembly cannot continue */
-    /* NOTE: NotEnoughMemoryException is treaded differently - it is raised by the memory 
-       allocation functions, then captured in main(), and then main() calls ReportError();
-       therefore cannot raise the exception here
-    */ 
-    switch (errnum) {
-    case ERR_MAX_CODESIZE:
-	throw(FatalErrorException, errstr);
-	break;
-    default:
-	break;
-    }
 }
 
