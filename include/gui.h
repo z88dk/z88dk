@@ -7,10 +7,7 @@
 #include <malloc.h>
 #include <stdio.h>
 #include <graphics.h>
-
-#ifdef ALTGUI
 #include <games.h>
-#endif
 
 #define WIN_BORDER	1
 #define WIN_LITE_BORDER	2

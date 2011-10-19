@@ -9,10 +9,9 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.16 2011-05-10 15:55:17 stefano Exp $
+ *	$Id: games.h,v 1.17 2011-10-19 10:56:31 stefano Exp $
  *
  */
-
 
 /* save the sprite background in another sprite */
 extern __LIB__ bksave(int x, int y, void *sprite);
@@ -49,6 +48,8 @@ extern __LIB__ __FASTCALL__ joystick(int game_device);
 #define MOVE_FIRE4 128
 
 
+#ifndef MAKE_LIB
+
 #ifdef CPC
 	unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "QAOP-MN"};
 	#define GAME_DEVICES 3
@@ -66,7 +67,12 @@ extern __LIB__ __FASTCALL__ joystick(int game_device);
 
 #ifdef MTX
 	unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
-	#define GAME_DEVICES 3
+	#define GAME_DEVICES 2
+#endif
+
+#ifdef OSCA
+	unsigned char *joystick_type[] = { "Cursor", "Joystick"};
+	#define GAME_DEVICES 2
 #endif
 
 #ifdef SVI
@@ -107,6 +113,8 @@ extern __LIB__ __FASTCALL__ joystick(int game_device);
 #ifndef GAME_DEVICES
 	unsigned char *joystick_type[] = {"QAOP-MN","8246-05"};
 	#define GAME_DEVICES 2
+#endif
+
 #endif
 
 #endif
