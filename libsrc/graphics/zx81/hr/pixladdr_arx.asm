@@ -1,6 +1,6 @@
 ;--------------------------------------------------------------
-; Part of this code comes from the 'HRG_Tool' 
-; by Matthias Swatosch
+; ARX816 style Graphics
+; for the ZX81
 ;--------------------------------------------------------------
 
 
@@ -9,7 +9,7 @@
 	XREF	base_graphics
 
 ;
-;	$Id: pixladdr.asm,v 1.4 2011-10-22 08:37:36 stefano Exp $
+;	$Id: pixladdr_arx.asm,v 1.1 2011-10-22 08:37:36 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -28,39 +28,27 @@
 ;
 
 .pixeladdress
+	ld	b,h     ; X
+	ld	c,l     ; Y
 
-	; add y-times the nuber of bytes per line (32)
-	; or just multiply y by 32 and the add
-	ld	e,l
-	ld	a,h
-	ld	b,a
-
-	ld	h,0
-
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-
-	ld	de,(base_graphics)
-	add	hl,de
-
-	; add x divided by 8
-	
-	;or	a
-	rra
-	srl a
-	srl a
-	ld	e,a
-	ld	d,0
-	add	hl,de
-	
-	ld	d,h
-	ld	e,l
-
+	ld	a,c     ;ycord in A
+	srl	a       ;shift it right
+	srl	a       ;3	
+	srl	a       ;times
+	ld	hl,base_graphics+1
+	or	(hl)    ;or in base address MSB
+	ld	d,a     ;** MSB in D
+	ld	a,c     ;get y cord again
+	and	7       ;just bits 2,1,0
+	ld	c,a
 	ld	a,b
-	or	0f8h	;set all unused bits 1
-	cpl			;they now become 0
-	
+	and	7
+	ld	h,a     ;save it
+	ld	a,b     ;get xcord
+	and	$f8     ;all but bits 2,1,0
+	or	c       ;or in the line bits
+	ld	e,a     ;** LSB in E
+	ld	a,h
+	or	$f8     ;set all unused bits 1
+	cpl         ;they now become 0
 	ret

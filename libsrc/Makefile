@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.163 2011-07-26 13:24:27 stefano Exp $
+# $Id: Makefile,v 1.164 2011-10-22 08:37:36 stefano Exp $
 
 
 include	Make.config
@@ -522,20 +522,24 @@ gfx81.lib:
 # ZX81 HR graphics lib - Stefano
 gfx81hr64.lib:
 	@echo ''
-	@echo '--- Building ZX81 High Resolution Library (64 rows)  ---'
+	@echo '--- Building ZX81 High Resolution Libraries (64 rows)  ---'
 	@echo ''
 	$(MAKE)	zx81deps
 	$(LIBLINKER) -IXIY -DFORzx81hr64 -x$(OUTPUT_DIRECTORY)/gfx81hr64 @$(LISTFILE_DIRECTORY)/gfx81hr.lst
 	$(MAKE)	zx81deps
+	$(LIBLINKER) -IXIY -DFORzx81hr64 -x$(OUTPUT_DIRECTORY)/gfx81arx64 @$(LISTFILE_DIRECTORY)/gfx81arx.lst
+	$(MAKE)	zx81deps
 
 gfx81hr192.lib:
 	@echo ''
-	@echo '--- Building ZX81 High Resolution Library (192 rows)  ---'
+	@echo '--- Building ZX81 High Resolution Libraries (192 rows)  ---'
 	@echo ''
 	$(MAKE)	zx81deps
 	$(LIBLINKER) -IXIY -DFORzx81hr192 -x$(OUTPUT_DIRECTORY)/gfx81hr192 @$(LISTFILE_DIRECTORY)/gfx81hr.lst
 	$(MAKE)	zx81deps
 	$(LIBLINKER) -IXIY -DFORzx81mt192 -x$(OUTPUT_DIRECTORY)/gfx81mt192 @$(LISTFILE_DIRECTORY)/gfx81mt.lst
+	$(MAKE)	zx81deps
+	$(LIBLINKER) -IXIY -DFORzx81hr192 -x$(OUTPUT_DIRECTORY)/gfx81arx192 @$(LISTFILE_DIRECTORY)/gfx81arx.lst
 	$(MAKE)	zx81deps
 
 # ZX81 maths library - Stefano

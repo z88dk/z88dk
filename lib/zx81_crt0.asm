@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.24 2009-06-22 21:20:05 dom Exp $
+;       $Id: zx81_crt0.asm,v 1.25 2011-10-22 08:37:36 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -95,7 +95,7 @@ ENDIF
 
 IF (startup>=2)
         call    hrg_on
- IF ((startup=3)|(startup=5))
+ IF ((startup=3)|(startup=5)|(startup=13)|(startup=15))
         ld	a,1
         ld      (hrgbrkflag),a
         call    hrg_on
@@ -143,7 +143,7 @@ ENDIF
         call    restore81
 
 IF (startup>=2)
- IF ((startup=3)|(startup=5))
+ IF ((startup=3)|(startup=5)|(startup=13)|(startup=15))
         xor	a
         ld      (hrgbrkflag),a
  ELSE
@@ -238,13 +238,25 @@ IF (startup=2)
         INCLUDE "zx81_altint.def"
 ENDIF
 
-;---------------------------------------
+;-------------------------------------------------
 ; High Resolution Graphics (Wilf Rigter WRX mode)
 ; Code my Matthias Swatosch
-;---------------------------------------
+;-------------------------------------------------
 
 IF (startup>=3)
+	IF (startup<=7)
         INCLUDE "zx81_hrg.def"
+    ENDIF
+ENDIF
+
+;-------------------------------------------------
+; High Resolution Graphics (Andy Rea ARX816 mode)
+;-------------------------------------------------
+
+IF (startup>=13)
+	IF (startup<=17)
+        INCLUDE "zx81_hrg_arx.def"
+    ENDIF
 ENDIF
 
 ;-----------
@@ -254,7 +266,7 @@ IF (startup>=3)
 text_rows:
 hr_rows:
 _hr_rows:
- IF (startup>=5)
+ IF ((startup=5)|(startup=6)|(startup=7)|(startup=15)|(startup=16)|(startup=17))
 		defw	8	; Current number of text rows in graphics mode
  ELSE
 		defw	24	; Current number of text rows in graphics mode
