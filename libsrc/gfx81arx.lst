@@ -11,7 +11,7 @@ graphics/fill
 graphics/dfill2
 graphics/getsprite
 graphics/zx81/hr/putsprite_arx
-graphics/stencil_render
+graphics/zx81/hr/stencil_render_arx
 graphics/bksave
 graphics/bkrestore
 graphics/xorpixl

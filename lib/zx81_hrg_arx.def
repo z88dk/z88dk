@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg_arx.def,v 1.1 2011-10-22 08:37:36 stefano Exp $
+;       $Id: zx81_hrg_arx.def,v 1.2 2011-10-24 06:16:39 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -215,6 +215,8 @@ IF ((startup=13)|(startup=15))
 nobrkk:
 ENDIF
 ELSE
+        nop
+        nop
         nop
 ENDIF
 
