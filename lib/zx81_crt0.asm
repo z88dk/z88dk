@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.26 2011-10-25 20:22:14 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.27 2011-10-28 06:07:54 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -89,8 +89,9 @@ start:
 
 IF (!DEFINED_startup | (startup=1))
         ; FAST mode, safest way to use the special registers
-        call    $F23    ; FAST mode
+        ;call    $F23    ; FAST mode
         ;call   $2E7    ;setfast
+        out ($fd),a  ; nmi off        
 ENDIF
 
 IF (startup>=2)
@@ -151,8 +152,9 @@ IF (startup>=2)
  ENDIF
 ELSE
  IF (!DEFINED_startup | (startup=1))
-        call    $F2B            ; SLOW mode
+        ;call    $F2B            ; SLOW mode
         ;call   $207    ;slowfast
+        out ($fe),a  ; nmi on
  ENDIF
 ENDIF
 

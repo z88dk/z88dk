@@ -7,12 +7,14 @@
 ;	void zx_fast();
 ;
 ;
-;	$Id: zx_fast.asm,v 1.1 2007-10-25 14:53:04 stefano Exp $
+;	$Id: zx_fast.asm,v 1.2 2011-10-28 06:09:05 stefano Exp $
 ;	
 
 XLIB	zx_fast
-LIB	hrg_off
 
 zx_fast:
-	call	hrg_off
-	jp	$F23		; FAST !
+		out ($fd),a  ; nmi off
+		ret
+
+;	call	hrg_off
+;	jp	$F23		; FAST !
