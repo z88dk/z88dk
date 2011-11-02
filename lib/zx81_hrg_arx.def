@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg_arx.def,v 1.4 2011-10-26 06:37:56 stefano Exp $
+;       $Id: zx81_hrg_arx.def,v 1.5 2011-11-02 14:24:33 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -14,6 +14,8 @@ XDEF	HRG_LineStart
 XDEF	HRG_Handler
 XDEF	blank
 XDEF	noblank
+XDEF	zx_fast
+XDEF	zx_slow
 
 
 IF ((startup=13)|(startup=15))
@@ -40,12 +42,23 @@ DEFC    RAMTOP  = 16388 ;word   Address of first byte above BASIC system area.
 
 ;----------------------------------------------------------------
 ;
+; Enter in FAST mode 
+;
+;----------------------------------------------------------------
+zx_fast:
+	call restore81
+	jp	$F23		; FAST !
+
+;----------------------------------------------------------------
+;
 ; Switch to HRG mode 
 ; "base_graphics" has to point to a reasonable adress
 ;
 ;----------------------------------------------------------------
+zx_slow:
 hrg_on:
-	call   $F2B	; SLOW
+		call   restore81
+		call   $F2B	; SLOW
 IF !DEFINED_hrgpage
         ld      hl,(base_graphics)
         ld      a,h
@@ -98,19 +111,29 @@ hrg_off:
 ; Sync display before mode switching
 ;
 ;----------------------------------------------------------------
+;----------------------------------------------------------------
+;
+; Sync display before mode switching
+;
+;----------------------------------------------------------------
 HRG_Sync:
-		push hl
-        ld      hl,$4034        ; FRAMES counter
-        ld      a,(hl)          ; get old FRAMES
+        push   hl
+        call   restore81
+        ld     a,(16443)	; test CDFLAG
+        and    128			; is in FAST mode ?
+        jr     z,nosync
+        ld     hl,$4034        ; FRAMES counter
+        ld     a,(hl)          ; get old FRAMES
 HRG_Sync1:
-        cp      (hl)            ; compare to new FRAMES
-        jr      z,HRG_Sync1     ; exit after a change is detected
-        pop hl
-        push hl
-        ld (HRG_handler_patch+2),hl
-        pop iy
+        cp     (hl)            ; compare to new FRAMES
+        jp     z,HRG_Sync1     ; exit after a change is detected
+nosync:
+        pop    hl
+        push   hl
+        ld     (HRG_handler_patch+2),hl
+        pop    iy
         ret
-
+        
 
 ;----------------------------------------------------------------
 ;
@@ -198,15 +221,6 @@ HRG_outloop4:
 ; -------------------------------------------------------
 ; 
 HRG_postproc:
-        ld	hl,(frames)        ; clock handler
-        inc	hl
-        ld	(frames),hl
-        ld	a,h
-        or	l
-        jp	nz,nofr1
-        ld	hl,frames+1
-        inc	(hl)
-nofr1:
 
         ;call   $0292          ; return to application program
 
@@ -218,7 +232,7 @@ nofr1:
 ; this idea comes from the Wilf Rigter's WRX1K hi-resolution implementation
 ; if we run in 64 lines mode we need to increase the number of border's lines
 
-HRG_blank_patch:
+HRG_blank_patch:	; WARNING: the values change due to the patching, don't tune here !!
 IF (startup>=15)
         add     140-8    ; more blank lines for fast application code and correct sync
         			; For the WRX version Siegfried Engel reports that values between 
@@ -228,14 +242,20 @@ ELSE
 ENDIF
 
         ld      c,a            ; load C with MARGIN
-        ld      a,(16443)      ; test CDFLAG
-        bit     7,a
+        ; ld      a,(16443)     ; test CDFLAG
+        ; bit     7,a
+        and      a             ; setting zero flag is enough, 
+                               ; ..we know MARGIN will always be > 0  ;)
 
         jp      $29b           ; save blank lines, start NMI, POP registers and RETURN
 
 pointedbyix:
         push    ix
         ld      ix,16384
+
+        ld    hl,($4034)        ; FRAMES, used also by clock handler
+        dec   hl
+        ld    ($4034),hl
 
         call    $0220          ; first PUSH register, then do VSYNC and get KEYBD
 

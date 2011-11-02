@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.27 2011-10-28 06:07:54 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.28 2011-11-02 14:24:33 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -52,7 +52,7 @@
         XDEF    save81          ;Save ZX81 critical registers
         XDEF    restore81       ;Restore ZX81 critical registers
 
-        XDEF    frames          ;Frame counter for time()
+        ;; XDEF    frames         ;Frame counter for time()
 
         org     16514
 
@@ -89,18 +89,17 @@ start:
 
 IF (!DEFINED_startup | (startup=1))
         ; FAST mode, safest way to use the special registers
-        ;call    $F23    ; FAST mode
+        call    $F23    ; FAST mode
         ;call   $2E7    ;setfast
-        out ($fd),a  ; nmi off        
+        ;out ($fd),a  ; nmi off        
 ENDIF
 
 IF (startup>=2)
-        call    hrg_on
  IF ((startup=3)|(startup=5)|(startup=13)|(startup=15))
         ld	a,1
         ld      (hrgbrkflag),a
-        call    hrg_on
  ENDIF
+        call    hrg_on
 ENDIF
 
 	; this must be after 'hrg_on', sometimes
@@ -152,9 +151,8 @@ IF (startup>=2)
  ENDIF
 ELSE
  IF (!DEFINED_startup | (startup=1))
-        ;call    $F2B            ; SLOW mode
+        call    $F2B            ; SLOW mode
         ;call   $207    ;slowfast
-        out ($fe),a  ; nmi on
  ENDIF
 ENDIF
 
@@ -288,8 +286,6 @@ exitcount:      defb    0       ; How many routines on the atexit() stack
 
 heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
-frames:         defw    0       ; counter handled with new interrupt
-		defb	0	; third byte for "frames"
 
                 defm  "Small C+ ZX81"   ;Unnecessary file signature
                 defb    0

@@ -18,6 +18,8 @@ graphics/xorpixl
 graphics/zx81/swapgfxbk
 graphics/zx81/hr/pixladdr
 graphics/zx81/hr/invhrg
+graphics/zx81/hr/hrg_tune_left
+graphics/zx81/hr/hrg_tune_right
 graphics/gray/g_circle
 graphics/gray/zx81/g_clg
 graphics/gray/g_draw

@@ -1,20 +1,19 @@
 ;
 ;	ZX81 clock() function
-;	By Stefano Bodrato - Oct. 2007
-;	New version based on custom interrupt driver
-;	(doesn't work in FAST MODE)
+;	By Stefano Bodrato - Oct. 2011
+;	Back to default FRAMES counter + 1 extra byte ;)
 ;
 ; --------
-; $Id: clock.asm,v 1.5 2007-10-04 10:28:48 stefano Exp $
+; $Id: clock.asm,v 1.6 2011-11-02 14:24:33 stefano Exp $
 
 
 	XLIB	clock
-	XREF	frames
+;	XREF	frames3
 
 .clock
-
-	ld	hl,(frames)
-	ld	a,(frames+1)
-	ld	e,a
-	ld	d,0
+	ld	hl,-1
+	ld	de,($4034)
+	and a
+	sbc hl,de
+	ld	de,0
 	ret

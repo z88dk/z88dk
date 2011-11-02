@@ -11,7 +11,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_altint.def,v 1.11 2010-06-24 09:05:51 stefano Exp $
+;       $Id: zx81_altint.def,v 1.12 2011-11-02 14:24:33 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -23,28 +23,45 @@ XDEF	hrg_on
 XDEF	hrg_off
 XDEF	MTCH_P1
 XDEF	MTCH_P2
+XDEF	zx_fast
+XDEF	zx_slow
+
+;----------------------------------------------------------------
+;
+; Enter in FAST mode 
+;
+;----------------------------------------------------------------
+zx_fast:
+	call restore81
+	jp	$F23		; FAST !
 
 ;========
 ; Not HRG really, but switches the new interrupt handler with no sighs
 ;========
 
+zx_slow:
 hrg_on:
-	call   $F2B	; SLOW
+		call    restore81
+		call    $F2B	; SLOW
         ld      hl,L0281
-        push	hl
+        push    hl
         jr      HRG_Sync
 
 hrg_off:
         ld      hl,$281
-        push	hl
-        ;ld      a,$1e
-        ;ld      i,a
+        push    hl
+        ld      a,$1e
+        ld      i,a
+		ld      a,(16443)	; test CDFLAG
+		and     128			; is in FAST mode ?
+		jr      z,nosync
 HRG_Sync:
         ld      hl,$4034        ; FRAMES counter
         ld      a,(hl)          ; get old FRAMES
 HRG_Sync1:
         cp      (hl)            ; compare to new FRAMES
         jr      z,HRG_Sync1     ; exit after a change is detected
+nosync:
         pop	iy              ; switch to new display handler
         ret
 
@@ -54,7 +71,7 @@ HRG_Sync1:
 
 ;; DISPLAY-1
 L0229:
-	LD      HL,($4034)      ; fetch two-byte system variable FRAMES.
+        LD      HL,($4034)      ; fetch two-byte system variable FRAMES.
         DEC     HL              ; decrement frames counter.
 
 ;; DISPLAY-P
@@ -156,9 +173,10 @@ L0292:  POP     IY              ; return address to IX register (-IXIY swap).
 
 	ld	a,(16424)      ; load C with MARGIN
 	ld	c,a
-	ld	a,(16443)      ; test CDFLAG
-	bit	7,a
-        jp	z,$2a9
+
+        ld	a,(16443)      ; test CDFLAG
+        and	128            ; is in FAST mode ?
+        jp	z,$2a9         ; if so, jp to DISPLAY-4
 
         ld 	a,c
         neg
@@ -166,14 +184,5 @@ L0292:  POP     IY              ; return address to IX register (-IXIY swap).
         ex 	af,af
         out 	($FE),a
 
-	ld	hl,(frames)	; clock handler
-        inc	hl
-        ld	(frames),hl
-        ld	a,h
-        or	l
-        jp	nz,nofr1
-        ld	hl,frames+1
-        inc	(hl)
-nofr1:
 	jp	$2A4
 
