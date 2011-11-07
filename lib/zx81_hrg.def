@@ -6,7 +6,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.18 2011-11-02 14:24:33 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.19 2011-11-07 18:23:39 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -123,7 +123,6 @@ noblank:
 ;----------------------------------------------------------------
 HRG_Sync:
         push   hl
-        call   restore81
         ld     a,(16443)	; test CDFLAG
         and    128			; is in FAST mode ?
         jr     z,nosync
@@ -149,12 +148,23 @@ blank:
 ;
 ;----------------------------------------------------------------
 hrg_off:
+		call	hrg_on     ; restore registers and make sure we are in SLOW mode
+
+IF !DEFINED_slowfix
         ld      hl,$281    ; switch back to text (original video routine)
-        call    HRG_Sync
+ELSE
+        ld      hl,L0281    ; switch back to text (fixed video routine)
+ENDIF
+
+        call	HRG_Sync
         ld      a,$1e
         ld      i,a
         ret
 
+
+IF DEFINED_slowfix
+        INCLUDE "zx81_altint_core.def"
+ENDIF
 
 ;----------------------------------------------------------------
 ;

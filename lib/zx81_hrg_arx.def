@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg_arx.def,v 1.5 2011-11-02 14:24:33 stefano Exp $
+;       $Id: zx81_hrg_arx.def,v 1.6 2011-11-07 18:23:39 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -76,6 +76,8 @@ IF (startup=17)
         ld	(graybit2),hl
         ld	(current_graphics),hl
 ENDIF
+
+;----------------------------------------------------------------
 noblank:
         ld      hl,HRG_handler  ; starts the hires mode when JP (IX) is made
         call	HRG_Sync
@@ -85,6 +87,7 @@ IF (startup<15)
 ENDIF
         ret
 
+;----------------------------------------------------------------
 blank:
         ld      hl,HRG_BlankHandler
         call	HRG_Sync
@@ -100,11 +103,23 @@ ENDIF
 ;
 ;----------------------------------------------------------------
 hrg_off:
+		call	hrg_on     ; restore registers and make sure we are in SLOW mode
+
+IF !DEFINED_slowfix
         ld      hl,$281    ; switch back to text (original video routine)
+ELSE
+        ld      hl,L0281    ; switch back to text (fixed video routine)
+ENDIF
+
         call	HRG_Sync
         ld      a,$1e
         ld      i,a
         ret
+
+
+IF DEFINED_slowfix
+        INCLUDE "zx81_altint_core.def"
+ENDIF
 
 ;----------------------------------------------------------------
 ;
@@ -118,7 +133,6 @@ hrg_off:
 ;----------------------------------------------------------------
 HRG_Sync:
         push   hl
-        call   restore81
         ld     a,(16443)	; test CDFLAG
         and    128			; is in FAST mode ?
         jr     z,nosync
