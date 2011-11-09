@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg_arx.def,v 1.6 2011-11-07 18:23:39 stefano Exp $
+;       $Id: zx81_hrg_arx.def,v 1.7 2011-11-09 16:19:28 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -103,29 +103,19 @@ ENDIF
 ;
 ;----------------------------------------------------------------
 hrg_off:
+IF DEFINED_noslowfix
+		jp		zx_fast
+ELSE
 		call	hrg_on     ; restore registers and make sure we are in SLOW mode
 
-IF !DEFINED_slowfix
-        ld      hl,$281    ; switch back to text (original video routine)
-ELSE
         ld      hl,L0281    ; switch back to text (fixed video routine)
-ENDIF
 
         call	HRG_Sync
         ld      a,$1e
         ld      i,a
         ret
-
-
-IF DEFINED_slowfix
-        INCLUDE "zx81_altint_core.def"
 ENDIF
 
-;----------------------------------------------------------------
-;
-; Sync display before mode switching
-;
-;----------------------------------------------------------------
 ;----------------------------------------------------------------
 ;
 ; Sync display before mode switching
@@ -147,6 +137,11 @@ nosync:
         ld     (HRG_handler_patch+2),hl
         pop    iy
         ret
+
+
+IF !DEFINED_noslowfix
+        INCLUDE "zx81_altint_core.def"
+ENDIF
         
 
 ;----------------------------------------------------------------
@@ -355,8 +350,6 @@ ENDIF
 ;----------------------------------------------------------------
 
 HRG_LineStart:
-;	defb 128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143
-;	defb 144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159
 	defb 00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15
 	defb 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
 	ret

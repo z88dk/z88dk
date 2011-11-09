@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.28 2011-11-02 14:24:33 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.29 2011-11-09 16:19:28 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -44,7 +44,9 @@
 
         XDEF    hr_rows		;Current number of text rows in graphics mode
         XDEF    _hr_rows	 ;as above for C declarations
+IF (startup>=3)
         XDEF    text_rows	 ;as above for VT ANSI mode
+ENDIF
         XDEF    base_graphics   ;Graphical variables
         XDEF    _base_graphics   ;as above for C declarations
         XDEF    coords          ;Current xy position

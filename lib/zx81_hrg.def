@@ -6,7 +6,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.19 2011-11-07 18:23:39 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.20 2011-11-09 16:19:28 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -148,21 +148,18 @@ blank:
 ;
 ;----------------------------------------------------------------
 hrg_off:
+IF DEFINED_noslowfix
+		jp		zx_fast
+ELSE
 		call	hrg_on     ; restore registers and make sure we are in SLOW mode
 
-IF !DEFINED_slowfix
-        ld      hl,$281    ; switch back to text (original video routine)
-ELSE
         ld      hl,L0281    ; switch back to text (fixed video routine)
-ENDIF
 
         call	HRG_Sync
         ld      a,$1e
         ld      i,a
         ret
 
-
-IF DEFINED_slowfix
         INCLUDE "zx81_altint_core.def"
 ENDIF
 
