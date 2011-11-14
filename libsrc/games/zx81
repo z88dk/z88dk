@@ -1,0 +1,1860 @@
+; $Id: zx81,v 1.3 2011-11-14 20:17:51 stefano Exp $
+;
+; ZX81 1 bit sound functions
+;
+; Stefano Bodrato - 11/11/2011
+;
+
+    XLIB     beeper
+
+    INCLUDE  "games/games.inc"
+
+    LIB      bit_open_di
+    LIB      bit_close_ei
+
+;
+; Ported by Dominic Morris
+; Adapted by Stefano Bodrato
+;
+; Spectrum beeper routine !!
+; HL=duration
+; DE=frequency
+;
+; Comments got from: http://www.wearmouth.demon.co.uk/scsra.htm
+; ----------------------------------------------------------------
+;
+; Outputs a square wave of given duration and frequency
+; to the loudspeaker.
+;   Enter with: DE = #cycles - 1
+;               HL = tone period as described next
+;
+; The tone period is measured in T states and consists of
+; three parts: a coarse part (H register), a medium part
+; (bits 7..2 of L) and a fine part (bits 1..0 of L) which
+; contribute to the waveform timing as follows:
+;
+;                          coarse    medium       fine
+; duration of low  = 118 + 1024*H + 16*(L>>2) + 4*(L&0x3)
+; duration of hi   = 118 + 1024*H + 16*(L>>2) + 4*(L&0x3)
+; Tp = tone period = 236 + 2048*H + 32*(L>>2) + 8*(L&0x3)
+;                  = 236 + 2048*H + 8*L = 236 + 8*HL
+;
+; As an example, to output five seconds of middle C (261.624 Hz):
+;   (a) Tone period = 1/261.624 = 3.822ms
+;   (b) Tone period in T-States = 3.822ms*fCPU = 13378
+;         where fCPU = clock frequency of the CPU = 3.5MHz
+;   (c) Find H and L for desired tone period:
+;         HL = (Tp - 236) / 8 = (13378 - 236) / 8 = 1643 = 0x066B
+;   (d) Tone duration in cycles = 5s/3.822ms = 1308 cycles
+;         DE = 1308 - 1 = 0x051B
+;
+; The resulting waveform has a duty ratio of exactly 50%.
+; 
+; ----------------------------------------------------------------
+
+
+.beeper
+          ld   a,l
+          srl  l
+          srl  l
+          cpl
+          and  3
+          ld   c,a
+          ld   b,0
+          ld   ix,beixp3
+          add  ix,bc
+          call bit_open_di
+
+.beixp3
+          nop
+          nop
+          nop
+          inc  b
+          inc  c
+.behllp   dec  c
+          jr   nz,behllp
+          ld   c,$3F
+          dec  b
+          jp   nz,behllp
+
+          xor  sndbit_mask
+
+;-----
+          out  (255),a
+          jp   z,isz
+
+          ld   b,a
+          in   a,(254)
+          ld   a,b
+.isz
+;-----
+
+          ld   b,h
+          ld   c,a
+          bit  sndbit_bit,a            ;if o/p go again!
+          jr   nz,be_again
+
+          ld   a,d
+          or   e
+          jr   z,be_end
+          ld   a,c
+          ld   c,l
+          dec  de
+          jp   (ix)
+.be_again
+          ld   c,l
+          inc  c
+          jp   (ix)
+.be_end
+
+          jp   bit_close_ei
+
+; $Id: zx81,v 1.3 2011-11-14 20:17:51 stefano Exp $
+;
+; ZX81 1 bit sound functions
+;
+; Stefano Bodrato - 11/11/2011
+;
+
+    XLIB     bit_close
+
+.bit_close
+          ret
+
+; $Id: zx81,v 1.3 2011-11-14 20:17:51 stefano Exp $
+;
+; ZX81 1 bit sound functions
+;
+; Close sound and restore interrupts
+;
+; Stefano Bodrato - 11/11/2011
+;
+
+    XLIB     bit_close_ei
+
+.bit_close_ei
+        ld     ix,16384
+        ld     a,(16443)	; test CDFLAG
+        and    128			; is in FAST mode ?
+        ret    z
+        out ($fe),a					; turn on interrupt
+        ret
+; $Id: zx81,v 1.3 2011-11-14 20:17:51 stefano Exp $
+;
+; Generic platform sound effects module.
+;
+; Original code by Dominic Morris
+; Adapted by Stefano Bodrato
+;
+;>Z88 sounds..hopefully!!
+;>Works..kinda nice to hear the z88 sing..now for music!
+;>djm June 1998
+;>
+;>This is quite a crude module, $4B0 isn't restored by most routines
+;>due to the fact that it is usually in the 00xxxxxx state when we
+;>get there
+
+
+          XLIB     bit_fx
+          INCLUDE  "games/games.inc"
+
+          LIB      beeper
+          LIB      bit_open_di
+          LIB      bit_close_ei
+
+
+;Sound routine..enter in with e holding the desired effect!
+
+
+.bit_fx
+          pop  bc
+          pop  de
+          push de
+          push bc
+
+          ld    a,e  
+          cp    8  
+          ret   nc  
+          add   a,a  
+          ld    e,a  
+          ld    d,0  
+          ld    hl,table  
+          add   hl,de  
+          ld    a,(hl)  
+          inc   hl  
+          ld    h,(hl)  
+          ld    l,a  
+          jp    (hl)  
+          
+.table    defw    fx2           ; effect #0
+          defw    fx5
+          defw    fx6
+          defw    zap0
+          defw    zap1
+          defw    clackson
+          defw    zap3
+          defw    warpcall      ; effect #7
+          
+          
+;Strange squeak hl=300,de=2
+;Game up hl=300,de=10 inc de
+;-like a PACMAN sound
+.fx6      ld    b,1  
+.fx6_1    push  bc  
+          ld    hl,300  
+          ld    de,10  
+.fx6_2    push  hl
+          push  de
+          call  beeper  
+          pop   de
+          pop   hl
+;      inc  de           ;if added in makes different sound..
+          ld    bc,10
+          and   a
+          sbc   hl,bc
+          jr    nc,fx6_2
+          pop   bc
+          djnz  fx6_1
+          ret 
+
+
+;Use during key defines?
+          
+.fx2      call  bit_open_di
+          ld    e,150  
+.fx2_1
+          xor   sndbit_mask  
+;-----
+          out  (255),a
+          jp   nz,isz
+
+          ld   b,a
+          in   a,(254)
+          ld   a,b
+.isz
+;-----
+          ld    b,e
+.fx2_2    djnz  fx2_2
+          inc   e
+          jr    nz,fx2_1
+          jp    bit_close_ei
+
+          
+;Laser repeat sound
+.fx5      ld    b,1  
+.fx5_1    push  bc  
+          ld    hl,1200  
+          ld    de,6  
+.fx5_2    push  hl  
+          push  de  
+          call  beeper  
+          pop   de  
+          pop   hl  
+          ld    bc,100  
+          and   a  
+          sbc   hl,bc  
+          jr    nc,fx5_2  
+          pop   bc  
+          djnz  fx5_1  
+          ret   
+          
+          
+;Eating sound
+
+.zap0     call  bit_open_di
+          ld    h,4
+.zap0_1   ld    b,(hl)  
+          dec   hl  
+.zap0_2   djnz  zap0_2  
+          xor   sndbit_mask
+;-----
+          out  (255),a
+          jp   z,isz2
+
+          ld   b,a
+          in   a,(254)
+          ld   a,b
+.isz2
+;-----
+          ex    af,af
+          ld    a,h  
+          or    l
+          jr    z,zap0_3
+          ex    af,af
+          jr    zap0_1  
+.zap0_3   jp    bit_close_ei
+          
+          
+;Clackson sound
+          
+.clackson
+          call  bit_open_di
+.clackson_LENGHT
+          ld      b,90
+.clackson_loop
+          dec     h
+          jr      nz,clackson_jump
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   z,isz3
+
+          ld   h,a
+          in   a,(254)
+          ld   a,h
+.isz3
+;-----
+
+.clackson_FR_1
+          ld      h,230
+.clackson_jump
+          dec     l
+          jr      nz,clackson_loop
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   z,isz4
+
+          ld   l,a
+          in   a,(254)
+          ld   a,l
+.isz4
+;-----
+
+.clackson_FR_2
+          ld      l,255
+          djnz    clackson_loop
+          call  bit_close_ei
+          ret
+          
+          
+;Beep thing
+          
+.zap3     call  bit_open_di
+.zap3_1   push  bc
+          xor   sndbit_mask
+
+;-----
+          out  (255),a
+          jp   z,isz6
+
+          ld   c,a
+          in   a,(254)
+          ld   a,c
+.isz6
+;-----
+
+          push  af
+          xor   a
+          sub   b
+          ld    b,a
+          pop   af
+.zap3_2   nop
+          djnz  zap3_2
+          xor   sndbit_mask
+
+;-----
+          out  (255),a
+          jp   z,isz7
+
+          ld   c,a
+          in   a,(254)
+          ld   a,c
+.isz7
+;-----
+          pop   bc
+          push  bc
+.zap3_3   nop
+          djnz  zap3_3
+          pop   bc
+          djnz  zap3_1
+          jp    bit_close_ei
+          
+          
+;Sound for warp
+          
+.warpcall
+          ld    hl,1600  
+          ld    (warps+1),hl  
+          ld    hl,-800  
+          ld    (warps1+1),hl  
+          ld    hl,-100  
+          ld    (warps2+1),hl  
+          ld   b,20
+.warpcall1
+          push bc
+          call warps
+          pop  bc
+          djnz warpcall1
+          ret   
+          
+.warps    ld    hl,1600  
+          ld    de,6  
+          call  beeper  
+.warps1   ld    hl,-800  
+.warps2   ld    de,-100  
+          and   a  
+          sbc   hl,de  
+          ld    (warps1+1),hl  
+          jr    nz,warps3  
+          ld    de,100  
+          ld    (warps2+1),de  
+.warps3   ex    de,hl  
+          ld    hl,1600  
+          add   hl,de  
+          ld    (warps+1),hl  
+          ret   
+          
+          
+;Our old squelch...
+
+.zap1     call  bit_open_di
+          ld    b,0  
+.zap1_1   push  bc  
+          xor   sndbit_mask  ;oscillate between high and low bits...
+
+;-----
+          out  (255),a
+          jp   z,isz8
+          
+          ld   c,a
+          in   a,(254)
+          ld   a,c
+.isz8
+;-----
+
+.zap1_2   nop
+          nop
+          djnz  zap1_2
+          pop   bc
+          djnz  zap1_1
+          jp    bit_close_ei
+          
+          
+; $Id: zx81,v 1.3 2011-11-14 20:17:51 stefano Exp $
+;
+; Generic platform sound effects module.
+; Alternate sound library by Stefano Bodrato
+;
+
+
+          XLIB     bit_fx2
+          INCLUDE  "games/games.inc"
+
+          LIB      bit_open_di
+          LIB      bit_close_ei
+
+
+.bit_fx2
+          pop  bc
+          pop  de
+          push de
+          push bc
+
+          ld    a,e  
+          cp    8  
+          ret   nc  
+          add   a,a  
+          ld    e,a  
+          ld    d,0  
+          ld    hl,table  
+          add   hl,de  
+          ld    a,(hl)  
+          inc   hl  
+          ld    h,(hl)  
+          ld    l,a  
+          jp    (hl)  
+          
+.table    defw    DeepSpace	; effect #0
+          defw    SSpace2
+          defw    TSpace
+          defw    Clackson2
+          defw    TSpace2
+          defw    TSpace3	; effect #5
+          defw    Squoink
+          defw    explosion
+          
+;Space sound
+          
+.DeepSpace
+          call  bit_open_di
+.DS_LENGHT
+          ld      b,100
+.ds_loop
+          dec     h
+          jr      nz,ds_jump
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,isz
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz
+;-----
+
+          push    bc
+          ld      b,250
+.loosetime1
+          djnz    loosetime1
+          pop     bc
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,isz2
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz2
+;-----
+
+.ds_FR_1
+          ;ld      h,230
+          ld      h,254
+.ds_jump
+          dec     l
+          jr      nz,ds_loop
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,isz3
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz3
+;-----
+
+          push    bc
+          ld      b,200
+.loosetime2
+          djnz    loosetime2
+          pop     bc
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,isz4
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz4
+;-----
+
+.ds_FR_2
+          ld      l,255
+          djnz    ds_loop
+          call	bit_close_ei
+          ret
+
+
+;Dual note with fuzzy addedd
+          
+.SSpace2
+          call  bit_open_di
+.SS_LENGHT
+          ld      b,100
+.ss_loop
+          dec     h
+          jr      nz,ss_jump
+          push    hl
+          push    af
+          ld      a,sndbit_mask
+          ld      h,0
+          and     (hl)
+          ld      l,a
+          pop     af
+          xor     l
+
+;-----
+          out  (255),a
+          jp   nz,isz5
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz5
+;-----
+
+          pop     hl
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,isz6
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz6
+;-----
+
+.ss_FR_1
+          ld      h,230
+.ss_jump
+          dec     l
+          jr      nz,ss_loop
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,isz7
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz7
+;-----
+
+.ss_FR_2
+          ld      l,255
+          djnz    ss_loop
+          call	bit_close_ei
+          ret
+
+
+;Dual note with LOT of fuzzy addedd
+          
+.TSpace
+          call  bit_open_di
+.TS_LENGHT
+          ld      b,100
+.ts_loop
+          dec     h
+          jr      nz,ts_jump
+          push    hl
+          push    af
+          ld      a,sndbit_mask
+          ld      h,0
+          and     (hl)
+          ld      l,a
+          pop     af
+          xor     l
+
+;-----
+          out  (255),a
+          jp   nz,isz8
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz8
+;-----
+
+          pop     hl
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,isz9
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz9
+;-----
+
+.ts_FR_1
+          ld      h,130
+.ts_jump
+          dec     l
+          jr      nz,ts_loop
+          push    hl
+          push    af
+          ld      a,sndbit_mask
+          ld      l,h
+          ld      h,0
+          and     (hl)
+          ld      l,a
+          pop     af
+          xor     l
+
+;-----
+          out  (255),a
+          jp   nz,isza
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isza
+;-----
+
+          pop     hl
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,iszb
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.iszb
+;-----
+
+.ts_FR_2
+          ld      l,155
+          djnz    ts_loop
+          call	bit_close_ei
+          ret
+
+
+
+.Clackson2
+          call  bit_open_di
+.CS_LENGHT
+          ld      b,200
+.cs_loop
+          dec     h
+          jr      nz,cs_jump
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,iszc
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.iszc
+;-----
+
+          push    bc
+          ld      b,250
+.cswait1
+          djnz    cswait1
+          pop     bc
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,iszd
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.iszd
+;-----
+
+.cs_FR_1
+          ld      h,230
+.cs_jump
+          inc     l
+          jr      nz,cs_loop
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,isze
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isze
+;-----
+
+          push    bc
+          ld      b,200
+.cswait2
+          djnz    cswait2
+          pop     bc
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,iszf
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.iszf
+;-----
+
+.cs_FR_2
+          ld      l,0
+          djnz    cs_loop
+          call	bit_close_ei
+          ret
+
+
+.TSpace2
+          ld      a,230
+          ld      (t2_FR_1+1),a
+          xor     a
+          ld      (t2_FR_2+1),a
+
+          call  bit_open_di
+.T2_LENGHT
+          ld      b,200
+.t2_loop
+          dec     h
+          jr      nz,t2_jump
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,iszg
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.iszg
+;-----
+
+          push    bc
+          ld      b,250
+.wait1
+          djnz    wait1
+          pop     bc
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,iszh
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.iszh
+;-----
+
+.t2_FR_1
+          ld      h,230
+.t2_jump
+          inc     l
+          jr      nz,t2_loop
+          push    af
+          ld      a,(t2_FR_2+1)
+          inc     a
+          ld      (t2_FR_2+1),a
+          pop     af
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,iszi
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.iszi
+;-----
+
+          push    bc
+          ld      b,200
+.wait2
+          djnz    wait2
+          pop     bc
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,iszj
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.iszj
+;-----
+
+.t2_FR_2
+          ld      l,0
+          djnz    t2_loop
+          call	bit_close_ei
+          ret
+
+
+.TSpace3
+          ld      a,230
+          ld      (u2_FR_1+1),a
+          xor     a
+          ld      (u2_FR_2+1),a
+
+          call  bit_open_di
+.U2_LENGHT
+          ld      b,200
+.u2_loop
+          dec     h
+          jr      nz,u2_jump
+          push    af
+          ld      a,(u2_FR_1+1)
+          inc     a
+          ld      (u2_FR_1+1),a
+          pop     af
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,iszk
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.iszk
+;-----
+
+.u2_FR_1
+          ld      h,50
+.u2_jump
+          inc     l
+          jr      nz,u2_loop
+          push    af
+          ld      a,(u2_FR_2+1)
+          inc     a
+          ld      (u2_FR_2+1),a
+          pop     af
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,iszl
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.iszl
+;-----
+
+.u2_FR_2
+          ld      l,0
+          djnz    u2_loop
+          call	bit_close_ei
+          ret
+
+
+.Squoink
+          ld      a,230
+          ld      (qi_FR_1+1),a
+          xor     a
+          ld      (qi_FR_2+1),a
+
+          call  bit_open_di
+.qi_LENGHT
+          ld      b,200
+.qi_loop
+          dec     h
+          jr      nz,qi_jump
+          push    af
+          ld      a,(qi_FR_1+1)
+          dec     a
+          ld      (qi_FR_1+1),a
+          pop     af
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,iszm
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.iszm
+;-----
+
+.qi_FR_1
+          ld      h,50
+.qi_jump
+          inc     l
+          jr      nz,qi_loop
+          push    af
+          ld      a,(qi_FR_2+1)
+          inc     a
+          ld      (qi_FR_2+1),a
+          pop     af
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,iszn
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.iszn
+;-----
+
+.qi_FR_2
+          ld      l,0
+          djnz    qi_loop
+          call	bit_close_ei
+          ret
+
+
+.explosion
+          call  bit_open_di
+          ld	hl,1
+.expl
+          push    hl
+          push    af
+          ld      a,sndbit_mask
+          ld      h,0
+          and     (hl)
+          ld      l,a
+          pop     af
+          xor     l
+
+;-----
+          out  (255),a
+          jp   nz,iszo
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.iszo
+;-----
+
+          pop     hl
+
+          push    af
+          ld      b,h
+          ld      c,l
+.dly      dec     bc
+          ld      a,b
+          or      c
+          jr      nz,dly
+          pop     af
+          
+          inc     hl
+          bit     1,h
+          jr      z,expl
+          
+          call	bit_close_ei
+          ret
+; $Id: zx81,v 1.3 2011-11-14 20:17:51 stefano Exp $
+;
+; Generic platform sound effects module.
+; Alternate sound library by Stefano Bodrato
+;
+
+
+          XLIB     bit_fx3
+          INCLUDE  "games/games.inc"
+
+          LIB      bit_open_di
+          LIB      bit_close_ei
+
+
+.bit_fx3
+          pop  bc
+          pop  de
+          push de
+          push bc
+
+          ld    a,e  
+          cp    8
+          ret   nc  
+          add   a,a  
+          ld    e,a  
+          ld    d,0  
+          ld    hl,table  
+          add   hl,de  
+          ld    a,(hl)  
+          inc   hl  
+          ld    h,(hl)  
+          ld    l,a  
+          jp    (hl)  
+          
+.table    defw    blirp2	; effect #0
+          defw    blirp          
+          defw    coff		; effect #2
+          defw    blurp
+          defw    descending
+          defw    ascending
+          defw    descending2
+          defw    fx7		; effect #7
+
+.blirp
+          call  bit_open_di
+          ld	b,255
+.expl
+          push    af
+          ld      a,sndbit_mask
+          ld      h,0
+          ld      l,b
+          and     (hl)
+          ld      l,a
+          pop     af
+          xor     l
+
+;-----
+          out  (255),a
+          jp   nz,isz
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz
+;-----
+
+          push    bc
+.dly      nop
+          djnz    dly
+          pop     bc
+
+          push    af
+          ld      a,sndbit_mask
+          ld      h,0
+          ld      l,b
+          and     (hl)
+          ld      l,a
+          pop     af
+          xor     l
+
+;-----
+          out  (255),a
+          jp   nz,isz2
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz2
+;-----
+
+          push    bc
+          push    af
+          ld      a,255
+          sub     b
+          ld      b,a
+          pop     af
+.dly2     nop
+          djnz    dly2
+          pop     bc
+          
+          djnz    expl
+          
+          call	bit_close_ei
+          ret
+
+
+.blirp2
+          call  bit_open_di
+          ld	b,100
+.blrp
+          push    af
+          ld      a,sndbit_mask
+          ld      h,0
+          ld      l,b
+          and     (hl)
+          ld      l,a
+          pop     af
+          xor     l
+
+;-----
+          out  (255),a
+          jp   nz,isz3
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz3
+;-----
+
+          push    bc
+          push    af
+          ld      a,255
+          sub     b
+          ld      b,a
+          pop     af
+.dlyb     nop
+          djnz    dlyb
+          pop     bc
+
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,isz4
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz4
+;-----
+
+          push    bc
+.dlya     nop
+          djnz    dlya
+          pop     bc
+
+          
+          djnz    blrp
+          
+          call	bit_close_ei
+          ret
+
+
+; Steam engine
+.coff
+          call  bit_open_di
+          ld	hl,0
+.coff2
+          push    af
+          ld      a,sndbit_mask
+          and     (hl)
+          ld      b,a
+          pop     af
+          xor     b
+
+;-----
+          out  (255),a
+          jp   nz,isz5
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz5
+;-----
+
+          ld      b,(hl)
+.cdly          
+          djnz    cdly
+          
+          inc     hl
+          bit     7,l
+          jr      z,coff2
+
+          call	bit_close_ei
+          ret
+
+
+.blurp
+          call  bit_open_di
+          ld	b,255
+.blurp2
+          push    af
+          ld      a,sndbit_mask
+          ld      h,0
+          ld      l,b
+          and     (hl)
+          ld      l,a
+          pop     af
+          xor     l
+
+;-----
+          out  (255),a
+          jp   nz,isz6
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz6
+;-----
+
+          push    af
+          ld      a,(hl)
+.dblurp   dec     a
+          jr      nz,dblurp
+          pop     af
+          
+          djnz    blurp2
+
+          call	bit_close_ei
+          ret
+
+
+; descending buzzing noise
+.descending
+          call  bit_open_di
+          ld	hl,1000
+          
+.desc1    push    hl
+          ld      b,16
+.desc2    rl      l
+          rl      h
+          jr      nc,desc3
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,isz7
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz7
+;-----
+
+.desc3
+          ld      e,5
+.desc4    dec     e
+          jr      nz,desc4
+          
+          djnz    desc2
+          
+          pop     hl
+          dec     hl
+          ld      c,a
+          ld      a,h
+          or      l
+          ld      a,c
+          jr      nz,desc1
+
+          call	bit_close_ei
+          ret
+
+
+; ascending buzzing noise
+.ascending
+          call  bit_open_di
+          ld	hl,1023
+          
+.hdesc1   push    hl
+          ld      b,16
+.hdesc2   rl      l
+          rl      h
+          jr      nc,hdesc3
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,isz8
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz8
+;-----
+
+.hdesc3
+          djnz    hdesc2
+          
+          pop     hl
+          dec     hl
+          ld      c,a
+          ld      a,h
+          or      l
+          ld      a,c
+          jr      nz,hdesc1
+
+          call	bit_close_ei
+          ret
+
+
+
+; descending buzzing noise #2
+.descending2
+          call  bit_open_di
+          ld	hl,1023
+          
+.asc1     push    hl
+          ld      b,16
+.asc2     rl      l
+          rl      h
+          jr      c,asc3
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   nz,isz9
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz9
+;-----
+
+.asc3
+          djnz    asc2
+          
+          pop     hl
+          dec     hl
+          ld      c,a
+          ld      a,h
+          or      l
+          ld      a,c
+          jr      nz,asc1
+
+          call	bit_close_ei
+          ret
+
+
+; noise #7
+.fx7
+          call  bit_open_di
+          ld	hl,4000
+          
+.fx71     push    hl
+          push    af
+          ld      a,sndbit_mask
+          and     l
+          ld      l,a
+          pop     af
+          xor     l
+
+;-----
+          out  (255),a
+          jp   nz,isza
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isza
+;-----
+
+          pop     hl
+          dec     hl
+          ld      c,a
+          ld      a,h
+          or      l
+          ld      a,c
+          jr      nz,fx71
+
+          call	bit_close_ei
+          ret
+; $Id: zx81,v 1.3 2011-11-14 20:17:51 stefano Exp $
+;
+; Generic platform sound effects module.
+;
+; Library #4 by Stefano Bodrato
+;
+
+
+          XLIB     bit_fx4
+          INCLUDE  "games/games.inc"
+
+          LIB      beeper
+          LIB      bit_open_di
+          LIB      bit_close_ei
+
+;Sound routine..enter in with e holding the desired effect!
+
+
+.bit_fx4
+          pop  bc
+          pop  de
+          push de
+          push bc
+          
+          ld    a,e  
+          cp    8
+          ret   nc  
+          add   a,a  
+          ld    e,a  
+          ld    d,0  
+          ld    hl,table  
+          add   hl,de  
+          ld    a,(hl)  
+          inc   hl  
+          ld    h,(hl)  
+          ld    l,a  
+          jp    (hl)  
+          
+.table    defw    fx1		; effect #0
+          defw    fx2
+          defw    fx3
+          defw    fx4
+          defw    fx5
+          defw    fx6
+          defw    fx7
+          defw    fx8
+          
+          
+; Strange squeak
+.fx1      ld    b,1  
+.fx1_1    push  bc  
+          ld    hl,600
+          ld    de,2
+.fx1_2    push  hl
+          push  de
+          call  beeper
+          pop   de
+          pop   hl
+          push  hl
+          push  de
+          ld	bc,400
+          sbc   hl,bc
+          ld	l,c
+          ld	h,b
+          call  beeper
+          pop   de
+          pop   hl
+          ld    bc,40
+          and   a
+          sbc   hl,bc
+          jr    nc,fx1_2
+          pop   bc
+          djnz  fx1_1
+          ret 
+          
+          
+; Sort of "audio tape rewind" effect
+.fx2      
+          ld    hl,1024
+.fx2_1    
+          ld    de,1
+          push  hl
+          push  de
+          ld	a,55
+          xor	l
+          ld	l,a
+          call  beeper
+          pop   de
+          pop   hl
+          dec	hl
+          ld	a,h
+          or	l
+          jr	nz,fx2_1
+          ret 
+          
+          
+; FX3 effect
+.fx3
+          ld    hl,30
+          ld    de,1
+.fx3_1    
+
+          push  hl
+          push  de
+          call  beeper
+          ld	hl,600
+          ld	de,1
+          call  beeper
+          pop   de
+          pop   hl
+          dec   hl
+
+
+          inc   de
+          ld	a,h
+          or	l
+          jr	nz,fx3_1
+          ret 
+          
+          
+; FX4 effect
+.fx4
+          ld	hl,1124
+          ld    de,1
+.fx4_1    
+
+          push  hl
+          push  de
+          call  beeper
+          pop   de
+          pop   hl
+
+          push  hl
+          push  de
+          ld	bc,900
+          sbc   hl,bc
+          call  beeper
+          pop   de
+          pop   hl
+
+          inc	hl
+          ld	a,l
+          and	a
+          jr	nz,fx4_1
+          ret 
+          
+         
+; Strange descending squeak 
+; FX5 effect
+.fx5
+          ld	hl,200
+          ld    de,1
+.fx5_1    
+
+          push  hl
+          push  de
+          call  beeper
+          pop   de
+          pop   hl
+
+          push  hl
+          push  de
+          ld	bc,180
+          sbc   hl,bc
+          call  beeper
+          pop   de
+          pop   hl
+
+          push  hl
+          push  de
+          call  beeper
+          pop   de
+          pop   hl
+
+          inc	hl
+          inc	de
+          ld	a,l
+          and	a
+          jr	nz,fx5_1
+          ret 
+          
+          
+; FX6 effect
+.fx6
+          ld	hl,300
+          ld    de,1
+.fx6_1    
+          push  hl
+          push  de
+          call  beeper
+          pop   de
+          pop   hl
+
+          push  hl
+          push  de
+          ld	bc,200
+          sbc   hl,bc
+          call  beeper
+          pop   de
+          pop   hl
+
+          inc	hl
+          inc	de
+          ld	a,l
+          and	50
+          jr	nz,fx6_1
+          ret
+          
+          
+; FX7 effect
+.fx7
+          ld	hl,1000
+          ld    de,1
+.fx7_1    
+          push  hl
+          push  de
+          call  beeper
+          pop   de
+          pop   hl
+          
+          push  hl
+          push  de
+          ld	bc,200
+          sbc   hl,bc
+          call  beeper
+          pop   de
+          pop   hl
+          
+          dec	hl
+          ld	a,l
+          and	50
+          jr	nz,fx7_1
+          ret
+          
+          
+; FX8 effect
+.fx8
+          ld	hl,100
+          ld    de,1
+.fx8_1    
+          push  hl
+          push  de
+          call  beeper
+          pop   de
+          pop   hl
+          
+          call	bit_open_di
+          out  (255),a
+          call	bit_close_ei
+          
+          push  hl
+          push  de
+          ld	bc,50
+.fx8_2
+          djnz  fx8_2
+          pop   de
+          pop   hl
+
+          call	bit_open_di
+          in   a,(254)
+          call	bit_close_ei
+          
+          inc	hl
+          ld	a,l
+          and	50
+          jr	nz,fx8_1
+          ret
+          
+          
+; $Id: zx81,v 1.3 2011-11-14 20:17:51 stefano Exp $
+;
+; ZX81 1 bit sound functions
+;
+; void bit_open();
+;
+; Stefano Bodrato - 11/11/2001
+;
+
+    XLIB     bit_open
+    XREF     snd_tick
+
+.bit_open
+	  xor a
+	  ret
+; $Id: zx81,v 1.3 2011-11-14 20:17:51 stefano Exp $
+;
+; ZX81 1 bit sound functions
+;
+; Open sound and disable interrupts for exact timing
+;
+; Stefano Bodrato - 11/11/2011
+;
+
+    XLIB     bit_open_di
+    XREF     snd_tick
+
+.bit_open_di
+        ld     a,(16443)	; test CDFLAG
+        and    128			; is in FAST mode ?
+        jr     z,nodi
+        out    ($fd),a         ; turn off interrupt
+.nodi
+        xor    a
+        ret
+; $Id: zx81,v 1.3 2011-11-14 20:17:51 stefano Exp $
+;
+; void bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4);
+;
+; Generic platform sound library.
+; synthetizer - this is a sort of "quad sound" routine.
+; It is based on 4 separate counters and a delay.
+; Depending on the parameters being passed it is able to play
+; on two audible voices, to generate sound effects and to play
+; with a single voice having odd waveforms.
+;
+; The parameters are passed with a self modifying code trick  :o(
+; This routine shouldn't stay in contended memory locations !!
+;
+
+          XLIB     bit_synth
+          INCLUDE  "games/games.inc"
+
+          LIB      bit_open_di
+          LIB      bit_close_ei
+
+.bit_synth
+
+          ld      ix,2
+          add     ix,sp
+          ld      a,(ix+8)
+          ld      (LEN+1),a
+          ld      a,(ix+6)
+          and     a
+          jr      z,FR1_blank
+          ld      (FR_1+1),a
+          ld      a,sndbit_mask
+.FR1_blank
+          ld      (FR1_tick+1),a
+          ld      a,(ix+4)
+          and     a
+          jr      z,FR2_blank
+          ld      (FR_2+1),a
+          ld      a,sndbit_mask
+.FR2_blank
+          ld      (FR2_tick+1),a
+          ld      a,(ix+2)
+          and     a
+          jr      z,FR3_blank
+          ld      (FR_3+1),a
+          ld      a,sndbit_mask
+.FR3_blank
+          ld      (FR1_tick+1),a
+          ld      a,(ix+0)
+          and     a
+          jr      z,FR4_blank
+          ld      (FR_4+1),a
+          ld      a,sndbit_mask
+.FR4_blank
+          ld      (FR1_tick+1),a
+
+          call    bit_open_di
+          ld      h,1
+          ld      l,h
+          ld      d,h
+          ld      e,h
+.LEN
+          ld      b,50
+.loop
+          ld      c,4
+.loop2
+          dec     h
+          jr      nz,jump
+.FR1_tick
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   z,isz
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz
+;-----
+
+.FR_1
+          ld      h,80
+.jump
+          dec     l
+          jr      nz,jump2
+.FR2_tick
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   z,isz2
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz2
+;-----
+
+.FR_2
+          ld      l,81
+.jump2
+          dec     d
+          jr      nz,jump3
+.FR3_tick
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   z,isz3
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz3
+;-----
+
+.FR_3
+          ld      d,162
+.jump3
+          dec     e
+          jr      nz,loop2
+.FR4_tick
+          xor     sndbit_mask
+
+;-----
+          out  (255),a
+          jp   z,isz4
+
+          ex   af,af
+          in   a,(254)
+          ex   af,af
+.isz4
+;-----
+
+.FR_4
+          ld      e,163
+          
+          dec     c
+          jr      nz,loop2
+          djnz    loop
+          call	bit_close_ei
+
+          ret
+
