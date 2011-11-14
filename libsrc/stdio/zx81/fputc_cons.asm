@@ -3,19 +3,32 @@
 ;
 ;	(HL)=char to display
 ;
-;	$Id: fputc_cons.asm,v 1.8 2009-08-20 05:59:11 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.9 2011-11-14 18:22:33 stefano Exp $
 ;
 
 	XLIB	fputc_cons
-	LIB	asctozx81
-	LIB	filltxt
+
+	LIB     asctozx81
+	LIB     restore81
+	;LIB	filltxt
 	
 	DEFC	ROWS=24
 	DEFC	COLUMNS=32
 
+	DEFC	COLUMN=$4039    ; S_POSN_x
+	DEFC	ROW=$403A       ; S_POSN_y
+;.ROW	defb	0
+;.COLUMN	defb	0
 
-.ROW	defb	0
-.COLUMN	defb	0
+
+; adjust coordinates from-to ZX81 ROM style
+.coord_adj
+	ld  hl,$1821	; (33,24) = top left screen posn
+	ld  de,(COLUMN)
+	and a
+	sbc hl,de
+	ld  (COLUMN),hl
+	ret
 
 
 .fputc_cons
@@ -23,18 +36,26 @@
 	add	hl,sp
 	ld	(charpos+1),hl
 	ld	a,(hl)
+	
 
 	cp	12
 	jr	nz,nocls
-	xor	a
-	ld	(ROW),a
- 	ld	(COLUMN),a
-	;;call	restore81	; Assembler will swap it to iy
-	;;jp	2602	; CLS
-	ld	l,a
-	jp	filltxt
+	call	restore81	; Assembler will swap it to iy
+	jp	2602	; CLS
+	;xor	a
+	;ld	(ROW),a
+ 	;ld	(COLUMN),a
+	;ld	l,a
+	;jp	filltxt
 
 .nocls
+
+	call coord_adj
+	call doput
+	jr 	coord_adj
+
+.doput
+
 	cp 13		; CR
 	jr	z,isLF
 	cp     10	; LF?

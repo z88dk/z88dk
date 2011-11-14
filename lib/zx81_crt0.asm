@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.29 2011-11-09 16:19:28 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.30 2011-11-14 18:22:32 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -42,14 +42,17 @@
         XDEF    heaplast        ;Near malloc heap variables
         XDEF    heapblocks
 
-        XDEF    hr_rows		;Current number of text rows in graphics mode
-        XDEF    _hr_rows	 ;as above for C declarations
 IF (startup>=3)
-        XDEF    text_rows	 ;as above for VT ANSI mode
+        XDEF    hr_rows         ;Current number of text rows in graphics mode
+        XDEF    _hr_rows        ;as above for C declarations
+
+        XDEF    text_rows       ;as above for VT ANSI mode
 ENDIF
         XDEF    base_graphics   ;Graphical variables
-        XDEF    _base_graphics   ;as above for C declarations
+        XDEF    _base_graphics  ;as above for C declarations
         XDEF    coords          ;Current xy position
+
+;;        XDEF    snd_tick        ;Sound variable
 
         XDEF    save81          ;Save ZX81 critical registers
         XDEF    restore81       ;Restore ZX81 critical registers
@@ -289,8 +292,11 @@ exitcount:      defb    0       ; How many routines on the atexit() stack
 heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
 
-                defm  "Small C+ ZX81"   ;Unnecessary file signature
-                defb    0
+;;snd_tick:       defb    0       ; Flag for sound .. D3=out (n),a ..  DB=in a,(m)
+
+;                defm  "Small C+ ZX81"   ;Unnecessary file signature
+;                defb    0
+
 
 ;-----------------------
 ; Floating point support

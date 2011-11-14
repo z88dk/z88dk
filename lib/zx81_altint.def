@@ -11,7 +11,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_altint.def,v 1.13 2011-11-07 18:23:39 stefano Exp $
+;       $Id: zx81_altint.def,v 1.14 2011-11-14 18:22:32 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -21,8 +21,6 @@
 
 XDEF	hrg_on
 XDEF	hrg_off
-XDEF	MTCH_P1
-XDEF	MTCH_P2
 XDEF	zx_fast
 XDEF	zx_slow
 

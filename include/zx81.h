@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.19 2011-11-02 14:24:33 stefano Exp $
+ * $Id: zx81.h,v 1.20 2011-11-14 18:22:32 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -167,6 +167,9 @@ extern char __LIB__ ascii_zx(char character);
 // FAST / SLOW mode switching, available only if startup >= 2
 extern void __LIB__ zx_fast();
 extern void __LIB__ zx_slow();
+
+// Test for BREAK being pressed
+extern int  __LIB__ zx_break(void);
 
 
 ///////////////////////////////////////////

@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.164 2011-10-22 08:37:36 stefano Exp $
+# $Id: Makefile,v 1.165 2011-11-14 18:22:33 stefano Exp $
 
 
 include	Make.config
@@ -491,6 +491,8 @@ zx81_clib.lib:
 	cd printflike ;	$(MAKE)	generic_iy ; cd ..
 	cd setjmp ; $(MAKE) generic_iy ; cd ..
 	cd assert ; $(MAKE) generic_iy ; cd ..
+	$(MAKE)	gamesdeps
+	cd games ; $(MAKE) lzx81	; cd ..
 	$(LIBLINKER) -IXIY -DFORzx81 -x$(OUTPUT_DIRECTORY)/zx81_clib @$(LISTFILE_DIRECTORY)/zx81.lst
 	$(MAKE)	zx81deps
 
@@ -507,6 +509,8 @@ zx81ansi_clib.lib:
 	cd printflike ;	$(MAKE)	; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	$(MAKE)	gamesdeps
+	cd games ; $(MAKE) lzx81	; cd ..
 	$(LIBLINKER) -IXIY -DFORzx81 $(COLDEFS)	-x$(OUTPUT_DIRECTORY)/zx81ansi_clib @$(LISTFILE_DIRECTORY)/zx81ansi.lst
 	$(MAKE)	zx81deps
 
@@ -537,9 +541,9 @@ gfx81hr192.lib:
 	$(MAKE)	zx81deps
 	$(LIBLINKER) -IXIY -DFORzx81hr192 -x$(OUTPUT_DIRECTORY)/gfx81hr192 @$(LISTFILE_DIRECTORY)/gfx81hr.lst
 	$(MAKE)	zx81deps
-	$(LIBLINKER) -IXIY -DFORzx81mt192 -x$(OUTPUT_DIRECTORY)/gfx81mt192 @$(LISTFILE_DIRECTORY)/gfx81mt.lst
-	$(MAKE)	zx81deps
 	$(LIBLINKER) -IXIY -DFORzx81hr192 -x$(OUTPUT_DIRECTORY)/gfx81arx192 @$(LISTFILE_DIRECTORY)/gfx81arx.lst
+	$(MAKE)	zx81deps
+	$(LIBLINKER) -IXIY -DFORzx81mt192 -x$(OUTPUT_DIRECTORY)/gfx81mt192 @$(LISTFILE_DIRECTORY)/gfx81mt.lst
 	$(MAKE)	zx81deps
 
 # ZX81 maths library - Stefano

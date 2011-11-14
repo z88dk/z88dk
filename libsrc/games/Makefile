@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.19 2011-03-15 14:34:08 stefano Exp $
+# $Id: Makefile,v 1.20 2011-11-14 18:22:33 stefano Exp $
 
 include	../Make.config
 
@@ -54,8 +54,15 @@ lc128:
 	zcc +c128ansi $(CFLAGS) -DC128 bit_frequency.c
 	zcc +c128ansi $(CFLAGS) -DC128 bit_play.c
 
+# -IXIY trick, interrupts sometimes disabled and few customizations
+# dependencies are respected already in the main makefile
+lzx81:
+	zcc +zx81 $(CFLAGS) -DZX81 bit_frequency.c
+	zcc +zx81 $(CFLAGS) -DZX81 bit_play.c
+
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o*
 	$(RM) ace/*.o c128/*.o cpc/*.o aquarius/*.o msx/*.o 
 	$(RM) sam/*.o spectrum/*.o trs80/*.o vz/*.o z88/*.o
 	$(RM) gal/*.o ticalc/*.o
+	$(RM) zx81/*.o
