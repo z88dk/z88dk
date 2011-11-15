@@ -5,7 +5,7 @@ stdio/zx81/fputc_cons
 stdio/puts_cons
 time/zx81/clock
 games/joystick
-games/zx81/bit_open
+games/zx81snd/bit_open
 games/zx81snd/bit_open_di
 games/zx81snd/bit_close
 games/zx81snd/bit_close_ei
