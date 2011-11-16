@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.20 2011-11-14 18:22:32 stefano Exp $
+ * $Id: zx81.h,v 1.21 2011-11-16 18:00:36 stefano Exp $
  */
 
 #ifndef __ZX81_H__
