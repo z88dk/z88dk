@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.30 2011-11-14 18:22:32 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.31 2011-11-16 18:31:57 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -59,7 +59,12 @@ ENDIF
 
         ;; XDEF    frames         ;Frame counter for time()
 
-        org     16514
+        IF      !myzorg
+                defc    myzorg  = 16514
+        ENDIF
+
+
+        org     myzorg
 
 
 ; Hide the mess in the REM line from BASIC program listing
