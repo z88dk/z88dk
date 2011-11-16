@@ -7,7 +7,7 @@
 ; Original function name: "HRG_Tool_TXTcopy"
 ;--------------------------------------------------------------
 ;
-;	$Id: copytxt_arx.asm,v 1.1 2011-11-15 16:40:47 stefano Exp $
+;	$Id: copytxt_arx.asm,v 1.2 2011-11-16 09:43:09 stefano Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -45,7 +45,7 @@ HRG_TXTcopyLoop:
 	cp	118
 	jr	z,HRG_TXTcopyNextLine
 
-;	push	hl		; HL points to byte in HRG
+	push	hl		; HL points to byte in HRG
 
 	push	de		; A is character
 	push	bc
@@ -104,11 +104,15 @@ ovmode:	nop
 	
 	pop	bc
 	pop	de
-;	pop	hl
+	pop	hl
 
 HRG_TXTcopyNextChar:
 	inc	de
-	inc	hl
+	push	bc
+	ld	bc,8
+	add	hl,bc
+	pop	bc
+	;inc	hl
 	jr	HRG_TXTcopyLoop
 
 

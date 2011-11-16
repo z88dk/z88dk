@@ -3,14 +3,14 @@
 ;
 ;	(HL)=char to display
 ;
-;	$Id: fputc_cons.asm,v 1.9 2011-11-14 18:22:33 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.10 2011-11-16 09:43:09 stefano Exp $
 ;
 
 	XLIB	fputc_cons
 
 	LIB     asctozx81
 	LIB     restore81
-	;LIB	filltxt
+	LIB     filltxt
 	
 	DEFC	ROWS=24
 	DEFC	COLUMNS=32
@@ -40,13 +40,12 @@
 
 	cp	12
 	jr	nz,nocls
-	call	restore81	; Assembler will swap it to iy
-	jp	2602	; CLS
-	;xor	a
-	;ld	(ROW),a
- 	;ld	(COLUMN),a
-	;ld	l,a
-	;jp	filltxt
+	;call	restore81	; Assembler will swap it to iy
+	;jp	2602	; CLS
+	ld  hl,$1821	; (33,24) = top left screen posn
+	ld  (COLUMN),hl
+	ld  l,0
+	jp	filltxt
 
 .nocls
 
