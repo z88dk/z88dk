@@ -4,6 +4,7 @@ zx81/invtxt
 zx81/mirrortxt
 zx81/scrolluptxt
 zx81/scrolldowntxt
+zx81/zx_cls
 zx81/_clg_hr
 zx81/basic/zx_basemem.asm
 zx81/basic/zx_basic_length.asm
@@ -22,3 +23,4 @@ zx81/asctozx81
 zx81/zx_ascii
 zx81/ascii_zx
 zx81/zx_asciimode
+zx81/zx_break

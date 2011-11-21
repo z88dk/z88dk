@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.21 2011-11-16 18:00:36 stefano Exp $
+ * $Id: zx81.h,v 1.22 2011-11-21 07:37:37 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -138,6 +138,9 @@ extern void __LIB__ __FASTCALL__ copytxt(int ovmode);
 //////////////////
 // MISC FUNCTIONS
 //////////////////
+
+// Clear text screen and set cursor at (0;0)
+extern void __LIB__ zx_cls();
 
 // Invert screen in text mode
 extern void __LIB__ invtxt();
