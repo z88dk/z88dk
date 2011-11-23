@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.31 2011-11-16 18:31:57 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.32 2011-11-23 09:03:06 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -94,7 +94,7 @@ ENDIF
         defb    118,255         ; block further listing
 
 start:
-
+		ld		ix, 16384	; (IXIY swap) when self-relocating IY is corrupt
         call    save81
 
 IF (!DEFINED_startup | (startup=1))
@@ -149,7 +149,7 @@ IF DEFINED_ANSIstdio
         call    closeall
 ENDIF
 ENDIF
-
+		; The BASIC USR call would restore IY on return, but it could not be enough
         call    restore81
 
 IF (startup>=2)
@@ -171,7 +171,6 @@ start1: ld      sp,0            ;Restore stack to entry value
         ret
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
-        jp      (hl)
 
 
 restore81:
