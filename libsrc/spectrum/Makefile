@@ -1,7 +1,7 @@
 #
 # Makefile for ZX Spectrum target specific lib
 #
-# $Id: Makefile,v 1.10 2010-03-12 15:21:13 stefano Exp $
+# $Id: Makefile,v 1.11 2011-11-25 09:46:08 stefano Exp $
 
 include ../Make.config
 
@@ -19,3 +19,4 @@ clean:
 	cd tape ; $(MAKE) clean ; cd ..
 	cd uspeech ; $(RM) *.o* ; cd ..
 	cd zxmmc ; $(RM) *.o* ; cd ..
+	cd ulaplus ; $(RM) *.o* ; cd ..

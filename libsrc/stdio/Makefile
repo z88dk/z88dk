@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.31 2011-06-15 20:15:00 stefano Exp $
+# $Id: Makefile,v 1.32 2011-11-25 09:46:08 stefano Exp $
 #
 
 include ../Make.config
@@ -144,13 +144,16 @@ clean:
 	$(RM) c128/*.o
 	$(RM) cpc/*.o
 	$(RM) cpm/*.o
+	$(RM) enterprise/*.o
 	$(RM) gal/*.o
 	$(RM) m5/*.o
 	$(RM) msx/*.o
+	$(RM) mtx/*.o
 	$(RM) mz/*.o
 	$(RM) nascom/*.o
 	$(RM) nc100/*.o
 	$(RM) newbrain/*.o
+	$(RM) osca/*.o
 	$(RM) oz/*.o
 	$(RM) sam/*.o
 	$(RM) sms/*.o

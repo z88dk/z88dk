@@ -4,7 +4,7 @@
 # Problems? Contact the	person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.165 2011-11-14 18:22:33 stefano Exp $
+# $Id: Makefile,v 1.166 2011-11-25 09:46:08 stefano Exp $
 
 
 include	Make.config
@@ -1391,6 +1391,7 @@ clean:
 	cd rect	; $(MAKE) clean	; cd ..
 	cd algorithm ; $(MAKE) clean ; cd ..
 	cd debug ; $(MAKE) clean ; cd ..
+	cd osca ; $(MAKE)	clean ;	cd ..
 	cd oz ; $(MAKE)	clean ;	cd ..
 	cd lib3d ; $(MAKE) clean ; cd ..
 	cd input ; $(MAKE) clean ; cd ..
@@ -1402,10 +1403,11 @@ clean:
 	cd ts2068 ; $(RM) *.o ;	cd ..
 	cd vz ;	$(RM) *.o ; cd ..
 	cd zx81	; $(MAKE) clean ; cd ..
-	cd cpc ; $(RM) *.o ; cd	..
-	cd sms ; $(MAKE) clean ; cd	..
+	cd cpc ; $(RM) *.o ; cd ..
+	cd sms ; $(MAKE) clean ; cd ..
 	cd threading/preempt	; $(MAKE) clean	; cd ../..
 	cd sprites/software/sp1	; $(MAKE) clean	; cd ../../..
+	cd stdio_new ; $(MAKE) clean ; cd ..
 
 install:
 	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.27 2011-09-02 12:43:57 stefano Exp $
+# $Id: Makefile,v 1.28 2011-11-25 09:46:08 stefano Exp $
 
 
 lx11:
@@ -45,7 +45,7 @@ clean:
 	$(RM) text6/*.o
 	$(RM) ticalc/*.o
 	$(RM) trs80/*.o
-	$(RM) ts2068/*.o
+	$(RM) ts2068hr/*.o
 	$(RM) vz200/*.o
 	$(RM) z88/*.o
 	$(RM) zx81/*.o
