@@ -3,14 +3,14 @@
 ;
 ;	(HL)=char to display
 ;
-;	$Id: fputc_cons.asm,v 1.12 2011-11-23 09:03:07 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.13 2011-11-28 20:14:50 stefano Exp $
 ;
 
 	XLIB	fputc_cons
 
 	LIB     asctozx81
 	LIB     restore81
-	LIB     zx_cls
+	LIB     filltxt
 	LIB     scrolluptxt
 	
 	DEFC	ROWS=24
@@ -28,8 +28,9 @@
 	ld	(charpos+1),hl
 	ld	a,(hl)
 
-	cp	12
-	jp  z,zx_cls
+	ld	l,0
+	cp	12		; CLS
+	jp	z,filltxt
 
 	call coord_adj
 	call doput

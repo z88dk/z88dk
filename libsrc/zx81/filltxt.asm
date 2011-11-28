@@ -3,7 +3,7 @@
 ;
 ;--------------------------------------------------------------
 ;
-;	$Id: filltxt.asm,v 1.1 2009-08-20 05:59:11 stefano Exp $
+;	$Id: filltxt.asm,v 1.2 2011-11-28 20:14:50 stefano Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -14,6 +14,8 @@
 	XLIB	filltxt
 
 	XREF	base_graphics
+
+	DEFC	COLUMN=$4039    ; S_POSN_x
 
 filltxt:
 	; __FASTCALL__ mode
@@ -35,4 +37,9 @@ floop:
 	inc	hl
 	pop	bc
 	djnz 	floop
+
+	ld  hl,$1821	; (33,24) = top left screen posn
+	ld  (COLUMN),hl
+	ld	hl,(16396)	; D_FILE
+    ld  ($400E),hl	; DF_CC ..position ZX81 cursor at beginning of display file
 	ret
