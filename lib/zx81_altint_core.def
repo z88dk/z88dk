@@ -3,7 +3,7 @@
 ;	Note: a swap between IX and IY happens "on the fly" during assembly !
 ; ----------------------------------------------------------------------------------------
 ;
-;       $Id: zx81_altint_core.def,v 1.2 2011-11-14 18:22:32 stefano Exp $
+;       $Id: zx81_altint_core.def,v 1.3 2011-11-29 21:44:00 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -42,10 +42,10 @@ L0239:  LD      H,A             ;
 
 ;; DISPLAY-2
 L023E:
-	push	ix
-	ld	ix,16384
+	; push	ix          ; Siggi - No point to preserve iy here !! 
+	; ld	ix,16384
 	CALL    $2BB           ; routine KEYBOARD
-	pop	ix
+	; pop	ix
         LD      BC,($4025)      ; sv LAST_K
         LD      ($4025),HL      ; sv LAST_K
         LD      A,B             ;

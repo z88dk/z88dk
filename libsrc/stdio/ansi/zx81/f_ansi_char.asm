@@ -19,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.6 2007-10-23 06:03:56 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.7 2011-11-29 21:44:00 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -100,16 +100,6 @@ ENDIF
   
   ld	d,a
   ld	e,0
-
-  ;push af
-  ;and 24
-  ;ld d,a
-  ;pop af
-  ;and 7
-  ;rrca
-  ;rrca
-  ;rrca
-  ;ld e,a
   
   ld hl,(base_graphics)
   add hl,de
@@ -118,6 +108,7 @@ ENDIF
   ld hl,DOTS+1
   ld b,(hl)
   ld hl,0
+
   ld a,(ansi_COLUMN)       ; Column text position
   ld e,a
   ld d,0
@@ -126,18 +117,31 @@ ENDIF
 .LP
   add hl,de
   djnz LP
-  ld b,3
-.LDIV
+
   srl h
   rr l
   rra
-  djnz LDIV
+  srl h
+  rr l
+  rra
+  srl h
+  rr l
+  rra
+IF ARX816
+  add hl,hl
+  add hl,hl
+  add hl,hl
+ENDIF
 
-
-  ld b,5
-.RGTA
   srl a
-  djnz RGTA
+  srl a
+  srl a
+  srl a
+  srl a
+;  ld b,5
+;.RGTA
+;  srl a
+;  djnz RGTA
 .ZCL
   ld (PRE+1),a
   ld e,a
@@ -180,17 +184,29 @@ ENDIF
   add hl,de
   djnz LFONT
 .NOLFONT
+
+IF !ARX816
   ld de,32	; next row
+ENDIF
+
   ld c,8
 .PRE
   ld b,4
+IF ARX816
+  rl (ix+8)
+ELSE
   rl (ix+1)
+ENDIF
   rl (ix+0)
   inc b
   dec b
   jr z,DTS
 .L1
+IF ARX816
+  rl (ix+8)
+ELSE
   rl (ix+1)
+ENDIF
   rl (ix+0)
   djnz L1
 .DTS
@@ -263,7 +279,11 @@ ENDIF
 
 .L2
   rla
+IF ARX816
+  rl (ix+8)
+ELSE
   rl (ix+1)
+ENDIF
   rl (ix+0)
   djnz L2
 .POST
@@ -272,11 +292,19 @@ ENDIF
   dec b
   jr z,NEXT
 .L3
+IF ARX816
+  rl (ix+8)
+ELSE
   rl (ix+1)
+ENDIF
   rl (ix+0)
   djnz L3
 .NEXT
+IF ARX816
+  inc ix
+ELSE
   add ix,de
+ENDIF
   inc hl
   dec c
   jr nz,PRE
