@@ -1,16 +1,16 @@
 ;
-;       ZX81 libraries
-;
-;--------------------------------------------------------------
-; Text scrolldown.
-; Doesn't directly set the current cursor position
-;--------------------------------------------------------------
-;
-;       $Id: scrolldowntxt.asm,v 1.1 2010-05-06 14:42:38 stefano Exp $
+;	ZX81 libraries - Stefano
 ;
 ;----------------------------------------------------------------
+;
+; $Id: scrolldowntxt.asm,v 1.2 2011-12-01 17:46:45 stefano Exp $
+;
+;----------------------------------------------------------------
+; Text scrolldown.
+;----------------------------------------------------------------
 
-        XLIB    scrolldowntxt
+    XLIB   scrolldowntxt
+    LIB    zx_topleft
 
 scrolldowntxt:
 	ld	hl,(16396)
@@ -28,4 +28,4 @@ blankline:
 	inc hl
 	ld (hl),a
 	djnz blankline
-	ret
+	jp zx_topleft

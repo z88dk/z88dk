@@ -3,7 +3,11 @@
 ;
 ;	(HL)=char to display
 ;
-;	$Id: fputc_cons.asm,v 1.13 2011-11-28 20:14:50 stefano Exp $
+;----------------------------------------------------------------
+;
+;	$Id: fputc_cons.asm,v 1.14 2011-12-01 17:46:45 stefano Exp $
+;
+;----------------------------------------------------------------
 ;
 
 	XLIB	fputc_cons
@@ -12,6 +16,8 @@
 	LIB     restore81
 	LIB     filltxt
 	LIB     scrolluptxt
+	LIB     zx_dfile_addr
+	LIB     zx_coord_adj
 	
 	DEFC	ROWS=24
 	DEFC	COLUMNS=32
@@ -32,20 +38,13 @@
 	cp	12		; CLS
 	jp	z,filltxt
 
-	call coord_adj
+	call zx_coord_adj
 	call doput
-	call getaddr
-.coord_adj             ; adjust coordinates from-to ZX81 ROM style
-	ld  hl,$1821       ; (33,24) = top left screen posn
-	ld  de,(COLUMN)
-	and a
-	sbc hl,de
-	ld  (COLUMN),hl
-	ret
+	call zx_dfile_addr
+	jp   zx_coord_adj
 
 
-.doput
-	
+.doput	
 	cp  13		; CR?
 	jr  z,isLF
 	cp  10      ; LF?
@@ -69,7 +68,7 @@
 
 	ld	hl,COLUMN
 	push	hl
-	call getaddr
+	call zx_dfile_addr
 	xor	a		; blank
 	ld	(hl),a
 	pop	hl
@@ -101,7 +100,7 @@
 	cp	 COLUMNS    ; top-right column ?   In this way we wait..
 	call z,isLF     ; .. to have a char to print before issuing a CR
 	pop  af
-	call getaddr
+	call zx_dfile_addr
 	ld	 (hl),a
 
 	ld	 a,(COLUMN)
@@ -111,25 +110,3 @@
 	ret	 nz		; no, return
  	jp	 isLF
 
-
-.getaddr
-	push	af
-	ld	hl,(16396)
-	inc	hl
-	ld	a,(ROW)
-	and	a
-	jr	z,r_zero
-	ld	b,a
-	ld	de,33	; 32+1. Every text line ends with an HALT
-.r_loop
-	add	hl,de
-	djnz	r_loop
-.r_zero
-	ld	a,(COLUMN)
-	ld	d,0
-	ld	e,a
-	add	hl,de
-	ld ($400E),hl	; DF_CC ..current ZX81 cursor position on display file
-	pop	af
-	ret
-	
