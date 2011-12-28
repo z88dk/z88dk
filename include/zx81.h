@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.22 2011-11-21 07:37:37 stefano Exp $
+ * $Id: zx81.h,v 1.23 2011-12-28 14:04:54 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -142,6 +142,9 @@ extern void __LIB__ __FASTCALL__ copytxt(int ovmode);
 // Clear text screen and set cursor at (0;0)
 extern void __LIB__ zx_cls();
 
+// Position text cursor at (0;0)
+extern void __LIB__ zx_topleft();
+
 // Invert screen in text mode
 extern void __LIB__ invtxt();
 
@@ -149,12 +152,13 @@ extern void __LIB__ invtxt();
 extern void __LIB__ mirrortxt();
 
 // Fill text screen in text mode with specified character code
+// and position text cursor at (0;0)
 extern void __LIB__ __FASTCALL__ filltxt(char character);
 
 // Scroll up text screen
 extern void __LIB__ scrolluptxt();
 
-// Scroll down text screen
+// Scroll down text screen and set cursor at (0;0)
 extern void __LIB__ scrolldowntxt();
 
 // Activates / Deactivates the ZX81 <-> ASCII converter,
@@ -173,6 +177,10 @@ extern void __LIB__ zx_slow();
 
 // Test for BREAK being pressed
 extern int  __LIB__ zx_break(void);
+
+// Set console cursor position, top-left=(0;0)
+extern int  __LIB__ __CALLEE__   zx_setcursorpos_callee(int x, int y);
+#define zx_setcursorpos(a,b)           zx_setcursorpos_callee(a,b)
 
 
 ///////////////////////////////////////////
@@ -205,6 +213,32 @@ extern void __LIB__ __CALLEE__   zx_setint_callee(char *variable, int value);
 #define zx_setstr(a,b)           zx_setstr_callee(a,b)
 #define zx_setint(a,b)           zx_setint_callee(a,b)
 #define zx_setfloat(a,b)         zx_setfloat_callee(a,b)
+
+
+////////////
+// TAPE I/O
+////////////
+
+#define LDERR_OK                  0
+#define LDERR_WRONG_DATA          1
+#define LDERR_VERIFY_ERROR        2
+#define LDERR_WAIT_TIMEOUT        3
+#define LDERR_WRONG_BLOCK_TYPE    4
+
+extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned char type);
+
+// SAVE - return with nonzero if BREAK is pressed
+// example values for custom speed:
+// 3  = 4800 bps, 9  = 3600 bps
+// 20 = 2400 bps, 40 = 1200 bps
+extern int  __LIB__            tape_save_block(void *addr, size_t len, unsigned char type);
+
+extern int  __LIB__ __CALLEE__ tape_load_block_callee(void *addr, size_t len, unsigned char type);
+extern int  __LIB__ __CALLEE__ tape_save_block_callee(void *addr, size_t len, unsigned char type);
+
+#define tape_save_block(a,b,c) tape_save_block_callee(a,b,c)
+#define tape_load_block(a,b,c) tape_load_block_callee(a,b,c)
+
 
 
 #endif

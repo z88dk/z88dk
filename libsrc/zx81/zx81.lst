@@ -29,3 +29,9 @@ zx81/basic/zx_setint_callee.asm
 zx81/basic/zx_setstr.asm
 zx81/basic/zx_setstr_callee.asm
 zx81/basic/zx_var_length.asm
+zx81/tape/musamy_save.asm
+zx81/tape/tape_save_block.asm
+zx81/tape/tape_save_block_callee.asm
+zx81/tape/musamy_load.asm
+zx81/tape/tape_load_block.asm
+zx81/tape/tape_load_block_callee.asm
