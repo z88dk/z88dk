@@ -8,15 +8,7 @@
 
 XLIB musamy_load
 
-LIB zx_fast
-LIB zx_slow
 
-musamy_load:
-		push hl
-		call zx_fast
-		pop hl	; L=0 -> LOAD, L=40h -> Verify
-
-		jr LDENTRY
 
 L00D5:	CCF
 L00D6:	EXX
@@ -72,17 +64,12 @@ L011E:	LD A,C
 		EXX
 		DEC E
 		ld hl,0
-		JR Z,LOADOK ;  load or verify successful
+		JR Z,FINISH ;  load or verify successful
 LOADERR:
 		inc hl
 		;RST 08h		; ERROR 'F'
 		;	DEFB 0Eh	; 'Invalid Program Name' (probably due to noise in the LOAD phase)
-LOADOK:
-		push hl
 FINISH:
-		call zx_slow
-
-		pop hl
 
 		pop af ; balance stack
 		pop af ; balance stack
@@ -96,8 +83,9 @@ L012C:	CP 0Ah		; A <- just loaded with H
 
 
 ; - ENTRY for LOAD
-LDENTRY:
-		LD H,0Ch ; TIMEOUT
+musamy_load:
+;		LD H,0Ch ; TIMEOUT
+		LD H,02h ; TIMEOUT
 
 L0132:	RES 3,L  ; 0000X000 ; init leader pulses mode 
 
@@ -117,8 +105,8 @@ L013B:	IN A,(FEh)	; read tape + key row + set output bit low
 		JR NZ,L0139
 		
 		pop hl
+		pop hl
 		ld hl,3
-		ex (sp),hl
 		JR FINISH
 ;L0148:	RST 08h		; ERROR
 ;			DEFB 1Ch	; 'T'
@@ -221,6 +209,5 @@ L018F:	EXX
 V_ERR:	; VERIFY ERROR
 		ld hl,2
 		push hl	; balance stack
-		push hl
 		JP FINISH
 

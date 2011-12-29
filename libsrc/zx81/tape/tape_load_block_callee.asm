@@ -9,6 +9,10 @@
 XLIB tape_load_block_callee
 XDEF ASMDISP_TAPE_LOAD_BLOCK_CALLEE
 
+LIB zx_fast
+LIB zx_slow
+
+
 ; Very simple header, only check the 'type' byte in a Spectrum-ish way.
 ; For design reasons, we test a whole word..
 ;-----
@@ -37,6 +41,7 @@ LIB  musamy_load
 		LD (header),bc	; LEN
 		
 		ld	e,a
+.ld_retry
 		push de
 		ld hl,rethere
 		push hl
@@ -49,18 +54,31 @@ LIB  musamy_load
 		LD HL,header2
 		PUSH HL
 
+		call zx_fast
+
 		;LD L,40h		; VERIFY MODE
 		LD L,0			; LOAD MODE
 		jp musamy_load
 
 .rethere
+		push hl
+		call zx_slow
+		call $f46	; BREAK-1
+		pop hl
 		pop de
+		ret nc	; if BREAK is pressed, return; timeout error code is valid for BREAK too
+		ld a,3
+		cp l	; timeout ?
+		jr z,ld_retry
+
 		xor a
 		or l
 		ret nz	; other errors
+
 		ld a,(header2)
 		cp e
 		ret z	; all OK
+
 		ld l,4	; file type error		
 		ret
 

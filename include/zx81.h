@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.23 2011-12-28 14:04:54 stefano Exp $
+ * $Id: zx81.h,v 1.24 2011-12-29 18:19:50 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -219,11 +219,11 @@ extern void __LIB__ __CALLEE__   zx_setint_callee(char *variable, int value);
 // TAPE I/O
 ////////////
 
-#define LDERR_OK                  0
-#define LDERR_WRONG_DATA          1
+#define LDERR_OK                  0       // LOAD OK
+#define LDERR_WRONG_DATA          1       // LOAD error
 #define LDERR_VERIFY_ERROR        2
-#define LDERR_WAIT_TIMEOUT        3
-#define LDERR_WRONG_BLOCK_TYPE    4
+#define LDERR_BREAK               3       // BREAK pressed
+#define LDERR_WRONG_BLOCK         4       // LOAD error: loaded block has wrong type
 
 extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned char type);
 
