@@ -9,10 +9,10 @@ XREF ASMDISP_ZX_SETCURSORPOS_CALLEE
 zx_setcursorpos:
 
    pop bc
-   pop hl
    pop de
-   push de
+   pop hl
    push hl
+   push de
    push bc
    
    jp zx_setcursorpos_callee + ASMDISP_ZX_SETCURSORPOS_CALLEE

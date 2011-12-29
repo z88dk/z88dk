@@ -7,7 +7,7 @@
 ;	int __CALLEE__ zx_setstr_callee(char variable, char *value);
 ;
 ;
-;	$Id: zx_setcursorpos_callee.asm,v 1.1 2011-12-01 17:46:45 stefano Exp $
+;	$Id: zx_setcursorpos_callee.asm,v 1.2 2011-12-29 21:49:18 stefano Exp $
 ;
 
 XLIB	zx_setcursorpos_callee
@@ -22,12 +22,14 @@ DEFC    COLUMN=$4039    ; S_POSN_x
 zx_setcursorpos_callee:
 
 	pop   bc
-	pop   hl
-	pop   de
+	pop de
+	pop hl
+	push hl
+	push de
 	push  bc
 
-; enter : l = y
-;         e = x
+; enter : l = x
+;         e = y
 
 .asmentry
 	ld d,l
