@@ -4,6 +4,9 @@
 ;      Internal routine for Musamy style turbo tape
 ;      Load (L=0) and verify (L=0x40), speed auto-calibration
 ;
+;
+;	$Id: musamy_load.asm,v 1.3 2012-01-09 16:02:36 stefano Exp $
+;
 
 
 XLIB musamy_load

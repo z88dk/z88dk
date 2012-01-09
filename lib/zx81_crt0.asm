@@ -6,11 +6,25 @@
 ;
 ;       ZX81 will be thrown in FAST mode by default.
 ;       The "startup=2" parameter forces the SLOW mode.
-;	Values for "startup" from 3 to 6 activate the HRG modes
+;       Values for "startup" from 3 to 6 activate the WRX HRG modes
+;       Values between 13 and 17 activate the ARX HRG modes
+;
+;
+;       OPTIMIZATIONS:
+;
+;       If in HRG mode it is possible to exclude the SLOW mode text with the
+;       '-Dnoslowfix' parameter it helps to save some memory.
+;
+;       If in WRX HRG mode a static position for HRGPAGE cam be defined in 
+;       program (i.e. "#pragma output hrgpage=32768"), moving the video frame
+;       over the stack instead than lowering it.  The automatic HRG page locator
+;       is also disabled too, ripping off about 13 bytes.
+;       In any case by POKEing at address 16518/16519 of the compiled program 
+;       the HRG page position can be still changed by the user for custom needs.
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.33 2011-12-28 14:04:54 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.34 2012-01-09 16:02:36 stefano Exp $
 ;
 ; - - - - - - -
 

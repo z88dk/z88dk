@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.24 2011-12-29 18:19:50 stefano Exp $
+ * $Id: zx81.h,v 1.25 2012-01-09 16:02:35 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -179,8 +179,9 @@ extern void __LIB__ zx_slow();
 extern int  __LIB__ zx_break(void);
 
 // Set console cursor position, top-left=(0;0)
+extern int  __LIB__              zx_setcursorpos(int x, int y);
 extern int  __LIB__ __CALLEE__   zx_setcursorpos_callee(int x, int y);
-#define zx_setcursorpos(a,b)           zx_setcursorpos_callee(a,b)
+#define zx_setcursorpos(a,b)     zx_setcursorpos_callee(a,b)
 
 
 ///////////////////////////////////////////
@@ -231,6 +232,7 @@ extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned 
 // example values for custom speed:
 // 3  = 4800 bps, 9  = 3600 bps
 // 20 = 2400 bps, 40 = 1200 bps
+extern void __LIB__ __FASTCALL__ set_tape_speed(unsigned char speed);
 extern int  __LIB__            tape_save_block(void *addr, size_t len, unsigned char type);
 
 extern int  __LIB__ __CALLEE__ tape_load_block_callee(void *addr, size_t len, unsigned char type);
@@ -238,7 +240,6 @@ extern int  __LIB__ __CALLEE__ tape_save_block_callee(void *addr, size_t len, un
 
 #define tape_save_block(a,b,c) tape_save_block_callee(a,b,c)
 #define tape_load_block(a,b,c) tape_load_block_callee(a,b,c)
-
 
 
 #endif

@@ -7,7 +7,6 @@ LIB zx_setcursorpos_callee
 XREF ASMDISP_ZX_SETCURSORPOS_CALLEE
 
 zx_setcursorpos:
-
    pop bc
    pop de
    pop hl

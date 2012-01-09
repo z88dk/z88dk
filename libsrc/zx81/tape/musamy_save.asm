@@ -1,8 +1,15 @@
 ;
+;      ZX81 Tape save routine
+;
+;
 ;      Musamy Save
 ;
 ;      Internal routine for Musamy style turbo tape
 ;      Save data !  ...set custom speed in (SAVE_SPEED+1)
+;
+;
+;	$Id: musamy_save.asm,v 1.2 2012-01-09 16:02:36 stefano Exp $
+;
 ;
 ; speed extimations:
 ; 3  = 4800 bps
@@ -17,13 +24,7 @@ XLIB musamy_save
 XDEF SAVE_SPEED
 
 
-LIB zx_fast
-LIB zx_slow
-
 musamy_save:
-
-
-		call zx_fast
 
 
 ; Leading pause
@@ -36,15 +37,15 @@ DLOOP:	DEC BC
 		DEC D
 		JR NZ,SILNC
 
-; Leader tone
+; Begin
 		LD L,06h	; @00000110
-LEADER:	LD C,11h
+LEADER:	LD C,11h	; Leading pulses count
 
-L01EE:	DEC C
+SLOOP:	DEC C
 		JR NZ,L0264
 
-		BIT 3,L		; @0000?000
-		JR NZ,RETURN ; set ? - RET !
+		BIT 3,L		; @0000?000   are we in the last phase ?
+		JR NZ,RETOK ; if so, return
 
 		BIT 2,L		; @00000?00
 		JR Z,NO_GAP
@@ -73,27 +74,25 @@ L020C:	SCF
 		LD L,00h
 		JR L0223
 
-RETURN:	;RET
-		call	zx_slow
-		ld	hl,0
+RETOK:	ld	hl,0
 		ret
 
 L0214:	LD B,0Eh
-L0216:	DJNZ L0216 ;
+DLY1:	DJNZ DLY1
 		LD A,D
 		RLA
 		RLA
 		LD B,A
-L021C:	DJNZ L021C ;
+DLY2:	DJNZ DLY2
 		SCF
-		JR L01EE
+		JR SLOOP
 
 
 L0222:	CCF
 
 L0223:	RL E
 		JR NZ,L0229
-		INC L		; update status flags: 00000110, 00000111, 00001000.
+		INC L		; update status flags: 00000110, 00000111...  then forced to 00001010
 		LD C,L
 
 L0229:	RL L
@@ -104,29 +103,29 @@ SAVE_SPEED:
 
 L0230:	LD D,A
 		LD B,D
-L0232:	DJNZ L0232 ;
+DLY3:	DJNZ DLY3
 		LD B,06h
-L0236:	DJNZ L0236 ;
+DLY4:	DJNZ DLY4 ;
 		IN A,(FEh)	; read tape + key row + set output bit low
 		XOR A
-		BIT 1,L
-		JR NZ,L0214
-		BIT 0,L
-		JR Z,L024D
+		BIT 1,L		; @000000?0
+		JR NZ,L0214 ; 
+		BIT 0,L		; @0000000?	; 
+		JR Z,L024D  ; jp if in the leader pulses phase (begin or end)
 		LD L,A
 		LD B,04h
-L0246:	DJNZ L0246 ;
+DLY5:	DJNZ DLY5
 		LD B,D
-L0249:	DJNZ L0249 ;
+DLY6:	DJNZ DLY6
 		JR L0223
 
 L024D:	LD L,A
 		LD B,08h
-L0250:	DJNZ L0250 ;
+DLY7:	DJNZ DLY7
 		LD A,D
 		RLA
 		LD B,A
-L0255:	DJNZ L0255 ;
+DLY8:	DJNZ DLY8
 		LD A,7Fh
 		IN A,(FEh)	; read tape + key row + set output bit low
 		RRA
@@ -140,17 +139,17 @@ cleansp:
 		dec hl	; Exit with error code '-1'
 		ret
 
-L0260:	LD L,0Ah
+TRAIL:	LD L,0Ah	; set flags status:  @00001010
 		JR LEADER
 
 L0264:	LD B,0Ch
-L0266:	DJNZ L0266 ;
+DLY9:	DJNZ DLY9
 		JR L022B
 
 NEXT_BLOCK:
 		POP HL
 		LD A,H
 		AND A
-		JR Z,L0260
+		JR Z,TRAIL
 		PUSH HL
 		JR L020C

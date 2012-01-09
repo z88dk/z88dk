@@ -13,6 +13,9 @@ XREF ASMDISP_TAPE_SAVE_BLOCK_CALLEE
 	ld a,c
 	pop bc
 	pop hl
+	push hl
+	push bc
+	push bc	; altered !
 	push de
 
    jp tape_save_block_callee + ASMDISP_TAPE_SAVE_BLOCK_CALLEE

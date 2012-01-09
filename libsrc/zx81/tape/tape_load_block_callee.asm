@@ -4,6 +4,9 @@
 ;
 ;      int __CALLEE__ tape_load_block_callee(void *addr, size_t len, unsigned char type)
 ;
+;
+;	$Id: tape_load_block_callee.asm,v 1.3 2012-01-09 16:02:36 stefano Exp $
+;
 
 
 XLIB tape_load_block_callee
