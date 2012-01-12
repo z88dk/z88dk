@@ -19,9 +19,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.26 2011-10-14 15:02:39 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.27 2012-01-12 18:53:58 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.26  2011-10-14 15:02:39  pauloscustodio
+/* Revision 1.27  2012-01-12 18:53:58  pauloscustodio
+/* comment
+/*
+/* Revision 1.26  2011/10/14 15:02:39  pauloscustodio
 /* Version 1.1.12
 /*
 /* Revision 1.25  2011/10/07 17:56:02  pauloscustodio
@@ -797,6 +800,8 @@ Based on 1.0.31
 	(reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
 	- path_remove_ext() removed everything after last ".", ignoring directory
 	  separators. Fixed.
+
+    - srcext initialization moved from main() to ResetOptions()
 
 -------------------------------------------------------------------------------
 07.10.2011 [1.1.11] (pauloscustodio)
