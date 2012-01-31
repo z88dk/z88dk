@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2011
  *
- *		$Id: flos.h,v 1.3 2011-08-04 14:10:12 stefano Exp $
+ *		$Id: flos.h,v 1.4 2012-01-31 20:58:07 stefano Exp $
  * 
  */
 
@@ -177,6 +177,11 @@ extern void __LIB__ page_out_video();
 // Wait video HW to be ready
 extern void __LIB__ wait_vrt();
 extern int __LIB__ __FASTCALL__ flos_paper(int color);
+
+// Memory bank control (range: 0 - 14)
+//	Set/Get which of the 32KB banks is mapped into address space $8000-$ffff
+extern int __LIB__ get_bank();
+extern void __LIB__ __FASTCALL__ set_bank(int bank);
 
 // Disk control
 extern int __LIB__ __FASTCALL__ change_volume(int volume);

@@ -3,7 +3,7 @@
 ;       Stefano - Sept 2011
 ;
 ;
-;	$Id: clg.asm,v 1.1 2011-09-02 12:43:57 stefano Exp $
+;	$Id: clg.asm,v 1.2 2012-01-31 20:58:07 stefano Exp $
 ;
 
     INCLUDE "flos.def"
@@ -11,6 +11,8 @@
 
                 XLIB    clg
                 
+                LIB     swapgfxbk
+                XREF    swapgfxbk1
                 XREF	base_graphics
 
 .clg
@@ -20,7 +22,9 @@
 
 	ld a,0
 	ld (vreg_rasthi),a		; select y window reg
-	ld a,$5a
+	;ld a,$5a
+	;ld a,$2e
+	ld a,64
 	ld (vreg_window),a		; set y window size/position (200 lines)
 	ld a,@00000100
 	ld (vreg_rasthi),a		; select x window reg
@@ -59,50 +63,41 @@
 
 
 	call kjt_wait_vrt		; wait for last line of display
-	call kjt_page_in_video	; page video RAM in at $2000-$3fff
+	call swapgfxbk
 	
 	ld	hl,$2000
 	ld	(base_graphics),hl
 		
-	;ld	d,h
-	;ld	e,l
-	;ld	bc,8000
-	;inc de
-	;ld	(hl),0
-	;ldir
-	
-		ld	hl,0
-		ld	d,h
-		ld	e,h
-		ld	b,h
-		add	hl,sp
-		ld	sp,$2000+$2000
+	ld	hl,0
+	ld	d,h
+	ld	e,h
+	ld	b,h
+	di
+	add	hl,sp
+	ld	sp,$2000+$2000
 .clgloop
-		push	de
-		push	de
-		push	de
-		push	de
+	push	de
+	push	de
+	push	de
+	push	de
 
-		push	de
-		push	de
-		push	de
-		push	de
+	push	de
+	push	de
+	push	de
+	push	de
 
-		push	de
-		push	de
-		push	de
-		push	de
+	push	de
+	push	de
+	push	de
+	push	de
 
-		push	de
-		push	de
-		push	de
-		push	de
+	push	de
+	push	de
+	push	de
+	push	de
 
-		djnz	clgloop
+	djnz	clgloop
 
-		ld	sp,hl
+	ld	sp,hl
 
-	
-	call kjt_page_out_video	; page video RAM out of $2000-$3fff
-
-	ret
+	jp swapgfxbk1

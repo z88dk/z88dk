@@ -4,7 +4,7 @@ lstoff
 ;
 ; Aug 2011
 ;
-; $Id: osca.def,v 1.1 2011-09-02 12:43:56 stefano Exp $
+; $Id: osca.def,v 1.2 2012-01-31 20:58:07 stefano Exp $
 ;
 
 ;----- OSCA v659 Main system hardware control / peripheral ports -------------
@@ -57,7 +57,7 @@ defc	audchan3_vol	= $1f
 
 ;------ Graphics registers -------------------------------------------------
 
-defc	palette 		= $0		
+defc	palette 		= $0
 
 defc	video_registers	= $200
 defc	vreg_xhws		= $200		; video control registers
@@ -90,7 +90,7 @@ defc	linedraw_reg0 	= $220		; line draw set-up registers (WORDS)
 defc	linedraw_reg1 	= $222
 defc	linedraw_reg2 	= $224
 defc	linedraw_reg3 	= $226
-defc	linedraw_reg4 	= $228		
+defc	linedraw_reg4 	= $228
 defc	linedraw_reg5 	= $22a
 defc	linedraw_reg6 	= $22c
 defc	linedraw_reg7 	= $22e
@@ -98,7 +98,7 @@ defc	linedraw_lut0 	= $230		; line draw look-up table (WORDS)
 defc	linedraw_lut1 	= $232
 defc	linedraw_lut2 	= $234
 defc	linedraw_lut3 	= $236
-defc	linedraw_lut4 	= $238		
+defc	linedraw_lut4 	= $238
 defc	linedraw_lut5 	= $23a
 defc	linedraw_lut6 	= $23c
 defc	linedraw_lut7 	= $23e

@@ -19,6 +19,10 @@ graphics/osca/w_putsprite
 graphics/osca/w_stencil_render
 graphics/draw_profile
 graphics/w_pointxy
+graphics/osca/cclg
+graphics/osca/cplot
+graphics/osca/cplotpixel
+games/osca/joystick
 osca/flos_paper
 osca/osca_version
 osca/flos_version
@@ -42,6 +46,7 @@ osca/create_file
 osca/erase_file
 osca/rename_file
 osca/delete_dir
+osca/osca_set_palette
 osca/parent_dir
 osca/root_dir
 osca/dir_move_first
@@ -52,4 +57,6 @@ osca/dir_get_entry_type
 osca/store_dir_position
 osca/restore_dir_position
 osca/change_dir
+osca/get_bank
+osca/set_bank
 @z80.lst

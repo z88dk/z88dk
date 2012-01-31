@@ -10,7 +10,7 @@
  *      Stefano has converted many of these routines to the new ports
  *      Some will work, some will not. djm 6/6/2000
  *
- *	$Id: graphics.h,v 1.11 2010-09-19 00:24:08 dom Exp $
+ *	$Id: graphics.h,v 1.12 2012-01-31 20:58:07 stefano Exp $
  */
 
 #ifndef __GFX_H__
@@ -68,7 +68,7 @@ extern __LIB__ xorborder(int tlx, int tly, int width, int height);
 extern __LIB__ circle(int x, int y, int radius, int skip);
 /* Undraw a circle */
 extern __LIB__ uncircle(int x, int y, int radius, int skip);
-/* Clear map */
+/* Init GFX mode and clear map */
 extern __LIB__ clg(void);
 /* Clear area of map */
 extern __LIB__ clga(int tlx, int tly, int width, int height);
@@ -113,10 +113,20 @@ extern __LIB__ lscroll(int x, int y, int width, int height, int pixels);
 extern __LIB__ rscroll(int x, int y, int width, int height, int pixels);
 /* Close the map */
 extern __LIB__ closegfx(struct window *);
+
+/* Colour graphics, only few targets are supported */
+/* Init GFX mode and clear map */
+extern __LIB__ cclg(void);
+/* Plot a pixel to screen */
+extern __LIB__ cplot(int x, int y, int color);
+/* Draw a line */
+extern __LIB__ cdraw(int x1, int y1, int x2, int y2, int color);
+/* Draw a circle */
+extern __LIB__ ccircle(int x, int y, int radius, int skip, int color);
+/* Relative draw */
+extern __LIB__ cdrawr(int px, int py, int color);
 #endif
 
 
-
 #endif
-
 
