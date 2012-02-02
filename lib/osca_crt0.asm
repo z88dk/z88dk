@@ -2,11 +2,21 @@
 ;
 ;       Stefano Bodrato - Jul. 2011
 ;
-;	$Id: osca_crt0.asm,v 1.4 2011-09-02 12:43:56 stefano Exp $
+;
+;       EXTRA OPTIONS:
+;
+;		At C source level:
+;       #pragma output osca_bank=(0..14) set the memory bank for locations > 32768 before loading program
+;		#pragma output osca_stack=<value> put the stack in a differen place, i.e. 32767
+;
+;       At compile time:
+;		-zorg=<location> parameter permits to specify the program position
+;
+;	$Id: osca_crt0.asm,v 1.5 2012-02-02 16:12:58 stefano Exp $
 ;
 
 
-                MODULE  ace_crt0
+                MODULE  osca_crt0
 
 ;
 ; Initially include the zcc_opt.def file to find out lots of lovely
@@ -18,8 +28,8 @@
 ; No matter what set up we have, main is always, always external to
 ; this file
 
-                XREF    _main
-		XDEF	snd_tick
+        XREF    _main
+        XDEF	snd_tick
 ;
 ; Some variables which are needed for both app and basic startup
 ;
@@ -34,7 +44,7 @@
 ; vprintf is internal to this file so we only ever include one of the set
 ; of routines
 
-	XDEF	_vfprintf
+        XDEF	_vfprintf
 
 ;Exit variables
 
@@ -46,11 +56,11 @@
         XDEF    __sgoioblk
 
        	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+        XDEF	heapblocks
 
 ; Graphics stuff
-	XDEF	base_graphics
-	XDEF	coords
+        XDEF	base_graphics
+        XDEF	coords
 
 ; Now, getting to the real stuff now!
 
@@ -63,24 +73,35 @@
         ENDIF
 
 
-	IF (myzorg = $5000)
+	IF ((myzorg = $5000) ~ (!DEFINED_osca_bank))
                 org		myzorg
 	ELSE
 				; optional Program Location File Header
-				org		myzorg-9
+				org		myzorg
 				defb	$ed
 				defb	$00
 				jr	start
 				defw	myzorg
-				defb	$0e	; bank
-				defb	$00				
+		IF DEFINED_osca_bank
+				defb	osca_bank
+		ELSE
+				defb    0
+		ENDIF
+				defb	$00 ; control byte: 1=truncate using next 3 bytes
+				;defw	0   ; Load length 15:0 only needed if truncate flag is set
+				;defb	0	; Load length ..bits 23:16, only needed if truncate flag is set
 	ENDIF
 	
 start:
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
+IF (!DEFINED_osca_stack)
         ld      sp,-64
+ELSE
+        ld      sp,osca_stack
+ENDIF
+        ;ld      sp,$7FFF
         ld      (exitsp),sp
 
 IF !DEFINED_nostreams
@@ -106,13 +127,13 @@ IF DEFINED_ANSIstdio
 	call	closeall
 ENDIF
 ENDIF
-	pop	bc
+        call	$10c4 ; kjt_flos_display (added in v547)
+        pop	bc
 start1:
         ld  sp,0
-        ;;ld  a,c	; return code (lowest byte only)
-        call	$10c4 ; kjt_flos_display (added in v547)
-
-        xor a ; (set A and flags for RESULT=OK)
+        ld  a,c	; return code (lowest byte only)
+        and a	; set Z flag to set the eventual error condition
+        ;xor a ; (set A and flags for RESULT=OK)
         ret
 
 l_dcal:

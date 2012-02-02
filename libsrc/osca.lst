@@ -59,4 +59,5 @@ osca/restore_dir_position
 osca/change_dir
 osca/get_bank
 osca/set_bank
+osca/inc_bank
 @z80.lst
