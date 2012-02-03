@@ -7,7 +7,7 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: cnvtab.asm,v 1.2 2007-12-19 18:13:43 stefano Exp $
+;	$Id: cnvtab.asm,v 1.3 2012-02-03 13:37:36 stefano Exp $
 ;
 
 	XLIB	zx81_cnvtab
@@ -28,6 +28,8 @@
 	defb	13
 	defb	11
 	defb	'"'
+	defb	9
+	defb	'_'
 	defb	12
 	defb	'£'
 	defb	13

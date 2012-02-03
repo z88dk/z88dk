@@ -4,7 +4,7 @@
 ;	gets(char *s) - get string from console
 ;
 ;
-;	$Id: gets.asm,v 1.2 2010-11-03 10:03:49 stefano Exp $
+;	$Id: gets.asm,v 1.3 2012-02-03 13:37:36 stefano Exp $
 ;
 
 
@@ -36,11 +36,10 @@
 	cp		12
 	jr		nz,nobs
 .bs
-	ld		a,h	; are we at beginning of buffer ?
-	sub		d
-	jr		nz,dobs
-	ld		a,l
-	sub		e
+	push	hl
+	and		a
+	sbc		hl,de
+	pop		hl
 	jr		z,getloop
 .dobs
 	call	wipecursor
