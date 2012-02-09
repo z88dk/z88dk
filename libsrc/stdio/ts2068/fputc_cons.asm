@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.3 2010-11-29 08:48:11 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.4 2012-02-09 09:03:33 stefano Exp $
 ;
 
 
@@ -33,7 +33,11 @@
 	cp    6
 	jr    nz,normal
 	dec   (hl)
-	call  doswitch32	; with the 512 dots mode we always have 64 columns
+	ld	hl,print32     ; with the 512 dots (64 cols) mode we print in 32 column mode..
+	ld	(print1+1),hl
+	xor	a              ; .. with column increment of a single byte
+	ld	(left2),a
+	ld	(right2),a
 .normal
 	ld	hl,2
 	add	hl,sp
@@ -362,6 +366,7 @@
         and     a
         ret     z
         dec     l
+.left2  nop
         ld      (chrloc),hl
         ret
 
@@ -371,6 +376,7 @@
         cp      63
         ret     z
         inc     l
+.right2 nop
         ld      (chrloc),hl
         ret
 
@@ -570,12 +576,19 @@
 	ret
 
 .doswitch
+	xor	a
+	ld	(left2),a
+	ld	(right2),a
 	ld	a,(params)
 	ld	hl,print64
 	ld	(print1+1),hl
 	cp	64
 	ret	z
 .doswitch32
+	ld	a,$2d
+	ld	(left2),a
+	dec	a
+	ld	(right2),a
 	ld	hl,print32
 	ld	(print1+1),hl
 	ret

@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.5 2007-06-24 17:14:21 dom Exp $
+;	$Id: fputc_cons.asm,v 1.6 2012-02-09 09:03:33 stefano Exp $
 ;
 
 
@@ -272,6 +272,7 @@
         and     a
         ret     z
         dec     l
+.left2  nop
         ld      (chrloc),hl
         ret
 
@@ -281,6 +282,7 @@
         cp      63
         ret     z
         inc     l
+.right2 nop
         ld      (chrloc),hl
         ret
 
@@ -467,11 +469,18 @@
 	ret
 
 .doswitch
+	xor	a
+	ld	(left2),a
+	ld	(right2),a
 	ld	a,(params)
 	ld	hl,print64
 	ld	(print1+1),hl
 	cp	64
 	ret	z
+	ld	a,$2d
+	ld	(left2),a
+	dec	a
+	ld	(right2),a
 	ld	hl,print32
 	ld	(print1+1),hl
 	ret
