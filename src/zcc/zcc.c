@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.52 2011-06-26 16:07:29 dom Exp $
+ *      $Id: zcc.c,v 1.53 2012-02-11 12:34:10 dom Exp $
  */
 
 
@@ -164,7 +164,7 @@ static char            extension[5];
 #define ASM_GNU    3
 static int             assembler_type = ASM_Z80ASM;
 static enum iostyle    assembler_style = outimplied;
-static char           *sdcc_assemblernames[] = { "z80asm", "asxxxx", "vasm", "gnu" };
+static char           *sdcc_assemblernames[] = { "z80asm", "asxxxx", "z80asm", "binutils" };
 static int             linker_output_separate_arg = 0;
 
 #define CC_SCCZ80 0 
@@ -200,7 +200,7 @@ static arg_t     myargs[] = {
     {"create-app", AF_BOOL_TRUE, SetBoolean, &createapp, "Run appmake on the resulting binary to create emulator usable file"},
     {"usetemp", AF_BOOL_TRUE, SetBoolean, &usetemp, "(default) Use the temporary directory for intermediate files"},
     {"notemp", AF_BOOL_FALSE, SetBoolean, &usetemp, "Don't use the temporary directory for intermediate files"},
-    {"asm", AF_MORE, SetAssembler, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm)"},
+    {"asm", AF_MORE, SetAssembler, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm, binutils)"},
     {"compiler", AF_MORE, SetCompiler, NULL, "Set the compiler type from the command line (sccz80, sdcc)"},
     { "pragma-define",AF_MORE,PragmaDefine,NULL,"Define the option in zcc_opt.def" },
     { "pragma-need",AF_MORE,PragmaNeed,NULL,"NEED the option in zcc_opt.def" },
@@ -543,7 +543,7 @@ main(int argc, char **argv)
         }
     }
 
-    if ((fp = fopen(DEFFILE, "w")) != NULL) {
+    if ((fp = fopen(DEFFILE, "a")) != NULL) {
         fprintf(fp,"%s", zccopt ? zccopt : "");
         fclose(fp);
     } else {
@@ -1153,7 +1153,7 @@ SetAssemblerType(char *name)
 
         style = outspecified_flag;
         linker_output_separate_arg = 1;
-    } else if (strcasecmp(name, "gnu") == 0 ) {
+    } else if (strcasecmp(name, "binutils") == 0 ) {
         type = ASM_GNU;
         linker = "z80-unknown-coff-ld";
         assembler = "z80-unknown-coff-as";
