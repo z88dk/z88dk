@@ -12,7 +12,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.5 2012-02-02 16:12:58 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.6 2012-02-16 07:04:08 stefano Exp $
 ;
 
 
@@ -87,12 +87,17 @@
 		ELSE
 				defb    0
 		ENDIF
-				defb	$00 ; control byte: 1=truncate using next 3 bytes
+				defb	$00 ; control byte: 1=truncate basing on next 3 bytes
 				;defw	0   ; Load length 15:0 only needed if truncate flag is set
 				;defb	0	; Load length ..bits 23:16, only needed if truncate flag is set
 	ENDIF
 	
 start:
+		;push	hl
+		;pop		bc
+		ld	b,h
+		ld	c,l
+
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
@@ -115,7 +120,73 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stderr
 ENDIF
 ENDIF
-        call    _main
+
+
+	; Push pointers to argv[n] onto the stack now
+	; We must start from the end 
+		ld	hl,0	;NULL pointer at end, just in case
+		push	hl
+
+		ld	h,b    ; ptr to argument list
+		ld	l,c
+		ld	b,0    ; parameter counter
+		ld	c,b    ; character counter
+
+		ld	a,(hl)
+		and	a
+		jr	z,argv_done
+
+		dec hl
+	find_end:
+		inc	hl
+		inc c
+		ld	a,(hl)
+		and	a
+		jr	nz,find_end
+		dec hl
+		; now HL points to the end of command line
+		; and C holds the length of args buffer
+		
+	; Try to find the end of the arguments
+	argv_loop_1:
+		ld	a,(hl)
+		cp	' '
+		jr	nz,argv_loop_2
+		ld	(hl),0
+		dec	hl
+		dec	c
+		jr	nz,argv_loop_1
+	; We've located the end of the last argument, try to find the start
+	argv_loop_2:
+		ld	a,(hl)
+		cp	' '
+		jr	nz,argv_loop_3
+		ld	(hl),0
+		inc	hl
+		push	hl
+		inc	b
+		dec	hl
+	argv_loop_3:
+		dec	hl
+		dec	c
+		jr	nz,argv_loop_2
+
+	argv_done:
+		ld	hl,end	;name of program (NULL)
+		push	hl
+		inc	b
+		ld	hl,0
+		add	hl,sp	;address of argv
+		ld	c,b
+		ld	b,0
+		push	bc	;argc
+		push	hl	;argv
+
+			call    _main		;Call user code
+
+		pop	bc	;kill argv
+		pop	bc	;kill argc
+
 cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
@@ -128,13 +199,21 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
         call	$10c4 ; kjt_flos_display (added in v547)
-        pop	bc
+        pop	hl
 start1:
         ld  sp,0
-        ld  a,c	; return code (lowest byte only)
+        ld	a,h	; is it a string ptr rather than a single byte ?
+        and	a
+        jr	nz,spawn
+        ld  a,l	; return code (lowest byte only)
         and a	; set Z flag to set the eventual error condition
         ;xor a ; (set A and flags for RESULT=OK)
         ret
+
+spawn:	
+		; HL = ptr to command string
+		ld	a,$fe	; ret code for 'spawn command'
+		ret
 
 l_dcal:
         jp      (hl)
@@ -170,30 +249,25 @@ ENDIF
 
 
 ;Seed for integer rand() routines
-
-_std_seed:      defw    0
+_std_seed:       defw    0
 
 ;Atexit routine
-
-exitsp:
-                defw    0
-exitcount:
-                defb    0
+exitsp:          defw    0
+exitcount:       defb    0
 
 ; Heap stuff
-
-heaplast:	defw	0
-heapblocks:	defw	0
+heaplast:        defw    0
+heapblocks:      defw    0
 
 ; mem stuff
+base_graphics:   defw    $2000
+coords:          defw    0
+snd_tick:        defb    0
 
-base_graphics:
-		defw	$2000
-coords:		defw	0
-snd_tick:	defb	0
-
+; Signature
          defm  "Small C+ OSCA"
-	 defb  0
+end:
+         defb  0
 
 ;All the float stuff is kept in a different file...for ease of altering!
 ;It will eventually be integrated into the library

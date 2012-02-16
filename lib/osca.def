@@ -4,7 +4,7 @@ lstoff
 ;
 ; Aug 2011
 ;
-; $Id: osca.def,v 1.2 2012-01-31 20:58:07 stefano Exp $
+; $Id: osca.def,v 1.3 2012-02-16 07:04:08 stefano Exp $
 ;
 
 ;----- OSCA v659 Main system hardware control / peripheral ports -------------

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.15 2009-06-22 21:20:05 dom Exp $
+;       $Id: cpc_crt0.asm,v 1.16 2012-02-16 07:04:08 stefano Exp $
 ;
 
         MODULE  cpc_crt0
@@ -59,11 +59,13 @@
 ;--------
 
 start:
+IF (startup=2)
         ld      hl,($39)        ; Original Interrupt code
         ld      (oldint),hl
         ld      hl,newint       ; Point to a null handler (increase stability)
         ld      ($39),hl
-        
+ENDIF
+;        di
         ld      (start1+1),sp
         ld      hl,-6530
         add     hl,sp
@@ -108,10 +110,13 @@ ENDIF
         ld      bc,(firmware_bc)        ; restore BC'
         exx
 
+IF (startup=2)
         ld      hl,(oldint)
         ld      ($39),hl
+ENDIF
         
 start1: ld      sp,0
+        ei
         ret
 
 l_dcal: jp      (hl)
@@ -178,10 +183,10 @@ fasign:         defb    0
 
 ENDIF
 
-
+IF (startup=2)
 newint:
         ei
         reti
-
 oldint:
         defw 0
+ENDIF
