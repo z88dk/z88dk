@@ -12,7 +12,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.6 2012-02-16 07:04:08 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.7 2012-02-17 07:51:48 stefano Exp $
 ;
 
 
@@ -191,7 +191,7 @@ cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
-	push	hl
+        push	hl
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 	LIB	closeall
@@ -202,18 +202,15 @@ ENDIF
         pop	hl
 start1:
         ld  sp,0
-        ld	a,h	; is it a string ptr rather than a single byte ?
-        and	a
-        jr	nz,spawn
+        xor a
+        or  h	; ATM we are not mamaging the 'spawn' exception
+        jr	nz,cmdok
+        ld	l,a
+cmdok:
         ld  a,l	; return code (lowest byte only)
         and a	; set Z flag to set the eventual error condition
         ;xor a ; (set A and flags for RESULT=OK)
         ret
-
-spawn:	
-		; HL = ptr to command string
-		ld	a,$fe	; ret code for 'spawn command'
-		ret
 
 l_dcal:
         jp      (hl)
