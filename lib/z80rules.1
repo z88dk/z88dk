@@ -2184,7 +2184,7 @@
 	dec	(hl)
 	ld	a,(hl)
 	inc	hl
-	jr	nc,ASMPC+3
+	jr	nz,ASMPC+3
 	dec	(hl)
 	ld	h,(hl)
 	ld	l,a

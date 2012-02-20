@@ -1,11 +1,15 @@
 /*
  *  OSCA demo
- *  New sample command for FLOS,
- *	decimal directory listing
+ *  New sample command for FLOS, MS-DOS style directory listing.
+ *  File size is shown in decimal, using the long data types.
+ *  /P and /W arguments are supported as well as the wildcards.
  * 
- * Stefano Bodrato, 3/8/2011
+ *  To build:
+ *  zcc +osca -o ddir.exe ddir.c
  * 
- * $Id: ddir.c,v 1.2 2012-02-17 07:51:47 stefano Exp $
+ *  Stefano Bodrato, 3/8/2011
+ * 
+ *  $Id: ddir.c,v 1.3 2012-02-20 07:42:45 stefano Exp $
  * 
  */
 
@@ -83,6 +87,8 @@ int main(int argc, char *argv[])
 	return(0);
 }
 
+// Found in the BDS C sources, (wildexp..),written by Leor Zolman.
+// contributed by: W. Earnest, Dave Hardy, Gary P. Novosielski, Bob Mathias and others
 
 int match(char *wildnam, char *filnam)
 {

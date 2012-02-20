@@ -12,7 +12,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.7 2012-02-17 07:51:48 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.8 2012-02-20 07:42:45 stefano Exp $
 ;
 
 
@@ -198,7 +198,10 @@ IF DEFINED_ANSIstdio
 	call	closeall
 ENDIF
 ENDIF
-        call	$10c4 ; kjt_flos_display (added in v547)
+		; kjt_flos_display restores the text mode but makes the screen flicker
+		; if it is in text mode already
+		;
+        ;call	$10c4 ; kjt_flos_display (added in v547)
         pop	hl
 start1:
         ld  sp,0
