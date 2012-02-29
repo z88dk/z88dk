@@ -24,6 +24,8 @@ graphics/osca/cplot
 graphics/osca/cplotpixel
 games/osca/joystick
 osca/flos_paper
+osca/get_pen
+osca/set_pen
 osca/osca_version
 osca/flos_version
 osca/flos_err
@@ -32,6 +34,8 @@ osca/page_out_video
 osca/wait_vrt
 osca/change_volume
 osca/check_volume_format
+osca/file_sector_list
+osca/find_file
 osca/get_current_volume
 osca/get_device_list
 osca/get_device_count
@@ -44,6 +48,7 @@ osca/get_volume_count
 osca/get_volume_list
 osca/create_file
 osca/erase_file
+osca/find_file
 osca/rename_file
 osca/delete_dir
 osca/osca_set_palette
@@ -54,6 +59,7 @@ osca/dir_move_next
 osca/dir_get_entry_name
 osca/dir_get_entry_size
 osca/dir_get_entry_type
+osca/get_dir_name
 osca/store_dir_position
 osca/restore_dir_position
 osca/change_dir

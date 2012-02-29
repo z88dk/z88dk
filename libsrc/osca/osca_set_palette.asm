@@ -4,7 +4,7 @@
 ;	extern void _FASTCALL_ osca_set_palette(char palette[256]);
 ;	set colour palette
 ;
-;	$Id: osca_set_palette.asm,v 1.1 2012-01-31 20:58:07 stefano Exp $
+;	$Id: osca_set_palette.asm,v 1.2 2012-02-29 07:03:53 stefano Exp $
 ;
 
 

@@ -4,7 +4,7 @@
 ;
 ;	Get the first sector used by a file
 ;
-;	$Id: get_first_file_cluster.asm,v 1.1 2011-08-04 14:10:13 stefano Exp $
+;	$Id: get_first_file_cluster.asm,v 1.2 2012-02-29 07:03:53 stefano Exp $
 ;
 
     INCLUDE "flos.def"

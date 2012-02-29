@@ -4,7 +4,7 @@
 ;
 ;	Get the size for the given file
 ;
-;	$Id: get_file_size.asm,v 1.1 2011-08-04 14:10:13 stefano Exp $
+;	$Id: get_file_size.asm,v 1.2 2012-02-29 07:03:53 stefano Exp $
 ;
 
     INCLUDE "flos.def"

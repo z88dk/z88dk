@@ -7,7 +7,7 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: cnvtab.asm,v 1.3 2012-02-03 13:37:36 stefano Exp $
+;	$Id: cnvtab.asm,v 1.4 2012-02-29 07:03:53 stefano Exp $
 ;
 
 	XLIB	zx81_cnvtab
@@ -16,12 +16,12 @@
 .zx81_cnvtab
 	defb	114	; cursor-left
 	defb	8
-        defb	115	; cursor-right
-        defb	9
-        defb	112	; cursor-up
-        defb	11
-        defb	113	; cursor-down
-        defb	10
+	defb	115	; cursor-right
+	defb	9
+	defb	112	; cursor-up
+	defb	11
+	defb	113	; cursor-down
+	defb	10
 	defb	119	; Rubout
 	defb	12
 	defb	118	; Newline
@@ -64,5 +64,22 @@
 	defb	'.'
 	defb	1
 	defb	39 ;"'"
+	defb	134
+	defb	'%'
+	defb	12
+	defb	'&'
+	defb	5
+	defb	'['
+	defb	133
+	defb	']'
+	defb	128
+	defb	'@'
+	defb	2
+	defb	96	; reversed "'"
+	defb	10
+	defb	'^'
+	defb	147
+	defb	'{'
+	defb	146
+	defb	'}'
 	defw	0
-

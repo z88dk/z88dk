@@ -5,7 +5,7 @@
 ;	int inc_bank();
 ;	Move, if possible, to next of 15 32KB banks at Z80 address $8000-$FFFF
 ;
-;	$Id: inc_bank.asm,v 1.1 2012-02-02 16:12:58 stefano Exp $
+;	$Id: inc_bank.asm,v 1.2 2012-02-29 07:03:53 stefano Exp $
 ;
 
     INCLUDE "flos.def"
