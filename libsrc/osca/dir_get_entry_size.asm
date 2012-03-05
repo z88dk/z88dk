@@ -4,7 +4,7 @@
 ;
 ;	Get file size (long) associated to current directory entry
 ;
-;	$Id: dir_get_entry_size.asm,v 1.1 2011-08-03 08:13:40 stefano Exp $
+;	$Id: dir_get_entry_size.asm,v 1.2 2012-03-05 20:40:15 stefano Exp $
 ;
 
     INCLUDE "flos.def"
@@ -12,13 +12,13 @@
 	XLIB  dir_get_entry_size
 	
 dir_get_entry_size:
-	push	iy
+;	push	iy
 	call	kjt_dir_list_get_entry
 	push	ix
 	pop		de
 	push	iy
 	pop		hl
-	pop		iy
+;	pop		iy
 	ret	z
 
 	ld	hl,0

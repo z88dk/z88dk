@@ -4,7 +4,7 @@
 ;
 ;	Get returns total sectors on current volume (long)
 ;
-;	$Id: get_total_sectors.asm,v 1.2 2012-02-29 07:03:53 stefano Exp $
+;	$Id: get_total_sectors.asm,v 1.3 2012-03-05 20:40:15 stefano Exp $
 ;
 
     INCLUDE "flos.def"
@@ -13,8 +13,6 @@
 	
 get_total_sectors:
 	call	kjt_get_total_sectors
-	ld	l,e
-	ld	h,d
-	ld	e,c
-	ld	d,0
+	ld	h,0
+	ld	l,c
 	ret
