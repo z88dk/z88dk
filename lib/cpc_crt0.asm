@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.16 2012-02-16 07:04:08 stefano Exp $
+;       $Id: cpc_crt0.asm,v 1.17 2012-03-05 20:44:41 stefano Exp $
 ;
 
         MODULE  cpc_crt0
@@ -37,9 +37,8 @@
 
         XDEF    snd_tick        ;Sound variable
 
-        XDEF    call_rom3       ;Interposer
-
         XDEF    firmware_bc     ;Needed by the firmware interposer
+        XDEF    firmware_af     ;Needed by the firmware interposer
 
 ;--------
 ; Set an origin for the application (-zorg=) default to $6000
@@ -65,7 +64,7 @@ IF (startup=2)
         ld      hl,newint       ; Point to a null handler (increase stability)
         ld      ($39),hl
 ENDIF
-;        di
+        di
         ld      (start1+1),sp
         ld      hl,-6530
         add     hl,sp
@@ -74,6 +73,11 @@ ENDIF
         exx
         ld      (firmware_bc),bc        ; keep BC', otherwise crash
         exx
+        ex      af,af
+        push    af
+        pop     bc
+        ld      (firmware_af),bc        ; keep F', otherwise crash
+        ex      af,af
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 ; Set up the std* stuff so we can be called again
@@ -109,6 +113,11 @@ ENDIF
         exx
         ld      bc,(firmware_bc)        ; restore BC'
         exx
+        ex      af,af
+        ld      bc,(firmware_af)        ; restore F'
+        push    bc
+        pop     af
+        ex      af,af
 
 IF (startup=2)
         ld      hl,(oldint)
@@ -162,6 +171,7 @@ base_graphics:
                 defw    $C000
 coords:         defw    0
 firmware_bc:    defw    0
+firmware_af:    defw    0
 
 heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
