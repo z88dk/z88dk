@@ -14,19 +14,25 @@
 ; Output Registers :  FLOS style error handling
 ;
 ;
-;	$Id: force_load.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
+;	$Id: force_load_callee.asm,v 1.1 2012-03-08 07:16:46 stefano Exp $
 ;
 
-	XLIB  force_load
-	LIB  force_load_callee
-	XREF ASMDISP_FORCE_LOAD_CALLEE
+    INCLUDE "flos.def"
 
-force_load:
+	XLIB  force_load_callee
+	LIB   flos_err
+	XDEF  ASMDISP_FORCE_LOAD_CALLEE
+	
+force_load_callee:
 	pop de
 	pop bc	; bank
 	pop hl	; data position
-	push hl
-	push bc
 	push de
 
-   jp force_load_callee + ASMDISP_FORCE_LOAD_CALLEE
+asmentry:
+	ld	b,c
+
+	call	kjt_force_load
+	jp		flos_err
+
+DEFC ASMDISP_FORCE_LOAD_CALLEE = asmentry - force_load_callee

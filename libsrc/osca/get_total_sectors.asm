@@ -4,7 +4,7 @@
 ;
 ;	Get returns total sectors on current volume (long)
 ;
-;	$Id: get_total_sectors.asm,v 1.3 2012-03-05 20:40:15 stefano Exp $
+;	$Id: get_total_sectors.asm,v 1.4 2012-03-08 07:16:46 stefano Exp $
 ;
 
     INCLUDE "flos.def"

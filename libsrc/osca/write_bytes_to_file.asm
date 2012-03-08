@@ -13,7 +13,7 @@
 ; Output Registers :  FLOS style error handling
 ;
 ;
-;	$Id: write_bytes_to_file.asm,v 1.1 2012-03-05 20:40:15 stefano Exp $
+;	$Id: write_bytes_to_file.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
 ;
 
     INCLUDE "flos.def"

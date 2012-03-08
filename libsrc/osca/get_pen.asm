@@ -2,7 +2,7 @@
 ;	Old School Computer Architecture - interfacing FLOS
 ;	Stefano Bodrato, 2011
 ;
-;	$Id: get_pen.asm,v 1.1 2012-02-29 07:03:53 stefano Exp $
+;	$Id: get_pen.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
 ;
 
     INCLUDE "flos.def"

@@ -6,7 +6,7 @@
 ;
 ;	Get the current sector and update the sector/cluster counters
 ;
-;	$Id: file_sector_list.asm,v 1.1 2012-02-29 07:03:53 stefano Exp $
+;	$Id: file_sector_list.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
 
 ;----------------------------------------------------------------
 ; ** doc related to kjt_file_sector_list **

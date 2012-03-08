@@ -4,13 +4,13 @@
 ;
 ;	Like 'rename' but with a FLOS style error handling
 ;
-;	$Id: rename_file.asm,v 1.1 2011-08-03 08:13:40 stefano Exp $
+;	$Id: rename_file.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
 ;
 
-    INCLUDE "flos.def"
 
 	XLIB  rename_file
-	LIB   flos_err
+	LIB  rename_file_callee
+	XREF ASMDISP_RENAME_FILE_CALLEE
 
 rename_file:
 	pop bc
@@ -19,5 +19,4 @@ rename_file:
 	push hl
 	push de
 	push bc
-	call	kjt_rename_file
-	jp   flos_err
+   jp rename_file_callee + ASMDISP_RENAME_FILE_CALLEE

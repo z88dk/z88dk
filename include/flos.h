@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2011
  *
- *		$Id: flos.h,v 1.6 2012-02-16 07:04:08 stefano Exp $
+ *		$Id: flos.h,v 1.7 2012-03-08 07:16:45 stefano Exp $
  * 
  */
 
@@ -203,6 +203,18 @@ struct flos_driver_table {
 	struct flos_driver *driver3;
 };
 
+struct flos_file {
+	char            name[13];	/* file name */
+	unsigned long   size;		/* file size */
+	unsigned int    cluster;	/* first cluster in file */
+	unsigned char   sector;	/* first cluster in file */
+	unsigned long   position;	/* current position in file */
+	// unsigned char   bank;		/* memory bank for file (if available) */
+	// unsigned int    address;	/* start address (if available) */
+	//int             flags;
+	//mode_t          mode;
+};
+
 // Get the FLOS OS version
 extern unsigned int __LIB__ flos_version();
 
@@ -215,6 +227,8 @@ extern void __LIB__ page_out_video();
 // Wait video HW to be ready
 extern void __LIB__ wait_vrt();
 extern int __LIB__ __FASTCALL__ flos_paper(int color);
+extern void __LIB__ set_pen(int color);
+extern int __LIB__ __FASTCALL__ get_pen(int color);
 
 // Memory bank control (range: 0 - 14)
 //	Set/Get which of the 32KB banks is mapped into address space $8000-$ffff
@@ -236,24 +250,52 @@ extern int __LIB__ parent_dir();
 extern int __LIB__ root_dir();
 extern int __LIB__ dir_move_first();
 extern int __LIB__ dir_move_next();
-extern int __LIB__ change_dir(char * dirname);
+extern int __LIB__ __FASTCALL__ change_dir(char * dirname);
 extern int __LIB__ dir_get_entry_type();  // 0=normal, 1=directory
 extern int __LIB__ dir_get_entry_name();
 extern unsigned long __LIB__ dir_get_entry_size();
 extern void __LIB__ store_dir_position();
 extern void __LIB__ restore_dir_position();
+extern int __LIB__ get_dir_name();
 // FAT16 file handling
 extern int __LIB__ __FASTCALL__ create_file(char * filename);
 extern int __LIB__ __FASTCALL__ erase_file(char * filename);
 extern int __LIB__ rename_file(char * filea, char * fileb);
 extern unsigned long __LIB__ __FASTCALL__ get_file_size(char * filename);
-extern unsigned int __LIB__ __FASTCALL__ get_first_file_cluster(char * filename);
+extern unsigned int  __LIB__ __FASTCALL__ get_first_file_cluster(char * filename);
+// Loads a struct with the file properties, points to struct or zero on error
+extern int  __LIB__ find_file (char *filename, struct flos_file file);
+// Get sector number and increment cluster and sector counters in struct
+extern unsigned long __LIB__ __FASTCALL__ file_sector_list (struct flos_file file);
+// Moves the read point from the start of a file (use after find file)
+extern void __LIB__ __FASTCALL__ set_file_pointer(unsigned long pointer);
+// Forces the read length of the file transfer to a certain value (use after find file)
+extern void __LIB__ __FASTCALL__ set_load_length(unsigned long length);
+// Forces a file to be loaded to a particular address / bank
+extern int  __LIB__ force_load(char *address, int bank);
+// Saves data onto a previously created/opened file
+extern int  __LIB__ write_bytes_to_file(char *filename, char *address, int bank, unsigned long len);
 
 // Drivers
 extern struct flos_device __LIB__ get_device_list();
 extern struct flos_driver_table __LIB__ get_driver_list();
 extern int __LIB__ get_device_info();
 extern int __LIB__ get_device_count();
+
+
+// And now a list of the same non-FASTCALL functions using CALLEE linkage
+
+extern int  __LIB__ __CALLEE__ rename_file_callee(char * filea, char * fileb);
+extern int  __LIB__ __CALLEE__ find_file_callee (char *filename, struct flos_file file);
+extern int  __LIB__ __CALLEE__ force_load_callee(char *address, int bank);
+
+
+// And now we make CALLEE linkage default to make compiled progs shorter and faster
+// These defines will generate warnings for function pointers but that's ok
+
+#define find_file(a,b)         find_file_callee(a,b)
+#define rename_file(a,b)       rename_file_callee(a,b)
+#define force_load(a,b)        force_load_callee(a,b)
 
 
 #endif /* __FLOS_H__ */

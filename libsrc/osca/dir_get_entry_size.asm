@@ -4,7 +4,7 @@
 ;
 ;	Get file size (long) associated to current directory entry
 ;
-;	$Id: dir_get_entry_size.asm,v 1.2 2012-03-05 20:40:15 stefano Exp $
+;	$Id: dir_get_entry_size.asm,v 1.3 2012-03-08 07:16:46 stefano Exp $
 ;
 
     INCLUDE "flos.def"

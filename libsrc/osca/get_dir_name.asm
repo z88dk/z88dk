@@ -4,7 +4,7 @@
 ;
 ;	Get name of current directory
 ;
-;	$Id: get_dir_name.asm,v 1.1 2012-02-29 07:03:53 stefano Exp $
+;	$Id: get_dir_name.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
 ;
 
     INCLUDE "flos.def"

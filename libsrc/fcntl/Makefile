@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.15 2007-06-03 15:13:05 stefano Exp $
+# $Id: Makefile,v 1.16 2012-03-08 07:16:45 stefano Exp $
 
 lcpc:
 	cd cpc ; $(MAKE) ; cd ..
@@ -9,6 +9,9 @@ lz88:
 lzx:	
 	cd spectrum ; $(MAKE) ; cd ..
 	cd dummy    ; $(MAKE) ; cd ..
+
+losca:	
+	cd osca ; $(MAKE) ; cd ..
 
 lnewbrain:
 	@echo ''
@@ -44,3 +47,4 @@ clean:
 	cd z88 ; $(MAKE) clean ; cd ..
 	cd zxvgs ; $(MAKE) clean ; cd ..
 	cd cpc ; $(MAKE) clean ; cd ..
+	cd osca ; $(MAKE) clean ; cd ..

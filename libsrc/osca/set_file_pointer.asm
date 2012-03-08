@@ -10,7 +10,7 @@
 ; IX:IY = Offset in bytes from start of file.
 ;
 ;
-;	$Id: set_file_pointer.asm,v 1.1 2012-03-05 20:40:15 stefano Exp $
+;	$Id: set_file_pointer.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
 ;
 
     INCLUDE "flos.def"
@@ -19,11 +19,16 @@
 
 set_file_pointer:
 
-	pop		hl		; sector ptr
-	pop		iy
-	pop		ix
-	push	ix
-	push	iy
-	push	hl
+	;__FASTCALL__
+	;pop		hl		; sector ptr
+	;pop		iy
+	;pop		ix
+	;push	ix
+	;push	iy
+	;push	hl
+	push hl
+	pop iy
+	push de
+	pop ix
 	
 	jp	kjt_set_file_pointer
