@@ -9,7 +9,7 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: w_stencil_init.asm,v 1.1 2010-12-24 11:59:35 stefano Exp $
+;	$Id: w_stencil_init.asm,v 1.2 2012-03-12 06:47:52 stefano Exp $
 ;
 
 	INCLUDE	"graphics/grafix.inc"
@@ -22,7 +22,7 @@
 		ld	d,h
 		ld	e,l
 		inc	de
-		ld	(hl),255
+		ld	(hl),127	; big enough but stay in the positive range !
 		ld	bc,maxy
 		push	bc
 		ldir
