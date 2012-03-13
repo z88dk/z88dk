@@ -6,7 +6,7 @@
 ;	in: source character in (HL)
 ;	out: A = converter character
 ;
-;	$Id: zx81toasc.asm,v 1.2 2007-10-29 08:03:00 stefano Exp $
+;	$Id: zx81toasc.asm,v 1.3 2012-03-13 20:38:35 stefano Exp $
 ;
 
 XLIB zx81toasc
@@ -31,9 +31,16 @@ LIB zx81_cnvtab
 	jr	c,isntchar
 	cp	64
 	jr	nc,isntchar
-	add	27	; Ok, re-code to the ZX81 charset
+	add	59	; Ok, lowercase
 	jr	setout	; .. and put it out
 .isntchar
+	cp	166	; Between A and Z ?
+	jr	c,isntchar1
+	cp	192
+	jr	nc,isntchar1
+	sub 101	; Uppercase
+	jr	setout	; .. and put it out
+.isntchar1
 	ld	hl,zx81_cnvtab
 .symloop
 	;inc	hl
