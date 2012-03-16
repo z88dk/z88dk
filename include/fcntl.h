@@ -5,7 +5,7 @@
  *
  *      djm 27/4/99
  *
- *	$Id: fcntl.h,v 1.11 2010-09-19 00:24:08 dom Exp $
+ *	$Id: fcntl.h,v 1.12 2012-03-16 08:22:30 stefano Exp $
  */
 
 
@@ -43,7 +43,7 @@ extern int __LIB__ writebyte(int fd, int c);
 
 /* Open a file returning the explicit filename, with length len */
 
-extern int __LIB__ open_z88(far char *name, int flags, mode_t mode, char *explicit, size_t len);
+extern int __LIB__ open_z88(far char *name, mode_t mode, int flags, char *explicit, size_t len);
 
 /* As above except the filename is near - good for ZSock devices (z88)*/
 
