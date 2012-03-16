@@ -6,7 +6,7 @@
 ;
 ;	Find a file and load its properties in a structure
 ;
-;	$Id: find_file_callee.asm,v 1.1 2012-03-08 07:16:46 stefano Exp $
+;	$Id: find_file_callee.asm,v 1.2 2012-03-16 07:10:13 stefano Exp $
 ;
 
     INCLUDE "flos.def"
@@ -57,14 +57,14 @@
 	xor		a		; set the zero flag for proper return code
 	ld		(hl),a	; initial sector
 
-	inc		hl
-	ld		(hl),a	; initial file position
-	inc		hl
-	ld		(hl),a
-	inc		hl
-	ld		(hl),a
-	inc		hl
-	ld		(hl),a
+	;inc		hl
+	;ld		(hl),a	; initial file position
+	;inc		hl
+	;ld		(hl),a
+	;inc		hl
+	;ld		(hl),a
+	;inc		hl
+	;ld		(hl),a
 
 	;xor		a
 err:

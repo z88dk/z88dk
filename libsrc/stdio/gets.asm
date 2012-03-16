@@ -4,7 +4,7 @@
 ;	gets(char *s) - get string from console
 ;
 ;
-;	$Id: gets.asm,v 1.3 2012-02-03 13:37:36 stefano Exp $
+;	$Id: gets.asm,v 1.4 2012-03-16 07:10:13 stefano Exp $
 ;
 
 
@@ -23,7 +23,9 @@
 	push bc
 	ld	d,h	; keep the start of buffer
 	ld	e,l
+IF EMULATECURSOR
 	call	cursor
+ENDIF
 
 .getloop
 	push	de
@@ -41,6 +43,7 @@
 	sbc		hl,de
 	pop		hl
 	jr		z,getloop
+IF EMULATECURSOR
 .dobs
 	call	wipecursor
 	call	chr8
@@ -50,17 +53,25 @@
 	call	cursor
 	dec		hl
 	jr		getloop
+ELSE
+	ld		a,8
+	call	conout
+ENDIF
 .nobs
 	cp		13
 	jr		z,getend
 	ld		(hl),a
 	inc		hl
 	call	conout
+IF EMULATECURSOR
 	call	cursor
+ENDIF
 	jr		getloop	
 
 .getend
+IF EMULATECURSOR
 	call	wipecursor
+ENDIF
 	xor	a
 	ld	(hl),a
 	ld	a,13	; end with CR
@@ -80,6 +91,7 @@
 	pop		hl
 	ret
 
+IF EMULATECURSOR
 .wipecursor
 	ld		a,' '
 	jr		cursor+2
@@ -90,3 +102,4 @@
 	ld		a,8
 	call	conout
 	ret
+ENDIF
