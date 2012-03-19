@@ -4,7 +4,7 @@
 ;	gets(char *s) - get string from console
 ;
 ;
-;	$Id: gets.asm,v 1.4 2012-03-16 07:10:13 stefano Exp $
+;	$Id: gets.asm,v 1.5 2012-03-19 15:43:09 stefano Exp $
 ;
 
 
@@ -56,6 +56,9 @@ IF EMULATECURSOR
 ELSE
 	ld		a,8
 	call	conout
+	ld		a,' '
+	call	conout
+	ld		a,8
 ENDIF
 .nobs
 	cp		13

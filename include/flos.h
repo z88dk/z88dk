@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2011
  *
- *		$Id: flos.h,v 1.7 2012-03-08 07:16:45 stefano Exp $
+ *		$Id: flos.h,v 1.8 2012-03-19 15:43:08 stefano Exp $
  * 
  */
 
@@ -13,6 +13,7 @@
 
 #include <sys/compiler.h>
 #include <sys/types.h>
+#include <fcntl.h>
 
 
 // Commands for the SD/MMC card
@@ -209,11 +210,14 @@ struct flos_file {
 	unsigned int    cluster;	/* first cluster in file */
 	unsigned char   sector;	/* first cluster in file */
 	unsigned long   position;	/* current position in file */
+	mode_t          mode;
 	// unsigned char   bank;		/* memory bank for file (if available) */
 	// unsigned int    address;	/* start address (if available) */
 	//int             flags;
-	//mode_t          mode;
 };
+
+// Internal use pointer for the 'multifile' lib
+extern struct flos_file *flos_lastfile;
 
 // Get the FLOS OS version
 extern unsigned int __LIB__ flos_version();

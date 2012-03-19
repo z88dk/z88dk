@@ -8,7 +8,7 @@
  *	djm 1/4/2000
  *
  * --------
- * $Id: ftell.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
+ * $Id: ftell.c,v 1.3 2012-03-19 15:43:09 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -18,9 +18,11 @@
 #endif
 
 #include <stdio.h>
+#include <fcntl.h>
 
 fpos_t ftell(FILE *fp)
 {
+/*
 #ifdef Z80
 #asm
 	pop	bc
@@ -46,11 +48,12 @@ fpos_t ftell(FILE *fp)
 	ld	h,d
 #endasm
 #else
+*/
 	if ( fp->flags&_IOUSE && fchkstd(fp)== 0 ) {
 		return (fdtell(fp->fd));
 	}
 	return -1L;
-#endif
+//#endif
 }
 
 
