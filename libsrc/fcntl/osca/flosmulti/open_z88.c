@@ -1,7 +1,7 @@
 /*
- *	Took "as is" fron the Dominic's files
+ *	Took "as is" from the Dominic's files
  *
- *	$Id: open_z88.c,v 1.2 2012-03-21 10:20:23 stefano Exp $
+ *	$Id: open_z88.c,v 1.1 2012-03-21 10:20:23 stefano Exp $
  */
 
 #include <fcntl.h>
@@ -9,7 +9,7 @@
 #include <flos.h>
 
 
-int open_z88(far char *name, int flags, mode_t mode, char *buf,int len)
+int open_z88(far char *name, mode_t mode, int flags, char *buf,int len)
 {
 	int  hand;
 

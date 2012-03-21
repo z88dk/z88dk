@@ -1,0 +1,9 @@
+close
+lseek
+open
+open_z88
+readbyte
+remove
+rename
+fdtell
+writebyte

@@ -12,24 +12,34 @@
  *	O_WRONLY = 1    Starts afresh?!?!?
  *	O_APPEND = 256
  *
- *	$Id: open.c,v 1.2 2012-03-21 10:20:23 stefano Exp $
+ *	$Id: open.c,v 1.1 2012-03-21 10:20:23 stefano Exp $
  */
 
 #include <fcntl.h>
 #include <flos.h>
 #include <string.h>
 
-//#include <stdio.h>
-//#include <malloc.h>
+#define MAX_FLOS_FILES 6
 
-struct flos_file flosfile;
+char flos_files[sizeof(struct flos_file)*MAX_FLOS_FILES];
+struct flos_file *flos_lastfile;
 
 int open(far char *name, int flags, mode_t mode)
 {
-	
-if (flosfile->name[0]!=0)
-	return (-1);
-	
+int x;
+struct flos_file *flosfile;
+
+for (x=0; x<MAX_FLOS_FILES; x++)
+	if (strcmp(name,flos_files[x*sizeof(struct flos_file)]) == 0)
+		return (-1);
+
+x=0;
+while (flos_files[x*sizeof(struct flos_file)] != 0) {
+	if (x == MAX_FLOS_FILES)
+		return (-1);
+	x++;
+}
+flosfile=&flos_files[x*sizeof(struct flos_file)];
 
 switch (mode) {
 	case O_RDONLY:
@@ -37,33 +47,40 @@ switch (mode) {
 			flosfile->name[0]=0;
 			return (-1);
 		}
-		set_load_length(1);
-		return(flosfile);
+		flosfile->position=0;
+		//set_load_length(1);
 		break;
 
 	case O_WRONLY:
 		if (find_file(name, flosfile) != 0)
 			erase_file(name);
 		create_file(name);
-		
 		if (find_file(name, flosfile) == 0) {
 			flosfile->name[0]=0;
 			return (-1);
 		}
-		return(flosfile);
+		flosfile->position=0;
 		break;
 
 	case O_APPEND:
 		if (find_file(name, flosfile) == 0) {
-			flosfile->name[0]=0;
+			create_file(name);
+			flosfile->position=0;
+		} else {
 			flosfile->position=flosfile->size-1;
-			set_load_length(1);
+		}
+		if (find_file(name, flosfile) == 0) {
+			flosfile->name[0]=0;
 			return (-1);
 		}
-		return(flosfile);
 		break;
-
+	default:
+ 		return(-1);
+		break;
 	}
-	return(-1);
+
+	flosfile->mode=mode;
+	flos_lastfile=flosfile;
+	return(flosfile);
 }
 
