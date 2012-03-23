@@ -7,4 +7,5 @@ readbyte
 remove
 rename
 fdtell
+write
 writebyte
