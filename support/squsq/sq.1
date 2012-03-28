@@ -1,0 +1,60 @@
+.TH SQ 1 Local
+.SH NAME
+sq, usq \- squeeze (compress) files
+.SH SYNOPSYS
+.B sq
+[
+.I file1
+] [
+.I file2
+] ...
+.BR
+.B usq
+[
+.I \-count
+]
+[
+[
+.I \-fcount
+]
+[
+.I file1
+] [
+.I file2
+] ...
+.SH DESCRIPTION
+.I sq
+compresses one or more files, using a Huffman coding scheme.
+.I usq
+decompresses or displays one or more files squeezed by
+.I sq.
+The algorithm is identical to the one used by the
+popular public domain 'SQ' programs, originally authored by Richard
+Greenlaw.
+.PP
+sq will squeeze each file passed on the argument line.  It will
+append `.SQ' to the original file name to create the output file
+name.  If no file names are given, sq will prompt for file names
+from the standard input.  A message is printed for each file,
+tracing each pass of the compression process.
+.PP
+.I usq
+will unsqueeze or display the files requested on the command
+line.  If no files are requested,  the file names are input from
+the standard input.  If no option is given, the file is unsqueezed
+to its original name.
+.PP
+If the \-count option is used, count lines are displayed
+from the start of the file, with all unprintable characters
+except CR, LF, TAB, and FF converted to periods.  The output is
+sent to the standard output.  If the \-fcount option is used,
+the file is displayed with a formfeed appended to the preview
+of each file.
+.SH AUTHOR
+Richard Greenlaw (original), Theo Pozzy (ported versions), Stefano Bodrato (more ports)
+.SH BUGS
+The file naming convention is not a one-to-one mapping, so multiple
+files may be squeezed to the same output file name.
+Also, the output file name for usq cannot be overridden.
+.SH "SEE ALSO"
+compact(1)

@@ -1,0 +1,60 @@
+
+This tool was originally written in BDS C by Richard Greenlaw and then ported
+to different C flavours during the years.  The last version by Theo Perry was
+quite modern but not enough to be easily compiled with the latest gcc versions.
+It is based on a Huffman coding scheme but fast enough to be run on old CPUs.
+This is yet another update, able to build with z88dk and gcc.
+
+It should run on any z88dk target with a full fcntl implementation and 16K RAM.
+An OS shell is useful but not strictly needed, in case no parameters are given,
+the program will run in interactive mode prompting the user for the single file
+names.
+
+It can just be used locally on the target computer or to prepare files to be 
+transferred from a modern computer to it (in case of low transfer speed).
+Also, it can be a good way to recover programs coming from old CP/M archives.
+Typical file extensions which might be found online are ".CQ" or ".AQM", they
+will be converted to C and ASM (or AZM) source files.
+
+
+---- ----
+
+NAME
+       sq, usq - squeeze (compress) files
+
+SYNOPSYS
+       sq  [  file1 ] [ file2 ] ...   usq [ -count ] [ [ -fcount ] [ file1 ] [
+       file2 ] ...
+
+DESCRIPTION
+       sq compresses one or more files, using a Huffman  coding  scheme.   usq
+       decompresses  or  displays one or more files squeezed by sq.  The algo‐
+       rithm is identical to the one used by the popular  public  domain  'SQ'
+       programs, originally authored by Richard Greenlaw.
+
+       sq  will squeeze each file passed on the argument line.  It will append
+       `.SQ' to the original file name to create the output file name.  If  no
+       file  names  are given, sq will prompt for file names from the standard
+       input.  A message is printed for each file, tracing each  pass  of  the
+       compression process.
+
+       usq  will unsqueeze or display the files requested on the command line.
+       If no files are requested,  the file names are input from the  standard
+       input.   If  no option is given, the file is unsqueezed to its original
+       name.
+
+       If the -count option is used, count lines are displayed from the  start
+       of the file, with all unprintable characters except CR, LF, TAB, and FF
+       converted to periods.  The output is sent to the standard  output.   If
+       the  -fcount  option  is  used,  the  file is displayed with a formfeed
+       appended to the preview of each file.
+
+AUTHOR
+       Richard Greenlaw (original),  Theo  Pozzy  (ported  versions),  Stefano
+       Bodrato (more ports)
+
+BUGS
+       The  file  naming  convention  is not a one-to-one mapping, so multiple
+       files may be squeezed to the same output file name.  Also,  the  output
+       file name for usq cannot be overridden.
+
