@@ -16,6 +16,19 @@ Also, it can be a good way to recover programs coming from old CP/M archives.
 Typical file extensions which might be found online are ".CQ" or ".AQM", they
 will be converted to C and ASM (or AZM) source files.
 
+Misc examples in command line mode (Wildcards are valid only with OSCA FLOS and UNIX):
+
+SQ *.TXT
+USQ *.?Q?
+SQ README.TXT *.EXE
+USQ -20 README.TQT   - (type the first 20 lines on screen)
+USQ -P300 README.TQT - (interactively read 300 rows of text, paged every 23 lines)
+USQ -F200 *.TQT      -  print on screen, insert a form feed at the end of every file, 
+                        not of much use when redirection/echo on printer is not supported.. 
+ 
+SQ or USq without parameters -> enter in interactive mode, almost useless on CP/M and OSCA FLOS,
+but essential for those systems without an OS or systems taking long time to load the command.
+
 
 ---- ----
 
@@ -23,8 +36,8 @@ NAME
        sq, usq - squeeze (compress) files
 
 SYNOPSYS
-       sq  [  file1 ] [ file2 ] ...   usq [ -count ] [ [ -fcount ] [ file1 ] [
-       file2 ] ...
+       sq [ file1 ] [ file2 ] ...   usq [ -count ] [ [ -fcount ] [ -pcount ] ]
+       [file1 ] [ file2 ] ...
 
 DESCRIPTION
        sq compresses one or more files, using a Huffman  coding  scheme.   usq
@@ -47,7 +60,8 @@ DESCRIPTION
        of the file, with all unprintable characters except CR, LF, TAB, and FF
        converted to periods.  The output is sent to the standard  output.   If
        the  -fcount  option  is  used,  the  file is displayed with a formfeed
-       appended to the preview of each file.
+       appended to the preview of each file.  If the -pcount option  is  used,
+       the user is prompted for a keypress every 23 lines.
 
 AUTHOR
        Richard Greenlaw (original),  Theo  Pozzy  (ported  versions),  Stefano

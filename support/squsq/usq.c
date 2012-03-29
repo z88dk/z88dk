@@ -7,7 +7,7 @@
  * Ported to modern c compilers and z88dk by Stefano Bodrato
  * 
  * 
- * $Id: usq.c,v 1.1 2012-03-28 07:39:06 stefano Exp $
+ * $Id: usq.c,v 1.2 2012-03-29 15:28:36 stefano Exp $
  * 
  * --------------------------------------------------------------
  *
@@ -44,6 +44,9 @@
  *	-fcount		Same as -count except formfeed
  *			appended to preview of each file.
  *			Example: -f10.
+ * 
+ *	-pcount		wait for keypress every 23 lines ("more" msg)
+ *			Example: -p200 .. goes on for approx. 9 pages of text
  *
  * If no such items are given on the command line you will be
  * prompted for commands (one at a time). An empty command
@@ -82,6 +85,8 @@
 
 #ifdef __OSCA__
 #include "flos.h"
+#undef gets(a)
+#define gets(a) flos_get_input_string(a,16); putchar('\n');
 #endif
 
 #define VERSION "3.2   23/03/2012"
@@ -103,6 +108,7 @@ int value;	/*current byte value or EOF */
 /* This must follow all include files */
 unsigned int dispcnt;	/* How much of each file to preview */
 char	ffflag;		/* should formfeed separate preview from different files */
+char	pgflag;		/* Pager flag, wait for keypress */
 
 
 /* get 16-bit word from file */
@@ -216,6 +222,7 @@ void unsqueeze(char *infile)
 	FILE *inbuff, *outbuff;	/* file buffers */
 	int i, c;
 	char cc;
+	int lines=0;
 
 	char *p;
 	unsigned int filecrc;	/* checksum */
@@ -282,7 +289,7 @@ void unsqueeze(char *infile)
 					/* newline will generate CR-LF */
 					goto next;
 				case '\n':	/* newline */
-					++linect;
+					{ ++linect; ++lines;}
 				case '\f':	/* formfeed */
 				case '\t':	/* tab */
 					break;
@@ -290,6 +297,12 @@ void unsqueeze(char *infile)
 					cc = '.';
 				}
 			putchar(cc);
+			if ((pgflag)&&(lines>23)) {
+				printf (" --more-- ");
+				while ((c=fgetc(stdin))==0) {}
+				putchar('\n');
+				lines=0;
+			}
 		next: ;
 		}
 		if(ffflag)
@@ -379,6 +392,8 @@ void obey(char *p)
 	if(*p == '-') {
 		if(ffflag = ((*(p+1) == 'F') || (*(p+1) == 'f')))
 			++p;
+		if(pgflag = ((*(p+1) == 'P') || (*(p+1) == 'p')))
+			++p;
 		/* Set number of lines of each file to view */
 		dispcnt = 65535;	/* default */
 		if(*(p+1))
@@ -409,7 +424,7 @@ void obey(char *p)
 int main(int argc, char *argv[])
 {
 	int i,c;
-	char inparg[16];	/* parameter from input */
+	char inparg[128];	/* parameter from input */
 
 	dispcnt = 0;	/* Not in preview mode */
 
@@ -420,28 +435,12 @@ int main(int argc, char *argv[])
 		obey(argv[i]);
 
 	if(argc < 2) {
-		printf("Enter file names, one line at a time, or type <RETURN> to quit.");
+		printf("Enter file names, one line at a time, or type <RETURN> to quit.\n");
 		do {
-			printf("\n*");
-			for(i = 0; i < 16; ++i) {
-				if((c = getchar()) == EOF)
-					c = '\n';	/* force empty (exit) command */
-					#ifdef __OSCA__
-					fputc_cons(c);
-					#endif
-				if((inparg[i] = c) == '\n') {
-					inparg[i] = '\0';
-					break;
-				}
-			}
+			gets(inparg);
 			if(inparg[0] != '\0')
 				obey(inparg);
 		} while(inparg[0] != '\0');
 	}
 }
-
-
-
-
-
 

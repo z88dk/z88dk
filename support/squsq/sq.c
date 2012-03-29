@@ -9,7 +9,7 @@
  * Ported to modern c compilers and z88dk by Stefano Bodrato
  * 
  * 
- * $Id: sq.c,v 1.1 2012-03-28 07:39:05 stefano Exp $
+ * $Id: sq.c,v 1.2 2012-03-29 15:28:36 stefano Exp $
  * 
  * --------------------------------------------------------------
  *
@@ -100,6 +100,8 @@
 
 #ifdef __OSCA__
 #include "flos.h"
+#undef gets(a)
+#define gets(a) flos_get_input_string(a,16); putchar('\n');
 #endif
 
 
@@ -552,7 +554,7 @@ void init_huff(FILE *ib)
  * Returns ERROR if codes are too long.
  */
 
-/* returns ERROR or NULL */
+/* returns ERROR or OK */
 /* level of tree being examined, from zero */
 /* root of subtree is also data value if leaf */
 int buildenc(int level, int root)
@@ -574,7 +576,7 @@ int buildenc(int level, int root)
 #ifdef DEBUG
 		if (debug) printf("  codelen[%d]=%d,code[%d]=%02x\n",root,codelen[root],root,code[root]);
 #endif
-		return ((level > 16) ? ERROR : NULL);
+		return ((level > 16) ? ERROR : OK);
 	} else {
 		if( l != NOCHILD) {
 			/* Clear path bit and continue deeper */
@@ -591,7 +593,7 @@ int buildenc(int level, int root)
 				return ERROR;
 		}
 	}
-	return (NULL);	/* if we got here we're ok so far */
+	return (OK);	/* if we got here we're ok so far */
 }
 
 
@@ -924,24 +926,12 @@ main(int argc, char *argv[])
 		obey(argv[i]);
 
 	if(argc < 2) {
-		printf("Enter file names, one line at a time, or type <RETURN> to quit.");
+		printf("Enter file names, one line at a time, or type <RETURN> to quit.\n");
 		do {
-			printf("\n*");
-			for(i = 0; i < 16; ++i) {
-				if((c = getchar()) == EOF)
-					c = '\n';	/* fake empty (exit) command */
-					#ifdef __OSCA__
-					fputc_cons(c);
-					#endif
-				if((inparg[i] = c) == '\n') {
-					inparg[i] = '\0';
-					break;
-				}
-			}
+			gets(inparg);
 			if(inparg[0] != '\0')
 				obey(inparg);
 		} while(inparg[0] != '\0');
 	}
 }
-
 

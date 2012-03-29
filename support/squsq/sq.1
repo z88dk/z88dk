@@ -18,6 +18,10 @@ sq, usq \- squeeze (compress) files
 .I \-fcount
 ]
 [
+.I \-pcount
+]
+]
+[
 .I file1
 ] [
 .I file2
@@ -49,7 +53,8 @@ from the start of the file, with all unprintable characters
 except CR, LF, TAB, and FF converted to periods.  The output is
 sent to the standard output.  If the \-fcount option is used,
 the file is displayed with a formfeed appended to the preview
-of each file.
+of each file.  If the \-pcount option is used,
+the user is prompted for a keypress every 23 lines.
 .SH AUTHOR
 Richard Greenlaw (original), Theo Pozzy (ported versions), Stefano Bodrato (more ports)
 .SH BUGS
