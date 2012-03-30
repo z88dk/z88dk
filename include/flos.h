@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2011
  *
- *		$Id: flos.h,v 1.8 2012-03-19 15:43:08 stefano Exp $
+ *		$Id: flos.h,v 1.9 2012-03-30 14:46:52 stefano Exp $
  * 
  */
 
@@ -208,7 +208,7 @@ struct flos_file {
 	char            name[13];	/* file name */
 	unsigned long   size;		/* file size */
 	unsigned int    cluster;	/* first cluster in file */
-	unsigned char   sector;	/* first cluster in file */
+	unsigned char   sector;	/* first sector in file */
 	unsigned long   position;	/* current position in file */
 	mode_t          mode;
 	// unsigned char   bank;		/* memory bank for file (if available) */
@@ -233,12 +233,14 @@ extern void __LIB__ wait_vrt();
 extern int __LIB__ __FASTCALL__ flos_paper(int color);
 extern void __LIB__ set_pen(int color);
 extern int __LIB__ __FASTCALL__ get_pen(int color);
+// Console input
+extern int __LIB__ flos_get_input_string(char *s,int len);
 
 // Memory bank control (range: 0 - 14)
 //	Set/Get which of the 32KB banks is mapped into address space $8000-$ffff
 extern int __LIB__ get_bank();
 extern void __LIB__ __FASTCALL__ set_bank(int bank);
-//	Sctivate, if possible, the nect memory bank
+//	Activate, if possible, the nect memory bank
 extern int __LIB__ inc_bank();
 
 // Disk control

@@ -1,6 +1,7 @@
 stdio/osca/fputc_cons
 stdio/osca/fgetc_cons
 stdio/osca/getk
+stdio/puts_cons
 @gfxbasew.lst
 graphics/osca/drawb
 graphics/osca/undrawb
@@ -26,6 +27,7 @@ games/osca/joystick
 osca/flos_paper
 osca/get_pen
 osca/set_pen
+osca/flos_get_input_string
 osca/osca_version
 osca/flos_version
 osca/flos_err
