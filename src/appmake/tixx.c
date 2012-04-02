@@ -1,29 +1,35 @@
 /*
- -------------------------------------------------------------------------------
- This version of bin2var has been adapted to work with the Z88DK's appmake tool.
- It has been fixed to be endian-independent by Dominic Morris / Stefano Bodrato
- -------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+This version of bin2var has been adapted to work with the Z88DK's appmake tool.
+It has been fixed to be endian-independent by Dominic Morris / Stefano Bodrato
+-------------------------------------------------------------------------------
 
- Bin2Var by David Phillips <david@acz.org>
- Converts binary images to TI Graph Link format files
+Bin2Var by David Phillips <david@acz.org>
+Converts binary images to TI Graph Link format files
 
- 1.00 -- 08/22/00
- * first release
- * support for 83P, 8XP
+1.00 -- 08/22/00
+* first release
+* support for 83P, 8XP
 strcasecmp
- 1.10 -- 08/23/00
- * made code more modular
- * added support for 82P, 86P, 86S
- * fixed __MSDOS__ macro spelling to be correct
+1.10 -- 08/23/00
+* made code more modular
+* added support for 82P, 86P, 86S
+* fixed __MSDOS__ macro spelling to be correct
 
- 1.20 -- 08/24/00
- * added suport for 85S
- * corrected header for 8XP
- * changed error message printing to use stderr
+1.20 -- 08/24/00
+* added suport for 85S
+* corrected header for 8XP
+* changed error message printing to use stderr
 
- Edited by Jeremy Drake to create unsquished 83P and 8XP files
- with correct "End" and "AsmPrgm" symbols
- */
+Edited by Jeremy Drake to create unsquished 83P and 8XP files
+with correct "End" and "AsmPrgm" symbols
+
+Edited by Thibault Duponchelle (z88dk version not bin2var) because it was buggy at least for 8xp (due to the port to z88dk probably or maybe the bin2var which was used was simply an old bin2var ressource).
+I'm not sure if I haven't added some other issues but I tested it and now it works for 8xp (so it's better than before).
+In fact I just have used vimdiff to correct the bugs, and not checked the real meaning of each written byte/word but only checked some of them).
+- Tested for ti84.
+- Tested for ti83 regular (squished and unsquished).
+*/
 
 #include "appmake.h"
 
@@ -185,9 +191,12 @@ int tixx_exec(char *target)
 
     if ( outfile == NULL ) {
         strcpy(filename,binname);
+        /* printf("Filename : %s\n", filename); */
         suffix_change(filename,suffix);
+        /* printf("Filename with suffix : %s\n", filename); */
     } else {
         strcpy(filename,outfile);
+        /*printf("Filename : %s\n", filename);*/
     }
 
     genname(filename, str);
@@ -195,8 +204,10 @@ int tixx_exec(char *target)
     if ( conf_comment != NULL ) {
         strncpy(comment,conf_comment,42);
         comment[42] = 0;
+    /*printf("Commentaire : %s\n", comment); */
     } else {
-        strcpy(comment, "Created with Z88DK - bin2var v1.20");
+        strcpy(comment, "Z88DK - bin2var v1.20");
+    /*printf("Commentaire : %s\n", comment); */
     }
 
     fp = fopen(binname, "rb");
@@ -228,25 +239,23 @@ int tixx_exec(char *target)
     writecomment(fp, comment);
 
     /* DATA SECTION LENGTH */
-    if ((ext == E_82P) || (ext == E_83P))
+    if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP))
         i = n + 17;
-    else if (ext == E_8XP)
-        i = n + 21;
     else if (ext == E_85S)
         i = n + 10 + strlen(str);
     else
         i = n + 18;
     writeword(i, fp);
+    /* printf("Data Length: %04X\n", i); */
+
 
     /****************/
     /* DATA SECTION */
     /****************/
 
     /* VARIABLE TYPE MARKER */
-    if ((ext == E_82P) || (ext == E_83P))
+    if ((ext == E_82P) || (ext == E_83P) || (ext == E_8XP))
         cfwrite("\x0b\0x00", 2, fp, &chk);
-    else if (ext == E_8XP)
-        cfwrite("\x0d\0x00", 2, fp, &chk);
     else if (ext == E_85S)
     {
         i = 4 + strlen(str);
@@ -255,13 +264,9 @@ int tixx_exec(char *target)
     }
     else
         cfwrite("\x0c\0x00", 2, fp, &chk);
-
-
+    
     /* VARIABLE LENGTH */
-    if(ext == E_8XP)
-        i = n + 4;
-    else
-        i = n + 2;
+    i = n + 2;    
     cfwriteword(i, fp, &chk);
 
     /* VARIABLE TYPE ID BYTE */
@@ -281,33 +286,14 @@ int tixx_exec(char *target)
     if (ext != E_85S)
         cfwrite(str, 8 - i, fp, &chk);
 
-    if (ext == E_8XP)
-    {
-        /* VERSION */
-        cfwritebyte(0, fp, &chk);
-        /* FLAG */
-        cfwritebyte(0, fp, &chk);
-    }    
-    
     /* VARIABLE LENGTH */
-    if (ext == E_8XP)
-    {
-        i = n + 4;
-        n2 = n + 2;
-    }
-    else
-    {
-        i = n + 2;
-        n2 = n;
-    }
+    i = n + 2;
+    n2 = n;
     cfwriteword(i, fp, &chk);
     cfwriteword(n2, fp, &chk);
+    /*printf("Var Length (i) : %04X\n", i);
+    printf("Var Length (n2) : %04X\n", n2); */
 
-    if(ext == E_8XP)
-    {
-        cfwrite("\xBB", 1, fp, &chk);
-        cfwrite("\x6D", 1, fp, &chk);
-    }
     cfwrite(buf, n, fp, &chk);
     writeword(chk, fp);
 
@@ -319,4 +305,3 @@ int tixx_exec(char *target)
 
     return 0;
 }
-
