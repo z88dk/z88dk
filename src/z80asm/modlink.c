@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.30 2011-10-14 14:46:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.31 2012-04-05 08:39:19 stefano Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.30  2011-10-14 14:46:03  pauloscustodio
+/* Revision 1.31  2012-04-05 08:39:19  stefano
+/* New reserved words, ASMTAIL and ASMSIZE, referring to the finally linked program block.
+/* ASMTAIL could be a good starting point to determine automatically the heap position for malloc() or to insert a stack overflow protection in programs.
+/* Note the in some case, after the program packaging, there are extra critical bytes to be preserved as well.
+/*
+/* Revision 1.30  2011/10/14 14:46:03  pauloscustodio
 /* -  BUG_0013 : defm check for MAX_CODESIZE incorrect
 /*  - Remove un-necessary tests for MAX_CODESIZE; all tests are concentrated in check_space() from codearea.c.
 /*
@@ -602,6 +607,9 @@ LinkModules (void)
 	
 	} while (CURRENTMODULE != lastobjmodule->nextmodule);	
 					/* parse only object modules, not added library modules */
+
+	DefineDefSym("ASMSIZE", get_codesize(), 0, &globalroot);
+	DefineDefSym("ASMTAIL", (size_t) (modulehdr->first->origin+get_codesize()), 0, &globalroot);
 
 	if (verbose == ON)
 	    printf ("Code size of linked modules is %d bytes\n", (int)get_codesize());
