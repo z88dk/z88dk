@@ -10,7 +10,7 @@
 ;       routines in different modules, we have got rid of
 ;       the conditional assembly around the float routines
 ;
-;	$Id: z80_crt0.hdr,v 1.7 2010-11-30 16:23:12 stefano Exp $
+;	$Id: z80_crt0.hdr,v 1.8 2012-04-12 16:56:35 stefano Exp $
 
 	XREF    base_graphics	; Address of graphics screen
 
@@ -34,9 +34,12 @@
 	LIB    l_putptr		;Put 3 byte pointer
 	LIB    l_gchar		;Get signed char
 	LIB    l_gcharsp	;Get signed char
+	LIB    l_gcharspsp	;Get signed char and push
 	LIB    l_sxt		;Sign extend char
 	LIB    l_gint		;Get int
-	LIB    l_gintsp		;Get int and push
+	LIB    l_gintsp		;Get int
+	LIB    l_gintspsp	;Get int and push
+	LIB    l_gint7de	;Get int, multiply by 7 and add from SP by de
 	LIB    l_gint_eq	;Get int and test == 0
 	LIB    l_ghtonsint	;Get reverse order int
 	LIB    l_pint		;Put int
@@ -81,6 +84,7 @@
 
 	LIB     lpush2		;Push a long under the stack
 	LIB     l_int2long_s	;Int->long signed conversion
+	LIB     l_int2long_s_float	;Int->long->float signed conversion (optimizer: use -O3)
 	LIB     l_long2int_s	;Long->int signed conversion
 	LIB     l_glong		;Get long
 	LIB     l_long_add

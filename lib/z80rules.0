@@ -621,3 +621,44 @@
 	ld	(%2),hl
 	ld	(%3),hl
 
+	ex	de,hl
+	ex	de,hl
+=
+
+	ld	hl,0	;const
+	rl	l
+	ret
+=
+	ld	hl,0	;const
+	ret
+
+	call	l_gint	;
+	ld	b,h
+	ld	c,l
+	add	hl,bc
+	add	hl,bc
+	add	hl,hl
+	add	hl,bc
+	pop	de
+	add	hl,de
+=
+	call	l_gint7de	;
+
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	ld	hl,%1	;const
+	call	l_gintsp	;
+
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gchar
+=
+	ld	hl,%1	;const
+	call	l_gcharsp	;
+
+	call	l_int2long_s
+	call	float
+=
+	call	l_int2long_s_float

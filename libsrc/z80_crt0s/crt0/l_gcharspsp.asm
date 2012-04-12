@@ -2,8 +2,8 @@
 ;       l_gchar variant to be used sometimes by the peephole optimizer
 ;
 
-XLIB l_gcharsp
-.l_gcharsp
+XLIB l_gcharspsp
+.l_gcharspsp
 	add	hl,sp
 	inc hl
 	inc hl
@@ -11,4 +11,5 @@ XLIB l_gcharsp
 	ld l,a
 	sbc   a,a
 	ld h,a
-	ret
+	ex	(sp),hl
+	jp (hl)

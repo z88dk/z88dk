@@ -2,8 +2,8 @@
 ;       l_gint variant to be used sometimes by the peephole optimizer
 ;
 
-XLIB l_gintsp
-.l_gintsp
+XLIB l_gintspsp
+.l_gintspsp
 	add	hl,sp
 	inc hl
 	inc hl
@@ -11,4 +11,5 @@ XLIB l_gintsp
 	inc     hl
 	ld h,(hl)
 	ld l,a
-	ret
+	ex	(sp),hl
+	jp (hl)

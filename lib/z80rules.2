@@ -1147,7 +1147,7 @@
 	ld	hl,%2	;const
 =
 	ld	hl,%1	;const
-	call	l_gintsp	;
+	call	l_gintspsp	;
 	ld	hl,%2	;const
 
 	ld	hl,%1	;const
@@ -1157,8 +1157,20 @@
 	ld	hl,%2	;const
 =
 	ld	hl,%1	;const
-	call	l_gcharsp	;
+	call	l_gcharspsp	;
 	ld	hl,%2	;const
+
+	call	l_gint	;
+	ld	b,h
+	ld	c,l
+	add	hl,bc
+	add	hl,bc
+	add	hl,hl
+	add	hl,bc
+	pop	de
+	add	hl,de
+=
+	call	l_gint7de	;
 
 	MODULE %1
 =
@@ -1199,3 +1211,18 @@
 	ld	hl,%0	;const
 	ld	(%1),hl
 	ld	(%2),hl
+
+	call	l_gchar
+	ld	a,l
+	call	l_sxt
+	ld	a,l
+=
+	call	l_gchar
+	ld	a,l
+
+	ld	hl,%1	;const
+	ld	a,l
+	call	l_sxt
+=
+	ld	hl,%1	;const
+	ld	a,l
