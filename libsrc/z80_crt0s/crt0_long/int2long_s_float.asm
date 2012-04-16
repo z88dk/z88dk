@@ -10,6 +10,6 @@
 .l_int2long_s_float
         ld      de,0
         bit     7,h
-        ret     z
+        jp		z,float
         dec     de
         jp		float
