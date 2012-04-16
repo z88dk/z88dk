@@ -9,7 +9,7 @@
 ;
 ;
 ; ------
-; $Id: ozcustomisr.asm,v 1.4 2011-08-12 17:13:55 pauloscustodio Exp $
+; $Id: ozcustomisr.asm,v 1.5 2012-04-16 08:44:34 stefano Exp $
 ;
 
 	XLIB	ozcustomisr
@@ -549,13 +549,13 @@ nokey:
         and     (hl)
         jr      z,doRepeat  ; not any other shift key
         ld      a,b
-        cp      kRShift~0ffh ; .and.0ffh
+        cp      kRShift ~ 0ffh
         jr      z,clearrepeat
-        cp      kNew~0ffh ; .and.0ffh
+        cp      kNew ~ 0ffh
         jr      z,clearrepeat
-        cp      kInv~0ffh ; .and.0ffh
+        cp      kInv ~ 0ffh
         jr      z,clearrepeat
-        cp      k2nd~0ffh ; .and.0ffh
+        cp      k2nd ~ 0ffh
         jr      z,clearrepeat
 
 doRepeat:

@@ -3,7 +3,7 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: dleq.asm,v 1.3 2011-08-12 07:15:19 pauloscustodio Exp $
+;	$Id: dleq.asm,v 1.4 2012-04-16 08:44:33 stefano Exp $
 ;
 
 		INCLUDE		"cpcfirm.def"

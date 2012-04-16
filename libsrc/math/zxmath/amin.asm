@@ -4,7 +4,7 @@
 ;
 ;       7/12/02 - Stefano Bodrato
 ;
-;       $Id: amin.asm,v 1.3 2011-08-08 18:42:48 pauloscustodio Exp $
+;       $Id: amin.asm,v 1.4 2012-04-16 08:44:34 stefano Exp $
 ;
 
 
@@ -31,6 +31,6 @@ ENDIF
 	defb	2			; [offset to go over the next byte]
 	defb	ZXFP_EXCHANGE
 	defb	ZXFP_END_CALC
+	call	ZXFP_STK_FETCH		; take away the bigger no from stack
 
-	call	ZXFP_STK_FETCH		; take away the smaller no from stack
         jp      stkequ
