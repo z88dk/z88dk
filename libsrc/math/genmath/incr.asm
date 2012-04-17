@@ -3,7 +3,7 @@
 ;
 ;	increment c ix de
 ;
-;       $Id: incr.asm,v 1.1 2008-07-27 21:44:57 aralbrec Exp $:
+;       $Id: incr.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
 
 		XLIB	incr
 
@@ -11,11 +11,9 @@
         RET     NZ
         INC     D
         RET     NZ
-        DEFB    $DD
-        INC     L
+        INC     IXL
         RET     NZ
-        DEFB    $DD
-        INC     H
+        INC     IXH
         RET     NZ
         INC     C
         RET     NZ      ;z => carry

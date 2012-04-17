@@ -3,7 +3,7 @@
 ;
 ;       Multiply fa y bc ix de
 ;
-;       $Id: fmul.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
+;       $Id: fmul_noaf.asm,v 1.1 2012-04-17 16:37:46 stefano Exp $:
 
 
 		XLIB	fmul
@@ -46,10 +46,12 @@
         LD      B,E     ;shift  c ix de b  right by 8...
         LD      E,D
         LD      D,IXL
-        EX      AF,AF'
+        ;EX      AF,AF'
+		PUSH    AF
         LD      A,IXH
         LD      IXL,A
-        EX      AF,AF'
+        ;EX      AF,AF'
+		POP     AF
         LD      IXH,C
         LD      C,A     ;...end of shifting
         RET             ;go to top of loop or NORM

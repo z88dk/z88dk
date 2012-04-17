@@ -3,7 +3,7 @@
 ;
 ;	Add bc ix de to FA
 ;
-;       $Id: fadd.asm,v 1.1 2008-07-27 21:44:57 aralbrec Exp $:
+;       $Id: fadd.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
 
 
 		XLIB	fadd
@@ -69,16 +69,12 @@
         LD      D,A
         INC     HL
         LD      A,(HL)
-        DEFB    $DD
-        SBC     A,L
-        DEFB    $DD
-        LD      L,A
+        SBC     A,IXL
+        LD      IXL,A
         INC     HL
         LD      A,(HL)
-        DEFB    $DD
-        SBC     A,H
-        DEFB    $DD
-        LD      H,A
+        SBC     A,IXH
+        LD      IXH,A
         INC     HL
         LD      A,(HL)
         SBC     A,C

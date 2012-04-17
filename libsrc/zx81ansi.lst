@@ -28,5 +28,6 @@ games/bit_frequency
 games/bit_beep
 games/zx81snd/beeper
 games/zx81snd/bit_synth
+z80_crt0s/z80_emu/afswap
 @zx81/zx81.lst
 @z80.lst

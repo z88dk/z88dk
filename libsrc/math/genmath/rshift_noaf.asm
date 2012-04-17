@@ -3,7 +3,7 @@
 ;
 ;	Shift c ix de b right by a
 ;
-;       $Id: rshift.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
+;       $Id: rshift_noaf.asm,v 1.1 2012-04-17 16:37:46 stefano Exp $:
 
 
 		XLIB	rshift
@@ -17,10 +17,12 @@
         LD      B,E     ;shift  c ix de b  right by 8...
         LD      E,D
         LD      D,IXL
-        EX      AF,AF'
+        ;EX      AF,AF'
+		PUSH    AF
         LD      A,IXH
         LD      IXL,A
-        EX      AF,AF'
+        ;EX      AF,AF'
+		POP     AF
         LD      IXH,C
         LD      C,0     ;...end of shifting
         JR      RSH2

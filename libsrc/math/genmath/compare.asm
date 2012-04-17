@@ -3,7 +3,7 @@
 ;
 ;       set flags per FA - ( bc ix de )
 ;
-;       $Id: compare.asm,v 1.1 2008-07-27 21:44:57 aralbrec Exp $:
+;       $Id: compare.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
 
 		XLIB	compare
 
@@ -42,13 +42,11 @@
         CP      (HL)
         RET     NZ
         DEC     HL
-        DEFB    $DD
-        LD      A,H
+        LD      A,IXH
         CP      (HL)
         RET     NZ
         DEC     HL
-        DEFB    $DD
-        LD      A,L
+		LD      A,IXL
         CP      (HL)
         RET     NZ
         DEC     HL

@@ -3,7 +3,7 @@
 ;
 ;       ???
 ;
-;       $Id: int2.asm,v 1.1 2008-07-27 21:44:57 aralbrec Exp $:
+;       $Id: int2.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
 
 
 		XLIB	int2
@@ -18,10 +18,8 @@
         LD      C,A
         LD      D,A
         LD      E,A
-        DEFB    $DD
-        LD      H,A
-        DEFB    $DD
-        LD      L,A
+        LD      IXH,A
+        LD      IXL,A
         OR      A
         RET     Z
         PUSH    HL
@@ -36,10 +34,8 @@
         INC     A
         JR      NZ,INT4
         DEC     IX
-        DEFB    $DD
-        LD      A,H
-        DEFB    $DD
-        AND     L
+        LD      A,IXH
+        AND     IXL
         INC     A
         JR      NZ,INT4
         DEC     C       ;...end of c ix de decrementing

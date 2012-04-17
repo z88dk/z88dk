@@ -1,29 +1,42 @@
 #
 # Wahey, a messed up makefile for building libraries!
-# $Id: Makefile,v 1.1 2008-07-27 21:44:57 aralbrec Exp $
+# $Id: Makefile,v 1.2 2012-04-17 16:37:46 stefano Exp $
 #
 
 include ../../Make.config
 
-CFILES = \
-	acos.c \
-	asin.c \
-	atan2.c \
-	atof.c \
-	cosh.c \
-	ftoa.c \
-	ftoe.c \
-	pow.c \
-	sinh.c \
-	tanh.c 
-
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
 
-all: genmath
+all: zx81math genmath
 
 genmath: $(OBJECTS)
+	zcc +test $(CFLAGS) acos.c
+	zcc +test $(CFLAGS) asin.c
+	zcc +test $(CFLAGS) atan2.c
+	zcc +test $(CFLAGS) atof.c
+	zcc +test $(CFLAGS) cosh.c
+	zcc +test $(CFLAGS) ftoa.c
+	zcc +test $(CFLAGS) ftoe.c
+	zcc +test $(CFLAGS) pow.c
+	zcc +test $(CFLAGS) sinh.c
+	zcc +test $(CFLAGS) tanh.c
 	$(LIBLINKER) -x../../$(OUTPUT_DIRECTORY)/gen_math @genlist
+
+zx81math:
+	$(RM) -f *.o
+	zcc +test $(CFLAGS) -Ca-IXIY acos.c
+	zcc +test $(CFLAGS) -Ca-IXIY asin.c
+	zcc +test $(CFLAGS) -Ca-IXIY atan2.c
+	zcc +test $(CFLAGS) -Ca-IXIY atof.c
+	zcc +test $(CFLAGS) -Ca-IXIY cosh.c
+	zcc +test $(CFLAGS) -Ca-IXIY ftoa.c
+	zcc +test $(CFLAGS) -Ca-IXIY ftoe.c
+	zcc +test $(CFLAGS) -Ca-IXIY pow.c
+	zcc +test $(CFLAGS) -Ca-IXIY sinh.c
+	zcc +test $(CFLAGS) -Ca-IXIY tanh.c
+	$(LIBLINKER) -x../../$(OUTPUT_DIRECTORY)/zx81_math -IXIY @zx81list
+	$(RM) -f *.o
 
 .c.o:
 	zcc +test $(CFLAGS) $*.c

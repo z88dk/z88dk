@@ -3,7 +3,7 @@
 ;
 ;       fraction add c ix de += (hl)
 ;
-;       $Id: fradd.asm,v 1.1 2008-07-27 21:44:57 aralbrec Exp $:
+;       $Id: fradd.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
 
 		XLIB	fradd
 
@@ -16,16 +16,12 @@
         LD      D,A
         INC     HL
         LD      A,(HL)
-        DEFB    $DD
-        ADC     A,L
-        DEFB    $DD
-        LD      L,A
+        ADC     A,IXL
+        LD      IXL,A
         INC     HL
         LD      A,(HL)
-        DEFB    $DD
-        ADC     A,H
-        DEFB    $DD
-        LD      H,A
+        ADC     A,IXH
+        LD      IXH,A
         INC     HL
         LD      A,(HL)
         ADC     A,C

@@ -11,12 +11,10 @@
         ld      d,(hl)
         inc     hl
         ld      c,(hl)
-        defb    $dd
-        ld      l,c
+        ld      ixl,c
         inc     hl
         ld      c,(hl)
-        defb    $dd
-        ld      h,c
+        ld      ixh,c
         inc     hl
         ld      c,(hl)
         inc     hl

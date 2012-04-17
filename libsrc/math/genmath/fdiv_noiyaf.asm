@@ -3,7 +3,7 @@
 ;
 ;	divide bc ix de by FA, leave result in FA
 ;
-;	$Id: fdiv.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $
+;	$Id: fdiv_noiyaf.asm,v 1.1 2012-04-17 16:37:46 stefano Exp $
 
 
 
@@ -116,8 +116,10 @@
         LD      A,C     ;test  c ix de...
         OR      D
         OR      E
-        OR      IXH
-        OR      IXL       ;...end of  c ix de  testing
+        DEFB    $DD
+        OR      H
+        DEFB    $DD
+        OR      L       ;...end of  c ix de  testing
         JR      NZ,DIV2 ;nz => dividend nonzero
         PUSH    HL
         LD      HL,FA+5

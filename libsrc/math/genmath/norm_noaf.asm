@@ -5,13 +5,14 @@
 ;	current exponent in fa+5
 ;	Result -> fa +5
 ;
-;       $Id: norm.asm,v 1.2 2012-04-17 16:37:46 stefano Exp $:
+;       $Id: norm_noaf.asm,v 1.1 2012-04-17 16:37:46 stefano Exp $:
 
 
 		XLIB	norm
 
 		LIB	pack
 		LIB	norm4
+		LIB	afswap
 
 		XREF	fa
 
@@ -42,12 +43,15 @@
 ;                       shift  c ix d hl  left one bit...
         ADD     HL,HL
         RL      D
-        EX      AF,AF'
+        ;EX      AF,AF'
+		call	afswap
         ADD     IX,IX
-        EX      AF,AF'
+        ;EX      AF,AF'
+		call	afswap
         JR      NC,NORM10
         INC     IX
-.NORM10 EX      AF,AF'
+.NORM10 ;EX      AF,AF'
+		call	afswap
         RL      C       ;...end of shifting
 ;
 .NORM12 JP      P,NORM8 ;p => high order bit still zero
