@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.32 2011-11-25 09:46:08 stefano Exp $
+# $Id: Makefile,v 1.33 2012-04-18 10:17:13 stefano Exp $
 #
 
 include ../Make.config
@@ -165,6 +165,7 @@ clean:
 	$(RM) ts2068/*.o
 	$(RM) sprinter/*.o
 	$(RM) svi/*.o
+	$(RM) sc3000/*.o
 	$(RM) vz200/*.o
 	$(RM) x07/*.o
 	$(RM) z88/*.o
