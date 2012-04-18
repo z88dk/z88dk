@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.36 2011-09-27 19:18:04 dom Exp $
+#	$Id: Makefile,v 1.37 2012-04-18 11:30:19 stefano Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -38,8 +38,8 @@ sccz80:
 	$(MAKE) -C src/sccz80 PREFIX=`pwd` install
 
 z80asm:
-	$(MAKE) -C src/z80asm.stable
-	$(MAKE) -C src/z80asm.stable PREFIX=`pwd` install
+	$(MAKE) -C src/z80asm
+	$(MAKE) -C src/z80asm PREFIX=`pwd` install
 
 zcc:
 	$(MAKE) -C src/zcc
@@ -71,7 +71,7 @@ install:
 	cd src/copt ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/cpp ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/sccz80 ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
-	cd src/z80asm.stable ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
+	cd src/z80asm ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	cd src/zcc ; $(MAKE) PREFIX=$(DESTDIR)/$(prefix) install
 	./config.sh $(prefix_share)/z88dk/ $(DEFAULT)
 	cp -R -p include $(DESTDIR)/$(prefix_share)/z88dk
@@ -93,7 +93,7 @@ clean-bins:
 	cd src/copt ; $(MAKE) clean
 	cd src/cpp ; $(MAKE) clean
 	cd src/sccz80 ; $(MAKE) clean
-	cd src/z80asm.stable ; $(MAKE) clean
+	cd src/z80asm ; $(MAKE) clean
 	cd src/zcc ; $(MAKE) clean
 	$(MAKE) -C support/ar clean
 
