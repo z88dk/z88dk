@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/zx82.t,v 1.2 2011-10-10 18:27:58 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/zx82.t,v 1.3 2012-04-22 19:37:46 pauloscustodio Exp $
 #
 # Build ZX Spectrum 48K ROM, compare result
 
@@ -68,16 +68,16 @@ t_z80asm_capture("-r0 -b $patched_src", "", "", 0);
 ok ! -f $err, "no $err";
 ok -f $obj, "$obj exists";
 ok -f $bin, "$bin exists";
-t_binary(scalar(read_file($bin, binmode => ':raw')),
-	 scalar(read_file($bmk_bin, binmode => ':raw')));
+t_binary(read_binfile($bin),
+	 read_binfile($bmk_bin));
 
 # assemble with separate modules
 t_z80asm_capture("-r0 -b \@$project", "", "", 0);
 for (@prj_err) { ok ! -f $_, "no $_"; }
 for (@prj_obj) { ok -f $_, "$_ exists"; }
 ok -f $prj_bin, "$prj_bin exists";
-t_binary(scalar(read_file($prj_bin, binmode => ':raw')),
-	 scalar(read_file($bmk_bin, binmode => ':raw')));
+t_binary(read_binfile($prj_bin),
+	 read_binfile($bmk_bin));
 
 unlink_testfiles(@testfiles);
 done_testing();

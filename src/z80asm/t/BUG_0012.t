@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0012.t,v 1.1 2011-08-21 20:14:14 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0012.t,v 1.2 2012-04-22 19:37:46 pauloscustodio Exp $
 #
 # BUG_0012 : binfilename[] array is too short, should be FILENAME_MAX
 
@@ -29,8 +29,8 @@ ok length($bin_file) > 64, "Bin file $bin_file";
 t_z80asm_capture("-r0 -b -o$bin_file ".asm_file(), "", "", 0);
 ok -f bin_file(), bin_file()." exists";
 ok -f $bin_file, $bin_file." exists";
-t_binary(scalar(read_file(bin_file(), binmode => ':raw')), "\0");
-t_binary(scalar(read_file($bin_file, binmode => ':raw')), "\0");
+t_binary(read_binfile(bin_file()), "\0");
+t_binary(read_binfile($bin_file), "\0");
 
 unlink_testfiles();
 done_testing();

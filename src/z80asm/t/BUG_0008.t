@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0008.t,v 1.1 2011-08-18 21:42:58 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0008.t,v 1.2 2012-04-22 19:37:46 pauloscustodio Exp $
 # $Log: BUG_0008.t,v $
-# Revision 1.1  2011-08-18 21:42:58  pauloscustodio
+# Revision 1.2  2012-04-22 19:37:46  pauloscustodio
+# Use read_binfile()
+#
+# Revision 1.1  2011/08/18 21:42:58  pauloscustodio
 # Test BUG_0008 : code block of 64K is read as zero
 #
 #
@@ -28,11 +31,11 @@ require 't/test_utils.pl';
 
 write_file(asm_file(), "defb 0xAA \n" x 65536);
 t_z80asm_capture(asm_file(), "", "", 0);
-t_binary(scalar(read_file(obj_file(), binary => ':raw')),
+t_binary(read_binfile(obj_file()),
 	 objfile(NAME => 'test',
 		 CODE => "\xAA" x 65536));
 t_z80asm_capture("-r0 -d -b ".asm_file(), "", "", 0);	# use obj, dont assemble
-t_binary(scalar(read_file(bin_file(), binary => ':raw')),
+t_binary(read_binfile(bin_file()),
 	 "\xAA" x 65536);
 
 unlink_testfiles();

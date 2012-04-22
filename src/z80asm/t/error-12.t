@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/error-12.t,v 1.3 2011-10-14 14:02:23 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/error-12.t,v 1.4 2012-04-22 19:37:46 pauloscustodio Exp $
 # $Log: error-12.t,v $
-# Revision 1.3  2011-10-14 14:02:23  pauloscustodio
+# Revision 1.4  2012-04-22 19:37:46  pauloscustodio
+# Use read_binfile()
+#
+# Revision 1.3  2011/10/14 14:02:23  pauloscustodio
 # test each of the MAXCODESIZE conditions in the code
 #
 # Revision 1.2  2011/07/14 01:32:09  pauloscustodio
@@ -124,7 +127,7 @@ write_file($asm_file2, "defb 0xAA");
 
 write_file(asm_file(), "defs 65535, 0xAA");
 t_z80asm_capture("-r0 -b ".asm_file()." $asm_file2", "", "", 0);
-t_binary(scalar(read_file(bin_file(), binmode => ':raw')),
+t_binary(read_binfile(bin_file()),
 	"\xAA" x 65536);
 
 write_file(asm_file(), "defs 65536, 0xAA");
