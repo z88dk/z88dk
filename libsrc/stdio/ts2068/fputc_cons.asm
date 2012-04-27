@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.4 2012-02-09 09:03:33 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.5 2012-04-27 12:16:57 stefano Exp $
 ;
 
 
@@ -364,7 +364,10 @@
 .left
         ld      a,l
         and     a
-        ret     z
+        jr		nz,doleft
+        ld		l,63
+        jr		up
+.doleft
         dec     l
 .left2  nop
         ld      (chrloc),hl

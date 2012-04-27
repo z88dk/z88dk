@@ -4,7 +4,7 @@
 ;	gets(char *s) - get string from console
 ;
 ;
-;	$Id: gets.asm,v 1.5 2012-03-19 15:43:09 stefano Exp $
+;	$Id: gets.asm,v 1.6 2012-04-27 12:16:57 stefano Exp $
 ;
 
 
@@ -12,6 +12,7 @@
 		LIB   fgetc_cons
 		LIB   fputc_cons
 
+DEFINE EMULATECURSOR
 
 ; Enter in with hl holding the address of string to print
 
@@ -33,6 +34,8 @@ ENDIF
 	call	fgetc_cons
 	pop		hl
 	pop		de
+	and		a
+	jr		z,getloop
 	cp		8
 	jr		z,bs
 	cp		12
@@ -43,24 +46,26 @@ ENDIF
 	sbc		hl,de
 	pop		hl
 	jr		z,getloop
+	dec		hl
 IF EMULATECURSOR
 .dobs
-	call	wipecursor
-	call	chr8
-	ld		a,' '
+	call	wipecursor	; ' ' + BS
+	ld		a,8
 	call	conout
-	call	chr8
+	call	wipecursor	; ' ' + BS
 	call	cursor
-	dec		hl
-	jr		getloop
 ELSE
 	ld		a,8
 	call	conout
 	ld		a,' '
 	call	conout
 	ld		a,8
+	call	conout
 ENDIF
+	jr		getloop
 .nobs
+	cp		12
+	jr		z,getloop
 	cp		13
 	jr		z,getend
 	ld		(hl),a

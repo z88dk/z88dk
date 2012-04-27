@@ -5,7 +5,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: fputc_cons.asm,v 1.14 2011-12-01 17:46:45 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.15 2012-04-27 12:16:57 stefano Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -70,7 +70,7 @@
 	push	hl
 	call zx_dfile_addr
 	xor	a		; blank
-	ld	(hl),a
+	;ld	(hl),a
 	pop	hl
 	cp	(hl)
 	jr	z,firstc ; are we in the first column?

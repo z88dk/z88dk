@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.6 2012-02-09 09:03:33 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.7 2012-04-27 12:16:57 stefano Exp $
 ;
 
 
@@ -187,39 +187,39 @@
           rrca  
           rrca  
           add   a,c  
-	  ld	e,a
+          ld	e,a
 ; Screen posn in de, now get font
-	  ex	af,af
+          ex	af,af
 
-	ld	b,8
+          ld	b,8
 .loop32
-	ld	a,(hl)
+          ld	a,(hl)
 .invers2 defb	0
-	ld	(de),a
-	inc	d	;down screen row
-	inc	hl
-	djnz	loop32
-        ld      a,d  
-	dec     a
-        rrca  
-        rrca  
-        rrca  
-        and     3  
-        or      88  
-        ld      d,a  
-	ld      a,(attr)
-	ld      (de),a
-	ld	hl,(chrloc)
-	inc	l
-	inc	l
-	jp	posncheck
+          ld	(de),a
+          inc	d	;down screen row
+          inc	hl
+          djnz	loop32
+          ld      a,d  
+          dec     a
+          rrca  
+          rrca  
+          rrca  
+        and 3  
+        or  88  
+        ld  d,a  
+        ld  a,(attr)
+        ld  (de),a
+        ld	hl,(chrloc)
+        inc	l
+        inc	l
+        jp	posncheck
 
 ; Ooops..ain't written this yet!
 ; We should scroll the screen up one character here
 ; Blanking the bottom row..
 .scrollup
         call    call_rom3
-	defw	3582
+        defw	3582
         ret
 
 ; This nastily inefficient table is the code table for the routines
@@ -270,7 +270,10 @@
 .left
         ld      a,l
         and     a
-        ret     z
+        jr		nz,doleft
+        ld		l,63
+        jr		up
+.doleft
         dec     l
 .left2  nop
         ld      (chrloc),hl
@@ -312,10 +315,10 @@
         ld      bc,6144
         ld      (hl),l
         ldir
-	ld	a,(attr)
-	ld	(hl),a
-	ld	bc,767
-	ldir
+        ld	a,(attr)
+        ld	(hl),a
+        ld	bc,767
+        ldir
         ld      hl,0
         ld      (chrloc),hl
         ret
@@ -325,9 +328,9 @@
 .cr
         ld      a,h
         cp      23
-	jr	nz,cr_1
-	call	scrollup
-	ld	h,22
+        jr	nz,cr_1
+        call	scrollup
+        ld	h,22
 .cr_1
         inc     h
         ld      l,0
@@ -441,16 +444,16 @@
 .setposn
         ld      a,2     ;number to expect
         ld      hl,doposn
-	jr	setparams
+        jr	setparams
 
 ; Setting the position
 ; We only care 
 
 .doposn
         ld      hl,(params)
-	ld	de,$2020
-	and	a
-	sbc	hl,de
+        ld	de,$2020
+        and	a
+        sbc	hl,de
         ld      a,h     ;y position
         cp      24
         ret     nc
