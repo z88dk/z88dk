@@ -7,11 +7,11 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_undrawr.asm,v 1.1 2008-07-17 15:39:56 stefano Exp $
+;	$Id: w_undrawr.asm,v 1.2 2012-04-28 16:23:59 stefano Exp $
 ;
 
 
-                XLIB    drawr
+                XLIB    undrawr
                 LIB     swapgfxbk
                 XREF	swapgfxbk1
 
@@ -19,7 +19,7 @@
                 LIB     w_respixel
 
 
-.drawr
+.undrawr
 		ld	ix,0
 		add	ix,sp
 		ld	e,(ix+2)
