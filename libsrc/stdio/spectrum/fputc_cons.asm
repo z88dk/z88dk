@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.7 2012-04-27 12:16:57 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.8 2012-05-02 14:23:42 stefano Exp $
 ;
 
 
@@ -31,7 +31,7 @@
 	ld	a,(hl)
         ex      af,af'
         ld      a,(flags)
-	and	a
+        and     a
         jp      z,putit_out1    ;no parameters pending
 ; Set up so dump into params so first param is at highest posn
         ld      l,a
@@ -226,10 +226,10 @@
 ; Done this way for future! Expansion
 
 .code_table
-        defw    noop    ; 0 - NUL
-        defw    switch  ; 1 - SOH
+        defw    noop      ; 0 - NUL
+        defw    switch    ; 1 - SOH
         defw    setfont32 ; 2
-        defw    setudg ; 3
+        defw    setudg    ; 3
         defw    noop    ; 4
         defw    noop    ; 5
         defw    noop    ; 6
@@ -242,10 +242,10 @@
         defw    cr      ;13 - CR (+NL)
         defw    noop    ;14
         defw    noop    ;15
-        defw    setink  ;16  - ink
-        defw    setpaper;17  - paper
-        defw    setflash;18  - flash
-        defw    setbright;19  - bright
+        defw    setink     ;16  - ink
+        defw    setpaper   ;17  - paper
+        defw    setflash   ;18  - flash
+        defw    setbright  ;19  - bright
         defw    setinverse ;20  - inverse
         defw    noop    ;21  - over
         defw    setposn ;22
@@ -451,9 +451,14 @@
 
 .doposn
         ld      hl,(params)
-        ld	de,$2020
-        and	a
-        sbc	hl,de
+        ld      a,(left2)
+        and     a			; are we in 32 columns mode ?
+        jr      z,nomult	; if not, do not double
+        rl		l
+.nomult
+        ;ld	de,$2020
+        ;and	a
+        ;sbc	hl,de
         ld      a,h     ;y position
         cp      24
         ret     nc
