@@ -19,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.1 2010-11-26 11:37:32 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.2 2012-05-04 16:39:25 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -32,6 +32,7 @@
 	
 ; Dirty thing for self modifying code
 	XDEF	INVRS	
+	XDEF	BOLD
 
 IF A255COL
 .text_cols   defb 255 ;defb 128
@@ -192,6 +193,10 @@ ENDIF
   djnz L1
 .DTS
   ld a,(hl)
+
+.BOLD
+  nop	;	rla
+  nop	;	or (hl)
   
 IF ROMFONT
 	; nothing here !

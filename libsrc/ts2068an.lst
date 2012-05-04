@@ -7,7 +7,7 @@ stdio/ansi/f_ansi_putc
 stdio/ansi/fputc_cons
 stdio/ansi/puts_cons
 stdio/ansi/f_ansi_dsr6
-stdio/ansi/spectrum/f_ansi_attr
+stdio/ansi/ts2068/f_ansi_attr
 stdio/ansi/spectrum/f_ansi_bel
 stdio/ansi/ts2068/f_ansi_char
 stdio/ansi/ts2068/f_ansi_cls
