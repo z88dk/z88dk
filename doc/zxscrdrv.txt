@@ -24,9 +24,9 @@ Here are the byte sequences for it:
 20,x      - Turn on/off inverse (x=49/48 ('1'/'0')
 
 22,y,x	  - Move to position y,x on the screen (0<=y<=23, 0<=x<=63)
-	    NB. y and x are displaced by 32 eg to move the print position
-	    to (0,0) use 22,32,32. 32 column mode also uses 64 column
-	    coordinates.
+	
+	    NB. Cursor positioning is now in "Sinclair" stile: (0,0) is on
+	    top-left, expecting the ROW,COLUMN parameters order.
 
 
 All the commands, except for the udg address/font address  can be embedded 

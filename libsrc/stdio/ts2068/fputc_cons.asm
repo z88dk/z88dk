@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.6 2012-05-02 14:23:42 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.7 2012-05-04 09:06:57 stefano Exp $
 ;
 
 
@@ -32,6 +32,8 @@
 	and   7
 	cp    6
 	jr    nz,normal
+	in    a,(255)
+	ld    (hrgmode_save),a
 	dec   (hl)
 	ld	hl,print32     ; with the 512 dots (64 cols) mode we print in 32 column mode..
 	ld	(print1+1),hl
@@ -558,11 +560,6 @@
 
 .doposn
         ld      hl,(params)
-        ld      a,(left2)
-        and     a			; are we in 32 columns mode ?
-        jr      z,nomult	; if not, do not double
-        rl		l
-.nomult
 ;	ld	de,$2020
 ;	and	a
 ;	sbc	hl,de
@@ -571,6 +568,11 @@
         ret     nc
         bit     6,l     ;is x > 64
         ret     nz
+        ld		a,(left2)
+        and		a
+        jr		z,no32mode
+        rl		l
+.no32mode
         ld      (chrloc),hl
         ret
 
@@ -584,6 +586,8 @@
 	ret
 
 .doswitch
+	ld	a,(hrgmode_save)
+	out	(255),a
 	xor	a
 	ld	(left2),a
 	ld	(right2),a
@@ -599,6 +603,8 @@
 	ld	(right2),a
 	ld	hl,print32
 	ld	(print1+1),hl
+	xor	a
+	out	(255),a
 	ret
 
 
@@ -608,6 +614,10 @@
 ; Variables
 ; Because we're on a Spectrum we can scatter statics all over the place!
 .hrgmode
+        defb	0
+
+; keep video register when in hrg mode 
+.hrgmode_save
         defb	0
 
 .chrloc
