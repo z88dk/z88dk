@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fgetc.c,v 1.5 2002-06-09 15:13:26 dom Exp $
+ * $Id: fgetc.c,v 1.6 2012-05-08 07:59:09 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -83,6 +83,9 @@ int fgetc(FILE *fp)
 	pop	ix	;ix back
 	jr	c,no_stdin
 	call	fgetc_cons	;get from console
+	push    hl
+	call    fputc_cons
+	pop     hl
 	ret			;always succeeds - never EOF
 .no_stdin
 	ld	l,(ix+fp_desc)
