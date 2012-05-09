@@ -2161,34 +2161,6 @@
 	ld	d,h
 	ld	e,l
 
-	push	hl
-	call	l_gint	;
-	inc	hl
-	pop	de
-	call	l_pint
-=
-	inc	(hl)
-	ld	a,(hl)
-	inc	hl
-	jr	nz,ASMPC+3
-	inc	(hl)
-	ld	h,(hl)
-	ld	l,a
-
-	push	hl
-	call	l_gint	;
-	dec	hl
-	pop	de
-	call	l_pint
-=
-	dec	(hl)
-	ld	a,(hl)
-	inc	hl
-	jr	nz,ASMPC+3
-	dec	(hl)
-	ld	h,(hl)
-	ld	l,a
-
 	jp	%1
 .%2
 	jp	%1
