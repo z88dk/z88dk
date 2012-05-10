@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.38 2010-11-03 10:03:49 stefano Exp $
+ * $Id: stdlib.h,v 1.39 2012-05-10 16:42:54 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -203,7 +203,9 @@ extern unsigned int  __LIB__ __FASTCALL__ wpeek(void *addr);
 // ACCURATE T-STATE DELAY
 /////////////////////////
 
+#ifndef delay
 extern void          __LIB__ __FASTCALL__ delay(unsigned int tstates);   // at least 141 T
+#endif
 
 
 /*********/
