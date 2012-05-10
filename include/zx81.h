@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.25 2012-01-09 16:02:35 stefano Exp $
+ * $Id: zx81.h,v 1.26 2012-05-10 14:49:24 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -109,9 +109,9 @@ extern void __LIB__ hrg_tune_left();
 extern void __LIB__ hrg_tune_right();
 
 // Hides the HRG screen making the zx81 run faster!
-extern void __LIB__ blank();
+extern void __LIB__ zx_blank();
 // Shows the HRG screen back
-extern void __LIB__ noblank();
+extern void __LIB__ zx_noblank();
 
 // Enable/disable High Resolution Graphics mode for Memotech board
 // gfx81mt192.lib or gfx81mt64.lib and "startup=2" mode required

@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg_arx.def,v 1.8 2011-12-28 14:04:54 stefano Exp $
+;       $Id: zx81_hrg_arx.def,v 1.9 2012-05-10 14:49:24 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -12,8 +12,8 @@ XDEF	hrg_on
 XDEF	hrg_off
 XDEF	HRG_LineStart
 XDEF	HRG_Handler
-XDEF	blank
-XDEF	noblank
+XDEF	zx_blank
+XDEF	zx_noblank
 XDEF	zx_fast
 XDEF	zx_slow
 
@@ -78,7 +78,7 @@ IF (startup=17)
 ENDIF
 
 ;----------------------------------------------------------------
-noblank:
+zx_noblank:
         ld      hl,HRG_handler  ; starts the hires mode when JP (IX) is made
         call	HRG_Sync
 IF (startup<15)
@@ -88,7 +88,7 @@ ENDIF
         ret
 
 ;----------------------------------------------------------------
-blank:
+zx_blank:
         ld      hl,HRG_BlankHandler
         call	HRG_Sync
 IF (startup<15)
