@@ -1,4 +1,24 @@
 	ld	hl,(%1)
+	inc	hl
+	ld	(%1),hl
+	dec	hl
+	ld	hl,(%1)
+=
+	ld	hl,(%1)
+	inc	hl
+	ld	(%1),hl
+
+	ld	hl,(%1)
+	dec	hl
+	ld	(%1),hl
+	inc	hl
+	ld	hl,(%1)
+=
+	ld	hl,(%1)
+	dec	hl
+	ld	(%1),hl
+
+	ld	hl,(%1)
 	ld	h,0
 	%2c	hl
 	ld	a,l
@@ -651,14 +671,20 @@
 	ld	hl,%1	;const
 	call	l_gintsp	;
 
+	call	l_int2long_s
+	call	float
+=
+	call	l_int2long_s_float
+
+	ld	h,%1
+	ld	l,%2
+	ld	hl,%3
+=
+	ld	hl,%3
+
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gchar
 =
 	ld	hl,%1	;const
 	call	l_gcharsp	;
-
-	call	l_int2long_s
-	call	float
-=
-	call	l_int2long_s_float

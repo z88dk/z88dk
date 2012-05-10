@@ -1211,18 +1211,3 @@
 	ld	hl,%0	;const
 	ld	(%1),hl
 	ld	(%2),hl
-
-	call	l_gchar
-	ld	a,l
-	call	l_sxt
-	ld	a,l
-=
-	call	l_gchar
-	ld	a,l
-
-	ld	hl,%1	;const
-	ld	a,l
-	call	l_sxt
-=
-	ld	hl,%1	;const
-	ld	a,l

@@ -9,6 +9,7 @@ XLIB l_gcharspsp
 	inc hl
 	ld a,(hl)
 	ld l,a
+	rlca
 	sbc   a,a
 	ld h,a
 	ex	(sp),hl
