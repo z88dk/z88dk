@@ -13,9 +13,21 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.21 2011-08-05 19:59:51 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.22 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.21  2011-08-05 19:59:51  pauloscustodio
+/* Revision 1.22  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.21  2011/08/05 19:59:51  pauloscustodio
 /* Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
 /*
 /* Revision 1.20  2011/07/18 00:48:25  pauloscustodio
@@ -40,7 +52,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /*
 /* Revision 1.15  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword
-/* 
+/*
 /* Revision 1.14  2011/07/09 01:23:13  pauloscustodio
 /* BUG_0001 : Error in expression during link, expression garbled - memory corruption?
 /*      Simple asm program: "org 0 \n jp NN \n jp NN \n NN: \n",
@@ -56,60 +68,60 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /*      If the random separator is a semicolon, GetSym() calls Skipline() to go past
 /*      the comment, and reads past the end of the expression in the OBJ file,
 /*      causing the parse of the next expression to fail.
-/* 
+/*
 /* Revision 1.13  2010/04/16 17:34:37  dom
 /* Make line number an int - 32768 lines isn't big enough...
-/* 
+/*
 /* Revision 1.12  2009/08/14 22:23:12  dom
 /* clean up some compiler warnings
-/* 
+/*
 /* Revision 1.11  2009/07/18 23:23:15  dom
 /* clean up the code a bit more (Formatting and a fewer magic numbers)
-/* 
+/*
 /* Revision 1.10  2007/06/17 12:07:43  dom
 /* Commit the rabbit emulation code including rrd, rld
-/* 
+/*
 /* Add a .vcproj for visual studio
-/* 
+/*
 /* Revision 1.9  2007/02/28 11:23:24  stefano
 /* New platform !
 /* Rabbit Control Module 2000/3000.
-/* 
+/*
 /* Revision 1.8  2002/04/22 14:45:51  stefano
 /* Removed the SLL L undocumented instructions from the Graph library.
 /* NEW startup=2 mode for the ZX81 (SLOW mode... hoping we'll make it work in the future).
 /* MS Visual C compiler related fixes
 /* -IXIY option on Z80ASM to swap the IX and IY registers
-/* 
+/*
 /* Revision 1.7  2002/01/18 21:12:17  dom
 /* 0x prefix allowed for hex constants
-/* 
+/*
 /* Revision 1.6  2002/01/18 16:55:40  dom
 /* minor bug fix on the previous commit
-/* 
+/*
 /* Revision 1.5  2002/01/18 16:53:13  dom
 /* added 'd' and 'b' identifiers for constants - decimal and binary
 /* respectively.
-/* 
+/*
 /* Revision 1.4  2002/01/16 21:56:43  dom
 /* we now accept h as a post modifier for hex numbers eg:
-/* 	ld	a,20h == ld a,$20 == ld a,32
-/* 
+/*      ld      a,20h == ld a,$20 == ld a,32
+/*
 /* Revision 1.3  2001/04/11 09:48:18  dom
 /* Minor fix to allow labels to end in ':'
-/* 
+/*
 /* Revision 1.2  2001/03/21 16:34:01  dom
 /* Added changes to allow labels to end in ':' and the prefix '.' isn't
 /* necessarily needed..this isn't guaranteed to be perfect so let me know
 /* of any problems and drop back to 1.0.18
-/* 
+/*
 /* Revision 1.1  2000/07/04 15:33:30  dom
 /* branches:  1.1.1;
 /* Initial revision
-/* 
+/*
 /* Revision 1.1.1.1  2000/07/04 15:33:30  dom
 /* First import of z88dk into the sourceforge system <gulp>
-/* 
+/*
 /* */
 
 /* $History: PRSLINE.C $ */
@@ -138,7 +150,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* GetSym() and Skipline() improved with EOF handling. */
 
 
-#include "memalloc.h"	/* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include to enable memory leak detection */
 
 #include <stdio.h>
 #include <string.h>
@@ -151,15 +163,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "errors.h"
 
 /* local functions */
-long GetConstant (char *evalerr);
-int IndirectRegisters (void);
-int CheckRegister16 (void);
-int CheckRegister8 (void);
-int CheckCondition (void);
-int GetChar (FILE *fptr);
-enum symbols GetSym (void);
-void Skipline (FILE *fptr);
-int CheckBaseType(int chcount);
+long GetConstant( char *evalerr );
+int IndirectRegisters( void );
+int CheckRegister16( void );
+int CheckRegister8( void );
+int CheckCondition( void );
+int GetChar( FILE *fptr );
+enum symbols GetSym( void );
+void Skipline( FILE *fptr );
+int CheckBaseType( int chcount );
 
 /* global variables */
 extern FILE *z80asmfile;
@@ -175,23 +187,23 @@ char  *temporary_start;
 char  *temporary_ptr = NULL;
 
 
-void UnGet(int c, FILE *fp)
+void UnGet( int c, FILE *fp )
 {
-  if ( temporary_ptr ) 
+    if ( temporary_ptr )
     {
-      temporary_ptr--;
-    } 
-  else 
+        temporary_ptr--;
+    }
+    else
     {
-      ungetc(c,fp);
+        ungetc( c, fp );
     }
 }
 
 
 
 
-void 
-SetTemporaryLine(char *line)
+void
+SetTemporaryLine( char *line )
 {
     temporary_start = temporary_ptr = line;
 }
@@ -202,296 +214,355 @@ SetTemporaryLine(char *line)
  *
  */
 int
-GetChar (FILE *fptr)
+GetChar( FILE *fptr )
 {
-  int c;
+    int c;
 
-  if ( temporary_ptr != NULL )
+    if ( temporary_ptr != NULL )
     {
-      if ( *temporary_ptr != 0 ) 
+        if ( *temporary_ptr != 0 )
         {
-          c = *temporary_ptr++;
-          return c;
-        } 
-      temporary_ptr = NULL;
+            c = *temporary_ptr++;
+            return c;
+        }
+
+        temporary_ptr = NULL;
     }
-      
-  
-  c = fgetc (fptr);
-  if (c == 13)
+
+
+    c = fgetc( fptr );
+
+    if ( c == 13 )
     {
-      /* Mac/Z88 line feed found,poll for MSDOS line feed */
-      c = fgetc (fptr);    
-      if (c != 10)
-        ungetc (c, fptr);	/* push non-line-feed character back into file stream */
-      
-      c = '\n';	/* always return the symbolic '\n' for line feed */
+        /* Mac/Z88 line feed found,poll for MSDOS line feed */
+        c = fgetc( fptr );
+
+        if ( c != 10 )
+        {
+            ungetc( c, fptr );    /* push non-line-feed character back into file stream */
+        }
+
+        c = '\n'; /* always return the symbolic '\n' for line feed */
     }
-  else
-    if (c == 10)
-      c = '\n';	/* UNIX/QDOS line feed */
-      
-  return c;	/* return all other characters */
+    else if ( c == 10 )
+    {
+        c = '\n';    /* UNIX/QDOS line feed */
+    }
+
+    return c;     /* return all other characters */
 }
 
 
-enum symbols 
-GetSym (void)
+enum symbols
+GetSym( void )
 {
-  char *instr;
-  int c, chcount = 0;
+    char *instr;
+    int c, chcount = 0;
 
-  ident[0] = '\0';
+    ident[0] = '\0';
 
-  if (EOL == ON)
+    if ( EOL == ON )
     {
-      sym = newline;
-      return sym;
+        sym = newline;
+        return sym;
     }
-  for (;;)
-    {				/* Ignore leading white spaces, if any... */
-      if (feof (z80asmfile))
+
+    for ( ;; )
+    {
+        /* Ignore leading white spaces, if any... */
+        if ( feof( z80asmfile ) )
         {
-          sym = newline;
-          EOL = ON;
-          return newline;
+            sym = newline;
+            EOL = ON;
+            return newline;
         }
-      else
+        else
         {
-          c = GetChar (z80asmfile);
-          if ((c == '\n') || (c == EOF) || (c == '\x1A')
-              || (c == '\0'))	        /* BUG_0001 Bugfix read overrun in OBJ file expression */
+            c = GetChar( z80asmfile );
+
+            if ( ( c == '\n' ) || ( c == EOF ) || ( c == '\x1A' )
+                    || ( c == '\0' ) )        /* BUG_0001 Bugfix read overrun in OBJ file expression */
             {
-              sym = newline;
-              EOL = ON;
-              return newline;
+                sym = newline;
+                EOL = ON;
+                return newline;
             }
-          else if (!isspace (c))
+            else if ( !isspace( c ) )
+            {
+                break;
+            }
+        }
+    }
+
+    instr = strchr( separators, c );
+
+    if ( instr != NULL )
+    {
+        sym = ssym[instr - separators];   /* index of found char in separators[] */
+
+        if ( sym == semicolon )
+        {
+            Skipline( z80asmfile );       /* ignore comment line, prepare for next line */
+            sym = newline;
+        }
+
+        return sym;
+    }
+
+    ident[chcount++] = ( char ) toupper( c );
+
+    switch ( c )
+    {
+        case '$':
+            sym = hexconst;
+            break;
+
+        case '@':
+        case '%':
+            sym = binconst;
+            break;
+
+        case '#':
+            sym = name;
+            break;
+
+        default:
+            if ( isdigit( c ) )
+            {
+                sym = decmconst;      /* a decimal number found */
+            }
+            else
+            {
+                if ( isalpha( c ) || c == '_' )
+                {
+                    sym = name;       /* an identifier found */
+                }
+                else
+                {
+                    sym = nil;        /* rubbish ... */
+                }
+            }
+
+            break;
+    }
+
+    /* Read identifier until space or legal separator is found */
+    if ( sym == name )
+    {
+        for ( ;; )
+        {
+            if ( feof( z80asmfile ) )
+            {
+                break;
+            }
+            else
+            {
+                c = GetChar( z80asmfile );
+
+                if ( ( c != EOF ) && ( !iscntrl( c ) ) && ( strchr( separators, c ) == NULL ) )
+                {
+                    if ( !isalnum( c ) )
+                    {
+                        if ( c != '_' )
+                        {
+                            sym = nil;
+                            break;
+                        }
+                        else
+                        {
+                            ident[chcount++] = '_';       /* underscore in identifier */
+                        }
+                    }
+                    else
+                    {
+                        ident[chcount++] = ( char ) toupper( c );
+                    }
+                }
+                else
+                {
+                    if ( c != ':' )
+                    {
+                        UnGet( c, z80asmfile );    /* puch character back into stream for next read */
+                    }
+                    else
+                    {
+                        sym = label;
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        chcount = CheckBaseType( chcount );
+    }
+    else
+    {
+        for ( ;; )
+        {
+            if ( feof( z80asmfile ) )
+            {
+                break;
+            }
+            else
+            {
+                c = GetChar( z80asmfile );
+
+                if ( ( c != EOF ) && !iscntrl( c ) && ( strchr( separators, c ) == NULL ) )
+                {
+                    ident[chcount++] = c;
+                }
+                else
+                {
+                    UnGet( c, z80asmfile );       /* puch character back into stream for next read */
+                    break;
+                }
+            }
+        }
+
+        chcount = CheckBaseType( chcount );
+    }
+
+    ident[chcount] = '\0';
+
+    return sym;
+}
+
+int
+CheckBaseType( int chcount )
+{
+    int   i;
+
+    if ( !isxdigit( ident[0] ) || chcount < 2 )    /* If it's not a hex digit straight off then reject it */
+    {
+        return chcount;
+    }
+
+    /* C style hex number */
+    if ( chcount > 2 && strncmp( ident, "0x", 2 ) == 0 )
+    {
+        for ( i = 2; i < chcount; i++ )
+        {
+            if ( !isxdigit( ident[i] ) )
+            {
+                break;
+            }
+        }
+
+        if ( i == chcount )
+        {
+            for ( i = 2; i < chcount ; i++ )
+            {
+                ident[i - 1] = ident[i];
+            }
+
+            ident[0] = '$';
+            sym = hexconst;
+            return ( chcount - 1 );
+        }
+    }
+
+    /* Check for this to be a hex num here */
+    for ( i = 0; i <  chcount ; i++ )
+    {
+        if ( !isxdigit( ident[i] ) )
+        {
             break;
         }
     }
 
-  instr = strchr (separators, c);
-  if (instr != NULL)
+    if ( i == ( chcount - 1 ) )
     {
-      sym = ssym[instr - separators];	/* index of found char in separators[] */
-      if (sym == semicolon)
+        if ( toupper( ident[i] ) == 'H' )
         {
-          Skipline (z80asmfile);	/* ignore comment line, prepare for next line */
-          sym = newline;
-        }
-      return sym;
-    }
-  ident[chcount++] = (char) toupper (c);
-  switch (c)
-    {
-    case '$':
-      sym = hexconst;
-      break;
-
-    case '@':
-    case '%':
-      sym = binconst;
-      break;
-
-    case '#':
-      sym = name;
-      break;
-
-    default:
-      if (isdigit (c))
-        {
-          sym = decmconst;	/* a decimal number found */
-        }
-      else
-        {
-          if (isalpha (c) || c == '_' )
+            for ( i = ( chcount - 1 ); i >= 0 ; i-- )
             {
-              sym = name;	/* an identifier found */
+                ident[i + 1] = ident[i];
             }
-          else
-            {
-              sym = nil;	/* rubbish ... */
-            }
+
+            ident[0] = '$';
+            sym = hexconst;
+            return chcount;
         }
-      break;
+        else
+        {
+            return chcount;      /* If we reached end of hex digits and the last one wasn't a 'h', then something is wrong, so return */
+        }
     }
 
-  /* Read identifier until space or legal separator is found */
-  if (sym == name)
+    /* Check for binary constant (ends in b) */
+    for ( i = 0; i <  chcount ; i++ )
     {
-      for (;;)
+        if ( ident[i] != '0' && ident[i] != '1' )
         {
-          if (feof (z80asmfile))
-            {
-              break;
-            }
-          else
-            {
-              c = GetChar (z80asmfile);
-              if ((c != EOF) && (!iscntrl (c)) && (strchr (separators, c) == NULL))
-                {
-                  if (!isalnum (c))
-                    {
-                      if (c != '_')
-                        {
-                          sym = nil;
-                          break;
-                        }
-                      else
-                        {
-                          ident[chcount++] = '_';	/* underscore in identifier */
-                        }
-                    }
-                  else
-                    {
-                      ident[chcount++] = (char) toupper (c);
-                    }
-                }
-              else
-                {
-                  if ( c != ':' ) 
-                    UnGet (c, z80asmfile);	/* puch character back into stream for next read */
-                  else 
-                    sym = label;
-                  break;
-                }
-            }
+            break;
         }
-      chcount = CheckBaseType(chcount);             
-    }
-  else
-    {
-      for (;;)
-        {
-          if (feof (z80asmfile))
-            {
-              break;
-            }
-          else
-            {
-              c = GetChar (z80asmfile);
-              if ((c != EOF) && !iscntrl (c) && (strchr (separators, c) == NULL))
-                {
-                  ident[chcount++] = c;
-                }
-              else
-                {
-                  UnGet (c, z80asmfile);	/* puch character back into stream for next read */
-                  break;
-                }
-            }
-        }
-      chcount = CheckBaseType(chcount);                   
     }
 
-  ident[chcount] = '\0';
+    if ( i == ( chcount - 1 ) && toupper( ident[i] ) == 'B' )
+    {
+        for ( i = ( chcount - 1 ); i >= 0 ; i-- )
+        {
+            ident[i + 1] = ident[i];
+        }
 
-  return sym;
+        ident[0] = '@';
+        sym = binconst;
+        return chcount;
+    }
+
+    /* Check for decimal (we default to it in anycase..but */
+    for ( i = 0; i <  chcount ; i++ )
+    {
+        if ( !isdigit( ident[i] ) )
+        {
+            break;
+        }
+    }
+
+    if ( i == ( chcount - 1 ) && toupper( ident[i] ) == 'D' )
+    {
+        sym = decmconst;
+        return chcount - 1;
+    }
+
+    return chcount;
 }
 
-int
-CheckBaseType(int chcount)
+
+
+
+
+void
+Skipline( FILE *fptr )
 {
-  int   i;
+    int c;
 
-  if ( !isxdigit(ident[0]) || chcount < 2 )      /* If it's not a hex digit straight off then reject it */
-	return chcount;
-
-  /* C style hex number */
-  if ( chcount > 2 && strncmp(ident,"0x",2) == 0 ) 
-	{
-      for ( i = 2; i < chcount; i++ ) 
-		{
-          if ( !isxdigit(ident[i]) )
-			break;
-		}
-      if ( i == chcount ) 
-		{
-          for ( i = 2; i < chcount ; i++ )
-			ident[i-1] = ident[i];
-          ident[0] = '$';
-          sym = hexconst;
-          return ( chcount - 1 );
-		}
-	}
-  /* Check for this to be a hex num here */
-  for ( i = 0; i <  chcount ; i++ ) 
-	{
-      if ( !isxdigit(ident[i])  )
-		break;
-    }
-  if ( i == ( chcount - 1)  ) 
-	{
-      if ( toupper(ident[i]) == 'H' ) 
-		{
-          for ( i = (chcount-1); i >= 0 ; i-- ) 
-			ident[i+1] = ident[i];
-          ident[0] = '$';
-          sym = hexconst;
-          return chcount;
-		} else {
-        return chcount;      /* If we reached end of hex digits and the last one wasn't a 'h', then something is wrong, so return */
-      }
-    }
-  /* Check for binary constant (ends in b) */
-  for ( i = 0; i <  chcount ; i++ ) 
-	{
-      if ( ident[i] != '0' && ident[i] != '1'  )
-		break;
-    }
-  if ( i == ( chcount - 1) && toupper(ident[i]) == 'B' ) 
-	{
-      for ( i = (chcount-1); i >= 0 ; i-- ) 
-		ident[i+1] = ident[i];
-      ident[0] = '@';
-      sym = binconst;
-      return chcount;
-    }
-  /* Check for decimal (we default to it in anycase..but */
-  for ( i = 0; i <  chcount ; i++ ) 
-	{
-      if ( !isdigit(ident[i])  )
-		break;
-    }
-  if ( i == ( chcount - 1) && toupper(ident[i]) == 'D' ) 
-	{
-      sym = decmconst;
-      return chcount-1;	    
-    }
-  return chcount;
-}
-
-
-
-
-
-void 
-Skipline (FILE *fptr)
-{
-  int c;
-
-  if (EOL == OFF)
+    if ( EOL == OFF )
     {
-      while (!feof (fptr))
+        while ( !feof( fptr ) )
         {
-          c = GetChar (fptr);
-          if ((c == '\n') || (c == EOF))
-            break;		/* get to beginning of next line... */
+            c = GetChar( fptr );
+
+            if ( ( c == '\n' ) || ( c == EOF ) )
+            {
+                break;    /* get to beginning of next line... */
+            }
         }
-      EOL = ON;
+
+        EOL = ON;
     }
 }
 
 
-struct 
-  {
+struct
+{
     char          *name;
     int            flags;
     int            cpu;
-  } 
-flags[] = 
-  {
+}
+flags[] =
+{
     { "Z",    FLAGS_Z,  CPU_ALL },
     { "NZ",   FLAGS_NZ, CPU_ALL },
     { "C",    FLAGS_C,  CPU_ALL },
@@ -508,277 +579,327 @@ flags[] =
     { "LT",   FLAGS_LT,  CPU_RCM4000 },  /* RCM4000 */
     { "V",    FLAGS_V,   CPU_RCM4000 },   /* RCM4000 */
 #endif
-  };
+};
 
 
 
-int 
-CheckCondition(void)
+int
+CheckCondition( void )
 {
     int     i;
     char   *text = ident;
-    int     len = strlen(text);
+    int     len = strlen( text );
 
-    for ( i = 0; i < sizeof(flags) / sizeof(flags[0]); i++ ) {
-        if ( len != strlen(flags[i].name) ) {
+    for ( i = 0; i < sizeof( flags ) / sizeof( flags[0] ); i++ )
+    {
+        if ( len != strlen( flags[i].name ) )
+        {
             continue;
         }
-        if ( strcmp(text, flags[i].name) == 0 ) {            
-            if ( (cpu_type & flags[i].cpu) == 0 ) {
+
+        if ( strcmp( text, flags[i].name ) == 0 )
+        {
+            if ( ( cpu_type & flags[i].cpu ) == 0 )
+            {
                 continue;
             }
+
             return flags[i].flags;
         }
     }
+
     return -1;
 }
 
 
-int 
-CheckRegister8 (void)
+int
+CheckRegister8( void )
 {
-  if (sym == name)
+    if ( sym == name )
     {
-      if (*(ident + 1) == '\0')
+        if ( *( ident + 1 ) == '\0' )
         {
-          switch (*ident)
+            switch ( *ident )
             {
-            case 'A':
-              return 7;
-            case 'H':
-              return 4;
-            case 'B':
-              return 0;
-            case 'L':
-              return 5;
-            case 'C':
-              return 1;
-            case 'D':
-              return 2;
-            case 'E':
-              return 3;
-            case 'I':
-            {
-              if ( (cpu_type & CPU_RABBIT) )
+                case 'A':
+                    return 7;
+
+                case 'H':
+                    return 4;
+
+                case 'B':
+                    return 0;
+
+                case 'L':
+                    return 5;
+
+                case 'C':
+                    return 1;
+
+                case 'D':
+                    return 2;
+
+                case 'E':
+                    return 3;
+
+                case 'I':
                 {
-                  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
-                  return -1;
-                }	
-              return 8;
-            }
-            case 'R':
-            {
-              if ( (cpu_type & CPU_RABBIT) )
+                    if ( ( cpu_type & CPU_RABBIT ) )
+                    {
+                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                        return -1;
+                    }
+
+                    return 8;
+                }
+
+                case 'R':
                 {
-                  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
-                  return -1;
-                }	
-              return 9;
-            }
-            case 'F':
-              return 6;
+                    if ( ( cpu_type & CPU_RABBIT ) )
+                    {
+                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                        return -1;
+                    }
+
+                    return 9;
+                }
+
+                case 'F':
+                    return 6;
             }
         }
-      else
+        else
         {
-          if (strcmp (ident, "IXL") == 0)
+            if ( strcmp( ident, "IXL" ) == 0 )
             {
-              if (swapIXIY == ON)
-                return (16 + 5);
-              else
-                return (8 + 5);
-            }
-
-          else if (strcmp (ident, "IXH") == 0)
-            {
-              if (swapIXIY == ON)
-                return (16 + 4);
-              else
-                return (8 + 4);
-            }
-	  
-          else if (strcmp (ident, "IYL") == 0)
-            {
-              if (swapIXIY == ON)
-                return (8 + 5);
-              else
-                return (16 + 5);
-            }
-
-          else if (strcmp (ident, "IYH") == 0)
-            {
-              if (swapIXIY == ON)
-                return (8 + 4);
-              else
-                return (16 + 4);
-            }
-
-          else if (strcmp (ident, "IIR") == 0) /** Was 'I' register */
-            {
-              if ( (cpu_type & CPU_RABBIT) )
+                if ( swapIXIY == ON )
                 {
-                  return 8;
+                    return ( 16 + 5 );
+                }
+                else
+                {
+                    return ( 8 + 5 );
                 }
             }
-          else if (strcmp (ident, "EIR") == 0) /** Was 'R' register */
+
+            else if ( strcmp( ident, "IXH" ) == 0 )
             {
-              if ( (cpu_type & CPU_RABBIT) )
+                if ( swapIXIY == ON )
                 {
-                  return 9;
+                    return ( 16 + 4 );
+                }
+                else
+                {
+                    return ( 8 + 4 );
                 }
             }
-	  
+
+            else if ( strcmp( ident, "IYL" ) == 0 )
+            {
+                if ( swapIXIY == ON )
+                {
+                    return ( 8 + 5 );
+                }
+                else
+                {
+                    return ( 16 + 5 );
+                }
+            }
+
+            else if ( strcmp( ident, "IYH" ) == 0 )
+            {
+                if ( swapIXIY == ON )
+                {
+                    return ( 8 + 4 );
+                }
+                else
+                {
+                    return ( 16 + 4 );
+                }
+            }
+
+            else if ( strcmp( ident, "IIR" ) == 0 ) /** Was 'I' register */
+            {
+                if ( ( cpu_type & CPU_RABBIT ) )
+                {
+                    return 8;
+                }
+            }
+            else if ( strcmp( ident, "EIR" ) == 0 ) /** Was 'R' register */
+            {
+                if ( ( cpu_type & CPU_RABBIT ) )
+                {
+                    return 9;
+                }
+            }
+
         }
     }
-  return -1;
+
+    return -1;
 }
 
 
-int 
-CheckRegister16 (void)
+int
+CheckRegister16( void )
 {
-  if (sym == name) {
-    if ( strcmp(ident,"HL") == 0 ) 
-      {
-        return REG16_HL;
-      }
-    else if ( strcmp(ident,"BC") == 0 ) 
-      {
-        return REG16_BC;
-      }
-    else if ( strcmp(ident,"DE") == 0 ) 
-      {
-        return REG16_DE;
-      }
-    else if ( strcmp(ident,"SP") == 0 ) 
-      {
-        return REG16_SP;
-      }
-    else if ( strcmp(ident,"AF") == 0 ) 
-      {
-        return REG16_AF;
-      }
-    else if ( strcmp(ident,"IX") == 0 ) 
-      {
-        return swapIXIY == ON ? REG16_IY : REG16_IX;
-      }
-    else if ( strcmp(ident,"IY") == 0 ) 
-      {
-        return swapIXIY == ON ? REG16_IX : REG16_IY;
-      }
+    if ( sym == name )
+    {
+        if ( strcmp( ident, "HL" ) == 0 )
+        {
+            return REG16_HL;
+        }
+        else if ( strcmp( ident, "BC" ) == 0 )
+        {
+            return REG16_BC;
+        }
+        else if ( strcmp( ident, "DE" ) == 0 )
+        {
+            return REG16_DE;
+        }
+        else if ( strcmp( ident, "SP" ) == 0 )
+        {
+            return REG16_SP;
+        }
+        else if ( strcmp( ident, "AF" ) == 0 )
+        {
+            return REG16_AF;
+        }
+        else if ( strcmp( ident, "IX" ) == 0 )
+        {
+            return swapIXIY == ON ? REG16_IY : REG16_IX;
+        }
+        else if ( strcmp( ident, "IY" ) == 0 )
+        {
+            return swapIXIY == ON ? REG16_IX : REG16_IY;
+        }
     }
-  return -1;
+
+    return -1;
 }
 
 
 /*
  * This function will parse the current line for an indirect addressing mode. The return code can be:
- * 
+ *
  * 0 - 2   :   (BC); (DE); (HL) 5,6     :   (IX <+|- expr.> ); (IY <+|- expr.> ) 7       :   (nn), nn = 16bit address
  * expression
- * 
+ *
  * The function also returns a pointer to the parsed expression, now converted to postfix.
  */
-int 
-IndirectRegisters (void)
+int
+IndirectRegisters( void )
 {
-  int reg16;
+    int reg16;
 
-  GetSym ();
-  reg16 = CheckRegister16 ();
-  switch (reg16)
+    GetSym();
+    reg16 = CheckRegister16();
+
+    switch ( reg16 )
     {
-    case REG16_BC:
-    case REG16_DE:
-    case REG16_HL:
-      if (GetSym () == rparen)
-        {			/* (BC) | (DE) | (HL) | ? */
-          GetSym ();
-          return (reg16);	/* indicate (BC), (DE), (HL) */
-        }
-      else
-        {
-          ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);	/* Right bracket missing! */
-          return -1;
-        }
+        case REG16_BC:
+        case REG16_DE:
+        case REG16_HL:
+            if ( GetSym() == rparen )
+            {
+                /* (BC) | (DE) | (HL) | ? */
+                GetSym();
+                return ( reg16 );     /* indicate (BC), (DE), (HL) */
+            }
+            else
+            {
+                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );     /* Right bracket missing! */
+                return -1;
+            }
 
-    case REG16_IX:
-    case REG16_IY:
-      GetSym ();		/* prepare expression evaluation */
-      return (reg16);
+        case REG16_IX:
+        case REG16_IY:
+            GetSym();                 /* prepare expression evaluation */
+            return ( reg16 );
 
-    case -1:			/* sym could be a '+', '-' or a symbol... */
-      return 7;
+        case -1:                    /* sym could be a '+', '-' or a symbol... */
+            return 7;
 
-    default:
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);
-      return -1;
+        default:
+            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+            return -1;
     }
 }
 
 
-long 
-GetConstant (char *evalerr)
+long
+GetConstant( char *evalerr )
 {
-  long size, len, intresult = 0;
-  unsigned short bitvalue = 1;
+    long size, len, intresult = 0;
+    unsigned short bitvalue = 1;
 
-  *evalerr = 0;			/* preset to no errors */
+    *evalerr = 0;                 /* preset to no errors */
 
-  if ((sym != hexconst) && (sym != binconst) && (sym != decmconst))
+    if ( ( sym != hexconst ) && ( sym != binconst ) && ( sym != decmconst ) )
     {
-      *evalerr = 1;
-      return (0);		/* syntax error - illegal constant definition */
-    }
-  size = strlen (ident);
-  if (sym != decmconst)
-    if ((--size) == 0)
-      {
         *evalerr = 1;
-        return (0);		/* syntax error - no constant specified */
-      }
-  switch (ident[0])
+        return ( 0 );             /* syntax error - illegal constant definition */
+    }
+
+    size = strlen( ident );
+
+    if ( sym != decmconst )
+        if ( ( --size ) == 0 )
+        {
+            *evalerr = 1;
+            return ( 0 );           /* syntax error - no constant specified */
+        }
+
+    switch ( ident[0] )
     {
-    case '@':
-    case '%':
-      if (size > 8)
-        {
-          *evalerr = 1;
-          return (0);		/* max 8 bit */
-        }
-      for (len = 1; len <= size; len++)
-        if (strchr ("01", ident[len]) == NULL)
-          {
-            *evalerr = 1;
-            return (0);
-          }
-      /* convert ASCII binary to integer */
-      for (len = size; len >= 1; len--)
-        {
-          if (ident[len] == '1')
-            intresult += bitvalue;
-          bitvalue <<= 1;	/* logical shift left & 16 bit 'adder' */
-        }
-      return (intresult);
+        case '@':
+        case '%':
+            if ( size > 8 )
+            {
+                *evalerr = 1;
+                return ( 0 );         /* max 8 bit */
+            }
 
-    case '$':
-      for (len = 1; len <= size; len++)
-        if (isxdigit (ident[len]) == 0)
-          {
-            *evalerr = 1;
-            return (0);
-          }
-      sscanf ((char *) (ident + 1), "%lx", &intresult);
-      return (intresult);
+            for ( len = 1; len <= size; len++ )
+                if ( strchr( "01", ident[len] ) == NULL )
+                {
+                    *evalerr = 1;
+                    return ( 0 );
+                }
 
-    default:
-      for (len = 0; len <= (size - 1); len++)
-        if (isdigit (ident[len]) == 0)
-          {
-            *evalerr = 1;
-            return (0);
-          }
-      return (atol (ident));
+            /* convert ASCII binary to integer */
+            for ( len = size; len >= 1; len-- )
+            {
+                if ( ident[len] == '1' )
+                {
+                    intresult += bitvalue;
+                }
+
+                bitvalue <<= 1;       /* logical shift left & 16 bit 'adder' */
+            }
+
+            return ( intresult );
+
+        case '$':
+            for ( len = 1; len <= size; len++ )
+                if ( isxdigit( ident[len] ) == 0 )
+                {
+                    *evalerr = 1;
+                    return ( 0 );
+                }
+
+            sscanf( ( char * )( ident + 1 ), "%lx", &intresult );
+            return ( intresult );
+
+        default:
+            for ( len = 0; len <= ( size - 1 ); len++ )
+                if ( isdigit( ident[len] ) == 0 )
+                {
+                    *evalerr = 1;
+                    return ( 0 );
+                }
+
+            return ( atol( ident ) );
     }
 }
 
@@ -794,3 +915,4 @@ GetConstant (char *evalerr)
  *  eval: (c-set-offset 'class-close 2)
  * End:
  */
+

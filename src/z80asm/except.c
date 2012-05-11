@@ -16,9 +16,21 @@ Copyright (C) Paulo Custodio, 2011
 Wrapper module for e4c to setup compile-time defines
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.c,v 1.3 2011-08-18 23:27:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.c,v 1.4 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: except.c,v $
-/* Revision 1.3  2011-08-18 23:27:54  pauloscustodio
+/* Revision 1.4  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.3  2011/08/18 23:27:54  pauloscustodio
 /* BUG_0009 : file read/write not tested for errors
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
@@ -39,6 +51,7 @@ Wrapper module for e4c to setup compile-time defines
 #include "e4c.c"
 
 /* exceptions */
-E4C_DEFINE_EXCEPTION(EarlyReturnException, "early return from function", RuntimeException);
-E4C_DEFINE_EXCEPTION(FatalErrorException,  "fatal error", RuntimeException);
-E4C_DEFINE_EXCEPTION(FileIOException,      "file i/o error",             RuntimeException);
+E4C_DEFINE_EXCEPTION( EarlyReturnException, "early return from function", RuntimeException );
+E4C_DEFINE_EXCEPTION( FatalErrorException,  "fatal error", RuntimeException );
+E4C_DEFINE_EXCEPTION( FileIOException,      "file i/o error",             RuntimeException );
+

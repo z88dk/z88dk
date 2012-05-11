@@ -13,9 +13,21 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.h,v 1.6 2011-07-09 18:25:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.h,v 1.7 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: hist.h,v $
-/* Revision 1.6  2011-07-09 18:25:35  pauloscustodio
+/* Revision 1.7  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.6  2011/07/09 18:25:35  pauloscustodio
 /* Log keyword in checkin comment was expanded inside Log expansion... recursive
 /* Added Z80asm banner to all source files
 /*
@@ -27,13 +39,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /*
 /* Revision 1.3  2011/07/09 01:40:15  pauloscustodio
 /* *** empty log message ***
-/* 
+/*
 /* Revision 1.2  2011/07/09 01:38:02  pauloscustodio
 /* *** empty log message ***
-/* 
+/*
 /* Revision 1.1  2011/07/09 01:07:56  pauloscustodio
 /* Moved version strings to hist.c, created hist.h, for easy maintenance.
-/* 
+/*
 /* */
 
 #ifndef HIST_H
@@ -46,3 +58,4 @@ extern char _prog_name[], _version[], _copyright[];
 extern char copyrightmsg[];
 
 #endif /* ndef HIST_H */
+

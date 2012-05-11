@@ -13,9 +13,21 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.12 2011-10-14 15:00:22 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.13 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.12  2011-10-14 15:00:22  pauloscustodio
+/* Revision 1.13  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.12  2011/10/14 15:00:22  pauloscustodio
 /* - Move cpu_type to options.c.
 /* - Replace strncpy by strncat, when used to make a safe copy without buffer overruns. The former pads the string with nulls.
 /* - Factor strtoupper() to new module strutil.c.
@@ -54,19 +66,19 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /*
 /* Revision 1.5  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword
-/* 
+/*
 /* Revision 1.4  2011/07/09 01:38:02  pauloscustodio
 /* *** empty log message ***
-/* 
+/*
 /* Revision 1.3  2011/07/09 01:31:24  pauloscustodio
 /* Moved snprintf macro to z80asm.h
-/* 
+/*
 /* Revision 1.2  2009/07/18 23:23:15  dom
 /* clean up the code a bit more (Formatting and a fewer magic numbers)
-/* 
+/*
 /* Revision 1.1  2009/06/13 17:36:24  dom
 /* Add -I and -L to specify search paths for libraries and includes
-/* 
+/*
 /* */
 
 /* $History: Z80ASM.C $ */
@@ -86,24 +98,24 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #endif
 
 /* maximum length of strings */
-#define MAXLINE	    1024
+#define MAXLINE     1024
 
 /* number of elements of an array */
 #define NUM_ELEMS(x) (sizeof(x)/sizeof(x[0]))
 
 /* default file name extensions */
-#define FILEEXT_MAX	(1+3+1)			/* size of fileext char[]: separator + 3 chars + null */
+#define FILEEXT_MAX     (1+3+1)                 /* size of fileext char[]: separator + 3 chars + null */
 
-#define FILEEXT_ASM	FILEEXT_SEPARATOR "asm"    /* ".asm" / "_asm" */
-#define FILEEXT_LST	FILEEXT_SEPARATOR "lst"    /* ".lst" / "_lst" */
-#define FILEEXT_OBJ	FILEEXT_SEPARATOR "obj"    /* ".obj" / "_obj" */
-#define FILEEXT_DEF	FILEEXT_SEPARATOR "def"    /* ".def" / "_def" */
-#define FILEEXT_ERR	FILEEXT_SEPARATOR "err"    /* ".err" / "_err" */
-#define FILEEXT_BIN	FILEEXT_SEPARATOR "bin"    /* ".bin" / "_bin" */
-#define FILEEXT_SEGBIN	FILEEXT_SEPARATOR "bn0"    /* ".bn0" / "_bn0" */
-#define FILEEXT_LIB	FILEEXT_SEPARATOR "lib"    /* ".lib" / "_lib" */
-#define FILEEXT_SYM	FILEEXT_SEPARATOR "sym"    /* ".sym" / "_sym" */
-#define FILEEXT_MAP	FILEEXT_SEPARATOR "map"    /* ".map" / "_map" */
+#define FILEEXT_ASM     FILEEXT_SEPARATOR "asm"    /* ".asm" / "_asm" */
+#define FILEEXT_LST     FILEEXT_SEPARATOR "lst"    /* ".lst" / "_lst" */
+#define FILEEXT_OBJ     FILEEXT_SEPARATOR "obj"    /* ".obj" / "_obj" */
+#define FILEEXT_DEF     FILEEXT_SEPARATOR "def"    /* ".def" / "_def" */
+#define FILEEXT_ERR     FILEEXT_SEPARATOR "err"    /* ".err" / "_err" */
+#define FILEEXT_BIN     FILEEXT_SEPARATOR "bin"    /* ".bin" / "_bin" */
+#define FILEEXT_SEGBIN  FILEEXT_SEPARATOR "bn0"    /* ".bn0" / "_bn0" */
+#define FILEEXT_LIB     FILEEXT_SEPARATOR "lib"    /* ".lib" / "_lib" */
+#define FILEEXT_SYM     FILEEXT_SEPARATOR "sym"    /* ".sym" / "_sym" */
+#define FILEEXT_MAP     FILEEXT_SEPARATOR "map"    /* ".map" / "_map" */
 
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation */
 extern char srcfilename[];
@@ -144,10 +156,11 @@ extern char   **include_dir;
 extern int      lib_dir_num;
 extern char   **lib_dir;
 
-extern char *Fetchfilename (FILE *fptr);
-extern char *SearchFile(char *base, int is_include);
-extern void CreateLibfile (char *filename);
-extern void GetLibfile (char *filename);
-extern void usage (void);
+extern char *Fetchfilename( FILE *fptr );
+extern char *SearchFile( char *base, int is_include );
+extern void CreateLibfile( char *filename );
+extern void GetLibfile( char *filename );
+extern void usage( void );
 
 #endif
+

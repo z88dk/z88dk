@@ -16,9 +16,21 @@ Copyright (C) Paulo Custodio, 2011
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.4 2011-10-14 14:54:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.5 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: file.h,v $
-/* Revision 1.4  2011-10-14 14:54:54  pauloscustodio
+/* Revision 1.5  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.4  2011/10/14 14:54:54  pauloscustodio
 /* - New path_basename() in file.c, change functions to return result string
 /*  pointer.
 /*
@@ -41,32 +53,33 @@ Utilities for file handling
 #ifndef FILE_H
 #define FILE_H
 
-#include "memalloc.h"			/* before any other include to enable memory leak detection */
+#include "memalloc.h"                   /* before any other include to enable memory leak detection */
 
 #include <stdio.h>
 
 /* raise FileIOException on error - dont use if EOF may be received */
-extern int xfputc (int c, FILE *stream);
-extern int xfgetc (       FILE *stream);
+extern int xfputc( int c, FILE *stream );
+extern int xfgetc( FILE *stream );
 
-extern size_t xfwrite (const void *buffer, size_t size, size_t count, FILE *stream);
-extern size_t xfread  (      void *buffer, size_t size, size_t count, FILE *stream);
+extern size_t xfwrite( const void *buffer, size_t size, size_t count, FILE *stream );
+extern size_t xfread( void *buffer, size_t size, size_t count, FILE *stream );
 
-#define xfwritec(buffer, count, stream)	    xfwrite(buffer, sizeof(char), count, stream)
-#define xfreadc( buffer, count, stream)	    xfread( buffer, sizeof(char), count, stream)
+#define xfwritec(buffer, count, stream)     xfwrite(buffer, sizeof(char), count, stream)
+#define xfreadc( buffer, count, stream)     xfread( buffer, sizeof(char), count, stream)
 
 /* read/write words and longs */
-extern void   xfput_word (size_t word, FILE *stream);
-extern size_t xfget_word (             FILE *stream);
+extern void   xfput_word( size_t word, FILE *stream );
+extern size_t xfget_word( FILE *stream );
 
-extern void   xfput_long (long dword,  FILE *stream);
-extern long   xfget_long (             FILE *stream);
+extern void   xfput_long( long dword,  FILE *stream );
+extern long   xfget_long( FILE *stream );
 
-/* pathname manipulation 
+/* pathname manipulation
  * All filenames are passed as char file[FILENAME_MAX] elements, instead of always strdup'ing
  */
-extern char * path_remove_ext  (char *filename);
-extern char * path_replace_ext (char *dest, const char *source, const char *new_ext);
-extern char * path_basename    (char *dest, const char *source);
+extern char *path_remove_ext( char *filename );
+extern char *path_replace_ext( char *dest, const char *source, const char *new_ext );
+extern char *path_basename( char *dest, const char *source );
 
 #endif /* ndef FILE_H */
+

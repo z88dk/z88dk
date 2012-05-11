@@ -16,9 +16,21 @@ Copyright (C) Paulo Custodio, 2011
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.2 2011-10-07 17:53:04 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.3 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: codearea.c,v $
-/* Revision 1.2  2011-10-07 17:53:04  pauloscustodio
+/* Revision 1.3  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.2  2011/10/07 17:53:04  pauloscustodio
 /* BUG_0015 : Relocation issue - dubious addresses come out of linking
 /* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
 /* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
@@ -46,164 +58,193 @@ Manage the code area in memory
 /*-----------------------------------------------------------------------------
 *   global data
 *----------------------------------------------------------------------------*/
-static char *codearea;			/* machine code block */
-static size_t codeindex;		/* point to current address of codearea */
-static size_t codesize;			/* size of all modules before current, 
-					   i.e. base address of current module 
-					   BUG_0015 */
-static size_t PC, oldPC;		/* Program Counter */
+static char *codearea;                  /* machine code block */
+static size_t codeindex;                /* point to current address of codearea */
+static size_t codesize;                 /* size of all modules before current,
+                                           i.e. base address of current module
+                                           BUG_0015 */
+static size_t PC, oldPC;                /* Program Counter */
 
 /*-----------------------------------------------------------------------------
 *   free_objfile_data
-*	Free all global structures
+*       Free all global structures
 *----------------------------------------------------------------------------*/
-static void free_objfile_data (void)
-{  
-    xfree0(codearea);			/* free memory for Z80 machine code */
+static void free_objfile_data( void )
+{
+    xfree0( codearea );                 /* free memory for Z80 machine code */
 }
 
 /*-----------------------------------------------------------------------------
 *   init_codearea_module
-*	Alloc all global structures
+*       Alloc all global structures
 *----------------------------------------------------------------------------*/
-void init_codearea_module (void)
+void init_codearea_module( void )
 {
-    codearea = (unsigned char *) xcalloc (MAXCODESIZE, sizeof (char));	
-					/* allocate memory for Z80 machine code */
-    atexit(free_objfile_data);	        /* cleanup on program end */
+    codearea = ( unsigned char * ) xcalloc( MAXCODESIZE, sizeof( char ) );
+    /* allocate memory for Z80 machine code */
+    atexit( free_objfile_data );        /* cleanup on program end */
 
-    init_codearea();			/* init vars */
+    init_codearea();                    /* init vars */
 
-    codesize  = 0;			/* marks start of each new module,
-					   always incremented
-					   BUG_0015 */
+    codesize  = 0;                      /* marks start of each new module,
+                                           always incremented
+                                           BUG_0015 */
 }
 
 /*-----------------------------------------------------------------------------
 *   modify program counter
 *----------------------------------------------------------------------------*/
-size_t set_PC (size_t n)    { return PC = n;     }
-size_t inc_PC (size_t n)    { return PC += n;    }
-size_t get_PC (void)	    { return PC;         }
+size_t set_PC( size_t n )
+{
+    return PC = n;
+}
+size_t inc_PC( size_t n )
+{
+    return PC += n;
+}
+size_t get_PC( void )
+{
+    return PC;
+}
 
-size_t set_oldPC (void)	    { return oldPC = PC; }
-size_t get_oldPC (void)	    { return oldPC;      }
+size_t set_oldPC( void )
+{
+    return oldPC = PC;
+}
+size_t get_oldPC( void )
+{
+    return oldPC;
+}
 
 /*-----------------------------------------------------------------------------
 *   init the code area, return current size
 *----------------------------------------------------------------------------*/
-void init_codearea (void)
+void init_codearea( void )
 {
-    codeindex = 0;			/* where to store next opcode byte */
-    set_PC(0); 
+    codeindex = 0;                      /* where to store next opcode byte */
+    set_PC( 0 );
     set_oldPC();
-    memset(codearea, 0, MAXCODESIZE);
+    memset( codearea, 0, MAXCODESIZE );
 }
 
-size_t get_codeindex (void) /* BUG_0015 */
+size_t get_codeindex( void ) /* BUG_0015 */
 {
     return codeindex;
 }
 
-size_t get_codesize (void) /* BUG_0015 */
+size_t get_codesize( void ) /* BUG_0015 */
 {
     return codesize;
 }
 
-size_t inc_codesize (size_t n) /* BUG_0015 */
+size_t inc_codesize( size_t n ) /* BUG_0015 */
 {
     return codesize += n;
 }
 
-static void check_space (size_t addr, size_t n) 
+static void check_space( size_t addr, size_t n )
 {
-    if (addr + n > MAXCODESIZE) {
-	ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE);
-	throw(FatalErrorException, "MAXCODESIZE reached");
+    if ( addr + n > MAXCODESIZE )
+    {
+        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE );
+        throw( FatalErrorException, "MAXCODESIZE reached" );
     }
 }
 
 /*-----------------------------------------------------------------------------
 *   read/write code area to an open file
 *----------------------------------------------------------------------------*/
-void fwrite_codearea (FILE *stream)
+void fwrite_codearea( FILE *stream )
 {
-    xfwritec(codearea, codeindex, stream);
+    xfwritec( codearea, codeindex, stream );
 }
 
-void fwrite_codearea_chunk (FILE *stream, size_t addr, size_t size)
+void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size )
 {
-    if (addr < codeindex) {
-	if (addr + size > codeindex) {
-	    size = codeindex - addr;
-	}
-	xfwritec(codearea + addr, size, stream);
+    if ( addr < codeindex )
+    {
+        if ( addr + size > codeindex )
+        {
+            size = codeindex - addr;
+        }
+
+        xfwritec( codearea + addr, size, stream );
     }
 }
 
 /* append data read from file to the current code area */
-void fread_codearea (FILE *stream, size_t size) 
+void fread_codearea( FILE *stream, size_t size )
 {
-    check_space(codeindex, size);
-    xfreadc(codearea + codeindex, size, stream);
+    check_space( codeindex, size );
+    xfreadc( codearea + codeindex, size, stream );
     codeindex += size;
 }
 
 /* read to codearea at offset - BUG_0015 */
-void fread_codearea_offset (FILE *stream, size_t offset, size_t size)
+void fread_codearea_offset( FILE *stream, size_t offset, size_t size )
 {
-    check_space(offset, size);
-    xfreadc(codearea + offset, size, stream);
-    if (codeindex < offset + size) 
-	codeindex = offset + size;
+    check_space( offset, size );
+    xfreadc( codearea + offset, size, stream );
+
+    if ( codeindex < offset + size )
+    {
+        codeindex = offset + size;
+    }
 }
 
 
 /*-----------------------------------------------------------------------------
 *   load data into code area
 *----------------------------------------------------------------------------*/
-void patch_byte (size_t *paddr, unsigned char byte)
+void patch_byte( size_t *paddr, unsigned char byte )
 {
-    check_space(*paddr, 1);
-    codearea[(*paddr)++] = byte;
+    check_space( *paddr, 1 );
+    codearea[( *paddr )++] = byte;
 }
 
-void append_byte (unsigned char byte)
+void append_byte( unsigned char byte )
 {
-    patch_byte(&codeindex, byte);
+    patch_byte( &codeindex, byte );
 }
 
-void patch_word (size_t *paddr, int word) 
+void patch_word( size_t *paddr, int word )
 {
-    check_space(*paddr, 2);
-    codearea[(*paddr)++] = word & 0xFF; word >>= 8;
-    codearea[(*paddr)++] = word & 0xFF; word >>= 8;
+    check_space( *paddr, 2 );
+    codearea[( *paddr )++] = word & 0xFF;
+    word >>= 8;
+    codearea[( *paddr )++] = word & 0xFF;
+    word >>= 8;
 }
 
-void append_word (int word)
+void append_word( int word )
 {
-    patch_word(&codeindex, word);
+    patch_word( &codeindex, word );
 }
 
-void patch_long (size_t *paddr, long dword)
+void patch_long( size_t *paddr, long dword )
 {
-    check_space(*paddr, 4);
-    codearea[(*paddr)++] = dword & 0xFF; dword >>= 8;
-    codearea[(*paddr)++] = dword & 0xFF; dword >>= 8;
-    codearea[(*paddr)++] = dword & 0xFF; dword >>= 8;
-    codearea[(*paddr)++] = dword & 0xFF; dword >>= 8;
+    check_space( *paddr, 4 );
+    codearea[( *paddr )++] = dword & 0xFF;
+    dword >>= 8;
+    codearea[( *paddr )++] = dword & 0xFF;
+    dword >>= 8;
+    codearea[( *paddr )++] = dword & 0xFF;
+    dword >>= 8;
+    codearea[( *paddr )++] = dword & 0xFF;
+    dword >>= 8;
 }
 
-void append_long (long dword) 
+void append_long( long dword )
 {
-    patch_long(&codeindex, dword);
+    patch_long( &codeindex, dword );
 }
 
-unsigned char get_byte (size_t *paddr) 
+unsigned char get_byte( size_t *paddr )
 {
     unsigned char byte;
 
-    E4C_ASSERT(*paddr >= 0 && *paddr < codeindex);
-    byte = codearea[(*paddr)++];
+    E4C_ASSERT( *paddr >= 0 && *paddr < codeindex );
+    byte = codearea[( *paddr )++];
     return byte;
 }
+

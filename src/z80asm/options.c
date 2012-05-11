@@ -14,9 +14,21 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.7 2011-10-14 14:57:45 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.8 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.7  2011-10-14 14:57:45  pauloscustodio
+/* Revision 1.8  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.7  2011/10/14 14:57:45  pauloscustodio
 /* - Move cpu_type to options.c.
 /* - Replace strncpy by strncat, when used to make a safe copy without buffer overruns. The former pads the string with nulls.
 /*
@@ -56,7 +68,7 @@ Copyright (C) Paulo Custodio, 2011
 /*
 /* */
 
-#include "memalloc.h"	/* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include to enable memory leak detection */
 
 #include <string.h>
 #include <ctype.h>
@@ -86,262 +98,323 @@ enum flag globaldef;
 enum flag autorelocate;
 enum flag deforigin;
 enum flag expl_binflnm;
-char binfilename[FILENAME_MAX];	/* -o explicit filename buffer (BUG_0012) */
-char srcext[FILEEXT_MAX];	/* contains default source file extension */
-char objext[FILEEXT_MAX];	/* contains default object file extension */
+char binfilename[FILENAME_MAX]; /* -o explicit filename buffer (BUG_0012) */
+char srcext[FILEEXT_MAX];       /* contains default source file extension */
+char objext[FILEEXT_MAX];       /* contains default object file extension */
 int  cpu_type;
 
 /*-----------------------------------------------------------------------------
 *   ResetOptions
-*	Reset globals to defaults
+*       Reset globals to defaults
 *----------------------------------------------------------------------------*/
-void ResetOptions (void) 
+void ResetOptions( void )
 {
     smallc_source   = OFF;
-    ti83plus	    = OFF;
-    swapIXIY	    = OFF;
-    clinemode	    = OFF;
-    clineno	    = 0;
-    codesegment	    = OFF;
-    datestamp	    = OFF;
-    sdcc_hacks	    = OFF;
-    force_xlib	    = OFF;
-    listing	    = OFF;
-    listing_CPY	    = OFF;
-    symtable	    = ON;
-    symfile	    = ON;
-    z80bin	    = OFF;
-    mapref	    = ON;
-    verbose	    = OFF;
-    globaldef	    = OFF;
+    ti83plus        = OFF;
+    swapIXIY        = OFF;
+    clinemode       = OFF;
+    clineno         = 0;
+    codesegment     = OFF;
+    datestamp       = OFF;
+    sdcc_hacks      = OFF;
+    force_xlib      = OFF;
+    listing         = OFF;
+    listing_CPY     = OFF;
+    symtable        = ON;
+    symfile         = ON;
+    z80bin          = OFF;
+    mapref          = ON;
+    verbose         = OFF;
+    globaldef       = OFF;
     autorelocate    = OFF;
-    deforigin	    = OFF; 
+    deforigin       = OFF;
     expl_binflnm    = OFF;
-    cpu_type	    = CPU_Z80;
+    cpu_type        = CPU_Z80;
 
-    strcpy(srcext, FILEEXT_ASM);	/* use ".asm" as default source file extension */
-    strcpy(objext, FILEEXT_OBJ);	/* use ".obj" as default source file extension */
+    strcpy( srcext, FILEEXT_ASM );      /* use ".asm" as default source file extension */
+    strcpy( objext, FILEEXT_OBJ );      /* use ".obj" as default source file extension */
 }
 
 /*-----------------------------------------------------------------------------
 *   SetAsmFlag
-*	Parse one command line option
+*       Parse one command line option
 *   Args:
-*	string after the initial '-' option start
+*       string after the initial '-' option start
 *   Sets global option variables, stop with error if option cannot be parsed
 *----------------------------------------------------------------------------*/
-void SetAsmFlag (char *flagid)
+void SetAsmFlag( char *flagid )
 {
-    if (*flagid == 'e') {
-	smallc_source = ON;			/* use ".xxx" as source file in stead of ".asm" */
-	
-	/* BUG - on QDOS separator is '_'
-	   Anyway there's no need to define, comes from default either '.' or '_'
-	srcext[0] = '.';
-	*/
+    if ( *flagid == 'e' )
+    {
+        smallc_source = ON;                     /* use ".xxx" as source file in stead of ".asm" */
 
-	strncpy(srcext + 1, flagid + 1, FILEEXT_MAX - 2);
-						/* copy argument string after '.' */
-	srcext[FILEEXT_MAX - 1] = '\0';		/* max. 3 letters extension */
+        /* BUG - on QDOS separator is '_'
+           Anyway there's no need to define, comes from default either '.' or '_'
+        srcext[0] = '.';
+        */
+
+        strncpy( srcext + 1, flagid + 1, FILEEXT_MAX - 2 );
+        /* copy argument string after '.' */
+        srcext[FILEEXT_MAX - 1] = '\0';         /* max. 3 letters extension */
     }
 
     /* djm: mod to get .o files produced instead of .obj */
     /* gbs: extended to use argument as definition, e.g. -Mo, which defines .o extension */
-    else if (*flagid == 'M') {
-	strncpy(objext + 1, flagid + 1, FILEEXT_MAX - 2);
-						/* copy argument string after '.' */
-	objext[FILEEXT_MAX - 1] = '\0';		/* max. 3 letters extension */
+    else if ( *flagid == 'M' )
+    {
+        strncpy( objext + 1, flagid + 1, FILEEXT_MAX - 2 );
+        /* copy argument string after '.' */
+        objext[FILEEXT_MAX - 1] = '\0';         /* max. 3 letters extension */
     }
 
     /** Check whether this is for the RCM2000/RCM3000 series of Z80-like CPU's */
-    else if (strcmp (flagid, "RCMX000") == 0) {
-	cpu_type = CPU_RCM2000;
+    else if ( strcmp( flagid, "RCMX000" ) == 0 )
+    {
+        cpu_type = CPU_RCM2000;
     }
 
     /* check weather to use an RST or CALL when Invoke is used */
-    else if (strcmp(flagid, "plus") == 0 ) {
-	ti83plus = ON;
+    else if ( strcmp( flagid, "plus" ) == 0 )
+    {
+        ti83plus = ON;
     }
 
     /* (stefano) IX and IY swap option */
-    else if (strcmp (flagid, "IXIY") == 0) {
-	swapIXIY = ON;
+    else if ( strcmp( flagid, "IXIY" ) == 0 )
+    {
+        swapIXIY = ON;
     }
 
     /* djm turn on c line mode to report line number of C source */
-    else if (strcmp(flagid, "C") == 0) {
-	clinemode = ON;
+    else if ( strcmp( flagid, "C" ) == 0 )
+    {
+        clinemode = ON;
     }
 
     /* split in 16K blocks */
-    else if (strcmp(flagid, "c") == 0) {
-	codesegment = ON;
+    else if ( strcmp( flagid, "c" ) == 0 )
+    {
+        codesegment = ON;
     }
 
-    else if ( strcmp(flagid, "sdcc") == 0 ) {
-	sdcc_hacks = ON;
+    else if ( strcmp( flagid, "sdcc" ) == 0 )
+    {
+        sdcc_hacks = ON;
     }
 
-    else if ( strcmp(flagid, "forcexlib") == 0 ) {
-	force_xlib = ON;
+    else if ( strcmp( flagid, "forcexlib" ) == 0 )
+    {
+        force_xlib = ON;
     }
 
-    else if (strcmp (flagid, "l") == 0) {
-	listing_CPY = listing = ON;
-	if (symtable)
-	    symfile = OFF;
+    else if ( strcmp( flagid, "l" ) == 0 )
+    {
+        listing_CPY = listing = ON;
+
+        if ( symtable )
+        {
+            symfile = OFF;
+        }
     }
 
-    else if (strcmp (flagid, "nl") == 0) {
-	listing_CPY = listing = OFF;
-	if (symtable)
-	    symfile = ON;
+    else if ( strcmp( flagid, "nl" ) == 0 )
+    {
+        listing_CPY = listing = OFF;
+
+        if ( symtable )
+        {
+            symfile = ON;
+        }
     }
 
-    else if (strcmp (flagid, "s") == 0) {
-	symtable = ON;
-	if (listing_CPY)
-	    symfile = OFF;
-	else
-	    symfile = ON;
+    else if ( strcmp( flagid, "s" ) == 0 )
+    {
+        symtable = ON;
+
+        if ( listing_CPY )
+        {
+            symfile = OFF;
+        }
+        else
+        {
+            symfile = ON;
+        }
     }
 
-    else if (strcmp (flagid, "ns") == 0) {
-	symtable = symfile = OFF;
-    }
-    
-    else if (strcmp (flagid, "b") == 0) {
-	z80bin = ON;		/* perform address relocation & linking */
+    else if ( strcmp( flagid, "ns" ) == 0 )
+    {
+        symtable = symfile = OFF;
     }
 
-    else if (strcmp (flagid, "nb") == 0) {
-	z80bin = OFF;
-	mapref = OFF;
+    else if ( strcmp( flagid, "b" ) == 0 )
+    {
+        z80bin = ON;            /* perform address relocation & linking */
     }
 
-    else if (strcmp (flagid, "d") == 0) {
-	datestamp = ON;		/* assemble only if source > object file */
+    else if ( strcmp( flagid, "nb" ) == 0 )
+    {
+        z80bin = OFF;
+        mapref = OFF;
     }
 
-    else if (strcmp (flagid, "nd") == 0) {
-	datestamp = OFF;
+    else if ( strcmp( flagid, "d" ) == 0 )
+    {
+        datestamp = ON;         /* assemble only if source > object file */
+    }
+
+    else if ( strcmp( flagid, "nd" ) == 0 )
+    {
+        datestamp = OFF;
     }
 
     /* -b, -d */
-    else if (strcmp (flagid, "a") == 0) {
-	z80bin = ON;
-	datestamp = ON;
+    else if ( strcmp( flagid, "a" ) == 0 )
+    {
+        z80bin = ON;
+        datestamp = ON;
     }
 
-    else if (strcmp (flagid, "v") == 0) {
-	verbose = ON;
+    else if ( strcmp( flagid, "v" ) == 0 )
+    {
+        verbose = ON;
     }
 
-    else if (strcmp (flagid, "nv") == 0) {
-	verbose = OFF;
+    else if ( strcmp( flagid, "nv" ) == 0 )
+    {
+        verbose = OFF;
     }
 
-    else if (strcmp (flagid, "m") == 0) {
-	mapref = ON;  
+    else if ( strcmp( flagid, "m" ) == 0 )
+    {
+        mapref = ON;
     }
 
-    else if (strcmp (flagid, "nm") == 0) {
-	mapref = OFF;
+    else if ( strcmp( flagid, "nm" ) == 0 )
+    {
+        mapref = OFF;
     }
 
-    else if (strcmp (flagid, "g") == 0) {
-	globaldef = ON;
+    else if ( strcmp( flagid, "g" ) == 0 )
+    {
+        globaldef = ON;
     }
 
-    else if (strcmp (flagid, "ng") == 0) {
-	globaldef = OFF;
+    else if ( strcmp( flagid, "ng" ) == 0 )
+    {
+        globaldef = OFF;
     }
 
-    else if (strcmp (flagid, "R") == 0) {
-	autorelocate = ON;
+    else if ( strcmp( flagid, "R" ) == 0 )
+    {
+        autorelocate = ON;
     }
 
-    else if (strcmp (flagid, "nR") == 0) {
-	autorelocate = OFF;
+    else if ( strcmp( flagid, "nR" ) == 0 )
+    {
+        autorelocate = OFF;
     }
 
-    else if (*flagid == 'i') {
-	GetLibfile ((flagid + 1));
+    else if ( *flagid == 'i' )
+    {
+        GetLibfile( ( flagid + 1 ) );
     }
 
-    else if (*flagid == 'x') {
-	CreateLibfile ((flagid + 1));
+    else if ( *flagid == 'x' )
+    {
+        CreateLibfile( ( flagid + 1 ) );
     }
 
-    else if (*flagid == 'r') {
-	sscanf (flagid + 1, "%x", &EXPLICIT_ORIGIN);
-	deforigin = ON;		/* explicit origin has been defined */
+    else if ( *flagid == 'r' )
+    {
+        sscanf( flagid + 1, "%x", &EXPLICIT_ORIGIN );
+        deforigin = ON;         /* explicit origin has been defined */
     }
 
-    else if (*flagid == 'o') {
-	/* store explicit filename for .BIN file (BUG_0012) */
-	binfilename[0] = '\0';		/* prepare for strncat */
-	strncat(binfilename, flagid + 1, sizeof(binfilename) - 1);
-	expl_binflnm = ON;      
+    else if ( *flagid == 'o' )
+    {
+        /* store explicit filename for .BIN file (BUG_0012) */
+        binfilename[0] = '\0';          /* prepare for strncat */
+        strncat( binfilename, flagid + 1, sizeof( binfilename ) - 1 );
+        expl_binflnm = ON;
     }
 
-    else if (*flagid == 't') {
-	sscanf (flagid + 1, "%d", &TAB_DIST);
+    else if ( *flagid == 't' )
+    {
+        sscanf( flagid + 1, "%d", &TAB_DIST );
     }
 
-    else if (*flagid == 'I') {
-	int i = include_dir_num++;
-	include_dir = xrealloc(include_dir, include_dir_num * sizeof(include_dir[0]));
-	include_dir[i] = xstrdup(flagid+1);
+    else if ( *flagid == 'I' )
+    {
+        int i = include_dir_num++;
+        include_dir = xrealloc( include_dir, include_dir_num * sizeof( include_dir[0] ) );
+        include_dir[i] = xstrdup( flagid + 1 );
     }
 
-    else if (*flagid == 'L') {
-	int i = lib_dir_num++;
-	lib_dir = xrealloc(lib_dir, lib_dir_num * sizeof(lib_dir[0]));
-	lib_dir[i] = xstrdup(flagid+1);
+    else if ( *flagid == 'L' )
+    {
+        int i = lib_dir_num++;
+        lib_dir = xrealloc( lib_dir, lib_dir_num * sizeof( lib_dir[0] ) );
+        lib_dir[i] = xstrdup( flagid + 1 );
     }
 
-    else if (*flagid == 'D') {
-	int i;
+    else if ( *flagid == 'D' )
+    {
+        int i;
 
-	strcpy (ident, (flagid + 1));	/* copy argument string */
-	if (!isalpha (ident[0])) {
-	    ReportError (NULL, 0, ERR_ILLEGAL_IDENT);	/* symbol must begin with alpha */
-	    return;
-	}
-	i = 0;
-	while (ident[i] != '\0') {
-	    if (strchr (separators, ident[i]) == NULL) {
-		if (!isalnum (ident[i])) {
-		    if (ident[i] != '_') {
-			ReportError (NULL, 0, ERR_ILLEGAL_IDENT);	/* illegal char in identifier */
-			return;
-		    }
-		    else {
-			ident[i] = '_';			/* underscore in identifier */
-		    }
-		}
-		else {
-		    ident[i] = toupper (ident[i]);
-		}
-	    }
-	    else {
-		ReportError (NULL, 0, ERR_ILLEGAL_IDENT);		/* illegal char in identifier */
-		return;
-	    }
-	    ++i;
-	}
-	DefineDefSym (ident, 1, 0, &staticroot);
+        strcpy( ident, ( flagid + 1 ) ); /* copy argument string */
+
+        if ( !isalpha( ident[0] ) )
+        {
+            ReportError( NULL, 0, ERR_ILLEGAL_IDENT );  /* symbol must begin with alpha */
+            return;
+        }
+
+        i = 0;
+
+        while ( ident[i] != '\0' )
+        {
+            if ( strchr( separators, ident[i] ) == NULL )
+            {
+                if ( !isalnum( ident[i] ) )
+                {
+                    if ( ident[i] != '_' )
+                    {
+                        ReportError( NULL, 0, ERR_ILLEGAL_IDENT );      /* illegal char in identifier */
+                        return;
+                    }
+                    else
+                    {
+                        ident[i] = '_';                 /* underscore in identifier */
+                    }
+                }
+                else
+                {
+                    ident[i] = toupper( ident[i] );
+                }
+            }
+            else
+            {
+                ReportError( NULL, 0, ERR_ILLEGAL_IDENT );              /* illegal char in identifier */
+                return;
+            }
+
+            ++i;
+        }
+
+        DefineDefSym( ident, 1, 0, &staticroot );
     }
 
-    else if (strcmp (flagid, "h") == 0) {
-	usage();
-	throw(IllegalArgumentException, "usage");
+    else if ( strcmp( flagid, "h" ) == 0 )
+    {
+        usage();
+        throw( IllegalArgumentException, "usage" );
     }
 
-    else {
-	/* BUG_0003 was missing Illegal Option error */
-	ReportError (NULL, 0, ERR_ILLEGAL_OPTION, flagid);
+    else
+    {
+        /* BUG_0003 was missing Illegal Option error */
+        ReportError( NULL, 0, ERR_ILLEGAL_OPTION, flagid );
     }
 }
+
 

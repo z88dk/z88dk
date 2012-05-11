@@ -14,9 +14,21 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.4 2011-10-14 14:57:45 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.5 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: options.h,v $
-/* Revision 1.4  2011-10-14 14:57:45  pauloscustodio
+/* Revision 1.5  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.4  2011/10/14 14:57:45  pauloscustodio
 /* - Move cpu_type to options.c.
 /* - Replace strncpy by strncat, when used to make a safe copy without buffer overruns. The former pads the string with nulls.
 /*
@@ -64,9 +76,9 @@ extern enum flag globaldef;
 extern enum flag autorelocate;
 extern enum flag deforigin;
 extern enum flag expl_binflnm;
-extern char binfilename[];		/* -o explicit filename buffer */
-extern char srcext[];			/* ".asm"/"_asm" extension, or whatever defined by -e */
-extern char objext[];			/* ".obj"/"_obj" extension, or whatever defined by -M */
+extern char binfilename[];              /* -o explicit filename buffer */
+extern char srcext[];                   /* ".asm"/"_asm" extension, or whatever defined by -e */
+extern char objext[];                   /* ".obj"/"_obj" extension, or whatever defined by -M */
 
 /* CPU type */
 #define CPU_Z80     1
@@ -81,9 +93,10 @@ extern char objext[];			/* ".obj"/"_obj" extension, or whatever defined by -M */
 extern int cpu_type;
 
 /* reset default options */
-extern void ResetOptions (void);
+extern void ResetOptions( void );
 
 /* parse one command line option */
-extern void SetAsmFlag (char *flagid);
+extern void SetAsmFlag( char *flagid );
 
 #endif /* ndef OPTIONS_H */
+

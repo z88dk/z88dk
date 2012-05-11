@@ -12,9 +12,21 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.25 2011-10-14 13:56:51 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.26 2012-05-11 19:29:49 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.25  2011-10-14 13:56:51  pauloscustodio
+# Revision 1.26  2012-05-11 19:29:49  pauloscustodio
+# Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+#         --mode=c
+#         --lineend=linux
+#         --indent=spaces=4
+#         --style=ansi --add-brackets
+#         --indent-switches --indent-classes
+#         --indent-preprocessor --convert-tabs
+#         --break-blocks
+#         --pad-oper --pad-paren-in --pad-header --unpad-paren
+#         --align-pointer=name
+#
+# Revision 1.25  2011/10/14 13:56:51  pauloscustodio
 # New module scrutil
 #
 # Revision 1.24  2011/10/07 17:23:57  pauloscustodio
@@ -134,6 +146,17 @@ OBJS = 	asmdrctv.o 	\
 	objfile.o	\
 	strutil.o
 
+ASTYLE = astyle \
+	--mode=c \
+	--lineend=linux \
+	--indent=spaces=4 \
+	--style=ansi --add-brackets \
+	--indent-switches --indent-classes \
+	--indent-preprocessor --convert-tabs \
+	--break-blocks \
+	--pad-oper --pad-paren-in --pad-header --unpad-paren \
+	--align-pointer=name
+
 all: z80asm$(EXESUFFIX)
 
 
@@ -146,13 +169,17 @@ install:
 
 
 clean :
-	$(RM) *.o *.exe *~ *.bak core z80asm$(EXESUFFIX) test.* test2.*
+	$(RM) *.o *.exe *~ *.bak *.orig core z80asm$(EXESUFFIX) test.* test2.*
 
 
 # test
 test : z80asm$(EXESUFFIX)
 	perl -S prove t/*.t
 
+
+# formatting style
+astyle:
+	$(ASTYLE) *.c *.h
 
 # Dependencies
 depend:

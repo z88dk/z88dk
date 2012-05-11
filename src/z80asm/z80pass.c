@@ -13,9 +13,21 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.22 2011-10-14 14:46:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.23 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.22  2011-10-14 14:46:03  pauloscustodio
+/* Revision 1.23  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.22  2011/10/14 14:46:03  pauloscustodio
 /* -  BUG_0013 : defm check for MAX_CODESIZE incorrect
 /*  - Remove un-necessary tests for MAX_CODESIZE; all tests are concentrated in check_space() from codearea.c.
 /*
@@ -98,45 +110,45 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /*
 /* Revision 1.8  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword
-/* 
+/*
 /* Revision 1.7  2011/07/09 01:34:12  pauloscustodio
 /* added casts to clean up warnings
 /* BUG_0004 : 8bit unsigned constants are not checked for out-of-range
 /*      Added the check to ExprUnsigned8() and Z80pass2().
-/* 
+/*
 /* Revision 1.6  2010/04/16 17:34:37  dom
 /* Make line number an int - 32768 lines isn't big enough...
-/* 
+/*
 /* Revision 1.5  2009/09/03 17:54:55  dom
 /* Fix name conflict with the getline function in POSIX 2008
-/* 
+/*
 /* Nabbed via Fedora/Kevin Kofler
-/* 
+/*
 /* Revision 1.4  2009/08/14 22:23:12  dom
 /* clean up some compiler warnings
-/* 
+/*
 /* Revision 1.3  2002/05/11 20:09:38  dom
 /* A patch around the appalling IF ELSE ENDIF handling of z80asm where it
 /* tries to evaluate FALSE clauses and gets completely in a twist.
-/* 
+/*
 /* These patches turn off the output to the two errors that I've seen pop
 /* up in this state: Syntax error and unknown identifier. Please test this
 /* one quite hard if you get a change... - it was done to allow even more
 /* complicated logic in the z88 app startup to actually work - as soon as I'm
 /* happy with that I'll commit it as well
-/* 
+/*
 /* Revision 1.2  2001/03/21 16:34:01  dom
 /* Added changes to allow labels to end in ':' and the prefix '.' isn't
 /* necessarily needed..this isn't guaranteed to be perfect so let me know
 /* of any problems and drop back to 1.0.18
-/* 
+/*
 /* Revision 1.1  2000/07/04 15:33:29  dom
 /* branches:  1.1.1;
 /* Initial revision
-/* 
+/*
 /* Revision 1.1.1.1  2000/07/04 15:33:29  dom
 /* First import of z88dk into the sourceforge system <gulp>
-/* 
+/*
 /* */
 
 /* $History: Z80PASS.C $ */
@@ -189,7 +201,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* Updated in $/Z80asm */
 /* SourceSafe Version History Comment Block added. */
 
-#include "memalloc.h"	/* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include to enable memory leak detection */
 
 #include <stdio.h>
 #include <limits.h>
@@ -207,41 +219,41 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "codearea.h"
 
 /* external functions */
-void Skipline (FILE *fptr);
-void LinkModules (void);
-void DefineOrigin (void);
-void ParseIdent (enum flag interpret);
-void RemovePfixlist (struct expr *pfixexpr);
-void StoreExpr (struct expr *pfixexpr, char range);
-int DefineSymbol (char *identifier, long value, unsigned char symboltype);
-int GetChar(FILE *fptr);
-long EvalPfixExpr (struct expr *pass2expr);
-struct expr *ParseNumExpr (void);
-enum symbols GetSym (void);
-symbol *FindSymbol (char *identifier, avltree * treeptr);
+void Skipline( FILE *fptr );
+void LinkModules( void );
+void DefineOrigin( void );
+void ParseIdent( enum flag interpret );
+void RemovePfixlist( struct expr *pfixexpr );
+void StoreExpr( struct expr *pfixexpr, char range );
+int DefineSymbol( char *identifier, long value, unsigned char symboltype );
+int GetChar( FILE *fptr );
+long EvalPfixExpr( struct expr *pass2expr );
+struct expr *ParseNumExpr( void );
+enum symbols GetSym( void );
+symbol *FindSymbol( char *identifier, avltree *treeptr );
 
 /* local functions */
-void ifstatement (enum flag interpret);
-void parseline (enum flag interpret);
-void getasmline (void);
-void Pass2info (struct expr *expression, char constrange, long lfileptr);
-void Z80pass1 (void);
-void Z80pass2 (void);
-void WriteSymbolTable (char *msg, avltree * root);
-void WriteListFile (void);
-void WriteHeader (void);
-void LineCounter (void);
-void PatchListFile (struct expr *pass2expr, long c);
-void WriteMapFile (void);
-void StoreName (symbol * node, unsigned char symscope);
-void StoreLibReference (symbol * node);
-void StoreGlobalName (symbol * node);
-void StoreLocalName (symbol * node);
-long Evallogexpr (void);
-struct sourcefile *Prevfile (void);
-struct sourcefile *Newfile (struct sourcefile *curfile, char *fname);
-struct sourcefile *Setfile (struct sourcefile *curfile, struct sourcefile *newfile, char *fname);
-struct sourcefile *FindFile (struct sourcefile *srcfile, char *fname);
+void ifstatement( enum flag interpret );
+void parseline( enum flag interpret );
+void getasmline( void );
+void Pass2info( struct expr *expression, char constrange, long lfileptr );
+void Z80pass1( void );
+void Z80pass2( void );
+void WriteSymbolTable( char *msg, avltree *root );
+void WriteListFile( void );
+void WriteHeader( void );
+void LineCounter( void );
+void PatchListFile( struct expr *pass2expr, long c );
+void WriteMapFile( void );
+void StoreName( symbol *node, unsigned char symscope );
+void StoreLibReference( symbol *node );
+void StoreGlobalName( symbol *node );
+void StoreLocalName( symbol *node );
+long Evallogexpr( void );
+struct sourcefile *Prevfile( void );
+struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
+struct sourcefile *Setfile( struct sourcefile *curfile, struct sourcefile *newfile, char *fname );
+struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 
 
 /* global variables */
@@ -251,538 +263,648 @@ extern enum symbols sym;
 extern enum flag writeline, EOL;
 extern unsigned char PAGELEN;
 extern long listfileptr, TOTALLINES;
-extern struct modules *modulehdr;	/* pointer to module header */
+extern struct modules *modulehdr;       /* pointer to module header */
 extern struct module *CURRENTMODULE;
 extern int PAGENR, LINENR;
 extern avltree *globalroot;
 
-void 
-Z80pass1 (void)
+void
+Z80pass1( void )
 {
-  line[0] = '\0';		    /* reset contents of list buffer */
+    line[0] = '\0';                   /* reset contents of list buffer */
 
-  while (!feof (z80asmfile))
+    while ( !feof( z80asmfile ) )
     {
-      if (listing)
-	writeline = ON;
-      parseline (ON);		    /* before parsing it */
+        if ( listing )
+        {
+            writeline = ON;
+        }
+
+        parseline( ON );              /* before parsing it */
     }
 }
 
 
 
-void 
-getasmline (void)
+void
+getasmline( void )
 {
-  long fptr;
-  int len,c;
+    long fptr;
+    int len, c;
 
-  fptr = ftell (z80asmfile);		/* remember file position */
+    fptr = ftell( z80asmfile );           /* remember file position */
 
-  c = '\0';
-  for (len=0; (len<254) && (c!='\n'); len++) 
+    c = '\0';
+
+    for ( len = 0; ( len < 254 ) && ( c != '\n' ); len++ )
     {
-      c = GetChar(z80asmfile); 
-      if (c != EOF)
-        line[len] = c;	/* line feed inclusive */
-      else
-        break;
-    }
-  line[len] = '\0'; 
+        c = GetChar( z80asmfile );
 
-  fseek (z80asmfile, fptr, SEEK_SET);	/* resume file position */
+        if ( c != EOF )
+        {
+            line[len] = c;    /* line feed inclusive */
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    line[len] = '\0';
+
+    fseek( z80asmfile, fptr, SEEK_SET );  /* resume file position */
 }
 
 
 
-void 
-parseline (enum flag interpret)
+void
+parseline( enum flag interpret )
 {
-  FindSymbol (ASSEMBLERPC, globalroot)->symvalue = get_PC();	/* update assembler program counter */
+    FindSymbol( ASSEMBLERPC, globalroot )->symvalue = get_PC();   /* update assembler program counter */
 
-      ++CURRENTFILE->line;
-      ++TOTALLINES;
-      if (listing)
-	getasmline ();		/* get a copy of current source line */
+    ++CURRENTFILE->line;
+    ++TOTALLINES;
 
-      EOL = OFF;		/* reset END OF LINE flag */
-      GetSym ();
-      if (sym == fullstop || sym == label)
-	{
-	  if (interpret == ON)
-	    {			/* Generate only possible label declaration if line parsing is allowed */
-	      if (sym == label || GetSym () == name)
-		{
-		  DefineSymbol (ident, get_PC(), SYMADDR | SYMTOUCHED);	/* labels must always be
-									 * touched due to forward */
-		  	GetSym ();	/* check for another identifier *//* referencing problems in
-				   * expressions */
-		}
-	      else
-		{
-		  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT);	/* a name must follow a
-										 * label declaration */
-		  return;	/* read in a new source line */
-		}
-	    }
-	  else
-	    {
-	      Skipline (z80asmfile);
-	      sym = newline;	/* ignore label and rest of line */
-	    }
-	}
-      switch (sym)
-	{
-	case name:
-	  ParseIdent (interpret);
-	  break;
+    if ( listing )
+    {
+        getasmline();    /* get a copy of current source line */
+    }
 
-	case newline:
-	  break;		/* empty line, get next... */
+    EOL = OFF;                /* reset END OF LINE flag */
+    GetSym();
 
-	default:
-	    if ( interpret == ON )
-	       ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX);	/* Syntax error */
-	}
+    if ( sym == fullstop || sym == label )
+    {
+        if ( interpret == ON )
+        {
+            /* Generate only possible label declaration if line parsing is allowed */
+            if ( sym == label || GetSym() == name )
+            {
+                DefineSymbol( ident, get_PC(), SYMADDR | SYMTOUCHED ); /* labels must always be
+                                                                         * touched due to forward */
+                GetSym();      /* check for another identifier *//* referencing problems in
+                                   * expressions */
+            }
+            else
+            {
+                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );       /* a name must follow a
+                                                                                 * label declaration */
+                return;       /* read in a new source line */
+            }
+        }
+        else
+        {
+            Skipline( z80asmfile );
+            sym = newline;    /* ignore label and rest of line */
+        }
+    }
 
-      if (listing && writeline)
-	WriteListFile ();	/* Write current source line to list file, if allowed */
+    switch ( sym )
+    {
+        case name:
+            ParseIdent( interpret );
+            break;
+
+        case newline:
+            break;                /* empty line, get next... */
+
+        default:
+            if ( interpret == ON )
+            {
+                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );    /* Syntax error */
+            }
+    }
+
+    if ( listing && writeline )
+    {
+        WriteListFile();    /* Write current source line to list file, if allowed */
+    }
 }
 
 
 
 /* multilevel contitional assembly logic */
 
-void 
-ifstatement (enum flag interpret)
+void
+ifstatement( enum flag interpret )
 {
-  if (interpret == ON)
-    {				/* evaluate #if expression */
-      if (Evallogexpr () != 0)
-	{
-
-	  do
-	    {			/* expression is TRUE, interpret lines until #else or #endif */
-	      if (!feof (z80asmfile))
-		{
-		  writeline = ON;
-		  parseline (ON);
-		}
-	      else
-		return;		/* end of file - exit from this #if level */
-	    }
-	  while ((sym != elsestatm) && (sym != endifstatm));
-
-	  if (sym == elsestatm)
-	    {
-	      do
-		{		/* then ignore lines until #endif ... */
-		  if (!feof (z80asmfile))
-		    {
-		      writeline = OFF;
-		      parseline (OFF);
-		    }
-		  else
-		    return;
-		}
-	      while (sym != endifstatm);
-	    }
-	}
-      else
-	{
-	  do
-	    {			/* expression is FALSE, ignore until #else or #endif */
-	      if (!feof (z80asmfile))
-		{
-		  writeline = OFF;
-		  parseline (OFF);
-		}
-	      else
-		return;
-	    }
-	  while ((sym != elsestatm) && (sym != endifstatm));
-
-	  if (sym == elsestatm)
-	    {
-	      do
-		{
-		  if (!feof (z80asmfile))
-		    {
-		      writeline = ON;
-		      parseline (ON);
-		    }
-		  else
-		    return;
-		}
-	      while (sym != endifstatm);
-	    }
-	}
-    }
-  else
+    if ( interpret == ON )
     {
-      do
-	{			/* don't evaluate #if expression and ignore all lines until #endif */
-	  if (!feof (z80asmfile))
-	    {
-	      writeline = OFF;
-	      parseline (OFF);
-	    }
-	  else
-	    return;		/* end of file - exit from this IF level */
-	}
-      while (sym != endifstatm);
-    }
+        /* evaluate #if expression */
+        if ( Evallogexpr() != 0 )
+        {
 
-  sym = nil;
-}
+            do
+            {
+                /* expression is TRUE, interpret lines until #else or #endif */
+                if ( !feof( z80asmfile ) )
+                {
+                    writeline = ON;
+                    parseline( ON );
+                }
+                else
+                {
+                    return;    /* end of file - exit from this #if level */
+                }
+            }
+            while ( ( sym != elsestatm ) && ( sym != endifstatm ) );
 
-
-
-long 
-Evallogexpr (void)
-{
-  struct expr *postfixexpr;
-  long constant = 0;
-
-  GetSym ();			/* get logical expression */
-  if ((postfixexpr = ParseNumExpr ()) != NULL)
-    {
-      constant = EvalPfixExpr (postfixexpr);
-      RemovePfixlist (postfixexpr);	/* remove linked list, expression evaluated */
-    }
-  return constant;
-}
-
-
-
-
-void 
-Z80pass2 (void)
-{
-  struct expr *pass2expr, *prevexpr;
-  struct JRPC *curJR, *prevJR;
-  long constant;
-  long fptr_exprdecl, fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
-  size_t patchptr;
-
-
-  if ((pass2expr = CURRENTMODULE->mexpr->firstexpr) != NULL)
-    {
-      curJR = CURRENTMODULE->JRaddr->firstref;	/* point at first JR PC address in this module */
-      do
-	{
-	  constant = EvalPfixExpr (pass2expr);
-	  if (pass2expr->stored == OFF)
-	    {
-	      if ((pass2expr->rangetype & EXPREXTERN) || (pass2expr->rangetype & EXPRADDR))
-		{
-		  /*
-		   * Expression contains symbol declared as external or defined as a relocatable
-		   * address,
-		   */
-		  /* store expression in relocatable file */
-		  switch (pass2expr->rangetype & RANGE)
-		    {
-		    case RANGE_32SIGN:
-		      StoreExpr (pass2expr, 'L');
-		      break;
-
-		    case RANGE_16CONST:
-		      StoreExpr (pass2expr, 'C');
-		      break;
-
-		    case RANGE_8UNSIGN:
-		      StoreExpr (pass2expr, 'U');
-		      break;
-
-		    case RANGE_8SIGN:
-		      StoreExpr (pass2expr, 'S');
-		      break;
-		    }
-		}
-	    }
-	  if ((pass2expr->rangetype & NOTEVALUABLE) && (pass2expr->stored==OFF))
-	    {
-	      if ((pass2expr->rangetype & RANGE) == RANGE_JROFFSET)
-		{
-		  if (pass2expr->rangetype & EXPREXTERN)
-		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_JR_NOT_LOCAL);	/* JR, DJNZ used an
-										 * external label - */
-		  else
-		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_NOT_DEFINED);
-		  prevJR = curJR;
-		  curJR = curJR->nextref;	/* get ready for next JR instruction */
-		  xfree0(prevJR);
-		}
-	      else
-		ReportError (pass2expr->srcfile, pass2expr->curline, ERR_NOT_DEFINED);
-	    }
-	  else
-	    {
-	      patchptr = pass2expr->codepos;		/* index in memory buffer */
-	      switch (pass2expr->rangetype & RANGE)
-		{
-		case RANGE_JROFFSET:
-		  constant -= curJR->PCaddr;	/* get module PC at JR instruction */
-		  if (constant >= -128 && constant <= 127)
-		    {
-		      patch_byte(&patchptr, (unsigned char) constant);	
-					   /* opcode is stored, now store relative jump */
-		    }
-		  else
-		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
-		  prevJR = curJR;
-		  curJR = curJR->nextref;	/* get ready for JR instruction */
-		  xfree0(prevJR);
-		  break;
-
-		case RANGE_8UNSIGN:
-                    /* BUG_0004 add test Integer out of range error */
-                    if (constant >= -128 && constant <= 255) {
-			patch_byte(&patchptr, (unsigned char) constant);	
-					   /* opcode is stored, now store byte */
+            if ( sym == elsestatm )
+            {
+                do
+                {
+                    /* then ignore lines until #endif ... */
+                    if ( !feof( z80asmfile ) )
+                    {
+                        writeline = OFF;
+                        parseline( OFF );
                     }
-                    else {
-                        ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
+                    else
+                    {
+                        return;
                     }
-		  break;
+                }
+                while ( sym != endifstatm );
+            }
+        }
+        else
+        {
+            do
+            {
+                /* expression is FALSE, ignore until #else or #endif */
+                if ( !feof( z80asmfile ) )
+                {
+                    writeline = OFF;
+                    parseline( OFF );
+                }
+                else
+                {
+                    return;
+                }
+            }
+            while ( ( sym != elsestatm ) && ( sym != endifstatm ) );
 
-		case RANGE_8SIGN:
-		  if (constant >= -128 && constant <= 255)
-		    {
-		      patch_byte(&patchptr, (unsigned char) constant);	
-					   /* opcode is stored, now store signed operand */
-		    }
-		  else
-		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
-		  break;
-
-		case RANGE_16CONST:
-		  if (constant >= -32768 && constant <= 65535)
-		    {
-		      patch_word(&patchptr, (int) constant);	
-					   /* store two bytes */
-		    }
-		  else
-		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
-		  break;
-
-		case RANGE_32SIGN:
-		  if (constant >= LONG_MIN && constant <= LONG_MAX)
-		    {
-		      patch_long(&patchptr, constant);	
-					   /* store 4 bytes */
-		    }
-		  else
-		    ReportError (pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant);
-		  break;
-		}
-	    }
-
-	  if (listing_CPY)
-	    PatchListFile (pass2expr, constant);
-
-	  prevexpr = pass2expr;
-	  pass2expr = pass2expr->nextexpr;	/* get next pass2 expression */
-	  RemovePfixlist (prevexpr);	/* release current expression */
-	}
-      while (pass2expr != NULL);	/* re-evaluate expressions and patch in code */
-
-      xfree0(CURRENTMODULE->mexpr);	/* Release header of expressions list */
-      xfree0(CURRENTMODULE->JRaddr);	/* Release header of relative jump address list */
-      CURRENTMODULE->mexpr = NULL;
-      CURRENTMODULE->JRaddr = NULL;
+            if ( sym == elsestatm )
+            {
+                do
+                {
+                    if ( !feof( z80asmfile ) )
+                    {
+                        writeline = ON;
+                        parseline( ON );
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                while ( sym != endifstatm );
+            }
+        }
     }
-  if ((TOTALERRORS == 0) && symtable)
+    else
     {
-      WriteSymbolTable ("Local Module Symbols:", CURRENTMODULE->localroot);
-      WriteSymbolTable ("Global Module Symbols:", globalroot);
+        do
+        {
+            /* don't evaluate #if expression and ignore all lines until #endif */
+            if ( !feof( z80asmfile ) )
+            {
+                writeline = OFF;
+                parseline( OFF );
+            }
+            else
+            {
+                return;    /* end of file - exit from this IF level */
+            }
+        }
+        while ( sym != endifstatm );
     }
-  fptr_namedecl = ftell (objfile);
-  inorder (CURRENTMODULE->localroot, (void (*)(void*)) StoreLocalName); /* Store Local Name declarations to relocatable file */
-  inorder (globalroot, (void (*)(void*)) StoreGlobalName);      /* Store Global name declarations to relocatable file */
 
-  fptr_libnmdecl = ftell (objfile);	/* Store library reference names */
-  inorder (globalroot, (void (*)(void*)) StoreLibReference);    /* Store library reference name declarations to relocatable file */
-
-  fptr_modname = ftell (objfile);
-  constant = strlen (CURRENTMODULE->mname);
-  xfputc(constant, objfile);	/* write length of module name to relocatable file */
-  xfwritec(CURRENTMODULE->mname, (size_t) constant, objfile);	/* write module name to relocatable
-										 * file       */
-  if ((constant = get_codeindex()) == 0)	/* BUG_0015 */
-    fptr_modcode = -1;		/* no code generated!  */
-  else
-    {
-      fptr_modcode = ftell (objfile);
-      xfput_word(constant, objfile);	/* two bytes of module code size */
-      fwrite_codearea(objfile);
-    }
-  inc_codesize(constant);		/* BUG_0015 */
-
-  if (verbose)
-    printf ("Size of module is %ld bytes\n", constant);
-
-  fseek (objfile, 8, SEEK_SET);	/* set file pointer to point at ORG */
-  if ((modulehdr->first == CURRENTMODULE))
-    {
-      if (deforigin)
-	CURRENTMODULE->origin = EXPLICIT_ORIGIN;	/* use origin from command line */
-    }
-  xfput_word(CURRENTMODULE->origin, objfile);		/* two bytes of origin */
-
-  fptr_exprdecl = 30;		/* expressions always begins at file position 24 */
-
-  if (fptr_namedecl == fptr_exprdecl)
-    fptr_exprdecl = -1;		/* no expressions */
-  if (fptr_libnmdecl == fptr_namedecl)
-    fptr_namedecl = -1;		/* no name declarations */
-  if (fptr_modname == fptr_libnmdecl)
-    fptr_libnmdecl = -1;	/* no library reference declarations */
-
-  xfput_long(fptr_modname, objfile);	/* write fptr. to module name */
-  xfput_long(fptr_exprdecl, objfile);	/* write fptr. to name declarations */
-  xfput_long(fptr_namedecl, objfile);	/* write fptr. to name declarations */
-  xfput_long(fptr_libnmdecl, objfile);	/* write fptr. to library name declarations */
-  xfput_long(fptr_modcode, objfile);	/* write fptr. to module code */
+    sym = nil;
 }
 
 
-void 
-StoreGlobalName (symbol * node)
+
+long
+Evallogexpr( void )
 {
-  if ((node->type & SYMXDEF) && (node->type & SYMTOUCHED))
-    StoreName (node, SYMXDEF);
-}
+    struct expr *postfixexpr;
+    long constant = 0;
 
+    GetSym();                     /* get logical expression */
 
-void 
-StoreLocalName (symbol * node)
-{
-  if ((node->type & SYMLOCAL) && (node->type & SYMTOUCHED))
-    StoreName (node, SYMLOCAL);
-}
-
-
-void 
-StoreName (symbol * node, unsigned char scope)
-{
-  int b;
-
-  switch (scope)
+    if ( ( postfixexpr = ParseNumExpr() ) != NULL )
     {
-    case SYMLOCAL:
-      xfputc('L', objfile);
-      break;
-
-    case SYMXDEF:
-      if (node->type & SYMDEF)
-	xfputc('X', objfile);
-      else
-	xfputc('G', objfile);
-      break;
+        constant = EvalPfixExpr( postfixexpr );
+        RemovePfixlist( postfixexpr );    /* remove linked list, expression evaluated */
     }
-  if (node->type & SYMADDR)	/* then write type of symbol */
-    xfputc('A', objfile);	/* either a relocatable address */
-  else
-    xfputc('C', objfile);	/* or a constant */
 
-  xfput_long(node->symvalue, objfile);
-
-  b = strlen (node->symname);
-  xfputc(b, objfile);		/* write length of symbol name to relocatable file */
-  xfwritec(node->symname, (size_t) b, objfile);	/* write symbol name to relocatable file */
+    return constant;
 }
 
 
-void 
-StoreLibReference (symbol * node)
+
+
+void
+Z80pass2( void )
 {
-  size_t b;
+    struct expr *pass2expr, *prevexpr;
+    struct JRPC *curJR, *prevJR;
+    long constant;
+    long fptr_exprdecl, fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
+    size_t patchptr;
 
-  if ((node->type & SYMXREF) && (node->type & SYMDEF) && (node->type & SYMTOUCHED))
+
+    if ( ( pass2expr = CURRENTMODULE->mexpr->firstexpr ) != NULL )
     {
-      b = strlen (node->symname);
-      xfputc((int) b, objfile);	/* write length of symbol name to relocatable file */
-      xfwritec(node->symname, b, objfile);	/* write symbol name to relocatable file */
+        curJR = CURRENTMODULE->JRaddr->firstref;  /* point at first JR PC address in this module */
+
+        do
+        {
+            constant = EvalPfixExpr( pass2expr );
+
+            if ( pass2expr->stored == OFF )
+            {
+                if ( ( pass2expr->rangetype & EXPREXTERN ) || ( pass2expr->rangetype & EXPRADDR ) )
+                {
+                    /*
+                     * Expression contains symbol declared as external or defined as a relocatable
+                     * address,
+                     */
+                    /* store expression in relocatable file */
+                    switch ( pass2expr->rangetype & RANGE )
+                    {
+                        case RANGE_32SIGN:
+                            StoreExpr( pass2expr, 'L' );
+                            break;
+
+                        case RANGE_16CONST:
+                            StoreExpr( pass2expr, 'C' );
+                            break;
+
+                        case RANGE_8UNSIGN:
+                            StoreExpr( pass2expr, 'U' );
+                            break;
+
+                        case RANGE_8SIGN:
+                            StoreExpr( pass2expr, 'S' );
+                            break;
+                    }
+                }
+            }
+
+            if ( ( pass2expr->rangetype & NOTEVALUABLE ) && ( pass2expr->stored == OFF ) )
+            {
+                if ( ( pass2expr->rangetype & RANGE ) == RANGE_JROFFSET )
+                {
+                    if ( pass2expr->rangetype & EXPREXTERN )
+                    {
+                        ReportError( pass2expr->srcfile, pass2expr->curline, ERR_JR_NOT_LOCAL );
+                    }     /* JR, DJNZ used an
+
+                                                                                 * external label - */
+                    else
+                    {
+                        ReportError( pass2expr->srcfile, pass2expr->curline, ERR_NOT_DEFINED );
+                    }
+
+                    prevJR = curJR;
+                    curJR = curJR->nextref;       /* get ready for next JR instruction */
+                    xfree0( prevJR );
+                }
+                else
+                {
+                    ReportError( pass2expr->srcfile, pass2expr->curline, ERR_NOT_DEFINED );
+                }
+            }
+            else
+            {
+                patchptr = pass2expr->codepos;            /* index in memory buffer */
+
+                switch ( pass2expr->rangetype & RANGE )
+                {
+                    case RANGE_JROFFSET:
+                        constant -= curJR->PCaddr;    /* get module PC at JR instruction */
+
+                        if ( constant >= -128 && constant <= 127 )
+                        {
+                            patch_byte( &patchptr, ( unsigned char ) constant );
+                            /* opcode is stored, now store relative jump */
+                        }
+                        else
+                        {
+                            ReportError( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                        }
+
+                        prevJR = curJR;
+                        curJR = curJR->nextref;       /* get ready for JR instruction */
+                        xfree0( prevJR );
+                        break;
+
+                    case RANGE_8UNSIGN:
+
+                        /* BUG_0004 add test Integer out of range error */
+                        if ( constant >= -128 && constant <= 255 )
+                        {
+                            patch_byte( &patchptr, ( unsigned char ) constant );
+                            /* opcode is stored, now store byte */
+                        }
+                        else
+                        {
+                            ReportError( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                        }
+
+                        break;
+
+                    case RANGE_8SIGN:
+                        if ( constant >= -128 && constant <= 255 )
+                        {
+                            patch_byte( &patchptr, ( unsigned char ) constant );
+                            /* opcode is stored, now store signed operand */
+                        }
+                        else
+                        {
+                            ReportError( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                        }
+
+                        break;
+
+                    case RANGE_16CONST:
+                        if ( constant >= -32768 && constant <= 65535 )
+                        {
+                            patch_word( &patchptr, ( int ) constant );
+                            /* store two bytes */
+                        }
+                        else
+                        {
+                            ReportError( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                        }
+
+                        break;
+
+                    case RANGE_32SIGN:
+                        if ( constant >= LONG_MIN && constant <= LONG_MAX )
+                        {
+                            patch_long( &patchptr, constant );
+                            /* store 4 bytes */
+                        }
+                        else
+                        {
+                            ReportError( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                        }
+
+                        break;
+                }
+            }
+
+            if ( listing_CPY )
+            {
+                PatchListFile( pass2expr, constant );
+            }
+
+            prevexpr = pass2expr;
+            pass2expr = pass2expr->nextexpr;      /* get next pass2 expression */
+            RemovePfixlist( prevexpr );   /* release current expression */
+        }
+        while ( pass2expr != NULL );      /* re-evaluate expressions and patch in code */
+
+        xfree0( CURRENTMODULE->mexpr );   /* Release header of expressions list */
+        xfree0( CURRENTMODULE->JRaddr );  /* Release header of relative jump address list */
+        CURRENTMODULE->mexpr = NULL;
+        CURRENTMODULE->JRaddr = NULL;
+    }
+
+    if ( ( TOTALERRORS == 0 ) && symtable )
+    {
+        WriteSymbolTable( "Local Module Symbols:", CURRENTMODULE->localroot );
+        WriteSymbolTable( "Global Module Symbols:", globalroot );
+    }
+
+    fptr_namedecl = ftell( objfile );
+    inorder( CURRENTMODULE->localroot, ( void ( * )( void * ) ) StoreLocalName ); /* Store Local Name declarations to relocatable file */
+    inorder( globalroot, ( void ( * )( void * ) ) StoreGlobalName ); /* Store Global name declarations to relocatable file */
+
+    fptr_libnmdecl = ftell( objfile );    /* Store library reference names */
+    inorder( globalroot, ( void ( * )( void * ) ) StoreLibReference ); /* Store library reference name declarations to relocatable file */
+
+    fptr_modname = ftell( objfile );
+    constant = strlen( CURRENTMODULE->mname );
+    xfputc( constant, objfile );  /* write length of module name to relocatable file */
+    xfwritec( CURRENTMODULE->mname, ( size_t ) constant, objfile );   /* write module name to relocatable
+                                                                                 * file       */
+
+    if ( ( constant = get_codeindex() ) == 0 )    /* BUG_0015 */
+    {
+        fptr_modcode = -1;    /* no code generated!  */
+    }
+    else
+    {
+        fptr_modcode = ftell( objfile );
+        xfput_word( constant, objfile );  /* two bytes of module code size */
+        fwrite_codearea( objfile );
+    }
+
+    inc_codesize( constant );             /* BUG_0015 */
+
+    if ( verbose )
+    {
+        printf( "Size of module is %ld bytes\n", constant );
+    }
+
+    fseek( objfile, 8, SEEK_SET ); /* set file pointer to point at ORG */
+
+    if ( ( modulehdr->first == CURRENTMODULE ) )
+    {
+        if ( deforigin )
+        {
+            CURRENTMODULE->origin = EXPLICIT_ORIGIN;    /* use origin from command line */
+        }
+    }
+
+    xfput_word( CURRENTMODULE->origin, objfile );         /* two bytes of origin */
+
+    fptr_exprdecl = 30;           /* expressions always begins at file position 24 */
+
+    if ( fptr_namedecl == fptr_exprdecl )
+    {
+        fptr_exprdecl = -1;    /* no expressions */
+    }
+
+    if ( fptr_libnmdecl == fptr_namedecl )
+    {
+        fptr_namedecl = -1;    /* no name declarations */
+    }
+
+    if ( fptr_modname == fptr_libnmdecl )
+    {
+        fptr_libnmdecl = -1;    /* no library reference declarations */
+    }
+
+    xfput_long( fptr_modname, objfile );  /* write fptr. to module name */
+    xfput_long( fptr_exprdecl, objfile ); /* write fptr. to name declarations */
+    xfput_long( fptr_namedecl, objfile ); /* write fptr. to name declarations */
+    xfput_long( fptr_libnmdecl, objfile ); /* write fptr. to library name declarations */
+    xfput_long( fptr_modcode, objfile );  /* write fptr. to module code */
+}
+
+
+void
+StoreGlobalName( symbol *node )
+{
+    if ( ( node->type & SYMXDEF ) && ( node->type & SYMTOUCHED ) )
+    {
+        StoreName( node, SYMXDEF );
     }
 }
 
 
-void 
-Pass2info (struct expr *pfixexpr,	/* pointer to header of postfix expression linked list */
-	   char constrange,	/* allowed size of value to be parsed */
-	   long byteoffset)
-{				/* position in listing file to patch */
-
-
-
-  if (listing)
-    byteoffset = listfileptr + 12 + 3 * byteoffset + 6 * ((byteoffset) / 32);
-  /*
-   * |    |   |  |   | add extra line, if hex bytes more than 1 line start of      |   |  | no. of hex bytes
-   * rel. to start current line in    |   length of hex number + space listfile      | linenumber & 2 spaces +
-   * hex address and 2 spaces
-   */
-  else
-    byteoffset = -1;		/* indicate that this expression is not going to be patched in listing file */
-
-
-  pfixexpr->nextexpr = NULL;
-  pfixexpr->rangetype = constrange;
-  pfixexpr->srcfile = CURRENTFILE->fname;	/* pointer to record containing current source file name */
-  pfixexpr->curline = CURRENTFILE->line;	/* pointer to record containing current line number */
-  pfixexpr->listpos = byteoffset;	/* now calculated as absolute file pointer */
-
-  if (CURRENTMODULE->mexpr->firstexpr == NULL)
+void
+StoreLocalName( symbol *node )
+{
+    if ( ( node->type & SYMLOCAL ) && ( node->type & SYMTOUCHED ) )
     {
-      CURRENTMODULE->mexpr->firstexpr = pfixexpr;
-      CURRENTMODULE->mexpr->currexpr = pfixexpr;	/* Expression header points at first expression */
+        StoreName( node, SYMLOCAL );
     }
-  else
+}
+
+
+void
+StoreName( symbol *node, unsigned char scope )
+{
+    int b;
+
+    switch ( scope )
     {
-      CURRENTMODULE->mexpr->currexpr->nextexpr = pfixexpr;	/* Current expr. node points to new expression
-								 * node */
-      CURRENTMODULE->mexpr->currexpr = pfixexpr;	/* Pointer to current expr. node updated */
+        case SYMLOCAL:
+            xfputc( 'L', objfile );
+            break;
+
+        case SYMXDEF:
+            if ( node->type & SYMDEF )
+            {
+                xfputc( 'X', objfile );
+            }
+            else
+            {
+                xfputc( 'G', objfile );
+            }
+
+            break;
+    }
+
+    if ( node->type & SYMADDR )   /* then write type of symbol */
+    {
+        xfputc( 'A', objfile );    /* either a relocatable address */
+    }
+    else
+    {
+        xfputc( 'C', objfile );    /* or a constant */
+    }
+
+    xfput_long( node->symvalue, objfile );
+
+    b = strlen( node->symname );
+    xfputc( b, objfile );         /* write length of symbol name to relocatable file */
+    xfwritec( node->symname, ( size_t ) b, objfile ); /* write symbol name to relocatable file */
+}
+
+
+void
+StoreLibReference( symbol *node )
+{
+    size_t b;
+
+    if ( ( node->type & SYMXREF ) && ( node->type & SYMDEF ) && ( node->type & SYMTOUCHED ) )
+    {
+        b = strlen( node->symname );
+        xfputc( ( int ) b, objfile ); /* write length of symbol name to relocatable file */
+        xfwritec( node->symname, b, objfile );    /* write symbol name to relocatable file */
+    }
+}
+
+
+void
+Pass2info( struct expr *pfixexpr,       /* pointer to header of postfix expression linked list */
+           char constrange,     /* allowed size of value to be parsed */
+           long byteoffset )
+{
+    /* position in listing file to patch */
+
+
+
+    if ( listing )
+    {
+        byteoffset = listfileptr + 12 + 3 * byteoffset + 6 * ( ( byteoffset ) / 32 );
+    }
+    /*
+     * |    |   |  |   | add extra line, if hex bytes more than 1 line start of      |   |  | no. of hex bytes
+     * rel. to start current line in    |   length of hex number + space listfile      | linenumber & 2 spaces +
+     * hex address and 2 spaces
+     */
+    else
+    {
+        byteoffset = -1;    /* indicate that this expression is not going to be patched in listing file */
+    }
+
+
+    pfixexpr->nextexpr = NULL;
+    pfixexpr->rangetype = constrange;
+    pfixexpr->srcfile = CURRENTFILE->fname;       /* pointer to record containing current source file name */
+    pfixexpr->curline = CURRENTFILE->line;        /* pointer to record containing current line number */
+    pfixexpr->listpos = byteoffset;       /* now calculated as absolute file pointer */
+
+    if ( CURRENTMODULE->mexpr->firstexpr == NULL )
+    {
+        CURRENTMODULE->mexpr->firstexpr = pfixexpr;
+        CURRENTMODULE->mexpr->currexpr = pfixexpr;        /* Expression header points at first expression */
+    }
+    else
+    {
+        CURRENTMODULE->mexpr->currexpr->nextexpr = pfixexpr;      /* Current expr. node points to new expression
+                                                                 * node */
+        CURRENTMODULE->mexpr->currexpr = pfixexpr;        /* Pointer to current expr. node updated */
     }
 }
 
 
 
 struct sourcefile *
-Prevfile (void)
+Prevfile( void )
 {
-  struct usedfile *newusedfile;
-  struct sourcefile *ownedfile;
+    struct usedfile *newusedfile;
+    struct sourcefile *ownedfile;
 
-  newusedfile = xcalloc_struct(struct usedfile);
-  ownedfile = CURRENTFILE;
-  CURRENTFILE = CURRENTFILE->prevsourcefile;	/* get back to owner file - now the current */
-  CURRENTFILE->newsourcefile = NULL;	/* current file is now the last in the list */
-  ownedfile->prevsourcefile = NULL;	/* pointer to owner now obsolete... */
+    newusedfile = xcalloc_struct( struct usedfile );
+    ownedfile = CURRENTFILE;
+    CURRENTFILE = CURRENTFILE->prevsourcefile;    /* get back to owner file - now the current */
+    CURRENTFILE->newsourcefile = NULL;    /* current file is now the last in the list */
+    ownedfile->prevsourcefile = NULL;     /* pointer to owner now obsolete... */
 
-  newusedfile->nextusedfile = CURRENTFILE->usedsourcefile;	/* set ptr to next record to current ptr to
-								 * another used file */
-  CURRENTFILE->usedsourcefile = newusedfile;	/* new used file now inserted into list */
-  newusedfile->ownedsourcefile = ownedfile;	/* the inserted record now points to previously owned file */
-  return (CURRENTFILE);
+    newusedfile->nextusedfile = CURRENTFILE->usedsourcefile;      /* set ptr to next record to current ptr to
+                                                                 * another used file */
+    CURRENTFILE->usedsourcefile = newusedfile;    /* new used file now inserted into list */
+    newusedfile->ownedsourcefile = ownedfile;     /* the inserted record now points to previously owned file */
+    return ( CURRENTFILE );
 }
 
 
 /* CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
 struct sourcefile *
-Newfile (struct sourcefile *curfile, char *fname)
+Newfile( struct sourcefile *curfile, char *fname )
 {
     struct sourcefile *nfile;
     struct sourcefile *ret;
 
-    nfile = xcalloc_struct(struct sourcefile);
-    try {
-	ret = Setfile(curfile, nfile, fname);
+    nfile = xcalloc_struct( struct sourcefile );
+
+    try
+    {
+        ret = Setfile( curfile, nfile, fname );
     }
-    catch(RuntimeException) {
-	xfree0(nfile);
-	rethrow("");
+    catch ( RuntimeException )
+    {
+        xfree0( nfile );
+        rethrow( "" );
     }
 
     return ret;
@@ -790,92 +912,110 @@ Newfile (struct sourcefile *curfile, char *fname)
 
 
 struct sourcefile *
-Setfile (struct sourcefile *curfile,	/* pointer to record of current source file */
-	 struct sourcefile *nfile,	/* pointer to record of new
-					 * source file */
-	 char *filename)
+Setfile( struct sourcefile *curfile,    /* pointer to record of current source file */
+         struct sourcefile *nfile,      /* pointer to record of new
+                                         * source file */
+         char *filename )
 {
-  nfile->fname = xstrdup(filename);	/* pointer to filename string */
-  nfile->prevsourcefile = curfile;
-  nfile->newsourcefile = NULL;
-  nfile->usedsourcefile = NULL;
-  nfile->filepointer = 0;
-  nfile->line = 0;			/* Reset to 0 as line counter during parsing */
-  return (nfile);
+    nfile->fname = xstrdup( filename );   /* pointer to filename string */
+    nfile->prevsourcefile = curfile;
+    nfile->newsourcefile = NULL;
+    nfile->usedsourcefile = NULL;
+    nfile->filepointer = 0;
+    nfile->line = 0;                      /* Reset to 0 as line counter during parsing */
+    return ( nfile );
 }
 
 
 int
-Flncmp(char *f1, char *f2)
+Flncmp( char *f1, char *f2 )
 {
-   int i;
+    int i;
 
-   if (strlen(f1) != strlen(f2))
-     return -1;
-   else
-     {
-       i = strlen(f1);
-       while(--i >= 0)
-         if( tolower(f1[i]) != tolower(f2[i]) )
-           return -1;
+    if ( strlen( f1 ) != strlen( f2 ) )
+    {
+        return -1;
+    }
+    else
+    {
+        i = strlen( f1 );
 
-       /* filenames equal */
-       return 0;
-     }
+        while ( --i >= 0 )
+            if ( tolower( f1[i] ) != tolower( f2[i] ) )
+            {
+                return -1;
+            }
+
+        /* filenames equal */
+        return 0;
+    }
 }
 
 
 struct sourcefile *
-FindFile (struct sourcefile *srcfile, char *flnm)
+FindFile( struct sourcefile *srcfile, char *flnm )
 {
-  struct sourcefile *foundfile;
+    struct sourcefile *foundfile;
 
-  if (srcfile != NULL)
+    if ( srcfile != NULL )
     {
-      if ((foundfile = FindFile(srcfile->prevsourcefile, flnm)) != NULL)
-        return foundfile;	/* trying to include an already included file recursively! */
+        if ( ( foundfile = FindFile( srcfile->prevsourcefile, flnm ) ) != NULL )
+        {
+            return foundfile;    /* trying to include an already included file recursively! */
+        }
 
-      if (Flncmp(srcfile->fname,flnm) == 0)
-        return srcfile;	/* this include file already used! */
-      else
-        return NULL;	/* this include file didn't match filename searched */
+        if ( Flncmp( srcfile->fname, flnm ) == 0 )
+        {
+            return srcfile;    /* this include file already used! */
+        }
+        else
+        {
+            return NULL;    /* this include file didn't match filename searched */
+        }
     }
-  else
-    return NULL;
+    else
+    {
+        return NULL;
+    }
 }
 
 
 
-void 
-PatchListFile (struct expr *pass2expr, long c)
+void
+PatchListFile( struct expr *pass2expr, long c )
 {
-  int i;
+    int i;
 
-  if (pass2expr->listpos == -1)
-    return;			/* listing wasn't switched ON during pass1 */
-  else
+    if ( pass2expr->listpos == -1 )
     {
-      fseek (listfile, pass2expr->listpos, SEEK_SET);	/* set file pointer in list file */
-      switch (pass2expr->rangetype & RANGE)
-	{			/* look only at range bits */
-	case RANGE_JROFFSET:
-	case RANGE_8UNSIGN:
-	case RANGE_8SIGN:
-	  fprintf (listfile, "%02X", (unsigned int) c);
-	  break;
+        return;    /* listing wasn't switched ON during pass1 */
+    }
+    else
+    {
+        fseek( listfile, pass2expr->listpos, SEEK_SET );  /* set file pointer in list file */
 
-	case RANGE_16CONST:
-	  fprintf (listfile, "%02X %02X", (unsigned int) (c & 0xFF), (unsigned int) (c >> 8) );
-	  break;
+        switch ( pass2expr->rangetype & RANGE )
+        {
+                /* look only at range bits */
+            case RANGE_JROFFSET:
+            case RANGE_8UNSIGN:
+            case RANGE_8SIGN:
+                fprintf( listfile, "%02X", ( unsigned int ) c );
+                break;
 
-	case RANGE_32SIGN:
-	  for (i = 0; i < 4; i++)
-	    {
-	      fprintf (listfile, "%02X ", (unsigned int) (c & 0xFF) );
-	      c >>= 8;
-	    }
-	  break;
-	}
+            case RANGE_16CONST:
+                fprintf( listfile, "%02X %02X", ( unsigned int )( c & 0xFF ), ( unsigned int )( c >> 8 ) );
+                break;
+
+            case RANGE_32SIGN:
+                for ( i = 0; i < 4; i++ )
+                {
+                    fprintf( listfile, "%02X ", ( unsigned int )( c & 0xFF ) );
+                    c >>= 8;
+                }
+
+                break;
+        }
     }
 }
 
@@ -884,135 +1024,163 @@ PatchListFile (struct expr *pass2expr, long c)
 /*
  * Write current source line to list file with Hex dump of assembled instruction
  */
-void 
-WriteListFile (void)
+void
+WriteListFile( void )
 {
-  int len, k;
-  size_t byteptr;
+    int len, k;
+    size_t byteptr;
 
-  if (strlen (line) == 0)
-    strcpy (line, "\n");
-
-  len = get_PC() - get_oldPC();
-  byteptr = get_codeindex() - len;	/* BUG_0015 */
-  if (len == 0)
-    fprintf (listfile, "%-4d  %04X%14s%s", CURRENTFILE->line, (unsigned short) get_oldPC(), "", line);		/* no bytes generated */
-  else if (len <= 4)
+    if ( strlen( line ) == 0 )
     {
-      fprintf (listfile, "%-4d  %04X  ", CURRENTFILE->line, (unsigned short) get_oldPC());
-      for (k = 0; k < len; k++)
-	fprintf (listfile, "%02X ", get_byte(&byteptr));
-      fprintf (listfile, "%*s%s", (unsigned short) (4 - len) * 3, "", line);
+        strcpy( line, "\n" );
     }
-  else
-    {
-      while (len)
-	{
-	  LineCounter ();
-	  if (len)
-	    fprintf (listfile, "%-4d  %04X  ", CURRENTFILE->line, (unsigned short) (get_PC() - len));
-	  for (k = (len - 32 > 0) ? 32 : len; k; k--, len--)
-	    fprintf (listfile, "%02X ", get_byte(&byteptr));
-	  fprintf (listfile, "\n");
-	}
-      fprintf (listfile, "%18s%s", "", line);
-      LineCounter ();
-    }
-  LineCounter ();			/* Update list file line counter - check page boundary */
-  listfileptr = ftell (listfile);	/* Get file position for beginning of next line in list file */
 
-  set_oldPC();
+    len = get_PC() - get_oldPC();
+    byteptr = get_codeindex() - len;      /* BUG_0015 */
+
+    if ( len == 0 )
+    {
+        fprintf( listfile, "%-4d  %04X%14s%s", CURRENTFILE->line, ( unsigned short ) get_oldPC(), "", line );    /* no bytes generated */
+    }
+    else if ( len <= 4 )
+    {
+        fprintf( listfile, "%-4d  %04X  ", CURRENTFILE->line, ( unsigned short ) get_oldPC() );
+
+        for ( k = 0; k < len; k++ )
+        {
+            fprintf( listfile, "%02X ", get_byte( &byteptr ) );
+        }
+
+        fprintf( listfile, "%*s%s", ( unsigned short )( 4 - len ) * 3, "", line );
+    }
+    else
+    {
+        while ( len )
+        {
+            LineCounter();
+
+            if ( len )
+            {
+                fprintf( listfile, "%-4d  %04X  ", CURRENTFILE->line, ( unsigned short )( get_PC() - len ) );
+            }
+
+            for ( k = ( len - 32 > 0 ) ? 32 : len; k; k--, len-- )
+            {
+                fprintf( listfile, "%02X ", get_byte( &byteptr ) );
+            }
+
+            fprintf( listfile, "\n" );
+        }
+
+        fprintf( listfile, "%18s%s", "", line );
+        LineCounter();
+    }
+
+    LineCounter();                        /* Update list file line counter - check page boundary */
+    listfileptr = ftell( listfile );      /* Get file position for beginning of next line in list file */
+
+    set_oldPC();
 }
 
 
-void 
-LineCounter (void)
+void
+LineCounter( void )
 {
-  if (++LINENR > PAGELEN)
+    if ( ++LINENR > PAGELEN )
     {
-      fprintf (listfile, "\x0C\n");	/* send FORM FEED to file */
-      WriteHeader ();
-      LINENR = 6;
+        fprintf( listfile, "\x0C\n" );    /* send FORM FEED to file */
+        WriteHeader();
+        LINENR = 6;
     }
 }
 
 
-void 
-WriteHeader (void)
+void
+WriteHeader( void )
 {
 #ifdef QDOS
-  fprintf (listfile, "%s %s, %s", _prog_name, _version, _copyright);
-  fprintf (listfile, "%*.*s", 122 - strlen (_prog_name) - strlen (_version) - strlen (_copyright) - 3, strlen (date), date);
+    fprintf( listfile, "%s %s, %s", _prog_name, _version, _copyright );
+    fprintf( listfile, "%*.*s", 122 - strlen( _prog_name ) - strlen( _version ) - strlen( _copyright ) - 3, strlen( date ), date );
 #else
-  fprintf (listfile, "%s", copyrightmsg);
-  fprintf (listfile, "%*.*s", (int)(122 - strlen (copyrightmsg)), (int) strlen (date), date);
+    fprintf( listfile, "%s", copyrightmsg );
+    fprintf( listfile, "%*.*s", ( int )( 122 - strlen( copyrightmsg ) ), ( int ) strlen( date ), date );
 #endif
-  fprintf (listfile, "Page %03d%*s'%s'\n\n\n", ++PAGENR, (int) (122 - 9 - 2 - strlen (lstfilename)), "", lstfilename);
+    fprintf( listfile, "Page %03d%*s'%s'\n\n\n", ++PAGENR, ( int )( 122 - 9 - 2 - strlen( lstfilename ) ), "", lstfilename );
 }
 
 
-void 
-WriteSymbol (symbol * n)
+void
+WriteSymbol( symbol *n )
 {
-  int k;
-  int space, tabulators;
-  struct pageref *page;
+    int k;
+    int space, tabulators;
+    struct pageref *page;
 
-  if (n->owner == CURRENTMODULE)
-    {				/* Write only symbols related to current module */
-      if ((n->type & SYMLOCAL) || (n->type & SYMXDEF))
-	{
-	  if ((n->type & SYMTOUCHED))
-	    {
-	      fprintf (listfile, "%s", n->symname);
-	      space = COLUMN_WIDTH - strlen (n->symname);
-	      for (tabulators = space % TAB_DIST ? space / TAB_DIST + 1 : space / TAB_DIST; tabulators > 0; tabulators--)
-		xfputc('\t', listfile);
-	      fprintf (listfile, "= %08lX", n->symvalue);
-	      if (n->references != NULL)
-		{
-		  page = n->references->firstref;
-		  fprintf (listfile, " : %3d* ", page->pagenr);
-		  page = page->nextref;
-		  k = 17;
-		  while (page != NULL)
-		    {
-		      if (k-- == 0)
-			{
-			  fprintf (listfile, "\n%45s", "");
-			  k = 16;
-			  LineCounter ();
-			}
-		      fprintf (listfile, "%3d ", page->pagenr);
-		      page = page->nextref;
-		    }
-		}
-	      fprintf (listfile, "\n");
-	      LineCounter ();
-	    }
-	}
+    if ( n->owner == CURRENTMODULE )
+    {
+        /* Write only symbols related to current module */
+        if ( ( n->type & SYMLOCAL ) || ( n->type & SYMXDEF ) )
+        {
+            if ( ( n->type & SYMTOUCHED ) )
+            {
+                fprintf( listfile, "%s", n->symname );
+                space = COLUMN_WIDTH - strlen( n->symname );
+
+                for ( tabulators = space % TAB_DIST ? space / TAB_DIST + 1 : space / TAB_DIST; tabulators > 0; tabulators-- )
+                {
+                    xfputc( '\t', listfile );
+                }
+
+                fprintf( listfile, "= %08lX", n->symvalue );
+
+                if ( n->references != NULL )
+                {
+                    page = n->references->firstref;
+                    fprintf( listfile, " : %3d* ", page->pagenr );
+                    page = page->nextref;
+                    k = 17;
+
+                    while ( page != NULL )
+                    {
+                        if ( k-- == 0 )
+                        {
+                            fprintf( listfile, "\n%45s", "" );
+                            k = 16;
+                            LineCounter();
+                        }
+
+                        fprintf( listfile, "%3d ", page->pagenr );
+                        page = page->nextref;
+                    }
+                }
+
+                fprintf( listfile, "\n" );
+                LineCounter();
+            }
+        }
     }
 }
 
 
-void 
-WriteSymbolTable (char *msg, avltree * root)
+void
+WriteSymbolTable( char *msg, avltree *root )
 {
 
-  fseek (listfile, 0, SEEK_END);	/* File position to end of file */
-  xfputc('\n', listfile);
-  LineCounter ();
-  xfputc('\n', listfile);
-  LineCounter ();
-  fprintf (listfile, "%s", msg);
-  LineCounter ();
-  xfputc('\n', listfile);
-  LineCounter ();
-  xfputc('\n', listfile);
-  LineCounter ();
+    fseek( listfile, 0, SEEK_END );       /* File position to end of file */
+    xfputc( '\n', listfile );
+    LineCounter();
+    xfputc( '\n', listfile );
+    LineCounter();
+    fprintf( listfile, "%s", msg );
+    LineCounter();
+    xfputc( '\n', listfile );
+    LineCounter();
+    xfputc( '\n', listfile );
+    LineCounter();
 
-  inorder (root, (void (*)(void*)) WriteSymbol);        /* write symbol table */
+    inorder( root, ( void ( * )( void * ) ) WriteSymbol ); /* write symbol table */
 }
+
 
 
 

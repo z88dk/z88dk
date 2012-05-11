@@ -13,9 +13,21 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.17 2011-08-21 20:19:47 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.18 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: config.h,v $
-/* Revision 1.17  2011-08-21 20:19:47  pauloscustodio
+/* Revision 1.18  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.17  2011/08/21 20:19:47  pauloscustodio
 /* Define FILEEXT_SEPARATOR as ".", or "_" on QDOS
 /*
 /* Revision 1.16  2011/07/09 18:25:35  pauloscustodio
@@ -27,60 +39,60 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /*
 /* Revision 1.14  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword
-/* 
+/*
 /* Revision 1.13  2011/07/09 01:38:02  pauloscustodio
 /* *** empty log message ***
-/* 
+/*
 /* Revision 1.12  2011/07/09 01:16:47  pauloscustodio
 /* added RCS keywords
-/* 
+/*
 /* Revision 1.11  2007/06/24 16:41:41  dom
 /* Don't use config.h for win32
-/* 
+/*
 /* Revision 1.10  2002/12/09 18:49:46  dom
 /* simplified the makefiles somewhat, allow cross building for Amiga on linux
-/* 
+/*
 /* Revision 1.9  2002/12/01 15:47:17  dom
 /* local install on unix resolved
-/* 
+/*
 /* Revision 1.8  2002/12/01 15:11:51  dom
 /* OS-X compile trickery
-/* 
+/*
 /* Revision 1.7  2002/11/05 11:45:56  dom
 /* powerpc endian detection
-/* 
+/*
 /* fix for 64 bit machines, sizeof(long) != 4
-/* 
+/*
 /* Revision 1.6  2002/10/03 21:17:17  dom
 /* change the amiga default dir to zcc: to match with zcc
-/* 
+/*
 /* Revision 1.5  2002/07/15 16:30:03  dom
 /* changed default path
-/* 
+/*
 /* Revision 1.4  2001/04/20 10:44:26  dom
 /* *** empty log message ***
-/* 
+/*
 /* Revision 1.3  2001/03/12 13:37:44  dom
 /* *** empty log message ***
-/* 
+/*
 /* Revision 1.2  2001/01/23 10:00:09  dom
 /* Changes by x1cygnus:
-/* 
+/*
 /* just added a harcoded macro Invoke, similar to callpkg except that the
 /* instruction 'Invoke' resolves to a call by default (ti83) and to a RST if
 /* the parameter -plus is specified on the command line.
-/* 
+/*
 /* Changes by dom:
 /* Added in a rudimentary default directory set up (Defined at compile time)
 /* a bit kludgy and not very nice!
-/* 
+/*
 /* Revision 1.1  2000/07/04 15:33:29  dom
 /* branches:  1.1.1;
 /* Initial revision
-/* 
+/*
 /* Revision 1.1.1.1  2000/07/04 15:33:29  dom
 /* First import of z88dk into the sourceforge system <gulp>
-/* 
+/*
 /* */
 
 /* Pick up the default installation path */
@@ -129,7 +141,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #endif
 
 #ifdef MSDOS
-#define MAXCODESIZE 65532	/* MSDOS 64K heap boundary */
+#define MAXCODESIZE 65532       /* MSDOS 64K heap boundary */
 #else
 #define MAXCODESIZE 65536
 #endif
@@ -143,7 +155,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #if #cpu(m68k) || #cpu(sparc) || #cpu(hppa) || #cpu(powerpc)
 #define ENDIAN 1
 #endif
-#endif	/* __GNUC__ */
+#endif  /* __GNUC__ */
 #endif
 
 /* File name extension separator */
@@ -152,4 +164,5 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #else
 #define FILEEXT_SEPARATOR "."
 #endif
+
 

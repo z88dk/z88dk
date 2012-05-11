@@ -17,9 +17,21 @@ Memory allocation routines to enable memory leak detection in MS Visual Studio D
 Needs to be included in every source file before any other include.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.h,v 1.2 2011-08-05 19:49:13 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.h,v 1.3 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: memalloc.h,v $
-/* Revision 1.2  2011-08-05 19:49:13  pauloscustodio
+/* Revision 1.3  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.2  2011/08/05 19:49:13  pauloscustodio
 /* CH_0004 : Exception mechanism to handle fatal errors
 /* New memory allocation functions xmalloc, xcalloc, ... that raise an exception if the memory cannot be allocated.
 /* New xfree0() macro which only frees if the pointer in non-null, and
@@ -35,43 +47,44 @@ Needs to be included in every source file before any other include.
 #define MEMALLOC_H
 
 #include <stdlib.h>
-#include "except.h"		/* CH_0004 : Exception mechanism to handle fatal errors */
+#include "except.h"             /* CH_0004 : Exception mechanism to handle fatal errors */
 
-#ifdef _CRTDBG_MAP_ALLOC	/* MS Visual Studio malloc debug */
+#ifdef _CRTDBG_MAP_ALLOC        /* MS Visual Studio malloc debug */
 #include <stdlib.h>
 #include <crtdbg.h>
 #endif
 
 /* init MS Visual Studio malloc debug */
-extern void init_memalloc (void);
+extern void init_memalloc( void );
 
-extern void * _check_memalloc (void *ptr);
-extern char * _check_stralloc (void *ptr, char *source);
+extern void *_check_memalloc( void *ptr );
+extern char *_check_stralloc( void *ptr, char *source );
 
-/* alloc memory, throw NotEnoughMemoryException on failure 
+/* alloc memory, throw NotEnoughMemoryException on failure
  * implemented as macros to report location of allocation in memory leak report */
-#define xcalloc(num, size)	_check_memalloc(calloc((num), (size)))
+#define xcalloc(num, size)      _check_memalloc(calloc((num), (size)))
 
-#define xmalloc(size)		_check_memalloc(malloc(size))
+#define xmalloc(size)           _check_memalloc(malloc(size))
 
 #define xrealloc(memblock, size) _check_memalloc(realloc((memblock), (size)))
 
 /* alloc length+1 bytes, init to empty string */
-#define xstralloc(length)	_check_stralloc(malloc((length)+1), NULL)
+#define xstralloc(length)       _check_stralloc(malloc((length)+1), NULL)
 
 /* strdup, throw NotEnoughMemoryException on failure */
-#define xstrdup(source)		((char *) _check_memalloc(strdup(source)))
+#define xstrdup(source)         ((char *) _check_memalloc(strdup(source)))
 
 /* like xstrdup, reserve additional chars for string to grow */
-extern char * xstrdup_add (char * source, int additional_chars);
+extern char *xstrdup_add( char *source, int additional_chars );
 
 /* macro to alloc struct
  * use xcalloc for structs to make sure any new pointers
  * in the struct are initialized to NULL */
-#define xcalloc_n_struct(n, type_t)	((type_t *) xcalloc((n), sizeof(type_t)))
-#define xcalloc_struct(type_t)		xcalloc_n_struct(1, type_t)
+#define xcalloc_n_struct(n, type_t)     ((type_t *) xcalloc((n), sizeof(type_t)))
+#define xcalloc_struct(type_t)          xcalloc_n_struct(1, type_t)
 
 /* macro to free if not NULL, and set pointer to NULL */
-#define xfree0(p)		do { if ((p) != NULL) { free(p); } (p) = NULL; } while (0)
+#define xfree0(p)               do { if ((p) != NULL) { free(p); } (p) = NULL; } while (0)
 
 #endif /* ndef MEMALLOC_H */
+

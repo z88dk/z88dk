@@ -14,9 +14,21 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.3 2011-08-18 23:27:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.4 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: errors.h,v $
-/* Revision 1.3  2011-08-18 23:27:54  pauloscustodio
+/* Revision 1.4  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.3  2011/08/18 23:27:54  pauloscustodio
 /* BUG_0009 : file read/write not tested for errors
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
@@ -45,53 +57,55 @@ Copyright (C) Paulo Custodio, 2011
 #include "symbol.h"
 
 /* errnum constants */
-enum {
-    ERR_NO_ERR			= -1,
-    ERR_FILE_OPEN		= 0,    /* args: %s filename */
-    ERR_SYNTAX			= 1,
-    ERR_NOT_DEFINED		= 2,
-    ERR_NO_MEMORY		= 3,
-    ERR_INT_RANGE		= 4,    /* args: %ld value */
-    ERR_EXPR_SYNTAX		= 5,
-    ERR_UNBALANCED_PAREN	= 6,
-    ERR_RANGE			= 7,    /* not used */
-    ERR_NO_SRC_FILE		= 8,
-    ERR_ILLEGAL_OPTION		= 9,	/* args: %s option */
-    ERR_UNKNOWN_IDENT		= 10,
-    ERR_ILLEGAL_IDENT		= 11,
-    ERR_MAX_CODESIZE		= 12,
-    ERR_TOTALERRORS		= 13,
-    ERR_SYMBOL_REDEFINED	= 14,	/* args: %s symbol */
-    ERR_MODULE_REDEFINED	= 15,
-    ERR_MODULE_NOT_DEFINED	= 16,   /* not used */
-    ERR_SYMBOL_DECL_LOCAL	= 17,	/* args: %s symbol */
-    ERR_SYMBOL_DECL_GLOBAL	= 18,	/* args: %s symbol */
-    ERR_SYMBOL_DECL_EXTERN	= 19,	/* args: %s symbol */   /* not used */
-    ERR_NO_CMD_ARGS		= 20,   /* not used */
-    ERR_ILLEGAL_SRC_FILENAME	= 21,	/* args: %s filename */
-    ERR_SYMBOL_REDECL_GLOBAL	= 22,	/* args: %s symbol */
-    ERR_SYMBOL_REDECL		= 23,	/* args: %s symbol */
-    ERR_ORG_REDEFINED		= 24,	/* not used */
-    ERR_JR_NOT_LOCAL		= 25,
-    ERR_NOT_OBJ_FILE		= 26,	/* args: %s filename */
-    ERR_RESERVED_NAME		= 27,	/* not used */
-    ERR_OPEN_LIB		= 28,	/* args: %s filename */
-    ERR_NOT_LIB_FILE		= 29,	/* args: %s filename */
-    ERR_ENV_NOT_DEFINED		= 30,	/* args: %s envvar */
-    ERR_INCLUDE_RECURSION	= 31,	/* args: %s filename */
-    ERR_FILE_IO			= 32,
+enum
+{
+    ERR_NO_ERR                  = -1,
+    ERR_FILE_OPEN               = 0,    /* args: %s filename */
+    ERR_SYNTAX                  = 1,
+    ERR_NOT_DEFINED             = 2,
+    ERR_NO_MEMORY               = 3,
+    ERR_INT_RANGE               = 4,    /* args: %ld value */
+    ERR_EXPR_SYNTAX             = 5,
+    ERR_UNBALANCED_PAREN        = 6,
+    ERR_RANGE                   = 7,    /* not used */
+    ERR_NO_SRC_FILE             = 8,
+    ERR_ILLEGAL_OPTION          = 9,    /* args: %s option */
+    ERR_UNKNOWN_IDENT           = 10,
+    ERR_ILLEGAL_IDENT           = 11,
+    ERR_MAX_CODESIZE            = 12,
+    ERR_TOTALERRORS             = 13,
+    ERR_SYMBOL_REDEFINED        = 14,   /* args: %s symbol */
+    ERR_MODULE_REDEFINED        = 15,
+    ERR_MODULE_NOT_DEFINED      = 16,   /* not used */
+    ERR_SYMBOL_DECL_LOCAL       = 17,   /* args: %s symbol */
+    ERR_SYMBOL_DECL_GLOBAL      = 18,   /* args: %s symbol */
+    ERR_SYMBOL_DECL_EXTERN      = 19,   /* args: %s symbol */   /* not used */
+    ERR_NO_CMD_ARGS             = 20,   /* not used */
+    ERR_ILLEGAL_SRC_FILENAME    = 21,   /* args: %s filename */
+    ERR_SYMBOL_REDECL_GLOBAL    = 22,   /* args: %s symbol */
+    ERR_SYMBOL_REDECL           = 23,   /* args: %s symbol */
+    ERR_ORG_REDEFINED           = 24,   /* not used */
+    ERR_JR_NOT_LOCAL            = 25,
+    ERR_NOT_OBJ_FILE            = 26,   /* args: %s filename */
+    ERR_RESERVED_NAME           = 27,   /* not used */
+    ERR_OPEN_LIB                = 28,   /* args: %s filename */
+    ERR_NOT_LIB_FILE            = 29,   /* args: %s filename */
+    ERR_ENV_NOT_DEFINED         = 30,   /* args: %s envvar */
+    ERR_INCLUDE_RECURSION       = 31,   /* args: %s filename */
+    ERR_FILE_IO                 = 32,
 };
 
 /* global variables */
-extern int	    ASSEMBLE_ERROR;	/* > ERR_NO_ERR if error */
-extern enum flag    ASMERROR;		/* ON if error */
-extern int	    ERRORS;		/* num errors in current source */
-extern int	    TOTALERRORS;	/* total num errors */
+extern int          ASSEMBLE_ERROR;     /* > ERR_NO_ERR if error */
+extern enum flag    ASMERROR;           /* ON if error */
+extern int          ERRORS;             /* num errors in current source */
+extern int          TOTALERRORS;        /* total num errors */
 
 /* reset to no-error status */
-extern void ResetErrors (void);
+extern void ResetErrors( void );
 
 /* report error functions */
-extern void ReportError   (char *filename, int linenr, int errnum, ...);
+extern void ReportError( char *filename, int linenr, int errnum, ... );
 
 #endif /* ndef ERRORS_H */
+

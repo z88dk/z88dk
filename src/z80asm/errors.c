@@ -14,9 +14,21 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.6 2011-10-14 14:46:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.7 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.6  2011-10-14 14:46:03  pauloscustodio
+/* Revision 1.7  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.6  2011/10/14 14:46:03  pauloscustodio
 /* -  BUG_0013 : defm check for MAX_CODESIZE incorrect
 /*  - Remove un-necessary tests for MAX_CODESIZE; all tests are concentrated in check_space() from codearea.c.
 /*
@@ -49,7 +61,7 @@ Copyright (C) Paulo Custodio, 2011
 /*
 /* */
 
-#include "memalloc.h"	/* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include to enable memory leak detection */
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -61,125 +73,141 @@ Copyright (C) Paulo Custodio, 2011
 #include "config.h"
 
 /* global variables */
-int	    ASSEMBLE_ERROR  = ERR_NO_ERR;   /* > ERR_NO_ERR if error */
-enum flag   ASMERROR	    = OFF;	    /* ON if error */
-int	    ERRORS	    = 0;	    /* num errors in current source */
-int	    TOTALERRORS	    = 0;	    /* total num errors */
+int         ASSEMBLE_ERROR  = ERR_NO_ERR;   /* > ERR_NO_ERR if error */
+enum flag   ASMERROR        = OFF;          /* ON if error */
+int         ERRORS          = 0;            /* num errors in current source */
+int         TOTALERRORS     = 0;            /* total num errors */
 
 /* static variables */
-static char *errmsg[] = {
-    /* 0  */    "File '%s' open error",		
-    /* 1  */    "Syntax error",			
-    /* 2  */    "Symbol not defined",			
-    /* 3  */    "Not enough memory",			
-    /* 4  */    "Integer '%ld' out of range",		
-    /* 5  */    "Syntax error in expression",		
-    /* 6  */    "Unbalanced parenthesis",		
-    /* 7  */    "Out of range",			
-    /* 8  */    "Source filename missing",		
-    /* 9  */    "Illegal option '-%s'",			
-    /* 10 */    "Unknown identifier",			
-    /* 11 */    "Illegal identifier",			
-    /* 12 */    "Max. code size of %ld bytes reached",	
-    /* 13 */    "%d errors occurred during assembly",	
-    /* 14 */    "Symbol '%s' already defined",		
-    /* 15 */    "Module name already defined",		
-    /* 16 */    "Module name not defined",		
-    /* 17 */    "Symbol '%s' already declared local",	
-    /* 18 */    "Symbol '%s' already declared global",	
-    /* 19 */    "Symbol '%s' already declared external",	
-    /* 20 */    "No command line arguments",		
-    /* 21 */    "Illegal source filename '%s'",		
-    /* 22 */    "Symbol '%s' declared global in another module",	
-    /* 23 */    "Re-declaration of '%s' not allowed",	
-    /* 24 */    "ORG already defined",		
-    /* 25 */    "Relative jump address must be local",		
-    /* 26 */    "File '%s' not an object file",		
-    /* 27 */    "Reserved name",		
-    /* 28 */    "Couldn't open library file '%s'",	
-    /* 29 */    "File '%s' not a library file",		
-    /* 30 */    "Environment variable '%s' not defined",	
-    /* 31 */    "Cannot include file '%s' recursively",	
-    /* 32 */	"File I/O error",
+static char *errmsg[] =
+{
+    /* 0  */    "File '%s' open error",
+    /* 1  */    "Syntax error",
+    /* 2  */    "Symbol not defined",
+    /* 3  */    "Not enough memory",
+    /* 4  */    "Integer '%ld' out of range",
+    /* 5  */    "Syntax error in expression",
+    /* 6  */    "Unbalanced parenthesis",
+    /* 7  */    "Out of range",
+    /* 8  */    "Source filename missing",
+    /* 9  */    "Illegal option '-%s'",
+    /* 10 */    "Unknown identifier",
+    /* 11 */    "Illegal identifier",
+    /* 12 */    "Max. code size of %ld bytes reached",
+    /* 13 */    "%d errors occurred during assembly",
+    /* 14 */    "Symbol '%s' already defined",
+    /* 15 */    "Module name already defined",
+    /* 16 */    "Module name not defined",
+    /* 17 */    "Symbol '%s' already declared local",
+    /* 18 */    "Symbol '%s' already declared global",
+    /* 19 */    "Symbol '%s' already declared external",
+    /* 20 */    "No command line arguments",
+    /* 21 */    "Illegal source filename '%s'",
+    /* 22 */    "Symbol '%s' declared global in another module",
+    /* 23 */    "Re-declaration of '%s' not allowed",
+    /* 24 */    "ORG already defined",
+    /* 25 */    "Relative jump address must be local",
+    /* 26 */    "File '%s' not an object file",
+    /* 27 */    "Reserved name",
+    /* 28 */    "Couldn't open library file '%s'",
+    /* 29 */    "File '%s' not a library file",
+    /* 30 */    "Environment variable '%s' not defined",
+    /* 31 */    "Cannot include file '%s' recursively",
+    /* 32 */    "File I/O error",
 };
 
 /*-----------------------------------------------------------------------------
 *   ResetErrors
-*	Reset global error variables to no-error
+*       Reset global error variables to no-error
 *----------------------------------------------------------------------------*/
-void ResetErrors (void)
+void ResetErrors( void )
 {
-    ASMERROR	    = OFF;
+    ASMERROR        = OFF;
     ASSEMBLE_ERROR  = ERR_NO_ERR;
-    ERRORS	    = 0;
-    TOTALERRORS	    = 0;
+    ERRORS          = 0;
+    TOTALERRORS     = 0;
 }
 
 /*-----------------------------------------------------------------------------
 *   ReportError
-*	Report error errnum at given file and line number
+*       Report error errnum at given file and line number
 *----------------------------------------------------------------------------*/
-void ReportError (char *filename, int lineno, int errnum, ...)
+void ReportError( char *filename, int lineno, int errnum, ... )
 {
     va_list argptr;
     char errstr[MAXLINE], *p;
-    
-    va_start(argptr, errnum);	/* init variable args */
-  
-    ASSEMBLE_ERROR = errnum;	/* set the global error variable for general error trapping */
+
+    va_start( argptr, errnum ); /* init variable args */
+
+    ASSEMBLE_ERROR = errnum;    /* set the global error variable for general error trapping */
     ASMERROR = ON;
- 
-    if (clinemode && clineno) 
-	lineno = clineno;
+
+    if ( clinemode && clineno )
+    {
+        lineno = clineno;
+    }
 
     /* CH_0003 : output prefix */
     p = errstr;
-    p += sprintf(p, "Error: ");
+    p += sprintf( p, "Error: " );
 
     /* output filename */
-    if (filename != NULL)
-	p += sprintf(p, "File '%s', ", filename);
+    if ( filename != NULL )
+    {
+        p += sprintf( p, "File '%s', ", filename );
+    }
 
     /* output module */
-    if (CURRENTMODULE != NULL && CURRENTMODULE->mname != NULL)
-	p += sprintf(p, "Module '%s', ", CURRENTMODULE->mname);
+    if ( CURRENTMODULE != NULL && CURRENTMODULE->mname != NULL )
+    {
+        p += sprintf( p, "Module '%s', ", CURRENTMODULE->mname );
+    }
 
     /* output line number */
-    if (lineno != 0)
-	p += sprintf(p, "at line %d, ", lineno);
+    if ( lineno != 0 )
+    {
+        p += sprintf( p, "at line %d, ", lineno );
+    }
 
     /* handle special errors */
-    if (errnum >= 0 && errnum < NUM_ELEMS(errmsg)) {
-	switch (errnum) {
-	    case ERR_MAX_CODESIZE:
-		p += sprintf(p, errmsg[errnum], (long)MAXCODESIZE);
-		break;
+    if ( errnum >= 0 && errnum < NUM_ELEMS( errmsg ) )
+    {
+        switch ( errnum )
+        {
+            case ERR_MAX_CODESIZE:
+                p += sprintf( p, errmsg[errnum], ( long )MAXCODESIZE );
+                break;
 
-	    case ERR_TOTALERRORS:
-		/* ignore all the info collected in errstr */
-		p = errstr;
-		p += sprintf(p, errmsg[errnum], TOTALERRORS);
-		break;
+            case ERR_TOTALERRORS:
+                /* ignore all the info collected in errstr */
+                p = errstr;
+                p += sprintf( p, errmsg[errnum], TOTALERRORS );
+                break;
 
-	    default:
-		p += vsprintf(p, errmsg[errnum], argptr);	/* pass variable args */
-	 }
+            default:
+                p += vsprintf( p, errmsg[errnum], argptr );     /* pass variable args */
+        }
     }
-    else {
-	p += sprintf(p, "Error %d", errnum);
+    else
+    {
+        p += sprintf( p, "Error %d", errnum );
     }
 
     /* add newline */
-    p += sprintf(p, "\n");
-    assert(p - errstr < sizeof(errstr) - 1);    /* check for overrun */
+    p += sprintf( p, "\n" );
+    assert( p - errstr < sizeof( errstr ) - 1 ); /* check for overrun */
 
-    /* CH_0001 : Assembly error messages should appear on stderr */  
-    fputs(errstr, stderr);
-    if (errfile != NULL)
-	fputs(errstr, errfile);
+    /* CH_0001 : Assembly error messages should appear on stderr */
+    fputs( errstr, stderr );
+
+    if ( errfile != NULL )
+    {
+        fputs( errstr, errfile );
+    }
 
     /* increment error counters */
     ++ERRORS;
     ++TOTALERRORS;
 }
+
 

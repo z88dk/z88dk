@@ -16,9 +16,21 @@ Copyright (C) Paulo Custodio, 2011
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.2 2011-10-07 17:53:04 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.3 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: codearea.h,v $
-/* Revision 1.2  2011-10-07 17:53:04  pauloscustodio
+/* Revision 1.3  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.2  2011/10/07 17:53:04  pauloscustodio
 /* BUG_0015 : Relocation issue - dubious addresses come out of linking
 /* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
 /* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
@@ -38,49 +50,50 @@ Manage the code area in memory
 #ifndef OBJFILE_H
 #define OBJFILE_H
 
-#include "memalloc.h"			/* before any other include to enable memory leak detection */
+#include "memalloc.h"                   /* before any other include to enable memory leak detection */
 
 #include <stdio.h>
 
 /* Start the module */
-extern void init_codearea_module (void);
+extern void init_codearea_module( void );
 
 /* move PC, return new value */
-extern size_t set_PC (size_t n);
-extern size_t inc_PC (size_t n);
-extern size_t get_PC (void);
+extern size_t set_PC( size_t n );
+extern size_t inc_PC( size_t n );
+extern size_t get_PC( void );
 
 /* copy PC to oldPC */
-extern size_t set_oldPC (void);
-extern size_t get_oldPC (void);
+extern size_t set_oldPC( void );
+extern size_t get_oldPC( void );
 
 /* init the code area, return current size */
-extern void init_codearea (void);		/* set code area to zeros */
-extern size_t get_codeindex (void);		/* return number of bytes appended */
+extern void init_codearea( void );              /* set code area to zeros */
+extern size_t get_codeindex( void );            /* return number of bytes appended */
 
-extern size_t get_codesize (void);		/* size of all modules before current, 
-						   i.e. base address of current module */
-extern size_t inc_codesize (size_t n);		/* increment loaded codesize */
+extern size_t get_codesize( void );              /* size of all modules before current,
+                                                   i.e. base address of current module */
+extern size_t inc_codesize( size_t n );         /* increment loaded codesize */
 
 /* write code area to an open file */
-extern void fwrite_codearea       (FILE *stream);
-extern void fwrite_codearea_chunk (FILE *stream, size_t addr, size_t size);
-extern void fread_codearea        (FILE *stream, size_t size);	/* append to codearea */
-extern void fread_codearea_offset (FILE *stream, size_t offset, size_t size);	/* read to codearea at offset */
+extern void fwrite_codearea( FILE *stream );
+extern void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size );
+extern void fread_codearea( FILE *stream, size_t size );        /* append to codearea */
+extern void fread_codearea_offset( FILE *stream, size_t offset, size_t size );  /* read to codearea at offset */
 
 /* patch a value at a position, or append to the end of the code area */
 /* the patch address is incremented after store */
-extern void  patch_byte    (size_t *paddr, unsigned char byte);	/* one byte */
-extern void append_byte    (               unsigned char byte);
+extern void  patch_byte( size_t *paddr, unsigned char byte );   /* one byte */
+extern void append_byte( unsigned char byte );
 
-extern void  patch_word    (size_t *paddr, int word);		/* 2-byte word */
-extern void append_word    (               int word);
+extern void  patch_word( size_t *paddr, int word );             /* 2-byte word */
+extern void append_word( int word );
 
-extern void  patch_long    (size_t *paddr, long dword);		/* 4-byte long */
-extern void append_long    (               long dword);
+extern void  patch_long( size_t *paddr, long dword );           /* 4-byte long */
+extern void append_long( long dword );
 
 /* get a byte at the given address */
 /* the patch address is incremented after fetch */
-extern unsigned char get_byte (size_t *paddr);
+extern unsigned char get_byte( size_t *paddr );
 
 #endif /* ndef OBJFILE_H */
+

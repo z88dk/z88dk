@@ -13,9 +13,21 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.14 2011-08-15 17:12:31 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.15 2012-05-11 19:29:49 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.14  2011-08-15 17:12:31  pauloscustodio
+/* Revision 1.15  2012-05-11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.14  2011/08/15 17:12:31  pauloscustodio
 /* Upgrade to Exceptions4c 2.8.9 to solve memory leak.
 /*
 /* Revision 1.13  2011/08/05 20:02:32  pauloscustodio
@@ -60,26 +72,26 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /*
 /* Revision 1.6  2011/07/09 01:46:00  pauloscustodio
 /* Added Log keyword
-/* 
+/*
 /* Revision 1.5  2011/07/09 01:30:14  pauloscustodio
 /* added casts to clean up warnings
-/* 
+/*
 /* Revision 1.4  2011/06/08 22:03:35  dom
 /* Vile hack
-/* 
+/*
 /* Revision 1.3  2010/04/16 17:34:37  dom
 /* Make line number an int - 32768 lines isn't big enough...
-/* 
+/*
 /* Revision 1.2  2007/07/13 09:03:10  dom
 /* allow multiple LIB/XDEF/XREF as necessary
-/* 
+/*
 /* Revision 1.1  2000/07/04 15:33:29  dom
 /* branches:  1.1.1;
 /* Initial revision
-/* 
+/*
 /* Revision 1.1.1.1  2000/07/04 15:33:29  dom
 /* First import of z88dk into the sourceforge system <gulp>
-/* 
+/*
 /* */
 
 /* $History: SYMBOLS.C $ */
@@ -114,7 +126,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* Updated in $/Z80asm */
 /* SourceSafe Version History Comment Block added. */
 
-#include "memalloc.h"	/* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include to enable memory leak detection */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -126,90 +138,101 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "errors.h"
 
 /* local functions */
-symbol *GetSymPtr (char *identifier);
-symbol *FindSymbol (char *identifier, avltree * treeptr);
-symbol *CreateSymbol (char *identifier, long value, unsigned char symboltype, struct module *symowner);
-int DefineSymbol (char *identifier, long value, unsigned char symboltype);
-int DefLocalSymbol (char *identifier, long value, unsigned char symboltype);
-int DefineDefSym (char *identifier, long value, unsigned char symtype, avltree ** root);
-int cmpidstr (symbol * kptr, symbol * p);
-int cmpidval (symbol * kptr, symbol * p);
-void InsertPageRef (symbol * symptr);
-void AppendPageRef (symbol * symptr);
-void DeclSymGlobal (char *identifier, unsigned char libtype);
-void DeclSymExtern (char *identifier, unsigned char libtype);
-void MovePageRefs (char *identifier, symbol * definedsym);
-void FreeSym (symbol * node);
+symbol *GetSymPtr( char *identifier );
+symbol *FindSymbol( char *identifier, avltree *treeptr );
+symbol *CreateSymbol( char *identifier, long value, unsigned char symboltype, struct module *symowner );
+int DefineSymbol( char *identifier, long value, unsigned char symboltype );
+int DefLocalSymbol( char *identifier, long value, unsigned char symboltype );
+int DefineDefSym( char *identifier, long value, unsigned char symtype, avltree **root );
+int cmpidstr( symbol *kptr, symbol *p );
+int cmpidval( symbol *kptr, symbol *p );
+void InsertPageRef( symbol *symptr );
+void AppendPageRef( symbol *symptr );
+void DeclSymGlobal( char *identifier, unsigned char libtype );
+void DeclSymExtern( char *identifier, unsigned char libtype );
+void MovePageRefs( char *identifier, symbol *definedsym );
+void FreeSym( symbol *node );
 
 
 /* global variables */
 extern int PAGENR;
 extern enum flag pass1;
-extern struct module *CURRENTMODULE;	/* pointer to current module */
+extern struct module *CURRENTMODULE;    /* pointer to current module */
 extern avltree *globalroot;
 
 
 /* CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
 symbol *
-CreateSymbol (char *identifier, long value, unsigned char symboltype, struct module *symowner)
+CreateSymbol( char *identifier, long value, unsigned char symboltype, struct module *symowner )
 {
     symbol *newsym;
 
-    newsym = xcalloc_struct(symbol);	/* Create area for a new symbol structure */
-    try {
-	newsym->symname = xstrdup(identifier);
-					/* Allocate area for a new symbol identifier */
-	try {
-	    if (symtable && listing_CPY) {
-		newsym->references = xcalloc_struct(struct symref);
-					/* Create area for a new symbol structure */
-		try {
-		    newsym->references->firstref = NULL;
-		    newsym->references->lastref = NULL;	
-					/* Page reference list initialised... */
-		    AppendPageRef(newsym);
-					/* store first page reference in listfile of this symbol */
-		}
-		catch(RuntimeException) {
-		    xfree0(newsym->references);
-		    rethrow("");
-		}
-	    }
-	    else {
-		newsym->references = NULL;
-					/* No listing file, no page references... */
-	    }
-	}
-	catch(RuntimeException) {
-	    xfree0(newsym->symname);
-	    rethrow("");
-	}
+    newsym = xcalloc_struct( symbol );  /* Create area for a new symbol structure */
+
+    try
+    {
+        newsym->symname = xstrdup( identifier );
+
+        /* Allocate area for a new symbol identifier */
+        try
+        {
+            if ( symtable && listing_CPY )
+            {
+                newsym->references = xcalloc_struct( struct symref );
+
+                /* Create area for a new symbol structure */
+                try
+                {
+                    newsym->references->firstref = NULL;
+                    newsym->references->lastref = NULL;
+                    /* Page reference list initialised... */
+                    AppendPageRef( newsym );
+                    /* store first page reference in listfile of this symbol */
+                }
+                catch ( RuntimeException )
+                {
+                    xfree0( newsym->references );
+                    rethrow( "" );
+                }
+            }
+            else
+            {
+                newsym->references = NULL;
+                /* No listing file, no page references... */
+            }
+        }
+        catch ( RuntimeException )
+        {
+            xfree0( newsym->symname );
+            rethrow( "" );
+        }
     }
-    catch(RuntimeException) {
-	xfree0(newsym);
-	rethrow("");
+    catch ( RuntimeException )
+    {
+        xfree0( newsym );
+        rethrow( "" );
     }
 
     newsym->owner = symowner;
     newsym->type = symboltype;
     newsym->symvalue = value;
 
-    return newsym;		/* pointer to new symbol node */
+    return newsym;              /* pointer to new symbol node */
 }
 
 
 
-int 
-cmpidstr (symbol * kptr, symbol * p)
+int
+cmpidstr( symbol *kptr, symbol *p )
 {
-  return strcmp (kptr->symname, p->symname);
+    return strcmp( kptr->symname, p->symname );
 }
 
 
-int 
-cmpidval (symbol * kptr, symbol * p)
+int
+cmpidval( symbol *kptr, symbol *p )
 {
-  return kptr->symvalue - p->symvalue;
+    return kptr->symvalue - p->symvalue;
 }
 
 
@@ -217,82 +240,99 @@ cmpidval (symbol * kptr, symbol * p)
 /*
  * DefineSymbol will create a record in memory, inserting it into an AVL tree (or creating the first record)
  */
-int 
-DefineSymbol (char *identifier,
-	      long value,	/* value of symbol, label */
-	      unsigned char symboltype)
-{				/* symbol is either address label or constant */
-  symbol *foundsymbol;
+int
+DefineSymbol( char *identifier,
+              long value,       /* value of symbol, label */
+              unsigned char symboltype )
+{
+    /* symbol is either address label or constant */
+    symbol *foundsymbol;
 
-  if ((foundsymbol = FindSymbol (identifier, globalroot)) == NULL)	/* Symbol not declared as global/extern */
-    return DefLocalSymbol (identifier, value, symboltype);
-  else if (foundsymbol->type & SYMXDEF)
+    if ( ( foundsymbol = FindSymbol( identifier, globalroot ) ) == NULL ) /* Symbol not declared as global/extern */
     {
-      if ((foundsymbol->type & SYMDEFINED) == 0)
-	{			/* symbol declared global, but not yet defined */
-	  foundsymbol->symvalue = value;
-	  foundsymbol->type |= (symboltype | SYMDEFINED);	/* defined, and typed as address label or
-								 * constant */
-	  foundsymbol->owner = CURRENTMODULE;	/* owner of symbol is always creator */
-	  if (pass1 && symtable && listing)
-	    {
-	      InsertPageRef (foundsymbol);	/* First element in list is definition of symbol */
-	      MovePageRefs (identifier, foundsymbol);	/* Move page references from possible forward
-							 * referenced symbol  */
-	    }
-	  return 1;
-	}
-      else
-	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier);
-							/* global symbol already defined */
-	  return 0;
-	}
+        return DefLocalSymbol( identifier, value, symboltype );
     }
-  else
-    return DefLocalSymbol (identifier, value, symboltype);	/* Extern declaration of symbol, now define
-								 * local symbol. */
-  /* the extern symbol is now no longer accessible */
+    else if ( foundsymbol->type & SYMXDEF )
+    {
+        if ( ( foundsymbol->type & SYMDEFINED ) == 0 )
+        {
+            /* symbol declared global, but not yet defined */
+            foundsymbol->symvalue = value;
+            foundsymbol->type |= ( symboltype | SYMDEFINED );       /* defined, and typed as address label or
+                                                                 * constant */
+            foundsymbol->owner = CURRENTMODULE;   /* owner of symbol is always creator */
+
+            if ( pass1 && symtable && listing )
+            {
+                InsertPageRef( foundsymbol );     /* First element in list is definition of symbol */
+                MovePageRefs( identifier, foundsymbol );   /* Move page references from possible forward
+                                                         * referenced symbol  */
+            }
+
+            return 1;
+        }
+        else
+        {
+            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier );
+            /* global symbol already defined */
+            return 0;
+        }
+    }
+    else
+    {
+        return DefLocalSymbol( identifier, value, symboltype );
+    }      /* Extern declaration of symbol, now define
+
+                                                                 * local symbol. */
+    /* the extern symbol is now no longer accessible */
 }
 
 
 
-int 
-DefLocalSymbol (char *identifier,
-		long value,	/* value of symbol, label */
-		unsigned char symboltype)
-{				/* symbol is either address label or constant */
-  symbol *foundsymbol;
+int
+DefLocalSymbol( char *identifier,
+                long value,     /* value of symbol, label */
+                unsigned char symboltype )
+{
+    /* symbol is either address label or constant */
+    symbol *foundsymbol;
 
-  if ((foundsymbol = FindSymbol (identifier, CURRENTMODULE->localroot)) == NULL)
-    {				/* Symbol not declared as local */
-      foundsymbol = CreateSymbol (identifier, value, symboltype | SYMLOCAL | SYMDEFINED, CURRENTMODULE);
-      E4C_ASSERT(foundsymbol != NULL);
-      insert (&CURRENTMODULE->localroot, foundsymbol, (int (*)(void*,void*)) cmpidstr);
-
-      if (pass1 && symtable && listing)
-	MovePageRefs (identifier, foundsymbol);		/* Move page references from forward referenced symbol */
-      return 1;
-    }
-  else if ((foundsymbol->type & SYMDEFINED) == 0)
-    {				/* symbol declared local, but not yet defined */
-      foundsymbol->symvalue = value;
-      foundsymbol->type |= symboltype | SYMLOCAL | SYMDEFINED;	/* local symbol type set to address
-								 * label or constant */
-      foundsymbol->owner = CURRENTMODULE;	/* owner of symbol is always creator */
-      if (pass1 && symtable && listing)
-	{
-	  InsertPageRef (foundsymbol);	/* First element in list is definition of symbol */
-	  MovePageRefs (identifier, foundsymbol);	/* Move page references from possible forward
-							 * referenced symbol */
-	}
-      return 1;
-    }
-  else
+    if ( ( foundsymbol = FindSymbol( identifier, CURRENTMODULE->localroot ) ) == NULL )
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier);
-							/* local symbol already defined */
-      return 0;
+        /* Symbol not declared as local */
+        foundsymbol = CreateSymbol( identifier, value, symboltype | SYMLOCAL | SYMDEFINED, CURRENTMODULE );
+        E4C_ASSERT( foundsymbol != NULL );
+        insert( &CURRENTMODULE->localroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
+
+        if ( pass1 && symtable && listing )
+        {
+            MovePageRefs( identifier, foundsymbol );    /* Move page references from forward referenced symbol */
+        }
+
+        return 1;
+    }
+    else if ( ( foundsymbol->type & SYMDEFINED ) == 0 )
+    {
+        /* symbol declared local, but not yet defined */
+        foundsymbol->symvalue = value;
+        foundsymbol->type |= symboltype | SYMLOCAL | SYMDEFINED;  /* local symbol type set to address
+                                                                 * label or constant */
+        foundsymbol->owner = CURRENTMODULE;       /* owner of symbol is always creator */
+
+        if ( pass1 && symtable && listing )
+        {
+            InsertPageRef( foundsymbol ); /* First element in list is definition of symbol */
+            MovePageRefs( identifier, foundsymbol );       /* Move page references from possible forward
+                                                         * referenced symbol */
+        }
+
+        return 1;
+    }
+    else
+    {
+        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier );
+        /* local symbol already defined */
+        return 0;
     }
 }
 
@@ -300,44 +340,50 @@ DefLocalSymbol (char *identifier,
 /*
  * Move pointer to list of page references from forward symbol and append it to first reference of defined symbol.
  */
-void 
-MovePageRefs (char *identifier, symbol * definedsym)
+void
+MovePageRefs( char *identifier, symbol *definedsym )
 {
-  symbol *forwardsym;
-  struct pageref *tmpref;
+    symbol *forwardsym;
+    struct pageref *tmpref;
 
-  if ((forwardsym = FindSymbol (identifier, CURRENTMODULE->notdeclroot)) != NULL)
+    if ( ( forwardsym = FindSymbol( identifier, CURRENTMODULE->notdeclroot ) ) != NULL )
     {
-      if (definedsym->references->firstref->pagenr == forwardsym->references->lastref->pagenr)
-	{
-	  if (forwardsym->references->firstref != forwardsym->references->lastref)
-	    {
-	      tmpref = forwardsym->references->firstref;	/* more than one reference */
-	      while (tmpref->nextref != forwardsym->references->lastref)
-		tmpref = tmpref->nextref;	/* get reference before last reference */
-	      xfree0(tmpref->nextref);	/* remove redundant reference */
-	      tmpref->nextref = NULL;	/* end of list */
-	      forwardsym->references->lastref = tmpref;		/* update pointer to last reference */
-	      definedsym->references->firstref->nextref = forwardsym->references->firstref;
-	      definedsym->references->lastref = forwardsym->references->lastref;	/* forward page
-											 * reference list
-											 * appended  */
-	    }
-	  else
-	    xfree0(forwardsym->references->firstref);	/* remove the redundant reference */
-	}
-      else
-	{
-	  definedsym->references->firstref->nextref = forwardsym->references->firstref;
-	  definedsym->references->lastref = forwardsym->references->lastref;
-	  /* last reference not on the same page as definition */
-	  /* forward page reference list now appended  */
-	}
+        if ( definedsym->references->firstref->pagenr == forwardsym->references->lastref->pagenr )
+        {
+            if ( forwardsym->references->firstref != forwardsym->references->lastref )
+            {
+                tmpref = forwardsym->references->firstref;        /* more than one reference */
 
-      xfree0(forwardsym->references);	/* remove pointer information to forward page reference list */
-      forwardsym->references = NULL;
-      /* symbol is not needed anymore, remove from symbol table of forward references */
-      delete (&CURRENTMODULE->notdeclroot, forwardsym, (int (*)(void*,void*)) cmpidstr, (void (*)(void*)) FreeSym);
+                while ( tmpref->nextref != forwardsym->references->lastref )
+                {
+                    tmpref = tmpref->nextref;    /* get reference before last reference */
+                }
+
+                xfree0( tmpref->nextref ); /* remove redundant reference */
+                tmpref->nextref = NULL;   /* end of list */
+                forwardsym->references->lastref = tmpref;         /* update pointer to last reference */
+                definedsym->references->firstref->nextref = forwardsym->references->firstref;
+                definedsym->references->lastref = forwardsym->references->lastref;        /* forward page
+                                                                                         * reference list
+                                                                                         * appended  */
+            }
+            else
+            {
+                xfree0( forwardsym->references->firstref );    /* remove the redundant reference */
+            }
+        }
+        else
+        {
+            definedsym->references->firstref->nextref = forwardsym->references->firstref;
+            definedsym->references->lastref = forwardsym->references->lastref;
+            /* last reference not on the same page as definition */
+            /* forward page reference list now appended  */
+        }
+
+        xfree0( forwardsym->references ); /* remove pointer information to forward page reference list */
+        forwardsym->references = NULL;
+        /* symbol is not needed anymore, remove from symbol table of forward references */
+        delete( &CURRENTMODULE->notdeclroot, forwardsym, ( int ( * )( void *, void * ) ) cmpidstr, ( void ( * )( void * ) ) FreeSym );
     }
 }
 
@@ -347,49 +393,59 @@ MovePageRefs (char *identifier, symbol * definedsym)
  * NULL
  */
 symbol *
-GetSymPtr (char *identifier)
+GetSymPtr( char *identifier )
 {
-  symbol *symbolptr;		/* pointer to current search node in AVL tree */
+    symbol *symbolptr;            /* pointer to current search node in AVL tree */
 
-  if ((symbolptr = FindSymbol (identifier, CURRENTMODULE->localroot)) == NULL)
+    if ( ( symbolptr = FindSymbol( identifier, CURRENTMODULE->localroot ) ) == NULL )
     {
-      if ((symbolptr = FindSymbol (identifier, globalroot)) == NULL)
-	{
-	  if (pass1 && symtable && listing_CPY)
-	    {
-	      if ((symbolptr = FindSymbol (identifier, CURRENTMODULE->notdeclroot)) == NULL)
-		{
-		  symbolptr = CreateSymbol (identifier, 0, SYM_NOTDEFINED, CURRENTMODULE);
-		  E4C_ASSERT(symbolptr != NULL);
-                  insert (&CURRENTMODULE->notdeclroot, symbolptr, (int (*)(void*,void*)) cmpidstr);
-		}
-	      else
-		AppendPageRef (symbolptr);	/* symbol found in forward referenced tree,
-						 * note page reference */
-	    }
-	  return NULL;
-	}
-      else
-	{
-	  if (pass1 && symtable && listing)
-	    AppendPageRef (symbolptr);	/* symbol found as global/extern declaration */
-	  return symbolptr;	/* symbol at least declared - return pointer to it... */
-	}
+        if ( ( symbolptr = FindSymbol( identifier, globalroot ) ) == NULL )
+        {
+            if ( pass1 && symtable && listing_CPY )
+            {
+                if ( ( symbolptr = FindSymbol( identifier, CURRENTMODULE->notdeclroot ) ) == NULL )
+                {
+                    symbolptr = CreateSymbol( identifier, 0, SYM_NOTDEFINED, CURRENTMODULE );
+                    E4C_ASSERT( symbolptr != NULL );
+                    insert( &CURRENTMODULE->notdeclroot, symbolptr, ( int ( * )( void *, void * ) ) cmpidstr );
+                }
+                else
+                {
+                    AppendPageRef( symbolptr );
+                }      /* symbol found in forward referenced tree,
+
+                                                 * note page reference */
+            }
+
+            return NULL;
+        }
+        else
+        {
+            if ( pass1 && symtable && listing )
+            {
+                AppendPageRef( symbolptr );    /* symbol found as global/extern declaration */
+            }
+
+            return symbolptr;     /* symbol at least declared - return pointer to it... */
+        }
     }
-  else
+    else
     {
-      if (pass1 && symtable && listing)
-	AppendPageRef (symbolptr);	/* symbol found as local declaration */
-      return symbolptr;		/* symbol at least declared - return pointer to it... */
+        if ( pass1 && symtable && listing )
+        {
+            AppendPageRef( symbolptr );    /* symbol found as local declaration */
+        }
+
+        return symbolptr;         /* symbol at least declared - return pointer to it... */
     }
 }
 
 
 
-int 
-compidentifier (char *identifier, symbol * p)
+int
+compidentifier( char *identifier, symbol *p )
 {
-  return strcmp (identifier, p->symname);
+    return strcmp( identifier, p->symname );
 }
 
 
@@ -397,247 +453,284 @@ compidentifier (char *identifier, symbol * p)
  * return pointer to found symbol in a symbol tree, otherwise NULL if not found
  */
 symbol *
-FindSymbol (char *identifier,	/* pointer to current identifier */
-	    avltree * treeptr)
-{				/* pointer to root of AVL tree */
-  symbol *found;
-
-  if (treeptr == NULL)
-    return NULL;
-  else
-    {
-      found = find (treeptr, identifier, (int (*)(void*,void*)) compidentifier);
-      if (found == NULL)
-	return NULL;
-      else
-	{
-	  found->type |= SYMTOUCHED;
-	  return found;		/* symbol found (declared/defined) */
-	}
-    }
-}
-
-
-
-void 
-DeclSymGlobal (char *identifier, unsigned char libtype)
+FindSymbol( char *identifier,   /* pointer to current identifier */
+            avltree *treeptr )
 {
-  symbol *foundsym, *clonedsym;
+    /* pointer to root of AVL tree */
+    symbol *found;
 
-  if ((foundsym = FindSymbol (identifier, CURRENTMODULE->localroot)) == NULL)
+    if ( treeptr == NULL )
     {
-      if ((foundsym = FindSymbol (identifier, globalroot)) == NULL)
-	{
-	  foundsym = CreateSymbol (identifier, 0, SYM_NOTDEFINED | SYMXDEF | libtype, CURRENTMODULE);
-	  E4C_ASSERT(foundsym != NULL);
-          insert (&globalroot, foundsym, (int (*)(void*,void*)) cmpidstr);    /* declare symbol as global */
-	}
-      else
-	{
-	  if (foundsym->owner != CURRENTMODULE)
-	    {						/* this symbol is declared in another module */
-	      if (foundsym->type & SYMXREF)
-		{
-		  foundsym->owner = CURRENTMODULE;	/* symbol now owned by this module */
-		  foundsym->type &= XREF_OFF;		/* re-declare symbol as global if symbol was */
-		  foundsym->type |= SYMXDEF | libtype;	/* declared extern in another module */
-		}
-	      else					/* cannot declare two identical global's */
-		ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL_GLOBAL, identifier);
-							/* Already declared global */
-	    }
-	  else if ( (foundsym->type & (SYMXDEF|libtype)) != (SYMXDEF|libtype) )
-	    {
-	      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL, identifier);
-							/* re-declaration not allowed */
-	    }
-	}
+        return NULL;
     }
-  else
-   {
-      if (FindSymbol (identifier, globalroot) == NULL)
-        {
-          /* If no global symbol of identical name has been created, then re-declare local symbol as global symbol */
-          foundsym->type &= SYMLOCAL_OFF;
-          foundsym->type |= SYMXDEF;
-          clonedsym = CreateSymbol (foundsym->symname, foundsym->symvalue, foundsym->type, CURRENTMODULE);
-	  E4C_ASSERT(clonedsym != NULL);
-          insert (&globalroot, clonedsym, (int (*)(void*,void*)) cmpidstr);
+    else
+    {
+        found = find( treeptr, identifier, ( int ( * )( void *, void * ) ) compidentifier );
 
-          /* original local symbol cloned as global symbol, now delete old local ... */
-          delete (&CURRENTMODULE->localroot, foundsym, (int (*)(void*,void*)) cmpidstr, (void (*)(void*)) FreeSym);
+        if ( found == NULL )
+        {
+            return NULL;
         }
-      else
-       {
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_GLOBAL, identifier);
-							/* already declared global */
-       }
-   }
+        else
+        {
+            found->type |= SYMTOUCHED;
+            return found;         /* symbol found (declared/defined) */
+        }
+    }
 }
 
 
 
-void 
-DeclSymExtern (char *identifier, unsigned char libtype)
+void
+DeclSymGlobal( char *identifier, unsigned char libtype )
 {
-  symbol *foundsym, *extsym;
+    symbol *foundsym, *clonedsym;
 
-  if ((foundsym = FindSymbol (identifier, CURRENTMODULE->localroot)) == NULL)
+    if ( ( foundsym = FindSymbol( identifier, CURRENTMODULE->localroot ) ) == NULL )
     {
-      if ((foundsym = FindSymbol (identifier, globalroot)) == NULL)
-	{
-	  foundsym = CreateSymbol (identifier, 0, SYM_NOTDEFINED | SYMXREF | libtype, CURRENTMODULE);
-	  E4C_ASSERT(foundsym != NULL);
-          insert (&globalroot, foundsym, (int (*)(void*,void*)) cmpidstr);    /* declare symbol as extern */
-	}
-      else 
+        if ( ( foundsym = FindSymbol( identifier, globalroot ) ) == NULL )
         {
-          if (foundsym->owner == CURRENTMODULE) {
-	if ( (foundsym->type & (SYMXREF | libtype)) != (SYMXREF |libtype) )
-           if (sdcc_hacks) 
-             foundsym->type=SYMXREF|libtype ;
-           else
-     	     ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL, identifier);
-							/* Re-declaration not allowed */
-      }
-    }
-    }
-  else
-   {
-      if (FindSymbol (identifier, globalroot) == NULL)
+            foundsym = CreateSymbol( identifier, 0, SYM_NOTDEFINED | SYMXDEF | libtype, CURRENTMODULE );
+            E4C_ASSERT( foundsym != NULL );
+            insert( &globalroot, foundsym, ( int ( * )( void *, void * ) ) cmpidstr ); /* declare symbol as global */
+        }
+        else
         {
-          /* If no external symbol of identical name has been declared, then re-declare local 
-             symbol as external symbol, but only if local symbol is not defined yet */ 
-          if ((foundsym->type & SYMDEFINED) == 0)
+            if ( foundsym->owner != CURRENTMODULE )
             {
-              foundsym->type &= SYMLOCAL_OFF;
-	      foundsym->type |= (SYMXREF | libtype);
-	      extsym = CreateSymbol (identifier, 0, foundsym->type, CURRENTMODULE);
-	      E4C_ASSERT(extsym != NULL);
-	      insert (&globalroot, extsym, (int (*)(void*,void*)) cmpidstr);
+                /* this symbol is declared in another module */
+                if ( foundsym->type & SYMXREF )
+                {
+                    foundsym->owner = CURRENTMODULE;      /* symbol now owned by this module */
+                    foundsym->type &= XREF_OFF;           /* re-declare symbol as global if symbol was */
+                    foundsym->type |= SYMXDEF | libtype;  /* declared extern in another module */
+                }
+                else                                      /* cannot declare two identical global's */
+                {
+                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL_GLOBAL, identifier );
+                }
 
-	      /* original local symbol cloned as external symbol, now delete old local ... */
-	      delete (&CURRENTMODULE->localroot, foundsym, (int (*)(void*,void*)) cmpidstr, (void (*)(void*)) FreeSym);
+                /* Already declared global */
             }
-          else
-	    ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_LOCAL, identifier);
-								    /* already declared local */
+            else if ( ( foundsym->type & ( SYMXDEF | libtype ) ) != ( SYMXDEF | libtype ) )
+            {
+                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL, identifier );
+                /* re-declaration not allowed */
+            }
         }
-      else if ( (foundsym->type & (SYMXREF|libtype)) != (SYMXREF|libtype) ) 
-	{
-	  ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL, identifier);	
-								    /* re-declaration not allowed */
-	}
-   }
+    }
+    else
+    {
+        if ( FindSymbol( identifier, globalroot ) == NULL )
+        {
+            /* If no global symbol of identical name has been created, then re-declare local symbol as global symbol */
+            foundsym->type &= SYMLOCAL_OFF;
+            foundsym->type |= SYMXDEF;
+            clonedsym = CreateSymbol( foundsym->symname, foundsym->symvalue, foundsym->type, CURRENTMODULE );
+            E4C_ASSERT( clonedsym != NULL );
+            insert( &globalroot, clonedsym, ( int ( * )( void *, void * ) ) cmpidstr );
+
+            /* original local symbol cloned as global symbol, now delete old local ... */
+            delete( &CURRENTMODULE->localroot, foundsym, ( int ( * )( void *, void * ) ) cmpidstr, ( void ( * )( void * ) ) FreeSym );
+        }
+        else
+        {
+            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_GLOBAL, identifier );
+            /* already declared global */
+        }
+    }
 }
 
 
 
-void 
-AppendPageRef (symbol * symptr)
+void
+DeclSymExtern( char *identifier, unsigned char libtype )
 {
-  struct pageref *newref = NULL;
+    symbol *foundsym, *extsym;
 
-  if (symptr->references->lastref != NULL)
-    if (symptr->references->lastref->pagenr == PAGENR ||
-	symptr->references->firstref->pagenr == PAGENR)		/* symbol reference on the same page - ignore */
-      return;
-
-  newref = xcalloc_struct(struct pageref);
-					/* new page reference of symbol - allocate... */
-  newref->pagenr = PAGENR;
-  newref->nextref = NULL;
-
-  if (symptr->references->lastref == NULL)
+    if ( ( foundsym = FindSymbol( identifier, CURRENTMODULE->localroot ) ) == NULL )
     {
-      symptr->references->lastref = newref;
-      symptr->references->firstref = newref;	/* First page reference in list */
+        if ( ( foundsym = FindSymbol( identifier, globalroot ) ) == NULL )
+        {
+            foundsym = CreateSymbol( identifier, 0, SYM_NOTDEFINED | SYMXREF | libtype, CURRENTMODULE );
+            E4C_ASSERT( foundsym != NULL );
+            insert( &globalroot, foundsym, ( int ( * )( void *, void * ) ) cmpidstr ); /* declare symbol as extern */
+        }
+        else
+        {
+            if ( foundsym->owner == CURRENTMODULE )
+            {
+                if ( ( foundsym->type & ( SYMXREF | libtype ) ) != ( SYMXREF | libtype ) )
+                    if ( sdcc_hacks )
+                    {
+                        foundsym->type = SYMXREF | libtype ;
+                    }
+                    else
+                    {
+                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL, identifier );
+                    }
+
+                /* Re-declaration not allowed */
+            }
+        }
     }
-  else
+    else
     {
-      symptr->references->lastref->nextref = newref;	/* current reference (last) points at new reference */
-      symptr->references->lastref = newref;	/* ptr to last reference updated to new reference */
+        if ( FindSymbol( identifier, globalroot ) == NULL )
+        {
+            /* If no external symbol of identical name has been declared, then re-declare local
+               symbol as external symbol, but only if local symbol is not defined yet */
+            if ( ( foundsym->type & SYMDEFINED ) == 0 )
+            {
+                foundsym->type &= SYMLOCAL_OFF;
+                foundsym->type |= ( SYMXREF | libtype );
+                extsym = CreateSymbol( identifier, 0, foundsym->type, CURRENTMODULE );
+                E4C_ASSERT( extsym != NULL );
+                insert( &globalroot, extsym, ( int ( * )( void *, void * ) ) cmpidstr );
+
+                /* original local symbol cloned as external symbol, now delete old local ... */
+                delete( &CURRENTMODULE->localroot, foundsym, ( int ( * )( void *, void * ) ) cmpidstr, ( void ( * )( void * ) ) FreeSym );
+            }
+            else
+            {
+                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_LOCAL, identifier );
+            }
+
+            /* already declared local */
+        }
+        else if ( ( foundsym->type & ( SYMXREF | libtype ) ) != ( SYMXREF | libtype ) )
+        {
+            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL, identifier );
+            /* re-declaration not allowed */
+        }
     }
 }
 
 
-void 
-InsertPageRef (symbol * symptr)
+
+void
+AppendPageRef( symbol *symptr )
 {
-  struct pageref *newref = NULL, *tmpptr = NULL;
+    struct pageref *newref = NULL;
 
-  if (symptr->references->firstref != NULL)
-    if (symptr->references->firstref->pagenr == PAGENR)		/* symbol reference on the same page - ignore */
-      return;
+    if ( symptr->references->lastref != NULL )
+        if ( symptr->references->lastref->pagenr == PAGENR ||
+                symptr->references->firstref->pagenr == PAGENR )        /* symbol reference on the same page - ignore */
+        {
+            return;
+        }
 
-  newref = xcalloc_struct(struct pageref);
-  newref->pagenr = PAGENR;
-  newref->nextref = symptr->references->firstref;	/* next reference will be current first reference */
+    newref = xcalloc_struct( struct pageref );
+    /* new page reference of symbol - allocate... */
+    newref->pagenr = PAGENR;
+    newref->nextref = NULL;
 
-  if (symptr->references->firstref == NULL)
-    {				/* If this is the first reference, then the... */
-      symptr->references->firstref = newref;	/* Current reference (last) points at new reference */
-      symptr->references->lastref = newref;	/* first page reference is also last page reference. */
-    }
-  else
+    if ( symptr->references->lastref == NULL )
     {
-      symptr->references->firstref = newref;	/* Current reference (last) points at new reference */
-      if (newref->pagenr == symptr->references->lastref->pagenr)
-	{			/* last reference = new reference */
-	  tmpptr = newref;
-	  while (tmpptr->nextref != symptr->references->lastref)
-	    tmpptr = tmpptr->nextref;	/* get reference before last reference */
-	  xfree0(tmpptr->nextref);	/* remove redundant reference */
-	  tmpptr->nextref = NULL;	/* end of list */
-	  symptr->references->lastref = tmpptr;		/* update pointer to last reference */
-	}
+        symptr->references->lastref = newref;
+        symptr->references->firstref = newref;    /* First page reference in list */
+    }
+    else
+    {
+        symptr->references->lastref->nextref = newref;    /* current reference (last) points at new reference */
+        symptr->references->lastref = newref;     /* ptr to last reference updated to new reference */
     }
 }
 
 
-int 
-DefineDefSym (char *identifier, long value, unsigned char symtype, avltree ** root)
+void
+InsertPageRef( symbol *symptr )
 {
-  symbol *staticsym;
+    struct pageref *newref = NULL, *tmpptr = NULL;
 
-  if (FindSymbol (identifier, *root) == NULL)
+    if ( symptr->references->firstref != NULL )
+        if ( symptr->references->firstref->pagenr == PAGENR )       /* symbol reference on the same page - ignore */
+        {
+            return;
+        }
+
+    newref = xcalloc_struct( struct pageref );
+    newref->pagenr = PAGENR;
+    newref->nextref = symptr->references->firstref;       /* next reference will be current first reference */
+
+    if ( symptr->references->firstref == NULL )
     {
-      staticsym = CreateSymbol (identifier, value, symtype | SYMDEF | SYMDEFINED, NULL);
-      E4C_ASSERT(staticsym != NULL);
-      insert (root, staticsym, (int (*)(void*,void*)) cmpidstr);
-      return 1;
+        /* If this is the first reference, then the... */
+        symptr->references->firstref = newref;    /* Current reference (last) points at new reference */
+        symptr->references->lastref = newref;     /* first page reference is also last page reference. */
     }
-  else
+    else
     {
-      ReportError (CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier);	
-						    /* Symbol already defined */
-      return 0;
+        symptr->references->firstref = newref;    /* Current reference (last) points at new reference */
+
+        if ( newref->pagenr == symptr->references->lastref->pagenr )
+        {
+            /* last reference = new reference */
+            tmpptr = newref;
+
+            while ( tmpptr->nextref != symptr->references->lastref )
+            {
+                tmpptr = tmpptr->nextref;    /* get reference before last reference */
+            }
+
+            xfree0( tmpptr->nextref );    /* remove redundant reference */
+            tmpptr->nextref = NULL;       /* end of list */
+            symptr->references->lastref = tmpptr;         /* update pointer to last reference */
+        }
     }
 }
 
 
-
-void 
-FreeSym (symbol * node)
+int
+DefineDefSym( char *identifier, long value, unsigned char symtype, avltree **root )
 {
-  struct pageref *pref, *tmpref;
+    symbol *staticsym;
 
-  if (node->references != NULL)
+    if ( FindSymbol( identifier, *root ) == NULL )
     {
-      if (node->references->firstref != NULL)
-	{
-	  pref = node->references->firstref;	/* get first page reference in list */
-	  while (pref != NULL)	/* free page reference list... */
-	    {
-	      tmpref = pref;
-	      pref = pref->nextref;
-	      xfree0(tmpref);
-	    }
-	}
-      xfree0(node->references);	/* Then remove head/end pointer record to list */
+        staticsym = CreateSymbol( identifier, value, symtype | SYMDEF | SYMDEFINED, NULL );
+        E4C_ASSERT( staticsym != NULL );
+        insert( root, staticsym, ( int ( * )( void *, void * ) ) cmpidstr );
+        return 1;
     }
-  if (node->symname != NULL)
-    xfree0(node->symname);	/* release symbol identifier */
-  xfree0(node);			/* then release the symbol record */
+    else
+    {
+        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier );
+        /* Symbol already defined */
+        return 0;
+    }
 }
+
+
+
+void
+FreeSym( symbol *node )
+{
+    struct pageref *pref, *tmpref;
+
+    if ( node->references != NULL )
+    {
+        if ( node->references->firstref != NULL )
+        {
+            pref = node->references->firstref;    /* get first page reference in list */
+
+            while ( pref != NULL ) /* free page reference list... */
+            {
+                tmpref = pref;
+                pref = pref->nextref;
+                xfree0( tmpref );
+            }
+        }
+
+        xfree0( node->references ); /* Then remove head/end pointer record to list */
+    }
+
+    if ( node->symname != NULL )
+    {
+        xfree0( node->symname );    /* release symbol identifier */
+    }
+
+    xfree0( node );               /* then release the symbol record */
+}
+
 
