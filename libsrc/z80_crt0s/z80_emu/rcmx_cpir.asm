@@ -25,7 +25,7 @@ XLIB rcmx_cpir
    
    inc c
    dec c
-   jp nz, loop
+   jr nz, loop
    
    inc b
    djnz loop

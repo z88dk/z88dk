@@ -22,7 +22,7 @@ XLIB rcmx_cpd
 
    ld a,b
    or c
-   jp nz, exitcpd
+   jr nz, exitcpd
    res 2,l
 
 .exitcpd
@@ -40,4 +40,4 @@ XLIB rcmx_cpd
    push af
    ex (sp),hl
    set 0,l
-   jp rejoin
+   jr rejoin

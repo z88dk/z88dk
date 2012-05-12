@@ -22,7 +22,7 @@ XLIB rcmx_cpi
 
    ld a,b
    or c
-   jp nz, exitcpi
+   jr nz, exitcpi
    res 2,l
 
 .exitcpi
@@ -40,4 +40,4 @@ XLIB rcmx_cpi
    push af
    ex (sp),hl
    set 0,l
-   jp rejoin
+   jr rejoin
