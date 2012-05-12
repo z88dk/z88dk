@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.22 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.23 2012-05-12 16:54:49 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.22  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.23  2012-05-12 16:54:49  pauloscustodio
+/* temporary_start not used, removed
+/*
+/* Revision 1.22  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -183,7 +186,6 @@ extern struct module *CURRENTMODULE;
 extern enum flag EOL;
 
 
-char  *temporary_start;
 char  *temporary_ptr = NULL;
 
 
@@ -205,7 +207,7 @@ void UnGet( int c, FILE *fp )
 void
 SetTemporaryLine( char *line )
 {
-    temporary_start = temporary_ptr = line;
+    temporary_ptr = line;
 }
 
 /* get a character from file with CR/LF/CRLF parsing capability.
