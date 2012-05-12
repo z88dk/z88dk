@@ -13,9 +13,20 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.27 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.28 2012-05-12 16:57:33 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.27  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.28  2012-05-12 16:57:33  pauloscustodio
+/*     BUG_0016 : RCMX000 emulation routines not assembled when LIST is ON (-l)
+/*         The code "cpi" is assembled as "call rcmx_cpi" when option -RCMX000 is ON.
+/*         This is implemented by calling SetTemporaryLine() to insert new code
+/*         at the current input position.
+/*         When LIST is ON, getasmline() remembers the input file position, reads
+/*         the next line and restores the file position. It ignores the buffer
+/*         set by SetTemporaryLine(), causing the assembler to skip
+/*         the "call rcmx_cpi" line.
+/*         Also added registry of rcmx_cpi as external library routine.
+/*
+/* Revision 1.27  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -698,7 +709,7 @@ CPI( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        SetTemporaryLine( "\ncall rcmx_cpi\n" );
+        SetTemporaryLine( "\nlib rcmx_cpi\ncall rcmx_cpi\n" );
         return;
     }
 
@@ -714,7 +725,7 @@ CPIR( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        SetTemporaryLine( "\ncall rcmx_cpir\n" );
+        SetTemporaryLine( "\nlib rcmx_cpir\ncall rcmx_cpir\n" );
         return;
     }
 
@@ -730,7 +741,7 @@ CPD( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        SetTemporaryLine( "\ncall rcmx_cpd\n" );
+        SetTemporaryLine( "\nlib rcmx_cpd\ncall rcmx_cpd\n" );
         return;
     }
 
@@ -746,7 +757,7 @@ CPDR( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        SetTemporaryLine( "\ncall rcmx_cpdr\n" );
+        SetTemporaryLine( "\nlib rcmx_cpdr\ncall rcmx_cpdr\n" );
         return;
     }
 
@@ -1158,7 +1169,7 @@ RLD( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        SetTemporaryLine( "\ncall rcmx_rld\n" );
+        SetTemporaryLine( "\nlib rcmx_rld\ncall rcmx_rld\n" );
         return;
     }
 
@@ -1174,7 +1185,7 @@ RRD( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        SetTemporaryLine( "\ncall rcmx_rrd\n" );
+        SetTemporaryLine( "\nlib rcmx_rrd\ncall rcmx_rrd\n" );
         return;
     }
 

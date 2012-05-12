@@ -13,9 +13,20 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.23 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.24 2012-05-12 16:57:33 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.23  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.24  2012-05-12 16:57:33  pauloscustodio
+/*     BUG_0016 : RCMX000 emulation routines not assembled when LIST is ON (-l)
+/*         The code "cpi" is assembled as "call rcmx_cpi" when option -RCMX000 is ON.
+/*         This is implemented by calling SetTemporaryLine() to insert new code
+/*         at the current input position.
+/*         When LIST is ON, getasmline() remembers the input file position, reads
+/*         the next line and restores the file position. It ignores the buffer
+/*         set by SetTemporaryLine(), causing the assembler to skip
+/*         the "call rcmx_cpi" line.
+/*         Also added registry of rcmx_cpi as external library routine.
+/*
+/* Revision 1.23  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -267,6 +278,7 @@ extern struct modules *modulehdr;       /* pointer to module header */
 extern struct module *CURRENTMODULE;
 extern int PAGENR, LINENR;
 extern avltree *globalroot;
+extern char *temporary_ptr;
 
 void
 Z80pass1( void )
@@ -290,9 +302,11 @@ void
 getasmline( void )
 {
     long fptr;
+    char *save_temporary_ptr;
     int len, c;
 
-    fptr = ftell( z80asmfile );           /* remember file position */
+    fptr = ftell( z80asmfile );           /* remember file and temp buffer position */
+    save_temporary_ptr = temporary_ptr;
 
     c = '\0';
 
@@ -312,7 +326,8 @@ getasmline( void )
 
     line[len] = '\0';
 
-    fseek( z80asmfile, fptr, SEEK_SET );  /* resume file position */
+    fseek( z80asmfile, fptr, SEEK_SET );  /* resume file and temp buffer position */
+    temporary_ptr = save_temporary_ptr;
 }
 
 
