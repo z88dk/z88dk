@@ -9,7 +9,7 @@
  *
  *      stefano - 18/3/2004
  *
- *	$Id: conio.h,v 1.3 2012-05-14 16:45:21 stefano Exp $
+ *	$Id: conio.h,v 1.4 2012-05-14 16:53:52 stefano Exp $
  */
 
 #ifndef __CONIO_H__
@@ -55,6 +55,7 @@ int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define gotoxy(a,b)     printf("%c[%u;%uH",27,b-1,a-1)
 
 #define clrscr() fputc_cons(12)
+#define normvideo() printf ("%c[m",27)
 #define clreol() printf("%c[K",27)
 
 /* Reads a character directly from the console, without echo. */
