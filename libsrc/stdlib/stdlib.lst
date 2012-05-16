@@ -5,7 +5,6 @@ stdlib/atol
 stdlib/bpeek
 stdlib/bpoke
 stdlib/bpoke_callee
-stdlib/delay
 stdlib/exit
 stdlib/inp
 stdlib/isqrt
@@ -40,4 +39,7 @@ stdlib/wpeek
 stdlib/wpoke
 stdlib/wpoke_callee
 stdlib/getopt
+stdlib/delay
+stdlib/t_delay
 stdlib/sleep
+stdlib/csleep

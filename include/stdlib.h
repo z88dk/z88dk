@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.39 2012-05-10 16:42:54 stefano Exp $
+ * $Id: stdlib.h,v 1.40 2012-05-16 16:59:56 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -99,7 +99,6 @@ extern int  __LIB__ __FASTCALL__ atexit(void *fcn);
 // int system(char *s);                     /* might be implemented in target's library but doubtful */
 // char *getenv(char *name);                /* might be implemented in target's library but doubtful */
 
-extern void __LIB__  sleep(int);
 extern int  __LIB__  getopt (int, char **, char *);
 extern   char *optarg;                      /* getopt(3) external variables */
 extern   int opterr;
@@ -199,13 +198,18 @@ extern unsigned int  __LIB__ __FASTCALL__ wpeek(void *addr);
 #define M_BPEEK(addr) asm("ld\thl,("#addr")\nld\th,0\n");
 #define M_WPEEK(addr) asm("ld\thl,("#addr")\n");
 
-/////////////////////////
-// ACCURATE T-STATE DELAY
-/////////////////////////
+//////////////////////////////////////////////////
+// Timing (some are non-standard)
+//////////////////////////////////////////////////
 
-#ifndef delay
-extern void          __LIB__ __FASTCALL__ delay(unsigned int tstates);   // at least 141 T
-#endif
+// ACCURATE T-STATE DELAY
+extern void   __LIB__ __FASTCALL__   t_delay(unsigned int tstates);   // at least 141 T
+
+/* Very non standard! sleep for centisecs! (z88 and others)*/
+extern void   __LIB__  __FASTCALL__   sleep (int secs);
+extern void   __LIB__  __FASTCALL__   csleep(unsigned int centiseconds);
+extern void   __LIB__  __FASTCALL__   delay (long milliseconds);
+
 
 
 /*********/
@@ -215,7 +219,6 @@ extern void          __LIB__ __FASTCALL__ delay(unsigned int tstates);   // at l
 // Non standard stdlib.h defs (mode is ignored)
 
 #ifdef __Z88__
-extern __LIB__ csleep(int);                 /* Very non standard! sleep for centisecs! (z88)*/
 #endif
 
 

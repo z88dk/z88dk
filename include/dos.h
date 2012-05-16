@@ -6,7 +6,7 @@
  *
  *      stefano2012
  *
- *	$Id: dos.h,v 1.1 2012-05-10 16:44:13 stefano Exp $
+ *	$Id: dos.h,v 1.2 2012-05-16 16:59:56 stefano Exp $
  */
 
 
@@ -18,7 +18,6 @@
 #include <time.h>
 #include <sound.h>
 
-/*
 struct date {
 	int da_day;
 	int da_mon;
@@ -32,14 +31,13 @@ struct time {
 	int ti_hund;
 };
 
+/*
 extern void __LIB__ getdate(struct date *);
 extern void __LIB__ gettime(struct time *);
 extern void __LIB__ setdate(struct date *);
 extern void __LIB__ settime(struct time *);
 */
 
-//extern void __LIB__ delay(unsigned int msec);
-#define delay(a) bit_beep(a/150,50000);
-
+//#define delay(a) bit_beep(1+a/150,50000);
 
 #endif /* __DOS_H__ */

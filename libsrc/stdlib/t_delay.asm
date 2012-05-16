@@ -1,13 +1,13 @@
-; void __FASTCALL__ delay(unsigned int tstates)
+; void __FASTCALL__ t_delay(unsigned int tstates)
 
-XLIB delay
+XLIB t_delay
 
 ; Z80 delay routine
 ; by Jan Bobrowski, license GPL
 ; wait hl T (including call; hl>=141)
 ; destroys: af, bc, hl
 
-.delay
+.t_delay
 
         ld      bc,-141
         add     hl,bc

@@ -2,8 +2,9 @@
 #define __MATH_H__
 
 #include <sys/compiler.h>
+#include <float.h>
 
-/* $Id: math.h,v 1.13 2010-09-19 00:24:08 dom Exp $ */
+/* $Id: math.h,v 1.14 2012-05-16 16:59:56 stefano Exp $ */
 
 
 extern double __LIB__ acos(double);  /* arc cosine */

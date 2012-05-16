@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.19 2008-07-21 10:09:26 stefano Exp $
+# $Id: Makefile,v 1.20 2012-05-16 16:59:56 stefano Exp $
 
 include ../Make.config
 
@@ -13,16 +13,16 @@ GENCFILES = \
 AFILES = $(GENCFILES:.c=.asm)
 GENOBJECTS = $(GENCFILES:.c=.o)
 
-lz88: rcmdeps z88_stdlib
+lz88: deps z88_stdlib
 
-lzx: rcmdeps zx_stdlib
+lzx: deps zx_stdlib
 
-generic: rcmdeps gen
+generic: deps gen
 
 gen: $(GENOBJECTS)
 
 .c.o:
-	zcc +test $(CFLAGS) $*.c
+	zcc +test $(CFLAGS) *.c
 
 z88_stdlib:
 	zcc +z88 $(CFLAGS) *.c
@@ -32,7 +32,12 @@ zx_stdlib:
 	zcc +zx $(CFLAGS) *.c
 	cd spectrum  ; cd ..
 
-rcmdeps:
+# Rabbit Control Module and timer dependencies
+deps:
+	$(RM) delay.o
+	$(RM) sleep.o
+	$(RM) csleep.o
+	$(RM) sleep.o
 	$(RM) inp.o
 	$(RM) outp_callee.o
 	$(RM) randomize.o

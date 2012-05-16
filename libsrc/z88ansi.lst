@@ -39,8 +39,6 @@ fcntl/z88/brotherdor
 stdlib/z88/atol
 stdlib/z88/getcwd
 stdlib/z88/mkdir
-stdlib/z88/sleep
-stdlib/z88/csleep
 time/gmtime
 time/localtime
 time/z88/clock

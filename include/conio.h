@@ -9,7 +9,7 @@
  *
  *      stefano - 18/3/2004
  *
- *	$Id: conio.h,v 1.4 2012-05-14 16:53:52 stefano Exp $
+ *	$Id: conio.h,v 1.5 2012-05-16 16:59:56 stefano Exp $
  */
 
 #ifndef __CONIO_H__
@@ -18,6 +18,11 @@
 // this is used by getch, putch and ungetch.
 //#include <sys/compiler.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <dos.h>
+
+// THIS ONE IS TERRIFIC !
+#define elseif else if
 
 #define    BLACK         0
 #define    BLUE          1
@@ -46,6 +51,12 @@ int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define textcolor(a)	printf("%c[%um",27,PCDOS_COLORS[a]+30)
 #define textbackground(a)	printf("%c[%um",27,PCDOS_COLORS[a]+40)
 #define textattr(a)	printf("%c[%um%c[%um",27,PCDOS_COLORS[a&0xF]+30,27,PCDOS_COLORS[a>>4]+40)
+#define highvideo()	printf("%c[1m",27);
+#define lowvideo()	printf("%c[2m",27);
+#define normvideo()	printf("%c[m",27);
+#define delline()	printf("%c[m",27);
+#define clrscr() textattr(7);fputc_cons(12)
+#define clreol() printf("%c[K",27)
 
 #define cprintf printf
 #define cputs puts_cons
@@ -54,9 +65,6 @@ int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 
 #define gotoxy(a,b)     printf("%c[%u;%uH",27,b-1,a-1)
 
-#define clrscr() fputc_cons(12)
-#define normvideo() printf ("%c[m",27)
-#define clreol() printf("%c[K",27)
 
 /* Reads a character directly from the console, without echo. */
 #define getch()  fgetc_cons()
@@ -67,7 +75,9 @@ int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 //#define putch(bp,fp) fputc(bp,fp)
 // #define ungetch(bp)  ungetc(bp,stdout)  // this one doesn't work
 
+#ifndef kbhit
 #define kbhit() (getk() ? 1 : 0)
+#endif
 
 #define random(a) rand()%a
 
