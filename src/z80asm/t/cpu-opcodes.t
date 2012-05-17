@@ -11,11 +11,14 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011
+# Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/cpu-opcodes.t,v 1.1 2012-05-13 20:40:03 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/cpu-opcodes.t,v 1.2 2012-05-17 15:01:52 pauloscustodio Exp $
 # $Log: cpu-opcodes.t,v $
-# Revision 1.1  2012-05-13 20:40:03  pauloscustodio
+# Revision 1.2  2012-05-17 15:01:52  pauloscustodio
+# Test only Z80 and RCM2000, skip Z180 (same as Z80 as of now) and RCM3000 (same as RCM2000 as of now)
+#
+# Revision 1.1  2012/05/13 20:40:03  pauloscustodio
 # Test all variations of Z80 vs RCMX000 opcodes. Prepared the way to add Z180.
 # Still to do: add all instructions of RCM2000 and RCM3000 (postponed)
 #
@@ -51,6 +54,7 @@ my %OPTION = (
 	RCM2000	=> "-RCMX000 -i".$z80emu_lib,
 	RCM3000	=> "-RCMX000 -i".$z80emu_lib,
 );
+my %SKIP = ( Z180 => 1, RCM3000 => 1 );
 
 # build z80emu.lib
 t_z80asm_capture("-l -x$z80emu_lib @z80emu_src", "", "", 0);
@@ -67,7 +71,7 @@ sub test_opcodes {
 	
 	while (my %opcodes = next_opcode($iter)) {
 		for my $cpu (@CPUS) {
-			if (exists $opcodes{$cpu}) {
+			if (exists($opcodes{$cpu}) && ! exists($SKIP{$cpu})) {
 				my $asm = $opcodes{$cpu}{asm};
 				my $bin = $opcodes{$cpu}{bin};
 				(my $asm_text = $asm) =~ s/\n/ : /g;
