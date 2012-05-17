@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.h,v 1.3 2012-05-17 17:42:14 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.h,v 1.4 2012-05-17 17:49:20 pauloscustodio Exp $ */
 /* $Log: symbols.h,v $
-/* Revision 1.3  2012-05-17 17:42:14  pauloscustodio
+/* Revision 1.4  2012-05-17 17:49:20  pauloscustodio
+/* astyle
+/*
+/* Revision 1.3  2012/05/17 17:42:14  pauloscustodio
 /* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
 /* always raised on error.
 /*
@@ -44,7 +47,7 @@ Copyright (C) Paulo Custodio, 2011
 
 /* Create a new symbol
    CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
-extern symbol * CreateSymbol( char *identifier, long value, unsigned char symboltype, struct module *symowner );
+extern symbol *CreateSymbol( char *identifier, long value, unsigned char symboltype, struct module *symowner );
 
 /* Create a symbol in the local or global tree */
 extern void DefineSymbol( char *identifier, long value, unsigned char symboltype );

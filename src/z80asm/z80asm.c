@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.45 2012-05-17 17:42:14 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.46 2012-05-17 17:49:20 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.45  2012-05-17 17:42:14  pauloscustodio
+/* Revision 1.46  2012-05-17 17:49:20  pauloscustodio
+/* astyle
+/*
+/* Revision 1.45  2012/05/17 17:42:14  pauloscustodio
 /* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
 /* always raised on error.
 /*
@@ -1448,6 +1451,7 @@ again:
     {
         ASMERROR = ON;
     }
+
     /* cleanup all allocated memory */
     finally
     {

@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.16 2012-05-17 17:42:14 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.17 2012-05-17 17:49:20 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.16  2012-05-17 17:42:14  pauloscustodio
+/* Revision 1.17  2012-05-17 17:49:20  pauloscustodio
+/* astyle
+/*
+/* Revision 1.16  2012/05/17 17:42:14  pauloscustodio
 /* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
 /* always raised on error.
 /*
@@ -165,7 +168,7 @@ extern avltree *globalroot;
 
 /* Create a new symbol
    CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
-symbol * CreateSymbol( char *identifier, long value, unsigned char symboltype, struct module *symowner )
+symbol *CreateSymbol( char *identifier, long value, unsigned char symboltype, struct module *symowner )
 {
     symbol *newsym;
 
@@ -243,8 +246,8 @@ cmpidval( symbol *kptr, symbol *p )
  * DefineSymbol will create a record in memory, inserting it into an AVL tree (or creating the first record)
  */
 void DefineSymbol( char *identifier,
-              long value,       /* value of symbol, label */
-              unsigned char symboltype )
+                   long value,       /* value of symbol, label */
+                   unsigned char symboltype )
 {
     /* symbol is either address label or constant */
     symbol *foundsymbol;
@@ -279,16 +282,16 @@ void DefineSymbol( char *identifier,
     else
     {
         /* Extern declaration of symbol, now define local symbol. */
+        /* the extern symbol is now no longer accessible */
         DefLocalSymbol( identifier, value, symboltype );
-    }      
-    /* the extern symbol is now no longer accessible */
+    }
 }
 
 
 
 static void DefLocalSymbol( char *identifier,
-                long value,     /* value of symbol, label */
-                unsigned char symboltype )
+                            long value,     /* value of symbol, label */
+                            unsigned char symboltype )
 {
     /* symbol is either address label or constant */
     symbol *foundsymbol;
