@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.5 2012-05-17 17:14:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.6 2012-05-17 20:31:45 pauloscustodio Exp $ */
 /* $Log: errors.h,v $
-/* Revision 1.5  2012-05-17 17:14:59  pauloscustodio
+/* Revision 1.6  2012-05-17 20:31:45  pauloscustodio
+/* New errors_def.h with error name and string together, for easier maintenance
+/*
+/* Revision 1.5  2012/05/17 17:14:59  pauloscustodio
 /* Remove global ASSEMBLE_ERROR, not used
 /*
 /* Revision 1.4  2012/05/11 19:29:49  pauloscustodio
@@ -59,44 +62,16 @@ Copyright (C) Paulo Custodio, 2011
 
 #include "symbol.h"
 
-/* errnum constants */
-enum
+/* error constants */
+#define DEF_MSG(name,msg)    name,
+
+typedef enum ErrorCode
 {
     ERR_NO_ERR                  = -1,
-    ERR_FILE_OPEN               = 0,    /* args: %s filename */
-    ERR_SYNTAX                  = 1,
-    ERR_NOT_DEFINED             = 2,
-    ERR_NO_MEMORY               = 3,
-    ERR_INT_RANGE               = 4,    /* args: %ld value */
-    ERR_EXPR_SYNTAX             = 5,
-    ERR_UNBALANCED_PAREN        = 6,
-    ERR_RANGE                   = 7,    /* not used */
-    ERR_NO_SRC_FILE             = 8,
-    ERR_ILLEGAL_OPTION          = 9,    /* args: %s option */
-    ERR_UNKNOWN_IDENT           = 10,
-    ERR_ILLEGAL_IDENT           = 11,
-    ERR_MAX_CODESIZE            = 12,
-    ERR_TOTALERRORS             = 13,
-    ERR_SYMBOL_REDEFINED        = 14,   /* args: %s symbol */
-    ERR_MODULE_REDEFINED        = 15,
-    ERR_MODULE_NOT_DEFINED      = 16,   /* not used */
-    ERR_SYMBOL_DECL_LOCAL       = 17,   /* args: %s symbol */
-    ERR_SYMBOL_DECL_GLOBAL      = 18,   /* args: %s symbol */
-    ERR_SYMBOL_DECL_EXTERN      = 19,   /* args: %s symbol */   /* not used */
-    ERR_NO_CMD_ARGS             = 20,   /* not used */
-    ERR_ILLEGAL_SRC_FILENAME    = 21,   /* args: %s filename */
-    ERR_SYMBOL_REDECL_GLOBAL    = 22,   /* args: %s symbol */
-    ERR_SYMBOL_REDECL           = 23,   /* args: %s symbol */
-    ERR_ORG_REDEFINED           = 24,   /* not used */
-    ERR_JR_NOT_LOCAL            = 25,
-    ERR_NOT_OBJ_FILE            = 26,   /* args: %s filename */
-    ERR_RESERVED_NAME           = 27,   /* not used */
-    ERR_OPEN_LIB                = 28,   /* args: %s filename */
-    ERR_NOT_LIB_FILE            = 29,   /* args: %s filename */
-    ERR_ENV_NOT_DEFINED         = 30,   /* args: %s envvar */
-    ERR_INCLUDE_RECURSION       = 31,   /* args: %s filename */
-    ERR_FILE_IO                 = 32,
-};
+#include "errors_def.h"
+} ErrorCode;
+
+#undef DEF_MSG
 
 /* global variables */
 extern enum flag    ASMERROR;           /* ON if error */

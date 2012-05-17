@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.8 2012-05-17 17:14:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.9 2012-05-17 20:31:45 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.8  2012-05-17 17:14:59  pauloscustodio
+/* Revision 1.9  2012-05-17 20:31:45  pauloscustodio
+/* New errors_def.h with error name and string together, for easier maintenance
+/*
+/* Revision 1.8  2012/05/17 17:14:59  pauloscustodio
 /* Remove global ASSEMBLE_ERROR, not used
 /*
 /* Revision 1.7  2012/05/11 19:29:49  pauloscustodio
@@ -80,43 +83,17 @@ enum flag   ASMERROR        = OFF;          /* ON if error */
 int         ERRORS          = 0;            /* num errors in current source */
 int         TOTALERRORS     = 0;            /* total num errors */
 
-/* static variables */
+/*-----------------------------------------------------------------------------
+*   Error strings
+*----------------------------------------------------------------------------*/
+#define DEF_MSG(name,msg)   msg,
+
 static char *errmsg[] =
 {
-    /* 0  */    "File '%s' open error",
-    /* 1  */    "Syntax error",
-    /* 2  */    "Symbol not defined",
-    /* 3  */    "Not enough memory",
-    /* 4  */    "Integer '%ld' out of range",
-    /* 5  */    "Syntax error in expression",
-    /* 6  */    "Unbalanced parenthesis",
-    /* 7  */    "Out of range",
-    /* 8  */    "Source filename missing",
-    /* 9  */    "Illegal option '-%s'",
-    /* 10 */    "Unknown identifier",
-    /* 11 */    "Illegal identifier",
-    /* 12 */    "Max. code size of %ld bytes reached",
-    /* 13 */    "%d errors occurred during assembly",
-    /* 14 */    "Symbol '%s' already defined",
-    /* 15 */    "Module name already defined",
-    /* 16 */    "Module name not defined",
-    /* 17 */    "Symbol '%s' already declared local",
-    /* 18 */    "Symbol '%s' already declared global",
-    /* 19 */    "Symbol '%s' already declared external",
-    /* 20 */    "No command line arguments",
-    /* 21 */    "Illegal source filename '%s'",
-    /* 22 */    "Symbol '%s' declared global in another module",
-    /* 23 */    "Re-declaration of '%s' not allowed",
-    /* 24 */    "ORG already defined",
-    /* 25 */    "Relative jump address must be local",
-    /* 26 */    "File '%s' not an object file",
-    /* 27 */    "Reserved name",
-    /* 28 */    "Couldn't open library file '%s'",
-    /* 29 */    "File '%s' not a library file",
-    /* 30 */    "Environment variable '%s' not defined",
-    /* 31 */    "Cannot include file '%s' recursively",
-    /* 32 */    "File I/O error",
+#include "errors_def.h"
 };
+
+#undef DEF_MSG
 
 /*-----------------------------------------------------------------------------
 *   ResetErrors
