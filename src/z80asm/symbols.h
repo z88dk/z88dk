@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.h,v 1.2 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.h,v 1.3 2012-05-17 17:42:14 pauloscustodio Exp $ */
 /* $Log: symbols.h,v $
-/* Revision 1.2  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.3  2012-05-17 17:42:14  pauloscustodio
+/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* always raised on error.
+/*
+/* Revision 1.2  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -38,7 +42,14 @@ Copyright (C) Paulo Custodio, 2011
 
 #include "symbol.h"
 
-extern int DefineDefSym( char *identifier, long value, unsigned char symtype, avltree **root );
+/* Create a new symbol
+   CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
+extern symbol * CreateSymbol( char *identifier, long value, unsigned char symboltype, struct module *symowner );
+
+/* Create a symbol in the local or global tree */
+extern void DefineSymbol( char *identifier, long value, unsigned char symboltype );
+
+/* Create a symbol in the given tree, error if already defined */
+extern void DefineDefSym( char *identifier, long value, unsigned char symboltype, avltree **root );
 
 #endif /* ndef SYMBOLS_H */
-

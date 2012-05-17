@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.24 2012-05-12 16:57:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.25 2012-05-17 17:42:14 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.24  2012-05-12 16:57:33  pauloscustodio
+/* Revision 1.25  2012-05-17 17:42:14  pauloscustodio
+/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* always raised on error.
+/*
+/* Revision 1.24  2012/05/12 16:57:33  pauloscustodio
 /*     BUG_0016 : RCMX000 emulation routines not assembled when LIST is ON (-l)
 /*         The code "cpi" is assembled as "call rcmx_cpi" when option -RCMX000 is ON.
 /*         This is implemented by calling SetTemporaryLine() to insert new code
@@ -222,6 +226,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include <time.h>
 #include "config.h"
 #include "symbol.h"
+#include "symbols.h"
 #include "hist.h"
 #include "options.h"
 #include "z80asm.h"
@@ -236,7 +241,6 @@ void DefineOrigin( void );
 void ParseIdent( enum flag interpret );
 void RemovePfixlist( struct expr *pfixexpr );
 void StoreExpr( struct expr *pfixexpr, char range );
-int DefineSymbol( char *identifier, long value, unsigned char symboltype );
 int GetChar( FILE *fptr );
 long EvalPfixExpr( struct expr *pass2expr );
 struct expr *ParseNumExpr( void );

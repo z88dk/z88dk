@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.32 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.33 2012-05-17 17:42:14 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.32  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.33  2012-05-17 17:42:14  pauloscustodio
+/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* always raised on error.
+/*
+/* Revision 1.32  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -246,6 +250,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "config.h"
 #include "options.h"
 #include "symbol.h"
+#include "symbols.h"
 #include "z80asm.h"
 #include "errors.h"
 #include "file.h"
@@ -258,13 +263,11 @@ struct module *NewModule( void );
 struct libfile *NewLibrary( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 long EvalPfixExpr( struct expr *pass2expr );
-int DefineDefSym( char *identifier, long value, unsigned char symtype, avltree **root );
 int cmpidstr( symbol *kptr, symbol *p );
 int cmpidval( symbol *kptr, symbol *p );
 int GetChar( FILE *fptr );
 struct expr *ParseNumExpr( void );
 symbol *FindSymbol( char *identifier, avltree *symbolptr );
-symbol *CreateSymbol( char *identifier, long value, unsigned char symboltype, struct module *symowner );
 
 /* local functions */
 int LinkModule( char *filename, long fptr_base );
@@ -317,28 +320,28 @@ unsigned short totaladdr, curroffset, sizeof_reloctable;
 void
 ReadNames( long nextname, long endnames )
 {
-    char scope, symtype;
+    char scope, symboltype;
     long value;
     symbol *foundsymbol;
 
     do
     {
         scope = xfgetc( z80asmfile );
-        symtype = xfgetc( z80asmfile );   /* type of name   */
+        symboltype = xfgetc( z80asmfile );   /* type of name   */
         value = xfget_long( z80asmfile ); /* read symbol (long) integer */
         ReadName();                       /* read symbol name */
 
         nextname += 1 + 1 + 4 + 1 + strlen( line );
 
-        switch ( symtype )
+        switch ( symboltype )
         {
             case 'A':
-                symtype = SYMADDR | SYMDEFINED;
+                symboltype = SYMADDR | SYMDEFINED;
                 value += modulehdr->first->origin + CURRENTMODULE->startoffset;       /* Absolute address */
                 break;
 
             case 'C':
-                symtype = SYMDEFINED;
+                symboltype = SYMDEFINED;
                 break;
         }
 
@@ -347,14 +350,13 @@ ReadNames( long nextname, long endnames )
             case 'L':
                 if ( ( foundsymbol = FindSymbol( line, CURRENTMODULE->localroot ) ) == NULL )
                 {
-                    foundsymbol = CreateSymbol( line, value, symtype | SYMLOCAL, CURRENTMODULE );
-                    E4C_ASSERT( foundsymbol != NULL );
+                    foundsymbol = CreateSymbol( line, value, symboltype | SYMLOCAL, CURRENTMODULE );
                     insert( &CURRENTMODULE->localroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
                 }
                 else
                 {
                     foundsymbol->symvalue = value;
-                    foundsymbol->type |= symtype | SYMLOCAL;
+                    foundsymbol->type |= symboltype | SYMLOCAL;
                     foundsymbol->owner = CURRENTMODULE;
                     redefinedmsg();
                 }
@@ -364,14 +366,13 @@ ReadNames( long nextname, long endnames )
             case 'G':
                 if ( ( foundsymbol = FindSymbol( line, globalroot ) ) == NULL )
                 {
-                    foundsymbol = CreateSymbol( line, value, symtype | SYMXDEF, CURRENTMODULE );
-                    E4C_ASSERT( foundsymbol != NULL );
+                    foundsymbol = CreateSymbol( line, value, symboltype | SYMXDEF, CURRENTMODULE );
                     insert( &globalroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
                 }
                 else
                 {
                     foundsymbol->symvalue = value;
-                    foundsymbol->type |= symtype | SYMXDEF;
+                    foundsymbol->type |= symboltype | SYMXDEF;
                     foundsymbol->owner = CURRENTMODULE;
                     redefinedmsg();
                 }
@@ -381,14 +382,13 @@ ReadNames( long nextname, long endnames )
             case 'X':
                 if ( ( foundsymbol = FindSymbol( line, globalroot ) ) == NULL )
                 {
-                    foundsymbol = CreateSymbol( line, value, symtype | SYMXDEF | SYMDEF, CURRENTMODULE );
-                    E4C_ASSERT( foundsymbol != NULL );
+                    foundsymbol = CreateSymbol( line, value, symboltype | SYMXDEF | SYMDEF, CURRENTMODULE );
                     insert( &globalroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
                 }
                 else
                 {
                     foundsymbol->symvalue = value;
-                    foundsymbol->type |= symtype | SYMXDEF | SYMDEF;
+                    foundsymbol->type |= symboltype | SYMXDEF | SYMDEF;
                     foundsymbol->owner = CURRENTMODULE;
                     redefinedmsg();
                 }

@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.25 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.26 2012-05-17 17:42:14 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.25  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.26  2012-05-17 17:42:14  pauloscustodio
+/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* always raised on error.
+/*
+/* Revision 1.25  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -214,6 +218,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "config.h"
 #include "options.h"
 #include "symbol.h"
+#include "symbols.h"
 #include "z80asm.h"
 #include "errors.h"
 #include "file.h"
@@ -221,12 +226,10 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 /* external functions */
 enum symbols GetSym( void );
-int DefineSymbol( char *identifier, long value, unsigned char symboltype );
 int ExprSigned8( int listoffset );
 int ExprUnsigned8( int listoffset );
 int ExprAddress( int listoffset );
 int ExprLong( int listoffset );
-int DefineDefSym( char *identifier, long value, unsigned char symtype, avltree **root );
 int DEFSP( void );
 int GetChar( FILE *fptr );
 long EvalPfixExpr( struct expr *pfixexpr );

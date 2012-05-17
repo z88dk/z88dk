@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.44 2012-05-17 14:56:23 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.45 2012-05-17 17:42:14 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.44  2012-05-17 14:56:23  pauloscustodio
+/* Revision 1.45  2012-05-17 17:42:14  pauloscustodio
+/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* always raised on error.
+/*
+/* Revision 1.44  2012/05/17 14:56:23  pauloscustodio
 /* New init_except() to be called at start of main(), auto cleanup atexit(), no need to call e4c_context_end()
 /*
 /* Revision 1.43  2012/05/11 19:29:49  pauloscustodio
@@ -370,6 +374,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include <ctype.h>
 #include "config.h"
 #include "symbol.h"
+#include "symbols.h"
 #include "z80asm.h"
 #include "hist.h"
 #include "options.h"
@@ -395,9 +400,6 @@ struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 enum symbols GetSym( void );
 long GetConstant( char *evalerr );
 int cmpidstr( symbol *kptr, symbol *p );
-int DefineSymbol( char *identifier, long value, unsigned char symboltype );
-int DefineDefSym( char *ident, long value, unsigned char symtype, avltree **root );
-symbol *CreateSymbol( char *identifier, long value, unsigned char symboltype, struct module *symowner );
 
 
 /* local functions */
@@ -525,12 +527,8 @@ AssembleSourceFile( void )
         set_oldPC();
         copy( staticroot, &CURRENTMODULE->localroot, ( int ( * )( void *, void * ) ) cmpidstr, ( void * ( * )( void * ) ) createsym );
 
-        if ( DefineDefSym( ASSEMBLERPC, get_PC(), 0, &globalroot ) == 0 )
-        {
-            /* Create standard 'ASMPC' identifier */
-            /* ERR_SYMBOL_REDEFINED - not expected */
-            throw( EarlyReturnException, "unexpected return from DefineDefSym" );
-        }
+        /* Create standard 'ASMPC' identifier */
+        DefineDefSym( ASSEMBLERPC, get_PC(), 0, &globalroot );
 
         if ( verbose )
         {
@@ -1201,12 +1199,8 @@ main( int argc, char *argv[] )
         globalroot = NULL;              /* global identifier tree initialized */
         staticroot = NULL;              /* static identifier tree initialized */
 
-        asmflag = DefineDefSym( OS_ID, 1, 0, &staticroot );
-
-        if ( !asmflag )
-        {
-            throw( IllegalArgumentException, "Failed OS_ID definition" );
-        }
+        /* define OS_ID */
+        DefineDefSym( OS_ID, 1, 0, &staticroot );
 
         /* Get command line arguments, if any... */
         if ( argc == 1 )
@@ -1289,7 +1283,6 @@ main( int argc, char *argv[] )
 
             init_codearea();            /* Pointer (PC)     to store z80 instruction */
             ERRORS = 0;
-            ASSEMBLE_ERROR = ERR_NO_ERR;        /* General error flag */
 
             if ( modsrcfile == NULL )
             {
@@ -1447,17 +1440,14 @@ again:
     {
         ReportError( NULL, 0, ERR_FILE_IO );
     }
-
     catch ( IllegalArgumentException )
     {
         ASMERROR = ON;
     }
-
     catch ( FatalErrorException )
     {
         ASMERROR = ON;
     }
-
     /* cleanup all allocated memory */
     finally
     {

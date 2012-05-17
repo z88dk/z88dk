@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.28 2012-05-12 16:57:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.29 2012-05-17 17:42:14 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.28  2012-05-12 16:57:33  pauloscustodio
+/* Revision 1.29  2012-05-17 17:42:14  pauloscustodio
+/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* always raised on error.
+/*
+/* Revision 1.28  2012/05/12 16:57:33  pauloscustodio
 /*     BUG_0016 : RCMX000 emulation routines not assembled when LIST is ON (-l)
 /*         The code "cpi" is assembled as "call rcmx_cpi" when option -RCMX000 is ON.
 /*         This is implemented by calling SetTemporaryLine() to insert new code
@@ -218,6 +222,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "config.h"
 #include "z80asm.h"
 #include "symbol.h"
+#include "symbols.h"
 #include "options.h"
 #include "errors.h"
 #include "codearea.h"
@@ -225,7 +230,6 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 /* external functions */
 void Skipline( FILE *fptr );
-int DefineSymbol( char *identifier, long value, unsigned char symboltype );
 void Subroutine_addr( int opc0, int opc );
 void JP_instr( int opc0, int opc );
 void PushPop_instr( int opcode );

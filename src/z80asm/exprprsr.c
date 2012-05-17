@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.21 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.22 2012-05-17 17:42:14 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.21  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.22  2012-05-17 17:42:14  pauloscustodio
+/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* always raised on error.
+/*
+/* Revision 1.21  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -961,7 +965,7 @@ NewPfixSymbol( struct expr *pfixexpr,
                long oprconst,
                enum symbols oprtype,
                char *symident,
-               unsigned char symtype )
+               unsigned char symboltype )
 {
     struct postfixlist *newnode;
 
@@ -972,7 +976,7 @@ NewPfixSymbol( struct expr *pfixexpr,
         newnode->operandconst = oprconst;
         newnode->operatortype = oprtype;
         newnode->nextoperand = NULL;
-        newnode->type = symtype;
+        newnode->type = symboltype;
 
         if ( symident != NULL )
         {

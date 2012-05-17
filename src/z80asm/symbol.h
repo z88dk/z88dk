@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.13 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.14 2012-05-17 17:42:14 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.13  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.14  2012-05-17 17:42:14  pauloscustodio
+/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* always raised on error.
+/*
+/* Revision 1.13  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -254,7 +258,7 @@ struct linkedmod
 #define CURRENTFILE     CURRENTMODULE->cfile
 #define ASSEMBLERPC     "ASMPC"
 
-/* Bitmasks for symtype */
+/* Bitmasks for symboltype */
 #define SYMDEFINED      1                                  /* bitmask 00000001 */
 #define SYMTOUCHED      2                                  /* bitmask 00000010 */
 #define SYMDEF          4                                  /* bitmask 00000100 */

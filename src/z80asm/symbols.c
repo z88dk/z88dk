@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.15 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.16 2012-05-17 17:42:14 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.15  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.16  2012-05-17 17:42:14  pauloscustodio
+/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* always raised on error.
+/*
+/* Revision 1.15  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -140,10 +144,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* local functions */
 symbol *GetSymPtr( char *identifier );
 symbol *FindSymbol( char *identifier, avltree *treeptr );
-symbol *CreateSymbol( char *identifier, long value, unsigned char symboltype, struct module *symowner );
-int DefineSymbol( char *identifier, long value, unsigned char symboltype );
-int DefLocalSymbol( char *identifier, long value, unsigned char symboltype );
-int DefineDefSym( char *identifier, long value, unsigned char symtype, avltree **root );
+static void DefLocalSymbol( char *identifier, long value, unsigned char symboltype );
 int cmpidstr( symbol *kptr, symbol *p );
 int cmpidval( symbol *kptr, symbol *p );
 void InsertPageRef( symbol *symptr );
@@ -154,6 +155,7 @@ void MovePageRefs( char *identifier, symbol *definedsym );
 void FreeSym( symbol *node );
 
 
+
 /* global variables */
 extern int PAGENR;
 extern enum flag pass1;
@@ -161,9 +163,9 @@ extern struct module *CURRENTMODULE;    /* pointer to current module */
 extern avltree *globalroot;
 
 
-/* CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
-symbol *
-CreateSymbol( char *identifier, long value, unsigned char symboltype, struct module *symowner )
+/* Create a new symbol
+   CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
+symbol * CreateSymbol( char *identifier, long value, unsigned char symboltype, struct module *symowner )
 {
     symbol *newsym;
 
@@ -240,8 +242,7 @@ cmpidval( symbol *kptr, symbol *p )
 /*
  * DefineSymbol will create a record in memory, inserting it into an AVL tree (or creating the first record)
  */
-int
-DefineSymbol( char *identifier,
+void DefineSymbol( char *identifier,
               long value,       /* value of symbol, label */
               unsigned char symboltype )
 {
@@ -250,7 +251,7 @@ DefineSymbol( char *identifier,
 
     if ( ( foundsymbol = FindSymbol( identifier, globalroot ) ) == NULL ) /* Symbol not declared as global/extern */
     {
-        return DefLocalSymbol( identifier, value, symboltype );
+        DefLocalSymbol( identifier, value, symboltype );
     }
     else if ( foundsymbol->type & SYMXDEF )
     {
@@ -268,29 +269,24 @@ DefineSymbol( char *identifier,
                 MovePageRefs( identifier, foundsymbol );   /* Move page references from possible forward
                                                          * referenced symbol  */
             }
-
-            return 1;
         }
         else
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier );
             /* global symbol already defined */
-            return 0;
+            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier );
         }
     }
     else
     {
-        return DefLocalSymbol( identifier, value, symboltype );
-    }      /* Extern declaration of symbol, now define
-
-                                                                 * local symbol. */
+        /* Extern declaration of symbol, now define local symbol. */
+        DefLocalSymbol( identifier, value, symboltype );
+    }      
     /* the extern symbol is now no longer accessible */
 }
 
 
 
-int
-DefLocalSymbol( char *identifier,
+static void DefLocalSymbol( char *identifier,
                 long value,     /* value of symbol, label */
                 unsigned char symboltype )
 {
@@ -301,7 +297,6 @@ DefLocalSymbol( char *identifier,
     {
         /* Symbol not declared as local */
         foundsymbol = CreateSymbol( identifier, value, symboltype | SYMLOCAL | SYMDEFINED, CURRENTMODULE );
-        E4C_ASSERT( foundsymbol != NULL );
         insert( &CURRENTMODULE->localroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
 
         if ( pass1 && symtable && listing )
@@ -330,8 +325,8 @@ DefLocalSymbol( char *identifier,
     }
     else
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier );
         /* local symbol already defined */
+        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier );
         return 0;
     }
 }
@@ -406,7 +401,6 @@ GetSymPtr( char *identifier )
                 if ( ( symbolptr = FindSymbol( identifier, CURRENTMODULE->notdeclroot ) ) == NULL )
                 {
                     symbolptr = CreateSymbol( identifier, 0, SYM_NOTDEFINED, CURRENTMODULE );
-                    E4C_ASSERT( symbolptr != NULL );
                     insert( &CURRENTMODULE->notdeclroot, symbolptr, ( int ( * )( void *, void * ) ) cmpidstr );
                 }
                 else
@@ -491,7 +485,6 @@ DeclSymGlobal( char *identifier, unsigned char libtype )
         if ( ( foundsym = FindSymbol( identifier, globalroot ) ) == NULL )
         {
             foundsym = CreateSymbol( identifier, 0, SYM_NOTDEFINED | SYMXDEF | libtype, CURRENTMODULE );
-            E4C_ASSERT( foundsym != NULL );
             insert( &globalroot, foundsym, ( int ( * )( void *, void * ) ) cmpidstr ); /* declare symbol as global */
         }
         else
@@ -527,7 +520,6 @@ DeclSymGlobal( char *identifier, unsigned char libtype )
             foundsym->type &= SYMLOCAL_OFF;
             foundsym->type |= SYMXDEF;
             clonedsym = CreateSymbol( foundsym->symname, foundsym->symvalue, foundsym->type, CURRENTMODULE );
-            E4C_ASSERT( clonedsym != NULL );
             insert( &globalroot, clonedsym, ( int ( * )( void *, void * ) ) cmpidstr );
 
             /* original local symbol cloned as global symbol, now delete old local ... */
@@ -553,7 +545,6 @@ DeclSymExtern( char *identifier, unsigned char libtype )
         if ( ( foundsym = FindSymbol( identifier, globalroot ) ) == NULL )
         {
             foundsym = CreateSymbol( identifier, 0, SYM_NOTDEFINED | SYMXREF | libtype, CURRENTMODULE );
-            E4C_ASSERT( foundsym != NULL );
             insert( &globalroot, foundsym, ( int ( * )( void *, void * ) ) cmpidstr ); /* declare symbol as extern */
         }
         else
@@ -585,7 +576,6 @@ DeclSymExtern( char *identifier, unsigned char libtype )
                 foundsym->type &= SYMLOCAL_OFF;
                 foundsym->type |= ( SYMXREF | libtype );
                 extsym = CreateSymbol( identifier, 0, foundsym->type, CURRENTMODULE );
-                E4C_ASSERT( extsym != NULL );
                 insert( &globalroot, extsym, ( int ( * )( void *, void * ) ) cmpidstr );
 
                 /* original local symbol cloned as external symbol, now delete old local ... */
@@ -681,23 +671,19 @@ InsertPageRef( symbol *symptr )
 }
 
 
-int
-DefineDefSym( char *identifier, long value, unsigned char symtype, avltree **root )
+void DefineDefSym( char *identifier, long value, unsigned char symboltype, avltree **root )
 {
     symbol *staticsym;
 
     if ( FindSymbol( identifier, *root ) == NULL )
     {
-        staticsym = CreateSymbol( identifier, value, symtype | SYMDEF | SYMDEFINED, NULL );
-        E4C_ASSERT( staticsym != NULL );
+        staticsym = CreateSymbol( identifier, value, symboltype | SYMDEF | SYMDEFINED, NULL );
         insert( root, staticsym, ( int ( * )( void *, void * ) ) cmpidstr );
-        return 1;
     }
     else
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier );
         /* Symbol already defined */
-        return 0;
+        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier );
     }
 }
 
