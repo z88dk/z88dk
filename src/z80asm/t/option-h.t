@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-h.t,v 1.2 2011-07-11 16:49:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-h.t,v 1.3 2012-05-17 21:36:06 pauloscustodio Exp $
 # $Log: option-h.t,v $
-# Revision 1.2  2011-07-11 16:49:31  pauloscustodio
+# Revision 1.3  2012-05-17 21:36:06  pauloscustodio
+# Remove global ASMERROR, redundant with TOTALERRORS.
+# Remove IllegalArgumentException, replace by FatalErrorException.
+#
+# Revision 1.2  2011/07/11 16:49:31  pauloscustodio
 # Get copyright information from hist.c
 #
 # Revision 1.1  2011/07/11 15:46:33  pauloscustodio
@@ -37,7 +41,9 @@ my($date) = 	 $hist =~ /\#define \s+ DATE      \s+ \" (.*?) \"/x;
 my($copyright) = $hist =~ /\#define \s+ COPYRIGHT \s+ \" (.*?) \"/x;
 my $copyrightmsg = "Z80 Module Assembler ".$version." (".$date."), (c) ".$copyright."\n";
 
-t_z80asm_capture("-h", $copyrightmsg . <<'END', "", 1);
+t_z80asm_capture("", $copyrightmsg, "", 0);
+
+t_z80asm_capture("-h", $copyrightmsg . <<'END', "", 0);
 z80asm [options] [ @<modulefile> | {<filename>} ]
 [] = may be ignored. {} = may be repeated. | = OR clause.
 To assemble 'fred.asm' use 'fred' or 'fred.asm'

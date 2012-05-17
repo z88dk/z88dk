@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.9 2012-05-17 20:31:45 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.10 2012-05-17 21:36:06 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.9  2012-05-17 20:31:45  pauloscustodio
+/* Revision 1.10  2012-05-17 21:36:06  pauloscustodio
+/* Remove global ASMERROR, redundant with TOTALERRORS.
+/* Remove IllegalArgumentException, replace by FatalErrorException.
+/*
+/* Revision 1.9  2012/05/17 20:31:45  pauloscustodio
 /* New errors_def.h with error name and string together, for easier maintenance
 /*
 /* Revision 1.8  2012/05/17 17:14:59  pauloscustodio
@@ -79,7 +83,6 @@ Copyright (C) Paulo Custodio, 2011
 #include "config.h"
 
 /* global variables */
-enum flag   ASMERROR        = OFF;          /* ON if error */
 int         ERRORS          = 0;            /* num errors in current source */
 int         TOTALERRORS     = 0;            /* total num errors */
 
@@ -101,7 +104,6 @@ static char *errmsg[] =
 *----------------------------------------------------------------------------*/
 void ResetErrors( void )
 {
-    ASMERROR        = OFF;
     ERRORS          = 0;
     TOTALERRORS     = 0;
 }
@@ -116,8 +118,6 @@ void ReportError( char *filename, int lineno, int errnum, ... )
     char errstr[MAXLINE], *p;
 
     va_start( argptr, errnum ); /* init variable args */
-
-    ASMERROR = ON;
 
     if ( clinemode && clineno )
     {

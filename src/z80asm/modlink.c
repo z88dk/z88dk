@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.33 2012-05-17 17:42:14 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.34 2012-05-17 21:36:06 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.33  2012-05-17 17:42:14  pauloscustodio
+/* Revision 1.34  2012-05-17 21:36:06  pauloscustodio
+/* Remove global ASMERROR, redundant with TOTALERRORS.
+/* Remove IllegalArgumentException, replace by FatalErrorException.
+/*
+/* Revision 1.33  2012/05/17 17:42:14  pauloscustodio
 /* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
 /* always raised on error.
 /*
@@ -670,7 +674,7 @@ LinkModules( void )
             printf( "Code size of linked modules is %d bytes\n", ( int )get_codesize() );
         }
 
-        if ( ASMERROR == OFF )
+        if ( TOTALERRORS == 0 )
         {
             ModuleExpr();    /*  Evaluate expressions in  all modules */
         }
@@ -1281,7 +1285,7 @@ CreateLib( void )
             errfile = NULL;
         }
 
-        if ( ASMERROR == OFF )
+        if ( TOTALERRORS == 0 )
         {
             remove( errfilename );    /*    no errors */
         }

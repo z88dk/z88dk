@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.8 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.9 2012-05-17 21:36:06 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.8  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.9  2012-05-17 21:36:06  pauloscustodio
+/* Remove global ASMERROR, redundant with TOTALERRORS.
+/* Remove IllegalArgumentException, replace by FatalErrorException.
+/*
+/* Revision 1.8  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -407,7 +411,7 @@ void SetAsmFlag( char *flagid )
     else if ( strcmp( flagid, "h" ) == 0 )
     {
         usage();
-        throw( IllegalArgumentException, "usage" );
+        throw( FatalErrorException, "usage" );
     }
 
     else

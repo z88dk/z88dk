@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.6 2012-05-17 20:31:45 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.7 2012-05-17 21:36:06 pauloscustodio Exp $ */
 /* $Log: errors.h,v $
-/* Revision 1.6  2012-05-17 20:31:45  pauloscustodio
+/* Revision 1.7  2012-05-17 21:36:06  pauloscustodio
+/* Remove global ASMERROR, redundant with TOTALERRORS.
+/* Remove IllegalArgumentException, replace by FatalErrorException.
+/*
+/* Revision 1.6  2012/05/17 20:31:45  pauloscustodio
 /* New errors_def.h with error name and string together, for easier maintenance
 /*
 /* Revision 1.5  2012/05/17 17:14:59  pauloscustodio
@@ -74,7 +78,6 @@ typedef enum ErrorCode
 #undef DEF_MSG
 
 /* global variables */
-extern enum flag    ASMERROR;           /* ON if error */
 extern int          ERRORS;             /* num errors in current source */
 extern int          TOTALERRORS;        /* total num errors */
 

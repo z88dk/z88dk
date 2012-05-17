@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.46 2012-05-17 17:49:20 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.47 2012-05-17 21:36:06 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.46  2012-05-17 17:49:20  pauloscustodio
+/* Revision 1.47  2012-05-17 21:36:06  pauloscustodio
+/* Remove global ASMERROR, redundant with TOTALERRORS.
+/* Remove IllegalArgumentException, replace by FatalErrorException.
+/*
+/* Revision 1.46  2012/05/17 17:49:20  pauloscustodio
 /* astyle
 /*
 /* Revision 1.45  2012/05/17 17:42:14  pauloscustodio
@@ -1209,7 +1213,7 @@ main( int argc, char *argv[] )
         if ( argc == 1 )
         {
             prompt();
-            throw( IllegalArgumentException, "No arguments" );
+            throw( FatalErrorException, "No arguments" );
         }
 
         time( &asmtime );
@@ -1269,7 +1273,7 @@ main( int argc, char *argv[] )
         if ( !argc && modsrcfile == NULL )
         {
             ReportError( NULL, 0, ERR_NO_SRC_FILE );
-            throw( IllegalArgumentException, "no source file" );
+            throw( FatalErrorException, "no source file" );
         }
 
         COLUMN_WIDTH = 4 * TAB_DIST;    /* define column width   for output files */
@@ -1387,7 +1391,7 @@ again:
         /* try-catch to delete lib file in case of error */
         try
         {
-            if ( createlibrary && ASMERROR == OFF )
+            if ( createlibrary && TOTALERRORS == 0 )
             {
                 CreateLib();
             }
@@ -1403,7 +1407,7 @@ again:
             {
                 fclose( libfile );
 
-                if ( ASMERROR )
+                if ( TOTALERRORS > 0 )
                 {
                     remove( libfilename );
                 }
@@ -1411,12 +1415,12 @@ again:
         }
 
 
-        if ( ( ASMERROR == OFF ) && verbose )
+        if ( ( TOTALERRORS == 0 ) && verbose )
         {
             printf( "Total of %ld lines assembled.\n", TOTALLINES );
         }
 
-        if ( ( ASMERROR == OFF ) && z80bin )
+        if ( ( TOTALERRORS == 0 ) && z80bin )
         {
             LinkModules();
         }
@@ -1443,13 +1447,8 @@ again:
     {
         ReportError( NULL, 0, ERR_FILE_IO );
     }
-    catch ( IllegalArgumentException )
-    {
-        ASMERROR = ON;
-    }
     catch ( FatalErrorException )
     {
-        ASMERROR = ON;
     }
 
     /* cleanup all allocated memory */
@@ -1509,16 +1508,12 @@ again:
 #endif
     }
 
-    if ( ASMERROR && TOTALERRORS > 0 )
+    if ( TOTALERRORS > 0 )
     {
         ReportError( NULL, 0, ERR_TOTALERRORS );
-    }
-
-    /* <djm>, if errors, then we really want to return an error number
-     * surely?
-     */
-    if ( ASMERROR )
-    {
+        /* <djm>, if errors, then we really want to return an error number
+         * surely?
+         */
         return 1;
     }
     else
