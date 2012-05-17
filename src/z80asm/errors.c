@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.7 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.8 2012-05-17 17:14:59 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.7  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.8  2012-05-17 17:14:59  pauloscustodio
+/* Remove global ASSEMBLE_ERROR, not used
+/*
+/* Revision 1.7  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -73,7 +76,6 @@ Copyright (C) Paulo Custodio, 2011
 #include "config.h"
 
 /* global variables */
-int         ASSEMBLE_ERROR  = ERR_NO_ERR;   /* > ERR_NO_ERR if error */
 enum flag   ASMERROR        = OFF;          /* ON if error */
 int         ERRORS          = 0;            /* num errors in current source */
 int         TOTALERRORS     = 0;            /* total num errors */
@@ -123,7 +125,6 @@ static char *errmsg[] =
 void ResetErrors( void )
 {
     ASMERROR        = OFF;
-    ASSEMBLE_ERROR  = ERR_NO_ERR;
     ERRORS          = 0;
     TOTALERRORS     = 0;
 }
@@ -139,7 +140,6 @@ void ReportError( char *filename, int lineno, int errnum, ... )
 
     va_start( argptr, errnum ); /* init variable args */
 
-    ASSEMBLE_ERROR = errnum;    /* set the global error variable for general error trapping */
     ASMERROR = ON;
 
     if ( clinemode && clineno )

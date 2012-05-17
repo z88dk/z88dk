@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.4 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.5 2012-05-17 17:14:59 pauloscustodio Exp $ */
 /* $Log: errors.h,v $
-/* Revision 1.4  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.5  2012-05-17 17:14:59  pauloscustodio
+/* Remove global ASSEMBLE_ERROR, not used
+/*
+/* Revision 1.4  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -96,7 +99,6 @@ enum
 };
 
 /* global variables */
-extern int          ASSEMBLE_ERROR;     /* > ERR_NO_ERR if error */
 extern enum flag    ASMERROR;           /* ON if error */
 extern int          ERRORS;             /* num errors in current source */
 extern int          TOTALERRORS;        /* total num errors */
