@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011
 Wrapper module for e4c to setup compile-time defines
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.4 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.5 2012-05-17 14:56:23 pauloscustodio Exp $ */
 /* $Log: except.h,v $
-/* Revision 1.4  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.5  2012-05-17 14:56:23  pauloscustodio
+/* New init_except() to be called at start of main(), auto cleanup atexit(), no need to call e4c_context_end()
+/*
+/* Revision 1.4  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -59,6 +62,9 @@ Wrapper module for e4c to setup compile-time defines
 #define _E4C_FUNCTION_NAME      NULL    /* gcc -O2 fails on "__extension__ __FUNCTION__" */
 
 #include "e4c.h"
+
+/* initialize exceptions */
+extern void init_except( void );
 
 /* exceptions */
 E4C_DECLARE_EXCEPTION( EarlyReturnException );

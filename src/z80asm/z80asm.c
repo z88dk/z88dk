@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.43 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.44 2012-05-17 14:56:23 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.43  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.44  2012-05-17 14:56:23  pauloscustodio
+/* New init_except() to be called at start of main(), auto cleanup atexit(), no need to call e4c_context_end()
+/*
+/* Revision 1.43  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -1175,9 +1178,8 @@ main( int argc, char *argv[] )
     int    include_level = 0;
     FILE  *includes[10];   /* 10 levels of inclusion should be enough */
 
+    init_except();                      /* init exception mechanism */
     init_memalloc();                    /* init memory leak detection */
-    e4c_context_begin( E4C_FALSE, e4c_print_exception );
-    /* init exception mechanism */
 
     /* start try..catch with finally to cleanup any allocated memory */
     try
@@ -1512,8 +1514,6 @@ again:
         lib_dir = NULL;
 #endif
     }
-
-    e4c_context_end();                  /* end exception mechanism */
 
     if ( ASMERROR && TOTALERRORS > 0 )
     {

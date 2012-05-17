@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011
 Wrapper module for e4c to setup compile-time defines
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.c,v 1.4 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.c,v 1.5 2012-05-17 14:56:23 pauloscustodio Exp $ */
 /* $Log: except.c,v $
-/* Revision 1.4  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.5  2012-05-17 14:56:23  pauloscustodio
+/* New init_except() to be called at start of main(), auto cleanup atexit(), no need to call e4c_context_end()
+/*
+/* Revision 1.4  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -48,10 +51,44 @@ Wrapper module for e4c to setup compile-time defines
 /* */
 
 #include "except.h"
+#include "types.h"
+#include "die.h"
 #include "e4c.c"
 
 /* exceptions */
 E4C_DEFINE_EXCEPTION( EarlyReturnException, "early return from function", RuntimeException );
-E4C_DEFINE_EXCEPTION( FatalErrorException,  "fatal error", RuntimeException );
+E4C_DEFINE_EXCEPTION( FatalErrorException,  "fatal error",                RuntimeException );
 E4C_DEFINE_EXCEPTION( FileIOException,      "file i/o error",             RuntimeException );
 
+/*-----------------------------------------------------------------------------
+*   fini_except
+*       Ends the exception mechanism, called by atexit()
+*----------------------------------------------------------------------------*/
+static void fini_except( void )
+{
+#ifdef EXCEPT_DEBUG
+    warn( "except: cleanup\n" );
+#endif
+    e4c_context_end();
+}
+
+/*-----------------------------------------------------------------------------
+*   init_except
+*       Initializes exception mechanism on first call, sets atexit() to
+*       end the exception mechanism.
+*       Must be called before any code that might throw an exception.
+*----------------------------------------------------------------------------*/
+void init_except( void )
+{
+    static bool initialized = FALSE;
+
+    if ( ! initialized )
+    {
+#ifdef EXCEPT_DEBUG
+        warn( "except: init\n" );
+#endif
+        e4c_context_begin( E4C_FALSE, e4c_print_exception );
+        atexit( fini_except );
+        initialized = TRUE;
+    }
+}
