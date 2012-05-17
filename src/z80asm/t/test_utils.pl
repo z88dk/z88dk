@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.10 2012-05-11 19:41:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.11 2012-05-17 15:03:37 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.10  2012-05-11 19:41:26  pauloscustodio
+# Revision 1.11  2012-05-17 15:03:37  pauloscustodio
+# Add functions to white-box test C modules by compiling and running a test C main() function
+#
+# Revision 1.10  2012/05/11 19:41:26  pauloscustodio
 # white space
 #
 # Revision 1.9  2012/04/22 20:34:13  pauloscustodio
@@ -54,43 +57,42 @@
 #
 # Common utils for tests
 
-use strict;
-use warnings;
-use Capture::Tiny::Extended 'capture';
+use Modern::Perl;
 use File::Slurp;
+use Capture::Tiny::Extended 'capture';
+use Test::Differences; 
+use List::AllUtils 'uniq';
 
 my $STOP_ON_ERR = grep {/-stop/} @ARGV; 
 my $KEEP_FILES	= grep {/-keep/} @ARGV; 
 my $test	 = "test";
 
 sub z80asm	 { $ENV{Z80ASM} || "z80asm" }
-sub asm_file {"$test.asm"}
-sub lst_file {"$test.lst"}
-sub inc_file {"$test.inc"}
-sub bin_file {"$test.bin"}
-sub map_file {"$test.map"}
-sub obj_file {"$test.obj"}
-sub lib_file {"$test.lib"}
-sub sym_file {"$test.sym"}
-sub def_file {"$test.def"}
-sub err_file {"$test.err"}
 
+my @TEST_EXT = (qw( asm lst inc bin map obj lib sym def err exe c o ));
+my @TEST_FILES = map {$test.".".$_ } @TEST_EXT;
+
+for my $ext (@TEST_EXT) {
+	eval 'sub '.$ext.'_file { return $test.".'.$ext.'"; }';
+	$@ and die $@;
+}
+
+#------------------------------------------------------------------------------
 sub unlink_testfiles {
 	my(@additional_files) = @_;
 	my $line = "[line ".((caller)[2])."]";
 	if ($KEEP_FILES) {
-		ok 0, "$line -keep : kept test files";
+		diag "$line -keep : kept test files";
 	}
 	else {
-		my @files = (asm_file(), lst_file(), inc_file(), bin_file(), map_file(), 
-					 obj_file(), lib_file(), sym_file(), def_file(), err_file(),
-					 @additional_files);
+		my @files = uniq(@TEST_FILES, @additional_files);
 		my $count = 0;
 		map {$count++ if -f} @files;
 		is unlink(@files), $count, "$line unlink $count testfiles";
 	}
 }
 
+#------------------------------------------------------------------------------
 sub t_z80asm_error {
 	my($code, $expected_err, $options) = @_;
 
@@ -126,6 +128,7 @@ sub t_z80asm_error {
 	exit 1 if $return == 0 && $STOP_ON_ERR;
 }
 
+#------------------------------------------------------------------------------
 sub t_z80asm_ok {
 	my($address_hex, $code, $expected_binary, $options) = @_;
 
@@ -155,6 +158,7 @@ sub t_z80asm_ok {
 	exit 1 if $return != 0 && $STOP_ON_ERR;
 }
 
+#------------------------------------------------------------------------------
 sub t_binary {
 	my($binary, $expected_binary, $test_name) = @_;
 	
@@ -172,9 +176,12 @@ sub t_binary {
 					 $addr, 
 					 hexdump(substr($binary, $addr, 16)),
 					 hexdump(substr($expected_binary, $addr, 16)));
+		
+		exit 1 if $STOP_ON_ERR;
 	}
 }
 
+#------------------------------------------------------------------------------
 sub t_z80asm_capture {
 	my($args, $expected_out, $expected_err, $expected_retval) = @_;
 
@@ -188,12 +195,19 @@ sub t_z80asm_capture {
 	is $stdout, $expected_out, "$line stdout";
 	is $stderr, $expected_err, "$line stderr";
 	ok !!$return == !!$expected_retval, "$line retval";
+	
+	exit 1 if $STOP_ON_ERR && 
+			  ($stdout ne $expected_out ||
+			   $stderr ne $expected_err ||
+			   !!$return != !!$expected_retval);
 }
 
+#------------------------------------------------------------------------------
 sub hexdump {
 	return join(' ', map { sprintf("%02X", ord($_)) } split(//, shift));
 }
 
+#------------------------------------------------------------------------------
 # return object file binary representation
 sub objfile {
 	my(%args) = @_;
@@ -248,6 +262,7 @@ sub objfile {
 	return $obj;
 }
 
+#------------------------------------------------------------------------------
 # store a pointer to the end of the binary object at the given address
 sub store_ptr {
 	my($robj, $addr) = @_;
@@ -256,17 +271,20 @@ sub store_ptr {
 	substr($$robj, $addr, length($packed_ptr)) = $packed_ptr;
 }
 
+#------------------------------------------------------------------------------
 sub pack_string {
 	my($string) = @_;
 	return pack("C", length($string)).uc($string);
 }
 
+#------------------------------------------------------------------------------
 sub read_binfile {
 	my($file) = @_;
 	ok -f $file, "$file exists";
 	return scalar read_file($file, binmode => ':raw');
 }
 
+#------------------------------------------------------------------------------
 # return library file binary representation
 sub libfile {
 	my(@obj_files) = @_;
@@ -282,6 +300,96 @@ sub libfile {
 	}
 
 	return $lib;
+}
+
+#------------------------------------------------------------------------------
+sub t_compile_module {
+	my($init_code, $main_code, $compile_args) = @_;
+
+	# wait for previous run to finish
+	sleep(1);
+	
+	my $cc = "cc -o test.exe test.c $compile_args";
+	note "line ", (caller)[2], ": $cc";
+	
+	# create code skeleton
+	$main_code = 
+$init_code."
+#include <stdlib.h>
+#include <stdio.h>
+int main (int argc, char **argv) {
+".$main_code."
+}
+";
+	while ($compile_args =~ /(\w+)\.[co]/ig) {
+		$main_code = 
+"#include \"$1.h\"
+".$main_code;
+	}
+	
+	write_file("test.c", $main_code);
+	my $ok = (0 == system($cc));
+	ok $ok;
+	
+	exit 1 if !$ok && $STOP_ON_ERR;
+}
+
+#------------------------------------------------------------------------------
+sub t_run_module {
+	my($args, $expected_out, $expected_err, $expected_exit) = @_;
+	
+	note "line ", (caller)[2], ": test.exe @$args";
+	my($out, $err, $exit) = capture { system("test.exe", @$args) };
+	note "line ", (caller)[2], ": exit ", $exit >> 8;
+	
+	$err = normalize($err);
+	
+	eq_or_diff_text $out, $expected_out;
+	eq_or_diff_text $err, $expected_err;
+	is !!$exit, !!$expected_exit;
+	
+	exit 1 if $STOP_ON_ERR && 
+			  ($out ne $expected_out ||
+			   $err ne $expected_err ||
+			   !!$exit != !!$expected_exit);
+}	
+
+#------------------------------------------------------------------------------
+# convert addresses to sequencial numbers
+# convert line numbers to sequencial numbers
+sub normalize {
+	my($err) = @_;
+	
+	# MAP memory addresses - map only first occurrence of each address
+	# as the OS may reuse addresses
+	my $addr_seq; 
+	for ($err) {
+		while (my($addr) = /(\b0x[0-9A-F]+\b)/i) {
+			$addr_seq++;
+		
+			# replace only first occurrence
+			s/(alloc \d+ bytes at) $addr/$1 ADDR_$addr_seq/;
+			s/(new class \w+ at) $addr/$1 ADDR_$addr_seq/;
+			s/(delete class \w+ at) $addr/$1 ADDR_$addr_seq/;
+			s/(free \d+ bytes at) $addr/$1 ADDR_$addr_seq/;
+			s/(\w+_(init|fini|copy)) $addr/$1 ADDR_$addr_seq/g;
+		}
+	}
+	
+	my %line_map;
+	while ($err =~ /((\w+\.[ch])\((\d+)\))/gi) {
+		$line_map{$2}{$3} = undef;
+	}
+	for my $file (keys %line_map) {
+		my $count;
+		for my $line (sort {$a <=> $b} keys %{$line_map{$file}}) {
+			my $new_line = ++$count;
+			$line_map{$file}{$line} = $new_line;
+			$err =~ s/$file\($line\)/$file\($new_line\)/gi;
+		}
+	}
+	
+	return $err;
 }
 
 1;
