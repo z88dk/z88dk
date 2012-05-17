@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.13 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.14 2012-05-17 14:47:39 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.13  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.14  2012-05-17 14:47:39  pauloscustodio
+/* NUM_ELEMS() moved to types.h
+/*
+/* Revision 1.13  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -91,6 +94,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include <stdlib.h>
 #include "config.h"
 #include "avltree.h"
+#include "types.h"
 
 /* snprintf is _snprintf in WIN32 */
 #ifdef WIN32
@@ -99,9 +103,6 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 
 /* maximum length of strings */
 #define MAXLINE     1024
-
-/* number of elements of an array */
-#define NUM_ELEMS(x) (sizeof(x)/sizeof(x[0]))
 
 /* default file name extensions */
 #define FILEEXT_MAX     (1+3+1)                 /* size of fileext char[]: separator + 3 chars + null */
