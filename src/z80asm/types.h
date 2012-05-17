@@ -16,16 +16,19 @@ Copyright (C) Paulo Custodio, 2011-2012
 Common types
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.1 2012-05-17 14:45:22 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.2 2012-05-17 15:10:47 pauloscustodio Exp $ */
 /* $Log: types.h,v $
-/* Revision 1.1  2012-05-17 14:45:22  pauloscustodio
+/* Revision 1.2  2012-05-17 15:10:47  pauloscustodio
+/* normalize constant for include-once #ifndef
+/*
+/* Revision 1.1  2012/05/17 14:45:22  pauloscustodio
 /* Common types
 /*
 /*
 /* */
 
-#ifndef _TYPES_H
-#define _TYPES_H
+#ifndef TYPES_H
+#define TYPES_H
 
 /* bool type and constants */
 typedef int bool;
@@ -35,4 +38,4 @@ typedef int bool;
 /* number of elements of an array */
 #define NUM_ELEMS(x) (sizeof(x)/sizeof(x[0]))
 
-#endif /* ndef _TYPES_H */
+#endif /* ndef TYPES_H */
