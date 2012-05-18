@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.26 2012-05-17 17:42:14 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.27 2012-05-18 00:20:32 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.26  2012-05-17 17:42:14  pauloscustodio
+/* Revision 1.27  2012-05-18 00:20:32  pauloscustodio
+/* ParseIndent(): remove hard coded IDs of IF, ELSE, ENDIF
+/* Z80ident[]: make always handling function the same name as assembler ident.
+/*
+/* Revision 1.26  2012/05/17 17:42:14  pauloscustodio
 /* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
 /* always raised on error.
 /*
@@ -58,8 +62,8 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
 /*
 /* Revision 1.20  2011/08/14 19:46:46  pauloscustodio
-/* - IncludeFile(), BINARY(): throw the new exception FatalErrorException for fatal error ERR_FILE_OPEN, no need to re-open the original source file after the error
-/* - IncludeFile(): no need to check for fatal error and return; bypassed by exception mechanism
+/* - INCLUDE(), BINARY(): throw the new exception FatalErrorException for fatal error ERR_FILE_OPEN, no need to re-open the original source file after the error
+/* - INCLUDE(): no need to check for fatal error and return; bypassed by exception mechanism
 /* - source_file_open flag removed; z80asmfile is used for the same purpose
 /*
 /* Revision 1.19  2011/08/05 19:37:38  pauloscustodio
@@ -182,7 +186,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* *****************  Version 7  ***************** */
 /* User: Gbs          Date: 2-05-99    Time: 18:01 */
 /* Updated in $/Z80asm */
-/* IncludeFile() now validates for recursive including of identical files. */
+/* INCLUDE() now validates for recursive including of identical files. */
 /*  */
 /* *****************  Version 5  ***************** */
 /* User: Gbs          Date: 17-04-99   Time: 0:30 */
@@ -249,8 +253,8 @@ symbol *FindSymbol( char *identifier, avltree *treeptr );
 
 /* local functions */
 void DeclModuleName( void );
-void DefSym( void );
-void UnDefineSym( void );
+void DEFINE( void );
+void UNDEFINE( void );
 
 
 /* global variables */
@@ -612,7 +616,7 @@ DEFS()
 }
 
 void
-UnDefineSym( void )
+UNDEFINE( void )
 {
     symbol *sym;
 
@@ -637,7 +641,7 @@ UnDefineSym( void )
 }
 
 void
-DefSym( void )
+DEFINE( void )
 {
     do
     {
@@ -957,7 +961,7 @@ DEFM( void )
 
 
 void
-IncludeFile( void )
+INCLUDE( void )
 {
     char    *filename;
 
@@ -979,7 +983,7 @@ IncludeFile( void )
         {
             /* Open include file */
             ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_FILE_OPEN, filename );
-            throw( FatalErrorException, "IncludeFile failed open include file" );
+            throw( FatalErrorException, "INCLUDE failed open include file" );
         }
         else
         {
@@ -1001,7 +1005,7 @@ IncludeFile( void )
             {
                 /* re-open current source file */
                 ReportError( NULL, 0, ERR_FILE_OPEN, CURRENTFILE->fname );
-                throw( FatalErrorException, "IncludeFile failed open original file" );
+                throw( FatalErrorException, "INCLUDE failed open original file" );
             }
             else
             {

@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.29 2012-05-17 17:42:14 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.30 2012-05-18 00:20:32 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.29  2012-05-17 17:42:14  pauloscustodio
+/* Revision 1.30  2012-05-18 00:20:32  pauloscustodio
+/* ParseIndent(): remove hard coded IDs of IF, ELSE, ENDIF
+/* Z80ident[]: make always handling function the same name as assembler ident.
+/*
+/* Revision 1.29  2012/05/17 17:42:14  pauloscustodio
 /* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
 /* always raised on error.
 /*
@@ -227,6 +231,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "errors.h"
 #include "codearea.h"
 #include "options.h"
+#include "types.h"
 
 /* external functions */
 void Skipline( FILE *fptr );
@@ -236,19 +241,17 @@ void PushPop_instr( int opcode );
 void RotShift_instr( int opcode );
 void BitTest_instr( int opcode );
 void ArithLog8_instr( int opcode );
-void DeclSymGlobal( char *identifier, unsigned char libtype );
-void DeclSymExtern( char *identifier, unsigned char libtype );
 void DeclModuleName( void );
-void DefSym( void );
+void DEFINE( void );
 void ifstatement( enum flag interpret );
-void DEFVARS( void ), DEFS( void ), ORG( void ), IncludeFile( void ), BINARY( void ), CALLOZ( void ), CALLPKG( void ), FPP( void );
+void DEFVARS( void ), DEFS( void ), ORG( void ), INCLUDE( void ), BINARY( void ), CALL_OZ( void ), OZ( void ), CALL_PKG( void ), FPP( void );
 void ADC( void ), ADD( void ), DEC( void ), IM( void ), IN( void ), INC( void ), INVOKE( void );
 void JR( void ), LD( void ), OUT( void ), RET( void ), SBC( void );
 void DEFB( void ), DEFC( void ), DEFM( void ), DEFW( void ), DEFL( void ), DEFP( void );
 void RST( void ), DEFGROUP( void );
 long GetConstant( char * );
 int CheckRegister8( void );
-void UnDefineSym( void );
+void UNDEFINE( void );
 
 
 /* local functions */
@@ -267,10 +270,10 @@ void RL( void ), RLA( void ), RLC( void ), RLCA( void ), RLD( void ), RR( void )
 void RRCA( void ), RRD( void );
 void SCF( void ), SET( void ), SLA( void ), SLL( void ), SRA( void );
 void SRL( void ), SUB( void ), XOR( void );
-void DeclExternIdent( void ), DeclGlobalIdent( void ), ListingOn( void ), ListingOff( void );
-void DeclLibIdent( void ), DeclGlobalLibIdent( void );
-void IFstat( void ), ELSEstat( void ), ENDIFstat( void );
-void DeclModule( void );
+void XREF( void ), XDEF( void ), LSTON( void ), LSTOFF( void );
+void LIB( void ), XLIB( void );
+void IF( void ), ELSE( void ), ENDIF( void );
+void MODULE( void );
 void LINE( void );
 void SetTemporaryLine( char *line );
 
@@ -292,109 +295,109 @@ struct Z80sym
 };
 
 
+#define DEF_ENTRY(func)     { #func, func }
 struct Z80sym Z80ident[] =
 {
-    {"ADC", ADC},                  /* 0 */
-    {"ADD", ADD},
-    {"AND", AND},
-    {"BINARY", BINARY},
-    {"BIT", BIT},
-    {"CALL", CALL},                /* 5 */
-    {"CALL_OZ", CALLOZ},
-    {"CALL_PKG", CALLPKG},
-    {"CCF", CCF},
-    {"CP", CP},
-    {"CPD", CPD},                  /* 10 */
-    {"CPDR", CPDR},
-    {"CPI", CPI},
-    {"CPIR", CPIR},
-    {"CPL", CPL},
-    {"DAA", DAA},                  /* 15 */
-    {"DEC", DEC},
-    {"DEFB", DEFB},
-    {"DEFC", DEFC},
-    {"DEFGROUP", DEFGROUP},
-    {"DEFINE", DefSym},            /* 20 */
-    {"DEFL", DEFL},
-    {"DEFM", DEFM},
-    {"DEFP", DEFP},
-    {"DEFS", DEFS},
-    {"DEFVARS", DEFVARS},          /* 25 */
-    {"DEFW", DEFW},
-    {"DI", DI},
-    {"DJNZ", DJNZ},
-    {"EI", EI},
-    {"ELSE", ELSEstat},            /* 30 */
-    {"ENDIF", ENDIFstat},
-    {"EX", EX},
-    {"EXX", EXX},
-    {"FPP", FPP},
-    {"HALT", HALT},                /* 35 */
-    {"IF", IFstat},
-    {"IM", IM},
-    {"IN", IN},
-    {"INC", INC},
-    {"INCLUDE", IncludeFile},      /* 40 */
-    {"IND", IND},
-    {"INDR", INDR},
-    {"INI", INI},
-    {"INIR", INIR},
-    {"INVOKE", INVOKE},            /* 45 */
-    {"JP", JP},
-    {"JR", JR},
-    {"LD", LD},
-    {"LDD", LDD},
-    {"LDDR", LDDR},                /* 50 */
-    {"LDI", LDI},
-    {"LDIR", LDIR},
-    {"LIB", DeclLibIdent},
-    {"LINE", LINE},
-    {"LSTOFF", ListingOff},        /* 55 */
-    {"LSTON", ListingOn},
-    {"MODULE", DeclModule},
-    {"NEG", NEG},
-    {"NOP", NOP},
-    {"OR", OR},                    /* 60 */
-    {"ORG", ORG},
-    {"OTDR", OTDR},
-    {"OTIR", OTIR},
-    {"OUT", OUT},
-    {"OUTD", OUTD},                /* 65 */
-    {"OUTI", OUTI},
-    {"OZ", CALLOZ},
-    {"POP", POP},
-    {"PUSH", PUSH},
-    {"RES", RES},                  /* 70 */
-    {"RET", RET},
-    {"RETI", RETI},
-    {"RETN", RETN},
-    {"RL", RL},
-    {"RLA", RLA},                  /* 75 */
-    {"RLC", RLC},
-    {"RLCA", RLCA},
-    {"RLD", RLD},
-    {"RR", RR},
-    {"RRA", RRA},                  /* 80 */
-    {"RRC", RRC},
-    {"RRCA", RRCA},
-    {"RRD", RRD},
-    {"RST", RST},
-    {"SBC", SBC},                  /* 85 */
-    {"SCF", SCF},
-    {"SET", SET},
-    {"SLA", SLA},
-    {"SLL", SLL},
-    {"SRA", SRA},                  /* 90 */
-    {"SRL", SRL},
-    {"SUB", SUB},
-    {"UNDEFINE", UnDefineSym},
-    {"XDEF", DeclGlobalIdent},
-    {"XLIB", DeclGlobalLibIdent},  /* 95 */
-    {"XOR", XOR},
-    {"XREF", DeclExternIdent}
+    DEF_ENTRY( ADC ),                  /* 0 */
+    DEF_ENTRY( ADD ),
+    DEF_ENTRY( AND ),
+    DEF_ENTRY( BINARY ),
+    DEF_ENTRY( BIT ),
+    DEF_ENTRY( CALL ),                /* 5 */
+    DEF_ENTRY( CALL_OZ ),
+    DEF_ENTRY( CALL_PKG ),
+    DEF_ENTRY( CCF ),
+    DEF_ENTRY( CP ),
+    DEF_ENTRY( CPD ),                  /* 10 */
+    DEF_ENTRY( CPDR ),
+    DEF_ENTRY( CPI ),
+    DEF_ENTRY( CPIR ),
+    DEF_ENTRY( CPL ),
+    DEF_ENTRY( DAA ),                  /* 15 */
+    DEF_ENTRY( DEC ),
+    DEF_ENTRY( DEFB ),
+    DEF_ENTRY( DEFC ),
+    DEF_ENTRY( DEFGROUP ),
+    DEF_ENTRY( DEFINE ),            /* 20 */
+    DEF_ENTRY( DEFL ),
+    DEF_ENTRY( DEFM ),
+    DEF_ENTRY( DEFP ),
+    DEF_ENTRY( DEFS ),
+    DEF_ENTRY( DEFVARS ),          /* 25 */
+    DEF_ENTRY( DEFW ),
+    DEF_ENTRY( DI ),
+    DEF_ENTRY( DJNZ ),
+    DEF_ENTRY( EI ),
+    DEF_ENTRY( ELSE ),            /* 30 */
+    DEF_ENTRY( ENDIF ),
+    DEF_ENTRY( EX ),
+    DEF_ENTRY( EXX ),
+    DEF_ENTRY( FPP ),
+    DEF_ENTRY( HALT ),                /* 35 */
+    DEF_ENTRY( IF ),
+    DEF_ENTRY( IM ),
+    DEF_ENTRY( IN ),
+    DEF_ENTRY( INC ),
+    DEF_ENTRY( INCLUDE ),      /* 40 */
+    DEF_ENTRY( IND ),
+    DEF_ENTRY( INDR ),
+    DEF_ENTRY( INI ),
+    DEF_ENTRY( INIR ),
+    DEF_ENTRY( INVOKE ),            /* 45 */
+    DEF_ENTRY( JP ),
+    DEF_ENTRY( JR ),
+    DEF_ENTRY( LD ),
+    DEF_ENTRY( LDD ),
+    DEF_ENTRY( LDDR ),                /* 50 */
+    DEF_ENTRY( LDI ),
+    DEF_ENTRY( LDIR ),
+    DEF_ENTRY( LIB ),
+    DEF_ENTRY( LINE ),
+    DEF_ENTRY( LSTOFF ),        /* 55 */
+    DEF_ENTRY( LSTON ),
+    DEF_ENTRY( MODULE ),
+    DEF_ENTRY( NEG ),
+    DEF_ENTRY( NOP ),
+    DEF_ENTRY( OR ),                    /* 60 */
+    DEF_ENTRY( ORG ),
+    DEF_ENTRY( OTDR ),
+    DEF_ENTRY( OTIR ),
+    DEF_ENTRY( OUT ),
+    DEF_ENTRY( OUTD ),                /* 65 */
+    DEF_ENTRY( OUTI ),
+    DEF_ENTRY( OZ ),
+    DEF_ENTRY( POP ),
+    DEF_ENTRY( PUSH ),
+    DEF_ENTRY( RES ),                  /* 70 */
+    DEF_ENTRY( RET ),
+    DEF_ENTRY( RETI ),
+    DEF_ENTRY( RETN ),
+    DEF_ENTRY( RL ),
+    DEF_ENTRY( RLA ),                  /* 75 */
+    DEF_ENTRY( RLC ),
+    DEF_ENTRY( RLCA ),
+    DEF_ENTRY( RLD ),
+    DEF_ENTRY( RR ),
+    DEF_ENTRY( RRA ),                  /* 80 */
+    DEF_ENTRY( RRC ),
+    DEF_ENTRY( RRCA ),
+    DEF_ENTRY( RRD ),
+    DEF_ENTRY( RST ),
+    DEF_ENTRY( SBC ),                  /* 85 */
+    DEF_ENTRY( SCF ),
+    DEF_ENTRY( SET ),
+    DEF_ENTRY( SLA ),
+    DEF_ENTRY( SLL ),
+    DEF_ENTRY( SRA ),                  /* 90 */
+    DEF_ENTRY( SRL ),
+    DEF_ENTRY( SUB ),
+    DEF_ENTRY( UNDEFINE ),
+    DEF_ENTRY( XDEF ),
+    DEF_ENTRY( XLIB ),  /* 95 */
+    DEF_ENTRY( XOR ),
+    DEF_ENTRY( XREF )
 };
-
-size_t totalz80id = sizeof( Z80ident ) / sizeof( Z80ident[0] );
+#undef DEF_ENTRY
 
 
 int
@@ -404,21 +407,13 @@ idcmp( const char *idptr, const struct Z80sym *symptr )
 }
 
 
-int
-SearchId( void )
+struct Z80sym * SearchId( void )
 {
     struct Z80sym *foundsym;
 
-    foundsym = ( struct Z80sym * ) bsearch( ident, Z80ident, totalz80id, sizeof( struct Z80sym ), ( fptr ) idcmp );
-
-    if ( foundsym == NULL )
-    {
-        return -1;
-    }
-    else
-    {
-        return foundsym - Z80ident;
-    }
+    foundsym = ( struct Z80sym * ) bsearch( ident, Z80ident, NUM_ELEMS(Z80ident), sizeof( struct Z80sym ), 
+                                            ( fptr ) idcmp );
+    return foundsym;
 }
 
 
@@ -426,38 +421,38 @@ SearchId( void )
 void
 ParseIdent( enum flag interpret )
 {
-    int id;
+    struct Z80sym *foundsym;
 
-    if ( ( id = SearchId() ) == -1 && interpret == ON )
+    foundsym = SearchId();
+    if ( foundsym == NULL && interpret == ON )
     {
         ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_UNKNOWN_IDENT );
     }
     else
     {
-        switch ( id )
+        if ( foundsym->z80func == IF )
         {
-            case 36:                /* IF */
-                if ( interpret == OFF )
-                {
-                    Skipline( z80asmfile );    /* skip current line until EOL */
-                }
+            if ( interpret == OFF )
+            {
+                Skipline( z80asmfile );    /* skip current line until EOL */
+            }
 
-                ifstatement( interpret );
-                break;
+            ifstatement( interpret );
+        }
+        else if ( foundsym->z80func == ELSE || 
+                  foundsym->z80func == ENDIF )
+        {
+            ( foundsym->z80func )();
+            Skipline( z80asmfile );
+        }
+        else 
+        {
+            if ( interpret == ON )
+            {
+                ( foundsym->z80func )();
+            }
 
-            case 30:                /* ELSE */
-            case 31:                /* ENDIF */
-                ( Z80ident[id].z80func )();
-                Skipline( z80asmfile );
-                break;
-
-            default:
-                if ( interpret == ON )
-                {
-                    ( Z80ident[id].z80func )();
-                }
-
-                Skipline( z80asmfile );               /* skip current line until EOL */
+            Skipline( z80asmfile );               /* skip current line until EOL */
         }
     }
 }
@@ -465,7 +460,7 @@ ParseIdent( enum flag interpret )
 
 
 void
-ListingOn( void )
+LSTON( void )
 {
     if ( listing_CPY == ON )
     {
@@ -478,7 +473,7 @@ ListingOn( void )
 
 
 void
-ListingOff( void )
+LSTOFF( void )
 {
     if ( listing_CPY == ON )
     {
@@ -504,7 +499,7 @@ void LINE( void )
 
 /* dummy function - not used */
 void
-IFstat( void )
+IF( void )
 {
 }
 
@@ -512,7 +507,7 @@ IFstat( void )
 
 
 void
-ELSEstat( void )
+ELSE( void )
 {
     sym = elsestatm;
     writeline = OFF;              /* but don't write this line in listing file */
@@ -522,7 +517,7 @@ ELSEstat( void )
 
 
 void
-ENDIFstat( void )
+ENDIF( void )
 {
     sym = endifstatm;
     writeline = OFF;              /* but don't write this line in listing file */
@@ -531,7 +526,7 @@ ENDIFstat( void )
 
 
 void
-DeclGlobalIdent( void )
+XDEF( void )
 {
     do
     {
@@ -556,7 +551,7 @@ DeclGlobalIdent( void )
 
 
 void
-DeclGlobalLibIdent( void )
+XLIB( void )
 {
     if ( GetSym() == name )
     {
@@ -573,11 +568,11 @@ DeclGlobalLibIdent( void )
 
 
 void
-DeclExternIdent( void )
+XREF( void )
 {
     if ( sdcc_hacks == ON )
     {
-        DeclLibIdent();
+        LIB();
         return;
     }
 
@@ -604,7 +599,7 @@ DeclExternIdent( void )
 
 
 void
-DeclLibIdent( void )
+LIB( void )
 {
 
     do
@@ -630,11 +625,11 @@ DeclLibIdent( void )
 
 
 void
-DeclModule( void )
+MODULE( void )
 {
     if ( force_xlib == ON )
     {
-        DeclGlobalLibIdent();
+        XLIB();
     }
     else
     {

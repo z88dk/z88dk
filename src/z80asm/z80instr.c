@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.26 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.27 2012-05-18 00:20:32 pauloscustodio Exp $ */
 /* $Log: z80instr.c,v $
-/* Revision 1.26  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.27  2012-05-18 00:20:32  pauloscustodio
+/* ParseIndent(): remove hard coded IDs of IF, ELSE, ENDIF
+/* Z80ident[]: make always handling function the same name as assembler ident.
+/*
+/* Revision 1.26  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -144,7 +148,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* *****************  Version 13  ***************** */
 /* User: Gbs          Date: 3-10-99    Time: 12:59 */
 /* Updated in $/Z80asm */
-/* Change in CALLPKG():  */
+/* Change in CALL_PKG():  */
 /* 0 is allowed as parameter. 16 bit address 8bi split using % 256 and  / */
 /* 256. */
 /*  */
@@ -686,8 +690,7 @@ RST( void )
 }
 
 
-void
-CALLOZ( void )
+void CALL_OZ( void )
 {
     long constant;
     struct expr *postfixexpr;
@@ -731,8 +734,14 @@ CALLOZ( void )
 }
 
 
+void OZ( void ) 
+{ 
+    CALL_OZ(); 
+}
+
+
 void
-CALLPKG( void )
+CALL_PKG( void )
 {
     long constant;
     struct expr *postfixexpr;
