@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.17 2012-05-17 17:49:20 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.18 2012-05-18 00:23:14 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.17  2012-05-17 17:49:20  pauloscustodio
+/* Revision 1.18  2012-05-18 00:23:14  pauloscustodio
+/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is always raised on error.
+/*
+/* Revision 1.17  2012/05/17 17:49:20  pauloscustodio
 /* astyle
 /*
 /* Revision 1.16  2012/05/17 17:42:14  pauloscustodio
@@ -152,8 +155,6 @@ int cmpidstr( symbol *kptr, symbol *p );
 int cmpidval( symbol *kptr, symbol *p );
 void InsertPageRef( symbol *symptr );
 void AppendPageRef( symbol *symptr );
-void DeclSymGlobal( char *identifier, unsigned char libtype );
-void DeclSymExtern( char *identifier, unsigned char libtype );
 void MovePageRefs( char *identifier, symbol *definedsym );
 void FreeSym( symbol *node );
 
@@ -306,8 +307,6 @@ static void DefLocalSymbol( char *identifier,
         {
             MovePageRefs( identifier, foundsymbol );    /* Move page references from forward referenced symbol */
         }
-
-        return 1;
     }
     else if ( ( foundsymbol->type & SYMDEFINED ) == 0 )
     {
@@ -323,14 +322,11 @@ static void DefLocalSymbol( char *identifier,
             MovePageRefs( identifier, foundsymbol );       /* Move page references from possible forward
                                                          * referenced symbol */
         }
-
-        return 1;
     }
     else
     {
         /* local symbol already defined */
         ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier );
-        return 0;
     }
 }
 
@@ -478,8 +474,7 @@ FindSymbol( char *identifier,   /* pointer to current identifier */
 
 
 
-void
-DeclSymGlobal( char *identifier, unsigned char libtype )
+void DeclSymGlobal( char *identifier, unsigned char libtype )
 {
     symbol *foundsym, *clonedsym;
 
@@ -503,15 +498,14 @@ DeclSymGlobal( char *identifier, unsigned char libtype )
                 }
                 else                                      /* cannot declare two identical global's */
                 {
+                    /* Already declared global */  
                     ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL_GLOBAL, identifier );
                 }
-
-                /* Already declared global */
             }
             else if ( ( foundsym->type & ( SYMXDEF | libtype ) ) != ( SYMXDEF | libtype ) )
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL, identifier );
                 /* re-declaration not allowed */
+                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL, identifier );
             }
         }
     }
@@ -530,16 +524,15 @@ DeclSymGlobal( char *identifier, unsigned char libtype )
         }
         else
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_GLOBAL, identifier );
             /* already declared global */
+            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_GLOBAL, identifier );
         }
     }
 }
 
 
 
-void
-DeclSymExtern( char *identifier, unsigned char libtype )
+void DeclSymExtern( char *identifier, unsigned char libtype )
 {
     symbol *foundsym, *extsym;
 

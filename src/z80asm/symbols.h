@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.h,v 1.4 2012-05-17 17:49:20 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.h,v 1.5 2012-05-18 00:23:14 pauloscustodio Exp $ */
 /* $Log: symbols.h,v $
-/* Revision 1.4  2012-05-17 17:49:20  pauloscustodio
+/* Revision 1.5  2012-05-18 00:23:14  pauloscustodio
+/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is always raised on error.
+/*
+/* Revision 1.4  2012/05/17 17:49:20  pauloscustodio
 /* astyle
 /*
 /* Revision 1.3  2012/05/17 17:42:14  pauloscustodio
@@ -54,5 +57,11 @@ extern void DefineSymbol( char *identifier, long value, unsigned char symboltype
 
 /* Create a symbol in the given tree, error if already defined */
 extern void DefineDefSym( char *identifier, long value, unsigned char symboltype, avltree **root );
+
+/* Declare a global symbol */
+extern void DeclSymGlobal( char *identifier, unsigned char libtype );
+
+/* Declare an external symbol */
+extern void DeclSymExtern( char *identifier, unsigned char libtype );
 
 #endif /* ndef SYMBOLS_H */

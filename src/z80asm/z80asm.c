@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.47 2012-05-17 21:36:06 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.48 2012-05-18 00:23:14 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.47  2012-05-17 21:36:06  pauloscustodio
+/* Revision 1.48  2012-05-18 00:23:14  pauloscustodio
+/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is always raised on error.
+/*
+/* Revision 1.47  2012/05/17 21:36:06  pauloscustodio
 /* Remove global ASMERROR, redundant with TOTALERRORS.
 /* Remove IllegalArgumentException, replace by FatalErrorException.
 /*
@@ -397,7 +400,6 @@ void Z80pass2( void );
 void CreateLib( void );
 void LinkModules( void );
 void DeclModuleName( void );
-void DeclSymGlobal( void );
 void FreeSym( symbol *node );
 void CreateDeffile( void );
 void WriteGlobal( symbol *node );
