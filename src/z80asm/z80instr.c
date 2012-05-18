@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.27 2012-05-18 00:20:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.28 2012-05-18 00:28:45 pauloscustodio Exp $ */
 /* $Log: z80instr.c,v $
-/* Revision 1.27  2012-05-18 00:20:32  pauloscustodio
+/* Revision 1.28  2012-05-18 00:28:45  pauloscustodio
+/* astyle
+/*
+/* Revision 1.27  2012/05/18 00:20:32  pauloscustodio
 /* ParseIndent(): remove hard coded IDs of IF, ELSE, ENDIF
 /* Z80ident[]: make always handling function the same name as assembler ident.
 /*
@@ -734,9 +737,9 @@ void CALL_OZ( void )
 }
 
 
-void OZ( void ) 
-{ 
-    CALL_OZ(); 
+void OZ( void )
+{
+    CALL_OZ();
 }
 
 

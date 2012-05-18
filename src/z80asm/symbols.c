@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.18 2012-05-18 00:23:14 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.19 2012-05-18 00:28:45 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.18  2012-05-18 00:23:14  pauloscustodio
+/* Revision 1.19  2012-05-18 00:28:45  pauloscustodio
+/* astyle
+/*
+/* Revision 1.18  2012/05/18 00:23:14  pauloscustodio
 /* DefineSymbol() and DefineDefSym() defined as void, a fatal error is always raised on error.
 /*
 /* Revision 1.17  2012/05/17 17:49:20  pauloscustodio
@@ -498,7 +501,7 @@ void DeclSymGlobal( char *identifier, unsigned char libtype )
                 }
                 else                                      /* cannot declare two identical global's */
                 {
-                    /* Already declared global */  
+                    /* Already declared global */
                     ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL_GLOBAL, identifier );
                 }
             }

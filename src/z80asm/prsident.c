@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.30 2012-05-18 00:20:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.31 2012-05-18 00:28:45 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.30  2012-05-18 00:20:32  pauloscustodio
+/* Revision 1.31  2012-05-18 00:28:45  pauloscustodio
+/* astyle
+/*
+/* Revision 1.30  2012/05/18 00:20:32  pauloscustodio
 /* ParseIndent(): remove hard coded IDs of IF, ELSE, ENDIF
 /* Z80ident[]: make always handling function the same name as assembler ident.
 /*
@@ -407,11 +410,11 @@ idcmp( const char *idptr, const struct Z80sym *symptr )
 }
 
 
-struct Z80sym * SearchId( void )
+struct Z80sym *SearchId( void )
 {
     struct Z80sym *foundsym;
 
-    foundsym = ( struct Z80sym * ) bsearch( ident, Z80ident, NUM_ELEMS(Z80ident), sizeof( struct Z80sym ), 
+    foundsym = ( struct Z80sym * ) bsearch( ident, Z80ident, NUM_ELEMS( Z80ident ), sizeof( struct Z80sym ),
                                             ( fptr ) idcmp );
     return foundsym;
 }
@@ -424,6 +427,7 @@ ParseIdent( enum flag interpret )
     struct Z80sym *foundsym;
 
     foundsym = SearchId();
+
     if ( foundsym == NULL && interpret == ON )
     {
         ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_UNKNOWN_IDENT );
@@ -439,13 +443,13 @@ ParseIdent( enum flag interpret )
 
             ifstatement( interpret );
         }
-        else if ( foundsym->z80func == ELSE || 
+        else if ( foundsym->z80func == ELSE ||
                   foundsym->z80func == ENDIF )
         {
             ( foundsym->z80func )();
             Skipline( z80asmfile );
         }
-        else 
+        else
         {
             if ( interpret == ON )
             {
