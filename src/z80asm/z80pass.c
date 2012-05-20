@@ -13,9 +13,18 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.25 2012-05-17 17:42:14 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.26 2012-05-20 06:02:09 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.25  2012-05-17 17:42:14  pauloscustodio
+/* Revision 1.26  2012-05-20 06:02:09  pauloscustodio
+/* Garbage collector
+/* Added automatic garbage collection on exit and simple fence mechanism
+/* to detect buffer underflow and overflow, to memalloc functions.
+/* No longer needed to call init_malloc().
+/* No longer need to try/catch during creation of memory structures to
+/* free partially created data - all not freed data is freed atexit().
+/* Renamed xfree0() to xfree().
+/*
+/* Revision 1.25  2012/05/17 17:42:14  pauloscustodio
 /* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
 /* always raised on error.
 /*
@@ -589,7 +598,7 @@ Z80pass2( void )
 
                     prevJR = curJR;
                     curJR = curJR->nextref;       /* get ready for next JR instruction */
-                    xfree0( prevJR );
+                    xfree( prevJR );
                 }
                 else
                 {
@@ -617,7 +626,7 @@ Z80pass2( void )
 
                         prevJR = curJR;
                         curJR = curJR->nextref;       /* get ready for JR instruction */
-                        xfree0( prevJR );
+                        xfree( prevJR );
                         break;
 
                     case RANGE_8UNSIGN:
@@ -687,8 +696,8 @@ Z80pass2( void )
         }
         while ( pass2expr != NULL );      /* re-evaluate expressions and patch in code */
 
-        xfree0( CURRENTMODULE->mexpr );   /* Release header of expressions list */
-        xfree0( CURRENTMODULE->JRaddr );  /* Release header of relative jump address list */
+        xfree( CURRENTMODULE->mexpr );   /* Release header of expressions list */
+        xfree( CURRENTMODULE->JRaddr );  /* Release header of relative jump address list */
         CURRENTMODULE->mexpr = NULL;
         CURRENTMODULE->JRaddr = NULL;
     }
@@ -915,16 +924,7 @@ Newfile( struct sourcefile *curfile, char *fname )
     struct sourcefile *ret;
 
     nfile = xcalloc_struct( struct sourcefile );
-
-    try
-    {
-        ret = Setfile( curfile, nfile, fname );
-    }
-    catch ( RuntimeException )
-    {
-        xfree0( nfile );
-        rethrow( "" );
-    }
+	ret = Setfile( curfile, nfile, fname );
 
     return ret;
 }

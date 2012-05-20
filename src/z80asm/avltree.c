@@ -13,9 +13,18 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.c,v 1.7 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.c,v 1.8 2012-05-20 06:02:08 pauloscustodio Exp $ */
 /* $Log: avltree.c,v $
-/* Revision 1.7  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.8  2012-05-20 06:02:08  pauloscustodio
+/* Garbage collector
+/* Added automatic garbage collection on exit and simple fence mechanism
+/* to detect buffer underflow and overflow, to memalloc functions.
+/* No longer needed to call init_malloc().
+/* No longer need to try/catch during creation of memory structures to
+/* free partially created data - all not freed data is freed atexit().
+/* Renamed xfree0() to xfree().
+/*
+/* Revision 1.7  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -281,7 +290,7 @@ deletemin( avltree **n, void **dataptr )
         *dataptr = ( *n )->data;  /* get pointer to data */
         temp = *n;
         *n = ( *n )->right;       /* return pointer to right subtree */
-        xfree0( temp );           /* of leftmost node                */
+        xfree( temp );           /* of leftmost node                */
     }
 
     if ( *n != NULL )
@@ -352,7 +361,7 @@ delete( avltree **n, void *key, int ( *comp )( void *, void * ), void ( *deletek
                     }
 
                     deletekey( temp->data );      /* delete node data */
-                    xfree0( temp ); /* delete avltree node */
+                    xfree( temp ); /* delete avltree node */
                 }
             }
         }
@@ -384,7 +393,7 @@ deleteall( avltree **p, void ( *deldata )( void * ) )
         deleteall( &( *p )->right, deldata );
 
         deldata( ( *p )->data );
-        xfree0( *p );
+        xfree( *p );
         *p = NULL;
     }
 }
@@ -484,7 +493,7 @@ move( avltree **p, avltree **newroot, int ( *symcmp )( void *, void * ) )
         move( &( *p )->right, newroot, symcmp );
 
         insert( newroot, ( *p )->data, symcmp );  /* insert node data by symcmp order */
-        xfree0( *p );             /* release avl-node */
+        xfree( *p );             /* release avl-node */
         *p = NULL;
     }
 }

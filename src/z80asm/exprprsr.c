@@ -13,9 +13,18 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.23 2012-05-20 05:31:18 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.24 2012-05-20 06:02:08 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.23  2012-05-20 05:31:18  pauloscustodio
+/* Revision 1.24  2012-05-20 06:02:08  pauloscustodio
+/* Garbage collector
+/* Added automatic garbage collection on exit and simple fence mechanism
+/* to detect buffer underflow and overflow, to memalloc functions.
+/* No longer needed to call init_malloc().
+/* No longer need to try/catch during creation of memory structures to
+/* free partially created data - all not freed data is freed atexit().
+/* Renamed xfree0() to xfree().
+/*
+/* Revision 1.23  2012/05/20 05:31:18  pauloscustodio
 /* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
 /*
 /* Revision 1.22  2012/05/17 17:42:14  pauloscustodio
@@ -628,56 +637,40 @@ ParseNumExpr( void )
 
     pfixhdr = xcalloc_struct( struct expr );
 
-    try
-    {
-        pfixhdr->firstnode = NULL;
-        pfixhdr->currentnode = NULL;
-        pfixhdr->rangetype = 0;
-        pfixhdr->stored = OFF;
-        pfixhdr->codepos = get_codeindex(); /* BUG_0015 */
-        pfixhdr->infixexpr = NULL;
-        pfixhdr->infixptr = NULL;
+	pfixhdr->firstnode = NULL;
+	pfixhdr->currentnode = NULL;
+	pfixhdr->rangetype = 0;
+	pfixhdr->stored = OFF;
+	pfixhdr->codepos = get_codeindex(); /* BUG_0015 */
+	pfixhdr->infixexpr = NULL;
+	pfixhdr->infixptr = NULL;
 
-        pfixhdr->infixexpr = xcalloc_n_struct( 128, char );     /* TODO: make size a constant */
+	pfixhdr->infixexpr = xcalloc_n_struct( 128, char );     /* TODO: make size a constant */
 
-        try
-        {
-            pfixhdr->infixptr = pfixhdr->infixexpr;             /* initialise pointer to start of buffer */
+	pfixhdr->infixptr = pfixhdr->infixexpr;             /* initialise pointer to start of buffer */
 
-            if ( sym == constexpr )
-            {
-                GetSym();               /* leading '#' : ignore relocatable address expression */
-                constant_expression = constexpr;        /* convert to constant expression */
-                *pfixhdr->infixptr++ = '#';
-            }
+	if ( sym == constexpr )
+	{
+		GetSym();               /* leading '#' : ignore relocatable address expression */
+		constant_expression = constexpr;        /* convert to constant expression */
+		*pfixhdr->infixptr++ = '#';
+	}
 
-            if ( Condition( pfixhdr ) )
-            {
-                /* parse expression... */
-                if ( constant_expression == constexpr )
-                {
-                    NewPfixSymbol( pfixhdr, 0, constexpr, NULL, 0 );    /* convert to constant expression */
-                }
+	if ( Condition( pfixhdr ) )
+	{
+		/* parse expression... */
+		if ( constant_expression == constexpr )
+		{
+			NewPfixSymbol( pfixhdr, 0, constexpr, NULL, 0 );    /* convert to constant expression */
+		}
 
-                *pfixhdr->infixptr = '\0';                      /* terminate infix expression */
-            }
-            else
-            {
-                RemovePfixlist( pfixhdr );
-                pfixhdr = NULL;         /* syntax error in expression or no room */
-            }                           /* for postfix expression */
-        }
-        catch ( RuntimeException )
-        {
-            xfree0( pfixhdr->infixexpr );
-            rethrow( "" );
-        }
-    }
-    catch ( RuntimeException )
-    {
-        xfree0( pfixhdr );
-        rethrow( "" );
-    }
+		*pfixhdr->infixptr = '\0';                      /* terminate infix expression */
+	}
+	else
+	{
+		RemovePfixlist( pfixhdr );
+		pfixhdr = NULL;         /* syntax error in expression or no room */
+	}                           /* for postfix expression */
 
     return pfixhdr;
 }
@@ -945,19 +938,19 @@ RemovePfixlist( struct expr *pfixexpr )
 
         if ( node->id != NULL )
         {
-            xfree0( node->id );    /* Remove symbol id, if defined */
+            xfree( node->id );    /* Remove symbol id, if defined */
         }
 
-        xfree0( node );
+        xfree( node );
         node = tmpnode;
     }
 
     if ( pfixexpr->infixexpr != NULL )
     {
-        xfree0( pfixexpr->infixexpr );    /* release infix expr. string */
+        xfree( pfixexpr->infixexpr );    /* release infix expr. string */
     }
 
-    xfree0( pfixexpr );           /* release header of postfix expression */
+    xfree( pfixexpr );           /* release header of postfix expression */
 }
 
 
@@ -974,27 +967,19 @@ NewPfixSymbol( struct expr *pfixexpr,
 
     newnode = xcalloc_struct( struct postfixlist );
 
-    try
-    {
-        newnode->operandconst = oprconst;
-        newnode->operatortype = oprtype;
-        newnode->nextoperand = NULL;
-        newnode->type = symboltype;
+	newnode->operandconst = oprconst;
+	newnode->operatortype = oprtype;
+	newnode->nextoperand = NULL;
+	newnode->type = symboltype;
 
-        if ( symident != NULL )
-        {
-            newnode->id = xstrdup( symident );    /* Allocate symbol */
-        }
-        else
-        {
-            newnode->id = NULL;
-        }
-    }
-    catch ( RuntimeException )
-    {
-        xfree0( newnode );
-        rethrow( "" );
-    }
+	if ( symident != NULL )
+	{
+		newnode->id = xstrdup( symident );    /* Allocate symbol */
+	}
+	else
+	{
+		newnode->id = NULL;
+	}
 
     if ( pfixexpr->firstnode == NULL )
     {
@@ -1033,7 +1018,7 @@ PopItem( struct pfixstack **stackpointer )
     constant = ( *stackpointer )->stackconstant;
     stackitem = *stackpointer;
     *stackpointer = ( *stackpointer )->prevstackitem;   /* move stackpointer to previous item */
-    xfree0( stackitem );                                /* return old item memory to OS */
+    xfree( stackitem );                                /* return old item memory to OS */
     return ( constant );
 }
 

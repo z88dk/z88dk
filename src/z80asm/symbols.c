@@ -13,9 +13,18 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.20 2012-05-20 05:31:18 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.21 2012-05-20 06:02:09 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.20  2012-05-20 05:31:18  pauloscustodio
+/* Revision 1.21  2012-05-20 06:02:09  pauloscustodio
+/* Garbage collector
+/* Added automatic garbage collection on exit and simple fence mechanism
+/* to detect buffer underflow and overflow, to memalloc functions.
+/* No longer needed to call init_malloc().
+/* No longer need to try/catch during creation of memory structures to
+/* free partially created data - all not freed data is freed atexit().
+/* Renamed xfree0() to xfree().
+/*
+/* Revision 1.20  2012/05/20 05:31:18  pauloscustodio
 /* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
 /*
 /* Revision 1.19  2012/05/18 00:28:45  pauloscustodio
@@ -181,49 +190,25 @@ symbol *CreateSymbol( char *identifier, long value, char symboltype, struct modu
 
     newsym = xcalloc_struct( symbol );  /* Create area for a new symbol structure */
 
-    try
-    {
-        newsym->symname = xstrdup( identifier );
+	newsym->symname = xstrdup( identifier );
 
-        /* Allocate area for a new symbol identifier */
-        try
-        {
-            if ( symtable && listing_CPY )
-            {
-                newsym->references = xcalloc_struct( struct symref );
+	/* Allocate area for a new symbol identifier */
+	if ( symtable && listing_CPY )
+	{
+		newsym->references = xcalloc_struct( struct symref );
 
-                /* Create area for a new symbol structure */
-                try
-                {
-                    newsym->references->firstref = NULL;
-                    newsym->references->lastref = NULL;
-                    /* Page reference list initialised... */
-                    AppendPageRef( newsym );
-                    /* store first page reference in listfile of this symbol */
-                }
-                catch ( RuntimeException )
-                {
-                    xfree0( newsym->references );
-                    rethrow( "" );
-                }
-            }
-            else
-            {
-                newsym->references = NULL;
-                /* No listing file, no page references... */
-            }
-        }
-        catch ( RuntimeException )
-        {
-            xfree0( newsym->symname );
-            rethrow( "" );
-        }
-    }
-    catch ( RuntimeException )
-    {
-        xfree0( newsym );
-        rethrow( "" );
-    }
+		/* Create area for a new symbol structure */
+		newsym->references->firstref = NULL;
+		newsym->references->lastref = NULL;
+		/* Page reference list initialised... */
+		AppendPageRef( newsym );
+		/* store first page reference in listfile of this symbol */
+	}
+	else
+	{
+		newsym->references = NULL;
+		/* No listing file, no page references... */
+	}
 
     newsym->owner = symowner;
     newsym->type = symboltype;
@@ -359,7 +344,7 @@ MovePageRefs( char *identifier, symbol *definedsym )
                     tmpref = tmpref->nextref;    /* get reference before last reference */
                 }
 
-                xfree0( tmpref->nextref ); /* remove redundant reference */
+                xfree( tmpref->nextref ); /* remove redundant reference */
                 tmpref->nextref = NULL;   /* end of list */
                 forwardsym->references->lastref = tmpref;         /* update pointer to last reference */
                 definedsym->references->firstref->nextref = forwardsym->references->firstref;
@@ -369,7 +354,7 @@ MovePageRefs( char *identifier, symbol *definedsym )
             }
             else
             {
-                xfree0( forwardsym->references->firstref );    /* remove the redundant reference */
+                xfree( forwardsym->references->firstref );    /* remove the redundant reference */
             }
         }
         else
@@ -380,7 +365,7 @@ MovePageRefs( char *identifier, symbol *definedsym )
             /* forward page reference list now appended  */
         }
 
-        xfree0( forwardsym->references ); /* remove pointer information to forward page reference list */
+        xfree( forwardsym->references ); /* remove pointer information to forward page reference list */
         forwardsym->references = NULL;
         /* symbol is not needed anymore, remove from symbol table of forward references */
         delete( &CURRENTMODULE->notdeclroot, forwardsym, ( int ( * )( void *, void * ) ) cmpidstr, ( void ( * )( void * ) ) FreeSym );
@@ -671,7 +656,7 @@ InsertPageRef( symbol *symptr )
                 tmpptr = tmpptr->nextref;    /* get reference before last reference */
             }
 
-            xfree0( tmpptr->nextref );    /* remove redundant reference */
+            xfree( tmpptr->nextref );    /* remove redundant reference */
             tmpptr->nextref = NULL;       /* end of list */
             symptr->references->lastref = tmpptr;         /* update pointer to last reference */
         }
@@ -712,19 +697,19 @@ FreeSym( symbol *node )
             {
                 tmpref = pref;
                 pref = pref->nextref;
-                xfree0( tmpref );
+                xfree( tmpref );
             }
         }
 
-        xfree0( node->references ); /* Then remove head/end pointer record to list */
+        xfree( node->references ); /* Then remove head/end pointer record to list */
     }
 
     if ( node->symname != NULL )
     {
-        xfree0( node->symname );    /* release symbol identifier */
+        xfree( node->symname );    /* release symbol identifier */
     }
 
-    xfree0( node );               /* then release the symbol record */
+    xfree( node );               /* then release the symbol record */
 }
 
 

@@ -13,9 +13,18 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.48 2012-05-18 00:23:14 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.49 2012-05-20 06:02:09 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.48  2012-05-18 00:23:14  pauloscustodio
+/* Revision 1.49  2012-05-20 06:02:09  pauloscustodio
+/* Garbage collector
+/* Added automatic garbage collection on exit and simple fence mechanism
+/* to detect buffer underflow and overflow, to memalloc functions.
+/* No longer needed to call init_malloc().
+/* No longer need to try/catch during creation of memory structures to
+/* free partially created data - all not freed data is freed atexit().
+/* Renamed xfree0() to xfree().
+/*
+/* Revision 1.48  2012/05/18 00:23:14  pauloscustodio
 /* DefineSymbol() and DefineDefSym() defined as void, a fatal error is always raised on error.
 /*
 /* Revision 1.47  2012/05/17 21:36:06  pauloscustodio
@@ -568,10 +577,6 @@ AssembleSourceFile( void )
             Z80pass2();
         }
     }
-    catch ( RuntimeException )
-    {
-        rethrow( "" );
-    }
 
     finally
     {
@@ -880,50 +885,26 @@ NewModule( void )
 
     newm = xcalloc_struct( struct module );
 
-    try
-    {
-        newm->nextmodule = NULL;
-        newm->mname = NULL;
-        newm->startoffset = get_codesize();
-        newm->origin = 65535;
-        newm->cfile = NULL;
-        newm->localroot = NULL;
-        newm->notdeclroot = NULL;
+	newm->nextmodule = NULL;
+	newm->mname = NULL;
+	newm->startoffset = get_codesize();
+	newm->origin = 65535;
+	newm->cfile = NULL;
+	newm->localroot = NULL;
+	newm->notdeclroot = NULL;
 
-        newm->mexpr = xcalloc_struct( struct expression );
+	newm->mexpr = xcalloc_struct( struct expression );
 
-        /* Allocate room for expression header */
-        try
-        {
-            newm->mexpr->firstexpr = NULL;
-            newm->mexpr->currexpr = NULL;
-            /* Module expression header initialised */
+	/* Allocate room for expression header */
+	newm->mexpr->firstexpr = NULL;
+	newm->mexpr->currexpr = NULL;
+	/* Module expression header initialised */
 
-            newm->JRaddr = xcalloc_struct( struct JRPC_Hdr );
+	newm->JRaddr = xcalloc_struct( struct JRPC_Hdr );
 
-            try
-            {
-                newm->JRaddr->firstref = NULL;
-                newm->JRaddr->lastref = NULL;
-                /* Module JRaddr list header initialised */
-            }
-            catch ( RuntimeException )
-            {
-                xfree0( newm->JRaddr );
-                rethrow( "" );
-            }
-        }
-        catch ( RuntimeException )
-        {
-            xfree0( newm->mexpr );
-            rethrow( "" );
-        }
-    }
-    catch ( RuntimeException )
-    {
-        xfree0( newm );
-        rethrow( "" );
-    }
+	newm->JRaddr->firstref = NULL;
+	newm->JRaddr->lastref = NULL;
+	/* Module JRaddr list header initialised */
 
     if ( modulehdr->first == NULL )
     {
@@ -1013,24 +994,24 @@ ReleaseModules( void )
             {
                 prevJR = curJR;
                 curJR = curJR->nextref; /* get ready for next JR instruction */
-                xfree0( prevJR );
+                xfree( prevJR );
             }
 
-            xfree0( curptr->JRaddr );
+            xfree( curptr->JRaddr );
             curptr->JRaddr = NULL;
         }
 
         if ( curptr->mname != NULL )
         {
-            xfree0( curptr->mname );
+            xfree( curptr->mname );
         }
 
         tmpptr = curptr;
         curptr = curptr->nextmodule;
-        xfree0( tmpptr );       /* Release module */
+        xfree( tmpptr );       /* Release module */
     }
 
-    xfree0( modulehdr );
+    xfree( modulehdr );
     modulehdr = NULL;
     CURRENTMODULE = NULL;
 }
@@ -1048,15 +1029,15 @@ ReleaseLibraries( void )
     {
         if ( curptr->libfilename != NULL )
         {
-            xfree0( curptr->libfilename );
+            xfree( curptr->libfilename );
         }
 
         tmpptr = curptr;
         curptr = curptr->nextlib;
-        xfree0( tmpptr );       /* release library */
+        xfree( tmpptr );       /* release library */
     }
 
-    xfree0( libraryhdr );       /* Release library header */
+    xfree( libraryhdr );       /* Release library header */
     libraryhdr = NULL;
 }
 
@@ -1076,7 +1057,7 @@ ReleaseExprns( struct expression *express )
         curexpr = tmpexpr;
     }
 
-    xfree0( express );
+    xfree( express );
 }
 
 
@@ -1088,8 +1069,8 @@ ReleaseFile( struct sourcefile *srcfile )
         ReleaseOwnedFile( srcfile->usedsourcefile );
     }
 
-    xfree0( srcfile->fname );   /* Release allocated area for filename */
-    xfree0( srcfile );          /* Release file information record for this file */
+    xfree( srcfile->fname );   /* Release allocated area for filename */
+    xfree( srcfile );          /* Release file information record for this file */
 }
 
 
@@ -1108,7 +1089,7 @@ ReleaseOwnedFile( struct usedfile *ownedfile )
         ReleaseFile( ownedfile->ownedsourcefile );
     }
 
-    xfree0( ownedfile );        /* Then release this owned file */
+    xfree( ownedfile );        /* Then release this owned file */
 }
 
 
@@ -1186,7 +1167,6 @@ main( int argc, char *argv[] )
     FILE  *includes[10];   /* 10 levels of inclusion should be enough */
 
     init_except();                      /* init exception mechanism */
-    init_memalloc();                    /* init memory leak detection */
 
     /* start try..catch with finally to cleanup any allocated memory */
     try
@@ -1398,11 +1378,6 @@ again:
                 CreateLib();
             }
         }
-        catch ( RuntimeException )
-        {
-            rethrow( "" );
-        }
-
         finally
         {
             if ( createlibrary )
@@ -1451,6 +1426,11 @@ again:
     }
     catch ( FatalErrorException )
     {
+		/* TOTALERRORS is already incremented */
+    }
+    catch ( RuntimeException )	/* catch all */
+    {
+		TOTALERRORS++;
     }
 
     /* cleanup all allocated memory */
@@ -1475,7 +1455,7 @@ again:
         if ( autorelocate )
             if ( reloctable != NULL )
             {
-                xfree0( reloctable );
+                xfree( reloctable );
             }
 
         /* BUG_0007 : memory leaks */
@@ -1485,10 +1465,10 @@ again:
 
             for ( i = 0; i < include_dir_num; i++ )
             {
-                xfree0( include_dir[i] );
+                xfree( include_dir[i] );
             }
 
-            xfree0( include_dir );
+            xfree( include_dir );
         }
 
         include_dir = NULL;
@@ -1500,10 +1480,10 @@ again:
 
             for ( i = 0; i < lib_dir_num; i++ )
             {
-                xfree0( lib_dir[i] );
+                xfree( lib_dir[i] );
             }
 
-            xfree0( lib_dir );
+            xfree( lib_dir );
         }
 
         lib_dir = NULL;

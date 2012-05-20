@@ -16,9 +16,18 @@ Copyright (C) Paulo Custodio, 2011
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.3 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.4 2012-05-20 06:02:08 pauloscustodio Exp $ */
 /* $Log: codearea.c,v $
-/* Revision 1.3  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.4  2012-05-20 06:02:08  pauloscustodio
+/* Garbage collector
+/* Added automatic garbage collection on exit and simple fence mechanism
+/* to detect buffer underflow and overflow, to memalloc functions.
+/* No longer needed to call init_malloc().
+/* No longer need to try/catch during creation of memory structures to
+/* free partially created data - all not freed data is freed atexit().
+/* Renamed xfree0() to xfree().
+/*
+/* Revision 1.3  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -71,7 +80,7 @@ static size_t PC, oldPC;                /* Program Counter */
 *----------------------------------------------------------------------------*/
 static void free_objfile_data( void )
 {
-    xfree0( codearea );                 /* free memory for Z80 machine code */
+    xfree( codearea );                 /* free memory for Z80 machine code */
 }
 
 /*-----------------------------------------------------------------------------

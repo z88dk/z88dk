@@ -13,9 +13,18 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.35 2012-05-20 05:31:18 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.36 2012-05-20 06:02:09 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.35  2012-05-20 05:31:18  pauloscustodio
+/* Revision 1.36  2012-05-20 06:02:09  pauloscustodio
+/* Garbage collector
+/* Added automatic garbage collection on exit and simple fence mechanism
+/* to detect buffer underflow and overflow, to memalloc functions.
+/* No longer needed to call init_malloc().
+/* No longer need to try/catch during creation of memory structures to
+/* free partially created data - all not freed data is freed atexit().
+/* Renamed xfree0() to xfree().
+/*
+/* Revision 1.35  2012/05/20 05:31:18  pauloscustodio
 /* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
 /*
 /* Revision 1.34  2012/05/17 21:36:06  pauloscustodio
@@ -813,7 +822,7 @@ LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
 
             finally
             {
-                xfree0( modname ); /* remove copy of module name */
+                xfree( modname ); /* remove copy of module name */
             }
         }
     }
@@ -893,7 +902,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
 
                 finally
                 {
-                    xfree0( mname );
+                    xfree( mname );
                 }
                 return ret;
             }
@@ -907,7 +916,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
 
                 finally
                 {
-                    xfree0( mname );
+                    xfree( mname );
                 }
                 return ret;
             }
@@ -945,61 +954,53 @@ CheckIfModuleWanted( FILE *z80asmfile, long currentlibmodule, char *modname )
     fseek( z80asmfile, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET );       /* point at module name  */
     mname = xstrdup( ReadName() );                      /* read module name */
 
-    try
-    {
-        if ( strcmp( mname, modname ) == 0 )
-        {
-            found = ON;
-        }
-        else
-        {
-            /* We didn't find the module name, lets have a look through the exported symbol list */
-            if ( fptr_name != 0 )
-            {
-                long end = fptr_libname;
-                long red = 0;
+	if ( strcmp( mname, modname ) == 0 )
+	{
+		found = ON;
+	}
+	else
+	{
+		/* We didn't find the module name, lets have a look through the exported symbol list */
+		if ( fptr_name != 0 )
+		{
+			long end = fptr_libname;
+			long red = 0;
 
-                if ( fptr_libname == -1 )
-                {
-                    end = fptr_mname;
-                }
+			if ( fptr_libname == -1 )
+			{
+				end = fptr_mname;
+			}
 
-                /* Move to the name section */
-                fseek( z80asmfile, currentlibmodule + 4 + 4 + fptr_name, SEEK_SET );
-                red = fptr_name;
+			/* Move to the name section */
+			fseek( z80asmfile, currentlibmodule + 4 + 4 + fptr_name, SEEK_SET );
+			red = fptr_name;
 
-                while ( ! found && red < end )
-                {
-                    char scope, type;
-                    long temp;
+			while ( ! found && red < end )
+			{
+				char scope, type;
+				long temp;
 
-                    scope = xfgetc( z80asmfile );
-                    red++;
-                    type = xfgetc( z80asmfile );
-                    red++;
-                    temp = xfget_long( z80asmfile );
-                    red += 4;
-                    name = ReadName();
-                    red += strlen( name );
-                    red++; /* Length byte */
+				scope = xfgetc( z80asmfile );
+				red++;
+				type = xfgetc( z80asmfile );
+				red++;
+				temp = xfget_long( z80asmfile );
+				red += 4;
+				name = ReadName();
+				red += strlen( name );
+				red++; /* Length byte */
 
-                    if ( ( scope == 'X' || scope == 'G' ) && strcmp( name, modname ) == 0 )
-                    {
-                        found = ON;
-                    }
-                }
-            }
-        }
-    }
-    catch ( RuntimeException )
-    {
-        xfree0( mname );
-        rethrow( "" );
-    }
+				if ( ( scope == 'X' || scope == 'G' ) && strcmp( name, modname ) == 0 )
+				{
+					found = ON;
+				}
+			}
+		}
+	}
 
     if ( !found )
     {
-        xfree0( mname );
+        xfree( mname );
         mname = NULL;
     }
 
@@ -1269,7 +1270,7 @@ CreateLib( void )
 
             xfput_long( Codesize, libfile );    /* size of this module */
             xfwritec( filebuffer, ( size_t ) Codesize, libfile ); /* write module to library */
-            xfree0( filebuffer );
+            xfree( filebuffer );
 
             CURRENTMODULE = CURRENTMODULE->nextmodule;
         }
@@ -1301,7 +1302,7 @@ CreateLib( void )
 
         if ( filebuffer )
         {
-            xfree0( filebuffer );
+            xfree( filebuffer );
         }
     }
 }
@@ -1323,20 +1324,11 @@ LinkTracedModule( char *filename, long baseptr )
 
     fname = xstrdup( filename );        /* get a copy module file name */
 
-    try
-    {
-        newm = xcalloc_struct( struct linkedmod );
-        newm->nextlink = NULL;
-        newm->objfilename = fname;
-        newm->modulestart = baseptr;
-        newm->moduleinfo = CURRENTMODULE;   /* pointer to current (active) module structure   */
-
-    }
-    catch ( RuntimeException )
-    {
-        xfree0( fname );
-        rethrow( "" );
-    }
+	newm = xcalloc_struct( struct linkedmod );
+	newm->nextlink = NULL;
+	newm->objfilename = fname;
+	newm->modulestart = baseptr;
+	newm->moduleinfo = CURRENTMODULE;   /* pointer to current (active) module structure   */
 
     if ( linkhdr->firstlink == NULL )
     {
@@ -1387,7 +1379,7 @@ CreateDeffile( void )
 
     finally
     {
-        xfree0( globaldefname );
+        xfree( globaldefname );
     }
 }
 
@@ -1446,7 +1438,7 @@ WriteMapFile( void )
 
     finally
     {
-        xfree0( mapfilename );
+        xfree( mapfilename );
     }
 }
 
@@ -1533,15 +1525,15 @@ ReleaseLinkInfo( void )
     {
         if ( m->objfilename != NULL )
         {
-            xfree0( m->objfilename );
+            xfree( m->objfilename );
         }
 
         n = m->nextlink;
-        xfree0( m );
+        xfree( m );
         m = n;
     }
 
-    xfree0( linkhdr );
+    xfree( linkhdr );
 
     linkhdr = NULL;
 }

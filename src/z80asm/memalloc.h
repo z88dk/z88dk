@@ -11,15 +11,26 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011
+Copyright (C) Paulo Custodio, 2011-2012
 
-Memory allocation routines to enable memory leak detection in MS Visual Studio Debug build
-Needs to be included in every source file before any other include.
+Memory allocation routines with automatic garbage collection on exit,
+Simple fence mechanism and exception thrown on out of memory.
+Only works for memory allocated by xmalloc and freed by xfree.
+Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.h,v 1.3 2012-05-11 19:29:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.h,v 1.4 2012-05-20 06:02:09 pauloscustodio Exp $ */
 /* $Log: memalloc.h,v $
-/* Revision 1.3  2012-05-11 19:29:49  pauloscustodio
+/* Revision 1.4  2012-05-20 06:02:09  pauloscustodio
+/* Garbage collector
+/* Added automatic garbage collection on exit and simple fence mechanism
+/* to detect buffer underflow and overflow, to memalloc functions.
+/* No longer needed to call init_malloc().
+/* No longer need to try/catch during creation of memory structures to
+/* free partially created data - all not freed data is freed atexit().
+/* Renamed xfree0() to xfree().
+/*
+/* Revision 1.3  2012/05/11 19:29:49  pauloscustodio
 /* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
 /*         --mode=c
 /*         --lineend=linux
@@ -46,36 +57,37 @@ Needs to be included in every source file before any other include.
 #ifndef MEMALLOC_H
 #define MEMALLOC_H
 
+/* include stdlib.h before crtdbg.h */
 #include <stdlib.h>
 #include "except.h"             /* CH_0004 : Exception mechanism to handle fatal errors */
 
 #ifdef _CRTDBG_MAP_ALLOC        /* MS Visual Studio malloc debug */
-#include <stdlib.h>
 #include <crtdbg.h>
 #endif
+#include <string.h>
+#include <stdio.h>
 
-/* init MS Visual Studio malloc debug */
-extern void init_memalloc( void );
+/*-----------------------------------------------------------------------------
+*   PUBLIC INTERFACE
+*   alloc memory
+*	throw NotEnoughMemoryException on failure
+*	throw AssertionException on buffer overruns
+*----------------------------------------------------------------------------*/
 
-extern void *_check_memalloc( void *ptr );
-extern char *_check_stralloc( void *ptr, char *source );
+extern void * _xmalloc(size_t size, char *file, int lineno);
+#define xmalloc(size)	_xmalloc((size), __FILE__, __LINE__)
 
-/* alloc memory, throw NotEnoughMemoryException on failure
- * implemented as macros to report location of allocation in memory leak report */
-#define xcalloc(num, size)      _check_memalloc(calloc((num), (size)))
+extern void * _xcalloc(int num, size_t size, char *file, int lineno);
+#define xcalloc(num, size)	_xcalloc((num), (size), __FILE__, __LINE__)
 
-#define xmalloc(size)           _check_memalloc(malloc(size))
+extern void * _xrealloc(void * memptr, size_t size, char *file, int lineno);
+#define xrealloc(memptr, size)	_xrealloc((memptr), (size), __FILE__, __LINE__)
 
-#define xrealloc(memblock, size) _check_memalloc(realloc((memblock), (size)))
+extern char * _xstrdup(char *source, char *file, int lineno);
+#define xstrdup(source)	_xstrdup((source), __FILE__, __LINE__)
 
-/* alloc length+1 bytes, init to empty string */
-#define xstralloc(length)       _check_stralloc(malloc((length)+1), NULL)
-
-/* strdup, throw NotEnoughMemoryException on failure */
-#define xstrdup(source)         ((char *) _check_memalloc(strdup(source)))
-
-/* like xstrdup, reserve additional chars for string to grow */
-extern char *xstrdup_add( char *source, int additional_chars );
+extern void _xfree(void * memptr, char *file, int lineno);
+#define xfree(memptr)	( _xfree((memptr), __FILE__, __LINE__), (memptr) = NULL )
 
 /* macro to alloc struct
  * use xcalloc for structs to make sure any new pointers
@@ -83,8 +95,4 @@ extern char *xstrdup_add( char *source, int additional_chars );
 #define xcalloc_n_struct(n, type_t)     ((type_t *) xcalloc((n), sizeof(type_t)))
 #define xcalloc_struct(type_t)          xcalloc_n_struct(1, type_t)
 
-/* macro to free if not NULL, and set pointer to NULL */
-#define xfree0(p)               do { if ((p) != NULL) { free(p); } (p) = NULL; } while (0)
-
 #endif /* ndef MEMALLOC_H */
-
