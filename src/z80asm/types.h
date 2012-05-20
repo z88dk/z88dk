@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Common types
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.2 2012-05-17 15:10:47 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.3 2012-05-20 05:59:18 pauloscustodio Exp $ */
 /* $Log: types.h,v $
-/* Revision 1.2  2012-05-17 15:10:47  pauloscustodio
+/* Revision 1.3  2012-05-20 05:59:18  pauloscustodio
+/* Add MAXLINE, WIN32 versions of snprintf, vsnprintf
+/*
+/* Revision 1.2  2012/05/17 15:10:47  pauloscustodio
 /* normalize constant for include-once #ifndef
 /*
 /* Revision 1.1  2012/05/17 14:45:22  pauloscustodio
@@ -37,5 +40,15 @@ typedef int bool;
 
 /* number of elements of an array */
 #define NUM_ELEMS(x) (sizeof(x)/sizeof(x[0]))
+
+/* maximum length of strings */
+#define MAXLINE     1024
+
+/* snprintf is _snprintf in WIN32 */
+#ifdef WIN32
+#define snprintf _snprintf
+#define vsnprintf _vsnprintf
+#endif
+
 
 #endif /* ndef TYPES_H */
