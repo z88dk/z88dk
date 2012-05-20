@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.24 2012-05-20 06:02:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.25 2012-05-20 06:39:27 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.24  2012-05-20 06:02:08  pauloscustodio
+/* Revision 1.25  2012-05-20 06:39:27  pauloscustodio
+/* astyle
+/*
+/* Revision 1.24  2012/05/20 06:02:08  pauloscustodio
 /* Garbage collector
 /* Added automatic garbage collection on exit and simple fence mechanism
 /* to detect buffer underflow and overflow, to memalloc functions.
@@ -521,9 +524,9 @@ Expression( struct expr *pfixexpr )
             if ( addsym == minus )
             {
                 NewPfixSymbol( pfixexpr, 0, negated, NULL, 0 );
-            }      /* operand is signed,
+            }
 
-                                                                                     * plus is redundant... */
+            /* operand is signed, plus is redundant... */
         }
         else
         {
@@ -535,7 +538,8 @@ Expression( struct expr *pfixexpr )
         return ( 0 );
     }
 
-    while ( ( sym == plus ) || ( sym == minus ) || ( sym == bin_and ) || ( sym == bin_or ) || ( sym == bin_xor ) )
+    while ( ( sym == plus ) || ( sym == minus ) ||
+            ( sym == bin_and ) || ( sym == bin_or ) || ( sym == bin_xor ) )
     {
         *pfixexpr->infixptr++ = separators[sym];
         addsym = sym;
@@ -637,40 +641,40 @@ ParseNumExpr( void )
 
     pfixhdr = xcalloc_struct( struct expr );
 
-	pfixhdr->firstnode = NULL;
-	pfixhdr->currentnode = NULL;
-	pfixhdr->rangetype = 0;
-	pfixhdr->stored = OFF;
-	pfixhdr->codepos = get_codeindex(); /* BUG_0015 */
-	pfixhdr->infixexpr = NULL;
-	pfixhdr->infixptr = NULL;
+    pfixhdr->firstnode = NULL;
+    pfixhdr->currentnode = NULL;
+    pfixhdr->rangetype = 0;
+    pfixhdr->stored = OFF;
+    pfixhdr->codepos = get_codeindex(); /* BUG_0015 */
+    pfixhdr->infixexpr = NULL;
+    pfixhdr->infixptr = NULL;
 
-	pfixhdr->infixexpr = xcalloc_n_struct( 128, char );     /* TODO: make size a constant */
+    pfixhdr->infixexpr = xcalloc_n_struct( 128, char );     /* TODO: make size a constant */
 
-	pfixhdr->infixptr = pfixhdr->infixexpr;             /* initialise pointer to start of buffer */
+    pfixhdr->infixptr = pfixhdr->infixexpr;             /* initialise pointer to start of buffer */
 
-	if ( sym == constexpr )
-	{
-		GetSym();               /* leading '#' : ignore relocatable address expression */
-		constant_expression = constexpr;        /* convert to constant expression */
-		*pfixhdr->infixptr++ = '#';
-	}
+    if ( sym == constexpr )
+    {
+        GetSym();               /* leading '#' : ignore relocatable address expression */
+        constant_expression = constexpr;        /* convert to constant expression */
+        *pfixhdr->infixptr++ = '#';
+    }
 
-	if ( Condition( pfixhdr ) )
-	{
-		/* parse expression... */
-		if ( constant_expression == constexpr )
-		{
-			NewPfixSymbol( pfixhdr, 0, constexpr, NULL, 0 );    /* convert to constant expression */
-		}
+    if ( Condition( pfixhdr ) )
+    {
+        /* parse expression... */
+        if ( constant_expression == constexpr )
+        {
+            NewPfixSymbol( pfixhdr, 0, constexpr, NULL, 0 );    /* convert to constant expression */
+        }
 
-		*pfixhdr->infixptr = '\0';                      /* terminate infix expression */
-	}
-	else
-	{
-		RemovePfixlist( pfixhdr );
-		pfixhdr = NULL;         /* syntax error in expression or no room */
-	}                           /* for postfix expression */
+        *pfixhdr->infixptr = '\0';                      /* terminate infix expression */
+    }
+    else
+    {
+        RemovePfixlist( pfixhdr );
+        pfixhdr = NULL;         /* syntax error in expression or no room */
+    }                           /* for postfix expression */
 
     return pfixhdr;
 }
@@ -967,19 +971,19 @@ NewPfixSymbol( struct expr *pfixexpr,
 
     newnode = xcalloc_struct( struct postfixlist );
 
-	newnode->operandconst = oprconst;
-	newnode->operatortype = oprtype;
-	newnode->nextoperand = NULL;
-	newnode->type = symboltype;
+    newnode->operandconst = oprconst;
+    newnode->operatortype = oprtype;
+    newnode->nextoperand = NULL;
+    newnode->type = symboltype;
 
-	if ( symident != NULL )
-	{
-		newnode->id = xstrdup( symident );    /* Allocate symbol */
-	}
-	else
-	{
-		newnode->id = NULL;
-	}
+    if ( symident != NULL )
+    {
+        newnode->id = xstrdup( symident );    /* Allocate symbol */
+    }
+    else
+    {
+        newnode->id = NULL;
+    }
 
     if ( pfixexpr->firstnode == NULL )
     {

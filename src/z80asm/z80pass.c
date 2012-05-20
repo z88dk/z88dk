@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.26 2012-05-20 06:02:09 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.27 2012-05-20 06:39:27 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.26  2012-05-20 06:02:09  pauloscustodio
+/* Revision 1.27  2012-05-20 06:39:27  pauloscustodio
+/* astyle
+/*
+/* Revision 1.26  2012/05/20 06:02:09  pauloscustodio
 /* Garbage collector
 /* Added automatic garbage collection on exit and simple fence mechanism
 /* to detect buffer underflow and overflow, to memalloc functions.
@@ -924,7 +927,7 @@ Newfile( struct sourcefile *curfile, char *fname )
     struct sourcefile *ret;
 
     nfile = xcalloc_struct( struct sourcefile );
-	ret = Setfile( curfile, nfile, fname );
+    ret = Setfile( curfile, nfile, fname );
 
     return ret;
 }

@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.36 2012-05-20 06:02:09 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.37 2012-05-20 06:39:27 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.36  2012-05-20 06:02:09  pauloscustodio
+/* Revision 1.37  2012-05-20 06:39:27  pauloscustodio
+/* astyle
+/*
+/* Revision 1.36  2012/05/20 06:02:09  pauloscustodio
 /* Garbage collector
 /* Added automatic garbage collection on exit and simple fence mechanism
 /* to detect buffer underflow and overflow, to memalloc functions.
@@ -366,7 +369,7 @@ ReadNames( long nextname, long endnames )
             case 'L':
                 if ( ( foundsymbol = FindSymbol( line, CURRENTMODULE->localroot ) ) == NULL )
                 {
-                    foundsymbol = CreateSymbol( line, value, (char)(symboltype | SYMLOCAL), CURRENTMODULE );
+                    foundsymbol = CreateSymbol( line, value, ( char )( symboltype | SYMLOCAL ), CURRENTMODULE );
                     insert( &CURRENTMODULE->localroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
                 }
                 else
@@ -382,7 +385,7 @@ ReadNames( long nextname, long endnames )
             case 'G':
                 if ( ( foundsymbol = FindSymbol( line, globalroot ) ) == NULL )
                 {
-                    foundsymbol = CreateSymbol( line, value, (char)(symboltype | SYMXDEF), CURRENTMODULE );
+                    foundsymbol = CreateSymbol( line, value, ( char )( symboltype | SYMXDEF ), CURRENTMODULE );
                     insert( &globalroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
                 }
                 else
@@ -398,7 +401,7 @@ ReadNames( long nextname, long endnames )
             case 'X':
                 if ( ( foundsymbol = FindSymbol( line, globalroot ) ) == NULL )
                 {
-                    foundsymbol = CreateSymbol( line, value, (char)(symboltype | SYMXDEF | SYMDEF), CURRENTMODULE );
+                    foundsymbol = CreateSymbol( line, value, ( char )( symboltype | SYMXDEF | SYMDEF ), CURRENTMODULE );
                     insert( &globalroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
                 }
                 else
@@ -954,49 +957,49 @@ CheckIfModuleWanted( FILE *z80asmfile, long currentlibmodule, char *modname )
     fseek( z80asmfile, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET );       /* point at module name  */
     mname = xstrdup( ReadName() );                      /* read module name */
 
-	if ( strcmp( mname, modname ) == 0 )
-	{
-		found = ON;
-	}
-	else
-	{
-		/* We didn't find the module name, lets have a look through the exported symbol list */
-		if ( fptr_name != 0 )
-		{
-			long end = fptr_libname;
-			long red = 0;
+    if ( strcmp( mname, modname ) == 0 )
+    {
+        found = ON;
+    }
+    else
+    {
+        /* We didn't find the module name, lets have a look through the exported symbol list */
+        if ( fptr_name != 0 )
+        {
+            long end = fptr_libname;
+            long red = 0;
 
-			if ( fptr_libname == -1 )
-			{
-				end = fptr_mname;
-			}
+            if ( fptr_libname == -1 )
+            {
+                end = fptr_mname;
+            }
 
-			/* Move to the name section */
-			fseek( z80asmfile, currentlibmodule + 4 + 4 + fptr_name, SEEK_SET );
-			red = fptr_name;
+            /* Move to the name section */
+            fseek( z80asmfile, currentlibmodule + 4 + 4 + fptr_name, SEEK_SET );
+            red = fptr_name;
 
-			while ( ! found && red < end )
-			{
-				char scope, type;
-				long temp;
+            while ( ! found && red < end )
+            {
+                char scope, type;
+                long temp;
 
-				scope = xfgetc( z80asmfile );
-				red++;
-				type = xfgetc( z80asmfile );
-				red++;
-				temp = xfget_long( z80asmfile );
-				red += 4;
-				name = ReadName();
-				red += strlen( name );
-				red++; /* Length byte */
+                scope = xfgetc( z80asmfile );
+                red++;
+                type = xfgetc( z80asmfile );
+                red++;
+                temp = xfget_long( z80asmfile );
+                red += 4;
+                name = ReadName();
+                red += strlen( name );
+                red++; /* Length byte */
 
-				if ( ( scope == 'X' || scope == 'G' ) && strcmp( name, modname ) == 0 )
-				{
-					found = ON;
-				}
-			}
-		}
-	}
+                if ( ( scope == 'X' || scope == 'G' ) && strcmp( name, modname ) == 0 )
+                {
+                    found = ON;
+                }
+            }
+        }
+    }
 
     if ( !found )
     {
@@ -1324,11 +1327,11 @@ LinkTracedModule( char *filename, long baseptr )
 
     fname = xstrdup( filename );        /* get a copy module file name */
 
-	newm = xcalloc_struct( struct linkedmod );
-	newm->nextlink = NULL;
-	newm->objfilename = fname;
-	newm->modulestart = baseptr;
-	newm->moduleinfo = CURRENTMODULE;   /* pointer to current (active) module structure   */
+    newm = xcalloc_struct( struct linkedmod );
+    newm->nextlink = NULL;
+    newm->objfilename = fname;
+    newm->modulestart = baseptr;
+    newm->moduleinfo = CURRENTMODULE;   /* pointer to current (active) module structure   */
 
     if ( linkhdr->firstlink == NULL )
     {

@@ -19,9 +19,12 @@ Only works for memory allocated by xmalloc and freed by xfree.
 Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.h,v 1.4 2012-05-20 06:02:09 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.h,v 1.5 2012-05-20 06:39:27 pauloscustodio Exp $ */
 /* $Log: memalloc.h,v $
-/* Revision 1.4  2012-05-20 06:02:09  pauloscustodio
+/* Revision 1.5  2012-05-20 06:39:27  pauloscustodio
+/* astyle
+/*
+/* Revision 1.4  2012/05/20 06:02:09  pauloscustodio
 /* Garbage collector
 /* Added automatic garbage collection on exit and simple fence mechanism
 /* to detect buffer underflow and overflow, to memalloc functions.
@@ -70,24 +73,24 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 /*-----------------------------------------------------------------------------
 *   PUBLIC INTERFACE
 *   alloc memory
-*	throw NotEnoughMemoryException on failure
-*	throw AssertionException on buffer overruns
+*   throw NotEnoughMemoryException on failure
+*   throw AssertionException on buffer overruns
 *----------------------------------------------------------------------------*/
 
-extern void * _xmalloc(size_t size, char *file, int lineno);
-#define xmalloc(size)	_xmalloc((size), __FILE__, __LINE__)
+extern void *_xmalloc( size_t size, char *file, int lineno );
+#define xmalloc(size)   _xmalloc((size), __FILE__, __LINE__)
 
-extern void * _xcalloc(int num, size_t size, char *file, int lineno);
-#define xcalloc(num, size)	_xcalloc((num), (size), __FILE__, __LINE__)
+extern void *_xcalloc( int num, size_t size, char *file, int lineno );
+#define xcalloc(num, size)  _xcalloc((num), (size), __FILE__, __LINE__)
 
-extern void * _xrealloc(void * memptr, size_t size, char *file, int lineno);
-#define xrealloc(memptr, size)	_xrealloc((memptr), (size), __FILE__, __LINE__)
+extern void *_xrealloc( void *memptr, size_t size, char *file, int lineno );
+#define xrealloc(memptr, size)  _xrealloc((memptr), (size), __FILE__, __LINE__)
 
-extern char * _xstrdup(char *source, char *file, int lineno);
-#define xstrdup(source)	_xstrdup((source), __FILE__, __LINE__)
+extern char *_xstrdup( char *source, char *file, int lineno );
+#define xstrdup(source) _xstrdup((source), __FILE__, __LINE__)
 
-extern void _xfree(void * memptr, char *file, int lineno);
-#define xfree(memptr)	( _xfree((memptr), __FILE__, __LINE__), (memptr) = NULL )
+extern void _xfree( void *memptr, char *file, int lineno );
+#define xfree(memptr)   ( _xfree((memptr), __FILE__, __LINE__), (memptr) = NULL )
 
 /* macro to alloc struct
  * use xcalloc for structs to make sure any new pointers

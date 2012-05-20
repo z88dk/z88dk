@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011
 Exit with a fatal error, warn on stderr
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.c,v 1.2 2012-05-20 06:04:18 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.c,v 1.3 2012-05-20 06:39:27 pauloscustodio Exp $ */
 /* $Log: die.c,v $
-/* Revision 1.2  2012-05-20 06:04:18  pauloscustodio
+/* Revision 1.3  2012-05-20 06:39:27  pauloscustodio
+/* astyle
+/*
+/* Revision 1.2  2012/05/20 06:04:18  pauloscustodio
 /* die() with exception instead of exit(1)
 /*
 /* Revision 1.1  2012/05/17 14:40:39  pauloscustodio
@@ -41,11 +44,11 @@ Exit with a fatal error, warn on stderr
 void die( e4c_exception_type exception, char *msg, ... )
 {
     va_list argptr;
-	char errstr[MAXLINE];
+    char errstr[MAXLINE];
 
     va_start( argptr, msg ); /* init variable args */
 
-	vsnprintf( errstr, sizeof(errstr)-1, msg, argptr );
+    vsnprintf( errstr, sizeof( errstr ) - 1, msg, argptr );
     fprintf( stderr, errstr );
     throw( exception, errstr );
 }

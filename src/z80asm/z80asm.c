@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.49 2012-05-20 06:02:09 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.50 2012-05-20 06:39:27 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.49  2012-05-20 06:02:09  pauloscustodio
+/* Revision 1.50  2012-05-20 06:39:27  pauloscustodio
+/* astyle
+/*
+/* Revision 1.49  2012/05/20 06:02:09  pauloscustodio
 /* Garbage collector
 /* Added automatic garbage collection on exit and simple fence mechanism
 /* to detect buffer underflow and overflow, to memalloc functions.
@@ -885,26 +888,26 @@ NewModule( void )
 
     newm = xcalloc_struct( struct module );
 
-	newm->nextmodule = NULL;
-	newm->mname = NULL;
-	newm->startoffset = get_codesize();
-	newm->origin = 65535;
-	newm->cfile = NULL;
-	newm->localroot = NULL;
-	newm->notdeclroot = NULL;
+    newm->nextmodule = NULL;
+    newm->mname = NULL;
+    newm->startoffset = get_codesize();
+    newm->origin = 65535;
+    newm->cfile = NULL;
+    newm->localroot = NULL;
+    newm->notdeclroot = NULL;
 
-	newm->mexpr = xcalloc_struct( struct expression );
+    newm->mexpr = xcalloc_struct( struct expression );
 
-	/* Allocate room for expression header */
-	newm->mexpr->firstexpr = NULL;
-	newm->mexpr->currexpr = NULL;
-	/* Module expression header initialised */
+    /* Allocate room for expression header */
+    newm->mexpr->firstexpr = NULL;
+    newm->mexpr->currexpr = NULL;
+    /* Module expression header initialised */
 
-	newm->JRaddr = xcalloc_struct( struct JRPC_Hdr );
+    newm->JRaddr = xcalloc_struct( struct JRPC_Hdr );
 
-	newm->JRaddr->firstref = NULL;
-	newm->JRaddr->lastref = NULL;
-	/* Module JRaddr list header initialised */
+    newm->JRaddr->firstref = NULL;
+    newm->JRaddr->lastref = NULL;
+    /* Module JRaddr list header initialised */
 
     if ( modulehdr->first == NULL )
     {
@@ -1378,6 +1381,7 @@ again:
                 CreateLib();
             }
         }
+
         finally
         {
             if ( createlibrary )
@@ -1426,11 +1430,11 @@ again:
     }
     catch ( FatalErrorException )
     {
-		/* TOTALERRORS is already incremented */
+        /* TOTALERRORS is already incremented */
     }
-    catch ( RuntimeException )	/* catch all */
+    catch ( RuntimeException )  /* catch all */
     {
-		TOTALERRORS++;
+        TOTALERRORS++;
     }
 
     /* cleanup all allocated memory */

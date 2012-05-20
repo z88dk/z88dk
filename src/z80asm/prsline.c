@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.25 2012-05-20 06:37:31 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.26 2012-05-20 06:39:27 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.25  2012-05-20 06:37:31  pauloscustodio
+/* Revision 1.26  2012-05-20 06:39:27  pauloscustodio
+/* astyle
+/*
+/* Revision 1.25  2012/05/20 06:37:31  pauloscustodio
 /* Comments on unreachable cases in GetSym()
 /*
 /* Revision 1.24  2012/05/20 05:31:18  pauloscustodio
@@ -596,7 +599,7 @@ CheckCondition( void )
 {
     int     i;
     char   *text = ident;
-	size_t len = strlen( text );
+    size_t len = strlen( text );
 
     for ( i = 0; i < sizeof( flags ) / sizeof( flags[0] ); i++ )
     {
