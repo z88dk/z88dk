@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.12 2012-05-20 05:40:00 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.13 2012-05-20 05:51:19 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.12  2012-05-20 05:40:00  pauloscustodio
+# Revision 1.13  2012-05-20 05:51:19  pauloscustodio
+# Need more test files, mask error return after exception
+#
+# Revision 1.12  2012/05/20 05:40:00  pauloscustodio
 # test asm only delete main test files before attempting to assemble, create other test files for multipl-object assembly
 #
 # Revision 1.11  2012/05/17 15:03:37  pauloscustodio
@@ -77,7 +80,7 @@ my @MAIN_TEST_FILES;
 my @TEST_FILES;
 
 for my $ext (@TEST_EXT) {
-	for my $id ("", "1", "2") {
+	for my $id ("", 1 .. 9) {
 		my $file = $test.$id.".".$ext;
 		my $sub_name = $ext.$id."_file";
 		no strict 'refs';
@@ -96,7 +99,7 @@ sub unlink_files {
 	map {$count++ if -f} @files;
 	is unlink(@files), $count, "$line unlink $count testfiles";
 }
-
+	
 #------------------------------------------------------------------------------
 sub unlink_testfiles {
 	my(@additional_files) = @_;
@@ -393,6 +396,7 @@ sub normalize {
 		}
 	}
 	
+	# map code line numbers
 	my %line_map;
 	while ($err =~ /((\w+\.[ch])\((\d+)\))/gi) {
 		$line_map{$2}{$3} = undef;
@@ -405,6 +409,9 @@ sub normalize {
 			$err =~ s/$file\($line\)/$file\($new_line\)/gi;
 		}
 	}
+	
+	# mask error number - random value on memory exception
+	$err =~ s/(The value of errno was) \d+/$1 0/gi;
 	
 	return $err;
 }
