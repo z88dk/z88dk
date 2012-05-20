@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.14 2012-05-17 14:47:39 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.15 2012-05-20 06:01:03 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.14  2012-05-17 14:47:39  pauloscustodio
+/* Revision 1.15  2012-05-20 06:01:03  pauloscustodio
+/* Moved MAXLINE, WIN32 versions of snprintf, vsnprintf to types.h
+/*
+/* Revision 1.14  2012/05/17 14:47:39  pauloscustodio
 /* NUM_ELEMS() moved to types.h
 /*
 /* Revision 1.13  2012/05/11 19:29:49  pauloscustodio
@@ -95,14 +98,6 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #include "config.h"
 #include "avltree.h"
 #include "types.h"
-
-/* snprintf is _snprintf in WIN32 */
-#ifdef WIN32
-#define snprintf _snprintf
-#endif
-
-/* maximum length of strings */
-#define MAXLINE     1024
 
 /* default file name extensions */
 #define FILEEXT_MAX     (1+3+1)                 /* size of fileext char[]: separator + 3 chars + null */
