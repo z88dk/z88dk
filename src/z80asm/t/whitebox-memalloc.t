@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.1 2012-05-20 05:48:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.2 2012-05-20 06:32:50 pauloscustodio Exp $
 # $Log: whitebox-memalloc.t,v $
-# Revision 1.1  2012-05-20 05:48:26  pauloscustodio
+# Revision 1.2  2012-05-20 06:32:50  pauloscustodio
+# Added tests
+#
+# Revision 1.1  2012/05/20 05:48:26  pauloscustodio
 # Test garbage collector
 #
 # Revision 1.1  2012/05/17 15:04:47  pauloscustodio
@@ -189,7 +192,7 @@ memalloc test.c(1): alloc 2147483680 bytes failed
 Uncaught NotEnoughMemoryException: memalloc test.c(1): alloc 2147483680 bytes failed
 
 
-    thrown at die (die.c:47)
+    thrown at die (die.c:50)
 
 The value of errno was 0.
 
@@ -212,7 +215,7 @@ memalloc test.c(1): block not found
 Uncaught AssertionException: memalloc test.c(1): block not found
 
 
-    thrown at die (die.c:47)
+    thrown at die (die.c:50)
 
 The value of errno was 0.
 
@@ -237,7 +240,7 @@ memalloc test.c(2): buffer underflow, memory allocated at test.c(1)
 Uncaught AssertionException: memalloc test.c(2): buffer underflow, memory allocated at test.c(1)
 
 
-    thrown at die (die.c:47)
+    thrown at die (die.c:50)
 
 The value of errno was 0.
 
@@ -262,7 +265,7 @@ memalloc test.c(2): buffer overflow, memory allocated at test.c(1)
 Uncaught AssertionException: memalloc test.c(2): buffer overflow, memory allocated at test.c(1)
 
 
-    thrown at die (die.c:47)
+    thrown at die (die.c:50)
 
 The value of errno was 0.
 

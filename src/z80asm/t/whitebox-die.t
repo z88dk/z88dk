@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-die.t,v 1.2 2012-05-20 05:52:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-die.t,v 1.3 2012-05-20 06:32:50 pauloscustodio Exp $
 # $Log: whitebox-die.t,v $
-# Revision 1.2  2012-05-20 05:52:10  pauloscustodio
+# Revision 1.3  2012-05-20 06:32:50  pauloscustodio
+# Added tests
+#
+# Revision 1.2  2012/05/20 05:52:10  pauloscustodio
 # Test raising exception in die
 #
 # Revision 1.1  2012/05/17 15:04:47  pauloscustodio
@@ -50,7 +53,7 @@ Hello John
 Uncaught NotEnoughMemoryException: Hello John
 
 
-    thrown at die (die.c:47)
+    thrown at die (die.c:50)
 
 The value of errno was 0.
 
