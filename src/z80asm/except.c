@@ -16,9 +16,13 @@ Copyright (C) Paulo Custodio, 2011
 Wrapper module for e4c to setup compile-time defines
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.c,v 1.5 2012-05-17 14:56:23 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.c,v 1.6 2012-05-20 05:56:37 pauloscustodio Exp $ */
 /* $Log: except.c,v $
-/* Revision 1.5  2012-05-17 14:56:23  pauloscustodio
+/* Revision 1.6  2012-05-20 05:56:37  pauloscustodio
+/* Handle the exit case after AssetionException, do not call e4c_context_end() at the
+/* exit if the context is not ready
+/*
+/* Revision 1.5  2012/05/17 14:56:23  pauloscustodio
 /* New init_except() to be called at start of main(), auto cleanup atexit(), no need to call e4c_context_end()
 /*
 /* Revision 1.4  2012/05/11 19:29:49  pauloscustodio
@@ -69,7 +73,8 @@ static void fini_except( void )
 #ifdef EXCEPT_DEBUG
     warn( "except: cleanup\n" );
 #endif
-    e4c_context_end();
+    if (e4c_context_is_ready())
+		e4c_context_end();
 }
 
 /*-----------------------------------------------------------------------------
@@ -88,6 +93,7 @@ void init_except( void )
         warn( "except: init\n" );
 #endif
         e4c_context_begin( E4C_FALSE, e4c_print_exception );
+
         atexit( fini_except );
         initialized = TRUE;
     }
