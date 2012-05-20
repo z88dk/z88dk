@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.24 2012-05-20 05:31:18 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.25 2012-05-20 06:37:31 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.24  2012-05-20 05:31:18  pauloscustodio
+/* Revision 1.25  2012-05-20 06:37:31  pauloscustodio
+/* Comments on unreachable cases in GetSym()
+/*
+/* Revision 1.24  2012/05/20 05:31:18  pauloscustodio
 /* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
 /*
 /* Revision 1.23  2012/05/12 16:54:49  pauloscustodio
@@ -323,11 +326,11 @@ GetSym( void )
             break;
 
         case '@':
-        case '%':
+        case '%':       /* not reached, as '%' is a separator */
             sym = binconst;
             break;
 
-        case '#':
+        case '#':       /* not reached, as '#' is a separator */
             sym = name;
             break;
 
