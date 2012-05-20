@@ -1,0 +1,934 @@
+<HTML>
+<HEAD>
+<TITLE>Manual Pages: queue</TITLE>
+<link rev="made" href="mailto:wosch@FreeBSD.ORG">
+<META name="robots" content="nofollow">
+</HEAD> 
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<H1><IMG  height=30 width=141 SRC="/images/smalltitle.gif" Alt="[OpenBSD]"><p><h2><font color=#e00000>Manual Pages</font><hr></h2> </H1>
+
+<FORM METHOD="GET" ACTION="/cgi-bin/man.cgi">
+<B><I>Man Page or Keyword Search:</I></B>
+<INPUT VALUE="queue" NAME="query">
+<INPUT TYPE="submit" VALUE="Submit">
+<INPUT TYPE="reset" VALUE="Reset">
+<BR>
+<INPUT NAME="apropos" VALUE="0" TYPE="RADIO" CHECKED> <A HREF="/cgi-bin/man.cgi?query=man&sektion=1&apropos=0">Man</A>
+<SELECT NAME="sektion">
+<OPTION VALUE="0">All Sections</OPTION>
+<OPTION VALUE="1">1 - General Commands</OPTION>
+<OPTION VALUE="2">2 - System Calls</OPTION>
+<OPTION VALUE="3">3 - Subroutines</OPTION>
+<OPTION VALUE="4">4 - Special Files</OPTION>
+<OPTION VALUE="5">5 - File Formats</OPTION>
+<OPTION VALUE="6">6 - Games</OPTION>
+<OPTION VALUE="7">7 - Macros and Conventions</OPTION>
+<OPTION VALUE="8">8 - Maintenance Commands</OPTION>
+<OPTION VALUE="9">9 - Kernel Interface</OPTION>
+<OPTION VALUE="n">n - New Commands</OPTION>
+</SELECT>
+<SELECT NAME="manpath">
+<OPTION VALUE="OpenBSD 2.2">OpenBSD 2.2</OPTION>
+<OPTION VALUE="OpenBSD 2.3">OpenBSD 2.3</OPTION>
+<OPTION VALUE="OpenBSD 2.4">OpenBSD 2.4</OPTION>
+<OPTION VALUE="OpenBSD 2.5">OpenBSD 2.5</OPTION>
+<OPTION VALUE="OpenBSD 2.6">OpenBSD 2.6</OPTION>
+<OPTION VALUE="OpenBSD 2.7">OpenBSD 2.7</OPTION>
+<OPTION VALUE="OpenBSD 2.8">OpenBSD 2.8</OPTION>
+<OPTION VALUE="OpenBSD 2.9">OpenBSD 2.9</OPTION>
+<OPTION VALUE="OpenBSD 3.0">OpenBSD 3.0</OPTION>
+<OPTION VALUE="OpenBSD 3.1">OpenBSD 3.1</OPTION>
+<OPTION VALUE="OpenBSD 3.2">OpenBSD 3.2</OPTION>
+<OPTION VALUE="OpenBSD 3.3">OpenBSD 3.3</OPTION>
+<OPTION VALUE="OpenBSD 3.4">OpenBSD 3.4</OPTION>
+<OPTION VALUE="OpenBSD 3.5">OpenBSD 3.5</OPTION>
+<OPTION VALUE="OpenBSD 3.6">OpenBSD 3.6</OPTION>
+<OPTION VALUE="OpenBSD 3.7">OpenBSD 3.7</OPTION>
+<OPTION VALUE="OpenBSD 3.8">OpenBSD 3.8</OPTION>
+<OPTION VALUE="OpenBSD 3.9">OpenBSD 3.9</OPTION>
+<OPTION VALUE="OpenBSD 4.0">OpenBSD 4.0</OPTION>
+<OPTION VALUE="OpenBSD 4.1">OpenBSD 4.1</OPTION>
+<OPTION VALUE="OpenBSD 4.2">OpenBSD 4.2</OPTION>
+<OPTION VALUE="OpenBSD 4.3">OpenBSD 4.3</OPTION>
+<OPTION VALUE="OpenBSD 4.4">OpenBSD 4.4</OPTION>
+<OPTION VALUE="OpenBSD 4.5">OpenBSD 4.5</OPTION>
+<OPTION VALUE="OpenBSD 4.6">OpenBSD 4.6</OPTION>
+<OPTION VALUE="OpenBSD 4.7">OpenBSD 4.7</OPTION>
+<OPTION VALUE="OpenBSD 4.8">OpenBSD 4.8</OPTION>
+<OPTION VALUE="OpenBSD 4.9">OpenBSD 4.9</OPTION>
+<OPTION SELECTED VALUE="OpenBSD Current">OpenBSD Current</OPTION>
+</SELECT>
+Architecture: <SELECT NAME="arch">
+<OPTION VALUE="alpha">alpha</OPTION>
+<OPTION VALUE="amd64">amd64</OPTION>
+<OPTION VALUE="amiga">amiga</OPTION>
+<OPTION VALUE="armish">armish</OPTION>
+<OPTION VALUE="cats">cats</OPTION>
+<OPTION VALUE="hp300">hp300</OPTION>
+<OPTION VALUE="hppa">hppa</OPTION>
+<OPTION VALUE="humppa">humppa</OPTION>
+<OPTION SELECTED VALUE="i386">i386</OPTION>
+<OPTION VALUE="landisk">landisk</OPTION>
+<OPTION VALUE="luna88k">luna88k</OPTION>
+<OPTION VALUE="mac68k">mac68k</OPTION>
+<OPTION VALUE="macppc">macppc</OPTION>
+<OPTION VALUE="mvme68k">mvme68k</OPTION>
+<OPTION VALUE="mvme88k">mvme88k</OPTION>
+<OPTION VALUE="pmax">pmax</OPTION>
+<OPTION VALUE="powerpc">powerpc</OPTION>
+<OPTION VALUE="sgi">sgi</OPTION>
+<OPTION VALUE="socppc">socppc</OPTION>
+<OPTION VALUE="sparc">sparc</OPTION>
+<OPTION VALUE="sparc64">sparc64</OPTION>
+<OPTION VALUE="sun3">sun3</OPTION>
+<OPTION VALUE="vax">vax</OPTION>
+<OPTION VALUE="wgrisc">wgrisc</OPTION>
+<OPTION VALUE="zaurus">zaurus</OPTION>
+</SELECT>
+<BR>
+<INPUT NAME="apropos" VALUE="1" TYPE="RADIO"> <A HREF="/cgi-bin/man.cgi?query=apropos&sektion=1&apropos=0">Apropos</A> Keyword Search (all sections)
+<SELECT NAME="format">
+<OPTION VALUE="html">html</OPTION>
+<OPTION VALUE="ascii">ascii</OPTION>
+<OPTION VALUE="latin1">latin1</OPTION>
+</SELECT>
+Output format
+</FORM>
+
+<A HREF="/cgi-bin/man.cgi?manpath=OpenBSD+Current">Index Page and Help</A> |
+<A HREF="/cgi-bin/man.cgi/faq.html">FAQ</A> |
+<A HREF="/cgi-bin/man.cgi/copyright.html">Copyright</A>
+<HR>
+<PRE>
+QUEUE(3)                  OpenBSD Programmer's Manual                 QUEUE(3)
+
+<a name="NAME" href="#end"><B>NAME</B></a>
+     <B>SLIST</B><I>_</I><B>ENTRY</B>, <B>SLIST</B><I>_</I><B>HEAD</B>, <B>SLIST</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>, <B>SLIST</B><I>_</I><B>FIRST</B>, <B>SLIST</B><I>_</I><B>NEXT</B>,
+     <B>SLIST</B><I>_</I><B>END</B>, <B>SLIST</B><I>_</I><B>EMPTY</B>, <B>SLIST</B><I>_</I><B>FOREACH</B>, <B>SLIST</B><I>_</I><B>FOREACH</B><I>_</I><B>PREVPTR</B>, <B>SLIST</B><I>_</I><B>INIT</B>,
+     <B>SLIST</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>, <B>SLIST</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>, <B>SLIST</B><I>_</I><B>REMOVE</B><I>_</I><B>HEAD</B>,
+     <B>SLIST</B><I>_</I><B>REMOVE</B><I>_</I><B>NEXT</B>, <B>SLIST</B><I>_</I><B>REMOVE</B>, <B>LIST</B><I>_</I><B>ENTRY</B>, <B>LIST</B><I>_</I><B>HEAD</B>,
+     <B>LIST</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>, <B>LIST</B><I>_</I><B>FIRST</B>, <B>LIST</B><I>_</I><B>NEXT</B>, <B>LIST</B><I>_</I><B>END</B>, <B>LIST</B><I>_</I><B>EMPTY</B>,
+     <B>LIST</B><I>_</I><B>FOREACH</B>, <B>LIST</B><I>_</I><B>INIT</B>, <B>LIST</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>, <B>LIST</B><I>_</I><B>INSERT</B><I>_</I><B>BEFORE</B>,
+     <B>LIST</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>, <B>LIST</B><I>_</I><B>REMOVE</B>, <B>LIST</B><I>_</I><B>REPLACE</B>, <B>SIMPLEQ</B><I>_</I><B>ENTRY</B>, <B>SIMPLEQ</B><I>_</I><B>HEAD</B>,
+     <B>SIMPLEQ</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>, <B>SIMPLEQ</B><I>_</I><B>FIRST</B>, <B>SIMPLEQ</B><I>_</I><B>NEXT</B>, <B>SIMPLEQ</B><I>_</I><B>END</B>,
+     <B>SIMPLEQ</B><I>_</I><B>EMPTY</B>, <B>SIMPLEQ</B><I>_</I><B>FOREACH</B>, <B>SIMPLEQ</B><I>_</I><B>INIT</B>, <B>SIMPLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>,
+     <B>SIMPLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>TAIL</B>, <B>SIMPLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>, <B>SIMPLEQ</B><I>_</I><B>REMOVE</B><I>_</I><B>HEAD</B>,
+     <B>TAILQ</B><I>_</I><B>ENTRY</B>, <B>TAILQ</B><I>_</I><B>HEAD</B>, <B>TAILQ</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>, <B>TAILQ</B><I>_</I><B>FIRST</B>, <B>TAILQ</B><I>_</I><B>NEXT</B>,
+     <B>TAILQ</B><I>_</I><B>END</B>, <B>TAILQ</B><I>_</I><B>LAST</B>, <B>TAILQ</B><I>_</I><B>PREV</B>, <B>TAILQ</B><I>_</I><B>EMPTY</B>, <B>TAILQ</B><I>_</I><B>FOREACH</B>,
+     <B>TAILQ</B><I>_</I><B>FOREACH</B><I>_</I><B>REVERSE</B>, <B>TAILQ</B><I>_</I><B>INIT</B>, <B>TAILQ</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>,
+     <B>TAILQ</B><I>_</I><B>INSERT</B><I>_</I><B>BEFORE</B>, <B>TAILQ</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>, <B>TAILQ</B><I>_</I><B>INSERT</B><I>_</I><B>TAIL</B>, <B>TAILQ</B><I>_</I><B>REMOVE</B>,
+     <B>TAILQ</B><I>_</I><B>REPLACE</B>, <B>CIRCLEQ</B><I>_</I><B>ENTRY</B>, <B>CIRCLEQ</B><I>_</I><B>HEAD</B>, <B>CIRCLEQ</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>,
+     <B>CIRCLEQ</B><I>_</I><B>FIRST</B>, <B>CIRCLEQ</B><I>_</I><B>LAST</B>, <B>CIRCLEQ</B><I>_</I><B>END</B>, <B>CIRCLEQ</B><I>_</I><B>NEXT</B>, <B>CIRCLEQ</B><I>_</I><B>PREV</B>,
+     <B>CIRCLEQ</B><I>_</I><B>EMPTY</B>, <B>CIRCLEQ</B><I>_</I><B>FOREACH</B>, <B>CIRCLEQ</B><I>_</I><B>FOREACH</B><I>_</I><B>REVERSE</B>, <B>CIRCLEQ</B><I>_</I><B>INIT</B>,
+     <B>CIRCLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>, <B>CIRCLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>BEFORE</B>, <B>CIRCLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>,
+     <B>CIRCLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>TAIL</B>, <B>CIRCLEQ</B><I>_</I><B>REMOVE</B>, <B>CIRCLEQ</B><I>_</I><B>REPLACE</B> - implementations of
+     singly-linked lists, doubly-linked lists, simple queues, tail queues, and
+     circular queues
+
+<a name="SYNOPSIS" href="#end"><B>SYNOPSIS</B></a>
+     <B>#include</B> &lt;<B><A HREF="/cgi-bin/man.cgi/usr/include/sys/queue.h">sys/queue.h</A></B>&gt;
+
+     <B>SLIST</B><I>_</I><B>ENTRY</B>(<I>TYPE</I>);
+
+     <B>SLIST</B><I>_</I><B>HEAD</B>(<I>HEADNAME</I>, <I>TYPE</I>);
+
+     <B>SLIST</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>(<I>SLIST_HEAD</I> <I>head</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>SLIST</B><I>_</I><B>FIRST</B>(<I>SLIST_HEAD</I> <I>*head</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>SLIST</B><I>_</I><B>NEXT</B>(<I>struct</I> <I>TYPE</I> <I>*listelm</I>, <I>SLIST_ENTRY</I> <I>NAME</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>SLIST</B><I>_</I><B>END</B>(<I>SLIST_HEAD</I> <I>*head</I>);
+
+     <I>int</I>
+     <B>SLIST</B><I>_</I><B>EMPTY</B>(<I>SLIST_HEAD</I> <I>*head</I>);
+
+     <B>SLIST</B><I>_</I><B>FOREACH</B>(<I>VARNAME</I>, <I>SLIST_HEAD</I> <I>*head</I>, <I>SLIST_ENTRY</I> <I>NAME</I>);
+
+     <B>SLIST</B><I>_</I><B>FOREACH</B><I>_</I><B>PREVPTR</B>(<I>VARNAME</I>, <I>VARNAMEP</I>, <I>SLIST_HEAD</I> <I>*head</I>,
+             <I>SLIST_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>SLIST</B><I>_</I><B>INIT</B>(<I>SLIST_HEAD</I> <I>*head</I>);
+
+     <I>void</I>
+     <B>SLIST</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>(<I>struct</I> <I>TYPE</I> <I>*listelm</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>,
+             <I>SLIST_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>SLIST</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>(<I>SLIST_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>SLIST_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>SLIST</B><I>_</I><B>REMOVE</B><I>_</I><B>HEAD</B>(<I>SLIST_HEAD</I> <I>*head</I>, <I>SLIST_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>SLIST</B><I>_</I><B>REMOVE</B><I>_</I><B>NEXT</B>(<I>SLIST_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>SLIST_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>SLIST</B><I>_</I><B>REMOVE</B>(<I>SLIST_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>TYPE</I>, <I>SLIST_ENTRY</I> <I>NAME</I>);
+
+     <B>LIST</B><I>_</I><B>ENTRY</B>(<I>TYPE</I>);
+
+     <B>LIST</B><I>_</I><B>HEAD</B>(<I>HEADNAME</I>, <I>TYPE</I>);
+
+     <B>LIST</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>(<I>LIST_HEAD</I> <I>head</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>LIST</B><I>_</I><B>FIRST</B>(<I>LIST_HEAD</I> <I>*head</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>LIST</B><I>_</I><B>NEXT</B>(<I>struct</I> <I>TYPE</I> <I>*listelm</I>, <I>LIST_ENTRY</I> <I>NAME</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>LIST</B><I>_</I><B>END</B>(<I>LIST_HEAD</I> <I>*head</I>);
+
+     <I>int</I>
+     <B>LIST</B><I>_</I><B>EMPTY</B>(<I>LIST_HEAD</I> <I>*head</I>);
+
+     <B>LIST</B><I>_</I><B>FOREACH</B>(<I>VARNAME</I>, <I>LIST_HEAD</I> <I>*head</I>, <I>LIST_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>LIST</B><I>_</I><B>INIT</B>(<I>LIST_HEAD</I> <I>*head</I>);
+
+     <I>void</I>
+     <B>LIST</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>(<I>struct</I> <I>TYPE</I> <I>*listelm</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>,
+             <I>LIST_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>LIST</B><I>_</I><B>INSERT</B><I>_</I><B>BEFORE</B>(<I>struct</I> <I>TYPE</I> <I>*listelm</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>,
+             <I>LIST_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>LIST</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>(<I>LIST_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>LIST_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>LIST</B><I>_</I><B>REMOVE</B>(<I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>LIST_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>LIST</B><I>_</I><B>REPLACE</B>(<I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>struct</I> <I>TYPE</I> <I>*elm2</I>, <I>LIST_ENTRY</I> <I>NAME</I>);
+
+     <B>SIMPLEQ</B><I>_</I><B>ENTRY</B>(<I>TYPE</I>);
+
+     <B>SIMPLEQ</B><I>_</I><B>HEAD</B>(<I>HEADNAME</I>, <I>TYPE</I>);
+
+     <B>SIMPLEQ</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>(<I>SIMPLEQ_HEAD</I> <I>head</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>SIMPLEQ</B><I>_</I><B>FIRST</B>(<I>SIMPLEQ_HEAD</I> <I>*head</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>SIMPLEQ</B><I>_</I><B>NEXT</B>(<I>struct</I> <I>TYPE</I> <I>*listelm</I>, <I>SIMPLEQ_ENTRY</I> <I>NAME</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>SIMPLEQ</B><I>_</I><B>END</B>(<I>SIMPLEQ_HEAD</I> <I>*head</I>);
+
+     <I>int</I>
+     <B>SIMPLEQ</B><I>_</I><B>EMPTY</B>(<I>SIMPLEQ_HEAD</I> <I>*head</I>);
+
+     <B>SIMPLEQ</B><I>_</I><B>FOREACH</B>(<I>VARNAME</I>, <I>SIMPLEQ_HEAD</I> <I>*head</I>, <I>SIMPLEQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>SIMPLEQ</B><I>_</I><B>INIT</B>(<I>SIMPLEQ_HEAD</I> <I>*head</I>);
+
+     <I>void</I>
+     <B>SIMPLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>(<I>SIMPLEQ_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>,
+             <I>SIMPLEQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>SIMPLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>TAIL</B>(<I>SIMPLEQ_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>,
+             <I>SIMPLEQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>SIMPLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>(<I>SIMPLEQ_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*listelm</I>,
+             <I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>SIMPLEQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>SIMPLEQ</B><I>_</I><B>REMOVE</B><I>_</I><B>HEAD</B>(<I>SIMPLEQ_HEAD</I> <I>*head</I>, <I>SIMPLEQ_ENTRY</I> <I>NAME</I>);
+
+     <B>TAILQ</B><I>_</I><B>ENTRY</B>(<I>TYPE</I>);
+
+     <B>TAILQ</B><I>_</I><B>HEAD</B>(<I>HEADNAME</I>, <I>TYPE</I>);
+
+     <B>TAILQ</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>(<I>TAILQ_HEAD</I> <I>head</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>TAILQ</B><I>_</I><B>FIRST</B>(<I>TAILQ_HEAD</I> <I>*head</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>TAILQ</B><I>_</I><B>NEXT</B>(<I>struct</I> <I>TYPE</I> <I>*listelm</I>, <I>TAILQ_ENTRY</I> <I>NAME</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>TAILQ</B><I>_</I><B>END</B>(<I>TAILQ_HEAD</I> <I>*head</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>TAILQ</B><I>_</I><B>LAST</B>(<I>TAILQ_HEAD</I> <I>*head</I>, <I>HEADNAME</I> <I>NAME</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>TAILQ</B><I>_</I><B>PREV</B>(<I>struct</I> <I>TYPE</I> <I>*listelm</I>, <I>HEADNAME</I> <I>NAME</I>, <I>TAILQ_ENTRY</I> <I>NAME</I>);
+
+     <I>int</I>
+     <B>TAILQ</B><I>_</I><B>EMPTY</B>(<I>TAILQ_HEAD</I> <I>*head</I>);
+
+     <B>TAILQ</B><I>_</I><B>FOREACH</B>(<I>VARNAME</I>, <I>TAILQ_HEAD</I> <I>*head</I>, <I>TAILQ_ENTRY</I> <I>NAME</I>);
+
+     <B>TAILQ</B><I>_</I><B>FOREACH</B><I>_</I><B>REVERSE</B>(<I>VARNAME</I>, <I>TAILQ_HEAD</I> <I>*head</I>, <I>HEADNAME</I>,
+             <I>TAILQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>TAILQ</B><I>_</I><B>INIT</B>(<I>TAILQ_HEAD</I> <I>*head</I>);
+
+     <I>void</I>
+     <B>TAILQ</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>(<I>TAILQ_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*listelm</I>,
+             <I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>TAILQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>TAILQ</B><I>_</I><B>INSERT</B><I>_</I><B>BEFORE</B>(<I>struct</I> <I>TYPE</I> <I>*listelm</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>,
+             <I>TAILQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>TAILQ</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>(<I>TAILQ_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>TAILQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>TAILQ</B><I>_</I><B>INSERT</B><I>_</I><B>TAIL</B>(<I>TAILQ_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>TAILQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>TAILQ</B><I>_</I><B>REMOVE</B>(<I>TAILQ_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>TAILQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>TAILQ</B><I>_</I><B>REPLACE</B>(<I>TAILQ_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>struct</I> <I>TYPE</I> <I>*elm2</I>,
+             <I>TAILQ_ENTRY</I> <I>NAME</I>);
+
+     <B>CIRCLEQ</B><I>_</I><B>ENTRY</B>(<I>TYPE</I>);
+
+     <B>CIRCLEQ</B><I>_</I><B>HEAD</B>(<I>HEADNAME</I>, <I>TYPE</I>);
+
+     <B>CIRCLEQ</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>(<I>CIRCLEQ_HEAD</I> <I>head</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>CIRCLEQ</B><I>_</I><B>FIRST</B>(<I>CIRCLEQ_HEAD</I> <I>*head</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>CIRCLEQ</B><I>_</I><B>LAST</B>(<I>CIRCLEQ_HEAD</I> <I>*head</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>CIRCLEQ</B><I>_</I><B>END</B>(<I>CIRCLEQ_HEAD</I> <I>*head</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>CIRCLEQ</B><I>_</I><B>NEXT</B>(<I>struct</I> <I>TYPE</I> <I>*listelm</I>, <I>CIRCLEQ_ENTRY</I> <I>NAME</I>);
+
+     <I>struct</I> <I>TYPE</I> <I>*</I>
+     <B>CIRCLEQ</B><I>_</I><B>PREV</B>(<I>struct</I> <I>TYPE</I> <I>*listelm</I>, <I>CIRCLEQ_ENTRY</I> <I>NAME</I>);
+
+     <I>int</I>
+     <B>CIRCLEQ</B><I>_</I><B>EMPTY</B>(<I>CIRCLEQ_HEAD</I> <I>*head</I>);
+
+     <B>CIRCLEQ</B><I>_</I><B>FOREACH</B>(<I>VARNAME</I>, <I>CIRCLEQ_HEAD</I> <I>*head</I>, <I>CIRCLEQ_ENTRY</I> <I>NAME</I>);
+
+     <B>CIRCLEQ</B><I>_</I><B>FOREACH</B><I>_</I><B>REVERSE</B>(<I>VARNAME</I>, <I>CIRCLEQ_HEAD</I> <I>*head</I>, <I>CIRCLEQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>CIRCLEQ</B><I>_</I><B>INIT</B>(<I>CIRCLEQ_HEAD</I> <I>*head</I>);
+
+     <I>void</I>
+     <B>CIRCLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>(<I>CIRCLEQ_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*listelm</I>,
+             <I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>CIRCLEQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>CIRCLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>BEFORE</B>(<I>CIRCLEQ_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*listelm</I>,
+             <I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>CIRCLEQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>CIRCLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>(<I>CIRCLEQ_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>,
+             <I>CIRCLEQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>CIRCLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>TAIL</B>(<I>CIRCLEQ_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>,
+             <I>CIRCLEQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>CIRCLEQ</B><I>_</I><B>REMOVE</B>(<I>CIRCLEQ_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>CIRCLEQ_ENTRY</I> <I>NAME</I>);
+
+     <I>void</I>
+     <B>CIRCLEQ</B><I>_</I><B>REPLACE</B>(<I>CIRCLEQ_HEAD</I> <I>*head</I>, <I>struct</I> <I>TYPE</I> <I>*elm</I>, <I>struct</I> <I>TYPE</I> <I>*elm2</I>,
+             <I>CIRCLEQ_ENTRY</I> <I>NAME</I>);
+
+<a name="DESCRIPTION" href="#end"><B>DESCRIPTION</B></a>
+     These macros define and operate on five types of data structures: singly-
+     linked lists, simple queues, lists, tail queues, and circular queues.
+     All five structures support the following functionality:
+
+           1.   Insertion of a new entry at the head of the list.
+           2.   Insertion of a new entry after any element in the list.
+           3.   Removal of an entry from the head of the list.
+           4.   Forward traversal through the list.
+
+     Singly-linked lists are the simplest of the five data structures and sup-
+     port only the above functionality.  Singly-linked lists are ideal for ap-
+     plications with large datasets and few or no removals, or for implement-
+     ing a LIFO queue.
+
+     Simple queues add the following functionality:
+
+           1.   Entries can be added at the end of a list.
+
+     However:
+
+           1.   All list insertions must specify the head of the list.
+           2.   Each head entry requires two pointers rather than one.
+           3.   Code size is about 15% greater and operations run about 20%
+                slower than singly-linked lists.
+
+     Simple queues are ideal for applications with large datasets and few or
+     no removals, or for implementing a FIFO queue.
+
+     All doubly linked types of data structures (lists, tail queues, and cir-
+     cle queues) additionally allow:
+
+           1.   Insertion of a new entry before any element in the list.
+           2.   Removal of any entry in the list.
+
+     However:
+
+           1.   Each element requires two pointers rather than one.
+           2.   Code size and execution time of operations (except for re-
+                moval) is about twice that of the singly-linked data-struc-
+                tures.
+
+     Lists are the simplest of the doubly linked data structures and support
+     only the above functionality over singly-linked lists.
+
+     Tail queues add the following functionality:
+
+           1.   Entries can be added at the end of a list.
+           2.   They may be traversed backwards, at a cost.
+
+     However:
+
+           1.   All list insertions and removals must specify the head of the
+                list.
+           2.   Each head entry requires two pointers rather than one.
+           3.   Code size is about 15% greater and operations run about 20%
+                slower than singly-linked lists.
+
+     Circular queues add the following functionality:
+
+           1.   Entries can be added at the end of a list.
+           2.   They may be traversed backwards, from tail to head.
+
+     However:
+
+           1.   All list insertions and removals must specify the head of the
+                list.
+           2.   Each head entry requires two pointers rather than one.
+           3.   The termination condition for traversal is more complex.
+           4.   Code size is about 40% greater and operations run about 45%
+                slower than lists.
+
+     In the macro definitions, <I>TYPE</I> is the name tag of a user defined struc-
+     ture that must contain a field of type SLIST_ENTRY, LIST_ENTRY,
+     SIMPLEQ_ENTRY, TAILQ_ENTRY, or CIRCLEQ_ENTRY, named <I>NAME</I>.  The argument
+     <I>HEADNAME</I> is the name tag of a user defined structure that must be de-
+     clared using the macros <B>SLIST</B><I>_</I><B>HEAD</B>(), <B>LIST</B><I>_</I><B>HEAD</B>(), <B>SIMPLEQ</B><I>_</I><B>HEAD</B>(),
+     <B>TAILQ</B><I>_</I><B>HEAD</B>(), or <B>CIRCLEQ</B><I>_</I><B>HEAD</B>().  See the examples below for further ex-
+     planation of how these macros are used.
+
+<a name="SINGLY-LINKED+LISTS" href="#end"><B>SINGLY-LINKED LISTS</B></a>
+     A singly-linked list is headed by a structure defined by the <B>SLIST</B><I>_</I><B>HEAD</B>()
+     macro.  This structure contains a single pointer to the first element on
+     the list.  The elements are singly linked for minimum space and pointer
+     manipulation overhead at the expense of <A HREF="/cgi-bin/man.cgi?query=O&sektion=n&arch=&apropos=0&manpath=OpenBSD+Current">O(n)</A> removal for arbitrary ele-
+     ments.  New elements can be added to the list after an existing element
+     or at the head of the list.  A <I>SLIST_HEAD</I> structure is declared as fol-
+     lows:
+
+           SLIST_HEAD(HEADNAME, TYPE) head;
+
+     where <I>HEADNAME</I> is the name of the structure to be defined, and struct
+     <I>TYPE</I> is the type of the elements to be linked into the list.  A pointer
+     to the head of the list can later be declared as:
+
+           struct HEADNAME *headp;
+
+     (The names head and headp are user selectable.)
+
+     The <I>HEADNAME</I> facility is often not used, leading to the following bizarre
+     code:
+
+           SLIST_HEAD(, TYPE) head, *headp;
+
+     The <B>SLIST</B><I>_</I><B>ENTRY</B>() macro declares a structure that connects the elements
+     in the list.
+
+     The <B>SLIST</B><I>_</I><B>INIT</B>() macro initializes the list referenced by <I>head</I>.
+
+     The list can also be initialized statically by using the
+     <B>SLIST</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>() macro like this:
+
+           SLIST_HEAD(HEADNAME, TYPE) head = SLIST_HEAD_INITIALIZER(head);
+
+     The <B>SLIST</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>() macro inserts the new element <I>elm</I> at the head of
+     the list.
+
+     The <B>SLIST</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>() macro inserts the new element <I>elm</I> after the ele-
+     ment <I>listelm</I>.
+
+     The <B>SLIST</B><I>_</I><B>REMOVE</B><I>_</I><B>HEAD</B>() macro removes the first element of the list
+     pointed by <I>head</I>.
+
+     The <B>SLIST</B><I>_</I><B>REMOVE</B><I>_</I><B>NEXT</B>() macro removes the list element immediately fol-
+     lowing <I>elm</I>.
+
+     The <B>SLIST</B><I>_</I><B>REMOVE</B>() macro removes the element <I>elm</I> of the list pointed by
+     <I>head</I>.
+
+     The <B>SLIST</B><I>_</I><B>FIRST</B>() and <B>SLIST</B><I>_</I><B>NEXT</B>() macros can be used to traverse the
+     list:
+
+           for (np = SLIST_FIRST(&amp;head); np != NULL; np = SLIST_NEXT(np, NAME))
+
+     Or, for simplicity, one can use the <B>SLIST</B><I>_</I><B>FOREACH</B>() macro:
+
+           SLIST_FOREACH(np, head, NAME)
+
+     The <B>SLIST</B><I>_</I><B>FOREACH</B><I>_</I><B>PREVPTR</B>() macro is similar to <B>SLIST</B><I>_</I><B>FOREACH</B>() except
+     that it stores a pointer to the previous element in <I>VARNAMEP</I>.  This pro-
+     vides access to the previous element while traversing the list, as one
+     would have with a doubly-linked list.
+
+     The <B>SLIST</B><I>_</I><B>EMPTY</B>() macro should be used to check whether a simple list is
+     empty.
+
+<a name="SINGLY-LINKED+LIST" href="#end"><B>SINGLY-LINKED LIST</B></a> EXAMPLE
+     SLIST_HEAD(listhead, entry) head;
+     struct entry {
+             ...
+             SLIST_ENTRY(entry) entries;     /* Simple list. */
+             ...
+     } *n1, *n2, *np;
+
+     SLIST_INIT(&amp;head);                      /* Initialize simple list. */
+
+     n1 = malloc(sizeof(struct entry));      /* Insert at the head. */
+     SLIST_INSERT_HEAD(&amp;head, n1, entries);
+
+     n2 = malloc(sizeof(struct entry));      /* Insert after. */
+     SLIST_INSERT_AFTER(n1, n2, entries);
+
+     SLIST_FOREACH(np, &amp;head, entries)       /* Forward traversal. */
+             np-&gt; ...
+
+     while (!SLIST_EMPTY(&amp;head)) {           /* Delete. */
+             n1 = SLIST_FIRST(&amp;head);
+             SLIST_REMOVE_HEAD(&amp;head, entries);
+             free(n1);
+     }
+
+<a name="LISTS" href="#end"><B>LISTS</B></a>
+     A list is headed by a structure defined by the <B>LIST</B><I>_</I><B>HEAD</B>() macro.  This
+     structure contains a single pointer to the first element on the list.
+     The elements are doubly linked so that an arbitrary element can be re-
+     moved without traversing the list.  New elements can be added to the list
+     after an existing element, before an existing element, or at the head of
+     the list.  A <I>LIST_HEAD</I> structure is declared as follows:
+
+           LIST_HEAD(HEADNAME, TYPE) head;
+
+     where <I>HEADNAME</I> is the name of the structure to be defined, and struct
+     <I>TYPE</I> is the type of the elements to be linked into the list.  A pointer
+     to the head of the list can later be declared as:
+
+           struct HEADNAME *headp;
+
+     (The names head and headp are user selectable.)
+
+     The <I>HEADNAME</I> facility is often not used, leading to the following bizarre
+     code:
+
+           LIST_HEAD(, TYPE) head, *headp;
+
+     The <B>LIST</B><I>_</I><B>ENTRY</B>() macro declares a structure that connects the elements in
+     the list.
+
+     The <B>LIST</B><I>_</I><B>INIT</B>() macro initializes the list referenced by <I>head</I>.
+
+     The list can also be initialized statically by using the
+     <B>LIST</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>() macro like this:
+
+           LIST_HEAD(HEADNAME, TYPE) head = LIST_HEAD_INITIALIZER(head);
+
+     The <B>LIST</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>() macro inserts the new element <I>elm</I> at the head of
+     the list.
+
+     The <B>LIST</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>() macro inserts the new element <I>elm</I> after the ele-
+     ment <I>listelm</I>.
+
+     The <B>LIST</B><I>_</I><B>INSERT</B><I>_</I><B>BEFORE</B>() macro inserts the new element <I>elm</I> before the el-
+     ement <I>listelm</I>.
+
+     The <B>LIST</B><I>_</I><B>REMOVE</B>() macro removes the element <I>elm</I> from the list.
+
+     The <B>LIST</B><I>_</I><B>REPLACE</B>() macro replaces the list element <I>elm</I> with the new ele-
+     ment <I>elm2</I>.
+
+     The <B>LIST</B><I>_</I><B>FIRST</B>() and <B>LIST</B><I>_</I><B>NEXT</B>() macros can be used to traverse the list:
+
+           for (np = LIST_FIRST(&amp;head); np != NULL; np = LIST_NEXT(np, NAME))
+
+     Or, for simplicity, one can use the <B>LIST</B><I>_</I><B>FOREACH</B>() macro:
+
+           LIST_FOREACH(np, head, NAME)
+
+     The <B>LIST</B><I>_</I><B>EMPTY</B>() macro should be used to check whether a list is empty.
+
+<a name="LIST+EXAMPLE" href="#end"><B>LIST EXAMPLE</B></a>
+     LIST_HEAD(listhead, entry) head;
+     struct entry {
+             ...
+             LIST_ENTRY(entry) entries;      /* List. */
+             ...
+     } *n1, *n2, *np;
+
+     LIST_INIT(&amp;head);                       /* Initialize list. */
+
+     n1 = malloc(sizeof(struct entry));      /* Insert at the head. */
+     LIST_INSERT_HEAD(&amp;head, n1, entries);
+
+     n2 = malloc(sizeof(struct entry));      /* Insert after. */
+     LIST_INSERT_AFTER(n1, n2, entries);
+
+     n2 = malloc(sizeof(struct entry));      /* Insert before. */
+     LIST_INSERT_BEFORE(n1, n2, entries);
+                                             /* Forward traversal. */
+     LIST_FOREACH(np, &amp;head, entries)
+             np-&gt; ...
+
+     while (!LIST_EMPTY(&amp;head))              /* Delete. */
+             n1 = LIST_FIRST(&amp;head);
+             LIST_REMOVE(n1, entries);
+             free(n1);
+     }
+
+<a name="SIMPLE+QUEUES" href="#end"><B>SIMPLE QUEUES</B></a>
+     A simple queue is headed by a structure defined by the <B>SIMPLEQ</B><I>_</I><B>HEAD</B>()
+     macro.  This structure contains a pair of pointers, one to the first ele-
+     ment in the simple queue and the other to the last element in the simple
+     queue.  The elements are singly linked.  New elements can be added to the
+     queue after an existing element, at the head of the queue or at the tail
+     of the queue.  A <I>SIMPLEQ_HEAD</I> structure is declared as follows:
+
+           SIMPLEQ_HEAD(HEADNAME, TYPE) head;
+
+     where <I>HEADNAME</I> is the name of the structure to be defined, and struct
+     <I>TYPE</I> is the type of the elements to be linked into the queue.  A pointer
+     to the head of the queue can later be declared as:
+
+           struct HEADNAME *headp;
+
+     (The names head and headp are user selectable.)
+
+     The <B>SIMPLEQ</B><I>_</I><B>ENTRY</B>() macro declares a structure that connects the elements
+     in the queue.
+
+     The <B>SIMPLEQ</B><I>_</I><B>INIT</B>() macro initializes the queue referenced by <I>head</I>.
+
+     The queue can also be initialized statically by using the
+     <B>SIMPLEQ</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>() macro like this:
+
+           SIMPLEQ_HEAD(HEADNAME, TYPE) head = SIMPLEQ_HEAD_INITIALIZER(head);
+
+     The <B>SIMPLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>() macro inserts the new element <I>elm</I> at the head
+     of the queue.
+
+     The <B>SIMPLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>TAIL</B>() macro inserts the new element <I>elm</I> at the end of
+     the queue.
+
+     The <B>SIMPLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>() macro inserts the new element <I>elm</I> after the
+     element <I>listelm</I>.
+
+     The <B>SIMPLEQ</B><I>_</I><B>REMOVE</B><I>_</I><B>HEAD</B>() macro removes the first element from the queue.
+
+     The <B>SIMPLEQ</B><I>_</I><B>FIRST</B>() and <B>SIMPLEQ</B><I>_</I><B>NEXT</B>() macros can be used to traverse the
+     queue.  The <B>SIMPLEQ</B><I>_</I><B>FOREACH</B>() is used for queue traversal:
+
+           SIMPLEQ_FOREACH(np, head, NAME)
+
+     The <B>SIMPLEQ</B><I>_</I><B>EMPTY</B>() macro should be used to check whether a list is emp-
+     ty.
+
+<a name="SIMPLE+QUEUE" href="#end"><B>SIMPLE QUEUE</B></a> EXAMPLE
+     SIMPLEQ_HEAD(listhead, entry) head = SIMPLEQ_HEAD_INITIALIZER(head);
+     struct entry {
+             ...
+             SIMPLEQ_ENTRY(entry) entries;   /* Simple queue. */
+             ...
+     } *n1, *n2, *np;
+
+     n1 = malloc(sizeof(struct entry));      /* Insert at the head. */
+     SIMPLEQ_INSERT_HEAD(&amp;head, n1, entries);
+
+     n2 = malloc(sizeof(struct entry));      /* Insert after. */
+     SIMPLEQ_INSERT_AFTER(&amp;head, n1, n2, entries);
+
+     n2 = malloc(sizeof(struct entry));      /* Insert at the tail. */
+     SIMPLEQ_INSERT_TAIL(&amp;head, n2, entries);
+                                             /* Forward traversal. */
+     SIMPLEQ_FOREACH(np, &amp;head, entries)
+             np-&gt; ...
+                                             /* Delete. */
+     while (!SIMPLEQ_EMPTY(&amp;head)) {
+             n1 = SIMPLEQ_FIRST(&amp;head);
+             SIMPLEQ_REMOVE_HEAD(&amp;head, entries);
+             free(n1);
+     }
+
+<a name="TAIL+QUEUES" href="#end"><B>TAIL QUEUES</B></a>
+     A tail queue is headed by a structure defined by the <B>TAILQ</B><I>_</I><B>HEAD</B>() macro.
+     This structure contains a pair of pointers, one to the first element in
+     the tail queue and the other to the last element in the tail queue.  The
+     elements are doubly linked so that an arbitrary element can be removed
+     without traversing the tail queue.  New elements can be added to the
+     queue after an existing element, before an existing element, at the head
+     of the queue, or at the end of the queue.  A <I>TAILQ_HEAD</I> structure is de-
+     clared as follows:
+
+           TAILQ_HEAD(HEADNAME, TYPE) head;
+
+     where <I>HEADNAME</I> is the name of the structure to be defined, and struct
+     <I>TYPE</I> is the type of the elements to be linked into the tail queue.  A
+     pointer to the head of the tail queue can later be declared as:
+
+           struct HEADNAME *headp;
+
+     (The names head and headp are user selectable.)
+
+     The <B>TAILQ</B><I>_</I><B>ENTRY</B>() macro declares a structure that connects the elements
+     in the tail queue.
+
+     The <B>TAILQ</B><I>_</I><B>INIT</B>() macro initializes the tail queue referenced by <I>head</I>.
+
+     The tail queue can also be initialized statically by using the
+     <B>TAILQ</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>() macro.
+
+     The <B>TAILQ</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>() macro inserts the new element <I>elm</I> at the head of
+     the tail queue.
+
+     The <B>TAILQ</B><I>_</I><B>INSERT</B><I>_</I><B>TAIL</B>() macro inserts the new element <I>elm</I> at the end of
+     the tail queue.
+
+     The <B>TAILQ</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>() macro inserts the new element <I>elm</I> after the ele-
+     ment <I>listelm</I>.
+
+     The <B>TAILQ</B><I>_</I><B>INSERT</B><I>_</I><B>BEFORE</B>() macro inserts the new element <I>elm</I> before the
+     element <I>listelm</I>.
+
+     The <B>TAILQ</B><I>_</I><B>REMOVE</B>() macro removes the element <I>elm</I> from the tail queue.
+
+     The <B>TAILQ</B><I>_</I><B>REPLACE</B>() macro replaces the list element <I>elm</I> with the new ele-
+     ment <I>elm2</I>.
+
+     <B>TAILQ</B><I>_</I><B>FOREACH</B>() and <B>TAILQ</B><I>_</I><B>FOREACH</B><I>_</I><B>REVERSE</B>() are used for traversing a
+     tail queue.  <B>TAILQ</B><I>_</I><B>FOREACH</B>() starts at the first element and proceeds to-
+     wards the last.  <B>TAILQ</B><I>_</I><B>FOREACH</B><I>_</I><B>REVERSE</B>() starts at the last element and
+     proceeds towards the first.
+
+           TAILQ_FOREACH(np, &amp;head, NAME)
+           TAILQ_FOREACH_REVERSE(np, &amp;head, HEADNAME, NAME)
+
+     The <B>TAILQ</B><I>_</I><B>FIRST</B>(), <B>TAILQ</B><I>_</I><B>NEXT</B>(), <B>TAILQ</B><I>_</I><B>LAST</B>() and <B>TAILQ</B><I>_</I><B>PREV</B>() macros can
+     be used to manually traverse a tail queue or an arbitrary part of one.
+
+     The <B>TAILQ</B><I>_</I><B>EMPTY</B>() macro should be used to check whether a tail queue is
+     empty.
+
+<a name="TAIL+QUEUE" href="#end"><B>TAIL QUEUE</B></a> EXAMPLE
+     TAILQ_HEAD(tailhead, entry) head;
+     struct entry {
+             ...
+             TAILQ_ENTRY(entry) entries;     /* Tail queue. */
+             ...
+     } *n1, *n2, *np;
+
+     TAILQ_INIT(&amp;head);                      /* Initialize queue. */
+
+     n1 = malloc(sizeof(struct entry));      /* Insert at the head. */
+     TAILQ_INSERT_HEAD(&amp;head, n1, entries);
+
+     n1 = malloc(sizeof(struct entry));      /* Insert at the tail. */
+     TAILQ_INSERT_TAIL(&amp;head, n1, entries);
+
+     n2 = malloc(sizeof(struct entry));      /* Insert after. */
+     TAILQ_INSERT_AFTER(&amp;head, n1, n2, entries);
+
+     n2 = malloc(sizeof(struct entry));      /* Insert before. */
+     TAILQ_INSERT_BEFORE(n1, n2, entries);
+                                             /* Forward traversal. */
+     TAILQ_FOREACH(np, &amp;head, entries)
+             np-&gt; ...
+                                             /* Manual forward traversal. */
+     for (np = n2; np != NULL; np = TAILQ_NEXT(np, entries))
+             np-&gt; ...
+                                             /* Delete. */
+     while (np = TAILQ_FIRST(&amp;head)) {
+             TAILQ_REMOVE(&amp;head, np, entries);
+             <A HREF="/cgi-bin/man.cgi?query=free&sektion=np&arch=&apropos=0&manpath=OpenBSD+Current">free(np)</A>;
+     }
+
+<a name="CIRCULAR+QUEUES" href="#end"><B>CIRCULAR QUEUES</B></a>
+     A circular queue is headed by a structure defined by the <B>CIRCLEQ</B><I>_</I><B>HEAD</B>()
+     macro.  This structure contains a pair of pointers, one to the first ele-
+     ment in the circular queue and the other to the last element in the cir-
+     cular queue.  The elements are doubly linked so that an arbitrary element
+     can be removed without traversing the queue.  New elements can be added
+     to the queue after an existing element, before an existing element, at
+     the head of the queue, or at the end of the queue.  A <I>CIRCLEQ_HEAD</I> struc-
+     ture is declared as follows:
+
+           CIRCLEQ_HEAD(HEADNAME, TYPE) head;
+
+     where <I>HEADNAME</I> is the name of the structure to be defined, and struct
+     <I>TYPE</I> is the type of the elements to be linked into the circular queue.  A
+     pointer to the head of the circular queue can later be declared as:
+
+           struct HEADNAME *headp;
+
+     (The names head and headp are user selectable.)
+
+     The <B>CIRCLEQ</B><I>_</I><B>ENTRY</B>() macro declares a structure that connects the elements
+     in the circular queue.
+
+     The <B>CIRCLEQ</B><I>_</I><B>INIT</B>() macro initializes the circular queue referenced by
+     <I>head</I>.
+
+     The circular queue can also be initialized statically by using the
+     <B>CIRCLEQ</B><I>_</I><B>HEAD</B><I>_</I><B>INITIALIZER</B>() macro.
+
+     The <B>CIRCLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>HEAD</B>() macro inserts the new element <I>elm</I> at the head
+     of the circular queue.
+
+     The <B>CIRCLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>TAIL</B>() macro inserts the new element <I>elm</I> at the end of
+     the circular queue.
+
+     The <B>CIRCLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>AFTER</B>() macro inserts the new element <I>elm</I> after the
+     element <I>listelm</I>.
+
+     The <B>CIRCLEQ</B><I>_</I><B>INSERT</B><I>_</I><B>BEFORE</B>() macro inserts the new element <I>elm</I> before the
+     element <I>listelm</I>.
+
+     The <B>CIRCLEQ</B><I>_</I><B>REMOVE</B>() macro removes the element <I>elm</I> from the circular
+     queue.
+
+     The <B>CIRCLEQ</B><I>_</I><B>REPLACE</B>() macro replaces the list element <I>elm</I> with the new
+     element <I>elm2</I>.
+
+     The <B>CIRCLEQ</B><I>_</I><B>FIRST</B>(), <B>CIRCLEQ</B><I>_</I><B>LAST</B>(), <B>CIRCLEQ</B><I>_</I><B>END</B>(), <B>CIRCLEQ</B><I>_</I><B>NEXT</B>() and
+     <B>CIRCLEQ</B><I>_</I><B>PREV</B>() macros can be used to traverse a circular queue.  The
+     <B>CIRCLEQ</B><I>_</I><B>FOREACH</B>() is used for circular queue forward traversal:
+
+           CIRCLEQ_FOREACH(np, head, NAME)
+
+     The <B>CIRCLEQ</B><I>_</I><B>FOREACH</B><I>_</I><B>REVERSE</B>() macro acts like <B>CIRCLEQ</B><I>_</I><B>FOREACH</B>() but tra-
+     verses the circular queue backwards.
+
+     The <B>CIRCLEQ</B><I>_</I><B>EMPTY</B>() macro should be used to check whether a circular
+     queue is empty.
+
+<a name="CIRCULAR+QUEUE" href="#end"><B>CIRCULAR QUEUE</B></a> EXAMPLE
+     CIRCLEQ_HEAD(circleq, entry) head;
+     struct entry {
+             ...
+             CIRCLEQ_ENTRY(entry) entries;   /* Circular queue. */
+             ...
+     } *n1, *n2, *np;
+
+     CIRCLEQ_INIT(&amp;head);                    /* Initialize circular queue. */
+
+     n1 = malloc(sizeof(struct entry));      /* Insert at the head. */
+     CIRCLEQ_INSERT_HEAD(&amp;head, n1, entries);
+
+     n1 = malloc(sizeof(struct entry));      /* Insert at the tail. */
+     CIRCLEQ_INSERT_TAIL(&amp;head, n1, entries);
+
+     n2 = malloc(sizeof(struct entry));      /* Insert after. */
+     CIRCLEQ_INSERT_AFTER(&amp;head, n1, n2, entries);
+
+     n2 = malloc(sizeof(struct entry));      /* Insert before. */
+     CIRCLEQ_INSERT_BEFORE(&amp;head, n1, n2, entries);
+                                             /* Forward traversal. */
+     CIRCLEQ_FOREACH(np, &amp;head, entries)
+             np-&gt; ...
+                                             /* Reverse traversal. */
+     CIRCLEQ_FOREACH_REVERSE(np, &amp;head, entries)
+             np-&gt; ...
+                                             /* Delete. */
+     while (!CIRCLEQ_EMPTY(&amp;head)) {
+             n1 = CIRCLEQ_FIRST(&amp;head);
+             CIRCLEQ_REMOVE(&amp;head, n1, entries);
+             free(n1);
+     }
+
+<a name="NOTES" href="#end"><B>NOTES</B></a>
+     It is an error to assume the next and previous fields are preserved after
+     an element has been removed from a list or queue.  Using any macro (ex-
+     cept the various forms of insertion) on an element removed from a list or
+     queue is incorrect.  An example of erroneous usage is removing the same
+     element twice.
+
+     The <B>SLIST</B><I>_</I><B>END</B>(), <B>LIST</B><I>_</I><B>END</B>(), <B>SIMPLEQ</B><I>_</I><B>END</B>() and <B>TAILQ</B><I>_</I><B>END</B>() macros are
+     provided for symmetry with <B>CIRCLEQ</B><I>_</I><B>END</B>().  They expand to NULL and don't
+     serve any useful purpose.
+
+     Trying to free a list in the following way is a common error:
+
+           LIST_FOREACH(var, head, entry)
+                   free(var);
+           free(head);
+
+     Since <I>var</I> is free'd, the <B>FOREACH</B>() macro refers to a pointer that may
+     have been reallocated already.  Proper code needs a second variable.
+
+           for (var = LIST_FIRST(head); var != LIST_END(head); var = nxt) {
+                   nxt = LIST_NEXT(var, entry);
+                   free(var);
+           }
+           LIST_INIT(head);        /* to put the list back in order */
+
+     A similar situation occurs when the current element is deleted from the
+     list.  Correct code saves a pointer to the next element in the list be-
+     fore removing the element:
+
+           for (var = LIST_FIRST(head); var != LIST_END(head); var = nxt) {
+                   nxt = LIST_NEXT(var, entry);
+                   if (some_condition) {
+                           LIST_REMOVE(var, entry);
+                           some_function(var);
+                   }
+           }
+
+<a name="HISTORY" href="#end"><B>HISTORY</B></a>
+     The <B>queue</B> functions first appeared in 4.4BSD.
+
+OpenBSD 4.8                      March 1, 2009                              13
+</PRE>
+<a name="end">
+<hr noshade>
+<a href="#NAME">NAME</a> |
+<a href="#SYNOPSIS">SYNOPSIS</a> |
+<a href="#DESCRIPTION">DESCRIPTION</a> |
+<a href="#SINGLY-LINKED+LISTS">SINGLY-LINKED LISTS</a> |
+<a href="#SINGLY-LINKED+LIST">SINGLY-LINKED LIST</a> |
+<a href="#LISTS">LISTS</a> |
+<a href="#LIST+EXAMPLE">LIST EXAMPLE</a> |
+<a href="#SIMPLE+QUEUES">SIMPLE QUEUES</a> |
+<a href="#SIMPLE+QUEUE">SIMPLE QUEUE</a> |
+<a href="#TAIL+QUEUES">TAIL QUEUES</a> |
+<a href="#TAIL+QUEUE">TAIL QUEUE</a> |
+<a href="#CIRCULAR+QUEUES">CIRCULAR QUEUES</a> |
+<a href="#CIRCULAR+QUEUE">CIRCULAR QUEUE</a> |
+<a href="#NOTES">NOTES</a> |
+<a href="#HISTORY">HISTORY</a>
+</BODY>
+</HTML>
