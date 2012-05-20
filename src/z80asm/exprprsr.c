@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.22 2012-05-17 17:42:14 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.23 2012-05-20 05:31:18 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.22  2012-05-17 17:42:14  pauloscustodio
+/* Revision 1.23  2012-05-20 05:31:18  pauloscustodio
+/* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
+/*
+/* Revision 1.22  2012/05/17 17:42:14  pauloscustodio
 /* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
 /* always raised on error.
 /*
@@ -229,7 +232,7 @@ void RemovePfixlist( struct expr *pfixexpr );
 void PushItem( long oprconst, struct pfixstack **stackpointer );
 void ClearEvalStack( struct pfixstack **stackptr );
 void CalcExpression( enum symbols opr, struct pfixstack **stackptr );
-void NewPfixSymbol( struct expr *pfixexpr, long oprconst, enum symbols oprtype, char *symident, unsigned char type );
+void NewPfixSymbol( struct expr *pfixexpr, long oprconst, enum symbols oprtype, char *symident, char symboltype );
 void StoreExpr( struct expr *pfixexpr, char range );
 int ExprSigned8( int listoffset );
 int ExprUnsigned8( int listoffset );
@@ -965,7 +968,7 @@ NewPfixSymbol( struct expr *pfixexpr,
                long oprconst,
                enum symbols oprtype,
                char *symident,
-               unsigned char symboltype )
+               char symboltype )
 {
     struct postfixlist *newnode;
 

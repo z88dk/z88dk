@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.14 2012-05-17 17:42:14 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.15 2012-05-20 05:31:18 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.14  2012-05-17 17:42:14  pauloscustodio
+/* Revision 1.15  2012-05-20 05:31:18  pauloscustodio
+/* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
+/*
+/* Revision 1.14  2012/05/17 17:42:14  pauloscustodio
 /* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
 /* always raised on error.
 /*
@@ -103,6 +106,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 #ifndef SYMBOL_H
 #define SYMBOL_H
 
+#include <stdlib.h>
 #include "avltree.h"    /* base symbol data structures and routines */
 
 /* Structured data types : */
@@ -218,7 +222,7 @@ struct module
 {
     struct module      *nextmodule;       /* pointer to next module */
     char               *mname;            /* pointer to string of module name */
-    long               startoffset;       /* this module's start offset from start of code buffer */
+    size_t             startoffset;       /* this module's start offset from start of code buffer */
     long               origin;            /* Address Origin of current machine code module during linking */
     struct sourcefile  *cfile;            /* pointer to current file record */
     avltree           *notdeclroot;       /* pointer to root of symbols not yet declared/defined */

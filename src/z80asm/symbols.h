@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.h,v 1.5 2012-05-18 00:23:14 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.h,v 1.6 2012-05-20 05:31:18 pauloscustodio Exp $ */
 /* $Log: symbols.h,v $
-/* Revision 1.5  2012-05-18 00:23:14  pauloscustodio
+/* Revision 1.6  2012-05-20 05:31:18  pauloscustodio
+/* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
+/*
+/* Revision 1.5  2012/05/18 00:23:14  pauloscustodio
 /* DefineSymbol() and DefineDefSym() defined as void, a fatal error is always raised on error.
 /*
 /* Revision 1.4  2012/05/17 17:49:20  pauloscustodio
@@ -50,18 +53,18 @@ Copyright (C) Paulo Custodio, 2011
 
 /* Create a new symbol
    CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
-extern symbol *CreateSymbol( char *identifier, long value, unsigned char symboltype, struct module *symowner );
+extern symbol *CreateSymbol( char *identifier, long value, char symboltype, struct module *symowner );
 
 /* Create a symbol in the local or global tree */
-extern void DefineSymbol( char *identifier, long value, unsigned char symboltype );
+extern void DefineSymbol( char *identifier, long value, char symboltype );
 
 /* Create a symbol in the given tree, error if already defined */
-extern void DefineDefSym( char *identifier, long value, unsigned char symboltype, avltree **root );
+extern void DefineDefSym( char *identifier, long value, char symboltype, avltree **root );
 
 /* Declare a global symbol */
-extern void DeclSymGlobal( char *identifier, unsigned char libtype );
+extern void DeclSymGlobal( char *identifier, char libtype );
 
 /* Declare an external symbol */
-extern void DeclSymExtern( char *identifier, unsigned char libtype );
+extern void DeclSymExtern( char *identifier, char libtype );
 
 #endif /* ndef SYMBOLS_H */

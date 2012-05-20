@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.34 2012-05-17 21:36:06 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.35 2012-05-20 05:31:18 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.34  2012-05-17 21:36:06  pauloscustodio
+/* Revision 1.35  2012-05-20 05:31:18  pauloscustodio
+/* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
+/*
+/* Revision 1.34  2012/05/17 21:36:06  pauloscustodio
 /* Remove global ASMERROR, redundant with TOTALERRORS.
 /* Remove IllegalArgumentException, replace by FatalErrorException.
 /*
@@ -354,7 +357,7 @@ ReadNames( long nextname, long endnames )
             case 'L':
                 if ( ( foundsymbol = FindSymbol( line, CURRENTMODULE->localroot ) ) == NULL )
                 {
-                    foundsymbol = CreateSymbol( line, value, symboltype | SYMLOCAL, CURRENTMODULE );
+                    foundsymbol = CreateSymbol( line, value, (char)(symboltype | SYMLOCAL), CURRENTMODULE );
                     insert( &CURRENTMODULE->localroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
                 }
                 else
@@ -370,7 +373,7 @@ ReadNames( long nextname, long endnames )
             case 'G':
                 if ( ( foundsymbol = FindSymbol( line, globalroot ) ) == NULL )
                 {
-                    foundsymbol = CreateSymbol( line, value, symboltype | SYMXDEF, CURRENTMODULE );
+                    foundsymbol = CreateSymbol( line, value, (char)(symboltype | SYMXDEF), CURRENTMODULE );
                     insert( &globalroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
                 }
                 else
@@ -386,7 +389,7 @@ ReadNames( long nextname, long endnames )
             case 'X':
                 if ( ( foundsymbol = FindSymbol( line, globalroot ) ) == NULL )
                 {
-                    foundsymbol = CreateSymbol( line, value, symboltype | SYMXDEF | SYMDEF, CURRENTMODULE );
+                    foundsymbol = CreateSymbol( line, value, (char)(symboltype | SYMXDEF | SYMDEF), CURRENTMODULE );
                     insert( &globalroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
                 }
                 else

@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.23 2012-05-12 16:54:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.24 2012-05-20 05:31:18 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.23  2012-05-12 16:54:49  pauloscustodio
+/* Revision 1.24  2012-05-20 05:31:18  pauloscustodio
+/* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
+/*
+/* Revision 1.23  2012/05/12 16:54:49  pauloscustodio
 /* temporary_start not used, removed
 /*
 /* Revision 1.22  2012/05/11 19:29:49  pauloscustodio
@@ -590,7 +593,7 @@ CheckCondition( void )
 {
     int     i;
     char   *text = ident;
-    int     len = strlen( text );
+	size_t len = strlen( text );
 
     for ( i = 0; i < sizeof( flags ) / sizeof( flags[0] ); i++ )
     {

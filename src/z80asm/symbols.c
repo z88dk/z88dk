@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.19 2012-05-18 00:28:45 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.20 2012-05-20 05:31:18 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.19  2012-05-18 00:28:45  pauloscustodio
+/* Revision 1.20  2012-05-20 05:31:18  pauloscustodio
+/* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
+/*
+/* Revision 1.19  2012/05/18 00:28:45  pauloscustodio
 /* astyle
 /*
 /* Revision 1.18  2012/05/18 00:23:14  pauloscustodio
@@ -153,7 +156,7 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 /* local functions */
 symbol *GetSymPtr( char *identifier );
 symbol *FindSymbol( char *identifier, avltree *treeptr );
-static void DefLocalSymbol( char *identifier, long value, unsigned char symboltype );
+static void DefLocalSymbol( char *identifier, long value, char symboltype );
 int cmpidstr( symbol *kptr, symbol *p );
 int cmpidval( symbol *kptr, symbol *p );
 void InsertPageRef( symbol *symptr );
@@ -172,7 +175,7 @@ extern avltree *globalroot;
 
 /* Create a new symbol
    CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
-symbol *CreateSymbol( char *identifier, long value, unsigned char symboltype, struct module *symowner )
+symbol *CreateSymbol( char *identifier, long value, char symboltype, struct module *symowner )
 {
     symbol *newsym;
 
@@ -251,7 +254,7 @@ cmpidval( symbol *kptr, symbol *p )
  */
 void DefineSymbol( char *identifier,
                    long value,       /* value of symbol, label */
-                   unsigned char symboltype )
+                   char symboltype )
 {
     /* symbol is either address label or constant */
     symbol *foundsymbol;
@@ -295,7 +298,7 @@ void DefineSymbol( char *identifier,
 
 static void DefLocalSymbol( char *identifier,
                             long value,     /* value of symbol, label */
-                            unsigned char symboltype )
+                            char symboltype )
 {
     /* symbol is either address label or constant */
     symbol *foundsymbol;
@@ -303,7 +306,7 @@ static void DefLocalSymbol( char *identifier,
     if ( ( foundsymbol = FindSymbol( identifier, CURRENTMODULE->localroot ) ) == NULL )
     {
         /* Symbol not declared as local */
-        foundsymbol = CreateSymbol( identifier, value, symboltype | SYMLOCAL | SYMDEFINED, CURRENTMODULE );
+        foundsymbol = CreateSymbol( identifier, value, (char)(symboltype | SYMLOCAL | SYMDEFINED), CURRENTMODULE );
         insert( &CURRENTMODULE->localroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
 
         if ( pass1 && symtable && listing )
@@ -477,19 +480,22 @@ FindSymbol( char *identifier,   /* pointer to current identifier */
 
 
 
-void DeclSymGlobal( char *identifier, unsigned char libtype )
+void DeclSymGlobal( char *identifier, char libtype )
 {
     symbol *foundsym, *clonedsym;
 
     if ( ( foundsym = FindSymbol( identifier, CURRENTMODULE->localroot ) ) == NULL )
     {
+		/* not local */
         if ( ( foundsym = FindSymbol( identifier, globalroot ) ) == NULL )
         {
-            foundsym = CreateSymbol( identifier, 0, SYM_NOTDEFINED | SYMXDEF | libtype, CURRENTMODULE );
+			/* not local, not global */
+            foundsym = CreateSymbol( identifier, 0, (char)(SYM_NOTDEFINED | SYMXDEF | libtype), CURRENTMODULE );
             insert( &globalroot, foundsym, ( int ( * )( void *, void * ) ) cmpidstr ); /* declare symbol as global */
         }
         else
         {
+			/* not local, global */
             if ( foundsym->owner != CURRENTMODULE )
             {
                 /* this symbol is declared in another module */
@@ -514,8 +520,10 @@ void DeclSymGlobal( char *identifier, unsigned char libtype )
     }
     else
     {
+		/* local */
         if ( FindSymbol( identifier, globalroot ) == NULL )
         {
+			/* local, not global */
             /* If no global symbol of identical name has been created, then re-declare local symbol as global symbol */
             foundsym->type &= SYMLOCAL_OFF;
             foundsym->type |= SYMXDEF;
@@ -527,6 +535,7 @@ void DeclSymGlobal( char *identifier, unsigned char libtype )
         }
         else
         {
+			/* local, global - no possible path (?), as if local & not global, symbol is moved local -> global */
             /* already declared global */
             ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_GLOBAL, identifier );
         }
@@ -535,7 +544,7 @@ void DeclSymGlobal( char *identifier, unsigned char libtype )
 
 
 
-void DeclSymExtern( char *identifier, unsigned char libtype )
+void DeclSymExtern( char *identifier, char libtype )
 {
     symbol *foundsym, *extsym;
 
@@ -543,7 +552,7 @@ void DeclSymExtern( char *identifier, unsigned char libtype )
     {
         if ( ( foundsym = FindSymbol( identifier, globalroot ) ) == NULL )
         {
-            foundsym = CreateSymbol( identifier, 0, SYM_NOTDEFINED | SYMXREF | libtype, CURRENTMODULE );
+            foundsym = CreateSymbol( identifier, 0, (char)(SYM_NOTDEFINED | SYMXREF | libtype), CURRENTMODULE );
             insert( &globalroot, foundsym, ( int ( * )( void *, void * ) ) cmpidstr ); /* declare symbol as extern */
         }
         else
@@ -670,13 +679,13 @@ InsertPageRef( symbol *symptr )
 }
 
 
-void DefineDefSym( char *identifier, long value, unsigned char symboltype, avltree **root )
+void DefineDefSym( char *identifier, long value, char symboltype, avltree **root )
 {
     symbol *staticsym;
 
     if ( FindSymbol( identifier, *root ) == NULL )
     {
-        staticsym = CreateSymbol( identifier, value, symboltype | SYMDEF | SYMDEFINED, NULL );
+        staticsym = CreateSymbol( identifier, value, (char)(symboltype | SYMDEF | SYMDEFINED), NULL );
         insert( root, staticsym, ( int ( * )( void *, void * ) ) cmpidstr );
     }
     else
