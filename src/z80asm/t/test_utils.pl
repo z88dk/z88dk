@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.11 2012-05-17 15:03:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.12 2012-05-20 05:40:00 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.11  2012-05-17 15:03:37  pauloscustodio
+# Revision 1.12  2012-05-20 05:40:00  pauloscustodio
+# test asm only delete main test files before attempting to assemble, create other test files for multipl-object assembly
+#
+# Revision 1.11  2012/05/17 15:03:37  pauloscustodio
 # Add functions to white-box test C modules by compiling and running a test C main() function
 #
 # Revision 1.10  2012/05/11 19:41:26  pauloscustodio
@@ -70,11 +73,28 @@ my $test	 = "test";
 sub z80asm	 { $ENV{Z80ASM} || "z80asm" }
 
 my @TEST_EXT = (qw( asm lst inc bin map obj lib sym def err exe c o ));
-my @TEST_FILES = map {$test.".".$_ } @TEST_EXT;
+my @MAIN_TEST_FILES;
+my @TEST_FILES;
 
 for my $ext (@TEST_EXT) {
-	eval 'sub '.$ext.'_file { return $test.".'.$ext.'"; }';
-	$@ and die $@;
+	for my $id ("", "1", "2") {
+		my $file = $test.$id.".".$ext;
+		my $sub_name = $ext.$id."_file";
+		no strict 'refs';
+		*$sub_name = sub { return $file };
+		
+		push @MAIN_TEST_FILES, $file if $id eq "";
+		push @TEST_FILES, $file;
+	}
+}
+
+#------------------------------------------------------------------------------
+sub unlink_files {
+	my(@files) = uniq(@_);
+	my $line = "[line ".((caller)[2])."]";
+	my $count = 0;
+	map {$count++ if -f} @files;
+	is unlink(@files), $count, "$line unlink $count testfiles";
 }
 
 #------------------------------------------------------------------------------
@@ -85,10 +105,7 @@ sub unlink_testfiles {
 		diag "$line -keep : kept test files";
 	}
 	else {
-		my @files = uniq(@TEST_FILES, @additional_files);
-		my $count = 0;
-		map {$count++ if -f} @files;
-		is unlink(@files), $count, "$line unlink $count testfiles";
+		unlink_files(@TEST_FILES, @additional_files);
 	}
 }
 
@@ -100,7 +117,7 @@ sub t_z80asm_error {
 	(my $test_name = $code) =~ s/\n.*/.../s;
 	ok 1, "$line t_z80asm_error $test_name - $expected_err";
 	
-	unlink_testfiles();
+	unlink_files(@MAIN_TEST_FILES);
 	write_file(asm_file(), "$code\n");
 	
 	my $cmd = z80asm()." ".($options || "")." ".asm_file();
@@ -125,7 +142,7 @@ sub t_z80asm_error {
 	is read_file(err_file(), err_mode => 'quiet'), 
 				$expected_err."\n", "$line error in error file";
 
-	exit 1 if $return == 0 && $STOP_ON_ERR;
+	exit 1 if $return != 0 && $STOP_ON_ERR;
 }
 
 #------------------------------------------------------------------------------
@@ -138,7 +155,7 @@ sub t_z80asm_ok {
 		hexdump(substr($expected_binary, 0, 16)).
 		(length($expected_binary) > 16 ? "..." : "");
 	
-	unlink_testfiles();
+	unlink_files(@MAIN_TEST_FILES);
 	write_file(asm_file(), "org 0x$address_hex\n$code\n");
 	
 	my $cmd = z80asm()." -l -b ".($options || "")." ".asm_file();
