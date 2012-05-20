@@ -11,11 +11,14 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011
+# Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-die.t,v 1.1 2012-05-17 15:04:47 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-die.t,v 1.2 2012-05-20 05:52:10 pauloscustodio Exp $
 # $Log: whitebox-die.t,v $
-# Revision 1.1  2012-05-17 15:04:47  pauloscustodio
+# Revision 1.2  2012-05-20 05:52:10  pauloscustodio
+# Test raising exception in die
+#
+# Revision 1.1  2012/05/17 15:04:47  pauloscustodio
 # white box test of new modules
 #
 # Revision 1.1  2012/04/22 20:32:20  pauloscustodio
@@ -27,22 +30,51 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
+my $compile = "-DEXCEPT_DEBUG die.c except.c";
+
 # test die
-t_compile_module("", <<'END', "die.c");
-	die("Hello %s\n", "John");
+t_compile_module("", <<'END', $compile);
+	init_except();
+	warn("1\n");	
+	die(NotEnoughMemoryException, "Hello %s\n", "John");
+	warn("2\n");	
+	
 	return 0;
 END
 t_run_module([], "", <<'END', 1);
+except: init
+1
 Hello John
+
+
+Uncaught NotEnoughMemoryException: Hello John
+
+
+    thrown at die (die.c:47)
+
+The value of errno was 0.
+
+Exception hierarchy
+________________________________________________________________
+
+    RuntimeException
+     |
+     +--NotEnoughMemoryException
+________________________________________________________________
+except: cleanup
 END
 
+
 # test warn
-t_compile_module("", <<'END', "die.c");
+t_compile_module("", <<'END', $compile);
+	init_except();
 	warn("Hello %s\n", "John");
 	return 0;
 END
 t_run_module([], "", <<'END', 0);
+except: init
 Hello John
+except: cleanup
 END
 
 unlink_testfiles();
