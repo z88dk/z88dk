@@ -16,9 +16,13 @@ Copyright (C) Paulo Custodio, 2011
 Define error codes and error messages
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.1 2012-05-17 20:31:45 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.2 2012-05-20 05:38:19 pauloscustodio Exp $ */
 /* $Log: errors_def.h,v $
-/* Revision 1.1  2012-05-17 20:31:45  pauloscustodio
+/* Revision 1.2  2012-05-20 05:38:19  pauloscustodio
+/* ERR_SYMBOL_DECL_GLOBAL seams to be impossible to get. Added comment on this,
+/* changed test error-18.t
+/*
+/* Revision 1.1  2012/05/17 20:31:45  pauloscustodio
 /* New errors_def.h with error name and string together, for easier maintenance
 /*
 /*
@@ -42,7 +46,7 @@ Define error codes and error messages
 /* 15 */ DEF_MSG( ERR_MODULE_REDEFINED,       "Module name already defined" )
 /* 16 */ DEF_MSG( ERR_MODULE_NOT_DEFINED,     "Module name not defined" ) /* not used */
 /* 17 */ DEF_MSG( ERR_SYMBOL_DECL_LOCAL,      "Symbol '%s' already declared local" )
-/* 18 */ DEF_MSG( ERR_SYMBOL_DECL_GLOBAL,     "Symbol '%s' already declared global" )
+/* 18 */ DEF_MSG( ERR_SYMBOL_DECL_GLOBAL,     "Symbol '%s' already declared global" ) /* not used? */
 /* 19 */ DEF_MSG( ERR_SYMBOL_DECL_EXTERN,     "Symbol '%s' already declared external" )  /* not used */
 /* 20 */ DEF_MSG( ERR_NO_CMD_ARGS,            "No command line arguments" )  /* not used */
 /* 21 */ DEF_MSG( ERR_ILLEGAL_SRC_FILENAME,   "Illegal source filename '%s'" )

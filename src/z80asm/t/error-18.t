@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/error-18.t,v 1.1 2011-07-12 22:47:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/error-18.t,v 1.2 2012-05-20 05:38:19 pauloscustodio Exp $
 # $Log: error-18.t,v $
-# Revision 1.1  2011-07-12 22:47:59  pauloscustodio
+# Revision 1.2  2012-05-20 05:38:19  pauloscustodio
+# ERR_SYMBOL_DECL_GLOBAL seams to be impossible to get. Added comment on this,
+# changed test error-18.t
+#
+# Revision 1.1  2011/07/12 22:47:59  pauloscustodio
 # - Moved all error variables and error reporting code to a separate module errors.c,
 #   replaced all extern declarations of these variables by include errors.h,
 #   created symbolic constants for error codes.
@@ -30,7 +34,7 @@ use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-diag "Symbol already declared global --> not tested";
+diag "Symbol already declared global --> not used?";
 
 unlink_testfiles();
 done_testing();
