@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011
 Exit with a fatal error, warn on stderr
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.c,v 1.4 2012-05-22 20:29:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.c,v 1.5 2012-05-22 20:35:26 pauloscustodio Exp $ */
 /* $Log: die.c,v $
-/* Revision 1.4  2012-05-22 20:29:17  pauloscustodio
+/* Revision 1.5  2012-05-22 20:35:26  pauloscustodio
+/* astyle
+/*
+/* Revision 1.4  2012/05/22 20:29:17  pauloscustodio
 /* Use new safestr_t to simplify avoiding buffer overruns
 /*
 /* Revision 1.3  2012/05/20 06:39:27  pauloscustodio
@@ -54,8 +57,8 @@ void die( e4c_exception_type exception, char *msg, ... )
 
     safestr_vfset( errstr, msg, argptr );   /* build message */
 
-    fprintf( stderr, safestr_data(errstr) );
-    throw( exception, safestr_data(errstr) );
+    fprintf( stderr, safestr_data( errstr ) );
+    throw( exception, safestr_data( errstr ) );
 }
 
 /*-----------------------------------------------------------------------------

@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Utilities for string handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.3 2012-05-22 20:26:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.4 2012-05-22 20:35:26 pauloscustodio Exp $ */
 /* $Log: strutil.h,v $
-/* Revision 1.3  2012-05-22 20:26:17  pauloscustodio
+/* Revision 1.4  2012-05-22 20:35:26  pauloscustodio
+/* astyle
+/*
+/* Revision 1.3  2012/05/22 20:26:17  pauloscustodio
 /* Safe strings
 /* New type safestr_t to hold strings with size to prevent buffer overruns.
 /* Remove strtoupper, use POSIX strupr instead
@@ -59,10 +62,10 @@ Utilities for string handling
 *
 *       SAFESTR_DEFINE( name, maxsize );        // name isa safestr_t * name
 *
-*	To define a safestr_t pointing to an existent buffer, do:
+*   To define a safestr_t pointing to an existent buffer, do:
 *
-*		char buffer[SIZE];
-*		SAFESTR_DEFINE_REF( name, buffer, sizeof(buffer) );
+*       char buffer[SIZE];
+*       SAFESTR_DEFINE_REF( name, buffer, sizeof(buffer) );
 *
 *----------------------------------------------------------------------------*/
 typedef struct safestr_t
@@ -77,7 +80,7 @@ typedef struct safestr_t
 
 #define SAFESTR_DEFINE(name, maxsize)   \
     char        name##_data [ maxsize ] = "";   \
-	SAFESTR_DEFINE_REF(name, name##_data, maxsize)
+    SAFESTR_DEFINE_REF(name, name##_data, maxsize)
 
 /* address of string chars */
 #define safestr_data(self)  \

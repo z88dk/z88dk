@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.11 2012-05-22 20:29:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.12 2012-05-22 20:35:26 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.11  2012-05-22 20:29:17  pauloscustodio
+/* Revision 1.12  2012-05-22 20:35:26  pauloscustodio
+/* astyle
+/*
+/* Revision 1.11  2012/05/22 20:29:17  pauloscustodio
 /* Use new safestr_t to simplify avoiding buffer overruns
 /*
 /* Revision 1.10  2012/05/17 21:36:06  pauloscustodio
@@ -176,11 +179,11 @@ void ReportError( char *filename, int lineno, int errnum, ... )
     safestr_cat( errstr, "\n" );
 
     /* CH_0001 : Assembly error messages should appear on stderr */
-    fputs( safestr_data(errstr), stderr );
+    fputs( safestr_data( errstr ), stderr );
 
     if ( errfile != NULL )
     {
-        fputs( safestr_data(errstr), errfile );
+        fputs( safestr_data( errstr ), errfile );
     }
 
     /* increment error counters */
