@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.10 2012-05-17 21:36:06 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.11 2012-05-22 20:29:17 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.10  2012-05-17 21:36:06  pauloscustodio
+/* Revision 1.11  2012-05-22 20:29:17  pauloscustodio
+/* Use new safestr_t to simplify avoiding buffer overruns
+/*
+/* Revision 1.10  2012/05/17 21:36:06  pauloscustodio
 /* Remove global ASMERROR, redundant with TOTALERRORS.
 /* Remove IllegalArgumentException, replace by FatalErrorException.
 /*
@@ -81,6 +84,7 @@ Copyright (C) Paulo Custodio, 2011
 #include "options.h"
 #include "z80asm.h"
 #include "config.h"
+#include "strutil.h"
 
 /* global variables */
 int         ERRORS          = 0;            /* num errors in current source */
@@ -115,7 +119,7 @@ void ResetErrors( void )
 void ReportError( char *filename, int lineno, int errnum, ... )
 {
     va_list argptr;
-    char errstr[MAXLINE], *p;
+    SAFESTR_DEFINE( errstr, MAXLINE );
 
     va_start( argptr, errnum ); /* init variable args */
 
@@ -125,25 +129,24 @@ void ReportError( char *filename, int lineno, int errnum, ... )
     }
 
     /* CH_0003 : output prefix */
-    p = errstr;
-    p += sprintf( p, "Error: " );
+    safestr_set( errstr, "Error: " );
 
     /* output filename */
     if ( filename != NULL )
     {
-        p += sprintf( p, "File '%s', ", filename );
+        safestr_fcat( errstr, "File '%s', ", filename );
     }
 
     /* output module */
     if ( CURRENTMODULE != NULL && CURRENTMODULE->mname != NULL )
     {
-        p += sprintf( p, "Module '%s', ", CURRENTMODULE->mname );
+        safestr_fcat( errstr, "Module '%s', ", CURRENTMODULE->mname );
     }
 
     /* output line number */
     if ( lineno != 0 )
     {
-        p += sprintf( p, "at line %d, ", lineno );
+        safestr_fcat( errstr, "at line %d, ", lineno );
     }
 
     /* handle special errors */
@@ -152,34 +155,32 @@ void ReportError( char *filename, int lineno, int errnum, ... )
         switch ( errnum )
         {
             case ERR_MAX_CODESIZE:
-                p += sprintf( p, errmsg[errnum], ( long )MAXCODESIZE );
+                safestr_fcat( errstr, errmsg[errnum], ( long )MAXCODESIZE );
                 break;
 
             case ERR_TOTALERRORS:
                 /* ignore all the info collected in errstr */
-                p = errstr;
-                p += sprintf( p, errmsg[errnum], TOTALERRORS );
+                safestr_fset( errstr, errmsg[errnum], TOTALERRORS );
                 break;
 
             default:
-                p += vsprintf( p, errmsg[errnum], argptr );     /* pass variable args */
+                safestr_vfcat( errstr, errmsg[errnum], argptr );     /* pass variable args */
         }
     }
     else
     {
-        p += sprintf( p, "Error %d", errnum );
+        safestr_fcat( errstr, "Error %d", errnum );
     }
 
     /* add newline */
-    p += sprintf( p, "\n" );
-    assert( p - errstr < sizeof( errstr ) - 1 ); /* check for overrun */
+    safestr_cat( errstr, "\n" );
 
     /* CH_0001 : Assembly error messages should appear on stderr */
-    fputs( errstr, stderr );
+    fputs( safestr_data(errstr), stderr );
 
     if ( errfile != NULL )
     {
-        fputs( errstr, errfile );
+        fputs( safestr_data(errstr), errfile );
     }
 
     /* increment error counters */
