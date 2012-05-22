@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.50 2012-05-20 06:39:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.51 2012-05-22 20:30:15 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.50  2012-05-20 06:39:27  pauloscustodio
+/* Revision 1.51  2012-05-22 20:30:15  pauloscustodio
+/* Use strupr (POSIX)  instead of strtoupper (removed from strutil)
+/*
+/* Revision 1.50  2012/05/20 06:39:27  pauloscustodio
 /* astyle
 /*
 /* Revision 1.49  2012/05/20 06:02:09  pauloscustodio
@@ -564,7 +567,7 @@ AssembleSourceFile( void )
         {
             path_basename( ident, srcfilename );
             path_remove_ext( ident );
-            strtoupper( ident );
+            strupr( ident );
             sym = name;
             DeclModuleName();
             /* ReportError (CURRENTFILE->fname, 0, ERR_MODULE_NOT_DEFINED); */
@@ -1156,12 +1159,10 @@ display_options( void )
     putchar( '\n' );
 }
 
-
 /***************************************************************************************************
  * Main entry of Z80asm
  ***************************************************************************************************/
-int
-main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
     int asmflag;
     int    i;
