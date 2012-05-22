@@ -19,9 +19,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.28 2012-05-12 17:15:57 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.29 2012-05-22 20:37:47 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.28  2012-05-12 17:15:57  pauloscustodio
+/* Revision 1.29  2012-05-22 20:37:47  pauloscustodio
+/* Version 1.1.14
+/*
+/* Revision 1.28  2012/05/12 17:15:57  pauloscustodio
 /* Version 1.1.13
 /*
 /* Revision 1.27  2012/01/12 18:53:58  pauloscustodio
@@ -519,7 +522,7 @@ the actual symbols names in question). Request by Dominic Morris of SmallC fame.
 "LINUX" OS ID now changed to generic "UNIX" in compilation, since there's no Linux specifics in the
 sources. Further, all UNIX's can successfully compile and execute z80asm.
 Recursive include of same or mutual files now error trapped (new FindFile() function and changes to
-IncludeFile() function).
+INCLUDE() function).
 
 04.05.99, V1.0.10 (gbs):
 Bug fixes related to reading filenames from source files (filenames should not be case converted
@@ -738,14 +741,14 @@ Based on 1.0.31
     CH_0004(a) : Exception mechanism to handle fatal errors
         - New exception FatalErrorException to raise on fatal assembly errors
         - ReportError(), LinkModules(), ModuleExpr(), CreateBinFile(),
-          CreateLib(), IncludeFile(), BINARY(): throw the new exception
+          CreateLib(), INCLUDE(), BINARY(): throw the new exception
           FatalErrorException for fatal errors ERR_FILE_OPEN and ERR_MAX_CODESIZE
         - AssembleSourceFile(): added try-catch to delete incomplete files
           in case of fatal error, throw FatalErrorException instead of early
           return.
         - main(): added try-catch to delete incomplete library file in case of
           fatal error.
-        - Z80pass1(), IncludeFile(): no need to check for fatal errors and return;
+        - Z80pass1(), INCLUDE(): no need to check for fatal errors and return;
           bypassed by the exception mechanism.
         - AssembleSourceFile(): error return is never used; changed to void.
         - source_file_open flag removed; z80asmfile is used for the same purpose.
@@ -848,11 +851,12 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
 05.04.2012 stefano
 -------------------------------------------------------------------------------
-    New stuff for z80asm
-    I just put in the version under developement of z80asm a couple of lines to
-    handle two new reserved words: ASMTAIL and ASMSIZE.
-    In my intention ASMTAIL could e used to define a good position for malloc()
-    or for a stack overflow protection routine.
+    CH_0006 : New reserved words ASMTAIL and ASMSIZE
+        New stuff for z80asm
+        I just put in the version under developement of z80asm a couple of lines to
+        handle two new reserved words: ASMTAIL and ASMSIZE.
+        In my intention ASMTAIL could e used to define a good position for malloc()
+        or for a stack overflow protection routine.
 
 -------------------------------------------------------------------------------
 12.05.2012 [1.1.13] (pauloscustodio)
@@ -883,6 +887,38 @@ Based on 1.0.31
     - Added testcase for ASMSIZE/ASMTAIL
 
 -------------------------------------------------------------------------------
+22.05.2012 [1.1.14] (pauloscustodio)
+-------------------------------------------------------------------------------
+    CH_0007 : Garbage collector
+    - Added automatic garbage collection on exit and simple fence mechanism
+      to detect buffer underflow and overflow, to memalloc functions.
+      No longer needed to call init_malloc().
+      No longer need to try/catch during creation of memory structures to
+      free partially created data - all not freed data is freed atexit().
+      Renamed xfree0() to xfree().
+
+    CH_0008 : Safe strings
+    - New type safestr_t to hold strings with size to prevent buffer overruns.
+
+    Internal cleanup:
+    - New init_except() to be called at start of main(), auto cleanup atexit().
+    - New die() and warn().
+    - New types.h with common types.
+    - Remove global ASSEMBLE_ERROR, not used.
+    - Remove global ASMERROR, redundant with TOTALERRORS.
+    - Remove IllegalArgumentException, replace by FatalErrorException.
+    - DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+      always raised on error.
+    - New errors_def.h with error name and string together, for easier
+      maintenance.
+    - ParseIndent(): remove hard coded IDs of IF, ELSE, ENDIF
+    - Z80ident[]: make always handling function the same name as assembler ident.
+    - Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
+    - ERR_SYMBOL_DECL_GLOBAL seams to be impossible to get. Added comment on this,
+      changed test error-18.t.
+    - Added tests
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -901,8 +937,8 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define DATE        "12.05.2012"
-#define VERSION     "1.1.13"
+#define DATE        "22.05.2012"
+#define VERSION     "1.1.14"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011"
 
 #ifdef QDOS
