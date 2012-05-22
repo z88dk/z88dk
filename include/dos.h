@@ -6,7 +6,7 @@
  *
  *      stefano2012
  *
- *	$Id: dos.h,v 1.2 2012-05-16 16:59:56 stefano Exp $
+ *	$Id: dos.h,v 1.3 2012-05-22 19:54:36 stefano Exp $
  */
 
 

@@ -2,7 +2,7 @@
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
 
-#pragma output hrgpage=36096
+//#pragma output hrgpage=36096
 
 #include <stdio.h>
 #include "icon"
@@ -33,7 +33,7 @@ GC gc;
 XFontStruct *font_info;
 char *display_name = NULL;
 int window_size = 0;
-  
+
 if ((display=XOpenDisplay(display_name)) == NULL)
   {
   fprintf(stderr,"basicwin: cannot connect to X server %s\n",
@@ -47,11 +47,11 @@ display_width = DisplayWidth(display,screen);
 display_height = DisplayHeight(display,screen);
 
 
-//width = display_width/3;
-//height = display_height/4;
+width = display_width-16;
+height = display_height-16;
 
-width = 230;
-height = 160;
+//width = 230;
+//height = 160;
 
 win = XCreateSimpleWindow(display, RootWindow(display,screen),
 			  x, y, width, height, border_width,

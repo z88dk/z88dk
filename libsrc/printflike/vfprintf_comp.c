@@ -11,11 +11,7 @@
 
 extern __LIB__ utoi(); 
 
-
-int vfprintf_comp(fd,ctl, ap)
-FILE *fd ;
-unsigned char *ctl;
-void *ap ;
+int vfprintf_comp(FILE *fd, unsigned char *ctl,void *ap)
 {
         int i, prec, preclen, len ;
         unsigned char c, right, str[25], pad;
@@ -96,7 +92,7 @@ void *ap ;
 		    continue ;
                 }
                 ctl = cx ; /* accept conversion spec */
-                if ( c != 's' )
+                if ( c != 's' && c != 'c' )
                         while ( *sptr == ' ' )
                                 ++sptr ;
                 len = -1 ;

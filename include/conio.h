@@ -9,7 +9,7 @@
  *
  *      stefano - 18/3/2004
  *
- *	$Id: conio.h,v 1.5 2012-05-16 16:59:56 stefano Exp $
+ *	$Id: conio.h,v 1.6 2012-05-22 19:54:36 stefano Exp $
  */
 
 #ifndef __CONIO_H__
@@ -21,8 +21,6 @@
 #include <stdlib.h>
 #include <dos.h>
 
-// THIS ONE IS TERRIFIC !
-#define elseif else if
 
 #define    BLACK         0
 #define    BLUE          1
@@ -63,7 +61,7 @@ int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define cgets gets
 #define cscanf scanf
 
-#define gotoxy(a,b)     printf("%c[%u;%uH",27,b-1,a-1)
+#define gotoxy(a,b)     printf("%c[%u;%uH",27,b,a)
 
 
 /* Reads a character directly from the console, without echo. */
@@ -81,5 +79,30 @@ int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 
 #define random(a) rand()%a
 
+
+// Missing functions, not yet implemented
+//extern int  __LIB__ movetext (int _left, int _top, int _right, int _bottom, int _destleft, int _desttop);
+//extern int  __LIB__ wherex (void);
+//extern int  __LIB__ wherey (void);
+//extern int  __LIB__ gettext (int left, int top, int right, int bottom, void *destin);
+
+#define	getpixel(a,b)	point(a,b)
+#define	putpixel(a,b,c)	(c ? plot(a,b):unplot(a,b))
+#define getmaxcolor()	1
+#define closegraph()		clrscr()
+#define initgraph(a,b,c)	clrscr()
+#define DETECT	0
+#define	grOk	0
+/*
+#define graphresult()	0
+#define clearviewport()	clrscr()
+*/
+#define	outtextxy(a,b,c) {}
+#define	rectangle(a,b,c,d) drawb(a,b,c-a,d-b)
+#define	ellipse(a,b,c,d,e,f) {}
+#define	circle(a,b,c) circle(a,b,c,1)
+#define	line(a,b,c,d) draw(a,b,c,d)
+#define	sector(a,b,c,d,e,f) {}
+#define drawpoly(a,b) {}
 
 #endif /* _CONIO_H */

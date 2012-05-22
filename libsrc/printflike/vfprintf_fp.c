@@ -17,10 +17,7 @@ extern __LIB__ utoi() ;
 #define ERR -1
 
 
-vfprintf_fp(fd, ctl, ap)
-    FILE *fd;
-    unsigned char *ctl;
-    void *ap;
+int vfprintf_fp(FILE *fd, unsigned char *ctl,void *ap)
 {
 	int i, width, prec, preclen, len, pf_count=0 ;
 	unsigned char c, right, str[128], pad;
@@ -114,7 +111,7 @@ vfprintf_fp(fd, ctl, ap)
                 continue ;
 		}
 		ctl = cx ; /* accept conversion spec */
-		if ( c != 's' )
+		if ( c != 's' && c != 'c' )
 			while ( *sptr == ' ' )
 				++sptr ;
 		len = -1 ;
