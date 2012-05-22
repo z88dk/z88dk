@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.13 2012-05-20 05:51:19 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.14 2012-05-22 20:33:34 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.13  2012-05-20 05:51:19  pauloscustodio
+# Revision 1.14  2012-05-22 20:33:34  pauloscustodio
+# Added tests
+#
+# Revision 1.13  2012/05/20 05:51:19  pauloscustodio
 # Need more test files, mask error return after exception
 #
 # Revision 1.12  2012/05/20 05:40:00  pauloscustodio
@@ -412,6 +415,7 @@ sub normalize {
 	
 	# mask error number - random value on memory exception
 	$err =~ s/(The value of errno was) \d+/$1 0/gi;
+	$err =~ s/(thrown at \w+ \(\w+\.c):\d+/$1:0/gi;
 	
 	return $err;
 }

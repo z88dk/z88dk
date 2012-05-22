@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.2 2012-05-20 06:32:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.3 2012-05-22 20:33:34 pauloscustodio Exp $
 # $Log: whitebox-memalloc.t,v $
-# Revision 1.2  2012-05-20 06:32:50  pauloscustodio
+# Revision 1.3  2012-05-22 20:33:34  pauloscustodio
+# Added tests
+#
+# Revision 1.2  2012/05/20 06:32:50  pauloscustodio
 # Added tests
 #
 # Revision 1.1  2012/05/20 05:48:26  pauloscustodio
@@ -24,9 +27,6 @@
 # Revision 1.1  2012/05/17 15:04:47  pauloscustodio
 # white box test of new modules
 #
-# Revision 1.1  2012/04/22 20:32:20  pauloscustodio
-# Test new ASMTAIL and ASMSIZE keywords
-#
 # Test memory allocation
 
 use Modern::Perl;
@@ -34,10 +34,10 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test memalloc
-my $compile = "-DMEMALLOC_DEBUG memalloc.c die.c except.c";
+my $compile = "-DMEMALLOC_DEBUG memalloc.c die.c except.c strutil.c";
 
 # allocate and no free no debug
-t_compile_module("", <<'END', "memalloc.c die.c except.c");
+t_compile_module("", <<'END', "memalloc.c die.c except.c strutil.c");
 	char * p1 = xmalloc(1);
 	char * p2 = xmalloc(2);
 	p1[0] = p2[0] = p2[1] = 0;
@@ -192,7 +192,7 @@ memalloc test.c(1): alloc 2147483680 bytes failed
 Uncaught NotEnoughMemoryException: memalloc test.c(1): alloc 2147483680 bytes failed
 
 
-    thrown at die (die.c:50)
+    thrown at die (die.c:0)
 
 The value of errno was 0.
 
@@ -215,7 +215,7 @@ memalloc test.c(1): block not found
 Uncaught AssertionException: memalloc test.c(1): block not found
 
 
-    thrown at die (die.c:50)
+    thrown at die (die.c:0)
 
 The value of errno was 0.
 
@@ -240,7 +240,7 @@ memalloc test.c(2): buffer underflow, memory allocated at test.c(1)
 Uncaught AssertionException: memalloc test.c(2): buffer underflow, memory allocated at test.c(1)
 
 
-    thrown at die (die.c:50)
+    thrown at die (die.c:0)
 
 The value of errno was 0.
 
@@ -265,7 +265,7 @@ memalloc test.c(2): buffer overflow, memory allocated at test.c(1)
 Uncaught AssertionException: memalloc test.c(2): buffer overflow, memory allocated at test.c(1)
 
 
-    thrown at die (die.c:50)
+    thrown at die (die.c:0)
 
 The value of errno was 0.
 

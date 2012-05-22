@@ -13,16 +13,16 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.2 2012-05-20 05:53:01 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.3 2012-05-22 20:33:34 pauloscustodio Exp $
 # $Log: whitebox-except.t,v $
-# Revision 1.2  2012-05-20 05:53:01  pauloscustodio
+# Revision 1.3  2012-05-22 20:33:34  pauloscustodio
+# Added tests
+#
+# Revision 1.2  2012/05/20 05:53:01  pauloscustodio
 # Test raising RuntimeException and AssertionException
 #
 # Revision 1.1  2012/05/17 15:04:47  pauloscustodio
 # white box test of new modules
-#
-# Revision 1.1  2012/04/22 20:32:20  pauloscustodio
-# Test new ASMTAIL and ASMSIZE keywords
 #
 # Test exceptions
 
@@ -30,7 +30,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $compile = "-DEXCEPT_DEBUG except.c die.c";
+my $compile = "-DEXCEPT_DEBUG except.c die.c strutil.c";
 
 # compile
 t_compile_module('', <<'END', $compile);
@@ -86,7 +86,7 @@ except: init
 
 Uncaught AssertionException: Error
 
-    thrown at main (test.c:20)
+    thrown at main (test.c:0)
 
 The value of errno was 0.
 

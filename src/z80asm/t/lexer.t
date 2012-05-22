@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/lexer.t,v 1.1 2012-05-20 06:32:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/lexer.t,v 1.2 2012-05-22 20:33:34 pauloscustodio Exp $
 # $Log: lexer.t,v $
-# Revision 1.1  2012-05-20 06:32:50  pauloscustodio
+# Revision 1.2  2012-05-22 20:33:34  pauloscustodio
+# Added tests
+#
+# Revision 1.1  2012/05/20 06:32:50  pauloscustodio
 # Added tests
 #
 # Revision 1.1  2011/08/05 19:28:40  pauloscustodio
@@ -52,6 +55,7 @@ my @asmbin = (
 	['defb 5*2,100/10,10%3',		"\x0A\x0A\x01"],
 	['defb 2^7',					"\x80"],
 	['defb 2*[1+2*(1+2)]',			"\x0E"],
+	['defb 2*1+2*1+2',				"\x06"],
 	['defb !0,!1',					"\1\0"],
 	["defb ' '",					"\x20"],
 );

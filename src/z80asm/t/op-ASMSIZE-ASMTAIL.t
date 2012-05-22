@@ -13,14 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/op-ASMSIZE-ASMTAIL.t,v 1.1 2012-04-22 20:32:20 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/op-ASMSIZE-ASMTAIL.t,v 1.2 2012-05-22 20:33:34 pauloscustodio Exp $
 # $Log: op-ASMSIZE-ASMTAIL.t,v $
-# Revision 1.1  2012-04-22 20:32:20  pauloscustodio
+# Revision 1.2  2012-05-22 20:33:34  pauloscustodio
+# Added tests
+#
+# Revision 1.1  2012/04/22 20:32:20  pauloscustodio
 # Test new ASMTAIL and ASMSIZE keywords
 #
-#
-#
-# Test ASMSIZE, ASMTAIL symbols
 
 use strict;
 use warnings;
