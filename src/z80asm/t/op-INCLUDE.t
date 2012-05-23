@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/op-INCLUDE.t,v 1.2 2012-05-20 06:32:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/op-INCLUDE.t,v 1.3 2012-05-23 20:45:42 pauloscustodio Exp $
 # $Log: op-INCLUDE.t,v $
-# Revision 1.2  2012-05-20 06:32:50  pauloscustodio
+# Revision 1.3  2012-05-23 20:45:42  pauloscustodio
+# Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
+# Add tests.
+#
+# Revision 1.2  2012/05/20 06:32:50  pauloscustodio
 # Added tests
 #
 # Revision 1.1  2011/08/05 19:28:40  pauloscustodio
@@ -52,7 +56,7 @@ write_file($dir.'/'.inc_file(), 'ld a,10');
 
 t_z80asm_ok(0, 'include "'.$dir.'/'.inc_file().'"', "\x3E\x0A");
 t_z80asm_error('include "'.inc_file().'"', 
-				"Error: File 'test.asm', at line 1, File 'test.inc' open error");
+				"Error: File 'test.asm', at line 1, Cannot open file 'test.inc' for reading");
 t_z80asm_ok(0, 'include "'.inc_file().'"', "\x3E\x0A", "-I$dir");
 
 # recursive include

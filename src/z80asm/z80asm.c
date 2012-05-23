@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.51 2012-05-22 20:30:15 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.52 2012-05-23 20:45:42 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.51  2012-05-22 20:30:15  pauloscustodio
+/* Revision 1.52  2012-05-23 20:45:42  pauloscustodio
+/* Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
+/* Add tests.
+/*
+/* Revision 1.51  2012/05/22 20:30:15  pauloscustodio
 /* Use strupr (POSIX)  instead of strtoupper (removed from strutil)
 /*
 /* Revision 1.50  2012/05/20 06:39:27  pauloscustodio
@@ -514,7 +518,7 @@ AssembleSourceFile( void )
         if ( ( errfile = fopen( errfilename, "w" ) ) == NULL )
         {
             /* Create error file */
-            ReportError( NULL, 0, ERR_FILE_OPEN, errfilename );
+            ReportError( NULL, 0, ERR_FOPEN_WRITE, errfilename );
             throw( FatalErrorException, "cannot open errfile" );
         }
 
@@ -530,7 +534,7 @@ AssembleSourceFile( void )
             }
             else
             {
-                ReportError( NULL, 0, ERR_FILE_OPEN, lstfilename );
+                ReportError( NULL, 0, ERR_FOPEN_WRITE, lstfilename );
                 throw( FatalErrorException, "cannot open lstfile" );
             }
         }
@@ -543,7 +547,7 @@ AssembleSourceFile( void )
         }
         else
         {
-            ReportError( NULL, 0, ERR_FILE_OPEN, objfilename );
+            ReportError( NULL, 0, ERR_FOPEN_WRITE, objfilename );
             throw( FatalErrorException, "cannot open objfile" );
         }
 
@@ -596,7 +600,7 @@ AssembleSourceFile( void )
             z80asmfile = NULL;
         }
 
-        if ( listing_CPY || symfile )
+        if ( listfile != NULL )
         {
             fseek( listfile, 0, SEEK_END );
             xfputc( 12, listfile );     /* end listing with a FF */
@@ -609,8 +613,11 @@ AssembleSourceFile( void )
             }
         }
 
-        fclose( objfile );
-        objfile = NULL;
+        if ( objfile != NULL )
+        {
+            fclose( objfile );
+            objfile = NULL;
+        }
 
         if ( ERRORS )
         {
@@ -690,7 +697,7 @@ TestAsmFile( void )
     if ( ( z80asmfile = fopen( srcfilename, "rb" ) ) == NULL )
     {
         /* Open source file */
-        ReportError( NULL, 0, ERR_FILE_OPEN, srcfilename );             /* Object module is not found or */
+        ReportError( NULL, 0, ERR_FOPEN_READ, srcfilename );             /* Object module is not found or */
         return -1;              /* source is has recently been updated */
     }
 
@@ -759,7 +766,7 @@ GetModuleSize( void )
     }
     else
     {
-        ReportError( NULL, 0, ERR_FILE_OPEN, objfilename );
+        ReportError( NULL, 0, ERR_FOPEN_READ, objfilename );
         return -1;
     }
 }
@@ -1247,7 +1254,7 @@ int main( int argc, char *argv[] )
                 if ( ( *argv )[0] == '@' )
                     if ( ( modsrcfile = fopen( ( *argv + 1 ), "rb" ) ) == NULL )
                     {
-                        ReportError( NULL, 0, ERR_FILE_OPEN, ( *argv + 1 ) );
+                        ReportError( NULL, 0, ERR_FOPEN_READ, ( *argv + 1 ) );
                     }
 
                 break;
@@ -1324,7 +1331,7 @@ again:
 
                     if ( ( modsrcfile = fopen( ident + 1, "rb" ) ) == NULL )
                     {
-                        ReportError( NULL, 0, ERR_FILE_OPEN, ident + 1 );
+                        ReportError( NULL, 0, ERR_FOPEN_READ, ident + 1 );
                     }
                     else
                     {

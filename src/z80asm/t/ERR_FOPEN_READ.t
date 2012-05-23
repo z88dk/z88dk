@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_FILE_OPEN.t,v 1.1 2012-05-23 18:07:51 pauloscustodio Exp $
-# $Log: ERR_FILE_OPEN.t,v $
-# Revision 1.1  2012-05-23 18:07:51  pauloscustodio
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_FOPEN_READ.t,v 1.1 2012-05-23 20:45:42 pauloscustodio Exp $
+# $Log: ERR_FOPEN_READ.t,v $
+# Revision 1.1  2012-05-23 20:45:42  pauloscustodio
+# Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
+# Add tests.
+#
+# Revision 1.1  2012/05/23 18:07:51  pauloscustodio
 # Unlink test files for errors from error numbers, to be able to change
 # error numbers.
 #
@@ -37,7 +41,6 @@
 # - Added test scripts for error messages.
 #
 #
-#
 # Test ERR_FILE_OPEN
 
 use strict;
@@ -47,7 +50,7 @@ require 't/test_utils.pl';
 
 unlink_testfiles();
 t_z80asm_capture(asm_file(), "",
-		"Error: File '".asm_file()."' open error\n".
+		"Error: Cannot open file '".asm_file()."' for reading\n".
 		"1 errors occurred during assembly\n",
 		1);
 
@@ -57,7 +60,14 @@ t_z80asm_error('
 	include "'.inc_file().'"
 	ld b, 1
 	', 
-	"Error: File 'test.asm', at line 3, File 'test.inc' open error",
+	"Error: File 'test.asm', at line 3, Cannot open file 'test.inc' for reading",
+	"-l");
+
+unlink_testfiles();
+t_z80asm_error('
+	binary "'.inc_file().'"
+	', 
+	"Error: File 'test.asm', at line 2, Cannot open file 'test.inc' for reading",
 	"-l");
 
 unlink_testfiles();

@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.27 2012-05-18 00:20:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.28 2012-05-23 20:45:42 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.27  2012-05-18 00:20:32  pauloscustodio
+/* Revision 1.28  2012-05-23 20:45:42  pauloscustodio
+/* Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
+/* Add tests.
+/*
+/* Revision 1.27  2012/05/18 00:20:32  pauloscustodio
 /* ParseIndent(): remove hard coded IDs of IF, ELSE, ENDIF
 /* Z80ident[]: make always handling function the same name as assembler ident.
 /*
@@ -982,7 +986,7 @@ INCLUDE( void )
         if ( ( z80asmfile = fopen( filename, "rb" ) ) == NULL )
         {
             /* Open include file */
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_FILE_OPEN, filename );
+            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_FOPEN_READ, filename );
             throw( FatalErrorException, "INCLUDE failed open include file" );
         }
         else
@@ -1004,7 +1008,7 @@ INCLUDE( void )
             if ( ( z80asmfile = fopen( CURRENTFILE->fname, "rb" ) ) == NULL )
             {
                 /* re-open current source file */
-                ReportError( NULL, 0, ERR_FILE_OPEN, CURRENTFILE->fname );
+                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_FOPEN_READ, CURRENTFILE->fname );
                 throw( FatalErrorException, "INCLUDE failed open original file" );
             }
             else
@@ -1036,7 +1040,7 @@ BINARY( void )
 
         if ( ( binfile = fopen( filename, "rb" ) ) == NULL )
         {
-            ReportError( NULL, 0, ERR_FILE_OPEN, filename );
+            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_FOPEN_READ, filename );
             throw( FatalErrorException, "BINARY failed open file" );
         }
 

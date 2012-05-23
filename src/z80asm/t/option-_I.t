@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-_I.t,v 1.2 2011-07-14 01:32:09 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-_I.t,v 1.3 2012-05-23 20:45:42 pauloscustodio Exp $
 # $Log: option-_I.t,v $
-# Revision 1.2  2011-07-14 01:32:09  pauloscustodio
+# Revision 1.3  2012-05-23 20:45:42  pauloscustodio
+# Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
+# Add tests.
+#
+# Revision 1.2  2011/07/14 01:32:09  pauloscustodio
 #     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 #     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 #     CH_0003 : Error messages should be more informative
@@ -46,7 +50,8 @@ write_file($inc, "ld a,1");
 t_z80asm_ok(0, "include \"$inc\"", "\x3E\x01");
 
 # no -I, only file name : error
-t_z80asm_error("include \"$inc_base\"", "Error: File 'test.asm', at line 1, File 'test.inc' open error");
+t_z80asm_error("include \"$inc_base\"", 
+			"Error: File 'test.asm', at line 1, Cannot open file 'test.inc' for reading");
 
 # -I : OK
 t_z80asm_ok(0, "include \"$inc_base\"", "\x3E\x01", "-I$inc_dir");
