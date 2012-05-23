@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.7 2012-05-17 21:36:06 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.8 2012-05-23 20:43:02 pauloscustodio Exp $ */
 /* $Log: errors.h,v $
-/* Revision 1.7  2012-05-17 21:36:06  pauloscustodio
+/* Revision 1.8  2012-05-23 20:43:02  pauloscustodio
+/* Remove ERR_NO_ERR, not used
+/*
+/* Revision 1.7  2012/05/17 21:36:06  pauloscustodio
 /* Remove global ASMERROR, redundant with TOTALERRORS.
 /* Remove IllegalArgumentException, replace by FatalErrorException.
 /*
@@ -71,7 +74,6 @@ Copyright (C) Paulo Custodio, 2011
 
 typedef enum ErrorCode
 {
-    ERR_NO_ERR                  = -1,
 #include "errors_def.h"
 } ErrorCode;
 
