@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.14 2012-05-22 20:33:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.15 2012-05-23 19:57:59 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.14  2012-05-22 20:33:34  pauloscustodio
+# Revision 1.15  2012-05-23 19:57:59  pauloscustodio
+# Test that files created with -c have correct content
+#
+# Revision 1.14  2012/05/22 20:33:34  pauloscustodio
 # Added tests
 #
 # Revision 1.13  2012/05/20 05:51:19  pauloscustodio
@@ -78,7 +81,7 @@ my $test	 = "test";
 
 sub z80asm	 { $ENV{Z80ASM} || "z80asm" }
 
-my @TEST_EXT = (qw( asm lst inc bin map obj lib sym def err exe c o ));
+my @TEST_EXT = (qw( asm lst inc bin bn0 bn1 bn2 bn3 map obj lib sym def err exe c o ));
 my @MAIN_TEST_FILES;
 my @TEST_FILES;
 
