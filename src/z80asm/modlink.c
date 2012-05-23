@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.37 2012-05-20 06:39:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.38 2012-05-23 20:00:38 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.37  2012-05-20 06:39:27  pauloscustodio
+/* Revision 1.38  2012-05-23 20:00:38  pauloscustodio
+/* BUG_0017 : no error message if fails to create binary file chunk (option -c).
+/* Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
+/*
+/* Revision 1.37  2012/05/20 06:39:27  pauloscustodio
 /* astyle
 /*
 /* Revision 1.36  2012/05/20 06:02:09  pauloscustodio
@@ -597,7 +601,7 @@ LinkModules( void )
 
         if ( ( errfile = fopen( errfilename, "w" ) ) == NULL )  /* open error file */
         {
-            ReportError( NULL, 0, ERR_FILE_OPEN, errfilename ); /* couldn't open error file */
+            ReportError( NULL, 0, ERR_FOPEN_WRITE, errfilename ); /* couldn't open error file */
             throw( FatalErrorException, "cant open errfilename" );
         }
 
@@ -626,7 +630,7 @@ LinkModules( void )
             }
             else
             {
-                ReportError( NULL, 0, ERR_FILE_OPEN, objfilename );     /* couldn't open relocatable file */
+                ReportError( NULL, 0, ERR_FOPEN_READ, objfilename );     /* couldn't open relocatable file */
                 break;
             }
 
@@ -1080,7 +1084,7 @@ ModuleExpr( void )
         }
         else
         {
-            ReportError( NULL, 0, ERR_FILE_OPEN, curlink->objfilename );          /* couldn't open relocatable file */
+            ReportError( NULL, 0, ERR_FOPEN_READ, curlink->objfilename );          /* couldn't open relocatable file */
             throw( FatalErrorException, "ModuleExpr failed open objfile" );
         }
 
@@ -1179,6 +1183,11 @@ CreateBinFile( void )
                     fwrite_codearea_chunk( binaryfile, offset, codeblock ); /* code in 16K chunks */
                     fclose( binaryfile );
                 }
+                else    /* BUG_0017 : was missing else */
+                {
+                    ReportError( NULL, 0, ERR_FOPEN_WRITE, tmpstr );
+                    throw( FatalErrorException, "CreateBinFile failed open binfile" );
+                }
 
                 offset += codeblock;
             }
@@ -1197,7 +1206,7 @@ CreateBinFile( void )
     }
     else
     {
-        ReportError( NULL, 0, ERR_FILE_OPEN, tmpstr );
+        ReportError( NULL, 0, ERR_FOPEN_WRITE, tmpstr );
         throw( FatalErrorException, "CreateBinFile failed open binfile" );
     }
 }
@@ -1226,7 +1235,7 @@ CreateLib( void )
         if ( ( errfile = fopen( errfilename, "w" ) ) == NULL )
         {
             /* open error file */
-            ReportError( NULL, 0, ERR_FILE_OPEN, errfilename );
+            ReportError( NULL, 0, ERR_FOPEN_WRITE, errfilename );
             throw( FatalErrorException, "cannot open errfilename" );
         }
 
@@ -1237,7 +1246,7 @@ CreateLib( void )
 
             if ( ( objectfile = fopen( CURRENTFILE->fname, "rb" ) ) == NULL )
             {
-                ReportError( NULL, 0, ERR_FILE_OPEN, CURRENTFILE->fname );
+                ReportError( NULL, 0, ERR_FOPEN_READ, CURRENTFILE->fname );
                 throw( FatalErrorException, "cannot open objfile" );
             }
 
@@ -1375,7 +1384,7 @@ CreateDeffile( void )
         if ( ( deffile = fopen( globaldefname, "w" ) ) == NULL )
         {
             /* Create DEFC file with global label declarations */
-            ReportError( NULL, 0, ERR_FILE_OPEN, globaldefname );       /* not fatal */
+            ReportError( NULL, 0, ERR_FOPEN_WRITE, globaldefname );       /* not fatal */
             globaldef = OFF;
         }
     }
@@ -1435,7 +1444,7 @@ WriteMapFile( void )
         }
         else
         {
-            ReportError( NULL, 0, ERR_FILE_OPEN, mapfilename );     /* not fatal */
+            ReportError( NULL, 0, ERR_FOPEN_WRITE, mapfilename );     /* not fatal */
         }
     }
 
