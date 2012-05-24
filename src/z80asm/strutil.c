@@ -16,11 +16,14 @@ Copyright (C) Paulo Custodio, 2011
 Utilities for string handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.3 2012-05-22 20:26:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.4 2012-05-24 15:07:03 pauloscustodio Exp $ */
 /* $Log: strutil.c,v $
-/* Revision 1.3  2012-05-22 20:26:17  pauloscustodio
+/* Revision 1.4  2012-05-24 15:07:03  pauloscustodio
+/* Rename safestr_t to sstr_t, keep length to speed-up appending chars
+/*
+/* Revision 1.3  2012/05/22 20:26:17  pauloscustodio
 /* Safe strings
-/* New type safestr_t to hold strings with size to prevent buffer overruns.
+/* New type sstr_t to hold strings with size to prevent buffer overruns.
 /* Remove strtoupper, use POSIX strupr instead
 /*
 /* Revision 1.2  2012/05/11 19:29:49  pauloscustodio
@@ -46,21 +49,21 @@ Utilities for string handling
 #include "strutil.h"
 
 /*-----------------------------------------------------------------------------
-*   safestr_set, safestr_cat : return address of data
+*   sstr_set, sstr_cat : return address of data
 *----------------------------------------------------------------------------*/
-char *safestr_set( safestr_t *self, char *source )
+char *sstr_set( sstr_t *self, char *source )
 {
-    safestr_clear( self );
-    return safestr_cat( self, source );
+    sstr_clear( self );
+    return sstr_cat( self, source );
 }
 
-char *safestr_cat( safestr_t *self, char *source )
+char *sstr_cat( sstr_t *self, char *source )
 {
-    size_t  mylen = safestr_len( self );
+    size_t  mylen = sstr_len( self );
     size_t  sourcelen = strlen( source );
     size_t  ncopy;
 
-    if ( mylen + sourcelen + 1 >= self->size )
+    if ( mylen + sourcelen + 1 > self->size )
     {
         ncopy = self->size - mylen - 1;     /* truncate */
     }
@@ -70,48 +73,59 @@ char *safestr_cat( safestr_t *self, char *source )
     }
 
     /* copy and null-terminate */
-    memcpy( safestr_data( self ) + mylen, source, ncopy );
-    safestr_data( self )[ mylen + ncopy ] = 0;
+    memcpy( sstr_data( self ) + mylen, source, ncopy );
+    sstr_len( self ) = mylen + ncopy;
+    sstr_data( self )[ sstr_len( self ) ] = 0;
 
-    return safestr_data( self );
+    return sstr_data( self );
 }
 
 /*-----------------------------------------------------------------------------
 *   sprintf-like set / cat
 *----------------------------------------------------------------------------*/
-char *safestr_vfset( safestr_t *self, char *format, va_list argptr )
+char *sstr_vfset( sstr_t *self, char *format, va_list argptr )
 {
-    safestr_clear( self );
-    return safestr_vfcat( self, format, argptr );
+    sstr_clear( self );
+    return sstr_vfcat( self, format, argptr );
 }
 
-char *safestr_vfcat( safestr_t *self, char *format, va_list argptr )
+char *sstr_vfcat( sstr_t *self, char *format, va_list argptr )
 {
-    size_t  mylen = safestr_len( self );
+    size_t  mylen = sstr_len( self );
     int     ncopy;      /* may be negative */
+    int     copied;
 
     ncopy = self->size - ( mylen + 1 );
 
     if ( ncopy > 0 )
     {
-        vsnprintf( safestr_data( self ) + mylen, ( size_t )ncopy, format, argptr );
+        /* returns number of chars written, or -1 if output truncated */
+        copied = vsnprintf( sstr_data( self ) + mylen, ( size_t )ncopy, format, argptr );
+        if (copied >= 0) 
+        {
+            sstr_len( self ) += copied;
+        }
+        else 
+        {
+            sstr_sync_len( self );
+        }
     }
 
-    return safestr_data( self );
+    return sstr_data( self );
 }
 
-char *safestr_fset( safestr_t *self, char *format, ... )
+char *sstr_fset( sstr_t *self, char *format, ... )
 {
     va_list argptr;
     va_start( argptr, format ); /* init variable args */
 
-    return safestr_vfset( self, format, argptr );
+    return sstr_vfset( self, format, argptr );
 }
 
-char *safestr_fcat( safestr_t *self, char *format, ... )
+char *sstr_fcat( sstr_t *self, char *format, ... )
 {
     va_list argptr;
     va_start( argptr, format ); /* init variable args */
 
-    return safestr_vfcat( self, format, argptr );
+    return sstr_vfcat( self, format, argptr );
 }

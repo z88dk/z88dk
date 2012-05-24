@@ -16,14 +16,17 @@ Copyright (C) Paulo Custodio, 2011-2012
 Utilities for string handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.4 2012-05-22 20:35:26 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.5 2012-05-24 15:07:03 pauloscustodio Exp $ */
 /* $Log: strutil.h,v $
-/* Revision 1.4  2012-05-22 20:35:26  pauloscustodio
+/* Revision 1.5  2012-05-24 15:07:03  pauloscustodio
+/* Rename safestr_t to sstr_t, keep length to speed-up appending chars
+/*
+/* Revision 1.4  2012/05/22 20:35:26  pauloscustodio
 /* astyle
 /*
 /* Revision 1.3  2012/05/22 20:26:17  pauloscustodio
 /* Safe strings
-/* New type safestr_t to hold strings with size to prevent buffer overruns.
+/* New type sstr_t to hold strings with size to prevent buffer overruns.
 /* Remove strtoupper, use POSIX strupr instead
 /*
 /* Revision 1.2  2012/05/11 19:29:49  pauloscustodio
@@ -58,51 +61,59 @@ Utilities for string handling
 /*-----------------------------------------------------------------------------
 *   Safe strings : char array with the size
 *
-*   A safestr_t can be defined and initialized in the stack or as global with:
+*   A sstr_t can be defined and initialized in the stack or as global with:
 *
-*       SAFESTR_DEFINE( name, maxsize );        // name isa safestr_t * name
+*       SSTR_DEFINE( name, maxsize );        // name isa sstr_t * name
 *
-*   To define a safestr_t pointing to an existent buffer, do:
+*   To define a sstr_t pointing to an existent buffer, do:
 *
 *       char buffer[SIZE];
-*       SAFESTR_DEFINE_REF( name, buffer, sizeof(buffer) );
+*       SSTR_DEFINE_REF( name, buffer, sizeof(buffer) );
 *
+*   The string keeps the length in an attribute to speed-up sstr_cat().
+*   If the buffer is manipulated, sstr_sync_len() needs to be called
+*   to synchronize the attribute with the string length.
 *----------------------------------------------------------------------------*/
-typedef struct safestr_t
+typedef struct sstr_t
 {
     char    *data;              /* point char array */
     size_t  size;               /* allocated size */
-} safestr_t;
+    size_t  len;                /* sring length (excluding zero terminator) */
+} sstr_t;
 
-#define SAFESTR_DEFINE_REF(name, buffer, maxsize)   \
-    safestr_t   name##_struct = { buffer, maxsize }; \
-    safestr_t * name = & name##_struct
+#define SSTR_DEFINE_REF(name, buffer, maxsize)   \
+    sstr_t   name##_struct = { buffer, maxsize, (buffer[0] = 0) }; \
+    sstr_t * name = & name##_struct
 
-#define SAFESTR_DEFINE(name, maxsize)   \
+#define SSTR_DEFINE(name, maxsize)   \
     char        name##_data [ maxsize ] = "";   \
-    SAFESTR_DEFINE_REF(name, name##_data, maxsize)
+    SSTR_DEFINE_REF(name, name##_data, maxsize)
 
 /* address of string chars */
-#define safestr_data(self)  \
+#define sstr_data(self)  \
     ((self)->data)
 
 /* string length (excluding zero terminator) */
-#define safestr_len(self)   \
-    strlen((self)->data)
+#define sstr_len(self)   \
+    ((self)->len)
+
+/* sync length in case string was modified in place */
+#define sstr_sync_len(self)	\
+    ((self)->len = strlen((self)->data))
 
 /* clear a string */
-#define safestr_clear(self) \
-    ((self)->data[0] = 0)
+#define sstr_clear(self) \
+    ((self)->data[0] = (self)->len = 0)
 
 /* set / cat from char * */
-extern char *safestr_set( safestr_t *self, char *source );
-extern char *safestr_cat( safestr_t *self, char *source );
+extern char *sstr_set( sstr_t *self, char *source );
+extern char *sstr_cat( sstr_t *self, char *source );
 
 /* sprintf-like set / cat */
-extern char *safestr_fset( safestr_t *self, char *format, ... );
-extern char *safestr_fcat( safestr_t *self, char *format, ... );
-extern char *safestr_vfset( safestr_t *self, char *format, va_list argptr );
-extern char *safestr_vfcat( safestr_t *self, char *format, va_list argptr );
+extern char *sstr_fset( sstr_t *self, char *format, ... );
+extern char *sstr_fcat( sstr_t *self, char *format, ... );
+extern char *sstr_vfset( sstr_t *self, char *format, va_list argptr );
+extern char *sstr_vfcat( sstr_t *self, char *format, va_list argptr );
 
 /*-----------------------------------------------------------------------------
 *   Utilities working on char *
