@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.32 2012-05-24 17:50:02 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.33 2012-05-24 21:42:42 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.32  2012-05-24 17:50:02  pauloscustodio
+# Revision 1.33  2012-05-24 21:42:42  pauloscustodio
+# CH_0011 : new string list class to hold lists of strings
+#
+# Revision 1.32  2012/05/24 17:50:02  pauloscustodio
 # CH_0010 : new string pool to hold strings for all program duration
 #
 # Revision 1.31  2012/05/24 17:01:45  pauloscustodio
@@ -161,6 +164,7 @@ OBJS = 	\
 	options.o	\
 	prsident.o	\
 	prsline.o	\
+	strlist.o	\
 	strpool.o	\
 	strutil.o	\
 	symbols.o	\
@@ -211,33 +215,39 @@ depend:
 
 asmdrctv.o: memalloc.h except.h e4c.h config.h ../config.h options.h symbol.h
 asmdrctv.o: avltree.h symbols.h z80asm.h types.h errors.h errors_def.h file.h
-asmdrctv.o: codearea.h
+asmdrctv.o: strlist.h class.h queue.h codearea.h
 avltree.o: memalloc.h except.h e4c.h avltree.h
 class.o: memalloc.h except.h e4c.h class.h queue.h types.h die.h
 codearea.o: codearea.h memalloc.h except.h e4c.h config.h ../config.h
 codearea.o: errors.h symbol.h avltree.h errors_def.h z80asm.h types.h file.h
+codearea.o: strlist.h class.h queue.h
 die.o: memalloc.h except.h e4c.h die.h types.h strutil.h
 errors.o: memalloc.h except.h e4c.h errors.h symbol.h avltree.h errors_def.h
 errors.o: options.h z80asm.h config.h ../config.h types.h strutil.h
 except.o: except.h memalloc.h e4c.h types.h die.h e4c.c
 exprprsr.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
-exprprsr.o: options.h errors.h errors_def.h file.h codearea.h
-file.o: file.h memalloc.h except.h e4c.h config.h ../config.h
+exprprsr.o: options.h errors.h errors_def.h file.h strlist.h class.h queue.h
+exprprsr.o: types.h codearea.h
+file.o: file.h memalloc.h except.h e4c.h strlist.h class.h queue.h types.h
+file.o: config.h ../config.h strutil.h strpool.h
 hist.o: memalloc.h except.h e4c.h hist.h
 ldinstr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 ldinstr.o: types.h symbol.h errors.h errors_def.h codearea.h options.h
 memalloc.o: memalloc.h except.h e4c.h types.h die.h queue.h
 modlink.o: memalloc.h except.h e4c.h config.h ../config.h options.h symbol.h
 modlink.o: avltree.h symbols.h z80asm.h types.h errors.h errors_def.h file.h
-modlink.o: codearea.h
+modlink.o: strlist.h class.h queue.h codearea.h
 objfile.o: objfile.h memalloc.h except.h e4c.h
 options.o: memalloc.h except.h e4c.h z80asm.h config.h ../config.h avltree.h
 options.o: types.h options.h symbol.h symbols.h errors.h errors_def.h
+options.o: strlist.h class.h queue.h file.h
 prsident.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 prsident.o: types.h symbol.h symbols.h options.h errors.h errors_def.h
 prsident.o: codearea.h
 prsline.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 prsline.o: types.h symbol.h options.h errors.h errors_def.h
+strlist.o: memalloc.h except.h e4c.h strlist.h class.h queue.h types.h
+strlist.o: strpool.h
 strpool.o: memalloc.h except.h e4c.h strpool.h class.h queue.h types.h
 strpool.o: uthash.h die.h
 strutil.o: strutil.h memalloc.h except.h e4c.h types.h
@@ -245,9 +255,9 @@ symbols.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
 symbols.o: symbols.h options.h errors.h errors_def.h
 z80asm.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
 z80asm.o: symbols.h z80asm.h types.h hist.h options.h errors.h errors_def.h
-z80asm.o: file.h codearea.h strutil.h
+z80asm.o: file.h strlist.h class.h queue.h codearea.h strutil.h
 z80instr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 z80instr.o: types.h symbol.h options.h errors.h errors_def.h codearea.h
 z80pass.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
 z80pass.o: symbols.h hist.h options.h z80asm.h types.h errors.h errors_def.h
-z80pass.o: file.h codearea.h
+z80pass.o: file.h strlist.h class.h queue.h codearea.h
