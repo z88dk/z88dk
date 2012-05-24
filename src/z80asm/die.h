@@ -10,15 +10,17 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011
+Copyright (C) Paulo Custodio, 2011-2012
 
 Exit with a fatal error, warn on stderr
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.h,v 1.3 2012-05-20 06:04:18 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.h,v 1.4 2012-05-24 17:09:27 pauloscustodio Exp $ */
 /* $Log: die.h,v $
-/* Revision 1.3  2012-05-20 06:04:18  pauloscustodio
+/* Revision 1.4  2012-05-24 17:09:27  pauloscustodio
+/* Unify copyright header
+/*
+/* Revision 1.3  2012/05/20 06:04:18  pauloscustodio
 /* die() with exception instead of exit(1)
 /*
 /* Revision 1.2  2012/05/17 15:10:47  pauloscustodio

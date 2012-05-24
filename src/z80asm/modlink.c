@@ -11,11 +11,15 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
+Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.38 2012-05-23 20:00:38 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.39 2012-05-24 17:09:27 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.38  2012-05-23 20:00:38  pauloscustodio
+/* Revision 1.39  2012-05-24 17:09:27  pauloscustodio
+/* Unify copyright header
+/*
+/* Revision 1.38  2012/05/23 20:00:38  pauloscustodio
 /* BUG_0017 : no error message if fails to create binary file chunk (option -c).
 /* Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
 /*

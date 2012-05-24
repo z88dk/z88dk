@@ -10,7 +10,6 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 
 Memory allocation routines with automatic garbage collection on exit,
@@ -19,9 +18,12 @@ Only works for memory allocated by xmalloc and freed by xfree.
 Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.c,v 1.5 2012-05-20 06:39:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.c,v 1.6 2012-05-24 17:09:27 pauloscustodio Exp $ */
 /* $Log: memalloc.c,v $
-/* Revision 1.5  2012-05-20 06:39:27  pauloscustodio
+/* Revision 1.6  2012-05-24 17:09:27  pauloscustodio
+/* Unify copyright header
+/*
+/* Revision 1.5  2012/05/20 06:39:27  pauloscustodio
 /* astyle
 /*
 /* Revision 1.4  2012/05/20 06:02:09  pauloscustodio

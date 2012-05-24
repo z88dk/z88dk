@@ -11,11 +11,15 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
+Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.26 2012-05-24 16:20:52 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.27 2012-05-24 17:09:27 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.26  2012-05-24 16:20:52  pauloscustodio
+/* Revision 1.27  2012-05-24 17:09:27  pauloscustodio
+/* Unify copyright header
+/*
+/* Revision 1.26  2012/05/24 16:20:52  pauloscustodio
 /* ERR_EXPR_SYNTAX renamed ERR_SYNTAX_EXPR (consistency)
 /*
 /* Revision 1.25  2012/05/20 06:39:27  pauloscustodio

@@ -11,11 +11,15 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
+Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.15 2012-05-20 06:01:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.16 2012-05-24 17:09:27 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.15  2012-05-20 06:01:03  pauloscustodio
+/* Revision 1.16  2012-05-24 17:09:27  pauloscustodio
+/* Unify copyright header
+/*
+/* Revision 1.15  2012/05/20 06:01:03  pauloscustodio
 /* Moved MAXLINE, WIN32 versions of snprintf, vsnprintf to types.h
 /*
 /* Revision 1.14  2012/05/17 14:47:39  pauloscustodio

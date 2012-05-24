@@ -11,14 +11,17 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011
+Copyright (C) Paulo Custodio, 2011-2012
 
 Define error codes and error messages
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.4 2012-05-24 16:20:52 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.5 2012-05-24 17:09:27 pauloscustodio Exp $ */
 /* $Log: errors_def.h,v $
-/* Revision 1.4  2012-05-24 16:20:52  pauloscustodio
+/* Revision 1.5  2012-05-24 17:09:27  pauloscustodio
+/* Unify copyright header
+/*
+/* Revision 1.4  2012/05/24 16:20:52  pauloscustodio
 /* ERR_EXPR_SYNTAX renamed ERR_SYNTAX_EXPR (consistency)
 /*
 /* Revision 1.3  2012/05/23 20:45:42  pauloscustodio

@@ -10,15 +10,17 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011
+Copyright (C) Paulo Custodio, 2011-2012
 
 Exit with a fatal error, warn on stderr
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.c,v 1.6 2012-05-24 15:07:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.c,v 1.7 2012-05-24 17:09:27 pauloscustodio Exp $ */
 /* $Log: die.c,v $
-/* Revision 1.6  2012-05-24 15:07:03  pauloscustodio
+/* Revision 1.7  2012-05-24 17:09:27  pauloscustodio
+/* Unify copyright header
+/*
+/* Revision 1.6  2012/05/24 15:07:03  pauloscustodio
 /* Rename safestr_t to sstr_t, keep length to speed-up appending chars
 /*
 /* Revision 1.5  2012/05/22 20:35:26  pauloscustodio

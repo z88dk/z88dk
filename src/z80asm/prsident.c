@@ -11,11 +11,15 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
+Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.31 2012-05-18 00:28:45 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.32 2012-05-24 17:09:27 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.31  2012-05-18 00:28:45  pauloscustodio
+/* Revision 1.32  2012-05-24 17:09:27  pauloscustodio
+/* Unify copyright header
+/*
+/* Revision 1.31  2012/05/18 00:28:45  pauloscustodio
 /* astyle
 /*
 /* Revision 1.30  2012/05/18 00:20:32  pauloscustodio

@@ -11,12 +11,15 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011
+Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.9 2012-05-24 13:43:52 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.10 2012-05-24 17:09:27 pauloscustodio Exp $ */
 /* $Log: errors.h,v $
-/* Revision 1.9  2012-05-24 13:43:52  pauloscustodio
+/* Revision 1.10  2012-05-24 17:09:27  pauloscustodio
+/* Unify copyright header
+/*
+/* Revision 1.9  2012/05/24 13:43:52  pauloscustodio
 /* Remove ERRORS, redundant with TOTALERRORS
 /*
 /* Revision 1.8  2012/05/23 20:43:02  pauloscustodio

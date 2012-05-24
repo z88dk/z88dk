@@ -11,11 +11,15 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
+Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.15 2012-05-20 05:31:18 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.16 2012-05-24 17:09:27 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.15  2012-05-20 05:31:18  pauloscustodio
+/* Revision 1.16  2012-05-24 17:09:27  pauloscustodio
+/* Unify copyright header
+/*
+/* Revision 1.15  2012/05/20 05:31:18  pauloscustodio
 /* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
 /*
 /* Revision 1.14  2012/05/17 17:42:14  pauloscustodio

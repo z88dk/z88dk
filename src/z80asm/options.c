@@ -11,12 +11,15 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011
+Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.10 2012-05-24 15:04:20 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.11 2012-05-24 17:09:27 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.10  2012-05-24 15:04:20  pauloscustodio
+/* Revision 1.11  2012-05-24 17:09:27  pauloscustodio
+/* Unify copyright header
+/*
+/* Revision 1.10  2012/05/24 15:04:20  pauloscustodio
 /* Make invalid option error fatal
 /*
 /* Revision 1.9  2012/05/17 21:36:06  pauloscustodio
