@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.30 2012-05-24 15:02:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.31 2012-05-24 17:01:45 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.30  2012-05-24 15:02:26  pauloscustodio
+# Revision 1.31  2012-05-24 17:01:45  pauloscustodio
+# CH_0009 : new CLASS to define simple classes
+#
+# Revision 1.30  2012/05/24 15:02:26  pauloscustodio
 # depends
 #
 # Revision 1.29  2012/05/17 20:29:32  pauloscustodio
@@ -140,6 +143,7 @@
 OBJS = 	\
 	asmdrctv.o 	\
 	avltree.o	\
+	class.o		\
 	codearea.o	\
 	die.o		\
 	errors.o	\
@@ -205,6 +209,7 @@ asmdrctv.o: memalloc.h except.h e4c.h config.h ../config.h options.h symbol.h
 asmdrctv.o: avltree.h symbols.h z80asm.h types.h errors.h errors_def.h file.h
 asmdrctv.o: codearea.h
 avltree.o: memalloc.h except.h e4c.h avltree.h
+class.o: memalloc.h except.h e4c.h class.h queue.h types.h die.h
 codearea.o: codearea.h memalloc.h except.h e4c.h config.h ../config.h
 codearea.o: errors.h symbol.h avltree.h errors_def.h z80asm.h types.h file.h
 die.o: memalloc.h except.h e4c.h die.h types.h strutil.h
