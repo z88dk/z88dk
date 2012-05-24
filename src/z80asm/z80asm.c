@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.52 2012-05-23 20:45:42 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.53 2012-05-24 10:58:39 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.52  2012-05-23 20:45:42  pauloscustodio
+/* Revision 1.53  2012-05-24 10:58:39  pauloscustodio
+/* BUG_0018 : stack overflow in '@' includes - wrong range check
+/*
+/* Revision 1.52  2012/05/23 20:45:42  pauloscustodio
 /* Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
 /* Add tests.
 /*
@@ -647,6 +650,97 @@ AssembleSourceFile( void )
     }
 }
 
+/*-----------------------------------------------------------------------------
+* Assemble a source file or a '@' list file
+*----------------------------------------------------------------------------*/
+static void AssembleAny( char *file )
+{
+    FILE *atfile;
+    char *read_file;
+    int flag;
+
+    switch ( file[0] )
+    {
+        case '\0':
+            /* no file to include */
+            return;
+
+        case '-':
+            /* Illegal source file name */
+            ReportError( NULL, 0, ERR_ILLEGAL_SRC_FILENAME, file );
+            return;
+
+        case '@':
+            file++;     /* skip '@' marker */
+            atfile = fopen( file, "rb" );
+
+            if ( atfile == NULL )
+            {
+                ReportError( NULL, 0, ERR_FOPEN_READ, file );
+            }
+            else
+            {
+                /* read lines from atfile and recurse */
+                while ( ( read_file = Fetchfilename( atfile ) ) &&
+                        *read_file )
+                {
+                    AssembleAny( read_file );
+                }
+
+                fclose( atfile );
+            }
+
+            return;             /* end of atfile */
+
+        default:
+            ; /* fall over to normal case */
+    }
+
+    /* normal case - assemble a asm source file */
+    z80asmfile = listfile = objfile = errfile = NULL;
+
+    init_codearea();            /* Pointer (PC) to store z80 instruction */
+    ERRORS = 0;
+
+    path_replace_ext( srcfilename, file, srcext );      /* set '.asm' extension */
+    path_replace_ext( objfilename, file, objext );      /* set '.obj' extension */
+    path_replace_ext( errfilename, file, FILEEXT_ERR ); /* set '.err' extension */
+    path_replace_ext( lstfilename, file,
+                      listing ? FILEEXT_LST             /* set '.lst' extension */
+                      : FILEEXT_SYM );                  /* set '.sym' extension */
+
+    /* Create module data structures for new file */
+    CURRENTMODULE = NewModule();
+    E4C_ASSERT( CURRENTMODULE != NULL );
+
+    /* Create first file record */
+    CURRENTFILE = Newfile( NULL, srcfilename );
+    E4C_ASSERT( CURRENTFILE != NULL );
+
+    if ( globaldef && CURRENTMODULE == modulehdr->first )
+    {
+        CreateDeffile();
+    }
+
+    flag = TestAsmFile();
+    if ( flag == 1 )            /* begin assembly... */
+    {
+        AssembleSourceFile();   
+
+        if ( verbose )
+        {
+            putchar( '\n' );    /* separate module texts */
+        }
+    }
+    else if ( flag == -1 )      /* file open error */
+    {
+        throw( FatalErrorException, "file open error" );
+    }
+    else                        /* file is up-to-date */
+    {
+    }
+}
+
 
 void
 CloseFiles( void )
@@ -1171,11 +1265,8 @@ display_options( void )
  ***************************************************************************************************/
 int main( int argc, char *argv[] )
 {
-    int asmflag;
     int    i;
     char  *ptr;
-    int    include_level = 0;
-    FILE  *includes[10];   /* 10 levels of inclusion should be enough */
 
     init_except();                      /* init exception mechanism */
 
@@ -1219,10 +1310,6 @@ int main( int argc, char *argv[] )
         TOTALERRORS = 0;
         TOTALLINES = 0;
 
-        CURRENTMODULE = NewModule();            /* then create a dummy module */
-        /* this is needed during command line parsing */
-        E4C_ASSERT( CURRENTMODULE != NULL );
-
         /* Setup some default search paths */
         i = include_dir_num++;
         include_dir = xrealloc( include_dir, include_dir_num * sizeof( include_dir[0] ) );
@@ -1240,30 +1327,13 @@ int main( int argc, char *argv[] )
         lib_dir[i] = xstrdup( "." );
 
 
-        while ( --argc > 0 )
+        /* Get options first */
+        for ( i = 1; i < argc && argv[i][0] == '-'; i++ )
         {
-            /* Get options first */
-            ++argv;
-
-            if ( ( *argv )[0] == '-' )
-            {
-                SetAsmFlag( ( ( *argv ) + 1 ) );
-            }
-            else
-            {
-                if ( ( *argv )[0] == '@' )
-                    if ( ( modsrcfile = fopen( ( *argv + 1 ), "rb" ) ) == NULL )
-                    {
-                        ReportError( NULL, 0, ERR_FOPEN_READ, ( *argv + 1 ) );
-                    }
-
-                break;
-            }
+            SetAsmFlag( argv[i] + 1 );
         }
 
-        ReleaseModules();               /* Now remove dummy module again, not needed */
-
-        if ( !argc && modsrcfile == NULL )
+        if ( i >= argc )
         {
             ReportError( NULL, 0, ERR_NO_SRC_FILE );
             throw( FatalErrorException, "no source file" );
@@ -1276,104 +1346,13 @@ int main( int argc, char *argv[] )
             display_options();    /* display status messages of select assembler options */
         }
 
-        for ( ;; )
+        /* Assemble file list */
+        for ( ; i < argc; i++ )
         {
-            /* Module loop */
-            z80asmfile = listfile = objfile = errfile = NULL;
+            AssembleAny( argv[i] );
+        }
 
-            init_codearea();            /* Pointer (PC)     to store z80 instruction */
-            ERRORS = 0;
-
-            if ( modsrcfile == NULL )
-            {
-                if ( argc > 0 )
-                {
-                    if ( ( *argv )[0] != '-' )
-                    {
-                        ident[0] = '\0';                /* prepare for strncat */
-                        strncat( ident, *argv, 254 );
-                        --argc;
-                        ++argv; /* get ready for next filename */
-                    }
-                    else
-                    {
-                        ReportError( NULL, 0, ERR_ILLEGAL_SRC_FILENAME, *argv ); /* Illegal source file name */
-                        break;
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-            else
-            {
-again:
-                ptr = Fetchfilename( modsrcfile );
-                strcpy( ident, ptr );
-
-                if ( strlen( ident ) == 0 )
-                {
-                    fclose( modsrcfile );
-
-                    if ( include_level )
-                    {
-                        include_level--;
-                        modsrcfile = includes[include_level];
-                        goto again;
-                    }
-
-                    break;
-                }
-                else if ( ident[0] == '@' && include_level < sizeof( includes ) - 1 )
-                {
-                    includes[include_level++] = modsrcfile;
-
-                    if ( ( modsrcfile = fopen( ident + 1, "rb" ) ) == NULL )
-                    {
-                        ReportError( NULL, 0, ERR_FOPEN_READ, ident + 1 );
-                    }
-                    else
-                    {
-                        goto again;
-                    }
-                }
-            }
-
-            path_replace_ext( srcfilename, ident, srcext );         /* set '.asm' extension */
-            path_replace_ext( objfilename, ident, objext );         /* set '.obj' extension */
-            path_replace_ext( errfilename, ident, FILEEXT_ERR );  /* set '.err' extension */
-            path_replace_ext( lstfilename, ident,
-                              listing ? FILEEXT_LST                  /* set '.lst' extension */
-                              : FILEEXT_SYM );               /* set '.sym' extension */
-
-            CURRENTMODULE = NewModule();                    /* Create module data structures for new file */
-            E4C_ASSERT( CURRENTMODULE != NULL );
-
-            CURRENTFILE = Newfile( NULL, srcfilename );   /* Create first file record */
-            E4C_ASSERT( CURRENTFILE != NULL );
-
-            if ( globaldef && CURRENTMODULE == modulehdr->first )
-            {
-                CreateDeffile();
-            }
-
-            if ( ( asmflag = TestAsmFile() ) == 1 )
-            {
-                AssembleSourceFile();   /* begin assembly... */
-
-                if ( verbose )
-                {
-                    putchar( '\n' );    /* separate module texts */
-                }
-            }
-            else if ( asmflag == -1 )
-            {
-                break;    /* file open error - stop assembler */
-            }
-
-        }                               /* for */
-
+        /* Link */
         CloseFiles();
 
         if ( globaldef )
