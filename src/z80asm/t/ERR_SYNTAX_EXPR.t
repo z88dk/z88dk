@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_EXPR_SYNTAX.t,v 1.1 2012-05-23 18:07:51 pauloscustodio Exp $
-# $Log: ERR_EXPR_SYNTAX.t,v $
-# Revision 1.1  2012-05-23 18:07:51  pauloscustodio
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_SYNTAX_EXPR.t,v 1.1 2012-05-24 17:18:52 pauloscustodio Exp $
+# $Log: ERR_SYNTAX_EXPR.t,v $
+# Revision 1.1  2012-05-24 17:18:52  pauloscustodio
+# ERR_EXPR_SYNTAX renamed ERR_SYNTAX_EXPR (consistency)
+#
+# Revision 1.1  2012/05/23 18:07:51  pauloscustodio
 # Unlink test files for errors from error numbers, to be able to change
 # error numbers.
 #
