@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.56 2012-05-24 15:07:43 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.57 2012-05-24 17:00:43 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.56  2012-05-24 15:07:43  pauloscustodio
+/* Revision 1.57  2012-05-24 17:00:43  pauloscustodio
+/* astyle
+/*
+/* Revision 1.56  2012/05/24 15:07:43  pauloscustodio
 /* whitespace
 /*
 /* Revision 1.55  2012/05/24 13:43:52  pauloscustodio
@@ -711,7 +714,7 @@ static void AssembleAny( char *file )
     z80asmfile = listfile = objfile = errfile = NULL;
 
     init_codearea();            /* Pointer (PC) to store z80 instruction */
-    
+
     path_replace_ext( srcfilename, file, srcext );      /* set '.asm' extension */
     path_replace_ext( objfilename, file, objext );      /* set '.obj' extension */
     path_replace_ext( errfilename, file, FILEEXT_ERR ); /* set '.err' extension */

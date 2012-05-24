@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011
 Utilities for string handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.4 2012-05-24 15:07:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.5 2012-05-24 17:00:43 pauloscustodio Exp $ */
 /* $Log: strutil.c,v $
-/* Revision 1.4  2012-05-24 15:07:03  pauloscustodio
+/* Revision 1.5  2012-05-24 17:00:43  pauloscustodio
+/* astyle
+/*
+/* Revision 1.4  2012/05/24 15:07:03  pauloscustodio
 /* Rename safestr_t to sstr_t, keep length to speed-up appending chars
 /*
 /* Revision 1.3  2012/05/22 20:26:17  pauloscustodio
@@ -101,11 +104,12 @@ char *sstr_vfcat( sstr_t *self, char *format, va_list argptr )
     {
         /* returns number of chars written, or -1 if output truncated */
         copied = vsnprintf( sstr_data( self ) + mylen, ( size_t )ncopy, format, argptr );
-        if (copied >= 0) 
+
+        if ( copied >= 0 )
         {
             sstr_len( self ) += copied;
         }
-        else 
+        else
         {
             sstr_sync_len( self );
         }

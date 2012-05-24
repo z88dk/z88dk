@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Utilities for string handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.5 2012-05-24 15:07:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.6 2012-05-24 17:00:43 pauloscustodio Exp $ */
 /* $Log: strutil.h,v $
-/* Revision 1.5  2012-05-24 15:07:03  pauloscustodio
+/* Revision 1.6  2012-05-24 17:00:43  pauloscustodio
+/* astyle
+/*
+/* Revision 1.5  2012/05/24 15:07:03  pauloscustodio
 /* Rename safestr_t to sstr_t, keep length to speed-up appending chars
 /*
 /* Revision 1.4  2012/05/22 20:35:26  pauloscustodio
@@ -98,7 +101,7 @@ typedef struct sstr_t
     ((self)->len)
 
 /* sync length in case string was modified in place */
-#define sstr_sync_len(self)	\
+#define sstr_sync_len(self) \
     ((self)->len = strlen((self)->data))
 
 /* clear a string */
