@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.9 2012-05-17 21:36:06 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.10 2012-05-24 15:04:20 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.9  2012-05-17 21:36:06  pauloscustodio
+/* Revision 1.10  2012-05-24 15:04:20  pauloscustodio
+/* Make invalid option error fatal
+/*
+/* Revision 1.9  2012/05/17 21:36:06  pauloscustodio
 /* Remove global ASMERROR, redundant with TOTALERRORS.
 /* Remove IllegalArgumentException, replace by FatalErrorException.
 /*
@@ -418,6 +421,7 @@ void SetAsmFlag( char *flagid )
     {
         /* BUG_0003 was missing Illegal Option error */
         ReportError( NULL, 0, ERR_ILLEGAL_OPTION, flagid );
+        throw( FatalErrorException, "invalid option" );
     }
 }
 
