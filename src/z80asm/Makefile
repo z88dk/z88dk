@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.31 2012-05-24 17:01:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.32 2012-05-24 17:50:02 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.31  2012-05-24 17:01:45  pauloscustodio
+# Revision 1.32  2012-05-24 17:50:02  pauloscustodio
+# CH_0010 : new string pool to hold strings for all program duration
+#
+# Revision 1.31  2012/05/24 17:01:45  pauloscustodio
 # CH_0009 : new CLASS to define simple classes
 #
 # Revision 1.30  2012/05/24 15:02:26  pauloscustodio
@@ -158,6 +161,7 @@ OBJS = 	\
 	options.o	\
 	prsident.o	\
 	prsline.o	\
+	strpool.o	\
 	strutil.o	\
 	symbols.o	\
 	z80asm.o	\
@@ -234,6 +238,8 @@ prsident.o: types.h symbol.h symbols.h options.h errors.h errors_def.h
 prsident.o: codearea.h
 prsline.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 prsline.o: types.h symbol.h options.h errors.h errors_def.h
+strpool.o: memalloc.h except.h e4c.h strpool.h class.h queue.h types.h
+strpool.o: uthash.h die.h
 strutil.o: strutil.h memalloc.h except.h e4c.h types.h
 symbols.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
 symbols.o: symbols.h options.h errors.h errors_def.h
