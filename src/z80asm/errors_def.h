@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011
 Define error codes and error messages
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.3 2012-05-23 20:45:42 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.4 2012-05-24 16:20:52 pauloscustodio Exp $ */
 /* $Log: errors_def.h,v $
-/* Revision 1.3  2012-05-23 20:45:42  pauloscustodio
+/* Revision 1.4  2012-05-24 16:20:52  pauloscustodio
+/* ERR_EXPR_SYNTAX renamed ERR_SYNTAX_EXPR (consistency)
+/*
+/* Revision 1.3  2012/05/23 20:45:42  pauloscustodio
 /* Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
 /* Add tests.
 /*
@@ -32,15 +35,24 @@ Define error codes and error messages
 /*
 /* */
 
+/* information */
 DEF_MSG( ERR_OK,                    "OK" ) /* not used */
+DEF_MSG( ERR_TOTALERRORS,           "%d errors occurred during assembly" )
+
+/* system errors */
+DEF_MSG( ERR_NO_MEMORY,             "Not enough memory" )
+
+/* file errors */
 DEF_MSG( ERR_FOPEN_READ,            "Cannot open file '%s' for reading" )
 DEF_MSG( ERR_FOPEN_WRITE,           "Cannot open file '%s' for writing" )
 
+/* syntax errors */
 DEF_MSG( ERR_SYNTAX,                "Syntax error" )
+DEF_MSG( ERR_SYNTAX_EXPR,           "Syntax error in expression" )
+
+
 DEF_MSG( ERR_NOT_DEFINED,           "Symbol not defined" )
-DEF_MSG( ERR_NO_MEMORY,             "Not enough memory" )
 DEF_MSG( ERR_INT_RANGE,             "Integer '%ld' out of range" )
-DEF_MSG( ERR_EXPR_SYNTAX,           "Syntax error in expression" )
 DEF_MSG( ERR_UNBALANCED_PAREN,      "Unbalanced parenthesis" )
 DEF_MSG( ERR_RANGE,                 "Out of range" )   /* not used */
 DEF_MSG( ERR_NO_SRC_FILE,           "Source filename missing" )
@@ -48,7 +60,6 @@ DEF_MSG( ERR_ILLEGAL_OPTION,        "Illegal option '-%s'" )
 DEF_MSG( ERR_UNKNOWN_IDENT,         "Unknown identifier" )
 DEF_MSG( ERR_ILLEGAL_IDENT,         "Illegal identifier" )
 DEF_MSG( ERR_MAX_CODESIZE,          "Max. code size of %ld bytes reached" )
-DEF_MSG( ERR_TOTALERRORS,           "%d errors occurred during assembly" )
 DEF_MSG( ERR_SYMBOL_REDEFINED,      "Symbol '%s' already defined" )
 DEF_MSG( ERR_MODULE_REDEFINED,      "Module name already defined" )
 DEF_MSG( ERR_MODULE_NOT_DEFINED,    "Module name not defined" ) /* not used */

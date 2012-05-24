@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.25 2012-05-20 06:39:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.26 2012-05-24 16:20:52 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.25  2012-05-20 06:39:27  pauloscustodio
+/* Revision 1.26  2012-05-24 16:20:52  pauloscustodio
+/* ERR_EXPR_SYNTAX renamed ERR_SYNTAX_EXPR (consistency)
+/*
+/* Revision 1.25  2012/05/20 06:39:27  pauloscustodio
 /* astyle
 /*
 /* Revision 1.24  2012/05/20 06:02:08  pauloscustodio
@@ -323,7 +326,7 @@ Factor( struct expr *pfixexpr )
 
             if ( eval_err == 1 )
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_EXPR_SYNTAX );
+                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX_EXPR );
                 return 0;           /* syntax error in expression */
             }
             else
@@ -404,7 +407,7 @@ Factor( struct expr *pfixexpr )
                     }
                     else
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_EXPR_SYNTAX );
+                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX_EXPR );
                         return 0;
                     }
                 }
@@ -435,7 +438,7 @@ Factor( struct expr *pfixexpr )
             break;
 
         default:
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_EXPR_SYNTAX );  /* syntax error */
+            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX_EXPR );  /* syntax error */
             return 0;
     }
 
