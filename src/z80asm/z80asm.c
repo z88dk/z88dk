@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.53 2012-05-24 10:58:39 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.54 2012-05-24 11:27:10 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.53  2012-05-24 10:58:39  pauloscustodio
+/* Revision 1.54  2012-05-24 11:27:10  pauloscustodio
+/* astyle
+/*
+/* Revision 1.53  2012/05/24 10:58:39  pauloscustodio
 /* BUG_0018 : stack overflow in '@' includes - wrong range check
 /*
 /* Revision 1.52  2012/05/23 20:45:42  pauloscustodio
@@ -723,9 +726,10 @@ static void AssembleAny( char *file )
     }
 
     flag = TestAsmFile();
+
     if ( flag == 1 )            /* begin assembly... */
     {
-        AssembleSourceFile();   
+        AssembleSourceFile();
 
         if ( verbose )
         {
