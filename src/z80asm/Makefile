@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.29 2012-05-17 20:29:32 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.30 2012-05-24 15:02:26 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.29  2012-05-17 20:29:32  pauloscustodio
+# Revision 1.30  2012-05-24 15:02:26  pauloscustodio
+# depends
+#
+# Revision 1.29  2012/05/17 20:29:32  pauloscustodio
 # depends
 #
 # Revision 1.28  2012/05/17 17:11:47  pauloscustodio
@@ -204,9 +207,9 @@ asmdrctv.o: codearea.h
 avltree.o: memalloc.h except.h e4c.h avltree.h
 codearea.o: codearea.h memalloc.h except.h e4c.h config.h ../config.h
 codearea.o: errors.h symbol.h avltree.h errors_def.h z80asm.h types.h file.h
-die.o: memalloc.h except.h e4c.h die.h
+die.o: memalloc.h except.h e4c.h die.h types.h strutil.h
 errors.o: memalloc.h except.h e4c.h errors.h symbol.h avltree.h errors_def.h
-errors.o: options.h z80asm.h config.h ../config.h types.h
+errors.o: options.h z80asm.h config.h ../config.h types.h strutil.h
 except.o: except.h memalloc.h e4c.h types.h die.h e4c.c
 exprprsr.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
 exprprsr.o: options.h errors.h errors_def.h file.h codearea.h
@@ -214,7 +217,7 @@ file.o: file.h memalloc.h except.h e4c.h config.h ../config.h
 hist.o: memalloc.h except.h e4c.h hist.h
 ldinstr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 ldinstr.o: types.h symbol.h errors.h errors_def.h codearea.h options.h
-memalloc.o: memalloc.h except.h e4c.h
+memalloc.o: memalloc.h except.h e4c.h types.h die.h queue.h
 modlink.o: memalloc.h except.h e4c.h config.h ../config.h options.h symbol.h
 modlink.o: avltree.h symbols.h z80asm.h types.h errors.h errors_def.h file.h
 modlink.o: codearea.h
@@ -226,7 +229,7 @@ prsident.o: types.h symbol.h symbols.h options.h errors.h errors_def.h
 prsident.o: codearea.h
 prsline.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 prsline.o: types.h symbol.h options.h errors.h errors_def.h
-strutil.o: strutil.h memalloc.h except.h e4c.h
+strutil.o: strutil.h memalloc.h except.h e4c.h types.h
 symbols.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
 symbols.o: symbols.h options.h errors.h errors_def.h
 z80asm.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
