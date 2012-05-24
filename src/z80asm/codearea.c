@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.4 2012-05-20 06:02:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.5 2012-05-24 16:18:53 pauloscustodio Exp $ */
 /* $Log: codearea.c,v $
-/* Revision 1.4  2012-05-20 06:02:08  pauloscustodio
+/* Revision 1.5  2012-05-24 16:18:53  pauloscustodio
+/* Let garbage collector do memory release atexit()
+/*
+/* Revision 1.4  2012/05/20 06:02:08  pauloscustodio
 /* Garbage collector
 /* Added automatic garbage collection on exit and simple fence mechanism
 /* to detect buffer underflow and overflow, to memalloc functions.
@@ -75,23 +78,14 @@ static size_t codesize;                 /* size of all modules before current,
 static size_t PC, oldPC;                /* Program Counter */
 
 /*-----------------------------------------------------------------------------
-*   free_objfile_data
-*       Free all global structures
-*----------------------------------------------------------------------------*/
-static void free_objfile_data( void )
-{
-    xfree( codearea );                 /* free memory for Z80 machine code */
-}
-
-/*-----------------------------------------------------------------------------
 *   init_codearea_module
 *       Alloc all global structures
 *----------------------------------------------------------------------------*/
 void init_codearea_module( void )
 {
+    /* allocate memory for Z80 machine code, will be cleaned by garbage collector
+       in memalloc.c */
     codearea = ( unsigned char * ) xcalloc( MAXCODESIZE, sizeof( char ) );
-    /* allocate memory for Z80 machine code */
-    atexit( free_objfile_data );        /* cleanup on program end */
 
     init_codearea();                    /* init vars */
 
