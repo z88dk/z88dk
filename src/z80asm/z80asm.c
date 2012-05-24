@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.58 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.59 2012-05-24 21:48:24 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.58  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.59  2012-05-24 21:48:24  pauloscustodio
+/* Remove the global variables include_dir, lib_dir, and respective
+/* counts, create instead the paths in the options module and
+/* create new search_include_file() and search_lib_file()
+/* functions to replace SearchFile().
+/*
+/* Revision 1.58  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.57  2012/05/24 17:00:43  pauloscustodio
@@ -201,7 +207,7 @@ Copyright (C) Paulo Custodio, 2011-2012
 /*      When the Z80_STDLIB variable is defined, libfilename is allocated with one byte
 /*      too short (strlen(filename) instead of strlen(filename)+1).
 /* BUG_0003 : Illegal options are ignored, although ReportError 9 (Illegal Option) exists
-/*      SetAsmFlag(): Some options were missing the 'return' statement, following through
+/*      set_asm_flag(): Some options were missing the 'return' statement, following through
 /*      to the next tests; inserted 'return' in options 'M', 'I', 'L' and 'D'.
 /*      Added ReportError 9 (Illegal Option) if the option is not recognized.
 /* CH_0001 : Assembly error messages should appear on stderr
@@ -467,11 +473,6 @@ struct libfile *NewLibrary( void );
 
 
 FILE *z80asmfile, *listfile, *errfile, *objfile, *mapfile, *modsrcfile, *deffile, *libfile;
-
-int      include_dir_num = 0;
-char   **include_dir = NULL;
-int      lib_dir_num = 0;
-char   **lib_dir = NULL;
 
 /* BUG_0001 array ssym[] needs to have one element per character in
  * separators, plus one newline to match the final '\0' just in case it is
@@ -947,7 +948,7 @@ GetLibfile( char *filename )
 
         snprintf( tempbuf, sizeof( tempbuf ), "%s%s", filename, ext );
 
-        ptr = SearchFile( tempbuf, 0 );
+        ptr = search_lib_file( tempbuf );
 
         f = xstrdup( ptr );
     }
@@ -1296,7 +1297,7 @@ int main( int argc, char *argv[] )
         writeline = ON;
         library = createlibrary = OFF;
 
-        ResetOptions();
+        reset_options();
         ResetErrors();
 
         modsrcfile = NULL;
@@ -1324,26 +1325,10 @@ int main( int argc, char *argv[] )
         TOTALERRORS = 0;
         TOTALLINES = 0;
 
-        /* Setup some default search paths */
-        i = include_dir_num++;
-        include_dir = xrealloc( include_dir, include_dir_num * sizeof( include_dir[0] ) );
-        include_dir[i] = xstrdup( "." );
-
-        if ( ( ptr = getenv( "Z80_OZFILES" ) ) != NULL )
-        {
-            i = include_dir_num++;
-            include_dir = xrealloc( include_dir, include_dir_num * sizeof( include_dir[0] ) );
-            include_dir[i] = xstrdup( ptr );
-        }
-
-        i = lib_dir_num++;
-        lib_dir = xrealloc( lib_dir, lib_dir_num * sizeof( lib_dir[0] ) );
-        lib_dir[i] = xstrdup( "." );
-
         /* Get options first */
         for ( i = 1; i < argc && argv[i][0] == '-'; i++ )
         {
-            SetAsmFlag( argv[i] + 1 );
+            set_asm_flag( argv[i] + 1 );
         }
 
         if ( i >= argc )
@@ -1457,40 +1442,13 @@ int main( int argc, char *argv[] )
         }
 
         if ( autorelocate )
+        {
             if ( reloctable != NULL )
             {
                 xfree( reloctable );
             }
-
-        /* BUG_0007 : memory leaks */
-        if ( include_dir )
-        {
-            int i;
-
-            for ( i = 0; i < include_dir_num; i++ )
-            {
-                xfree( include_dir[i] );
-            }
-
-            xfree( include_dir );
         }
 
-        include_dir = NULL;
-
-        /* BUG_0007 : memory leaks */
-        if ( lib_dir )
-        {
-            int i;
-
-            for ( i = 0; i < lib_dir_num; i++ )
-            {
-                xfree( lib_dir[i] );
-            }
-
-            xfree( lib_dir );
-        }
-
-        lib_dir = NULL;
 #endif
     }
 
@@ -1551,47 +1509,6 @@ symbol *
 createsym( symbol *symptr )
 {
     return CreateSymbol( symptr->symname, symptr->symvalue, symptr->type, symptr->owner );
-}
-
-
-/** \brief Search for a filename in the include path
- *
- *  \param base - The filename to search for
- *
- *  \return Filename (static buffer)
- */
-char *SearchFile( char *base, int is_include )
-{
-    static char  filename[FILENAME_MAX + 1];
-    char       **paths = lib_dir;
-    int          paths_num = lib_dir_num;
-    struct stat  sb;
-    int          i;
-
-    if ( is_include )
-    {
-        paths = include_dir;
-        paths_num = include_dir_num;
-    }
-
-    if ( stat( base, &sb ) == 0 )
-    {
-        snprintf( filename, sizeof( filename ), "%s", base );
-        return filename;
-    }
-
-    for ( i = 0; i < paths_num; i++ )
-    {
-        snprintf( filename, sizeof( filename ), "%s/%s", paths[i], base );
-
-        if ( stat( filename, &sb ) == 0 )
-        {
-            return filename;
-        }
-    }
-
-    snprintf( filename, sizeof( filename ), "%s", base );
-    return filename;
 }
 
 

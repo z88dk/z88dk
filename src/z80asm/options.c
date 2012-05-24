@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.11 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.12 2012-05-24 21:48:24 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.11  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.12  2012-05-24 21:48:24  pauloscustodio
+/* Remove the global variables include_dir, lib_dir, and respective
+/* counts, create instead the paths in the options module and
+/* create new search_include_file() and search_lib_file()
+/* functions to replace SearchFile().
+/*
+/* Revision 1.11  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.10  2012/05/24 15:04:20  pauloscustodio
@@ -86,6 +92,8 @@ Copyright (C) Paulo Custodio, 2011-2012
 #include "options.h"
 #include "symbols.h"
 #include "errors.h"
+#include "strlist.h"
+#include "file.h"
 
 /* global option variables */
 enum flag smallc_source;
@@ -113,11 +121,53 @@ char srcext[FILEEXT_MAX];       /* contains default source file extension */
 char objext[FILEEXT_MAX];       /* contains default object file extension */
 int  cpu_type;
 
+/* directory lists for search_include_file() and search_lib_file() */
+static StrList *include_path = NULL;
+static StrList *lib_path = NULL;
+
 /*-----------------------------------------------------------------------------
-*   ResetOptions
+*   Initialize search paths
+*----------------------------------------------------------------------------*/
+static void init_search_paths( void )
+{
+    char *dir;
+
+    if ( include_path == NULL )
+    {
+        include_path = OBJ_NEW( StrList );
+
+        dir = getenv( "Z80_OZFILES" );
+
+        if ( dir != NULL )
+        {
+            StrList_append( include_path, dir );
+        }
+    }
+
+    if ( lib_path == NULL )
+    {
+        lib_path = OBJ_NEW( StrList );
+    }
+}
+
+/*-----------------------------------------------------------------------------
+*   Search file
+*----------------------------------------------------------------------------*/
+char *search_include_file( char *filename )
+{
+    return search_file( filename, include_path );
+}
+
+char *search_lib_file( char *filename )
+{
+    return search_file( filename, lib_path );
+}
+
+/*-----------------------------------------------------------------------------
+*   reset_options
 *       Reset globals to defaults
 *----------------------------------------------------------------------------*/
-void ResetOptions( void )
+void reset_options( void )
 {
     smallc_source   = OFF;
     ti83plus        = OFF;
@@ -143,16 +193,18 @@ void ResetOptions( void )
 
     strcpy( srcext, FILEEXT_ASM );      /* use ".asm" as default source file extension */
     strcpy( objext, FILEEXT_OBJ );      /* use ".obj" as default source file extension */
+
+    init_search_paths();                /* initialize the search paths */
 }
 
 /*-----------------------------------------------------------------------------
-*   SetAsmFlag
+*   set_asm_flag
 *       Parse one command line option
 *   Args:
 *       string after the initial '-' option start
 *   Sets global option variables, stop with error if option cannot be parsed
 *----------------------------------------------------------------------------*/
-void SetAsmFlag( char *flagid )
+void set_asm_flag( char *flagid )
 {
     if ( *flagid == 'e' )
     {
@@ -355,16 +407,12 @@ void SetAsmFlag( char *flagid )
 
     else if ( *flagid == 'I' )
     {
-        int i = include_dir_num++;
-        include_dir = xrealloc( include_dir, include_dir_num * sizeof( include_dir[0] ) );
-        include_dir[i] = xstrdup( flagid + 1 );
+        StrList_append( include_path, flagid + 1 );
     }
 
     else if ( *flagid == 'L' )
     {
-        int i = lib_dir_num++;
-        lib_dir = xrealloc( lib_dir, lib_dir_num * sizeof( lib_dir[0] ) );
-        lib_dir[i] = xstrdup( flagid + 1 );
+        StrList_append( lib_path, flagid + 1 );
     }
 
     else if ( *flagid == 'D' )

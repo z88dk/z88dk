@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.29 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.30 2012-05-24 21:48:24 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.29  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.30  2012-05-24 21:48:24  pauloscustodio
+/* Remove the global variables include_dir, lib_dir, and respective
+/* counts, create instead the paths in the options module and
+/* create new search_include_file() and search_lib_file()
+/* functions to replace SearchFile().
+/*
+/* Revision 1.29  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.28  2012/05/23 20:45:42  pauloscustodio
@@ -1115,7 +1121,7 @@ Fetchfilename( FILE *fptr )
         ptr++;
     }
 
-    return strlen( ptr ) ? SearchFile( ptr, 1 ) : "";
+    return strlen( ptr ) ? search_include_file( ptr ) : "";
 }
 
 

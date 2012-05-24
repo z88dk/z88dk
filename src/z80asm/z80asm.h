@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.16 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.17 2012-05-24 21:48:24 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.16  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.17  2012-05-24 21:48:24  pauloscustodio
+/* Remove the global variables include_dir, lib_dir, and respective
+/* counts, create instead the paths in the options module and
+/* create new search_include_file() and search_lib_file()
+/* functions to replace SearchFile().
+/*
+/* Revision 1.16  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.15  2012/05/20 06:01:03  pauloscustodio
@@ -151,13 +157,7 @@ extern avltree *globalroot, *staticroot;
 extern struct module *CURRENTMODULE;
 extern FILE *listfile, *mapfile, *z80asmfile, *errfile, *deffile, *libfile;
 
-extern int      include_dir_num;
-extern char   **include_dir;
-extern int      lib_dir_num;
-extern char   **lib_dir;
-
 extern char *Fetchfilename( FILE *fptr );
-extern char *SearchFile( char *base, int is_include );
 extern void CreateLibfile( char *filename );
 extern void GetLibfile( char *filename );
 extern void usage( void );
