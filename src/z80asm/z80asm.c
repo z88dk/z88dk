@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.55 2012-05-24 13:43:52 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.56 2012-05-24 15:07:43 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.55  2012-05-24 13:43:52  pauloscustodio
+/* Revision 1.56  2012-05-24 15:07:43  pauloscustodio
+/* whitespace
+/*
+/* Revision 1.55  2012/05/24 13:43:52  pauloscustodio
 /* Remove ERRORS, redundant with TOTALERRORS
 /*
 /* Revision 1.54  2012/05/24 11:27:10  pauloscustodio
@@ -1283,7 +1286,6 @@ int main( int argc, char *argv[] )
     {
         init_codearea_module();         /* init data for object file creation */
 
-
         writeline = ON;
         library = createlibrary = OFF;
 
@@ -1311,9 +1313,6 @@ int main( int argc, char *argv[] )
         time( &asmtime );
         date = asctime( localtime( &asmtime ) ); /* get current system time for date in list file */
 
-
-
-
         PAGELEN = 66;
         TOTALERRORS = 0;
         TOTALLINES = 0;
@@ -1333,7 +1332,6 @@ int main( int argc, char *argv[] )
         i = lib_dir_num++;
         lib_dir = xrealloc( lib_dir, lib_dir_num * sizeof( lib_dir[0] ) );
         lib_dir[i] = xstrdup( "." );
-
 
         /* Get options first */
         for ( i = 1; i < argc && argv[i][0] == '-'; i++ )
