@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.6 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.7 2012-05-24 21:44:00 pauloscustodio Exp $ */
 /* $Log: file.h,v $
-/* Revision 1.6  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.7  2012-05-24 21:44:00  pauloscustodio
+/* New search_file() to search file in a StrList
+/*
+/* Revision 1.6  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.5  2012/05/11 19:29:49  pauloscustodio
@@ -56,6 +59,7 @@ Utilities for file handling
 #define FILE_H
 
 #include "memalloc.h"                   /* before any other include to enable memory leak detection */
+#include "strlist.h"
 
 #include <stdio.h>
 
@@ -82,6 +86,10 @@ extern long   xfget_long( FILE *stream );
 extern char *path_remove_ext( char *filename );
 extern char *path_replace_ext( char *dest, const char *source, const char *new_ext );
 extern char *path_basename( char *dest, const char *source );
+
+/* search for a file on the given directory list, return full path name
+ * pathname is stored in strpool, no need to remove */
+extern char *search_file( char *filename, StrList *dir_list );
 
 #endif /* ndef FILE_H */
 

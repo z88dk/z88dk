@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.7 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.8 2012-05-24 21:44:00 pauloscustodio Exp $ */
 /* $Log: file.c,v $
-/* Revision 1.7  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.8  2012-05-24 21:44:00  pauloscustodio
+/* New search_file() to search file in a StrList
+/*
+/* Revision 1.7  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.6  2012/05/11 19:29:49  pauloscustodio
@@ -60,8 +63,13 @@ Utilities for file handling
 
 #include <string.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "file.h"
 #include "config.h"
+#include "strutil.h"
+#include "strpool.h"
 
 /*-----------------------------------------------------------------------------
 *   File IO with exception
@@ -241,3 +249,36 @@ char *path_basename( char *dest, const char *source )
 }
 
 
+/*-----------------------------------------------------------------------------
+*  Search for a file on the given directory list, return full path name
+*  pathname is stored in strpool, no need to remove
+*----------------------------------------------------------------------------*/
+char *search_file( char *filename, StrList *dir_list )
+{
+    StrListElem *iter;
+    char        *dir;
+    struct stat sb;
+    SSTR_DEFINE( pathname, FILENAME_MAX );
+
+    /* check if file exists in current directory */
+    if ( stat( filename, &sb ) == 0 )
+    {
+        return strpool_add( filename );
+    }
+
+    /* search in dir_list */
+    StrList_first( dir_list, &iter );
+
+    while ( dir = StrList_next( dir_list, &iter ) )
+    {
+        sstr_fset( pathname, "%s/%s", dir, filename );
+
+        if ( stat( sstr_data( pathname ), &sb ) == 0 )
+        {
+            return strpool_add( sstr_data( pathname ) );
+        }
+    }
+
+    /* return unchanged pathname if not found */
+    return strpool_add( filename );
+}
