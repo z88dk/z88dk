@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.8 2012-05-23 20:43:02 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.9 2012-05-24 13:43:52 pauloscustodio Exp $ */
 /* $Log: errors.h,v $
-/* Revision 1.8  2012-05-23 20:43:02  pauloscustodio
+/* Revision 1.9  2012-05-24 13:43:52  pauloscustodio
+/* Remove ERRORS, redundant with TOTALERRORS
+/*
+/* Revision 1.8  2012/05/23 20:43:02  pauloscustodio
 /* Remove ERR_NO_ERR, not used
 /*
 /* Revision 1.7  2012/05/17 21:36:06  pauloscustodio
@@ -80,7 +83,6 @@ typedef enum ErrorCode
 #undef DEF_MSG
 
 /* global variables */
-extern int          ERRORS;             /* num errors in current source */
 extern int          TOTALERRORS;        /* total num errors */
 
 /* reset to no-error status */

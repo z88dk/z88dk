@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.54 2012-05-24 11:27:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.55 2012-05-24 13:43:52 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.54  2012-05-24 11:27:10  pauloscustodio
+/* Revision 1.55  2012-05-24 13:43:52  pauloscustodio
+/* Remove ERRORS, redundant with TOTALERRORS
+/*
+/* Revision 1.54  2012/05/24 11:27:10  pauloscustodio
 /* astyle
 /*
 /* Revision 1.53  2012/05/24 10:58:39  pauloscustodio
@@ -518,6 +521,8 @@ avltree *globalroot, *staticroot;
 void
 AssembleSourceFile( void )
 {
+    int start_errors = TOTALERRORS;     /* count errors in this source file */
+
     /* try-catch to delete incomplete files in case of fatal error */
     try
     {
@@ -583,7 +588,7 @@ AssembleSourceFile( void )
             /* ReportError (CURRENTFILE->fname, 0, ERR_MODULE_NOT_DEFINED); */
         }
 
-        if ( ERRORS == 0 )
+        if ( start_errors == TOTALERRORS )
         {
             if ( verbose )
             {
@@ -613,7 +618,7 @@ AssembleSourceFile( void )
             fclose( listfile );
             listfile = NULL;
 
-            if ( ERRORS )
+            if ( start_errors != TOTALERRORS )
             {
                 remove( lstfilename );    /* remove incomplete list file */
             }
@@ -625,7 +630,7 @@ AssembleSourceFile( void )
             objfile = NULL;
         }
 
-        if ( ERRORS )
+        if ( start_errors != TOTALERRORS )
         {
             remove( objfilename );    /* remove incomplete object file */
         }
@@ -635,7 +640,7 @@ AssembleSourceFile( void )
             fclose( errfile );
             errfile = NULL;
 
-            if ( ERRORS == 0 )
+            if ( start_errors == TOTALERRORS )
             {
                 remove( errfilename );    /* remove empty error file */
             }
@@ -703,8 +708,7 @@ static void AssembleAny( char *file )
     z80asmfile = listfile = objfile = errfile = NULL;
 
     init_codearea();            /* Pointer (PC) to store z80 instruction */
-    ERRORS = 0;
-
+    
     path_replace_ext( srcfilename, file, srcext );      /* set '.asm' extension */
     path_replace_ext( objfilename, file, objext );      /* set '.obj' extension */
     path_replace_ext( errfilename, file, FILEEXT_ERR ); /* set '.err' extension */

@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.12 2012-05-22 20:35:26 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.13 2012-05-24 13:43:52 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.12  2012-05-22 20:35:26  pauloscustodio
+/* Revision 1.13  2012-05-24 13:43:52  pauloscustodio
+/* Remove ERRORS, redundant with TOTALERRORS
+/*
+/* Revision 1.12  2012/05/22 20:35:26  pauloscustodio
 /* astyle
 /*
 /* Revision 1.11  2012/05/22 20:29:17  pauloscustodio
@@ -90,7 +93,6 @@ Copyright (C) Paulo Custodio, 2011
 #include "strutil.h"
 
 /* global variables */
-int         ERRORS          = 0;            /* num errors in current source */
 int         TOTALERRORS     = 0;            /* total num errors */
 
 /*-----------------------------------------------------------------------------
@@ -111,7 +113,6 @@ static char *errmsg[] =
 *----------------------------------------------------------------------------*/
 void ResetErrors( void )
 {
-    ERRORS          = 0;
     TOTALERRORS     = 0;
 }
 
@@ -186,8 +187,7 @@ void ReportError( char *filename, int lineno, int errnum, ... )
         fputs( safestr_data( errstr ), errfile );
     }
 
-    /* increment error counters */
-    ++ERRORS;
+    /* increment error counter */
     ++TOTALERRORS;
 }
 
