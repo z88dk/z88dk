@@ -20,9 +20,13 @@ each object, which in turn may call destructors of contained objects.
 
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.1 2012-05-24 17:01:45 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.2 2012-05-25 21:43:55 pauloscustodio Exp $ */
 /* $Log: class.h,v $
-/* Revision 1.1  2012-05-24 17:01:45  pauloscustodio
+/* Revision 1.2  2012-05-25 21:43:55  pauloscustodio
+/* compile error in cygwin gcc 3.4.5 with forward declaration of
+/* typedef struct ObjRegister ObjRegister
+/*
+/* Revision 1.1  2012/05/24 17:01:45  pauloscustodio
 /* CH_0009 : new CLASS to define simple classes
 /*
 /*
@@ -66,7 +70,7 @@ OBJ_AUTODELETE(obj1) = FALSE;   // if object is destroyed by another
 *----------------------------------------------------------------------------*/
 
 /* declare object registry for use in class definition */
-typedef struct ObjRegister ObjRegister;
+struct ObjRegister;
 
 /*-----------------------------------------------------------------------------
 *   Start class declaration
@@ -86,7 +90,7 @@ typedef struct ObjRegister ObjRegister;
     struct T {                                                              \
         /* header, equal in all classes */                                  \
         struct {                            /* private attributes */        \
-            void (*delete_ptr)(ObjRegister *);                              \
+            void (*delete_ptr)(struct ObjRegister *);                       \
             /* destructor function */       \
             char *name;                     /* class name */                \
             char *file; int lineno;         /* where defined */             \
@@ -111,8 +115,8 @@ typedef struct ObjRegister ObjRegister;
         T * self = xcalloc_struct(T);       /* allocate object */           \
         OBJ_AUTODELETE(self) = TRUE;        /* auto delete by default */    \
         T##_init(self);                     /* call user initialization */  \
-        _register_obj((ObjRegister *) self,                                 \
-                      (void (*)(ObjRegister *)) T##_delete,                 \
+        _register_obj((struct ObjRegister *) self,                          \
+                      (void (*)(struct ObjRegister *)) T##_delete,          \
                       ""#T, __FILE__, __LINE__);                            \
         /* register for cleanup */      \
         return self;                                                        \
@@ -123,14 +127,15 @@ typedef struct ObjRegister ObjRegister;
         T * self = xmalloc(sizeof(T));      /* allocate object */           \
         memcpy(self, other, sizeof(T));     /* byte copy */                 \
         T##_copy(self);                     /* alloc memory if needed */    \
-        _update_register_obj((ObjRegister *) self, __FILE__, __LINE__);     \
+        _update_register_obj((struct ObjRegister *) self,                   \
+                             __FILE__, __LINE__);                           \
         /* register for cleanup */      \
         return self;                                                        \
     }                                                                       \
     /* destructor */                                                        \
     void T##_delete (T * self)                                              \
     {                                                                       \
-        _deregister_obj((ObjRegister *) self, __FILE__, __LINE__);          \
+        _deregister_obj((struct ObjRegister *) self, __FILE__, __LINE__);   \
         /* remove from cleanup list */  \
         T##_fini(self);                     /* call user cleanup */         \
         xfree(self);                        /* reclaim memory */            \
@@ -140,18 +145,18 @@ typedef struct ObjRegister ObjRegister;
 *   Helper macros
 *----------------------------------------------------------------------------*/
 #define OBJ_NEW(T)      T##_new()
-#define OBJ_DELETE(obj) ( ( (*(obj)->_class.delete_ptr)((ObjRegister *)(obj)) ), \
+#define OBJ_DELETE(obj) ( ( (*(obj)->_class.delete_ptr)((struct ObjRegister *)(obj)) ), \
                           (obj) = NULL )
 #define OBJ_AUTODELETE(obj) ((obj)->_class.autodelete)
 
 /*-----------------------------------------------------------------------------
 *   Private interface
 *----------------------------------------------------------------------------*/
-extern void _register_obj( ObjRegister *obj,
-                           void ( *delete_ptr )( ObjRegister * ),
+extern void _register_obj( struct ObjRegister *obj,
+                           void ( *delete_ptr )( struct ObjRegister * ),
                            char *name,
                            char *file, int lineno );
-extern void _update_register_obj( ObjRegister *obj, char *file, int lineno );
-extern void _deregister_obj( ObjRegister *obj, char *file, int lineno );
+extern void _update_register_obj( struct ObjRegister *obj, char *file, int lineno );
+extern void _deregister_obj( struct ObjRegister *obj, char *file, int lineno );
 
 #endif /* ndef CLASS_H */
