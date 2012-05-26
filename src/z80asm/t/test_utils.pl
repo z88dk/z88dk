@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.16 2012-05-24 10:58:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.17 2012-05-26 18:50:26 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.16  2012-05-24 10:58:39  pauloscustodio
+# Revision 1.17  2012-05-26 18:50:26  pauloscustodio
+# Use .o instead of .c to build test program, faster compilation.
+# Use gcc to compile instead of cc.
+#
+# Revision 1.16  2012/05/24 10:58:39  pauloscustodio
 # BUG_0018 : stack overflow in '@' includes - wrong range check
 #
 # Revision 1.15  2012/05/23 19:57:59  pauloscustodio
@@ -84,8 +88,8 @@ my $test	 = "test";
 
 sub z80asm	 { $ENV{Z80ASM} || "z80asm" }
 
-my @TEST_EXT = (qw( asm lst inc bin bn0 bn1 bn2 bn3 map obj lib sym def err exe c o 
-					asmlst ));
+my @TEST_EXT = (qw( asm lst inc bin bn0 bn1 bn2 bn3 map obj lib sym def err 
+					exe c o asmlst ));
 my @MAIN_TEST_FILES;
 my @TEST_FILES;
 

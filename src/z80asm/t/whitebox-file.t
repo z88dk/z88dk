@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.1 2012-05-24 21:44:00 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.2 2012-05-26 18:50:26 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.1  2012-05-24 21:44:00  pauloscustodio
+# Revision 1.2  2012-05-26 18:50:26  pauloscustodio
+# Use .o instead of .c to build test program, faster compilation.
+# Use gcc to compile instead of cc.
+#
+# Revision 1.1  2012/05/24 21:44:00  pauloscustodio
 # New search_file() to search file in a StrList
 #
 #
@@ -27,10 +31,17 @@ use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
 # test memalloc
-my $compile = "file.c strlist.c strpool.c memalloc.c class.c die.c strutil.c except.c";
+my $objs = "file.o errors.o strlist.o strpool.o memalloc.o class.o ".
+		   "die.o strutil.o except.o";
+ok ! system "make $objs";
 
-t_compile_module('', <<'END', $compile);
+t_compile_module(<<'INIT', <<'END', $objs);
 #define ERROR return __LINE__
+struct module *CURRENTMODULE;
+FILE *errfile;
+int clinemode;
+int clineno;
+INIT
 	/* main */
 	StrList *list = OBJ_NEW(StrList);
 	

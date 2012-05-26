@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.3 2012-05-22 20:33:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.4 2012-05-26 18:50:26 pauloscustodio Exp $
 # $Log: whitebox-except.t,v $
-# Revision 1.3  2012-05-22 20:33:34  pauloscustodio
+# Revision 1.4  2012-05-26 18:50:26  pauloscustodio
+# Use .o instead of .c to build test program, faster compilation.
+# Use gcc to compile instead of cc.
+#
+# Revision 1.3  2012/05/22 20:33:34  pauloscustodio
 # Added tests
 #
 # Revision 1.2  2012/05/20 05:53:01  pauloscustodio
@@ -30,7 +34,9 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $compile = "-DEXCEPT_DEBUG except.c die.c strutil.c";
+my $objs = "die.o strutil.o";
+ok ! system "make $objs";
+my $compile = "-DEXCEPT_DEBUG except.c $objs";
 
 # compile
 t_compile_module('', <<'END', $compile);

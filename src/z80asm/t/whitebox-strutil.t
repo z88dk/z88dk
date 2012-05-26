@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.3 2012-05-26 17:46:01 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.4 2012-05-26 18:50:26 pauloscustodio Exp $
 # $Log: whitebox-strutil.t,v $
-# Revision 1.3  2012-05-26 17:46:01  pauloscustodio
+# Revision 1.4  2012-05-26 18:50:26  pauloscustodio
+# Use .o instead of .c to build test program, faster compilation.
+# Use gcc to compile instead of cc.
+#
+# Revision 1.3  2012/05/26 17:46:01  pauloscustodio
 # Put back strtoupper, strupr does not exist in all systems, was causing nightly build to fail
 #
 # Revision 1.2  2012/05/24 15:07:03  pauloscustodio
@@ -34,9 +38,10 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test xmalloc
-my $compile = "strutil.c";
+my $objs = "strutil.o";
+ok ! system "make $objs";
 
-t_compile_module(<<'INIT', <<'END', $compile);
+t_compile_module(<<'INIT', <<'END', $objs);
 #define SZ 5
 #define ERROR return __LINE__
 #define TEST(s,is) \

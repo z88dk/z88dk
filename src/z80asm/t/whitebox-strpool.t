@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strpool.t,v 1.1 2012-05-24 17:50:02 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strpool.t,v 1.2 2012-05-26 18:50:26 pauloscustodio Exp $
 # $Log: whitebox-strpool.t,v $
-# Revision 1.1  2012-05-24 17:50:02  pauloscustodio
+# Revision 1.2  2012-05-26 18:50:26  pauloscustodio
+# Use .o instead of .c to build test program, faster compilation.
+# Use gcc to compile instead of cc.
+#
+# Revision 1.1  2012/05/24 17:50:02  pauloscustodio
 # CH_0010 : new string pool to hold strings for all program duration
 #
 # Revision 1.1  2012/05/24 17:16:28  pauloscustodio
@@ -29,7 +33,9 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test strpool
-my $compile = "-DCLASS_DEBUG -DMEMALLOC_DEBUG strpool.c class.c memalloc.c die.c strutil.c except.c";
+my $objs = "strpool.o die.o strutil.o except.o";
+ok ! system "make $objs";
+my $compile = "-DCLASS_DEBUG -DMEMALLOC_DEBUG class.c memalloc.c $objs";
 
 t_compile_module(<<'END_INIT', <<'END', $compile);
 #define ERROR return __LINE__

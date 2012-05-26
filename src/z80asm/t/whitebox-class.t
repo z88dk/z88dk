@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.1 2012-05-24 17:16:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.2 2012-05-26 18:50:26 pauloscustodio Exp $
 # $Log: whitebox-class.t,v $
-# Revision 1.1  2012-05-24 17:16:28  pauloscustodio
+# Revision 1.2  2012-05-26 18:50:26  pauloscustodio
+# Use .o instead of .c to build test program, faster compilation.
+# Use gcc to compile instead of cc.
+#
+# Revision 1.1  2012/05/24 17:16:28  pauloscustodio
 # CH_0009 : new CLASS to define simple classes
 #
 #
@@ -26,7 +30,11 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test class
-my $compile = "-DCLASS_DEBUG -DMEMALLOC_DEBUG class.c memalloc.c die.c except.c strutil.c";
+
+my $objs = "die.o except.o strutil.o";
+ok ! system "make $objs";
+my $compile = "-DCLASS_DEBUG -DMEMALLOC_DEBUG class.c memalloc.c $objs";
+
 my $init = <<'END';
 CLASS(Name)
 	char *str;

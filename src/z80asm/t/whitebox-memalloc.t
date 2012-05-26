@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.3 2012-05-22 20:33:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.4 2012-05-26 18:50:26 pauloscustodio Exp $
 # $Log: whitebox-memalloc.t,v $
-# Revision 1.3  2012-05-22 20:33:34  pauloscustodio
+# Revision 1.4  2012-05-26 18:50:26  pauloscustodio
+# Use .o instead of .c to build test program, faster compilation.
+# Use gcc to compile instead of cc.
+#
+# Revision 1.3  2012/05/22 20:33:34  pauloscustodio
 # Added tests
 #
 # Revision 1.2  2012/05/20 06:32:50  pauloscustodio
@@ -34,7 +38,9 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test memalloc
-my $compile = "-DMEMALLOC_DEBUG memalloc.c die.c except.c strutil.c";
+my $objs = "die.o except.o strutil.o";
+ok ! system "make $objs";
+my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 
 # allocate and no free no debug
 t_compile_module("", <<'END', "memalloc.c die.c except.c strutil.c");

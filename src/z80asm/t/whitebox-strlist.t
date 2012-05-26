@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.1 2012-05-24 21:42:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.2 2012-05-26 18:50:26 pauloscustodio Exp $
 # $Log: whitebox-strlist.t,v $
-# Revision 1.1  2012-05-24 21:42:42  pauloscustodio
+# Revision 1.2  2012-05-26 18:50:26  pauloscustodio
+# Use .o instead of .c to build test program, faster compilation.
+# Use gcc to compile instead of cc.
+#
+# Revision 1.1  2012/05/24 21:42:42  pauloscustodio
 # CH_0011 : new string list class to hold lists of strings
 #
 #
@@ -26,7 +30,9 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test memalloc
-my $compile = "-DMEMALLOC_DEBUG strlist.c strpool.c memalloc.c class.c die.c strutil.c except.c";
+my $objs = "strlist.o strpool.o class.o die.o strutil.o except.o";
+ok ! system "make $objs";
+my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 
 t_compile_module(<<'END_INIT', <<'END', $compile);
 #include "die.h"
