@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.59 2012-05-24 21:48:24 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.60 2012-05-26 17:46:00 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.59  2012-05-24 21:48:24  pauloscustodio
+/* Revision 1.60  2012-05-26 17:46:00  pauloscustodio
+/* Put back strtoupper, strupr does not exist in all systems, was causing nightly build to fail
+/*
+/* Revision 1.59  2012/05/24 21:48:24  pauloscustodio
 /* Remove the global variables include_dir, lib_dir, and respective
 /* counts, create instead the paths in the options module and
 /* create new search_include_file() and search_lib_file()
@@ -593,7 +596,7 @@ AssembleSourceFile( void )
         {
             path_basename( ident, srcfilename );
             path_remove_ext( ident );
-            strupr( ident );
+            strtoupper( ident );
             sym = name;
             DeclModuleName();
             /* ReportError (CURRENTFILE->fname, 0, ERR_MODULE_NOT_DEFINED); */

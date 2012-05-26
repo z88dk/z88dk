@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Utilities for string handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.7 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.8 2012-05-26 17:46:00 pauloscustodio Exp $ */
 /* $Log: strutil.h,v $
-/* Revision 1.7  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.8  2012-05-26 17:46:00  pauloscustodio
+/* Put back strtoupper, strupr does not exist in all systems, was causing nightly build to fail
+/*
+/* Revision 1.7  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.6  2012/05/24 17:00:43  pauloscustodio
@@ -123,6 +126,10 @@ extern char *sstr_vfcat( sstr_t *self, char *format, va_list argptr );
 /*-----------------------------------------------------------------------------
 *   Utilities working on char *
 *----------------------------------------------------------------------------*/
+
+/* convert string to upper/lower case - modify in place, return address of string */
+extern char *strtoupper( char *string );
+extern char *strtolower( char *string );
 
 #endif /* ndef STRUTIL_H */
 

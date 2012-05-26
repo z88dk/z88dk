@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.2 2012-05-24 15:07:03 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.3 2012-05-26 17:46:01 pauloscustodio Exp $
 # $Log: whitebox-strutil.t,v $
-# Revision 1.2  2012-05-24 15:07:03  pauloscustodio
+# Revision 1.3  2012-05-26 17:46:01  pauloscustodio
+# Put back strtoupper, strupr does not exist in all systems, was causing nightly build to fail
+#
+# Revision 1.2  2012/05/24 15:07:03  pauloscustodio
 # Rename safestr_t to sstr_t, keep length to speed-up appending chars
 #
 # Revision 1.1  2012/05/22 20:26:17  pauloscustodio
@@ -165,6 +168,17 @@ INIT
 	// test SSTR_DEFINE_REF()
 	if (s2->data != buffer)				ERROR;
 	if (s2->size != 5)					ERROR;
+
+	// strtoupper, strtolower
+	sstr_set(s, "Abc1");
+	p = strtolower(sstr_data(s));
+	if (p != sstr_data(s))				ERROR;
+	TEST(s, "abc1");
+	
+	sstr_set(s, "Abc1");
+	p = strtoupper(sstr_data(s));
+	if (p != sstr_data(s))				ERROR;
+	TEST(s, "ABC1");
 	
 	return 0;
 END
