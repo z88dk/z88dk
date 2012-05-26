@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Wrapper module for e4c to setup compile-time defines
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.6 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.7 2012-05-26 18:33:25 pauloscustodio Exp $ */
 /* $Log: except.h,v $
-/* Revision 1.6  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.7  2012-05-26 18:33:25  pauloscustodio
+/* Remove EarlyReturnException, FileIOException: no longer used.
+/*
+/* Revision 1.6  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.5  2012/05/17 14:56:23  pauloscustodio
@@ -40,7 +43,7 @@ Wrapper module for e4c to setup compile-time defines
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
 /* - Created new exception FileIOException and ERR_FILE_IO error.
-/* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
+/* - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
 /*
 /* Revision 1.2  2011/08/14 19:25:55  pauloscustodio
 /* - New exception FatalErrorException to raise on fatal assembly errors
@@ -69,10 +72,7 @@ Wrapper module for e4c to setup compile-time defines
 extern void init_except( void );
 
 /* exceptions */
-E4C_DECLARE_EXCEPTION( EarlyReturnException );
 E4C_DECLARE_EXCEPTION( FatalErrorException );
-E4C_DECLARE_EXCEPTION( FileIOException );
-
 
 #endif /* ndef EXCEPT_H */
 
