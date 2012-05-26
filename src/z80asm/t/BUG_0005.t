@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0005.t,v 1.4 2011-07-14 01:32:09 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0005.t,v 1.5 2012-05-26 18:51:10 pauloscustodio Exp $
 # $Log: BUG_0005.t,v $
-# Revision 1.4  2011-07-14 01:32:09  pauloscustodio
+# Revision 1.5  2012-05-26 18:51:10  pauloscustodio
+# CH_0012 : wrappers on OS calls to raise fatal error
+# CH_0013 : new errors interface to decouple calling code from errors.c
+#
+# Revision 1.4  2011/07/14 01:32:09  pauloscustodio
 #     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 #     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 #     CH_0003 : Error messages should be more informative
@@ -46,7 +50,7 @@ require 't/test_utils.pl';
 t_z80asm_ok(0, "inc (ix)",      "\xDD\x34\x00");
 t_z80asm_ok(0, "inc (ix + 3)",  "\xDD\x34\x03");
 t_z80asm_ok(0, "inc (ix - 3)",  "\xDD\x34\xFD");
-t_z80asm_error("inc (ix   3)", 	"Error: File 'test.asm', at line 1, Syntax error");
+t_z80asm_error("inc (ix   3)", 	"Error at file 'test.asm' line 1: Syntax error");
 
 unlink_testfiles();
 done_testing();

@@ -16,9 +16,13 @@ Copyright (C) Paulo Custodio, 2011-2012
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.6 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.7 2012-05-26 18:51:10 pauloscustodio Exp $ */
 /* $Log: codearea.c,v $
-/* Revision 1.6  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.7  2012-05-26 18:51:10  pauloscustodio
+/* CH_0012 : wrappers on OS calls to raise fatal error
+/* CH_0013 : new errors interface to decouple calling code from errors.c
+/*
+/* Revision 1.6  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.5  2012/05/24 16:18:53  pauloscustodio
@@ -152,8 +156,7 @@ static void check_space( size_t addr, size_t n )
 {
     if ( addr + n > MAXCODESIZE )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_MAX_CODESIZE );
-        throw( FatalErrorException, "MAXCODESIZE reached" );
+        fatal_error( ERR_MAX_CODESIZE, ( long )MAXCODESIZE );
     }
 }
 
@@ -162,7 +165,7 @@ static void check_space( size_t addr, size_t n )
 *----------------------------------------------------------------------------*/
 void fwrite_codearea( FILE *stream )
 {
-    xfwritec( codearea, codeindex, stream );
+    fwritec_err( codearea, codeindex, stream );
 }
 
 void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size )
@@ -174,7 +177,7 @@ void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size )
             size = codeindex - addr;
         }
 
-        xfwritec( codearea + addr, size, stream );
+        fwritec_err( codearea + addr, size, stream );
     }
 }
 
@@ -182,7 +185,7 @@ void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size )
 void fread_codearea( FILE *stream, size_t size )
 {
     check_space( codeindex, size );
-    xfreadc( codearea + codeindex, size, stream );
+    freadc_err( codearea + codeindex, size, stream );
     codeindex += size;
 }
 
@@ -190,7 +193,7 @@ void fread_codearea( FILE *stream, size_t size )
 void fread_codearea_offset( FILE *stream, size_t offset, size_t size )
 {
     check_space( offset, size );
-    xfreadc( codearea + offset, size, stream );
+    freadc_err( codearea + offset, size, stream );
 
     if ( codeindex < offset + size )
     {

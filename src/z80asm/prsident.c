@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.32 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.33 2012-05-26 18:51:10 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.32  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.33  2012-05-26 18:51:10  pauloscustodio
+/* CH_0012 : wrappers on OS calls to raise fatal error
+/* CH_0013 : new errors interface to decouple calling code from errors.c
+/*
+/* Revision 1.32  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.31  2012/05/18 00:28:45  pauloscustodio
@@ -434,7 +438,7 @@ ParseIdent( enum flag interpret )
 
     if ( foundsym == NULL && interpret == ON )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_UNKNOWN_IDENT );
+        error( ERR_UNKNOWN_IDENT );
     }
     else
     {
@@ -497,7 +501,14 @@ void LINE( void )
     char    err;
     char    name[128];
     GetSym();
+
     clineno = GetConstant( &err );
+
+    if ( clinemode )
+    {
+        set_error_line( clineno );
+    }
+
     line[0] = '\0';
     snprintf( name, sizeof( name ), "__C_LINE_%d", clineno );
     DefineSymbol( name, get_PC(), SYMADDR | SYMTOUCHED );
@@ -544,7 +555,7 @@ XDEF( void )
         }
         else
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
             return;
         }
     }
@@ -552,7 +563,7 @@ XDEF( void )
 
     if ( sym != newline )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+        error( ERR_SYNTAX );
     }
 }
 
@@ -568,7 +579,7 @@ XLIB( void )
     }
     else
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+        error( ERR_SYNTAX );
         return;
     }
 }
@@ -592,7 +603,7 @@ XREF( void )
         }
         else
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
             return;
         }
     }
@@ -600,7 +611,7 @@ XREF( void )
 
     if ( sym != newline )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+        error( ERR_SYNTAX );
     }
 }
 
@@ -618,7 +629,7 @@ LIB( void )
         }
         else
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
             return;
         }
     }
@@ -626,7 +637,7 @@ LIB( void )
 
     if ( sym != newline )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+        error( ERR_SYNTAX );
     }
 }
 
@@ -661,7 +672,7 @@ HALT( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -780,7 +791,7 @@ IND( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -796,7 +807,7 @@ INDR( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -812,7 +823,7 @@ INI( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -828,7 +839,7 @@ INIR( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -844,7 +855,7 @@ OUTI( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -860,7 +871,7 @@ OUTD( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -876,7 +887,7 @@ OTIR( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -892,7 +903,7 @@ OTDR( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -1057,7 +1068,7 @@ SLL( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -1160,7 +1171,7 @@ RETN( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -1252,7 +1263,7 @@ DI( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -1267,7 +1278,7 @@ EI( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -1282,7 +1293,7 @@ DAA( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 

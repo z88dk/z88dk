@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.29 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.30 2012-05-26 18:51:10 pauloscustodio Exp $ */
 /* $Log: z80instr.c,v $
-/* Revision 1.29  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.30  2012-05-26 18:51:10  pauloscustodio
+/* CH_0012 : wrappers on OS calls to raise fatal error
+/* CH_0013 : new errors interface to decouple calling code from errors.c
+/*
+/* Revision 1.29  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.28  2012/05/18 00:28:45  pauloscustodio
@@ -270,11 +274,11 @@ PushPop_instr( int opcode )
                 break;
 
             default:
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                error( ERR_ILLEGAL_IDENT );
         }
     else
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+        error( ERR_SYNTAX );
     }
 }
 
@@ -293,7 +297,7 @@ RET( void )
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                error( ERR_ILLEGAL_IDENT );
             }
 
             break;
@@ -303,7 +307,7 @@ RET( void )
             break;
 
         default:
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
             return;
     }
 
@@ -352,27 +356,27 @@ EX( void )
                                     break;
 
                                 default:
-                                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                                    error( ERR_ILLEGAL_IDENT );
                             }
                         else
                         {
-                            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                            error( ERR_SYNTAX );
                         }
                     else
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                        error( ERR_SYNTAX );
                     }
                 else
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                    error( ERR_SYNTAX );
                 }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                error( ERR_ILLEGAL_IDENT );
             }
         else
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
         }
     else if ( sym == name )
     {
@@ -388,15 +392,15 @@ EX( void )
                         }
                         else
                         {
-                            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                            error( ERR_ILLEGAL_IDENT );
                         }
                     else
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                        error( ERR_SYNTAX );
                     }
                 else
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                    error( ERR_SYNTAX );
                 }
 
                 break;
@@ -411,26 +415,26 @@ EX( void )
                         }
                         else
                         {
-                            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                            error( ERR_ILLEGAL_IDENT );
                         }
                     else
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                        error( ERR_SYNTAX );
                     }
                 else
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                    error( ERR_SYNTAX );
                 }
 
                 break;
 
             default:
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                error( ERR_ILLEGAL_IDENT );
         }
     }
     else
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+        error( ERR_SYNTAX );
     }
 }
 
@@ -443,7 +447,7 @@ OUT( void )
 
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -463,7 +467,7 @@ OUT( void )
                             case 8:
                             case 9:
                             case -1:
-                                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                                error( ERR_ILLEGAL_IDENT );
                                 break;
 
                             default:
@@ -474,15 +478,15 @@ OUT( void )
                         }
                     else
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                        error( ERR_SYNTAX );
                     }
                 else
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                    error( ERR_SYNTAX );
                 }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                error( ERR_SYNTAX );
             }
         }
         else
@@ -502,26 +506,26 @@ OUT( void )
                     {
                         if ( CheckRegister8() != 7 )
                         {
-                            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                            error( ERR_ILLEGAL_IDENT );
                         }
                     }
                     else
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                        error( ERR_SYNTAX );
                     }
                 else
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                    error( ERR_SYNTAX );
                 }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                error( ERR_SYNTAX );
             }
         }
     }
     else
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+        error( ERR_SYNTAX );
     }
 }
 
@@ -533,7 +537,7 @@ IN( void )
 
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -544,19 +548,19 @@ IN( void )
             case 8:
             case 9:
             case -1:
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                error( ERR_ILLEGAL_IDENT );
                 break;
 
             default:
                 if ( GetSym() != comma )
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                    error( ERR_SYNTAX );
                     break;
                 }
 
                 if ( GetSym() != lparen )
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                    error( ERR_SYNTAX );
                     break;
                 }
 
@@ -578,20 +582,20 @@ IN( void )
                             if ( ExprUnsigned8( 1 ) )
                                 if ( sym != rparen )
                                 {
-                                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                                    error( ERR_SYNTAX );
                                 }
 
                             inc_PC( 2 );
                         }
                         else
                         {
-                            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                            error( ERR_ILLEGAL_IDENT );
                         }
 
                         break;
 
                     default:
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                        error( ERR_ILLEGAL_IDENT );
                         break;
                 }
 
@@ -600,7 +604,7 @@ IN( void )
     }
     else
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+        error( ERR_SYNTAX );
     }
 }
 
@@ -613,7 +617,7 @@ IM( void )
 
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
         return;
     }
 
@@ -623,7 +627,7 @@ IM( void )
     {
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED );
+            error( ERR_NOT_DEFINED );
         }
         else
         {
@@ -667,7 +671,7 @@ RST( void )
     {
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED );
+            error( ERR_NOT_DEFINED );
         }
         else
         {
@@ -678,7 +682,7 @@ RST( void )
                 if ( ( cpu_type & CPU_RABBIT ) &&
                         ( ( constant == 0 ) || ( constant == 8 ) || ( constant == 0x30 ) ) )
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                    error( ERR_ILLEGAL_IDENT );
                 }
                 else
                 {
@@ -688,7 +692,7 @@ RST( void )
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant );
+                error( ERR_INT_RANGE, constant );
             }
         }
 
@@ -714,7 +718,7 @@ void CALL_OZ( void )
     {
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED );    /* CALL_OZ expression must be evaluable */
+            error( ERR_NOT_DEFINED );    /* CALL_OZ expression must be evaluable */
         }
         else
         {
@@ -732,7 +736,7 @@ void CALL_OZ( void )
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant );
+                error( ERR_INT_RANGE, constant );
             }
         }
 
@@ -765,7 +769,7 @@ CALL_PKG( void )
     {
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED );    /* CALL_OZ expression must be evaluable */
+            error( ERR_NOT_DEFINED );    /* CALL_OZ expression must be evaluable */
         }
         else
         {
@@ -778,7 +782,7 @@ CALL_PKG( void )
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant );
+                error( ERR_INT_RANGE, constant );
             }
         }
 
@@ -812,7 +816,7 @@ INVOKE( void )
     {
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED );    /* INVOKE expression must be evaluable */
+            error( ERR_NOT_DEFINED );    /* INVOKE expression must be evaluable */
         }
         else
         {
@@ -825,7 +829,7 @@ INVOKE( void )
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant );
+                error( ERR_INT_RANGE, constant );
             }
         }
 
@@ -851,7 +855,7 @@ FPP( void )
     {
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED );    /* FPP expression must be evaluable */
+            error( ERR_NOT_DEFINED );    /* FPP expression must be evaluable */
         }
         else
         {
@@ -864,7 +868,7 @@ FPP( void )
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant );
+                error( ERR_INT_RANGE, constant );
             }
         }
 
@@ -886,7 +890,7 @@ Subroutine_addr( int opcode0, int opcode )
 
         if ( GetSym() != comma )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
             return;
         }
 
@@ -899,7 +903,7 @@ Subroutine_addr( int opcode0, int opcode )
 
             if ( constant >= 4 )
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                error( ERR_ILLEGAL_IDENT );
                 return;
             }
 
@@ -1028,11 +1032,11 @@ JP_instr( int opc0, int opc )
                 break;
 
             case -1:
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                error( ERR_SYNTAX );
                 break;
 
             default:
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                error( ERR_ILLEGAL_IDENT );
                 break;
         }
     }
@@ -1068,7 +1072,7 @@ JR( void )
                 }
                 else
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX ); /* comma missing */
+                    error( ERR_SYNTAX ); /* comma missing */
                     return;
                 }
 
@@ -1077,7 +1081,7 @@ JR( void )
                 break;                /* identifier not a condition id - check for legal expression */
 
             default:
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );      /* illegal condition, syntax
+                error( ERR_SYNTAX );      /* illegal condition, syntax
                                                                      * error  */
                 return;
         }
@@ -1106,7 +1110,7 @@ JR( void )
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant );
+                error( ERR_INT_RANGE, constant );
             }
         }
     }
@@ -1149,7 +1153,7 @@ DJNZ( void )
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant );
+                error( ERR_INT_RANGE, constant );
             }
         }
     }
@@ -1210,12 +1214,12 @@ ADD( void )
                 }
                 else
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                    error( ERR_ILLEGAL_IDENT );
                 }
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                error( ERR_SYNTAX );
             }
 
             break;
@@ -1242,14 +1246,14 @@ ADD( void )
                         }
                         else
                         {
-                            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                            error( ERR_ILLEGAL_IDENT );
                             return;
                         }
 
                         break;
 
                     default:
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                        error( ERR_ILLEGAL_IDENT );
                         return;
                 }
 
@@ -1267,13 +1271,13 @@ ADD( void )
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                error( ERR_SYNTAX );
             }
 
             break;
 
         default:
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_UNKNOWN_IDENT );
+            error( ERR_UNKNOWN_IDENT );
             break;
     }
 }
@@ -1309,18 +1313,18 @@ SBC( void )
                 }
                 else
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                    error( ERR_ILLEGAL_IDENT );
                 }
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                error( ERR_SYNTAX );
             }
 
             break;
 
         default:
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+            error( ERR_ILLEGAL_IDENT );
             break;
     }
 }
@@ -1357,18 +1361,18 @@ ADC( void )
                 }
                 else
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                    error( ERR_ILLEGAL_IDENT );
                 }
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                error( ERR_SYNTAX );
             }
 
             break;
 
         default:
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+            error( ERR_ILLEGAL_IDENT );
             break;
     }
 }
@@ -1408,7 +1412,7 @@ ArithLog8_instr( int opcode )
                 break;
 
             default:
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                error( ERR_SYNTAX );
                 break;
         }
     else
@@ -1428,7 +1432,7 @@ ArithLog8_instr( int opcode )
             case 6:         /* xxx A,F illegal */
             case 8:         /* xxx A,I illegal */
             case 9:         /* xxx A,R illegal */
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                error( ERR_ILLEGAL_IDENT );
                 break;
 
             default:
@@ -1437,7 +1441,7 @@ ArithLog8_instr( int opcode )
                     /* IXl or IXh */
                     if ( ( cpu_type & CPU_RABBIT ) )
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                        error( ERR_ILLEGAL_IDENT );
                         return;
                     }
 
@@ -1449,7 +1453,7 @@ ArithLog8_instr( int opcode )
                     /* IYl or IYh */
                     if ( ( cpu_type & CPU_RABBIT ) )
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                        error( ERR_ILLEGAL_IDENT );
                         return;
                     }
 
@@ -1482,7 +1486,7 @@ INC( void )
             break;
 
         case 4:
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+            error( ERR_ILLEGAL_IDENT );
             break;
 
         case 5:
@@ -1519,7 +1523,7 @@ DEC( void )
             break;
 
         case 4:
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+            error( ERR_ILLEGAL_IDENT );
             break;
 
         case 5:
@@ -1574,7 +1578,7 @@ IncDec_8bit_instr( int opcode )
 
 
             default:
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                error( ERR_SYNTAX );
                 break;
         }
     }
@@ -1588,7 +1592,7 @@ IncDec_8bit_instr( int opcode )
             case 6:
             case 8:
             case 9:
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );       /* INC/DEC I ;  INC/DEC R
+                error( ERR_ILLEGAL_IDENT );       /* INC/DEC I ;  INC/DEC R
                                                                      * illegal */
                 break;
 
@@ -1596,7 +1600,7 @@ IncDec_8bit_instr( int opcode )
             case 13:
                 if ( ( cpu_type & CPU_RABBIT ) )
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                    error( ERR_ILLEGAL_IDENT );
                     return;
                 }
 
@@ -1609,7 +1613,7 @@ IncDec_8bit_instr( int opcode )
             case 21:
                 if ( ( cpu_type & CPU_RABBIT ) )
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                    error( ERR_ILLEGAL_IDENT );
                     return;
                 }
 
@@ -1641,7 +1645,7 @@ BitTest_instr( int opcode )
         /* Expression must not be stored in object file */
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED );
+            error( ERR_NOT_DEFINED );
         }
         else
         {
@@ -1680,7 +1684,7 @@ BitTest_instr( int opcode )
                                 break;
 
                             default:
-                                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                                error( ERR_SYNTAX );
                                 break;
                         }
                     }
@@ -1695,7 +1699,7 @@ BitTest_instr( int opcode )
                             case 8:
                             case 9:
                             case -1:
-                                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                                error( ERR_ILLEGAL_IDENT );
                                 break;
 
                             default:
@@ -1707,12 +1711,12 @@ BitTest_instr( int opcode )
                 }
                 else
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                    error( ERR_SYNTAX );
                 }
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, bitnumber );
+                error( ERR_INT_RANGE, bitnumber );
             }
         }
 
@@ -1753,7 +1757,7 @@ RotShift_instr( int opcode )
                 break;
 
             default:
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                error( ERR_SYNTAX );
                 break;
         }
     else
@@ -1767,7 +1771,7 @@ RotShift_instr( int opcode )
             case 8:
             case 9:
             case -1:
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                error( ERR_ILLEGAL_IDENT );
                 break;
 
             default:

@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_OPEN_LIB.t,v 1.1 2012-05-23 18:07:51 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_OPEN_LIB.t,v 1.2 2012-05-26 18:51:10 pauloscustodio Exp $
 # $Log: ERR_OPEN_LIB.t,v $
-# Revision 1.1  2012-05-23 18:07:51  pauloscustodio
+# Revision 1.2  2012-05-26 18:51:10  pauloscustodio
+# CH_0012 : wrappers on OS calls to raise fatal error
+# CH_0013 : new errors interface to decouple calling code from errors.c
+#
+# Revision 1.1  2012/05/23 18:07:51  pauloscustodio
 # Unlink test files for errors from error numbers, to be able to change
 # error numbers.
 #
@@ -45,7 +49,7 @@ require 't/test_utils.pl';
 unlink_testfiles();
 write_file(asm_file(), "nop");
 t_z80asm_capture("-r0 -b -ixxxx ".asm_file(), "", 
-		"Error: Couldn't open library file 'xxxx.lib'\n".
+		"Error: Cannot open file 'xxxx.lib' for reading\n".
 		"1 errors occurred during assembly\n",
 		1);
 

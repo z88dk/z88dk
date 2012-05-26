@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.28 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.29 2012-05-26 18:51:10 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.28  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.29  2012-05-26 18:51:10  pauloscustodio
+/* CH_0012 : wrappers on OS calls to raise fatal error
+/* CH_0013 : new errors interface to decouple calling code from errors.c
+/*
+/* Revision 1.28  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.27  2012/05/20 06:39:27  pauloscustodio
@@ -84,15 +88,15 @@ Copyright (C) Paulo Custodio, 2011-2012
 /* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
 /*
 /* Revision 1.18  2011/08/19 10:20:32  pauloscustodio
-/* - Factored code to read/write word from file into xfget_word/xfput_word.
-/* - Renamed ReadLong/WriteLong to xfget_long/xfput_long for symetry.
+/* - Factored code to read/write word from file into fgetw_err/fputw_err.
+/* - Renamed ReadLong/WriteLong to fgetl_err/fputl_err for symetry.
 /*
 /* Revision 1.17  2011/08/18 23:27:54  pauloscustodio
 /* BUG_0009 : file read/write not tested for errors
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
 /* - Created new exception FileIOException and ERR_FILE_IO error.
-/* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
+/* - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
 /*
 /* Revision 1.16  2011/08/14 19:37:43  pauloscustodio
 /* Z80pass1(): no need to check for fatal error and return; bypassed by exception mechanism
@@ -358,6 +362,12 @@ parseline( enum flag interpret )
     FindSymbol( ASSEMBLERPC, globalroot )->symvalue = get_PC();   /* update assembler program counter */
 
     ++CURRENTFILE->line;
+
+    if ( !clinemode )
+    {
+        set_error_line( CURRENTFILE->line );    /* error location */
+    }
+
     ++TOTALLINES;
 
     if ( listing )
@@ -382,7 +392,7 @@ parseline( enum flag interpret )
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );       /* a name must follow a
+                error( ERR_ILLEGAL_IDENT );       /* a name must follow a
                                                                                  * label declaration */
                 return;       /* read in a new source line */
             }
@@ -406,7 +416,7 @@ parseline( enum flag interpret )
         default:
             if ( interpret == ON )
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );    /* Syntax error */
+                error( ERR_SYNTAX );    /* Syntax error */
             }
     }
 
@@ -594,13 +604,13 @@ Z80pass2( void )
                 {
                     if ( pass2expr->rangetype & EXPREXTERN )
                     {
-                        ReportError( pass2expr->srcfile, pass2expr->curline, ERR_JR_NOT_LOCAL );
+                        error_at( pass2expr->srcfile, pass2expr->curline, ERR_JR_NOT_LOCAL );
                     }     /* JR, DJNZ used an
 
                                                                                  * external label - */
                     else
                     {
-                        ReportError( pass2expr->srcfile, pass2expr->curline, ERR_NOT_DEFINED );
+                        error_at( pass2expr->srcfile, pass2expr->curline, ERR_NOT_DEFINED );
                     }
 
                     prevJR = curJR;
@@ -609,7 +619,7 @@ Z80pass2( void )
                 }
                 else
                 {
-                    ReportError( pass2expr->srcfile, pass2expr->curline, ERR_NOT_DEFINED );
+                    error_at( pass2expr->srcfile, pass2expr->curline, ERR_NOT_DEFINED );
                 }
             }
             else
@@ -628,7 +638,7 @@ Z80pass2( void )
                         }
                         else
                         {
-                            ReportError( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                            error_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
                         }
 
                         prevJR = curJR;
@@ -646,7 +656,7 @@ Z80pass2( void )
                         }
                         else
                         {
-                            ReportError( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                            error_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
                         }
 
                         break;
@@ -659,7 +669,7 @@ Z80pass2( void )
                         }
                         else
                         {
-                            ReportError( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                            error_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
                         }
 
                         break;
@@ -672,7 +682,7 @@ Z80pass2( void )
                         }
                         else
                         {
-                            ReportError( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                            error_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
                         }
 
                         break;
@@ -685,7 +695,7 @@ Z80pass2( void )
                         }
                         else
                         {
-                            ReportError( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                            error_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
                         }
 
                         break;
@@ -709,7 +719,7 @@ Z80pass2( void )
         CURRENTMODULE->JRaddr = NULL;
     }
 
-    if ( ( TOTALERRORS == 0 ) && symtable )
+    if ( ! get_num_errors() && symtable )
     {
         WriteSymbolTable( "Local Module Symbols:", CURRENTMODULE->localroot );
         WriteSymbolTable( "Global Module Symbols:", globalroot );
@@ -724,8 +734,8 @@ Z80pass2( void )
 
     fptr_modname = ftell( objfile );
     constant = strlen( CURRENTMODULE->mname );
-    xfputc( constant, objfile );  /* write length of module name to relocatable file */
-    xfwritec( CURRENTMODULE->mname, ( size_t ) constant, objfile );   /* write module name to relocatable
+    fputc_err( constant, objfile );  /* write length of module name to relocatable file */
+    fwritec_err( CURRENTMODULE->mname, ( size_t ) constant, objfile );   /* write module name to relocatable
                                                                                  * file       */
 
     if ( ( constant = get_codeindex() ) == 0 )    /* BUG_0015 */
@@ -735,7 +745,7 @@ Z80pass2( void )
     else
     {
         fptr_modcode = ftell( objfile );
-        xfput_word( constant, objfile );  /* two bytes of module code size */
+        fputw_err( constant, objfile );  /* two bytes of module code size */
         fwrite_codearea( objfile );
     }
 
@@ -756,7 +766,7 @@ Z80pass2( void )
         }
     }
 
-    xfput_word( CURRENTMODULE->origin, objfile );         /* two bytes of origin */
+    fputw_err( CURRENTMODULE->origin, objfile );         /* two bytes of origin */
 
     fptr_exprdecl = 30;           /* expressions always begins at file position 24 */
 
@@ -775,11 +785,11 @@ Z80pass2( void )
         fptr_libnmdecl = -1;    /* no library reference declarations */
     }
 
-    xfput_long( fptr_modname, objfile );  /* write fptr. to module name */
-    xfput_long( fptr_exprdecl, objfile ); /* write fptr. to name declarations */
-    xfput_long( fptr_namedecl, objfile ); /* write fptr. to name declarations */
-    xfput_long( fptr_libnmdecl, objfile ); /* write fptr. to library name declarations */
-    xfput_long( fptr_modcode, objfile );  /* write fptr. to module code */
+    fputl_err( fptr_modname, objfile );  /* write fptr. to module name */
+    fputl_err( fptr_exprdecl, objfile ); /* write fptr. to name declarations */
+    fputl_err( fptr_namedecl, objfile ); /* write fptr. to name declarations */
+    fputl_err( fptr_libnmdecl, objfile ); /* write fptr. to library name declarations */
+    fputl_err( fptr_modcode, objfile );  /* write fptr. to module code */
 }
 
 
@@ -811,17 +821,17 @@ StoreName( symbol *node, unsigned char scope )
     switch ( scope )
     {
         case SYMLOCAL:
-            xfputc( 'L', objfile );
+            fputc_err( 'L', objfile );
             break;
 
         case SYMXDEF:
             if ( node->type & SYMDEF )
             {
-                xfputc( 'X', objfile );
+                fputc_err( 'X', objfile );
             }
             else
             {
-                xfputc( 'G', objfile );
+                fputc_err( 'G', objfile );
             }
 
             break;
@@ -829,18 +839,18 @@ StoreName( symbol *node, unsigned char scope )
 
     if ( node->type & SYMADDR )   /* then write type of symbol */
     {
-        xfputc( 'A', objfile );    /* either a relocatable address */
+        fputc_err( 'A', objfile );    /* either a relocatable address */
     }
     else
     {
-        xfputc( 'C', objfile );    /* or a constant */
+        fputc_err( 'C', objfile );    /* or a constant */
     }
 
-    xfput_long( node->symvalue, objfile );
+    fputl_err( node->symvalue, objfile );
 
     b = strlen( node->symname );
-    xfputc( b, objfile );         /* write length of symbol name to relocatable file */
-    xfwritec( node->symname, ( size_t ) b, objfile ); /* write symbol name to relocatable file */
+    fputc_err( b, objfile );         /* write length of symbol name to relocatable file */
+    fwritec_err( node->symname, ( size_t ) b, objfile ); /* write symbol name to relocatable file */
 }
 
 
@@ -852,8 +862,8 @@ StoreLibReference( symbol *node )
     if ( ( node->type & SYMXREF ) && ( node->type & SYMDEF ) && ( node->type & SYMTOUCHED ) )
     {
         b = strlen( node->symname );
-        xfputc( ( int ) b, objfile ); /* write length of symbol name to relocatable file */
-        xfwritec( node->symname, b, objfile );    /* write symbol name to relocatable file */
+        fputc_err( ( int ) b, objfile ); /* write length of symbol name to relocatable file */
+        fwritec_err( node->symname, b, objfile );    /* write symbol name to relocatable file */
     }
 }
 
@@ -1154,7 +1164,7 @@ WriteSymbol( symbol *n )
 
                 for ( tabulators = space % TAB_DIST ? space / TAB_DIST + 1 : space / TAB_DIST; tabulators > 0; tabulators-- )
                 {
-                    xfputc( '\t', listfile );
+                    fputc_err( '\t', listfile );
                 }
 
                 fprintf( listfile, "= %08lX", n->symvalue );
@@ -1193,15 +1203,15 @@ WriteSymbolTable( char *msg, avltree *root )
 {
 
     fseek( listfile, 0, SEEK_END );       /* File position to end of file */
-    xfputc( '\n', listfile );
+    fputc_err( '\n', listfile );
     LineCounter();
-    xfputc( '\n', listfile );
+    fputc_err( '\n', listfile );
     LineCounter();
     fprintf( listfile, "%s", msg );
     LineCounter();
-    xfputc( '\n', listfile );
+    fputc_err( '\n', listfile );
     LineCounter();
-    xfputc( '\n', listfile );
+    fputc_err( '\n', listfile );
     LineCounter();
 
     inorder( root, ( void ( * )( void * ) ) WriteSymbol ); /* write symbol table */

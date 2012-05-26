@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-_I.t,v 1.3 2012-05-23 20:45:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-_I.t,v 1.4 2012-05-26 18:51:10 pauloscustodio Exp $
 # $Log: option-_I.t,v $
-# Revision 1.3  2012-05-23 20:45:42  pauloscustodio
+# Revision 1.4  2012-05-26 18:51:10  pauloscustodio
+# CH_0012 : wrappers on OS calls to raise fatal error
+# CH_0013 : new errors interface to decouple calling code from errors.c
+#
+# Revision 1.3  2012/05/23 20:45:42  pauloscustodio
 # Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
 # Add tests.
 #
@@ -51,7 +55,7 @@ t_z80asm_ok(0, "include \"$inc\"", "\x3E\x01");
 
 # no -I, only file name : error
 t_z80asm_error("include \"$inc_base\"", 
-			"Error: File 'test.asm', at line 1, Cannot open file 'test.inc' for reading");
+			"Error at file 'test.asm' line 1: Cannot open file 'test.inc' for reading");
 
 # -I : OK
 t_z80asm_ok(0, "include \"$inc_base\"", "\x3E\x01", "-I$inc_dir");

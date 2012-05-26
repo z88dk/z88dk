@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.27 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.28 2012-05-26 18:51:10 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.27  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.28  2012-05-26 18:51:10  pauloscustodio
+/* CH_0012 : wrappers on OS calls to raise fatal error
+/* CH_0013 : new errors interface to decouple calling code from errors.c
+/*
+/* Revision 1.27  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.26  2012/05/24 16:20:52  pauloscustodio
@@ -73,7 +77,7 @@ Copyright (C) Paulo Custodio, 2011-2012
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
 /* - Created new exception FileIOException and ERR_FILE_IO error.
-/* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
+/* - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
 /*
 /* Revision 1.17  2011/08/15 17:12:31  pauloscustodio
 /* Upgrade to Exceptions4c 2.8.9 to solve memory leak.
@@ -330,7 +334,7 @@ Factor( struct expr *pfixexpr )
 
             if ( eval_err == 1 )
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX_EXPR );
+                error( ERR_SYNTAX_EXPR );
                 return 0;           /* syntax error in expression */
             }
             else
@@ -359,7 +363,7 @@ Factor( struct expr *pfixexpr )
                 }
                 else
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_UNBALANCED_PAREN );
+                    error( ERR_UNBALANCED_PAREN );
                     return 0;
                 }
             }
@@ -388,7 +392,7 @@ Factor( struct expr *pfixexpr )
 
             if ( feof( z80asmfile ) )
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                error( ERR_SYNTAX );
                 return 0;
             }
             else
@@ -397,7 +401,7 @@ Factor( struct expr *pfixexpr )
 
                 if ( constant == EOF )
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                    error( ERR_SYNTAX );
                     return 0;
                 }
                 else
@@ -411,7 +415,7 @@ Factor( struct expr *pfixexpr )
                     }
                     else
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX_EXPR );
+                        error( ERR_SYNTAX_EXPR );
                         return 0;
                     }
                 }
@@ -442,7 +446,7 @@ Factor( struct expr *pfixexpr )
             break;
 
         default:
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX_EXPR );  /* syntax error */
+            error( ERR_SYNTAX_EXPR );  /* syntax error */
             return 0;
     }
 
@@ -693,12 +697,12 @@ StoreExpr( struct expr *pfixexpr, char range )
 {
     unsigned char b;
 
-    xfputc( range, objfile );     /* range of expression */
-    xfput_word( pfixexpr->codepos, objfile );     /* patchptr */
+    fputc_err( range, objfile );     /* range of expression */
+    fputw_err( pfixexpr->codepos, objfile );     /* patchptr */
     b = strlen( pfixexpr->infixexpr );
-    xfputc( b, objfile );         /* length prefixed string */
-    xfwritec( pfixexpr->infixexpr, ( size_t ) b, objfile );
-    xfputc( 0, objfile );         /* nul-terminate expression */
+    fputc_err( b, objfile );         /* length prefixed string */
+    fwritec_err( pfixexpr->infixexpr, ( size_t ) b, objfile );
+    fputc_err( 0, objfile );         /* nul-terminate expression */
 
     pfixexpr->stored = ON;
 }
@@ -1093,7 +1097,7 @@ ExprLong( int listoffset )
                     }
                     else
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant );
+                        error( ERR_INT_RANGE, constant );
                     }
                 }
             }
@@ -1159,7 +1163,7 @@ ExprAddress( int listoffset )
                     }
                     else
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant );
+                        error( ERR_INT_RANGE, constant );
                     }
                 }
             }
@@ -1225,7 +1229,7 @@ ExprUnsigned8( int listoffset )
                     }
                     else
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant );
+                        error( ERR_INT_RANGE, constant );
                     }
                 }
             }
@@ -1266,7 +1270,7 @@ ExprSigned8( int listoffset )
             break;              /* continue into parsing expression */
 
         default:                /* Syntax error, e.g. (ix 4) */
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
             return 0;           /* FAIL */
     }
 
@@ -1306,7 +1310,7 @@ ExprSigned8( int listoffset )
                     }
                     else
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant );
+                        error( ERR_INT_RANGE, constant );
                     }
                 }
             }

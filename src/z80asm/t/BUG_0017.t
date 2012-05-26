@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0017.t,v 1.1 2012-05-23 20:00:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0017.t,v 1.2 2012-05-26 18:51:10 pauloscustodio Exp $
 # $Log: BUG_0017.t,v $
-# Revision 1.1  2012-05-23 20:00:38  pauloscustodio
+# Revision 1.2  2012-05-26 18:51:10  pauloscustodio
+# CH_0012 : wrappers on OS calls to raise fatal error
+# CH_0013 : new errors interface to decouple calling code from errors.c
+#
+# Revision 1.1  2012/05/23 20:00:38  pauloscustodio
 # BUG_0017 : no error message if fails to create binary file chunk (option -c).
 # Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
 #
@@ -37,7 +41,7 @@ my $asm = "DEFB 0\n" x 0x10000;
 write_file( asm_file(), $asm );
 t_z80asm_capture("-r0 -b -c ".asm_file(),
 				"", 
-				"Error: Module 'TEST', Cannot open file 'test.bn1' for writing\n".
+				"Error: Cannot open file 'test.bn1' for writing\n".
 				"1 errors occurred during assembly\n",
 				1);
 

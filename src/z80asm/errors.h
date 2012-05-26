@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.10 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.11 2012-05-26 18:51:10 pauloscustodio Exp $ */
 /* $Log: errors.h,v $
-/* Revision 1.10  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.11  2012-05-26 18:51:10  pauloscustodio
+/* CH_0012 : wrappers on OS calls to raise fatal error
+/* CH_0013 : new errors interface to decouple calling code from errors.c
+/*
+/* Revision 1.10  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.9  2012/05/24 13:43:52  pauloscustodio
@@ -52,7 +56,7 @@ Copyright (C) Paulo Custodio, 2011-2012
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
 /* - Created new exception FileIOException and ERR_FILE_IO error.
-/* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
+/* - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
 /*
 /* Revision 1.2  2011/07/14 01:32:08  pauloscustodio
 /*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
@@ -73,26 +77,54 @@ Copyright (C) Paulo Custodio, 2011-2012
 #ifndef ERRORS_H
 #define ERRORS_H
 
-#include "symbol.h"
+#include <stdio.h>
 
 /* error constants */
 #define DEF_MSG(name,msg)    name,
-
 typedef enum ErrorCode
 {
 #include "errors_def.h"
 } ErrorCode;
-
 #undef DEF_MSG
 
-/* global variables */
-extern int          TOTALERRORS;        /* total num errors */
+/* define the next FILE, LINENO, MODULE to use in error messages error(), fatal_error(), warning() */
+extern void set_error_null( void );             /* clear all locations */
+extern void set_error_file( char *filename );
+extern void set_error_module( char *modulename );
+extern void set_error_line( int lineno );
 
-/* reset to no-error status */
-extern void ResetErrors( void );
+/* reset count of errors and warnings and return current count */
+extern void reset_error_count( void );
+extern int  get_num_errors( void );
+extern int  get_num_warnings( void );
 
-/* report error functions */
-extern void ReportError( char *filename, int linenr, int errnum, ... );
+/* define file to receive all errors / warnings from now on */
+extern void open_error_file( char *filename );
+extern void close_error_file( void );   /* deletes the file if no errors */
+
+/* error / warning with printf-like argument */
+extern void fatal_error( ErrorCode err, ... );
+extern void error( ErrorCode err, ... );
+extern void warning( ErrorCode err, ... );
+
+/* error / warning at given location */
+extern void fatal_error_at( char *filename, int lineno, ErrorCode err, ... );
+extern void error_at( char *filename, int lineno, ErrorCode err, ... );
+extern void warning_at( char *filename, int lineno, ErrorCode err, ... );
+
+/* OS interface with fatal errors on failure */
+extern FILE *fopen_err( char *filename, char *mode );
+
+extern void fputc_err( int c, FILE *stream );
+extern int fgetc_err( FILE *stream );   /* EOF is fatal */
+
+extern void fwrite_err( const void *buffer, size_t size, size_t count, FILE *stream );
+#define fwritec_err(buffer, count, stream) \
+    fwrite_err(buffer, sizeof(char), count, stream)
+
+extern void fread_err( void *buffer, size_t size, size_t count, FILE *stream );   /* EOF is fatal */
+#define freadc_err( buffer, count, stream) \
+    fread_err( buffer, sizeof(char), count, stream)   /* EOF is fatal */
 
 #endif /* ndef ERRORS_H */
 

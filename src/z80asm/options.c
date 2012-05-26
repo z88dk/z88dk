@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.12 2012-05-24 21:48:24 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.13 2012-05-26 18:51:10 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.12  2012-05-24 21:48:24  pauloscustodio
+/* Revision 1.13  2012-05-26 18:51:10  pauloscustodio
+/* CH_0012 : wrappers on OS calls to raise fatal error
+/* CH_0013 : new errors interface to decouple calling code from errors.c
+/*
+/* Revision 1.12  2012/05/24 21:48:24  pauloscustodio
 /* Remove the global variables include_dir, lib_dir, and respective
 /* counts, create instead the paths in the options module and
 /* create new search_include_file() and search_lib_file()
@@ -423,7 +427,7 @@ void set_asm_flag( char *flagid )
 
         if ( !isalpha( ident[0] ) )
         {
-            ReportError( NULL, 0, ERR_ILLEGAL_IDENT );  /* symbol must begin with alpha */
+            error( ERR_ILLEGAL_IDENT );  /* symbol must begin with alpha */
             return;
         }
 
@@ -437,7 +441,7 @@ void set_asm_flag( char *flagid )
                 {
                     if ( ident[i] != '_' )
                     {
-                        ReportError( NULL, 0, ERR_ILLEGAL_IDENT );      /* illegal char in identifier */
+                        error( ERR_ILLEGAL_IDENT );      /* illegal char in identifier */
                         return;
                     }
                     else
@@ -452,7 +456,7 @@ void set_asm_flag( char *flagid )
             }
             else
             {
-                ReportError( NULL, 0, ERR_ILLEGAL_IDENT );              /* illegal char in identifier */
+                error( ERR_ILLEGAL_IDENT );              /* illegal char in identifier */
                 return;
             }
 
@@ -471,8 +475,7 @@ void set_asm_flag( char *flagid )
     else
     {
         /* BUG_0003 was missing Illegal Option error */
-        ReportError( NULL, 0, ERR_ILLEGAL_OPTION, flagid );
-        throw( FatalErrorException, "invalid option" );
+        fatal_error( ERR_ILLEGAL_OPTION, flagid );
     }
 }
 

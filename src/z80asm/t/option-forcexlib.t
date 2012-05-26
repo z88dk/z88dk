@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-forcexlib.t,v 1.2 2011-07-14 01:32:09 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-forcexlib.t,v 1.3 2012-05-26 18:51:10 pauloscustodio Exp $
 # $Log: option-forcexlib.t,v $
-# Revision 1.2  2011-07-14 01:32:09  pauloscustodio
+# Revision 1.3  2012-05-26 18:51:10  pauloscustodio
+# CH_0012 : wrappers on OS calls to raise fatal error
+# CH_0013 : new errors interface to decouple calling code from errors.c
+#
+# Revision 1.2  2011/07/14 01:32:09  pauloscustodio
 #     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 #     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 #     CH_0003 : Error messages should be more informative
@@ -53,7 +57,7 @@ t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
 ok -f $lib;
 write_file(asm_file(), "lib main \n call main");
 t_z80asm_capture("-r0 -b -i".$lib." ".asm_file(), "",
-		"Error: File 'test.asm', Module 'TEST', Symbol not defined\n".
+		"Error at file 'test.asm' module 'TEST': Symbol not defined in expression 'MAIN'\n".
 		"1 errors occurred during assembly\n", 
 		1);
 

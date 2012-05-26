@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_FOPEN_READ.t,v 1.1 2012-05-23 20:45:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_FOPEN_READ.t,v 1.2 2012-05-26 18:51:10 pauloscustodio Exp $
 # $Log: ERR_FOPEN_READ.t,v $
-# Revision 1.1  2012-05-23 20:45:42  pauloscustodio
+# Revision 1.2  2012-05-26 18:51:10  pauloscustodio
+# CH_0012 : wrappers on OS calls to raise fatal error
+# CH_0013 : new errors interface to decouple calling code from errors.c
+#
+# Revision 1.1  2012/05/23 20:45:42  pauloscustodio
 # Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
 # Add tests.
 #
@@ -60,14 +64,14 @@ t_z80asm_error('
 	include "'.inc_file().'"
 	ld b, 1
 	', 
-	"Error: File 'test.asm', at line 3, Cannot open file 'test.inc' for reading",
+	"Error at file 'test.asm' line 3: Cannot open file 'test.inc' for reading",
 	"-l");
 
 unlink_testfiles();
 t_z80asm_error('
 	binary "'.inc_file().'"
 	', 
-	"Error: File 'test.asm', at line 2, Cannot open file 'test.inc' for reading",
+	"Error at file 'test.asm' line 2: Cannot open file 'test.inc' for reading",
 	"-l");
 
 unlink_testfiles();

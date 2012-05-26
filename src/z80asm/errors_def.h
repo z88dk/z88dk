@@ -16,9 +16,13 @@ Copyright (C) Paulo Custodio, 2011-2012
 Define error codes and error messages
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.5 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.6 2012-05-26 18:51:10 pauloscustodio Exp $ */
 /* $Log: errors_def.h,v $
-/* Revision 1.5  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.6  2012-05-26 18:51:10  pauloscustodio
+/* CH_0012 : wrappers on OS calls to raise fatal error
+/* CH_0013 : new errors interface to decouple calling code from errors.c
+/*
+/* Revision 1.5  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.4  2012/05/24 16:20:52  pauloscustodio
@@ -44,18 +48,25 @@ DEF_MSG( ERR_TOTALERRORS,           "%d errors occurred during assembly" )
 
 /* system errors */
 DEF_MSG( ERR_NO_MEMORY,             "Not enough memory" )
+DEF_MSG( ERR_RUNTIME,               "Run-time error" )
 
 /* file errors */
 DEF_MSG( ERR_FOPEN_READ,            "Cannot open file '%s' for reading" )
 DEF_MSG( ERR_FOPEN_WRITE,           "Cannot open file '%s' for writing" )
+DEF_MSG( ERR_FILE_READ,             "Cannot read from file" )
+DEF_MSG( ERR_FILE_WRITE,            "Cannot write to file" )
 
 /* syntax errors */
 DEF_MSG( ERR_SYNTAX,                "Syntax error" )
 DEF_MSG( ERR_SYNTAX_EXPR,           "Syntax error in expression" )
+DEF_MSG( ERR_EXPR,                  "Error in expression '%s'" )
 
+DEF_MSG( ERR_INT_RANGE,             "Integer '%ld' out of range" )
+DEF_MSG( ERR_INT_RANGE_EXPR,        "Integer '%ld' out of range in expression '%s'" )
 
 DEF_MSG( ERR_NOT_DEFINED,           "Symbol not defined" )
-DEF_MSG( ERR_INT_RANGE,             "Integer '%ld' out of range" )
+DEF_MSG( ERR_NOT_DEFINED_EXPR,      "Symbol not defined in expression '%s'" )
+
 DEF_MSG( ERR_UNBALANCED_PAREN,      "Unbalanced parenthesis" )
 DEF_MSG( ERR_RANGE,                 "Out of range" )   /* not used */
 DEF_MSG( ERR_NO_SRC_FILE,           "Source filename missing" )
@@ -81,4 +92,3 @@ DEF_MSG( ERR_OPEN_LIB,              "Couldn't open library file '%s'" )
 DEF_MSG( ERR_NOT_LIB_FILE,          "File '%s' not a library file" )
 DEF_MSG( ERR_ENV_NOT_DEFINED,       "Environment variable '%s' not defined" )
 DEF_MSG( ERR_INCLUDE_RECURSION,     "Cannot include file '%s' recursively" )
-DEF_MSG( ERR_FILE_IO,               "File I/O error" )

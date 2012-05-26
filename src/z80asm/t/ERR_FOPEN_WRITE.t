@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_FOPEN_WRITE.t,v 1.1 2012-05-23 20:45:42 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_FOPEN_WRITE.t,v 1.2 2012-05-26 18:51:10 pauloscustodio Exp $
 #
 # Test ERR_FOPEN_WRITE
 
@@ -28,7 +28,7 @@ make_path( err_file() );
 write_file( asm_file(), 'nop' );
 t_z80asm_capture("-r0 -b -c ".asm_file(),
 				"", 
-				"Error: Cannot open file 'test.err' for writing\n".
+				"Error at file 'test.asm': Cannot open file 'test.err' for writing\n".
 				"1 errors occurred during assembly\n",
 				1);
 remove_tree( err_file() );
@@ -38,7 +38,7 @@ make_path( lst_file() );
 write_file( asm_file(), 'nop' );
 t_z80asm_capture("-l -r0 -b -c ".asm_file(),
 				"", 
-				"Error: Cannot open file 'test.lst' for writing\n".
+				"Error at file 'test.asm': Cannot open file 'test.lst' for writing\n".
 				"1 errors occurred during assembly\n",
 				1);
 remove_tree( lst_file() );
@@ -48,7 +48,7 @@ make_path( sym_file() );
 write_file( asm_file(), 'nop' );
 t_z80asm_capture("-r0 -b -c ".asm_file(),
 				"", 
-				"Error: Cannot open file 'test.sym' for writing\n".
+				"Error at file 'test.asm': Cannot open file 'test.sym' for writing\n".
 				"1 errors occurred during assembly\n",
 				1);
 remove_tree( sym_file() );
@@ -58,7 +58,7 @@ make_path( obj_file() );
 write_file( asm_file(), 'nop' );
 t_z80asm_capture("-l -r0 -b -c ".asm_file(),
 				"", 
-				"Error: Cannot open file 'test.obj' for writing\n".
+				"Error at file 'test.asm': Cannot open file 'test.obj' for writing\n".
 				"1 errors occurred during assembly\n",
 				1);
 remove_tree( obj_file() );
@@ -68,7 +68,7 @@ make_path( bin_file() );
 write_file( asm_file(), 'nop' );
 t_z80asm_capture("-r0 -b -c ".asm_file(),
 				"", 
-				"Error: Module 'TEST', Cannot open file 'test.bin' for writing\n".
+				"Error: Cannot open file 'test.bin' for writing\n".
 				"1 errors occurred during assembly\n",
 				1);
 remove_tree( bin_file() );

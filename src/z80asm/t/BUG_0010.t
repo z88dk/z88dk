@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0010.t,v 1.2 2011-08-19 19:21:25 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0010.t,v 1.3 2012-05-26 18:51:10 pauloscustodio Exp $
 # $Log: BUG_0010.t,v $
-# Revision 1.2  2011-08-19 19:21:25  pauloscustodio
+# Revision 1.3  2012-05-26 18:51:10  pauloscustodio
+# CH_0012 : wrappers on OS calls to raise fatal error
+# CH_0013 : new errors interface to decouple calling code from errors.c
+#
+# Revision 1.2  2011/08/19 19:21:25  pauloscustodio
 # Additional test cases
 #
 # Revision 1.1  2011/08/19 15:53:59  pauloscustodio
@@ -38,7 +42,7 @@ t_z80asm_ok(0, $code, "\xAA" x 65534 . "\x3E\xAA");
 
 # raise HEAP CORRUPTION DETECTED in MSVC
 $code = "defb 0xAA\n" x 65535 . "ld a, 0xAA";
-t_z80asm_error($code, "Error: File 'test.asm', at line 65536, Max. code size of 65536 bytes reached");
+t_z80asm_error($code, "Error at file 'test.asm' line 65536: Max. code size of 65536 bytes reached");
 
 
 $code = "defb 0xAA\n" x 65533 . "ld bc, 0xAAAA";
@@ -46,7 +50,7 @@ t_z80asm_ok(0, $code, "\xAA" x 65533 . "\x01\xAA\xAA");
 
 # raise HEAP CORRUPTION DETECTED in MSVC
 $code = "defb 0xAA\n" x 65534 . "ld bc, 0xAAAA";
-t_z80asm_error($code, "Error: File 'test.asm', at line 65535, Max. code size of 65536 bytes reached");
+t_z80asm_error($code, "Error at file 'test.asm' line 65535: Max. code size of 65536 bytes reached");
 
 
 $code = "defb 0xAA\n" x 65532 . "defl 0xAAAAAAAA";
@@ -54,7 +58,7 @@ t_z80asm_ok(0, $code, "\xAA" x 65536);
 
 # raise HEAP CORRUPTION DETECTED in MSVC
 $code = "defb 0xAA\n" x 65533 . "defl 0xAAAAAAAA";
-t_z80asm_error($code, "Error: File 'test.asm', at line 65534, Max. code size of 65536 bytes reached");
+t_z80asm_error($code, "Error at file 'test.asm' line 65534: Max. code size of 65536 bytes reached");
 
 unlink_testfiles();
 done_testing();

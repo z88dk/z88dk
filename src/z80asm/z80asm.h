@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.17 2012-05-24 21:48:24 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.18 2012-05-26 18:51:10 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.17  2012-05-24 21:48:24  pauloscustodio
+/* Revision 1.18  2012-05-26 18:51:10  pauloscustodio
+/* CH_0012 : wrappers on OS calls to raise fatal error
+/* CH_0013 : new errors interface to decouple calling code from errors.c
+/*
+/* Revision 1.17  2012/05/24 21:48:24  pauloscustodio
 /* Remove the global variables include_dir, lib_dir, and respective
 /* counts, create instead the paths in the options module and
 /* create new search_include_file() and search_lib_file()
@@ -155,7 +159,7 @@ extern char ident[];
 extern char separators[];
 extern avltree *globalroot, *staticroot;
 extern struct module *CURRENTMODULE;
-extern FILE *listfile, *mapfile, *z80asmfile, *errfile, *deffile, *libfile;
+extern FILE *listfile, *mapfile, *z80asmfile, *deffile, *libfile;
 
 extern char *Fetchfilename( FILE *fptr );
 extern void CreateLibfile( char *filename );

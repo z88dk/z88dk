@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0004.t,v 1.4 2011-07-14 01:32:09 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0004.t,v 1.5 2012-05-26 18:51:10 pauloscustodio Exp $
 # $Log: BUG_0004.t,v $
-# Revision 1.4  2011-07-14 01:32:09  pauloscustodio
+# Revision 1.5  2012-05-26 18:51:10  pauloscustodio
+# CH_0012 : wrappers on OS calls to raise fatal error
+# CH_0013 : new errors interface to decouple calling code from errors.c
+#
+# Revision 1.4  2011/07/14 01:32:09  pauloscustodio
 #     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 #     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 #     CH_0003 : Error messages should be more informative
@@ -43,9 +47,9 @@ require 't/test_utils.pl';
 
 # Integer out of range
 t_z80asm_error("ld a,-129", 			
-		"Error: File 'test.asm', at line 1, Integer '-129' out of range");
+		"Error at file 'test.asm' line 1: Integer '-129' out of range");
 t_z80asm_error("ld a,N \n defc N = -129", 	
-		"Error: File 'test.asm', Module 'TEST', at line 1, Integer '-129' out of range");
+		"Error at file 'test.asm' module 'TEST' line 1: Integer '-129' out of range");
 
 t_z80asm_ok(0, "ld a,-128", 			"\x3E\x80");
 t_z80asm_ok(0, "ld a,N \n defc N = -128", 	"\x3E\x80");
@@ -54,22 +58,22 @@ t_z80asm_ok(0, "ld a,255", 			"\x3E\xFF");
 t_z80asm_ok(0, "ld a,N \n defc N = 255", 	"\x3E\xFF");
 
 t_z80asm_error("ld a,256", 			
-		"Error: File 'test.asm', at line 1, Integer '256' out of range");
+		"Error at file 'test.asm' line 1: Integer '256' out of range");
 t_z80asm_error("ld a,N \n defc N = 256",	
-		"Error: File 'test.asm', Module 'TEST', at line 1, Integer '256' out of range");
+		"Error at file 'test.asm' module 'TEST' line 1: Integer '256' out of range");
 
 t_z80asm_error("ld bc,-32769", 			
-		"Error: File 'test.asm', at line 1, Integer '-32769' out of range");
+		"Error at file 'test.asm' line 1: Integer '-32769' out of range");
 t_z80asm_error("ld bc,N \n defc N = -32769", 	
-		"Error: File 'test.asm', Module 'TEST', at line 1, Integer '-32769' out of range");
+		"Error at file 'test.asm' module 'TEST' line 1: Integer '-32769' out of range");
 
 t_z80asm_ok(0, "ld bc,-32768", 			"\x01\x00\x80");
 t_z80asm_ok(0, "ld bc,N \n defc N = -32768", 	"\x01\x00\x80");
 
 t_z80asm_error("ld bc,65536", 			
-		"Error: File 'test.asm', at line 1, Integer '65536' out of range");
+		"Error at file 'test.asm' line 1: Integer '65536' out of range");
 t_z80asm_error("ld bc,N \n defc N = 65536", 	
-		"Error: File 'test.asm', Module 'TEST', at line 1, Integer '65536' out of range");
+		"Error at file 'test.asm' module 'TEST' line 1: Integer '65536' out of range");
 
 t_z80asm_ok(0, "ld bc,65535", 			"\x01\xFF\xFF");
 t_z80asm_ok(0, "ld bc,N \n defc N = 65535", 	"\x01\xFF\xFF");

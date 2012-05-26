@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.27 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.28 2012-05-26 18:51:10 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.27  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.28  2012-05-26 18:51:10  pauloscustodio
+/* CH_0012 : wrappers on OS calls to raise fatal error
+/* CH_0013 : new errors interface to decouple calling code from errors.c
+/*
+/* Revision 1.27  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.26  2012/05/20 06:39:27  pauloscustodio
@@ -661,7 +665,7 @@ CheckRegister8( void )
                 {
                     if ( ( cpu_type & CPU_RABBIT ) )
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                        error( ERR_ILLEGAL_IDENT );
                         return -1;
                     }
 
@@ -672,7 +676,7 @@ CheckRegister8( void )
                 {
                     if ( ( cpu_type & CPU_RABBIT ) )
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+                        error( ERR_ILLEGAL_IDENT );
                         return -1;
                     }
 
@@ -823,7 +827,7 @@ IndirectRegisters( void )
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );     /* Right bracket missing! */
+                error( ERR_SYNTAX );     /* Right bracket missing! */
                 return -1;
             }
 
@@ -836,7 +840,7 @@ IndirectRegisters( void )
             return 7;
 
         default:
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+            error( ERR_ILLEGAL_IDENT );
             return -1;
     }
 }

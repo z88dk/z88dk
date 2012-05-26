@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.23 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.24 2012-05-26 18:51:10 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.23  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.24  2012-05-26 18:51:10  pauloscustodio
+/* CH_0012 : wrappers on OS calls to raise fatal error
+/* CH_0013 : new errors interface to decouple calling code from errors.c
+/*
+/* Revision 1.23  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.22  2012/05/20 06:39:27  pauloscustodio
@@ -275,7 +279,7 @@ void DefineSymbol( char *identifier,
         else
         {
             /* global symbol already defined */
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier );
+            error( ERR_SYMBOL_REDEFINED, identifier );
         }
     }
     else
@@ -324,7 +328,7 @@ static void DefLocalSymbol( char *identifier,
     else
     {
         /* local symbol already defined */
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier );
+        error( ERR_SYMBOL_REDEFINED, identifier );
     }
 }
 
@@ -500,13 +504,13 @@ void DeclSymGlobal( char *identifier, char libtype )
                 else                                      /* cannot declare two identical global's */
                 {
                     /* Already declared global */
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL_GLOBAL, identifier );
+                    error( ERR_SYMBOL_REDECL_GLOBAL, identifier );
                 }
             }
             else if ( ( foundsym->type & ( SYMXDEF | libtype ) ) != ( SYMXDEF | libtype ) )
             {
                 /* re-declaration not allowed */
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL, identifier );
+                error( ERR_SYMBOL_REDECL, identifier );
             }
         }
     }
@@ -529,7 +533,7 @@ void DeclSymGlobal( char *identifier, char libtype )
         {
             /* local, global - no possible path (?), as if local & not global, symbol is moved local -> global */
             /* already declared global */
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_GLOBAL, identifier );
+            error( ERR_SYMBOL_DECL_GLOBAL, identifier );
         }
     }
 }
@@ -558,7 +562,7 @@ void DeclSymExtern( char *identifier, char libtype )
                     }
                     else
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL, identifier );
+                        error( ERR_SYMBOL_REDECL, identifier );
                     }
 
                 /* Re-declaration not allowed */
@@ -583,14 +587,14 @@ void DeclSymExtern( char *identifier, char libtype )
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_DECL_LOCAL, identifier );
+                error( ERR_SYMBOL_DECL_LOCAL, identifier );
             }
 
             /* already declared local */
         }
         else if ( ( foundsym->type & ( SYMXREF | libtype ) ) != ( SYMXREF | libtype ) )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDECL, identifier );
+            error( ERR_SYMBOL_REDECL, identifier );
             /* re-declaration not allowed */
         }
     }
@@ -683,7 +687,7 @@ void DefineDefSym( char *identifier, long value, char symboltype, avltree **root
     else
     {
         /* Symbol already defined */
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYMBOL_REDEFINED, identifier );
+        error( ERR_SYMBOL_REDEFINED, identifier );
     }
 }
 

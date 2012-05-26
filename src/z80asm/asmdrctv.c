@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.30 2012-05-24 21:48:24 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.31 2012-05-26 18:51:10 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.30  2012-05-24 21:48:24  pauloscustodio
+/* Revision 1.31  2012-05-26 18:51:10  pauloscustodio
+/* CH_0012 : wrappers on OS calls to raise fatal error
+/* CH_0013 : new errors interface to decouple calling code from errors.c
+/*
+/* Revision 1.30  2012/05/24 21:48:24  pauloscustodio
 /* Remove the global variables include_dir, lib_dir, and respective
 /* counts, create instead the paths in the options module and
 /* create new search_include_file() and search_lib_file()
@@ -73,7 +77,7 @@ Copyright (C) Paulo Custodio, 2011-2012
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
 /* - Created new exception FileIOException and ERR_FILE_IO error.
-/* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
+/* - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
 /*
 /* Revision 1.20  2011/08/14 19:46:46  pauloscustodio
 /* - INCLUDE(), BINARY(): throw the new exception FatalErrorException for fatal error ERR_FILE_OPEN, no need to re-open the original source file after the error
@@ -305,12 +309,12 @@ DEFSP( void )
             }
         else
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
             return -1;
         }
     else
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+        error( ERR_SYNTAX );
         return -1;
     }
 }
@@ -327,13 +331,13 @@ Parsevarsize( void )
 
     if ( strcmp( ident, "DS" ) != 0 )
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+        error( ERR_ILLEGAL_IDENT );
     }
     else
     {
         if ( ( varsize = DEFSP() ) == -1 )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_UNKNOWN_IDENT );
+            error( ERR_UNKNOWN_IDENT );
         }
         else
         {
@@ -343,7 +347,7 @@ Parsevarsize( void )
             {
                 if ( postfixexpr->rangetype & NOTEVALUABLE )
                 {
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED );
+                    error( ERR_NOT_DEFINED );
                     RemovePfixlist( postfixexpr );
                 }
                 else
@@ -357,7 +361,7 @@ Parsevarsize( void )
                     }
                     else
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, size_multiplier );
+                        error( ERR_INT_RANGE, size_multiplier );
                     }
                 }
             }
@@ -391,7 +395,7 @@ Parsedefvarsize( long offset )
             break;
 
         default:
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
     }
 
     return varoffset;
@@ -415,7 +419,7 @@ DEFVARS( void )
         /* expr. must not be stored in relocatable file */
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED );
+            error( ERR_NOT_DEFINED );
             RemovePfixlist( postfixexpr );
             return;
         }
@@ -455,6 +459,12 @@ DEFVARS( void )
 
         EOL = OFF;
         ++CURRENTFILE->line;
+
+        if ( !clinemode )
+        {
+            set_error_line( CURRENTFILE->line );    /* error location */
+        }
+
         GetSym();
     }
 
@@ -465,6 +475,12 @@ DEFVARS( void )
             if ( EOL == ON )
             {
                 ++CURRENTFILE->line;
+
+                if ( !clinemode )
+                {
+                    set_error_line( CURRENTFILE->line );    /* error location */
+                }
+
                 EOL = OFF;
             }
             else
@@ -495,6 +511,12 @@ DEFGROUP( void )
         Skipline( z80asmfile );
         EOL = OFF;
         ++CURRENTFILE->line;
+
+        if ( !clinemode )
+        {
+            set_error_line( CURRENTFILE->line );    /* error location */
+        }
+
     }
 
     if ( sym == lcurly )
@@ -504,6 +526,12 @@ DEFGROUP( void )
             if ( EOL == ON )
             {
                 ++CURRENTFILE->line;
+
+                if ( !clinemode )
+                {
+                    set_error_line( CURRENTFILE->line );    /* error location */
+                }
+
                 EOL = OFF;
             }
             else
@@ -530,7 +558,7 @@ DEFGROUP( void )
                                 {
                                     if ( postfixexpr->rangetype & NOTEVALUABLE )
                                     {
-                                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED );
+                                        error( ERR_NOT_DEFINED );
                                     }
                                     else
                                     {
@@ -552,7 +580,7 @@ DEFGROUP( void )
                             break;
 
                         default:
-                            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                            error( ERR_SYNTAX );
                             break;
                     }
                 }
@@ -580,7 +608,7 @@ DEFS()
         /* expr. must not be stored in relocatable file */
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED );
+            error( ERR_NOT_DEFINED );
         }
         else
         {
@@ -600,7 +628,7 @@ DEFS()
                 {
                     if ( constexpr->rangetype & NOTEVALUABLE )
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED );
+                        error( ERR_NOT_DEFINED );
                     }
                     else
                     {
@@ -622,7 +650,7 @@ DEFS()
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant );
+                error( ERR_INT_RANGE, constant );
                 return;
             }
         }
@@ -647,7 +675,7 @@ UNDEFINE( void )
         }
         else
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
             break;
         }
     }
@@ -665,7 +693,7 @@ DEFINE( void )
         }
         else
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
             break;
         }
     }
@@ -695,7 +723,7 @@ DEFC( void )
                        * relocatable file */
                     if ( postfixexpr->rangetype & NOTEVALUABLE )
                     {
-                        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED );
+                        error( ERR_NOT_DEFINED );
                         break;
                     }
                     else
@@ -714,13 +742,13 @@ DEFC( void )
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                error( ERR_SYNTAX );
                 break;
             }
         }
         else
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
             break;
         }
     }
@@ -742,7 +770,7 @@ ORG( void )
     {
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_NOT_DEFINED );
+            error( ERR_NOT_DEFINED );
         }
         else
         {
@@ -754,7 +782,7 @@ ORG( void )
             }
             else
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INT_RANGE, constant );
+                error( ERR_INT_RANGE, constant );
             }
         }
 
@@ -786,7 +814,7 @@ DEFB( void )
         }
         else if ( sym != comma )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
             break;
         }
     }
@@ -818,7 +846,7 @@ DEFW( void )
         }
         else if ( sym != comma )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
             break;
         }
     }
@@ -847,7 +875,7 @@ DEFP( void )
         /* Pointers must be specified as WORD,BYTE pairs separated by commas */
         if ( sym != comma )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
         }
 
         GetSym();
@@ -866,7 +894,7 @@ DEFP( void )
         }
         else if ( sym != comma )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
             break;
         }
     }
@@ -898,7 +926,7 @@ DEFL( void )
         }
         else if ( sym != comma )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+            error( ERR_SYNTAX );
             break;
         }
     }
@@ -925,7 +953,7 @@ DEFM( void )
                 {
                     sym = newline;
                     EOL = ON;
-                    ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                    error( ERR_SYNTAX );
                     return;
                 }
                 else
@@ -942,7 +970,7 @@ DEFM( void )
 
                         if ( sym != strconq && sym != comma && sym != newline && sym != semicolon )
                         {
-                            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+                            error( ERR_SYNTAX );
                             return;
                         }
 
@@ -960,7 +988,7 @@ DEFM( void )
 
             if ( sym != strconq && sym != comma && sym != newline && sym != semicolon )
             {
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX ); /* expression separator not found */
+                error( ERR_SYNTAX ); /* expression separator not found */
                 break;
             }
 
@@ -986,50 +1014,38 @@ INCLUDE( void )
 
         if ( FindFile( CURRENTFILE, filename ) != NULL )
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_INCLUDE_RECURSION, filename );
+            error( ERR_INCLUDE_RECURSION, filename );
             return;
         }
 
         CURRENTFILE->filepointer = ftell( z80asmfile );   /* get file position of current source file */
         fclose( z80asmfile );     /* close current source file */
 
-        if ( ( z80asmfile = fopen( filename, "rb" ) ) == NULL )
+        z80asmfile = fopen_err( filename, "rb" );           /* CH_0012 */
+        CURRENTFILE = Newfile( CURRENTFILE, filename );       /* Allocate new file into file information list */
+
+        set_error_file( filename );
+
+        if ( verbose )
         {
-            /* Open include file */
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_FOPEN_READ, filename );
-            throw( FatalErrorException, "INCLUDE failed open include file" );
+            puts( CURRENTFILE->fname );    /* display name of INCLUDE file */
         }
-        else
-        {
-            CURRENTFILE = Newfile( CURRENTFILE, filename );       /* Allocate new file into file information list */
 
-            if ( verbose )
-            {
-                puts( CURRENTFILE->fname );    /* display name of INCLUDE file */
-            }
+        Z80pass1();           /* parse include file */
 
-            Z80pass1();           /* parse include file */
+        CURRENTFILE = Prevfile();     /* Now get back to current file... */
 
-            CURRENTFILE = Prevfile();     /* Now get back to current file... */
+        set_error_file( CURRENTFILE->fname );
 
-            fclose( z80asmfile );
-            z80asmfile = NULL;
+        fclose( z80asmfile );
+        z80asmfile = NULL;
 
-            if ( ( z80asmfile = fopen( CURRENTFILE->fname, "rb" ) ) == NULL )
-            {
-                /* re-open current source file */
-                ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_FOPEN_READ, CURRENTFILE->fname );
-                throw( FatalErrorException, "INCLUDE failed open original file" );
-            }
-            else
-            {
-                fseek( z80asmfile, CURRENTFILE->filepointer, 0 ); /* file position to beginning of */
-            }
-        }                       /* line following INCLUDE line */
+        z80asmfile = fopen_err( CURRENTFILE->fname, "rb" );           /* CH_0012 */
+        fseek( z80asmfile, CURRENTFILE->filepointer, 0 ); /* file position to beginning of */
     }
     else
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+        error( ERR_SYNTAX );
     }
 
     sym = newline;
@@ -1048,12 +1064,7 @@ BINARY( void )
     {
         filename = Fetchfilename( z80asmfile );
 
-        if ( ( binfile = fopen( filename, "rb" ) ) == NULL )
-        {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_FOPEN_READ, filename );
-            throw( FatalErrorException, "BINARY failed open file" );
-        }
-
+        binfile = fopen_err( filename, "rb" );           /* CH_0012 */
         fseek( binfile, 0L, SEEK_END ); /* file pointer to end of file */
         Codesize = ftell( binfile );
         fseek( binfile, 0L, SEEK_SET ); /* file pointer to start of file */
@@ -1065,7 +1076,7 @@ BINARY( void )
     }
     else
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_SYNTAX );
+        error( ERR_SYNTAX );
     }
 }
 
@@ -1137,12 +1148,12 @@ DeclModuleName( void )
         }
         else
         {
-            ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_ILLEGAL_IDENT );
+            error( ERR_ILLEGAL_IDENT );
         }
     }
     else
     {
-        ReportError( CURRENTFILE->fname, CURRENTFILE->line, ERR_MODULE_REDEFINED );
+        error( ERR_MODULE_REDEFINED );
     }
 }
 

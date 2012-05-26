@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.60 2012-05-26 17:46:00 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.61 2012-05-26 18:51:10 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.60  2012-05-26 17:46:00  pauloscustodio
+/* Revision 1.61  2012-05-26 18:51:10  pauloscustodio
+/* CH_0012 : wrappers on OS calls to raise fatal error
+/* CH_0013 : new errors interface to decouple calling code from errors.c
+/*
+/* Revision 1.60  2012/05/26 17:46:00  pauloscustodio
 /* Put back strtoupper, strupr does not exist in all systems, was causing nightly build to fail
 /*
 /* Revision 1.59  2012/05/24 21:48:24  pauloscustodio
@@ -118,15 +122,15 @@ Copyright (C) Paulo Custodio, 2011-2012
 /* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
 /*
 /* Revision 1.38  2011/08/19 10:20:32  pauloscustodio
-/* - Factored code to read/write word from file into xfget_word/xfput_word.
-/* - Renamed ReadLong/WriteLong to xfget_long/xfput_long for symetry.
+/* - Factored code to read/write word from file into fgetw_err/fputw_err.
+/* - Renamed ReadLong/WriteLong to fgetl_err/fputl_err for symetry.
 /*
 /* Revision 1.37  2011/08/18 23:27:54  pauloscustodio
 /* BUG_0009 : file read/write not tested for errors
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
 /* - Created new exception FileIOException and ERR_FILE_IO error.
-/* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
+/* - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
 /*
 /* Revision 1.36  2011/08/18 21:47:48  pauloscustodio
 /* BUG_0008 : code block of 64K is read as zero
@@ -475,7 +479,7 @@ struct module *NewModule( void );
 struct libfile *NewLibrary( void );
 
 
-FILE *z80asmfile, *listfile, *errfile, *objfile, *mapfile, *modsrcfile, *deffile, *libfile;
+FILE *z80asmfile, *listfile, *objfile, *mapfile, *modsrcfile, *deffile, *libfile;
 
 /* BUG_0001 array ssym[] needs to have one element per character in
  * separators, plus one newline to match the final '\0' just in case it is
@@ -535,46 +539,28 @@ avltree *globalroot, *staticroot;
 void
 AssembleSourceFile( void )
 {
-    int start_errors = TOTALERRORS;     /* count errors in this source file */
+    int start_errors = get_num_errors();     /* count errors in this source file */
 
     /* try-catch to delete incomplete files in case of fatal error */
     try
     {
-        if ( ( errfile = fopen( errfilename, "w" ) ) == NULL )
-        {
-            /* Create error file */
-            ReportError( NULL, 0, ERR_FOPEN_WRITE, errfilename );
-            throw( FatalErrorException, "cannot open errfile" );
-        }
+        /* Create error file */
+        open_error_file( errfilename );
 
         if ( listing_CPY || symfile )
         {
-            if ( ( listfile = fopen( lstfilename, "w+" ) ) != NULL )
-            {
-                /* Create LIST or SYMBOL file */
-                PAGENR = 0;
-                LINENR = 6;
-                WriteHeader();                  /* Begin list file with a header */
-                listfileptr = ftell( listfile ); /* Get file pos. of next line in list file */
-            }
-            else
-            {
-                ReportError( NULL, 0, ERR_FOPEN_WRITE, lstfilename );
-                throw( FatalErrorException, "cannot open lstfile" );
-            }
+            /* Create LIST or SYMBOL file */
+            listfile = fopen_err( lstfilename, "w+" );           /* CH_0012 */
+            PAGENR = 0;
+            LINENR = 6;
+            WriteHeader();                  /* Begin list file with a header */
+            listfileptr = ftell( listfile ); /* Get file pos. of next line in list file */
         }
 
-        if ( ( objfile = fopen( objfilename, "w+b" ) ) != NULL )
-        {
-            /* Create relocatable object file */
-            xfwritec( Z80objhdr,    strlen( Z80objhdr ),    objfile );
-            xfwritec( objhdrprefix, strlen( objhdrprefix ), objfile );
-        }
-        else
-        {
-            ReportError( NULL, 0, ERR_FOPEN_WRITE, objfilename );
-            throw( FatalErrorException, "cannot open objfile" );
-        }
+        /* Create relocatable object file */
+        objfile = fopen_err( objfilename, "w+b" );           /* CH_0012 */
+        fwritec_err( Z80objhdr,    strlen( Z80objhdr ),    objfile );
+        fwritec_err( objhdrprefix, strlen( objhdrprefix ), objfile );
 
         set_PC( 0 );
         set_oldPC();
@@ -599,10 +585,12 @@ AssembleSourceFile( void )
             strtoupper( ident );
             sym = name;
             DeclModuleName();
-            /* ReportError (CURRENTFILE->fname, 0, ERR_MODULE_NOT_DEFINED); */
         }
 
-        if ( start_errors == TOTALERRORS )
+        set_error_null();
+        set_error_module( CURRENTMODULE->mname );
+
+        if ( start_errors == get_num_errors() )
         {
             if ( verbose )
             {
@@ -619,6 +607,9 @@ AssembleSourceFile( void )
          * Source file no longer needed (file could already have been closed, if fatal error occurred during INCLUDE
          * processing).
          */
+
+        set_error_null();
+
         if ( z80asmfile != NULL )
         {
             fclose( z80asmfile );
@@ -628,13 +619,14 @@ AssembleSourceFile( void )
         if ( listfile != NULL )
         {
             fseek( listfile, 0, SEEK_END );
-            xfputc( 12, listfile );     /* end listing with a FF */
+            fputc_err( 12, listfile );     /* end listing with a FF */
             fclose( listfile );
             listfile = NULL;
 
-            if ( start_errors != TOTALERRORS )
+            if ( start_errors != get_num_errors() )
             {
-                remove( lstfilename );    /* remove incomplete list file */
+                /* remove incomplete list file */
+                remove( lstfilename );
             }
         }
 
@@ -644,25 +636,17 @@ AssembleSourceFile( void )
             objfile = NULL;
         }
 
-        if ( start_errors != TOTALERRORS )
+        if ( start_errors != get_num_errors() )
         {
-            remove( objfilename );    /* remove incomplete object file */
+            /* remove incomplete object file */
+            remove( objfilename );
         }
 
-        if ( errfile != NULL )
-        {
-            fclose( errfile );
-            errfile = NULL;
-
-            if ( start_errors == TOTALERRORS )
-            {
-                remove( errfilename );    /* remove empty error file */
-            }
-        }
+        close_error_file();
 
         if ( globaldef )
         {
-            xfputc( '\n', deffile );    /* separate DEFC lines for each module */
+            fputc_err( '\n', deffile );    /* separate DEFC lines for each module */
             inorder( globalroot, ( void ( * )( void * ) ) WriteGlobal );
         }
 
@@ -689,28 +673,21 @@ static void AssembleAny( char *file )
 
         case '-':
             /* Illegal source file name */
-            ReportError( NULL, 0, ERR_ILLEGAL_SRC_FILENAME, file );
+            error( ERR_ILLEGAL_SRC_FILENAME, file );
             return;
 
         case '@':
             file++;     /* skip '@' marker */
-            atfile = fopen( file, "rb" );
+            atfile = fopen_err( file, "rb" );           /* CH_0012 */
 
-            if ( atfile == NULL )
+            /* read lines from atfile and recurse */
+            while ( ( read_file = Fetchfilename( atfile ) ) &&
+                    *read_file )
             {
-                ReportError( NULL, 0, ERR_FOPEN_READ, file );
+                AssembleAny( read_file );
             }
-            else
-            {
-                /* read lines from atfile and recurse */
-                while ( ( read_file = Fetchfilename( atfile ) ) &&
-                        *read_file )
-                {
-                    AssembleAny( read_file );
-                }
 
-                fclose( atfile );
-            }
+            fclose( atfile );
 
             return;             /* end of atfile */
 
@@ -719,7 +696,7 @@ static void AssembleAny( char *file )
     }
 
     /* normal case - assemble a asm source file */
-    z80asmfile = listfile = objfile = errfile = NULL;
+    z80asmfile = listfile = objfile = NULL;
 
     init_codearea();            /* Pointer (PC) to store z80 instruction */
 
@@ -747,6 +724,8 @@ static void AssembleAny( char *file )
 
     if ( flag == 1 )            /* begin assembly... */
     {
+        set_error_file( srcfilename );
+
         AssembleSourceFile();
 
         if ( verbose )
@@ -761,6 +740,8 @@ static void AssembleAny( char *file )
     else                        /* file is up-to-date */
     {
     }
+
+    set_error_null();           /* no more module in error messages */
 }
 
 
@@ -782,12 +763,9 @@ CloseFiles( void )
         fclose( objfile );
     }
 
-    if ( errfile != NULL )
-    {
-        fclose( errfile );
-    }
+    close_error_file();
 
-    z80asmfile = listfile = objfile = errfile = NULL;
+    z80asmfile = listfile = objfile = NULL;
 }
 
 
@@ -810,12 +788,8 @@ TestAsmFile( void )
             }
     }
 
-    if ( ( z80asmfile = fopen( srcfilename, "rb" ) ) == NULL )
-    {
-        /* Open source file */
-        ReportError( NULL, 0, ERR_FOPEN_READ, srcfilename );             /* Object module is not found or */
-        return -1;              /* source is has recently been updated */
-    }
+    /* Open source file */
+    z80asmfile = fopen_err( srcfilename, "rb" );           /* CH_0012 */
 
     return 1;                   /* assemble if no datestamp check */
 }
@@ -829,62 +803,55 @@ GetModuleSize( void )
     long fptr_modcode, fptr_modname;
     size_t size;
 
-    if ( ( objfile = fopen( objfilename, "rb" ) ) != NULL )
+    /* open relocatable object file */
+    objfile = fopen_err( objfilename, "rb" );           /* CH_0012 */
+    freadc_err( fheader, 8U, objfile );        /* read first 8 chars from file into array */
+    fheader[8] = '\0';
+
+    if ( strcmp( fheader, Z80objhdr ) != 0 )
     {
-        /* open relocatable object file */
-        xfreadc( fheader, 8U, objfile );        /* read first 8 chars from file into array */
-        fheader[8] = '\0';
-
-        if ( strcmp( fheader, Z80objhdr ) != 0 )
-        {
-            /* compare header of file */
-            ReportError( NULL, 0, ERR_NOT_OBJ_FILE, objfilename );      /* not an object file */
-            fclose( objfile );
-            objfile = NULL;
-            return -1;
-        }
-
-        fseek( objfile, 8 + 2, SEEK_SET );              /* set file pointer to point at module name */
-        fptr_modname = xfget_long( objfile );   /* get file pointer to module name */
-        fseek( objfile, fptr_modname, SEEK_SET );       /* set file pointer to module name */
-
-        size = xfgetc( objfile );
-        xfreadc( line, size, objfile ); /* read module name */
-        line[size] = '\0';
-        CURRENTMODULE->mname = xstrdup( line );
-
-        fseek( objfile, 26, SEEK_SET ); /* set file pointer to point at module code pointer */
-        fptr_modcode = xfget_long( objfile );   /* get file pointer to module code */
-
-        if ( fptr_modcode != -1 )
-        {
-            fseek( objfile, fptr_modcode, SEEK_SET );   /* set file pointer to module code */
-            size = xfget_word( objfile );
-
-            /* BUG_0008 : fix size, if a zero was written, the moudule is actually 64K */
-            if ( size == 0 )
-            {
-                size = 0x10000;
-            }
-
-            if ( CURRENTMODULE->startoffset + size > MAXCODESIZE )
-            {
-                ReportError( objfilename, 0, ERR_MAX_CODESIZE );
-            }
-            else
-            {
-                inc_codesize( size );           /* BUG_0015 : was not updating codesize */
-            }
-        }
-
+        /* compare header of file */
+        error( ERR_NOT_OBJ_FILE, objfilename );      /* not an object file */
         fclose( objfile );
-        return 0;
-    }
-    else
-    {
-        ReportError( NULL, 0, ERR_FOPEN_READ, objfilename );
+        objfile = NULL;
         return -1;
     }
+
+    fseek( objfile, 8 + 2, SEEK_SET );              /* set file pointer to point at module name */
+    fptr_modname = fgetl_err( objfile );   /* get file pointer to module name */
+    fseek( objfile, fptr_modname, SEEK_SET );       /* set file pointer to module name */
+
+    size = fgetc_err( objfile );
+    freadc_err( line, size, objfile ); /* read module name */
+    line[size] = '\0';
+    CURRENTMODULE->mname = xstrdup( line );
+
+    fseek( objfile, 26, SEEK_SET ); /* set file pointer to point at module code pointer */
+    fptr_modcode = fgetl_err( objfile );   /* get file pointer to module code */
+
+    if ( fptr_modcode != -1 )
+    {
+        fseek( objfile, fptr_modcode, SEEK_SET );   /* set file pointer to module code */
+        size = fgetw_err( objfile );
+
+        /* BUG_0008 : fix size, if a zero was written, the moudule is actually 64K */
+        if ( size == 0 )
+        {
+            size = 0x10000;
+        }
+
+        if ( CURRENTMODULE->startoffset + size > MAXCODESIZE )
+        {
+            error_at( objfilename, 0, ERR_MAX_CODESIZE, ( long )MAXCODESIZE );
+        }
+        else
+        {
+            inc_codesize( size );           /* BUG_0015 : was not updating codesize */
+        }
+    }
+
+    fclose( objfile );
+    return 0;
 }
 
 
@@ -909,21 +876,15 @@ CreateLibfile( char *filename )
         }
         else
         {
-            ReportError( NULL, 0, ERR_ENV_NOT_DEFINED, "Z80_STDLIB" );
+            error( ERR_ENV_NOT_DEFINED, "Z80_STDLIB" );
             return;
         }
     }
 
-    if ( ( libfile = fopen( libfilename, "w+b" ) ) == NULL )
-    {
-        /* create library as BINARY file */
-        ReportError( NULL, 0, ERR_OPEN_LIB, libfilename );
-    }
-    else
-    {
-        createlibrary = ON;
-        xfwritec( Z80libhdr, 8U, libfile );     /* write library header */
-    }
+    /* create library as BINARY file */
+    libfile = fopen_err( libfilename, "w+b" );           /* CH_0012 */
+    createlibrary = ON;
+    fwritec_err( Z80libhdr, 8U, libfile );     /* write library header */
 }
 
 
@@ -966,28 +927,20 @@ GetLibfile( char *filename )
         }
         else
         {
-            ReportError( NULL, 0, ERR_ENV_NOT_DEFINED, "Z80_STDLIB" );
+            error( ERR_ENV_NOT_DEFINED, "Z80_STDLIB" );
             return;
         }
     }
 
     newlib->libfilename = f;
 
-    if ( ( z80asmfile = fopen( f, "rb" ) ) == NULL )
-    {
-        /* Does file exist? */
-        ReportError( NULL, 0, ERR_OPEN_LIB, f );
-        return;
-    }
-    else
-    {
-        xfreadc( fheader, 8U, z80asmfile );     /* read first 8 chars from file into array */
-        fheader[8] = '\0';
-    }
+    z80asmfile = fopen_err( f, "rb" );           /* CH_0012 */
+    freadc_err( fheader, 8U, z80asmfile );     /* read first 8 chars from file into array */
+    fheader[8] = '\0';
 
     if ( strcmp( fheader, Z80libhdr ) != 0 )            /* compare header of file */
     {
-        ReportError( NULL, 0, ERR_NOT_LIB_FILE, f );    /* not a library file */
+        error( ERR_NOT_LIB_FILE, f );    /* not a library file */
     }
     else
     {
@@ -1288,20 +1241,21 @@ display_options( void )
 int main( int argc, char *argv[] )
 {
     int    i;
-    char  *ptr;
 
     init_except();                      /* init exception mechanism */
 
     /* start try..catch with finally to cleanup any allocated memory */
     try
     {
+        set_error_null();               /* clear location of error messages */
+
         init_codearea_module();         /* init data for object file creation */
 
         writeline = ON;
         library = createlibrary = OFF;
 
         reset_options();
-        ResetErrors();
+        reset_error_count();
 
         modsrcfile = NULL;
         CURRENTMODULE = NULL;
@@ -1325,7 +1279,6 @@ int main( int argc, char *argv[] )
         date = asctime( localtime( &asmtime ) ); /* get current system time for date in list file */
 
         PAGELEN = 66;
-        TOTALERRORS = 0;
         TOTALLINES = 0;
 
         /* Get options first */
@@ -1336,8 +1289,7 @@ int main( int argc, char *argv[] )
 
         if ( i >= argc )
         {
-            ReportError( NULL, 0, ERR_NO_SRC_FILE );
-            throw( FatalErrorException, "no source file" );
+            fatal_error( ERR_NO_SRC_FILE );
         }
 
         COLUMN_WIDTH = 4 * TAB_DIST;    /* define column width   for output files */
@@ -1364,7 +1316,7 @@ int main( int argc, char *argv[] )
         /* try-catch to delete lib file in case of error */
         try
         {
-            if ( createlibrary && TOTALERRORS == 0 )
+            if ( createlibrary && ! get_num_errors() )
             {
                 CreateLib();
             }
@@ -1376,7 +1328,7 @@ int main( int argc, char *argv[] )
             {
                 fclose( libfile );
 
-                if ( TOTALERRORS > 0 )
+                if ( get_num_errors() )
                 {
                     remove( libfilename );
                 }
@@ -1384,17 +1336,17 @@ int main( int argc, char *argv[] )
         }
 
 
-        if ( ( TOTALERRORS == 0 ) && verbose )
+        if ( ! get_num_errors() && verbose )
         {
             printf( "Total of %ld lines assembled.\n", TOTALLINES );
         }
 
-        if ( ( TOTALERRORS == 0 ) && z80bin )
+        if ( ! get_num_errors() && z80bin )
         {
             LinkModules();
         }
 
-        if ( ( TOTALERRORS == 0 ) && z80bin )
+        if ( ! get_num_errors() && z80bin )
         {
             if ( mapref )
             {
@@ -1410,24 +1362,23 @@ int main( int argc, char *argv[] )
     /* catch and report fatal errors */
     catch ( NotEnoughMemoryException )
     {
-        ReportError( NULL, 0, ERR_NO_MEMORY );
+        error( ERR_NO_MEMORY );
     }
-    catch ( FileIOException )
-    {
-        ReportError( NULL, 0, ERR_FILE_IO );
-    }
+
     catch ( FatalErrorException )
     {
         /* TOTALERRORS is already incremented */
     }
     catch ( RuntimeException )  /* catch all */
     {
-        TOTALERRORS++;
+        error( ERR_RUNTIME );
     }
 
     /* cleanup all allocated memory */
     finally
     {
+        set_error_null();
+
         CloseFiles();
 
 #ifndef QDOS
@@ -1455,9 +1406,9 @@ int main( int argc, char *argv[] )
 #endif
     }
 
-    if ( TOTALERRORS > 0 )
+    if ( get_num_errors() )
     {
-        ReportError( NULL, 0, ERR_TOTALERRORS );
+        warning( ERR_TOTALERRORS, get_num_errors() );
         /* <djm>, if errors, then we really want to return an error number
          * surely?
          */

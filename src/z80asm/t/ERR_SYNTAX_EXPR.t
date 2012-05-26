@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_SYNTAX_EXPR.t,v 1.1 2012-05-24 17:18:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_SYNTAX_EXPR.t,v 1.2 2012-05-26 18:51:10 pauloscustodio Exp $
 # $Log: ERR_SYNTAX_EXPR.t,v $
-# Revision 1.1  2012-05-24 17:18:52  pauloscustodio
+# Revision 1.2  2012-05-26 18:51:10  pauloscustodio
+# CH_0012 : wrappers on OS calls to raise fatal error
+# CH_0013 : new errors interface to decouple calling code from errors.c
+#
+# Revision 1.1  2012/05/24 17:18:52  pauloscustodio
 # ERR_EXPR_SYNTAX renamed ERR_SYNTAX_EXPR (consistency)
 #
 # Revision 1.1  2012/05/23 18:07:51  pauloscustodio
@@ -45,7 +49,7 @@ use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-t_z80asm_error("ld a,1+", "Error: File 'test.asm', at line 1, Syntax error in expression");
+t_z80asm_error("ld a,1+", "Error at file 'test.asm' line 1: Syntax error in expression");
 
 unlink_testfiles();
 done_testing();
