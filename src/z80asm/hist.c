@@ -11,6 +11,7 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
+Copyright (C) Paulo Custodio, 2011-2012
 */
 
 /*
@@ -19,9 +20,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.29 2012-05-22 20:37:47 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.30 2012-05-26 18:56:02 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.29  2012-05-22 20:37:47  pauloscustodio
+/* Revision 1.30  2012-05-26 18:56:02  pauloscustodio
+/* Version 1.1.15
+/*
+/* Revision 1.29  2012/05/22 20:37:47  pauloscustodio
 /* Version 1.1.14
 /*
 /* Revision 1.28  2012/05/12 17:15:57  pauloscustodio
@@ -641,7 +645,7 @@ Based on 1.0.31
          with one byte too short (strlen(filename) instead of strlen(filename)+1).
 
     BUG_0003 : Illegal options are ignored, although ReportError 9 (Illegal Option) exists
-         SetAsmFlag(): Some options were missing the 'return' statement,
+         set_asm_flag(): Some options were missing the 'return' statement,
          following through to the next tests; inserted 'return'
          in options 'M', 'I', 'L' and 'D'.
          Added ReportError 9 (Illegal Option) if the option is not recognized.
@@ -770,7 +774,7 @@ Based on 1.0.31
         - In case of disk full file write fails, but assembler does not
           detect the error and leaves back corruped object/binary files
         - Created new exception FileIOException and ERR_FILE_IO error.
-        - Created new functions xfputc, xfgetc, ... to raise the
+        - Created new functions fputc_err, fgetc_err, ... to raise the
           exception on error.
 
     BUG_0010 : heap corruption when reaching MAXCODESIZE
@@ -785,8 +789,8 @@ Based on 1.0.31
           data - whatever was in memory at that location in codearea.
 
         - Upgrade to Exceptions4c 2.8.9 to solve memory leak.
-        - Factored code to read/write word from file into xfget_word/xfput_word.
-        - Renamed ReadLong/WriteLong to xfget_long/xfput_long for symetry.
+        - Factored code to read/write word from file into fgetw_err/fputw_err.
+        - Renamed ReadLong/WriteLong to fgetl_err/fputl_err for symetry.
 
 -------------------------------------------------------------------------------
 29.09.2011 [1.1.9] (pauloscustodio)
@@ -807,7 +811,7 @@ Based on 1.0.31
         - path_remove_ext() removed everything after last ".", ignoring directory
           separators. Fixed.
 
-    - srcext initialization moved from main() to ResetOptions()
+    - srcext initialization moved from main() to reset_options()
 
 -------------------------------------------------------------------------------
 07.10.2011 [1.1.11] (pauloscustodio)
@@ -898,9 +902,10 @@ Based on 1.0.31
       Renamed xfree0() to xfree().
 
     CH_0008 : Safe strings
-    - New type safestr_t to hold strings with size to prevent buffer overruns.
+    - New type sstr_t to hold strings with size to prevent buffer overruns.
 
     Internal cleanup:
+    - Included OpenBSD queue.h
     - New init_except() to be called at start of main(), auto cleanup atexit().
     - New die() and warn().
     - New types.h with common types.
@@ -917,6 +922,74 @@ Based on 1.0.31
     - ERR_SYMBOL_DECL_GLOBAL seams to be impossible to get. Added comment on this,
       changed test error-18.t.
     - Added tests
+
+-------------------------------------------------------------------------------
+26.05.2012 [1.1.15] (pauloscustodio)
+-------------------------------------------------------------------------------
+    BUG_0017 : no error message if fails to create binary file chunk (option -c)
+        Was missing else case for fopen() failure.
+
+    BUG_0018 : stack overflow in '@' includes - wrong range check
+        if (include_level < sizeof( includes ) - 1) compares size in bytes, not
+        number of elements
+
+    CH_0009 : define simple classes with ordered construction and destruction
+        Simple classes defined in C with constructor, destructor and copy
+        constructor defined.
+        All objects that were not deleted during the program execution
+        are orderly destroyed at the exit, i.e. by calling the destructor of
+        each object, which in turn may call destructors of contained objects.
+
+    CH_0010 : new string pool to hold strings for all program duration
+        Keep pool of strings for all duration of the program.
+        Most keywords in input program are the same, no need to keep several copies
+        and manage strdup/free for each token.
+        Strings with the same contents are reused.
+
+    CH_0011 : new string list class to hold lists of strings
+        Used to keep the include and lib search paths.
+        Remove the global variables include_dir, lib_dir, and respective
+        counts, create instead the paths in the options module and
+        create new search_include_file() and search_lib_file()
+        functions to replace SearchFile().
+
+    CH_0012 : wrappers on OS calls to raise fatal error
+        Remove all the checks for failure after fopen(), localize the error
+        checking and fatal error in fopen_err().
+        Removed exception FileIOException and ERR_FILE_IO error.
+
+    CH_0013 : new errors interface to decouple calling code from errors.c
+        Hide the global variables TOTALERRORS and errfile, throw FatalErrorException
+        inside errors.c's new interface, to simplify the calling code.
+        New interface to declare current error location to the error module,
+        decouple errors.c from the internal knowledge of the z80asm data 
+        structures.
+        Uniform error message format, with file at compile time and module
+        at link time.
+        New ERR_EXPR, ERR_INT_RANGE_EXPR, ERR_NOT_DEFINED_EXPR at link time
+        to remove old hack of writing the faulty expression directly to the
+        errfile file handle.
+        Error numbers are no longer fixed, test files now have the error name
+        and errors_def.h defines the errors in any order, that is used in errors.h
+        to define the error code and in errors.c the error string.
+        Remove ERR_NO_ERR, not used.
+        Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
+        ERR_EXPR_SYNTAX renamed ERR_SYNTAX_EXPR (consistency).
+        New ERR_RUNTIME for unexpected RuntimeException.
+        Replace ERR_FILE_IO by ERR_FILE_READ and ERR_FILE_WRITE
+        Remove ERRORS, redundant with TOTALERRORS.
+
+    Internal cleanup:
+    - Rename safestr_t to sstr_t, keep length to speed-up appending chars.
+    - Make invalid option error fatal.
+    - Let garbage collector do memory release atexit().
+    - Included uthash.h by Troy D. Hanson http://uthash.sourceforge.net
+    - New search_file() to search file in a StrList.
+    - Remove EarlyReturnException, FileIOException: no longer used.
+    - Put back strtoupper, strupr does not exist in all systems,
+      was causing nightly build to fail
+    - Replaced xfputc and friends with fputc_err, raising a fatal_error() 
+      instead of an exception, moved to errors.c.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -937,9 +1010,9 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define DATE        "22.05.2012"
-#define VERSION     "1.1.14"
-#define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011"
+#define DATE        "26.05.2012"
+#define VERSION     "1.1.15"
+#define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2012"
 
 #ifdef QDOS
 #include <qdos.h>
