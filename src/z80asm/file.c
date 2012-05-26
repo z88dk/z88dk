@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2012
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.8 2012-05-24 21:44:00 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.9 2012-05-26 18:36:36 pauloscustodio Exp $ */
 /* $Log: file.c,v $
-/* Revision 1.8  2012-05-24 21:44:00  pauloscustodio
+/* Revision 1.9  2012-05-26 18:36:36  pauloscustodio
+/* Replaced xfputc and friends with fputc_err, raising a fatal_error() instead of an
+/* exception, moved to errors.c
+/*
+/* Revision 1.8  2012/05/24 21:44:00  pauloscustodio
 /* New search_file() to search file in a StrList
 /*
 /* Revision 1.7  2012/05/24 17:09:27  pauloscustodio
@@ -54,7 +58,7 @@ Utilities for file handling
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
 /* - Created new exception FileIOException and ERR_FILE_IO error.
-/* - Created new functions xfputc, xfgetc, ... to raise the exception on error.
+/* - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
 /*
 /* Revision 1.1  2011/08/18 21:42:05  pauloscustodio
 /* Utilities for file handling
@@ -70,96 +74,55 @@ Utilities for file handling
 #include "config.h"
 #include "strutil.h"
 #include "strpool.h"
+#include "errors.h"
 
 /*-----------------------------------------------------------------------------
 *   File IO with exception
 *----------------------------------------------------------------------------*/
-int xfputc( int c, FILE *stream )
-{
-    int ret = fputc( c, stream );
-
-    if ( ret == EOF )
-    {
-        throw( FileIOException, "fputc error" );
-    }
-
-    return ret;
-}
-
-int xfgetc( FILE *stream )
-{
-    int ret = fgetc( stream );
-
-    if ( ret == EOF )
-    {
-        throw( FileIOException, "fgetc error" );
-    }
-
-    return ret;
-}
-
-size_t xfwrite( const void *buffer, size_t size, size_t count, FILE *stream )
-{
-    size_t written = fwrite( buffer, size, count, stream );
-
-    if ( written != count )
-    {
-        throw( FileIOException, "fwrite error" );
-    }
-
-    return written;
-}
-
-size_t xfread( void *buffer, size_t size, size_t count, FILE *stream )
-{
-    size_t read = fread( buffer, size, count, stream );
-
-    if ( read != count )
-    {
-        throw( FileIOException, "fread error" );
-    }
-
-    return read;
-}
 
 /*-----------------------------------------------------------------------------
 *   File IO words and longs
 *----------------------------------------------------------------------------*/
-void xfput_word( size_t word, FILE *stream )
+void fputw_err( size_t word, FILE *stream )
 {
-    xfputc( word & 0xFF, stream );
-    word >>= 8;
-    xfputc( word & 0xFF, stream );
-    word >>= 8;
+    char buffer[2] =
+    {
+        ( word >> 0 ) & 0xFF,
+        ( word >> 8 ) & 0xFF
+    };
+    fwritec_err( buffer, sizeof( buffer ), stream );
 }
 
-size_t xfget_word( FILE *stream )
+size_t fgetw_err( FILE *stream )
 {
-    size_t word =  xfgetc( stream );
-    word       |= ( xfgetc( stream ) << 8 );
-    return word;
+    char buffer[2];
+    freadc_err( buffer, sizeof( buffer ), stream );
+    return
+        ( ( buffer[0] << 0 ) & 0x00FF ) |
+        ( ( buffer[1] << 8 ) & 0xFF00 );
 }
 
-void xfput_long( long dword, FILE *stream )
+void fputl_err( long dword, FILE *stream )
 {
-    xfputc( dword & 0xFF, stream );
-    dword >>= 8;
-    xfputc( dword & 0xFF, stream );
-    dword >>= 8;
-    xfputc( dword & 0xFF, stream );
-    dword >>= 8;
-    xfputc( dword & 0xFF, stream );
-    dword >>= 8;
+    char buffer[4] =
+    {
+        ( dword >> 0 ) & 0xFF,
+        ( dword >> 8 ) & 0xFF,
+        ( dword >> 16 ) & 0xFF,
+        ( dword >> 24 ) & 0xFF
+    };
+    fwritec_err( buffer, sizeof( buffer ), stream );
 }
 
-long xfget_long( FILE *stream )
+long fgetl_err( FILE *stream )
 {
-    long dword =  xfgetc( stream );
-    dword     |= ( xfgetc( stream ) <<  8 );
-    dword     |= ( xfgetc( stream ) << 16 );
-    dword     |= ( xfgetc( stream ) << 24 );
-
-    return dword;
+    char buffer[4];
+    freadc_err( buffer, sizeof( buffer ), stream );
+    return
+        ( ( buffer[0] << 0 ) & 0x000000FF ) |
+        ( ( buffer[1] << 8 ) & 0x0000FF00 ) |
+        ( ( buffer[2] << 16 ) & 0x00FF0000 ) |
+        ( ( buffer[3] << 24 ) & 0xFF000000 );
 }
 
 /*-----------------------------------------------------------------------------
