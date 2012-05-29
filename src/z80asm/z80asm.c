@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.61 2012-05-26 18:51:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.62 2012-05-29 21:00:35 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.61  2012-05-26 18:51:10  pauloscustodio
+/* Revision 1.62  2012-05-29 21:00:35  pauloscustodio
+/* BUG_0019 : z80asm closes a closed file handle, crash in Linux
+/*
+/* Revision 1.61  2012/05/26 18:51:10  pauloscustodio
 /* CH_0012 : wrappers on OS calls to raise fatal error
 /* CH_0013 : new errors interface to decouple calling code from errors.c
 /*
@@ -751,21 +754,22 @@ CloseFiles( void )
     if ( z80asmfile != NULL )
     {
         fclose( z80asmfile );
+        z80asmfile = NULL;
     }
 
     if ( listfile != NULL )
     {
         fclose( listfile );
+        listfile = NULL;
     }
 
     if ( objfile != NULL )
     {
         fclose( objfile );
+        objfile = NULL;
     }
 
     close_error_file();
-
-    z80asmfile = listfile = objfile = NULL;
 }
 
 
@@ -851,6 +855,7 @@ GetModuleSize( void )
     }
 
     fclose( objfile );
+    objfile = NULL;
     return 0;
 }
 
@@ -1311,6 +1316,7 @@ int main( int argc, char *argv[] )
         if ( globaldef )
         {
             fclose( deffile );
+            deffile = NULL;
         }
 
         /* try-catch to delete lib file in case of error */
@@ -1327,6 +1333,7 @@ int main( int argc, char *argv[] )
             if ( createlibrary )
             {
                 fclose( libfile );
+                libfile = NULL;
 
                 if ( get_num_errors() )
                 {

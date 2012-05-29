@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.40 2012-05-26 18:51:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.41 2012-05-29 21:00:35 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.40  2012-05-26 18:51:10  pauloscustodio
+/* Revision 1.41  2012-05-29 21:00:35  pauloscustodio
+/* BUG_0019 : z80asm closes a closed file handle, crash in Linux
+/*
+/* Revision 1.40  2012/05/26 18:51:10  pauloscustodio
 /* CH_0012 : wrappers on OS calls to raise fatal error
 /* CH_0013 : new errors interface to decouple calling code from errors.c
 /*
@@ -670,6 +673,7 @@ LinkModules( void )
             }
 
             fclose( z80asmfile );
+            z80asmfile = NULL;
 
             LinkModule( objfilename, 0 );       /* link code & read name definitions */
 
@@ -767,6 +771,7 @@ LinkModule( char *filename, long fptr_base )
     }
 
     fclose( z80asmfile );
+    z80asmfile = NULL;
 
     if ( fptr_libnmdecl != -1 )
     {
@@ -802,6 +807,7 @@ LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
                                                              * declarations */
         ReadName();               /* read library reference name */
         fclose( z80asmfile );
+        z80asmfile = NULL;
 
         len = strlen( line );
         nextname += 1 + len;      /* remember module pointer to next name in this   object module */
@@ -892,6 +898,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
                 try
                 {
                     fclose( z80asmfile );
+                    z80asmfile = NULL;
                     ret =  LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
                 }
 
@@ -906,6 +913,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
                 try
                 {
                     fclose( z80asmfile );
+                    z80asmfile = NULL;
                     ret =  LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
                 }
 
@@ -919,6 +927,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
     }
 
     fclose( z80asmfile );
+    z80asmfile = NULL;
     return 0;
 }
 
@@ -1096,8 +1105,8 @@ ModuleExpr( void )
         }
 
         fclose( z80asmfile );
-
         z80asmfile = NULL;
+        
         curlink = curlink->nextlink;
     }
     while ( curlink != NULL );
@@ -1153,10 +1162,12 @@ CreateBinFile( void )
         printf( "Relocation header is %d bytes.\n", ( int )( sizeof_relocroutine + sizeof_reloctable + 4 ) );
         fwrite_codearea( binaryfile );                                /* write code as one big chunk */
         fclose( binaryfile );
+        binaryfile = NULL;
     }
     else if ( codesegment == ON && get_codesize() > 16384 )
     {
         fclose( binaryfile );
+        binaryfile = NULL;
         offset = 0;
         codesize = get_codesize();
 
@@ -1168,6 +1179,7 @@ CreateBinFile( void )
             binaryfile = fopen_err( sstr_data( filename ), "wb" );         /* CH_0012 */
             fwrite_codearea_chunk( binaryfile, offset, codeblock ); /* code in 16K chunks */
             fclose( binaryfile );
+            binaryfile = NULL;
 
             offset += codeblock;
         }
@@ -1177,6 +1189,7 @@ CreateBinFile( void )
     {
         fwrite_codearea( binaryfile );                                /* write code as one big chunk */
         fclose( binaryfile );
+        binaryfile = NULL;
     }
 
     if ( verbose )
@@ -1393,6 +1406,7 @@ WriteMapFile( void )
         }
 
         fclose( mapfile );
+        mapfile = NULL;
     }
 
     finally

@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.31 2012-05-26 18:51:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.32 2012-05-29 21:00:35 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.31  2012-05-26 18:51:10  pauloscustodio
+/* Revision 1.32  2012-05-29 21:00:35  pauloscustodio
+/* BUG_0019 : z80asm closes a closed file handle, crash in Linux
+/*
+/* Revision 1.31  2012/05/26 18:51:10  pauloscustodio
 /* CH_0012 : wrappers on OS calls to raise fatal error
 /* CH_0013 : new errors interface to decouple calling code from errors.c
 /*
@@ -1073,6 +1076,7 @@ BINARY( void )
         inc_PC( Codesize );
 
         fclose( binfile );
+        binfile = NULL;
     }
     else
     {
