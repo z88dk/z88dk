@@ -9,7 +9,7 @@
  *
  *      stefano - 18/3/2004
  *
- *	$Id: conio.h,v 1.6 2012-05-22 19:54:36 stefano Exp $
+ *	$Id: conio.h,v 1.7 2012-05-29 07:27:44 stefano Exp $
  */
 
 #ifndef __CONIO_H__
@@ -56,35 +56,49 @@ int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define clrscr() textattr(7);fputc_cons(12)
 #define clreol() printf("%c[K",27)
 
+/* The leading underscores are for compatibility with the 
+ * Digital Mars library */
+
 #define cprintf printf
+#define _cprintf printf
 #define cputs puts_cons
+#define _cputs puts_cons
 #define cgets gets
+#define _cgets gets
 #define cscanf scanf
+#define _cscanf scanf
 
 #define gotoxy(a,b)     printf("%c[%u;%uH",27,b,a)
+#define _gotoxy(a,b)     printf("%c[%u;%uH",27,b,a)
 
-
-/* Reads a character directly from the console, without echo. */
+/* Reads a character directly from the console, (without echo?) */
 #define getch()  fgetc_cons()
-/* Reads a character directly from the console, without echo. */
-#define getche() fputc_cons(fgetc_cons())                // not sure about this one...
+#define _getch()  fgetc_cons()
+/* Reads a character directly from the console, (with echo ?) */
+#define getche() fgetc_cons()               // not sure about this one...
+#define _getche() fgetc_cons()                // not sure about this one...
 // Direct output to console
-#define putch(a) fputc_cons(a)
-//#define putch(bp,fp) fputc(bp,fp)
-// #define ungetch(bp)  ungetc(bp,stdout)  // this one doesn't work
+#define putch(a) fputc_cons()
+#define _putch(a) fputc_cons()
+
+// can't be fixed easily.. i.e. the simplified gets won't work
+//#define ungetch(bp)  ungetc(bp,stdin)  // this one doesn't work
+//#define _ungetch(bp)  ungetc(bp,stdin)  // this one doesn't work
 
 #ifndef kbhit
 #define kbhit() (getk() ? 1 : 0)
+#define _kbhit() (getk() ? 1 : 0)
 #endif
 
 #define random(a) rand()%a
 
 
-// Missing functions, not yet implemented
+// Missing functions, not implemented
 //extern int  __LIB__ movetext (int _left, int _top, int _right, int _bottom, int _destleft, int _desttop);
 //extern int  __LIB__ wherex (void);
 //extern int  __LIB__ wherey (void);
 //extern int  __LIB__ gettext (int left, int top, int right, int bottom, void *destin);
+
 
 #define	getpixel(a,b)	point(a,b)
 #define	putpixel(a,b,c)	(c ? plot(a,b):unplot(a,b))
