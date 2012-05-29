@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.17 2012-05-26 18:50:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.18 2012-05-29 21:02:19 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.17  2012-05-26 18:50:26  pauloscustodio
+# Revision 1.18  2012-05-29 21:02:19  pauloscustodio
+# Changes for linux:
+# - call ./z80asm instead of z80asm
+# - memory addresses appear as 0x0xHHHH in Linux (one 0x by user, one by %p)
+#
+# Revision 1.17  2012/05/26 18:50:26  pauloscustodio
 # Use .o instead of .c to build test program, faster compilation.
 # Use gcc to compile instead of cc.
 #
@@ -86,7 +91,7 @@ my $STOP_ON_ERR = grep {/-stop/} @ARGV;
 my $KEEP_FILES	= grep {/-keep/} @ARGV; 
 my $test	 = "test";
 
-sub z80asm	 { $ENV{Z80ASM} || "z80asm" }
+sub z80asm	 { $ENV{Z80ASM} || "./z80asm" }
 
 my @TEST_EXT = (qw( asm lst inc bin bn0 bn1 bn2 bn3 map obj lib sym def err 
 					exe c o asmlst ));
@@ -373,7 +378,7 @@ sub t_run_module {
 	my($args, $expected_out, $expected_err, $expected_exit) = @_;
 	
 	note "line ", (caller)[2], ": test.exe @$args";
-	my($out, $err, $exit) = capture { system("test.exe", @$args) };
+	my($out, $err, $exit) = capture { system("./test.exe", @$args) };
 	note "line ", (caller)[2], ": exit ", $exit >> 8;
 	
 	$err = normalize($err);
@@ -398,7 +403,7 @@ sub normalize {
 	# as the OS may reuse addresses
 	my $addr_seq; 
 	for ($err) {
-		while (my($addr) = /(\b0x[0-9A-F]+\b)/i) {
+		while (my($addr) = /(\b(0x)+[0-9A-F]+\b)/i) {	# in Linux we get 0x0xHHHH
 			$addr_seq++;
 		
 			# replace only first occurrence
