@@ -12,7 +12,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.10 2012-03-08 07:16:45 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.11 2012-05-30 07:32:12 stefano Exp $
 ;
 
 
@@ -61,6 +61,102 @@
 ; Graphics stuff
         XDEF	base_graphics
         XDEF	coords
+
+; FLOS system variables
+        XDEF	sector_lba0		; keep this byte order
+        XDEF	sector_lba1
+        XDEF	sector_lba2
+        XDEF	sector_lba3
+
+        XDEF	a_store1		
+        XDEF	bc_store1
+        XDEF	de_store1
+        XDEF	hl_store1
+        XDEF	a_store2
+        XDEF	bc_store2
+        XDEF	de_store2
+        XDEF	hl_store2
+        XDEF	storeix
+        XDEF	storeiy
+        XDEF	storesp
+        XDEF	storepc
+        XDEF	storef	  
+        XDEF	store_registers
+        XDEF	com_start_addr
+
+        XDEF	cursor_y		;keep this byte order 
+        XDEF	cursor_x		;(allows read as word with y=LSB) 
+		
+        XDEF	current_scancode
+        XDEF	current_asciicode
+        XDEF	memmonaddrl
+        XDEF	memmonaddrh
+        XDEF	ser_loads_banksel
+        XDEF	ser_loadaddr
+        XDEF	ser_saveaddr
+        XDEF	ser_savelengthl
+        XDEF	ser_savelengthh
+        XDEF	ser_loadlengthl
+        XDEF	ser_loadlengthh 
+
+        XDEF	cmdop_start_address
+        XDEF	cmdop_end_address
+
+        XDEF	copy_dest_address
+        XDEF	copy_dest_bank
+
+        XDEF	in_script_flag
+        XDEF	max_bank
+        XDEF	script_dir
+
+        XDEF	find_hexstringascii
+        XDEF	temphex
+        XDEF	os_linecount
+        XDEF	ui_index 
+
+        XDEF	commandstring
+        XDEF	output_line
+
+        XDEF	os_args_start_lo
+        XDEF	os_args_start_hi
+        XDEF	os_args_pos_cache
+
+        XDEF	os_extcmd_jmp_addr
+
+        XDEF	os_dir_block_cache
+
+        XDEF	banksel_cache
+
+        XDEF	cursorflashtimer
+        XDEF	cursorstatus
+
+        XDEF	script_buffer
+        XDEF	script_file_offset
+        XDEF	script_buffer_offset
+        XDEF	script_orig_dir
+
+        XDEF	scancode_buffer
+
+        XDEF	key_buf_wr_idx
+        XDEF	key_buf_rd_idx
+        XDEF	key_release_mode		
+        XDEF	not_currently_used
+        XDEF	key_mod_flags
+        XDEF	insert_mode
+
+        XDEF	mouse_packet
+        XDEF	mouse_packet_index
+
+        XDEF	use_mouse	
+
+        XDEF	mouse_pos_x
+        XDEF	mouse_pos_y
+        XDEF	mouse_buttons
+
+        XDEF	mouse_window_size_x
+        XDEF	mouse_window_size_y
+
+
 
 ; Now, getting to the real stuff now!
 
@@ -263,6 +359,132 @@ heapblocks:      defw    0
 base_graphics:   defw    $2000
 coords:          defw    0
 snd_tick:        defb    0
+
+
+;--------------------------------------------------------------------------------------------
+;
+; OS_variables location as defined in system_equates.asm
+; FLOSv582 sets it to $B00, hopefully it won't change much
+; We try to keep it dynamic
+;
+;--------------------------------------------------------------------------------------------
+
+IF !DEFINED_FLOSvarsaddr
+      defc FLOSvarsaddr = $B00
+ENDIF
+
+defc OS_window_cols = 40
+defc OS_window_rows = 25
+
+;--------------------------------------------------------------------------------------------
+
+DEFVARS FLOSvarsaddr
+{
+
+sector_lba0	ds.b 1		; keep this byte order
+sector_lba1	ds.b 1
+sector_lba2	ds.b 1
+sector_lba3	ds.b 1
+
+a_store1		ds.b 1		
+bc_store1		ds.b 2
+de_store1		ds.b 2
+hl_store1		ds.b 2
+a_store2		ds.b 1
+bc_store2		ds.b 2
+de_store2		ds.b 2
+hl_store2		ds.b 2
+storeix		ds.b 2
+storeiy		ds.b 2
+storesp		ds.b 2
+storepc		ds.b 2
+storef	  	ds.b 1
+store_registers	ds.b 1
+com_start_addr	ds.w 1
+
+cursor_y		ds.b 1		;keep this byte order 
+cursor_x		ds.b 1		;(allows read as word with y=LSB) 
+
+current_scancode	ds.b 1
+current_asciicode	ds.b 1
+memmonaddrl	ds.b 1
+memmonaddrh	ds.b 1
+ser_loads_banksel	ds.b 1
+ser_loadaddr	ds.b 2
+ser_saveaddr	ds.b 2
+ser_savelengthl	ds.b 1
+ser_savelengthh	ds.b 1
+ser_loadlengthl	ds.b 1
+ser_loadlengthh 	ds.b 1
+
+cmdop_start_address	ds.b 2
+cmdop_end_address	ds.b 2
+
+copy_dest_address	ds.b 2
+copy_dest_bank	ds.b 1
+
+in_script_flag	ds.b 1
+max_bank		ds.b 1
+script_dir	ds.w 1
+
+find_hexstringascii ds.b 2
+temphex		ds.b 1
+os_linecount	ds.b 1
+ui_index		ds.b 1 
+
+commandstring	ds.b OS_window_cols+2
+output_line	ds.b OS_window_cols+2
+
+os_args_start_lo	ds.b 1
+os_args_start_hi	ds.b 1
+os_args_pos_cache	ds.w 1
+
+os_extcmd_jmp_addr	ds.w 1
+
+os_dir_block_cache  ds.w 1
+
+banksel_cache	ds.b 1
+
+cursorflashtimer	ds.b 1
+cursorstatus	ds.b 1
+
+script_buffer		ds.b OS_window_cols+2
+script_file_offset		ds.w 1
+script_buffer_offset	ds.w 1
+script_orig_dir		ds.w 1
+
+scancode_buffer		ds.b 32
+
+key_buf_wr_idx		ds.b 1
+key_buf_rd_idx		ds.b 1
+key_release_mode		ds.b 1		
+not_currently_used		ds.b 1
+key_mod_flags		ds.b 1
+insert_mode		ds.b 1
+
+mouse_packet		ds.b 3
+mouse_packet_index		ds.b 1
+
+use_mouse			ds.b 1
+
+mouse_pos_x		ds.w 1
+mouse_pos_y		ds.w 1
+mouse_buttons		ds.b 1
+
+mouse_window_size_x		ds.w 1
+mouse_window_size_y		ds.w 1
+
+;=======================================================================================
+;first_os_var		equ cursor_y
+;last_os_var		equ mouse_window_size_y+2
+;=======================================================================================
+}
+
+defc first_os_var = cursor_y
+defc last_os_var  = mouse_window_size_y+2
+
+;--------------------------------------------------------------------------------------------
+
 
 ; Signature
          defm  "Small C+ OSCA"

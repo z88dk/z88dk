@@ -5,13 +5,14 @@
 ;	Print character to the screen
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.2 2011-07-27 15:11:27 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.3 2012-05-30 07:32:12 stefano Exp $
 ;
 
 
     INCLUDE "flos.def"
 
 	XLIB  fputc_cons
+	XREF  cursor_x
 
 ;
 ; Entry:        char to print
@@ -27,6 +28,15 @@
 	ld	(hl),a
 	dec hl
 	ld	a,(hl)
+	cp 8
+	jr nz,nobs
+	ld	a,(cursor_x)
+	and a
+	ret z
+	dec a
+	ld (cursor_x),a
+	ret
+.nobs
 	cp 13
 	jr nz,nocr
 	dec (hl)	; switch CR to CRLF
