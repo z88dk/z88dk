@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.32 2012-05-29 21:00:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.33 2012-05-30 22:06:48 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.32  2012-05-29 21:00:35  pauloscustodio
+/* Revision 1.33  2012-05-30 22:06:48  pauloscustodio
+/* BUG_0019 : z80asm closes a closed file handle, crash in Linux
+/*
+/* Revision 1.32  2012/05/29 21:00:35  pauloscustodio
 /* BUG_0019 : z80asm closes a closed file handle, crash in Linux
 /*
 /* Revision 1.31  2012/05/26 18:51:10  pauloscustodio
@@ -1023,6 +1026,9 @@ INCLUDE( void )
 
         CURRENTFILE->filepointer = ftell( z80asmfile );   /* get file position of current source file */
         fclose( z80asmfile );     /* close current source file */
+		z80asmfile = NULL;			/* NOTE: this is necessary to make sure
+									   z80asmfile is NULL in case the next
+									   fopen_err() throws an exception */
 
         z80asmfile = fopen_err( filename, "rb" );           /* CH_0012 */
         CURRENTFILE = Newfile( CURRENTFILE, filename );       /* Allocate new file into file information list */

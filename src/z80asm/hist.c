@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2012
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.31 2012-05-29 21:03:39 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.32 2012-05-30 22:06:48 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.31  2012-05-29 21:03:39  pauloscustodio
+/* Revision 1.32  2012-05-30 22:06:48  pauloscustodio
+/* BUG_0019 : z80asm closes a closed file handle, crash in Linux
+/*
+/* Revision 1.31  2012/05/29 21:03:39  pauloscustodio
 /* Version 1.1.16
 /*
 /* Revision 1.30  2012/05/26 18:56:02  pauloscustodio
@@ -995,7 +998,7 @@ Based on 1.0.31
       instead of an exception, moved to errors.c.
 
 -------------------------------------------------------------------------------
-29.05.2012 [1.1.16] (pauloscustodio)
+31.05.2012 [1.1.16] (pauloscustodio)
 -------------------------------------------------------------------------------
     BUG_0019 : z80asm closes a closed file handle, crash in Linux
         GetModuleSize() opens and closes the objfile, but keeps objfile
@@ -1021,7 +1024,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define DATE        "29.05.2012"
+#define DATE        "31.05.2012"
 #define VERSION     "1.1.16"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2012"
 
