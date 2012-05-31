@@ -12,7 +12,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.12 2012-05-31 06:11:31 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.13 2012-05-31 14:52:58 stefano Exp $
 ;
 
 
@@ -84,8 +84,8 @@
         XDEF	store_registers
         XDEF	com_start_addr
 
-        XDEF	ansi_COLUMN		;keep this byte order 
-        XDEF	ansi_ROW		;(allows read as word with y=LSB) 
+        XDEF	cursor_y		;keep this byte order 
+        XDEF	cursor_x		;(allows read as word with y=LSB) 
 		
         XDEF	current_scancode
         XDEF	current_asciicode
@@ -333,10 +333,8 @@ storef	  	ds.b 1
 store_registers	ds.b 1
 com_start_addr	ds.w 1
 
-ansi_ROW		ds.b 1		;keep this byte order 
-ansi_COLUMN		ds.b 1		;(allows read as word with y=LSB) 
-;cursor_y		ds.b 1		;keep this byte order 
-;cursor_x		ds.b 1		;(allows read as word with y=LSB) 
+cursor_y		ds.b 1		;keep this byte order 
+cursor_x		ds.b 1		;(allows read as word with y=LSB) 
 
 current_scancode	ds.b 1
 current_asciicode	ds.b 1

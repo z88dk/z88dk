@@ -4,7 +4,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.168 2012-04-18 10:17:13 stefano Exp $
+# $Id: Makefile,v 1.169 2012-05-31 14:52:59 stefano Exp $
 
 
 include Make.config
@@ -18,7 +18,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	cpm_clib.lib einstein.lib gal_clib.lib m5_clib.lib \
 	msx_clib.lib mtx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
-	osca_clib.lib ozansi_clib.lib pps_clib.lib ppsansi_clib.lib \
+	osca_clib.lib oscaansi_clib.lib ozansi_clib.lib pps_clib.lib ppsansi_clib.lib \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib \
 	trs80_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib \
@@ -1316,6 +1316,19 @@ osca_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORosca -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst
+	cd fcntl ; $(MAKE) losca ; cd ..
+
+oscaansi_clib.lib:
+	@echo ''
+	@echo '--- Building OSCA Library ANSI VT version ---'
+	@echo ''
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORosca -x$(OUTPUT_DIRECTORY)/oscaansi_clib.lib @$(LISTFILE_DIRECTORY)/oscaansi.lst
 	cd fcntl ; $(MAKE) losca ; cd ..
 
 # Z88 maths build - dom

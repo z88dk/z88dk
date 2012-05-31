@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.33 2012-04-18 10:17:13 stefano Exp $
+# $Id: Makefile,v 1.34 2012-05-31 14:52:59 stefano Exp $
 #
 
 include ../Make.config
@@ -129,6 +129,7 @@ clean:
 	$(RM) ansi/generic/*.o
 	$(RM) ansi/nascom/*.o
 	$(RM) ansi/oz/*.o
+	$(RM) ansi/osca/*.o
 	$(RM) ansi/sam/*.o
 	$(RM) ansi/sharp-mz/*.o
 	$(RM) ansi/spectrum/*.o
