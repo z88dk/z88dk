@@ -5,14 +5,14 @@
 ;	Print character to the screen
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.3 2012-05-30 07:32:12 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.4 2012-05-31 06:11:32 stefano Exp $
 ;
 
 
     INCLUDE "flos.def"
 
 	XLIB  fputc_cons
-	XREF  cursor_x
+	XREF  ansi_COLUMN
 
 ;
 ; Entry:        char to print
@@ -30,11 +30,11 @@
 	ld	a,(hl)
 	cp 8
 	jr nz,nobs
-	ld	a,(cursor_x)
+	ld	a,(ansi_COLUMN)
 	and a
 	ret z
 	dec a
-	ld (cursor_x),a
+	ld (ansi_COLUMN),a
 	ret
 .nobs
 	cp 13
