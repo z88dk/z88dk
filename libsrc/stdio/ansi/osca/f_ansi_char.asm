@@ -19,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.1 2012-05-31 14:52:59 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.2 2012-06-01 10:26:17 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -28,23 +28,33 @@
 	XREF	ansi_ROW
 	XREF	ansi_COLUMN
 
-	XREF	cursor_y
-	XREF	cursor_x
-
 	XDEF	text_cols
 	XDEF	text_rows
+
+;	XREF	cursor_y
+;	XREF	cursor_x
 	
-.mychar   defb 0
-          defb 0 ; string termination
+;.mychar   defb 0
+;          defb 0 ; string termination
 	
 .text_cols   defb 40
 .text_rows   defb 25
 
 .ansi_CHAR
-	ld (mychar),a
-	ld a,(ansi_ROW)
-	ld (cursor_y),a
+
+;	ld (mychar),a
+;	ld a,(ansi_ROW)
+;	ld (cursor_y),a
+;	ld a,(ansi_COLUMN)
+;	ld (cursor_x),a
+;	ld hl,mychar
+;	jp kjt_print_string
+
+	ld e,a
 	ld a,(ansi_COLUMN)
-	ld (cursor_x),a
-	ld hl,mychar
-	jp kjt_print_string
+	ld b,a
+	ld a,(ansi_ROW)
+	ld c,a
+	ld a,e
+	jp kjt_plot_char
+	
