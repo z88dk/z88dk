@@ -9,7 +9,7 @@
 ;	Stefano Bodrato - June 2012
 ;
 ;
-;	$Id: f_ansi_bel.asm,v 1.2 2012-06-01 10:26:17 stefano Exp $
+;	$Id: f_ansi_bel.asm,v 1.3 2012-06-04 14:04:24 stefano Exp $
 ;
 
 	XLIB	ansi_BEL
@@ -18,16 +18,24 @@
 
 .ansi_BEL
 	di
-	in	a,(sys_mem_select)
-	push af
-	ld a,4			;put first page of audio RAM
-	out (sys_mem_select),a	;(sysRAM $20000-$27fff) at Z80 $8000-$FFFF
-	ld	hl,($8000)
-	push hl
-	
-	ld hl,$7f80		;put 2 byte square wave at $8000
-	ld ($8000),hl
 
+	ld hl,0
+	ld e,2
+	call kjt_read_sysram_flat
+	push af
+	ld hl,1
+	ld e,2
+	call kjt_read_sysram_flat
+	push af
+	ld hl,0
+	ld e,2
+	ld a,$80	;put 1st byte square wave
+	call kjt_write_sysram_flat
+	ld hl,1
+	ld e,2
+	ld a,$7f	;put 2nd byte square wave
+	call kjt_write_sysram_flat
+	
 ;-----------------------------------------------------------------------------------------
 	
 	in a,(sys_audio_enable)	
@@ -50,12 +58,12 @@
 	ld c,audchan0_loc
 	out (c),l			;write sample address to relevant port
 	
-	ld hl,2			;sample length * IN WORDS *
+	ld hl,1			;sample length * IN WORDS *
 	ld b,h
 	ld c,audchan0_len
 	out (c),l			;set sample length to relevant port
 	
-	ld hl,$6000		;period = clock ticks between sample bytes
+	ld hl,$4000		;period = clock ticks between sample bytes
 	ld b,h
 	ld c,audchan0_per
 	out (c),l			;set sample period to relevant port 
@@ -77,9 +85,14 @@
 	and @11111110
 	out (sys_audio_enable),a	;stop channel 0 playback
 
-	pop hl
-	ld	($8000),hl
+	ld hl,1
+	ld e,2
 	pop af
-	out (sys_mem_select),a	;restore mem mapping
+	call kjt_write_sysram_flat
+	ld hl,0
+	ld e,2
+	pop af
+	call kjt_write_sysram_flat
+
 	ei
 	ret
