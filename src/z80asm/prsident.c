@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.33 2012-05-26 18:51:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.34 2012-06-05 22:24:47 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.33  2012-05-26 18:51:10  pauloscustodio
+/* Revision 1.34  2012-06-05 22:24:47  pauloscustodio
+/* BUG_0020 : Segmentation fault in ParseIdent for symbol not found with interpret OFF
+/*
+/* Revision 1.33  2012/05/26 18:51:10  pauloscustodio
 /* CH_0012 : wrappers on OS calls to raise fatal error
 /* CH_0013 : new errors interface to decouple calling code from errors.c
 /*
@@ -436,9 +439,12 @@ ParseIdent( enum flag interpret )
 
     foundsym = SearchId();
 
-    if ( foundsym == NULL && interpret == ON )
+    if ( foundsym == NULL )
     {
-        error( ERR_UNKNOWN_IDENT );
+        if ( interpret == ON )      /* only issue error message if interpreting */
+        {
+            error( ERR_UNKNOWN_IDENT );
+        }
     }
     else
     {
