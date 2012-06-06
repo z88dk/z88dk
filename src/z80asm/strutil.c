@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Utilities for string handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.7 2012-05-26 17:46:00 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.8 2012-06-06 22:42:57 pauloscustodio Exp $ */
 /* $Log: strutil.c,v $
-/* Revision 1.7  2012-05-26 17:46:00  pauloscustodio
+/* Revision 1.8  2012-06-06 22:42:57  pauloscustodio
+/* BUG_0021 : Different behaviour in string truncation in strutil in Linux and Win32
+/*
+/* Revision 1.7  2012/05/26 17:46:00  pauloscustodio
 /* Put back strtoupper, strupr does not exist in all systems, was causing nightly build to fail
 /*
 /* Revision 1.6  2012/05/24 17:09:27  pauloscustodio
@@ -103,20 +106,22 @@ char *sstr_vfcat( sstr_t *self, char *format, va_list argptr )
     int     ncopy;      /* may be negative */
     int     copied;
 
-    ncopy = self->size - ( mylen + 1 );
+    /* BUG_0020 : Linux vsnprintf always terminates string; Win32 only if there is enough space */
+    ncopy = self->size - mylen;         /* full space including null terminator */
 
     if ( ncopy > 0 )
     {
         /* returns number of chars written, or -1 if output truncated */
         copied = vsnprintf( sstr_data( self ) + mylen, ( size_t )ncopy, format, argptr );
 
-        if ( copied >= 0 )
+        if ( copied >= ncopy || copied < 0 )    /* string may not be terminated */
+        {
+            sstr_data(self)[self->size - 1] = 0;
+            sstr_sync_len( self );
+        }
+        else                                    /* string was terminated */
         {
             sstr_len( self ) += copied;
-        }
-        else
-        {
-            sstr_sync_len( self );
         }
     }
 

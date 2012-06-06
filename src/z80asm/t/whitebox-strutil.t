@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.4 2012-05-26 18:50:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.5 2012-06-06 22:42:57 pauloscustodio Exp $
 # $Log: whitebox-strutil.t,v $
-# Revision 1.4  2012-05-26 18:50:26  pauloscustodio
+# Revision 1.5  2012-06-06 22:42:57  pauloscustodio
+# BUG_0021 : Different behaviour in string truncation in strutil in Linux and Win32
+#
+# Revision 1.4  2012/05/26 18:50:26  pauloscustodio
 # Use .o instead of .c to build test program, faster compilation.
 # Use gcc to compile instead of cc.
 #
@@ -115,6 +118,8 @@ INIT
 	TEST(s, "1234");
 	sstr_fset(s, "%d", 12345);
 	TEST(s, "1234");
+	sstr_fset(s, "%d", 123456);
+	TEST(s, "1234");
 	
 	p = sstr_fcat(s, "");
 	if (p != sstr_data(s))			ERROR;
@@ -132,6 +137,10 @@ INIT
 	sstr_fcat(s, "%d", 4);
 	TEST(s, "1234");
 	sstr_fcat(s, "%d", 5);
+	TEST(s, "1234");
+	sstr_fcat(s, "%d", 56);
+	TEST(s, "1234");
+	sstr_fcat(s, "%d", 567);
 	TEST(s, "1234");
 	
 	sstr_clear(s);
