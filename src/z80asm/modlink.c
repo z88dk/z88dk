@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.41 2012-05-29 21:00:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.42 2012-06-07 11:54:13 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.41  2012-05-29 21:00:35  pauloscustodio
+/* Revision 1.42  2012-06-07 11:54:13  pauloscustodio
+/* - Make mapfile static to module modlink.
+/* - Remove modsrcfile, not used.
+/* - GetModuleSize(): use local variable for file handle instead of objfile
+/*
+/* Revision 1.41  2012/05/29 21:00:35  pauloscustodio
 /* BUG_0019 : z80asm closes a closed file handle, crash in Linux
 /*
 /* Revision 1.40  2012/05/26 18:51:10  pauloscustodio
@@ -329,7 +334,7 @@ void ReleaseLinkInfo( void );
 static char          *CheckIfModuleWanted( FILE *z80asmfile, long currentlibmodule, char *modname );
 
 /* global variables */
-extern FILE *listfile, *mapfile, *z80asmfile, *deffile, *libfile;
+extern FILE *listfile, *z80asmfile, *deffile, *libfile;
 extern char line[], ident[];
 extern char Z80objhdr[];
 extern enum symbols sym, GetSym( void );
@@ -350,6 +355,8 @@ struct linklist *linkhdr;
 struct libfile *CURRENTLIB;
 unsigned short totaladdr, curroffset, sizeof_reloctable;
 
+/* static variables */
+static FILE *mapfile;
 
 void
 ReadNames( long nextname, long endnames )
@@ -1406,7 +1413,6 @@ WriteMapFile( void )
         }
 
         fclose( mapfile );
-        mapfile = NULL;
     }
 
     finally

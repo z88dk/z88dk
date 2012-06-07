@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.33 2012-05-30 22:06:48 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.34 2012-06-07 11:54:13 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.33  2012-05-30 22:06:48  pauloscustodio
+/* Revision 1.34  2012-06-07 11:54:13  pauloscustodio
+/* - Make mapfile static to module modlink.
+/* - Remove modsrcfile, not used.
+/* - GetModuleSize(): use local variable for file handle instead of objfile
+/*
+/* Revision 1.33  2012/05/30 22:06:48  pauloscustodio
 /* BUG_0019 : z80asm closes a closed file handle, crash in Linux
 /*
 /* Revision 1.32  2012/05/29 21:00:35  pauloscustodio
@@ -1047,7 +1052,9 @@ INCLUDE( void )
         set_error_file( CURRENTFILE->fname );
 
         fclose( z80asmfile );
-        z80asmfile = NULL;
+        z80asmfile = NULL;          /* NOTE: this is necessary to make sure
+                                       z80asmfile is NULL in case the next
+                                       fopen_err() throws an exception */
 
         z80asmfile = fopen_err( CURRENTFILE->fname, "rb" );           /* CH_0012 */
         fseek( z80asmfile, CURRENTFILE->filepointer, 0 ); /* file position to beginning of */

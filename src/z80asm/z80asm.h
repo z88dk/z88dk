@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.18 2012-05-26 18:51:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.19 2012-06-07 11:54:13 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.18  2012-05-26 18:51:10  pauloscustodio
+/* Revision 1.19  2012-06-07 11:54:13  pauloscustodio
+/* - Make mapfile static to module modlink.
+/* - Remove modsrcfile, not used.
+/* - GetModuleSize(): use local variable for file handle instead of objfile
+/*
+/* Revision 1.18  2012/05/26 18:51:10  pauloscustodio
 /* CH_0012 : wrappers on OS calls to raise fatal error
 /* CH_0013 : new errors interface to decouple calling code from errors.c
 /*
@@ -159,7 +164,7 @@ extern char ident[];
 extern char separators[];
 extern avltree *globalroot, *staticroot;
 extern struct module *CURRENTMODULE;
-extern FILE *listfile, *mapfile, *z80asmfile, *deffile, *libfile;
+extern FILE *listfile, *z80asmfile, *deffile, *libfile;
 
 extern char *Fetchfilename( FILE *fptr );
 extern void CreateLibfile( char *filename );

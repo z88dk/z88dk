@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.62 2012-05-29 21:00:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.63 2012-06-07 11:54:13 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.62  2012-05-29 21:00:35  pauloscustodio
+/* Revision 1.63  2012-06-07 11:54:13  pauloscustodio
+/* - Make mapfile static to module modlink.
+/* - Remove modsrcfile, not used.
+/* - GetModuleSize(): use local variable for file handle instead of objfile
+/*
+/* Revision 1.62  2012/05/29 21:00:35  pauloscustodio
 /* BUG_0019 : z80asm closes a closed file handle, crash in Linux
 /*
 /* Revision 1.61  2012/05/26 18:51:10  pauloscustodio
@@ -482,7 +487,7 @@ struct module *NewModule( void );
 struct libfile *NewLibrary( void );
 
 
-FILE *z80asmfile, *listfile, *objfile, *mapfile, *modsrcfile, *deffile, *libfile;
+FILE *z80asmfile, *listfile, *objfile, *deffile, *libfile;
 
 /* BUG_0001 array ssym[] needs to have one element per character in
  * separators, plus one newline to match the final '\0' just in case it is
@@ -800,43 +805,44 @@ TestAsmFile( void )
 
 
 
+/* return -1 if object file invalid, 0 if valid and module size is updated */
 int
 GetModuleSize( void )
 {
     char fheader[9];
     long fptr_modcode, fptr_modname;
     size_t size;
+    FILE *fp;
 
     /* open relocatable object file */
-    objfile = fopen_err( objfilename, "rb" );           /* CH_0012 */
-    freadc_err( fheader, 8U, objfile );        /* read first 8 chars from file into array */
+    fp = fopen_err( objfilename, "rb" );           /* CH_0012 */
+    freadc_err( fheader, 8U, fp );        /* read first 8 chars from file into array */
     fheader[8] = '\0';
 
     if ( strcmp( fheader, Z80objhdr ) != 0 )
     {
         /* compare header of file */
         error( ERR_NOT_OBJ_FILE, objfilename );      /* not an object file */
-        fclose( objfile );
-        objfile = NULL;
+        fclose( fp );
         return -1;
     }
 
-    fseek( objfile, 8 + 2, SEEK_SET );              /* set file pointer to point at module name */
-    fptr_modname = fgetl_err( objfile );   /* get file pointer to module name */
-    fseek( objfile, fptr_modname, SEEK_SET );       /* set file pointer to module name */
+    fseek( fp, 8 + 2, SEEK_SET );              /* set file pointer to point at module name */
+    fptr_modname = fgetl_err( fp );   /* get file pointer to module name */
+    fseek( fp, fptr_modname, SEEK_SET );       /* set file pointer to module name */
 
-    size = fgetc_err( objfile );
-    freadc_err( line, size, objfile ); /* read module name */
+    size = fgetc_err( fp );
+    freadc_err( line, size, fp ); /* read module name */
     line[size] = '\0';
     CURRENTMODULE->mname = xstrdup( line );
 
-    fseek( objfile, 26, SEEK_SET ); /* set file pointer to point at module code pointer */
-    fptr_modcode = fgetl_err( objfile );   /* get file pointer to module code */
+    fseek( fp, 26, SEEK_SET ); /* set file pointer to point at module code pointer */
+    fptr_modcode = fgetl_err( fp );   /* get file pointer to module code */
 
     if ( fptr_modcode != -1 )
     {
-        fseek( objfile, fptr_modcode, SEEK_SET );   /* set file pointer to module code */
-        size = fgetw_err( objfile );
+        fseek( fp, fptr_modcode, SEEK_SET );   /* set file pointer to module code */
+        size = fgetw_err( fp );
 
         /* BUG_0008 : fix size, if a zero was written, the moudule is actually 64K */
         if ( size == 0 )
@@ -854,8 +860,7 @@ GetModuleSize( void )
         }
     }
 
-    fclose( objfile );
-    objfile = NULL;
+    fclose( fp );
     return 0;
 }
 
@@ -1262,7 +1267,6 @@ int main( int argc, char *argv[] )
         reset_options();
         reset_error_count();
 
-        modsrcfile = NULL;
         CURRENTMODULE = NULL;
         modulehdr = NULL;               /* initialise to no modules */
         libraryhdr = NULL;              /* initialise to no library files */
