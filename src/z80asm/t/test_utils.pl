@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.18 2012-05-29 21:02:19 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.19 2012-06-07 10:17:57 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.18  2012-05-29 21:02:19  pauloscustodio
+# Revision 1.19  2012-06-07 10:17:57  pauloscustodio
+# delay after deleting files before calling new z80asm
+#
+# Revision 1.18  2012/05/29 21:02:19  pauloscustodio
 # Changes for linux:
 # - call ./z80asm instead of z80asm
 # - memory addresses appear as 0x0xHHHH in Linux (one 0x by user, one by %p)
@@ -117,6 +120,7 @@ sub unlink_files {
 	my $count = 0;
 	map {$count++ if -f} @files;
 	is unlink(@files), $count, "$line unlink $count testfiles";
+	while (grep {-f} @files) { sleep 1 };	# z80asm sometimes cannot create errfile
 }
 	
 #------------------------------------------------------------------------------
