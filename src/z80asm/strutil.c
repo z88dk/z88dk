@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Utilities for string handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.8 2012-06-06 22:42:57 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.9 2012-06-07 11:49:59 pauloscustodio Exp $ */
 /* $Log: strutil.c,v $
-/* Revision 1.8  2012-06-06 22:42:57  pauloscustodio
+/* Revision 1.9  2012-06-07 11:49:59  pauloscustodio
+/* stricompare() instead of Flncmp()
+/*
+/* Revision 1.8  2012/06/06 22:42:57  pauloscustodio
 /* BUG_0021 : Different behaviour in string truncation in strutil in Linux and Win32
 /*
 /* Revision 1.7  2012/05/26 17:46:00  pauloscustodio
@@ -169,4 +172,34 @@ char *strtolower( char *string )
     }
 
     return string;
+}
+
+int stricompare( char *s1, char *s2 )
+{
+    char c1, c2;
+
+    while ( 1 )
+    {
+        c1 = *s1++;
+        c1 = tolower( c1 );
+        c2 = *s2++;
+        c2 = tolower( c2 );
+
+        if ( c1 == 0 && c2 == 0 )
+        {
+            return 0;           /* equal */
+        }
+        else if ( c1 < c2 )
+        {
+            return -1;          /* s1 comes before */
+        }
+        else if ( c1 > c2 )
+        {
+            return 1;           /* s2 comes before */
+        }
+        else
+        {
+            ;                   /* check next */
+        }
+    }
 }

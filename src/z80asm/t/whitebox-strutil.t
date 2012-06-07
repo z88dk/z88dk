@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.5 2012-06-06 22:42:57 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.6 2012-06-07 11:49:59 pauloscustodio Exp $
 # $Log: whitebox-strutil.t,v $
-# Revision 1.5  2012-06-06 22:42:57  pauloscustodio
+# Revision 1.6  2012-06-07 11:49:59  pauloscustodio
+# stricompare() instead of Flncmp()
+#
+# Revision 1.5  2012/06/06 22:42:57  pauloscustodio
 # BUG_0021 : Different behaviour in string truncation in strutil in Linux and Win32
 #
 # Revision 1.4  2012/05/26 18:50:26  pauloscustodio
@@ -193,6 +196,15 @@ INIT
 	p = strtoupper(sstr_data(s));
 	if (p != sstr_data(s))				ERROR;
 	TEST(s, "ABC1");
+	
+	// stricompare
+	if (stricompare("","") != 0)		ERROR;
+	if (stricompare("a","") != 1)		ERROR;
+	if (stricompare("","a") != -1)		ERROR;
+	if (stricompare("a","a") != 0)		ERROR;
+	if (stricompare("ab","a") != 1)		ERROR;
+	if (stricompare("a","ab") != -1)	ERROR;
+	if (stricompare("ab","ab") != 0)	ERROR;
 	
 	return 0;
 END

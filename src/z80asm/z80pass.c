@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.29 2012-05-26 18:51:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.30 2012-06-07 11:49:59 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.29  2012-05-26 18:51:10  pauloscustodio
+/* Revision 1.30  2012-06-07 11:49:59  pauloscustodio
+/* stricompare() instead of Flncmp()
+/*
+/* Revision 1.29  2012/05/26 18:51:10  pauloscustodio
 /* CH_0012 : wrappers on OS calls to raise fatal error
 /* CH_0013 : new errors interface to decouple calling code from errors.c
 /*
@@ -292,7 +295,7 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 
 
 /* global variables */
-extern FILE *z80asmfile, *listfile, *objfile, *mapfile;
+extern FILE *z80asmfile, *listfile, *objfile;
 extern char *date, line[], ident[], separators[];
 extern enum symbols sym;
 extern enum flag writeline, EOL;
@@ -963,31 +966,6 @@ Setfile( struct sourcefile *curfile,    /* pointer to record of current source f
 }
 
 
-int
-Flncmp( char *f1, char *f2 )
-{
-    int i;
-
-    if ( strlen( f1 ) != strlen( f2 ) )
-    {
-        return -1;
-    }
-    else
-    {
-        i = strlen( f1 );
-
-        while ( --i >= 0 )
-            if ( tolower( f1[i] ) != tolower( f2[i] ) )
-            {
-                return -1;
-            }
-
-        /* filenames equal */
-        return 0;
-    }
-}
-
-
 struct sourcefile *
 FindFile( struct sourcefile *srcfile, char *flnm )
 {
@@ -1000,7 +978,7 @@ FindFile( struct sourcefile *srcfile, char *flnm )
             return foundfile;    /* trying to include an already included file recursively! */
         }
 
-        if ( Flncmp( srcfile->fname, flnm ) == 0 )
+        if ( stricompare( srcfile->fname, flnm ) == 0 )
         {
             return srcfile;    /* this include file already used! */
         }
