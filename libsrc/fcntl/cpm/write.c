@@ -4,9 +4,8 @@
  *  27/1/2002 - djm
  *
  *
- *  $Id: write.c,v 1.1 2002-01-27 21:28:48 dom Exp $
+ *  $Id: write.c,v 1.2 2012-06-13 11:04:29 stefano Exp $
  */
-
 
 #include <fcntl.h>
 #include <stdlib.h>
@@ -21,8 +20,7 @@ unsigned int write(int fd, void *buf, size_t len)
     unsigned char uid;
     struct fcb *fc;
     int    cnt,size,offset;
-
-
+    
     if ( fd >= MAXFILE )
 	return -1;
 

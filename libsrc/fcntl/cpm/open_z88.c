@@ -5,14 +5,15 @@
  *
  *  We don't bother filling up the explicitname (yet...)
  *
- *  $Id: open_z88.c,v 1.2 2002-04-21 19:08:43 dom Exp $
+ *  $Id: open_z88.c,v 1.3 2012-06-13 11:04:29 stefano Exp $
  */
 
 #include <cpm.h>
 #include <stdio.h>
 #include <fcntl.h>
 
-int open_z88(far char *nam, int mode, mode_t flags, char *outbuf, size_t extlen)
+
+int open_z88(far char *nam, int flags, mode_t mode, char *outbuf, size_t extlen)
 {
     struct fcb *fc;
     unsigned char uid,pad;
@@ -20,15 +21,15 @@ int open_z88(far char *nam, int mode, mode_t flags, char *outbuf, size_t extlen)
     char *name = nam;
 
 
-    if ( ++mode > U_RDWR )
-	mode = U_RDWR;
+    if ( ++flags > U_RDWR )
+		flags = U_RDWR;
 
     if ( ( fc = getfcb() ) == NULL ) {
 	return -1;
     }
 
     if ( setfcb(fc,name) == 0 ) {  /* We had a real file, not a device */
-	if ( mode == U_READ && bdos(CPM_VERS,0) >= 0x30 ) 
+	if ( flags == U_READ && bdos(CPM_VERS,0) >= 0x30 ) 
 	    fc->name[5] |= 0x80;    /* read only mode */
 	uid = getuid();
 	setuid(fc->uid);
@@ -36,20 +37,20 @@ int open_z88(far char *nam, int mode, mode_t flags, char *outbuf, size_t extlen)
 	if ( bdos(CPM_OPN,fc) == -1 ) {
 	    clearfcb(fc);
 	    setuid(uid);
-	    if ( mode > U_READ ) {  /* If returned error and writer then create */
+	    if ( flags > U_READ ) {  /* If returned error and writer then create */
 		fd = creat(name,0);
 		if ( fd == -1 )
 		    return -1;
 		fc = _fcb[fd];
-		fc->use = mode;
+		fc->use = flags;
 		return fd;
 	    }
 	    return -1;   /* An error */
 	}
 	setuid(uid);
-	fc->use = mode;
+	fc->use = flags;
     }
-    fd =  (fc - &_fcb[0]);
+    fd =  ((fc - &_fcb[0])/sizeof(struct fcb));
     return fd;
 }
-	
+

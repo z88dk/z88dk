@@ -5,7 +5,7 @@
  *
  *  Based on Hitech C library (as usual)
  *
- *  $Id: creat.c,v 1.1 2002-01-27 21:28:48 dom Exp $
+ *  $Id: creat.c,v 1.2 2012-06-13 11:04:29 stefano Exp $
  */
 
 #include <cpm.h>
@@ -39,7 +39,7 @@ int creat(far char *nam, mode_t mode)
 	fc->use = U_WRITE;
     }
     
-    fd = fc - &_fcb[0];
+    fd =  ((fc - &_fcb[0])/sizeof(struct fcb));
     return fd;
 }
 

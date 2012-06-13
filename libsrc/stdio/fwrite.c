@@ -10,7 +10,7 @@
  *	djm 1/4/2000
  *
  * --------
- * $Id: fwrite.c,v 1.4 2012-06-13 06:34:24 stefano Exp $
+ * $Id: fwrite.c,v 1.5 2012-06-13 11:04:30 stefano Exp $
  */
 
 #define ANSI_STDIO
