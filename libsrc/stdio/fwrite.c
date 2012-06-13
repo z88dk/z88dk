@@ -10,7 +10,7 @@
  *	djm 1/4/2000
  *
  * --------
- * $Id: fwrite.c,v 1.3 2010-01-15 07:12:06 stefano Exp $
+ * $Id: fwrite.c,v 1.4 2012-06-13 06:34:24 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -19,8 +19,7 @@
 
 int fwrite(void *ptr, size_t size, size_t nmemb, FILE *fp)
 {
-	if ( (fp->flags&(_IOUSE|_IOWRITE)==(_IOUSE|_IOWRITE))  && 
-			fchkstd(fp)== 0 ) {
+	if ( (fp->flags&(_IOUSE|_IOWRITE)==(_IOUSE|_IOWRITE)) && fchkstd(fp)== 0 ) {
 		int written=write(fp->fd,ptr,size*nmemb);
 		/* Return number of members written */
 		return (written/size);
