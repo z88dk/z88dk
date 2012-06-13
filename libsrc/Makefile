@@ -1,10 +1,11 @@
 #
+#
 # Ah, that'd be nice, a library makefile!
 #
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.169 2012-05-31 14:52:59 stefano Exp $
+# $Id: Makefile,v 1.170 2012-06-13 12:10:05 stefano Exp $
 
 
 include Make.config
@@ -962,7 +963,7 @@ msx_clib.lib:
 	cd fcntl ; $(MAKE) lcpm ; cd ..
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) generic ; cd ..
-	cd stdio ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) lcpm ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
