@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.1 2012-05-26 18:51:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.2 2012-06-14 15:01:27 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.1  2012-05-26 18:51:10  pauloscustodio
+# Revision 1.2  2012-06-14 15:01:27  pauloscustodio
+# Split safe strings from strutil.c to safestr.c
+#
+# Revision 1.1  2012/05/26 18:51:10  pauloscustodio
 # CH_0012 : wrappers on OS calls to raise fatal error
 # CH_0013 : new errors interface to decouple calling code from errors.c
 #
@@ -32,7 +35,7 @@ require 't/test_utils.pl';
 # test errors.c
 unlink_testfiles();
 
-my $objs = "errors.o memalloc.o class.o die.o strutil.o strpool.o except.o";
+my $objs = "errors.o memalloc.o class.o die.o strutil.o safestr.o strpool.o except.o";
 ok ! system "make $objs";
 
 my $init = <<'END';

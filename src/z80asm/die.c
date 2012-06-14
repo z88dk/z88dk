@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Exit with a fatal error, warn on stderr
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.c,v 1.7 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.c,v 1.8 2012-06-14 15:01:27 pauloscustodio Exp $ */
 /* $Log: die.c,v $
-/* Revision 1.7  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.8  2012-06-14 15:01:27  pauloscustodio
+/* Split safe strings from strutil.c to safestr.c
+/*
+/* Revision 1.7  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.6  2012/05/24 15:07:03  pauloscustodio
@@ -45,6 +48,7 @@ Exit with a fatal error, warn on stderr
 #include "die.h"
 #include "types.h"
 #include "strutil.h"
+#include "safestr.h"
 
 #include <stdlib.h>
 #include <stdio.h>

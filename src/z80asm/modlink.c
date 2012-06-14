@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.42 2012-06-07 11:54:13 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.43 2012-06-14 15:01:27 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.42  2012-06-07 11:54:13  pauloscustodio
+/* Revision 1.43  2012-06-14 15:01:27  pauloscustodio
+/* Split safe strings from strutil.c to safestr.c
+/*
+/* Revision 1.42  2012/06/07 11:54:13  pauloscustodio
 /* - Make mapfile static to module modlink.
 /* - Remove modsrcfile, not used.
 /* - GetModuleSize(): use local variable for file handle instead of objfile
@@ -295,6 +298,7 @@ Copyright (C) Paulo Custodio, 2011-2012
 #include "file.h"
 #include "codearea.h"
 #include "strutil.h"
+#include "safestr.h"
 
 /* external functions */
 void FreeSym( symbol *node );

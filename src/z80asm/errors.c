@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.16 2012-05-26 18:51:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.17 2012-06-14 15:01:27 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.16  2012-05-26 18:51:10  pauloscustodio
+/* Revision 1.17  2012-06-14 15:01:27  pauloscustodio
+/* Split safe strings from strutil.c to safestr.c
+/*
+/* Revision 1.16  2012/05/26 18:51:10  pauloscustodio
 /* CH_0012 : wrappers on OS calls to raise fatal error
 /* CH_0013 : new errors interface to decouple calling code from errors.c
 /*
@@ -98,6 +101,7 @@ Copyright (C) Paulo Custodio, 2011-2012
 #include <assert.h>
 #include "errors.h"
 #include "strutil.h"
+#include "safestr.h"
 #include "class.h"
 #include "strpool.h"
 #include "types.h"

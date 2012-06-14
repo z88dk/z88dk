@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.4 2012-05-26 18:50:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.5 2012-06-14 15:01:27 pauloscustodio Exp $
 # $Log: whitebox-memalloc.t,v $
-# Revision 1.4  2012-05-26 18:50:26  pauloscustodio
+# Revision 1.5  2012-06-14 15:01:27  pauloscustodio
+# Split safe strings from strutil.c to safestr.c
+#
+# Revision 1.4  2012/05/26 18:50:26  pauloscustodio
 # Use .o instead of .c to build test program, faster compilation.
 # Use gcc to compile instead of cc.
 #
@@ -37,13 +40,12 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-# test memalloc
-my $objs = "die.o except.o strutil.o";
+my $objs = "die.o except.o strutil.o safestr.o";
 ok ! system "make $objs";
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 
 # allocate and no free no debug
-t_compile_module("", <<'END', "memalloc.c die.c except.c strutil.c");
+t_compile_module("", <<'END', "memalloc.c die.o except.o strutil.o safestr.o");
 	char * p1 = xmalloc(1);
 	char * p2 = xmalloc(2);
 	p1[0] = p2[0] = p2[1] = 0;

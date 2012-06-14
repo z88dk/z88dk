@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.2 2012-05-26 18:50:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.3 2012-06-14 15:01:27 pauloscustodio Exp $
 # $Log: whitebox-class.t,v $
-# Revision 1.2  2012-05-26 18:50:26  pauloscustodio
+# Revision 1.3  2012-06-14 15:01:27  pauloscustodio
+# Split safe strings from strutil.c to safestr.c
+#
+# Revision 1.2  2012/05/26 18:50:26  pauloscustodio
 # Use .o instead of .c to build test program, faster compilation.
 # Use gcc to compile instead of cc.
 #
@@ -31,7 +34,7 @@ require 't/test_utils.pl';
 
 # test class
 
-my $objs = "die.o except.o strutil.o";
+my $objs = "die.o except.o strutil.o safestr.o";
 ok ! system "make $objs";
 my $compile = "-DCLASS_DEBUG -DMEMALLOC_DEBUG class.c memalloc.c $objs";
 

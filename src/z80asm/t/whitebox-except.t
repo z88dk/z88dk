@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.4 2012-05-26 18:50:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.5 2012-06-14 15:01:27 pauloscustodio Exp $
 # $Log: whitebox-except.t,v $
-# Revision 1.4  2012-05-26 18:50:26  pauloscustodio
+# Revision 1.5  2012-06-14 15:01:27  pauloscustodio
+# Split safe strings from strutil.c to safestr.c
+#
+# Revision 1.4  2012/05/26 18:50:26  pauloscustodio
 # Use .o instead of .c to build test program, faster compilation.
 # Use gcc to compile instead of cc.
 #
@@ -34,7 +37,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "die.o strutil.o";
+my $objs = "die.o strutil.o safestr.o";
 ok ! system "make $objs";
 my $compile = "-DEXCEPT_DEBUG except.c $objs";
 

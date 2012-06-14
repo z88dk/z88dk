@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.9 2012-05-26 18:36:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.10 2012-06-14 15:01:27 pauloscustodio Exp $ */
 /* $Log: file.c,v $
-/* Revision 1.9  2012-05-26 18:36:36  pauloscustodio
+/* Revision 1.10  2012-06-14 15:01:27  pauloscustodio
+/* Split safe strings from strutil.c to safestr.c
+/*
+/* Revision 1.9  2012/05/26 18:36:36  pauloscustodio
 /* Replaced xfputc and friends with fputc_err, raising a fatal_error() instead of an
 /* exception, moved to errors.c
 /*
@@ -73,6 +76,7 @@ Utilities for file handling
 #include "file.h"
 #include "config.h"
 #include "strutil.h"
+#include "safestr.h"
 #include "strpool.h"
 #include "errors.h"
 
