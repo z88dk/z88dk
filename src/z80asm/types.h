@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Common types
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.4 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.5 2012-06-14 15:03:13 pauloscustodio Exp $ */
 /* $Log: types.h,v $
-/* Revision 1.4  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.5  2012-06-14 15:03:13  pauloscustodio
+/* Use _MSC_VER instead of WIN32 for MS-C compiler specific code
+/*
+/* Revision 1.4  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.3  2012/05/20 05:59:18  pauloscustodio
@@ -46,8 +49,8 @@ typedef int bool;
 /* maximum length of strings */
 #define MAXLINE     1024
 
-/* snprintf is _snprintf in WIN32 */
-#ifdef WIN32
+/* snprintf is _snprintf in _MSC_VER */
+#ifdef _MSC_VER
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
 #endif
