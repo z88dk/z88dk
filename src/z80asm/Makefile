@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.34 2012-05-26 18:50:06 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.35 2012-06-14 15:04:58 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.34  2012-05-26 18:50:06  pauloscustodio
+# Revision 1.35  2012-06-14 15:04:58  pauloscustodio
+# New safestr.o, dynstr.o
+#
+# Revision 1.34  2012/05/26 18:50:06  pauloscustodio
 # Use gcc to compile instead of cc.
 #
 # Revision 1.33  2012/05/24 21:42:42  pauloscustodio
@@ -155,6 +158,7 @@ OBJS = 	\
 	class.o		\
 	codearea.o	\
 	die.o		\
+	dynstr.o	\
 	errors.o	\
 	except.o	\
 	exprprsr.o	\
@@ -167,6 +171,7 @@ OBJS = 	\
 	options.o	\
 	prsident.o	\
 	prsline.o	\
+	safestr.o	\
 	strlist.o	\
 	strpool.o	\
 	strutil.o	\
@@ -226,22 +231,24 @@ class.o: memalloc.h except.h e4c.h class.h queue.h types.h die.h
 codearea.o: codearea.h memalloc.h except.h e4c.h config.h ../config.h
 codearea.o: errors.h errors_def.h symbol.h avltree.h z80asm.h types.h file.h
 codearea.o: strlist.h class.h queue.h
-die.o: memalloc.h except.h e4c.h die.h types.h strutil.h
-errors.o: memalloc.h except.h e4c.h errors.h errors_def.h strutil.h types.h
-errors.o: class.h queue.h strpool.h
+die.o: memalloc.h except.h e4c.h die.h types.h strutil.h safestr.h
+dynstr.o: dynstr.h memalloc.h except.h e4c.h types.h class.h queue.h
+errors.o: memalloc.h except.h e4c.h errors.h errors_def.h strutil.h safestr.h
+errors.o: types.h class.h queue.h strpool.h
 except.o: except.h memalloc.h e4c.h types.h die.h e4c.c
 exprprsr.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
 exprprsr.o: options.h errors.h errors_def.h file.h strlist.h class.h queue.h
 exprprsr.o: types.h codearea.h
 file.o: file.h memalloc.h except.h e4c.h strlist.h class.h queue.h types.h
-file.o: config.h ../config.h strutil.h strpool.h errors.h errors_def.h
+file.o: config.h ../config.h strutil.h safestr.h strpool.h errors.h
+file.o: errors_def.h
 hist.o: memalloc.h except.h e4c.h hist.h
 ldinstr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 ldinstr.o: types.h symbol.h errors.h errors_def.h codearea.h options.h
 memalloc.o: memalloc.h except.h e4c.h types.h die.h queue.h
 modlink.o: memalloc.h except.h e4c.h config.h ../config.h options.h symbol.h
 modlink.o: avltree.h symbols.h z80asm.h types.h errors.h errors_def.h file.h
-modlink.o: strlist.h class.h queue.h codearea.h strutil.h
+modlink.o: strlist.h class.h queue.h codearea.h strutil.h safestr.h
 objfile.o: objfile.h memalloc.h except.h e4c.h
 options.o: memalloc.h except.h e4c.h z80asm.h config.h ../config.h avltree.h
 options.o: types.h options.h symbol.h symbols.h errors.h errors_def.h
@@ -251,11 +258,12 @@ prsident.o: types.h symbol.h symbols.h options.h errors.h errors_def.h
 prsident.o: codearea.h
 prsline.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 prsline.o: types.h symbol.h options.h errors.h errors_def.h
+safestr.o: safestr.h memalloc.h except.h e4c.h types.h
 strlist.o: memalloc.h except.h e4c.h strlist.h class.h queue.h types.h
 strlist.o: strpool.h
 strpool.o: memalloc.h except.h e4c.h strpool.h class.h queue.h types.h
 strpool.o: uthash.h die.h
-strutil.o: strutil.h memalloc.h except.h e4c.h types.h
+strutil.o: strutil.h memalloc.h except.h e4c.h
 symbols.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
 symbols.o: symbols.h options.h errors.h errors_def.h
 z80asm.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
