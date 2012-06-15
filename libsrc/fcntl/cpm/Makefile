@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.8 2010-10-05 06:33:45 stefano Exp $
+# $Id: Makefile,v 1.9 2012-06-15 07:46:52 stefano Exp $
 
 include ../../Make.config
 
@@ -19,6 +19,7 @@ CFILES = \
 	read.c \
 	readbyte.c \
 	remove.c \
+	rename.c \
 	setfcb.c \
 	write.c \
 	writebyte.c 

@@ -15,6 +15,7 @@ fcntl/cpm/_putoffset
 fcntl/cpm/read
 fcntl/cpm/readbyte
 fcntl/cpm/remove
+fcntl/cpm/rename
 fcntl/cpm/setfcb
 fcntl/cpm/write
 fcntl/cpm/writebyte

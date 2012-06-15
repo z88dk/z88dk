@@ -3,7 +3,7 @@
  *
  *   Based on Hitech C as usual
  *
- *   $Id: remove.c,v 1.1 2002-01-27 21:28:48 dom Exp $
+ *   $Id: remove.c,v 1.2 2012-06-15 07:46:52 stefano Exp $
  */
 
 #include <cpm.h>
@@ -13,16 +13,19 @@
 
 int remove(char *name)
 {
-    struct fcb  fc;
+    struct fcb fc;
+
     int       retval;
-    unsigned char uid,pad;
+    unsigned char uid;
 
     if ( setfcb(fc,name) ) 
 	return 0;
 
-    uid = getuid();
-    setuid(fc.uid);
-    retval = bdos(CPM_DEL,&fc);
+	uid = getuid();
+	setuid(fc->uid);
+
+    retval = bdos(CPM_DEL,fc);
+
     setuid(uid);
     return retval;
 }
