@@ -2,15 +2,15 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.21 2009-06-22 21:20:05 dom Exp $
+;	$Id: msx_crt0.asm,v 1.22 2012-06-21 07:31:56 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
 ;
-;	#pragma no-streams      - No stdio disc files
-;	#pragma no-fileio       - No fileio at all
-;	#pragma no-protectmsdos - strip the MS-DOS protection header
+;	#pragma output nostreams      - No stdio disc files
+;	#pragma output nofileio       - No fileio at all
+;	#pragma output noprotectmsdos - strip the MS-DOS protection header
 ;
 ;	These can cut down the size of the resultant executable
 

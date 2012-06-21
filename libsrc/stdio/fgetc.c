@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fgetc.c,v 1.6 2012-05-08 07:59:09 stefano Exp $
+ * $Id: fgetc.c,v 1.7 2012-06-21 07:31:57 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -95,6 +95,12 @@ int fgetc(FILE *fp)
 	call	readbyte	;readbyte sorts out stack (fastcall)
 ;	pop	bc		;dump handle
 	pop	ix		;get fp back
+
+	; enforcement to the EOF checks, Stefano 21/6/2012
+	ld	a,h
+	inc a
+	jr  z,is_eof
+
 #ifdef __STDIO_BINARY
 	ld	a,_IOTEXT	;check for text mode
 	and	(ix+fp_flags)
@@ -102,12 +108,13 @@ int fgetc(FILE *fp)
 	ld	a,l		;load bytes
 	sub	__STDIO_EOFMARKER	;compare with the EOF marker
 	and	a		;reset carry
-	ret	nz		
-	ld	hl,-1		;signify EOF
+	ret	nz
 #else
 	ret	nc		;no error so return (make sure other
 				;implementations respect this!)
 #endif
+.is_eof
+	ld	hl,-1		;signify EOF
 .seteof
 	ld	a,(ix+fp_flags)
 	or	_IOEOF

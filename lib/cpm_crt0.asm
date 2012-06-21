@@ -8,14 +8,14 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.14 2010-09-14 14:28:44 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.15 2012-06-21 07:31:56 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
 ;
-;	#pragma no-streams - No stdio disc files
-;	#pragma no-fileio  - No fileio at all
-;	#pragma no-protectmsdos - strip the MS-DOS protection header
+;	#pragma output nostreams - No stdio disc files
+;	#pragma output nofileio  - No fileio at all
+;	#pragma output noprotectmsdos - strip the MS-DOS protection header
 ;
 ;	These can cut down the size of the resultant executable
 
