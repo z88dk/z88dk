@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.170 2012-06-13 12:10:05 stefano Exp $
+# $Id: Makefile,v 1.171 2012-06-26 06:09:52 stefano Exp $
 
 
 include Make.config
@@ -1314,6 +1314,7 @@ osca_clib.lib:
 	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
+	cd rs232 ; $(MAKE) losca ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORosca -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst
@@ -1326,6 +1327,7 @@ oscaansi_clib.lib:
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
+	cd rs232 ; $(MAKE) losca ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..

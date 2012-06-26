@@ -5,7 +5,7 @@
 ;
 ;       unsigned char rs232_put(char)
 ;
-;       $Id: rs232_put.asm,v 1.2 2008-06-05 14:31:24 stefano Exp $
+;       $Id: rs232_put.asm,v 1.3 2012-06-26 06:09:53 stefano Exp $
 
 ; Fastcall so implicit push
 
@@ -13,8 +13,8 @@
                 XLIB   rs232_put
 
 rs232_put:
-                ;;push af
                 ld   bc,$f8ee
+
 wait:           in   a,(c)
                 bit  7,a
                 jr   z,wait
@@ -22,12 +22,12 @@ wait:           in   a,(c)
 cts:            in   a,(c)
                 bit  2,a
                 jr   nz,cts
-                ;;pop  af
+
                 ld      a,l     ;get byte
                 ld   c,$ef
                 out  (c),a
+
                 ld   hl,0       ;RS_ERR_OK
-                pop  bc         ;remove implicit push
                 ret
 
 
