@@ -5,7 +5,7 @@
 ;
 ;       unsigned char rs232_get(char *)
 ;
-;       $Id: rs232_get.asm,v 1.1 2012-06-26 06:11:23 stefano Exp $
+;       $Id: rs232_get.asm,v 1.2 2012-06-26 06:16:08 stefano Exp $
 
 
 ; __FASTCALL__
@@ -16,7 +16,7 @@
 
 rs232_get:
 	
-			ld b,0
+			ld b,50
 .wait_sb
 			in a,(sys_joy_com_flags)		; if bit 6 of status flags = 1, byte is in buffer 
 			bit 6,a
@@ -28,7 +28,7 @@ rs232_get:
 			djnz wait_sb
 
 			ld	hl,4	; RS_ERR_NO_DATA
-						; time out after 1 second
+						; time out after 0.2 seconds
 			ret
 			
 .sbyte_in
