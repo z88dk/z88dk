@@ -1,0 +1,67 @@
+lstoff
+
+; SD Card common definitions
+
+; $Id: sdcard.def,v 1.1 2012-07-10 05:55:38 stefano Exp $
+
+
+	defc	sd_error_spi_mode_failed	= $01
+
+	defc	sd_error_mmc_init_failed	= $10
+	defc	sd_error_sd_init_failed		= $11
+	defc	sd_error_sdhc_init_failed	= $12
+	defc	sd_error_vrange_bad			= $13
+	defc	sd_error_check_pattern_bad	= $14
+
+	defc	sd_error_illegal_command		= $20
+	defc	sd_error_bad_command_response	= $21
+	defc	sd_error_data_token_timeout		= $22
+	defc	sd_error_write_timeout			= $23
+	defc	sd_error_write_failed			= $24
+
+
+;  ---------------------- SD protocol commands ------------------------------------
+
+	defc	SD_GO_IDLE_STATE         = $40
+
+	defc	CMD1                     = $41
+	defc	SD_SEND_OP_COND          = $41
+
+	defc	CMD9                     = $49
+	;;defc	SD_READ_CSD              = $49
+
+	defc	CMD10                    = $4A
+	;;defc	SD_READ_CID              = $4A
+
+	defc	SD_TERMINATE_MULTI_READ  = $4C
+
+	defc	CMD13                    = $4D
+	defc	SD_STATUS                = $4D
+
+	defc	SD_SET_BLOCK_SIZE        = $50
+
+	defc	CMD17                    = $51
+	defc	MMC_READ_SINGLE_BLOCK    = $51
+
+	defc	SD_READ_MULTIPLE_BLOCK   = $52
+
+	defc	CMD24                    = $58
+	defc	SD_WRITE_SINGLE_BLOCK    = $58
+
+	defc	SD_WRITE_MULTIPLE_BLOCK  = $59
+
+	defc	SD_START_TAG             = $60
+	defc	SD_END_TAG               = $61
+	defc	SD_ERASE_BLOCK           = $66
+
+	defc	ACMD41                   = $69	; SDHC 
+	defc	CMD55                    = $77	; SDHC APP_CMD (prefix for application command)
+	defc	CMD58                    = $7A	; SDHC 
+
+	defc	CMD59                    = $7B  ; CRC_ON_OFF (Only bit 0) Argument sets CRC on (1) or off (0).
+
+	defc	MMC_STOP_TRAN            = $FD
+
+
+lston
+

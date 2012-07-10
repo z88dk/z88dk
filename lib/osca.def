@@ -4,7 +4,7 @@ lstoff
 ;
 ; Aug 2011
 ;
-; $Id: osca.def,v 1.3 2012-02-16 07:04:08 stefano Exp $
+; $Id: osca.def,v 1.4 2012-07-10 05:55:38 stefano Exp $
 ;
 
 ;----- OSCA v659 Main system hardware control / peripheral ports -------------
@@ -136,5 +136,11 @@ defc	sprite_base	= $1000		; 4KB when banked in
 defc	video_base	= $2000		; 8KB when banked in
 
 ;--------------------------------------------------------------------------
+
+; SD Card related data
+
+defc	sd_cs		= 2	; FPGA output (active low)
+defc	sd_power	= 3	; FPGA output (active low)
+
 
 lston

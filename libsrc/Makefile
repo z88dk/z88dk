@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.171 2012-06-26 06:09:52 stefano Exp $
+# $Id: Makefile,v 1.172 2012-07-10 05:55:38 stefano Exp $
 
 
 include Make.config
@@ -1424,6 +1424,7 @@ clean:
 	cd threading/preempt    ; $(MAKE) clean ; cd ../..
 	cd sprites/software/sp1 ; $(MAKE) clean ; cd ../../..
 	cd stdio_new ; $(MAKE) clean ; cd ..
+	cd sdcard    ; $(MAKE) clean ; cd ..
 	$(RM) *.lib
 
 install:

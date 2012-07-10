@@ -12,7 +12,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.13 2012-05-31 14:52:58 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.14 2012-07-10 05:55:38 stefano Exp $
 ;
 
 
@@ -373,6 +373,23 @@ fp_seed:        defb    $80,$80,0,0,0,0
 extra:          defs    6
 fa:             defs    6
 fasign:         defb    0
+
+ENDIF
+
+; SD CARD interface
+IF DEFINED_NEED_SDCARD
+
+	XDEF card_select
+	XDEF sd_card_info
+
+	XDEF sector_buffer_loc
+
+; Keep the following 2 bytes in the right order (1-card_select, 2-sd_card_info) !!!
+card_select:		defb    0    ; Currently selected MMC/SD slot
+sd_card_info:		defb    0    ; Card type flags..
+
+sector_buffer_loc:	defw	sector_buffer
+sector_buffer:	defs 513
 
 ENDIF
 

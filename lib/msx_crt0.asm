@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.22 2012-06-21 07:31:56 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.23 2012-07-10 05:55:38 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
