@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.8 2012-05-02 14:23:42 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.9 2012-08-01 21:13:29 dom Exp $
 ;
 
 
@@ -451,14 +451,14 @@
 
 .doposn
         ld      hl,(params)
+        ld	de,$2020
+        and	a
+        sbc	hl,de
         ld      a,(left2)
         and     a			; are we in 32 columns mode ?
         jr      z,nomult	; if not, do not double
         rl		l
 .nomult
-        ;ld	de,$2020
-        ;and	a
-        ;sbc	hl,de
         ld      a,h     ;y position
         cp      24
         ret     nc
