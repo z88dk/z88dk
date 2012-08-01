@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.35 2012-06-14 15:04:58 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.36 2012-08-01 21:08:02 dom Exp $
 # $Log: Makefile,v $
-# Revision 1.35  2012-06-14 15:04:58  pauloscustodio
+# Revision 1.36  2012-08-01 21:08:02  dom
+# Allow x-compilation of z80asm
+#
+# Revision 1.35  2012/06/14 15:04:58  pauloscustodio
 # New safestr.o, dynstr.o
 #
 # Revision 1.34  2012/05/26 18:50:06  pauloscustodio
@@ -191,7 +194,7 @@ ASTYLE = astyle \
 	--pad-oper --pad-paren-in --pad-header --unpad-paren \
 	--align-pointer=name
 
-CC = gcc
+CC ?= gcc
 
 all: z80asm$(EXESUFFIX)
 
