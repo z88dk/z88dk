@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.40 2012-05-16 16:59:56 stefano Exp $
+ * $Id: stdlib.h,v 1.41 2012-09-03 07:31:55 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -217,6 +217,12 @@ extern void   __LIB__  __FASTCALL__   delay (long milliseconds);
 /*********/
 
 // Non standard stdlib.h defs (mode is ignored)
+// Extract a given number of bits from a byte string (at specified bit position) and load into a long value
+extern unsigned long __LIB__             extract_bits(unsigned char *data, unsigned int start, unsigned int size);
+extern unsigned long __LIB__ __CALLEE__  extract_bits_callee(unsigned char *data, unsigned int start, unsigned int size);
+
+#define extract_bits(a,b,c)  extract_bits_callee(a,b,c)
+
 
 #ifdef __Z88__
 #endif

@@ -99,8 +99,11 @@ sdcard/sd_send_command_string
 sdcard/sd_send_eight_clocks
 sdcard/sd_set_sector_addr_regs
 sdcard/sd_set_sector_addr_lba0
+sdcard/sd_sectors
 sdcard/sd_size
 sdcard/sd_wait_data_token
+sdcard/UNSTUFF_BITS
+sdcard/UNSTUFF_BITS_callee
 sdcard/osca/pause_4ms
 sdcard/osca/sd_select_card
 sdcard/osca/sd_deselect_card

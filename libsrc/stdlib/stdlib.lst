@@ -6,6 +6,9 @@ stdlib/bpeek
 stdlib/bpoke
 stdlib/bpoke_callee
 stdlib/exit
+stdlib/extract_bits
+stdlib/extract_bits_callee
+stdlib/extract_bits_sub
 stdlib/inp
 stdlib/isqrt
 stdlib/itoa

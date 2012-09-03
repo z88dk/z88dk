@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2012
  *
- *		$Id: sdcard.h,v 1.1 2012-07-10 05:55:38 stefano Exp $
+ *		$Id: sdcard.h,v 1.2 2012-09-03 07:31:55 stefano Exp $
  * 
  */
 
@@ -124,6 +124,26 @@ unsigned char	CSD[16];	// Two higher bits should be set to 0
 int				csdfoo;		// Terminate with two extra bytes, to avoid overflows.
 };
 
+struct mmc_csd {
+unsigned char	structure;
+unsigned char	mmca_vsn;
+unsigned int	cmdclass;
+unsigned int	tacc_clks;
+unsigned long	tacc_ns;
+unsigned long	c_size;
+unsigned long	r2w_factor;
+unsigned long	max_dtr;
+unsigned long	erase_size;		/* In sectors */
+unsigned long	read_blkbits;
+unsigned long	write_blkbits;
+unsigned long	capacity;
+unsigned char	read_partial;
+unsigned char	read_misalign;
+unsigned char	write_partial;
+unsigned char	write_misalign;
+};
+
+
 #define SD_TYPE_MMC    0
 #define SD_TYPE_SD     1
 #define SD_TYPE_SDHC   2
@@ -145,7 +165,21 @@ extern unsigned long __LIB__ __FASTCALL__ sd_sectors(struct SD_INFO descriptor);
 // Read a given sector from the SD card
 extern int __LIB__ sd_read_sector(struct SD_INFO descriptor, long sector, unsigned char *address);
 
+// Unpack bits to read CID or CSD or other, bit count begins on the less signigicant position
+// of a 16 byte (128 bit) long block, thus on the rightmost bit
+extern unsigned long __LIB__             UNSTUFF_BITS(unsigned char *data, unsigned int start, unsigned int size);
+extern unsigned long __LIB__ __CALLEE__  UNSTUFF_BITS_callee(unsigned char *data, unsigned int start, unsigned int size);
 
+#define UNSTUFF_BITS(a,b,c)  UNSTUFF_BITS_callee(a,b,c)
+
+
+// Reserved functions, internal use only
+extern void __LIB__ __FASTCALL__ sd_deselect_card();
+extern void __LIB__ __FASTCALL__ sd_send_eight_clocks();
+extern void __LIB__ __FASTCALL__ sd_wait_data_token();
+extern void __LIB__ __FASTCALL__ pause_4ms();
+extern void __LIB__ __FASTCALL__ sd_power_off();
+extern void __LIB__ __FASTCALL__ sd_power_on();
 
 // Asks CRT0 stub to reserve some service variables for SDCARD
 #pragma output NEED_SDCARD
