@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.172 2012-07-10 05:55:38 stefano Exp $
+# $Id: Makefile,v 1.173 2012-09-04 15:53:32 stefano Exp $
 
 
 include Make.config
@@ -1317,7 +1317,8 @@ osca_clib.lib:
 	cd rs232 ; $(MAKE) losca ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
-	$(LIBLINKER) -DFORosca -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst
+	cd sdcard ; $(MAKE) clean ; cd ..
+	$(LIBLINKER) -DFORosca -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst
 	cd fcntl ; $(MAKE) losca ; cd ..
 
 oscaansi_clib.lib:
@@ -1331,7 +1332,8 @@ oscaansi_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
-	$(LIBLINKER) -DFORosca -x$(OUTPUT_DIRECTORY)/oscaansi_clib.lib @$(LISTFILE_DIRECTORY)/oscaansi.lst
+	cd sdcard ; $(MAKE) clean ; cd ..
+	$(LIBLINKER) -DFORosca -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/oscaansi_clib.lib @$(LISTFILE_DIRECTORY)/oscaansi.lst
 	cd fcntl ; $(MAKE) losca ; cd ..
 
 # Z88 maths build - dom
