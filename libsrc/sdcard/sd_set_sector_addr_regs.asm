@@ -6,14 +6,14 @@
 ;	set HL to dest address for data
 ;	set B to number of bytes required  
 ;
-;	$Id: sd_set_sector_addr_regs.asm,v 1.2 2012-09-04 15:53:32 stefano Exp $
+;	$Id: sd_set_sector_addr_regs.asm,v 1.3 2012-09-11 13:09:39 stefano Exp $
 ;
 
 	XLIB	sd_set_sector_addr_regs
-IF SDHC_SUPPORT
 	XREF	cmd_generic_args
-ENDIF
+IF SDHC_SUPPORT
 	XREF	sd_card_info
+ENDIF
 
 
 sd_set_sector_addr_regs:

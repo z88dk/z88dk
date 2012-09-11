@@ -5,9 +5,9 @@
 ;	Ported by Stefano Bodrato, 2012
 ;
 ;	Init SD card communications
-;	On entry: HL=card slot number
+;	On entry: A=card slot number
 ;
-;	$Id: sd_init_main.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $
+;	$Id: sd_init_main.asm,v 1.2 2012-09-11 13:09:39 stefano Exp $
 ;
 
 
@@ -45,11 +45,10 @@ ENDIF
 
 sd_init_main:
 
-	xor a				; Clear card info start
-	or  l				; Requested SD card slot <> 0 ?
+	and a				; Requested SD card slot <> 0 ?
 	ret nz				; then return with A carrying an error status
 	
-	ld (sd_card_info),a
+	ld (sd_card_info),a		; reset card info flags
 
 	call sd_power_off			; Switch off power to the card (SPI clock slow, /CS is low but should be irrelevent)
 	
@@ -170,7 +169,7 @@ sd_iwl:
 	
 	bit 2,a				
 	jr nz,sd_mmc_init			; check command response bit 2, if set = illegal command - try MMC init
-				
+	
 	dec bc
 	ld a,b
 	or c

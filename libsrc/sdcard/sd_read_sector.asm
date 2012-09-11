@@ -3,6 +3,8 @@
 ;	Taken from the OSCA Bootcode by Phil Ruston 2011
 ;	Port by Stefano Bodrato, 2012
 ;
+;	int sd_read_sector(struct SD_INFO descriptor, long sector, unsigned char *address);
+;
 ;	set HL to dest address for data
 ;
 ;	sd_card_info and card_select must be accessible, 
@@ -10,7 +12,7 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_read_sector.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $
+;	$Id: sd_read_sector.asm,v 1.2 2012-09-11 13:09:39 stefano Exp $
 ;
 
 	XLIB	sd_read_sector
@@ -28,7 +30,6 @@
     INCLUDE "osca.def"
 
 sd_read_sector:
-
 	ld	ix,0
 	add	ix,sp
 	
@@ -52,7 +53,6 @@ sd_read_sector:
 	ld	h,(ix+7)	; MSB
 		
 	call sd_set_sector_addr_regs
-	
 
 	ld a,CMD17			; Send CMD17 read sector command
 	call sd_send_command_current_args

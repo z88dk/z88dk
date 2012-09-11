@@ -6,7 +6,7 @@
 ;	Init SD card communications
 ;	Input: HL = card slot number
 ;
-;	$Id: sd_initialize.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $
+;	$Id: sd_initialize.asm,v 1.2 2012-09-11 13:09:39 stefano Exp $
 ;
 
 	XLIB	sd_initialize
@@ -20,6 +20,7 @@
 
 
 sd_initialize:
+	ld	a,l
 	call sd_init_main
 	or a				; if non-zero returned in A, there was an error
 	jr z,sd_inok

@@ -6,7 +6,7 @@
 ;	set HL = location of 6 byte command string
 ;	returns command response in A (ZF set if $00)
 ;
-;	$Id: sd_send_command_string.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $
+;	$Id: sd_send_command_string.asm,v 1.2 2012-09-11 13:09:39 stefano Exp $
 ;
 
 
@@ -17,11 +17,11 @@
 	XDEF	cmd_generic
 	XDEF	cmd_generic_args
 	XDEF	cmd_generic_crc
+	XDEF	sd_wait_valid_response
 	
 	LIB		sd_select_card
 	LIB		sd_send_eight_clocks
 	LIB		sd_send_byte
-	LIB		sd_wait_valid_response
 	LIB		sd_get_byte
 
 
@@ -48,6 +48,10 @@ sd_send_command_current_args:
 
 sd_send_command_string:
 
+; set HL = location of 6 byte command string
+; returns command response in A (ZF set if $00)
+
+
 	call sd_select_card			; send command always enables card select
 	
 	call sd_send_eight_clocks		; send 8 clocks first - seems necessary for SD cards..
@@ -61,8 +65,8 @@ sd_sclp:
 	djnz sd_sclp
 	pop bc
 	
-	call sd_get_byte			; skip first byte of nCR, a quirk of my SD card interface?
-		
+	;call sd_get_byte			; skip first byte of nCR, a quirk of the OSCA V6 SD card interface?
+	
 
 sd_wait_valid_response:
 	

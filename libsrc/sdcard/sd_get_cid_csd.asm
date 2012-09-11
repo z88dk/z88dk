@@ -4,7 +4,7 @@
 ;	portions of the code are by Alessandro Poppi and Phil Ruston
 ;	
 ;
-;	$Id: sd_get_cid_csd.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $ 
+;	$Id: sd_get_cid_csd.asm,v 1.2 2012-09-11 13:09:39 stefano Exp $ 
 ;
 ;--------------------------------------------------------------------------------------------------------
 ; READ MMC CID subroutine. Data is stored at address (HL), command in A (READ_CID or READ_CSD).
@@ -17,6 +17,7 @@
 
 	XLIB	sd_get_cid_csd
 	
+	LIB		sd_send_command_string
 	LIB		sd_send_command_null_args
 	LIB		sd_wait_data_token
 	LIB		sd_read_bytes
