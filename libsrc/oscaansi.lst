@@ -92,8 +92,10 @@ sdcard/sd_read_cid
 sdcard/sd_read_csd
 sdcard/sd_get_cid_csd
 sdcard/sd_read_sector
+sdcard/sd_read_sector_callee
 sdcard/osca/sd_read_sector_main
 sdcard/sd_write_sector
+sdcard/sd_write_sector_callee
 sdcard/sd_write_sector_main
 sdcard/sd_send_command_string
 sdcard/sd_send_eight_clocks

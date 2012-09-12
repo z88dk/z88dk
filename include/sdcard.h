@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2012
  *
- *		$Id: sdcard.h,v 1.3 2012-09-11 13:09:39 stefano Exp $
+ *		$Id: sdcard.h,v 1.4 2012-09-12 07:05:02 stefano Exp $
  * 
  */
 
@@ -107,7 +107,7 @@
 
 
 struct SD_INFO {
-unsigned char	slot;		// 0 or 1
+unsigned char	slot;		// 0, 1, etc..
 unsigned char	port;		// SD_0 or SD_1 (as above, but specifies HW address)
 unsigned char	flags;		// (sd_card_info) bit4: Block mode access, bit 0:3 card type (0:MMC,1:SD,2:SDHC)
 
@@ -144,14 +144,21 @@ extern unsigned long __LIB__ __FASTCALL__ sd_size(struct SD_INFO descriptor);
 extern unsigned long __LIB__ __FASTCALL__ sd_sectors(struct SD_INFO descriptor);
 
 // Read a given sector from the SD card
-extern int __LIB__ sd_read_sector(struct SD_INFO descriptor, long sector, unsigned char *address);
+extern int __LIB__            sd_read_sector(struct SD_INFO descriptor, long sector, unsigned char *address);
+extern int __LIB__ __CALLEE__ sd_read_sector_callee(struct SD_INFO descriptor, long sector, unsigned char *address);
+
+// Write a given sector to the SD card
+extern int __LIB__            sd_write_sector(struct SD_INFO descriptor, long sector, unsigned char *address);
+extern int __LIB__ __CALLEE__ sd_write_sector_callee(struct SD_INFO descriptor, long sector, unsigned char *address);
 
 // Unpack bits to read CID or CSD or other, bit count begins on the less signigicant position
 // of a 16 byte (128 bit) long block, thus on the rightmost bit
 extern unsigned long __LIB__             UNSTUFF_BITS(unsigned char *data, unsigned int start, unsigned int size);
 extern unsigned long __LIB__ __CALLEE__  UNSTUFF_BITS_callee(unsigned char *data, unsigned int start, unsigned int size);
 
-#define UNSTUFF_BITS(a,b,c)  UNSTUFF_BITS_callee(a,b,c)
+#define sd_read_sector(a,b,c)  sd_read_sector_callee(a,b,c)
+#define sd_write_sector(a,b,c)  sd_write_sector_callee(a,b,c)
+#define UNSTUFF_BITS(a,b,c)    UNSTUFF_BITS_callee(a,b,c)
 
 
 // Reserved functions, internal use only

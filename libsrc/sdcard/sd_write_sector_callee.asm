@@ -1,0 +1,107 @@
+;
+;	Old School Computer Architecture - SD Card driver
+;	Taken from the OSCA Bootcode by Phil Ruston 2011
+;	Port by Stefano Bodrato, 2012
+;
+;	int sd_write_sector(struct SD_INFO descriptor, long sector, unsigned char *address);
+;
+;	sd_card_info and card_select must be accessible, 
+;	a good place to put them is in the vars declared in the CRT0 stub
+;
+;	on exit: 0 if all OK or error code
+;
+;	$Id: sd_write_sector_callee.asm,v 1.1 2012-09-12 07:05:02 stefano Exp $
+;
+
+	XLIB	sd_write_sector_callee
+	XDEF	ASMDISP_SD_WRITE_SECTOR_CALLEE
+
+	XREF	sd_card_info
+	XREF	card_select
+
+	LIB		sd_write_sector_main
+	LIB		sd_deselect_card
+	LIB		sd_set_sector_addr_regs
+	LIB		sd_send_command_current_args
+	LIB		sd_send_eight_clocks
+	LIB		sd_send_byte
+	LIB		sd_get_byte
+
+    INCLUDE "sdcard.def"
+
+sd_write_sector_callee:
+
+	pop af	; ret addr
+	pop bc	; dst addr
+	pop hl	; sector pos lsb
+	pop de	; sector pos msb
+	pop ix	; SD_INFO struct
+	push af
+
+.asmentry
+						; ptr to MMC mask to be used to select port
+	ld	a,(ix+1)		; or any other hw dependent reference to current slot
+	ld	(card_select), a
+	ld	a,(ix+2)
+	ld	(sd_card_info), a
+	
+	push bc
+	call sd_set_sector_addr_regs
+
+	ld a,CMD24			; Send CMD24 write sector command
+	call sd_send_command_current_args
+	pop hl
+	ld a,sd_error_bad_command_response
+	jr nz, write_end
+	
+	push hl
+	call sd_send_eight_clocks		; wait 8 clocks before proceding	
+
+	ld a,$fe
+	call sd_send_byte			; send $FE = packet header code
+
+	pop hl
+;..............................................................................................	
+
+	call sd_write_sector_main
+
+;.............................................................................................	
+
+	call sd_get_byte			; get packet response
+	and $1f
+	srl a
+	cp $02
+	jr z,sd_wr_ok
+
+sd_write_fail:
+	ld a,sd_error_write_failed
+	jr write_end
+
+sd_wr_ok:
+	ld bc,65535			; read bytes until $ff is received
+sd_wcbsy:
+	call sd_get_byte			; until that time, card is busy
+	cp $ff
+	jr nz,sd_busy
+	xor a				; A = 0, all OK
+	jr write_end
+	
+sd_busy:
+	dec bc
+	ld a,b
+	or c
+	jr nz,sd_wcbsy
+
+sd_card_busy_timeout:
+	ld a,sd_error_write_timeout
+
+write_end:
+	call sd_deselect_card		; Routines always deselect card on return
+
+;	or a				; If A = 0 on SD routine exit, ZF set on return: No error
+	ld h,0
+	ld l,a
+	ret
+
+
+DEFC ASMDISP_SD_WRITE_SECTOR_CALLEE = asmentry - sd_write_sector_callee

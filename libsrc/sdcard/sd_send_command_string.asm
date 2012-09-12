@@ -6,7 +6,7 @@
 ;	set HL = location of 6 byte command string
 ;	returns command response in A (ZF set if $00)
 ;
-;	$Id: sd_send_command_string.asm,v 1.2 2012-09-11 13:09:39 stefano Exp $
+;	$Id: sd_send_command_string.asm,v 1.3 2012-09-12 07:05:02 stefano Exp $
 ;
 
 

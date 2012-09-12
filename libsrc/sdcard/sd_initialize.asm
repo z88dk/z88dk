@@ -6,7 +6,7 @@
 ;	Init SD card communications
 ;	Input: HL = card slot number
 ;
-;	$Id: sd_initialize.asm,v 1.2 2012-09-11 13:09:39 stefano Exp $
+;	$Id: sd_initialize.asm,v 1.3 2012-09-12 07:05:02 stefano Exp $
 ;
 
 	XLIB	sd_initialize
