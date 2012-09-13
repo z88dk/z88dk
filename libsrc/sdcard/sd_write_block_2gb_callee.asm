@@ -10,11 +10,11 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_write_sector_callee.asm,v 1.2 2012-09-13 07:24:17 stefano Exp $
+;	$Id: sd_write_block_2gb_callee.asm,v 1.1 2012-09-13 07:24:17 stefano Exp $
 ;
 
-	XLIB	sd_write_sector_callee
-	XDEF	ASMDISP_SD_WRITE_SECTOR_CALLEE
+	XLIB	sd_write_block_2gb_callee
+	XDEF	ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
 
 	XREF	sd_card_info
 	XREF	card_select
@@ -29,7 +29,7 @@
 
     INCLUDE "sdcard.def"
 
-sd_write_sector_callee:
+sd_write_block_2gb_callee:
 
 	pop af	; ret addr
 	pop bc	; dst addr
@@ -39,6 +39,14 @@ sd_write_sector_callee:
 	push af
 
 .asmentry
+
+IF SDHC_SUPPORT
+	ld a,(sd_card_info)
+	and $10
+	ld a,sd_error_too_big
+	jr nz,write_end			; if SDHC card, linear addressing is not supported
+ENDIF
+
 						; ptr to MMC mask to be used to select port
 	ld	a,(ix+1)		; or any other hw dependent reference to current slot
 	ld	(card_select), a
@@ -46,7 +54,7 @@ sd_write_sector_callee:
 	ld	(sd_card_info), a
 	
 	push bc
-	scf
+	sub a ; reset carry flag
 	call sd_set_sector_addr_regs
 
 	ld a,CMD24			; Send CMD24 write sector command
@@ -105,4 +113,4 @@ write_end:
 	ret
 
 
-DEFC ASMDISP_SD_WRITE_SECTOR_CALLEE = asmentry - sd_write_sector_callee
+DEFC ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE = asmentry - sd_write_block_2gb_callee

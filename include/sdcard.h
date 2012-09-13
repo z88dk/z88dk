@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2012
  *
- *		$Id: sdcard.h,v 1.4 2012-09-12 07:05:02 stefano Exp $
+ *		$Id: sdcard.h,v 1.5 2012-09-13 07:24:17 stefano Exp $
  * 
  */
 
@@ -143,6 +143,14 @@ extern unsigned long __LIB__ __FASTCALL__ sd_size(struct SD_INFO descriptor);
 // Compute the SD/MMC card size (in sectors).
 extern unsigned long __LIB__ __FASTCALL__ sd_sectors(struct SD_INFO descriptor);
 
+// Given a linear address, read 512 bytes from the SD or MMC card (only for cards < 2GB)
+extern int __LIB__            sd_read_block_2gb(struct SD_INFO descriptor, long sector, unsigned char *address);
+extern int __LIB__ __CALLEE__ sd_read_block_2gb_callee(struct SD_INFO descriptor, long sector, unsigned char *address);
+
+// Given a linear address, write 512 bytes to the SD or MMC  card (only for cards < 2GB)
+extern int __LIB__            sd_write_block_2gb(struct SD_INFO descriptor, long sector, unsigned char *address);
+extern int __LIB__ __CALLEE__ sd_write_block_2gb_callee(struct SD_INFO descriptor, long sector, unsigned char *address);
+
 // Read a given sector from the SD card
 extern int __LIB__            sd_read_sector(struct SD_INFO descriptor, long sector, unsigned char *address);
 extern int __LIB__ __CALLEE__ sd_read_sector_callee(struct SD_INFO descriptor, long sector, unsigned char *address);
@@ -156,6 +164,8 @@ extern int __LIB__ __CALLEE__ sd_write_sector_callee(struct SD_INFO descriptor, 
 extern unsigned long __LIB__             UNSTUFF_BITS(unsigned char *data, unsigned int start, unsigned int size);
 extern unsigned long __LIB__ __CALLEE__  UNSTUFF_BITS_callee(unsigned char *data, unsigned int start, unsigned int size);
 
+#define sd_read_block_2gb(a,b,c)  sd_read_block_2gb_callee(a,b,c)
+#define sd_write_block_2gb(a,b,c)  sd_write_block_2gb_callee(a,b,c)
 #define sd_read_sector(a,b,c)  sd_read_sector_callee(a,b,c)
 #define sd_write_sector(a,b,c)  sd_write_sector_callee(a,b,c)
 #define UNSTUFF_BITS(a,b,c)    UNSTUFF_BITS_callee(a,b,c)

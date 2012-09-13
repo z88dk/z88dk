@@ -86,11 +86,16 @@ osca/get_bank
 osca/set_bank
 osca/inc_bank
 sdcard/sd_initialize
+sdcard/sd_init_main
 sdcard/sd_load
 sdcard/sd_read_bytes
 sdcard/sd_read_cid
 sdcard/sd_read_csd
 sdcard/sd_get_cid_csd
+sdcard/sd_read_block_2gb
+sdcard/sd_read_block_2gb_callee
+sdcard/sd_write_block_2gb
+sdcard/sd_write_block_2gb_callee
 sdcard/sd_read_sector
 sdcard/sd_read_sector_callee
 sdcard/osca/sd_read_sector_main
@@ -110,7 +115,6 @@ sdcard/osca/pause_4ms
 sdcard/osca/sd_select_card
 sdcard/osca/sd_deselect_card
 sdcard/osca/sd_get_byte
-sdcard/osca/sd_init_main
 sdcard/osca/sd_power_off
 sdcard/osca/sd_power_on
 sdcard/osca/sd_select_card

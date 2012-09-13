@@ -6,7 +6,7 @@
 ;	set HL to dest address for data
 ;	set B to number of bytes required  
 ;
-;	$Id: sd_set_sector_addr_regs.asm,v 1.3 2012-09-11 13:09:39 stefano Exp $
+;	$Id: sd_set_sector_addr_regs.asm,v 1.4 2012-09-13 07:24:17 stefano Exp $
 ;
 
 	XLIB	sd_set_sector_addr_regs
@@ -25,7 +25,8 @@ sd_set_sector_addr_regs:
 	ld	e,d
 	ld	d,l
 
-
+	jr	nc,lbatoargs	; if C is reset -> do not multiply by 512
+						; (linear addressing for cards <= 2GB only)
 IF SDHC_SUPPORT
 	ld a,(sd_card_info)
 	and $10

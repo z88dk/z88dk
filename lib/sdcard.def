@@ -2,7 +2,7 @@ lstoff
 
 ; SD Card common definitions
 
-; $Id: sdcard.def,v 1.1 2012-07-10 05:55:38 stefano Exp $
+; $Id: sdcard.def,v 1.2 2012-09-13 07:24:17 stefano Exp $
 
 
 	defc	sd_error_spi_mode_failed	= $01
@@ -18,6 +18,7 @@ lstoff
 	defc	sd_error_data_token_timeout		= $22
 	defc	sd_error_write_timeout			= $23
 	defc	sd_error_write_failed			= $24
+	defc	sd_error_too_big				= $25
 
 
 ;  ---------------------- SD protocol commands ------------------------------------
@@ -33,21 +34,25 @@ lstoff
 	defc	CMD10                    = $4A
 	;;defc	SD_READ_CID              = $4A
 
+	defc	CMD12                    = $4C
 	defc	SD_TERMINATE_MULTI_READ  = $4C
 
 	defc	CMD13                    = $4D
 	defc	SD_STATUS                = $4D
 
+	defc	CMD16                    = $50
 	defc	SD_SET_BLOCK_SIZE        = $50
 
 	defc	CMD17                    = $51
 	defc	MMC_READ_SINGLE_BLOCK    = $51
 
+	defc	CMD18                    = $52
 	defc	SD_READ_MULTIPLE_BLOCK   = $52
 
 	defc	CMD24                    = $58
 	defc	SD_WRITE_SINGLE_BLOCK    = $58
 
+	defc	CMD25                    = $59
 	defc	SD_WRITE_MULTIPLE_BLOCK  = $59
 
 	defc	SD_START_TAG             = $60

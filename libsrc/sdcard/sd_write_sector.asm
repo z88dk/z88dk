@@ -10,7 +10,7 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_write_sector.asm,v 1.2 2012-09-12 07:05:02 stefano Exp $
+;	$Id: sd_write_sector.asm,v 1.3 2012-09-13 07:24:17 stefano Exp $
 ;
 
 	XLIB	sd_write_sector

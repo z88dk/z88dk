@@ -10,15 +10,15 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_read_sector.asm,v 1.4 2012-09-13 07:24:17 stefano Exp $
+;	$Id: sd_read_block_2gb.asm,v 1.1 2012-09-13 07:24:17 stefano Exp $
 ;
 
-	XLIB	sd_read_sector
+	XLIB	sd_read_block_2gb
 
-	LIB		sd_read_sector_callee
-	XREF	ASMDISP_SD_READ_SECTOR_CALLEE
+	LIB		sd_read_block_2gb_callee
+	XREF	ASMDISP_SD_READ_BLOCK_2GB_CALLEE
 
-sd_read_sector:
+sd_read_block_2gb:
 	pop af	; ret addr
 	pop bc	; dst addr
 	pop hl	; sector pos lsb
@@ -27,5 +27,5 @@ sd_read_sector:
 	
 	push af
 	
-	jp sd_read_sector_callee + ASMDISP_SD_READ_SECTOR_CALLEE
+	jp sd_read_block_2gb_callee + ASMDISP_SD_READ_BLOCK_2GB_CALLEE
 
