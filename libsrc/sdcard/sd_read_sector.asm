@@ -10,7 +10,7 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_read_sector.asm,v 1.4 2012-09-13 07:24:17 stefano Exp $
+;	$Id: sd_read_sector.asm,v 1.5 2012-09-20 21:13:16 stefano Exp $
 ;
 
 	XLIB	sd_read_sector
@@ -20,7 +20,8 @@
 
 sd_read_sector:
 	pop af	; ret addr
-	pop bc	; dst addr
+	pop hl	; dst addr
+	exx
 	pop hl	; sector pos lsb
 	pop de	; sector pos msb
 	pop ix	; SD_INFO struct

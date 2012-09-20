@@ -9,7 +9,7 @@
 ;
 ;       Stefano - Sept 2011
 ;
-;	$Id: w_pixladdr.asm,v 1.1 2011-09-02 12:43:57 stefano Exp $
+;	$Id: w_pixladdr.asm,v 1.2 2012-09-20 21:13:15 stefano Exp $
 ;
 ;
 ; ******************************************************************
@@ -32,18 +32,14 @@
         ld      l,e             ;hl = y
         ld      h,d
 
-        add     hl,hl           ;hl = y * 32;
-        add     hl,hl
-        add     hl,hl
-        add     hl,hl
-        add     hl,hl
-
-        ex      de,hl           ;de = y * 32; hl = y
-
         add     hl,hl           ;hl = y * 8
         add     hl,hl
         add     hl,hl
-
+        ld		d,h
+        ld		e,l
+        add     hl,hl           ;hl = y * 32
+        add     hl,hl
+        
         add     hl,de           ;hl = (y * 32)+(y * 8)
 
         ld      e,c             ;de = x

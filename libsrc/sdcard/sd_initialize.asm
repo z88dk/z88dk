@@ -6,7 +6,7 @@
 ;	Init SD card communications
 ;	Input: HL = card slot number
 ;
-;	$Id: sd_initialize.asm,v 1.3 2012-09-12 07:05:02 stefano Exp $
+;	$Id: sd_initialize.asm,v 1.4 2012-09-20 21:13:16 stefano Exp $
 ;
 
 	XLIB	sd_initialize
@@ -31,11 +31,11 @@ sd_initialize:
 sd_inok:
 	call sd_spi_port_fast		; on initializtion success -  switch to fast clock 
 
-	call sd_read_cid			; and read CID/CSD
-	jr nz,sd_done
-	push hl				; cache the location of the ID string
-	call sd_read_csd
-	pop hl
+;	call sd_read_cid			; and read CID/CSD
+;	jr nz,sd_done
+;	push hl				; cache the location of the ID string
+;	call sd_read_csd
+;	pop hl
 
 sd_done:
 	call sd_deselect_card		; Routines always deselect card on return

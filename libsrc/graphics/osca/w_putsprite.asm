@@ -6,7 +6,7 @@
 ; TS2068 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.2 2011-09-09 06:03:28 stefano Exp $
+; $Id: w_putsprite.asm,v 1.3 2012-09-20 21:13:15 stefano Exp $
 ;
 
         XLIB    putsprite
@@ -84,11 +84,11 @@
         ld      l,e                 ; display location from pixeladdress
 
         ld      a,(ix+0)
+        ld       d,a
+        ld       b,(ix+1)
         cp      9
         jp      nc,putspritew
 
-         ld       d,a
-         ld       b,(ix+1)
 ._oloop  push     bc                ;Save # of rows
          ld       b,d               ;Load width
          ld       c,(ix+2)          ;Load one line of image
@@ -137,8 +137,6 @@
 
 
 .putspritew
-         ld       d,a
-         ld       b,(ix+1)        
 .woloop  push     bc                ;Save # of rows
          ld       b,d               ;Load width
          ld       c,(ix+2)          ;Load one line of image

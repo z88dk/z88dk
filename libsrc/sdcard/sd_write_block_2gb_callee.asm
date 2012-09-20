@@ -10,7 +10,7 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_write_block_2gb_callee.asm,v 1.1 2012-09-13 07:24:17 stefano Exp $
+;	$Id: sd_write_block_2gb_callee.asm,v 1.2 2012-09-20 21:13:16 stefano Exp $
 ;
 
 	XLIB	sd_write_block_2gb_callee
@@ -32,7 +32,8 @@
 sd_write_block_2gb_callee:
 
 	pop af	; ret addr
-	pop bc	; dst addr
+	pop hl	; dst addr
+	exx
 	pop hl	; sector pos lsb
 	pop de	; sector pos msb
 	pop ix	; SD_INFO struct
@@ -53,25 +54,22 @@ ENDIF
 	ld	a,(ix+2)
 	ld	(sd_card_info), a
 	
-	push bc
 	sub a ; reset carry flag
 	call sd_set_sector_addr_regs
 
 	ld a,CMD24			; Send CMD24 write sector command
 	call sd_send_command_current_args
-	pop hl
 	ld a,sd_error_bad_command_response
 	jr nz, write_end
 	
-	push hl
 	call sd_send_eight_clocks		; wait 8 clocks before proceding	
 
 	ld a,$fe
 	call sd_send_byte			; send $FE = packet header code
 
-	pop hl
 ;..............................................................................................	
 
+	exx
 	call sd_write_sector_main
 
 ;.............................................................................................	

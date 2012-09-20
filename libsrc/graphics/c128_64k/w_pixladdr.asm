@@ -7,7 +7,7 @@
         XREF    _vdcDispMem
 
 ;
-;       $Id: w_pixladdr.asm,v 1.1 2008-07-17 15:39:56 stefano Exp $
+;       $Id: w_pixladdr.asm,v 1.2 2012-09-20 21:13:15 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -38,18 +38,13 @@
         ld      l,e             ;hl = y
         ld      h,d
 
-        add     hl,hl           ;hl = y * 64;
-        add     hl,hl
-        add     hl,hl
-        add     hl,hl
-        add     hl,hl
-        add     hl,hl
-
-        ex      de,hl           ;de = y * 64; hl = y
-
         add     hl,hl           ;hl = y * 16
         add     hl,hl
         add     hl,hl
+        add     hl,hl
+		ld		d,h
+		ld		e,l
+        add     hl,hl			;hl = y*64
         add     hl,hl
 
         add     hl,de           ;hl = (y * 64)+(y * 16)

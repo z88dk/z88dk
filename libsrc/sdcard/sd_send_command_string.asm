@@ -6,7 +6,7 @@
 ;	set HL = location of 6 byte command string
 ;	returns command response in A (ZF set if $00)
 ;
-;	$Id: sd_send_command_string.asm,v 1.4 2012-09-13 07:24:17 stefano Exp $
+;	$Id: sd_send_command_string.asm,v 1.5 2012-09-20 21:13:16 stefano Exp $
 ;
 
 
@@ -18,6 +18,8 @@
 	XDEF	cmd_generic_args
 	XDEF	cmd_generic_crc
 	XDEF	sd_wait_valid_response
+
+	XREF	sd_before_get
 	
 	LIB		sd_select_card
 	LIB		sd_send_eight_clocks
@@ -65,8 +67,8 @@ sd_sclp:
 	djnz sd_sclp
 	pop bc
 	
-	;call sd_get_byte			; skip first byte of nCR, a quirk of the OSCA V6 SD card interface?
-	
+	call sd_get_byte			; skip first byte of nCR, a quirk of the OSCA V6 SD card interface?
+	;call sd_before_get		; this is a slightly heavy workaround, no command byte is sent  ;)
 
 sd_wait_valid_response:
 	
@@ -77,7 +79,7 @@ sd_wncrl:
 	bit 7,a				; If bit 7 = 0, it's a valid response
 	jr z,sd_gcr
 	djnz sd_wncrl
-					
+
 sd_gcr:
 	or a				; zero flag set if Command response = 00
 	pop bc

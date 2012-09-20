@@ -6,7 +6,7 @@
 ;	set HL to dest address for data
 ;	set B to number of bytes required  
 ;
-;	$Id: sd_set_sector_addr_regs.asm,v 1.4 2012-09-13 07:24:17 stefano Exp $
+;	$Id: sd_set_sector_addr_regs.asm,v 1.5 2012-09-20 21:13:16 stefano Exp $
 ;
 
 	XLIB	sd_set_sector_addr_regs

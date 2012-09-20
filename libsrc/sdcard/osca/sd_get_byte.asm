@@ -6,25 +6,29 @@
 ;
 ;	Returns byte read from card in A
 ;
-;	$Id: sd_get_byte.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $
+;	$Id: sd_get_byte.asm,v 1.2 2012-09-20 21:13:16 stefano Exp $
 ;
 
 
 	XLIB	sd_get_byte
+	XDEF	sd_before_get
+	
 	LIB		sd_send_eight_clocks
-	;XREF	sd_waitserend
+	XREF	sd_waitserend
 	
     INCLUDE "osca.def"
 
 
 sd_get_byte:
 
-	;ld a,$ff
-	;out (sys_spi_port),a		; send 8 clocks
-	;
-	;call sd_waitserend
-	
-	call sd_send_eight_clocks
+	call sd_before_get
+	;call sd_send_eight_clocks
 
 	in a,(sys_spi_port)			; read the contents of the shift register
 	ret
+
+sd_before_get:
+	ld a,$ff
+	out (sys_spi_port),a		; send 8 clocks
+	
+	jp sd_waitserend

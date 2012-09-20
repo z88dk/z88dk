@@ -10,7 +10,7 @@
 ;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,v 1.29 2011-09-02 12:43:57 stefano Exp $
+;	$Id: grafix.inc,v 1.30 2012-09-20 21:13:15 stefano Exp $
 ;
 
 
@@ -141,6 +141,8 @@ IF FORosca
 	DEFINE gotgfx
 	defc maxx	= 320
 	defc maxy	= 200
+	; untested 240 lines resolution, see 'libsrc/graphics/osca'
+	;defc maxy	= 240
 ENDIF
 
 IF FORc128hr

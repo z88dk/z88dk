@@ -3,7 +3,7 @@
 ;       Stefano - Sept 2011
 ;
 ;
-;	$Id: clg.asm,v 1.2 2012-01-31 20:58:07 stefano Exp $
+;	$Id: clg.asm,v 1.3 2012-09-20 21:13:15 stefano Exp $
 ;
 
     INCLUDE "flos.def"
@@ -22,10 +22,23 @@
 
 	ld a,0
 	ld (vreg_rasthi),a		; select y window reg
+
+	ld e,90			; y display settings for PAL display: 200 lines
+	;ld e,61			; y display settings for PAL display: 240 lines
+	in a,(sys_vreg_read)
+	bit 5,a
+	jr z,paltv
+	ld e,56	; y display settings for non-PAL display: 200 lines
+	;ld e,27 ; I'm only guessing this one for 240 lines
+.paltv
+	ld	a,e
+	ld (vreg_window),a		; set y window size/position (200 lines in docs, but I hope to get to 240)
+	
 	;ld a,$5a
 	;ld a,$2e
-	ld a,64
-	ld (vreg_window),a		; set y window size/position (200 lines)
+	;ld a,64
+	;ld (vreg_window),a		; set y window size/position (200 lines)
+
 	ld a,@00000100
 	ld (vreg_rasthi),a		; select x window reg
 	ld a,$8c

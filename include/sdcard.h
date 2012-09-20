@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2012
  *
- *		$Id: sdcard.h,v 1.5 2012-09-13 07:24:17 stefano Exp $
+ *		$Id: sdcard.h,v 1.6 2012-09-20 21:13:15 stefano Exp $
  * 
  */
 
@@ -75,6 +75,23 @@
 #define SD_STARTBLOCK_MWRITE		0xFC
 #define	SD_STOP_TRAN				0xFD
 #define SD_STOPTRAN_WRITE			0xFD	// Alias
+
+
+// Error codes (z88dk internals)
+#define sd_error_spi_mode_failed		0x01
+
+#define sd_error_mmc_init_failed		0x10
+#define sd_error_sd_init_failed			0x11
+#define sd_error_sdhc_init_failed		0x12
+#define sd_error_vrange_bad				0x13
+#define sd_error_check_pattern_bad		0x14
+
+#define sd_error_illegal_command			0x20
+#define sd_error_bad_command_response		0x21
+#define sd_error_data_token_timeout			0x22
+#define sd_error_write_timeout				0x23
+#define sd_error_write_failed				0x24
+#define sd_error_too_big					0x25
 
 
 // MMC/SD in SPI mode reports two status bytes for SEND_STATUS
