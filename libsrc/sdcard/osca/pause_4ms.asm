@@ -6,7 +6,7 @@
 ;
 ;	Short delay to sync communications with card
 ;
-;	$Id: pause_4ms.asm,v 1.2 2012-09-20 21:13:16 stefano Exp $
+;	$Id: pause_4ms.asm,v 1.3 2012-09-21 14:02:22 stefano Exp $
 ;
 
 

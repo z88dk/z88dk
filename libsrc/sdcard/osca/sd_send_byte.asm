@@ -5,8 +5,10 @@
 ;	Ported by Stefano Bodrato, 2012
 ;
 ;	Put byte to send to card in A
+;	C holds the checksum, do not alter it in a command sequence
+;   Corrupts H and B
 ;
-;	$Id: sd_send_byte.asm,v 1.2 2012-09-20 21:13:16 stefano Exp $
+;	$Id: sd_send_byte.asm,v 1.3 2012-09-21 14:02:22 stefano Exp $
 ;
 
 
@@ -18,9 +20,25 @@
 
 sd_send_byte:
 
-
 	out (sys_spi_port),a		; send byte to serializer
-	
+; ------------------------
+	ld d,8		; 8 bits
+crcloop:
+	sla c		; crc <<= 1;
+	ld	e,a
+	xor c
+	and $80		; if ((byte & 0x80) ^ (crc & 0x80)) ..
+	jr z,isz
+	ld a,9		; .. then crc ^= 0x09
+	xor c
+	ld c,a
+isz:
+	ld a,e
+	rla			; byte <<=1;
+;	djnz crcloop
+	dec d
+	jr nz,crcloop
+; ------------------------
 sd_waitserend:
 	in a,(sys_hw_flags)			; wait for serialization to end
 	bit 6,a

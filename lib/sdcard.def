@@ -2,7 +2,7 @@ lstoff
 
 ; SD Card common definitions
 
-; $Id: sdcard.def,v 1.2 2012-09-13 07:24:17 stefano Exp $
+; $Id: sdcard.def,v 1.3 2012-09-21 14:02:22 stefano Exp $
 
 
 	defc	sd_error_spi_mode_failed	= $01
@@ -23,10 +23,13 @@ lstoff
 
 ;  ---------------------- SD protocol commands ------------------------------------
 
+	defc	CMD0                     = $40
 	defc	SD_GO_IDLE_STATE         = $40
 
 	defc	CMD1                     = $41
 	defc	SD_SEND_OP_COND          = $41
+
+	defc	CMD8                     = $48
 
 	defc	CMD9                     = $49
 	;;defc	SD_READ_CSD              = $49

@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2012
  *
- *		$Id: sdcard.h,v 1.6 2012-09-20 21:13:15 stefano Exp $
+ *		$Id: sdcard.h,v 1.7 2012-09-21 14:02:21 stefano Exp $
  * 
  */
 

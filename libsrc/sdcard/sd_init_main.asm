@@ -7,7 +7,7 @@
 ;	Init SD card communications
 ;	On entry: A=card slot number
 ;
-;	$Id: sd_init_main.asm,v 1.3 2012-09-20 21:13:16 stefano Exp $
+;	$Id: sd_init_main.asm,v 1.4 2012-09-21 14:02:22 stefano Exp $
 ;
 
 
@@ -18,6 +18,7 @@
 	LIB		sd_power_off
 	LIB		sd_send_eight_clocks
 	LIB		sd_send_command_string
+	XREF	sd_send_command_int_args
 	XREF	sd_send_command_null_args
 	XREF	sd_card_info
 	LIB		sd_read_bytes_to_sector_buffer
@@ -28,17 +29,20 @@
     XREF	sd_card_info
 
 
-CMD0_string:
-	defb $40,$00,$00,$00,$00,$95
+;CMD0_string:
+;	defb $40,$00,$00,$00,$00,$95
+;	defb $40,$00,$00,$00,$00
 
 
 IF SDHC_SUPPORT
 
-CMD8_string:
-	defb $48,$00,$00,$01,$aa,$87
+;CMD8_string:
+;	defb $48,$00,$00,$01,$aa,$87
+;	defb $48,$00,$00,$01,$aa
 
 ACMD41HCS_string:
-	defb $69,$40,$00,$00,$00,$01
+;	defb $69,$40,$00,$00,$00,$01
+	defb $69,$40,$00,$00,$00
 
 ENDIF
 
@@ -64,8 +68,8 @@ sd_ecilp:
 	call sd_send_eight_clocks
 	djnz sd_ecilp
 	
-	ld hl,CMD0_string			; Send Reset Command CMD0 ($40,$00,$00,$00,$00,$95)
-	call sd_send_command_string		; (When /CS is low on receipt of CMD0, card enters SPI mode) 
+	ld	a,CMD0			; Send Reset Command CMD0 ($40,$00,$00,$00,$00,$95)
+	call sd_send_command_null_args
 	cp $01				; Command Response should be $01 ("In idle mode")
 	jr z,sd_spi_mode_ok
 	
@@ -80,8 +84,11 @@ sd_spi_mode_ok:
 
 IF SDHC_SUPPORT
 
-	ld hl,CMD8_string			; send CMD8 ($48,$00,$00,$01,$aa,$87) to test for SDHC card
-	call sd_send_command_string
+	;ld hl,CMD8_string			; send CMD8 ($48,$00,$00,$01,$aa,$87) to test for SDHC card
+	;call sd_send_command_string
+	ld a,CMD8
+	ld de,$1AA	; 0x1AA means that the card is SDC V2 and can work at voltage range of 2.7 to 3.6 volts.
+	call sd_send_command_int_args
 	cp $01
 	jr nz,sd_sdc_init			; if R1 response is not $01: illegal command: not an SDHC card
 

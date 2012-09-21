@@ -6,7 +6,7 @@
 ;	int sd_load(slot, struct SD_INFO sd_descriptor)
 ;		result: 0-OK, 
 ;
-;	$Id: sd_load.asm,v 1.5 2012-09-20 21:13:16 stefano Exp $ 
+;	$Id: sd_load.asm,v 1.6 2012-09-21 14:02:22 stefano Exp $ 
 ;
 ;-----------------------------------------------------------------------------------------
 ; Init SD interface. look for card, etc..
