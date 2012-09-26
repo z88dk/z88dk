@@ -7,7 +7,7 @@
 ;	Init SD card communications
 ;	On entry: A=card slot number
 ;
-;	$Id: sd_init_main.asm,v 1.4 2012-09-21 14:02:22 stefano Exp $
+;	$Id: sd_init_main.asm,v 1.5 2012-09-26 14:15:25 stefano Exp $
 ;
 
 

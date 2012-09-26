@@ -5,7 +5,7 @@
 ;
 ;	Send 8 clocks to card, used in various places to keep communications stable
 ;
-;	$Id: sd_send_eight_clocks.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $
+;	$Id: sd_send_eight_clocks.asm,v 1.2 2012-09-26 14:15:25 stefano Exp $
 ;
 
 	XLIB	sd_send_eight_clocks
@@ -16,5 +16,4 @@
 sd_send_eight_clocks:
 
 	ld a,$ff
-	call sd_send_byte
-	ret
+	jp sd_send_byte
