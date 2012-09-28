@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2012
  *
- *		$Id: sdcard.h,v 1.7 2012-09-21 14:02:21 stefano Exp $
+ *		$Id: sdcard.h,v 1.8 2012-09-28 12:33:32 stefano Exp $
  * 
  */
 
@@ -189,7 +189,8 @@ extern unsigned long __LIB__ __CALLEE__  UNSTUFF_BITS_callee(unsigned char *data
 
 
 // Reserved functions, internal use only
-extern void __LIB__ __FASTCALL__ sd_initialize(int card);
+//extern void __LIB__ __FASTCALL__ sd_initialize(int card);
+/*
 extern void __LIB__ sd_deselect_card();
 extern void __LIB__ sd_send_eight_clocks();
 extern void __LIB__ sd_wait_data_token();
@@ -197,7 +198,7 @@ extern void __LIB__ pause_4ms();
 // WIP, perhaps a card number parameter should be added
 extern void __LIB__ sd_power_off();
 extern void __LIB__ sd_power_on();
-
+*/
 // Asks CRT0 stub to reserve some service variables for SDCARD
 #pragma output NEED_SDCARD
 

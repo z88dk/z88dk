@@ -856,6 +856,11 @@
 =
 	ld	hl,0
 
+	ld	h,0
+	call	l_gint	;
+=
+	call	l_gchar	;
+
 	call	l_glong
 	ld	hl,0
 	ld	de,0

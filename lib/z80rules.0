@@ -218,8 +218,7 @@
 	ld	h,0
 	call	l_pint_pop
 =
-	call	l_gint
-	ld	h,0
+	call	l_gchar
 
 	ld	hl,%1	;const
 	call	l_gint
