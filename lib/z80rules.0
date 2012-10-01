@@ -687,3 +687,12 @@
 =
 	ld	hl,%1	;const
 	call	l_gcharsp	;
+
+	ld	de,256	;const
+	ex	de,hl
+	call	l_div
+	ld	hl,(%1)
+=
+	ld	d,0
+	ld	e,h
+	ld	hl,(%1)

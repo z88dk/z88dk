@@ -2213,6 +2213,13 @@
 .%2
 .%1
 
+	ld	hl,%1	;const
+	ld	(%2),hl
+	ld	hl,0	;const
+=
+	ld	hl,%1	;const
+	ld	(%2),hl
+
 	ex	de,hl
 	ex	de,hl
 =
