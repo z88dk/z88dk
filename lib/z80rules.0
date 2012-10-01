@@ -690,7 +690,7 @@
 
 	ld	de,256	;const
 	ex	de,hl
-	call	l_div
+	call	l_div_u
 	ld	hl,(%1)
 =
 	ld	d,0
