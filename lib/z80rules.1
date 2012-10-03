@@ -370,12 +370,10 @@
 	push	hl
 
 	push	bc
-	ld	hl,%1	;const
+	ld	hl,%1
 	pop	bc
-	push	hl
 =
-	ld	hl,%1	;const
-	push	hl
+	ld	hl,%1
 
 	pop	hl
 	push	hl
@@ -1431,12 +1429,6 @@
 	add	hl,bc
 	push	hl
 
-	push	bc
-	ld	hl,%1
-	pop	bc
-=
-	ld	hl,%1
-
 	call	exit
 	ret
 =
@@ -2215,7 +2207,7 @@
 
 	ld	hl,%1	;const
 	ld	(%2),hl
-	ld	hl,0	;const
+	ld	hl,%1	;const
 =
 	ld	hl,%1	;const
 	ld	(%2),hl

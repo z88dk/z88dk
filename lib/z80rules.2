@@ -861,6 +861,56 @@
 =
 	call	l_gchar	;
 
+	ld	a,l
+	call	l_sxt
+	ld	hl,(_%1)
+=
+	ld	hl,(_%1)
+	ld	a,l
+	call	l_sxt
+
+	ld	a,l
+	call	l_sxt
+	call	l_glong
+=
+	call	l_glong
+
+	call	l_int2long_s
+	call	l_gchar
+=
+	call	l_gchar
+	ld	a,l
+	call	l_sxt
+	call	l_int2long_s
+
+	call	l_int2long_s
+	call	l_gint	;
+=
+	call	l_gint	;
+	call	l_int2long_s
+
+	ld	a,l
+	call	l_sxt
+	call	l_gint	;
+=
+	call	l_gint	;
+
+	add	hl,sp
+	call	ifix
+	call	dload
+=
+	add	hl,sp
+	call	dload
+	call	ifix
+
+	call	ifix
+	ld	hl,_%1
+	call	dload
+=
+	ld	hl,_%1
+	call	dload
+	call	ifix
+
 	call	l_glong
 	ld	hl,0
 	ld	de,0
