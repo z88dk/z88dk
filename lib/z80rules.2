@@ -1266,3 +1266,27 @@
 	ld	hl,%0	;const
 	ld	(%1),hl
 	ld	(%2),hl
+
+	ld	hl,%1	;const
+	ld	a,l
+	call	l_sxt
+	ld	a,l
+	ld	(%2),a
+	ld	h%3
+=
+	ld	a,#(%1 % 256)
+	ld	(%2),a
+	ld	h%3
+
+	ld	hl,%1	;const
+	ld	a,l
+	call	l_sxt
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	h%3
+=
+	pop	de
+	ld	a,#(%1 % 256)
+	ld	(de),a
+	ld	h%3
