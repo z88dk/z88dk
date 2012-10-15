@@ -14,7 +14,7 @@
  *	Rewrote 'miniprintn' in assembler, less usage of stack and save 180 bytes
  * 
  * --------
- * $Id: vfprintf_mini.c,v 1.6 2011-08-03 08:13:40 stefano Exp $
+ * $Id: vfprintf_mini.c,v 1.7 2012-10-15 10:40:46 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -162,6 +162,8 @@ LIB	l_int2long_s
 	cp	'u'
 	jr z,isint
 	cp	'd'
+	jr	z,isint
+	cp	'i'
 	jr	z,isint
 	cp	'f'		; fake.. we have an integer here !
 	jr nz,noint

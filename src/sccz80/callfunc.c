@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.6 2007-06-24 14:43:45 dom Exp $
+ *      $Id: callfunc.c,v 1.7 2012-10-15 10:40:46 stefano Exp $
  */
 
 /*
@@ -308,6 +308,7 @@ static int SetMiniFunc(unsigned char *arg)
                         case 'e':
                         case 'E':
                         case 'f':
+                        case '.':
                         case 'g':
                         case 'G':
                                 complex=3;
@@ -316,7 +317,7 @@ static int SetMiniFunc(unsigned char *arg)
                         case 'i':
                         case 'p':
                         case 'n':
-			case 'x':
+                        case 'x':
                                 if (complex<=2) complex=2;
                                 break;
                 }

@@ -740,3 +740,13 @@
 	ld	a,l
 	ld	(de),a
 	ld	h%2
+
+	push	de
+	ld	de,%1
+	call	%2
+	pop	de
+	pop	de
+=
+	ld	de,%1
+	call	%2
+	pop	de

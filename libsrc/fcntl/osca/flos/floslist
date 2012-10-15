@@ -1,5 +1,6 @@
 close
 lseek
+mkdir
 open
 open_z88
 read

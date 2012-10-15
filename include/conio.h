@@ -9,7 +9,7 @@
  *
  *      stefano - 18/3/2004
  *
- *	$Id: conio.h,v 1.7 2012-05-29 07:27:44 stefano Exp $
+ *	$Id: conio.h,v 1.8 2012-10-15 10:40:45 stefano Exp $
  */
 
 #ifndef __CONIO_H__
@@ -44,17 +44,17 @@
 // Color translation table
 int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 // QUICK C syntax
-#define settextcolor(a)	printf("%c[%um",27,PCDOS_COLORS[a]+30)
+#define settextcolor(a)	printf("\033[%um",PCDOS_COLORS[a]+30)
 // TURBO C syntax
-#define textcolor(a)	printf("%c[%um",27,PCDOS_COLORS[a]+30)
-#define textbackground(a)	printf("%c[%um",27,PCDOS_COLORS[a]+40)
-#define textattr(a)	printf("%c[%um%c[%um",27,PCDOS_COLORS[a&0xF]+30,27,PCDOS_COLORS[a>>4]+40)
-#define highvideo()	printf("%c[1m",27);
-#define lowvideo()	printf("%c[2m",27);
-#define normvideo()	printf("%c[m",27);
-#define delline()	printf("%c[m",27);
+#define textcolor(a)	printf("\033[%um",PCDOS_COLORS[a]+30)
+#define textbackground(a)	printf("\033[%um",PCDOS_COLORS[a]+40)
+#define textattr(a)	printf("\033[%um\033[%um",PCDOS_COLORS[a&0xF]+30,PCDOS_COLORS[a>>4]+40)
+#define highvideo()	printf("\033[1m");
+#define lowvideo()	printf("\033[2m");
+#define normvideo()	printf("\033[m");
+#define delline()	printf("\033[m");
 #define clrscr() textattr(7);fputc_cons(12)
-#define clreol() printf("%c[K",27)
+#define clreol() printf("\033[K")
 
 /* The leading underscores are for compatibility with the 
  * Digital Mars library */
@@ -68,8 +68,8 @@ int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define cscanf scanf
 #define _cscanf scanf
 
-#define gotoxy(a,b)     printf("%c[%u;%uH",27,b,a)
-#define _gotoxy(a,b)     printf("%c[%u;%uH",27,b,a)
+#define gotoxy(a,b)     printf("\033[%u;%uH",b,a)
+#define _gotoxy(a,b)     printf("\033[%u;%uH",b,a)
 
 /* Reads a character directly from the console, (without echo?) */
 #define getch()  fgetc_cons()

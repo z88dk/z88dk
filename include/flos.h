@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2011
  *
- *		$Id: flos.h,v 1.9 2012-03-30 14:46:52 stefano Exp $
+ *		$Id: flos.h,v 1.10 2012-10-15 10:40:45 stefano Exp $
  * 
  */
 
@@ -251,12 +251,13 @@ extern int __LIB__ get_current_volume();   // Current 'drive' (0..n)
 extern int __LIB__ check_volume_format();
 extern unsigned long __LIB__ get_total_sectors();
 // Directory related commands
+extern int __LIB__ __FASTCALL__ change_dir(char * dirname);
+extern int __LIB__ __FASTCALL__ make_dir(char * dirname);
 extern int __LIB__ __FASTCALL__ delete_dir(char * dirname);
 extern int __LIB__ parent_dir();
 extern int __LIB__ root_dir();
 extern int __LIB__ dir_move_first();
 extern int __LIB__ dir_move_next();
-extern int __LIB__ __FASTCALL__ change_dir(char * dirname);
 extern int __LIB__ dir_get_entry_type();  // 0=normal, 1=directory
 extern int __LIB__ dir_get_entry_name();
 extern unsigned long __LIB__ dir_get_entry_size();

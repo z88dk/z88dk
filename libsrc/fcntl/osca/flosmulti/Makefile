@@ -1,12 +1,12 @@
 #
 # Makefile for OSCA FLOS file support
 #
-# $Id: Makefile,v 1.3 2012-03-23 13:46:51 stefano Exp $
+# $Id: Makefile,v 1.4 2012-10-15 10:40:46 stefano Exp $
 
 
 include ../../../Make.config
 
-all:	open.o open_z88.o close.o read.o readbyte.o write.o writebyte.o remove.o rename.o lseek.o fdtell.o
+all:	open.o open_z88.o close.o read.o readbyte.o write.o writebyte.o remove.o rename.o mkdir.o lseek.o fdtell.o
 	$(LIBLINKER) -x../../../$(OUTPUT_DIRECTORY)/flosxdos @floslist
 
 .c.o:

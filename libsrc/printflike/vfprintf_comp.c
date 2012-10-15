@@ -63,9 +63,10 @@ int vfprintf_comp(FILE *fd, unsigned char *ctl,void *ap)
 		    c = *cx++;
 		    switch ( c ) {
 		    case 'd':
+		    case 'i':
 		    case 'u':
 		    case 'x':
-			ltoa_any(*(long *)ap,str,20,( c == 'x' ? 16 : 10 ),(c == 'd'));
+			ltoa_any(*(long *)ap,str,20,( c == 'x' ? 16 : 10 ),((c == 'd')||(c == 'i')));
 			ap -= sizeof(int);
 			break;
 		    default:
@@ -76,6 +77,7 @@ int vfprintf_comp(FILE *fd, unsigned char *ctl,void *ap)
 		    ltoa_any((unsigned long)i,str,7,10,0);
 		    break;
 		case 'd' :
+	    case 'i':
 		    ltoa_any(i,str,7,10,1);
 		    break ;
 		case 'x' :

@@ -14,7 +14,7 @@
  *	Cut down version for z88 that only handles ints
  *
  * --------
- * $Id: vfprintf_mini.c,v 1.1 2002-05-09 09:47:05 dom Exp $
+ * $Id: vfprintf_mini.c,v 1.2 2012-10-15 10:40:46 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -42,12 +42,13 @@ int vfprintf_mini(FILE *fp, unsigned char *fmt,void *ap)
                         fputc(c,fp);
                 else {
                         c = *fmt++;
-                        switch (c) {			
+                        switch (c) {
                         case 'd':
+                        case 'i':
                                 miniprintn((unsigned int)*(int *)ap,fp,1);
                                 ap -= sizeof(int);
                                 break;
-			case 'u':
+                        case 'u':
                                 miniprintn((unsigned int)*(unsigned int *)ap,fp,0);
                                 ap -= sizeof(int);
                                 break;

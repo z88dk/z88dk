@@ -61,6 +61,7 @@ osca/get_total_sectors
 osca/get_volume_count
 osca/get_volume_list
 osca/delete_dir
+osca/make_dir
 osca/parent_dir
 osca/root_dir
 osca/dir_move_first

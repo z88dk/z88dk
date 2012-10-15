@@ -5,7 +5,7 @@
  *
  *      djm 27/4/99
  *
- *	$Id: fcntl.h,v 1.12 2012-03-16 08:22:30 stefano Exp $
+ *	$Id: fcntl.h,v 1.13 2012-10-15 10:40:45 stefano Exp $
  */
 
 
@@ -43,13 +43,15 @@ extern int __LIB__ writebyte(int fd, int c);
 
 /* Open a file returning the explicit filename, with length len */
 
-extern int __LIB__ open_z88(far char *name, mode_t mode, int flags, char *explicit, size_t len);
+extern int __LIB__ open_z88(far char *name, int flags, mode_t mode, char *explicit, size_t len);
 
 /* As above except the filename is near - good for ZSock devices (z88)*/
 
 extern int __LIB__ nropen(char *name, int flags, mode_t mode, char *explicit, size_t len);
 
-extern int __LIB__ mkdir(char *, int mode);
+/* mkdir is defined in sys/stat.h */
+/* extern int __LIB__ mkdir(char *, int mode); */
+
 extern char __LIB__ *getcwd(char *buf, size_t maxlen);
 
 /* Following two only implemented for Sprinter ATM (20.11.2002) */
