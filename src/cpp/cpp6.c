@@ -2,7 +2,7 @@
  *			    C P P 6 . C
  *		S u p p o r t   R o u t i n e s
  *
- * $Id: cpp6.c,v 1.5 2010-04-11 00:20:31 dom Exp $
+ * $Id: cpp6.c,v 1.6 2012-10-16 06:23:22 stefano Exp $
  *
  *
  * Edit History
@@ -72,7 +72,7 @@
  * cget()	Like get(), but skip over TOK_SEP.
  * unget()	Push last gotten character back on the input stream.
  * cerror(), cwarn(), cfatal(), cierror(), ciwarn()
- *		These routines format an print messages to the user.
+ *		These routines format and print messages to the user.
  *		cerror & cwarn take a format and a single string argument.
  *		cierror & ciwarn take a format and a single int (char) argument.
  *		cfatal takes a format and a single string argument.
@@ -386,10 +386,19 @@ register int	(*outfun)();			/* Output/store func	*/
 	 * on the input stream.  Floating point numbers accept a trailing
 	 * 'L' for "long double".
 	 */
-done:	if (dotflag || expseen) {		/* Floating point?	*/
-	    if (c == 'l' || c == 'L') {
-		(*outfun)(c);
-		c = get();			/* Ungotten later	*/
+done:
+	    if (c == 'f' || c == 'F') {
+			if (!dotflag) {
+				(*outfun)('.');
+			}
+			dotflag = TRUE;
+			c = get();			/* Ungotten later	*/
+	    }
+
+		if (dotflag || expseen) {		/* Floating point?	*/
+			if (c == 'l' || c == 'L') {
+			(*outfun)(c);
+			c = get();			/* Ungotten later	*/
 	    }
 	}
 	else {					/* Else it's an integer	*/
@@ -921,7 +930,7 @@ char		*arg;			/* Something for the message	*/
 	if (*severity == 'S')
 	    fprintf(stderr, format, arg);
 	else
-	    fprintf(stderr, format, (int) arg);
+	    fprintf(stderr, format, (int) arg);     // !!!
 	putc('\n', stderr);
 	if ((file = infile) == NULL)
 	    return;				/* At end of file	*/
@@ -964,7 +973,7 @@ int		narg;		/* Single numeric argument		*/
  * Print a normal error message, numeric argument.
  */
 {
-	domsg("IError", format, (char *) narg);
+	domsg("IError", format, narg);	// !!!
 	errors++;
 }
 
@@ -996,8 +1005,6 @@ int		narg;			/* Single numeric argument	*/
  * A non-fatal error, numeric argument.
  */
 {
-	domsg("IWarning", format, (char *) narg);
+	domsg("IWarning", format, narg);	// !!!
 }
-
-
 

@@ -1,4 +1,4 @@
-/*  $Id: cppdef.h,v 1.3 2008-05-26 06:53:01 stefano Exp $  */
+/*  $Id: cppdef.h,v 1.4 2012-10-16 06:23:22 stefano Exp $  */
 
 #define	TRUE			1
 #define	FALSE			0
@@ -93,7 +93,7 @@
 #ifndef	OK_DATE
 #define	OK_DATE		TRUE
 #endif
-
+
 /*
  * Some common definitions.
  */
