@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.54 2012-10-17 10:58:03 stefano Exp $
+ *      $Id: zcc.c,v 1.55 2012-10-17 11:54:40 stefano Exp $
  */
 
 
@@ -1460,7 +1460,8 @@ ShowErrors(char *filen, char *orig)
     char           *temp;
     char            buffer[LINEMAX + 1];
     char            buffer2[LINEMAX + 1];
-    int             j,linepos;
+    char            filenamebuf[LINEMAX + 1];
+    int             j,linepos,fnpos,fnlen;
     FILE           *fp, *fp2;
 
     temp = changesuffix(filen, ".err");
@@ -1480,14 +1481,17 @@ ShowErrors(char *filen, char *orig)
 
             /* Dig into asm source file and show the corresponding line */
 			linepos = atoi(strstr(buffer, " line ") + strlen(" line "));
-
+			strcpy(filenamebuf,strstr(buffer,"'") + strlen("'"));
+			sprintf(strstr(filenamebuf,"'"),"\0");
+/*
+			printf("-- %s --",filenamebuf);
 			temp = changesuffix(filen, ".opt");
 			if ((fp2 = fopen(temp, "r")) == NULL) {
 				temp = changesuffix(filen, ".asm");
 				fp2 = fopen(temp, "r");
 			}
-
-			if ((linepos > strlen(" line ")) && (fp2 != NULL)) {
+*/
+			if ((linepos > strlen(" line ")) && ((fp2 = fopen(filenamebuf, "r")) != NULL)) {
 				for (j = 1; j < linepos; j++)
 					fgets(buffer2, LINEMAX, fp2);
 				fprintf(stderr, "                   ^ ---- %s",fgets(buffer2, LINEMAX, fp2));
