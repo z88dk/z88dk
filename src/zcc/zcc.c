@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.53 2012-02-11 12:34:10 dom Exp $
+ *      $Id: zcc.c,v 1.54 2012-10-17 10:58:03 stefano Exp $
  */
 
 
@@ -1453,21 +1453,18 @@ CopyCrt0(void)
     myconf[CRT0].def = newptr;
 }
 
-/*
- * Show the error file attached to file filen
- */
-
 
 void 
 ShowErrors(char *filen, char *orig)
 {
     char           *temp;
     char            buffer[LINEMAX + 1];
-    int             j;
-    FILE           *fp;
+    char            buffer2[LINEMAX + 1];
+    int             j,linepos;
+    FILE           *fp, *fp2;
 
     temp = changesuffix(filen, ".err");
-    if ((fp = fopen(temp, "r")) != 0) {
+    if ((fp = fopen(temp, "r")) != NULL) {
         if (orig)
             fprintf(stderr, "Errors in source file %s:\n", orig);
         else {
@@ -1477,8 +1474,27 @@ ShowErrors(char *filen, char *orig)
                 fprintf(stderr, "%s = %s\n", filelist[j], orgfiles[j]);
             }
         }
-        while (fgets(buffer, LINEMAX, fp) != NULL)
+
+        while (fgets(buffer, LINEMAX, fp) != NULL) {
             fprintf(stderr, "%s", buffer);
+
+            /* Dig into asm source file and show the corresponding line */
+			linepos = atoi(strstr(buffer, " line ") + strlen(" line "));
+
+			temp = changesuffix(filen, ".opt");
+			if ((fp2 = fopen(temp, "r")) == NULL) {
+				temp = changesuffix(filen, ".asm");
+				fp2 = fopen(temp, "r");
+			}
+
+			if ((linepos > strlen(" line ")) && (fp2 != NULL)) {
+				for (j = 1; j < linepos; j++)
+					fgets(buffer2, LINEMAX, fp2);
+				fprintf(stderr, "                   ^ ---- %s",fgets(buffer2, LINEMAX, fp2));
+			}
+			fclose(fp2);
+
+		}
         fclose(fp);
 
     }
@@ -1727,3 +1743,4 @@ add_zccopt(char *fmt,...)
  *  eval: (c-set-offset 'class-close 4)
  * End:
  */
+
