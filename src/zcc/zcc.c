@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.55 2012-10-17 11:54:40 stefano Exp $
+ *      $Id: zcc.c,v 1.56 2012-10-18 09:03:09 stefano Exp $
  */
 
 
@@ -412,7 +412,7 @@ linkthem(char *linker)
     for (i = 0; i < nfiles; ++i) {
         if ((!lateassemble && hassuffix(filelist[i], OBJEXT)) || lateassemble) {
             strcat(p, " ");
-            //filelist[i][strlen(filelist[i]) - strlen(OBJEXT)] = '\0';
+            /* filelist[i][strlen(filelist[i]) - strlen(OBJEXT)] = '\0'; */
             strcat(p, filelist[i]);
         }
     }
@@ -1479,24 +1479,18 @@ ShowErrors(char *filen, char *orig)
         while (fgets(buffer, LINEMAX, fp) != NULL) {
             fprintf(stderr, "%s", buffer);
 
-            /* Dig into asm source file and show the corresponding line */
-			linepos = atoi(strstr(buffer, " line ") + strlen(" line "));
-			strcpy(filenamebuf,strstr(buffer,"'") + strlen("'"));
-			sprintf(strstr(filenamebuf,"'"),"\0");
-/*
-			printf("-- %s --",filenamebuf);
-			temp = changesuffix(filen, ".opt");
-			if ((fp2 = fopen(temp, "r")) == NULL) {
-				temp = changesuffix(filen, ".asm");
-				fp2 = fopen(temp, "r");
+            /* Dig into asm source file and show the corresponding line.. */
+			if (strstr(buffer, " line ") >0) {    /* ..only if a line number is given */
+				linepos = atoi(strstr(buffer, " line ") + strlen(" line "));
+				strcpy(filenamebuf,strstr(buffer,"'") + strlen("'"));
+				sprintf(strstr(filenamebuf,"'"),"\0");
+				if ((linepos > 1) && ((fp2 = fopen(filenamebuf, "r")) != NULL)) {
+					for (j = 1; j < linepos; j++)
+						fgets(buffer2, LINEMAX, fp2);
+					fprintf(stderr, "                   ^ ---- %s",fgets(buffer2, LINEMAX, fp2));
+				}
+				fclose(fp2);
 			}
-*/
-			if ((linepos > strlen(" line ")) && ((fp2 = fopen(filenamebuf, "r")) != NULL)) {
-				for (j = 1; j < linepos; j++)
-					fgets(buffer2, LINEMAX, fp2);
-				fprintf(stderr, "                   ^ ---- %s",fgets(buffer2, LINEMAX, fp2));
-			}
-			fclose(fp2);
 
 		}
         fclose(fp);
