@@ -5,7 +5,7 @@
  *
  *      djm 9/1/2000
  *
- *	$Id: time.h,v 1.13 2010-09-19 00:24:08 dom Exp $
+ *	$Id: time.h,v 1.14 2012-10-24 06:44:12 stefano Exp $
  */
 
 
@@ -60,6 +60,27 @@ extern clock_t __LIB__ clock(void);
 #endif
 
 
+/* This could make srand(time(NULL)) work, but do not expect much more.. */
+
+#ifdef __ENTERPRISE__
+#define time(NULL) clock()
+#endif
+
+#ifdef __NEWBRAIN__
+#define time(NULL) clock()
+#endif
+
+#ifdef __RCMX000__
+#define time(NULL) clock()
+#endif
+
+#ifdef __SPECTRUM__
+#define time(NULL) clock()
+#endif
+
+#ifdef __ZX81__
+#define time(NULL) clock()
+#endif
 
 
 #endif /* _TIME_H */
