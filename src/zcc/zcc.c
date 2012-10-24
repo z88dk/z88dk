@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.56 2012-10-18 09:03:09 stefano Exp $
+ *      $Id: zcc.c,v 1.57 2012-10-24 19:46:38 stefano Exp $
  */
 
 
@@ -23,6 +23,12 @@
 
 #ifdef WIN32
 #define strcasecmp(a,b) stricmp(a,b)
+#endif
+
+#if (_BSD_SOURCE || _SVID_SOURCE || _XOPEN_SOURCE >= 500)
+#define mktempfile(a) mkstemp(a)
+#else
+#define mktempfile(a) mktemp(a)
 #endif
 
 typedef struct arg_s arg_t;
@@ -1545,7 +1551,7 @@ tempname(char *filen)
 
 #else
     strcpy(filen, "/tmp/tmpXXXXXXXX");
-    mktemp(filen);
+    mktempfile(filen);
 #endif
 }
 
