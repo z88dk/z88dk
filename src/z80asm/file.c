@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.10 2012-06-14 15:01:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.11 2012-10-28 17:22:56 pauloscustodio Exp $ */
 /* $Log: file.c,v $
-/* Revision 1.10  2012-06-14 15:01:27  pauloscustodio
+/* Revision 1.11  2012-10-28 17:22:56  pauloscustodio
+/* BUG_0021: need sign extension in 64-bit architectures
+/*
+/* Revision 1.10  2012/06/14 15:01:27  pauloscustodio
 /* Split safe strings from strutil.c to safestr.c
 /*
 /* Revision 1.9  2012/05/26 18:36:36  pauloscustodio
@@ -121,12 +124,21 @@ void fputl_err( long dword, FILE *stream )
 long fgetl_err( FILE *stream )
 {
     char buffer[4];
+    long retval;
+
     freadc_err( buffer, sizeof( buffer ), stream );
-    return
+    retval = 
         ( ( buffer[0] << 0 ) & 0x000000FF ) |
         ( ( buffer[1] << 8 ) & 0x0000FF00 ) |
         ( ( buffer[2] << 16 ) & 0x00FF0000 ) |
         ( ( buffer[3] << 24 ) & 0xFF000000 );
+
+    /* BUG_0021: sign extend if bit 31 is on */
+    if (retval & 0x80000000L) {
+        retval |= ~ 0xFFFFFFFFL;
+    }
+
+    return retval;
 }
 
 /*-----------------------------------------------------------------------------
