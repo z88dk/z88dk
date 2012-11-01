@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.30 2012-06-07 11:49:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.31 2012-11-01 23:20:56 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.30  2012-06-07 11:49:59  pauloscustodio
+/* Revision 1.31  2012-11-01 23:20:56  pauloscustodio
+/* Warinings due to missing include
+/*
+/* Revision 1.30  2012/06/07 11:49:59  pauloscustodio
 /* stricompare() instead of Flncmp()
 /*
 /* Revision 1.29  2012/05/26 18:51:10  pauloscustodio
@@ -256,6 +259,7 @@ Copyright (C) Paulo Custodio, 2011-2012
 #include "errors.h"
 #include "file.h"
 #include "codearea.h"
+#include "strutil.h"
 
 /* external functions */
 void Skipline( FILE *fptr );
