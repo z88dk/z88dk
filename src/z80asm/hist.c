@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2012
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.33 2012-06-05 22:24:47 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.34 2012-11-01 23:21:49 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.33  2012-06-05 22:24:47  pauloscustodio
+/* Revision 1.34  2012-11-01 23:21:49  pauloscustodio
+/* Version 1.1.18
+/*
+/* Revision 1.33  2012/06/05 22:24:47  pauloscustodio
 /* BUG_0020 : Segmentation fault in ParseIdent for symbol not found with interpret OFF
 /*
 /* Revision 1.32  2012/05/30 22:06:48  pauloscustodio
@@ -1016,6 +1019,14 @@ Based on 1.0.31
         is not detected and a NULL pointer is dereferenced.
 
 -------------------------------------------------------------------------------
+01.11.2012 [1.1.18] (pauloscustodio)
+-------------------------------------------------------------------------------
+    BUG_0021 : need sign extension in 64-bit architectures
+		Reading of object files failed in 64-bit architectures because 
+		0xFFFFFFFF was being checked against -1, which is true in 32-bit
+		but not in 64-bit.
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1034,8 +1045,8 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define DATE        "05.06.2012"
-#define VERSION     "1.1.17"
+#define DATE        "01.11.2012"
+#define VERSION     "1.1.18"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2012"
 
 #ifdef QDOS
