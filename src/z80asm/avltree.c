@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.c,v 1.9 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/avltree.c,v 1.10 2012-11-03 17:39:35 pauloscustodio Exp $ */
 /* $Log: avltree.c,v $
-/* Revision 1.9  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.10  2012-11-03 17:39:35  pauloscustodio
+/* astyle, comments
+/*
+/* Revision 1.9  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.8  2012/05/20 06:02:08  pauloscustodio
@@ -84,7 +87,7 @@ Copyright (C) Paulo Custodio, 2011-2012
 /* Updated in $/Z80asm */
 /* SourceSafe Version History Comment Block added. */
 
-#include "memalloc.h"   /* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include */
 
 #include <stdlib.h>
 #include "avltree.h"

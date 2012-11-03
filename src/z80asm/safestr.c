@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Safe strings : char array with the size
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.c,v 1.1 2012-06-14 15:01:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.c,v 1.2 2012-11-03 17:39:36 pauloscustodio Exp $ */
 /* $Log: safestr.c,v $
-/* Revision 1.1  2012-06-14 15:01:27  pauloscustodio
+/* Revision 1.2  2012-11-03 17:39:36  pauloscustodio
+/* astyle, comments
+/*
+/* Revision 1.1  2012/06/14 15:01:27  pauloscustodio
 /* Split safe strings from strutil.c to safestr.c
 /*
 /*
@@ -80,7 +83,7 @@ char *sstr_vfcat( sstr_t *self, char *format, va_list argptr )
     int     ncopy;      /* may be negative */
     int     copied;
 
-    /* BUG_0020 : Linux vsnprintf always terminates string; Win32 only if there is enough space */
+    /* BUG_0022 : Linux vsnprintf always terminates string; Win32 only if there is enough space */
     ncopy = self->size - mylen;         /* full space including null terminator */
 
     if ( ncopy > 0 )
@@ -90,7 +93,7 @@ char *sstr_vfcat( sstr_t *self, char *format, va_list argptr )
 
         if ( copied >= ncopy || copied < 0 )    /* string may not be terminated */
         {
-            sstr_data(self)[self->size - 1] = 0;
+            sstr_data( self )[self->size - 1] = 0;
             sstr_sync_len( self );
         }
         else                                    /* string was terminated */

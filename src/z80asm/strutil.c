@@ -15,16 +15,19 @@ Copyright (C) Paulo Custodio, 2011-2012
 Utilities working on char *
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.10 2012-06-14 15:01:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.11 2012-11-03 17:39:36 pauloscustodio Exp $ */
 /* $Log: strutil.c,v $
-/* Revision 1.10  2012-06-14 15:01:27  pauloscustodio
+/* Revision 1.11  2012-11-03 17:39:36  pauloscustodio
+/* astyle, comments
+/*
+/* Revision 1.10  2012/06/14 15:01:27  pauloscustodio
 /* Split safe strings from strutil.c to safestr.c
 /*
 /* Revision 1.9  2012/06/07 11:49:59  pauloscustodio
 /* stricompare() instead of Flncmp()
 /*
 /* Revision 1.8  2012/06/06 22:42:57  pauloscustodio
-/* BUG_0021 : Different behaviour in string truncation in strutil in Linux and Win32
+/* BUG_0022 : Different behaviour in string truncation in strutil in Linux and Win32
 /*
 /* Revision 1.7  2012/05/26 17:46:00  pauloscustodio
 /* Put back strtoupper, strupr does not exist in all systems, was causing nightly build to fail

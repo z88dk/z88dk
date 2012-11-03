@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.4 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.5 2012-11-03 17:39:35 pauloscustodio Exp $ */
 /* $Log: codearea.h,v $
-/* Revision 1.4  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.5  2012-11-03 17:39:35  pauloscustodio
+/* astyle, comments
+/*
+/* Revision 1.4  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.3  2012/05/11 19:29:49  pauloscustodio
@@ -53,7 +56,7 @@ Manage the code area in memory
 #ifndef OBJFILE_H
 #define OBJFILE_H
 
-#include "memalloc.h"                   /* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include */
 
 #include <stdio.h>
 

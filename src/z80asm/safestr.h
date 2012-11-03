@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Safe strings : char array with the size
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.h,v 1.1 2012-06-14 15:01:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.h,v 1.2 2012-11-03 17:39:36 pauloscustodio Exp $ */
 /* $Log: safestr.h,v $
-/* Revision 1.1  2012-06-14 15:01:27  pauloscustodio
+/* Revision 1.2  2012-11-03 17:39:36  pauloscustodio
+/* astyle, comments
+/*
+/* Revision 1.1  2012/06/14 15:01:27  pauloscustodio
 /* Split safe strings from strutil.c to safestr.c
 /*
 /*
@@ -26,7 +29,7 @@ Safe strings : char array with the size
 #ifndef SAFESTR_H
 #define SAFESTR_H
 
-#include "memalloc.h"                   /* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include */
 
 #include <stdlib.h>
 #include <string.h>

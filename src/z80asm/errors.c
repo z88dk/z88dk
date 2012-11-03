@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.17 2012-06-14 15:01:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.18 2012-11-03 17:39:35 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.17  2012-06-14 15:01:27  pauloscustodio
+/* Revision 1.18  2012-11-03 17:39:35  pauloscustodio
+/* astyle, comments
+/*
+/* Revision 1.17  2012/06/14 15:01:27  pauloscustodio
 /* Split safe strings from strutil.c to safestr.c
 /*
 /* Revision 1.16  2012/05/26 18:51:10  pauloscustodio
@@ -93,7 +96,7 @@ Copyright (C) Paulo Custodio, 2011-2012
 /*
 /* */
 
-#include "memalloc.h"   /* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include */
 
 #include <stdio.h>
 #include <stdarg.h>

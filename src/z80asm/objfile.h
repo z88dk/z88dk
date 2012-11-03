@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Handle object file contruction, reading and writing
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.3 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.4 2012-11-03 17:39:36 pauloscustodio Exp $ */
 /* $Log: objfile.h,v $
-/* Revision 1.3  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.4  2012-11-03 17:39:36  pauloscustodio
+/* astyle, comments
+/*
+/* Revision 1.3  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.2  2012/05/11 19:29:49  pauloscustodio
@@ -42,7 +45,7 @@ Handle object file contruction, reading and writing
 #ifndef OBJFILE_H
 #define OBJFILE_H
 
-#include "memalloc.h"                   /* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include */
 
 #endif /* ndef OBJFILE_H */
 

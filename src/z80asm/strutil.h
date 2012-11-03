@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Utilities working on char *
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.10 2012-06-14 15:01:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.11 2012-11-03 17:39:36 pauloscustodio Exp $ */
 /* $Log: strutil.h,v $
-/* Revision 1.10  2012-06-14 15:01:27  pauloscustodio
+/* Revision 1.11  2012-11-03 17:39:36  pauloscustodio
+/* astyle, comments
+/*
+/* Revision 1.10  2012/06/14 15:01:27  pauloscustodio
 /* Split safe strings from strutil.c to safestr.c
 /*
 /* Revision 1.9  2012/06/07 11:49:59  pauloscustodio
@@ -64,9 +67,9 @@ Utilities working on char *
 #ifndef STRUTIL_H
 #define STRUTIL_H
 
-#include "memalloc.h"                   /* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include */
 
-/* convert string to upper/lower case - modify in place, 
+/* convert string to upper/lower case - modify in place,
    return address of string */
 extern char *strtoupper( char *string );
 extern char *strtolower( char *string );

@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.63 2012-06-07 11:54:13 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.64 2012-11-03 17:39:36 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.63  2012-06-07 11:54:13  pauloscustodio
+/* Revision 1.64  2012-11-03 17:39:36  pauloscustodio
+/* astyle, comments
+/*
+/* Revision 1.63  2012/06/07 11:54:13  pauloscustodio
 /* - Make mapfile static to module modlink.
 /* - Remove modsrcfile, not used.
 /* - GetModuleSize(): use local variable for file handle instead of objfile
@@ -433,7 +436,7 @@ Copyright (C) Paulo Custodio, 2011-2012
 
 /* Oops, screw up! exit(0) (was exit(-1))  should be exit(1) - djm 29/2/99 */
 
-#include "memalloc.h"   /* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include */
 
 #include <stdio.h>
 #include <time.h>

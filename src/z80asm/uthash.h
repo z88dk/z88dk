@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define UTHASH_H
 
 /* Modified to use xmalloc, die */
-#include "memalloc.h"
+#include "memalloc.h"   /* before any other include */
 #include "die.h"
 
 #include <string.h>   /* memcmp,strlen */

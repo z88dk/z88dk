@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2012
 Wrapper module for e4c to setup compile-time defines
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.7 2012-05-26 18:33:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.8 2012-11-03 17:39:35 pauloscustodio Exp $ */
 /* $Log: except.h,v $
-/* Revision 1.7  2012-05-26 18:33:25  pauloscustodio
+/* Revision 1.8  2012-11-03 17:39:35  pauloscustodio
+/* astyle, comments
+/*
+/* Revision 1.7  2012/05/26 18:33:25  pauloscustodio
 /* Remove EarlyReturnException, FileIOException: no longer used.
 /*
 /* Revision 1.6  2012/05/24 17:09:27  pauloscustodio
@@ -58,7 +61,7 @@ Wrapper module for e4c to setup compile-time defines
 #ifndef EXCEPT_H
 #define EXCEPT_H
 
-#include "memalloc.h"                   /* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include */
 
 #ifndef __NO_INLINE__
 #define __NO_INLINE__                   /* gcc -O2 fails on "__extension__ inline" */

@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.16 2012-05-26 18:51:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.17 2012-11-03 17:39:36 pauloscustodio Exp $ */
 /* $Log: ldinstr.c,v $
-/* Revision 1.16  2012-05-26 18:51:10  pauloscustodio
+/* Revision 1.17  2012-11-03 17:39:36  pauloscustodio
+/* astyle, comments
+/*
+/* Revision 1.16  2012/05/26 18:51:10  pauloscustodio
 /* CH_0012 : wrappers on OS calls to raise fatal error
 /* CH_0013 : new errors interface to decouple calling code from errors.c
 /*
@@ -124,7 +127,7 @@ Copyright (C) Paulo Custodio, 2011-2012
 /* Updated in $/Z80asm */
 /* SourceSafe Version History Comment Block added. */
 
-#include "memalloc.h"   /* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include */
 
 #include <stdio.h>
 #include "config.h"

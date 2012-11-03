@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.34 2012-06-05 22:24:47 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.35 2012-11-03 17:39:36 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.34  2012-06-05 22:24:47  pauloscustodio
+/* Revision 1.35  2012-11-03 17:39:36  pauloscustodio
+/* astyle, comments
+/*
+/* Revision 1.34  2012/06/05 22:24:47  pauloscustodio
 /* BUG_0020 : Segmentation fault in ParseIdent for symbol not found with interpret OFF
 /*
 /* Revision 1.33  2012/05/26 18:51:10  pauloscustodio
@@ -232,7 +235,7 @@ Copyright (C) Paulo Custodio, 2011-2012
 /* makes all accumulator related instructions equal in syntax and removes */
 /* ambiguity. */
 
-#include "memalloc.h"   /* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include */
 
 #include <stdio.h>
 #include <string.h>

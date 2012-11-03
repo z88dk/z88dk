@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.31 2012-11-01 23:20:56 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.32 2012-11-03 17:39:36 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.31  2012-11-01 23:20:56  pauloscustodio
+/* Revision 1.32  2012-11-03 17:39:36  pauloscustodio
+/* astyle, comments
+/*
+/* Revision 1.31  2012/11/01 23:20:56  pauloscustodio
 /* Warinings due to missing include
 /*
 /* Revision 1.30  2012/06/07 11:49:59  pauloscustodio
@@ -242,7 +245,7 @@ Copyright (C) Paulo Custodio, 2011-2012
 /* Updated in $/Z80asm */
 /* SourceSafe Version History Comment Block added. */
 
-#include "memalloc.h"   /* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include */
 
 #include <stdio.h>
 #include <limits.h>
