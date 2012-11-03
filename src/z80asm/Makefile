@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.36 2012-08-01 21:08:02 dom Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.37 2012-11-03 17:27:51 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.36  2012-08-01 21:08:02  dom
+# Revision 1.37  2012-11-03 17:27:51  pauloscustodio
+# Remove all test* in make clean
+#
+# Revision 1.36  2012/08/01 21:08:02  dom
 # Allow x-compilation of z80asm
 #
 # Revision 1.35  2012/06/14 15:04:58  pauloscustodio
@@ -208,7 +211,7 @@ install:
 
 
 clean :
-	$(RM) *.o *.exe *~ *.bak *.orig core z80asm$(EXESUFFIX) test.* test2.*
+	$(RM) *.o *.exe *~ *.bak *.orig core z80asm$(EXESUFFIX) test*
 
 
 # test
@@ -276,4 +279,4 @@ z80instr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 z80instr.o: types.h symbol.h options.h errors.h errors_def.h codearea.h
 z80pass.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
 z80pass.o: symbols.h hist.h options.h z80asm.h types.h errors.h errors_def.h
-z80pass.o: file.h strlist.h class.h queue.h codearea.h
+z80pass.o: file.h strlist.h class.h queue.h codearea.h strutil.h
