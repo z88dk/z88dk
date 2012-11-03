@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2012
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.34 2012-11-01 23:21:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.35 2012-11-03 17:41:11 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.34  2012-11-01 23:21:49  pauloscustodio
+/* Revision 1.35  2012-11-03 17:41:11  pauloscustodio
+/* Version 1.1.19
+/*
+/* Revision 1.34  2012/11/01 23:21:49  pauloscustodio
 /* Version 1.1.18
 /*
 /* Revision 1.33  2012/06/05 22:24:47  pauloscustodio
@@ -974,7 +977,7 @@ Based on 1.0.31
         Hide the global variables TOTALERRORS and errfile, throw FatalErrorException
         inside errors.c's new interface, to simplify the calling code.
         New interface to declare current error location to the error module,
-        decouple errors.c from the internal knowledge of the z80asm data 
+        decouple errors.c from the internal knowledge of the z80asm data
         structures.
         Uniform error message format, with file at compile time and module
         at link time.
@@ -1000,7 +1003,7 @@ Based on 1.0.31
     - Remove EarlyReturnException, FileIOException: no longer used.
     - Put back strtoupper, strupr does not exist in all systems,
       was causing nightly build to fail
-    - Replaced xfputc and friends with fputc_err, raising a fatal_error() 
+    - Replaced xfputc and friends with fputc_err, raising a fatal_error()
       instead of an exception, moved to errors.c.
 
 -------------------------------------------------------------------------------
@@ -1022,9 +1025,28 @@ Based on 1.0.31
 01.11.2012 [1.1.18] (pauloscustodio)
 -------------------------------------------------------------------------------
     BUG_0021 : need sign extension in 64-bit architectures
-		Reading of object files failed in 64-bit architectures because 
-		0xFFFFFFFF was being checked against -1, which is true in 32-bit
-		but not in 64-bit.
+        Reading of object files failed in 64-bit architectures because
+        0xFFFFFFFF was being checked against -1, which is true in 32-bit
+        but not in 64-bit.
+
+-------------------------------------------------------------------------------
+03.11.2012 [1.1.19] (pauloscustodio)
+-------------------------------------------------------------------------------
+    BUG_0022 : Different behaviour in string truncation in strutil in Linux and Win32
+        Linux vsnprintf always writes the null terminator, therefore requires
+        buffer size as argument.
+        Win32 vsnprintf writes the null terminator only if there is room at the
+        end, and needs the null terminator to be added in case of buffer full.
+
+    CH_0014 : New Dynamic Strings that grow automatically on creation / concatenation
+
+    Internal cleanup:
+    - Make mapfile static to module modlink.
+    - Remove modsrcfile, not used.
+    - GetModuleSize(): use local variable for file handle instead of objfile
+    - stricompare() instead of Flncmp().
+    - Split safe strings from strutil.c to safestr.c.
+    - Use _MSC_VER instead of WIN32 for MS-C compiler specific code.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -1041,12 +1063,12 @@ FUTURE CHANGES - require change of the object file format
 
 */
 
-#include "memalloc.h"   /* before any other include to enable memory leak detection */
+#include "memalloc.h"   /* before any other include */
 
 #include "hist.h"
 
-#define DATE        "01.11.2012"
-#define VERSION     "1.1.18"
+#define DATE        "03.11.2012"
+#define VERSION     "1.1.19"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2012"
 
 #ifdef QDOS
