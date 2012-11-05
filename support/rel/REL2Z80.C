@@ -3,7 +3,7 @@
         by Enrico Maria Giordano and Stefano Bodrato
         This file is part of the Z88 Developement Kit  -  http://www.z88dk.org
 
-        $Id: REL2Z80.C,v 1.5 2006-04-06 07:20:15 stefano Exp $
+        $Id: REL2Z80.C,v 1.6 2012-11-05 08:15:51 stefano Exp $
 */
 
 #include <stdio.h>
@@ -70,7 +70,7 @@ void AddExpDecl( struct Z80Module *Z80Module, int Address, char Type, char *Name
     struct ExpDecl *Tmp = Z80Module -> ExpDecl;
     struct ExpDecl *New;
 
-    New = malloc( sizeof( struct ExpDecl ) );
+    New = (ExpDecl *) malloc( sizeof( struct ExpDecl ) );
 
     New -> Address = Address;
     New -> Type = Type;
@@ -153,7 +153,7 @@ void AddNameDecl( struct Z80Module *Z80Module, int Address, char Type, char *Nam
 
     if ( ExistNameDecl( Z80Module, Name ) ) return;
 
-    New = malloc( sizeof( struct NameDecl ) );
+    New = (NameDecl *) malloc( sizeof( struct NameDecl ) );
 
     strcpy( New -> Name, Name );
     New -> Type = Type;
@@ -209,7 +209,7 @@ void AddLibNameDecl( struct Z80Module *Z80Module, char *Name )
 
     if ( ExistLibNameDecl( Z80Module, Name ) ) return;
 
-    New = malloc( sizeof( struct LibNameDecl ) );
+    New = (LibNameDecl *) malloc( sizeof( struct LibNameDecl ) );
 
     strcpy( New -> Name, Name );
     New -> Next = 0;
