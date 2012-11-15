@@ -7,7 +7,7 @@
    in a C source data declaration to be used
    in z88dk with the "draw_profile" function.
 
-   $Id: z80svg.c,v 1.9 2011-01-14 14:20:13 stefano Exp $
+   $Id: z80svg.c,v 1.10 2012-11-15 18:38:00 stefano Exp $
 */
 
 
@@ -40,8 +40,10 @@ unsigned char line;
 int	elementcnt;
 unsigned int pathcnt,nodecnt,skipcnt;
 /* File and string buffer pointers */
-char *destline;
+char destline[10000];
 FILE *source,*dest;
+
+int takedisabled=0;
 
 
 int gethex(char hexval) {
@@ -96,8 +98,10 @@ void chkstyle (xmlNodePtr node)
 	  attr = xmlGetProp(node, (const xmlChar *) "fill-opacity");
 	  if(attr != NULL) {
 			opacity=atof((const char *)attr);
+			xmlFree(attr);
 	  }
-	  //xmlFree(attr);
+	  //  a pass with valgrind would be a great idea  :/
+	  //
 	  attr = xmlGetProp(node, (const xmlChar *) "fill");
 	  if(attr != NULL) {
 			style=strdup((const char *)attr);
@@ -115,15 +119,17 @@ void chkstyle (xmlNodePtr node)
 				if (area == 1) fprintf(stderr,"\n  Disabling area mode (too transparent)");
 				area=0;
 			}
+			xmlFree(attr);
 	  }
-	  //xmlFree(attr);
+	  //
 	  
 	  /* Now the line properties */
 	  attr = xmlGetProp(node, (const xmlChar *) "stroke-opacity");
 	  if(attr != NULL) {
 			opacity=atof((const char *)attr);
+			xmlFree(attr);
 	  } else opacity=0;
-	  //xmlFree(attr);
+	  //
 
 	  attr = xmlGetProp(node, (const xmlChar *) "stroke");
 	  if(attr != NULL) {
@@ -141,8 +147,9 @@ void chkstyle (xmlNodePtr node)
 				pen=(unsigned char)retcode;
 				fprintf(stderr,"\n  Line mode enabled, dither level: %i",fill);
 			}
+			xmlFree(attr);
 	  }
-	  //xmlFree(attr);
+	  //
 	  if (line == 1) {
 		  attr = xmlGetProp(node, (const xmlChar *) "stroke-width");
 		  if(attr != NULL) {
@@ -151,9 +158,10 @@ void chkstyle (xmlNodePtr node)
 				pen=DITHER_BLACK+(pen)/2;
 				if (pen>15) pen=15;
 				fprintf(stderr,"\n  Extra pen width: %i", pen);
+				xmlFree(attr);
 			  } else pen = color;
 		  } //else pen = color;
-		  //xmlFree(attr);
+		  //
 	  }
 }
 
@@ -163,7 +171,6 @@ void chkstyle2(xmlNodePtr node)
 	xmlChar *attr;
 	char *myattr;
 	char *style;
-	char *sstyle;
 	int retcode;
 	float forceline;
 	float opacity;
@@ -175,8 +182,7 @@ void chkstyle2(xmlNodePtr node)
 		retcode = 0;
 		opacity = 0;
 		forceline = 0;
-		sstyle=strdup((const char *)attr);
-		style=sstyle;
+		style=strdup((const char *)attr);
 		strtok(style,";:");
 		while (style != NULL) {
 			if (!strcmp(style,"fill")) {
@@ -237,7 +243,7 @@ void chkstyle2(xmlNodePtr node)
 			if (!strcmp(style,"stroke-width")) {
 				style=strtok(NULL,";:");
 				if (line == 1) {
-					pen=atoi((unsigned char *)attr);
+					pen=atoi(style);
 					  if ((pen>1)&&(pen!=0)) {
 						pen=DITHER_BLACK+(pen)/2;
 						if (pen>15) pen=15;
@@ -248,9 +254,9 @@ void chkstyle2(xmlNodePtr node)
 
 			style=strtok(NULL,";:");
 		}
+	  free(style);
+	  //xmlFree(attr);
 	  }
-	//free(sstyle);
-	//xmlFree(attr);
 }
 
 
@@ -300,13 +306,14 @@ void line_to (unsigned char x,unsigned char y,unsigned char oldx,unsigned char o
 int main( int argc, char *argv[] )
 {
     unsigned char Dummy[300];
+	unsigned char currentlayer[300]="";
     int i,c;
     char** p = argv+1;
 	char *arg;
 
-	char stname[50]="svg_picture";
-	char sname[255]="";
-	char dname[255]="";
+	char stname[150]="svg_picture";
+	char sname[300]="";
+	char dname[300]="";
 	float scale=100;
 	int xshift=0;
 	int yshift=0;
@@ -375,8 +382,8 @@ int main( int argc, char *argv[] )
 			fprintf(stderr,"\n   -cCOLOR: Change pen color, default is black (11).");
 			fprintf(stderr,"\n      (0-11) white to black, (12-15) thicker gray to black.");
 			fprintf(stderr,"\n   -bSHIFT: Adjust 'color' brightness, +/- 10.");
-			fprintf(stderr,"\n   -r: Rotate the picture.");
-			fprintf(stderr,"\n   -w: Enable wireframe mode.");
+			fprintf(stderr,"\n   -w: Enable wireframe mode.        |  -r: Rotate the picture.");
+			fprintf(stderr,"\n   -d: Consider the disabled layers. |  ");
 			fprintf(stderr,"\n   -e<1,2>: Encode in expanded form, repeating every command.");
 			fprintf(stderr,"\n   -l<1-255>: Force max number of 'lineto' elements in a row.");
 			fprintf(stderr,"\n   -g: Group paths forming the same area in a single stencil block.");
@@ -446,6 +453,9 @@ int main( int argc, char *argv[] )
 			break;
 	   case 'r' :
 			rotate=1;
+			break;
+	   case 'd' :
+			takedisabled=1;
 			break;
 	   case 'g' :
 			grouping=1;
@@ -544,7 +554,7 @@ autoloop:
 			return 1;
 		}
 
-		destline=malloc(5000);
+		//destline=malloc(5000);
 		width = height = 255;
 		x = y = inix = iniy = 0;
 		pen=color;
@@ -593,6 +603,24 @@ autoloop:
 		inipath=0;
 		while(node != NULL) {
 
+			if(xmlStrcmp(node->name, (const xmlChar *) "namedview") == 0) {
+
+				attr = xmlGetProp(node, (const xmlChar *) "id");
+				if (attr == NULL)
+					strcpy(Dummy,"(id missing)");
+				else
+					sprintf(Dummy,"%s",(const char *)attr);
+				fprintf(stderr,"\nAnalyzing view: %s",Dummy);
+				//xmlFree(attr);
+
+				attr = xmlGetProp(node, (const xmlChar *) "current-layer");
+				if (attr != NULL)
+					sprintf(currentlayer,"%s",(const char *)attr);
+				//xmlFree(attr);
+			}
+
+
+
 			if(xmlStrcmp(node->name, (const xmlChar *) "g") == 0) {
 
 				gnode[gcount]=node;
@@ -600,48 +628,55 @@ autoloop:
 
 				attr = xmlGetProp(node, (const xmlChar *) "id");
 				if (attr == NULL)
-					strcpy(Dummy,"(missing)");
+					strcpy(Dummy,"(name missing)");
 				else
 					sprintf(Dummy,"%s",(const char *)attr);
-				fprintf(stderr,"\nEntering subnode (%u), id: %s",gcount,Dummy);
-				//xmlFree(attr);
+				
+				//if (strlen(currentlayer)!=0) {
+				//if (takedisabled==1) {	
+				if ((takedisabled==1) || (strlen(currentlayer)==0) || (strcmp(currentlayer,Dummy)==0)) {
+				
+					fprintf(stderr,"\nEntering subnode (%u), id: %s",gcount,Dummy);
+					//xmlFree(attr);
 
-				pen=color;
-				fill=color;
-				area=0;
-				line=1;
+					pen=color;
+					fill=color;
+					area=0;
+					line=1;
 
-				if (wireframe != 1) {
-					chkstyle (node);
-					chkstyle2 (node);
-					switch (forcedmode) {
-						case 1:
-							line=1;	area=0;
-							break;
-						case 2:
-							line=0;	area=1;
-							break;
-						case 3:
-							line=1;	area=1;
-							break;
-						case 4:
-							line=1;
-							break;
-						case 5:
-							area=1;
-							break;
-						case 6:
-							line=0;
-							break;
-						case 7:
-							area=0;
-							break;
+					if (wireframe != 1) {
+						chkstyle (node);
+						chkstyle2 (node);
+						switch (forcedmode) {
+							case 1:
+								line=1;	area=0;
+								break;
+							case 2:
+								line=0;	area=1;
+								break;
+							case 3:
+								line=1;	area=1;
+								break;
+							case 4:
+								line=1;
+								break;
+							case 5:
+								area=1;
+								break;
+							case 6:
+								line=0;
+								break;
+							case 7:
+								area=0;
+								break;
+						}
 					}
-				}
-				if (node->xmlChildrenNode != NULL)
-					node = node->xmlChildrenNode;
-				else
-					fprintf(stderr," -> (empty subnode)",gcount,Dummy);
+					if (node->xmlChildrenNode != NULL)
+						node = node->xmlChildrenNode;
+					else
+						fprintf(stderr," -> (empty subnode)",gcount,Dummy);
+				} else
+				fprintf(stderr,"\nExcluding subnode (%u), id: %s",gcount,Dummy);
 			}
 
 			if(xmlStrcmp(node->name, (const xmlChar *) "path") == 0) {
@@ -942,7 +977,7 @@ autoloop:
 		yshift=scale*(yshift-atm)/100;
 		fprintf(stderr,"\n------\n------\n");
 
-		free (destline);
+		//free (destline);
 		goto autoloop;
 	}
 
