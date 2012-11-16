@@ -1,5 +1,6 @@
-
-/*
+  
+  
+/* ----------------------------------------------------------
    Z80SVG
    by Stefano Bodrato
 
@@ -7,11 +8,18 @@
    in a C source data declaration to be used
    in z88dk with the "draw_profile" function.
 
-   $Id: z80svg.c,v 1.10 2012-11-15 18:38:00 stefano Exp $
+   MinGW
+   gcc -o z80svg z80svg.c -lxml2
+   MinGW static
+   gcc -Wall -s -static -O2 -o z80svg z80svg.c -lxml2 -liconv -lz msvcrt.dll
+
+   $Id: z80svg.c,v 1.11 2012-11-16 18:30:27 stefano Exp $
+ * ----------------------------------------------------------
 */
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>
 #include <math.h>
@@ -44,7 +52,6 @@ char destline[10000];
 FILE *source,*dest;
 
 int takedisabled=0;
-
 
 int gethex(char hexval) {
 	char c;
@@ -98,7 +105,7 @@ void chkstyle (xmlNodePtr node)
 	  attr = xmlGetProp(node, (const xmlChar *) "fill-opacity");
 	  if(attr != NULL) {
 			opacity=atof((const char *)attr);
-			xmlFree(attr);
+			//xmlFree(attr);
 	  }
 	  //  a pass with valgrind would be a great idea  :/
 	  //
@@ -119,7 +126,7 @@ void chkstyle (xmlNodePtr node)
 				if (area == 1) fprintf(stderr,"\n  Disabling area mode (too transparent)");
 				area=0;
 			}
-			xmlFree(attr);
+			//xmlFree(attr);
 	  }
 	  //
 	  
@@ -127,7 +134,7 @@ void chkstyle (xmlNodePtr node)
 	  attr = xmlGetProp(node, (const xmlChar *) "stroke-opacity");
 	  if(attr != NULL) {
 			opacity=atof((const char *)attr);
-			xmlFree(attr);
+			//xmlFree(attr);
 	  } else opacity=0;
 	  //
 
@@ -147,18 +154,18 @@ void chkstyle (xmlNodePtr node)
 				pen=(unsigned char)retcode;
 				fprintf(stderr,"\n  Line mode enabled, dither level: %i",fill);
 			}
-			xmlFree(attr);
+			//!!!xmlFree(attr);
 	  }
 	  //
 	  if (line == 1) {
 		  attr = xmlGetProp(node, (const xmlChar *) "stroke-width");
 		  if(attr != NULL) {
-			  pen=atoi((unsigned char *)attr);
+			  pen=atoi((const char *)attr);
 			  if ((pen>1)&&(pen!=0)) {
 				pen=DITHER_BLACK+(pen)/2;
 				if (pen>15) pen=15;
 				fprintf(stderr,"\n  Extra pen width: %i", pen);
-				xmlFree(attr);
+				//xmlFree(attr);
 			  } else pen = color;
 		  } //else pen = color;
 		  //
@@ -169,8 +176,8 @@ void chkstyle (xmlNodePtr node)
 void chkstyle2(xmlNodePtr node)
 {
 	xmlChar *attr;
-	char *myattr;
 	char *style;
+	char *sstyle;
 	int retcode;
 	float forceline;
 	float opacity;
@@ -182,7 +189,8 @@ void chkstyle2(xmlNodePtr node)
 		retcode = 0;
 		opacity = 0;
 		forceline = 0;
-		style=strdup((const char *)attr);
+		sstyle=strdup((const char *)attr);
+		style=sstyle;
 		strtok(style,";:");
 		while (style != NULL) {
 			if (!strcmp(style,"fill")) {
@@ -253,8 +261,9 @@ void chkstyle2(xmlNodePtr node)
 			}
 
 			style=strtok(NULL,";:");
+		//free(sstyle);
 		}
-	  free(style);
+	  //free(style);
 	  //xmlFree(attr);
 	  }
 }
@@ -269,11 +278,14 @@ void line_to (unsigned char x,unsigned char y,unsigned char oldx,unsigned char o
 				sprintf(destline,"%s 0x%2X,0x%02X,0x%02X,", destline, CMD_AREA_LINETO, x, y);
 			else
 				sprintf(destline,"%s 0x%02X,0x%02X,", destline, x, y);
-		  else if ((area==1)||(line==1))
-			if (elementcnt == 0)
-				sprintf(destline,"%s 0x%2X,0x%02X,0x%02X,", destline, CMD_LINETO|pen, x, y);
-			else
-				sprintf(destline,"%s 0x%02X,0x%02X,", destline, x, y);
+		  else {
+			if ((area==1)||(line==1)) {
+				if (elementcnt == 0)
+					sprintf(destline,"%s 0x%2X,0x%02X,0x%02X,", destline, CMD_LINETO|pen, x, y);
+				else
+					sprintf(destline,"%s 0x%02X,0x%02X,", destline, x, y);
+			}
+		  }
 		}
 		else {elementcnt--; skipcnt++;}
 	} else {
@@ -305,9 +317,9 @@ void line_to (unsigned char x,unsigned char y,unsigned char oldx,unsigned char o
 
 int main( int argc, char *argv[] )
 {
-    unsigned char Dummy[300];
-	unsigned char currentlayer[300]="";
-    int i,c;
+    char Dummy[600];
+	char currentlayer[300]="";
+    int i;
     char** p = argv+1;
 	char *arg;
 
@@ -325,7 +337,6 @@ int main( int argc, char *argv[] )
 	int forcedmode=0;
 	int expanded=0;
 	int maxelements=0;
-	char hexval[3]="00";
 	int inipath;
 	int curves_cnt;
 
@@ -395,14 +406,14 @@ int main( int argc, char *argv[] )
 	   case 'n' :
 			if (strlen(arg)==2) {
 				fprintf(stderr,"\nInvalid struct name\n");
-				exit(1);
+				exit(2);
 			}
 			sprintf(stname,"%s", arg+2);
 			break;
 	   case 'o' :
 			if (strlen(arg)==2) {
 				fprintf(stderr,"\nInvalid output file name\n");
-				exit(1);
+				exit(3);
 			}
 			sprintf(dname,"%s", arg+2);
 			break;
@@ -410,42 +421,42 @@ int main( int argc, char *argv[] )
 			scale=atof(arg+2);
 			if (scale < 1) {
 				fprintf(stderr,"\nInvalid scale value\n");
-				exit(1);
+				exit(4);
 			}
 			break;
 	   case 'x' :
 			xshift=atoi(arg+2);
 			if (strlen(arg)==2) {
 				fprintf(stderr,"\nInvalid X shifting value.\n");
-				exit(1);
+				exit(5);
 			}
 			break;
 	   case 'y' :
 			yshift=atoi(arg+2);
 			if (strlen(arg)==2) {
 				fprintf(stderr,"\nInvalid Y shifting value.\n");
-				exit(1);
+				exit(6);
 			}
 			break;
 	   case 'c' :
 			color=atoi(arg+2);
 			if (color > 15) {
 				fprintf(stderr,"\nInvalid color.\n");
-				exit(1);
+				exit(7);
 			}
 			break;
 	   case 'l' :
 			maxelements=atoi(arg+2);
 			if (maxelements > 255) {
 				fprintf(stderr,"\nInvalid max. number of line elements per row.\n");
-				exit(1);
+				exit(8);
 			}
 			break;
 	   case 'b' :
 			color_balance=atoi(arg+2);
 			if ((color_balance > 10)||(color_balance < -10)) {
 				fprintf(stderr,"\nInvalid color brightness shift.\n");
-				exit(1);
+				exit(9);
 			}
 			break;
 	   case 'w' :
@@ -464,21 +475,21 @@ int main( int argc, char *argv[] )
 			pathdetails=atoi(arg+2);
 			if ((pathdetails==0)||(pathdetails>2)) {
 				fprintf(stderr,"\nInvalid path detail listing option.\n");
-				exit(1);
+				exit(10);
 			}
 			break;
 	   case 'f' :
 			forcedmode=atoi(arg+2);
 			if ((forcedmode==0)||(forcedmode>7)) {
 				fprintf(stderr,"\nInvalid 'force mode' option.\n");
-				exit(1);
+				exit(11);
 			}
 			break;
 	   case 'e' :
 			expanded=atoi(arg+2);
 			if (expanded>2) {
 				fprintf(stderr,"\nInvalid option for expanded format.\n");
-				exit(1);
+				exit(12);
 			}
 			break;
 	   case 'a' :
@@ -496,11 +507,12 @@ int main( int argc, char *argv[] )
 	 }
 	}
 	
-	if (maxelements==0)
+	if (maxelements==0) {
 		if (expanded == 0)
 			maxelements=64;
 		else
 			maxelements=30;
+	}
 
 	sprintf(sname,"%s", arg);
 
@@ -508,22 +520,26 @@ int main( int argc, char *argv[] )
     /* (do we really need this?) */
     LIBXML_TEST_VERSION
 
+	oldcmd=0;
+	xx=0; yy=0; cx=0; cy=0;
+
 	if (autosize==1)
 		fprintf(stderr,"\n------\nAutosize mode, FIRST PASS\n------\n");
+		
 autoloop:
 
 	doc = xmlParseFile(sname);
 	
 	if (doc == NULL ) {
 		fprintf(stderr,"Error, can't parse the source SVG file   %s\n",sname);
-		return;
+		exit(13);
 	}
  
  	node = xmlDocGetRootElement(doc);
 	if (node == NULL) {
 		fprintf(stderr,"Error empty SVG document\n");
 		xmlFreeDoc(doc);
-		return;
+		exit(14);
 	}
 
 	if (strlen(dname)==0) sprintf(dname,"%s", sname);
@@ -533,7 +549,7 @@ autoloop:
     {
 		fprintf(stderr,"Error, can't open the destination file   %s\n", Dummy);
 		(void)fcloseall();
-		exit(2);
+		exit(15);
     }
 	fprintf(stderr,"\nOutput file is %s\n", Dummy);
 
@@ -543,7 +559,7 @@ autoloop:
 	if( ferror( dest ) ) {
 		fprintf(stderr, "Error writing on target file:  %s\n", dname );
 		(void)fcloseall();
-		exit(3);
+		exit(16);
     }
 
  		// Check if it is an svg file
@@ -551,7 +567,7 @@ autoloop:
 		{
 			fprintf(stderr, "Not an svg file\n");
 			xmlFreeDoc(doc);
-			return 1;
+			exit(17);
 		}
 
 		//destline=malloc(5000);
@@ -562,24 +578,26 @@ autoloop:
 
 		// Width
 		attr = xmlGetProp(node, (const xmlChar *) "width");
-		if(attr != NULL)
-			width = atoi((const char *)attr);
-		//xmlFree(attr);
+		if(attr != NULL) {
+			width = atof((const char *)attr);
+			//xmlFree(attr);
+		}
 
 		// Height
 		attr = xmlGetProp(node, (const xmlChar *) "height");
 		if(attr != NULL)
-			height = atoi((const char *)attr);
+			height = atof((const char *)attr);
 		//xmlFree(attr);
+
 		// X
 		attr = xmlGetProp(node, (const xmlChar *) "x");
 		if(attr != NULL)
-			xx = atoi((const char *)attr);
+			xx = atof((const char *)attr);
 		//xmlFree(attr);
 		// Y
 		attr = xmlGetProp(node, (const xmlChar *) "y");
 		if(attr != NULL)
-			yy = atoi((const char *)attr);
+			yy = atof((const char *)attr);
 		//xmlFree(attr);
 
 		// Init abs margin limits (inverted)
@@ -608,15 +626,19 @@ autoloop:
 				attr = xmlGetProp(node, (const xmlChar *) "id");
 				if (attr == NULL)
 					strcpy(Dummy,"(id missing)");
-				else
+				else {
 					sprintf(Dummy,"%s",(const char *)attr);
+					//xmlFree(attr);
+				}
 				fprintf(stderr,"\nAnalyzing view: %s",Dummy);
-				//xmlFree(attr);
+				//
 
 				attr = xmlGetProp(node, (const xmlChar *) "current-layer");
-				if (attr != NULL)
+				if (attr != NULL) {
 					sprintf(currentlayer,"%s",(const char *)attr);
-				//xmlFree(attr);
+					//xmlFree(attr);
+				}
+				//
 			}
 
 
@@ -629,15 +651,17 @@ autoloop:
 				attr = xmlGetProp(node, (const xmlChar *) "id");
 				if (attr == NULL)
 					strcpy(Dummy,"(name missing)");
-				else
+				else {
 					sprintf(Dummy,"%s",(const char *)attr);
+					//xmlFree(attr);
+				}
 				
 				//if (strlen(currentlayer)!=0) {
 				//if (takedisabled==1) {	
 				if ((takedisabled==1) || (strlen(currentlayer)==0) || (strcmp(currentlayer,Dummy)==0)) {
 				
 					fprintf(stderr,"\nEntering subnode (%u), id: %s",gcount,Dummy);
-					//xmlFree(attr);
+					//
 
 					pen=color;
 					fill=color;
@@ -674,7 +698,7 @@ autoloop:
 					if (node->xmlChildrenNode != NULL)
 						node = node->xmlChildrenNode;
 					else
-						fprintf(stderr," -> (empty subnode)",gcount,Dummy);
+						fprintf(stderr," -> (empty subnode)");
 				} else
 				fprintf(stderr,"\nExcluding subnode (%u), id: %s",gcount,Dummy);
 			}
@@ -690,10 +714,11 @@ autoloop:
 				attr = xmlGetProp(node, (const xmlChar *) "id");
 				if (attr == NULL)
 					strcpy(Dummy,"(no name)");
-				else
+				else {
 					sprintf(Dummy,"%s",(const char *)attr);
+					//xmlFree(attr);
+				}
 				fprintf(stderr,"\n  Processing path group #%u, id: %s",pathcnt,Dummy);
-				//xmlFree(attr);
 
 				if (wireframe != 1) {
 					chkstyle (node);
@@ -863,7 +888,8 @@ autoloop:
 										if ((area==1)||(line==1))
 											fprintf(dest,"\t0x%2X,0x%02X, %s\n", REPEAT_COMMAND, elementcnt, destline);
 									elementcnt=0;
-									sprintf(destline,"");
+									//sprintf(destline,"");
+									destline[0]='\0';
 									if ((inipath==0) && (area==1) && (line==1))
 										fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
 									else if (grouping == 0) {
@@ -892,7 +918,8 @@ autoloop:
 											if ((area==1)||(line==1))
 												fprintf(dest,"\t0x%2X,0x%02X, %s\n\t", REPEAT_COMMAND, elementcnt, destline);
 											elementcnt=0;
-											sprintf(destline,"");
+											//sprintf(destline,"");
+											destline[0]='\0';
 										}
 									} else {
 										if (elementcnt>maxelements) {
@@ -967,12 +994,13 @@ autoloop:
 		autosize=2;
 		fprintf(stderr,"\n\n\n------\nAutosize mode, SECOND PASS\n------\n");
 		if ((arm-alm)>(abm-atm)) {
-			scale=100*255/(arm-alm);
+			scale=100*254/(arm-alm);
 			fprintf(stderr,"Autosizing in landscape mode (max x = 255)\n");
 		} else {
-			scale=100*255/(abm-atm);
+			scale=100*254/(abm-atm);
 			fprintf(stderr,"Autosizing in portrait mode (max y = 255)\n");
 		}
+		fprintf(stderr,"\n--alm: %f, atm: %f ----\n",alm,atm);
 		xshift=scale*(xshift-alm)/100;
 		yshift=scale*(yshift-atm)/100;
 		fprintf(stderr,"\n------\n------\n");
@@ -991,6 +1019,7 @@ autoloop:
 	}
 
 	fprintf(stderr,"\n\nConversion done.\n");
+	return(0);
 }
 
 //#endif
