@@ -11,7 +11,7 @@
    MinGW
    gcc -Wall -O2 -o z80svg z80svg.c libxml2.dll
 
-   $Id: z80svg.c,v 1.12 2012-11-19 16:01:21 stefano Exp $
+   $Id: z80svg.c,v 1.13 2012-11-19 16:17:54 stefano Exp $
  * ----------------------------------------------------------
 */
 
@@ -237,9 +237,8 @@ int get_color(char *style) {
 	
 	c=0;
 	while (ctable[c++].shade_level<255) {
-		if(!strcmp(style, ctable[c].color_name)) {
-			printf("%s",ctable[c].color_name);
-			return(ctable[c].shade_level);}
+		if(!strcmp(style, ctable[c].color_name))
+			return(ctable[c].shade_level);
 	}
 
 	if(!strncmp(style, "url",3))
