@@ -9,11 +9,9 @@
    in z88dk with the "draw_profile" function.
 
    MinGW
-   gcc -o z80svg z80svg.c -lxml2
-   MinGW static
-   gcc -Wall -s -static -O2 -o z80svg z80svg.c -lxml2 -liconv -lz msvcrt.dll
+   gcc -Wall -O2 -o z80svg z80svg.c libxml2.dll
 
-   $Id: z80svg.c,v 1.11 2012-11-16 18:30:27 stefano Exp $
+   $Id: z80svg.c,v 1.12 2012-11-19 16:01:21 stefano Exp $
  * ----------------------------------------------------------
 */
 
@@ -23,7 +21,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <math.h>
-#include <libxml/parser.h>
+#include <libxml2/libxml/parser.h>
 
 #include "../../include/gfxprofile.h"
 //#include "gfxprofile.h"
@@ -33,6 +31,165 @@
 #ifdef __MINGW32__
 #define fcloseall _fcloseall
 #endif
+
+
+struct svgcolor{
+	char color_name[30];
+	int  shade_level;
+};
+
+
+const struct svgcolor ctable[]={
+    {"aliceblue", 1},
+    {"antiquewhite", 1},
+    {"aqua", 4},
+    {"aquamarine", 3},
+    {"azure", 1},
+    {"beige", 1},
+    {"bisque", 2},
+    {"black", 11},
+    {"blanchedalmond", 2},
+    {"blue", 8},
+    {"blueviolet", 6},
+    {"brown", 8},
+    {"burlywood", 4},
+    {"cadetblue", 6},
+    {"chartreuse", 6},
+    {"chocolate", 7},
+    {"coral", 5},
+    {"cornflowerblue", 5},
+    {"cornsilk", 1},
+    {"crimson", 7},
+    {"cyan", 4},
+    {"darkblue", 10},
+    {"darkcyan", 8},
+    {"darkgoldenrod", 7},
+    {"darkgray", 4},
+    {"darkgreen", 10},
+    {"darkgrey", 4},
+    {"darkkhaki", 5},
+    {"darkmagenta", 8},
+    {"darkolivegreen", 8},
+    {"darkorange", 6},
+    {"darkorchid", 6},
+    {"darkred", 10},
+    {"darksalmon", 4},
+    {"darkseagreen", 5},
+    {"darkslateblue", 8},
+    {"darkslategray", 9},
+    {"darkslategrey", 9},
+    {"darkturquoise", 6},
+    {"darkviolet", 6},
+    {"deeppink", 5},
+    {"deepskyblue", 5},
+    {"dimgray", 7},
+    {"dimgrey", 7},
+    {"dodgerblue", 5},
+    {"firebrick", 8},
+    {"floralwhite", 1},
+    {"forestgreen", 9},
+    {"fuchsia", 4},
+    {"gainsboro", 2},
+    {"ghostwhite", 1},
+    {"gold", 5},
+    {"goldenrod", 6},
+    {"gray", 6},
+    {"green", 10},
+    {"greenyellow", 5},
+    {"grey", 6},
+    {"honeydew", 1},
+    {"hotpink", 4},
+    {"indianred", 6},
+    {"indigo", 9},
+    {"ivory", 1},
+    {"khaki", 3},
+    {"lavender", 1},
+    {"lavenderblush", 1},
+    {"lawngreen", 6},
+    {"lemonchiffon", 1},
+    {"lightblue", 3},
+    {"lightcoral", 4},
+    {"lightcyan", 1},
+    {"lightgoldenrodyellow", 1},
+    {"lightgray", 2},
+    {"lightgreen", 4},
+    {"lightgrey", 2},
+    {"lightpink", 2},
+    {"lightsalmon", 4},
+    {"lightseagreen", 6},
+    {"lightskyblue", 3},
+    {"lightslategray", 6},
+    {"lightslategrey", 6},
+    {"lightsteelblue", 3},
+    {"lightyellow", 1},
+    {"lime", 8},
+    {"limegreen", 7},
+    {"linen", 1},
+    {"magenta", 4},
+    {"maroon", 10},
+    {"mediumaquamarine", 5},
+    {"mediumblue", 9},
+    {"mediumorchid", 5},
+    {"mediumpurple", 5},
+    {"mediumseagreen", 6},
+    {"mediumslateblue", 5},
+    {"mediumspringgreen", 6},
+    {"mediumturquoise", 5},
+    {"mediumvioletred", 6},
+    {"midnightblue", 9},
+    {"mintcream", 1},
+    {"mistyrose", 1},
+    {"moccasin", 2},
+    {"navajowhite", 2},
+    {"navy", 10},
+    {"oldlace", 1},
+    {"olive", 8},
+    {"olivedrab", 7},
+    {"orange", 5},
+    {"orangered", 7},
+    {"orchid", 4},
+    {"palegoldenrod", 2},
+    {"palegreen", 4},
+    {"paleturquoise", 2},
+    {"palevioletred", 5},
+    {"papayawhip", 1},
+    {"peachpuff", 2},
+    {"peru", 6},
+    {"pink", 2},
+    {"plum", 3},
+    {"powderblue", 2},
+    {"purple", 8},
+    {"red", 8},
+    {"rosybrown", 5},
+    {"royalblue", 6},
+    {"saddlebrown", 8},
+    {"salmon", 4},
+    {"sandybrown", 4},
+    {"seagreen", 8},
+    {"seashell", 1},
+    {"sienna", 7},
+    {"silver", 3},
+    {"skyblue", 3},
+    {"slateblue", 6},
+    {"slategray", 6},
+    {"slategrey", 6},
+    {"snow", 1},
+    {"springgreen", 6},
+    {"steelblue", 6},
+    {"tan", 4},
+    {"teal", 8},
+    {"thistle", 3},
+    {"tomato", 5},
+    {"turquoise", 4},
+    {"violet", 3},
+    {"wheat", 2},
+    {"white", 0},
+    {"whitesmoke", 1},
+    {"yellow", 4},
+    {"yellowgreen", 6},
+    {"", 255}
+};
+
 
 /* Global variables */
 /* colors */
@@ -76,13 +233,24 @@ char *skip_num(char *p) {
 
 int get_color(char *style) {
 	int color;
+	int c;
+	
+	c=0;
+	while (ctable[c++].shade_level<255) {
+		if(!strcmp(style, ctable[c].color_name)) {
+			printf("%s",ctable[c].color_name);
+			return(ctable[c].shade_level);}
+	}
+
 	if(!strncmp(style, "url",3))
 		return(3);
-	if(!strcmp(style, "black"))
-		return(DITHER_BLACK);
-	else if(!strcmp(style, "white"))
-		return(DITHER_WHITE);
-	else if (style[0] == '#') {
+
+//	if(!strcmp(style, "black"))
+//		return(DITHER_BLACK);
+//	else if(!strcmp(style, "white"))
+//		return(DITHER_WHITE);
+//	else 
+	if (style[0] == '#') {
 		color = color_balance+(11-11*(16*gethex(style[1])+gethex(style[2])+
 		  16*gethex(style[3])+gethex(style[4])+
 		  16*gethex(style[5])+gethex(style[6]))/(255*3));
@@ -131,11 +299,12 @@ void chkstyle (xmlNodePtr node)
 	  //
 	  
 	  /* Now the line properties */
+	  opacity=0.6;
 	  attr = xmlGetProp(node, (const xmlChar *) "stroke-opacity");
 	  if(attr != NULL) {
 			opacity=atof((const char *)attr);
 			//xmlFree(attr);
-	  } else opacity=0;
+	  }
 	  //
 
 	  attr = xmlGetProp(node, (const xmlChar *) "stroke");
@@ -144,9 +313,9 @@ void chkstyle (xmlNodePtr node)
 			retcode=get_color(style);
 			free(style);
 			
-			if (opacity > 0.9) retcode=DITHER_BLACK;
+			if (opacity > 0.5) retcode=DITHER_BLACK;
 			if (retcode == -1) {
-				if (line == 1) fprintf(stderr,"\n  Disabling line mode");
+				if (line == 1) fprintf(stderr,"\n  Disabling line mode (too transparent)");
 				line=0;
 				}
 			else {
@@ -370,8 +539,8 @@ int main( int argc, char *argv[] )
     }
 
 	color=DITHER_BLACK;  /* 11 (black thin pen) is default */
-	color_balance=0;
-    
+	color_balance=0;  /* 11 (black thin pen) is default */
+
 	for (i = 1; i < argc; i++) {
 	 arg = argv[i];
 	 if (arg && *arg == '-') {
@@ -394,7 +563,7 @@ int main( int argc, char *argv[] )
 			fprintf(stderr,"\n      (0-11) white to black, (12-15) thicker gray to black.");
 			fprintf(stderr,"\n   -bSHIFT: Adjust 'color' brightness, +/- 10.");
 			fprintf(stderr,"\n   -w: Enable wireframe mode.        |  -r: Rotate the picture.");
-			fprintf(stderr,"\n   -d: Consider the disabled layers. |  ");
+			fprintf(stderr,"\n   -i: Include the disabled layers. |  ");
 			fprintf(stderr,"\n   -e<1,2>: Encode in expanded form, repeating every command.");
 			fprintf(stderr,"\n   -l<1-255>: Force max number of 'lineto' elements in a row.");
 			fprintf(stderr,"\n   -g: Group paths forming the same area in a single stencil block.");
@@ -465,7 +634,7 @@ int main( int argc, char *argv[] )
 	   case 'r' :
 			rotate=1;
 			break;
-	   case 'd' :
+	   case 'i' :
 			takedisabled=1;
 			break;
 	   case 'g' :
@@ -506,7 +675,7 @@ int main( int argc, char *argv[] )
 	   p++;
 	 }
 	}
-	
+
 	if (maxelements==0) {
 		if (expanded == 0)
 			maxelements=64;
@@ -519,6 +688,8 @@ int main( int argc, char *argv[] )
     /* Initialize the XML library */
     /* (do we really need this?) */
     LIBXML_TEST_VERSION
+
+	fprintf(stderr,"\n------\ntroubleshooting tip\n------\n");
 
 	oldcmd=0;
 	xx=0; yy=0; cx=0; cy=0;
@@ -548,6 +719,7 @@ autoloop:
     if( (dest=fopen( Dummy, "wb+" )) == NULL )
     {
 		fprintf(stderr,"Error, can't open the destination file   %s\n", Dummy);
+		xmlFreeDoc(doc);
 		(void)fcloseall();
 		exit(15);
     }
@@ -558,6 +730,7 @@ autoloop:
 
 	if( ferror( dest ) ) {
 		fprintf(stderr, "Error writing on target file:  %s\n", dname );
+		xmlFreeDoc(doc);
 		(void)fcloseall();
 		exit(16);
     }
@@ -575,6 +748,8 @@ autoloop:
 		x = y = inix = iniy = 0;
 		pen=color;
 		fill=color;
+		area=0;
+		line=1;
 
 		// Width
 		attr = xmlGetProp(node, (const xmlChar *) "width");
@@ -700,7 +875,7 @@ autoloop:
 					else
 						fprintf(stderr," -> (empty subnode)");
 				} else
-				fprintf(stderr,"\nExcluding subnode (%u), id: %s",gcount,Dummy);
+				fprintf(stderr,"\nExcluding subnode (%u), id: %s, use '-i' to force inclusion.",gcount,Dummy);
 			}
 
 			if(xmlStrcmp(node->name, (const xmlChar *) "path") == 0) {
@@ -781,7 +956,19 @@ autoloop:
 								case 'm':
 									cmd = 'l';
 									break;
+								case 'h':
+									cmd = 'l';
+									break;
+								case 'v':
+									cmd = 'l';
+									break;
 								case 'M':
+									cmd = 'L';
+									break;
+								case 'H':
+									cmd = 'L';
+									break;
+								case 'V':
 									cmd = 'L';
 									break;
 								default:
@@ -819,9 +1006,17 @@ autoloop:
 							}
 						} else {
 							nodecnt++;
+							/* skip 5 parameters if cmd is 'arc'*/
+							if ((cmd == 'A')||(cmd == 'a')) {
+								path=skip_num(path);
+								path=skip_num(path);
+								path=skip_num(path);
+								path=skip_num(path);
+								path=skip_num(path);
+							}
 							/* Vertical and Horizontal lines take 1 parameter only */
 							if (toupper(cmd) != 'V') {
-								cx=cy=atof(path)-xx;
+								cx=atof(path)-xx;
 								path=skip_num(path);
 							}
 							if (toupper(cmd) != 'H') {
@@ -830,7 +1025,7 @@ autoloop:
 							}
 							////fprintf(stderr,"\n%s",path);
 							/* don't consider the second parameter of a relative curve*/
-							if ((cmd == 'c')||(cmd == 's')||(cmd == 'q')||(cmd == 't')||(cmd == 'a')) {
+							if ((cmd == 'c')||(cmd == 's')||(cmd == 'q')||(cmd == 't')) {
 								curves_cnt++;
 								if ((curves_cnt % 3)==1) {
 									path=skip_num(path);
@@ -994,15 +1189,15 @@ autoloop:
 		autosize=2;
 		fprintf(stderr,"\n\n\n------\nAutosize mode, SECOND PASS\n------\n");
 		if ((arm-alm)>(abm-atm)) {
-			scale=100*254/(arm-alm);
+			scale=100*251/(arm-alm);
 			fprintf(stderr,"Autosizing in landscape mode (max x = 255)\n");
 		} else {
-			scale=100*254/(abm-atm);
+			scale=100*251/(abm-atm);
 			fprintf(stderr,"Autosizing in portrait mode (max y = 255)\n");
 		}
-		fprintf(stderr,"\n--alm: %f, atm: %f ----\n",alm,atm);
-		xshift=scale*(xshift-alm)/100;
-		yshift=scale*(yshift-atm)/100;
+		//fprintf(stderr,"\n--alm: %f, atm: %f ----\n",alm,atm);
+		xshift=2+scale*(xshift-alm)/100;
+		yshift=2+scale*(yshift-atm)/100;
 		fprintf(stderr,"\n------\n------\n");
 
 		//free (destline);
@@ -1019,6 +1214,9 @@ autoloop:
 	}
 
 	fprintf(stderr,"\n\nConversion done.\n");
+
+	xmlFreeDoc(doc);
+	(void)fcloseall();
 	return(0);
 }
 
