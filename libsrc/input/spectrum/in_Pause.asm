@@ -2,7 +2,7 @@
 ; 09.2005 aralbrec
 
 XLIB in_Pause
-LIB in_WaitForNoKey, in_WaitForKey, delay
+LIB in_WaitForNoKey, in_WaitForKey, t_delay
 
 ; Waits a period of time measured in milliseconds and exits
 ; early if a key is pressed
@@ -25,7 +25,7 @@ LIB in_WaitForNoKey, in_WaitForKey, delay
 
    ex de,hl
    ld hl,3500 - 78
-   call delay                  ; wait exactly HL t-states
+   call t_delay                  ; wait exactly HL t-states
    ex de,hl
    
    dec hl

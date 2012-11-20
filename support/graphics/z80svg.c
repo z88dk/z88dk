@@ -11,7 +11,7 @@
    MinGW
    gcc -Wall -O2 -o z80svg z80svg.c libxml2.dll
 
-   $Id: z80svg.c,v 1.13 2012-11-19 16:17:54 stefano Exp $
+   $Id: z80svg.c,v 1.14 2012-11-20 20:33:14 stefano Exp $
  * ----------------------------------------------------------
 */
 
@@ -192,6 +192,7 @@ const struct svgcolor ctable[]={
 
 
 /* Global variables */
+
 /* colors */
 unsigned char pen;
 unsigned char fill;
@@ -204,11 +205,34 @@ unsigned char line;
 /* Counters */
 int	elementcnt;
 unsigned int pathcnt,nodecnt,skipcnt;
+
 /* File and string buffer pointers */
 char destline[10000];
 FILE *source,*dest;
 
-int takedisabled=0;
+/* flags */
+int expanded=0;
+int rotate=0;
+int pathdetails=0;
+int wireframe=0;
+int autosize=0;
+int forcedmode=0;
+int xshift=0;
+int yshift=0;
+
+/* Positioning */
+float scale=100;
+float width, height;
+float xx,yy,cx,cy,fx,fy,ax;
+float lm,rm,tm,bm;
+float alm,arm,atm,abm;
+unsigned char x,y;
+
+/* Current command */
+unsigned char cmd;
+
+char tmpstr[30];
+
 
 int gethex(char hexval) {
 	char c;
@@ -261,7 +285,7 @@ int get_color(char *style) {
 }
 
 /* Pick pen and area style */
-void chkstyle (xmlNodePtr node)
+void chkstyle_a (xmlNodePtr node)
 {
 	xmlChar *attr;
 	int retcode;
@@ -341,7 +365,7 @@ void chkstyle (xmlNodePtr node)
 }
 
 
-void chkstyle2(xmlNodePtr node)
+void chkstyle_b(xmlNodePtr node)
 {
 	xmlChar *attr;
 	char *style;
@@ -437,8 +461,37 @@ void chkstyle2(xmlNodePtr node)
 }
 
 
+void chkstyle(xmlNodePtr node) {
+				if (wireframe != 1) {
+					chkstyle_a (node);
+					chkstyle_b (node);
+					switch (forcedmode) {
+						case 1:
+							line=1;	area=0;
+							break;
+						case 2:
+							line=0;	area=1;
+							break;
+						case 3:
+							line=1;	area=1;
+							break;
+						case 4:
+							line=1;
+							break;
+						case 5:
+							area=1;
+							break;
+						case 6:
+							line=0;
+							break;
+						case 7:
+							area=0;
+							break;
+					}
+				}
+}
 
-void line_to (unsigned char x,unsigned char y,unsigned char oldx,unsigned char oldy,int expanded) {
+void line_to (unsigned char x,unsigned char y,unsigned char oldx,unsigned char oldy) {
 	if (expanded == 0) {
 		if ((x != oldx) || (y != oldy)) {
 		  if ((area==1) && (line==0))
@@ -482,6 +535,44 @@ void line_to (unsigned char x,unsigned char y,unsigned char oldx,unsigned char o
 }
 
 
+void scale_and_shift() {
+			/* Scale and shift the picture (part of the main loop) */
+			cx=(scale*(cx-xx)/100);
+			cy=(scale*(cy-yy)/100);
+			if (rotate==1) {
+				ax=cx;	cx=cy;	cy=ax;
+			}
+			
+			if (pathdetails==1) printf("\n%c %f %f",cmd,cx,cy);
+			
+			sprintf (tmpstr,"%0.f",(255*cx/width));
+			fx=atof(tmpstr)+xshift;
+			if (autosize==2) {
+				if (fx<=0) fx=0;
+				if (fx>=255) fx=255;
+				sprintf (tmpstr,"%0.f",fx-xshift);
+			}
+			x=atoi(tmpstr)+xshift;
+			sprintf (tmpstr,"%0.f",(255*cy/height));
+			fy=atof(tmpstr)+yshift;	
+			if (autosize==2) {
+				if (fy<=0) fy=0;
+				if (fy>=255) fy=255;
+				sprintf (tmpstr,"%0.f",fy-yshift);
+			}
+			y=atoi(tmpstr)+yshift;				
+
+			/* keep track of margins */
+			if (lm>fx) lm=fx;
+			if (rm<fx) rm=fx;
+			if (tm>fy) tm=fy;
+			if (bm<fy) bm=fy;
+
+			//printf("|%c| 0x%02X 0x%02X",cmd, x, y);
+			if ((area==1)||(line==1))
+				if (pathdetails==2) printf("\n%c %03u %03u",cmd, x, y);
+}
+
 
 int main( int argc, char *argv[] )
 {
@@ -494,17 +585,9 @@ int main( int argc, char *argv[] )
 	char stname[150]="svg_picture";
 	char sname[300]="";
 	char dname[300]="";
-	float scale=100;
-	int xshift=0;
-	int yshift=0;
-	int pathdetails=0;
-	int wireframe=0;
-	int autosize=0;
 	int grouping=0;
-	int rotate=0;
-	int forcedmode=0;
-	int expanded=0;
 	int maxelements=0;
+	int takedisabled=0;
 	int inipath;
 	int curves_cnt;
 
@@ -521,17 +604,11 @@ int main( int argc, char *argv[] )
 	char *path;
 	// Static line buffer, to make it compatible to MinGW32
 	char spath[2000000];
-	char tmpstr[10];
-	unsigned char cmd, oldcmd;
-	unsigned char x,y,inix,iniy;
+	unsigned char oldcmd;
+	unsigned char inix,iniy;
 	unsigned char oldx, oldy;
 	float svcx,svcy;
 
-	float width, height;
-	float xx,yy,cx,cy,fx,fy,ax;
-	float lm,rm,tm,bm;
-	float alm,arm,atm,abm;
-	
     if ( (argc < 2) ) {
       fprintf(stderr,"\nParameter error, use 'z80svg -h' for help.\n\n");
       exit(1);
@@ -842,33 +919,8 @@ autoloop:
 					area=0;
 					line=1;
 
-					if (wireframe != 1) {
-						chkstyle (node);
-						chkstyle2 (node);
-						switch (forcedmode) {
-							case 1:
-								line=1;	area=0;
-								break;
-							case 2:
-								line=0;	area=1;
-								break;
-							case 3:
-								line=1;	area=1;
-								break;
-							case 4:
-								line=1;
-								break;
-							case 5:
-								area=1;
-								break;
-							case 6:
-								line=0;
-								break;
-							case 7:
-								area=0;
-								break;
-						}
-					}
+					chkstyle (node);
+
 					if (node->xmlChildrenNode != NULL)
 						node = node->xmlChildrenNode;
 					else
@@ -877,13 +929,42 @@ autoloop:
 				fprintf(stderr,"\nExcluding subnode (%u), id: %s, use '-i' to force inclusion.",gcount,Dummy);
 			}
 
-			if(xmlStrcmp(node->name, (const xmlChar *) "path") == 0) {
+			/* Rectangle */
+			/*
+			if(xmlStrcmp(node->name, (const xmlChar *) "rect") == 0) {
 
-/*				nodecolor[pathcnt]=pen;
-				nodecolor[pathcnt]=fill;
-				nodearea[pathcnt]=area;
-				nodeline[pathcnt]=line;
-*/
+				chkstyle (node);				
+				
+				attr = xmlGetProp(node, (const xmlChar *) "x");
+				if(attr != NULL) {
+					cx=atof((const char *)attr);
+					//xmlFree(attr);
+				}
+				attr = xmlGetProp(node, (const xmlChar *) "y");
+				if(attr != NULL) {
+					cy=atof((const char *)attr);
+					//xmlFree(attr);
+				}
+				
+				scale_and_shift();
+
+				if ((area==1) && (line==1))
+					fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
+				if ((area==1)||(line==1)) {
+					if ((area==1) && (line==0)) {
+					  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_AREA_PLOT, x, y);
+					}
+					else
+					  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_PLOT|pen, x, y);
+				}
+				fprintf(dest,"\t0x%2X,\n", CMD_AREA_CLOSE|fill);
+
+
+			}*/
+
+
+			/* PATHS (a whole world!) */
+			if(xmlStrcmp(node->name, (const xmlChar *) "path") == 0) {
 				pathcnt++;
 				attr = xmlGetProp(node, (const xmlChar *) "id");
 				if (attr == NULL)
@@ -894,33 +975,7 @@ autoloop:
 				}
 				fprintf(stderr,"\n  Processing path group #%u, id: %s",pathcnt,Dummy);
 
-				if (wireframe != 1) {
-					chkstyle (node);
-					chkstyle2 (node);
-					switch (forcedmode) {
-						case 1:
-							line=1;	area=0;
-							break;
-						case 2:
-							line=0;	area=1;
-							break;
-						case 3:
-							line=1;	area=1;
-							break;
-						case 4:
-							line=1;
-							break;
-						case 5:
-							area=1;
-							break;
-						case 6:
-							line=0;
-							break;
-						case 7:
-							area=0;
-							break;
-					}
-				}
+				chkstyle(node);
 
 				attr = xmlGetProp(node, (const xmlChar *) "d");
 
@@ -955,21 +1010,21 @@ autoloop:
 								case 'm':
 									cmd = 'l';
 									break;
-								case 'h':
+/*								case 'h':
 									cmd = 'l';
 									break;
 								case 'v':
 									cmd = 'l';
-									break;
+									break;*/
 								case 'M':
 									cmd = 'L';
 									break;
-								case 'H':
+/*								case 'H':
 									cmd = 'L';
 									break;
 								case 'V':
 									cmd = 'L';
-									break;
+									break;*/
 								default:
 									cmd=oldcmd;
 							}
@@ -995,7 +1050,7 @@ autoloop:
 */
 						if ((cmd == 'Z')||(cmd == 'z')) {
 							if ((x != inix) || (y != iniy))
-								line_to (inix,iniy,oldx,oldy,expanded);
+								line_to (inix,iniy,oldx,oldy);
 
 							if (pathdetails>0) printf("\n%c", cmd);
 							if (strlen(path)>0) {
@@ -1024,7 +1079,7 @@ autoloop:
 							}
 							////fprintf(stderr,"\n%s",path);
 							/* don't consider the second parameter of a relative curve*/
-							if ((cmd == 'c')||(cmd == 's')||(cmd == 'q')||(cmd == 't')) {
+							if ((cmd == 'c')||(cmd == 'q')||(cmd == 't')) {
 								curves_cnt++;
 								if ((curves_cnt % 3)==1) {
 									path=skip_num(path);
@@ -1039,41 +1094,9 @@ autoloop:
 								cmd=toupper(cmd);
 							}
 							svcx=cx; svcy=cy;
-							/* Now scale and shift the picture */
-							cx=(scale*(cx-xx)/100);
-							cy=(scale*(cy-yy)/100);
-							if (rotate==1) {
-								ax=cx;	cx=cy;	cy=ax;
-							}
 							
-							if (pathdetails==1) printf("\n%c %f %f",cmd,cx,cy);
-							
-							sprintf (tmpstr,"%0.f",(255*cx/width));
-							fx=atof(tmpstr)+xshift;
-							if (autosize==2) {
-								if (fx<=0) fx=0;
-								if (fx>=255) fx=255;
-								sprintf (tmpstr,"%0.f",fx-xshift);
-							}
-							x=atoi(tmpstr)+xshift;
-							sprintf (tmpstr,"%0.f",(255*cy/height));
-							fy=atof(tmpstr)+yshift;	
-							if (autosize==2) {
-								if (fy<=0) fy=0;
-								if (fy>=255) fy=255;
-								sprintf (tmpstr,"%0.f",fy-yshift);
-							}
-							y=atoi(tmpstr)+yshift;				
-
-							/* keep track of margins */
-							if (lm>fx) lm=fx;
-							if (rm<fx) rm=fx;
-							if (tm>fy) tm=fy;
-							if (bm<fy) bm=fy;
-
-							//printf("|%c| 0x%02X 0x%02X",cmd, x, y);
-							if ((area==1)||(line==1))
-								if (pathdetails==2) printf("\n%c %03u %03u",cmd, x, y);
+							/* Scale and shift the picture */
+							scale_and_shift();
 							
 							switch (cmd) {
 								case 'M':
@@ -1105,7 +1128,7 @@ autoloop:
 									break;
 								default:
 									if ((oldx!=0) && (oldy!=0))
-									line_to (x,y,oldx,oldy,expanded);
+									line_to (x,y,oldx,oldy);
 
 									if (expanded == 0) {
 										if (elementcnt >= maxelements) {

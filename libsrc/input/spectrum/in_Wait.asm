@@ -2,7 +2,7 @@
 ; 09.2005 aralbrec
 
 XLIB in_Wait
-LIB delay
+LIB t_delay
 
 ; Waits a period of time measured in milliseconds.
 ;
@@ -20,7 +20,7 @@ LIB delay
 .loop
 
    ld hl,3500 - 36
-   call delay                  ; wait exactly HL t-states
+   call t_delay                  ; wait exactly HL t-states
    
    dec de
    ld a,d
