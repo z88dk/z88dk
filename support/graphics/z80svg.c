@@ -11,7 +11,7 @@
    MinGW
    gcc -Wall -O2 -o z80svg z80svg.c libxml2.dll
 
-   $Id: z80svg.c,v 1.14 2012-11-20 20:33:14 stefano Exp $
+   $Id: z80svg.c,v 1.15 2012-11-23 17:13:50 stefano Exp $
  * ----------------------------------------------------------
 */
 
@@ -32,6 +32,12 @@
 #define fcloseall _fcloseall
 #endif
 
+/* 
+ * Let's reduce the autosize computed scale to save memory
+ * (overlapping corners are excluded)
+ */
+
+#define scale_divisor 2.5
 
 struct svgcolor{
 	char color_name[30];
@@ -211,6 +217,10 @@ char destline[10000];
 FILE *source,*dest;
 
 /* flags */
+int inipath;
+int grouping=0;
+int maxelements=0;
+int verbose=0;
 int expanded=0;
 int rotate=0;
 int pathdetails=0;
@@ -220,19 +230,20 @@ int forcedmode=0;
 int xshift=0;
 int yshift=0;
 
+unsigned char inix,iniy;
+unsigned char oldx, oldy;
+
+
 /* Positioning */
 float scale=100;
 float width, height;
-float xx,yy,cx,cy,fx,fy,ax;
+float xx,yy,cx,cy,fx,fy;
 float lm,rm,tm,bm;
 float alm,arm,atm,abm;
 unsigned char x,y;
 
 /* Current command */
 unsigned char cmd;
-
-char tmpstr[30];
-
 
 int gethex(char hexval) {
 	char c;
@@ -260,9 +271,21 @@ int get_color(char *style) {
 	int c;
 	
 	c=0;
+
 	while (ctable[c++].shade_level<255) {
 		if(!strcmp(style, ctable[c].color_name))
 			return(ctable[c].shade_level);
+	}
+
+	if(!strncmp(style, "rgb",3)) {
+		while (!isdigit(*style) && (strlen(style) > 0) ) style++;
+		color=atoi(style);
+		while ( (*style != ',') && (strlen(style) > 0) ) style++;
+		color=color+atoi(++style);
+		while ( (*style != ',') && (strlen(style) > 0) ) style++;
+		color=color+atoi(++style);
+		color = color_balance+(11-(11*color/(255*3)));
+		return (color);
 	}
 
 	if(!strncmp(style, "url",3))
@@ -283,6 +306,26 @@ int get_color(char *style) {
 	  }
 	else return (-1);  /* "none" */
 }
+
+int look_parent_name(xmlNodePtr node,char * layer_name)
+{
+	xmlNodePtr parentnode;
+	xmlChar *attr;
+	char Dummy[600];
+
+	parentnode = node;
+	
+	while (parentnode->parent != NULL) {
+			attr = xmlGetProp(parentnode, (const xmlChar *) "id");
+			if (attr != NULL) {
+				sprintf(Dummy,"%s",(const char *)attr);
+				if (strcmp(layer_name,Dummy)==0) return 1;
+			}
+			parentnode=parentnode->parent;
+	}
+	return 0;
+}
+
 
 /* Pick pen and area style */
 void chkstyle_a (xmlNodePtr node)
@@ -306,15 +349,15 @@ void chkstyle_a (xmlNodePtr node)
 			retcode=get_color(style);
 			free(style);
 			if (retcode == -1) {
-				if (area == 1) fprintf(stderr,"\n  Disabling area mode");
+				if ((area == 1)&&(verbose==1)) fprintf(stderr,"\n  Disabling area mode");
 				area=0;
 				}
 			else if (opacity > 0.5) {
 				area=1;
 				fill=(unsigned char)retcode;
-				fprintf(stderr,"\n  Area mode enabled, dither level: %i",fill);
+				if (verbose==1) fprintf(stderr,"\n  Area mode enabled, dither level: %i",fill);
 			} else {
-				if (area == 1) fprintf(stderr,"\n  Disabling area mode (too transparent)");
+				if ((area == 1) && (verbose==1)) fprintf(stderr,"\n  Disabling area mode (too transparent)");
 				area=0;
 			}
 			//xmlFree(attr);
@@ -338,13 +381,13 @@ void chkstyle_a (xmlNodePtr node)
 			
 			if (opacity > 0.5) retcode=DITHER_BLACK;
 			if (retcode == -1) {
-				if (line == 1) fprintf(stderr,"\n  Disabling line mode (too transparent)");
+				if ((line == 1)&&((verbose==1))) fprintf(stderr,"\n  Disabling line mode (too transparent)");
 				line=0;
 				}
 			else {
 				line=1;
 				pen=(unsigned char)retcode;
-				fprintf(stderr,"\n  Line mode enabled, dither level: %i",fill);
+				if (verbose==1) fprintf(stderr,"\n  Line mode enabled, dither level: %i",fill);
 			}
 			//!!!xmlFree(attr);
 	  }
@@ -356,7 +399,7 @@ void chkstyle_a (xmlNodePtr node)
 			  if ((pen>1)&&(pen!=0)) {
 				pen=DITHER_BLACK+(pen)/2;
 				if (pen>15) pen=15;
-				fprintf(stderr,"\n  Extra pen width: %i", pen);
+				if (verbose==1) fprintf(stderr,"\n  Extra pen width: %i", pen);
 				//xmlFree(attr);
 			  } else pen = color;
 		  } //else pen = color;
@@ -389,13 +432,13 @@ void chkstyle_b(xmlNodePtr node)
 				style=strtok(NULL,";:");
 				retcode=get_color(style);
 				if ((retcode == -1)||(forceline == 1)) {
-					if (area == 1) fprintf(stderr,"\n  Disabling area mode");
+					if ((area == 1)&&(verbose==1)) fprintf(stderr,"\n  Disabling area mode");
 					area=0;
 					}
 				else {
 					area=1;
 					fill=(unsigned char)retcode;
-					fprintf(stderr,"\n  Area mode enabled, dither level: %i",fill);
+					if (verbose==1) fprintf(stderr,"\n  Area mode enabled, dither level: %i",fill);
 				}
 			}
 
@@ -403,7 +446,7 @@ void chkstyle_b(xmlNodePtr node)
 				style=strtok(NULL,";:");
 				opacity=atof(style);
 				if (opacity <= 0.5) {
-					if (area == 1) fprintf(stderr,"\n  Disabling area mode (too transparent)");
+					if ((area == 1)&&(verbose==1)) fprintf(stderr,"\n  Disabling area mode (too transparent)");
 					area=0;
 				}
 			}
@@ -412,7 +455,7 @@ void chkstyle_b(xmlNodePtr node)
 				style=strtok(NULL,";:");
 				stroke_opacity=atof(style);
 				if ((retcode == -1) && (stroke_opacity > 0.6)) {
-					fprintf(stderr,"\n  Restoring line mode");
+					if (verbose==1) fprintf(stderr,"\n  Restoring line mode");
 					line=1;
 				}
 			}
@@ -432,10 +475,10 @@ void chkstyle_b(xmlNodePtr node)
 						pen = DITHER_BLACK;
 					else
 						pen=(unsigned char)retcode;
-					fprintf(stderr,"\n  Line mode enabled, dither level: %i",fill);
+					if (verbose==1) fprintf(stderr,"\n  Line mode enabled, dither level: %i",fill);
 					}
 				else {
-					if (line == 1) fprintf(stderr,"\n  Disabling line mode");
+					if ((line == 1)&&(verbose==1)) fprintf(stderr,"\n  Disabling line mode");
 					line=0;
 				}
 			}
@@ -447,7 +490,7 @@ void chkstyle_b(xmlNodePtr node)
 					  if ((pen>1)&&(pen!=0)) {
 						pen=DITHER_BLACK+(pen)/2;
 						if (pen>15) pen=15;
-						fprintf(stderr,"\n  Extra pen width: %i", pen);
+						if (verbose==1) fprintf(stderr,"\n  Extra pen width: %i", pen);
 					  } else pen = color;
 				}
 			}
@@ -489,6 +532,34 @@ void chkstyle(xmlNodePtr node) {
 							break;
 					}
 				}
+}
+
+void move_to (unsigned char x,unsigned char y) {
+
+		if ((expanded==0)&&(elementcnt > 0))
+			if ((area==1)||(line==1))
+				fprintf(dest,"\t0x%2X,0x%02X, %s\n", REPEAT_COMMAND, elementcnt, destline);
+		elementcnt=0;
+		//sprintf(destline,"");
+		destline[0]='\0';
+		if ((inipath==0) && (area==1) && (line==1))
+			fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
+		else if (grouping == 0) {
+			if ((inipath==1) && (area==1))
+				fprintf(dest,"\t0x%2X,\n", CMD_AREA_CLOSE|fill);
+			if ((area==1) && (line==1))
+				fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
+		}
+		inix=x;
+		iniy=y;
+		if ((area==1)||(line==1)) {
+			if ((area==1) && (line==0)) {
+			  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_AREA_PLOT, x, y);
+			}
+			else
+			  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_PLOT|pen, x, y);
+		}
+		inipath=1;
 }
 
 void line_to (unsigned char x,unsigned char y,unsigned char oldx,unsigned char oldy) {
@@ -534,62 +605,79 @@ void line_to (unsigned char x,unsigned char y,unsigned char oldx,unsigned char o
 	elementcnt++;
 }
 
+void close_area() {
+	if ((expanded == 0)&&(elementcnt>0))
+		if ((area==1)||(line==1))
+			fprintf(dest,"\t0x%2X,0x%02X, %s\n\t", REPEAT_COMMAND, elementcnt, destline);
+
+	if ((area == 1) && (inipath==1)) {
+		fprintf(dest,"\t0x%2X,\n", CMD_AREA_CLOSE|fill);
+	}
+}
+
 
 void scale_and_shift() {
-			/* Scale and shift the picture (part of the main loop) */
-			cx=(scale*(cx-xx)/100);
-			cy=(scale*(cy-yy)/100);
-			if (rotate==1) {
-				ax=cx;	cx=cy;	cy=ax;
-			}
-			
-			if (pathdetails==1) printf("\n%c %f %f",cmd,cx,cy);
-			
-			sprintf (tmpstr,"%0.f",(255*cx/width));
-			fx=atof(tmpstr)+xshift;
-			if (autosize==2) {
-				if (fx<=0) fx=0;
-				if (fx>=255) fx=255;
-				sprintf (tmpstr,"%0.f",fx-xshift);
-			}
-			x=atoi(tmpstr)+xshift;
-			sprintf (tmpstr,"%0.f",(255*cy/height));
-			fy=atof(tmpstr)+yshift;	
-			if (autosize==2) {
-				if (fy<=0) fy=0;
-				if (fy>=255) fy=255;
-				sprintf (tmpstr,"%0.f",fy-yshift);
-			}
-			y=atoi(tmpstr)+yshift;				
 
-			/* keep track of margins */
-			if (lm>fx) lm=fx;
-			if (rm<fx) rm=fx;
-			if (tm>fy) tm=fy;
-			if (bm<fy) bm=fy;
+float ax;
+char * tmpstr;
 
-			//printf("|%c| 0x%02X 0x%02X",cmd, x, y);
-			if ((area==1)||(line==1))
-				if (pathdetails==2) printf("\n%c %03u %03u",cmd, x, y);
+	tmpstr=malloc(100);
+	/* Scale and shift the picture (part of the main loop) */
+	cx=(scale*(cx-xx)/100);
+	cy=(scale*(cy-yy)/100);
+	if (rotate==1) {
+		ax=cx;	cx=cy;	cy=ax;
+	}
+	
+	if (pathdetails==1) printf("\n%c %f %f",cmd,cx,cy);
+	
+	sprintf (tmpstr,"%0.f",(255*cx/width));
+	fx=atof(tmpstr)+xshift;
+	if (autosize==2) {
+		if (fx<=0) fx=0;
+		if (fx>=255) fx=255;
+		sprintf (tmpstr,"%0.f",fx-xshift);
+	}
+	x=atoi(tmpstr)+xshift;
+	sprintf (tmpstr,"%0.f",(255*cy/height));
+	fy=atof(tmpstr)+yshift;	
+	if (autosize==2) {
+		if (fy<=0) fy=0;
+		if (fy>=255) fy=255;
+		sprintf (tmpstr,"%0.f",fy-yshift);
+	}
+	y=atoi(tmpstr)+yshift;
+
+	/* keep track of margins */
+	if (lm>fx) lm=fx;
+	if (rm<fx) rm=fx;
+	if (tm>fy) tm=fy;
+	if (bm<fy) bm=fy;
+
+	//printf("|%c| 0x%02X 0x%02X",cmd, x, y);
+	if ((area==1)||(line==1))
+		if (pathdetails==2) printf("\n%c %03u %03u",cmd, x, y);
+	
+	free(tmpstr);
 }
 
 
 int main( int argc, char *argv[] )
 {
-    char Dummy[600];
+	char Dummy[600];
 	char currentlayer[300]="";
     int i;
     char** p = argv+1;
 	char *arg;
+	float x1,x2,y1,y2;
 
 	char stname[150]="svg_picture";
 	char sname[300]="";
 	char dname[300]="";
-	int grouping=0;
-	int maxelements=0;
+
 	int takedisabled=0;
-	int inipath;
 	int curves_cnt;
+	int excluded_nodes=0;
 
 	xmlDocPtr doc;
 	xmlNodePtr node;
@@ -605,8 +693,6 @@ int main( int argc, char *argv[] )
 	// Static line buffer, to make it compatible to MinGW32
 	char spath[2000000];
 	unsigned char oldcmd;
-	unsigned char inix,iniy;
-	unsigned char oldx, oldy;
 	float svcx,svcy;
 
     if ( (argc < 2) ) {
@@ -629,7 +715,7 @@ int main( int argc, char *argv[] )
 			fprintf(stderr,"\n      The default name is 'svg_picture'");
 			fprintf(stderr,"\n   -oTARGET: output file name. '.h' is always added.");
 			fprintf(stderr,"\n      Default is the source SVG file name with trailing '.h'.");
-			fprintf(stderr,"\n   -a: run twice and resize the picture automatically.");
+			fprintf(stderr,"\n   -a: shift and resize automatically to roughly 100 points.");
 			fprintf(stderr,"\n   -sSCALE: optional percentage to resize the picture size.");
 			fprintf(stderr,"\n   -xXSHIFT: optional top-left corner shifting, X coordinate.");
 			fprintf(stderr,"\n      Negative values are allowed.");
@@ -638,8 +724,8 @@ int main( int argc, char *argv[] )
 			fprintf(stderr,"\n   -cCOLOR: Change pen color, default is black (11).");
 			fprintf(stderr,"\n      (0-11) white to black, (12-15) thicker gray to black.");
 			fprintf(stderr,"\n   -bSHIFT: Adjust 'color' brightness, +/- 10.");
-			fprintf(stderr,"\n   -w: Enable wireframe mode.        |  -r: Rotate the picture.");
-			fprintf(stderr,"\n   -i: Include the disabled layers. |  ");
+			fprintf(stderr,"\n   -w: Enable wireframe mode.       |  -r: Rotate the picture.");
+			fprintf(stderr,"\n   -i: Include the disabled layers. |  -v: Verbose.");
 			fprintf(stderr,"\n   -e<1,2>: Encode in expanded form, repeating every command.");
 			fprintf(stderr,"\n   -l<1-255>: Force max number of 'lineto' elements in a row.");
 			fprintf(stderr,"\n   -g: Group paths forming the same area in a single stencil block.");
@@ -707,6 +793,9 @@ int main( int argc, char *argv[] )
 	   case 'w' :
 			wireframe=1;
 			break;
+	   case 'v' :
+			verbose=1;
+			break;
 	   case 'r' :
 			rotate=1;
 			break;
@@ -765,7 +854,7 @@ int main( int argc, char *argv[] )
     /* (do we really need this?) */
     LIBXML_TEST_VERSION
 
-	fprintf(stderr,"\n------\ntroubleshooting tip\n------\n");
+	if (verbose==1) fprintf(stderr,"\n------\ntroubleshooting tips\n------\n");
 
 	oldcmd=0;
 	xx=0; yy=0; cx=0; cy=0;
@@ -802,7 +891,7 @@ autoloop:
 	fprintf(stderr,"\nOutput file is %s\n", Dummy);
 
     fprintf( dest, "\n\n\nstatic unsigned char %s[] = {  ", stname );
-	if (wireframe == 0) fprintf( dest,"\n\t0x%2X,", CMD_AREA_INIT );
+	//if (wireframe == 0) fprintf( dest,"\n\t0x%2X,", CMD_AREA_INIT );
 
 	if( ferror( dest ) ) {
 		fprintf(stderr, "Error writing on target file:  %s\n", dname );
@@ -868,6 +957,7 @@ autoloop:
 			node = node->xmlChildrenNode;
 
 		// Show all nodes in the current pos
+		excluded_nodes =0;
 		pathcnt=0;
 		inipath=0;
 		while(node != NULL) {
@@ -881,12 +971,13 @@ autoloop:
 					sprintf(Dummy,"%s",(const char *)attr);
 					//xmlFree(attr);
 				}
-				fprintf(stderr,"\nAnalyzing view: %s",Dummy);
+				if (verbose==1) fprintf(stderr,"\nAnalyzing view: %s",Dummy);
 				//
 
 				attr = xmlGetProp(node, (const xmlChar *) "current-layer");
 				if (attr != NULL) {
 					sprintf(currentlayer,"%s",(const char *)attr);
+					if (verbose==1) fprintf(stderr,"\nLimiting to layer: %s",currentlayer);
 					//xmlFree(attr);
 				}
 				//
@@ -908,11 +999,11 @@ autoloop:
 				}
 				
 				//if (strlen(currentlayer)!=0) {
-				//if (takedisabled==1) {	
-				if ((takedisabled==1) || (strlen(currentlayer)==0) || (strcmp(currentlayer,Dummy)==0)) {
+				//if (takedisabled==1) {
+				//if ((takedisabled==1) || (strlen(currentlayer)==0) || (strcmp(currentlayer,Dummy)==0)) {
+				if ((takedisabled==1) || (strlen(currentlayer)==0) || look_parent_name(node,currentlayer)) {
 				
-					fprintf(stderr,"\nEntering subnode (%u), id: %s",gcount,Dummy);
-					//
+					if (verbose==1) fprintf(stderr,"\nEntering subnode (%u), id: %s",gcount,Dummy);
 
 					pen=color;
 					fill=color;
@@ -924,44 +1015,213 @@ autoloop:
 					if (node->xmlChildrenNode != NULL)
 						node = node->xmlChildrenNode;
 					else
-						fprintf(stderr," -> (empty subnode)");
-				} else
-				fprintf(stderr,"\nExcluding subnode (%u), id: %s, use '-i' to force inclusion.",gcount,Dummy);
+						if (verbose==1) fprintf(stderr," -> (empty subnode)");
+				} else {
+					excluded_nodes++;
+					if (verbose==1) fprintf(stderr,"\nExcluding subnode (%u), id: %s, use '-i' to force inclusion.",gcount,Dummy);
+				}
 			}
 
+			/*      */
+			/* Line */
+			/*      */
+			if(xmlStrcmp(node->name, (const xmlChar *) "line") == 0) {
+
+				inipath=0;
+				elementcnt=0;
+
+				if (verbose==1) fprintf(stderr,"\nObject: 'line'.");
+
+				chkstyle (node);
+				
+				x1=y1=x2=y2=0;
+				oldx=oldy=0;
+				svcx=svcy=0;
+				
+				attr = xmlGetProp(node, (const xmlChar *) "x1");
+				if(attr != NULL) {
+					x1=atof((const char *)attr)-xx;
+					//xmlFree(attr);
+				}
+				attr = xmlGetProp(node, (const xmlChar *) "y1");
+				if(attr != NULL) {
+					y1=atof((const char *)attr)-yy;
+					//xmlFree(attr);
+				}
+				attr = xmlGetProp(node, (const xmlChar *) "x2");
+				if(attr != NULL) {
+					x2=atof((const char *)attr);
+					//xmlFree(attr);
+				}
+				attr = xmlGetProp(node, (const xmlChar *) "y2");
+				if(attr != NULL) {
+					y2=atof((const char *)attr);
+					//xmlFree(attr);
+				}
+
+				/* Let's put something in the 'cmd' variable.. '|' for line */
+
+				cmd='|';
+				cx=x1; cy=y1;
+				scale_and_shift();
+				move_to (x,y);
+				oldx=x; oldy=y;
+				line_to (x,y,oldx,oldy);
+
+				cx=x2; cy=y2;
+				scale_and_shift();
+				line_to (x,y,oldx,oldy);
+				oldx=x; oldy=y;
+
+				if (pathdetails>0) printf("\n");
+
+				close_area();
+
+				/* keep track of absolute margins */
+				if (alm>lm) alm=lm;
+				if (arm<rm) arm=rm;
+				if (atm>tm) atm=tm;
+				if (abm<bm) abm=bm;
+
+				inipath=0;
+			}
+
+
+			/*           */
 			/* Rectangle */
-			/*
+			/*           */
 			if(xmlStrcmp(node->name, (const xmlChar *) "rect") == 0) {
 
-				chkstyle (node);				
+				inipath=0;
+				elementcnt=0;
+
+				if (verbose==1) fprintf(stderr,"\nObject: 'rect'.");
+
+				chkstyle (node);
+				
+				x1=y1=x2=y2=0;
+				oldx=oldy=0;
+				svcx=svcy=0;
 				
 				attr = xmlGetProp(node, (const xmlChar *) "x");
 				if(attr != NULL) {
-					cx=atof((const char *)attr);
+					x1=atof((const char *)attr)-xx;
 					//xmlFree(attr);
 				}
 				attr = xmlGetProp(node, (const xmlChar *) "y");
 				if(attr != NULL) {
-					cy=atof((const char *)attr);
+					y1=atof((const char *)attr)-yy;
 					//xmlFree(attr);
 				}
-				
-				scale_and_shift();
-
-				if ((area==1) && (line==1))
-					fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
-				if ((area==1)||(line==1)) {
-					if ((area==1) && (line==0)) {
-					  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_AREA_PLOT, x, y);
-					}
-					else
-					  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_PLOT|pen, x, y);
+				attr = xmlGetProp(node, (const xmlChar *) "width");
+				if(attr != NULL) {
+					x2=x1+atof((const char *)attr);
+					//xmlFree(attr);
 				}
-				fprintf(dest,"\t0x%2X,\n", CMD_AREA_CLOSE|fill);
+				attr = xmlGetProp(node, (const xmlChar *) "height");
+				if(attr != NULL) {
+					y2=y1+atof((const char *)attr);
+					//xmlFree(attr);
+				}
+
+				/* Let's put something in the 'cmd' variable,
+				 * this will be shown if 'details' are printed out. '[...]'*/
+
+				/* first corner: '[' */
+				cmd='[';
+				cx=x1; cy=y1;
+				scale_and_shift();
+				cmd='|';
+				move_to (x,y);
+				oldx=x; oldy=y;
+				line_to (x,y,oldx,oldy);
+
+				/* segment 1 */
+				cx=x2; cy=y1;
+				scale_and_shift();
+				line_to (x,y,oldx,oldy);
+				oldx=x; oldy=y;
+
+				/* segment 2 */
+				cx=x2; cy=y2;
+				scale_and_shift();
+				line_to (x,y,oldx,oldy);
+				oldx=x; oldy=y;
+
+				/* segment 3 */
+				cx=x1; cy=y2;
+				scale_and_shift();
+				line_to (x,y,oldx,oldy);
+				oldx=x; oldy=y;
+
+				/* segment 4 */
+				cmd=']';
+				cx=x1; cy=y1;
+				scale_and_shift();
+				line_to (x,y,oldx,oldy);
+				oldx=x; oldy=y;
+
+				if (pathdetails>0) printf("\n");
+
+				close_area();
+
+				/* keep track of absolute margins */
+				if (alm>lm) alm=lm;
+				if (arm<rm) arm=rm;
+				if (atm>tm) atm=tm;
+				if (abm<bm) abm=bm;
+
+				inipath=0;
+			}
 
 
-			}*/
+			/*         */
+			/* Polygon */
+			/*         */
+			if(xmlStrcmp(node->name, (const xmlChar *) "polygon") == 0) {
 
+				inipath=0;
+				elementcnt=0;
+
+				if (verbose==1) fprintf(stderr,"\nObject: 'polygon'.");
+
+				chkstyle (node);
+				
+				x1=y1=x2=y2=0;
+				oldx=oldy=0;
+				svcx=svcy=0;
+				
+				cmd='[';
+
+				attr = xmlGetProp(node, (const xmlChar *) "points");
+				if(attr != NULL) {
+					sprintf(Dummy,"%s",(const char *)attr);
+					//xmlFree(attr);
+
+/*
+					cx=x1; cy=y1;
+					scale_and_shift();
+					move_to (x,y);
+					oldx=x; oldy=y;
+					line_to (x,y,oldx,oldy);
+
+					cx=x2; cy=y2;
+					scale_and_shift();
+					line_to (x,y,oldx,oldy);
+					oldx=x; oldy=y;
+
+					if (pathdetails>0) printf("\n");
+
+					close_area();
+*/
+//					/* keep track of absolute margins */
+//					if (alm>lm) alm=lm;
+//					if (arm<rm) arm=rm;
+//					if (atm>tm) atm=tm;
+//					if (abm<bm) abm=bm;
+				}
+				inipath=0;
+			}
 
 			/* PATHS (a whole world!) */
 			if(xmlStrcmp(node->name, (const xmlChar *) "path") == 0) {
@@ -973,7 +1233,7 @@ autoloop:
 					sprintf(Dummy,"%s",(const char *)attr);
 					//xmlFree(attr);
 				}
-				fprintf(stderr,"\n  Processing path group #%u, id: %s",pathcnt,Dummy);
+				if (verbose==1) fprintf(stderr,"\n  Processing path group #%u, id: %s",pathcnt,Dummy);
 
 				chkstyle(node);
 
@@ -999,8 +1259,8 @@ autoloop:
 					sprintf (spath,"%s",(const char *)attr);
 					path=spath;
 					curves_cnt=0;
-					oldx=0; oldy=0;
-					svcx=0; svcy=0;
+					oldx=oldy=0;
+					svcx=svcy=0;
 
 					while (strlen(path)>0) {
 						path=skip_spc(path);
@@ -1010,21 +1270,9 @@ autoloop:
 								case 'm':
 									cmd = 'l';
 									break;
-/*								case 'h':
-									cmd = 'l';
-									break;
-								case 'v':
-									cmd = 'l';
-									break;*/
 								case 'M':
 									cmd = 'L';
 									break;
-/*								case 'H':
-									cmd = 'L';
-									break;
-								case 'V':
-									cmd = 'L';
-									break;*/
 								default:
 									cmd=oldcmd;
 							}
@@ -1101,30 +1349,7 @@ autoloop:
 							switch (cmd) {
 								case 'M':
 								case 'm':
-									if ((expanded==0)&&(elementcnt > 0))
-										if ((area==1)||(line==1))
-											fprintf(dest,"\t0x%2X,0x%02X, %s\n", REPEAT_COMMAND, elementcnt, destline);
-									elementcnt=0;
-									//sprintf(destline,"");
-									destline[0]='\0';
-									if ((inipath==0) && (area==1) && (line==1))
-										fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
-									else if (grouping == 0) {
-										if ((inipath==1) && (area==1))
-											fprintf(dest,"\t0x%2X,\n", CMD_AREA_CLOSE|fill);
-										if ((area==1) && (line==1))
-											fprintf( dest,"\n\t0x%2X, ", CMD_AREA_INITB );
-									}
-									inix=x;
-									iniy=y;
-									if ((area==1)||(line==1)) {
-										if ((area==1) && (line==0)) {
-										  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_AREA_PLOT, x, y);
-									    }
-										else
-										  fprintf(dest,"\n\t0x%2X,0x%02X,0x%02X,\n\t", CMD_PLOT|pen, x, y);
-									}
-									inipath=1;
+									move_to (x,y);
 									break;
 								default:
 									if ((oldx!=0) && (oldy!=0))
@@ -1152,21 +1377,15 @@ autoloop:
 						path=skip_spc(path);
 					}
 
-					if ((expanded == 0)&&(elementcnt>0))
-						if ((area==1)||(line==1))
-							fprintf(dest,"\t0x%2X,0x%02X, %s\n\t", REPEAT_COMMAND, elementcnt, destline);
-
-					if ((area == 1) && (inipath==1)) {
-						fprintf(dest,"\t0x%2X,\n", CMD_AREA_CLOSE|fill);
-					}
-
+					close_area();
+					
 					if (pathdetails>0) printf("\n");
-						
+					
 					inipath=0;
 				}
 				//xmlFree(attr);
 				//free(spath);
-				fprintf(stderr,"\n    Extracted %u nodes, (%u ovelaps skipped)\n",nodecnt-skipcnt, skipcnt);
+				if (verbose==1) fprintf(stderr,"\n    Extracted %u nodes, (%u overlapping coordinates skipped)\n\n",nodecnt-skipcnt, skipcnt);
 
 				/* keep track of absolute margins */
 				if (alm>lm) alm=lm;
@@ -1174,11 +1393,11 @@ autoloop:
 				if (atm>tm) atm=tm;
 				if (abm<bm) abm=bm;
 
-				fprintf(stderr,"    --Coordinate limits--");
-				fprintf(stderr,"\n    left : %f",lm);
-				fprintf(stderr,"\n    right : %f",rm);
-				fprintf(stderr,"\n    top : %f",tm);
-				fprintf(stderr,"\n    bottom : %f\n",bm);
+				if (verbose==1) fprintf(stderr,"    --Coordinate limits--");
+				if (verbose==1) fprintf(stderr,"\n    left : %f",lm);
+				if (verbose==1) fprintf(stderr,"\n    right : %f",rm);
+				if (verbose==1) fprintf(stderr,"\n    top : %f",tm);
+				if (verbose==1) fprintf(stderr,"\n    bottom : %f\n",bm);
 			} /* path */
 
 /*
@@ -1188,6 +1407,7 @@ autoloop:
 			line=nodeline[pathcnt-1];
 */
 			node = node->next;
+		
 			if ((node == NULL) && (gcount>0)) {
 				gcount--;
 				node=gnode[gcount];
@@ -1207,24 +1427,28 @@ autoloop:
 
     (void)fcloseall();
 
+	fprintf(stderr,"\n\n");
 	if (autosize==1) {
 		autosize=2;
-		fprintf(stderr,"\n\n\n------\nAutosize mode, SECOND PASS\n------\n");
+		fprintf(stderr,"\n------\n------\n");
 		if ((arm-alm)>(abm-atm)) {
-			scale=100*251/(arm-alm);
-			fprintf(stderr,"Autosizing in landscape mode (max x = 255)\n");
+			scale=100*251/(arm-alm)/scale_divisor;
+			fprintf(stderr,"Autosizing in landscape mode");
 		} else {
-			scale=100*251/(abm-atm);
-			fprintf(stderr,"Autosizing in portrait mode (max y = 255)\n");
+			scale=100*251/(abm-atm)/scale_divisor;
+			fprintf(stderr,"Autosizing in portrait mode");
 		}
+		
 		//fprintf(stderr,"\n--alm: %f, atm: %f ----\n",alm,atm);
 		xshift=2+scale*(xshift-alm)/100;
 		yshift=2+scale*(yshift-atm)/100;
-		fprintf(stderr,"\n------\n------\n");
+		fprintf(stderr,", SECOND PASS\n------\n------\n");
 
 		//free (destline);
 		goto autoloop;
 	}
+
+	if (excluded_nodes > 0) fprintf(stderr,"\nHidden nodes found, use '-i' to include them.\n");
 
 	if (autosize==2) {
 		fprintf(stderr,"\n------\n");

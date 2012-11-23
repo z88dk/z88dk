@@ -15,6 +15,7 @@
  *	 - Few defines to make life easier
  *   - tape save
  *   - lowercase text taken from the oz700 port in the 'ozdev' web site
+ *   - opt graphics scenes
  *
  *	Found at: http://www.penelope.demon.co.uk/pod/
  *
@@ -29,6 +30,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
+#ifdef PICS
+#include <graphics.h>
+#include <adv_a.h>
+#endif
 
 #ifdef ACE
 #include <ace.h>
@@ -1812,6 +1818,23 @@ DARK_ND	jr      DO_AUTO					; (96)
 void ShowRoom()
 {
 	int nItem;
+
+#ifdef PICS
+	switch(CUR_RM)
+	{
+		case 0:
+			draw_profile(60, 60, 160, mountain);
+			draw_profile(63, 63, 152, mountain);
+			draw_profile(80, 120, 80, mountain);
+			break;
+		case 7:
+		case 8:
+		case 9:
+		case 10:
+			draw_profile(60, 60, 240, maze);
+		
+	}
+#endif
 
 	PrintStr(straRoom[CUR_RM]);
 
