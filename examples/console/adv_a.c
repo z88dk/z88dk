@@ -1825,14 +1825,33 @@ void ShowRoom()
 		case 0:
 			draw_profile(60, 60, 160, mountain);
 			draw_profile(63, 63, 152, mountain);
+			draw(135,73,175,71);
+			draw_profile(80, 80, 240, tree2);
 			draw_profile(80, 120, 80, mountain);
+			draw_profile(60, 110, 200, tree2);
+			break;
+		case 3:
+			for (nItem = 1; nItem < 5; ++nItem) {
+				draw_profile(nItem*10-rand()%100, 20+rand()%40, 170+nItem*20, tree2);
+				draw_profile(60-rand()%100, nItem+rand()%40, 170+nItem*20, tree1);
+			}
+			break;
+		case 6:
+			draw_profile(60, 3, 180, shed);
 			break;
 		case 7:
 		case 8:
 		case 9:
 		case 10:
 			draw_profile(60, 60, 240, maze);
-		
+			break;
+		case 14:
+			draw_profile(20, 100, 200, keyboard);
+			break;
+		case 19:
+			draw_profile(60, 20, 160, jail);
+			break;
+
 	}
 #endif
 
