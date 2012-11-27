@@ -1227,14 +1227,6 @@
 =
 	call	l_gint7de	;
 
-	MODULE %1
-=
-	; MODULE %1
-
-	.optsdcc %1
-=
-	; SDCC options: %1
-
 	ld	hl,%1
 	ld	(hl),%2
 	ld	hl,0x0001 + %1
@@ -1243,16 +1235,12 @@
 	ld	(hl),%2
 	inc	hl
 
-	LIB _main
-=
-	XLIB _main
-	INCLUDE "zcc_opt.def"
-	INCLUDE "z80_crt0.hdr"
-
 ._main%1
 ._main%2
 =
 ; Z88DK moved 'main' before 'GSINIT'
+	INCLUDE "zcc_opt.def"
+	INCLUDE "z80_crt0.hdr"
 
 ; global & static %1
 =
