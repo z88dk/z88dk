@@ -1836,6 +1836,9 @@ void ShowRoom()
 				draw_profile(60-rand()%100, nItem+rand()%40, 170+nItem*20, tree1);
 			}
 			break;
+		case 4:
+			draw_profile(50, 20, 160, lake);
+			break;
 		case 6:
 			draw_profile(60, 3, 180, shed);
 			break;
