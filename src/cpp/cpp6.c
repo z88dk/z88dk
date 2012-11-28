@@ -2,7 +2,7 @@
  *			    C P P 6 . C
  *		S u p p o r t   R o u t i n e s
  *
- * $Id: cpp6.c,v 1.6 2012-10-16 06:23:22 stefano Exp $
+ * $Id: cpp6.c,v 1.7 2012-11-28 20:28:30 dom Exp $
  *
  *
  * Edit History
@@ -334,7 +334,7 @@ register int	(*outfun)();			/* Output/store func	*/
 		(*outfun)(c);			/* Stuff the 'x'	*/
 		c = get();			/* Get next character	*/
 	    }
-	}
+        }
 	for (;;) {				/* Process curr. char.	*/
 	    /*
 	     * Note that this algorithm accepts "012e4" and "03.4"
@@ -387,13 +387,15 @@ register int	(*outfun)();			/* Output/store func	*/
 	 * 'L' for "long double".
 	 */
 done:
-	    if (c == 'f' || c == 'F') {
+#if 0
+	    if ((c == 'f' || c == 'F') && radix == 10) {
 			if (!dotflag) {
 				(*outfun)('.');
 			}
 			dotflag = TRUE;
 			c = get();			/* Ungotten later	*/
 	    }
+#endif
 
 		if (dotflag || expseen) {		/* Floating point?	*/
 			if (c == 'l' || c == 'L') {
