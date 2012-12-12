@@ -32,7 +32,7 @@ char Board[144];        /* Space for decompressed Level */
 #define K_NEXTLEV '+'
 #define K_PREVLEV '-'
 
-#if defined __ZX81__ || defined __VZ200__ || defined __NASCOM__ || defined __TRS80__ || defined __GAL__
+#if defined __VZ200__ || defined __NASCOM__ || defined __TRS80__ || defined __GAL__
 #define K_UP       'Q'  /* arrow up     */
 #define K_DOWN     'A' /* arrow down   */
 #define K_LEFT     'O'  /* arrow left   */

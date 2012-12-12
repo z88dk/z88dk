@@ -9,7 +9,7 @@
  *
  *      Later on, this should set panel values
  *
- *      $Id: rs232_params.c,v 1.5 2012-11-25 14:35:36 stefano Exp $
+ *      $Id: rs232_params.c,v 1.6 2012-12-12 17:28:06 stefano Exp $
  */
 
         /* BAUD system variable: 23747
@@ -71,10 +71,8 @@ tabell:
         defw    $0701   ;RS_BAUD_75             ; experimental
         defw    $04C5   ;RS_BAUD_110
         defw    $03E6   ;RS_BAUD_134_5          ; experimental
-        ; (gets transformed to:  defw $037. ;0x04 ; experimental ???)
-        ; At the moment we pass the decimal value
-        ;defw    $037F   ;RS_BAUD_150            ; experimental
-        defw    895   ;RS_BAUD_150            ; experimental
+        ; (a bug in cpp was changing the next line to:  defw $037. ;0x04 ; experimental ... now fixed)
+        defw    $037F   ;RS_BAUD_150            ; experimental
         defw    $01BE   ;RS_BAUD_300
         defw    $00DE   ;RS_BAUD_600
         defw    $006E   ;RS_BAUD_1200

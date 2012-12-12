@@ -40,7 +40,7 @@ char Board[144];        /* Space for decompressed Level */
 #define K_CLEAR   '9'
 #endif
 
-#if defined __ZX81__ || defined __VZ200__ || defined __NASCOM__ || defined __TRS80__ || defined __GAL__ || defined __MTX__
+#if defined __VZ200__ || defined __NASCOM__ || defined __TRS80__ || defined __GAL__ || defined __MTX__
 #define K_UP       'Q'  /* arrow up     */
 #define K_DOWN     'A' /* arrow down   */
 #define K_LEFT     'O'  /* arrow left   */
