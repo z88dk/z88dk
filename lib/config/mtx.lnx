@@ -21,7 +21,7 @@ APPMAKER	appmake
 # supplied to the compiler when you supply -lmz to the frontend
 # you'll probably want to change this if you're retargetting
 #
-# No handling for the Spectrum, so leave as per z88
+# No handling for the MTX, so leave as per z88
 
 Z88MATHFLG	-D__NATIVE_MATH__
 
@@ -79,7 +79,7 @@ COPTRULES3	DESTDIR/lib/z80rules.0
 # CRT0	   = Full path and name of the startup code file (omit suffix!)
 #
 
-CRT0		DESTDIR/lib/spec_crt0
+CRT0		DESTDIR/lib/mtx_crt0
 
 
 #
@@ -123,7 +123,7 @@ GENMATHLIB	gen_math
 # generic z80 startup functions
 #
 
-OPTIONS		 -v -O2 -I. -lndos -DZ80 -DSMALL_C -DMTX -D__MTX__ -M -DSCCZ80 -Cz+mtx
+OPTIONS		 -v -O2 -I. -lmtx_clib -lndos -DZ80 -DSMALL_C -DMTX -D__MTX__ -M -DSCCZ80 -Cz+mtx
 
 
 # Additional config options for the alternate assemblers
