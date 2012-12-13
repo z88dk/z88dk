@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.26 2012-05-10 14:49:24 stefano Exp $
+ * $Id: zx81.h,v 1.27 2012-12-13 17:28:01 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -163,7 +163,8 @@ extern void __LIB__ scrolldowntxt();
 
 // Activates / Deactivates the ZX81 <-> ASCII converter,
 // used in some output routine and interfacing to the BASIC strings
-extern void __LIB__ __FASTCALL__ zx_asciimode();
+// 0=disable ASCII converter - 1=re-activates it
+extern void __LIB__ __FASTCALL__ zx_asciimode(int mode);
 
 // ZX81 <-> ASCII char conversion
 extern char __LIB__ zx_ascii(char character);

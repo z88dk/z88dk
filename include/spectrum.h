@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.36 2012-05-02 14:23:42 stefano Exp $
+ * $Id: spectrum.h,v 1.37 2012-12-13 17:28:01 stefano Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -320,6 +320,7 @@ extern uint  __LIB__ __CALLEE__   zx_screenstr_callee(uchar row, uchar col);
 #define zx_screenstr(a,b)         zx_screenstr_callee(a,b)
 
 #define zx_setcursorpos(a,b)      fputc_cons(22); fputc_cons(a); fputc_cons(b);
+#define zx_topleft()              fputc_cons(22); fputc_cons(0); fputc_cons(0);
 
 // In the following, screen address refers to a pixel address within the display file while
 // attribute address refers to the attributes area.
