@@ -1,7 +1,7 @@
 /*
  *      Memotech MTX application packager
  *      
- *      $Id: mtx.c,v 1.6 2011-09-25 09:53:21 dom Exp $
+ *      $Id: mtx.c,v 1.7 2012-12-24 10:19:11 stefano Exp $
  */
 
 
@@ -142,7 +142,7 @@ int mtx_exec(char *target)
 			if (mtb)
 			  suffix_change(filename,".mtb");
 			else
-			  suffix_change(filename,".");
+			  suffix_change(filename,"");
 		} else {
 			strcpy(filename,outfile);
 		}

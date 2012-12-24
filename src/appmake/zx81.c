@@ -7,8 +7,9 @@
  *        Stefano Bodrato Apr. 2000
  *        May 2010, added support for wave file
  *
- *        $Id: zx81.c,v 1.11 2011-05-23 07:10:39 stefano Exp $
+ *        $Id: zx81.c,v 1.12 2012-12-24 10:19:11 stefano Exp $
  */
+
 
 #include "appmake.h"
 
@@ -19,6 +20,7 @@ static char              audio        = 0;
 static char              fast         = 0;
 static char              dumb         = 0;
 static char              collapsed    = 0;
+static char              zx80         = 0;
 
 
 /* Options that are available for this module */
@@ -30,6 +32,7 @@ option_t zx81_options[] = {
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "collapsed",  "Collapse display to save loading time",  OPT_BOOL,  &collapsed },
+    {  0,  "zx80",     "Work in ZX80 mode (4K ROM)",  OPT_BOOL,  &zx80 },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -90,7 +93,10 @@ int zx81_exec(char *target)
 	} else {
 		if ( outfile == NULL ) {
 			strcpy(filename,binname);
-			suffix_change(filename,".P");
+			if ( !zx80 )
+				suffix_change(filename,".P");
+			else
+				suffix_change(filename,".O");
 		} else {
 			strcpy(filename,outfile);
 		}
@@ -126,94 +132,280 @@ int zx81_exec(char *target)
 			myexit(NULL,1);
 		}
 
+	/* Write out the '.P' or '.O' file */
+		if ( collapsed ) screen_size = 25; else screen_size = 793;
+		if ( zx80 ) {
+			screen_size=0;
+			// All system VARS are saved !  Does it mean the memory model matters ?
+			fputc(255,fpout);							// ERR_NR
+			fputc(136,fpout);							// FLAGS
+			writeword(65534,fpout);						// PPC
+			writeword(16422+len+106,fpout);				// E_ADDR
+			writeword(1,fpout);							// E_PPC
+			// ZX80 BASIC program starts at 16420
+			writeword(16420+len+106,fpout);				// VARS
+			writeword(16421+len+106,fpout);				// E_LINE
+			writeword(16423+len+106,fpout);				// D_FILE
+			writeword(16424+len+106+screen_size,fpout);	// DF_EA
+			writeword(16424+len+106+screen_size,fpout);	// DF_END
+			fputc(2,fpout);								// DF_ZX
+			writeword(0,fpout);							// S_TOP
+			writeword(0,fpout);							// X_PTR
+			writeword(0,fpout);							// OLDPPC
+			fputc(0,fpout);								// FLAGX
+			writeword(1968,fpout);						// T_ADDR
+			writeword(0,fpout);							// SEED ..should we 'randomize' it ?
+			writeword(5000,fpout);						// FRAMES
+			writeword(16423+len+106,fpout);				// V_ADDR
+			writeword(0,fpout);							// ACC
+			fputc(33,fpout);							// S_POSN (X)
+			fputc(23,fpout);							// S_POSN (Y)
+			writeword(16422+len+106,fpout);				// CH_ADD
+		} else {
+			// SYSTEM VARS before "VERSN" are not saved (ERR_NR, FLAGS, ERR_SP, RAMTOP, MODE, PPC are preserved)
+			fputc(0,fpout);								// VERSN ($4009)
+			writeword(1,fpout);							// E_PPC
+			writeword(16530+len,fpout);					// D_FILE
+			writeword(16531+len,fpout);					// DF_CC
+			writeword(16530+len+screen_size,fpout);		// VARS
+			writeword(0,fpout);							// DEST
+			writeword(16531+len+screen_size,fpout);		// E_LINE
+			writeword(16535+len+screen_size,fpout);		// CH_ADD ($4016)
+			writeword(0,fpout);							// X_PTR
+			writeword(16536+len+screen_size,fpout);		// STKBOT
+			writeword(16536+len+screen_size,fpout);		// STKEND
+			fputc(0,fpout);								// BERG
+			writeword(16477,fpout);						// MEM
+			fputc(0,fpout);								// not used
+			fputc(2,fpout);								// DF_SZ
+			writeword(0,fpout);							// S_TOP
+			fputc(191,fpout);							// LAST_K
+			fputc(253,fpout);							// 
+			fputc(255,fpout);							// DB_ST
+			fputc(55,fpout);							// MARGIN (55 if 50hz, 31 if 60 hz)
+			writeword(16530+len,fpout);					// NXTLIN
+			writeword(0,fpout);							// OLDPPC
+			fputc(0,fpout);								// FLAGX
+			writeword(0,fpout);							// STRLEN
+			writeword(3213,fpout);						// T_ADDR
+			writeword(0,fpout);							// SEED .. should we 'randomize' it ?
+			writeword(63000,fpout);						// FRAMES
+			writeword(0,fpout);							// COORDS
+			fputc(188,fpout);							// PR_CC
+			fputc(33,fpout);							// S_POSN (X)
+			fputc(24,fpout);							// S_POSN (Y)
+			fputc(64,fpout);							// CDFLAG
 
-	/* Write out the .P file */
-		if ( collapsed ) screen_size = 25; else screen_size = 793;	
-		fputc(0,fpout);								// VERSN ($4009)
-		writeword(1,fpout);							// E_PPC
-		writeword(16530+len,fpout);					// D_FILE
-		writeword(16531+len,fpout);					// DF_CC
-		writeword(16530+len+screen_size,fpout);		// VARS
-		writeword(0,fpout);							// DEST
-		writeword(16531+len+screen_size,fpout);		// E_LINE
-		writeword(16535+len+screen_size,fpout);		// CH_ADD ($4016)
-		writeword(0,fpout);							// X_PTR
-		writeword(16536+len+screen_size,fpout);		// STKBOT
-		writeword(16536+len+screen_size,fpout);		// STKEND
-		fputc(0,fpout);								// BERG
-		writeword(16477,fpout);						// MEM
-		fputc(0,fpout);								// not used
-		fputc(2,fpout);								// DF_SZ
-		writeword(0,fpout);							// S_TOP
-		fputc(191,fpout);							// LAST_K
-		fputc(253,fpout);							// 
-		fputc(255,fpout);
-		fputc(55,fpout);							// MARGIN (55 if 50hz, 31 if 60 hz)
-		writeword(16530+len,fpout);					// NXTLIN
-		fputc(0,fpout);
-		fputc(0,fpout);
-		fputc(0,fpout);
-		fputc(0,fpout);
-		fputc(0,fpout);
-		fputc(141,fpout);
-		fputc(12,fpout);
-		writeword(0,fpout);
-		fputc(184,fpout);
-		fputc(247,fpout);
-		writeword(0,fpout);
-		writeword(8636,fpout);
-		writeword(16408,fpout);
-		for (i=0;i<16;i++)
-			writeword(0,fpout);
-		fputc(118,fpout);
-		for (i=0;i<5;i++)
-			writeword(0,fpout);
-		fputc(132,fpout);
-		fputc(32,fpout);
-		for (i=0;i<10;i++)
-			writeword(0,fpout);
-		/* Now, the basic program, here.*/
-		/* 1 REM.... */
-		fputc(00,fpout);
-		fputc(01,fpout);
-		writeword(len+2,fpout);
-		fputc(234,fpout);
-		/* ... M/C ...*/
-		for (i=0; i<len;i++) {
-			c=getc(fpin);
-			fputc(c,fpout);
-		}
-		/* .. and ENTER.*/
-		fputc(118,fpout);
-		/* 2 RAND USR VAL "16514" */
-		fputc(00,fpout);
-		fputc(02,fpout);
-		writeword(11,fpout);
-		fputc(249,fpout);
-		fputc(212,fpout);
-		fputc(197,fpout);
-		fputc(11,fpout);
-		fputc(29,fpout);
-		fputc(34,fpout);
-		fputc(33,fpout);
-		fputc(29,fpout);
-		fputc(32,fpout);
-		fputc(11,fpout);
-		/* .. and ENTER.*/
-		fputc(118,fpout);
-
-		/* At last the DISPLAY FILE */
-		for (c=0;c<24;c++)
-		{
+			for (i=0;i<16;i++)
+				writeword(0,fpout);
 			fputc(118,fpout);
-			if ( !collapsed ) {
-			  for (i=0;i<32;i++)
-				fputc(0,fpout);
-			}
+			for (i=0;i<5;i++)
+				writeword(0,fpout);
+			fputc(132,fpout);
+			fputc(32,fpout);
+			for (i=0;i<10;i++)
+				writeword(0,fpout);
 		}
-		fputc(118,fpout);
 
-		fputc(128,fpout);
+		if ( zx80 ) {
+			/* 1 RANDOMISE USR(16525)*/
+			fputc(00,fpout);
+			fputc(01,fpout);
+			//fputc(244,fpout);	/* PRINT */
+			fputc(239,fpout);	/* RANDOMISE */
+			fputc(58,fpout);	/* U */
+			fputc(56,fpout);	/* S */
+			fputc(55,fpout);	/* R */
+			fputc(218,fpout);	/* ( */
+			fputc(1+28,fpout);	/* 1 */
+			fputc(6+28,fpout);	/* 6 */
+			fputc(5+28,fpout);	/* 5 */
+			fputc(2+28,fpout);	/* 2 */
+			fputc(5+28,fpout);	/* 5 */
+			fputc(217,fpout);	/* ) */
+			fputc(118,fpout);
+			/* 2 REM */
+			fputc(00,fpout);
+			fputc(02,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 3 REM */
+			fputc(00,fpout);
+			fputc(03,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 4 REM */
+			fputc(00,fpout);
+			fputc(04,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 5 REM */
+			fputc(00,fpout);
+			fputc(05,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 6 REM */
+			fputc(00,fpout);
+			fputc(06,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 7 REM */
+			fputc(00,fpout);
+			fputc(07,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 8 REM */
+			fputc(00,fpout);
+			fputc(8,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 9 REM */
+			fputc(00,fpout);
+			fputc(9,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 10 REM */
+			fputc(00,fpout);
+			fputc(10,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 11 REM */
+			fputc(00,fpout);
+			fputc(11,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 12 REM */
+			fputc(00,fpout);
+			fputc(12,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 13 REM */
+			fputc(00,fpout);
+			fputc(13,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 14 REM */
+			fputc(00,fpout);
+			fputc(14,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 15 REM */
+			fputc(00,fpout);
+			fputc(15,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 16 REM */
+			fputc(00,fpout);
+			fputc(16,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 17 REM */
+			fputc(00,fpout);
+			fputc(17,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 18 REM */
+			fputc(00,fpout);
+			fputc(18,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 19 REM */
+			fputc(00,fpout);
+			fputc(19,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 20 REM */
+			fputc(00,fpout);
+			fputc(20,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 21 REM */
+			fputc(00,fpout);
+			fputc(21,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+			/* 22 REM */
+			fputc(00,fpout);
+			fputc(22,fpout);
+			fputc(254,fpout);
+			fputc(118,fpout);
+
+			//for (i=0;i<screen_size;i++)
+			//fputc(0,fpout);
+
+			/* 23 REM */
+			fputc(00,fpout);
+			fputc(23,fpout);
+			fputc(254,fpout);
+
+			/* ... M/C ...*/
+			for (i=0; i<len;i++) {
+				c=getc(fpin);
+				fputc(c,fpout);
+			}
+
+			/* .. and ENTER. (+2)*/
+			fputc(118,fpout);
+			fputc(128,fpout);
+			
+			/* At last the DISPLAY FILE */
+			/*for (c=0;c<24;c++)
+			{
+				fputc(118,fpout);
+				if ( !collapsed ) {
+				  for (i=0;i<32;i++)
+					fputc(0,fpout);
+				}
+			}
+			fputc(118,fpout);
+			fputc(128,fpout);*/
+
+		} else {
+			/* Now, the basic program, here.*/
+			/* 1 REM.... */
+			fputc(00,fpout);
+			fputc(01,fpout);
+			writeword(len+2,fpout);
+			fputc(234,fpout);
+			/* ... M/C ...*/
+			for (i=0; i<len;i++) {
+				c=getc(fpin);
+				fputc(c,fpout);
+			}
+			/* .. and ENTER.*/
+			fputc(118,fpout);
+
+			/* 2 RAND USR VAL "16514" */
+			fputc(00,fpout);
+			fputc(02,fpout);
+			writeword(11,fpout);
+			fputc(249,fpout);
+			fputc(212,fpout);
+			fputc(197,fpout);
+			fputc(11,fpout);
+			fputc(29,fpout);
+			fputc(34,fpout);
+			fputc(33,fpout);
+			fputc(29,fpout);
+			fputc(32,fpout);
+			fputc(11,fpout);
+			/* .. and ENTER.*/
+			fputc(118,fpout);
+
+			/* At last the DISPLAY FILE */
+			/*for (c=0;c<24;c++)
+			{
+				fputc(118,fpout);
+				if ( !collapsed ) {
+				  for (i=0;i<32;i++)
+					fputc(0,fpout);
+				}
+			}
+			fputc(118,fpout);
+			fputc(128,fpout);*/
+		}
+
+
 		fclose(fpin);
 		fclose(fpout);
 	}
@@ -245,22 +437,24 @@ int zx81_exec(char *target)
 	    for (i=0; i < 0x3000; i++)
 			fputc(0x20, fpout);
 
-		/* The program on tape has to have a leading name */
-		if (dumb) printf("\nAssigning name : ");
-		strcpy(name,"           ");
-		for (i=0;(i<=11)&&(isalnum(filename[i]));i++) {
-		if (dumb) printf("%c",toupper(filename[i]));
-			if (isalpha(filename[i]))
-				name[i]=toupper(filename[i])-27;
-			else
-				name[i]=filename[i]-20;
+		if (!zx80) {
+			/* The program on tape has to have a leading name */
+			if (dumb) printf("\nAssigning name : ");
+			strcpy(name,"           ");
+			for (i=0;(i<=11)&&(isalnum(filename[i]));i++) {
+			if (dumb) printf("%c",toupper(filename[i]));
+				if (isalpha(filename[i]))
+					name[i]=toupper(filename[i])-27;
+				else
+					name[i]=filename[i]-20;
+			}
+			if (dumb) printf("\n\n");
+			name[i-1]=name[i-1]+128;
+
+			for (i=0;name[i]!=' ';i++)
+				zx81_rawout(fpout,name[i]);
 		}
-		if (dumb) printf("\n\n");
-		name[i-1]=name[i-1]+128;
-
-		for (i=0;name[i]!=' ';i++)
-			zx81_rawout(fpout,name[i]);
-
+		
 		/*
 		zx81_rawout(fpout,'Z'-27);
 		zx81_rawout(fpout,'8'-20);
