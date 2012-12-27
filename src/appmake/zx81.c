@@ -7,7 +7,7 @@
  *        Stefano Bodrato Apr. 2000
  *        May 2010, added support for wave file
  *
- *        $Id: zx81.c,v 1.12 2012-12-24 10:19:11 stefano Exp $
+ *        $Id: zx81.c,v 1.13 2012-12-27 08:44:44 stefano Exp $
  */
 
 
@@ -393,7 +393,7 @@ int zx81_exec(char *target)
 			fputc(118,fpout);
 
 			/* At last the DISPLAY FILE */
-			/*for (c=0;c<24;c++)
+			for (c=0;c<24;c++)
 			{
 				fputc(118,fpout);
 				if ( !collapsed ) {
@@ -402,7 +402,7 @@ int zx81_exec(char *target)
 				}
 			}
 			fputc(118,fpout);
-			fputc(128,fpout);*/
+			fputc(128,fpout);
 		}
 
 
