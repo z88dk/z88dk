@@ -7,14 +7,19 @@
 ; values for ROW and COLUMN
 ;----------------------------------------------------------------
 ;
-;  $Id: zx_dfile_addr.asm,v 1.2 2012-01-09 16:02:36 stefano Exp $
+;  $Id: zx_dfile_addr.asm,v 1.3 2012-12-31 10:38:24 stefano Exp $
 ;
 ;----------------------------------------------------------------
 
 	XLIB    zx_dfile_addr
 
+IF FORzx81
 	DEFC    COLUMN=$4039    ; S_POSN_x
 	DEFC    ROW=$403A       ; S_POSN_y
+ELSE
+	DEFC   COLUMN=$4024    ; S_POSN_x
+	DEFC   ROW=$4025       ; S_POSN_y
+ENDIF
 
 zx_dfile_addr:
 	push	af
@@ -33,6 +38,8 @@ zx_dfile_addr:
 	ld	d,0
 	ld	e,a
 	add	hl,de
+IF FORzx81
 	ld ($400E),hl	; DF_CC ..current ZX81 cursor position on display file
+ENDIF
 	pop	af
 	ret

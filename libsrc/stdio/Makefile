@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.35 2012-06-13 06:34:24 stefano Exp $
+# $Id: Makefile,v 1.36 2012-12-31 10:38:23 stefano Exp $
 #
 
 include ../Make.config
@@ -170,6 +170,7 @@ clean:
 	$(RM) vz200/*.o
 	$(RM) x07/*.o
 	$(RM) z88/*.o
+	$(RM) zx80/*.o
 	$(RM) zx81/*.o
 	$(RM) rcmx000/*.o
 	cd zsock ; $(MAKE) clean ; cd ..

@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.17 2011-06-25 22:48:17 dom Exp $ */
+/* $Id: stdio.h,v 1.18 2012-12-31 10:38:23 stefano Exp $ */
 
 #undef __STDIO_BINARY        /* By default don't consider binary files */
 
@@ -16,6 +16,10 @@
 #endif
 
 #ifdef __ZX81__
+#include <zx81.h>
+#endif
+
+#ifdef __ZX80__
 #include <zx81.h>
 #endif
 

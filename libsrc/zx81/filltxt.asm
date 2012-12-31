@@ -3,7 +3,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: filltxt.asm,v 1.4 2012-01-09 16:02:36 stefano Exp $
+;	$Id: filltxt.asm,v 1.5 2012-12-31 10:38:24 stefano Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -14,14 +14,16 @@
 	XLIB   filltxt
 	LIB    zx_topleft
 
+IF FORzx81
 	XREF   base_graphics
+ENDIF
 
 filltxt:
 	; __FASTCALL__ mode
 	ld	a,l
-
+	
 	ld	hl,(16396)
-	inc	hl
+	inc	hl			; skip the first 'halt' instruction in the D-FILE
 
 	ld	b,24
 floop:
@@ -33,7 +35,16 @@ floop:
 	ld	bc,31
 	ldir
 	inc	hl
+
+IF FORzx80
+	push af
+	ld	a,118
+	ld	(hl),a
+	pop af
+ENDIF
+
 	inc	hl
 	pop	bc
 	djnz 	floop
+
 	jp  zx_topleft

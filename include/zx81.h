@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.27 2012-12-13 17:28:01 stefano Exp $
+ * $Id: zx81.h,v 1.28 2012-12-31 10:38:23 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -16,6 +16,42 @@
 /////////////
 
 // Basic Tokens
+
+#ifdef __ZX80__
+
+#define TK_THEN         0xD5
+#define TK_TO           0xD6
+#define TK_NOT          0xDB
+#define TK_AND          0xE0
+#define TK_OR           0xE1
+#define TK_STAR_STAR    0XE2
+#define TK_LIST         0xE6
+#define TK_RETURN       0xE7
+#define TK_CLS          0xE8
+#define TK_DIM          0xE9
+#define TK_SAVE         0xEA
+#define TK_FOR          0xEB
+#define TK_GO_TO        0xEC
+#define TK_POKE         0xED
+#define TK_INPUT        0xEE
+#define TK_RANDOMIZE    0xEF
+
+#define TK_LET          0xF0
+#define TK_NEXT         0xF3
+#define TK_PRINT        0xF4
+#define TK_NEW          0xF6
+#define TK_RUN          0xF7
+
+#define TK_STOP         0xF8
+#define TK_CONT         0xF9
+#define TK_CONTINUE     0xF9
+#define TK_IF           0xFA
+#define TK_GO_SUB       0xFB
+#define TK_LOAD         0xFC
+#define TK_CLEAR        0xFD
+#define TK_REM          0xFE
+
+#else
 
 #define TK_RND         64
 #define TK_INKEYS      65
@@ -88,6 +124,7 @@
 #define TK_RETURN      254
 #define TK_COPY        255
 
+#endif
 
 /////////////////////////////////
 // HIGH RESOLUTION RELATED STUFF

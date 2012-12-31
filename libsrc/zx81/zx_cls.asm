@@ -3,7 +3,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: zx_cls.asm,v 1.5 2012-01-09 16:02:36 stefano Exp $
+;	$Id: zx_cls.asm,v 1.6 2012-12-31 10:38:24 stefano Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -13,12 +13,19 @@
 
 	XLIB   zx_cls
 	
+IF FORzx81
 	LIB	   restore81
 	LIB    zx_topleft
+ELSE
+	LIB    filltxt
+ENDIF
 
 zx_cls:
-
+IF FORzx81
 	call  restore81
 	call  $a2a
 	jp    zx_topleft
-
+ELSE
+	ld	l,0
+	jp	filltxt
+ENDIF

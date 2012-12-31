@@ -1,5 +1,5 @@
 /*
- *   $Id: othello.c,v 1.6 2012-10-05 11:44:04 stefano Exp $
+ *   $Id: othello.c,v 1.7 2012-12-31 10:38:23 stefano Exp $
  * 
  *   z88dk port of the 'historical' game by Leor Zolman
  *
@@ -23,6 +23,7 @@
  * 
  *   Examples on how to compile in redefinded font mode:
  *   zcc +zx81 -O3 -startup=2 -create-app -DREDEFINED_FONT -DZX81_FONT othello.c
+ *   zcc +zx80 -O3 -create-app -DREDEFINED_FONT -DZX80_FONT othello.c
  *   zcc +ace -O3 -lndos -create-app -DREDEFINED_FONT othello.c
  *   zcc +srr -O3 -lndos -create-app -DREDEFINED_FONT othello.c
  *   zcc +zx -O3 -lndos -create-app -DREDEFINED_FONT othello.c
@@ -519,12 +520,12 @@ void prtbrd(char b[64])
 	 }
 #endif
 #ifdef TEXT
-	#if defined (REDEFINED_FONT) || defined (ZX81_FONT) 
+	#if defined (REDEFINED_FONT) || defined (ZX81_FONT) || defined (ZX80_FONT)
 		printf("  12345678\n");
 		for (i=0; i<8; i++) {
 			printf(" %u",i+1);
 			for (j=0; j<8; j++) {
-			#if defined (ZX81_FONT) || defined (ZX81_DKTRONICS)
+			#if defined (ZX80_FONT) || defined (ZX81_FONT) || defined (ZX81_DKTRONICS) 
 				zx_asciimode(0);
 				switch(b[i*8+j]) {
 					#ifdef ZX81_DKTRONICS
@@ -538,15 +539,27 @@ void prtbrd(char b[64])
 						putchar (G_EMPTY);
 						break;
 					#else
-					case BLACK:
-						putchar (151);
-						break;
-					case WHITE:
-						putchar (180);
-						break;
-					default:
-						putchar (128+8*((i+j)&1));
-						break;
+						#ifdef ZX80_FONT
+						case BLACK:
+							putchar (148);
+							break;
+						case WHITE:
+							putchar (180);
+							break;
+						default:
+							putchar (128+9*((i+j)&1));
+							break;
+						#else
+						case BLACK:
+							putchar (151);
+							break;
+						case WHITE:
+							putchar (180);
+							break;
+						default:
+							putchar (128+8*((i+j)&1));
+							break;
+						#endif
 					#endif
 				}
 				zx_asciimode(1);

@@ -7,7 +7,7 @@
  *        Stefano Bodrato Apr. 2000
  *        May 2010, added support for wave file
  *
- *        $Id: zx81.c,v 1.13 2012-12-27 08:44:44 stefano Exp $
+ *        $Id: zx81.c,v 1.14 2012-12-31 10:38:24 stefano Exp $
  */
 
 
@@ -137,6 +137,17 @@ int zx81_exec(char *target)
 		if ( zx80 ) {
 			screen_size=0;
 			// All system VARS are saved !  Does it mean the memory model matters ?
+/*
+140D:0100  FF 88 FE FF 90 40 01 00-8E 40 8F 40 91 40 92 40   .....@...@.@.@.@
+140D:0110  92 40 02 01 00 00 00 00-00 00 B0 07 00 00 1C 15   .@..............
+140D:0120  00 00 00 00 21 17 90 40-00 01 EF 3A 38 37 DA 1D   ....!..@...:87..
+140D:0130  22 21 1E 21 D9 76 00 02-FE 76 00 03 FE 76 00 04   "!.!.v...v...v..
+140D:0140  FE 76 00 05 FE 76 00 06-FE 76 00 07 FE 76 00 08   .v...v...v...v..
+140D:0150  FE 76 00 09 FE 76 00 0A-FE 76 00 0B FE 76 00 0C   .v...v...v...v..
+140D:0160  FE 76 00 0D FE 76 00 0E-FE 76 00 0F FE 76 00 10   .v...v...v...v..
+140D:0170  FE 76 00 11 FE 76 00 12-FE 76 00 13 FE 76 00 14   .v...v...v...v..
+140D:0180  FE 76 00 15 FE 76 00 16-FE 76 00 17 FE 76 80 00   .v...v...v...v..
+*/
 			fputc(255,fpout);							// ERR_NR
 			fputc(136,fpout);							// FLAGS
 			writeword(65534,fpout);						// PPC
@@ -149,7 +160,7 @@ int zx81_exec(char *target)
 			writeword(16424+len+106+screen_size,fpout);	// DF_EA
 			writeword(16424+len+106+screen_size,fpout);	// DF_END
 			fputc(2,fpout);								// DF_ZX
-			writeword(0,fpout);							// S_TOP
+			writeword(1,fpout);							// S_TOP
 			writeword(0,fpout);							// X_PTR
 			writeword(0,fpout);							// OLDPPC
 			fputc(0,fpout);								// FLAGX
@@ -206,6 +217,7 @@ int zx81_exec(char *target)
 			for (i=0;i<10;i++)
 				writeword(0,fpout);
 		}
+
 
 		if ( zx80 ) {
 			/* 1 RANDOMISE USR(16525)*/
@@ -324,14 +336,12 @@ int zx81_exec(char *target)
 			fputc(21,fpout);
 			fputc(254,fpout);
 			fputc(118,fpout);
-			/* 22 REM */
+			/* 22 STOP */
 			fputc(00,fpout);
 			fputc(22,fpout);
-			fputc(254,fpout);
+			fputc(248,fpout);
 			fputc(118,fpout);
 
-			//for (i=0;i<screen_size;i++)
-			//fputc(0,fpout);
 
 			/* 23 REM */
 			fputc(00,fpout);
@@ -346,10 +356,12 @@ int zx81_exec(char *target)
 
 			/* .. and ENTER. (+2)*/
 			fputc(118,fpout);
+
 			fputc(128,fpout);
 			
 			/* At last the DISPLAY FILE */
-			/*for (c=0;c<24;c++)
+			/*
+			for (c=0;c<24;c++)
 			{
 				fputc(118,fpout);
 				if ( !collapsed ) {
@@ -358,7 +370,8 @@ int zx81_exec(char *target)
 				}
 			}
 			fputc(118,fpout);
-			fputc(128,fpout);*/
+			fputc(128,fpout);
+			*/
 
 		} else {
 			/* Now, the basic program, here.*/

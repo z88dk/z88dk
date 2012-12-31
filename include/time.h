@@ -5,7 +5,7 @@
  *
  *      djm 9/1/2000
  *
- *	$Id: time.h,v 1.14 2012-10-24 06:44:12 stefano Exp $
+ *	$Id: time.h,v 1.15 2012-12-31 10:38:23 stefano Exp $
  */
 
 
@@ -76,11 +76,17 @@ extern clock_t __LIB__ clock(void);
 
 #ifdef __SPECTRUM__
 #define time(NULL) clock()
+extern int FRAMES @23672;
 #endif
 
 #ifdef __ZX81__
 #define time(NULL) clock()
+extern int FRAMES @16436;
 #endif
 
+#ifdef __ZX80__
+#define time(NULL) clock()
+extern int FRAMES @16414;
+#endif
 
 #endif /* _TIME_H */
