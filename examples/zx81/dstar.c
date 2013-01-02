@@ -9,6 +9,7 @@
  *  Build options:
  * 
  *  Various redefinable characters board
+ *  (does something similar exist on the ZX80 ?)
  *    zcc +zx81 -startup=2 -create-app dstar.c
  *
  * 	Dk'Tronics without RAM expansion
@@ -16,6 +17,7 @@
  *
  * 	Standard Sinclair mode
  *    zcc +zx81 -startup=2 -create-app -DTEXT dstar.c
+ *    zcc +zx80 -create-app -DTEXT dstar.c
  * 
  * * * * * * *
  *
@@ -90,6 +92,9 @@
 
 void main()
 {
+#ifdef __ZX80__
+	gen_tv_field_init(0);
+#endif
 #ifdef DKTRONICS
 	#asm
 	ld	a,$2a
@@ -116,6 +121,8 @@ void main()
 	/* (we're working in text mode, with redefinded font) */
 	display=d_file+1;
 
+	DrawBoard();
+	
 	/* Loop keyhandler till you finished the game */
 	while (CheckNotFinished())
 	  Gamekeys();
@@ -130,9 +137,10 @@ void Gamekeys(void)
      * (either the box or the ball) */
 	charptr = PieceIsBall ? &BoxOffset : &BallOffset;
 
-	switch(getk())
+	switch(fgetc_cons())
 	{
 #ifndef DKTRONICS
+#ifndef __ZX80__
 		case '0':
 			#asm
 			ld	a,$1e
@@ -176,6 +184,7 @@ void Gamekeys(void)
 			#endasm
 			break;
 #endif
+#endif
 		case K_DOWN:
 		  MovePiece(charptr,0,+1);
 		  break;
@@ -193,7 +202,11 @@ void Gamekeys(void)
 		  #ifdef SOUND
 		    bit_fx4 (5);
 		  #endif
-		  while (getk() == K_SWITCH) {}
+		  //while (getk() == K_SWITCH) {}
+		#ifdef __ZX80__
+			// make the display 'hop' to notify that we're switching
+			gen_tv_field();
+		#endif
 		  break;
 		case K_EXIT:
 		  exit(0);
@@ -211,6 +224,7 @@ void Gamekeys(void)
 		    bit_fx4 (3);
 		  #endif
 		  SetupLevel();
+		  break;
 	}
 }
 
@@ -298,9 +312,16 @@ char CheckNotFinished(void)
 	int i;
 
 	ptr = Board;
+#ifdef __ZX80__
+	gen_tv_field();
+#endif
 	for(i=1 ; i!=144 ; i++)
 	{
 		if(*ptr++ == BUBB) return(TRUE);   /* Are there any bubbles? */
+#ifdef __ZX80__
+		if ((i%9)==8)
+			gen_tv_field();
+#endif
 	}
 	if(++Level == MAXLEVEL) return(FALSE); /* All levels done?       */
 
@@ -330,16 +351,18 @@ void MovePiece(char *ptr, char plusx, char plusy)
 	temp  = PieceIsBall + 3;
 	temp2 = (plusx + (plusy * 16));
 
+#ifdef __ZX80__
+		gen_tv_field();
+#endif
+
 	while(1) /* loop */
 	{
-
 		locn = *(ptr) + Board;
 		if(TestNextPosIsStop(*(locn+temp2))) return; /* till edge */
+
+		y = (*(ptr) / 16);		x = (*(ptr) - (y * 16));
+
 /*
-		y = (*(ptr) / 16);
-		x = (*(ptr) - (y * 16)) * spritesize;
-		y *= spritesize;
-*/		y = (*(ptr) / 16);		x = (*(ptr) - (y * 16));
 		if(*(locn+temp2)==BUBB)
 		{
 			//putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * BUBB));			
@@ -349,10 +372,13 @@ void MovePiece(char *ptr, char plusx, char plusy)
 			bit_fx2 (5);
 			#endif
 		}
-
+*/
 		*(locn+temp2) = *locn;
 		*locn = 0;
 
+#ifdef __ZX80__
+		gen_tv_field();
+#endif
  		/* remove old */
 		//putsprite(spr_xor,x,y,sprites + (spritemem * temp));		
 		putpic (x,y,0);
@@ -367,6 +393,9 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		#endif
 
 		(*ptr) += temp2;
+#ifdef __ZX80__
+		gen_tv_field();
+#endif
 	}
 }
 
@@ -436,6 +465,41 @@ void putpic(int x, int y, int picture) {
 #endif
 #ifdef TEXT
 	#define HAVEPICS
+#ifdef __ZX80__
+	switch(picture)
+	{
+	case WALL:
+		display[y*66+x*2]=9;
+		display[y*66+x*2+1]=9;
+		display[y*66+33+x*2]=9;
+		display[y*66+33+x*2+1]=9;
+		break;
+	case BUBB:
+		display[y*66+x*2]=7;
+		display[y*66+x*2+1]=0;
+		display[y*66+33+x*2]=0;
+		display[y*66+33+x*2+1]=0;
+		break;
+	case BALL:
+		display[y*66+x*2]=7;
+		display[y*66+x*2+1]=6;
+		display[y*66+33+x*2]=5;
+		display[y*66+33+x*2+1]=4;
+		break;
+	case BOX:
+		display[y*66+x*2]=135;
+		display[y*66+x*2+1]=134;
+		display[y*66+33+x*2]=133;
+		display[y*66+33+x*2+1]=132;
+		break;
+	case 0:
+		display[y*66+x*2]=0;
+		display[y*66+x*2+1]=0;
+		display[y*66+33+x*2]=0;
+		display[y*66+33+x*2+1]=0;
+		break;
+	}
+#else
 	switch(picture)
 	{
 	case WALL:
@@ -469,6 +533,7 @@ void putpic(int x, int y, int picture) {
 		display[y*66+33+x*2+1]=0;
 		break;
 	}
+#endif
 #endif
 #ifndef HAVEPICS
 	if (picture == 0) {

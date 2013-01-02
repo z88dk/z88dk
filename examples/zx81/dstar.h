@@ -32,25 +32,13 @@ char Board[144];        /* Space for decompressed Level */
 #define K_NEXTLEV '+'
 #define K_PREVLEV '-'
 
-#if defined __VZ200__ || defined __NASCOM__ || defined __TRS80__ || defined __GAL__
-#define K_UP       'Q'  /* arrow up     */
-#define K_DOWN     'A' /* arrow down   */
-#define K_LEFT     'O'  /* arrow left   */
-#define K_RIGHT    'P'  /* arrow right  */
-#define K_SWITCH   ' '  /* [SPACE]      */
-#define K_EXIT     'G' /* [Esc]/[Quit] */
-#define K_CLEAR    'H'
-#endif
-
-#ifndef K_UP
 #define K_UP       'q'  /* arrow up     */
 #define K_DOWN     'a' /* arrow down   */
 #define K_LEFT     'o'  /* arrow left   */
 #define K_RIGHT    'p'  /* arrow right  */
-#define K_SWITCH   ' '  /* [SPACE]      */
+#define K_SWITCH   'm'  /* [SPACE]      */
 #define K_EXIT     'g' /* [Esc]/[Quit] */
 #define K_CLEAR    'h'
-#endif
 
 extern char levels[];
 char *display;

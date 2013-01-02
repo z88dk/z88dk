@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.173 2012-09-04 15:53:32 stefano Exp $
+# $Id: Makefile,v 1.174 2013-01-02 14:55:32 stefano Exp $
 
 
 include Make.config
@@ -24,7 +24,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib \
 	trs80_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib \
 	embedded_clib.lib test_clib.lib \
-	preempt.lib zx81libs
+	preempt.lib zx80_clib.lib zx81libs
 
 genlibs: z80_crt0.lib gen_math.lib debug.lib malloc.lib ndos.lib adt.lib balloc.lib \
 	 im2.lib rect.lib algorithm.lib lib3d.lib x11.lib
@@ -94,6 +94,7 @@ zx81deps:
 	$(RM) -f strings/*.o
 	$(RM) -f stdlib/*.o
 	$(RM) -f stdio/*.o
+	$(RM) -f stdio/zx81/*.o
 	$(RM) -f stdio_new/stream-general/*.o
 	$(RM) -f stdio_new/stream-out/stdio_basechar.o
 	$(RM) -f stdio_new/stream-general/stdio_atou.o
@@ -105,6 +106,9 @@ zx81deps:
 	$(RM) -f graphics/zx81/*.o
 	$(RM) -f graphics/zx81/hr/*.o
 	$(RM) -f graphics/gray/*.o
+	$(RM) -f zx81/*.o
+	$(RM) -f zx81/tape/*.o
+	$(RM) -f zx81/basic/*.o
 
 # interesting algorithms - aralbrec
 algorithm.lib:
@@ -479,6 +483,23 @@ vzansi_clib.lib:
 	$(MAKE) gamesdeps
 	cd games ; $(MAKE) lvz ; cd ..
 	$(LIBLINKER) -DFORvz -x$(OUTPUT_DIRECTORY)/vzansi_clib @$(LISTFILE_DIRECTORY)/vzansi.lst
+
+# ZX81 lib - Stefano
+zx80_clib.lib:
+	@echo ''
+	@echo '--- Building ZX80 Library ---'
+	@echo ''
+	$(MAKE) zx81deps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
+	cd games ; $(MAKE) lzx ; cd ..
+	$(LIBLINKER) -DFORzx80 -x$(OUTPUT_DIRECTORY)/zx80_clib @$(LISTFILE_DIRECTORY)/zx80.lst
+	$(MAKE) zx81deps
 
 # ZX81 lib - Stefano
 zx81_clib.lib:

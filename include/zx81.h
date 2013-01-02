@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.28 2012-12-31 10:38:23 stefano Exp $
+ * $Id: zx81.h,v 1.29 2013-01-02 14:55:31 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -154,6 +154,14 @@ extern void __LIB__ zx_noblank();
 // gfx81mt192.lib or gfx81mt64.lib and "startup=2" mode required
 extern void __LIB__ mt_hrg_off();
 extern void __LIB__ mt_hrg_on();
+
+
+// ZX80 or ZX81 in FAST mode: try to generate a TV frame on demand
+// programmers should call this repedeately in their program loops
+// about every 1300ms;  'init' has to be called once at startup
+// by default the delay calibration is set to 0xE9 when '0' is passed.
+extern void __LIB__ __FASTCALL__ gen_tv_field_init(int delay);
+extern void __LIB__ gen_tv_field();
 
 // Invert HRG display ("hardware" way)
 extern void __LIB__ invhrg();
