@@ -10,11 +10,14 @@
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011
+# Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.37 2012-11-03 17:27:51 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.38 2013-01-10 22:32:16 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.37  2012-11-03 17:27:51  pauloscustodio
+# Revision 1.38  2013-01-10 22:32:16  pauloscustodio
+# Dont force gcc
+#
+# Revision 1.37  2012/11/03 17:27:51  pauloscustodio
 # Remove all test* in make clean
 #
 # Revision 1.36  2012/08/01 21:08:02  dom
@@ -196,8 +199,6 @@ ASTYLE = astyle \
 	--break-blocks \
 	--pad-oper --pad-paren-in --pad-header --unpad-paren \
 	--align-pointer=name
-
-CC ?= gcc
 
 all: z80asm$(EXESUFFIX)
 
