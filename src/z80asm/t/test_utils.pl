@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.19 2012-06-07 10:17:57 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.20 2013-01-14 00:22:31 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.19  2012-06-07 10:17:57  pauloscustodio
+# Revision 1.20  2013-01-14 00:22:31  pauloscustodio
+# Allow t_z80asm_ok() with warnings
+#
+# Revision 1.19  2012/06/07 10:17:57  pauloscustodio
 # delay after deleting files before calling new z80asm
 #
 # Revision 1.18  2012/05/29 21:02:19  pauloscustodio
@@ -168,13 +171,16 @@ sub t_z80asm_error {
 	is read_file(err_file(), err_mode => 'quiet'), 
 				$expected_err."\n", "$line error in error file";
 
-	exit 1 if $return != 0 && $STOP_ON_ERR;
+	exit 1 if $return == 0 && $STOP_ON_ERR;
 }
 
 #------------------------------------------------------------------------------
 sub t_z80asm_ok {
-	my($address_hex, $code, $expected_binary, $options) = @_;
+	my($address_hex, $code, $expected_binary, $options, $expected_warnings) = @_;
 
+	$expected_warnings ||= "";
+	chomp($expected_warnings);
+	
 	my $line = "[line ".((caller)[2])."]";
 	(my $test_name = $code) =~ s/\n.*/.../s;
 	ok 1, "$line t_z80asm_ok $test_name - ".
@@ -189,8 +195,11 @@ sub t_z80asm_ok {
 	my($stdout, $stderr, $return) = capture {
 		system $cmd;
 	};
+	
 	is $stdout, "", "$line stdout";
-	is $stderr, "", "$line stderr";
+	chomp($stderr);
+	is $stderr, $expected_warnings, "$line stderr";
+	
 	ok $return == 0, "$line exit value";
 	ok ! -f err_file(), "$line no error file";
 	ok -f bin_file(), "$line bin file found";
