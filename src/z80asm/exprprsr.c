@@ -11,12 +11,15 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.29 2012-11-03 17:39:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.30 2013-01-14 00:29:37 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.29  2012-11-03 17:39:35  pauloscustodio
+/* Revision 1.30  2013-01-14 00:29:37  pauloscustodio
+/* CH_0015 : integer out of range error replaced by warning
+/*
+/* Revision 1.29  2012/11/03 17:39:35  pauloscustodio
 /* astyle, comments
 /*
 /* Revision 1.28  2012/05/26 18:51:10  pauloscustodio
@@ -1094,14 +1097,10 @@ ExprLong( int listoffset )
                     constant = EvalPfixExpr( pfixexpr );
                     RemovePfixlist( pfixexpr );
 
-                    if ( constant >= LONG_MIN && constant <= LONG_MAX )
-                    {
-                        append_long( constant );
-                    }
-                    else
-                    {
-                        error( ERR_INT_RANGE, constant );
-                    }
+                    if ( constant < LONG_MIN || constant > LONG_MAX )
+						warning( ERR_INT_RANGE, constant );
+
+                    append_long( constant );
                 }
             }
         }
@@ -1160,14 +1159,10 @@ ExprAddress( int listoffset )
                     constant = EvalPfixExpr( pfixexpr );
                     RemovePfixlist( pfixexpr );
 
-                    if ( constant >= -32768 && constant <= 65535 )
-                    {
-                        append_word( constant );
-                    }
-                    else
-                    {
-                        error( ERR_INT_RANGE, constant );
-                    }
+                    if ( constant < -32768 || constant > 65535 )
+                        warning( ERR_INT_RANGE, constant );
+
+					append_word( constant );
                 }
             }
         }
@@ -1225,15 +1220,10 @@ ExprUnsigned8( int listoffset )
                     constant = EvalPfixExpr( pfixexpr );
                     RemovePfixlist( pfixexpr );
 
-                    /* BUG_0004 add test Integer out of range error */
-                    if ( constant >= -128 && constant <= 255 )
-                    {
-                        append_byte( ( unsigned char ) constant );
-                    }
-                    else
-                    {
-                        error( ERR_INT_RANGE, constant );
-                    }
+                    if ( constant < -128 || constant > 255 )
+                        warning( ERR_INT_RANGE, constant );
+
+					append_byte( ( unsigned char ) constant );
                 }
             }
         }
@@ -1307,14 +1297,10 @@ ExprSigned8( int listoffset )
                     constant = EvalPfixExpr( pfixexpr );
                     RemovePfixlist( pfixexpr );
 
-                    if ( constant >= -128 && constant <= 255 )
-                    {
-                        append_byte( ( unsigned char ) constant );
-                    }
-                    else
-                    {
-                        error( ERR_INT_RANGE, constant );
-                    }
+                    if ( constant < -128 || constant > 255 )
+						warning( ERR_INT_RANGE, constant );
+
+					append_byte( ( unsigned char ) constant );
                 }
             }
         }

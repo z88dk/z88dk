@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_INT_RANGE.t,v 1.2 2012-05-26 18:51:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_INT_RANGE.t,v 1.3 2013-01-14 00:29:37 pauloscustodio Exp $
 # $Log: ERR_INT_RANGE.t,v $
-# Revision 1.2  2012-05-26 18:51:10  pauloscustodio
+# Revision 1.3  2013-01-14 00:29:37  pauloscustodio
+# CH_0015 : integer out of range error replaced by warning
+#
+# Revision 1.2  2012/05/26 18:51:10  pauloscustodio
 # CH_0012 : wrappers on OS calls to raise fatal error
 # CH_0013 : new errors interface to decouple calling code from errors.c
 #
@@ -52,52 +55,62 @@ use Test::More;
 require 't/test_utils.pl';
 
 # Integer out of range (pass 1)
-t_z80asm_error("ld a,-129",	"Error at file 'test.asm' line 1: Integer '-129' out of range");
-t_z80asm_ok(0, "ld a,-128", 	"\x3E\x80");
+t_z80asm_ok(0, "ld a,-129",	"\x3E\x7F", 
+				"",	"Warning at file 'test.asm' line 2: Integer '-129' out of range");
+t_z80asm_ok(0, "ld a,-128", "\x3E\x80");
 t_z80asm_ok(0, "ld a,255", 	"\x3E\xFF");
-t_z80asm_error("ld a,256", 	"Error at file 'test.asm' line 1: Integer '256' out of range");
+t_z80asm_ok(0, "ld a,256", 	"\x3E\x00",
+				"", "Warning at file 'test.asm' line 2: Integer '256' out of range");
 
-t_z80asm_error("ld bc,-32769", 	"Error at file 'test.asm' line 1: Integer '-32769' out of range");
+t_z80asm_ok(0, "ld bc,-32769", 	"\x01\xFF\x7F",
+				"", "Warning at file 'test.asm' line 2: Integer '-32769' out of range");
 t_z80asm_ok(0, "ld bc,-32768", 	"\x01\x00\x80");
 t_z80asm_ok(0, "ld bc,65535", 	"\x01\xFF\xFF");
-t_z80asm_error("ld bc,65536", 	"Error at file 'test.asm' line 1: Integer '65536' out of range");
+t_z80asm_ok(0, "ld bc,65536", 	"\x01\x00\x00",
+				"", "Warning at file 'test.asm' line 2: Integer '65536' out of range");
 
 # Integer out of range (pass 2)
-t_z80asm_error("ld a,N \n defc N = -129", 	
-				"Error at file 'test.asm' module 'TEST' line 1: Integer '-129' out of range");
+t_z80asm_ok(0, "ld a,N \n defc N = -129", 	"\x3E\x7F", 	
+				"", "Warning at file 'test.asm' module 'TEST' line 2: Integer '-129' out of range");
 t_z80asm_ok(0, "ld a,N \n defc N = -128", 	"\x3E\x80");
 t_z80asm_ok(0, "ld a,N \n defc N = 255", 	"\x3E\xFF");
-t_z80asm_error("ld a,N \n defc N = 256",	
-				"Error at file 'test.asm' module 'TEST' line 1: Integer '256' out of range");
+t_z80asm_ok(0, "ld a,N \n defc N = 256", 	"\x3E\x00",
+				"", "Warning at file 'test.asm' module 'TEST' line 2: Integer '256' out of range");
 
-t_z80asm_error("ld bc,N \n defc N = -32769", 	
-				"Error at file 'test.asm' module 'TEST' line 1: Integer '-32769' out of range");
+t_z80asm_ok(0, "ld bc,N \n defc N = -32769", 	"\x01\xFF\x7F",
+				"", "Warning at file 'test.asm' module 'TEST' line 2: Integer '-32769' out of range");
 t_z80asm_ok(0, "ld bc,N \n defc N = -32768", 	"\x01\x00\x80");
 t_z80asm_ok(0, "ld bc,N \n defc N = 65535", 	"\x01\xFF\xFF");
-t_z80asm_error("ld bc,N \n defc N = 65536", 	
-				"Error at file 'test.asm' module 'TEST' line 1: Integer '65536' out of range");
+t_z80asm_ok(0, "ld bc,N \n defc N = 65536", 	"\x01\x00\x00",
+				"", "Warning at file 'test.asm' module 'TEST' line 2: Integer '65536' out of range");
 
 # index register offset
-t_z80asm_error("ld (ix-129),-1", "Error at file 'test.asm' line 1: Integer '-129' out of range");
+t_z80asm_ok(0, "ld (ix-129),-1", "\xDD\x36\x7F\xFF",
+				"", "Warning at file 'test.asm' line 2: Integer '-129' out of range");
 t_z80asm_ok(0, "ld (ix-128),-1", "\xDD\x36\x80\xFF");
+diag "BUG: ld (ix+128),x should fail";
 t_z80asm_ok(0, "ld (ix+255),-1", "\xDD\x36\xFF\xFF");
-t_z80asm_error("ld (ix+256),-1", "Error at file 'test.asm' line 1: Integer '256' out of range");
+t_z80asm_ok(0, "ld (ix+256),-1", "\xDD\x36\x00\xFF", 
+				"", "Warning at file 'test.asm' line 2: Integer '256' out of range");
 
-t_z80asm_error("ld (ix+value),-1 \n defc value = -129", 
-				"Error at file 'test.asm' module 'TEST' line 1: Integer '-129' out of range");
+t_z80asm_ok(0, "ld (ix+value),-1 \n defc value = -129", "\xDD\x36\x7F\xFF",
+				"", "Warning at file 'test.asm' module 'TEST' line 2: Integer '-129' out of range");
 t_z80asm_ok(0, "ld (ix+value),-1 \n defc value = -128", "\xDD\x36\x80\xFF");
+diag "BUG: ld (ix+128),x should fail";
 t_z80asm_ok(0, "ld (ix+value),-1 \n defc value =  255", "\xDD\x36\xFF\xFF");
-t_z80asm_error("ld (ix+value),-1 \n defc value =  256", 
-				"Error at file 'test.asm' module 'TEST' line 1: Integer '256' out of range");
+t_z80asm_ok(0, "ld (ix+value),-1 \n defc value =  256", "\xDD\x36\x00\xFF", 
+				"", "Warning at file 'test.asm' module 'TEST' line 2: Integer '256' out of range");
 
 # 32-bit arithmetic, long range is not tested on a 32bit long
 t_z80asm_ok(0, "defl 0xFFFFFFFF+1", "\0\0\0\0");
 
 # call out of range
-t_z80asm_error("call -32769", 	"Error at file 'test.asm' line 1: Integer '-32769' out of range");
+t_z80asm_ok(0, "call -32769", 	"\xCD\xFF\x7F",
+				"", "Warning at file 'test.asm' line 2: Integer '-32769' out of range");
 t_z80asm_ok(0, "call -32768", 	"\xCD\x00\x80");
 t_z80asm_ok(0, "call 65535", 	"\xCD\xFF\xFF");
-t_z80asm_error("call 65536", 	"Error at file 'test.asm' line 1: Integer '65536' out of range");
+t_z80asm_ok(0, "call 65536", 	"\xCD\x00\x00",
+				"", "Warning at file 'test.asm' line 2: Integer '65536' out of range");
 
 # RST out of range
 for ([0x00 => 0xC7], [0x08 => 0xCF], [0x10 => 0xD7], [0x18 => 0xDF], 
@@ -235,17 +248,17 @@ unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = -32769");
 write_file(asm_file(), 	"xref value \n ld bc,value");
 t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "", 
-		"Error at file 'test.asm' module 'TEST': Integer '-32769' out of range in expression 'VALUE'\n".
-		"1 errors occurred during assembly\n", 
-		1);
+		"Warning at file 'test.asm' module 'TEST': Integer '-32769' out of range in expression 'VALUE'\n", 
+		0);
+t_binary(read_file(bin_file(), binary => ':raw'), "\x01\xFF\x7F");
 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 0");
 write_file(asm_file(), 	"xref value \n ld bc,value-32769");
 t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "", 
-		"Error at file 'test.asm' module 'TEST': Integer '-32769' out of range in expression 'VALUE-32769'\n".
-		"1 errors occurred during assembly\n", 
-		1);
+		"Warning at file 'test.asm' module 'TEST': Integer '-32769' out of range in expression 'VALUE-32769'\n", 
+		0);
+t_binary(read_file(bin_file(), binary => ':raw'), "\x01\xFF\x7F");
 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = -32768");
@@ -275,17 +288,19 @@ unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 65536");
 write_file(asm_file(), 	"xref value \n ld bc,value");
 t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "", 
-		"Error at file 'test.asm' module 'TEST': Integer '65536' out of range in expression 'VALUE'\n".
-		"1 errors occurred during assembly\n", 
-		1);
+		"Warning at file 'test.asm' module 'TEST': Integer '65536' out of range in expression 'VALUE'\n", 
+		0);
+t_binary(read_file(bin_file(), binary => ':raw'), "\x01\x00\x00");
 
 unlink_testfiles($asm2, $obj2, $sym2);
 write_file($asm2, 	"xdef value \n defc value = 0");
 write_file(asm_file(), 	"xref value \n ld bc,value+65536");
 t_z80asm_capture("-b -r0 ".asm_file()." ".$asm2, "", 
-		"Error at file 'test.asm' module 'TEST': Integer '65536' out of range in expression 'VALUE+65536'\n".
-		"1 errors occurred during assembly\n", 
-		1);
+		"Warning at file 'test.asm' module 'TEST': Integer '65536' out of range in expression 'VALUE+65536'\n", 
+		0);
+t_binary(read_file(bin_file(), binary => ':raw'), "\x01\x00\x00");
+
+diag "Test (ix+ddd) with multiple modules";
 
 # JR
 t_z80asm_error("jr asmpc+2-129", "Error at file 'test.asm' line 1: Integer '-129' out of range");

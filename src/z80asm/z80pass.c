@@ -11,12 +11,15 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.32 2012-11-03 17:39:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.33 2013-01-14 00:29:37 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.32  2012-11-03 17:39:36  pauloscustodio
+/* Revision 1.33  2013-01-14 00:29:37  pauloscustodio
+/* CH_0015 : integer out of range error replaced by warning
+/*
+/* Revision 1.32  2012/11/03 17:39:36  pauloscustodio
 /* astyle, comments
 /*
 /* Revision 1.31  2012/11/01 23:20:56  pauloscustodio
@@ -657,57 +660,31 @@ Z80pass2( void )
                         break;
 
                     case RANGE_8UNSIGN:
+                        if ( constant < -128 || constant > 255 )
+                            warning_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
 
-                        /* BUG_0004 add test Integer out of range error */
-                        if ( constant >= -128 && constant <= 255 )
-                        {
-                            patch_byte( &patchptr, ( unsigned char ) constant );
-                            /* opcode is stored, now store byte */
-                        }
-                        else
-                        {
-                            error_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
-                        }
-
+						patch_byte( &patchptr, ( unsigned char ) constant );
                         break;
 
                     case RANGE_8SIGN:
-                        if ( constant >= -128 && constant <= 255 )
-                        {
-                            patch_byte( &patchptr, ( unsigned char ) constant );
-                            /* opcode is stored, now store signed operand */
-                        }
-                        else
-                        {
-                            error_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
-                        }
+                        if ( constant < -128 || constant > 255 )
+                            warning_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
 
+						patch_byte( &patchptr, ( unsigned char ) constant );
                         break;
 
                     case RANGE_16CONST:
-                        if ( constant >= -32768 && constant <= 65535 )
-                        {
-                            patch_word( &patchptr, ( int ) constant );
-                            /* store two bytes */
-                        }
-                        else
-                        {
-                            error_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
-                        }
+                        if ( constant < -32768 || constant > 65535 )
+                            warning_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
 
+						patch_word( &patchptr, ( int ) constant );
                         break;
 
                     case RANGE_32SIGN:
-                        if ( constant >= LONG_MIN && constant <= LONG_MAX )
-                        {
-                            patch_long( &patchptr, constant );
-                            /* store 4 bytes */
-                        }
-                        else
-                        {
-                            error_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
-                        }
+                        if ( constant < LONG_MIN || constant > LONG_MAX )
+                            warning_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
 
+						patch_long( &patchptr, constant );
                         break;
                 }
             }

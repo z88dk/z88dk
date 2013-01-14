@@ -11,12 +11,15 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.44 2012-11-03 17:39:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.45 2013-01-14 00:29:37 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.44  2012-11-03 17:39:36  pauloscustodio
+/* Revision 1.45  2013-01-14 00:29:37  pauloscustodio
+/* CH_0015 : integer out of range error replaced by warning
+/*
+/* Revision 1.44  2012/11/03 17:39:36  pauloscustodio
 /* astyle, comments
 /*
 /* Revision 1.43  2012/06/14 15:01:27  pauloscustodio
@@ -505,26 +508,17 @@ ReadExpr( long nextexpr, long endexpr )
                         break;
 
                     case 'S':
-                        if ( ( constant >= -128 ) && ( constant <= 255 ) )
-                        {
-                            patch_byte( &patchptr, ( unsigned char ) constant );    /* opcode is stored, now store signed 8bit value */
-                        }
-                        else
-                        {
-                            error_at( CURRENTFILE->fname, 0, ERR_INT_RANGE_EXPR, constant, line );
-                        }
+                        if ( constant < -128 || constant > 255 )
+                            warning_at( CURRENTFILE->fname, 0, ERR_INT_RANGE_EXPR, constant, line );
 
+						patch_byte( &patchptr, ( unsigned char ) constant );    /* opcode is stored, now store signed 8bit value */
                         break;
 
                     case 'C':
-                        if ( ( constant >= -32768 ) && ( constant <= 65535 ) )
-                        {
-                            patch_word( &patchptr, constant );
-                        }
-                        else
-                        {
-                            error_at( CURRENTFILE->fname, 0, ERR_INT_RANGE_EXPR, constant, line );
-                        }
+                        if ( constant < -32768 || constant > 65535 )
+                            warning_at( CURRENTFILE->fname, 0, ERR_INT_RANGE_EXPR, constant, line );
+
+						patch_word( &patchptr, constant );
 
                         if ( autorelocate )
                             if ( postfixexpr->rangetype & SYMADDR )
@@ -552,15 +546,10 @@ ReadExpr( long nextexpr, long endexpr )
                         break;
 
                     case 'L':
-                        if ( constant >= LONG_MIN && constant <= LONG_MAX )
-                        {
-                            patch_long( &patchptr, constant );
-                        }
-                        else
-                        {
-                            error_at( CURRENTFILE->fname, 0, ERR_INT_RANGE_EXPR, constant, line );
-                        }
+                        if ( constant < LONG_MIN || constant > LONG_MAX )
+                            warning_at( CURRENTFILE->fname, 0, ERR_INT_RANGE_EXPR, constant, line );
 
+						patch_long( &patchptr, constant );
                         break;
                 }
             }
