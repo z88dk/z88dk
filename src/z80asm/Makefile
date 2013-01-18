@@ -12,9 +12,14 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.40 2013-01-10 23:33:49 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.41 2013-01-18 22:59:17 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.40  2013-01-10 23:33:49  pauloscustodio
+# Revision 1.41  2013-01-18 22:59:17  pauloscustodio
+# CH_0016 : StrHash class to create maps from string to void*
+# Created the StrHash to create hash tables mapping string keys kept in
+# strpool to void* user pointer.
+#
+# Revision 1.40  2013/01/10 23:33:49  pauloscustodio
 # Fix dependencies for MSVC_TARGET
 #
 # Revision 1.39  2013/01/10 22:54:18  pauloscustodio
@@ -187,6 +192,7 @@ OBJS = 	\
 	prsident.o	\
 	prsline.o	\
 	safestr.o	\
+	strhash.o	\
 	strlist.o	\
 	strpool.o	\
 	strutil.o	\
@@ -278,6 +284,8 @@ prsident.o: codearea.h
 prsline.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 prsline.o: types.h symbol.h options.h errors.h errors_def.h
 safestr.o: safestr.h memalloc.h except.h e4c.h types.h
+strhash.o: memalloc.h except.h e4c.h strhash.h types.h class.h queue.h
+strhash.o: uthash.h die.h strpool.h
 strlist.o: memalloc.h except.h e4c.h strlist.h class.h queue.h types.h
 strlist.o: strpool.h
 strpool.o: memalloc.h except.h e4c.h strpool.h class.h queue.h types.h
