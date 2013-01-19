@@ -18,9 +18,13 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.2 2013-01-19 00:04:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.3 2013-01-19 23:52:40 pauloscustodio Exp $ */
 /* $Log: strhash.c,v $
-/* Revision 1.2  2013-01-19 00:04:53  pauloscustodio
+/* Revision 1.3  2013-01-19 23:52:40  pauloscustodio
+/* strhash hanged on cleanup - delete by HASH_ITER / HASH_DEL
+/* instead of traversing CIRCLEQ
+/*
+/* Revision 1.2  2013/01/19 00:04:53  pauloscustodio
 /* Implement StrHash_clone, required change in API of class.h and all classes that used it.
 /*
 /* Revision 1.1  2013/01/18 22:59:17  pauloscustodio
@@ -65,19 +69,20 @@ void StrHash_copy( StrHash *self, StrHash *other )
 
 void StrHash_fini( StrHash *self )
 {
-    StrHashElem *elem;
+    StrHashElem *elem, *tmp;
 
-	while ( ! CIRCLEQ_EMPTY( &self->head ) )
+    HASH_ITER( hh, self->hash_table, elem, tmp )
     {
-		elem = CIRCLEQ_FIRST( &self->head );
-		StrHash_remove( self, elem->key );
+        HASH_DEL( self->hash_table, elem );
+        xfree( elem );
     }
+
 }
 
 /*-----------------------------------------------------------------------------
 *	Find a hash entry
 *----------------------------------------------------------------------------*/
-static StrHashElem *StrHash_find( StrHash *self, char *key )
+StrHashElem *StrHash_find( StrHash *self, char *key )
 {
     StrHashElem *elem;
     size_t  	num_chars = strlen( key );

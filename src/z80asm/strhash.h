@@ -18,9 +18,13 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.h,v 1.1 2013-01-18 22:59:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.h,v 1.2 2013-01-19 23:52:40 pauloscustodio Exp $ */
 /* $Log: strhash.h,v $
-/* Revision 1.1  2013-01-18 22:59:17  pauloscustodio
+/* Revision 1.2  2013-01-19 23:52:40  pauloscustodio
+/* strhash hanged on cleanup - delete by HASH_ITER / HASH_DEL
+/* instead of traversing CIRCLEQ
+/*
+/* Revision 1.1  2013/01/18 22:59:17  pauloscustodio
 /* CH_0016 : StrHash class to create maps from string to void*
 /* Created the StrHash to create hash tables mapping string keys kept in
 /* strpool to void* user pointer.
@@ -62,6 +66,7 @@ typedef struct StrHashElem
     CIRCLEQ_ENTRY( StrHashElem ) entries;
 									/* doubly linked circular queue of all elements */
     UT_hash_handle hh;      		/* hash table */
+
 } StrHashElem;
 
 CLASS( StrHash )
@@ -71,12 +76,13 @@ CIRCLEQ_HEAD( StrHashHead, StrHashElem )
 END_CLASS;
 
 /* methods */
-extern void  StrHash_set( StrHash *self, char *key, void *value );
-extern void *StrHash_get( StrHash *self, char *key );
-extern bool  StrHash_exists( StrHash *self, char *key );
-extern void  StrHash_remove( StrHash *self, char *key );
+extern void			StrHash_set( StrHash *self, char *key, void *value );
+extern void		   *StrHash_get( StrHash *self, char *key );
+extern bool			StrHash_exists( StrHash *self, char *key );
+extern void			StrHash_remove( StrHash *self, char *key );
+extern StrHashElem *StrHash_find( StrHash *self, char *key );
 
-extern void  StrHash_first( StrHash *self, StrHashElem **iter );
-extern bool  StrHash_next( StrHash *self, StrHashElem **iter );
+extern void			StrHash_first( StrHash *self, StrHashElem **iter );
+extern bool			StrHash_next( StrHash *self, StrHashElem **iter );
 
 #endif /* ndef STRHASH_H */

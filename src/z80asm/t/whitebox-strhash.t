@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.3 2013-01-19 01:33:16 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.4 2013-01-19 23:52:41 pauloscustodio Exp $
 # $Log: whitebox-strhash.t,v $
-# Revision 1.3  2013-01-19 01:33:16  pauloscustodio
+# Revision 1.4  2013-01-19 23:52:41  pauloscustodio
+# strhash hanged on cleanup - delete by HASH_ITER / HASH_DEL
+# instead of traversing CIRCLEQ
+#
+# Revision 1.3  2013/01/19 01:33:16  pauloscustodio
 # Clean-up strpool code
 #
 # Revision 1.2  2013/01/19 00:04:53  pauloscustodio
@@ -204,6 +208,16 @@ END_INIT
 	if (!StrHash_exists(hash2, "def"))			ERROR;
 	if (!StrHash_exists(hash2, "ghi"))			ERROR;
 	
+	StrHash_remove(hash2, "abc");
+	
+	if (StrHash_get(hash2, "abc") != NULL)		ERROR;
+	if (StrHash_get(hash2, "def") != (void*)2)	ERROR;
+	if (StrHash_get(hash2, "ghi") != (void*)3)	ERROR;
+	
+	if ( StrHash_exists(hash2, "abc"))			ERROR;
+	if (!StrHash_exists(hash2, "def"))			ERROR;
+	if (!StrHash_exists(hash2, "ghi"))			ERROR;
+	
 	return 0;
 END
 
@@ -212,35 +226,35 @@ init
 memalloc: init
 memalloc strhash.c(1): alloc 40 bytes at ADDR_1
 memalloc strpool.c(1): alloc 32 bytes at ADDR_2
-memalloc strhash.c(2): alloc 48 bytes at ADDR_3
+memalloc strhash.c(4): alloc 48 bytes at ADDR_3
 memalloc strpool.c(2): alloc 36 bytes at ADDR_4
 memalloc strpool.c(3): alloc 4 bytes at ADDR_5
 memalloc strpool.c(4): alloc 44 bytes at ADDR_6
 memalloc strpool.c(4): alloc 384 bytes at ADDR_7
-memalloc strhash.c(3): alloc 44 bytes at ADDR_8
-memalloc strhash.c(3): alloc 384 bytes at ADDR_9
-memalloc strhash.c(2): alloc 48 bytes at ADDR_10
+memalloc strhash.c(5): alloc 44 bytes at ADDR_8
+memalloc strhash.c(5): alloc 384 bytes at ADDR_9
+memalloc strhash.c(4): alloc 48 bytes at ADDR_10
 memalloc strpool.c(2): alloc 36 bytes at ADDR_11
 memalloc strpool.c(3): alloc 4 bytes at ADDR_12
-memalloc strhash.c(2): alloc 48 bytes at ADDR_13
+memalloc strhash.c(4): alloc 48 bytes at ADDR_13
 memalloc strpool.c(2): alloc 36 bytes at ADDR_14
 memalloc strpool.c(3): alloc 4 bytes at ADDR_15
 memalloc strhash.c(1): alloc 40 bytes at ADDR_16
-memalloc strhash.c(2): alloc 48 bytes at ADDR_17
-memalloc strhash.c(3): alloc 44 bytes at ADDR_18
-memalloc strhash.c(3): alloc 384 bytes at ADDR_19
-memalloc strhash.c(2): alloc 48 bytes at ADDR_20
-memalloc strhash.c(2): alloc 48 bytes at ADDR_21
-memalloc strhash.c(5): free 48 bytes at ADDR_10 allocated at strhash.c(2)
-memalloc strhash.c(5): free 48 bytes at ADDR_13 allocated at strhash.c(2)
-memalloc strhash.c(4): free 384 bytes at ADDR_9 allocated at strhash.c(3)
-memalloc strhash.c(4): free 44 bytes at ADDR_8 allocated at strhash.c(3)
-memalloc strhash.c(5): free 48 bytes at ADDR_3 allocated at strhash.c(2)
-memalloc strhash.c(5): free 48 bytes at ADDR_17 allocated at strhash.c(2)
-memalloc strhash.c(5): free 48 bytes at ADDR_20 allocated at strhash.c(2)
-memalloc strhash.c(4): free 384 bytes at ADDR_19 allocated at strhash.c(3)
-memalloc strhash.c(4): free 44 bytes at ADDR_18 allocated at strhash.c(3)
-memalloc strhash.c(5): free 48 bytes at ADDR_21 allocated at strhash.c(2)
+memalloc strhash.c(4): alloc 48 bytes at ADDR_17
+memalloc strhash.c(5): alloc 44 bytes at ADDR_18
+memalloc strhash.c(5): alloc 384 bytes at ADDR_19
+memalloc strhash.c(4): alloc 48 bytes at ADDR_20
+memalloc strhash.c(4): alloc 48 bytes at ADDR_21
+memalloc strhash.c(7): free 48 bytes at ADDR_10 allocated at strhash.c(4)
+memalloc strhash.c(7): free 48 bytes at ADDR_13 allocated at strhash.c(4)
+memalloc strhash.c(6): free 384 bytes at ADDR_9 allocated at strhash.c(5)
+memalloc strhash.c(6): free 44 bytes at ADDR_8 allocated at strhash.c(5)
+memalloc strhash.c(7): free 48 bytes at ADDR_3 allocated at strhash.c(4)
+memalloc strhash.c(7): free 48 bytes at ADDR_17 allocated at strhash.c(4)
+memalloc strhash.c(3): free 48 bytes at ADDR_20 allocated at strhash.c(4)
+memalloc strhash.c(2): free 384 bytes at ADDR_19 allocated at strhash.c(5)
+memalloc strhash.c(2): free 44 bytes at ADDR_18 allocated at strhash.c(5)
+memalloc strhash.c(3): free 48 bytes at ADDR_21 allocated at strhash.c(4)
 memalloc strhash.c(1): free 40 bytes at ADDR_16 allocated at strhash.c(1)
 memalloc strhash.c(1): free 40 bytes at ADDR_1 allocated at strhash.c(1)
 memalloc strpool.c(6): free 4 bytes at ADDR_5 allocated at strpool.c(3)
