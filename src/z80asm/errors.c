@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.18 2012-11-03 17:39:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.19 2013-01-19 00:04:53 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.18  2012-11-03 17:39:35  pauloscustodio
+/* Revision 1.19  2013-01-19 00:04:53  pauloscustodio
+/* Implement StrHash_clone, required change in API of class.h and all classes that used it.
+/*
+/* Revision 1.18  2012/11/03 17:39:35  pauloscustodio
 /* astyle, comments
 /*
 /* Revision 1.17  2012/06/14 15:01:27  pauloscustodio
@@ -139,7 +142,7 @@ void ErrFile_init( ErrFile *self )
     strpool_init();
 }
 
-void ErrFile_copy( ErrFile *self )
+void ErrFile_copy( ErrFile *self, ErrFile *other )
 {
     self->fp = NULL;
 }

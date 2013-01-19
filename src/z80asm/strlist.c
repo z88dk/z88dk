@@ -10,14 +10,17 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 
 List of strings (e.g. include path); strings kept in strpool.h
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.c,v 1.1 2012-05-24 21:42:42 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.c,v 1.2 2013-01-19 00:04:53 pauloscustodio Exp $ */
 /* $Log: strlist.c,v $
-/* Revision 1.1  2012-05-24 21:42:42  pauloscustodio
+/* Revision 1.2  2013-01-19 00:04:53  pauloscustodio
+/* Implement StrHash_clone, required change in API of class.h and all classes that used it.
+/*
+/* Revision 1.1  2012/05/24 21:42:42  pauloscustodio
 /* CH_0011 : new string list class to hold lists of strings
 /*
 /*
@@ -40,21 +43,16 @@ void StrList_init( StrList *self )
     TAILQ_INIT( &self->head );
 }
 
-void StrList_copy( StrList *self )
+void StrList_copy( StrList *self, StrList *other )
 {
-    StrListElem *elem, *new_elem;
-    TAILQ_HEAD( , StrListElem ) old_head;
+    StrListElem *elem;
 
-    /* save old head from original object */
-    memcpy( &old_head, &self->head, sizeof( old_head ) );
-
-    /* create new list and copy element by element from old_head */
+    /* create new list and copy element by element from other */
     TAILQ_INIT( &self->head );
-    TAILQ_FOREACH( elem, &old_head, entries )
+
+    TAILQ_FOREACH( elem, &other->head, entries )
     {
-        new_elem = xcalloc_struct( StrListElem );
-        new_elem->string = elem->string; /* point to same string at strpool */
-        TAILQ_INSERT_TAIL( &self->head, new_elem, entries );
+		StrList_append( self, elem->string );
     }
 }
 

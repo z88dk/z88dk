@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.3 2012-06-14 15:01:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.4 2013-01-19 00:04:53 pauloscustodio Exp $
 # $Log: whitebox-strlist.t,v $
-# Revision 1.3  2012-06-14 15:01:27  pauloscustodio
+# Revision 1.4  2013-01-19 00:04:53  pauloscustodio
+# Implement StrHash_clone, required change in API of class.h and all classes that used it.
+#
+# Revision 1.3  2012/06/14 15:01:27  pauloscustodio
 # Split safe strings from strutil.c to safestr.c
 #
 # Revision 1.2  2012/05/26 18:50:26  pauloscustodio
@@ -110,30 +113,30 @@ init
 memalloc: init
 memalloc strlist.c(1): alloc 36 bytes at ADDR_1
 memalloc strpool.c(1): alloc 28 bytes at ADDR_2
-memalloc strlist.c(4): alloc 12 bytes at ADDR_3
+memalloc strlist.c(3): alloc 12 bytes at ADDR_3
 memalloc strpool.c(2): alloc 36 bytes at ADDR_4
 memalloc strpool.c(3): alloc 4 bytes at ADDR_5
 memalloc strpool.c(4): alloc 44 bytes at ADDR_6
 memalloc strpool.c(4): alloc 384 bytes at ADDR_7
-memalloc strlist.c(4): alloc 12 bytes at ADDR_8
+memalloc strlist.c(3): alloc 12 bytes at ADDR_8
 memalloc strpool.c(2): alloc 36 bytes at ADDR_9
 memalloc strpool.c(3): alloc 4 bytes at ADDR_10
 memalloc strlist.c(1): alloc 36 bytes at ADDR_11
-memalloc strlist.c(2): alloc 12 bytes at ADDR_12
-memalloc strlist.c(2): alloc 12 bytes at ADDR_13
-memalloc strlist.c(4): alloc 12 bytes at ADDR_14
+memalloc strlist.c(3): alloc 12 bytes at ADDR_12
+memalloc strlist.c(3): alloc 12 bytes at ADDR_13
+memalloc strlist.c(3): alloc 12 bytes at ADDR_14
 memalloc strpool.c(2): alloc 36 bytes at ADDR_15
 memalloc strpool.c(3): alloc 4 bytes at ADDR_16
-memalloc strlist.c(4): alloc 12 bytes at ADDR_17
+memalloc strlist.c(3): alloc 12 bytes at ADDR_17
 memalloc strpool.c(2): alloc 36 bytes at ADDR_18
 memalloc strpool.c(3): alloc 4 bytes at ADDR_19
-memalloc strlist.c(3): free 12 bytes at ADDR_3 allocated at strlist.c(4)
-memalloc strlist.c(3): free 12 bytes at ADDR_8 allocated at strlist.c(4)
-memalloc strlist.c(3): free 12 bytes at ADDR_14 allocated at strlist.c(4)
+memalloc strlist.c(2): free 12 bytes at ADDR_3 allocated at strlist.c(3)
+memalloc strlist.c(2): free 12 bytes at ADDR_8 allocated at strlist.c(3)
+memalloc strlist.c(2): free 12 bytes at ADDR_14 allocated at strlist.c(3)
 memalloc strlist.c(1): free 36 bytes at ADDR_1 allocated at strlist.c(1)
-memalloc strlist.c(3): free 12 bytes at ADDR_12 allocated at strlist.c(2)
-memalloc strlist.c(3): free 12 bytes at ADDR_13 allocated at strlist.c(2)
-memalloc strlist.c(3): free 12 bytes at ADDR_17 allocated at strlist.c(4)
+memalloc strlist.c(2): free 12 bytes at ADDR_12 allocated at strlist.c(3)
+memalloc strlist.c(2): free 12 bytes at ADDR_13 allocated at strlist.c(3)
+memalloc strlist.c(2): free 12 bytes at ADDR_17 allocated at strlist.c(3)
 memalloc strlist.c(1): free 36 bytes at ADDR_11 allocated at strlist.c(1)
 memalloc strpool.c(6): free 4 bytes at ADDR_5 allocated at strpool.c(3)
 memalloc strpool.c(7): free 36 bytes at ADDR_4 allocated at strpool.c(2)

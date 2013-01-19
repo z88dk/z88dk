@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.1 2013-01-18 22:59:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.2 2013-01-19 00:04:53 pauloscustodio Exp $
 # $Log: whitebox-strhash.t,v $
-# Revision 1.1  2013-01-18 22:59:18  pauloscustodio
+# Revision 1.2  2013-01-19 00:04:53  pauloscustodio
+# Implement StrHash_clone, required change in API of class.h and all classes that used it.
+#
+# Revision 1.1  2013/01/18 22:59:18  pauloscustodio
 # CH_0016 : StrHash class to create maps from string to void*
 # Created the StrHash to create hash tables mapping string keys kept in
 # strpool to void* user pointer.
@@ -86,96 +89,117 @@ void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 
 END_INIT
 	/* main */
-	StrHash *hash;
+	StrHash *hash1, *hash2;
 	
 	warn("init\n");
-	hash = OBJ_NEW(StrHash);
-	check_list(hash, "");
+	hash1 = OBJ_NEW(StrHash);
+	check_list(hash1, "");
 	
-	if (StrHash_get(hash, "abc") != NULL)		ERROR;
-	if (StrHash_get(hash, "def") != NULL)		ERROR;
-	if (StrHash_get(hash, "ghi") != NULL)		ERROR;
+	if (StrHash_get(hash1, "abc") != NULL)		ERROR;
+	if (StrHash_get(hash1, "def") != NULL)		ERROR;
+	if (StrHash_get(hash1, "ghi") != NULL)		ERROR;
 	
-	if ( StrHash_exists(hash, "abc"))			ERROR;
-	if ( StrHash_exists(hash, "def"))			ERROR;
-	if ( StrHash_exists(hash, "ghi"))			ERROR;
+	if ( StrHash_exists(hash1, "abc"))			ERROR;
+	if ( StrHash_exists(hash1, "def"))			ERROR;
+	if ( StrHash_exists(hash1, "ghi"))			ERROR;
 	
-	StrHash_set(hash, "abc", (void*)1);
-	check_list(hash, "abc 1");
+	StrHash_set(hash1, "abc", (void*)1);
+	check_list(hash1, "abc 1");
 
-	if (StrHash_get(hash, "abc") != (void*)1)	ERROR;
-	if (StrHash_get(hash, "def") != NULL)		ERROR;
-	if (StrHash_get(hash, "ghi") != NULL)		ERROR;
+	if (StrHash_get(hash1, "abc") != (void*)1)	ERROR;
+	if (StrHash_get(hash1, "def") != NULL)		ERROR;
+	if (StrHash_get(hash1, "ghi") != NULL)		ERROR;
 	
-	if (!StrHash_exists(hash, "abc"))			ERROR;
-	if ( StrHash_exists(hash, "def"))			ERROR;
-	if ( StrHash_exists(hash, "ghi"))			ERROR;
+	if (!StrHash_exists(hash1, "abc"))			ERROR;
+	if ( StrHash_exists(hash1, "def"))			ERROR;
+	if ( StrHash_exists(hash1, "ghi"))			ERROR;
 	
-	StrHash_set(hash, "def", (void*)2);
-	check_list(hash, "abc 1 def 2");
+	StrHash_set(hash1, "def", (void*)2);
+	check_list(hash1, "abc 1 def 2");
 
-	if (StrHash_get(hash, "abc") != (void*)1)	ERROR;
-	if (StrHash_get(hash, "def") != (void*)2)	ERROR;
-	if (StrHash_get(hash, "ghi") != NULL)		ERROR;
+	if (StrHash_get(hash1, "abc") != (void*)1)	ERROR;
+	if (StrHash_get(hash1, "def") != (void*)2)	ERROR;
+	if (StrHash_get(hash1, "ghi") != NULL)		ERROR;
 	
-	if (!StrHash_exists(hash, "abc"))			ERROR;
-	if (!StrHash_exists(hash, "def"))			ERROR;
-	if ( StrHash_exists(hash, "ghi"))			ERROR;
+	if (!StrHash_exists(hash1, "abc"))			ERROR;
+	if (!StrHash_exists(hash1, "def"))			ERROR;
+	if ( StrHash_exists(hash1, "ghi"))			ERROR;
 	
-	StrHash_set(hash, "ghi", (void*)3);
-	check_list(hash, "abc 1 def 2 ghi 3");
+	StrHash_set(hash1, "ghi", (void*)3);
+	check_list(hash1, "abc 1 def 2 ghi 3");
 
-	if (StrHash_get(hash, "abc") != (void*)1)	ERROR;
-	if (StrHash_get(hash, "def") != (void*)2)	ERROR;
-	if (StrHash_get(hash, "ghi") != (void*)3)	ERROR;
+	if (StrHash_get(hash1, "abc") != (void*)1)	ERROR;
+	if (StrHash_get(hash1, "def") != (void*)2)	ERROR;
+	if (StrHash_get(hash1, "ghi") != (void*)3)	ERROR;
 	
-	if (!StrHash_exists(hash, "abc"))			ERROR;
-	if (!StrHash_exists(hash, "def"))			ERROR;
-	if (!StrHash_exists(hash, "ghi"))			ERROR;
+	if (!StrHash_exists(hash1, "abc"))			ERROR;
+	if (!StrHash_exists(hash1, "def"))			ERROR;
+	if (!StrHash_exists(hash1, "ghi"))			ERROR;
 	
-	StrHash_remove(hash, "def");
-	check_list(hash, "abc 1 ghi 3");
+	
+	hash2 = StrHash_clone(hash1);
+	
+	if (StrHash_get(hash2, "abc") != (void*)1)	ERROR;
+	if (StrHash_get(hash2, "def") != (void*)2)	ERROR;
+	if (StrHash_get(hash2, "ghi") != (void*)3)	ERROR;
+	
+	if (!StrHash_exists(hash2, "abc"))			ERROR;
+	if (!StrHash_exists(hash2, "def"))			ERROR;
+	if (!StrHash_exists(hash2, "ghi"))			ERROR;
+	
+	
+	StrHash_remove(hash1, "def");
+	check_list(hash1, "abc 1 ghi 3");
 
-	if (StrHash_get(hash, "abc") != (void*)1)	ERROR;
-	if (StrHash_get(hash, "def") != NULL)		ERROR;
-	if (StrHash_get(hash, "ghi") != (void*)3)	ERROR;
+	if (StrHash_get(hash1, "abc") != (void*)1)	ERROR;
+	if (StrHash_get(hash1, "def") != NULL)		ERROR;
+	if (StrHash_get(hash1, "ghi") != (void*)3)	ERROR;
 	
-	if (!StrHash_exists(hash, "abc"))			ERROR;
-	if ( StrHash_exists(hash, "def"))			ERROR;
-	if (!StrHash_exists(hash, "ghi"))			ERROR;
+	if (!StrHash_exists(hash1, "abc"))			ERROR;
+	if ( StrHash_exists(hash1, "def"))			ERROR;
+	if (!StrHash_exists(hash1, "ghi"))			ERROR;
 	
-	StrHash_remove(hash, "def");
-	check_list(hash, "abc 1 ghi 3");
+	StrHash_remove(hash1, "def");
+	check_list(hash1, "abc 1 ghi 3");
 
-	if (StrHash_get(hash, "abc") != (void*)1)	ERROR;
-	if (StrHash_get(hash, "def") != NULL)		ERROR;
-	if (StrHash_get(hash, "ghi") != (void*)3)	ERROR;
+	if (StrHash_get(hash1, "abc") != (void*)1)	ERROR;
+	if (StrHash_get(hash1, "def") != NULL)		ERROR;
+	if (StrHash_get(hash1, "ghi") != (void*)3)	ERROR;
 	
-	if (!StrHash_exists(hash, "abc"))			ERROR;
-	if ( StrHash_exists(hash, "def"))			ERROR;
-	if (!StrHash_exists(hash, "ghi"))			ERROR;
+	if (!StrHash_exists(hash1, "abc"))			ERROR;
+	if ( StrHash_exists(hash1, "def"))			ERROR;
+	if (!StrHash_exists(hash1, "ghi"))			ERROR;
 	
-	StrHash_remove(hash, "ghi");
-	check_list(hash, "abc 1");
+	StrHash_remove(hash1, "ghi");
+	check_list(hash1, "abc 1");
 
-	if (StrHash_get(hash, "abc") != (void*)1)	ERROR;
-	if (StrHash_get(hash, "def") != NULL)		ERROR;
-	if (StrHash_get(hash, "ghi") != NULL)		ERROR;
+	if (StrHash_get(hash1, "abc") != (void*)1)	ERROR;
+	if (StrHash_get(hash1, "def") != NULL)		ERROR;
+	if (StrHash_get(hash1, "ghi") != NULL)		ERROR;
 	
-	if (!StrHash_exists(hash, "abc"))			ERROR;
-	if ( StrHash_exists(hash, "def"))			ERROR;
-	if ( StrHash_exists(hash, "ghi"))			ERROR;
+	if (!StrHash_exists(hash1, "abc"))			ERROR;
+	if ( StrHash_exists(hash1, "def"))			ERROR;
+	if ( StrHash_exists(hash1, "ghi"))			ERROR;
 	
-	StrHash_remove(hash, "abc");
-	check_list(hash, "");
+	StrHash_remove(hash1, "abc");
+	check_list(hash1, "");
 
-	if (StrHash_get(hash, "abc") != NULL)		ERROR;
-	if (StrHash_get(hash, "def") != NULL)		ERROR;
-	if (StrHash_get(hash, "ghi") != NULL)		ERROR;
+	if (StrHash_get(hash1, "abc") != NULL)		ERROR;
+	if (StrHash_get(hash1, "def") != NULL)		ERROR;
+	if (StrHash_get(hash1, "ghi") != NULL)		ERROR;
 	
-	if ( StrHash_exists(hash, "abc"))			ERROR;
-	if ( StrHash_exists(hash, "def"))			ERROR;
-	if ( StrHash_exists(hash, "ghi"))			ERROR;
+	if ( StrHash_exists(hash1, "abc"))			ERROR;
+	if ( StrHash_exists(hash1, "def"))			ERROR;
+	if ( StrHash_exists(hash1, "ghi"))			ERROR;
+
+	
+	if (StrHash_get(hash2, "abc") != (void*)1)	ERROR;
+	if (StrHash_get(hash2, "def") != (void*)2)	ERROR;
+	if (StrHash_get(hash2, "ghi") != (void*)3)	ERROR;
+	
+	if (!StrHash_exists(hash2, "abc"))			ERROR;
+	if (!StrHash_exists(hash2, "def"))			ERROR;
+	if (!StrHash_exists(hash2, "ghi"))			ERROR;
 	
 	return 0;
 END
@@ -198,11 +222,23 @@ memalloc strpool.c(3): alloc 4 bytes at ADDR_12
 memalloc strhash.c(2): alloc 48 bytes at ADDR_13
 memalloc strpool.c(2): alloc 36 bytes at ADDR_14
 memalloc strpool.c(3): alloc 4 bytes at ADDR_15
+memalloc strhash.c(1): alloc 40 bytes at ADDR_16
+memalloc strhash.c(2): alloc 48 bytes at ADDR_17
+memalloc strhash.c(3): alloc 44 bytes at ADDR_18
+memalloc strhash.c(3): alloc 384 bytes at ADDR_19
+memalloc strhash.c(2): alloc 48 bytes at ADDR_20
+memalloc strhash.c(2): alloc 48 bytes at ADDR_21
 memalloc strhash.c(5): free 48 bytes at ADDR_10 allocated at strhash.c(2)
 memalloc strhash.c(5): free 48 bytes at ADDR_13 allocated at strhash.c(2)
 memalloc strhash.c(4): free 384 bytes at ADDR_9 allocated at strhash.c(3)
 memalloc strhash.c(4): free 44 bytes at ADDR_8 allocated at strhash.c(3)
 memalloc strhash.c(5): free 48 bytes at ADDR_3 allocated at strhash.c(2)
+memalloc strhash.c(5): free 48 bytes at ADDR_17 allocated at strhash.c(2)
+memalloc strhash.c(5): free 48 bytes at ADDR_20 allocated at strhash.c(2)
+memalloc strhash.c(4): free 384 bytes at ADDR_19 allocated at strhash.c(3)
+memalloc strhash.c(4): free 44 bytes at ADDR_18 allocated at strhash.c(3)
+memalloc strhash.c(5): free 48 bytes at ADDR_21 allocated at strhash.c(2)
+memalloc strhash.c(1): free 40 bytes at ADDR_16 allocated at strhash.c(1)
 memalloc strhash.c(1): free 40 bytes at ADDR_1 allocated at strhash.c(1)
 memalloc strpool.c(6): free 4 bytes at ADDR_5 allocated at strpool.c(3)
 memalloc strpool.c(7): free 36 bytes at ADDR_4 allocated at strpool.c(2)

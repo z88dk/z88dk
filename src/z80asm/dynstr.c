@@ -17,9 +17,12 @@ Using class.h for automatic garbage collection.
 Strings may contain zero byte, length is defined by separate field.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.2 2012-11-03 17:39:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.3 2013-01-19 00:04:53 pauloscustodio Exp $ */
 /* $Log: dynstr.c,v $
-/* Revision 1.2  2012-11-03 17:39:36  pauloscustodio
+/* Revision 1.3  2013-01-19 00:04:53  pauloscustodio
+/* Implement StrHash_clone, required change in API of class.h and all classes that used it.
+/*
+/* Revision 1.2  2012/11/03 17:39:36  pauloscustodio
 /* astyle, comments
 /*
 /* Revision 1.1  2012/06/14 15:03:45  pauloscustodio
@@ -48,7 +51,7 @@ void Str_init( Str *self )
     Str_clear( self );
 }
 
-void Str_copy( Str *self )
+void Str_copy( Str *self, Str *other )
 {
     char *data_copy = xmalloc( self->size );
     memcpy( data_copy, self->data, self->size );

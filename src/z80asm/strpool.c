@@ -18,9 +18,12 @@ and manage strdup/free for each token.
 Strings with the same contents are reused.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.c,v 1.1 2012-05-24 17:50:02 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.c,v 1.2 2013-01-19 00:04:53 pauloscustodio Exp $ */
 /* $Log: strpool.c,v $
-/* Revision 1.1  2012-05-24 17:50:02  pauloscustodio
+/* Revision 1.2  2013-01-19 00:04:53  pauloscustodio
+/* Implement StrHash_clone, required change in API of class.h and all classes that used it.
+/*
+/* Revision 1.1  2012/05/24 17:50:02  pauloscustodio
 /* CH_0010 : new string pool to hold strings for all program duration
 /*
 /*
@@ -40,13 +43,13 @@ CLASS( StrPool )
 END_CLASS;
 DEF_CLASS( StrPool );
 
-static void StrHash_delete_all( void );
+static void StrPoolHash_delete_all( void );
 
 void StrPool_init( StrPool *self )   { }
-void StrPool_copy( StrPool *self )   { }
+void StrPool_copy( StrPool *self, StrPool *other )   { }
 void StrPool_fini( StrPool *self )
 {
-    StrHash_delete_all();
+    StrPoolHash_delete_all();
 }
 
 static StrPool *str_pool = NULL;
@@ -54,20 +57,20 @@ static StrPool *str_pool = NULL;
 /*-----------------------------------------------------------------------------
 *   Hash table
 *----------------------------------------------------------------------------*/
-typedef struct StrHash
+typedef struct StrPoolHash
 {
     char    *string;        /* xstrdup */
 
     UT_hash_handle hh;      /* hash table */
-} StrHash;
+} StrPoolHash;
 
 /* hash table of all strings */
-static StrHash *hash_table = NULL;
+static StrPoolHash *hash_table = NULL;
 
 /* add one string to the hash table, if not yet there; returns address */
-static char *StrHash_add( char *string )
+static char *StrPoolHash_add( char *string )
 {
-    StrHash *hash;
+    StrPoolHash *hash;
     size_t  num_chars = strlen( string );
 
     /* check if string exists already */
@@ -79,7 +82,7 @@ static char *StrHash_add( char *string )
     }
 
     /* add to hash */
-    hash = xcalloc_struct( StrHash );
+    hash = xcalloc_struct( StrPoolHash );
     hash->string = xstrdup( string );   /* alloc string */
     HASH_ADD_KEYPTR( hh, hash_table, hash->string, num_chars, hash );
 
@@ -87,9 +90,9 @@ static char *StrHash_add( char *string )
 }
 
 /* delete all strings */
-static void StrHash_delete_all( void )
+static void StrPoolHash_delete_all( void )
 {
-    StrHash *hash, *tmp;
+    StrPoolHash *hash, *tmp;
 
     HASH_ITER( hh, hash_table, hash, tmp )
     {
@@ -105,7 +108,7 @@ static void StrHash_delete_all( void )
 char *strpool_add( char *string )
 {
     strpool_init();
-    return StrHash_add( string );
+    return StrPoolHash_add( string );
 }
 
 void strpool_init( void )

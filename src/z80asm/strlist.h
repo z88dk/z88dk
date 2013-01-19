@@ -10,14 +10,17 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 
 List of strings (e.g. include path); strings kept in strpool.h
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.h,v 1.1 2012-05-24 21:42:42 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.h,v 1.2 2013-01-19 00:04:53 pauloscustodio Exp $ */
 /* $Log: strlist.h,v $
-/* Revision 1.1  2012-05-24 21:42:42  pauloscustodio
+/* Revision 1.2  2013-01-19 00:04:53  pauloscustodio
+/* Implement StrHash_clone, required change in API of class.h and all classes that used it.
+/*
+/* Revision 1.1  2012/05/24 21:42:42  pauloscustodio
 /* CH_0011 : new string list class to hold lists of strings
 /*
 /*
@@ -49,7 +52,7 @@ typedef struct StrListElem
 } StrListElem;
 
 CLASS( StrList )
-TAILQ_HEAD( , StrListElem ) head; /* head of queue */
+TAILQ_HEAD( StrListHead, StrListElem ) head; /* head of queue */
 END_CLASS;
 
 /* methods */

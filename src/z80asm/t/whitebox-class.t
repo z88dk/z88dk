@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.3 2012-06-14 15:01:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.4 2013-01-19 00:04:53 pauloscustodio Exp $
 # $Log: whitebox-class.t,v $
-# Revision 1.3  2012-06-14 15:01:27  pauloscustodio
+# Revision 1.4  2013-01-19 00:04:53  pauloscustodio
+# Implement StrHash_clone, required change in API of class.h and all classes that used it.
+#
+# Revision 1.3  2012/06/14 15:01:27  pauloscustodio
 # Split safe strings from strutil.c to safestr.c
 #
 # Revision 1.2  2012/05/26 18:50:26  pauloscustodio
@@ -45,19 +48,19 @@ END_CLASS;
 
 DEF_CLASS(Name);
 
-void Name_init (Name * self)
+void Name_init (Name *self)
 { 
 	fprintf(stderr, "Name_init 0x%p\n", self);
 	self->str = xstrdup("John"); 
 }
 
-void Name_copy (Name * self) 	
+void Name_copy (Name *self, Name *other) 	
 { 
 	fprintf(stderr, "Name_copy 0x%p\n", self);
 	self->str = xstrdup(self->str); 
 }
 
-void Name_fini (Name * self) 	
+void Name_fini (Name *self) 	
 { 
 	fprintf(stderr, "Name_fini 0x%p\n", self);
 	xfree(self->str); 
@@ -70,20 +73,20 @@ END_CLASS;
 
 DEF_CLASS(Person);
 
-void Person_init (Person * self) 	
+void Person_init (Person *self) 	
 { 
 	fprintf(stderr, "Person_init 0x%p\n", self);
 	self->name = OBJ_NEW(Name); 
 	self->age = 31; 
 }
 
-void Person_copy (Person * self) 	
+void Person_copy (Person *self, Person *other) 	
 { 
 	fprintf(stderr, "Person_copy 0x%p\n", self);
 	self->name = Name_clone(self->name); 
 }
 
-void Person_fini (Person * self) 	
+void Person_fini (Person *self) 	
 { 
 	fprintf(stderr, "Person_fini 0x%p\n", self);
 	OBJ_DELETE(self->name); 

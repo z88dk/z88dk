@@ -18,9 +18,12 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.1 2013-01-18 22:59:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.2 2013-01-19 00:04:53 pauloscustodio Exp $ */
 /* $Log: strhash.c,v $
-/* Revision 1.1  2013-01-18 22:59:17  pauloscustodio
+/* Revision 1.2  2013-01-19 00:04:53  pauloscustodio
+/* Implement StrHash_clone, required change in API of class.h and all classes that used it.
+/*
+/* Revision 1.1  2013/01/18 22:59:17  pauloscustodio
 /* CH_0016 : StrHash class to create maps from string to void*
 /* Created the StrHash to create hash tables mapping string keys kept in
 /* strpool to void* user pointer.
@@ -46,8 +49,18 @@ void StrHash_init( StrHash *self )
     CIRCLEQ_INIT( &self->head );
 }
 
-void StrHash_copy( StrHash *self )
+void StrHash_copy( StrHash *self, StrHash *other )
 {
+    StrHashElem *elem;
+
+    /* create new hash and copy element by element from other */
+	self->hash_table = NULL;
+    CIRCLEQ_INIT( &self->head );
+
+	CIRCLEQ_FOREACH( elem, &other->head, entries )
+    {
+		StrHash_set( self, elem->key, elem->value );
+    }
 }
 
 void StrHash_fini( StrHash *self )

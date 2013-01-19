@@ -20,9 +20,12 @@ each object, which in turn may call destructors of contained objects.
 
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.2 2012-05-25 21:43:55 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.3 2013-01-19 00:04:53 pauloscustodio Exp $ */
 /* $Log: class.h,v $
-/* Revision 1.2  2012-05-25 21:43:55  pauloscustodio
+/* Revision 1.3  2013-01-19 00:04:53  pauloscustodio
+/* Implement StrHash_clone, required change in API of class.h and all classes that used it.
+/*
+/* Revision 1.2  2012/05/25 21:43:55  pauloscustodio
 /* compile error in cygwin gcc 3.4.5 with forward declaration of
 /* typedef struct ObjRegister ObjRegister
 /*
@@ -55,7 +58,8 @@ DEF_CLASS(T);
 
 // helper functions, need to be defined
 void T_init (T *self)   { self->string = xcalloc(1000,1); }
-void T_copy (T *self)   { self->string = xstrdup(self->string); }
+void T_copy (T *self, T *other)
+						{ self->string = xstrdup(other->string); }
 void T_fini (T *self)   { xfree(self->string); }
 
 // usage of class
@@ -84,7 +88,8 @@ struct ObjRegister;
     extern void T##_delete (T * self);                                      \
     /* helper functions to be supplied by user */                           \
     extern void T##_init (T * self);        /* called by T##_new    */      \
-    extern void T##_copy (T * self);        /* called by T##_clone  */      \
+    extern void T##_copy (T * self, T * other);								\
+											/* called by T##_clone  */      \
     extern void T##_fini (T * self);        /* called by T##_delete */      \
     /* class structure */                                                   \
     struct T {                                                              \
@@ -126,7 +131,7 @@ struct ObjRegister;
     {                                                                       \
         T * self = xmalloc(sizeof(T));      /* allocate object */           \
         memcpy(self, other, sizeof(T));     /* byte copy */                 \
-        T##_copy(self);                     /* alloc memory if needed */    \
+        T##_copy(self, other);              /* alloc memory if needed */    \
         _update_register_obj((struct ObjRegister *) self,                   \
                              __FILE__, __LINE__);                           \
         /* register for cleanup */      \
