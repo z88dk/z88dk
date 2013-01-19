@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strpool.t,v 1.3 2012-06-14 15:01:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strpool.t,v 1.4 2013-01-19 01:33:16 pauloscustodio Exp $
 # $Log: whitebox-strpool.t,v $
-# Revision 1.3  2012-06-14 15:01:27  pauloscustodio
+# Revision 1.4  2013-01-19 01:33:16  pauloscustodio
+# Clean-up strpool code
+#
+# Revision 1.3  2012/06/14 15:01:27  pauloscustodio
 # Split safe strings from strutil.c to safestr.c
 #
 # Revision 1.2  2012/05/26 18:50:26  pauloscustodio
@@ -430,7 +433,7 @@ END
 t_run_module([], "", <<ERR, 0);
 first run - create pool for all strings
 memalloc: init
-memalloc strpool.c(1): alloc 28 bytes at ADDR_1
+memalloc strpool.c(1): alloc 32 bytes at ADDR_1
 class: init
 class strpool.c(1): new class StrPool at ADDR_1
 memalloc strpool.c(2): alloc 36 bytes at ADDR_2
@@ -1846,7 +1849,7 @@ memalloc strpool.c(5): free 768 bytes at ADDR_336 allocated at strpool.c(4)
 memalloc strpool.c(5): free 44 bytes at ADDR_4 allocated at strpool.c(4)
 memalloc strpool.c(6): free 6 bytes at ADDR_706 allocated at strpool.c(3)
 memalloc strpool.c(7): free 36 bytes at ADDR_705 allocated at strpool.c(2)
-memalloc strpool.c(1): free 28 bytes at ADDR_1 allocated at strpool.c(1)
+memalloc strpool.c(1): free 32 bytes at ADDR_1 allocated at strpool.c(1)
 memalloc: cleanup
 ERR
 

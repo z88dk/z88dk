@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.2 2013-01-19 00:04:53 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.3 2013-01-19 01:33:16 pauloscustodio Exp $
 # $Log: whitebox-strhash.t,v $
-# Revision 1.2  2013-01-19 00:04:53  pauloscustodio
+# Revision 1.3  2013-01-19 01:33:16  pauloscustodio
+# Clean-up strpool code
+#
+# Revision 1.2  2013/01/19 00:04:53  pauloscustodio
 # Implement StrHash_clone, required change in API of class.h and all classes that used it.
 #
 # Revision 1.1  2013/01/18 22:59:18  pauloscustodio
@@ -208,7 +211,7 @@ t_run_module([], "", <<ERR, 0);
 init
 memalloc: init
 memalloc strhash.c(1): alloc 40 bytes at ADDR_1
-memalloc strpool.c(1): alloc 28 bytes at ADDR_2
+memalloc strpool.c(1): alloc 32 bytes at ADDR_2
 memalloc strhash.c(2): alloc 48 bytes at ADDR_3
 memalloc strpool.c(2): alloc 36 bytes at ADDR_4
 memalloc strpool.c(3): alloc 4 bytes at ADDR_5
@@ -248,7 +251,7 @@ memalloc strpool.c(5): free 384 bytes at ADDR_7 allocated at strpool.c(4)
 memalloc strpool.c(5): free 44 bytes at ADDR_6 allocated at strpool.c(4)
 memalloc strpool.c(6): free 4 bytes at ADDR_15 allocated at strpool.c(3)
 memalloc strpool.c(7): free 36 bytes at ADDR_14 allocated at strpool.c(2)
-memalloc strpool.c(1): free 28 bytes at ADDR_2 allocated at strpool.c(1)
+memalloc strpool.c(1): free 32 bytes at ADDR_2 allocated at strpool.c(1)
 memalloc: cleanup
 ERR
 

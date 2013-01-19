@@ -18,10 +18,10 @@ and manage strdup/free for each token.
 Strings with the same contents are reused.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.c,v 1.2 2013-01-19 00:04:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.c,v 1.3 2013-01-19 01:33:16 pauloscustodio Exp $ */
 /* $Log: strpool.c,v $
-/* Revision 1.2  2013-01-19 00:04:53  pauloscustodio
-/* Implement StrHash_clone, required change in API of class.h and all classes that used it.
+/* Revision 1.3  2013-01-19 01:33:16  pauloscustodio
+/* Clean-up strpool code
 /*
 /* Revision 1.1  2012/05/24 17:50:02  pauloscustodio
 /* CH_0010 : new string pool to hold strings for all program duration
@@ -37,70 +37,82 @@ Strings with the same contents are reused.
 #include "queue.h"
 
 /*-----------------------------------------------------------------------------
-*   Dummy class to destroy hash_table atexit()
+*   String pool entry
 *----------------------------------------------------------------------------*/
-CLASS( StrPool )
-END_CLASS;
-DEF_CLASS( StrPool );
-
-static void StrPoolHash_delete_all( void );
-
-void StrPool_init( StrPool *self )   { }
-void StrPool_copy( StrPool *self, StrPool *other )   { }
-void StrPool_fini( StrPool *self )
-{
-    StrPoolHash_delete_all();
-}
-
-static StrPool *str_pool = NULL;
-
-/*-----------------------------------------------------------------------------
-*   Hash table
-*----------------------------------------------------------------------------*/
-typedef struct StrPoolHash
+typedef struct StrPoolEntry
 {
     char    *string;        /* xstrdup */
 
     UT_hash_handle hh;      /* hash table */
-} StrPoolHash;
 
-/* hash table of all strings */
-static StrPoolHash *hash_table = NULL;
+} StrPoolEntry;
 
-/* add one string to the hash table, if not yet there; returns address */
-static char *StrPoolHash_add( char *string )
+/*-----------------------------------------------------------------------------
+*   Class
+*----------------------------------------------------------------------------*/
+CLASS( StrPool )
+StrPoolEntry	*hash;
+END_CLASS;
+
+DEF_CLASS( StrPool );
+
+static StrPool *str_pool = NULL;	/* sigleton */
+
+/*-----------------------------------------------------------------------------
+*   Initialize
+*----------------------------------------------------------------------------*/
+void StrPool_init( StrPool *self )   
 {
-    StrPoolHash *hash;
+	self->hash = NULL;
+}
+
+/*-----------------------------------------------------------------------------
+*   Clone
+*----------------------------------------------------------------------------*/
+void StrPool_copy( StrPool *self, StrPool *other )
+{
+	/* clone points to the same hash - sigleton */
+}
+
+/*-----------------------------------------------------------------------------
+*   Add and return string
+*----------------------------------------------------------------------------*/
+char *StrPool_add( StrPool *self, char *string )
+{
+	StrPoolEntry *elem;
     size_t  num_chars = strlen( string );
 
     /* check if string exists already */
-    HASH_FIND( hh, hash_table, string, num_chars, hash );
-
-    if ( hash )
+    HASH_FIND( hh, self->hash, string, num_chars, elem );
+    if ( elem )
     {
-        return hash->string;    /* found */
+        return elem->string;    /* found */
     }
 
-    /* add to hash */
-    hash = xcalloc_struct( StrPoolHash );
-    hash->string = xstrdup( string );   /* alloc string */
-    HASH_ADD_KEYPTR( hh, hash_table, hash->string, num_chars, hash );
+    /* add to elem */
+    elem = xcalloc_struct( StrPoolEntry );
+    elem->string = xstrdup( string );   /* alloc string */
 
-    return hash->string;
+    HASH_ADD_KEYPTR( hh, self->hash, elem->string, num_chars, elem );
+
+    return elem->string;
 }
 
-/* delete all strings */
-static void StrPoolHash_delete_all( void )
+/*-----------------------------------------------------------------------------
+*   Delete all
+*----------------------------------------------------------------------------*/
+void StrPool_fini( StrPool *self )
 {
-    StrPoolHash *hash, *tmp;
+    StrPoolEntry *elem, *tmp;
 
-    HASH_ITER( hh, hash_table, hash, tmp )
+    HASH_ITER( hh, self->hash, elem, tmp )
     {
-        HASH_DEL( hash_table, hash );
-        xfree( hash->string );
-        xfree( hash );
+        HASH_DEL( self->hash, elem );
+        xfree( elem->string );
+        xfree( elem );
     }
 }
+
 
 /*-----------------------------------------------------------------------------
 *   Public interface
@@ -108,7 +120,7 @@ static void StrPoolHash_delete_all( void )
 char *strpool_add( char *string )
 {
     strpool_init();
-    return StrPoolHash_add( string );
+    return StrPool_add( str_pool, string );
 }
 
 void strpool_init( void )
