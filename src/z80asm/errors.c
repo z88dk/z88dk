@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2012
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.19 2013-01-19 00:04:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.20 2013-01-19 23:54:04 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.19  2013-01-19 00:04:53  pauloscustodio
+/* Revision 1.20  2013-01-19 23:54:04  pauloscustodio
+/* BUG_0023 : Error file with warning is removed in link phase
+/* z80asm -b f1.asm
+/* If assembling f1.asm produces a warning, the link phase removes the f1.err
+/* file hidding the warning.
+/*
+/* Revision 1.19  2013/01/19 00:04:53  pauloscustodio
 /* Implement StrHash_clone, required change in API of class.h and all classes that used it.
 /*
 /* Revision 1.18  2012/11/03 17:39:35  pauloscustodio
@@ -111,6 +117,7 @@ Copyright (C) Paulo Custodio, 2011-2012
 #include "class.h"
 #include "strpool.h"
 #include "types.h"
+#include "strhash.h"
 
 /*-----------------------------------------------------------------------------
 *   Error strings
@@ -128,7 +135,7 @@ static char *error_msg[] =
 CLASS( ErrFile )
 FILE    *fp;            /* file handle */
 char    *filename;      /* file name kept in strpool.h */
-int     num_errors;     /* number of errors in file, do delete file if empty */
+StrHash	*num_errors;    /* number of errors per file, do delete file if empty */
 END_CLASS;
 
 DEF_CLASS( ErrFile );
@@ -140,30 +147,56 @@ void ErrFile_init( ErrFile *self )
 {
     /* force init strpool to make sure ErrFile is destroyed before StrPool */
     strpool_init();
+
+	self->num_errors = OBJ_NEW( StrHash );
+	OBJ_AUTODELETE(self->num_errors) = FALSE;
 }
 
 void ErrFile_copy( ErrFile *self, ErrFile *other )
 {
     self->fp = NULL;
+
+	self->num_errors = OBJ_NEW( StrHash );
+	OBJ_AUTODELETE( self->num_errors ) = FALSE;
 }
 
 void ErrFile_fini( ErrFile *self )
 {
     ErrFile_close( self );
+
+	OBJ_DELETE( self->num_errors );
 }
 
 void ErrFile_open( ErrFile *self, char *filename )
 {
+	int count;
+	char *mode;
+
     /* close current file if any */
     ErrFile_close( self );
 
-    /* open new file */
-    self->fp = fopen_err( filename, "w" );           /* CH_0012 */
+    /* open new file (BUG_0023, CH_0012) */
+	count = (int)StrHash_get( self->num_errors, filename );
+	if ( count > 0 ) 
+	{			
+		mode = "a";									/* errors registered in this session - append to file */
+	}
+	else 
+	{
+		mode = "w";									/* no errors registered in this session - create to file */
+
+		StrHash_set( self->num_errors, filename, (void*) 0 );	
+													/* init error count */
+	}
+
+    self->fp = fopen_err( filename, mode );
     self->filename = strpool_add( filename );
 }
 
 void ErrFile_close( ErrFile *self )
 {
+	int count;
+
     /* close current file if any */
     if ( self->fp != NULL )
     {
@@ -171,23 +204,32 @@ void ErrFile_close( ErrFile *self )
     }
 
     /* delete file if num_errors is zero */
-    if ( self->filename != NULL && self->num_errors == 0 )
+    if ( self->filename != NULL )
     {
-        remove( self->filename );
+		count = (int)StrHash_get( self->num_errors, self->filename );
+		if (count == 0) 
+			remove( self->filename );
     }
 
     /* reset */
     self->fp         = NULL;
     self->filename   = NULL;        /* file kept in strpool, no leak */
-    self->num_errors = 0;
 }
 
 void ErrFile_puts( ErrFile *self, char *str )
 {
+	int count;
+
     if ( self->fp != NULL )
     {
         fputs( str, self->fp );
-        self->num_errors++;
+
+		/* count errors per file */
+		if ( self->filename != NULL )
+		{
+			count = 1 + (int)StrHash_get( self->num_errors, self->filename );
+			StrHash_set( self->num_errors, self->filename, (void*)count );
+		}
     }
 }
 

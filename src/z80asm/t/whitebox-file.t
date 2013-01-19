@@ -13,9 +13,15 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2012
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.3 2012-06-14 15:01:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.4 2013-01-19 23:54:04 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.3  2012-06-14 15:01:27  pauloscustodio
+# Revision 1.4  2013-01-19 23:54:04  pauloscustodio
+# BUG_0023 : Error file with warning is removed in link phase
+# z80asm -b f1.asm
+# If assembling f1.asm produces a warning, the link phase removes the f1.err
+# file hidding the warning.
+#
+# Revision 1.3  2012/06/14 15:01:27  pauloscustodio
 # Split safe strings from strutil.c to safestr.c
 #
 # Revision 1.2  2012/05/26 18:50:26  pauloscustodio
@@ -34,7 +40,7 @@ use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
 # test memalloc
-my $objs = "file.o errors.o strlist.o strpool.o memalloc.o class.o ".
+my $objs = "file.o errors.o strlist.o strhash.o strpool.o memalloc.o class.o ".
 		   "die.o strutil.o safestr.o except.o";
 ok ! system "make $objs";
 
