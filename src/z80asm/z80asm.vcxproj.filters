@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="avltree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="symbol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="class.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="codearea.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="die.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dynstr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="e4c.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="errors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="errors_def.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="except.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="file.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="memalloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="objfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="safestr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="strlist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="strpool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="strutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="symbols.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uthash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="z80asm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="strhash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="asmdrctv.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="avltree.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="exprprsr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hist.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ldinstr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="modlink.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prsident.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prsline.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="symbols.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="z80asm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="z80instr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="z80pass.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="class.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="codearea.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="die.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dynstr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="errors.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="except.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="file.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="memalloc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="objfile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="options.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="safestr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="strlist.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="strpool.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="strutil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="strhash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

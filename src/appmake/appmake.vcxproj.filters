@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="appmake.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="abc80.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ace-tap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="appmake.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="aquarius.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c128.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="galaksija.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hex.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="msx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mz.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="nascom.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="newbrain.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rex6000.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sms.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="svi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tixx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trs80.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="z88.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="z88shell.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zx81.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zxvgs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="enterprise.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="m5.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mtx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sc3000.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sorcerer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vz.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="x07.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

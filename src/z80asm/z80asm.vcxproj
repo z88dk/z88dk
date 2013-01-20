@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{53E270D6-344C-49AB-94F2-7871479963C1}</ProjectGuid>
+    <RootNamespace>z80asm</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>Static</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Debug\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/U "MSDOS" /wd4996 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/wd4996 %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="avltree.h" />
+    <ClInclude Include="class.h" />
+    <ClInclude Include="codearea.h" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="die.h" />
+    <ClInclude Include="dynstr.h" />
+    <ClInclude Include="e4c.h" />
+    <ClInclude Include="errors.h" />
+    <ClInclude Include="errors_def.h" />
+    <ClInclude Include="except.h" />
+    <ClInclude Include="file.h" />
+    <ClInclude Include="hist.h" />
+    <ClInclude Include="memalloc.h" />
+    <ClInclude Include="objfile.h" />
+    <ClInclude Include="options.h" />
+    <ClInclude Include="queue.h" />
+    <ClInclude Include="safestr.h" />
+    <ClInclude Include="strhash.h" />
+    <ClInclude Include="strlist.h" />
+    <ClInclude Include="strpool.h" />
+    <ClInclude Include="strutil.h" />
+    <ClInclude Include="symbol.h" />
+    <ClInclude Include="symbols.h" />
+    <ClInclude Include="types.h" />
+    <ClInclude Include="uthash.h" />
+    <ClInclude Include="z80asm.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="asmdrctv.c" />
+    <ClCompile Include="avltree.c" />
+    <ClCompile Include="class.c" />
+    <ClCompile Include="codearea.c" />
+    <ClCompile Include="die.c" />
+    <ClCompile Include="dynstr.c" />
+    <ClCompile Include="errors.c" />
+    <ClCompile Include="except.c" />
+    <ClCompile Include="exprprsr.c" />
+    <ClCompile Include="file.c" />
+    <ClCompile Include="hist.c" />
+    <ClCompile Include="ldinstr.c" />
+    <ClCompile Include="memalloc.c" />
+    <ClCompile Include="modlink.c" />
+    <ClCompile Include="objfile.c" />
+    <ClCompile Include="options.c" />
+    <ClCompile Include="prsident.c" />
+    <ClCompile Include="prsline.c" />
+    <ClCompile Include="safestr.c" />
+    <ClCompile Include="strhash.c" />
+    <ClCompile Include="strlist.c" />
+    <ClCompile Include="strpool.c" />
+    <ClCompile Include="strutil.c" />
+    <ClCompile Include="symbols.c" />
+    <ClCompile Include="z80asm.c" />
+    <ClCompile Include="z80instr.c" />
+    <ClCompile Include="z80pass.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
