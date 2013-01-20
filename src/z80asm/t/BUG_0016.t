@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0016.t,v 1.1 2012-05-12 17:03:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0016.t,v 1.2 2013-01-20 20:43:12 pauloscustodio Exp $
 # $Log: BUG_0016.t,v $
-# Revision 1.1  2012-05-12 17:03:29  pauloscustodio
+# Revision 1.2  2013-01-20 20:43:12  pauloscustodio
+# Delete *.lst files that are generated during the test in the libsrc/z80_crt0s/z80_emu
+# directory
+#
+# Revision 1.1  2012/05/12 17:03:29  pauloscustodio
 # BUG_0016 : RCMX000 emulation routines not assembled when LIST is ON (-l)
 #
 # Revision 1.1  2011/07/11 15:46:33  pauloscustodio
@@ -35,6 +39,7 @@ my @z80emu_routines = qw(
 		rcmx_cpi
 );
 my @z80emu_src = map {$z80emu_srcdir.'/'.$_.'.asm'} @z80emu_routines;
+my @z80emu_lst = map {$z80emu_srcdir.'/'.$_.'.lst'} @z80emu_routines;
 my $cpi_emu = "\x38\x12\xBE\x23\x0B\xF5\xE3\xCB\x85\xCB\xD5\x78".
 			  "\xB1\x20\x02\xCB\x95\xE3\xF1\xC9\xBE\x23\x0B\xF5".
 			  "\xE3\xCB\xC5\x18\xEC";
@@ -59,5 +64,5 @@ for my $list ("", "-l") {
 	t_binary(read_binfile(bin_file()), "\xCD\x03\x00".$cpi_emu);
 }
 
-unlink_testfiles($z80emu_lib);
+unlink_testfiles($z80emu_lib, @z80emu_lst);
 done_testing();
