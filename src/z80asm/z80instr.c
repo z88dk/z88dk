@@ -11,12 +11,18 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.31 2012-11-03 17:39:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.32 2013-01-20 12:50:05 pauloscustodio Exp $ */
 /* $Log: z80instr.c,v $
-/* Revision 1.31  2012-11-03 17:39:36  pauloscustodio
+/* Revision 1.32  2013-01-20 12:50:05  pauloscustodio
+/* BUG_0025 : JR at org 0 with out-of-range jump crashes WriteListFile()
+/* jr instruction on address 0, with out of range argument ->
+/* jr calls error and writes incomplete opcode (only one byte);
+/* WriteListFile tries to list bytes from -1 to 1 -> crash
+/*
+/* Revision 1.31  2012/11/03 17:39:36  pauloscustodio
 /* astyle, comments
 /*
 /* Revision 1.30  2012/05/26 18:51:10  pauloscustodio
@@ -1113,6 +1119,7 @@ JR( void )
             }
             else
             {
+                append_byte( 0 );								/* BUG_0025 - store dummy offset */
                 error( ERR_INT_RANGE, constant );
             }
         }
@@ -1156,6 +1163,7 @@ DJNZ( void )
             }
             else
             {
+                append_byte( 0 );								/* BUG_0025 - store dummy offset */
                 error( ERR_INT_RANGE, constant );
             }
         }
