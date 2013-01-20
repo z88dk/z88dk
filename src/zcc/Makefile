@@ -11,6 +11,7 @@ install:
 
 clean:
 	$(RM) zcc$(EXESUFFIX) zcc.o core
+	$(RM) -rf Debug Release
 
 
 #Dependencies

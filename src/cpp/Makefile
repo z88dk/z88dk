@@ -16,3 +16,4 @@ install:
 
 clean:
 	$(RM) *.o core *~ zcpp$(EXESUFFIX)
+	$(RM) -rf Debug Release

@@ -16,6 +16,7 @@ install:
 
 clean:
 	$(RM) z80nm$(EXESUFFIX) ar.o getopt/*.o core
+	$(RM) -rf Debug Release
 
 
 #Dependencies

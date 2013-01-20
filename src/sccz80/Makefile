@@ -1,7 +1,7 @@
 #
 # Makefile for sccz80
 #
-# $Id: Makefile,v 1.10 2009-07-23 21:05:20 dom Exp $
+# $Id: Makefile,v 1.11 2013-01-20 20:43:59 pauloscustodio Exp $
 #
 
 
@@ -37,6 +37,7 @@ install:
 
 clean :
 	$(RM) *.o *~ core sccz80$(EXESUFFIX)
+	$(RM) -rf Debug Release
 
 # Dependencies (gcc -MM)
 callfunc.o: callfunc.c ccdefs.h define.h lvalue.h callfunc.h codegen.h \

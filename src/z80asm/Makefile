@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.41 2013-01-18 22:59:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.42 2013-01-20 20:43:59 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.41  2013-01-18 22:59:17  pauloscustodio
+# Revision 1.42  2013-01-20 20:43:59  pauloscustodio
+# make clean now deletes Microsoft Visual C++ output files
+#
+# Revision 1.41  2013/01/18 22:59:17  pauloscustodio
 # CH_0016 : StrHash class to create maps from string to void*
 # Created the StrHash to create hash tables mapping string keys kept in
 # strpool to void* user pointer.
@@ -225,6 +228,7 @@ install:
 
 clean :
 	$(RM) *.o *.exe *~ *.bak *.orig core $(TARGET) test*
+	$(RM) -rf Debug Release
 
 # test
 test : $(TARGET)
@@ -259,7 +263,7 @@ codearea.o: strlist.h class.h queue.h
 die.o: memalloc.h except.h e4c.h die.h types.h strutil.h safestr.h
 dynstr.o: dynstr.h memalloc.h except.h e4c.h types.h class.h queue.h
 errors.o: memalloc.h except.h e4c.h errors.h errors_def.h strutil.h safestr.h
-errors.o: types.h class.h queue.h strpool.h
+errors.o: types.h class.h queue.h strpool.h strhash.h uthash.h die.h
 except.o: except.h memalloc.h e4c.h types.h die.h e4c.c
 exprprsr.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
 exprprsr.o: options.h errors.h errors_def.h file.h strlist.h class.h queue.h

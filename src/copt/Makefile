@@ -11,7 +11,8 @@ install:
 	install copt$(EXESUFFIX) $(PREFIX)/bin
 
 clean:
-	$(RM) copt copt.o core$(EXESUFFIX)
+	$(RM) copt$(EXESUFFIX) copt.o core$(EXESUFFIX)
+	$(RM) -rf Debug Release
 
 
 #Dependencies

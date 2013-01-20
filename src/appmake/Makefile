@@ -17,5 +17,7 @@ install:
 
 clean:
 	$(RM) appmake$(EXESUFFIX) $(OBJS) core
+	$(RM) -rf Debug Release
+
 
 
