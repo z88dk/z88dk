@@ -19,7 +19,7 @@ $(DESTDIR)preempt.lib: $(OBJECTS)
 	$(LIBLINKER) -x$(DESTDIR)preempt $(OBJECTS)
 
 clean:
-	rm -f *.o $(DESTDIR)preempt.lib
+	rm -f *.o $(DESTDIR)preempt.lib zcc_opt.def
 
 
 
