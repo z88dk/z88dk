@@ -10,14 +10,17 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 
 Handle object file contruction, reading and writing
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.3 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.4 2013-01-20 21:24:28 pauloscustodio Exp $ */
 /* $Log: objfile.c,v $
-/* Revision 1.3  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.4  2013-01-20 21:24:28  pauloscustodio
+/* Updated copyright year to 2013
+/*
+/* Revision 1.3  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.2  2012/05/11 19:29:49  pauloscustodio

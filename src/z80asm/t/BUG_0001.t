@@ -11,11 +11,14 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011
+# Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0001.t,v 1.4 2011-07-14 23:49:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0001.t,v 1.5 2013-01-20 21:24:28 pauloscustodio Exp $
 # $Log: BUG_0001.t,v $
-# Revision 1.4  2011-07-14 23:49:50  pauloscustodio
+# Revision 1.5  2013-01-20 21:24:28  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.4  2011/07/14 23:49:50  pauloscustodio
 #     BUG_0001(a) : during correction of BUG_0001, new symbol colon was introduced in enum symbols,
 # 	causing expressions stored in object files to be wrong, e.g. VALUE-1 was stored as
 # 	VALUE*1. This caused problems in expression evaluation in link phase.

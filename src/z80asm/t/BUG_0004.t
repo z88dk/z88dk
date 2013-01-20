@@ -11,11 +11,14 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011
+# Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0004.t,v 1.6 2013-01-14 00:21:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0004.t,v 1.7 2013-01-20 21:24:28 pauloscustodio Exp $
 # $Log: BUG_0004.t,v $
-# Revision 1.6  2013-01-14 00:21:35  pauloscustodio
+# Revision 1.7  2013-01-20 21:24:28  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.6  2013/01/14 00:21:35  pauloscustodio
 # Remove dupplicate tests that are run in ERR_INT_RANGE.t
 #
 # Revision 1.5  2012/05/26 18:51:10  pauloscustodio

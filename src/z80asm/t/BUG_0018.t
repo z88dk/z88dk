@@ -11,11 +11,14 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011
+# Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0018.t,v 1.1 2012-05-24 10:58:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0018.t,v 1.2 2013-01-20 21:24:28 pauloscustodio Exp $
 # $Log: BUG_0018.t,v $
-# Revision 1.1  2012-05-24 10:58:39  pauloscustodio
+# Revision 1.2  2013-01-20 21:24:28  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.1  2012/05/24 10:58:39  pauloscustodio
 # BUG_0018 : stack overflow in '@' includes - wrong range check
 #
 #

@@ -11,12 +11,15 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.19 2012-06-07 11:54:13 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.20 2013-01-20 21:24:28 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.19  2012-06-07 11:54:13  pauloscustodio
+/* Revision 1.20  2013-01-20 21:24:28  pauloscustodio
+/* Updated copyright year to 2013
+/*
+/* Revision 1.19  2012/06/07 11:54:13  pauloscustodio
 /* - Make mapfile static to module modlink.
 /* - Remove modsrcfile, not used.
 /* - GetModuleSize(): use local variable for file handle instead of objfile

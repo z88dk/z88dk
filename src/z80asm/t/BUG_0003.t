@@ -11,11 +11,14 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011
+# Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0003.t,v 1.5 2011-07-14 01:32:08 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0003.t,v 1.6 2013-01-20 21:24:28 pauloscustodio Exp $
 # $Log: BUG_0003.t,v $
-# Revision 1.5  2011-07-14 01:32:08  pauloscustodio
+# Revision 1.6  2013-01-20 21:24:28  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.5  2011/07/14 01:32:08  pauloscustodio
 #     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
 #     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
 #     CH_0003 : Error messages should be more informative

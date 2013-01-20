@@ -10,14 +10,17 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities working on char *
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.11 2012-11-03 17:39:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.12 2013-01-20 21:24:28 pauloscustodio Exp $ */
 /* $Log: strutil.c,v $
-/* Revision 1.11  2012-11-03 17:39:36  pauloscustodio
+/* Revision 1.12  2013-01-20 21:24:28  pauloscustodio
+/* Updated copyright year to 2013
+/*
+/* Revision 1.11  2012/11/03 17:39:36  pauloscustodio
 /* astyle, comments
 /*
 /* Revision 1.10  2012/06/14 15:01:27  pauloscustodio

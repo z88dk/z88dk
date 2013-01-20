@@ -11,11 +11,14 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011-2012
+# Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.1 2012-06-14 15:03:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.2 2013-01-20 21:24:29 pauloscustodio Exp $
 # $Log: whitebox-dynstr.t,v $
-# Revision 1.1  2012-06-14 15:03:45  pauloscustodio
+# Revision 1.2  2013-01-20 21:24:29  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.1  2012/06/14 15:03:45  pauloscustodio
 # CH_0014 : New Dynamic Strings that grow automatically on creation / concatenation
 #
 #

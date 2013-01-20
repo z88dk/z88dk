@@ -10,14 +10,17 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.8 2012-05-26 18:36:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.9 2013-01-20 21:24:28 pauloscustodio Exp $ */
 /* $Log: file.h,v $
-/* Revision 1.8  2012-05-26 18:36:36  pauloscustodio
+/* Revision 1.9  2013-01-20 21:24:28  pauloscustodio
+/* Updated copyright year to 2013
+/*
+/* Revision 1.8  2012/05/26 18:36:36  pauloscustodio
 /* Replaced xfputc and friends with fputc_err, raising a fatal_error() instead of an
 /* exception, moved to errors.c
 /*

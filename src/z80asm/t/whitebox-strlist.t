@@ -11,11 +11,14 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011-2012
+# Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.5 2013-01-19 01:33:16 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.6 2013-01-20 21:24:29 pauloscustodio Exp $
 # $Log: whitebox-strlist.t,v $
-# Revision 1.5  2013-01-19 01:33:16  pauloscustodio
+# Revision 1.6  2013-01-20 21:24:29  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.5  2013/01/19 01:33:16  pauloscustodio
 # Clean-up strpool code
 #
 # Revision 1.4  2013/01/19 00:04:53  pauloscustodio

@@ -11,14 +11,17 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 
 Define error codes and error messages
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.6 2012-05-26 18:51:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.7 2013-01-20 21:24:28 pauloscustodio Exp $ */
 /* $Log: errors_def.h,v $
-/* Revision 1.6  2012-05-26 18:51:10  pauloscustodio
+/* Revision 1.7  2013-01-20 21:24:28  pauloscustodio
+/* Updated copyright year to 2013
+/*
+/* Revision 1.6  2012/05/26 18:51:10  pauloscustodio
 /* CH_0012 : wrappers on OS calls to raise fatal error
 /* CH_0013 : new errors interface to decouple calling code from errors.c
 /*

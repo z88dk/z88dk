@@ -11,12 +11,15 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.35 2012-11-03 17:39:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.36 2013-01-20 21:24:28 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.35  2012-11-03 17:39:36  pauloscustodio
+/* Revision 1.36  2013-01-20 21:24:28  pauloscustodio
+/* Updated copyright year to 2013
+/*
+/* Revision 1.35  2012/11/03 17:39:36  pauloscustodio
 /* astyle, comments
 /*
 /* Revision 1.34  2012/06/07 11:54:13  pauloscustodio

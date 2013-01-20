@@ -10,14 +10,17 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 
 Wrapper module for e4c to setup compile-time defines
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.8 2012-11-03 17:39:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.9 2013-01-20 21:24:28 pauloscustodio Exp $ */
 /* $Log: except.h,v $
-/* Revision 1.8  2012-11-03 17:39:35  pauloscustodio
+/* Revision 1.9  2013-01-20 21:24:28  pauloscustodio
+/* Updated copyright year to 2013
+/*
+/* Revision 1.8  2012/11/03 17:39:35  pauloscustodio
 /* astyle, comments
 /*
 /* Revision 1.7  2012/05/26 18:33:25  pauloscustodio

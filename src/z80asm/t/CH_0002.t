@@ -11,11 +11,14 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011
+# Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/CH_0002.t,v 1.3 2011-07-09 18:25:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/CH_0002.t,v 1.4 2013-01-20 21:24:28 pauloscustodio Exp $
 # $Log: CH_0002.t,v $
-# Revision 1.3  2011-07-09 18:25:35  pauloscustodio
+# Revision 1.4  2013-01-20 21:24:28  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.3  2011/07/09 18:25:35  pauloscustodio
 # Log keyword in checkin comment was expanded inside Log expansion... recursive
 # Added Z80asm banner to all source files
 #

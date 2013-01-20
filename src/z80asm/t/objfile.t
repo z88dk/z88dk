@@ -11,13 +11,16 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011
+# Copyright (C) Paulo Custodio, 2011-2013
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.1 2011-08-19 15:53:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.2 2013-01-20 21:24:29 pauloscustodio Exp $
 # $Log: objfile.t,v $
-# Revision 1.1  2011-08-19 15:53:59  pauloscustodio
+# Revision 1.2  2013-01-20 21:24:29  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.1  2011/08/19 15:53:59  pauloscustodio
 # BUG_0010 : heap corruption when reaching MAXCODESIZE
 # - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
 # - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.

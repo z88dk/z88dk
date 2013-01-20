@@ -11,14 +11,17 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.5 2012-11-03 17:39:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.6 2013-01-20 21:24:28 pauloscustodio Exp $ */
 /* $Log: codearea.h,v $
-/* Revision 1.5  2012-11-03 17:39:35  pauloscustodio
+/* Revision 1.6  2013-01-20 21:24:28  pauloscustodio
+/* Updated copyright year to 2013
+/*
+/* Revision 1.5  2012/11/03 17:39:35  pauloscustodio
 /* astyle, comments
 /*
 /* Revision 1.4  2012/05/24 17:09:27  pauloscustodio
