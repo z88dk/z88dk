@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.30 2013-01-14 00:29:37 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.31 2013-01-20 13:18:10 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.30  2013-01-14 00:29:37  pauloscustodio
+/* Revision 1.31  2013-01-20 13:18:10  pauloscustodio
+/* BUG_0024 : (ix+128) should show warning message
+/* Signed integer range was wrongly checked to -128..255 instead
+/* of -128..127
+/*
+/* Revision 1.30  2013/01/14 00:29:37  pauloscustodio
 /* CH_0015 : integer out of range error replaced by warning
 /*
 /* Revision 1.29  2012/11/03 17:39:35  pauloscustodio
@@ -1297,7 +1302,7 @@ ExprSigned8( int listoffset )
                     constant = EvalPfixExpr( pfixexpr );
                     RemovePfixlist( pfixexpr );
 
-                    if ( constant < -128 || constant > 255 )
+                    if ( constant < -128 || constant > 127 )
 						warning( ERR_INT_RANGE, constant );
 
 					append_byte( ( unsigned char ) constant );

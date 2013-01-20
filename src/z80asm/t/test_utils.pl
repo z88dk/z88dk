@@ -11,11 +11,16 @@
 #    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
-# Copyright (C) Paulo Custodio, 2011
+# Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.20 2013-01-14 00:22:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.21 2013-01-20 13:18:10 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.20  2013-01-14 00:22:31  pauloscustodio
+# Revision 1.21  2013-01-20 13:18:10  pauloscustodio
+# BUG_0024 : (ix+128) should show warning message
+# Signed integer range was wrongly checked to -128..255 instead
+# of -128..127
+#
+# Revision 1.20  2013/01/14 00:22:31  pauloscustodio
 # Allow t_z80asm_ok() with warnings
 #
 # Revision 1.19  2012/06/07 10:17:57  pauloscustodio
@@ -103,10 +108,12 @@ my @TEST_EXT = (qw( asm lst inc bin bn0 bn1 bn2 bn3 map obj lib sym def err
 					exe c o asmlst ));
 my @MAIN_TEST_FILES;
 my @TEST_FILES;
+my @IDS = ("", 0 .. 20);
+my %FILE;
 
 for my $ext (@TEST_EXT) {
-	for my $id ("", 0 .. 20) {
-		my $file = $test.$id.".".$ext;
+	for my $id (@IDS) {
+		my $file = $FILE{$ext}{$id} = $test.$id.".".$ext;
 		my $sub_name = $ext.$id."_file";
 		no strict 'refs';
 		*$sub_name = sub { return $file };
@@ -117,15 +124,13 @@ for my $ext (@TEST_EXT) {
 }
 
 #------------------------------------------------------------------------------
-sub unlink_files {
-	my(@files) = uniq(@_);
-	my $line = "[line ".((caller)[2])."]";
-	my $count = 0;
-	map {$count++ if -f} @files;
-	is unlink(@files), $count, "$line unlink $count testfiles";
+sub _unlink_files {
+	my($line, @files) = @_;
+	@files = grep {-f} uniq(@files);
+	is unlink(@files), scalar(@files), "$line unlink @files";
 	while (grep {-f} @files) { sleep 1 };	# z80asm sometimes cannot create errfile
 }
-	
+
 #------------------------------------------------------------------------------
 sub unlink_testfiles {
 	my(@additional_files) = @_;
@@ -134,8 +139,129 @@ sub unlink_testfiles {
 		diag "$line -keep : kept test files";
 	}
 	else {
-		unlink_files(@TEST_FILES, @additional_files);
+		_unlink_files($line, @TEST_FILES, @additional_files);
 	}
+}
+
+#------------------------------------------------------------------------------
+# Args:
+#	asm, asm1, asm2, ... : source text, asm is main file; can use " : " to split lines
+#	org : -1 to skip -r0 option, >= 0 to define -r{org}, undef for -r0, org = decimal value
+# 	options : additional assemble options
+#   out : expected output, if any
+#   err : expected errors, if any
+#   bin : expected binary output if defined, undef if compilation should fail
+# 	nolist : true to remove -l option
+
+sub t_z80asm {
+	my(%args) = @_;
+	
+	my $line = "[line ".((caller)[2])."]";
+	
+	_unlink_files($line, @TEST_FILES);
+	
+	# build input files
+	my @asm; 
+	my @obj;
+	my @lst;
+	for my $id (@IDS) {
+		my $asm = $args{"asm$id"} or next;
+		$asm =~ s/\s+:\s+/\n/g;
+		$asm .= "\n";
+		
+		write_file($FILE{asm}{$id}, $asm);
+		push @asm, $FILE{asm}{$id};
+		push @obj, $FILE{obj}{$id};
+		push @lst, $FILE{lst}{$id};
+	}
+	
+	# assemble
+	my $cmd = z80asm()." ";
+	exists($args{nolist}) or
+		$cmd .= "-l ";
+	$cmd .= "-b ";
+	
+	# org
+	if (! exists $args{org}) {
+		$cmd .= "-r0 ";
+	}
+	elsif ($args{org} < 0) {
+		# no -r
+	}
+	else {
+		$cmd .= sprintf("-r%04X ", $args{org});
+	}
+
+	exists($args{options})
+		and $cmd .= $args{options} ." ";
+	$cmd .= "@asm";
+	
+	ok 1, "$line $cmd";
+
+	my($stdout, $stderr, $return) = capture {
+		system $cmd;
+	};
+	
+	my $errors;
+
+	# check stdout
+	$args{out} ||= ""; chomp($args{out}); chomp($stdout);
+	$errors++ unless $stdout eq $args{out};
+	is $stdout, $args{out}, "$line out";
+	
+	# check stderr
+	$args{err} ||= ""; chomp($args{err}); chomp($stderr);
+	my $exp_err_screen = my $exp_err_file = $args{err};
+	if (! defined($args{bin})) {
+		$exp_err_screen .= "\n1 errors occurred during assembly";
+	}
+	$errors++ unless $stderr eq $exp_err_screen;
+	is $stderr, $exp_err_screen, "$line err";
+	if ($stderr) {
+		ok -f err_file(), "$line ".err_file();
+		my $got_err_file = read_file(err_file(), err_mode => 'quiet') // "";
+		chomp($got_err_file);
+		is $exp_err_file, $got_err_file, "$line err file";
+	}
+	
+	# check retval
+	if (defined($args{bin})) {	# asm success
+		$errors++ unless $return == 0;
+		ok $return == 0, "$line exit value";
+		
+		# warning -> got_err_file
+		# ok ! -f err_file(), "$line no ".err_file();
+		
+		ok -f $_, "$line $_" for (@obj, bin_file(), map_file());
+		
+		my $binary = read_file(bin_file(), binmode => ':raw', err_mode => 'quiet');
+		t_binary($binary, $args{bin}, $line);
+	}
+	else {				# asm failed
+		$errors++ unless $return != 0;
+		ok $return != 0, "$line exit value";
+
+		ok -f err_file(), "$line ".err_file();
+
+		ok ! -f $_, "$line no $_" for (@obj, bin_file(), map_file());
+		
+		if ($cmd =~ / -x(\S+)/) {
+			my $lib = $1;
+			$lib .= ".lib" unless $lib =~ /\.lib$/i;
+			
+			ok ! -f $1, "$line no $lib";
+		}
+	}
+	
+	# list file
+	if ($cmd =~ / -l / && defined($args{bin})) {
+		ok -f $_, "$line $_" for (@lst);
+	}
+	else {
+		ok ! -f $_, "$line no $_" for (@lst);
+	}
+	
+	exit 1 if $errors && $STOP_ON_ERR;
 }
 
 #------------------------------------------------------------------------------
@@ -146,7 +272,7 @@ sub t_z80asm_error {
 	(my $test_name = $code) =~ s/\n.*/.../s;
 	ok 1, "$line t_z80asm_error $test_name - $expected_err";
 	
-	unlink_files(@MAIN_TEST_FILES);
+	_unlink_files($line, @MAIN_TEST_FILES);
 	write_file(asm_file(), "$code\n");
 	
 	my $cmd = z80asm()." ".($options || "")." ".asm_file();
@@ -187,7 +313,7 @@ sub t_z80asm_ok {
 		hexdump(substr($expected_binary, 0, 16)).
 		(length($expected_binary) > 16 ? "..." : "");
 	
-	unlink_files(@MAIN_TEST_FILES);
+	_unlink_files($line, @MAIN_TEST_FILES);
 	write_file(asm_file(), "org 0x$address_hex\n$code\n");
 	
 	my $cmd = z80asm()." -l -b ".($options || "")." ".asm_file();
@@ -359,7 +485,9 @@ sub t_compile_module {
 	my($init_code, $main_code, $compile_args) = @_;
 
 	# wait for previous run to finish
-	sleep(1);
+	while (-f 'test.exe' && ! unlink('test.exe')) {
+		sleep(1);
+	}
 	
 	my $cc = "cc -o test.exe test.c $compile_args";
 	note "line ", (caller)[2], ": $cc";

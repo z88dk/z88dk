@@ -11,12 +11,17 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.16 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.17 2013-01-20 13:18:10 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.16  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.17  2013-01-20 13:18:10  pauloscustodio
+/* BUG_0024 : (ix+128) should show warning message
+/* Signed integer range was wrongly checked to -128..255 instead
+/* of -128..127
+/*
+/* Revision 1.16  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.15  2012/05/20 05:31:18  pauloscustodio
@@ -293,7 +298,7 @@ struct linkedmod
 
 #define RANGE_JROFFSET  0
 #define RANGE_8UNSIGN   1
-#define RANGE_8SIGN     2
+#define RANGE_8SIGN     2		/* (ix+d) */
 #define RANGE_16CONST   3
 #define RANGE_32SIGN    4
 
