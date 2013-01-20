@@ -11,7 +11,7 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 */
 
 /*
@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2012
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.35 2012-11-03 17:41:11 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.36 2013-01-20 13:45:49 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.35  2012-11-03 17:41:11  pauloscustodio
+/* Revision 1.36  2013-01-20 13:45:49  pauloscustodio
+/* Version 1.1.20
+/*
+/* Revision 1.35  2012/11/03 17:41:11  pauloscustodio
 /* Version 1.1.19
 /*
 /* Revision 1.34  2012/11/01 23:21:49  pauloscustodio
@@ -1049,6 +1052,32 @@ Based on 1.0.31
     - Use _MSC_VER instead of WIN32 for MS-C compiler specific code.
 
 -------------------------------------------------------------------------------
+20.01.2013 [1.1.20] (pauloscustodio)
+-------------------------------------------------------------------------------
+    CH_0015 : integer out of range error replaced by warning
+		C compiler generates code "ld bc,-50000" which was causing the assembly
+		to abort. Replace by warning message but assemble value.
+		Warnings on ERR_INT_RANGE, ERR_INT_RANGE_EXPR.
+
+    CH_0016 : StrHash class to create maps from string to void*
+		Created the StrHash to create hash tables mapping string keys kept in
+		strpool to void* user pointer. This will be used to solve BUG_0023.
+	
+	BUG_0023 : Error file with warning is removed in link phase
+		z80asm -b f1.asm
+		If assembling f1.asm produces a warning, the link phase removes the f1.err
+		file hidding the warning.
+
+	BUG_0024 : (ix+128) should show warning message
+		Signed integer range was wrongly checked to -128..255 instead
+		of -128..127
+		
+	BUG_0025 : JR at org 0 with out-of-range jump crashes WriteListFile()
+		jr instruction on address 0, with out of range argument ->
+		jr calls error and writes incomplete opcode (only one byte);
+		WriteListFile tries to list bytes from -1 to 1 -> crash
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1067,9 +1096,9 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define DATE        "03.11.2012"
-#define VERSION     "1.1.19"
-#define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2012"
+#define DATE        "20.01.2013"
+#define VERSION     "1.1.20"
+#define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS
 #include <qdos.h>
