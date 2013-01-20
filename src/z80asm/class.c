@@ -10,7 +10,7 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 
 Simple classes defined in C with constructor, destructor and copy
 constructor defined.
@@ -20,9 +20,13 @@ each object, which in turn may call destructors of contained objects.
 
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.c,v 1.1 2012-05-24 17:01:45 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.c,v 1.2 2013-01-20 21:10:32 pauloscustodio Exp $ */
 /* $Log: class.c,v $
-/* Revision 1.1  2012-05-24 17:01:45  pauloscustodio
+/* Revision 1.2  2013-01-20 21:10:32  pauloscustodio
+/* Rename bool to BOOL, to be consistent with TRUE and FALSE and
+/* distinguish from C++ bool, true, false
+/*
+/* Revision 1.1  2012/05/24 17:01:45  pauloscustodio
 /* CH_0009 : new CLASS to define simple classes
 /*
 /*
@@ -96,7 +100,7 @@ static void cleanup( void )
 *----------------------------------------------------------------------------*/
 static void init( void )
 {
-    static bool initialized = FALSE;
+    static BOOL initialized = FALSE;
 
     if ( ! initialized )
     {

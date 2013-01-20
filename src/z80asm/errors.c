@@ -11,12 +11,16 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.20 2013-01-19 23:54:04 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.21 2013-01-20 21:10:32 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.20  2013-01-19 23:54:04  pauloscustodio
+/* Revision 1.21  2013-01-20 21:10:32  pauloscustodio
+/* Rename bool to BOOL, to be consistent with TRUE and FALSE and
+/* distinguish from C++ bool, true, false
+/*
+/* Revision 1.20  2013/01/19 23:54:04  pauloscustodio
 /* BUG_0023 : Error file with warning is removed in link phase
 /* z80asm -b f1.asm
 /* If assembling f1.asm produces a warning, the link phase removes the f1.err
@@ -317,7 +321,7 @@ void close_error_file( void )
 *----------------------------------------------------------------------------*/
 static void out_error_msg( int *countp, char *prefix,
                            char *filename, int lineno,
-                           bool is_fatal,
+                           BOOL is_fatal,
                            ErrorCode err, va_list argptr )
 {
     SSTR_DEFINE( str, MAXLINE );

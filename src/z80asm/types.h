@@ -10,14 +10,18 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 
 Common types
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.5 2012-06-14 15:03:13 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.6 2013-01-20 21:10:32 pauloscustodio Exp $ */
 /* $Log: types.h,v $
-/* Revision 1.5  2012-06-14 15:03:13  pauloscustodio
+/* Revision 1.6  2013-01-20 21:10:32  pauloscustodio
+/* Rename bool to BOOL, to be consistent with TRUE and FALSE and
+/* distinguish from C++ bool, true, false
+/*
+/* Revision 1.5  2012/06/14 15:03:13  pauloscustodio
 /* Use _MSC_VER instead of WIN32 for MS-C compiler specific code
 /*
 /* Revision 1.4  2012/05/24 17:09:27  pauloscustodio
@@ -38,8 +42,8 @@ Common types
 #ifndef TYPES_H
 #define TYPES_H
 
-/* bool type and constants */
-typedef int bool;
+/* BOOL type and constants */
+typedef int BOOL;
 #define FALSE 0
 #define TRUE (!FALSE)
 

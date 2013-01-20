@@ -10,7 +10,7 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 
 Memory allocation routines with automatic garbage collection on exit,
 Simple fence mechanism and exception thrown on out of memory.
@@ -18,9 +18,13 @@ Only works for memory allocated by xmalloc and freed by xfree.
 Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.c,v 1.6 2012-05-24 17:09:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.c,v 1.7 2013-01-20 21:10:32 pauloscustodio Exp $ */
 /* $Log: memalloc.c,v $
-/* Revision 1.6  2012-05-24 17:09:27  pauloscustodio
+/* Revision 1.7  2013-01-20 21:10:32  pauloscustodio
+/* Rename bool to BOOL, to be consistent with TRUE and FALSE and
+/* distinguish from C++ bool, true, false
+/*
+/* Revision 1.6  2012/05/24 17:09:27  pauloscustodio
 /* Unify copyright header
 /*
 /* Revision 1.5  2012/05/20 06:39:27  pauloscustodio
@@ -149,7 +153,7 @@ static void cleanup( void )
 
 static void init( void )
 {
-    static bool initialized = FALSE;
+    static BOOL initialized = FALSE;
 
     if ( ! initialized )
     {

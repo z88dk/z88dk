@@ -18,9 +18,13 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.3 2013-01-19 23:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.4 2013-01-20 21:10:32 pauloscustodio Exp $ */
 /* $Log: strhash.c,v $
-/* Revision 1.3  2013-01-19 23:52:40  pauloscustodio
+/* Revision 1.4  2013-01-20 21:10:32  pauloscustodio
+/* Rename bool to BOOL, to be consistent with TRUE and FALSE and
+/* distinguish from C++ bool, true, false
+/*
+/* Revision 1.3  2013/01/19 23:52:40  pauloscustodio
 /* strhash hanged on cleanup - delete by HASH_ITER / HASH_DEL
 /* instead of traversing CIRCLEQ
 /*
@@ -136,7 +140,7 @@ void *StrHash_get( StrHash *self, char *key )
 /*-----------------------------------------------------------------------------
 *	Check if a key exists in the hash
 *----------------------------------------------------------------------------*/
-bool StrHash_exists( StrHash *self, char *key )
+BOOL StrHash_exists( StrHash *self, char *key )
 {
     StrHashElem *elem;
 	
@@ -176,7 +180,7 @@ void StrHash_first( StrHash *self, StrHashElem **iter )
     *iter = NULL;
 }
 
-bool StrHash_next( StrHash *self, StrHashElem **iter )
+BOOL StrHash_next( StrHash *self, StrHashElem **iter )
 {
 	if ( *iter == NULL )
 	{	

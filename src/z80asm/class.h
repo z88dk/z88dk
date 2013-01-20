@@ -10,7 +10,7 @@
     ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
-Copyright (C) Paulo Custodio, 2011-2012
+Copyright (C) Paulo Custodio, 2011-2013
 
 Simple classes defined in C with constructor, destructor and copy
 constructor defined.
@@ -20,9 +20,13 @@ each object, which in turn may call destructors of contained objects.
 
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.3 2013-01-19 00:04:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.4 2013-01-20 21:10:32 pauloscustodio Exp $ */
 /* $Log: class.h,v $
-/* Revision 1.3  2013-01-19 00:04:53  pauloscustodio
+/* Revision 1.4  2013-01-20 21:10:32  pauloscustodio
+/* Rename bool to BOOL, to be consistent with TRUE and FALSE and
+/* distinguish from C++ bool, true, false
+/*
+/* Revision 1.3  2013/01/19 00:04:53  pauloscustodio
 /* Implement StrHash_clone, required change in API of class.h and all classes that used it.
 /*
 /* Revision 1.2  2012/05/25 21:43:55  pauloscustodio
@@ -99,7 +103,7 @@ struct ObjRegister;
             /* destructor function */       \
             char *name;                     /* class name */                \
             char *file; int lineno;         /* where defined */             \
-            bool autodelete;                /* false to skip cleanup */     \
+            BOOL autodelete;                /* false to skip cleanup */     \
             LIST_ENTRY(T) entries;          /* D-Linked list of objs */     \
         } _class;                                                           \
         /* next come the user supplied fields */
