@@ -18,9 +18,15 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.h,v 1.3 2013-01-20 21:10:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.h,v 1.4 2013-01-22 01:02:54 pauloscustodio Exp $ */
 /* $Log: strhash.h,v $
-/* Revision 1.3  2013-01-20 21:10:32  pauloscustodio
+/* Revision 1.4  2013-01-22 01:02:54  pauloscustodio
+/* Removed CIRCLEQ from StrHash - redundant, UT_hash_handle contains a double-linked list
+/* Added StrHash_set_delptr() to define at create-key time the function to free the value when
+/* the item is deleted later.
+/* Added StrHash_head() to get head of list - usefull in a delete-all loop.
+/*
+/* Revision 1.3  2013/01/20 21:10:32  pauloscustodio
 /* Rename bool to BOOL, to be consistent with TRUE and FALSE and
 /* distinguish from C++ bool, true, false
 /*
@@ -50,6 +56,9 @@ Memory pointed by value of each hash entry must be managed by caller.
 *
 *   StrHash *self = OBJ_NEW(StrHash);
 *   StrHash_set(self, "KEY", (void*)value);	// adds to tail of list
+*   StrHash_set_delptr(self, "KEY", (void*)value, void(*delete_ptr)(void*));	
+*											// suplies delete pointer
+*											// DONT USE StrHash_clone() with this
 *	value = StrHash_get(self, "KEY"); 		// NULL if not exists
 *	if ( StrHash_exists(self, "KEY") ) ...
 *   StrHash_remove(self, "KEY");
@@ -59,6 +68,8 @@ Memory pointed by value of each hash entry must be managed by caller.
 *   while (StrHash_next(self, &iter)) {
 *		// use iter->key, iter->value
 *	}
+*	
+*	head = StrHash_head(self);				// element at head of list or NULL
 *
 *   OBJ_DELETE(StrHash);
 *----------------------------------------------------------------------------*/
@@ -67,16 +78,16 @@ typedef struct StrHashElem
     char    *key; 					/* string kept in strpool.h */
 	void	*value;					/* value managed by caller */
 
-    CIRCLEQ_ENTRY( StrHashElem ) entries;
-									/* doubly linked circular queue of all elements */
+	void	(*delete_ptr)(void*);	/* delete funtion for value, if defined
+									   used automatically to release value 
+									   when StrHashElem is deleted */
+	
     UT_hash_handle hh;      		/* hash table */
 
 } StrHashElem;
 
 CLASS( StrHash )
 StrHashElem		*hash_table;		/* hash table of all keys */
-CIRCLEQ_HEAD( StrHashHead, StrHashElem ) 	
-				 head; 				/* head of queue */
 END_CLASS;
 
 /* methods */
@@ -85,7 +96,13 @@ extern void		   *StrHash_get( StrHash *self, char *key );
 extern BOOL			StrHash_exists( StrHash *self, char *key );
 extern void			StrHash_remove( StrHash *self, char *key );
 extern StrHashElem *StrHash_find( StrHash *self, char *key );
+extern StrHashElem *StrHash_head( StrHash *self );
 
+/* set data and supply delete pointer for data */
+extern void 		StrHash_set_delptr( StrHash *self, char *key, void *value,
+										void(*delete_ptr)(void*) );	
+
+/* traverse the list */
 extern void			StrHash_first( StrHash *self, StrHashElem **iter );
 extern BOOL			StrHash_next( StrHash *self, StrHashElem **iter );
 

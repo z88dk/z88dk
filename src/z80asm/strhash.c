@@ -18,9 +18,15 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.4 2013-01-20 21:10:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.5 2013-01-22 01:02:54 pauloscustodio Exp $ */
 /* $Log: strhash.c,v $
-/* Revision 1.4  2013-01-20 21:10:32  pauloscustodio
+/* Revision 1.5  2013-01-22 01:02:54  pauloscustodio
+/* Removed CIRCLEQ from StrHash - redundant, UT_hash_handle contains a double-linked list
+/* Added StrHash_set_delptr() to define at create-key time the function to free the value when
+/* the item is deleted later.
+/* Added StrHash_head() to get head of list - usefull in a delete-all loop.
+/*
+/* Revision 1.4  2013/01/20 21:10:32  pauloscustodio
 /* Rename bool to BOOL, to be consistent with TRUE and FALSE and
 /* distinguish from C++ bool, true, false
 /*
@@ -54,31 +60,43 @@ void StrHash_init( StrHash *self )
     strpool_init();
 
 	self->hash_table = NULL;
-    CIRCLEQ_INIT( &self->head );
 }
 
 void StrHash_copy( StrHash *self, StrHash *other )
 {
-    StrHashElem *elem;
+    StrHashElem *elem, *tmp;
 
     /* create new hash and copy element by element from other */
 	self->hash_table = NULL;
-    CIRCLEQ_INIT( &self->head );
 
-	CIRCLEQ_FOREACH( elem, &other->head, entries )
+    HASH_ITER( hh, other->hash_table, elem, tmp )
     {
 		StrHash_set( self, elem->key, elem->value );
     }
 }
 
+void StrHash_delete_elem( StrHash *self, StrHashElem *elem )
+{
+	if ( elem )
+	{
+		HASH_DEL( self->hash_table, elem );
+		
+		if ( elem->delete_ptr )
+		{
+			(*elem->delete_ptr)( elem->value );
+		}
+		
+		xfree( elem );
+	}
+}
+		
 void StrHash_fini( StrHash *self )
 {
     StrHashElem *elem, *tmp;
 
     HASH_ITER( hh, self->hash_table, elem, tmp )
     {
-        HASH_DEL( self->hash_table, elem );
-        xfree( elem );
+        StrHash_delete_elem( self, elem );
     }
 
 }
@@ -96,9 +114,18 @@ StrHashElem *StrHash_find( StrHash *self, char *key )
 }
 
 /*-----------------------------------------------------------------------------
+*	Get first hash entry, maybe NULL
+*----------------------------------------------------------------------------*/
+StrHashElem *StrHash_head( StrHash *self )
+{
+    return (StrHashElem *)self->hash_table;
+}
+
+/*-----------------------------------------------------------------------------
 *	Create the element if the key is not found, update the value if found
 *----------------------------------------------------------------------------*/
-void StrHash_set( StrHash *self, char *key, void *value )
+void StrHash_set_delptr( StrHash *self, char *key, void *value,
+						 void(*delete_ptr)(void*) )
 {
     StrHashElem *elem;
 	size_t num_chars;
@@ -111,16 +138,20 @@ void StrHash_set( StrHash *self, char *key, void *value )
 		elem = xcalloc_struct( StrHashElem );
 		elem->key = strpool_add( key );
 		
-		/* add to tail of CIRCLEQ */
-		CIRCLEQ_INSERT_TAIL( &self->head, elem, entries);
-		
 		/* add to hash */
 		num_chars = strlen( key );
 		HASH_ADD_KEYPTR( hh, self->hash_table, key, num_chars, elem );
 	}
 	
-	/* update value */
-	elem->value	= value;
+	/* update value and delete_ptr */
+	elem->value	     = value;
+	elem->delete_ptr = delete_ptr;
+}
+
+
+void StrHash_set( StrHash *self, char *key, void *value )
+{
+	StrHash_set_delptr( self, key, value, NULL );
 }
 
 /*-----------------------------------------------------------------------------
@@ -159,17 +190,7 @@ void StrHash_remove( StrHash *self, char *key )
     StrHashElem *elem;
 	
 	elem = StrHash_find( self, key );
-	if (elem) 
-	{
-		/* remove from CIRCLEQ */
-		CIRCLEQ_REMOVE( &self->head, elem, entries );
-		
-		/* remove from hash table */
-        HASH_DEL( self->hash_table, elem );
-		
-		/* release memory */
-        xfree( elem );
-	}
+	StrHash_delete_elem( self, elem );
 }
 
 /*-----------------------------------------------------------------------------
@@ -184,15 +205,12 @@ BOOL StrHash_next( StrHash *self, StrHashElem **iter )
 {
 	if ( *iter == NULL )
 	{	
-		*iter = CIRCLEQ_FIRST( &self->head );			/* first element */
+		*iter = self->hash_table;						/* first element */
 	}
-	else if ( *iter == CIRCLEQ_END( &self->head ) )
+	else 
 	{
-		return FALSE;									/* end of list */
+		*iter = (StrHashElem*)(*iter)->hh.next;
 	}
-	else
-	{
-		*iter = CIRCLEQ_NEXT( *iter, entries );			/* 2nd and following */
-	}
-	return ( *iter == CIRCLEQ_END( &self->head ) ) ? FALSE : TRUE;
+
+	return *iter ? TRUE : FALSE;
 }
