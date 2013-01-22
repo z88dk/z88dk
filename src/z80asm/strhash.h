@@ -18,9 +18,14 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.h,v 1.4 2013-01-22 01:02:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.h,v 1.5 2013-01-22 22:24:49 pauloscustodio Exp $ */
 /* $Log: strhash.h,v $
-/* Revision 1.4  2013-01-22 01:02:54  pauloscustodio
+/* Revision 1.5  2013-01-22 22:24:49  pauloscustodio
+/* Removed StrHash_set_delptr() - not intuitive and error prone
+/* Added StrHash_remove_all() to remove all elements
+/* Added StrHash_remove_elem() to remove one item giving its address
+/*
+/* Revision 1.4  2013/01/22 01:02:54  pauloscustodio
 /* Removed CIRCLEQ from StrHash - redundant, UT_hash_handle contains a double-linked list
 /* Added StrHash_set_delptr() to define at create-key time the function to free the value when
 /* the item is deleted later.
@@ -56,9 +61,6 @@ Memory pointed by value of each hash entry must be managed by caller.
 *
 *   StrHash *self = OBJ_NEW(StrHash);
 *   StrHash_set(self, "KEY", (void*)value);	// adds to tail of list
-*   StrHash_set_delptr(self, "KEY", (void*)value, void(*delete_ptr)(void*));	
-*											// suplies delete pointer
-*											// DONT USE StrHash_clone() with this
 *	value = StrHash_get(self, "KEY"); 		// NULL if not exists
 *	if ( StrHash_exists(self, "KEY") ) ...
 *   StrHash_remove(self, "KEY");
@@ -78,10 +80,6 @@ typedef struct StrHashElem
     char    *key; 					/* string kept in strpool.h */
 	void	*value;					/* value managed by caller */
 
-	void	(*delete_ptr)(void*);	/* delete funtion for value, if defined
-									   used automatically to release value 
-									   when StrHashElem is deleted */
-	
     UT_hash_handle hh;      		/* hash table */
 
 } StrHashElem;
@@ -90,17 +88,17 @@ CLASS( StrHash )
 StrHashElem		*hash_table;		/* hash table of all keys */
 END_CLASS;
 
-/* methods */
+/* manipulate key, value */
 extern void			StrHash_set( StrHash *self, char *key, void *value );
 extern void		   *StrHash_get( StrHash *self, char *key );
 extern BOOL			StrHash_exists( StrHash *self, char *key );
 extern void			StrHash_remove( StrHash *self, char *key );
+extern void			StrHash_remove_all( StrHash *self );
+
+/* manipulate StrHashElem */
 extern StrHashElem *StrHash_find( StrHash *self, char *key );
 extern StrHashElem *StrHash_head( StrHash *self );
-
-/* set data and supply delete pointer for data */
-extern void 		StrHash_set_delptr( StrHash *self, char *key, void *value,
-										void(*delete_ptr)(void*) );	
+extern void 		StrHash_remove_elem( StrHash *self, StrHashElem *elem );
 
 /* traverse the list */
 extern void			StrHash_first( StrHash *self, StrHashElem **iter );

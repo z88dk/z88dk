@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.5 2013-01-22 01:02:54 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.6 2013-01-22 22:24:49 pauloscustodio Exp $
 # $Log: whitebox-strhash.t,v $
-# Revision 1.5  2013-01-22 01:02:54  pauloscustodio
+# Revision 1.6  2013-01-22 22:24:49  pauloscustodio
+# Removed StrHash_set_delptr() - not intuitive and error prone
+# Added StrHash_remove_all() to remove all elements
+# Added StrHash_remove_elem() to remove one item giving its address
+#
+# Revision 1.5  2013/01/22 01:02:54  pauloscustodio
 # Removed CIRCLEQ from StrHash - redundant, UT_hash_handle contains a double-linked list
 # Added StrHash_set_delptr() to define at create-key time the function to free the value when
 # the item is deleted later.
@@ -63,211 +68,239 @@ t_compile_module(<<'END_INIT', <<'END', $compile);
 
 #define ERROR return __LINE__
 
-void *alloc_data(char *data) 
-{
-	void *p = xstrdup(data);
-	warn("alloc_data(\"%s\")\n", p);
-	return p;
-}
-
-void free_data(void *data) 
-{
-	warn("free_data(\"%s\")\n", data);
-	xfree(data);
-}
-
 void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 {
-	StrHashElem *iter;
-	char *exp_key, *got_string;
-	int exp_value; 
-	char tokens[256], *tokensp;
+	StrHashElem *iter, *elem;
+	char tokens[256], wrong_key[256], *tokensp;
+	char *exp_key, *exp_value, *value;
+	int i;
+	BOOL has_next = FALSE;
 	
 	/* strtok cannot modify constant strings */
 	strcpy(tokens, expected);
 	tokensp = tokens;
 	
 	StrHash_first(hash, &iter);
-	while (1) {
-		exp_key   = strtok(tokensp, " "); tokensp = NULL;
-		exp_value = atoi(strtok(tokensp, " ")); tokensp = NULL;
+	for ( i = 0; ; i++ )
+	{
+		has_next = StrHash_next(hash, &iter);
 		
-		got_string = StrHash_next(hash, &iter) ? iter->key : NULL;
+		/* next expected key */
+		exp_key = strtok(tokensp, " "); 
+		tokensp = NULL;
 		
-		if (exp_key == NULL && got_string != NULL)
-			die(AssertionException, "%s(%d): got %s, expected end of hash\n", 
-			    file, lineno, got_string);
-		else if (exp_key != NULL && got_string == NULL)
-			die(AssertionException, "%s(%d): got end of hash, expected %s\n", 
+		if (exp_key == NULL && has_next)
+		{
+			die(AssertionException, "%s %d : got %s, expected end of hash\n", 
+			    file, lineno, iter->key);
+		}
+		else if (exp_key != NULL && ! has_next)
+		{
+			die(AssertionException, "%s %d : got end of hash, expected %s\n", 
 			    file, lineno, exp_key);
-		else if (exp_key == NULL && got_string == NULL)
+		}
+		else if (exp_key == NULL && ! has_next)
+		{
 			break;		/* OK */
-		else if (strcmp(exp_key, got_string) != 0)
-			die(AssertionException, "%s(%d): got %s, expected %s\n", 
-			    file, lineno, got_string, exp_key);
-		else if (exp_value != (int)iter->value)
-			die(AssertionException, "%s(%d): got %d, expected %d\n", 
-			    file, lineno, (int)iter->value, exp_value);
+		}
+		
+		/* get expected value */
+		exp_value = strtok(tokensp, " ");
+		if (exp_value == NULL)
+		{
+			die(AssertionException, "%s %d : exp_value should not be NULL\n", 
+			    file, lineno);
+		}
+				
+		/* check that key and value match */
+		if (strcmp(iter->key, exp_key))
+		{
+			die(AssertionException, "%s %d : key mismatch, got %s, expected %s\n", 
+			    file, lineno, iter->key, exp_key);
+		}
+		
+		if (strcmp(iter->value, exp_value))
+		{
+			die(AssertionException, "%s %d : value mismatch, got %s, expected %s\n", 
+			    file, lineno, iter->value, exp_value);
+		}
+		
+		/* compute wrong key */
+		strcpy(wrong_key, iter->key);
+		(*wrong_key)++;
+
+		/* check positive and negative StrHash_get() */
+		value = StrHash_get(hash, iter->key);
+		if (value == NULL || strcmp(value, iter->value))
+		{
+			die(AssertionException, "%s %d : get(%s) = %s, expected %s\n", 
+			    file, lineno, iter->key, value, iter->value);
+		}
+
+		value = StrHash_get(hash, wrong_key);
+		if (value != NULL)
+		{
+			die(AssertionException, "%s %d : get(%s) = %s, expected NULL\n", 
+			    file, lineno, wrong_key, value);
+		}
+		
+		/* check positive and negative StrHash_exists() */
+		if ( ! StrHash_exists(hash, iter->key) )
+		{
+			die(AssertionException, "%s %d : exists(%s) = FALSE, expected TRUE\n", 
+			    file, lineno, iter->key);
+		}
+
+		if ( StrHash_exists(hash, wrong_key) )
+		{
+			die(AssertionException, "%s %d : exists(%s) = TRUE, expected FALSE\n", 
+			    file, lineno, wrong_key);
+		}
+		
+		/* check positive and negative StrHash_find() */
+		elem = StrHash_find(hash, iter->key);
+		if ( elem == NULL || elem != iter )
+		{
+			die(AssertionException, "%s %d : find(%s) failed\n", 
+			    file, lineno, iter->key);
+		}
+
+		elem = StrHash_find(hash, wrong_key);
+		if ( elem != NULL )
+		{
+			die(AssertionException, "%s %d : find(%s) failed\n", 
+			    file, lineno, wrong_key);
+		}
+		
+		/* check StrHash_head() */
+		if ( i == 0 ) 
+		{
+			if ( StrHash_head(hash) != iter )
+			{
+				die(AssertionException, "%s %d : head() failed, i = %d\n", 
+					file, lineno, i);
+			}
+		}
+		else 
+		{
+			if ( StrHash_head(hash) == iter )
+			{
+				die(AssertionException, "%s %d : head() failed, i = %d\n", 
+					file, lineno, i);
+			}
+		}
 	}
-}	
+}
 
 #define check_list(hash,expected) _check_list(hash,expected,__FILE__,__LINE__)
 
 END_INIT
 	/* main */
 	StrHash *hash1, *hash2;
+	StrHashElem *elem;
 	
 	warn("init\n");
 	hash1 = OBJ_NEW(StrHash);
+	if (StrHash_head(hash1) != NULL)			ERROR;
 	check_list(hash1, "");
 	
-	if (StrHash_head(hash1) != NULL)			ERROR;
+	StrHash_set(hash1, "abc", "123");
+	check_list(hash1, "abc 123");
 	
-	if (StrHash_get(hash1, "abc") != NULL)		ERROR;
-	if (StrHash_get(hash1, "def") != NULL)		ERROR;
-	if (StrHash_get(hash1, "ghi") != NULL)		ERROR;
+	StrHash_set(hash1, "def", "456");
+	check_list(hash1, "abc 123 def 456");
 	
-	if ( StrHash_exists(hash1, "abc"))			ERROR;
-	if ( StrHash_exists(hash1, "def"))			ERROR;
-	if ( StrHash_exists(hash1, "ghi"))			ERROR;
+	StrHash_set(hash1, "ghi", "789");
+	check_list(hash1, "abc 123 def 456 ghi 789");
 	
-	StrHash_set(hash1, "abc", (void*)1);
-	check_list(hash1, "abc 1");
-
-	if (StrHash_head(hash1) != StrHash_find(hash1, "abc"))	ERROR;
-	
-	if (StrHash_get(hash1, "abc") != (void*)1)	ERROR;
-	if (StrHash_get(hash1, "def") != NULL)		ERROR;
-	if (StrHash_get(hash1, "ghi") != NULL)		ERROR;
-	
-	if (!StrHash_exists(hash1, "abc"))			ERROR;
-	if ( StrHash_exists(hash1, "def"))			ERROR;
-	if ( StrHash_exists(hash1, "ghi"))			ERROR;
-	
-	StrHash_set(hash1, "def", (void*)2);
-	check_list(hash1, "abc 1 def 2");
-
-	if (StrHash_head(hash1) != StrHash_find(hash1, "abc"))	ERROR;
-
-	if (StrHash_get(hash1, "abc") != (void*)1)	ERROR;
-	if (StrHash_get(hash1, "def") != (void*)2)	ERROR;
-	if (StrHash_get(hash1, "ghi") != NULL)		ERROR;
-	
-	if (!StrHash_exists(hash1, "abc"))			ERROR;
-	if (!StrHash_exists(hash1, "def"))			ERROR;
-	if ( StrHash_exists(hash1, "ghi"))			ERROR;
-	
-	StrHash_set(hash1, "ghi", (void*)3);
-	check_list(hash1, "abc 1 def 2 ghi 3");
-
-	if (StrHash_head(hash1) != StrHash_find(hash1, "abc"))	ERROR;
-
-	if (StrHash_get(hash1, "abc") != (void*)1)	ERROR;
-	if (StrHash_get(hash1, "def") != (void*)2)	ERROR;
-	if (StrHash_get(hash1, "ghi") != (void*)3)	ERROR;
-	
-	if (!StrHash_exists(hash1, "abc"))			ERROR;
-	if (!StrHash_exists(hash1, "def"))			ERROR;
-	if (!StrHash_exists(hash1, "ghi"))			ERROR;
-	
+	StrHash_set(hash1, "def", "456");
+	check_list(hash1, "abc 123 def 456 ghi 789");
 	
 	/* clone */
 	hash2 = StrHash_clone(hash1);
-	check_list(hash2, "abc 1 def 2 ghi 3");
-	
-	if (StrHash_get(hash2, "abc") != (void*)1)	ERROR;
-	if (StrHash_get(hash2, "def") != (void*)2)	ERROR;
-	if (StrHash_get(hash2, "ghi") != (void*)3)	ERROR;
-	
-	if (!StrHash_exists(hash2, "abc"))			ERROR;
-	if (!StrHash_exists(hash2, "def"))			ERROR;
-	if (!StrHash_exists(hash2, "ghi"))			ERROR;
-	
+	check_list(hash1, "abc 123 def 456 ghi 789");
+	check_list(hash2, "abc 123 def 456 ghi 789");
 	
 	StrHash_remove(hash1, "def");
-	check_list(hash1, "abc 1 ghi 3");
-
-	if (StrHash_get(hash1, "abc") != (void*)1)	ERROR;
-	if (StrHash_get(hash1, "def") != NULL)		ERROR;
-	if (StrHash_get(hash1, "ghi") != (void*)3)	ERROR;
-	
-	if (!StrHash_exists(hash1, "abc"))			ERROR;
-	if ( StrHash_exists(hash1, "def"))			ERROR;
-	if (!StrHash_exists(hash1, "ghi"))			ERROR;
+	check_list(hash1, "abc 123 ghi 789");
+	check_list(hash2, "abc 123 def 456 ghi 789");
 	
 	StrHash_remove(hash1, "def");
-	check_list(hash1, "abc 1 ghi 3");
-
-	if (StrHash_get(hash1, "abc") != (void*)1)	ERROR;
-	if (StrHash_get(hash1, "def") != NULL)		ERROR;
-	if (StrHash_get(hash1, "ghi") != (void*)3)	ERROR;
-	
-	if (!StrHash_exists(hash1, "abc"))			ERROR;
-	if ( StrHash_exists(hash1, "def"))			ERROR;
-	if (!StrHash_exists(hash1, "ghi"))			ERROR;
+	check_list(hash1, "abc 123 ghi 789");
+	check_list(hash2, "abc 123 def 456 ghi 789");
 	
 	StrHash_remove(hash1, "ghi");
-	check_list(hash1, "abc 1");
+	check_list(hash1, "abc 123");
+	check_list(hash2, "abc 123 def 456 ghi 789");
 
-	if (StrHash_get(hash1, "abc") != (void*)1)	ERROR;
-	if (StrHash_get(hash1, "def") != NULL)		ERROR;
-	if (StrHash_get(hash1, "ghi") != NULL)		ERROR;
-	
-	if (!StrHash_exists(hash1, "abc"))			ERROR;
-	if ( StrHash_exists(hash1, "def"))			ERROR;
-	if ( StrHash_exists(hash1, "ghi"))			ERROR;
-	
 	StrHash_remove(hash1, "abc");
 	check_list(hash1, "");
+	check_list(hash2, "abc 123 def 456 ghi 789");
 
-	if (StrHash_get(hash1, "abc") != NULL)		ERROR;
-	if (StrHash_get(hash1, "def") != NULL)		ERROR;
-	if (StrHash_get(hash1, "ghi") != NULL)		ERROR;
+	StrHash_remove_all(hash1);
+	check_list(hash1, "");
+	check_list(hash2, "abc 123 def 456 ghi 789");
 	
-	if ( StrHash_exists(hash1, "abc"))			ERROR;
-	if ( StrHash_exists(hash1, "def"))			ERROR;
-	if ( StrHash_exists(hash1, "ghi"))			ERROR;
-
-	
-	check_list(hash2, "abc 1 def 2 ghi 3");
-
-	if (StrHash_get(hash2, "abc") != (void*)1)	ERROR;
-	if (StrHash_get(hash2, "def") != (void*)2)	ERROR;
-	if (StrHash_get(hash2, "ghi") != (void*)3)	ERROR;
-	
-	if (!StrHash_exists(hash2, "abc"))			ERROR;
-	if (!StrHash_exists(hash2, "def"))			ERROR;
-	if (!StrHash_exists(hash2, "ghi"))			ERROR;
-	
-	StrHash_remove(hash2, "abc");
-	check_list(hash2, "def 2 ghi 3");
-	
-	if (StrHash_get(hash2, "abc") != NULL)		ERROR;
-	if (StrHash_get(hash2, "def") != (void*)2)	ERROR;
-	if (StrHash_get(hash2, "ghi") != (void*)3)	ERROR;
-	
-	if ( StrHash_exists(hash2, "abc"))			ERROR;
-	if (!StrHash_exists(hash2, "def"))			ERROR;
-	if (!StrHash_exists(hash2, "ghi"))			ERROR;
-
-	StrHash_remove(hash2, "def");
-	check_list(hash2, "ghi 3");
-	
-	StrHash_remove(hash2, "ghi");
+	StrHash_remove_all(hash2);
+	check_list(hash1, "");
 	check_list(hash2, "");
-
-	/* test auto-delete of values */
-	StrHash_set_delptr(hash1, "abc", alloc_data("abc"), free_data);
-	StrHash_set_delptr(hash1, "def", alloc_data("def"), free_data);
-	StrHash_set_delptr(hash1, "ghi", alloc_data("ghi"), free_data);
 	
-	if (strcmp(StrHash_get(hash1, "abc"), "abc"))	ERROR;
-	if (strcmp(StrHash_get(hash1, "def"), "def"))	ERROR;
-	if (strcmp(StrHash_get(hash1, "ghi"), "ghi"))	ERROR;
 	
-	/* Automagically deletes data */
-	StrHash_remove(hash1, "def");
+	/* head / remove_elem */
+	StrHash_set(hash1, "abc", "123");
+	StrHash_set(hash1, "def", "456");
+	StrHash_set(hash1, "ghi", "789");
+	check_list(hash1, "abc 123 def 456 ghi 789");
 
+	elem = StrHash_head(hash1); 
+	if (elem == NULL) ERROR;
+	if (strcmp(elem->key, "abc")) ERROR;
+	StrHash_remove_elem(hash1, elem);
+	check_list(hash1, "def 456 ghi 789");
+
+	elem = StrHash_head(hash1); 
+	if (elem == NULL) ERROR;
+	if (strcmp(elem->key, "def")) ERROR;
+	StrHash_remove_elem(hash1, elem);
+	check_list(hash1, "ghi 789");
+
+	elem = StrHash_head(hash1); 
+	if (elem == NULL) ERROR;
+	if (strcmp(elem->key, "ghi")) ERROR;
+	StrHash_remove_elem(hash1, elem);
+	check_list(hash1, "");
+
+	elem = StrHash_head(hash1); 
+	if (elem != NULL) ERROR;
+	check_list(hash1, "");
+
+	StrHash_set(hash1, "abc", "123");
+	StrHash_set(hash1, "def", "456");
+	StrHash_set(hash1, "ghi", "789");
+	check_list(hash1, "abc 123 def 456 ghi 789");
+
+	elem = StrHash_find(hash1, "def"); 
+	if (elem == NULL) ERROR;
+	if (strcmp(elem->key, "def")) ERROR;
+	StrHash_remove_elem(hash1, elem);
+	check_list(hash1, "abc 123 ghi 789");
+
+	elem = StrHash_find(hash1, "ghi"); 
+	if (elem == NULL) ERROR;
+	if (strcmp(elem->key, "ghi")) ERROR;
+	StrHash_remove_elem(hash1, elem);
+	check_list(hash1, "abc 123");
+
+	elem = StrHash_find(hash1, "abc"); 
+	if (elem == NULL) ERROR;
+	if (strcmp(elem->key, "abc")) ERROR;
+	StrHash_remove_elem(hash1, elem);
+	check_list(hash1, "");
+
+	elem = StrHash_find(hash1, "abc"); 
+	if (elem != NULL) ERROR;
+	check_list(hash1, "");
+	
 	return 0;
 END
 
@@ -276,58 +309,56 @@ init
 memalloc: init
 memalloc strhash.c(1): alloc 32 bytes at ADDR_1
 memalloc strpool.c(1): alloc 32 bytes at ADDR_2
-memalloc strhash.c(4): alloc 44 bytes at ADDR_3
+memalloc strhash.c(4): alloc 40 bytes at ADDR_3
 memalloc strpool.c(2): alloc 36 bytes at ADDR_4
 memalloc strpool.c(3): alloc 4 bytes at ADDR_5
 memalloc strpool.c(4): alloc 44 bytes at ADDR_6
 memalloc strpool.c(4): alloc 384 bytes at ADDR_7
 memalloc strhash.c(5): alloc 44 bytes at ADDR_8
 memalloc strhash.c(5): alloc 384 bytes at ADDR_9
-memalloc strhash.c(4): alloc 44 bytes at ADDR_10
+memalloc strhash.c(4): alloc 40 bytes at ADDR_10
 memalloc strpool.c(2): alloc 36 bytes at ADDR_11
 memalloc strpool.c(3): alloc 4 bytes at ADDR_12
-memalloc strhash.c(4): alloc 44 bytes at ADDR_13
+memalloc strhash.c(4): alloc 40 bytes at ADDR_13
 memalloc strpool.c(2): alloc 36 bytes at ADDR_14
 memalloc strpool.c(3): alloc 4 bytes at ADDR_15
 memalloc strhash.c(1): alloc 32 bytes at ADDR_16
-memalloc strhash.c(4): alloc 44 bytes at ADDR_17
+memalloc strhash.c(4): alloc 40 bytes at ADDR_17
 memalloc strhash.c(5): alloc 44 bytes at ADDR_18
 memalloc strhash.c(5): alloc 384 bytes at ADDR_19
-memalloc strhash.c(4): alloc 44 bytes at ADDR_20
-memalloc strhash.c(4): alloc 44 bytes at ADDR_21
-memalloc strhash.c(3): free 44 bytes at ADDR_10 allocated at strhash.c(4)
-memalloc strhash.c(3): free 44 bytes at ADDR_13 allocated at strhash.c(4)
+memalloc strhash.c(4): alloc 40 bytes at ADDR_20
+memalloc strhash.c(4): alloc 40 bytes at ADDR_21
+memalloc strhash.c(3): free 40 bytes at ADDR_10 allocated at strhash.c(4)
+memalloc strhash.c(3): free 40 bytes at ADDR_13 allocated at strhash.c(4)
 memalloc strhash.c(2): free 384 bytes at ADDR_9 allocated at strhash.c(5)
 memalloc strhash.c(2): free 44 bytes at ADDR_8 allocated at strhash.c(5)
-memalloc strhash.c(3): free 44 bytes at ADDR_3 allocated at strhash.c(4)
-memalloc strhash.c(3): free 44 bytes at ADDR_17 allocated at strhash.c(4)
-memalloc strhash.c(3): free 44 bytes at ADDR_20 allocated at strhash.c(4)
+memalloc strhash.c(3): free 40 bytes at ADDR_3 allocated at strhash.c(4)
+memalloc strhash.c(3): free 40 bytes at ADDR_17 allocated at strhash.c(4)
+memalloc strhash.c(3): free 40 bytes at ADDR_20 allocated at strhash.c(4)
 memalloc strhash.c(2): free 384 bytes at ADDR_19 allocated at strhash.c(5)
 memalloc strhash.c(2): free 44 bytes at ADDR_18 allocated at strhash.c(5)
-memalloc strhash.c(3): free 44 bytes at ADDR_21 allocated at strhash.c(4)
-memalloc test.c(1): alloc 4 bytes at ADDR_22
-alloc_data("abc")
-memalloc strhash.c(4): alloc 44 bytes at ADDR_23
-memalloc strhash.c(5): alloc 44 bytes at ADDR_24
-memalloc strhash.c(5): alloc 384 bytes at ADDR_25
-memalloc test.c(1): alloc 4 bytes at ADDR_26
-alloc_data("def")
-memalloc strhash.c(4): alloc 44 bytes at ADDR_27
-memalloc test.c(1): alloc 4 bytes at ADDR_28
-alloc_data("ghi")
-memalloc strhash.c(4): alloc 44 bytes at ADDR_29
-free_data("def")
-memalloc test.c(2): free 4 bytes at ADDR_26 allocated at test.c(1)
-memalloc strhash.c(3): free 44 bytes at ADDR_27 allocated at strhash.c(4)
+memalloc strhash.c(3): free 40 bytes at ADDR_21 allocated at strhash.c(4)
+memalloc strhash.c(4): alloc 40 bytes at ADDR_22
+memalloc strhash.c(5): alloc 44 bytes at ADDR_23
+memalloc strhash.c(5): alloc 384 bytes at ADDR_24
+memalloc strhash.c(4): alloc 40 bytes at ADDR_25
+memalloc strhash.c(4): alloc 40 bytes at ADDR_26
+memalloc strhash.c(3): free 40 bytes at ADDR_22 allocated at strhash.c(4)
+memalloc strhash.c(3): free 40 bytes at ADDR_25 allocated at strhash.c(4)
+memalloc strhash.c(2): free 384 bytes at ADDR_24 allocated at strhash.c(5)
+memalloc strhash.c(2): free 44 bytes at ADDR_23 allocated at strhash.c(5)
+memalloc strhash.c(3): free 40 bytes at ADDR_26 allocated at strhash.c(4)
+memalloc strhash.c(4): alloc 40 bytes at ADDR_27
+memalloc strhash.c(5): alloc 44 bytes at ADDR_28
+memalloc strhash.c(5): alloc 384 bytes at ADDR_29
+memalloc strhash.c(4): alloc 40 bytes at ADDR_30
+memalloc strhash.c(4): alloc 40 bytes at ADDR_31
+memalloc strhash.c(3): free 40 bytes at ADDR_30 allocated at strhash.c(4)
+memalloc strhash.c(3): free 40 bytes at ADDR_31 allocated at strhash.c(4)
+memalloc strhash.c(2): free 384 bytes at ADDR_29 allocated at strhash.c(5)
+memalloc strhash.c(2): free 44 bytes at ADDR_28 allocated at strhash.c(5)
+memalloc strhash.c(3): free 40 bytes at ADDR_27 allocated at strhash.c(4)
 memalloc strhash.c(1): free 32 bytes at ADDR_16 allocated at strhash.c(1)
-free_data("abc")
-memalloc test.c(2): free 4 bytes at ADDR_22 allocated at test.c(1)
-memalloc strhash.c(3): free 44 bytes at ADDR_23 allocated at strhash.c(4)
-memalloc strhash.c(2): free 384 bytes at ADDR_25 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_24 allocated at strhash.c(5)
-free_data("ghi")
-memalloc test.c(2): free 4 bytes at ADDR_28 allocated at test.c(1)
-memalloc strhash.c(3): free 44 bytes at ADDR_29 allocated at strhash.c(4)
 memalloc strhash.c(1): free 32 bytes at ADDR_1 allocated at strhash.c(1)
 memalloc strpool.c(6): free 4 bytes at ADDR_5 allocated at strpool.c(3)
 memalloc strpool.c(7): free 36 bytes at ADDR_4 allocated at strpool.c(2)

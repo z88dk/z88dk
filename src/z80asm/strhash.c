@@ -18,9 +18,14 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.5 2013-01-22 01:02:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.6 2013-01-22 22:24:49 pauloscustodio Exp $ */
 /* $Log: strhash.c,v $
-/* Revision 1.5  2013-01-22 01:02:54  pauloscustodio
+/* Revision 1.6  2013-01-22 22:24:49  pauloscustodio
+/* Removed StrHash_set_delptr() - not intuitive and error prone
+/* Added StrHash_remove_all() to remove all elements
+/* Added StrHash_remove_elem() to remove one item giving its address
+/*
+/* Revision 1.5  2013/01/22 01:02:54  pauloscustodio
 /* Removed CIRCLEQ from StrHash - redundant, UT_hash_handle contains a double-linked list
 /* Added StrHash_set_delptr() to define at create-key time the function to free the value when
 /* the item is deleted later.
@@ -75,30 +80,22 @@ void StrHash_copy( StrHash *self, StrHash *other )
     }
 }
 
-void StrHash_delete_elem( StrHash *self, StrHashElem *elem )
-{
-	if ( elem )
-	{
-		HASH_DEL( self->hash_table, elem );
-		
-		if ( elem->delete_ptr )
-		{
-			(*elem->delete_ptr)( elem->value );
-		}
-		
-		xfree( elem );
-	}
-}
-		
 void StrHash_fini( StrHash *self )
+{
+	StrHash_remove_all( self );
+}
+
+/*-----------------------------------------------------------------------------
+*	Remove all entries
+*----------------------------------------------------------------------------*/
+void StrHash_remove_all( StrHash *self )
 {
     StrHashElem *elem, *tmp;
 
     HASH_ITER( hh, self->hash_table, elem, tmp )
     {
-        StrHash_delete_elem( self, elem );
+        StrHash_remove_elem( self, elem );
     }
-
 }
 
 /*-----------------------------------------------------------------------------
@@ -122,10 +119,21 @@ StrHashElem *StrHash_head( StrHash *self )
 }
 
 /*-----------------------------------------------------------------------------
+*	Delete a hash entry if not NULL
+*----------------------------------------------------------------------------*/
+void StrHash_remove_elem( StrHash *self, StrHashElem *elem )
+{
+	if ( elem )
+	{
+		HASH_DEL( self->hash_table, elem );
+		xfree( elem );
+	}
+}
+
+/*-----------------------------------------------------------------------------
 *	Create the element if the key is not found, update the value if found
 *----------------------------------------------------------------------------*/
-void StrHash_set_delptr( StrHash *self, char *key, void *value,
-						 void(*delete_ptr)(void*) )
+void StrHash_set( StrHash *self, char *key, void *value )
 {
     StrHashElem *elem;
 	size_t num_chars;
@@ -143,15 +151,8 @@ void StrHash_set_delptr( StrHash *self, char *key, void *value,
 		HASH_ADD_KEYPTR( hh, self->hash_table, key, num_chars, elem );
 	}
 	
-	/* update value and delete_ptr */
+	/* update value */
 	elem->value	     = value;
-	elem->delete_ptr = delete_ptr;
-}
-
-
-void StrHash_set( StrHash *self, char *key, void *value )
-{
-	StrHash_set_delptr( self, key, value, NULL );
 }
 
 /*-----------------------------------------------------------------------------
@@ -190,7 +191,7 @@ void StrHash_remove( StrHash *self, char *key )
     StrHashElem *elem;
 	
 	elem = StrHash_find( self, key );
-	StrHash_delete_elem( self, elem );
+	StrHash_remove_elem( self, elem );
 }
 
 /*-----------------------------------------------------------------------------
