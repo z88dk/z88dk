@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.174 2013-01-02 14:55:32 stefano Exp $
+# $Id: Makefile,v 1.175 2013-01-24 15:31:38 stefano Exp $
 
 
 include Make.config
@@ -19,7 +19,8 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	cpm_clib.lib einstein.lib gal_clib.lib m5_clib.lib \
 	msx_clib.lib mtx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
-	osca_clib.lib oscaansi_clib.lib ozansi_clib.lib pps_clib.lib ppsansi_clib.lib \
+	osca_clib.lib oscaansi_clib.lib ozansi_clib.lib \
+	pc6001_clib.lib pc6001ansi_clib.lib pps_clib.lib ppsansi_clib.lib \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib \
 	trs80_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib \
@@ -413,6 +414,34 @@ mzx_tiny.lib:
 	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
 	@echo ''
 	cd math/zxmath ; $(MAKE) mzx_tiny ; cd ../..
+
+# PC6001 lib - Stefano
+pc6001_clib.lib:
+	@echo ''
+	@echo '--- Building PC6001 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORpc6001 -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(LISTFILE_DIRECTORY)/pc6001.lst
+
+# PC6001 ansi lib - Stefano
+pc6001ansi_clib.lib:
+	@echo ''
+	@echo '--- Building PC6001 ANSI Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORpc6001 -x$(OUTPUT_DIRECTORY)/pc6001ansi_clib @$(LISTFILE_DIRECTORY)/pc6001ansi.lst
 
 # Native for sprinter - dom
 pps_clib.lib:

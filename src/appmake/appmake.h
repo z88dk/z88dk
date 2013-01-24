@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.24 2011-06-14 07:36:01 stefano Exp $
+ *   $Id: appmake.h,v 1.25 2013-01-24 15:31:39 stefano Exp $
  */
 
 
@@ -70,6 +70,9 @@ extern option_t  mz_options;
 
 extern int       nascom_exec(char *target);
 extern option_t  nascom_options;
+
+extern int       nec_exec(char *target);
+extern option_t  nec_options;
 
 extern int       sorcerer_exec(char *target);
 extern option_t  sorcerer_options;
@@ -166,6 +169,9 @@ struct {
     { "bin2nas",   "nas",       "(C) 2003 Stefano Bodrato",
       "Generates a .NAS file suitable for use by emulators",
       nascom_exec,    &nascom_options },
+    { "hex2cas",   "nec",       "(C) 2003,2007 Takahide Matsutsuka",
+      "PC-6001 (and others) CAS format conversion utility",
+      nec_exec,    &nec_options },
     { "bin2srr",   "srr",       "(C) 2011 Stefano Bodrato",
       "Packaging for Sorcerer Exidy, --audio for WAV format",
       sorcerer_exec,    &sorcerer_options },
@@ -227,7 +233,7 @@ struct {
       "Generates a .P file suitable for use by emulators, optionally a WAV file",
       zx81_exec,    &zx81_options }
 };
-#define APPMAKE_TARGETS 33
+#define APPMAKE_TARGETS 34
 #endif
 
 

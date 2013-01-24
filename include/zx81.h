@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.29 2013-01-02 14:55:31 stefano Exp $
+ * $Id: zx81.h,v 1.30 2013-01-24 15:31:37 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -135,6 +135,9 @@ extern int base_graphics;
 
 // direct call for "clear graphics page"
 extern void __LIB__ _clg_hr();
+
+// Change the (text or graphics) video page
+extern void __LIB__  __FASTCALL__ hrg_sync(void *addr);
 
 // Enable/disable High Resolution Graphics mode
 // if startup=2, disables/enables the new interrupt handler (dangerous!)
