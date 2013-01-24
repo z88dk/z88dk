@@ -15,9 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 Common types
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.6 2013-01-20 21:10:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.7 2013-01-24 23:03:03 pauloscustodio Exp $ */
 /* $Log: types.h,v $
-/* Revision 1.6  2013-01-20 21:10:32  pauloscustodio
+/* Revision 1.7  2013-01-24 23:03:03  pauloscustodio
+/* Replaced (unsigned char) by (byte_t)
+/* Replaced (unisigned int) by (size_t)
+/* Replaced (short) by (int)
+/*
+/* Revision 1.6  2013/01/20 21:10:32  pauloscustodio
 /* Rename bool to BOOL, to be consistent with TRUE and FALSE and
 /* distinguish from C++ bool, true, false
 /*
@@ -42,10 +47,16 @@ Common types
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <stdlib.h>					/* size_t */
+
 /* BOOL type and constants */
 typedef int BOOL;
 #define FALSE 0
 #define TRUE (!FALSE)
+
+/* Unsigned types */
+typedef unsigned char byte_t;		/*  8-bit */
+/* typedef unsigned int size_t;	*/	/* 32-bit */
 
 /* number of elements of an array */
 #define NUM_ELEMS(x) (sizeof(x)/sizeof(x[0]))

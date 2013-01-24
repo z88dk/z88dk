@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.31 2013-01-20 13:18:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.32 2013-01-24 23:03:03 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.31  2013-01-20 13:18:10  pauloscustodio
+/* Revision 1.32  2013-01-24 23:03:03  pauloscustodio
+/* Replaced (unsigned char) by (byte_t)
+/* Replaced (unisigned int) by (size_t)
+/* Replaced (short) by (int)
+/*
+/* Revision 1.31  2013/01/20 13:18:10  pauloscustodio
 /* BUG_0024 : (ix+128) should show warning message
 /* Signed integer range was wrongly checked to -128..255 instead
 /* of -128..127
@@ -417,7 +422,7 @@ Factor( struct expr *pfixexpr )
                 }
                 else
                 {
-                    *pfixexpr->infixptr++ = ( unsigned char )constant;             /* store char in infix expr */
+                    *pfixexpr->infixptr++ = (byte_t)constant;             /* store char in infix expr */
 
                     if ( GetSym() == squote )
                     {
@@ -706,7 +711,7 @@ ParseNumExpr( void )
 void
 StoreExpr( struct expr *pfixexpr, char range )
 {
-    unsigned char b;
+    byte_t b;
 
     fputc_err( range, objfile );     /* range of expression */
     fputw_err( pfixexpr->codepos, objfile );     /* patchptr */
@@ -1228,7 +1233,7 @@ ExprUnsigned8( int listoffset )
                     if ( constant < -128 || constant > 255 )
                         warning( ERR_INT_RANGE, constant );
 
-					append_byte( ( unsigned char ) constant );
+					append_byte( (byte_t) constant );
                 }
             }
         }
@@ -1305,7 +1310,7 @@ ExprSigned8( int listoffset )
                     if ( constant < -128 || constant > 127 )
 						warning( ERR_INT_RANGE, constant );
 
-					append_byte( ( unsigned char ) constant );
+					append_byte( (byte_t) constant );
                 }
             }
         }

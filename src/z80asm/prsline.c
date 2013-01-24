@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.30 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.31 2013-01-24 23:03:03 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.30  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.31  2013-01-24 23:03:03  pauloscustodio
+/* Replaced (unsigned char) by (byte_t)
+/* Replaced (unisigned int) by (size_t)
+/* Replaced (short) by (int)
+/*
+/* Revision 1.30  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.29  2012/11/03 17:39:36  pauloscustodio
@@ -856,7 +861,7 @@ long
 GetConstant( char *evalerr )
 {
     long size, len, intresult = 0;
-    unsigned short bitvalue = 1;
+    size_t bitvalue = 1;
 
     *evalerr = 0;                 /* preset to no errors */
 

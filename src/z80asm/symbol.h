@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.17 2013-01-20 13:18:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.18 2013-01-24 23:03:03 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.17  2013-01-20 13:18:10  pauloscustodio
+/* Revision 1.18  2013-01-24 23:03:03  pauloscustodio
+/* Replaced (unsigned char) by (byte_t)
+/* Replaced (unisigned int) by (size_t)
+/* Replaced (short) by (int)
+/*
+/* Revision 1.17  2013/01/20 13:18:10  pauloscustodio
 /* BUG_0024 : (ix+128) should show warning message
 /* Signed integer range was wrongly checked to -128..255 instead
 /* of -128..127
@@ -117,6 +122,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 #include <stdlib.h>
 #include "avltree.h"    /* base symbol data structures and routines */
+#include "types.h"
 
 /* Structured data types : */
 
@@ -136,7 +142,7 @@ enum symbols        { space, strconq, dquote, squote, semicolon, comma, fullstop
 struct pageref
 {
     struct pageref     *nextref;          /* pointer to next page reference of symbol */
-    short              pagenr;            /* page number where symbol is referenced */
+    int              pagenr;            /* page number where symbol is referenced */
 };                                      /* the first symbol node in identifies the symbol definition */
 
 struct symref
@@ -158,7 +164,7 @@ struct postfixlist
     long               operandconst;
     enum symbols       operatortype;
     char               *id;               /* pointer to identifier */
-    unsigned char      type;              /* type of identifier (local, global, rel. address or constant) */
+    byte_t			   type;              /* type of identifier (local, global, rel. address or constant) */
 };
 
 struct expr
@@ -166,13 +172,13 @@ struct expr
     struct expr        *nextexpr;         /* pointer to next expression */
     struct postfixlist *firstnode;
     struct postfixlist *currentnode;
-    unsigned char      rangetype;         /* range type of evaluated expression */
+    byte_t			   rangetype;         /* range type of evaluated expression */
     enum flag          stored;            /* Flag to indicate that expression has been stored to object file */
     char               *infixexpr;        /* pointer to ASCII infix expression */
     char               *infixptr;         /* pointer to current char in infix expression */
     size_t             codepos;           /* rel. position in module code to patch (in pass 2) */
     char               *srcfile;          /* expr. in file 'srcfile' - allocated name area deleted by ReleaseFile */
-    int                 curline;           /* expression in line of source file */
+    int                curline;           /* expression in line of source file */
     long               listpos;           /* position in listing file to patch (in pass 2) */
 };
 
@@ -208,13 +214,13 @@ struct JRPC_Hdr
 struct JRPC
 {
     struct JRPC        *nextref;          /* pointer to next JR address reference  */
-    unsigned short     PCaddr;            /* absolute of PC address of JR instruction  */
+    size_t			   PCaddr;            /* absolute of PC address of JR instruction  */
 };
 
 
 typedef struct node
 {
-    unsigned char     type;              /* type of symbol  */
+    byte_t     type;              /* type of symbol  */
     char              *symname;          /* pointer to symbol identifier */
     long              symvalue;          /* value of symbol */
     struct symref     *references;       /* pointer to all found references of symbol */

@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.18 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.19 2013-01-24 23:03:03 pauloscustodio Exp $ */
 /* $Log: ldinstr.c,v $
-/* Revision 1.18  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.19  2013-01-24 23:03:03  pauloscustodio
+/* Replaced (unsigned char) by (byte_t)
+/* Replaced (unisigned int) by (size_t)
+/* Replaced (short) by (int)
+/*
+/* Revision 1.18  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.17  2012/11/03 17:39:36  pauloscustodio
@@ -336,7 +341,7 @@ LD( void )
                             }
 
                             destreg &= 7;
-                            append_byte( ( unsigned char )( destreg * 0x08 + 0x06 ) );
+                            append_byte( (byte_t)( destreg * 0x08 + 0x06 ) );
                             ExprUnsigned8( 1 );
                             inc_PC( 2 );
                             return;
@@ -395,7 +400,7 @@ LD( void )
                         sourcereg &= 7;
                         destreg &= 7;
 
-                        append_byte( ( unsigned char )( 0x40 + destreg * 0x08 + sourcereg ) );  /* LD  r,r  */
+                        append_byte( (byte_t)( 0x40 + destreg * 0x08 + sourcereg ) );  /* LD  r,r  */
                         inc_PC( 1 );
                     }
                 }
@@ -436,7 +441,7 @@ LD_HL8bit_indrct( void )
                 break;
 
             default:
-                append_byte( ( unsigned char )( 0x70 + sourcereg ) );         /* LD  (HL),r  */
+                append_byte( (byte_t)( 0x70 + sourcereg ) );         /* LD  (HL),r  */
                 inc_PC( 1 );
                 break;
         }
@@ -499,7 +504,7 @@ LD_index8bit_indrct( int destreg )
                 break;
 
             default:
-                patch_byte( &opcodeptr, ( unsigned char )( 112 + sourcereg ) );       /* LD  (IX|IY+d),r  */
+                patch_byte( &opcodeptr, (byte_t)( 112 + sourcereg ) );       /* LD  (IX|IY+d),r  */
                 inc_PC( 3 );
                 break;
         }                       /* end switch */
@@ -522,7 +527,7 @@ LD_r_8bit_indrct( int destreg )
     switch ( sourcereg = IndirectRegisters() )
     {
         case 2:
-            append_byte( ( unsigned char )( 0x40 + destreg * 0x08 + 0x06 ) ); /* LD   r,(HL)  */
+            append_byte( (byte_t)( 0x40 + destreg * 0x08 + 0x06 ) ); /* LD   r,(HL)  */
             inc_PC( 1 );
             break;
 
@@ -537,7 +542,7 @@ LD_r_8bit_indrct( int destreg )
                 append_byte( 0xFD );
             }
 
-            append_byte( ( unsigned char )( 0x40 + destreg * 0x08 + 0x06 ) );
+            append_byte( (byte_t)( 0x40 + destreg * 0x08 + 0x06 ) );
             ExprSigned8( 2 );
             inc_PC( 3 );
             break;
@@ -629,7 +634,7 @@ LD_address_indrct( long exprptr )
             case 1:         /* LD  (nn),dd   => dd: BC,DE,SP  */
             case 3:
                 append_byte( 0xED );
-                append_byte( ( unsigned char )( 0x43 + sourcereg * 0x10 ) );
+                append_byte( (byte_t)( 0x43 + sourcereg * 0x10 ) );
                 bytepos = 2;
                 inc_PC( 2 );
                 break;
@@ -725,7 +730,7 @@ LD_16bit_reg( void )
 
                     default:
                         append_byte( 0xED );
-                        append_byte( ( unsigned char )( 0x4B + destreg * 0x10 ) );
+                        append_byte( (byte_t)( 0x4B + destreg * 0x10 ) );
                         bytepos = 2;
                         inc_PC( 2 );
                         break;
@@ -762,7 +767,7 @@ LD_16bit_reg( void )
                                 break;
 
                             default:
-                                append_byte( ( unsigned char )( destreg * 0x10 + 0x01 ) );
+                                append_byte( (byte_t)( destreg * 0x10 + 0x01 ) );
                                 bytepos = 1;
                                 inc_PC( 1 );
                                 break;

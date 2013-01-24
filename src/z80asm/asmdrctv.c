@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.36 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.37 2013-01-24 23:03:03 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.36  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.37  2013-01-24 23:03:03  pauloscustodio
+/* Replaced (unsigned char) by (byte_t)
+/* Replaced (unisigned int) by (size_t)
+/* Replaced (short) by (int)
+/*
+/* Revision 1.36  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.35  2012/11/03 17:39:36  pauloscustodio
@@ -295,7 +300,7 @@ void UNDEFINE( void );
 /* global variables */
 extern FILE *z80asmfile, *listfile;
 extern char ident[], stringconst[];
-extern unsigned short DEFVPC;
+extern size_t DEFVPC;
 extern enum symbols sym;
 extern enum flag writeline, EOL;
 extern struct modules *modulehdr;
@@ -448,7 +453,7 @@ DEFVARS( void )
 
         if ( ( offset != -1 ) && ( offset != 0 ) )
         {
-            DEFVPC = ( unsigned short )offset;
+            DEFVPC = (size_t)offset;
             globaldefv = ON;
         }
         else
@@ -508,7 +513,7 @@ DEFVARS( void )
 
         if ( globaldefv == ON )
         {
-            DEFVPC = ( unsigned short )offset;
+            DEFVPC = (size_t)offset;
         }
     }
 }
@@ -662,7 +667,7 @@ DEFS()
 
                 while ( constant-- )
                 {
-                    append_byte( ( unsigned char ) val );
+                    append_byte( (byte_t) val );
                 }
             }
             else
@@ -977,7 +982,7 @@ DEFM( void )
                 {
                     if ( constant != '\"' )
                     {
-                        append_byte( ( unsigned char ) constant );
+                        append_byte( (byte_t) constant );
                         ++bytepos;
                         inc_PC( 1 );
                     }

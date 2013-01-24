@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.46 2013-01-20 13:18:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.47 2013-01-24 23:03:03 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.46  2013-01-20 13:18:10  pauloscustodio
+/* Revision 1.47  2013-01-24 23:03:03  pauloscustodio
+/* Replaced (unsigned char) by (byte_t)
+/* Replaced (unisigned int) by (size_t)
+/* Replaced (short) by (int)
+/*
+/* Revision 1.46  2013/01/20 13:18:10  pauloscustodio
 /* BUG_0024 : (ix+128) should show warning message
 /* Signed integer range was wrongly checked to -128..255 instead
 /* of -128..127
@@ -355,8 +360,8 @@ extern char Z80objhdr[];
 extern enum symbols sym, GetSym( void );
 extern enum flag writeline;
 extern enum flag EOL, library;
-extern unsigned char PAGELEN;
-extern unsigned char reloc_routine[];
+extern byte_t PAGELEN;
+extern byte_t reloc_routine[];
 extern int listfileptr;
 extern struct modules *modulehdr;
 extern struct liblist *libraryhdr;
@@ -368,7 +373,7 @@ extern size_t sizeof_relocroutine;
 
 struct linklist *linkhdr;
 struct libfile *CURRENTLIB;
-unsigned short totaladdr, curroffset, sizeof_reloctable;
+size_t totaladdr, curroffset, sizeof_reloctable;
 
 /* static variables */
 static FILE *mapfile;
@@ -512,14 +517,14 @@ ReadExpr( long nextexpr, long endexpr )
                         if ( constant < -128 || constant > 255 )
 							warning( ERR_INT_RANGE_EXPR, constant, line );
 
-                        patch_byte( &patchptr, ( unsigned char ) constant );
+                        patch_byte( &patchptr, (byte_t) constant );
                         break;
 
                     case 'S':
                         if ( constant < -128 || constant > 127 )
 							warning( ERR_INT_RANGE_EXPR, constant, line );
 
-						patch_byte( &patchptr, ( unsigned char ) constant );    /* opcode is stored, now store signed 8bit value */
+						patch_byte( &patchptr, (byte_t) constant );    /* opcode is stored, now store signed 8bit value */
                         break;
 
                     case 'C':
@@ -536,19 +541,19 @@ ReadExpr( long nextexpr, long endexpr )
 
                                 if ( ( constant >= 0 ) && ( constant <= 255 ) )
                                 {
-                                    *relocptr++ = ( unsigned char ) constant;
+                                    *relocptr++ = (byte_t) constant;
                                     sizeof_reloctable++;
                                 }
                                 else
                                 {
                                     *relocptr++ = 0;
-                                    *relocptr++ = ( unsigned short )( get_PC() - curroffset ) % 256U;
-                                    *relocptr++ = ( unsigned short )( get_PC() - curroffset ) / 256U;
+                                    *relocptr++ = (size_t)( get_PC() - curroffset ) % 256U;
+                                    *relocptr++ = (size_t)( get_PC() - curroffset ) / 256U;
                                     sizeof_reloctable += 3;
                                 }
 
                                 totaladdr++;
-                                curroffset = ( unsigned short )get_PC();
+                                curroffset = (size_t)get_PC();
                             }
 
                         break;
@@ -1165,10 +1170,10 @@ CreateBinFile( void )
     if ( autorelocate == ON && totaladdr != 0 )
     {
         fwritec_err( reloc_routine, sizeof_relocroutine, binaryfile );   /* relocate routine */
-        *( reloctable + 0 ) = ( unsigned short ) totaladdr % 256U;
-        *( reloctable + 1 ) = ( unsigned short ) totaladdr / 256U;    /* total of relocation elements */
-        *( reloctable + 2 ) = ( unsigned short ) sizeof_reloctable % 256U;
-        *( reloctable + 3 ) = ( unsigned short ) sizeof_reloctable / 256U; /* total size of relocation table elements */
+        *( reloctable + 0 ) = (size_t) totaladdr % 256U;
+        *( reloctable + 1 ) = (size_t) totaladdr / 256U;    /* total of relocation elements */
+        *( reloctable + 2 ) = (size_t) sizeof_reloctable % 256U;
+        *( reloctable + 3 ) = (size_t) sizeof_reloctable / 256U; /* total size of relocation table elements */
 
         fwritec_err( reloctable, sizeof_reloctable + 4, binaryfile );    /* write relocation table, inclusive 4 byte header */
         printf( "Relocation header is %d bytes.\n", ( int )( sizeof_relocroutine + sizeof_reloctable + 4 ) );

@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.65 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.66 2013-01-24 23:03:03 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.65  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.66  2013-01-24 23:03:03  pauloscustodio
+/* Replaced (unsigned char) by (byte_t)
+/* Replaced (unisigned int) by (size_t)
+/* Replaced (short) by (int)
+/*
+/* Revision 1.65  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.64  2012/11/03 17:39:36  pauloscustodio
@@ -511,7 +516,7 @@ enum flag EOL, library, createlibrary;
 
 int PAGENR, LINENR;
 long TOTALLINES;
-unsigned char PAGELEN;
+byte_t PAGELEN;
 int TAB_DIST = 8, COLUMN_WIDTH;
 char line[255], stringconst[255], ident[FILENAME_MAX + 1];
 
@@ -527,7 +532,7 @@ char Z80objhdr[] = "Z80RMF01";
 char objhdrprefix[] = "oomodnexprnamelibnmodc";
 char Z80libhdr[] = "Z80LMF01";
 
-unsigned char reloc_routine[] =
+byte_t reloc_routine[] =
     "\x08\xD9\xFD\xE5\xE1\x01\x49\x00\x09\x5E\x23\x56\xD5\x23\x4E\x23"
     "\x46\x23\xE5\x09\x44\x4D\xE3\x7E\x23\xB7\x20\x06\x5E\x23\x56\x23"
     "\x18\x03\x16\x00\x5F\xE3\x19\x5E\x23\x56\xEB\x09\xEB\x72\x2B\x73"
@@ -539,7 +544,7 @@ size_t sizeof_relocroutine = 73;
 char *reloctable = NULL, *relocptr = NULL;
 
 long listfileptr;
-unsigned short DEFVPC;          /* DEFVARS address counter */
+size_t DEFVPC;          /* DEFVARS address counter */
 size_t EXPLICIT_ORIGIN;         /* origin defined from command line */
 time_t asmtime;                 /* time   of assembly in seconds */
 char *date;                     /* pointer to datestring calculated from asmtime */

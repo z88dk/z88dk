@@ -16,9 +16,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.6 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.7 2013-01-24 23:03:03 pauloscustodio Exp $ */
 /* $Log: codearea.h,v $
-/* Revision 1.6  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.7  2013-01-24 23:03:03  pauloscustodio
+/* Replaced (unsigned char) by (byte_t)
+/* Replaced (unisigned int) by (size_t)
+/* Replaced (short) by (int)
+/*
+/* Revision 1.6  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.5  2012/11/03 17:39:35  pauloscustodio
@@ -60,6 +65,7 @@ Manage the code area in memory
 #define OBJFILE_H
 
 #include "memalloc.h"   /* before any other include */
+#include "types.h"
 
 #include <stdio.h>
 
@@ -91,8 +97,8 @@ extern void fread_codearea_offset( FILE *stream, size_t offset, size_t size );  
 
 /* patch a value at a position, or append to the end of the code area */
 /* the patch address is incremented after store */
-extern void  patch_byte( size_t *paddr, unsigned char byte );   /* one byte */
-extern void append_byte( unsigned char byte );
+extern void  patch_byte( size_t *paddr, byte_t byte );   /* one byte */
+extern void append_byte( byte_t byte );
 
 extern void  patch_word( size_t *paddr, int word );             /* 2-byte word */
 extern void append_word( int word );
@@ -102,7 +108,7 @@ extern void append_long( long dword );
 
 /* get a byte at the given address */
 /* the patch address is incremented after fetch */
-extern unsigned char get_byte( size_t *paddr );
+extern byte_t get_byte( size_t *paddr );
 
 #endif /* ndef OBJFILE_H */
 

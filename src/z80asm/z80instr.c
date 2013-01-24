@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.32 2013-01-20 12:50:05 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.33 2013-01-24 23:03:03 pauloscustodio Exp $ */
 /* $Log: z80instr.c,v $
-/* Revision 1.32  2013-01-20 12:50:05  pauloscustodio
+/* Revision 1.33  2013-01-24 23:03:03  pauloscustodio
+/* Replaced (unsigned char) by (byte_t)
+/* Replaced (unisigned int) by (size_t)
+/* Replaced (short) by (int)
+/*
+/* Revision 1.32  2013/01/20 12:50:05  pauloscustodio
 /* BUG_0025 : JR at org 0 with out-of-range jump crashes WriteListFile()
 /* jr instruction on address 0, with out of range argument ->
 /* jr calls error and writes incomplete opcode (only one byte);
@@ -261,24 +266,24 @@ PushPop_instr( int opcode )
             case REG16_BC:
             case REG16_DE:
             case REG16_HL:
-                append_byte( ( unsigned char )( opcode + qq * 0x10 ) );
+                append_byte( (byte_t)( opcode + qq * 0x10 ) );
                 inc_PC( 1 );
                 break;
 
             case REG16_AF:
-                append_byte( ( unsigned char )( opcode + 0x30 ) );
+                append_byte( (byte_t)( opcode + 0x30 ) );
                 inc_PC( 1 );
                 break;
 
             case REG16_IX:
                 append_byte( 0xDD );
-                append_byte( ( unsigned char )( opcode + 0x20 ) );
+                append_byte( (byte_t)( opcode + 0x20 ) );
                 inc_PC( 2 );
                 break;
 
             case REG16_IY:
                 append_byte( 0xFD );
-                append_byte( ( unsigned char )( opcode + 0x20 ) );
+                append_byte( (byte_t)( opcode + 0x20 ) );
                 inc_PC( 2 );
                 break;
 
@@ -302,7 +307,7 @@ RET( void )
         case name:
             if ( ( constant = CheckCondition() ) != -1 )
             {
-                append_byte( ( unsigned char )( 0xC0 + constant * 0x08 ) );    /* RET cc  instruction opcode */
+                append_byte( (byte_t)( 0xC0 + constant * 0x08 ) );    /* RET cc  instruction opcode */
             }
             else
             {
@@ -481,7 +486,7 @@ OUT( void )
 
                             default:
                                 append_byte( 0xED );
-                                append_byte( ( unsigned char )( 0x41 + reg * 0x08 ) ); /* OUT (C),r  */
+                                append_byte( (byte_t)( 0x41 + reg * 0x08 ) ); /* OUT (C),r  */
                                 inc_PC( 2 );
                                 break;
                         }
@@ -579,7 +584,7 @@ IN( void )
                 {
                     case 1:
                         append_byte( 0xED );
-                        append_byte( ( unsigned char )( 0x40 + inreg * 0x08 ) ); /* IN r,(C) */
+                        append_byte( (byte_t)( 0x40 + inreg * 0x08 ) ); /* IN r,(C) */
                         inc_PC( 2 );
                         break;
 
@@ -695,7 +700,7 @@ RST( void )
                 }
                 else
                 {
-                    append_byte( ( unsigned char )( 0xC7 + constant ) ); /* RST  00H, ... 38H */
+                    append_byte( (byte_t)( 0xC7 + constant ) ); /* RST  00H, ... 38H */
                     inc_PC( 1 );
                 }
             }
@@ -735,7 +740,7 @@ void CALL_OZ( void )
 
             if ( ( constant > 0 ) && ( constant <= 255 ) )
             {
-                append_byte( ( unsigned char )constant ); /* 1 byte OZ parameter */
+                append_byte( (byte_t)constant ); /* 1 byte OZ parameter */
                 inc_PC( 1 );
             }
             else if ( ( constant > 255 ) && ( constant <= 65535 ) )
@@ -872,7 +877,7 @@ FPP( void )
 
             if ( ( constant > 0 ) && ( constant < 255 ) )
             {
-                append_byte( ( unsigned char )constant ); /* 1 byte OZ parameter */
+                append_byte( (byte_t)constant ); /* 1 byte OZ parameter */
                 inc_PC( 1 );
             }
             else
@@ -923,28 +928,28 @@ Subroutine_addr( int opcode0, int opcode )
                 case FLAGS_NZ:  /* nz */
                     append_byte( 0x28 ); /* jr z */
                     append_byte( 0x03 );
-                    append_byte( ( unsigned char )opcode0 );
+                    append_byte( (byte_t)opcode0 );
                     inc_PC( 2 );
                     break;
 
                 case FLAGS_Z:  /* z */
                     append_byte( 0x20 ); /* jr nz */
                     append_byte( 0x03 );
-                    append_byte( ( unsigned char )opcode0 );
+                    append_byte( (byte_t)opcode0 );
                     inc_PC( 2 );
                     break;
 
                 case FLAGS_NC:  /* nc */
                     append_byte( 0x38 ); /* jr c */
                     append_byte( 0x03 );
-                    append_byte( ( unsigned char )opcode0 );
+                    append_byte( (byte_t)opcode0 );
                     inc_PC( 2 );
                     break;
 
                 case FLAGS_C:  /* c */
                     append_byte( 0x30 ); /* jr nc */
                     append_byte( 0x03 );
-                    append_byte( ( unsigned char )opcode0 );
+                    append_byte( (byte_t)opcode0 );
                     inc_PC( 2 );
                     break;
 
@@ -995,14 +1000,14 @@ Subroutine_addr( int opcode0, int opcode )
         }
         else
         {
-            append_byte( ( unsigned char )( opcode + constant * 0x08 ) ); /* get instruction opcode */
+            append_byte( (byte_t)( opcode + constant * 0x08 ) ); /* get instruction opcode */
         }
 
         GetSym();
     }
     else
     {
-        append_byte( ( unsigned char )opcode0 );    /* JP nn, CALL nn */
+        append_byte( (byte_t)opcode0 );    /* JP nn, CALL nn */
     }
 
     ExprAddress( 1 );
@@ -1072,7 +1077,7 @@ JR( void )
             case FLAGS_Z:
             case FLAGS_NC:
             case FLAGS_C:
-                append_byte( ( unsigned char )( 0x20 + constant * 0x08 ) );
+                append_byte( (byte_t)( 0x20 + constant * 0x08 ) );
 
                 if ( GetSym() == comma )
                 {
@@ -1115,7 +1120,7 @@ JR( void )
 
             if ( ( constant >= -128 ) && ( constant <= 127 ) )
             {
-                append_byte( ( unsigned char )( constant ) );    /* opcode is stored, now store relative jump */
+                append_byte( (byte_t)( constant ) );    /* opcode is stored, now store relative jump */
             }
             else
             {
@@ -1159,7 +1164,7 @@ DJNZ( void )
 
             if ( ( constant >= -128 ) && ( constant <= 127 ) )
             {
-                append_byte( ( unsigned char )( constant ) );    /* opcode is stored, now store relative jump */
+                append_byte( (byte_t)( constant ) );    /* opcode is stored, now store relative jump */
             }
             else
             {
@@ -1178,7 +1183,7 @@ NewJRaddr( void )
 
     newJRPC = xcalloc_struct( struct JRPC );
     newJRPC->nextref = NULL;
-    newJRPC->PCaddr = ( unsigned short )get_PC();
+    newJRPC->PCaddr = (size_t)get_PC();
 
     if ( CURRENTMODULE->JRaddr->firstref == NULL )
     {
@@ -1220,7 +1225,7 @@ ADD( void )
 
                 if ( reg16 >= 0 && reg16 <= 3 )
                 {
-                    append_byte( ( unsigned char )( 0x09 + 0x10 * reg16 ) );  /* ADD HL,rr */
+                    append_byte( (byte_t)( 0x09 + 0x10 * reg16 ) );  /* ADD HL,rr */
                     inc_PC( 1 );
                 }
                 else
@@ -1277,7 +1282,7 @@ ADD( void )
                     append_byte( 0xFD );
                 }
 
-                append_byte( ( unsigned char )( 0x09 + 0x10 * reg16 ) );
+                append_byte( (byte_t)( 0x09 + 0x10 * reg16 ) );
                 inc_PC( 2 );
             }
             else
@@ -1319,7 +1324,7 @@ SBC( void )
                 if ( reg16 >= 0 && reg16 <= 3 )
                 {
                     append_byte( 0xED );
-                    append_byte( ( unsigned char )( 0x42 + 0x10 * reg16 ) );
+                    append_byte( (byte_t)( 0x42 + 0x10 * reg16 ) );
                     inc_PC( 2 );
                 }
                 else
@@ -1367,7 +1372,7 @@ ADC( void )
                 if ( reg16 >= 0 && reg16 <= 3 )
                 {
                     append_byte( 0xED );
-                    append_byte( ( unsigned char )( 0x4A + 0x10 * reg16 ) );
+                    append_byte( (byte_t)( 0x4A + 0x10 * reg16 ) );
                     inc_PC( 2 );
                 }
                 else
@@ -1402,7 +1407,7 @@ ArithLog8_instr( int opcode )
         switch ( reg = IndirectRegisters() )
         {
             case 2:
-                append_byte( ( unsigned char )( 0x80 + opcode * 0x08 + 0x06 ) ); /* xxx  A,(HL) */
+                append_byte( (byte_t)( 0x80 + opcode * 0x08 + 0x06 ) ); /* xxx  A,(HL) */
                 inc_PC( 1 );
                 break;
 
@@ -1417,7 +1422,7 @@ ArithLog8_instr( int opcode )
                     append_byte( 0xFD );    /* xxx A,(IY+d) */
                 }
 
-                append_byte( ( unsigned char )( 0x80 + opcode * 0x08 + 0x06 ) );
+                append_byte( (byte_t)( 0x80 + opcode * 0x08 + 0x06 ) );
                 ExprSigned8( 2 );
                 inc_PC( 3 );
                 break;
@@ -1435,7 +1440,7 @@ ArithLog8_instr( int opcode )
         {
                 /* 8bit register wasn't found, try to evaluate an expression */
             case -1:
-                append_byte( ( unsigned char )( 0xC0 + opcode * 0x08 + 0x06 ) ); /* xxx  A,n */
+                append_byte( (byte_t)( 0xC0 + opcode * 0x08 + 0x06 ) ); /* xxx  A,n */
                 ExprUnsigned8( 1 );
                 inc_PC( 2 );
                 break;
@@ -1474,7 +1479,7 @@ ArithLog8_instr( int opcode )
 
                 reg &= 7;
 
-                append_byte( ( unsigned char )( 0x80 + opcode * 0x08 + reg ) ); /* xxx  A,r */
+                append_byte( (byte_t)( 0x80 + opcode * 0x08 + reg ) ); /* xxx  A,r */
                 inc_PC( 1 );
                 break;
         }
@@ -1513,7 +1518,7 @@ INC( void )
             break;
 
         default:
-            append_byte( ( unsigned char )( 0x03 + reg16 * 0x10 ) );
+            append_byte( (byte_t)( 0x03 + reg16 * 0x10 ) );
             inc_PC( 1 );
             break;
     }
@@ -1550,7 +1555,7 @@ DEC( void )
             break;
 
         default:
-            append_byte( ( unsigned char )( 0x0B + reg16 * 0x10 ) );
+            append_byte( (byte_t)( 0x0B + reg16 * 0x10 ) );
             inc_PC( 1 );
             break;
     }
@@ -1567,7 +1572,7 @@ IncDec_8bit_instr( int opcode )
         switch ( reg = IndirectRegisters() )
         {
             case 2:
-                append_byte( ( unsigned char )( 0x30 + opcode ) ); /* INC/DEC (HL) */
+                append_byte( (byte_t)( 0x30 + opcode ) ); /* INC/DEC (HL) */
                 inc_PC( 1 );
                 break;
 
@@ -1582,7 +1587,7 @@ IncDec_8bit_instr( int opcode )
                     append_byte( 0xFD );    /* INC/DEC (IY+d) */
                 }
 
-                append_byte( ( unsigned char )( 0x30 + opcode ) );
+                append_byte( (byte_t)( 0x30 + opcode ) );
                 ExprSigned8( 2 );
                 inc_PC( 3 );
                 break;
@@ -1616,7 +1621,7 @@ IncDec_8bit_instr( int opcode )
                 }
 
                 append_byte( 0xDD );
-                append_byte( ( unsigned char )( ( reg & 0x07 ) * 0x08 + opcode ) ); /* INC/DEC  ixh,ixl */
+                append_byte( (byte_t)( ( reg & 0x07 ) * 0x08 + opcode ) ); /* INC/DEC  ixh,ixl */
                 inc_PC( 2 );
                 break;
 
@@ -1629,12 +1634,12 @@ IncDec_8bit_instr( int opcode )
                 }
 
                 append_byte( 0xFD );
-                append_byte( ( unsigned char )( ( reg & 0x07 ) * 0x08 + opcode ) ); /* INC/DEC  iyh,iyl */
+                append_byte( (byte_t)( ( reg & 0x07 ) * 0x08 + opcode ) ); /* INC/DEC  iyh,iyl */
                 inc_PC( 2 );
                 break;
 
             default:
-                append_byte( ( unsigned char )( reg * 0x08 + opcode ) );  /* INC/DEC  r */
+                append_byte( (byte_t)( reg * 0x08 + opcode ) );  /* INC/DEC  r */
                 inc_PC( 1 );
                 break;
         }
@@ -1673,7 +1678,7 @@ BitTest_instr( int opcode )
                         {
                             case 2:
                                 append_byte( 0xCB );  /* (HL)  */
-                                append_byte( ( unsigned char )( opcode + bitnumber * 0x08 + 0x06 ) );
+                                append_byte( (byte_t)( opcode + bitnumber * 0x08 + 0x06 ) );
                                 inc_PC( 2 );
                                 break;
 
@@ -1690,7 +1695,7 @@ BitTest_instr( int opcode )
 
                                 append_byte( 0xCB );
                                 ExprSigned8( 2 );
-                                append_byte( ( unsigned char )( opcode + bitnumber * 0x08 + 0x06 ) );
+                                append_byte( (byte_t)( opcode + bitnumber * 0x08 + 0x06 ) );
                                 inc_PC( 4 );
                                 break;
 
@@ -1715,7 +1720,7 @@ BitTest_instr( int opcode )
 
                             default:
                                 append_byte( 0xCB );
-                                append_byte( ( unsigned char )( opcode + bitnumber * 0x08 + reg ) );
+                                append_byte( (byte_t)( opcode + bitnumber * 0x08 + reg ) );
                                 inc_PC( 2 );
                         }
                     }
@@ -1746,7 +1751,7 @@ RotShift_instr( int opcode )
         {
             case 2:
                 append_byte( 0xCB );
-                append_byte( ( unsigned char )( opcode * 0x08 + 0x06 ) );
+                append_byte( (byte_t)( opcode * 0x08 + 0x06 ) );
                 inc_PC( 2 );
                 break;
 
@@ -1763,7 +1768,7 @@ RotShift_instr( int opcode )
 
                 append_byte( 0xCB );
                 ExprSigned8( 2 );
-                append_byte( ( unsigned char )( opcode * 0x08 + 0x06 ) );
+                append_byte( (byte_t)( opcode * 0x08 + 0x06 ) );
                 inc_PC( 4 );
                 break;
 
@@ -1787,7 +1792,7 @@ RotShift_instr( int opcode )
 
             default:
                 append_byte( 0xCB );
-                append_byte( ( unsigned char )( opcode * 0x08 + reg ) );
+                append_byte( (byte_t)( opcode * 0x08 + reg ) );
                 inc_PC( 2 );
         }
     }

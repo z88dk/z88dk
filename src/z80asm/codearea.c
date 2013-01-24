@@ -16,9 +16,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.8 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.9 2013-01-24 23:03:03 pauloscustodio Exp $ */
 /* $Log: codearea.c,v $
-/* Revision 1.8  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.9  2013-01-24 23:03:03  pauloscustodio
+/* Replaced (unsigned char) by (byte_t)
+/* Replaced (unisigned int) by (size_t)
+/* Replaced (short) by (int)
+/*
+/* Revision 1.8  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.7  2012/05/26 18:51:10  pauloscustodio
@@ -95,7 +100,7 @@ void init_codearea_module( void )
 {
     /* allocate memory for Z80 machine code, will be cleaned by garbage collector
        in memalloc.c */
-    codearea = ( unsigned char * ) xcalloc( MAXCODESIZE, sizeof( char ) );
+    codearea = (byte_t *) xcalloc( MAXCODESIZE, sizeof( char ) );
 
     init_codearea();                    /* init vars */
 
@@ -111,10 +116,12 @@ size_t set_PC( size_t n )
 {
     return PC = n;
 }
+
 size_t inc_PC( size_t n )
 {
     return PC += n;
 }
+
 size_t get_PC( void )
 {
     return PC;
@@ -124,6 +131,7 @@ size_t set_oldPC( void )
 {
     return oldPC = PC;
 }
+
 size_t get_oldPC( void )
 {
     return oldPC;
@@ -208,13 +216,13 @@ void fread_codearea_offset( FILE *stream, size_t offset, size_t size )
 /*-----------------------------------------------------------------------------
 *   load data into code area
 *----------------------------------------------------------------------------*/
-void patch_byte( size_t *paddr, unsigned char byte )
+void patch_byte( size_t *paddr, byte_t byte )
 {
     check_space( *paddr, 1 );
     codearea[( *paddr )++] = byte;
 }
 
-void append_byte( unsigned char byte )
+void append_byte( byte_t byte )
 {
     patch_byte( &codeindex, byte );
 }
@@ -251,9 +259,9 @@ void append_long( long dword )
     patch_long( &codeindex, dword );
 }
 
-unsigned char get_byte( size_t *paddr )
+byte_t get_byte( size_t *paddr )
 {
-    unsigned char byte;
+    byte_t byte;
 
     E4C_ASSERT( *paddr >= 0 && *paddr < codeindex );
     byte = codearea[( *paddr )++];

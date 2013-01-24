@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.34 2013-01-20 13:18:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.35 2013-01-24 23:03:03 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.34  2013-01-20 13:18:10  pauloscustodio
+/* Revision 1.35  2013-01-24 23:03:03  pauloscustodio
+/* Replaced (unsigned char) by (byte_t)
+/* Replaced (unisigned int) by (size_t)
+/* Replaced (short) by (int)
+/*
+/* Revision 1.34  2013/01/20 13:18:10  pauloscustodio
 /* BUG_0024 : (ix+128) should show warning message
 /* Signed integer range was wrongly checked to -128..255 instead
 /* of -128..127
@@ -298,7 +303,7 @@ void WriteHeader( void );
 void LineCounter( void );
 void PatchListFile( struct expr *pass2expr, long c );
 void WriteMapFile( void );
-void StoreName( symbol *node, unsigned char symscope );
+void StoreName( symbol *node, byte_t symscope );
 void StoreLibReference( symbol *node );
 void StoreGlobalName( symbol *node );
 void StoreLocalName( symbol *node );
@@ -314,7 +319,7 @@ extern FILE *z80asmfile, *listfile, *objfile;
 extern char *date, line[], ident[], separators[];
 extern enum symbols sym;
 extern enum flag writeline, EOL;
-extern unsigned char PAGELEN;
+extern byte_t PAGELEN;
 extern long listfileptr, TOTALLINES;
 extern struct modules *modulehdr;       /* pointer to module header */
 extern struct module *CURRENTMODULE;
@@ -651,7 +656,7 @@ Z80pass2( void )
 
                         if ( constant >= -128 && constant <= 127 )
                         {
-                            patch_byte( &patchptr, ( unsigned char ) constant );
+                            patch_byte( &patchptr, (byte_t) constant );
                             /* opcode is stored, now store relative jump */
                         }
                         else
@@ -668,14 +673,14 @@ Z80pass2( void )
                         if ( constant < -128 || constant > 255 )
                             warning_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
 
-						patch_byte( &patchptr, ( unsigned char ) constant );
+						patch_byte( &patchptr, (byte_t) constant );
                         break;
 
                     case RANGE_8SIGN:
                         if ( constant < -128 || constant > 127 )
                             warning_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
 
-						patch_byte( &patchptr, ( unsigned char ) constant );
+						patch_byte( &patchptr, (byte_t) constant );
                         break;
 
                     case RANGE_16CONST:
@@ -806,7 +811,7 @@ StoreLocalName( symbol *node )
 
 
 void
-StoreName( symbol *node, unsigned char scope )
+StoreName( symbol *node, byte_t scope )
 {
     int b;
 
@@ -1003,17 +1008,17 @@ PatchListFile( struct expr *pass2expr, long c )
             case RANGE_JROFFSET:
             case RANGE_8UNSIGN:
             case RANGE_8SIGN:
-                fprintf( listfile, "%02X", ( unsigned int ) c );
+                fprintf( listfile, "%02X", (size_t) c );
                 break;
 
             case RANGE_16CONST:
-                fprintf( listfile, "%02X %02X", ( unsigned int )( c & 0xFF ), ( unsigned int )( c >> 8 ) );
+                fprintf( listfile, "%02X %02X", (size_t)( c & 0xFF ), (size_t)( c >> 8 ) );
                 break;
 
             case RANGE_32SIGN:
                 for ( i = 0; i < 4; i++ )
                 {
-                    fprintf( listfile, "%02X ", ( unsigned int )( c & 0xFF ) );
+                    fprintf( listfile, "%02X ", (size_t)( c & 0xFF ) );
                     c >>= 8;
                 }
 
@@ -1043,18 +1048,18 @@ WriteListFile( void )
 
     if ( len == 0 )
     {
-        fprintf( listfile, "%-4d  %04X%14s%s", CURRENTFILE->line, ( unsigned short ) get_oldPC(), "", line );    /* no bytes generated */
+        fprintf( listfile, "%-4d  %04X%14s%s", CURRENTFILE->line, get_oldPC(), "", line );    /* no bytes generated */
     }
     else if ( len <= 4 )
     {
-        fprintf( listfile, "%-4d  %04X  ", CURRENTFILE->line, ( unsigned short ) get_oldPC() );
+        fprintf( listfile, "%-4d  %04X  ", CURRENTFILE->line, get_oldPC() );
 
         for ( k = 0; k < len; k++ )
         {
             fprintf( listfile, "%02X ", get_byte( &byteptr ) );
         }
 
-        fprintf( listfile, "%*s%s", ( unsigned short )( 4 - len ) * 3, "", line );
+        fprintf( listfile, "%*s%s", ( 4 - len ) * 3, "", line );
     }
     else
     {
@@ -1064,7 +1069,7 @@ WriteListFile( void )
 
             if ( len )
             {
-                fprintf( listfile, "%-4d  %04X  ", CURRENTFILE->line, ( unsigned short )( get_PC() - len ) );
+                fprintf( listfile, "%-4d  %04X  ", CURRENTFILE->line, get_PC() - len );
             }
 
             for ( k = ( len - 32 > 0 ) ? 32 : len; k; k--, len-- )
