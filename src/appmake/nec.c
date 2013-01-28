@@ -6,7 +6,7 @@
  * 
  *        MC loader by Stefano Bodrato, (c) 2013
  *
- *        $Id: nec.c,v 1.1 2013-01-24 15:31:39 stefano Exp $
+ *        $Id: nec.c,v 1.2 2013-01-28 08:14:47 stefano Exp $
  */
 
 
@@ -18,8 +18,8 @@ static char             *outfile      = NULL;
 static int               origin       = -1;
 static int               mode         = -1;
 static char              help         = 0;
-//static char              audio        = 0;
-//static char              fast         = 0;
+static char              audio        = 0;
+static char              fast         = 0;
 //static char              dumb         = 0;
 
 
@@ -29,8 +29,8 @@ option_t nec_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
-//    {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
-//    {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
+    {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
+    {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
 //    {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
 	{  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  "mode",     "0..5: 16k,32k,mk2,n,ROM,n88", OPT_INT,  &mode },
@@ -61,6 +61,65 @@ enum {
 #define MODE5_ADDRESS_CODESEG 0x8037
 #define MODEN88_ADDRESS_CODESEG 0x0100
 #define MODEROM_ADDRESS_CODESEG 0x4004
+
+
+/* It is a sort of a fast mode KansasCity format,          */
+/* very close to the SC-3000                               */
+/* four fast cycles for '1', two slow cycles for '0'       */
+/* but the samples I've seen seem to have also an aplitude */
+/* variation, so here it is !                              */
+
+
+void nec_bit (FILE *fpout, unsigned char bit)
+{
+	int i, period0, period1;
+  
+	if ( fast ) {
+		period1 = 8;
+		period0 = 14;
+	} else {
+		period1 = 9;
+		period0 = 21;
+	}
+
+	if (bit) {
+		/* '1' */
+		  for (i=0; i < period1; i++)
+			fputc (0x30,fpout);
+		  for (i=0; i < period1; i++)
+			fputc (0xd0,fpout);
+		  for (i=0; i < period1; i++)
+			fputc (0x30,fpout);
+		  for (i=0; i < period1; i++)
+			fputc (0xd0,fpout);
+	} else {
+		/* '0' */
+		  for (i=0; i < (period0); i++)
+			fputc (0x10,fpout);
+		  for (i=0; i < (period0); i++)
+			fputc (0xf0,fpout);
+	}
+}
+
+void nec_rawout (FILE *fpout, unsigned char b)
+{
+  /* bit order is reversed ! */
+  static unsigned char c[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
+  int i;
+
+  /* 1 start bit */
+  nec_bit (fpout,0);
+
+  /* byte */
+  for (i=0; i < 8; i++)
+		nec_bit (fpout, (b & c[i]));
+
+  /* 2 stop bits */
+  nec_bit (fpout,1);
+  nec_bit (fpout,1);
+}
+
+
 
 // output file structure
 // 1/ prefix (prefix_length bytes)
@@ -157,9 +216,9 @@ int nec_exec(char *target)
     char       wavfile[FILENAME_MAX+1];
     char       name[12];
     FILE       *fpin, *fpout;
-    int        c;
-    int        i;
-    int        len;
+    int        c, i, j;
+    int        len, stage;
+    int        zerocount;
 
 	unsigned char* prefix;
 	int        prefix_length;
@@ -319,6 +378,110 @@ int nec_exec(char *target)
 		fclose(fpin);
 		fclose(fpout);
 //	}
+
+	/* ***************************************** */
+	/*  Now, if requested, create the audio file */
+	/* ***************************************** */
+	if (( audio ) || ( fast )) {
+		if ( (fpin=fopen(filename,"rb") ) == NULL ) {
+			fprintf(stderr,"Can't open file %s for wave conversion\n",filename);
+			myexit(NULL,1);
+		}
+
+        if (fseek(fpin,0,SEEK_END)) {
+           fclose(fpin);
+           myexit("Couldn't determine size of file\n",1);
+        }
+        len=ftell(fpin);
+        fseek(fpin,0,SEEK_SET);
+
+        strcpy(wavfile,filename);
+
+			suffix_change(wavfile,".RAW");
+
+		if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
+			fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
+			myexit(NULL,1);
+		}
+
+		/* leading silence */
+		for (i=0; i < 0x3000; i++)
+			fputc(0x20, fpout);
+
+
+		/* leading tone */
+		for (i=0; i < 3600; i++)
+			nec_bit (fpout,1);
+
+		stage=0;
+		
+		for (i=0; (i < len); i++) {
+			c=getc(fpin);
+			switch(stage)
+			{
+				// BASIC Header: seek for the filename termination
+				case 0:
+					if (c==0) {
+						nec_rawout(fpout,0);
+						stage++;
+						for (j=0; j < 600; j++)
+							nec_bit (fpout,1);
+						c=getc(fpin);
+					}
+					break;
+				// BASIC Block + MC stub: seek for more than 3 zeroes in sequence
+				case 1:
+					if ((c==0) && (zerocount == 3) ) {
+						stage++;
+						while ((c=getc(fpin)) == 0)
+							zerocount++;
+						for (j=3; j <= zerocount; j++)
+							nec_rawout(fpout,0);
+						zerocount = 0;	// Not necessary
+						for (j=0; j < 600; j++)
+							nec_bit (fpout,1);
+					}
+					break;
+				default:
+					break;
+					//fprintf(stderr,"Problems",origin);
+					//return -1;
+			}
+			nec_rawout(fpout,c);
+			if (c)
+				zerocount = 0;
+			else
+				zerocount++;
+		}
+
+		// tail
+		for (j=0; j < 200; j++)
+			nec_bit (fpout,1);
+
+		/* Data blocks */
+		//while (ftell(fpin) < len) {
+			/* leader tone (3600 records of bit 1) */
+		//	for (i=0; i < 3600; i++)
+		//		nec_bit (fpout,1);
+			/* data block */
+		//	blocklen = (getc(fpin) + 256 * getc(fpin));
+		//	for (i=0; (i < blocklen); i++) {
+		//		c=getc(fpin);
+		//		nec_rawout(fpout,c);
+		//	}
+		//}
+
+		/* trailing silence */
+		for (i=0; i < 0x10000; i++)
+			fputc(0x20, fpout);
+
+        fclose(fpin);
+        fclose(fpout);
+
+		/* Now complete with the WAV header */
+		raw2wav(wavfile);
+
+	}
 
     exit(0);
 }
