@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Lists of objects defined by class.h
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classlist.h,v 1.1 2013-01-30 00:39:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classlist.h,v 1.2 2013-01-30 20:38:59 pauloscustodio Exp $ */
 /* $Log: classlist.h,v $
-/* Revision 1.1  2013-01-30 00:39:25  pauloscustodio
+/* Revision 1.2  2013-01-30 20:38:59  pauloscustodio
+/* Double macro call not necessary
+/*
+/* Revision 1.1  2013/01/30 00:39:25  pauloscustodio
 /* New CLASS_LIST() to create lists of objects defined with CLASS()
 /*
 /*
@@ -54,8 +57,7 @@ while (obj = TList_next(list, &iter)) {...}
 /*-----------------------------------------------------------------------------
 *   Class declaration
 *----------------------------------------------------------------------------*/
-#define CLASS_LIST(T) _CLASS_LIST(T)
-#define _CLASS_LIST(T)														\
+#define CLASS_LIST(T) 														\
 	/* list element, contains obj pointer to T of element */				\
 	typedef struct T##ListElem												\
 	{																		\
@@ -76,8 +78,7 @@ while (obj = TList_next(list, &iter)) {...}
 /*-----------------------------------------------------------------------------
 *   Class definition
 *----------------------------------------------------------------------------*/
-#define DEF_CLASS_LIST(T) _DEF_CLASS_LIST(T)
-#define _DEF_CLASS_LIST(T)													\
+#define DEF_CLASS_LIST(T)													\
 	/* define the class */													\
 	DEF_CLASS(T##List)														\
 																			\

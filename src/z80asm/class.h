@@ -20,9 +20,12 @@ each object, which in turn may call destructors of contained objects.
 
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.5 2013-01-30 00:39:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.6 2013-01-30 20:38:59 pauloscustodio Exp $ */
 /* $Log: class.h,v $
-/* Revision 1.5  2013-01-30 00:39:25  pauloscustodio
+/* Revision 1.6  2013-01-30 20:38:59  pauloscustodio
+/* Double macro call not necessary
+/*
+/* Revision 1.5  2013/01/30 00:39:25  pauloscustodio
 /* New CLASS_LIST() to create lists of objects defined with CLASS()
 /*
 /* Revision 1.4  2013/01/20 21:10:32  pauloscustodio
@@ -86,8 +89,7 @@ struct ObjRegister;
 /*-----------------------------------------------------------------------------
 *   Start class declaration
 *----------------------------------------------------------------------------*/
-#define CLASS(T) _CLASS(T)
-#define _CLASS(T)                                                            \
+#define CLASS(T)	                                                        \
     /* forward declaration of struct */                                     \
     typedef struct T T;                                                     \
     /* constructor, copy constructor, destructor defined by DEF_CLASS() */  \
@@ -121,8 +123,7 @@ struct ObjRegister;
 /*-----------------------------------------------------------------------------
 *   Class definition
 *----------------------------------------------------------------------------*/
-#define DEF_CLASS(T) _DEF_CLASS(T)
-#define _DEF_CLASS(T)                                                        \
+#define DEF_CLASS(T)                                                        \
     /* constructor */                                                       \
     T * T##_new (void)                                                      \
     {                                                                       \
