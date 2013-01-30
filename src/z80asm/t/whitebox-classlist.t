@@ -13,13 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classlist.t,v 1.1 2013-01-30 00:39:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classlist.t,v 1.2 2013-01-30 00:48:29 pauloscustodio Exp $
 # $Log: whitebox-classlist.t,v $
-# Revision 1.1  2013-01-30 00:39:26  pauloscustodio
+# Revision 1.2  2013-01-30 00:48:29  pauloscustodio
+# Test OBJ_DELETE()
+#
+# Revision 1.1  2013/01/30 00:39:26  pauloscustodio
 # New CLASS_LIST() to create lists of objects defined with CLASS()
 #
-#
-# Test strlist
 
 use Modern::Perl;
 use Test::More;
@@ -111,6 +112,9 @@ END_INIT
 	T_NEXT(list2, "ABC");
 	T_NEXT(list2, "DEF");
 	T_END(list2);
+	
+	OBJ_DELETE(list2);
+	OBJ_DELETE(list);
 	
 	return 0;
 END
