@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.6 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.7 2013-01-30 20:40:07 pauloscustodio Exp $
 # $Log: whitebox-strlist.t,v $
-# Revision 1.6  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.7  2013-01-30 20:40:07  pauloscustodio
+# Test cases
+#
+# Revision 1.6  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.5  2013/01/19 01:33:16  pauloscustodio
@@ -51,63 +54,82 @@ t_compile_module(<<'END_INIT', <<'END', $compile);
 
 #define ERROR return __LINE__
 
-void _check_list (StrList *list, char *expected, char *file, int lineno)
-{
-	StrListElem *iter;
-	char *exp_string, *got_string;
-	char tokens[256], *tokensp;
-	
-	/* strtok cannot modify constant strings */
-	strcpy(tokens, expected);
-	tokensp = tokens;
-	
+#define T_START(list)							\
 	StrList_first(list, &iter);
-	while (1) {
-		exp_string = strtok(tokensp, " "); tokensp = NULL;
-		got_string = StrList_next(list, &iter);
-		
-		if (exp_string == NULL && got_string != NULL)
-			die(AssertionException, "%s(%d): got %s, expected end of list\n", 
-			    file, lineno, got_string);
-		else if (exp_string != NULL && got_string == NULL)
-			die(AssertionException, "%s(%d): got end of list, expected %s\n", 
-			    file, lineno, exp_string);
-		else if (exp_string == NULL && got_string == NULL)
-			break;		/* OK */
-		else if (strcmp(exp_string, got_string) != 0)
-			die(AssertionException, "%s(%d): got %s, expected %s\n", 
-			    file, lineno, got_string, exp_string);
-	}
-}	
 
-#define check_list(list,expected) _check_list(list,expected,__FILE__,__LINE__)
+#define T_NEXT(list, text)						\
+	str = StrList_next(list, &iter);			\
+	if (! str) 							ERROR;	\
+	if (strcmp(str, text)) 				ERROR;	\
+	if (str != iter->string)			ERROR;
+
+#define T_END(list)								\
+	str = StrList_next(list, &iter);			\
+	if (str) 							ERROR;
 
 END_INIT
 	/* main */
 	StrList *l1, *l2;
+	char *str;
+	StrListElem *iter;
 	
-	warn("init\n");
 	l1 = OBJ_NEW(StrList);
-	check_list(l1, "");
+	
+	T_START(l1);
+	T_END(l1);
 	
 	StrList_append(l1, "abc");
-	check_list(l1, "abc");
 
+	T_START(l1);
+	T_NEXT(l1, "abc");
+	T_END(l1);
+	
 	StrList_append(l1, "def");
-	check_list(l1, "abc def");
 
+	T_START(l1);
+	T_NEXT(l1, "abc");
+	T_NEXT(l1, "def");
+	T_END(l1);
+	
 	l2 = StrList_clone(l1);
-	check_list(l1, "abc def");
-	check_list(l2, "abc def");
+
+	T_START(l1);
+	T_NEXT(l1, "abc");
+	T_NEXT(l1, "def");
+	T_END(l1);
+	
+	T_START(l2);
+	T_NEXT(l2, "abc");
+	T_NEXT(l2, "def");
+	T_END(l2);
 	
 	StrList_append(l1, "ghi");
-	check_list(l1, "abc def ghi");
-	check_list(l2, "abc def");
 
+	T_START(l1);
+	T_NEXT(l1, "abc");
+	T_NEXT(l1, "def");
+	T_NEXT(l1, "ghi");
+	T_END(l1);
+	
+	T_START(l2);
+	T_NEXT(l2, "abc");
+	T_NEXT(l2, "def");
+	T_END(l2);
+	
 	StrList_append(l2, "jkl");
-	check_list(l1, "abc def ghi");
-	check_list(l2, "abc def jkl");
 
+	T_START(l1);
+	T_NEXT(l1, "abc");
+	T_NEXT(l1, "def");
+	T_NEXT(l1, "ghi");
+	T_END(l1);
+	
+	T_START(l2);
+	T_NEXT(l2, "abc");
+	T_NEXT(l2, "def");
+	T_NEXT(l2, "jkl");
+	T_END(l2);
+	
 	OBJ_DELETE(l1);
 	OBJ_DELETE(l2);
 	
@@ -115,7 +137,6 @@ END_INIT
 END
 
 t_run_module([], "", <<ERR, 0);
-init
 memalloc: init
 memalloc strlist.c(1): alloc 36 bytes at ADDR_1
 memalloc strpool.c(1): alloc 32 bytes at ADDR_2

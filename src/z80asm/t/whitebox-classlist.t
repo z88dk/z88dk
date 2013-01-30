@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classlist.t,v 1.2 2013-01-30 00:48:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classlist.t,v 1.3 2013-01-30 20:40:07 pauloscustodio Exp $
 # $Log: whitebox-classlist.t,v $
-# Revision 1.2  2013-01-30 00:48:29  pauloscustodio
+# Revision 1.3  2013-01-30 20:40:07  pauloscustodio
+# Test cases
+#
+# Revision 1.2  2013/01/30 00:48:29  pauloscustodio
 # Test OBJ_DELETE()
 #
 # Revision 1.1  2013/01/30 00:39:26  pauloscustodio
@@ -57,7 +60,8 @@ DEF_CLASS_LIST(Obj);
 #define T_NEXT(list, text)						\
 	obj = ObjList_next(list, &iter);			\
 	if (! obj) 							ERROR;	\
-	if (strcmp(obj->string, text)) 		ERROR;
+	if (strcmp(obj->string, text)) 		ERROR;	\
+	if (obj != iter->obj)				ERROR;
 
 #define T_END(list)								\
 	obj = ObjList_next(list, &iter);			\
@@ -113,6 +117,35 @@ END_INIT
 	T_NEXT(list2, "DEF");
 	T_END(list2);
 	
+	obj  = OBJ_NEW(Obj); strcpy(obj->string, "ghi");
+	ObjList_append(list, obj);
+
+	T_START(list);
+	T_NEXT(list, "abc");
+	T_NEXT(list, "def");
+	T_NEXT(list, "ghi");
+	T_END(list);
+	
+	T_START(list2);
+	T_NEXT(list2, "ABC");
+	T_NEXT(list2, "DEF");
+	T_END(list2);
+	
+	obj  = OBJ_NEW(Obj); strcpy(obj->string, "JKL");
+	ObjList_append(list2, obj);
+
+	T_START(list);
+	T_NEXT(list, "abc");
+	T_NEXT(list, "def");
+	T_NEXT(list, "ghi");
+	T_END(list);
+	
+	T_START(list2);
+	T_NEXT(list2, "ABC");
+	T_NEXT(list2, "DEF");
+	T_NEXT(list2, "JKL");
+	T_END(list2);
+	
 	OBJ_DELETE(list2);
 	OBJ_DELETE(list);
 	
@@ -135,12 +168,21 @@ memalloc test.c(5): alloc 12 bytes at ADDR_11
 memalloc test.c(4): alloc 32 bytes at ADDR_12
 memalloc test.c(2): alloc 4 bytes at ADDR_13
 memalloc test.c(5): alloc 12 bytes at ADDR_14
+memalloc test.c(4): alloc 32 bytes at ADDR_15
+memalloc test.c(1): alloc 12 bytes at ADDR_16
+memalloc test.c(5): alloc 12 bytes at ADDR_17
+memalloc test.c(4): alloc 32 bytes at ADDR_18
+memalloc test.c(1): alloc 12 bytes at ADDR_19
+memalloc test.c(5): alloc 12 bytes at ADDR_20
 memalloc test.c(3): free 4 bytes at ADDR_10 allocated at test.c(2)
 memalloc test.c(4): free 32 bytes at ADDR_9 allocated at test.c(4)
 memalloc test.c(5): free 12 bytes at ADDR_11 allocated at test.c(5)
 memalloc test.c(3): free 4 bytes at ADDR_13 allocated at test.c(2)
 memalloc test.c(4): free 32 bytes at ADDR_12 allocated at test.c(4)
 memalloc test.c(5): free 12 bytes at ADDR_14 allocated at test.c(5)
+memalloc test.c(3): free 12 bytes at ADDR_19 allocated at test.c(1)
+memalloc test.c(4): free 32 bytes at ADDR_18 allocated at test.c(4)
+memalloc test.c(5): free 12 bytes at ADDR_20 allocated at test.c(5)
 memalloc test.c(5): free 36 bytes at ADDR_8 allocated at test.c(5)
 memalloc test.c(3): free 12 bytes at ADDR_3 allocated at test.c(1)
 memalloc test.c(4): free 32 bytes at ADDR_2 allocated at test.c(4)
@@ -148,6 +190,9 @@ memalloc test.c(5): free 12 bytes at ADDR_4 allocated at test.c(5)
 memalloc test.c(3): free 12 bytes at ADDR_6 allocated at test.c(1)
 memalloc test.c(4): free 32 bytes at ADDR_5 allocated at test.c(4)
 memalloc test.c(5): free 12 bytes at ADDR_7 allocated at test.c(5)
+memalloc test.c(3): free 12 bytes at ADDR_16 allocated at test.c(1)
+memalloc test.c(4): free 32 bytes at ADDR_15 allocated at test.c(4)
+memalloc test.c(5): free 12 bytes at ADDR_17 allocated at test.c(5)
 memalloc test.c(5): free 36 bytes at ADDR_1 allocated at test.c(5)
 memalloc: cleanup
 ERR
