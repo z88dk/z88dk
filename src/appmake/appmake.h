@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.25 2013-01-24 15:31:39 stefano Exp $
+ *   $Id: appmake.h,v 1.26 2013-01-31 13:28:57 stefano Exp $
  */
 
 
@@ -260,7 +260,7 @@ extern void         writeword_cksum(unsigned int i, FILE *fp, unsigned long *cks
 
 extern void			raw2wav(char *rawfilename);
 
-extern void			zx_pilot(FILE *fpout);
+extern void			zx_pilot(int pilot_len, FILE *fpout);
 extern void			zx_rawbit(FILE *fpout, int period);
 extern void			zx_rawout (FILE *fpout, unsigned char b, char fast);
 

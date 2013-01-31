@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.12 2011-05-23 07:10:39 stefano Exp $
+ *   $Id: appmake.c,v 1.13 2013-01-31 13:28:57 stefano Exp $
  */
 
 #define MAIN_C
@@ -404,7 +404,8 @@ void raw2wav(char *wavfile)
 	remove (rawfilename);
 }
 
-void zx_pilot(FILE *fpout)
+/* Pilot lenght in standard mode is about 2000 */
+void zx_pilot(int pilot_len, FILE *fpout)
 {
   int i,j;
 
@@ -413,14 +414,14 @@ void zx_pilot(FILE *fpout)
     fputc (0x20,fpout);
 
   /* Then the beeeep */
-  for (j=0; j<2000; j++) {
+  for (j=0; j<pilot_len; j++) {
     for (i=0; i < 27; i++)
 	  fputc (0x20,fpout);
     for (i=0; i < 27; i++)
 	  fputc (0xe0,fpout);
   }
 
-  /* On audio output we force the carry flag to zero */
+  /* Sync */
   for (i=0; i < 8; i++)
 	fputc (0x20,fpout);
   for (i=0; i < 8; i++)

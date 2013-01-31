@@ -9,6 +9,7 @@
  *        Dominic Morris  - 10/03/2003 - integrated into appmake & options
  *        Stefano Bodrato - 19/07/2007 - BASIC block 'merge' feature
  *        Stefano Bodrato - 2010,2011  - AUDIO options and single BASIC block mode
+ *        Stefano Bodrato - 01/02/2013 - Turbo tape option
  *
  *        Creates a new TAP file (overwriting if necessary) just ready to run.
  *        You can use tapmaker to customize your work.
@@ -21,8 +22,19 @@
  *            PRINT PEEK 23635+256*PEEK 23636+5
  *        Advanced users can also see bin2bas-rem in the 'support/zx' directory
  *        and take benefit of the self-relocating code.
+ * 
+ *        The turbo tape option produces only valid WAV files.
+ *        It can be combined with the 'fast' flag to achieve extra speed.
+ *        The '.tap' file is left for advanced users for hand-editing which
+ *        can take benefit od the 'dumb' mode and 'patch' options
+ *        (i.e. the extra compile options:
+ *              -Cz--patchpos -Cz21 -Cz--patchdata -Czcd7f
+ *         ..will make the turbo loader ready for a title screen, then
+ *        some more sound editing will be necessary to add the picture
+ *        taken from a previously prepared audio file using the dumb/turbo options).
+ * 
  *
- *        $Id: zx.c,v 1.14 2012-05-07 06:05:43 stefano Exp $
+ *        $Id: zx.c,v 1.15 2013-01-31 13:28:57 stefano Exp $
  */
 
 #include "appmake.h"
@@ -35,9 +47,12 @@ static char             *outfile      = NULL;
 static char             *blockname    = NULL;
 static char             *merge        = NULL;
 static int               origin       = -1;
+static int               patchpos     = -1;
+static char             *patchdata    = NULL;
 static char              help         = 0;
 static char              audio        = 0;
 static char              ts2068       = 0;
+static char              turbo        = 0;
 static char              fast         = 0;
 static char              dumb         = 0;
 static char              noloader     = 0;
@@ -52,6 +67,9 @@ option_t zx_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "ts2068",   "TS2068 BASIC relocation (if possible)",  OPT_BOOL,  &ts2068 },
+    {  0,  "turbo",    "Turbo tape loader",          OPT_BOOL,  &turbo },
+    {  0,  "patchpos", "Turbo tape patch position",  OPT_INT,   &patchpos },
+    {  0,  "patchdata", "Turbo tape patch (i.e. cd7fff..)",  OPT_STR,   &patchdata },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "noloader",  "Don't create the loader block",  OPT_BOOL,  &noloader },
@@ -62,7 +80,32 @@ option_t zx_options[] = {
 };
 
 
-unsigned char ts_loader[] = { 
+//turbo Loader
+static unsigned char turbo_loader[] = { 
+0x60, 0x69,	    //  ld h,b / ld l,c
+17,36,0,        //	ld	de,36 (offset)
+0x19,           //	add	hl,de
+17,0x7f,0xff,   //	ld	de,65407
+1,128,0,        //	ld	bc,128
+0xed, 0xb0,     //	ldir
+221,33,0,64,    //	ld	ix,16384
+17,0,27,        //	ld	de,6912
+0,0,0,          //	placeholder for: call	65407
+221,33,0,128,   //	ld	ix,loc	(pos 26/27)
+17,0,255,       //	ld	de,len	(pos 29/30)
+205,0x7f,0xff,  //	call	65407
+0xfb, 0xc9,     //  ei / ret
+0x3E, 0xFF, 0x14, 0x08, 0x15, 0xF3, 0xDB, 0xFE, 0x1F, 0xE6, 0x20, 0x4F, 0xBF, 0x06, 0x9C, 0xCD,
+0xDC, 0xFF, 0x30, 0xF8, 0x3E, 0xC6, 0xB8, 0x30, 0xF4, 0x24, 0x20, 0xF1, 0x06, 0xC9, 0xCD, 0xE0,
+0xFF, 0x30, 0xE9, 0x78, 0xFE, 0xD4, 0x30, 0xF4, 0xCD, 0xE0, 0xFF, 0xD0, 0x79, 0xEE, 0x03, 0x4F,
+0x06, 0xD0, 0x18, 0x0A, 0x08, 0xDD, 0x75, 0x00, 0xDD, 0x23, 0x1B, 0x08, 0x06, 0xD2, 0x2E, 0x01,
+0xCD, 0xDC, 0xFF, 0xD0, 0x3E, 0xEA, 0xB8, 0xDA, 0xD8, 0xFF, 0x3E, 0xD5, 0xB8, 0xCB, 0x15, 0x06,
+0xD0, 0xD2, 0xBF, 0xFF, 0x7A, 0xB3, 0x20, 0xDC, 0xC9, 0x2D, 0xC3, 0xD3, 0xFF, 0xCD, 0xE0, 0xFF,
+0xD0, 0x3E, 0x0D, 0x3D, 0x20, 0xFD, 0xA7, 0x04, 0xC8, 0x3E, 0x7F, 0xDB, 0xFE, 0x1F, 0xA9, 0xE6,
+0x20, 0x28, 0xF4, 0x79, 0x2F, 0x4F, 0x78, 0x00, 0xE6, 0x07, 0xF6, 0x08, 0xD3, 0xFE, 0x37, 0xC9
+};
+
+static unsigned char ts_loader[] = { 
 //basic hdr
 19,0
 ,0x00,0x00,'2','0','6','8',' ','r','e','l','o','c',0x3A,0x00,0x05,0x00,0x3A,0x00,0x5e
@@ -84,6 +127,46 @@ unsigned char ts_loader[] = {
 ,0xF4,0xF1,0xE9,0xB5
 };
 
+
+void turbo_rawout (FILE *fpout, unsigned char b)
+{
+  static unsigned char c[8] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
+  int i,period;
+
+  if (!b) {
+	  /* if byte is zero then we shortcut to a single bit ! */
+	  if ( fast ) period = 14; else period = 16;
+	  zx_rawbit(fpout, period);
+  } else {
+	  for (i=0; i < 8; i++)
+	  {
+		if (b & c[i])
+		  if ( fast ) period = 9; else period = 10;
+		  //period = 10;
+		else
+		  //if ( fast ) period = 5; else period = 6;
+		  period=5;
+
+		zx_rawbit(fpout, period);
+	  }
+  }
+}
+
+
+int hexdigit(char digit) {
+    if (digit >= 'A' && digit <= 'F') {
+        return digit - 'A' + 10;
+    } else if (digit >= 'a' && digit <= 'f') {
+        return digit - 'a' + 10;
+    } else if (digit >= '0' && digit <= '9') {
+        return digit - '0';
+    }
+
+	fprintf(stderr,"\nError in patch string\n");
+	myexit(NULL,1);
+}
+
+
 int zx_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
@@ -95,6 +178,7 @@ int zx_exec(char *target)
     int     c;
     int     i,blocklen;
     int     len, mlen;
+    int		blockcount;
 
     if ( help )
         return -1;
@@ -103,8 +187,32 @@ int zx_exec(char *target)
         return -1;
     }
 
+	if (turbo)  {
+		audio = TRUE;
+		fprintf(stderr,"WARNING: 'tap' file in turbo mode is inconsistent, use the WAV audio file.\n");
+	}
+
+	if ((patchpos >=0) && (patchpos < sizeof(turbo_loader)) && (patchdata != NULL)) {
+		i=0;
+		fprintf(stderr,"Patching the turbo loader at position %u: ",patchpos);
+		while (patchdata[i]) {
+			if (i&1) {
+				c+=hexdigit(patchdata[i]);
+				turbo_loader[patchpos]=(unsigned char)c;
+				fprintf(stderr,"$%x ",c);
+				patchpos++;
+			} else {
+				c=16*hexdigit(patchdata[i]);
+			}
+			i++;
+		}
+		fprintf(stderr," (%i bytes)\n",i/2);
+		
+	}
+
 	if (dumb) {
 		strcpy(filename,binname);
+		if (turbo) fprintf(stderr,"WARNING: turbo option in dumb mode requires extra editing of the wav file.\n");
 		
 	} else {
 		if ( outfile == NULL ) {
@@ -166,12 +274,13 @@ int zx_exec(char *target)
 		}
 
 		if ((pos>23700)&&(pos<24000)) {
+			if (turbo) fprintf(stderr,"WARNING: turbo has no effect in single BASIC block mode.\n");
 			/* All in a BASIC line */
 			/* Write out the BASIC header file */
 				writeword_p(19,fpout,&parity);         /* Header len */
 				writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
 				parity=0;
-				writebyte_p(0,fpout,&parity);             /* Filetype (Basic) */
+				writebyte_p(0,fpout,&parity);          /* Filetype (Basic) */
 
 			/* Deal with the filename */
 				if (strlen(blockname) >= 10 ) {
@@ -182,8 +291,8 @@ int zx_exec(char *target)
 				}
 				for        (i=0;i<=9;i++)
 					writebyte_p(name[i],fpout,&parity);
-				writeword_p(21 +len,fpout,&parity);   /* length */
-				writeword_p(10,fpout,&parity);            /* line for auto-start */
+				writeword_p(21 +len,fpout,&parity);    /* length */
+				writeword_p(10,fpout,&parity);         /* line for auto-start */
 				writeword_p(21 + len,fpout,&parity);   /* length (?) */
 				writebyte_p(parity,fpout,&parity);
 
@@ -194,7 +303,7 @@ int zx_exec(char *target)
 
 				writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
 				writebyte_p(1,fpout,&parity);          /* LSB... */
-				writeword_p(2+len,fpout,&parity);         /* BASIC line length */
+				writeword_p(2+len,fpout,&parity);      /* BASIC line length */
 				writebyte_p(0xea,fpout,&parity);       /* REM */
 				for (i=0; i<len;i++) {
 					c=getc(fpin);
@@ -203,12 +312,12 @@ int zx_exec(char *target)
 				writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
 
 				writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
-				writebyte_p(10,fpout,&parity);          /* LSB... */
+				writebyte_p(10,fpout,&parity);         /* LSB... */
 				writeword_p(11,fpout,&parity);         /* BASIC line length */
 				writebyte_p(0xf9,fpout,&parity);       /* RANDOMIZE */
 				writebyte_p(0xc0,fpout,&parity);       /* USR */
 				writebyte_p(0xb0,fpout,&parity);       /* VAL */
-				sprintf(mybuf,"\"%i\"",(int)pos);           /* Location for USR */
+				sprintf(mybuf,"\"%i\"",(int)pos);      /* Location for USR */
 				writestring_p(mybuf,fpout,&parity);
 				writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
 				writebyte_p(parity,fpout,&parity);
@@ -217,10 +326,11 @@ int zx_exec(char *target)
 				Loader block
 			   =============== */
 
+		   mlen=0;
 		   if ( !noloader ) {
 				/* If requested, merge an external loader */
-				mlen=0;
 				if ( merge != NULL ) {
+					if (turbo) fprintf(stderr,"WARNING: turbo mode conflicts with the 'merge' option.\n");
 					if ( (fpmerge=fopen(merge,"rb") ) == NULL ) {
 						fprintf(stderr,"File for 'merge' not found: %s\n",merge);
 						fclose(fpin);
@@ -262,6 +372,14 @@ int zx_exec(char *target)
 
 
 				/* BASIC loader */
+				
+					if (turbo) {
+						mlen=22+sizeof(turbo_loader)+32;	/* extra BASIC size for REM line + turbo block + turbo caller code */
+						turbo_loader[26] = pos%256;
+						turbo_loader[27] = pos/256;
+						turbo_loader[29] = len%256;
+						turbo_loader[30] = len/256;
+					}
 
 				/* Write out the BASIC header file */
 					writeword_p(19,fpout,&parity);         /* Header len */
@@ -275,22 +393,61 @@ int zx_exec(char *target)
 					writeword_p(0x1e + mlen,fpout,&parity);   /* length (?) */
 					writebyte_p(parity,fpout,&parity);
 
-
 				/* Write out the BASIC loader program */
 					writeword_p(32 + mlen,fpout,&parity);         /* block lenght */
 					parity=0;
 					writebyte_p(255,fpout,&parity);        /* Data has a block type of 255 */
+
+					/* REM line is <compiled program length> + 22 bytes long */
+					if (turbo) {
+						writebyte_p(0,fpout,&parity);         /* MSB of BASIC line number for REM */
+						writebyte_p(1,fpout,&parity);         /* LSB... */
+						writeword_p(18+sizeof(turbo_loader),fpout,&parity);         /* BASIC line length */
+						writebyte_p(0x10,fpout,&parity);         /* Cosmetics (ink) */
+						writebyte_p(7,fpout,&parity);          /* Cosmetics (white) */
+						writebyte_p(0xea,fpout,&parity);       /* REM */
+						writebyte_p(0x11,fpout,&parity);         /* Cosmetics (paper) */
+						writebyte_p(0,fpout,&parity);          /* Cosmetics (black) */
+						writestring_p(" Z88DK C+ ",fpout,&parity);
+						writebyte_p(0x11,fpout,&parity);         /* Cosmetics (paper) */
+						writebyte_p(7,fpout,&parity);          /* Cosmetics (white) */
+						for (i=0; (i < sizeof(turbo_loader)); i++)
+							writebyte_p(turbo_loader[i],fpout,&parity); 
+						writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
+					}
+
 					writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
 					writebyte_p(10,fpout,&parity);         /* LSB... */
-					writeword_p(26,fpout,&parity);         /* BASIC line length */
+					if (!turbo)
+						writeword_p(26,fpout,&parity);         /* BASIC line length */
+					else
+						writeword_p(26+32,fpout,&parity);         /* BASIC line length */
 					writebyte_p(0xfd,fpout,&parity);       /* CLEAR */
 					writebyte_p(0xb0,fpout,&parity);       /* VAL */
 					sprintf(mybuf,"\"%i\":",(int)pos-1);        /* location for CLEAR */
 					writestring_p(mybuf,fpout,&parity);
-					writebyte_p(0xef,fpout,&parity);       /* LOAD */
-					writebyte_p('"',fpout,&parity);
-					writebyte_p('"',fpout,&parity);
-					writebyte_p(0xaf,fpout,&parity);       /* CODE */
+					if (turbo) {
+						/* 36 bytes, which means 32 extra bytes */
+						writebyte_p(0xf9,fpout,&parity);       /* RANDOMIZE */
+						writebyte_p(0xc0,fpout,&parity);       /* USR */
+						writebyte_p('(',fpout,&parity);
+						writebyte_p(0xbe,fpout,&parity);       /* PEEK */
+						writebyte_p(0xb0,fpout,&parity);       /* VAL */
+						writestring_p("\"23635\"+",fpout,&parity);
+						writebyte_p(0xb0,fpout,&parity);       /* VAL */
+						writestring_p("\"256\"*",fpout,&parity);
+						writebyte_p(0xbe,fpout,&parity);       /* PEEK */
+						writebyte_p(0xb0,fpout,&parity);       /* VAL */
+						writestring_p("\"23636\"+",fpout,&parity);
+						writebyte_p(0xb0,fpout,&parity);       /* VAL */
+						writestring_p("\"21\"",fpout,&parity);
+						writebyte_p(')',fpout,&parity);
+					} else {
+						writebyte_p(0xef,fpout,&parity);       /* LOAD */
+						writebyte_p('"',fpout,&parity);
+						writebyte_p('"',fpout,&parity);
+						writebyte_p(0xaf,fpout,&parity);       /* CODE */
+					}
 					writebyte_p(':',fpout,&parity);
 					writebyte_p(0xf9,fpout,&parity);       /* RANDOMIZE */
 					writebyte_p(0xc0,fpout,&parity);       /* USR */
@@ -362,12 +519,16 @@ int zx_exec(char *target)
 			myexit(NULL,1);
 		}
 
+		blockcount = 0;
+		if (noloader) blockcount = 2;
+
 		/* leading silence */
 	    for (i=0; i < 0x500; i++)
 			fputc(0x20, fpout);
 
 			/* Data blocks */
 		while (ftell(fpin) < len) {
+		  blockcount++;
 		  blocklen = (getc(fpin) + 256 * getc(fpin));
 		  if (dumb) {
 			if (blocklen==19)
@@ -375,19 +536,42 @@ int zx_exec(char *target)
 			else
 				printf("\n  Block found, length: %d Byte(s) ",blocklen);
 		  }
-		  zx_pilot(fpout);
-          for (i=0; (i < blocklen); i++) {
-            c=getc(fpin);
-			if ((dumb) && (blocklen==19) && (c>=32) && (c<=126) && (i>1) && (i<12) )
-				printf("%c",c);
-		    zx_rawout(fpout,c,fast);
-          }
+
+		  if (dumb || !turbo || (blockcount != 3)) {        /* byte block headers must be ignored in turbo mode */
+
+			  if (turbo && (blockcount==4)) {             /* get rid of the first byte in the data block if in turbo mode */
+					c=getc(fpin);
+					blocklen--; 
+					}
+
+			  if (turbo && (blockcount==4))
+				zx_pilot(900,fpout);
+			  else if (fast)
+				zx_pilot(1500,fpout);
+			  else
+				zx_pilot(2000,fpout);
+
+			  for (i=0; (i < blocklen); i++) {
+				c=getc(fpin);
+
+				if ( (dumb) && (blocklen==19) && (c>=32) && (c<=126) && (i>1) && (i<12) )
+					printf("%c",c);
+
+				if ((turbo && blockcount == 4) || (turbo && dumb))
+					turbo_rawout(fpout,c);
+				else
+					zx_rawout(fpout,c,fast);
+			  }
+		  } else
+			  for (i=0; (i < blocklen); i++)		/* Skip the block we're excluding */
+				c=getc(fpin);
+
+		  if ((turbo && blockcount == 4) || (turbo && dumb)) {
+					zx_rawout(fpout,1,fast);
+				}
+
 		  if (dumb) printf("\n");
 		}
-
-		/* trailing silence */
-	    for (i=0; i < 0x1000; i++)
-			fputc(0x20, fpout);
 
         fclose(fpin);
         fclose(fpout);

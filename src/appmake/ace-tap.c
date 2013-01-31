@@ -6,7 +6,7 @@
  *                         - Modified for the Jupiter ACE
  *	Stefano 19/5/2010 - Heavily updated
  *
- *	$Id: ace-tap.c,v 1.8 2011-05-23 07:10:39 stefano Exp $
+ *	$Id: ace-tap.c,v 1.9 2013-01-31 13:28:57 stefano Exp $
  */
 
 #include "appmake.h"
@@ -229,7 +229,7 @@ int acetap_exec(char *target)
 			else
 				printf("\n  Block found, length: %d Byte(s) ",blocklen);
 		  }
-		  zx_pilot(fpout);
+		  zx_pilot(2000,fpout);
 		  // extra byte at beginning
 		  if (blocklen == 26)
 			zx_rawout(fpout,0,fast);
