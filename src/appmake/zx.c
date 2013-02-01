@@ -23,18 +23,22 @@
  *        Advanced users can also see bin2bas-rem in the 'support/zx' directory
  *        and take benefit of the self-relocating code.
  * 
- *        The turbo tape option produces only valid WAV files.
- *        It can be combined with the 'fast' flag to achieve extra speed.
+ *        The turbo tape option produces valid WAV files only.
+ * 
+ *        It can be combined with the '--fast' flag to achieve extra speed and
+ *        with the '--screen' option to add a title screen.
+ * 
  *        The '.tap' file is left for advanced users for hand-editing which
  *        can take benefit od the 'dumb' mode and 'patch' options
  *        (i.e. the extra compile options:
- *              -Cz--patchpos -Cz21 -Cz--patchdata -Czcd7f
- *         ..will make the turbo loader ready for a title screen, then
- *        some more sound editing will be necessary to add the picture
+ *              -Cz--patchpos -Cz21 -Cz--patchdata -Czcd7fff
+ *         ..will make the turbo loader ready to load an intermediate block
+ *        (by default a title screen but it can be changed with a longer patch),
+ *        then some more sound editing will be necessary to add the picture
  *        taken from a previously prepared audio file using the dumb/turbo options).
  * 
  *
- *        $Id: zx.c,v 1.15 2013-01-31 13:28:57 stefano Exp $
+ *        $Id: zx.c,v 1.16 2013-02-01 15:16:31 stefano Exp $
  */
 
 #include "appmake.h"
@@ -49,6 +53,7 @@ static char             *merge        = NULL;
 static int               origin       = -1;
 static int               patchpos     = -1;
 static char             *patchdata    = NULL;
+static char             *screen       = NULL;
 static char              help         = 0;
 static char              audio        = 0;
 static char              ts2068       = 0;
@@ -70,6 +75,7 @@ option_t zx_options[] = {
     {  0,  "turbo",    "Turbo tape loader",          OPT_BOOL,  &turbo },
     {  0,  "patchpos", "Turbo tape patch position",  OPT_INT,   &patchpos },
     {  0,  "patchdata", "Turbo tape patch (i.e. cd7fff..)",  OPT_STR,   &patchdata },
+    {  0,  "screen",    "Title screen file name",    OPT_STR,   &screen },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "noloader",  "Don't create the loader block",  OPT_BOOL,  &noloader },
@@ -135,16 +141,17 @@ void turbo_rawout (FILE *fpout, unsigned char b)
 
   if (!b) {
 	  /* if byte is zero then we shortcut to a single bit ! */
-	  if ( fast ) period = 14; else period = 16;
+	  // Experimental min limit is 14
+	  if ( fast ) period = 15; else period = 16;
 	  zx_rawbit(fpout, period);
   } else {
 	  for (i=0; i < 8; i++)
 	  {
 		if (b & c[i])
-		  if ( fast ) period = 9; else period = 10;
+		  // Experimental min limit is 7
+		  if ( fast ) period = 8; else period = 10;
 		  //period = 10;
 		else
-		  //if ( fast ) period = 5; else period = 6;
 		  period=5;
 
 		zx_rawbit(fpout, period);
@@ -176,7 +183,7 @@ int zx_exec(char *target)
     FILE    *fpin, *fpout, *fpmerge;
     long    pos;
     int     c;
-    int     i,blocklen;
+    int     i,j,blocklen;
     int     len, mlen;
     int		blockcount;
 
@@ -255,9 +262,7 @@ int zx_exec(char *target)
 			fclose(fpin);
 			myexit(NULL,1);
 		}
-
 		len=ftell(fpin);
-
 		fseek(fpin,0L,SEEK_SET);
 
 		if ( (fpout=fopen(filename,"wb") ) == NULL ) {
@@ -299,7 +304,7 @@ int zx_exec(char *target)
 			/* Write out the 'BASIC' program */
 				writeword_p(23 + len,fpout,&parity);         /* block lenght */
 				parity=0;
-				writebyte_p(255,fpout,&parity);        /* Data has a block type of 255 */
+				writebyte_p(255,fpout,&parity);        /* Data is a type 255 block */
 
 				writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
 				writebyte_p(1,fpout,&parity);          /* LSB... */
@@ -330,7 +335,13 @@ int zx_exec(char *target)
 		   if ( !noloader ) {
 				/* If requested, merge an external loader */
 				if ( merge != NULL ) {
-					if (turbo) fprintf(stderr,"WARNING: turbo mode conflicts with the 'merge' option.\n");
+					if (turbo) {
+						fprintf(stderr,"ERROR: turbo mode conflicts with the 'merge' option.\n");
+						fclose(fpin);
+						fclose(fpout);
+						myexit(NULL,1);
+					}
+
 					if ( (fpmerge=fopen(merge,"rb") ) == NULL ) {
 						fprintf(stderr,"File for 'merge' not found: %s\n",merge);
 						fclose(fpin);
@@ -374,12 +385,19 @@ int zx_exec(char *target)
 				/* BASIC loader */
 				
 					if (turbo) {
-						mlen=22+sizeof(turbo_loader)+32;	/* extra BASIC size for REM line + turbo block + turbo caller code */
+						mlen+=22+sizeof(turbo_loader)+32;	/* extra BASIC size for REM line + turbo block + turbo caller code */
 						turbo_loader[26] = pos%256;
 						turbo_loader[27] = pos/256;
 						turbo_loader[29] = len%256;
 						turbo_loader[30] = len/256;
+						if (screen) {
+							turbo_loader[21] = 0xcd;		/* activate the extra screen block loading */
+							turbo_loader[22] = 0x7f;
+							turbo_loader[23] = 0xff;
+ 						}
 					}
+
+					if (screen && !turbo)  mlen+=5;			/* Add the space count for -- LOAD "" SCREEN$:
 
 				/* Write out the BASIC header file */
 					writeword_p(19,fpout,&parity);         /* Header len */
@@ -396,7 +414,7 @@ int zx_exec(char *target)
 				/* Write out the BASIC loader program */
 					writeword_p(32 + mlen,fpout,&parity);         /* block lenght */
 					parity=0;
-					writebyte_p(255,fpout,&parity);        /* Data has a block type of 255 */
+					writebyte_p(255,fpout,&parity);        /* Data is a type 255 block */
 
 					/* REM line is <compiled program length> + 22 bytes long */
 					if (turbo) {
@@ -419,7 +437,10 @@ int zx_exec(char *target)
 					writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
 					writebyte_p(10,fpout,&parity);         /* LSB... */
 					if (!turbo)
-						writeword_p(26,fpout,&parity);         /* BASIC line length */
+						if (screen)
+							writeword_p(26+5,fpout,&parity);         /* BASIC line length */
+						else
+							writeword_p(26,fpout,&parity);         /* BASIC line length */
 					else
 						writeword_p(26+32,fpout,&parity);         /* BASIC line length */
 					writebyte_p(0xfd,fpout,&parity);       /* CLEAR */
@@ -443,6 +464,13 @@ int zx_exec(char *target)
 						writestring_p("\"21\"",fpout,&parity);
 						writebyte_p(')',fpout,&parity);
 					} else {
+						if (screen && !turbo) {
+							writebyte_p(0xef,fpout,&parity);       /* LOAD */
+							writebyte_p('"',fpout,&parity);
+							writebyte_p('"',fpout,&parity);
+							writebyte_p(0xaa,fpout,&parity);       /* SCREEN$ */
+							writebyte_p(':',fpout,&parity);
+						}
 						writebyte_p(0xef,fpout,&parity);       /* LOAD */
 						writebyte_p('"',fpout,&parity);
 						writebyte_p('"',fpout,&parity);
@@ -459,7 +487,76 @@ int zx_exec(char *target)
 				}
 			}
 
+		/* Title screen */
+			if ( screen != NULL ) {
+				
+				if ( (fpmerge=fopen(screen,"rb") ) == NULL ) {
+					fprintf(stderr,"Title screen file not found: %s\n",screen);
+					fclose(fpin);
+					fclose(fpout);
+					myexit(NULL,1);
+				}
 
+				if ( fseek(fpmerge,0,SEEK_END) ) {
+					fprintf(stderr,"Couldn't determine size of file\n");
+					fclose(fpin);
+					fclose(fpout);
+					fclose(fpmerge);
+					myexit(NULL,1);
+				}
+
+				mlen=ftell(fpmerge);
+				if (((mlen < 6912) || (mlen >=7000)) && (mlen != 6144) && (mlen != 2048)) {
+					fprintf(stderr,"Title screen size not recognized; %u\n",mlen);
+					fclose(fpin);
+					fclose(fpout);
+					fclose(fpmerge);
+					myexit(NULL,1);
+				}
+				
+				if (mlen <= 6912) {
+					fseek (fpmerge,0,SEEK_SET);
+					j=mlen;
+					turbo_loader[19] = mlen%256;
+					turbo_loader[20] = mlen/256;
+				} else {
+					fseek (fpmerge,mlen-6913,SEEK_SET);
+					j=6912;
+				}
+	
+				writeword_p(19,fpout,&parity);         /* Header len */
+				writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
+				parity=0;
+				writebyte_p(3,fpout,&parity);          /* Filetype (Code) */
+			/* Deal with the filename */
+				if (strlen(blockname) >= 10 ) {
+					strncpy(name,blockname,10);
+				} else {
+					strcpy(name,blockname);
+					strncat(name,"$         ",10-strlen(blockname));
+				}
+				for  (i=0;i<=9;i++)
+					writebyte_p(name[i],fpout,&parity);
+				
+				writeword_p(j,fpout,&parity);
+				writeword_p(16384,fpout,&parity);        /* load address */
+				writeword_p(0,fpout,&parity);          /* offset */
+				writebyte_p(parity,fpout,&parity);
+
+			/* Now onto the data bit */
+				writeword_p(j+2,fpout,&parity);      /* Length of next block */
+				
+				parity=0;
+				writebyte_p(255,fpout,&parity);        /* Data is a type 255 block */
+				for (i=0; i<j;i++) {
+					c=getc(fpmerge);
+					writebyte_p(c,fpout,&parity);
+				}
+				writebyte_p(parity,fpout,&parity);
+
+				fclose (fpmerge);
+			}
+		
 		/* M/C program */
 
 		/* Write out the code header file */
@@ -485,7 +582,7 @@ int zx_exec(char *target)
 			writeword_p(len+2,fpout,&parity);      /* Length of next block */
 				
 			parity=0;
-			writebyte_p(255,fpout,&parity);        /* Data has a block type of 255 */
+			writebyte_p(255,fpout,&parity);        /* Data is a type 255 block */
 			for (i=0; i<len;i++) {
 				c=getc(fpin);
 				writebyte_p(c,fpout,&parity);
@@ -537,15 +634,15 @@ int zx_exec(char *target)
 				printf("\n  Block found, length: %d Byte(s) ",blocklen);
 		  }
 
-		  if (dumb || !turbo || (blockcount != 3)) {        /* byte block headers must be ignored in turbo mode */
+		  if (dumb || !turbo || ((blockcount != 3) && (blockcount != 5))) {        /* byte block headers must be ignored in turbo mode */
 
-			  if (turbo && (blockcount==4)) {             /* get rid of the first byte in the data block if in turbo mode */
+			  if (turbo && (dumb || (blockcount==4) || (blockcount==6))) {             /* get rid of the first byte in the data block if in turbo mode */
 					c=getc(fpin);
 					blocklen--; 
 					}
 
-			  if (turbo && (blockcount==4))
-				zx_pilot(900,fpout);
+			  if (turbo && ((blockcount == 4) || (blockcount == 6)))
+				zx_pilot(500,fpout);
 			  else if (fast)
 				zx_pilot(1500,fpout);
 			  else
@@ -557,7 +654,7 @@ int zx_exec(char *target)
 				if ( (dumb) && (blocklen==19) && (c>=32) && (c<=126) && (i>1) && (i<12) )
 					printf("%c",c);
 
-				if ((turbo && blockcount == 4) || (turbo && dumb))
+				if ((turbo && ((blockcount == 4) || (blockcount == 6))) || (turbo && dumb))
 					turbo_rawout(fpout,c);
 				else
 					zx_rawout(fpout,c,fast);
@@ -566,7 +663,7 @@ int zx_exec(char *target)
 			  for (i=0; (i < blocklen); i++)		/* Skip the block we're excluding */
 				c=getc(fpin);
 
-		  if ((turbo && blockcount == 4) || (turbo && dumb)) {
+		  if ((turbo && (blockcount == 4) || (blockcount == 6) ) || (turbo && dumb)) {
 					zx_rawout(fpout,1,fast);
 				}
 
