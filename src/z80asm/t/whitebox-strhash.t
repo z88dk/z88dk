@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.6 2013-01-22 22:24:49 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.7 2013-02-02 00:07:35 pauloscustodio Exp $
 # $Log: whitebox-strhash.t,v $
-# Revision 1.6  2013-01-22 22:24:49  pauloscustodio
+# Revision 1.7  2013-02-02 00:07:35  pauloscustodio
+# StrHash_next() returns value instead of BOOL
+#
+# Revision 1.6  2013/01/22 22:24:49  pauloscustodio
 # Removed StrHash_set_delptr() - not intuitive and error prone
 # Added StrHash_remove_all() to remove all elements
 # Added StrHash_remove_elem() to remove one item giving its address
@@ -74,7 +77,7 @@ void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 	char tokens[256], wrong_key[256], *tokensp;
 	char *exp_key, *exp_value, *value;
 	int i;
-	BOOL has_next = FALSE;
+	void *next_elem;
 	
 	/* strtok cannot modify constant strings */
 	strcpy(tokens, expected);
@@ -83,23 +86,23 @@ void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 	StrHash_first(hash, &iter);
 	for ( i = 0; ; i++ )
 	{
-		has_next = StrHash_next(hash, &iter);
+		next_elem = StrHash_next(hash, &iter);
 		
 		/* next expected key */
 		exp_key = strtok(tokensp, " "); 
 		tokensp = NULL;
 		
-		if (exp_key == NULL && has_next)
+		if (exp_key == NULL && next_elem)
 		{
 			die(AssertionException, "%s %d : got %s, expected end of hash\n", 
 			    file, lineno, iter->key);
 		}
-		else if (exp_key != NULL && ! has_next)
+		else if (exp_key != NULL && ! next_elem)
 		{
 			die(AssertionException, "%s %d : got end of hash, expected %s\n", 
 			    file, lineno, exp_key);
 		}
-		else if (exp_key == NULL && ! has_next)
+		else if (exp_key == NULL && ! next_elem)
 		{
 			break;		/* OK */
 		}
@@ -123,6 +126,12 @@ void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 		{
 			die(AssertionException, "%s %d : value mismatch, got %s, expected %s\n", 
 			    file, lineno, iter->value, exp_value);
+		}
+		
+		if (iter->value != next_elem)
+		{
+			die(AssertionException, "%s %d : value pointer mismatch\n", 
+			    file, lineno);
 		}
 		
 		/* compute wrong key */

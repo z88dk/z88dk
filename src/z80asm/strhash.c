@@ -18,9 +18,12 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.6 2013-01-22 22:24:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.7 2013-02-02 00:07:35 pauloscustodio Exp $ */
 /* $Log: strhash.c,v $
-/* Revision 1.6  2013-01-22 22:24:49  pauloscustodio
+/* Revision 1.7  2013-02-02 00:07:35  pauloscustodio
+/* StrHash_next() returns value instead of BOOL
+/*
+/* Revision 1.6  2013/01/22 22:24:49  pauloscustodio
 /* Removed StrHash_set_delptr() - not intuitive and error prone
 /* Added StrHash_remove_all() to remove all elements
 /* Added StrHash_remove_elem() to remove one item giving its address
@@ -202,7 +205,7 @@ void StrHash_first( StrHash *self, StrHashElem **iter )
     *iter = NULL;
 }
 
-BOOL StrHash_next( StrHash *self, StrHashElem **iter )
+void *StrHash_next( StrHash *self, StrHashElem **iter )
 {
 	if ( *iter == NULL )
 	{	
@@ -213,5 +216,5 @@ BOOL StrHash_next( StrHash *self, StrHashElem **iter )
 		*iter = (StrHashElem*)(*iter)->hh.next;
 	}
 
-	return *iter ? TRUE : FALSE;
+	return *iter ? (*iter)->value : NULL;
 }

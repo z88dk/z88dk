@@ -18,9 +18,12 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.h,v 1.5 2013-01-22 22:24:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.h,v 1.6 2013-02-02 00:07:35 pauloscustodio Exp $ */
 /* $Log: strhash.h,v $
-/* Revision 1.5  2013-01-22 22:24:49  pauloscustodio
+/* Revision 1.6  2013-02-02 00:07:35  pauloscustodio
+/* StrHash_next() returns value instead of BOOL
+/*
+/* Revision 1.5  2013/01/22 22:24:49  pauloscustodio
 /* Removed StrHash_set_delptr() - not intuitive and error prone
 /* Added StrHash_remove_all() to remove all elements
 /* Added StrHash_remove_elem() to remove one item giving its address
@@ -101,7 +104,7 @@ extern StrHashElem *StrHash_head( StrHash *self );
 extern void 		StrHash_remove_elem( StrHash *self, StrHashElem *elem );
 
 /* traverse the list */
-extern void			StrHash_first( StrHash *self, StrHashElem **iter );
-extern BOOL			StrHash_next( StrHash *self, StrHashElem **iter );
+extern void	 StrHash_first( StrHash *self, StrHashElem **iter );
+extern void *StrHash_next(  StrHash *self, StrHashElem **iter );
 
 #endif /* ndef STRHASH_H */
