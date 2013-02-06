@@ -39,7 +39,7 @@
  *        taken from a previously prepared audio file using the dumb/turbo options).
  * 
  *
- *        $Id: zx.c,v 1.17 2013-02-06 10:29:22 stefano Exp $
+ *        $Id: zx.c,v 1.18 2013-02-06 11:07:26 stefano Exp $
  */
 
 #include "appmake.h"
@@ -709,6 +709,9 @@ int zx_exec(char *target)
 
 		blockcount = 0;
 		if (noloader) blockcount = 2;
+		
+		if ((ts2068) && (pos >= 33000))
+			blockcount-=4;
 
 		/* leading silence */
 	    for (i=0; i < 0x500; i++)
