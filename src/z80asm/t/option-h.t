@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-h.t,v 1.4 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-h.t,v 1.5 2013-02-11 21:56:11 pauloscustodio Exp $
 # $Log: option-h.t,v $
-# Revision 1.4  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.5  2013-02-11 21:56:11  pauloscustodio
+# get_copyright() moved to test_utils.pl
+#
+# Revision 1.4  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.3  2012/05/17 21:36:06  pauloscustodio
@@ -37,12 +40,7 @@ use File::Slurp;
 use Test::More;
 require 't/test_utils.pl';
 
-# get version and date from hist.c
-my $hist = read_file("hist.c");
-my($version) = 	 $hist =~ /\#define \s+ VERSION   \s+ \" (.*?) \"/x;
-my($date) = 	 $hist =~ /\#define \s+ DATE      \s+ \" (.*?) \"/x;
-my($copyright) = $hist =~ /\#define \s+ COPYRIGHT \s+ \" (.*?) \"/x;
-my $copyrightmsg = "Z80 Module Assembler ".$version." (".$date."), (c) ".$copyright."\n";
+my $copyrightmsg = get_copyright()."\n";
 
 t_z80asm_capture("", $copyrightmsg, "", 0);
 
