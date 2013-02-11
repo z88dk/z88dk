@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.18 2013-01-24 23:03:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.19 2013-02-11 21:52:31 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.18  2013-01-24 23:03:03  pauloscustodio
+/* Revision 1.19  2013-02-11 21:52:31  pauloscustodio
+/* Added comments
+/*
+/* Revision 1.18  2013/01/24 23:03:03  pauloscustodio
 /* Replaced (unsigned char) by (byte_t)
 /* Replaced (unisigned int) by (size_t)
 /* Replaced (short) by (int)
@@ -141,7 +144,7 @@ enum symbols        { space, strconq, dquote, squote, semicolon, comma, fullstop
 
 struct pageref
 {
-    struct pageref     *nextref;          /* pointer to next page reference of symbol */
+    struct pageref   *nextref;          /* pointer to next page reference of symbol */
     int              pagenr;            /* page number where symbol is referenced */
 };                                      /* the first symbol node in identifies the symbol definition */
 
@@ -149,7 +152,7 @@ struct symref
 {
     struct pageref     *firstref;         /* Pointer to first page number reference of symbol */
     struct pageref     *lastref;          /* Pointer to last/current page number reference    */
-};                                      /* NB: First reference defines creation of symbol   */
+};                                        /* NB: First reference defines creation of symbol   */
 
 struct pfixstack
 {
@@ -220,7 +223,7 @@ struct JRPC
 
 typedef struct node
 {
-    byte_t     type;              /* type of symbol  */
+    byte_t			  type;              /* type of symbol  */
     char              *symname;          /* pointer to symbol identifier */
     long              symvalue;          /* value of symbol */
     struct symref     *references;       /* pointer to all found references of symbol */
@@ -278,35 +281,35 @@ struct linkedmod
 #define ASSEMBLERPC     "ASMPC"
 
 /* Bitmasks for symboltype */
-#define SYMDEFINED      1                                  /* bitmask 00000001 */
-#define SYMTOUCHED      2                                  /* bitmask 00000010 */
-#define SYMDEF          4                                  /* bitmask 00000100 */
-#define SYMADDR         8                                  /* bitmask 00001000 */
-#define SYMLOCAL        16                                 /* bitmask 00010000 */
-#define SYMXDEF         32                                 /* bitmask 00100000 */
-#define SYMXREF         64                                 /* bitmask 01000000 */
+#define SYMDEFINED      1       /* bitmask 00000001 */	/* symbol is defined */
+#define SYMTOUCHED      2       /* bitmask 00000010 */	/* symbol was used, e.g. returned by a symbol table search */
+#define SYMDEF          4       /* bitmask 00000100 */	/* DEFINE, -D, ASMPC, OS_ID, LIB, XLIB, global library; not output in sym list */
+#define SYMADDR         8       /* bitmask 00001000 */	/* symbol is address */
+#define SYMLOCAL        16      /* bitmask 00010000 */	/* symbol is local */
+#define SYMXDEF         32      /* bitmask 00100000 */	/* symbol is global (SYMXDEF) or global library (SYMXDEF|SYMDEF) */
+#define SYMXREF         64      /* bitmask 01000000 */	/* symbol is external (SYMXREF) or external library (SYMXREF|SYMDEF) */
 
-#define XDEF_OFF        223                                /* bitmask 11011111 */
-#define XREF_OFF        191                                /* bitmask 10111111 */
-#define SYMLOCAL_OFF    239                                /* bitmask 11101111 */
-#define SYMTYPE         120                                /* bitmask 01111000 */
-#define SYM_NOTDEFINED  0
+#define XDEF_OFF        223     /* bitmask 11011111 */
+#define XREF_OFF        191     /* bitmask 10111111 */
+#define SYMLOCAL_OFF    239     /* bitmask 11101111 */
+#define SYMTYPE         120     /* bitmask 01111000 */
+#define SYM_NOTDEFINED  0		
 
 /* bitmasks for expression evaluation in rangetype */
-#define RANGE           7                                  /* bitmask 00000111 */   /* Range types are 0 - 4 */
-#define EXPRADDR        8                                  /* bitmask 00001000 */   /* Expression contains reloc. address label */
-#define EXPRLOCAL       16                                 /* bitmask 00010000 */   /* Expression contains local symbol */
-#define EXPRGLOBAL      32                                 /* bitmask 00100000 */   /* Expression contains global symbol */
-#define EXPREXTERN      64                                 /* bitmask 01000000 */   /* Expression contains extern symbol */
-#define NOTEVALUABLE    128                                /* bitmask 10000000 */   /* Expression is not evaluable */
-#define EVALUATED       127                                /* bitmask 01111111 */   /* Expression is not evaluable */
-#define CLEAR_EXPRADDR  247                                /* bitmask 11110111 */   /* Convert to constant expression */
+#define RANGE           7		/* bitmask 00000111 */   /* Range types are 0 - 4 */
+#define EXPRADDR        8       /* bitmask 00001000 */   /* Expression contains reloc. address label */
+#define EXPRLOCAL       16      /* bitmask 00010000 */   /* Expression contains local symbol */
+#define EXPRGLOBAL      32      /* bitmask 00100000 */   /* Expression contains global symbol */
+#define EXPREXTERN      64      /* bitmask 01000000 */   /* Expression contains extern symbol */
+#define NOTEVALUABLE    128     /* bitmask 10000000 */   /* Expression is not evaluable */
+#define EVALUATED       127     /* bitmask 01111111 */   /* Expression is evaluated */
+#define CLEAR_EXPRADDR  247     /* bitmask 11110111 */   /* Convert to constant expression */
 
-#define RANGE_JROFFSET  0
-#define RANGE_8UNSIGN   1
+#define RANGE_JROFFSET  0		/* relative jump argument */
+#define RANGE_8UNSIGN   1		/* 8-bit immediate */
 #define RANGE_8SIGN     2		/* (ix+d) */
-#define RANGE_16CONST   3
-#define RANGE_32SIGN    4
+#define RANGE_16CONST   3		/* 16-bit immediate */
+#define RANGE_32SIGN    4		/* 32-bit immediate */
 
 
 #endif /* ndef SYMBOL_H */
