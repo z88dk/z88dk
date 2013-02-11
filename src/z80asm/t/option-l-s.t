@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-l-s.t,v 1.3 2013-01-24 23:03:03 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-l-s.t,v 1.4 2013-02-11 21:54:38 pauloscustodio Exp $
 # $Log: option-l-s.t,v $
-# Revision 1.3  2013-01-24 23:03:03  pauloscustodio
+# Revision 1.4  2013-02-11 21:54:38  pauloscustodio
+# BUG_0026 : Incorrect paging in symbol list
+#
+# Revision 1.3  2013/01/24 23:03:03  pauloscustodio
 # Replaced (unsigned char) by (byte_t)
 # Replaced (unisigned int) by (size_t)
 # Replaced (short) by (int)
@@ -33,121 +36,291 @@ use strict;
 use warnings;
 use File::Slurp;
 use Test::More;
+use Test::Differences; 
 require 't/test_utils.pl';
 
-my $asm = "
-	xdef main
-	defb 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32
-main:	ld b,10
-loop:	djnz loop
-	ret
-";
-my $re_header_sym = qr/ Z80 \s Module \s Assembler .* \s+ 
-			Page \s+ 001 \s+ 'test.sym' \s+ /x;
-my $re_header_lst = qr/ Z80 \s Module \s Assembler .* \s+ 
-			Page \s+ 001 \s+ 'test.lst' \s+ /x;
-my $re_list =	    qr/	1 \s+ 0000 \s+ 
-			2 \s+ 0000 \s+ xdef \s main \s+ 
-			
-			3 \s+ 0000 \s+ 00 \s+ 01 \s+ 02 \s+ 03 \s+ 04 \s+ 05 \s+ 06 \s+ 07 
-			           \s+ 08 \s+ 09 \s+ 0A \s+ 0B \s+ 0C \s+ 0D \s+ 0E \s+ 0F 
-					   \s+ 10 \s+ 11 \s+ 12 \s+ 13 \s+ 14 \s+ 15 \s+ 16 \s+ 17 
-					   \s+ 18 \s+ 19 \s+ 1A \s+ 1B \s+ 1C \s+ 1D \s+ 1E \s+ 1F \s+
-					   
-			3 \s+ 0020 \s+ 20 \s+
-                  	defb \s+ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32 \s+
-					
-			4 \s+ 0021 \s+ 06 \s 0A \s+ main: \s+ ld \s b,10 \s+
-			5 \s+ 0023 \s+ 10 \s FE \s+ loop: \s+ djnz \s loop \s+
-			6 \s+ 0025 \s+ C9                 \s+ ret \s+
-			7 \s+ 0026 \s+ /x;	
-my $re_symbols =    qr/ Local \s Module \s Symbols: \s+
-			LOOP \s+ = \s+ 00000023 \s+ (?: : \s+ 1\* \s+ )? 
-			Global \s Module \s Symbols: \s+
-			MAIN \s+ = \s+ 00000021 \s+ (?: : \s+ 1\* \s+ )? /x;
+#------------------------------------------------------------------------------
+# Page handling
+my $PAGE_SIZE = 61;
+my $LINE_SIZE = 121;
+my $COLUMN_WIDTH = 32;
+my $linenr;
+my $pagenr;
+my $page_linenr;
 
-# no list file implies symbol table
-unlink_testfiles();
-write_file(asm_file(), $asm);
-t_z80asm_capture(asm_file(), "", "", 0);
-ok -f obj_file();
-ok -f sym_file();
-ok ! -f lst_file();
-like read_file(sym_file()),
-	qr/ \A 	$re_header_sym 
-		$re_symbols
-	    \z /x;
+#------------------------------------------------------------------------------
+my $addr = 0;
+my $lbl_base = 2 * 2 * 256;
+my %lbl_page;
+my %lbl_addr;
+my %lbl_global;
 
-# no list file implies symbol table
-unlink_testfiles();
-write_file(asm_file(), $asm);
-t_z80asm_capture("-nl ".asm_file(), "", "", 0);
-ok -f obj_file();
-ok -f sym_file();
-ok ! -f lst_file();
-like read_file(sym_file()),
-	qr/ \A	$re_header_sym
-		$re_symbols
-	    \z /x;
+#------------------------------------------------------------------------------
+my @asm;
+my @bin;
+my @lst;
 
-# list file implies no symbol table
-unlink_testfiles();
-write_file(asm_file(), $asm);
-t_z80asm_capture("-l ".asm_file(), "", "", 0);
-ok -f obj_file();
-ok ! -f sym_file();
-ok -f lst_file();
-like read_file(lst_file()),
-	qr/ \A	$re_header_lst
-		$re_list
-		$re_symbols
-	    \z /x;
+#------------------------------------------------------------------------------
+# build test assembly
+first_line();
+use_labels();
+define_labels();
+use_labels();
+add_end_line();
 
-# symbol table, no list
-unlink_testfiles();
-write_file(asm_file(), $asm);
-t_z80asm_capture("-s ".asm_file(), "", "", 0);
-ok -f obj_file();
-ok -f sym_file();
-ok ! -f lst_file();
-like read_file(sym_file()),
-	qr/ \A 	$re_header_sym 
-		$re_symbols
-	    \z /x;
+my $asm = join("\n", @asm);
+#"
+#	xlib loop
+#	xdef main
+#	defb 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32
+#main:	ld b,10
+#loop:	djnz loop
+#	ret
+#";
+my $bin = join('', @bin);
+#	pack("C*", 
+#	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,
+#	0x06, 10,
+#	0x10, -2 & 0xFF,
+#	0xC9
+#);
 
-# symbol table and list
-unlink_testfiles();
-write_file(asm_file(), $asm);
-t_z80asm_capture("-l -s ".asm_file(), "", "", 0);
-ok -f obj_file();
-ok ! -f sym_file();
-ok -f lst_file();
-like read_file(lst_file()),
-	qr/ \A 	$re_header_lst 
-		$re_list
-		$re_symbols
-	    \z /x;
 
-# symbol table, no list
-unlink_testfiles();
-write_file(asm_file(), $asm);
-t_z80asm_capture("-nl -s ".asm_file(), "", "", 0);
-ok -f obj_file();
-ok -f sym_file();
-ok ! -f lst_file();
-like read_file(sym_file()),
-	qr/ \A 	$re_header_sym 
-		$re_symbols
-	    \z /x;
 
 # no symbol table, no list
-unlink_testfiles();
-write_file(asm_file(), $asm);
-t_z80asm_capture("-nl -ns ".asm_file(), "", "", 0);
-ok -f obj_file();
-ok ! -f sym_file();
-ok ! -f lst_file();
+t_z80asm(
+	asm		=> $asm,
+	bin		=> $bin,
+	options	=> '-nl -ns',
+	nolist	=> 1,
+);
 
+# list file implies no symbol table
+for my $option ('-l', '-l -s') {
+	t_z80asm(
+		asm		=> $asm,
+		bin		=> $bin,
+		options	=> $option,
+		nolist	=> 1,
+	);
+	compare_list_file(lst_file(), @lst, sym_lines(1));
+}
+
+# no list file implies symbol table
+for my $option ('', '-nl', '-s', '-nl -s') {
+	t_z80asm(
+		asm		=> $asm,
+		bin		=> $bin,
+		options	=> $option,
+		nolist	=> 1,
+	);
+	compare_list_file(sym_file(), sym_lines(0));
+}
 
 unlink_testfiles();
 done_testing();
+
+#------------------------------------------------------------------------------
+# Page handling
+sub first_line {
+	$linenr = 1;
+	$pagenr = 1;
+	$page_linenr = 1;
+}
+
+sub next_line {
+	$linenr++;
+	$page_linenr++;
+	if ($page_linenr > $PAGE_SIZE) {
+		$page_linenr = 1;
+		$pagenr++;
+	}
+}
+
+#------------------------------------------------------------------------------
+# define lblxxx labels
+sub define_labels {
+	$addr == $lbl_base or die "lbl_base should be $addr";
+	
+	for (0..255) {
+		my $label = sprintf("lbl%03d", $_);
+		my $asm   = sprintf("$label: defb %3d", $_);
+		push @asm, $asm;
+		push @bin, pack("C", $_);
+		push @lst, sprintf("%-5d %04X  %02X          $asm", 
+						   $linenr, $addr, 
+						   $_, $_);
+
+		unshift $lbl_page{$label}, $pagenr;
+		
+		$lbl_addr{$label} = $addr;
+		
+		$addr++;
+		next_line();
+	}
+	
+	# add global labels
+	for (0..255) {
+		my $label = sprintf("global%03d", $_);
+		my $asm1  =         "        xdef $label";
+		my $asm2  = sprintf("$label: defb %3d", $_);
+		
+		push @asm, $asm1;
+		push @asm, $asm2;
+		push @bin, pack("C", $_);
+
+		push @lst, sprintf("%-5d %04X              $asm1", 
+						   $linenr, $addr);
+		$lbl_page{$label}[0] = $pagenr;
+		next_line();
+
+		push @lst, sprintf("%-5d %04X  %02X          $asm2", 
+						   $linenr, $addr, 
+						   $_);
+
+		unshift $lbl_page{$label}, $pagenr if $pagenr != $lbl_page{$label}[0];
+		$lbl_global{$label} = 1;
+		
+		$lbl_addr{$label} = $addr;
+		
+		$addr++;
+		next_line();
+	}
+	
+	# add labels of all sizes
+	for (2..255) {
+		my $label = substr("x" . (($_.'_') x $_), 0, $_);
+		my $asm   = "$label: defb $_";
+		next if length($asm) + 2 > 255;
+		
+		push @asm, $asm;
+		push @bin, pack("C", $_);
+		
+		push @lst, sprintf("%-5d %04X  %02X          $asm", 
+						   $linenr, $addr, $_);
+		$lbl_page{$label}[0] = $pagenr;
+		$lbl_addr{$label} = $addr;
+		
+		$addr++;
+		next_line();
+	}		
+}
+
+#------------------------------------------------------------------------------
+# use lblxxx labels
+sub use_labels {
+	for (0..255) {
+		my $label = sprintf("lbl%03d", $_);
+		my $asm   = sprintf("defw %3d, $label", $_);
+		push @asm, $asm;
+		push @bin, pack("v*", $_, $lbl_base + $_);
+		push @lst, sprintf("%-5d %04X  %02X %02X %02X %02X $asm", 
+						   $linenr, $addr, 
+						   $_, 0, 
+						   ($lbl_base + $_) & 0xFF, 
+						   (($lbl_base + $_) >> 8) & 0xFF);
+
+		$lbl_page{$label} ||= [];
+		push $lbl_page{$label}, $pagenr;
+		
+		$addr += 4;
+		next_line();
+	}
+}
+
+#------------------------------------------------------------------------------
+# add end line with final assembly address
+sub add_end_line {
+	push @lst, sprintf("%-5d %04X              ", 
+					   $linenr, $addr);
+	next_line();
+}
+
+#------------------------------------------------------------------------------
+# Return list of lines of symbol table
+sub sym_lines {
+	my($show_pages) = @_;
+	my @sym;
+	
+	push @sym, "";
+	push @sym, "";
+	push @sym, "Local Module Symbols:";
+	push @sym, "";
+	
+	for (sort keys %lbl_addr) {
+		push @sym, format_sym_line($_, $show_pages) unless $lbl_global{$_};
+	}
+	
+	push @sym, "";
+	push @sym, "";
+	push @sym, "Global Module Symbols:";
+	push @sym, "";
+	
+	for (sort keys %lbl_addr) {
+		push @sym, format_sym_line($_, $show_pages) if $lbl_global{$_};
+	}
+	
+	return @sym;
+}
+
+sub format_sym_line {
+	my($label, $show_pages) = @_;
+	
+	my $line = uc($label);
+	my $space = $COLUMN_WIDTH - length($label);
+	my $tabs  = int($space / 8);
+	
+	$line .= "\t" x ($space % 8 ? $tabs + 1 : $tabs);
+	$line .= "= " . sprintf("%08X", $lbl_addr{$label});
+	
+	if ($show_pages) {
+		$line .= " :";
+		my @pages = @{$lbl_page{$label}};
+		$line .= sprintf("%4d", shift @pages) . '*';
+		while (@pages) {
+			$line .= sprintf("%4d", shift @pages);
+		}
+		$line .= " ";
+	}
+	
+	return $line;
+}
+
+#------------------------------------------------------------------------------
+# compare result file with list of expected lines
+sub compare_list_file {
+	my($file, @expected) = @_;
+
+	my $line = "[line ".((caller)[2])."]";
+
+	my @got = read_file($file);
+	chomp(@got);
+	
+	insert_headers(get_copyright(), get_unix_date($got[0]), $file, \@expected);
+	
+	eq_or_diff \@got, \@expected, "$line compare $file";
+}
+
+# insert headers every $PAGE_SIZE lines
+sub insert_headers {
+	my($copyright, $date, $file, $lines) = @_;
+	my $i = 0;
+	my $page = 1;
+	
+	while ($i < @$lines) {
+		my @insert;
+		push @insert, "\f" if $i > 0;
+		push @insert, $copyright . " " x ($LINE_SIZE - length($copyright) - length($date)) . $date;
+		push @insert, "Page ".sprintf("%03d", $page) . " " x ($LINE_SIZE - 10 - length($file)) . "'$file'";
+		push @insert, "";
+		push @insert, "";
+		
+		splice(@$lines, $i, 0, @insert);
+		
+		$page++;
+		$i += @insert + $PAGE_SIZE;
+	}
+	push @$lines, "\f";
+}
+
+

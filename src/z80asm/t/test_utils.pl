@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.21 2013-01-20 13:18:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.22 2013-02-11 21:54:38 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.21  2013-01-20 13:18:10  pauloscustodio
+# Revision 1.22  2013-02-11 21:54:38  pauloscustodio
+# BUG_0026 : Incorrect paging in symbol list
+#
+# Revision 1.21  2013/01/20 13:18:10  pauloscustodio
 # BUG_0024 : (ix+128) should show warning message
 # Signed integer range was wrongly checked to -128..255 instead
 # of -128..127
@@ -164,6 +167,7 @@ sub t_z80asm {
 	my @asm; 
 	my @obj;
 	my @lst;
+	my @sym;
 	for my $id (@IDS) {
 		my $asm = $args{"asm$id"} or next;
 		$asm =~ s/\s+:\s+/\n/g;
@@ -173,6 +177,7 @@ sub t_z80asm {
 		push @asm, $FILE{asm}{$id};
 		push @obj, $FILE{obj}{$id};
 		push @lst, $FILE{lst}{$id};
+		push @sym, $FILE{sym}{$id};
 	}
 	
 	# assemble
@@ -253,12 +258,24 @@ sub t_z80asm {
 		}
 	}
 	
-	# list file
-	if ($cmd =~ / -l / && defined($args{bin})) {
-		ok -f $_, "$line $_" for (@lst);
+	# list file or symbol table
+	if (defined($args{bin})) {
+		if ($cmd =~ / -l /) {
+			ok   -f $_, "$line $_" for (@lst);
+			ok ! -f $_, "$line no $_" for (@sym);
+		}
+		elsif ($cmd =~ / -ns /) {
+			ok ! -f $_, "$line no $_" for (@lst);
+			ok ! -f $_, "$line no $_" for (@sym);
+		}
+		else {
+			ok ! -f $_, "$line no $_" for (@lst);
+			ok   -f $_, "$line $_" for (@sym);
+		}
 	}
 	else {
 		ok ! -f $_, "$line no $_" for (@lst);
+		ok ! -f $_, "$line no $_" for (@sym);
 	}
 	
 	exit 1 if $errors && $STOP_ON_ERR;
@@ -577,6 +594,29 @@ sub normalize {
 	return $err;
 }
 
+#------------------------------------------------------------------------------
+# get version and date from hist.c
+sub get_copyright {
+	my $hist = read_file("hist.c");
+	my($version) = 	 $hist =~ /\#define \s+ VERSION   \s+ \" (.*?) \"/x or die;
+	my($date) = 	 $hist =~ /\#define \s+ DATE      \s+ \" (.*?) \"/x or die;
+	my($copyright) = $hist =~ /\#define \s+ COPYRIGHT \s+ \" (.*?) \"/x or die;
+	my $copyrightmsg = "Z80 Module Assembler ".$version." (".$date."), (c) ".$copyright;
+	
+	return $copyrightmsg;
+}
+
+#------------------------------------------------------------------------------
+# get UNIX date from input text
+sub get_unix_date {
+	my($text) = @_;
+
+	$text =~ /( (Mon|Tue|Wed|Thu|Fri|Sat|Sun) \s
+				(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \s
+				\d\d \s \d\d:\d\d:\d\d \s \d\d\d\d
+			  )/x
+		or die "Date not found in $text";
+	return $1;
+}
+	
 1;
-
-

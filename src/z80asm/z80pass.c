@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.35 2013-01-24 23:03:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.36 2013-02-11 21:54:38 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.35  2013-01-24 23:03:03  pauloscustodio
+/* Revision 1.36  2013-02-11 21:54:38  pauloscustodio
+/* BUG_0026 : Incorrect paging in symbol list
+/*
+/* Revision 1.35  2013/01/24 23:03:03  pauloscustodio
 /* Replaced (unsigned char) by (byte_t)
 /* Replaced (unisigned int) by (size_t)
 /* Replaced (short) by (int)
@@ -1179,8 +1182,7 @@ WriteSymbolTable( char *msg, avltree *root )
     LineCounter();
     fputc_err( '\n', listfile );
     LineCounter();
-    fprintf( listfile, "%s", msg );
-    LineCounter();
+    fprintf( listfile, "%s", msg );		/* BUG_0026: removed extra LineCounter(); */
     fputc_err( '\n', listfile );
     LineCounter();
     fputc_err( '\n', listfile );
