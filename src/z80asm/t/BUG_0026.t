@@ -13,13 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0026.t,v 1.1 2013-02-11 21:54:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0026.t,v 1.2 2013-02-12 00:55:32 pauloscustodio Exp $
 # $Log: BUG_0026.t,v $
-# Revision 1.1  2013-02-11 21:54:38  pauloscustodio
+# Revision 1.2  2013-02-12 00:55:32  pauloscustodio
+# Comment
+#
+# Revision 1.1  2013/02/11 21:54:38  pauloscustodio
 # BUG_0026 : Incorrect paging in symbol list
 #
-#
-# BUG_0026 : Incorrect paging in symbol list
 
 use strict;
 use warnings;
