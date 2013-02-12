@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.20 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.21 2013-02-12 00:55:00 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.20  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.21  2013-02-12 00:55:00  pauloscustodio
+/* CH_0017 : Align with spaces, deprecate -t option
+/*
+/* Revision 1.20  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.19  2012/06/07 11:54:13  pauloscustodio
@@ -142,6 +145,11 @@ extern char objfilename[];
 extern char errfilename[];
 extern char libfilename[];
 
+/* Page metrics for list file (CH_0017) */
+#define PAGE_LEN		66
+#define PAGE_WIDTH		122
+#define COLUMN_WIDTH	32
+
 
 #define REG16_BC   0
 #define REG16_DE   1
@@ -162,7 +170,6 @@ extern char libfilename[];
 
 
 extern size_t EXPLICIT_ORIGIN;
-extern int TAB_DIST, COLUMN_WIDTH;
 extern char ident[];
 extern char separators[];
 extern avltree *globalroot, *staticroot;

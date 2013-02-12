@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.15 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.16 2013-02-12 00:55:00 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.15  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.16  2013-02-12 00:55:00  pauloscustodio
+/* CH_0017 : Align with spaces, deprecate -t option
+/*
+/* Revision 1.15  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.14  2012/11/03 17:39:36  pauloscustodio
@@ -412,7 +415,8 @@ void set_asm_flag( char *flagid )
 
     else if ( *flagid == 't' )
     {
-        sscanf( flagid + 1, "%d", &TAB_DIST );
+		flagid[1] = '\0';
+		warning( ERR_OPTION_DEPRECATED, flagid );		/* CH_0017 */
     }
 
     else if ( *flagid == 'I' )

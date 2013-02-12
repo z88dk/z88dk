@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.47 2013-01-24 23:03:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.48 2013-02-12 00:55:00 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.47  2013-01-24 23:03:03  pauloscustodio
+/* Revision 1.48  2013-02-12 00:55:00  pauloscustodio
+/* CH_0017 : Align with spaces, deprecate -t option
+/*
+/* Revision 1.47  2013/01/24 23:03:03  pauloscustodio
 /* Replaced (unsigned char) by (byte_t)
 /* Replaced (unisigned int) by (size_t)
 /* Replaced (short) by (int)
@@ -360,7 +363,6 @@ extern char Z80objhdr[];
 extern enum symbols sym, GetSym( void );
 extern enum flag writeline;
 extern enum flag EOL, library;
-extern byte_t PAGELEN;
 extern byte_t reloc_routine[];
 extern int listfileptr;
 extern struct modules *modulehdr;
@@ -1436,18 +1438,10 @@ WriteMapFile( void )
 void
 WriteMapSymbol( symbol *mapnode )
 {
-    int tabulators, space;
-
     if ( mapnode->type & SYMADDR )
     {
-        fprintf( mapfile, "%s", mapnode->symname );
-        space = COLUMN_WIDTH - strlen( mapnode->symname );
-
-        for ( tabulators = space % TAB_DIST ? space / TAB_DIST + 1 : space / TAB_DIST;
-                tabulators > 0; tabulators-- )
-        {
-            fputc_err( '\t', mapfile );
-        }
+		/* CH_0017 */
+        fprintf( mapfile, "%-*s ", COLUMN_WIDTH - 1, mapnode->symname );
 
         if ( autorelocate )
         {
@@ -1476,22 +1470,13 @@ WriteMapSymbol( symbol *mapnode )
 void
 WriteGlobal( symbol *node )
 {
-    int tabulators, space;
-
     if ( ( node->type & SYMTOUCHED ) && ( node->type & SYMADDR ) &&
             ( node->type & SYMXDEF ) && !( node->type & SYMDEF ) )
     {
         /* Write only global definitions - not library routines     */
-        fprintf( deffile, "DEFC %s", node->symname );
-
-        space = COLUMN_WIDTH - 5 - strlen( node->symname );
-
-        for ( tabulators = space % TAB_DIST ? space / TAB_DIST + 1 : space / TAB_DIST; tabulators > 0; tabulators-- )
-        {
-            fputc_err( '\t', deffile );
-        }
-
-        fprintf( deffile, "= $%04lX; ", node->symvalue + modulehdr->first->origin + CURRENTMODULE->startoffset );
+     	/* CH_0017 */
+		fprintf( deffile, "DEFC %-*s ", COLUMN_WIDTH - 1, node->symname );
+        fprintf( deffile, "= $%04lX ; ", node->symvalue + modulehdr->first->origin + CURRENTMODULE->startoffset );
         fprintf( deffile, "Module %s\n", node->owner->mname );
     }
 }

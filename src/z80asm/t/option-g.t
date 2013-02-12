@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-g.t,v 1.2 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-g.t,v 1.3 2013-02-12 00:55:00 pauloscustodio Exp $
 # $Log: option-g.t,v $
-# Revision 1.2  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.3  2013-02-12 00:55:00  pauloscustodio
+# CH_0017 : Align with spaces, deprecate -t option
+#
+# Revision 1.2  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.1  2011/07/11 15:46:33  pauloscustodio
@@ -28,20 +31,49 @@ use strict;
 use warnings;
 use File::Slurp;
 use Test::More;
+use Test::Differences; 
 require 't/test_utils.pl';
 
-my $asm = "xdef main \n main: ld b,10 \n loop: djnz loop";
+my $asm = "
+	xdef main, x31_x31_x31_x31_x31_x31_x31_x31, x_32_x32_x32_x32_x32_x32_x32_x32
+main: ld b,10
+loop: djnz loop
+x31_x31_x31_x31_x31_x31_x31_x31: defb 0
+x_32_x32_x32_x32_x32_x32_x32_x32: defb 0
+";
+my $asm2 = "
+	xdef func
+func: ret
+";
+my $bin = "\x06\x0A\x10\xFE\x00\x00\xC9";
+
 
 # -g
-t_z80asm_ok(0, $asm, "\x06\x0A\x10\xFE", "-g");
-like read_file(def_file()),
-	qr/ \A  \s*
-		DEFC \s+ MAIN \s+ = \s+ \$0000; \s+ Module \s+ TEST \s+
-	    \z /x;
+t_z80asm(
+	asm		=> $asm,
+	asm2	=> $asm2,
+	bin		=> $bin,
+	options	=> '-g',
+);
+ok -f def_file(), def_file();
+eq_or_diff scalar(read_file(def_file())), <<'END', "deffile contents";
+DEFC MAIN                            = $0000 ; Module TEST
+DEFC X31_X31_X31_X31_X31_X31_X31_X31 = $0004 ; Module TEST
+DEFC X_32_X32_X32_X32_X32_X32_X32_X32 = $0005 ; Module TEST
+
+DEFC FUNC                            = $0006 ; Module TEST2
+
+END
+
 
 # -ng
-t_z80asm_ok(0, $asm, "\x06\x0A\x10\xFE", "-g -ng");
-ok ! -f def_file();
+t_z80asm(
+	asm		=> $asm,
+	asm2	=> $asm2,
+	bin		=> $bin,
+	options	=> '-g -ng',
+);
+ok ! -f def_file(), "no ".def_file();
 
 unlink_testfiles();
 done_testing();

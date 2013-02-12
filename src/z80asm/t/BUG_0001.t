@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0001.t,v 1.5 2013-01-20 21:24:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0001.t,v 1.6 2013-02-12 00:55:00 pauloscustodio Exp $
 # $Log: BUG_0001.t,v $
-# Revision 1.5  2013-01-20 21:24:28  pauloscustodio
+# Revision 1.6  2013-02-12 00:55:00  pauloscustodio
+# CH_0017 : Align with spaces, deprecate -t option
+#
+# Revision 1.5  2013/01/20 21:24:28  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.4  2011/07/14 23:49:50  pauloscustodio
@@ -41,26 +44,25 @@ use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-my $ASM = "
+my $asm = "
 JP NN
 JP NN
 NN:
 ";
-my $BIN = "\xC3\x06\x00\xC3\x06\x00";
-t_z80asm_ok(0, $ASM, $BIN, "-t4 -b");
+
+my $bin = "\xC3\x06\x00\xC3\x06\x00";
+
+t_z80asm(
+	asm		=> $asm,
+	bin		=> $bin,
+);
 
 # Test bugfix of BUG_0001(a)
-my $asm2 = asm_file(); $asm2 =~ s/\.asm$/2.asm/i;
-write_file(asm_file(), "
-	xref value
-	ld a,value-0
-");
-write_file($asm2, "
-	xdef value
-	defc value=10
-");
-t_z80asm_capture("-r0 -b ".asm_file()." ".$asm2, "", "", 0);
-t_binary(read_file(bin_file(), binary => ':raw'), "\x3E\x0A");
+t_z80asm(
+	asm		=> " xref value : ld a,value-0 ",
+	asm2	=> " xdef value : defc value=10 ",
+	bin		=> "\x3E\x0A",
+);
 
-unlink_testfiles($asm2);
+unlink_testfiles();
 done_testing();

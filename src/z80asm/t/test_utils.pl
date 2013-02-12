@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.22 2013-02-11 21:54:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.23 2013-02-12 00:55:00 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.22  2013-02-11 21:54:38  pauloscustodio
+# Revision 1.23  2013-02-12 00:55:00  pauloscustodio
+# CH_0017 : Align with spaces, deprecate -t option
+#
+# Revision 1.22  2013/02/11 21:54:38  pauloscustodio
 # BUG_0026 : Incorrect paging in symbol list
 #
 # Revision 1.21  2013/01/20 13:18:10  pauloscustodio
@@ -222,7 +225,7 @@ sub t_z80asm {
 	}
 	$errors++ unless $stderr eq $exp_err_screen;
 	is $stderr, $exp_err_screen, "$line err";
-	if ($stderr) {
+	if ($stderr && $stderr !~ /option.*deprecated/) {	# option deprecated: before error file is created
 		ok -f err_file(), "$line ".err_file();
 		my $got_err_file = read_file(err_file(), err_mode => 'quiet') // "";
 		chomp($got_err_file);
@@ -237,7 +240,15 @@ sub t_z80asm {
 		# warning -> got_err_file
 		# ok ! -f err_file(), "$line no ".err_file();
 		
-		ok -f $_, "$line $_" for (@obj, bin_file(), map_file());
+		ok -f $_, "$line $_" for (@obj, bin_file());
+		
+		# map file
+		if ($cmd =~ / -nm /) {
+			ok ! -f map_file(), "$line no ".map_file();
+		}
+		else {
+			ok   -f map_file(), "$line ".map_file();
+		}
 		
 		my $binary = read_file(bin_file(), binmode => ':raw', err_mode => 'quiet');
 		t_binary($binary, $args{bin}, $line);

@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.66 2013-01-24 23:03:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.67 2013-02-12 00:55:00 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.66  2013-01-24 23:03:03  pauloscustodio
+/* Revision 1.67  2013-02-12 00:55:00  pauloscustodio
+/* CH_0017 : Align with spaces, deprecate -t option
+/*
+/* Revision 1.66  2013/01/24 23:03:03  pauloscustodio
 /* Replaced (unsigned char) by (byte_t)
 /* Replaced (unisigned int) by (size_t)
 /* Replaced (short) by (int)
@@ -516,8 +519,6 @@ enum flag EOL, library, createlibrary;
 
 int PAGENR, LINENR;
 long TOTALLINES;
-byte_t PAGELEN;
-int TAB_DIST = 8, COLUMN_WIDTH;
 char line[255], stringconst[255], ident[FILENAME_MAX + 1];
 
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation */
@@ -665,8 +666,8 @@ AssembleSourceFile( void )
 
         if ( globaldef )
         {
-            fputc_err( '\n', deffile );    /* separate DEFC lines for each module */
             inorder( globalroot, ( void ( * )( void * ) ) WriteGlobal );
+            fputc_err( '\n', deffile );    /* separate DEFC lines for each module */
         }
 
         deleteall( &CURRENTMODULE->localroot, ( void ( * )( void * ) ) FreeSym );
@@ -1298,7 +1299,6 @@ int main( int argc, char *argv[] )
         time( &asmtime );
         date = asctime( localtime( &asmtime ) ); /* get current system time for date in list file */
 
-        PAGELEN = 66;
         TOTALLINES = 0;
 
         /* Get options first */
@@ -1311,8 +1311,6 @@ int main( int argc, char *argv[] )
         {
             fatal_error( ERR_NO_SRC_FILE );
         }
-
-        COLUMN_WIDTH = 4 * TAB_DIST;    /* define column width   for output files */
 
         if ( verbose == ON )
         {
