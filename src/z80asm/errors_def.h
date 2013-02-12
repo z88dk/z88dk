@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Define error codes and error messages
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.7 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.8 2013-02-12 00:48:54 pauloscustodio Exp $ */
 /* $Log: errors_def.h,v $
-/* Revision 1.7  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.8  2013-02-12 00:48:54  pauloscustodio
+/* CH_0017 : Align with spaces, deprecate -t option
+/*
+/* Revision 1.7  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.6  2012/05/26 18:51:10  pauloscustodio
@@ -48,6 +51,7 @@ Define error codes and error messages
 /* information */
 DEF_MSG( ERR_OK,                    "OK" ) /* not used */
 DEF_MSG( ERR_TOTALERRORS,           "%d errors occurred during assembly" )
+DEF_MSG( ERR_OPTION_DEPRECATED,		"option '-%s' is deprecated" )
 
 /* system errors */
 DEF_MSG( ERR_NO_MEMORY,             "Not enough memory" )
