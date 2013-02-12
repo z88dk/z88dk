@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.36 2013-01-20 13:45:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.37 2013-02-12 00:59:14 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.36  2013-01-20 13:45:49  pauloscustodio
+/* Revision 1.37  2013-02-12 00:59:14  pauloscustodio
+/* Version 1.1.21
+/*
+/* Revision 1.36  2013/01/20 13:45:49  pauloscustodio
 /* Version 1.1.20
 /*
 /* Revision 1.35  2012/11/03 17:41:11  pauloscustodio
@@ -1078,6 +1081,36 @@ Based on 1.0.31
 		WriteListFile tries to list bytes from -1 to 1 -> crash
 
 -------------------------------------------------------------------------------
+12.02.2013 [1.1.21] (pauloscustodio)
+-------------------------------------------------------------------------------
+	BUG_0026 : Incorrect paging in symbol list
+		The pages including the header of each symbol list had one line less
+		than the others - incorrect call of LineCounter().
+		
+	BUG_0027 : Incorrect tabulation in symbol list
+		When symbols are longer than COLUMN_WIDTH by 1, one extra tab is 
+		output between symbol name and '=' sign.
+		See CH_0017.
+		
+	BUG_0028 : Not aligned page list in symbol list with more that 18 references
+		The page list of each symbol at the end of the list file is not aligned
+		when there are more than 18 references of a symbol.
+		The first line has 18 references, the next lines have 17.
+		The '*' causes the 2nd and next lines to have misaligned references.
+
+	CH_0017 : Align with spaces, deprecate -t option
+		Replace TAB-printing logic by printf() field length specifier.
+		Simpler code at the expense of longer output files, using spaces instead
+		of TABs. 
+		Change list file, sym file, map file and def file.
+		Change page metrics variables into constants.
+		
+    Internal cleanup:
+	- Unified usage of integer types: int, char, byte_t, size_t
+	- New CLASS_LIST() to create lists of objects defined by CLASS()
+	- New CLASS_HASH() to create hash tables of objects defined by CLASS()
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1096,8 +1129,8 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define DATE        "20.01.2013"
-#define VERSION     "1.1.20"
+#define DATE        "12.02.2013"
+#define VERSION     "1.1.21"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS
