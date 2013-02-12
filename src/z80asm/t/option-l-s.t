@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-l-s.t,v 1.4 2013-02-11 21:54:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-l-s.t,v 1.5 2013-02-12 00:58:13 pauloscustodio Exp $
 # $Log: option-l-s.t,v $
-# Revision 1.4  2013-02-11 21:54:38  pauloscustodio
+# Revision 1.5  2013-02-12 00:58:13  pauloscustodio
+# BUG_0027 : Incorrect tabulation in symbol list
+# BUG_0028 : Not aligned page list in symbol list with more that 18 references
+# CH_0017 : Align with spaces, deprecate -t option
+#
+# Revision 1.4  2013/02/11 21:54:38  pauloscustodio
 # BUG_0026 : Incorrect paging in symbol list
 #
 # Revision 1.3  2013/01/24 23:03:03  pauloscustodio
@@ -66,6 +71,7 @@ first_line();
 use_labels();
 define_labels();
 use_labels();
+long_reference_list();
 add_end_line();
 
 my $asm = join("\n", @asm);
@@ -229,6 +235,41 @@ sub use_labels {
 }
 
 #------------------------------------------------------------------------------
+# create a reference list with 40 different pages
+sub long_reference_list {
+	my $label = "long_ref";
+
+	# define the label
+	my $asm = "$label:";
+	push @asm, $asm;
+	push @bin, '';
+	push @lst, sprintf("%-5d %04X              $asm", 
+					   $linenr, $addr);
+
+	$lbl_page{$label}[0] = $pagenr;
+	$lbl_addr{$label} = $addr;
+
+	$addr += 0;
+	next_line();
+
+	# use the label
+	while (@{$lbl_page{$label}} < 18*3) {
+		my $asm = "defw $label";
+		push @asm, $asm;
+		push @bin, pack("v", $lbl_addr{$label});
+		push @lst, sprintf("%-5d %04X  %02X %02X       $asm", 
+						   $linenr, $addr,
+						   $lbl_addr{$label} & 0xFF, 
+						   ($lbl_addr{$label} >> 8) & 0xFF);
+
+		push @{$lbl_page{$label}}, $pagenr unless $lbl_page{$label}[-1] == $pagenr;
+
+		$addr += 2;
+		next_line();
+	}		
+}
+ 
+#------------------------------------------------------------------------------
 # add end line with final assembly address
 sub add_end_line {
 	push @lst, sprintf("%-5d %04X              ", 
@@ -265,25 +306,37 @@ sub sym_lines {
 
 sub format_sym_line {
 	my($label, $show_pages) = @_;
+	my @ret;
 	
 	my $line = uc($label);
-	my $space = $COLUMN_WIDTH - length($label);
-	my $tabs  = int($space / 8);
-	
-	$line .= "\t" x ($space % 8 ? $tabs + 1 : $tabs);
-	$line .= "= " . sprintf("%08X", $lbl_addr{$label});
+	if (length($line) >= $COLUMN_WIDTH) {
+		push @ret, $line;
+		$line = '';
+	}
+	$line .= sprintf("%-*s= %08X", $COLUMN_WIDTH - length($line), '', $lbl_addr{$label});
 	
 	if ($show_pages) {
 		$line .= " :";
+		
 		my @pages = @{$lbl_page{$label}};
-		$line .= sprintf("%4d", shift @pages) . '*';
-		while (@pages) {
-			$line .= sprintf("%4d", shift @pages);
+		my $first = 1;
+		while (my @block = splice(@pages, 0, 15)) {
+			$line .= sprintf("%4d%s", shift @block, $first ? '*' : ' ');
+			$first = 0;
+			
+			while (@block) {
+				$line .= sprintf("%4d ", shift @block);
+			}
+			
+			if (@pages) {
+				push @ret, $line;
+				$line = sprintf("%*s", $COLUMN_WIDTH + 2 + 8 + 2, '');
+			}
 		}
-		$line .= " ";
 	}
+	push @ret, $line;
 	
-	return $line;
+	return @ret;
 }
 
 #------------------------------------------------------------------------------

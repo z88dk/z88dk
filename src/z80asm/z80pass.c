@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.36 2013-02-11 21:54:38 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.37 2013-02-12 00:58:13 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.36  2013-02-11 21:54:38  pauloscustodio
+/* Revision 1.37  2013-02-12 00:58:13  pauloscustodio
+/* BUG_0027 : Incorrect tabulation in symbol list
+/* BUG_0028 : Not aligned page list in symbol list with more that 18 references
+/* CH_0017 : Align with spaces, deprecate -t option
+/*
+/* Revision 1.36  2013/02/11 21:54:38  pauloscustodio
 /* BUG_0026 : Incorrect paging in symbol list
 /*
 /* Revision 1.35  2013/01/24 23:03:03  pauloscustodio
@@ -322,7 +327,6 @@ extern FILE *z80asmfile, *listfile, *objfile;
 extern char *date, line[], ident[], separators[];
 extern enum symbols sym;
 extern enum flag writeline, EOL;
-extern byte_t PAGELEN;
 extern long listfileptr, TOTALLINES;
 extern struct modules *modulehdr;       /* pointer to module header */
 extern struct module *CURRENTMODULE;
@@ -1097,7 +1101,7 @@ WriteListFile( void )
 void
 LineCounter( void )
 {
-    if ( ++LINENR > PAGELEN )
+    if ( ++LINENR > PAGE_LEN )
     {
         fprintf( listfile, "\x0C\n" );    /* send FORM FEED to file */
         WriteHeader();
@@ -1111,12 +1115,12 @@ WriteHeader( void )
 {
 #ifdef QDOS
     fprintf( listfile, "%s %s, %s", _prog_name, _version, _copyright );
-    fprintf( listfile, "%*.*s", 122 - strlen( _prog_name ) - strlen( _version ) - strlen( _copyright ) - 3, strlen( date ), date );
+    fprintf( listfile, "%*.*s", PAGE_WIDTH - strlen( _prog_name ) - strlen( _version ) - strlen( _copyright ) - 3, strlen( date ), date );
 #else
     fprintf( listfile, "%s", copyrightmsg );
-    fprintf( listfile, "%*.*s", ( int )( 122 - strlen( copyrightmsg ) ), ( int ) strlen( date ), date );
+    fprintf( listfile, "%*.*s", ( int )( PAGE_WIDTH - strlen( copyrightmsg ) ), ( int ) strlen( date ), date );
 #endif
-    fprintf( listfile, "Page %03d%*s'%s'\n\n\n", ++PAGENR, ( int )( 122 - 9 - 2 - strlen( lstfilename ) ), "", lstfilename );
+    fprintf( listfile, "Page %03d%*s'%s'\n\n\n", ++PAGENR, ( int )( PAGE_WIDTH - 9 - 2 - strlen( lstfilename ) ), "", lstfilename );
 }
 
 
@@ -1124,8 +1128,8 @@ void
 WriteSymbol( symbol *n )
 {
     int k;
-    int space, tabulators;
     struct pageref *page;
+	char *symbol_output;
 
     if ( n->owner == CURRENTMODULE )
     {
@@ -1134,33 +1138,39 @@ WriteSymbol( symbol *n )
         {
             if ( ( n->type & SYMTOUCHED ) )
             {
-                fprintf( listfile, "%s", n->symname );
-                space = COLUMN_WIDTH - strlen( n->symname );
+				/* BUG_0027 */
+				if ( strlen( n->symname ) < COLUMN_WIDTH )
+				{
+					symbol_output = n->symname;		/* one line with symbol name and value */
+				}
+				else 
+				{
+					symbol_output = "";				/* one line with symbol name, next line with blanks */
 
-                for ( tabulators = space % TAB_DIST ? space / TAB_DIST + 1 : space / TAB_DIST; tabulators > 0; tabulators-- )
-                {
-                    fputc_err( '\t', listfile );
-                }
+					fprintf( listfile, "%s\n", n->symname );
+					LineCounter();
+				}
 
-                fprintf( listfile, "= %08lX", n->symvalue );
+				fprintf( listfile, "%-*s= %08lX", COLUMN_WIDTH, symbol_output, n->symvalue );
 
+				/* BUG_0028 */
                 if ( n->references != NULL )
                 {
                     page = n->references->firstref;
-                    fprintf( listfile, " : %3d* ", page->pagenr );
+                    fprintf( listfile, " :%4d*", page->pagenr );
                     page = page->nextref;
-                    k = 17;
+                    k = 14;
 
                     while ( page != NULL )
                     {
                         if ( k-- == 0 )
                         {
-                            fprintf( listfile, "\n%45s", "" );
-                            k = 16;
+                            fprintf( listfile, "\n%*s", COLUMN_WIDTH + 2 + 8 + 2, "" );
                             LineCounter();
+                            k = 14;
                         }
 
-                        fprintf( listfile, "%3d ", page->pagenr );
+                        fprintf( listfile, "%4d ", page->pagenr );
                         page = page->nextref;
                     }
                 }
