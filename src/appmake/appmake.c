@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.15 2013-02-06 10:29:22 stefano Exp $
+ *   $Id: appmake.c,v 1.16 2013-02-13 09:00:29 stefano Exp $
  */
 
 #define MAIN_C
@@ -447,11 +447,11 @@ void zx_rawout (FILE *fpout, unsigned char b, char fast)
   {
     if (b & c[i])
 	  /* Experimental MIN limit is 17 */
-	  if ( fast ) period = 18; else period = 22;
+	  if ( fast ) period = 19; else period = 22;
 	  //period = 22;
     else
       /* Experimental MIN limit is 7 */
-      if ( fast ) period = 8; else period = 11;
+      if ( fast ) period = 9; else period = 11;
       //period = 11;
 
     zx_rawbit(fpout, period);
