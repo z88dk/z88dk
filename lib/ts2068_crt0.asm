@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.12 2010-12-24 11:59:35 stefano Exp $
+;       $Id: ts2068_crt0.asm,v 1.13 2013-02-14 11:29:53 stefano Exp $
 ;
 
 
@@ -370,9 +370,7 @@ heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
 
 
-IF DEFINED_NEED1bitsound
 snd_tick:       defb	0	; Sound variable
-ENDIF
 
 
 ; ZXMMC SD/MMC interface

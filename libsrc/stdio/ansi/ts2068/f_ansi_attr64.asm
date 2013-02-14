@@ -1,5 +1,5 @@
 ;
-; 	ANSI Video handling for the TS2068
+; 	ANSI Video handling for the TS2068 64 columns
 ;	By Stefano Bodrato - May 2011
 ;
 ; 	Text Attributes
@@ -9,31 +9,23 @@
 ;	Be careful here...
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.2 2013-02-14 11:29:53 stefano Exp $
+;	$Id: f_ansi_attr64.asm,v 1.1 2013-02-14 11:29:53 stefano Exp $
 ;
-IF A64COL
-	INCLUDE "stdio/ansi/ts2068/f_ansi_attr64.asm"
-ELSE
-IF A80COL
-	INCLUDE "stdio/ansi/ts2068/f_ansi_attr85.asm"
-ELSE
-IF A85COL
-	INCLUDE "stdio/ansi/ts2068/f_ansi_attr85.asm"
-ELSE
+
 	XLIB	ansi_attr
 
 	XREF	INVRS
 	XREF	BOLD
+	XREF	UNDERLINE
 
 .ansi_attr
         and     a
         jr      nz,noreset
         ld	(BOLD),a
         ld	(BOLD+1),a
-        xor     a
         ld      (INVRS),a      ; inverse 0
-        ld      a, 24
-        ld      (INVRS+2),a   ; underline 0
+        ld      a, 201
+        ld      (UNDERLINE),a ; ret - underline 0
         ret
 .noreset
         cp      1
@@ -56,26 +48,26 @@ ELSE
 .nodim
         cp      4
         jr      nz,nounderline
-        ld      a,32
-        ld      (INVRS+2),a   ; underline 1
+        xor     a
+        ld      (UNDERLINE),a ; nop - underline 1
         ret
 .nounderline
         cp      24
         jr      nz,noCunderline
-        ld      a, 24
-        ld      (INVRS+2),a   ; underline 0
+        ld      a, 201
+        ld      (UNDERLINE),a; ret - underline 0
         ret
 .noCunderline
         cp      5
         jr      nz,noblink
-        ld      a,32
-        ld      (INVRS+2),a   ; underline (blink emulation) 1
+        xor     a
+        ld      (UNDERLINE),a ; nop - underline (blink emulation) 1
         ret
 .noblink
         cp      25
         jr      nz,nocblink
-        ld      a, 24
-        ld      (INVRS+2),a   ; underline (blink emulation) 0
+        ld      a, 201
+        ld      (UNDERLINE),a; ret - underline (blink emulation) 0
         ret
 .nocblink
         cp      7
@@ -91,6 +83,3 @@ ELSE
         ret
 .noCreverse
         ret
-ENDIF
-ENDIF
-ENDIF

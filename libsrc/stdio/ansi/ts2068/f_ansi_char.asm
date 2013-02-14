@@ -19,8 +19,19 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.2 2012-05-04 16:39:25 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.3 2013-02-14 11:29:54 stefano Exp $
 ;
+IF A64COL
+	INCLUDE "stdio/ansi/ts2068/f_ansi_char64.asm"
+ELSE
+
+IF A80COL
+	INCLUDE "stdio/ansi/ts2068/f_ansi_char85.asm"
+ELSE
+
+IF A85COL
+	INCLUDE "stdio/ansi/ts2068/f_ansi_char85.asm"
+ELSE
 
 	XLIB	ansi_CHAR
 	
@@ -353,3 +364,6 @@ ENDIF
     rl (ix+0)
     pop bc
     ret
+ENDIF
+ENDIF
+ENDIF
