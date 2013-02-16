@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.20 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.21 2013-02-16 09:43:55 pauloscustodio Exp $ */
 /* $Log: config.h,v $
-/* Revision 1.20  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.21  2013-02-16 09:43:55  pauloscustodio
+/* BUG_0029 : Incorrect alignment in list file with more than 4 bytes opcode
+/* Need to define the EOL_SIZE per platform
+/*
+/* Revision 1.20  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.19  2012/05/24 17:09:27  pauloscustodio
@@ -170,6 +174,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 #define FILEEXT_SEPARATOR "_"
 #else
 #define FILEEXT_SEPARATOR "."
+#endif
+
+/* EOL size */
+#if defined(WIN32) || defined(MSDOS)
+#define EOL_LEN	2
+#else
+#define EOL_LEN	1
 #endif
 
 
