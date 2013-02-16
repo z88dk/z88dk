@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-l-s.t,v 1.5 2013-02-12 00:58:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-l-s.t,v 1.6 2013-02-16 09:46:56 pauloscustodio Exp $
 # $Log: option-l-s.t,v $
-# Revision 1.5  2013-02-12 00:58:13  pauloscustodio
+# Revision 1.6  2013-02-16 09:46:56  pauloscustodio
+# BUG_0029 : Incorrect alignment in list file with more than 4 bytes opcode
+#
+# Revision 1.5  2013/02/12 00:58:13  pauloscustodio
 # BUG_0027 : Incorrect tabulation in symbol list
 # BUG_0028 : Not aligned page list in symbol list with more that 18 references
 # CH_0017 : Align with spaces, deprecate -t option
@@ -48,6 +51,7 @@ require 't/test_utils.pl';
 # Page handling
 my $PAGE_SIZE = 61;
 my $LINE_SIZE = 121;
+my $MAX_LINE = 255-2;
 my $COLUMN_WIDTH = 32;
 my $linenr;
 my $pagenr;
@@ -72,6 +76,10 @@ use_labels();
 define_labels();
 use_labels();
 long_reference_list();
+diag "BUG_0030: patching fails";
+diag "BUG: lines longer that 255 garble list file";
+#patching();
+lines_10k();
 add_end_line();
 
 my $asm = join("\n", @asm);
@@ -150,65 +158,36 @@ sub define_labels {
 	
 	for (0..255) {
 		my $label = sprintf("lbl%03d", $_);
-		my $asm   = sprintf("$label: defb %3d", $_);
-		push @asm, $asm;
-		push @bin, pack("C", $_);
-		push @lst, sprintf("%-5d %04X  %02X          $asm", 
-						   $linenr, $addr, 
-						   $_, $_);
 
 		unshift $lbl_page{$label}, $pagenr;
-		
 		$lbl_addr{$label} = $addr;
 		
-		$addr++;
-		next_line();
+		push_list_line("$label: defb $_", $_ );
 	}
 	
 	# add global labels
 	for (0..255) {
 		my $label = sprintf("global%03d", $_);
-		my $asm1  =         "        xdef $label";
-		my $asm2  = sprintf("$label: defb %3d", $_);
 		
-		push @asm, $asm1;
-		push @asm, $asm2;
-		push @bin, pack("C", $_);
-
-		push @lst, sprintf("%-5d %04X              $asm1", 
-						   $linenr, $addr);
 		$lbl_page{$label}[0] = $pagenr;
-		next_line();
-
-		push @lst, sprintf("%-5d %04X  %02X          $asm2", 
-						   $linenr, $addr, 
-						   $_);
+		push_list_line("xdef $label");
 
 		unshift $lbl_page{$label}, $pagenr if $pagenr != $lbl_page{$label}[0];
 		$lbl_global{$label} = 1;
-		
 		$lbl_addr{$label} = $addr;
-		
-		$addr++;
-		next_line();
+		push_list_line("$label: defb $_", $_);
 	}
 	
 	# add labels of all sizes
 	for (2..255) {
 		my $label = substr("x" . (($_.'_') x $_), 0, $_);
-		my $asm   = "$label: defb $_";
-		next if length($asm) + 2 > 255;
+				
+		my $asm = "$label: defb $_";
+		last if length($asm) >= $MAX_LINE;
 		
-		push @asm, $asm;
-		push @bin, pack("C", $_);
-		
-		push @lst, sprintf("%-5d %04X  %02X          $asm", 
-						   $linenr, $addr, $_);
 		$lbl_page{$label}[0] = $pagenr;
 		$lbl_addr{$label} = $addr;
-		
-		$addr++;
-		next_line();
+		push_list_line($asm, $_);
 	}		
 }
 
@@ -217,64 +196,77 @@ sub define_labels {
 sub use_labels {
 	for (0..255) {
 		my $label = sprintf("lbl%03d", $_);
-		my $asm   = sprintf("defw %3d, $label", $_);
-		push @asm, $asm;
-		push @bin, pack("v*", $_, $lbl_base + $_);
-		push @lst, sprintf("%-5d %04X  %02X %02X %02X %02X $asm", 
-						   $linenr, $addr, 
-						   $_, 0, 
-						   ($lbl_base + $_) & 0xFF, 
-						   (($lbl_base + $_) >> 8) & 0xFF);
-
+		
 		$lbl_page{$label} ||= [];
 		push $lbl_page{$label}, $pagenr;
-		
-		$addr += 4;
-		next_line();
+		push_list_line("defw $_, $label", unpack("C*", pack("v*", $_, $lbl_base + $_)));
 	}
 }
 
 #------------------------------------------------------------------------------
-# create a reference list with 40 different pages
+# create a reference list with more than two lines in listing file
 sub long_reference_list {
 	my $label = "long_ref";
 
 	# define the label
-	my $asm = "$label:";
-	push @asm, $asm;
-	push @bin, '';
-	push @lst, sprintf("%-5d %04X              $asm", 
-					   $linenr, $addr);
-
 	$lbl_page{$label}[0] = $pagenr;
 	$lbl_addr{$label} = $addr;
-
-	$addr += 0;
-	next_line();
+	push_list_line("$label:");
 
 	# use the label
 	while (@{$lbl_page{$label}} < 18*3) {
-		my $asm = "defw $label";
-		push @asm, $asm;
-		push @bin, pack("v", $lbl_addr{$label});
-		push @lst, sprintf("%-5d %04X  %02X %02X       $asm", 
-						   $linenr, $addr,
-						   $lbl_addr{$label} & 0xFF, 
-						   ($lbl_addr{$label} >> 8) & 0xFF);
-
 		push @{$lbl_page{$label}}, $pagenr unless $lbl_page{$label}[-1] == $pagenr;
-
-		$addr += 2;
-		next_line();
+		push_list_line("defw $label", unpack("C*", pack("v*", $lbl_addr{$label})));
 	}		
 }
- 
+
+#------------------------------------------------------------------------------
+# test patching of listing file
+sub patching {
+	my $label = 'P';
+	
+	my $base_addr = $addr;
+	$lbl_page{$label}[0] = $pagenr;
+	$lbl_addr{$label} = $base_addr + 47361;
+	
+	patch_expr($label, 'defb', 'P/256', 'C', $lbl_addr{$label} >> 8);
+	patch_expr($label, 'defw', 'P', 'v', $lbl_addr{$label});
+	patch_expr($label, 'defl', 'P', 'V', $lbl_addr{$label});
+		
+	die "label $label: expected at address \$base_addr + ".($addr-$base_addr) unless $addr == $lbl_addr{$label};
+	pop @{$lbl_page{$label}} if $lbl_page{$label}[-1] == $pagenr;
+	unshift @{$lbl_page{$label}}, $pagenr;
+	push_list_line("$label:");
+}
+
+sub patch_expr {
+	my($label, $opcode, $expr, $pack, $value) = @_;
+	
+	my $asm = "$opcode $expr";
+	my @values = ($value);
+	while (length($asm) < $MAX_LINE) {
+		$lbl_page{$label} ||= [];
+		push $lbl_page{$label}, $pagenr unless $lbl_page{$label}[-1] == $pagenr;
+		push_list_line($asm, unpack("C*", pack("$pack*", @values)));
+		
+		# add one item to list
+		$asm .= ",$expr";
+		push @values, $value;
+	}
+}
+
+#------------------------------------------------------------------------------
+# add lines up to 10000
+sub lines_10k {
+	while ($linenr < 10000) {
+		push_list_line("nop", 0);
+	}
+}
+
 #------------------------------------------------------------------------------
 # add end line with final assembly address
 sub add_end_line {
-	push @lst, sprintf("%-5d %04X              ", 
-					   $linenr, $addr);
-	next_line();
+	push_list_line();
 }
 
 #------------------------------------------------------------------------------
@@ -288,7 +280,7 @@ sub sym_lines {
 	push @sym, "Local Module Symbols:";
 	push @sym, "";
 	
-	for (sort keys %lbl_addr) {
+	for (sort {uc($a) cmp uc($b)} keys %lbl_addr) {
 		push @sym, format_sym_line($_, $show_pages) unless $lbl_global{$_};
 	}
 	
@@ -297,13 +289,14 @@ sub sym_lines {
 	push @sym, "Global Module Symbols:";
 	push @sym, "";
 	
-	for (sort keys %lbl_addr) {
+	for (sort {uc($a) cmp uc($b)} keys %lbl_addr) {
 		push @sym, format_sym_line($_, $show_pages) if $lbl_global{$_};
 	}
 	
 	return @sym;
 }
 
+#------------------------------------------------------------------------------
 sub format_sym_line {
 	my($label, $show_pages) = @_;
 	my @ret;
@@ -340,6 +333,43 @@ sub format_sym_line {
 }
 
 #------------------------------------------------------------------------------
+# push list line
+sub push_list_line {
+	my($asm, @bytes) = @_;
+
+	push @asm, $asm if $asm;
+	push @bin, pack("C*", @bytes);
+	
+	my $lst = sprintf("%-5d %04X  ", $linenr, $addr);
+	
+	my @lst_bytes = @bytes;
+	while (@lst_bytes) {
+		my @lst_block = splice(@lst_bytes, 0, 32);
+		$lst .= join('', map {sprintf("%02X ", $_)} @lst_block);
+		$addr += @lst_block;
+
+		# still for another row?
+		if (@lst_bytes) {
+			push @lst, $lst;
+			next_line(); $linenr--;
+			$lst = sprintf("%5s %04X  ", "", $addr);
+		}
+	}
+	
+	# assembly
+	if (@bytes <= 4) {
+		$lst = sprintf("%-24s%s", $lst, $asm // '');
+	}
+	else {
+		push @lst, $lst;
+		next_line(); $linenr--;
+		$lst = sprintf("%-24s%s", "", $asm // '');
+	}		
+	push @lst, $lst;
+	next_line();
+}
+	
+#------------------------------------------------------------------------------
 # compare result file with list of expected lines
 sub compare_list_file {
 	my($file, @expected) = @_;
@@ -354,6 +384,7 @@ sub compare_list_file {
 	eq_or_diff \@got, \@expected, "$line compare $file";
 }
 
+#------------------------------------------------------------------------------
 # insert headers every $PAGE_SIZE lines
 sub insert_headers {
 	my($copyright, $date, $file, $lines) = @_;

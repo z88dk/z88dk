@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.37 2013-02-12 00:58:13 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.38 2013-02-16 09:46:55 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.37  2013-02-12 00:58:13  pauloscustodio
+/* Revision 1.38  2013-02-16 09:46:55  pauloscustodio
+/* BUG_0029 : Incorrect alignment in list file with more than 4 bytes opcode
+/*
+/* Revision 1.37  2013/02/12 00:58:13  pauloscustodio
 /* BUG_0027 : Incorrect tabulation in symbol list
 /* BUG_0028 : Not aligned page list in symbol list with more that 18 references
 /* CH_0017 : Align with spaces, deprecate -t option
@@ -874,16 +877,13 @@ StoreLibReference( symbol *node )
 
 void
 Pass2info( struct expr *pfixexpr,       /* pointer to header of postfix expression linked list */
-           char constrange,     /* allowed size of value to be parsed */
-           long byteoffset )
+           char constrange,				/* allowed size of value to be parsed */
+           long byteoffset )			/* position in listing file to patch */
 {
-    /* position in listing file to patch */
-
-
-
     if ( listing )
     {
-        byteoffset = listfileptr + 12 + 3 * byteoffset + 6 * ( ( byteoffset ) / 32 );
+        byteoffset = listfileptr + 12 + 3 * byteoffset + 
+					 ( byteoffset / 32 ) * ( 12 + EOL_LEN );	/* BUG_0029 */
     }
     /*
      * |    |   |  |   | add extra line, if hex bytes more than 1 line start of      |   |  | no. of hex bytes
@@ -900,7 +900,7 @@ Pass2info( struct expr *pfixexpr,       /* pointer to header of postfix expressi
     pfixexpr->rangetype = constrange;
     pfixexpr->srcfile = CURRENTFILE->fname;       /* pointer to record containing current source file name */
     pfixexpr->curline = CURRENTFILE->line;        /* pointer to record containing current line number */
-    pfixexpr->listpos = byteoffset;       /* now calculated as absolute file pointer */
+    pfixexpr->listpos = byteoffset;				  /* now calculated as absolute file pointer */
 
     if ( CURRENTMODULE->mexpr->firstexpr == NULL )
     {
@@ -910,8 +910,8 @@ Pass2info( struct expr *pfixexpr,       /* pointer to header of postfix expressi
     else
     {
         CURRENTMODULE->mexpr->currexpr->nextexpr = pfixexpr;      /* Current expr. node points to new expression
-                                                                 * node */
-        CURRENTMODULE->mexpr->currexpr = pfixexpr;        /* Pointer to current expr. node updated */
+                                                                   * node */
+        CURRENTMODULE->mexpr->currexpr = pfixexpr;				  /* Pointer to current expr. node updated */
     }
 }
 
@@ -1044,6 +1044,7 @@ WriteListFile( void )
 {
     int len, k;
     size_t byteptr;
+	BOOL first_line;					/* BUG_0029 */
 
     if ( strlen( line ) == 0 )
     {
@@ -1055,11 +1056,12 @@ WriteListFile( void )
 
     if ( len == 0 )
     {
-        fprintf( listfile, "%-4d  %04X%14s%s", CURRENTFILE->line, get_oldPC(), "", line );    /* no bytes generated */
+        fprintf( listfile, "%-5d %04X%14s%s", CURRENTFILE->line, get_oldPC(), "", line );    /* no bytes generated */
+	    LineCounter();						/* BUG_0029 */
     }
     else if ( len <= 4 )
     {
-        fprintf( listfile, "%-4d  %04X  ", CURRENTFILE->line, get_oldPC() );
+        fprintf( listfile, "%-5d %04X  ", CURRENTFILE->line, get_oldPC() );
 
         for ( k = 0; k < len; k++ )
         {
@@ -1067,17 +1069,22 @@ WriteListFile( void )
         }
 
         fprintf( listfile, "%*s%s", ( 4 - len ) * 3, "", line );
+	    LineCounter();						/* BUG_0029 */
     }
     else
     {
+		first_line = TRUE;
         while ( len )
         {
-            LineCounter();
-
-            if ( len )
+            if ( first_line )
             {
-                fprintf( listfile, "%-4d  %04X  ", CURRENTFILE->line, get_PC() - len );
+                fprintf( listfile, "%-5d %04X  ", CURRENTFILE->line, get_PC() - len );
             }
+			else 
+			{
+                fprintf( listfile, "      %04X  ", get_PC() - len );
+			}
+			first_line = FALSE;
 
             for ( k = ( len - 32 > 0 ) ? 32 : len; k; k--, len-- )
             {
@@ -1085,13 +1092,13 @@ WriteListFile( void )
             }
 
             fprintf( listfile, "\n" );
+		    LineCounter();							/* BUG_0029 */
         }
 
-        fprintf( listfile, "%18s%s", "", line );
-        LineCounter();
+        fprintf( listfile, "%24s%s", "", line );	/* BUG_0029 */
+	    LineCounter();								/* BUG_0029 */
     }
 
-    LineCounter();                        /* Update list file line counter - check page boundary */
     listfileptr = ftell( listfile );      /* Get file position for beginning of next line in list file */
 
     set_oldPC();
@@ -1108,6 +1115,7 @@ LineCounter( void )
         LINENR = 6;
     }
 }
+
 
 
 void
