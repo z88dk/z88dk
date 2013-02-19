@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.26 2013-01-31 13:28:57 stefano Exp $
+ *   $Id: appmake.h,v 1.27 2013-02-19 12:56:09 stefano Exp $
  */
 
 
@@ -264,3 +264,4 @@ extern void			zx_pilot(int pilot_len, FILE *fpout);
 extern void			zx_rawbit(FILE *fpout, int period);
 extern void			zx_rawout (FILE *fpout, unsigned char b, char fast);
 
+extern int			hexdigit(char digit);

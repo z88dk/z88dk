@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.16 2013-02-13 09:00:29 stefano Exp $
+ *   $Id: appmake.c,v 1.17 2013-02-19 12:56:09 stefano Exp $
  */
 
 #define MAIN_C
@@ -456,5 +456,18 @@ void zx_rawout (FILE *fpout, unsigned char b, char fast)
 
     zx_rawbit(fpout, period);
   }
+}
+
+int hexdigit(char digit) {
+    if (digit >= 'A' && digit <= 'F') {
+        return digit - 'A' + 10;
+    } else if (digit >= 'a' && digit <= 'f') {
+        return digit - 'a' + 10;
+    } else if (digit >= '0' && digit <= '9') {
+        return digit - '0';
+    }
+
+	fprintf(stderr,"\nError in patch string\n");
+	myexit(NULL,1);
 }
 
