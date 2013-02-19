@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.13 2013-02-14 11:29:53 stefano Exp $
+;       $Id: ts2068_crt0.asm,v 1.14 2013-02-19 12:46:39 stefano Exp $
 ;
 
 
@@ -39,6 +39,7 @@
 
         XDEF    call_rom3       ; Interposer
 
+        XDEF    call_extrom     ; TS2068 extension ROM interposer
 
 
 ;--------
@@ -348,6 +349,32 @@ ENDIF
 		out ($f4),a
         ret
 
+call_extrom:
+		di
+		push af
+		in	a,($ff)
+		set	7,a
+		out	($ff),a
+		in	a,($f4)
+		ld	(hssave),a
+		ld	a,1
+		out ($f4),a
+		pop	af
+		push	hl
+		ld	hl,call_extrom_exit
+		ex	(sp),hl
+		jp	(hl)
+
+hssave:	defb 0
+
+call_extrom_exit:
+		ld	a,(hssave)
+		out	($f4),a
+		in	a,($ff)
+		res	7,a
+		out	($ff),a
+		ei
+		ret
 
 ;-----------
 ; Now some variables

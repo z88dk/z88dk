@@ -8,7 +8,12 @@
 
 XLIB tape_load_block_callee
 XDEF ASMDISP_TAPE_LOAD_BLOCK_CALLEE
+
+IF FORts2068
+XREF call_extrom
+ELSE
 XREF call_rom3
+ENDIF
 
 .tape_load_block_callee
 
@@ -26,11 +31,35 @@ XREF call_rom3
 ;          a = type
 
 	scf
+
+	IF FORts2068
+		ld		hl,$fc
+        call    call_extrom
+        ld      hl,-1
+		ret	nc		;error
+		inc	hl		;okay
+		ret
+	ELSE
+
+		ld      hl,(23613)
+		push    hl
+		ld      hl,loadblock1
+		push    hl
+		ld      (23613),sp
         call    call_rom3
         defw    1366            ;call ROM3 load routine
-        ld      hl,-1
-	ret	nc		;error
-	inc	hl		;okay
-	ret
+		ld	hl,0	; no error
+		jr	nc,loadblock1
+
+.loadblock2
+        pop     de
+        ld      (23613),de      ;get back original 23613
+        ret
+
+.loadblock1
+        ld      hl,-1           ;error
+        jr      loadblock2
+
+	ENDIF
 
 DEFC ASMDISP_TAPE_LOAD_BLOCK_CALLEE = asmentry - tape_load_block_callee

@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.175 2013-01-24 15:31:38 stefano Exp $
+# $Id: Makefile,v 1.176 2013-02-19 12:46:39 stefano Exp $
 
 
 include Make.config
@@ -346,7 +346,7 @@ ts2068_clib.lib:
 	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lzx ; cd ..
-	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
+	$(LIBLINKER) -DFORzx -DFORts2068 -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
 # vt100 C lib for TS2068 - stefano/dom
 # use -DROMFONT for a tiny 36 columns mode
@@ -355,7 +355,7 @@ ts2068an_clib.lib:
 	@echo ''
 	@echo '--- Building TS2068 (Spectrum clone) ANSI Library ---'
 	@echo ''
-	$(RM) stdio/ansi/spectrum/f_ansi_char.o
+	$(RM) stdio/ansi/ts2068/f_ansi_*.o
 	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
 	cd stdlib ; $(MAKE) lzx ; cd ..
@@ -367,7 +367,7 @@ ts2068an_clib.lib:
 	$(MAKE) gamesdeps
 	cd spectrum ; $(MAKE) ; cd ..
 	cd games ; $(MAKE) lzx ; cd ..
-	$(LIBLINKER) -DFORzx -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068an_clib @$(LISTFILE_DIRECTORY)/ts2068an.lst
+	$(LIBLINKER) -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068an_clib @$(LISTFILE_DIRECTORY)/ts2068an.lst
 
 # TS2068 HRG graphics lib - Stefano
 gfx2068hr.lib:

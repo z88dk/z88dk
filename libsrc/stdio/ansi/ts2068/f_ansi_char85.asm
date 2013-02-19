@@ -13,7 +13,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char85.asm,v 1.1 2013-02-14 11:29:54 stefano Exp $
+;	$Id: f_ansi_char85.asm,v 1.2 2013-02-19 12:46:39 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -66,21 +66,20 @@ ENDIF
 	push hl ; screen address
 
 .char
-	ld e,'A'      ; Put here the character to be printed
-	ld d,0
+	ld l,'A'      ; Put here the character to be printed
+	ld h,0
+	add hl,hl
+	add hl,hl
+	add hl,hl
 
 IF ROMFONT
-	ld hl,15360
+	ld de,15360
 ELSE
-	ld hl,font-256
+	ld de,font-256
 ENDIF
-	ld b,8
-
-.LFONT
 	add hl,de
-	djnz LFONT
-	push hl
-	pop de ; font
+
+	ex de,hl; de - font
 	pop hl ; screen
 
 	ld a,c

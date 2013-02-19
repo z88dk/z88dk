@@ -7,7 +7,12 @@
 
 XLIB tape_save_block_callee
 XDEF ASMDISP_TAPE_SAVE_BLOCK_CALLEE
+
+IF FORts2068
+XREF call_extrom
+ELSE
 XREF call_rom3
+ENDIF
 
 .tape_save_block_callee
 
@@ -24,6 +29,12 @@ XREF call_rom3
 
 .asmentry
 
+	IF FORts2068
+		ld		hl,$68
+        call    call_extrom
+        ld		hl,0
+        ret
+	ELSE
         ld      hl,(23613)
         push    hl
         ld      hl,saveblock1
@@ -35,14 +46,13 @@ XREF call_rom3
         ld      hl,0
         
 .saveblock2
-
         pop     de
         ld      (23613),de      ;get back original 23613
         ret
-        
-.saveblock1
 
+.saveblock1
         ld      hl,-1           ;error
         jr      saveblock2
+	ENDIF
 
 DEFC ASMDISP_TAPE_SAVE_BLOCK_CALLEE = asmentry - tape_save_block_callee

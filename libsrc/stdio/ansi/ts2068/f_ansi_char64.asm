@@ -61,19 +61,18 @@
 ;;	ld hl,16384
 	push hl
 .char
-	ld e,'A'      ; Put here the character to be printed
-	ld d,0
+	ld l,'A'      ; Put here the character to be printed
+	ld h,0
+	add hl,hl
+	add hl,hl
+	add hl,hl
 
 IF ROMFONT
-	ld hl,15360
+	ld de,15360
 ELSE
-	ld hl,font-256
+	ld de,font-256
 ENDIF
-	ld b,8
-
-.LFONT
 	add hl,de
-	djnz LFONT
 
 	pop de; de - screen, hl - font
 	ld b,8

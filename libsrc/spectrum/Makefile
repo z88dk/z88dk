@@ -1,12 +1,13 @@
 #
 # Makefile for ZX Spectrum target specific lib
 #
-# $Id: Makefile,v 1.11 2011-11-25 09:46:08 stefano Exp $
+# $Id: Makefile,v 1.12 2013-02-19 12:46:39 stefano Exp $
 
 include ../Make.config
 
 
-all:	
+all:
+	cd tape ; $(MAKE) clean ; cd ..
 	cd tape ; $(MAKE) ; cd ..
 
 clean:
