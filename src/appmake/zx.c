@@ -32,14 +32,14 @@
  *        The '.tap' file is left for advanced users for hand-editing which
  *        can take benefit od the 'dumb' mode and 'patch' options
  *        (i.e. the extra compile options:
- *              -Cz--patchpos -Cz21 -Cz--patchdata -Czcd7fff
+ *              -Cz--patchpos -Cz18 -Cz--patchdata -Czcd69ff
  *         ..will make the turbo loader ready to load an intermediate block
  *        (by default a title screen but it can be changed with a longer patch),
  *        then some more sound editing will be necessary to add the picture
  *        taken from a previously prepared audio file using the dumb/turbo options).
  * 
  *
- *        $Id: zx.c,v 1.19 2013-02-13 09:00:29 stefano Exp $
+ *        $Id: zx.c,v 1.20 2013-02-19 12:47:37 stefano Exp $
  */
 
 #include "appmake.h"
@@ -101,15 +101,21 @@ option_t zx_options[] = {
 // turbo Loader
 static unsigned char turbo_loader[] = { 
 0x60, 0x69,	    //  ld h,b / ld l,c
-17,38,0,        //	ld	de,38 (offset)
+17,52,0,        //	ld	de,52 (offset)
 0x19,           //	add	hl,de
 17,0x69,0xff,   //	ld	de,65385
 1,150,0,        //	ld	bc,150
 0xed, 0xb0,     //	ldir
+221,33,0,64,    //	ld	ix,16384 (position [14])
+// length is not checked, we load all the data we find
+0,0,0,          //	placeholder for: call	65385
 221,33,0,64,    //	ld	ix,16384
 // length is not checked, we load all the data we find
 0,0,0,          //	placeholder for: call	65385
-221,33,0,128,   //	ld	ix,loc	(pos 23/24)
+221,33,0,64,    //	ld	ix,16384
+// length is not checked, we load all the data we find
+0,0,0,          //	placeholder for: call	65385
+221,33,0,128,   //	ld	ix,loc	(pos 37/38)
 // length is not checked, we load all the data we find
 205,0x69,0xff,  //	call	65385
 0x3a, 0x48, 0x5c, // ld a,(23624)	; Restore border color
@@ -190,20 +196,6 @@ void turbo_rawout (FILE *fpout, unsigned char b)
   }
 }
 
-
-
-int hexdigit(char digit) {
-    if (digit >= 'A' && digit <= 'F') {
-        return digit - 'A' + 10;
-    } else if (digit >= 'a' && digit <= 'f') {
-        return digit - 'a' + 10;
-    } else if (digit >= '0' && digit <= '9') {
-        return digit - '0';
-    }
-
-	fprintf(stderr,"\nError in patch string\n");
-	myexit(NULL,1);
-}
 
 
 int zx_exec(char *target)
@@ -434,8 +426,8 @@ int zx_exec(char *target)
 				
 					if (turbo) {
 						mlen+=22+loader_len+32;	/* extra BASIC size for REM line + turbo block + turbo caller code */
-						loader[23] = pos%256;
-						loader[24] = pos/256;
+						loader[37] = pos%256;
+						loader[38] = pos/256;
 						if (screen) {
 							turbo_loader[18] = 0xcd;		/* activate the extra screen block loading */
 							turbo_loader[19] = 0x69;
@@ -553,7 +545,7 @@ int zx_exec(char *target)
 
 				mlen=ftell(fpmerge);
 				if (((mlen < 6912) || (mlen >=7000)) && (mlen != 6144) && (mlen != 2048)) {
-					fprintf(stderr,"Title screen size not recognized; %u\n",mlen);
+					fprintf(stderr,"ERROR: Title screen size not recognized: %u\n",mlen);
 					fclose(fpin);
 					fclose(fpout);
 					fclose(fpmerge);
