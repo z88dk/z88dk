@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.8 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.9 2013-02-19 22:52:40 pauloscustodio Exp $ */
 /* $Log: options.h,v $
-/* Revision 1.8  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.9  2013-02-19 22:52:40  pauloscustodio
+/* BUG_0030 : List bytes patching overwrites header
+/* BUG_0031 : List file garbled with input lines with 255 chars
+/* New listfile.c with all the listing related code
+/*
+/* Revision 1.8  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.7  2012/05/24 21:48:24  pauloscustodio
@@ -78,8 +83,8 @@ extern enum flag datestamp;
 extern enum flag sdcc_hacks;
 extern enum flag force_xlib;
 extern enum flag listing;
-extern enum flag listing_CPY;
-extern enum flag symtable;
+extern enum flag option_list;
+extern enum flag option_symtable;
 extern enum flag symfile;
 extern enum flag z80bin;
 extern enum flag mapref;

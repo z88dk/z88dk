@@ -20,9 +20,14 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.38 2013-02-16 09:46:55 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.39 2013-02-19 22:52:40 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.38  2013-02-16 09:46:55  pauloscustodio
+/* Revision 1.39  2013-02-19 22:52:40  pauloscustodio
+/* BUG_0030 : List bytes patching overwrites header
+/* BUG_0031 : List file garbled with input lines with 255 chars
+/* New listfile.c with all the listing related code
+/*
+/* Revision 1.38  2013/02/16 09:46:55  pauloscustodio
 /* BUG_0029 : Incorrect alignment in list file with more than 4 bytes opcode
 /*
 /* Revision 1.37  2013/02/12 00:59:14  pauloscustodio
@@ -1124,21 +1129,24 @@ Based on 1.0.31
 		second and next lines, for more than 32 bytes instructions.
 
 -------------------------------------------------------------------------------
-FUTURE CHANGES - require change of the object file format
+19.02.2013 [1.1.23] (pauloscustodio)
 -------------------------------------------------------------------------------
-
 	BUG_0030 : List bytes patching overwrites header
 		When instruction is more than 32 bytes and second line of bytes is
 		on a different page, the expression bytes are patched on the header
 		line, because the offsets to the start of the list line stored in the 
 		expression are no longer true.
-		To solve need to create the list file in two steps. This is not really 
-		needed, as the pagination can be added to the text file.
-		Solve by removing the pagination and headers. The file can be paginated 
-		outside the assembler.
+		
+	BUG_0031 : List file garbled with input lines with 255 chars
+		When the input line is the maximum size, the newline character is not
+		read from file and the list output is garbled - missing newline.
 
     Internal cleanup:
 	- New listfile.c with all the listing related code
+
+-------------------------------------------------------------------------------
+FUTURE CHANGES - require change of the object file format
+-------------------------------------------------------------------------------
 
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
         - Bug only happens with forward references to relative addresses in
@@ -1156,8 +1164,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define DATE        "16.02.2013"
-#define VERSION     "1.1.22"
+#define VERSION     "1.1.23"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS
@@ -1178,4 +1185,4 @@ struct WINDOWDEF _condetails =
 char amiver[] = "$VER: z80asm " VERSION ", (c) " COPYRIGHT;
 #endif
 
-char copyrightmsg[] = "Z80 Module Assembler " VERSION " (" DATE "), (c) " COPYRIGHT;
+char copyrightmsg[] = "Z80 Module Assembler " VERSION ", (c) " COPYRIGHT;

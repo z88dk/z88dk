@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.19 2013-02-11 21:52:31 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.20 2013-02-19 22:52:40 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.19  2013-02-11 21:52:31  pauloscustodio
+/* Revision 1.20  2013-02-19 22:52:40  pauloscustodio
+/* BUG_0030 : List bytes patching overwrites header
+/* BUG_0031 : List file garbled with input lines with 255 chars
+/* New listfile.c with all the listing related code
+/*
+/* Revision 1.19  2013/02/11 21:52:31  pauloscustodio
 /* Added comments
 /*
 /* Revision 1.18  2013/01/24 23:03:03  pauloscustodio
@@ -311,6 +316,10 @@ struct linkedmod
 #define RANGE_16CONST   3		/* 16-bit immediate */
 #define RANGE_32SIGN    4		/* 32-bit immediate */
 
+/* return 1, 2 or 4 for a rangetype */
+#define RANGE_SIZE(x)	(((x) & RANGE) == RANGE_32SIGN  ? 4 : \
+						 ((x) & RANGE) == RANGE_16CONST ? 2 : \
+														  1 )
 
 #endif /* ndef SYMBOL_H */
 

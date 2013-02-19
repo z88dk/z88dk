@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0026.t,v 1.2 2013-02-12 00:55:32 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0026.t,v 1.3 2013-02-19 22:52:40 pauloscustodio Exp $
 # $Log: BUG_0026.t,v $
-# Revision 1.2  2013-02-12 00:55:32  pauloscustodio
+# Revision 1.3  2013-02-19 22:52:40  pauloscustodio
+# BUG_0030 : List bytes patching overwrites header
+# BUG_0031 : List file garbled with input lines with 255 chars
+# New listfile.c with all the listing related code
+#
+# Revision 1.2  2013/02/12 00:55:32  pauloscustodio
 # Comment
 #
 # Revision 1.1  2013/02/11 21:54:38  pauloscustodio
@@ -27,8 +32,12 @@ use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-# Integer out of range
-ok 1, "Tested by option-l-s.t";
+for (0 .. 255) {
+	list_push_asm("XDEF GLOBAL$_");
+	list_push_asm("GLOBAL$_: defb $_", $_);
+	list_push_asm("LOCAL$_: defb $_", $_);
+}
+list_test();	
 
 unlink_testfiles();
 done_testing();

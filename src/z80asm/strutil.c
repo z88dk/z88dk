@@ -15,9 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 Utilities working on char *
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.12 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.13 2013-02-19 22:52:40 pauloscustodio Exp $ */
 /* $Log: strutil.c,v $
-/* Revision 1.12  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.13  2013-02-19 22:52:40  pauloscustodio
+/* BUG_0030 : List bytes patching overwrites header
+/* BUG_0031 : List file garbled with input lines with 255 chars
+/* New listfile.c with all the listing related code
+/*
+/* Revision 1.12  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.11  2012/11/03 17:39:36  pauloscustodio
@@ -127,3 +132,17 @@ int stricompare( char *s1, char *s2 )
         }
     }
 }
+
+char *chomp( char *string )
+{
+	char *p;
+
+	p = string + strlen(string) - 1;	/* point at last char */
+	while (p >= string && (*p == '\n' || *p == '\r' || *p == '\f' || *p == '\t' || *p == ' '))
+	{
+		*p = '\0';
+		p--;
+	}
+	return string;
+}
+

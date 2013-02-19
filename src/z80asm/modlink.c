@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.48 2013-02-12 00:55:00 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.49 2013-02-19 22:52:40 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.48  2013-02-12 00:55:00  pauloscustodio
+/* Revision 1.49  2013-02-19 22:52:40  pauloscustodio
+/* BUG_0030 : List bytes patching overwrites header
+/* BUG_0031 : List file garbled with input lines with 255 chars
+/* New listfile.c with all the listing related code
+/*
+/* Revision 1.48  2013/02/12 00:55:00  pauloscustodio
 /* CH_0017 : Align with spaces, deprecate -t option
 /*
 /* Revision 1.47  2013/01/24 23:03:03  pauloscustodio
@@ -318,6 +323,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "codearea.h"
 #include "strutil.h"
 #include "safestr.h"
+#include "listfile.h"
 
 /* external functions */
 void FreeSym( symbol *node );
@@ -357,18 +363,16 @@ void ReleaseLinkInfo( void );
 static char          *CheckIfModuleWanted( FILE *z80asmfile, long currentlibmodule, char *modname );
 
 /* global variables */
-extern FILE *listfile, *z80asmfile, *deffile, *libfile;
+extern FILE *z80asmfile, *deffile, *libfile;
 extern char line[], ident[];
 extern char Z80objhdr[];
 extern enum symbols sym, GetSym( void );
 extern enum flag writeline;
 extern enum flag EOL, library;
 extern byte_t reloc_routine[];
-extern int listfileptr;
 extern struct modules *modulehdr;
 extern struct liblist *libraryhdr;
 extern struct module *CURRENTMODULE;
-extern int PAGENR;
 extern avltree *globalroot;
 extern char *reloctable, *relocptr;
 extern size_t sizeof_relocroutine;
@@ -587,7 +591,7 @@ LinkModules( void )
     char fheader[9];
     size_t origin;
     struct module *lastobjmodule;
-    symtable = listing = OFF;
+    option_symtable = listing = OFF;
     linkhdr = NULL;
 
     if ( verbose )

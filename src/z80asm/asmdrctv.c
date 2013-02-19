@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.37 2013-01-24 23:03:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.38 2013-02-19 22:52:40 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.37  2013-01-24 23:03:03  pauloscustodio
+/* Revision 1.38  2013-02-19 22:52:40  pauloscustodio
+/* BUG_0030 : List bytes patching overwrites header
+/* BUG_0031 : List file garbled with input lines with 255 chars
+/* New listfile.c with all the listing related code
+/*
+/* Revision 1.37  2013/01/24 23:03:03  pauloscustodio
 /* Replaced (unsigned char) by (byte_t)
 /* Replaced (unisigned int) by (size_t)
 /* Replaced (short) by (int)
@@ -298,7 +303,7 @@ void UNDEFINE( void );
 
 
 /* global variables */
-extern FILE *z80asmfile, *listfile;
+extern FILE *z80asmfile;
 extern char ident[], stringconst[];
 extern size_t DEFVPC;
 extern enum symbols sym;

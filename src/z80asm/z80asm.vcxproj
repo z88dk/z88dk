@@ -92,7 +92,10 @@
     <ClInclude Include="except.h" />
     <ClInclude Include="file.h" />
     <ClInclude Include="hist.h" />
+    <ClInclude Include="listfile.h" />
     <ClInclude Include="memalloc.h" />
+    <ClInclude Include="model.h" />
+    <ClInclude Include="module.h" />
     <ClInclude Include="objfile.h" />
     <ClInclude Include="options.h" />
     <ClInclude Include="queue.h" />
@@ -120,7 +123,9 @@
     <ClCompile Include="file.c" />
     <ClCompile Include="hist.c" />
     <ClCompile Include="ldinstr.c" />
+    <ClCompile Include="listfile.c" />
     <ClCompile Include="memalloc.c" />
+    <ClCompile Include="model.c" />
     <ClCompile Include="modlink.c" />
     <ClCompile Include="objfile.c" />
     <ClCompile Include="options.c" />

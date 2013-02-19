@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.26 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.27 2013-02-19 22:52:40 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.26  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.27  2013-02-19 22:52:40  pauloscustodio
+/* BUG_0030 : List bytes patching overwrites header
+/* BUG_0031 : List file garbled with input lines with 255 chars
+/* New listfile.c with all the listing related code
+/*
+/* Revision 1.26  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.25  2012/11/03 17:39:36  pauloscustodio
@@ -178,6 +183,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "symbols.h"
 #include "options.h"
 #include "errors.h"
+#include "listfile.h"
 
 /* local functions */
 symbol *GetSymPtr( char *identifier );
@@ -193,7 +199,6 @@ void FreeSym( symbol *node );
 
 
 /* global variables */
-extern int PAGENR;
 extern enum flag pass1;
 extern struct module *CURRENTMODULE;    /* pointer to current module */
 extern avltree *globalroot;
@@ -210,7 +215,7 @@ symbol *CreateSymbol( char *identifier, long value, char symboltype, struct modu
     newsym->symname = xstrdup( identifier );
 
     /* Allocate area for a new symbol identifier */
-    if ( symtable && listing_CPY )
+    if ( option_symtable && option_list )
     {
         newsym->references = xcalloc_struct( struct symref );
 
@@ -275,7 +280,7 @@ void DefineSymbol( char *identifier,
                                                                  * constant */
             foundsymbol->owner = CURRENTMODULE;   /* owner of symbol is always creator */
 
-            if ( pass1 && symtable && listing )
+            if ( pass1 && option_symtable && listing )
             {
                 InsertPageRef( foundsymbol );     /* First element in list is definition of symbol */
                 MovePageRefs( identifier, foundsymbol );   /* Move page references from possible forward
@@ -311,7 +316,7 @@ static void DefLocalSymbol( char *identifier,
         foundsymbol = CreateSymbol( identifier, value, ( char )( symboltype | SYMLOCAL | SYMDEFINED ), CURRENTMODULE );
         insert( &CURRENTMODULE->localroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
 
-        if ( pass1 && symtable && listing )
+        if ( pass1 && option_symtable && listing )
         {
             MovePageRefs( identifier, foundsymbol );    /* Move page references from forward referenced symbol */
         }
@@ -324,7 +329,7 @@ static void DefLocalSymbol( char *identifier,
                                                                  * label or constant */
         foundsymbol->owner = CURRENTMODULE;       /* owner of symbol is always creator */
 
-        if ( pass1 && symtable && listing )
+        if ( pass1 && option_symtable && listing )
         {
             InsertPageRef( foundsymbol ); /* First element in list is definition of symbol */
             MovePageRefs( identifier, foundsymbol );       /* Move page references from possible forward
@@ -403,7 +408,7 @@ GetSymPtr( char *identifier )
     {
         if ( ( symbolptr = FindSymbol( identifier, globalroot ) ) == NULL )
         {
-            if ( pass1 && symtable && listing_CPY )
+            if ( pass1 && option_symtable && option_list )
             {
                 if ( ( symbolptr = FindSymbol( identifier, CURRENTMODULE->notdeclroot ) ) == NULL )
                 {
@@ -422,7 +427,7 @@ GetSymPtr( char *identifier )
         }
         else
         {
-            if ( pass1 && symtable && listing )
+            if ( pass1 && option_symtable && listing )
             {
                 AppendPageRef( symbolptr );    /* symbol found as global/extern declaration */
             }
@@ -432,7 +437,7 @@ GetSymPtr( char *identifier )
     }
     else
     {
-        if ( pass1 && symtable && listing )
+        if ( pass1 && option_symtable && listing )
         {
             AppendPageRef( symbolptr );    /* symbol found as local declaration */
         }
@@ -614,15 +619,15 @@ AppendPageRef( symbol *symptr )
     struct pageref *newref = NULL;
 
     if ( symptr->references->lastref != NULL )
-        if ( symptr->references->lastref->pagenr == PAGENR ||
-                symptr->references->firstref->pagenr == PAGENR )        /* symbol reference on the same page - ignore */
+        if ( symptr->references->lastref->pagenr == get_page_nr() ||
+                symptr->references->firstref->pagenr == get_page_nr() )        /* symbol reference on the same page - ignore */
         {
             return;
         }
 
     newref = xcalloc_struct( struct pageref );
     /* new page reference of symbol - allocate... */
-    newref->pagenr = PAGENR;
+    newref->pagenr = get_page_nr();
     newref->nextref = NULL;
 
     if ( symptr->references->lastref == NULL )
@@ -644,13 +649,13 @@ InsertPageRef( symbol *symptr )
     struct pageref *newref = NULL, *tmpptr = NULL;
 
     if ( symptr->references->firstref != NULL )
-        if ( symptr->references->firstref->pagenr == PAGENR )       /* symbol reference on the same page - ignore */
+        if ( symptr->references->firstref->pagenr == get_page_nr() )       /* symbol reference on the same page - ignore */
         {
             return;
         }
 
     newref = xcalloc_struct( struct pageref );
-    newref->pagenr = PAGENR;
+    newref->pagenr = get_page_nr();
     newref->nextref = symptr->references->firstref;       /* next reference will be current first reference */
 
     if ( symptr->references->firstref == NULL )

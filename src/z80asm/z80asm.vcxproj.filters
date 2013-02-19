@@ -93,6 +93,15 @@
     <ClInclude Include="strhash.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="module.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="listfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -174,6 +183,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="strhash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="listfile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="model.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.21 2013-02-12 00:55:00 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.22 2013-02-19 22:52:40 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.21  2013-02-12 00:55:00  pauloscustodio
+/* Revision 1.22  2013-02-19 22:52:40  pauloscustodio
+/* BUG_0030 : List bytes patching overwrites header
+/* BUG_0031 : List file garbled with input lines with 255 chars
+/* New listfile.c with all the listing related code
+/*
+/* Revision 1.21  2013/02/12 00:55:00  pauloscustodio
 /* CH_0017 : Align with spaces, deprecate -t option
 /*
 /* Revision 1.20  2013/01/20 21:24:28  pauloscustodio
@@ -140,16 +145,9 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation */
 extern char srcfilename[];
-extern char lstfilename[];
 extern char objfilename[];
 extern char errfilename[];
 extern char libfilename[];
-
-/* Page metrics for list file (CH_0017) */
-#define PAGE_LEN		66
-#define PAGE_WIDTH		122
-#define COLUMN_WIDTH	32
-
 
 #define REG16_BC   0
 #define REG16_DE   1
@@ -170,11 +168,12 @@ extern char libfilename[];
 
 
 extern size_t EXPLICIT_ORIGIN;
+extern char line[];
 extern char ident[];
 extern char separators[];
 extern avltree *globalroot, *staticroot;
 extern struct module *CURRENTMODULE;
-extern FILE *listfile, *z80asmfile, *deffile, *libfile;
+extern FILE *z80asmfile, *deffile, *libfile;
 
 extern char *Fetchfilename( FILE *fptr );
 extern void CreateLibfile( char *filename );

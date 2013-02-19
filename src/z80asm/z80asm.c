@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.67 2013-02-12 00:55:00 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.68 2013-02-19 22:52:40 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.67  2013-02-12 00:55:00  pauloscustodio
+/* Revision 1.68  2013-02-19 22:52:40  pauloscustodio
+/* BUG_0030 : List bytes patching overwrites header
+/* BUG_0031 : List file garbled with input lines with 255 chars
+/* New listfile.c with all the listing related code
+/*
+/* Revision 1.67  2013/02/12 00:55:00  pauloscustodio
 /* CH_0017 : Align with spaces, deprecate -t option
 /*
 /* Revision 1.66  2013/01/24 23:03:03  pauloscustodio
@@ -465,6 +470,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "file.h"
 #include "codearea.h"
 #include "strutil.h"
+#include "listfile.h"
 
 /* external functions */
 void RemovePfixlist( struct expr *pfixexpr );
@@ -486,7 +492,6 @@ int cmpidstr( symbol *kptr, symbol *p );
 
 /* local functions */
 void prompt( void );
-void WriteHeader( void );
 void ReleaseFile( struct sourcefile *srcfile );
 void ReleaseLibraries( void );
 void ReleaseOwnedFile( struct usedfile *ownedfile );
@@ -501,7 +506,7 @@ struct module *NewModule( void );
 struct libfile *NewLibrary( void );
 
 
-FILE *z80asmfile, *listfile, *objfile, *deffile, *libfile;
+FILE *z80asmfile, *objfile, *deffile, *libfile;
 
 /* BUG_0001 array ssym[] needs to have one element per character in
  * separators, plus one newline to match the final '\0' just in case it is
@@ -517,13 +522,11 @@ char separators[] = " &\"\';,.({[]})+-*/%^=~|:<>!#:";
 enum flag pass1, writeline;
 enum flag EOL, library, createlibrary;
 
-int PAGENR, LINENR;
 long TOTALLINES;
 char line[255], stringconst[255], ident[FILENAME_MAX + 1];
 
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation */
 char srcfilename[FILENAME_MAX];
-char lstfilename[FILENAME_MAX];
 char objfilename[FILENAME_MAX];
 char errfilename[FILENAME_MAX];
 char libfilename[FILENAME_MAX];
@@ -544,11 +547,8 @@ size_t sizeof_relocroutine = 73;
 
 char *reloctable = NULL, *relocptr = NULL;
 
-long listfileptr;
 size_t DEFVPC;          /* DEFVARS address counter */
 size_t EXPLICIT_ORIGIN;         /* origin defined from command line */
-time_t asmtime;                 /* time   of assembly in seconds */
-char *date;                     /* pointer to datestring calculated from asmtime */
 
 struct modules *modulehdr;
 struct module *CURRENTMODULE;
@@ -567,14 +567,10 @@ AssembleSourceFile( void )
         /* Create error file */
         open_error_file( errfilename );
 
-        if ( listing_CPY || symfile )
+        if ( option_list || symfile )
         {
             /* Create LIST or SYMBOL file */
-            listfile = fopen_err( lstfilename, "w+" );           /* CH_0012 */
-            PAGENR = 0;
-            LINENR = 6;
-            WriteHeader();                  /* Begin list file with a header */
-            listfileptr = ftell( listfile ); /* Get file pos. of next line in list file */
+			open_list_file( srcfilename );
         }
 
         /* Create relocatable object file */
@@ -636,19 +632,8 @@ AssembleSourceFile( void )
             z80asmfile = NULL;
         }
 
-        if ( listfile != NULL )
-        {
-            fseek( listfile, 0, SEEK_END );
-            fputc_err( 12, listfile );     /* end listing with a FF */
-            fclose( listfile );
-            listfile = NULL;
-
-            if ( start_errors != get_num_errors() )
-            {
-                /* remove incomplete list file */
-                remove( lstfilename );
-            }
-        }
+		/* remove list file if more errors now than before */
+		close_list_file( start_errors == get_num_errors() );
 
         if ( objfile != NULL )
         {
@@ -716,16 +701,13 @@ static void AssembleAny( char *file )
     }
 
     /* normal case - assemble a asm source file */
-    z80asmfile = listfile = objfile = NULL;
+    z80asmfile = objfile = NULL;
 
     init_codearea();            /* Pointer (PC) to store z80 instruction */
 
     path_replace_ext( srcfilename, file, srcext );      /* set '.asm' extension */
     path_replace_ext( objfilename, file, objext );      /* set '.obj' extension */
     path_replace_ext( errfilename, file, FILEEXT_ERR ); /* set '.err' extension */
-    path_replace_ext( lstfilename, file,
-                      listing ? FILEEXT_LST             /* set '.lst' extension */
-                      : FILEEXT_SYM );                  /* set '.sym' extension */
 
     /* Create module data structures for new file */
     CURRENTMODULE = NewModule();
@@ -772,12 +754,6 @@ CloseFiles( void )
     {
         fclose( z80asmfile );
         z80asmfile = NULL;
-    }
-
-    if ( listfile != NULL )
-    {
-        fclose( listfile );
-        listfile = NULL;
     }
 
     if ( objfile != NULL )
@@ -1295,9 +1271,6 @@ int main( int argc, char *argv[] )
             prompt();
             throw( FatalErrorException, "No arguments" );
         }
-
-        time( &asmtime );
-        date = asctime( localtime( &asmtime ) ); /* get current system time for date in list file */
 
         TOTALLINES = 0;
 

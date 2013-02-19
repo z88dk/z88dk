@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.36 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.37 2013-02-19 22:52:40 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.36  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.37  2013-02-19 22:52:40  pauloscustodio
+/* BUG_0030 : List bytes patching overwrites header
+/* BUG_0031 : List file garbled with input lines with 255 chars
+/* New listfile.c with all the listing related code
+/*
+/* Revision 1.36  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.35  2012/11/03 17:39:36  pauloscustodio
@@ -486,7 +491,7 @@ ParseIdent( enum flag interpret )
 void
 LSTON( void )
 {
-    if ( listing_CPY == ON )
+    if ( option_list == ON )
     {
         listing = ON;             /* switch listing ON again... */
         writeline = OFF;          /* but don't write this line in listing file */
@@ -499,7 +504,7 @@ LSTON( void )
 void
 LSTOFF( void )
 {
-    if ( listing_CPY == ON )
+    if ( option_list == ON )
     {
         listing = writeline = OFF;        /* but don't write this line in listing file */
         line[0] = '\0';

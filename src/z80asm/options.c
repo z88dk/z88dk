@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.16 2013-02-12 00:55:00 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.17 2013-02-19 22:52:40 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.16  2013-02-12 00:55:00  pauloscustodio
+/* Revision 1.17  2013-02-19 22:52:40  pauloscustodio
+/* BUG_0030 : List bytes patching overwrites header
+/* BUG_0031 : List file garbled with input lines with 255 chars
+/* New listfile.c with all the listing related code
+/*
+/* Revision 1.16  2013/02/12 00:55:00  pauloscustodio
 /* CH_0017 : Align with spaces, deprecate -t option
 /*
 /* Revision 1.15  2013/01/20 21:24:28  pauloscustodio
@@ -119,8 +124,8 @@ enum flag datestamp;
 enum flag sdcc_hacks;
 enum flag force_xlib;
 enum flag listing;
-enum flag listing_CPY;
-enum flag symtable;
+enum flag option_list;
+enum flag option_symtable;
 enum flag symfile;
 enum flag z80bin;
 enum flag mapref;
@@ -192,8 +197,8 @@ void reset_options( void )
     sdcc_hacks      = OFF;
     force_xlib      = OFF;
     listing         = OFF;
-    listing_CPY     = OFF;
-    symtable        = ON;
+    option_list     = OFF;
+    option_symtable = ON;
     symfile         = ON;
     z80bin          = OFF;
     mapref          = ON;
@@ -284,9 +289,9 @@ void set_asm_flag( char *flagid )
 
     else if ( strcmp( flagid, "l" ) == 0 )
     {
-        listing_CPY = listing = ON;
+        option_list = listing = ON;
 
-        if ( symtable )
+		if ( option_symtable )
         {
             symfile = OFF;
         }
@@ -294,9 +299,9 @@ void set_asm_flag( char *flagid )
 
     else if ( strcmp( flagid, "nl" ) == 0 )
     {
-        listing_CPY = listing = OFF;
+        option_list = listing = OFF;
 
-        if ( symtable )
+		if ( option_symtable )
         {
             symfile = ON;
         }
@@ -304,9 +309,9 @@ void set_asm_flag( char *flagid )
 
     else if ( strcmp( flagid, "s" ) == 0 )
     {
-        symtable = ON;
+        option_symtable = ON;
 
-        if ( listing_CPY )
+        if ( option_list )
         {
             symfile = OFF;
         }
@@ -318,7 +323,7 @@ void set_asm_flag( char *flagid )
 
     else if ( strcmp( flagid, "ns" ) == 0 )
     {
-        symtable = symfile = OFF;
+        option_symtable = symfile = OFF;
     }
 
     else if ( strcmp( flagid, "b" ) == 0 )

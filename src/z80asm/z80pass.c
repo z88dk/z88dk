@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.38 2013-02-16 09:46:55 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.39 2013-02-19 22:52:40 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.38  2013-02-16 09:46:55  pauloscustodio
+/* Revision 1.39  2013-02-19 22:52:40  pauloscustodio
+/* BUG_0030 : List bytes patching overwrites header
+/* BUG_0031 : List file garbled with input lines with 255 chars
+/* New listfile.c with all the listing related code
+/*
+/* Revision 1.38  2013/02/16 09:46:55  pauloscustodio
 /* BUG_0029 : Incorrect alignment in list file with more than 4 bytes opcode
 /*
 /* Revision 1.37  2013/02/12 00:58:13  pauloscustodio
@@ -287,6 +292,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "file.h"
 #include "codearea.h"
 #include "strutil.h"
+#include "listfile.h"
 
 /* external functions */
 void Skipline( FILE *fptr );
@@ -309,10 +315,6 @@ void Pass2info( struct expr *expression, char constrange, long lfileptr );
 void Z80pass1( void );
 void Z80pass2( void );
 void WriteSymbolTable( char *msg, avltree *root );
-void WriteListFile( void );
-void WriteHeader( void );
-void LineCounter( void );
-void PatchListFile( struct expr *pass2expr, long c );
 void WriteMapFile( void );
 void StoreName( symbol *node, byte_t symscope );
 void StoreLibReference( symbol *node );
@@ -326,14 +328,13 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 
 
 /* global variables */
-extern FILE *z80asmfile, *listfile, *objfile;
-extern char *date, line[], ident[], separators[];
+extern FILE *z80asmfile, *objfile;
+extern char line[], ident[], separators[];
 extern enum symbols sym;
 extern enum flag writeline, EOL;
-extern long listfileptr, TOTALLINES;
+extern long TOTALLINES;
 extern struct modules *modulehdr;       /* pointer to module header */
 extern struct module *CURRENTMODULE;
-extern int PAGENR, LINENR;
 extern avltree *globalroot;
 extern char *temporary_ptr;
 
@@ -455,7 +456,7 @@ parseline( enum flag interpret )
 
     if ( listing && writeline )
     {
-        WriteListFile();    /* Write current source line to list file, if allowed */
+        write_asmln_list_file( line );    /* Write current source line to list file, if allowed */
     }
 }
 
@@ -709,9 +710,9 @@ Z80pass2( void )
                 }
             }
 
-            if ( listing_CPY )
+            if ( option_list )
             {
-                PatchListFile( pass2expr, constant );
+				list_file_patch( pass2expr->listpos, constant, RANGE_SIZE(pass2expr->rangetype) );
             }
 
             prevexpr = pass2expr;
@@ -726,7 +727,7 @@ Z80pass2( void )
         CURRENTMODULE->JRaddr = NULL;
     }
 
-    if ( ! get_num_errors() && symtable )
+    if ( ! get_num_errors() && option_symtable )
     {
         WriteSymbolTable( "Local Module Symbols:", CURRENTMODULE->localroot );
         WriteSymbolTable( "Global Module Symbols:", globalroot );
@@ -880,27 +881,12 @@ Pass2info( struct expr *pfixexpr,       /* pointer to header of postfix expressi
            char constrange,				/* allowed size of value to be parsed */
            long byteoffset )			/* position in listing file to patch */
 {
-    if ( listing )
-    {
-        byteoffset = listfileptr + 12 + 3 * byteoffset + 
-					 ( byteoffset / 32 ) * ( 12 + EOL_LEN );	/* BUG_0029 */
-    }
-    /*
-     * |    |   |  |   | add extra line, if hex bytes more than 1 line start of      |   |  | no. of hex bytes
-     * rel. to start current line in    |   length of hex number + space listfile      | linenumber & 2 spaces +
-     * hex address and 2 spaces
-     */
-    else
-    {
-        byteoffset = -1;    /* indicate that this expression is not going to be patched in listing file */
-    }
-
-
     pfixexpr->nextexpr = NULL;
     pfixexpr->rangetype = constrange;
     pfixexpr->srcfile = CURRENTFILE->fname;       /* pointer to record containing current source file name */
     pfixexpr->curline = CURRENTFILE->line;        /* pointer to record containing current line number */
-    pfixexpr->listpos = byteoffset;				  /* now calculated as absolute file pointer */
+    pfixexpr->listpos = list_file_patch_pos(byteoffset);
+												  /* now calculated as absolute file pointer */
 
     if ( CURRENTMODULE->mexpr->firstexpr == NULL )
     {
@@ -995,143 +981,6 @@ FindFile( struct sourcefile *srcfile, char *flnm )
 }
 
 
-
-void
-PatchListFile( struct expr *pass2expr, long c )
-{
-    int i;
-
-    if ( pass2expr->listpos == -1 )
-    {
-        return;    /* listing wasn't switched ON during pass1 */
-    }
-    else
-    {
-        fseek( listfile, pass2expr->listpos, SEEK_SET );  /* set file pointer in list file */
-
-        switch ( pass2expr->rangetype & RANGE )
-        {
-                /* look only at range bits */
-            case RANGE_JROFFSET:
-            case RANGE_8UNSIGN:
-            case RANGE_8SIGN:
-                fprintf( listfile, "%02X", (size_t) c );
-                break;
-
-            case RANGE_16CONST:
-                fprintf( listfile, "%02X %02X", (size_t)( c & 0xFF ), (size_t)( c >> 8 ) );
-                break;
-
-            case RANGE_32SIGN:
-                for ( i = 0; i < 4; i++ )
-                {
-                    fprintf( listfile, "%02X ", (size_t)( c & 0xFF ) );
-                    c >>= 8;
-                }
-
-                break;
-        }
-    }
-}
-
-
-
-/*
- * Write current source line to list file with Hex dump of assembled instruction
- */
-void
-WriteListFile( void )
-{
-    int len, k;
-    size_t byteptr;
-	BOOL first_line;					/* BUG_0029 */
-
-    if ( strlen( line ) == 0 )
-    {
-        strcpy( line, "\n" );
-    }
-
-    len = get_PC() - get_oldPC();
-    byteptr = get_codeindex() - len;      /* BUG_0015 */
-
-    if ( len == 0 )
-    {
-        fprintf( listfile, "%-5d %04X%14s%s", CURRENTFILE->line, get_oldPC(), "", line );    /* no bytes generated */
-	    LineCounter();						/* BUG_0029 */
-    }
-    else if ( len <= 4 )
-    {
-        fprintf( listfile, "%-5d %04X  ", CURRENTFILE->line, get_oldPC() );
-
-        for ( k = 0; k < len; k++ )
-        {
-            fprintf( listfile, "%02X ", get_byte( &byteptr ) );
-        }
-
-        fprintf( listfile, "%*s%s", ( 4 - len ) * 3, "", line );
-	    LineCounter();						/* BUG_0029 */
-    }
-    else
-    {
-		first_line = TRUE;
-        while ( len )
-        {
-            if ( first_line )
-            {
-                fprintf( listfile, "%-5d %04X  ", CURRENTFILE->line, get_PC() - len );
-            }
-			else 
-			{
-                fprintf( listfile, "      %04X  ", get_PC() - len );
-			}
-			first_line = FALSE;
-
-            for ( k = ( len - 32 > 0 ) ? 32 : len; k; k--, len-- )
-            {
-                fprintf( listfile, "%02X ", get_byte( &byteptr ) );
-            }
-
-            fprintf( listfile, "\n" );
-		    LineCounter();							/* BUG_0029 */
-        }
-
-        fprintf( listfile, "%24s%s", "", line );	/* BUG_0029 */
-	    LineCounter();								/* BUG_0029 */
-    }
-
-    listfileptr = ftell( listfile );      /* Get file position for beginning of next line in list file */
-
-    set_oldPC();
-}
-
-
-void
-LineCounter( void )
-{
-    if ( ++LINENR > PAGE_LEN )
-    {
-        fprintf( listfile, "\x0C\n" );    /* send FORM FEED to file */
-        WriteHeader();
-        LINENR = 6;
-    }
-}
-
-
-
-void
-WriteHeader( void )
-{
-#ifdef QDOS
-    fprintf( listfile, "%s %s, %s", _prog_name, _version, _copyright );
-    fprintf( listfile, "%*.*s", PAGE_WIDTH - strlen( _prog_name ) - strlen( _version ) - strlen( _copyright ) - 3, strlen( date ), date );
-#else
-    fprintf( listfile, "%s", copyrightmsg );
-    fprintf( listfile, "%*.*s", ( int )( PAGE_WIDTH - strlen( copyrightmsg ) ), ( int ) strlen( date ), date );
-#endif
-    fprintf( listfile, "Page %03d%*s'%s'\n\n\n", ++PAGENR, ( int )( PAGE_WIDTH - 9 - 2 - strlen( lstfilename ) ), "", lstfilename );
-}
-
-
 void
 WriteSymbol( symbol *n )
 {
@@ -1155,17 +1004,16 @@ WriteSymbol( symbol *n )
 				{
 					symbol_output = "";				/* one line with symbol name, next line with blanks */
 
-					fprintf( listfile, "%s\n", n->symname );
-					LineCounter();
+					fprintf_list_file( "%s\n", n->symname );
 				}
 
-				fprintf( listfile, "%-*s= %08lX", COLUMN_WIDTH, symbol_output, n->symvalue );
+				fprintf_list_file( "%-*s= %08lX", COLUMN_WIDTH, symbol_output, n->symvalue );
 
 				/* BUG_0028 */
                 if ( n->references != NULL )
                 {
                     page = n->references->firstref;
-                    fprintf( listfile, " :%4d*", page->pagenr );
+                    fprintf_list_file( " :%4d*", page->pagenr );
                     page = page->nextref;
                     k = 14;
 
@@ -1173,18 +1021,16 @@ WriteSymbol( symbol *n )
                     {
                         if ( k-- == 0 )
                         {
-                            fprintf( listfile, "\n%*s", COLUMN_WIDTH + 2 + 8 + 2, "" );
-                            LineCounter();
+                            fprintf_list_file( "\n%*s", COLUMN_WIDTH + 2 + 8 + 2, "" );
                             k = 14;
                         }
 
-                        fprintf( listfile, "%4d ", page->pagenr );
+                        fprintf_list_file( "%4d ", page->pagenr );
                         page = page->nextref;
                     }
                 }
 
-                fprintf( listfile, "\n" );
-                LineCounter();
+                fprintf_list_file( "\n" );
             }
         }
     }
@@ -1194,21 +1040,6 @@ WriteSymbol( symbol *n )
 void
 WriteSymbolTable( char *msg, avltree *root )
 {
-
-    fseek( listfile, 0, SEEK_END );       /* File position to end of file */
-    fputc_err( '\n', listfile );
-    LineCounter();
-    fputc_err( '\n', listfile );
-    LineCounter();
-    fprintf( listfile, "%s", msg );		/* BUG_0026: removed extra LineCounter(); */
-    fputc_err( '\n', listfile );
-    LineCounter();
-    fputc_err( '\n', listfile );
-    LineCounter();
-
+    fprintf_list_file( "\n\n%s\n\n", msg );
     inorder( root, ( void ( * )( void * ) ) WriteSymbol ); /* write symbol table */
 }
-
-
-
-

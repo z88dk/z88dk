@@ -13,21 +13,36 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0028.t,v 1.1 2013-02-16 09:46:56 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0028.t,v 1.2 2013-02-19 22:52:40 pauloscustodio Exp $
 # $Log: BUG_0028.t,v $
-# Revision 1.1  2013-02-16 09:46:56  pauloscustodio
-# BUG_0029 : Incorrect alignment in list file with more than 4 bytes opcode
+# Revision 1.2  2013-02-19 22:52:40  pauloscustodio
+# BUG_0030 : List bytes patching overwrites header
+# BUG_0031 : List file garbled with input lines with 255 chars
+# New listfile.c with all the listing related code
 #
-#
+# Revision 1.1  2013/02/16 09:46:56  pauloscustodio
 # BUG_0028 : Not aligned page list in symbol list with more that 18 references
+#
 
 use strict;
 use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-# Integer out of range
-ok 1, "Tested by option-l-s.t";
+# very long reference list, one defined before reference, other defined after reference
+list_push_asm("LBL1:");
+
+for (0 .. 255) {
+	list_push_asm("defw LBL1", 0, 0);
+	list_push_asm("defw LBL2", 0, 4);
+
+	list_push_asm(";") for (1..61-2);	# force new page
+}		
+
+list_push_asm("LBL2:");
+
+list_test();	
+
 
 unlink_testfiles();
 done_testing();

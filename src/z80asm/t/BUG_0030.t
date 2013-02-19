@@ -13,21 +13,28 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0030.t,v 1.1 2013-02-16 09:46:56 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0030.t,v 1.2 2013-02-19 22:52:40 pauloscustodio Exp $
 # $Log: BUG_0030.t,v $
-# Revision 1.1  2013-02-16 09:46:56  pauloscustodio
-# BUG_0029 : Incorrect alignment in list file with more than 4 bytes opcode
-#
-#
+# Revision 1.2  2013-02-19 22:52:40  pauloscustodio
 # BUG_0030 : List bytes patching overwrites header
+# BUG_0031 : List file garbled with input lines with 255 chars
+# New listfile.c with all the listing related code
+#
+# Revision 1.1  2013/02/16 09:46:56  pauloscustodio
+# BUG_0030 : List bytes patching overwrites header
+#
 
 use strict;
 use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-# Integer out of range
-ok 1, "Tested by option-l-s.t";
+my $num = (get_max_line() - 5) / 2;		# max number of operands
+list_push_asm(";") for (1..60);
+list_push_asm("defb ".join(",", ('P') x $num), (0x12) x $num);
+list_push_asm("defc P = 0x12");
+
+list_test();
 
 unlink_testfiles();
 done_testing();

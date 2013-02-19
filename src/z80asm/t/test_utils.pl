@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.23 2013-02-12 00:55:00 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.24 2013-02-19 22:52:40 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.23  2013-02-12 00:55:00  pauloscustodio
+# Revision 1.24  2013-02-19 22:52:40  pauloscustodio
+# BUG_0030 : List bytes patching overwrites header
+# BUG_0031 : List file garbled with input lines with 255 chars
+# New listfile.c with all the listing related code
+#
+# Revision 1.23  2013/02/12 00:55:00  pauloscustodio
 # CH_0017 : Align with spaces, deprecate -t option
 #
 # Revision 1.22  2013/02/11 21:54:38  pauloscustodio
@@ -610,9 +615,8 @@ sub normalize {
 sub get_copyright {
 	my $hist = read_file("hist.c");
 	my($version) = 	 $hist =~ /\#define \s+ VERSION   \s+ \" (.*?) \"/x or die;
-	my($date) = 	 $hist =~ /\#define \s+ DATE      \s+ \" (.*?) \"/x or die;
 	my($copyright) = $hist =~ /\#define \s+ COPYRIGHT \s+ \" (.*?) \"/x or die;
-	my $copyrightmsg = "Z80 Module Assembler ".$version." (".$date."), (c) ".$copyright;
+	my $copyrightmsg = "Z80 Module Assembler ".$version.", (c) ".$copyright;
 	
 	return $copyrightmsg;
 }
@@ -629,5 +633,266 @@ sub get_unix_date {
 		or die "Date not found in $text";
 	return $1;
 }
+
+#------------------------------------------------------------------------------
+# LIST FILE HANDLING
+#------------------------------------------------------------------------------
+my $PAGE_SIZE = 61;
+my $LINE_SIZE = 122;
+my $MAX_LINE = 255-2;
+my $COLUMN_WIDTH = 32;
+my $LINENR;
+my $PAGENR;
+my $PAGE_LINENR;
+my $ADDR = 0;
+my %LABEL_PAGE;
+my %LABEL_ADDR;
+my %LABEL_GLOBAL;
+my @LIST_ASM;
+my @LIST_BIN;
+my @LIST_LST;
+my $LABEL_RE = qr/\b[A-Z_][A-Z0-9_]*/;
+
+# pagination functions
+sub list_first_line {
+	$LINENR = 1;
+	$PAGENR = 1;
+	$PAGE_LINENR = 1;
+}
+
+# pagination functions
+sub list_next_line {
+	$LINENR++;
+	$PAGE_LINENR++;
+	if ($PAGE_LINENR > $PAGE_SIZE) {
+		$PAGE_LINENR = 1;
+		$PAGENR++;
+	}
+}
+
+sub get_max_line  { $MAX_LINE }
+sub get_num_lines { $LINENR   }
+
+#------------------------------------------------------------------------------
+# push list line - interpreets any ALL_CAPS word as a label
+sub list_push_asm {
+	my($asm, @bytes) = @_;
+
+	# handle asm, interpreet labels
+	if ($asm) {
+		push @LIST_ASM, $asm;
+		
+		if ($asm =~ /^\s*($LABEL_RE)\s*:/) {		# define label
+			unshift @{$LABEL_PAGE{$1}}, $PAGENR;
+			$LABEL_PAGE{$1} ||= [];
+			$LABEL_ADDR{$1} = $ADDR;
+		}
+		elsif ($asm =~ /^\s*defc\s+($LABEL_RE)\s*=\s*(.*)/) {		# define constant
+			unshift @{$LABEL_PAGE{$1}}, $PAGENR;
+			$LABEL_PAGE{$1} ||= [];
+			$LABEL_ADDR{$1} = 0+eval($2);
+		}
+		elsif ($asm =~ /(?i:xdef|xlib)\s+($LABEL_RE)/) {	# global label
+			push @{$LABEL_PAGE{$1}}, $PAGENR;
+			$LABEL_GLOBAL{$1}++;
+		}
+		else {
+			push @{$LABEL_PAGE{$1}}, $PAGENR while $asm =~ /($LABEL_RE)/g;	# use label
+		}
+	}
 	
+	# handle bin
+	push @LIST_BIN, pack("C*", @bytes);
+	
+	# handle list
+	my $lst = sprintf("%-5d %04X  ", $LINENR, $ADDR);
+	
+	my @lst_bytes = @bytes;
+	while (@lst_bytes) {
+		my @lst_block = splice(@lst_bytes, 0, 32);
+		$lst .= join('', map {sprintf("%02X ", $_)} @lst_block);
+		$ADDR += @lst_block;
+
+		# still for another row?
+		if (@lst_bytes) {
+			push @LIST_LST, $lst;
+			list_next_line(); $LINENR--;
+			$lst = sprintf("%5s %04X  ", "", $ADDR);
+		}
+	}
+	
+	# assembly
+	if (@bytes <= 4) {
+		$lst = sprintf("%-24s%s", $lst, $asm // '');
+	}
+	else {
+		push @LIST_LST, $lst;
+		list_next_line(); $LINENR--;
+		$lst = sprintf("%-24s%s", "", $asm // '');
+	}		
+	push @LIST_LST, $lst;
+	list_next_line();
+}
+	
+#------------------------------------------------------------------------------
+# compare result file with list of expected lines
+sub compare_list_file {
+	my($file, @expected) = @_;
+
+	my $line = "[line ".((caller)[2])."]";
+
+	my @got = read_file($file);
+	chomp(@got);
+	
+	insert_headers(get_copyright(), get_unix_date($got[0]), $file, \@expected);
+	
+	eq_or_diff \@got, \@expected, "$line compare $file";
+}
+
+#------------------------------------------------------------------------------
+# insert headers every $PAGE_SIZE lines
+sub insert_headers {
+	my($copyright, $date, $file, $lines) = @_;
+	my $i = 0;
+	my $page = 1;
+	
+	while ($i <= @$lines) {
+		my @insert;
+		push @insert, "\f" if $i > 0;
+		push @insert, $copyright . " " x ($LINE_SIZE - length($copyright) - length($date)) . $date;
+		push @insert, "Page ".sprintf("%03d", $page) . " " x ($LINE_SIZE - 10 - length($file)) . "'$file'";
+		push @insert, "";
+		push @insert, "";
+		
+		splice(@$lines, $i, 0, @insert);
+		
+		$page++;
+		$i += @insert + $PAGE_SIZE;
+	}
+	push @$lines, "\f";
+}
+
+#------------------------------------------------------------------------------
+# Return list of lines of symbol table
+sub sym_lines {
+	my($show_pages) = @_;
+	my @sym;
+	
+	push @sym, "";
+	push @sym, "";
+	push @sym, "Local Module Symbols:";
+	push @sym, "";
+	
+	for (sort {uc($a) cmp uc($b)} keys %LABEL_ADDR) {
+		push @sym, format_sym_line($_, $show_pages) unless $LABEL_GLOBAL{$_};
+	}
+	
+	push @sym, "";
+	push @sym, "";
+	push @sym, "Global Module Symbols:";
+	push @sym, "";
+	
+	for (sort {uc($a) cmp uc($b)} keys %LABEL_ADDR) {
+		push @sym, format_sym_line($_, $show_pages) if $LABEL_GLOBAL{$_};
+	}
+	
+	return @sym;
+}
+
+#------------------------------------------------------------------------------
+sub format_sym_line {
+	my($label, $show_pages) = @_;
+	my @ret;
+	
+	my $line = uc($label);
+	if (length($line) >= $COLUMN_WIDTH) {
+		push @ret, $line;
+		$line = '';
+	}
+	$line .= sprintf("%-*s= %08X", $COLUMN_WIDTH - length($line), '', $LABEL_ADDR{$label});
+	
+	if ($show_pages) {
+		$line .= " :";
+		
+		my @pages = uniq @{$LABEL_PAGE{$label}};
+		my $first = 1;
+		while (my @block = splice(@pages, 0, 15)) {
+			my $page = shift @block;
+			$line .= sprintf("%4d%s", $page, $first ? '*' : ' ');
+			$first = 0;
+			
+			while (@block) {
+				my $page = shift @block;
+				$line .= sprintf("%4d ", $page);
+			}
+			
+			if (@pages) {
+				push @ret, $line;
+				$line = sprintf("%*s", $COLUMN_WIDTH + 2 + 8 + 2, '');
+			}
+		}
+	}
+	push @ret, $line;
+	
+	return @ret;
+}
+
+#------------------------------------------------------------------------------
+# test list file
+sub list_test {
+	my $asm = join("\n", @LIST_ASM);
+	my $bin = join('',   @LIST_BIN);
+
+	list_push_asm();
+	
+	for my $options ("-ns -nl", "-nl -ns") {
+		t_z80asm(
+			asm		=> $asm,
+			bin		=> $bin,
+			options	=> "-ns -nl",
+			nolist	=> 1,
+		);
+		ok ! -f lst_file(), "no ".lst_file();
+		ok ! -f sym_file(), "no ".sym_file();
+	}
+	
+	for my $options ("-ns -l", "-l -ns") {
+		t_z80asm(
+			asm		=> $asm,
+			bin		=> $bin,
+			options	=> "-ns -l",
+			nolist	=> 1,
+		);
+		ok   -f lst_file(), lst_file();
+		ok ! -f sym_file(), "no ".sym_file();
+		compare_list_file(lst_file(), @LIST_LST);
+	}
+	
+	for my $options ("", "-nl", "-s", "-s -nl", "-nl -s") {
+		t_z80asm(
+			asm		=> $asm,
+			bin		=> $bin,
+			options	=> "-s -nl",
+			nolist	=> 1,
+		);
+		ok ! -f lst_file(), "no ".lst_file();
+		ok   -f sym_file(), sym_file();
+		compare_list_file(sym_file(), sym_lines(0));
+	}
+	
+	for my $options ("-l", "-s -l", "-l -s") {
+		t_z80asm(
+			asm		=> $asm,
+			bin		=> $bin,
+			options	=> "-s -l",
+			nolist	=> 1,
+		);
+		ok   -f lst_file(), lst_file();
+		ok ! -f sym_file(), "no ".sym_file();
+		compare_list_file(lst_file(), @LIST_LST, sym_lines(1));
+	}
+}
+
+list_first_line();
+
 1;
