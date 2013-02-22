@@ -18,9 +18,12 @@ Only works for memory allocated by xmalloc and freed by xfree.
 Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.c,v 1.7 2013-01-20 21:10:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.c,v 1.8 2013-02-22 17:16:40 pauloscustodio Exp $ */
 /* $Log: memalloc.c,v $
-/* Revision 1.7  2013-01-20 21:10:32  pauloscustodio
+/* Revision 1.8  2013-02-22 17:16:40  pauloscustodio
+/* Output memory leaks on exit
+/*
+/* Revision 1.7  2013/01/20 21:10:32  pauloscustodio
 /* Rename bool to BOOL, to be consistent with TRUE and FALSE and
 /* distinguish from C++ bool, true, false
 /*
@@ -124,6 +127,8 @@ static char msg_buffer_overflow[] = "memalloc %s(%d): buffer overflow, "
 static char msg_new_alloc[] =       "memalloc %s(%d): alloc %u bytes at 0x%p\n";
 static char msg_delete_alloc[] =    "memalloc %s(%d): free %u bytes at 0x%p "
                                     "allocated at %s(%d)\n";
+static char msg_delete_leak[] =     "memalloc %s(%d): free memory leak of %u bytes at 0x%p "
+                                    "allocated at %s(%d)\n";
 
 /*-----------------------------------------------------------------------------
 *   cleanup atexit()
@@ -140,6 +145,12 @@ static void cleanup( void )
     while ( ! LIST_EMPTY( &mem_blocks ) )
     {
         block = LIST_FIRST( &mem_blocks );
+#ifndef MEMALLOC_DEBUG
+		warn( msg_delete_leak,  __FILE__, __LINE__, 
+			  block->client_size, CLIENT_PTR( block ), 
+			  block->file, block->lineno );
+#endif
+
         _xfree( CLIENT_PTR( block ), __FILE__, __LINE__ );  /* deletes from list */
     }
 }

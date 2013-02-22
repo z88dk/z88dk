@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.6 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.7 2013-02-22 17:16:40 pauloscustodio Exp $
 # $Log: whitebox-memalloc.t,v $
-# Revision 1.6  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.7  2013-02-22 17:16:40  pauloscustodio
+# Output memory leaks on exit
+#
+# Revision 1.6  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.5  2012/06/14 15:01:27  pauloscustodio
@@ -58,7 +61,10 @@ t_compile_module("", <<'END', "memalloc.c die.o except.o strutil.o safestr.o");
 	else 
 		return 1;
 END
-t_run_module([], "", "", 0);
+t_run_module([], "", <<ERR, 0);
+memalloc memalloc.c(1): free memory leak of 2 bytes at ADDR_1 allocated at test.c(2)
+memalloc memalloc.c(1): free memory leak of 1 bytes at ADDR_2 allocated at test.c(1)
+ERR
 
 
 # debug
