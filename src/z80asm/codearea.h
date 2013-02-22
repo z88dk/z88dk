@@ -16,9 +16,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.7 2013-01-24 23:03:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.8 2013-02-22 17:19:19 pauloscustodio Exp $ */
 /* $Log: codearea.h,v $
-/* Revision 1.7  2013-01-24 23:03:03  pauloscustodio
+/* Revision 1.8  2013-02-22 17:19:19  pauloscustodio
+/* Add listfile interface to append bytes to the listing
+/* Remove oldPC - no longer needed with new listfile
+/* Solve memory leak
+/*
+/* Revision 1.7  2013/01/24 23:03:03  pauloscustodio
 /* Replaced (unsigned char) by (byte_t)
 /* Replaced (unisigned int) by (size_t)
 /* Replaced (short) by (int)
@@ -76,10 +81,6 @@ extern void init_codearea_module( void );
 extern size_t set_PC( size_t n );
 extern size_t inc_PC( size_t n );
 extern size_t get_PC( void );
-
-/* copy PC to oldPC */
-extern size_t set_oldPC( void );
-extern size_t get_oldPC( void );
 
 /* init the code area, return current size */
 extern void init_codearea( void );              /* set code area to zeros */

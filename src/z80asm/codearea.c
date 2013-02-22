@@ -16,9 +16,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.9 2013-01-24 23:03:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.10 2013-02-22 17:19:19 pauloscustodio Exp $ */
 /* $Log: codearea.c,v $
-/* Revision 1.9  2013-01-24 23:03:03  pauloscustodio
+/* Revision 1.10  2013-02-22 17:19:19  pauloscustodio
+/* Add listfile interface to append bytes to the listing
+/* Remove oldPC - no longer needed with new listfile
+/* Solve memory leak
+/*
+/* Revision 1.9  2013/01/24 23:03:03  pauloscustodio
 /* Replaced (unsigned char) by (byte_t)
 /* Replaced (unisigned int) by (size_t)
 /* Replaced (short) by (int)
@@ -81,6 +86,7 @@ Manage the code area in memory
 #include "symbol.h"
 #include "z80asm.h"
 #include "file.h"
+#include "listfile.h"
 
 /*-----------------------------------------------------------------------------
 *   global data
@@ -90,7 +96,18 @@ static size_t codeindex;                /* point to current address of codearea 
 static size_t codesize;                 /* size of all modules before current,
                                            i.e. base address of current module
                                            BUG_0015 */
-static size_t PC, oldPC;                /* Program Counter */
+static size_t PC;		                /* Program Counter */
+
+/*-----------------------------------------------------------------------------
+*   cleanup memory on exit
+*----------------------------------------------------------------------------*/
+static void fini_codearea_module( void )
+{
+	if ( codearea != NULL )
+	{
+		xfree( codearea );
+	}
+}
 
 /*-----------------------------------------------------------------------------
 *   init_codearea_module
@@ -98,15 +115,22 @@ static size_t PC, oldPC;                /* Program Counter */
 *----------------------------------------------------------------------------*/
 void init_codearea_module( void )
 {
-    /* allocate memory for Z80 machine code, will be cleaned by garbage collector
-       in memalloc.c */
+	static BOOL initialized = FALSE;
+
+    /* allocate memory for Z80 machine code */
     codearea = (byte_t *) xcalloc( MAXCODESIZE, sizeof( char ) );
+	if ( ! initialized ) 
+	{
+		atexit( fini_codearea_module );
+		initialized = TRUE;
+	}
 
     init_codearea();                    /* init vars */
 
     codesize  = 0;                      /* marks start of each new module,
                                            always incremented
                                            BUG_0015 */
+
 }
 
 /*-----------------------------------------------------------------------------
@@ -127,16 +151,6 @@ size_t get_PC( void )
     return PC;
 }
 
-size_t set_oldPC( void )
-{
-    return oldPC = PC;
-}
-
-size_t get_oldPC( void )
-{
-    return oldPC;
-}
-
 /*-----------------------------------------------------------------------------
 *   init the code area, return current size
 *----------------------------------------------------------------------------*/
@@ -144,7 +158,6 @@ void init_codearea( void )
 {
     codeindex = 0;                      /* where to store next opcode byte */
     set_PC( 0 );
-    set_oldPC();
     memset( codearea, 0, MAXCODESIZE );
 }
 
@@ -225,6 +238,7 @@ void patch_byte( size_t *paddr, byte_t byte )
 void append_byte( byte_t byte )
 {
     patch_byte( &codeindex, byte );
+	list_append_byte( byte );
 }
 
 void patch_word( size_t *paddr, int word )
@@ -239,6 +253,7 @@ void patch_word( size_t *paddr, int word )
 void append_word( int word )
 {
     patch_word( &codeindex, word );
+	list_append_word( word );
 }
 
 void patch_long( size_t *paddr, long dword )
@@ -257,6 +272,7 @@ void patch_long( size_t *paddr, long dword )
 void append_long( long dword )
 {
     patch_long( &codeindex, dword );
+	list_append_long( dword );
 }
 
 byte_t get_byte( size_t *paddr )
