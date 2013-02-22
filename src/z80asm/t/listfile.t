@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/listfile.t,v 1.1 2013-02-19 22:52:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/listfile.t,v 1.2 2013-02-22 17:26:34 pauloscustodio Exp $
 # $Log: listfile.t,v $
-# Revision 1.1  2013-02-19 22:52:41  pauloscustodio
+# Revision 1.2  2013-02-22 17:26:34  pauloscustodio
+# Decouple assembler from listfile handling
+#
+# Revision 1.1  2013/02/19 22:52:41  pauloscustodio
 # BUG_0030 : List bytes patching overwrites header
 # BUG_0031 : List file garbled with input lines with 255 chars
 # New listfile.c with all the listing related code
@@ -28,6 +31,8 @@ use File::Slurp;
 use Test::More;
 use Test::Differences; 
 require 't/test_utils.pl';
+
+my $inc_file = "testinclude.inc";
 
 # use after defined, local
 list_push_asm("defc A = 1");
@@ -66,6 +71,18 @@ for (1..255) {
 	list_push_asm($asm, $_);
 }		
 
+# include a file
+write_file($inc_file, <<END);
+ld a,+A
+ld b,+B
+add a,b
+END
+list_push_include($inc_file);
+list_push_asm("ld a,+A", 0x3E, 0x01);
+list_push_asm("ld b,+B", 0x06, 0x02);
+list_push_asm("add a,b", 0x80);
+list_pop_include();
+
 # list with more than 10000 lines - last test
 while (get_num_lines() <= 10000) {
 	list_push_asm("nop", 0);
@@ -73,5 +90,5 @@ while (get_num_lines() <= 10000) {
 
 list_test();
 
-unlink_testfiles();
+unlink_testfiles($inc_file);
 done_testing();

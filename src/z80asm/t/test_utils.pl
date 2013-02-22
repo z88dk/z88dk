@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.24 2013-02-19 22:52:40 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.25 2013-02-22 17:26:34 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.24  2013-02-19 22:52:40  pauloscustodio
+# Revision 1.25  2013-02-22 17:26:34  pauloscustodio
+# Decouple assembler from listfile handling
+#
+# Revision 1.24  2013/02/19 22:52:40  pauloscustodio
 # BUG_0030 : List bytes patching overwrites header
 # BUG_0031 : List file garbled with input lines with 255 chars
 # New listfile.c with all the listing related code
@@ -585,6 +588,7 @@ sub normalize {
 			s/(new class \w+ at) $addr/$1 ADDR_$addr_seq/;
 			s/(delete class \w+ at) $addr/$1 ADDR_$addr_seq/;
 			s/(free \d+ bytes at) $addr/$1 ADDR_$addr_seq/;
+			s/(free memory leak of \d+ bytes at) $addr/$1 ADDR_$addr_seq/;
 			s/(\w+_(init|fini|copy)) $addr/$1 ADDR_$addr_seq/g;
 		}
 	}
@@ -641,7 +645,7 @@ my $PAGE_SIZE = 61;
 my $LINE_SIZE = 122;
 my $MAX_LINE = 255-2;
 my $COLUMN_WIDTH = 32;
-my $LINENR;
+my $LINENR; my @LINENR;
 my $PAGENR;
 my $PAGE_LINENR;
 my $ADDR = 0;
@@ -679,8 +683,8 @@ sub list_push_asm {
 	my($asm, @bytes) = @_;
 
 	# handle asm, interpreet labels
-	if ($asm) {
-		push @LIST_ASM, $asm;
+	if ($asm) {				
+		push @LIST_ASM, $asm unless @LINENR;		# not if inside include
 		
 		if ($asm =~ /^\s*($LABEL_RE)\s*:/) {		# define label
 			unshift @{$LABEL_PAGE{$1}}, $PAGENR;
@@ -732,6 +736,20 @@ sub list_push_asm {
 	}		
 	push @LIST_LST, $lst;
 	list_next_line();
+}
+
+# hanble includes
+sub list_push_include {
+	my($file) = @_;
+	push @LIST_ASM, "include \"$file\"";
+	push @LINENR, $LINENR;
+	$LINENR = 1;
+}
+
+sub list_pop_include {
+	list_push_asm();
+	@LINENR or die;
+	$LINENR = pop(@LINENR) + 1;
 }
 	
 #------------------------------------------------------------------------------

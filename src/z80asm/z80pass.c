@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.39 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.40 2013-02-22 17:26:34 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.39  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.40  2013-02-22 17:26:34  pauloscustodio
+/* Decouple assembler from listfile handling
+/*
+/* Revision 1.39  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -366,7 +369,7 @@ getasmline( void )
     fptr = ftell( z80asmfile );           /* remember file and temp buffer position */
     save_temporary_ptr = temporary_ptr;
 
-    c = '\0';
+    c = 0;
 
     for ( len = 0; ( len < 254 ) && ( c != '\n' ); len++ )
     {
@@ -407,6 +410,7 @@ parseline( enum flag interpret )
     if ( listing )
     {
         getasmline();    /* get a copy of current source line */
+		list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
     }
 
     EOL = OFF;                /* reset END OF LINE flag */
@@ -456,7 +460,7 @@ parseline( enum flag interpret )
 
     if ( listing && writeline )
     {
-        write_asmln_list_file( line );    /* Write current source line to list file, if allowed */
+        list_end_line();				/* Write current source line to list file */
     }
 }
 
@@ -712,7 +716,7 @@ Z80pass2( void )
 
             if ( option_list )
             {
-				list_file_patch( pass2expr->listpos, constant, RANGE_SIZE(pass2expr->rangetype) );
+				list_patch_data( pass2expr->listpos, constant, RANGE_SIZE(pass2expr->rangetype) );
             }
 
             prevexpr = pass2expr;
@@ -885,7 +889,7 @@ Pass2info( struct expr *pfixexpr,       /* pointer to header of postfix expressi
     pfixexpr->rangetype = constrange;
     pfixexpr->srcfile = CURRENTFILE->fname;       /* pointer to record containing current source file name */
     pfixexpr->curline = CURRENTFILE->line;        /* pointer to record containing current line number */
-    pfixexpr->listpos = list_file_patch_pos(byteoffset);
+    pfixexpr->listpos = list_patch_pos(byteoffset);
 												  /* now calculated as absolute file pointer */
 
     if ( CURRENTMODULE->mexpr->firstexpr == NULL )
@@ -984,9 +988,7 @@ FindFile( struct sourcefile *srcfile, char *flnm )
 void
 WriteSymbol( symbol *n )
 {
-    int k;
     struct pageref *page;
-	char *symbol_output;
 
     if ( n->owner == CURRENTMODULE )
     {
@@ -995,42 +997,23 @@ WriteSymbol( symbol *n )
         {
             if ( ( n->type & SYMTOUCHED ) )
             {
-				/* BUG_0027 */
-				if ( strlen( n->symname ) < COLUMN_WIDTH )
-				{
-					symbol_output = n->symname;		/* one line with symbol name and value */
-				}
-				else 
-				{
-					symbol_output = "";				/* one line with symbol name, next line with blanks */
-
-					fprintf_list_file( "%s\n", n->symname );
-				}
-
-				fprintf_list_file( "%-*s= %08lX", COLUMN_WIDTH, symbol_output, n->symvalue );
+				list_start_symbol( n->symname, n->symvalue );
 
 				/* BUG_0028 */
                 if ( n->references != NULL )
                 {
                     page = n->references->firstref;
-                    fprintf_list_file( " :%4d*", page->pagenr );
-                    page = page->nextref;
-                    k = 14;
+					list_append_reference( page->pagenr, TRUE );
 
+					page = page->nextref;
                     while ( page != NULL )
                     {
-                        if ( k-- == 0 )
-                        {
-                            fprintf_list_file( "\n%*s", COLUMN_WIDTH + 2 + 8 + 2, "" );
-                            k = 14;
-                        }
-
-                        fprintf_list_file( "%4d ", page->pagenr );
+						list_append_reference( page->pagenr, FALSE );
                         page = page->nextref;
                     }
                 }
 
-                fprintf_list_file( "\n" );
+                list_end_symbol();
             }
         }
     }
@@ -1040,6 +1023,6 @@ WriteSymbol( symbol *n )
 void
 WriteSymbolTable( char *msg, avltree *root )
 {
-    fprintf_list_file( "\n\n%s\n\n", msg );
+	list_start_table( msg );
     inorder( root, ( void ( * )( void * ) ) WriteSymbol ); /* write symbol table */
 }

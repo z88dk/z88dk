@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.27 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.28 2013-02-22 17:26:33 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.27  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.28  2013-02-22 17:26:33  pauloscustodio
+/* Decouple assembler from listfile handling
+/*
+/* Revision 1.27  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -619,15 +622,15 @@ AppendPageRef( symbol *symptr )
     struct pageref *newref = NULL;
 
     if ( symptr->references->lastref != NULL )
-        if ( symptr->references->lastref->pagenr == get_page_nr() ||
-                symptr->references->firstref->pagenr == get_page_nr() )        /* symbol reference on the same page - ignore */
+        if ( symptr->references->lastref->pagenr == list_get_page_nr() ||
+                symptr->references->firstref->pagenr == list_get_page_nr() )        /* symbol reference on the same page - ignore */
         {
             return;
         }
 
     newref = xcalloc_struct( struct pageref );
     /* new page reference of symbol - allocate... */
-    newref->pagenr = get_page_nr();
+    newref->pagenr = list_get_page_nr();
     newref->nextref = NULL;
 
     if ( symptr->references->lastref == NULL )
@@ -649,13 +652,13 @@ InsertPageRef( symbol *symptr )
     struct pageref *newref = NULL, *tmpptr = NULL;
 
     if ( symptr->references->firstref != NULL )
-        if ( symptr->references->firstref->pagenr == get_page_nr() )       /* symbol reference on the same page - ignore */
+        if ( symptr->references->firstref->pagenr == list_get_page_nr() )       /* symbol reference on the same page - ignore */
         {
             return;
         }
 
     newref = xcalloc_struct( struct pageref );
-    newref->pagenr = get_page_nr();
+    newref->pagenr = list_get_page_nr();
     newref->nextref = symptr->references->firstref;       /* next reference will be current first reference */
 
     if ( symptr->references->firstref == NULL )

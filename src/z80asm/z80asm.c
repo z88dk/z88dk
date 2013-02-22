@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.68 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.69 2013-02-22 17:26:33 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.68  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.69  2013-02-22 17:26:33  pauloscustodio
+/* Decouple assembler from listfile handling
+/*
+/* Revision 1.68  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -570,7 +573,10 @@ AssembleSourceFile( void )
         if ( option_list || symfile )
         {
             /* Create LIST or SYMBOL file */
-			open_list_file( srcfilename );
+			list_open( srcfilename,
+						option_list ? 
+							  FILEEXT_LST           /* set '.lst' extension */
+							: FILEEXT_SYM );		/* set '.sym' extension */
         }
 
         /* Create relocatable object file */
@@ -579,7 +585,6 @@ AssembleSourceFile( void )
         fwritec_err( objhdrprefix, strlen( objhdrprefix ), objfile );
 
         set_PC( 0 );
-        set_oldPC();
         copy( staticroot, &CURRENTMODULE->localroot, ( int ( * )( void *, void * ) ) cmpidstr, ( void * ( * )( void * ) ) createsym );
 
         /* Create standard 'ASMPC' identifier */
@@ -633,7 +638,7 @@ AssembleSourceFile( void )
         }
 
 		/* remove list file if more errors now than before */
-		close_list_file( start_errors == get_num_errors() );
+		list_close( start_errors == get_num_errors() );
 
         if ( objfile != NULL )
         {

@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle assembly listing and symbol table listing.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.1 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.2 2013-02-22 17:26:33 pauloscustodio Exp $ */
 /* $Log: listfile.c,v $
-/* Revision 1.1  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.2  2013-02-22 17:26:33  pauloscustodio
+/* Decouple assembler from listfile handling
+/*
+/* Revision 1.1  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -32,7 +35,6 @@ Handle assembly listing and symbol table listing.
 #include "z80asm.h"
 #include "errors.h"
 #include "hist.h"
-#include "class.h"
 #include "strpool.h"
 #include "types.h"
 #include "safestr.h"
@@ -41,7 +43,6 @@ Handle assembly listing and symbol table listing.
 
 #include <stdio.h>
 #include <time.h>
-#include <stdarg.h>
 
 /*-----------------------------------------------------------------------------
 *   Static variables
@@ -52,104 +53,61 @@ static time_t list_time;		/* time   of assembly in seconds */
 static char *list_date;			/* pointer to datestring calculated from list_time */
 
 /*-----------------------------------------------------------------------------
+*   Global state variables
+*----------------------------------------------------------------------------*/
+static ListFile *the_list = NULL;
+
+/*-----------------------------------------------------------------------------
 *   Class to hold current list file
 *----------------------------------------------------------------------------*/
-CLASS( ListFile )
-	char	*filename;				/* list file name, held in strpool */
-	FILE	*file;					/* open file */
-	long	start_line_pos;			/* ftell() position at start of next list line */
-
-	int		page_nr;				/* current page number */
-	int		line_nr;				/* current line number in page */
-END_CLASS;
-
 DEF_CLASS(ListFile);
 
-/* declare methods */
-void ListFile_open( ListFile *self, char *source_file );
-void ListFile_close( ListFile *self, BOOL keep_file );
-void ListFile_init_page( ListFile *self );
-void ListFile_vfprintf( ListFile *self, char *msg, va_list argptr );
-void ListFile_fprintf( ListFile *self, char *msg, ... );
-void ListFile_write_header( ListFile *self );
-void ListFile_write_asmln( ListFile *self, char *asm_line );
-long ListFile_patch_pos( ListFile *self, int byte_offset );
-void ListFile_patch( ListFile *self, long patch_pos, long value, int num_bytes );
-
-
+/*-----------------------------------------------------------------------------
+*	Class helper methods
+*----------------------------------------------------------------------------*/
 void ListFile_init ( ListFile *self )
 { 
     /* force init strpool to make sure ListFile is destroyed before StrPool */
     strpool_init();
+
+	self->bytes = OBJ_NEW( Str );
+	OBJ_AUTODELETE( self->bytes ) = FALSE;
+
+	self->line  = OBJ_NEW( Str );
+	OBJ_AUTODELETE( self->line ) = FALSE;
 }
 
 void ListFile_copy ( ListFile *self, ListFile *other )
 {
 	/* cannot copy object because of external resources held - open file */
-	self->filename = NULL;
-	self->file     = NULL;
+	self->filename		= NULL;
+	self->file			= NULL;
+	self->bytes			= NULL;
+	self->source_file	= NULL;
+	self->line			= NULL;
 }
 
 void ListFile_fini ( ListFile *self )   
 {
 	/* delete file if object is garbage-collected - unexpected exit */
 	ListFile_close( self, FALSE );
+
+	OBJ_DELETE( self->bytes );
+	OBJ_DELETE( self->line );
 }
 
-void ListFile_open( ListFile *self, char *source_file )
-{
-	char list_filename[FILENAME_MAX];
-
-	/* close and discard any open list file */
-	ListFile_close( self, FALSE );
-
-	/* compute time for header */
-    time( &list_time );
-    list_date = asctime( localtime( &list_time ) ); /* get current system time for date in list file */
-
-	/* open the file */
-	path_replace_ext( list_filename, source_file,
-						listing ? 
-						FILEEXT_LST             /* set '.lst' extension */
-						: FILEEXT_SYM );			/* set '.sym' extension */
-
-	self->filename	= strpool_add(list_filename);
-	self->file		= fopen_err( list_filename, "w+" );
-
-	/* output header */
-	ListFile_init_page( self );
-}
-
-void ListFile_close( ListFile *self, BOOL keep_file )
-{
-	if ( self->file != NULL ) 
-	{
-        fputc_err( '\f', self->file );     /* end listing with a FF */
-        fclose( self->file );
-
-		if ( ! keep_file) 
-		{
-            remove( self->filename );
-		}
-	}
-
-	self->file = NULL;
-}
-
-void ListFile_init_page( ListFile *self )
-{
-	if ( self->file != NULL ) 
-	{
-		self->page_nr = 0;
-		ListFile_write_header( self );			/* Begin list file with a header */
-		self->start_line_pos = ftell( self->file );	/* Get file pos. of next line in list file */
-	}
-}
-
-void ListFile_vfprintf( ListFile *self, char *msg, va_list argptr )
+/*-----------------------------------------------------------------------------
+*	output one line to the list file
+*----------------------------------------------------------------------------*/
+static void ListFile_write_header( ListFile *self );
+static void ListFile_fprintf( ListFile *self, char *msg, ... )
 {
     SSTR_DEFINE( str, MAXLINE );
 	char *p;
+    va_list argptr;
+
+	va_start( argptr, msg ); /* init variable args */
+
 
 	if ( self->file != NULL ) 
 	{
@@ -172,15 +130,10 @@ void ListFile_vfprintf( ListFile *self, char *msg, va_list argptr )
 	}
 }
 
-void ListFile_fprintf( ListFile *self, char *msg, ... )
-{
-    va_list argptr;
-    va_start( argptr, msg ); /* init variable args */
-
-	ListFile_vfprintf( self, msg, argptr );
-}
-
-void ListFile_write_header( ListFile *self )
+/*-----------------------------------------------------------------------------
+*	Draw the page header
+*----------------------------------------------------------------------------*/
+static void ListFile_write_header( ListFile *self )
 {
 	long	fpos1, fpos2, fpos3;
 
@@ -234,54 +187,176 @@ void ListFile_write_header( ListFile *self )
 	}
 }
 
-/* Write current source line to list file with Hex dump of assembled instruction */
-void ListFile_write_asmln( ListFile *self, char *asm_line )
+/*-----------------------------------------------------------------------------
+*	Initialize the page
+*----------------------------------------------------------------------------*/
+static void ListFile_init_page( ListFile *self )
 {
-    int len, i;
-    size_t byteptr;
-
 	if ( self->file != NULL ) 
 	{
-		/* remove end new-line and spaces (BUG_0031) */
-		chomp(asm_line);						
-
-		/* get length of hex dump and address of first byte (BUG_0015) */
-		len = get_PC() - get_oldPC();
-		byteptr = get_codeindex() - len;
-
-		/* output line number and address */
-		ListFile_fprintf( self, "%-5d %04X  ", CURRENTFILE->line, get_oldPC() );
-
-		/* output hex dump */
-		for ( i = 0 ; i < len ; i++ )
-		{
-			ListFile_fprintf( self, "%02X ", get_byte( &byteptr ) );
-			if ( i < len - 1 && 
-				 ( (i+1) % HEX_DUMP_WIDTH) == 0 )
-			{
-				ListFile_fprintf( self, "\n      %04X  ", get_oldPC() + i + 1 );
-			}
-		}
-
-		/* output line */
-		if ( len <= 4 )
-		{
-			ListFile_fprintf( self, "%*s", (4 - len) * 3, "" );		/* pad to start of asm line */
-		}
-		else 
-		{
-			ListFile_fprintf( self, "\n%*s", 5 + 1 + 4 + 2 + (4 * 3), "" );		/* pad to start of asm line */
-		}
-
-		ListFile_fprintf( self, "%s\n", asm_line );
-
-		/* prepare for next list line */
-		self->start_line_pos = ftell( self->file );      /* Get file position for beginning of next line in list file */
-		set_oldPC();
+		self->page_nr = 0;
+		ListFile_write_header( self );			/* Begin list file with a header */
+		self->start_line_pos = ftell( self->file );	/* Get file pos. of next line in list file */
 	}
 }
 
-/* compute patch position of given byte, take page size and header into account */
+/*-----------------------------------------------------------------------------
+*	open the list file
+*----------------------------------------------------------------------------*/
+void ListFile_open( ListFile *self, char *source_file, char *extension )
+{
+	char list_filename[FILENAME_MAX];
+
+	/* close and discard any open list file */
+	ListFile_close( self, FALSE );
+
+	/* compute time for header */
+    time( &list_time );
+    list_date = asctime( localtime( &list_time ) ); /* get current system time for date in list file */
+
+	/* open the file */
+	path_replace_ext( list_filename, source_file, extension );
+
+	self->filename	= strpool_add(list_filename);
+	self->file		= fopen_err( list_filename, "w+" );
+
+	/* output header */
+	ListFile_init_page( self );
+}
+
+void list_open( char *source_file, char *extension )
+{
+	if (the_list == NULL)
+	{
+		the_list = OBJ_NEW(ListFile);
+	}
+
+	ListFile_open( the_list, source_file, extension );
+}
+
+/*-----------------------------------------------------------------------------
+*	close the list file
+*----------------------------------------------------------------------------*/
+void ListFile_close( ListFile *self, BOOL keep_file )
+{
+	if ( self->file != NULL ) 
+	{
+        fputc_err( '\f', self->file );     /* end listing with a FF */
+        fclose( self->file );
+
+		if ( ! keep_file) 
+		{
+            remove( self->filename );
+		}
+	}
+
+	self->file = NULL;
+}
+
+void list_close( BOOL keep_file )
+{
+	if ( the_list != NULL )
+	{
+		ListFile_close( the_list, keep_file );
+	}
+}
+
+/*-----------------------------------------------------------------------------
+*	start output of list line
+*----------------------------------------------------------------------------*/
+void ListFile_start_line( ListFile *self, size_t address, 
+						  char *source_file, int source_line_nr, char *line )
+{
+	if ( self->file != NULL ) 
+	{
+		/* Get file position for beginning of next line in list file */
+		self->start_line_pos = ftell( self->file );      
+
+		/* init all line-related variables */
+		self->address = address;
+		Str_clear( self->bytes );
+
+		self->source_file = strpool_add( source_file );
+		self->source_line_nr = source_line_nr;
+
+		/* normalize the line end (BUG_0031) */
+		Str_szset( self->line, line );
+		Str_chomp( self->line );
+		Str_szcat( self->line, "\n" );
+	}
+}
+
+void list_start_line( size_t address, 
+					  char *source_file, int source_line_nr, char *line )
+{
+	if ( the_list != NULL )
+	{
+		ListFile_start_line( the_list, address, 
+						     source_file, source_line_nr, line );
+	}
+}
+
+/*-----------------------------------------------------------------------------
+*	append one byte / word / long to list line
+*----------------------------------------------------------------------------*/
+void ListFile_append( ListFile *self, long value, int num_bytes )
+{
+	byte_t byte;
+
+	if ( self->file != NULL ) 
+	{
+		while ( num_bytes-- > 0 ) 
+		{
+			byte = value & 0xFF;
+			Str_bcat( self->bytes, &byte, sizeof(byte) );
+			value >>= 8;
+		}
+	}
+}
+
+void ListFile_append_byte( ListFile *self, byte_t byte )
+{
+	ListFile_append( self, byte, 1 );
+}
+
+void ListFile_append_word( ListFile *self, int word )
+{
+	ListFile_append( self, word, 2 );
+}
+
+void ListFile_append_long( ListFile *self, long dword )
+{
+	ListFile_append( self, dword, 4 );
+}
+
+void list_append( long value, int num_bytes )
+{
+	if ( the_list != NULL )
+	{
+		ListFile_append( the_list, value, num_bytes );
+	}
+}
+
+void list_append_byte( byte_t byte )
+{
+	list_append( byte, 1 );
+}
+
+void list_append_word( int word )
+{
+	list_append( word, 2 );
+}
+
+void list_append_long( long dword )
+{
+	list_append( dword, 4 );
+}
+
+/*-----------------------------------------------------------------------------
+*	compute list file position (ftell()) for patching byte at given offset,
+*	take page size and header into account
+*	from start of line, return -1 if no list file open
+*----------------------------------------------------------------------------*/
 long ListFile_patch_pos( ListFile *self, int byte_offset )
 {
 	int line_nr;
@@ -312,8 +387,72 @@ long ListFile_patch_pos( ListFile *self, int byte_offset )
 	}
 }
 
-/* patch list file hex bytes */
-void ListFile_patch( ListFile *self, long patch_pos, long value, int num_bytes )
+long list_patch_pos( int byte_offset )
+{
+	if ( the_list != NULL )
+	{
+		return ListFile_patch_pos( the_list, byte_offset );
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+/*-----------------------------------------------------------------------------
+*	output the current assembly line to the list file with Hex dump 
+*----------------------------------------------------------------------------*/
+void ListFile_end_line( ListFile *self )
+{
+    int len, i;
+    byte_t *byteptr;
+
+	if ( self->file != NULL )
+	{
+		/* get length of hex dump and pointer to data bytes (BUG_0015) */
+		len     = Str_len( self->bytes );
+		byteptr = Str_data( self->bytes );
+
+		/* output line number and address */
+		ListFile_fprintf( self, "%-5d %04X  ", self->source_line_nr, self->address );
+
+		/* output hex dump */
+		for ( i = 0 ; i < len ; i++ )
+		{
+			ListFile_fprintf( self, "%02X ", *byteptr++ );
+			if ( i < len - 1 && 
+				 ( (i+1) % HEX_DUMP_WIDTH) == 0 )
+			{
+				ListFile_fprintf( self, "\n      %04X  ", self->address + i + 1 );
+			}
+		}
+
+		/* output line - pad to start of asm line*/
+		if ( len <= 4 )
+		{
+			ListFile_fprintf( self, "%*s", (4 - len) * 3, "" );
+		}
+		else 
+		{
+			ListFile_fprintf( self, "\n%*s", 5 + 1 + 4 + 2 + (4 * 3), "" );
+		}
+
+		ListFile_fprintf( self, "%s", Str_data( self->line ) );
+	}
+}
+
+void list_end_line( void )
+{
+	if ( the_list != NULL )
+	{
+		ListFile_end_line( the_list );
+	}
+}
+
+/*-----------------------------------------------------------------------------
+*	patch list file
+*----------------------------------------------------------------------------*/
+void ListFile_patch_data( ListFile *self, long patch_pos, long value, int num_bytes )
 {
 	if ( self->file != NULL && patch_pos >= 0 ) 
 	{
@@ -327,75 +466,129 @@ void ListFile_patch( ListFile *self, long patch_pos, long value, int num_bytes )
 	}
 }
 
-/*-----------------------------------------------------------------------------
-*   Global state variables
-*----------------------------------------------------------------------------*/
-static ListFile *the_list = NULL;
+void list_patch_data( long patch_pos, long value, int num_bytes )
+{
+	if ( the_list != NULL )
+	{
+		ListFile_patch_data( the_list, patch_pos, value, num_bytes );
+	}
+}
 
 /*-----------------------------------------------------------------------------
-*   Module API
+*	start symbol table
 *----------------------------------------------------------------------------*/
-void open_list_file( char *source_file )
+void ListFile_start_table( ListFile *self, char *title )
 {
-    if ( option_list || symfile )
+	if ( self->file != NULL ) 
 	{
-		if (the_list == NULL)
+		ListFile_fprintf( self, "\n\n%s\n\n", title );
+	}
+}
+
+void list_start_table( char *title )
+{
+	if ( the_list != NULL )
+	{
+		ListFile_start_table( the_list, title );
+	}
+}
+
+/*-----------------------------------------------------------------------------
+*	output symbol name and symbol value
+*----------------------------------------------------------------------------*/
+void ListFile_start_symbol( ListFile *self, char *symbol_name, long symbol_value )
+{
+	char *symbol_output;
+
+	if ( self->file != NULL ) 
+	{
+		/* BUG_0027 */
+		if ( strlen( symbol_name ) < COLUMN_WIDTH )
 		{
-			the_list = OBJ_NEW(ListFile);
+			symbol_output = symbol_name;	/* one line with symbol name and value */
+		}
+		else 
+		{
+			symbol_output = "";				/* one line with symbol name, next line with blanks */
+			ListFile_fprintf( self, "%s\n", symbol_name );
 		}
 
-		ListFile_open( the_list, source_file );
+		ListFile_fprintf( self, "%-*s= %08lX", COLUMN_WIDTH, symbol_output, symbol_value );
+
+		self->count_page_ref = 0;
 	}
 }
 
-void close_list_file( BOOL keep_file )
+void list_start_symbol( char *symbol_name, long symbol_value )
 {
 	if ( the_list != NULL )
 	{
-		ListFile_close( the_list, keep_file );
+		ListFile_start_symbol( the_list, symbol_name, symbol_value );
 	}
 }
 
-int get_page_nr( void )
+/*-----------------------------------------------------------------------------
+*	output one page reference
+*----------------------------------------------------------------------------*/
+void ListFile_append_reference( ListFile *self, int page_nr, BOOL is_define )
 {
-	return the_list == NULL ? 0 : the_list->page_nr;
-}
-
-void fprintf_list_file( char *msg, ... )
-{
-    va_list argptr;
-    va_start( argptr, msg ); /* init variable args */
-
-	if ( the_list != NULL )
+	if ( self->file != NULL ) 
 	{
-		ListFile_vfprintf( the_list, msg, argptr );
+		/* output separator on first reference */
+		if ( self->count_page_ref == 0 )
+		{
+			ListFile_fprintf( self, " :" );
+		}
+
+		/* output newline after x references */
+		else if ( ( self->count_page_ref % REF_PER_LINE ) == 0 )
+		{
+			ListFile_fprintf( self, "\n%*s", COLUMN_WIDTH + 2 + 8 + 2, "" );
+		}
+
+		/* output page reference */
+		ListFile_fprintf( self, "%4d%c", page_nr, is_define ? '*' : ' ' );
+
+		self->count_page_ref++;
 	}
 }
 
-void write_asmln_list_file( char *asm_line )
-{
-	if ( the_list != NULL )
-	{
-		ListFile_write_asmln( the_list, asm_line );
-	}
-}
-
-long list_file_patch_pos( int byte_offset )
-{
-	if ( the_list != NULL )
-	{
-		return ListFile_patch_pos( the_list, byte_offset );
-	}
-	else
-	{
-		return -1;
-	}
-}
-
-void list_file_patch( long patch_pos, long value, int num_bytes )
+void list_append_reference( int page_nr, BOOL is_define )
 {
 	if ( the_list != NULL )
 	{
-		ListFile_patch( the_list, patch_pos, value, num_bytes );
+		ListFile_append_reference( the_list, page_nr, is_define );
 	}
+}
+
+/*-----------------------------------------------------------------------------
+*	end symbol output
+*----------------------------------------------------------------------------*/
+void ListFile_end_symbol( ListFile *self )
+{
+	if ( self->file != NULL ) 
+	{
+		ListFile_fprintf( self, "\n" );
+	}
+}
+
+void list_end_symbol( void )
+{
+	if ( the_list != NULL )
+	{
+		ListFile_end_symbol( the_list );
+	}
+}
+
+/*-----------------------------------------------------------------------------
+*	get current page number
+*----------------------------------------------------------------------------*/
+int ListFile_get_page_nr( ListFile *self )
+{
+	return self->file != NULL ? self->page_nr : -1;
+}
+
+int list_get_page_nr( void )
+{
+	return the_list != NULL ? ListFile_get_page_nr( the_list ) : -1;
 }
