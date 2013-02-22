@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.2 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.3 2013-02-22 17:21:29 pauloscustodio Exp $
 # $Log: whitebox-dynstr.t,v $
-# Revision 1.2  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.3  2013-02-22 17:21:29  pauloscustodio
+# Added chomp()
+#
+# Revision 1.2  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.1  2012/06/14 15:03:45  pauloscustodio
@@ -28,7 +31,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "dynstr.o class.o die.o safestr.o except.o";
+my $objs = "dynstr.o class.o die.o safestr.o strutil.o except.o";
 ok ! system "make $objs";
 
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
@@ -206,6 +209,15 @@ END_INIT
 	
 	Str_szset(s1, "aa"); Str_szset(s2, "a");
 	if (Str_compare(s1,s2) <= 0) 	ERROR;
+	
+	// chomp
+	Str_szset(s1, "\r\n \t\fx\r\n \t\f");
+	Str_chomp(s1);
+	check_str(s1, 256, 6, "\r\n \t\fx");
+	
+	Str_szset(s1, "\r\n \t\f \r\n \t\f");
+	Str_chomp(s1);
+	check_str(s1, 256, 0, "");
 	
 	warn("delete s1\n");
 	OBJ_DELETE(s1);

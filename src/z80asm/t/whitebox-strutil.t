@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.8 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.9 2013-02-22 17:21:29 pauloscustodio Exp $
 # $Log: whitebox-strutil.t,v $
-# Revision 1.8  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.9  2013-02-22 17:21:29  pauloscustodio
+# Added chomp()
+#
+# Revision 1.8  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.7  2012/06/14 15:01:27  pauloscustodio
@@ -55,7 +58,7 @@ ok ! system "make $objs";
 t_compile_module('', <<'END', $objs);
 #define ERROR return __LINE__
 
-	char s[5];
+	char s[255];
 	char * p;
 
 	// strtoupper, strtolower
@@ -79,6 +82,17 @@ t_compile_module('', <<'END', $objs);
 	if (stricompare("ab","a") != 1)		ERROR;
 	if (stricompare("a","ab") != -1)	ERROR;
 	if (stricompare("ab","ab") != 0)	ERROR;
+	
+	// chomp
+	strcpy(s, "\r\n \t\fx\r\n \t\f");
+	p = chomp(s);
+	if (p != s)							ERROR;
+	if(strcmp(s, "\r\n \t\fx"))			ERROR;
+	
+	strcpy(s, "\r\n \t\f \r\n \t\f");
+	p = chomp(s);
+	if (p != s)							ERROR;
+	if(strcmp(s, ""))					ERROR;
 	
 	return 0;
 END

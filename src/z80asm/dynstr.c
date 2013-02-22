@@ -17,9 +17,12 @@ Using class.h for automatic garbage collection.
 Strings may contain zero byte, length is defined by separate field.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.4 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.5 2013-02-22 17:21:29 pauloscustodio Exp $ */
 /* $Log: dynstr.c,v $
-/* Revision 1.4  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.5  2013-02-22 17:21:29  pauloscustodio
+/* Added chomp()
+/*
+/* Revision 1.4  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.3  2013/01/19 00:04:53  pauloscustodio
@@ -37,6 +40,7 @@ Strings may contain zero byte, length is defined by separate field.
 #include <string.h>
 #include <ctype.h>
 #include "dynstr.h"
+#include "strutil.h"
 
 /*-----------------------------------------------------------------------------
 *   Constants
@@ -68,7 +72,7 @@ void Str_fini( Str *self )
 
 /*-----------------------------------------------------------------------------
 *   expand if needed to store at least more num_chars plus a zero byte
-*   increment size if blocks of SIZE_MASK (256)
+*   increment size in blocks of SIZE_MASK (256)
 *----------------------------------------------------------------------------*/
 void Str_reserve( Str *self, size_t num_chars )
 {
@@ -180,4 +184,13 @@ void Str_fcat( Str *self, char *format, ... )
     va_start( argptr, format ); /* init variable args */
 
     Str_vfcat( self, format, argptr );
+}
+
+/*-----------------------------------------------------------------------------
+*   remove end newlines and whitespace
+*----------------------------------------------------------------------------*/
+void Str_chomp( Str *self )
+{
+	chomp( Str_data(self) );
+	Str_sync_len(self);
 }

@@ -17,9 +17,12 @@ Using class.h for automatic garbage collection.
 Strings may contain zero byte, length is defined by separate field.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.h,v 1.3 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.h,v 1.4 2013-02-22 17:21:29 pauloscustodio Exp $ */
 /* $Log: dynstr.h,v $
-/* Revision 1.3  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.4  2013-02-22 17:21:29  pauloscustodio
+/* Added chomp()
+/*
+/* Revision 1.3  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.2  2012/11/03 17:39:36  pauloscustodio
@@ -49,9 +52,9 @@ Strings may contain zero byte, length is defined by separate field.
 *   OBJ_DELETE(Str);
 *----------------------------------------------------------------------------*/
 CLASS( Str )
-char    *data;      /* data bytes */
-size_t  size;       /* allocated size */
-size_t  len;        /* sring length (excluding zero terminator) */
+	char    *data;      /* data bytes */
+	size_t  size;       /* allocated size */
+	size_t  len;        /* sring length (excluding zero terminator) */
 END_CLASS;
 
 /* address of string chars */
@@ -94,6 +97,9 @@ extern void Str_vfcat( Str *self, char *format, va_list argptr );
 #define Str_compare(s1,s2)  ((s1)->len < (s2)->len ? -1 : \
                              (s1)->len > (s2)->len ?  1 : \
                              memcmp((s1)->data, (s2)->data, (s1)->len))
+
+/* remove end newlines and whitespace */
+extern void Str_chomp( Str *self );
 
 #endif /* ndef DYNSTR_H */
 
