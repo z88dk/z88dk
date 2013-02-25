@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.25 2013-02-22 17:26:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.26 2013-02-25 21:37:30 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.25  2013-02-22 17:26:34  pauloscustodio
+# Revision 1.26  2013-02-25 21:37:30  pauloscustodio
+# Show output difference of t_run_module() in visual-diff, to allow easy merge of changes
+#
+# Revision 1.25  2013/02/22 17:26:34  pauloscustodio
 # Decouple assembler from listfile handling
 #
 # Revision 1.24  2013/02/19 22:52:40  pauloscustodio
@@ -563,6 +566,14 @@ sub t_run_module {
 	eq_or_diff_text $out, $expected_out;
 	eq_or_diff_text $err, $expected_err;
 	is !!$exit, !!$expected_exit;
+	
+	# if DEBUG, call wdiff to compare out and err with expected out and err
+	if ($ENV{DEBUG} && $out.$err ne $expected_out.$expected_err) {
+		my $temp_input = $0.".tmp";
+		my @input = read_file($0);
+		write_file($temp_input, @input[0 .. (caller)[2] - 1], $out, $err );
+		system "wdiff \"$0\" \"$temp_input\"";
+	}
 	
 	exit 1 if $STOP_ON_ERR && 
 			  ($out ne $expected_out ||
