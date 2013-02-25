@@ -18,9 +18,12 @@ Keys are kept in strpool, no need to release memory.
 Uses StrHash to keep the keys, takes care of memory allocation of values.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classhash.h,v 1.1 2013-02-02 00:08:26 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classhash.h,v 1.2 2013-02-25 21:36:17 pauloscustodio Exp $ */
 /* $Log: classhash.h,v $
-/* Revision 1.1  2013-02-02 00:08:26  pauloscustodio
+/* Revision 1.2  2013-02-25 21:36:17  pauloscustodio
+/* Uniform the APIs of classhash, classlist, strhash, strlist
+/*
+/* Revision 1.1  2013/02/02 00:08:26  pauloscustodio
 /* New CLASS_HASH() to create hash tables of objects defined by CLASS()
 /*
 /*
@@ -44,26 +47,6 @@ CLASS_HASH(T);			// T is declared by CLASS(T); defines THash
 // define the hash class
 DEF_CLASS_HASH(T);
 
-// methods
-THash *hash = OBJ_NEW(THash);
-T *obj1 = OBJ_NEW(T);
-void THash_set(hash, "KEY", obj1);			// append to end
-
-T *obj2 = THash_get(hash, "KEY"); 			// NULL if not exists
-
-if ( THash_exists(hash, "KEY") ) ...
-
-THash_remove(hash, "KEY");
-StrHash_remove_all(hash);
-
-THashElem *iter; 
-THash_first(hash, &iter);
-while (THash_next(hash, &iter)) {
-	// use iter->key, iter->value
-}
-
-OBJ_DELETE(THash);
-
 *----------------------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------------------
@@ -78,20 +61,42 @@ OBJ_DELETE(THash);
 	/* iterator class */													\
 	typedef StrHashElem T##HashElem;										\
 																			\
-	/* methods */															\
-	extern void T##Hash_set(    	T##Hash *self, char *key, T *obj );		\
-	extern T   *T##Hash_get(    	T##Hash *self, char *key );				\
-	extern BOOL T##Hash_exists( 	T##Hash *self, char *key );				\
-	extern void T##Hash_remove( 	T##Hash *self, char *key );				\
+	/* compare function used by sort */										\
+	typedef int (*T##Hash_compare_func)(T##HashElem *a, T##HashElem *b);	\
+																			\
+	/* add new key/value to the list, create new entry if new key, */		\
+	/* overwrite if key exists */											\
+	extern void T##Hash_set( T##Hash *self, char *key, T *obj );			\
+																			\
+	/* retrive value for a given key, return NULL if not found */			\
+	extern T *T##Hash_get( T##Hash *self, char *key );						\
+																			\
+	/* Check if a key exists in the hash */									\
+	extern BOOL T##Hash_exists( T##Hash *self, char *key );					\
+																			\
+	/* Remove element from hash if found */									\
+	extern void T##Hash_remove( T##Hash *self, char *key );					\
+																			\
+	/* Remove all entries */												\
 	extern void T##Hash_remove_all( T##Hash *self );						\
 																			\
+	/* Find a hash entry */													\
 	extern T##HashElem *T##Hash_find( T##Hash *self, char *key );			\
-	extern T##HashElem *T##Hash_head( T##Hash *self );						\
-	extern void 		T##Hash_remove_elem( 								\
-									  T##Hash *self, T##HashElem *elem );	\
 																			\
-	extern void T##Hash_first( T##Hash *self, T##HashElem **iter );			\
-	extern T   *T##Hash_next(  T##Hash *self, T##HashElem **iter );			\
+	/* Delete a hash entry if not NULL */									\
+	extern void T##Hash_remove_elem( T##Hash *self, T##HashElem *elem );	\
+																			\
+	/* get the iterator of the first element in the list, NULL if empty */	\
+	extern T##HashElem *T##Hash_first( T##Hash *self );						\
+																			\
+	/* get the iterator of the next element in the list, NULL at end */		\
+	extern T##HashElem *T##Hash_next( T##HashElem *iter );					\
+																			\
+	/* check if hash is empty */											\
+	extern BOOL T##Hash_empty( T##Hash *self );								\
+																			\
+	/* sort the items in the hash */										\
+	extern void T##Hash_sort( T##Hash *self, T##Hash_compare_func compare );\
 
 /*-----------------------------------------------------------------------------
 *   Class definition
@@ -112,8 +117,8 @@ OBJ_DELETE(THash);
 		/* create new hash and copy element by element from other */		\
 		self->hash = OBJ_NEW(StrHash);										\
 																			\
-		StrHash_first(other->hash, &iter);									\
-		while (StrHash_next(other->hash, &iter)) 							\
+		for ( iter = StrHash_first(other->hash) ; iter != NULL ;			\
+		      iter = StrHash_next(iter) )		 							\
 		{																	\
 			T##Hash_set( self,		 										\
 						 iter->key, T##_clone( (T *) iter->value ) );		\
@@ -168,7 +173,7 @@ OBJ_DELETE(THash);
 	{																		\
 		T##HashElem *elem;													\
 																			\
-		while ( elem = T##Hash_head( self ) )								\
+		while ( elem = T##Hash_first( self ) )								\
 		{																	\
 			T##Hash_remove_elem( self, elem );								\
 		}																	\
@@ -178,12 +183,6 @@ OBJ_DELETE(THash);
 	T##HashElem *T##Hash_find( T##Hash *self, char *key )					\
 	{																		\
 		return StrHash_find( self->hash, key );								\
-	}																		\
-																			\
-	/* get first hash entry, maybe NULL */									\
-	T##HashElem *T##Hash_head( T##Hash *self )								\
-	{																		\
-		return StrHash_head( self->hash );									\
 	}																		\
 																			\
 	/* delete a hash entry if not NULL */									\
@@ -199,15 +198,29 @@ OBJ_DELETE(THash);
 		}																	\
 	}																		\
 																			\
-																			\
-	void T##Hash_first( T##Hash *self, T##HashElem **iter )					\
+	/* get first hash entry, maybe NULL */									\
+	T##HashElem *T##Hash_first( T##Hash *self )								\
 	{																		\
-		StrHash_first( self->hash, iter );									\
+		return StrHash_first( self->hash );									\
 	}																		\
 																			\
-	T *T##Hash_next(  T##Hash *self, T##HashElem **iter )					\
+	/* get the iterator of the next element in the list, NULL at end */		\
+	T##HashElem *T##Hash_next( T##HashElem *iter )							\
 	{																		\
-		return (T *) StrHash_next( self->hash, iter );						\
+		return StrHash_next( iter );										\
 	}																		\
+																			\
+	/* check if hash is empty */											\
+	BOOL T##Hash_empty( T##Hash *self )										\
+	{																		\
+		return T##Hash_first(self) == NULL ? TRUE : FALSE;					\
+	}																		\
+																			\
+	/* sort the items in the hash */										\
+	void T##Hash_sort( T##Hash *self, T##Hash_compare_func compare )		\
+	{																		\
+		StrHash_sort( self->hash, compare );								\
+	}																		\
+
 
 #endif /* ndef CLASSHASH_H */

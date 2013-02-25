@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.13 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.14 2013-02-25 21:36:17 pauloscustodio Exp $ */
 /* $Log: file.c,v $
-/* Revision 1.13  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.14  2013-02-25 21:36:17  pauloscustodio
+/* Uniform the APIs of classhash, classlist, strhash, strlist
+/*
+/* Revision 1.13  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.12  2012/11/03 17:39:36  pauloscustodio
@@ -253,10 +256,10 @@ char *search_file( char *filename, StrList *dir_list )
     }
 
     /* search in dir_list */
-    StrList_first( dir_list, &iter );
-
-    while ( dir = StrList_next( dir_list, &iter ) )
-    {
+	for ( iter = StrList_first( dir_list ); iter != NULL ; 
+		  iter = StrList_next( iter ) )
+	{
+		dir = iter->string;
         sstr_fset( pathname, "%s/%s", dir, filename );
 
         if ( stat( sstr_data( pathname ), &sb ) == 0 )

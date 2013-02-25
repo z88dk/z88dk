@@ -18,9 +18,12 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.h,v 1.6 2013-02-02 00:07:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.h,v 1.7 2013-02-25 21:36:17 pauloscustodio Exp $ */
 /* $Log: strhash.h,v $
-/* Revision 1.6  2013-02-02 00:07:35  pauloscustodio
+/* Revision 1.7  2013-02-25 21:36:17  pauloscustodio
+/* Uniform the APIs of classhash, classlist, strhash, strlist
+/*
+/* Revision 1.6  2013/02/02 00:07:35  pauloscustodio
 /* StrHash_next() returns value instead of BOOL
 /*
 /* Revision 1.5  2013/01/22 22:24:49  pauloscustodio
@@ -60,23 +63,7 @@ Memory pointed by value of each hash entry must be managed by caller.
 #include "uthash.h"
 
 /*-----------------------------------------------------------------------------
-*   PUBLIC INTERFACE
-*
-*   StrHash *self = OBJ_NEW(StrHash);
-*   StrHash_set(self, "KEY", (void*)value);	// adds to tail of list
-*	value = StrHash_get(self, "KEY"); 		// NULL if not exists
-*	if ( StrHash_exists(self, "KEY") ) ...
-*   StrHash_remove(self, "KEY");
-*
-*   StrHashElem *iter; 
-*   StrHash_first(self, &iter);
-*   while (StrHash_next(self, &iter)) {
-*		// use iter->key, iter->value
-*	}
-*	
-*	head = StrHash_head(self);				// element at head of list or NULL
-*
-*   OBJ_DELETE(StrHash);
+*   Class
 *----------------------------------------------------------------------------*/
 typedef struct StrHashElem
 {
@@ -88,23 +75,44 @@ typedef struct StrHashElem
 } StrHashElem;
 
 CLASS( StrHash )
-StrHashElem		*hash_table;		/* hash table of all keys */
+	StrHashElem		*hash;			/* hash table of all keys */
 END_CLASS;
 
-/* manipulate key, value */
-extern void			StrHash_set( StrHash *self, char *key, void *value );
-extern void		   *StrHash_get( StrHash *self, char *key );
-extern BOOL			StrHash_exists( StrHash *self, char *key );
-extern void			StrHash_remove( StrHash *self, char *key );
-extern void			StrHash_remove_all( StrHash *self );
+/* compare function used by sort */
+typedef int (*StrHash_compare_func)(StrHashElem *a, StrHashElem *b);
 
-/* manipulate StrHashElem */
+/* add new key/value to the list, create new entry if new key, 
+   overwrite if key exists */
+extern void StrHash_set( StrHash *self, char *key, void *value );
+
+/* retrive value for a given key, return NULL if not found */
+extern void *StrHash_get( StrHash *self, char *key );
+
+/* Check if a key exists in the hash */
+extern BOOL StrHash_exists( StrHash *self, char *key );
+
+/* Remove element from hash if found */
+extern void StrHash_remove( StrHash *self, char *key );
+
+/* Remove all entries */
+extern void StrHash_remove_all( StrHash *self );
+
+/* Find a hash entry */
 extern StrHashElem *StrHash_find( StrHash *self, char *key );
-extern StrHashElem *StrHash_head( StrHash *self );
-extern void 		StrHash_remove_elem( StrHash *self, StrHashElem *elem );
 
-/* traverse the list */
-extern void	 StrHash_first( StrHash *self, StrHashElem **iter );
-extern void *StrHash_next(  StrHash *self, StrHashElem **iter );
+/* Delete a hash entry if not NULL */
+extern void StrHash_remove_elem( StrHash *self, StrHashElem *elem );
+
+/* get the iterator of the first element in the list, NULL if list empty */
+extern StrHashElem *StrHash_first( StrHash *self );
+
+/* get the iterator of the next element in the list, NULL at end of list */
+extern StrHashElem *StrHash_next( StrHashElem *iter );
+
+/* check if hash is empty */
+extern BOOL StrHash_empty( StrHash *self );
+
+/* sort the items in the hash */
+extern void StrHash_sort( StrHash *self, StrHash_compare_func compare );
 
 #endif /* ndef STRHASH_H */

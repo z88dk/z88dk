@@ -18,9 +18,12 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.7 2013-02-02 00:07:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.8 2013-02-25 21:36:17 pauloscustodio Exp $ */
 /* $Log: strhash.c,v $
-/* Revision 1.7  2013-02-02 00:07:35  pauloscustodio
+/* Revision 1.8  2013-02-25 21:36:17  pauloscustodio
+/* Uniform the APIs of classhash, classlist, strhash, strlist
+/*
+/* Revision 1.7  2013/02/02 00:07:35  pauloscustodio
 /* StrHash_next() returns value instead of BOOL
 /*
 /* Revision 1.6  2013/01/22 22:24:49  pauloscustodio
@@ -67,7 +70,7 @@ void StrHash_init( StrHash *self )
     /* force init strpool to make sure StrHash is destroyed before StrPool */
     strpool_init();
 
-	self->hash_table = NULL;
+	self->hash = NULL;
 }
 
 void StrHash_copy( StrHash *self, StrHash *other )
@@ -75,9 +78,9 @@ void StrHash_copy( StrHash *self, StrHash *other )
     StrHashElem *elem, *tmp;
 
     /* create new hash and copy element by element from other */
-	self->hash_table = NULL;
+	self->hash = NULL;
 
-    HASH_ITER( hh, other->hash_table, elem, tmp )
+    HASH_ITER( hh, other->hash, elem, tmp )
     {
 		StrHash_set( self, elem->key, elem->value );
     }
@@ -95,7 +98,7 @@ void StrHash_remove_all( StrHash *self )
 {
     StrHashElem *elem, *tmp;
 
-    HASH_ITER( hh, self->hash_table, elem, tmp )
+    HASH_ITER( hh, self->hash, elem, tmp )
     {
         StrHash_remove_elem( self, elem );
     }
@@ -109,16 +112,8 @@ StrHashElem *StrHash_find( StrHash *self, char *key )
     StrHashElem *elem;
     size_t  	num_chars = strlen( key );
 
-    HASH_FIND( hh, self->hash_table, key, num_chars, elem );
+    HASH_FIND( hh, self->hash, key, num_chars, elem );
 	return elem;
-}
-
-/*-----------------------------------------------------------------------------
-*	Get first hash entry, maybe NULL
-*----------------------------------------------------------------------------*/
-StrHashElem *StrHash_head( StrHash *self )
-{
-    return (StrHashElem *)self->hash_table;
 }
 
 /*-----------------------------------------------------------------------------
@@ -128,7 +123,7 @@ void StrHash_remove_elem( StrHash *self, StrHashElem *elem )
 {
 	if ( elem )
 	{
-		HASH_DEL( self->hash_table, elem );
+		HASH_DEL( self->hash, elem );
 		xfree( elem );
 	}
 }
@@ -151,7 +146,7 @@ void StrHash_set( StrHash *self, char *key, void *value )
 		
 		/* add to hash */
 		num_chars = strlen( key );
-		HASH_ADD_KEYPTR( hh, self->hash_table, key, num_chars, elem );
+		HASH_ADD_KEYPTR( hh, self->hash, key, num_chars, elem );
 	}
 	
 	/* update value */
@@ -198,23 +193,34 @@ void StrHash_remove( StrHash *self, char *key )
 }
 
 /*-----------------------------------------------------------------------------
+*	Get first hash entry, maybe NULL
+*----------------------------------------------------------------------------*/
+StrHashElem *StrHash_first( StrHash *self )
+{
+    return (StrHashElem *)self->hash;
+}
+
+/*-----------------------------------------------------------------------------
 *   itereate through list
 *----------------------------------------------------------------------------*/
-void StrHash_first( StrHash *self, StrHashElem **iter )
+StrHashElem *StrHash_next( StrHashElem *iter )
 {
-    *iter = NULL;
+	return iter == NULL ? NULL : (StrHashElem *)(iter)->hh.next;
 }
 
-void *StrHash_next( StrHash *self, StrHashElem **iter )
+/*-----------------------------------------------------------------------------
+*	check if hash is empty
+*----------------------------------------------------------------------------*/
+BOOL StrHash_empty( StrHash *self )
 {
-	if ( *iter == NULL )
-	{	
-		*iter = self->hash_table;						/* first element */
-	}
-	else 
-	{
-		*iter = (StrHashElem*)(*iter)->hh.next;
-	}
-
-	return *iter ? (*iter)->value : NULL;
+	return StrHash_first(self) == NULL ? TRUE : FALSE;
 }
+
+/*-----------------------------------------------------------------------------
+*	sort the items in the hash
+*----------------------------------------------------------------------------*/
+void StrHash_sort( StrHash *self, StrHash_compare_func compare )
+{
+	HASH_SORT( self->hash, compare );
+}
+

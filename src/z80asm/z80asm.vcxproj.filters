@@ -102,6 +102,12 @@
     <ClInclude Include="model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="classhash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="classlist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">

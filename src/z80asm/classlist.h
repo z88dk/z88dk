@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Lists of objects defined by class.h
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classlist.h,v 1.2 2013-01-30 20:38:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classlist.h,v 1.3 2013-02-25 21:36:17 pauloscustodio Exp $ */
 /* $Log: classlist.h,v $
-/* Revision 1.2  2013-01-30 20:38:59  pauloscustodio
+/* Revision 1.3  2013-02-25 21:36:17  pauloscustodio
+/* Uniform the APIs of classhash, classlist, strhash, strlist
+/*
+/* Revision 1.2  2013/01/30 20:38:59  pauloscustodio
 /* Double macro call not necessary
 /*
 /* Revision 1.1  2013/01/30 00:39:25  pauloscustodio
@@ -43,15 +46,6 @@ CLASS_LIST(T);			// T is declared by CLASS(T); defines TList
 // define the list class
 DEF_CLASS_LIST(T);
 
-// methods
-TList *list = OBJ_NEW(TList);
-T *obj1 = OBJ_NEW(T);
-void TList_append(list, obj1);			// append to end
-
-TListElem *iter;
-TList_first(list, &iter);
-while (obj = TList_next(list, &iter)) {...}
-
 *----------------------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------------------
@@ -67,13 +61,45 @@ while (obj = TList_next(list, &iter)) {...}
 																			\
 	/* list class */														\
 	CLASS( T##List )														\
+		int count;								/* number of objects */		\
 		TAILQ_HEAD( T##ListHead, T##ListElem ) head; 	/* head of queue */	\
 	END_CLASS;																\
 																			\
-	/* methods */															\
-	extern void T##List_append( T##List *self, T *obj );					\
-	extern void T##List_first(  T##List *self, T##ListElem **iter );		\
-	extern T   *T##List_next(   T##List *self, T##ListElem **iter );		
+	/* add object to end of list - list becomes owner of obj */				\
+	extern void T##List_push( T##List *self, T *obj );						\
+																			\
+	/* extract object from end of list - caller becomes owner of obj */		\
+	extern T *T##List_pop( T##List *self );									\
+																			\
+	/* add object to start of list - list becomes owner of obj */			\
+	extern void T##List_unshift( T##List *self, T *obj );					\
+																			\
+	/* extract object from start of list - caller becomes owner of obj */	\
+	extern T *T##List_shift( T##List *self );								\
+																			\
+	/* set iterator to start and end of list, object is iter->obj */		\
+	extern T##ListElem *T##List_first( T##List *self );						\
+	extern T##ListElem *T##List_last( T##List *self );						\
+																			\
+	/* advance iterator to next/previous element */							\
+	extern T##ListElem *T##List_next( T##ListElem *iter );					\
+	extern T##ListElem *T##List_prev( T##ListElem *iter );					\
+																			\
+	/* insert object before/after a given iterator, list becomes owner */	\
+	extern T##ListElem *T##List_insert_after( T##List *self, 				\
+								T##ListElem *iter, T *obj );				\
+	extern T##ListElem *T##List_insert_before( T##List *self, 				\
+								T##ListElem *iter, T *obj );				\
+																			\
+	/* remove and return object pointed by iterator, caller becomes owner */\
+	/* advance iterator to next element */									\
+	extern T *T##List_remove( T##List *self, T##ListElem **iter );			\
+																			\
+	/* remove all objects from the list */									\
+	extern void T##List_remove_all( T##List *self );						\
+																			\
+	/* check if list is empty */											\
+	extern BOOL T##List_empty( T##List *self );								\
 
 /*-----------------------------------------------------------------------------
 *   Class definition
@@ -93,14 +119,128 @@ while (obj = TList_next(list, &iter)) {...}
 																			\
 		/* create new list and copy element by element from other */		\
 		TAILQ_INIT( &self->head );											\
+		self->count = 0;													\
 																			\
 		TAILQ_FOREACH( elem, &other->head, entries )						\
 		{																	\
-			ObjList_append( self, T##_clone( elem->obj ) );					\
+			T##List_push( self, T##_clone( elem->obj ) );					\
 		}																	\
 	}																		\
 																			\
 	void T##List_fini ( T##List *self )										\
+	{																		\
+		T##List_remove_all( self );											\
+	}																		\
+																			\
+	/* create a new element */												\
+	T##ListElem *T##List_new_elem( T##List *self, T *obj )					\
+	{																		\
+		T##ListElem *elem = xcalloc_struct( T##ListElem );					\
+		elem->obj = obj;													\
+		OBJ_AUTODELETE(obj) = FALSE;		/* deleted by list */			\
+		self->count++;														\
+		return elem;														\
+	}																		\
+																			\
+	/* remove element and return object */									\
+	T *T##List_remove_elem( T##List *self, T##ListElem *elem )				\
+	{																		\
+		T *obj;																\
+																			\
+		if ( elem == NULL )													\
+			return NULL;													\
+																			\
+		obj = elem->obj;													\
+		OBJ_AUTODELETE(obj) = TRUE;		/* deleted by caller */				\
+		TAILQ_REMOVE( &self->head, elem, entries);							\
+		xfree( elem );														\
+		self->count--;														\
+		return obj;															\
+	}																		\
+																			\
+	/* add object to end of list - list becomes owner of the obj */			\
+	void T##List_push( T##List *self, T *obj )								\
+	{																		\
+		T##ListElem *elem = T##List_new_elem( self, obj );					\
+		TAILQ_INSERT_TAIL( &self->head, elem, entries );					\
+	}																		\
+																			\
+	/* extract object from end of list - caller becomes owner of the obj */	\
+	T *T##List_pop( T##List *self )											\
+	{																		\
+		T##ListElem *elem = T##List_last( self );							\
+		return T##List_remove_elem( self, elem );							\
+	}																		\
+																			\
+	/* add object to start of list - list becomes owner of the object */	\
+	void T##List_unshift(T##List *self, T *obj )							\
+	{																		\
+		T##ListElem *elem = T##List_new_elem( self, obj );					\
+		TAILQ_INSERT_HEAD( &self->head, elem, entries );					\
+	}																		\
+																			\
+	/* extract object from start of list - caller becomes owner of obj */	\
+	T *T##List_shift( T##List *self )										\
+	{																		\
+		T##ListElem *elem = T##List_first( self );							\
+		return T##List_remove_elem( self, elem );							\
+	}																		\
+																			\
+	/* set iterator to start of list, object is iter->obj */				\
+	T##ListElem *T##List_first( T##List *self )								\
+	{																		\
+		return TAILQ_FIRST( &self->head );									\
+	}																		\
+																			\
+	/* set iterator to end of list, object is iter->obj */					\
+	T##ListElem *T##List_last( T##List *self )								\
+	{																		\
+		return TAILQ_LAST( &self->head, T##ListHead );						\
+	}																		\
+																			\
+	/* advance iterator to next element */									\
+	T##ListElem *T##List_next( T##ListElem *iter )							\
+	{																		\
+		return iter == NULL ? NULL :										\
+				TAILQ_NEXT( iter, entries );								\
+	}																		\
+																			\
+	/* advance iterator to previous element */								\
+	T##ListElem *T##List_prev( T##ListElem *iter )							\
+	{																		\
+		return iter == NULL ? NULL :										\
+				TAILQ_PREV( iter, T##ListHead, entries );					\
+	}																		\
+																			\
+	/* insert an object before/after a given iterator, list becomes owner */\
+	T##ListElem *T##List_insert_after( T##List *self, 						\
+								T##ListElem *iter, T *obj )					\
+	{																		\
+		T##ListElem *elem = T##List_new_elem( self, obj );					\
+		TAILQ_INSERT_AFTER( &self->head, iter, elem, entries );				\
+		return elem;														\
+	}																		\
+																			\
+	/* insert an object before/after a given iterator, list becomes owner */\
+	T##ListElem *T##List_insert_before( T##List *self, 						\
+								T##ListElem *iter, T *obj )					\
+	{																		\
+		T##ListElem *elem = T##List_new_elem( self, obj );					\
+		TAILQ_INSERT_BEFORE( iter, elem, entries );							\
+		return elem;														\
+	}																		\
+																			\
+	/* remove and return object pointed by iterator, caller becomes owner */\
+	/* advance iterator to next element */									\
+	T *T##List_remove( T##List *self, T##ListElem **iter )					\
+	{																		\
+		T##ListElem *old_iter = *iter;										\
+		*iter = T##List_next(*iter);										\
+		return T##List_remove_elem( self, old_iter );						\
+	}																		\
+																			\
+	/* remove all objects from the list */									\
+	void T##List_remove_all( T##List *self )								\
 	{																		\
 		T##ListElem *elem;													\
 																			\
@@ -110,37 +250,15 @@ while (obj = TList_next(list, &iter)) {...}
 																			\
 			OBJ_DELETE( elem->obj );										\
 			xfree( elem );													\
+			self->count--;													\
 		}																	\
 	}																		\
 																			\
-	/* append to list */													\
-	void T##List_append( T##List *self, T *obj )							\
+	/* check if list is empty */											\
+	BOOL T##List_empty( T##List *self )										\
 	{																		\
-		T##ListElem *elem = xcalloc_struct( T##ListElem );					\
-		elem->obj = obj;													\
-		OBJ_AUTODELETE(obj) = FALSE;		/* deleted by list */			\
-		TAILQ_INSERT_TAIL( &self->head, elem, entries );					\
+		return T##List_first(self) == NULL ? TRUE : FALSE;					\
 	}																		\
-																			\
-	/* init iterator */														\
-	void T##List_first( T##List *self, T##ListElem **iter )					\
-	{																		\
-		*iter = NULL;														\
-	}																		\
-																			\
-	/* get next object */													\
-	T *T##List_next( T##List *self, T##ListElem **iter )					\
-	{																		\
-		if ( *iter == NULL )												\
-		{																	\
-			*iter = TAILQ_FIRST( &self->head );		/* first time */		\
-		}																	\
-		else																\
-		{																	\
-			*iter = TAILQ_NEXT( *iter, entries );	/* 2nd & following */	\
-		}																	\
-																			\
-		return *iter == NULL ? NULL : ( *iter )->obj;						\
-	}																		
+
 
 #endif /* ndef CLASSLIST_H */

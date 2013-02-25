@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.7 2013-01-30 20:40:07 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.8 2013-02-25 21:36:17 pauloscustodio Exp $
 # $Log: whitebox-strlist.t,v $
-# Revision 1.7  2013-01-30 20:40:07  pauloscustodio
+# Revision 1.8  2013-02-25 21:36:17  pauloscustodio
+# Uniform the APIs of classhash, classlist, strhash, strlist
+#
+# Revision 1.7  2013/01/30 20:40:07  pauloscustodio
 # Test cases
 #
 # Revision 1.6  2013/01/20 21:24:29  pauloscustodio
@@ -55,17 +58,19 @@ t_compile_module(<<'END_INIT', <<'END', $compile);
 #define ERROR return __LINE__
 
 #define T_START(list)							\
-	StrList_first(list, &iter);
+	iter = StrList_first(list);
 
 #define T_NEXT(list, text)						\
-	str = StrList_next(list, &iter);			\
+	if (! iter) 						ERROR;	\
+	str = iter->string;							\
 	if (! str) 							ERROR;	\
 	if (strcmp(str, text)) 				ERROR;	\
-	if (str != iter->string)			ERROR;
+	if (str != iter->string)			ERROR;	\
+	iter = StrList_next(iter);					
 
 #define T_END(list)								\
-	str = StrList_next(list, &iter);			\
-	if (str) 							ERROR;
+	iter = StrList_next(iter);					\
+	if (iter) 							ERROR;
 
 END_INIT
 	/* main */
@@ -78,13 +83,13 @@ END_INIT
 	T_START(l1);
 	T_END(l1);
 	
-	StrList_append(l1, "abc");
+	StrList_push(l1, "abc");
 
 	T_START(l1);
 	T_NEXT(l1, "abc");
 	T_END(l1);
 	
-	StrList_append(l1, "def");
+	StrList_push(l1, "def");
 
 	T_START(l1);
 	T_NEXT(l1, "abc");
@@ -103,7 +108,7 @@ END_INIT
 	T_NEXT(l2, "def");
 	T_END(l2);
 	
-	StrList_append(l1, "ghi");
+	StrList_push(l1, "ghi");
 
 	T_START(l1);
 	T_NEXT(l1, "abc");
@@ -116,7 +121,7 @@ END_INIT
 	T_NEXT(l2, "def");
 	T_END(l2);
 	
-	StrList_append(l2, "jkl");
+	StrList_push(l2, "jkl");
 
 	T_START(l1);
 	T_NEXT(l1, "abc");
@@ -129,6 +134,16 @@ END_INIT
 	T_NEXT(l2, "def");
 	T_NEXT(l2, "jkl");
 	T_END(l2);
+	
+	/* empty */
+	OBJ_DELETE(l1);
+	l1 = OBJ_NEW(StrList);
+	
+	if (! StrList_empty(l1)) ERROR;
+	
+	StrList_push(l1, "abc");
+	
+	if (StrList_empty(l1)) ERROR;
 	
 	OBJ_DELETE(l1);
 	OBJ_DELETE(l2);
@@ -161,6 +176,10 @@ memalloc strlist.c(2): free 12 bytes at ADDR_3 allocated at strlist.c(3)
 memalloc strlist.c(2): free 12 bytes at ADDR_8 allocated at strlist.c(3)
 memalloc strlist.c(2): free 12 bytes at ADDR_14 allocated at strlist.c(3)
 memalloc strlist.c(1): free 36 bytes at ADDR_1 allocated at strlist.c(1)
+memalloc strlist.c(1): alloc 36 bytes at ADDR_20
+memalloc strlist.c(3): alloc 12 bytes at ADDR_21
+memalloc strlist.c(2): free 12 bytes at ADDR_21 allocated at strlist.c(3)
+memalloc strlist.c(1): free 36 bytes at ADDR_20 allocated at strlist.c(1)
 memalloc strlist.c(2): free 12 bytes at ADDR_12 allocated at strlist.c(3)
 memalloc strlist.c(2): free 12 bytes at ADDR_13 allocated at strlist.c(3)
 memalloc strlist.c(2): free 12 bytes at ADDR_17 allocated at strlist.c(3)

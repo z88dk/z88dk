@@ -82,6 +82,8 @@
   <ItemGroup>
     <ClInclude Include="avltree.h" />
     <ClInclude Include="class.h" />
+    <ClInclude Include="classhash.h" />
+    <ClInclude Include="classlist.h" />
     <ClInclude Include="codearea.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="die.h" />

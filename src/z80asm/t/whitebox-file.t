@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.5 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.6 2013-02-25 21:36:17 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.5  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.6  2013-02-25 21:36:17  pauloscustodio
+# Uniform the APIs of classhash, classlist, strhash, strlist
+#
+# Revision 1.5  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.4  2013/01/19 23:54:04  pauloscustodio
@@ -57,9 +60,9 @@ INIT
 	/* main */
 	StrList *list = OBJ_NEW(StrList);
 	
-	StrList_append(list, "x1");
-	StrList_append(list, "x2");
-	StrList_append(list, "x3");
+	StrList_push(list, "x1");
+	StrList_push(list, "x2");
+	StrList_push(list, "x3");
 	
 	puts( search_file(argv[1], list) );
 	return 0;

@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 List of strings (e.g. include path); strings kept in strpool.h
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.c,v 1.2 2013-01-19 00:04:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.c,v 1.3 2013-02-25 21:36:17 pauloscustodio Exp $ */
 /* $Log: strlist.c,v $
-/* Revision 1.2  2013-01-19 00:04:53  pauloscustodio
+/* Revision 1.3  2013-02-25 21:36:17  pauloscustodio
+/* Uniform the APIs of classhash, classlist, strhash, strlist
+/*
+/* Revision 1.2  2013/01/19 00:04:53  pauloscustodio
 /* Implement StrHash_clone, required change in API of class.h and all classes that used it.
 /*
 /* Revision 1.1  2012/05/24 21:42:42  pauloscustodio
@@ -52,7 +55,7 @@ void StrList_copy( StrList *self, StrList *other )
 
     TAILQ_FOREACH( elem, &other->head, entries )
     {
-		StrList_append( self, elem->string );
+		StrList_push( self, elem->string );
     }
 }
 
@@ -70,7 +73,7 @@ void StrList_fini( StrList *self )
 /*-----------------------------------------------------------------------------
 *   append a string to the list
 *----------------------------------------------------------------------------*/
-void StrList_append( StrList *self, char *string )
+void StrList_push( StrList *self, char *string )
 {
     StrListElem *elem;
 
@@ -82,21 +85,21 @@ void StrList_append( StrList *self, char *string )
 /*-----------------------------------------------------------------------------
 *   itereate through list
 *----------------------------------------------------------------------------*/
-void StrList_first( StrList *self, StrListElem **iter )
+StrListElem *StrList_first( StrList *self )
 {
-    *iter = NULL;
+    return TAILQ_FIRST( &self->head );
 }
 
-char *StrList_next( StrList *self, StrListElem **iter )
+StrListElem *StrList_next( StrListElem *iter )
 {
-    if ( *iter == NULL )
-    {
-        *iter = TAILQ_FIRST( &self->head );    /* first time */
-    }
-    else
-    {
-        *iter = TAILQ_NEXT( *iter, entries );    /* 2nd and following */
-    }
+    return iter == NULL ? NULL :
+				TAILQ_NEXT( iter, entries );
+}
 
-    return *iter == NULL ? NULL : ( *iter )->string;
+/*-----------------------------------------------------------------------------
+*   check if list is empty
+*----------------------------------------------------------------------------*/
+BOOL StrList_empty( StrList *self )
+{
+	return StrList_first(self) == NULL ? TRUE : FALSE;
 }

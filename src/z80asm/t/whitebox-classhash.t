@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classhash.t,v 1.1 2013-02-02 00:08:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classhash.t,v 1.2 2013-02-25 21:36:17 pauloscustodio Exp $
 # $Log: whitebox-classhash.t,v $
-# Revision 1.1  2013-02-02 00:08:26  pauloscustodio
+# Revision 1.2  2013-02-25 21:36:17  pauloscustodio
+# Uniform the APIs of classhash, classlist, strhash, strlist
+#
+# Revision 1.1  2013/02/02 00:08:26  pauloscustodio
 # New CLASS_HASH() to create hash tables of objects defined by CLASS()
 #
 #
@@ -66,10 +69,11 @@ void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 
 
 #define T_START(hash)							\
-	ObjHash_first(hash, &iter);
+	iter = ObjHash_first(hash);
 
 #define T_NEXT(hash, akey, atext)				\
-	obj = ObjHash_next(hash, &iter);			\
+	if (! iter)							ERROR;	\
+	obj = iter->value;							\
 	if (! obj) 							ERROR;	\
 	if (strcmp(iter->key, akey)) 		ERROR;	\
 	if (strcmp(obj->string, atext))		ERROR;	\
@@ -80,11 +84,22 @@ void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 	obj = ObjHash_get(hash, "nokey");			\
 	if (obj) 							ERROR;	\
 	if (! ObjHash_exists(hash, akey))	ERROR;	\
-	if (ObjHash_exists(hash, "nokey"))	ERROR;
+	if (ObjHash_exists(hash, "nokey"))	ERROR;	\
+	iter = ObjHash_next(iter);
 
 #define T_END(hash)								\
-	obj = ObjHash_next(hash, &iter);			\
-	if (obj) 							ERROR;
+	if (iter != NULL)					ERROR;
+
+
+int ascending (ObjHashElem *a, ObjHashElem *b)
+{
+	return strcmp(((Obj *)(a->value))->string, ((Obj *)(b->value))->string);
+}
+
+int descending (ObjHashElem *a, ObjHashElem *b)
+{
+	return strcmp(((Obj *)(b->value))->string, ((Obj *)(a->value))->string);
+}
 
 END_INIT
 	/* main */
@@ -214,7 +229,7 @@ END_INIT
 	T_START(hash2);
 	T_END(hash2);
 
-	/* head / remove_elem */
+	/* first / remove_elem */
 	ObjHash_set(hash, "abc", new_obj("123"));
 	ObjHash_set(hash, "def", new_obj("456"));
 	ObjHash_set(hash, "ghi", new_obj("789"));
@@ -225,7 +240,7 @@ END_INIT
 	T_NEXT(hash, "ghi", "789");
 	T_END(hash);
 
-	elem = ObjHash_head(hash); 
+	elem = ObjHash_first(hash); 
 	if (elem == NULL) ERROR;
 	if (strcmp(elem->key, "abc")) ERROR;
 	ObjHash_remove_elem(hash, elem);
@@ -235,7 +250,7 @@ END_INIT
 	T_NEXT(hash, "ghi", "789");
 	T_END(hash);
 
-	elem = ObjHash_head(hash); 
+	elem = ObjHash_first(hash); 
 	if (elem == NULL) ERROR;
 	if (strcmp(elem->key, "def")) ERROR;
 	ObjHash_remove_elem(hash, elem);
@@ -244,7 +259,7 @@ END_INIT
 	T_NEXT(hash, "ghi", "789");
 	T_END(hash);
 
-	elem = ObjHash_head(hash); 
+	elem = ObjHash_first(hash); 
 	if (elem == NULL) ERROR;
 	if (strcmp(elem->key, "ghi")) ERROR;
 	ObjHash_remove_elem(hash, elem);
@@ -252,7 +267,7 @@ END_INIT
 	T_START(hash);
 	T_END(hash);
 
-	elem = ObjHash_head(hash); 
+	elem = ObjHash_first(hash); 
 	if (elem != NULL) ERROR;
 
 	T_START(hash);
@@ -302,7 +317,45 @@ END_INIT
 	T_START(hash);
 	T_END(hash);
 
-	warn("end\n");
+	/* empty */
+	OBJ_DELETE(hash);
+	hash = OBJ_NEW(ObjHash);
+
+	if (! ObjHash_empty(hash)) ERROR;
+	
+	ObjHash_set(hash, "abc", new_obj("123"));
+	
+	if (ObjHash_empty(hash)) ERROR;
+
+	/* sort */
+	OBJ_DELETE(hash);
+	hash = OBJ_NEW(ObjHash);
+	
+	ObjHash_set(hash, "def", new_obj("456"));
+	ObjHash_set(hash, "abc", new_obj("321"));
+	ObjHash_set(hash, "ghi", new_obj("789"));
+
+	T_START(hash);
+	T_NEXT(hash, "def", "456");
+	T_NEXT(hash, "abc", "321");
+	T_NEXT(hash, "ghi", "789");
+	T_END(hash);
+
+	ObjHash_sort(hash, ascending);
+	
+	T_START(hash);
+	T_NEXT(hash, "abc", "321");
+	T_NEXT(hash, "def", "456");
+	T_NEXT(hash, "ghi", "789");
+	T_END(hash);
+
+	ObjHash_sort(hash, descending);
+	
+	T_START(hash);
+	T_NEXT(hash, "ghi", "789");
+	T_NEXT(hash, "def", "456");
+	T_NEXT(hash, "abc", "321");
+	T_END(hash);
 	
 	return 0;
 END
@@ -414,10 +467,49 @@ memalloc test.c(4): free 32 bytes at ADDR_49 allocated at test.c(4)
 memalloc strhash.c(2): free 384 bytes at ADDR_53 allocated at strhash.c(5)
 memalloc strhash.c(2): free 44 bytes at ADDR_52 allocated at strhash.c(5)
 memalloc strhash.c(3): free 40 bytes at ADDR_51 allocated at strhash.c(4)
-end
+memalloc test.c(5): free 32 bytes at ADDR_1 allocated at test.c(5)
+memalloc test.c(5): alloc 32 bytes at ADDR_60
+memalloc strhash.c(1): alloc 32 bytes at ADDR_61
+memalloc test.c(4): alloc 32 bytes at ADDR_62
+memalloc test.c(1): alloc 12 bytes at ADDR_63
+memalloc strhash.c(4): alloc 40 bytes at ADDR_64
+memalloc strhash.c(5): alloc 44 bytes at ADDR_65
+memalloc strhash.c(5): alloc 384 bytes at ADDR_66
+memalloc test.c(3): free 12 bytes at ADDR_63 allocated at test.c(1)
+memalloc test.c(4): free 32 bytes at ADDR_62 allocated at test.c(4)
+memalloc strhash.c(2): free 384 bytes at ADDR_66 allocated at strhash.c(5)
+memalloc strhash.c(2): free 44 bytes at ADDR_65 allocated at strhash.c(5)
+memalloc strhash.c(3): free 40 bytes at ADDR_64 allocated at strhash.c(4)
+memalloc test.c(5): free 32 bytes at ADDR_60 allocated at test.c(5)
+memalloc test.c(5): alloc 32 bytes at ADDR_67
+memalloc strhash.c(1): alloc 32 bytes at ADDR_68
+memalloc test.c(4): alloc 32 bytes at ADDR_69
+memalloc test.c(1): alloc 12 bytes at ADDR_70
+memalloc strhash.c(4): alloc 40 bytes at ADDR_71
+memalloc strhash.c(5): alloc 44 bytes at ADDR_72
+memalloc strhash.c(5): alloc 384 bytes at ADDR_73
+memalloc test.c(4): alloc 32 bytes at ADDR_74
+memalloc test.c(1): alloc 12 bytes at ADDR_75
+memalloc strhash.c(4): alloc 40 bytes at ADDR_76
+memalloc test.c(4): alloc 32 bytes at ADDR_77
+memalloc test.c(1): alloc 12 bytes at ADDR_78
+memalloc strhash.c(4): alloc 40 bytes at ADDR_79
+memalloc test.c(3): free 12 bytes at ADDR_78 allocated at test.c(1)
+memalloc test.c(4): free 32 bytes at ADDR_77 allocated at test.c(4)
+memalloc strhash.c(3): free 40 bytes at ADDR_79 allocated at strhash.c(4)
+memalloc test.c(3): free 12 bytes at ADDR_70 allocated at test.c(1)
+memalloc test.c(4): free 32 bytes at ADDR_69 allocated at test.c(4)
+memalloc strhash.c(3): free 40 bytes at ADDR_71 allocated at strhash.c(4)
+memalloc test.c(3): free 12 bytes at ADDR_75 allocated at test.c(1)
+memalloc test.c(4): free 32 bytes at ADDR_74 allocated at test.c(4)
+memalloc strhash.c(2): free 384 bytes at ADDR_73 allocated at strhash.c(5)
+memalloc strhash.c(2): free 44 bytes at ADDR_72 allocated at strhash.c(5)
+memalloc strhash.c(3): free 40 bytes at ADDR_76 allocated at strhash.c(4)
+memalloc test.c(5): free 32 bytes at ADDR_67 allocated at test.c(5)
+memalloc strhash.c(1): free 32 bytes at ADDR_68 allocated at strhash.c(1)
+memalloc strhash.c(1): free 32 bytes at ADDR_61 allocated at strhash.c(1)
 memalloc test.c(5): free 32 bytes at ADDR_25 allocated at test.c(5)
 memalloc strhash.c(1): free 32 bytes at ADDR_26 allocated at strhash.c(1)
-memalloc test.c(5): free 32 bytes at ADDR_1 allocated at test.c(5)
 memalloc strhash.c(1): free 32 bytes at ADDR_2 allocated at strhash.c(1)
 memalloc strpool.c(6): free 4 bytes at ADDR_8 allocated at strpool.c(3)
 memalloc strpool.c(7): free 36 bytes at ADDR_7 allocated at strpool.c(2)

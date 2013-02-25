@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.17 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.18 2013-02-25 21:36:17 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.17  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.18  2013-02-25 21:36:17  pauloscustodio
+/* Uniform the APIs of classhash, classlist, strhash, strlist
+/*
+/* Revision 1.17  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -158,7 +161,7 @@ static void init_search_paths( void )
 
         if ( dir != NULL )
         {
-            StrList_append( include_path, dir );
+            StrList_push( include_path, dir );
         }
     }
 
@@ -426,12 +429,12 @@ void set_asm_flag( char *flagid )
 
     else if ( *flagid == 'I' )
     {
-        StrList_append( include_path, flagid + 1 );
+        StrList_push( include_path, flagid + 1 );
     }
 
     else if ( *flagid == 'L' )
     {
-        StrList_append( lib_path, flagid + 1 );
+        StrList_push( lib_path, flagid + 1 );
     }
 
     else if ( *flagid == 'D' )
