@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle assembly listing and symbol table listing.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.2 2013-02-22 17:26:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.3 2013-02-26 02:36:54 pauloscustodio Exp $ */
 /* $Log: listfile.c,v $
-/* Revision 1.2  2013-02-22 17:26:33  pauloscustodio
+/* Revision 1.3  2013-02-26 02:36:54  pauloscustodio
+/* Simplified symbol output to listfile by using SymbolRefList argument
+/*
+/* Revision 1.2  2013/02/22 17:26:33  pauloscustodio
 /* Decouple assembler from listfile handling
 /*
 /* Revision 1.1  2013/02/19 22:52:40  pauloscustodio
@@ -494,11 +497,15 @@ void list_start_table( char *title )
 }
 
 /*-----------------------------------------------------------------------------
-*	output symbol name and symbol value
+*	output symbol 
 *----------------------------------------------------------------------------*/
-void ListFile_start_symbol( ListFile *self, char *symbol_name, long symbol_value )
+void ListFile_symbol( ListFile *self, char *symbol_name, long symbol_value, 
+					  SymbolRefList *references )
 {
 	char *symbol_output;
+	int count_page_ref;
+    SymbolRefListElem *iter;
+	BOOL first;
 
 	if ( self->file != NULL ) 
 	{
@@ -515,68 +522,36 @@ void ListFile_start_symbol( ListFile *self, char *symbol_name, long symbol_value
 
 		ListFile_fprintf( self, "%-*s= %08lX", COLUMN_WIDTH, symbol_output, symbol_value );
 
-		self->count_page_ref = 0;
-	}
-}
+		/* BUG_0028 */
+		for ( iter = SymbolRefList_first( references ), first = TRUE, count_page_ref = 0 ; 
+			  iter != NULL ;
+			  iter = SymbolRefList_next( iter ), first = FALSE, count_page_ref++ )
+        {
+			/* output separator on first reference */
+			if ( count_page_ref == 0 )
+			{
+				ListFile_fprintf( self, " :" );
+			}
+			/* output newline after x references */
+			else if ( ( count_page_ref % REF_PER_LINE ) == 0 )
+			{
+				ListFile_fprintf( self, "\n%*s", COLUMN_WIDTH + 2 + 8 + 2, "" );
+			}
 
-void list_start_symbol( char *symbol_name, long symbol_value )
-{
-	if ( the_list != NULL )
-	{
-		ListFile_start_symbol( the_list, symbol_name, symbol_value );
-	}
-}
+			/* output page reference */
+			ListFile_fprintf( self, "%4d%c", iter->obj->page_nr, first ? '*' : ' ' );
+        }
 
-/*-----------------------------------------------------------------------------
-*	output one page reference
-*----------------------------------------------------------------------------*/
-void ListFile_append_reference( ListFile *self, int page_nr, BOOL is_define )
-{
-	if ( self->file != NULL ) 
-	{
-		/* output separator on first reference */
-		if ( self->count_page_ref == 0 )
-		{
-			ListFile_fprintf( self, " :" );
-		}
-
-		/* output newline after x references */
-		else if ( ( self->count_page_ref % REF_PER_LINE ) == 0 )
-		{
-			ListFile_fprintf( self, "\n%*s", COLUMN_WIDTH + 2 + 8 + 2, "" );
-		}
-
-		/* output page reference */
-		ListFile_fprintf( self, "%4d%c", page_nr, is_define ? '*' : ' ' );
-
-		self->count_page_ref++;
-	}
-}
-
-void list_append_reference( int page_nr, BOOL is_define )
-{
-	if ( the_list != NULL )
-	{
-		ListFile_append_reference( the_list, page_nr, is_define );
-	}
-}
-
-/*-----------------------------------------------------------------------------
-*	end symbol output
-*----------------------------------------------------------------------------*/
-void ListFile_end_symbol( ListFile *self )
-{
-	if ( self->file != NULL ) 
-	{
 		ListFile_fprintf( self, "\n" );
 	}
 }
 
-void list_end_symbol( void )
+void list_symbol( char *symbol_name, long symbol_value, 
+				  SymbolRefList *references )
 {
 	if ( the_list != NULL )
 	{
-		ListFile_end_symbol( the_list );
+		ListFile_symbol( the_list, symbol_name, symbol_value, references );
 	}
 }
 

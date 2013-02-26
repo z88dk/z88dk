@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.41 2013-02-26 02:11:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.42 2013-02-26 02:36:54 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.41  2013-02-26 02:11:32  pauloscustodio
+/* Revision 1.42  2013-02-26 02:36:54  pauloscustodio
+/* Simplified symbol output to listfile by using SymbolRefList argument
+/*
+/* Revision 1.41  2013/02/26 02:11:32  pauloscustodio
 /* New model_symref.c with all symbol cross-reference list handling
 /*
 /* Revision 1.40  2013/02/22 17:26:34  pauloscustodio
@@ -993,9 +996,6 @@ FindFile( struct sourcefile *srcfile, char *flnm )
 void
 WriteSymbol( symbol *n )
 {
-    SymbolRefListElem *iter;
-	BOOL defined;
-
     if ( n->owner == CURRENTMODULE )
     {
         /* Write only symbols related to current module */
@@ -1003,17 +1003,7 @@ WriteSymbol( symbol *n )
         {
             if ( ( n->type & SYMTOUCHED ) )
             {
-				list_start_symbol( n->symname, n->symvalue );
-
-				/* BUG_0028 */
-				for ( iter = SymbolRefList_first( n->references ), defined = TRUE ; 
-					  iter != NULL ;
-					  iter = SymbolRefList_next( iter ), defined = FALSE )
-                {
-					list_append_reference( iter->obj->page_nr, defined );
-                }
-
-                list_end_symbol();
+				list_symbol( n->symname, n->symvalue, n->references );
             }
         }
     }

@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle assembly listing and symbol table listing.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.2 2013-02-22 17:26:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.3 2013-02-26 02:36:54 pauloscustodio Exp $ */
 /* $Log: listfile.h,v $
-/* Revision 1.2  2013-02-22 17:26:33  pauloscustodio
+/* Revision 1.3  2013-02-26 02:36:54  pauloscustodio
+/* Simplified symbol output to listfile by using SymbolRefList argument
+/*
+/* Revision 1.2  2013/02/22 17:26:33  pauloscustodio
 /* Decouple assembler from listfile handling
 /*
 /* Revision 1.1  2013/02/19 22:52:40  pauloscustodio
@@ -32,11 +35,11 @@ Handle assembly listing and symbol table listing.
 #define LISTFILE_H
 
 #include "memalloc.h"   /* before any other include */
-#include "class.h"
-#include "types.h"
-#include "dynstr.h"
 
-#include <stdarg.h>
+#include "class.h"
+#include "dynstr.h"
+#include "model.h"
+#include "types.h"
 
 /* Page metrics for list file (CH_0017) */
 #define PAGE_LEN		64
@@ -64,8 +67,6 @@ CLASS( ListFile )
 	int		source_line_nr;			/* line number of source */
 	Str		*line;					/* input line being output */
 
-	/* current symbol being output */
-	int		count_page_ref;			/* number of page_refs output */
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
@@ -96,16 +97,13 @@ extern void ListFile_end_line( ListFile *self );
 /* patch the bytes at the given patch_pos returned by ListFile_patch_pos() */
 extern void ListFile_patch_data( ListFile *self, long patch_pos, long value, int num_bytes );
 
-/* write the symbol table in four steps:
+/* write the symbol table in two steps:
    1. start a new table, provide title
-   2. output symbol name
-   3. output reference, output reference, ...
-   4. end symbol
+   2. output symbol name, reference, output reference, ...
 */
 extern void ListFile_start_table( ListFile *self, char *title );
-extern void ListFile_start_symbol( ListFile *self, char *symbol_name, long symbol_value );
-extern void ListFile_append_reference( ListFile *self, int page_nr, BOOL is_define );
-extern void ListFile_end_symbol( ListFile *self );
+extern void ListFile_symbol( ListFile *self, char *symbol_name, long symbol_value, 
+						     SymbolRefList *references );
 
 /* return current page number */
 extern int ListFile_get_page_nr( ListFile *self );
@@ -126,9 +124,8 @@ extern long list_patch_pos( int byte_offset );
 extern void list_end_line( void );
 extern void list_patch_data( long patch_pos, long value, int num_bytes );
 extern void list_start_table( char *title );
-extern void list_start_symbol( char *symbol_name, long symbol_value );
-extern void list_append_reference( int page_nr, BOOL is_define );
-extern void list_end_symbol( void );
+extern void list_symbol( char *symbol_name, long symbol_value, 
+						 SymbolRefList *references );
 extern int  list_get_page_nr( void );
 
 #endif /* ndef LISTFILE_H */
