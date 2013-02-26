@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.40 2013-02-22 17:26:34 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.41 2013-02-26 02:11:32 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.40  2013-02-22 17:26:34  pauloscustodio
+/* Revision 1.41  2013-02-26 02:11:32  pauloscustodio
+/* New model_symref.c with all symbol cross-reference list handling
+/*
+/* Revision 1.40  2013/02/22 17:26:34  pauloscustodio
 /* Decouple assembler from listfile handling
 /*
 /* Revision 1.39  2013/02/19 22:52:40  pauloscustodio
@@ -279,23 +282,25 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 #include "memalloc.h"   /* before any other include */
 
-#include <stdio.h>
+#include <ctype.h>
 #include <limits.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <time.h>
+
+#include "codearea.h"
 #include "config.h"
-#include "symbol.h"
-#include "symbols.h"
-#include "hist.h"
-#include "options.h"
-#include "z80asm.h"
 #include "errors.h"
 #include "file.h"
-#include "codearea.h"
-#include "strutil.h"
+#include "hist.h"
 #include "listfile.h"
+#include "model.h"
+#include "options.h"
+#include "strutil.h"
+#include "symbol.h"
+#include "symbols.h"
+#include "z80asm.h"
 
 /* external functions */
 void Skipline( FILE *fptr );
@@ -988,7 +993,8 @@ FindFile( struct sourcefile *srcfile, char *flnm )
 void
 WriteSymbol( symbol *n )
 {
-    struct pageref *page;
+    SymbolRefListElem *iter;
+	BOOL defined;
 
     if ( n->owner == CURRENTMODULE )
     {
@@ -1000,17 +1006,11 @@ WriteSymbol( symbol *n )
 				list_start_symbol( n->symname, n->symvalue );
 
 				/* BUG_0028 */
-                if ( n->references != NULL )
+				for ( iter = SymbolRefList_first( n->references ), defined = TRUE ; 
+					  iter != NULL ;
+					  iter = SymbolRefList_next( iter ), defined = FALSE )
                 {
-                    page = n->references->firstref;
-					list_append_reference( page->pagenr, TRUE );
-
-					page = page->nextref;
-                    while ( page != NULL )
-                    {
-						list_append_reference( page->pagenr, FALSE );
-                        page = page->nextref;
-                    }
+					list_append_reference( iter->obj->page_nr, defined );
                 }
 
                 list_end_symbol();

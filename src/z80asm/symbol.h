@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.20 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.21 2013-02-26 02:11:32 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.20  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.21  2013-02-26 02:11:32  pauloscustodio
+/* New model_symref.c with all symbol cross-reference list handling
+/*
+/* Revision 1.20  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -131,6 +134,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include <stdlib.h>
 #include "avltree.h"    /* base symbol data structures and routines */
 #include "types.h"
+#include "model.h"
 
 /* Structured data types : */
 
@@ -147,17 +151,6 @@ enum symbols        { space, strconq, dquote, squote, semicolon, comma, fullstop
                       ifstatm, elsestatm, endifstatm, label, colon
                     };
 
-struct pageref
-{
-    struct pageref   *nextref;          /* pointer to next page reference of symbol */
-    int              pagenr;            /* page number where symbol is referenced */
-};                                      /* the first symbol node in identifies the symbol definition */
-
-struct symref
-{
-    struct pageref     *firstref;         /* Pointer to first page number reference of symbol */
-    struct pageref     *lastref;          /* Pointer to last/current page number reference    */
-};                                        /* NB: First reference defines creation of symbol   */
 
 struct pfixstack
 {
@@ -228,11 +221,11 @@ struct JRPC
 
 typedef struct node
 {
-    byte_t			  type;              /* type of symbol  */
-    char              *symname;          /* pointer to symbol identifier */
-    long              symvalue;          /* value of symbol */
-    struct symref     *references;       /* pointer to all found references of symbol */
-    struct module     *owner;            /* pointer to module which ownes symbol */
+    byte_t				type;				/* type of symbol  */
+    char				*symname;			/* pointer to symbol identifier */
+    long				symvalue;			/* value of symbol */
+    SymbolRefList		*references;		/* pointer to all found references of symbol */
+    struct module		*owner;				/* pointer to module which ownes symbol */
 } symbol;
 
 struct modules

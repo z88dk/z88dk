@@ -15,12 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Data model of assember structures
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.1 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.2 2013-02-26 02:11:32 pauloscustodio Exp $ */
 /* $Log: model.h,v $
-/* Revision 1.1  2013-02-19 22:52:40  pauloscustodio
-/* BUG_0030 : List bytes patching overwrites header
-/* BUG_0031 : List file garbled with input lines with 255 chars
-/* New listfile.c with all the listing related code
+/* Revision 1.2  2013-02-26 02:11:32  pauloscustodio
+/* New model_symref.c with all symbol cross-reference list handling
+/*
+/* Revision 1.1  2013/02/19 22:52:40  pauloscustodio
 /*
 /*
 /* */
@@ -30,7 +30,24 @@ Data model of assember structures
 
 #include "memalloc.h"   /* before any other include */
 #include "class.h"
-#include "strhash.h"
+#include "classlist.h"
+#include "types.h"
 
+/*-----------------------------------------------------------------------------
+*   Cross reference list of symbol usage
+*	Defined in model_symref.c
+*----------------------------------------------------------------------------*/
+CLASS( SymbolRef )
+	int		page_nr;			/* page where symbol used/defined */
+END_CLASS;
+
+CLASS_LIST( SymbolRef );		/* list of references sorted by page_nr, with 
+								   definition reference at head of list */
+
+/* add a symbol reference, create the list if NULL */
+extern void add_symbol_ref( SymbolRefList *list, int page_nr, BOOL defined );
+
+/* concatenate two symbol reference lists */
+extern void cat_symbol_refs( SymbolRefList *list, SymbolRefList *other );
 
 #endif /* ndef MODEL_H */

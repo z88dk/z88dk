@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.28 2013-02-22 17:26:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.29 2013-02-26 02:11:32 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.28  2013-02-22 17:26:33  pauloscustodio
+/* Revision 1.29  2013-02-26 02:11:32  pauloscustodio
+/* New model_symref.c with all symbol cross-reference list handling
+/*
+/* Revision 1.28  2013/02/22 17:26:33  pauloscustodio
 /* Decouple assembler from listfile handling
 /*
 /* Revision 1.27  2013/02/19 22:52:40  pauloscustodio
@@ -181,12 +184,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "config.h"
-#include "symbol.h"
-#include "symbols.h"
-#include "options.h"
 #include "errors.h"
 #include "listfile.h"
+#include "model.h"
+#include "options.h"
+#include "strpool.h"
+#include "symbol.h"
+#include "symbols.h"
 
 /* local functions */
 symbol *GetSymPtr( char *identifier );
@@ -194,9 +200,6 @@ symbol *FindSymbol( char *identifier, avltree *treeptr );
 static void DefLocalSymbol( char *identifier, long value, char symboltype );
 int cmpidstr( symbol *kptr, symbol *p );
 int cmpidval( symbol *kptr, symbol *p );
-void InsertPageRef( symbol *symptr );
-void AppendPageRef( symbol *symptr );
-void MovePageRefs( char *identifier, symbol *definedsym );
 void FreeSym( symbol *node );
 
 
@@ -213,26 +216,16 @@ symbol *CreateSymbol( char *identifier, long value, char symboltype, struct modu
 {
     symbol *newsym;
 
-    newsym = xcalloc_struct( symbol );  /* Create area for a new symbol structure */
+    newsym = xcalloc_struct( symbol );					/* Create area for a new symbol structure */
 
-    newsym->symname = xstrdup( identifier );
+    newsym->symname = strpool_add( identifier );		/* symbol name in strpool, not freed */
 
-    /* Allocate area for a new symbol identifier */
+	newsym->references = OBJ_NEW( SymbolRefList );		/* create the list */
+
     if ( option_symtable && option_list )
     {
-        newsym->references = xcalloc_struct( struct symref );
-
-        /* Create area for a new symbol structure */
-        newsym->references->firstref = NULL;
-        newsym->references->lastref = NULL;
-        /* Page reference list initialised... */
-        AppendPageRef( newsym );
-        /* store first page reference in listfile of this symbol */
-    }
-    else
-    {
-        newsym->references = NULL;
-        /* No listing file, no page references... */
+	    /* add reference */
+		add_symbol_ref( newsym->references, list_get_page_nr(), FALSE );
     }
 
     newsym->owner = symowner;
@@ -258,6 +251,23 @@ cmpidval( symbol *kptr, symbol *p )
 }
 
 
+/* delete notdeclroot symbol, moving all page references to new defined symbol */
+static void delete_notdecl_symbol ( char *name, symbol *defined_symbol )
+{
+	symbol *delete_symbol;
+
+	delete_symbol = FindSymbol( name, CURRENTMODULE->notdeclroot );
+	if ( delete_symbol != NULL )
+	{
+		/* move all references */
+		cat_symbol_refs( defined_symbol->references, delete_symbol->references );
+
+        /* symbol is not needed anymore, remove from symbol table of forward references */
+        delete( &CURRENTMODULE->notdeclroot, delete_symbol, 
+			    ( int ( * )( void *, void * ) ) cmpidstr, 
+				( void ( * )( void * ) ) FreeSym );
+	}
+}
 
 /*
  * DefineSymbol will create a record in memory, inserting it into an AVL tree (or creating the first record)
@@ -285,9 +295,11 @@ void DefineSymbol( char *identifier,
 
             if ( pass1 && option_symtable && listing )
             {
-                InsertPageRef( foundsymbol );     /* First element in list is definition of symbol */
-                MovePageRefs( identifier, foundsymbol );   /* Move page references from possible forward
-                                                         * referenced symbol  */
+				/* First element in list is definition of symbol */
+                add_symbol_ref( foundsymbol->references, list_get_page_nr(), TRUE );     
+
+				/* Move page references from possible forward referenced symbol  */
+                delete_notdecl_symbol( identifier, foundsymbol );   
             }
         }
         else
@@ -321,7 +333,11 @@ static void DefLocalSymbol( char *identifier,
 
         if ( pass1 && option_symtable && listing )
         {
-            MovePageRefs( identifier, foundsymbol );    /* Move page references from forward referenced symbol */
+            /* First element in list is definition of symbol */
+			add_symbol_ref( foundsymbol->references, list_get_page_nr(), TRUE );
+			
+			/* Move page references from forward referenced symbol */
+            delete_notdecl_symbol( identifier, foundsymbol );    
         }
     }
     else if ( ( foundsymbol->type & SYMDEFINED ) == 0 )
@@ -334,9 +350,11 @@ static void DefLocalSymbol( char *identifier,
 
         if ( pass1 && option_symtable && listing )
         {
-            InsertPageRef( foundsymbol ); /* First element in list is definition of symbol */
-            MovePageRefs( identifier, foundsymbol );       /* Move page references from possible forward
-                                                         * referenced symbol */
+            /* First element in list is definition of symbol */
+			add_symbol_ref( foundsymbol->references, list_get_page_nr(), TRUE );
+			
+			/* Move page references from possible forward referenced symbol */
+            delete_notdecl_symbol( identifier, foundsymbol );       
         }
     }
     else
@@ -347,55 +365,6 @@ static void DefLocalSymbol( char *identifier,
 }
 
 
-/*
- * Move pointer to list of page references from forward symbol and append it to first reference of defined symbol.
- */
-void
-MovePageRefs( char *identifier, symbol *definedsym )
-{
-    symbol *forwardsym;
-    struct pageref *tmpref;
-
-    if ( ( forwardsym = FindSymbol( identifier, CURRENTMODULE->notdeclroot ) ) != NULL )
-    {
-        if ( definedsym->references->firstref->pagenr == forwardsym->references->lastref->pagenr )
-        {
-            if ( forwardsym->references->firstref != forwardsym->references->lastref )
-            {
-                tmpref = forwardsym->references->firstref;        /* more than one reference */
-
-                while ( tmpref->nextref != forwardsym->references->lastref )
-                {
-                    tmpref = tmpref->nextref;    /* get reference before last reference */
-                }
-
-                xfree( tmpref->nextref ); /* remove redundant reference */
-                tmpref->nextref = NULL;   /* end of list */
-                forwardsym->references->lastref = tmpref;         /* update pointer to last reference */
-                definedsym->references->firstref->nextref = forwardsym->references->firstref;
-                definedsym->references->lastref = forwardsym->references->lastref;        /* forward page
-                                                                                         * reference list
-                                                                                         * appended  */
-            }
-            else
-            {
-                xfree( forwardsym->references->firstref );    /* remove the redundant reference */
-            }
-        }
-        else
-        {
-            definedsym->references->firstref->nextref = forwardsym->references->firstref;
-            definedsym->references->lastref = forwardsym->references->lastref;
-            /* last reference not on the same page as definition */
-            /* forward page reference list now appended  */
-        }
-
-        xfree( forwardsym->references ); /* remove pointer information to forward page reference list */
-        forwardsym->references = NULL;
-        /* symbol is not needed anymore, remove from symbol table of forward references */
-        delete( &CURRENTMODULE->notdeclroot, forwardsym, ( int ( * )( void *, void * ) ) cmpidstr, ( void ( * )( void * ) ) FreeSym );
-    }
-}
 
 
 /*
@@ -420,10 +389,9 @@ GetSymPtr( char *identifier )
                 }
                 else
                 {
-                    AppendPageRef( symbolptr );
-                }      /* symbol found in forward referenced tree,
-
-                                                 * note page reference */
+                    /* symbol found in forward referenced tree, note page reference */
+					add_symbol_ref( symbolptr->references, list_get_page_nr(), FALSE );
+                }      
             }
 
             return NULL;
@@ -432,7 +400,8 @@ GetSymPtr( char *identifier )
         {
             if ( pass1 && option_symtable && listing )
             {
-                AppendPageRef( symbolptr );    /* symbol found as global/extern declaration */
+                /* symbol found as global/extern declaration */
+				add_symbol_ref( symbolptr->references, list_get_page_nr(), FALSE );
             }
 
             return symbolptr;     /* symbol at least declared - return pointer to it... */
@@ -442,7 +411,8 @@ GetSymPtr( char *identifier )
     {
         if ( pass1 && option_symtable && listing )
         {
-            AppendPageRef( symbolptr );    /* symbol found as local declaration */
+            /* symbol found as local declaration */
+			add_symbol_ref( symbolptr->references, list_get_page_nr(), FALSE );
         }
 
         return symbolptr;         /* symbol at least declared - return pointer to it... */
@@ -616,77 +586,8 @@ void DeclSymExtern( char *identifier, char libtype )
 
 
 
-void
-AppendPageRef( symbol *symptr )
-{
-    struct pageref *newref = NULL;
-
-    if ( symptr->references->lastref != NULL )
-        if ( symptr->references->lastref->pagenr == list_get_page_nr() ||
-                symptr->references->firstref->pagenr == list_get_page_nr() )        /* symbol reference on the same page - ignore */
-        {
-            return;
-        }
-
-    newref = xcalloc_struct( struct pageref );
-    /* new page reference of symbol - allocate... */
-    newref->pagenr = list_get_page_nr();
-    newref->nextref = NULL;
-
-    if ( symptr->references->lastref == NULL )
-    {
-        symptr->references->lastref = newref;
-        symptr->references->firstref = newref;    /* First page reference in list */
-    }
-    else
-    {
-        symptr->references->lastref->nextref = newref;    /* current reference (last) points at new reference */
-        symptr->references->lastref = newref;     /* ptr to last reference updated to new reference */
-    }
-}
 
 
-void
-InsertPageRef( symbol *symptr )
-{
-    struct pageref *newref = NULL, *tmpptr = NULL;
-
-    if ( symptr->references->firstref != NULL )
-        if ( symptr->references->firstref->pagenr == list_get_page_nr() )       /* symbol reference on the same page - ignore */
-        {
-            return;
-        }
-
-    newref = xcalloc_struct( struct pageref );
-    newref->pagenr = list_get_page_nr();
-    newref->nextref = symptr->references->firstref;       /* next reference will be current first reference */
-
-    if ( symptr->references->firstref == NULL )
-    {
-        /* If this is the first reference, then the... */
-        symptr->references->firstref = newref;    /* Current reference (last) points at new reference */
-        symptr->references->lastref = newref;     /* first page reference is also last page reference. */
-    }
-    else
-    {
-        symptr->references->firstref = newref;    /* Current reference (last) points at new reference */
-
-        if ( newref->pagenr == symptr->references->lastref->pagenr )
-        {
-            /* last reference = new reference */
-            tmpptr = newref;
-
-            while ( tmpptr->nextref != symptr->references->lastref )
-            {
-                tmpptr = tmpptr->nextref;    /* get reference before last reference */
-            }
-
-            xfree( tmpptr->nextref );    /* remove redundant reference */
-            tmpptr->nextref = NULL;       /* end of list */
-            symptr->references->lastref = tmpptr;         /* update pointer to last reference */
-        }
-    }
-}
 
 
 void DefineDefSym( char *identifier, long value, char symboltype, avltree **root )
@@ -710,28 +611,9 @@ void DefineDefSym( char *identifier, long value, char symboltype, avltree **root
 void
 FreeSym( symbol *node )
 {
-    struct pageref *pref, *tmpref;
-
     if ( node->references != NULL )
     {
-        if ( node->references->firstref != NULL )
-        {
-            pref = node->references->firstref;    /* get first page reference in list */
-
-            while ( pref != NULL ) /* free page reference list... */
-            {
-                tmpref = pref;
-                pref = pref->nextref;
-                xfree( tmpref );
-            }
-        }
-
-        xfree( node->references ); /* Then remove head/end pointer record to list */
-    }
-
-    if ( node->symname != NULL )
-    {
-        xfree( node->symname );    /* release symbol identifier */
+		OBJ_DELETE( node->references );
     }
 
     xfree( node );               /* then release the symbol record */
