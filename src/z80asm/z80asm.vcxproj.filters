@@ -108,6 +108,9 @@
     <ClInclude Include="classlist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="srcfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -195,6 +198,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="model_symref.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="srcfile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

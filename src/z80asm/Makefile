@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.46 2013-02-26 02:11:32 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.47 2013-02-27 22:29:59 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.46  2013-02-26 02:11:32  pauloscustodio
+# Revision 1.47  2013-02-27 22:29:59  pauloscustodio
+# New srcfile.c to handle reading lines from source files
+#
+# Revision 1.46  2013/02/26 02:11:32  pauloscustodio
 # New model_symref.c with all symbol cross-reference list handling
 #
 # Revision 1.45  2013/02/25 21:37:30  pauloscustodio
@@ -211,6 +214,7 @@ OBJS = 	\
 	prsident.o		\
 	prsline.o		\
 	safestr.o		\
+	srcfile.o		\
 	strhash.o		\
 	strlist.o		\
 	strpool.o		\
@@ -268,9 +272,10 @@ depend:
 
 # DO NOT DELETE
 
-asmdrctv.o: memalloc.h except.h e4c.h config.h ../config.h options.h symbol.h
-asmdrctv.o: avltree.h types.h model.h class.h queue.h classlist.h symbols.h
-asmdrctv.o: z80asm.h errors.h errors_def.h file.h strlist.h codearea.h
+asmdrctv.o: memalloc.h except.h e4c.h codearea.h types.h config.h ../config.h
+asmdrctv.o: errors.h errors_def.h file.h strlist.h class.h queue.h options.h
+asmdrctv.o: symbol.h avltree.h model.h classlist.h srcfile.h dynstr.h
+asmdrctv.o: symbols.h z80asm.h
 avltree.o: memalloc.h except.h e4c.h avltree.h
 class.o: memalloc.h except.h e4c.h class.h queue.h types.h die.h
 codearea.o: codearea.h memalloc.h except.h e4c.h types.h config.h ../config.h
@@ -293,8 +298,8 @@ ldinstr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 ldinstr.o: types.h symbol.h model.h class.h queue.h classlist.h errors.h
 ldinstr.o: errors_def.h codearea.h options.h
 listfile.o: memalloc.h except.h e4c.h listfile.h class.h queue.h types.h
-listfile.o: dynstr.h file.h strlist.h options.h symbol.h avltree.h model.h
-listfile.o: classlist.h z80asm.h config.h ../config.h errors.h errors_def.h
+listfile.o: dynstr.h model.h classlist.h file.h strlist.h options.h symbol.h
+listfile.o: avltree.h z80asm.h config.h ../config.h errors.h errors_def.h
 listfile.o: hist.h strpool.h safestr.h strutil.h codearea.h
 memalloc.o: memalloc.h except.h e4c.h types.h die.h queue.h
 model_symref.o: memalloc.h except.h e4c.h model.h class.h queue.h types.h
@@ -304,9 +309,10 @@ modlink.o: avltree.h types.h model.h class.h queue.h classlist.h symbols.h
 modlink.o: z80asm.h errors.h errors_def.h file.h strlist.h codearea.h
 modlink.o: strutil.h safestr.h listfile.h dynstr.h
 objfile.o: objfile.h memalloc.h except.h e4c.h
-options.o: memalloc.h except.h e4c.h z80asm.h config.h ../config.h avltree.h
-options.o: types.h options.h symbol.h model.h class.h queue.h classlist.h
-options.o: symbols.h errors.h errors_def.h strlist.h file.h
+options.o: memalloc.h except.h e4c.h errors.h errors_def.h file.h strlist.h
+options.o: class.h queue.h types.h options.h symbol.h avltree.h model.h
+options.o: classlist.h srcfile.h dynstr.h symbols.h z80asm.h config.h
+options.o: ../config.h
 prsident.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 prsident.o: types.h symbol.h model.h class.h queue.h classlist.h symbols.h
 prsident.o: options.h errors.h errors_def.h codearea.h
@@ -314,6 +320,8 @@ prsline.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 prsline.o: types.h symbol.h model.h class.h queue.h classlist.h options.h
 prsline.o: errors.h errors_def.h
 safestr.o: safestr.h memalloc.h except.h e4c.h types.h
+srcfile.o: memalloc.h except.h e4c.h file.h strlist.h class.h queue.h types.h
+srcfile.o: srcfile.h classlist.h dynstr.h
 strhash.o: memalloc.h except.h e4c.h strhash.h types.h class.h queue.h
 strhash.o: uthash.h die.h strpool.h
 strlist.o: memalloc.h except.h e4c.h strlist.h class.h queue.h types.h
