@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.14 2013-02-25 21:36:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.15 2013-02-27 20:44:32 pauloscustodio Exp $ */
 /* $Log: file.c,v $
-/* Revision 1.14  2013-02-25 21:36:17  pauloscustodio
+/* Revision 1.15  2013-02-27 20:44:32  pauloscustodio
+/* Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
+/* search_file() now accepts a NULL dir_list.
+/*
+/* Revision 1.14  2013/02/25 21:36:17  pauloscustodio
 /* Uniform the APIs of classhash, classlist, strhash, strlist
 /*
 /* Revision 1.13  2013/01/20 21:24:28  pauloscustodio
@@ -242,12 +246,18 @@ char *path_basename( char *dest, const char *source )
 *  Search for a file on the given directory list, return full path name
 *  pathname is stored in strpool, no need to remove
 *----------------------------------------------------------------------------*/
-char *search_file( char *filename, StrList *dir_list )
+char *search_file( char *filename, SzList *dir_list )
 {
-    StrListElem *iter;
+    SzListElem *iter;
     char        *dir;
     struct stat sb;
     SSTR_DEFINE( pathname, FILENAME_MAX );
+
+	/* if no dir_list, return file */
+	if ( dir_list == NULL )
+    {
+        return strpool_add( filename );
+    }
 
     /* check if file exists in current directory */
     if ( stat( filename, &sb ) == 0 )
@@ -256,8 +266,8 @@ char *search_file( char *filename, StrList *dir_list )
     }
 
     /* search in dir_list */
-	for ( iter = StrList_first( dir_list ); iter != NULL ; 
-		  iter = StrList_next( iter ) )
+	for ( iter = SzList_first( dir_list ); iter != NULL ; 
+		  iter = SzList_next( iter ) )
 	{
 		dir = iter->string;
         sstr_fset( pathname, "%s/%s", dir, filename );

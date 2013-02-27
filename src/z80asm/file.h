@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.9 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.10 2013-02-27 20:44:32 pauloscustodio Exp $ */
 /* $Log: file.h,v $
-/* Revision 1.9  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.10  2013-02-27 20:44:32  pauloscustodio
+/* Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
+/* search_file() now accepts a NULL dir_list.
+/*
+/* Revision 1.9  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.8  2012/05/26 18:36:36  pauloscustodio
@@ -86,7 +90,7 @@ extern char *path_basename( char *dest, const char *source );
 
 /* search for a file on the given directory list, return full path name
  * pathname is stored in strpool, no need to remove */
-extern char *search_file( char *filename, StrList *dir_list );
+extern char *search_file( char *filename, SzList *dir_list );
 
 #endif /* ndef FILE_H */
 
