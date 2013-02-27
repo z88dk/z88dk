@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.26 2013-02-25 21:37:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.27 2013-02-27 22:32:38 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.26  2013-02-25 21:37:30  pauloscustodio
+# Revision 1.27  2013-02-27 22:32:38  pauloscustodio
+# Abort test at t_compile_module() if compilation failed
+#
+# Revision 1.26  2013/02/25 21:37:30  pauloscustodio
 # Show output difference of t_run_module() in visual-diff, to allow easy merge of changes
 #
 # Revision 1.25  2013/02/22 17:26:34  pauloscustodio
@@ -550,7 +553,7 @@ int main (int argc, char **argv) {
 	my $ok = (0 == system($cc));
 	ok $ok;
 	
-	exit 1 if !$ok && $STOP_ON_ERR;
+	exit 1 if !$ok;	# no need to cotinue if compilation failed
 }
 
 #------------------------------------------------------------------------------
