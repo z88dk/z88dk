@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.18 2013-02-25 21:36:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.19 2013-02-27 20:47:30 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.18  2013-02-25 21:36:17  pauloscustodio
+/* Revision 1.19  2013-02-27 20:47:30  pauloscustodio
+/* Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
+/*
+/* Revision 1.18  2013/02/25 21:36:17  pauloscustodio
 /* Uniform the APIs of classhash, classlist, strhash, strlist
 /*
 /* Revision 1.17  2013/02/19 22:52:40  pauloscustodio
@@ -143,8 +146,8 @@ char objext[FILEEXT_MAX];       /* contains default object file extension */
 int  cpu_type;
 
 /* directory lists for search_include_file() and search_lib_file() */
-static StrList *include_path = NULL;
-static StrList *lib_path = NULL;
+static SzList *include_path = NULL;
+static SzList *lib_path = NULL;
 
 /*-----------------------------------------------------------------------------
 *   Initialize search paths
@@ -155,19 +158,19 @@ static void init_search_paths( void )
 
     if ( include_path == NULL )
     {
-        include_path = OBJ_NEW( StrList );
+        include_path = OBJ_NEW( SzList );
 
         dir = getenv( "Z80_OZFILES" );
 
         if ( dir != NULL )
         {
-            StrList_push( include_path, dir );
+            SzList_push( include_path, dir );
         }
     }
 
     if ( lib_path == NULL )
     {
-        lib_path = OBJ_NEW( StrList );
+        lib_path = OBJ_NEW( SzList );
     }
 }
 
@@ -429,12 +432,12 @@ void set_asm_flag( char *flagid )
 
     else if ( *flagid == 'I' )
     {
-        StrList_push( include_path, flagid + 1 );
+        SzList_push( include_path, flagid + 1 );
     }
 
     else if ( *flagid == 'L' )
     {
-        StrList_push( lib_path, flagid + 1 );
+        SzList_push( lib_path, flagid + 1 );
     }
 
     else if ( *flagid == 'D' )

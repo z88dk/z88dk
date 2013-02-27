@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.8 2013-02-25 21:36:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.9 2013-02-27 20:47:30 pauloscustodio Exp $
 # $Log: whitebox-strlist.t,v $
-# Revision 1.8  2013-02-25 21:36:17  pauloscustodio
+# Revision 1.9  2013-02-27 20:47:30  pauloscustodio
+# Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
+#
+# Revision 1.8  2013/02/25 21:36:17  pauloscustodio
 # Uniform the APIs of classhash, classlist, strhash, strlist
 #
 # Revision 1.7  2013/01/30 20:40:07  pauloscustodio
@@ -58,7 +61,7 @@ t_compile_module(<<'END_INIT', <<'END', $compile);
 #define ERROR return __LINE__
 
 #define T_START(list)							\
-	iter = StrList_first(list);
+	iter = SzList_first(list);
 
 #define T_NEXT(list, text)						\
 	if (! iter) 						ERROR;	\
@@ -66,37 +69,37 @@ t_compile_module(<<'END_INIT', <<'END', $compile);
 	if (! str) 							ERROR;	\
 	if (strcmp(str, text)) 				ERROR;	\
 	if (str != iter->string)			ERROR;	\
-	iter = StrList_next(iter);					
+	iter = SzList_next(iter);					
 
 #define T_END(list)								\
-	iter = StrList_next(iter);					\
+	iter = SzList_next(iter);					\
 	if (iter) 							ERROR;
 
 END_INIT
 	/* main */
-	StrList *l1, *l2;
+	SzList *l1, *l2;
 	char *str;
-	StrListElem *iter;
+	SzListElem *iter;
 	
-	l1 = OBJ_NEW(StrList);
+	l1 = OBJ_NEW(SzList);
 	
 	T_START(l1);
 	T_END(l1);
 	
-	StrList_push(l1, "abc");
+	SzList_push(l1, "abc");
 
 	T_START(l1);
 	T_NEXT(l1, "abc");
 	T_END(l1);
 	
-	StrList_push(l1, "def");
+	SzList_push(l1, "def");
 
 	T_START(l1);
 	T_NEXT(l1, "abc");
 	T_NEXT(l1, "def");
 	T_END(l1);
 	
-	l2 = StrList_clone(l1);
+	l2 = SzList_clone(l1);
 
 	T_START(l1);
 	T_NEXT(l1, "abc");
@@ -108,7 +111,7 @@ END_INIT
 	T_NEXT(l2, "def");
 	T_END(l2);
 	
-	StrList_push(l1, "ghi");
+	SzList_push(l1, "ghi");
 
 	T_START(l1);
 	T_NEXT(l1, "abc");
@@ -121,7 +124,7 @@ END_INIT
 	T_NEXT(l2, "def");
 	T_END(l2);
 	
-	StrList_push(l2, "jkl");
+	SzList_push(l2, "jkl");
 
 	T_START(l1);
 	T_NEXT(l1, "abc");
@@ -137,13 +140,13 @@ END_INIT
 	
 	/* empty */
 	OBJ_DELETE(l1);
-	l1 = OBJ_NEW(StrList);
+	l1 = OBJ_NEW(SzList);
 	
-	if (! StrList_empty(l1)) ERROR;
+	if (! SzList_empty(l1)) ERROR;
 	
-	StrList_push(l1, "abc");
+	SzList_push(l1, "abc");
 	
-	if (StrList_empty(l1)) ERROR;
+	if (SzList_empty(l1)) ERROR;
 	
 	OBJ_DELETE(l1);
 	OBJ_DELETE(l2);

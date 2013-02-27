@@ -12,12 +12,15 @@
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-List of strings (e.g. include path); strings kept in strpool.h
+List of fixed strings (e.g. include path); strings kept in strpool.h to the end of execution
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.h,v 1.3 2013-02-25 21:36:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.h,v 1.4 2013-02-27 20:47:30 pauloscustodio Exp $ */
 /* $Log: strlist.h,v $
-/* Revision 1.3  2013-02-25 21:36:17  pauloscustodio
+/* Revision 1.4  2013-02-27 20:47:30  pauloscustodio
+/* Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
+/*
+/* Revision 1.3  2013/02/25 21:36:17  pauloscustodio
 /* Uniform the APIs of classhash, classlist, strhash, strlist
 /*
 /* Revision 1.2  2013/01/19 00:04:53  pauloscustodio
@@ -39,31 +42,31 @@ List of strings (e.g. include path); strings kept in strpool.h
 
 /*-----------------------------------------------------------------------------
 *   PUBLIC INTERFACE
-*   StrList *list = OBJ_NEW(StrList);
-*   StrList_push(list, ".");
+*   SzList *list = OBJ_NEW(SzList);
+*   SzList_push(list, ".");
 *
-*   StrListElem *iter; char *string;
-*   for ( iter = StrList_first(list); iter != NULL; iter = StrList_next(iter) ) 
+*   SzListElem *iter; char *string;
+*   for ( iter = SzList_first(list); iter != NULL; iter = SzList_next(iter) ) 
 *	{ use iter->string }
 *
-*   OBJ_DELETE(StrList);
+*   OBJ_DELETE(SzList);
 *----------------------------------------------------------------------------*/
-typedef struct StrListElem
+typedef struct SzListElem
 {
     char    *string;                /* string kept in strpool.h */
 
-    TAILQ_ENTRY( StrListElem ) entries;   /* Tail queue. */
-} StrListElem;
+    TAILQ_ENTRY( SzListElem ) entries;   /* Tail queue. */
+} SzListElem;
 
-CLASS( StrList )
-TAILQ_HEAD( StrListHead, StrListElem ) head; /* head of queue */
+CLASS( SzList )
+TAILQ_HEAD( SzListHead, SzListElem ) head; /* head of queue */
 END_CLASS;
 
 /* methods */
-extern void         StrList_push( StrList *self, char *string );
-extern StrListElem *StrList_first( StrList *self );
-extern StrListElem *StrList_next( StrListElem *iter );
+extern void         SzList_push( SzList *self, char *string );
+extern SzListElem *SzList_first( SzList *self );
+extern SzListElem *SzList_next( SzListElem *iter );
 
-extern BOOL StrList_empty( StrList *self );
+extern BOOL SzList_empty( SzList *self );
 
 #endif /* ndef STRLIST_H */

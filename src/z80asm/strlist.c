@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 List of strings (e.g. include path); strings kept in strpool.h
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.c,v 1.3 2013-02-25 21:36:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.c,v 1.4 2013-02-27 20:47:30 pauloscustodio Exp $ */
 /* $Log: strlist.c,v $
-/* Revision 1.3  2013-02-25 21:36:17  pauloscustodio
+/* Revision 1.4  2013-02-27 20:47:30  pauloscustodio
+/* Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
+/*
+/* Revision 1.3  2013/02/25 21:36:17  pauloscustodio
 /* Uniform the APIs of classhash, classlist, strhash, strlist
 /*
 /* Revision 1.2  2013/01/19 00:04:53  pauloscustodio
@@ -36,32 +39,32 @@ List of strings (e.g. include path); strings kept in strpool.h
 /*-----------------------------------------------------------------------------
 *   Define the class
 *----------------------------------------------------------------------------*/
-DEF_CLASS( StrList );
+DEF_CLASS( SzList );
 
-void StrList_init( StrList *self )
+void SzList_init( SzList *self )
 {
-    /* force init strpool to make sure StrList is destroyed before StrPool */
+    /* force init strpool to make sure SzList is destroyed before StrPool */
     strpool_init();
 
     TAILQ_INIT( &self->head );
 }
 
-void StrList_copy( StrList *self, StrList *other )
+void SzList_copy( SzList *self, SzList *other )
 {
-    StrListElem *elem;
+    SzListElem *elem;
 
     /* create new list and copy element by element from other */
     TAILQ_INIT( &self->head );
 
     TAILQ_FOREACH( elem, &other->head, entries )
     {
-		StrList_push( self, elem->string );
+		SzList_push( self, elem->string );
     }
 }
 
-void StrList_fini( StrList *self )
+void SzList_fini( SzList *self )
 {
-    StrListElem *elem;
+    SzListElem *elem;
 
     while ( elem = TAILQ_FIRST( &self->head ) )
     {
@@ -73,11 +76,11 @@ void StrList_fini( StrList *self )
 /*-----------------------------------------------------------------------------
 *   append a string to the list
 *----------------------------------------------------------------------------*/
-void StrList_push( StrList *self, char *string )
+void SzList_push( SzList *self, char *string )
 {
-    StrListElem *elem;
+    SzListElem *elem;
 
-    elem = xcalloc_struct( StrListElem );
+    elem = xcalloc_struct( SzListElem );
     elem->string = strpool_add( string );
     TAILQ_INSERT_TAIL( &self->head, elem, entries );
 }
@@ -85,12 +88,12 @@ void StrList_push( StrList *self, char *string )
 /*-----------------------------------------------------------------------------
 *   itereate through list
 *----------------------------------------------------------------------------*/
-StrListElem *StrList_first( StrList *self )
+SzListElem *SzList_first( SzList *self )
 {
     return TAILQ_FIRST( &self->head );
 }
 
-StrListElem *StrList_next( StrListElem *iter )
+SzListElem *SzList_next( SzListElem *iter )
 {
     return iter == NULL ? NULL :
 				TAILQ_NEXT( iter, entries );
@@ -99,7 +102,7 @@ StrListElem *StrList_next( StrListElem *iter )
 /*-----------------------------------------------------------------------------
 *   check if list is empty
 *----------------------------------------------------------------------------*/
-BOOL StrList_empty( StrList *self )
+BOOL SzList_empty( SzList *self )
 {
-	return StrList_first(self) == NULL ? TRUE : FALSE;
+	return SzList_first(self) == NULL ? TRUE : FALSE;
 }

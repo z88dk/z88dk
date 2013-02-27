@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.6 2013-02-25 21:36:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.7 2013-02-27 20:47:30 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.6  2013-02-25 21:36:17  pauloscustodio
+# Revision 1.7  2013-02-27 20:47:30  pauloscustodio
+# Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
+#
+# Revision 1.6  2013/02/25 21:36:17  pauloscustodio
 # Uniform the APIs of classhash, classlist, strhash, strlist
 #
 # Revision 1.5  2013/01/20 21:24:29  pauloscustodio
@@ -58,11 +61,11 @@ int clinemode;
 int clineno;
 INIT
 	/* main */
-	StrList *list = OBJ_NEW(StrList);
+	SzList *list = OBJ_NEW(SzList);
 	
-	StrList_push(list, "x1");
-	StrList_push(list, "x2");
-	StrList_push(list, "x3");
+	SzList_push(list, "x1");
+	SzList_push(list, "x2");
+	SzList_push(list, "x3");
 	
 	puts( search_file(argv[1], list) );
 	return 0;
