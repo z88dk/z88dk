@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.7 2013-02-27 20:47:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.8 2013-02-27 20:56:52 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.7  2013-02-27 20:47:30  pauloscustodio
+# Revision 1.8  2013-02-27 20:56:52  pauloscustodio
+# search_file() now accepts a NULL dir_list.
+#
+# Revision 1.7  2013/02/27 20:47:30  pauloscustodio
 # Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
 #
 # Revision 1.6  2013/02/25 21:36:17  pauloscustodio
@@ -61,11 +64,20 @@ int clinemode;
 int clineno;
 INIT
 	/* main */
-	SzList *list = OBJ_NEW(SzList);
+	SzList *list;
 	
-	SzList_push(list, "x1");
-	SzList_push(list, "x2");
-	SzList_push(list, "x3");
+	if (argv[2][0] == '0')
+	{
+		list = NULL;
+	}
+	else
+	{
+		list = OBJ_NEW(SzList);
+	
+		SzList_push(list, "x1");
+		SzList_push(list, "x2");
+		SzList_push(list, "x3");
+	}
 	
 	puts( search_file(argv[1], list) );
 	return 0;
@@ -81,11 +93,17 @@ write_file('x2/f2', "");
 write_file('x3/f2', "");
 write_file('x3/f3', "");
 
-t_run_module(['f0'], "f0\n", "", 0);
-t_run_module(['f1'], "x1/f1\n", "", 0);
-t_run_module(['f2'], "x2/f2\n", "", 0);
-t_run_module(['f3'], "x3/f3\n", "", 0);
-t_run_module(['f4'], "f4\n", "", 0);
+t_run_module(['f0', '0'], "f0\n", "", 0);
+t_run_module(['f1', '0'], "f1\n", "", 0);
+t_run_module(['f2', '0'], "f2\n", "", 0);
+t_run_module(['f3', '0'], "f3\n", "", 0);
+t_run_module(['f4', '0'], "f4\n", "", 0);
+
+t_run_module(['f0', '1'], "f0\n", "", 0);
+t_run_module(['f1', '1'], "x1/f1\n", "", 0);
+t_run_module(['f2', '1'], "x2/f2\n", "", 0);
+t_run_module(['f3', '1'], "x3/f3\n", "", 0);
+t_run_module(['f4', '1'], "f4\n", "", 0);
 
 # delete directories and files
 remove_tree(qw( x1 x2 x3 ));
