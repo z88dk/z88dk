@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.38 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.39 2013-02-27 22:34:16 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.38  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.39  2013-02-27 22:34:16  pauloscustodio
+/* Move include path search to srcfile.c
+/*
+/* Revision 1.38  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -260,18 +263,19 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 #include "memalloc.h"   /* before any other include to enable memory leak detection */
 
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
+#include "codearea.h"
 #include "config.h"
+#include "errors.h"
+#include "file.h"
 #include "options.h"
+#include "srcfile.h"
 #include "symbol.h"
 #include "symbols.h"
 #include "z80asm.h"
-#include "errors.h"
-#include "file.h"
-#include "codearea.h"
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* external functions */
 enum symbols GetSym( void );
@@ -1165,7 +1169,7 @@ Fetchfilename( FILE *fptr )
         ptr++;
     }
 
-    return strlen( ptr ) ? search_include_file( ptr ) : "";
+    return strlen( ptr ) ? search_source_file( ptr ) : "";
 }
 
 

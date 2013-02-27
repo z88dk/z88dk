@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.19 2013-02-27 20:47:30 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.20 2013-02-27 22:34:16 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.19  2013-02-27 20:47:30  pauloscustodio
+/* Revision 1.20  2013-02-27 22:34:16  pauloscustodio
+/* Move include path search to srcfile.c
+/*
+/* Revision 1.19  2013/02/27 20:47:30  pauloscustodio
 /* Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
 /*
 /* Revision 1.18  2013/02/25 21:36:17  pauloscustodio
@@ -110,14 +113,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 #include "memalloc.h"   /* before any other include */
 
-#include <string.h>
-#include <ctype.h>
-#include "z80asm.h"
-#include "options.h"
-#include "symbols.h"
 #include "errors.h"
-#include "strlist.h"
 #include "file.h"
+#include "options.h"
+#include "srcfile.h"
+#include "strlist.h"
+#include "symbols.h"
+#include "z80asm.h"
+#include <ctype.h>
+#include <string.h>
 
 /* global option variables */
 enum flag smallc_source;
@@ -145,8 +149,7 @@ char srcext[FILEEXT_MAX];       /* contains default source file extension */
 char objext[FILEEXT_MAX];       /* contains default object file extension */
 int  cpu_type;
 
-/* directory lists for search_include_file() and search_lib_file() */
-static SzList *include_path = NULL;
+/* directory list for search_lib_file() */
 static SzList *lib_path = NULL;
 
 /*-----------------------------------------------------------------------------
@@ -156,18 +159,14 @@ static void init_search_paths( void )
 {
     char *dir;
 
-    if ( include_path == NULL )
+	/* init source path */
+    dir = getenv( "Z80_OZFILES" );
+    if ( dir != NULL )
     {
-        include_path = OBJ_NEW( SzList );
-
-        dir = getenv( "Z80_OZFILES" );
-
-        if ( dir != NULL )
-        {
-            SzList_push( include_path, dir );
-        }
+        add_source_file_path( dir );
     }
 
+	/* init lib path */
     if ( lib_path == NULL )
     {
         lib_path = OBJ_NEW( SzList );
@@ -177,11 +176,6 @@ static void init_search_paths( void )
 /*-----------------------------------------------------------------------------
 *   Search file
 *----------------------------------------------------------------------------*/
-char *search_include_file( char *filename )
-{
-    return search_file( filename, include_path );
-}
-
 char *search_lib_file( char *filename )
 {
     return search_file( filename, lib_path );
@@ -432,7 +426,7 @@ void set_asm_flag( char *flagid )
 
     else if ( *flagid == 'I' )
     {
-        SzList_push( include_path, flagid + 1 );
+        add_source_file_path( flagid + 1 );
     }
 
     else if ( *flagid == 'L' )

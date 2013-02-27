@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.9 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.10 2013-02-27 22:34:16 pauloscustodio Exp $ */
 /* $Log: options.h,v $
-/* Revision 1.9  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.10  2013-02-27 22:34:16  pauloscustodio
+/* Move include path search to srcfile.c
+/*
+/* Revision 1.9  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -116,7 +119,6 @@ extern void reset_options( void );
 extern void set_asm_flag( char *flagid );
 
 /* search files in paths */
-extern char *search_include_file( char *filename );
 extern char *search_lib_file( char *filename );
 
 #endif /* ndef OPTIONS_H */
