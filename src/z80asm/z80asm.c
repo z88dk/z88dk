@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.69 2013-02-22 17:26:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.70 2013-02-27 20:47:53 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.69  2013-02-22 17:26:33  pauloscustodio
+/* Revision 1.70  2013-02-27 20:47:53  pauloscustodio
+/* comments
+/*
+/* Revision 1.69  2013/02/22 17:26:33  pauloscustodio
 /* Decouple assembler from listfile handling
 /*
 /* Revision 1.68  2013/02/19 22:52:40  pauloscustodio
@@ -585,7 +588,9 @@ AssembleSourceFile( void )
         fwritec_err( objhdrprefix, strlen( objhdrprefix ), objfile );
 
         set_PC( 0 );
-        copy( staticroot, &CURRENTMODULE->localroot, ( int ( * )( void *, void * ) ) cmpidstr, ( void * ( * )( void * ) ) createsym );
+        copy( staticroot, &CURRENTMODULE->localroot, 
+			  ( int ( * )( void *, void * ) ) cmpidstr, 
+			  ( void * ( * )( void * ) ) createsym );
 
         /* Create standard 'ASMPC' identifier */
         DefineDefSym( ASSEMBLERPC, get_PC(), 0, &globalroot );
@@ -660,9 +665,12 @@ AssembleSourceFile( void )
             fputc_err( '\n', deffile );    /* separate DEFC lines for each module */
         }
 
-        deleteall( &CURRENTMODULE->localroot, ( void ( * )( void * ) ) FreeSym );
-        deleteall( &CURRENTMODULE->notdeclroot, ( void ( * )( void * ) ) FreeSym );
-        deleteall( &globalroot, ( void ( * )( void * ) ) FreeSym );
+        deleteall( &CURRENTMODULE->localroot, 
+				   ( void ( * )( void * ) ) FreeSym );
+        deleteall( &CURRENTMODULE->notdeclroot, 
+			       ( void ( * )( void * ) ) FreeSym );
+        deleteall( &globalroot, 
+			       ( void ( * )( void * ) ) FreeSym );
     }
 }
 

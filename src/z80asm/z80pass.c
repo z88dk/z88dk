@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.42 2013-02-26 02:36:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.43 2013-02-27 20:47:53 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.42  2013-02-26 02:36:54  pauloscustodio
+/* Revision 1.43  2013-02-27 20:47:53  pauloscustodio
+/* comments
+/*
+/* Revision 1.42  2013/02/26 02:36:54  pauloscustodio
 /* Simplified symbol output to listfile by using SymbolRefList argument
 /*
 /* Revision 1.41  2013/02/26 02:11:32  pauloscustodio
@@ -431,15 +434,14 @@ parseline( enum flag interpret )
             /* Generate only possible label declaration if line parsing is allowed */
             if ( sym == label || GetSym() == name )
             {
-                DefineSymbol( ident, get_PC(), SYMADDR | SYMTOUCHED ); /* labels must always be
-                                                                         * touched due to forward */
-                GetSym();      /* check for another identifier *//* referencing problems in
-                                   * expressions */
+				/* labels must always be touched due to forward referencing problems in expressions */
+                DefineSymbol( ident, get_PC(), SYMADDR | SYMTOUCHED ); 
+                                                                         
+                GetSym();      /* check for another identifier */				
             }
             else
             {
-                error( ERR_ILLEGAL_IDENT );       /* a name must follow a
-                                                                                 * label declaration */
+                error( ERR_ILLEGAL_IDENT );       /* a name must follow a label declaration */
                 return;       /* read in a new source line */
             }
         }
