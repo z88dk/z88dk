@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.3 2013-02-22 17:21:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.4 2013-02-28 00:32:35 pauloscustodio Exp $
 # $Log: whitebox-dynstr.t,v $
-# Revision 1.3  2013-02-22 17:21:29  pauloscustodio
+# Revision 1.4  2013-02-28 00:32:35  pauloscustodio
+# New interface to Str to copy characters to string
+#
+# Revision 1.3  2013/02/22 17:21:29  pauloscustodio
 # Added chomp()
 #
 # Revision 1.2  2013/01/20 21:24:29  pauloscustodio
@@ -101,6 +104,17 @@ END_INIT
 	Str_szset(s1, "world");
 	check_str(s1, 256, 5, "world");
 
+
+	Str_chset(s1, 'X');
+	check_str(s1, 256, 1, "X");
+
+	Str_chset(s1, 'H');
+	check_str(s1, 256, 1, "H");
+
+	Str_chcat(s1, 'E');
+	check_str(s1, 256, 2, "HE");
+
+	
 	warn("Str_clear\n");
 	Str_clear(s1);
 	check_str(s1, 256, 0, "");

@@ -17,9 +17,12 @@ Using class.h for automatic garbage collection.
 Strings may contain zero byte, length is defined by separate field.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.5 2013-02-22 17:21:29 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.6 2013-02-28 00:32:35 pauloscustodio Exp $ */
 /* $Log: dynstr.c,v $
-/* Revision 1.5  2013-02-22 17:21:29  pauloscustodio
+/* Revision 1.6  2013-02-28 00:32:35  pauloscustodio
+/* New interface to Str to copy characters to string
+/*
+/* Revision 1.5  2013/02/22 17:21:29  pauloscustodio
 /* Added chomp()
 /*
 /* Revision 1.4  2013/01/20 21:24:28  pauloscustodio
@@ -131,6 +134,28 @@ void Str_bcat( Str *self, char *source, size_t size )
 
     self->len += size;
 }
+
+/*-----------------------------------------------------------------------------
+*   set / cat from char
+*----------------------------------------------------------------------------*/
+void Str_chset( Str *self, char ch )
+{
+    Str_clear( self );
+    Str_chcat( self, ch );
+}
+
+void Str_chcat( Str *self, char ch )
+{
+	char buff[2];
+
+	/* build sz string */
+	buff[0] = ch;
+	buff[1] = 0;
+
+	/* szcat */
+	Str_szcat( self, buff );
+}
+
 
 /*-----------------------------------------------------------------------------
 *   sprintf-like set / cat

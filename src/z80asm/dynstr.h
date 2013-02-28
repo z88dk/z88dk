@@ -17,9 +17,12 @@ Using class.h for automatic garbage collection.
 Strings may contain zero byte, length is defined by separate field.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.h,v 1.4 2013-02-22 17:21:29 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.h,v 1.5 2013-02-28 00:32:35 pauloscustodio Exp $ */
 /* $Log: dynstr.h,v $
-/* Revision 1.4  2013-02-22 17:21:29  pauloscustodio
+/* Revision 1.5  2013-02-28 00:32:35  pauloscustodio
+/* New interface to Str to copy characters to string
+/*
+/* Revision 1.4  2013/02/22 17:21:29  pauloscustodio
 /* Added chomp()
 /*
 /* Revision 1.3  2013/01/20 21:24:28  pauloscustodio
@@ -78,6 +81,10 @@ extern void Str_unreserve( Str *self );
 /* set / cat from memory buffer, add always a zero byte after */
 extern void Str_bset( Str *self, char *source, size_t size );
 extern void Str_bcat( Str *self, char *source, size_t size );
+
+/* set / cat from char */
+extern void Str_chset( Str *self, char ch );
+extern void Str_chcat( Str *self, char ch );
 
 /* set / cat from char* */
 #define Str_szset(self,source)  Str_bset((self),(source),strlen(source))
