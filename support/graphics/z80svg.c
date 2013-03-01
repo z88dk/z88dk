@@ -11,7 +11,7 @@
    MinGW
    gcc -Wall -O2 -o z80svg z80svg.c libxml2.dll
 
-   $Id: z80svg.c,v 1.15 2012-11-23 17:13:50 stefano Exp $
+   $Id: z80svg.c,v 1.16 2013-03-01 09:42:47 stefano Exp $
  * ----------------------------------------------------------
 */
 
@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <ctype.h>
 #include <string.h>
 #include <math.h>
 #include <libxml2/libxml/parser.h>
@@ -236,6 +237,7 @@ unsigned char oldx, oldy;
 
 /* Positioning */
 float scale=100;
+float xyproportion=1;
 float width, height;
 float xx,yy,cx,cy,fx,fy;
 float lm,rm,tm,bm;
@@ -623,7 +625,7 @@ char * tmpstr;
 
 	tmpstr=malloc(100);
 	/* Scale and shift the picture (part of the main loop) */
-	cx=(scale*(cx-xx)/100);
+	cx=(scale*xyproportion*(cx-xx)/100);
 	cy=(scale*(cy-yy)/100);
 	if (rotate==1) {
 		ax=cx;	cx=cy;	cy=ax;
@@ -717,6 +719,7 @@ int main( int argc, char *argv[] )
 			fprintf(stderr,"\n      Default is the source SVG file name with trailing '.h'.");
 			fprintf(stderr,"\n   -a: shift and resize automatically to roughly 100 points.");
 			fprintf(stderr,"\n   -sSCALE: optional percentage to resize the picture size.");
+			fprintf(stderr,"\n   -zPROPORTION: x/y proportion (default is 1).");
 			fprintf(stderr,"\n   -xXSHIFT: optional top-left corner shifting, X coordinate.");
 			fprintf(stderr,"\n      Negative values are allowed.");
 			fprintf(stderr,"\n   -yYSHIFT: optional top-left corner shifting, Y coordinate.");
@@ -755,39 +758,46 @@ int main( int argc, char *argv[] )
 				exit(4);
 			}
 			break;
+	   case 'z' :
+			xyproportion=atof(arg+2);
+			if (xyproportion < 1) {
+				fprintf(stderr,"\nInvalid value for x/y proportion\n");
+				exit(5);
+			}
+			break;
 	   case 'x' :
 			xshift=atoi(arg+2);
 			if (strlen(arg)==2) {
 				fprintf(stderr,"\nInvalid X shifting value.\n");
-				exit(5);
+				exit(6);
 			}
 			break;
 	   case 'y' :
 			yshift=atoi(arg+2);
 			if (strlen(arg)==2) {
 				fprintf(stderr,"\nInvalid Y shifting value.\n");
-				exit(6);
+				exit(7);
 			}
 			break;
 	   case 'c' :
 			color=atoi(arg+2);
 			if (color > 15) {
 				fprintf(stderr,"\nInvalid color.\n");
-				exit(7);
+				exit(8);
 			}
 			break;
 	   case 'l' :
 			maxelements=atoi(arg+2);
 			if (maxelements > 255) {
 				fprintf(stderr,"\nInvalid max. number of line elements per row.\n");
-				exit(8);
+				exit(9);
 			}
 			break;
 	   case 'b' :
 			color_balance=atoi(arg+2);
 			if ((color_balance > 10)||(color_balance < -10)) {
 				fprintf(stderr,"\nInvalid color brightness shift.\n");
-				exit(9);
+				exit(10);
 			}
 			break;
 	   case 'w' :
@@ -809,21 +819,21 @@ int main( int argc, char *argv[] )
 			pathdetails=atoi(arg+2);
 			if ((pathdetails==0)||(pathdetails>2)) {
 				fprintf(stderr,"\nInvalid path detail listing option.\n");
-				exit(10);
+				exit(11);
 			}
 			break;
 	   case 'f' :
 			forcedmode=atoi(arg+2);
 			if ((forcedmode==0)||(forcedmode>7)) {
 				fprintf(stderr,"\nInvalid 'force mode' option.\n");
-				exit(11);
+				exit(12);
 			}
 			break;
 	   case 'e' :
 			expanded=atoi(arg+2);
 			if (expanded>2) {
 				fprintf(stderr,"\nInvalid option for expanded format.\n");
-				exit(12);
+				exit(13);
 			}
 			break;
 	   case 'a' :
@@ -868,14 +878,14 @@ autoloop:
 	
 	if (doc == NULL ) {
 		fprintf(stderr,"Error, can't parse the source SVG file   %s\n",sname);
-		exit(13);
+		exit(14);
 	}
  
  	node = xmlDocGetRootElement(doc);
 	if (node == NULL) {
 		fprintf(stderr,"Error empty SVG document\n");
 		xmlFreeDoc(doc);
-		exit(14);
+		exit(15);
 	}
 
 	if (strlen(dname)==0) sprintf(dname,"%s", sname);
@@ -886,7 +896,7 @@ autoloop:
 		fprintf(stderr,"Error, can't open the destination file   %s\n", Dummy);
 		xmlFreeDoc(doc);
 		(void)fcloseall();
-		exit(15);
+		exit(16);
     }
 	fprintf(stderr,"\nOutput file is %s\n", Dummy);
 
@@ -897,7 +907,7 @@ autoloop:
 		fprintf(stderr, "Error writing on target file:  %s\n", dname );
 		xmlFreeDoc(doc);
 		(void)fcloseall();
-		exit(16);
+		exit(17);
     }
 
  		// Check if it is an svg file
@@ -905,7 +915,7 @@ autoloop:
 		{
 			fprintf(stderr, "Not an svg file\n");
 			xmlFreeDoc(doc);
-			exit(17);
+			exit(18);
 		}
 
 		//destline=malloc(5000);

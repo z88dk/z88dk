@@ -5,7 +5,7 @@
 ;
 ;		void draw_profile(int dx, int dy, int scale, unsigned char *metapic);
 ;
-;	$Id: draw_profile.asm,v 1.5 2011-01-14 14:20:13 stefano Exp $
+;	$Id: draw_profile.asm,v 1.6 2013-03-01 09:42:47 stefano Exp $
 ;
 
 
@@ -66,9 +66,9 @@ getbyte:
 
 getx:
 	ld	hl,(_vx)
-IF (maxx > 256)
-	add hl,hl	; double size for X in wide mode !
-ENDIF
+;IF (maxx > 256)
+;	add hl,hl	; double size for X in wide mode !
+;ENDIF
 	call getparm
 	ret
 
@@ -110,8 +110,14 @@ draw_profile:
 	ld	l,(ix+4)
 	ld	(_percent),hl
 	ld	l,(ix+6)
+IF (maxx > 256)
+	ld	h,(ix+7)
+ENDIF
 	ld	(_vy),hl
 	ld	l,(ix+8)
+IF (maxx > 256)
+	ld	h,(ix+9)
+ENDIF
 	ld	(_vx),hl
 	
 IF (maxx > 256)
