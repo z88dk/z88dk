@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.27 2013-02-19 12:56:09 stefano Exp $
+ *   $Id: appmake.h,v 1.28 2013-03-01 10:03:42 stefano Exp $
  */
 
 
@@ -58,6 +58,9 @@ extern option_t  hex_options;
 
 extern int       m5_exec(char *target);
 extern option_t  m5_options;
+
+extern int       mc_exec(char *target);
+extern option_t  mc_options;
 
 extern int       msx_exec(char *target);
 extern option_t  msx_options;
@@ -134,7 +137,7 @@ struct {
       "Creates a BASIC loader and a tape file for the ABC computers",
       abc80_exec,   &abc80_options },
     { "acetap",  "ace",    "(C) 2001 Stefano Bodrato",
-      "Generates a .TAP for the Ace32 emulator and optionally a WAV file",
+      "Generates a .TAP for the Ace32 emulator, optional WAV file",
       acetap_exec,   &acetap_options },
     { "bin2caq",  "aquarius", "(C) 2001 Stefano Bodrato",
       "Creates a BASIC loader file and binary stored in variable array format",
@@ -155,8 +158,11 @@ struct {
       "Creates an intel hex record suitable for embedded devices",
       hex_exec,     &hex_options },
     { "bin2m5",   "m5",      "(C) 2010 Stefano Bodrato",
-      "Generates a tape file for the Sord M5, optionally a WAV file",
+      "Generates a tape file for the Sord M5, optional WAV file",
       m5_exec,   &m5_options },
+    { "mc1000",   "mc",      "(C) 2013 Stefano Bodrato",
+      "Generates a CAS file for the CCE MC-1000, optional WAV file",
+      mc_exec,   &mc_options },
     { "bin2msx",  "msx",      "(C) 2001 Stefano Bodrato",
       "Adds a file header to enable the program to be loaded using 'bload \"file.bin\",r",
       msx_exec,     &msx_options },
@@ -227,13 +233,13 @@ struct {
       "Creates a zxvgs application file",
       zxvgs_exec,   &zxvgs_options},
     { "bin2tap",  "zx",       "(C) 2000,2003 Dominic Morris & Stefano Bodrato", 
-      "Generates a .TAP file complete with BASIC header, optionally a WAV file",
+      "Generates a .TAP file complete with BASIC header, optional WAV file",
       zx_exec,      &zx_options },
     { "bin2p",    "zx81",     "(C) 2000 Stefano Bodrato",                         
-      "Generates a .P file suitable for use by emulators, optionally a WAV file",
+      "Generates a .P file suitable for use by emulators, optional WAV file",
       zx81_exec,    &zx81_options }
 };
-#define APPMAKE_TARGETS 34
+#define APPMAKE_TARGETS 35
 #endif
 
 
