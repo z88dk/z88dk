@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.39 2013-02-27 22:34:16 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.40 2013-03-02 23:48:55 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.39  2013-02-27 22:34:16  pauloscustodio
+/* Revision 1.40  2013-03-02 23:48:55  pauloscustodio
+/* New LEGACY define to mark code that should be removed but is kept
+/* to keep backwards compatibility
+/*
+/* Revision 1.39  2013/02/27 22:34:16  pauloscustodio
 /* Move include path search to srcfile.c
 /*
 /* Revision 1.38  2013/02/19 22:52:40  pauloscustodio
@@ -1164,10 +1168,12 @@ Fetchfilename( FILE *fptr )
 
     ptr = ident;
 
+#ifdef LEGACY
     if ( *ptr == '#' )
     {
         ptr++;
     }
+#endif
 
     return strlen( ptr ) ? search_source_file( ptr ) : "";
 }

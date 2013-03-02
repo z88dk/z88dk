@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.22 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.23 2013-03-02 23:48:55 pauloscustodio Exp $ */
 /* $Log: config.h,v $
-/* Revision 1.22  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.23  2013-03-02 23:48:55  pauloscustodio
+/* New LEGACY define to mark code that should be removed but is kept
+/* to keep backwards compatibility
+/*
+/* Revision 1.22  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -180,3 +184,8 @@ Copyright (C) Paulo Custodio, 2011-2013
 #else
 #define FILEEXT_SEPARATOR "."
 #endif
+
+
+/* defined to keep the legacy features, undefined to discard them */
+#define LEGACY
+ 
