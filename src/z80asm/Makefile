@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.47 2013-02-27 22:29:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.48 2013-03-02 23:49:44 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.47  2013-02-27 22:29:59  pauloscustodio
+# Revision 1.48  2013-03-02 23:49:44  pauloscustodio
+# depends
+#
+# Revision 1.47  2013/02/27 22:29:59  pauloscustodio
 # New srcfile.c to handle reading lines from source files
 #
 # Revision 1.46  2013/02/26 02:11:32  pauloscustodio
@@ -320,8 +323,8 @@ prsline.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 prsline.o: types.h symbol.h model.h class.h queue.h classlist.h options.h
 prsline.o: errors.h errors_def.h
 safestr.o: safestr.h memalloc.h except.h e4c.h types.h
-srcfile.o: memalloc.h except.h e4c.h file.h strlist.h class.h queue.h types.h
-srcfile.o: srcfile.h classlist.h dynstr.h
+srcfile.o: memalloc.h except.h e4c.h errors.h errors_def.h file.h strlist.h
+srcfile.o: class.h queue.h types.h srcfile.h classlist.h dynstr.h strpool.h
 strhash.o: memalloc.h except.h e4c.h strhash.h types.h class.h queue.h
 strhash.o: uthash.h die.h strpool.h
 strlist.o: memalloc.h except.h e4c.h strlist.h class.h queue.h types.h
