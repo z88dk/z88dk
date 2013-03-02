@@ -17,9 +17,12 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.1 2013-02-27 22:31:43 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.2 2013-03-02 23:52:49 pauloscustodio Exp $ */
 /* $Log: srcfile.h,v $
-/* Revision 1.1  2013-02-27 22:31:43  pauloscustodio
+/* Revision 1.2  2013-03-02 23:52:49  pauloscustodio
+/* Add API to handle a stack of open sorce files and singleton API
+/*
+/* Revision 1.1  2013/02/27 22:31:43  pauloscustodio
 /* New srcfile.c to handle reading lines from source files
 /*
 /*
@@ -47,8 +50,6 @@ extern void add_source_file_path( char *directory );
    in strpool, no need to free */
 extern char *search_source_file( char *filename );
 
-#if 0
-
 /*-----------------------------------------------------------------------------
 *   Class to hold stack of input lines to read next
 *----------------------------------------------------------------------------*/
@@ -68,6 +69,7 @@ CLASS( SourceFile )
 									   Next line read is on the top of the stack */
 END_CLASS;
 
+
 /*-----------------------------------------------------------------------------
 *	SourceFile API
 *----------------------------------------------------------------------------*/
@@ -83,14 +85,45 @@ extern void SourceFile_open( SourceFile *self, char *source_file );
 extern char *SourceFile_getline( SourceFile *self );
 
 /* push lines to the line_stack, to be read next - they need to be pushed 
-   in reverse order, i.e. last pushed is next to be retrieved */
+   in reverse order, i.e. last pushed is next to be retrieved 
+   line may contain multiple lines separated by '\n', they are split and
+   pushed back-to-forth so that first text is first to retrieve from getline() */
 extern void SourceFile_ungetline( SourceFile *self, char *line );
+
+
+/*-----------------------------------------------------------------------------
+*   Class to hold stack of input files, current is on top
+*----------------------------------------------------------------------------*/
+CLASS_LIST( SourceFile );
+
+
+/*-----------------------------------------------------------------------------
+*	SourceFileList API - same as SourceFile, but keep all open files in a
+*	stack, manipulate the top element
+*----------------------------------------------------------------------------*/
+/* open a new file pushing it to top of stack
+   abort with error if same file already open below in stack,
+   to avoid infinite include recursion */
+extern void  SourceFileList_open( SourceFileList *self, char *source_file );
+extern char *SourceFileList_getline( SourceFileList *self );
+extern void  SourceFileList_ungetline( SourceFileList *self, char *line );
+
+/* get current file, line and line number */
+extern char *SourceFileList_filename( SourceFileList *self );
+extern char *SourceFileList_line( SourceFileList *self );
+extern int   SourceFileList_line_nr( SourceFileList *self );
+
 
 /*-----------------------------------------------------------------------------
 *	Singleton API - all methods work on one global list object
 *	See description for corresponding method above
 *----------------------------------------------------------------------------*/
+extern void  source_open( char *source_file );
+extern char *source_getline( void );
+extern void  source_ungetline( char *line );
+extern char *source_filename( void );
+extern char *source_line( void );
+extern int   source_line_nr( void );
 
-#endif
 
 #endif /* ndef SRCFILE_H */
