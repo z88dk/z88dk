@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.21 2013-01-20 21:10:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.22 2013-03-02 23:50:38 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.21  2013-01-20 21:10:32  pauloscustodio
+/* Revision 1.22  2013-03-02 23:50:38  pauloscustodio
+/* use getc() instead of fgetc()
+/*
+/* Revision 1.21  2013/01/20 21:10:32  pauloscustodio
 /* Rename bool to BOOL, to be consistent with TRUE and FALSE and
 /* distinguish from C++ bool, true, false
 /*
@@ -470,7 +473,7 @@ void fputc_err( int c, FILE *stream )
 
 int fgetc_err( FILE *stream )
 {
-    int ret = fgetc( stream );
+    int ret = getc( stream );
 
     if ( ret == EOF )
     {
