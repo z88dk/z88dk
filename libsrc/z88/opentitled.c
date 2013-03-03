@@ -19,7 +19,7 @@ static char winapl[] = "\x013@  \x012A";
 void opentitled(int wid,int tlx,int tly,int width,int height,char *name)
 {
 #asm
-	include	"#stdio.def"
+	include	"stdio.def"
 	LIB	opwin
 
 	ld	ix,2		; IX points to name

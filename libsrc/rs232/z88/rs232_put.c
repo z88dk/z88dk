@@ -15,7 +15,7 @@
 u8_t rs232_put(i8_t char)
 {	/* Fastcall so implicit push */
 #asm
-	INCLUDE	"#serintfc.def"
+	INCLUDE	"serintfc.def"
 	ld	a,l	;get byte
 	ld	l,si_pbt
 	ld	bc,0	;timeout

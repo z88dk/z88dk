@@ -6,7 +6,7 @@
  *      Preserve tabs!!
  *
  * -----
- * $Id: readbyte.c,v 1.3 2003-10-01 20:01:07 dom Exp $
+ * $Id: readbyte.c,v 1.4 2013-03-03 23:51:11 pauloscustodio Exp $
  */
 
 
@@ -18,7 +18,7 @@
 int __FASTCALL__ readbyte(int fd)
 {
 #asm
-        INCLUDE "#fileio.def"
+        INCLUDE "fileio.def"
 
 	pop     ix      ; On entry to FASTCALL function, the parameter
 			; is pushed onto the stack        

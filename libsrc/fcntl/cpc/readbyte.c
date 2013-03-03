@@ -5,7 +5,7 @@
  *
  *
  * -----
- * $Id: readbyte.c,v 1.2 2007-07-21 21:28:22 dom Exp $
+ * $Id: readbyte.c,v 1.3 2013-03-03 23:51:10 pauloscustodio Exp $
  */
 
 
@@ -19,7 +19,7 @@ int __FASTCALL__ readbyte(int fd)
 	if ( fd != 0 )		/* Check to see if this is the read file */
 		return EOF;
 #asm
-        INCLUDE "#cpcfirm.def"
+        INCLUDE "cpcfirm.def"
     call    firmware
 	defw	cas_in_char
 	ccf

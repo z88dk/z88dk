@@ -8,7 +8,7 @@
  *	djm 13/3/2000
  *
  * -----
- * $Id: brotherdor.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
+ * $Id: brotherdor.c,v 1.3 2013-03-03 23:51:10 pauloscustodio Exp $
  */
 
 #include <z88.h>
@@ -16,7 +16,7 @@
 int brotherdor(int handle, char *type)
 {
 #asm
-	INCLUDE	"#dor.def"
+	INCLUDE	"dor.def"
 	pop	de
 	pop	ix
 	push	ix

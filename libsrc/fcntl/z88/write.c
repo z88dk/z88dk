@@ -9,7 +9,7 @@
  *      fclose from the other stuff
  *
  * -----
- * $Id: write.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
+ * $Id: write.c,v 1.3 2013-03-03 23:51:11 pauloscustodio Exp $
  */
 
 
@@ -20,7 +20,7 @@
 size_t write(int fd, void *ptr, size_t len)
 {
 #asm
-        INCLUDE         "#fileio.def"
+        INCLUDE         "fileio.def"
 
         ld      ix,2
         add     ix,sp

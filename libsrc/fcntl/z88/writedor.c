@@ -6,7 +6,7 @@
  *	djm 13/3/2000
  *
  * -----
- * $Id: writedor.c,v 1.3 2002-04-07 15:36:25 dom Exp $
+ * $Id: writedor.c,v 1.4 2013-03-03 23:51:11 pauloscustodio Exp $
  */
 
 
@@ -15,7 +15,7 @@
 void writedor(int handle, char type, char len, void *buf)
 {
 #asm
-	INCLUDE	"#dor.def"
+	INCLUDE	"dor.def"
 	ld	iy,0		;Use iy as framepointer for ease
 	add	iy,sp
 	ld	e,(iy+2)	;buffer

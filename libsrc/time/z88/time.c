@@ -6,7 +6,7 @@
  *	Our epoch is the UNIX epoch of 00:00:00 1/1/1970
  *
  * --------
- * $Id: time.c,v 1.3 2001-04-18 12:40:07 stefano Exp $
+ * $Id: time.c,v 1.4 2013-03-03 23:51:11 pauloscustodio Exp $
  */
 
 
@@ -34,7 +34,7 @@ time_t time(time_t *store)
 long gtoy()
 {
 #asm
-	INCLUDE	"#time.def"
+	INCLUDE	"time.def"
 	ld	de,2
 	call_oz(gn_gmd)	;abc, a=MSB
 	ld	d,0

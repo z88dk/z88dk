@@ -8,7 +8,7 @@
  *	djm 13/3/2000
  *
  * -----
- * $Id: sondor.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
+ * $Id: sondor.c,v 1.3 2013-03-03 23:51:11 pauloscustodio Exp $
  */
 
 
@@ -17,7 +17,7 @@
 int sondor(int handle, char *type)
 {
 #asm
-	INCLUDE	"#dor.def"
+	INCLUDE	"dor.def"
 	pop	de
 	pop	ix
 	push	ix

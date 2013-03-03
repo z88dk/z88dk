@@ -12,7 +12,7 @@
  *	djm 9/1/2000
  *	
  * --------
- * $Id: clock.c,v 1.2 2001-04-18 12:40:07 stefano Exp $
+ * $Id: clock.c,v 1.3 2013-03-03 23:51:11 pauloscustodio Exp $
  */
 
 #include <time.h>
@@ -25,7 +25,7 @@
 clock_t clock()
 {
 #asm
-	INCLUDE	"#time.def"
+	INCLUDE	"time.def"
 	ld	de,2	;FIX djm 13/3/2000 DN3.23 states de=1 is illegal
 	call_oz(gn_gmt)	;abc, a=MSB
 	ld	d,0

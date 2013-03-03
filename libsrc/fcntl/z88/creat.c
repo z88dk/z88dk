@@ -6,7 +6,7 @@
  *      djm 27/4/99
  *
  * -----
- * $Id: creat.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
+ * $Id: creat.c,v 1.3 2013-03-03 23:51:10 pauloscustodio Exp $
  */
 
 
@@ -15,7 +15,7 @@
 int creat(far char *name, mode_t mode)
 {
 #asm
-        INCLUDE "#fileio.def"
+        INCLUDE "fileio.def"
         
         ld      ix,0
         add     ix,sp

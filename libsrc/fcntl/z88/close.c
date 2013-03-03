@@ -9,7 +9,7 @@
  *      fclose from the other stuff
  *
  * -----
- * $Id: close.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
+ * $Id: close.c,v 1.3 2013-03-03 23:51:10 pauloscustodio Exp $
  */
 
 
@@ -19,7 +19,7 @@
 int close(int fd)
 {
 #asm
-        INCLUDE         "#fileio.def"
+        INCLUDE         "fileio.def"
         pop     bc
         pop     hl
         push    hl

@@ -12,7 +12,7 @@
  *   2  SEEK_END from end of file (always -ve)
  *
  * -----
- * $Id: lseek.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
+ * $Id: lseek.c,v 1.3 2013-03-03 23:51:10 pauloscustodio Exp $
  */
 
 
@@ -21,7 +21,7 @@
 long lseek(int fd, long posn, int whence)
 {
 #asm
-        INCLUDE "#fileio.def"
+        INCLUDE "fileio.def"
         
         ld      ix,0    
         add     ix,sp

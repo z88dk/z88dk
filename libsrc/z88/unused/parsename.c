@@ -9,7 +9,7 @@
 int parsefile(far char *name, wildcard_t *st)
 {
 #asm
-	INCLUDE	"#fileio.def"
+	INCLUDE	"fileio.def"
 	ld	ix,0
 	add	ix,sp
 	ld	e,(ix+2)	;st

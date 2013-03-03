@@ -3,7 +3,7 @@
  *
  * 	Open a CPC file for reading
  * -----
- * $Id: cpc_openin.c,v 1.2 2007-07-21 21:28:22 dom Exp $
+ * $Id: cpc_openin.c,v 1.3 2013-03-03 23:51:10 pauloscustodio Exp $
  */
 
 
@@ -12,7 +12,7 @@
 int cpc_openin(char *name, int len, char *buf)
 {
 #asm
-	INCLUDE		"#cpcfirm.def"
+	INCLUDE		"cpcfirm.def"
 	LIB		cpc_setup_open
 	call	cpc_setup_open
     call    firmware

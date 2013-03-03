@@ -10,7 +10,7 @@
 int wcclose(wild_t handle)
 {
 #asm
-	INCLUDE	"#fileio.def"
+	INCLUDE	"fileio.def"
 	pop	bc
 	pop	ix	;handle
 	push	ix

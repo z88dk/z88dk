@@ -3,7 +3,7 @@
  *
  *	18/3/2000 djm
  *
- *	$Id: read.c,v 1.4 2003-10-11 12:19:23 dom Exp $
+ *	$Id: read.c,v 1.5 2013-03-03 23:51:10 pauloscustodio Exp $
  */
 
 #include <fcntl.h>
@@ -11,7 +11,7 @@
 size_t read(int handle, void *buf, size_t len)
 {
 #asm
-	INCLUDE	"#p3dos.def"
+	INCLUDE	"p3dos.def"
 	XREF	dodos
 	ld	ix,0
 	add	ix,sp

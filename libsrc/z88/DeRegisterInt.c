@@ -13,7 +13,7 @@
 int DeRegisterInt(void)
 {
 #pragma asm
-	INCLUDE	"#packages.def"
+	INCLUDE	"packages.def"
 ; First of all check that package system is there
 	call_pkg(pkg_ayt)
 	ld	hl,0	;Failure

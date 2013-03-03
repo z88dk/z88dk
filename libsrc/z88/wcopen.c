@@ -10,7 +10,7 @@
 wild_t	wcopen(far char *string, int mode)
 {
 #asm
-	INCLUDE	"#fileio.def"
+	INCLUDE	"fileio.def"
 	ld	ix,0
 	add	ix,sp
 	ld	l,(ix+4)

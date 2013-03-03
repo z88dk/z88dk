@@ -12,7 +12,7 @@
 pid_t	getpid(void)
 {
 #pragma asm
-	INCLUDE	"#packages.def"
+	INCLUDE	"packages.def"
 	call_pkg(pkg_ayt)
 	ld	hl,-1		;failure
 	ret	c		;failed

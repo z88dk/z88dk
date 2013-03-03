@@ -10,7 +10,7 @@
 char *fnexpand(far char *string, char *buffer, size_t size)
 {
 #asm
-	INCLUDE	"#fileio.def"
+	INCLUDE	"fileio.def"
 	ld	ix,0
 	add	ix,sp
 	ld	l,(ix+6)	;filename

@@ -4,7 +4,7 @@
  *	djm 13/3/2000 - Hacked from fopen
  *
  * -----
- * $Id: opendor.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
+ * $Id: opendor.c,v 1.3 2013-03-03 23:51:11 pauloscustodio Exp $
  */
 
 
@@ -13,7 +13,7 @@
 int opendor(char *filename)
 {
 #asm
-	INCLUDE	"#fileio.def"
+	INCLUDE	"fileio.def"
 ;Create some room on the stack for the filename to be expanded into..
 	pop	bc
 	pop	de	;filename

@@ -16,7 +16,7 @@
 
 #if 0
 #asm
-        INCLUDE "#director.def"
+        INCLUDE "director.def"
 #endasm
 #endif
 

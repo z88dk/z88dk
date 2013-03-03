@@ -8,7 +8,7 @@
 void nameapp(char *name)
 {
 #asm
-	INCLUDE	"#director.def"
+	INCLUDE	"director.def"
 	pop	bc
 	pop	hl
 	push	hl

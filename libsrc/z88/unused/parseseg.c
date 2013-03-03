@@ -10,7 +10,7 @@ int parseseg(far char *seg, far char **end)
 {
 /* NB far char * is 3 bytes, far char ** is two */
 #asm
-	INCLUDE	"#fileio.def"
+	INCLUDE	"fileio.def"
 	ld	ix,0
 	add	ix,sp
 	ld	l,(ix+4)	;seg

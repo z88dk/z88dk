@@ -14,7 +14,7 @@
  *	Open a file for writing - e=4, d=2 (creat)
  *	Open a file for append  - e=2, d=2
  *
- *	$Id: open.c,v 1.4 2003-10-10 11:05:02 dom Exp $
+ *	$Id: open.c,v 1.5 2013-03-03 23:51:10 pauloscustodio Exp $
  */
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */
@@ -23,7 +23,7 @@
 int open(far char *name, int flags, mode_t mode)
 {                                      
 #asm
-	INCLUDE	"#p3dos.def"
+	INCLUDE	"p3dos.def"
 	XREF	dodos
 	ld	ix,2
 	add	ix,sp

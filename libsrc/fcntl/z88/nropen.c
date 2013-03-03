@@ -19,7 +19,7 @@
  *	djm 15/4/2000
  *
  * -----
- * $Id: nropen.c,v 1.2 2001-04-18 14:59:40 stefano Exp $
+ * $Id: nropen.c,v 1.3 2013-03-03 23:51:11 pauloscustodio Exp $
  */
 
 
@@ -28,7 +28,7 @@
 int nropen(char *name, int flags, mode_t mode, char *buf, size_t len)
 {
 #asm
-        INCLUDE "#fileio.def"
+        INCLUDE "fileio.def"
         
         ld      ix,0
         add     ix,sp

@@ -3,7 +3,7 @@
  *
  *	18/3/2000 djm
  *
- *	$Id: write.c,v 1.2 2003-10-10 11:05:02 dom Exp $
+ *	$Id: write.c,v 1.3 2013-03-03 23:51:10 pauloscustodio Exp $
  */
 
 #include <fcntl.h>
@@ -11,7 +11,7 @@
 size_t write(int handle, void *buf, size_t len)
 {
 #asm
-	INCLUDE "#p3dos.def"
+	INCLUDE "p3dos.def"
 	XREF	dodos
 	ld	ix,0
 	add	ix,sp

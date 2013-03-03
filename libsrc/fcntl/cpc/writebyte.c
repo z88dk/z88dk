@@ -5,7 +5,7 @@
  *
  *
  * -----
- * $Id: writebyte.c,v 1.2 2007-07-21 21:28:22 dom Exp $
+ * $Id: writebyte.c,v 1.3 2013-03-03 23:51:10 pauloscustodio Exp $
  */
 
 
@@ -19,7 +19,7 @@ int writebyte(int fd, int byte)
 	if ( fd != 1 )		/* Check to see if this is the write file */
 		return EOF;
 #asm
-        INCLUDE "#cpcfirm.def"
+        INCLUDE "cpcfirm.def"
 	pop	    bc
 	pop	    hl	;byte
 	pop	    de	;file handle (ignore it)

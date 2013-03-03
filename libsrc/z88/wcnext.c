@@ -9,7 +9,7 @@
 int wcnext(wild_t handle, void *buffer, size_t len, wildcard_t *wst)
 {
 #asm
-	INCLUDE	"#fileio.def"
+	INCLUDE	"fileio.def"
 	ld	ix,0
 	add	ix,sp
 	ld	c,(ix+4)	;len

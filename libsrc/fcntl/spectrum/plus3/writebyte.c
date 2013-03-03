@@ -8,7 +8,7 @@
  *	Enter with de = filehandle
  *		    c = byte to write
  *
- *	$Id: writebyte.c,v 1.3 2003-10-10 11:05:02 dom Exp $
+ *	$Id: writebyte.c,v 1.4 2013-03-03 23:51:10 pauloscustodio Exp $
  */
 
 #include <fcntl.h>
@@ -16,7 +16,7 @@
 int writebyte(int handle, int byte)
 {
 #asm
-	INCLUDE "#p3dos.def"
+	INCLUDE "p3dos.def"
 	XREF	dodos
 	pop	bc
 	pop	hl	;byte

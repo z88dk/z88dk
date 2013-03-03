@@ -25,7 +25,7 @@ void openpopup(int wid,int tlx,int tly,int width,int height,char *name)
 {
 #asm
 	LIB	opwin
-	include	"#stdio.def"
+	include	"stdio.def"
 
 	ld	ix,2		; IX points to name
 	add	ix,sp

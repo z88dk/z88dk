@@ -18,7 +18,7 @@ int exec_cli(char *str)
 int exec_cli_i(char *str, size_t len)
 {
 #asm
-	INCLUDE	"#director.def"
+	INCLUDE	"director.def"
 	pop	de
 	pop	bc
 	pop	hl
