@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.49 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.50 2013-03-04 23:23:37 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.49  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.50  2013-03-04 23:23:37  pauloscustodio
+/* Removed writeline, that was used to cancel listing of multi-line
+/* constructs, as only the first line was shown on the list file. Fixed
+/* the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
+/*
+/* Revision 1.49  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -367,7 +372,6 @@ extern FILE *z80asmfile, *deffile, *libfile;
 extern char line[], ident[];
 extern char Z80objhdr[];
 extern enum symbols sym, GetSym( void );
-extern enum flag writeline;
 extern enum flag EOL, library;
 extern byte_t reloc_routine[];
 extern struct modules *modulehdr;

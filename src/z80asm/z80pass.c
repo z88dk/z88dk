@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.43 2013-02-27 20:47:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.44 2013-03-04 23:23:37 pauloscustodio Exp $ */
 /* $Log: z80pass.c,v $
-/* Revision 1.43  2013-02-27 20:47:53  pauloscustodio
+/* Revision 1.44  2013-03-04 23:23:37  pauloscustodio
+/* Removed writeline, that was used to cancel listing of multi-line
+/* constructs, as only the first line was shown on the list file. Fixed
+/* the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
+/*
+/* Revision 1.43  2013/02/27 20:47:53  pauloscustodio
 /* comments
 /*
 /* Revision 1.42  2013/02/26 02:36:54  pauloscustodio
@@ -345,7 +350,7 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 extern FILE *z80asmfile, *objfile;
 extern char line[], ident[], separators[];
 extern enum symbols sym;
-extern enum flag writeline, EOL;
+extern enum flag EOL;
 extern long TOTALLINES;
 extern struct modules *modulehdr;       /* pointer to module header */
 extern struct module *CURRENTMODULE;
@@ -359,11 +364,6 @@ Z80pass1( void )
 
     while ( !feof( z80asmfile ) )
     {
-        if ( listing )
-        {
-            writeline = ON;
-        }
-
         parseline( ON );              /* before parsing it */
     }
 }
@@ -468,10 +468,7 @@ parseline( enum flag interpret )
             }
     }
 
-    if ( listing && writeline )
-    {
-        list_end_line();				/* Write current source line to list file */
-    }
+    list_end_line();				/* Write current source line to list file */
 }
 
 
@@ -492,7 +489,6 @@ ifstatement( enum flag interpret )
                 /* expression is TRUE, interpret lines until #else or #endif */
                 if ( !feof( z80asmfile ) )
                 {
-                    writeline = ON;
                     parseline( ON );
                 }
                 else
@@ -509,7 +505,6 @@ ifstatement( enum flag interpret )
                     /* then ignore lines until #endif ... */
                     if ( !feof( z80asmfile ) )
                     {
-                        writeline = OFF;
                         parseline( OFF );
                     }
                     else
@@ -527,7 +522,6 @@ ifstatement( enum flag interpret )
                 /* expression is FALSE, ignore until #else or #endif */
                 if ( !feof( z80asmfile ) )
                 {
-                    writeline = OFF;
                     parseline( OFF );
                 }
                 else
@@ -543,7 +537,6 @@ ifstatement( enum flag interpret )
                 {
                     if ( !feof( z80asmfile ) )
                     {
-                        writeline = ON;
                         parseline( ON );
                     }
                     else
@@ -562,7 +555,6 @@ ifstatement( enum flag interpret )
             /* don't evaluate #if expression and ignore all lines until #endif */
             if ( !feof( z80asmfile ) )
             {
-                writeline = OFF;
                 parseline( OFF );
             }
             else

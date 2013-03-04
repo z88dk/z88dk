@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.27 2013-02-27 22:32:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.28 2013-03-04 23:23:37 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.27  2013-02-27 22:32:38  pauloscustodio
+# Revision 1.28  2013-03-04 23:23:37  pauloscustodio
+# Removed writeline, that was used to cancel listing of multi-line
+# constructs, as only the first line was shown on the list file. Fixed
+# the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
+#
+# Revision 1.27  2013/02/27 22:32:38  pauloscustodio
 # Abort test at t_compile_module() if compilation failed
 #
 # Revision 1.26  2013/02/25 21:37:30  pauloscustodio
@@ -670,6 +675,7 @@ my @LIST_ASM;
 my @LIST_BIN;
 my @LIST_LST;
 my $LABEL_RE = qr/\b[A-Z_][A-Z0-9_]*/;
+my $LIST_ON = 1;
 
 # pagination functions
 sub list_first_line {
@@ -696,6 +702,8 @@ sub get_num_lines { $LINENR   }
 sub list_push_asm {
 	my($asm, @bytes) = @_;
 
+	my $new_list_on = $LIST_ON;
+	
 	# handle asm, interpreet labels
 	if ($asm) {				
 		push @LIST_ASM, $asm unless @LINENR;		# not if inside include
@@ -713,6 +721,12 @@ sub list_push_asm {
 		elsif ($asm =~ /(?i:xdef|xlib)\s+($LABEL_RE)/) {	# global label
 			push @{$LABEL_PAGE{$1}}, $PAGENR;
 			$LABEL_GLOBAL{$1}++;
+		}
+		elsif ($asm =~ /^\s*lstoff\s*$/i) {
+			$new_list_on = 0;
+		}
+		elsif ($asm =~ /^\s*lston\s*$/i) {
+			$new_list_on = 1;
 		}
 		else {
 			push @{$LABEL_PAGE{$1}}, $PAGENR while $asm =~ /($LABEL_RE)/g;	# use label
@@ -733,8 +747,10 @@ sub list_push_asm {
 
 		# still for another row?
 		if (@lst_bytes) {
-			push @LIST_LST, $lst;
-			list_next_line(); $LINENR--;
+			if ($LIST_ON) {
+				push @LIST_LST, $lst;
+				list_next_line(); $LINENR--;
+			}
 			$lst = sprintf("%5s %04X  ", "", $ADDR);
 		}
 	}
@@ -744,18 +760,28 @@ sub list_push_asm {
 		$lst = sprintf("%-24s%s", $lst, $asm // '');
 	}
 	else {
-		push @LIST_LST, $lst;
-		list_next_line(); $LINENR--;
+		if ($LIST_ON) {
+			push @LIST_LST, $lst;
+			list_next_line(); $LINENR--;
+		}
 		$lst = sprintf("%-24s%s", "", $asm // '');
 	}		
-	push @LIST_LST, $lst;
-	list_next_line();
+
+	if ($LIST_ON) {
+		push @LIST_LST, $lst;
+		list_next_line();
+	}
+	else {
+		$LINENR++;
+	}
+	
+	$LIST_ON = $new_list_on;
 }
 
 # hanble includes
 sub list_push_include {
 	my($file) = @_;
-	push @LIST_ASM, "include \"$file\"";
+	list_push_asm("include \"$file\"");
 	push @LINENR, $LINENR;
 	$LINENR = 1;
 }
@@ -763,7 +789,7 @@ sub list_push_include {
 sub list_pop_include {
 	list_push_asm();
 	@LINENR or die;
-	$LINENR = pop(@LINENR) + 1;
+	$LINENR = pop(@LINENR);
 }
 	
 #------------------------------------------------------------------------------

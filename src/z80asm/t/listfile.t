@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/listfile.t,v 1.2 2013-02-22 17:26:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/listfile.t,v 1.3 2013-03-04 23:23:37 pauloscustodio Exp $
 # $Log: listfile.t,v $
-# Revision 1.2  2013-02-22 17:26:34  pauloscustodio
+# Revision 1.3  2013-03-04 23:23:37  pauloscustodio
+# Removed writeline, that was used to cancel listing of multi-line
+# constructs, as only the first line was shown on the list file. Fixed
+# the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
+#
+# Revision 1.2  2013/02/22 17:26:34  pauloscustodio
 # Decouple assembler from listfile handling
 #
 # Revision 1.1  2013/02/19 22:52:41  pauloscustodio
@@ -82,6 +87,37 @@ list_push_asm("ld a,+A", 0x3E, 0x01);
 list_push_asm("ld b,+B", 0x06, 0x02);
 list_push_asm("add a,b", 0x80);
 list_pop_include();
+
+# DEFVARS
+list_push_asm("defvars 0x4000");
+list_push_asm("{");
+list_push_asm(" RUNTIMEFLAGS1 ds.b 1");
+list_push_asm(" RUNTIMEFLAGS2 ds.b 1");
+list_push_asm("}");
+
+# DEFGROUP
+list_push_asm("defgroup");
+list_push_asm("{");
+list_push_asm("  SYM_NULL, SYM_DQUOTE, SYM_SQUOTE, SYM_SEMICOLON,");
+list_push_asm("  SYM_COMMA, SYM_FULLSTOP, SYM_LPAREN, SYM_LCURLY, SYM_RCURLY");
+list_push_asm("}");
+
+# LSTON LSTOFF
+list_push_asm("lstoff");
+list_push_asm("ld bc,0", 1, 0, 0);
+list_push_asm("lston");
+
+# IF ELSE ENDIF 
+list_push_asm("if 0");
+list_push_asm("ld bc,0");
+list_push_asm("else");
+list_push_asm("ld bc,1", 1, 1, 0);
+list_push_asm("endif");
+list_push_asm("if 1");
+list_push_asm("ld hl,1", 0x21, 1, 0);
+list_push_asm("else");
+list_push_asm("ld hl,0");
+list_push_asm("endif");
 
 # list with more than 10000 lines - last test
 while (get_num_lines() <= 10000) {

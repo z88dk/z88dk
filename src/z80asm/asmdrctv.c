@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.40 2013-03-02 23:48:55 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.41 2013-03-04 23:23:37 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.40  2013-03-02 23:48:55  pauloscustodio
+/* Revision 1.41  2013-03-04 23:23:37  pauloscustodio
+/* Removed writeline, that was used to cancel listing of multi-line
+/* constructs, as only the first line was shown on the list file. Fixed
+/* the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
+/*
+/* Revision 1.40  2013/03/02 23:48:55  pauloscustodio
 /* New LEGACY define to mark code that should be removed but is kept
 /* to keep backwards compatibility
 /*
@@ -271,6 +276,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "config.h"
 #include "errors.h"
 #include "file.h"
+#include "listfile.h"
 #include "options.h"
 #include "srcfile.h"
 #include "symbol.h"
@@ -302,6 +308,7 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 int cmpidstr( symbol *kptr, symbol *p );
 void FreeSym( symbol *node );
 symbol *FindSymbol( char *identifier, avltree *treeptr );
+void getasmline( void );
 
 
 /* local functions */
@@ -315,7 +322,7 @@ extern FILE *z80asmfile;
 extern char ident[], stringconst[];
 extern size_t DEFVPC;
 extern enum symbols sym;
-extern enum flag writeline, EOL;
+extern enum flag EOL;
 extern struct modules *modulehdr;
 extern struct module *CURRENTMODULE;
 
@@ -446,7 +453,6 @@ DEFVARS( void )
     long offset;
     enum flag globaldefv;
 
-    writeline = OFF;              /* DEFVARS definitions are not output'ed to listing file */
     GetSym();
 
     if ( ( postfixexpr = ParseNumExpr() ) != NULL )
@@ -500,6 +506,12 @@ DEFVARS( void )
             set_error_line( CURRENTFILE->line );    /* error location */
         }
 
+		if ( listing )
+		{
+			getasmline();    /* get a copy of current source line */
+			list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
+		}
+
         GetSym();
     }
 
@@ -515,6 +527,12 @@ DEFVARS( void )
                 {
                     set_error_line( CURRENTFILE->line );    /* error location */
                 }
+
+				if ( listing )
+				{
+					getasmline();    /* get a copy of current source line */
+					list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
+				}
 
                 EOL = OFF;
             }
@@ -539,8 +557,6 @@ DEFGROUP( void )
     struct expr *postfixexpr;
     long constant, enumconst = 0;
 
-    writeline = OFF;              /* DEFGROUP definitions are not output'ed to listing file */
-
     while ( !feof( z80asmfile ) && GetSym() != lcurly )
     {
         Skipline( z80asmfile );
@@ -551,6 +567,13 @@ DEFGROUP( void )
         {
             set_error_line( CURRENTFILE->line );    /* error location */
         }
+
+		if ( listing )
+		{
+			getasmline();    /* get a copy of current source line */
+			list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
+		}
+
 
     }
 
@@ -566,6 +589,12 @@ DEFGROUP( void )
                 {
                     set_error_line( CURRENTFILE->line );    /* error location */
                 }
+
+				if ( listing )
+				{
+					getasmline();    /* get a copy of current source line */
+					list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
+				}
 
                 EOL = OFF;
             }
@@ -1089,7 +1118,6 @@ INCLUDE( void )
     }
 
     sym = newline;
-    writeline = OFF;              /* don't write current source line to listing file (empty line of INCLUDE file) */
 }
 
 

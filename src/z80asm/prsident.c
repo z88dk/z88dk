@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.37 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.38 2013-03-04 23:23:37 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.37  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.38  2013-03-04 23:23:37  pauloscustodio
+/* Removed writeline, that was used to cancel listing of multi-line
+/* constructs, as only the first line was shown on the list file. Fixed
+/* the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
+/*
+/* Revision 1.37  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -245,18 +250,18 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 #include "memalloc.h"   /* before any other include */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include "codearea.h"
 #include "config.h"
-#include "z80asm.h"
+#include "errors.h"
+#include "listfile.h"
+#include "options.h"
 #include "symbol.h"
 #include "symbols.h"
-#include "options.h"
-#include "errors.h"
-#include "codearea.h"
-#include "options.h"
 #include "types.h"
+#include "z80asm.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* external functions */
 void Skipline( FILE *fptr );
@@ -305,7 +310,7 @@ void SetTemporaryLine( char *line );
 /* global variables */
 extern FILE *z80asmfile;
 extern enum symbols sym, GetSym( void );
-extern enum flag writeline, EOL;
+extern enum flag EOL;
 extern char ident[], line[];
 extern struct module *CURRENTMODULE;
 
@@ -493,8 +498,7 @@ LSTON( void )
 {
     if ( option_list == ON )
     {
-        listing = ON;             /* switch listing ON again... */
-        writeline = OFF;          /* but don't write this line in listing file */
+        listing = ON;				/* switch listing ON again... */
         line[0] = '\0';
     }
 }
@@ -506,7 +510,7 @@ LSTOFF( void )
 {
     if ( option_list == ON )
     {
-        listing = writeline = OFF;        /* but don't write this line in listing file */
+        listing = OFF;        
         line[0] = '\0';
     }
 }
@@ -546,7 +550,6 @@ void
 ELSE( void )
 {
     sym = elsestatm;
-    writeline = OFF;              /* but don't write this line in listing file */
 }
 
 
@@ -556,7 +559,6 @@ void
 ENDIF( void )
 {
     sym = endifstatm;
-    writeline = OFF;              /* but don't write this line in listing file */
 }
 
 
