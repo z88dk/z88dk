@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.70 2013-02-27 20:47:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.71 2013-03-04 23:37:09 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.70  2013-02-27 20:47:53  pauloscustodio
+/* Revision 1.71  2013-03-04 23:37:09  pauloscustodio
+/* Removed pass1 that was used to skip creating page references of created
+/* symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
+/* modified list_get_page_nr() to return -1 after the whole source is
+/* processed.
+/*
+/* Revision 1.70  2013/02/27 20:47:53  pauloscustodio
 /* comments
 /*
 /* Revision 1.69  2013/02/22 17:26:33  pauloscustodio
@@ -525,7 +531,6 @@ enum symbols sym, ssym[] =
     };
 char separators[] = " &\"\';,.({[]})+-*/%^=~|:<>!#:";
 
-enum flag pass1, writeline;
 enum flag EOL, library, createlibrary;
 
 long TOTALLINES;
@@ -600,9 +605,8 @@ AssembleSourceFile( void )
             printf( "Assembling '%s'...\nPass1...\n", srcfilename );
         }
 
-        pass1 = ON;
         Z80pass1();
-        pass1 = OFF;                    /* GetSymPtr will only generate page references in Pass1 (if listing is ON) */
+		list_end();                    /* GetSymPtr will only generate page references until list_end() */
 
         if ( CURRENTMODULE->mname == NULL )     /* Module name must be defined */
         {
@@ -1262,7 +1266,6 @@ int main( int argc, char *argv[] )
 
         init_codearea_module();         /* init data for object file creation */
 
-        writeline = ON;
         library = createlibrary = OFF;
 
         reset_options();

@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.32 2013-01-24 23:03:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.33 2013-03-04 23:37:09 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.32  2013-01-24 23:03:03  pauloscustodio
+/* Revision 1.33  2013-03-04 23:37:09  pauloscustodio
+/* Removed pass1 that was used to skip creating page references of created
+/* symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
+/* modified list_get_page_nr() to return -1 after the whole source is
+/* processed.
+/*
+/* Revision 1.32  2013/01/24 23:03:03  pauloscustodio
 /* Replaced (unsigned char) by (byte_t)
 /* Replaced (unisigned int) by (size_t)
 /* Replaced (short) by (int)
@@ -289,7 +295,7 @@ struct expr *ParseNumExpr( void );
 /* global variables */
 extern struct module *CURRENTMODULE;
 extern avltree *globalroot;
-extern enum symbols sym, pass1;
+extern enum symbols sym;
 extern char ident[], separators[];
 extern FILE *z80asmfile, *objfile;
 

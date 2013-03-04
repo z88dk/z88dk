@@ -15,9 +15,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle assembly listing and symbol table listing.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.3 2013-02-26 02:36:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.4 2013-03-04 23:37:09 pauloscustodio Exp $ */
 /* $Log: listfile.h,v $
-/* Revision 1.3  2013-02-26 02:36:54  pauloscustodio
+/* Revision 1.4  2013-03-04 23:37:09  pauloscustodio
+/* Removed pass1 that was used to skip creating page references of created
+/* symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
+/* modified list_get_page_nr() to return -1 after the whole source is
+/* processed.
+/*
+/* Revision 1.3  2013/02/26 02:36:54  pauloscustodio
 /* Simplified symbol output to listfile by using SymbolRefList argument
 /*
 /* Revision 1.2  2013/02/22 17:26:33  pauloscustodio
@@ -58,7 +64,10 @@ CLASS( ListFile )
 	int		page_nr;				/* current page number */
 	int		line_nr;				/* current line number in page */
 
+	BOOL	source_list_ended;		/* end of source listing, from now on no source lines */
+
 	/* current line being output */
+	BOOL	line_started;			/* true if a line was started but not ended */
 	long	start_line_pos;			/* ftell() position at start of next list line */
 	size_t	address;				/* address of start of line */
 	Str		*bytes;					/* list of bytes output for this line */
@@ -94,6 +103,9 @@ extern void ListFile_append_long( ListFile *self, long dword );
 extern long ListFile_patch_pos( ListFile *self, int byte_offset );
 extern void ListFile_end_line( ListFile *self );
 
+/* end the source listing - get_page_nr() returns -1 from here onwards */
+extern void ListFile_end( ListFile *self );
+
 /* patch the bytes at the given patch_pos returned by ListFile_patch_pos() */
 extern void ListFile_patch_data( ListFile *self, long patch_pos, long value, int num_bytes );
 
@@ -122,6 +134,7 @@ extern void list_append_word( int word );
 extern void list_append_long( long dword );
 extern long list_patch_pos( int byte_offset );
 extern void list_end_line( void );
+extern void list_end( void );
 extern void list_patch_data( long patch_pos, long value, int num_bytes );
 extern void list_start_table( char *title );
 extern void list_symbol( char *symbol_name, long symbol_value, 

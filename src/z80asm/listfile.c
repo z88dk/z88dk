@@ -15,9 +15,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle assembly listing and symbol table listing.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.3 2013-02-26 02:36:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.4 2013-03-04 23:37:09 pauloscustodio Exp $ */
 /* $Log: listfile.c,v $
-/* Revision 1.3  2013-02-26 02:36:54  pauloscustodio
+/* Revision 1.4  2013-03-04 23:37:09  pauloscustodio
+/* Removed pass1 that was used to skip creating page references of created
+/* symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
+/* modified list_get_page_nr() to return -1 after the whole source is
+/* processed.
+/*
+/* Revision 1.3  2013/02/26 02:36:54  pauloscustodio
 /* Simplified symbol output to listfile by using SymbolRefList argument
 /*
 /* Revision 1.2  2013/02/22 17:26:33  pauloscustodio
@@ -222,6 +228,7 @@ void ListFile_open( ListFile *self, char *source_file, char *extension )
 
 	self->filename	= strpool_add(list_filename);
 	self->file		= fopen_err( list_filename, "w+" );
+	self->source_list_ended = FALSE;
 
 	/* output header */
 	ListFile_init_page( self );
@@ -244,6 +251,9 @@ void ListFile_close( ListFile *self, BOOL keep_file )
 {
 	if ( self->file != NULL ) 
 	{
+		/* close any pending line started */
+		ListFile_end( self );
+
         fputc_err( '\f', self->file );     /* end listing with a FF */
         fclose( self->file );
 
@@ -270,8 +280,13 @@ void list_close( BOOL keep_file )
 void ListFile_start_line( ListFile *self, size_t address, 
 						  char *source_file, int source_line_nr, char *line )
 {
-	if ( self->file != NULL ) 
+	if ( self->file != NULL && ! self->source_list_ended ) 
 	{
+		/* close any pending line */
+		ListFile_end_line( self );
+
+		self->line_started = TRUE;			/* signal: in line */
+
 		/* Get file position for beginning of next line in list file */
 		self->start_line_pos = ftell( self->file );      
 
@@ -306,7 +321,7 @@ void ListFile_append( ListFile *self, long value, int num_bytes )
 {
 	byte_t byte;
 
-	if ( self->file != NULL ) 
+	if ( self->file != NULL && ! self->source_list_ended ) 
 	{
 		while ( num_bytes-- > 0 ) 
 		{
@@ -365,7 +380,7 @@ long ListFile_patch_pos( ListFile *self, int byte_offset )
 	int line_nr;
 	int start_line_pos;
 
-	if ( self->file == NULL ) 
+	if ( self->file == NULL || self->source_list_ended ) 
 	{
 		return -1;
 	}
@@ -410,7 +425,7 @@ void ListFile_end_line( ListFile *self )
     int len, i;
     byte_t *byteptr;
 
-	if ( self->file != NULL )
+	if ( self->file != NULL && self->line_started && ! self->source_list_ended )
 	{
 		/* get length of hex dump and pointer to data bytes (BUG_0015) */
 		len     = Str_len( self->bytes );
@@ -441,6 +456,8 @@ void ListFile_end_line( ListFile *self )
 		}
 
 		ListFile_fprintf( self, "%s", Str_data( self->line ) );
+
+		self->line_started = FALSE;				/* no longer in line */
 	}
 }
 
@@ -449,6 +466,23 @@ void list_end_line( void )
 	if ( the_list != NULL )
 	{
 		ListFile_end_line( the_list );
+	}
+}
+
+/*-----------------------------------------------------------------------------
+*	signal end of list file
+*----------------------------------------------------------------------------*/
+void ListFile_end( ListFile *self )
+{
+	ListFile_end_line( self );
+	self->source_list_ended = TRUE;
+}
+
+void list_end( void )
+{
+	if ( the_list != NULL )
+	{
+		ListFile_end( the_list );
 	}
 }
 
@@ -560,7 +594,7 @@ void list_symbol( char *symbol_name, long symbol_value,
 *----------------------------------------------------------------------------*/
 int ListFile_get_page_nr( ListFile *self )
 {
-	return self->file != NULL ? self->page_nr : -1;
+	return ( self->file != NULL && ! self->source_list_ended ) ? self->page_nr : -1;
 }
 
 int list_get_page_nr( void )

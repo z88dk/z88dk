@@ -15,9 +15,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 Cross reference list of symbol usage
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/model_symref.c,v 1.1 2013-02-26 02:11:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/model_symref.c,v 1.2 2013-03-04 23:37:09 pauloscustodio Exp $ */
 /* $Log: model_symref.c,v $
-/* Revision 1.1  2013-02-26 02:11:32  pauloscustodio
+/* Revision 1.2  2013-03-04 23:37:09  pauloscustodio
+/* Removed pass1 that was used to skip creating page references of created
+/* symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
+/* modified list_get_page_nr() to return -1 after the whole source is
+/* processed.
+/*
+/* Revision 1.1  2013/02/26 02:11:32  pauloscustodio
 /* New model_symref.c with all symbol cross-reference list handling
 /*
 /* Revision 1.1  2013/02/19 22:52:40  pauloscustodio
@@ -59,29 +65,32 @@ void add_symbol_ref( SymbolRefList *list, int page_nr, BOOL defined )
 {
 	SymbolRef *obj;
 
-	/* check if page_nr was already referenced at start (definition) or end (usage) */
-	if ( ! ref_repeated( list, page_nr ) )
+	if ( page_nr > 0 )							/* = -1 in link phase */
 	{
-		/* add the reference */
-		obj = OBJ_NEW( SymbolRef );
-		obj->page_nr = page_nr;
+		/* check if page_nr was already referenced at start (definition) or end (usage) */
+		if ( ! ref_repeated( list, page_nr ) )
+		{
+			/* add the reference */
+			obj = OBJ_NEW( SymbolRef );
+			obj->page_nr = page_nr;
 
-		if ( defined ) 
-		{
-			SymbolRefList_unshift( list, obj );		/* add at start */
+			if ( defined ) 
+			{
+				SymbolRefList_unshift( list, obj );		/* add at start */
+			}
+			else 
+			{
+				SymbolRefList_push( list, obj );			/* add at end */
+			}
 		}
-		else 
+		else if ( ! SymbolRefList_empty(list) &&
+				  defined &&
+				  SymbolRefList_last(list)->obj->page_nr == page_nr )
 		{
-			SymbolRefList_push( list, obj );			/* add at end */
+			/* move the reference from emd of list to start of list, set defined flag */
+			obj = SymbolRefList_pop( list );
+			SymbolRefList_unshift( list, obj );
 		}
-	}
-	else if ( ! SymbolRefList_empty(list) &&
-		      defined &&
-			  SymbolRefList_last(list)->obj->page_nr == page_nr )
-	{
-		/* move the reference from emd of list to start of list, set defined flag */
-		obj = SymbolRefList_pop( list );
-		SymbolRefList_unshift( list, obj );
 	}
 }
 

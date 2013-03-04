@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.29 2013-02-26 02:11:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.c,v 1.30 2013-03-04 23:37:09 pauloscustodio Exp $ */
 /* $Log: symbols.c,v $
-/* Revision 1.29  2013-02-26 02:11:32  pauloscustodio
+/* Revision 1.30  2013-03-04 23:37:09  pauloscustodio
+/* Removed pass1 that was used to skip creating page references of created
+/* symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
+/* modified list_get_page_nr() to return -1 after the whole source is
+/* processed.
+/*
+/* Revision 1.29  2013/02/26 02:11:32  pauloscustodio
 /* New model_symref.c with all symbol cross-reference list handling
 /*
 /* Revision 1.28  2013/02/22 17:26:33  pauloscustodio
@@ -205,7 +211,6 @@ void FreeSym( symbol *node );
 
 
 /* global variables */
-extern enum flag pass1;
 extern struct module *CURRENTMODULE;    /* pointer to current module */
 extern avltree *globalroot;
 
@@ -293,7 +298,7 @@ void DefineSymbol( char *identifier,
                                                                  * constant */
             foundsymbol->owner = CURRENTMODULE;   /* owner of symbol is always creator */
 
-            if ( pass1 && option_symtable && listing )
+            if ( option_symtable && listing )
             {
 				/* First element in list is definition of symbol */
                 add_symbol_ref( foundsymbol->references, list_get_page_nr(), TRUE );     
@@ -331,7 +336,7 @@ static void DefLocalSymbol( char *identifier,
         foundsymbol = CreateSymbol( identifier, value, ( char )( symboltype | SYMLOCAL | SYMDEFINED ), CURRENTMODULE );
         insert( &CURRENTMODULE->localroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
 
-        if ( pass1 && option_symtable && listing )
+        if ( option_symtable && listing )
         {
             /* First element in list is definition of symbol */
 			add_symbol_ref( foundsymbol->references, list_get_page_nr(), TRUE );
@@ -348,7 +353,7 @@ static void DefLocalSymbol( char *identifier,
                                                                  * label or constant */
         foundsymbol->owner = CURRENTMODULE;       /* owner of symbol is always creator */
 
-        if ( pass1 && option_symtable && listing )
+        if ( option_symtable && listing )
         {
             /* First element in list is definition of symbol */
 			add_symbol_ref( foundsymbol->references, list_get_page_nr(), TRUE );
@@ -380,7 +385,7 @@ GetSymPtr( char *identifier )
     {
         if ( ( symbolptr = FindSymbol( identifier, globalroot ) ) == NULL )
         {
-            if ( pass1 && option_symtable && option_list )
+            if ( option_symtable && option_list )
             {
                 if ( ( symbolptr = FindSymbol( identifier, CURRENTMODULE->notdeclroot ) ) == NULL )
                 {
@@ -398,7 +403,7 @@ GetSymPtr( char *identifier )
         }
         else
         {
-            if ( pass1 && option_symtable && listing )
+            if ( option_symtable && listing )
             {
                 /* symbol found as global/extern declaration */
 				add_symbol_ref( symbolptr->references, list_get_page_nr(), FALSE );
@@ -409,7 +414,7 @@ GetSymPtr( char *identifier )
     }
     else
     {
-        if ( pass1 && option_symtable && listing )
+        if ( option_symtable && listing )
         {
             /* symbol found as local declaration */
 			add_symbol_ref( symbolptr->references, list_get_page_nr(), FALSE );
