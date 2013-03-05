@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.30 2013-01-24 15:31:38 stefano Exp $
+# $Id: Makefile,v 1.31 2013-03-05 13:13:26 stefano Exp $
 
 
 lx11:
@@ -33,6 +33,7 @@ clean:
 	$(RM) gray/ticalc/*.o
 	$(RM) gray/cpc/*.o
 	$(RM) gray/zx81/*.o
+	$(RM) mc1000/*.o
 	$(RM) msx/*.o
 	$(RM) msx/surface/*.o
 	$(RM) mz/*.o

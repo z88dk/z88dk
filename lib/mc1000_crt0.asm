@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.1 2013-03-04 18:03:37 stefano Exp $
+;       $Id: mc1000_crt0.asm,v 1.2 2013-03-05 13:13:26 stefano Exp $
 ;
 
 
@@ -40,7 +40,9 @@
         XDEF    coords          ;Current xy position
         XDEF	pixelbyte	; Temp store for non-buffered mode
         XDEF	pixeladdress
+        XDEF	clg
         XDEF	pix_return
+        XDEF	gfxbyte_get
 
        	XDEF	snd_tick        ;Sound variable
 
@@ -323,6 +325,30 @@ ENDIF
 
 
 
+;-----------  GFX init  -------------
+.clg
+	ld	b,0
+	ld	a,$9e
+	out	($80),a
+
+	ld	hl,$8000
+.clg1
+	ld	(hl),b
+	inc	hl
+	ld	a,h
+	cp	$98
+	jp	nz,clg1
+
+	ld	a,$9f
+	out	($80),a
+	ld	($f5),a		; Instruct the BASIC about the current screen mode
+					; so the ROM won't mess with the video page when called
+	ld	hl,clgret
+	ld	($f7),hl	; cursor flashing and positioning routine
+
+.clgret
+	ret
+
 ;-----------  GFX paging  -------------
 .pixeladdress
 
@@ -354,21 +380,21 @@ ENDIF
 	add	hl,de	
 	
 ;-------
-
+.gfxbyte_get
 	ld	a,$9e
 	out	($80),a
 
 	ld	a,(hl)
-	ld	e,a
+	ld	d,h
+	ld	e,l
+	ld	hl,pixelbyte
+	ld	(hl),a
 
 	ld	a,$9f
 	out	($80),a
 
-	ld	a,e
-	ld	(pixelbyte),a
-
-	ld	d,h
-	ld	e,l
+;	ld	d,h
+;	ld	e,l
 
 ;-------
 
@@ -383,15 +409,12 @@ ENDIF
 
 		;ld       (hl),a	; hl points to "pixelbyte"
 
-		;ld	e,a
 		ex	af,af	; dcircle uses the flags in af'.. watch out !
 		ld	a,$9e
 		out	($80),a
 
-		;ld	a,(pixelbyte)
-		;ld	a,e
 		ex	af,af	; dcircle uses the flags in af'.. watch out !
-		ld	(hl),a	; hl points to "pixelbyte"
+		ld	(de),a	; pixel address
 
 		ld	a,$9f
 		out	($80),a

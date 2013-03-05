@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.36 2012-12-31 10:38:23 stefano Exp $
+# $Id: Makefile,v 1.37 2013-03-05 13:13:26 stefano Exp $
 #
 
 include ../Make.config
@@ -148,6 +148,7 @@ clean:
 	$(RM) enterprise/*.o
 	$(RM) gal/*.o
 	$(RM) m5/*.o
+	$(RM) mc1000/*.o
 	$(RM) msx/*.o
 	$(RM) mtx/*.o
 	$(RM) mz/*.o

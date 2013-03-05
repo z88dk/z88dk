@@ -6,7 +6,7 @@
 ;	Stefano Bodrato, 2013
 ;
 ;
-;	$Id: getk.asm,v 1.1 2013-03-04 18:08:43 stefano Exp $
+;	$Id: getk.asm,v 1.2 2013-03-05 13:13:26 stefano Exp $
 ;
 
 ; The code at entry $c009 checks if a key has been pressed in a 7ms interval.
@@ -16,10 +16,17 @@
 	XLIB	getk
 
 .getk
-	call	$C009
+;	call	$C009
+;	and		a
+;	jr		z,key_got
+;	call	$C006
+;key_got:
+
+	call	$C027
 	and		a
 	jr		z,key_got
-	call	$C006
+	ld		a,($011B)
+
 key_got:
 	ld	l,a
 	ld	h,0
