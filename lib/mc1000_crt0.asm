@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.2 2013-03-05 13:13:26 stefano Exp $
+;       $Id: mc1000_crt0.asm,v 1.3 2013-03-06 06:51:41 stefano Exp $
 ;
 
 
@@ -327,7 +327,7 @@ ENDIF
 
 ;-----------  GFX init  -------------
 .clg
-	ld	b,0
+	ld	b,255
 	ld	a,$9e
 	out	($80),a
 
@@ -388,6 +388,7 @@ ENDIF
 	ld	d,h
 	ld	e,l
 	ld	hl,pixelbyte
+	cpl
 	ld	(hl),a
 
 	ld	a,$9f
@@ -414,6 +415,7 @@ ENDIF
 		out	($80),a
 
 		ex	af,af	; dcircle uses the flags in af'.. watch out !
+		cpl
 		ld	(de),a	; pixel address
 
 		ld	a,$9f

@@ -28,7 +28,7 @@
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.1 2013-03-05 13:13:26 stefano Exp $
+;	$Id: stencil_render.asm,v 1.2 2013-03-06 06:51:41 stefano Exp $
 ;
 
 .stencil_render
@@ -99,12 +99,12 @@
 			and	a
 			sbc	hl,de
 
-			rr	h
-			rr	l
-			rr	h
-			rr	l
-			rr	h
-			rr	l
+			;rr	h
+			;rr	l
+			;rr	h
+			;rr	l
+			;rr	h
+			;rr	l
 
 			jr	z,onebyte	; area is within the same address...
 
@@ -114,27 +114,37 @@
 			ld	de,8
 
 			;call	store_byte
-			call	pix_return
 			
-			add	hl,de
-			;inc	hl			; offset += 1 (8 bits)
+			ex	de,hl
+			call	pix_return
+			ex	de,hl
+			
+			;add	hl,de
+			inc	hl			; offset += 1 (8 bits)
 
-.pattern2			ld	a,0
+.pattern2		ld	a,0
 				dec	b
 				jr	z,bitmaskr
 
+				ex	de,hl
 .fill_row_loop							; do
 				;call	store_byte
+				push af
 				call	pix_return
-				add	hl,de
-				;inc	hl			; offset += 1 (8 bits)
+				pop af
+				
+				;add	hl,de
+				inc	de			; offset += 1 (8 bits
 				djnz	fill_row_loop		; while ( r-- != 0 )
+				ex	de,hl
 
 
 .bitmaskr		ld	a,0
 			call	mask_pattern
 			;call	store_byte
+			ex	de,hl
 			call	pix_return
+			ex	de,hl
 
 			jr	yloop
 

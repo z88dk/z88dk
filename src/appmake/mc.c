@@ -1,7 +1,7 @@
 /*
  *        CCE MMC-1000 BIN to CAS file converter and WAV generator
  *
- *        $Id: mc.c,v 1.2 2013-03-04 18:03:38 stefano Exp $
+ *        $Id: mc.c,v 1.3 2013-03-06 06:51:41 stefano Exp $
  */
 
 #include "appmake.h"
@@ -24,7 +24,7 @@ option_t mc_options[] = {
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
-    {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
+    {  0,  "fast",     "Fast loading WAV trick for MESS emulator",  OPT_BOOL,  &fast },
 //    {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
 	{  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0 , "blockname", "Name of the code block",    OPT_STR,   &blockname},
@@ -41,8 +41,8 @@ void mc_bit (FILE *fpout, unsigned char bit)
 		period0 = 27;
 		period1 = 11;
 	} else {
-		period0 = 27;
-		period1 = 14;
+		period0 = 32;
+		period1 = 16;
 	}
 
 	if (bit) {
