@@ -14,9 +14,17 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.41 2013-03-04 23:23:37 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.42 2013-03-06 00:02:17 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.41  2013-03-04 23:23:37  pauloscustodio
+/* Revision 1.42  2013-03-06 00:02:17  pauloscustodio
+/* 	BUG_0032 : DEFGROUP ignores name after assignment
+/* 		The code
+/* DEFGROUP {
+/*   f10 = 10, f11
+/* }
+/* did not define f11 - all text after the expression was discarded.
+/*
+/* Revision 1.41  2013/03/04 23:23:37  pauloscustodio
 /* Removed writeline, that was used to cancel listing of multi-line
 /* constructs, as only the first line was shown on the list file. Fixed
 /* the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
@@ -634,7 +642,7 @@ DEFGROUP( void )
                                     RemovePfixlist( postfixexpr );
                                 }
 
-                                GetSym();     /* prepare for next identifier */
+                                /* BUG_0032 - removed: GetSym(); */
                             }
                             else
                             {
