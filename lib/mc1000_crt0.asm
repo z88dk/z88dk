@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.3 2013-03-06 06:51:41 stefano Exp $
+;       $Id: mc1000_crt0.asm,v 1.4 2013-03-08 13:40:19 stefano Exp $
 ;
 
 
@@ -42,7 +42,16 @@
         XDEF	pixeladdress
         XDEF	clg
         XDEF	pix_return
+        XDEF	pix_rl
+        XDEF	pix_pre
+        XDEF	pix_post
+        
         XDEF	gfxbyte_get
+        
+        XDEF	ansi_cls
+        XDEF	ansi_del_line
+        XDEF	ansi_scrollup
+
 
        	XDEF	snd_tick        ;Sound variable
 
@@ -326,6 +335,7 @@ ENDIF
 
 
 ;-----------  GFX init  -------------
+.ansi_cls
 .clg
 	ld	b,255
 	ld	a,$9e
@@ -347,6 +357,40 @@ ENDIF
 	ld	($f7),hl	; cursor flashing and positioning routine
 
 .clgret
+	ret
+
+;-----------  GFX support for ANSI VT emulation  -------------
+.ansi_scrollup
+	ld	a,$9e
+	out	($80),a
+
+	ld	de,$8000
+	ld	hl,$8000+256
+	ld	bc,6144-256
+	ldir
+	
+	ld	a,23
+
+.ansi_del_line
+	ex	af,af
+	ld	a,$9e
+	out	($80),a
+	ex	af,af
+
+	ld	hl,$8000
+	ld	d,a		; de = line*256
+	ld	e,l
+	add	hl,de	;Line address in HL	
+	
+	ld	bc,255
+	ld	(hl),c
+	ld	d,h
+	ld	e,l
+	inc	de
+	ldir
+
+	ld	a,$9f
+	out	($80),a
 	ret
 
 ;-----------  GFX paging  -------------
@@ -394,34 +438,71 @@ ENDIF
 	ld	a,$9f
 	out	($80),a
 
-;	ld	d,h
-;	ld	e,l
-
-;-------
-
 	ld	a,b
 	or	0f8h	;set all unused bits 1
-	cpl			;they now become 0
-	
+	cpl			;they now become 0	
 	ret
 
 
+;-------
 .pix_return
+	ex	af,af	; dcircle uses the flags in af'.. watch out !
+	ld	a,$9e
+	out	($80),a
 
-		;ld       (hl),a	; hl points to "pixelbyte"
+	ex	af,af	; dcircle uses the flags in af'.. watch out !
+	cpl
+	ld	(de),a	; pixel address
 
-		ex	af,af	; dcircle uses the flags in af'.. watch out !
-		ld	a,$9e
-		out	($80),a
+	ld	a,$9f
+	out	($80),a
+	ret
 
-		ex	af,af	; dcircle uses the flags in af'.. watch out !
-		cpl
-		ld	(de),a	; pixel address
+;------- ANSI VT support (chunk 1)
+.pix_pre
+	ld	a,$9e
+	out	($80),a
 
-		ld	a,$9f
-		out	($80),a
-		
-		ret
+	rl (ix+1)
+	rl (ix+0)
+	inc b
+	dec b
+	jr z,DTS
+.L1
+	rl (ix+1)
+	rl (ix+0)
+	djnz L1
+.DTS
+	;ex	af,af	;
+	ld	a,$9f
+	out	($80),a
+	;ex	af,af	;
+	ret
+
+;------- ANSI VT support (chunk 2)
+.pix_rl
+	ex	af,af	;
+	ld	a,$9e
+	out	($80),a
+	ex	af,af	;
+.L2
+	rla
+	rl (ix+1)
+	rl (ix+0)
+	djnz L2
+.pix_post
+	ld b,6
+	inc b
+	dec b
+	jr z,NEXT
+.L3
+	rl (ix+1)
+	rl (ix+0)
+	djnz L3
+.NEXT
+	ld	a,$9f
+	out	($80),a	
+	ret
 
 
 ;-----------

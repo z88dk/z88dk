@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.37 2013-03-05 13:13:26 stefano Exp $
+# $Id: Makefile,v 1.38 2013-03-08 13:40:20 stefano Exp $
 #
 
 include ../Make.config
@@ -127,6 +127,7 @@ clean:
 	$(RM) ansi/c128/*.o
 	$(RM) ansi/cpc/*.o
 	$(RM) ansi/generic/*.o
+	$(RM) ansi/mc1000/*.o
 	$(RM) ansi/nascom/*.o
 	$(RM) ansi/oz/*.o
 	$(RM) ansi/osca/*.o

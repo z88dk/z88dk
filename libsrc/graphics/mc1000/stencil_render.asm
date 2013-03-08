@@ -28,7 +28,7 @@
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.2 2013-03-06 06:51:41 stefano Exp $
+;	$Id: stencil_render.asm,v 1.3 2013-03-08 13:40:20 stefano Exp $
 ;
 
 .stencil_render

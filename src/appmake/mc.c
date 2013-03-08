@@ -1,7 +1,7 @@
 /*
  *        CCE MMC-1000 BIN to CAS file converter and WAV generator
  *
- *        $Id: mc.c,v 1.3 2013-03-06 06:51:41 stefano Exp $
+ *        $Id: mc.c,v 1.4 2013-03-08 13:40:20 stefano Exp $
  */
 
 #include "appmake.h"
@@ -39,9 +39,9 @@ void mc_bit (FILE *fpout, unsigned char bit)
 	if ( fast ) {
 		// We're just guessing, no test on the real harware has been done
 		period0 = 27;
-		period1 = 11;
+		period1 = 14;
 	} else {
-		period0 = 32;
+		period0 = 31;
 		period1 = 16;
 	}
 
@@ -231,7 +231,7 @@ int mc_exec(char *target)
 
 		/* trailing silence */
 	    for (i=0; i < 0x1500; i++)
-			fputc(0x20, fpout);
+			fputc(0x80, fpout);
 
         fclose(fpin);
         fclose(fpout);

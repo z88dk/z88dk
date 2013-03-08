@@ -4,7 +4,7 @@
 ;		just in case they become critical.
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.1 2013-03-05 13:13:26 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.2 2013-03-08 13:40:20 stefano Exp $
 ;
 
 		XLIB    swapgfxbk

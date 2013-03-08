@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.177 2013-03-05 13:13:26 stefano Exp $
+# $Id: Makefile,v 1.178 2013-03-08 13:40:20 stefano Exp $
 
 
 include Make.config
@@ -16,7 +16,7 @@ include Make.config
 all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	abc80_clib.lib abc80ansi_clib.lib abc800_clib.lib \
 	ace_clib.lib aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
-	cpm_clib.lib einstein.lib gal_clib.lib m5_clib.lib mc1000_clib.lib \
+	cpm_clib.lib einstein.lib gal_clib.lib m5_clib.lib mc1000_clib.lib mc1000ansi_clib.lib \
 	msx_clib.lib mtx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
 	osca_clib.lib oscaansi_clib.lib ozansi_clib.lib \
@@ -1111,6 +1111,21 @@ mc1000_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORmc1000 -x$(OUTPUT_DIRECTORY)/mc1000_clib @$(LISTFILE_DIRECTORY)/mc1000.lst
+
+# MC-1000 ANSI library - Stefano
+mc1000ansi_clib.lib:
+	@echo ''
+	@echo '--- Building CCE MC-1000 ANSI Library ---'
+	@echo ''
+	$(RM) stdio/ansi/mc1000/f_ansi_char.o
+	$(MAKE) gfxdeps
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORmc1000 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/mc1000ansi_clib @$(LISTFILE_DIRECTORY)/mc1000ansi.lst
 
 # NASCOM library - Stefano
 nascom_clib.lib:
