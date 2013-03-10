@@ -17,9 +17,12 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.2 2013-03-02 23:52:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.3 2013-03-10 18:00:24 pauloscustodio Exp $ */
 /* $Log: srcfile.c,v $
-/* Revision 1.2  2013-03-02 23:52:49  pauloscustodio
+/* Revision 1.3  2013-03-10 18:00:24  pauloscustodio
+/* Interface with errors (set input position for errors) and  listfile (start list of each input line)
+/*
+/* Revision 1.2  2013/03/02 23:52:49  pauloscustodio
 /* Add API to handle a stack of open sorce files and singleton API
 /*
 /* Revision 1.1  2013/02/27 22:31:43  pauloscustodio
@@ -31,8 +34,11 @@ Allows pushing back of lines, for example to expand macros.
 
 #include "memalloc.h"   /* before any other include */
 
+#include "codearea.h"
 #include "errors.h"
 #include "file.h"
+#include "listfile.h"
+#include "options.h"
 #include "srcfile.h"
 #include "strlist.h"
 #include "strpool.h"
@@ -205,10 +211,30 @@ char *SourceFile_getline( SourceFile *self )
 	if ( Str_len( self->line ) > 0 )		/* even if EOF found, we need to return any chars in line first */
 	{
 		self->line_nr++;
+
+		/* interface with error - set error location */
+		if ( !clinemode )
+		{
+			set_error_file( self->filename );   /* error location */
+			set_error_line( self->line_nr ); 
+		}
+
+		/* interface with list */
+		if ( listing )
+		{
+			list_start_line( get_PC(), self->filename, self->line_nr, Str_data( self->line ) );
+		}
+
 		return Str_data( self->line );
 	}
 	else 
 	{
+		/* interface with error - set error location */
+		if ( !clinemode )
+		{
+			set_error_null();				/* clear error location */
+		}
+
 		self->line_nr = 0;					/* no more input */
 		fclose( self->file );				/* close input */
 		self->file = NULL;

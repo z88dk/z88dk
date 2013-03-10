@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.2 2013-03-02 23:52:49 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.3 2013-03-10 18:00:24 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.2  2013-03-02 23:52:49  pauloscustodio
+# Revision 1.3  2013-03-10 18:00:24  pauloscustodio
+# Interface with errors (set input position for errors) and  listfile (start list of each input line)
+#
+# Revision 1.2  2013/03/02 23:52:49  pauloscustodio
 # Add API to handle a stack of open sorce files and singleton API
 #
 # Revision 1.1  2013/02/27 22:31:43  pauloscustodio
@@ -42,6 +45,9 @@ struct module *CURRENTMODULE;
 FILE *errfile;
 int clinemode;
 int clineno;
+int listing;
+size_t get_PC( void ) { return 0; }
+void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) {}
 END
 
 # check source path
