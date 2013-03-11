@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.38 2013-01-20 20:43:58 pauloscustodio Exp $
+#	$Id: Makefile,v 1.39 2013-03-11 13:00:31 stefano Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -57,10 +57,12 @@ libs:
 	cd libsrc ; $(MAKE) install
 
 install-libs:
-	mkdir -p $(prefix)/lib/z88dk/lib/clibs
+   	mkdir -p $(prefix)/lib/z88dk/lib/config
+   	cp -R lib/config/* $(prefix)/lib/z88dk/lib/config/
+   	find $(prefix)/lib/z88dk/lib/config -type f | xargs chmod 644
+   	mkdir -p $(prefix)/lib/z88dk/lib/clibs
 	cp -R lib/clibs/* $(prefix)/lib/z88dk/lib/clibs/
 	find $(prefix)/lib/z88dk/lib/clibs -type f | xargs chmod 644
-
 
 install:
 	mkdir -p -m 755 $(DESTDIR)/$(prefix)/bin $(DESTDIR)/$(prefix_share)/z88dk
@@ -96,6 +98,5 @@ clean-bins:
 	cd src/z80asm ; $(MAKE) clean
 	cd src/zcc ; $(MAKE) clean
 	$(MAKE) -C support/ar clean
-	$(MAKE) -C win32 clean
 
 .PHONY: test
