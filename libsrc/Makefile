@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.178 2013-03-08 13:40:20 stefano Exp $
+# $Id: Makefile,v 1.179 2013-03-13 21:02:56 stefano Exp $
 
 
 include Make.config
@@ -1110,6 +1110,8 @@ mc1000_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
+	cd games ; $(MAKE) lmc1000 ; cd ..
 	$(LIBLINKER) -DFORmc1000 -x$(OUTPUT_DIRECTORY)/mc1000_clib @$(LISTFILE_DIRECTORY)/mc1000.lst
 
 # MC-1000 ANSI library - Stefano
@@ -1125,6 +1127,8 @@ mc1000ansi_clib.lib:
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
+	$(MAKE) gamesdeps
+	cd games ; $(MAKE) lmc1000 ; cd ..
 	$(LIBLINKER) -DFORmc1000 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/mc1000ansi_clib @$(LISTFILE_DIRECTORY)/mc1000ansi.lst
 
 # NASCOM library - Stefano

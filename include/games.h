@@ -9,7 +9,7 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.18 2013-01-24 15:31:37 stefano Exp $
+ *	$Id: games.h,v 1.19 2013-03-13 21:02:56 stefano Exp $
  *
  */
 
@@ -72,6 +72,11 @@ extern __LIB__ __FASTCALL__ joystick(int game_device);
 
 #ifdef MTX
 	unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
+	#define GAME_DEVICES 2
+#endif
+
+#ifdef MC1000
+	unsigned char *joystick_type[] = {"Joystick A", "Joystick B"};
 	#define GAME_DEVICES 2
 #endif
 

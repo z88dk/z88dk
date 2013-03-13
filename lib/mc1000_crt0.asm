@@ -3,8 +3,15 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.4 2013-03-08 13:40:19 stefano Exp $
+;       $Id: mc1000_crt0.asm,v 1.5 2013-03-13 21:02:56 stefano Exp $
 ;
+
+; 	There are a couple of #pragma optimization directives 
+;	this file:
+;
+;	#pragma output nostreams      - No stdio disc files
+;	#pragma output nogfx          - Saves memory in TEXT only programs
+
 
 
 
@@ -52,6 +59,7 @@
         XDEF	ansi_del_line
         XDEF	ansi_scrollup
 
+        XDEF	FRAMES
 
        	XDEF	snd_tick        ;Sound variable
 
@@ -257,6 +265,23 @@ ENDIF
 
 
 start:
+
+	ld	hl,($39)
+	ld	(irq_hndl+1),hl
+	
+	;CALL $CEBA
+	;LD ($0128),A
+	;LD ($0357),A
+	;LD ($0360),A
+	;LD ($0358),A
+	;LD ($0352),A
+	;LD ($0361),A
+	;DEC A
+	;LD ($0106),A
+	;LD ($0353),A
+	;LD ($106),a
+		;ld		hl,$106
+		;ld		(hl),255	; disable gaming mode (shouldn't this work by putting 255??)
         ld      hl,0
         add     hl,sp
         ld      (start1+1),hl
@@ -270,6 +295,7 @@ start:
 has48k:
         ld      sp,hl
         
+        ;ei
         ;xor     a
         ;out     ($80),a
         ;call    $c021      ; setup text page (ptr in HL)
@@ -290,15 +316,41 @@ ENDIF
         pop     bc
 start1:
         ld      sp,0
+
 IF (startup=2)
         ;jp      $C000  ; BASIC entry (COLD RESET)
         jp      $C003  ; BASIC entry (WARM RESET)
 ELSE
+		ld	hl,(irq_hndl+1)
+		ld	($39),hl
 		ret
 ENDIF
 
 l_dcal:
         jp      (hl)
+
+
+; IRQ stub to get a time counter
+mc_irq:
+		di
+		push hl
+		push af
+		ld	hl,(frames)
+		inc	hl
+		ld	(frames),hl
+		ld	a,h
+		or	l
+		jr	nz,irq_hndl
+		ld	hl,(frames+2)
+		inc	hl
+		ld	(frames+2),hl
+irq_hndl:
+		ld	hl,0
+		jp	$7f
+
+FRAMES:
+		defw	0
+		defw	0
 
 ;-----------
 ; Define the stdin/out/err area. For the z88 we have two models - the
@@ -332,6 +384,8 @@ ELSE
         ENDIF
 ENDIF
 
+
+IF !DEFINED_nogfx
 
 
 ;-----------  GFX init  -------------
@@ -504,6 +558,7 @@ ENDIF
 	out	($80),a	
 	ret
 
+ENDIF
 
 ;-----------
 ; Now some variables

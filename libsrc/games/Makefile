@@ -1,6 +1,13 @@
-# $Id: Makefile,v 1.23 2012-02-02 16:12:58 stefano Exp $
+# $Id: Makefile,v 1.24 2013-03-13 21:02:57 stefano Exp $
 
 include	../Make.config
+
+# At this stage we could still miss the *_clib elements
+# but never mind, we are not linking the objects, yet
+
+lmc1000:
+	zcc +mc1000 $(CFLAGS) -DMC1000 bit_frequency.c
+	zcc +mc1000 $(CFLAGS) -DMC1000 bit_play.c
 
 lenterprise:
 	zcc +enterprise $(CFLAGS) -DENTERPRISE bit_frequency.c
@@ -65,4 +72,4 @@ clean:
 	$(RM) ace/*.o c128/*.o cpc/*.o aquarius/*.o msx/*.o 
 	$(RM) sam/*.o spectrum/*.o trs80/*.o vz/*.o z88/*.o
 	$(RM) gal/*.o ticalc/*.o enterprise/*.o mtx/*.o
-	$(RM) osca/*.o zx81snd/*.o
+	$(RM) osca/*.o zx81snd/*.o mc1000/*.o
