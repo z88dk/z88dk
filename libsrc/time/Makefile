@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.17 2011-03-18 07:12:41 stefano Exp $
+# $Id: Makefile,v 1.18 2013-03-15 17:33:41 stefano Exp $
 
 include ../Make.config
 
@@ -42,6 +42,7 @@ clean:
 	$(RM) enterprise/*.o*
 	$(RM) newbrain/*.o*
 	$(RM) rcmx000/*.o*
+	$(RM) mc1000/*.o*
 	cd z88 ; $(MAKE) clean ; cd ..
 	cd spectrum ; $(MAKE) clean ; cd ..
 	cd sprinter ; $(MAKE) clean ; cd ..

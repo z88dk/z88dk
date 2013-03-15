@@ -25,6 +25,7 @@ graphics/mc1000/bksave
 graphics/mc1000/bkrestore
 graphics/mc1000/swapgfxbk
 graphics/mc1000/stencil_render
+time/mc1000/clock
 games/mc1000/joystick
 games/mc1000/bit_open
 games/mc1000/bit_open_di

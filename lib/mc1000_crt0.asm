@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.5 2013-03-13 21:02:56 stefano Exp $
+;       $Id: mc1000_crt0.asm,v 1.6 2013-03-15 17:33:41 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma optimization directives 
@@ -268,6 +268,8 @@ start:
 
 	ld	hl,($39)
 	ld	(irq_hndl+1),hl
+	ld	hl,mc_irq
+	ld	($39),hl
 	
 	;CALL $CEBA
 	;LD ($0128),A
@@ -346,7 +348,10 @@ mc_irq:
 		ld	(frames+2),hl
 irq_hndl:
 		ld	hl,0
-		jp	$7f
+		;jp	$7f
+		pop af
+		ex	(sp),hl
+		ret
 
 FRAMES:
 		defw	0

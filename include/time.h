@@ -5,7 +5,7 @@
  *
  *      djm 9/1/2000
  *
- *	$Id: time.h,v 1.16 2013-03-13 21:02:56 stefano Exp $
+ *	$Id: time.h,v 1.17 2013-03-15 17:33:41 stefano Exp $
  */
 
 
@@ -17,6 +17,10 @@
 
 #ifdef __Z88__
 #define CLOCKS_PER_SEC 100
+#endif
+
+#ifdef __MC1000__
+#define CLOCKS_PER_SEC 300
 #endif
 
 #ifndef CLOCKS_PER_SEC
