@@ -1,21 +1,16 @@
 ;
 ;	Fast background restore
 ;
-;	MSX version
+;	MC-1000 version
 ;
-;	$Id: bkrestore.asm,v 1.2 2013-03-08 13:40:20 stefano Exp $
+;	$Id: bkrestore.asm,v 1.3 2013-03-27 12:51:22 stefano Exp $
 ;
 
 
 	XLIB    bkrestore
+	
 	XREF	bkpixeladdress
-
-
-IF FORmsx
-	INCLUDE "msx.def"
-ELSE
-	INCLUDE "svi.def"
-ENDIF
+	XREF	pix_return
 
 
 .bkrestore
@@ -42,35 +37,15 @@ ENDIF
 .bkrestores
 	push	bc
 
-	push	hl
 	call	bkpixeladdress
-	pop	hl
 
 .rbytes
 	ld	b,0
 .rloop
-	
+	ld	a,(ix+4)
 	;ld	(de),a
-	
-         ld       a,e		; LSB of video memory ptr
-         di
-         out      (VDP_CMD),a
-         ld       a,d		; MSB of video mem ptr
-         and      @00111111	; masked with "write command" bits
-         or       @01000000
-         ei
-         out      (VDP_CMD), a
-         ld       a,(ix+4)	; <- current data byte
-         out      (VDP_DATA), a
-	
-	;inc	de
-	
-	push	hl		; Point to next byte
-	ld	hl,8
-	add	hl,de
-	ex	de,hl
-	pop	hl
-
+	call	pix_return
+	inc	de
 	inc	ix
 	djnz	rloop
 

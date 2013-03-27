@@ -1,21 +1,16 @@
 ;
 ;	Fast background area save
 ;
-;	MSX version
+;	MC-1000 version
 ;
-;	$Id: bksave.asm,v 1.2 2013-03-08 13:40:20 stefano Exp $
+;	$Id: bksave.asm,v 1.3 2013-03-27 12:51:22 stefano Exp $
 ;
 
 
 	XLIB    bksave
 	XDEF	bkpixeladdress
-
-
-IF FORmsx
-	INCLUDE "msx.def"
-ELSE
-	INCLUDE "svi.def"
-ENDIF
+	XREF	gfxbyte_get
+	XREF	pixelbyte
 
 	
 .bksave
@@ -54,36 +49,28 @@ ENDIF
 .bksaves
 	push	bc
 
-	push	hl
 	call	bkpixeladdress
-	pop	hl
 	
 .rbytes
 	ld	b,0
 .rloop
 ;-------
-	ld	a,e		; LSB of video memory ptr
-	di
-	out	(VDP_CMD), a
-	ld	a,d		; MSB of video mem ptr
-	and	@00111111	; masked with "read command" bits
-	ei
-	out	(VDP_CMD), a
-	in	a, (VDP_DATAIN)
+	push bc
+	push hl
+	ex	de,hl
+	call gfxbyte_get
+	ex	de,hl
+	pop hl
+	pop bc
+	ld	a,(pixelbyte)
+	
 ;-------	
 	ld	(ix+4),a
 	
-	;inc	de
-
-	push	hl		; Point to next byte
-	ld	hl,8
-	add	hl,de
-	ex	de,hl
-	pop	hl
-
+	inc	de
+	
 	inc	ix
 	djnz	rloop
-
 
 	inc	l
 	
@@ -96,26 +83,34 @@ ENDIF
 
 
 .bkpixeladdress
-	push	hl
-	ld	b,l		; Y
+	push hl
+	; add y-times the nuber of bytes per line (32)
+	; or just multiply y by 32 and the add
+	ld	e,l
+	ld	a,h
+	ld	b,a
+
+	ld	h,0
+
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+
+	ld	de,$8000
+	add	hl,de
+
+	; add x divided by 8
 	
-	ld	a,h		; X
-	and	@11111000
-	ld	l,a
-
-	ld	a,b		; Y
+	;or	a
 	rra
-	rra
-	rra
-	and	@00011111
-
-	ld	h,a		; + ((Y & @11111000) << 5)
-
-	ld	a,b		; Y
-	and	7
+	srl a
+	srl a
 	ld	e,a
 	ld	d,0
-	add	hl,de		; + Y&7
+	add	hl,de	
+
 	ex	de,hl
 	pop	hl
 	ret
