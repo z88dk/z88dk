@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Define error codes and error messages
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.8 2013-02-12 00:48:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.9 2013-03-29 23:53:08 pauloscustodio Exp $ */
 /* $Log: errors_def.h,v $
-/* Revision 1.8  2013-02-12 00:48:54  pauloscustodio
+/* Revision 1.9  2013-03-29 23:53:08  pauloscustodio
+/* Added GNU Flex-based scanner. Not yet integrated into assembler.
+/*
+/* Revision 1.8  2013/02/12 00:48:54  pauloscustodio
 /* CH_0017 : Align with spaces, deprecate -t option
 /*
 /* Revision 1.7  2013/01/20 21:24:28  pauloscustodio
@@ -67,6 +70,9 @@ DEF_MSG( ERR_FILE_WRITE,            "Cannot write to file" )
 DEF_MSG( ERR_SYNTAX,                "Syntax error" )
 DEF_MSG( ERR_SYNTAX_EXPR,           "Syntax error in expression" )
 DEF_MSG( ERR_EXPR,                  "Error in expression '%s'" )
+DEF_MSG( ERR_UNCLOSED_STR,          "Unclosed string" )
+DEF_MSG( ERR_UNBALANCED_STRUCT,     "Unbalanced struct" )
+DEF_MSG( ERR_UNBALANCED_STRUCT_AT,  "Unbalanced struct started at line %d" )
 
 DEF_MSG( ERR_INT_RANGE,             "Integer '%ld' out of range" )
 DEF_MSG( ERR_INT_RANGE_EXPR,        "Integer '%ld' out of range in expression '%s'" )

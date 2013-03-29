@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.28 2013-03-04 23:23:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.29 2013-03-29 23:53:08 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.28  2013-03-04 23:23:37  pauloscustodio
+# Revision 1.29  2013-03-29 23:53:08  pauloscustodio
+# Added GNU Flex-based scanner. Not yet integrated into assembler.
+#
+# Revision 1.28  2013/03/04 23:23:37  pauloscustodio
 # Removed writeline, that was used to cancel listing of multi-line
 # constructs, as only the first line was shown on the list file. Fixed
 # the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
@@ -597,9 +600,11 @@ sub normalize {
 	
 	# MAP memory addresses - map only first occurrence of each address
 	# as the OS may reuse addresses
+	my $sentence_re = qr/alloc \d+ bytes at|new class \w+ at|delete class \w+ at|free \d+ bytes at|free memory leak of \d+ bytes at|\w+_(?:init|fini|copy)/;
+	
 	my $addr_seq; 
 	for ($err) {
-		while (my($addr) = /(\b(0x)+[0-9A-F]+\b)/i) {	# in Linux we get 0x0xHHHH
+		while (my($sentence, $addr) = /($sentence_re) ((0x)+[0-9A-F]+\b)/i) {	# in Linux we get 0x0xHHHH
 			$addr_seq++;
 		
 			# replace only first occurrence
@@ -608,7 +613,9 @@ sub normalize {
 			s/(delete class \w+ at) $addr/$1 ADDR_$addr_seq/;
 			s/(free \d+ bytes at) $addr/$1 ADDR_$addr_seq/;
 			s/(free memory leak of \d+ bytes at) $addr/$1 ADDR_$addr_seq/;
-			s/(\w+_(init|fini|copy)) $addr/$1 ADDR_$addr_seq/g;
+			s/(\w+_init) $addr/$1 ADDR_$addr_seq/g;
+			s/(\w+_fini) $addr/$1 ADDR_$addr_seq/g;
+			s/(\w+_copy) $addr/$1 ADDR_$addr_seq/g;
 		}
 	}
 	

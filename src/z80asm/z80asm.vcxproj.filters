@@ -111,6 +111,9 @@
     <ClInclude Include="srcfile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="scan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -201,6 +204,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="srcfile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scan.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
