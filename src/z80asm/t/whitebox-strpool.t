@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strpool.t,v 1.5 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strpool.t,v 1.6 2013-03-30 00:00:26 pauloscustodio Exp $
 # $Log: whitebox-strpool.t,v $
-# Revision 1.5  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.6  2013-03-30 00:00:26  pauloscustodio
+# Accept special case NULL in strpool_add, return NULL
+#
+# Revision 1.5  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.4  2013/01/19 01:33:16  pauloscustodio
@@ -429,6 +432,10 @@ END_INIT
 		if (strcmp(strings[i].source, pool)) ERROR;
 		if (pool != strings[i].pool) ERROR;
 	}
+	
+	warn("check NULL case\n");
+	pool = strpool_add(NULL);
+	if (pool != NULL) ERROR;
 	
 	return 0;
 END
@@ -1146,6 +1153,7 @@ memalloc strpool.c(3): alloc 6 bytes at ADDR_704
 memalloc strpool.c(2): alloc 36 bytes at ADDR_705
 memalloc strpool.c(3): alloc 6 bytes at ADDR_706
 second run - check that pool did not move
+check NULL case
 class: cleanup
 class strpool.c(1): delete class StrPool at ADDR_1 created at strpool.c(1)
 memalloc strpool.c(6): free 2 bytes at ADDR_3 allocated at strpool.c(3)

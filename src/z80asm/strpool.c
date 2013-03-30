@@ -18,9 +18,12 @@ and manage strdup/free for each token.
 Strings with the same contents are reused.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.c,v 1.4 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.c,v 1.5 2013-03-30 00:00:26 pauloscustodio Exp $ */
 /* $Log: strpool.c,v $
-/* Revision 1.4  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.5  2013-03-30 00:00:26  pauloscustodio
+/* Accept special case NULL in strpool_add, return NULL
+/*
+/* Revision 1.4  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.3  2013/01/19 01:33:16  pauloscustodio
@@ -83,9 +86,16 @@ void StrPool_copy( StrPool *self, StrPool *other )
 char *StrPool_add( StrPool *self, char *string )
 {
 	StrPoolEntry *elem;
-    size_t  num_chars = strlen( string );
-
+    size_t num_chars;
+	
+	/* special case : NULL string */
+	if ( string == NULL ) 
+	{
+		return NULL;
+	}
+	
     /* check if string exists already */
+	num_chars = strlen( string );
     HASH_FIND( hh, self->hash, string, num_chars, elem );
     if ( elem )
     {
