@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.10 2013-02-22 17:19:19 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.11 2013-03-30 00:02:22 pauloscustodio Exp $ */
 /* $Log: codearea.c,v $
-/* Revision 1.10  2013-02-22 17:19:19  pauloscustodio
+/* Revision 1.11  2013-03-30 00:02:22  pauloscustodio
+/* include memalloc.h before any other include
+/*
+/* Revision 1.10  2013/02/22 17:19:19  pauloscustodio
 /* Add listfile interface to append bytes to the listing
 /* Remove oldPC - no longer needed with new listfile
 /* Solve memory leak
@@ -78,6 +81,8 @@ Manage the code area in memory
 /* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
 /*
 /* */
+
+#include "memalloc.h"   /* before any other include */
 
 #include <memory.h>
 #include "codearea.h"

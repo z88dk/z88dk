@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Wrapper module for e4c to setup compile-time defines
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.c,v 1.10 2013-01-20 21:10:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.c,v 1.11 2013-03-30 00:02:22 pauloscustodio Exp $ */
 /* $Log: except.c,v $
-/* Revision 1.10  2013-01-20 21:10:32  pauloscustodio
+/* Revision 1.11  2013-03-30 00:02:22  pauloscustodio
+/* include memalloc.h before any other include
+/*
+/* Revision 1.10  2013/01/20 21:10:32  pauloscustodio
 /* Rename bool to BOOL, to be consistent with TRUE and FALSE and
 /* distinguish from C++ bool, true, false
 /*
@@ -66,6 +69,7 @@ Wrapper module for e4c to setup compile-time defines
 /*
 /* */
 
+#include "memalloc.h"   /* before any other include */
 #include "except.h"
 #include "types.h"
 #include "die.h"

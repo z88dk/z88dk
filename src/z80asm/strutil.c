@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Utilities working on char *
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.13 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.14 2013-03-30 00:02:22 pauloscustodio Exp $ */
 /* $Log: strutil.c,v $
-/* Revision 1.13  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.14  2013-03-30 00:02:22  pauloscustodio
+/* include memalloc.h before any other include
+/*
+/* Revision 1.13  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -72,6 +75,7 @@ Utilities working on char *
 /*
 /* */
 
+#include "memalloc.h"   /* before any other include */
 #include <string.h>
 #include <ctype.h>
 #include "strutil.h"

@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle object file contruction, reading and writing
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.4 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.5 2013-03-30 00:02:22 pauloscustodio Exp $ */
 /* $Log: objfile.c,v $
-/* Revision 1.4  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.5  2013-03-30 00:02:22  pauloscustodio
+/* include memalloc.h before any other include
+/*
+/* Revision 1.4  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.3  2012/05/24 17:09:27  pauloscustodio
@@ -42,6 +45,7 @@ Handle object file contruction, reading and writing
 /*
 /* */
 
+#include "memalloc.h"   /* before any other include */
 #include <memory.h>
 #include "objfile.h"
 

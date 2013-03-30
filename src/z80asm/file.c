@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Utilities for file handling
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.15 2013-02-27 20:44:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.16 2013-03-30 00:02:22 pauloscustodio Exp $ */
 /* $Log: file.c,v $
-/* Revision 1.15  2013-02-27 20:44:32  pauloscustodio
+/* Revision 1.16  2013-03-30 00:02:22  pauloscustodio
+/* include memalloc.h before any other include
+/*
+/* Revision 1.15  2013/02/27 20:44:32  pauloscustodio
 /* Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
 /* search_file() now accepts a NULL dir_list.
 /*
@@ -84,6 +87,7 @@ Utilities for file handling
 /*
 /* */
 
+#include "memalloc.h"   /* before any other include */
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>

@@ -17,9 +17,12 @@ Using class.h for automatic garbage collection.
 Strings may contain zero byte, length is defined by separate field.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.6 2013-02-28 00:32:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.7 2013-03-30 00:02:22 pauloscustodio Exp $ */
 /* $Log: dynstr.c,v $
-/* Revision 1.6  2013-02-28 00:32:35  pauloscustodio
+/* Revision 1.7  2013-03-30 00:02:22  pauloscustodio
+/* include memalloc.h before any other include
+/*
+/* Revision 1.6  2013/02/28 00:32:35  pauloscustodio
 /* New interface to Str to copy characters to string
 /*
 /* Revision 1.5  2013/02/22 17:21:29  pauloscustodio
@@ -40,6 +43,7 @@ Strings may contain zero byte, length is defined by separate field.
 /*
 /* */
 
+#include "memalloc.h"   /* before any other include */
 #include <string.h>
 #include <ctype.h>
 #include "dynstr.h"

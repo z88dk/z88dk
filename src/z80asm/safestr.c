@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Safe strings : char array with the size
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.c,v 1.3 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.c,v 1.4 2013-03-30 00:02:22 pauloscustodio Exp $ */
 /* $Log: safestr.c,v $
-/* Revision 1.3  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.4  2013-03-30 00:02:22  pauloscustodio
+/* include memalloc.h before any other include
+/*
+/* Revision 1.3  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.2  2012/11/03 17:39:36  pauloscustodio
@@ -29,6 +32,7 @@ Safe strings : char array with the size
 /*
 /* */
 
+#include "memalloc.h"   /* before any other include */
 #include <string.h>
 #include <ctype.h>
 #include "safestr.h"
