@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.72 2013-03-31 11:59:57 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.73 2013-03-31 12:28:10 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.72  2013-03-31 11:59:57  pauloscustodio
+/* Revision 1.73  2013-03-31 12:28:10  pauloscustodio
+/* GetLibfile() was using global z80asmfile instead of a local FILE* variable - fixed
+/*
+/* Revision 1.72  2013/03/31 11:59:57  pauloscustodio
 /* Decouple module name creation from parsing, define CURRENTMODULE->mname
 /* direcly instead of calling DeclModuleName()
 /*
@@ -916,6 +919,7 @@ GetLibfile( char *filename )
     char           *ext = "";
     char *f, fheader[9];
     int len;
+	FILE *file;
 
     newlib = NewLibrary();
     E4C_ASSERT( newlib != NULL );
@@ -953,8 +957,8 @@ GetLibfile( char *filename )
 
     newlib->libfilename = f;
 
-    z80asmfile = fopen_err( f, "rb" );           /* CH_0012 */
-    freadc_err( fheader, 8U, z80asmfile );     /* read first 8 chars from file into array */
+    file = fopen_err( f, "rb" );           /* CH_0012 */
+    freadc_err( fheader, 8U, file );     /* read first 8 chars from file into array */
     fheader[8] = '\0';
 
     if ( strcmp( fheader, Z80libhdr ) != 0 )            /* compare header of file */
@@ -966,8 +970,7 @@ GetLibfile( char *filename )
         library = ON;
     }
 
-    fclose( z80asmfile );
-    z80asmfile = NULL;
+    fclose( file );
 }
 
 
