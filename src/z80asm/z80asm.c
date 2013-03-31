@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.71 2013-03-04 23:37:09 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.72 2013-03-31 11:59:57 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.71  2013-03-04 23:37:09  pauloscustodio
+/* Revision 1.72  2013-03-31 11:59:57  pauloscustodio
+/* Decouple module name creation from parsing, define CURRENTMODULE->mname
+/* direcly instead of calling DeclModuleName()
+/*
+/* Revision 1.71  2013/03/04 23:37:09  pauloscustodio
 /* Removed pass1 that was used to skip creating page references of created
 /* symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
 /* modified list_get_page_nr() to return -1 after the whole source is
@@ -570,6 +574,7 @@ avltree *globalroot, *staticroot;
 void
 AssembleSourceFile( void )
 {
+	char module_name[FILENAME_MAX];
     int start_errors = get_num_errors();     /* count errors in this source file */
 
     /* try-catch to delete incomplete files in case of fatal error */
@@ -610,11 +615,10 @@ AssembleSourceFile( void )
 
         if ( CURRENTMODULE->mname == NULL )     /* Module name must be defined */
         {
-            path_basename( ident, srcfilename );
-            path_remove_ext( ident );
-            strtoupper( ident );
-            sym = name;
-            DeclModuleName();
+            path_basename( module_name, srcfilename );
+            path_remove_ext( module_name );
+            strtoupper( module_name );
+            CURRENTMODULE->mname = xstrdup( module_name );
         }
 
         set_error_null();
