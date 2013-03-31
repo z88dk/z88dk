@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.50 2013-03-04 23:23:37 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.51 2013-03-31 13:49:41 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.50  2013-03-04 23:23:37  pauloscustodio
+/* Revision 1.51  2013-03-31 13:49:41  pauloscustodio
+/* ReadName(), ReadNames(), CheckIfModuleWanted(), LinkLibModules(), SearchLibFile()
+/* were using global z80asmfile instead of a local FILE* variable - fixed
+/*
+/* Revision 1.50  2013/03/04 23:23:37  pauloscustodio
 /* Removed writeline, that was used to cancel listing of multi-line
 /* constructs, as only the first line was shown on the list file. Fixed
 /* the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
@@ -349,7 +353,7 @@ int LinkTracedModule( char *filename, long baseptr );
 int LinkLibModules( char *objfilename, long fptr_base, long startnames, long endnames );
 int LinkLibModule( struct libfile *library, long curmodule, char *modname );
 int SearchLibfile( struct libfile *curlib, char *modname );
-char *ReadName( void );
+char *ReadName( FILE *file );
 void redefinedmsg( void );
 void CreateLib( void );
 void SearchLibraries( char *modname );
@@ -358,14 +362,14 @@ void ModuleExpr( void );
 void CreateBinFile( void );
 void DefineOrigin( void );
 void WriteMapFile( void );
-void ReadNames( long nextname, long endnames );
+void ReadNames( FILE *file, long nextname, long endnames );
 void ReadExpr( long nextexpr, long endexpr );
 void ReOrderSymbol( avltree *node, avltree **maproot, int ( *symcmp )( void *, void * ) );
 void WriteMapSymbol( symbol *mapnode );
 void WriteGlobal( symbol *node );
 void CreateDeffile( void );
 void ReleaseLinkInfo( void );
-static char          *CheckIfModuleWanted( FILE *z80asmfile, long currentlibmodule, char *modname );
+static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname );
 
 /* global variables */
 extern FILE *z80asmfile, *deffile, *libfile;
@@ -389,7 +393,7 @@ size_t totaladdr, curroffset, sizeof_reloctable;
 static FILE *mapfile;
 
 void
-ReadNames( long nextname, long endnames )
+ReadNames( FILE *file, long nextname, long endnames )
 {
     char scope, symboltype;
     long value;
@@ -397,10 +401,10 @@ ReadNames( long nextname, long endnames )
 
     do
     {
-        scope = fgetc_err( z80asmfile );
-        symboltype = fgetc_err( z80asmfile );   /* type of name   */
-        value = fgetl_err( z80asmfile ); /* read symbol (long) integer */
-        ReadName();                       /* read symbol name */
+        scope = fgetc_err( file );
+        symboltype = fgetc_err( file ); /* type of name   */
+        value = fgetl_err( file );		/* read symbol (long) integer */
+        ReadName( file );				/* read symbol name */
 
         nextname += 1 + 1 + 4 + 1 + strlen( line );
 
@@ -788,11 +792,11 @@ LinkModule( char *filename, long fptr_base )
 
         if ( fptr_libnmdecl != -1 )
         {
-            ReadNames( fptr_namedecl, fptr_libnmdecl );    /* Read symbols until library declarations */
+            ReadNames( z80asmfile, fptr_namedecl, fptr_libnmdecl );    /* Read symbols until library declarations */
         }
         else
         {
-            ReadNames( fptr_namedecl, fptr_modname );    /* Read symbol suntil module name */
+            ReadNames( z80asmfile, fptr_namedecl, fptr_modname );    /* Read symbol suntil module name */
         }
     }
 
@@ -824,16 +828,16 @@ LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
 {
     long len;
     char *modname;
+	FILE *file;
 
     do
     {
         /* open object file for reading */
-        z80asmfile = fopen_err( filename, "rb" );           /* CH_0012 */
-        fseek( z80asmfile, fptr_base + nextname, SEEK_SET );       /* set file pointer to point at library name
+        file = fopen_err( filename, "rb" );           /* CH_0012 */
+        fseek( file, fptr_base + nextname, SEEK_SET );       /* set file pointer to point at library name
                                                              * declarations */
-        ReadName();               /* read library reference name */
-        fclose( z80asmfile );
-        z80asmfile = NULL;
+        ReadName( file );					/* read library reference name */
+        fclose( file );
 
         len = strlen( line );
         nextname += 1 + len;      /* remember module pointer to next name in this   object module */
@@ -901,8 +905,9 @@ SearchLibfile( struct libfile *curlib, char *modname )
     long currentlibmodule, modulesize;
     int ret;
     char *mname;
+	FILE *file;
 
-    z80asmfile = fopen_err( curlib->libfilename, "rb" );           /* CH_0012 */
+    file = fopen_err( curlib->libfilename, "rb" );           /* CH_0012 */
 
     while ( curlib->nextobjfile != -1 )
     {
@@ -910,21 +915,20 @@ SearchLibfile( struct libfile *curlib, char *modname )
         do
         {
             /* point at first available module in library */
-            fseek( z80asmfile, curlib->nextobjfile, SEEK_SET );   /* point at beginning of a module */
+            fseek( file, curlib->nextobjfile, SEEK_SET );   /* point at beginning of a module */
             currentlibmodule = curlib->nextobjfile;
-            curlib->nextobjfile = fgetl_err( z80asmfile ); /* get file pointer to next module in library */
-            modulesize = fgetl_err( z80asmfile ); /* get size of current module */
+            curlib->nextobjfile = fgetl_err( file ); /* get file pointer to next module in library */
+            modulesize = fgetl_err( file ); /* get size of current module */
         }
         while ( modulesize == 0 && curlib->nextobjfile != -1 );
 
         if ( modulesize != 0 )
         {
-            if ( ( mname = CheckIfModuleWanted( z80asmfile, currentlibmodule, modname ) ) != NULL )
+            if ( ( mname = CheckIfModuleWanted( file, currentlibmodule, modname ) ) != NULL )
             {
                 try
                 {
-                    fclose( z80asmfile );
-                    z80asmfile = NULL;
+                    fclose( file );
                     ret =  LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
                 }
 
@@ -934,12 +938,11 @@ SearchLibfile( struct libfile *curlib, char *modname )
                 }
                 return ret;
             }
-            else if ( sdcc_hacks == ON && modname[0] == '_' && ( mname = CheckIfModuleWanted( z80asmfile, currentlibmodule, modname + 1 ) ) != NULL )
+            else if ( sdcc_hacks == ON && modname[0] == '_' && ( mname = CheckIfModuleWanted( file, currentlibmodule, modname + 1 ) ) != NULL )
             {
                 try
                 {
-                    fclose( z80asmfile );
-                    z80asmfile = NULL;
+                    fclose( file );
                     ret =  LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
                 }
 
@@ -952,8 +955,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
         }
     }
 
-    fclose( z80asmfile );
-    z80asmfile = NULL;
+    fclose( file );
     return 0;
 }
 
@@ -966,7 +968,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
 
  */
 static char *
-CheckIfModuleWanted( FILE *z80asmfile, long currentlibmodule, char *modname )
+CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
 {
     long fptr_mname, fptr_expr, fptr_name, fptr_libname;
     char *mname;
@@ -975,14 +977,14 @@ CheckIfModuleWanted( FILE *z80asmfile, long currentlibmodule, char *modname )
 
 
     /* found module name? */
-    fseek( z80asmfile, currentlibmodule + 4 + 4 + 8 + 2, SEEK_SET );     /* point at module name  file
+    fseek( file, currentlibmodule + 4 + 4 + 8 + 2, SEEK_SET );     /* point at module name  file
                                                                         * pointer */
-    fptr_mname = fgetl_err( z80asmfile );      /* get module name file  pointer   */
-    fptr_expr = fgetl_err( z80asmfile );
-    fptr_name = fgetl_err( z80asmfile );
-    fptr_libname = fgetl_err( z80asmfile );
-    fseek( z80asmfile, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET );       /* point at module name  */
-    mname = xstrdup( ReadName() );                      /* read module name */
+    fptr_mname = fgetl_err( file );      /* get module name file  pointer   */
+    fptr_expr = fgetl_err( file );
+    fptr_name = fgetl_err( file );
+    fptr_libname = fgetl_err( file );
+    fseek( file, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET );       /* point at module name  */
+    mname = xstrdup( ReadName( file ) );                      /* read module name */
 
     if ( strcmp( mname, modname ) == 0 )
     {
@@ -1002,7 +1004,7 @@ CheckIfModuleWanted( FILE *z80asmfile, long currentlibmodule, char *modname )
             }
 
             /* Move to the name section */
-            fseek( z80asmfile, currentlibmodule + 4 + 4 + fptr_name, SEEK_SET );
+            fseek( file, currentlibmodule + 4 + 4 + fptr_name, SEEK_SET );
             red = fptr_name;
 
             while ( ! found && red < end )
@@ -1010,13 +1012,13 @@ CheckIfModuleWanted( FILE *z80asmfile, long currentlibmodule, char *modname )
                 char scope, type;
                 long temp;
 
-                scope = fgetc_err( z80asmfile );
+                scope = fgetc_err( file );
                 red++;
-                type = fgetc_err( z80asmfile );
+                type = fgetc_err( file );
                 red++;
-                temp = fgetl_err( z80asmfile );
+                temp = fgetl_err( file );
                 red += 4;
-                name = ReadName();
+                name = ReadName( file );
                 red += strlen( name );
                 red++; /* Length byte */
 
@@ -1064,12 +1066,12 @@ LinkLibModule( struct libfile *library, long curmodule, char *modname )
 
 
 char *
-ReadName( void )
+ReadName( FILE *file )
 {
     size_t strlength;
 
-    strlength = fgetc_err( z80asmfile );
-    freadc_err( line, strlength, z80asmfile ); /* read   name */
+    strlength = fgetc_err( file );
+    freadc_err( line, strlength, file ); /* read   name */
     line[strlength] = '\0';
 
     return line;
@@ -1115,16 +1117,12 @@ ModuleExpr( void )
 
             if ( fptr_namedecl != -1 )
             {
-                ReadExpr( fptr_exprdecl, fptr_namedecl );
-            }    /* Evaluate until beginning of name
-
-                                                         * declarations     */
+                ReadExpr( fptr_exprdecl, fptr_namedecl );	/* Evaluate until beginning of name declarations */
+            }    
             else if ( fptr_libnmdecl != -1 )
             {
-                ReadExpr( fptr_exprdecl, fptr_libnmdecl );
-            }   /* Evaluate until beginning of library
-
-                                                         * reference declarations */
+                ReadExpr( fptr_exprdecl, fptr_libnmdecl );	/* Evaluate until beginning of library reference declarations */
+            }   
             else
             {
                 ReadExpr( fptr_exprdecl, fptr_modname );    /* Evaluate until beginning of module name */
