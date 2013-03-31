@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Scanner - to be processed by: flex -L scan.l
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.1 2013-03-29 23:53:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.2 2013-03-31 18:28:30 pauloscustodio Exp $ */
 /* $Log: scan.l,v $
-/* Revision 1.1  2013-03-29 23:53:08  pauloscustodio
+/* Revision 1.2  2013-03-31 18:28:30  pauloscustodio
+/* New TOK_LABEL for a label definition, i.e. ". NAME" or "NAME :"
+/*
+/* Revision 1.1  2013/03/29 23:53:08  pauloscustodio
 /* Added GNU Flex-based scanner. Not yet integrated into assembler.
 /*
 /*
@@ -89,6 +92,7 @@ typedef enum TokType
 
     /* language tokens */
     TOK_NAME,                   /* any identifier */
+    TOK_LABEL,                  /* label definition, i.e. ". NAME" or "NAME :" */
     TOK_NUMBER,
     TOK_STRING,                 /* single- or double-quoted string */
     TOK_PREPROC,                /* preprocessor command */
@@ -294,10 +298,28 @@ D16		[0-9a-f]
 
 
 			/* Identifier */
-{ID}		{	
+{ID}		{
 				Str_bset( token->str_value, yytext, yyleng ); 	
 				strtoupper( Str_data( token->str_value ) );		
 				return TOK_NAME;
+			}
+
+			/* Label */
+"."{SPACE}*{ID}{SPACE}*":"?	|
+"."?{SPACE}*{ID}{SPACE}*":"	{
+				/* trim starting dot and ending colon */
+				while ( yytext[0] == '.' || isspace( yytext[0] ) ) 
+				{
+					yytext++;
+					yyleng--;
+				}
+				while ( yytext[yyleng-1] == ':' || isspace( yytext[yyleng-1] ) ) 
+				{
+					yyleng--;
+				}
+				Str_bset( token->str_value, yytext, yyleng ); 	
+				strtoupper( Str_data( token->str_value ) );		
+				return TOK_LABEL;
 			}
 
 			/* String - return string without quotes */

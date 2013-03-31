@@ -19,17 +19,20 @@ Copyright (C) Paulo Custodio, 2011-2013
 Scanner - to be processed by: flex -L scan.l
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.1 2013-03-29 23:53:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.2 2013-03-31 18:28:30 pauloscustodio Exp $ */
 /* $Log: scan.h,v $
-/* Revision 1.1  2013-03-29 23:53:08  pauloscustodio
+/* Revision 1.2  2013-03-31 18:28:30  pauloscustodio
+/* New TOK_LABEL for a label definition, i.e. ". NAME" or "NAME :"
+/*
+/* Revision 1.1  2013/03/29 23:53:08  pauloscustodio
 /* Added GNU Flex-based scanner. Not yet integrated into assembler.
 /*
 /*
 /* */
 
-#include "memalloc.h"   /* before any other include */
+#include "memalloc.h"	/* before any other include */
 
-#define YY_NO_UNISTD_H  1       /* don't include unistd */
+#define YY_NO_UNISTD_H	1		/* don't include unistd */
 
 #ifndef SCAN_H
 #define SCAN_H
@@ -43,12 +46,12 @@ Scanner - to be processed by: flex -L scan.l
 *----------------------------------------------------------------------------*/
 typedef enum TokType
 {
-    /* mark end of input */
-    TOK_NULL            = 0,
-
+	/* mark end of input */
+	TOK_NULL			= 0,
+	
     /* single character tokens */
     TOK_NEWLINE         = '\n',
-
+	
     TOK_EXCLAM          = '!',
     TOK_HASH            = '#',
     TOK_DOLLAR          = '$',
@@ -77,7 +80,7 @@ typedef enum TokType
     TOK_VBAR            = '|',
     TOK_RCURLY          = '}',
     TOK_TILDE           = '~',
-
+	
     /* multi-character tokens */
     TOK_EQUAL_EQUAL     = 0x100,/* "==" */
     TOK_LESS_GREATER,           /* "<>" */
@@ -92,6 +95,7 @@ typedef enum TokType
 
     /* language tokens */
     TOK_NAME,                   /* any identifier */
+    TOK_LABEL,                  /* label definition, i.e. ". NAME" or "NAME :" */
     TOK_NUMBER,
     TOK_STRING,                 /* single- or double-quoted string */
     TOK_PREPROC,                /* preprocessor command */
@@ -101,15 +105,15 @@ typedef enum TokType
 /*-----------------------------------------------------------------------------
 *   Token and list of tokens
 *----------------------------------------------------------------------------*/
-CLASS( Token )
-TokType tok_type;           /* type of token */
-long    num_value;          /* numeric value, if any */
-Str    *str_value;          /* string value, if any */
-char   *filename;           /* file name - kept in strpool */
-int     line_nr;            /* input line number */
+CLASS(Token)
+	TokType	tok_type;			/* type of token */
+	long	num_value;			/* numeric value, if any */
+	Str	   *str_value;			/* string value, if any */
+	char   *filename;			/* file name - kept in strpool */
+	int 	line_nr;			/* input line number */
 END_CLASS;
 
-CLASS_LIST( Token );
+CLASS_LIST(Token);
 
 /*-----------------------------------------------------------------------------
 *   API - uses srcfile.h singleton API
@@ -119,27 +123,27 @@ CLASS_LIST( Token );
 extern void scan_file( char *filename );
 extern void scan_text( char *text );
 
-/* scan input for next token, return token type;
+/* scan input for next token, return token type; 
    use scan_xxx() to last returned token attributes, only valid until next
    scan_get()/scan_unget() call */
 extern TokType scan_get( void );
 extern TokType scan_tok_type( void );
-extern long    scan_num_value( void );
+extern long	   scan_num_value( void );
 extern char   *scan_str_value( void );
 extern char   *scan_filename( void );
-extern int     scan_line_nr( void );
+extern int 	   scan_line_nr( void );
 
 /* push back token to input stream */
 extern void scan_unget( TokType tok_type, long num_value, char *str_value,
-                        char *filename, int line_nr );
+						char *filename, int line_nr );
 
 /* stack of nested constructs, i.e. IF / ELSE / ENDIF
    local to each input file, stack must be empty at the end of file */
 extern void scan_push_struct( int id, int value );
-extern int  scan_top_id( void );
+extern int  scan_top_id( void );						
 extern int  scan_top_value( void );
 extern void scan_replace_struct( int id, int value );
-extern void scan_pop_struct( int id );      /* syntaxt error if id != top_id */
+extern void scan_pop_struct( int id );		/* syntaxt error if id != top_id */
 
 /* forward declaration for YY_EXTRA_TYPE */
 struct Context;
@@ -182,7 +186,7 @@ struct Context;
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 
 /* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
- * if you want the limit (max/min) macros for int types.
+ * if you want the limit (max/min) macros for int types. 
  */
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
@@ -199,7 +203,7 @@ typedef uint32_t flex_uint32_t;
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
 typedef int flex_int32_t;
-typedef unsigned char flex_uint8_t;
+typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
 
@@ -241,15 +245,15 @@ typedef unsigned int flex_uint32_t;
 /* The "const" storage-class-modifier is valid. */
 #define YY_USE_CONST
 
-#else   /* ! __cplusplus */
+#else	/* ! __cplusplus */
 
 /* C99 requires __STDC__ to be defined as 1. */
 #if defined (__STDC__)
 
 #define YY_USE_CONST
 
-#endif  /* defined (__STDC__) */
-#endif  /* ! __cplusplus */
+#endif	/* defined (__STDC__) */
+#endif	/* ! __cplusplus */
 
 #ifdef YY_USE_CONST
 #define yyconst const
@@ -260,7 +264,7 @@ typedef unsigned int flex_uint32_t;
 /* An opaque pointer. */
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
-typedef void *yyscan_t;
+typedef void* yyscan_t;
 #endif
 
 /* For convenience, these vars (plus the bison vars far below)
@@ -300,69 +304,69 @@ typedef size_t yy_size_t;
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
 struct yy_buffer_state
-{
-    FILE *yy_input_file;
+	{
+	FILE *yy_input_file;
 
-    char *yy_ch_buf;        /* input buffer */
-    char *yy_buf_pos;       /* current position in input buffer */
+	char *yy_ch_buf;		/* input buffer */
+	char *yy_buf_pos;		/* current position in input buffer */
 
-    /* Size of input buffer in bytes, not including room for EOB
-     * characters.
-     */
-    yy_size_t yy_buf_size;
+	/* Size of input buffer in bytes, not including room for EOB
+	 * characters.
+	 */
+	yy_size_t yy_buf_size;
 
-    /* Number of characters read into yy_ch_buf, not including EOB
-     * characters.
-     */
-    int yy_n_chars;
+	/* Number of characters read into yy_ch_buf, not including EOB
+	 * characters.
+	 */
+	int yy_n_chars;
 
-    /* Whether we "own" the buffer - i.e., we know we created it,
-     * and can realloc() it to grow it, and should free() it to
-     * delete it.
-     */
-    int yy_is_our_buffer;
+	/* Whether we "own" the buffer - i.e., we know we created it,
+	 * and can realloc() it to grow it, and should free() it to
+	 * delete it.
+	 */
+	int yy_is_our_buffer;
 
-    /* Whether this is an "interactive" input source; if so, and
-     * if we're using stdio for input, then we want to use getc()
-     * instead of fread(), to make sure we stop fetching input after
-     * each newline.
-     */
-    int yy_is_interactive;
+	/* Whether this is an "interactive" input source; if so, and
+	 * if we're using stdio for input, then we want to use getc()
+	 * instead of fread(), to make sure we stop fetching input after
+	 * each newline.
+	 */
+	int yy_is_interactive;
 
-    /* Whether we're considered to be at the beginning of a line.
-     * If so, '^' rules will be active on the next match, otherwise
-     * not.
-     */
-    int yy_at_bol;
+	/* Whether we're considered to be at the beginning of a line.
+	 * If so, '^' rules will be active on the next match, otherwise
+	 * not.
+	 */
+	int yy_at_bol;
 
     int yy_bs_lineno; /**< The line count. */
     int yy_bs_column; /**< The column count. */
+    
+	/* Whether to try to fill the input buffer when we reach the
+	 * end of it.
+	 */
+	int yy_fill_buffer;
 
-    /* Whether to try to fill the input buffer when we reach the
-     * end of it.
-     */
-    int yy_fill_buffer;
+	int yy_buffer_status;
 
-    int yy_buffer_status;
-
-};
+	};
 #endif /* !YY_STRUCT_YY_BUFFER_STATE */
 
-void yyrestart( FILE *input_file , yyscan_t yyscanner );
-void yy_switch_to_buffer( YY_BUFFER_STATE new_buffer , yyscan_t yyscanner );
-YY_BUFFER_STATE yy_create_buffer( FILE *file, int size , yyscan_t yyscanner );
-void yy_delete_buffer( YY_BUFFER_STATE b , yyscan_t yyscanner );
-void yy_flush_buffer( YY_BUFFER_STATE b , yyscan_t yyscanner );
-void yypush_buffer_state( YY_BUFFER_STATE new_buffer , yyscan_t yyscanner );
-void yypop_buffer_state( yyscan_t yyscanner );
+void yyrestart (FILE *input_file ,yyscan_t yyscanner );
+void yy_switch_to_buffer (YY_BUFFER_STATE new_buffer ,yyscan_t yyscanner );
+YY_BUFFER_STATE yy_create_buffer (FILE *file,int size ,yyscan_t yyscanner );
+void yy_delete_buffer (YY_BUFFER_STATE b ,yyscan_t yyscanner );
+void yy_flush_buffer (YY_BUFFER_STATE b ,yyscan_t yyscanner );
+void yypush_buffer_state (YY_BUFFER_STATE new_buffer ,yyscan_t yyscanner );
+void yypop_buffer_state (yyscan_t yyscanner );
 
-YY_BUFFER_STATE yy_scan_buffer( char *base, yy_size_t size , yyscan_t yyscanner );
-YY_BUFFER_STATE yy_scan_string( yyconst char *yy_str , yyscan_t yyscanner );
-YY_BUFFER_STATE yy_scan_bytes( yyconst char *bytes, int len , yyscan_t yyscanner );
+YY_BUFFER_STATE yy_scan_buffer (char *base,yy_size_t size ,yyscan_t yyscanner );
+YY_BUFFER_STATE yy_scan_string (yyconst char *yy_str ,yyscan_t yyscanner );
+YY_BUFFER_STATE yy_scan_bytes (yyconst char *bytes,int len ,yyscan_t yyscanner );
 
-void *yyalloc( yy_size_t , yyscan_t yyscanner );
-void *yyrealloc( void *, yy_size_t , yyscan_t yyscanner );
-void yyfree( void * , yyscan_t yyscanner );
+void *yyalloc (yy_size_t ,yyscan_t yyscanner );
+void *yyrealloc (void *,yy_size_t ,yyscan_t yyscanner );
+void yyfree (void * ,yyscan_t yyscanner );
 
 /* Begin user sect3 */
 
@@ -387,38 +391,38 @@ void yyfree( void * , yyscan_t yyscanner );
 
 #define YY_EXTRA_TYPE struct Context *
 
-int yylex_init( yyscan_t *scanner );
+int yylex_init (yyscan_t* scanner);
 
-int yylex_init_extra( YY_EXTRA_TYPE user_defined, yyscan_t *scanner );
+int yylex_init_extra (YY_EXTRA_TYPE user_defined,yyscan_t* scanner);
 
 /* Accessor methods to globals.
    These are made visible to non-reentrant scanners for convenience. */
 
-int yylex_destroy( yyscan_t yyscanner );
+int yylex_destroy (yyscan_t yyscanner );
 
-int yyget_debug( yyscan_t yyscanner );
+int yyget_debug (yyscan_t yyscanner );
 
-void yyset_debug( int debug_flag , yyscan_t yyscanner );
+void yyset_debug (int debug_flag ,yyscan_t yyscanner );
 
-YY_EXTRA_TYPE yyget_extra( yyscan_t yyscanner );
+YY_EXTRA_TYPE yyget_extra (yyscan_t yyscanner );
 
-void yyset_extra( YY_EXTRA_TYPE user_defined , yyscan_t yyscanner );
+void yyset_extra (YY_EXTRA_TYPE user_defined ,yyscan_t yyscanner );
 
-FILE *yyget_in( yyscan_t yyscanner );
+FILE *yyget_in (yyscan_t yyscanner );
 
-void yyset_in( FILE *in_str , yyscan_t yyscanner );
+void yyset_in  (FILE * in_str ,yyscan_t yyscanner );
 
-FILE *yyget_out( yyscan_t yyscanner );
+FILE *yyget_out (yyscan_t yyscanner );
 
-void yyset_out( FILE *out_str , yyscan_t yyscanner );
+void yyset_out  (FILE * out_str ,yyscan_t yyscanner );
 
-int yyget_leng( yyscan_t yyscanner );
+int yyget_leng (yyscan_t yyscanner );
 
-char *yyget_text( yyscan_t yyscanner );
+char *yyget_text (yyscan_t yyscanner );
 
-int yyget_lineno( yyscan_t yyscanner );
+int yyget_lineno (yyscan_t yyscanner );
 
-void yyset_lineno( int line_number , yyscan_t yyscanner );
+void yyset_lineno (int line_number ,yyscan_t yyscanner );
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -426,18 +430,18 @@ void yyset_lineno( int line_number , yyscan_t yyscanner );
 
 #ifndef YY_SKIP_YYWRAP
 #ifdef __cplusplus
-extern "C" int yywrap( yyscan_t yyscanner );
+extern "C" int yywrap (yyscan_t yyscanner );
 #else
-extern int yywrap( yyscan_t yyscanner );
+extern int yywrap (yyscan_t yyscanner );
 #endif
 #endif
 
 #ifndef yytext_ptr
-static void yy_flex_strncpy( char *, yyconst char *, int , yyscan_t yyscanner );
+static void yy_flex_strncpy (char *,yyconst char *,int ,yyscan_t yyscanner);
 #endif
 
 #ifdef YY_NEED_STRLEN
-static int yy_flex_strlen( yyconst char * , yyscan_t yyscanner );
+static int yy_flex_strlen (yyconst char * ,yyscan_t yyscanner);
 #endif
 
 #ifndef YY_NO_INPUT
@@ -465,7 +469,7 @@ static int yy_flex_strlen( yyconst char * , yyscan_t yyscanner );
 #ifndef YY_DECL
 #define YY_DECL_IS_OURS 1
 
-extern int yylex( yyscan_t yyscanner );
+extern int yylex (yyscan_t yyscanner);
 
 #define YY_DECL int yylex (yyscan_t yyscanner)
 #endif /* !YY_DECL */
