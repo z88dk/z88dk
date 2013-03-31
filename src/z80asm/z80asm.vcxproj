@@ -100,6 +100,7 @@
     <ClInclude Include="module.h" />
     <ClInclude Include="objfile.h" />
     <ClInclude Include="options.h" />
+    <ClInclude Include="parse.h" />
     <ClInclude Include="queue.h" />
     <ClInclude Include="safestr.h" />
     <ClInclude Include="scan.h" />
@@ -133,6 +134,7 @@
     <ClCompile Include="modlink.c" />
     <ClCompile Include="objfile.c" />
     <ClCompile Include="options.c" />
+    <ClCompile Include="parse.c" />
     <ClCompile Include="prsident.c" />
     <ClCompile Include="prsline.c" />
     <ClCompile Include="safestr.c" />
