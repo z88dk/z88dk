@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/op-DEFGROUP.t,v 1.1 2013-03-06 00:02:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/op-DEFGROUP.t,v 1.2 2013-04-01 22:03:20 pauloscustodio Exp $
 # $Log: op-DEFGROUP.t,v $
-# Revision 1.1  2013-03-06 00:02:17  pauloscustodio
+# Revision 1.2  2013-04-01 22:03:20  pauloscustodio
+# Add conditional assembly tests
+#
+# Revision 1.1  2013/03/06 00:02:17  pauloscustodio
 # 	BUG_0032 : DEFGROUP ignores name after assignment
 # 		The code
 # DEFGROUP {
@@ -68,6 +71,42 @@ t_z80asm(
 						10, 11,
 				),
 );
+
+# check with conditional assembly
+t_z80asm(
+	asm		=> "
+				if 1
+					defgroup 
+					{ 
+						ff = 1
+					}
+				else
+					defgroup 
+					{
+						ff = 2
+					}
+				endif
+				
+				if 0
+					defgroup 
+					{ 
+						fg = 1
+					}
+				else
+					defgroup 
+					{
+						fg = 2
+					}
+				endif
+				
+				defw ff, fg
+				
+				",
+	bin 	=>	pack("v*", 
+						1, 2
+				),
+);
+
 
 unlink_testfiles();
 done_testing();

@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/op-DEFVARS.t,v 1.1 2013-03-06 00:03:05 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/op-DEFVARS.t,v 1.2 2013-04-01 22:03:20 pauloscustodio Exp $
 # $Log: op-DEFVARS.t,v $
-# Revision 1.1  2013-03-06 00:03:05  pauloscustodio
+# Revision 1.2  2013-04-01 22:03:20  pauloscustodio
+# Add conditional assembly tests
+#
+# Revision 1.1  2013/03/06 00:03:05  pauloscustodio
 # Test DEFVARS
 #
 #
@@ -70,6 +73,34 @@ t_z80asm(
 						0x1000+100+2+3+4,		# f9
 						0x1000+100+2+3+4+4,		# f10
 						0x1000+100+2+3+4+4+4,	# f11
+				),
+);
+
+# check with conditional assembly
+t_z80asm(
+	asm		=> "
+				if 0
+					defc base = 0x1000
+					defvars base 
+					{
+						f1		ds.b 100
+						f2
+					}
+				else
+					defc base = 0x1000
+					defvars base 
+					{
+						f1		ds.b 200
+						f2
+					}
+				endif
+
+				defw f1, f2
+				
+				",
+	bin 	=>	pack("v*", 
+						0x1000, 				# f1
+						0x1000+200, 			# f2
 				),
 );
 
