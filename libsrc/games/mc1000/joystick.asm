@@ -13,9 +13,9 @@
     ; 2 = Player 2's joystick.
 
     ld    a,l
-    and   a
-    jr    z,j_p1
     cp    1
+    jr    z,j_p1
+    cp    2
     jr    z,j_p2
     jr    j_nop
 
@@ -45,7 +45,7 @@
     cpl    ; In original data bits 0 represent keypress. Invert.
     ld    b,a
     ; Transfer fire to bit 0.
-    or    c    ; Fire pressed?
+    and   c    ; Fire pressed?
     jr    z,j_nofire
     set    0,b
     jr    j_reverse
