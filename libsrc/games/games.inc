@@ -5,7 +5,7 @@
 ;       based on the Dominic's sound routines
 ;
 ;
-;       $Id: games.inc,v 1.20 2013-03-14 07:54:18 stefano Exp $
+;       $Id: games.inc,v 1.21 2013-04-03 15:24:31 stefano Exp $
 ;
 
 IF FORc128
@@ -27,9 +27,9 @@ IF FORmsx
 ENDIF
 
 IF FORmc1000
-        defc sndbit_port   = 96			; $60 = YM amplitude register
-        defc sndbit_bit    = 3			; More significant bit
-        defc sndbit_mask   = 8
+        defc sndbit_port   = 96            ; $60 = YM amplitude register
+        defc sndbit_bit    = 3            ; More significant bit
+        defc sndbit_mask   = 15
 ENDIF
 
 IF FORsvi

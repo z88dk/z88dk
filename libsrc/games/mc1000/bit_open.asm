@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.1 2013-03-13 21:02:57 stefano Exp $
+; $Id: bit_open.asm,v 1.2 2013-04-03 15:24:32 stefano Exp $
 ;
 ; CCE MC-1000 bit sound functions
 ;
@@ -16,7 +16,8 @@
     call	bit_close
 
     ld    a,8 ; Select amplitude register for channel A.
-    out    ($20),a
-    ld		(snd_tick),a
+    out   ($20),a
+    xor   a
+    ld    (snd_tick),a
 
     ret
