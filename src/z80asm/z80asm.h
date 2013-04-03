@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.22 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.23 2013-04-03 22:52:56 pauloscustodio Exp $ */
 /* $Log: z80asm.h,v $
-/* Revision 1.22  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.23  2013-04-03 22:52:56  pauloscustodio
+/* Move libfilename to options.c, keep it in strpool
+/*
+/* Revision 1.22  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -147,7 +150,6 @@ Copyright (C) Paulo Custodio, 2011-2013
 extern char srcfilename[];
 extern char objfilename[];
 extern char errfilename[];
-extern char libfilename[];
 
 #define REG16_BC   0
 #define REG16_DE   1
@@ -176,8 +178,8 @@ extern struct module *CURRENTMODULE;
 extern FILE *z80asmfile, *deffile, *libfile;
 
 extern char *Fetchfilename( FILE *fptr );
-extern void CreateLibfile( char *filename );
-extern void GetLibfile( char *filename );
+extern char *CreateLibfile( char *filename );
+extern char *GetLibfile( char *filename );
 extern void usage( void );
 
 #endif

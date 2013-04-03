@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.20 2013-02-27 22:34:16 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.21 2013-04-03 22:52:56 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.20  2013-02-27 22:34:16  pauloscustodio
+/* Revision 1.21  2013-04-03 22:52:56  pauloscustodio
+/* Move libfilename to options.c, keep it in strpool
+/*
+/* Revision 1.20  2013/02/27 22:34:16  pauloscustodio
 /* Move include path search to srcfile.c
 /*
 /* Revision 1.19  2013/02/27 20:47:30  pauloscustodio
@@ -118,6 +121,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "options.h"
 #include "srcfile.h"
 #include "strlist.h"
+#include "strpool.h"
 #include "symbols.h"
 #include "z80asm.h"
 #include <ctype.h>
@@ -144,6 +148,7 @@ enum flag globaldef;
 enum flag autorelocate;
 enum flag deforigin;
 enum flag expl_binflnm;
+char *libfilename;				/* -i, -x library file, kept in strpool */
 char binfilename[FILENAME_MAX]; /* -o explicit filename buffer (BUG_0012) */
 char srcext[FILEEXT_MAX];       /* contains default source file extension */
 char objext[FILEEXT_MAX];       /* contains default object file extension */
@@ -396,12 +401,12 @@ void set_asm_flag( char *flagid )
 
     else if ( *flagid == 'i' )
     {
-        GetLibfile( ( flagid + 1 ) );
+        libfilename = GetLibfile( ( flagid + 1 ) );
     }
 
     else if ( *flagid == 'x' )
     {
-        CreateLibfile( ( flagid + 1 ) );
+        libfilename = CreateLibfile( ( flagid + 1 ) );
     }
 
     else if ( *flagid == 'r' )

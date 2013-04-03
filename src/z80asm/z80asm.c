@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.73 2013-03-31 12:28:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.74 2013-04-03 22:52:56 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.73  2013-03-31 12:28:10  pauloscustodio
+/* Revision 1.74  2013-04-03 22:52:56  pauloscustodio
+/* Move libfilename to options.c, keep it in strpool
+/*
+/* Revision 1.73  2013/03/31 12:28:10  pauloscustodio
 /* GetLibfile() was using global z80asmfile instead of a local FILE* variable - fixed
 /*
 /* Revision 1.72  2013/03/31 11:59:57  pauloscustodio
@@ -473,23 +476,24 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 #include "memalloc.h"   /* before any other include */
 
-#include <stdio.h>
-#include <time.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <ctype.h>
+#include "codearea.h"
 #include "config.h"
+#include "errors.h"
+#include "file.h"
+#include "hist.h"
+#include "listfile.h"
+#include "options.h"
+#include "strpool.h"
+#include "strutil.h"
 #include "symbol.h"
 #include "symbols.h"
 #include "z80asm.h"
-#include "hist.h"
-#include "options.h"
-#include "errors.h"
-#include "file.h"
-#include "codearea.h"
-#include "strutil.h"
-#include "listfile.h"
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <time.h>
 
 /* external functions */
 void RemovePfixlist( struct expr *pfixexpr );
@@ -547,7 +551,6 @@ char line[255], stringconst[255], ident[FILENAME_MAX + 1];
 char srcfilename[FILENAME_MAX];
 char objfilename[FILENAME_MAX];
 char errfilename[FILENAME_MAX];
-char libfilename[FILENAME_MAX];
 
 
 char Z80objhdr[] = "Z80RMF01";
@@ -877,67 +880,62 @@ GetModuleSize( void )
 }
 
 
-void
-CreateLibfile( char *filename )
+/* create library file, return name in strpool */
+char *CreateLibfile( char *filename )
 {
     size_t len;
+	char buff[FILENAME_MAX];
+	char *found_libfilename;
 
     len = strlen( filename );
 
     if ( len )
     {
-        path_replace_ext( libfilename, filename, FILEEXT_LIB );     /* add '.lib' extension */
+        path_replace_ext( buff, filename, FILEEXT_LIB );     /* add '.lib' extension */
+		found_libfilename = strpool_add( buff );
     }
     else
     {
         if ( ( filename = getenv( "Z80_STDLIB" ) ) != NULL )
         {
-            /* BUG_0002 - off by one alloc */
-            libfilename[0] = '\0';              /* prepare for strncat */
-            strncat( libfilename, filename, FILENAME_MAX - 1 );
+			found_libfilename = strpool_add( filename );
         }
         else
         {
             error( ERR_ENV_NOT_DEFINED, "Z80_STDLIB" );
-            return;
+            return NULL;
         }
     }
 
     /* create library as BINARY file */
-    libfile = fopen_err( libfilename, "w+b" );           /* CH_0012 */
+    libfile = fopen_err( found_libfilename, "w+b" );           /* CH_0012 */
     createlibrary = ON;
     fwritec_err( Z80libhdr, 8U, libfile );     /* write library header */
+
+	return found_libfilename;
 }
 
 
-void
-GetLibfile( char *filename )
+/* search library file name, return found name in strpool */
+char *GetLibfile( char *filename )
 {
-    char            tempbuf[FILENAME_MAX + 1];
+    char            buff[FILENAME_MAX];
     struct libfile *newlib;
-    char           *ptr;
+    char           *found_libfilename;
     char           *ext = "";
-    char *f, fheader[9];
+    char fheader[9];
     int len;
 	FILE *file;
 
     newlib = NewLibrary();
-    E4C_ASSERT( newlib != NULL );
 
     len = strlen( filename );
 
     if ( len )
     {
-        if ( strcmp( filename + ( len - 4 ), FILEEXT_LIB ) != 0 )
-        {
-            ext = FILEEXT_LIB;
-        }
-
-        snprintf( tempbuf, sizeof( tempbuf ), "%s%s", filename, ext );
-
-        ptr = search_lib_file( tempbuf );
-
-        f = xstrdup( ptr );
+		/* set lib extension */
+		path_replace_ext( buff, filename, FILEEXT_LIB );
+        found_libfilename = search_lib_file( buff );		/* copied to strpool */
     }
     else
     {
@@ -946,24 +944,24 @@ GetLibfile( char *filename )
         if ( filename != NULL )
         {
             /* BUG_0002 - off by one alloc */
-            f = xstrdup( filename );
+            found_libfilename = strpool_add( filename );
         }
         else
         {
             error( ERR_ENV_NOT_DEFINED, "Z80_STDLIB" );
-            return;
+            return NULL;
         }
     }
 
-    newlib->libfilename = f;
+    newlib->libfilename = xstrdup( found_libfilename );		/* freed when newlib is freed */
 
-    file = fopen_err( f, "rb" );           /* CH_0012 */
+    file = fopen_err( found_libfilename, "rb" );           /* CH_0012 */
     freadc_err( fheader, 8U, file );     /* read first 8 chars from file into array */
     fheader[8] = '\0';
 
     if ( strcmp( fheader, Z80libhdr ) != 0 )            /* compare header of file */
     {
-        error( ERR_NOT_LIB_FILE, f );    /* not a library file */
+        error( ERR_NOT_LIB_FILE, found_libfilename );    /* not a library file */
     }
     else
     {
@@ -971,6 +969,8 @@ GetLibfile( char *filename )
     }
 
     fclose( file );
+
+	return found_libfilename;
 }
 
 

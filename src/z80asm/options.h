@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.10 2013-02-27 22:34:16 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.11 2013-04-03 22:52:56 pauloscustodio Exp $ */
 /* $Log: options.h,v $
-/* Revision 1.10  2013-02-27 22:34:16  pauloscustodio
+/* Revision 1.11  2013-04-03 22:52:56  pauloscustodio
+/* Move libfilename to options.c, keep it in strpool
+/*
+/* Revision 1.10  2013/02/27 22:34:16  pauloscustodio
 /* Move include path search to srcfile.c
 /*
 /* Revision 1.9  2013/02/19 22:52:40  pauloscustodio
@@ -96,6 +99,7 @@ extern enum flag globaldef;
 extern enum flag autorelocate;
 extern enum flag deforigin;
 extern enum flag expl_binflnm;
+extern char *libfilename;				/* -i, -x library file, kept in strpool */
 extern char binfilename[];              /* -o explicit filename buffer */
 extern char srcext[];                   /* ".asm"/"_asm" extension, or whatever defined by -e */
 extern char objext[];                   /* ".obj"/"_obj" extension, or whatever defined by -M */
