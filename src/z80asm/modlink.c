@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.51 2013-03-31 13:49:41 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.52 2013-04-03 21:53:47 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.51  2013-03-31 13:49:41  pauloscustodio
+/* Revision 1.52  2013-04-03 21:53:47  pauloscustodio
+/* CreateDeffile() : no need to allocate file name dynamically, use a stack variable
+/*
+/* Revision 1.51  2013/03/31 13:49:41  pauloscustodio
 /* ReadName(), ReadNames(), CheckIfModuleWanted(), LinkLibModules(), SearchLibFile()
 /* were using global z80asmfile instead of a local FILE* variable - fixed
 /*
@@ -318,21 +321,21 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 #include "memalloc.h"   /* before any other include */
 
-#include <stdio.h>
-#include <limits.h>
-#include <stdlib.h>
-#include <string.h>
+#include "codearea.h"
 #include "config.h"
+#include "errors.h"
+#include "file.h"
+#include "listfile.h"
 #include "options.h"
+#include "safestr.h"
+#include "strutil.h"
 #include "symbol.h"
 #include "symbols.h"
 #include "z80asm.h"
-#include "errors.h"
-#include "file.h"
-#include "codearea.h"
-#include "strutil.h"
-#include "safestr.h"
-#include "listfile.h"
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* external functions */
 void FreeSym( symbol *node );
@@ -1364,24 +1367,13 @@ DefineOrigin( void )
 void
 CreateDeffile( void )
 {
-    char *globaldefname;
+    char globaldefname[FILENAME_MAX];
 
     /* use first module filename to create global definition file */
-    globaldefname = xstrdup( modulehdr->first->cfile->fname );
-
-    try
-    {
-        strcpy( globaldefname + strlen( globaldefname ) - 4, FILEEXT_DEF );       /* overwrite '_asm' extension with
-                                                                            * '_def' */
+	path_replace_ext( globaldefname, modulehdr->first->cfile->fname, FILEEXT_DEF ); /* set '.def' extension */
 
         /* Create DEFC file with global label declarations */
         deffile = fopen_err( globaldefname, "w" );           /* CH_0012 */
-    }
-
-    finally
-    {
-        xfree( globaldefname );
-    }
 }
 
 
