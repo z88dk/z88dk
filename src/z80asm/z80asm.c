@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.74 2013-04-03 22:52:56 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.75 2013-04-04 23:24:18 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.74  2013-04-03 22:52:56  pauloscustodio
+/* Revision 1.75  2013-04-04 23:24:18  pauloscustodio
+/* Remove global variable errfilename
+/*
+/* Revision 1.74  2013/04/03 22:52:56  pauloscustodio
 /* Move libfilename to options.c, keep it in strpool
 /*
 /* Revision 1.73  2013/03/31 12:28:10  pauloscustodio
@@ -550,7 +553,6 @@ char line[255], stringconst[255], ident[FILENAME_MAX + 1];
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation */
 char srcfilename[FILENAME_MAX];
 char objfilename[FILENAME_MAX];
-char errfilename[FILENAME_MAX];
 
 
 char Z80objhdr[] = "Z80RMF01";
@@ -587,7 +589,7 @@ AssembleSourceFile( void )
     try
     {
         /* Create error file */
-        open_error_file( errfilename );
+        open_error_file( err_filename_ext( srcfilename ) );
 
         if ( option_list || symfile )
         {
@@ -734,7 +736,6 @@ static void AssembleAny( char *file )
 
     path_replace_ext( srcfilename, file, srcext );      /* set '.asm' extension */
     path_replace_ext( objfilename, file, objext );      /* set '.obj' extension */
-    path_replace_ext( errfilename, file, FILEEXT_ERR ); /* set '.err' extension */
 
     /* Create module data structures for new file */
     CURRENTMODULE = NewModule();

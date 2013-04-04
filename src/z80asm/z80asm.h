@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.24 2013-04-04 23:08:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.25 2013-04-04 23:24:18 pauloscustodio Exp $
 $Log: z80asm.h,v $
-Revision 1.24  2013-04-04 23:08:18  pauloscustodio
+Revision 1.25  2013-04-04 23:24:18  pauloscustodio
+Remove global variable errfilename
+
+Revision 1.24  2013/04/04 23:08:18  pauloscustodio
 Helper functions to create file names of each of the extensions used in z80asm
 
 Revision 1.23  2013/04/03 22:52:56  pauloscustodio
@@ -137,7 +140,6 @@ $History: Z80ASM.C $
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation */
 extern char srcfilename[];
 extern char objfilename[];
-extern char errfilename[];
 
 #define REG16_BC   0
 #define REG16_DE   1

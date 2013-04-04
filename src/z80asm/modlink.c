@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.52 2013-04-03 21:53:47 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.53 2013-04-04 23:24:18 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.52  2013-04-03 21:53:47  pauloscustodio
+/* Revision 1.53  2013-04-04 23:24:18  pauloscustodio
+/* Remove global variable errfilename
+/*
+/* Revision 1.52  2013/04/03 21:53:47  pauloscustodio
 /* CreateDeffile() : no need to allocate file name dynamically, use a stack variable
 /*
 /* Revision 1.51  2013/03/31 13:49:41  pauloscustodio
@@ -629,11 +632,8 @@ LinkModules( void )
         CURRENTMODULE = modulehdr->first;       /* begin with first module */
         lastobjmodule = modulehdr->last;        /* remember this last module, further modules are libraries */
 
-        path_replace_ext( errfilename, CURRENTFILE->fname, FILEEXT_ERR );
-        /* overwrite '.asm' extension with '.err' */
-
         /* open error file */
-        open_error_file( errfilename );
+        open_error_file( err_filename_ext( CURRENTFILE->fname ) );
 
         set_PC( 0 );
         DefineDefSym( ASSEMBLERPC, get_PC(), 0, &globalroot );  /* Create standard 'ASMPC' identifier */
@@ -1243,11 +1243,9 @@ CreateLib( void )
 
     CURRENTMODULE = modulehdr->first;
 
-    path_replace_ext( errfilename, libfilename, FILEEXT_ERR );  /* overwrite '.lib' extension with '.err' */
-
     try
     {
-        open_error_file( errfilename );
+        open_error_file( err_filename_ext( libfilename ) );
 
         do
         {
