@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.8 2013-02-27 20:56:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.9 2013-04-04 23:08:18 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.8  2013-02-27 20:56:52  pauloscustodio
+# Revision 1.9  2013-04-04 23:08:18  pauloscustodio
+# Helper functions to create file names of each of the extensions used in z80asm
+#
+# Revision 1.8  2013/02/27 20:56:52  pauloscustodio
 # search_file() now accepts a NULL dir_list.
 #
 # Revision 1.7  2013/02/27 20:47:30  pauloscustodio
@@ -56,13 +59,15 @@ my $objs = "file.o errors.o strlist.o strhash.o strpool.o memalloc.o class.o ".
 		   "die.o strutil.o safestr.o except.o";
 ok ! system "make $objs";
 
-t_compile_module(<<'INIT', <<'END', $objs);
+my $init = <<'INIT';
 #define ERROR return __LINE__
 struct module *CURRENTMODULE;
 FILE *errfile;
 int clinemode;
 int clineno;
 INIT
+
+t_compile_module($init, <<'END', $objs);
 	/* main */
 	SzList *list;
 	
@@ -104,6 +109,68 @@ t_run_module(['f1', '1'], "x1/f1\n", "", 0);
 t_run_module(['f2', '1'], "x2/f2\n", "", 0);
 t_run_module(['f3', '1'], "x3/f3\n", "", 0);
 t_run_module(['f4', '1'], "f4\n", "", 0);
+
+# test file manipulation
+t_compile_module($init, <<'END', $objs);
+#define T1(init, func, result) \
+		strcpy( file, init); \
+		p = func; \
+		if (p != file || strcmp(file, result)) { \
+			warn("line %d: %s -> %s, %s\n", __LINE__, init, p, file); ERROR; \
+		}
+#define T2(func, result) \
+		p = func; \
+		if (strcmp(p, result)) { \
+			warn("line %d: %s != %s\n", __LINE__, p, result); ERROR; \
+		}
+	
+	char file[FILENAME_MAX];
+	char *p;
+	
+	T1("abc", 			(path_remove_ext(file)), "abc");
+	T1("abc.", 			(path_remove_ext(file)), "abc");
+	T1("abc.xpt", 		(path_remove_ext(file)), "abc");
+	T1("abc.xpt.obj", 	(path_remove_ext(file)), "abc.xpt");
+	T1("./abc", 		(path_remove_ext(file)), "./abc");
+	T1(".\\abc",		(path_remove_ext(file)), ".\\abc");
+	T1("./abc.", 		(path_remove_ext(file)), "./abc");
+	T1(".\\abc.",		(path_remove_ext(file)), ".\\abc");
+	T1("./abc.xpt", 	(path_remove_ext(file)), "./abc");
+	T1(".\\abc.xpt",	(path_remove_ext(file)), ".\\abc");
+
+	T1("", (path_replace_ext(file, "abc", 			".obj")),	"abc.obj");
+	T1("", (path_replace_ext(file, "abc.", 			".obj")),	"abc.obj");
+	T1("", (path_replace_ext(file, "abc.xpt.zz",	".obj")),	"abc.xpt.obj");
+	T1("", (path_replace_ext(file, "./abc", 		".obj")),	"./abc.obj");
+	T1("", (path_replace_ext(file, ".\\abc", 		".obj")),	".\\abc.obj");
+	T1("", (path_replace_ext(file, "./abc.", 		".obj")),	"./abc.obj");
+	T1("", (path_replace_ext(file, ".\\abc.", 		".obj")),	".\\abc.obj");
+	T1("", (path_replace_ext(file, "./abc.xpt", 	".obj")),	"./abc.obj");
+	T1("", (path_replace_ext(file, ".\\abc.xpt", 	".obj")),	".\\abc.obj");
+	
+	T1("", (path_basename(file, "abc")),			"abc");
+	T1("", (path_basename(file, "abc.zz")),			"abc.zz");
+	T1("", (path_basename(file, "./abc")),			"abc");
+	T1("", (path_basename(file, ".\\abc")),			"abc");
+	T1("", (path_basename(file, "/a/b/c/abc")),		"abc");
+	T1("", (path_basename(file, "\\a\\b\\c\\abc")),	"abc");
+	
+	T2((asm_filename_ext("./abc.xpt")),		"./abc.asm");
+	T2((lst_filename_ext("./abc.xpt")),		"./abc.lst");
+	T2((obj_filename_ext("./abc.xpt")),		"./abc.obj");
+	T2((def_filename_ext("./abc.xpt")),		"./abc.def");
+	T2((err_filename_ext("./abc.xpt")),		"./abc.err");
+	T2((bin_filename_ext("./abc.xpt")),		"./abc.bin");
+	T2((segbin_filename_ext("./abc.xpt")),	"./abc.bn0");
+	T2((lib_filename_ext("./abc.xpt")),		"./abc.lib");
+	T2((sym_filename_ext("./abc.xpt")),		"./abc.sym");
+	T2((map_filename_ext("./abc.xpt")),		"./abc.map");
+	
+	return 0;
+END
+
+t_run_module([], "", "", 0);
+
 
 # delete directories and files
 remove_tree(qw( x1 x2 x3 ));
