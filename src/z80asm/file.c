@@ -14,9 +14,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.17 2013-04-04 23:08:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.18 2013-04-06 13:15:04 pauloscustodio Exp $
 $Log: file.c,v $
-Revision 1.17  2013-04-04 23:08:18  pauloscustodio
+Revision 1.18  2013-04-06 13:15:04  pauloscustodio
+Move default asm and obj extension handling to file.c.
+srcfilename and objfilename are now pointers to static variables in file.c
+
+Revision 1.17  2013/04/04 23:08:18  pauloscustodio
 Helper functions to create file names of each of the extensions used in z80asm
 
 Revision 1.16  2013/03/30 00:02:22  pauloscustodio
@@ -97,10 +101,26 @@ Utilities for file handling
 #include "safestr.h"
 #include "strpool.h"
 #include "strutil.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+
+/*-----------------------------------------------------------------------------
+*   Default extensions
+*----------------------------------------------------------------------------*/
+static SSTR_DEFINE( asm_ext, FILENAME_MAX );
+static SSTR_DEFINE( obj_ext, FILENAME_MAX );
+
+/* init asm_ext and obj_ext before first use */
+static BOOL ext_initialized = FALSE;
+#define init_ext() \
+	if (! ext_initialized ) { \
+		sstr_set( asm_ext, FILEEXT_ASM ); \
+		sstr_set( obj_ext, FILEEXT_OBJ ); \
+		ext_initialized = TRUE; \
+	}
 
 /*-----------------------------------------------------------------------------
 *   File IO with exception
@@ -252,14 +272,19 @@ char *path_basename( char *dest, const char *source )
 *   NOT REENTRANT!
 *----------------------------------------------------------------------------*/
 #define DEF_FUNC(ext,EXT) \
-	char *ext ## _filename_ext( char *filename ) { \
-		static char buff[FILENAME_MAX]; \
-		return path_replace_ext( buff, filename, EXT ); \
+	char *ext##_filename_ext( char *filename ) \
+	{ \
+		static SSTR_DEFINE( buff, FILENAME_MAX ); \
+		\
+		init_ext(); \
+		path_replace_ext( sstr_data( buff ), filename, EXT ); \
+		sstr_sync_len( buff ); \
+		return sstr_data( buff ); \
 	}
 
-	DEF_FUNC( asm,    FILEEXT_ASM    )
+	DEF_FUNC( asm,    sstr_data( asm_ext ) )
+	DEF_FUNC( obj,    sstr_data( obj_ext ) )
 	DEF_FUNC( lst,    FILEEXT_LST    )
-	DEF_FUNC( obj,    FILEEXT_OBJ    )
 	DEF_FUNC( def,    FILEEXT_DEF    )
 	DEF_FUNC( err,    FILEEXT_ERR    )
 	DEF_FUNC( bin,    FILEEXT_BIN    )
@@ -269,6 +294,35 @@ char *path_basename( char *dest, const char *source )
 	DEF_FUNC( map,    FILEEXT_MAP    )
 
 #undef DEF_FUNC
+
+/* define new extensions for asm and obj, instead of default */
+void set_asm_ext( char *ext )
+{
+	init_ext();
+	sstr_set( asm_ext, FILEEXT_SEPARATOR );
+	sstr_cat( asm_ext, ext );
+}
+
+void set_obj_ext( char *ext )
+{
+	init_ext();
+	sstr_set( obj_ext, FILEEXT_SEPARATOR );
+	sstr_cat( obj_ext, ext );
+}
+
+char *get_asm_ext( void )
+{
+	init_ext();
+	return sstr_data( asm_ext );
+}
+
+char *get_obj_ext( void )
+{
+	init_ext();
+	return sstr_data( obj_ext );
+}
+
+
 
 /*-----------------------------------------------------------------------------
 *  Search for a file on the given directory list, return full path name

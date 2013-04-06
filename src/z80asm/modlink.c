@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.53 2013-04-04 23:24:18 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.54 2013-04-06 13:15:04 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.53  2013-04-04 23:24:18  pauloscustodio
+/* Revision 1.54  2013-04-06 13:15:04  pauloscustodio
+/* Move default asm and obj extension handling to file.c.
+/* srcfilename and objfilename are now pointers to static variables in file.c
+/*
+/* Revision 1.53  2013/04/04 23:24:18  pauloscustodio
 /* Remove global variable errfilename
 /*
 /* Revision 1.52  2013/04/03 21:53:47  pauloscustodio
@@ -135,7 +139,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
 /* - Factor all pathname manipulation into module file.c.
 /* - Make default extensions constants.
-/* - Move srcext[] and objext[] to the options.c module.
+/* - Move asm_ext[] and obj_ext[] to the options.c module.
 /*
 /* Revision 1.27  2011/08/19 15:53:58  pauloscustodio
 /* BUG_0010 : heap corruption when reaching MAXCODESIZE
@@ -657,8 +661,8 @@ LinkModules( void )
                 set_error_line( CURRENTFILE->line );    /* error location */
             }
 
-            path_replace_ext( objfilename, CURRENTFILE->fname, objext );
             /* overwrite '.asm' extension with * '.obj' */
+            objfilename = obj_filename_ext( CURRENTFILE->fname );
 
             /* open relocatable file for reading */
             z80asmfile = fopen_err( objfilename, "rb" );           /* CH_0012 */
@@ -1147,7 +1151,6 @@ ModuleExpr( void )
 void
 CreateBinFile( void )
 {
-    char binfilenumber = '0';
     FILE *binaryfile;
     size_t codesize, codeblock, offset;
     SSTR_DEFINE( filename, FILENAME_MAX );
@@ -1203,13 +1206,13 @@ CreateBinFile( void )
         {
             codeblock = ( codesize > 16384U ) ? 16384U : codesize;
             codesize -= codeblock;
-            sstr_data( filename )[sstr_len( filename ) - 1] = binfilenumber++; /* path code file with number */
             binaryfile = fopen_err( sstr_data( filename ), "wb" );         /* CH_0012 */
             fwrite_codearea_chunk( binaryfile, offset, codeblock ); /* code in 16K chunks */
             fclose( binaryfile );
             binaryfile = NULL;
 
             offset += codeblock;
+            ++(sstr_data( filename )[sstr_len( filename ) - 1]); /* path code file with number */
         }
         while ( codesize );
     }
@@ -1234,7 +1237,8 @@ CreateLib( void )
     long Codesize;
     FILE *objectfile = NULL;
     long fptr;
-    char *filebuffer = NULL, *fname = NULL;
+    char *filebuffer = NULL;
+	char filename[FILENAME_MAX];
 
     if ( verbose )
     {
@@ -1252,8 +1256,10 @@ CreateLib( void )
             set_error_null();
             set_error_module( CURRENTMODULE->mname );
 
-            fname = CURRENTFILE->fname;
-            strcpy( fname + strlen( fname ) - 4, objext );      /* overwrite '_asm' extension with '_obj' */
+			/* replace fname with the .obj extension */
+			path_replace_ext( filename, CURRENTFILE->fname, get_obj_ext() );
+			xfree( CURRENTFILE->fname );
+			CURRENTFILE->fname = xstrdup( filename );
 
             objectfile = fopen_err( CURRENTFILE->fname, "rb" );           /* CH_0012 */
             fseek( objectfile, 0L, SEEK_END );  /* file pointer to end of file */

@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.75 2013-04-04 23:24:18 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.76 2013-04-06 13:15:04 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.75  2013-04-04 23:24:18  pauloscustodio
+/* Revision 1.76  2013-04-06 13:15:04  pauloscustodio
+/* Move default asm and obj extension handling to file.c.
+/* srcfilename and objfilename are now pointers to static variables in file.c
+/*
+/* Revision 1.75  2013/04/04 23:24:18  pauloscustodio
 /* Remove global variable errfilename
 /*
 /* Revision 1.74  2013/04/03 22:52:56  pauloscustodio
@@ -166,7 +170,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
 /* - Factor all pathname manipulation into module file.c.
 /* - Make default extensions constants.
-/* - Move srcext[] and objext[] to the options.c module.
+/* - Move asm_ext[] and obj_ext[] to the options.c module.
 /*
 /* Revision 1.39  2011/08/19 15:53:58  pauloscustodio
 /* BUG_0010 : heap corruption when reaching MAXCODESIZE
@@ -550,9 +554,8 @@ enum flag EOL, library, createlibrary;
 long TOTALLINES;
 char line[255], stringconst[255], ident[FILENAME_MAX + 1];
 
-/* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation */
-char srcfilename[FILENAME_MAX];
-char objfilename[FILENAME_MAX];
+char *srcfilename;
+char *objfilename;
 
 
 char Z80objhdr[] = "Z80RMF01";
@@ -734,8 +737,8 @@ static void AssembleAny( char *file )
 
     init_codearea();            /* Pointer (PC) to store z80 instruction */
 
-    path_replace_ext( srcfilename, file, srcext );      /* set '.asm' extension */
-    path_replace_ext( objfilename, file, objext );      /* set '.obj' extension */
+    srcfilename = asm_filename_ext( file );      /* set '.asm' extension */
+    objfilename = obj_filename_ext( file );      /* set '.obj' extension */
 
     /* Create module data structures for new file */
     CURRENTMODULE = NewModule();
@@ -1453,8 +1456,8 @@ usage( void )
     puts( "<modulefile> contains file names of all modules to be linked:" );
     puts( "File names are put on separate lines ended with \\n. File types recognized or" );
     puts( "created by z80asm (defined by the following extension):" );
-    printf( "%s = source file (default), or alternative -e<ext>\n", FILEEXT_ASM );
-    printf( "%s = object file (default), or alternative -M<ext>\n", objext );
+    printf( "%s = source file (default), or alternative -e<ext>\n", get_asm_ext() );
+    printf( "%s = object file (default), or alternative -M<ext>\n", get_obj_ext() );
     printf( "%s = list file, %s = Z80 code file\n", FILEEXT_LST, FILEEXT_BIN );
     printf( "%s = symbols file, %s = map file, %s = XDEF file, %s = error file\n", FILEEXT_SYM, FILEEXT_MAP, FILEEXT_DEF, FILEEXT_ERR );
     puts( "Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)" );
@@ -1467,7 +1470,7 @@ usage( void )
     puts( "-d date stamp control, assemble only if source file > object file" );
     puts( "-a: -b & -d (assemble only updated source files, then link & relocate)" );
     puts( "-o<bin filename> expl. output filename, -g XDEF reloc. addr. from all modules" );
-    printf( "-i<library> include <library> LIB modules with %s modules during linking\n", objext );
+    printf( "-i<library> include <library> LIB modules with %s modules during linking\n", get_obj_ext() );
     puts( "-x<library> create library from specified modules ( e.g. with @<modules> )" );
     printf( "-t<n> tabulator width for %s, %s, %s files. Column width is 4 times -t\n", FILEEXT_MAP, FILEEXT_DEF, FILEEXT_SYM );
     printf( "-I<path> additional path to search for includes\n" );

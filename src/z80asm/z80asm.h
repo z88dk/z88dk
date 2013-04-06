@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.25 2013-04-04 23:24:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.26 2013-04-06 13:15:04 pauloscustodio Exp $
 $Log: z80asm.h,v $
-Revision 1.25  2013-04-04 23:24:18  pauloscustodio
+Revision 1.26  2013-04-06 13:15:04  pauloscustodio
+Move default asm and obj extension handling to file.c.
+srcfilename and objfilename are now pointers to static variables in file.c
+
+Revision 1.25  2013/04/04 23:24:18  pauloscustodio
 Remove global variable errfilename
 
 Revision 1.24  2013/04/04 23:08:18  pauloscustodio
@@ -81,7 +85,7 @@ Revision 1.11  2011/08/21 20:37:20  pauloscustodio
 CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
 - Factor all pathname manipulation into module file.c.
 - Make default extensions constants.
-- Move srcext[] and objext[] to the options.c module.
+- Move asm_ext[] and obj_ext[] to the options.c module.
 
 Revision 1.10  2011/07/14 01:32:08  pauloscustodio
     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
@@ -137,9 +141,8 @@ $History: Z80ASM.C $
 #include <stdio.h>
 #include <stdlib.h>
 
-/* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation */
-extern char srcfilename[];
-extern char objfilename[];
+extern char *srcfilename;
+extern char *objfilename;
 
 #define REG16_BC   0
 #define REG16_DE   1

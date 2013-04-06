@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.21 2013-04-03 22:52:56 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.22 2013-04-06 13:15:04 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.21  2013-04-03 22:52:56  pauloscustodio
+/* Revision 1.22  2013-04-06 13:15:04  pauloscustodio
+/* Move default asm and obj extension handling to file.c.
+/* srcfilename and objfilename are now pointers to static variables in file.c
+/*
+/* Revision 1.21  2013/04/03 22:52:56  pauloscustodio
 /* Move libfilename to options.c, keep it in strpool
 /*
 /* Revision 1.20  2013/02/27 22:34:16  pauloscustodio
@@ -83,7 +87,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
 /* - Factor all pathname manipulation into module file.c.
 /* - Make default extensions constants.
-/* - Move srcext[] and objext[] to the options.c module.
+/* - Move asm_ext[] and obj_ext[] to the options.c module.
 /*
 /* Revision 1.5  2011/08/05 19:58:28  pauloscustodio
 /* CH_0004 : Exception mechanism to handle fatal errors
@@ -150,8 +154,6 @@ enum flag deforigin;
 enum flag expl_binflnm;
 char *libfilename;				/* -i, -x library file, kept in strpool */
 char binfilename[FILENAME_MAX]; /* -o explicit filename buffer (BUG_0012) */
-char srcext[FILEEXT_MAX];       /* contains default source file extension */
-char objext[FILEEXT_MAX];       /* contains default object file extension */
 int  cpu_type;
 
 /* directory list for search_lib_file() */
@@ -214,9 +216,6 @@ void reset_options( void )
     expl_binflnm    = OFF;
     cpu_type        = CPU_Z80;
 
-    strcpy( srcext, FILEEXT_ASM );      /* use ".asm" as default source file extension */
-    strcpy( objext, FILEEXT_OBJ );      /* use ".obj" as default source file extension */
-
     init_search_paths();                /* initialize the search paths */
 }
 
@@ -229,27 +228,18 @@ void reset_options( void )
 *----------------------------------------------------------------------------*/
 void set_asm_flag( char *flagid )
 {
+	/* use ".xxx" as source file in stead of ".asm" */
     if ( *flagid == 'e' )
     {
-        smallc_source = ON;                     /* use ".xxx" as source file in stead of ".asm" */
-
-        /* BUG - on QDOS separator is '_'
-           Anyway there's no need to define, comes from default either '.' or '_'
-        srcext[0] = '.';
-        */
-
-        strncpy( srcext + 1, flagid + 1, FILEEXT_MAX - 2 );
-        /* copy argument string after '.' */
-        srcext[FILEEXT_MAX - 1] = '\0';         /* max. 3 letters extension */
+        smallc_source = ON;                     
+		set_asm_ext( flagid + 1 );
     }
 
     /* djm: mod to get .o files produced instead of .obj */
     /* gbs: extended to use argument as definition, e.g. -Mo, which defines .o extension */
     else if ( *flagid == 'M' )
     {
-        strncpy( objext + 1, flagid + 1, FILEEXT_MAX - 2 );
-        /* copy argument string after '.' */
-        objext[FILEEXT_MAX - 1] = '\0';         /* max. 3 letters extension */
+		set_obj_ext( flagid + 1 );
     }
 
     /** Check whether this is for the RCM2000/RCM3000 series of Z80-like CPU's */

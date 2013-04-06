@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.11 2013-04-03 22:52:56 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.12 2013-04-06 13:15:04 pauloscustodio Exp $ */
 /* $Log: options.h,v $
-/* Revision 1.11  2013-04-03 22:52:56  pauloscustodio
+/* Revision 1.12  2013-04-06 13:15:04  pauloscustodio
+/* Move default asm and obj extension handling to file.c.
+/* srcfilename and objfilename are now pointers to static variables in file.c
+/*
+/* Revision 1.11  2013/04/03 22:52:56  pauloscustodio
 /* Move libfilename to options.c, keep it in strpool
 /*
 /* Revision 1.10  2013/02/27 22:34:16  pauloscustodio
@@ -60,7 +64,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
 /* - Factor all pathname manipulation into module file.c.
 /* - Make default extensions constants.
-/* - Move srcext[] and objext[] to the options.c module.
+/* - Move asm_ext[] and obj_ext[] to the options.c module.
 /*
 /* Revision 1.2  2011/07/12 22:47:59  pauloscustodio
 /* - Moved all error variables and error reporting code to a separate module errors.c,
@@ -101,8 +105,6 @@ extern enum flag deforigin;
 extern enum flag expl_binflnm;
 extern char *libfilename;				/* -i, -x library file, kept in strpool */
 extern char binfilename[];              /* -o explicit filename buffer */
-extern char srcext[];                   /* ".asm"/"_asm" extension, or whatever defined by -e */
-extern char objext[];                   /* ".obj"/"_obj" extension, or whatever defined by -M */
 
 /* CPU type */
 #define CPU_Z80     1

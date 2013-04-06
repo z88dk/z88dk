@@ -14,9 +14,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.11 2013-04-04 23:08:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.12 2013-04-06 13:15:04 pauloscustodio Exp $
 $Log: file.h,v $
-Revision 1.11  2013-04-04 23:08:18  pauloscustodio
+Revision 1.12  2013-04-06 13:15:04  pauloscustodio
+Move default asm and obj extension handling to file.c.
+srcfilename and objfilename are now pointers to static variables in file.c
+
+Revision 1.11  2013/04/04 23:08:18  pauloscustodio
 Helper functions to create file names of each of the extensions used in z80asm
 
 Revision 1.10  2013/02/27 20:44:32  pauloscustodio
@@ -91,8 +95,6 @@ extern char *path_replace_ext( char *dest, const char *source, const char *new_e
 extern char *path_basename( char *dest, const char *source );
 
 /* default file name extensions */
-#define FILEEXT_MAX     (1+3+1)                 /* size of fileext char[]: separator + 3 chars + null */
-
 #define FILEEXT_ASM     FILEEXT_SEPARATOR "asm"    /* ".asm" / "_asm" */
 #define FILEEXT_LST     FILEEXT_SEPARATOR "lst"    /* ".lst" / "_lst" */
 #define FILEEXT_OBJ     FILEEXT_SEPARATOR "obj"    /* ".obj" / "_obj" */
@@ -116,6 +118,13 @@ extern char *segbin_filename_ext( char *filename );
 extern char *lib_filename_ext( char *filename );
 extern char *sym_filename_ext( char *filename );
 extern char *map_filename_ext( char *filename );
+
+/* define new extensions for asm and obj, instead of default */
+extern void set_asm_ext( char *ext );
+extern void set_obj_ext( char *ext );
+
+extern char *get_asm_ext( void );
+extern char *get_obj_ext( void );
 
 /* search for a file on the given directory list, return full path name
  * pathname is stored in strpool, no need to remove */

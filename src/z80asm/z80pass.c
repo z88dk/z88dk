@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.45 2013-03-31 18:33:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.46 2013-04-06 13:15:04 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.45  2013-03-31 18:33:55  pauloscustodio
+Revision 1.46  2013-04-06 13:15:04  pauloscustodio
+Move default asm and obj extension handling to file.c.
+srcfilename and objfilename are now pointers to static variables in file.c
+
+Revision 1.45  2013/03/31 18:33:55  pauloscustodio
 Comments
 
 Revision 1.44  2013/03/04 23:23:37  pauloscustodio
@@ -144,7 +148,7 @@ Revision 1.20  2011/08/21 20:37:20  pauloscustodio
 CH_0005 : handle files as char[FILENAME_MAX] instead of strdup for every operation
 - Factor all pathname manipulation into module file.c.
 - Make default extensions constants.
-- Move srcext[] and objext[] to the options.c module.
+- Move asm_ext[] and obj_ext[] to the options.c module.
 
 Revision 1.19  2011/08/19 15:53:58  pauloscustodio
 BUG_0010 : heap corruption when reaching MAXCODESIZE
