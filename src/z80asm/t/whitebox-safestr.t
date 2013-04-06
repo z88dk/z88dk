@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-safestr.t,v 1.2 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-safestr.t,v 1.3 2013-04-06 10:55:15 pauloscustodio Exp $
 # $Log: whitebox-safestr.t,v $
-# Revision 1.2  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.3  2013-04-06 10:55:15  pauloscustodio
+# SSTR_DEFINE() caused compilation error "C2099: initializer is not a constant" when used to define global variables
+#
+# Revision 1.2  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.1  2012/06/14 15:01:27  pauloscustodio
@@ -32,7 +35,7 @@ my $objs = "safestr.o";
 ok ! system "make $objs";
 
 t_compile_module(<<'INIT', <<'END', $objs);
-#define SZ 5
+#define SZ (5)
 #define ERROR return __LINE__
 #define TEST(s,is) \
 	if (s->size != SZ)					ERROR;	\
@@ -55,6 +58,8 @@ char * test_vfcat(sstr_t *self, char *format, ...)
 	return sstr_vfcat(self, format, argptr);
 }
 
+SSTR_DEFINE(global, SZ);
+
 INIT
 	char buffer[5];
 	SSTR_DEFINE( s, SZ );
@@ -66,6 +71,12 @@ INIT
 	if (p != sstr_data(s))			ERROR;
 	TEST(s, "");
 	
+	TEST(global, "");
+	p = sstr_set(global, "");
+	if (p != sstr_data(global))		ERROR;
+	TEST(global, "");
+
+	
 	sstr_set(s, "1234");
 	TEST(s, "1234");
 	sstr_set(s, "123");
@@ -73,6 +84,14 @@ INIT
 	sstr_set(s, "");
 	TEST(s, "");
 	
+	sstr_set(global, "1234");
+	TEST(global, "1234");
+	sstr_set(global, "123");
+	TEST(global, "123");
+	sstr_set(global, "");
+	TEST(global, "");
+	
+
 	p = sstr_cat(s, "");
 	if (p != sstr_data(s))			ERROR;
 	TEST(s, "");

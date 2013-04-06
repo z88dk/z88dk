@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Safe strings : char array with the size
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.h,v 1.3 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.h,v 1.4 2013-04-06 10:55:14 pauloscustodio Exp $ */
 /* $Log: safestr.h,v $
-/* Revision 1.3  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.4  2013-04-06 10:55:14  pauloscustodio
+/* SSTR_DEFINE() caused compilation error "C2099: initializer is not a constant" when used to define global variables
+/*
+/* Revision 1.3  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.2  2012/11/03 17:39:36  pauloscustodio
@@ -49,7 +52,7 @@ Safe strings : char array with the size
 *
 *   To define a sstr_t pointing to an existent buffer, do:
 *
-*       char buffer[SIZE];
+*       char buffer[SIZE] = "";
 *       SSTR_DEFINE_REF( name, buffer, sizeof(buffer) );
 *
 *   The string keeps the length in an attribute to speed-up sstr_cat().
@@ -60,11 +63,11 @@ typedef struct sstr_t
 {
     char    *data;              /* point char array */
     size_t  size;               /* allocated size */
-    size_t  len;                /* sring length (excluding zero terminator) */
+    size_t  len;                /* string length (excluding zero terminator) */
 } sstr_t;
 
 #define SSTR_DEFINE_REF(name, buffer, maxsize)   \
-    sstr_t   name##_struct = { buffer, maxsize, (buffer[0] = 0) }; \
+    sstr_t   name##_struct = { buffer, maxsize, 0 }; \
     sstr_t * name = & name##_struct
 
 #define SSTR_DEFINE(name, maxsize)   \
