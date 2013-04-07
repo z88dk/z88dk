@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.76 2013-04-06 13:15:04 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.77 2013-04-07 22:10:52 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.76  2013-04-06 13:15:04  pauloscustodio
+/* Revision 1.77  2013-04-07 22:10:52  pauloscustodio
+/* Usage did not take -e into account
+/*
+/* Revision 1.76  2013/04/06 13:15:04  pauloscustodio
 /* Move default asm and obj extension handling to file.c.
 /* srcfilename and objfilename are now pointers to static variables in file.c
 /*
@@ -1452,7 +1455,7 @@ usage( void )
     printf( "%s\n", copyrightmsg );
     puts( "z80asm [options] [ @<modulefile> | {<filename>} ]" );
     puts( "[] = may be ignored. {} = may be repeated. | = OR clause." );
-    printf( "To assemble 'fred%s' use 'fred' or 'fred%s'\n", FILEEXT_ASM, FILEEXT_ASM );
+    printf( "To assemble 'fred%s' use 'fred' or 'fred%s'\n", get_asm_ext(), get_asm_ext() );
     puts( "<modulefile> contains file names of all modules to be linked:" );
     puts( "File names are put on separate lines ended with \\n. File types recognized or" );
     puts( "created by z80asm (defined by the following extension):" );
