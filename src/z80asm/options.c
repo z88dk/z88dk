@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.22 2013-04-06 13:15:04 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.23 2013-04-07 22:26:07 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.22  2013-04-06 13:15:04  pauloscustodio
+/* Revision 1.23  2013-04-07 22:26:07  pauloscustodio
+/* Removed global variable smallc_source, no longer used
+/*
+/* Revision 1.22  2013/04/06 13:15:04  pauloscustodio
 /* Move default asm and obj extension handling to file.c.
 /* srcfilename and objfilename are now pointers to static variables in file.c
 /*
@@ -132,7 +135,6 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include <string.h>
 
 /* global option variables */
-enum flag smallc_source;
 enum flag ti83plus;
 enum flag swapIXIY;
 enum flag clinemode;
@@ -194,7 +196,6 @@ char *search_lib_file( char *filename )
 *----------------------------------------------------------------------------*/
 void reset_options( void )
 {
-    smallc_source   = OFF;
     ti83plus        = OFF;
     swapIXIY        = OFF;
     clinemode       = OFF;
@@ -231,7 +232,6 @@ void set_asm_flag( char *flagid )
 	/* use ".xxx" as source file in stead of ".asm" */
     if ( *flagid == 'e' )
     {
-        smallc_source = ON;                     
 		set_asm_ext( flagid + 1 );
     }
 
