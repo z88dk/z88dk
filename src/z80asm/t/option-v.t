@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-v.t,v 1.2 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-v.t,v 1.3 2013-04-07 22:30:48 pauloscustodio Exp $
 # $Log: option-v.t,v $
-# Revision 1.2  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.3  2013-04-07 22:30:48  pauloscustodio
+# Test output with 3 input lines
+#
+# Revision 1.2  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.1  2011/07/11 15:46:33  pauloscustodio
@@ -32,7 +35,7 @@ require 't/test_utils.pl';
 
 # -v
 unlink_testfiles();
-write_file(asm_file(), "nop");
+write_file(asm_file(), " nop \n nop \n nop");
 t_z80asm_capture("-r0 -b -v ".asm_file(),
 		"Assemble all files
 Create symbol table file.
@@ -42,13 +45,13 @@ Create address map file.
 Assembling 'test.asm'...
 Pass1...
 Pass2...
-Size of module is 1 bytes
+Size of module is 3 bytes
 
-Total of 1 lines assembled.
+Total of 3 lines assembled.
 linking module(s)...
 Pass1...
 ORG address for code is 0000
-Code size of linked modules is 1 bytes
+Code size of linked modules is 3 bytes
 Pass2...
 Creating map...
 Code generation completed.
@@ -57,7 +60,7 @@ Code generation completed.
 		0);
 ok -f obj_file();
 ok -f bin_file();
-is read_file(bin_file(), binmode => ':raw'), "\0";
+is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
 
 # -nv
 unlink_testfiles();
