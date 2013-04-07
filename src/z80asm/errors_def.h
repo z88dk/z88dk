@@ -16,9 +16,17 @@ Copyright (C) Paulo Custodio, 2011-2013
 Define error codes and error messages
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.9 2013-03-29 23:53:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.10 2013-04-07 23:34:19 pauloscustodio Exp $ */
 /* $Log: errors_def.h,v $
-/* Revision 1.9  2013-03-29 23:53:08  pauloscustodio
+/* Revision 1.10  2013-04-07 23:34:19  pauloscustodio
+/* CH_0020 : ERR_ORG_NOT_DEFINED if no ORG given
+/* z80asm no longer asks for an ORG address from the standard input
+/* if one is not given either by an ORG statement or a -r option;
+/* it exists with an error message instead.
+/* The old behaviour was causing wrong build scripts to hang waiting
+/* for input.
+/*
+/* Revision 1.9  2013/03/29 23:53:08  pauloscustodio
 /* Added GNU Flex-based scanner. Not yet integrated into assembler.
 /*
 /* Revision 1.8  2013/02/12 00:48:54  pauloscustodio
@@ -98,6 +106,7 @@ DEF_MSG( ERR_ILLEGAL_SRC_FILENAME,  "Illegal source filename '%s'" )
 DEF_MSG( ERR_SYMBOL_REDECL_GLOBAL,  "Symbol '%s' declared global in another module" )
 DEF_MSG( ERR_SYMBOL_REDECL,         "Re-declaration of '%s' not allowed" )
 DEF_MSG( ERR_ORG_REDEFINED,         "ORG already defined" ) /* not used */
+DEF_MSG( ERR_ORG_NOT_DEFINED,       "ORG not defined" )
 DEF_MSG( ERR_JR_NOT_LOCAL,          "Relative jump address must be local" )
 DEF_MSG( ERR_NOT_OBJ_FILE,          "File '%s' not an object file" )
 DEF_MSG( ERR_RESERVED_NAME,         "Reserved name" )  /* not used */

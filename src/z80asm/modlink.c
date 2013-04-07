@@ -14,9 +14,17 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.54 2013-04-06 13:15:04 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.55 2013-04-07 23:34:19 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.54  2013-04-06 13:15:04  pauloscustodio
+/* Revision 1.55  2013-04-07 23:34:19  pauloscustodio
+/* CH_0020 : ERR_ORG_NOT_DEFINED if no ORG given
+/* z80asm no longer asks for an ORG address from the standard input
+/* if one is not given either by an ORG statement or a -r option;
+/* it exists with an error message instead.
+/* The old behaviour was causing wrong build scripts to hang waiting
+/* for input.
+/*
+/* Revision 1.54  2013/04/06 13:15:04  pauloscustodio
 /* Move default asm and obj extension handling to file.c.
 /* srcfilename and objfilename are now pointers to static variables in file.c
 /*
@@ -370,7 +378,6 @@ void SearchLibraries( char *modname );
 void LinkModules( void );
 void ModuleExpr( void );
 void CreateBinFile( void );
-void DefineOrigin( void );
 void WriteMapFile( void );
 void ReadNames( FILE *file, long nextname, long endnames );
 void ReadExpr( long nextexpr, long endexpr );
@@ -698,7 +705,10 @@ LinkModules( void )
 
                         if ( CURRENTMODULE->origin == 65535U )
                         {
-                            DefineOrigin();    /* Define origin of first module from the keyboard */
+							error( ERR_ORG_NOT_DEFINED, objfilename );  /* no ORG */
+							fclose( z80asmfile );
+							z80asmfile = NULL;
+							break;
                         }
                     }
                 }
@@ -1359,12 +1369,6 @@ LinkTracedModule( char *filename, long baseptr )
 
 
 
-void
-DefineOrigin( void )
-{
-    printf( "ORG not yet defined!\nPlease enter as hexadecimal: " );
-    scanf( "%lx", &modulehdr->first->origin );
-}
 
 
 

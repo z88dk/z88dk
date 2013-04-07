@@ -13,9 +13,17 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.46 2013-04-06 13:15:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.47 2013-04-07 23:34:19 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.46  2013-04-06 13:15:04  pauloscustodio
+Revision 1.47  2013-04-07 23:34:19  pauloscustodio
+CH_0020 : ERR_ORG_NOT_DEFINED if no ORG given
+z80asm no longer asks for an ORG address from the standard input
+if one is not given either by an ORG statement or a -r option;
+it exists with an error message instead.
+The old behaviour was causing wrong build scripts to hang waiting
+for input.
+
+Revision 1.46  2013/04/06 13:15:04  pauloscustodio
 Move default asm and obj extension handling to file.c.
 srcfilename and objfilename are now pointers to static variables in file.c
 
@@ -332,7 +340,6 @@ First import of z88dk into the sourceforge system <gulp>
 /* external functions */
 void Skipline( FILE *fptr );
 void LinkModules( void );
-void DefineOrigin( void );
 void ParseIdent( enum flag interpret );
 void RemovePfixlist( struct expr *pfixexpr );
 void StoreExpr( struct expr *pfixexpr, char range );
