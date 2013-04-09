@@ -1,5 +1,5 @@
 @echo off
-rem $Id: gccmake.bat,v 1.1 2012-11-05 08:15:51 stefano Exp $
+rem $Id: gccmake.bat,v 1.2 2013-04-09 11:54:13 stefano Exp $
 
 echo *******************
 echo * Building z80asm *
@@ -16,13 +16,20 @@ gcc    -c -o exprprsr.o exprprsr.c
 gcc    -c -o file.o file.c
 gcc    -c -o hist.o hist.c
 gcc    -c -o ldinstr.o ldinstr.c
+gcc    -c -o listfile.o listfile.c
 gcc    -c -o memalloc.o memalloc.c
+gcc    -c -o model.o model.c
+gcc    -c -o model_symref.o model_symref.c
 gcc    -c -o modlink.o modlink.c
 gcc    -c -o objfile.o objfile.c
 gcc    -c -o options.o options.c
+gcc    -c -o parse.o parse.c
 gcc    -c -o prsident.o prsident.c
 gcc    -c -o prsline.o prsline.c
 gcc    -c -o safestr.o safestr.c
+gcc    -c -o scan.o scan.c
+gcc    -c -o srcfile.o srcfile.c
+gcc    -c -o strhash.o strhash.c
 gcc    -c -o strlist.o strlist.c
 gcc    -c -o strpool.o strpool.c
 gcc    -c -o strutil.o strutil.c
