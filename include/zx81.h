@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.30 2013-01-24 15:31:37 stefano Exp $
+ * $Id: zx81.h,v 1.31 2013-04-09 13:08:12 stefano Exp $
  */
 
 #ifndef __ZX81_H__
@@ -258,6 +258,7 @@ extern void __LIB__              zx_setfloat(char *variable, float value);
 extern int  __LIB__ __CALLEE__   zx_getstr_callee(char variable, char *value);
 extern void __LIB__ __CALLEE__   zx_setstr_callee(char variable, char *value);
 extern void __LIB__ __CALLEE__   zx_setint_callee(char *variable, int value);
+extern void __LIB__ __CALLEE__   zx_setfloat_callee(char *variable, float value);
 
 #define zx_getstr(a,b)           zx_getstr_callee(a,b)
 #define zx_setstr(a,b)           zx_setstr_callee(a,b)
