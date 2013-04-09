@@ -19,9 +19,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 Scanner - to be processed by: flex -L scan.l
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.2 2013-03-31 18:28:30 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.3 2013-04-09 20:56:50 pauloscustodio Exp $ */
 /* $Log: scan.h,v $
-/* Revision 1.2  2013-03-31 18:28:30  pauloscustodio
+/* Revision 1.3  2013-04-09 20:56:50  pauloscustodio
+/* TOK_LABEL removed - identifying a label as XXX: has to be a parsing action in order to
+/* distinguish a label from a continuation statement, e.g.
+/* LABEL: ld a,VALUE : inc a ; LABEL is label, VALUE is name
+/*
+/* Revision 1.2  2013/03/31 18:28:30  pauloscustodio
 /* New TOK_LABEL for a label definition, i.e. ". NAME" or "NAME :"
 /*
 /* Revision 1.1  2013/03/29 23:53:08  pauloscustodio
@@ -95,7 +100,6 @@ typedef enum TokType
 
     /* language tokens */
     TOK_NAME,                   /* any identifier */
-    TOK_LABEL,                  /* label definition, i.e. ". NAME" or "NAME :" */
     TOK_NUMBER,
     TOK_STRING,                 /* single- or double-quoted string */
     TOK_PREPROC,                /* preprocessor command */

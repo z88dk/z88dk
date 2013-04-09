@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.2 2013-03-31 18:28:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.3 2013-04-09 20:56:51 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.2  2013-03-31 18:28:30  pauloscustodio
+# Revision 1.3  2013-04-09 20:56:51  pauloscustodio
+# TOK_LABEL removed - identifying a label as XXX: has to be a parsing action in order to
+# distinguish a label from a continuation statement, e.g.
+# LABEL: ld a,VALUE : inc a ; LABEL is label, VALUE is name
+#
+# Revision 1.2  2013/03/31 18:28:30  pauloscustodio
 # New TOK_LABEL for a label definition, i.e. ". NAME" or "NAME :"
 #
 # Revision 1.1  2013/03/29 23:53:08  pauloscustodio
@@ -83,7 +88,6 @@ char *decode_token (TokType tok_type)
 		CASE_TOK( DBL_GREATER	)
 		CASE_TOK( DBL_ASTERISK	)
 		CASE_TOK( NAME			)
-		CASE_TOK( LABEL			)
 		CASE_TOK( NUMBER		)
 		CASE_TOK( STRING		)
 		
@@ -109,7 +113,6 @@ TokType next_token (void)
 		  scan_line_nr(), token_str );
 	switch (tok_type) {
 		case TOK_NAME:
-		case TOK_LABEL:
 			warn(" %s", scan_str_value() );
 			break;
 		case TOK_STRING:
@@ -176,11 +179,6 @@ write_file('x2/f2', {binmode => ':raw'}, <<'END');
 ; names
 _Abc_123 Abc_123 123_Abc_
 Abc_123	af' bc'de'af'
-
-; labels
-. abc   abc
-  abc : abc
-. abc : abc
 
 ; numbers - decimal
 0 2147483647 2147483648
@@ -648,131 +646,115 @@ Token: x2/f2(9) NAME AF'
 Token: x2/f2(9) NEWLINE
 List:x2/f2:10:
 Token: x2/f2(10) NEWLINE
-List:x2/f2:11:; labels
+List:x2/f2:11:; numbers - decimal
 Token: x2/f2(11) NEWLINE
-List:x2/f2:12:. abc   abc
-Token: x2/f2(12) LABEL ABC
-Token: x2/f2(12) NAME ABC
+List:x2/f2:12:0 2147483647 2147483648
+Token: x2/f2(12) NUMBER 0
+Token: x2/f2(12) NUMBER 2147483647
+Token: x2/f2(12) NUMBER -2147483648
 Token: x2/f2(12) NEWLINE
-List:x2/f2:13:  abc : abc
-Token: x2/f2(13) LABEL ABC
-Token: x2/f2(13) NAME ABC
+List:x2/f2:13:
 Token: x2/f2(13) NEWLINE
-List:x2/f2:14:. abc : abc
-Token: x2/f2(14) LABEL ABC
-Token: x2/f2(14) NAME ABC
+List:x2/f2:14:; numbers - binary
 Token: x2/f2(14) NEWLINE
-List:x2/f2:15:
+List:x2/f2:15:  0000b   0011b    1111111111111111111111111111111b
+Token: x2/f2(15) NUMBER 0
+Token: x2/f2(15) NUMBER 3
+Token: x2/f2(15) NUMBER 2147483647
 Token: x2/f2(15) NEWLINE
-List:x2/f2:16:; numbers - decimal
+List:x2/f2:16: @0000   @0011    @1111111111111111111111111111111
+Token: x2/f2(16) NUMBER 0
+Token: x2/f2(16) NUMBER 3
+Token: x2/f2(16) NUMBER 2147483647
 Token: x2/f2(16) NEWLINE
-List:x2/f2:17:0 2147483647 2147483648
+List:x2/f2:17: %0000   %0011    %1111111111111111111111111111111
 Token: x2/f2(17) NUMBER 0
+Token: x2/f2(17) NUMBER 3
 Token: x2/f2(17) NUMBER 2147483647
-Token: x2/f2(17) NUMBER -2147483648
 Token: x2/f2(17) NEWLINE
-List:x2/f2:18:
+List:x2/f2:18:0b0000  0b0011   0b1111111111111111111111111111111
+Token: x2/f2(18) NUMBER 0
+Token: x2/f2(18) NUMBER 3
+Token: x2/f2(18) NUMBER 2147483647
 Token: x2/f2(18) NEWLINE
-List:x2/f2:19:; numbers - binary
+List:x2/f2:19:@'----' @'--##'  @'###############################'
+Token: x2/f2(19) NUMBER 0
+Token: x2/f2(19) NUMBER 3
+Token: x2/f2(19) NUMBER 2147483647
 Token: x2/f2(19) NEWLINE
-List:x2/f2:20:  0000b   0011b    1111111111111111111111111111111b
+List:x2/f2:20:%'----' %'--##'  %'###############################'
 Token: x2/f2(20) NUMBER 0
 Token: x2/f2(20) NUMBER 3
 Token: x2/f2(20) NUMBER 2147483647
 Token: x2/f2(20) NEWLINE
-List:x2/f2:21: @0000   @0011    @1111111111111111111111111111111
+List:x2/f2:21:@"----" @"--##"  @"###############################"
 Token: x2/f2(21) NUMBER 0
 Token: x2/f2(21) NUMBER 3
 Token: x2/f2(21) NUMBER 2147483647
 Token: x2/f2(21) NEWLINE
-List:x2/f2:22: %0000   %0011    %1111111111111111111111111111111
+List:x2/f2:22:%"----" %"--##"  %"###############################"
 Token: x2/f2(22) NUMBER 0
 Token: x2/f2(22) NUMBER 3
 Token: x2/f2(22) NUMBER 2147483647
 Token: x2/f2(22) NEWLINE
-List:x2/f2:23:0b0000  0b0011   0b1111111111111111111111111111111
-Token: x2/f2(23) NUMBER 0
-Token: x2/f2(23) NUMBER 3
-Token: x2/f2(23) NUMBER 2147483647
+List:x2/f2:23:
 Token: x2/f2(23) NEWLINE
-List:x2/f2:24:@'----' @'--##'  @'###############################'
-Token: x2/f2(24) NUMBER 0
-Token: x2/f2(24) NUMBER 3
-Token: x2/f2(24) NUMBER 2147483647
+List:x2/f2:24:; numbers - hexadecimal
 Token: x2/f2(24) NEWLINE
-List:x2/f2:25:%'----' %'--##'  %'###############################'
+List:x2/f2:25:  0h 0ah 0FH   7FFFFFFFh
 Token: x2/f2(25) NUMBER 0
-Token: x2/f2(25) NUMBER 3
+Token: x2/f2(25) NUMBER 10
+Token: x2/f2(25) NUMBER 15
 Token: x2/f2(25) NUMBER 2147483647
 Token: x2/f2(25) NEWLINE
-List:x2/f2:26:@"----" @"--##"  @"###############################"
+List:x2/f2:26: $0   $a  $F  $7FFFFFFF
 Token: x2/f2(26) NUMBER 0
-Token: x2/f2(26) NUMBER 3
+Token: x2/f2(26) NUMBER 10
+Token: x2/f2(26) NUMBER 15
 Token: x2/f2(26) NUMBER 2147483647
 Token: x2/f2(26) NEWLINE
-List:x2/f2:27:%"----" %"--##"  %"###############################"
+List:x2/f2:27: #0   #a  #F  #7FFFFFFF
 Token: x2/f2(27) NUMBER 0
-Token: x2/f2(27) NUMBER 3
+Token: x2/f2(27) NUMBER 10
+Token: x2/f2(27) NUMBER 15
 Token: x2/f2(27) NUMBER 2147483647
 Token: x2/f2(27) NEWLINE
-List:x2/f2:28:
+List:x2/f2:28:0x0  0xa 0xF 0x7FFFFFFF
+Token: x2/f2(28) NUMBER 0
+Token: x2/f2(28) NUMBER 10
+Token: x2/f2(28) NUMBER 15
+Token: x2/f2(28) NUMBER 2147483647
 Token: x2/f2(28) NEWLINE
-List:x2/f2:29:; numbers - hexadecimal
+List:x2/f2:29:
 Token: x2/f2(29) NEWLINE
-List:x2/f2:30:  0h 0ah 0FH   7FFFFFFFh
-Token: x2/f2(30) NUMBER 0
-Token: x2/f2(30) NUMBER 10
-Token: x2/f2(30) NUMBER 15
-Token: x2/f2(30) NUMBER 2147483647
+List:x2/f2:30:; strings - single-quote
 Token: x2/f2(30) NEWLINE
-List:x2/f2:31: $0   $a  $F  $7FFFFFFF
-Token: x2/f2(31) NUMBER 0
-Token: x2/f2(31) NUMBER 10
-Token: x2/f2(31) NUMBER 15
-Token: x2/f2(31) NUMBER 2147483647
+List:x2/f2:31:'''a''"'';';comment
+Token: x2/f2(31) STRING ''
+Token: x2/f2(31) STRING 'a'
+Token: x2/f2(31) STRING '"'
+Token: x2/f2(31) STRING ';'
 Token: x2/f2(31) NEWLINE
-List:x2/f2:32: #0   #a  #F  #7FFFFFFF
-Token: x2/f2(32) NUMBER 0
-Token: x2/f2(32) NUMBER 10
-Token: x2/f2(32) NUMBER 15
-Token: x2/f2(32) NUMBER 2147483647
-Token: x2/f2(32) NEWLINE
-List:x2/f2:33:0x0  0xa 0xF 0x7FFFFFFF
-Token: x2/f2(33) NUMBER 0
-Token: x2/f2(33) NUMBER 10
-Token: x2/f2(33) NUMBER 15
-Token: x2/f2(33) NUMBER 2147483647
-Token: x2/f2(33) NEWLINE
-List:x2/f2:34:
-Token: x2/f2(34) NEWLINE
-List:x2/f2:35:; strings - single-quote
-Token: x2/f2(35) NEWLINE
-List:x2/f2:36:'''a''"'';';comment
-Token: x2/f2(36) STRING ''
-Token: x2/f2(36) STRING 'a'
-Token: x2/f2(36) STRING '"'
-Token: x2/f2(36) STRING ';'
-Token: x2/f2(36) NEWLINE
-List:x2/f2:37:'unclosed
+List:x2/f2:32:'unclosed
 memalloc errors.c(1): alloc 40 bytes at ADDR_111
 memalloc strhash.c(1): alloc 32 bytes at ADDR_112
-Error at file 'x2/f2' line 37: Unclosed string
+Error at file 'x2/f2' line 32: Unclosed string
+Token: x2/f2(32) NEWLINE
+List:x2/f2:33:
+Token: x2/f2(33) NEWLINE
+List:x2/f2:34:; strings - double-quotes
+Token: x2/f2(34) NEWLINE
+List:x2/f2:35:"""a""'"";";comment
+Token: x2/f2(35) STRING ''
+Token: x2/f2(35) STRING 'a'
+Token: x2/f2(35) STRING '''
+Token: x2/f2(35) STRING ';'
+Token: x2/f2(35) NEWLINE
+List:x2/f2:36:"unclosed
+Error at file 'x2/f2' line 36: Unclosed string
+Token: x2/f2(36) NEWLINE
+List:x2/f2:37:
 Token: x2/f2(37) NEWLINE
-List:x2/f2:38:
-Token: x2/f2(38) NEWLINE
-List:x2/f2:39:; strings - double-quotes
-Token: x2/f2(39) NEWLINE
-List:x2/f2:40:"""a""'"";";comment
-Token: x2/f2(40) STRING ''
-Token: x2/f2(40) STRING 'a'
-Token: x2/f2(40) STRING '''
-Token: x2/f2(40) STRING ';'
-Token: x2/f2(40) NEWLINE
-List:x2/f2:41:"unclosed
-Error at file 'x2/f2' line 41: Unclosed string
-Token: x2/f2(41) NEWLINE
-List:x2/f2:42:
-Token: x2/f2(42) NEWLINE
 memalloc scan.c(5): free 12 bytes at ADDR_107 allocated at scan.c(5)
 memalloc scan.c(8): free 16386 bytes at ADDR_110 allocated at scan.c(7)
 memalloc scan.c(8): free 48 bytes at ADDR_109 allocated at scan.c(7)
