@@ -6,7 +6,7 @@
 ; 
 ;	int __CALLEE__ zx_setfloat_callee(char *variable, float value); 
 ; 
-;	$Id: zx_setfloat_callee.asm,v 1.1 2009-07-15 16:48:42 stefano Exp $ 
+;	$Id: zx_setfloat_callee.asm,v 1.2 2013-04-11 08:29:04 stefano Exp $ 
 ;  	
 
 XLIB	zx_setfloat_callee
@@ -23,7 +23,7 @@ zx_setfloat_callee:
 	pop de
 	pop de	; float value is already in FA
 	
-	pop de     ; var name
+	;pop de     ; var name
 	ex (sp),hl ; ret addr <-> var name
 
 ; enter : (FA) = float value
