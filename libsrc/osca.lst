@@ -24,6 +24,7 @@ graphics/osca/cclg
 graphics/osca/cplot
 graphics/osca/cplotpixel
 games/osca/joystick
+time/osca/clock
 osca/flos_paper
 osca/get_pen
 osca/set_pen

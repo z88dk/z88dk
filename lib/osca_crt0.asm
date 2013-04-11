@@ -12,7 +12,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.14 2012-07-10 05:55:38 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.15 2013-04-11 16:44:55 stefano Exp $
 ;
 
 
@@ -90,6 +90,14 @@
         XDEF	current_scancode
         XDEF	current_asciicode
 
+        XDEF	FRAMES
+
+;--------
+; OSCA / FLOS specific definitions
+;--------
+
+        INCLUDE "flos.def"
+        INCLUDE "osca.def"
 
 
 ; Now, getting to the real stuff now!
@@ -123,6 +131,8 @@
 	ENDIF
 	
 start:
+        di
+
 		;push	hl
 		;pop		bc
 		ld	b,h
@@ -139,6 +149,54 @@ ENDIF
         ;ld      sp,$7FFF
         ld      (exitsp),sp
 
+IF (!DEFINED_osca_notimer)
+
+        ld  hl,(FLOS_irq_vector)            		; The label "irq_vector" = $A01 (contained in equates file)
+        ld  (original_irq_vector),hl   		; Store the original FLOS vecotr for restoration later.
+        ld  hl,my_custom_irq_handler
+        ld  (FLOS_irq_vector),hl
+
+        ld  a,@10000111                		; Enable keyboard, mouse and timer interrupts
+        out  (sys_irq_enable),a
+
+	ld a,250
+	neg
+	out (sys_timer),a
+
+        ld  a,@00000100
+        out  (sys_clear_irq_flags),a           ; Clear the timer IRQ flag
+
+;        ld		hl,(FLOS_irq_vector)            ; The label "irq_vector" = $A01 (contained in equates file)
+;        ld		(original_irq_vector),hl   ; Store the original FLOS vecotr for restoration later.
+;        ld		hl,my_custom_irq_handler
+;        ld		(FLOS_irq_vector),hl
+
+
+;        ;ld		a,@10000111                ; Enable keyboard, mouse and timer interrupts
+;        ld		a,@10000101                ; Enable keyboard and timer interrupts
+;        out		(sys_irq_enable),a
+;;        ld		a,@10001011                ; Enable keyboard, mouse and video interrupts
+;;        out		(sys_irq_enable),a
+
+;; set a = number of 16 microsecond periods to wait
+;		ld	a,250	; 4 ms
+;		;xor a
+;		neg
+;		out (sys_timer),a
+;        ld		a,@00000100
+;        out		(sys_clear_irq_flags),a           ; Clear the timer IRQ flag
+
+ELSE
+		ld	b,255
+.v_srand_loop
+		ld	hl,FLOSvarsaddr
+		add	(hl)
+		ld	(frames),a
+		inc hl
+		djnz v_srand_loop
+ENDIF
+        ei
+        
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 ; Set up the std* stuff so we can be called again
@@ -232,6 +290,14 @@ ENDIF
 		; if it is in text mode already
 		;
         ;call	$10c4 ; kjt_flos_display (added in v547)
+IF (!DEFINED_osca_notimer)
+        di
+        ld		hl,(original_irq_vector)
+        ld		(FLOS_irq_vector),hl
+        ld		a,@10000011                     ; Enable keyboard and mouse interrupts only
+        out		(sys_irq_enable),a
+        ei
+ENDIF
         pop	hl
 start1:
         ld  sp,0
@@ -247,6 +313,65 @@ cmdok:
 
 l_dcal:
         jp      (hl)
+
+IF (!DEFINED_osca_notimer)
+; ----------------------------------
+; Custom Interrupt handlers
+; ----------------------------------
+my_custom_irq_handler:
+        push af
+        in  a,(sys_irq_ps2_flags)
+        bit  0,a        
+        call nz,kjt_keyboard_irq_code      ; Kernal keyboard irq handler
+        bit  1,a
+        call nz,kjt_mouse_irq_code         ; Kernal mouse irq handler
+        bit  2,a
+        call nz,my_timer_irq_code          ; User's timer irq handler
+        pop af
+        ei
+        reti
+
+my_timer_irq_code:
+        push af                            ; (do whatever, push/pop registers!)
+        push hl
+
+;        ld hl,(frames_pre)
+;        inc (hl)
+;        ld a,(hl)
+;        bit 4,a
+;        jr nz,timer_irq_count_done
+
+        ld hl,(frames)
+        inc hl
+        ld (frames),hl
+        ;;ld	(palette),hl		; testing purposes
+        ld a,h
+        or l
+        jr nz,timer_irq_count_done
+        ld hl,(frames+2)
+        inc hl
+        ld (frames+2),hl
+
+timer_irq_count_done:
+        ld  a,@00000100
+        out  (sys_clear_irq_flags),a           ; Clear the timer IRQ flag
+
+        pop  hl
+        pop  af
+        ret
+
+original_irq_vector:
+	defw 0
+
+frames_pre:
+
+	defb 0
+
+frames:
+
+	defw 0
+	defw 0
+
 
 ; Now, define some values for stdin, stdout, stderr
 
@@ -299,7 +424,7 @@ snd_tick:        defb    0
 ;
 ; OS_variables location as defined in system_equates.asm
 ; FLOSv582 sets it to $B00, hopefully it won't change much
-; We try to keep it dynamic
+; but we keep the option for making it dynamic
 ;
 ;--------------------------------------------------------------------------------------------
 

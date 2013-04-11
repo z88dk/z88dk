@@ -4,10 +4,11 @@ lstoff
 ;
 ; Jul 2011
 ;
-; $Id: flos.def,v 1.1 2011-07-26 13:24:27 stefano Exp $
+; $Id: flos.def,v 1.2 2013-04-11 16:44:55 stefano Exp $
 ;
 
 defc FLOS_location = $1000
+defc FLOS_irq_vector = $a01
 
 defc kjt_print_string         = $1013
 defc kjt_clear_screen         = $1016

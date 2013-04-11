@@ -33,6 +33,7 @@ graphics/w_pointxy
 graphics/osca/cclg
 graphics/osca/cplot
 graphics/osca/cplotpixel
+time/osca/clock
 games/osca/joystick
 osca/flos_paper
 osca/get_pen
