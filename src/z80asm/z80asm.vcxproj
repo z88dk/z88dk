@@ -84,6 +84,7 @@
     <ClInclude Include="class.h" />
     <ClInclude Include="classhash.h" />
     <ClInclude Include="classlist.h" />
+    <ClInclude Include="classring.h" />
     <ClInclude Include="codearea.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="die.h" />
@@ -104,6 +105,9 @@
     <ClInclude Include="queue.h" />
     <ClInclude Include="safestr.h" />
     <ClInclude Include="scan.h" />
+    <ClInclude Include="scan_def.h" />
+    <ClInclude Include="scan_struct.h" />
+    <ClInclude Include="scan_token.h" />
     <ClInclude Include="srcfile.h" />
     <ClInclude Include="strhash.h" />
     <ClInclude Include="strlist.h" />
@@ -130,6 +134,7 @@
     <ClCompile Include="ldinstr.c" />
     <ClCompile Include="listfile.c" />
     <ClCompile Include="memalloc.c" />
+    <ClCompile Include="model.c" />
     <ClCompile Include="model_symref.c" />
     <ClCompile Include="modlink.c" />
     <ClCompile Include="objfile.c" />
@@ -139,6 +144,9 @@
     <ClCompile Include="prsline.c" />
     <ClCompile Include="safestr.c" />
     <ClCompile Include="scan.c" />
+    <ClCompile Include="scan_context.c" />
+    <ClCompile Include="scan_struct.c" />
+    <ClCompile Include="scan_token.c" />
     <ClCompile Include="srcfile.c" />
     <ClCompile Include="strhash.c" />
     <ClCompile Include="strlist.c" />

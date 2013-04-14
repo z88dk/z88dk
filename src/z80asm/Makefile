@@ -12,9 +12,13 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.50 2013-03-31 13:16:48 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.51 2013-04-14 18:16:58 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.50  2013-03-31 13:16:48  pauloscustodio
+# Revision 1.51  2013-04-14 18:16:58  pauloscustodio
+# Split scanner in several modules, allow token look-ahead to simplify
+# parser.
+#
+# Revision 1.50  2013/03/31 13:16:48  pauloscustodio
 # Embryo of parse module
 #
 # Revision 1.49  2013/03/29 23:53:07  pauloscustodio
@@ -216,6 +220,7 @@ OBJS = 	\
 	ldinstr.o		\
 	listfile.o		\
 	memalloc.o		\
+	model.o			\
 	model_symref.o	\
 	modlink.o		\
 	objfile.o		\
@@ -225,6 +230,9 @@ OBJS = 	\
 	prsline.o		\
 	safestr.o		\
 	scan.o			\
+	scan_context.o	\
+	scan_struct.o	\
+	scan_token.o	\
 	srcfile.o		\
 	strhash.o		\
 	strlist.o		\
@@ -251,7 +259,7 @@ MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
 CFLAGS +=		-W
 
-all: $(TARGET)
+all: $(TARGET) gccmake.bat
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $(TARGET)  $(OBJS)
@@ -285,6 +293,32 @@ $(MSVC_TARGET) : $(wildcard *.c) $(wildcard *.h)
 astyle:
 	$(ASTYLE) *.c *.h
 
+# gccmake.bat
+gccmake.bat : Makefile
+	perl -e "print \
+				'@echo off', qq(\n), \
+				'rem ', '$$', 'Id', '$$', qq(\n), \
+				qq(\n), \
+				'echo *******************', qq(\n), \
+				'echo * Building z80asm *', qq(\n), \
+				'echo *******************', qq(\n), \
+				'del *.o', qq(\n); \
+			for (@ARGV) { \
+				s/\.o$$//; \
+				print 'gcc -c -o '; \
+				print; \
+				print '.o ', ' ' x (20 - length); \
+				print; \
+				print '.c'; \
+				print qq(\n); \
+			} \
+			print \
+				'gcc -o z80asm *.o', qq(\n), \
+				'copy z80asm.exe ..\\..\\bin', qq(\n), \
+				'del z80asm.exe', qq(\n); \
+		" $(OBJS) > gccmake.bat.new
+	mv gccmake.bat.new gccmake.bat
+	
 # Dependencies
 depend:
 	makedepend -Y -- $(CFLAGS) -- $(OBJS:.o=.c)
@@ -309,9 +343,9 @@ except.o: memalloc.h except.h e4c.h types.h die.h e4c.c
 exprprsr.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
 exprprsr.o: types.h model.h class.h queue.h classlist.h options.h errors.h
 exprprsr.o: errors_def.h file.h strlist.h codearea.h
-file.o: memalloc.h except.h e4c.h file.h strlist.h class.h queue.h types.h
-file.o: config.h ../config.h strutil.h safestr.h strpool.h errors.h
-file.o: errors_def.h
+file.o: memalloc.h except.h e4c.h config.h ../config.h errors.h errors_def.h
+file.o: file.h strlist.h class.h queue.h types.h safestr.h strpool.h
+file.o: strutil.h
 hist.o: memalloc.h except.h e4c.h hist.h
 ldinstr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 ldinstr.o: types.h symbol.h model.h class.h queue.h classlist.h errors.h
@@ -323,26 +357,39 @@ listfile.o: hist.h strpool.h safestr.h strutil.h codearea.h
 memalloc.o: memalloc.h except.h e4c.h types.h die.h queue.h
 model_symref.o: memalloc.h except.h e4c.h model.h class.h queue.h types.h
 model_symref.o: classlist.h
-modlink.o: memalloc.h except.h e4c.h config.h ../config.h options.h symbol.h
-modlink.o: avltree.h types.h model.h class.h queue.h classlist.h symbols.h
-modlink.o: z80asm.h errors.h errors_def.h file.h strlist.h codearea.h
-modlink.o: strutil.h safestr.h listfile.h dynstr.h
+modlink.o: memalloc.h except.h e4c.h codearea.h types.h config.h ../config.h
+modlink.o: errors.h errors_def.h file.h strlist.h class.h queue.h listfile.h
+modlink.o: dynstr.h model.h classlist.h options.h symbol.h avltree.h
+modlink.o: safestr.h strutil.h symbols.h z80asm.h
 objfile.o: memalloc.h except.h e4c.h objfile.h
 options.o: memalloc.h except.h e4c.h errors.h errors_def.h file.h strlist.h
 options.o: class.h queue.h types.h options.h symbol.h avltree.h model.h
-options.o: classlist.h srcfile.h dynstr.h symbols.h z80asm.h config.h
-options.o: ../config.h
-parse.o: memalloc.h except.h e4c.h parse.h
+options.o: classlist.h srcfile.h dynstr.h strpool.h symbols.h z80asm.h
+options.o: config.h ../config.h
+parse.o: memalloc.h except.h e4c.h class.h queue.h types.h dynstr.h scan.h
+parse.o: scan_context.h classlist.h scan_struct.h scan_token.h classring.h
+parse.o: parse.h
 prsident.o: memalloc.h except.h e4c.h codearea.h types.h config.h ../config.h
 prsident.o: errors.h errors_def.h listfile.h class.h queue.h dynstr.h model.h
-prsident.o: classlist.h options.h symbol.h avltree.h symbols.h z80asm.h
-prsline.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
-prsline.o: types.h symbol.h model.h class.h queue.h classlist.h options.h
-prsline.o: errors.h errors_def.h
+prsident.o: classlist.h options.h symbol.h avltree.h scan.h scan_context.h
+prsident.o: scan_struct.h scan_token.h classring.h symbols.h z80asm.h
+prsline.o: memalloc.h except.h e4c.h config.h ../config.h errors.h
+prsline.o: errors_def.h options.h symbol.h avltree.h types.h model.h class.h
+prsline.o: queue.h classlist.h scan.h scan_context.h scan_struct.h
+prsline.o: scan_token.h classring.h dynstr.h z80asm.h
 safestr.o: memalloc.h except.h e4c.h safestr.h types.h
-scan.o: memalloc.h except.h e4c.h class.h queue.h types.h classlist.h
-scan.o: dynstr.h codearea.h die.h errors.h errors_def.h listfile.h model.h
-scan.o: options.h symbol.h avltree.h srcfile.h strutil.h strpool.h
+scan.o: memalloc.h except.h e4c.h scan_context.h class.h queue.h types.h
+scan.o: classlist.h scan_struct.h scan_token.h classring.h dynstr.h
+scan.o: codearea.h die.h errors.h errors_def.h listfile.h model.h options.h
+scan.o: symbol.h avltree.h srcfile.h strpool.h strutil.h
+scan_context.o: memalloc.h except.h e4c.h errors.h errors_def.h options.h
+scan_context.o: symbol.h avltree.h types.h model.h class.h queue.h
+scan_context.o: classlist.h scan.h scan_context.h scan_struct.h scan_token.h
+scan_context.o: classring.h dynstr.h srcfile.h strpool.h
+scan_struct.o: memalloc.h except.h e4c.h errors.h errors_def.h scan_struct.h
+scan_struct.o: class.h queue.h types.h classlist.h
+scan_token.o: memalloc.h except.h e4c.h scan_token.h class.h queue.h types.h
+scan_token.o: classring.h dynstr.h strpool.h
 srcfile.o: memalloc.h except.h e4c.h codearea.h types.h errors.h errors_def.h
 srcfile.o: file.h strlist.h class.h queue.h listfile.h dynstr.h model.h
 srcfile.o: classlist.h options.h symbol.h avltree.h srcfile.h strpool.h
@@ -356,14 +403,15 @@ strutil.o: memalloc.h except.h e4c.h strutil.h
 symbols.o: memalloc.h except.h e4c.h config.h ../config.h errors.h
 symbols.o: errors_def.h listfile.h class.h queue.h types.h dynstr.h model.h
 symbols.o: classlist.h options.h symbol.h avltree.h strpool.h symbols.h
-z80asm.o: memalloc.h except.h e4c.h config.h ../config.h symbol.h avltree.h
-z80asm.o: types.h model.h class.h queue.h classlist.h symbols.h z80asm.h
-z80asm.o: hist.h options.h errors.h errors_def.h file.h strlist.h codearea.h
-z80asm.o: strutil.h listfile.h dynstr.h scan.h
+z80asm.o: memalloc.h except.h e4c.h codearea.h types.h config.h ../config.h
+z80asm.o: errors.h errors_def.h file.h strlist.h class.h queue.h hist.h
+z80asm.o: listfile.h dynstr.h model.h classlist.h options.h symbol.h
+z80asm.o: avltree.h strpool.h strutil.h symbols.h z80asm.h
 z80instr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 z80instr.o: types.h symbol.h model.h class.h queue.h classlist.h options.h
 z80instr.o: errors.h errors_def.h codearea.h
 z80pass.o: memalloc.h except.h e4c.h codearea.h types.h config.h ../config.h
 z80pass.o: errors.h errors_def.h file.h strlist.h class.h queue.h hist.h
 z80pass.o: listfile.h dynstr.h model.h classlist.h options.h symbol.h
-z80pass.o: avltree.h strutil.h symbols.h z80asm.h
+z80pass.o: avltree.h scan.h scan_context.h scan_struct.h scan_token.h
+z80pass.o: classring.h strutil.h symbols.h z80asm.h

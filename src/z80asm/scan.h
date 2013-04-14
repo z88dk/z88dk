@@ -19,9 +19,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 Scanner - to be processed by: flex -L scan.l
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.3 2013-04-09 20:56:50 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.4 2013-04-14 18:16:58 pauloscustodio Exp $ */
 /* $Log: scan.h,v $
-/* Revision 1.3  2013-04-09 20:56:50  pauloscustodio
+/* Revision 1.4  2013-04-14 18:16:58  pauloscustodio
+/* Split scanner in several modules, allow token look-ahead to simplify
+/* parser.
+/*
+/* Revision 1.3  2013/04/09 20:56:50  pauloscustodio
 /* TOK_LABEL removed - identifying a label as XXX: has to be a parsing action in order to
 /* distinguish a label from a continuation statement, e.g.
 /* LABEL: ld a,VALUE : inc a ; LABEL is label, VALUE is name
@@ -42,85 +46,19 @@ Scanner - to be processed by: flex -L scan.l
 #ifndef SCAN_H
 #define SCAN_H
 
-#include "class.h"
-#include "classlist.h"
-#include "dynstr.h"
+#include "scan_context.h"
+#include "scan_struct.h"
+#include "scan_token.h"
 
 /*-----------------------------------------------------------------------------
-*   Token Type
+*   forward declarations
 *----------------------------------------------------------------------------*/
-typedef enum TokType
-{
-	/* mark end of input */
-	TOK_NULL			= 0,
-	
-    /* single character tokens */
-    TOK_NEWLINE         = '\n',
-	
-    TOK_EXCLAM          = '!',
-    TOK_HASH            = '#',
-    TOK_DOLLAR          = '$',
-    TOK_PERCENT         = '%',
-    TOK_AMPERSAND       = '&',
-    TOK_LPAREN          = '(',
-    TOK_RPAREN          = ')',
-    TOK_ASTERISK        = '*',
-    TOK_PLUS            = '+',
-    TOK_COMMA           = ',',
-    TOK_HYPHEN          = '-',
-    TOK_PERIOD          = '.',
-    TOK_SLASH           = '/',
-    TOK_COLON           = ':',
-    TOK_LESS            = '<',
-    TOK_EQUAL           = '=',
-    TOK_GREATER         = '>',
-    TOK_QUESTION        = '?',
-    TOK_ATSIGN          = '@',
-    TOK_LSQUARE         = '[',
-    TOK_BACKSLASH       = '\\',
-    TOK_RSQUARE         = ']',
-    TOK_CARET           = '^',
-    TOK_BACKQUOTE       = '`',
-    TOK_LCURLY          = '{',
-    TOK_VBAR            = '|',
-    TOK_RCURLY          = '}',
-    TOK_TILDE           = '~',
-	
-    /* multi-character tokens */
-    TOK_EQUAL_EQUAL     = 0x100,/* "==" */
-    TOK_LESS_GREATER,           /* "<>" */
-    TOK_NOT_EQUAL,              /* "!=" */
-    TOK_LESS_EQUAL,             /* "<=" */
-    TOK_GREATER_EQUAL,          /* ">=" */
-    TOK_DBL_VBAR,               /* "||" */
-    TOK_DBL_AMPERSAND,          /* "&&" */
-    TOK_DBL_LESS,               /* "<<" */
-    TOK_DBL_GREATER,            /* ">>" */
-    TOK_DBL_ASTERISK,           /* "**" */
-
-    /* language tokens */
-    TOK_NAME,                   /* any identifier */
-    TOK_NUMBER,
-    TOK_STRING,                 /* single- or double-quoted string */
-    TOK_PREPROC,                /* preprocessor command */
-
-} TokType;
+struct Context;				/* YY_EXTRA_TYPE */
+#define YY_DECL TokType yylex (Token *token, yyscan_t yyscanner)
+extern YY_DECL;
 
 /*-----------------------------------------------------------------------------
-*   Token and list of tokens
-*----------------------------------------------------------------------------*/
-CLASS(Token)
-	TokType	tok_type;			/* type of token */
-	long	num_value;			/* numeric value, if any */
-	Str	   *str_value;			/* string value, if any */
-	char   *filename;			/* file name - kept in strpool */
-	int 	line_nr;			/* input line number */
-END_CLASS;
-
-CLASS_LIST(Token);
-
-/*-----------------------------------------------------------------------------
-*   API - uses srcfile.h singleton API
+*   scan API
 *----------------------------------------------------------------------------*/
 
 /* Start reading file / text at current position */
@@ -128,18 +66,18 @@ extern void scan_file( char *filename );
 extern void scan_text( char *text );
 
 /* scan input for next token, return token type; 
-   use scan_xxx() to last returned token attributes, only valid until next
-   scan_get()/scan_unget() call */
+   use scan_token(0) to get last returned token, only valid until next scan_get() call */
 extern TokType scan_get( void );
-extern TokType scan_tok_type( void );
-extern long	   scan_num_value( void );
-extern char   *scan_str_value( void );
-extern char   *scan_filename( void );
-extern int 	   scan_line_nr( void );
 
-/* push back token to input stream */
-extern void scan_unget( TokType tok_type, long num_value, char *str_value,
-						char *filename, int line_nr );
+/* get Nth token in the current context, NULL if none, 0 = current, 1 = next, ... */
+extern Token *scan_token( int n );		
+
+/* attributes of Nth token */
+extern TokType scan_tok_type( int n );
+extern long	   scan_num_value( int n );
+extern char   *scan_str_value( int n );
+extern char   *scan_filename( int n );
+extern int 	   scan_line_nr( int n );
 
 /* stack of nested constructs, i.e. IF / ELSE / ENDIF
    local to each input file, stack must be empty at the end of file */
@@ -149,11 +87,8 @@ extern int  scan_top_value( void );
 extern void scan_replace_struct( int id, int value );
 extern void scan_pop_struct( int id );		/* syntaxt error if id != top_id */
 
-/* forward declaration for YY_EXTRA_TYPE */
-struct Context;
 
 #endif /* ndef SCAN_H */
-
 
 
 
