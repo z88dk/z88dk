@@ -16,9 +16,13 @@ Fixed-size circular ring of objects defined by class.h
 Objects are pre-allocated and cleared before being returned to caller as new elements.
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classring.h,v 1.1 2013-04-13 15:55:10 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classring.h,v 1.2 2013-04-14 18:18:40 pauloscustodio Exp $
 $Log: classring.h,v $
-Revision 1.1  2013-04-13 15:55:10  pauloscustodio
+Revision 1.2  2013-04-14 18:18:40  pauloscustodio
+Was missing setting autodelete of children to false, caused multiple frees on some occasions.
+Warnings.
+
+Revision 1.1  2013/04/13 15:55:10  pauloscustodio
 New CLASS_RING for circular queue of tokens pre-allocated to spare the
 alloc/free for each token received from the lexer, and to allow quick
 look-ahead for the parser without the need to push back tokens.
@@ -93,9 +97,10 @@ DEF_CLASS_RING(T);
 	void T##Ring_init ( T##Ring *self )										\
 	{																		\
 		int i;																\
-		for ( i = 0; i < NUM_ELEMS(self->queue); i++ ) 						\
+		for ( i = 0; i < (int)NUM_ELEMS(self->queue); i++ ) 				\
 		{																	\
 			self->queue[i] = OBJ_NEW(T);									\
+			OBJ_AUTODELETE( self->queue[i] ) = FALSE;						\
 		}																	\
 		self->first = self->last = 0;										\
 	}																		\
@@ -103,7 +108,7 @@ DEF_CLASS_RING(T);
 	void T##Ring_copy ( T##Ring *self, T##Ring *other )						\
 	{																		\
 		int i;																\
-		for ( i = 0; i < NUM_ELEMS(self->queue); i++ ) 						\
+		for ( i = 0; i < (int)NUM_ELEMS(self->queue); i++ )					\
 		{																	\
 			self->queue[i] = T##_clone( other->queue[i] );					\
 		}																	\
@@ -112,7 +117,7 @@ DEF_CLASS_RING(T);
 	void T##Ring_fini ( T##Ring *self )										\
 	{																		\
 		int i;																\
-		for ( i = 0; i < NUM_ELEMS(self->queue); i++ ) 						\
+		for ( i = 0; i < (int)NUM_ELEMS(self->queue); i++ ) 				\
 		{																	\
 			OBJ_DELETE( self->queue[i] );									\
 		}																	\
@@ -127,7 +132,7 @@ DEF_CLASS_RING(T);
 	/* check if ring is full */												\
 	BOOL T##Ring_full( T##Ring *self )										\
 	{																		\
-		return ((self->last + 1) % NUM_ELEMS(self->queue)) == self->first;	\
+		return ((self->last + 1) % (int)NUM_ELEMS(self->queue)) == self->first;	\
 	}																		\
 																			\
 	/* get pointer to ring element number N for N=0,1,2,..,-2,-1 */			\
