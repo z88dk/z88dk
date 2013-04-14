@@ -19,9 +19,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 Scanner - to be processed by: flex -L scan.l
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.4 2013-04-14 18:16:58 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.5 2013-04-14 20:47:27 pauloscustodio Exp $ */
 /* $Log: scan.h,v $
-/* Revision 1.4  2013-04-14 18:16:58  pauloscustodio
+/* Revision 1.5  2013-04-14 20:47:27  pauloscustodio
+/* TOK_LABEL for a label definition, i.e. ".NAME" or "NAME:", with no spaces between symbols
+/* colon to separate assembly statements in a line needs spaces.
+/*
+/* Revision 1.4  2013/04/14 18:16:58  pauloscustodio
 /* Split scanner in several modules, allow token look-ahead to simplify
 /* parser.
 /*

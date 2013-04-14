@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.4 2013-04-14 18:17:00 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.5 2013-04-14 20:47:27 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.4  2013-04-14 18:17:00  pauloscustodio
+# Revision 1.5  2013-04-14 20:47:27  pauloscustodio
+# TOK_LABEL for a label definition, i.e. ".NAME" or "NAME:", with no spaces between symbols
+# colon to separate assembly statements in a line needs spaces.
+#
+# Revision 1.4  2013/04/14 18:17:00  pauloscustodio
 # Split scanner in several modules, allow token look-ahead to simplify
 # parser.
 #
@@ -99,6 +103,7 @@ char *decode_token (TokType tok_type)
 		CASE_TOK( DBL_GREATER	)
 		CASE_TOK( DBL_ASTERISK	)
 		CASE_TOK( NAME			)
+		CASE_TOK( LABEL			)
 		CASE_TOK( NUMBER		)
 		CASE_TOK( STRING		)
 		
@@ -144,6 +149,7 @@ TokType next_token (void)
 		  scan_line_nr(0), token_str );
 	switch (tok_type) {
 		case TOK_NAME:
+		case TOK_LABEL:
 			warn(" %s", scan_str_value(0) );
 			break;
 		case TOK_STRING:
@@ -211,6 +217,11 @@ write_file('x2/f2', {binmode => ':raw'}, <<'END');
 ; names
 _Abc_123 Abc_123 123_Abc_
 Abc_123	af' bc'de'af'
+
+; labels
+.abc  . def : ghi
+ abc: . def : ghi
+.abc: . def : ghi
 
 ; numbers - decimal
 0 2147483647 2147483648
@@ -899,115 +910,140 @@ Token: x2/f2(9) NAME AF'
 Token: x2/f2(9) NEWLINE
 List:x2/f2:10:
 Token: x2/f2(10) NEWLINE
-List:x2/f2:11:; numbers - decimal
+List:x2/f2:11:; labels
 Token: x2/f2(11) NEWLINE
-List:x2/f2:12:0 2147483647 2147483648
-Token: x2/f2(12) NUMBER 0
-Token: x2/f2(12) NUMBER 2147483647
-Token: x2/f2(12) NUMBER -2147483648
+List:x2/f2:12:.abc  . def : ghi
+Token: x2/f2(12) LABEL ABC
+Token: x2/f2(12) PERIOD
+Token: x2/f2(12) NAME DEF
+Token: x2/f2(12) COLON
+Token: x2/f2(12) NAME GHI
 Token: x2/f2(12) NEWLINE
-List:x2/f2:13:
+List:x2/f2:13: abc: . def : ghi
+Token: x2/f2(13) LABEL ABC
+Token: x2/f2(13) PERIOD
+Token: x2/f2(13) NAME DEF
+Token: x2/f2(13) COLON
+Token: x2/f2(13) NAME GHI
 Token: x2/f2(13) NEWLINE
-List:x2/f2:14:; numbers - binary
+List:x2/f2:14:.abc: . def : ghi
+Token: x2/f2(14) LABEL ABC
+Token: x2/f2(14) PERIOD
+Token: x2/f2(14) NAME DEF
+Token: x2/f2(14) COLON
+Token: x2/f2(14) NAME GHI
 Token: x2/f2(14) NEWLINE
-List:x2/f2:15:  0000b   0011b    1111111111111111111111111111111b
-Token: x2/f2(15) NUMBER 0
-Token: x2/f2(15) NUMBER 3
-Token: x2/f2(15) NUMBER 2147483647
+List:x2/f2:15:
 Token: x2/f2(15) NEWLINE
-List:x2/f2:16: @0000   @0011    @1111111111111111111111111111111
-Token: x2/f2(16) NUMBER 0
-Token: x2/f2(16) NUMBER 3
-Token: x2/f2(16) NUMBER 2147483647
+List:x2/f2:16:; numbers - decimal
 Token: x2/f2(16) NEWLINE
-List:x2/f2:17: %0000   %0011    %1111111111111111111111111111111
+List:x2/f2:17:0 2147483647 2147483648
 Token: x2/f2(17) NUMBER 0
-Token: x2/f2(17) NUMBER 3
 Token: x2/f2(17) NUMBER 2147483647
+Token: x2/f2(17) NUMBER -2147483648
 Token: x2/f2(17) NEWLINE
-List:x2/f2:18:0b0000  0b0011   0b1111111111111111111111111111111
-Token: x2/f2(18) NUMBER 0
-Token: x2/f2(18) NUMBER 3
-Token: x2/f2(18) NUMBER 2147483647
+List:x2/f2:18:
 Token: x2/f2(18) NEWLINE
-List:x2/f2:19:@'----' @'--##'  @'###############################'
-Token: x2/f2(19) NUMBER 0
-Token: x2/f2(19) NUMBER 3
-Token: x2/f2(19) NUMBER 2147483647
+List:x2/f2:19:; numbers - binary
 Token: x2/f2(19) NEWLINE
-List:x2/f2:20:%'----' %'--##'  %'###############################'
+List:x2/f2:20:  0000b   0011b    1111111111111111111111111111111b
 Token: x2/f2(20) NUMBER 0
 Token: x2/f2(20) NUMBER 3
 Token: x2/f2(20) NUMBER 2147483647
 Token: x2/f2(20) NEWLINE
-List:x2/f2:21:@"----" @"--##"  @"###############################"
+List:x2/f2:21: @0000   @0011    @1111111111111111111111111111111
 Token: x2/f2(21) NUMBER 0
 Token: x2/f2(21) NUMBER 3
 Token: x2/f2(21) NUMBER 2147483647
 Token: x2/f2(21) NEWLINE
-List:x2/f2:22:%"----" %"--##"  %"###############################"
+List:x2/f2:22: %0000   %0011    %1111111111111111111111111111111
 Token: x2/f2(22) NUMBER 0
 Token: x2/f2(22) NUMBER 3
 Token: x2/f2(22) NUMBER 2147483647
 Token: x2/f2(22) NEWLINE
-List:x2/f2:23:
+List:x2/f2:23:0b0000  0b0011   0b1111111111111111111111111111111
+Token: x2/f2(23) NUMBER 0
+Token: x2/f2(23) NUMBER 3
+Token: x2/f2(23) NUMBER 2147483647
 Token: x2/f2(23) NEWLINE
-List:x2/f2:24:; numbers - hexadecimal
+List:x2/f2:24:@'----' @'--##'  @'###############################'
+Token: x2/f2(24) NUMBER 0
+Token: x2/f2(24) NUMBER 3
+Token: x2/f2(24) NUMBER 2147483647
 Token: x2/f2(24) NEWLINE
-List:x2/f2:25:  0h 0ah 0FH   7FFFFFFFh
+List:x2/f2:25:%'----' %'--##'  %'###############################'
 Token: x2/f2(25) NUMBER 0
-Token: x2/f2(25) NUMBER 10
-Token: x2/f2(25) NUMBER 15
+Token: x2/f2(25) NUMBER 3
 Token: x2/f2(25) NUMBER 2147483647
 Token: x2/f2(25) NEWLINE
-List:x2/f2:26: $0   $a  $F  $7FFFFFFF
+List:x2/f2:26:@"----" @"--##"  @"###############################"
 Token: x2/f2(26) NUMBER 0
-Token: x2/f2(26) NUMBER 10
-Token: x2/f2(26) NUMBER 15
+Token: x2/f2(26) NUMBER 3
 Token: x2/f2(26) NUMBER 2147483647
 Token: x2/f2(26) NEWLINE
-List:x2/f2:27: #0   #a  #F  #7FFFFFFF
+List:x2/f2:27:%"----" %"--##"  %"###############################"
 Token: x2/f2(27) NUMBER 0
-Token: x2/f2(27) NUMBER 10
-Token: x2/f2(27) NUMBER 15
+Token: x2/f2(27) NUMBER 3
 Token: x2/f2(27) NUMBER 2147483647
 Token: x2/f2(27) NEWLINE
-List:x2/f2:28:0x0  0xa 0xF 0x7FFFFFFF
-Token: x2/f2(28) NUMBER 0
-Token: x2/f2(28) NUMBER 10
-Token: x2/f2(28) NUMBER 15
-Token: x2/f2(28) NUMBER 2147483647
+List:x2/f2:28:
 Token: x2/f2(28) NEWLINE
-List:x2/f2:29:
+List:x2/f2:29:; numbers - hexadecimal
 Token: x2/f2(29) NEWLINE
-List:x2/f2:30:; strings - single-quote
+List:x2/f2:30:  0h 0ah 0FH   7FFFFFFFh
+Token: x2/f2(30) NUMBER 0
+Token: x2/f2(30) NUMBER 10
+Token: x2/f2(30) NUMBER 15
+Token: x2/f2(30) NUMBER 2147483647
 Token: x2/f2(30) NEWLINE
-List:x2/f2:31:'''a''"'';';comment
-Token: x2/f2(31) STRING ''
-Token: x2/f2(31) STRING 'a'
-Token: x2/f2(31) STRING '"'
-Token: x2/f2(31) STRING ';'
+List:x2/f2:31: $0   $a  $F  $7FFFFFFF
+Token: x2/f2(31) NUMBER 0
+Token: x2/f2(31) NUMBER 10
+Token: x2/f2(31) NUMBER 15
+Token: x2/f2(31) NUMBER 2147483647
 Token: x2/f2(31) NEWLINE
-List:x2/f2:32:'unclosed
+List:x2/f2:32: #0   #a  #F  #7FFFFFFF
+Token: x2/f2(32) NUMBER 0
+Token: x2/f2(32) NUMBER 10
+Token: x2/f2(32) NUMBER 15
+Token: x2/f2(32) NUMBER 2147483647
+Token: x2/f2(32) NEWLINE
+List:x2/f2:33:0x0  0xa 0xF 0x7FFFFFFF
+Token: x2/f2(33) NUMBER 0
+Token: x2/f2(33) NUMBER 10
+Token: x2/f2(33) NUMBER 15
+Token: x2/f2(33) NUMBER 2147483647
+Token: x2/f2(33) NEWLINE
+List:x2/f2:34:
+Token: x2/f2(34) NEWLINE
+List:x2/f2:35:; strings - single-quote
+Token: x2/f2(35) NEWLINE
+List:x2/f2:36:'''a''"'';';comment
+Token: x2/f2(36) STRING ''
+Token: x2/f2(36) STRING 'a'
+Token: x2/f2(36) STRING '"'
+Token: x2/f2(36) STRING ';'
+Token: x2/f2(36) NEWLINE
+List:x2/f2:37:'unclosed
 memalloc errors.c(1): alloc 40 bytes at ADDR_228
 memalloc strhash.c(1): alloc 32 bytes at ADDR_229
-Error at file 'x2/f2' line 32: Unclosed string
-Token: x2/f2(32) NEWLINE
-List:x2/f2:33:
-Token: x2/f2(33) NEWLINE
-List:x2/f2:34:; strings - double-quotes
-Token: x2/f2(34) NEWLINE
-List:x2/f2:35:"""a""'"";";comment
-Token: x2/f2(35) STRING ''
-Token: x2/f2(35) STRING 'a'
-Token: x2/f2(35) STRING '''
-Token: x2/f2(35) STRING ';'
-Token: x2/f2(35) NEWLINE
-List:x2/f2:36:"unclosed
-Error at file 'x2/f2' line 36: Unclosed string
-Token: x2/f2(36) NEWLINE
-List:x2/f2:37:
+Error at file 'x2/f2' line 37: Unclosed string
 Token: x2/f2(37) NEWLINE
+List:x2/f2:38:
+Token: x2/f2(38) NEWLINE
+List:x2/f2:39:; strings - double-quotes
+Token: x2/f2(39) NEWLINE
+List:x2/f2:40:"""a""'"";";comment
+Token: x2/f2(40) STRING ''
+Token: x2/f2(40) STRING 'a'
+Token: x2/f2(40) STRING '''
+Token: x2/f2(40) STRING ';'
+Token: x2/f2(40) NEWLINE
+List:x2/f2:41:"unclosed
+Error at file 'x2/f2' line 41: Unclosed string
+Token: x2/f2(41) NEWLINE
+List:x2/f2:42:
+Token: x2/f2(42) NEWLINE
 memalloc scan_context.c(2): free 12 bytes at ADDR_224 allocated at scan_context.c(2)
 memalloc scan.c(2): free 16386 bytes at ADDR_227 allocated at scan.c(1)
 memalloc scan.c(2): free 48 bytes at ADDR_226 allocated at scan.c(1)

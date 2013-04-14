@@ -14,9 +14,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Token class for tokens returned by scanner
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan_token.h,v 1.1 2013-04-14 18:17:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan_token.h,v 1.2 2013-04-14 20:47:27 pauloscustodio Exp $
 $Log: scan_token.h,v $
-Revision 1.1  2013-04-14 18:17:00  pauloscustodio
+Revision 1.2  2013-04-14 20:47:27  pauloscustodio
+TOK_LABEL for a label definition, i.e. ".NAME" or "NAME:", with no spaces between symbols
+colon to separate assembly statements in a line needs spaces.
+
+Revision 1.1  2013/04/14 18:17:00  pauloscustodio
 Split scanner in several modules, allow token look-ahead to simplify
 parser.
 
@@ -91,12 +95,10 @@ typedef enum TokType
 
     /* language tokens */
     TOK_NAME,                   /* any identifier */
+    TOK_LABEL,                  /* .NAME or NAME:, without spaces between symbols */
     TOK_NUMBER,
     TOK_STRING,                 /* single- or double-quoted string */
     TOK_PREPROC,                /* preprocessor command */
-
-	/* semantic tokens, i.e. returned by the parser */
-	TOK_LABEL,
 
 } TokType;
 

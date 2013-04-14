@@ -16,9 +16,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 Scanner - to be processed by: flex -L scan.l
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.4 2013-04-14 18:16:58 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.5 2013-04-14 20:47:27 pauloscustodio Exp $ */
 /* $Log: scan.l,v $
-/* Revision 1.4  2013-04-14 18:16:58  pauloscustodio
+/* Revision 1.5  2013-04-14 20:47:27  pauloscustodio
+/* TOK_LABEL for a label definition, i.e. ".NAME" or "NAME:", with no spaces between symbols
+/* colon to separate assembly statements in a line needs spaces.
+/*
+/* Revision 1.4  2013/04/14 18:16:58  pauloscustodio
 /* Split scanner in several modules, allow token look-ahead to simplify
 /* parser.
 /*
@@ -191,6 +195,24 @@ D16		[0-9a-f]
 				Str_bset( token->str_value, yytext, yyleng ); 	
 				strtoupper( Str_data( token->str_value ) );		
 				YY_RETURN(TOK_NAME);
+			}
+
+			/* Label */
+"."{ID}":"?	|
+"."?{ID}":"	{
+				/* trim starting dot and ending colon */
+				if ( yytext[0] == '.' ) 
+				{
+					yytext++;
+					yyleng--;
+				}
+				if ( yytext[yyleng-1] == ':' ) 
+				{
+					yyleng--;
+				}
+				Str_bset( token->str_value, yytext, yyleng ); 	
+				strtoupper( Str_data( token->str_value ) );		
+				YY_RETURN(TOK_LABEL);
 			}
 
 			/* String - return string without quotes */
