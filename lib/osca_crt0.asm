@@ -12,7 +12,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.15 2013-04-11 16:44:55 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.16 2013-04-15 15:56:01 stefano Exp $
 ;
 
 
@@ -159,33 +159,12 @@ IF (!DEFINED_osca_notimer)
         ld  a,@10000111                		; Enable keyboard, mouse and timer interrupts
         out  (sys_irq_enable),a
 
-	ld a,250
-	neg
-	out (sys_timer),a
+        ld a,250
+        neg
+        out (sys_timer),a
 
         ld  a,@00000100
         out  (sys_clear_irq_flags),a           ; Clear the timer IRQ flag
-
-;        ld		hl,(FLOS_irq_vector)            ; The label "irq_vector" = $A01 (contained in equates file)
-;        ld		(original_irq_vector),hl   ; Store the original FLOS vecotr for restoration later.
-;        ld		hl,my_custom_irq_handler
-;        ld		(FLOS_irq_vector),hl
-
-
-;        ;ld		a,@10000111                ; Enable keyboard, mouse and timer interrupts
-;        ld		a,@10000101                ; Enable keyboard and timer interrupts
-;        out		(sys_irq_enable),a
-;;        ld		a,@10001011                ; Enable keyboard, mouse and video interrupts
-;;        out		(sys_irq_enable),a
-
-;; set a = number of 16 microsecond periods to wait
-;		ld	a,250	; 4 ms
-;		;xor a
-;		neg
-;		out (sys_timer),a
-;        ld		a,@00000100
-;        out		(sys_clear_irq_flags),a           ; Clear the timer IRQ flag
-
 ELSE
 		ld	b,255
 .v_srand_loop
@@ -359,6 +338,8 @@ timer_irq_count_done:
         pop  hl
         pop  af
         ret
+ENDIF
+
 
 original_irq_vector:
 	defw 0

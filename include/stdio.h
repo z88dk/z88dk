@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.18 2012-12-31 10:38:23 stefano Exp $ */
+/* $Id: stdio.h,v 1.19 2013-04-15 15:56:01 stefano Exp $ */
 
 #undef __STDIO_BINARY        /* By default don't consider binary files */
 
@@ -253,5 +253,14 @@ extern void __LIB__ printk(char *fmt,...);
 
 #endif /* !FDSTDIO */
 
+
+/*
+ *  MICRO C compatibility:  keep at bottom of this file
+ *  Some of Dunfield's Micro C code can be ported with the '-DMICROC' parameter
+ */
+
+#ifdef MICROC
+#include <microc.h>
+#endif
 
 #endif /* _STDIO_H */

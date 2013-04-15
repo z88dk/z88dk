@@ -23,5 +23,6 @@ extern int __LIB__ __FASTCALL__ toascii(int);
 extern int __LIB__ __FASTCALL__ tolower(int);
 extern int __LIB__ __FASTCALL__ toupper(int);
 
+#define isblank(a) isspace(a)
 
 #endif
