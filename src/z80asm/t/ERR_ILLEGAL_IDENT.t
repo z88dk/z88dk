@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_ILLEGAL_IDENT.t,v 1.3 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_ILLEGAL_IDENT.t,v 1.4 2013-04-15 20:10:16 pauloscustodio Exp $
 # $Log: ERR_ILLEGAL_IDENT.t,v $
-# Revision 1.3  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.4  2013-04-15 20:10:16  pauloscustodio
+# Test opcode not available in Rabit
+#
+# Revision 1.3  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.2  2012/05/26 18:51:10  pauloscustodio
@@ -49,6 +52,7 @@ use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
+t_z80asm_error("daa", "Error at file 'test.asm' line 1: Illegal identifier", "-RCMX000");
 t_z80asm_error("ld (bc),b", "Error at file 'test.asm' line 1: Illegal identifier");
 
 unlink_testfiles();
