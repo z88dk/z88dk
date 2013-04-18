@@ -31,6 +31,7 @@
 #include <string.h>
 #include <ctype.h>
 
+
 #ifdef PICS
 #include <graphics.h>
 #include <adv_a.h>
@@ -55,6 +56,10 @@
 #ifndef getkey
 #include <conio.h>
 #define getkey() getch()
+#endif
+
+#ifdef DISK
+FILE *fpsave;
 #endif
 
 void GetLine();
@@ -147,7 +152,7 @@ char	strTokenBuf[4];		/* workspace of $04 bytes to hold a token*/
 int nScore;
 
 #ifdef SPECTRUM
-#define MAX_COL 63
+#define MAX_COL 50
 #endif
 #ifdef Z88
 #define MAX_COL 79
@@ -1626,10 +1631,6 @@ VNDef AUT_LST[] =
 
 
 
-
-
-
-
 /*
 // ======================================================================
 // output a character to the display
@@ -1838,6 +1839,9 @@ void ShowRoom()
 			break;
 		case 4:
 			draw_profile(50, 20, 160, lake);
+			break;
+		case 5:
+				draw_profile(50, 20, 240, strange_house);
 			break;
 		case 6:
 			draw_profile(60, 3, 180, shed);
@@ -2573,7 +2577,7 @@ void SH_OK()
 
 void SH_QUIT()
 {
-#if TAPE
+#ifdef TAPE
 	PrintStr("Do you want to save the game?\n");
 
 	if (i_GetCh() == 'Y')
@@ -2586,6 +2590,21 @@ void SH_QUIT()
 		tape_save_block(naItemLoc, sizeof(naItemLoc), 3);
 		tape_save_block(&CUR_RM, sizeof(CUR_RM), 4);
 #endif
+
+#ifdef DISK
+	PrintStr("Do you want to save the game?\n");
+
+	if (i_GetCh() == 'Y')
+	{
+		/* save */
+		fpsave=fopen("adv_a.sav","wb");
+		fwrite(GVARS, sizeof(GVARS),1, fpsave);
+		fwrite(&nScore, sizeof(nScore),1, fpsave);
+		fwrite(naItemLoc, sizeof(naItemLoc),1, fpsave);
+		fwrite(&CUR_RM, sizeof(CUR_RM),1, fpsave);
+		fclose(fpsave);
+#endif
+
 		PrintStr("Do you wish to continue?\n");
 
 		if (i_GetCh() == 'Y')
@@ -2593,7 +2612,10 @@ void SH_QUIT()
 			nNextParseAction = NA_DO_AUTO;
 			return;
 		}
-#if TAPE
+#ifdef TAPE
+	}
+#endif
+#ifdef DISK
 	}
 #endif
 
@@ -2964,7 +2986,7 @@ int main()
 
 		CUR_RM = 0;
 
-#if TAPE
+#ifdef TAPE
 		PrintStr("Want to restore a game?\n");
 		if (i_GetCh() == 'Y')
 		{
@@ -2973,14 +2995,29 @@ int main()
 			tape_load_block(&nScore, sizeof(nScore), 2);
 			tape_load_block(naItemLoc, sizeof(naItemLoc), 3);
 			tape_load_block(&CUR_RM, sizeof(CUR_RM), 4);
+		}
+#endif
+
+#ifdef DISK
+		PrintStr("Want to restore a game?\n");
+		if (i_GetCh() == 'Y')
+		{
+		/* restore */
+			fpsave=fopen("adv_a.sav","rb");
+			fread(GVARS, sizeof(GVARS),1, fpsave);
+			fread(&nScore, sizeof(nScore),1, fpsave);
+			fread(naItemLoc, sizeof(naItemLoc),1, fpsave);
+			fread(&CUR_RM, sizeof(CUR_RM),1, fpsave);
+			fclose(fpsave);
+		}
+#endif
 
 /*
 			PrintStr("Restore not supported\n");
 			PrintStr("Press a key");
 			i_GetCh();
 */
-		}
-#endif
+
 		for (;;)		/* main loop */
 		{
 			ClearScr();
