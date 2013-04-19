@@ -4,7 +4,7 @@
 ;	gets(char *s) - get string from console
 ;
 ;
-;	$Id: gets.asm,v 1.6 2012-04-27 12:16:57 stefano Exp $
+;	$Id: gets.asm,v 1.7 2013-04-19 15:40:48 stefano Exp $
 ;
 
 
@@ -32,6 +32,7 @@ ENDIF
 	push	de
 	push	hl	; preserve buffer location
 	call	fgetc_cons
+	ld		a,l
 	pop		hl
 	pop		de
 	and		a

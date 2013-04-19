@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.19 2013-04-15 15:56:01 stefano Exp $ */
+/* $Id: stdio.h,v 1.20 2013-04-19 15:40:48 stefano Exp $ */
 
 #undef __STDIO_BINARY        /* By default don't consider binary files */
 
@@ -149,7 +149,7 @@ extern int __LIB__ fwrite(void *ptr, int size, int num, FILE *);
 
 
 /* You shouldn't use gets. z88 gets() is limited to 255 characters */
-extern int __LIB__ gets(char *s);
+extern char __LIB__ *gets(char *s);
 
 /* Some standard macros */
 
