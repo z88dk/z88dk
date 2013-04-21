@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.23 2013-03-02 23:48:55 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.24 2013-04-21 22:57:53 pauloscustodio Exp $ */
 /* $Log: config.h,v $
-/* Revision 1.23  2013-03-02 23:48:55  pauloscustodio
+/* Revision 1.24  2013-04-21 22:57:53  pauloscustodio
+/* ENDIAN not used and logic to define it was causing Deprecated warnings - removed
+/*
+/* Revision 1.23  2013/03/02 23:48:55  pauloscustodio
 /* New LEGACY define to mark code that should be removed but is kept
 /* to keep backwards compatibility
 /*
@@ -141,7 +144,6 @@ Copyright (C) Paulo Custodio, 2011-2013
 #ifdef QDOS
 #define OS_ID "QDOS"
 #define QDOS 1
-#define ENDIAN 1
 #define DEFLIBDIR ""
 #endif
 
@@ -149,7 +151,6 @@ Copyright (C) Paulo Custodio, 2011-2013
 #ifdef AMIGA
 #define OS_ID "AMIGA"
 #define AMIGA 1
-#define ENDIAN 1
 #define DEFLIBDIR "zcc:lib/"
 #endif
 
@@ -166,25 +167,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 #define MAXCODESIZE 65536
 #endif
 
-/* Some clever config-ing if we're using GNUC */
-#ifdef __BIG_ENDIAN__
-/* Sadly the compiler on OS-X falls over with the #if below... */
-#define ENDIAN
-#else
-#ifdef __GNUC__
-#if #cpu(m68k) || #cpu(sparc) || #cpu(hppa) || #cpu(powerpc)
-#define ENDIAN 1
-#endif
-#endif  /* __GNUC__ */
-#endif
-
 /* File name extension separator */
 #ifdef QDOS
 #define FILEEXT_SEPARATOR "_"
 #else
 #define FILEEXT_SEPARATOR "."
 #endif
-
 
 /* defined to keep the legacy features, undefined to discard them */
 #define LEGACY
