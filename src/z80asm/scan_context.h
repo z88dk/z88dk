@@ -14,9 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner context - current input file/buffer
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan_context.h,v 1.1 2013-04-14 18:16:59 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan_context.h,v 1.2 2013-04-21 06:49:41 stefano Exp $
 $Log: scan_context.h,v $
-Revision 1.1  2013-04-14 18:16:59  pauloscustodio
+Revision 1.2  2013-04-21 06:49:41  stefano
+unlocked the z80asm build step
+
+Revision 1.1  2013/04/14 18:16:59  pauloscustodio
 Split scanner in several modules, allow token look-ahead to simplify
 parser.
 
@@ -38,7 +41,11 @@ parser.
 *   Scanner context
 *----------------------------------------------------------------------------*/
 
+/* An opaque pointer. */
+#ifndef YY_TYPEDEF_YY_SCANNER_T
+#define YY_TYPEDEF_YY_SCANNER_T
 typedef void* yyscan_t;			/* forward declaration */
+#endif
 
 /* Scanner context - current input file/buffer */
 CLASS(Context)
