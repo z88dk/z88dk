@@ -14,9 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner context - current input file/buffer
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan_context.h,v 1.2 2013-04-21 06:49:41 stefano Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan_context.h,v 1.3 2013-04-21 22:51:03 pauloscustodio Exp $
 $Log: scan_context.h,v $
-Revision 1.2  2013-04-21 06:49:41  stefano
+Revision 1.3  2013-04-21 22:51:03  pauloscustodio
+Include io.h only in MSVC
+
+Revision 1.2  2013/04/21 06:49:41  stefano
 unlocked the z80asm build step
 
 Revision 1.1  2013/04/14 18:16:59  pauloscustodio
@@ -41,7 +44,7 @@ parser.
 *   Scanner context
 *----------------------------------------------------------------------------*/
 
-/* An opaque pointer. */
+/* From scan.h */
 #ifndef YY_TYPEDEF_YY_SCANNER_T
 #define YY_TYPEDEF_YY_SCANNER_T
 typedef void* yyscan_t;			/* forward declaration */

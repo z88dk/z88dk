@@ -19,10 +19,10 @@ Copyright (C) Paulo Custodio, 2011-2013
 Scanner - to be processed by: flex -L scan.l
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.6 2013-04-21 06:49:41 stefano Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.7 2013-04-21 22:51:03 pauloscustodio Exp $ */
 /* $Log: scan.h,v $
-/* Revision 1.6  2013-04-21 06:49:41  stefano
-/* unlocked the z80asm build step
+/* Revision 1.7  2013-04-21 22:51:03  pauloscustodio
+/* Include io.h only in MSVC
 /*
 /* Revision 1.5  2013/04/14 20:47:27  pauloscustodio
 /* TOK_LABEL for a label definition, i.e. ".NAME" or "NAME:", with no spaces between symbols
@@ -56,6 +56,7 @@ Scanner - to be processed by: flex -L scan.l
 #include "scan_context.h"
 #include "scan_struct.h"
 #include "scan_token.h"
+#include "types.h"
 
 /*-----------------------------------------------------------------------------
 *   forward declarations

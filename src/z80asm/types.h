@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Common types
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.7 2013-01-24 23:03:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.8 2013-04-21 22:51:03 pauloscustodio Exp $ */
 /* $Log: types.h,v $
-/* Revision 1.7  2013-01-24 23:03:03  pauloscustodio
+/* Revision 1.8  2013-04-21 22:51:03  pauloscustodio
+/* Include io.h only in MSVC
+/*
+/* Revision 1.7  2013/01/24 23:03:03  pauloscustodio
 /* Replaced (unsigned char) by (byte_t)
 /* Replaced (unisigned int) by (size_t)
 /* Replaced (short) by (int)
@@ -70,5 +73,9 @@ typedef unsigned char byte_t;		/*  8-bit */
 #define vsnprintf _vsnprintf
 #endif
 
+/* io.h required to use low-level file io in MSC */
+#ifdef _MSC_VER
+#include <io.h>
+#endif
 
 #endif /* ndef TYPES_H */
