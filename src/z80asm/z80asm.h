@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.26 2013-04-06 13:15:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.27 2013-04-22 21:23:38 pauloscustodio Exp $
 $Log: z80asm.h,v $
-Revision 1.26  2013-04-06 13:15:04  pauloscustodio
+Revision 1.27  2013-04-22 21:23:38  pauloscustodio
+declare TOTALLINES
+
+Revision 1.26  2013/04/06 13:15:04  pauloscustodio
 Move default asm and obj extension handling to file.c.
 srcfilename and objfilename are now pointers to static variables in file.c
 
@@ -174,6 +177,7 @@ extern char *Fetchfilename( FILE *fptr );
 extern char *CreateLibfile( char *filename );
 extern char *GetLibfile( char *filename );
 extern void usage( void );
+extern long TOTALLINES;
 
 #endif
 
