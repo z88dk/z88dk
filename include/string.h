@@ -1,5 +1,5 @@
-#ifndef __STRINGS_H__
-#define __STRINGS_H__
+#ifndef __STRING_H__
+#define __STRING_H__
 
 /*
  *	This is strings.h
@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.21 2010-09-19 00:24:08 dom Exp $
+ *	$Id: string.h,v 1.22 2013-04-23 15:59:07 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -27,6 +27,7 @@ extern int  __LIB__               strncmp(char *, char *, uint);
 extern char __LIB__              *strncpy(char *, char *, uint);
 extern char __LIB__ __FASTCALL__ *strrev(char *);
 extern char __LIB__              *strchr(unsigned char *, unsigned char);
+extern char __LIB__              *strchrnul(unsigned char *, unsigned char);
 extern char __LIB__              *strrchr(unsigned char *, unsigned char);
 extern char __LIB__              *strrstrip(char *, char);
 extern char __LIB__              *strstrip(char *, uint);
@@ -50,6 +51,7 @@ extern void __LIB__              *memset(void *, unsigned char, uint);
 extern void __LIB__              *memcpy(void *, void *,uint);
 extern void __LIB__              *memmove(void *, void *, uint);
 extern void __LIB__              *memchr(void *, unsigned char, uint);
+extern void __LIB__              *memrchr(void *, unsigned char, uint);
 extern int  __LIB__               memcmp(void *, void *, uint);
 extern void __LIB__              *memswap(void *, void *, uint);
 extern void __LIB__              *memopi(void *, void *, uint, uint);
@@ -66,6 +68,7 @@ extern char __LIB__ __CALLEE__   *strncat_callee(char *, char *, uint);
 extern int  __LIB__ __CALLEE__    strncmp_callee(char *, char *, uint);
 extern char __LIB__ __CALLEE__   *strncpy_callee(char *, char *, uint);
 extern char __LIB__ __CALLEE__   *strchr_callee(unsigned char *, unsigned char);
+extern char __LIB__ __CALLEE__   *strchrnul_callee(unsigned char *, unsigned char);
 extern char __LIB__ __CALLEE__   *strrchr_callee(unsigned char *, unsigned char);
 extern char __LIB__ __CALLEE__   *strrstrip_callee(char *, char);
 extern char __LIB__ __CALLEE__   *strstrip_callee(char *, uint);
@@ -85,10 +88,12 @@ extern void __LIB__ __CALLEE__   *memset_callee(void *, unsigned char, uint);
 extern void __LIB__ __CALLEE__   *memcpy_callee(void *, void *,uint);
 extern void __LIB__ __CALLEE__   *memmove_callee(void *, void *, uint);
 extern void __LIB__ __CALLEE__   *memchr_callee(void *, unsigned char, uint);
+extern void __LIB__ __CALLEE__   *memrchr_callee(void *, unsigned char, uint);
 extern int  __LIB__ __CALLEE__    memcmp_callee(void *, void *, uint);
 extern void __LIB__ __CALLEE__   *memswap_callee(void *, void *, uint);
 extern void __LIB__ __CALLEE__   *memopi_callee(void *, void *, uint, uint);
 extern void __LIB__ __CALLEE__   *memopd_callee(void *, void *, uint, uint);
+
 
 // And now we make CALLEE linkage default to make compiled progs shorter and faster
 // These defines will generate warnings for function pointers but that's ok
@@ -100,6 +105,7 @@ extern void __LIB__ __CALLEE__   *memopd_callee(void *, void *, uint, uint);
 #define strncmp(a,b,c)      strncmp_callee(a,b,c)
 #define strncpy(a,b,c)      strncpy_callee(a,b,c)
 #define strchr(a,b)         strchr_callee(a,b)
+#define strchrnul(a,b)      strchrnul_callee(a,b)
 #define strrchr(a,b)        strrchr_callee(a,b)
 #define strrstrip(a,b)      strrstrip_callee(a,b)
 #define strstrip(a,b)       strstrip_callee(a,b)
@@ -121,6 +127,7 @@ extern void __LIB__ __CALLEE__   *memopd_callee(void *, void *, uint, uint);
 #define memcpy(a,b,c)   memcpy_callee(a,b,c)
 #define memmove(a,b,c)  memmove_callee(a,b,c)
 #define memchr(a,b,c)   memchr_callee(a,b,c)
+#define memrchr(a,b,c)   memrchr_callee(a,b,c)
 #define memcmp(a,b,c)   memcmp_callee(a,b,c)
 #define memswap(a,b,c)  memswap_callee(a,b,c)
 #define memopi(a,b,c,d) memopi_callee(a,b,c,d)
@@ -187,5 +194,21 @@ extern char __LIB__  *rindex(unsigned char *, unsigned char);
 #define index(s,b)    strchr_callee(s,b)
 #define rindex(s,b)   strrchr_callee(s,b)
 
+
+/*
+ * Some more C legacy stuff
+ */
+
+extern void __LIB__   *strset(unsigned char *, unsigned char);
+extern void __LIB__   *strnset(unsigned char *, unsigned char, uint);
+extern int  __LIB__   strcmpi(char *, char *);
+extern int  __LIB__   strncmpi(char *, char *, uint);
+extern void __LIB__   *rawmemchr(void *, unsigned char);
+
+#define strset(s,c)           memset_callee(s,c,sizeof(s)-1)
+#define strnset(string,c,n)   memset_callee(string,c,n)
+#define strcmpi(a,b)          stricmp_callee(a,b)
+#define strncmpi(a,b)         strnicmp_callee(a,b)
+#define rawmemchr(a,b)        memchr_callee(a,b,65535)
 
 #endif

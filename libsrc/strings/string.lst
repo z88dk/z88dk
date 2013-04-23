@@ -15,6 +15,8 @@ strings/memopd_callee
 strings/memopi
 strings/memopi_callee
 strings/memops
+strings/memrchr
+strings/memrchr_callee
 strings/memset
 strings/memset_callee
 strings/memswap
@@ -25,6 +27,8 @@ strings/strcat
 strings/strcat_callee
 strings/strchr
 strings/strchr_callee
+strings/strchrnul
+strings/strchrnul_callee
 strings/strcmp
 strings/strcmp_callee
 strings/strcpy
