@@ -14,36 +14,37 @@
 Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.7 2013-04-23 19:23:14 pauloscustodio Exp $ 
+$Log: scan.l,v $
+Revision 1.7  2013-04-23 19:23:14  pauloscustodio
+Comments
+
+Revision 1.6  2013/04/21 22:51:03  pauloscustodio
+Include io.h only in MSVC
+
+Revision 1.5  2013/04/14 20:47:27  pauloscustodio
+TOK_LABEL for a label definition, i.e. ".NAME" or "NAME:", with no spaces between symbols
+colon to separate assembly statements in a line needs spaces.
+
+Revision 1.4  2013/04/14 18:16:58  pauloscustodio
+Split scanner in several modules, allow token look-ahead to simplify
+parser.
+
+Revision 1.3  2013/04/09 20:56:50  pauloscustodio
+TOK_LABEL removed - identifying a label as XXX: has to be a parsing action in order to
+distinguish a label from a continuation statement, e.g.
+LABEL: ld a,VALUE : inc a ; LABEL is label, VALUE is name
+
+Revision 1.2  2013/03/31 18:28:30  pauloscustodio
+New TOK_LABEL for a label definition, i.e. ". NAME" or "NAME :"
+
+Revision 1.1  2013/03/29 23:53:08  pauloscustodio
+Added GNU Flex-based scanner. Not yet integrated into assembler.
+
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.6 2013-04-21 22:51:03 pauloscustodio Exp $ */
-/* $Log: scan.l,v $
-/* Revision 1.6  2013-04-21 22:51:03  pauloscustodio
-/* Include io.h only in MSVC
-/*
-/* Revision 1.5  2013/04/14 20:47:27  pauloscustodio
-/* TOK_LABEL for a label definition, i.e. ".NAME" or "NAME:", with no spaces between symbols
-/* colon to separate assembly statements in a line needs spaces.
-/*
-/* Revision 1.4  2013/04/14 18:16:58  pauloscustodio
-/* Split scanner in several modules, allow token look-ahead to simplify
-/* parser.
-/*
-/* Revision 1.3  2013/04/09 20:56:50  pauloscustodio
-/* TOK_LABEL removed - identifying a label as XXX: has to be a parsing action in order to
-/* distinguish a label from a continuation statement, e.g.
-/* LABEL: ld a,VALUE : inc a ; LABEL is label, VALUE is name
-/*
-/* Revision 1.2  2013/03/31 18:28:30  pauloscustodio
-/* New TOK_LABEL for a label definition, i.e. ". NAME" or "NAME :"
-/*
-/* Revision 1.1  2013/03/29 23:53:08  pauloscustodio
-/* Added GNU Flex-based scanner. Not yet integrated into assembler.
-/*
-/*
-/* */
-
-#include "memalloc.h"	/* before any other include */
+#include "memalloc.h"			/* before any other include */
 
 #define YY_NO_UNISTD_H	1		/* don't include unistd */
 
