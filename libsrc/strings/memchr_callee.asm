@@ -13,7 +13,6 @@ LIB     rcmx_cpir
    pop bc
    pop de
    ex (sp),hl
-   ld a,e
    
    ; enter : hl = char *s
    ;          a = char c
@@ -24,6 +23,7 @@ LIB     rcmx_cpir
    
 .asmentry
    
+   ld a,e
    cpir
    dec hl
    ret z

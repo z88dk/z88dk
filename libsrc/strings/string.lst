@@ -63,6 +63,8 @@ strings/strrstr
 strings/strrstr_callee
 strings/strrstrip
 strings/strrstrip_callee
+strings/strsep
+strings/strsep_callee
 strings/strspn
 strings/strspn_callee
 strings/strstr

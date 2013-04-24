@@ -13,7 +13,6 @@ LIB     rcmx_cpdr
    pop bc
    pop de
    ex (sp),hl
-   ld a,e
    
    ; enter : hl = char *s
    ;          a = char c
@@ -23,9 +22,10 @@ LIB     rcmx_cpdr
    ; uses  : f, bc, hl
    
 .asmentry
+   ld a,e
    add hl,bc
    cpdr
-   dec hl
+   inc hl
    ret z
    
    ld h,b

@@ -1,39 +1,48 @@
-; char __CALLEE__ *strtok_callee(char *s, char *delim)
+; char __CALLEE__ *strsep_callee(char *s, char *delim)
 ; on each call, return next token in s using delimiters from string delim
 ; 01.2007 aralbrec
 
-XLIB strtok_callee
-XDEF ASMDISP_STRTOK_CALLEE
+XLIB strsep_callee
+XDEF ASMDISP_STRSEP_CALLEE
 
 LIB strchr_callee
 XREF ASMDISP_STRCHR_CALLEE
 
-; static data stored here, not ROMable
+; 
 
-.strtok_callee
+.strsep_callee
 
    pop hl     ; ret addr
    pop de     ; *delim
-   ex (sp),hl ; ret addr <> *s
+   ex (sp),hl ; ret addr <> **s
    
    ; enter : de = char *delim
-   ;         hl = char *s
+   ;         hl = char **s
    ; exit  : token found : hl = ptr, C flag set
    ;         else        : hl = 0, NC flag set
    ; uses  : af, c, de, hl
 
 .asmentry
-
-   ld a,h
-   or l
-   jr nz, newstart
    
-   ld hl,(lastpos)
-   ld a,h
-   or l
-   ret z
 
-.newstart
+;   ld a,h
+;   or l
+;   jr nz, newstart
+   
+;   ld hl,(lastpos)
+;   ld a,h
+;   or l
+;   ret z
+
+;.newstart
+
+; keep **s
+   push hl
+; **s -> *s
+   ld	a,(hl)
+   inc hl
+   ld	h,(hl)
+   ld	l,a
 
    ex de,hl
    
@@ -69,12 +78,27 @@ XREF ASMDISP_STRCHR_CALLEE
    inc hl
    scf
 .doret
-   ld (lastpos),hl
-   pop hl
+   ;ld (lastpos),hl
+   ;pop hl
+   
+   ;pop de	; *s
+   ;pop hl	; **s
+   
+   pop de	; original *s
+   ex de,hl
+   ex (sp),hl ; *s <> **s
+
+   ld (hl),e	; update **s
+   inc hl
+   ld (hl),d
+   ;ex de,hl
+   
+   pop hl	; *s
+   
    ret
 
-.lastpos
+;.lastpos
+;
+;   defw 0
 
-   defw 0
-
-DEFC ASMDISP_STRTOK_CALLEE = asmentry - strtok_callee
+DEFC ASMDISP_STRSEP_CALLEE = asmentry - strsep_callee

@@ -14,7 +14,7 @@
  *	Rewrote 'miniprintn' in assembler, less usage of stack and save 180 bytes
  * 
  * --------
- * $Id: vfprintf_mini.c,v 1.7 2012-10-15 10:40:46 stefano Exp $
+ * $Id: vfprintf_mini.c,v 1.8 2013-04-24 17:22:18 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -199,11 +199,14 @@ LIB	l_int2long_s
 .noint
 	cp	's'
 	jr	nz,nostring
-
 	push hl
 	push de
 	ex	de,hl
 	call l_gint
+	ld	a,h
+	or  l
+	jr  nz,printstr
+	ld	hl,nullstr
 .printstr
 	ld	a,(hl)
 	inc hl
@@ -369,6 +372,10 @@ LIB fputc
 	pop bc
 	pop		hl
 	ret
+
+.nullstr
+	defm "(null)"
+	defb 0
 
 #endasm
 
