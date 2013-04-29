@@ -4,7 +4,7 @@
 #include <sys/compiler.h>
 #include <float.h>
 
-/* $Id: math.h,v 1.14 2012-05-16 16:59:56 stefano Exp $ */
+/* $Id: math.h,v 1.15 2013-04-29 16:51:27 stefano Exp $ */
 
 
 extern double __LIB__ acos(double);  /* arc cosine */
@@ -23,6 +23,7 @@ extern double __LIB__ sinh(double);  /* hyperbolic sine */
 extern double __LIB__ sqrt(double);  /* square root */
 extern double __LIB__ tan(double);   /* tangent */
 extern double __LIB__ tanh(double);  /* hyperbolic tangent */
+#define log2(a) (log(a)/M_LN2)
 
 #ifndef _HAVE_ATOF_
 #define _HAVE_ATOF_

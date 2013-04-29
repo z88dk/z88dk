@@ -73,4 +73,6 @@ strings/strstrip
 strings/strstrip_callee
 strings/strtok
 strings/strtok_callee
+strings/strtok_r
+strings/strtok_r_callee
 strings/strupr

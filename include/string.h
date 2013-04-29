@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.22 2013-04-23 15:59:07 stefano Exp $
+ *	$Id: string.h,v 1.23 2013-04-29 16:51:27 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -34,6 +34,9 @@ extern char __LIB__              *strstrip(char *, uint);
 extern char __LIB__              *strstr(char *, char *);
 extern char __LIB__              *strrstr(char *, char *);
 extern char __LIB__              *strtok(char *, char *);
+extern char __LIB__              *strtok_r(char *, char *, char **);
+extern char __LIB__              *strtok_s(char *, char *, char **);
+extern char __LIB__              *strsep(char **, char *);
 extern char __LIB__              *strpbrk(char *, char *);
 extern int  __LIB__               strpos(char *, uint);
 extern int  __LIB__               strcspn(char *, char *);
@@ -75,6 +78,8 @@ extern char __LIB__ __CALLEE__   *strstrip_callee(char *, uint);
 extern char __LIB__ __CALLEE__   *strstr_callee(char *, char *);
 extern char __LIB__ __CALLEE__   *strrstr_callee(char *, char *);
 extern char __LIB__ __CALLEE__   *strtok_callee(char *, char *);
+extern char __LIB__ __CALLEE__   *strtok_r_callee(char *, char *, char **);
+extern char __LIB__ __CALLEE__   *strsep_callee(char **, char *);
 extern char __LIB__ __CALLEE__   *strpbrk_callee(char *, char *);
 extern int  __LIB__ __CALLEE__    strpos_callee(char *, uint);
 extern int  __LIB__ __CALLEE__    strcspn_callee(char *, char *);
@@ -112,6 +117,9 @@ extern void __LIB__ __CALLEE__   *memopd_callee(void *, void *, uint, uint);
 #define strstr(a,b)         strstr_callee(a,b)
 #define strrstr(a,b)        strrstr_callee(a,b)
 #define strtok(a,b)         strtok_callee(a,b)
+#define strtok_r(a,b,c)     strtok_r_callee(a,b,c)
+#define strtok_s(a,b,c)     strtok_r_callee(a,b,c)
+#define strsep(a,b)         strsep_callee(a,b)
 #define strpbrk(a,b)        strpbrk_callee(a,b)
 #define strpos(a,b)         strpos_callee(a,b)
 #define strcspn(a,b)        strcspn_callee(a,b)
@@ -127,7 +135,7 @@ extern void __LIB__ __CALLEE__   *memopd_callee(void *, void *, uint, uint);
 #define memcpy(a,b,c)   memcpy_callee(a,b,c)
 #define memmove(a,b,c)  memmove_callee(a,b,c)
 #define memchr(a,b,c)   memchr_callee(a,b,c)
-#define memrchr(a,b,c)   memrchr_callee(a,b,c)
+#define memrchr(a,b,c)  memrchr_callee(a,b,c)
 #define memcmp(a,b,c)   memcmp_callee(a,b,c)
 #define memswap(a,b,c)  memswap_callee(a,b,c)
 #define memopi(a,b,c,d) memopi_callee(a,b,c,d)
