@@ -17,9 +17,12 @@ Using class.h for automatic garbage collection.
 Strings may contain zero byte, length is defined by separate field.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.7 2013-03-30 00:02:22 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.8 2013-04-29 22:24:33 pauloscustodio Exp $ */
 /* $Log: dynstr.c,v $
-/* Revision 1.7  2013-03-30 00:02:22  pauloscustodio
+/* Revision 1.8  2013-04-29 22:24:33  pauloscustodio
+/* Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
+/*
+/* Revision 1.7  2013/03/30 00:02:22  pauloscustodio
 /* include memalloc.h before any other include
 /*
 /* Revision 1.6  2013/02/28 00:32:35  pauloscustodio
@@ -221,5 +224,14 @@ void Str_fcat( Str *self, char *format, ... )
 void Str_chomp( Str *self )
 {
 	chomp( Str_data(self) );
+	Str_sync_len(self);
+}
+
+/*-----------------------------------------------------------------------------
+*   convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
+*----------------------------------------------------------------------------*/
+void Str_normalize_eol( Str *self )
+{
+	normalize_eol( Str_data(self) );
 	Str_sync_len(self);
 }

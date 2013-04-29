@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.9 2013-02-22 17:21:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.10 2013-04-29 22:24:33 pauloscustodio Exp $
 # $Log: whitebox-strutil.t,v $
-# Revision 1.9  2013-02-22 17:21:29  pauloscustodio
+# Revision 1.10  2013-04-29 22:24:33  pauloscustodio
+# Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
+#
+# Revision 1.9  2013/02/22 17:21:29  pauloscustodio
 # Added chomp()
 #
 # Revision 1.8  2013/01/20 21:24:29  pauloscustodio
@@ -94,6 +97,22 @@ t_compile_module('', <<'END', $objs);
 	if (p != s)							ERROR;
 	if(strcmp(s, ""))					ERROR;
 	
+	// normalize_eol
+	strcpy(s, "A" "\r\n" "B" "\n\r" "C" "\n" "D" "\r" "E");
+	p = normalize_eol(s);
+	if (p != s)							ERROR;
+	if(strcmp(s, "A\nB\nC\nD\nE"))		ERROR;
+	
+	strcpy(s, "A" "\r");
+	p = normalize_eol(s);
+	if (p != s)							ERROR;
+	if(strcmp(s, "A\n"))				ERROR;
+	
+	strcpy(s, "A" "\n");
+	p = normalize_eol(s);
+	if (p != s)							ERROR;
+	if(strcmp(s, "A\n"))				ERROR;
+
 	return 0;
 END
 

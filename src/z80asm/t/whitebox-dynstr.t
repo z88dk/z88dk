@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.4 2013-02-28 00:32:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.5 2013-04-29 22:24:33 pauloscustodio Exp $
 # $Log: whitebox-dynstr.t,v $
-# Revision 1.4  2013-02-28 00:32:35  pauloscustodio
+# Revision 1.5  2013-04-29 22:24:33  pauloscustodio
+# Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
+#
+# Revision 1.4  2013/02/28 00:32:35  pauloscustodio
 # New interface to Str to copy characters to string
 #
 # Revision 1.3  2013/02/22 17:21:29  pauloscustodio
@@ -232,6 +235,20 @@ END_INIT
 	Str_szset(s1, "\r\n \t\f \r\n \t\f");
 	Str_chomp(s1);
 	check_str(s1, 256, 0, "");
+
+	// normalize_eol
+	Str_szset(s1, "A" "\r\n" "B" "\n\r" "C" "\n" "D" "\r" "E");
+	Str_normalize_eol(s1);
+	check_str(s1, 256, 9, "A\nB\nC\nD\nE");
+	
+	Str_szset(s1, "A" "\r");
+	Str_normalize_eol(s1);
+	check_str(s1, 256, 2, "A\n");
+	
+	Str_szset(s1, "A" "\n");
+	Str_normalize_eol(s1);
+	check_str(s1, 256, 2, "A\n");
+	
 	
 	warn("delete s1\n");
 	OBJ_DELETE(s1);

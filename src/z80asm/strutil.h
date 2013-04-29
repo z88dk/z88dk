@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Utilities working on char *
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.13 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.14 2013-04-29 22:24:33 pauloscustodio Exp $ */
 /* $Log: strutil.h,v $
-/* Revision 1.13  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.14  2013-04-29 22:24:33  pauloscustodio
+/* Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
+/*
+/* Revision 1.13  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -87,5 +90,10 @@ extern int stricompare( char *s1, char *s2 );
 
 /* remove end newline and whitespace - modify in place, return address of string */
 extern char *chomp( char *string );
+
+/* convert end-of-line sequences CR, CRLF, LFCR, LF all to LF 
+   - modify in place, return address of string */
+extern char *normalize_eol( char *string );
+
 
 #endif /* ndef STRUTIL_H */

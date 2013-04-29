@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Utilities working on char *
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.14 2013-03-30 00:02:22 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.15 2013-04-29 22:24:33 pauloscustodio Exp $ */
 /* $Log: strutil.c,v $
-/* Revision 1.14  2013-03-30 00:02:22  pauloscustodio
+/* Revision 1.15  2013-04-29 22:24:33  pauloscustodio
+/* Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
+/*
+/* Revision 1.14  2013/03/30 00:02:22  pauloscustodio
 /* include memalloc.h before any other include
 /*
 /* Revision 1.13  2013/02/19 22:52:40  pauloscustodio
@@ -149,4 +152,27 @@ char *chomp( char *string )
 	}
 	return string;
 }
+
+char *normalize_eol( char *string )
+{
+	char *in, *out;
+	
+    for ( in = out = string; *in; in++ )
+    {
+		if ( in[0] == '\r' || in[0] == '\n' )
+		{
+			if ( ( in[1] == '\r' || in[1] == '\n' ) && in[0] != in[1] )
+				in++;				/* skip next */
+			*out++ = '\n';			
+		}
+		else
+		{
+			*out++ = in[0];
+		}
+	}
+	*out = '\0';
+	
+	return string;
+}
+
 
