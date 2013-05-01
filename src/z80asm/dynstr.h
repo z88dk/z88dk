@@ -17,9 +17,12 @@ Using class.h for automatic garbage collection.
 Strings may contain zero byte, length is defined by separate field.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.h,v 1.6 2013-04-29 22:24:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.h,v 1.7 2013-05-01 21:10:49 pauloscustodio Exp $ */
 /* $Log: dynstr.h,v $
-/* Revision 1.6  2013-04-29 22:24:33  pauloscustodio
+/* Revision 1.7  2013-05-01 21:10:49  pauloscustodio
+/* Add getline to Str, converting EOL sequences to LF.
+/*
+/* Revision 1.6  2013/04/29 22:24:33  pauloscustodio
 /* Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
 /*
 /* Revision 1.5  2013/02/28 00:32:35  pauloscustodio
@@ -45,12 +48,12 @@ Strings may contain zero byte, length is defined by separate field.
 
 #include "memalloc.h"   /* before any other include */
 
+#include "class.h"
+#include "types.h"
+#include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
-
-#include "types.h"
-#include "class.h"
 
 /*-----------------------------------------------------------------------------
 *   PUBLIC INTERFACE
@@ -113,6 +116,11 @@ extern void Str_chomp( Str *self );
 
 /* convert end-of-line sequences CR, CRLF, LFCR, LF all to LF */
 extern void Str_normalize_eol( Str *self );
+
+/* get one line from input, convert end-of-line sequences, 
+   return string including one LF character
+   return FALSE on end of input */
+extern BOOL Str_getline( Str *self, FILE *fp );
  
 #endif /* ndef DYNSTR_H */
 

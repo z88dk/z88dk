@@ -14,9 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.9 2013-05-01 19:03:45 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.10 2013-05-01 21:10:49 pauloscustodio Exp $ 
 $Log: scan.c,v $
-Revision 1.9  2013-05-01 19:03:45  pauloscustodio
+Revision 1.10  2013-05-01 21:10:49  pauloscustodio
+Add getline to Str, converting EOL sequences to LF.
+
+Revision 1.8  2013/05/01 19:03:45  pauloscustodio
 Simplified scanner and adapted to be used with a BISON generated parser.
 Removed balanced struct checking and token ring.
 Removed start condition to list assembly lines, as it was difficult to keep in sync across included
@@ -3035,34 +3038,6 @@ static long scan_num (char *text, int num_suffix_chars, int base)
 *	Return when buffer is (almost)full, make sure a line is not split
 *	between buffer and out of buffer
 *----------------------------------------------------------------------------*/
-void yy_read_line( FILE *file, Str *buffer )
-{
-	int c1, c2;
-	
-	Str_chset( buffer, RS );				/* start with RS char */
-	while ( (c1 = getc( file )) != EOF && c1 != '\n' && c1 != '\r' )
-		Str_chcat( buffer, c1 );
-	
-	if ( c1 == EOF )
-	{
-		if ( Str_len( buffer ) > 1 )		/* more than just the RS char */
-			Str_chcat( buffer, '\n' );		/* missing newline at end of line */
-		else 
-			Str_clear( buffer );			/* no input, clear buffer */
-	}
-	else 						
-	{
-		Str_chcat( buffer, '\n' );			/* end of line */
-		
-		if ( (c2 = getc( file )) != EOF &&
-			 ! ( c1 == '\n' && c2 == '\r' ||
-				 c1 == '\r' && c2 == '\n' ) )
-		{
-			ungetc( c2, file );				/* push back to input */
-		}
-	}
-}
-	
 int yy_input( char *buffer, size_t size )
 {
 	Context *context;
@@ -3080,7 +3055,12 @@ int yy_input( char *buffer, size_t size )
 		/* fill context buffer with next line, if empty */
 		if ( Str_len( context->buffer ) == 0 )
 		{
-			yy_read_line( context->file, context->buffer ); 
+			/* read one line, insert RS char in buffer if line found */
+			if ( Str_getline( context->buffer, context->file ) )
+			{
+				*buffer_ptr++ = RS;
+				size--;
+			}
 			context->buffer_start = 0;
 		}
 		

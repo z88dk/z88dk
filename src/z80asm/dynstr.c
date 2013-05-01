@@ -17,9 +17,12 @@ Using class.h for automatic garbage collection.
 Strings may contain zero byte, length is defined by separate field.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.8 2013-04-29 22:24:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.9 2013-05-01 21:10:49 pauloscustodio Exp $ */
 /* $Log: dynstr.c,v $
-/* Revision 1.8  2013-04-29 22:24:33  pauloscustodio
+/* Revision 1.9  2013-05-01 21:10:49  pauloscustodio
+/* Add getline to Str, converting EOL sequences to LF.
+/*
+/* Revision 1.8  2013/04/29 22:24:33  pauloscustodio
 /* Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
 /*
 /* Revision 1.7  2013/03/30 00:02:22  pauloscustodio
@@ -235,3 +238,38 @@ void Str_normalize_eol( Str *self )
 	normalize_eol( Str_data(self) );
 	Str_sync_len(self);
 }
+
+/*-----------------------------------------------------------------------------
+*   get one line from input, convert end-of-line sequences, 
+*   return string including one LF character
+*   return FALSE on end of input
+*----------------------------------------------------------------------------*/
+BOOL Str_getline( Str *self, FILE *fp )
+{
+	int c1, c2;
+	
+	Str_clear( self );
+	while ( (c1 = getc( fp )) != EOF && c1 != '\n' && c1 != '\r' )
+		Str_chcat( self, c1 );
+	
+	if ( c1 == EOF )
+	{
+		if ( Str_len( self ) > 0 )			/* read some chars */
+			Str_chcat( self, '\n' );		/* missing newline at end of line */
+	}
+	else 						
+	{
+		Str_chcat( self, '\n' );			/* end of line */
+		
+		if ( (c2 = getc( fp )) != EOF &&
+			 ! ( c1 == '\n' && c2 == '\r' ||
+				 c1 == '\r' && c2 == '\n' ) )
+		{
+			ungetc( c2, fp );				/* push back to input */
+		}
+	}
+	
+	return Str_len( self ) > 0 ? TRUE : FALSE;
+}
+
+ 

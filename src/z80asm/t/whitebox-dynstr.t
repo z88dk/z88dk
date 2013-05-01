@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.5 2013-04-29 22:24:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.6 2013-05-01 21:10:49 pauloscustodio Exp $
 # $Log: whitebox-dynstr.t,v $
-# Revision 1.5  2013-04-29 22:24:33  pauloscustodio
+# Revision 1.6  2013-05-01 21:10:49  pauloscustodio
+# Add getline to Str, converting EOL sequences to LF.
+#
+# Revision 1.5  2013/04/29 22:24:33  pauloscustodio
 # Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
 #
 # Revision 1.4  2013/02/28 00:32:35  pauloscustodio
@@ -41,6 +44,14 @@ my $objs = "dynstr.o class.o die.o safestr.o strutil.o except.o";
 ok ! system "make $objs";
 
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
+
+write_file(asm1_file(), {binmode => ':raw'}, "");
+write_file(asm2_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE");
+write_file(asm3_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\n");
+write_file(asm4_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\r");
+write_file(asm5_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\r\n");
+write_file(asm6_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\n\r");
+
 
 t_compile_module(<<'END_INIT', <<'END', $compile);
 #include "die.h"
@@ -87,6 +98,8 @@ void call_cat_vf (Str *str, char *format, ...)
 END_INIT
 	/* main */
 	Str *s1, *s2;
+	int i, j;
+	FILE *fp;
 	
 	warn("init\n");
 	s1 = OBJ_NEW(Str);
@@ -249,6 +262,35 @@ END_INIT
 	Str_normalize_eol(s1);
 	check_str(s1, 256, 2, "A\n");
 	
+
+	// getline
+	for ( i = 1 ; 1 ; i++ )
+	{
+		Str_fset( s1, "test%d.asm", i );
+		fp = fopen( Str_data( s1 ), "rb" );
+		if ( fp == NULL )
+			break;
+			
+		warn("Read file %s:\n", Str_data( s1 ) );
+		
+		while ( Str_getline( s1, fp ) )
+		{
+			for ( j = 0; j < Str_len( s1 ) ; j++ )
+			{
+				if ( Str_data( s1 )[j] > ' ' )
+					warn("%c", Str_data( s1 )[j] );
+				else
+					warn("<%02X>", Str_data( s1 )[j] );
+			}
+			warn("\n");
+		}
+		
+		Str_szset( s1, "hello" );
+		if ( Str_getline( s1, fp ) )	ERROR;
+		if ( Str_len( s1 ) > 0 )		ERROR;
+		
+		fclose( fp );
+	}
 	
 	warn("delete s1\n");
 	OBJ_DELETE(s1);
@@ -304,6 +346,37 @@ Str_bset
 Str_bcat
 Str_set, Str_cat
 Str_compare
+Read file test1.asm:
+Read file test2.asm:
+A<0A>
+B<0A>
+C<0A>
+D<0A>
+E<0A>
+Read file test3.asm:
+A<0A>
+B<0A>
+C<0A>
+D<0A>
+E<0A>
+Read file test4.asm:
+A<0A>
+B<0A>
+C<0A>
+D<0A>
+E<0A>
+Read file test5.asm:
+A<0A>
+B<0A>
+C<0A>
+D<0A>
+E<0A>
+Read file test6.asm:
+A<0A>
+B<0A>
+C<0A>
+D<0A>
+E<0A>
 delete s1
 memalloc dynstr.c(3): free 256 bytes at ADDR_13 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_1 allocated at dynstr.c(1)

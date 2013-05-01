@@ -18,9 +18,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.9 2013-05-01 19:03:45 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.10 2013-05-01 21:10:49 pauloscustodio Exp $ 
 $Log: scan.h,v $
-Revision 1.9  2013-05-01 19:03:45  pauloscustodio
+Revision 1.10  2013-05-01 21:10:49  pauloscustodio
+Add getline to Str, converting EOL sequences to LF.
+
+Revision 1.8  2013/05/01 19:03:45  pauloscustodio
 Simplified scanner and adapted to be used with a BISON generated parser.
 Removed balanced struct checking and token ring.
 Removed start condition to list assembly lines, as it was difficult to keep in sync across included
