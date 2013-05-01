@@ -4,7 +4,7 @@
 #include <sys/compiler.h>
 #include <float.h>
 
-/* $Id: math.h,v 1.15 2013-04-29 16:51:27 stefano Exp $ */
+/* $Id: math.h,v 1.16 2013-05-01 08:22:56 stefano Exp $ */
 
 
 extern double __LIB__ acos(double);  /* arc cosine */
@@ -49,8 +49,22 @@ extern double __LIB__ atof(char *);
 #define hypot(x,y) sqrt(x*x+y*y)
 #define asinh(x) log(2.*fabs(x)+1./(sqrt(x*x+1.)+fabs(x)))
 #define acosh(x) log(2.*x-1./(x+sqrt(x*x-1.)))
+#define atanh(x) (log((1.+x)/(1.-x))*.5)
 #define log1p(x) log(1.+x)
+#define exp2(x)  pow(2.,x)
 #define expm1(x) (exp(x)-1.)
+
+#define copysign(a,b) (b<.0?-fabs(a):fabs(a))
+#define fdim(a,b) (a>b?a-b:b-a)
+#define fma(x,y,z) (x*y+z)
+
+//extern double __LIB__ frexp(double val, int *exp);	/* get mantissa and exponent */
+//extern int __LIB__ ilogb(double val);					/* get exponent */
+//extern int __LIB__ logb(double val);					/* get exponent */
+
+#define infinity() INFINITY
+
+
 
 
 #endif /* _MATH_H */

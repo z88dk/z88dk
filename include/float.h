@@ -8,12 +8,12 @@
  *	Some more floating point routines..I can't remember
  *	why these are separated out..
  *
- *	$Id: float.h,v 1.10 2013-04-29 16:51:26 stefano Exp $
+ *	$Id: float.h,v 1.11 2013-05-01 08:22:56 stefano Exp $
  */
 
 
 
-extern double __LIB__ fmod();
+extern double __LIB__ fmod(double,double);
 extern double __LIB__ amax(double,double);
 extern double __LIB__ fabs(double);
 extern double __LIB__ amin(double,double);
@@ -23,12 +23,16 @@ extern double __LIB__ fprand(void); /* Generic only */
 extern double __LIB__ __FASTCALL__ zfloat(int);
 extern int __LIB__ fpseed(double);    /* Seed random number */
 
+
+#define fmax(x,y) amax(x,y)
+#define fmin(x,y) amix(x,y)
+
 #define rint(a) ceil(a)
 
 #define trunc(a) (a>0.?floor(a):ceil(a))
 #define round(a) (a>0.?floor(a+0.5):ceil(a-0.5))
 
-#define fmod(x,y) (x-(fabs(y)*trunc(x/fabs(y))))
+//#define fmod(x,y) (x-(fabs(y)*trunc(x/fabs(y))))
 #define remainder(x,y) (x-(fabs(y)*round(x/fabs(y))))
 
 #ifndef _HAVE_ATOF_
@@ -47,16 +51,45 @@ extern void __LIB__ ftoe(double, int, char *);
  * Some constant nicked from /usr/include/math.h
  */
 
+#define FLT_ROUNDS 1
+#define FLT_RADIX 2
 
-/* Constants (biased for the way z88dk works) */
-
-//#ifdef _USE_MATH_DEFINES
-
-#define MAXFLOAT   1.7e32		/* valid in all the FP implementations, 'genmath' can go further */
-#define HUGE_VAL   1.7e32       /* as above */
-#define INFINITY   9.999e37		/* will probably work fine only whith 'genmath' */
+/*
+ *  With 'FASTMATH' some constant is defined with a lower precision
+ *  This saves code space and increases the speed for those very
+ *  few specialized applications which use such values.
+ * 
+ *  Unless you know what you're doing you should set 'FASTMATH'
+ *  with the simplified maths libraries (i.e. the ZX81/Spectrum ones)
+ *  if you need the constants below.
+ */
 
 #ifdef FASTMATH
+
+#define FLT_MANT_DIG 31
+#define DBL_MANT_DIG 31
+#define FLT_DIG      7
+#define DBL_DIG      7
+
+#define FLT_EPSILON  0.000000001
+#define DBL_EPSILON  0.000000001
+#define MAXFLOAT     1.5e32
+#define HUGE_VAL     1.0e32
+#define INFINITY     1.7e32
+#define FLT_MAX      1.5e32
+#define DBL_MAX      1.5e32
+#define FLT_MIN      1.0e-38
+#define DBL_MIN      1.0e-38
+#define FLT_MIN_EXP    -38
+#define DBL_MIN_EXP    -38
+#define FLT_MIN_10_EXP -38
+#define DBL_MIN_10_EXP -38
+#define FLT_MAX_EXP     32
+#define DBL_MAX_EXP     32
+#define FLT_MAX_10_EXP  31
+#define DBL_MAX_10_EXP  31
+
+/* Simplified constants (a bit biased for the way z88dk works) */
 
 #define M_E        2.718282
 #define M_INVLN2   1.442694  /* 1 / log(2) */
@@ -81,6 +114,29 @@ extern void __LIB__ ftoe(double, int, char *);
 #define M_SQRT1_2  0.707107
 
 #else
+
+#define FLT_MANT_DIG 39
+#define DBL_MANT_DIG 39
+#define FLT_DIG      9
+#define DBL_DIG      9
+
+#define FLT_EPSILON  0.000000000001
+#define DBL_EPSILON  0.000000000001
+#define MAXFLOAT     9.995e37
+#define HUGE_VAL     9.990e37
+#define INFINITY     9.999e37
+#define FLT_MAX      9.995e37
+#define DBL_MAX      9.995e37
+#define FLT_MIN      1.0e-38
+#define DBL_MIN      1.0e-38
+#define FLT_MIN_EXP    -38
+#define DBL_MIN_EXP    -38
+#define FLT_MIN_10_EXP -38
+#define DBL_MIN_10_EXP -38
+#define FLT_MAX_EXP     37
+#define DBL_MAX_EXP     37
+#define FLT_MAX_10_EXP  36
+#define DBL_MAX_10_EXP  36
 
 /* By default we use expressions to increase the precision, */
 /* but the resulting code will be slower and bigger         */
