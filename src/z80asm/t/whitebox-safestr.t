@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-safestr.t,v 1.3 2013-04-06 10:55:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-safestr.t,v 1.4 2013-05-01 21:37:50 pauloscustodio Exp $
 # $Log: whitebox-safestr.t,v $
-# Revision 1.3  2013-04-06 10:55:15  pauloscustodio
+# Revision 1.4  2013-05-01 21:37:50  pauloscustodio
+# Added chset, chcat and getline
+#
+# Revision 1.3  2013/04/06 10:55:15  pauloscustodio
 # SSTR_DEFINE() caused compilation error "C2099: initializer is not a constant" when used to define global variables
 #
 # Revision 1.2  2013/01/20 21:24:29  pauloscustodio
@@ -31,8 +34,16 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "safestr.o";
+my $objs = "safestr.o die.o except.o";
 ok ! system "make $objs";
+
+write_file(asm1_file(), {binmode => ':raw'}, "");
+write_file(asm2_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE");
+write_file(asm3_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\n");
+write_file(asm4_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\r");
+write_file(asm5_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\r\n");
+write_file(asm6_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\n\r");
+write_file(asm7_file(), {binmode => ':raw'}, "ABCDEFGHIJ\nabcdefghij\n");
 
 t_compile_module(<<'INIT', <<'END', $objs);
 #define SZ (5)
@@ -64,7 +75,10 @@ INIT
 	char buffer[5];
 	SSTR_DEFINE( s, SZ );
 	SSTR_DEFINE_REF( s2, buffer, sizeof(buffer) );
-	char * p;
+	char filename[FILENAME_MAX];
+	int i, j;
+	FILE *fp;
+	char *p;
 
 	TEST(s, "");
 	p = sstr_set(s, "");
@@ -189,10 +203,76 @@ INIT
 	if (s2->data != buffer)				ERROR;
 	if (s2->size != 5)					ERROR;
 
+	// getline
+	for ( i = 1 ; 1 ; i++ )
+	{
+		sprintf( filename, "test%d.asm", i );
+		fp = fopen( filename, "rb" );
+		if ( fp == NULL )
+			break;
+			
+		warn("Read file %s:\n", filename );
+		
+		while ( sstr_getline( s, fp ) )
+		{
+			for ( j = 0; j < sstr_len( s ) ; j++ )
+			{
+				if ( sstr_data( s )[j] > ' ' )
+					warn("%c", sstr_data( s )[j] );
+				else
+					warn("<%02X>", sstr_data( s )[j] );
+			}
+			warn("\n");
+		}
+		
+		sstr_set( s, "hello" );
+		if ( sstr_getline( s, fp ) )	ERROR;
+		if ( sstr_len( s ) > 0 )		ERROR;
+		
+		fclose( fp );
+	}
+	
+	
+	
 	return 0;
 END
 
-t_run_module([], "", "", 0);
+t_run_module([], "", <<'END', 0);
+Read file test1.asm:
+Read file test2.asm:
+A<0A>
+B<0A>
+C<0A>
+D<0A>
+E<0A>
+Read file test3.asm:
+A<0A>
+B<0A>
+C<0A>
+D<0A>
+E<0A>
+Read file test4.asm:
+A<0A>
+B<0A>
+C<0A>
+D<0A>
+E<0A>
+Read file test5.asm:
+A<0A>
+B<0A>
+C<0A>
+D<0A>
+E<0A>
+Read file test6.asm:
+A<0A>
+B<0A>
+C<0A>
+D<0A>
+E<0A>
+Read file test7.asm:
+ABCD
+abcd
+END
 
 unlink_testfiles();
 done_testing;

@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Safe strings : char array with the size
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.h,v 1.4 2013-04-06 10:55:14 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.h,v 1.5 2013-05-01 21:37:50 pauloscustodio Exp $ */
 /* $Log: safestr.h,v $
-/* Revision 1.4  2013-04-06 10:55:14  pauloscustodio
+/* Revision 1.5  2013-05-01 21:37:50  pauloscustodio
+/* Added chset, chcat and getline
+/*
+/* Revision 1.4  2013/04/06 10:55:14  pauloscustodio
 /* SSTR_DEFINE() caused compilation error "C2099: initializer is not a constant" when used to define global variables
 /*
 /* Revision 1.3  2013/01/20 21:24:28  pauloscustodio
@@ -37,11 +40,10 @@ Safe strings : char array with the size
 
 #include "memalloc.h"   /* before any other include */
 
+#include "types.h"
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
-
-#include "types.h"
 
 /*-----------------------------------------------------------------------------
 *   Safe strings : char array with the size
@@ -90,6 +92,10 @@ typedef struct sstr_t
 #define sstr_clear(self) \
     ((self)->data[0] = 0, (self)->len = 0)
 
+/* set / cat from char */
+extern char *sstr_chset( sstr_t *self, char ch );
+extern char *sstr_chcat( sstr_t *self, char ch );
+
 /* set / cat from char * */
 extern char *sstr_set( sstr_t *self, char *source );
 extern char *sstr_cat( sstr_t *self, char *source );
@@ -99,6 +105,12 @@ extern char *sstr_fset( sstr_t *self, char *format, ... );
 extern char *sstr_fcat( sstr_t *self, char *format, ... );
 extern char *sstr_vfset( sstr_t *self, char *format, va_list argptr );
 extern char *sstr_vfcat( sstr_t *self, char *format, va_list argptr );
+
+/* get one line from input, convert end-of-line sequences, 
+   return string including one LF character
+   return FALSE on end of input */
+extern BOOL sstr_getline( sstr_t *self, FILE *fp );
+ 
 
 #endif /* ndef SAFESTR_H */
 

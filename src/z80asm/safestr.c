@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Safe strings : char array with the size
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.c,v 1.4 2013-03-30 00:02:22 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.c,v 1.5 2013-05-01 21:37:50 pauloscustodio Exp $ */
 /* $Log: safestr.c,v $
-/* Revision 1.4  2013-03-30 00:02:22  pauloscustodio
+/* Revision 1.5  2013-05-01 21:37:50  pauloscustodio
+/* Added chset, chcat and getline
+/*
+/* Revision 1.4  2013/03/30 00:02:22  pauloscustodio
 /* include memalloc.h before any other include
 /*
 /* Revision 1.3  2013/01/20 21:24:28  pauloscustodio
@@ -76,6 +79,27 @@ char *sstr_cat( sstr_t *self, char *source )
 }
 
 /*-----------------------------------------------------------------------------
+*   sstr_set, sstr_cat : return address of data
+*----------------------------------------------------------------------------*/
+char *sstr_chset( sstr_t *self, char ch )
+{
+    sstr_clear( self );
+    return sstr_chcat( self, ch );
+}
+
+char *sstr_chcat( sstr_t *self, char ch )
+{
+	char buff[2];
+
+	/* build sz string */
+	buff[0] = ch;
+	buff[1] = 0;
+
+	/* cat */
+	return sstr_cat( self, buff );
+}
+
+/*-----------------------------------------------------------------------------
 *   sprintf-like set / cat
 *----------------------------------------------------------------------------*/
 char *sstr_vfset( sstr_t *self, char *format, va_list argptr )
@@ -127,3 +151,37 @@ char *sstr_fcat( sstr_t *self, char *format, ... )
 
     return sstr_vfcat( self, format, argptr );
 }
+
+/*-----------------------------------------------------------------------------
+*   get one line from input, convert end-of-line sequences, 
+*   return string including one LF character
+*   return FALSE on end of input
+*----------------------------------------------------------------------------*/
+BOOL sstr_getline( sstr_t *self, FILE *fp )
+{
+	int c1, c2;
+	
+	sstr_clear( self );
+	while ( (c1 = getc( fp )) != EOF && c1 != '\n' && c1 != '\r' )
+		sstr_chcat( self, c1 );
+	
+	if ( c1 == EOF )
+	{
+		if ( sstr_len( self ) > 0 )			/* read some chars */
+			sstr_chcat( self, '\n' );		/* missing newline at end of line */
+	}
+	else 						
+	{
+		sstr_chcat( self, '\n' );			/* end of line */
+		
+		if ( (c2 = getc( fp )) != EOF &&
+			 ! ( c1 == '\n' && c2 == '\r' ||
+				 c1 == '\r' && c2 == '\n' ) )
+		{
+			ungetc( c2, fp );				/* push back to input */
+		}
+	}
+	
+	return sstr_len( self ) > 0 ? TRUE : FALSE;
+}
+
