@@ -18,9 +18,19 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.8 2013-04-23 19:23:14 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.9 2013-05-01 19:03:45 pauloscustodio Exp $ 
 $Log: scan.h,v $
-Revision 1.8  2013-04-23 19:23:14  pauloscustodio
+Revision 1.9  2013-05-01 19:03:45  pauloscustodio
+Simplified scanner and adapted to be used with a BISON generated parser.
+Removed balanced struct checking and token ring.
+Removed start condition to list assembly lines, as it was difficult to keep in sync across included
+files; inserted an RS char in the input before each line to trigger listing.
+Allow ".NAME" and "NAME:" to return a NAME token, so that ".LD" is recognized as a label and not the LD assembly statement.
+Added Integer out of range warning to number scanning routine.
+Allow input lines to be any size, as long as memory can be allocated.
+Created a skeleton BISON parser.
+
+Revision 1.7  2013/04/23 19:23:14  pauloscustodio
 Comments
 
 Revision 1.6  2013/04/21 22:51:03  pauloscustodio
@@ -54,17 +64,8 @@ Added GNU Flex-based scanner. Not yet integrated into assembler.
 #ifndef SCAN_H
 #define SCAN_H
 
-#include "scan_context.h"
-#include "scan_struct.h"
-#include "scan_token.h"
+#include "parse.h"
 #include "types.h"
-
-/*-----------------------------------------------------------------------------
-*   forward declarations
-*----------------------------------------------------------------------------*/
-struct Context;				/* YY_EXTRA_TYPE */
-#define YY_DECL TokType yylex (Token *token, yyscan_t yyscanner)
-extern YY_DECL;
 
 /*-----------------------------------------------------------------------------
 *   scan API
@@ -74,28 +75,9 @@ extern YY_DECL;
 extern void scan_file( char *filename );
 extern void scan_text( char *text );
 
-/* scan input for next token, return token type; 
-   use scan_token(0) to get last returned token, only valid until next scan_get() call */
-extern TokType scan_get( void );
-
-/* get Nth token in the current context, NULL if none, 0 = current, 1 = next, ... */
-extern Token *scan_token( int n );		
-
-/* attributes of Nth token */
-extern TokType scan_tok_type( int n );
-extern long	   scan_num_value( int n );
-extern char   *scan_str_value( int n );
-extern char   *scan_filename( int n );
-extern int 	   scan_line_nr( int n );
-
-/* stack of nested constructs, i.e. IF / ELSE / ENDIF
-   local to each input file, stack must be empty at the end of file */
-extern void scan_push_struct( int id, int value );
-extern int  scan_top_id( void );						
-extern int  scan_top_value( void );
-extern void scan_replace_struct( int id, int value );
-extern void scan_pop_struct( int id );		/* syntaxt error if id != top_id */
-
+/* Current location */
+extern char *scan_filename( void );	/* NULL if no file open */
+extern int   scan_line_nr( void );		/* 0 if no line number */
 
 #endif /* ndef SCAN_H */
 
@@ -209,23 +191,6 @@ typedef unsigned int flex_uint32_t;
 #define yyconst
 #endif
 
-/* An opaque pointer. */
-#ifndef YY_TYPEDEF_YY_SCANNER_T
-#define YY_TYPEDEF_YY_SCANNER_T
-typedef void* yyscan_t;
-#endif
-
-/* For convenience, these vars (plus the bison vars far below)
-   are macros in the reentrant scanner. */
-#define yyin yyg->yyin_r
-#define yyout yyg->yyout_r
-#define yyextra yyg->yyextra_r
-#define yyleng yyg->yyleng_r
-#define yytext yyg->yytext_r
-#define yylineno (YY_CURRENT_BUFFER_LVALUE->yy_bs_lineno)
-#define yycolumn (YY_CURRENT_BUFFER_LVALUE->yy_bs_column)
-#define yy_flex_debug yyg->yy_flex_debug_r
-
 /* Size of default input buffer. */
 #ifndef YY_BUF_SIZE
 #ifdef __ia64__
@@ -243,6 +208,10 @@ typedef void* yyscan_t;
 #define YY_TYPEDEF_YY_BUFFER_STATE
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #endif
+
+extern int yyleng;
+
+extern FILE *yyin, *yyout;
 
 #ifndef YY_TYPEDEF_YY_SIZE_T
 #define YY_TYPEDEF_YY_SIZE_T
@@ -300,32 +269,34 @@ struct yy_buffer_state
 	};
 #endif /* !YY_STRUCT_YY_BUFFER_STATE */
 
-void yyrestart (FILE *input_file ,yyscan_t yyscanner );
-void yy_switch_to_buffer (YY_BUFFER_STATE new_buffer ,yyscan_t yyscanner );
-YY_BUFFER_STATE yy_create_buffer (FILE *file,int size ,yyscan_t yyscanner );
-void yy_delete_buffer (YY_BUFFER_STATE b ,yyscan_t yyscanner );
-void yy_flush_buffer (YY_BUFFER_STATE b ,yyscan_t yyscanner );
-void yypush_buffer_state (YY_BUFFER_STATE new_buffer ,yyscan_t yyscanner );
-void yypop_buffer_state (yyscan_t yyscanner );
+void yyrestart (FILE *input_file  );
+void yy_switch_to_buffer (YY_BUFFER_STATE new_buffer  );
+YY_BUFFER_STATE yy_create_buffer (FILE *file,int size  );
+void yy_delete_buffer (YY_BUFFER_STATE b  );
+void yy_flush_buffer (YY_BUFFER_STATE b  );
+void yypush_buffer_state (YY_BUFFER_STATE new_buffer  );
+void yypop_buffer_state (void );
 
-YY_BUFFER_STATE yy_scan_buffer (char *base,yy_size_t size ,yyscan_t yyscanner );
-YY_BUFFER_STATE yy_scan_string (yyconst char *yy_str ,yyscan_t yyscanner );
-YY_BUFFER_STATE yy_scan_bytes (yyconst char *bytes,int len ,yyscan_t yyscanner );
+YY_BUFFER_STATE yy_scan_buffer (char *base,yy_size_t size  );
+YY_BUFFER_STATE yy_scan_string (yyconst char *yy_str  );
+YY_BUFFER_STATE yy_scan_bytes (yyconst char *bytes,int len  );
 
-void *yyalloc (yy_size_t ,yyscan_t yyscanner );
-void *yyrealloc (void *,yy_size_t ,yyscan_t yyscanner );
-void yyfree (void * ,yyscan_t yyscanner );
+void *yyalloc (yy_size_t  );
+void *yyrealloc (void *,yy_size_t  );
+void yyfree (void *  );
 
 /* Begin user sect3 */
 
 #define yywrap(n) 1
 #define YY_SKIP_YYWRAP
 
-#define yytext_ptr yytext_r
+extern int yylineno;
+
+extern char *yytext;
+#define yytext_ptr yytext
 
 #ifdef YY_HEADER_EXPORT_START_CONDITIONS
 #define INITIAL 0
-#define READ_LINE 1
 
 #endif
 
@@ -337,40 +308,42 @@ void yyfree (void * ,yyscan_t yyscanner );
 #include <unistd.h>
 #endif
 
-#define YY_EXTRA_TYPE struct Context *
-
-int yylex_init (yyscan_t* scanner);
-
-int yylex_init_extra (YY_EXTRA_TYPE user_defined,yyscan_t* scanner);
+#ifndef YY_EXTRA_TYPE
+#define YY_EXTRA_TYPE void *
+#endif
 
 /* Accessor methods to globals.
    These are made visible to non-reentrant scanners for convenience. */
 
-int yylex_destroy (yyscan_t yyscanner );
+int yylex_destroy (void );
 
-int yyget_debug (yyscan_t yyscanner );
+int yyget_debug (void );
 
-void yyset_debug (int debug_flag ,yyscan_t yyscanner );
+void yyset_debug (int debug_flag  );
 
-YY_EXTRA_TYPE yyget_extra (yyscan_t yyscanner );
+YY_EXTRA_TYPE yyget_extra (void );
 
-void yyset_extra (YY_EXTRA_TYPE user_defined ,yyscan_t yyscanner );
+void yyset_extra (YY_EXTRA_TYPE user_defined  );
 
-FILE *yyget_in (yyscan_t yyscanner );
+FILE *yyget_in (void );
 
-void yyset_in  (FILE * in_str ,yyscan_t yyscanner );
+void yyset_in  (FILE * in_str  );
 
-FILE *yyget_out (yyscan_t yyscanner );
+FILE *yyget_out (void );
 
-void yyset_out  (FILE * out_str ,yyscan_t yyscanner );
+void yyset_out  (FILE * out_str  );
 
-int yyget_leng (yyscan_t yyscanner );
+int yyget_leng (void );
 
-char *yyget_text (yyscan_t yyscanner );
+char *yyget_text (void );
 
-int yyget_lineno (yyscan_t yyscanner );
+int yyget_lineno (void );
 
-void yyset_lineno (int line_number ,yyscan_t yyscanner );
+void yyset_lineno (int line_number  );
+
+YYSTYPE * yyget_lval (void );
+
+void yyset_lval (YYSTYPE * yylval_param  );
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -378,18 +351,18 @@ void yyset_lineno (int line_number ,yyscan_t yyscanner );
 
 #ifndef YY_SKIP_YYWRAP
 #ifdef __cplusplus
-extern "C" int yywrap (yyscan_t yyscanner );
+extern "C" int yywrap (void );
 #else
-extern int yywrap (yyscan_t yyscanner );
+extern int yywrap (void );
 #endif
 #endif
 
 #ifndef yytext_ptr
-static void yy_flex_strncpy (char *,yyconst char *,int ,yyscan_t yyscanner);
+static void yy_flex_strncpy (char *,yyconst char *,int );
 #endif
 
 #ifdef YY_NEED_STRLEN
-static int yy_flex_strlen (yyconst char * ,yyscan_t yyscanner);
+static int yy_flex_strlen (yyconst char * );
 #endif
 
 #ifndef YY_NO_INPUT
@@ -417,9 +390,11 @@ static int yy_flex_strlen (yyconst char * ,yyscan_t yyscanner);
 #ifndef YY_DECL
 #define YY_DECL_IS_OURS 1
 
-extern int yylex (yyscan_t yyscanner);
+extern int yylex \
+               (YYSTYPE * yylval_param );
 
-#define YY_DECL int yylex (yyscan_t yyscanner)
+#define YY_DECL int yylex \
+               (YYSTYPE * yylval_param )
 #endif /* !YY_DECL */
 
 /* yy_get_previous_state - get the state just before the EOB char was reached */

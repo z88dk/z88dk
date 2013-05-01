@@ -120,15 +120,6 @@
     <ClInclude Include="classring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="scan_def.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scan_token.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scan_struct.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -227,16 +218,7 @@
     <ClCompile Include="parse.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="scan_token.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scan_struct.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="model.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scan_context.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

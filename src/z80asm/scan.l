@@ -15,9 +15,19 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.7 2013-04-23 19:23:14 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.8 2013-05-01 19:03:45 pauloscustodio Exp $ 
 $Log: scan.l,v $
-Revision 1.7  2013-04-23 19:23:14  pauloscustodio
+Revision 1.8  2013-05-01 19:03:45  pauloscustodio
+Simplified scanner and adapted to be used with a BISON generated parser.
+Removed balanced struct checking and token ring.
+Removed start condition to list assembly lines, as it was difficult to keep in sync across included
+files; inserted an RS char in the input before each line to trigger listing.
+Allow ".NAME" and "NAME:" to return a NAME token, so that ".LD" is recognized as a label and not the LD assembly statement.
+Added Integer out of range warning to number scanning routine.
+Allow input lines to be any size, as long as memory can be allocated.
+Created a skeleton BISON parser.
+
+Revision 1.7  2013/04/23 19:23:14  pauloscustodio
 Comments
 
 Revision 1.6  2013/04/21 22:51:03  pauloscustodio
@@ -51,17 +61,8 @@ Added GNU Flex-based scanner. Not yet integrated into assembler.
 #ifndef SCAN_H
 #define SCAN_H
 
-#include "scan_context.h"
-#include "scan_struct.h"
-#include "scan_token.h"
+#include "parse.h"
 #include "types.h"
-
-/*-----------------------------------------------------------------------------
-*   forward declarations
-*----------------------------------------------------------------------------*/
-struct Context;				/* YY_EXTRA_TYPE */
-#define YY_DECL TokType yylex (Token *token, yyscan_t yyscanner)
-extern YY_DECL;
 
 /*-----------------------------------------------------------------------------
 *   scan API
@@ -71,28 +72,9 @@ extern YY_DECL;
 extern void scan_file( char *filename );
 extern void scan_text( char *text );
 
-/* scan input for next token, return token type; 
-   use scan_token(0) to get last returned token, only valid until next scan_get() call */
-extern TokType scan_get( void );
-
-/* get Nth token in the current context, NULL if none, 0 = current, 1 = next, ... */
-extern Token *scan_token( int n );		
-
-/* attributes of Nth token */
-extern TokType scan_tok_type( int n );
-extern long	   scan_num_value( int n );
-extern char   *scan_str_value( int n );
-extern char   *scan_filename( int n );
-extern int 	   scan_line_nr( int n );
-
-/* stack of nested constructs, i.e. IF / ELSE / ENDIF
-   local to each input file, stack must be empty at the end of file */
-extern void scan_push_struct( int id, int value );
-extern int  scan_top_id( void );						
-extern int  scan_top_value( void );
-extern void scan_replace_struct( int id, int value );
-extern void scan_pop_struct( int id );		/* syntaxt error if id != top_id */
-
+/* Current location */
+extern char *scan_filename( void );	/* NULL if no file open */
+extern int   scan_line_nr( void );		/* 0 if no line number */
 
 #endif /* ndef SCAN_H */
 }
@@ -100,35 +82,151 @@ extern void scan_pop_struct( int id );		/* syntaxt error if id != top_id */
 %{
 #include "codearea.h"
 #include "ctype.h"
+#include "class.h"
+#include "classlist.h"
 #include "die.h"
+#include "dynstr.h"
 #include "errors.h"
 #include "listfile.h"
 #include "options.h"
-#include "scan_context.h"
-#include "scan_struct.h"
-#include "scan_token.h"
 #include "srcfile.h"
 #include "strpool.h"
 #include "strutil.h"
+#include <stdio.h>
 
 static long scan_num (char *text, int num_suffix_chars, int base);
-
-/* handle line number */
-#define YY_USER_ACTION 														\
-	token->filename = context->filename;									\
-	token->line_nr  = context->line_nr;										\
-	if ( !clinemode )														\
-	{																		\
-		set_error_line( context->line_nr ); 								\
-	}
-
-/* return and set tok_type */	
-#define YY_RETURN(x)														\
-	return ( token->tok_type = (x) )
+int yylex_destroy (void);
 
 /* die on error */
-#define YY_FATAL_ERROR(msg) 												\
+#define YY_FATAL_ERROR(msg) 										\
 	die( AssertionException, msg )
+
+/* input function to convert different eol sequences (\r\n, \r, \n) into \n 
+   and insert a RS (0x30 - record separator) character before every line,
+   used to read the whole line and call srclist */
+int yy_input( char *buffer, size_t size );
+#define YY_INPUT(buf,result,size) 	\
+	(result) = yy_input( (char *) (buf), (size))
+
+#define RS '\x1E'
+
+/*-----------------------------------------------------------------------------
+*   Scanner context
+*----------------------------------------------------------------------------*/
+
+/* Scanner context - current input file/buffer */
+CLASS(Context)
+	FILE   *file; 			/* current input file, NULL if reading from buffer */
+	char   *filename;		/* point to filename in strpool */
+	int 	line_nr;		/* current line number */
+	
+	Str    *buffer;			/* scan buffer */
+	size_t	buffer_start;	/* point to first char in buffer, in case we read it
+							   in chunks */
+END_CLASS;
+DEF_CLASS(Context);
+
+void Context_init( Context *self )
+{
+    /* force init strpool to make sure Context is destroyed before StrPool */
+    strpool_init();
+	
+	self->buffer = OBJ_NEW(Str);
+	OBJ_AUTODELETE(self->buffer) = FALSE;
+}
+
+void Context_copy( Context *self, Context *other ) { }
+
+void Context_fini( Context *self )	/* free resources */
+{
+	if ( self->file )
+		fclose( self->file );
+	
+	OBJ_DELETE(self->buffer);
+}
+
+Context *Context_create( FILE *file, char *filename, int line_nr )
+{
+	Context *self;
+
+	/* allocate and init new context */
+	self = OBJ_NEW(Context);
+	self->file		= file;
+	self->filename	= strpool_add(filename);
+	self->line_nr	= line_nr;
+	
+	/* interface with errors */
+	set_error_null();
+	set_error_file( filename );   			/* error location */
+	
+	return self;
+}
+
+/* Scanner context - scack of contexts, top of stack is current */
+CLASS_LIST(Context);
+DEF_CLASS_LIST(Context);
+
+static ContextList *contexts;
+
+#define init_contexts() \
+				( contexts != NULL ? \
+				  contexts : \
+				  ( contexts = OBJ_NEW(ContextList) ) )
+
+static Context *top_context( void )
+{
+	init_contexts();
+	
+	return ContextList_empty( contexts ) ?
+				NULL : 
+				ContextList_last( contexts )->obj;
+}
+
+/* check circular includes, error if found */
+static void check_circular_includes( char *filename ) 
+{
+	ContextListElem *iter;
+	
+	init_contexts();
+	
+	for ( iter = ContextList_last( contexts ) ; iter != NULL ; 
+		  iter = ContextList_prev( iter ) )
+	{
+		if ( iter->obj->file != NULL &&			/* open file, not scanned text */
+		     strcmp( filename, iter->obj->filename ) == 0 )
+		{
+            fatal_error( ERR_INCLUDE_RECURSION, filename );
+		}
+	}
+}	
+
+/*-----------------------------------------------------------------------------
+*   Call YY_destroy on exit
+*----------------------------------------------------------------------------*/
+CLASS(Scan)
+END_CLASS;
+DEF_CLASS(Scan);
+
+static Scan *scan;
+
+void Scan_init( Scan *self )
+{
+    /* force init contexts to make sure Contexts are destroyed before Scan */
+    init_contexts();
+}
+
+void Scan_copy( Scan *self, Scan *other ) { }
+
+void Scan_fini( Scan *self )	/* free resources */
+{
+	yylex_destroy();
+}
+
+#define init_scan() \
+			( scan != NULL ? \
+			  scan : \
+			  ( scan = OBJ_NEW(Scan) ) )
+
 
 %}
 
@@ -139,126 +237,127 @@ static long scan_num (char *text, int num_suffix_chars, int base);
 %option case-insensitive 8bit 
 %option pointer nounistd
 %option warn noverbose 
-%option reentrant noyywrap nodefault noyylineno 
+%option noyywrap nodefault noyylineno
 %option noyyalloc noyyrealloc noyyfree
 %option batch fast align never-interactive
-%option extra-type="struct Context *"
+%option bison-bridge
 
-NEWLINE	(\r|\n|\r\n|\n\r)
-SPACE	[ \t\f]
-ID		(af\'|[_a-z][_a-z0-9]*)
+RS		\x1E
+NEWLINE	\n
+SPACE	[ \t\f\r]
+ID		[_a-zA-Z][_a-zA-Z0-9]*
 D2		[01]
 D10		[0-9]
-D16		[0-9a-f]
-
-/*-----------------------------------------------------------------------------
-*	Start conditions
-*----------------------------------------------------------------------------*/
-
-/* start condition active to read whole line for list before scanning tokens */
-%x		READ_LINE		
+D16		[0-9a-fA-F]
 
 /*-----------------------------------------------------------------------------
 *	Rules
 *----------------------------------------------------------------------------*/
 
 %%
-			Context *context = yyget_extra( yyscanner );
+			Context *context = top_context();
 			
-			/* setup state for listing, if first call of file or first call
-			   after newline */
-			if ( context->do_list )
-			{
-				BEGIN( READ_LINE );
-			}
+			/* return unless a text is being read */
+			if ( context == NULL )
+				yyterminate();
 
-			/* process list */
-<READ_LINE>[^\r\n]*{NEWLINE}?	{
-				list_start_line( get_PC(), context->filename, context->line_nr, yytext );
-				yyless( 0 );				/* push all text back to input */
-				context->do_list = FALSE;
-				BEGIN( INITIAL );
-			}
+			/* read whole line, increment line number */
+{RS}.*{NEWLINE}	{
+				context->line_nr++;
+				if ( !clinemode )
+					set_error_line( context->line_nr );
 
-			/* newline */
-{NEWLINE}	{
-				context->line_nr += context->line_inc;		/* count lines */
-				if ( listing && context->file != NULL )
-				{
-					context->do_list = TRUE;				/* READ_LINE on next scan */
-				}
-				YY_RETURN(TOK_NEWLINE);
-			}			
+				if ( listing )
+					list_start_line( get_PC(), 
+									 context->filename, context->line_nr, 
+									 yytext + 1 );
+				yyless( 1 );				/* push all text except RS back to input */
+			}
 
 {SPACE}+	/* blanks */
-;.* 		/* comment */
-
+;.*			/* comment */
 
 			/* Identifier */
-{ID}		{
-				Str_bset( token->str_value, yytext, yyleng ); 	
-				strtoupper( Str_data( token->str_value ) );		
-				YY_RETURN(TOK_NAME);
-			}
-
-			/* Label */
-"."{ID}":"?	|
-"."?{ID}":"	{
-				/* trim starting dot and ending colon */
-				if ( yytext[0] == '.' ) 
-				{
-					yytext++;
-					yyleng--;
-				}
-				if ( yytext[yyleng-1] == ':' ) 
-				{
-					yyleng--;
-				}
-				Str_bset( token->str_value, yytext, yyleng ); 	
-				strtoupper( Str_data( token->str_value ) );		
-				YY_RETURN(TOK_LABEL);
-			}
+{ID}		strtoupper( yylval->sval = xstrdup( yytext ) ); return NAME;
+"."{ID}		strtoupper( yylval->sval = xstrdup( yytext + 1 ) ); return NAME;
+{ID}":"		strtoupper( yylval->sval = xstrdup( yytext ) ); yylval->sval[ yyleng - 1 ] = '\0';return NAME;
 
 			/* String - return string without quotes */
 [\'][^\'\r\n]*[\'] 	|
 [\"][^\"\r\n]*[\"]	{
-				Str_bset( token->str_value, yytext+1, yyleng-2 ); 	
-				YY_RETURN(TOK_STRING);
+				yylval->sval = xstrdup( yytext + 1 );
+				yylval->sval[ yyleng - 2 ] = '\0';
+				return STRING;
 			}
 
 [\'][^\'\r\n]* 	|
 [\"][^\"\r\n]*	error( ERR_UNCLOSED_STR );
 
-			/* Number - return value in yyvalue */
-{D10}+				token->num_value = scan_num(yytext,     0, 10); YY_RETURN(TOK_NUMBER);
-{D10}{D16}*h		token->num_value = scan_num(yytext,     1, 16); YY_RETURN(TOK_NUMBER);
-[\$\#]{D16}+		token->num_value = scan_num(yytext + 1, 0, 16); YY_RETURN(TOK_NUMBER);
-0x{D16}+			token->num_value = scan_num(yytext + 2, 0, 16); YY_RETURN(TOK_NUMBER);
-{D2}+b				token->num_value = scan_num(yytext,     1,  2); YY_RETURN(TOK_NUMBER);
-[\@\%]{D2}+			token->num_value = scan_num(yytext + 1, 0,  2); YY_RETURN(TOK_NUMBER);
-0b{D2}+				token->num_value = scan_num(yytext + 2, 0,  2); YY_RETURN(TOK_NUMBER);
-[\@\%][\'][-#]+[\']	token->num_value = scan_num(yytext + 2, 1,  2); YY_RETURN(TOK_NUMBER);
-[\@\%][\"][-#]+[\"]	token->num_value = scan_num(yytext + 2, 1,  2); YY_RETURN(TOK_NUMBER);
+			/* Number - return value in yylval */
+{D10}+				yylval->lval = scan_num(yytext,     0, 10); return NUMBER;
+{D10}{D16}*h		yylval->lval = scan_num(yytext,     1, 16); return NUMBER;
+[\$\#]{D16}+		yylval->lval = scan_num(yytext + 1, 0, 16); return NUMBER;
+0x{D16}+			yylval->lval = scan_num(yytext + 2, 0, 16); return NUMBER;
+{D2}+b				yylval->lval = scan_num(yytext,     1,  2); return NUMBER;
+[\@\%]{D2}+			yylval->lval = scan_num(yytext + 1, 0,  2); return NUMBER;
+0b{D2}+				yylval->lval = scan_num(yytext + 2, 0,  2); return NUMBER;
+[\@\%][\'][-#]+[\']	yylval->lval = scan_num(yytext + 2, 1,  2); return NUMBER;
+[\@\%][\"][-#]+[\"]	yylval->lval = scan_num(yytext + 2, 1,  2); return NUMBER;
 			
 			/* multi-char tokens */			
-"=="		YY_RETURN(TOK_EQUAL_EQUAL);
-"<>"		YY_RETURN(TOK_LESS_GREATER);
-"!="		YY_RETURN(TOK_NOT_EQUAL);
-"<="		YY_RETURN(TOK_LESS_EQUAL);
-">="		YY_RETURN(TOK_GREATER_EQUAL);
-"||"		YY_RETURN(TOK_DBL_VBAR);
-"&&"		YY_RETURN(TOK_DBL_AMPERSAND);
-"<<"		YY_RETURN(TOK_DBL_LESS);
-">>"		YY_RETURN(TOK_DBL_GREATER);
-"**"		YY_RETURN(TOK_DBL_ASTERISK);
+"=="		return EQUAL_EQUAL;
+"<>"		return LESS_GREATER;
+"!="		return NOT_EQUAL;
+"<="		return LESS_EQUAL;
+">="		return GREATER_EQUAL;
+"||"		return DBL_VBAR;
+"&&"		return DBL_AMPERSAND;
+"<<"		return DBL_LESS;
+">>"		return DBL_GREATER;
+"**"		return DBL_ASTERISK;
 
 			/* default rule - one character token */
-.			YY_RETURN((TokType)yytext[0]);
+.|{NEWLINE}	return yytext[0];
 
+			/* pop context at end of input */
+<<EOF>> 	{
+				/* pop context */
+				set_error_null();
+			
+				yypop_buffer_state();		/* remove lex buffer */
+				
+				context = ContextList_pop( contexts );
+				OBJ_DELETE(context);		/* remove context */
+				
+				context = top_context();	/* new top context */
+				if ( context == NULL )
+					yyterminate();			/* popped last context */
+					
+				set_error_file( context->filename );
+				set_error_line( context->line_nr );
+			}
 %%
 
 /*-----------------------------------------------------------------------------
-*	convert number to long, range error if greater than LONG_MAX
+*   Memory allocation used in scanner
+*----------------------------------------------------------------------------*/
+void *yyalloc( size_t bytes )
+{
+    return xmalloc( bytes );
+}
+
+void *yyrealloc( void *ptr, size_t bytes )
+{
+    return xrealloc( ptr, bytes );
+}
+
+void yyfree( void *ptr )
+{
+    xfree( ptr );
+}
+
+/*-----------------------------------------------------------------------------
+*	convert number to long, range warning if greater than LONG_MAX
 *----------------------------------------------------------------------------*/
 static long scan_num (char *text, int num_suffix_chars, int base)
 {
@@ -267,11 +366,13 @@ static long scan_num (char *text, int num_suffix_chars, int base)
 	int length;
 	char c;
 	int i;
+	BOOL range_err;
 	
 	/* ignore any suffix characters */
 	length = strlen(text) - num_suffix_chars;
 	
 	value = 0;
+	range_err = FALSE;
 	for ( i = 0 ; i < length ; i++ ) 
 	{
 		c = *text++;					/* read each digit */
@@ -296,26 +397,189 @@ static long scan_num (char *text, int num_suffix_chars, int base)
 		}
 		
 		value = value * base + digit;
+		if ( value < 0 )
+			range_err = TRUE;			/* overflow to sign bit */
 	}
 	
+	if ( range_err )
+		warning( ERR_INT_RANGE, value );
+		
 	return value;
 }
 
 /*-----------------------------------------------------------------------------
-*   Memory allocation used in scanner
+* 	input function to convert different eol sequences 
+*	("\r\n", "\n\r", "\r", "\n") into "\n", add a terminating "\n" if not found 
+*	in input, and insert a RS (0x30 - record separator) character before 
+*	every line, used to read the whole line and call srclist.
+*	Return when buffer is (almost)full, make sure a line is not split
+*	between buffer and out of buffer
 *----------------------------------------------------------------------------*/
-void *yyalloc( size_t bytes, yyscan_t scanner )
+void yy_read_line( FILE *file, Str *buffer )
 {
-    return xmalloc( bytes );
+	int c1, c2;
+	
+	Str_chset( buffer, RS );				/* start with RS char */
+	while ( (c1 = getc( file )) != EOF && c1 != '\n' && c1 != '\r' )
+		Str_chcat( buffer, c1 );
+	
+	if ( c1 == EOF )
+	{
+		if ( Str_len( buffer ) > 1 )		/* more than just the RS char */
+			Str_chcat( buffer, '\n' );		/* missing newline at end of line */
+		else 
+			Str_clear( buffer );			/* no input, clear buffer */
+	}
+	else 						
+	{
+		Str_chcat( buffer, '\n' );			/* end of line */
+		
+		if ( (c2 = getc( file )) != EOF &&
+			 ! ( c1 == '\n' && c2 == '\r' ||
+				 c1 == '\r' && c2 == '\n' ) )
+		{
+			ungetc( c2, file );				/* push back to input */
+		}
+	}
+}
+	
+int yy_input( char *buffer, size_t size )
+{
+	Context *context;
+	char *buffer_ptr;
+	size_t num_copy;
+
+	/* get context */
+	context = top_context();
+	if ( context == NULL )
+		return 0;								/* paranoid check */
+	
+	/* read until buffer full or eof */
+	for ( buffer_ptr = buffer ; size >= 2 ; )	/* minimum line = RS LF */
+	{
+		/* fill context buffer with next line, if empty */
+		if ( Str_len( context->buffer ) == 0 )
+		{
+			yy_read_line( context->file, context->buffer ); 
+			context->buffer_start = 0;
+		}
+		
+		/* check for end of input */
+		if ( Str_len( context->buffer ) == 0 )
+			break;
+
+		/* return next chunk from input from buffer */
+		num_copy = Str_len( context->buffer ) - context->buffer_start;
+		if ( num_copy > size )
+			num_copy = size;
+		
+		memcpy( buffer_ptr, Str_data( context->buffer ) + context->buffer_start, num_copy ); 
+		buffer_ptr 				+= num_copy; 
+		size 					-= num_copy;
+		context->buffer_start 	+= num_copy;
+
+		/* clear input buffer for next round */
+		if ( context->buffer_start >= Str_len( context->buffer ) )
+		{
+			Str_clear( context->buffer );
+			context->buffer_start = 0;
+		}
+	}
+	
+	return buffer_ptr - buffer;						/* number of chars read */
 }
 
-void *yyrealloc( void *ptr, size_t bytes, yyscan_t scanner )
+
+/*-----------------------------------------------------------------------------
+*   Start reading file at current position
+*----------------------------------------------------------------------------*/
+void scan_file( char *filename )
 {
-    return xrealloc( ptr, bytes );
+	Context *context;
+	FILE 	*file;
+	
+	init_scan();
+	
+	/* search source path */
+	filename = search_source_file( filename );
+	
+	/* check for circular includes */
+	check_circular_includes( filename );
+	
+	/* try to open the file */
+	file = fopen( filename, "rb" ); 		/* b: to ready \r and \n */
+	if ( file == NULL ) 
+	{
+		fatal_error( ERR_FOPEN_READ, filename );
+	}
+
+	/* create a new context */
+	context = Context_create( file, filename, 0 );
+	ContextList_push( contexts, context );
+	
+	/* save lexer state */
+	yypush_buffer_state( yy_create_buffer( NULL, YY_BUF_SIZE ) );
 }
 
-void yyfree( void *ptr, yyscan_t scanner )
+/*-----------------------------------------------------------------------------
+*   Start reading text at current position
+*----------------------------------------------------------------------------*/
+void scan_text( char *text )
 {
-    xfree( ptr );
+	Context *context;
+	Context *prev_context;
+	char 	*prev_filename;
+	int 	 prev_line_nr;
+	YY_BUFFER_STATE temp_yy_buffer;
+	
+	init_scan();
+	
+	/* if already reading input, copy file and line_nr of last item in stack */
+	prev_context  = top_context();
+	if ( prev_context == NULL )
+	{
+		prev_filename = NULL;
+		prev_line_nr  = 0;
+	}
+	else 
+	{
+		prev_filename = prev_context->filename;
+		prev_line_nr  = prev_context->line_nr;
+	}
+
+	/* create a new context */
+	context = Context_create( NULL, prev_filename, prev_line_nr );
+	ContextList_push( contexts, context );
+	
+	/* make a copy of text and normalize eol sequences; yy_scan_string() will make  
+	   a new copy of string */
+	Str_szset( context->buffer, text );
+	Str_normalize_eol( context->buffer );
+	Str_bcat( context->buffer, "\0\0", 2 );
+	
+	/* save lexer state - need to push a dummy created buffer, replaced afterwards
+	   by yy_scan_buffer() because of bug in yy_scan_buffer(): overwrites last
+       stack entry, destroying current context; then we yypush_buffer_state() getting
+	   two copies of the buffer on the two top stack entries; when the top is 
+	   destroyed by yy_pop_buffer_state(), we get an invalid buffer on the top
+	   of the stack */
+	temp_yy_buffer = yy_create_buffer( NULL, 2 );	/* very small buffer size */
+	yypush_buffer_state( temp_yy_buffer );	
+	yy_scan_buffer( Str_data( context->buffer ), Str_len( context->buffer ) );
+	yy_delete_buffer( temp_yy_buffer );
 }
 
+/*-----------------------------------------------------------------------------
+*   Current location
+*----------------------------------------------------------------------------*/
+char *scan_filename( void )
+{
+	Context *context = top_context();
+	return context == NULL ? NULL : context->filename;
+}
+
+int scan_line_nr( void )
+{
+	Context *context = top_context();
+	return context == NULL ? 0 : context->line_nr;
+}

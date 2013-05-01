@@ -105,9 +105,6 @@
     <ClInclude Include="queue.h" />
     <ClInclude Include="safestr.h" />
     <ClInclude Include="scan.h" />
-    <ClInclude Include="scan_def.h" />
-    <ClInclude Include="scan_struct.h" />
-    <ClInclude Include="scan_token.h" />
     <ClInclude Include="srcfile.h" />
     <ClInclude Include="strhash.h" />
     <ClInclude Include="strlist.h" />
@@ -144,9 +141,6 @@
     <ClCompile Include="prsline.c" />
     <ClCompile Include="safestr.c" />
     <ClCompile Include="scan.c" />
-    <ClCompile Include="scan_context.c" />
-    <ClCompile Include="scan_struct.c" />
-    <ClCompile Include="scan_token.c" />
     <ClCompile Include="srcfile.c" />
     <ClCompile Include="strhash.c" />
     <ClCompile Include="strlist.c" />

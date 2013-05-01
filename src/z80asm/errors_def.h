@@ -16,9 +16,19 @@ Copyright (C) Paulo Custodio, 2011-2013
 Define error codes and error messages
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.10 2013-04-07 23:34:19 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.11 2013-05-01 19:03:45 pauloscustodio Exp $ */
 /* $Log: errors_def.h,v $
-/* Revision 1.10  2013-04-07 23:34:19  pauloscustodio
+/* Revision 1.11  2013-05-01 19:03:45  pauloscustodio
+/* Simplified scanner and adapted to be used with a BISON generated parser.
+/* Removed balanced struct checking and token ring.
+/* Removed start condition to list assembly lines, as it was difficult to keep in sync across included
+/* files; inserted an RS char in the input before each line to trigger listing.
+/* Allow ".NAME" and "NAME:" to return a NAME token, so that ".LD" is recognized as a label and not the LD assembly statement.
+/* Added Integer out of range warning to number scanning routine.
+/* Allow input lines to be any size, as long as memory can be allocated.
+/* Created a skeleton BISON parser.
+/*
+/* Revision 1.10  2013/04/07 23:34:19  pauloscustodio
 /* CH_0020 : ERR_ORG_NOT_DEFINED if no ORG given
 /* z80asm no longer asks for an ORG address from the standard input
 /* if one is not given either by an ORG statement or a -r option;
@@ -79,8 +89,6 @@ DEF_MSG( ERR_SYNTAX,                "Syntax error" )
 DEF_MSG( ERR_SYNTAX_EXPR,           "Syntax error in expression" )
 DEF_MSG( ERR_EXPR,                  "Error in expression '%s'" )
 DEF_MSG( ERR_UNCLOSED_STR,          "Unclosed string" )
-DEF_MSG( ERR_UNBALANCED_STRUCT,     "Unbalanced struct" )
-DEF_MSG( ERR_UNBALANCED_STRUCT_AT,  "Unbalanced struct started at line %d" )
 
 DEF_MSG( ERR_INT_RANGE,             "Integer '%ld' out of range" )
 DEF_MSG( ERR_INT_RANGE_EXPR,        "Integer '%ld' out of range in expression '%s'" )

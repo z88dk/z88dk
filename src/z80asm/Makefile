@@ -12,9 +12,19 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.52 2013-04-21 22:51:51 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.53 2013-05-01 19:03:45 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.52  2013-04-21 22:51:51  pauloscustodio
+# Revision 1.53  2013-05-01 19:03:45  pauloscustodio
+# Simplified scanner and adapted to be used with a BISON generated parser.
+# Removed balanced struct checking and token ring.
+# Removed start condition to list assembly lines, as it was difficult to keep in sync across included
+# files; inserted an RS char in the input before each line to trigger listing.
+# Allow ".NAME" and "NAME:" to return a NAME token, so that ".LD" is recognized as a label and not the LD assembly statement.
+# Added Integer out of range warning to number scanning routine.
+# Allow input lines to be any size, as long as memory can be allocated.
+# Created a skeleton BISON parser.
+#
+# Revision 1.52  2013/04/21 22:51:51  pauloscustodio
 # Simplified flex build
 #
 # Revision 1.51  2013/04/14 18:16:58  pauloscustodio
@@ -233,9 +243,6 @@ OBJS = 	\
 	prsline.o		\
 	safestr.o		\
 	scan.o			\
-	scan_context.o	\
-	scan_struct.o	\
-	scan_token.o	\
 	srcfile.o		\
 	strhash.o		\
 	strlist.o		\
@@ -270,7 +277,13 @@ $(TARGET): $(OBJS)
 # flex
 scan.c scan.h : scan.l
 	flex -L scan.l
+	perl -i.bak -ne "print unless /^#line/" scan.c scan.h
+	$(RM) scan.c.bak scan.h.bak
 
+# bison
+parse.c parse.h : parse.y
+	bison parse.y
+	
 install:
 	install $(TARGET) $(PREFIX)/bin/
 
@@ -367,7 +380,7 @@ options.o: memalloc.h except.h e4c.h errors.h errors_def.h file.h strlist.h
 options.o: class.h queue.h types.h options.h symbol.h avltree.h model.h
 options.o: classlist.h srcfile.h dynstr.h strpool.h symbols.h z80asm.h
 options.o: config.h ../config.h
-parse.o: memalloc.h except.h e4c.h parse.h
+parse.o: memalloc.h except.h e4c.h dynstr.h types.h class.h queue.h
 prsident.o: memalloc.h except.h e4c.h codearea.h types.h config.h ../config.h
 prsident.o: errors.h errors_def.h listfile.h class.h queue.h dynstr.h model.h
 prsident.o: classlist.h options.h symbol.h avltree.h symbols.h z80asm.h
@@ -375,18 +388,9 @@ prsline.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h avltree.h
 prsline.o: types.h symbol.h model.h class.h queue.h classlist.h options.h
 prsline.o: errors.h errors_def.h
 safestr.o: memalloc.h except.h e4c.h safestr.h types.h
-scan.o: memalloc.h except.h e4c.h scan_context.h class.h queue.h types.h
-scan.o: classlist.h scan_struct.h scan_token.h classring.h dynstr.h
-scan.o: codearea.h die.h errors.h errors_def.h listfile.h model.h options.h
-scan.o: symbol.h avltree.h srcfile.h strpool.h strutil.h
-scan_context.o: memalloc.h except.h e4c.h errors.h errors_def.h options.h
-scan_context.o: symbol.h avltree.h types.h model.h class.h queue.h
-scan_context.o: classlist.h scan.h scan_context.h scan_struct.h scan_token.h
-scan_context.o: classring.h dynstr.h srcfile.h strpool.h
-scan_struct.o: memalloc.h except.h e4c.h errors.h errors_def.h scan_struct.h
-scan_struct.o: class.h queue.h types.h classlist.h
-scan_token.o: memalloc.h except.h e4c.h scan_token.h class.h queue.h types.h
-scan_token.o: classring.h dynstr.h strpool.h
+scan.o: memalloc.h except.h e4c.h parse.h dynstr.h types.h class.h queue.h
+scan.o: codearea.h classlist.h die.h errors.h errors_def.h listfile.h model.h
+scan.o: options.h symbol.h avltree.h srcfile.h strpool.h strutil.h
 srcfile.o: memalloc.h except.h e4c.h codearea.h types.h errors.h errors_def.h
 srcfile.o: file.h strlist.h class.h queue.h listfile.h dynstr.h model.h
 srcfile.o: classlist.h options.h symbol.h avltree.h srcfile.h strpool.h
@@ -410,5 +414,4 @@ z80instr.o: errors.h errors_def.h codearea.h
 z80pass.o: memalloc.h except.h e4c.h codearea.h types.h config.h ../config.h
 z80pass.o: errors.h errors_def.h file.h strlist.h class.h queue.h hist.h
 z80pass.o: listfile.h dynstr.h model.h classlist.h options.h symbol.h
-z80pass.o: avltree.h scan.h scan_context.h scan_struct.h scan_token.h
-z80pass.o: classring.h strutil.h symbols.h z80asm.h
+z80pass.o: avltree.h scan.h parse.h strutil.h symbols.h z80asm.h

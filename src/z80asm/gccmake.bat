@@ -1,5 +1,5 @@
 @echo off
-rem $Id: gccmake.bat,v 1.5 2013-04-21 22:59:09 pauloscustodio Exp $
+rem $Id: gccmake.bat,v 1.6 2013-05-01 19:03:45 pauloscustodio Exp $
 
 echo *******************
 echo * Building z80asm *
@@ -29,9 +29,6 @@ gcc -c -o prsident.o             prsident.c
 gcc -c -o prsline.o              prsline.c
 gcc -c -o safestr.o              safestr.c
 gcc -c -o scan.o                 scan.c
-gcc -c -o scan_context.o         scan_context.c
-gcc -c -o scan_struct.o          scan_struct.c
-gcc -c -o scan_token.o           scan_token.c
 gcc -c -o srcfile.o              srcfile.c
 gcc -c -o strhash.o              strhash.c
 gcc -c -o strlist.o              strlist.c
