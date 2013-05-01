@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Common types
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.8 2013-04-21 22:51:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.9 2013-05-01 22:24:28 pauloscustodio Exp $ */
 /* $Log: types.h,v $
-/* Revision 1.8  2013-04-21 22:51:03  pauloscustodio
+/* Revision 1.9  2013-05-01 22:24:28  pauloscustodio
+/* Make sure MAXLINE is >= FILENAME_MAX
+/*
+/* Revision 1.8  2013/04/21 22:51:03  pauloscustodio
 /* Include io.h only in MSVC
 /*
 /* Revision 1.7  2013/01/24 23:03:03  pauloscustodio
@@ -65,7 +68,8 @@ typedef unsigned char byte_t;		/*  8-bit */
 #define NUM_ELEMS(x) (sizeof(x)/sizeof(x[0]))
 
 /* maximum length of strings */
-#define MAXLINE     1024
+#define _MIN_MAXLINE	1024
+#define MAXLINE			(_MIN_MAXLINE > FILENAME_MAX ? _MIN_MAXLINE : FILENAME_MAX)
 
 /* snprintf is _snprintf in _MSC_VER */
 #ifdef _MSC_VER
