@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-safestr.t,v 1.4 2013-05-01 21:37:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-safestr.t,v 1.5 2013-05-01 22:23:39 pauloscustodio Exp $
 # $Log: whitebox-safestr.t,v $
-# Revision 1.4  2013-05-01 21:37:50  pauloscustodio
+# Revision 1.5  2013-05-01 22:23:39  pauloscustodio
+# Added chomp and normalize_eol
+#
+# Revision 1.4  2013/05/01 21:37:50  pauloscustodio
 # Added chset, chcat and getline
 #
 # Revision 1.3  2013/04/06 10:55:15  pauloscustodio
@@ -34,7 +37,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "safestr.o die.o except.o";
+my $objs = "safestr.o strutil.o die.o except.o";
 ok ! system "make $objs";
 
 write_file(asm1_file(), {binmode => ':raw'}, "");
@@ -203,6 +206,46 @@ INIT
 	if (s2->data != buffer)				ERROR;
 	if (s2->size != 5)					ERROR;
 
+	
+	// chomp
+	sstr_set(s, "\rx\r\n");
+	sstr_chomp(s);
+	TEST(s, "\rx");
+	
+	sstr_set(s, "\r\n \t");
+	sstr_chomp(s);
+	TEST(s, "");
+
+	sstr_set(s, "\f\r\t\f");
+	sstr_chomp(s);
+	TEST(s, "");
+
+	// normalize_eol
+	sstr_set(s, "A" "\r" "B" "\n");
+	sstr_normalize_eol(s);
+	TEST(s, "A\nB\n");
+	
+	sstr_set(s, "A" "\n" "B");
+	sstr_normalize_eol(s);
+	TEST(s, "A\nB");
+	
+	sstr_set(s, "A" "\r");
+	sstr_normalize_eol(s);
+	TEST(s, "A\n");
+	
+	sstr_set(s, "A" "\n");
+	sstr_normalize_eol(s);
+	TEST(s, "A\n");
+	
+	sstr_set(s, "A" "\r\n");
+	sstr_normalize_eol(s);
+	TEST(s, "A\n");
+	
+	sstr_set(s, "A" "\n\r");
+	sstr_normalize_eol(s);
+	TEST(s, "A\n");
+	
+	
 	// getline
 	for ( i = 1 ; 1 ; i++ )
 	{
