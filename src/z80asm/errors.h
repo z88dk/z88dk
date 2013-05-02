@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.12 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.13 2013-05-02 00:01:03 pauloscustodio Exp $ */
 /* $Log: errors.h,v $
-/* Revision 1.12  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.13  2013-05-02 00:01:03  pauloscustodio
+/* New stat_err()
+/*
+/* Revision 1.12  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.11  2012/05/26 18:51:10  pauloscustodio
@@ -81,6 +84,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #define ERRORS_H
 
 #include <stdio.h>
+#include <sys/stat.h>
 
 /* error constants */
 #define DEF_MSG(name,msg)    name,
@@ -128,6 +132,8 @@ extern void fwrite_err( const void *buffer, size_t size, size_t count, FILE *str
 extern void fread_err( void *buffer, size_t size, size_t count, FILE *stream );   /* EOF is fatal */
 #define freadc_err( buffer, count, stream) \
     fread_err( buffer, sizeof(char), count, stream)   /* EOF is fatal */
+
+extern void stat_err( char *filename, struct stat *filestat );
 
 #endif /* ndef ERRORS_H */
 

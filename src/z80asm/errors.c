@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.22 2013-03-02 23:50:38 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.23 2013-05-02 00:01:03 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.22  2013-03-02 23:50:38  pauloscustodio
+/* Revision 1.23  2013-05-02 00:01:03  pauloscustodio
+/* New stat_err()
+/*
+/* Revision 1.22  2013/03/02 23:50:38  pauloscustodio
 /* use getc() instead of fgetc()
 /*
 /* Revision 1.21  2013/01/20 21:10:32  pauloscustodio
@@ -461,6 +464,19 @@ FILE *fopen_err( char *filename, char *mode )
     return fp;
 }
 
+void stat_err( char *filename, struct stat *filestat )
+{
+    int result = stat( filename, filestat );
+
+    if ( result < 0 )
+    {
+        fatal_error_at( error_filename, error_line,
+                        ERR_FOPEN_READ,
+                        filename );
+    }
+}
+
+
 void fputc_err( int c, FILE *stream )
 {
     int ret = fputc( c, stream );
@@ -502,3 +518,4 @@ void fread_err( void *buffer, size_t size, size_t count, FILE *stream )
         fatal_error_at( error_filename, error_line, ERR_FILE_READ );
     }
 }
+
