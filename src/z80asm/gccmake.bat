@@ -1,5 +1,5 @@
 @echo off
-rem $Id: gccmake.bat,v 1.6 2013-05-01 19:03:45 pauloscustodio Exp $
+rem $Id: gccmake.bat,v 1.7 2013-05-02 21:20:14 pauloscustodio Exp $
 
 echo *******************
 echo * Building z80asm *
