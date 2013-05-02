@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Safe strings : char array with the size
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.c,v 1.6 2013-05-01 22:23:39 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.c,v 1.7 2013-05-02 21:21:50 pauloscustodio Exp $ */
 /* $Log: safestr.c,v $
-/* Revision 1.6  2013-05-01 22:23:39  pauloscustodio
+/* Revision 1.7  2013-05-02 21:21:50  pauloscustodio
+/* warnings
+/*
+/* Revision 1.6  2013/05/01 22:23:39  pauloscustodio
 /* Added chomp and normalize_eol
 /*
 /* Revision 1.5  2013/05/01 21:37:50  pauloscustodio
@@ -39,15 +42,14 @@ Safe strings : char array with the size
 /* */
 
 #include "memalloc.h"   /* before any other include */
-#include <string.h>
-#include <ctype.h>
-#include "safestr.h"
 
+#include "safestr.h"
+#include "strutil.h"
+#include "types.h"
+#include <ctype.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
-
-#include "types.h"
 
 /*-----------------------------------------------------------------------------
 *   sstr_set, sstr_cat : return address of data
