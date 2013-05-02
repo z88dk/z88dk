@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.77 2013-04-07 22:10:52 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.78 2013-05-02 00:04:18 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.77  2013-04-07 22:10:52  pauloscustodio
+/* Revision 1.78  2013-05-02 00:04:18  pauloscustodio
+/* Cleanup assemble decision logic
+/*
+/* Revision 1.77  2013/04/07 22:10:52  pauloscustodio
 /* Usage did not take -e into account
 /*
 /* Revision 1.76  2013/04/06 13:15:04  pauloscustodio
@@ -493,6 +496,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "hist.h"
 #include "listfile.h"
 #include "options.h"
+#include "safestr.h"
 #include "strpool.h"
 #include "strutil.h"
 #include "symbol.h"
@@ -532,8 +536,6 @@ void ReleaseModules( void );
 void ReleaseExprns( struct expression *express );
 void CloseFiles( void );
 void AssembleSourceFile( void );
-int TestAsmFile( void );
-int GetModuleSize( void );
 symbol *createsym( symbol *symptr );
 struct module *NewModule( void );
 struct libfile *NewLibrary( void );
@@ -585,6 +587,193 @@ struct liblist *libraryhdr;
 avltree *globalroot, *staticroot;
 
 
+/* local functions */
+static void assemble_list( char *filename );
+static BOOL assemble_special( char *filename );
+static BOOL load_module_object( char *filename );
+static void query_assemble( char *src_filename, char *obj_filename );
+
+/*-----------------------------------------------------------------------------
+*   Assemble one source file
+*	If filename starts with '@', reads the file as a list of filenames
+*	and assembles each one in turn
+*----------------------------------------------------------------------------*/
+void assemble_file( char *filename )
+{
+    int flag;
+
+	if ( assemble_special( filename ) )
+		return;								/* handled a special file */
+		
+    /* normal case - assemble a asm source file */
+    z80asmfile = objfile = NULL;
+
+    init_codearea();            /* Pointer (PC) to store z80 instruction */
+
+    srcfilename = asm_filename_ext( filename );      /* set '.asm' extension */
+    objfilename = obj_filename_ext( filename );      /* set '.obj' extension */
+
+    /* Create module data structures for new file */
+    CURRENTMODULE = NewModule();
+
+    /* Create first file record */
+    CURRENTFILE = Newfile( NULL, srcfilename );
+
+    if ( globaldef && CURRENTMODULE == modulehdr->first )
+    {
+        CreateDeffile();
+    }
+
+	query_assemble( srcfilename, objfilename );
+    set_error_null();           /* no more module in error messages */
+}
+
+/*-----------------------------------------------------------------------------
+*   Check for special file name started with '@' to read a list of files to 
+*	assemble; 
+*	Return TRUE if filename was special and was handled
+*----------------------------------------------------------------------------*/
+static BOOL assemble_special( char *filename )
+{
+    switch ( filename[0] )
+    {
+        case '\0':
+            /* no file to include */
+            return TRUE;
+
+        case '-':
+            /* Illegal source file name */
+            error( ERR_ILLEGAL_SRC_FILENAME, filename );
+            return TRUE;
+
+        case '@':
+            assemble_list( filename + 1 );     	/* skip '@' marker */
+            return TRUE;
+
+        default:
+            return FALSE;
+    }
+}
+
+/*-----------------------------------------------------------------------------
+*   Assemble list of files read from given file name
+*----------------------------------------------------------------------------*/
+static void assemble_list( char *filename )
+{
+	FILE *fp;
+	SSTR_DEFINE( line, MAXLINE );
+
+	fp = fopen_err( filename, "rb" );
+
+	/* read lines from file and assemble each one in turn */
+	while ( sstr_getline( line, fp ) )
+	{
+		sstr_chomp( line );
+		assemble_file( sstr_data( line ) );		/* may contain '@' -> recurse */
+	}
+
+	fclose( fp );
+}
+
+/*-----------------------------------------------------------------------------
+*	Assemble file or load object module size if datestamp option was given
+*	and object file is up-to-date
+*----------------------------------------------------------------------------*/
+static void query_assemble( char *src_filename, char *obj_filename )
+{
+    struct stat src_stat, obj_stat;
+	int obj_stat_result;
+	
+	/* get time stamp of files, error if source not found */
+	stat_err(               src_filename, &src_stat );
+	obj_stat_result = stat( obj_filename, &obj_stat );
+	
+    if ( datestamp &&								/* -d option */
+		 obj_stat_result >= 0 &&					/* object file exists */
+		 src_stat.st_mtime <= obj_stat.st_mtime &&	/* source older than object */
+		 load_module_object( obj_filename )			/* object file valid and size loaded */
+	   )
+    {
+        /* OK - object file is up-to-date */
+	}
+	else 
+	{
+		/* Assemble source file */
+		z80asmfile = fopen_err( src_filename, "rb" );           /* CH_0012 */
+        AssembleSourceFile();
+	}
+}
+
+/*-----------------------------------------------------------------------------
+*	Updates current module name and size, if given object file is valid
+*	If not, raises error and returns FALSE
+*----------------------------------------------------------------------------*/
+BOOL load_module_object( char *filename )
+{
+    char buffer[MAXLINE];
+    long fptr_modcode, fptr_modname;
+    size_t size;
+    FILE *fp;
+
+    /* open object file */
+    fp = fopen_err( filename, "rb" );	        /* CH_0012 */
+    freadc_err( buffer, 8U, fp );       		/* read first 8 chars from file into array */
+    buffer[8] = '\0';
+
+	/* compare header of file */
+    if ( strcmp( buffer, Z80objhdr ) != 0 )
+    {
+        error( ERR_NOT_OBJ_FILE, filename );	/* not an object file */
+        fclose( fp );
+        return FALSE;
+    }
+
+	/* define module name of current module */
+    fseek( fp, 8 + 2, SEEK_SET );              	/* set file pointer to point at module name */
+    fptr_modname = fgetl_err( fp );   			/* get file pointer to module name */
+    fseek( fp, fptr_modname, SEEK_SET );       	/* set file pointer to module name */
+
+    size = fgetc_err( fp );
+    freadc_err( buffer, size, fp ); 			/* read module name */
+    buffer[size] = '\0';
+    CURRENTMODULE->mname = xstrdup( buffer );
+
+	/* define module size of current module */
+    fseek( fp, 26, SEEK_SET ); 					/* set file pointer to point at 
+												   module code pointer */
+    fptr_modcode = fgetl_err( fp );   			/* get file pointer to module code */
+
+    if ( fptr_modcode != -1 )
+    {
+        fseek( fp, fptr_modcode, SEEK_SET );   /* set file pointer to module code */
+        size = fgetw_err( fp );
+
+        /* BUG_0008 : fix size, if a zero was written, the module is actually 64K */
+        if ( size == 0 )
+        {
+            size = 0x10000;
+        }
+
+        if ( CURRENTMODULE->startoffset + size > MAXCODESIZE )
+        {
+ 			/* return TRUE in this case; module is OK, but we cannot link because total
+			   size > 64K */
+           error_at( objfilename, 0, ERR_MAX_CODESIZE, ( long )MAXCODESIZE );
+        }
+        else
+        {
+            inc_codesize( size );           /* BUG_0015 : was not updating codesize */
+        }
+    }
+
+    fclose( fp );
+	
+    return TRUE;
+}
+
+
+
+
 void
 AssembleSourceFile( void )
 {
@@ -594,6 +783,8 @@ AssembleSourceFile( void )
     /* try-catch to delete incomplete files in case of fatal error */
     try
     {
+        set_error_file( srcfilename );
+
         /* Create error file */
         open_error_file( err_filename_ext( srcfilename ) );
 
@@ -693,91 +884,12 @@ AssembleSourceFile( void )
 			       ( void ( * )( void * ) ) FreeSym );
         deleteall( &globalroot, 
 			       ( void ( * )( void * ) ) FreeSym );
-    }
-}
-
-/*-----------------------------------------------------------------------------
-* Assemble a source file or a '@' list file
-*----------------------------------------------------------------------------*/
-static void AssembleAny( char *file )
-{
-    FILE *atfile;
-    char *read_file;
-    int flag;
-
-    switch ( file[0] )
-    {
-        case '\0':
-            /* no file to include */
-            return;
-
-        case '-':
-            /* Illegal source file name */
-            error( ERR_ILLEGAL_SRC_FILENAME, file );
-            return;
-
-        case '@':
-            file++;     /* skip '@' marker */
-            atfile = fopen_err( file, "rb" );           /* CH_0012 */
-
-            /* read lines from atfile and recurse */
-            while ( ( read_file = Fetchfilename( atfile ) ) &&
-                    *read_file )
-            {
-                AssembleAny( read_file );
-            }
-
-            fclose( atfile );
-
-            return;             /* end of atfile */
-
-        default:
-            ; /* fall over to normal case */
-    }
-
-    /* normal case - assemble a asm source file */
-    z80asmfile = objfile = NULL;
-
-    init_codearea();            /* Pointer (PC) to store z80 instruction */
-
-    srcfilename = asm_filename_ext( file );      /* set '.asm' extension */
-    objfilename = obj_filename_ext( file );      /* set '.obj' extension */
-
-    /* Create module data structures for new file */
-    CURRENTMODULE = NewModule();
-    E4C_ASSERT( CURRENTMODULE != NULL );
-
-    /* Create first file record */
-    CURRENTFILE = Newfile( NULL, srcfilename );
-    E4C_ASSERT( CURRENTFILE != NULL );
-
-    if ( globaldef && CURRENTMODULE == modulehdr->first )
-    {
-        CreateDeffile();
-    }
-
-    flag = TestAsmFile();
-
-    if ( flag == 1 )            /* begin assembly... */
-    {
-        set_error_file( srcfilename );
-
-        AssembleSourceFile();
 
         if ( verbose )
         {
             putchar( '\n' );    /* separate module texts */
         }
     }
-    else if ( flag == -1 )      /* file open error */
-    {
-        throw( FatalErrorException, "file open error" );
-    }
-    else                        /* file is up-to-date */
-    {
-    }
-
-    set_error_null();           /* no more module in error messages */
 }
 
 
@@ -797,93 +909,6 @@ CloseFiles( void )
     }
 
     close_error_file();
-}
-
-
-int
-TestAsmFile( void )
-{
-    struct stat afile, ofile;
-
-    if ( datestamp )
-    {
-        /* assemble only updated files */
-        if ( stat( srcfilename, &afile ) == -1 )
-        {
-            return GetModuleSize();    /* source file not available... */
-        }
-        else if ( stat( objfilename, &ofile ) != -1 )
-            if ( afile.st_mtime <= ofile.st_mtime )
-            {
-                return GetModuleSize();    /* source is older than object module */
-            }
-    }
-
-    /* Open source file */
-    z80asmfile = fopen_err( srcfilename, "rb" );           /* CH_0012 */
-
-    return 1;                   /* assemble if no datestamp check */
-}
-
-
-
-/* return -1 if object file invalid, 0 if valid and module size is updated */
-int
-GetModuleSize( void )
-{
-    char fheader[9];
-    long fptr_modcode, fptr_modname;
-    size_t size;
-    FILE *fp;
-
-    /* open relocatable object file */
-    fp = fopen_err( objfilename, "rb" );           /* CH_0012 */
-    freadc_err( fheader, 8U, fp );        /* read first 8 chars from file into array */
-    fheader[8] = '\0';
-
-    if ( strcmp( fheader, Z80objhdr ) != 0 )
-    {
-        /* compare header of file */
-        error( ERR_NOT_OBJ_FILE, objfilename );      /* not an object file */
-        fclose( fp );
-        return -1;
-    }
-
-    fseek( fp, 8 + 2, SEEK_SET );              /* set file pointer to point at module name */
-    fptr_modname = fgetl_err( fp );   /* get file pointer to module name */
-    fseek( fp, fptr_modname, SEEK_SET );       /* set file pointer to module name */
-
-    size = fgetc_err( fp );
-    freadc_err( line, size, fp ); /* read module name */
-    line[size] = '\0';
-    CURRENTMODULE->mname = xstrdup( line );
-
-    fseek( fp, 26, SEEK_SET ); /* set file pointer to point at module code pointer */
-    fptr_modcode = fgetl_err( fp );   /* get file pointer to module code */
-
-    if ( fptr_modcode != -1 )
-    {
-        fseek( fp, fptr_modcode, SEEK_SET );   /* set file pointer to module code */
-        size = fgetw_err( fp );
-
-        /* BUG_0008 : fix size, if a zero was written, the moudule is actually 64K */
-        if ( size == 0 )
-        {
-            size = 0x10000;
-        }
-
-        if ( CURRENTMODULE->startoffset + size > MAXCODESIZE )
-        {
-            error_at( objfilename, 0, ERR_MAX_CODESIZE, ( long )MAXCODESIZE );
-        }
-        else
-        {
-            inc_codesize( size );           /* BUG_0015 : was not updating codesize */
-        }
-    }
-
-    fclose( fp );
-    return 0;
 }
 
 
@@ -1323,7 +1348,7 @@ int main( int argc, char *argv[] )
         /* Assemble file list */
         for ( ; i < argc; i++ )
         {
-            AssembleAny( argv[i] );
+            assemble_file( argv[i] );
         }
 
         /* Link */

@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.27 2013-04-22 21:23:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.28 2013-05-02 00:04:18 pauloscustodio Exp $
 $Log: z80asm.h,v $
-Revision 1.27  2013-04-22 21:23:38  pauloscustodio
+Revision 1.28  2013-05-02 00:04:18  pauloscustodio
+Cleanup assemble decision logic
+
+Revision 1.27  2013/04/22 21:23:38  pauloscustodio
 declare TOTALLINES
 
 Revision 1.26  2013/04/06 13:15:04  pauloscustodio
@@ -178,6 +181,8 @@ extern char *CreateLibfile( char *filename );
 extern char *GetLibfile( char *filename );
 extern void usage( void );
 extern long TOTALLINES;
+
+extern void assemble_file( char *filename );
 
 #endif
 
