@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.78 2013-05-02 00:04:18 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.79 2013-05-02 21:24:50 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.78  2013-05-02 00:04:18  pauloscustodio
+/* Revision 1.79  2013-05-02 21:24:50  pauloscustodio
+/* Cleanup assemble login
+/* Removed global vars srcfilename, objfilename
+/*
+/* Revision 1.78  2013/05/02 00:04:18  pauloscustodio
 /* Cleanup assemble decision logic
 /*
 /* Revision 1.77  2013/04/07 22:10:52  pauloscustodio
@@ -535,7 +539,6 @@ void ReleaseOwnedFile( struct usedfile *ownedfile );
 void ReleaseModules( void );
 void ReleaseExprns( struct expression *express );
 void CloseFiles( void );
-void AssembleSourceFile( void );
 symbol *createsym( symbol *symptr );
 struct module *NewModule( void );
 struct libfile *NewLibrary( void );
@@ -558,10 +561,6 @@ enum flag EOL, library, createlibrary;
 
 long TOTALLINES;
 char line[255], stringconst[255], ident[FILENAME_MAX + 1];
-
-char *srcfilename;
-char *objfilename;
-
 
 char Z80objhdr[] = "Z80RMF01";
 char objhdrprefix[] = "oomodnexprnamelibnmodc";
@@ -592,6 +591,7 @@ static void assemble_list( char *filename );
 static BOOL assemble_special( char *filename );
 static BOOL load_module_object( char *filename );
 static void query_assemble( char *src_filename, char *obj_filename );
+static void do_assemble( char *src_filename, char *obj_filename );
 
 /*-----------------------------------------------------------------------------
 *   Assemble one source file
@@ -600,7 +600,7 @@ static void query_assemble( char *src_filename, char *obj_filename );
 *----------------------------------------------------------------------------*/
 void assemble_file( char *filename )
 {
-    int flag;
+	char *src_filename, *obj_filename;
 
 	if ( assemble_special( filename ) )
 		return;								/* handled a special file */
@@ -610,21 +610,21 @@ void assemble_file( char *filename )
 
     init_codearea();            /* Pointer (PC) to store z80 instruction */
 
-    srcfilename = asm_filename_ext( filename );      /* set '.asm' extension */
-    objfilename = obj_filename_ext( filename );      /* set '.obj' extension */
+    src_filename = asm_filename_ext( filename );      /* set '.asm' extension */
+    obj_filename = obj_filename_ext( filename );      /* set '.obj' extension */
 
     /* Create module data structures for new file */
     CURRENTMODULE = NewModule();
 
     /* Create first file record */
-    CURRENTFILE = Newfile( NULL, srcfilename );
+    CURRENTFILE = Newfile( NULL, src_filename );
 
     if ( globaldef && CURRENTMODULE == modulehdr->first )
     {
         CreateDeffile();
     }
 
-	query_assemble( srcfilename, objfilename );
+	query_assemble( src_filename, obj_filename );
     set_error_null();           /* no more module in error messages */
 }
 
@@ -699,9 +699,129 @@ static void query_assemble( char *src_filename, char *obj_filename )
 	else 
 	{
 		/* Assemble source file */
-		z80asmfile = fopen_err( src_filename, "rb" );           /* CH_0012 */
-        AssembleSourceFile();
+        do_assemble( src_filename, obj_filename );
 	}
+}
+
+/*-----------------------------------------------------------------------------
+*	Assemble one file
+*----------------------------------------------------------------------------*/
+static void do_assemble( char *src_filename, char *obj_filename )
+{
+	char module_name[FILENAME_MAX];
+    int start_errors = get_num_errors();     /* count errors in this source file */
+
+    /* try-catch to delete incomplete files in case of fatal error */
+    try
+    {
+		z80asmfile = fopen_err( src_filename, "rb" );           /* CH_0012 */
+        set_error_file( src_filename );
+
+        /* Create error file */
+        open_error_file( err_filename_ext( src_filename ) );
+
+        if ( option_list || symfile )
+        {
+            /* Create LIST or SYMBOL file */
+			list_open( src_filename,
+						option_list ? 
+							  FILEEXT_LST           /* set '.lst' extension */
+							: FILEEXT_SYM );		/* set '.sym' extension */
+        }
+
+        /* Create relocatable object file */
+        objfile = fopen_err( obj_filename, "w+b" );           /* CH_0012 */
+        fwritec_err( Z80objhdr,    strlen( Z80objhdr ),    objfile );
+        fwritec_err( objhdrprefix, strlen( objhdrprefix ), objfile );
+
+        set_PC( 0 );
+        copy( staticroot, &CURRENTMODULE->localroot, 
+			  ( int ( * )( void *, void * ) ) cmpidstr, 
+			  ( void * ( * )( void * ) ) createsym );
+
+        /* Create standard 'ASMPC' identifier */
+        DefineDefSym( ASSEMBLERPC, get_PC(), 0, &globalroot );
+
+        if ( verbose )
+        {
+            printf( "Assembling '%s'...\nPass1...\n", src_filename );
+        }
+
+        Z80pass1();
+		list_end();                    /* GetSymPtr will only generate page references until list_end() */
+
+        if ( CURRENTMODULE->mname == NULL )     /* Module name must be defined */
+        {
+            path_basename( module_name, src_filename );
+            path_remove_ext( module_name );
+            strtoupper( module_name );
+            CURRENTMODULE->mname = xstrdup( module_name );
+        }
+
+        set_error_null();
+        set_error_module( CURRENTMODULE->mname );
+
+        if ( start_errors == get_num_errors() )
+        {
+            if ( verbose )
+            {
+                puts( "Pass2..." );
+            }
+
+            Z80pass2();
+        }
+    }
+
+    finally
+    {
+        /*
+         * Source file no longer needed (file could already have been closed, if fatal error occurred during INCLUDE
+         * processing).
+         */
+
+        set_error_null();
+
+        if ( z80asmfile != NULL )
+        {
+            fclose( z80asmfile );
+            z80asmfile = NULL;
+        }
+
+		/* remove list file if more errors now than before */
+		list_close( start_errors == get_num_errors() );
+
+        if ( objfile != NULL )
+        {
+            fclose( objfile );
+            objfile = NULL;
+        }
+
+        if ( start_errors != get_num_errors() )
+        {
+            /* remove incomplete object file */
+            remove( obj_filename );
+        }
+
+        close_error_file();
+
+        if ( globaldef )
+        {
+            inorder( globalroot, ( void ( * )( void * ) ) WriteGlobal );
+            fputc_err( '\n', deffile );    /* separate DEFC lines for each module */
+        }
+
+        deleteall( &CURRENTMODULE->localroot, 
+				   ( void ( * )( void * ) ) FreeSym );
+        deleteall( &CURRENTMODULE->notdeclroot, 
+			       ( void ( * )( void * ) ) FreeSym );
+        deleteall( &globalroot, 
+			       ( void ( * )( void * ) ) FreeSym );
+
+        if ( verbose )
+        {
+            putchar( '\n' );    /* separate module texts */
+        }
+    }
 }
 
 /*-----------------------------------------------------------------------------
@@ -758,7 +878,7 @@ BOOL load_module_object( char *filename )
         {
  			/* return TRUE in this case; module is OK, but we cannot link because total
 			   size > 64K */
-           error_at( objfilename, 0, ERR_MAX_CODESIZE, ( long )MAXCODESIZE );
+           error_at( filename, 0, ERR_MAX_CODESIZE, ( long )MAXCODESIZE );
         }
         else
         {
@@ -772,125 +892,6 @@ BOOL load_module_object( char *filename )
 }
 
 
-
-
-void
-AssembleSourceFile( void )
-{
-	char module_name[FILENAME_MAX];
-    int start_errors = get_num_errors();     /* count errors in this source file */
-
-    /* try-catch to delete incomplete files in case of fatal error */
-    try
-    {
-        set_error_file( srcfilename );
-
-        /* Create error file */
-        open_error_file( err_filename_ext( srcfilename ) );
-
-        if ( option_list || symfile )
-        {
-            /* Create LIST or SYMBOL file */
-			list_open( srcfilename,
-						option_list ? 
-							  FILEEXT_LST           /* set '.lst' extension */
-							: FILEEXT_SYM );		/* set '.sym' extension */
-        }
-
-        /* Create relocatable object file */
-        objfile = fopen_err( objfilename, "w+b" );           /* CH_0012 */
-        fwritec_err( Z80objhdr,    strlen( Z80objhdr ),    objfile );
-        fwritec_err( objhdrprefix, strlen( objhdrprefix ), objfile );
-
-        set_PC( 0 );
-        copy( staticroot, &CURRENTMODULE->localroot, 
-			  ( int ( * )( void *, void * ) ) cmpidstr, 
-			  ( void * ( * )( void * ) ) createsym );
-
-        /* Create standard 'ASMPC' identifier */
-        DefineDefSym( ASSEMBLERPC, get_PC(), 0, &globalroot );
-
-        if ( verbose )
-        {
-            printf( "Assembling '%s'...\nPass1...\n", srcfilename );
-        }
-
-        Z80pass1();
-		list_end();                    /* GetSymPtr will only generate page references until list_end() */
-
-        if ( CURRENTMODULE->mname == NULL )     /* Module name must be defined */
-        {
-            path_basename( module_name, srcfilename );
-            path_remove_ext( module_name );
-            strtoupper( module_name );
-            CURRENTMODULE->mname = xstrdup( module_name );
-        }
-
-        set_error_null();
-        set_error_module( CURRENTMODULE->mname );
-
-        if ( start_errors == get_num_errors() )
-        {
-            if ( verbose )
-            {
-                puts( "Pass2..." );
-            }
-
-            Z80pass2();
-        }
-    }
-
-    finally
-    {
-        /*
-         * Source file no longer needed (file could already have been closed, if fatal error occurred during INCLUDE
-         * processing).
-         */
-
-        set_error_null();
-
-        if ( z80asmfile != NULL )
-        {
-            fclose( z80asmfile );
-            z80asmfile = NULL;
-        }
-
-		/* remove list file if more errors now than before */
-		list_close( start_errors == get_num_errors() );
-
-        if ( objfile != NULL )
-        {
-            fclose( objfile );
-            objfile = NULL;
-        }
-
-        if ( start_errors != get_num_errors() )
-        {
-            /* remove incomplete object file */
-            remove( objfilename );
-        }
-
-        close_error_file();
-
-        if ( globaldef )
-        {
-            inorder( globalroot, ( void ( * )( void * ) ) WriteGlobal );
-            fputc_err( '\n', deffile );    /* separate DEFC lines for each module */
-        }
-
-        deleteall( &CURRENTMODULE->localroot, 
-				   ( void ( * )( void * ) ) FreeSym );
-        deleteall( &CURRENTMODULE->notdeclroot, 
-			       ( void ( * )( void * ) ) FreeSym );
-        deleteall( &globalroot, 
-			       ( void ( * )( void * ) ) FreeSym );
-
-        if ( verbose )
-        {
-            putchar( '\n' );    /* separate module texts */
-        }
-    }
-}
 
 
 void

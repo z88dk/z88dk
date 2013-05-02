@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.55 2013-04-07 23:34:19 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.56 2013-05-02 21:24:50 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.55  2013-04-07 23:34:19  pauloscustodio
+/* Revision 1.56  2013-05-02 21:24:50  pauloscustodio
+/* Cleanup assemble login
+/* Removed global vars srcfilename, objfilename
+/*
+/* Revision 1.55  2013/04/07 23:34:19  pauloscustodio
 /* CH_0020 : ERR_ORG_NOT_DEFINED if no ORG given
 /* z80asm no longer asks for an ORG address from the standard input
 /* if one is not given either by an ORG statement or a -r option;
@@ -616,6 +620,8 @@ LinkModules( void )
     char fheader[9];
     size_t origin;
     struct module *lastobjmodule;
+	char *obj_filename;
+
     option_symtable = listing = OFF;
     linkhdr = NULL;
 
@@ -669,17 +675,17 @@ LinkModules( void )
             }
 
             /* overwrite '.asm' extension with * '.obj' */
-            objfilename = obj_filename_ext( CURRENTFILE->fname );
+            obj_filename = obj_filename_ext( CURRENTFILE->fname );
 
             /* open relocatable file for reading */
-            z80asmfile = fopen_err( objfilename, "rb" );           /* CH_0012 */
+            z80asmfile = fopen_err( obj_filename, "rb" );           /* CH_0012 */
             freadc_err( fheader, 8U, z80asmfile );             /* read first 6 chars from file into array */
             fheader[8] = '\0';
 
             /* compare header of file */
             if ( strcmp( fheader, Z80objhdr ) != 0 )
             {
-                error( ERR_NOT_OBJ_FILE, objfilename );  /* not a object     file */
+                error( ERR_NOT_OBJ_FILE, obj_filename );  /* not a object     file */
                 fclose( z80asmfile );
                 z80asmfile = NULL;
                 break;
@@ -705,7 +711,7 @@ LinkModules( void )
 
                         if ( CURRENTMODULE->origin == 65535U )
                         {
-							error( ERR_ORG_NOT_DEFINED, objfilename );  /* no ORG */
+							error( ERR_ORG_NOT_DEFINED, obj_filename );  /* no ORG */
 							fclose( z80asmfile );
 							z80asmfile = NULL;
 							break;
@@ -722,7 +728,7 @@ LinkModules( void )
             fclose( z80asmfile );
             z80asmfile = NULL;
 
-            LinkModule( objfilename, 0 );       /* link code & read name definitions */
+            LinkModule( obj_filename, 0 );       /* link code & read name definitions */
 
             CURRENTMODULE = CURRENTMODULE->nextmodule;  /* get next module, if any */
 
@@ -1188,7 +1194,7 @@ CreateBinFile( void )
         }
     }
 
-    /* binary output to srcfilename.bin */
+    /* binary output to filename.bin */
     binaryfile = fopen_err( sstr_data( filename ), "wb" );         /* CH_0012 */
 
     if ( autorelocate == ON && totaladdr != 0 )
@@ -1380,8 +1386,8 @@ CreateDeffile( void )
     /* use first module filename to create global definition file */
 	path_replace_ext( globaldefname, modulehdr->first->cfile->fname, FILEEXT_DEF ); /* set '.def' extension */
 
-        /* Create DEFC file with global label declarations */
-        deffile = fopen_err( globaldefname, "w" );           /* CH_0012 */
+    /* Create DEFC file with global label declarations */
+    deffile = fopen_err( globaldefname, "w" );           /* CH_0012 */
 }
 
 

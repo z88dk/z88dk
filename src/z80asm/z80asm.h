@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.28 2013-05-02 00:04:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.29 2013-05-02 21:24:50 pauloscustodio Exp $
 $Log: z80asm.h,v $
-Revision 1.28  2013-05-02 00:04:18  pauloscustodio
+Revision 1.29  2013-05-02 21:24:50  pauloscustodio
+Cleanup assemble login
+Removed global vars srcfilename, objfilename
+
+Revision 1.28  2013/05/02 00:04:18  pauloscustodio
 Cleanup assemble decision logic
 
 Revision 1.27  2013/04/22 21:23:38  pauloscustodio
@@ -146,9 +150,6 @@ $History: Z80ASM.C $
 #include "types.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-extern char *srcfilename;
-extern char *objfilename;
 
 #define REG16_BC   0
 #define REG16_DE   1
