@@ -3,7 +3,7 @@
  *
  *      Various compiler file i/o routines
  *
- *      $Id: io.c,v 1.7 2009-06-21 21:16:52 dom Exp $
+ *      $Id: io.c,v 1.8 2013-05-06 13:24:57 stefano Exp $
  */
 
 #include "ccdefs.h"
@@ -141,7 +141,7 @@ t_buffer * startbuffer(int blocks)
 	buf->start = (char *) mymalloc(size);
 	buf->end = buf->start + blocks * size - 1;
 	buf->next = buf->start;
-	buf->before = currentbuffer;
+	buf->before = NULL;
 	currentbuffer = buf;
 	return buf;
 }
@@ -149,14 +149,14 @@ t_buffer * startbuffer(int blocks)
 void suspendbuffer(void)
 {
 	if (currentbuffer)
-		currentbuffer = currentbuffer->before;
+		currentbuffer = (t_buffer *)currentbuffer->before;
 }
 
 void clearbuffer(t_buffer *buf)
 {
 	if (! buf || ! buf->start) return;
 	if (currentbuffer == buf)
-		currentbuffer = currentbuffer->before;
+		currentbuffer = (t_buffer *)currentbuffer->before;
 	* buf->next = '\0';
 	outstr(buf->start);
 	free(buf->start);

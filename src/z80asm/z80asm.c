@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.80 2013-05-06 12:13:32 stefano Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.81 2013-05-06 13:24:57 stefano Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.80  2013-05-06 12:13:32  stefano
+/* Revision 1.81  2013-05-06 13:24:57  stefano
+/* *** empty log message ***
+/*
+/* Revision 1.80  2013/05/06 12:13:32  stefano
 /* Excluded the check to see if we have a source file in case it is asked to build
 /* only the updated files (it could be a C compiled program).
 /*
@@ -689,7 +692,7 @@ static void query_assemble( char *src_filename, char *obj_filename )
 	int obj_stat_result;
 	
 	/* get time stamp of files, error if source not found */
-    if ( datestamp )
+    if ( !datestamp )
 	    stat_err(           src_filename, &src_stat );
 	obj_stat_result = stat( obj_filename, &obj_stat );
 	
