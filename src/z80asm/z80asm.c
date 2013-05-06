@@ -14,9 +14,18 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.81 2013-05-06 13:24:57 stefano Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.82 2013-05-06 22:06:22 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.81  2013-05-06 13:24:57  stefano
+/* Revision 1.82  2013-05-06 22:06:22  pauloscustodio
+/* BUG_0033 : -d option fails if .asm does not exist
+/* When building test.o from test.c, the test.asm file is removed by zcc.
+/* If the .o is then linked into a library with the -d option to skip
+/* assembling, z80asm fails with error
+/* "Cannot open file 'test.asm' for reading".
+/* Bug introduced when replaced TestAsmFile() by query_assemble() in
+/* z80asm.c 1.78.
+/*
+/* Revision 1.81  2013/05/06 13:24:57  stefano
 /* *** empty log message ***
 /*
 /* Revision 1.80  2013/05/06 12:13:32  stefano
@@ -689,16 +698,19 @@ static void assemble_list( char *filename )
 static void query_assemble( char *src_filename, char *obj_filename )
 {
     struct stat src_stat, obj_stat;
-	int obj_stat_result;
+	int src_stat_result, obj_stat_result;
 	
 	/* get time stamp of files, error if source not found */
-    if ( !datestamp )
-	    stat_err(           src_filename, &src_stat );
+    src_stat_result = stat( src_filename, &src_stat );	/* BUG_0033 */
 	obj_stat_result = stat( obj_filename, &obj_stat );
 	
     if ( datestamp &&								/* -d option */
 		 obj_stat_result >= 0 &&					/* object file exists */
-		 src_stat.st_mtime <= obj_stat.st_mtime &&	/* source older than object */
+		 ( src_stat_result >= 0 ?						/* if source file exists, ... */
+			src_stat.st_mtime <= obj_stat.st_mtime		/* ... source older than object */
+			: TRUE										/* ... else source does not exist, but object exists
+															   --> consider up-to-date (e.g. test.c -> test.o) */
+		 ) &&
 		 load_module_object( obj_filename )			/* object file valid and size loaded */
 	   )
     {
