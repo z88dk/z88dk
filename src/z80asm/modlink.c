@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.56 2013-05-02 21:24:50 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.57 2013-05-06 23:02:12 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.56  2013-05-02 21:24:50  pauloscustodio
+/* Revision 1.57  2013-05-06 23:02:12  pauloscustodio
+/* BUG_0034 : If assembly process fails with fatal error, invalid library is kept
+/* Option -x creates an empty library file (just the header). If the
+/* assembly process fails with a fatal errror afterwards, the library file
+/* is not deleted.
+/*
+/* Revision 1.56  2013/05/02 21:24:50  pauloscustodio
 /* Cleanup assemble login
 /* Removed global vars srcfilename, objfilename
 /*
@@ -377,7 +383,7 @@ int LinkLibModule( struct libfile *library, long curmodule, char *modname );
 int SearchLibfile( struct libfile *curlib, char *modname );
 char *ReadName( FILE *file );
 void redefinedmsg( void );
-void CreateLib( void );
+void CreateLib( char *lib_filename );
 void SearchLibraries( char *modname );
 void LinkModules( void );
 void ModuleExpr( void );
@@ -393,9 +399,10 @@ void ReleaseLinkInfo( void );
 static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname );
 
 /* global variables */
-extern FILE *z80asmfile, *deffile, *libfile;
+extern FILE *z80asmfile, *deffile;
 extern char line[], ident[];
 extern char Z80objhdr[];
+extern char Z80libhdr[];
 extern enum symbols sym, GetSym( void );
 extern enum flag EOL, library;
 extern byte_t reloc_routine[];
@@ -1248,24 +1255,29 @@ CreateBinFile( void )
 
 
 void
-CreateLib( void )
+CreateLib( char *lib_filename )
 {
     long Codesize;
-    FILE *objectfile = NULL;
-    long fptr;
+    FILE *lib_file = NULL;
+    FILE *obj_file = NULL;
     char *filebuffer = NULL;
-	char filename[FILENAME_MAX];
+    long fptr;
+	char obj_filename[FILENAME_MAX];
 
     if ( verbose )
     {
         puts( "Creating library..." );
     }
 
-    CURRENTMODULE = modulehdr->first;
+	CURRENTMODULE = modulehdr->first;
 
     try
     {
-        open_error_file( err_filename_ext( libfilename ) );
+		/* create library as BINARY file */
+		lib_file = fopen_err( lib_filename, "w+b" );          /* CH_0012 */
+		fwritec_err( Z80libhdr, 8U, lib_file );				/* write library header */
+
+        open_error_file( err_filename_ext( lib_filename ) );
 
         do
         {
@@ -1273,19 +1285,19 @@ CreateLib( void )
             set_error_module( CURRENTMODULE->mname );
 
 			/* replace fname with the .obj extension */
-			path_replace_ext( filename, CURRENTFILE->fname, get_obj_ext() );
+			path_replace_ext( obj_filename, CURRENTFILE->fname, get_obj_ext() );
 			xfree( CURRENTFILE->fname );
-			CURRENTFILE->fname = xstrdup( filename );
+			CURRENTFILE->fname = xstrdup( obj_filename );
 
-            objectfile = fopen_err( CURRENTFILE->fname, "rb" );           /* CH_0012 */
-            fseek( objectfile, 0L, SEEK_END );  /* file pointer to end of file */
-            Codesize = ftell( objectfile );
-            fseek( objectfile, 0L, SEEK_SET );  /* file pointer to start of file */
+            obj_file = fopen_err( CURRENTFILE->fname, "rb" );           /* CH_0012 */
+            fseek( obj_file, 0L, SEEK_END );  /* file pointer to end of file */
+            Codesize = ftell( obj_file );
+            fseek( obj_file, 0L, SEEK_SET );  /* file pointer to start of file */
 
             filebuffer = ( char * ) xmalloc( ( size_t ) Codesize );
-            freadc_err( filebuffer, Codesize, objectfile ); /* load object file */
-            fclose( objectfile );
-            objectfile = NULL;
+            freadc_err( filebuffer, Codesize, obj_file ); /* load object file */
+            fclose( obj_file );
+            obj_file = NULL;
 
             if ( memcmp( filebuffer, Z80objhdr, 8U ) != 0 )
             {
@@ -1295,21 +1307,21 @@ CreateLib( void )
 
             if ( verbose )
             {
-                printf( "<%s> module at %04lX.\n", CURRENTFILE->fname, ftell( libfile ) );
+                printf( "<%s> module at %04lX.\n", CURRENTFILE->fname, ftell( lib_file ) );
             }
 
             if ( CURRENTMODULE->nextmodule == NULL )
             {
-                fputl_err( -1, libfile );    /* this is the last module */
+                fputl_err( -1, lib_file );    /* this is the last module */
             }
             else
             {
-                fptr = ftell( libfile ) + 4 + 4;
-                fputl_err( fptr + Codesize, libfile ); /* file pointer to next module */
+                fptr = ftell( lib_file ) + 4 + 4;
+                fputl_err( fptr + Codesize, lib_file ); /* file pointer to next module */
             }
 
-            fputl_err( Codesize, libfile );    /* size of this module */
-            fwritec_err( filebuffer, ( size_t ) Codesize, libfile ); /* write module to library */
+            fputl_err( Codesize, lib_file );    /* size of this module */
+            fwritec_err( filebuffer, ( size_t ) Codesize, lib_file ); /* write module to library */
             xfree( filebuffer );
 
             CURRENTMODULE = CURRENTMODULE->nextmodule;
@@ -1319,19 +1331,20 @@ CreateLib( void )
 
     finally
     {
-        set_error_null();
+        if ( obj_file )
+            fclose( obj_file );
+
+        if ( lib_file )
+			fclose( lib_file );
+
+        if ( get_num_errors() )
+            remove( lib_filename );
+
+		set_error_null();
         close_error_file();
 
-        if ( objectfile )
-        {
-            fclose( objectfile );
-            objectfile = NULL;
-        }
-
         if ( filebuffer )
-        {
             xfree( filebuffer );
-        }
     }
 }
 

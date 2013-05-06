@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.29 2013-05-02 21:24:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.30 2013-05-06 23:02:12 pauloscustodio Exp $
 $Log: z80asm.h,v $
-Revision 1.29  2013-05-02 21:24:50  pauloscustodio
+Revision 1.30  2013-05-06 23:02:12  pauloscustodio
+BUG_0034 : If assembly process fails with fatal error, invalid library is kept
+Option -x creates an empty library file (just the header). If the
+assembly process fails with a fatal errror afterwards, the library file
+is not deleted.
+
+Revision 1.29  2013/05/02 21:24:50  pauloscustodio
 Cleanup assemble login
 Removed global vars srcfilename, objfilename
 
@@ -175,7 +181,7 @@ extern char ident[];
 extern char separators[];
 extern avltree *globalroot, *staticroot;
 extern struct module *CURRENTMODULE;
-extern FILE *z80asmfile, *deffile, *libfile;
+extern FILE *z80asmfile, *deffile;
 
 extern char *Fetchfilename( FILE *fptr );
 extern char *CreateLibfile( char *filename );

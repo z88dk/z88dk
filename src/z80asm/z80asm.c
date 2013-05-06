@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.82 2013-05-06 22:06:22 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.83 2013-05-06 23:02:12 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.82  2013-05-06 22:06:22  pauloscustodio
+/* Revision 1.83  2013-05-06 23:02:12  pauloscustodio
+/* BUG_0034 : If assembly process fails with fatal error, invalid library is kept
+/* Option -x creates an empty library file (just the header). If the
+/* assembly process fails with a fatal errror afterwards, the library file
+/* is not deleted.
+/*
+/* Revision 1.82  2013/05/06 22:06:22  pauloscustodio
 /* BUG_0033 : -d option fails if .asm does not exist
 /* When building test.o from test.c, the test.asm file is removed by zcc.
 /* If the .o is then linked into a library with the -d option to skip
@@ -533,7 +539,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 void RemovePfixlist( struct expr *pfixexpr );
 void Z80pass1( void );
 void Z80pass2( void );
-void CreateLib( void );
+void CreateLib( char *lib_filename );
 void LinkModules( void );
 void DeclModuleName( void );
 void FreeSym( symbol *node );
@@ -560,7 +566,7 @@ struct module *NewModule( void );
 struct libfile *NewLibrary( void );
 
 
-FILE *z80asmfile, *objfile, *deffile, *libfile;
+FILE *z80asmfile, *objfile, *deffile;
 
 /* BUG_0001 array ssym[] needs to have one element per character in
  * separators, plus one newline to match the final '\0' just in case it is
@@ -933,7 +939,7 @@ CloseFiles( void )
 }
 
 
-/* create library file, return name in strpool */
+/* define name of library file to create, return name in strpool */
 char *CreateLibfile( char *filename )
 {
     size_t len;
@@ -960,10 +966,7 @@ char *CreateLibfile( char *filename )
         }
     }
 
-    /* create library as BINARY file */
-    libfile = fopen_err( found_libfilename, "w+b" );           /* CH_0012 */
     createlibrary = ON;
-    fwritec_err( Z80libhdr, 8U, libfile );     /* write library header */
 
 	return found_libfilename;
 }
@@ -1381,27 +1384,10 @@ int main( int argc, char *argv[] )
             deffile = NULL;
         }
 
-        /* try-catch to delete lib file in case of error */
-        try
+        /* Create library */
+        if ( createlibrary && ! get_num_errors() )
         {
-            if ( createlibrary && ! get_num_errors() )
-            {
-                CreateLib();
-            }
-        }
-
-        finally
-        {
-            if ( createlibrary )
-            {
-                fclose( libfile );
-                libfile = NULL;
-
-                if ( get_num_errors() )
-                {
-                    remove( libfilename );
-                }
-            }
+            CreateLib( libfilename );
         }
 
 
