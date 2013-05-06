@@ -3,6 +3,7 @@ isin
 i2f
 f2i
 div256
+ellipse
 mesh_new
 mesh_delete
 vector_cross_product

@@ -37,7 +37,7 @@ extern int __LIB__ f2i (long v);
 //#define wgavgfx(x, y, w)	(mulfx(i2f(1) - w, x) + mulfx(w, y))
 
 
-#define PI 3.14159265358979
+#define PI   3.141592
 
 /// represents a vector in 3 dimensions
 typedef struct {
@@ -135,11 +135,20 @@ extern void __LIB__ object_apply_transformations(object_t* obj, vector_t* pbuffe
 /*
 	Integer sin functions taken from the lib3d library, OZ7xx DK
 	by Hamilton, Green and Pruss
-	isin and icos return a value between -16384 and +16384
+	isin and icos return a value between -254 and +255
+	(changed by Stefano, originally it was +/- 16384)
 */
 
 extern int __LIB__ __FASTCALL__ isin(unsigned int degrees); /* input must be between 0 and 360 */
 extern int __LIB__ __FASTCALL__ icos(unsigned int degrees); /* input must be between 0 and 360 */
-extern int __LIB__  div256(long value); /* divide by 16384 */
+extern int __LIB__  div256(long value); /* divide by 255 */
+
+
+/* Monochrome graphics functions depending on lib3d portions */
+/* they extend the <graphics.h> capability */
+
+/* Draw an ellipse arc delimited by 'startangle' and 'endangle' (deg) */
+extern int __LIB__ ellipse(int cx, int cy, int sa, int ea, int xradius, int yradius);
+
 
 #endif /* __LIB3D_H__ */
