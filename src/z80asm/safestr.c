@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Safe strings : char array with the size
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.c,v 1.7 2013-05-02 21:21:50 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.c,v 1.8 2013-05-07 22:10:56 pauloscustodio Exp $ */
 /* $Log: safestr.c,v $
-/* Revision 1.7  2013-05-02 21:21:50  pauloscustodio
+/* Revision 1.8  2013-05-07 22:10:56  pauloscustodio
+/* sstr_getchars(): get N characters from input, return FALSE on EOF
+/*
+/* Revision 1.7  2013/05/02 21:21:50  pauloscustodio
 /* warnings
 /*
 /* Revision 1.6  2013/05/01 22:23:39  pauloscustodio
@@ -173,6 +176,20 @@ void sstr_normalize_eol( sstr_t *self )
 {
 	normalize_eol( sstr_data(self) );
 	sstr_sync_len(self);
+}
+
+/*-----------------------------------------------------------------------------
+*   get N characters from input, return FALSE on EOF
+*----------------------------------------------------------------------------*/
+BOOL sstr_getchars( sstr_t *self, FILE *fp, int num_chars )
+{
+	int c;
+	
+	sstr_clear( self );
+	while ( num_chars-- > 0 && (c = getc( fp )) != EOF )
+		sstr_chcat( self, c );
+		
+	return c == EOF ? FALSE : TRUE;
 }
 
 /*-----------------------------------------------------------------------------

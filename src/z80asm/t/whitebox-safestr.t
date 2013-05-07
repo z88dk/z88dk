@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-safestr.t,v 1.5 2013-05-01 22:23:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-safestr.t,v 1.6 2013-05-07 22:10:56 pauloscustodio Exp $
 # $Log: whitebox-safestr.t,v $
-# Revision 1.5  2013-05-01 22:23:39  pauloscustodio
+# Revision 1.6  2013-05-07 22:10:56  pauloscustodio
+# sstr_getchars(): get N characters from input, return FALSE on EOF
+#
+# Revision 1.5  2013/05/01 22:23:39  pauloscustodio
 # Added chomp and normalize_eol
 #
 # Revision 1.4  2013/05/01 21:37:50  pauloscustodio
@@ -72,6 +75,21 @@ char * test_vfcat(sstr_t *self, char *format, ...)
 	return sstr_vfcat(self, format, argptr);
 }
 
+void dump_sstr( sstr_t *s )
+{
+	int j;
+	
+	for ( j = 0; j < sstr_len( s ) ; j++ )
+	{
+		if ( sstr_data( s )[j] > ' ' )
+			warn("%c", sstr_data( s )[j] );
+		else
+			warn("<%02X>", sstr_data( s )[j] );
+	}
+	warn("\n");
+}
+
+
 SSTR_DEFINE(global, SZ);
 
 INIT
@@ -79,9 +97,10 @@ INIT
 	SSTR_DEFINE( s, SZ );
 	SSTR_DEFINE_REF( s2, buffer, sizeof(buffer) );
 	char filename[FILENAME_MAX];
-	int i, j;
+	int i;
 	FILE *fp;
 	char *p;
+	BOOL b;
 
 	TEST(s, "");
 	p = sstr_set(s, "");
@@ -206,7 +225,6 @@ INIT
 	if (s2->data != buffer)				ERROR;
 	if (s2->size != 5)					ERROR;
 
-	
 	// chomp
 	sstr_set(s, "\rx\r\n");
 	sstr_chomp(s);
@@ -245,6 +263,17 @@ INIT
 	sstr_normalize_eol(s);
 	TEST(s, "A\n");
 	
+	// getchars
+	sprintf( filename, "test7.asm" );
+	fp = fopen( filename, "rb" );
+	if ( fp == NULL ) ERROR;
+	warn("Read file %s:\n", filename );
+	do
+	{
+		b = sstr_getchars( s, fp, 3 );
+		warn("getchars(3) got %d, ", b);
+		dump_sstr( s );
+	} while ( b );
 	
 	// getline
 	for ( i = 1 ; 1 ; i++ )
@@ -257,16 +286,7 @@ INIT
 		warn("Read file %s:\n", filename );
 		
 		while ( sstr_getline( s, fp ) )
-		{
-			for ( j = 0; j < sstr_len( s ) ; j++ )
-			{
-				if ( sstr_data( s )[j] > ' ' )
-					warn("%c", sstr_data( s )[j] );
-				else
-					warn("<%02X>", sstr_data( s )[j] );
-			}
-			warn("\n");
-		}
+			dump_sstr( s );
 		
 		sstr_set( s, "hello" );
 		if ( sstr_getline( s, fp ) )	ERROR;
@@ -281,6 +301,15 @@ INIT
 END
 
 t_run_module([], "", <<'END', 0);
+Read file test7.asm:
+getchars(3) got 1, ABC
+getchars(3) got 1, DEF
+getchars(3) got 1, GHI
+getchars(3) got 1, J<0A>a
+getchars(3) got 1, bcd
+getchars(3) got 1, efg
+getchars(3) got 1, hij
+getchars(3) got 0, <0A>
 Read file test1.asm:
 Read file test2.asm:
 A<0A>
