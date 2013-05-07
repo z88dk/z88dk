@@ -1,5 +1,5 @@
 @echo off
-rem $Id: gccmake.bat,v 1.7 2013-05-02 21:20:14 pauloscustodio Exp $
+rem $Id: gccmake.bat,v 1.8 2013-05-07 22:43:24 pauloscustodio Exp $
 
 echo *******************
 echo * Building z80asm *
@@ -38,6 +38,6 @@ gcc -c -o symbols.o              symbols.c
 gcc -c -o z80asm.o               z80asm.c
 gcc -c -o z80instr.o             z80instr.c
 gcc -c -o z80pass.o              z80pass.c
-gcc -o z80asm *.o
+gcc -o z80asm.exe *.o
 copy z80asm.exe ..\..\bin
 del z80asm.exe

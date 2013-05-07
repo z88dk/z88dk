@@ -12,9 +12,13 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.54 2013-05-02 21:20:14 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.55 2013-05-07 22:43:24 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.54  2013-05-02 21:20:14  pauloscustodio
+# Revision 1.55  2013-05-07 22:43:24  pauloscustodio
+# Build gccmake.bat so that CVS Id is not always changed, causing file to be always
+#  modified
+#
+# Revision 1.54  2013/05/02 21:20:14  pauloscustodio
 # depends
 #
 # Revision 1.53  2013/05/01 19:03:45  pauloscustodio
@@ -291,8 +295,8 @@ install:
 	install $(TARGET) $(PREFIX)/bin/
 
 clean :
-	$(RM) *.o *.exe *~ *.bak *.orig core $(TARGET) test* t/*.tmp
-	$(RM) -rf Debug Release
+	$(RM) *.o *.exe *~ *.bak *.orig core $(TARGET) test* t/*.tmp zcc_opt.def
+	$(RM) -rf Debug Release x1 x2 x3
 
 # test
 test : $(TARGET)
@@ -310,11 +314,22 @@ $(MSVC_TARGET) : $(wildcard *.c) $(wildcard *.h)
 astyle:
 	$(ASTYLE) *.c *.h
 
-# gccmake.bat
+# gccmake.bat - work arround impossibility of writing a '$' in the perl code
 gccmake.bat : Makefile
-	perl -e "print \
-				'@echo off', qq(\n), \
-				'rem ', '$$', 'Id', '$$', qq(\n), \
+	perl -e " \
+			print \
+				'@echo off', qq(\n); \
+			@printed = (); \
+			open(F, 'gccmake.bat'); \
+			while (<F>) { \
+				next unless /^rem.*Id/; \
+				push @printed, 1; \
+				print; \
+				last; \
+			} \
+			close(F); \
+			@printed or print 'rem ','$$','Id','$$',qq(\n); \
+			print \
 				qq(\n), \
 				'echo *******************', qq(\n), \
 				'echo * Building z80asm *', qq(\n), \
@@ -330,7 +345,7 @@ gccmake.bat : Makefile
 				print qq(\n); \
 			} \
 			print \
-				'gcc -o z80asm *.o', qq(\n), \
+				'gcc -o z80asm.exe *.o', qq(\n), \
 				'copy z80asm.exe ..\\..\\bin', qq(\n), \
 				'del z80asm.exe', qq(\n); \
 		" $(OBJS) > gccmake.bat.new
