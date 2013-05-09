@@ -14,9 +14,6 @@
 extern __LIB__ utoi() ;
 
 
-#define ERR -1
-
-
 int vfprintf_fp(FILE *fd, unsigned char *ctl,void *ap)
 {
 	int i, width, prec, preclen, len, pf_count=0 ;
@@ -63,22 +60,19 @@ int vfprintf_fp(FILE *fd, unsigned char *ctl,void *ap)
 		c = *cx++ ;
 		i = *ap;
 		ap -= sizeof(int);
+
 		switch(c) {
 		case 'l':
-            c = *cx++;
-            switch ( c ) {
-            case 'd':
-            case 'i':
-            case 'u':
-            case 'x':
-                ltoa_any(*(long *)ap,str,20,( c == 'x' ? 16 : 10 ),((c == 'd')||(c == 'i')));
-                ap -= sizeof(int);
-                break;
-            default:
-                continue;
-            }
-            break;
-
+		    c = *cx++;
+			if ((c == 'd') || (c == 'i') || (c == 'u') || (c == 'x')) {
+		        ltoa_any(*(long *)ap,str,20,( c == 'x' ? 16 : 10 ),((c == 'd')||(c == 'i')));
+		        ap -= sizeof(int);
+		    } else
+		        continue ;
+		    break;
+        case 'u' :
+            ltoa_any((unsigned long)i,str,7,10,0);
+            break ;
         case 'd' :
         case 'i' :
             ltoa_any(i,str,7,10,1);
@@ -92,10 +86,9 @@ int vfprintf_fp(FILE *fd, unsigned char *ctl,void *ap)
             break ;
         case 's' :
             sptr = (unsigned char *)i ;
+            if (sptr == 0) sptr = "(null)";
             break ;
-        case 'u' :
-            ltoa_any((unsigned long)i,str,7,10,0);
-            break ;
+
         default:
             if ( preclen == 0 )
                 prec = 6 ;
@@ -112,13 +105,14 @@ int vfprintf_fp(FILE *fd, unsigned char *ctl,void *ap)
             else
                 continue ;
 		}
+
 		ctl = cx ; /* accept conversion spec */
 		if ( c != 's' && c != 'c' )
 			while ( *sptr == ' ' )
 				++sptr ;
 		len = -1 ;
 		while ( sptr[++len] )
-			; /* get length */
+				; /* get length */
 		if ( c == 's' && len>prec && preclen>0 )
 			len = prec ;
 		if (right)

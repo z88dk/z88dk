@@ -1,6 +1,4 @@
-This is the "full" printf routines - they support width specifiers, but
-not the %ld/%lu types (well ya can't have it all!) - they've been rejigged
-into using the new stdio library, I've tested sprintf and printf and they
-seem to work.
+This is the "full" printf routines - they support width specifiers,
+including the %ld/%lu types 
 
 The scanf routines have also been rejigged, but they're not tested.
