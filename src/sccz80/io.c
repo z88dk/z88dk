@@ -3,7 +3,7 @@
  *
  *      Various compiler file i/o routines
  *
- *      $Id: io.c,v 1.8 2013-05-06 13:24:57 stefano Exp $
+ *      $Id: io.c,v 1.9 2013-05-10 07:19:37 stefano Exp $
  */
 
 #include "ccdefs.h"
@@ -141,7 +141,7 @@ t_buffer * startbuffer(int blocks)
 	buf->start = (char *) mymalloc(size);
 	buf->end = buf->start + blocks * size - 1;
 	buf->next = buf->start;
-	buf->before = NULL;
+	buf->before = currentbuffer;	/* <-- DON'T USE NULL HERE TO SUPPRESS WARNING !!  */
 	currentbuffer = buf;
 	return buf;
 }

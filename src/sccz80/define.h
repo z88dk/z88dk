@@ -1,13 +1,15 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.12 2011-06-26 16:07:29 dom Exp $
+ * $Id: define.h,v 1.13 2013-05-10 07:19:37 stefano Exp $
  */
 
 /*      Stand-alone definitions                 */
 
 #define NO              0
 #define YES             1
+#ifndef NULL
 #define NULL            0
+#endif
 #define NULL_FD 0
 
 #define NULL_FN 0
