@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0033.t,v 1.1 2013-05-06 22:06:22 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0033.t,v 1.2 2013-05-11 00:30:55 pauloscustodio Exp $
 # $Log: BUG_0033.t,v $
-# Revision 1.1  2013-05-06 22:06:22  pauloscustodio
+# Revision 1.2  2013-05-11 00:30:55  pauloscustodio
+# Delete zcc options file
+#
+# Revision 1.1  2013/05/06 22:06:22  pauloscustodio
 # BUG_0033 : -d option fails if .asm does not exist
 # When building test.o from test.c, the test.asm file is removed by zcc.
 # If the .o is then linked into a library with the -d option to skip
@@ -41,5 +44,5 @@ ok -f o_file(), o_file()." exists";
 t_z80asm_capture("-d -Mo -x".lib2_file()." ".asm_file(), "", "", 0);
 ok -f lib2_file(), lib2_file()." exists";
 
-unlink_testfiles();
+unlink_testfiles('zcc_opt.def');
 done_testing();
