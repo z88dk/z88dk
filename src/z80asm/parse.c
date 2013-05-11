@@ -81,9 +81,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Bison grammar for z80asm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.2 2013-05-01 19:03:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.3 2013-05-11 00:32:05 pauloscustodio Exp $
 $Log: parse.c,v $
-Revision 1.2  2013-05-01 19:03:45  pauloscustodio
+Revision 1.3  2013-05-11 00:32:05  pauloscustodio
+*** empty log message ***
+
+Revision 1.1  2013/05/01 19:03:46  pauloscustodio
 Simplified scanner and adapted to be used with a BISON generated parser.
 Removed balanced struct checking and token ring.
 Removed start condition to list assembly lines, as it was difficult to keep in sync across included
@@ -515,11 +518,11 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    91,    91,    92,    95,    96,    99,   100,   101,   104,
-     105,   106,   107,   108,   109,   110,   111,   112,   113,   114,
-     117,   118,   119,   120,   123,   125,   125,   125,   125,   125,
-     125,   125,   126,   126,   126,   126,   127,   127,   127,   127,
-     128,   128,   128,   128,   129,   129,   129,   129,   129
+       0,   101,   101,   102,   105,   106,   109,   110,   111,   114,
+     115,   116,   117,   118,   119,   120,   121,   122,   123,   124,
+     127,   128,   129,   130,   133,   135,   135,   135,   135,   135,
+     135,   135,   136,   136,   136,   136,   137,   137,   137,   137,
+     138,   138,   138,   138,   139,   139,   139,   139,   139
 };
 #endif
 
