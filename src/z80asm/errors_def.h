@@ -16,9 +16,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 Define error codes and error messages
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.11 2013-05-01 19:03:45 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.12 2013-05-11 00:29:26 pauloscustodio Exp $ */
 /* $Log: errors_def.h,v $
-/* Revision 1.11  2013-05-01 19:03:45  pauloscustodio
+/* Revision 1.12  2013-05-11 00:29:26  pauloscustodio
+/* CH_0021 : Exceptions on file IO show file name
+/* Keep a hash table of all opened file names, so that the file name
+/* is shown on a fatal error.
+/* Rename file IO funtions: f..._err to xf...
+/*
+/* Revision 1.11  2013/05/01 19:03:45  pauloscustodio
 /* Simplified scanner and adapted to be used with a BISON generated parser.
 /* Removed balanced struct checking and token ring.
 /* Removed start condition to list assembly lines, as it was difficult to keep in sync across included
@@ -81,8 +87,11 @@ DEF_MSG( ERR_RUNTIME,               "Run-time error" )
 /* file errors */
 DEF_MSG( ERR_FOPEN_READ,            "Cannot open file '%s' for reading" )
 DEF_MSG( ERR_FOPEN_WRITE,           "Cannot open file '%s' for writing" )
-DEF_MSG( ERR_FILE_READ,             "Cannot read from file" )
-DEF_MSG( ERR_FILE_WRITE,            "Cannot write to file" )
+DEF_MSG( ERR_FCLOSE,				"Cannot close file '%s'" )
+DEF_MSG( ERR_FWRITE,				"Cannot write to file '%s'" )
+DEF_MSG( ERR_FREAD,					"Unexpected EOF reading from file '%s'" )
+DEF_MSG( ERR_FWRITE_STRING,			"String too long writing to file '%s'" )
+DEF_MSG( ERR_FREAD_STRING,			"String too long reading from file '%s'" )
 
 /* syntax errors */
 DEF_MSG( ERR_SYNTAX,                "Syntax error" )

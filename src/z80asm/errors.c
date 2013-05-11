@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.23 2013-05-02 00:01:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.24 2013-05-11 00:29:26 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.23  2013-05-02 00:01:03  pauloscustodio
+/* Revision 1.24  2013-05-11 00:29:26  pauloscustodio
+/* CH_0021 : Exceptions on file IO show file name
+/* Keep a hash table of all opened file names, so that the file name
+/* is shown on a fatal error.
+/* Rename file IO funtions: f..._err to xf...
+/*
+/* Revision 1.23  2013/05/02 00:01:03  pauloscustodio
 /* New stat_err()
 /*
 /* Revision 1.22  2013/03/02 23:50:38  pauloscustodio
@@ -117,17 +123,18 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 #include "memalloc.h"   /* before any other include */
 
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-#include <assert.h>
-#include "errors.h"
-#include "strutil.h"
-#include "safestr.h"
 #include "class.h"
-#include "strpool.h"
-#include "types.h"
+#include "errors.h"
+#include "file.h"
+#include "safestr.h"
 #include "strhash.h"
+#include "strpool.h"
+#include "strutil.h"
+#include "types.h"
+#include <assert.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
 
 /*-----------------------------------------------------------------------------
 *   Error strings
@@ -445,77 +452,3 @@ void warning_at( char *filename, int lineno, ErrorCode err, ... )
     va_start( argptr, err );
     out_error_msg( &num_warnings, "Warning", filename, lineno, FALSE, err, argptr );
 }
-
-
-/*-----------------------------------------------------------------------------
-*   OS interface with fatal errors on failure
-*----------------------------------------------------------------------------*/
-FILE *fopen_err( char *filename, char *mode )
-{
-    FILE *fp = fopen( filename, mode );
-
-    if ( fp == NULL )
-    {
-        fatal_error_at( error_filename, error_line,
-                        mode[0] == 'r' ? ERR_FOPEN_READ  : ERR_FOPEN_WRITE,
-                        filename );
-    }
-
-    return fp;
-}
-
-void stat_err( char *filename, struct stat *filestat )
-{
-    int result = stat( filename, filestat );
-
-    if ( result < 0 )
-    {
-        fatal_error_at( error_filename, error_line,
-                        ERR_FOPEN_READ,
-                        filename );
-    }
-}
-
-
-void fputc_err( int c, FILE *stream )
-{
-    int ret = fputc( c, stream );
-
-    if ( ret == EOF )
-    {
-        fatal_error_at( error_filename, error_line, ERR_FILE_WRITE );
-    }
-}
-
-int fgetc_err( FILE *stream )
-{
-    int ret = getc( stream );
-
-    if ( ret == EOF )
-    {
-        fatal_error_at( error_filename, error_line, ERR_FILE_READ );
-    }
-
-    return ret;
-}
-
-void fwrite_err( const void *buffer, size_t size, size_t count, FILE *stream )
-{
-    size_t written = fwrite( buffer, size, count, stream );
-
-    if ( written != count )
-    {
-        fatal_error_at( error_filename, error_line, ERR_FILE_WRITE );
-    }
-}
-
-void fread_err( void *buffer, size_t size, size_t count, FILE *stream )
-{
-    size_t read = fread( buffer, size, count, stream );
-
-    if ( read != count )
-    {
-        fatal_error_at( error_filename, error_line, ERR_FILE_READ );
-    }
-}
-

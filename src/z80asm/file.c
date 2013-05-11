@@ -14,9 +14,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.18 2013-04-06 13:15:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.19 2013-05-11 00:29:26 pauloscustodio Exp $
 $Log: file.c,v $
-Revision 1.18  2013-04-06 13:15:04  pauloscustodio
+Revision 1.19  2013-05-11 00:29:26  pauloscustodio
+CH_0021 : Exceptions on file IO show file name
+Keep a hash table of all opened file names, so that the file name
+is shown on a fatal error.
+Rename file IO funtions: f..._err to xf...
+
+Revision 1.18  2013/04/06 13:15:04  pauloscustodio
 Move default asm and obj extension handling to file.c.
 srcfilename and objfilename are now pointers to static variables in file.c
 
@@ -95,12 +101,14 @@ Utilities for file handling
 
 #include "memalloc.h"   /* before any other include */
 
+#include "class.h"
 #include "config.h"
 #include "errors.h"
 #include "file.h"
 #include "safestr.h"
 #include "strpool.h"
 #include "strutil.h"
+#include "uthash.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -123,62 +131,280 @@ static BOOL ext_initialized = FALSE;
 	}
 
 /*-----------------------------------------------------------------------------
-*   File IO with exception
+*	Keep hash table of FILE* to file names for error messages
 *----------------------------------------------------------------------------*/
+typedef struct OpenFileElem
+{
+    FILE    *file; 					/* file pointer returned by fopen */
+	char    *filename;				/* file name kept in strpool.h */
+	
+    UT_hash_handle hh;      		/* hash table */
+
+} OpenFileElem;
+
+CLASS( OpenFile )
+	OpenFileElem *hash;				/* keep hash of all open files */
+END_CLASS;
+
+DEF_CLASS( OpenFile );
+
+void OpenFile_init( OpenFile *self )   
+{
+	strpool_init();
+}
+
+void OpenFile_copy( OpenFile *self, OpenFile *other ) { }
+
+void OpenFile_fini( OpenFile *self )
+{
+    OpenFileElem *elem, *tmp;
+
+    HASH_ITER( hh, self->hash, elem, tmp )
+    {
+        HASH_DEL( self->hash, elem );
+        xfree( elem );
+    }
+}
+
+static OpenFile *open_files = NULL;	/* sigleton */
+
+#define init_open_files()	( open_files == NULL ? (open_files = OBJ_NEW( OpenFile )) : open_files )
+
+/* file names are only deleted on end of program, to be able to show error message on 2nd fclose */
+static void add_filename( FILE *file, char *filename )
+{
+	OpenFileElem *elem;
+
+	init_open_files();
+
+    /* check if file exists already */
+    HASH_FIND_PTR( open_files->hash, &file, elem );
+    if ( elem )
+    {
+		/* found, replace name */
+		elem->filename 	= strpool_add(filename);		
+    }
+	else
+	{
+		/* new, create hash entry */
+		elem = xcalloc_struct(OpenFileElem);
+		elem->file 		= file;
+		elem->filename 	= strpool_add(filename);		
+		
+		HASH_ADD_PTR( open_files->hash, file, elem );
+	}	
+}
+
+static char *get_filename( FILE *file )
+{
+	OpenFileElem *elem;
+
+	init_open_files();
+
+    /* check if file exists already */
+    HASH_FIND_PTR( open_files->hash, &file, elem );
+    
+	return elem ? elem->filename : "???";	
+}
 
 /*-----------------------------------------------------------------------------
-*   File IO words and longs
+*   File open and close
 *----------------------------------------------------------------------------*/
-void fputw_err( size_t word, FILE *stream )
+void xstat( char *filename, struct stat *filestat )
+{
+    int result = stat( filename, filestat );
+
+    if ( result < 0 )
+        fatal_error( ERR_FOPEN_READ, filename );
+}
+
+FILE *xfopen( char *filename, char *mode )
+{
+    FILE *file = fopen( filename, mode );
+    if ( file == NULL )
+        fatal_error( mode[0] == 'r' ? ERR_FOPEN_READ  : ERR_FOPEN_WRITE,
+                     filename );
+
+	add_filename( file, filename );		/* never deleted from hash */
+    return file;
+}
+
+void xfclose( FILE *file )
+{
+	int result = fclose( file );
+	if ( result < 0 )
+		fatal_error( ERR_FCLOSE, get_filename(file) );
+}
+
+/*-----------------------------------------------------------------------------
+*   Buffers
+*----------------------------------------------------------------------------*/
+void xfwrite( const void *buffer, size_t size, size_t count, FILE *file )
+{
+    size_t written = fwrite( buffer, size, count, file );
+    if ( written != count )
+        fatal_error( ERR_FWRITE, get_filename(file) );
+}
+
+void xfread( void *buffer, size_t size, size_t count, FILE *file )
+{
+    size_t read = fread( buffer, size, count, file );
+    if ( read != count )
+        fatal_error( ERR_FREAD, get_filename(file) );
+}
+
+void xfput_char( const char *buffer, size_t len, FILE *file )
+{
+	xfwrite( buffer, sizeof(char), len, file );
+}
+
+void xfget_char( char *buffer, size_t len, FILE *file )
+{
+	xfread( buffer, sizeof(char), len, file );
+}
+
+/*-----------------------------------------------------------------------------
+*   Read / write 8 bits
+*----------------------------------------------------------------------------*/
+void xfput_u8( int value, FILE *file )
+{
+    int result = fputc( value, file );
+    if ( result < 0 )
+        fatal_error( ERR_FWRITE, get_filename(file) );
+}
+
+int xfget_u8( FILE *file )
+{
+    int result = getc( file );
+    if ( result < 0 )
+        fatal_error( ERR_FREAD, get_filename(file) );
+    return result;
+}
+
+int xfget_i8( FILE *file )
+{
+	int result = xfget_u8( file );
+    if ( result & 0x80 )
+        result |= ~ 0xFF;
+	return result;
+}
+
+/*-----------------------------------------------------------------------------
+*   Read / write 16 bits
+*----------------------------------------------------------------------------*/
+void xfput_u16( int value, FILE *file )
 {
     char buffer[2] =
     {
-        ( word >> 0 ) & 0xFF,
-        ( word >> 8 ) & 0xFF
+        (value & 0x00FF) >> 0,
+        (value & 0xFF00) >> 8
     };
-    fwritec_err( buffer, sizeof( buffer ), stream );
+    xfput_char( buffer, sizeof(buffer), file );
 }
 
-size_t fgetw_err( FILE *stream )
+int xfget_u16( FILE *file )
 {
     char buffer[2];
-    freadc_err( buffer, sizeof( buffer ), stream );
+    xfget_char( buffer, sizeof(buffer), file );
     return
         ( ( buffer[0] << 0 ) & 0x00FF ) |
         ( ( buffer[1] << 8 ) & 0xFF00 );
 }
 
-void fputl_err( long dword, FILE *stream )
+int xfget_i16( FILE *file )
+{
+	int result = xfget_u16( file );
+    if ( result & 0x8000 )
+        result |= ~ 0xFFFF;
+	return result;
+}
+
+/*-----------------------------------------------------------------------------
+*   Read / write 32 bits
+*----------------------------------------------------------------------------*/
+void xfput_u32( long value, FILE *file )
 {
     char buffer[4] =
     {
-        ( dword >> 0 ) & 0xFF,
-        ( dword >> 8 ) & 0xFF,
-        ( dword >> 16 ) & 0xFF,
-        ( dword >> 24 ) & 0xFF
+        (value & 0x000000FF) >> 0,
+        (value & 0x0000FF00) >> 8,
+        (value & 0x00FF0000) >> 16,
+        (value & 0xFF000000) >> 24
     };
-    fwritec_err( buffer, sizeof( buffer ), stream );
+    xfput_char( buffer, sizeof(buffer), file );
 }
 
-long fgetl_err( FILE *stream )
+long xfget_u32( FILE *file )
 {
     char buffer[4];
     long retval;
 
-    freadc_err( buffer, sizeof( buffer ), stream );
-    retval =
-        ( ( buffer[0] << 0 ) & 0x000000FF ) |
-        ( ( buffer[1] << 8 ) & 0x0000FF00 ) |
+    freadc_err( buffer, sizeof( buffer ), file );
+    return
+        ( ( buffer[0] << 0  ) & 0x000000FF ) |
+        ( ( buffer[1] << 8  ) & 0x0000FF00 ) |
         ( ( buffer[2] << 16 ) & 0x00FF0000 ) |
         ( ( buffer[3] << 24 ) & 0xFF000000 );
+}
 
-    /* BUG_0021: sign extend if bit 31 is on */
-    if ( retval & 0x80000000L )
-    {
-        retval |= ~ 0xFFFFFFFFL;
-    }
+long xfget_i32( FILE *file )
+{
+	long result = xfget_u32( file );
+    if ( result & 0x80000000L )		/* BUG_0021: sign extend if bit 31 is on */
+        result |= ~ 0xFFFFFFFFL;
+    return result;
+}
 
-    return retval;
+/*-----------------------------------------------------------------------------
+*   Read / write sstr_t
+*----------------------------------------------------------------------------*/
+void xfput_sstr( sstr_t *str, FILE *file )
+{
+	xfput_char( sstr_data(str), sstr_len(str), file );
+}
+
+void xfget_sstr( sstr_t *str, size_t len, FILE *file )
+{
+	if ( len + 1 > str->size )
+		fatal_error( ERR_FREAD_STRING, get_filename(file) );/* too long */
+	
+	xfget_char( sstr_data(str), len, file );				/* characters */
+	sstr_data(str)[len] = '\0';								/* terminate string */
+	sstr_sync_len(str);
+}
+
+/*-----------------------------------------------------------------------------
+*   Read / write Counted strings
+*----------------------------------------------------------------------------*/
+
+/* read/write sstr_t byte-counted strings (1 byte size + string chars) with error check */
+void xfput_c1sstr( sstr_t *str, FILE *file )
+{
+	if ( sstr_len(str) > 0xFF )
+		fatal_error( ERR_FWRITE_STRING, get_filename(file) );	/* too long */
+	xfput_u8( sstr_len(str), file );							/* byte count */
+	xfput_sstr( str, file );									/* characters */
+}
+
+void xfget_c1sstr( sstr_t *str, FILE *file )
+{
+	size_t len = xfget_u8( file );								/* byte count */
+	xfget_sstr( str, len, file );
+}
+
+/* read/write sstr_t word-counted strings (2 bytes size + string chars) with error check */
+void xfput_c2sstr( sstr_t *str, FILE *file )
+{
+	if ( sstr_len(str) > 0xFFFF )
+		fatal_error( ERR_FWRITE_STRING, get_filename(file) );	/* too long */
+	xfput_u16( sstr_len(str), file );							/* word count */
+	xfput_sstr( str, file );									/* characters */
+}
+
+void xfget_c2sstr( sstr_t *str, FILE *file )
+{
+	size_t len = xfget_u16( file );								/* word count */
+	xfget_sstr( str, len, file );
 }
 
 /*-----------------------------------------------------------------------------

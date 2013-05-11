@@ -13,9 +13,15 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.29 2013-03-29 23:53:08 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.30 2013-05-11 00:29:26 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.29  2013-03-29 23:53:08  pauloscustodio
+# Revision 1.30  2013-05-11 00:29:26  pauloscustodio
+# CH_0021 : Exceptions on file IO show file name
+# Keep a hash table of all opened file names, so that the file name
+# is shown on a fatal error.
+# Rename file IO funtions: f..._err to xf...
+#
+# Revision 1.29  2013/03/29 23:53:08  pauloscustodio
 # Added GNU Flex-based scanner. Not yet integrated into assembler.
 #
 # Revision 1.28  2013/03/04 23:23:37  pauloscustodio
@@ -539,27 +545,99 @@ sub t_compile_module {
 		sleep(1);
 	}
 	
+	# get list of object files
+	my %modules;
+	while ($compile_args =~ /(\w+)\.[co]/ig) {
+		$modules{$1}++;
+	}
+
+	# make modules (once per run)
+	our %made_modules;
+	my @make_modules;
+	for (keys %modules) {
+		push @make_modules, "$_.o" unless $made_modules{$_}++;
+	}
+	if (@make_modules) {
+		my $make = "make @make_modules";
+		note "line ", (caller)[2], ": $make";
+		
+		my $ok = (0 == system($make));
+		ok $ok, "make";
+		
+		exit 1 if !$ok;	# no need to cotinue if compilation failed
+	}
+	
+	# create code skeleton
+	$main_code = "
+#include <stdlib.h>
+#include <stdio.h>
+
+".join("\n", map {"#include \"$_.h\""} sort keys %modules)."\n".
+$init_code.'
+int _exception_raised;
+int _exception_initialized;
+
+#define TITLE(title)	fprintf(stderr, "\n---- TEST: " title " ----\n\n")
+
+#define TEST_DIE(err_condition, err_message, expr_str) \
+			if ( err_condition ) { \
+				fprintf(stderr, err_message " (%s) at file %s, line %d\n", \
+								expr_str, __FILE__, __LINE__); \
+				exit(1); \
+			} \
+			else
+
+#define ASSERT(expr) 			TEST_DIE( ! (expr), "TEST FAILED", #expr )
+
+#define TEST_TRY(expr, err_condition, err_message, expr_str) \
+			if ( ! _exception_initialized ) { \
+				init_except(); \
+				_exception_initialized = 1; \
+			} \
+			_exception_raised = 0; \
+			try { expr; } \
+			catch (RuntimeException) { \
+				_exception_raised = 1; \
+			} \
+			TEST_DIE( (err_condition), "EXCEPTION " err_message "RAISED", expr_str )
+
+#define TRY_OK(expr) 	TEST_TRY( expr,   _exception_raised, "",     #expr )
+#define TRY_NOK(expr) 	TEST_TRY( expr, ! _exception_raised, "NOT ", #expr )
+
+void dump_file ( char *filename )
+{
+	FILE *fp;
+	int addr, c;
+	
+	ASSERT( fp = fopen( filename, "rb") );
+	
+	fprintf(stderr, "File: %s:", filename);
+	for ( addr = 0; (c = fgetc(fp)) != EOF; addr++ ) {
+		if (addr % 16 == 0)
+			fprintf(stderr, "\n%4X  ", addr);
+		if (c > 0x20 && c < 0x7F)
+			fprintf(stderr, " %1c   ", c);
+		else
+			fprintf(stderr, "<%02X> ", c);
+	}
+	fprintf(stderr, "\n");
+	fclose(fp);
+}
+
+int main (int argc, char **argv) {
+'.$main_code."
+	return 0;
+}
+";
+	
+	write_file("test.c", $main_code);
+
+	# build
 	my $cc = "cc -o test.exe test.c $compile_args";
 	note "line ", (caller)[2], ": $cc";
 	
-	# create code skeleton
-	$main_code = 
-$init_code."
-#include <stdlib.h>
-#include <stdio.h>
-int main (int argc, char **argv) {
-".$main_code."
-}
-";
-	while ($compile_args =~ /(\w+)\.[co]/ig) {
-		$main_code = 
-"#include \"$1.h\"
-".$main_code;
-	}
-	
-	write_file("test.c", $main_code);
 	my $ok = (0 == system($cc));
-	ok $ok;
+	ok $ok, "cc";
 	
 	exit 1 if !$ok;	# no need to cotinue if compilation failed
 }
@@ -582,7 +660,7 @@ sub t_run_module {
 	if ($ENV{DEBUG} && $out.$err ne $expected_out.$expected_err) {
 		my $temp_input = $0.".tmp";
 		my @input = read_file($0);
-		write_file($temp_input, @input[0 .. (caller)[2] - 1], $out, $err );
+		write_file($temp_input, @input[0 .. (caller)[2] - 1], $out, $err, "END\n" );
 		system "wdiff \"$0\" \"$temp_input\"";
 	}
 	

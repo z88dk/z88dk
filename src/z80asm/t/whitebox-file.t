@@ -13,9 +13,15 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.9 2013-04-04 23:08:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.10 2013-05-11 00:29:26 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.9  2013-04-04 23:08:18  pauloscustodio
+# Revision 1.10  2013-05-11 00:29:26  pauloscustodio
+# CH_0021 : Exceptions on file IO show file name
+# Keep a hash table of all opened file names, so that the file name
+# is shown on a fatal error.
+# Rename file IO funtions: f..._err to xf...
+#
+# Revision 1.9  2013/04/04 23:08:18  pauloscustodio
 # Helper functions to create file names of each of the extensions used in z80asm
 #
 # Revision 1.8  2013/02/27 20:56:52  pauloscustodio
@@ -54,13 +60,10 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-# test memalloc
 my $objs = "file.o errors.o strlist.o strhash.o strpool.o memalloc.o class.o ".
 		   "die.o strutil.o safestr.o except.o";
-ok ! system "make $objs";
 
 my $init = <<'INIT';
-#define ERROR return __LINE__
 struct module *CURRENTMODULE;
 FILE *errfile;
 int clinemode;
@@ -68,7 +71,6 @@ int clineno;
 INIT
 
 t_compile_module($init, <<'END', $objs);
-	/* main */
 	SzList *list;
 	
 	if (argv[2][0] == '0')
@@ -85,7 +87,6 @@ t_compile_module($init, <<'END', $objs);
 	}
 	
 	puts( search_file(argv[1], list) );
-	return 0;
 END
 
 # create directories and files
@@ -115,14 +116,12 @@ t_compile_module($init, <<'END', $objs);
 #define T1(init, func, result) \
 		strcpy( file, init); \
 		p = func; \
-		if (p != file || strcmp(file, result)) { \
-			warn("line %d: %s -> %s, %s\n", __LINE__, init, p, file); ERROR; \
-		}
+		ASSERT( p == file ); \
+		ASSERT( strcmp(file, result) == 0 )
+
 #define T2(func, result) \
 		p = func; \
-		if (strcmp(p, result)) { \
-			warn("line %d: %s != %s\n", __LINE__, p, result); ERROR; \
-		}
+		ASSERT( strcmp(p, result) == 0 )
 	
 	char file[FILENAME_MAX];
 	char *p;
@@ -165,12 +164,477 @@ t_compile_module($init, <<'END', $objs);
 	T2((lib_filename_ext("./abc.xpt")),		"./abc.lib");
 	T2((sym_filename_ext("./abc.xpt")),		"./abc.sym");
 	T2((map_filename_ext("./abc.xpt")),		"./abc.map");
-	
-	return 0;
 END
 
 t_run_module([], "", "", 0);
 
+# test file IO
+t_compile_module($init, <<'END', $objs);
+/* 256 characters */
+#define BIG_STR "1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
+				"1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
+				"1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
+				"1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
+				"1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
+				"123456" 
+	SSTR_DEFINE( small, 5 );
+	SSTR_DEFINE( large, 1024 );
+	char buffer[1024];
+	FILE *file;
+	long fpos;
+	struct stat filestat;
+	
+	TITLE("xfopen");
+	TRY_NOK( file = xfopen("test1xxxx.bin", "rb") );
+	TRY_NOK( file = xfopen("x/x/x/x/test1.bin", "wb") );
+	
+	TITLE("xfclose");
+	TRY_OK( file = xfopen("test1.bin", "wb") );
+	TRY_OK( xfclose(file) );
+	TRY_NOK( xfclose(file) );
+	
+	TITLE("xstat");
+	TRY_NOK( xstat("test1xxxx.bin", &filestat) );
+	memset( &filestat, 0, sizeof(filestat) );
+	TRY_OK(  xstat("test1.bin",     &filestat) );
+	ASSERT( filestat.st_size == 0 );
+
+	TITLE("xfwrite");
+	sstr_set( small, BIG_STR );
+	TRY_OK( file = xfopen("test1.bin", "wb") );
+	TRY_OK( xfwrite( sstr_data(small), sizeof(char), sstr_len(small), file ) );
+	TRY_OK( xfclose(file) );
+	dump_file("test1.bin");
+
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	TRY_NOK( xfwrite( sstr_data(small), sizeof(char), sstr_len(small), file ) );
+	TRY_OK( xfclose(file) );
+
+	TITLE("xfread");
+	memset(buffer, 0, sizeof(buffer));
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	TRY_OK( xfread( buffer, sizeof(char), sstr_len(small), file ) );
+	ASSERT( 0 == memcmp(buffer, sstr_data(small), sstr_len(small)) );
+	fseek(file, 1, SEEK_SET);
+	TRY_NOK( xfread( buffer, sizeof(char), sstr_len(small), file ) );
+	TRY_OK( xfclose(file) );
+
+	TITLE("xfput_char");
+	sstr_set( small, BIG_STR );
+	TRY_OK( file = xfopen("test1.bin", "wb") );
+	TRY_OK( xfput_char( sstr_data(small), sstr_len(small), file ) );
+	TRY_OK( xfclose(file) );
+	dump_file("test1.bin");
+
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	TRY_NOK( xfput_char( sstr_data(small), sstr_len(small), file ) );
+	TRY_OK( xfclose(file) );
+
+	TITLE("xfget_char");
+	memset(buffer, 0, sizeof(buffer));
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	TRY_OK( xfget_char( buffer, sstr_len(small), file ) );
+	ASSERT( 0 == memcmp(buffer, sstr_data(small), sstr_len(small)) );
+	fseek(file, 1, SEEK_SET);
+	TRY_NOK( xfget_char( buffer, sstr_len(small), file ) );
+	TRY_OK( xfclose(file) );
+
+	TITLE("xfput_u8");
+	TRY_OK( file = xfopen("test1.bin", "wb") );
+	TRY_OK( xfput_u8( -128, file ) );
+	TRY_OK( xfput_u8( -127, file ) );
+	TRY_OK( xfput_u8(    0, file ) );
+	TRY_OK( xfput_u8(  127, file ) );
+	TRY_OK( xfput_u8(  128, file ) );
+	TRY_OK( xfput_u8(  255, file ) );
+	TRY_OK( xfclose(file) );
+	dump_file("test1.bin");
+
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	TRY_NOK( xfput_u8( 0, file ) );
+	TRY_OK( xfclose(file) );
+	
+	TITLE("xfget_u8");
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	ASSERT( xfget_u8(file) ==  128 );
+	ASSERT( xfget_u8(file) ==  129 );
+	ASSERT( xfget_u8(file) ==    0 );
+	ASSERT( xfget_u8(file) ==  127 );
+	ASSERT( xfget_u8(file) ==  128 );
+	ASSERT( xfget_u8(file) ==  255 );
+	TRY_NOK( xfget_u8( file ) );
+	TRY_OK( xfclose(file) );
+	
+	TITLE("xfget_i8");
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	ASSERT( xfget_i8(file) == -128 );
+	ASSERT( xfget_i8(file) == -127 );
+	ASSERT( xfget_i8(file) ==    0 );
+	ASSERT( xfget_i8(file) ==  127 );
+	ASSERT( xfget_i8(file) == -128 );
+	ASSERT( xfget_i8(file) ==   -1 );
+	TRY_NOK( xfget_i8( file ) );
+	TRY_OK( xfclose(file) );
+	
+	TITLE("xfput_u16");
+	TRY_OK( file = xfopen("test1.bin", "wb") );
+	TRY_OK( xfput_u16( -32768, file ) );
+	TRY_OK( xfput_u16( -32767, file ) );
+	TRY_OK( xfput_u16(      0, file ) );
+	TRY_OK( xfput_u16(  32767, file ) );
+	TRY_OK( xfput_u16(  32768, file ) );
+	TRY_OK( xfput_u16(  65535, file ) );
+	TRY_OK( xfclose(file) );
+	dump_file("test1.bin");
+
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	TRY_NOK( xfput_u16( 0, file ) );
+	TRY_OK( xfclose(file) );
+	
+	TITLE("xfget_u16");
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	ASSERT( xfget_u16(file) ==  32768 );
+	ASSERT( xfget_u16(file) ==  32769 );
+	ASSERT( xfget_u16(file) ==      0 );
+	ASSERT( xfget_u16(file) ==  32767 );
+	ASSERT( xfget_u16(file) ==  32768 );
+	ASSERT( xfget_u16(file) ==  65535 );
+	fseek(file, -1, SEEK_END);
+	TRY_NOK( xfget_u16( file ) );
+	TRY_OK( xfclose(file) );
+	
+	TITLE("xfget_i16");
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	ASSERT( xfget_i16(file) == -32768 );
+	ASSERT( xfget_i16(file) == -32767 );
+	ASSERT( xfget_i16(file) ==      0 );
+	ASSERT( xfget_i16(file) ==  32767 );
+	ASSERT( xfget_i16(file) == -32768 );
+	ASSERT( xfget_i16(file) ==     -1 );
+	fseek(file, -1, SEEK_END);
+	TRY_NOK( xfget_i16( file ) );
+	TRY_OK( xfclose(file) );
+
+	TITLE("xfput_u32");
+	TRY_OK( file = xfopen("test1.bin", "wb") );
+	TRY_OK( xfput_u32( -2147483648, file ) );
+	TRY_OK( xfput_u32( -2147483647, file ) );
+	TRY_OK( xfput_u32(           0, file ) );
+	TRY_OK( xfput_u32(           1, file ) );
+	TRY_OK( xfput_u32(         256, file ) );
+	TRY_OK( xfput_u32(       65536, file ) );
+	TRY_OK( xfput_u32(    16777216, file ) );
+	TRY_OK( xfput_u32(  2147483647, file ) );
+	TRY_OK( xfput_u32(  2147483648, file ) );
+	TRY_OK( xfput_u32(  4294967295, file ) );
+	TRY_OK( xfclose(file) );
+	dump_file("test1.bin");
+
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	TRY_NOK( xfput_u32( 0, file ) );
+	TRY_OK( xfclose(file) );
+	
+	TITLE("xfget_u32");
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	ASSERT( xfget_u32(file) ==  2147483648 );
+	ASSERT( xfget_u32(file) ==  2147483649 );
+	ASSERT( xfget_u32(file) ==           0 );
+	ASSERT( xfget_u32(file) ==           1 );
+	ASSERT( xfget_u32(file) ==         256 );
+	ASSERT( xfget_u32(file) ==       65536 );
+	ASSERT( xfget_u32(file) ==    16777216 );
+	ASSERT( xfget_u32(file) ==  2147483647 );
+	ASSERT( xfget_u32(file) ==  2147483648 );
+	ASSERT( xfget_u32(file) ==  4294967295 );
+	fseek(file, -3, SEEK_END);
+	TRY_NOK( xfget_u32( file ) );
+	TRY_OK( xfclose(file) );
+	
+	TITLE("xfget_i32");
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	ASSERT( xfget_i32(file) == -2147483648 );
+	ASSERT( xfget_i32(file) == -2147483647 );
+	ASSERT( xfget_i32(file) ==           0 );
+	ASSERT( xfget_i32(file) ==           1 );
+	ASSERT( xfget_i32(file) ==         256 );
+	ASSERT( xfget_i32(file) ==       65536 );
+	ASSERT( xfget_i32(file) ==    16777216 );
+	ASSERT( xfget_i32(file) ==  2147483647 );
+	ASSERT( xfget_i32(file) ==  2147483648 );
+	ASSERT( xfget_i32(file) ==  4294967295 );
+	fseek(file, -3, SEEK_END);
+	TRY_NOK( xfget_i32( file ) );
+	TRY_OK( xfclose(file) );
+	
+	TITLE("xfput_sstr");
+	sstr_set( small, BIG_STR );
+	TRY_OK( file = xfopen("test1.bin", "wb") );
+	TRY_OK( xfput_sstr( small, file ) );
+	TRY_OK( xfclose(file) );
+	dump_file("test1.bin");
+
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	TRY_NOK( xfput_sstr( small, file ) );
+	TRY_OK( xfclose(file) );
+
+	TITLE("xfget_sstr");
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	TRY_OK( xfget_sstr( small, small->size-1, file ) );
+	ASSERT( 0 == memcmp(sstr_data(small), BIG_STR, sstr_len(small)) );
+	TRY_NOK( xfget_u8( file ) );
+	fseek(file, 1, SEEK_SET);
+	TRY_NOK( xfget_sstr( small, small->size-1, file ) );
+	fseek(file, 0, SEEK_SET);
+	TRY_NOK( xfget_sstr( small, small->size, file ) );
+	TRY_OK( xfclose(file) );
+
+	TITLE("xfput_c1sstr");
+	TRY_OK( file = xfopen("test1.bin", "wb") );
+	sstr_set(large, BIG_STR); sstr_data(large)[0] = '\0'; sstr_sync_len(large);
+	TRY_OK( xfput_c1sstr(large, file) );
+	sstr_set(large, BIG_STR); sstr_data(large)[1] = '\0'; sstr_sync_len(large);
+	TRY_OK( xfput_c1sstr(large, file) );
+	sstr_set(large, BIG_STR); sstr_data(large)[255] = '\0'; sstr_sync_len(large);
+	TRY_OK( xfput_c1sstr(large, file) );
+	sstr_set(large, BIG_STR); sstr_data(large)[256] = '\0'; sstr_sync_len(large);
+	TRY_NOK( xfput_c1sstr(large, file) );
+	TRY_OK( xfclose(file) );
+	dump_file("test1.bin");
+
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	sstr_set(large, BIG_STR); sstr_data(large)[0] = '\0'; sstr_sync_len(large);
+	TRY_NOK( xfput_c1sstr(large, file) );
+	TRY_OK( xfclose(file) );
+
+	TITLE("xfget_c1sstr");
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	TRY_OK( xfget_c1sstr( large, file ) );
+	ASSERT( 0 == sstr_len(large) );
+	ASSERT( 0 == memcmp(sstr_data(large), BIG_STR, sstr_len(large)) );
+	TRY_OK( xfget_c1sstr( large, file ) );
+	ASSERT( 1 == sstr_len(large) );
+	ASSERT( 0 == memcmp(sstr_data(large), BIG_STR, sstr_len(large)) );
+	TRY_OK( xfget_c1sstr( large, file ) );
+	ASSERT( 255 == sstr_len(large) );
+	ASSERT( 0 == memcmp(sstr_data(large), BIG_STR, sstr_len(large)) );
+	TRY_NOK( xfget_u8( file ) );
+	fseek(file, 0, SEEK_SET);
+	TRY_OK( xfget_c1sstr( small, file ) );
+	ASSERT( 0 == sstr_len(small) );
+	ASSERT( 0 == memcmp(sstr_data(small), BIG_STR, sstr_len(small)) );
+	TRY_OK( xfget_c1sstr( small, file ) );
+	ASSERT( 1 == sstr_len(small) );
+	ASSERT( 0 == memcmp(sstr_data(small), BIG_STR, sstr_len(small)) );
+	TRY_NOK( xfget_c1sstr(small, file) );
+	TRY_OK( xfclose(file) );
+
+	TITLE("xfput_c2sstr");
+	TRY_OK( file = xfopen("test1.bin", "wb") );
+	sstr_set(large, BIG_STR); sstr_data(large)[0] = '\0'; sstr_sync_len(large);
+	TRY_OK( xfput_c2sstr(large, file) );
+	sstr_set(large, BIG_STR); sstr_data(large)[1] = '\0'; sstr_sync_len(large);
+	TRY_OK( xfput_c2sstr(large, file) );
+	sstr_set(large, BIG_STR); sstr_data(large)[255] = '\0'; sstr_sync_len(large);
+	TRY_OK( xfput_c2sstr(large, file) );
+	sstr_set(large, BIG_STR); sstr_data(large)[256] = '\0'; sstr_sync_len(large);
+	TRY_OK( xfput_c2sstr(large, file) );
+	TRY_OK( xfclose(file) );
+	dump_file("test1.bin");
+
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	sstr_set(large, BIG_STR); sstr_data(large)[0] = '\0'; sstr_sync_len(large);
+	TRY_NOK( xfput_c2sstr(large, file) );
+	TRY_OK( xfclose(file) );
+
+	TITLE("xfget_c2sstr");
+	TRY_OK( file = xfopen("test1.bin", "rb") );
+	TRY_OK( xfget_c2sstr( large, file ) );
+	ASSERT( 0 == sstr_len(large) );
+	ASSERT( 0 == memcmp(sstr_data(large), BIG_STR, sstr_len(large)) );
+	TRY_OK( xfget_c2sstr( large, file ) );
+	ASSERT( 1 == sstr_len(large) );
+	ASSERT( 0 == memcmp(sstr_data(large), BIG_STR, sstr_len(large)) );
+	TRY_OK( xfget_c2sstr( large, file ) );
+	ASSERT( 255 == sstr_len(large) );
+	ASSERT( 0 == memcmp(sstr_data(large), BIG_STR, sstr_len(large)) );
+	TRY_OK( xfget_c2sstr( large, file ) );
+	ASSERT( 256 == sstr_len(large) );
+	ASSERT( 0 == memcmp(sstr_data(large), BIG_STR, sstr_len(large)) );
+	TRY_NOK( xfget_u8( file ) );
+	fseek(file, 0, SEEK_SET);
+	TRY_OK( xfget_c2sstr( small, file ) );
+	ASSERT( 0 == sstr_len(small) );
+	ASSERT( 0 == memcmp(sstr_data(small), BIG_STR, sstr_len(small)) );
+	TRY_OK( xfget_c2sstr( small, file ) );
+	ASSERT( 1 == sstr_len(small) );
+	ASSERT( 0 == memcmp(sstr_data(small), BIG_STR, sstr_len(small)) );
+	TRY_NOK( xfget_c2sstr(small, file) );
+	TRY_OK( xfclose(file) );
+
+END
+
+t_run_module([], "", <<'END', 0);
+
+---- TEST: xfopen ----
+
+Error: Cannot open file 'test1xxxx.bin' for reading
+Error: Cannot open file 'x/x/x/x/test1.bin' for writing
+
+---- TEST: xfclose ----
+
+Error: Cannot close file 'test1.bin'
+
+---- TEST: xstat ----
+
+Error: Cannot open file 'test1xxxx.bin' for reading
+
+---- TEST: xfwrite ----
+
+File: test1.bin:
+   0   1    2    3    4   
+Error: Cannot write to file 'test1.bin'
+
+---- TEST: xfread ----
+
+Error: Unexpected EOF reading from file 'test1.bin'
+
+---- TEST: xfput_char ----
+
+File: test1.bin:
+   0   1    2    3    4   
+Error: Cannot write to file 'test1.bin'
+
+---- TEST: xfget_char ----
+
+Error: Unexpected EOF reading from file 'test1.bin'
+
+---- TEST: xfput_u8 ----
+
+File: test1.bin:
+   0  <80> <81> <00> <7F> <80> <FF> 
+Error: Cannot write to file 'test1.bin'
+
+---- TEST: xfget_u8 ----
+
+Error: Unexpected EOF reading from file 'test1.bin'
+
+---- TEST: xfget_i8 ----
+
+Error: Unexpected EOF reading from file 'test1.bin'
+
+---- TEST: xfput_u16 ----
+
+File: test1.bin:
+   0  <00> <80> <01> <80> <00> <00> <FF> <7F> <00> <80> <FF> <FF> 
+Error: Cannot write to file 'test1.bin'
+
+---- TEST: xfget_u16 ----
+
+Error: Unexpected EOF reading from file 'test1.bin'
+
+---- TEST: xfget_i16 ----
+
+Error: Unexpected EOF reading from file 'test1.bin'
+
+---- TEST: xfput_u32 ----
+
+File: test1.bin:
+   0  <00> <00> <00> <80> <01> <00> <00> <80> <00> <00> <00> <00> <01> <00> <00> <00> 
+  10  <00> <01> <00> <00> <00> <00> <01> <00> <00> <00> <00> <01> <FF> <FF> <FF> <7F> 
+  20  <00> <00> <00> <80> <FF> <FF> <FF> <FF> 
+Error: Cannot write to file 'test1.bin'
+
+---- TEST: xfget_u32 ----
+
+Error: Unexpected EOF reading from file 'test1.bin'
+
+---- TEST: xfget_i32 ----
+
+Error: Unexpected EOF reading from file 'test1.bin'
+
+---- TEST: xfput_sstr ----
+
+File: test1.bin:
+   0   1    2    3    4   
+Error: Cannot write to file 'test1.bin'
+
+---- TEST: xfget_sstr ----
+
+Error: Unexpected EOF reading from file 'test1.bin'
+Error: Unexpected EOF reading from file 'test1.bin'
+Error: String too long reading from file 'test1.bin'
+
+---- TEST: xfput_c1sstr ----
+
+Error: String too long writing to file 'test1.bin'
+File: test1.bin:
+   0  <00> <01>  1   <FF>  1    2    3    4    5    6    7    8    9    0    1    2   
+  10   3    4    5    6    7    8    9    0    1    2    3    4    5    6    7    8   
+  20   9    0    1    2    3    4    5    6    7    8    9    0    1    2    3    4   
+  30   5    6    7    8    9    0    1    2    3    4    5    6    7    8    9    0   
+  40   1    2    3    4    5    6    7    8    9    0    1    2    3    4    5    6   
+  50   7    8    9    0    1    2    3    4    5    6    7    8    9    0    1    2   
+  60   3    4    5    6    7    8    9    0    1    2    3    4    5    6    7    8   
+  70   9    0    1    2    3    4    5    6    7    8    9    0    1    2    3    4   
+  80   5    6    7    8    9    0    1    2    3    4    5    6    7    8    9    0   
+  90   1    2    3    4    5    6    7    8    9    0    1    2    3    4    5    6   
+  A0   7    8    9    0    1    2    3    4    5    6    7    8    9    0    1    2   
+  B0   3    4    5    6    7    8    9    0    1    2    3    4    5    6    7    8   
+  C0   9    0    1    2    3    4    5    6    7    8    9    0    1    2    3    4   
+  D0   5    6    7    8    9    0    1    2    3    4    5    6    7    8    9    0   
+  E0   1    2    3    4    5    6    7    8    9    0    1    2    3    4    5    6   
+  F0   7    8    9    0    1    2    3    4    5    6    7    8    9    0    1    2   
+ 100   3    4    5   
+Error: Cannot write to file 'test1.bin'
+
+---- TEST: xfget_c1sstr ----
+
+Error: Unexpected EOF reading from file 'test1.bin'
+Error: String too long reading from file 'test1.bin'
+
+---- TEST: xfput_c2sstr ----
+
+File: test1.bin:
+   0  <00> <00> <01> <00>  1   <FF> <00>  1    2    3    4    5    6    7    8    9   
+  10   0    1    2    3    4    5    6    7    8    9    0    1    2    3    4    5   
+  20   6    7    8    9    0    1    2    3    4    5    6    7    8    9    0    1   
+  30   2    3    4    5    6    7    8    9    0    1    2    3    4    5    6    7   
+  40   8    9    0    1    2    3    4    5    6    7    8    9    0    1    2    3   
+  50   4    5    6    7    8    9    0    1    2    3    4    5    6    7    8    9   
+  60   0    1    2    3    4    5    6    7    8    9    0    1    2    3    4    5   
+  70   6    7    8    9    0    1    2    3    4    5    6    7    8    9    0    1   
+  80   2    3    4    5    6    7    8    9    0    1    2    3    4    5    6    7   
+  90   8    9    0    1    2    3    4    5    6    7    8    9    0    1    2    3   
+  A0   4    5    6    7    8    9    0    1    2    3    4    5    6    7    8    9   
+  B0   0    1    2    3    4    5    6    7    8    9    0    1    2    3    4    5   
+  C0   6    7    8    9    0    1    2    3    4    5    6    7    8    9    0    1   
+  D0   2    3    4    5    6    7    8    9    0    1    2    3    4    5    6    7   
+  E0   8    9    0    1    2    3    4    5    6    7    8    9    0    1    2    3   
+  F0   4    5    6    7    8    9    0    1    2    3    4    5    6    7    8    9   
+ 100   0    1    2    3    4    5   <00> <01>  1    2    3    4    5    6    7    8   
+ 110   9    0    1    2    3    4    5    6    7    8    9    0    1    2    3    4   
+ 120   5    6    7    8    9    0    1    2    3    4    5    6    7    8    9    0   
+ 130   1    2    3    4    5    6    7    8    9    0    1    2    3    4    5    6   
+ 140   7    8    9    0    1    2    3    4    5    6    7    8    9    0    1    2   
+ 150   3    4    5    6    7    8    9    0    1    2    3    4    5    6    7    8   
+ 160   9    0    1    2    3    4    5    6    7    8    9    0    1    2    3    4   
+ 170   5    6    7    8    9    0    1    2    3    4    5    6    7    8    9    0   
+ 180   1    2    3    4    5    6    7    8    9    0    1    2    3    4    5    6   
+ 190   7    8    9    0    1    2    3    4    5    6    7    8    9    0    1    2   
+ 1A0   3    4    5    6    7    8    9    0    1    2    3    4    5    6    7    8   
+ 1B0   9    0    1    2    3    4    5    6    7    8    9    0    1    2    3    4   
+ 1C0   5    6    7    8    9    0    1    2    3    4    5    6    7    8    9    0   
+ 1D0   1    2    3    4    5    6    7    8    9    0    1    2    3    4    5    6   
+ 1E0   7    8    9    0    1    2    3    4    5    6    7    8    9    0    1    2   
+ 1F0   3    4    5    6    7    8    9    0    1    2    3    4    5    6    7    8   
+ 200   9    0    1    2    3    4    5    6   
+Error: Cannot write to file 'test1.bin'
+
+---- TEST: xfget_c2sstr ----
+
+Error: Unexpected EOF reading from file 'test1.bin'
+Error: String too long reading from file 'test1.bin'
+END
 
 # delete directories and files
 remove_tree(qw( x1 x2 x3 ));

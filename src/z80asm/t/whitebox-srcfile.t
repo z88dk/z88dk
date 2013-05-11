@@ -13,9 +13,15 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.3 2013-03-10 18:00:24 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.4 2013-05-11 00:29:26 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.3  2013-03-10 18:00:24  pauloscustodio
+# Revision 1.4  2013-05-11 00:29:26  pauloscustodio
+# CH_0021 : Exceptions on file IO show file name
+# Keep a hash table of all opened file names, so that the file name
+# is shown on a fatal error.
+# Rename file IO funtions: f..._err to xf...
+#
+# Revision 1.3  2013/03/10 18:00:24  pauloscustodio
 # Interface with errors (set input position for errors) and  listfile (start list of each input line)
 #
 # Revision 1.2  2013/03/02 23:52:49  pauloscustodio
@@ -418,28 +424,27 @@ memalloc dynstr.c(3): alloc 256 bytes at ADDR_16
 memalloc srcfile.c(1): alloc 40 bytes at ADDR_17
 memalloc strpool.c(2): alloc 36 bytes at ADDR_18
 memalloc strpool.c(3): alloc 3 bytes at ADDR_19
-memalloc strpool.c(2): alloc 36 bytes at ADDR_20
-memalloc strpool.c(3): alloc 6 bytes at ADDR_21
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_22
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_23
-memalloc dynstr.c(4): free 256 bytes at ADDR_23 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_24
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_25
+memalloc file.c(1): alloc 32 bytes at ADDR_20
+memalloc file.c(4): alloc 40 bytes at ADDR_21
+memalloc file.c(5): alloc 44 bytes at ADDR_22
+memalloc file.c(5): alloc 384 bytes at ADDR_23
+memalloc strpool.c(2): alloc 36 bytes at ADDR_24
+memalloc strpool.c(3): alloc 6 bytes at ADDR_25
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_26
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_27
 memalloc dynstr.c(4): free 256 bytes at ADDR_27 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 7 bytes at ADDR_28
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_28
 memalloc srcfile.c(1): alloc 12 bytes at ADDR_29
-memalloc srcfile.c(3): alloc 28 bytes at ADDR_30
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_31
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_32
-memalloc dynstr.c(4): free 256 bytes at ADDR_32 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 7 bytes at ADDR_33
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_34
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_30
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_31
+memalloc dynstr.c(4): free 256 bytes at ADDR_31 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 7 bytes at ADDR_32
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_33
+memalloc srcfile.c(3): alloc 28 bytes at ADDR_34
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_35
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_36
 memalloc dynstr.c(4): free 256 bytes at ADDR_36 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_37
+memalloc dynstr.c(4): alloc 7 bytes at ADDR_37
 memalloc srcfile.c(1): alloc 12 bytes at ADDR_38
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_39
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_40
@@ -451,7 +456,15 @@ memalloc dynstr.c(3): alloc 256 bytes at ADDR_44
 memalloc dynstr.c(4): free 256 bytes at ADDR_44 allocated at dynstr.c(3)
 memalloc dynstr.c(4): alloc 8 bytes at ADDR_45
 memalloc srcfile.c(1): alloc 12 bytes at ADDR_46
-memalloc srcfile.c(4): free 28 bytes at ADDR_30 allocated at srcfile.c(3)
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_47
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_48
+memalloc dynstr.c(4): free 256 bytes at ADDR_48 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_49
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_50
+memalloc srcfile.c(4): free 28 bytes at ADDR_34 allocated at srcfile.c(3)
+memalloc srcfile.c(1): free 12 bytes at ADDR_50 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 8 bytes at ADDR_49 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_47 allocated at dynstr.c(1)
 memalloc srcfile.c(1): free 12 bytes at ADDR_46 allocated at srcfile.c(1)
 memalloc dynstr.c(2): free 8 bytes at ADDR_45 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_43 allocated at dynstr.c(1)
@@ -459,27 +472,19 @@ memalloc srcfile.c(1): free 12 bytes at ADDR_42 allocated at srcfile.c(1)
 memalloc dynstr.c(2): free 8 bytes at ADDR_41 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_39 allocated at dynstr.c(1)
 memalloc srcfile.c(1): free 12 bytes at ADDR_38 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_37 allocated at dynstr.c(4)
+memalloc dynstr.c(2): free 7 bytes at ADDR_37 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_35 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_34 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 7 bytes at ADDR_33 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_31 allocated at dynstr.c(1)
+memalloc srcfile.c(1): free 12 bytes at ADDR_33 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 7 bytes at ADDR_32 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_30 allocated at dynstr.c(1)
 memalloc srcfile.c(1): free 12 bytes at ADDR_29 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 7 bytes at ADDR_28 allocated at dynstr.c(4)
+memalloc dynstr.c(2): free 8 bytes at ADDR_28 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_26 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_25 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_24 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_22 allocated at dynstr.c(1)
-memalloc srcfile.c(3): alloc 28 bytes at ADDR_47
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_48
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_49
-memalloc dynstr.c(4): free 256 bytes at ADDR_49 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 7 bytes at ADDR_50
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_51
+memalloc srcfile.c(3): alloc 28 bytes at ADDR_51
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_52
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_53
 memalloc dynstr.c(4): free 256 bytes at ADDR_53 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_54
+memalloc dynstr.c(4): alloc 7 bytes at ADDR_54
 memalloc srcfile.c(1): alloc 12 bytes at ADDR_55
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_56
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_57
@@ -491,7 +496,15 @@ memalloc dynstr.c(3): alloc 256 bytes at ADDR_61
 memalloc dynstr.c(4): free 256 bytes at ADDR_61 allocated at dynstr.c(3)
 memalloc dynstr.c(4): alloc 8 bytes at ADDR_62
 memalloc srcfile.c(1): alloc 12 bytes at ADDR_63
-memalloc srcfile.c(4): free 28 bytes at ADDR_47 allocated at srcfile.c(3)
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_64
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_65
+memalloc dynstr.c(4): free 256 bytes at ADDR_65 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_66
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_67
+memalloc srcfile.c(4): free 28 bytes at ADDR_51 allocated at srcfile.c(3)
+memalloc srcfile.c(1): free 12 bytes at ADDR_67 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 8 bytes at ADDR_66 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_64 allocated at dynstr.c(1)
 memalloc srcfile.c(1): free 12 bytes at ADDR_63 allocated at srcfile.c(1)
 memalloc dynstr.c(2): free 8 bytes at ADDR_62 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_60 allocated at dynstr.c(1)
@@ -499,37 +512,29 @@ memalloc srcfile.c(1): free 12 bytes at ADDR_59 allocated at srcfile.c(1)
 memalloc dynstr.c(2): free 8 bytes at ADDR_58 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_56 allocated at dynstr.c(1)
 memalloc srcfile.c(1): free 12 bytes at ADDR_55 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_54 allocated at dynstr.c(4)
+memalloc dynstr.c(2): free 7 bytes at ADDR_54 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_52 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_51 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 7 bytes at ADDR_50 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_48 allocated at dynstr.c(1)
-memalloc srcfile.c(5): alloc 40 bytes at ADDR_64
-memalloc srcfile.c(2): alloc 48 bytes at ADDR_65
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_66
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_67
-memalloc srcfile.c(1): alloc 40 bytes at ADDR_68
-memalloc srcfile.c(5): alloc 12 bytes at ADDR_69
+memalloc srcfile.c(5): alloc 40 bytes at ADDR_68
+memalloc srcfile.c(2): alloc 48 bytes at ADDR_69
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_70
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_71
-memalloc dynstr.c(4): free 256 bytes at ADDR_71 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_72
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_73
+memalloc srcfile.c(1): alloc 40 bytes at ADDR_72
+memalloc srcfile.c(5): alloc 12 bytes at ADDR_73
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_74
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_75
 memalloc dynstr.c(4): free 256 bytes at ADDR_75 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 7 bytes at ADDR_76
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_76
 memalloc srcfile.c(1): alloc 12 bytes at ADDR_77
-memalloc srcfile.c(3): alloc 28 bytes at ADDR_78
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_79
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_80
-memalloc dynstr.c(4): free 256 bytes at ADDR_80 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 7 bytes at ADDR_81
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_82
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_78
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_79
+memalloc dynstr.c(4): free 256 bytes at ADDR_79 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 7 bytes at ADDR_80
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_81
+memalloc srcfile.c(3): alloc 28 bytes at ADDR_82
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_83
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_84
 memalloc dynstr.c(4): free 256 bytes at ADDR_84 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_85
+memalloc dynstr.c(4): alloc 7 bytes at ADDR_85
 memalloc srcfile.c(1): alloc 12 bytes at ADDR_86
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_87
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_88
@@ -541,7 +546,15 @@ memalloc dynstr.c(3): alloc 256 bytes at ADDR_92
 memalloc dynstr.c(4): free 256 bytes at ADDR_92 allocated at dynstr.c(3)
 memalloc dynstr.c(4): alloc 8 bytes at ADDR_93
 memalloc srcfile.c(1): alloc 12 bytes at ADDR_94
-memalloc srcfile.c(4): free 28 bytes at ADDR_78 allocated at srcfile.c(3)
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_95
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_96
+memalloc dynstr.c(4): free 256 bytes at ADDR_96 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_97
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_98
+memalloc srcfile.c(4): free 28 bytes at ADDR_82 allocated at srcfile.c(3)
+memalloc srcfile.c(1): free 12 bytes at ADDR_98 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 8 bytes at ADDR_97 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_95 allocated at dynstr.c(1)
 memalloc srcfile.c(1): free 12 bytes at ADDR_94 allocated at srcfile.c(1)
 memalloc dynstr.c(2): free 8 bytes at ADDR_93 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_91 allocated at dynstr.c(1)
@@ -549,47 +562,39 @@ memalloc srcfile.c(1): free 12 bytes at ADDR_90 allocated at srcfile.c(1)
 memalloc dynstr.c(2): free 8 bytes at ADDR_89 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_87 allocated at dynstr.c(1)
 memalloc srcfile.c(1): free 12 bytes at ADDR_86 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_85 allocated at dynstr.c(4)
+memalloc dynstr.c(2): free 7 bytes at ADDR_85 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_83 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_82 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 7 bytes at ADDR_81 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_79 allocated at dynstr.c(1)
+memalloc srcfile.c(1): free 12 bytes at ADDR_81 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 7 bytes at ADDR_80 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_78 allocated at dynstr.c(1)
 memalloc srcfile.c(1): free 12 bytes at ADDR_77 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 7 bytes at ADDR_76 allocated at dynstr.c(4)
+memalloc dynstr.c(2): free 8 bytes at ADDR_76 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_74 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_73 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_72 allocated at dynstr.c(4)
+memalloc srcfile.c(5): free 12 bytes at ADDR_73 allocated at srcfile.c(5)
+memalloc dynstr.c(2): free 256 bytes at ADDR_71 allocated at dynstr.c(3)
 memalloc dynstr.c(1): free 40 bytes at ADDR_70 allocated at dynstr.c(1)
-memalloc srcfile.c(5): free 12 bytes at ADDR_69 allocated at srcfile.c(5)
-memalloc dynstr.c(2): free 256 bytes at ADDR_67 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_66 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 40 bytes at ADDR_68 allocated at srcfile.c(1)
-memalloc srcfile.c(2): free 48 bytes at ADDR_65 allocated at srcfile.c(2)
-memalloc srcfile.c(2): alloc 48 bytes at ADDR_95
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_96
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_97
-memalloc srcfile.c(1): alloc 40 bytes at ADDR_98
-memalloc srcfile.c(5): alloc 12 bytes at ADDR_99
+memalloc srcfile.c(1): free 40 bytes at ADDR_72 allocated at srcfile.c(1)
+memalloc srcfile.c(2): free 48 bytes at ADDR_69 allocated at srcfile.c(2)
+memalloc srcfile.c(2): alloc 48 bytes at ADDR_99
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_100
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_101
-memalloc dynstr.c(4): free 256 bytes at ADDR_101 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_102
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_103
+memalloc srcfile.c(1): alloc 40 bytes at ADDR_102
+memalloc srcfile.c(5): alloc 12 bytes at ADDR_103
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_104
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_105
 memalloc dynstr.c(4): free 256 bytes at ADDR_105 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 7 bytes at ADDR_106
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_106
 memalloc srcfile.c(1): alloc 12 bytes at ADDR_107
-memalloc srcfile.c(3): alloc 28 bytes at ADDR_108
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_109
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_110
-memalloc dynstr.c(4): free 256 bytes at ADDR_110 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 7 bytes at ADDR_111
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_112
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_108
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_109
+memalloc dynstr.c(4): free 256 bytes at ADDR_109 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 7 bytes at ADDR_110
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_111
+memalloc srcfile.c(3): alloc 28 bytes at ADDR_112
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_113
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_114
 memalloc dynstr.c(4): free 256 bytes at ADDR_114 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_115
+memalloc dynstr.c(4): alloc 7 bytes at ADDR_115
 memalloc srcfile.c(1): alloc 12 bytes at ADDR_116
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_117
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_118
@@ -601,7 +606,15 @@ memalloc dynstr.c(3): alloc 256 bytes at ADDR_122
 memalloc dynstr.c(4): free 256 bytes at ADDR_122 allocated at dynstr.c(3)
 memalloc dynstr.c(4): alloc 8 bytes at ADDR_123
 memalloc srcfile.c(1): alloc 12 bytes at ADDR_124
-memalloc srcfile.c(4): free 28 bytes at ADDR_108 allocated at srcfile.c(3)
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_125
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_126
+memalloc dynstr.c(4): free 256 bytes at ADDR_126 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_127
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_128
+memalloc srcfile.c(4): free 28 bytes at ADDR_112 allocated at srcfile.c(3)
+memalloc srcfile.c(1): free 12 bytes at ADDR_128 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 8 bytes at ADDR_127 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_125 allocated at dynstr.c(1)
 memalloc srcfile.c(1): free 12 bytes at ADDR_124 allocated at srcfile.c(1)
 memalloc dynstr.c(2): free 8 bytes at ADDR_123 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_121 allocated at dynstr.c(1)
@@ -609,170 +622,173 @@ memalloc srcfile.c(1): free 12 bytes at ADDR_120 allocated at srcfile.c(1)
 memalloc dynstr.c(2): free 8 bytes at ADDR_119 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_117 allocated at dynstr.c(1)
 memalloc srcfile.c(1): free 12 bytes at ADDR_116 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_115 allocated at dynstr.c(4)
+memalloc dynstr.c(2): free 7 bytes at ADDR_115 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_113 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_112 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 7 bytes at ADDR_111 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_109 allocated at dynstr.c(1)
+memalloc srcfile.c(1): free 12 bytes at ADDR_111 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 7 bytes at ADDR_110 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_108 allocated at dynstr.c(1)
 memalloc srcfile.c(1): free 12 bytes at ADDR_107 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 7 bytes at ADDR_106 allocated at dynstr.c(4)
+memalloc dynstr.c(2): free 8 bytes at ADDR_106 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_104 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_103 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_102 allocated at dynstr.c(4)
+memalloc srcfile.c(2): alloc 48 bytes at ADDR_129
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_130
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_131
+memalloc srcfile.c(1): alloc 40 bytes at ADDR_132
+memalloc file.c(4): alloc 40 bytes at ADDR_133
+memalloc srcfile.c(5): alloc 12 bytes at ADDR_134
+memalloc srcfile.c(5): free 12 bytes at ADDR_134 allocated at srcfile.c(5)
+memalloc dynstr.c(2): free 256 bytes at ADDR_131 allocated at dynstr.c(3)
+memalloc dynstr.c(1): free 40 bytes at ADDR_130 allocated at dynstr.c(1)
+memalloc srcfile.c(1): free 40 bytes at ADDR_132 allocated at srcfile.c(1)
+memalloc srcfile.c(2): free 48 bytes at ADDR_129 allocated at srcfile.c(2)
+memalloc srcfile.c(5): free 12 bytes at ADDR_103 allocated at srcfile.c(5)
+memalloc dynstr.c(2): free 256 bytes at ADDR_101 allocated at dynstr.c(3)
 memalloc dynstr.c(1): free 40 bytes at ADDR_100 allocated at dynstr.c(1)
-memalloc srcfile.c(2): alloc 48 bytes at ADDR_125
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_126
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_127
-memalloc srcfile.c(1): alloc 40 bytes at ADDR_128
-memalloc srcfile.c(5): alloc 12 bytes at ADDR_129
-memalloc srcfile.c(5): free 12 bytes at ADDR_129 allocated at srcfile.c(5)
-memalloc dynstr.c(2): free 256 bytes at ADDR_127 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_126 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 40 bytes at ADDR_128 allocated at srcfile.c(1)
-memalloc srcfile.c(2): free 48 bytes at ADDR_125 allocated at srcfile.c(2)
-memalloc srcfile.c(5): free 12 bytes at ADDR_99 allocated at srcfile.c(5)
-memalloc dynstr.c(2): free 256 bytes at ADDR_97 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_96 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 40 bytes at ADDR_98 allocated at srcfile.c(1)
-memalloc srcfile.c(2): free 48 bytes at ADDR_95 allocated at srcfile.c(2)
-memalloc srcfile.c(5): alloc 40 bytes at ADDR_130
-memalloc srcfile.c(2): alloc 48 bytes at ADDR_131
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_132
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_133
-memalloc srcfile.c(1): alloc 40 bytes at ADDR_134
-memalloc srcfile.c(5): alloc 12 bytes at ADDR_135
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_136
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_137
-memalloc dynstr.c(4): free 256 bytes at ADDR_137 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_138
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_139
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_140
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_141
-memalloc dynstr.c(4): free 256 bytes at ADDR_141 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 7 bytes at ADDR_142
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_143
-memalloc srcfile.c(3): alloc 28 bytes at ADDR_144
+memalloc srcfile.c(1): free 40 bytes at ADDR_102 allocated at srcfile.c(1)
+memalloc srcfile.c(2): free 48 bytes at ADDR_99 allocated at srcfile.c(2)
+memalloc srcfile.c(5): alloc 40 bytes at ADDR_135
+memalloc srcfile.c(2): alloc 48 bytes at ADDR_136
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_137
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_138
+memalloc srcfile.c(1): alloc 40 bytes at ADDR_139
+memalloc srcfile.c(5): alloc 12 bytes at ADDR_140
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_141
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_142
+memalloc dynstr.c(4): free 256 bytes at ADDR_142 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_143
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_144
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_145
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_146
 memalloc dynstr.c(4): free 256 bytes at ADDR_146 allocated at dynstr.c(3)
 memalloc dynstr.c(4): alloc 7 bytes at ADDR_147
 memalloc srcfile.c(1): alloc 12 bytes at ADDR_148
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_149
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_150
-memalloc dynstr.c(4): free 256 bytes at ADDR_150 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_151
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_152
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_153
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_154
-memalloc dynstr.c(4): free 256 bytes at ADDR_154 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_155
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_156
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_157
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_158
-memalloc dynstr.c(4): free 256 bytes at ADDR_158 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_159
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_160
-memalloc srcfile.c(4): free 28 bytes at ADDR_144 allocated at srcfile.c(3)
-memalloc srcfile.c(1): free 12 bytes at ADDR_160 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_159 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_157 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_156 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_155 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_153 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_152 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_151 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_149 allocated at dynstr.c(1)
+memalloc srcfile.c(3): alloc 28 bytes at ADDR_149
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_150
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_151
+memalloc dynstr.c(4): free 256 bytes at ADDR_151 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 7 bytes at ADDR_152
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_153
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_154
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_155
+memalloc dynstr.c(4): free 256 bytes at ADDR_155 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_156
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_157
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_158
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_159
+memalloc dynstr.c(4): free 256 bytes at ADDR_159 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_160
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_161
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_162
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_163
+memalloc dynstr.c(4): free 256 bytes at ADDR_163 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_164
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_165
+memalloc srcfile.c(4): free 28 bytes at ADDR_149 allocated at srcfile.c(3)
+memalloc srcfile.c(1): free 12 bytes at ADDR_165 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 8 bytes at ADDR_164 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_162 allocated at dynstr.c(1)
+memalloc srcfile.c(1): free 12 bytes at ADDR_161 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 8 bytes at ADDR_160 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_158 allocated at dynstr.c(1)
+memalloc srcfile.c(1): free 12 bytes at ADDR_157 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 8 bytes at ADDR_156 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_154 allocated at dynstr.c(1)
+memalloc srcfile.c(1): free 12 bytes at ADDR_153 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 7 bytes at ADDR_152 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_150 allocated at dynstr.c(1)
 memalloc srcfile.c(1): free 12 bytes at ADDR_148 allocated at srcfile.c(1)
 memalloc dynstr.c(2): free 7 bytes at ADDR_147 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_145 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_143 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 7 bytes at ADDR_142 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_140 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_139 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_138 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_136 allocated at dynstr.c(1)
-memalloc srcfile.c(5): free 12 bytes at ADDR_135 allocated at srcfile.c(5)
-memalloc dynstr.c(2): free 256 bytes at ADDR_133 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_132 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 40 bytes at ADDR_134 allocated at srcfile.c(1)
-memalloc srcfile.c(2): free 48 bytes at ADDR_131 allocated at srcfile.c(2)
-memalloc srcfile.c(2): alloc 48 bytes at ADDR_161
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_162
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_163
-memalloc srcfile.c(1): alloc 40 bytes at ADDR_164
-memalloc srcfile.c(5): alloc 12 bytes at ADDR_165
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_166
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_167
-memalloc dynstr.c(4): free 256 bytes at ADDR_167 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_168
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_169
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_170
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_171
-memalloc dynstr.c(4): free 256 bytes at ADDR_171 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 7 bytes at ADDR_172
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_173
-memalloc srcfile.c(3): alloc 28 bytes at ADDR_174
+memalloc srcfile.c(1): free 12 bytes at ADDR_144 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 8 bytes at ADDR_143 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_141 allocated at dynstr.c(1)
+memalloc srcfile.c(5): free 12 bytes at ADDR_140 allocated at srcfile.c(5)
+memalloc dynstr.c(2): free 256 bytes at ADDR_138 allocated at dynstr.c(3)
+memalloc dynstr.c(1): free 40 bytes at ADDR_137 allocated at dynstr.c(1)
+memalloc srcfile.c(1): free 40 bytes at ADDR_139 allocated at srcfile.c(1)
+memalloc srcfile.c(2): free 48 bytes at ADDR_136 allocated at srcfile.c(2)
+memalloc srcfile.c(2): alloc 48 bytes at ADDR_166
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_167
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_168
+memalloc srcfile.c(1): alloc 40 bytes at ADDR_169
+memalloc srcfile.c(5): alloc 12 bytes at ADDR_170
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_171
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_172
+memalloc dynstr.c(4): free 256 bytes at ADDR_172 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_173
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_174
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_175
 memalloc dynstr.c(3): alloc 256 bytes at ADDR_176
 memalloc dynstr.c(4): free 256 bytes at ADDR_176 allocated at dynstr.c(3)
 memalloc dynstr.c(4): alloc 7 bytes at ADDR_177
 memalloc srcfile.c(1): alloc 12 bytes at ADDR_178
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_179
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_180
-memalloc dynstr.c(4): free 256 bytes at ADDR_180 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_181
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_182
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_183
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_184
-memalloc dynstr.c(4): free 256 bytes at ADDR_184 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_185
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_186
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_187
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_188
-memalloc dynstr.c(4): free 256 bytes at ADDR_188 allocated at dynstr.c(3)
-memalloc dynstr.c(4): alloc 8 bytes at ADDR_189
-memalloc srcfile.c(1): alloc 12 bytes at ADDR_190
-memalloc srcfile.c(4): free 28 bytes at ADDR_174 allocated at srcfile.c(3)
-memalloc srcfile.c(1): free 12 bytes at ADDR_190 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_189 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_187 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_186 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_185 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_183 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_182 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_181 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_179 allocated at dynstr.c(1)
+memalloc srcfile.c(3): alloc 28 bytes at ADDR_179
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_180
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_181
+memalloc dynstr.c(4): free 256 bytes at ADDR_181 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 7 bytes at ADDR_182
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_183
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_184
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_185
+memalloc dynstr.c(4): free 256 bytes at ADDR_185 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_186
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_187
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_188
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_189
+memalloc dynstr.c(4): free 256 bytes at ADDR_189 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_190
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_191
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_192
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_193
+memalloc dynstr.c(4): free 256 bytes at ADDR_193 allocated at dynstr.c(3)
+memalloc dynstr.c(4): alloc 8 bytes at ADDR_194
+memalloc srcfile.c(1): alloc 12 bytes at ADDR_195
+memalloc srcfile.c(4): free 28 bytes at ADDR_179 allocated at srcfile.c(3)
+memalloc srcfile.c(1): free 12 bytes at ADDR_195 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 8 bytes at ADDR_194 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_192 allocated at dynstr.c(1)
+memalloc srcfile.c(1): free 12 bytes at ADDR_191 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 8 bytes at ADDR_190 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_188 allocated at dynstr.c(1)
+memalloc srcfile.c(1): free 12 bytes at ADDR_187 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 8 bytes at ADDR_186 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_184 allocated at dynstr.c(1)
+memalloc srcfile.c(1): free 12 bytes at ADDR_183 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 7 bytes at ADDR_182 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_180 allocated at dynstr.c(1)
 memalloc srcfile.c(1): free 12 bytes at ADDR_178 allocated at srcfile.c(1)
 memalloc dynstr.c(2): free 7 bytes at ADDR_177 allocated at dynstr.c(4)
 memalloc dynstr.c(1): free 40 bytes at ADDR_175 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_173 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 7 bytes at ADDR_172 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_170 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 12 bytes at ADDR_169 allocated at srcfile.c(1)
-memalloc dynstr.c(2): free 8 bytes at ADDR_168 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_166 allocated at dynstr.c(1)
-memalloc srcfile.c(2): alloc 48 bytes at ADDR_191
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_192
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_193
-memalloc srcfile.c(1): alloc 40 bytes at ADDR_194
-memalloc srcfile.c(5): alloc 12 bytes at ADDR_195
-memalloc srcfile.c(5): free 12 bytes at ADDR_195 allocated at srcfile.c(5)
-memalloc dynstr.c(2): free 256 bytes at ADDR_193 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_192 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 40 bytes at ADDR_194 allocated at srcfile.c(1)
-memalloc srcfile.c(2): free 48 bytes at ADDR_191 allocated at srcfile.c(2)
-memalloc srcfile.c(5): free 12 bytes at ADDR_165 allocated at srcfile.c(5)
-memalloc dynstr.c(2): free 256 bytes at ADDR_163 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_162 allocated at dynstr.c(1)
-memalloc srcfile.c(1): free 40 bytes at ADDR_164 allocated at srcfile.c(1)
-memalloc srcfile.c(2): free 48 bytes at ADDR_161 allocated at srcfile.c(2)
+memalloc srcfile.c(1): free 12 bytes at ADDR_174 allocated at srcfile.c(1)
+memalloc dynstr.c(2): free 8 bytes at ADDR_173 allocated at dynstr.c(4)
+memalloc dynstr.c(1): free 40 bytes at ADDR_171 allocated at dynstr.c(1)
+memalloc srcfile.c(2): alloc 48 bytes at ADDR_196
+memalloc dynstr.c(1): alloc 40 bytes at ADDR_197
+memalloc dynstr.c(3): alloc 256 bytes at ADDR_198
+memalloc srcfile.c(1): alloc 40 bytes at ADDR_199
+memalloc srcfile.c(5): alloc 12 bytes at ADDR_200
+memalloc srcfile.c(5): free 12 bytes at ADDR_200 allocated at srcfile.c(5)
+memalloc dynstr.c(2): free 256 bytes at ADDR_198 allocated at dynstr.c(3)
+memalloc dynstr.c(1): free 40 bytes at ADDR_197 allocated at dynstr.c(1)
+memalloc srcfile.c(1): free 40 bytes at ADDR_199 allocated at srcfile.c(1)
+memalloc srcfile.c(2): free 48 bytes at ADDR_196 allocated at srcfile.c(2)
+memalloc srcfile.c(5): free 12 bytes at ADDR_170 allocated at srcfile.c(5)
+memalloc dynstr.c(2): free 256 bytes at ADDR_168 allocated at dynstr.c(3)
+memalloc dynstr.c(1): free 40 bytes at ADDR_167 allocated at dynstr.c(1)
+memalloc srcfile.c(1): free 40 bytes at ADDR_169 allocated at srcfile.c(1)
+memalloc srcfile.c(2): free 48 bytes at ADDR_166 allocated at srcfile.c(2)
 memalloc dynstr.c(2): free 256 bytes at ADDR_16 allocated at dynstr.c(3)
 memalloc dynstr.c(1): free 40 bytes at ADDR_15 allocated at dynstr.c(1)
 memalloc srcfile.c(1): free 40 bytes at ADDR_17 allocated at srcfile.c(1)
 memalloc srcfile.c(2): free 48 bytes at ADDR_14 allocated at srcfile.c(2)
-memalloc srcfile.c(5): free 40 bytes at ADDR_64 allocated at srcfile.c(5)
+memalloc srcfile.c(5): free 40 bytes at ADDR_68 allocated at srcfile.c(5)
 last object deleted
-memalloc srcfile.c(5): free 40 bytes at ADDR_130 allocated at srcfile.c(5)
+memalloc srcfile.c(5): free 40 bytes at ADDR_135 allocated at srcfile.c(5)
+memalloc file.c(3): free 40 bytes at ADDR_21 allocated at file.c(4)
+memalloc file.c(2): free 384 bytes at ADDR_23 allocated at file.c(5)
+memalloc file.c(2): free 44 bytes at ADDR_22 allocated at file.c(5)
+memalloc file.c(3): free 40 bytes at ADDR_133 allocated at file.c(4)
+memalloc file.c(1): free 32 bytes at ADDR_20 allocated at file.c(1)
 memalloc strlist.c(2): free 12 bytes at ADDR_3 allocated at strlist.c(3)
 memalloc strlist.c(2): free 12 bytes at ADDR_8 allocated at strlist.c(3)
 memalloc strlist.c(2): free 12 bytes at ADDR_11 allocated at strlist.c(3)
@@ -787,8 +803,8 @@ memalloc strpool.c(6): free 3 bytes at ADDR_19 allocated at strpool.c(3)
 memalloc strpool.c(7): free 36 bytes at ADDR_18 allocated at strpool.c(2)
 memalloc strpool.c(5): free 384 bytes at ADDR_7 allocated at strpool.c(4)
 memalloc strpool.c(5): free 44 bytes at ADDR_6 allocated at strpool.c(4)
-memalloc strpool.c(6): free 6 bytes at ADDR_21 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_20 allocated at strpool.c(2)
+memalloc strpool.c(6): free 6 bytes at ADDR_25 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_24 allocated at strpool.c(2)
 memalloc strpool.c(1): free 32 bytes at ADDR_2 allocated at strpool.c(1)
 memalloc: cleanup
 END

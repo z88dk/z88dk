@@ -13,9 +13,15 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.4 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.5 2013-05-11 00:29:26 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.4  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.5  2013-05-11 00:29:26  pauloscustodio
+# CH_0021 : Exceptions on file IO show file name
+# Keep a hash table of all opened file names, so that the file name
+# is shown on a fatal error.
+# Rename file IO funtions: f..._err to xf...
+#
+# Revision 1.4  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.3  2013/01/19 23:54:04  pauloscustodio
@@ -44,8 +50,8 @@ require 't/test_utils.pl';
 # test errors.c
 unlink_testfiles();
 
-my $objs = "errors.o memalloc.o class.o die.o strutil.o strhash.o safestr.o strpool.o except.o";
-ok ! system "make $objs";
+my $objs = "errors.o memalloc.o class.o die.o strutil.o strhash.o safestr.o strpool.o except.o ".
+		   "strlist.o file.o";
 
 my $init = <<'END';
 #define ERROR return __LINE__

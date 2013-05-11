@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.13 2013-05-02 00:01:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.14 2013-05-11 00:29:26 pauloscustodio Exp $ */
 /* $Log: errors.h,v $
-/* Revision 1.13  2013-05-02 00:01:03  pauloscustodio
+/* Revision 1.14  2013-05-11 00:29:26  pauloscustodio
+/* CH_0021 : Exceptions on file IO show file name
+/* Keep a hash table of all opened file names, so that the file name
+/* is shown on a fatal error.
+/* Rename file IO funtions: f..._err to xf...
+/*
+/* Revision 1.13  2013/05/02 00:01:03  pauloscustodio
 /* New stat_err()
 /*
 /* Revision 1.12  2013/01/20 21:24:28  pauloscustodio
@@ -84,7 +90,6 @@ Copyright (C) Paulo Custodio, 2011-2013
 #define ERRORS_H
 
 #include <stdio.h>
-#include <sys/stat.h>
 
 /* error constants */
 #define DEF_MSG(name,msg)    name,
@@ -118,22 +123,6 @@ extern void warning( ErrorCode err, ... );
 extern void fatal_error_at( char *filename, int lineno, ErrorCode err, ... );
 extern void error_at( char *filename, int lineno, ErrorCode err, ... );
 extern void warning_at( char *filename, int lineno, ErrorCode err, ... );
-
-/* OS interface with fatal errors on failure */
-extern FILE *fopen_err( char *filename, char *mode );
-
-extern void fputc_err( int c, FILE *stream );
-extern int fgetc_err( FILE *stream );   /* EOF is fatal */
-
-extern void fwrite_err( const void *buffer, size_t size, size_t count, FILE *stream );
-#define fwritec_err(buffer, count, stream) \
-    fwrite_err(buffer, sizeof(char), count, stream)
-
-extern void fread_err( void *buffer, size_t size, size_t count, FILE *stream );   /* EOF is fatal */
-#define freadc_err( buffer, count, stream) \
-    fread_err( buffer, sizeof(char), count, stream)   /* EOF is fatal */
-
-extern void stat_err( char *filename, struct stat *filestat );
 
 #endif /* ndef ERRORS_H */
 

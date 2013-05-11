@@ -14,9 +14,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.12 2013-04-06 13:15:04 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.13 2013-05-11 00:29:26 pauloscustodio Exp $
 $Log: file.h,v $
-Revision 1.12  2013-04-06 13:15:04  pauloscustodio
+Revision 1.13  2013-05-11 00:29:26  pauloscustodio
+CH_0021 : Exceptions on file IO show file name
+Keep a hash table of all opened file names, so that the file name
+is shown on a fatal error.
+Rename file IO funtions: f..._err to xf...
+
+Revision 1.12  2013/04/06 13:15:04  pauloscustodio
 Move default asm and obj extension handling to file.c.
 srcfilename and objfilename are now pointers to static variables in file.c
 
@@ -77,15 +83,64 @@ Utilities for file handling
 
 #include "memalloc.h"   /* before any other include */
 
+#include "safestr.h"
 #include "strlist.h"
+#include "types.h"
 #include <stdio.h>
+#include <sys/stat.h>
 
-/* read/write words and longs */
-extern void   fputw_err( size_t word, FILE *stream );
-extern size_t fgetw_err( FILE *stream );
 
-extern void   fputl_err( long dword,  FILE *stream );
-extern long   fgetl_err( FILE *stream );
+/* OS interface with fatal errors on failure */
+extern void  xstat(  char *filename, struct stat *filestat );
+extern FILE *xfopen( char *filename, char *mode ); 
+extern void  xfclose( FILE *file );
+
+/* read/write buffers */
+extern void xfwrite( const void *buffer, size_t size, size_t count, FILE *file );
+extern void xfread(        void *buffer, size_t size, size_t count, FILE *file );   /* EOF is fatal */
+
+extern void xfput_char( const char *buffer, size_t len, FILE *file );
+extern void xfget_char(       char *buffer, size_t len, FILE *file );   /* EOF is fatal */
+
+/* read/write numbers */
+extern void  xfput_u8( int value, FILE *file );
+extern int   xfget_u8( FILE *file );   /* EOF is fatal */
+extern int   xfget_i8( FILE *file );   /* EOF is fatal */
+
+extern void  xfput_u16( int value, FILE *file );
+extern int   xfget_u16( FILE *file );   /* EOF is fatal */
+extern int   xfget_i16( FILE *file );   /* EOF is fatal */
+
+extern void  xfput_u32( long value, FILE *file );
+extern long  xfget_u32( FILE *file );   /* EOF is fatal */
+extern long  xfget_i32( FILE *file );   /* EOF is fatal */
+
+/* read/write sstr_t */
+extern void  xfput_sstr( sstr_t *str, FILE *file );
+extern void  xfget_sstr( sstr_t *str, size_t len, FILE *file );
+
+/* read/write sstr_t byte-counted strings (1 byte size + string chars) */
+extern void   xfput_c1sstr( sstr_t *str, FILE *file );
+extern void   xfget_c1sstr( sstr_t *str, FILE *file );
+
+/* read/write sstr_t word-counted strings (2 bytes size + string chars) */
+extern void   xfput_c2sstr( sstr_t *str, FILE *file );
+extern void   xfget_c2sstr( sstr_t *str, FILE *file );
+
+/* legacy interface - to be deleted */
+#define stat_err	xstat
+#define fopen_err	xfopen
+#define fwrite_err	xfwrite
+#define fwritec_err	xfput_char
+#define fread_err	xfread
+#define freadc_err	xfget_char
+#define fputc_err	xfput_u8
+#define fgetc_err	xfget_u8
+#define fputw_err	xfput_u16
+#define fgetw_err	xfget_u16
+#define fputl_err	xfput_u32
+#define fgetl_err	xfget_i32
+
 
 /* pathname manipulation
  * All filenames are passed as char file[FILENAME_MAX] elements, instead of always strdup'ing
