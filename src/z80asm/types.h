@@ -15,9 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 Common types
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.9 2013-05-01 22:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.10 2013-05-12 19:23:17 pauloscustodio Exp $ */
 /* $Log: types.h,v $
-/* Revision 1.9  2013-05-01 22:24:28  pauloscustodio
+/* Revision 1.10  2013-05-12 19:23:17  pauloscustodio
+/* MAXIDENT for maximum identifier length - set at 255 because of object file format
+/* with one byte string length
+/* MIN and MAX macros
+/*
+/* Revision 1.9  2013/05/01 22:24:28  pauloscustodio
 /* Make sure MAXLINE is >= FILENAME_MAX
 /*
 /* Revision 1.8  2013/04/21 22:51:03  pauloscustodio
@@ -65,11 +70,16 @@ typedef unsigned char byte_t;		/*  8-bit */
 /* typedef unsigned int size_t;	*/	/* 32-bit */
 
 /* number of elements of an array */
-#define NUM_ELEMS(x) (sizeof(x)/sizeof(x[0]))
+#define NUM_ELEMS(x)	(sizeof(x)/sizeof(x[0]))
+
+/* MIN/MAX */
+#define MIN(a,b)		( (a) < (b) ? (a) : (b) )
+#define MAX(a,b)		( (a) > (b) ? (a) : (b) )
 
 /* maximum length of strings */
 #define _MIN_MAXLINE	1024
-#define MAXLINE			(_MIN_MAXLINE > FILENAME_MAX ? _MIN_MAXLINE : FILENAME_MAX)
+#define MAXIDENT		255
+#define MAXLINE			MAX( _MIN_MAXLINE, MAX( FILENAME_MAX, MAXIDENT ) )
 
 /* snprintf is _snprintf in _MSC_VER */
 #ifdef _MSC_VER
