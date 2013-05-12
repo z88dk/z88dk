@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.83 2013-05-06 23:02:12 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.84 2013-05-12 19:46:35 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.83  2013-05-06 23:02:12  pauloscustodio
+/* Revision 1.84  2013-05-12 19:46:35  pauloscustodio
+/* New module for object file handling
+/*
+/* Revision 1.83  2013/05/06 23:02:12  pauloscustodio
 /* BUG_0034 : If assembly process fails with fatal error, invalid library is kept
 /* Option -x creates an empty library file (just the header). If the
 /* assembly process fails with a fatal errror afterwards, the library file
@@ -584,8 +587,8 @@ enum flag EOL, library, createlibrary;
 long TOTALLINES;
 char line[255], stringconst[255], ident[FILENAME_MAX + 1];
 
-char Z80objhdr[] = "Z80RMF01";
-char objhdrprefix[] = "oomodnexprnamelibnmodc";
+extern char Z80objhdr[];
+extern char objhdrprefix[];
 char Z80libhdr[] = "Z80LMF01";
 
 byte_t reloc_routine[] =
