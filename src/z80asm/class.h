@@ -20,9 +20,12 @@ each object, which in turn may call destructors of contained objects.
 
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.6 2013-01-30 20:38:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.7 2013-05-12 21:39:05 pauloscustodio Exp $ */
 /* $Log: class.h,v $
-/* Revision 1.6  2013-01-30 20:38:59  pauloscustodio
+/* Revision 1.7  2013-05-12 21:39:05  pauloscustodio
+/* OBJ_DELETE() now accepts and ignores a NULL argument
+/*
+/* Revision 1.6  2013/01/30 20:38:59  pauloscustodio
 /* Double macro call not necessary
 /*
 /* Revision 1.5  2013/01/30 00:39:25  pauloscustodio
@@ -160,8 +163,11 @@ struct ObjRegister;
 *   Helper macros
 *----------------------------------------------------------------------------*/
 #define OBJ_NEW(T)      T##_new()
-#define OBJ_DELETE(obj) ( ( (*(obj)->_class.delete_ptr)((struct ObjRegister *)(obj)) ), \
-                          (obj) = NULL )
+#define OBJ_DELETE(obj) ( (obj) == NULL ? \
+								NULL : \
+								( ( (*(obj)->_class.delete_ptr)( \
+											(struct ObjRegister *) (obj) ) ), \
+								  (obj) = NULL ) )
 #define OBJ_AUTODELETE(obj) ((obj)->_class.autodelete)
 
 /*-----------------------------------------------------------------------------

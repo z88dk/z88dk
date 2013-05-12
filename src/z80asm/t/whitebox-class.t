@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.5 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.6 2013-05-12 21:39:05 pauloscustodio Exp $
 # $Log: whitebox-class.t,v $
-# Revision 1.5  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.6  2013-05-12 21:39:05  pauloscustodio
+# OBJ_DELETE() now accepts and ignores a NULL argument
+#
+# Revision 1.5  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.4  2013/01/19 00:04:53  pauloscustodio
@@ -127,11 +130,15 @@ t_compile_module($init, <<'END', $compile);
 	if (test >= 3) {
 		OBJ_DELETE(p1);
 		if (p1)								return 13;
+		OBJ_DELETE(p1);		/* test double delete */
+		if (p1)								return 14;
 	}
 	
 	if (test >= 4) {
 		OBJ_DELETE(p2);
-		if (p2)								return 14;
+		if (p2)								return 15;
+		OBJ_DELETE(p2);		/* test double delete */
+		if (p2)								return 16;
 	}
 	
 	return 0;
