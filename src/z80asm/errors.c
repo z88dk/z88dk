@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.24 2013-05-11 00:29:26 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.25 2013-05-12 19:39:32 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.24  2013-05-11 00:29:26  pauloscustodio
+/* Revision 1.25  2013-05-12 19:39:32  pauloscustodio
+/* warnings
+/*
+/* Revision 1.24  2013/05/11 00:29:26  pauloscustodio
 /* CH_0021 : Exceptions on file IO show file name
 /* Keep a hash table of all opened file names, so that the file name
 /* is shown on a fatal error.
@@ -372,7 +375,7 @@ static void out_error_msg( int *countp, char *prefix,
     sstr_cat( str, ": " );
 
     /* output error message */
-    if ( err >= 0 && err < NUM_ELEMS( error_msg ) )
+    if ( err < NUM_ELEMS( error_msg ) )
     {
         switch ( err )
         {

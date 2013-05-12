@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.42 2013-03-06 00:02:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.43 2013-05-12 19:39:32 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.42  2013-03-06 00:02:17  pauloscustodio
+/* Revision 1.43  2013-05-12 19:39:32  pauloscustodio
+/* warnings
+/*
+/* Revision 1.42  2013/03/06 00:02:17  pauloscustodio
 /* 	BUG_0032 : DEFGROUP ignores name after assignment
 /* 		The code
 /* DEFGROUP {
@@ -848,7 +851,7 @@ ORG( void )
         {
             constant = EvalPfixExpr( postfixexpr );       /* ORG expression must not contain undefined symbols */
 
-            if ( constant >= 0 && constant <= 65535U )
+            if ( constant >= 0 && constant <= 65535 )
             {
                 CURRENTMODULE->origin = constant;
             }

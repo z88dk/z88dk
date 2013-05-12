@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.11 2013-03-30 00:02:22 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.12 2013-05-12 19:39:32 pauloscustodio Exp $ */
 /* $Log: codearea.c,v $
-/* Revision 1.11  2013-03-30 00:02:22  pauloscustodio
+/* Revision 1.12  2013-05-12 19:39:32  pauloscustodio
+/* warnings
+/*
+/* Revision 1.11  2013/03/30 00:02:22  pauloscustodio
 /* include memalloc.h before any other include
 /*
 /* Revision 1.10  2013/02/22 17:19:19  pauloscustodio
@@ -284,7 +287,7 @@ byte_t get_byte( size_t *paddr )
 {
     byte_t byte;
 
-    E4C_ASSERT( *paddr >= 0 && *paddr < codeindex );
+    E4C_ASSERT( *paddr < codeindex );
     byte = codearea[( *paddr )++];
     return byte;
 }

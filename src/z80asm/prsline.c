@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.31 2013-01-24 23:03:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.32 2013-05-12 19:39:32 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.31  2013-01-24 23:03:03  pauloscustodio
+/* Revision 1.32  2013-05-12 19:39:32  pauloscustodio
+/* warnings
+/*
+/* Revision 1.31  2013/01/24 23:03:03  pauloscustodio
 /* Replaced (unsigned char) by (byte_t)
 /* Replaced (unisigned int) by (size_t)
 /* Replaced (short) by (int)
@@ -192,6 +195,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "symbol.h"
 #include "options.h"
 #include "errors.h"
+#include "types.h"
 
 /* local functions */
 long GetConstant( char *evalerr );
@@ -616,11 +620,11 @@ flags[] =
 int
 CheckCondition( void )
 {
-    int     i;
+    size_t  i;
     char   *text = ident;
-    size_t len = strlen( text );
+    size_t  len = strlen( text );
 
-    for ( i = 0; i < sizeof( flags ) / sizeof( flags[0] ); i++ )
+    for ( i = 0; i < NUM_ELEMS(flags); i++ )
     {
         if ( len != strlen( flags[i].name ) )
         {

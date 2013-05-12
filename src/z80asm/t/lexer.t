@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/lexer.t,v 1.3 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/lexer.t,v 1.4 2013-05-12 19:39:32 pauloscustodio Exp $
 # $Log: lexer.t,v $
-# Revision 1.3  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.4  2013-05-12 19:39:32  pauloscustodio
+# warnings
+#
+# Revision 1.3  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.2  2012/05/22 20:33:34  pauloscustodio
@@ -34,7 +37,6 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-diag "Should accept blanks between label and colon";
 diag "Should accept binary constant longer than 8 bits";
 
 my @asmbin = (
