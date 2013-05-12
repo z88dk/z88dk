@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.1 2013-04-13 15:55:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.2 2013-05-12 19:20:34 pauloscustodio Exp $
 # $Log: whitebox-classring.t,v $
-# Revision 1.1  2013-04-13 15:55:10  pauloscustodio
+# Revision 1.2  2013-05-12 19:20:34  pauloscustodio
+# warnings
+#
+# Revision 1.1  2013/04/13 15:55:10  pauloscustodio
 # New CLASS_RING for circular queue of tokens pre-allocated to spare the
 # alloc/free for each token received from the lexer, and to allow quick
 # look-ahead for the parser without the need to push back tokens.
@@ -28,19 +31,11 @@ require 't/test_utils.pl';
 
 # test memalloc
 my $objs = "class.o die.o strutil.o safestr.o except.o";
-ok ! system "make $objs";
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 
 t_compile_module(<<'END_INIT', <<'END', $compile);
 
 #define ERROR return __LINE__
-#define ASSERT(expr) \
-			if ( ! (expr) ) { \
-				warn("TEST FAILED (%s) at file %s, line %d\n", \
-					 #expr, __FILE__, __LINE__); \
-				ERROR; \
-			} \
-			else
 
 #include "classring.h"
 

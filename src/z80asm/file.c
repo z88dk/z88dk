@@ -14,9 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.19 2013-05-11 00:29:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.20 2013-05-12 19:20:34 pauloscustodio Exp $
 $Log: file.c,v $
-Revision 1.19  2013-05-11 00:29:26  pauloscustodio
+Revision 1.20  2013-05-12 19:20:34  pauloscustodio
+warnings
+
+Revision 1.19  2013/05/11 00:29:26  pauloscustodio
 CH_0021 : Exceptions on file IO show file name
 Keep a hash table of all opened file names, so that the file name
 is shown on a fatal error.
@@ -326,10 +329,10 @@ void xfput_u32( long value, FILE *file )
 {
     char buffer[4] =
     {
-        (value & 0x000000FF) >> 0,
-        (value & 0x0000FF00) >> 8,
-        (value & 0x00FF0000) >> 16,
-        (value & 0xFF000000) >> 24
+        (char)((value & 0x000000FF) >> 0),
+        (char)((value & 0x0000FF00) >> 8),
+        (char)((value & 0x00FF0000) >> 16),
+        (char)((value & 0xFF000000) >> 24)
     };
     xfput_char( buffer, sizeof(buffer), file );
 }
@@ -337,7 +340,6 @@ void xfput_u32( long value, FILE *file )
 long xfget_u32( FILE *file )
 {
     char buffer[4];
-    long retval;
 
     freadc_err( buffer, sizeof( buffer ), file );
     return

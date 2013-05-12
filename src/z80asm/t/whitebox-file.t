@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.10 2013-05-11 00:29:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.11 2013-05-12 19:20:34 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.10  2013-05-11 00:29:26  pauloscustodio
+# Revision 1.11  2013-05-12 19:20:34  pauloscustodio
+# warnings
+#
+# Revision 1.10  2013/05/11 00:29:26  pauloscustodio
 # CH_0021 : Exceptions on file IO show file name
 # Keep a hash table of all opened file names, so that the file name
 # is shown on a fatal error.
@@ -60,17 +63,12 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "file.o errors.o strlist.o strhash.o strpool.o memalloc.o class.o ".
+my $objs = "file.o errors.o strlist.o strhash.o strpool.o class.o ".
 		   "die.o strutil.o safestr.o except.o";
+my $objs_r = "$objs                  memalloc.o";
+my $objs_d = "$objs -DMEMALLOC_DEBUG memalloc.c";
 
-my $init = <<'INIT';
-struct module *CURRENTMODULE;
-FILE *errfile;
-int clinemode;
-int clineno;
-INIT
-
-t_compile_module($init, <<'END', $objs);
+t_compile_module('', <<'END', $objs_r);
 	SzList *list;
 	
 	if (argv[2][0] == '0')
@@ -112,7 +110,7 @@ t_run_module(['f3', '1'], "x3/f3\n", "", 0);
 t_run_module(['f4', '1'], "f4\n", "", 0);
 
 # test file manipulation
-t_compile_module($init, <<'END', $objs);
+t_compile_module('', <<'END', $objs_r);
 #define T1(init, func, result) \
 		strcpy( file, init); \
 		p = func; \
@@ -169,7 +167,7 @@ END
 t_run_module([], "", "", 0);
 
 # test file IO
-t_compile_module($init, <<'END', $objs);
+t_compile_module('', <<'END', $objs_d);
 /* 256 characters */
 #define BIG_STR "1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
 				"1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
@@ -477,11 +475,23 @@ t_run_module([], "", <<'END', 0);
 
 ---- TEST: xfopen ----
 
+memalloc: init
+memalloc errors.c(1): alloc 40 bytes at ADDR_1
+memalloc strpool.c(1): alloc 32 bytes at ADDR_2
+memalloc strhash.c(1): alloc 32 bytes at ADDR_3
 Error: Cannot open file 'test1xxxx.bin' for reading
 Error: Cannot open file 'x/x/x/x/test1.bin' for writing
 
 ---- TEST: xfclose ----
 
+memalloc file.c(1): alloc 32 bytes at ADDR_4
+memalloc file.c(4): alloc 40 bytes at ADDR_5
+memalloc strpool.c(2): alloc 36 bytes at ADDR_6
+memalloc strpool.c(3): alloc 10 bytes at ADDR_7
+memalloc strpool.c(4): alloc 44 bytes at ADDR_8
+memalloc strpool.c(4): alloc 384 bytes at ADDR_9
+memalloc file.c(5): alloc 44 bytes at ADDR_10
+memalloc file.c(5): alloc 384 bytes at ADDR_11
 Error: Cannot close file 'test1.bin'
 
 ---- TEST: xstat ----
@@ -634,6 +644,18 @@ Error: Cannot write to file 'test1.bin'
 
 Error: Unexpected EOF reading from file 'test1.bin'
 Error: String too long reading from file 'test1.bin'
+memalloc file.c(2): free 384 bytes at ADDR_11 allocated at file.c(5)
+memalloc file.c(2): free 44 bytes at ADDR_10 allocated at file.c(5)
+memalloc file.c(3): free 40 bytes at ADDR_5 allocated at file.c(4)
+memalloc file.c(1): free 32 bytes at ADDR_4 allocated at file.c(1)
+memalloc strhash.c(1): free 32 bytes at ADDR_3 allocated at strhash.c(1)
+memalloc errors.c(1): free 40 bytes at ADDR_1 allocated at errors.c(1)
+memalloc strpool.c(5): free 384 bytes at ADDR_9 allocated at strpool.c(4)
+memalloc strpool.c(5): free 44 bytes at ADDR_8 allocated at strpool.c(4)
+memalloc strpool.c(6): free 10 bytes at ADDR_7 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_6 allocated at strpool.c(2)
+memalloc strpool.c(1): free 32 bytes at ADDR_2 allocated at strpool.c(1)
+memalloc: cleanup
 END
 
 # delete directories and files

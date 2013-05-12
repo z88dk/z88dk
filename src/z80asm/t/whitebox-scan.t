@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.6 2013-05-01 19:03:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.7 2013-05-12 19:20:34 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.6  2013-05-01 19:03:46  pauloscustodio
+# Revision 1.7  2013-05-12 19:20:34  pauloscustodio
+# warnings
+#
+# Revision 1.6  2013/05/01 19:03:46  pauloscustodio
 # Simplified scanner and adapted to be used with a BISON generated parser.
 # Removed balanced struct checking and token ring.
 # Removed start condition to list assembly lines, as it was difficult to keep in sync across included
@@ -75,13 +78,6 @@ my $init = <<'END_INIT'; $init =~ s/<TOKEN_CASE>/@token_case/;
 #define MAX_LINE	21000		/* we need 20000 for a very big token */
 
 #define ERROR return __LINE__
-#define ASSERT(expr) \
-			if ( ! (expr) ) { \
-				warn("TEST FAILED (%s) at file %s, line %d\n", \
-					 #expr, __FILE__, __LINE__); \
-				ERROR; \
-			} \
-			else
 
 char *decode_token (int token, YYSTYPE *yylval)
 {
