@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.30 2013-05-11 00:29:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.31 2013-05-12 19:41:21 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.30  2013-05-11 00:29:26  pauloscustodio
+# Revision 1.31  2013-05-12 19:41:21  pauloscustodio
+# write binfile
+#
+# Revision 1.30  2013/05/11 00:29:26  pauloscustodio
 # CH_0021 : Exceptions on file IO show file name
 # Keep a hash table of all opened file names, so that the file name
 # is shown on a fatal error.
@@ -516,6 +519,12 @@ sub read_binfile {
 	my($file) = @_;
 	ok -f $file, "$file exists";
 	return scalar read_file($file, binmode => ':raw');
+}
+
+#------------------------------------------------------------------------------
+sub write_binfile {
+	my($file, $data) = @_;
+	write_file($file, {binmode => ':raw'}, $data);
 }
 
 #------------------------------------------------------------------------------
