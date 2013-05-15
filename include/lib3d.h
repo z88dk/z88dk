@@ -148,13 +148,22 @@ extern int __LIB__  div256(long value); /* divide by 255 */
 /* they extend the <graphics.h> capability */
 
 /* Draw an ellipse arc delimited by 'startangle' and 'endangle' (deg) */
-extern int __LIB__ ellipse(int cx, int cy, int sa, int ea, int xradius, int yradius);
+extern __LIB__ ellipse(int cx, int cy, int sa, int ea, int xradius, int yradius) __SMALLCDECL;
 
 /* Draw an arc delimited by 'startangle' and 'endangle' (deg) */
 #define arc(x,y,s,e,r)  ellipse(x,y,s,e,r,r)
 
 /* Draw a polygon by a given number of corners, rotation in degrees determined by sa. */
-extern int __LIB__ polygon(int cx, int cy, int corners, int r, int sa);
+extern __LIB__ polygon(int cx, int cy, int corners, int r, int sa) __SMALLCDECL;
+
+
+
+/* As above but related to the "stencil" object */
+extern __LIB__ stencil_add_polygon(int cx, int cy, int corners, int r, int sa, unsigned char *stencil) __SMALLCDECL;
+extern __LIB__ stencil_add_ellipse(int cx, int cy, int sa, int ea, int xradius, int yradius, unsigned char *stencil) __SMALLCDECL;
+#define stencil_add_arc(x,y,s,e,r,t)  stencil_add_ellipse(x,y,s,e,r,r,t)
+
+
 
 
 #endif /* __LIB3D_H__ */

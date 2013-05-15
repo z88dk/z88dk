@@ -20,7 +20,7 @@
  *
  * djm 4/4/2000
  *
- * $Id: z88stdio.h,v 1.5 2010-09-19 00:24:08 dom Exp $
+ * $Id: z88stdio.h,v 1.6 2013-05-15 06:45:46 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -130,7 +130,8 @@ extern char __LIB__ fgetc_cons(void);
 
 /* Screen operations */
 
-#define putchar(x) fputc_cons(x)
+/* #define putchar(x) fputc_cons(x) */
+#define putchar(bp) fputc(bp,stdout)
 extern __LIB__ fputc_cons(char);
 
 extern __LIB__ putn(int);

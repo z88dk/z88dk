@@ -6,6 +6,8 @@ div256
 ellipse
 mesh_new
 mesh_delete
+stencil_add_polygon
+stencil_add_ellipse
 vector_cross_product
 vector_cross_product_z
 vector_add

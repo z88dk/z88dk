@@ -12,7 +12,7 @@
  *	O_WRONLY = 1    Starts afresh?!?!?
  *	O_APPEND = 256
  *
- *	$Id: open.c,v 1.2 2012-03-21 10:20:23 stefano Exp $
+ *	$Id: open.c,v 1.3 2013-05-15 06:45:46 stefano Exp $
  */
 
 #include <fcntl.h>
@@ -37,8 +37,8 @@ switch (mode) {
 			flosfile->name[0]=0;
 			return (-1);
 		}
+		flosfile->position=0;
 		set_load_length(1);
-		return(flosfile);
 		break;
 
 	case O_WRONLY:
@@ -50,20 +50,25 @@ switch (mode) {
 			flosfile->name[0]=0;
 			return (-1);
 		}
-		return(flosfile);
+		flosfile->position=0;
 		break;
 
 	case O_APPEND:
-		if (find_file(name, flosfile) == 0) {
-			flosfile->name[0]=0;
+		if (find_file(name, flosfile) != 0) {
 			flosfile->position=flosfile->size-1;
-			set_load_length(1);
-			return (-1);
+		} else {
+			erase_file(name);
+			create_file(name);
+			flosfile->position=0;
 		}
-		return(flosfile);
 		break;
 
+	default:
+ 		return(-1);
+		break;
 	}
-	return(-1);
+	
+	flosfile->mode=mode;
+	return(flosfile);
 }
 
