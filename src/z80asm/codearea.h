@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.8 2013-02-22 17:19:19 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.9 2013-05-16 22:39:39 pauloscustodio Exp $ */
 /* $Log: codearea.h,v $
-/* Revision 1.8  2013-02-22 17:19:19  pauloscustodio
+/* Revision 1.9  2013-05-16 22:39:39  pauloscustodio
+/* Bad include-once define
+/*
+/* Revision 1.8  2013/02/22 17:19:19  pauloscustodio
 /* Add listfile interface to append bytes to the listing
 /* Remove oldPC - no longer needed with new listfile
 /* Solve memory leak
@@ -66,8 +69,8 @@ Manage the code area in memory
 /*
 /* */
 
-#ifndef OBJFILE_H
-#define OBJFILE_H
+#ifndef CODEAREA_H
+#define CODEAREA_H
 
 #include "memalloc.h"   /* before any other include */
 #include "types.h"
@@ -111,5 +114,5 @@ extern void append_long( long dword );
 /* the patch address is incremented after fetch */
 extern byte_t get_byte( size_t *paddr );
 
-#endif /* ndef OBJFILE_H */
+#endif /* ndef CODEAREA_H */
 
