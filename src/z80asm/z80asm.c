@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.84 2013-05-12 19:46:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.85 2013-05-16 22:45:21 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.84  2013-05-12 19:46:35  pauloscustodio
+/* Revision 1.85  2013-05-16 22:45:21  pauloscustodio
+/* Add ObjFile to struct module
+/* Use ObjFile to check for valid object file
+/*
+/* Revision 1.84  2013/05/12 19:46:35  pauloscustodio
 /* New module for object file handling
 /*
 /* Revision 1.83  2013/05/06 23:02:12  pauloscustodio
@@ -524,6 +528,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "file.h"
 #include "hist.h"
 #include "listfile.h"
+#include "objfile.h"
 #include "options.h"
 #include "safestr.h"
 #include "strpool.h"
@@ -855,69 +860,31 @@ static void do_assemble( char *src_filename, char *obj_filename )
 
 /*-----------------------------------------------------------------------------
 *	Updates current module name and size, if given object file is valid
-*	If not, raises error and returns FALSE
+*	If not returns FALSE
 *----------------------------------------------------------------------------*/
 BOOL load_module_object( char *filename )
 {
-    char buffer[MAXLINE];
-    long fptr_modcode, fptr_modname;
-    size_t size;
-    FILE *fp;
+	ObjFile *obj_file;
 
-    /* open object file */
-    fp = fopen_err( filename, "rb" );	        /* CH_0012 */
-    freadc_err( buffer, 8U, fp );       		/* read first 8 chars from file into array */
-    buffer[8] = '\0';
-
-	/* compare header of file */
-    if ( strcmp( buffer, Z80objhdr ) != 0 )
-    {
-        error( ERR_NOT_OBJ_FILE, filename );	/* not an object file */
-        fclose( fp );
-        return FALSE;
-    }
-
-	/* define module name of current module */
-    fseek( fp, 8 + 2, SEEK_SET );              	/* set file pointer to point at module name */
-    fptr_modname = fgetl_err( fp );   			/* get file pointer to module name */
-    fseek( fp, fptr_modname, SEEK_SET );       	/* set file pointer to module name */
-
-    size = fgetc_err( fp );
-    freadc_err( buffer, size, fp ); 			/* read module name */
-    buffer[size] = '\0';
-    CURRENTMODULE->mname = xstrdup( buffer );
-
-	/* define module size of current module */
-    fseek( fp, 26, SEEK_SET ); 					/* set file pointer to point at 
-												   module code pointer */
-    fptr_modcode = fgetl_err( fp );   			/* get file pointer to module code */
-
-    if ( fptr_modcode != -1 )
-    {
-        fseek( fp, fptr_modcode, SEEK_SET );   /* set file pointer to module code */
-        size = fgetw_err( fp );
-
-        /* BUG_0008 : fix size, if a zero was written, the module is actually 64K */
-        if ( size == 0 )
-        {
-            size = 0x10000;
-        }
-
-        if ( CURRENTMODULE->startoffset + size > MAXCODESIZE )
+	obj_file = ObjFile_open_read( filename, TRUE );	/* test-mode => no errors */
+	if ( obj_file != NULL )
+	{
+		if ( CURRENTMODULE->startoffset + obj_file->code_size > MAXCODESIZE )
         {
  			/* return TRUE in this case; module is OK, but we cannot link because total
 			   size > 64K */
-           error_at( filename, 0, ERR_MAX_CODESIZE, ( long )MAXCODESIZE );
+			error_at( filename, 0, ERR_MAX_CODESIZE, (long)MAXCODESIZE );
         }
         else
-        {
-            inc_codesize( size );           /* BUG_0015 : was not updating codesize */
-        }
-    }
+            inc_codesize( obj_file->code_size );	/* BUG_0015 */
 
-    fclose( fp );
-	
-    return TRUE;
+		CURRENTMODULE->mname	= xstrdup( obj_file->modname );
+		CURRENTMODULE->obj_file = obj_file;
+
+		return TRUE;
+	}
+	else
+		return FALSE;
 }
 
 
@@ -1168,6 +1135,8 @@ ReleaseModules( void )
         {
             xfree( curptr->mname );
         }
+
+		OBJ_DELETE( curptr->obj_file );
 
         tmpptr = curptr;
         curptr = curptr->nextmodule;

@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_NOT_OBJ_FILE.t,v 1.2 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_NOT_OBJ_FILE.t,v 1.3 2013-05-16 22:45:21 pauloscustodio Exp $
 # $Log: ERR_NOT_OBJ_FILE.t,v $
-# Revision 1.2  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.3  2013-05-16 22:45:21  pauloscustodio
+# Add ObjFile to struct module
+# Use ObjFile to check for valid object file
+#
+# Revision 1.2  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.1  2012/05/23 18:07:51  pauloscustodio
@@ -48,19 +52,16 @@ require 't/test_utils.pl';
 unlink_testfiles();
 write_file(asm_file(), "nop");
 write_file(obj_file(), "not an object");
-t_z80asm_capture("-r0 -b -d ".obj_file(), "", 
-		"Error: File 'test.obj' not an object file\n".
-		"1 errors occurred during assembly\n",
-		1);
-
+t_z80asm_capture("-r0 -b -d ".obj_file(), "", "", 0);
+t_binary(read_binfile(obj_file()), objfile(NAME => "TEST", CODE => "\x00", ORG => 0));
+t_binary(read_binfile(bin_file()), "\x00");
+	
 # CreateLib uses a different error call
 unlink_testfiles();
 write_file(asm_file(), "nop");
 write_file(obj_file(), "not an object");
-t_z80asm_capture("-x".lib_file()." -d ".obj_file(), "",
-		"Error: File 'test.obj' not an object file\n".
-		"1 errors occurred during assembly\n",
-		1);
+t_z80asm_capture("-x".lib_file()." -d ".obj_file(), "", "", 0);
+t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "TEST", CODE => "\x00")));
 
 unlink_testfiles();
 done_testing();

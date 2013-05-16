@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.31 2013-05-12 19:41:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.32 2013-05-16 22:45:21 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.31  2013-05-12 19:41:21  pauloscustodio
+# Revision 1.32  2013-05-16 22:45:21  pauloscustodio
+# Add ObjFile to struct module
+# Use ObjFile to check for valid object file
+#
+# Revision 1.31  2013/05/12 19:41:21  pauloscustodio
 # write binfile
 #
 # Revision 1.30  2013/05/11 00:29:26  pauloscustodio
@@ -586,7 +590,7 @@ $init_code.'
 int _exception_raised;
 int _exception_initialized;
 
-#define TITLE(title)	fprintf(stderr, "\n---- TEST: " title " ----\n\n")
+#define TITLE(title)	fprintf(stderr, "\n---- TEST: %s ----\n\n", (title) )
 
 #define TEST_DIE(err_condition, err_message, expr_str) \
 			if ( err_condition ) { \

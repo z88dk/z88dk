@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.21 2013-02-26 02:11:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.22 2013-05-16 22:45:21 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.21  2013-02-26 02:11:32  pauloscustodio
+/* Revision 1.22  2013-05-16 22:45:21  pauloscustodio
+/* Add ObjFile to struct module
+/* Use ObjFile to check for valid object file
+/*
+/* Revision 1.21  2013/02/26 02:11:32  pauloscustodio
 /* New model_symref.c with all symbol cross-reference list handling
 /*
 /* Revision 1.20  2013/02/19 22:52:40  pauloscustodio
@@ -135,6 +139,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "avltree.h"    /* base symbol data structures and routines */
 #include "types.h"
 #include "model.h"
+#include "objfile.h"
 
 /* Structured data types : */
 
@@ -245,6 +250,7 @@ struct module
     avltree           *localroot;         /* pointer to root of local symbols tree */
     struct expression  *mexpr;            /* pointer to expressions in this module */
     struct JRPC_Hdr    *JRaddr;           /* pointer to list of JR PC addresses */
+	ObjFile			   *obj_file;		  /* ObjFile structure describing the object file */
 };
 
 struct liblist

@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.1 2013-05-12 19:46:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.2 2013-05-16 22:45:21 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.1  2013-05-12 19:46:35  pauloscustodio
+# Revision 1.2  2013-05-16 22:45:21  pauloscustodio
+# Add ObjFile to struct module
+# Use ObjFile to check for valid object file
+#
+# Revision 1.1  2013/05/12 19:46:35  pauloscustodio
 # New module for object file handling
 #
 #
@@ -29,17 +33,15 @@ my $objs = "-DMEMALLOC_DEBUG memalloc.c ".
 		   "objfile.o class.o strpool.o file.o ".
 		   "strutil.o safestr.o strlist.o strhash.o errors.o die.o except.o";
 
-# write test object files
-my $obj1 = objfile(NAME => "TEST1", CODE => "");
-write_binfile(obj1_file(), $obj1); 
-write_binfile(lib1_file(), libfile($obj1));
-
 t_compile_module('', <<'END', $objs);
+
+#define SEL3(i,a,b,c)	((i)<=0?(a):(i)<=1?(b):(c))
+
 	ObjFile *obj;
 	FILE	*file;
-	BOOL	test_mode;
-	BOOL	in_library;
-	int 	i;
+	int 	code_size;
+	
+	code_size = atoi(argv[1]);
 	
 	TITLE("File not found, test mode");	
 	unlink("test.obj");
@@ -80,57 +82,73 @@ t_compile_module('', <<'END', $objs);
 	TRY_OK( obj = ObjFile_open_read("test.obj", FALSE) );
 	ASSERT( obj == NULL );
 	
-	for ( i = 0; i < 3; i++ )
-	{
-		switch (i)
-		{
-			case 0:
-				TITLE("TEST1 object file, read mode");
-				test_mode = FALSE;
-				in_library = FALSE;
-				TRY_OK( obj = ObjFile_open_read("test1.obj", test_mode) );
-				break;
-			case 1:
-				TITLE("TEST1 object file, test mode");
-				test_mode = TRUE;
-				in_library = FALSE;
-				TRY_OK( obj = ObjFile_open_read("test1.obj", test_mode) );
-				break;
-			case 2:
-				TITLE("TEST1 object file, in library");
-				test_mode = FALSE;
-				in_library = TRUE;
-				TRY_OK( file = xfopen("test1.lib", "rb") );
-				ASSERT( file != NULL );
-				fseek( file, 16, SEEK_SET );
-				TRY_OK( obj = ObjFile_read("test1.lib", file) );
-				break;
-		}
-		
-		ASSERT( obj != NULL );
-		
-		ASSERT( obj->start_ptr == (in_library ? 16 : 0) );
-		ASSERT( strcmp(obj->filename, 
-		               in_library ? "test1.lib" : "test1.obj") == 0 );
-		ASSERT( strcmp(obj->modname,  "TEST1") == 0 );
-		ASSERT( obj->in_library == in_library );
-		ASSERT( obj->writing == FALSE );
-		ASSERT( obj->org_addr == -1 );
-		ASSERT( obj->modname_ptr != -1 );
-		ASSERT( obj->expr_ptr == -1 );
-		ASSERT( obj->symbols_ptr == -1 );
-		ASSERT( obj->externsym_ptr == -1 );
-		ASSERT( obj->code_ptr == -1 );
-		ASSERT( obj->code_size == 0 );
-		
-		OBJ_DELETE(obj);
-		ASSERT( obj == NULL );
-	}	
+	TITLE("TEST1 Object file, read mode");
+	TRY_OK( obj = ObjFile_open_read("test1.obj", FALSE) );
+	ASSERT( obj != NULL );
+	ASSERT( obj->start_ptr == 0 );
+	ASSERT( strcmp(obj->filename, "test1.obj") == 0 );
+	ASSERT( strcmp(obj->modname,  "TEST1") == 0 );
+	ASSERT( obj->in_library == FALSE );
+	ASSERT( obj->writing == FALSE );
+	ASSERT( obj->org_addr == -1 );
+	ASSERT( obj->modname_ptr != -1 );
+	ASSERT( obj->expr_ptr == -1 );
+	ASSERT( obj->symbols_ptr == -1 );
+	ASSERT( obj->externsym_ptr == -1 );
+	ASSERT( code_size ? (obj->code_ptr != -1) : (obj->code_ptr == -1));
+	ASSERT( obj->code_size == code_size );
+	OBJ_DELETE(obj);
+	ASSERT( obj == NULL );
+	
+	TITLE("TEST1 Object file, test mode");
+	TRY_OK( obj = ObjFile_open_read("test1.obj", TRUE) );
+	ASSERT( obj != NULL );
+	ASSERT( obj->start_ptr == 0 );
+	ASSERT( strcmp(obj->filename, "test1.obj") == 0 );
+	ASSERT( strcmp(obj->modname,  "TEST1") == 0 );
+	ASSERT( obj->in_library == FALSE );
+	ASSERT( obj->writing == FALSE );
+	ASSERT( obj->org_addr == -1 );
+	ASSERT( obj->modname_ptr != -1 );
+	ASSERT( obj->expr_ptr == -1 );
+	ASSERT( obj->symbols_ptr == -1 );
+	ASSERT( obj->externsym_ptr == -1 );
+	ASSERT( code_size ? (obj->code_ptr != -1) : (obj->code_ptr == -1));
+	ASSERT( obj->code_size == code_size );
+	OBJ_DELETE(obj);
+	ASSERT( obj == NULL );
+	
+	TITLE("TEST1 Library file");
+	TRY_OK( file = xfopen("test1.lib", "rb") );
+	ASSERT( file != NULL );
+	fseek( file, 16, SEEK_SET );
+	TRY_OK( obj = ObjFile_read("test1.lib", file) );	
+	ASSERT( obj != NULL );
+	ASSERT( obj->start_ptr == 16 );
+	ASSERT( strcmp(obj->filename, "test1.lib") == 0 );
+	ASSERT( strcmp(obj->modname,  "TEST1") == 0 );
+	ASSERT( obj->in_library == TRUE );
+	ASSERT( obj->writing == FALSE );
+	ASSERT( obj->org_addr == -1 );
+	ASSERT( obj->modname_ptr != -1 );
+	ASSERT( obj->expr_ptr == -1 );
+	ASSERT( obj->symbols_ptr == -1 );
+	ASSERT( obj->externsym_ptr == -1 );
+	ASSERT( code_size ? (obj->code_ptr != -1) : (obj->code_ptr == -1));
+	ASSERT( obj->code_size == code_size );
+	OBJ_DELETE(obj);
+	ASSERT( obj == NULL );
 	
 	TITLE("End");	
 END
 
-t_run_module([], "", <<'END', 0);
+# write test object file
+for my $code_size (0, 1, 65536) {
+	my $obj1 = objfile(NAME => "TEST1", CODE => "\x00" x $code_size);
+	write_binfile(obj1_file(), $obj1); 
+	write_binfile(lib1_file(), libfile($obj1));
+
+	t_run_module([$code_size], "", <<'END', 0);
 
 ---- TEST: File not found, test mode ----
 
@@ -165,7 +183,7 @@ Error: File 'test.obj' not an object file
 
 Error: File 'test.obj' not an object file
 
----- TEST: TEST1 object file, read mode ----
+---- TEST: TEST1 Object file, read mode ----
 
 memalloc strpool.c(2): alloc 36 bytes at ADDR_12
 memalloc strpool.c(3): alloc 10 bytes at ADDR_13
@@ -174,12 +192,12 @@ memalloc strpool.c(2): alloc 36 bytes at ADDR_15
 memalloc strpool.c(3): alloc 6 bytes at ADDR_16
 memalloc objfile.c(1): free 80 bytes at ADDR_14 allocated at objfile.c(1)
 
----- TEST: TEST1 object file, test mode ----
+---- TEST: TEST1 Object file, test mode ----
 
 memalloc objfile.c(1): alloc 80 bytes at ADDR_17
 memalloc objfile.c(1): free 80 bytes at ADDR_17 allocated at objfile.c(1)
 
----- TEST: TEST1 object file, in library ----
+---- TEST: TEST1 Library file ----
 
 memalloc strpool.c(2): alloc 36 bytes at ADDR_18
 memalloc strpool.c(3): alloc 10 bytes at ADDR_19
@@ -207,6 +225,7 @@ memalloc strpool.c(7): free 36 bytes at ADDR_18 allocated at strpool.c(2)
 memalloc strpool.c(1): free 32 bytes at ADDR_2 allocated at strpool.c(1)
 memalloc: cleanup
 END
+}
 
 # delete directories and files
 unlink_testfiles();
