@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.22 2013-05-16 22:45:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.23 2013-05-16 23:39:48 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.22  2013-05-16 22:45:21  pauloscustodio
+/* Revision 1.23  2013-05-16 23:39:48  pauloscustodio
+/* Move struct node to sym.c, rename to Symbol
+/* Move SymbolRef to symref.c
+/*
+/* Revision 1.22  2013/05/16 22:45:21  pauloscustodio
 /* Add ObjFile to struct module
 /* Use ObjFile to check for valid object file
 /*
@@ -135,11 +139,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 #ifndef SYMBOL_H
 #define SYMBOL_H
 
-#include <stdlib.h>
+#include "memalloc.h"   /* before any other include */
+
 #include "avltree.h"    /* base symbol data structures and routines */
-#include "types.h"
 #include "model.h"
 #include "objfile.h"
+#include "sym.h"
+#include "types.h"
+#include <stdlib.h>
 
 /* Structured data types : */
 
@@ -223,16 +230,6 @@ struct JRPC
     size_t			   PCaddr;            /* absolute of PC address of JR instruction  */
 };
 
-
-typedef struct node
-{
-    byte_t				type;				/* type of symbol  */
-    char				*symname;			/* pointer to symbol identifier */
-    long				symvalue;			/* value of symbol */
-    SymbolRefList		*references;		/* pointer to all found references of symbol */
-    struct module		*owner;				/* pointer to module which ownes symbol */
-} symbol;
-
 struct modules
 {
     struct module      *first;            /* pointer to first module */
@@ -283,21 +280,6 @@ struct linkedmod
 
 #define CURRENTFILE     CURRENTMODULE->cfile
 #define ASSEMBLERPC     "ASMPC"
-
-/* Bitmasks for symboltype */
-#define SYMDEFINED      1       /* bitmask 00000001 */	/* symbol is defined */
-#define SYMTOUCHED      2       /* bitmask 00000010 */	/* symbol was used, e.g. returned by a symbol table search */
-#define SYMDEF          4       /* bitmask 00000100 */	/* DEFINE, -D, ASMPC, OS_ID, LIB, XLIB, global library; not output in sym list */
-#define SYMADDR         8       /* bitmask 00001000 */	/* symbol is address */
-#define SYMLOCAL        16      /* bitmask 00010000 */	/* symbol is local */
-#define SYMXDEF         32      /* bitmask 00100000 */	/* symbol is global (SYMXDEF) or global library (SYMXDEF|SYMDEF) */
-#define SYMXREF         64      /* bitmask 01000000 */	/* symbol is external (SYMXREF) or external library (SYMXREF|SYMDEF) */
-
-#define XDEF_OFF        223     /* bitmask 11011111 */
-#define XREF_OFF        191     /* bitmask 10111111 */
-#define SYMLOCAL_OFF    239     /* bitmask 11101111 */
-#define SYMTYPE         120     /* bitmask 01111000 */
-#define SYM_NOTDEFINED  0		
 
 /* bitmasks for expression evaluation in rangetype */
 #define RANGE           7		/* bitmask 00000111 */   /* Range types are 0 - 4 */

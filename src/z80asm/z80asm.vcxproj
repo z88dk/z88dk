@@ -110,8 +110,10 @@
     <ClInclude Include="strlist.h" />
     <ClInclude Include="strpool.h" />
     <ClInclude Include="strutil.h" />
+    <ClInclude Include="sym.h" />
     <ClInclude Include="symbol.h" />
     <ClInclude Include="symbols.h" />
+    <ClInclude Include="symref.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="uthash.h" />
     <ClInclude Include="z80asm.h" />
@@ -146,7 +148,9 @@
     <ClCompile Include="strlist.c" />
     <ClCompile Include="strpool.c" />
     <ClCompile Include="strutil.c" />
+    <ClCompile Include="sym.c" />
     <ClCompile Include="symbols.c" />
+    <ClCompile Include="symref.c" />
     <ClCompile Include="z80asm.c" />
     <ClCompile Include="z80instr.c" />
     <ClCompile Include="z80pass.c" />

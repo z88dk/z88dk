@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle assembly listing and symbol table listing.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.4 2013-03-04 23:37:09 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.5 2013-05-16 23:39:48 pauloscustodio Exp $ */
 /* $Log: listfile.h,v $
-/* Revision 1.4  2013-03-04 23:37:09  pauloscustodio
+/* Revision 1.5  2013-05-16 23:39:48  pauloscustodio
+/* Move struct node to sym.c, rename to Symbol
+/* Move SymbolRef to symref.c
+/*
+/* Revision 1.4  2013/03/04 23:37:09  pauloscustodio
 /* Removed pass1 that was used to skip creating page references of created
 /* symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
 /* modified list_get_page_nr() to return -1 after the whole source is
@@ -44,7 +48,7 @@ Handle assembly listing and symbol table listing.
 
 #include "class.h"
 #include "dynstr.h"
-#include "model.h"
+#include "symref.h"
 #include "types.h"
 
 /* Page metrics for list file (CH_0017) */

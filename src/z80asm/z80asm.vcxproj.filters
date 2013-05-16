@@ -120,6 +120,12 @@
     <ClInclude Include="classring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sym.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="symref.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -219,6 +225,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="model.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="symref.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sym.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

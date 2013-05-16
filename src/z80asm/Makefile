@@ -12,9 +12,13 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.56 2013-05-11 00:22:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.57 2013-05-16 23:39:48 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.56  2013-05-11 00:22:33  pauloscustodio
+# Revision 1.57  2013-05-16 23:39:48  pauloscustodio
+# Move struct node to sym.c, rename to Symbol
+# Move SymbolRef to symref.c
+#
+# Revision 1.56  2013/05/11 00:22:33  pauloscustodio
 # depends
 #
 # Revision 1.55  2013/05/07 22:43:24  pauloscustodio
@@ -258,7 +262,9 @@ OBJS = 	\
 	strlist.o		\
 	strpool.o		\
 	strutil.o		\
+	sym.o			\
 	symbols.o		\
+	symref.o		\
 	z80asm.o		\
 	z80instr.o		\
 	z80pass.o		\
