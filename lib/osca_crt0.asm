@@ -8,11 +8,14 @@
 ;		At C source level:
 ;       #pragma output osca_bank=(0..14) set the memory bank for locations > 32768 before loading program
 ;		#pragma output osca_stack=<value> put the stack in a differen place, i.e. 32767
+;		#pragma output nostreams - No stdio disc files
+;		#pragma output noredir   - do not insert the file redirection option while parsing the
+;		                           command line arguments (useless if "nostreams" is set)
 ;
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.16 2013-04-15 15:56:01 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.17 2013-05-21 08:10:42 stefano Exp $
 ;
 
 
@@ -101,6 +104,7 @@
 
 
 ; Now, getting to the real stuff now!
+
 
 ;--------
 ; Set an origin for the application (-zorg=) default to $5000
@@ -230,6 +234,51 @@ ENDIF
 		jr	nz,argv_loop_3
 		ld	(hl),0
 		inc	hl
+
+IF !DEFINED_noredir
+IF !DEFINED_nostreams
+IF DEFINED_ANSIstdio
+
+		LIB freopen
+
+		xor a
+		add b
+		jr	nz,no_redir_stdout
+		ld	a,(hl)
+		cp  '>'
+		jr	nz,no_redir_stdout
+		push hl
+		inc hl
+		cp  (hl)
+		dec hl
+		ld	de,redir_fopen_flag	; "a" or "w"
+		jr	nz,noappendb
+		ld	a,'a'
+		ld	(de),a
+		inc hl
+noappendb:
+		inc hl
+		
+		push bc
+		push hl					; file name ptr
+		push de
+		ld	de,__sgoioblk+4		; file struct for stdout
+		push de
+		call freopen
+		pop de
+		pop de
+		pop hl
+		pop bc
+
+		pop hl
+		
+		jr	argv_loop_3-1
+no_redir_stdout:
+
+ENDIF
+ENDIF
+ENDIF
+
 		push	hl
 		inc	b
 		dec	hl
@@ -242,6 +291,7 @@ ENDIF
 		ld	hl,end	;name of program (NULL)
 		push	hl
 		inc	b
+		
 		ld	hl,0
 		add	hl,sp	;address of argv
 		ld	c,b
@@ -480,6 +530,16 @@ extra:          defs    6
 fa:             defs    6
 fasign:         defb    0
 
+ENDIF
+
+IF !DEFINED_noredir
+IF !DEFINED_nostreams
+IF DEFINED_ANSIstdio
+redir_fopen_flag:
+				defb 'w'
+				defb 0
+ENDIF
+ENDIF
 ENDIF
 
 ; SD CARD interface

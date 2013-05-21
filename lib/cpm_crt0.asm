@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.16 2012-07-10 05:55:38 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.17 2013-05-21 08:10:42 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -16,6 +16,8 @@
 ;	#pragma output nostreams - No stdio disc files
 ;	#pragma output nofileio  - No fileio at all
 ;	#pragma output noprotectmsdos - strip the MS-DOS protection header
+;	#pragma output noredir   - do not insert the file redirection option while parsing the
+;	                           command line arguments (useless if "nostreams" is set)
 ;
 ;	These can cut down the size of the resultant executable
 
@@ -57,6 +59,7 @@
 	XDEF	RG0SAV		; keeping track of VDP register values (Einstein)
 	XDEF	pixelbyte	; VDP gfx driver, byte temp storage
 	XDEF	coords
+
 
 
         org     $100
@@ -135,6 +138,50 @@ argv_loop_2:
 	jr	nz,argv_loop_3
 	ld	(hl),0
 	inc	hl
+
+IF !DEFINED_noredir
+IF !DEFINED_nostreams
+IF DEFINED_ANSIstdio
+
+		LIB freopen
+
+		xor a
+		add b
+		jr	nz,no_redir_stdout
+		ld	a,(hl)
+		cp  '>'
+		jr	nz,no_redir_stdout
+		push hl
+		inc hl
+		cp  (hl)
+		dec hl
+		ld	de,redir_fopen_flag	; "a" or "w"
+		jr	nz,noappendb
+		ld	a,'a'
+		ld	(de),a
+		inc hl
+noappendb:
+		inc hl
+		
+		push bc
+		push hl					; file name ptr
+		push de
+		ld	de,__sgoioblk+4		; file struct for stdout
+		push de
+		call freopen
+		pop de
+		pop de
+		pop hl
+		pop bc
+
+		pop hl
+		
+		jr	argv_loop_3-1
+no_redir_stdout:
+ENDIF
+ENDIF
+ENDIF
+
 	push	hl
 	inc	b
 	dec	hl
@@ -251,3 +298,14 @@ fa:             defs    6		; FP accumulator
 fasign:         defb    0		; FP variable
 
 ENDIF
+
+IF !DEFINED_noredir
+IF !DEFINED_nostreams
+IF DEFINED_ANSIstdio
+redir_fopen_flag:
+				defb 'w'
+				defb 0
+ENDIF
+ENDIF
+ENDIF
+
