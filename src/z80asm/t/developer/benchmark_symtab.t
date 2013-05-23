@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.1 2013-05-23 21:45:24 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.2 2013-05-23 22:07:44 pauloscustodio Exp $
 # $Log: benchmark_symtab.t,v $
-# Revision 1.1  2013-05-23 21:45:24  pauloscustodio
+# Revision 1.2  2013-05-23 22:07:44  pauloscustodio
+# replace symbol* by Symbol*
+#
+# Revision 1.1  2013/05/23 21:45:24  pauloscustodio
 # Benchmark hashtable vs avltree for symbol table
 #
 #
@@ -54,6 +57,7 @@ my @uniq = uniq(@words);
 ok scalar(@uniq), "Found ".scalar(@uniq)." words used ".scalar(@words)." times";
 
 my $init = <<'END';
+#include "sym.h"
 #include "symbols.h"
 #include <time.h>
 
@@ -64,23 +68,23 @@ char *words[] = {
 	NULL
 };
 
-int cmpid( symbol *kptr, symbol *p )
+int cmpid( Symbol *kptr, Symbol *p )
 {
-    return strcmp( kptr->symname, p->symname );
+    return strcmp( kptr->name, p->name );
 }
 
-int cmpname( char *name, symbol *p )
+int cmpname( char *name, Symbol *p )
 {
-    return strcmp( name, p->symname );
+    return strcmp( name, p->name );
 }
 
-symbol *FindSymbol2( char *name, avltree *treeptr )
+Symbol *FindSymbol2( char *name, avltree *treeptr )
 {
 	return treeptr == NULL ? NULL : 
 			find( treeptr, name, ( int ( * )( void *, void * ) ) cmpname );
 }
 
-void FreeSym2( symbol *node )
+void FreeSym2( Symbol *node )
 {
     if ( node->references != NULL )
     {
@@ -96,18 +100,18 @@ StrHash *hashroot = NULL;
 
 void add_avltree(char *name)
 {
-    symbol *foundsymbol;
+    Symbol *foundsymbol;
 	
 	foundsymbol = FindSymbol2( name, avlroot );
 	if ( foundsymbol != NULL )
 	{
-		foundsymbol->symvalue++;
+		foundsymbol->value++;
 	}
 	else
 	{
-		foundsymbol = xcalloc_struct(symbol);
-		foundsymbol->symname = name;
-		foundsymbol->symvalue = 0;
+		foundsymbol = xcalloc_struct(Symbol);
+		foundsymbol->name = name;
+		foundsymbol->value = 0;
 		insert( &avlroot, foundsymbol, ( int ( * )( void *, void * ) ) 		 cmpid );
 	}
 }
@@ -133,21 +137,21 @@ void test_avltree()
 
 void add_hash(char *name)
 {
-    symbol *foundsymbol;
+    Symbol *foundsymbol;
 	
 	if ( hashroot == NULL )
 		hashroot = OBJ_NEW(StrHash);
 		
-	foundsymbol = (symbol *)StrHash_get( hashroot, name );
+	foundsymbol = (Symbol *)StrHash_get( hashroot, name );
 	if ( foundsymbol != NULL )
 	{
-		foundsymbol->symvalue++;
+		foundsymbol->value++;
 	}
 	else
 	{
-		foundsymbol = xcalloc_struct(symbol);
-		foundsymbol->symname = name;
-		foundsymbol->symvalue = 0;
+		foundsymbol = xcalloc_struct(Symbol);
+		foundsymbol->name = name;
+		foundsymbol->value = 0;
 		StrHash_set( hashroot, name, foundsymbol );
 	}
 }
@@ -169,6 +173,9 @@ void test_hash()
 	time(&end_time);
 	warn("hash: %ld s\n", end_time-start_time);
 
+	warn("total source input words: %5d\n", NUM_ELEMS(words));
+	warn("total different words:    %5d\n", HASH_COUNT(hashroot->hash));
+	
     HASH_ITER( hh, hashroot->hash, elem, tmp )
     {
         xfree(elem->value);
@@ -188,8 +195,10 @@ t_compile_module($init, <<'END', $objs);
 END
 
 t_run_module([], "", <<'END', 0);
-avltree: 30 s
-hash: 20 s
+avltree: 32 s
+hash: 19 s
+total source input words: 19333
+total different words:     2326
 END
 
 # delete directories and files
