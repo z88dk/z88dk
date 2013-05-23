@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.57 2013-05-06 23:02:12 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.58 2013-05-23 22:22:23 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.57  2013-05-06 23:02:12  pauloscustodio
+/* Revision 1.58  2013-05-23 22:22:23  pauloscustodio
+/* Move symbol to sym.c, rename to Symbol
+/*
+/* Revision 1.57  2013/05/06 23:02:12  pauloscustodio
 /* BUG_0034 : If assembly process fails with fatal error, invalid library is kept
 /* Option -x creates an empty library file (just the header). If the
 /* assembly process fails with a fatal errror afterwards, the library file
@@ -354,6 +357,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "options.h"
 #include "safestr.h"
 #include "strutil.h"
+#include "sym.h"
 #include "symbol.h"
 #include "symbols.h"
 #include "z80asm.h"
@@ -363,17 +367,17 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include <string.h>
 
 /* external functions */
-void FreeSym( symbol *node );
+void FreeSym( Symbol *node );
 void RemovePfixlist( struct expr *pfixexpr );
 struct module *NewModule( void );
 struct libfile *NewLibrary( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 long EvalPfixExpr( struct expr *pass2expr );
-int cmpidstr( symbol *kptr, symbol *p );
-int cmpidval( symbol *kptr, symbol *p );
+int cmpidstr( Symbol *kptr, Symbol *p );
+int cmpidval( Symbol *kptr, Symbol *p );
 int GetChar( FILE *fptr );
 struct expr *ParseNumExpr( void );
-symbol *FindSymbol( char *identifier, avltree *symbolptr );
+Symbol *FindSymbol( char *identifier, avltree *symbolptr );
 
 /* local functions */
 int LinkModule( char *filename, long fptr_base );
@@ -392,8 +396,8 @@ void WriteMapFile( void );
 void ReadNames( FILE *file, long nextname, long endnames );
 void ReadExpr( long nextexpr, long endexpr );
 void ReOrderSymbol( avltree *node, avltree **maproot, int ( *symcmp )( void *, void * ) );
-void WriteMapSymbol( symbol *mapnode );
-void WriteGlobal( symbol *node );
+void WriteMapSymbol( Symbol *mapnode );
+void WriteGlobal( Symbol *node );
 void CreateDeffile( void );
 void ReleaseLinkInfo( void );
 static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname );
@@ -423,20 +427,21 @@ static FILE *mapfile;
 void
 ReadNames( FILE *file, long nextname, long endnames )
 {
-    char scope, symboltype;
+    char scope, symbol_char;
+	byte_t symboltype;
     long value;
-    symbol *foundsymbol;
+    Symbol *foundsymbol;
 
     do
     {
         scope = fgetc_err( file );
-        symboltype = fgetc_err( file ); /* type of name   */
+        symbol_char = fgetc_err( file ); /* type of name   */
         value = fgetl_err( file );		/* read symbol (long) integer */
         ReadName( file );				/* read symbol name */
 
         nextname += 1 + 1 + 4 + 1 + strlen( line );
 
-        switch ( symboltype )
+        switch ( symbol_char )
         {
             case 'A':
                 symboltype = SYMADDR | SYMDEFINED;
@@ -453,12 +458,12 @@ ReadNames( FILE *file, long nextname, long endnames )
             case 'L':
                 if ( ( foundsymbol = FindSymbol( line, CURRENTMODULE->localroot ) ) == NULL )
                 {
-                    foundsymbol = CreateSymbol( line, value, ( char )( symboltype | SYMLOCAL ), CURRENTMODULE );
+                    foundsymbol = Symbol_create( line, value, symboltype | SYMLOCAL, CURRENTMODULE );
                     insert( &CURRENTMODULE->localroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
                 }
                 else
                 {
-                    foundsymbol->symvalue = value;
+                    foundsymbol->value = value;
                     foundsymbol->type |= symboltype | SYMLOCAL;
                     foundsymbol->owner = CURRENTMODULE;
                     redefinedmsg();
@@ -469,12 +474,12 @@ ReadNames( FILE *file, long nextname, long endnames )
             case 'G':
                 if ( ( foundsymbol = FindSymbol( line, globalroot ) ) == NULL )
                 {
-                    foundsymbol = CreateSymbol( line, value, ( char )( symboltype | SYMXDEF ), CURRENTMODULE );
+                    foundsymbol = Symbol_create( line, value, symboltype | SYMXDEF, CURRENTMODULE );
                     insert( &globalroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
                 }
                 else
                 {
-                    foundsymbol->symvalue = value;
+                    foundsymbol->value = value;
                     foundsymbol->type |= symboltype | SYMXDEF;
                     foundsymbol->owner = CURRENTMODULE;
                     redefinedmsg();
@@ -485,12 +490,12 @@ ReadNames( FILE *file, long nextname, long endnames )
             case 'X':
                 if ( ( foundsymbol = FindSymbol( line, globalroot ) ) == NULL )
                 {
-                    foundsymbol = CreateSymbol( line, value, ( char )( symboltype | SYMXDEF | SYMDEF ), CURRENTMODULE );
+                    foundsymbol = Symbol_create( line, value, symboltype | SYMXDEF | SYMDEF, CURRENTMODULE );
                     insert( &globalroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
                 }
                 else
                 {
-                    foundsymbol->symvalue = value;
+                    foundsymbol->value = value;
                     foundsymbol->type |= symboltype | SYMXDEF | SYMDEF;
                     foundsymbol->owner = CURRENTMODULE;
                     redefinedmsg();
@@ -528,7 +533,7 @@ ReadExpr( long nextexpr, long endexpr )
         /* assembler PC     as absolute address */
         set_PC( modulehdr->first->origin + CURRENTMODULE->startoffset + offsetptr );
 
-        FindSymbol( ASSEMBLERPC, globalroot )->symvalue = get_PC();
+        FindSymbol( ASSEMBLERPC, globalroot )->value = get_PC();
 
         i = fgetc_err( z80asmfile ); /* get length of infix expression */
         fptr = ftell( z80asmfile );       /* file pointer is at start of expression */
@@ -1461,20 +1466,20 @@ WriteMapFile( void )
 
 
 void
-WriteMapSymbol( symbol *mapnode )
+WriteMapSymbol( Symbol *mapnode )
 {
     if ( mapnode->type & SYMADDR )
     {
 		/* CH_0017 */
-        fprintf( mapfile, "%-*s ", COLUMN_WIDTH - 1, mapnode->symname );
+        fprintf( mapfile, "%-*s ", COLUMN_WIDTH - 1, mapnode->name );
 
         if ( autorelocate )
         {
-            fprintf( mapfile, "= %04lX, ", sizeof_relocroutine + sizeof_reloctable + 4 + mapnode->symvalue );
+            fprintf( mapfile, "= %04lX, ", sizeof_relocroutine + sizeof_reloctable + 4 + mapnode->value );
         }
         else
         {
-            fprintf( mapfile, "= %04lX, ", mapnode->symvalue );
+            fprintf( mapfile, "= %04lX, ", mapnode->value );
         }
 
         if ( mapnode->type & SYMLOCAL )
@@ -1493,15 +1498,15 @@ WriteMapSymbol( symbol *mapnode )
 
 
 void
-WriteGlobal( symbol *node )
+WriteGlobal( Symbol *node )
 {
     if ( ( node->type & SYMTOUCHED ) && ( node->type & SYMADDR ) &&
             ( node->type & SYMXDEF ) && !( node->type & SYMDEF ) )
     {
         /* Write only global definitions - not library routines     */
      	/* CH_0017 */
-		fprintf( deffile, "DEFC %-*s ", COLUMN_WIDTH - 1, node->symname );
-        fprintf( deffile, "= $%04lX ; ", node->symvalue + modulehdr->first->origin + CURRENTMODULE->startoffset );
+		fprintf( deffile, "DEFC %-*s ", COLUMN_WIDTH - 1, node->name );
+        fprintf( deffile, "= $%04lX ; ", node->value + modulehdr->first->origin + CURRENTMODULE->startoffset );
         fprintf( deffile, "Module %s\n", node->owner->mname );
     }
 }

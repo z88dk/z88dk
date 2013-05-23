@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.1 2013-05-16 23:39:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.2 2013-05-23 22:22:23 pauloscustodio Exp $
 $Log: sym.h,v $
-Revision 1.1  2013-05-16 23:39:48  pauloscustodio
+Revision 1.2  2013-05-23 22:22:23  pauloscustodio
+Move symbol to sym.c, rename to Symbol
+
+Revision 1.1  2013/05/16 23:39:48  pauloscustodio
 Move struct node to sym.c, rename to Symbol
 Move SymbolRef to symref.c
 
@@ -48,29 +51,31 @@ END_CLASS;
 /*-----------------------------------------------------------------------------
 *   Symbol type bitmasks
 *----------------------------------------------------------------------------*/
-#define SYMDEFINED      1       /* bitmask 00000001 */	/* symbol is defined */
-#define SYMTOUCHED      2       /* bitmask 00000010 */	/* symbol was used, e.g. returned by a symbol table search */
-#define SYMDEF          4       /* bitmask 00000100 */	/* DEFINE, -D, ASMPC, OS_ID, LIB, XLIB, global library; not output in sym list */
-#define SYMADDR         8       /* bitmask 00001000 */	/* symbol is address */
-#define SYMLOCAL        16      /* bitmask 00010000 */	/* symbol is local */
-#define SYMXDEF         32      /* bitmask 00100000 */	/* symbol is global (SYMXDEF) or global library (SYMXDEF|SYMDEF) */
-#define SYMXREF         64      /* bitmask 01000000 */	/* symbol is external (SYMXREF) or external library (SYMXREF|SYMDEF) */
+#define SYMDEFINED      1       /* 00000001 symbol is defined */
+#define SYMTOUCHED      2       /* 00000010 symbol was used, e.g. returned by 
+											a symbol table search */
+#define SYMDEF          4       /* 00000100 DEFINE, -D, ASMPC, OS_ID, LIB, XLIB, 
+											global library; not output in sym list */
+#define SYMADDR         8       /* 00001000 symbol is address */
+#define SYMLOCAL        16      /* 00010000 symbol is local */
+#define SYMXDEF         32      /* 00100000 symbol is global (SYMXDEF) 
+											or global library (SYMXDEF|SYMDEF) */
+#define SYMXREF         64      /* 01000000 symbol is external (SYMXREF) 
+											or external library (SYMXREF|SYMDEF) */
 
-#define XDEF_OFF        223     /* bitmask 11011111 */
-#define XREF_OFF        191     /* bitmask 10111111 */
-#define SYMLOCAL_OFF    239     /* bitmask 11101111 */
-#define SYMTYPE         120     /* bitmask 01111000 */
+#define XDEF_OFF        223     /* 11011111 */
+#define XREF_OFF        191     /* 10111111 */
+#define SYMLOCAL_OFF    239     /* 11101111 */
+#define SYMTYPE         120     /* 01111000 */
 #define SYM_NOTDEFINED  0		
 
-/* OLD, to be deleted */
-typedef struct node
-{
-    byte_t				type;				/* type of symbol  */
-    char				*symname;			/* pointer to symbol identifier */
-    long				symvalue;			/* value of symbol */
-    SymbolRefList		*references;		/* pointer to all found references of symbol */
-    struct module		*owner;				/* pointer to module which ownes symbol */
-} symbol;
+/*-----------------------------------------------------------------------------
+*   Symbol API
+*----------------------------------------------------------------------------*/
+
+/* create a new symbol, needs to be deleted by OBJ_DELETE()
+   adds a reference to the page were referred to */
+extern Symbol *Symbol_create( char *name, long value, byte_t type, struct module *owner );
+
 
 #endif /* ndef SYM_H */
-

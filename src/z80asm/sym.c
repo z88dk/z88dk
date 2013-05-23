@@ -15,17 +15,21 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.1 2013-05-16 23:39:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.2 2013-05-23 22:22:23 pauloscustodio Exp $
 $Log: sym.c,v $
-Revision 1.1  2013-05-16 23:39:48  pauloscustodio
+Revision 1.2  2013-05-23 22:22:23  pauloscustodio
+Move symbol to sym.c, rename to Symbol
+
+Revision 1.1  2013/05/16 23:39:48  pauloscustodio
 Move struct node to sym.c, rename to Symbol
 Move SymbolRef to symref.c
-
 
 */
 
 #include "memalloc.h"   /* before any other include */
 
+#include "listfile.h"
+#include "options.h"
 #include "strpool.h"
 #include "sym.h"
 
@@ -52,3 +56,28 @@ void Symbol_fini( Symbol *self )
 {
 	OBJ_DELETE(self->references);
 }
+
+/*-----------------------------------------------------------------------------
+*   create a new symbol, needs to be deleted by OBJ_DELETE()
+*	adds a reference to the page were referred to
+*----------------------------------------------------------------------------*/
+Symbol *Symbol_create( char *name, long value, byte_t type, struct module *owner )
+{
+    Symbol *self 	= OBJ_NEW(Symbol);
+
+    self->name 		= strpool_add( name );			/* name in strpool, not freed */
+    self->value 	= value;
+    self->type 		= type;
+	self->references= OBJ_NEW( SymbolRefList );		/* create reference list */
+    self->owner 	= owner;
+
+	
+	/* add reference */
+    if ( option_symtable && option_list )
+		add_symbol_ref( self->references, list_get_page_nr(), FALSE );
+
+    return self;              						/* pointer to new symbol */
+}
+
+
+

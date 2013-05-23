@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.33 2013-03-04 23:37:09 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.34 2013-05-23 22:22:23 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.33  2013-03-04 23:37:09  pauloscustodio
+/* Revision 1.34  2013-05-23 22:22:23  pauloscustodio
+/* Move symbol to sym.c, rename to Symbol
+/*
+/* Revision 1.33  2013/03/04 23:37:09  pauloscustodio
 /* Removed pass1 that was used to skip creating page references of created
 /* symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
 /* modified list_get_page_nr() to return -1 after the whole source is
@@ -267,8 +270,8 @@ Copyright (C) Paulo Custodio, 2011-2013
 enum symbols GetSym( void );
 void Pass2info( struct expr *expression, char constrange, long lfileptr );
 long GetConstant( char *evalerr );
-symbol *GetSymPtr( char *identifier );
-symbol *FindSymbol( char *identifier, avltree *symbolptr );
+Symbol *GetSymPtr( char *identifier );
+Symbol *FindSymbol( char *identifier, avltree *symbolptr );
 int GetChar( FILE *fptr );
 
 /* local functions */
@@ -304,7 +307,7 @@ int
 Factor( struct expr *pfixexpr )
 {
     long constant;
-    symbol *symptr;
+    Symbol *symptr;
     char eval_err;
     enum symbols open_paren;
 
@@ -324,7 +327,7 @@ Factor( struct expr *pfixexpr )
                 if ( symptr->type & SYMDEFINED )
                 {
                     pfixexpr->rangetype |= ( symptr->type & SYMTYPE );      /* copy appropriate type bits */
-                    NewPfixSymbol( pfixexpr, symptr->symvalue, number, NULL, symptr->type );
+                    NewPfixSymbol( pfixexpr, symptr->value, number, NULL, symptr->type );
                 }
                 else
                 {
@@ -736,7 +739,7 @@ EvalPfixExpr( struct expr *pfixlist )
 {
     struct pfixstack *stackptr = NULL;
     struct postfixlist *pfixexpr;
-    symbol *symptr;
+    Symbol *symptr;
     long ret;
 
     try
@@ -764,7 +767,7 @@ EvalPfixExpr( struct expr *pfixlist )
                                 symptr = FindSymbol( pfixexpr->id, CURRENTMODULE->localroot );
                                 pfixlist->rangetype |= ( symptr->type & SYMTYPE );      /* copy appropriate type
                                                                              * bits */
-                                PushItem( symptr->symvalue, &stackptr );
+                                PushItem( symptr->value, &stackptr );
                             }
                             else
                             {
@@ -777,7 +780,7 @@ EvalPfixExpr( struct expr *pfixlist )
 
                                     if ( symptr->type & SYMDEFINED )
                                     {
-                                        PushItem( symptr->symvalue, &stackptr );
+                                        PushItem( symptr->value, &stackptr );
                                     }
                                     else
                                     {
@@ -804,7 +807,7 @@ EvalPfixExpr( struct expr *pfixlist )
 
                                 if ( symptr->type & SYMDEFINED )
                                 {
-                                    PushItem( symptr->symvalue, &stackptr );
+                                    PushItem( symptr->value, &stackptr );
                                 }
                                 else
                                 {

@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.47 2013-04-07 23:34:19 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.48 2013-05-23 22:22:23 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.47  2013-04-07 23:34:19  pauloscustodio
+Revision 1.48  2013-05-23 22:22:23  pauloscustodio
+Move symbol to sym.c, rename to Symbol
+
+Revision 1.47  2013/04/07 23:34:19  pauloscustodio
 CH_0020 : ERR_ORG_NOT_DEFINED if no ORG given
 z80asm no longer asks for an ORG address from the standard input
 if one is not given either by an ORG statement or a -r option;
@@ -327,6 +330,7 @@ First import of z88dk into the sourceforge system <gulp>
 #include "options.h"
 #include "scan.h"
 #include "strutil.h"
+#include "sym.h"
 #include "symbol.h"
 #include "symbols.h"
 #include "z80asm.h"
@@ -347,7 +351,7 @@ int GetChar( FILE *fptr );
 long EvalPfixExpr( struct expr *pass2expr );
 struct expr *ParseNumExpr( void );
 enum symbols GetSym( void );
-symbol *FindSymbol( char *identifier, avltree *treeptr );
+Symbol *FindSymbol( char *identifier, avltree *treeptr );
 
 /* local functions */
 void ifstatement( enum flag interpret );
@@ -358,10 +362,10 @@ void Z80pass1( void );
 void Z80pass2( void );
 void WriteSymbolTable( char *msg, avltree *root );
 void WriteMapFile( void );
-void StoreName( symbol *node, byte_t symscope );
-void StoreLibReference( symbol *node );
-void StoreGlobalName( symbol *node );
-void StoreLocalName( symbol *node );
+void StoreName( Symbol *node, byte_t symscope );
+void StoreLibReference( Symbol *node );
+void StoreGlobalName( Symbol *node );
+void StoreLocalName( Symbol *node );
 long Evallogexpr( void );
 struct sourcefile *Prevfile( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
@@ -430,7 +434,7 @@ getasmline( void )
 void
 parseline( enum flag interpret )
 {
-    FindSymbol( ASSEMBLERPC, globalroot )->symvalue = get_PC();   /* update assembler program counter */
+    FindSymbol( ASSEMBLERPC, globalroot )->value = get_PC();   /* update assembler program counter */
 
     ++CURRENTFILE->line;
 
@@ -829,7 +833,7 @@ Z80pass2( void )
 
 
 void
-StoreGlobalName( symbol *node )
+StoreGlobalName( Symbol *node )
 {
     if ( ( node->type & SYMXDEF ) && ( node->type & SYMTOUCHED ) )
     {
@@ -839,7 +843,7 @@ StoreGlobalName( symbol *node )
 
 
 void
-StoreLocalName( symbol *node )
+StoreLocalName( Symbol *node )
 {
     if ( ( node->type & SYMLOCAL ) && ( node->type & SYMTOUCHED ) )
     {
@@ -849,7 +853,7 @@ StoreLocalName( symbol *node )
 
 
 void
-StoreName( symbol *node, byte_t scope )
+StoreName( Symbol *node, byte_t scope )
 {
     int b;
 
@@ -881,24 +885,24 @@ StoreName( symbol *node, byte_t scope )
         fputc_err( 'C', objfile );    /* or a constant */
     }
 
-    fputl_err( node->symvalue, objfile );
+    fputl_err( node->value, objfile );
 
-    b = strlen( node->symname );
+    b = strlen( node->name );
     fputc_err( b, objfile );         /* write length of symbol name to relocatable file */
-    fwritec_err( node->symname, ( size_t ) b, objfile ); /* write symbol name to relocatable file */
+    fwritec_err( node->name, ( size_t ) b, objfile ); /* write symbol name to relocatable file */
 }
 
 
 void
-StoreLibReference( symbol *node )
+StoreLibReference( Symbol *node )
 {
     size_t b;
 
     if ( ( node->type & SYMXREF ) && ( node->type & SYMDEF ) && ( node->type & SYMTOUCHED ) )
     {
-        b = strlen( node->symname );
+        b = strlen( node->name );
         fputc_err( ( int ) b, objfile ); /* write length of symbol name to relocatable file */
-        fwritec_err( node->symname, b, objfile );    /* write symbol name to relocatable file */
+        fwritec_err( node->name, b, objfile );    /* write symbol name to relocatable file */
     }
 }
 
@@ -1009,7 +1013,7 @@ FindFile( struct sourcefile *srcfile, char *flnm )
 
 
 void
-WriteSymbol( symbol *n )
+WriteSymbol( Symbol *n )
 {
     if ( n->owner == CURRENTMODULE )
     {
@@ -1018,7 +1022,7 @@ WriteSymbol( symbol *n )
         {
             if ( ( n->type & SYMTOUCHED ) )
             {
-				list_symbol( n->symname, n->symvalue, n->references );
+				list_symbol( n->name, n->value, n->references );
             }
         }
     }

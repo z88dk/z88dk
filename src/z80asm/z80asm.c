@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.85 2013-05-16 22:45:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.86 2013-05-23 22:22:23 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.85  2013-05-16 22:45:21  pauloscustodio
+/* Revision 1.86  2013-05-23 22:22:23  pauloscustodio
+/* Move symbol to sym.c, rename to Symbol
+/*
+/* Revision 1.85  2013/05/16 22:45:21  pauloscustodio
 /* Add ObjFile to struct module
 /* Use ObjFile to check for valid object file
 /*
@@ -550,15 +553,15 @@ void Z80pass2( void );
 void CreateLib( char *lib_filename );
 void LinkModules( void );
 void DeclModuleName( void );
-void FreeSym( symbol *node );
+void FreeSym( Symbol *node );
 void CreateDeffile( void );
-void WriteGlobal( symbol *node );
+void WriteGlobal( Symbol *node );
 void WriteMapFile( void );
 void CreateBinFile( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 enum symbols GetSym( void );
 long GetConstant( char *evalerr );
-int cmpidstr( symbol *kptr, symbol *p );
+int cmpidstr( Symbol *kptr, Symbol *p );
 
 
 /* local functions */
@@ -569,7 +572,7 @@ void ReleaseOwnedFile( struct usedfile *ownedfile );
 void ReleaseModules( void );
 void ReleaseExprns( struct expression *express );
 void CloseFiles( void );
-symbol *createsym( symbol *symptr );
+Symbol *createsym( Symbol *symptr );
 struct module *NewModule( void );
 struct libfile *NewLibrary( void );
 
@@ -1486,10 +1489,10 @@ usage( void )
 }
 
 
-symbol *
-createsym( symbol *symptr )
+Symbol *
+createsym( Symbol *symptr )
 {
-    return CreateSymbol( symptr->symname, symptr->symvalue, symptr->type, symptr->owner );
+    return Symbol_create( symptr->name, symptr->value, symptr->type, symptr->owner );
 }
 
 

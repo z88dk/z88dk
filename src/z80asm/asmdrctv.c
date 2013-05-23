@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.43 2013-05-12 19:39:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.44 2013-05-23 22:22:23 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.43  2013-05-12 19:39:32  pauloscustodio
+/* Revision 1.44  2013-05-23 22:22:23  pauloscustodio
+/* Move symbol to sym.c, rename to Symbol
+/*
+/* Revision 1.43  2013/05/12 19:39:32  pauloscustodio
 /* warnings
 /*
 /* Revision 1.42  2013/03/06 00:02:17  pauloscustodio
@@ -316,9 +319,9 @@ struct expr *ParseNumExpr( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 struct sourcefile *Prevfile( void );
 struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
-int cmpidstr( symbol *kptr, symbol *p );
-void FreeSym( symbol *node );
-symbol *FindSymbol( char *identifier, avltree *treeptr );
+int cmpidstr( Symbol *kptr, Symbol *p );
+void FreeSym( Symbol *node );
+Symbol *FindSymbol( char *identifier, avltree *treeptr );
 void getasmline( void );
 
 
@@ -735,7 +738,7 @@ DEFS()
 void
 UNDEFINE( void )
 {
-    symbol *sym;
+    Symbol *sym;
 
     do
     {

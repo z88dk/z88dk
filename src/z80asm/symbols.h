@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.h,v 1.8 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.h,v 1.9 2013-05-23 22:22:23 pauloscustodio Exp $ */
 /* $Log: symbols.h,v $
-/* Revision 1.8  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.9  2013-05-23 22:22:23  pauloscustodio
+/* Move symbol to sym.c, rename to Symbol
+/*
+/* Revision 1.8  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.7  2012/05/24 17:09:27  pauloscustodio
@@ -57,20 +60,16 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 #include "symbol.h"
 
-/* Create a new symbol
-   CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
-extern symbol *CreateSymbol( char *identifier, long value, char symboltype, struct module *symowner );
-
 /* Create a symbol in the local or global tree */
-extern void DefineSymbol( char *identifier, long value, char symboltype );
+extern void DefineSymbol( char *identifier, long value, byte_t symboltype );
 
 /* Create a symbol in the given tree, error if already defined */
-extern void DefineDefSym( char *identifier, long value, char symboltype, avltree **root );
+extern void DefineDefSym( char *identifier, long value, byte_t symboltype, avltree **root );
 
 /* Declare a global symbol */
-extern void DeclSymGlobal( char *identifier, char libtype );
+extern void DeclSymGlobal( char *identifier, byte_t libtype );
 
 /* Declare an external symbol */
-extern void DeclSymExtern( char *identifier, char libtype );
+extern void DeclSymExtern( char *identifier, byte_t libtype );
 
 #endif /* ndef SYMBOLS_H */
