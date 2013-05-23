@@ -5,7 +5,7 @@
  *
  *  We don't bother filling up the explicitname (yet...)
  *
- *  $Id: open_z88.c,v 1.3 2012-06-13 11:04:29 stefano Exp $
+ *  $Id: open_z88.c,v 1.4 2013-05-23 16:27:04 stefano Exp $
  */
 
 #include <cpm.h>
@@ -29,28 +29,32 @@ int open_z88(far char *nam, int flags, mode_t mode, char *outbuf, size_t extlen)
     }
 
     if ( setfcb(fc,name) == 0 ) {  /* We had a real file, not a device */
-	if ( flags == U_READ && bdos(CPM_VERS,0) >= 0x30 ) 
-	    fc->name[5] |= 0x80;    /* read only mode */
-	uid = getuid();
-	setuid(fc->uid);
+		if ( flags == U_READ && bdos(CPM_VERS,0) >= 0x30 ) 
+			fc->name[5] |= 0x80;    /* read only mode */
+		uid = getuid();
+		setuid(fc->uid);
 
-	if ( bdos(CPM_OPN,fc) == -1 ) {
-	    clearfcb(fc);
-	    setuid(uid);
-	    if ( flags > U_READ ) {  /* If returned error and writer then create */
-		fd = creat(name,0);
-		if ( fd == -1 )
-		    return -1;
-		fc = _fcb[fd];
+		if ( bdos(CPM_OPN,fc) == -1 ) {
+			clearfcb(fc);
+			setuid(uid);
+			if ( flags > U_READ ) {  /* If returned error and writer then create */
+			fd = creat(name,0);
+			if ( fd == -1 )
+				return -1;
+			fc = _fcb[fd];
+			fc->use = flags;
+			return fd;
+			}
+			return -1;   /* An error */
+		}
+
+		setuid(uid);
 		fc->use = flags;
-		return fd;
-	    }
-	    return -1;   /* An error */
-	}
-	setuid(uid);
-	fc->use = flags;
     }
     fd =  ((fc - &_fcb[0])/sizeof(struct fcb));
+	if ( (*(unsigned char *)mode) == 'a' )
+		lseek(fd,0L,SEEK_END);
+
     return fd;
 }
 
