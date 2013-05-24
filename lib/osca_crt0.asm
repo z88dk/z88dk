@@ -15,7 +15,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.17 2013-05-21 08:10:42 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.18 2013-05-24 06:57:10 stefano Exp $
 ;
 
 
