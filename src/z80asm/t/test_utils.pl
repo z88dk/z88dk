@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.32 2013-05-16 22:45:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.33 2013-05-27 22:45:13 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.32  2013-05-16 22:45:21  pauloscustodio
+# Revision 1.33  2013-05-27 22:45:13  pauloscustodio
+# Allow ASSERT to be used in INIT code in t_compile_module()
+#
+# Revision 1.32  2013/05/16 22:45:21  pauloscustodio
 # Add ObjFile to struct module
 # Use ObjFile to check for valid object file
 #
@@ -585,8 +588,7 @@ sub t_compile_module {
 #include <stdlib.h>
 #include <stdio.h>
 
-".join("\n", map {"#include \"$_.h\""} sort keys %modules)."\n".
-$init_code.'
+".join("\n", map {"#include \"$_.h\""} sort keys %modules)."\n".'
 int _exception_raised;
 int _exception_initialized;
 
@@ -636,7 +638,7 @@ void dump_file ( char *filename )
 	fprintf(stderr, "\n");
 	fclose(fp);
 }
-
+'.$init_code.'
 int main (int argc, char **argv) {
 '.$main_code."
 	return 0;
