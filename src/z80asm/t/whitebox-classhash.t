@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classhash.t,v 1.2 2013-02-25 21:36:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classhash.t,v 1.3 2013-05-27 22:43:34 pauloscustodio Exp $
 # $Log: whitebox-classhash.t,v $
-# Revision 1.2  2013-02-25 21:36:17  pauloscustodio
+# Revision 1.3  2013-05-27 22:43:34  pauloscustodio
+# StrHash_set failed when the key string buffer was reused later in the code.
+# StrHash_get failed to retrieve object after the key used by StrHash_set was reused.
+#
+# Revision 1.2  2013/02/25 21:36:17  pauloscustodio
 # Uniform the APIs of classhash, classlist, strhash, strlist
 #
 # Revision 1.1  2013/02/02 00:08:26  pauloscustodio
@@ -101,6 +105,15 @@ int descending (ObjHashElem *a, ObjHashElem *b)
 	return strcmp(((Obj *)(b->value))->string, ((Obj *)(a->value))->string);
 }
 
+/* reuse string - test saving of keys by hash */
+char *S(char *str)
+{
+	static char buffer[MAXLINE];
+	
+	strcpy(buffer, str);		/* overwrite last string */
+	return buffer;
+}
+
 END_INIT
 	/* main */
 	Obj *obj;
@@ -112,7 +125,7 @@ END_INIT
 	T_START(hash);
 	T_END(hash);
 
-	ObjHash_set(hash, "abc", new_obj("321"));
+	ObjHash_set(hash, S("abc"), new_obj("321"));
 	
 	T_START(hash);
 	T_NEXT(hash, "abc", "321");
@@ -122,14 +135,14 @@ END_INIT
 	T_NEXT(hash, "abc", "321");
 	T_END(hash);
 
-	ObjHash_set(hash, "def", new_obj("456"));
+	ObjHash_set(hash, S("def"), new_obj("456"));
 
 	T_START(hash);
 	T_NEXT(hash, "abc", "321");
 	T_NEXT(hash, "def", "456");
 	T_END(hash);
 
-	ObjHash_set(hash, "ghi", new_obj("789"));
+	ObjHash_set(hash, S("ghi"), new_obj("789"));
 
 	T_START(hash);
 	T_NEXT(hash, "abc", "321");
@@ -138,7 +151,7 @@ END_INIT
 	T_END(hash);
 
 	/* set new object, old is deleted */
-	ObjHash_set(hash, "abc", new_obj("123"));
+	ObjHash_set(hash, S("abc"), new_obj("123"));
 	
 	T_START(hash);
 	T_NEXT(hash, "abc", "123");
@@ -161,7 +174,7 @@ END_INIT
 	T_NEXT(hash2, "ghi", "789");
 	T_END(hash2);
 
-	ObjHash_remove(hash, "def");
+	ObjHash_remove(hash, S("def"));
 	
 	T_START(hash);
 	T_NEXT(hash, "abc", "123");
@@ -174,7 +187,7 @@ END_INIT
 	T_NEXT(hash2, "ghi", "789");
 	T_END(hash2);
 
-	ObjHash_remove(hash, "def");
+	ObjHash_remove(hash, S("def"));
 	
 	T_START(hash);
 	T_NEXT(hash, "abc", "123");
@@ -187,7 +200,7 @@ END_INIT
 	T_NEXT(hash2, "ghi", "789");
 	T_END(hash2);
 
-	ObjHash_remove(hash, "ghi");
+	ObjHash_remove(hash, S("ghi"));
 	
 	T_START(hash);
 	T_NEXT(hash, "abc", "123");
@@ -199,7 +212,7 @@ END_INIT
 	T_NEXT(hash2, "ghi", "789");
 	T_END(hash2);
 
-	ObjHash_remove(hash, "abc");
+	ObjHash_remove(hash, S("abc"));
 	
 	T_START(hash);
 	T_END(hash);
@@ -230,9 +243,9 @@ END_INIT
 	T_END(hash2);
 
 	/* first / remove_elem */
-	ObjHash_set(hash, "abc", new_obj("123"));
-	ObjHash_set(hash, "def", new_obj("456"));
-	ObjHash_set(hash, "ghi", new_obj("789"));
+	ObjHash_set(hash, S("abc"), new_obj("123"));
+	ObjHash_set(hash, S("def"), new_obj("456"));
+	ObjHash_set(hash, S("ghi"), new_obj("789"));
 
 	T_START(hash);
 	T_NEXT(hash, "abc", "123");
@@ -274,9 +287,9 @@ END_INIT
 	T_END(hash);
 
 	/* find / remove_elem */
-	ObjHash_set(hash, "abc", new_obj("123"));
-	ObjHash_set(hash, "def", new_obj("456"));
-	ObjHash_set(hash, "ghi", new_obj("789"));
+	ObjHash_set(hash, S("abc"), new_obj("123"));
+	ObjHash_set(hash, S("def"), new_obj("456"));
+	ObjHash_set(hash, S("ghi"), new_obj("789"));
 
 	T_START(hash);
 	T_NEXT(hash, "abc", "123");
@@ -323,7 +336,7 @@ END_INIT
 
 	if (! ObjHash_empty(hash)) ERROR;
 	
-	ObjHash_set(hash, "abc", new_obj("123"));
+	ObjHash_set(hash, S("abc"), new_obj("123"));
 	
 	if (ObjHash_empty(hash)) ERROR;
 
@@ -331,9 +344,9 @@ END_INIT
 	OBJ_DELETE(hash);
 	hash = OBJ_NEW(ObjHash);
 	
-	ObjHash_set(hash, "def", new_obj("456"));
-	ObjHash_set(hash, "abc", new_obj("321"));
-	ObjHash_set(hash, "ghi", new_obj("789"));
+	ObjHash_set(hash, S("def"), new_obj("456"));
+	ObjHash_set(hash, S("abc"), new_obj("321"));
+	ObjHash_set(hash, S("ghi"), new_obj("789"));
 
 	T_START(hash);
 	T_NEXT(hash, "def", "456");

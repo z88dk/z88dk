@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.8 2013-02-25 21:36:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.9 2013-05-27 22:43:34 pauloscustodio Exp $
 # $Log: whitebox-strhash.t,v $
-# Revision 1.8  2013-02-25 21:36:17  pauloscustodio
+# Revision 1.9  2013-05-27 22:43:34  pauloscustodio
+# StrHash_set failed when the key string buffer was reused later in the code.
+# StrHash_get failed to retrieve object after the key used by StrHash_set was reused.
+#
+# Revision 1.8  2013/02/25 21:36:17  pauloscustodio
 # Uniform the APIs of classhash, classlist, strhash, strlist
 #
 # Revision 1.7  2013/02/02 00:07:35  pauloscustodio
@@ -197,6 +201,15 @@ int descending (StrHashElem *a, StrHashElem *b)
 	return strcmp((char*)(b->value), (char*)(a->value));
 }
 
+/* reuse string - test saving of keys by hash */
+char *S(char *str)
+{
+	static char buffer[MAXLINE];
+	
+	strcpy(buffer, str);		/* overwrite last string */
+	return buffer;
+}
+
 END_INIT
 	/* main */
 	StrHash *hash1, *hash2;
@@ -207,16 +220,16 @@ END_INIT
 	if (StrHash_first(hash1) != NULL)			ERROR;
 	check_list(hash1, "");
 	
-	StrHash_set(hash1, "abc", "123");
+	StrHash_set(hash1, S("abc"), "123");
 	check_list(hash1, "abc 123");
 	
-	StrHash_set(hash1, "def", "456");
+	StrHash_set(hash1, S("def"), "456");
 	check_list(hash1, "abc 123 def 456");
 	
-	StrHash_set(hash1, "ghi", "789");
+	StrHash_set(hash1, S("ghi"), "789");
 	check_list(hash1, "abc 123 def 456 ghi 789");
 	
-	StrHash_set(hash1, "def", "456");
+	StrHash_set(hash1, S("def"), "456");
 	check_list(hash1, "abc 123 def 456 ghi 789");
 	
 	/* clone */
@@ -224,19 +237,19 @@ END_INIT
 	check_list(hash1, "abc 123 def 456 ghi 789");
 	check_list(hash2, "abc 123 def 456 ghi 789");
 	
-	StrHash_remove(hash1, "def");
+	StrHash_remove(hash1, S("def"));
 	check_list(hash1, "abc 123 ghi 789");
 	check_list(hash2, "abc 123 def 456 ghi 789");
 	
-	StrHash_remove(hash1, "def");
+	StrHash_remove(hash1, S("def"));
 	check_list(hash1, "abc 123 ghi 789");
 	check_list(hash2, "abc 123 def 456 ghi 789");
 	
-	StrHash_remove(hash1, "ghi");
+	StrHash_remove(hash1, S("ghi"));
 	check_list(hash1, "abc 123");
 	check_list(hash2, "abc 123 def 456 ghi 789");
 
-	StrHash_remove(hash1, "abc");
+	StrHash_remove(hash1, S("abc"));
 	check_list(hash1, "");
 	check_list(hash2, "abc 123 def 456 ghi 789");
 
@@ -250,9 +263,9 @@ END_INIT
 	
 	
 	/* head / remove_elem */
-	StrHash_set(hash1, "abc", "123");
-	StrHash_set(hash1, "def", "456");
-	StrHash_set(hash1, "ghi", "789");
+	StrHash_set(hash1, S("abc"), "123");
+	StrHash_set(hash1, S("def"), "456");
+	StrHash_set(hash1, S("ghi"), "789");
 	check_list(hash1, "abc 123 def 456 ghi 789");
 
 	elem = StrHash_first(hash1); 
@@ -277,30 +290,30 @@ END_INIT
 	if (elem != NULL) ERROR;
 	check_list(hash1, "");
 
-	StrHash_set(hash1, "abc", "123");
-	StrHash_set(hash1, "def", "456");
-	StrHash_set(hash1, "ghi", "789");
+	StrHash_set(hash1, S("abc"), "123");
+	StrHash_set(hash1, S("def"), "456");
+	StrHash_set(hash1, S("ghi"), "789");
 	check_list(hash1, "abc 123 def 456 ghi 789");
 
-	elem = StrHash_find(hash1, "def"); 
+	elem = StrHash_find(hash1, S("def")); 
 	if (elem == NULL) ERROR;
 	if (strcmp(elem->key, "def")) ERROR;
 	StrHash_remove_elem(hash1, elem);
 	check_list(hash1, "abc 123 ghi 789");
 
-	elem = StrHash_find(hash1, "ghi"); 
+	elem = StrHash_find(hash1, S("ghi")); 
 	if (elem == NULL) ERROR;
 	if (strcmp(elem->key, "ghi")) ERROR;
 	StrHash_remove_elem(hash1, elem);
 	check_list(hash1, "abc 123");
 
-	elem = StrHash_find(hash1, "abc"); 
+	elem = StrHash_find(hash1, S("abc")); 
 	if (elem == NULL) ERROR;
 	if (strcmp(elem->key, "abc")) ERROR;
 	StrHash_remove_elem(hash1, elem);
 	check_list(hash1, "");
 
-	elem = StrHash_find(hash1, "abc"); 
+	elem = StrHash_find(hash1, S("abc")); 
 	if (elem != NULL) ERROR;
 	check_list(hash1, "");
 	
@@ -310,7 +323,7 @@ END_INIT
 	
 	if (! StrHash_empty(hash1)) ERROR;
 	
-	StrHash_set(hash1, "abc", "123");
+	StrHash_set(hash1, S("abc"), "123");
 	
 	if (StrHash_empty(hash1)) ERROR;
 	
@@ -318,16 +331,16 @@ END_INIT
 	OBJ_DELETE(hash1);
 	hash1 = OBJ_NEW(StrHash);
 	
-	StrHash_set(hash1, "def", "456");
+	StrHash_set(hash1, S("def"), "456");
 	check_list(hash1, "def 456");
 	
-	StrHash_set(hash1, "abc", "123");
+	StrHash_set(hash1, S("abc"), "123");
 	check_list(hash1, "def 456 abc 123");
 	
-	StrHash_set(hash1, "ghi", "789");
+	StrHash_set(hash1, S("ghi"), "789");
 	check_list(hash1, "def 456 abc 123 ghi 789");
 	
-	StrHash_set(hash1, "def", "457");
+	StrHash_set(hash1, S("def"), "457");
 	check_list(hash1, "def 457 abc 123 ghi 789");
 	
 	StrHash_sort(hash1, ascending);

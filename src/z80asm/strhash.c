@@ -18,9 +18,13 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.8 2013-02-25 21:36:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.9 2013-05-27 22:43:34 pauloscustodio Exp $ */
 /* $Log: strhash.c,v $
-/* Revision 1.8  2013-02-25 21:36:17  pauloscustodio
+/* Revision 1.9  2013-05-27 22:43:34  pauloscustodio
+/* StrHash_set failed when the key string buffer was reused later in the code.
+/* StrHash_get failed to retrieve object after the key used by StrHash_set was reused.
+/*
+/* Revision 1.8  2013/02/25 21:36:17  pauloscustodio
 /* Uniform the APIs of classhash, classlist, strhash, strlist
 /*
 /* Revision 1.7  2013/02/02 00:07:35  pauloscustodio
@@ -144,9 +148,9 @@ void StrHash_set( StrHash *self, char *key, void *value )
 		elem = xcalloc_struct( StrHashElem );
 		elem->key = strpool_add( key );
 		
-		/* add to hash */
+		/* add to hash, need to store elem->key instead of key, as it is invariant */
 		num_chars = strlen( key );
-		HASH_ADD_KEYPTR( hh, self->hash, key, num_chars, elem );
+		HASH_ADD_KEYPTR( hh, self->hash, elem->key, num_chars, elem );
 	}
 	
 	/* update value */
