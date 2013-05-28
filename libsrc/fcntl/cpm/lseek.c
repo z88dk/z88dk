@@ -5,7 +5,7 @@
  *	1	SEEK_CUR from current position
  *	2	SEEK_END from end of file (always -ve)
  *
- *	$Id: lseek.c,v 1.4 2013-05-23 16:27:04 stefano Exp $
+ *	$Id: lseek.c,v 1.5 2013-05-28 06:02:44 stefano Exp $
 */
 
 #include <fcntl.h>
@@ -33,7 +33,7 @@ long lseek(int fd,long posn, int whence)
 
 	case 2:
 		while (read(fd,buffer,1) != EOF) {
-			if (buffer[0]==0x1a) break;
+			if (buffer[0]==__STDIO_EOFMARKER) break;
 		}
 		pos = fc->rwptr-1;
 		break;

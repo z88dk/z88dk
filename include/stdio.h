@@ -3,9 +3,10 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.20 2013-04-19 15:40:48 stefano Exp $ */
+/* $Id: stdio.h,v 1.21 2013-05-28 06:02:44 stefano Exp $ */
 
-#undef __STDIO_BINARY        /* By default don't consider binary files */
+#undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
+#undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
 
 #ifdef FDSTDIO
 #include <z88stdio.h>
@@ -24,7 +25,13 @@
 #endif
 
 #ifdef __CPM__
+/* This will define __STDIO_BINARY, __STDIO_EOFMARKER and __STDIO_CRLF  */
 #include <cpm.h>
+#endif
+
+#ifdef __OSCA__
+/* This will define __STDIO_BINARY, __STDIO_EOFMARKER and __STDIO_CRLF  */
+#include <flos.h>
 #endif
 
 #ifdef ZXVGS

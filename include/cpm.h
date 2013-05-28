@@ -7,7 +7,7 @@
  *    Many of these values have been obtained via reference to
  *    Hitech C
  *
- *    $Id: cpm.h,v 1.6 2010-09-19 00:24:08 dom Exp $
+ *    $Id: cpm.h,v 1.7 2013-05-28 06:02:43 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -37,7 +37,8 @@
 #define U_LST   7               /* list device */
 
 #define __STDIO_EOFMARKER  26   /* End of file marker (^Z) */
-#define __STDIO_BINARY    1     /* We should consider binary */       
+#define __STDIO_BINARY     1    /* We should consider binary/text differences */
+#define __STDIO_CRLF       1    /* Automatically convert between CR and CRLF */
 
 struct fcb {
     u8_t    drive;          /* drive code */

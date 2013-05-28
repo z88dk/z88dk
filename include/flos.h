@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2011
  *
- *		$Id: flos.h,v 1.10 2012-10-15 10:40:45 stefano Exp $
+ *		$Id: flos.h,v 1.11 2013-05-28 06:02:44 stefano Exp $
  * 
  */
 
@@ -14,7 +14,6 @@
 #include <sys/compiler.h>
 #include <sys/types.h>
 #include <fcntl.h>
-
 
 // Commands for the SD/MMC card
 #define	MMC_GO_IDLE_STATE			0x40

@@ -1,10 +1,10 @@
 /*
- *  Read from a file
+ *  Write to a file
  * 
  *  27/1/2002 - djm
  *
  *
- *  $Id: write.c,v 1.2 2012-06-13 11:04:29 stefano Exp $
+ *  $Id: write.c,v 1.3 2013-05-28 06:02:44 stefano Exp $
  */
 
 #include <fcntl.h>

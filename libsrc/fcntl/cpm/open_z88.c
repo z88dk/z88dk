@@ -5,7 +5,7 @@
  *
  *  We don't bother filling up the explicitname (yet...)
  *
- *  $Id: open_z88.c,v 1.4 2013-05-23 16:27:04 stefano Exp $
+ *  $Id: open_z88.c,v 1.5 2013-05-28 06:02:44 stefano Exp $
  */
 
 #include <cpm.h>
@@ -33,6 +33,9 @@ int open_z88(far char *nam, int flags, mode_t mode, char *outbuf, size_t extlen)
 			fc->name[5] |= 0x80;    /* read only mode */
 		uid = getuid();
 		setuid(fc->uid);
+
+		if ( (*(unsigned char *)mode) == 'w' )
+			remove(nam);
 
 		if ( bdos(CPM_OPN,fc) == -1 ) {
 			clearfcb(fc);

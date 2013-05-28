@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fputc.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
+ * $Id: fputc.c,v 1.3 2013-05-28 06:02:44 stefano Exp $
  */
 
 
@@ -76,6 +76,21 @@ int fputc(int c,FILE *fp)
 	ld	l,(ix+fp_desc)
 	ld	h,(ix+fp_desc+1)
 	push	hl	;fd
+#ifdef __STDIO_BINARY
+#ifdef __STDIO_CRLF
+	ld	a,_IOTEXT	;check for text mode
+	and	(ix+fp_flags)
+	jr	z,no_binary
+	ld	a,c		;load bytes
+	cp	13
+	jr	nz,no_binary
+	push	bc	;c
+	call	writebyte
+	pop	bc
+	ld	c,10
+.no_binary
+#endif
+#endif
 	push	bc	;c
 	call	writebyte
 	pop	bc	;discard values
