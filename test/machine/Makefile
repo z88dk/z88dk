@@ -10,7 +10,7 @@ HEADERS = machine.h cmds.h
 CFLAGS = -DZ88DK -DJUMPZ80  -DDEBUG -DLSB_FIRST
 
 
-all: machine$(EXESUFFIX) machine_rcmx$(EXESUFFIX)
+all: fetch extract patch machine$(EXESUFFIX) machine_rcmx$(EXESUFFIX)
 
 
 %.o: %.c $(HEADERS)
@@ -25,6 +25,19 @@ machine$(EXESUFFIX): $(OBJECTS)
 machine_rcmx$(EXESUFFIX): $(OBJECTS_RCMX)
 	$(CC) -o $@ $(OBJECTS_RCMX)
 
+fetch:
+	wget http://fms.komkon.org/EMUL8/Z80-081707.zip
+	touch fetch
+
+extract:
+	unzip -a Z80-081707.zip
+	touch extract
+
+patch:
+	cd Z80 ; patch -p1 < ../rcm.patch
+	touch patch
+
 
 clean:
-	rm -f $(OBJECTS) $(OBJECTS_RCMX) machine$(EXESUFFIX) machine_rcmx$(EXESUFFIX) *~
+	rm -f $(OBJECTS) $(OBJECTS_RCMX) machine$(EXESUFFIX) machine_rcmx$(EXESUFFIX) *~ patch fetch Z80-081707.zip extract
+	rm -f Z80/Codes.h Z80/CodesED.h	Z80/CodesXX.h Z80/Debug.c Z80/Z80.c Z80/CodesCB.h Z80/CodesXCB.h Z80/ConDebug.c	Z80/Tables.h	Z80/Z80.h
