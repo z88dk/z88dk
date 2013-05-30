@@ -30,7 +30,7 @@ graphics/bkrestore
 graphics/spectrum/rowtab
 graphics/oz/pixladdr
 graphics/liner
-graphics/stencil_render
+graphics/oz/stencil_render
 graphics/oz/swapgfxbk
 games/joystick
 @z80.lst

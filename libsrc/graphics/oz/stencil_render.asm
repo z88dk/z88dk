@@ -22,7 +22,7 @@
 	XREF swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.6 2013-05-30 12:34:46 stefano Exp $
+;	$Id: stencil_render.asm,v 1.1 2013-05-30 12:34:46 stefano Exp $
 ;
 
 .stencil_render
@@ -70,7 +70,8 @@
 			
 			push	bc
 			call	pixeladdress		; bitpos0 = pixeladdress(x,y)
-			call	leftbitmask		; LeftBitMask(bitpos0)
+			;call	leftbitmask		; LeftBitMask(bitpos0)
+			call	rightbitmask		; LeftBitMask(bitpos0)
 			pop	bc
 			push	de			
 			
@@ -85,7 +86,8 @@
 			ld	l,c		; Y
 
 			call	pixeladdress		; bitpos1 = pixeladdress(x+width-1,y)
-			call	rightbitmask		; RightBitMask(bitpos1)
+			;call	rightbitmask		; RightBitMask(bitpos1)
+			call	leftbitmask		; RightBitMask(bitpos1)
 			ld	(bitmaskr+1),a		; bitmask1 = LeftBitMask(bitpos0)
 
 			pop	af	; pattern to be drawn (left-masked)
@@ -107,7 +109,7 @@
 			;add	hl,de
 			inc	hl			; offset += 1 (8 bits)
 
-.pattern2			ld	a,0
+.pattern2		ld	a,0
 				dec	b
 				jr	z,bitmaskr
 
