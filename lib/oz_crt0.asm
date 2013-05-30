@@ -14,7 +14,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.8 2009-06-22 21:20:05 dom Exp $
+;       $Id: oz_crt0.asm,v 1.9 2013-05-30 06:34:35 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -173,7 +173,6 @@ IF DEFINED_ozgetch2
 ;        ld      a,2
 ;        out     (16h),a         ;; enable key click
 
-	LIB	ozcustomisr
 	LIB	ozsetisr
 	
         ld      hl,ozcustomisr
@@ -427,6 +426,10 @@ ozcontrast:
 
 s_ozlcdstatus:
         defw  0
+
+; Keyboard and interrupts
+
+INCLUDE "oz_customisr.def"
 
 IF DEFINED_ozgetch2
 KeyBufGetPos:   defb 0

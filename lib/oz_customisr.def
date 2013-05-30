@@ -1,0 +1,254 @@
+;
+;       CRT0 for the sharp OZ
+;		Custom interrupt handler
+;
+;	parts of this program come from the OZ-7xx SDK by by Alexander R. Pruss
+;	by Stefano Bodrato - Oct. 2003
+;
+; ----------------------------------------------------------------------------------------
+;
+; - - - - - - -
+;
+;       $Id: oz_customisr.def,v 1.1 2013-05-30 06:34:35 stefano Exp $
+;
+; - - - - - - -
+
+
+;
+;
+;	custom interrupt code + key scanning
+;
+;
+; ------
+; $Id: oz_customisr.def,v 1.1 2013-05-30 06:34:35 stefano Exp $
+;
+	
+	XDEF	serial_hook
+
+	XDEF	ozkeyclick
+	XDEF	oz1hz
+
+	XDEF	frames
+	XDEF	ozi64hztime
+	XDEF	oz4sec_word
+	XDEF	ozi64hzcount
+	XDEF	ozdisablepowerkey
+
+	XDEF	ozgreyscale
+	XDEF	ozgreycount
+
+	XDEF	s_64hz_hook
+	XDEF	s_64hz_return
+
+IF DEFINED_ozgetch2
+	XREF	KeyboardBuffer
+	XREF	KeyBufGetPos
+	XREF	KeyBufPutPos
+ENDIF
+
+defc	PauseFirst = 32
+
+
+PowerOff:
+        ld      a,(ozdisablepowerkey)
+        or      a
+        jp      nz,NotPowerOff
+        inc     a
+        ld      (ozdisablepowerkey),a
+
+IF DEFINED_ozgetch2
+        ld      hl,803Ah		;kPower
+        ld      (KeyboardBuffer),hl
+        ld      a,0bh
+        ld      (KeyBufGetPos),a
+        xor     a
+        ld      (KeyBufPutPos),a
+ENDIF
+        ;jp      _exit
+        jp      cleanup
+
+
+FastClock:
+        ld      a,(ozgreyscale)
+        or      a
+        jp      z,FastClockDone
+        push    hl
+        ld      hl,(ozgreycount)
+        dec     hl
+        ld      (ozgreycount),hl
+        ld      a,l
+        or      h
+        jp      nz,pophl_FastClockDone
+        in      a,(22h)
+        xor     4
+        out     (22h),a
+        ld      hl,110
+        jr      z,NotAdd  ;; second page -- only 300 delay
+        add     hl,hl
+NotAdd:
+        ld      (ozgreycount),hl
+pophl_FastClockDone:
+        pop     hl
+FastClockDone:
+        ld      a,d
+        and     0ffh - 64
+        jr      nz,FromFastClock
+        ei
+        ret
+
+
+; ------------------------------------
+
+ozcustomisr:
+        in      a,(5)
+        ld      d,a
+
+        ld      a,0ffh
+        out     (6),a
+
+        in      a,(7) ;; mask
+        cpl
+        and     d
+        ld      d,a
+
+        bit     6,d
+        jp      nz,FastClock
+FromFastClock:
+
+        bit     0,d   ;; e   ;; get keyboard bit
+        call    nz,KbdHit
+
+        in      a,(46h)
+        and     16
+        jp      nz,PowerOff  ;; power switch depressed
+NotPowerOff:
+        in      a,(12h)
+        and     128
+        ;jp      z,__exit   ;; battery switch flipped - get out rapidly
+        jp	z,s_init_unblank   ;; battery switch flipped - get out rapidly
+
+serial_hook:
+        jp      GetOutPopAF
+GetOutPopAF:
+
+        bit     4,d  ;; 1hz
+        jr      nz,Inc1hz
+notInc1hz:
+        bit     5,d  ;; 64hz
+        jp      nz,KbdAndClock
+        ei
+        ret
+
+Inc1hz:
+        push    hl
+        ld      hl,(oz1hz)
+        inc     hl
+        ld      (oz1hz),hl
+        pop     hl
+        jr      notInc1hz
+
+
+KbdHit:
+ozi64hztime:
+        ld      a,PauseFirst+1
+;__ozi64hztime equ $-1
+        ld      (ozi64hzcount),a
+        or      a
+        ret     z
+        in      a,(7)    
+        and     255-32   ;; enable 64hz interrupt
+        or      1        ;; disable keyboard interrupt for now
+        out     (7),a
+        ret
+
+KbdAndClock:
+        ld      a,(keybusy)
+        or      a
+        ret     nz
+        dec     a      ; a=ff
+        ld      (keybusy),a
+        ei
+        jp      key_isr
+key_isr_ret:
+        xor     a
+        ld      (keybusy),a
+        ret
+
+ozdisablepowerkey:
+	defs 1
+
+ozi64hzcount:
+	defs 1
+ozgreyscale:
+	defs 1
+ozgreycount:
+	defs 2
+oz1hz:
+	defs 2
+frames:
+	defs 1
+oz4sec_word:
+	defs 1
+	defs 2
+keybusy:
+	defs 1
+
+
+; Keyboard driver
+; the original code by Benjamin Green was removed
+; to avoid license conflicts in the Linux distros
+
+
+key_isr:
+	push	bc
+	push	de
+	push	hl
+
+	ld      hl,ozi64hzcount
+	ld      a,(hl)
+	or      a
+	jr      z,skipCountDown
+	dec     a
+	ld      (hl),a
+	jr      nz,skipCountDown
+	ld		bc,7
+	in      a,(c)
+	or      32      ; disable 64hz interrupt
+	and     254     ; keep the keyboard interrupt
+	out     (c),a
+skipCountDown:
+	ld	hl,(frames)
+	inc	hl
+	ld	(frames),hl
+	ld	a,h
+	or	l
+	jr	nz,irq_hndl
+	ld	hl,(frames+2)
+	inc	hl
+	ld	(frames+2),hl
+irq_hndl:
+
+
+s_64hz_hook:
+	jp      s_64hz_return
+s_64hz_return:
+
+rxxoff_hook:
+	jp      noxoff
+noxoff:
+
+
+	;
+	;  -- Keboard driver removed --
+	;
+
+
+KBufferFull:
+iret:	ld	a,0ffh
+	out	(11h),a
+	out	(12h),a
+	pop	hl
+	pop	de
+	pop	bc
+	jp      key_isr_ret
+
