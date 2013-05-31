@@ -7,7 +7,7 @@
  *    Many of these values have been obtained via reference to
  *    Hitech C
  *
- *    $Id: cpm.h,v 1.7 2013-05-28 06:02:43 stefano Exp $
+ *    $Id: cpm.h,v 1.8 2013-05-31 13:34:25 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -19,7 +19,12 @@
 #define MAXFILE  10
 
 /* Whether we want fileio to support devices (default, no), if you
- * change it then recompile the library */
+ * change it then recompile the library
+ * the DEVICES flag adds the following filenames:  CON: RDR: PUN: LST:
+ * When DEVICES is not set, an optimized driver helps saving memory and
+ * permits to specify the user area in filenames, i.e.  "0/c:file.ext"
+ */
+ 
 #if 0
 #define DEVICES
 #endif
@@ -114,8 +119,6 @@ extern void __LIB__ _putoffset(unsigned char *where,long offset);
 
 /* Mark an FCB as being unused */
 #define clearfcb(f)  (f)->use = 0
-
-
 
 
 #endif
