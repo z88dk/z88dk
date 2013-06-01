@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.33 2013-05-27 22:45:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.34 2013-06-01 01:19:58 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.33  2013-05-27 22:45:13  pauloscustodio
+# Revision 1.34  2013-06-01 01:19:58  pauloscustodio
+# Add linkerr to t_z80asm() for compile OK but failed link.
+#
+# Revision 1.33  2013/05/27 22:45:13  pauloscustodio
 # Allow ASSERT to be used in INIT code in t_compile_module()
 #
 # Revision 1.32  2013/05/16 22:45:21  pauloscustodio
@@ -193,7 +196,8 @@ sub unlink_testfiles {
 #	org : -1 to skip -r0 option, >= 0 to define -r{org}, undef for -r0, org = decimal value
 # 	options : additional assemble options
 #   out : expected output, if any
-#   err : expected errors, if any
+#   err : expected compile errors, if any
+#   linkerr : expected link errors, if any
 #   bin : expected binary output if defined, undef if compilation should fail
 # 	nolist : true to remove -l option
 
@@ -256,8 +260,9 @@ sub t_z80asm {
 	is $stdout, $args{out}, "$line out";
 	
 	# check stderr
-	$args{err} ||= ""; chomp($args{err}); chomp($stderr);
-	my $exp_err_screen = my $exp_err_file = $args{err};
+	$args{err} ||= ""; $args{linkerr} ||= ""; 
+	chomp($args{err}); chomp($args{linkerr}); chomp($stderr);
+	my $exp_err_screen = my $exp_err_file = $args{err}.$args{linkerr};
 	if (! defined($args{bin})) {
 		$exp_err_screen .= "\n1 errors occurred during assembly";
 	}
@@ -291,6 +296,22 @@ sub t_z80asm {
 		my $binary = read_file(bin_file(), binmode => ':raw', err_mode => 'quiet');
 		t_binary($binary, $args{bin}, $line);
 	}
+	elsif ($args{linkerr}) {	# asm OK but link failed
+		$errors++ unless $return != 0;
+		ok $return != 0, "$line exit value";
+
+		ok -f err_file(), "$line ".err_file();
+
+		ok -f $_, "$line $_" for (@obj);
+		ok ! -f $_, "$line no $_" for (bin_file(), map_file());
+		
+		if ($cmd =~ / -x(\S+)/) {
+			my $lib = $1;
+			$lib .= ".lib" unless $lib =~ /\.lib$/i;
+			
+			ok ! -f $1, "$line no $lib";
+		}
+	}
 	else {				# asm failed
 		$errors++ unless $return != 0;
 		ok $return != 0, "$line exit value";
@@ -321,6 +342,10 @@ sub t_z80asm {
 			ok ! -f $_, "$line no $_" for (@lst);
 			ok   -f $_, "$line $_" for (@sym);
 		}
+	}
+	elsif ($args{linkerr}) {	# asm OK but link failed
+		ok -f $_, "$line $_" for (@lst);
+		ok ! -f $_, "$line no $_" for (@sym);
 	}
 	else {
 		ok ! -f $_, "$line no $_" for (@lst);
