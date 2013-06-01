@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.h,v 1.9 2013-05-23 22:22:23 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/symbols.h,v 1.10 2013-06-01 01:07:46 pauloscustodio Exp $ */
 /* $Log: symbols.h,v $
-/* Revision 1.9  2013-05-23 22:22:23  pauloscustodio
+/* Revision 1.10  2013-06-01 01:07:46  pauloscustodio
+/* Moved to sym.c and symtab.c
+/*
+/* Revision 1.9  2013/05/23 22:22:23  pauloscustodio
 /* Move symbol to sym.c, rename to Symbol
 /*
 /* Revision 1.8  2013/01/20 21:24:28  pauloscustodio
@@ -29,13 +32,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
 /*
 /* Revision 1.5  2012/05/18 00:23:14  pauloscustodio
-/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is always raised on error.
+/* define_symbol() and define_def_symbol() defined as void, a fatal error is always raised on error.
 /*
 /* Revision 1.4  2012/05/17 17:49:20  pauloscustodio
 /* astyle
 /*
 /* Revision 1.3  2012/05/17 17:42:14  pauloscustodio
-/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* define_symbol() and define_def_symbol() defined as void, a fatal error is
 /* always raised on error.
 /*
 /* Revision 1.2  2012/05/11 19:29:49  pauloscustodio
@@ -57,19 +60,5 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 #ifndef SYMBOLS_H
 #define SYMBOLS_H
-
-#include "symbol.h"
-
-/* Create a symbol in the local or global tree */
-extern void DefineSymbol( char *identifier, long value, byte_t symboltype );
-
-/* Create a symbol in the given tree, error if already defined */
-extern void DefineDefSym( char *identifier, long value, byte_t symboltype, avltree **root );
-
-/* Declare a global symbol */
-extern void DeclSymGlobal( char *identifier, byte_t libtype );
-
-/* Declare an external symbol */
-extern void DeclSymExtern( char *identifier, byte_t libtype );
 
 #endif /* ndef SYMBOLS_H */
