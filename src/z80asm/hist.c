@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.39 2013-02-19 22:52:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.40 2013-06-01 01:26:26 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.39  2013-02-19 22:52:40  pauloscustodio
+/* Revision 1.40  2013-06-01 01:26:26  pauloscustodio
+/* Version 1.2.0
+/*
+/* Revision 1.39  2013/02/19 22:52:40  pauloscustodio
 /* BUG_0030 : List bytes patching overwrites header
 /* BUG_0031 : List file garbled with input lines with 255 chars
 /* New listfile.c with all the listing related code
@@ -474,12 +477,12 @@ were defined during assembly of the first module.
 
 21.04.95, V0.52:
 New avltree algorithms used in Z80asm. Many symbol-related routines changed to new interface.
-Forward-referenced symbols now finally deleted, in stead of being marked SYMREMOVED. FindSymbol() now faster.
+Forward-referenced symbols now finally deleted, in stead of being marked SYMREMOVED. find_symbol() now faster.
 
 24.04.95, V0.53:
 'ASMPC' standard identifier now implemented as part of the global symbol tables. This means that
 that it is equal to all other created symbols. Both pass1(), pass2() and the linking process use the assembler PC.
-The explicit code in DefineSymbol() and Factor() are finally removed, which has speeded up the algorithms.
+The explicit code in define_symbol() and Factor() are finally removed, which has speeded up the algorithms.
 
 25.04.95, V0.54:
 standard avltree move() and copy() now used in stead of CopyTree() and ReorderSymbol().
@@ -830,7 +833,7 @@ Based on 1.0.31
         - Factor all pathname manipulation into module file.c.
         - Make default extensions constants.
         - Factor FILEEXT_SEPARATOR into config.h.
-        - Move srcext[] and objext[] to the options.c module.
+        - Move asm_ext[] and obj_ext[] to the options.c module.
 
 -------------------------------------------------------------------------------
 30.09.2011 [1.1.10] (pauloscustodio)
@@ -840,7 +843,7 @@ Based on 1.0.31
         - path_remove_ext() removed everything after last ".", ignoring directory
           separators. Fixed.
 
-    - srcext initialization moved from main() to reset_options()
+    - asm_ext initialization moved from main() to reset_options()
 
 -------------------------------------------------------------------------------
 07.10.2011 [1.1.11] (pauloscustodio)
@@ -941,7 +944,7 @@ Based on 1.0.31
     - Remove global ASSEMBLE_ERROR, not used.
     - Remove global ASMERROR, redundant with TOTALERRORS.
     - Remove IllegalArgumentException, replace by FatalErrorException.
-    - DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+    - define_symbol() and define_def_symbol() defined as void, a fatal error is
       always raised on error.
     - New errors_def.h with error name and string together, for easier
       maintenance.
@@ -1145,15 +1148,119 @@ Based on 1.0.31
 	- New listfile.c with all the listing related code
 
 -------------------------------------------------------------------------------
+01.06.2013 [1.2.0] (pauloscustodio)
+-------------------------------------------------------------------------------
+	BUG_0032 : DEFGROUP ignores name after assignment
+		The code 
+			DEFGROUP {
+				f10 = 10, f11
+			}
+		did not define f11 - all text after the expression was discarded.
+		
+	BUG_0033 : -d option fails if .asm does not exist
+		When building test.o from test.c, the test.asm file is removed by zcc.
+		If the .o is then linked into a library with the -d option to skip 
+		assembling, z80asm fails with error 
+		"Cannot open file 'test.asm' for reading".
+		Bug introduced when replaced TestAsmFile() by query_assemble() in 
+		z80asm.c 1.78.
+		
+	BUG_0034 : If assembly process fails with fatal error, invalid library is kept
+		Option -x creates an empty library file (just the header). If the 
+		assembly process fails with a fatal errror afterwards, the library file 
+		is not deleted.
+
+	CH_0020 : ERR_ORG_NOT_DEFINED if no ORG given
+		z80asm no longer asks for an ORG address from the standard input
+		if one is not given either by an ORG statement or a -r option; 
+		it exists with an error message instead.
+		The old behaviour was causing wrong build scripts to hang waiting
+		for input.
+		
+	CH_0021 : Exceptions on file IO show file name
+		Keep a hash table of all opened file names, so that the file name
+		is shown on a fatal error.
+		Rename file IO funtions: f..._err to xf...
+
+	CH_0022 : Replace avltree by hash table for symbol table
+		Replaced avltree from original assembler by hash table because:
+		a) code simplicity
+		b) performance - avltree 50% slower when loading the symbols from the 
+		   ZX 48 ROM assembly, see t\developer\benchmark_symtab.t
+		Removed unused errors, replaced by assertion, code not reached:
+		ERR_SYMBOL_DECL_GLOBAL, ERR_SYMBOL_DECL_EXTERN.
+		Replaced error ERR_SYMBOL_REDECL_GLOBAL (not reached in compile phase)
+		by ERR_SYMBOL_REDEFINED_MODULE (was printf).
+	
+    Internal cleanup:
+	- Decouple assembler from listfile handling
+	- Uniform the APIs of classhash, classlist, strhash, strlist
+	- New model_symref.c with all symbol cross-reference list handling
+	- Simplified symbol output to listfile by using SymbolRefList argument
+	- Renamed StrList to SzList to solve conflict with CLASS_LIST( Str )
+	  also generating a class StrList
+	- New srcfile.c to handle reading lines from source files
+	- Move include path search to srcfile.c
+	- New interface to Str to copy characters to string
+	- New LEGACY define to mark code that should be removed but is kept 
+	  to keep backwards compatibility
+	- Removed writeline, that was used to cancel listing of multi-line 
+	  constructs, as only the first line was shown on the list file. Fixed
+	  the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
+	- Removed pass1 that was used to skip creating page references of created
+	  symbols in pass2. Modified add_symbol_ref() to ignore pages < 1, 
+	  modified list_get_page_nr() to return -1 after the whole source is 
+	  processed.
+	- Added flex-based scanner, not yet integrated into assembler
+	- Decouple module name creation from parsing, define CURRENTMODULE->mname
+	  directly instead of calling DeclModuleName()
+	- GetLibfile(), ReadName(), ReadNames(), CheckIfModuleWanted(), 
+	  LinkLibModules(), SearchLibFile() were using global z80asmfile instead 
+	  of a local FILE* variable - fixed
+	- CreateDeffile() : no need to allocate file name dynamically, use a stack variable
+	- Move libfilename to options.c, keep it in strpool
+	- Helper functions to create file names of each of the extensions used in z80asm
+	- Remove global variable errfilename
+	- SSTR_DEFINE() caused compilation error "C2099: initializer is not a constant" 
+	  when used to define global variables
+	- Move default asm and obj extension handling to file.c.
+	- srcfilename and objfilename are now pointers to static variables in file.c
+	- Removed global variable smallc_source, no longer used
+	- New CLASS_RING for circular queue of tokens pre-allocated to spare the
+	  alloc/free for each token received from the lexer, and to allow quick
+	  look-ahead for the parser without the need to push back tokens.
+	- ENDIAN not used and logic to define it was causing Deprecated warnings - removed
+	- Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
+	- Add utility functions to get N characters from input, return FALSE on EOF
+	- New module for object file handling
+	- New MAXIDENT for maximum identifier length - set at 255 because of 
+	  object file format with one byte string length
+	- New MIN and MAX macros
+	- Move symbol to sym.c, rename to Symbol
+	- StrHash_set failed when the key string buffer was reused later in the code.
+	  StrHash_get failed to retrieve object after the key used by StrHash_set 
+	  was reused.
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
-
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
         - Bug only happens with forward references to relative addresses in
           expressions.
         - See example from zx48.asm ROM image in t/BUG_0011.t test file.
         - Need to change object file format to correct - need patchptr and
           address of instruction start.
+
+	CH_0018 : Remove legacy '#' in include file
+		According to the z80asm manual, the # sign is used to insert the 
+		Z80_OZFILES environment variable before the file name, but this 
+		is not done as the assembler searches for the include file in all 
+		the include path, which includes the Z80_OZFILES environment variable.
+		Handling of '#' in INCLUDE removed.
+
+	CH_0019 : Replaced tokenizer with Flex based scanner
+		Simplified code by using flex instead of special-built scanner and 
+		tokenizer.
 
     - Sections
     - Standard operators in expressions
@@ -1164,7 +1271,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "1.1.23"
+#define VERSION     "1.2.0"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS
