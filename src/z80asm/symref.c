@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Cross reference list of symbol usage
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.c,v 1.1 2013-05-16 23:39:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.c,v 1.2 2013-06-01 01:24:22 pauloscustodio Exp $
 $Log: symref.c,v $
-Revision 1.1  2013-05-16 23:39:48  pauloscustodio
+Revision 1.2  2013-06-01 01:24:22  pauloscustodio
+CH_0022 : Replace avltree by hash table for symbol table
+
+Revision 1.1  2013/05/16 23:39:48  pauloscustodio
 Move struct node to sym.c, rename to Symbol
 Move SymbolRef to symref.c
 
@@ -91,7 +94,7 @@ void add_symbol_ref( SymbolRefList *list, int page_nr, BOOL defined )
 				  defined &&
 				  SymbolRefList_last(list)->obj->page_nr == page_nr )
 		{
-			/* move the reference from emd of list to start of list, set defined flag */
+			/* move the reference from end of list to start of list, set defined flag */
 			obj = SymbolRefList_pop( list );
 			SymbolRefList_unshift( list, obj );
 		}

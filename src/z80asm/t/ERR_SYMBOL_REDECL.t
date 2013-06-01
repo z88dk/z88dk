@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_SYMBOL_REDECL.t,v 1.3 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_SYMBOL_REDECL.t,v 1.4 2013-06-01 01:24:23 pauloscustodio Exp $
 # $Log: ERR_SYMBOL_REDECL.t,v $
-# Revision 1.3  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.4  2013-06-01 01:24:23  pauloscustodio
+# CH_0022 : Replace avltree by hash table for symbol table
+#
+# Revision 1.3  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.2  2012/05/26 18:51:10  pauloscustodio
@@ -49,15 +52,7 @@ use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-t_z80asm_error("
-	XREF name
-	XDEF name
-", "Error at file 'test.asm' line 3: Re-declaration of 'NAME' not allowed");
-
-t_z80asm_error("
-	XDEF name
-	XREF name
-", "Error at file 'test.asm' line 3: Re-declaration of 'NAME' not allowed");
+ok 1, "tested by symtab.t";
 
 unlink_testfiles();
 done_testing();

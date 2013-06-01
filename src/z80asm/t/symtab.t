@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.1 2013-05-28 23:39:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.2 2013-06-01 01:24:23 pauloscustodio Exp $
 # $Log: symtab.t,v $
-# Revision 1.1  2013-05-28 23:39:04  pauloscustodio
+# Revision 1.2  2013-06-01 01:24:23  pauloscustodio
+# CH_0022 : Replace avltree by hash table for symbol table
+#
+# Revision 1.1  2013/05/28 23:39:04  pauloscustodio
 # test definition of symbols in all possible combinations
 #
 #
@@ -192,6 +195,11 @@ t_z80asm(
 );
 
 t_z80asm(
+	asm		=> "xdef VAR : VAR: : defb VAR",
+	bin		=> "\0",
+);
+
+t_z80asm(
 	asm		=> "VAR: : xref VAR",
 	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already declared local",
 );
@@ -205,6 +213,112 @@ t_z80asm(
 	asm		=> "VAR: : lib VAR",
 	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already declared local",
 );
+
+# XDEF
+t_z80asm(
+	asm		=> "xdef VAR : xdef VAR : VAR: defb VAR",
+	bin		=> "\0",
+);
+
+t_z80asm(
+	asm		=> "xdef VAR : xref VAR",
+	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+);
+
+t_z80asm(
+	asm		=> "xdef VAR : lib VAR",
+	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+);
+
+t_z80asm(
+	asm		=> "xdef VAR : xlib VAR",
+	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+);
+
+t_z80asm(
+	asm		=> "xdef VAR",
+	asm1	=> "xdef VAR : defc VAR=3 : defb VAR",
+	bin		=> "\3",
+);
+
+# XREF
+t_z80asm(
+	asm		=> "xref VAR : xdef VAR",
+	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+);
+
+t_z80asm(
+	asm		=> "xref VAR : xref VAR : VAR: defb VAR",	# local hides global
+	bin		=> "\0",
+);
+
+t_z80asm(
+	asm		=> "xref VAR : lib VAR",
+	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+);
+
+t_z80asm(
+	asm		=> "xref VAR : xlib VAR",
+	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+);
+
+# LIB
+t_z80asm(
+	asm		=> "lib VAR : xdef VAR",
+	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+);
+
+t_z80asm(
+	asm		=> "lib VAR : xref VAR : VAR: defb VAR",	# local hides global
+	bin		=> "\0",
+);
+
+t_z80asm(
+	asm		=> "lib VAR : lib VAR : VAR: defb VAR",	# local hides global
+	bin		=> "\0",
+);
+
+t_z80asm(
+	asm		=> "lib VAR : xlib VAR",
+	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+);
+
+# XLIB
+t_z80asm(
+	asm		=> "xlib VAR : xdef VAR : VAR: defb VAR",
+	bin		=> "\0",
+);
+
+t_z80asm(
+	asm		=> "xlib VAR : xref VAR",
+	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+);
+
+t_z80asm(
+	asm		=> "xlib VAR : lib VAR",
+	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+);
+
+t_z80asm(
+	asm		=> "xlib VAR : xlib VAR",
+	err		=> "Error at file 'test.asm' line 2: Module name already defined",
+);
+
+# Symbol redefined
+t_z80asm(
+	asm		=> "xdef VAR : defc VAR=3 : defb VAR",
+	asm1	=> "xdef VAR : defc VAR=3 : defb VAR",
+	linkerr	=> "Error at module 'TEST1': Symbol 'VAR' redefined in module 'TEST1'",
+);
+
+
+# Symbol declared global in another module
+t_z80asm(
+	asm		=> "xdef VAR : defc VAR=2",
+	asm1	=> "xdef VAR : defc VAR=3",
+	linkerr	=> "Error at module 'TEST1': Symbol 'VAR' redefined in module 'TEST1'",
+);
+
 
 # delete directories and files
 unlink_testfiles();

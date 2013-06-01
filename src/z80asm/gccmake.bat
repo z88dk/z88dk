@@ -1,12 +1,11 @@
 @echo off
-rem $Id: gccmake.bat,v 1.9 2013-05-16 23:39:48 pauloscustodio Exp $
+rem $Id: gccmake.bat,v 1.10 2013-06-01 01:24:22 pauloscustodio Exp $
 
 echo *******************
 echo * Building z80asm *
 echo *******************
 del *.o
 gcc -c -o asmdrctv.o             asmdrctv.c
-gcc -c -o avltree.o              avltree.c
 gcc -c -o class.o                class.c
 gcc -c -o codearea.o             codearea.c
 gcc -c -o die.o                  die.c
@@ -35,8 +34,8 @@ gcc -c -o strlist.o              strlist.c
 gcc -c -o strpool.o              strpool.c
 gcc -c -o strutil.o              strutil.c
 gcc -c -o sym.o                  sym.c
-gcc -c -o symbols.o              symbols.c
 gcc -c -o symref.o               symref.c
+gcc -c -o symtab.o               symtab.c
 gcc -c -o z80asm.o               z80asm.c
 gcc -c -o z80instr.o             z80instr.c
 gcc -c -o z80pass.o              z80pass.c

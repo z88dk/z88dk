@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.30 2013-05-06 23:02:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.31 2013-06-01 01:24:22 pauloscustodio Exp $
 $Log: z80asm.h,v $
-Revision 1.30  2013-05-06 23:02:12  pauloscustodio
+Revision 1.31  2013-06-01 01:24:22  pauloscustodio
+CH_0022 : Replace avltree by hash table for symbol table
+
+Revision 1.30  2013/05/06 23:02:12  pauloscustodio
 BUG_0034 : If assembly process fails with fatal error, invalid library is kept
 Option -x creates an empty library file (just the header). If the
 assembly process fails with a fatal errror afterwards, the library file
@@ -151,7 +154,6 @@ $History: Z80ASM.C $
 #ifndef Z80ASM_H
 #define Z80ASM_H
 
-#include "avltree.h"
 #include "config.h"
 #include "types.h"
 #include <stdio.h>
@@ -179,7 +181,6 @@ extern size_t EXPLICIT_ORIGIN;
 extern char line[];
 extern char ident[];
 extern char separators[];
-extern avltree *globalroot, *staticroot;
 extern struct module *CURRENTMODULE;
 extern FILE *z80asmfile, *deffile;
 
@@ -192,4 +193,3 @@ extern long TOTALLINES;
 extern void assemble_file( char *filename );
 
 #endif
-

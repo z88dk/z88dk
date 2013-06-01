@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.2 2013-05-23 22:22:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.3 2013-06-01 01:24:22 pauloscustodio Exp $
 $Log: sym.h,v $
-Revision 1.2  2013-05-23 22:22:23  pauloscustodio
+Revision 1.3  2013-06-01 01:24:22  pauloscustodio
+CH_0022 : Replace avltree by hash table for symbol table
+
+Revision 1.2  2013/05/23 22:22:23  pauloscustodio
 Move symbol to sym.c, rename to Symbol
 
 Revision 1.1  2013/05/16 23:39:48  pauloscustodio
@@ -33,7 +36,6 @@ Move SymbolRef to symref.c
 #include "memalloc.h"   /* before any other include */
 
 #include "class.h"
-#include "symbol.h"
 #include "symref.h"
 #include "types.h"
 
@@ -68,6 +70,11 @@ END_CLASS;
 #define SYMLOCAL_OFF    239     /* 11101111 */
 #define SYMTYPE         120     /* 01111000 */
 #define SYM_NOTDEFINED  0		
+
+/*-----------------------------------------------------------------------------
+*   Location symbol
+*----------------------------------------------------------------------------*/
+#define ASSEMBLERPC     "ASMPC"
 
 /*-----------------------------------------------------------------------------
 *   Symbol API

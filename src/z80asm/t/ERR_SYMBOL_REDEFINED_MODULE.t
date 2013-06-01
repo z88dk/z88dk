@@ -13,31 +13,19 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_SYMBOL_DECL_EXTERN.t,v 1.2 2013-01-20 21:24:29 pauloscustodio Exp $
-# $Log: ERR_SYMBOL_DECL_EXTERN.t,v $
-# Revision 1.2  2013-01-20 21:24:29  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.1  2012/05/23 18:07:51  pauloscustodio
-# Unlink test files for errors from error numbers, to be able to change
-# error numbers.
-#
-# Revision 1.1  2011/07/12 22:47:59  pauloscustodio
-# - Moved all error variables and error reporting code to a separate module errors.c,
-#   replaced all extern declarations of these variables by include errors.h,
-#   created symbolic constants for error codes.
-# - Added test scripts for error messages.
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_SYMBOL_REDEFINED_MODULE.t,v 1.1 2013-06-01 01:24:23 pauloscustodio Exp $
+# $Log: ERR_SYMBOL_REDEFINED_MODULE.t,v $
+# Revision 1.1  2013-06-01 01:24:23  pauloscustodio
+# CH_0022 : Replace avltree by hash table for symbol table
 #
 #
-#
-# Test error 19
 
 use strict;
 use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-diag "Symbol already declared external --> no longer used";
+ok 1, "tested by symtab.t";
 
 unlink_testfiles();
 done_testing();

@@ -80,7 +80,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="avltree.h" />
     <ClInclude Include="class.h" />
     <ClInclude Include="classhash.h" />
     <ClInclude Include="classlist.h" />
@@ -115,7 +114,6 @@
     <ClInclude Include="strutil.h" />
     <ClInclude Include="sym.h" />
     <ClInclude Include="symbol.h" />
-    <ClInclude Include="symbols.h" />
     <ClInclude Include="symref.h" />
     <ClInclude Include="symtab.h" />
     <ClInclude Include="types.h" />
@@ -124,7 +122,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c" />
-    <ClCompile Include="avltree.c" />
     <ClCompile Include="class.c" />
     <ClCompile Include="codearea.c" />
     <ClCompile Include="die.c" />
@@ -156,7 +153,6 @@
     <ClCompile Include="strpool.c" />
     <ClCompile Include="strutil.c" />
     <ClCompile Include="sym.c" />
-    <ClCompile Include="symbols.c" />
     <ClCompile Include="symref.c" />
     <ClCompile Include="symtab.c" />
     <ClCompile Include="z80asm.c" />

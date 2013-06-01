@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.34 2013-05-23 22:22:23 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.35 2013-06-01 01:24:21 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.34  2013-05-23 22:22:23  pauloscustodio
+/* Revision 1.35  2013-06-01 01:24:21  pauloscustodio
+/* CH_0022 : Replace avltree by hash table for symbol table
+/*
+/* Revision 1.34  2013/05/23 22:22:23  pauloscustodio
 /* Move symbol to sym.c, rename to Symbol
 /*
 /* Revision 1.33  2013/03/04 23:37:09  pauloscustodio
@@ -67,7 +70,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
 /*
 /* Revision 1.22  2012/05/17 17:42:14  pauloscustodio
-/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* define_symbol() and define_def_symbol() defined as void, a fatal error is
 /* always raised on error.
 /*
 /* Revision 1.21  2012/05/11 19:29:49  pauloscustodio
@@ -265,13 +268,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "errors.h"
 #include "file.h"
 #include "codearea.h"
+#include "z80asm.h"
 
 /* external functions */
 enum symbols GetSym( void );
 void Pass2info( struct expr *expression, char constrange, long lfileptr );
 long GetConstant( char *evalerr );
-Symbol *GetSymPtr( char *identifier );
-Symbol *FindSymbol( char *identifier, avltree *symbolptr );
 int GetChar( FILE *fptr );
 
 /* local functions */
@@ -297,7 +299,6 @@ struct expr *ParseNumExpr( void );
 
 /* global variables */
 extern struct module *CURRENTMODULE;
-extern avltree *globalroot;
 extern enum symbols sym;
 extern char ident[], separators[];
 extern FILE *z80asmfile, *objfile;
@@ -314,12 +315,12 @@ Factor( struct expr *pfixexpr )
     switch ( sym )
     {
         case name:
-            symptr = GetSymPtr( ident );
+            symptr = get_used_symbol( ident );
 
             /* Bodge for handling underscores (sdcc hack) */
             if ( sdcc_hacks == ON && ident[0] == '_' && symptr == NULL )
             {
-                symptr = GetSymPtr( ident + 1 );
+                symptr = get_used_symbol( ident + 1 );
             }
 
             if ( symptr != NULL )
@@ -764,14 +765,14 @@ EvalPfixExpr( struct expr *pfixlist )
                             /* if all bits are set to zero */
                             if ( pfixexpr->type & SYMLOCAL )
                             {
-                                symptr = FindSymbol( pfixexpr->id, CURRENTMODULE->localroot );
+                                symptr = find_symbol( pfixexpr->id, CURRENTMODULE->local_tab );
                                 pfixlist->rangetype |= ( symptr->type & SYMTYPE );      /* copy appropriate type
                                                                              * bits */
                                 PushItem( symptr->value, &stackptr );
                             }
                             else
                             {
-                                symptr = FindSymbol( pfixexpr->id, globalroot );
+                                symptr = find_symbol( pfixexpr->id, get_global_tab() );
 
                                 if ( symptr != NULL )
                                 {
@@ -797,9 +798,8 @@ EvalPfixExpr( struct expr *pfixlist )
                         }
                         else
                         {
-                            /* try to find symbol now as either */
-
-                            symptr = GetSymPtr( pfixexpr->id );       /* declared local or global */
+                            /* try to find symbol now as either declared local or global */
+                            symptr = get_used_symbol( pfixexpr->id );       
 
                             if ( symptr != NULL )
                             {

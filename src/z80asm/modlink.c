@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.58 2013-05-23 22:22:23 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.59 2013-06-01 01:24:22 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.58  2013-05-23 22:22:23  pauloscustodio
+/* Revision 1.59  2013-06-01 01:24:22  pauloscustodio
+/* CH_0022 : Replace avltree by hash table for symbol table
+/*
+/* Revision 1.58  2013/05/23 22:22:23  pauloscustodio
 /* Move symbol to sym.c, rename to Symbol
 /*
 /* Revision 1.57  2013/05/06 23:02:12  pauloscustodio
@@ -122,7 +125,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Remove IllegalArgumentException, replace by FatalErrorException.
 /*
 /* Revision 1.33  2012/05/17 17:42:14  pauloscustodio
-/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* define_symbol() and define_def_symbol() defined as void, a fatal error is
 /* always raised on error.
 /*
 /* Revision 1.32  2012/05/11 19:29:49  pauloscustodio
@@ -359,7 +362,6 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "strutil.h"
 #include "sym.h"
 #include "symbol.h"
-#include "symbols.h"
 #include "z80asm.h"
 #include <limits.h>
 #include <stdio.h>
@@ -367,17 +369,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include <string.h>
 
 /* external functions */
-void FreeSym( Symbol *node );
 void RemovePfixlist( struct expr *pfixexpr );
 struct module *NewModule( void );
 struct libfile *NewLibrary( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 long EvalPfixExpr( struct expr *pass2expr );
-int cmpidstr( Symbol *kptr, Symbol *p );
-int cmpidval( Symbol *kptr, Symbol *p );
 int GetChar( FILE *fptr );
 struct expr *ParseNumExpr( void );
-Symbol *FindSymbol( char *identifier, avltree *symbolptr );
 
 /* local functions */
 int LinkModule( char *filename, long fptr_base );
@@ -395,9 +393,7 @@ void CreateBinFile( void );
 void WriteMapFile( void );
 void ReadNames( FILE *file, long nextname, long endnames );
 void ReadExpr( long nextexpr, long endexpr );
-void ReOrderSymbol( avltree *node, avltree **maproot, int ( *symcmp )( void *, void * ) );
-void WriteMapSymbol( Symbol *mapnode );
-void WriteGlobal( Symbol *node );
+void WriteDefFile( SymbolHash *symtab );
 void CreateDeffile( void );
 void ReleaseLinkInfo( void );
 static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname );
@@ -413,7 +409,6 @@ extern byte_t reloc_routine[];
 extern struct modules *modulehdr;
 extern struct liblist *libraryhdr;
 extern struct module *CURRENTMODULE;
-extern avltree *globalroot;
 extern char *reloctable, *relocptr;
 extern size_t sizeof_relocroutine;
 
@@ -427,6 +422,7 @@ static FILE *mapfile;
 void
 ReadNames( FILE *file, long nextname, long endnames )
 {
+	SymbolHash *global_tab = get_global_tab();
     char scope, symbol_char;
 	byte_t symboltype;
     long value;
@@ -456,63 +452,55 @@ ReadNames( FILE *file, long nextname, long endnames )
         switch ( scope )
         {
             case 'L':
-                if ( ( foundsymbol = FindSymbol( line, CURRENTMODULE->localroot ) ) == NULL )
+                if ( ( foundsymbol = find_symbol( line, CURRENTMODULE->local_tab ) ) == NULL )
                 {
                     foundsymbol = Symbol_create( line, value, symboltype | SYMLOCAL, CURRENTMODULE );
-                    insert( &CURRENTMODULE->localroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
+                    SymbolHash_set( CURRENTMODULE->local_tab, line, foundsymbol );
                 }
                 else
                 {
                     foundsymbol->value = value;
                     foundsymbol->type |= symboltype | SYMLOCAL;
                     foundsymbol->owner = CURRENTMODULE;
-                    redefinedmsg();
+                    error( ERR_SYMBOL_REDEFINED_MODULE, line, CURRENTMODULE->mname );
                 }
 
                 break;
 
             case 'G':
-                if ( ( foundsymbol = FindSymbol( line, globalroot ) ) == NULL )
+                if ( ( foundsymbol = find_symbol( line, global_tab ) ) == NULL )
                 {
                     foundsymbol = Symbol_create( line, value, symboltype | SYMXDEF, CURRENTMODULE );
-                    insert( &globalroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
+                    SymbolHash_set( global_tab, line, foundsymbol );
                 }
                 else
                 {
                     foundsymbol->value = value;
                     foundsymbol->type |= symboltype | SYMXDEF;
                     foundsymbol->owner = CURRENTMODULE;
-                    redefinedmsg();
+                    error( ERR_SYMBOL_REDEFINED_MODULE, line, CURRENTMODULE->mname );
                 }
 
                 break;
 
             case 'X':
-                if ( ( foundsymbol = FindSymbol( line, globalroot ) ) == NULL )
+                if ( ( foundsymbol = find_symbol( line, global_tab ) ) == NULL )
                 {
                     foundsymbol = Symbol_create( line, value, symboltype | SYMXDEF | SYMDEF, CURRENTMODULE );
-                    insert( &globalroot, foundsymbol, ( int ( * )( void *, void * ) ) cmpidstr );
+                    SymbolHash_set( global_tab, line, foundsymbol );
                 }
                 else
                 {
                     foundsymbol->value = value;
                     foundsymbol->type |= symboltype | SYMXDEF | SYMDEF;
                     foundsymbol->owner = CURRENTMODULE;
-                    redefinedmsg();
+                    error( ERR_SYMBOL_REDEFINED_MODULE, line, CURRENTMODULE->mname );
                 }
 
                 break;
         }
     }
     while ( nextname < endnames );
-}
-
-
-
-void
-redefinedmsg( void )
-{
-    printf( "Symbol <%s> redefined in module '%s'\n", line, CURRENTMODULE->mname );
 }
 
 
@@ -533,7 +521,7 @@ ReadExpr( long nextexpr, long endexpr )
         /* assembler PC     as absolute address */
         set_PC( modulehdr->first->origin + CURRENTMODULE->startoffset + offsetptr );
 
-        FindSymbol( ASSEMBLERPC, globalroot )->value = get_PC();
+        find_symbol( ASSEMBLERPC, get_global_tab() )->value = get_PC();
 
         i = fgetc_err( z80asmfile ); /* get length of infix expression */
         fptr = ftell( z80asmfile );       /* file pointer is at start of expression */
@@ -665,7 +653,7 @@ LinkModules( void )
         open_error_file( err_filename_ext( CURRENTFILE->fname ) );
 
         set_PC( 0 );
-        DefineDefSym( ASSEMBLERPC, get_PC(), 0, &globalroot );  /* Create standard 'ASMPC' identifier */
+        define_def_symbol( ASSEMBLERPC, get_PC(), 0, get_global_tab() );  /* Create standard 'ASMPC' identifier */
 
         do                                      /* link machine code & read symbols in all modules */
         {
@@ -751,8 +739,8 @@ LinkModules( void )
 
         set_error_null();
 
-        DefineDefSym( "ASMSIZE", get_codesize(), 0, &globalroot );
-        DefineDefSym( "ASMTAIL", ( size_t )( modulehdr->first->origin + get_codesize() ), 0, &globalroot );
+        define_def_symbol( "ASMSIZE", get_codesize(), 0, get_global_tab() );
+        define_def_symbol( "ASMTAIL", ( size_t )( modulehdr->first->origin + get_codesize() ), 0, get_global_tab() );
 
         if ( verbose == ON )
         {
@@ -877,7 +865,7 @@ LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
         len = strlen( line );
         nextname += 1 + len;      /* remember module pointer to next name in this   object module */
 
-        if ( FindSymbol( line, globalroot ) == NULL )
+        if ( find_symbol( line, get_global_tab() ) == NULL )
         {
             modname = xstrdup( line );
 
@@ -1391,11 +1379,6 @@ LinkTracedModule( char *filename, long baseptr )
 }
 
 
-
-
-
-
-
 void
 CreateDeffile( void )
 {
@@ -1410,105 +1393,116 @@ CreateDeffile( void )
 
 
 void
+WriteMapSymbols( SymbolHash *symtab )
+{
+	SymbolHashElem *iter;
+	Symbol         *sym;
+
+	for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
+	{
+		sym = (Symbol *)iter->value;
+
+		if ( sym->type & SYMADDR )
+		{
+			/* CH_0017 */
+			fprintf( mapfile, "%-*s ", COLUMN_WIDTH - 1, sym->name );
+
+			if ( autorelocate )
+			{
+				fprintf( mapfile, "= %04lX, ", sizeof_relocroutine + sizeof_reloctable + 4 + sym->value );
+			}
+			else
+			{
+				fprintf( mapfile, "= %04lX, ", sym->value );
+			}
+
+			if ( sym->type & SYMLOCAL )
+			{
+				fputc_err( 'L', mapfile );
+			}
+			else
+			{
+				fputc_err( 'G', mapfile );
+			}
+
+			fprintf( mapfile, ": %s\n", sym->owner->mname );
+		}
+    }
+}
+
+
+void
 WriteMapFile( void )
 {
-    avltree *maproot = NULL, *newmaproot = NULL;
+    char mapfilename[FILENAME_MAX];
+	SymbolHash *map_symtab;
     struct module *cmodule;
-    char *mapfilename;
 
-    cmodule = modulehdr->first; /* begin with first module */
+    /* use first module filename to create global map file */
+	path_replace_ext( mapfilename, modulehdr->first->cfile->fname, FILEEXT_MAP ); /* set '.map' extension */
 
-    mapfilename = xstrdup( cmodule->cfile->fname );
-    strcpy( mapfilename + strlen( mapfilename ) - 4, FILEEXT_MAP );     /* overwrite '_asm' extension with '_map' */
+    /* Create MAP file */
+    mapfile = xfopen( mapfilename, "w" );           /* CH_0012 */
 
-    try
+    if ( verbose )
     {
-        /* Create MAP file */
-        mapfile = fopen_err( mapfilename, "w" );           /* CH_0012 */
-
-        if ( verbose )
-        {
-            puts( "Creating map..." );
-        }
-
-        do
-        {
-            move( &cmodule->localroot, &maproot, ( int ( * )( void *, void * ) ) cmpidstr ); /* move all  local address symbols alphabetically */
-            cmodule = cmodule->nextmodule;  /* alphabetically */
-        }
-        while ( cmodule != NULL );
-
-        move( &globalroot, &maproot, ( int ( * )( void *, void * ) ) cmpidstr ); /* move all global address symbols alphabetically */
-
-        if ( maproot == NULL )
-        {
-            fputs( "None.\n", mapfile );
-        }
-        else
-        {
-            inorder( maproot, ( void ( * )( void * ) ) WriteMapSymbol ); /* Write map symbols alphabetically */
-            move( &maproot, &newmaproot, ( int ( * )( void *, void * ) ) cmpidval ); /* then re-order symbols numerically */
-            fputs( "\n\n", mapfile );
-
-            inorder( newmaproot, ( void ( * )( void * ) ) WriteMapSymbol ); /* Write map symbols numerically */
-            deleteall( &newmaproot, ( void ( * )( void * ) ) FreeSym ); /* then release all map symbols */
-        }
-
-        fclose( mapfile );
+        puts( "Creating map..." );
     }
 
-    finally
+	/* copy all local symbols from all modules to a map_symtab */
+	/* BUG: symbols with the same name get overwritten */
+	map_symtab = OBJ_NEW(SymbolHash);
+	for ( cmodule = modulehdr->first; cmodule != NULL; cmodule = cmodule->nextmodule )
     {
-        xfree( mapfilename );
+		SymbolHash_cat( map_symtab, cmodule->local_tab );
     }
+
+    SymbolHash_cat( map_symtab, get_global_tab() );
+
+    if ( SymbolHash_empty( map_symtab ) )
+    {
+        fputs( "None.\n", mapfile );
+    }
+    else
+    {
+		/* Write map symbols alphabetically */
+		SymbolHash_sort( map_symtab, SymbolHash_by_name );
+		WriteMapSymbols( map_symtab );
+
+        fputs( "\n\n", mapfile );
+
+		/* Write map symbols numerically */
+		SymbolHash_sort( map_symtab, SymbolHash_by_value );
+		WriteMapSymbols( map_symtab );
+    }
+
+	OBJ_DELETE(map_symtab);
+
+    xfclose( mapfile );
 }
 
 
 
 void
-WriteMapSymbol( Symbol *mapnode )
+WriteDefFile( SymbolHash *symtab )
 {
-    if ( mapnode->type & SYMADDR )
-    {
-		/* CH_0017 */
-        fprintf( mapfile, "%-*s ", COLUMN_WIDTH - 1, mapnode->name );
+	SymbolHashElem *iter;
+	Symbol         *sym;
 
-        if ( autorelocate )
-        {
-            fprintf( mapfile, "= %04lX, ", sizeof_relocroutine + sizeof_reloctable + 4 + mapnode->value );
-        }
-        else
-        {
-            fprintf( mapfile, "= %04lX, ", mapnode->value );
-        }
-
-        if ( mapnode->type & SYMLOCAL )
-        {
-            fputc_err( 'L', mapfile );
-        }
-        else
-        {
-            fputc_err( 'G', mapfile );
-        }
-
-        fprintf( mapfile, ": %s\n", mapnode->owner->mname );
-    }
-}
-
-
-
-void
-WriteGlobal( Symbol *node )
-{
-    if ( ( node->type & SYMTOUCHED ) && ( node->type & SYMADDR ) &&
-            ( node->type & SYMXDEF ) && !( node->type & SYMDEF ) )
-    {
-        /* Write only global definitions - not library routines     */
-     	/* CH_0017 */
-		fprintf( deffile, "DEFC %-*s ", COLUMN_WIDTH - 1, node->name );
-        fprintf( deffile, "= $%04lX ; ", node->value + modulehdr->first->origin + CURRENTMODULE->startoffset );
-        fprintf( deffile, "Module %s\n", node->owner->mname );
-    }
+	SymbolHash_sort( symtab, SymbolHash_by_name );
+	for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
+	{
+		sym = (Symbol *)iter->value;
+		if ( ( sym->type & SYMTOUCHED ) &&   ( sym->type & SYMADDR ) &&
+			 ( sym->type & SYMXDEF    ) && ! ( sym->type & SYMDEF  ) )
+		{
+			/* Write only global definitions - not library routines     */
+     		/* CH_0017 */
+			fprintf( deffile, "DEFC %-*s ", COLUMN_WIDTH - 1, sym->name );
+			fprintf( deffile, "= $%04lX ; ", sym->value + modulehdr->first->origin + CURRENTMODULE->startoffset );
+			fprintf( deffile, "Module %s\n", sym->owner->mname );
+		}
+	}
 }
 
 

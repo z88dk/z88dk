@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.23 2013-04-07 22:26:07 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.24 2013-06-01 01:24:22 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.23  2013-04-07 22:26:07  pauloscustodio
+/* Revision 1.24  2013-06-01 01:24:22  pauloscustodio
+/* CH_0022 : Replace avltree by hash table for symbol table
+/*
+/* Revision 1.23  2013/04/07 22:26:07  pauloscustodio
 /* Removed global variable smallc_source, no longer used
 /*
 /* Revision 1.22  2013/04/06 13:15:04  pauloscustodio
@@ -129,7 +132,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "srcfile.h"
 #include "strlist.h"
 #include "strpool.h"
-#include "symbols.h"
+#include "symbol.h"
 #include "z80asm.h"
 #include <ctype.h>
 #include <string.h>
@@ -473,7 +476,7 @@ void set_asm_flag( char *flagid )
             ++i;
         }
 
-        DefineDefSym( ident, 1, 0, &staticroot );
+        define_def_symbol( ident, 1, 0, get_static_tab() );
     }
 
     else if ( strcmp( flagid, "h" ) == 0 )

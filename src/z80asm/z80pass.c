@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.48 2013-05-23 22:22:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.49 2013-06-01 01:24:22 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.48  2013-05-23 22:22:23  pauloscustodio
+Revision 1.49  2013-06-01 01:24:22  pauloscustodio
+CH_0022 : Replace avltree by hash table for symbol table
+
+Revision 1.48  2013/05/23 22:22:23  pauloscustodio
 Move symbol to sym.c, rename to Symbol
 
 Revision 1.47  2013/04/07 23:34:19  pauloscustodio
@@ -108,7 +111,7 @@ free partially created data - all not freed data is freed atexit().
 Renamed xfree0() to xfree().
 
 Revision 1.25  2012/05/17 17:42:14  pauloscustodio
-DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+define_symbol() and define_def_symbol() defined as void, a fatal error is
 always raised on error.
 
 Revision 1.24  2012/05/12 16:57:33  pauloscustodio
@@ -332,7 +335,6 @@ First import of z88dk into the sourceforge system <gulp>
 #include "strutil.h"
 #include "sym.h"
 #include "symbol.h"
-#include "symbols.h"
 #include "z80asm.h"
 #include <ctype.h>
 #include <limits.h>
@@ -351,7 +353,6 @@ int GetChar( FILE *fptr );
 long EvalPfixExpr( struct expr *pass2expr );
 struct expr *ParseNumExpr( void );
 enum symbols GetSym( void );
-Symbol *FindSymbol( char *identifier, avltree *treeptr );
 
 /* local functions */
 void ifstatement( enum flag interpret );
@@ -360,12 +361,8 @@ void getasmline( void );
 void Pass2info( struct expr *expression, char constrange, long lfileptr );
 void Z80pass1( void );
 void Z80pass2( void );
-void WriteSymbolTable( char *msg, avltree *root );
+void WriteSymbolTable( char *msg, SymbolHash *symtab );
 void WriteMapFile( void );
-void StoreName( Symbol *node, byte_t symscope );
-void StoreLibReference( Symbol *node );
-void StoreGlobalName( Symbol *node );
-void StoreLocalName( Symbol *node );
 long Evallogexpr( void );
 struct sourcefile *Prevfile( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
@@ -381,7 +378,6 @@ extern enum flag EOL;
 extern long TOTALLINES;
 extern struct modules *modulehdr;       /* pointer to module header */
 extern struct module *CURRENTMODULE;
-extern avltree *globalroot;
 extern char *temporary_ptr;
 
 void
@@ -434,7 +430,7 @@ getasmline( void )
 void
 parseline( enum flag interpret )
 {
-    FindSymbol( ASSEMBLERPC, globalroot )->value = get_PC();   /* update assembler program counter */
+    find_symbol( ASSEMBLERPC, get_global_tab() )->value = get_PC();   /* update assembler program counter */
 
     ++CURRENTFILE->line;
 
@@ -462,7 +458,7 @@ parseline( enum flag interpret )
             if ( sym == label || GetSym() == name )
             {
 				/* labels must always be touched due to forward referencing problems in expressions */
-                DefineSymbol( ident, get_PC(), SYMADDR | SYMTOUCHED ); 
+                define_symbol( ident, get_PC(), SYMADDR | SYMTOUCHED ); 
                                                                          
                 GetSym();      /* check for another identifier */				
             }
@@ -497,6 +493,8 @@ parseline( enum flag interpret )
 
     list_end_line();				/* Write current source line to list file */
 }
+
+
 
 
 
@@ -613,6 +611,109 @@ Evallogexpr( void )
 
     return constant;
 }
+
+
+void
+StoreName( Symbol *node, byte_t scope )
+{
+    int b;
+
+    switch ( scope )
+    {
+        case SYMLOCAL:
+            fputc_err( 'L', objfile );
+            break;
+
+        case SYMXDEF:
+            if ( node->type & SYMDEF )
+            {
+                fputc_err( 'X', objfile );
+            }
+            else
+            {
+                fputc_err( 'G', objfile );
+            }
+
+            break;
+    }
+
+    if ( node->type & SYMADDR )   /* then write type of symbol */
+    {
+        fputc_err( 'A', objfile );    /* either a relocatable address */
+    }
+    else
+    {
+        fputc_err( 'C', objfile );    /* or a constant */
+    }
+
+    fputl_err( node->value, objfile );
+
+    b = strlen( node->name );
+    fputc_err( b, objfile );         /* write length of symbol name to relocatable file */
+    fwritec_err( node->name, ( size_t ) b, objfile ); /* write symbol name to relocatable file */
+}
+
+
+void
+StoreGlobalNames( SymbolHash *symtab )
+{
+	SymbolHashElem *iter;
+	Symbol         *sym;
+
+	SymbolHash_sort( symtab, SymbolHash_by_name );
+	for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
+	{
+		sym = (Symbol *)iter->value;
+
+		if ( ( sym->type & SYMXDEF ) && ( sym->type & SYMTOUCHED ) )
+		{
+			StoreName( sym, SYMXDEF );
+		}
+	}
+}
+
+
+void
+StoreLocalNames( SymbolHash *symtab )
+{
+	SymbolHashElem *iter;
+	Symbol         *sym;
+
+	SymbolHash_sort( symtab, SymbolHash_by_name );
+	for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
+	{
+		sym = (Symbol *)iter->value;
+
+		if ( ( sym->type & SYMLOCAL ) && ( sym->type & SYMTOUCHED ) )
+		{
+			StoreName( sym, SYMLOCAL );
+		}
+	}
+}
+
+
+void
+StoreLibReferences( SymbolHash *symtab )
+{
+    size_t b;
+
+	SymbolHashElem *iter;
+	Symbol         *sym;
+
+	SymbolHash_sort( symtab, SymbolHash_by_name );
+	for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
+	{
+		sym = (Symbol *)iter->value;
+
+		if ( ( sym->type & SYMXREF ) && ( sym->type & SYMDEF ) && ( sym->type & SYMTOUCHED ) )
+		{
+			b = strlen( sym->name );
+			fputc_err( ( int ) b, objfile ); /* write length of symbol name to relocatable file */
+			fwritec_err( sym->name, b, objfile );    /* write symbol name to relocatable file */
+		}
+	}
+}
+
 
 
 
@@ -761,16 +862,22 @@ Z80pass2( void )
 
     if ( ! get_num_errors() && option_symtable )
     {
-        WriteSymbolTable( "Local Module Symbols:", CURRENTMODULE->localroot );
-        WriteSymbolTable( "Global Module Symbols:", globalroot );
+        WriteSymbolTable( "Local Module Symbols:", CURRENTMODULE->local_tab );
+        WriteSymbolTable( "Global Module Symbols:", get_global_tab() );
     }
 
     fptr_namedecl = ftell( objfile );
-    inorder( CURRENTMODULE->localroot, ( void ( * )( void * ) ) StoreLocalName ); /* Store Local Name declarations to relocatable file */
-    inorder( globalroot, ( void ( * )( void * ) ) StoreGlobalName ); /* Store Global name declarations to relocatable file */
+
+	/* Store Local Name declarations to relocatable file */
+	StoreLocalNames( CURRENTMODULE->local_tab ); 
+
+	/* Store Global name declarations to relocatable file */
+	StoreGlobalNames( get_global_tab() ); 
 
     fptr_libnmdecl = ftell( objfile );    /* Store library reference names */
-    inorder( globalroot, ( void ( * )( void * ) ) StoreLibReference ); /* Store library reference name declarations to relocatable file */
+
+	/* Store library reference name declarations to relocatable file */
+	StoreLibReferences( get_global_tab() );
 
     fptr_modname = ftell( objfile );
     constant = strlen( CURRENTMODULE->mname );
@@ -829,81 +936,6 @@ Z80pass2( void )
     fputl_err( fptr_namedecl, objfile ); /* write fptr. to name declarations */
     fputl_err( fptr_libnmdecl, objfile ); /* write fptr. to library name declarations */
     fputl_err( fptr_modcode, objfile );  /* write fptr. to module code */
-}
-
-
-void
-StoreGlobalName( Symbol *node )
-{
-    if ( ( node->type & SYMXDEF ) && ( node->type & SYMTOUCHED ) )
-    {
-        StoreName( node, SYMXDEF );
-    }
-}
-
-
-void
-StoreLocalName( Symbol *node )
-{
-    if ( ( node->type & SYMLOCAL ) && ( node->type & SYMTOUCHED ) )
-    {
-        StoreName( node, SYMLOCAL );
-    }
-}
-
-
-void
-StoreName( Symbol *node, byte_t scope )
-{
-    int b;
-
-    switch ( scope )
-    {
-        case SYMLOCAL:
-            fputc_err( 'L', objfile );
-            break;
-
-        case SYMXDEF:
-            if ( node->type & SYMDEF )
-            {
-                fputc_err( 'X', objfile );
-            }
-            else
-            {
-                fputc_err( 'G', objfile );
-            }
-
-            break;
-    }
-
-    if ( node->type & SYMADDR )   /* then write type of symbol */
-    {
-        fputc_err( 'A', objfile );    /* either a relocatable address */
-    }
-    else
-    {
-        fputc_err( 'C', objfile );    /* or a constant */
-    }
-
-    fputl_err( node->value, objfile );
-
-    b = strlen( node->name );
-    fputc_err( b, objfile );         /* write length of symbol name to relocatable file */
-    fwritec_err( node->name, ( size_t ) b, objfile ); /* write symbol name to relocatable file */
-}
-
-
-void
-StoreLibReference( Symbol *node )
-{
-    size_t b;
-
-    if ( ( node->type & SYMXREF ) && ( node->type & SYMDEF ) && ( node->type & SYMTOUCHED ) )
-    {
-        b = strlen( node->name );
-        fputc_err( ( int ) b, objfile ); /* write length of symbol name to relocatable file */
-        fwritec_err( node->name, b, objfile );    /* write symbol name to relocatable file */
-    }
 }
 
 
@@ -1013,25 +1045,29 @@ FindFile( struct sourcefile *srcfile, char *flnm )
 
 
 void
-WriteSymbol( Symbol *n )
+WriteSymbolTable( char *msg, SymbolHash *symtab )
 {
-    if ( n->owner == CURRENTMODULE )
-    {
-        /* Write only symbols related to current module */
-        if ( ( n->type & SYMLOCAL ) || ( n->type & SYMXDEF ) )
-        {
-            if ( ( n->type & SYMTOUCHED ) )
-            {
-				list_symbol( n->name, n->value, n->references );
-            }
-        }
-    }
-}
+	SymbolHashElem *iter;
+	Symbol         *sym;
 
-
-void
-WriteSymbolTable( char *msg, avltree *root )
-{
+	/* dump all symbols sorted by name */
 	list_start_table( msg );
-    inorder( root, ( void ( * )( void * ) ) WriteSymbol ); /* write symbol table */
+
+	SymbolHash_sort( symtab, SymbolHash_by_name );
+	for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
+	{
+		sym = (Symbol *)iter->value;
+		if ( sym->owner == CURRENTMODULE )
+		{
+			/* Write only symbols related to current module */
+			if ( ( sym->type & SYMLOCAL ) || ( sym->type & SYMXDEF ) )
+			{
+				if ( ( sym->type & SYMTOUCHED ) )
+				{
+					list_symbol( sym->name, sym->value, sym->references );
+				}
+			}
+		}
+
+	}
 }

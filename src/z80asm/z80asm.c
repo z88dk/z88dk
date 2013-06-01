@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.86 2013-05-23 22:22:23 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.87 2013-06-01 01:24:22 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.86  2013-05-23 22:22:23  pauloscustodio
+/* Revision 1.87  2013-06-01 01:24:22  pauloscustodio
+/* CH_0022 : Replace avltree by hash table for symbol table
+/*
+/* Revision 1.86  2013/05/23 22:22:23  pauloscustodio
 /* Move symbol to sym.c, rename to Symbol
 /*
 /* Revision 1.85  2013/05/16 22:45:21  pauloscustodio
@@ -165,7 +168,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Renamed xfree0() to xfree().
 /*
 /* Revision 1.48  2012/05/18 00:23:14  pauloscustodio
-/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is always raised on error.
+/* define_symbol() and define_def_symbol() defined as void, a fatal error is always raised on error.
 /*
 /* Revision 1.47  2012/05/17 21:36:06  pauloscustodio
 /* Remove global ASMERROR, redundant with TOTALERRORS.
@@ -175,7 +178,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* astyle
 /*
 /* Revision 1.45  2012/05/17 17:42:14  pauloscustodio
-/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* define_symbol() and define_def_symbol() defined as void, a fatal error is
 /* always raised on error.
 /*
 /* Revision 1.44  2012/05/17 14:56:23  pauloscustodio
@@ -537,7 +540,6 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "strpool.h"
 #include "strutil.h"
 #include "symbol.h"
-#include "symbols.h"
 #include "z80asm.h"
 #include <ctype.h>
 #include <stdio.h>
@@ -553,15 +555,13 @@ void Z80pass2( void );
 void CreateLib( char *lib_filename );
 void LinkModules( void );
 void DeclModuleName( void );
-void FreeSym( Symbol *node );
 void CreateDeffile( void );
-void WriteGlobal( Symbol *node );
+void WriteDefFile( SymbolHash *symtab );
 void WriteMapFile( void );
 void CreateBinFile( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 enum symbols GetSym( void );
 long GetConstant( char *evalerr );
-int cmpidstr( Symbol *kptr, Symbol *p );
 
 
 /* local functions */
@@ -616,7 +616,6 @@ size_t EXPLICIT_ORIGIN;         /* origin defined from command line */
 struct modules *modulehdr;
 struct module *CURRENTMODULE;
 struct liblist *libraryhdr;
-avltree *globalroot, *staticroot;
 
 
 /* local functions */
@@ -772,12 +771,12 @@ static void do_assemble( char *src_filename, char *obj_filename )
         fwritec_err( objhdrprefix, strlen( objhdrprefix ), objfile );
 
         set_PC( 0 );
-        copy( staticroot, &CURRENTMODULE->localroot, 
-			  ( int ( * )( void *, void * ) ) cmpidstr, 
-			  ( void * ( * )( void * ) ) createsym );
+
+		/* initialize local symtab with copy of static one (-D defines) */
+		SymbolHash_cat( CURRENTMODULE->local_tab, get_static_tab() );
 
         /* Create standard 'ASMPC' identifier */
-        DefineDefSym( ASSEMBLERPC, get_PC(), 0, &globalroot );
+        define_def_symbol( ASSEMBLERPC, get_PC(), 0, get_global_tab() );
 
         if ( verbose )
         {
@@ -785,7 +784,8 @@ static void do_assemble( char *src_filename, char *obj_filename )
         }
 
         Z80pass1();
-		list_end();                    /* GetSymPtr will only generate page references until list_end() */
+
+		list_end();                    /* get_used_symbol will only generate page references until list_end() */
 
         if ( CURRENTMODULE->mname == NULL )     /* Module name must be defined */
         {
@@ -806,6 +806,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
             }
 
             Z80pass2();
+
         }
     }
 
@@ -843,16 +844,13 @@ static void do_assemble( char *src_filename, char *obj_filename )
 
         if ( globaldef )
         {
-            inorder( globalroot, ( void ( * )( void * ) ) WriteGlobal );
+            WriteDefFile( get_global_tab() );
             fputc_err( '\n', deffile );    /* separate DEFC lines for each module */
         }
 
-        deleteall( &CURRENTMODULE->localroot, 
-				   ( void ( * )( void * ) ) FreeSym );
-        deleteall( &CURRENTMODULE->notdeclroot, 
-			       ( void ( * )( void * ) ) FreeSym );
-        deleteall( &globalroot, 
-			       ( void ( * )( void * ) ) FreeSym );
+        SymbolHash_remove_all( CURRENTMODULE->local_tab );
+        SymbolHash_remove_all( CURRENTMODULE->notdecl_tab );
+        SymbolHash_remove_all( get_global_tab() );
 
         if ( verbose )
         {
@@ -1023,8 +1021,8 @@ NewModule( void )
     newm->startoffset = get_codesize();
     newm->origin = 65535;
     newm->cfile = NULL;
-    newm->localroot = NULL;
-    newm->notdeclroot = NULL;
+    newm->local_tab   = OBJ_NEW(SymbolHash);
+    newm->notdecl_tab = OBJ_NEW(SymbolHash);
 
     newm->mexpr = xcalloc_struct( struct expression );
 
@@ -1110,8 +1108,8 @@ ReleaseModules( void )
             ReleaseFile( curptr->cfile );
         }
 
-        deleteall( &curptr->localroot, ( void ( * )( void * ) ) FreeSym );
-        deleteall( &curptr->notdeclroot, ( void ( * )( void * ) ) FreeSym );
+        OBJ_DELETE( curptr->local_tab );
+        OBJ_DELETE( curptr->notdecl_tab );
 
         if ( curptr->mexpr != NULL )
         {
@@ -1313,11 +1311,8 @@ int main( int argc, char *argv[] )
         modulehdr = NULL;               /* initialise to no modules */
         libraryhdr = NULL;              /* initialise to no library files */
 
-        globalroot = NULL;              /* global identifier tree initialized */
-        staticroot = NULL;              /* static identifier tree initialized */
-
         /* define OS_ID */
-        DefineDefSym( OS_ID, 1, 0, &staticroot );
+        define_def_symbol( OS_ID, 1, 0, get_static_tab() );
 
         /* Get command line arguments, if any... */
         if ( argc == 1 )
@@ -1412,9 +1407,6 @@ int main( int argc, char *argv[] )
         CloseFiles();
 
 #ifndef QDOS
-        deleteall( &globalroot, ( void ( * )( void * ) ) FreeSym );
-        deleteall( &staticroot, ( void ( * )( void * ) ) FreeSym );
-
         if ( modulehdr != NULL )
         {
             ReleaseModules();    /* Release module information (symbols, etc.) */
@@ -1494,7 +1486,6 @@ createsym( Symbol *symptr )
 {
     return Symbol_create( symptr->name, symptr->value, symptr->type, symptr->owner );
 }
-
 
 /*
  * Local Variables:

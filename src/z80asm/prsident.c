@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.38 2013-03-04 23:23:37 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.39 2013-06-01 01:24:22 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.38  2013-03-04 23:23:37  pauloscustodio
+/* Revision 1.39  2013-06-01 01:24:22  pauloscustodio
+/* CH_0022 : Replace avltree by hash table for symbol table
+/*
+/* Revision 1.38  2013/03/04 23:23:37  pauloscustodio
 /* Removed writeline, that was used to cancel listing of multi-line
 /* constructs, as only the first line was shown on the list file. Fixed
 /* the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
@@ -50,7 +53,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Z80ident[]: make always handling function the same name as assembler ident.
 /*
 /* Revision 1.29  2012/05/17 17:42:14  pauloscustodio
-/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* define_symbol() and define_def_symbol() defined as void, a fatal error is
 /* always raised on error.
 /*
 /* Revision 1.28  2012/05/12 16:57:33  pauloscustodio
@@ -108,7 +111,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Added Log keyword
 /*
 /* Revision 1.18  2011/07/09 01:21:55  pauloscustodio
-/* added DefineSymbol() declaration
+/* added define_symbol() declaration
 /*
 /* Revision 1.17  2011/02/27 11:58:46  stefano
 /* Rolled back z80asm changes (I must have messed up something!!)
@@ -256,7 +259,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "listfile.h"
 #include "options.h"
 #include "symbol.h"
-#include "symbols.h"
+#include "symtab.h"
 #include "types.h"
 #include "z80asm.h"
 #include <stdio.h>
@@ -532,7 +535,7 @@ void LINE( void )
 
     line[0] = '\0';
     snprintf( name, sizeof( name ), "__C_LINE_%d", clineno );
-    DefineSymbol( name, get_PC(), SYMADDR | SYMTOUCHED );
+    define_symbol( name, get_PC(), SYMADDR | SYMTOUCHED );
 }
 
 
@@ -570,7 +573,7 @@ XDEF( void )
     {
         if ( GetSym() == name )
         {
-            DeclSymGlobal( ident, 0 );
+            declare_global_obj_symbol( ident );
         }
         else
         {
@@ -594,7 +597,7 @@ XLIB( void )
     if ( GetSym() == name )
     {
         DeclModuleName();         /* XLIB name is implicit MODULE name */
-        DeclSymGlobal( ident, SYMDEF );
+        declare_global_lib_symbol( ident );
     }
     else
     {
@@ -618,7 +621,7 @@ XREF( void )
     {
         if ( GetSym() == name )
         {
-            DeclSymExtern( ident, 0 );    /* Define symbol as extern */
+            declare_extern_obj_symbol( ident );    /* Define symbol as extern */
         }
         else
         {
@@ -644,7 +647,7 @@ LIB( void )
     {
         if ( GetSym() == name )
         {
-            DeclSymExtern( ident, SYMDEF );     /* Define symbol as extern LIB reference */
+            declare_extern_lib_symbol( ident );     /* Define symbol as extern LIB reference */
         }
         else
         {

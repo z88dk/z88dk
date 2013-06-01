@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="avltree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -76,9 +73,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="strutil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="symbols.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="types.h">
@@ -143,9 +137,6 @@
     <ClCompile Include="asmdrctv.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="avltree.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="exprprsr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -162,9 +153,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="prsline.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="symbols.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="z80asm.c">

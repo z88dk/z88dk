@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.23 2013-05-16 23:39:48 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.24 2013-06-01 01:24:22 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.23  2013-05-16 23:39:48  pauloscustodio
+/* Revision 1.24  2013-06-01 01:24:22  pauloscustodio
+/* CH_0022 : Replace avltree by hash table for symbol table
+/*
+/* Revision 1.23  2013/05/16 23:39:48  pauloscustodio
 /* Move struct node to sym.c, rename to Symbol
 /* Move SymbolRef to symref.c
 /*
@@ -52,7 +55,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
 /*
 /* Revision 1.14  2012/05/17 17:42:14  pauloscustodio
-/* DefineSymbol() and DefineDefSym() defined as void, a fatal error is
+/* define_symbol() and define_def_symbol() defined as void, a fatal error is
 /* always raised on error.
 /*
 /* Revision 1.13  2012/05/11 19:29:49  pauloscustodio
@@ -141,10 +144,9 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 #include "memalloc.h"   /* before any other include */
 
-#include "avltree.h"    /* base symbol data structures and routines */
 #include "model.h"
 #include "objfile.h"
-#include "sym.h"
+#include "symtab.h"
 #include "types.h"
 #include <stdlib.h>
 
@@ -243,8 +245,8 @@ struct module
     size_t             startoffset;       /* this module's start offset from start of code buffer */
     long               origin;            /* Address Origin of current machine code module during linking */
     struct sourcefile  *cfile;            /* pointer to current file record */
-    avltree           *notdeclroot;       /* pointer to root of symbols not yet declared/defined */
-    avltree           *localroot;         /* pointer to root of local symbols tree */
+    SymbolHash        *notdecl_tab;       /* pointer to root of symbols not yet declared/defined */
+    SymbolHash        *local_tab;         /* pointer to root of local symbols tree */
     struct expression  *mexpr;            /* pointer to expressions in this module */
     struct JRPC_Hdr    *JRaddr;           /* pointer to list of JR PC addresses */
 	ObjFile			   *obj_file;		  /* ObjFile structure describing the object file */
@@ -279,7 +281,6 @@ struct linkedmod
 
 
 #define CURRENTFILE     CURRENTMODULE->cfile
-#define ASSEMBLERPC     "ASMPC"
 
 /* bitmasks for expression evaluation in rangetype */
 #define RANGE           7		/* bitmask 00000111 */   /* Range types are 0 - 4 */
