@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.2 2013-05-23 22:22:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.3 2013-06-01 01:21:02 pauloscustodio Exp $
 $Log: sym.c,v $
-Revision 1.2  2013-05-23 22:22:23  pauloscustodio
+Revision 1.3  2013-06-01 01:21:02  pauloscustodio
+Symbol references were being created twice
+
+Revision 1.2  2013/05/23 22:22:23  pauloscustodio
 Move symbol to sym.c, rename to Symbol
 
 Revision 1.1  2013/05/16 23:39:48  pauloscustodio
@@ -68,7 +71,6 @@ Symbol *Symbol_create( char *name, long value, byte_t type, struct module *owner
     self->name 		= strpool_add( name );			/* name in strpool, not freed */
     self->value 	= value;
     self->type 		= type;
-	self->references= OBJ_NEW( SymbolRefList );		/* create reference list */
     self->owner 	= owner;
 
 	
