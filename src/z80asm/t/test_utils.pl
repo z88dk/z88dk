@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.34 2013-06-01 01:19:58 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.35 2013-06-03 23:21:35 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.34  2013-06-01 01:19:58  pauloscustodio
+# Revision 1.35  2013-06-03 23:21:35  pauloscustodio
+# show wdiff on t_binary() failure
+#
+# Revision 1.34  2013/06/01 01:19:58  pauloscustodio
 # Add linkerr to t_z80asm() for compile OK but failed link.
 #
 # Revision 1.33  2013/05/27 22:45:13  pauloscustodio
@@ -144,6 +147,7 @@ use File::Slurp;
 use Capture::Tiny::Extended 'capture';
 use Test::Differences; 
 use List::AllUtils 'uniq';
+use Data::HexDump;
 
 my $STOP_ON_ERR = grep {/-stop/} @ARGV; 
 my $KEEP_FILES	= grep {/-keep/} @ARGV; 
@@ -440,11 +444,18 @@ sub t_binary {
 		my $addr = 0;
 		$addr++ while (substr($binary, $addr, 1) eq substr($expected_binary, $addr, 1));
 		diag sprintf("$test_name Assembly differs at %04X:\n".
-					 "	   got: %s\n".
+					 ".....got: %s\n".
 					 "expected: %s\n", 
 					 $addr, 
 					 hexdump(substr($binary, $addr, 16)),
 					 hexdump(substr($expected_binary, $addr, 16)));
+		
+		# show wdiff
+		if ($ENV{DEBUG}) {
+			write_file("test.binary.got", 		HexDump($binary));
+			write_file("test.binary.expected", 	HexDump($expected_binary));
+			system "wdiff test.binary.got test.binary.expected";
+		}
 		
 		exit 1 if $STOP_ON_ERR;
 	}
