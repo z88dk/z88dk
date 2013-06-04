@@ -15,7 +15,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.19 2013-05-28 08:09:47 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.20 2013-06-04 11:41:13 stefano Exp $
 ;
 
 
@@ -232,7 +232,7 @@ ENDIF
 		ld	a,(hl)
 		cp	' '
 		jr	nz,argv_loop_3
-		ld	(hl),0
+		;ld	(hl),0
 		inc	hl
 
 IF !DEFINED_noredir
@@ -240,7 +240,6 @@ IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 
 		LIB freopen
-
 		xor a
 		add b
 		jr	nz,no_redir_stdout
@@ -272,7 +271,8 @@ noappendb:
 
 		pop hl
 		
-		jr	argv_loop_3-1
+		dec hl
+		jr	argv_zloop
 no_redir_stdout:
 
 		ld	a,(hl)
@@ -295,7 +295,8 @@ no_redir_stdout:
 
 		pop hl
 		
-		jr	argv_loop_3-1
+		dec hl
+		jr	argv_zloop
 no_redir_stdin:
 
 ENDIF
@@ -305,6 +306,19 @@ ENDIF
 		push	hl
 		inc	b
 		dec	hl
+
+; skip extra blanks
+	argv_zloop:
+		ld	(hl),0
+		dec	c
+		jr	z,argv_done
+		dec	hl
+		ld	a,(hl)
+		cp	' '
+		jr	z,argv_zloop
+		inc c
+		inc hl
+
 	argv_loop_3:
 		dec	hl
 		dec	c

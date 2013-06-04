@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.18 2013-05-24 06:57:10 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.19 2013-06-04 11:41:13 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -136,7 +136,7 @@ argv_loop_2:
 	ld	a,(hl)
 	cp	' '
 	jr	nz,argv_loop_3
-	ld	(hl),0
+	;ld	(hl),0
 	inc	hl
 
 IF !DEFINED_noredir
@@ -144,7 +144,6 @@ IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 
 		LIB freopen
-
 		xor a
 		add b
 		jr	nz,no_redir_stdout
@@ -176,7 +175,8 @@ noappendb:
 
 		pop hl
 		
-		jr	argv_loop_3-1
+		dec hl
+		jr	argv_zloop
 no_redir_stdout:
 
 		ld	a,(hl)
@@ -199,7 +199,8 @@ no_redir_stdout:
 
 		pop hl
 		
-		jr	argv_loop_3-1
+		dec hl
+		jr	argv_zloop
 no_redir_stdin:
 
 ENDIF
@@ -209,6 +210,19 @@ ENDIF
 	push	hl
 	inc	b
 	dec	hl
+
+; skip extra blanks
+argv_zloop:
+	ld	(hl),0
+	dec	c
+	jr	z,argv_done
+	dec	hl
+	ld	a,(hl)
+	cp	' '
+	jr	z,argv_zloop
+	inc c
+	inc hl
+
 argv_loop_3:
 	dec	hl
 	dec	c
