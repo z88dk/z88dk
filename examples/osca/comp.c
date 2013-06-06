@@ -4,7 +4,7 @@
  * 
  * zcc +osca -lflosxdos comp.c
  * 
- * $Id: comp.c,v 1.1 2012-03-22 09:55:48 stefano Exp $
+ * $Id: comp.c,v 1.2 2013-06-06 11:42:46 stefano Exp $
  * 
  */
 
@@ -13,8 +13,6 @@
 #include <fcntl.h>
 #include <string.h>
 #include <ctype.h>
-
-#define SECTOR_SIZE 512
 
 int line = 1, block = 0, lflag = 0, pflag=0, charn = -1;
 long pos=-1L;
@@ -56,7 +54,7 @@ main(int argc, char *argv[])
 	}
 
 	while (1) {
-		if (++charn == SECTOR_SIZE) { block++ ;charn = 0; }
+		if (++charn == SECSIZE) { block++ ;charn = 0; }
 		pos++;
 		c = getc(f1); d = getc(f2);
 		if (c == '\n') line++;
