@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2011
  *
- *		$Id: flos.h,v 1.11 2013-05-28 06:02:44 stefano Exp $
+ *		$Id: flos.h,v 1.12 2013-06-06 08:58:31 stefano Exp $
  * 
  */
 
@@ -163,6 +163,9 @@
 #define FERR_ABORTED         0x2d	// (*) Aborted
 #define FERR_NO_MBR          0x2e	// (*) No MBR
 
+
+/* Size of Sector */
+#define SECSIZE  512
 
 
 struct flos_capacity {

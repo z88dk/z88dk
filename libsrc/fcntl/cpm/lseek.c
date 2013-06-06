@@ -5,7 +5,7 @@
  *	1	SEEK_CUR from current position
  *	2	SEEK_END from end of file (always -ve)
  *
- *	$Id: lseek.c,v 1.5 2013-05-28 06:02:44 stefano Exp $
+ *	$Id: lseek.c,v 1.6 2013-06-06 08:58:32 stefano Exp $
 */
 
 #include <fcntl.h>

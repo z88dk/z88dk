@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.41 2012-09-03 07:31:55 stefano Exp $
+ * $Id: stdlib.h,v 1.42 2013-06-06 08:58:31 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -222,6 +222,9 @@ extern unsigned long __LIB__             extract_bits(unsigned char *data, unsig
 extern unsigned long __LIB__ __CALLEE__  extract_bits_callee(unsigned char *data, unsigned int start, unsigned int size);
 
 #define extract_bits(a,b,c)  extract_bits_callee(a,b,c)
+
+// Compare a file name in "8.3" format to a wildcard expression
+extern int __LIB__ wcmatch(char *wildnam, char *filnam);
 
 
 #ifdef __Z88__

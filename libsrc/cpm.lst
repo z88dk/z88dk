@@ -5,6 +5,14 @@ stdio/puts_cons
 fcntl/cpm/bdos
 fcntl/cpm/close
 fcntl/cpm/creat
+fcntl/cpm/change_volume
+fcntl/cpm/dir_move_first
+fcntl/cpm/dir_move_next
+fcntl/cpm/dir_get_entry_type
+fcntl/cpm/dir_get_entry_name
+fcntl/cpm/dir_get_entry_size
+fcntl/cpm/get_current_volume
+fcntl/cpm/get_dir_name
 fcntl/cpm/fdtell
 fcntl/cpm/getfcb
 fcntl/cpm/lseek

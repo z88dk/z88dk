@@ -4,7 +4,7 @@
  *  27/1/2002 - djm
  *
  *
- *  $Id: write.c,v 1.4 2013-05-31 13:34:25 stefano Exp $
+ *  $Id: write.c,v 1.5 2013-06-06 08:58:32 stefano Exp $
  */
 
 #include <fcntl.h>

@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.21 2013-05-28 06:02:44 stefano Exp $ */
+/* $Id: stdio.h,v 1.22 2013-06-06 08:58:31 stefano Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -27,6 +27,12 @@
 #ifdef __CPM__
 /* This will define __STDIO_BINARY, __STDIO_EOFMARKER and __STDIO_CRLF  */
 #include <cpm.h>
+#endif
+
+#ifdef __MSX__
+/* This will define __STDIO_BINARY, __STDIO_EOFMARKER and __STDIO_CRLF  */
+#include <cpm.h>
+#include <msx.h>
 #endif
 
 #ifdef __OSCA__

@@ -7,7 +7,7 @@
  *    Many of these values have been obtained via reference to
  *    Hitech C
  *
- *    $Id: cpm.h,v 1.8 2013-05-31 13:34:25 stefano Exp $
+ *    $Id: cpm.h,v 1.9 2013-06-06 08:58:31 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -120,5 +120,21 @@ extern void __LIB__ _putoffset(unsigned char *where,long offset);
 /* Mark an FCB as being unused */
 #define clearfcb(f)  (f)->use = 0
 
+/* directory stuff */
+
+extern struct fcb __LIB__ *fc_dir;
+extern char __LIB__ fc_dirpos;
+extern char __LIB__ *fc_dirbuf;
+
+/* Disk control (as for OSCA FLOS) */
+extern int __LIB__ __FASTCALL__ change_volume(int volume);
+extern int __LIB__ get_current_volume();   // Current 'drive' (0..n)
+/* Directory related commands (as for OSCA FLOS) */
+extern int __LIB__ dir_move_first();
+extern int __LIB__ dir_move_next();
+extern int __LIB__ dir_get_entry_type();  // 0=normal, 1=directory
+extern int __LIB__ dir_get_entry_name();
+extern unsigned long __LIB__ dir_get_entry_size();
+extern int __LIB__ get_dir_name();
 
 #endif

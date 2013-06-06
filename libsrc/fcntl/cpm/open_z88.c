@@ -5,7 +5,7 @@
  *
  *  We don't bother filling up the explicitname (yet...)
  *
- *  $Id: open_z88.c,v 1.6 2013-05-31 13:34:25 stefano Exp $
+ *  $Id: open_z88.c,v 1.7 2013-06-06 08:58:32 stefano Exp $
  */
 
 #include <cpm.h>

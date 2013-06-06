@@ -4,7 +4,7 @@
  *  27/1/2002 - djm
  *
  *
- *  $Id: read.c,v 1.2 2013-05-31 13:34:25 stefano Exp $
+ *  $Id: read.c,v 1.3 2013-06-06 08:58:32 stefano Exp $
  */
 
 #include <stdio.h>

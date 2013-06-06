@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.11 2013-05-31 13:34:25 stefano Exp $
+# $Id: Makefile,v 1.12 2013-06-06 08:58:32 stefano Exp $
 
 include ../../Make.config
 
@@ -10,6 +10,14 @@ CFILES = \
 	bdos.c \
 	close.c \
 	creat.c \
+	change_volume.c \
+	dir_move_first.c \
+	dir_move_next.c \
+	dir_get_entry_type.c \
+	dir_get_entry_name.c \
+	dir_get_entry_size.c \
+	get_current_volume.c \
+	get_dir_name.c \
 	fdtell.c \
 	getfcb.c \
 	lseek.c \
