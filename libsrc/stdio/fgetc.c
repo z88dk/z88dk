@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fgetc.c,v 1.8 2013-05-28 06:02:44 stefano Exp $
+ * $Id: fgetc.c,v 1.9 2013-06-07 14:12:57 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -83,10 +83,14 @@ int fgetc(FILE *fp)
 	pop	ix	;ix back
 	jr	c,no_stdin
 	call	fgetc_cons	;get from console
+#ifdef __STDIO_EOFMARKER
+	cp	__STDIO_EOFMARKER
+	jr	z,is_eof
+#endif
 	push    hl
 	call    fputc_cons
 	pop     hl
-	ret			;always succeeds - never EOF
+	ret			; always succeeds - never EOF when EOF has not been defined.
 .no_stdin
 	ld	l,(ix+fp_desc)
 	ld	h,(ix+fp_desc+1)
