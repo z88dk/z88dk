@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.31 2013-06-01 01:24:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.32 2013-06-08 23:07:53 pauloscustodio Exp $
 $Log: z80asm.h,v $
-Revision 1.31  2013-06-01 01:24:22  pauloscustodio
+Revision 1.32  2013-06-08 23:07:53  pauloscustodio
+Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
+Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_sym()
+ and define_global_sym().
+
+Revision 1.31  2013/06/01 01:24:22  pauloscustodio
 CH_0022 : Replace avltree by hash table for symbol table
 
 Revision 1.30  2013/05/06 23:02:12  pauloscustodio
@@ -156,6 +161,7 @@ $History: Z80ASM.C $
 
 #include "config.h"
 #include "types.h"
+#include "sym.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -183,6 +189,7 @@ extern char ident[];
 extern char separators[];
 extern struct module *CURRENTMODULE;
 extern FILE *z80asmfile, *deffile;
+extern Symbol *ASMPC;
 
 extern char *Fetchfilename( FILE *fptr );
 extern char *CreateLibfile( char *filename );

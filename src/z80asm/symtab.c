@@ -18,9 +18,14 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.2 2013-06-01 01:24:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.3 2013-06-08 23:07:53 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.2  2013-06-01 01:24:22  pauloscustodio
+Revision 1.3  2013-06-08 23:07:53  pauloscustodio
+Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
+Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_sym()
+ and define_global_sym().
+
+Revision 1.2  2013/06/01 01:24:22  pauloscustodio
 CH_0022 : Replace avltree by hash table for symbol table
 
 Revision 1.1  2013/05/23 22:22:23  pauloscustodio
@@ -43,6 +48,23 @@ Move symbol to sym.c, rename to Symbol
 DEF_CLASS_HASH(Symbol);				/* defines SymbolHash */
 
 /*-----------------------------------------------------------------------------
+*   join two symbol tables, adding all symbols from source to the target 
+*   symbol table; if symbols with the same name exist, the one from source 
+*   overwrites the one at target
+*----------------------------------------------------------------------------*/
+void SymbolHash_cat( SymbolHash *target, SymbolHash *source )
+{
+	SymbolHashElem *iter;
+	Symbol         *sym;
+
+	for ( iter = SymbolHash_first( source ); iter; iter = SymbolHash_next( iter ) )
+	{
+		sym = (Symbol *)iter->value;
+		SymbolHash_set( target, sym->name, Symbol_clone(sym) );
+	}	
+}
+
+/*-----------------------------------------------------------------------------
 *   Global Symbol Tables
 *----------------------------------------------------------------------------*/
 #define DEF_GET_TAB(func)						\
@@ -61,21 +83,58 @@ DEF_GET_TAB(get_static_tab)
 #undef DEF_GET_TAB
 
 /*-----------------------------------------------------------------------------
-*   join two symbol tables, adding all symbols from source to the target 
-*   symbol table; if symbols with the same name exist, the one from source 
-*   overwrites the one at target
+*   create a symbol in the given table, error if already defined
 *----------------------------------------------------------------------------*/
-void SymbolHash_cat( SymbolHash *target, SymbolHash *source )
+Symbol *_define_sym( SymbolHash *symtab, 
+				  char *name, long value, byte_t type, struct module *owner )
+{
+    Symbol *sym;
+
+	sym = SymbolHash_get( symtab, name );
+	if ( sym != NULL )					/* Symbol already defined */
+    {
+        error( ERR_SYMBOL_REDEFINED, name );
+    }
+	else
+	{
+        sym = Symbol_create( name, value, type | SYMDEFINED, owner );
+		SymbolHash_set( symtab, name, sym );
+	}
+	return sym;
+}
+
+/*-----------------------------------------------------------------------------
+*   define a static symbol (from -D command line)
+*----------------------------------------------------------------------------*/
+Symbol *define_static_sym( char *name, long value )
+{
+	return _define_sym( get_static_tab(), name, value, SYMDEF, NULL );
+}
+
+/*-----------------------------------------------------------------------------
+*   define a global symbol (e.g. ASMPC)
+*----------------------------------------------------------------------------*/
+Symbol *define_global_sym( char *name, long value )
+{
+	return _define_sym( get_global_tab(), name, value, SYMDEF, NULL );
+}
+
+/*-----------------------------------------------------------------------------
+*   copy the static symbols to CURRENTMODULE->local_tab
+*----------------------------------------------------------------------------*/
+void copy_static_syms( void )
 {
 	SymbolHashElem *iter;
 	Symbol         *sym;
 
-	for ( iter = SymbolHash_first( source ); iter; iter = SymbolHash_next( iter ) )
+	for ( iter = SymbolHash_first( get_static_tab() ); iter; iter = SymbolHash_next( iter ) )
 	{
 		sym = (Symbol *)iter->value;
-		SymbolHash_set( target, sym->name, Symbol_clone(sym) );
-	}	
+		_define_sym( CURRENTMODULE->local_tab, 
+					 sym->name, sym->value, sym->type, CURRENTMODULE );
+	}
 }
+
 
 
 /*-----------------------------------------------------------------------------
@@ -206,20 +265,9 @@ void define_symbol( char *name, long value, byte_t type )
 /*-----------------------------------------------------------------------------
 *   create a SYMDEF symbol in the given table, error if already defined
 *----------------------------------------------------------------------------*/
-void define_def_symbol( char *name, long value, byte_t type, SymbolHash *symtab )
+Symbol *define_def_symbol( char *name, long value, byte_t type, SymbolHash *symtab )
 {
-    Symbol *sym;
-
-	sym = find_symbol( name, symtab );
-	if ( sym != NULL )					/* Symbol already defined */
-    {
-        error( ERR_SYMBOL_REDEFINED, name );
-    }
-	else
-	{
-        sym = Symbol_create( name, value, type | SYMDEF | SYMDEFINED, NULL );
-		SymbolHash_set( symtab, name, sym );
-	}
+	return _define_sym( symtab, name, value, type | SYMDEF, NULL );
 }
 
 /*-----------------------------------------------------------------------------

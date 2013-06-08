@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.87 2013-06-01 01:24:22 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.88 2013-06-08 23:07:53 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.87  2013-06-01 01:24:22  pauloscustodio
+/* Revision 1.88  2013-06-08 23:07:53  pauloscustodio
+/* Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
+/* Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_sym()
+/*  and define_global_sym().
+/*
+/* Revision 1.87  2013/06/01 01:24:22  pauloscustodio
 /* CH_0022 : Replace avltree by hash table for symbol table
 /*
 /* Revision 1.86  2013/05/23 22:22:23  pauloscustodio
@@ -616,7 +621,7 @@ size_t EXPLICIT_ORIGIN;         /* origin defined from command line */
 struct modules *modulehdr;
 struct module *CURRENTMODULE;
 struct liblist *libraryhdr;
-
+Symbol *ASMPC;
 
 /* local functions */
 static void assemble_list( char *filename );
@@ -773,10 +778,10 @@ static void do_assemble( char *src_filename, char *obj_filename )
         set_PC( 0 );
 
 		/* initialize local symtab with copy of static one (-D defines) */
-		SymbolHash_cat( CURRENTMODULE->local_tab, get_static_tab() );
+		copy_static_syms();
 
         /* Create standard 'ASMPC' identifier */
-        define_def_symbol( ASSEMBLERPC, get_PC(), 0, get_global_tab() );
+        ASMPC = define_global_sym( ASSEMBLERPC, get_PC() );
 
         if ( verbose )
         {
@@ -1312,7 +1317,7 @@ int main( int argc, char *argv[] )
         libraryhdr = NULL;              /* initialise to no library files */
 
         /* define OS_ID */
-        define_def_symbol( OS_ID, 1, 0, get_static_tab() );
+        define_static_sym( OS_ID, 1 );
 
         /* Get command line arguments, if any... */
         if ( argc == 1 )

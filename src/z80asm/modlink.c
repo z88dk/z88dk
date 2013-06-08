@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.59 2013-06-01 01:24:22 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.60 2013-06-08 23:07:53 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.59  2013-06-01 01:24:22  pauloscustodio
+/* Revision 1.60  2013-06-08 23:07:53  pauloscustodio
+/* Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
+/* Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_sym()
+/*  and define_global_sym().
+/*
+/* Revision 1.59  2013/06/01 01:24:22  pauloscustodio
 /* CH_0022 : Replace avltree by hash table for symbol table
 /*
 /* Revision 1.58  2013/05/23 22:22:23  pauloscustodio
@@ -521,7 +526,7 @@ ReadExpr( long nextexpr, long endexpr )
         /* assembler PC     as absolute address */
         set_PC( modulehdr->first->origin + CURRENTMODULE->startoffset + offsetptr );
 
-        find_symbol( ASSEMBLERPC, get_global_tab() )->value = get_PC();
+        ASMPC->value = get_PC();
 
         i = fgetc_err( z80asmfile ); /* get length of infix expression */
         fptr = ftell( z80asmfile );       /* file pointer is at start of expression */
@@ -653,7 +658,7 @@ LinkModules( void )
         open_error_file( err_filename_ext( CURRENTFILE->fname ) );
 
         set_PC( 0 );
-        define_def_symbol( ASSEMBLERPC, get_PC(), 0, get_global_tab() );  /* Create standard 'ASMPC' identifier */
+        ASMPC = define_global_sym( ASSEMBLERPC, get_PC() );  /* Create standard 'ASMPC' identifier */
 
         do                                      /* link machine code & read symbols in all modules */
         {
@@ -739,8 +744,8 @@ LinkModules( void )
 
         set_error_null();
 
-        define_def_symbol( "ASMSIZE", get_codesize(), 0, get_global_tab() );
-        define_def_symbol( "ASMTAIL", ( size_t )( modulehdr->first->origin + get_codesize() ), 0, get_global_tab() );
+        define_global_sym( "ASMSIZE", get_codesize() );
+        define_global_sym( "ASMTAIL", modulehdr->first->origin + get_codesize() );
 
         if ( verbose == ON )
         {

@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.49 2013-06-01 01:24:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.50 2013-06-08 23:07:53 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.49  2013-06-01 01:24:22  pauloscustodio
+Revision 1.50  2013-06-08 23:07:53  pauloscustodio
+Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
+Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_sym()
+ and define_global_sym().
+
+Revision 1.49  2013/06/01 01:24:22  pauloscustodio
 CH_0022 : Replace avltree by hash table for symbol table
 
 Revision 1.48  2013/05/23 22:22:23  pauloscustodio
@@ -430,7 +435,7 @@ getasmline( void )
 void
 parseline( enum flag interpret )
 {
-    find_symbol( ASSEMBLERPC, get_global_tab() )->value = get_PC();   /* update assembler program counter */
+    ASMPC->value = get_PC();   /* update assembler program counter */
 
     ++CURRENTFILE->line;
 

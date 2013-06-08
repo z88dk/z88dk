@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.1 2013-06-01 01:24:23 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.2 2013-06-08 23:07:53 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.1  2013-06-01 01:24:23  pauloscustodio
+# Revision 1.2  2013-06-08 23:07:53  pauloscustodio
+# Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
+# Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_sym()
+#  and define_global_sym().
+#
+# Revision 1.1  2013/06/01 01:24:23  pauloscustodio
 # CH_0022 : Replace avltree by hash table for symbol table
 #
 #
@@ -41,6 +46,8 @@ int list_get_page_nr() { return page_nr; }
 
 struct module the_module;
 struct module *CURRENTMODULE = &the_module;
+
+extern SymbolHash *get_static_tab(void);
 
 void dump_SymbolRefList ( SymbolRefList *references )
 {
