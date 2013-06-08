@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.59 2013-06-01 01:24:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.60 2013-06-08 22:58:22 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.59  2013-06-01 01:24:21  pauloscustodio
+# Revision 1.60  2013-06-08 22:58:22  pauloscustodio
+# Add module.c
+#
+# Revision 1.59  2013/06/01 01:24:21  pauloscustodio
 # CH_0022 : Replace avltree by hash table for symbol table
 #
 # Revision 1.58  2013/05/23 22:22:23  pauloscustodio
@@ -253,6 +256,7 @@ OBJS = 	\
 	listfile.o		\
 	memalloc.o		\
 	model.o			\
+	module.o		\
 	model_symref.o	\
 	modlink.o		\
 	objfile.o		\
