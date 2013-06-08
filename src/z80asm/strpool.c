@@ -18,9 +18,12 @@ and manage strdup/free for each token.
 Strings with the same contents are reused.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.c,v 1.5 2013-03-30 00:00:26 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.c,v 1.6 2013-06-08 23:09:06 pauloscustodio Exp $ */
 /* $Log: strpool.c,v $
-/* Revision 1.5  2013-03-30 00:00:26  pauloscustodio
+/* Revision 1.6  2013-06-08 23:09:06  pauloscustodio
+/* Show strpool on exit if DEBUG
+/*
+/* Revision 1.5  2013/03/30 00:00:26  pauloscustodio
 /* Accept special case NULL in strpool_add, return NULL
 /*
 /* Revision 1.4  2013/01/20 21:24:28  pauloscustodio
@@ -120,6 +123,9 @@ void StrPool_fini( StrPool *self )
 
     HASH_ITER( hh, self->hash, elem, tmp )
     {
+#ifdef DEBUG
+		puts( elem->string );
+#endif
         HASH_DEL( self->hash, elem );
         xfree( elem->string );
         xfree( elem );
