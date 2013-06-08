@@ -14,10 +14,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.6 2013-05-12 19:46:35 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.7 2013-06-08 23:08:38 pauloscustodio Exp $ 
 
 $Log: objfile.h,v $
-Revision 1.6  2013-05-12 19:46:35  pauloscustodio
+Revision 1.7  2013-06-08 23:08:38  pauloscustodio
+comments
+
+Revision 1.6  2013/05/12 19:46:35  pauloscustodio
 New module for object file handling
 
 Revision 1.5  2013/01/20 21:24:28  pauloscustodio
@@ -66,7 +69,7 @@ CLASS( ObjFile )
 	long	start_ptr;			/* offset in file to start of object file
 								   used when object module is part of a library */
 	
-	char   *filename;			/* object file name, kept in strpool */
+	char   *filename;			/* object file name, in strpool */
 	char   *modname;			/* module name, in strpool */
 	
 	BOOL	in_library;			/* true if this file is part of a library */
@@ -94,7 +97,7 @@ END_CLASS;
    by OBJ_DELETE() by caller; 
    return NULL and raise error on invalid file or file not found;
    In test_mode does not raise errors - used when deciding if an existent
-   object file can be reused or needs to be assembled agains. */
+   object file can be reused or needs to be assembled again */
 extern ObjFile *ObjFile_open_read( char *filename, BOOL test_mode );
 
 /* read an object file from an open library file, return new object that 

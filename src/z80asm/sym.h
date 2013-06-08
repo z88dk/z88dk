@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.3 2013-06-01 01:24:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.4 2013-06-08 23:08:38 pauloscustodio Exp $
 $Log: sym.h,v $
-Revision 1.3  2013-06-01 01:24:22  pauloscustodio
+Revision 1.4  2013-06-08 23:08:38  pauloscustodio
+comments
+
+Revision 1.3  2013/06/01 01:24:22  pauloscustodio
 CH_0022 : Replace avltree by hash table for symbol table
 
 Revision 1.2  2013/05/23 22:22:23  pauloscustodio
@@ -45,9 +48,9 @@ Move SymbolRef to symref.c
 CLASS( Symbol )
 	char		   *name;				/* name, kept in strpool */
 	long			value;				/* computed value of symbol */
-    byte_t			type;				/* type of symbol  */
+    byte_t			type;				/* type of symbol */
     SymbolRefList  *references;			/* pointer to all found references of symbol */
-    struct module  *owner;				/* week pointer to module which owns symbol */
+    struct module  *owner;				/* weak pointer to module which owns symbol */
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
