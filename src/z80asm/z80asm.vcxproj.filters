@@ -245,5 +245,8 @@
     <ClCompile Include="symtab.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="module.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

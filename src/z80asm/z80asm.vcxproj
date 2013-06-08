@@ -137,6 +137,7 @@
     <ClCompile Include="model.c" />
     <ClCompile Include="model_symref.c" />
     <ClCompile Include="modlink.c" />
+    <ClCompile Include="module.c" />
     <ClCompile Include="objfile.c" />
     <ClCompile Include="options.c" />
     <ClCompile Include="parse.c" />
