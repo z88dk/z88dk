@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.45 2013-06-01 01:24:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.46 2013-06-08 23:37:32 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.45  2013-06-01 01:24:21  pauloscustodio
+/* Revision 1.46  2013-06-08 23:37:32  pauloscustodio
+/* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
+/*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
+/* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+/*
+/* Revision 1.45  2013/06/01 01:24:21  pauloscustodio
 /* CH_0022 : Replace avltree by hash table for symbol table
 /*
 /* Revision 1.44  2013/05/23 22:22:23  pauloscustodio
@@ -94,7 +99,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Z80ident[]: make always handling function the same name as assembler ident.
 /*
 /* Revision 1.26  2012/05/17 17:42:14  pauloscustodio
-/* define_symbol() and define_def_symbol() defined as void, a fatal error is
+/* define_symbol() defined as void, a fatal error is
 /* always raised on error.
 /*
 /* Revision 1.25  2012/05/11 19:29:49  pauloscustodio
@@ -767,7 +772,7 @@ DEFINE( void )
     {
         if ( GetSym() == name )
         {
-            define_def_symbol( ident, 1, 0, CURRENTMODULE->local_tab );
+            define_local_def_sym( ident, 1 );
         }
         else
         {

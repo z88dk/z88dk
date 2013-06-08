@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.24 2013-06-01 01:24:22 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.25 2013-06-08 23:37:32 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.24  2013-06-01 01:24:22  pauloscustodio
+/* Revision 1.25  2013-06-08 23:37:32  pauloscustodio
+/* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
+/*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
+/* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+/*
+/* Revision 1.24  2013/06/01 01:24:22  pauloscustodio
 /* CH_0022 : Replace avltree by hash table for symbol table
 /*
 /* Revision 1.23  2013/05/16 23:39:48  pauloscustodio
@@ -55,7 +60,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Solve signed/unsigned mismatch warnings in symboltype, libtype: changed to char.
 /*
 /* Revision 1.14  2012/05/17 17:42:14  pauloscustodio
-/* define_symbol() and define_def_symbol() defined as void, a fatal error is
+/* define_symbol() defined as void, a fatal error is
 /* always raised on error.
 /*
 /* Revision 1.13  2012/05/11 19:29:49  pauloscustodio

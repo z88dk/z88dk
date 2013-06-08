@@ -15,9 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.4 2013-06-08 23:08:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.5 2013-06-08 23:37:32 pauloscustodio Exp $
 $Log: sym.h,v $
-Revision 1.4  2013-06-08 23:08:38  pauloscustodio
+Revision 1.5  2013-06-08 23:37:32  pauloscustodio
+Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
+ define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
+Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+
+Revision 1.4  2013/06/08 23:08:38  pauloscustodio
 comments
 
 Revision 1.3  2013/06/01 01:24:22  pauloscustodio
@@ -75,9 +80,11 @@ END_CLASS;
 #define SYM_NOTDEFINED  0		
 
 /*-----------------------------------------------------------------------------
-*   Location symbol
+*   Special symbols
 *----------------------------------------------------------------------------*/
-#define ASSEMBLERPC     "ASMPC"
+#define ASMPC_KW	"ASMPC"
+#define ASMSIZE_KW	"ASMSIZE"
+#define ASMTAIL_KW	"ASMTAIL"
 
 /*-----------------------------------------------------------------------------
 *   Symbol API

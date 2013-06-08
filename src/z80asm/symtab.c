@@ -18,12 +18,17 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.3 2013-06-08 23:07:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.4 2013-06-08 23:37:32 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.3  2013-06-08 23:07:53  pauloscustodio
+Revision 1.4  2013-06-08 23:37:32  pauloscustodio
+Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
+ define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
+Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+
+Revision 1.3  2013/06/08 23:07:53  pauloscustodio
 Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
-Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_sym()
- and define_global_sym().
+Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_def_sym()
+ and define_global_def_sym().
 
 Revision 1.2  2013/06/01 01:24:22  pauloscustodio
 CH_0022 : Replace avltree by hash table for symbol table
@@ -106,7 +111,7 @@ Symbol *_define_sym( SymbolHash *symtab,
 /*-----------------------------------------------------------------------------
 *   define a static symbol (from -D command line)
 *----------------------------------------------------------------------------*/
-Symbol *define_static_sym( char *name, long value )
+Symbol *define_static_def_sym( char *name, long value )
 {
 	return _define_sym( get_static_tab(), name, value, SYMDEF, NULL );
 }
@@ -114,10 +119,19 @@ Symbol *define_static_sym( char *name, long value )
 /*-----------------------------------------------------------------------------
 *   define a global symbol (e.g. ASMPC)
 *----------------------------------------------------------------------------*/
-Symbol *define_global_sym( char *name, long value )
+Symbol *define_global_def_sym( char *name, long value )
 {
 	return _define_sym( get_global_tab(), name, value, SYMDEF, NULL );
 }
+
+/*-----------------------------------------------------------------------------
+*   define a local DEF symbol (e.g. DEFINE)
+*----------------------------------------------------------------------------*/
+Symbol *define_local_def_sym( char *name, long value )
+{
+	return _define_sym( CURRENTMODULE->local_tab, name, value, SYMDEF, CURRENTMODULE );
+}
+
 
 /*-----------------------------------------------------------------------------
 *   copy the static symbols to CURRENTMODULE->local_tab
@@ -260,14 +274,6 @@ void define_symbol( char *name, long value, byte_t type )
 	{									/* the extern symbol is now no longer accessible */
         define_local_symbol( name, value, type );
     }
-}
-
-/*-----------------------------------------------------------------------------
-*   create a SYMDEF symbol in the given table, error if already defined
-*----------------------------------------------------------------------------*/
-Symbol *define_def_symbol( char *name, long value, byte_t type, SymbolHash *symtab )
-{
-	return _define_sym( symtab, name, value, type | SYMDEF, NULL );
 }
 
 /*-----------------------------------------------------------------------------

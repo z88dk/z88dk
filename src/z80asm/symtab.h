@@ -18,12 +18,17 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.3 2013-06-08 23:07:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.4 2013-06-08 23:37:32 pauloscustodio Exp $
 $Log: symtab.h,v $
-Revision 1.3  2013-06-08 23:07:53  pauloscustodio
+Revision 1.4  2013-06-08 23:37:32  pauloscustodio
+Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
+ define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
+Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+
+Revision 1.3  2013/06/08 23:07:53  pauloscustodio
 Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
-Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_sym()
- and define_global_sym().
+Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_def_sym()
+ and define_global_def_sym().
 
 Revision 1.2  2013/06/01 01:24:22  pauloscustodio
 CH_0022 : Replace avltree by hash table for symbol table
@@ -56,11 +61,14 @@ extern void SymbolHash_cat( SymbolHash *target, SymbolHash *source );
 *   API
 *----------------------------------------------------------------------------*/
 
-/* define a static symbol (from -D command line) */
-extern Symbol *define_static_sym( char *name, long value );
+/* define a static DEF symbol (from -D command line) */
+extern Symbol *define_static_def_sym( char *name, long value );
 
-/* define a global symbol (e.g. ASMPC) */
-extern Symbol *define_global_sym( char *name, long value );
+/* define a global DEF symbol (e.g. ASMPC) */
+extern Symbol *define_global_def_sym( char *name, long value );
+
+/* define a local DEF symbol (e.g. DEFINE) */
+extern Symbol *define_local_def_sym( char *name, long value );
 
 /* copy the static symbols to CURRENTMODULE->local_tab */
 extern void copy_static_syms( void );
@@ -81,9 +89,6 @@ extern Symbol *find_symbol( char *name, SymbolHash *symtab );
    c) if declared global/extern and defined -> error REDEFINED
    d) if in global table and not global/extern -> define a new local symbol */
 extern void define_symbol( char *name, long value, byte_t type );
-
-/* create a SYMDEF symbol in the given table, error if already defined */
-extern Symbol *define_def_symbol( char *name, long value, byte_t type, SymbolHash *symtab );
 
 /* refer to a symbol in an expression
    search for symbol in either local tree or global table, 

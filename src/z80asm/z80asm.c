@@ -14,12 +14,17 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.88 2013-06-08 23:07:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.89 2013-06-08 23:37:32 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.88  2013-06-08 23:07:53  pauloscustodio
+/* Revision 1.89  2013-06-08 23:37:32  pauloscustodio
+/* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
+/*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
+/* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+/*
+/* Revision 1.88  2013/06/08 23:07:53  pauloscustodio
 /* Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
-/* Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_sym()
-/*  and define_global_sym().
+/* Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_def_sym()
+/*  and define_global_def_sym().
 /*
 /* Revision 1.87  2013/06/01 01:24:22  pauloscustodio
 /* CH_0022 : Replace avltree by hash table for symbol table
@@ -173,7 +178,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* Renamed xfree0() to xfree().
 /*
 /* Revision 1.48  2012/05/18 00:23:14  pauloscustodio
-/* define_symbol() and define_def_symbol() defined as void, a fatal error is always raised on error.
+/* define_symbol() defined as void, a fatal error is always raised on error.
 /*
 /* Revision 1.47  2012/05/17 21:36:06  pauloscustodio
 /* Remove global ASMERROR, redundant with TOTALERRORS.
@@ -183,7 +188,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* astyle
 /*
 /* Revision 1.45  2012/05/17 17:42:14  pauloscustodio
-/* define_symbol() and define_def_symbol() defined as void, a fatal error is
+/* define_symbol() defined as void, a fatal error is
 /* always raised on error.
 /*
 /* Revision 1.44  2012/05/17 14:56:23  pauloscustodio
@@ -781,7 +786,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
 		copy_static_syms();
 
         /* Create standard 'ASMPC' identifier */
-        ASMPC = define_global_sym( ASSEMBLERPC, get_PC() );
+        ASMPC = define_global_def_sym( ASMPC_KW, get_PC() );
 
         if ( verbose )
         {
@@ -1317,7 +1322,7 @@ int main( int argc, char *argv[] )
         libraryhdr = NULL;              /* initialise to no library files */
 
         /* define OS_ID */
-        define_static_sym( OS_ID, 1 );
+        define_static_def_sym( OS_ID, 1 );
 
         /* Get command line arguments, if any... */
         if ( argc == 1 )

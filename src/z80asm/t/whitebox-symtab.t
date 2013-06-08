@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.2 2013-06-08 23:07:53 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.3 2013-06-08 23:37:32 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.2  2013-06-08 23:07:53  pauloscustodio
+# Revision 1.3  2013-06-08 23:37:32  pauloscustodio
+# Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
+#  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
+# Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+#
+# Revision 1.2  2013/06/08 23:07:53  pauloscustodio
 # Add global ASMPC Symbol pointer, to avoid "ASMPC" symbol table lookup on every instruction.
 # Encapsulate get_global_tab() and get_static_tab() by using new functions define_static_sym()
 #  and define_global_sym().
@@ -48,6 +53,9 @@ struct module the_module;
 struct module *CURRENTMODULE = &the_module;
 
 extern SymbolHash *get_static_tab(void);
+
+extern Symbol *_define_sym( SymbolHash *symtab, 
+							char *name, long value, byte_t type, struct module *owner );
 
 void dump_SymbolRefList ( SymbolRefList *references )
 {
@@ -146,15 +154,15 @@ t_compile_module($init, <<'END', $objs);
 	
 	TITLE("Concat symbol tables");	
 	ASSERT( symtab  = OBJ_NEW(SymbolHash) );
-	define_def_symbol(S("VAR1"),  1, 0, symtab); page_nr++;
-	define_def_symbol(S("VAR2"),  2, 0, symtab); page_nr++; 
-	define_def_symbol(S("VAR3"), -3, 0, symtab); page_nr++;
+	_define_sym(symtab, S("VAR1"),  1, 0, NULL); page_nr++;
+	_define_sym(symtab, S("VAR2"),  2, 0, NULL); page_nr++; 
+	_define_sym(symtab, S("VAR3"), -3, 0, NULL); page_nr++;
 	dump_SymbolHash(symtab, "tab1");
 	
 	ASSERT( symtab2 = OBJ_NEW(SymbolHash) );
-	define_def_symbol(S("VAR3"), 3, 0, symtab2); page_nr++;
-	define_def_symbol(S("VAR4"), 4, 0, symtab2); page_nr++;
-	define_def_symbol(S("VAR5"), 5, 0, symtab2); page_nr++;
+	_define_sym(symtab2, S("VAR3"), 3, 0, NULL); page_nr++;
+	_define_sym(symtab2, S("VAR4"), 4, 0, NULL); page_nr++;
+	_define_sym(symtab2, S("VAR5"), 5, 0, NULL); page_nr++;
 	dump_SymbolHash(symtab2, "tab2");
 	
 	SymbolHash_cat( symtab, symtab2 );
@@ -165,10 +173,10 @@ t_compile_module($init, <<'END', $objs);
 	
 	TITLE("Sort");	
 	ASSERT( symtab  = OBJ_NEW(SymbolHash) );
-	define_def_symbol(S("ONE"), 	1, 0, symtab); page_nr++;
-	define_def_symbol(S("TWO"),		2, 0, symtab); page_nr++; 
-	define_def_symbol(S("THREE"),	3, 0, symtab); page_nr++;
-	define_def_symbol(S("FOUR"),	4, 0, symtab); page_nr++;
+	_define_sym(symtab, S("ONE"), 	1, 0, NULL); page_nr++;
+	_define_sym(symtab, S("TWO"),	2, 0, NULL); page_nr++; 
+	_define_sym(symtab, S("THREE"),	3, 0, NULL); page_nr++;
+	_define_sym(symtab, S("FOUR"),	4, 0, NULL); page_nr++;
 
 	dump_SymbolHash(symtab, "tab");
 	
@@ -182,18 +190,18 @@ t_compile_module($init, <<'END', $objs);
 
 	TITLE("Use local symbol before definition");
 	page_nr = 1;
-	define_def_symbol(S("WIN32"), 1, 0, get_static_tab()); page_nr++;
+	_define_sym(get_static_tab(), S("WIN32"), 1, 0, NULL); page_nr++;
 	SymbolHash_cat( CURRENTMODULE->local_tab, get_static_tab() ); page_nr++;
-	define_def_symbol( S(ASSEMBLERPC), 0, 0, get_global_tab() ); page_nr++;
-	find_symbol( S(ASSEMBLERPC), get_global_tab() )->value += 3; page_nr++;
-	find_symbol( S(ASSEMBLERPC), get_global_tab() )->value += 3; page_nr++;
+	_define_sym(get_global_tab(), S(ASMPC_KW), 0, 0, NULL); page_nr++;
+	find_symbol( S(ASMPC_KW), get_global_tab() )->value += 3; page_nr++;
+	find_symbol( S(ASMPC_KW), get_global_tab() )->value += 3; page_nr++;
 	sym = get_used_symbol(S("NN")); page_nr++;
 	ASSERT( sym == NULL );
-	find_symbol( S(ASSEMBLERPC), get_global_tab() )->value += 3; page_nr++;
+	find_symbol( S(ASMPC_KW), get_global_tab() )->value += 3; page_nr++;
 	sym = get_used_symbol(S("NN")); page_nr++;
 	ASSERT( sym == NULL );
-	find_symbol( S(ASSEMBLERPC), get_global_tab() )->value += 3; page_nr++;
-	define_symbol(S("NN"), find_symbol( S(ASSEMBLERPC), get_global_tab() )->value, SYMADDR | SYMTOUCHED ); 
+	find_symbol( S(ASMPC_KW), get_global_tab() )->value += 3; page_nr++;
+	define_symbol(S("NN"), find_symbol( S(ASMPC_KW), get_global_tab() )->value, SYMADDR | SYMTOUCHED ); 
 	sym = get_used_symbol(S("NN")); page_nr++;
 	ASSERT( sym != NULL );
 	dump_Symbol(sym);
@@ -269,9 +277,9 @@ memalloc symref.c(1): alloc 32 bytes at ADDR_38
 memalloc symref.c(2): alloc 12 bytes at ADDR_39
 memalloc strhash.c(4): alloc 40 bytes at ADDR_40
 Symtab "tab1": 
-  Symbol "VAR1" = 1, type = 0x05 [DEFINED DEF ], ref = [1 ], owner = NULL
-  Symbol "VAR2" = 2, type = 0x05 [DEFINED DEF ], ref = [2 ], owner = NULL
-  Symbol "VAR3" = -3, type = 0x05 [DEFINED DEF ], ref = [3 ], owner = NULL
+  Symbol "VAR1" = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
+  Symbol "VAR2" = 2, type = 0x01 [DEFINED ], ref = [2 ], owner = NULL
+  Symbol "VAR3" = -3, type = 0x01 [DEFINED ], ref = [3 ], owner = NULL
 memalloc symtab.c(1): alloc 32 bytes at ADDR_41
 memalloc strhash.c(1): alloc 32 bytes at ADDR_42
 memalloc sym.c(1): alloc 48 bytes at ADDR_43
@@ -296,9 +304,9 @@ memalloc symref.c(1): alloc 32 bytes at ADDR_61
 memalloc symref.c(2): alloc 12 bytes at ADDR_62
 memalloc strhash.c(4): alloc 40 bytes at ADDR_63
 Symtab "tab2": 
-  Symbol "VAR3" = 3, type = 0x05 [DEFINED DEF ], ref = [4 ], owner = NULL
-  Symbol "VAR4" = 4, type = 0x05 [DEFINED DEF ], ref = [5 ], owner = NULL
-  Symbol "VAR5" = 5, type = 0x05 [DEFINED DEF ], ref = [6 ], owner = NULL
+  Symbol "VAR3" = 3, type = 0x01 [DEFINED ], ref = [4 ], owner = NULL
+  Symbol "VAR4" = 4, type = 0x01 [DEFINED ], ref = [5 ], owner = NULL
+  Symbol "VAR5" = 5, type = 0x01 [DEFINED ], ref = [6 ], owner = NULL
 memalloc sym.c(1): alloc 48 bytes at ADDR_64
 memalloc symref.c(2): alloc 40 bytes at ADDR_65
 memalloc symref.c(1): alloc 32 bytes at ADDR_66
@@ -318,11 +326,11 @@ memalloc symref.c(1): alloc 32 bytes at ADDR_75
 memalloc symref.c(2): alloc 12 bytes at ADDR_76
 memalloc strhash.c(4): alloc 40 bytes at ADDR_77
 Symtab "merged_tab": 
-  Symbol "VAR1" = 1, type = 0x05 [DEFINED DEF ], ref = [1 ], owner = NULL
-  Symbol "VAR2" = 2, type = 0x05 [DEFINED DEF ], ref = [2 ], owner = NULL
-  Symbol "VAR3" = 3, type = 0x05 [DEFINED DEF ], ref = [4 ], owner = NULL
-  Symbol "VAR4" = 4, type = 0x05 [DEFINED DEF ], ref = [5 ], owner = NULL
-  Symbol "VAR5" = 5, type = 0x05 [DEFINED DEF ], ref = [6 ], owner = NULL
+  Symbol "VAR1" = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
+  Symbol "VAR2" = 2, type = 0x01 [DEFINED ], ref = [2 ], owner = NULL
+  Symbol "VAR3" = 3, type = 0x01 [DEFINED ], ref = [4 ], owner = NULL
+  Symbol "VAR4" = 4, type = 0x01 [DEFINED ], ref = [5 ], owner = NULL
+  Symbol "VAR5" = 5, type = 0x01 [DEFINED ], ref = [6 ], owner = NULL
 memalloc symref.c(1): free 32 bytes at ADDR_22 allocated at symref.c(1)
 memalloc symref.c(2): free 12 bytes at ADDR_23 allocated at symref.c(2)
 memalloc symref.c(2): free 40 bytes at ADDR_21 allocated at symref.c(2)
@@ -405,20 +413,20 @@ memalloc symref.c(1): alloc 32 bytes at ADDR_107
 memalloc symref.c(2): alloc 12 bytes at ADDR_108
 memalloc strhash.c(4): alloc 40 bytes at ADDR_109
 Symtab "tab": 
-  Symbol "ONE" = 1, type = 0x05 [DEFINED DEF ], ref = [7 ], owner = NULL
-  Symbol "TWO" = 2, type = 0x05 [DEFINED DEF ], ref = [8 ], owner = NULL
-  Symbol "THREE" = 3, type = 0x05 [DEFINED DEF ], ref = [9 ], owner = NULL
-  Symbol "FOUR" = 4, type = 0x05 [DEFINED DEF ], ref = [10 ], owner = NULL
+  Symbol "ONE" = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
+  Symbol "TWO" = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
+  Symbol "THREE" = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
+  Symbol "FOUR" = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
 Symtab "tab by name": 
-  Symbol "FOUR" = 4, type = 0x05 [DEFINED DEF ], ref = [10 ], owner = NULL
-  Symbol "ONE" = 1, type = 0x05 [DEFINED DEF ], ref = [7 ], owner = NULL
-  Symbol "THREE" = 3, type = 0x05 [DEFINED DEF ], ref = [9 ], owner = NULL
-  Symbol "TWO" = 2, type = 0x05 [DEFINED DEF ], ref = [8 ], owner = NULL
+  Symbol "FOUR" = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
+  Symbol "ONE" = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
+  Symbol "THREE" = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
+  Symbol "TWO" = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
 Symtab "tab by value": 
-  Symbol "ONE" = 1, type = 0x05 [DEFINED DEF ], ref = [7 ], owner = NULL
-  Symbol "TWO" = 2, type = 0x05 [DEFINED DEF ], ref = [8 ], owner = NULL
-  Symbol "THREE" = 3, type = 0x05 [DEFINED DEF ], ref = [9 ], owner = NULL
-  Symbol "FOUR" = 4, type = 0x05 [DEFINED DEF ], ref = [10 ], owner = NULL
+  Symbol "ONE" = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
+  Symbol "TWO" = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
+  Symbol "THREE" = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
+  Symbol "FOUR" = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
 memalloc symref.c(1): free 32 bytes at ADDR_84 allocated at symref.c(1)
 memalloc symref.c(2): free 12 bytes at ADDR_85 allocated at symref.c(2)
 memalloc symref.c(2): free 40 bytes at ADDR_81 allocated at symref.c(2)
@@ -503,11 +511,11 @@ memalloc strhash.c(2): free 44 bytes at ADDR_142 allocated at strhash.c(5)
 memalloc strhash.c(3): free 40 bytes at ADDR_141 allocated at strhash.c(4)
 Symbol "NN" = 12, type = 0x1B [DEFINED TOUCHED ADDR LOCAL ], ref = [10 6 8 ], owner = CURRENTMODULE
 Symtab "global tab": 
-  Symbol "ASMPC" = 12, type = 0x07 [DEFINED TOUCHED DEF ], ref = [3 ], owner = NULL
+  Symbol "ASMPC" = 12, type = 0x03 [DEFINED TOUCHED ], ref = [3 ], owner = NULL
 Symtab "static tab": 
-  Symbol "WIN32" = 1, type = 0x05 [DEFINED DEF ], ref = [1 ], owner = NULL
+  Symbol "WIN32" = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
 Symtab "local tab": 
-  Symbol "WIN32" = 1, type = 0x05 [DEFINED DEF ], ref = [1 ], owner = NULL
+  Symbol "WIN32" = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
   Symbol "NN" = 12, type = 0x1B [DEFINED TOUCHED ADDR LOCAL ], ref = [10 6 8 ], owner = CURRENTMODULE
 Symtab "not declared tab": EMPTY
 

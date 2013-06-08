@@ -20,9 +20,14 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.40 2013-06-01 01:26:26 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.41 2013-06-08 23:37:32 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.40  2013-06-01 01:26:26  pauloscustodio
+/* Revision 1.41  2013-06-08 23:37:32  pauloscustodio
+/* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
+/*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
+/* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+/*
+/* Revision 1.40  2013/06/01 01:26:26  pauloscustodio
 /* Version 1.2.0
 /*
 /* Revision 1.39  2013/02/19 22:52:40  pauloscustodio
@@ -944,7 +949,7 @@ Based on 1.0.31
     - Remove global ASSEMBLE_ERROR, not used.
     - Remove global ASMERROR, redundant with TOTALERRORS.
     - Remove IllegalArgumentException, replace by FatalErrorException.
-    - define_symbol() and define_def_symbol() defined as void, a fatal error is
+    - define_symbol() defined as void, a fatal error is
       always raised on error.
     - New errors_def.h with error name and string together, for easier
       maintenance.
