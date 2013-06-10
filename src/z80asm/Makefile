@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.60 2013-06-08 22:58:22 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.61 2013-06-10 23:08:03 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.60  2013-06-08 22:58:22  pauloscustodio
+# Revision 1.61  2013-06-10 23:08:03  pauloscustodio
+# depends
+#
+# Revision 1.60  2013/06/08 22:58:22  pauloscustodio
 # Add module.c
 #
 # Revision 1.59  2013/06/01 01:24:21  pauloscustodio
@@ -402,8 +405,8 @@ file.o: ../config.h errors.h errors_def.h file.h safestr.h strlist.h
 file.o: strpool.h strutil.h uthash.h die.h
 hist.o: memalloc.h except.h e4c.h hist.h
 ldinstr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h types.h
-ldinstr.o: symbol.h model.h objfile.h class.h queue.h symtab.h classhash.h
-ldinstr.o: strhash.h uthash.h die.h sym.h symref.h classlist.h errors.h
+ldinstr.o: sym.h class.h queue.h symref.h classlist.h symbol.h model.h
+ldinstr.o: objfile.h symtab.h classhash.h strhash.h uthash.h die.h errors.h
 ldinstr.o: errors_def.h codearea.h options.h
 listfile.o: memalloc.h except.h e4c.h listfile.h class.h queue.h types.h
 listfile.o: dynstr.h symref.h classlist.h file.h safestr.h strlist.h
@@ -411,6 +414,9 @@ listfile.o: options.h symbol.h model.h objfile.h symtab.h classhash.h
 listfile.o: strhash.h uthash.h die.h sym.h z80asm.h config.h ../config.h
 listfile.o: errors.h errors_def.h hist.h strpool.h strutil.h codearea.h
 memalloc.o: memalloc.h except.h e4c.h types.h die.h queue.h
+module.o: memalloc.h except.h e4c.h module.h class.h queue.h types.h
+module.o: classlist.h dynstr.h symtab.h classhash.h strhash.h uthash.h die.h
+module.o: sym.h symref.h
 modlink.o: memalloc.h except.h e4c.h codearea.h types.h config.h ../config.h
 modlink.o: errors.h errors_def.h file.h safestr.h strlist.h class.h queue.h
 modlink.o: listfile.h dynstr.h symref.h classlist.h options.h symbol.h
@@ -429,8 +435,8 @@ prsident.o: errors.h errors_def.h listfile.h class.h queue.h dynstr.h
 prsident.o: symref.h classlist.h options.h symbol.h model.h objfile.h
 prsident.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h z80asm.h
 prsline.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h types.h
-prsline.o: symbol.h model.h objfile.h class.h queue.h symtab.h classhash.h
-prsline.o: strhash.h uthash.h die.h sym.h symref.h classlist.h options.h
+prsline.o: sym.h class.h queue.h symref.h classlist.h symbol.h model.h
+prsline.o: objfile.h symtab.h classhash.h strhash.h uthash.h die.h options.h
 prsline.o: errors.h errors_def.h
 safestr.o: memalloc.h except.h e4c.h safestr.h types.h strutil.h
 scan.o: memalloc.h except.h e4c.h parse.h types.h codearea.h class.h queue.h
@@ -463,8 +469,8 @@ z80asm.o: hist.h listfile.h dynstr.h symref.h classlist.h objfile.h options.h
 z80asm.o: symbol.h model.h symtab.h classhash.h strhash.h uthash.h die.h
 z80asm.o: sym.h strpool.h strutil.h z80asm.h
 z80instr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h types.h
-z80instr.o: symbol.h model.h objfile.h class.h queue.h symtab.h classhash.h
-z80instr.o: strhash.h uthash.h die.h sym.h symref.h classlist.h options.h
+z80instr.o: sym.h class.h queue.h symref.h classlist.h symbol.h model.h
+z80instr.o: objfile.h symtab.h classhash.h strhash.h uthash.h die.h options.h
 z80instr.o: errors.h errors_def.h codearea.h
 z80pass.o: memalloc.h except.h e4c.h codearea.h types.h config.h ../config.h
 z80pass.o: errors.h errors_def.h file.h safestr.h strlist.h class.h queue.h
