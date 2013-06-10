@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fputc.c,v 1.3 2013-05-28 06:02:44 stefano Exp $
+ * $Id: fputc_callee.c,v 1.1 2013-06-10 13:15:50 stefano Exp $
  */
 
 
@@ -19,16 +19,30 @@
 
 
 
-int fputc(int c,FILE *fp)
+int fputc_callee(int c,FILE *fp)
 {
-#ifdef Z80
+//#ifdef Z80
 #asm
+
+XDEF ASMDISP_FPUTC_CALLEE
+
 	pop	de
 	pop	ix	;fp
 	pop	bc	;c
-	push	bc
-	push	ix
-	push	de
+
+	push de
+
+.asmentry
+
+DEFC ASMDISP_FPUTC_CALLEE = asmentry - fputc_callee
+XDEF ASMDISP_FPUTC_CALLEE
+
+;	pop	de
+;	pop	ix	;fp
+;	pop	bc	;c
+;	push	bc
+;	push	ix
+;	push	de
 	ld	hl,-1	;EOF
 	ld	a,(ix+fp_flags)
 	and	a	;no thing
@@ -96,6 +110,10 @@ int fputc(int c,FILE *fp)
 	pop	bc	;discard values
 	pop	bc
 #endasm
+
+/*
+ *  This code portion probably can't be used anymore as we're in 'CALLEE' mode.
+ * 
 #else
         if ( fp->flags == 0 || fp->flags & _IOREAD ) return EOF;
 
@@ -105,8 +123,10 @@ int fputc(int c,FILE *fp)
 	} 
 #ifdef NET_STDIO
 	if ( fp->flags & _IONETWORK)
-		return(fputc_net(fp->fd,c)
+		return(fputc_net(fp->fd,c));
 #endif
 	return (writebyte(fp->fd,c));
 #endif
+*/
+
 }

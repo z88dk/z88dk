@@ -14,7 +14,7 @@
  *	Rewrote 'miniprintn' in assembler, less usage of stack and save 180 bytes
  * 
  * --------
- * $Id: vfprintf_mini.c,v 1.8 2013-04-24 17:22:18 stefano Exp $
+ * $Id: vfprintf_mini.c,v 1.9 2013-06-10 13:15:50 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -87,7 +87,7 @@ int vfprintf_mini(FILE *fp, unsigned char *fmt,void *ap)
 */
 #asm
 
-LIB	fputc
+;LIB	fputc
 LIB _miniprintn
 LIB	l_glong
 LIB	l_int2long_s
@@ -274,7 +274,7 @@ static void __CALLEE__ miniprintn(long number, FILE *file, unsigned char flag)
 #asm
 LIB l_long_neg
 LIB l_long_div_u
-LIB fputc
+LIB fputc_callee
 
 .printn2
 	pop af	; ret addr.
@@ -365,12 +365,14 @@ LIB fputc
 
 
 .doprint
+	push bc
 	ld	h,0
 	push	hl
 	push	bc	; FILE ptr
-	call	fputc
+	call	fputc_callee
+	;pop bc
+	;pop hl
 	pop bc
-	pop		hl
 	ret
 
 .nullstr

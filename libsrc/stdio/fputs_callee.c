@@ -6,7 +6,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fputs.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
+ * $Id: fputs_callee.c,v 1.1 2013-06-10 13:15:50 stefano Exp $
  */
 
 
@@ -15,16 +15,28 @@
 
 
 
-int fputs(unsigned char *s,FILE *fp)
+int fputs_callee(unsigned char *s,FILE *fp)
 {
-#ifdef Z80
+//#ifdef Z80
 #asm
+
 	pop	hl	;ret
 	pop	ix	;fp
 	pop	de	;s
-	push	de
-	push	ix
-	push	hl
+
+	push hl
+
+.asmentry
+
+DEFC ASMDISP_FPUTS_CALLEE = asmentry - fputs_callee
+XDEF ASMDISP_FPUTS_CALLEE
+
+;	pop	hl	;ret
+;	pop	ix	;fp
+;	pop	de	;s
+;	push	de
+;	push	ix
+;	push	hl
 .loop
 	ld	hl,1	;non -ve number
 	ld	a,(de)	;*s
@@ -36,9 +48,11 @@ int fputs(unsigned char *s,FILE *fp)
 	push	de	;keep s
 	push	hl	;send *s++
 	push	ix	;send fp
-	call	fputc
-	pop	ix	;get fp back
-	pop	bc	;discard hl
+
+	call	fputc_callee
+
+	;pop	ix	;get fp back
+	;pop	bc	;discard hl
 	pop	de	;get s back
 	ld	a,l	;test for EOF returned
 	and	h
@@ -46,9 +60,11 @@ int fputs(unsigned char *s,FILE *fp)
 	ret	z
 	jr	loop
 #endasm
+/*
 #else
         while (*s) {
                 if ( fputc(*s++,fp) == EOF) return(EOF);
         }
 #endif
+*/
 }

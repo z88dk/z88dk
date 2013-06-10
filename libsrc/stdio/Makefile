@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.38 2013-03-08 13:40:20 stefano Exp $
+# $Id: Makefile,v 1.39 2013-06-10 13:15:50 stefano Exp $
 #
 
 include ../Make.config
@@ -17,7 +17,7 @@ STDCFILES = \
 	fgets_cons.c \
 	fopen.c \
 	fopen_z88.c \
-	fputs.c \
+	fputs_callee.c \
 	freopen.c \
 	fseek.c \
 	ftell.c \
@@ -31,7 +31,7 @@ STDCFILES = \
 GENCFILES = \
 	fclose.c \
 	fgetc.c \
-	fputc.c \
+	fputc_callee.c \
 	freopen_z88.c \
 	fread.c 
 
@@ -56,7 +56,7 @@ lz88net: std net z88_x
 net:
 	zcc +z88 $(CFLAGS) -DNET_STDIO fclose.c
 	zcc +z88 $(CFLAGS) -DNET_STDIO fgetc.c
-	zcc +z88 $(CFLAGS) -DNET_STDIO fputc.c
+	zcc +z88 $(CFLAGS) -DNET_STDIO fputc_callee.c
 	zcc +z88 $(CFLAGS) -DNET_STDIO freopen_z88.c
 	zcc +z88 $(CFLAGS) -DNET_STDIO fflush.c
 	zcc +z88 $(CFLAGS) -DNET_STDIO fread.c
@@ -68,7 +68,7 @@ net:
 cpm:	$(GENCOBJECTS)
 	zcc +test $(CFLAGS) -D__CPM__ fclose.c
 	zcc +test $(CFLAGS) -D__CPM__ fgetc.c
-	zcc +test $(CFLAGS) -D__CPM__ fputc.c
+	zcc +test $(CFLAGS) -D__CPM__ fputc_callee.c
 	zcc +test $(CFLAGS) -D__CPM__ freopen_z88.c
 	zcc +test $(CFLAGS) -D__CPM__ fread.c
 
@@ -76,7 +76,7 @@ cpm:	$(GENCOBJECTS)
 gen:
 	zcc +test $(CFLAGS) fclose.c
 	zcc +test $(CFLAGS) fgetc.c
-	zcc +test $(CFLAGS) fputc.c
+	zcc +test $(CFLAGS) fputc_callee.c
 	zcc +test $(CFLAGS) freopen_z88.c
 	zcc +test $(CFLAGS) fread.c
 	cd 8080; $(MAKE) ; cd ..
@@ -95,7 +95,7 @@ generic_iy:
 	zcc +test $(CFLAGS) -Ca-IXIY fgets_cons.c
 	zcc +test $(CFLAGS) -Ca-IXIY fopen.c
 	zcc +test $(CFLAGS) -Ca-IXIY fopen_z88.c
-	zcc +test $(CFLAGS) -Ca-IXIY fputs.c
+	zcc +test $(CFLAGS) -Ca-IXIY fputs_callee.c
 	zcc +test $(CFLAGS) -Ca-IXIY freopen.c
 	zcc +test $(CFLAGS) -Ca-IXIY fseek.c
 	zcc +test $(CFLAGS) -Ca-IXIY ftell.c
@@ -108,7 +108,7 @@ generic_iy:
 #gen
 	zcc +test $(CFLAGS) -Ca-IXIY fclose.c
 	zcc +test $(CFLAGS) -Ca-IXIY fgetc.c
-	zcc +test $(CFLAGS) -Ca-IXIY fputc.c
+	zcc +test $(CFLAGS) -Ca-IXIY fputc_callee.c
 	zcc +test $(CFLAGS) -Ca-IXIY freopen_z88.c
 	zcc +test $(CFLAGS) -Ca-IXIY fread.c
 

@@ -31,7 +31,9 @@ stdio/fgets_cons
 stdio/fopen
 stdio/fopen_z88
 stdio/fputc
+stdio/fputc_callee
 stdio/fputs
+stdio/fputs_callee
 stdio/fread
 stdio/freopen
 stdio/freopen_z88
@@ -48,4 +50,6 @@ stdio/vfprintf_mini
 stdio_new/error/stdio_error_zc
 stdio_new/general/stdio_basechar
 stdio_new/general/stdio_atou
+stdio_new/general/stdio_ultoa_any
+stdio_new/general/stdio_utoa_any
 @strings/string.lst

@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fgetc.c,v 1.9 2013-06-07 14:12:57 stefano Exp $
+ * $Id: fgetc.c,v 1.10 2013-06-10 13:15:50 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -26,12 +26,17 @@
 
 int fgetc(FILE *fp)
 {
-#ifdef Z80
+//#ifdef Z80
 #asm
-	pop	bc
-	pop	ix	;fp
-	push	ix
-	push	bc
+;__FASTCALL__
+;	pop	bc
+;	pop	ix	;fp
+;	push	ix
+;	push	bc
+
+	push hl
+	pop ix
+
 	ld	hl,-1	;EOF
 	ld	a,(ix+fp_flags)	;get flags
 	and	a
@@ -143,6 +148,7 @@ int fgetc(FILE *fp)
 	or	_IOEOF
 	ld	(ix+fp_flags),a	;set EOF, return with EOF
 #endasm
+/*
 #else
         int     c;
         if ( fp->flags == 0 || (fp->flags & _IOWRITE)   ) return EOF;
@@ -154,4 +160,5 @@ int fgetc(FILE *fp)
                         fp->flags&=_IOEOF;
         return(c);
 #endif
+*/
 }
