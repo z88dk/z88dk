@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.89 2013-06-08 23:37:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.90 2013-06-10 23:11:33 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.89  2013-06-08 23:37:32  pauloscustodio
+/* Revision 1.90  2013-06-10 23:11:33  pauloscustodio
+/* CH_0023 : Remove notdecl_tab
+/*
+/* Revision 1.89  2013/06/08 23:37:32  pauloscustodio
 /* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
 /*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
 /* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
@@ -859,7 +862,6 @@ static void do_assemble( char *src_filename, char *obj_filename )
         }
 
         SymbolHash_remove_all( CURRENTMODULE->local_tab );
-        SymbolHash_remove_all( CURRENTMODULE->notdecl_tab );
         SymbolHash_remove_all( get_global_tab() );
 
         if ( verbose )
@@ -1032,7 +1034,6 @@ NewModule( void )
     newm->origin = 65535;
     newm->cfile = NULL;
     newm->local_tab   = OBJ_NEW(SymbolHash);
-    newm->notdecl_tab = OBJ_NEW(SymbolHash);
 
     newm->mexpr = xcalloc_struct( struct expression );
 
@@ -1119,7 +1120,6 @@ ReleaseModules( void )
         }
 
         OBJ_DELETE( curptr->local_tab );
-        OBJ_DELETE( curptr->notdecl_tab );
 
         if ( curptr->mexpr != NULL )
         {

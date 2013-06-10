@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.25 2013-06-08 23:37:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.26 2013-06-10 23:11:33 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.25  2013-06-08 23:37:32  pauloscustodio
+/* Revision 1.26  2013-06-10 23:11:33  pauloscustodio
+/* CH_0023 : Remove notdecl_tab
+/*
+/* Revision 1.25  2013/06/08 23:37:32  pauloscustodio
 /* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
 /*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
 /* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
@@ -250,7 +253,6 @@ struct module
     size_t             startoffset;       /* this module's start offset from start of code buffer */
     long               origin;            /* Address Origin of current machine code module during linking */
     struct sourcefile  *cfile;            /* pointer to current file record */
-    SymbolHash        *notdecl_tab;       /* pointer to root of symbols not yet declared/defined */
     SymbolHash        *local_tab;         /* pointer to root of local symbols tree */
     struct expression  *mexpr;            /* pointer to expressions in this module */
     struct JRPC_Hdr    *JRaddr;           /* pointer to list of JR PC addresses */

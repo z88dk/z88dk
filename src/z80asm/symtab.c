@@ -18,9 +18,12 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.4 2013-06-08 23:37:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.5 2013-06-10 23:11:33 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.4  2013-06-08 23:37:32  pauloscustodio
+Revision 1.5  2013-06-10 23:11:33  pauloscustodio
+CH_0023 : Remove notdecl_tab
+
+Revision 1.4  2013/06/08 23:37:32  pauloscustodio
 Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
 Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
@@ -160,28 +163,15 @@ Symbol *find_symbol( char *name, SymbolHash *symtab )
     Symbol *sym;
 
 	sym = SymbolHash_get( symtab, name );
+
+	/* Bodge for handling underscores (sdcc hack) */
+    if ( sym == NULL && sdcc_hacks && name[0] == '_' )
+        sym = SymbolHash_get( symtab, name + 1 );
+
 	if ( sym != NULL )
 		sym->type |= SYMTOUCHED;
 
 	return sym;
-}
-
-/*-----------------------------------------------------------------------------
-*   delete notdecl_tab symbol, if any with same name,
-*	moving all page references to new defined symbol
-*----------------------------------------------------------------------------*/
-static void delete_notdecl_symbol ( Symbol *defined_symbol )
-{
-	Symbol *notdecl_sym;
-
-	notdecl_sym = find_symbol( defined_symbol->name, CURRENTMODULE->notdecl_tab );
-	if ( notdecl_sym != NULL )
-	{
-		/* move all references */
-		cat_symbol_refs( defined_symbol->references, notdecl_sym->references );
-
-		SymbolHash_remove( CURRENTMODULE->notdecl_tab, defined_symbol->name );
-	}
 }
 
 /*-----------------------------------------------------------------------------
@@ -205,9 +195,6 @@ static void define_local_symbol( char *name, long value, byte_t type )
         {
             /* First element in list is definition of symbol */
 			add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
-			
-			/* Move page references from forward referenced symbol */
-            delete_notdecl_symbol( sym );    
         }
 	}
 	else if ( sym->type & SYMDEFINED )	/* local symbol already defined */
@@ -224,9 +211,6 @@ static void define_local_symbol( char *name, long value, byte_t type )
         {
             /* First element in list is definition of symbol */
 			add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
-			
-			/* Move page references from possible forward referenced symbol */
-            delete_notdecl_symbol( sym );       
         }
 	}
 }
@@ -264,10 +248,7 @@ void define_symbol( char *name, long value, byte_t type )
             {
 				/* First element in list is definition of symbol */
                 add_symbol_ref( sym->references, list_get_page_nr(), TRUE );     
-
-				/* Move page references from possible forward referenced symbol  */
-                delete_notdecl_symbol( sym );   
-            }
+			}
 		}
 	}
 	else								/* Extern declaration of symbol, now define local symbol. */
@@ -293,29 +274,13 @@ Symbol *get_used_symbol( char *name )
 		sym = find_symbol( name, global_tab );				/* search in global tab */
         if ( sym == NULL )
         {
-			/* not local, not global -> add to not-declared list, only if listing */
-            if ( option_symtable && option_list )
-            {
-				sym = find_symbol( name, CURRENTMODULE->notdecl_tab );
-															/* search in not-declared tab */
-                if ( sym == NULL )
-                {
-                    sym = Symbol_create( name, 0, SYM_NOTDEFINED, CURRENTMODULE );
-					SymbolHash_set( CURRENTMODULE->notdecl_tab, name, sym );
-                }
-                else
-                {
-                    /* symbol found in forward referenced tree, note page reference */
-					add_symbol_ref( sym->references, list_get_page_nr(), FALSE );
-                }      
-            }
-
-            return NULL;
+            sym = Symbol_create( name, 0, SYM_NOTDEFINED, CURRENTMODULE );
+			SymbolHash_set( CURRENTMODULE->local_tab, name, sym );
 		}
 	}
 
 	/* add page references */
-	if ( sym != NULL && option_symtable && option_list )
+	if ( option_symtable && option_list )
 		add_symbol_ref( sym->references, list_get_page_nr(), FALSE );
 
 	return sym;

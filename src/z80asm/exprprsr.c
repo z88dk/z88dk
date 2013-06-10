@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.36 2013-06-08 23:37:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.37 2013-06-10 23:11:33 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.36  2013-06-08 23:37:32  pauloscustodio
+/* Revision 1.37  2013-06-10 23:11:33  pauloscustodio
+/* CH_0023 : Remove notdecl_tab
+/*
+/* Revision 1.36  2013/06/08 23:37:32  pauloscustodio
 /* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
 /*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
 /* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
@@ -321,33 +324,19 @@ Factor( struct expr *pfixexpr )
     {
         case name:
             symptr = get_used_symbol( ident );
-
-            /* Bodge for handling underscores (sdcc hack) */
-            if ( sdcc_hacks == ON && ident[0] == '_' && symptr == NULL )
+            if ( symptr->type & SYMDEFINED )
             {
-                symptr = get_used_symbol( ident + 1 );
-            }
-
-            if ( symptr != NULL )
-            {
-                if ( symptr->type & SYMDEFINED )
-                {
-                    pfixexpr->rangetype |= ( symptr->type & SYMTYPE );      /* copy appropriate type bits */
-                    NewPfixSymbol( pfixexpr, symptr->value, number, NULL, symptr->type );
-                }
-                else
-                {
-                    pfixexpr->rangetype |= ( ( symptr->type & SYMTYPE ) | NOTEVALUABLE );
-                    /* copy appropriate declaration bits */
-
-                    NewPfixSymbol( pfixexpr, 0, number, ident, symptr->type );
-                    /* symbol only declared, store symbol name */
-                }
+				/* copy appropriate type bits */
+                pfixexpr->rangetype |= ( symptr->type & SYMTYPE );
+                NewPfixSymbol( pfixexpr, symptr->value, number, NULL, symptr->type );
             }
             else
             {
-                pfixexpr->rangetype |= NOTEVALUABLE;        /* expression not evaluable */
-                NewPfixSymbol( pfixexpr, 0, number, ident, SYM_NOTDEFINED ); /* symbol not found */
+                /* copy appropriate declaration bits */
+                pfixexpr->rangetype |= ( symptr->type & SYMTYPE ) | NOTEVALUABLE;
+
+				/* symbol only declared, store symbol name */
+				NewPfixSymbol( pfixexpr, 0, number, ident, symptr->type );
             }
 
             strcpy( pfixexpr->infixptr, ident );    /* add identifier to infix expr */
@@ -765,7 +754,7 @@ EvalPfixExpr( struct expr *pfixlist )
                     else
                     {
                         /* symbol was not defined and not declared */
-                        if ( pfixexpr->type != SYM_NOTDEFINED )
+                        if ( (pfixexpr->type & ~ SYMTOUCHED) != SYM_NOTDEFINED )
                         {
                             /* if all bits are set to zero */
                             if ( pfixexpr->type & SYMLOCAL )
@@ -806,19 +795,12 @@ EvalPfixExpr( struct expr *pfixlist )
                             /* try to find symbol now as either declared local or global */
                             symptr = get_used_symbol( pfixexpr->id );       
 
-                            if ( symptr != NULL )
-                            {
-                                pfixlist->rangetype |= ( symptr->type & SYMTYPE );    /* copy appropriate type bits */
+							/* copy appropriate type bits */
+                            pfixlist->rangetype |= ( symptr->type & SYMTYPE );    
 
-                                if ( symptr->type & SYMDEFINED )
-                                {
-                                    PushItem( symptr->value, &stackptr );
-                                }
-                                else
-                                {
-                                    pfixlist->rangetype |= NOTEVALUABLE;
-                                    PushItem( 0, &stackptr );
-                                }
+                            if ( symptr->type & SYMDEFINED )
+                            {
+                                PushItem( symptr->value, &stackptr );
                             }
                             else
                             {

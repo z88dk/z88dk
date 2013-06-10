@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.41 2013-06-08 23:37:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.42 2013-06-10 23:11:33 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.41  2013-06-08 23:37:32  pauloscustodio
+/* Revision 1.42  2013-06-10 23:11:33  pauloscustodio
+/* CH_0023 : Remove notdecl_tab
+/*
+/* Revision 1.41  2013/06/08 23:37:32  pauloscustodio
 /* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
 /*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
 /* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
@@ -1247,6 +1250,17 @@ Based on 1.0.31
 	  was reused.
 
 -------------------------------------------------------------------------------
+11.06.2013 [1.2.1] (pauloscustodio)
+-------------------------------------------------------------------------------
+	BUG_0035 : Symbol not defined in forward references
+		Symbol not defined error when a symbol is used more than once before 
+		being defined. Consequence of removal of notdecl_tab symbol table.
+
+	CH_0023 : Remove notdecl_tab
+		Symbol is created in symbol table on first usage, SYMDEFINED bit
+		identifies if it was defined or not.
+		
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1276,7 +1290,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "1.2.0"
+#define VERSION     "1.2.1"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS
