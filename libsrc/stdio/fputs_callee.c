@@ -6,7 +6,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fputs_callee.c,v 1.1 2013-06-10 13:15:50 stefano Exp $
+ * $Id: fputs_callee.c,v 1.2 2013-06-11 09:17:15 stefano Exp $
  */
 
 

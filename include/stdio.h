@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.23 2013-06-10 13:15:49 stefano Exp $ */
+/* $Id: stdio.h,v 1.24 2013-06-11 09:17:15 stefano Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -146,16 +146,25 @@ extern void __LIB__ closeall();
 /* Optimized stdio uses the 'CALLEE' convention here and there   */
 
 extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp);
+
+extern int __LIB__ fputs(unsigned char *s,  FILE *fp);
+extern int __LIB__ fputc(int c, FILE *fp) __SMALLCDECL;
+
 extern int __LIB__ __CALLEE__ fputs_callee(unsigned char *s,  FILE *fp);
-extern int __LIB__ __CALLEE__ fputc_callee(int c, FILE *fp) __SMALLCDECL;
+extern int __LIB__ __CALLEE__ fputc_callee(int c, FILE *fp);
 extern int __LIB__ __FASTCALL__ fgetc(FILE *fp);
 #define getc(f) fgetc(f)
 extern int __LIB__ ungetc(int c, FILE *);
 extern int __LIB__ feof(FILE *fp);
 extern int __LIB__ puts(unsigned char *);
 
-#define fputc(a,b)   fputc_callee(a,b)
 #define fputs(a,b)   fputs_callee(a,b)
+#define fputc(a,b)   fputc_callee(a,b)
+
+/* Some standard macros */
+#define putc(bp,fp) fputc_callee(bp,fp)
+#define putchar(bp) fputc_callee(bp,stdout)
+#define getchar()  fgetc(stdin)
 
 /* --------------------------------------------------------------*/
 
@@ -173,6 +182,11 @@ extern int __LIB__ fgetc(FILE *fp);
 extern int __LIB__ ungetc(int c, FILE *);
 extern int __LIB__ feof(FILE *fp);
 extern int __LIB__ puts(unsigned char *);
+
+/* Some standard macros */
+#define putc(bp,fp) fputc(bp,fp)
+#define putchar(bp) fputc(bp,stdout)
+#define getchar()  fgetc(stdin)
 
 /* --------------------------------------------------------------*/
 
@@ -193,11 +207,6 @@ extern int __LIB__ fwrite(void *ptr, int size, int num, FILE *);
 /* You shouldn't use gets. z88 gets() is limited to 255 characters */
 extern char __LIB__ *gets(char *s);
 
-/* Some standard macros */
-
-#define putc(bp,fp) fputc(bp,fp)
-#define putchar(bp) fputc(bp,stdout)
-#define getchar()  fgetc(stdin)
 
 /*
  * Yes! vfprintf is deliberately without a __LIB__ cos

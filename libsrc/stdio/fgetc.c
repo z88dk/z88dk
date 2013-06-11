@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fgetc.c,v 1.10 2013-06-10 13:15:50 stefano Exp $
+ * $Id: fgetc.c,v 1.11 2013-06-11 09:17:15 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -28,12 +28,12 @@ int fgetc(FILE *fp)
 {
 //#ifdef Z80
 #asm
-;__FASTCALL__
 ;	pop	bc
 ;	pop	ix	;fp
 ;	push	ix
 ;	push	bc
 
+;__FASTCALL__
 	push hl
 	pop ix
 

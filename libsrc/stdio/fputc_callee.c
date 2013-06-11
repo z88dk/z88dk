@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fputc_callee.c,v 1.1 2013-06-10 13:15:50 stefano Exp $
+ * $Id: fputc_callee.c,v 1.2 2013-06-11 09:17:15 stefano Exp $
  */
 
 
@@ -24,8 +24,6 @@ int fputc_callee(int c,FILE *fp)
 //#ifdef Z80
 #asm
 
-XDEF ASMDISP_FPUTC_CALLEE
-
 	pop	de
 	pop	ix	;fp
 	pop	bc	;c
@@ -43,6 +41,7 @@ XDEF ASMDISP_FPUTC_CALLEE
 ;	push	bc
 ;	push	ix
 ;	push	de
+
 	ld	hl,-1	;EOF
 	ld	a,(ix+fp_flags)
 	and	a	;no thing
@@ -71,7 +70,7 @@ XDEF ASMDISP_FPUTC_CALLEE
 	push	hl	;socket
 	push	bc	;byte
 	call	fputc_net
-	pop	bc
+	pop	hl
 	pop	bc
 	ret
 .no_net
@@ -107,8 +106,9 @@ XDEF ASMDISP_FPUTC_CALLEE
 #endif
 	push	bc	;c
 	call	writebyte
-	pop	bc	;discard values
-	pop	bc
+	pop	hl	;discard values
+	pop	bc	; fd
+	ret
 #endasm
 
 /*

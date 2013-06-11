@@ -14,7 +14,7 @@
  *	Rewrote 'miniprintn' in assembler, less usage of stack and save 180 bytes
  * 
  * --------
- * $Id: vfprintf_mini.c,v 1.9 2013-06-10 13:15:50 stefano Exp $
+ * $Id: vfprintf_mini.c,v 1.10 2013-06-11 09:17:15 stefano Exp $
  */
 
 #define ANSI_STDIO
@@ -28,7 +28,7 @@
  * to step to the next one..
  */
 
-static void __CALLEE__ miniprintn(long number, FILE *fil, unsigned char flag);
+static void miniprintn(long number, FILE *fil, unsigned char flag);
 
 int vfprintf_mini(FILE *fp, unsigned char *fmt,void *ap)
 {
@@ -92,7 +92,7 @@ LIB _miniprintn
 LIB	l_glong
 LIB	l_int2long_s
 
-.vfprintf_callee
+.vfprintf
 
 ; int vfprintf_mini(FILE *fp, unsigned char *fmt,void *ap)
 
@@ -230,13 +230,6 @@ LIB	l_int2long_s
 ._put_char
 	push de
 	push hl
-;	ld	h,0
-;	ld	l,a
-;	push hl
-;	push	bc
-;	call	fputc
-;	pop	bc
-;	pop	hl
 
 	ld		l,a
 	call	doprint	; awful trick to save few bytes
@@ -258,7 +251,7 @@ LIB	l_int2long_s
 }
 
 
-static void __CALLEE__ miniprintn(long number, FILE *file, unsigned char flag)
+static void miniprintn(long number, FILE *file, unsigned char flag)
 {
 		/*
         unsigned long i;
@@ -297,13 +290,6 @@ LIB fputc_callee
 	call	l_long_neg
 	pop bc
 	push bc
-
-	;push hl
-	;push de
-	;ld	l,'-'
-	;call	doprint
-	;pop de
-	;pop hl
 
 	ld	a,'-'
 	call	_put_char 	; awful trick to save few bytes
@@ -365,14 +351,14 @@ LIB fputc_callee
 
 
 .doprint
-	push bc
 	ld	h,0
+	push hl
+	push bc
 	push	hl
 	push	bc	; FILE ptr
 	call	fputc_callee
-	;pop bc
-	;pop hl
 	pop bc
+	pop hl
 	ret
 
 .nullstr

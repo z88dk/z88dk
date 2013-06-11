@@ -101,20 +101,32 @@ int vfprintf_comp(FILE *fd, unsigned char *ctl,void *ap)
 		if ( c == 's' && len>prec && preclen>0 )
 			len = prec ;
 		if (right)
+		#asm
+		;rep1
+		#endasm
 			while ( ((width--)-len) > 0 ) {
 				fputc(pad, fd) ;
 				++pf_count;
 			}
+		#asm
+		;rep1-end
+		#endasm
 		while ( len ) {
 			fputc(*sptr++, fd) ;
 			++pf_count;
 			--len ;
 			--width ;
 		}
+		#asm
+		;rep2
+		#endasm
 		while ( ((width--)-len) > 0 ) {
 			fputc(pad, fd) ;
 			++pf_count;
 		}
+		#asm
+		;rep2-end
+		#endasm
 	}
 	return(pf_count) ;
 }

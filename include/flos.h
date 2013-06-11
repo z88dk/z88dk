@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 2011
  *
- *		$Id: flos.h,v 1.12 2013-06-06 08:58:31 stefano Exp $
+ *		$Id: flos.h,v 1.13 2013-06-11 09:17:15 stefano Exp $
  * 
  */
 
