@@ -3,10 +3,14 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.25 2013-06-11 13:06:37 stefano Exp $ */
+/* $Id: stdio.h,v 1.26 2013-06-11 14:55:18 stefano Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
+
+#ifdef __RCMX000__
+#define SIMPLIFIED_STDIO
+#endif
 
 #ifdef FDSTDIO
 #include <z88stdio.h>
@@ -140,7 +144,29 @@ extern int __LIB__ fclose(FILE *fp);
 extern void __LIB__ closeall();
 
 
-#ifndef __RCMX000__
+#ifdef SIMPLIFIED_STDIO
+
+/* --------------------------------------------------------------*/
+/* The "8080" stdio lib is at the moment used only by the        */
+/* Rabbit Control Module, which is not fully z80 compatible      */
+
+extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp);
+extern int __LIB__ fputs(unsigned char *s,  FILE *fp);
+extern int __LIB__ fputc(int c, FILE *fp) __SMALLCDECL;
+extern int __LIB__ fgetc(FILE *fp);
+#define getc(f) fgetc(f)
+extern int __LIB__ ungetc(int c, FILE *);
+extern int __LIB__ feof(FILE *fp);
+extern int __LIB__ puts(unsigned char *);
+
+/* Some standard macros */
+#define putc(bp,fp) fputc(bp,fp)
+#define putchar(bp) fputc(bp,stdout)
+#define getchar()  fgetc(stdin)
+
+/* --------------------------------------------------------------*/
+
+#else
 
 /* --------------------------------------------------------------*/
 /* Optimized stdio uses the 'CALLEE' convention here and there   */
@@ -165,28 +191,6 @@ extern int __LIB__ puts(unsigned char *);
 /* Some standard macros */
 #define putc(bp,fp) fputc_callee(bp,fp)
 #define putchar(bp) fputc_callee(bp,stdout)
-#define getchar()  fgetc(stdin)
-
-/* --------------------------------------------------------------*/
-
-#else
-
-/* --------------------------------------------------------------*/
-/* The "8080" stdio lib is at the moment used only by the        */
-/* Rabbit Control Module, which is not fully z80 compatible      */
-
-extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp);
-extern int __LIB__ fputs(unsigned char *s,  FILE *fp);
-extern int __LIB__ fputc(int c, FILE *fp) __SMALLCDECL;
-extern int __LIB__ fgetc(FILE *fp);
-#define getc(f) fgetc(f)
-extern int __LIB__ ungetc(int c, FILE *);
-extern int __LIB__ feof(FILE *fp);
-extern int __LIB__ puts(unsigned char *);
-
-/* Some standard macros */
-#define putc(bp,fp) fputc(bp,fp)
-#define putchar(bp) fputc(bp,stdout)
 #define getchar()  fgetc(stdin)
 
 /* --------------------------------------------------------------*/

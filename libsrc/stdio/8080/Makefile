@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.6 2008-03-05 20:35:48 dom Exp $
+# $Id: Makefile,v 1.7 2013-06-11 14:55:18 stefano Exp $
 #
 
 include ../../Make.config
@@ -27,7 +27,7 @@ z88_x:
 	cd z88 ; $(MAKE) ; cd ..
 
 .c.o:
-	zcc +test $(CFLAGS) $*.c
+	zcc +test -DSIMPLIFIED_STDIO $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i $(AFILES)
