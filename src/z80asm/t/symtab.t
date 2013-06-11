@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.2 2013-06-01 01:24:23 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.3 2013-06-11 23:16:06 pauloscustodio Exp $
 # $Log: symtab.t,v $
-# Revision 1.2  2013-06-01 01:24:23  pauloscustodio
+# Revision 1.3  2013-06-11 23:16:06  pauloscustodio
+# Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
+# Add error message for invalid symbol and scope chars in object file.
+#
+# Revision 1.2  2013/06/01 01:24:23  pauloscustodio
 # CH_0022 : Replace avltree by hash table for symbol table
 #
 # Revision 1.1  2013/05/28 23:39:04  pauloscustodio
@@ -308,7 +312,7 @@ t_z80asm(
 t_z80asm(
 	asm		=> "xdef VAR : defc VAR=3 : defb VAR",
 	asm1	=> "xdef VAR : defc VAR=3 : defb VAR",
-	linkerr	=> "Error at module 'TEST1': Symbol 'VAR' redefined in module 'TEST1'",
+	linkerr	=> "Error at module 'TEST1': Symbol 'VAR' already defined in module 'TEST'",
 );
 
 
@@ -316,7 +320,7 @@ t_z80asm(
 t_z80asm(
 	asm		=> "xdef VAR : defc VAR=2",
 	asm1	=> "xdef VAR : defc VAR=3",
-	linkerr	=> "Error at module 'TEST1': Symbol 'VAR' redefined in module 'TEST1'",
+	linkerr	=> "Error at module 'TEST1': Symbol 'VAR' already defined in module 'TEST'",
 );
 
 

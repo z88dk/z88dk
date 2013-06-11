@@ -18,9 +18,13 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.4 2013-06-08 23:37:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.5 2013-06-11 23:16:06 pauloscustodio Exp $
 $Log: symtab.h,v $
-Revision 1.4  2013-06-08 23:37:32  pauloscustodio
+Revision 1.5  2013-06-11 23:16:06  pauloscustodio
+Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
+Add error message for invalid symbol and scope chars in object file.
+
+Revision 1.4  2013/06/08 23:37:32  pauloscustodio
 Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
 Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
@@ -61,6 +65,14 @@ extern void SymbolHash_cat( SymbolHash *target, SymbolHash *source );
 *   API
 *----------------------------------------------------------------------------*/
 
+/* return pointer to found symbol in a symbol table, otherwise NULL if not found */
+extern Symbol *find_symbol( char *name, SymbolHash *symtab );
+
+/* refer to a symbol in an expression
+   search for symbol in either local tree or global table, 
+   create undefined symbol if not found, return symbol */
+extern Symbol *get_used_symbol( char *name );
+
 /* define a static DEF symbol (from -D command line) */
 extern Symbol *define_static_def_sym( char *name, long value );
 
@@ -70,18 +82,18 @@ extern Symbol *define_global_def_sym( char *name, long value );
 /* define a local DEF symbol (e.g. DEFINE) */
 extern Symbol *define_local_def_sym( char *name, long value );
 
+/* define a new symbol in the local, global or global lib tabs */
+extern Symbol *define_local_sym( char *name, long value, byte_t type );
+extern Symbol *define_global_sym( char *name, long value, byte_t type );
+extern Symbol *define_library_sym( char *name, long value, byte_t type );
+
 /* copy the static symbols to CURRENTMODULE->local_tab */
 extern void copy_static_syms( void );
-
-
 
 /*-----------------------------------------------------------------------------
 *   Global Symbol Tables
 *----------------------------------------------------------------------------*/
 extern SymbolHash *get_global_tab(void);
-
-/* return pointer to found symbol in a symbol table, otherwise NULL if not found */
-extern Symbol *find_symbol( char *name, SymbolHash *symtab );
 
 /* create a symbol in the local or global tree:
    a) if not already global/extern, create in the local (CURRENTMODULE) symbol table
@@ -89,11 +101,6 @@ extern Symbol *find_symbol( char *name, SymbolHash *symtab );
    c) if declared global/extern and defined -> error REDEFINED
    d) if in global table and not global/extern -> define a new local symbol */
 extern void define_symbol( char *name, long value, byte_t type );
-
-/* refer to a symbol in an expression
-   search for symbol in either local tree or global table, 
-   return found pointer if defined/declared, otherwise return NULL */
-extern Symbol *get_used_symbol( char *name );
 
 /* declare a global symbol XDEF or XLIB */
 extern void declare_global_obj_symbol( char *name );

@@ -18,9 +18,13 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.5 2013-06-10 23:11:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.6 2013-06-11 23:16:06 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.5  2013-06-10 23:11:33  pauloscustodio
+Revision 1.6  2013-06-11 23:16:06  pauloscustodio
+Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
+Add error message for invalid symbol and scope chars in object file.
+
+Revision 1.5  2013/06/10 23:11:33  pauloscustodio
 CH_0023 : Remove notdecl_tab
 
 Revision 1.4  2013/06/08 23:37:32  pauloscustodio
@@ -91,70 +95,6 @@ DEF_GET_TAB(get_static_tab)
 #undef DEF_GET_TAB
 
 /*-----------------------------------------------------------------------------
-*   create a symbol in the given table, error if already defined
-*----------------------------------------------------------------------------*/
-Symbol *_define_sym( SymbolHash *symtab, 
-				  char *name, long value, byte_t type, struct module *owner )
-{
-    Symbol *sym;
-
-	sym = SymbolHash_get( symtab, name );
-	if ( sym != NULL )					/* Symbol already defined */
-    {
-        error( ERR_SYMBOL_REDEFINED, name );
-    }
-	else
-	{
-        sym = Symbol_create( name, value, type | SYMDEFINED, owner );
-		SymbolHash_set( symtab, name, sym );
-	}
-	return sym;
-}
-
-/*-----------------------------------------------------------------------------
-*   define a static symbol (from -D command line)
-*----------------------------------------------------------------------------*/
-Symbol *define_static_def_sym( char *name, long value )
-{
-	return _define_sym( get_static_tab(), name, value, SYMDEF, NULL );
-}
-
-/*-----------------------------------------------------------------------------
-*   define a global symbol (e.g. ASMPC)
-*----------------------------------------------------------------------------*/
-Symbol *define_global_def_sym( char *name, long value )
-{
-	return _define_sym( get_global_tab(), name, value, SYMDEF, NULL );
-}
-
-/*-----------------------------------------------------------------------------
-*   define a local DEF symbol (e.g. DEFINE)
-*----------------------------------------------------------------------------*/
-Symbol *define_local_def_sym( char *name, long value )
-{
-	return _define_sym( CURRENTMODULE->local_tab, name, value, SYMDEF, CURRENTMODULE );
-}
-
-
-/*-----------------------------------------------------------------------------
-*   copy the static symbols to CURRENTMODULE->local_tab
-*----------------------------------------------------------------------------*/
-void copy_static_syms( void )
-{
-	SymbolHashElem *iter;
-	Symbol         *sym;
-
-	for ( iter = SymbolHash_first( get_static_tab() ); iter; iter = SymbolHash_next( iter ) )
-	{
-		sym = (Symbol *)iter->value;
-		_define_sym( CURRENTMODULE->local_tab, 
-					 sym->name, sym->value, sym->type, CURRENTMODULE );
-	}
-}
-
-
-
-/*-----------------------------------------------------------------------------
 *   return pointer to found symbol in a symbol tree, otherwise NULL if not found
 *	marks looked-up symbol as SYMTOUCHED
 *----------------------------------------------------------------------------*/
@@ -172,6 +112,121 @@ Symbol *find_symbol( char *name, SymbolHash *symtab )
 		sym->type |= SYMTOUCHED;
 
 	return sym;
+}
+
+/*-----------------------------------------------------------------------------
+*   create a symbol in the given table, error if already defined
+*----------------------------------------------------------------------------*/
+Symbol *_define_sym( char *name, long value, byte_t type, 
+					 struct module *owner, SymbolHash *symtab )
+{
+    Symbol *sym;
+
+	sym = find_symbol( name, symtab );
+	if ( sym != NULL )					/* Symbol already defined */
+    {
+		if ( sym->owner && sym->owner != owner && sym->owner->mname )
+			error( ERR_SYMBOL_REDEFINED_MODULE, name, sym->owner->mname );
+		else
+			error( ERR_SYMBOL_REDEFINED, name );
+    }
+	else
+	{
+        sym = Symbol_create( name, value, type | SYMDEFINED, owner );
+		SymbolHash_set( symtab, name, sym );
+
+        /* add symbol references if listing */
+        if ( option_symtable && option_list )
+			add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
+	}
+
+	return sym;
+}
+
+/*-----------------------------------------------------------------------------
+*   refer to a symbol in an expression
+*   search for symbol in either local tree or global table, 
+*   create undefined symbol if not found, return symbol
+*----------------------------------------------------------------------------*/
+Symbol *get_used_symbol( char *name )
+{
+	SymbolHash *global_tab = get_global_tab();
+    Symbol     *sym;
+
+	sym = find_symbol( name, CURRENTMODULE->local_tab );	/* search in local tab */
+    if ( sym == NULL )
+    {
+		/* not local */
+		sym = find_symbol( name, global_tab );				/* search in global tab */
+        if ( sym == NULL )
+        {
+            sym = Symbol_create( name, 0, SYM_NOTDEFINED, CURRENTMODULE );
+			SymbolHash_set( CURRENTMODULE->local_tab, name, sym );
+		}
+	}
+
+	/* add page references */
+	if ( option_symtable && option_list )
+		add_symbol_ref( sym->references, list_get_page_nr(), FALSE );
+
+	return sym;
+}
+			
+/*-----------------------------------------------------------------------------
+*   define a static symbol (from -D command line)
+*----------------------------------------------------------------------------*/
+Symbol *define_static_def_sym( char *name, long value )
+{
+	return _define_sym( name, value, SYMDEF, NULL, get_static_tab() );
+}
+
+/*-----------------------------------------------------------------------------
+*   define a global symbol (e.g. ASMPC)
+*----------------------------------------------------------------------------*/
+Symbol *define_global_def_sym( char *name, long value )
+{
+	return _define_sym( name, value, SYMDEF, NULL, get_global_tab() );
+}
+
+/*-----------------------------------------------------------------------------
+*   define a local DEF symbol (e.g. DEFINE)
+*----------------------------------------------------------------------------*/
+Symbol *define_local_def_sym( char *name, long value )
+{
+	return _define_sym( name, value, SYMDEF, CURRENTMODULE, CURRENTMODULE->local_tab );
+}
+
+/*-----------------------------------------------------------------------------
+*   define a new symbol in the local, global or global lib tabs
+*----------------------------------------------------------------------------*/
+Symbol *define_local_sym( char *name, long value, byte_t type )
+{
+	return _define_sym( name, value, type | SYMLOCAL, CURRENTMODULE, CURRENTMODULE->local_tab );
+}
+
+Symbol *define_global_sym( char *name, long value, byte_t type )
+{
+	return _define_sym( name, value, type | SYMXDEF, CURRENTMODULE, get_global_tab() );
+}
+
+Symbol *define_library_sym( char *name, long value, byte_t type )
+{
+	return _define_sym( name, value, type | SYMXDEF | SYMDEF, CURRENTMODULE, get_global_tab() );
+}
+
+/*-----------------------------------------------------------------------------
+*   copy the static symbols to CURRENTMODULE->local_tab
+*----------------------------------------------------------------------------*/
+void copy_static_syms( void )
+{
+	SymbolHashElem *iter;
+	Symbol         *sym;
+
+	for ( iter = SymbolHash_first( get_static_tab() ); iter; iter = SymbolHash_next( iter ) )
+	{
+		sym = (Symbol *)iter->value;
+		_define_sym( sym->name, sym->value, sym->type, CURRENTMODULE, CURRENTMODULE->local_tab );
+	}
 }
 
 /*-----------------------------------------------------------------------------
@@ -257,35 +312,6 @@ void define_symbol( char *name, long value, byte_t type )
     }
 }
 
-/*-----------------------------------------------------------------------------
-*   refer to a symbol in an expression
-*   search for symbol in either local tree or global table, 
-*   return found pointer if defined/declared, otherwise return NULL
-*----------------------------------------------------------------------------*/
-Symbol *get_used_symbol( char *name )
-{
-	SymbolHash *global_tab = get_global_tab();
-    Symbol     *sym;
-
-	sym = find_symbol( name, CURRENTMODULE->local_tab );	/* search in local tab */
-    if ( sym == NULL )
-    {
-		/* not local */
-		sym = find_symbol( name, global_tab );				/* search in global tab */
-        if ( sym == NULL )
-        {
-            sym = Symbol_create( name, 0, SYM_NOTDEFINED, CURRENTMODULE );
-			SymbolHash_set( CURRENTMODULE->local_tab, name, sym );
-		}
-	}
-
-	/* add page references */
-	if ( option_symtable && option_list )
-		add_symbol_ref( sym->references, list_get_page_nr(), FALSE );
-
-	return sym;
-}
-			
 /*-----------------------------------------------------------------------------
 *   declare a global symbol; type = 0 for XDEF, SYMDEF for XLIB
 *----------------------------------------------------------------------------*/

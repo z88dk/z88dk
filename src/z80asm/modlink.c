@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.61 2013-06-08 23:37:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.62 2013-06-11 23:16:06 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.61  2013-06-08 23:37:32  pauloscustodio
+/* Revision 1.62  2013-06-11 23:16:06  pauloscustodio
+/* Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
+/* Add error message for invalid symbol and scope chars in object file.
+/*
+/* Revision 1.61  2013/06/08 23:37:32  pauloscustodio
 /* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
 /*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
 /* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
@@ -401,7 +405,7 @@ void LinkModules( void );
 void ModuleExpr( void );
 void CreateBinFile( void );
 void WriteMapFile( void );
-void ReadNames( FILE *file, long nextname, long endnames );
+void ReadNames( char *filename, FILE *file, long nextname, long endnames );
 void ReadExpr( long nextexpr, long endexpr );
 void WriteDefFile( SymbolHash *symtab );
 void CreateDeffile( void );
@@ -430,9 +434,8 @@ size_t totaladdr, curroffset, sizeof_reloctable;
 static FILE *mapfile;
 
 void
-ReadNames( FILE *file, long nextname, long endnames )
+ReadNames( char *filename, FILE *file, long nextname, long endnames )
 {
-	SymbolHash *global_tab = get_global_tab();
     char scope, symbol_char;
 	byte_t symboltype;
     long value;
@@ -450,65 +453,35 @@ ReadNames( FILE *file, long nextname, long endnames )
         switch ( symbol_char )
         {
             case 'A':
-                symboltype = SYMADDR | SYMDEFINED;
+                symboltype = SYMADDR;
                 value += modulehdr->first->origin + CURRENTMODULE->startoffset;       /* Absolute address */
                 break;
 
             case 'C':
-                symboltype = SYMDEFINED;
+                symboltype = 0;
                 break;
+
+			default:
+				error( ERR_NOT_OBJ_FILE, filename );
         }
 
         switch ( scope )
         {
             case 'L':
-                if ( ( foundsymbol = find_symbol( line, CURRENTMODULE->local_tab ) ) == NULL )
-                {
-                    foundsymbol = Symbol_create( line, value, symboltype | SYMLOCAL, CURRENTMODULE );
-                    SymbolHash_set( CURRENTMODULE->local_tab, line, foundsymbol );
-                }
-                else
-                {
-                    foundsymbol->value = value;
-                    foundsymbol->type |= symboltype | SYMLOCAL;
-                    foundsymbol->owner = CURRENTMODULE;
-                    error( ERR_SYMBOL_REDEFINED_MODULE, line, CURRENTMODULE->mname );
-                }
-
-                break;
+				define_local_sym( line, value, symboltype );
+				break;
 
             case 'G':
-                if ( ( foundsymbol = find_symbol( line, global_tab ) ) == NULL )
-                {
-                    foundsymbol = Symbol_create( line, value, symboltype | SYMXDEF, CURRENTMODULE );
-                    SymbolHash_set( global_tab, line, foundsymbol );
-                }
-                else
-                {
-                    foundsymbol->value = value;
-                    foundsymbol->type |= symboltype | SYMXDEF;
-                    foundsymbol->owner = CURRENTMODULE;
-                    error( ERR_SYMBOL_REDEFINED_MODULE, line, CURRENTMODULE->mname );
-                }
-
-                break;
+				define_global_sym( line, value, symboltype );
+				break;
 
             case 'X':
-                if ( ( foundsymbol = find_symbol( line, global_tab ) ) == NULL )
-                {
-                    foundsymbol = Symbol_create( line, value, symboltype | SYMXDEF | SYMDEF, CURRENTMODULE );
-                    SymbolHash_set( global_tab, line, foundsymbol );
-                }
-                else
-                {
-                    foundsymbol->value = value;
-                    foundsymbol->type |= symboltype | SYMXDEF | SYMDEF;
-                    foundsymbol->owner = CURRENTMODULE;
-                    error( ERR_SYMBOL_REDEFINED_MODULE, line, CURRENTMODULE->mname );
-                }
+				define_library_sym( line, value, symboltype );
+				break;
 
-                break;
-        }
+			default:
+				error( ERR_NOT_OBJ_FILE, filename );
+		}
     }
     while ( nextname < endnames );
 }
@@ -825,11 +798,11 @@ LinkModule( char *filename, long fptr_base )
 
         if ( fptr_libnmdecl != -1 )
         {
-            ReadNames( z80asmfile, fptr_namedecl, fptr_libnmdecl );    /* Read symbols until library declarations */
+            ReadNames( filename, z80asmfile, fptr_namedecl, fptr_libnmdecl );    /* Read symbols until library declarations */
         }
         else
         {
-            ReadNames( z80asmfile, fptr_namedecl, fptr_modname );    /* Read symbol suntil module name */
+            ReadNames( filename, z80asmfile, fptr_namedecl, fptr_modname );    /* Read symbol suntil module name */
         }
     }
 

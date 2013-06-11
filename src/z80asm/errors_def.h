@@ -16,9 +16,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 Define error codes and error messages
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.13 2013-06-01 01:24:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.14 2013-06-11 23:16:06 pauloscustodio Exp $ */
 /* $Log: errors_def.h,v $
-/* Revision 1.13  2013-06-01 01:24:21  pauloscustodio
+/* Revision 1.14  2013-06-11 23:16:06  pauloscustodio
+/* Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
+/* Add error message for invalid symbol and scope chars in object file.
+/*
+/* Revision 1.13  2013/06/01 01:24:21  pauloscustodio
 /* CH_0022 : Replace avltree by hash table for symbol table
 /*
 /* Revision 1.12  2013/05/11 00:29:26  pauloscustodio
@@ -117,7 +121,7 @@ DEF_MSG( ERR_ILLEGAL_IDENT,         "Illegal identifier" )
 DEF_MSG( ERR_MAX_CODESIZE,          "Max. code size of %ld bytes reached" )
 DEF_MSG( ERR_SYMBOL_REDEFINED,      "Symbol '%s' already defined" )
 DEF_MSG( ERR_SYMBOL_REDEFINED_MODULE,
-									"Symbol '%s' redefined in module '%s'" )
+									"Symbol '%s' already defined in module '%s'" )
 DEF_MSG( ERR_MODULE_REDEFINED,      "Module name already defined" )
 DEF_MSG( ERR_MODULE_NOT_DEFINED,    "Module name not defined" ) /* not used */
 DEF_MSG( ERR_SYMBOL_DECL_LOCAL,     "Symbol '%s' already declared local" )
