@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.24 2013-06-11 09:17:15 stefano Exp $ */
+/* $Id: stdio.h,v 1.25 2013-06-11 13:06:37 stefano Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -152,7 +152,8 @@ extern int __LIB__ fputc(int c, FILE *fp) __SMALLCDECL;
 
 extern int __LIB__ __CALLEE__ fputs_callee(unsigned char *s,  FILE *fp);
 extern int __LIB__ __CALLEE__ fputc_callee(int c, FILE *fp);
-extern int __LIB__ __FASTCALL__ fgetc(FILE *fp);
+extern int __LIB__ fgetc(FILE *fp);
+
 #define getc(f) fgetc(f)
 extern int __LIB__ ungetc(int c, FILE *);
 extern int __LIB__ feof(FILE *fp);
