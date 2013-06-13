@@ -6,7 +6,7 @@
 /*
  * Now some trickery to link in the correct routines for far
  *
- * $Id: malloc.h,v 1.12 2010-09-19 00:24:08 dom Exp $
+ * $Id: malloc.h,v 1.13 2013-06-13 17:25:58 stefano Exp $
  */
 
 
@@ -42,6 +42,12 @@
 // sbrk(25000,126);   /* add 126 bytes from 25000-25125 inclusive  */
 // a = malloc(100);
 
+/* Trick to force a default malloc initialization  */
+/* Activate it by invoking zcc with '-DAMALLOC'    */
+#ifdef AMALLOC
+#pragma output USING_amalloc
+#endif
+
 extern void __LIB__              mallinit(void);
 extern void __LIB__              sbrk(void *addr, unsigned int size);
 extern void __LIB__ __CALLEE__   sbrk_callee(void *addr, unsigned int size);
@@ -65,9 +71,11 @@ extern void __LIB__ __CALLEE__   mallinfo_callee(unsigned int *total, unsigned i
 
 #define HEAPSIZE(bp)       unsigned char heap[bp+4];
 #define heapinit(a)        mallinit(); sbrk_callee(heap+4,a);
-#define getfree()          asm("LIB\tMAHeapInfo\nXREF\t_heap\nld\thl,_heap\ncall\tMAHeapInfo\nex\tde,hl\n");
-#define getlarge()         asm("LIB\tMAHeapInfo\nXREF\t_heap\nld\thl,_heap\ncall\tMAHeapInfo\nld\tl,c\nld\th,b\n");
-#define realloc_down(a,b)  realloc_callee(a,b);
+#define getfree()          asm("LIB\tMAHeapInfo\nXREF\t_heap\nld\thl,_heap\ncall\tMAHeapInfo\nex\tde,hl\n")
+#define getlarge()         asm("LIB\tMAHeapInfo\nXREF\t_heap\nld\thl,_heap\ncall\tMAHeapInfo\nld\tl,c\nld\th,b\n")
+#define realloc_down(a,b)  realloc_callee(a,b)
+
+
 
 // Named Heap Functions
 //

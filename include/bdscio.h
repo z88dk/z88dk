@@ -1,11 +1,12 @@
 /*
  * BDS C Compatibility
- * $Id: bdscio.h,v 1.1 2013-06-07 14:12:57 stefano Exp $
+ * $Id: bdscio.h,v 1.2 2013-06-13 17:25:58 stefano Exp $
  */
 
 #ifndef __BDSCIO_H__
 #define __BDSCIO_H__
 
+#define AMALLOC
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -81,7 +82,6 @@
 #define error(a); {puts_cons(a);exit(-1);}
 
 #define movmem(a,b,c) memcpy(b,a,c)
-#define sbrk(a) malloc(a)
 #define alloc(a) malloc(a)
 
 

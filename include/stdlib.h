@@ -5,10 +5,11 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.42 2013-06-06 08:58:31 stefano Exp $
+ * $Id: stdlib.h,v 1.43 2013-06-13 17:25:58 stefano Exp $
  */
 
 #include <sys/compiler.h>
+#include <sys/types.h>
 #include <sys/types.h>
 
 
@@ -79,6 +80,7 @@ extern void __LIB__ __FASTCALL__ srand(unsigned int seed);
 
 // Before using the malloc library you must initialize the heap -- see malloc.h for details
 // calloc(), malloc(), realloc(), free(), mallinit(), mallinfo(), sbrk()
+// ot use the -DAMALLOC option to let z88dk doing it automatically
 
 #include <malloc.h>
 

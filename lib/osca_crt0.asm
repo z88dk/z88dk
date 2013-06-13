@@ -15,7 +15,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.20 2013-06-04 11:41:13 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.21 2013-06-13 17:25:59 stefano Exp $
 ;
 
 
@@ -152,6 +152,41 @@ ELSE
 ENDIF
         ;ld      sp,$7FFF
         ld      (exitsp),sp
+        
+        push bc  ; keep ptr to arg list
+
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of 
+; the compiled program and the stack pointer
+IF DEFINED_USING_amalloc
+	push hl
+
+	ld	hl,_heap
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	inc bc
+	; compact way to do "mallinit()"
+	xor	a
+	ld	(hl),a
+	dec hl
+	ld	(hl),a
+
+	pop hl	; sp
+	sbc hl,bc	; hl = total free memory
+	ld d,h
+	ld e,l
+	srl d
+	rr e
+	srl d
+	rr e
+	sbc hl,de	;  keep 2/3 of free memory for the heap, and the remaining space for stack
+
+	push bc ; main address for malloc area
+	push hl	; area size
+	LIB sbrk_callee
+	call	sbrk_callee
+ENDIF
 
 IF (!DEFINED_osca_notimer)
 
@@ -195,13 +230,10 @@ ENDIF
 
 	; Push pointers to argv[n] onto the stack now
 	; We must start from the end 
-		ld	hl,0	;NULL pointer at end, just in case
-		push	hl
-
-		ld	h,b    ; ptr to argument list
-		ld	l,c
-		ld	b,0    ; parameter counter
-		ld	c,b    ; character counter
+		ld	hl,0    ; NULL pointer at end, just in case
+		ld	b,h     ; parameter counter
+		ld	c,h     ; character counter
+		ex	(sp),hl ; retrieve ptr to argument list / store NULL ptr
 
 		ld	a,(hl)
 		and	a
@@ -481,6 +513,17 @@ exitcount:       defb    0
 ; Heap stuff
 heaplast:        defw    0
 heapblocks:      defw    0
+
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+._heap
+	defw ASMTAIL	; Location of the last program byte
+	defw 0
+ENDIF
 
 ; mem stuff
 base_graphics:   defw    $2000

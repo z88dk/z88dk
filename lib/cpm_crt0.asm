@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.19 2013-06-04 11:41:13 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.20 2013-06-13 17:25:59 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -90,11 +90,44 @@ ENDIF
 	neg
 	ld	l,a
 	ld	h,-1		;negative number
-        ld      de,-64		;Add on space for atexit() stack
+	ld      de,-64		;Add on space for atexit() stack
 	add	hl,de
-        add     hl,sp
-        ld      sp,hl
-        ld      (exitsp),sp
+	add     hl,sp
+	ld      sp,hl
+	ld      (exitsp),sp
+
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of 
+; the compiled program and the stack pointer
+IF DEFINED_USING_amalloc
+	push hl
+
+	ld	hl,_heap
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	inc bc
+	; compact way to do "mallinit()"
+	xor	a
+	ld	(hl),a
+	dec hl
+	ld	(hl),a
+
+	pop hl	; sp
+	sbc hl,bc	; hl = total free memory
+	ld d,h
+	ld e,l
+	srl d
+	rr e
+	srl d
+	rr e
+	sbc hl,de	;  keep 2/3 of free memory for the heap, and the remaining space for stack
+
+	push bc ; main address for malloc area
+	push hl	; area size
+	LIB sbrk_callee
+	call	sbrk_callee
+ENDIF
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -301,9 +334,22 @@ exitsp:		defw	0	;Address of atexit() stack
 exitcount:	defb	0	;Number of atexit() routinens
 heaplast:	defw	0	;Pointer to last free heap block
 heapblocks:	defw	0	;Number of heap blocks available
+
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+._heap
+	defw ASMTAIL	; Location of the last program byte
+	defw 0
+ENDIF
+
 IF !DEFINED_nofileio
 __fcb:		defs	420,0	;file control block (10 files) (MAXFILE)
 ENDIF
+
 IF !DEFINED_HAVESEED
 		XDEF    _std_seed        ;Integer rand() seed
 _std_seed:       defw    0      ; Seed for integer rand() routines
@@ -323,6 +369,7 @@ end:		defb	0		; null file name
 RG0SAV:		defb	0		; VDP graphics driver (Einstein)
 pixelbyte:	defb	0		; temp byte storage for VDP driver
 coords:		defw    0       ; Current graphics xy coordinates
+
 
 ;----------------------------------------------
 ; Floating point support routines and variables
