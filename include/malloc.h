@@ -6,7 +6,7 @@
 /*
  * Now some trickery to link in the correct routines for far
  *
- * $Id: malloc.h,v 1.13 2013-06-13 17:25:58 stefano Exp $
+ * $Id: malloc.h,v 1.14 2013-06-14 16:58:19 stefano Exp $
  */
 
 
@@ -42,10 +42,28 @@
 // sbrk(25000,126);   /* add 126 bytes from 25000-25125 inclusive  */
 // a = malloc(100);
 
-/* Trick to force a default malloc initialization  */
-/* Activate it by invoking zcc with '-DAMALLOC'    */
+/* Trick to force a default malloc initialization    */
+/* Activate it by invoking zcc with i.e. '-DAMALLOC' */
+
+// Automatic Preset for malloc:  3/4 of the free memory
 #ifdef AMALLOC
 #pragma output USING_amalloc
+#endif
+#ifdef AMALLOC3
+#pragma output USING_amalloc
+#endif
+
+// Automatic Preset for malloc:  2/4 of the free memory
+#ifdef AMALLOC2
+#pragma output USING_amalloc
+#pragma output USING_amalloc_2
+#endif
+
+// Automatic Preset for malloc:  1/4 of the free memory
+#ifdef AMALLOC1
+#pragma output USING_amalloc
+#pragma output USING_amalloc_2
+#pragma output USING_amalloc_1
 #endif
 
 extern void __LIB__              mallinit(void);

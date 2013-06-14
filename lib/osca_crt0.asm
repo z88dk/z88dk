@@ -15,7 +15,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.21 2013-06-13 17:25:59 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.22 2013-06-14 16:58:19 stefano Exp $
 ;
 
 
@@ -159,33 +159,7 @@ ENDIF
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
 IF DEFINED_USING_amalloc
-	push hl
-
-	ld	hl,_heap
-	ld	c,(hl)
-	inc	hl
-	ld	b,(hl)
-	inc bc
-	; compact way to do "mallinit()"
-	xor	a
-	ld	(hl),a
-	dec hl
-	ld	(hl),a
-
-	pop hl	; sp
-	sbc hl,bc	; hl = total free memory
-	ld d,h
-	ld e,l
-	srl d
-	rr e
-	srl d
-	rr e
-	sbc hl,de	;  keep 2/3 of free memory for the heap, and the remaining space for stack
-
-	push bc ; main address for malloc area
-	push hl	; area size
-	LIB sbrk_callee
-	call	sbrk_callee
+    INCLUDE "amalloc.def"
 ENDIF
 
 IF (!DEFINED_osca_notimer)
