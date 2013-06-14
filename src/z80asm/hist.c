@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.42 2013-06-10 23:11:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.43 2013-06-14 23:49:15 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.42  2013-06-10 23:11:33  pauloscustodio
+/* Revision 1.43  2013-06-14 23:49:15  pauloscustodio
+/* Version 1.2.2
+/*
+/* Revision 1.42  2013/06/10 23:11:33  pauloscustodio
 /* CH_0023 : Remove notdecl_tab
 /*
 /* Revision 1.41  2013/06/08 23:37:32  pauloscustodio
@@ -1259,7 +1262,20 @@ Based on 1.0.31
 	CH_0023 : Remove notdecl_tab
 		Symbol is created in symbol table on first usage, SYMDEFINED bit
 		identifies if it was defined or not.
-		
+
+-------------------------------------------------------------------------------
+15.06.2013 [1.2.2] (pauloscustodio)
+-------------------------------------------------------------------------------
+	BUG_0036 : Map file does not show local symbols with the same name in different modules
+		If the same local symbol is defined in multiple modules, only one of
+		them appears in the map file.
+		"None." is written in map file if no symbols are defined.
+
+    Internal cleanup:
+	- Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
+	- Add error message for invalid symbol and scope chars in object file.
+	- find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
+
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
@@ -1290,7 +1306,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "1.2.1"
+#define VERSION     "1.2.2"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS
