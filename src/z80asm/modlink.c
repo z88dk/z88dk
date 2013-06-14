@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.63 2013-06-14 22:14:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.64 2013-06-14 23:47:13 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.63  2013-06-14 22:14:36  pauloscustodio
+/* Revision 1.64  2013-06-14 23:47:13  pauloscustodio
+/* BUG_0036 : Map file does not show local symbols with the same name in different modules
+/* If the same local symbol is defined in multiple modules, only one of
+/* them appears in the map file.
+/* "None." is written in map file if no symbols are defined.
+/*
+/* Revision 1.63  2013/06/14 22:14:36  pauloscustodio
 /* find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
 /*
 /* Revision 1.62  2013/06/11 23:16:06  pauloscustodio
@@ -376,6 +382,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "listfile.h"
 #include "options.h"
 #include "safestr.h"
+#include "strpool.h"
 #include "strutil.h"
 #include "sym.h"
 #include "symbol.h"
@@ -1387,34 +1394,60 @@ WriteMapSymbols( SymbolHash *symtab )
 	{
 		sym = (Symbol *)iter->value;
 
-		if ( sym->type & SYMADDR )
+		/* CH_0017 */
+		fprintf( mapfile, "%-*s ", COLUMN_WIDTH - 1, sym->name );
+
+		if ( autorelocate )
 		{
-			/* CH_0017 */
-			fprintf( mapfile, "%-*s ", COLUMN_WIDTH - 1, sym->name );
-
-			if ( autorelocate )
-			{
-				fprintf( mapfile, "= %04lX, ", sizeof_relocroutine + sizeof_reloctable + 4 + sym->value );
-			}
-			else
-			{
-				fprintf( mapfile, "= %04lX, ", sym->value );
-			}
-
-			if ( sym->type & SYMLOCAL )
-			{
-				fputc_err( 'L', mapfile );
-			}
-			else
-			{
-				fputc_err( 'G', mapfile );
-			}
-
-			fprintf( mapfile, ": %s\n", sym->owner->mname );
+			fprintf( mapfile, "= %04lX, ", sizeof_relocroutine + sizeof_reloctable + 4 + sym->value );
 		}
+		else
+		{
+			fprintf( mapfile, "= %04lX, ", sym->value );
+		}
+
+		if ( sym->type & SYMLOCAL )
+		{
+			fputc_err( 'L', mapfile );
+		}
+		else
+		{
+			fputc_err( 'G', mapfile );
+		}
+
+		fprintf( mapfile, ": %s\n", sym->owner->mname );
     }
 }
 
+/* return NAME@MODULE in strpool */
+static char *full_sym_name( Symbol *sym )
+{
+	SSTR_DEFINE(name, MAXLINE);
+
+	sstr_set(name, sym->name);
+	if ( sym->owner && sym->owner->mname ) 
+	{
+		sstr_cat(name, "@");
+		sstr_cat(name, sym->owner->mname);
+	}
+
+	return strpool_add(sstr_data(name));
+}
+
+/* copy all SYMADDR symbols to target, replacing NAME by NAME@MODULE */
+static void copy_full_sym_names( SymbolHash *target, SymbolHash *source )
+{
+	SymbolHashElem *iter;
+	Symbol         *sym;
+
+	for ( iter = SymbolHash_first( source ); iter; iter = SymbolHash_next( iter ) )
+	{
+		sym = (Symbol *)iter->value;
+			
+		if ( sym->type & SYMADDR )
+			SymbolHash_set( target, full_sym_name(sym), Symbol_clone(sym) );
+	}	
+}
 
 void
 WriteMapFile( void )
@@ -1423,7 +1456,7 @@ WriteMapFile( void )
 	SymbolHash *map_symtab;
     struct module *cmodule;
 
-    /* use first module filename to create global map file */
+	/* use first module filename to create global map file */
 	path_replace_ext( mapfilename, modulehdr->first->cfile->fname, FILEEXT_MAP ); /* set '.map' extension */
 
     /* Create MAP file */
@@ -1435,14 +1468,16 @@ WriteMapFile( void )
     }
 
 	/* copy all local symbols from all modules to a map_symtab */
-	/* BUG: symbols with the same name get overwritten */
+
+	/* BUG_0036 - need to create coposed symbol names NAME@MODULE, so that local symbols in different modules
+	   are shown */
 	map_symtab = OBJ_NEW(SymbolHash);
 	for ( cmodule = modulehdr->first; cmodule != NULL; cmodule = cmodule->nextmodule )
     {
-		SymbolHash_cat( map_symtab, cmodule->local_tab );
+	    copy_full_sym_names( map_symtab, cmodule->local_tab );
     }
 
-    SymbolHash_cat( map_symtab, get_global_tab() );
+    copy_full_sym_names( map_symtab, get_global_tab() );
 
     if ( SymbolHash_empty( map_symtab ) )
     {
