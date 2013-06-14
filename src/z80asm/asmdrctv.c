@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.46 2013-06-08 23:37:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.47 2013-06-14 22:14:36 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.46  2013-06-08 23:37:32  pauloscustodio
+/* Revision 1.47  2013-06-14 22:14:36  pauloscustodio
+/* find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
+/*
+/* Revision 1.46  2013/06/08 23:37:32  pauloscustodio
 /* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
 /*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
 /* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
@@ -749,7 +752,7 @@ UNDEFINE( void )
     {
         if ( GetSym() == name )
         {
-            sym = find_symbol( ident, CURRENTMODULE->local_tab );
+            sym = find_local_symbol( ident );
         }
 
         if ( sym != NULL )

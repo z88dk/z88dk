@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.62 2013-06-11 23:16:06 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.63 2013-06-14 22:14:36 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.62  2013-06-11 23:16:06  pauloscustodio
+/* Revision 1.63  2013-06-14 22:14:36  pauloscustodio
+/* find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
+/*
+/* Revision 1.62  2013/06/11 23:16:06  pauloscustodio
 /* Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
 /* Add error message for invalid symbol and scope chars in object file.
 /*
@@ -439,7 +442,6 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
     char scope, symbol_char;
 	byte_t symboltype;
     long value;
-    Symbol *foundsymbol;
 
     do
     {
@@ -848,7 +850,7 @@ LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
         len = strlen( line );
         nextname += 1 + len;      /* remember module pointer to next name in this   object module */
 
-        if ( find_symbol( line, get_global_tab() ) == NULL )
+        if ( find_global_symbol( line ) == NULL )
         {
             modname = xstrdup( line );
 

@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.37 2013-06-10 23:11:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.38 2013-06-14 22:14:36 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.37  2013-06-10 23:11:33  pauloscustodio
+/* Revision 1.38  2013-06-14 22:14:36  pauloscustodio
+/* find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
+/*
+/* Revision 1.37  2013/06/10 23:11:33  pauloscustodio
 /* CH_0023 : Remove notdecl_tab
 /*
 /* Revision 1.36  2013/06/08 23:37:32  pauloscustodio
@@ -759,19 +762,21 @@ EvalPfixExpr( struct expr *pfixlist )
                             /* if all bits are set to zero */
                             if ( pfixexpr->type & SYMLOCAL )
                             {
-                                symptr = find_symbol( pfixexpr->id, CURRENTMODULE->local_tab );
-                                pfixlist->rangetype |= ( symptr->type & SYMTYPE );      /* copy appropriate type
-                                                                             * bits */
+                                symptr = find_local_symbol( pfixexpr->id );
+
+								/* copy appropriate type bits */
+                                pfixlist->rangetype |= ( symptr->type & SYMTYPE );
+
                                 PushItem( symptr->value, &stackptr );
                             }
                             else
                             {
-                                symptr = find_symbol( pfixexpr->id, get_global_tab() );
+                                symptr = find_global_symbol( pfixexpr->id );
 
                                 if ( symptr != NULL )
                                 {
-                                    pfixlist->rangetype |= ( symptr->type & SYMTYPE );  /* copy appropriate type
-                                                                                     * bits */
+									/* copy appropriate type bits */
+                                    pfixlist->rangetype |= ( symptr->type & SYMTYPE );
 
                                     if ( symptr->type & SYMDEFINED )
                                     {
@@ -791,7 +796,7 @@ EvalPfixExpr( struct expr *pfixlist )
                             }
                         }
                         else
-                        {
+						{
                             /* try to find symbol now as either declared local or global */
                             symptr = get_used_symbol( pfixexpr->id );       
 

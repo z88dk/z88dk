@@ -18,9 +18,12 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.6 2013-06-11 23:16:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.7 2013-06-14 22:14:36 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.6  2013-06-11 23:16:06  pauloscustodio
+Revision 1.7  2013-06-14 22:14:36  pauloscustodio
+find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
+
+Revision 1.6  2013/06/11 23:16:06  pauloscustodio
 Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
 Add error message for invalid symbol and scope chars in object file.
 
@@ -112,6 +115,16 @@ Symbol *find_symbol( char *name, SymbolHash *symtab )
 		sym->type |= SYMTOUCHED;
 
 	return sym;
+}
+
+Symbol *find_local_symbol( char *name )  
+{ 
+	return find_symbol( name, CURRENTMODULE->local_tab ); 
+}
+	
+Symbol *find_global_symbol( char *name ) 
+{ 
+	return find_symbol( name, get_global_tab() ); 
 }
 
 /*-----------------------------------------------------------------------------
