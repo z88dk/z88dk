@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.47 2013-06-14 22:14:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.48 2013-06-15 00:26:23 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.47  2013-06-14 22:14:36  pauloscustodio
+/* Revision 1.48  2013-06-15 00:26:23  pauloscustodio
+/* Move mapfile writing to mapfile.c.
+/*
+/* Revision 1.47  2013/06/14 22:14:36  pauloscustodio
 /* find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
 /*
 /* Revision 1.46  2013/06/08 23:37:32  pauloscustodio
@@ -345,7 +348,6 @@ extern char ident[], stringconst[];
 extern size_t DEFVPC;
 extern enum symbols sym;
 extern enum flag EOL;
-extern struct modules *modulehdr;
 extern struct module *CURRENTMODULE;
 
 

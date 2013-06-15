@@ -132,6 +132,9 @@
     <ClInclude Include="symtab.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="mapfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -246,6 +249,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="module.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mapfile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

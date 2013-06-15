@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.90 2013-06-10 23:11:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.91 2013-06-15 00:26:23 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.90  2013-06-10 23:11:33  pauloscustodio
+/* Revision 1.91  2013-06-15 00:26:23  pauloscustodio
+/* Move mapfile writing to mapfile.c.
+/*
+/* Revision 1.90  2013/06/10 23:11:33  pauloscustodio
 /* CH_0023 : Remove notdecl_tab
 /*
 /* Revision 1.89  2013/06/08 23:37:32  pauloscustodio
@@ -547,6 +550,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "file.h"
 #include "hist.h"
 #include "listfile.h"
+#include "mapfile.h"
 #include "objfile.h"
 #include "options.h"
 #include "safestr.h"
@@ -570,7 +574,6 @@ void LinkModules( void );
 void DeclModuleName( void );
 void CreateDeffile( void );
 void WriteDefFile( SymbolHash *symtab );
-void WriteMapFile( void );
 void CreateBinFile( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 enum symbols GetSym( void );
@@ -620,6 +623,7 @@ byte_t reloc_routine[] =
     "\x71\x01\xFD\x70\x02\xD9\x08\xFD\xE9";
 
 size_t sizeof_relocroutine = 73;
+size_t sizeof_reloctable   = 0;
 
 char *reloctable = NULL, *relocptr = NULL;
 
@@ -1385,7 +1389,7 @@ int main( int argc, char *argv[] )
         {
             if ( mapref )
             {
-                WriteMapFile();
+                write_map_file();
             }
 
             CreateBinFile();

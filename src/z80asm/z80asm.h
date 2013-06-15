@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.33 2013-06-08 23:37:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.34 2013-06-15 00:26:23 pauloscustodio Exp $
 $Log: z80asm.h,v $
-Revision 1.33  2013-06-08 23:37:32  pauloscustodio
+Revision 1.34  2013-06-15 00:26:23  pauloscustodio
+Move mapfile writing to mapfile.c.
+
+Revision 1.33  2013/06/08 23:37:32  pauloscustodio
 Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
 Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
@@ -193,8 +196,10 @@ extern char line[];
 extern char ident[];
 extern char separators[];
 extern struct module *CURRENTMODULE;
+extern struct modules *modulehdr;
 extern FILE *z80asmfile, *deffile;
 extern Symbol *ASMPC;
+extern size_t sizeof_relocroutine, sizeof_reloctable;
 
 extern char *Fetchfilename( FILE *fptr );
 extern char *CreateLibfile( char *filename );

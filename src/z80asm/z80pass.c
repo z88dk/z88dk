@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.51 2013-06-08 23:37:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.52 2013-06-15 00:26:23 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.51  2013-06-08 23:37:32  pauloscustodio
+Revision 1.52  2013-06-15 00:26:23  pauloscustodio
+Move mapfile writing to mapfile.c.
+
+Revision 1.51  2013/06/08 23:37:32  pauloscustodio
 Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
 Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
@@ -372,7 +375,6 @@ void Pass2info( struct expr *expression, char constrange, long lfileptr );
 void Z80pass1( void );
 void Z80pass2( void );
 void WriteSymbolTable( char *msg, SymbolHash *symtab );
-void WriteMapFile( void );
 long Evallogexpr( void );
 struct sourcefile *Prevfile( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
@@ -386,7 +388,6 @@ extern char line[], ident[], separators[];
 extern enum symbols sym;
 extern enum flag EOL;
 extern long TOTALLINES;
-extern struct modules *modulehdr;       /* pointer to module header */
 extern struct module *CURRENTMODULE;
 extern char *temporary_ptr;
 
