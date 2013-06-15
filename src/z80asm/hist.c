@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.43 2013-06-14 23:49:15 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.44 2013-06-15 22:10:01 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.43  2013-06-14 23:49:15  pauloscustodio
+/* Revision 1.44  2013-06-15 22:10:01  pauloscustodio
+/* BUG_0037 : Symbol already defined error when symbol used in IF expression
+/*
+/* Revision 1.43  2013/06/14 23:49:15  pauloscustodio
 /* Version 1.2.2
 /*
 /* Revision 1.42  2013/06/10 23:11:33  pauloscustodio
@@ -1277,6 +1280,20 @@ Based on 1.0.31
 	- find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
 
 -------------------------------------------------------------------------------
+15.06.2013 [1.2.3] (pauloscustodio)
+-------------------------------------------------------------------------------
+	BUG_0037 : Symbol already defined error when symbol used in IF expression
+		The code:
+			IF !NEED_floatpack
+				DEFINE	NEED_floatpack
+			ENDIF
+			defb NEED_floatpack
+		fails with "Symbol 'NEED_FLOATPACK' already defined"
+
+    Internal cleanup:
+	- Move mapfile writing to mapfile.c.
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1306,7 +1323,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "1.2.2"
+#define VERSION     "1.2.3"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS

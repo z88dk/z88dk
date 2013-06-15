@@ -18,9 +18,12 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.7 2013-06-14 22:14:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.8 2013-06-15 22:10:01 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.7  2013-06-14 22:14:36  pauloscustodio
+Revision 1.8  2013-06-15 22:10:01  pauloscustodio
+BUG_0037 : Symbol already defined error when symbol used in IF expression
+
+Revision 1.7  2013/06/14 22:14:36  pauloscustodio
 find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
 
 Revision 1.6  2013/06/11 23:16:06  pauloscustodio
@@ -136,22 +139,28 @@ Symbol *_define_sym( char *name, long value, byte_t type,
     Symbol *sym;
 
 	sym = find_symbol( name, symtab );
-	if ( sym != NULL )					/* Symbol already defined */
+	if ( sym == NULL )						/* new symbol */
+	{
+		sym = Symbol_create( name, value, type | SYMDEFINED, owner );
+		SymbolHash_set( symtab, name, sym );
+	}
+	else if ( ! (sym->type & SYMDEFINED) )	/* already declared but not defined */
+	{
+		sym->value = value;
+		sym->type |= type | SYMDEFINED;
+		sym->owner = owner;
+	}
+	else									/* already defined */
     {
 		if ( sym->owner && sym->owner != owner && sym->owner->mname )
 			error( ERR_SYMBOL_REDEFINED_MODULE, name, sym->owner->mname );
 		else
 			error( ERR_SYMBOL_REDEFINED, name );
     }
-	else
-	{
-        sym = Symbol_create( name, value, type | SYMDEFINED, owner );
-		SymbolHash_set( symtab, name, sym );
 
-        /* add symbol references if listing */
-        if ( option_symtable && option_list )
-			add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
-	}
+	/* add symbol references if listing */
+    if ( option_symtable && option_list )
+		add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
 
 	return sym;
 }
