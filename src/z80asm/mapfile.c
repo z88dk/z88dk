@@ -14,9 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.1 2013-06-15 00:26:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.2 2013-06-16 16:49:20 pauloscustodio Exp $
 $Log: mapfile.c,v $
-Revision 1.1  2013-06-15 00:26:23  pauloscustodio
+Revision 1.2  2013-06-16 16:49:20  pauloscustodio
+Symbol_fullname() to return full symbol name NAME@MODULE
+
+Revision 1.1  2013/06/15 00:26:23  pauloscustodio
 Move mapfile writing to mapfile.c.
 
 
@@ -73,23 +76,6 @@ static void write_map_syms( FILE *file, SymbolHash *symtab )
 }
 
 /*-----------------------------------------------------------------------------
-*   return NAME@MODULE in strpool
-*----------------------------------------------------------------------------*/
-static char *full_sym_name( Symbol *sym )
-{
-	SSTR_DEFINE(name, MAXLINE);
-
-	sstr_set(name, sym->name);
-	if ( sym->owner && sym->owner->mname ) 
-	{
-		sstr_cat(name, "@");
-		sstr_cat(name, sym->owner->mname);
-	}
-
-	return strpool_add(sstr_data(name));
-}
-
-/*-----------------------------------------------------------------------------
 *   copy all SYMADDR symbols to target, replacing NAME by NAME@MODULE
 *----------------------------------------------------------------------------*/
 static void copy_full_sym_names( SymbolHash *target, SymbolHash *source )
@@ -102,7 +88,7 @@ static void copy_full_sym_names( SymbolHash *target, SymbolHash *source )
 		sym = (Symbol *)iter->value;
 			
 		if ( sym->type & SYMADDR )
-			SymbolHash_set( target, full_sym_name(sym), Symbol_clone(sym) );
+			SymbolHash_set( target, Symbol_fullname(sym), Symbol_clone(sym) );
 	}	
 }
 

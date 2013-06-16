@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.5 2013-06-08 23:37:32 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.6 2013-06-16 16:49:20 pauloscustodio Exp $
 $Log: sym.h,v $
-Revision 1.5  2013-06-08 23:37:32  pauloscustodio
+Revision 1.6  2013-06-16 16:49:20  pauloscustodio
+Symbol_fullname() to return full symbol name NAME@MODULE
+
+Revision 1.5  2013/06/08 23:37:32  pauloscustodio
 Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
 Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
@@ -93,6 +96,9 @@ END_CLASS;
 /* create a new symbol, needs to be deleted by OBJ_DELETE()
    adds a reference to the page were referred to */
 extern Symbol *Symbol_create( char *name, long value, byte_t type, struct module *owner );
+
+/* return full symbol name NAME@MODULE stored in strpool */
+extern char *Symbol_fullname( Symbol *sym );
 
 
 #endif /* ndef SYM_H */

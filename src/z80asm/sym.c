@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.4 2013-06-08 23:08:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.5 2013-06-16 16:49:20 pauloscustodio Exp $
 $Log: sym.c,v $
-Revision 1.4  2013-06-08 23:08:38  pauloscustodio
+Revision 1.5  2013-06-16 16:49:20  pauloscustodio
+Symbol_fullname() to return full symbol name NAME@MODULE
+
+Revision 1.4  2013/06/08 23:08:38  pauloscustodio
 comments
 
 Revision 1.3  2013/06/01 01:21:02  pauloscustodio
@@ -36,6 +39,7 @@ Move SymbolRef to symref.c
 
 #include "listfile.h"
 #include "options.h"
+#include "safestr.h"
 #include "strpool.h"
 #include "sym.h"
 
@@ -81,6 +85,23 @@ Symbol *Symbol_create( char *name, long value, byte_t type, struct module *owner
 		add_symbol_ref( self->references, list_get_page_nr(), FALSE );
 
     return self;              						/* pointer to new symbol */
+}
+
+/*-----------------------------------------------------------------------------
+*   return full symbol name NAME@MODULE stored in strpool
+*----------------------------------------------------------------------------*/
+char *Symbol_fullname( Symbol *sym )
+{
+	SSTR_DEFINE(name, MAXLINE);
+
+	sstr_set(name, sym->name);
+	if ( sym->owner && sym->owner->mname ) 
+	{
+		sstr_cat(name, "@");
+		sstr_cat(name, sym->owner->mname);
+	}
+
+	return strpool_add(sstr_data(name));
 }
 
 

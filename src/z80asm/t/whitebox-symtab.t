@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.5 2013-06-11 23:16:06 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.6 2013-06-16 16:49:20 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.5  2013-06-11 23:16:06  pauloscustodio
+# Revision 1.6  2013-06-16 16:49:20  pauloscustodio
+# Symbol_fullname() to return full symbol name NAME@MODULE
+#
+# Revision 1.5  2013/06/11 23:16:06  pauloscustodio
 # Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
 # Add error message for invalid symbol and scope chars in object file.
 #
@@ -76,7 +79,8 @@ void dump_Symbols () {}
 
 void dump_Symbol ( Symbol *sym )
 {
-	warn("Symbol \"%s\" = %ld, type = 0x%02X [", sym->name, sym->value, sym->type );
+	warn("Symbol %s (%s) = %ld, type = 0x%02X [", 
+		 sym->name, Symbol_fullname(sym), sym->value, sym->type );
 	if (sym->type & SYMDEFINED)	warn("DEFINED ");
 	if (sym->type & SYMTOUCHED)	warn("TOUCHED ");
 	if (sym->type & SYMDEF)		warn("DEF ");
@@ -137,9 +141,15 @@ t_compile_module($init, <<'END', $objs);
     CURRENTMODULE->local_tab   = OBJ_NEW(SymbolHash);
 
 	TITLE("Create symbol");	
+	sym = Symbol_create(S("VAR1"), 123, 0, NULL);
+	dump_Symbol(sym);
+	OBJ_DELETE(sym);
+
 	sym = Symbol_create(S("VAR1"), 123, 0, CURRENTMODULE);
 	dump_Symbol(sym);
-
+	CURRENTMODULE->mname = "MODULE";
+	dump_Symbol(sym);
+	
 	TITLE("Delete symbol");	
 	OBJ_DELETE(sym);
 	
@@ -238,362 +248,380 @@ memalloc strpool.c(4): alloc 44 bytes at ADDR_8
 memalloc strpool.c(4): alloc 384 bytes at ADDR_9
 memalloc symref.c(1): alloc 32 bytes at ADDR_10
 memalloc symref.c(2): alloc 12 bytes at ADDR_11
-Symbol "VAR1" = 123, type = 0x00 [], ref = [1 ], owner = CURRENTMODULE
-
----- TEST: Delete symbol ----
-
+Symbol VAR1 (VAR1) = 123, type = 0x00 [], ref = [1 ], owner = NULL
 memalloc symref.c(1): free 32 bytes at ADDR_10 allocated at symref.c(1)
 memalloc symref.c(2): free 12 bytes at ADDR_11 allocated at symref.c(2)
 memalloc symref.c(2): free 40 bytes at ADDR_5 allocated at symref.c(2)
 memalloc sym.c(1): free 48 bytes at ADDR_4 allocated at sym.c(1)
+memalloc sym.c(1): alloc 48 bytes at ADDR_12
+memalloc symref.c(2): alloc 40 bytes at ADDR_13
+memalloc symref.c(1): alloc 32 bytes at ADDR_14
+memalloc symref.c(2): alloc 12 bytes at ADDR_15
+Symbol VAR1 (VAR1) = 123, type = 0x00 [], ref = [1 ], owner = CURRENTMODULE
+memalloc strpool.c(2): alloc 36 bytes at ADDR_16
+memalloc strpool.c(3): alloc 12 bytes at ADDR_17
+Symbol VAR1 (VAR1@MODULE) = 123, type = 0x00 [], ref = [1 ], owner = CURRENTMODULE
+
+---- TEST: Delete symbol ----
+
+memalloc symref.c(1): free 32 bytes at ADDR_14 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_15 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_13 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_12 allocated at sym.c(1)
 
 ---- TEST: Global symtab ----
 
-memalloc symtab.c(1): alloc 32 bytes at ADDR_12
-memalloc strhash.c(1): alloc 32 bytes at ADDR_13
+memalloc symtab.c(1): alloc 32 bytes at ADDR_18
+memalloc strhash.c(1): alloc 32 bytes at ADDR_19
 Symtab "global": EMPTY
-memalloc symtab.c(1): alloc 32 bytes at ADDR_14
-memalloc strhash.c(1): alloc 32 bytes at ADDR_15
+memalloc symtab.c(1): alloc 32 bytes at ADDR_20
+memalloc strhash.c(1): alloc 32 bytes at ADDR_21
 Symtab "static": EMPTY
 
 ---- TEST: Concat symbol tables ----
 
-memalloc symtab.c(1): alloc 32 bytes at ADDR_16
-memalloc strhash.c(1): alloc 32 bytes at ADDR_17
-memalloc sym.c(1): alloc 48 bytes at ADDR_18
-memalloc symref.c(2): alloc 40 bytes at ADDR_19
-memalloc symref.c(1): alloc 32 bytes at ADDR_20
-memalloc symref.c(2): alloc 12 bytes at ADDR_21
-memalloc strhash.c(4): alloc 40 bytes at ADDR_22
-memalloc strhash.c(5): alloc 44 bytes at ADDR_23
-memalloc strhash.c(5): alloc 384 bytes at ADDR_24
-memalloc symref.c(2): free 12 bytes at ADDR_21 allocated at symref.c(2)
-memalloc symref.c(2): alloc 12 bytes at ADDR_25
-memalloc sym.c(1): alloc 48 bytes at ADDR_26
-memalloc symref.c(2): alloc 40 bytes at ADDR_27
-memalloc strpool.c(2): alloc 36 bytes at ADDR_28
-memalloc strpool.c(3): alloc 5 bytes at ADDR_29
-memalloc symref.c(1): alloc 32 bytes at ADDR_30
+memalloc symtab.c(1): alloc 32 bytes at ADDR_22
+memalloc strhash.c(1): alloc 32 bytes at ADDR_23
+memalloc sym.c(1): alloc 48 bytes at ADDR_24
+memalloc symref.c(2): alloc 40 bytes at ADDR_25
+memalloc symref.c(1): alloc 32 bytes at ADDR_26
+memalloc symref.c(2): alloc 12 bytes at ADDR_27
+memalloc strhash.c(4): alloc 40 bytes at ADDR_28
+memalloc strhash.c(5): alloc 44 bytes at ADDR_29
+memalloc strhash.c(5): alloc 384 bytes at ADDR_30
+memalloc symref.c(2): free 12 bytes at ADDR_27 allocated at symref.c(2)
 memalloc symref.c(2): alloc 12 bytes at ADDR_31
-memalloc strhash.c(4): alloc 40 bytes at ADDR_32
-memalloc symref.c(2): free 12 bytes at ADDR_31 allocated at symref.c(2)
-memalloc symref.c(2): alloc 12 bytes at ADDR_33
-memalloc sym.c(1): alloc 48 bytes at ADDR_34
-memalloc symref.c(2): alloc 40 bytes at ADDR_35
-memalloc strpool.c(2): alloc 36 bytes at ADDR_36
-memalloc strpool.c(3): alloc 5 bytes at ADDR_37
-memalloc symref.c(1): alloc 32 bytes at ADDR_38
+memalloc sym.c(1): alloc 48 bytes at ADDR_32
+memalloc symref.c(2): alloc 40 bytes at ADDR_33
+memalloc strpool.c(2): alloc 36 bytes at ADDR_34
+memalloc strpool.c(3): alloc 5 bytes at ADDR_35
+memalloc symref.c(1): alloc 32 bytes at ADDR_36
+memalloc symref.c(2): alloc 12 bytes at ADDR_37
+memalloc strhash.c(4): alloc 40 bytes at ADDR_38
+memalloc symref.c(2): free 12 bytes at ADDR_37 allocated at symref.c(2)
 memalloc symref.c(2): alloc 12 bytes at ADDR_39
-memalloc strhash.c(4): alloc 40 bytes at ADDR_40
-memalloc symref.c(2): free 12 bytes at ADDR_39 allocated at symref.c(2)
-memalloc symref.c(2): alloc 12 bytes at ADDR_41
-Symtab "tab1": 
-  Symbol "VAR1" = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
-  Symbol "VAR2" = 2, type = 0x01 [DEFINED ], ref = [2 ], owner = NULL
-  Symbol "VAR3" = -3, type = 0x01 [DEFINED ], ref = [3 ], owner = NULL
-memalloc symtab.c(1): alloc 32 bytes at ADDR_42
-memalloc strhash.c(1): alloc 32 bytes at ADDR_43
-memalloc sym.c(1): alloc 48 bytes at ADDR_44
-memalloc symref.c(2): alloc 40 bytes at ADDR_45
-memalloc symref.c(1): alloc 32 bytes at ADDR_46
+memalloc sym.c(1): alloc 48 bytes at ADDR_40
+memalloc symref.c(2): alloc 40 bytes at ADDR_41
+memalloc strpool.c(2): alloc 36 bytes at ADDR_42
+memalloc strpool.c(3): alloc 5 bytes at ADDR_43
+memalloc symref.c(1): alloc 32 bytes at ADDR_44
+memalloc symref.c(2): alloc 12 bytes at ADDR_45
+memalloc strhash.c(4): alloc 40 bytes at ADDR_46
+memalloc symref.c(2): free 12 bytes at ADDR_45 allocated at symref.c(2)
 memalloc symref.c(2): alloc 12 bytes at ADDR_47
-memalloc strhash.c(4): alloc 40 bytes at ADDR_48
-memalloc strhash.c(5): alloc 44 bytes at ADDR_49
-memalloc strhash.c(5): alloc 384 bytes at ADDR_50
-memalloc symref.c(2): free 12 bytes at ADDR_47 allocated at symref.c(2)
-memalloc symref.c(2): alloc 12 bytes at ADDR_51
-memalloc sym.c(1): alloc 48 bytes at ADDR_52
-memalloc symref.c(2): alloc 40 bytes at ADDR_53
-memalloc strpool.c(2): alloc 36 bytes at ADDR_54
-memalloc strpool.c(3): alloc 5 bytes at ADDR_55
-memalloc symref.c(1): alloc 32 bytes at ADDR_56
+Symtab "tab1": 
+  Symbol VAR1 (VAR1) = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
+  Symbol VAR2 (VAR2) = 2, type = 0x01 [DEFINED ], ref = [2 ], owner = NULL
+  Symbol VAR3 (VAR3) = -3, type = 0x01 [DEFINED ], ref = [3 ], owner = NULL
+memalloc symtab.c(1): alloc 32 bytes at ADDR_48
+memalloc strhash.c(1): alloc 32 bytes at ADDR_49
+memalloc sym.c(1): alloc 48 bytes at ADDR_50
+memalloc symref.c(2): alloc 40 bytes at ADDR_51
+memalloc symref.c(1): alloc 32 bytes at ADDR_52
+memalloc symref.c(2): alloc 12 bytes at ADDR_53
+memalloc strhash.c(4): alloc 40 bytes at ADDR_54
+memalloc strhash.c(5): alloc 44 bytes at ADDR_55
+memalloc strhash.c(5): alloc 384 bytes at ADDR_56
+memalloc symref.c(2): free 12 bytes at ADDR_53 allocated at symref.c(2)
 memalloc symref.c(2): alloc 12 bytes at ADDR_57
-memalloc strhash.c(4): alloc 40 bytes at ADDR_58
-memalloc symref.c(2): free 12 bytes at ADDR_57 allocated at symref.c(2)
-memalloc symref.c(2): alloc 12 bytes at ADDR_59
-memalloc sym.c(1): alloc 48 bytes at ADDR_60
-memalloc symref.c(2): alloc 40 bytes at ADDR_61
-memalloc strpool.c(2): alloc 36 bytes at ADDR_62
-memalloc strpool.c(3): alloc 5 bytes at ADDR_63
-memalloc symref.c(1): alloc 32 bytes at ADDR_64
+memalloc sym.c(1): alloc 48 bytes at ADDR_58
+memalloc symref.c(2): alloc 40 bytes at ADDR_59
+memalloc strpool.c(2): alloc 36 bytes at ADDR_60
+memalloc strpool.c(3): alloc 5 bytes at ADDR_61
+memalloc symref.c(1): alloc 32 bytes at ADDR_62
+memalloc symref.c(2): alloc 12 bytes at ADDR_63
+memalloc strhash.c(4): alloc 40 bytes at ADDR_64
+memalloc symref.c(2): free 12 bytes at ADDR_63 allocated at symref.c(2)
 memalloc symref.c(2): alloc 12 bytes at ADDR_65
-memalloc strhash.c(4): alloc 40 bytes at ADDR_66
-memalloc symref.c(2): free 12 bytes at ADDR_65 allocated at symref.c(2)
-memalloc symref.c(2): alloc 12 bytes at ADDR_67
-Symtab "tab2": 
-  Symbol "VAR3" = 3, type = 0x01 [DEFINED ], ref = [4 ], owner = NULL
-  Symbol "VAR4" = 4, type = 0x01 [DEFINED ], ref = [5 ], owner = NULL
-  Symbol "VAR5" = 5, type = 0x01 [DEFINED ], ref = [6 ], owner = NULL
-memalloc sym.c(1): alloc 48 bytes at ADDR_68
-memalloc symref.c(2): alloc 40 bytes at ADDR_69
+memalloc sym.c(1): alloc 48 bytes at ADDR_66
+memalloc symref.c(2): alloc 40 bytes at ADDR_67
+memalloc strpool.c(2): alloc 36 bytes at ADDR_68
+memalloc strpool.c(3): alloc 5 bytes at ADDR_69
 memalloc symref.c(1): alloc 32 bytes at ADDR_70
 memalloc symref.c(2): alloc 12 bytes at ADDR_71
-memalloc symref.c(1): free 32 bytes at ADDR_38 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_41 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_35 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_34 allocated at sym.c(1)
-memalloc sym.c(1): alloc 48 bytes at ADDR_72
-memalloc symref.c(2): alloc 40 bytes at ADDR_73
-memalloc symref.c(1): alloc 32 bytes at ADDR_74
-memalloc symref.c(2): alloc 12 bytes at ADDR_75
-memalloc strhash.c(4): alloc 40 bytes at ADDR_76
-memalloc sym.c(1): alloc 48 bytes at ADDR_77
-memalloc symref.c(2): alloc 40 bytes at ADDR_78
-memalloc symref.c(1): alloc 32 bytes at ADDR_79
-memalloc symref.c(2): alloc 12 bytes at ADDR_80
-memalloc strhash.c(4): alloc 40 bytes at ADDR_81
-Symtab "merged_tab": 
-  Symbol "VAR1" = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
-  Symbol "VAR2" = 2, type = 0x01 [DEFINED ], ref = [2 ], owner = NULL
-  Symbol "VAR3" = 3, type = 0x01 [DEFINED ], ref = [4 ], owner = NULL
-  Symbol "VAR4" = 4, type = 0x01 [DEFINED ], ref = [5 ], owner = NULL
-  Symbol "VAR5" = 5, type = 0x01 [DEFINED ], ref = [6 ], owner = NULL
-memalloc symref.c(1): free 32 bytes at ADDR_20 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_25 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_19 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_18 allocated at sym.c(1)
-memalloc strhash.c(3): free 40 bytes at ADDR_22 allocated at strhash.c(4)
-memalloc symref.c(1): free 32 bytes at ADDR_30 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_33 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_27 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_26 allocated at sym.c(1)
-memalloc strhash.c(3): free 40 bytes at ADDR_32 allocated at strhash.c(4)
-memalloc symref.c(1): free 32 bytes at ADDR_70 allocated at symref.c(1)
+memalloc strhash.c(4): alloc 40 bytes at ADDR_72
 memalloc symref.c(2): free 12 bytes at ADDR_71 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_69 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_68 allocated at sym.c(1)
-memalloc strhash.c(3): free 40 bytes at ADDR_40 allocated at strhash.c(4)
-memalloc symref.c(1): free 32 bytes at ADDR_74 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_75 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_73 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_72 allocated at sym.c(1)
-memalloc strhash.c(3): free 40 bytes at ADDR_76 allocated at strhash.c(4)
-memalloc symref.c(1): free 32 bytes at ADDR_79 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_80 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_78 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_77 allocated at sym.c(1)
-memalloc strhash.c(2): free 384 bytes at ADDR_24 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_23 allocated at strhash.c(5)
-memalloc strhash.c(3): free 40 bytes at ADDR_81 allocated at strhash.c(4)
-memalloc symtab.c(1): free 32 bytes at ADDR_16 allocated at symtab.c(1)
-memalloc symref.c(1): free 32 bytes at ADDR_46 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_51 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_45 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_44 allocated at sym.c(1)
-memalloc strhash.c(3): free 40 bytes at ADDR_48 allocated at strhash.c(4)
-memalloc symref.c(1): free 32 bytes at ADDR_56 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_59 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_53 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_52 allocated at sym.c(1)
-memalloc strhash.c(3): free 40 bytes at ADDR_58 allocated at strhash.c(4)
-memalloc symref.c(1): free 32 bytes at ADDR_64 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_67 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_61 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_60 allocated at sym.c(1)
-memalloc strhash.c(2): free 384 bytes at ADDR_50 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_49 allocated at strhash.c(5)
-memalloc strhash.c(3): free 40 bytes at ADDR_66 allocated at strhash.c(4)
-memalloc symtab.c(1): free 32 bytes at ADDR_42 allocated at symtab.c(1)
+memalloc symref.c(2): alloc 12 bytes at ADDR_73
+Symtab "tab2": 
+  Symbol VAR3 (VAR3) = 3, type = 0x01 [DEFINED ], ref = [4 ], owner = NULL
+  Symbol VAR4 (VAR4) = 4, type = 0x01 [DEFINED ], ref = [5 ], owner = NULL
+  Symbol VAR5 (VAR5) = 5, type = 0x01 [DEFINED ], ref = [6 ], owner = NULL
+memalloc sym.c(1): alloc 48 bytes at ADDR_74
+memalloc symref.c(2): alloc 40 bytes at ADDR_75
+memalloc symref.c(1): alloc 32 bytes at ADDR_76
+memalloc symref.c(2): alloc 12 bytes at ADDR_77
+memalloc symref.c(1): free 32 bytes at ADDR_44 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_47 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_41 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_40 allocated at sym.c(1)
+memalloc sym.c(1): alloc 48 bytes at ADDR_78
+memalloc symref.c(2): alloc 40 bytes at ADDR_79
+memalloc symref.c(1): alloc 32 bytes at ADDR_80
+memalloc symref.c(2): alloc 12 bytes at ADDR_81
+memalloc strhash.c(4): alloc 40 bytes at ADDR_82
+memalloc sym.c(1): alloc 48 bytes at ADDR_83
+memalloc symref.c(2): alloc 40 bytes at ADDR_84
+memalloc symref.c(1): alloc 32 bytes at ADDR_85
+memalloc symref.c(2): alloc 12 bytes at ADDR_86
+memalloc strhash.c(4): alloc 40 bytes at ADDR_87
+Symtab "merged_tab": 
+  Symbol VAR1 (VAR1) = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
+  Symbol VAR2 (VAR2) = 2, type = 0x01 [DEFINED ], ref = [2 ], owner = NULL
+  Symbol VAR3 (VAR3) = 3, type = 0x01 [DEFINED ], ref = [4 ], owner = NULL
+  Symbol VAR4 (VAR4) = 4, type = 0x01 [DEFINED ], ref = [5 ], owner = NULL
+  Symbol VAR5 (VAR5) = 5, type = 0x01 [DEFINED ], ref = [6 ], owner = NULL
+memalloc symref.c(1): free 32 bytes at ADDR_26 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_31 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_25 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_24 allocated at sym.c(1)
+memalloc strhash.c(3): free 40 bytes at ADDR_28 allocated at strhash.c(4)
+memalloc symref.c(1): free 32 bytes at ADDR_36 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_39 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_33 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_32 allocated at sym.c(1)
+memalloc strhash.c(3): free 40 bytes at ADDR_38 allocated at strhash.c(4)
+memalloc symref.c(1): free 32 bytes at ADDR_76 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_77 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_75 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_74 allocated at sym.c(1)
+memalloc strhash.c(3): free 40 bytes at ADDR_46 allocated at strhash.c(4)
+memalloc symref.c(1): free 32 bytes at ADDR_80 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_81 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_79 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_78 allocated at sym.c(1)
+memalloc strhash.c(3): free 40 bytes at ADDR_82 allocated at strhash.c(4)
+memalloc symref.c(1): free 32 bytes at ADDR_85 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_86 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_84 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_83 allocated at sym.c(1)
+memalloc strhash.c(2): free 384 bytes at ADDR_30 allocated at strhash.c(5)
+memalloc strhash.c(2): free 44 bytes at ADDR_29 allocated at strhash.c(5)
+memalloc strhash.c(3): free 40 bytes at ADDR_87 allocated at strhash.c(4)
+memalloc symtab.c(1): free 32 bytes at ADDR_22 allocated at symtab.c(1)
+memalloc symref.c(1): free 32 bytes at ADDR_52 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_57 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_51 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_50 allocated at sym.c(1)
+memalloc strhash.c(3): free 40 bytes at ADDR_54 allocated at strhash.c(4)
+memalloc symref.c(1): free 32 bytes at ADDR_62 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_65 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_59 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_58 allocated at sym.c(1)
+memalloc strhash.c(3): free 40 bytes at ADDR_64 allocated at strhash.c(4)
+memalloc symref.c(1): free 32 bytes at ADDR_70 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_73 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_67 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_66 allocated at sym.c(1)
+memalloc strhash.c(2): free 384 bytes at ADDR_56 allocated at strhash.c(5)
+memalloc strhash.c(2): free 44 bytes at ADDR_55 allocated at strhash.c(5)
+memalloc strhash.c(3): free 40 bytes at ADDR_72 allocated at strhash.c(4)
+memalloc symtab.c(1): free 32 bytes at ADDR_48 allocated at symtab.c(1)
 
 ---- TEST: Sort ----
 
-memalloc symtab.c(1): alloc 32 bytes at ADDR_82
-memalloc strhash.c(1): alloc 32 bytes at ADDR_83
-memalloc sym.c(1): alloc 48 bytes at ADDR_84
-memalloc symref.c(2): alloc 40 bytes at ADDR_85
-memalloc strpool.c(2): alloc 36 bytes at ADDR_86
-memalloc strpool.c(3): alloc 4 bytes at ADDR_87
-memalloc symref.c(1): alloc 32 bytes at ADDR_88
-memalloc symref.c(2): alloc 12 bytes at ADDR_89
-memalloc strhash.c(4): alloc 40 bytes at ADDR_90
-memalloc strhash.c(5): alloc 44 bytes at ADDR_91
-memalloc strhash.c(5): alloc 384 bytes at ADDR_92
-memalloc symref.c(2): free 12 bytes at ADDR_89 allocated at symref.c(2)
-memalloc symref.c(2): alloc 12 bytes at ADDR_93
-memalloc sym.c(1): alloc 48 bytes at ADDR_94
-memalloc symref.c(2): alloc 40 bytes at ADDR_95
-memalloc strpool.c(2): alloc 36 bytes at ADDR_96
-memalloc strpool.c(3): alloc 4 bytes at ADDR_97
-memalloc symref.c(1): alloc 32 bytes at ADDR_98
+memalloc symtab.c(1): alloc 32 bytes at ADDR_88
+memalloc strhash.c(1): alloc 32 bytes at ADDR_89
+memalloc sym.c(1): alloc 48 bytes at ADDR_90
+memalloc symref.c(2): alloc 40 bytes at ADDR_91
+memalloc strpool.c(2): alloc 36 bytes at ADDR_92
+memalloc strpool.c(3): alloc 4 bytes at ADDR_93
+memalloc symref.c(1): alloc 32 bytes at ADDR_94
+memalloc symref.c(2): alloc 12 bytes at ADDR_95
+memalloc strhash.c(4): alloc 40 bytes at ADDR_96
+memalloc strhash.c(5): alloc 44 bytes at ADDR_97
+memalloc strhash.c(5): alloc 384 bytes at ADDR_98
+memalloc symref.c(2): free 12 bytes at ADDR_95 allocated at symref.c(2)
 memalloc symref.c(2): alloc 12 bytes at ADDR_99
-memalloc strhash.c(4): alloc 40 bytes at ADDR_100
-memalloc symref.c(2): free 12 bytes at ADDR_99 allocated at symref.c(2)
-memalloc symref.c(2): alloc 12 bytes at ADDR_101
-memalloc sym.c(1): alloc 48 bytes at ADDR_102
-memalloc symref.c(2): alloc 40 bytes at ADDR_103
-memalloc strpool.c(2): alloc 36 bytes at ADDR_104
-memalloc strpool.c(3): alloc 6 bytes at ADDR_105
-memalloc symref.c(1): alloc 32 bytes at ADDR_106
+memalloc sym.c(1): alloc 48 bytes at ADDR_100
+memalloc symref.c(2): alloc 40 bytes at ADDR_101
+memalloc strpool.c(2): alloc 36 bytes at ADDR_102
+memalloc strpool.c(3): alloc 4 bytes at ADDR_103
+memalloc symref.c(1): alloc 32 bytes at ADDR_104
+memalloc symref.c(2): alloc 12 bytes at ADDR_105
+memalloc strhash.c(4): alloc 40 bytes at ADDR_106
+memalloc symref.c(2): free 12 bytes at ADDR_105 allocated at symref.c(2)
 memalloc symref.c(2): alloc 12 bytes at ADDR_107
-memalloc strhash.c(4): alloc 40 bytes at ADDR_108
-memalloc symref.c(2): free 12 bytes at ADDR_107 allocated at symref.c(2)
-memalloc symref.c(2): alloc 12 bytes at ADDR_109
-memalloc sym.c(1): alloc 48 bytes at ADDR_110
-memalloc symref.c(2): alloc 40 bytes at ADDR_111
-memalloc strpool.c(2): alloc 36 bytes at ADDR_112
-memalloc strpool.c(3): alloc 5 bytes at ADDR_113
-memalloc symref.c(1): alloc 32 bytes at ADDR_114
+memalloc sym.c(1): alloc 48 bytes at ADDR_108
+memalloc symref.c(2): alloc 40 bytes at ADDR_109
+memalloc strpool.c(2): alloc 36 bytes at ADDR_110
+memalloc strpool.c(3): alloc 6 bytes at ADDR_111
+memalloc symref.c(1): alloc 32 bytes at ADDR_112
+memalloc symref.c(2): alloc 12 bytes at ADDR_113
+memalloc strhash.c(4): alloc 40 bytes at ADDR_114
+memalloc symref.c(2): free 12 bytes at ADDR_113 allocated at symref.c(2)
 memalloc symref.c(2): alloc 12 bytes at ADDR_115
-memalloc strhash.c(4): alloc 40 bytes at ADDR_116
-memalloc symref.c(2): free 12 bytes at ADDR_115 allocated at symref.c(2)
-memalloc symref.c(2): alloc 12 bytes at ADDR_117
+memalloc sym.c(1): alloc 48 bytes at ADDR_116
+memalloc symref.c(2): alloc 40 bytes at ADDR_117
+memalloc strpool.c(2): alloc 36 bytes at ADDR_118
+memalloc strpool.c(3): alloc 5 bytes at ADDR_119
+memalloc symref.c(1): alloc 32 bytes at ADDR_120
+memalloc symref.c(2): alloc 12 bytes at ADDR_121
+memalloc strhash.c(4): alloc 40 bytes at ADDR_122
+memalloc symref.c(2): free 12 bytes at ADDR_121 allocated at symref.c(2)
+memalloc symref.c(2): alloc 12 bytes at ADDR_123
 Symtab "tab": 
-  Symbol "ONE" = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
-  Symbol "TWO" = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
-  Symbol "THREE" = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
-  Symbol "FOUR" = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
+  Symbol ONE (ONE) = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
+  Symbol TWO (TWO) = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
+  Symbol THREE (THREE) = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
+  Symbol FOUR (FOUR) = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
 Symtab "tab by name": 
-  Symbol "FOUR" = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
-  Symbol "ONE" = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
-  Symbol "THREE" = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
-  Symbol "TWO" = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
+  Symbol FOUR (FOUR) = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
+  Symbol ONE (ONE) = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
+  Symbol THREE (THREE) = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
+  Symbol TWO (TWO) = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
 Symtab "tab by value": 
-  Symbol "ONE" = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
-  Symbol "TWO" = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
-  Symbol "THREE" = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
-  Symbol "FOUR" = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
-memalloc symref.c(1): free 32 bytes at ADDR_88 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_93 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_85 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_84 allocated at sym.c(1)
-memalloc strhash.c(3): free 40 bytes at ADDR_90 allocated at strhash.c(4)
-memalloc symref.c(1): free 32 bytes at ADDR_98 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_101 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_95 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_94 allocated at sym.c(1)
-memalloc strhash.c(3): free 40 bytes at ADDR_100 allocated at strhash.c(4)
-memalloc symref.c(1): free 32 bytes at ADDR_106 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_109 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_103 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_102 allocated at sym.c(1)
-memalloc strhash.c(3): free 40 bytes at ADDR_108 allocated at strhash.c(4)
-memalloc symref.c(1): free 32 bytes at ADDR_114 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_117 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_111 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_110 allocated at sym.c(1)
-memalloc strhash.c(2): free 384 bytes at ADDR_92 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_91 allocated at strhash.c(5)
-memalloc strhash.c(3): free 40 bytes at ADDR_116 allocated at strhash.c(4)
-memalloc symtab.c(1): free 32 bytes at ADDR_82 allocated at symtab.c(1)
+  Symbol ONE (ONE) = 1, type = 0x01 [DEFINED ], ref = [7 ], owner = NULL
+  Symbol TWO (TWO) = 2, type = 0x01 [DEFINED ], ref = [8 ], owner = NULL
+  Symbol THREE (THREE) = 3, type = 0x01 [DEFINED ], ref = [9 ], owner = NULL
+  Symbol FOUR (FOUR) = 4, type = 0x01 [DEFINED ], ref = [10 ], owner = NULL
+memalloc symref.c(1): free 32 bytes at ADDR_94 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_99 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_91 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_90 allocated at sym.c(1)
+memalloc strhash.c(3): free 40 bytes at ADDR_96 allocated at strhash.c(4)
+memalloc symref.c(1): free 32 bytes at ADDR_104 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_107 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_101 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_100 allocated at sym.c(1)
+memalloc strhash.c(3): free 40 bytes at ADDR_106 allocated at strhash.c(4)
+memalloc symref.c(1): free 32 bytes at ADDR_112 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_115 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_109 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_108 allocated at sym.c(1)
+memalloc strhash.c(3): free 40 bytes at ADDR_114 allocated at strhash.c(4)
+memalloc symref.c(1): free 32 bytes at ADDR_120 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_123 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_117 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_116 allocated at sym.c(1)
+memalloc strhash.c(2): free 384 bytes at ADDR_98 allocated at strhash.c(5)
+memalloc strhash.c(2): free 44 bytes at ADDR_97 allocated at strhash.c(5)
+memalloc strhash.c(3): free 40 bytes at ADDR_122 allocated at strhash.c(4)
+memalloc symtab.c(1): free 32 bytes at ADDR_88 allocated at symtab.c(1)
 
 ---- TEST: Use local symbol before definition ----
 
-memalloc sym.c(1): alloc 48 bytes at ADDR_118
-memalloc symref.c(2): alloc 40 bytes at ADDR_119
-memalloc strpool.c(2): alloc 36 bytes at ADDR_120
-memalloc strpool.c(3): alloc 6 bytes at ADDR_121
-memalloc symref.c(1): alloc 32 bytes at ADDR_122
-memalloc symref.c(2): alloc 12 bytes at ADDR_123
-memalloc strhash.c(4): alloc 40 bytes at ADDR_124
-memalloc strhash.c(5): alloc 44 bytes at ADDR_125
-memalloc strhash.c(5): alloc 384 bytes at ADDR_126
-memalloc symref.c(2): free 12 bytes at ADDR_123 allocated at symref.c(2)
-memalloc symref.c(2): alloc 12 bytes at ADDR_127
-memalloc sym.c(1): alloc 48 bytes at ADDR_128
-memalloc symref.c(2): alloc 40 bytes at ADDR_129
-memalloc symref.c(1): alloc 32 bytes at ADDR_130
-memalloc symref.c(2): alloc 12 bytes at ADDR_131
-memalloc strhash.c(4): alloc 40 bytes at ADDR_132
-memalloc strhash.c(5): alloc 44 bytes at ADDR_133
-memalloc strhash.c(5): alloc 384 bytes at ADDR_134
-memalloc sym.c(1): alloc 48 bytes at ADDR_135
-memalloc symref.c(2): alloc 40 bytes at ADDR_136
-memalloc strpool.c(2): alloc 36 bytes at ADDR_137
-memalloc strpool.c(3): alloc 6 bytes at ADDR_138
-memalloc symref.c(1): alloc 32 bytes at ADDR_139
-memalloc symref.c(2): alloc 12 bytes at ADDR_140
-memalloc strhash.c(4): alloc 40 bytes at ADDR_141
-memalloc strhash.c(5): alloc 44 bytes at ADDR_142
-memalloc strhash.c(5): alloc 384 bytes at ADDR_143
-memalloc symref.c(2): free 12 bytes at ADDR_140 allocated at symref.c(2)
-memalloc symref.c(2): alloc 12 bytes at ADDR_144
-memalloc sym.c(1): alloc 48 bytes at ADDR_145
-memalloc symref.c(2): alloc 40 bytes at ADDR_146
-memalloc strpool.c(2): alloc 36 bytes at ADDR_147
-memalloc strpool.c(3): alloc 3 bytes at ADDR_148
-memalloc symref.c(1): alloc 32 bytes at ADDR_149
+memalloc sym.c(1): alloc 48 bytes at ADDR_124
+memalloc symref.c(2): alloc 40 bytes at ADDR_125
+memalloc strpool.c(2): alloc 36 bytes at ADDR_126
+memalloc strpool.c(3): alloc 6 bytes at ADDR_127
+memalloc symref.c(1): alloc 32 bytes at ADDR_128
+memalloc symref.c(2): alloc 12 bytes at ADDR_129
+memalloc strhash.c(4): alloc 40 bytes at ADDR_130
+memalloc strhash.c(5): alloc 44 bytes at ADDR_131
+memalloc strhash.c(5): alloc 384 bytes at ADDR_132
+memalloc symref.c(2): free 12 bytes at ADDR_129 allocated at symref.c(2)
+memalloc symref.c(2): alloc 12 bytes at ADDR_133
+memalloc sym.c(1): alloc 48 bytes at ADDR_134
+memalloc symref.c(2): alloc 40 bytes at ADDR_135
+memalloc symref.c(1): alloc 32 bytes at ADDR_136
+memalloc symref.c(2): alloc 12 bytes at ADDR_137
+memalloc strhash.c(4): alloc 40 bytes at ADDR_138
+memalloc strhash.c(5): alloc 44 bytes at ADDR_139
+memalloc strhash.c(5): alloc 384 bytes at ADDR_140
+memalloc sym.c(1): alloc 48 bytes at ADDR_141
+memalloc symref.c(2): alloc 40 bytes at ADDR_142
+memalloc strpool.c(2): alloc 36 bytes at ADDR_143
+memalloc strpool.c(3): alloc 6 bytes at ADDR_144
+memalloc symref.c(1): alloc 32 bytes at ADDR_145
+memalloc symref.c(2): alloc 12 bytes at ADDR_146
+memalloc strhash.c(4): alloc 40 bytes at ADDR_147
+memalloc strhash.c(5): alloc 44 bytes at ADDR_148
+memalloc strhash.c(5): alloc 384 bytes at ADDR_149
+memalloc symref.c(2): free 12 bytes at ADDR_146 allocated at symref.c(2)
 memalloc symref.c(2): alloc 12 bytes at ADDR_150
-memalloc strhash.c(4): alloc 40 bytes at ADDR_151
-memalloc symref.c(1): alloc 32 bytes at ADDR_152
-memalloc symref.c(2): alloc 12 bytes at ADDR_153
-memalloc symref.c(1): alloc 32 bytes at ADDR_154
-memalloc symref.c(2): alloc 12 bytes at ADDR_155
-Symbol "NN" = 12, type = 0x1B [DEFINED TOUCHED ADDR LOCAL ], ref = [10 6 8 ], owner = CURRENTMODULE
+memalloc sym.c(1): alloc 48 bytes at ADDR_151
+memalloc symref.c(2): alloc 40 bytes at ADDR_152
+memalloc strpool.c(2): alloc 36 bytes at ADDR_153
+memalloc strpool.c(3): alloc 3 bytes at ADDR_154
+memalloc symref.c(1): alloc 32 bytes at ADDR_155
+memalloc symref.c(2): alloc 12 bytes at ADDR_156
+memalloc strhash.c(4): alloc 40 bytes at ADDR_157
+memalloc symref.c(1): alloc 32 bytes at ADDR_158
+memalloc symref.c(2): alloc 12 bytes at ADDR_159
+memalloc symref.c(1): alloc 32 bytes at ADDR_160
+memalloc symref.c(2): alloc 12 bytes at ADDR_161
+memalloc strpool.c(2): alloc 36 bytes at ADDR_162
+memalloc strpool.c(3): alloc 10 bytes at ADDR_163
+Symbol NN (NN@MODULE) = 12, type = 0x1B [DEFINED TOUCHED ADDR LOCAL ], ref = [10 6 8 ], owner = CURRENTMODULE
 Symtab "global tab": 
-  Symbol "ASMPC" = 12, type = 0x03 [DEFINED TOUCHED ], ref = [3 ], owner = NULL
+  Symbol ASMPC (ASMPC) = 12, type = 0x03 [DEFINED TOUCHED ], ref = [3 ], owner = NULL
 Symtab "static tab": 
-  Symbol "WIN32" = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
+  Symbol WIN32 (WIN32) = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
 Symtab "local tab": 
-  Symbol "WIN32" = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
-  Symbol "NN" = 12, type = 0x1B [DEFINED TOUCHED ADDR LOCAL ], ref = [10 6 8 ], owner = CURRENTMODULE
+  Symbol WIN32 (WIN32) = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
+  Symbol NN (NN@MODULE) = 12, type = 0x1B [DEFINED TOUCHED ADDR LOCAL ], ref = [10 6 8 ], owner = CURRENTMODULE
 
 ---- TEST: End ----
 
-memalloc strhash.c(1): free 32 bytes at ADDR_83 allocated at strhash.c(1)
-memalloc strhash.c(1): free 32 bytes at ADDR_43 allocated at strhash.c(1)
-memalloc strhash.c(1): free 32 bytes at ADDR_17 allocated at strhash.c(1)
-memalloc symref.c(1): free 32 bytes at ADDR_122 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_127 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_119 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_118 allocated at sym.c(1)
-memalloc strhash.c(2): free 384 bytes at ADDR_126 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_125 allocated at strhash.c(5)
-memalloc strhash.c(3): free 40 bytes at ADDR_124 allocated at strhash.c(4)
-memalloc symtab.c(1): free 32 bytes at ADDR_14 allocated at symtab.c(1)
-memalloc strhash.c(1): free 32 bytes at ADDR_15 allocated at strhash.c(1)
-memalloc symref.c(1): free 32 bytes at ADDR_139 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_144 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_136 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_135 allocated at sym.c(1)
-memalloc strhash.c(2): free 384 bytes at ADDR_143 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_142 allocated at strhash.c(5)
-memalloc strhash.c(3): free 40 bytes at ADDR_141 allocated at strhash.c(4)
-memalloc symtab.c(1): free 32 bytes at ADDR_12 allocated at symtab.c(1)
-memalloc strhash.c(1): free 32 bytes at ADDR_13 allocated at strhash.c(1)
-memalloc symref.c(1): free 32 bytes at ADDR_130 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_131 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_129 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_128 allocated at sym.c(1)
-memalloc strhash.c(3): free 40 bytes at ADDR_132 allocated at strhash.c(4)
-memalloc symref.c(1): free 32 bytes at ADDR_154 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_155 allocated at symref.c(2)
-memalloc symref.c(1): free 32 bytes at ADDR_149 allocated at symref.c(1)
+memalloc strhash.c(1): free 32 bytes at ADDR_89 allocated at strhash.c(1)
+memalloc strhash.c(1): free 32 bytes at ADDR_49 allocated at strhash.c(1)
+memalloc strhash.c(1): free 32 bytes at ADDR_23 allocated at strhash.c(1)
+memalloc symref.c(1): free 32 bytes at ADDR_128 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_133 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_125 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_124 allocated at sym.c(1)
+memalloc strhash.c(2): free 384 bytes at ADDR_132 allocated at strhash.c(5)
+memalloc strhash.c(2): free 44 bytes at ADDR_131 allocated at strhash.c(5)
+memalloc strhash.c(3): free 40 bytes at ADDR_130 allocated at strhash.c(4)
+memalloc symtab.c(1): free 32 bytes at ADDR_20 allocated at symtab.c(1)
+memalloc strhash.c(1): free 32 bytes at ADDR_21 allocated at strhash.c(1)
+memalloc symref.c(1): free 32 bytes at ADDR_145 allocated at symref.c(1)
 memalloc symref.c(2): free 12 bytes at ADDR_150 allocated at symref.c(2)
-memalloc symref.c(1): free 32 bytes at ADDR_152 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_153 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_146 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_145 allocated at sym.c(1)
-memalloc strhash.c(2): free 384 bytes at ADDR_134 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_133 allocated at strhash.c(5)
-memalloc strhash.c(3): free 40 bytes at ADDR_151 allocated at strhash.c(4)
+memalloc symref.c(2): free 40 bytes at ADDR_142 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_141 allocated at sym.c(1)
+memalloc strhash.c(2): free 384 bytes at ADDR_149 allocated at strhash.c(5)
+memalloc strhash.c(2): free 44 bytes at ADDR_148 allocated at strhash.c(5)
+memalloc strhash.c(3): free 40 bytes at ADDR_147 allocated at strhash.c(4)
+memalloc symtab.c(1): free 32 bytes at ADDR_18 allocated at symtab.c(1)
+memalloc strhash.c(1): free 32 bytes at ADDR_19 allocated at strhash.c(1)
+memalloc symref.c(1): free 32 bytes at ADDR_136 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_137 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_135 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_134 allocated at sym.c(1)
+memalloc strhash.c(3): free 40 bytes at ADDR_138 allocated at strhash.c(4)
+memalloc symref.c(1): free 32 bytes at ADDR_160 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_161 allocated at symref.c(2)
+memalloc symref.c(1): free 32 bytes at ADDR_155 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_156 allocated at symref.c(2)
+memalloc symref.c(1): free 32 bytes at ADDR_158 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_159 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_152 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_151 allocated at sym.c(1)
+memalloc strhash.c(2): free 384 bytes at ADDR_140 allocated at strhash.c(5)
+memalloc strhash.c(2): free 44 bytes at ADDR_139 allocated at strhash.c(5)
+memalloc strhash.c(3): free 40 bytes at ADDR_157 allocated at strhash.c(4)
 memalloc symtab.c(1): free 32 bytes at ADDR_1 allocated at symtab.c(1)
 memalloc strhash.c(1): free 32 bytes at ADDR_2 allocated at strhash.c(1)
 memalloc strpool.c(6): free 5 bytes at ADDR_7 allocated at strpool.c(3)
 memalloc strpool.c(7): free 36 bytes at ADDR_6 allocated at strpool.c(2)
-memalloc strpool.c(6): free 5 bytes at ADDR_29 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_28 allocated at strpool.c(2)
-memalloc strpool.c(6): free 5 bytes at ADDR_37 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_36 allocated at strpool.c(2)
-memalloc strpool.c(6): free 5 bytes at ADDR_55 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_54 allocated at strpool.c(2)
-memalloc strpool.c(6): free 5 bytes at ADDR_63 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_62 allocated at strpool.c(2)
-memalloc strpool.c(6): free 4 bytes at ADDR_87 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_86 allocated at strpool.c(2)
-memalloc strpool.c(6): free 4 bytes at ADDR_97 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_96 allocated at strpool.c(2)
-memalloc strpool.c(6): free 6 bytes at ADDR_105 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_104 allocated at strpool.c(2)
-memalloc strpool.c(6): free 5 bytes at ADDR_113 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_112 allocated at strpool.c(2)
-memalloc strpool.c(6): free 6 bytes at ADDR_121 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_120 allocated at strpool.c(2)
-memalloc strpool.c(6): free 6 bytes at ADDR_138 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_137 allocated at strpool.c(2)
+memalloc strpool.c(6): free 12 bytes at ADDR_17 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_16 allocated at strpool.c(2)
+memalloc strpool.c(6): free 5 bytes at ADDR_35 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_34 allocated at strpool.c(2)
+memalloc strpool.c(6): free 5 bytes at ADDR_43 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_42 allocated at strpool.c(2)
+memalloc strpool.c(6): free 5 bytes at ADDR_61 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_60 allocated at strpool.c(2)
+memalloc strpool.c(6): free 5 bytes at ADDR_69 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_68 allocated at strpool.c(2)
+memalloc strpool.c(6): free 4 bytes at ADDR_93 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_92 allocated at strpool.c(2)
+memalloc strpool.c(6): free 4 bytes at ADDR_103 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_102 allocated at strpool.c(2)
+memalloc strpool.c(6): free 6 bytes at ADDR_111 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_110 allocated at strpool.c(2)
+memalloc strpool.c(6): free 5 bytes at ADDR_119 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_118 allocated at strpool.c(2)
+memalloc strpool.c(6): free 6 bytes at ADDR_127 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_126 allocated at strpool.c(2)
+memalloc strpool.c(6): free 6 bytes at ADDR_144 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_143 allocated at strpool.c(2)
+memalloc strpool.c(6): free 3 bytes at ADDR_154 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_153 allocated at strpool.c(2)
 memalloc strpool.c(5): free 384 bytes at ADDR_9 allocated at strpool.c(4)
 memalloc strpool.c(5): free 44 bytes at ADDR_8 allocated at strpool.c(4)
-memalloc strpool.c(6): free 3 bytes at ADDR_148 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_147 allocated at strpool.c(2)
+memalloc strpool.c(6): free 10 bytes at ADDR_163 allocated at strpool.c(3)
+memalloc strpool.c(7): free 36 bytes at ADDR_162 allocated at strpool.c(2)
 memalloc strpool.c(1): free 32 bytes at ADDR_3 allocated at strpool.c(1)
 memalloc: cleanup
 END
