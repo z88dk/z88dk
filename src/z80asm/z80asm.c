@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.92 2013-06-16 20:14:39 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.93 2013-06-16 22:25:39 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.92  2013-06-16 20:14:39  pauloscustodio
+/* Revision 1.93  2013-06-16 22:25:39  pauloscustodio
+/* New remove_all_{local,static,global}_syms( void ) functions
+/* to encapsulate calls to get_global_tab().
+/*
+/* Revision 1.92  2013/06/16 20:14:39  pauloscustodio
 /* Move deffile writing to deffile.c, remove global variable deffile
 /*
 /* Revision 1.91  2013/06/15 00:26:23  pauloscustodio
@@ -856,8 +860,8 @@ static void do_assemble( char *src_filename, char *obj_filename )
 
         close_error_file();
 
-        SymbolHash_remove_all( CURRENTMODULE->local_tab );
-        SymbolHash_remove_all( get_global_tab() );
+        remove_all_local_syms();
+        remove_all_global_syms();
 
         if ( verbose )
         {

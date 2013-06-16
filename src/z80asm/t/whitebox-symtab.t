@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.7 2013-06-16 17:51:57 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.8 2013-06-16 22:25:39 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.7  2013-06-16 17:51:57  pauloscustodio
+# Revision 1.8  2013-06-16 22:25:39  pauloscustodio
+# New remove_all_{local,static,global}_syms( void ) functions
+# to encapsulate calls to get_global_tab().
+#
+# Revision 1.7  2013/06/16 17:51:57  pauloscustodio
 # get_all_syms() to get list of symbols matching a type mask, use in mapfile to decouple
 # it from get_global_tab()
 #
@@ -231,6 +235,18 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( sym->type & SYMDEFINED );
 	dump_Symbol(sym);
 	
+	dump_symtab();
+	
+	TITLE("Delete Local");	
+	remove_all_local_syms();
+	dump_symtab();
+	
+	TITLE("Delete Static");	
+	remove_all_static_syms();
+	dump_symtab();
+	
+	TITLE("Delete Global");	
+	remove_all_global_syms();
 	dump_symtab();
 	
 	TITLE("End");	
@@ -559,29 +575,8 @@ Symtab "local tab":
   Symbol WIN32 (WIN32) = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
   Symbol NN (NN@MODULE) = 12, type = 0x1B [DEFINED TOUCHED ADDR LOCAL ], ref = [10 6 8 ], owner = CURRENTMODULE
 
----- TEST: End ----
+---- TEST: Delete Local ----
 
-memalloc strhash.c(1): free 32 bytes at ADDR_89 allocated at strhash.c(1)
-memalloc strhash.c(1): free 32 bytes at ADDR_49 allocated at strhash.c(1)
-memalloc strhash.c(1): free 32 bytes at ADDR_23 allocated at strhash.c(1)
-memalloc symref.c(1): free 32 bytes at ADDR_128 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_133 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_125 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_124 allocated at sym.c(1)
-memalloc strhash.c(2): free 384 bytes at ADDR_132 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_131 allocated at strhash.c(5)
-memalloc strhash.c(3): free 40 bytes at ADDR_130 allocated at strhash.c(4)
-memalloc symtab.c(1): free 32 bytes at ADDR_20 allocated at symtab.c(1)
-memalloc strhash.c(1): free 32 bytes at ADDR_21 allocated at strhash.c(1)
-memalloc symref.c(1): free 32 bytes at ADDR_145 allocated at symref.c(1)
-memalloc symref.c(2): free 12 bytes at ADDR_150 allocated at symref.c(2)
-memalloc symref.c(2): free 40 bytes at ADDR_142 allocated at symref.c(2)
-memalloc sym.c(1): free 48 bytes at ADDR_141 allocated at sym.c(1)
-memalloc strhash.c(2): free 384 bytes at ADDR_149 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_148 allocated at strhash.c(5)
-memalloc strhash.c(3): free 40 bytes at ADDR_147 allocated at strhash.c(4)
-memalloc symtab.c(1): free 32 bytes at ADDR_18 allocated at symtab.c(1)
-memalloc strhash.c(1): free 32 bytes at ADDR_19 allocated at strhash.c(1)
 memalloc symref.c(1): free 32 bytes at ADDR_136 allocated at symref.c(1)
 memalloc symref.c(2): free 12 bytes at ADDR_137 allocated at symref.c(2)
 memalloc symref.c(2): free 40 bytes at ADDR_135 allocated at symref.c(2)
@@ -598,6 +593,48 @@ memalloc sym.c(1): free 48 bytes at ADDR_151 allocated at sym.c(1)
 memalloc strhash.c(2): free 384 bytes at ADDR_140 allocated at strhash.c(5)
 memalloc strhash.c(2): free 44 bytes at ADDR_139 allocated at strhash.c(5)
 memalloc strhash.c(3): free 40 bytes at ADDR_157 allocated at strhash.c(4)
+Symtab "global tab": 
+  Symbol ASMPC (ASMPC) = 12, type = 0x03 [DEFINED TOUCHED ], ref = [3 ], owner = NULL
+Symtab "static tab": 
+  Symbol WIN32 (WIN32) = 1, type = 0x01 [DEFINED ], ref = [1 ], owner = NULL
+Symtab "local tab": EMPTY
+
+---- TEST: Delete Static ----
+
+memalloc symref.c(1): free 32 bytes at ADDR_128 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_133 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_125 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_124 allocated at sym.c(1)
+memalloc strhash.c(2): free 384 bytes at ADDR_132 allocated at strhash.c(5)
+memalloc strhash.c(2): free 44 bytes at ADDR_131 allocated at strhash.c(5)
+memalloc strhash.c(3): free 40 bytes at ADDR_130 allocated at strhash.c(4)
+Symtab "global tab": 
+  Symbol ASMPC (ASMPC) = 12, type = 0x03 [DEFINED TOUCHED ], ref = [3 ], owner = NULL
+Symtab "static tab": EMPTY
+Symtab "local tab": EMPTY
+
+---- TEST: Delete Global ----
+
+memalloc symref.c(1): free 32 bytes at ADDR_145 allocated at symref.c(1)
+memalloc symref.c(2): free 12 bytes at ADDR_150 allocated at symref.c(2)
+memalloc symref.c(2): free 40 bytes at ADDR_142 allocated at symref.c(2)
+memalloc sym.c(1): free 48 bytes at ADDR_141 allocated at sym.c(1)
+memalloc strhash.c(2): free 384 bytes at ADDR_149 allocated at strhash.c(5)
+memalloc strhash.c(2): free 44 bytes at ADDR_148 allocated at strhash.c(5)
+memalloc strhash.c(3): free 40 bytes at ADDR_147 allocated at strhash.c(4)
+Symtab "global tab": EMPTY
+Symtab "static tab": EMPTY
+Symtab "local tab": EMPTY
+
+---- TEST: End ----
+
+memalloc strhash.c(1): free 32 bytes at ADDR_89 allocated at strhash.c(1)
+memalloc strhash.c(1): free 32 bytes at ADDR_49 allocated at strhash.c(1)
+memalloc strhash.c(1): free 32 bytes at ADDR_23 allocated at strhash.c(1)
+memalloc symtab.c(1): free 32 bytes at ADDR_20 allocated at symtab.c(1)
+memalloc strhash.c(1): free 32 bytes at ADDR_21 allocated at strhash.c(1)
+memalloc symtab.c(1): free 32 bytes at ADDR_18 allocated at symtab.c(1)
+memalloc strhash.c(1): free 32 bytes at ADDR_19 allocated at strhash.c(1)
 memalloc symtab.c(1): free 32 bytes at ADDR_1 allocated at symtab.c(1)
 memalloc strhash.c(1): free 32 bytes at ADDR_2 allocated at strhash.c(1)
 memalloc strpool.c(6): free 5 bytes at ADDR_7 allocated at strpool.c(3)

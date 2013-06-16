@@ -18,9 +18,13 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.10 2013-06-16 20:14:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.11 2013-06-16 22:25:39 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.10  2013-06-16 20:14:39  pauloscustodio
+Revision 1.11  2013-06-16 22:25:39  pauloscustodio
+New remove_all_{local,static,global}_syms( void ) functions
+to encapsulate calls to get_global_tab().
+
+Revision 1.10  2013/06/16 20:14:39  pauloscustodio
 Move deffile writing to deffile.c, remove global variable deffile
 
 Revision 1.9  2013/06/16 17:51:57  pauloscustodio
@@ -295,6 +299,13 @@ void copy_static_syms( void )
 		_define_sym( sym->name, sym->value, sym->type, CURRENTMODULE, CURRENTMODULE->local_tab );
 	}
 }
+
+/*-----------------------------------------------------------------------------
+*   delete the static and global symbols
+*----------------------------------------------------------------------------*/
+void remove_all_local_syms( void )	{ SymbolHash_remove_all( CURRENTMODULE->local_tab ); }
+void remove_all_static_syms( void )	{ SymbolHash_remove_all( get_static_tab() ); }
+void remove_all_global_syms( void )	{ SymbolHash_remove_all( get_global_tab() ); }
 
 /*-----------------------------------------------------------------------------
 *   create a local symbol:
