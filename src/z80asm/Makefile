@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.62 2013-06-15 00:26:23 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.63 2013-06-16 18:01:54 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.62  2013-06-15 00:26:23  pauloscustodio
+# Revision 1.63  2013-06-16 18:01:54  pauloscustodio
+# Add testzcc target to compile and run a few examples using the assembler.
+#
+# Revision 1.62  2013/06/15 00:26:23  pauloscustodio
 # Move mapfile writing to mapfile.c.
 #
 # Revision 1.61  2013/06/10 23:08:03  pauloscustodio
@@ -320,7 +323,8 @@ install:
 	install $(TARGET) $(PREFIX)/bin/
 
 clean :
-	$(RM) *.o *.exe *~ *.bak *.orig core $(TARGET) test* t/*.tmp t/developer/*.tmp zcc_opt.def
+	$(RM) *.o *.exe *~ *.bak *.orig core $(TARGET) test* t/*.tmp t/developer/*.tmp 
+	$(RM) microman.bin microman.tap mandel.bin mandel.tap zcc_opt.def
 	$(RM) -rf Debug Release x1 x2 x3
 
 # test
@@ -329,6 +333,12 @@ test : $(TARGET)
 
 testmsvc : $(MSVC_TARGET)
 	make Z80ASM=$(MSVC_TARGET) test
+
+testzcc : $(TARGET)
+	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c
+	zcc +zx -lndos -lmzx -create-app -omandel.bin   ../../examples/graphics/mandel.c
+	eightyone microman.tap
+	eightyone mandel.tap
 
 # build with msvc - need to build manualy, devenv not available in Express
 $(MSVC_TARGET) : $(wildcard *.c) $(wildcard *.h)
@@ -465,7 +475,7 @@ strpool.o: uthash.h die.h
 strutil.o: memalloc.h except.h e4c.h strutil.h
 sym.o: memalloc.h except.h e4c.h listfile.h class.h queue.h types.h dynstr.h
 sym.o: symref.h classlist.h options.h symbol.h model.h objfile.h symtab.h
-sym.o: classhash.h strhash.h uthash.h die.h sym.h strpool.h
+sym.o: classhash.h strhash.h uthash.h die.h sym.h safestr.h strpool.h
 symref.o: memalloc.h except.h e4c.h symref.h class.h queue.h types.h
 symref.o: classlist.h
 symtab.o: memalloc.h except.h e4c.h errors.h errors_def.h listfile.h class.h
