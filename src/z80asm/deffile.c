@@ -12,35 +12,23 @@
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-Mapfile writing - list of all local and global address symbols after link phase
+Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.4 2013-06-16 20:14:39 pauloscustodio Exp $
-$Log: mapfile.c,v $
-Revision 1.4  2013-06-16 20:14:39  pauloscustodio
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.1 2013-06-16 20:14:39 pauloscustodio Exp $
+$Log: deffile.c,v $
+Revision 1.1  2013-06-16 20:14:39  pauloscustodio
 Move deffile writing to deffile.c, remove global variable deffile
 
-Revision 1.3  2013/06/16 17:51:57  pauloscustodio
-get_all_syms() to get list of symbols matching a type mask, use in mapfile to decouple
-it from get_global_tab()
-
-Revision 1.2  2013/06/16 16:49:20  pauloscustodio
-Symbol_fullname() to return full symbol name NAME@MODULE
-
-Revision 1.1  2013/06/15 00:26:23  pauloscustodio
-Move mapfile writing to mapfile.c.
 
 
 */
 
-
 #include "memalloc.h"   /* before any other include */
 
+#include "deffile.h"
 #include "file.h"
 #include "listfile.h"
-#include "mapfile.h"
 #include "options.h"
-#include "safestr.h"
-#include "strpool.h"
 #include "symbol.h"
 #include "symtab.h"
 #include "z80asm.h"
@@ -48,7 +36,7 @@ Move mapfile writing to mapfile.c.
 /*-----------------------------------------------------------------------------
 *   Write all symbols in given symbol table to given file
 *----------------------------------------------------------------------------*/
-static void write_map_syms( FILE *file, SymbolHash *symtab )
+static void write_def_syms( FILE *file, SymbolHash *symtab )
 {
 	SymbolHashElem *iter;
 	Symbol         *sym;
@@ -58,73 +46,53 @@ static void write_map_syms( FILE *file, SymbolHash *symtab )
 		sym = (Symbol *)iter->value;
 
 		/* CH_0017 */
-		fprintf( file, "%-*s ", COLUMN_WIDTH - 1, sym->name );
+		fprintf( file, "DEFC %-*s ", COLUMN_WIDTH - 1, sym->name );
 
 		if ( autorelocate )
 		{
-			fprintf( file, "= %04lX, ", sizeof_relocroutine + sizeof_reloctable + 4 + sym->value );
+			fprintf( file, "= $%04lX ; ", sizeof_relocroutine + sizeof_reloctable + 4 + sym->value );
 		}
 		else
 		{
-			fprintf( file, "= %04lX, ", sym->value );
+			fprintf( file, "= $%04lX ; ", sym->value );
 		}
 
-		if ( sym->type & SYMLOCAL )
-		{
-			fputc_err( 'L', file );
-		}
-		else
-		{
-			fputc_err( 'G', file );
-		}
-
-		fprintf( file, ": %s\n", sym->owner->mname );
+		fprintf( file, "Module %s\n", sym->owner->mname );
     }
 }
 
 /*-----------------------------------------------------------------------------
-*   write full mapfile to FILE.map, where FILE is the name of the first
+*   write full defition file to FILE.def, where FILE is the name of the first
 *	linked source module
 *----------------------------------------------------------------------------*/
-void write_map_file( void )
+void write_def_file( void )
 {
     char *filename;
 	FILE *file;
-	SymbolHash *map_symtab;
+	SymbolHash *def_symtab;
 
-	/* use first module filename to create global map file */
-	filename = map_filename_ext( modulehdr->first->cfile->fname ); /* set '.map' extension */
+	/* use first module filename to create global def file */
+	filename = def_filename_ext( modulehdr->first->cfile->fname ); /* set '.def' extension */
 
-    /* Create MAP file */
+    /* Create DEF file */
     file = xfopen( filename, "w" );           /* CH_0012 */
 
     if ( verbose )
     {
-        puts( "Creating map..." );
+        puts( "Creating global definition file..." );
     }
 
-	/* BUG_0036 - need to create coposed symbol names NAME@MODULE, so that local symbols 
-	   in different modules are shown */
-	map_symtab = get_all_syms( SYMADDR, SYMADDR );
-    if ( SymbolHash_empty( map_symtab ) )
-    {
-        fputs( "None.\n", file );
-    }
-    else
-    {
-		/* Write map symbols alphabetically */
-		SymbolHash_sort( map_symtab, SymbolHash_by_name );
-		write_map_syms( file, map_symtab );
+	def_symtab = get_all_syms( SYMADDR | SYMLOCAL | SYMXDEF | SYMDEF, 
+							   SYMADDR | 0        | SYMXDEF | 0      );
 
-        fputs( "\n\n", file );
+	/* Write symbols by address */
+	SymbolHash_sort( def_symtab, SymbolHash_by_value );
+	write_def_syms( file, def_symtab );
 
-		/* Write map symbols numerically */
-		SymbolHash_sort( map_symtab, SymbolHash_by_value );
-		write_map_syms( file, map_symtab );
-    }
-
-	OBJ_DELETE(map_symtab);
+	OBJ_DELETE(def_symtab);
 
     xfclose( file );
 }
+
+
 

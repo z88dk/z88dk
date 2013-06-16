@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.63 2013-06-16 18:01:54 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.64 2013-06-16 20:14:39 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.63  2013-06-16 18:01:54  pauloscustodio
+# Revision 1.64  2013-06-16 20:14:39  pauloscustodio
+# Move deffile writing to deffile.c, remove global variable deffile
+#
+# Revision 1.63  2013/06/16 18:01:54  pauloscustodio
 # Add testzcc target to compile and run a few examples using the assembler.
 #
 # Revision 1.62  2013/06/15 00:26:23  pauloscustodio
@@ -254,6 +257,7 @@ OBJS = 	\
 	asmdrctv.o 		\
 	class.o			\
 	codearea.o		\
+	deffile.o		\
 	die.o			\
 	dynstr.o		\
 	errors.o		\
@@ -266,9 +270,9 @@ OBJS = 	\
 	mapfile.o		\
 	memalloc.o		\
 	model.o			\
-	module.o		\
 	model_symref.o	\
 	modlink.o		\
+	module.o		\
 	objfile.o		\
 	options.o		\
 	parse.o			\
@@ -403,6 +407,10 @@ codearea.o: errors.h errors_def.h symbol.h model.h objfile.h class.h queue.h
 codearea.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h symref.h
 codearea.o: classlist.h z80asm.h file.h safestr.h strlist.h listfile.h
 codearea.o: dynstr.h
+deffile.o: memalloc.h except.h e4c.h deffile.h file.h safestr.h types.h
+deffile.o: strlist.h class.h queue.h listfile.h dynstr.h symref.h classlist.h
+deffile.o: options.h symbol.h model.h objfile.h symtab.h classhash.h
+deffile.o: strhash.h uthash.h die.h sym.h z80asm.h config.h ../config.h
 die.o: memalloc.h except.h e4c.h die.h types.h strutil.h safestr.h
 dynstr.o: memalloc.h except.h e4c.h dynstr.h class.h queue.h types.h
 dynstr.o: strutil.h
@@ -433,14 +441,14 @@ mapfile.o: options.h symbol.h model.h objfile.h symtab.h classhash.h
 mapfile.o: strhash.h uthash.h die.h sym.h strpool.h z80asm.h config.h
 mapfile.o: ../config.h
 memalloc.o: memalloc.h except.h e4c.h types.h die.h queue.h
-module.o: memalloc.h except.h e4c.h module.h class.h queue.h types.h
-module.o: classlist.h dynstr.h symtab.h classhash.h strhash.h uthash.h die.h
-module.o: sym.h symref.h
 modlink.o: memalloc.h except.h e4c.h codearea.h types.h config.h ../config.h
 modlink.o: errors.h errors_def.h file.h safestr.h strlist.h class.h queue.h
 modlink.o: listfile.h dynstr.h symref.h classlist.h options.h symbol.h
 modlink.o: model.h objfile.h symtab.h classhash.h strhash.h uthash.h die.h
 modlink.o: sym.h strpool.h strutil.h z80asm.h
+module.o: memalloc.h except.h e4c.h module.h class.h queue.h types.h
+module.o: classlist.h dynstr.h symtab.h classhash.h strhash.h uthash.h die.h
+module.o: sym.h symref.h
 objfile.o: memalloc.h except.h e4c.h class.h queue.h types.h errors.h
 objfile.o: errors_def.h file.h safestr.h strlist.h objfile.h strpool.h
 options.o: memalloc.h except.h e4c.h errors.h errors_def.h file.h safestr.h
@@ -483,10 +491,10 @@ symtab.o: queue.h types.h dynstr.h symref.h classlist.h options.h symbol.h
 symtab.o: model.h objfile.h symtab.h classhash.h strhash.h uthash.h die.h
 symtab.o: sym.h z80asm.h config.h ../config.h
 z80asm.o: memalloc.h except.h e4c.h codearea.h types.h config.h ../config.h
-z80asm.o: errors.h errors_def.h file.h safestr.h strlist.h class.h queue.h
-z80asm.o: hist.h listfile.h dynstr.h symref.h classlist.h mapfile.h objfile.h
-z80asm.o: options.h symbol.h model.h symtab.h classhash.h strhash.h uthash.h
-z80asm.o: die.h sym.h strpool.h strutil.h z80asm.h
+z80asm.o: deffile.h errors.h errors_def.h file.h safestr.h strlist.h class.h
+z80asm.o: queue.h hist.h listfile.h dynstr.h symref.h classlist.h mapfile.h
+z80asm.o: objfile.h options.h symbol.h model.h symtab.h classhash.h strhash.h
+z80asm.o: uthash.h die.h sym.h strpool.h strutil.h z80asm.h
 z80instr.o: memalloc.h except.h e4c.h config.h ../config.h z80asm.h types.h
 z80instr.o: sym.h class.h queue.h symref.h classlist.h symbol.h model.h
 z80instr.o: objfile.h symtab.h classhash.h strhash.h uthash.h die.h options.h

@@ -18,9 +18,12 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.9 2013-06-16 17:51:57 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.10 2013-06-16 20:14:39 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.9  2013-06-16 17:51:57  pauloscustodio
+Revision 1.10  2013-06-16 20:14:39  pauloscustodio
+Move deffile writing to deffile.c, remove global variable deffile
+
+Revision 1.9  2013/06/16 17:51:57  pauloscustodio
 get_all_syms() to get list of symbols matching a type mask, use in mapfile to decouple
 it from get_global_tab()
 
@@ -243,7 +246,8 @@ Symbol *define_library_sym( char *name, long value, byte_t type )
 /*-----------------------------------------------------------------------------
 *   copy all SYMADDR symbols to target, replacing NAME by NAME@MODULE
 *----------------------------------------------------------------------------*/
-static void copy_full_sym_names( SymbolHash *target, SymbolHash *source, byte_t type_mask )
+static void copy_full_sym_names( SymbolHash *target, SymbolHash *source, 
+								 byte_t type_mask, byte_t type_value )
 {
 	SymbolHashElem *iter;
 	Symbol         *sym;
@@ -252,7 +256,7 @@ static void copy_full_sym_names( SymbolHash *target, SymbolHash *source, byte_t 
 	{
 		sym = (Symbol *)iter->value;
 			
-		if ( sym->type & type_mask )
+		if ( (sym->type & type_mask) == (type_value & type_mask) )
 			SymbolHash_set( target, Symbol_fullname(sym), Symbol_clone(sym) );
 	}	
 }
@@ -260,18 +264,19 @@ static void copy_full_sym_names( SymbolHash *target, SymbolHash *source, byte_t 
 /*-----------------------------------------------------------------------------
 *   get the list of symbols that match the given type mask, 
 *   mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE()
+*   Selects symbols where (type & type_mask) == type_value 
 *----------------------------------------------------------------------------*/
-SymbolHash *get_all_syms( byte_t type_mask )
+SymbolHash *get_all_syms( byte_t type_mask, byte_t type_value )
 {
 	SymbolHash *all_syms = OBJ_NEW(SymbolHash);
     struct module *cmodule;
 	
 	for ( cmodule = modulehdr->first; cmodule != NULL; cmodule = cmodule->nextmodule )
     {
-	    copy_full_sym_names( all_syms, cmodule->local_tab, type_mask );
+	    copy_full_sym_names( all_syms, cmodule->local_tab, type_mask, type_value );
     }
 
-    copy_full_sym_names( all_syms, get_global_tab(), type_mask );
+    copy_full_sym_names( all_syms, get_global_tab(), type_mask, type_value );
 	
 	return all_syms;
 }

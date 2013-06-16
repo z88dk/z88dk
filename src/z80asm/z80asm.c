@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.91 2013-06-15 00:26:23 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.92 2013-06-16 20:14:39 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.91  2013-06-15 00:26:23  pauloscustodio
+/* Revision 1.92  2013-06-16 20:14:39  pauloscustodio
+/* Move deffile writing to deffile.c, remove global variable deffile
+/*
+/* Revision 1.91  2013/06/15 00:26:23  pauloscustodio
 /* Move mapfile writing to mapfile.c.
 /*
 /* Revision 1.90  2013/06/10 23:11:33  pauloscustodio
@@ -546,6 +549,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 #include "codearea.h"
 #include "config.h"
+#include "deffile.h"
 #include "errors.h"
 #include "file.h"
 #include "hist.h"
@@ -572,8 +576,6 @@ void Z80pass2( void );
 void CreateLib( char *lib_filename );
 void LinkModules( void );
 void DeclModuleName( void );
-void CreateDeffile( void );
-void WriteDefFile( SymbolHash *symtab );
 void CreateBinFile( void );
 struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 enum symbols GetSym( void );
@@ -593,7 +595,7 @@ struct module *NewModule( void );
 struct libfile *NewLibrary( void );
 
 
-FILE *z80asmfile, *objfile, *deffile;
+FILE *z80asmfile, *objfile;
 
 /* BUG_0001 array ssym[] needs to have one element per character in
  * separators, plus one newline to match the final '\0' just in case it is
@@ -667,11 +669,6 @@ void assemble_file( char *filename )
 
     /* Create first file record */
     CURRENTFILE = Newfile( NULL, src_filename );
-
-    if ( globaldef && CURRENTMODULE == modulehdr->first )
-    {
-        CreateDeffile();
-    }
 
 	query_assemble( src_filename, obj_filename );
     set_error_null();           /* no more module in error messages */
@@ -858,12 +855,6 @@ static void do_assemble( char *src_filename, char *obj_filename )
         }
 
         close_error_file();
-
-        if ( globaldef )
-        {
-            WriteDefFile( get_global_tab() );
-            fputc_err( '\n', deffile );    /* separate DEFC lines for each module */
-        }
 
         SymbolHash_remove_all( CURRENTMODULE->local_tab );
         SymbolHash_remove_all( get_global_tab() );
@@ -1362,12 +1353,6 @@ int main( int argc, char *argv[] )
         /* Link */
         CloseFiles();
 
-        if ( globaldef )
-        {
-            fclose( deffile );
-            deffile = NULL;
-        }
-
         /* Create library */
         if ( createlibrary && ! get_num_errors() )
         {
@@ -1391,6 +1376,11 @@ int main( int argc, char *argv[] )
             {
                 write_map_file();
             }
+
+			if ( globaldef )
+			{
+				write_def_file();
+			}
 
             CreateBinFile();
         }

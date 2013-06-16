@@ -86,6 +86,7 @@
     <ClInclude Include="classring.h" />
     <ClInclude Include="codearea.h" />
     <ClInclude Include="config.h" />
+    <ClInclude Include="deffile.h" />
     <ClInclude Include="die.h" />
     <ClInclude Include="dynstr.h" />
     <ClInclude Include="e4c.h" />
@@ -125,6 +126,7 @@
     <ClCompile Include="asmdrctv.c" />
     <ClCompile Include="class.c" />
     <ClCompile Include="codearea.c" />
+    <ClCompile Include="deffile.c" />
     <ClCompile Include="die.c" />
     <ClCompile Include="dynstr.c" />
     <ClCompile Include="errors.c" />

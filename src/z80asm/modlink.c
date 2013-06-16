@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.65 2013-06-15 00:26:23 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.66 2013-06-16 20:14:39 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.65  2013-06-15 00:26:23  pauloscustodio
+/* Revision 1.66  2013-06-16 20:14:39  pauloscustodio
+/* Move deffile writing to deffile.c, remove global variable deffile
+/*
+/* Revision 1.65  2013/06/15 00:26:23  pauloscustodio
 /* Move mapfile writing to mapfile.c.
 /*
 /* Revision 1.64  2013/06/14 23:47:13  pauloscustodio
@@ -419,13 +422,11 @@ void ModuleExpr( void );
 void CreateBinFile( void );
 void ReadNames( char *filename, FILE *file, long nextname, long endnames );
 void ReadExpr( long nextexpr, long endexpr );
-void WriteDefFile( SymbolHash *symtab );
-void CreateDeffile( void );
 void ReleaseLinkInfo( void );
 static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname );
 
 /* global variables */
-extern FILE *z80asmfile, *deffile;
+extern FILE *z80asmfile;
 extern char line[], ident[];
 extern char Z80objhdr[];
 extern char Z80libhdr[];
@@ -1366,43 +1367,6 @@ LinkTracedModule( char *filename, long baseptr )
 
     return 1;
 }
-
-
-void
-CreateDeffile( void )
-{
-    char globaldefname[FILENAME_MAX];
-
-    /* use first module filename to create global definition file */
-	path_replace_ext( globaldefname, modulehdr->first->cfile->fname, FILEEXT_DEF ); /* set '.def' extension */
-
-    /* Create DEFC file with global label declarations */
-    deffile = fopen_err( globaldefname, "w" );           /* CH_0012 */
-}
-
-
-void
-WriteDefFile( SymbolHash *symtab )
-{
-	SymbolHashElem *iter;
-	Symbol         *sym;
-
-	SymbolHash_sort( symtab, SymbolHash_by_name );
-	for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
-	{
-		sym = (Symbol *)iter->value;
-		if ( ( sym->type & SYMTOUCHED ) &&   ( sym->type & SYMADDR ) &&
-			 ( sym->type & SYMXDEF    ) && ! ( sym->type & SYMDEF  ) )
-		{
-			/* Write only global definitions - not library routines     */
-     		/* CH_0017 */
-			fprintf( deffile, "DEFC %-*s ", COLUMN_WIDTH - 1, sym->name );
-			fprintf( deffile, "= $%04lX ; ", sym->value + modulehdr->first->origin + CURRENTMODULE->startoffset );
-			fprintf( deffile, "Module %s\n", sym->owner->mname );
-		}
-	}
-}
-
 
 
 void
