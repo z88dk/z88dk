@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.6 2013-06-16 16:49:20 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.7 2013-06-16 17:51:57 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.6  2013-06-16 16:49:20  pauloscustodio
+# Revision 1.7  2013-06-16 17:51:57  pauloscustodio
+# get_all_syms() to get list of symbols matching a type mask, use in mapfile to decouple
+# it from get_global_tab()
+#
+# Revision 1.6  2013/06/16 16:49:20  pauloscustodio
 # Symbol_fullname() to return full symbol name NAME@MODULE
 #
 # Revision 1.5  2013/06/11 23:16:06  pauloscustodio
@@ -61,6 +65,8 @@ int list_get_page_nr() { return page_nr; }
 
 struct module the_module;
 struct module *CURRENTMODULE = &the_module;
+struct modules the_modules;
+struct modules *modulehdr = &the_modules;
 
 extern SymbolHash *get_static_tab(void);
 
@@ -139,6 +145,8 @@ t_compile_module($init, <<'END', $objs);
 	
 	TITLE("Create current module");	
     CURRENTMODULE->local_tab   = OBJ_NEW(SymbolHash);
+	modulehdr->first = CURRENTMODULE;
+	CURRENTMODULE->nextmodule = NULL;
 
 	TITLE("Create symbol");	
 	sym = Symbol_create(S("VAR1"), 123, 0, NULL);

@@ -18,9 +18,13 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.6 2013-06-14 22:14:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.h,v 1.7 2013-06-16 17:51:57 pauloscustodio Exp $
 $Log: symtab.h,v $
-Revision 1.6  2013-06-14 22:14:36  pauloscustodio
+Revision 1.7  2013-06-16 17:51:57  pauloscustodio
+get_all_syms() to get list of symbols matching a type mask, use in mapfile to decouple
+it from get_global_tab()
+
+Revision 1.6  2013/06/14 22:14:36  pauloscustodio
 find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
 
 Revision 1.5  2013/06/11 23:16:06  pauloscustodio
@@ -91,6 +95,10 @@ extern Symbol *define_local_def_sym( char *name, long value );
 extern Symbol *define_local_sym( char *name, long value, byte_t type );
 extern Symbol *define_global_sym( char *name, long value, byte_t type );
 extern Symbol *define_library_sym( char *name, long value, byte_t type );
+
+/* get the list of symbols that match the given type mask, 
+   mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE() */
+extern SymbolHash *get_all_syms( byte_t type_mask );
 
 /* copy the static symbols to CURRENTMODULE->local_tab */
 extern void copy_static_syms( void );

@@ -14,9 +14,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.2 2013-06-16 16:49:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.3 2013-06-16 17:51:57 pauloscustodio Exp $
 $Log: mapfile.c,v $
-Revision 1.2  2013-06-16 16:49:20  pauloscustodio
+Revision 1.3  2013-06-16 17:51:57  pauloscustodio
+get_all_syms() to get list of symbols matching a type mask, use in mapfile to decouple
+it from get_global_tab()
+
+Revision 1.2  2013/06/16 16:49:20  pauloscustodio
 Symbol_fullname() to return full symbol name NAME@MODULE
 
 Revision 1.1  2013/06/15 00:26:23  pauloscustodio
@@ -76,23 +80,6 @@ static void write_map_syms( FILE *file, SymbolHash *symtab )
 }
 
 /*-----------------------------------------------------------------------------
-*   copy all SYMADDR symbols to target, replacing NAME by NAME@MODULE
-*----------------------------------------------------------------------------*/
-static void copy_full_sym_names( SymbolHash *target, SymbolHash *source )
-{
-	SymbolHashElem *iter;
-	Symbol         *sym;
-
-	for ( iter = SymbolHash_first( source ); iter; iter = SymbolHash_next( iter ) )
-	{
-		sym = (Symbol *)iter->value;
-			
-		if ( sym->type & SYMADDR )
-			SymbolHash_set( target, Symbol_fullname(sym), Symbol_clone(sym) );
-	}	
-}
-
-/*-----------------------------------------------------------------------------
 *   write full mapfile to FILE.map, where FILE is the name of the first
 *	linked source module
 *----------------------------------------------------------------------------*/
@@ -101,7 +88,6 @@ void write_map_file( void )
     char *filename;
 	FILE *file;
 	SymbolHash *map_symtab;
-    struct module *cmodule;
 
 	/* use first module filename to create global map file */
 	filename = map_filename_ext( modulehdr->first->cfile->fname ); /* set '.map' extension */
@@ -118,14 +104,7 @@ void write_map_file( void )
 
 	/* BUG_0036 - need to create coposed symbol names NAME@MODULE, so that local symbols in different modules
 	   are shown */
-	map_symtab = OBJ_NEW(SymbolHash);
-	for ( cmodule = modulehdr->first; cmodule != NULL; cmodule = cmodule->nextmodule )
-    {
-	    copy_full_sym_names( map_symtab, cmodule->local_tab );
-    }
-
-    copy_full_sym_names( map_symtab, get_global_tab() );
-
+	map_symtab = get_all_syms( SYMADDR );
     if ( SymbolHash_empty( map_symtab ) )
     {
         fputs( "None.\n", file );

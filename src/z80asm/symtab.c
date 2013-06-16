@@ -18,9 +18,13 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.8 2013-06-15 22:10:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.9 2013-06-16 17:51:57 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.8  2013-06-15 22:10:01  pauloscustodio
+Revision 1.9  2013-06-16 17:51:57  pauloscustodio
+get_all_syms() to get list of symbols matching a type mask, use in mapfile to decouple
+it from get_global_tab()
+
+Revision 1.8  2013/06/15 22:10:01  pauloscustodio
 BUG_0037 : Symbol already defined error when symbol used in IF expression
 
 Revision 1.7  2013/06/14 22:14:36  pauloscustodio
@@ -234,6 +238,42 @@ Symbol *define_global_sym( char *name, long value, byte_t type )
 Symbol *define_library_sym( char *name, long value, byte_t type )
 {
 	return _define_sym( name, value, type | SYMXDEF | SYMDEF, CURRENTMODULE, get_global_tab() );
+}
+
+/*-----------------------------------------------------------------------------
+*   copy all SYMADDR symbols to target, replacing NAME by NAME@MODULE
+*----------------------------------------------------------------------------*/
+static void copy_full_sym_names( SymbolHash *target, SymbolHash *source, byte_t type_mask )
+{
+	SymbolHashElem *iter;
+	Symbol         *sym;
+
+	for ( iter = SymbolHash_first( source ); iter; iter = SymbolHash_next( iter ) )
+	{
+		sym = (Symbol *)iter->value;
+			
+		if ( sym->type & type_mask )
+			SymbolHash_set( target, Symbol_fullname(sym), Symbol_clone(sym) );
+	}	
+}
+
+/*-----------------------------------------------------------------------------
+*   get the list of symbols that match the given type mask, 
+*   mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE()
+*----------------------------------------------------------------------------*/
+SymbolHash *get_all_syms( byte_t type_mask )
+{
+	SymbolHash *all_syms = OBJ_NEW(SymbolHash);
+    struct module *cmodule;
+	
+	for ( cmodule = modulehdr->first; cmodule != NULL; cmodule = cmodule->nextmodule )
+    {
+	    copy_full_sym_names( all_syms, cmodule->local_tab, type_mask );
+    }
+
+    copy_full_sym_names( all_syms, get_global_tab(), type_mask );
+	
+	return all_syms;
 }
 
 /*-----------------------------------------------------------------------------
