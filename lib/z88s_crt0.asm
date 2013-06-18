@@ -3,7 +3,7 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.10 2009-06-22 21:20:05 dom Exp $
+;	$Id: z88s_crt0.asm,v 1.11 2013-06-18 06:11:23 stefano Exp $
 
 
 
@@ -15,14 +15,14 @@
 	org	shell_loadaddr-shell_headerlen
 
 header_start:
-        defm    "!bin"
+	defm    "!bin"
 	defb	shell_verh
 	defb	shell_verm
 	defb	shell_verl
 	defb	13
 shell_length:
-        defw    0		; Fill in by make program
-        defw    start
+	defw    0		; Fill in by make program
+	defw    start
 
 
 ;-----------
@@ -40,9 +40,17 @@ start:
 	ld	(hl),0		; terminate command line
 	ld	hl,-100		; atexit stack (64) + argv space
 	add	hl,sp
-        ld      sp,hl
-        ld      (exitsp),sp	
-        call    doerrhan	;Initialise a laughable error handler
+	ld      sp,hl
+	ld      (exitsp),sp	
+
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of 
+; the compiled program and the stack pointer
+	IF DEFINED_USING_amalloc
+		INCLUDE "amalloc.def"
+	ENDIF
+
+	call    doerrhan	;Initialise a laughable error handler
 
 		
 ;-----------
@@ -346,6 +354,18 @@ ENDIF
 
 heaplast:	defw	0	; Address of last block on heap
 heapblocks:	defw 	0	; Number of blocks
+
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+_heap:
+                defw ASMTAIL	; Location of the last program byte
+                defw 0
+ENDIF
+
 
 packintrout:	defw	0	; Address of user interrupt routine
 

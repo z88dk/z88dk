@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: vz_crt0.asm,v 1.13 2010-08-02 12:58:03 stefano Exp $
+;       $Id: vz_crt0.asm,v 1.14 2013-06-18 06:11:23 stefano Exp $
 ;
 
 
@@ -108,6 +108,30 @@ ENDIF
 
 start:
 
+	ld	hl,-64		; 32 pointers (ANSI standard)
+	add	hl,sp
+	ld	sp,hl
+	ld	(exitsp),sp
+
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of 
+; the compiled program and the stack pointer
+	IF DEFINED_USING_amalloc
+		INCLUDE "amalloc.def"
+	ENDIF
+
+IF !DEFINED_nostreams
+IF DEFINED_ANSIstdio
+; Set up the std* stuff so we can be called again
+	ld	hl,__sgoioblk+2
+	ld	(hl),19	;stdin
+	ld	hl,__sgoioblk+6
+	ld	(hl),21	;stdout
+	ld	hl,__sgoioblk+10
+	ld	(hl),21	;stderr
+ENDIF
+ENDIF
+
         call    _main
 cleanup:
 ;
@@ -120,9 +144,6 @@ IF DEFINED_ANSIstdio
         call    closeall
 ENDIF
 ENDIF
-        exx
-        ld      hl,10072
-        exx
         pop     bc
 start1:
         ld      sp,0
@@ -179,9 +200,30 @@ ENDIF
 exitsp:         defw    0       ; Address of where the atexit() stack is
 exitcount:      defb    0       ; How many routines on the atexit() stack
 
-
 heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
+
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+_heap:
+                defw ASMTAIL	; Location of the last program byte
+                defw 0
+ENDIF
+
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+_heap:
+                defw ASMTAIL	; Location of the last program byte
+                defw 0
+ENDIF
 
 IF DEFINED_NEED1bitsound
 snd_tick:	defb	0	; Sound variable

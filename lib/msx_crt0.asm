@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.24 2013-06-04 11:41:13 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.25 2013-06-18 06:11:23 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -101,6 +101,13 @@ ENDIF
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
+
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of 
+; the compiled program and the stack pointer
+	IF DEFINED_USING_amalloc
+		INCLUDE "amalloc.def"
+	ENDIF
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -367,6 +374,16 @@ exitcount:
 heaplast:	defw	0
 heapblocks:	defw	0
 
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+_heap:
+                defw ASMTAIL	; Location of the last program byte
+                defw 0
+ENDIF
 
 ; mem stuff
 

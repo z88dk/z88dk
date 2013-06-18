@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.31 2011-07-05 14:47:36 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.32 2013-06-18 06:11:23 stefano Exp $
 ;
 
 
@@ -116,6 +116,31 @@ ELSE
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
+
+; Optional definition for auto MALLOC init; it takes
+; all the space between the end of the program and UDG
+IF DEFINED_USING_amalloc
+		ld	hl,_heap
+		ld	c,(hl)
+		inc	hl
+		ld	b,(hl)
+		inc bc
+		; compact way to do "mallinit()"
+		xor	a
+		ld	(hl),a
+		dec hl
+		ld	(hl),a
+
+		;  Stack is somewhere else, no need to reduce the size for malloc
+		ld	hl,65535-168 ; Preserve UDG
+		sbc hl,bc	; hl = total free memory
+
+		push bc ; main address for malloc area
+		push hl	; area size
+		LIB sbrk_callee
+		call	sbrk_callee
+ENDIF
+
   IF DEFINED_ZXVGS
 ;setting variables needed for proper keyboard reading
         LD      (IY+1),$CD      ; FLAGS #5C3B
@@ -126,6 +151,7 @@ ELSE
         call    5633
 
 ENDIF
+
 
 
 IF !DEFINED_nostreams
@@ -163,6 +189,10 @@ cleanup_exit:
         rst     0
 
         defs    56-cleanup_exit-1
+
+if (ASMPC<>$0038)
+        defs    CODE_ALIGNMENT_ERROR
+endif
 
 ; ######## IM 1 MODE INTERRUPT ENTRY ########
 
@@ -488,6 +518,16 @@ exitcount:      defb    0       ; How many routines on the atexit() stack
 heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
 
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+_heap:
+                defw ASMTAIL	; Location of the last program byte
+                defw 0
+ENDIF
 
 snd_tick:       defb    0       ; Sound variable
 

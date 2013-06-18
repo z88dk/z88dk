@@ -4,7 +4,7 @@
 ;       Stefano Bodrato - 2011
 ;
 ;
-;	$Id: enterprise_crt0.asm,v 1.11 2011-04-01 06:50:45 stefano Exp $
+;	$Id: enterprise_crt0.asm,v 1.12 2013-06-18 06:11:23 stefano Exp $
 ;
 
 
@@ -107,7 +107,7 @@ IF !DEFINED_noprotectmsdos
 	; This protection takes little less than 50 bytes
 	defb	$eb,$04		;MS DOS protection... JMPS to MS-DOS message if Intel
 	ex	de,hl
-	jp	begin		;First decent instruction for Z80, it survived up to here !
+	jp	begin		;First decent instruction for Z80, if survived up to here !
 	defb	$b4,$09		;DOS protection... MOV AH,9 (Err msg for MS-DOS)
 	defb	$ba
 	defw	dosmessage	;DOS protection... MOV DX,OFFSET dosmessage
@@ -162,14 +162,21 @@ ENDIF
         defb  11						; set 40x25 characters window
 
 
-;        ld      hl,0
-;        add     hl,sp
+        ld      hl,0
+        add     hl,sp
 ;        ld      (start1+1),hl
         ld      (start1+1),sp
 ;        ld      hl,-64
 ;        add     hl,sp
 ;        ld      sp,hl
         ld      (exitsp),sp
+
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of 
+; the compiled program and the stack pointer
+	IF DEFINED_USING_amalloc
+		INCLUDE "amalloc.def"
+	ENDIF
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -282,6 +289,16 @@ exitcount:
 heaplast:	defw	0
 heapblocks:	defw	0
 
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+_heap:
+                defw ASMTAIL	; Location of the last program byte
+                defw 0
+ENDIF
 
 ; mem stuff
 

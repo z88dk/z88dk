@@ -9,7 +9,7 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: nc100_crt0.asm,v 1.8 2009-06-22 21:20:05 dom Exp $
+;       $Id: nc100_crt0.asm,v 1.9 2013-06-18 06:11:23 stefano Exp $
 ;
 
 
@@ -25,30 +25,37 @@
 ; Some scope definitions
 ;--------
 
-	XREF    _main		;main() is always external to crt0 code
+		XREF    _main		;main() is always external to crt0 code
 
-        XDEF    cleanup		;jp'd to by exit()
-        XDEF    l_dcal		;jp(hl)
+		XDEF    cleanup		;jp'd to by exit()
+		XDEF    l_dcal		;jp(hl)
 
-        XDEF    _std_seed	;Integer rand() seed
+		XDEF    _std_seed	;Integer rand() seed
 
-	XDEF	_vfprintf	;jp to the printf() core
+		XDEF	_vfprintf	;jp to the printf() core
 
-        XDEF    exitsp		;atexit() variables
-        XDEF    exitcount
+		XDEF    exitsp		;atexit() variables
+		XDEF    exitcount
 
-       	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+		XDEF	heaplast	;Near malloc heap variables
+		XDEF	heapblocks
 
-        XDEF    __sgoioblk	;stdio info block
+		XDEF    __sgoioblk	;stdio info block
 
-	XDEF	base_graphics	;Graphical variables
-	XDEF	coords
+		XDEF	base_graphics	;Graphical variables
+		XDEF	coords
 
-        org     $C000
 
-	jp	start
-	defs	509		;Waste 509 bytes of space
+IF (startup=2)
+
+		org     $8C00
+		jp	start
+
+ELSE
+
+		org     $C000
+		jp	start
+		defs	509		;Waste 509 bytes of space
 
 ;--------
 ; Card header
@@ -59,12 +66,23 @@
 	defm	"z88dk NC100"
 	defb	0,0
 
+ENDIF
+
+
 start:				;Entry point at $c2220
-	ld	(start+1),sp	;Save entry sp
+        ld      (start1+1),sp   ;Save entry stack
         ld      hl,-64		;Create the atexit stack
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
+
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of 
+; the compiled program and the stack pointer
+	IF DEFINED_USING_amalloc
+		INCLUDE "amalloc.def"
+	ENDIF
+
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 ; Set up the std* stuff so we can be called again
@@ -85,12 +103,10 @@ IF DEFINED_ANSIstdio
 	call	closeall
 ENDIF
 ENDIF
-	exx			;???? Hangover from ZX code?
-	ld	hl,10072
-	exx
 	pop	bc
-start1:	ld	sp,0
-        ret
+start1:
+	ld	sp,0
+	ret
 
 l_dcal:	jp	(hl)
 
@@ -135,8 +151,19 @@ exitcount:	defb	0	;Number of atexit() routines
 heaplast:	defw	0	;heap variables
 heapblocks:	defw	0
 
-base_graphics:	defw	0	;Graphics variables
-coords:		defw	0
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+_heap:
+                defw ASMTAIL	; Location of the last program byte
+                defw 0
+ENDIF
+
+base_graphics:  defw	0	;Graphics variables
+coords:         defw	0
 
 		defm	"Small C+ nc100"
 		defb	0

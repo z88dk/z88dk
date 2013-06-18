@@ -4,23 +4,23 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: sam_crt0.asm,v 1.10 2009-06-22 21:20:05 dom Exp $
+;       $Id: sam_crt0.asm,v 1.11 2013-06-18 06:11:23 stefano Exp $
 ;
 
 
-                MODULE  sam_crt0
+        MODULE  sam_crt0
 
 ;
 ; Initially include the zcc_opt.def file to find out lots of lovely
 ; information about what we should do..
 ;
 
-                INCLUDE "zcc_opt.def"
+        INCLUDE "zcc_opt.def"
 
 ; No matter what set up we have, main is always, always external to
 ; this fileb
 
-                XREF    _main
+        XREF    _main
 
 ;
 ; Some variables which are needed for both app and basic startup
@@ -44,7 +44,7 @@
         XDEF    exitcount
 
        	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+        XDEF	heapblocks
 
 ; For stdin, stdout, stder
 
@@ -66,7 +66,36 @@
 
 
 start:
-         ld      (start1+1),sp
+        ld      (start1+1),sp   ;Save entry stack
+        ld      hl,-64		;Create the atexit stack
+        add     hl,sp
+        ld      sp,hl
+        ld      (exitsp),sp
+
+; Optional definition for auto MALLOC init; it takes
+; all the space between the end of the program and UDG
+IF DEFINED_USING_amalloc
+		ld	hl,_heap
+		ld	c,(hl)
+		inc	hl
+		ld	b,(hl)
+		inc bc
+		; compact way to do "mallinit()"
+		xor	a
+		ld	(hl),a
+		dec hl
+		ld	(hl),a
+
+		;  Stack is somewhere else, no need to reduce the size for malloc
+		ld	hl,65535
+		sbc hl,bc	; hl = total free memory
+
+		push bc ; main address for malloc area
+		push hl	; area size
+		LIB sbrk_callee
+		call	sbrk_callee
+ENDIF
+
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -171,6 +200,17 @@ ENDIF
 
 heaplast:       defw    0
 heapblocks:     defw    0
+
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+_heap:
+                defw ASMTAIL	; Location of the last program byte
+                defw 0
+ENDIF
 
 ; mem stuff
 

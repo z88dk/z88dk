@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: pps_crt0.asm,v 1.7 2013-06-04 11:41:13 stefano Exp $
+;       $Id: pps_crt0.asm,v 1.8 2013-06-18 06:11:23 stefano Exp $
 ;
 
 
@@ -62,6 +62,14 @@ start:
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
+
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of 
+; the compiled program and the stack pointer
+	IF DEFINED_USING_amalloc
+		INCLUDE "amalloc.def"
+	ENDIF
+
 	ld	(start_prefix),ix
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -276,6 +284,17 @@ exitcount:      defb    0       ; How many routines on the atexit() stack
 
 heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
+
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+_heap:
+                defw ASMTAIL	; Location of the last program byte
+                defw 0
+ENDIF
 
 start_prefix:   defw	0	; Entry handle from OS
 

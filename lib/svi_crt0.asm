@@ -2,52 +2,52 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;       $Id: svi_crt0.asm,v 1.10 2009-06-22 21:20:05 dom Exp $
+;       $Id: svi_crt0.asm,v 1.11 2013-06-18 06:11:23 stefano Exp $
 ;
 
 
-                MODULE  svi_crt0
+		MODULE  svi_crt0
 
 ;
 ; Initially include the zcc_opt.def file to find out lots of lovely
 ; information about what we should do..
 ;
 
-                INCLUDE "zcc_opt.def"
+		INCLUDE "zcc_opt.def"
 
 ;--------
 ; Some scope definitions
 ;--------
 
-	XREF    _main
+		XREF    _main
 
-        XDEF    cleanup
-        XDEF    l_dcal
+		XDEF    cleanup
+		XDEF    l_dcal
 
-        XDEF    _std_seed
+		XDEF    _std_seed
 
-	XDEF	snd_tick	; Sound variable
+		XDEF	snd_tick	; Sound variable
 
-	XDEF	_vfprintf
+		XDEF	_vfprintf
 
-        XDEF    exitsp
-        XDEF    exitcount
+		XDEF    exitsp
+		XDEF    exitcount
 
-       	XDEF	heaplast	; Near malloc heap variables
-	XDEF	heapblocks
+		XDEF	heaplast	; Near malloc heap variables
+		XDEF	heapblocks
 
-        XDEF    __sgoioblk
+		XDEF    __sgoioblk
 
-; Graphics stuff
-	XDEF	pixelbyte	; Temp store for non-buffered mode
-        XDEF    base_graphics   ; Graphical variables
-        XDEF    coords          ; Current xy position
+		; Graphics stuff
+		XDEF	pixelbyte	; Temp store for non-buffered mode
+		XDEF    base_graphics   ; Graphical variables
+		XDEF    coords          ; Current xy position
 
-; MSX platform specific stuff
-;
-        XDEF    msxbios
-        ;; XDEF    brksave
-        
+		; MSX platform specific stuff
+		;
+		XDEF    msxbios
+		;; XDEF    brksave
+
 
 
 ; Now, getting to the real stuff now!
@@ -63,6 +63,13 @@ start:
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
+
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of 
+; the compiled program and the stack pointer
+	IF DEFINED_USING_amalloc
+		INCLUDE "amalloc.def"
+	ENDIF
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -161,6 +168,18 @@ exitcount:
 
 heaplast:	defw	0
 heapblocks:	defw	0
+
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+_heap:
+                defw ASMTAIL	; Location of the last program byte
+                defw 0
+ENDIF
+
 
 ; ---------------
 ; MSX specific stuff

@@ -16,9 +16,9 @@
 ;ENDIF
 
 
+; $Id: amalloc.def,v 1.2 2013-06-18 06:11:22 stefano Exp $
 
-; $Id: amalloc.def,v 1.1 2013-06-14 16:58:19 stefano Exp $
-
+	; HL must hold SP or the end of free memory
 	push hl
 
 	ld	hl,_heap
@@ -52,4 +52,3 @@ ENDIF
 	push hl	; area size
 	LIB sbrk_callee
 	call	sbrk_callee
-

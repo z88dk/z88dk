@@ -1,7 +1,7 @@
 ;
 ;       Startup for Canon X-07
 ;
-;       $Id: x07_crt0.asm,v 1.1 2011-06-15 20:15:00 stefano Exp $
+;       $Id: x07_crt0.asm,v 1.2 2013-06-18 06:11:23 stefano Exp $
 ;
 
 	MODULE  x07_crt0
@@ -62,6 +62,13 @@ start:
 	add     hl,sp
 	ld      sp,hl
 	ld      (exitsp),sp
+
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of 
+; the compiled program and the stack pointer
+	IF DEFINED_USING_amalloc
+		INCLUDE "amalloc.def"
+	ENDIF
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -136,6 +143,18 @@ exitsp:		defw	0	;Address of atexit() stack
 exitcount:	defb	0	;Number of atexit() routinens
 heaplast:	defw	0	;Pointer to last free heap block
 heapblocks:	defw	0	;Number of heap blocks available
+
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+_heap:
+                defw ASMTAIL	; Location of the last program byte
+                defw 0
+ENDIF
+
 IF !DEFINED_HAVESEED
 		XDEF    _std_seed        ;Integer rand() seed
 _std_seed:       defw    0      ; Seed for integer rand() routines

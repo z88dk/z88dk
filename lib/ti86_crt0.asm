@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.24 2010-11-11 09:17:09 stefano Exp $
+;	$Id: ti86_crt0.asm,v 1.25 2013-06-18 06:11:23 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -35,7 +35,7 @@
 	XDEF	exitsp		; Exit variables
 	XDEF	exitcount	;
 
-       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heaplast	;Near malloc heap variables
 	XDEF	heapblocks
 
 	XDEF	__sgoioblk	; For stdin, stdout, stder
@@ -231,6 +231,25 @@ ELSE
 	ld	(exitsp),sp
 ENDIF
 
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of 
+; the compiled program and the stack pointer
+	IF DEFINED_USING_amalloc
+		INCLUDE "amalloc.def"
+	ENDIF
+
+IF !DEFINED_nostreams
+IF DEFINED_ANSIstdio
+; Set up the std* stuff so we can be called again
+	ld	hl,__sgoioblk+2
+	ld	(hl),19	;stdin
+	ld	hl,__sgoioblk+6
+	ld	(hl),21	;stdout
+	ld	hl,__sgoioblk+10
+	ld	(hl),21	;stderr
+ENDIF
+ENDIF
+
 ;  IF NONANSI
 	call	_homeup		; Set text cursor at (0,0)
 	ld	a,8		; Set _winBtm back to 8, so we
@@ -346,6 +365,17 @@ exitcount:	defb	0
 ; Heap stuff
 heaplast:	defw	0
 heapblocks:	defw	0
+
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+_heap:
+                defw ASMTAIL	; Location of the last program byte
+                defw 0
+ENDIF
 
 ; mem stuff
 base_graphics:	defw	$FC00	;TI86

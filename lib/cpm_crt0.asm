@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.20 2013-06-13 17:25:59 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.21 2013-06-18 06:11:23 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -100,33 +100,7 @@ ENDIF
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
 IF DEFINED_USING_amalloc
-	push hl
-
-	ld	hl,_heap
-	ld	c,(hl)
-	inc	hl
-	ld	b,(hl)
-	inc bc
-	; compact way to do "mallinit()"
-	xor	a
-	ld	(hl),a
-	dec hl
-	ld	(hl),a
-
-	pop hl	; sp
-	sbc hl,bc	; hl = total free memory
-	ld d,h
-	ld e,l
-	srl d
-	rr e
-	srl d
-	rr e
-	sbc hl,de	;  keep 2/3 of free memory for the heap, and the remaining space for stack
-
-	push bc ; main address for malloc area
-	push hl	; area size
-	LIB sbrk_callee
-	call	sbrk_callee
+    INCLUDE "amalloc.def"
 ENDIF
 
 IF !DEFINED_nostreams
@@ -341,7 +315,7 @@ XDEF _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area
-._heap
+_heap:
 	defw ASMTAIL	; Location of the last program byte
 	defw 0
 ENDIF

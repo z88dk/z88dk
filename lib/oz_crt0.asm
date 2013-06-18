@@ -14,7 +14,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.9 2013-05-30 06:34:35 stefano Exp $
+;       $Id: oz_crt0.asm,v 1.10 2013-06-18 06:11:23 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -200,6 +200,13 @@ ENDIF
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
+
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of 
+; the compiled program and the stack pointer
+	IF DEFINED_USING_amalloc
+		INCLUDE "amalloc.def"
+	ENDIF
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
@@ -526,9 +533,20 @@ _std_seed:      defw    0       ; Seed for integer rand() routines
 exitsp:         defw    0       ; Address of where the atexit() stack is
 exitcount:      defb    0       ; How many routines on the atexit() stack
 
-
 heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
+
+IF DEFINED_USING_amalloc
+XREF ASMTAIL
+XDEF _heap
+; The heap pointer will be wiped at startup,
+; but first its value (based on ASMTAIL)
+; will be kept for sbrk() to setup the malloc area
+_heap:
+                defw ASMTAIL	; Location of the last program byte
+                defw 0
+ENDIF
+
 saved_hl:       defw	0	; Temp store for hl
 saved_de:       defw	0	; Temp store for de
 

@@ -15,7 +15,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.22 2013-06-14 16:58:19 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.23 2013-06-18 06:11:23 stefano Exp $
 ;
 
 
@@ -494,7 +494,7 @@ XDEF _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area
-._heap
+_heap:
 	defw ASMTAIL	; Location of the last program byte
 	defw 0
 ENDIF
