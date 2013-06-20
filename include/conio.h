@@ -9,7 +9,7 @@
  *
  *      stefano - 18/3/2004
  *
- *	$Id: conio.h,v 1.9 2012-10-24 06:44:12 stefano Exp $
+ *	$Id: conio.h,v 1.10 2013-06-20 08:25:45 stefano Exp $
  */
 
 #ifndef __CONIO_H__
@@ -41,7 +41,7 @@ int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 #define delline()	printf("\033[m")
 //#define clrscr() textattr(7);fputc_cons(12)
 /* In this way we can do some sort of color and setcolor functions redefinition */
-#define clrscr() textcolor(WHITE);textbackground(BLACK);fputc_cons(12)
+#define clrscr() printf("\033[%um\033[%um%c",30,47,12)
 #define clreol() printf("\033[K")
 
 /* The leading underscores are for compatibility with the 

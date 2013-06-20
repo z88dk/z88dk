@@ -1,12 +1,11 @@
 /*
  * BDS C Compatibility
- * $Id: bdscio.h,v 1.2 2013-06-13 17:25:58 stefano Exp $
+ * $Id: bdscio.h,v 1.3 2013-06-20 08:25:45 stefano Exp $
  */
 
 #ifndef __BDSCIO_H__
 #define __BDSCIO_H__
 
-#define AMALLOC
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -40,6 +39,7 @@
 
 #define NSECTS 8	/* Number of sectors to buffer up in ram */
 
+// BUFSIZ has to do with an old fashioned fopen version: please hand-adjust the code
 //#define BUFSIZ (NSECTS * SECSIZ + 6 )	/* Don't touch this */
 
 
@@ -79,7 +79,7 @@
 #define out(a) puts_cons(a)
 #define eqs(a,b) (!strcmp(a,b)==0)
 
-#define error(a); {puts_cons(a);exit(-1);}
+#define error(a) exit(puts_cons(a)&0)
 
 #define movmem(a,b,c) memcpy(b,a,c)
 #define alloc(a) malloc(a)

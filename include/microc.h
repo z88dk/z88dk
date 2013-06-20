@@ -15,10 +15,7 @@
 #include <math.h>
 #undef abort
 
-void abort(char *text) {
- puts_cons(text);
- exit(-1);
-}
+#define abort(a) exit(puts_cons(a)&0)
 
 #define getstr(s,l)         fgets_cons(s,l)
 #define putstr(s)           puts_cons(s)

@@ -5,7 +5,7 @@
 ;	getkey() Wait for keypress
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.2 2011-07-27 15:11:27 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.3 2013-06-20 08:25:45 stefano Exp $
 ;
 
 
@@ -21,6 +21,22 @@
 	or a
 	jr z,kwait
 
+	cp	20		; CTRL
+	jr  nz,noctrl
+	; Let's handle CTRL-Z and CTRL-C
+.ctrl_wait
+	call kjt_get_key
+	or	a
+	jr z,ctrl_wait
+	cp  33
+	jr	nz,nobreak
+	ld	a,3
+.nobreak
+	; keyboard scan code for Z is 26 which is perfect
+	; for CTRL-Z without further conversions
+	ld	b,a
+	jr  dokey
+.noctrl
 	cp	$5a
 	jr	nz,noent
 	ld	b,13
@@ -48,7 +64,7 @@
 .isdel
 	ld	b,12
 .nodel
-
+.dokey
 	ld	l,b	; ASCII CODE
 	ld	h,0
 
