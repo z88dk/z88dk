@@ -5,7 +5,7 @@
 ;	Print character to the screen
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.5 2012-05-31 14:52:59 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.6 2013-06-21 10:25:28 stefano Exp $
 ;
 
 
@@ -37,6 +37,8 @@
 	ld (cursor_x),a
 	ret
 .nobs
+	cp 10
+	ret z
 	cp 13
 	jr nz,nocr
 	dec (hl)	; switch CR to CRLF

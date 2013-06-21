@@ -5,7 +5,7 @@
 ;	getkey() Wait for keypress
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.3 2013-06-20 08:25:45 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.4 2013-06-21 10:25:28 stefano Exp $
 ;
 
 
@@ -13,10 +13,20 @@
 
 	XLIB	fgetc_cons
 
+.buf defb 0
+
 .fgetc_cons
 
 .kwait
 
+	ld	a,(buf)
+	and a
+	jr	z,nobuf
+	ld	b,a
+	xor	a
+	ld	(buf),a
+	jr	dokey
+.nobuf
 	call kjt_get_key
 	or a
 	jr z,kwait
@@ -40,6 +50,8 @@
 	cp	$5a
 	jr	nz,noent
 	ld	b,13
+	ld	a,10
+	ld  (buf),a
 .noent
 	cp	$6b
 	jr	nz,noleft
