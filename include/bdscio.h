@@ -1,6 +1,6 @@
 /*
  * BDS C Compatibility
- * $Id: bdscio.h,v 1.4 2013-06-26 13:01:15 stefano Exp $
+ * $Id: bdscio.h,v 1.5 2013-06-26 13:34:42 stefano Exp $
  */
 
 #ifndef __BDSCIO_H__
@@ -63,6 +63,8 @@
 
 #define fgets(a,b) fgets(a,MAXLINE,b)
 
+#define unlink(a) remove(a)
+#define fefc(a) fclose(a)
 
 /* The functions in 'dio.h' are not necessary with z88dk */
 
