@@ -1,6 +1,6 @@
 /*
  * BDS C Compatibility
- * $Id: bdscio.h,v 1.3 2013-06-20 08:25:45 stefano Exp $
+ * $Id: bdscio.h,v 1.4 2013-06-26 13:01:15 stefano Exp $
  */
 
 #ifndef __BDSCIO_H__
@@ -83,7 +83,7 @@
 
 #define movmem(a,b,c) memcpy(b,a,c)
 #define alloc(a) malloc(a)
-
+#define sbrk(a) malloc(a)?asm("\n"):-1
 
 /*******   Some console (video) terminal characteristics:   *******/
 
