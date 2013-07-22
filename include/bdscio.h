@@ -1,6 +1,6 @@
 /*
  * BDS C Compatibility
- * $Id: bdscio.h,v 1.5 2013-06-26 13:34:42 stefano Exp $
+ * $Id: bdscio.h,v 1.6 2013-07-22 09:37:39 stefano Exp $
  */
 
 #ifndef __BDSCIO_H__
@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <setjmp.h>
 #include <string.h>
+#include <ctype.h>
 
 
 /**********************************************************************
@@ -71,6 +72,8 @@
 #define dioinit(a,b) {}
 #define dioflush() 0
 
+#define exit() exit(0)
+
 
 #define FALSE 0
 #define TRUE 1
@@ -84,8 +87,12 @@
 #define error(a) exit(puts_cons(a)&0)
 
 #define movmem(a,b,c) memcpy(b,a,c)
+
 #define alloc(a) malloc(a)
+#undef sbrk
 #define sbrk(a) malloc(a)?asm("\n"):-1
+
+#define isalpnum(a) isalnum(a)
 
 /*******   Some console (video) terminal characteristics:   *******/
 

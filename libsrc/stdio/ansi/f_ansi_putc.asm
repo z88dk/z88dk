@@ -7,7 +7,7 @@
 ;
 ;	Stefano Bodrato - 21/4/2000
 ;
-;	$Id: f_ansi_putc.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_putc.asm,v 1.3 2013-07-22 09:37:39 stefano Exp $
 ;
 
 	XLIB	ansi_putc
@@ -22,13 +22,15 @@
 
 .ansi_putc
  
- call ansi_CHAR
- ld a,(text_cols)
- ld d,a
- ld a,(ansi_COLUMN)
- inc a
- ld (ansi_COLUMN),a
- cp d		; last column ?
- ret nz		; no, return
- jp ansi_LF
-
+  push af
+  ld a,(text_cols)
+  ld d,a
+  ld a,(ansi_COLUMN)
+  cp d          ; last column ?
+  call nc,ansi_LF; yes
+  pop af
+  call ansi_CHAR
+  ld a,(ansi_COLUMN)
+  inc a
+  ld (ansi_COLUMN),a
+  ret
