@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.40 2013-06-08 23:37:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.41 2013-08-26 21:49:39 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.40  2013-06-08 23:37:32  pauloscustodio
+/* Revision 1.41  2013-08-26 21:49:39  pauloscustodio
+/* Bug report 2013-07-27 10:50:27 by rkd77 : compile with -Wformat -Werror=format-security
+/*
+/* Revision 1.40  2013/06/08 23:37:32  pauloscustodio
 /* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
 /*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
 /* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
@@ -539,7 +542,7 @@ void LINE( void )
     }
 
     line[0] = '\0';
-    snprintf( name, sizeof( name ), "__C_LINE_%d", clineno );
+    snprintf( name, sizeof( name ), "__C_LINE_%ld", clineno );
     define_symbol( name, get_PC(), SYMADDR | SYMTOUCHED );
 }
 

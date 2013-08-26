@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.45 2013-08-26 21:18:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.46 2013-08-26 21:49:39 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.45  2013-08-26 21:18:03  pauloscustodio
+/* Revision 1.46  2013-08-26 21:49:39  pauloscustodio
+/* Bug report 2013-07-27 10:50:27 by rkd77 : compile with -Wformat -Werror=format-security
+/*
+/* Revision 1.45  2013/08/26 21:18:03  pauloscustodio
 /* Version 1.2.4
 /*
 /* Revision 1.44  2013/06/15 22:10:01  pauloscustodio
@@ -1308,6 +1311,14 @@ Based on 1.0.31
 	  to encapsulate calls to get_global_tab().
 
 -------------------------------------------------------------------------------
+26.08.2013 [1.2.5] (pauloscustodio)
+-------------------------------------------------------------------------------
+	Bug report 2013-07-27 10:50:27 by rkd77 
+	-Wformat -Werror=format-security
+		Some distributions build packages with -Wformat -Werror=format-security.
+		Build of z88dk fails with these options.
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1337,7 +1348,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "1.2.4"
+#define VERSION     "1.2.5"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS
