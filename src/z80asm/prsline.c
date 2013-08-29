@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.32 2013-05-12 19:39:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.33 2013-08-29 22:01:20 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.32  2013-05-12 19:39:32  pauloscustodio
+/* Revision 1.33  2013-08-29 22:01:20  pauloscustodio
+/* Accept ** as power  operator
+/*
+/* Revision 1.32  2013/05/12 19:39:32  pauloscustodio
 /* warnings
 /*
 /* Revision 1.31  2013/01/24 23:03:03  pauloscustodio
@@ -291,7 +294,7 @@ enum symbols
 GetSym( void )
 {
     char *instr;
-    int c, chcount = 0;
+    int c, c2, chcount = 0;
 
     ident[0] = '\0';
 
@@ -327,6 +330,28 @@ GetSym( void )
             }
         }
     }
+
+	/* special cases for composed separators */
+	switch ( c ) 
+	{
+	case '*':
+		c2 = GetChar( z80asmfile );
+		if ( c2 == '*' )
+		{
+			sym = power;
+			return sym;
+		}
+		else
+		{
+			if ( c2 != EOF )
+				UnGet( c2, z80asmfile );
+			sym = multiply;
+			return sym;
+		}
+	default:
+		/* continue */
+		;
+	}
 
     instr = strchr( separators, c );
 
