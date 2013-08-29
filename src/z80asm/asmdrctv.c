@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.48 2013-06-15 00:26:23 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.49 2013-08-29 21:42:10 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.48  2013-06-15 00:26:23  pauloscustodio
+/* Revision 1.49  2013-08-29 21:42:10  pauloscustodio
+/* comment
+/*
+/* Revision 1.48  2013/06/15 00:26:23  pauloscustodio
 /* Move mapfile writing to mapfile.c.
 /*
 /* Revision 1.47  2013/06/14 22:14:36  pauloscustodio
@@ -1046,7 +1049,9 @@ DEFM( void )
                 }
                 else
                 {
-                    if ( constant != '\"' )
+                    if ( constant != '\"' ) /* NOTE: should be dquote, but dquote is index in 
+											   enum symbols (=2) computed by GetSym(), 
+											   different from char retrieved by GetChar() */
                     {
                         append_byte( (byte_t) constant );
                         ++bytepos;
