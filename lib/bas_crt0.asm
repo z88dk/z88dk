@@ -2,7 +2,7 @@
 ;
 ;       Created 1/4/99 djm
 ;
-;	$Id: bas_crt0.asm,v 1.8 2013-06-18 06:11:23 stefano Exp $
+;	$Id: bas_crt0.asm,v 1.9 2013-08-30 01:22:25 pauloscustodio Exp $
 
 
 ;-----------
@@ -23,8 +23,8 @@ bas_first:
         DEFB    bas_last - bas_first    ;Line Length
 ;       DEFW    0                       ;Row Number 0 can not be listed
         DEFW    1
-        DEFM    BAS_IF & BAS_PAGE_G & "<>&2300" & BAS_THEN & BAS_NEW
-        DEFM    BAS_ELSE & BAS_LOMEM_P & "=&AFFF" & BAS_CALL & BAS_TO & "P" & CR
+        DEFM    BAS_IF , BAS_PAGE_G , "<>&2300" , BAS_THEN , BAS_NEW
+        DEFM    BAS_ELSE , BAS_LOMEM_P , "=&AFFF" , BAS_CALL , BAS_TO , "P" , CR
 bas_last:
         DEFB    0
         DEFW    $FFFF           ;End of BASIC program. Next address is TOP.

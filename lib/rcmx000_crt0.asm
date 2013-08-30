@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: rcmx000_crt0.asm,v 1.6 2009-06-22 21:20:05 dom Exp $
+;       $Id: rcmx000_crt0.asm,v 1.7 2013-08-30 01:22:25 pauloscustodio Exp $
 ;
 ; - - - - - - -
 
@@ -136,7 +136,7 @@ ENDIF
 
 	; Here is a great place to store temp variables and stuff!!
 acme:	defw 4711 			; useless arbitrarily choosen number
-	defm  "Small C+ RCM2/3000"&0	;Unnecessary file signature
+	defm  "Small C+ RCM2/3000",0	;Unnecessary file signature
 _std_seed:
 	defw 0          		; Needed for rand and srand
 

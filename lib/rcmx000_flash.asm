@@ -233,7 +233,7 @@ dbg_skip2here:
 	; run in flash!!
 	jp blinkled_n
 
-transfstr: defm "This is the transfer 2 ram function"&0
+transfstr: defm "This is the transfer 2 ram function",0
 
 
 _s_ostr: defw 0

@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.16 2009-06-22 21:20:05 dom Exp $
+;       $Id: rex_crt0.asm,v 1.17 2013-08-30 01:22:25 pauloscustodio Exp $
 ;
 
 	MODULE rex_crt0
@@ -24,8 +24,8 @@
 	XDEF	cleanup
 
 
-;	defm	"ApplicationName:Addin"&10&13
-;	defm	"[program name - 10 chars?]"&10&13
+;	defm	"ApplicationName:Addin",10,13
+;	defm	"[program name - 10 chars?]",10,13
 ;	defb	0
 ;	defw	endprof-begprog
 ;	defb	0,0

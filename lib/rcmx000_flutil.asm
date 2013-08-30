@@ -4,7 +4,7 @@ fel:
 	call outstr
 endhere: jr endhere
 
-felstr: defm "Something went wrong while flashing"&10&0
+felstr: defm "Something went wrong while flashing",10,0
 	
 dot:
 	push hl
@@ -122,7 +122,7 @@ dontwrap:
 
 
 frv:
-	defm "Done flashing! Now reset target!!!"&0
+	defm "Done flashing! Now reset target!!!",0
 
 flashbyte:
 
@@ -286,11 +286,11 @@ peekb:  ; a is the segment, hl is the address and data is returned in a
 	ret
 	
 fin_str:
-	defm 10&"Finnished flashing, now reset target..."&10&0
+	defm 10,"Finnished flashing, now reset target...",10,0
 erase_str:
-	defm "Erased flash..."&10&0
+	defm "Erased flash...",10,0
 
-dotstr:	defm "."&0
+dotstr:	defm ".",0
 
 
 outstr:
