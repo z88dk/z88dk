@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.93 2013-06-16 22:25:39 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.94 2013-08-30 01:11:54 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.93  2013-06-16 22:25:39  pauloscustodio
+/* Revision 1.94  2013-08-30 01:11:54  pauloscustodio
+/* Symbols in symbol.h enum definition and in z80asm.c ssyms[] must be in the exact
+/* same order. Moreover need to define some different symbols for the legacy
+/* version.
+/*
+/* Move all defintions to token_def.h, included in both other files.
+/*
+/* Revision 1.93  2013/06/16 22:25:39  pauloscustodio
 /* New remove_all_{local,static,global}_syms( void ) functions
 /* to encapsulate calls to get_global_tab().
 /*
@@ -566,6 +573,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "strutil.h"
 #include "symbol.h"
 #include "z80asm.h"
+#include "legacy.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -603,14 +611,23 @@ FILE *z80asmfile, *objfile;
 
 /* BUG_0001 array ssym[] needs to have one element per character in
  * separators, plus one newline to match the final '\0' just in case it is
- * not caught before */
+ * not caught before, needs to have the same sequence as enum symbols {} */
 enum symbols sym, ssym[] =
-    {
-        space, strconq, dquote, squote, semicolon, comma, fullstop,
-        lparen, lcurly, lsquare, rsquare, rcurly, rparen, plus, minus, multiply, divi, mod, power,
-        assign, bin_and, bin_or, bin_xor, less, greater, log_not, constexpr, colon, newline
-    };
-char separators[] = " &\"\';,.({[]})+-*/%^=~|:<>!#:";
+{
+#define TOKEN(name, str_legacy, str_new) name,
+#include "token_def.h"
+#undef TOKEN
+};
+
+char separators[] = 
+#ifdef LEGACY
+#define TOKEN(name, str_legacy, str_new) str_legacy
+#else
+#define TOKEN(name, str_legacy, str_new) str_new
+#endif
+#include "token_def.h"
+#undef TOKEN
+;
 
 enum flag EOL, library, createlibrary;
 
@@ -619,7 +636,12 @@ char line[255], stringconst[255], ident[FILENAME_MAX + 1];
 
 extern char Z80objhdr[];
 extern char objhdrprefix[];
+
+#ifdef LEGACY
 char Z80libhdr[] = "Z80LMF01";
+#else
+char Z80libhdr[] = "Z80LMF02";
+#endif
 
 byte_t reloc_routine[] =
     "\x08\xD9\xFD\xE5\xE1\x01\x49\x00\x09\x5E\x23\x56\xD5\x23\x4E\x23"

@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.26 2013-06-10 23:11:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symbol.h,v 1.27 2013-08-30 01:11:54 pauloscustodio Exp $ */
 /* $Log: symbol.h,v $
-/* Revision 1.26  2013-06-10 23:11:33  pauloscustodio
+/* Revision 1.27  2013-08-30 01:11:54  pauloscustodio
+/* Symbols in symbol.h enum definition and in z80asm.c ssyms[] must be in the exact
+/* same order. Moreover need to define some different symbols for the legacy
+/* version.
+/*
+/* Move all defintions to token_def.h, included in both other files.
+/*
+/* Revision 1.26  2013/06/10 23:11:33  pauloscustodio
 /* CH_0023 : Remove notdecl_tab
 /*
 /* Revision 1.25  2013/06/08 23:37:32  pauloscustodio
@@ -166,12 +173,12 @@ enum flag           { OFF, ON };
 /* BUG_0001(a) : during correction of BUG_0001, new symbol colon was introduced in enum symbols,
         causing expressions stored in object files to be wrong, e.g. VALUE-1 was stored as
         VALUE*1. This caused problems in expression evaluation in link phase. */
-enum symbols        { space, strconq, dquote, squote, semicolon, comma, fullstop, lparen, lcurly, lsquare, rsquare, rcurly, rparen,
-                      plus, minus, multiply, divi, mod, power, assign, bin_and, bin_or, bin_xor, less,
-                      greater, log_not, constexpr, newline, lessequal, greatequal, notequal, name, number,
-                      decmconst, hexconst, binconst, charconst, negated, nil,
-                      ifstatm, elsestatm, endifstatm, label, colon
-                    };
+enum symbols
+{ 
+#define TOKEN(name, str_legacy, str_new) name,
+#include "token_def.h"
+#undef TOKEN
+};
 
 
 struct pfixstack

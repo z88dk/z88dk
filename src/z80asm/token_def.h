@@ -15,14 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.1 2013-08-30 01:06:08 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.2 2013-08-30 01:11:54 pauloscustodio Exp $
 */
 
 /* define list of tokens with corresponding string representation, 
    use a " " when not single-char token 
    newline must be the last token so that it is returned when a '\0' char is searched
 		name,		legacy,	new		 */
-#define SAME(x) x,x
 TOKEN(	space, 		" ", " " )
 TOKEN(	dquote, 	"\"","\"")
 TOKEN(	squote, 	"'", "'" )
@@ -69,10 +68,19 @@ TOKEN(	ifstatm,	" ", " " )
 TOKEN(	elsestatm,	" ", " " )
 TOKEN(	endifstatm,	" ", " " )
 TOKEN(	label,		" ", " " )
-TOKEN(	newline,	"",  ""  )	/* must be last and empty string to match '\0' */
+
+/* must be last and empty string to match '\0' */
+TOKEN(	newline,	"",  ""  )
 
 /* $Log: token_def.h,v $
-/* Revision 1.1  2013-08-30 01:06:08  pauloscustodio
+/* Revision 1.2  2013-08-30 01:11:54  pauloscustodio
+/* Symbols in symbol.h enum definition and in z80asm.c ssyms[] must be in the exact
+/* same order. Moreover need to define some different symbols for the legacy
+/* version.
+/*
+/* Move all defintions to token_def.h, included in both other files.
+/*
+/* Revision 1.1  2013/08/30 01:06:08  pauloscustodio
 /* New C-like expressions, defined when LEGACY is not defined. Keeps old
 /* behaviour under -DLEGACY (defined in legacy.h)
 /*
