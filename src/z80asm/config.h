@@ -14,13 +14,18 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.25 2013-08-30 01:06:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.26 2013-08-30 21:50:43 pauloscustodio Exp $ */
 /* $Log: config.h,v $
-/* Revision 1.25  2013-08-30 01:06:08  pauloscustodio
-/* New C-like expressions, defined when LEGACY is not defined. Keeps old
-/* behaviour under -DLEGACY (defined in legacy.h)
+/* Revision 1.26  2013-08-30 21:50:43  pauloscustodio
+/* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
+/* as an identifier reserved by the C standard for implementation-defined behaviour
+/* starting with two underscores.
 /*
-/* BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-DLEGACY)
+/* Revision 1.25  2013/08/30 01:06:08  pauloscustodio
+/* New C-like expressions, defined when __LEGACY_Z80ASM_SYNTAX is not defined. Keeps old
+/* behaviour under -D__LEGACY_Z80ASM_SYNTAX (defined in legacy.h)
+/*
+/* BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-D__LEGACY_Z80ASM_SYNTAX)
 /* - Expressions now use more standard C-like operators
 /* - Object and library files changed signature to
 /*   "Z80RMF02", "Z80LMF02", to avoid usage of old
@@ -37,7 +42,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* ENDIAN not used and logic to define it was causing Deprecated warnings - removed
 /*
 /* Revision 1.23  2013/03/02 23:48:55  pauloscustodio
-/* New LEGACY define to mark code that should be removed but is kept
+/* New __LEGACY_Z80ASM_SYNTAX define to mark code that should be removed but is kept
 /* to keep backwards compatibility
 /*
 /* Revision 1.22  2013/02/19 22:52:40  pauloscustodio

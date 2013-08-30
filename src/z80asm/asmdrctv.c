@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.49 2013-08-29 21:42:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.50 2013-08-30 21:50:43 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.49  2013-08-29 21:42:10  pauloscustodio
+/* Revision 1.50  2013-08-30 21:50:43  pauloscustodio
+/* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
+/* as an identifier reserved by the C standard for implementation-defined behaviour
+/* starting with two underscores.
+/*
+/* Revision 1.49  2013/08/29 21:42:10  pauloscustodio
 /* comment
 /*
 /* Revision 1.48  2013/06/15 00:26:23  pauloscustodio
@@ -53,7 +58,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
 /*
 /* Revision 1.40  2013/03/02 23:48:55  pauloscustodio
-/* New LEGACY define to mark code that should be removed but is kept
+/* New __LEGACY_Z80ASM_SYNTAX define to mark code that should be removed but is kept
 /* to keep backwards compatibility
 /*
 /* Revision 1.39  2013/02/27 22:34:16  pauloscustodio
@@ -1225,7 +1230,7 @@ Fetchfilename( FILE *fptr )
 
     ptr = ident;
 
-#ifdef LEGACY
+#ifdef __LEGACY_Z80ASM_SYNTAX
     if ( *ptr == '#' )
     {
         ptr++;

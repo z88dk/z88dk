@@ -95,6 +95,7 @@
     <ClInclude Include="except.h" />
     <ClInclude Include="file.h" />
     <ClInclude Include="hist.h" />
+    <ClInclude Include="legacy.h" />
     <ClInclude Include="listfile.h" />
     <ClInclude Include="mapfile.h" />
     <ClInclude Include="memalloc.h" />
@@ -118,6 +119,7 @@
     <ClInclude Include="symbol.h" />
     <ClInclude Include="symref.h" />
     <ClInclude Include="symtab.h" />
+    <ClInclude Include="token_def.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="uthash.h" />
     <ClInclude Include="z80asm.h" />

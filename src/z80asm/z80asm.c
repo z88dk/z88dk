@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.94 2013-08-30 01:11:54 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.95 2013-08-30 21:50:43 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.94  2013-08-30 01:11:54  pauloscustodio
+/* Revision 1.95  2013-08-30 21:50:43  pauloscustodio
+/* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
+/* as an identifier reserved by the C standard for implementation-defined behaviour
+/* starting with two underscores.
+/*
+/* Revision 1.94  2013/08/30 01:11:54  pauloscustodio
 /* Symbols in symbol.h enum definition and in z80asm.c ssyms[] must be in the exact
 /* same order. Moreover need to define some different symbols for the legacy
 /* version.
@@ -620,7 +625,7 @@ enum symbols sym, ssym[] =
 };
 
 char separators[] = 
-#ifdef LEGACY
+#ifdef __LEGACY_Z80ASM_SYNTAX
 #define TOKEN(name, str_legacy, str_new) str_legacy
 #else
 #define TOKEN(name, str_legacy, str_new) str_new
@@ -637,7 +642,7 @@ char line[255], stringconst[255], ident[FILENAME_MAX + 1];
 extern char Z80objhdr[];
 extern char objhdrprefix[];
 
-#ifdef LEGACY
+#ifdef __LEGACY_Z80ASM_SYNTAX
 char Z80libhdr[] = "Z80LMF01";
 #else
 char Z80libhdr[] = "Z80LMF02";

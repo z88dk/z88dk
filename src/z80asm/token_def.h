@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.2 2013-08-30 01:11:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.3 2013-08-30 21:50:43 pauloscustodio Exp $
 */
 
 /* define list of tokens with corresponding string representation, 
@@ -73,7 +73,12 @@ TOKEN(	label,		" ", " " )
 TOKEN(	newline,	"",  ""  )
 
 /* $Log: token_def.h,v $
-/* Revision 1.2  2013-08-30 01:11:54  pauloscustodio
+/* Revision 1.3  2013-08-30 21:50:43  pauloscustodio
+/* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
+/* as an identifier reserved by the C standard for implementation-defined behaviour
+/* starting with two underscores.
+/*
+/* Revision 1.2  2013/08/30 01:11:54  pauloscustodio
 /* Symbols in symbol.h enum definition and in z80asm.c ssyms[] must be in the exact
 /* same order. Moreover need to define some different symbols for the legacy
 /* version.
@@ -81,10 +86,10 @@ TOKEN(	newline,	"",  ""  )
 /* Move all defintions to token_def.h, included in both other files.
 /*
 /* Revision 1.1  2013/08/30 01:06:08  pauloscustodio
-/* New C-like expressions, defined when LEGACY is not defined. Keeps old
-/* behaviour under -DLEGACY (defined in legacy.h)
+/* New C-like expressions, defined when __LEGACY_Z80ASM_SYNTAX is not defined. Keeps old
+/* behaviour under -D__LEGACY_Z80ASM_SYNTAX (defined in legacy.h)
 /*
-/* BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-DLEGACY)
+/* BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-D__LEGACY_Z80ASM_SYNTAX)
 /* - Expressions now use more standard C-like operators
 /* - Object and library files changed signature to
 /*   "Z80RMF02", "Z80LMF02", to avoid usage of old

@@ -12,13 +12,18 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.66 2013-08-30 01:06:08 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.67 2013-08-30 21:50:43 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.66  2013-08-30 01:06:08  pauloscustodio
-# New C-like expressions, defined when LEGACY is not defined. Keeps old
-# behaviour under -DLEGACY (defined in legacy.h)
+# Revision 1.67  2013-08-30 21:50:43  pauloscustodio
+# By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
+# as an identifier reserved by the C standard for implementation-defined behaviour
+# starting with two underscores.
 #
-# BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-DLEGACY)
+# Revision 1.66  2013/08/30 01:06:08  pauloscustodio
+# New C-like expressions, defined when __LEGACY_Z80ASM_SYNTAX  is not defined. Keeps old
+# behaviour under -D__LEGACY_Z80ASM_SYNTAX  (defined in legacy.h)
+#
+# BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-D__LEGACY_Z80ASM_SYNTAX )
 # - Expressions now use more standard C-like operators
 # - Object and library files changed signature to
 #   "Z80RMF02", "Z80LMF02", to avoid usage of old
@@ -351,12 +356,12 @@ CFLAGS +=		-W -Wformat -Werror=format-security
 all: $(TARGET) gccmake.bat
 
 legacy:
-	echo "#define LEGACY" > legacy.h
+	echo "#define __LEGACY_Z80ASM_SYNTAX " > legacy.h
 	$(MAKE) depend
 	$(MAKE)
 
 new:
-	echo "#undef LEGACY" > legacy.h
+	echo "#undef __LEGACY_Z80ASM_SYNTAX " > legacy.h
 	$(MAKE) depend
 	$(MAKE)
 

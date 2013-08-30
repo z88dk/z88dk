@@ -20,13 +20,18 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.47 2013-08-30 01:06:08 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.48 2013-08-30 21:50:43 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.47  2013-08-30 01:06:08  pauloscustodio
-/* New C-like expressions, defined when LEGACY is not defined. Keeps old
-/* behaviour under -DLEGACY (defined in legacy.h)
+/* Revision 1.48  2013-08-30 21:50:43  pauloscustodio
+/* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
+/* as an identifier reserved by the C standard for implementation-defined behaviour
+/* starting with two underscores.
 /*
-/* BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-DLEGACY)
+/* Revision 1.47  2013/08/30 01:06:08  pauloscustodio
+/* New C-like expressions, defined when __LEGACY_Z80ASM_SYNTAX is not defined. Keeps old
+/* behaviour under -D__LEGACY_Z80ASM_SYNTAX (defined in legacy.h)
+/*
+/* BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-D__LEGACY_Z80ASM_SYNTAX)
 /* - Expressions now use more standard C-like operators
 /* - Object and library files changed signature to
 /*   "Z80RMF02", "Z80LMF02", to avoid usage of old
@@ -1239,7 +1244,7 @@ Based on 1.0.31
 	- New srcfile.c to handle reading lines from source files
 	- Move include path search to srcfile.c
 	- New interface to Str to copy characters to string
-	- New LEGACY define to mark code that should be removed but is kept 
+	- New __LEGACY_Z80ASM_SYNTAX define to mark code that should be removed but is kept 
 	  to keep backwards compatibility
 	- Removed writeline, that was used to cancel listing of multi-line 
 	  constructs, as only the first line was shown on the list file. Fixed
@@ -1338,7 +1343,7 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
 29.08.2013 [1.2.6] (pauloscustodio)
 -------------------------------------------------------------------------------
-	BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-DLEGACY)
+	BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-D__LEGACY_Z80ASM_SYNTAX)
 	- Expressions now use more standard C-like operators
 	- Object and library files changed signature to 
 	  "Z80RMF02", "Z80LMF02", to avoid usage of old
@@ -1351,6 +1356,20 @@ Based on 1.0.31
 	- AND:                          changed from '~' to '&';  '~' will be NOT
 	- NOT:                          '~' added as binary not
 
+	CH_0018 : Remove legacy '#' in include file
+		According to the z80asm manual, the # sign is used to insert the 
+		Z80_OZFILES environment variable before the file name, but this 
+		is not done as the assembler searches for the include file in all 
+		the include path, which includes the Z80_OZFILES environment variable.
+		Handling of '#' in INCLUDE removed.
+
+-------------------------------------------------------------------------------
+30.08.2013 [1.2.7] (pauloscustodio)
+-------------------------------------------------------------------------------
+	By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
+	as an identifier reserved by the C standard for implementation-defined behaviour
+	starting with two underscores.
+
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
@@ -1360,13 +1379,6 @@ FUTURE CHANGES - require change of the object file format
         - See example from zx48.asm ROM image in t/BUG_0011.t test file.
         - Need to change object file format to correct - need patchptr and
           address of instruction start.
-
-	CH_0018 : Remove legacy '#' in include file
-		According to the z80asm manual, the # sign is used to insert the 
-		Z80_OZFILES environment variable before the file name, but this 
-		is not done as the assembler searches for the include file in all 
-		the include path, which includes the Z80_OZFILES environment variable.
-		Handling of '#' in INCLUDE removed.
 
 	CH_0019 : Replaced tokenizer with Flex based scanner
 		Simplified code by using flex instead of special-built scanner and 
@@ -1381,7 +1393,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "1.2.6"
+#define VERSION     "1.2.7"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS

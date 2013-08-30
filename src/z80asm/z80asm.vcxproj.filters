@@ -138,6 +138,12 @@
     <ClInclude Include="deffile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="legacy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="token_def.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
