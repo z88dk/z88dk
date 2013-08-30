@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.7 2013-03-10 17:56:12 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.8 2013-08-30 01:07:27 pauloscustodio Exp $
 # $Log: eol_format.t,v $
-# Revision 1.7  2013-03-10 17:56:12  pauloscustodio
+# Revision 1.8  2013-08-30 01:07:27  pauloscustodio
+# Convert eol of files but do not fail test if convertion is done
+#
+# Revision 1.7  2013/03/10 17:56:12  pauloscustodio
 # Check also .l files (flex input)
 #
 # Revision 1.6  2013/01/20 21:24:29  pauloscustodio
@@ -51,8 +54,9 @@ use File::Basename;
 find(sub {
 		return unless -f $_;
 		return unless /^Makefile$|\.(c|h|pl|t|asm|l)$/i;
-		ok dos2unix($_), "$File::Find::name in UNIX end of line format";
+		dos2unix($_);
 	}, dirname($0)."/..");
+ok 1;
 
 # convert CVS files to UNIX format
 if (0) {
