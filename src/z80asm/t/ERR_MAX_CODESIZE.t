@@ -13,9 +13,26 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_MAX_CODESIZE.t,v 1.3 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/ERR_MAX_CODESIZE.t,v 1.4 2013-08-30 01:06:08 pauloscustodio Exp $
 # $Log: ERR_MAX_CODESIZE.t,v $
-# Revision 1.3  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.4  2013-08-30 01:06:08  pauloscustodio
+# New C-like expressions, defined when LEGACY is not defined. Keeps old
+# behaviour under -DLEGACY (defined in legacy.h)
+#
+# BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-DLEGACY)
+# - Expressions now use more standard C-like operators
+# - Object and library files changed signature to
+#   "Z80RMF02", "Z80LMF02", to avoid usage of old
+#   object files with expressions inside in the old format
+#
+# Detail:
+# - String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
+# - Power:                        changed from '^' to '**'; '^' will be XOR
+# - XOR:                          changed from ':' to '^';
+# - AND:                          changed from '~' to '&';  '~' will be NOT
+# - NOT:                          '~' added as binary not
+#
+# Revision 1.3  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.2  2012/05/26 18:51:10  pauloscustodio
@@ -56,6 +73,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test each of the MAXCODESIZE conditions in the code
+my $COMMA = get_legacy() ? "&" : ",";
 
 # DEFB
 t_z80asm_ok(0, "defs 65535, 0xAA \n defb 0xAA \n",
@@ -111,14 +129,14 @@ t_z80asm_ok(0, "defs 65534, 'a' \n defm 97, \"a\" \n",
 t_z80asm_error("defs 65535, 'a' \n defm 97, \"a\" \n",
 	       "Error at file 'test.asm' line 2: Max. code size of 65536 bytes reached");
 
-t_z80asm_ok(0, "defs 65534, 'a' \n defm 97 & \"a\" \n",
+t_z80asm_ok(0, "defs 65534, 'a' \n defm 97 $COMMA \"a\" \n",
 	    "a" x 65536);
-t_z80asm_error("defs 65535, 'a' \n defm 97 & \"a\" \n",
+t_z80asm_error("defs 65535, 'a' \n defm 97 $COMMA \"a\" \n",
 	       "Error at file 'test.asm' line 2: Max. code size of 65536 bytes reached");
 
-t_z80asm_ok(0, "defs 65534, 'a' \n defm \"a\" & 97 \n",
+t_z80asm_ok(0, "defs 65534, 'a' \n defm \"a\" $COMMA 97 \n",
 	    "a" x 65536);
-t_z80asm_error("defs 65535, 'a' \n defm \"a\" & 97 \n",
+t_z80asm_error("defs 65535, 'a' \n defm \"a\" $COMMA 97 \n",
 	       "Error at file 'test.asm' line 2: Max. code size of 65536 bytes reached");
 
 # BINARY

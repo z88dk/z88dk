@@ -20,9 +20,26 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.46 2013-08-26 21:49:39 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.47 2013-08-30 01:06:08 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.46  2013-08-26 21:49:39  pauloscustodio
+/* Revision 1.47  2013-08-30 01:06:08  pauloscustodio
+/* New C-like expressions, defined when LEGACY is not defined. Keeps old
+/* behaviour under -DLEGACY (defined in legacy.h)
+/*
+/* BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-DLEGACY)
+/* - Expressions now use more standard C-like operators
+/* - Object and library files changed signature to
+/*   "Z80RMF02", "Z80LMF02", to avoid usage of old
+/*   object files with expressions inside in the old format
+/*
+/* Detail:
+/* - String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
+/* - Power:                        changed from '^' to '**'; '^' will be XOR
+/* - XOR:                          changed from ':' to '^';
+/* - AND:                          changed from '~' to '&';  '~' will be NOT
+/* - NOT:                          '~' added as binary not
+/*
+/* Revision 1.46  2013/08/26 21:49:39  pauloscustodio
 /* Bug report 2013-07-27 10:50:27 by rkd77 : compile with -Wformat -Werror=format-security
 /*
 /* Revision 1.45  2013/08/26 21:18:03  pauloscustodio
@@ -1319,6 +1336,22 @@ Based on 1.0.31
 		Build of z88dk fails with these options.
 
 -------------------------------------------------------------------------------
+29.08.2013 [1.2.6] (pauloscustodio)
+-------------------------------------------------------------------------------
+	BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-DLEGACY)
+	- Expressions now use more standard C-like operators
+	- Object and library files changed signature to 
+	  "Z80RMF02", "Z80LMF02", to avoid usage of old
+	  object files with expressions inside in the old format
+	
+	Detail:
+	- String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
+	- Power:                        changed from '^' to '**'; '^' will be XOR
+	- XOR:                          changed from ':' to '^';
+	- AND:                          changed from '~' to '&';  '~' will be NOT
+	- NOT:                          '~' added as binary not
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1348,7 +1381,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "1.2.5"
+#define VERSION     "1.2.6"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS

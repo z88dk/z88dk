@@ -13,9 +13,26 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.35 2013-06-03 23:21:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.36 2013-08-30 01:06:08 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.35  2013-06-03 23:21:35  pauloscustodio
+# Revision 1.36  2013-08-30 01:06:08  pauloscustodio
+# New C-like expressions, defined when LEGACY is not defined. Keeps old
+# behaviour under -DLEGACY (defined in legacy.h)
+#
+# BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-DLEGACY)
+# - Expressions now use more standard C-like operators
+# - Object and library files changed signature to
+#   "Z80RMF02", "Z80LMF02", to avoid usage of old
+#   object files with expressions inside in the old format
+#
+# Detail:
+# - String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
+# - Power:                        changed from '^' to '**'; '^' will be XOR
+# - XOR:                          changed from ':' to '^';
+# - AND:                          changed from '~' to '&';  '~' will be NOT
+# - NOT:                          '~' added as binary not
+#
+# Revision 1.35  2013/06/03 23:21:35  pauloscustodio
 # show wdiff on t_binary() failure
 #
 # Revision 1.34  2013/06/01 01:19:58  pauloscustodio
@@ -492,7 +509,7 @@ sub hexdump {
 sub objfile {
 	my(%args) = @_;
 
-	my $obj = "Z80RMF01";
+	my $obj = get_legacy() ? "Z80RMF01" : "Z80RMF02";
 	$obj .= pack("v", $args{ORG} // -1);
 
 	# store empty pointers; mark position for later
@@ -574,7 +591,7 @@ sub write_binfile {
 # return library file binary representation
 sub libfile {
 	my(@obj_files) = @_;
-	my $lib = 'Z80LMF01';
+	my $lib = get_legacy() ? "Z80LMF01" : "Z80LMF02";
 	for my $i (0 .. $#obj_files) {
 		my $obj_file = $obj_files[$i];
 		my $next_ptr = ($i == $#obj_files) ?
@@ -778,6 +795,13 @@ sub get_copyright {
 	my $copyrightmsg = "Z80 Module Assembler ".$version.", (c) ".$copyright;
 	
 	return $copyrightmsg;
+}
+
+#------------------------------------------------------------------------------
+# get legacy flag from legacy.h
+sub get_legacy {
+	my $legacy = read_file("legacy.h");
+	if ($legacy =~ /define\s+LEGACY/) { return 1 } else { return 0 }
 }
 
 #------------------------------------------------------------------------------

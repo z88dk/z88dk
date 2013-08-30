@@ -14,9 +14,26 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.38 2013-06-14 22:14:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.39 2013-08-30 01:06:08 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.38  2013-06-14 22:14:36  pauloscustodio
+/* Revision 1.39  2013-08-30 01:06:08  pauloscustodio
+/* New C-like expressions, defined when LEGACY is not defined. Keeps old
+/* behaviour under -DLEGACY (defined in legacy.h)
+/*
+/* BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-DLEGACY)
+/* - Expressions now use more standard C-like operators
+/* - Object and library files changed signature to
+/*   "Z80RMF02", "Z80LMF02", to avoid usage of old
+/*   object files with expressions inside in the old format
+/*
+/* Detail:
+/* - String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
+/* - Power:                        changed from '^' to '**'; '^' will be XOR
+/* - XOR:                          changed from ':' to '^';
+/* - AND:                          changed from '~' to '&';  '~' will be NOT
+/* - NOT:                          '~' added as binary not
+/*
+/* Revision 1.38  2013/06/14 22:14:36  pauloscustodio
 /* find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
 /*
 /* Revision 1.37  2013/06/10 23:11:33  pauloscustodio
@@ -280,6 +297,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "file.h"
 #include "codearea.h"
 #include "z80asm.h"
+#include "legacy.h"
 
 /* external functions */
 enum symbols GetSym( void );
@@ -410,6 +428,21 @@ Factor( struct expr *pfixexpr )
 
             break;
 
+        case bin_not:
+            *pfixexpr->infixptr++ = '~';
+            GetSym();
+
+            if ( !Factor( pfixexpr ) )
+            {
+                return 0;
+            }
+            else
+            {
+                NewPfixSymbol( pfixexpr, 0, bin_not, NULL, 0 );    /* binary NOT...  */
+            }
+
+            break;
+
         case squote:
             *pfixexpr->infixptr++ = '\'';   /* store single quote in infix expr */
 
@@ -489,7 +522,14 @@ Pterm( struct expr *pfixexpr )
 
     while ( sym == power )
     {
+#ifdef LEGACY
         *pfixexpr->infixptr++ = separators[power];        /* store '^' in infix expr */
+#else
+		/* store '**' in infix expr */
+        *pfixexpr->infixptr++ = '*';
+        *pfixexpr->infixptr++ = '*';
+#endif
+
         GetSym();
 
         if ( Factor( pfixexpr ) )
@@ -823,6 +863,10 @@ EvalPfixExpr( struct expr *pfixlist )
 
                 case log_not:
                     stackptr->stackconstant = !( stackptr->stackconstant );
+                    break;
+
+                case bin_not:
+                    stackptr->stackconstant = ~( stackptr->stackconstant );
                     break;
 
                 case constexpr:

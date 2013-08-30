@@ -13,9 +13,26 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/lexer.t,v 1.4 2013-05-12 19:39:32 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/lexer.t,v 1.5 2013-08-30 01:06:08 pauloscustodio Exp $
 # $Log: lexer.t,v $
-# Revision 1.4  2013-05-12 19:39:32  pauloscustodio
+# Revision 1.5  2013-08-30 01:06:08  pauloscustodio
+# New C-like expressions, defined when LEGACY is not defined. Keeps old
+# behaviour under -DLEGACY (defined in legacy.h)
+#
+# BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-DLEGACY)
+# - Expressions now use more standard C-like operators
+# - Object and library files changed signature to
+#   "Z80RMF02", "Z80LMF02", to avoid usage of old
+#   object files with expressions inside in the old format
+#
+# Detail:
+# - String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
+# - Power:                        changed from '^' to '**'; '^' will be XOR
+# - XOR:                          changed from ':' to '^';
+# - AND:                          changed from '~' to '&';  '~' will be NOT
+# - NOT:                          '~' added as binary not
+#
+# Revision 1.4  2013/05/12 19:39:32  pauloscustodio
 # warnings
 #
 # Revision 1.3  2013/01/20 21:24:29  pauloscustodio
@@ -39,29 +56,35 @@ require 't/test_utils.pl';
 
 diag "Should accept binary constant longer than 8 bits";
 
+my($COMMA, $AND, $XOR, $NOT,      $POWER) = get_legacy() ? 	
+  ('&',    '~',  ':',  '0xFF :',  '^'   ) : 
+  (',',    '&',  '^',  '~',       '**'  );
+	
 my @asmbin = (
-	['ld a,1; comment ignored',		"\x3E\x01"],
-	['.label_1 ld a,2',				"\x3E\x02"],
-	['_label_2: ld a,3',			"\x3E\x03"],
-	['defw label_1,_label_2',		"\x02\x00\x04\x00"],
-	['defw #label_1',				"\x02\x00"],
-	['defb 255,128D',				"\xFF\x80"],
-	['defb $FF,0xFE,0BEH',			"\xFF\xFE\xBE"],
-	['defb @1010,1010B',			"\x0A\x0A"],
-	['defm "hello"&32,"world"',		"hello world"],
-	['defb 1<0,1<1,1<2',			"\0\0\1"],
-	['defb 1<=0,1<=1,1<=2',			"\0\1\1"],
-	['defb 1=0,1=1,1=2',			"\0\1\0"],
-	['defb 1<>0,1<>1,1<>2',			"\1\0\1"],
-	['defb 1>0,1>1,1>2',			"\1\0\0"],
-	['defb 1>=0,1>=1,1>=2',			"\1\1\0"],
-	['defb +1,-1',					"\x01\xFF"],
-	['defb 1+1,3-1,3~2,2|0,0:2',	"\2\2\2\2\2"],	# plus,minus,and,or,xor
-	['defb 5*2,100/10,10%3',		"\x0A\x0A\x01"],
-	['defb 2^7',					"\x80"],
-	['defb 2*[1+2*(1+2)]',			"\x0E"],
-	['defb 2*1+2*1+2',				"\x06"],
-	['defb !0,!1',					"\1\0"],
+	["ld a,1; comment ignored",		"\x3E\x01"],
+	[".label_1 ld a,2",				"\x3E\x02"],
+	["_label_2: ld a,3",			"\x3E\x03"],
+	["defw label_1,_label_2",		"\x02\x00\x04\x00"],
+	["defw #label_1",				"\x02\x00"],
+	["defb 255,128D",				"\xFF\x80"],
+	["defb \$FF,0xFE,0BEH",			"\xFF\xFE\xBE"],
+	["defb \@1010,1010B",			"\x0A\x0A"],
+	["defm \"hello\" $COMMA 32,\"world\"",
+									"hello world"],
+	["defb 1<0,1<1,1<2",			"\0\0\1"],
+	["defb 1<=0,1<=1,1<=2",			"\0\1\1"],
+	["defb 1=0,1=1,1=2",			"\0\1\0"],
+	["defb 1<>0,1<>1,1<>2",			"\1\0\1"],
+	["defb 1>0,1>1,1>2",			"\1\0\0"],
+	["defb 1>=0,1>=1,1>=2",			"\1\1\0"],
+	["defb +1,-1",					"\x01\xFF"],
+	["defb 1+1,3-1,3 $AND 2,2|0,0 $XOR 2,( $NOT 0xAA ) $AND 0xFF",
+									"\2\2\2\2\2\x55"],	# plus,minus,and,or,xor,not
+	["defb 5*2,100/10,10%3",		"\x0A\x0A\x01"],
+	["defb 2 $POWER 7, 2**6",		"\x80\x40"],
+	["defb 2*[1+2*(1+2)]",			"\x0E"],
+	["defb 2*1+2*1+2",				"\x06"],
+	["defb !0,!1",					"\1\0"],
 	["defb ' '",					"\x20"],
 );
 my($asm,$bin) = ("","");
@@ -71,6 +94,16 @@ for (@asmbin) {
 }
 
 t_z80asm_ok(0, $asm, $bin);
+
+t_z80asm_error("defb ''",						"Error at file 'test.asm' line 1: Syntax error in expression");
+t_z80asm_error("defb 'he'",						"Error at file 'test.asm' line 1: Syntax error in expression");
+
+# test power expression (**) in object file
+t_z80asm(
+	asm		=> " xref v1, v2 : defb v1**v2",
+	asm2	=> " xdef v1, v2 : defc v1 = 2, v2 = 7 ",
+	bin		=> "\x80",
+);
 
 unlink_testfiles();
 done_testing();

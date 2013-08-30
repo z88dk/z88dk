@@ -15,10 +15,27 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle object file contruction, reading and writing
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.6 2013-05-12 19:46:35 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.7 2013-08-30 01:06:08 pauloscustodio Exp $
 
 $Log: objfile.c,v $
-Revision 1.6  2013-05-12 19:46:35  pauloscustodio
+Revision 1.7  2013-08-30 01:06:08  pauloscustodio
+New C-like expressions, defined when LEGACY is not defined. Keeps old
+behaviour under -DLEGACY (defined in legacy.h)
+
+BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-DLEGACY)
+- Expressions now use more standard C-like operators
+- Object and library files changed signature to
+  "Z80RMF02", "Z80LMF02", to avoid usage of old
+  object files with expressions inside in the old format
+
+Detail:
+- String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
+- Power:                        changed from '^' to '**'; '^' will be XOR
+- XOR:                          changed from ':' to '^';
+- AND:                          changed from '~' to '&';  '~' will be NOT
+- NOT:                          '~' added as binary not
+
+Revision 1.6  2013/05/12 19:46:35  pauloscustodio
 New module for object file handling
 
 Revision 1.5  2013/03/30 00:02:22  pauloscustodio
@@ -57,11 +74,17 @@ BUG_0010 : heap corruption when reaching MAXCODESIZE
 #include "objfile.h"
 #include "safestr.h"
 #include "strpool.h"
+#include "legacy.h"
 
 /*-----------------------------------------------------------------------------
 *   Object header
 *----------------------------------------------------------------------------*/
+#ifdef LEGACY
 char Z80objhdr[] 	= "Z80RMF01";
+#else
+char Z80objhdr[] 	= "Z80RMF02";
+#endif
+
 #define Z80objhdr_size (sizeof(Z80objhdr)-1)
 
 char objhdrprefix[] = "oomodnexprnamelibnmodc";

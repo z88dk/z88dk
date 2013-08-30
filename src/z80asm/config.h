@@ -14,9 +14,26 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.24 2013-04-21 22:57:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/config.h,v 1.25 2013-08-30 01:06:08 pauloscustodio Exp $ */
 /* $Log: config.h,v $
-/* Revision 1.24  2013-04-21 22:57:53  pauloscustodio
+/* Revision 1.25  2013-08-30 01:06:08  pauloscustodio
+/* New C-like expressions, defined when LEGACY is not defined. Keeps old
+/* behaviour under -DLEGACY (defined in legacy.h)
+/*
+/* BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-DLEGACY)
+/* - Expressions now use more standard C-like operators
+/* - Object and library files changed signature to
+/*   "Z80RMF02", "Z80LMF02", to avoid usage of old
+/*   object files with expressions inside in the old format
+/*
+/* Detail:
+/* - String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
+/* - Power:                        changed from '^' to '**'; '^' will be XOR
+/* - XOR:                          changed from ':' to '^';
+/* - AND:                          changed from '~' to '&';  '~' will be NOT
+/* - NOT:                          '~' added as binary not
+/*
+/* Revision 1.24  2013/04/21 22:57:53  pauloscustodio
 /* ENDIAN not used and logic to define it was causing Deprecated warnings - removed
 /*
 /* Revision 1.23  2013/03/02 23:48:55  pauloscustodio
@@ -173,7 +190,3 @@ Copyright (C) Paulo Custodio, 2011-2013
 #else
 #define FILEEXT_SEPARATOR "."
 #endif
-
-/* defined to keep the legacy features, undefined to discard them */
-#define LEGACY
- 
