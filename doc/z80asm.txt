@@ -1235,17 +1235,18 @@ implemented: binary AND, OR and XOR.
 * multiplication, e.g. 45*2 (90).
 / division, e.g. 256/8 (32).
 % modulus, e.g. 256%8 (0).
-^ power, e.g. 2^7 (128). 
-~ Binary AND, e.g. 255 ~ 7 (7).
+** power, e.g. 2**7 (128). 
+& Binary AND, e.g. 255 & 7 (7).
 | Binary OR, e.g. 128 | 64 (192).
-: Binary XOR, e.g. 128 ~ 128 (0).
+^ Binary XOR, e.g. 128 ^ 128 (0).
+~ Binary NOT, e.g. (~0xAA)&0xFF (0x55).
 # Truncate expression as constant (remove relocatable address flag)
 
 Arithmetic operators use the standard operator precedence, shown from highest to
 lowest:
 
 $@' (constant identifiers)
-() ^ */% +-~|:
+() ** */% +-&|^~
 
 If you want to overide the default operator precedence rules, use brackets ().
 
@@ -1306,8 +1307,8 @@ In occasional circumstances it may be necessary to use the current location of
 the assembler program counter in an expression e.g. calculating a relative
 distance. This may be done with the help of the ASMPC identifier. An example:
 
-.errmsg0 DEFM errmsg1 - ASMPC - 1 & "File open error" 
-.errmsg1 DEFM errmsg2 - ASMPC - 1 & "Syntax error"
+.errmsg0 DEFM errmsg1 - ASMPC - 1 , "File open error" 
+.errmsg1 DEFM errmsg2 - ASMPC - 1 , "Syntax error"
 .errmsg2
 
 Here, a length byte of the following string (excluding the length byte) is

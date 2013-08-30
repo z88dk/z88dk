@@ -1,7 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>THE Z80 CROSS ASSEMBLER, V1.0.16 (30th January 2000)</title>
-
-</head>
+<html><head><title>THE Z80 CROSS ASSEMBLER, V1.0.16 (30th January 2000)</title></head>
 <body style="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);">
 <h1>
 <center>Z88 Development Kit
@@ -202,7 +200,7 @@ in other compiled projects</a></li>
 <li><a href="#6.4">6.4 Relational operators</a></li>
 <li><a href="#6.5">6.5 The ASMPC standard
 function</a></li>
-<li><a href="#6.6">6.6 The &amp; operator</a></li>
+<li><a href="#6.6">6.6 The ',' operator</a></li>
 <li><a href="#6.7">6.7 Symbol identifiers in
 expressions</a></li>
 </ul>
@@ -1918,11 +1916,11 @@ are put in front of the constant to identify the type:</p>
 arithmetic operators are supported: addition, subtraction,
 multiplication, division and modulus. In addition binary logical
 operators are implemented: binary AND, OR and XOR.</p>
-<pre>+ addition, e.g. 12+13<br>- unary minus, subtraction. e.g. -10, 12-45<br>* multiplication, e.g. 45*2 (90)<br>/ division, e.g. 256/8 (32)<br>% modulus, e.g. 256%8 (0)<br>^ power, e.g. 2^7 (128)<br>~ Binary AND, e.g. 255 ~ 7 (7)<br>| Binary OR, e.g. 128 | 64 (192)<br>: Binary XOR, e.g. 128 ~ 128 (0)<br># Truncate expression as constant (remove relocatable address flag)</pre>
+<pre>+ addition, e.g. 12+13<br>- unary minus, subtraction. e.g. -10, 12-45<br>* multiplication, e.g. 45*2 (90)<br>/ division, e.g. 256/8 (32)<br>% modulus, e.g. 256%8 (0)<br>** power, e.g. 2**7 (128)<br>&amp; Binary AND, e.g. 255 &amp; 7 (7)<br>| Binary OR, e.g. 128 | 64 (192)<br>^ Binary XOR, e.g. 128 ^ 128 (0)<br>~ Binary NOT, e.g. (~0xAA)&amp;0xFF (0x55).<br># Truncate expression as constant (remove relocatable address flag)</pre>
 <p style="text-align: justify;">Arithmetic
 operators use the standard operator precedence, shown from highest to
 lowest:</p>
-<pre>$@' (constant identifiers)<br>() ^ */% +-~|:</pre>
+<pre>$@' (constant identifiers)<br>() ** */% +-&amp;|^~</pre>
 <p style="text-align: justify;">If you want to
 overide the default operator precedence rules, use brackets ().</p>
 <hr style="width: 100%; height: 2px;">
@@ -1983,21 +1981,21 @@ circumstances it may be necessary to use the current location of the
 assembler program counter in an expression e.g. calculating a relative
 distance. This may be done with the help of the ASMPC identifier. An
 example:</p>
-<pre>.errmsg0 DEFM errmsg1 - ASMPC - 1 &amp; "File open error"<br>.errmsg1 DEFM errmsg2 - ASMPC - 1 &amp; "Syntax error"<br>.errmsg2&nbsp;</pre>
+<pre>.errmsg0 DEFM errmsg1 - ASMPC - 1 , "File open error"<br>.errmsg1 DEFM errmsg2 - ASMPC - 1 , "Syntax error"<br>.errmsg2&nbsp;</pre>
 <p style="text-align: justify;">Here, a length byte of the
 following string (excluding the length byte)
 is calculated by using the current ASMPC address value.</p>
 <hr style="width: 100%; height: 2px;">
-<h2><a name="6.6"></a>6.6 The &amp;
+<h2><a name="6.6"></a>6.6 The ','
 operator</h2>
 <p style="text-align: justify;">You may use expressions in
 string definitions when using the
 <a href="#7-DEFM">DEFM</a> directive. String
 constants are enclosed in double quotes, e.g.
 "abcdefgh". Several strings and byte expressions may be concatanated
-using the &amp; operator. The resulting type of an expression in
+using the ',' operator. The resulting type of an expression in
 strings are an unsigned byte of the range of 0 to 255, e.g.:</p>
-<pre>DEFM "string_a" &amp; "string_b" &amp; 'X' &amp; CR &amp; LF &amp; 0</pre>
+<pre>DEFM "string_a" , "string_b" , 'X' , CR , LF , 0</pre>
 <hr style="width: 100%; height: 2px;">
 <h2><a name="6.7"></a>6.7 Symbol identifiers
 in expressions</h2>
@@ -2093,7 +2091,7 @@ expression&gt;</h2>
 <p style="text-align: justify;">Stores a
 string constant at the current assembler PC. Strings are enclosed in
 double quotes. Strings may be concatanated with byte constants using
-the &amp; operator. This is useful if control characters need to be
+the ',' operator. This is useful if control characters need to be
 a part of the string and cannot be typed from the keyboard.</p>
 <hr style="width: 100%; height: 2px;">
 <h2><a name="7-DEFGROUP"></a>DEFGROUP
