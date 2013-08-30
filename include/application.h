@@ -19,7 +19,7 @@
  *
  *	Packages are now supported (work for 16k packages)
  *
- *	$Id: application.h,v 1.4 2009-06-22 21:33:57 dom Exp $
+ *	$Id: application.h,v 1.5 2013-08-30 01:16:39 pauloscustodio Exp $
  */
 
 #ifndef HELP1
@@ -76,9 +76,9 @@
 
 #define APPLBYTE(b)     defb    b
 
-#define APPLNAME(b)     defm    b &0
+#define APPLNAME(b)     defm    b, 0
 
-#define HELPTEXT(b)     defm    b &127
+#define HELPTEXT(b)     defm    b, 127
 
 #define APPLTEXT(b)     defm    b
 
