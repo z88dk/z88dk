@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.6 2010-07-13 06:16:53 stefano Exp $
+;	$Id: sms_crt0.asm,v 1.7 2013-08-30 01:26:40 pauloscustodio Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -239,9 +239,9 @@ _Data:
     ;      ||`----- 28 row/224 line mode
     ;      |`------ Enable VBlank interrupts
     ;      `------- Enable display
-    defb (NameTableAddress/2^10) |@11110001,$82
-    defb (SpriteTableAddress/2^7)|@10000001,$85
-    defb (SpriteSet/2^2)         |@11111011,$86
+    defb (NameTableAddress/1024) |@11110001,$82
+    defb (SpriteTableAddress/128)|@10000001,$85
+    defb (SpriteSet/4)           |@11111011,$86
     defb $f|$f0,$87
     ;     `-------- Border palette colour (sprite palette)
     defb $00,$88

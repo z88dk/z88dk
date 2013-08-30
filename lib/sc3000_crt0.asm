@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jun 2010
 ;
-;	$Id: sc3000_crt0.asm,v 1.5 2013-06-18 06:11:23 stefano Exp $
+;	$Id: sc3000_crt0.asm,v 1.6 2013-08-30 01:26:40 pauloscustodio Exp $
 ;
 
 	; Constants for ROM mode (-startup=2)
@@ -388,9 +388,9 @@ _Data:
     ;      ||`----- 28 row/224 line mode
     ;      |`------ Enable VBlank interrupts
     ;      `------- Enable display
-    defb (NameTableAddress/2^10) |@11110001,$82
-    defb (SpriteTableAddress/2^7)|@10000001,$85
-    defb (SpriteSet/2^2)         |@11111011,$86
+    defb (NameTableAddress/1024) |@11110001,$82
+    defb (SpriteTableAddress/128)|@10000001,$85
+    defb (SpriteSet/4)           |@11111011,$86
     defb $f|$f0,$87
     ;     `-------- Border palette colour (sprite palette)
     defb $00,$88
