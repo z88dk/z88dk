@@ -8,7 +8,7 @@
 ;       source:  http://www.cepece.info/amstrad/source/rsxcall.html
 ;       ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
 ;
-;       $Id: rename.asm,v 1.2 2009-06-22 21:44:16 dom Exp $
+;       $Id: rename.asm,v 1.3 2013-08-30 01:28:02 pauloscustodio Exp $
 ;
 
         XLIB    rename
@@ -65,7 +65,7 @@
 
 	ret
 
-.ren_cmd	defm	"ren"&0
+.ren_cmd	defm	"ren",0
 
 ;;-------------------------------------------------------------
 ;; the string descriptor blocks for the parameters

@@ -14,9 +14,9 @@ static char  wincrn[] = "\0x5\0x1\2*L";   /* br corner string */
 #if 0
 #asm
 
-._winbot	defm	1&"2-S"&1&"2Y"&0	; move to window bottom string
-._winlin	defm	1&"2*I"&1&"3N"&0	; bottom line string
-._wincrn	defm	5&1&"2*L"&0		; br corner string
+._winbot	defm	1,"2-S",1,"2Y",0	; move to window bottom string
+._winlin	defm	1,"2*I",1,"3N",0	; bottom line string
+._wincrn	defm	5,1,"2*L",0		; br corner string
 
 #endasm
 #endif
