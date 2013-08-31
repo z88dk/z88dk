@@ -12,9 +12,12 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.67 2013-08-30 21:50:43 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.68 2013-08-31 16:50:27 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.67  2013-08-30 21:50:43  pauloscustodio
+# Revision 1.68  2013-08-31 16:50:27  pauloscustodio
+# Test GLIB CFLAGS and LDFLAGS
+#
+# Revision 1.67  2013/08/30 21:50:43  pauloscustodio
 # By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
 # as an identifier reserved by the C standard for implementation-defined behaviour
 # starting with two underscores.
@@ -282,12 +285,49 @@
 # EXE suffix
 #------------------------------------------------------------------------------
 ifeq ($(OS),Windows_NT)
-    EXE := .exe
-    DLL := .dll
+    EXE 	:= .exe
+    DLL 	:= .dll
 else
     EXE := 
     DLL :=
 endif
+
+
+#------------------------------------------------------------------------------
+# Using GLIB - see http://www.gtk.org/
+#
+# Compile GLIB in Unix, see http://developer.gimp.org/api/2.0/glib/glib-building.html
+#   Use GLIB: see http://developer.gimp.org/api/2.0/glib/glib-compiling.html
+#	E.g. for Debian:
+#		apt-get install pkg-config
+#		apt-get install libglib2.0
+#
+# Use GLIB in Win32/MinGW, see http://www.gtk.org/download/win32.php,
+#   Point environment variable GLIB_ROOT to root of MinGW msys 1.0 dir, e.g
+#	GLIB_ROOT=C:\MinGW\msys\1.0
+#	Extract at $(GLIB_ROOT):
+#	- glib_2.28.8-1_win32.zip
+#	- glib-dev_2.28.8-1_win32.zip
+#	- gettext-runtime_0.18.1.1-2_win32.zip
+#	- gettext-runtime-dev_0.18.1.1-2_win32.zip
+#------------------------------------------------------------------------------
+ifeq ($(OS),Windows_NT)
+
+ifndef GLIB_ROOT
+$(error Environment variable GLIB_ROOT needs to point to GLIB installation, see http://www.gtk.org/)
+endif
+
+CFLAGS 	+= -I$(GLIB_ROOT)/include/glib-2.0 -I$(GLIB_ROOT)/lib/glib-2.0/include
+LDFLAGS += -L$(GLIB_ROOT)/lib -lglib-2.0
+
+else
+
+CFLAGS 	+= $(shell pkg-config --cflags glib-2.0)
+LDFLAGS += $(shell pkg-config --libs glib-2.0)
+
+endif
+
+
 
 #------------------------------------------------------------------------------
 # Object files
@@ -366,7 +406,7 @@ new:
 	$(MAKE)
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $(TARGET)  $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
 
 # flex
 scan.c scan.h : scan.l
