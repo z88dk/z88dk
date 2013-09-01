@@ -12,50 +12,6 @@
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
 # Copyright (C) Paulo Custodio, 2011-2013
-
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.9 2013-09-01 11:52:55 pauloscustodio Exp $
-# $Log: whitebox-scan.t,v $
-# Revision 1.9  2013-09-01 11:52:55  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
-#
-# Revision 1.8  2013/09/01 00:18:30  pauloscustodio
-# - Replaced e4c exception mechanism by a much simpler one based on a few
-#   macros. The former did not allow an exit(1) to be called within a
-#   try-catch block.
-#
-# Revision 1.7  2013/05/12 19:20:34  pauloscustodio
-# warnings
-#
-# Revision 1.6  2013/05/01 19:03:46  pauloscustodio
-# Simplified scanner and adapted to be used with a BISON generated parser.
-# Removed balanced struct checking and token ring.
-# Removed start condition to list assembly lines, as it was difficult to keep in sync across included
-# files; inserted an RS char in the input before each line to trigger listing.
-# Allow ".NAME" and "NAME:" to return a NAME token, so that ".LD" is recognized as a label and not the LD assembly statement.
-# Added Integer out of range warning to number scanning routine.
-# Allow input lines to be any size, as long as memory can be allocated.
-# Created a skeleton BISON parser.
-#
-# Revision 1.5  2013/04/14 20:47:27  pauloscustodio
-# TOK_LABEL for a label definition, i.e. ".NAME" or "NAME:", with no spaces between symbols
-# colon to separate assembly statements in a line needs spaces.
-#
-# Revision 1.4  2013/04/14 18:17:00  pauloscustodio
-# Split scanner in several modules, allow token look-ahead to simplify
-# parser.
-#
-# Revision 1.3  2013/04/09 20:56:51  pauloscustodio
-# TOK_LABEL removed - identifying a label as XXX: has to be a parsing action in order to
-# distinguish a label from a continuation statement, e.g.
-# LABEL: ld a,VALUE : inc a ; LABEL is label, VALUE is name
-#
-# Revision 1.2  2013/03/31 18:28:30  pauloscustodio
-# New TOK_LABEL for a label definition, i.e. ". NAME" or "NAME :"
-#
-# Revision 1.1  2013/03/29 23:53:08  pauloscustodio
-# Added GNU Flex-based scanner. Not yet integrated into assembler.
-#
 #
 # Test scan.l
 
@@ -272,248 +228,79 @@ write_file(asm10_file(), {binmode => ':raw'}, "0123456789abcdef");
 write_file(asm11_file(), {binmode => ':raw'}, "ld a," . '0' x 20 ."1 \n".
                                               "ld b," . '0' x 20 ."1 \n");
 
-t_run_module([asm1_file()], '', <<'END', 0); 
-memalloc: init
+t_run_module([asm1_file()], <<'OUT', <<'END', 0); 
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+         4 |          1 |          0 |          0 |          1 |         +0
+        12 |         11 |         11 |          0 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        28 |          1 |          1 |          0 |          0 |         +0
+        36 |          0 |          1 |          1 |          0 |         +0
+        40 |         12 |         12 |          0 |          0 |         +0
+        48 |         22 |         22 |          0 |          0 |         +0
+        96 |          2 |          2 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+       256 |          0 |         11 |         11 |          0 |         +0
+       384 |          1 |          1 |          0 |          0 |         +0
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+   >  4096 |         11 |         11 |          0 |          0 |        ***
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=188190, zero-initialized=184294 (97.93%), freed=186418 (99.06%), remaining=1772
+OUT
 Read file test1.asm:
-memalloc scan.c(3): alloc 28 bytes at ADDR_1
-memalloc scan.c(2): alloc 40 bytes at ADDR_2
-memalloc strpool.c(1): alloc 32 bytes at ADDR_3
-memalloc strpool.c(2): alloc 36 bytes at ADDR_4
-memalloc strpool.c(3): alloc 10 bytes at ADDR_5
-memalloc strpool.c(4): alloc 44 bytes at ADDR_6
-memalloc strpool.c(4): alloc 384 bytes at ADDR_7
-memalloc scan.c(1): alloc 48 bytes at ADDR_8
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_9
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_10
-memalloc scan.c(2): alloc 12 bytes at ADDR_11
-memalloc scan.c(4): alloc 48 bytes at ADDR_12
-memalloc scan.c(4): alloc 16386 bytes at ADDR_13
-memalloc scan.c(4): alloc 4 bytes at ADDR_14
-memalloc scan.c(6): free 16386 bytes at ADDR_13 allocated at scan.c(4)
-memalloc scan.c(6): free 48 bytes at ADDR_12 allocated at scan.c(4)
-memalloc scan.c(2): free 12 bytes at ADDR_11 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_10 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_9 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_8 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Read file test2.asm:
-memalloc strpool.c(2): alloc 36 bytes at ADDR_15
-memalloc strpool.c(3): alloc 10 bytes at ADDR_16
-memalloc scan.c(1): alloc 48 bytes at ADDR_17
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_18
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_19
-memalloc scan.c(2): alloc 12 bytes at ADDR_20
-memalloc scan.c(4): alloc 48 bytes at ADDR_21
-memalloc scan.c(4): alloc 16386 bytes at ADDR_22
-memalloc scan.c(5): free 4 bytes at ADDR_14 allocated at scan.c(4)
-memalloc scan.c(5): alloc 36 bytes at ADDR_23
 <1E>A<0A><1E>B<0A><1E>C<0A><1E>D<0A><1E>E<0A>
-memalloc scan.c(6): free 16386 bytes at ADDR_22 allocated at scan.c(4)
-memalloc scan.c(6): free 48 bytes at ADDR_21 allocated at scan.c(4)
-memalloc scan.c(2): free 12 bytes at ADDR_20 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_19 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_18 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_17 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Read file test3.asm:
-memalloc strpool.c(2): alloc 36 bytes at ADDR_24
-memalloc strpool.c(3): alloc 10 bytes at ADDR_25
-memalloc scan.c(1): alloc 48 bytes at ADDR_26
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_27
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_28
-memalloc scan.c(2): alloc 12 bytes at ADDR_29
-memalloc scan.c(4): alloc 48 bytes at ADDR_30
-memalloc scan.c(4): alloc 16386 bytes at ADDR_31
 <1E>A<0A><1E>B<0A><1E>C<0A><1E>D<0A><1E>E<0A>
-memalloc scan.c(6): free 16386 bytes at ADDR_31 allocated at scan.c(4)
-memalloc scan.c(6): free 48 bytes at ADDR_30 allocated at scan.c(4)
-memalloc scan.c(2): free 12 bytes at ADDR_29 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_28 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_27 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_26 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Read file test4.asm:
-memalloc strpool.c(2): alloc 36 bytes at ADDR_32
-memalloc strpool.c(3): alloc 10 bytes at ADDR_33
-memalloc scan.c(1): alloc 48 bytes at ADDR_34
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_35
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_36
-memalloc scan.c(2): alloc 12 bytes at ADDR_37
-memalloc scan.c(4): alloc 48 bytes at ADDR_38
-memalloc scan.c(4): alloc 16386 bytes at ADDR_39
 <1E>A<0A><1E>B<0A><1E>C<0A><1E>D<0A><1E>E<0A>
-memalloc scan.c(6): free 16386 bytes at ADDR_39 allocated at scan.c(4)
-memalloc scan.c(6): free 48 bytes at ADDR_38 allocated at scan.c(4)
-memalloc scan.c(2): free 12 bytes at ADDR_37 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_36 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_35 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_34 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Read file test5.asm:
-memalloc strpool.c(2): alloc 36 bytes at ADDR_40
-memalloc strpool.c(3): alloc 10 bytes at ADDR_41
-memalloc scan.c(1): alloc 48 bytes at ADDR_42
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_43
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_44
-memalloc scan.c(2): alloc 12 bytes at ADDR_45
-memalloc scan.c(4): alloc 48 bytes at ADDR_46
-memalloc scan.c(4): alloc 16386 bytes at ADDR_47
 <1E>A<0A><1E>B<0A><1E>C<0A><1E>D<0A><1E>E<0A>
-memalloc scan.c(6): free 16386 bytes at ADDR_47 allocated at scan.c(4)
-memalloc scan.c(6): free 48 bytes at ADDR_46 allocated at scan.c(4)
-memalloc scan.c(2): free 12 bytes at ADDR_45 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_44 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_43 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_42 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Read file test6.asm:
-memalloc strpool.c(2): alloc 36 bytes at ADDR_48
-memalloc strpool.c(3): alloc 10 bytes at ADDR_49
-memalloc scan.c(1): alloc 48 bytes at ADDR_50
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_51
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_52
-memalloc scan.c(2): alloc 12 bytes at ADDR_53
-memalloc scan.c(4): alloc 48 bytes at ADDR_54
-memalloc scan.c(4): alloc 16386 bytes at ADDR_55
 <1E>A<0A><1E>B<0A><1E>C<0A><1E>D<0A><1E>E<0A>
-memalloc scan.c(6): free 16386 bytes at ADDR_55 allocated at scan.c(4)
-memalloc scan.c(6): free 48 bytes at ADDR_54 allocated at scan.c(4)
-memalloc scan.c(2): free 12 bytes at ADDR_53 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_52 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_51 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_50 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Read file test7.asm:
-memalloc strpool.c(2): alloc 36 bytes at ADDR_56
-memalloc strpool.c(3): alloc 10 bytes at ADDR_57
-memalloc scan.c(1): alloc 48 bytes at ADDR_58
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_59
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_60
-memalloc scan.c(2): alloc 12 bytes at ADDR_61
-memalloc scan.c(4): alloc 48 bytes at ADDR_62
-memalloc scan.c(4): alloc 16386 bytes at ADDR_63
 <1E>0123456789abcd<0A>
-memalloc scan.c(6): free 16386 bytes at ADDR_63 allocated at scan.c(4)
-memalloc scan.c(6): free 48 bytes at ADDR_62 allocated at scan.c(4)
-memalloc scan.c(2): free 12 bytes at ADDR_61 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_60 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_59 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_58 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Read file test8.asm:
-memalloc strpool.c(2): alloc 36 bytes at ADDR_64
-memalloc strpool.c(3): alloc 10 bytes at ADDR_65
-memalloc scan.c(1): alloc 48 bytes at ADDR_66
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_67
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_68
-memalloc scan.c(2): alloc 12 bytes at ADDR_69
-memalloc scan.c(4): alloc 48 bytes at ADDR_70
-memalloc scan.c(4): alloc 16386 bytes at ADDR_71
 <1E>0123456789<0A><1E>012
 3456789abcd<0A>
-memalloc scan.c(6): free 16386 bytes at ADDR_71 allocated at scan.c(4)
-memalloc scan.c(6): free 48 bytes at ADDR_70 allocated at scan.c(4)
-memalloc scan.c(2): free 12 bytes at ADDR_69 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_68 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_67 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_66 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Read file test9.asm:
-memalloc strpool.c(2): alloc 36 bytes at ADDR_72
-memalloc strpool.c(3): alloc 10 bytes at ADDR_73
-memalloc scan.c(1): alloc 48 bytes at ADDR_74
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_75
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_76
-memalloc scan.c(2): alloc 12 bytes at ADDR_77
-memalloc scan.c(4): alloc 48 bytes at ADDR_78
-memalloc scan.c(4): alloc 16386 bytes at ADDR_79
 <1E>0123456789abcde
 <0A>
-memalloc scan.c(6): free 16386 bytes at ADDR_79 allocated at scan.c(4)
-memalloc scan.c(6): free 48 bytes at ADDR_78 allocated at scan.c(4)
-memalloc scan.c(2): free 12 bytes at ADDR_77 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_76 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_75 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_74 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Read file test10.asm:
-memalloc strpool.c(2): alloc 36 bytes at ADDR_80
-memalloc strpool.c(3): alloc 11 bytes at ADDR_81
-memalloc scan.c(1): alloc 48 bytes at ADDR_82
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_83
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_84
-memalloc scan.c(2): alloc 12 bytes at ADDR_85
-memalloc scan.c(4): alloc 48 bytes at ADDR_86
-memalloc scan.c(4): alloc 16386 bytes at ADDR_87
 <1E>0123456789abcde
 f<0A>
-memalloc scan.c(6): free 16386 bytes at ADDR_87 allocated at scan.c(4)
-memalloc scan.c(6): free 48 bytes at ADDR_86 allocated at scan.c(4)
-memalloc scan.c(2): free 12 bytes at ADDR_85 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_84 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_83 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_82 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Read file test11.asm:
-memalloc strpool.c(2): alloc 36 bytes at ADDR_88
-memalloc strpool.c(3): alloc 11 bytes at ADDR_89
-memalloc scan.c(1): alloc 48 bytes at ADDR_90
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_91
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_92
-memalloc scan.c(2): alloc 12 bytes at ADDR_93
-memalloc scan.c(4): alloc 48 bytes at ADDR_94
-memalloc scan.c(4): alloc 16386 bytes at ADDR_95
 <1E>ld<20>a,0000000000
 00000000001<20><0A><1E>ld
 <20>b,0000000000000
 00000001<20><0A>
-memalloc scan.c(6): free 16386 bytes at ADDR_95 allocated at scan.c(4)
-memalloc scan.c(6): free 48 bytes at ADDR_94 allocated at scan.c(4)
-memalloc scan.c(2): free 12 bytes at ADDR_93 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_92 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_91 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_90 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
-memalloc strpool.c(6): free 10 bytes at ADDR_5 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_4 allocated at strpool.c(2)
-memalloc strpool.c(6): free 10 bytes at ADDR_16 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_15 allocated at strpool.c(2)
-memalloc strpool.c(6): free 10 bytes at ADDR_25 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_24 allocated at strpool.c(2)
-memalloc strpool.c(6): free 10 bytes at ADDR_33 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_32 allocated at strpool.c(2)
-memalloc strpool.c(6): free 10 bytes at ADDR_41 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_40 allocated at strpool.c(2)
-memalloc strpool.c(6): free 10 bytes at ADDR_49 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_48 allocated at strpool.c(2)
-memalloc strpool.c(6): free 10 bytes at ADDR_57 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_56 allocated at strpool.c(2)
-memalloc strpool.c(6): free 10 bytes at ADDR_65 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_64 allocated at strpool.c(2)
-memalloc strpool.c(6): free 10 bytes at ADDR_73 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_72 allocated at strpool.c(2)
-memalloc strpool.c(6): free 11 bytes at ADDR_81 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_80 allocated at strpool.c(2)
-memalloc strpool.c(5): free 384 bytes at ADDR_7 allocated at strpool.c(4)
-memalloc strpool.c(5): free 44 bytes at ADDR_6 allocated at strpool.c(4)
-memalloc strpool.c(6): free 11 bytes at ADDR_89 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_88 allocated at strpool.c(2)
-memalloc strpool.c(1): free 32 bytes at ADDR_3 allocated at strpool.c(1)
-memalloc scan.c(6): free 36 bytes at ADDR_23 allocated at scan.c(5)
-memalloc scan.c(3): free 28 bytes at ADDR_1 allocated at scan.c(3)
-memalloc scan.c(2): free 40 bytes at ADDR_2 allocated at scan.c(2)
-memalloc: cleanup
 END
 
 
@@ -575,491 +362,260 @@ t_compile_module($init, <<'END', $compile);
 	return 0;
 END
 
-t_run_module([], '', <<'END', 0);
-memalloc: init
-memalloc strlist.c(1): alloc 36 bytes at ADDR_1
-memalloc strpool.c(1): alloc 32 bytes at ADDR_2
-memalloc strlist.c(3): alloc 12 bytes at ADDR_3
-memalloc strpool.c(2): alloc 36 bytes at ADDR_4
-memalloc strpool.c(3): alloc 3 bytes at ADDR_5
-memalloc strpool.c(4): alloc 44 bytes at ADDR_6
-memalloc strpool.c(4): alloc 384 bytes at ADDR_7
-memalloc strlist.c(3): alloc 12 bytes at ADDR_8
-memalloc strpool.c(2): alloc 36 bytes at ADDR_9
-memalloc strpool.c(3): alloc 3 bytes at ADDR_10
-memalloc strlist.c(3): alloc 12 bytes at ADDR_11
-memalloc strpool.c(2): alloc 36 bytes at ADDR_12
-memalloc strpool.c(3): alloc 3 bytes at ADDR_13
+t_run_module([], <<'OUT', <<'END', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+         2 |         19 |         19 |          0 |          0 |         +0
+         3 |         37 |         37 |          0 |          0 |         +0
+         4 |         17 |         16 |          0 |          1 |         +0
+         5 |          8 |          8 |          0 |          0 |         +0
+         6 |          1 |          1 |          0 |          0 |         +0
+         8 |          2 |          2 |          0 |          0 |         +0
+         9 |          1 |          1 |          0 |          0 |         +0
+        12 |         16 |         16 |          0 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        28 |          1 |          1 |          0 |          0 |         +0
+        32 |          1 |          1 |          0 |          0 |         +0
+        36 |          1 |          2 |          1 |          0 |         +0
+        40 |         15 |         15 |          0 |          0 |         +0
+        48 |         33 |         33 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+       256 |          0 |         12 |         13 |          1 |         +0
+       512 |          0 |          0 |          1 |          1 |         +0
+       768 |          0 |          0 |          1 |          1 |         +0
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          1 |          1 |         +0
+      1280 |          0 |          0 |          1 |          1 |         +0
+      1536 |          0 |          0 |          1 |          1 |         +0
+      1792 |          0 |          0 |          1 |          1 |         +0
+      2048 |          0 |          0 |          1 |          1 |         +0
+      2304 |          0 |          0 |          1 |          1 |         +0
+      2560 |          0 |          0 |          1 |          1 |         +0
+      2816 |          0 |          0 |          1 |          1 |         +0
+      3072 |          0 |          0 |          1 |          1 |         +0
+      3328 |          0 |          0 |          1 |          1 |         +0
+      3584 |          0 |          0 |          1 |          1 |         +0
+      3840 |          0 |          0 |          1 |          1 |         +0
+   >  4096 |          6 |          7 |         65 |         64 |        ***
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=948826, zero-initialized=102688 (10.82%), freed=947054 (99.81%), remaining=1772
+OUT
 Test: Read before start
-memalloc scan.c(2): alloc 40 bytes at ADDR_14
 Token: (0) NULL
 Token: (0) NULL
 Test: read f0
-memalloc scan.c(3): alloc 28 bytes at ADDR_15
-memalloc strpool.c(2): alloc 36 bytes at ADDR_16
-memalloc strpool.c(3): alloc 3 bytes at ADDR_17
-memalloc scan.c(1): alloc 48 bytes at ADDR_18
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_19
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_20
-memalloc scan.c(2): alloc 12 bytes at ADDR_21
-memalloc scan.c(8): alloc 48 bytes at ADDR_22
-memalloc scan.c(8): alloc 16386 bytes at ADDR_23
-memalloc scan.c(8): alloc 4 bytes at ADDR_24
 List:f0:1:F0 1
-memalloc scan.c(4): alloc 3 bytes at ADDR_25
-memalloc test.c(2): free 3 bytes at ADDR_25 allocated at scan.c(4)
 Token: f0(1) NAME F0
 Token: f0(1) NUMBER 1
 Token: f0(1) '\n'
 List:f0:2:
 Token: f0(2) '\n'
 List:f0:3:F0 3
-memalloc scan.c(4): alloc 3 bytes at ADDR_26
-memalloc test.c(2): free 3 bytes at ADDR_26 allocated at scan.c(4)
 Token: f0(3) NAME F0
 Token: f0(3) NUMBER 3
 Token: f0(3) '\n'
 List:f0:4:
 Token: f0(4) '\n'
 List:f0:5:F0 5
-memalloc scan.c(4): alloc 3 bytes at ADDR_27
-memalloc test.c(2): free 3 bytes at ADDR_27 allocated at scan.c(4)
 Token: f0(5) NAME F0
 Token: f0(5) NUMBER 5
 Token: f0(5) '\n'
 List:f0:6:
 Token: f0(6) '\n'
 List:f0:7:F0 7
-memalloc scan.c(4): alloc 3 bytes at ADDR_28
-memalloc test.c(2): free 3 bytes at ADDR_28 allocated at scan.c(4)
 Token: f0(7) NAME F0
 Token: f0(7) NUMBER 7
 Token: f0(7) '\n'
 List:f0:8:
 Token: f0(8) '\n'
 List:f0:9:F0 9
-memalloc scan.c(4): alloc 3 bytes at ADDR_29
-memalloc test.c(2): free 3 bytes at ADDR_29 allocated at scan.c(4)
 Token: f0(9) NAME F0
 Token: f0(9) NUMBER 9
 Token: f0(9) '\n'
 List:f0:10:
 Token: f0(10) '\n'
 List:f0:11:F0 11
-memalloc scan.c(4): alloc 3 bytes at ADDR_30
-memalloc test.c(2): free 3 bytes at ADDR_30 allocated at scan.c(4)
 Token: f0(11) NAME F0
 Token: f0(11) NUMBER 11
 Token: f0(11) '\n'
 List:f0:12:
 Token: f0(12) '\n'
 List:f0:13:F0 13
-memalloc scan.c(4): alloc 3 bytes at ADDR_31
-memalloc test.c(2): free 3 bytes at ADDR_31 allocated at scan.c(4)
 Token: f0(13) NAME F0
 Token: f0(13) NUMBER 13
 Token: f0(13) '\n'
-memalloc scan.c(10): free 16386 bytes at ADDR_23 allocated at scan.c(8)
-memalloc scan.c(10): free 48 bytes at ADDR_22 allocated at scan.c(8)
-memalloc scan.c(2): free 12 bytes at ADDR_21 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_20 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_19 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_18 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Test: read f0 as text
-memalloc scan.c(1): alloc 48 bytes at ADDR_32
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_33
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_34
-memalloc scan.c(2): alloc 12 bytes at ADDR_35
-memalloc scan.c(8): alloc 48 bytes at ADDR_36
-memalloc scan.c(8): alloc 4 bytes at ADDR_37
-memalloc scan.c(9): free 4 bytes at ADDR_24 allocated at scan.c(8)
-memalloc scan.c(9): alloc 36 bytes at ADDR_38
-memalloc scan.c(8): alloc 48 bytes at ADDR_39
-memalloc scan.c(10): free 4 bytes at ADDR_37 allocated at scan.c(8)
-memalloc scan.c(10): free 48 bytes at ADDR_36 allocated at scan.c(8)
-memalloc scan.c(4): alloc 3 bytes at ADDR_40
-memalloc test.c(2): free 3 bytes at ADDR_40 allocated at scan.c(4)
 Token: (0) NAME F0
 Token: (0) NUMBER 1
 Token: (0) '\n'
 Token: (0) '\n'
-memalloc scan.c(4): alloc 3 bytes at ADDR_41
-memalloc test.c(2): free 3 bytes at ADDR_41 allocated at scan.c(4)
 Token: (0) NAME F0
 Token: (0) NUMBER 3
 Token: (0) '\n'
 Token: (0) '\n'
-memalloc scan.c(4): alloc 3 bytes at ADDR_42
-memalloc test.c(2): free 3 bytes at ADDR_42 allocated at scan.c(4)
 Token: (0) NAME F0
 Token: (0) NUMBER 5
 Token: (0) '\n'
 Token: (0) '\n'
-memalloc scan.c(4): alloc 3 bytes at ADDR_43
-memalloc test.c(2): free 3 bytes at ADDR_43 allocated at scan.c(4)
 Token: (0) NAME F0
 Token: (0) NUMBER 7
 Token: (0) '\n'
 Token: (0) '\n'
-memalloc scan.c(4): alloc 3 bytes at ADDR_44
-memalloc test.c(2): free 3 bytes at ADDR_44 allocated at scan.c(4)
 Token: (0) NAME F0
 Token: (0) NUMBER 9
 Token: (0) '\n'
 Token: (0) '\n'
-memalloc scan.c(4): alloc 3 bytes at ADDR_45
-memalloc test.c(2): free 3 bytes at ADDR_45 allocated at scan.c(4)
 Token: (0) NAME F0
 Token: (0) NUMBER 11
 Token: (0) '\n'
 Token: (0) '\n'
-memalloc scan.c(4): alloc 3 bytes at ADDR_46
-memalloc test.c(2): free 3 bytes at ADDR_46 allocated at scan.c(4)
 Token: (0) NAME F0
 Token: (0) NUMBER 13
-memalloc scan.c(10): free 48 bytes at ADDR_39 allocated at scan.c(8)
-memalloc scan.c(2): free 12 bytes at ADDR_35 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_34 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_33 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_32 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Test: read f1
-memalloc strpool.c(2): alloc 36 bytes at ADDR_47
-memalloc strpool.c(3): alloc 6 bytes at ADDR_48
-memalloc scan.c(1): alloc 48 bytes at ADDR_49
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_50
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_51
-memalloc scan.c(2): alloc 12 bytes at ADDR_52
-memalloc scan.c(8): alloc 48 bytes at ADDR_53
-memalloc scan.c(8): alloc 16386 bytes at ADDR_54
 List:x1/f1:1:F1 1
-memalloc scan.c(4): alloc 3 bytes at ADDR_55
-memalloc test.c(2): free 3 bytes at ADDR_55 allocated at scan.c(4)
 Token: x1/f1(1) NAME F1
 Token: x1/f1(1) NUMBER 1
 Token: x1/f1(1) '\n'
 List:x1/f1:2:F1 2
-memalloc scan.c(4): alloc 3 bytes at ADDR_56
-memalloc test.c(2): free 3 bytes at ADDR_56 allocated at scan.c(4)
 Token: x1/f1(2) NAME F1
 Token: x1/f1(2) NUMBER 2
 Token: x1/f1(2) '\n'
 List:x1/f1:3:F1 3
-memalloc scan.c(4): alloc 3 bytes at ADDR_57
-memalloc test.c(2): free 3 bytes at ADDR_57 allocated at scan.c(4)
 Token: x1/f1(3) NAME F1
 Token: x1/f1(3) NUMBER 3
 Token: x1/f1(3) '\n'
-memalloc scan.c(10): free 16386 bytes at ADDR_54 allocated at scan.c(8)
-memalloc scan.c(10): free 48 bytes at ADDR_53 allocated at scan.c(8)
-memalloc scan.c(2): free 12 bytes at ADDR_52 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_51 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_50 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_49 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Test: push text once
-memalloc scan.c(1): alloc 48 bytes at ADDR_58
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_59
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_60
-memalloc scan.c(2): alloc 12 bytes at ADDR_61
-memalloc scan.c(8): alloc 48 bytes at ADDR_62
-memalloc scan.c(8): alloc 4 bytes at ADDR_63
-memalloc scan.c(8): alloc 48 bytes at ADDR_64
-memalloc scan.c(10): free 4 bytes at ADDR_63 allocated at scan.c(8)
-memalloc scan.c(10): free 48 bytes at ADDR_62 allocated at scan.c(8)
 Token: (0) '\n'
 Token: (0) '\n'
 Token: (0) NUMBER 1
 Token: (0) NUMBER 2
 Token: (0) NUMBER 3
-memalloc scan.c(4): alloc 2 bytes at ADDR_65
-memalloc test.c(2): free 2 bytes at ADDR_65 allocated at scan.c(4)
 Token: (0) NAME A
-memalloc scan.c(4): alloc 2 bytes at ADDR_66
-memalloc test.c(2): free 2 bytes at ADDR_66 allocated at scan.c(4)
 Token: (0) NAME B
-memalloc scan.c(4): alloc 2 bytes at ADDR_67
-memalloc test.c(2): free 2 bytes at ADDR_67 allocated at scan.c(4)
 Token: (0) NAME C
 Token: (0) '\n'
-memalloc scan.c(10): free 48 bytes at ADDR_64 allocated at scan.c(8)
-memalloc scan.c(2): free 12 bytes at ADDR_61 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_60 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_59 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_58 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Test: push text twice
-memalloc scan.c(1): alloc 48 bytes at ADDR_68
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_69
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_70
-memalloc scan.c(2): alloc 12 bytes at ADDR_71
-memalloc scan.c(8): alloc 48 bytes at ADDR_72
-memalloc scan.c(8): alloc 4 bytes at ADDR_73
-memalloc scan.c(8): alloc 48 bytes at ADDR_74
-memalloc scan.c(10): free 4 bytes at ADDR_73 allocated at scan.c(8)
-memalloc scan.c(10): free 48 bytes at ADDR_72 allocated at scan.c(8)
-memalloc scan.c(1): alloc 48 bytes at ADDR_75
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_76
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_77
-memalloc scan.c(2): alloc 12 bytes at ADDR_78
-memalloc scan.c(8): alloc 48 bytes at ADDR_79
-memalloc scan.c(8): alloc 4 bytes at ADDR_80
-memalloc scan.c(8): alloc 48 bytes at ADDR_81
-memalloc scan.c(10): free 4 bytes at ADDR_80 allocated at scan.c(8)
-memalloc scan.c(10): free 48 bytes at ADDR_79 allocated at scan.c(8)
-memalloc scan.c(4): alloc 5 bytes at ADDR_82
-memalloc test.c(2): free 5 bytes at ADDR_82 allocated at scan.c(4)
 Token: (0) NAME DEFC
-memalloc scan.c(4): alloc 2 bytes at ADDR_83
-memalloc test.c(2): free 2 bytes at ADDR_83 allocated at scan.c(4)
 Token: (0) NAME C
 Token: (0) '='
 Token: (0) NUMBER 2
 Token: (0) '\n'
-memalloc scan.c(4): alloc 5 bytes at ADDR_84
-memalloc test.c(2): free 5 bytes at ADDR_84 allocated at scan.c(4)
 Token: (0) NAME DEFC
-memalloc scan.c(4): alloc 2 bytes at ADDR_85
-memalloc test.c(2): free 2 bytes at ADDR_85 allocated at scan.c(4)
 Token: (0) NAME D
 Token: (0) '='
 Token: (0) NUMBER 3
 Token: (0) '\n'
-memalloc scan.c(10): free 48 bytes at ADDR_81 allocated at scan.c(8)
-memalloc scan.c(2): free 12 bytes at ADDR_78 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_77 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_76 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_75 allocated at scan.c(1)
 Token: (0) '\n'
 Token: (0) '\n'
 Token: (0) NUMBER 1
 Token: (0) NUMBER 2
 Token: (0) NUMBER 3
-memalloc scan.c(4): alloc 2 bytes at ADDR_86
-memalloc test.c(2): free 2 bytes at ADDR_86 allocated at scan.c(4)
 Token: (0) NAME A
-memalloc scan.c(4): alloc 2 bytes at ADDR_87
-memalloc test.c(2): free 2 bytes at ADDR_87 allocated at scan.c(4)
 Token: (0) NAME B
-memalloc scan.c(4): alloc 2 bytes at ADDR_88
-memalloc test.c(2): free 2 bytes at ADDR_88 allocated at scan.c(4)
 Token: (0) NAME C
 Token: (0) '\n'
-memalloc scan.c(10): free 48 bytes at ADDR_74 allocated at scan.c(8)
-memalloc scan.c(2): free 12 bytes at ADDR_71 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_70 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_69 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_68 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Test: push text in middle of reading
-memalloc scan.c(1): alloc 48 bytes at ADDR_89
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_90
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_91
-memalloc scan.c(2): alloc 12 bytes at ADDR_92
-memalloc scan.c(8): alloc 48 bytes at ADDR_93
-memalloc scan.c(8): alloc 4 bytes at ADDR_94
-memalloc scan.c(8): alloc 48 bytes at ADDR_95
-memalloc scan.c(10): free 4 bytes at ADDR_94 allocated at scan.c(8)
-memalloc scan.c(10): free 48 bytes at ADDR_93 allocated at scan.c(8)
 Token: (0) '\n'
 Token: (0) '\n'
 Token: (0) NUMBER 1
 Token: (0) NUMBER 2
-memalloc scan.c(1): alloc 48 bytes at ADDR_96
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_97
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_98
-memalloc scan.c(2): alloc 12 bytes at ADDR_99
-memalloc scan.c(8): alloc 48 bytes at ADDR_100
-memalloc scan.c(8): alloc 4 bytes at ADDR_101
-memalloc scan.c(8): alloc 48 bytes at ADDR_102
-memalloc scan.c(10): free 4 bytes at ADDR_101 allocated at scan.c(8)
-memalloc scan.c(10): free 48 bytes at ADDR_100 allocated at scan.c(8)
-memalloc scan.c(4): alloc 5 bytes at ADDR_103
-memalloc test.c(2): free 5 bytes at ADDR_103 allocated at scan.c(4)
 Token: (0) NAME DEFC
-memalloc scan.c(4): alloc 2 bytes at ADDR_104
-memalloc test.c(2): free 2 bytes at ADDR_104 allocated at scan.c(4)
 Token: (0) NAME C
 Token: (0) '='
 Token: (0) NUMBER 2
 Token: (0) '\n'
-memalloc scan.c(4): alloc 5 bytes at ADDR_105
-memalloc test.c(2): free 5 bytes at ADDR_105 allocated at scan.c(4)
 Token: (0) NAME DEFC
-memalloc scan.c(4): alloc 2 bytes at ADDR_106
-memalloc test.c(2): free 2 bytes at ADDR_106 allocated at scan.c(4)
 Token: (0) NAME D
 Token: (0) '='
 Token: (0) NUMBER 3
 Token: (0) '\n'
-memalloc scan.c(10): free 48 bytes at ADDR_102 allocated at scan.c(8)
-memalloc scan.c(2): free 12 bytes at ADDR_99 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_98 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_97 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_96 allocated at scan.c(1)
 Token: (0) NUMBER 3
-memalloc scan.c(4): alloc 2 bytes at ADDR_107
-memalloc test.c(2): free 2 bytes at ADDR_107 allocated at scan.c(4)
 Token: (0) NAME A
-memalloc scan.c(4): alloc 2 bytes at ADDR_108
-memalloc test.c(2): free 2 bytes at ADDR_108 allocated at scan.c(4)
 Token: (0) NAME B
-memalloc scan.c(4): alloc 2 bytes at ADDR_109
-memalloc test.c(2): free 2 bytes at ADDR_109 allocated at scan.c(4)
 Token: (0) NAME C
 Token: (0) '\n'
-memalloc scan.c(10): free 48 bytes at ADDR_95 allocated at scan.c(8)
-memalloc scan.c(2): free 12 bytes at ADDR_92 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_91 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_90 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_89 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
 Test: open text file
-memalloc scan.c(1): alloc 48 bytes at ADDR_110
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_111
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_112
-memalloc scan.c(2): alloc 12 bytes at ADDR_113
-memalloc scan.c(8): alloc 48 bytes at ADDR_114
-memalloc scan.c(8): alloc 16386 bytes at ADDR_115
 List:f0:1:F0 1
-memalloc scan.c(4): alloc 3 bytes at ADDR_116
-memalloc test.c(2): free 3 bytes at ADDR_116 allocated at scan.c(4)
 Token: f0(1) NAME F0
 Token: f0(1) NUMBER 1
 Token: f0(1) '\n'
 List:f0:2:
 Token: f0(2) '\n'
 List:f0:3:F0 3
-memalloc scan.c(4): alloc 3 bytes at ADDR_117
-memalloc test.c(2): free 3 bytes at ADDR_117 allocated at scan.c(4)
 Token: f0(3) NAME F0
 Token: f0(3) NUMBER 3
 Token: f0(3) '\n'
-memalloc scan.c(1): alloc 48 bytes at ADDR_118
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_119
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_120
-memalloc scan.c(2): alloc 12 bytes at ADDR_121
-memalloc scan.c(8): alloc 48 bytes at ADDR_122
-memalloc scan.c(8): alloc 4 bytes at ADDR_123
-memalloc scan.c(8): alloc 48 bytes at ADDR_124
-memalloc scan.c(10): free 4 bytes at ADDR_123 allocated at scan.c(8)
-memalloc scan.c(10): free 48 bytes at ADDR_122 allocated at scan.c(8)
-memalloc scan.c(4): alloc 5 bytes at ADDR_125
-memalloc test.c(2): free 5 bytes at ADDR_125 allocated at scan.c(4)
 Token: f0(3) NAME DEFC
-memalloc scan.c(4): alloc 2 bytes at ADDR_126
-memalloc test.c(2): free 2 bytes at ADDR_126 allocated at scan.c(4)
 Token: f0(3) NAME C
 Token: f0(3) '='
 Token: f0(3) NUMBER 2
 Token: f0(3) '\n'
-memalloc scan.c(4): alloc 5 bytes at ADDR_127
-memalloc test.c(2): free 5 bytes at ADDR_127 allocated at scan.c(4)
 Token: f0(3) NAME DEFC
-memalloc scan.c(4): alloc 2 bytes at ADDR_128
-memalloc test.c(2): free 2 bytes at ADDR_128 allocated at scan.c(4)
 Token: f0(3) NAME D
 Token: f0(3) '='
 Token: f0(3) NUMBER 3
 Token: f0(3) '\n'
-memalloc scan.c(10): free 48 bytes at ADDR_124 allocated at scan.c(8)
-memalloc scan.c(2): free 12 bytes at ADDR_121 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_120 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_119 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_118 allocated at scan.c(1)
 List:f0:4:
 Token: f0(4) '\n'
 List:f0:5:F0 5
-memalloc scan.c(4): alloc 3 bytes at ADDR_129
-memalloc test.c(2): free 3 bytes at ADDR_129 allocated at scan.c(4)
 Token: f0(5) NAME F0
 Token: f0(5) NUMBER 5
-memalloc scan.c(1): alloc 48 bytes at ADDR_130
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_131
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_132
-memalloc scan.c(2): alloc 12 bytes at ADDR_133
-memalloc scan.c(8): alloc 48 bytes at ADDR_134
-memalloc scan.c(8): alloc 16386 bytes at ADDR_135
 List:x1/f1:1:F1 1
-memalloc scan.c(4): alloc 3 bytes at ADDR_136
-memalloc test.c(2): free 3 bytes at ADDR_136 allocated at scan.c(4)
 Token: x1/f1(1) NAME F1
 Token: x1/f1(1) NUMBER 1
 Token: x1/f1(1) '\n'
 List:x1/f1:2:F1 2
-memalloc scan.c(4): alloc 3 bytes at ADDR_137
-memalloc test.c(2): free 3 bytes at ADDR_137 allocated at scan.c(4)
 Token: x1/f1(2) NAME F1
 Token: x1/f1(2) NUMBER 2
 Token: x1/f1(2) '\n'
 List:x1/f1:3:F1 3
-memalloc scan.c(4): alloc 3 bytes at ADDR_138
-memalloc test.c(2): free 3 bytes at ADDR_138 allocated at scan.c(4)
 Token: x1/f1(3) NAME F1
 Token: x1/f1(3) NUMBER 3
 Token: x1/f1(3) '\n'
-memalloc scan.c(10): free 16386 bytes at ADDR_135 allocated at scan.c(8)
-memalloc scan.c(10): free 48 bytes at ADDR_134 allocated at scan.c(8)
-memalloc scan.c(2): free 12 bytes at ADDR_133 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_132 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_131 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_130 allocated at scan.c(1)
 Token: f0(5) '\n'
 List:f0:6:
 Token: f0(6) '\n'
 List:f0:7:F0 7
-memalloc scan.c(4): alloc 3 bytes at ADDR_139
-memalloc test.c(2): free 3 bytes at ADDR_139 allocated at scan.c(4)
 Token: f0(7) NAME F0
 Token: f0(7) NUMBER 7
 Token: f0(7) '\n'
 List:f0:8:
 Token: f0(8) '\n'
 List:f0:9:F0 9
-memalloc scan.c(4): alloc 3 bytes at ADDR_140
-memalloc test.c(2): free 3 bytes at ADDR_140 allocated at scan.c(4)
 Token: f0(9) NAME F0
 Token: f0(9) NUMBER 9
 Token: f0(9) '\n'
 List:f0:10:
 Token: f0(10) '\n'
 List:f0:11:F0 11
-memalloc scan.c(4): alloc 3 bytes at ADDR_141
-memalloc test.c(2): free 3 bytes at ADDR_141 allocated at scan.c(4)
 Token: f0(11) NAME F0
 Token: f0(11) NUMBER 11
 Token: f0(11) '\n'
 List:f0:12:
 Token: f0(12) '\n'
 List:f0:13:F0 13
-memalloc scan.c(4): alloc 3 bytes at ADDR_142
-memalloc test.c(2): free 3 bytes at ADDR_142 allocated at scan.c(4)
 Token: f0(13) NAME F0
 Token: f0(13) NUMBER 13
 Token: f0(13) '\n'
-memalloc scan.c(10): free 16386 bytes at ADDR_115 allocated at scan.c(8)
-memalloc scan.c(10): free 48 bytes at ADDR_114 allocated at scan.c(8)
-memalloc scan.c(2): free 12 bytes at ADDR_113 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_112 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_111 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_110 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
-memalloc strpool.c(2): alloc 36 bytes at ADDR_143
-memalloc strpool.c(3): alloc 6 bytes at ADDR_144
-memalloc scan.c(1): alloc 48 bytes at ADDR_145
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_146
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_147
-memalloc scan.c(2): alloc 12 bytes at ADDR_148
-memalloc scan.c(8): alloc 48 bytes at ADDR_149
-memalloc scan.c(8): alloc 16386 bytes at ADDR_150
 List:x2/f2:1:; sigle-character tokens
 Token: x2/f2(1) '\n'
 List:x2/f2:2:! # $ % & ( ) * + , - . / : < = > ? @ [ \ ] ^ ` { | } ~
@@ -1113,32 +669,16 @@ Token: x2/f2(6) '\n'
 List:x2/f2:7:; names
 Token: x2/f2(7) '\n'
 List:x2/f2:8:_Abc_123 Abc_123 123_Abc_
-memalloc scan.c(4): alloc 9 bytes at ADDR_151
-memalloc test.c(2): free 9 bytes at ADDR_151 allocated at scan.c(4)
 Token: x2/f2(8) NAME _ABC_123
-memalloc scan.c(4): alloc 8 bytes at ADDR_152
-memalloc test.c(2): free 8 bytes at ADDR_152 allocated at scan.c(4)
 Token: x2/f2(8) NAME ABC_123
 Token: x2/f2(8) NUMBER 123
-memalloc scan.c(4): alloc 6 bytes at ADDR_153
-memalloc test.c(2): free 6 bytes at ADDR_153 allocated at scan.c(4)
 Token: x2/f2(8) NAME _ABC_
 Token: x2/f2(8) '\n'
 List:x2/f2:9:Abc_123	af' bc'de'af'
-memalloc scan.c(4): alloc 8 bytes at ADDR_154
-memalloc test.c(2): free 8 bytes at ADDR_154 allocated at scan.c(4)
 Token: x2/f2(9) NAME ABC_123
-memalloc scan.c(4): alloc 3 bytes at ADDR_155
-memalloc test.c(2): free 3 bytes at ADDR_155 allocated at scan.c(4)
 Token: x2/f2(9) NAME AF
-memalloc scan.c(7): alloc 5 bytes at ADDR_156
-memalloc test.c(1): free 5 bytes at ADDR_156 allocated at scan.c(7)
 Token: x2/f2(9) STRING ' bc'
-memalloc scan.c(4): alloc 3 bytes at ADDR_157
-memalloc test.c(2): free 3 bytes at ADDR_157 allocated at scan.c(4)
 Token: x2/f2(9) NAME DE
-memalloc scan.c(7): alloc 4 bytes at ADDR_158
-memalloc test.c(1): free 4 bytes at ADDR_158 allocated at scan.c(7)
 Token: x2/f2(9) STRING 'af'
 Token: x2/f2(9) '\n'
 List:x2/f2:10:
@@ -1146,43 +686,25 @@ Token: x2/f2(10) '\n'
 List:x2/f2:11:; labels
 Token: x2/f2(11) '\n'
 List:x2/f2:12:.abc  . def : ghi
-memalloc scan.c(5): alloc 4 bytes at ADDR_159
-memalloc test.c(2): free 4 bytes at ADDR_159 allocated at scan.c(5)
 Token: x2/f2(12) NAME ABC
 Token: x2/f2(12) '.'
-memalloc scan.c(4): alloc 4 bytes at ADDR_160
-memalloc test.c(2): free 4 bytes at ADDR_160 allocated at scan.c(4)
 Token: x2/f2(12) NAME DEF
 Token: x2/f2(12) ':'
-memalloc scan.c(4): alloc 4 bytes at ADDR_161
-memalloc test.c(2): free 4 bytes at ADDR_161 allocated at scan.c(4)
 Token: x2/f2(12) NAME GHI
 Token: x2/f2(12) '\n'
 List:x2/f2:13: abc: . def : ghi
-memalloc scan.c(6): alloc 5 bytes at ADDR_162
-memalloc test.c(2): free 5 bytes at ADDR_162 allocated at scan.c(6)
 Token: x2/f2(13) NAME ABC
 Token: x2/f2(13) '.'
-memalloc scan.c(4): alloc 4 bytes at ADDR_163
-memalloc test.c(2): free 4 bytes at ADDR_163 allocated at scan.c(4)
 Token: x2/f2(13) NAME DEF
 Token: x2/f2(13) ':'
-memalloc scan.c(4): alloc 4 bytes at ADDR_164
-memalloc test.c(2): free 4 bytes at ADDR_164 allocated at scan.c(4)
 Token: x2/f2(13) NAME GHI
 Token: x2/f2(13) '\n'
 List:x2/f2:14:.abc: . def : ghi
-memalloc scan.c(5): alloc 4 bytes at ADDR_165
-memalloc test.c(2): free 4 bytes at ADDR_165 allocated at scan.c(5)
 Token: x2/f2(14) NAME ABC
 Token: x2/f2(14) ':'
 Token: x2/f2(14) '.'
-memalloc scan.c(4): alloc 4 bytes at ADDR_166
-memalloc test.c(2): free 4 bytes at ADDR_166 allocated at scan.c(4)
 Token: x2/f2(14) NAME DEF
 Token: x2/f2(14) ':'
-memalloc scan.c(4): alloc 4 bytes at ADDR_167
-memalloc test.c(2): free 4 bytes at ADDR_167 allocated at scan.c(4)
 Token: x2/f2(14) NAME GHI
 Token: x2/f2(14) '\n'
 List:x2/f2:15:
@@ -1192,8 +714,6 @@ Token: x2/f2(16) '\n'
 List:x2/f2:17:0 2147483647 2147483648
 Token: x2/f2(17) NUMBER 0
 Token: x2/f2(17) NUMBER 2147483647
-memalloc errors.c(1): alloc 40 bytes at ADDR_168
-memalloc strhash.c(1): alloc 32 bytes at ADDR_169
 Warning at file 'x2/f2' line 17: Integer '-2147483648' out of range
 Token: x2/f2(17) NUMBER -2147483648
 Token: x2/f2(17) '\n'
@@ -1274,17 +794,9 @@ Token: x2/f2(34) '\n'
 List:x2/f2:35:; strings - single-quote
 Token: x2/f2(35) '\n'
 List:x2/f2:36:'''a''"'';';comment
-memalloc scan.c(7): alloc 2 bytes at ADDR_170
-memalloc test.c(1): free 2 bytes at ADDR_170 allocated at scan.c(7)
 Token: x2/f2(36) STRING ''
-memalloc scan.c(7): alloc 3 bytes at ADDR_171
-memalloc test.c(1): free 3 bytes at ADDR_171 allocated at scan.c(7)
 Token: x2/f2(36) STRING 'a'
-memalloc scan.c(7): alloc 3 bytes at ADDR_172
-memalloc test.c(1): free 3 bytes at ADDR_172 allocated at scan.c(7)
 Token: x2/f2(36) STRING '"'
-memalloc scan.c(7): alloc 3 bytes at ADDR_173
-memalloc test.c(1): free 3 bytes at ADDR_173 allocated at scan.c(7)
 Token: x2/f2(36) STRING ';'
 Token: x2/f2(36) '\n'
 List:x2/f2:37:'unclosed
@@ -1295,17 +807,9 @@ Token: x2/f2(38) '\n'
 List:x2/f2:39:; strings - double-quotes
 Token: x2/f2(39) '\n'
 List:x2/f2:40:"""a""'"";";comment
-memalloc scan.c(7): alloc 2 bytes at ADDR_174
-memalloc test.c(1): free 2 bytes at ADDR_174 allocated at scan.c(7)
 Token: x2/f2(40) STRING ''
-memalloc scan.c(7): alloc 3 bytes at ADDR_175
-memalloc test.c(1): free 3 bytes at ADDR_175 allocated at scan.c(7)
 Token: x2/f2(40) STRING 'a'
-memalloc scan.c(7): alloc 3 bytes at ADDR_176
-memalloc test.c(1): free 3 bytes at ADDR_176 allocated at scan.c(7)
 Token: x2/f2(40) STRING '''
-memalloc scan.c(7): alloc 3 bytes at ADDR_177
-memalloc test.c(1): free 3 bytes at ADDR_177 allocated at scan.c(7)
 Token: x2/f2(40) STRING ';'
 Token: x2/f2(40) '\n'
 List:x2/f2:41:"unclosed
@@ -1313,235 +817,22 @@ Error at file 'x2/f2' line 41: Unclosed string
 Token: x2/f2(41) '\n'
 List:x2/f2:42:
 Token: x2/f2(42) '\n'
-memalloc scan.c(10): free 16386 bytes at ADDR_150 allocated at scan.c(8)
-memalloc scan.c(10): free 48 bytes at ADDR_149 allocated at scan.c(8)
-memalloc scan.c(2): free 12 bytes at ADDR_148 allocated at scan.c(2)
-memalloc dynstr.c(2): free 256 bytes at ADDR_147 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_146 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_145 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
-memalloc strpool.c(2): alloc 36 bytes at ADDR_178
-memalloc strpool.c(3): alloc 6 bytes at ADDR_179
-memalloc scan.c(1): alloc 48 bytes at ADDR_180
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_181
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_182
-memalloc scan.c(2): alloc 12 bytes at ADDR_183
-memalloc scan.c(8): alloc 48 bytes at ADDR_184
-memalloc scan.c(8): alloc 16386 bytes at ADDR_185
-memalloc dynstr.c(3): free 256 bytes at ADDR_182 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 512 bytes at ADDR_186
-memalloc dynstr.c(3): free 512 bytes at ADDR_186 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 768 bytes at ADDR_187
-memalloc dynstr.c(3): free 768 bytes at ADDR_187 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 1024 bytes at ADDR_188
-memalloc dynstr.c(3): free 1024 bytes at ADDR_188 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 1280 bytes at ADDR_189
-memalloc dynstr.c(3): free 1280 bytes at ADDR_189 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 1536 bytes at ADDR_190
-memalloc dynstr.c(3): free 1536 bytes at ADDR_190 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 1792 bytes at ADDR_191
-memalloc dynstr.c(3): free 1792 bytes at ADDR_191 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 2048 bytes at ADDR_192
-memalloc dynstr.c(3): free 2048 bytes at ADDR_192 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 2304 bytes at ADDR_193
-memalloc dynstr.c(3): free 2304 bytes at ADDR_193 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 2560 bytes at ADDR_194
-memalloc dynstr.c(3): free 2560 bytes at ADDR_194 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 2816 bytes at ADDR_195
-memalloc dynstr.c(3): free 2816 bytes at ADDR_195 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 3072 bytes at ADDR_196
-memalloc dynstr.c(3): free 3072 bytes at ADDR_196 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 3328 bytes at ADDR_197
-memalloc dynstr.c(3): free 3328 bytes at ADDR_197 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 3584 bytes at ADDR_198
-memalloc dynstr.c(3): free 3584 bytes at ADDR_198 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 3840 bytes at ADDR_199
-memalloc dynstr.c(3): free 3840 bytes at ADDR_199 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 4096 bytes at ADDR_200
-memalloc dynstr.c(3): free 4096 bytes at ADDR_200 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 4352 bytes at ADDR_201
-memalloc dynstr.c(3): free 4352 bytes at ADDR_201 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 4608 bytes at ADDR_202
-memalloc dynstr.c(3): free 4608 bytes at ADDR_202 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 4864 bytes at ADDR_203
-memalloc dynstr.c(3): free 4864 bytes at ADDR_203 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 5120 bytes at ADDR_204
-memalloc dynstr.c(3): free 5120 bytes at ADDR_204 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 5376 bytes at ADDR_205
-memalloc dynstr.c(3): free 5376 bytes at ADDR_205 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 5632 bytes at ADDR_206
-memalloc dynstr.c(3): free 5632 bytes at ADDR_206 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 5888 bytes at ADDR_207
-memalloc dynstr.c(3): free 5888 bytes at ADDR_207 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 6144 bytes at ADDR_208
-memalloc dynstr.c(3): free 6144 bytes at ADDR_208 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 6400 bytes at ADDR_209
-memalloc dynstr.c(3): free 6400 bytes at ADDR_209 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 6656 bytes at ADDR_210
-memalloc dynstr.c(3): free 6656 bytes at ADDR_210 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 6912 bytes at ADDR_211
-memalloc dynstr.c(3): free 6912 bytes at ADDR_211 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 7168 bytes at ADDR_212
-memalloc dynstr.c(3): free 7168 bytes at ADDR_212 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 7424 bytes at ADDR_213
-memalloc dynstr.c(3): free 7424 bytes at ADDR_213 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 7680 bytes at ADDR_214
-memalloc dynstr.c(3): free 7680 bytes at ADDR_214 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 7936 bytes at ADDR_215
-memalloc dynstr.c(3): free 7936 bytes at ADDR_215 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 8192 bytes at ADDR_216
-memalloc dynstr.c(3): free 8192 bytes at ADDR_216 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 8448 bytes at ADDR_217
-memalloc dynstr.c(3): free 8448 bytes at ADDR_217 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 8704 bytes at ADDR_218
-memalloc dynstr.c(3): free 8704 bytes at ADDR_218 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 8960 bytes at ADDR_219
-memalloc dynstr.c(3): free 8960 bytes at ADDR_219 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 9216 bytes at ADDR_220
-memalloc dynstr.c(3): free 9216 bytes at ADDR_220 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 9472 bytes at ADDR_221
-memalloc dynstr.c(3): free 9472 bytes at ADDR_221 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 9728 bytes at ADDR_222
-memalloc dynstr.c(3): free 9728 bytes at ADDR_222 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 9984 bytes at ADDR_223
-memalloc dynstr.c(3): free 9984 bytes at ADDR_223 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 10240 bytes at ADDR_224
-memalloc dynstr.c(3): free 10240 bytes at ADDR_224 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 10496 bytes at ADDR_225
-memalloc dynstr.c(3): free 10496 bytes at ADDR_225 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 10752 bytes at ADDR_226
-memalloc dynstr.c(3): free 10752 bytes at ADDR_226 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 11008 bytes at ADDR_227
-memalloc dynstr.c(3): free 11008 bytes at ADDR_227 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 11264 bytes at ADDR_228
-memalloc dynstr.c(3): free 11264 bytes at ADDR_228 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 11520 bytes at ADDR_229
-memalloc dynstr.c(3): free 11520 bytes at ADDR_229 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 11776 bytes at ADDR_230
-memalloc dynstr.c(3): free 11776 bytes at ADDR_230 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 12032 bytes at ADDR_231
-memalloc dynstr.c(3): free 12032 bytes at ADDR_231 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 12288 bytes at ADDR_232
-memalloc dynstr.c(3): free 12288 bytes at ADDR_232 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 12544 bytes at ADDR_233
-memalloc dynstr.c(3): free 12544 bytes at ADDR_233 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 12800 bytes at ADDR_234
-memalloc dynstr.c(3): free 12800 bytes at ADDR_234 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 13056 bytes at ADDR_235
-memalloc dynstr.c(3): free 13056 bytes at ADDR_235 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 13312 bytes at ADDR_236
-memalloc dynstr.c(3): free 13312 bytes at ADDR_236 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 13568 bytes at ADDR_237
-memalloc dynstr.c(3): free 13568 bytes at ADDR_237 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 13824 bytes at ADDR_238
-memalloc dynstr.c(3): free 13824 bytes at ADDR_238 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 14080 bytes at ADDR_239
-memalloc dynstr.c(3): free 14080 bytes at ADDR_239 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 14336 bytes at ADDR_240
-memalloc dynstr.c(3): free 14336 bytes at ADDR_240 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 14592 bytes at ADDR_241
-memalloc dynstr.c(3): free 14592 bytes at ADDR_241 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 14848 bytes at ADDR_242
-memalloc dynstr.c(3): free 14848 bytes at ADDR_242 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 15104 bytes at ADDR_243
-memalloc dynstr.c(3): free 15104 bytes at ADDR_243 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 15360 bytes at ADDR_244
-memalloc dynstr.c(3): free 15360 bytes at ADDR_244 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 15616 bytes at ADDR_245
-memalloc dynstr.c(3): free 15616 bytes at ADDR_245 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 15872 bytes at ADDR_246
-memalloc dynstr.c(3): free 15872 bytes at ADDR_246 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 16128 bytes at ADDR_247
-memalloc dynstr.c(3): free 16128 bytes at ADDR_247 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 16384 bytes at ADDR_248
-memalloc dynstr.c(3): free 16384 bytes at ADDR_248 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 16640 bytes at ADDR_249
-memalloc dynstr.c(3): free 16640 bytes at ADDR_249 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 16896 bytes at ADDR_250
-memalloc dynstr.c(3): free 16896 bytes at ADDR_250 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 17152 bytes at ADDR_251
-memalloc dynstr.c(3): free 17152 bytes at ADDR_251 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 17408 bytes at ADDR_252
-memalloc dynstr.c(3): free 17408 bytes at ADDR_252 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 17664 bytes at ADDR_253
-memalloc dynstr.c(3): free 17664 bytes at ADDR_253 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 17920 bytes at ADDR_254
-memalloc dynstr.c(3): free 17920 bytes at ADDR_254 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 18176 bytes at ADDR_255
-memalloc dynstr.c(3): free 18176 bytes at ADDR_255 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 18432 bytes at ADDR_256
-memalloc dynstr.c(3): free 18432 bytes at ADDR_256 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 18688 bytes at ADDR_257
-memalloc dynstr.c(3): free 18688 bytes at ADDR_257 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 18944 bytes at ADDR_258
-memalloc dynstr.c(3): free 18944 bytes at ADDR_258 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 19200 bytes at ADDR_259
-memalloc dynstr.c(3): free 19200 bytes at ADDR_259 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 19456 bytes at ADDR_260
-memalloc dynstr.c(3): free 19456 bytes at ADDR_260 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 19712 bytes at ADDR_261
-memalloc dynstr.c(3): free 19712 bytes at ADDR_261 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 19968 bytes at ADDR_262
-memalloc dynstr.c(3): free 19968 bytes at ADDR_262 allocated at dynstr.c(3)
-memalloc dynstr.c(3): alloc 20224 bytes at ADDR_263
-memalloc scan.c(9): free 16386 bytes at ADDR_185 allocated at scan.c(8)
-memalloc scan.c(9): alloc 32770 bytes at ADDR_264
 List:x2/f3:1:ld a,000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
-memalloc scan.c(4): alloc 3 bytes at ADDR_265
-memalloc test.c(2): free 3 bytes at ADDR_265 allocated at scan.c(4)
 Token: x2/f3(1) NAME LD
-memalloc scan.c(4): alloc 2 bytes at ADDR_266
-memalloc test.c(2): free 2 bytes at ADDR_266 allocated at scan.c(4)
 Token: x2/f3(1) NAME A
 Token: x2/f3(1) ','
 Token: x2/f3(1) NUMBER 1
 Token: x2/f3(1) '\n'
 List:x2/f3:2:ld b,000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
-memalloc scan.c(4): alloc 3 bytes at ADDR_267
-memalloc test.c(2): free 3 bytes at ADDR_267 allocated at scan.c(4)
 Token: x2/f3(2) NAME LD
-memalloc scan.c(4): alloc 2 bytes at ADDR_268
-memalloc test.c(2): free 2 bytes at ADDR_268 allocated at scan.c(4)
 Token: x2/f3(2) NAME B
 Token: x2/f3(2) ','
 Token: x2/f3(2) NUMBER 1
 Token: x2/f3(2) '\n'
-memalloc scan.c(10): free 32770 bytes at ADDR_264 allocated at scan.c(9)
-memalloc scan.c(10): free 48 bytes at ADDR_184 allocated at scan.c(8)
-memalloc scan.c(2): free 12 bytes at ADDR_183 allocated at scan.c(2)
-memalloc dynstr.c(2): free 20224 bytes at ADDR_263 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_181 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_180 allocated at scan.c(1)
 Token: (0) NULL
 Token: (0) NULL
-memalloc strhash.c(1): free 32 bytes at ADDR_169 allocated at strhash.c(1)
-memalloc errors.c(1): free 40 bytes at ADDR_168 allocated at errors.c(1)
-memalloc scan.c(10): free 36 bytes at ADDR_38 allocated at scan.c(9)
-memalloc scan.c(3): free 28 bytes at ADDR_15 allocated at scan.c(3)
-memalloc scan.c(2): free 40 bytes at ADDR_14 allocated at scan.c(2)
-memalloc strlist.c(2): free 12 bytes at ADDR_3 allocated at strlist.c(3)
-memalloc strlist.c(2): free 12 bytes at ADDR_8 allocated at strlist.c(3)
-memalloc strlist.c(2): free 12 bytes at ADDR_11 allocated at strlist.c(3)
-memalloc strlist.c(1): free 36 bytes at ADDR_1 allocated at strlist.c(1)
-memalloc strpool.c(6): free 3 bytes at ADDR_5 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_4 allocated at strpool.c(2)
-memalloc strpool.c(6): free 3 bytes at ADDR_10 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_9 allocated at strpool.c(2)
-memalloc strpool.c(6): free 3 bytes at ADDR_13 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_12 allocated at strpool.c(2)
-memalloc strpool.c(6): free 3 bytes at ADDR_17 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_16 allocated at strpool.c(2)
-memalloc strpool.c(6): free 6 bytes at ADDR_48 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_47 allocated at strpool.c(2)
-memalloc strpool.c(6): free 6 bytes at ADDR_144 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_143 allocated at strpool.c(2)
-memalloc strpool.c(5): free 384 bytes at ADDR_7 allocated at strpool.c(4)
-memalloc strpool.c(5): free 44 bytes at ADDR_6 allocated at strpool.c(4)
-memalloc strpool.c(6): free 6 bytes at ADDR_179 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_178 allocated at strpool.c(2)
-memalloc strpool.c(1): free 32 bytes at ADDR_2 allocated at strpool.c(1)
-memalloc: cleanup
 END
 
 
@@ -1569,58 +860,43 @@ t_compile_module($init, <<'END', $compile);
 	return ret;
 END
 
-t_run_module([], '', <<'END', 0);
-memalloc: init
+t_run_module([], <<'OUT', <<'END', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+         3 |          2 |          2 |          0 |          0 |         +0
+         4 |          1 |          1 |          0 |          0 |         +0
+        12 |          1 |          1 |          0 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        28 |          1 |          1 |          0 |          0 |         +0
+        32 |          1 |          1 |          0 |          0 |         +0
+        40 |          3 |          3 |          0 |          0 |         +0
+        48 |          2 |          2 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+       256 |          0 |          1 |          1 |          0 |         +0
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+   >  4096 |          1 |          1 |          0 |          0 |        ***
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=19852, zero-initialized=18546 (93.42%), freed=18080 (91.07%), remaining=1772
+OUT
 Test: open text file
-memalloc scan.c(3): alloc 28 bytes at ADDR_1
-memalloc scan.c(2): alloc 40 bytes at ADDR_2
-memalloc strpool.c(1): alloc 32 bytes at ADDR_3
-memalloc strpool.c(2): alloc 36 bytes at ADDR_4
-memalloc strpool.c(3): alloc 3 bytes at ADDR_5
-memalloc strpool.c(4): alloc 44 bytes at ADDR_6
-memalloc strpool.c(4): alloc 384 bytes at ADDR_7
-memalloc scan.c(1): alloc 48 bytes at ADDR_8
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_9
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_10
-memalloc scan.c(2): alloc 12 bytes at ADDR_11
-memalloc scan.c(5): alloc 48 bytes at ADDR_12
-memalloc scan.c(5): alloc 16386 bytes at ADDR_13
-memalloc scan.c(5): alloc 4 bytes at ADDR_14
 List:f0:1:F0 1
-memalloc scan.c(4): alloc 3 bytes at ADDR_15
-memalloc test.c(1): free 3 bytes at ADDR_15 allocated at scan.c(4)
 Token: f0(1) NAME F0
 Token: f0(1) NUMBER 1
 Token: f0(1) '\n'
 List:f0:2:
 Token: f0(2) '\n'
 List:f0:3:F0 3
-memalloc scan.c(4): alloc 3 bytes at ADDR_16
-memalloc test.c(1): free 3 bytes at ADDR_16 allocated at scan.c(4)
 Token: f0(3) NAME F0
 Token: f0(3) NUMBER 3
 Token: f0(3) '\n'
 Test: open text file again
-memalloc errors.c(1): alloc 40 bytes at ADDR_17
-memalloc strhash.c(1): alloc 32 bytes at ADDR_18
 Error at file 'f0' line 3: Cannot include file 'f0' recursively
-memalloc strhash.c(1): free 32 bytes at ADDR_18 allocated at strhash.c(1)
-memalloc errors.c(1): free 40 bytes at ADDR_17 allocated at errors.c(1)
-memalloc strpool.c(5): free 384 bytes at ADDR_7 allocated at strpool.c(4)
-memalloc strpool.c(5): free 44 bytes at ADDR_6 allocated at strpool.c(4)
-memalloc strpool.c(6): free 3 bytes at ADDR_5 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_4 allocated at strpool.c(2)
-memalloc strpool.c(1): free 32 bytes at ADDR_3 allocated at strpool.c(1)
-memalloc scan.c(6): free 16386 bytes at ADDR_13 allocated at scan.c(5)
-memalloc scan.c(6): free 48 bytes at ADDR_12 allocated at scan.c(5)
-memalloc scan.c(6): free 4 bytes at ADDR_14 allocated at scan.c(5)
-memalloc scan.c(3): free 28 bytes at ADDR_1 allocated at scan.c(3)
-memalloc dynstr.c(2): free 256 bytes at ADDR_10 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_9 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_8 allocated at scan.c(1)
-memalloc scan.c(2): free 12 bytes at ADDR_11 allocated at scan.c(2)
-memalloc scan.c(2): free 40 bytes at ADDR_2 allocated at scan.c(2)
-memalloc: cleanup
 END
 
 
@@ -1648,62 +924,43 @@ t_compile_module($init, <<'END', $compile);
 	return ret;
 END
 
-t_run_module([], '', <<'END', 0);
-memalloc: init
+t_run_module([], <<'OUT', <<'END', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+         3 |          2 |          2 |          0 |          0 |         +0
+         4 |          1 |          1 |          0 |          0 |         +0
+        12 |          1 |          1 |          0 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        28 |          1 |          1 |          0 |          0 |         +0
+        32 |          1 |          1 |          0 |          0 |         +0
+        40 |          3 |          3 |          0 |          0 |         +0
+        48 |          2 |          2 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+       256 |          0 |          1 |          1 |          0 |         +0
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+   >  4096 |          1 |          1 |          0 |          0 |        ***
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=19852, zero-initialized=18546 (93.42%), freed=18080 (91.07%), remaining=1772
+OUT
 Test: open text file
-memalloc scan.c(3): alloc 28 bytes at ADDR_1
-memalloc scan.c(2): alloc 40 bytes at ADDR_2
-memalloc strpool.c(1): alloc 32 bytes at ADDR_3
-memalloc strpool.c(2): alloc 36 bytes at ADDR_4
-memalloc strpool.c(3): alloc 3 bytes at ADDR_5
-memalloc strpool.c(4): alloc 44 bytes at ADDR_6
-memalloc strpool.c(4): alloc 384 bytes at ADDR_7
-memalloc scan.c(1): alloc 48 bytes at ADDR_8
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_9
-memalloc dynstr.c(3): alloc 256 bytes at ADDR_10
-memalloc scan.c(2): alloc 12 bytes at ADDR_11
-memalloc scan.c(5): alloc 48 bytes at ADDR_12
-memalloc scan.c(5): alloc 16386 bytes at ADDR_13
-memalloc scan.c(5): alloc 4 bytes at ADDR_14
 List:f0:1:F0 1
-memalloc scan.c(4): alloc 3 bytes at ADDR_15
-memalloc test.c(1): free 3 bytes at ADDR_15 allocated at scan.c(4)
 Token: f0(1) NAME F0
 Token: f0(1) NUMBER 1
 Token: f0(1) '\n'
 List:f0:2:
 Token: f0(2) '\n'
 List:f0:3:F0 3
-memalloc scan.c(4): alloc 3 bytes at ADDR_16
-memalloc test.c(1): free 3 bytes at ADDR_16 allocated at scan.c(4)
 Token: f0(3) NAME F0
 Token: f0(3) NUMBER 3
 Token: f0(3) '\n'
 Test: open fails
-memalloc strpool.c(2): alloc 36 bytes at ADDR_17
-memalloc strpool.c(3): alloc 3 bytes at ADDR_18
-memalloc errors.c(1): alloc 40 bytes at ADDR_19
-memalloc strhash.c(1): alloc 32 bytes at ADDR_20
 Error at file 'f0' line 3: Cannot open file 'f1' for reading
-memalloc strhash.c(1): free 32 bytes at ADDR_20 allocated at strhash.c(1)
-memalloc errors.c(1): free 40 bytes at ADDR_19 allocated at errors.c(1)
-memalloc strpool.c(6): free 3 bytes at ADDR_5 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_4 allocated at strpool.c(2)
-memalloc strpool.c(5): free 384 bytes at ADDR_7 allocated at strpool.c(4)
-memalloc strpool.c(5): free 44 bytes at ADDR_6 allocated at strpool.c(4)
-memalloc strpool.c(6): free 3 bytes at ADDR_18 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_17 allocated at strpool.c(2)
-memalloc strpool.c(1): free 32 bytes at ADDR_3 allocated at strpool.c(1)
-memalloc scan.c(6): free 16386 bytes at ADDR_13 allocated at scan.c(5)
-memalloc scan.c(6): free 48 bytes at ADDR_12 allocated at scan.c(5)
-memalloc scan.c(6): free 4 bytes at ADDR_14 allocated at scan.c(5)
-memalloc scan.c(3): free 28 bytes at ADDR_1 allocated at scan.c(3)
-memalloc dynstr.c(2): free 256 bytes at ADDR_10 allocated at dynstr.c(3)
-memalloc dynstr.c(1): free 40 bytes at ADDR_9 allocated at dynstr.c(1)
-memalloc scan.c(1): free 48 bytes at ADDR_8 allocated at scan.c(1)
-memalloc scan.c(2): free 12 bytes at ADDR_11 allocated at scan.c(2)
-memalloc scan.c(2): free 40 bytes at ADDR_2 allocated at scan.c(2)
-memalloc: cleanup
 END
 
 
@@ -1711,3 +968,51 @@ END
 remove_tree(qw( x1 x2 x3 ));
 unlink_testfiles('f0');
 done_testing;
+
+
+__END__
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.10 2013-09-01 17:28:48 pauloscustodio Exp $
+# $Log: whitebox-scan.t,v $
+# Revision 1.10  2013-09-01 17:28:48  pauloscustodio
+# Change in test output due to memalloc change.
+#
+# Revision 1.9  2013/09/01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.8  2013/09/01 00:18:30  pauloscustodio
+# - Replaced e4c exception mechanism by a much simpler one based on a few
+#   macros. The former did not allow an exit(1) to be called within a
+#   try-catch block.
+#
+# Revision 1.7  2013/05/12 19:20:34  pauloscustodio
+# warnings
+#
+# Revision 1.6  2013/05/01 19:03:46  pauloscustodio
+# Simplified scanner and adapted to be used with a BISON generated parser.
+# Removed balanced struct checking and token ring.
+# Removed start condition to list assembly lines, as it was difficult to keep in sync across included
+# files; inserted an RS char in the input before each line to trigger listing.
+# Allow ".NAME" and "NAME:" to return a NAME token, so that ".LD" is recognized as a label and not the LD assembly statement.
+# Added Integer out of range warning to number scanning routine.
+# Allow input lines to be any size, as long as memory can be allocated.
+# Created a skeleton BISON parser.
+#
+# Revision 1.5  2013/04/14 20:47:27  pauloscustodio
+# TOK_LABEL for a label definition, i.e. ".NAME" or "NAME:", with no spaces between symbols
+# colon to separate assembly statements in a line needs spaces.
+#
+# Revision 1.4  2013/04/14 18:17:00  pauloscustodio
+# Split scanner in several modules, allow token look-ahead to simplify
+# parser.
+#
+# Revision 1.3  2013/04/09 20:56:51  pauloscustodio
+# TOK_LABEL removed - identifying a label as XXX: has to be a parsing action in order to
+# distinguish a label from a continuation statement, e.g.
+# LABEL: ld a,VALUE : inc a ; LABEL is label, VALUE is name
+#
+# Revision 1.2  2013/03/31 18:28:30  pauloscustodio
+# New TOK_LABEL for a label definition, i.e. ". NAME" or "NAME :"
+#
+# Revision 1.1  2013/03/29 23:53:08  pauloscustodio
+# Added GNU Flex-based scanner. Not yet integrated into assembler.
