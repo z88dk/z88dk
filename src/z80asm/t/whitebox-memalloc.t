@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.9 2013-09-01 11:52:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.10 2013-09-01 16:21:55 pauloscustodio Exp $
 #
 # Test memory allocation
 
@@ -21,280 +21,38 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "die.o except.o strutil.o safestr.o init.o";
+my $objs = "die.o except.o strutil.o safestr.o init.o strpool.o";
 ok ! system "make $objs";
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 
-# allocate and no free no debug
-t_compile_module("", <<'END', "memalloc.c die.o except.o strutil.o safestr.o init.o");
-	char * p1 = xmalloc(1);
-	char * p2 = xmalloc(2);
-	p1[0] = p2[0] = p2[1] = 0;
-	if (memcmp(p1-4, "\xAA\xAA\xAA\xAA\0\xAA\xAA\xAA\xAA", 9) == 0 &&
-	    memcmp(p2-4, "\xAA\xAA\xAA\xAA\0\0\xAA\xAA\xAA\xAA", 10) == 0)
-		return 0;
-	else 
-		return 1;
+# show memory leaks
+t_compile_module("", <<'END', $compile);
+	char * p1 = xmalloc(100);
+	char * p2 = xmalloc(100);
 END
 t_run_module([], "", <<END, 0);
-memalloc memalloc.c(1): free memory leak of 2 bytes at ADDR_1 allocated at test.c(2)
-memalloc memalloc.c(1): free memory leak of 1 bytes at ADDR_2 allocated at test.c(1)
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+       100 |          2 |          0 |          0 |          0 |       +200
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=220, zero-initialized=200 (90.91%), freed=20 (9.09%), remaining=200
 END
-
-
-# debug
-t_compile_module("", <<'END', $compile);
-#define ERROR return __LINE__
-	char *p1, *p2;
-	int test;
-	
-	if (argc != 2) ERROR;
-	test = atoi(argv[1]);
-	
-	switch (test) {
-	case 1:							// no allocation
-		break;
-	
-	case 2:							// alloc & no free, free in opposite order of alloc
-		p1 = xmalloc(1);
-		p2 = xmalloc(2);
-		p1[0] = p2[0] = p2[1] = 0;
-		if (memcmp(p1-4, "\xAA\xAA\xAA\xAA\0\xAA\xAA\xAA\xAA", 9)) ERROR;
-		if (memcmp(p2-4, "\xAA\xAA\xAA\xAA\0\0\xAA\xAA\xAA\xAA", 10)) ERROR;
-		break;
-
-	case 3:							// alloc & free
-		p1 = xmalloc(1);
-		xfree(p1);
-		if (p1) ERROR;
-		break;
-	
-	case 4:							// alloc failed
-		p1 = xmalloc(0x80000000);
-		ERROR;
-	
-	case 5:							// unmatched block
-		xfree(argv);
-		break;
-		
-	case 6:							// buffer underflow
-		p1 = xmalloc(1);
-		p1[-1] = 0;
-		xfree(p1);
-		break;
-	
-	case 7:							// buffer overflow
-		p1 = xmalloc(1);
-		p1[1] = 0;
-		xfree(p1);
-		break;
-		
-	case 8:							// xmalloc
-		p1 = xmalloc(0);
-		p2 = xmalloc(1);
-		p2[0] = 0;
-		if (memcmp(p1-4, "\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA", 8)) ERROR;
-		if (memcmp(p2-4, "\xAA\xAA\xAA\xAA\0\xAA\xAA\xAA\xAA", 9)) ERROR;
-		break;
-
-	case 9:							// xcalloc
-		p1 = xcalloc(5, 1);
-		if (memcmp(p1-4, "\xAA\xAA\xAA\xAA\0\0\0\0\0\xAA\xAA\xAA\xAA", 13)) ERROR;
-		break;
-
-	case 10:						// realloc - NULL input
-		p1 = xrealloc(NULL, 2);
-		p1[0] = p1[1] = 2;
-		if (memcmp(p1-4, "\xAA\xAA\xAA\xAA\2\2\xAA\xAA\xAA\xAA", 10)) ERROR;
-		break;
-	
-	case 11:						// xrealloc - shrink
-		p1 = xmalloc(2);
-		p1[0] = p1[1] = 2;
-		if (memcmp(p1-4, "\xAA\xAA\xAA\xAA\2\2\xAA\xAA\xAA\xAA", 10)) ERROR;
-		p1 = xrealloc(p1, 1);
-		if (memcmp(p1-4, "\xAA\xAA\xAA\xAA\2\xAA\xAA\xAA\xAA", 9)) ERROR;
-		p1 = xrealloc(p1, 0);
-		if (memcmp(p1-4, "\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA", 8)) ERROR;
-		break;
-
-	case 12:						// xrealloc - grow
-		p1 = xmalloc(1);
-		p1[0] = 2;
-		if (memcmp(p1-4, "\xAA\xAA\xAA\xAA\2\xAA\xAA\xAA\xAA", 9)) ERROR;
-		p1 = xrealloc(p1, 2);
-		p1[1] = 3;
-		if (memcmp(p1-4, "\xAA\xAA\xAA\xAA\2\3\xAA\xAA\xAA\xAA", 10)) ERROR;
-		break;
-
-	case 13:						// xstrdup
-		p1 = xstrdup("hello");
-		if (memcmp(p1-4, "\xAA\xAA\xAA\xAAhello\0\xAA\xAA\xAA\xAA", 14)) ERROR;
-		break;
-
-	case 14:						// xcalloc_struct
-		p1 = xcalloc_struct(char);
-		if (memcmp(p1-4, "\xAA\xAA\xAA\xAA\0\xAA\xAA\xAA\xAA", 9)) ERROR;
-		break;
-
-	case 15:						// xcalloc_n_struct
-		p1 = xcalloc_n_struct(2, char);
-		if (memcmp(p1-4, "\xAA\xAA\xAA\xAA\0\0\xAA\xAA\xAA\xAA", 10)) ERROR;
-		break;
-
-	case 16:
-		p1 = NULL;
-		xfree(p1);
-		break;
-		
-	default:
-		ERROR;
-	}
-	
-	return 0;
-END
-
-# no allocation
-t_run_module([1], "", <<END, 0);
-memalloc: init
-memalloc: cleanup
-END
-
-# alloc & no free, free in opposite order of alloc
-t_run_module([2], "", <<END, 0);
-memalloc: init
-memalloc test.c(1): alloc 1 bytes at ADDR_1
-memalloc test.c(2): alloc 2 bytes at ADDR_2
-memalloc: cleanup
-memalloc memalloc.c(1): free 2 bytes at ADDR_2 allocated at test.c(2)
-memalloc memalloc.c(1): free 1 bytes at ADDR_1 allocated at test.c(1)
-END
-
-# alloc & free
-t_run_module([3], "", <<END, 0);
-memalloc: init
-memalloc test.c(1): alloc 1 bytes at ADDR_1
-memalloc test.c(2): free 1 bytes at ADDR_1 allocated at test.c(1)
-memalloc: cleanup
-END
-
-# alloc failed
-t_run_module([4], "", <<END, 1);
-memalloc: init
-memalloc test.c(1): alloc 2147483680 bytes failed
-memalloc: cleanup
-END
-
-# unmatched block
-t_run_module([5], "", <<END, 1);
-memalloc: init
-memalloc test.c(1): block not found
-memalloc: cleanup
-END
-
-# buffer underflow
-t_run_module([6], "", <<END, 1);
-memalloc: init
-memalloc test.c(1): alloc 1 bytes at ADDR_1
-memalloc test.c(2): free 1 bytes at ADDR_1 allocated at test.c(1)
-memalloc test.c(2): buffer underflow, memory allocated at test.c(1)
-memalloc: cleanup
-END
-
-# buffer overflow
-t_run_module([7], "", <<END, 1);
-memalloc: init
-memalloc test.c(1): alloc 1 bytes at ADDR_1
-memalloc test.c(2): free 1 bytes at ADDR_1 allocated at test.c(1)
-memalloc test.c(2): buffer overflow, memory allocated at test.c(1)
-memalloc: cleanup
-END
-
-# memalloc
-t_run_module([8], "", <<END, 0);
-memalloc: init
-memalloc test.c(1): alloc 0 bytes at ADDR_1
-memalloc test.c(2): alloc 1 bytes at ADDR_2
-memalloc: cleanup
-memalloc memalloc.c(1): free 1 bytes at ADDR_2 allocated at test.c(2)
-memalloc memalloc.c(1): free 0 bytes at ADDR_1 allocated at test.c(1)
-END
-
-# xcalloc
-t_run_module([9], "", <<END, 0);
-memalloc: init
-memalloc test.c(1): alloc 5 bytes at ADDR_1
-memalloc: cleanup
-memalloc memalloc.c(1): free 5 bytes at ADDR_1 allocated at test.c(1)
-END
-
-# xrealloc - NULL input
-t_run_module([10], "", <<END, 0);
-memalloc: init
-memalloc test.c(1): alloc 2 bytes at ADDR_1
-memalloc: cleanup
-memalloc memalloc.c(1): free 2 bytes at ADDR_1 allocated at test.c(1)
-END
-
-# xrealloc - shrink
-t_run_module([11], "", <<END, 0);
-memalloc: init
-memalloc test.c(1): alloc 2 bytes at ADDR_1
-memalloc test.c(2): free 2 bytes at ADDR_1 allocated at test.c(1)
-memalloc test.c(2): alloc 1 bytes at ADDR_2
-memalloc test.c(3): free 1 bytes at ADDR_2 allocated at test.c(2)
-memalloc test.c(3): alloc 0 bytes at ADDR_3
-memalloc: cleanup
-memalloc memalloc.c(1): free 0 bytes at ADDR_3 allocated at test.c(3)
-END
-
-# xrealloc - grow
-t_run_module([12], "", <<END, 0);
-memalloc: init
-memalloc test.c(1): alloc 1 bytes at ADDR_1
-memalloc test.c(2): free 1 bytes at ADDR_1 allocated at test.c(1)
-memalloc test.c(2): alloc 2 bytes at ADDR_2
-memalloc: cleanup
-memalloc memalloc.c(1): free 2 bytes at ADDR_2 allocated at test.c(2)
-END
-
-# xstrdup
-t_run_module([13], "", <<END, 0);
-memalloc: init
-memalloc test.c(1): alloc 6 bytes at ADDR_1
-memalloc: cleanup
-memalloc memalloc.c(1): free 6 bytes at ADDR_1 allocated at test.c(1)
-END
-
-# xcalloc_struct
-t_run_module([14], "", <<END, 0);
-memalloc: init
-memalloc test.c(1): alloc 1 bytes at ADDR_1
-memalloc: cleanup
-memalloc memalloc.c(1): free 1 bytes at ADDR_1 allocated at test.c(1)
-END
-
-# xcalloc_n_struct
-t_run_module([15], "", <<END, 0);
-memalloc: init
-memalloc test.c(1): alloc 2 bytes at ADDR_1
-memalloc: cleanup
-memalloc memalloc.c(1): free 2 bytes at ADDR_1 allocated at test.c(1)
-END
-
-# xfree with NULL pointer
-t_run_module([16], "", <<END, 0);
-memalloc: init
-memalloc: cleanup
-END
-
 
 unlink_testfiles();
 done_testing;
 
 __END__
 # $Log: whitebox-memalloc.t,v $
-# Revision 1.9  2013-09-01 11:52:55  pauloscustodio
+# Revision 1.10  2013-09-01 16:21:55  pauloscustodio
+# Removed memalloc allocation checking code, use MSVC _CRTDBG_MAP_ALLOC instead.
+# Dump memory usage statistics at the end if MEMALLOC_DEBUG defined.
+#
+# Revision 1.9  2013/09/01 11:52:55  pauloscustodio
 # Setup memalloc on init.c.
 # Setup GLib memory allocation functions to use memalloc functions.
 #

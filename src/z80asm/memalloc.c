@@ -12,77 +12,13 @@
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-Memory allocation routines with automatic garbage collection on exit,
-Simple fence mechanism and exception thrown on out of memory.
-Only works for memory allocated by xmalloc and freed by xfree.
-Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
+Activate _CRTDBG_MAP_ALLOC, MS Visual Studio malloc debug - detects buffer overruns and
+memory leaks.
+Needs to be first include in any source, i.e. crtdbg.h needs to be included upfront.
+On MEMALLOC_DEBUG, shows statistics of memory usage on exit.
 */
 
 #include "memalloc.h"   /* before any other include */
-
-#include "types.h"
-#include "die.h"
-#include "queue.h"
-#include <glib.h>
-#include <stdlib.h>
-#include <stdio.h>
-
-/*-----------------------------------------------------------------------------
-*   Memory Block - allocated before the actual buffer requested by the user
-*   keeps linked list of all allocated blocks to be freed at exit
-*----------------------------------------------------------------------------*/
-#define FENCE_SIZE      sizeof(void*)
-#define FENCE_SIGN      0xAA
-#define MEMBLOCK_SIGN   0x5A5A5A5A
-
-typedef struct MemBlock
-{
-    int signature;                  /* contains MEMBLOCK_SIGN to make sure we found
-                                       a block */
-    size_t  client_size;            /* size requested by client */
-    char    *file;                  /* source where allocated */
-    int     lineno;                 /* line number where allocated */
-
-    LIST_ENTRY( MemBlock ) entries; /* Double-linked list of blocks */
-
-    char    fence[FENCE_SIZE];      /* fence to detect underflow */
-
-    /* client data starts here with client_size bytes + FENCE_SIZE fence */
-
-} MemBlock;
-
-/* list of all allocated memory */
-static LIST_HEAD( MemBlockList, MemBlock ) mem_blocks = LIST_HEAD_INITIALIZER( mem_blocks );
-
-/* convert from MemBlock area to client area */
-#define CLIENT_PTR(block)   ((block)->fence + FENCE_SIZE)
-#define CLIENT_SIZE(block)  ((block)->client_size)
-
-/* convert client block and size to MemBlock and total size */
-#define BLOCK_PTR(ptr)      ((MemBlock *) (((char*) (ptr)) - sizeof(MemBlock)))
-#define BLOCK_SIZE(size)    ((size) + sizeof(MemBlock) + FENCE_SIZE)
-
-/* address of both fences */
-#define START_FENCE_PTR(block)  ((block)->fence)
-#define END_FENCE_PTR(block)    (CLIENT_PTR(block) + (block)->client_size)
-
-
-/*-----------------------------------------------------------------------------
-*   GLIB memory v-table
-*----------------------------------------------------------------------------*/
-static void *glib_malloc(size_t size) { return xmalloc(size); }
-static void *glib_realloc(void *memptr, size_t size) { return xrealloc(memptr, size); }
-extern void  glib_free(void *memptr) { xfree(memptr); }
-static void *glib_calloc(size_t num, size_t size) { return xcalloc((int)num, size); }
-
-static GMemVTable mem_vtable = {
-	glib_malloc,
-	glib_realloc,
-	glib_free,
-	glib_calloc,
-	glib_malloc,
-	glib_realloc
-};
 
 /*-----------------------------------------------------------------------------
 *   Initialize functions called by init.c
@@ -93,14 +29,13 @@ static GMemVTable mem_vtable = {
 
 extern void init_memalloc(void)
 {
-	/* init GLIB memory handling */
-	g_mem_set_vtable( &mem_vtable );
-		
 #ifdef MEMALLOC_DEBUG
-    warn( "memalloc: init\n" );
+	/* init GLIB memory profiling */
+	g_mem_set_vtable( glib_mem_profiler_table );
 #endif
 
-#ifdef _CRTDBG_MAP_ALLOC        /* MS Visual Studio malloc debug */
+#ifdef _CRTDBG_MAP_ALLOC
+	/* Setup MS Visual Studio malloc debug */
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	REPORT_STDERR( _CRT_WARN );
 	REPORT_STDERR( _CRT_ERROR );
@@ -111,266 +46,25 @@ extern void init_memalloc(void)
 }
 #undef REPORT_STDERR
 
-
 /*-----------------------------------------------------------------------------
 *   Terminate functions called by init.c
 *----------------------------------------------------------------------------*/
 void fini_memalloc(void)
 {
-    MemBlock *block;
-
 #ifdef MEMALLOC_DEBUG
-    warn( "memalloc: cleanup\n" );
+    g_mem_profile();
 #endif
-
-    /* delete all existing blocks */
-    while ( ! LIST_EMPTY( &mem_blocks ) )
-    {
-        block = LIST_FIRST( &mem_blocks );
-#ifndef MEMALLOC_DEBUG
-		warn( "memalloc %s(%d): free memory leak of %u bytes at 0x%p "
-			  "allocated at %s(%d)\n",  
-			  __FILE__, __LINE__, 
-			  block->client_size, CLIENT_PTR( block ), 
-			  block->file, block->lineno );
-#endif
-
-        _xfree( CLIENT_PTR( block ), __FILE__, __LINE__ );  /* deletes from list */
-    }
 }
 
 
-/*-----------------------------------------------------------------------------
-*   Create a new MemBlock
-*----------------------------------------------------------------------------*/
-static MemBlock *new_block( size_t client_size, char *file, int lineno )
-{
-    MemBlock *block;
-    size_t   block_size;
-
-    /* create memory to hold MemBlock + client area + fence */
-    block_size = BLOCK_SIZE( client_size );
-    block      = malloc( block_size );
-
-    if ( block == NULL )
-    {
-        die( "memalloc %s(%d): alloc %u bytes failed\n", file, lineno, block_size );
-        /* not reached */
-    }
-
-    /* init block */
-    block->signature   = MEMBLOCK_SIGN;
-    block->client_size = client_size;
-    block->file        = file;
-    block->lineno      = lineno;
-
-    /* fill fences */
-    memset( START_FENCE_PTR( block ), FENCE_SIGN, FENCE_SIZE );
-    memset( END_FENCE_PTR( block ),   FENCE_SIGN, FENCE_SIZE );
-
-    /* add to list of blocks in reverse order, so that cleanup is reversed */
-    LIST_INSERT_HEAD( &mem_blocks, block, entries );
-
-#ifdef MEMALLOC_DEBUG
-    warn( "memalloc %s(%d): alloc %u bytes at 0x%p\n", block->file, block->lineno,
-          CLIENT_SIZE( block ), CLIENT_PTR( block ) );
-#endif
-
-    return block;
-}
-
-/*-----------------------------------------------------------------------------
-*   Find a block via client ptr, exit if not found
-*----------------------------------------------------------------------------*/
-static MemBlock *find_block( void *client_ptr, char *file, int lineno )
-{
-    MemBlock *block;
-
-    block = BLOCK_PTR( client_ptr );
-
-    if ( block->signature != MEMBLOCK_SIGN )
-    {
-        die( "memalloc %s(%d): block not found\n", file, lineno );
-        /* not reached */
-    }
-
-    return block;
-}
-
-/*-----------------------------------------------------------------------------
-*   Check block fence
-*----------------------------------------------------------------------------*/
-static void check_fences( MemBlock *block, char *file, int lineno )
-{
-    char fence[FENCE_SIZE];
-
-    memset( fence, FENCE_SIGN, FENCE_SIZE );
-
-    /* check fences */
-    if ( 0 != memcmp( fence, START_FENCE_PTR( block ), FENCE_SIZE ) )
-    {
-        die( "memalloc %s(%d): buffer underflow, "
-			 "memory allocated at %s(%d)\n", 
-			 file, lineno, block->file, block->lineno );
-        /* not reached */
-    }
-
-    if ( 0 != memcmp( fence, END_FENCE_PTR( block ), FENCE_SIZE ) )
-    {
-        die( "memalloc %s(%d): buffer overflow, "
-			 "memory allocated at %s(%d)\n", 
-			 file, lineno, block->file, block->lineno );
-        /* not reached */
-    }
-}
-
-/*-----------------------------------------------------------------------------
-*   xmalloc
-*----------------------------------------------------------------------------*/
-void *_xmalloc( size_t client_size, char *file, int lineno )
-{
-    MemBlock *block;
-
-    block = new_block( client_size, file, lineno );
-    return CLIENT_PTR( block );
-}
-
-/*-----------------------------------------------------------------------------
-*   xfree
-*----------------------------------------------------------------------------*/
-void _xfree( void *client_ptr, char *file, int lineno )
-{
-    MemBlock *block;
-
-    /* if input is NULL, do nothing */
-    if ( client_ptr == NULL )
-    {
-        return;
-    }
-
-    block = find_block( client_ptr, file, lineno );
-
-#ifdef MEMALLOC_DEBUG
-    warn( "memalloc %s(%d): free %u bytes at 0x%p "
-		  "allocated at %s(%d)\n", 
-		  file, lineno,
-          CLIENT_SIZE( block ), CLIENT_PTR( block ),
-          block->file, block->lineno );
-#endif
-
-    /* delete from list to avoid recursion atexit() if overflow */
-    LIST_REMOVE( block, entries );
-
-    /* check fences */
-    check_fences( block, file, lineno );
-
-    /* delete memory blocks */
-    free( block );
-}
-
-/*-----------------------------------------------------------------------------
-*   xcalloc
-*----------------------------------------------------------------------------*/
-void *_xcalloc( int num, size_t size, char *file, int lineno )
-{
-    MemBlock *block;
-    size_t   client_size;
-    void     *client_ptr;
-
-    client_size = num * size;
-    block       = new_block( client_size, file, lineno );
-    client_ptr  = CLIENT_PTR( block );
-
-    memset( client_ptr, 0, client_size );
-
-    return client_ptr;
-}
-
-/*-----------------------------------------------------------------------------
-*   xstrdup
-*----------------------------------------------------------------------------*/
-char *_xstrdup( char *source, char *file, int lineno )
-{
-    MemBlock *block;
-    size_t   client_size;
-    void     *client_ptr;
-
-    client_size = strlen( source ) + 1;
-    block       = new_block( client_size, file, lineno );
-    client_ptr  = CLIENT_PTR( block );
-
-    /* copy string */
-    strcpy( client_ptr, source );
-
-    return client_ptr;
-}
-
-/*-----------------------------------------------------------------------------
-*   xrealloc
-*----------------------------------------------------------------------------*/
-void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
-{
-    MemBlock *block;
-    size_t   block_size;
-
-    /* if input is NULL, behave as malloc */
-    if ( client_ptr == NULL )
-    {
-        return _xmalloc( client_size, file, lineno );
-    }
-
-    /* find the block */
-    block = find_block( client_ptr, file, lineno );
-
-#ifdef MEMALLOC_DEBUG
-    warn( "memalloc %s(%d): free %u bytes at 0x%p "
-		  "allocated at %s(%d)\n", 
-		  file, lineno,
-          CLIENT_SIZE( block ), CLIENT_PTR( block ),
-          block->file, block->lineno );
-#endif
-
-    /* delete from list as realloc may move block */
-    LIST_REMOVE( block, entries );
-
-    /* check fences */
-    check_fences( block, file, lineno );
-
-    /* reallocate and create new end fence */
-    block_size = BLOCK_SIZE( client_size );
-    block      = realloc( block, block_size );
-
-    if ( block == NULL )
-    {
-        die( "memalloc %s(%d): alloc %u bytes failed\n", file, lineno, block_size );
-        /* not reached */
-    }
-
-    client_ptr = CLIENT_PTR( block );
-
-    /* update block */
-    block->client_size = client_size;
-    block->file        = file;
-    block->lineno      = lineno;
-
-    /* fill end fence */
-    memset( END_FENCE_PTR( block ),   FENCE_SIGN, FENCE_SIZE );
-
-    /* add to list of blocks in reverse order, so that cleanup is reversed */
-    LIST_INSERT_HEAD( &mem_blocks, block, entries );
-
-#ifdef MEMALLOC_DEBUG
-    warn( "memalloc %s(%d): alloc %u bytes at 0x%p\n", block->file, block->lineno,
-          CLIENT_SIZE( block ), CLIENT_PTR( block ) );
-#endif
-
-    return client_ptr;
-}
-
-
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.c,v 1.10 2013-09-01 11:52:55 pauloscustodio Exp $ */
+/* */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.c,v 1.11 2013-09-01 16:21:55 pauloscustodio Exp $ */
 /* $Log: memalloc.c,v $
-/* Revision 1.10  2013-09-01 11:52:55  pauloscustodio
+/* Revision 1.11  2013-09-01 16:21:55  pauloscustodio
+/* Removed memalloc allocation checking code, use MSVC _CRTDBG_MAP_ALLOC instead.
+/* Dump memory usage statistics at the end if MEMALLOC_DEBUG defined.
+/*
+/* Revision 1.10  2013/09/01 11:52:55  pauloscustodio
 /* Setup memalloc on init.c.
 /* Setup GLib memory allocation functions to use memalloc functions.
 /*
@@ -421,7 +115,4 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
 /*
 /* Revision 1.1  2011/07/18 00:43:35  pauloscustodio
 /* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
-/*
-/*
 /* */
-

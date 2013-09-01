@@ -12,11 +12,10 @@
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-Memory allocation routines with automatic garbage collection on exit,
-Simple fence mechanism and exception thrown on out of memory.
-Only works for memory allocated by xmalloc and freed by xfree.
-Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
-Integrate with GLIB memory allocation
+Activate _CRTDBG_MAP_ALLOC, MS Visual Studio malloc debug - detects buffer overruns and
+memory leaks.
+Needs to be first include in any source, i.e. crtdbg.h needs to be included upfront.
+On MEMALLOC_DEBUG, shows statistics of memory usage on exit.
 */
 
 #pragma once
@@ -27,8 +26,10 @@ Integrate with GLIB memory allocation
 #ifdef _CRTDBG_MAP_ALLOC        /* MS Visual Studio malloc debug */
 #include <crtdbg.h>
 #endif
+
 #include <string.h>
 #include <stdio.h>
+#include <glib.h>
 
 /*-----------------------------------------------------------------------------
 *   Initialize and Terminate functions called by init()
@@ -42,32 +43,27 @@ extern void fini_memalloc(void);
 *   dies on allocation failure or buffer overruns
 *----------------------------------------------------------------------------*/
 
-extern void *_xmalloc( size_t size, char *file, int lineno );
-#define xmalloc(size)   _xmalloc((size), __FILE__, __LINE__)
-
-extern void *_xcalloc( int num, size_t size, char *file, int lineno );
-#define xcalloc(num, size)  _xcalloc((num), (size), __FILE__, __LINE__)
-
-extern void *_xrealloc( void *memptr, size_t size, char *file, int lineno );
-#define xrealloc(memptr, size)  _xrealloc((memptr), (size), __FILE__, __LINE__)
-
-extern char *_xstrdup( char *source, char *file, int lineno );
-#define xstrdup(source) _xstrdup((source), __FILE__, __LINE__)
-
-extern void _xfree( void *memptr, char *file, int lineno );
-#define xfree(memptr)   ( _xfree((memptr), __FILE__, __LINE__), (memptr) = NULL )
+#define xmalloc		g_malloc0
+#define xcalloc		g_malloc0_n
+#define xrealloc	g_realloc
+#define xstrdup		g_strdup
+#define xfree		g_free
 
 /* macro to alloc struct
  * use xcalloc for structs to make sure any new pointers
  * in the struct are initialized to NULL */
-#define xcalloc_n_struct(n, type_t)     ((type_t *) xcalloc((n), sizeof(type_t)))
-#define xcalloc_struct(type_t)          xcalloc_n_struct(1, type_t)
+#define xcalloc_n_struct(n, type_t)     g_new0(type_t, n)
+#define xcalloc_struct(type_t)          g_new0(type_t, 1)
 
 
-
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.h,v 1.9 2013-09-01 11:52:55 pauloscustodio Exp $ */
+/* */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.h,v 1.10 2013-09-01 16:21:55 pauloscustodio Exp $ */
 /* $Log: memalloc.h,v $
-/* Revision 1.9  2013-09-01 11:52:55  pauloscustodio
+/* Revision 1.10  2013-09-01 16:21:55  pauloscustodio
+/* Removed memalloc allocation checking code, use MSVC _CRTDBG_MAP_ALLOC instead.
+/* Dump memory usage statistics at the end if MEMALLOC_DEBUG defined.
+/*
+/* Revision 1.9  2013/09/01 11:52:55  pauloscustodio
 /* Setup memalloc on init.c.
 /* Setup GLib memory allocation functions to use memalloc functions.
 /*
@@ -114,6 +110,4 @@ extern void _xfree( void *memptr, char *file, int lineno );
 /*
 /* Revision 1.1  2011/07/18 00:43:35  pauloscustodio
 /* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
-/*
-/*
 /* */
