@@ -12,21 +12,6 @@
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
 # Copyright (C) Paulo Custodio, 2011-2013
-
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.3 2013-09-01 11:52:55 pauloscustodio Exp $
-# $Log: whitebox-classring.t,v $
-# Revision 1.3  2013-09-01 11:52:55  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
-#
-# Revision 1.2  2013/05/12 19:20:34  pauloscustodio
-# warnings
-#
-# Revision 1.1  2013/04/13 15:55:10  pauloscustodio
-# New CLASS_RING for circular queue of tokens pre-allocated to spare the
-# alloc/free for each token received from the lexer, and to allow quick
-# look-ahead for the parser without the need to push back tokens.
-#
 #
 
 use Modern::Perl;
@@ -34,7 +19,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test memalloc
-my $objs = "class.o die.o strutil.o safestr.o except.o init.o";
+my $objs = "class.o die.o strutil.o safestr.o except.o init.o strpool.o";
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 
 t_compile_module(<<'END_INIT', <<'END', $compile);
@@ -70,7 +55,7 @@ void dump_ring( char *name, ObjRing *ring )
 	int i, size;
 	Obj *obj;
 	
-	size = NUM_ELEMS(ring->queue);
+	size = G_N_ELEMENTS(ring->queue);
 
 	warn("%s = \"", name);
 	for (i = 0; i < size; i++) {
@@ -254,22 +239,21 @@ END_INIT
 	return 0;
 END
 
-t_run_module([], "", <<ERR, 0);
-memalloc: init
+t_run_module([], <<'OUT', <<'ERR', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+        32 |         12 |         12 |          0 |          0 |         +0
+        60 |          2 |          2 |          0 |          0 |         +0
+       100 |         12 |         12 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=1724, zero-initialized=1704 (98.84%), freed=1724 (100.00%), remaining=0
+OUT
 start
-memalloc test.c(5): alloc 60 bytes at ADDR_1
-memalloc test.c(4): alloc 32 bytes at ADDR_2
-memalloc test.c(1): alloc 100 bytes at ADDR_3
-memalloc test.c(4): alloc 32 bytes at ADDR_4
-memalloc test.c(1): alloc 100 bytes at ADDR_5
-memalloc test.c(4): alloc 32 bytes at ADDR_6
-memalloc test.c(1): alloc 100 bytes at ADDR_7
-memalloc test.c(4): alloc 32 bytes at ADDR_8
-memalloc test.c(1): alloc 100 bytes at ADDR_9
-memalloc test.c(4): alloc 32 bytes at ADDR_10
-memalloc test.c(1): alloc 100 bytes at ADDR_11
-memalloc test.c(4): alloc 32 bytes at ADDR_12
-memalloc test.c(1): alloc 100 bytes at ADDR_13
 ring = ""
   #                     
 +-#-+---+---+---+---+---+
@@ -710,19 +694,6 @@ ring = ""
 | b | a | Z | e | d | c |
 +---+---+---+-#-+---+---+
               #         
-memalloc test.c(5): alloc 60 bytes at ADDR_14
-memalloc test.c(4): alloc 32 bytes at ADDR_15
-memalloc test.c(2): alloc 100 bytes at ADDR_16
-memalloc test.c(4): alloc 32 bytes at ADDR_17
-memalloc test.c(2): alloc 100 bytes at ADDR_18
-memalloc test.c(4): alloc 32 bytes at ADDR_19
-memalloc test.c(2): alloc 100 bytes at ADDR_20
-memalloc test.c(4): alloc 32 bytes at ADDR_21
-memalloc test.c(2): alloc 100 bytes at ADDR_22
-memalloc test.c(4): alloc 32 bytes at ADDR_23
-memalloc test.c(2): alloc 100 bytes at ADDR_24
-memalloc test.c(4): alloc 32 bytes at ADDR_25
-memalloc test.c(2): alloc 100 bytes at ADDR_26
 ring = ""
               #         
 +---+---+---+-#-+---+---+
@@ -778,35 +749,28 @@ ring2 = "xyz"
 +---+---+---+-#-+---+---+
               #         
 end
-memalloc test.c(3): free 100 bytes at ADDR_16 allocated at test.c(2)
-memalloc test.c(4): free 32 bytes at ADDR_15 allocated at test.c(4)
-memalloc test.c(3): free 100 bytes at ADDR_18 allocated at test.c(2)
-memalloc test.c(4): free 32 bytes at ADDR_17 allocated at test.c(4)
-memalloc test.c(3): free 100 bytes at ADDR_20 allocated at test.c(2)
-memalloc test.c(4): free 32 bytes at ADDR_19 allocated at test.c(4)
-memalloc test.c(3): free 100 bytes at ADDR_22 allocated at test.c(2)
-memalloc test.c(4): free 32 bytes at ADDR_21 allocated at test.c(4)
-memalloc test.c(3): free 100 bytes at ADDR_24 allocated at test.c(2)
-memalloc test.c(4): free 32 bytes at ADDR_23 allocated at test.c(4)
-memalloc test.c(3): free 100 bytes at ADDR_26 allocated at test.c(2)
-memalloc test.c(4): free 32 bytes at ADDR_25 allocated at test.c(4)
-memalloc test.c(5): free 60 bytes at ADDR_14 allocated at test.c(5)
-memalloc test.c(3): free 100 bytes at ADDR_3 allocated at test.c(1)
-memalloc test.c(4): free 32 bytes at ADDR_2 allocated at test.c(4)
-memalloc test.c(3): free 100 bytes at ADDR_5 allocated at test.c(1)
-memalloc test.c(4): free 32 bytes at ADDR_4 allocated at test.c(4)
-memalloc test.c(3): free 100 bytes at ADDR_7 allocated at test.c(1)
-memalloc test.c(4): free 32 bytes at ADDR_6 allocated at test.c(4)
-memalloc test.c(3): free 100 bytes at ADDR_9 allocated at test.c(1)
-memalloc test.c(4): free 32 bytes at ADDR_8 allocated at test.c(4)
-memalloc test.c(3): free 100 bytes at ADDR_11 allocated at test.c(1)
-memalloc test.c(4): free 32 bytes at ADDR_10 allocated at test.c(4)
-memalloc test.c(3): free 100 bytes at ADDR_13 allocated at test.c(1)
-memalloc test.c(4): free 32 bytes at ADDR_12 allocated at test.c(4)
-memalloc test.c(5): free 60 bytes at ADDR_1 allocated at test.c(5)
-memalloc: cleanup
 ERR
 
 
 unlink_testfiles();
 done_testing;
+
+
+__END__
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.4 2013-09-01 18:08:29 pauloscustodio Exp $
+# $Log: whitebox-classring.t,v $
+# Revision 1.4  2013-09-01 18:08:29  pauloscustodio
+# Change in test output due to memalloc change.
+#
+# Revision 1.3  2013/09/01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.2  2013/05/12 19:20:34  pauloscustodio
+# warnings
+#
+# Revision 1.1  2013/04/13 15:55:10  pauloscustodio
+# New CLASS_RING for circular queue of tokens pre-allocated to spare the
+# alloc/free for each token received from the lexer, and to allow quick
+# look-ahead for the parser without the need to push back tokens.
+#
