@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.50 2013-08-30 21:50:43 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.51 2013-09-01 12:00:07 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.50  2013-08-30 21:50:43  pauloscustodio
+/* Revision 1.51  2013-09-01 12:00:07  pauloscustodio
+/* Cleanup compilation warnings
+/*
+/* Revision 1.50  2013/08/30 21:50:43  pauloscustodio
 /* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
 /* as an identifier reserved by the C standard for implementation-defined behaviour
 /* starting with two underscores.
@@ -695,7 +698,7 @@ DEFS()
     struct expr *postfixexpr;
     struct expr *constexpr;
 
-    long constant, val;
+    long constant = 0, val = 0;
 
     GetSym();                     /* get numerical expression */
 
@@ -756,7 +759,7 @@ DEFS()
 void
 UNDEFINE( void )
 {
-    Symbol *sym;
+    Symbol *sym = NULL;
 
     do
     {

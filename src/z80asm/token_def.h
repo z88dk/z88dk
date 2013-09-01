@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.3 2013-08-30 21:50:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.4 2013-09-01 12:00:07 pauloscustodio Exp $
 */
 
 /* define list of tokens with corresponding string representation, 
@@ -73,7 +73,10 @@ TOKEN(	label,		" ", " " )
 TOKEN(	newline,	"",  ""  )
 
 /* $Log: token_def.h,v $
-/* Revision 1.3  2013-08-30 21:50:43  pauloscustodio
+/* Revision 1.4  2013-09-01 12:00:07  pauloscustodio
+/* Cleanup compilation warnings
+/*
+/* Revision 1.3  2013/08/30 21:50:43  pauloscustodio
 /* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
 /* as an identifier reserved by the C standard for implementation-defined behaviour
 /* starting with two underscores.

@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.27 2013-09-01 00:18:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.28 2013-09-01 12:00:07 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.27  2013-09-01 00:18:28  pauloscustodio
+/* Revision 1.28  2013-09-01 12:00:07  pauloscustodio
+/* Cleanup compilation warnings
+/*
+/* Revision 1.27  2013/09/01 00:18:28  pauloscustodio
 /* - Replaced e4c exception mechanism by a much simpler one based on a few
 /*   macros. The former did not allow an exit(1) to be called within a
 /*   try-catch block.
@@ -419,7 +422,7 @@ void set_asm_flag( char *flagid )
 
     else if ( *flagid == 'r' )
     {
-        sscanf( flagid + 1, "%x", &EXPLICIT_ORIGIN );
+        sscanf( flagid + 1, "%x", (size_t *)&EXPLICIT_ORIGIN );
         deforigin = ON;         /* explicit origin has been defined */
     }
 

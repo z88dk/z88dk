@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.96 2013-09-01 00:18:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.97 2013-09-01 12:00:07 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.96  2013-09-01 00:18:28  pauloscustodio
+/* Revision 1.97  2013-09-01 12:00:07  pauloscustodio
+/* Cleanup compilation warnings
+/*
+/* Revision 1.96  2013/09/01 00:18:28  pauloscustodio
 /* - Replaced e4c exception mechanism by a much simpler one based on a few
 /*   macros. The former did not allow an exit(1) to be called within a
 /*   try-catch block.
@@ -587,6 +590,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "except.h"
 #include "z80asm.h"
 #include <ctype.h>
+#include <glib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1336,7 +1340,7 @@ int main( int argc, char *argv[] )
 {
     int    i;
 
-    /* start try..catch with finally to cleanup any allocated memory */
+	/* start try..catch with finally to cleanup any allocated memory */
     TRY
     {
         set_error_null();               /* clear location of error messages */

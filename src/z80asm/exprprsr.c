@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.41 2013-09-01 00:18:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.42 2013-09-01 12:00:07 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.41  2013-09-01 00:18:28  pauloscustodio
+/* Revision 1.42  2013-09-01 12:00:07  pauloscustodio
+/* Cleanup compilation warnings
+/*
+/* Revision 1.41  2013/09/01 00:18:28  pauloscustodio
 /* - Replaced e4c exception mechanism by a much simpler one based on a few
 /*   macros. The former did not allow an exit(1) to be called within a
 /*   try-catch block.
@@ -790,7 +793,7 @@ EvalPfixExpr( struct expr *pfixlist )
     struct pfixstack *stackptr = NULL;
     struct postfixlist *pfixexpr;
     Symbol *symptr;
-    long ret;
+    long ret = 0;
 
     TRY
     {

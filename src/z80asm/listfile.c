@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle assembly listing and symbol table listing.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.4 2013-03-04 23:37:09 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.5 2013-09-01 12:00:07 pauloscustodio Exp $ */
 /* $Log: listfile.c,v $
-/* Revision 1.4  2013-03-04 23:37:09  pauloscustodio
+/* Revision 1.5  2013-09-01 12:00:07  pauloscustodio
+/* Cleanup compilation warnings
+/*
+/* Revision 1.4  2013/03/04 23:37:09  pauloscustodio
 /* Removed pass1 that was used to skip creating page references of created
 /* symbols in pass2. Modified add_symbol_ref() to ignore pages < 1,
 /* modified list_get_page_nr() to return -1 after the whole source is
@@ -144,7 +147,7 @@ static void ListFile_fprintf( ListFile *self, char *msg, ... )
 *----------------------------------------------------------------------------*/
 static void ListFile_write_header( ListFile *self )
 {
-	long	fpos1, fpos2, fpos3;
+	long	fpos1 = 0, fpos2 = 0, fpos3 = 0;
 
 	if ( self->file != NULL ) 
 	{
