@@ -16,11 +16,51 @@ Keep pool of strings for all duration of the program.
 Most keywords in input program are the same, no need to keep several copies
 and manage strdup/free for each token.
 Strings with the same contents are reused.
+Changed to use GLib String Chunks
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.c,v 1.6 2013-06-08 23:09:06 pauloscustodio Exp $ */
+#include "memalloc.h"   /* before any other include */
+
+#include "strpool.h"
+#include "types.h"
+#include <glib.h>
+
+/*-----------------------------------------------------------------------------
+*   Global String Chunks pool
+*----------------------------------------------------------------------------*/
+static GStringChunk *str_pool;
+
+/*-----------------------------------------------------------------------------
+*   Initialize and Terminate functions called by init()
+*----------------------------------------------------------------------------*/
+void init_strpool(void)
+{
+	str_pool = g_string_chunk_new( MAXLINE );
+}
+
+void fini_strpool(void)
+{
+	g_string_chunk_free( str_pool );
+}
+
+/*-----------------------------------------------------------------------------
+*   Add a const string to the pool, return it's address
+*----------------------------------------------------------------------------*/
+char *strpool_add( char *string )
+{
+    return string == NULL ? 
+			string : 
+			g_string_chunk_insert_const( str_pool, string );
+}
+
+
+/* */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.c,v 1.7 2013-09-01 16:51:26 pauloscustodio Exp $ */
 /* $Log: strpool.c,v $
-/* Revision 1.6  2013-06-08 23:09:06  pauloscustodio
+/* Revision 1.7  2013-09-01 16:51:26  pauloscustodio
+/* Replaced strpool code by GLib String Chunks.
+/*
+/* Revision 1.6  2013/06/08 23:09:06  pauloscustodio
 /* Show strpool on exit if DEBUG
 /*
 /* Revision 1.5  2013/03/30 00:00:26  pauloscustodio
@@ -34,119 +74,5 @@ Strings with the same contents are reused.
 /*
 /* Revision 1.1  2012/05/24 17:50:02  pauloscustodio
 /* CH_0010 : new string pool to hold strings for all program duration
-/*
-/*
 /* */
 
-#include "memalloc.h"   /* before any other include */
-#include "strpool.h"
-#include "class.h"
-#include "types.h"
-#include "uthash.h"
-#include "queue.h"
-
-/*-----------------------------------------------------------------------------
-*   String pool entry
-*----------------------------------------------------------------------------*/
-typedef struct StrPoolEntry
-{
-    char    *string;        /* xstrdup */
-
-    UT_hash_handle hh;      /* hash table */
-
-} StrPoolEntry;
-
-/*-----------------------------------------------------------------------------
-*   Class
-*----------------------------------------------------------------------------*/
-CLASS( StrPool )
-StrPoolEntry	*hash;
-END_CLASS;
-
-DEF_CLASS( StrPool );
-
-static StrPool *str_pool = NULL;	/* sigleton */
-
-/*-----------------------------------------------------------------------------
-*   Initialize
-*----------------------------------------------------------------------------*/
-void StrPool_init( StrPool *self )   
-{
-	self->hash = NULL;
-}
-
-/*-----------------------------------------------------------------------------
-*   Clone
-*----------------------------------------------------------------------------*/
-void StrPool_copy( StrPool *self, StrPool *other )
-{
-	/* clone points to the same hash - sigleton */
-}
-
-/*-----------------------------------------------------------------------------
-*   Add and return string
-*----------------------------------------------------------------------------*/
-char *StrPool_add( StrPool *self, char *string )
-{
-	StrPoolEntry *elem;
-    size_t num_chars;
-	
-	/* special case : NULL string */
-	if ( string == NULL ) 
-	{
-		return NULL;
-	}
-	
-    /* check if string exists already */
-	num_chars = strlen( string );
-    HASH_FIND( hh, self->hash, string, num_chars, elem );
-    if ( elem )
-    {
-        return elem->string;    /* found */
-    }
-
-    /* add to elem */
-    elem = xcalloc_struct( StrPoolEntry );
-    elem->string = xstrdup( string );   /* alloc string */
-
-    HASH_ADD_KEYPTR( hh, self->hash, elem->string, num_chars, elem );
-
-    return elem->string;
-}
-
-/*-----------------------------------------------------------------------------
-*   Delete all
-*----------------------------------------------------------------------------*/
-void StrPool_fini( StrPool *self )
-{
-    StrPoolEntry *elem, *tmp;
-
-    HASH_ITER( hh, self->hash, elem, tmp )
-    {
-#ifdef DEBUG
-		puts( elem->string );
-#endif
-        HASH_DEL( self->hash, elem );
-        xfree( elem->string );
-        xfree( elem );
-    }
-}
-
-
-/*-----------------------------------------------------------------------------
-*   Public interface
-*----------------------------------------------------------------------------*/
-char *strpool_add( char *string )
-{
-    strpool_init();
-    return StrPool_add( str_pool, string );
-}
-
-void strpool_init( void )
-{
-    /* create object to destory hash on first time */
-    if ( str_pool == NULL )
-    {
-        str_pool = OBJ_NEW( StrPool );
-    }
-}

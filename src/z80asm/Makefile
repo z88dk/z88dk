@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.71 2013-09-01 12:28:51 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.72 2013-09-01 16:53:18 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXE suffix
@@ -103,6 +103,7 @@ OBJS = 	\
 MAKE_INIT =			tools/make_init.pl
 INIT = \
 	memalloc.h 		\
+	strpool.h		\
 
 #------------------------------------------------------------------------------
 # variables
@@ -186,7 +187,7 @@ prove: $(TARGET)
 	perl -S prove t/*.t
 
 testmsvc : $(MSVC_TARGET)
-	make Z80ASM=$(MSVC_TARGET) test
+	make Z80ASM=$(MSVC_TARGET) prove
 
 testzcc : $(TARGET)
 	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c
@@ -247,7 +248,10 @@ depend:
 
 
 # $Log: Makefile,v $
-# Revision 1.71  2013-09-01 12:28:51  pauloscustodio
+# Revision 1.72  2013-09-01 16:53:18  pauloscustodio
+# Replaced strpool code by GLib String Chunks.
+#
+# Revision 1.71  2013/09/01 12:28:51  pauloscustodio
 # Unified glib compilation options between MinGW and Linux
 #
 # Revision 1.70  2013/09/01 11:52:55  pauloscustodio
@@ -559,7 +563,7 @@ file.o: memalloc.h class.h queue.h types.h config.h  errors.h
 file.o: errors_def.h file.h safestr.h strlist.h strpool.h strutil.h uthash.h
 file.o: die.h
 hist.o: memalloc.h hist.h
-init.o: memalloc.h
+init.o: memalloc.h strpool.h
 ldinstr.o: memalloc.h config.h  z80asm.h types.h sym.h class.h
 ldinstr.o: queue.h symref.h classlist.h symbol.h model.h objfile.h symtab.h
 ldinstr.o: classhash.h strhash.h uthash.h die.h token_def.h errors.h
@@ -573,7 +577,7 @@ mapfile.o: memalloc.h file.h safestr.h types.h strlist.h class.h queue.h
 mapfile.o: listfile.h dynstr.h symref.h classlist.h mapfile.h options.h
 mapfile.o: symbol.h model.h objfile.h symtab.h classhash.h strhash.h uthash.h
 mapfile.o: die.h sym.h token_def.h strpool.h z80asm.h config.h 
-memalloc.o: memalloc.h types.h die.h queue.h
+memalloc.o: memalloc.h
 modlink.o: memalloc.h codearea.h types.h config.h  errors.h
 modlink.o: errors_def.h file.h safestr.h strlist.h class.h queue.h listfile.h
 modlink.o: dynstr.h symref.h classlist.h options.h symbol.h model.h objfile.h
@@ -610,7 +614,7 @@ srcfile.o: strpool.h
 strhash.o: memalloc.h strhash.h types.h class.h queue.h uthash.h die.h
 strhash.o: strpool.h
 strlist.o: memalloc.h strlist.h class.h queue.h types.h strpool.h
-strpool.o: memalloc.h strpool.h class.h queue.h types.h uthash.h die.h
+strpool.o: memalloc.h strpool.h types.h
 strutil.o: memalloc.h strutil.h
 sym.o: memalloc.h listfile.h class.h queue.h types.h dynstr.h symref.h
 sym.o: classlist.h options.h symbol.h model.h objfile.h symtab.h classhash.h
@@ -622,9 +626,9 @@ symtab.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h token_def.h
 symtab.o: z80asm.h config.h 
 z80asm.o: memalloc.h codearea.h types.h config.h  deffile.h
 z80asm.o: errors.h errors_def.h file.h safestr.h strlist.h class.h queue.h
-z80asm.o: hist.h init.h legacy.h listfile.h dynstr.h symref.h classlist.h
-z80asm.o: mapfile.h objfile.h options.h symbol.h model.h symtab.h classhash.h
-z80asm.o: strhash.h uthash.h die.h sym.h token_def.h strpool.h strutil.h
+z80asm.o: hist.h init.h strpool.h legacy.h listfile.h dynstr.h symref.h
+z80asm.o: classlist.h mapfile.h objfile.h options.h symbol.h model.h symtab.h
+z80asm.o: classhash.h strhash.h uthash.h die.h sym.h token_def.h strutil.h
 z80asm.o: except.h z80asm.h
 z80instr.o: memalloc.h config.h  z80asm.h types.h sym.h class.h
 z80instr.o: queue.h symref.h classlist.h symbol.h model.h objfile.h symtab.h
