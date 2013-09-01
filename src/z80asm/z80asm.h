@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.35 2013-06-16 20:14:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.36 2013-09-01 11:59:05 pauloscustodio Exp $
 $Log: z80asm.h,v $
-Revision 1.35  2013-06-16 20:14:39  pauloscustodio
+Revision 1.36  2013-09-01 11:59:05  pauloscustodio
+Force memalloc to be the first include, to be able to use MSVC memory debug tools
+
+Revision 1.35  2013/06/16 20:14:39  pauloscustodio
 Move deffile writing to deffile.c, remove global variable deffile
 
 Revision 1.34  2013/06/15 00:26:23  pauloscustodio
@@ -169,6 +172,8 @@ $History: Z80ASM.C $
 
 #ifndef Z80ASM_H
 #define Z80ASM_H
+
+#include "memalloc.h"   /* before any other include */
 
 #include "config.h"
 #include "types.h"

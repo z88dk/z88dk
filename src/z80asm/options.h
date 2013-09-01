@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.13 2013-04-07 22:26:07 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.14 2013-09-01 11:59:05 pauloscustodio Exp $ */
 /* $Log: options.h,v $
-/* Revision 1.13  2013-04-07 22:26:07  pauloscustodio
+/* Revision 1.14  2013-09-01 11:59:05  pauloscustodio
+/* Force memalloc to be the first include, to be able to use MSVC memory debug tools
+/*
+/* Revision 1.13  2013/04/07 22:26:07  pauloscustodio
 /* Removed global variable smallc_source, no longer used
 /*
 /* Revision 1.12  2013/04/06 13:15:04  pauloscustodio
@@ -82,6 +85,8 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 #ifndef OPTIONS_H
 #define OPTIONS_H
+
+#include "memalloc.h"   /* before any other include */
 
 #include "symbol.h"
 

@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Common types
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.10 2013-05-12 19:23:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.11 2013-09-01 11:59:05 pauloscustodio Exp $ */
 /* $Log: types.h,v $
-/* Revision 1.10  2013-05-12 19:23:17  pauloscustodio
+/* Revision 1.11  2013-09-01 11:59:05  pauloscustodio
+/* Force memalloc to be the first include, to be able to use MSVC memory debug tools
+/*
+/* Revision 1.10  2013/05/12 19:23:17  pauloscustodio
 /* MAXIDENT for maximum identifier length - set at 255 because of object file format
 /* with one byte string length
 /* MIN and MAX macros
@@ -57,6 +60,8 @@ Common types
 
 #ifndef TYPES_H
 #define TYPES_H
+
+#include "memalloc.h"   /* before any other include */
 
 #include <stdlib.h>					/* size_t */
 
