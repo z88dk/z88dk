@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.41 2013-08-26 21:49:39 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.42 2013-09-01 18:45:35 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.41  2013-08-26 21:49:39  pauloscustodio
+/* Revision 1.42  2013-09-01 18:45:35  pauloscustodio
+/* Remove NUM_ELEMS, use G_N_ELEMENTS instead (from glib.h)
+/* Remove FALSE, TRUE, MIN, MAX; defined in glib.h
+/*
+/* Revision 1.41  2013/08/26 21:49:39  pauloscustodio
 /* Bug report 2013-07-27 10:50:27 by rkd77 : compile with -Wformat -Werror=format-security
 /*
 /* Revision 1.40  2013/06/08 23:37:32  pauloscustodio
@@ -452,7 +456,7 @@ struct Z80sym *SearchId( void )
 {
     struct Z80sym *foundsym;
 
-    foundsym = ( struct Z80sym * ) bsearch( ident, Z80ident, NUM_ELEMS( Z80ident ), sizeof( struct Z80sym ),
+    foundsym = ( struct Z80sym * ) bsearch( ident, Z80ident, G_N_ELEMENTS( Z80ident ), sizeof( struct Z80sym ),
                                             ( fptr ) idcmp );
     return foundsym;
 }

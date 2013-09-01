@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.33 2013-08-29 22:01:20 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.34 2013-09-01 18:45:35 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.33  2013-08-29 22:01:20  pauloscustodio
+/* Revision 1.34  2013-09-01 18:45:35  pauloscustodio
+/* Remove NUM_ELEMS, use G_N_ELEMENTS instead (from glib.h)
+/* Remove FALSE, TRUE, MIN, MAX; defined in glib.h
+/*
+/* Revision 1.33  2013/08/29 22:01:20  pauloscustodio
 /* Accept ** as power  operator
 /*
 /* Revision 1.32  2013/05/12 19:39:32  pauloscustodio
@@ -649,7 +653,7 @@ CheckCondition( void )
     char   *text = ident;
     size_t  len = strlen( text );
 
-    for ( i = 0; i < NUM_ELEMS(flags); i++ )
+    for ( i = 0; i < G_N_ELEMENTS(flags); i++ )
     {
         if ( len != strlen( flags[i].name ) )
         {

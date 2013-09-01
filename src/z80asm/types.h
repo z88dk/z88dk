@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 Common types
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.11 2013-09-01 11:59:05 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/types.h,v 1.12 2013-09-01 18:45:35 pauloscustodio Exp $ */
 /* $Log: types.h,v $
-/* Revision 1.11  2013-09-01 11:59:05  pauloscustodio
+/* Revision 1.12  2013-09-01 18:45:35  pauloscustodio
+/* Remove NUM_ELEMS, use G_N_ELEMENTS instead (from glib.h)
+/* Remove FALSE, TRUE, MIN, MAX; defined in glib.h
+/*
+/* Revision 1.11  2013/09/01 11:59:05  pauloscustodio
 /* Force memalloc to be the first include, to be able to use MSVC memory debug tools
 /*
 /* Revision 1.10  2013/05/12 19:23:17  pauloscustodio
@@ -63,23 +67,15 @@ Common types
 
 #include "memalloc.h"   /* before any other include */
 
+#include <glib.h>
 #include <stdlib.h>					/* size_t */
 
 /* BOOL type and constants */
-typedef int BOOL;
-#define FALSE 0
-#define TRUE (!FALSE)
+typedef int BOOL;					/* FALSE and TRUE defined in glib.h */
 
 /* Unsigned types */
 typedef unsigned char byte_t;		/*  8-bit */
 /* typedef unsigned int size_t;	*/	/* 32-bit */
-
-/* number of elements of an array */
-#define NUM_ELEMS(x)	(sizeof(x)/sizeof(x[0]))
-
-/* MIN/MAX */
-#define MIN(a,b)		( (a) < (b) ? (a) : (b) )
-#define MAX(a,b)		( (a) > (b) ? (a) : (b) )
 
 /* maximum length of strings */
 #define _MIN_MAXLINE	1024

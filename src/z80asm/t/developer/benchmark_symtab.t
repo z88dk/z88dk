@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.2 2013-05-23 22:07:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.3 2013-09-01 18:45:35 pauloscustodio Exp $
 # $Log: benchmark_symtab.t,v $
-# Revision 1.2  2013-05-23 22:07:44  pauloscustodio
+# Revision 1.3  2013-09-01 18:45:35  pauloscustodio
+# Remove NUM_ELEMS, use G_N_ELEMENTS instead (from glib.h)
+# Remove FALSE, TRUE, MIN, MAX; defined in glib.h
+#
+# Revision 1.2  2013/05/23 22:07:44  pauloscustodio
 # replace symbol* by Symbol*
 #
 # Revision 1.1  2013/05/23 21:45:24  pauloscustodio
@@ -173,7 +177,7 @@ void test_hash()
 	time(&end_time);
 	warn("hash: %ld s\n", end_time-start_time);
 
-	warn("total source input words: %5d\n", NUM_ELEMS(words));
+	warn("total source input words: %5d\n", G_N_ELEMENTS(words));
 	warn("total different words:    %5d\n", HASH_COUNT(hashroot->hash));
 	
     HASH_ITER( hh, hashroot->hash, elem, tmp )
