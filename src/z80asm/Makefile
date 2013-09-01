@@ -12,17 +12,15 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.70 2013-09-01 11:52:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.71 2013-09-01 12:28:51 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXE suffix
 #------------------------------------------------------------------------------
 ifeq ($(OS),Windows_NT)
     EXE 	:= .exe
-    DLL 	:= .dll
 else
     EXE := 
-    DLL :=
 endif
 
 
@@ -36,29 +34,25 @@ endif
 #		apt-get install libglib2.0
 #
 # Use GLIB in Win32/MinGW, see http://www.gtk.org/download/win32.php,
-#   Point environment variable GLIB_ROOT to root of MinGW msys 1.0 dir, e.g
-#	GLIB_ROOT=C:\MinGW\msys\1.0
-#	Extract at $(GLIB_ROOT):
-#	- glib_2.28.8-1_win32.zip
-#	- glib-dev_2.28.8-1_win32.zip
-#	- gettext-runtime_0.18.1.1-2_win32.zip
-#	- gettext-runtime-dev_0.18.1.1-2_win32.zip
+#   Installation of pkg-config and glib-2.0:
+#   1) Extract the following binary packages at the MinGW msys root dir, e.g.
+#      C:\MinGW\msys\1.0
+#		- glib_2.28.8-1_win32.zip
+#		- glib-dev_2.28.8-1_win32.zip
+#		- gettext-runtime_0.18.1.1-2_win32.zip
+#		- gettext-runtime-dev_0.18.1.1-2_win32.zip
+#	2) In a MinGW shell unpack pkg-config-2.28.tar.gz downloaded from
+#	   http://pkgconfig.freedesktop.org/releases/
+#	3) Point the GLIB variables to the GLIB installation and build pkg-config:
+#		export GLIB_CFLAGS="-I/C/MinGW/msys/1.0/include/glib-2.0 -I/C/MinGW/msys/1.0/lib/glib-2.0/include"
+#		export GLIB_LIBS="-L/C/MinGW/msys/1.0/lib -lglib-2.0"
+#		./configure
+#		make
+#		make install
+#	4) Setup environment variable PKG_CONFIG_PATH to C:\MinGW\msys\1.0\lib\pkgconfig
 #------------------------------------------------------------------------------
-ifeq ($(OS),Windows_NT)
-
-ifndef GLIB_ROOT
-$(error Environment variable GLIB_ROOT needs to point to GLIB installation, see http://www.gtk.org/)
-endif
-
-CFLAGS 	+= -I$(GLIB_ROOT)/include/glib-2.0 -I$(GLIB_ROOT)/lib/glib-2.0/include
-LDFLAGS += -L$(GLIB_ROOT)/lib -lglib-2.0
-
-else
-
 CFLAGS 	+= $(shell pkg-config --cflags glib-2.0)
 LDFLAGS += $(shell pkg-config --libs glib-2.0)
-
-endif
 
 #------------------------------------------------------------------------------
 # Object files
@@ -253,7 +247,10 @@ depend:
 
 
 # $Log: Makefile,v $
-# Revision 1.70  2013-09-01 11:52:55  pauloscustodio
+# Revision 1.71  2013-09-01 12:28:51  pauloscustodio
+# Unified glib compilation options between MinGW and Linux
+#
+# Revision 1.70  2013/09/01 11:52:55  pauloscustodio
 # Setup memalloc on init.c.
 # Setup GLib memory allocation functions to use memalloc functions.
 #

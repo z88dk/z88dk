@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.39 2013-09-01 11:52:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.40 2013-09-01 12:28:52 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -23,25 +23,6 @@ use Capture::Tiny::Extended 'capture';
 use Test::Differences; 
 use List::AllUtils 'uniq';
 use Data::HexDump;
-
-my $CFLAGS;
-my $LDFLAGS;
-BEGIN {
-	open(my $pipe, "make -p|") or die;
-	while (<$pipe>) {
-		if (/^CFLAGS\s*=\s*(.*)/) {
-			$CFLAGS = $1;
-			$CFLAGS =~ s/\$\((\w+)\)/ $ENV{$1} /ge;
-			last if $LDFLAGS;
-		}
-		elsif (/^LDFLAGS\s*=\s*(.*)/) {
-			$LDFLAGS = $1;
-			$LDFLAGS =~ s/\$\((\w+)\)/ $ENV{$1} /ge;
-			last if $CFLAGS;
-		}
-	}
-	close($pipe) or die;
-};
 
 my $STOP_ON_ERR = grep {/-stop/} @ARGV; 
 my $KEEP_FILES	= grep {/-keep/} @ARGV; 
@@ -490,6 +471,8 @@ sub t_compile_module {
 	while (-f 'test.exe' && ! unlink('test.exe')) {
 		sleep(1);
 	}
+	
+	my($CFLAGS, $LDFLAGS) = get_gcc_options();
 	
 	# get list of object files
 	my %modules;
@@ -987,11 +970,40 @@ sub list_test {
 
 list_first_line();
 
+#------------------------------------------------------------------------------
+# Get compilation options
+#------------------------------------------------------------------------------
+sub get_gcc_options {
+	our %FLAGS;
+	
+	if ( ! %FLAGS ) {
+		open(my $pipe, "make -p|") or die;
+		while (<$pipe>) {
+			if (/^(CFLAGS|LDFLAGS)\s*=\s*(.*)/) {
+				my($flag, $text) = ($1, $2);
+				$text =~ s/\$\((\w+)\)/ $ENV{$1} /ge;
+				$text =~ s/\$\(shell (.*?)\)/ `$1` /ge;
+				$text =~ s/\s+/ /g;
+				
+				$FLAGS{$flag} = $text;
+				last if scalar keys %FLAGS == 2;
+			}
+		}
+		close($pipe) or die;
+	}
+	
+	return @FLAGS{qw( CFLAGS LDFLAGS )};
+};
+
+
 1;
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.39  2013-09-01 11:52:55  pauloscustodio
+# Revision 1.40  2013-09-01 12:28:52  pauloscustodio
+# Unified glib compilation options between MinGW and Linux
+#
+# Revision 1.39  2013/09/01 11:52:55  pauloscustodio
 # Setup memalloc on init.c.
 # Setup GLib memory allocation functions to use memalloc functions.
 #
