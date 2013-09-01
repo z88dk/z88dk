@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.11 2013-09-01 16:39:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.12 2013-09-01 17:36:22 pauloscustodio Exp $
 #
 # Test memory allocation
 
@@ -30,7 +30,7 @@ t_compile_module("", <<'END', $compile);
 	char * p1 = xmalloc(100);
 	char * p2 = xmalloc(100);
 END
-t_run_module([], "", <<END, 0);
+t_run_module([], <<END, "", 0);
 GLib Memory statistics (successful operations):
  blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
@@ -49,7 +49,10 @@ done_testing;
 
 __END__
 # $Log: whitebox-memalloc.t,v $
-# Revision 1.11  2013-09-01 16:39:29  pauloscustodio
+# Revision 1.12  2013-09-01 17:36:22  pauloscustodio
+# Change in test output due to memalloc change.
+#
+# Revision 1.11  2013/09/01 16:39:29  pauloscustodio
 # Removed memalloc allocation checking code, use MSVC _CRTDBG_MAP_ALLOC instead.
 # Dump memory usage statistics at the end if MEMALLOC_DEBUG defined.
 #

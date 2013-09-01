@@ -12,53 +12,6 @@
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
 # Copyright (C) Paulo Custodio, 2011-2013
-
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.12 2013-09-01 11:52:55 pauloscustodio Exp $
-# $Log: whitebox-file.t,v $
-# Revision 1.12  2013-09-01 11:52:55  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
-#
-# Revision 1.11  2013/05/12 19:20:34  pauloscustodio
-# warnings
-#
-# Revision 1.10  2013/05/11 00:29:26  pauloscustodio
-# CH_0021 : Exceptions on file IO show file name
-# Keep a hash table of all opened file names, so that the file name
-# is shown on a fatal error.
-# Rename file IO funtions: f..._err to xf...
-#
-# Revision 1.9  2013/04/04 23:08:18  pauloscustodio
-# Helper functions to create file names of each of the extensions used in z80asm
-#
-# Revision 1.8  2013/02/27 20:56:52  pauloscustodio
-# search_file() now accepts a NULL dir_list.
-#
-# Revision 1.7  2013/02/27 20:47:30  pauloscustodio
-# Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
-#
-# Revision 1.6  2013/02/25 21:36:17  pauloscustodio
-# Uniform the APIs of classhash, classlist, strhash, strlist
-#
-# Revision 1.5  2013/01/20 21:24:29  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.4  2013/01/19 23:54:04  pauloscustodio
-# BUG_0023 : Error file with warning is removed in link phase
-# z80asm -b f1.asm
-# If assembling f1.asm produces a warning, the link phase removes the f1.err
-# file hidding the warning.
-#
-# Revision 1.3  2012/06/14 15:01:27  pauloscustodio
-# Split safe strings from strutil.c to safestr.c
-#
-# Revision 1.2  2012/05/26 18:50:26  pauloscustodio
-# Use .o instead of .c to build test program, faster compilation.
-# Use gcc to compile instead of cc.
-#
-# Revision 1.1  2012/05/24 21:44:00  pauloscustodio
-# New search_file() to search file in a StrList
-#
 #
 # Test file
 
@@ -67,8 +20,8 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "file.o errors.o strlist.o strhash.o strpool.o class.o ".
-		   "die.o strutil.o safestr.o except.o init.o";
+my $objs = "file.o errors.o strlist.o strhash.o class.o ".
+		   "die.o strutil.o safestr.o except.o init.o strpool.o";
 my $objs_r = "$objs                  memalloc.o";
 my $objs_d = "$objs -DMEMALLOC_DEBUG memalloc.c";
 
@@ -475,27 +428,33 @@ t_compile_module('', <<'END', $objs_d);
 
 END
 
-t_run_module([], "", <<'END', 0);
-memalloc: init
+t_run_module([], <<'OUT', <<'END', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+        32 |          2 |          2 |          0 |          0 |         +0
+        40 |          2 |          2 |          0 |          0 |         +0
+        44 |          1 |          1 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+       384 |          1 |          1 |          0 |          0 |         +0
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=3484, zero-initialized=2440 (70.03%), freed=1712 (49.14%), remaining=1772
+OUT
 
 ---- TEST: xfopen ----
 
-memalloc errors.c(1): alloc 40 bytes at ADDR_1
-memalloc strpool.c(1): alloc 32 bytes at ADDR_2
-memalloc strhash.c(1): alloc 32 bytes at ADDR_3
 Error: Cannot open file 'test1xxxx.bin' for reading
 Error: Cannot open file 'x/x/x/x/test1.bin' for writing
 
 ---- TEST: xfclose ----
 
-memalloc file.c(1): alloc 32 bytes at ADDR_4
-memalloc file.c(4): alloc 40 bytes at ADDR_5
-memalloc strpool.c(2): alloc 36 bytes at ADDR_6
-memalloc strpool.c(3): alloc 10 bytes at ADDR_7
-memalloc strpool.c(4): alloc 44 bytes at ADDR_8
-memalloc strpool.c(4): alloc 384 bytes at ADDR_9
-memalloc file.c(5): alloc 44 bytes at ADDR_10
-memalloc file.c(5): alloc 384 bytes at ADDR_11
 Error: Cannot close file 'test1.bin'
 
 ---- TEST: xstat ----
@@ -648,21 +607,61 @@ Error: Cannot write to file 'test1.bin'
 
 Error: Unexpected EOF reading from file 'test1.bin'
 Error: String too long reading from file 'test1.bin'
-memalloc file.c(2): free 384 bytes at ADDR_11 allocated at file.c(5)
-memalloc file.c(2): free 44 bytes at ADDR_10 allocated at file.c(5)
-memalloc file.c(3): free 40 bytes at ADDR_5 allocated at file.c(4)
-memalloc file.c(1): free 32 bytes at ADDR_4 allocated at file.c(1)
-memalloc strhash.c(1): free 32 bytes at ADDR_3 allocated at strhash.c(1)
-memalloc errors.c(1): free 40 bytes at ADDR_1 allocated at errors.c(1)
-memalloc strpool.c(5): free 384 bytes at ADDR_9 allocated at strpool.c(4)
-memalloc strpool.c(5): free 44 bytes at ADDR_8 allocated at strpool.c(4)
-memalloc strpool.c(6): free 10 bytes at ADDR_7 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_6 allocated at strpool.c(2)
-memalloc strpool.c(1): free 32 bytes at ADDR_2 allocated at strpool.c(1)
-memalloc: cleanup
 END
 
 # delete directories and files
 remove_tree(qw( x1 x2 x3 ));
 unlink_testfiles('f0');
 done_testing;
+
+
+__END__
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.13 2013-09-01 17:39:26 pauloscustodio Exp $
+# $Log: whitebox-file.t,v $
+# Revision 1.13  2013-09-01 17:39:26  pauloscustodio
+# Change in test output due to memalloc change.
+#
+# Revision 1.12  2013/09/01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.11  2013/05/12 19:20:34  pauloscustodio
+# warnings
+#
+# Revision 1.10  2013/05/11 00:29:26  pauloscustodio
+# CH_0021 : Exceptions on file IO show file name
+# Keep a hash table of all opened file names, so that the file name
+# is shown on a fatal error.
+# Rename file IO funtions: f..._err to xf...
+#
+# Revision 1.9  2013/04/04 23:08:18  pauloscustodio
+# Helper functions to create file names of each of the extensions used in z80asm
+#
+# Revision 1.8  2013/02/27 20:56:52  pauloscustodio
+# search_file() now accepts a NULL dir_list.
+#
+# Revision 1.7  2013/02/27 20:47:30  pauloscustodio
+# Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
+#
+# Revision 1.6  2013/02/25 21:36:17  pauloscustodio
+# Uniform the APIs of classhash, classlist, strhash, strlist
+#
+# Revision 1.5  2013/01/20 21:24:29  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.4  2013/01/19 23:54:04  pauloscustodio
+# BUG_0023 : Error file with warning is removed in link phase
+# z80asm -b f1.asm
+# If assembling f1.asm produces a warning, the link phase removes the f1.err
+# file hidding the warning.
+#
+# Revision 1.3  2012/06/14 15:01:27  pauloscustodio
+# Split safe strings from strutil.c to safestr.c
+#
+# Revision 1.2  2012/05/26 18:50:26  pauloscustodio
+# Use .o instead of .c to build test program, faster compilation.
+# Use gcc to compile instead of cc.
+#
+# Revision 1.1  2012/05/24 21:44:00  pauloscustodio
+# New search_file() to search file in a StrList
+#
