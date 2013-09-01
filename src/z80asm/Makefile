@@ -12,9 +12,15 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.68 2013-08-31 16:50:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.69 2013-09-01 00:08:55 pauloscustodio Exp $
 # $Log: Makefile,v $
-# Revision 1.68  2013-08-31 16:50:27  pauloscustodio
+# Revision 1.69  2013-09-01 00:08:55  pauloscustodio
+# - Included GLIB in the Makefile options.
+# - Created a code-generation mechanism for automatic execution of initialize
+#   code before the main() function starts, and methods for struct malloc
+#   and free calling constructors and destructors.
+#
+# Revision 1.68  2013/08/31 16:50:27  pauloscustodio
 # Test GLIB CFLAGS and LDFLAGS
 #
 # Revision 1.67  2013/08/30 21:50:43  pauloscustodio
@@ -327,8 +333,6 @@ LDFLAGS += $(shell pkg-config --libs glib-2.0)
 
 endif
 
-
-
 #------------------------------------------------------------------------------
 # Object files
 #------------------------------------------------------------------------------
@@ -344,6 +348,7 @@ OBJS = 	\
 	exprprsr.o		\
 	file.o			\
 	hist.o			\
+	init.o			\
 	ldinstr.o		\
 	listfile.o		\
 	mapfile.o		\
@@ -370,6 +375,13 @@ OBJS = 	\
 	z80asm.o		\
 	z80instr.o		\
 	z80pass.o		\
+
+#------------------------------------------------------------------------------
+# Initializing modules in the required initialization order
+#------------------------------------------------------------------------------
+MAKE_INIT =			tools/make_init.pl
+INIT = \
+	model.h 		\
 
 #------------------------------------------------------------------------------
 # variables
@@ -408,30 +420,48 @@ new:
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
 
+#------------------------------------------------------------------------------
+# init module
+#------------------------------------------------------------------------------
+init.c init.h : $(INIT) $(MAKE_INIT) $(MAKEFILE)
+	perl $(MAKE_INIT) $(INIT)
+	
+#------------------------------------------------------------------------------
 # flex
+#------------------------------------------------------------------------------
 scan.c scan.h : scan.l
 	flex -L scan.l
 	perl -i.bak -ne "print unless /^#line/" scan.c scan.h
 	$(RM) scan.c.bak scan.h.bak
 
+#------------------------------------------------------------------------------
 # bison
+#------------------------------------------------------------------------------
 parse.c parse.h : parse.y
 	bison parse.y
 	
+#------------------------------------------------------------------------------
+# intall
+#------------------------------------------------------------------------------
 install:
 	install $(TARGET) $(PREFIX)/bin/
 
+#------------------------------------------------------------------------------
+# clean
+#------------------------------------------------------------------------------
 clean :
 	$(RM) *.o *.exe *~ *.bak *.orig core $(TARGET) test* t/*.tmp t/developer/*.tmp 
 	$(RM) microman.bin microman.tap mandel.bin mandel.tap zcc_opt.def
 	$(RM) -rf Debug Release x1 x2 x3
 
+#------------------------------------------------------------------------------
 # test
+#------------------------------------------------------------------------------
 test : $(TARGET)
 	$(MAKE) new    prove
 	$(MAKE) legacy prove
 
-prove:
+prove: $(TARGET)
 	perl -S prove t/*.t
 
 testmsvc : $(MSVC_TARGET)
@@ -491,124 +521,114 @@ gccmake.bat : Makefile
 	
 # Dependencies
 depend:
-	makedepend -Y -- $(CFLAGS) -- $(OBJS:.o=.c)
+	makedepend -Y $(OBJS:.o=.c)
 	perl -i.bak -pe "s!\.\.\/config\.h!!g" Makefile
 
 # DO NOT DELETE
 
-asmdrctv.o: memalloc.h except.h e4c.h codearea.h types.h config.h 
-asmdrctv.o: errors.h errors_def.h file.h safestr.h strlist.h class.h queue.h
+asmdrctv.o: memalloc.h codearea.h types.h config.h  errors.h
+asmdrctv.o: errors_def.h file.h safestr.h strlist.h class.h queue.h
 asmdrctv.o: listfile.h dynstr.h symref.h classlist.h options.h symbol.h
 asmdrctv.o: model.h objfile.h symtab.h classhash.h strhash.h uthash.h die.h
 asmdrctv.o: sym.h token_def.h srcfile.h z80asm.h
-class.o: memalloc.h except.h e4c.h class.h queue.h types.h die.h
-codearea.o: memalloc.h except.h e4c.h codearea.h types.h config.h 
-codearea.o: errors.h errors_def.h symbol.h model.h objfile.h class.h queue.h
-codearea.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h symref.h
-codearea.o: classlist.h token_def.h z80asm.h file.h safestr.h strlist.h
-codearea.o: listfile.h dynstr.h
-deffile.o: memalloc.h except.h e4c.h deffile.h file.h safestr.h types.h
-deffile.o: strlist.h class.h queue.h listfile.h dynstr.h symref.h classlist.h
-deffile.o: options.h symbol.h model.h objfile.h symtab.h classhash.h
-deffile.o: strhash.h uthash.h die.h sym.h token_def.h z80asm.h config.h
-deffile.o: 
-die.o: memalloc.h except.h e4c.h die.h types.h strutil.h safestr.h
-dynstr.o: memalloc.h except.h e4c.h dynstr.h class.h queue.h types.h
-dynstr.o: strutil.h
-errors.o: memalloc.h except.h e4c.h class.h queue.h types.h errors.h
-errors.o: errors_def.h file.h safestr.h strlist.h strhash.h uthash.h die.h
-errors.o: strpool.h strutil.h
-except.o: memalloc.h except.h e4c.h types.h die.h e4c.c
-exprprsr.o: memalloc.h except.h e4c.h config.h  symbol.h model.h
-exprprsr.o: objfile.h class.h queue.h types.h symtab.h classhash.h strhash.h
-exprprsr.o: uthash.h die.h sym.h symref.h classlist.h token_def.h options.h
-exprprsr.o: errors.h errors_def.h file.h safestr.h strlist.h codearea.h
-exprprsr.o: z80asm.h legacy.h
-file.o: memalloc.h except.h e4c.h class.h queue.h types.h config.h
-file.o:  errors.h errors_def.h file.h safestr.h strlist.h
-file.o: strpool.h strutil.h uthash.h die.h
-hist.o: memalloc.h except.h e4c.h hist.h
-ldinstr.o: memalloc.h except.h e4c.h config.h  z80asm.h types.h
-ldinstr.o: sym.h class.h queue.h symref.h classlist.h symbol.h model.h
-ldinstr.o: objfile.h symtab.h classhash.h strhash.h uthash.h die.h
-ldinstr.o: token_def.h errors.h errors_def.h codearea.h options.h
-listfile.o: memalloc.h except.h e4c.h listfile.h class.h queue.h types.h
-listfile.o: dynstr.h symref.h classlist.h file.h safestr.h strlist.h
-listfile.o: options.h symbol.h model.h objfile.h symtab.h classhash.h
-listfile.o: strhash.h uthash.h die.h sym.h token_def.h z80asm.h config.h
-listfile.o:  errors.h errors_def.h hist.h strpool.h strutil.h
-listfile.o: codearea.h
-mapfile.o: memalloc.h except.h e4c.h file.h safestr.h types.h strlist.h
-mapfile.o: class.h queue.h listfile.h dynstr.h symref.h classlist.h mapfile.h
-mapfile.o: options.h symbol.h model.h objfile.h symtab.h classhash.h
-mapfile.o: strhash.h uthash.h die.h sym.h token_def.h strpool.h z80asm.h
-mapfile.o: config.h 
-memalloc.o: memalloc.h except.h e4c.h types.h die.h queue.h
-modlink.o: memalloc.h except.h e4c.h codearea.h types.h config.h 
-modlink.o: errors.h errors_def.h file.h safestr.h strlist.h class.h queue.h
-modlink.o: listfile.h dynstr.h symref.h classlist.h options.h symbol.h
-modlink.o: model.h objfile.h symtab.h classhash.h strhash.h uthash.h die.h
-modlink.o: sym.h token_def.h strpool.h strutil.h z80asm.h
-module.o: memalloc.h except.h e4c.h module.h class.h queue.h types.h
-module.o: classlist.h dynstr.h symtab.h classhash.h strhash.h uthash.h die.h
-module.o: sym.h symref.h
-objfile.o: memalloc.h except.h e4c.h class.h queue.h types.h errors.h
-objfile.o: errors_def.h file.h safestr.h strlist.h objfile.h strpool.h
-objfile.o: legacy.h
-options.o: memalloc.h except.h e4c.h errors.h errors_def.h file.h safestr.h
-options.o: types.h strlist.h class.h queue.h options.h symbol.h model.h
-options.o: objfile.h symtab.h classhash.h strhash.h uthash.h die.h sym.h
-options.o: symref.h classlist.h token_def.h srcfile.h dynstr.h strpool.h
-options.o: z80asm.h config.h 
-parse.o: memalloc.h except.h e4c.h
-prsident.o: memalloc.h except.h e4c.h codearea.h types.h config.h 
-prsident.o: errors.h errors_def.h listfile.h class.h queue.h dynstr.h
-prsident.o: symref.h classlist.h options.h symbol.h model.h objfile.h
-prsident.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h token_def.h
-prsident.o: z80asm.h
-prsline.o: memalloc.h except.h e4c.h config.h  z80asm.h types.h
-prsline.o: sym.h class.h queue.h symref.h classlist.h symbol.h model.h
-prsline.o: objfile.h symtab.h classhash.h strhash.h uthash.h die.h
-prsline.o: token_def.h options.h errors.h errors_def.h
-safestr.o: memalloc.h except.h e4c.h safestr.h types.h strutil.h
-scan.o: memalloc.h except.h e4c.h parse.h types.h codearea.h class.h queue.h
-scan.o: classlist.h die.h dynstr.h errors.h errors_def.h listfile.h symref.h
-scan.o: options.h symbol.h model.h objfile.h symtab.h classhash.h strhash.h
-scan.o: uthash.h sym.h token_def.h srcfile.h strpool.h strutil.h
-srcfile.o: memalloc.h except.h e4c.h codearea.h types.h errors.h errors_def.h
-srcfile.o: file.h safestr.h strlist.h class.h queue.h listfile.h dynstr.h
-srcfile.o: symref.h classlist.h options.h symbol.h model.h objfile.h symtab.h
+class.o: memalloc.h class.h queue.h types.h die.h
+codearea.o: memalloc.h codearea.h types.h config.h  errors.h
+codearea.o: errors_def.h symbol.h model.h objfile.h class.h queue.h symtab.h
+codearea.o: classhash.h strhash.h uthash.h die.h sym.h symref.h classlist.h
+codearea.o: token_def.h z80asm.h file.h safestr.h strlist.h listfile.h
+codearea.o: dynstr.h
+deffile.o: memalloc.h deffile.h file.h safestr.h types.h strlist.h class.h
+deffile.o: queue.h listfile.h dynstr.h symref.h classlist.h options.h
+deffile.o: symbol.h model.h objfile.h symtab.h classhash.h strhash.h uthash.h
+deffile.o: die.h sym.h token_def.h z80asm.h config.h 
+die.o: memalloc.h die.h
+dynstr.o: memalloc.h dynstr.h class.h queue.h types.h strutil.h
+errors.o: memalloc.h class.h queue.h types.h errors.h errors_def.h file.h
+errors.o: safestr.h strlist.h strhash.h uthash.h die.h strpool.h strutil.h
+errors.o: except.h
+except.o: memalloc.h except.h die.h types.h
+exprprsr.o: memalloc.h codearea.h types.h config.h  errors.h
+exprprsr.o: errors_def.h file.h safestr.h strlist.h class.h queue.h legacy.h
+exprprsr.o: options.h symbol.h model.h objfile.h symtab.h classhash.h
+exprprsr.o: strhash.h uthash.h die.h sym.h symref.h classlist.h token_def.h
+exprprsr.o: except.h z80asm.h
+file.o: memalloc.h class.h queue.h types.h config.h  errors.h
+file.o: errors_def.h file.h safestr.h strlist.h strpool.h strutil.h uthash.h
+file.o: die.h
+hist.o: memalloc.h hist.h
+init.o: model.h
+ldinstr.o: memalloc.h config.h  z80asm.h types.h sym.h class.h
+ldinstr.o: queue.h symref.h classlist.h symbol.h model.h objfile.h symtab.h
+ldinstr.o: classhash.h strhash.h uthash.h die.h token_def.h errors.h
+ldinstr.o: errors_def.h codearea.h options.h
+listfile.o: memalloc.h listfile.h class.h queue.h types.h dynstr.h symref.h
+listfile.o: classlist.h file.h safestr.h strlist.h options.h symbol.h model.h
+listfile.o: objfile.h symtab.h classhash.h strhash.h uthash.h die.h sym.h
+listfile.o: token_def.h z80asm.h config.h  errors.h errors_def.h
+listfile.o: hist.h strpool.h strutil.h codearea.h
+mapfile.o: memalloc.h file.h safestr.h types.h strlist.h class.h queue.h
+mapfile.o: listfile.h dynstr.h symref.h classlist.h mapfile.h options.h
+mapfile.o: symbol.h model.h objfile.h symtab.h classhash.h strhash.h uthash.h
+mapfile.o: die.h sym.h token_def.h strpool.h z80asm.h config.h 
+memalloc.o: memalloc.h types.h die.h queue.h
+modlink.o: memalloc.h codearea.h types.h config.h  errors.h
+modlink.o: errors_def.h file.h safestr.h strlist.h class.h queue.h listfile.h
+modlink.o: dynstr.h symref.h classlist.h options.h symbol.h model.h objfile.h
+modlink.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h token_def.h
+modlink.o: strpool.h strutil.h except.h z80asm.h
+module.o: memalloc.h module.h class.h queue.h types.h classlist.h dynstr.h
+module.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h symref.h
+objfile.o: memalloc.h class.h queue.h types.h errors.h errors_def.h file.h
+objfile.o: safestr.h strlist.h objfile.h strpool.h legacy.h
+options.o: memalloc.h errors.h errors_def.h file.h safestr.h types.h
+options.o: strlist.h class.h queue.h options.h symbol.h model.h objfile.h
+options.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h symref.h
+options.o: classlist.h token_def.h srcfile.h dynstr.h strpool.h z80asm.h
+options.o: config.h 
+parse.o: memalloc.h
+prsident.o: memalloc.h codearea.h types.h config.h  errors.h
+prsident.o: errors_def.h listfile.h class.h queue.h dynstr.h symref.h
+prsident.o: classlist.h options.h symbol.h model.h objfile.h symtab.h
+prsident.o: classhash.h strhash.h uthash.h die.h sym.h token_def.h z80asm.h
+prsline.o: memalloc.h config.h  z80asm.h types.h sym.h class.h
+prsline.o: queue.h symref.h classlist.h symbol.h model.h objfile.h symtab.h
+prsline.o: classhash.h strhash.h uthash.h die.h token_def.h options.h
+prsline.o: errors.h errors_def.h
+safestr.o: memalloc.h safestr.h types.h strutil.h
+scan.o: memalloc.h parse.h types.h codearea.h class.h queue.h classlist.h
+scan.o: die.h dynstr.h errors.h errors_def.h listfile.h symref.h options.h
+scan.o: symbol.h model.h objfile.h symtab.h classhash.h strhash.h uthash.h
+scan.o: sym.h token_def.h srcfile.h strpool.h strutil.h
+srcfile.o: memalloc.h codearea.h types.h errors.h errors_def.h file.h
+srcfile.o: safestr.h strlist.h class.h queue.h listfile.h dynstr.h symref.h
+srcfile.o: classlist.h options.h symbol.h model.h objfile.h symtab.h
 srcfile.o: classhash.h strhash.h uthash.h die.h sym.h token_def.h srcfile.h
 srcfile.o: strpool.h
-strhash.o: memalloc.h except.h e4c.h strhash.h types.h class.h queue.h
-strhash.o: uthash.h die.h strpool.h
-strlist.o: memalloc.h except.h e4c.h strlist.h class.h queue.h types.h
-strlist.o: strpool.h
-strpool.o: memalloc.h except.h e4c.h strpool.h class.h queue.h types.h
-strpool.o: uthash.h die.h
-strutil.o: memalloc.h except.h e4c.h strutil.h
-sym.o: memalloc.h except.h e4c.h listfile.h class.h queue.h types.h dynstr.h
-sym.o: symref.h classlist.h options.h symbol.h model.h objfile.h symtab.h
-sym.o: classhash.h strhash.h uthash.h die.h sym.h token_def.h safestr.h
-sym.o: strpool.h
-symref.o: memalloc.h except.h e4c.h symref.h class.h queue.h types.h
-symref.o: classlist.h
-symtab.o: memalloc.h except.h e4c.h errors.h errors_def.h listfile.h class.h
-symtab.o: queue.h types.h dynstr.h symref.h classlist.h options.h symbol.h
-symtab.o: model.h objfile.h symtab.h classhash.h strhash.h uthash.h die.h
-symtab.o: sym.h token_def.h z80asm.h config.h 
-z80asm.o: memalloc.h except.h e4c.h codearea.h types.h config.h 
-z80asm.o: deffile.h errors.h errors_def.h file.h safestr.h strlist.h class.h
-z80asm.o: queue.h hist.h listfile.h dynstr.h symref.h classlist.h mapfile.h
-z80asm.o: objfile.h options.h symbol.h model.h symtab.h classhash.h strhash.h
-z80asm.o: uthash.h die.h sym.h token_def.h strpool.h strutil.h z80asm.h
-z80asm.o: legacy.h
-z80instr.o: memalloc.h except.h e4c.h config.h  z80asm.h types.h
-z80instr.o: sym.h class.h queue.h symref.h classlist.h symbol.h model.h
-z80instr.o: objfile.h symtab.h classhash.h strhash.h uthash.h die.h
-z80instr.o: token_def.h options.h errors.h errors_def.h codearea.h
-z80pass.o: memalloc.h except.h e4c.h codearea.h types.h config.h 
-z80pass.o: errors.h errors_def.h file.h safestr.h strlist.h class.h queue.h
-z80pass.o: hist.h listfile.h dynstr.h symref.h classlist.h model.h options.h
+strhash.o: memalloc.h strhash.h types.h class.h queue.h uthash.h die.h
+strhash.o: strpool.h
+strlist.o: memalloc.h strlist.h class.h queue.h types.h strpool.h
+strpool.o: memalloc.h strpool.h class.h queue.h types.h uthash.h die.h
+strutil.o: memalloc.h strutil.h
+sym.o: memalloc.h listfile.h class.h queue.h types.h dynstr.h symref.h
+sym.o: classlist.h options.h symbol.h model.h objfile.h symtab.h classhash.h
+sym.o: strhash.h uthash.h die.h sym.h token_def.h safestr.h strpool.h
+symref.o: memalloc.h symref.h class.h queue.h types.h classlist.h
+symtab.o: memalloc.h errors.h errors_def.h listfile.h class.h queue.h types.h
+symtab.o: dynstr.h symref.h classlist.h options.h symbol.h model.h objfile.h
+symtab.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h token_def.h
+symtab.o: z80asm.h config.h 
+z80asm.o: memalloc.h codearea.h types.h config.h  deffile.h
+z80asm.o: errors.h errors_def.h file.h safestr.h strlist.h class.h queue.h
+z80asm.o: hist.h init.h model.h legacy.h listfile.h dynstr.h symref.h
+z80asm.o: classlist.h mapfile.h objfile.h options.h symbol.h symtab.h
+z80asm.o: classhash.h strhash.h uthash.h die.h sym.h token_def.h strpool.h
+z80asm.o: strutil.h except.h z80asm.h
+z80instr.o: memalloc.h config.h  z80asm.h types.h sym.h class.h
+z80instr.o: queue.h symref.h classlist.h symbol.h model.h objfile.h symtab.h
+z80instr.o: classhash.h strhash.h uthash.h die.h token_def.h options.h
+z80instr.o: errors.h errors_def.h codearea.h
+z80pass.o: memalloc.h codearea.h types.h config.h  errors.h
+z80pass.o: errors_def.h file.h safestr.h strlist.h class.h queue.h hist.h
+z80pass.o: listfile.h dynstr.h symref.h classlist.h model.h options.h
 z80pass.o: symbol.h objfile.h symtab.h classhash.h strhash.h uthash.h die.h
 z80pass.o: sym.h token_def.h scan.h parse.h strutil.h z80asm.h
