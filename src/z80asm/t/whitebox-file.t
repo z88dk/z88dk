@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.11 2013-05-12 19:20:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.12 2013-09-01 11:52:55 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.11  2013-05-12 19:20:34  pauloscustodio
+# Revision 1.12  2013-09-01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.11  2013/05/12 19:20:34  pauloscustodio
 # warnings
 #
 # Revision 1.10  2013/05/11 00:29:26  pauloscustodio
@@ -64,7 +68,7 @@ use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
 my $objs = "file.o errors.o strlist.o strhash.o strpool.o class.o ".
-		   "die.o strutil.o safestr.o except.o";
+		   "die.o strutil.o safestr.o except.o init.o";
 my $objs_r = "$objs                  memalloc.o";
 my $objs_d = "$objs -DMEMALLOC_DEBUG memalloc.c";
 
@@ -472,10 +476,10 @@ t_compile_module('', <<'END', $objs_d);
 END
 
 t_run_module([], "", <<'END', 0);
+memalloc: init
 
 ---- TEST: xfopen ----
 
-memalloc: init
 memalloc errors.c(1): alloc 40 bytes at ADDR_1
 memalloc strpool.c(1): alloc 32 bytes at ADDR_2
 memalloc strhash.c(1): alloc 32 bytes at ADDR_3

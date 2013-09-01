@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.5 2013-09-01 00:18:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.6 2013-09-01 11:52:56 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.5  2013-09-01 00:18:30  pauloscustodio
+# Revision 1.6  2013-09-01 11:52:56  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.5  2013/09/01 00:18:30  pauloscustodio
 # - Replaced e4c exception mechanism by a much simpler one based on a few
 #   macros. The former did not allow an exit(1) to be called within a
 #   try-catch block.
@@ -45,7 +49,7 @@ require 't/test_utils.pl';
 
 # test memalloc
 my $objs = "srcfile.o file.o errors.o strlist.o strhash.o dynstr.o strpool.o class.o ".
-		   "die.o strutil.o safestr.o except.o";
+		   "die.o strutil.o safestr.o except.o init.o";
 ok ! system "make $objs";
 my $compile   = "                 memalloc.c $objs";
 my $compile_d = "-DMEMALLOC_DEBUG memalloc.c $objs";

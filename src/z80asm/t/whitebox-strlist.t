@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.9 2013-02-27 20:47:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.10 2013-09-01 11:52:56 pauloscustodio Exp $
 # $Log: whitebox-strlist.t,v $
-# Revision 1.9  2013-02-27 20:47:30  pauloscustodio
+# Revision 1.10  2013-09-01 11:52:56  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.9  2013/02/27 20:47:30  pauloscustodio
 # Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
 #
 # Revision 1.8  2013/02/25 21:36:17  pauloscustodio
@@ -51,7 +55,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test memalloc
-my $objs = "strlist.o strpool.o class.o die.o strutil.o safestr.o except.o";
+my $objs = "strlist.o strpool.o class.o die.o strutil.o safestr.o except.o init.o";
 ok ! system "make $objs";
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 

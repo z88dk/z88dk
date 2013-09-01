@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.10 2013-09-01 00:18:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.11 2013-09-01 11:52:56 pauloscustodio Exp $
 # $Log: whitebox-strhash.t,v $
-# Revision 1.10  2013-09-01 00:18:30  pauloscustodio
+# Revision 1.11  2013-09-01 11:52:56  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.10  2013/09/01 00:18:30  pauloscustodio
 # - Replaced e4c exception mechanism by a much simpler one based on a few
 #   macros. The former did not allow an exit(1) to be called within a
 #   try-catch block.
@@ -74,7 +78,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test memalloc
-my $objs = "strhash.o strpool.o class.o die.o strutil.o safestr.o except.o";
+my $objs = "strhash.o strpool.o class.o die.o strutil.o safestr.o except.o init.o";
 ok ! system "make $objs";
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 
@@ -358,8 +362,8 @@ END_INIT
 END
 
 t_run_module([], "", <<ERR, 0);
-init
 memalloc: init
+init
 memalloc strhash.c(1): alloc 32 bytes at ADDR_1
 memalloc strpool.c(1): alloc 32 bytes at ADDR_2
 memalloc strhash.c(4): alloc 40 bytes at ADDR_3

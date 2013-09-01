@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classlist.t,v 1.4 2013-02-25 21:36:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classlist.t,v 1.5 2013-09-01 11:52:55 pauloscustodio Exp $
 # $Log: whitebox-classlist.t,v $
-# Revision 1.4  2013-02-25 21:36:17  pauloscustodio
+# Revision 1.5  2013-09-01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.4  2013/02/25 21:36:17  pauloscustodio
 # Uniform the APIs of classhash, classlist, strhash, strlist
 #
 # Revision 1.3  2013/01/30 20:40:07  pauloscustodio
@@ -33,7 +37,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test memalloc
-my $objs = "class.o die.o strutil.o safestr.o except.o";
+my $objs = "class.o die.o strutil.o safestr.o except.o init.o";
 ok ! system "make $objs";
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 

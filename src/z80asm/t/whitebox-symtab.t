@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.8 2013-06-16 22:25:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.9 2013-09-01 11:52:56 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.8  2013-06-16 22:25:39  pauloscustodio
+# Revision 1.9  2013-09-01 11:52:56  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.8  2013/06/16 22:25:39  pauloscustodio
 # New remove_all_{local,static,global}_syms( void ) functions
 # to encapsulate calls to get_global_tab().
 #
@@ -55,7 +59,7 @@ require 't/test_utils.pl';
 my $objs = "-DMEMALLOC_DEBUG memalloc.c ".
 		   "sym.o symtab.o symref.o ".
 		   "class.o strpool.o strutil.o safestr.o strlist.o strhash.o ".
-		   "file.o errors.o die.o except.o";
+		   "file.o errors.o die.o except.o init.o";
 
 my $init = <<'END';
 #include "symbol.h"
@@ -254,10 +258,10 @@ END
 
 # write test object file
 t_run_module([], "", <<'END', 0);
+memalloc: init
 
 ---- TEST: Create current module ----
 
-memalloc: init
 memalloc symtab.c(1): alloc 32 bytes at ADDR_1
 memalloc strhash.c(1): alloc 32 bytes at ADDR_2
 memalloc strpool.c(1): alloc 32 bytes at ADDR_3

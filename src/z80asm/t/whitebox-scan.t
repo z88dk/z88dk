@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.8 2013-09-01 00:18:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.9 2013-09-01 11:52:55 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.8  2013-09-01 00:18:30  pauloscustodio
+# Revision 1.9  2013-09-01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.8  2013/09/01 00:18:30  pauloscustodio
 # - Replaced e4c exception mechanism by a much simpler one based on a few
 #   macros. The former did not allow an exit(1) to be called within a
 #   try-catch block.
@@ -61,7 +65,8 @@ use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
 # test scan
-my $objs = "scan.o scan_token.o scan_struct.o scan_context.o class.o die.o strutil.o safestr.o except.o errors.o dynstr.o strpool.o srcfile.o strhash.o strlist.o file.o";
+my $objs = "scan.o scan_token.o scan_struct.o scan_context.o class.o die.o strutil.o safestr.o ".
+		   "except.o errors.o dynstr.o strpool.o srcfile.o strhash.o strlist.o file.o init.o";
 ok ! system "make $objs parse.h";
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 
@@ -268,8 +273,8 @@ write_file(asm11_file(), {binmode => ':raw'}, "ld a," . '0' x 20 ."1 \n".
                                               "ld b," . '0' x 20 ."1 \n");
 
 t_run_module([asm1_file()], '', <<'END', 0); 
-Read file test1.asm:
 memalloc: init
+Read file test1.asm:
 memalloc scan.c(3): alloc 28 bytes at ADDR_1
 memalloc scan.c(2): alloc 40 bytes at ADDR_2
 memalloc strpool.c(1): alloc 32 bytes at ADDR_3
@@ -1565,8 +1570,8 @@ t_compile_module($init, <<'END', $compile);
 END
 
 t_run_module([], '', <<'END', 0);
-Test: open text file
 memalloc: init
+Test: open text file
 memalloc scan.c(3): alloc 28 bytes at ADDR_1
 memalloc scan.c(2): alloc 40 bytes at ADDR_2
 memalloc strpool.c(1): alloc 32 bytes at ADDR_3
@@ -1644,8 +1649,8 @@ t_compile_module($init, <<'END', $compile);
 END
 
 t_run_module([], '', <<'END', 0);
-Test: open text file
 memalloc: init
+Test: open text file
 memalloc scan.c(3): alloc 28 bytes at ADDR_1
 memalloc scan.c(2): alloc 40 bytes at ADDR_2
 memalloc strpool.c(1): alloc 32 bytes at ADDR_3

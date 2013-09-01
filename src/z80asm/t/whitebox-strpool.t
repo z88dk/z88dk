@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strpool.t,v 1.6 2013-03-30 00:00:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strpool.t,v 1.7 2013-09-01 11:52:56 pauloscustodio Exp $
 # $Log: whitebox-strpool.t,v $
-# Revision 1.6  2013-03-30 00:00:26  pauloscustodio
+# Revision 1.7  2013-09-01 11:52:56  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.6  2013/03/30 00:00:26  pauloscustodio
 # Accept special case NULL in strpool_add, return NULL
 #
 # Revision 1.5  2013/01/20 21:24:29  pauloscustodio
@@ -45,7 +49,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test strpool
-my $objs = "strpool.o die.o strutil.o safestr.o except.o";
+my $objs = "strpool.o die.o strutil.o safestr.o except.o init.o";
 ok ! system "make $objs";
 my $compile = "-DCLASS_DEBUG -DMEMALLOC_DEBUG class.c memalloc.c $objs";
 
@@ -441,8 +445,8 @@ END_INIT
 END
 
 t_run_module([], "", <<ERR, 0);
-first run - create pool for all strings
 memalloc: init
+first run - create pool for all strings
 memalloc strpool.c(1): alloc 32 bytes at ADDR_1
 class: init
 class strpool.c(1): new class StrPool at ADDR_1

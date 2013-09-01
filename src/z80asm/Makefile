@@ -12,9 +12,252 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.69 2013-09-01 00:08:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.70 2013-09-01 11:52:55 pauloscustodio Exp $
+
+#------------------------------------------------------------------------------
+# EXE suffix
+#------------------------------------------------------------------------------
+ifeq ($(OS),Windows_NT)
+    EXE 	:= .exe
+    DLL 	:= .dll
+else
+    EXE := 
+    DLL :=
+endif
+
+
+#------------------------------------------------------------------------------
+# Using GLIB - see http://www.gtk.org/
+#
+# Compile GLIB in Unix, see http://developer.gimp.org/api/2.0/glib/glib-building.html
+#   Use GLIB: see http://developer.gimp.org/api/2.0/glib/glib-compiling.html
+#	E.g. for Debian:
+#		apt-get install pkg-config
+#		apt-get install libglib2.0
+#
+# Use GLIB in Win32/MinGW, see http://www.gtk.org/download/win32.php,
+#   Point environment variable GLIB_ROOT to root of MinGW msys 1.0 dir, e.g
+#	GLIB_ROOT=C:\MinGW\msys\1.0
+#	Extract at $(GLIB_ROOT):
+#	- glib_2.28.8-1_win32.zip
+#	- glib-dev_2.28.8-1_win32.zip
+#	- gettext-runtime_0.18.1.1-2_win32.zip
+#	- gettext-runtime-dev_0.18.1.1-2_win32.zip
+#------------------------------------------------------------------------------
+ifeq ($(OS),Windows_NT)
+
+ifndef GLIB_ROOT
+$(error Environment variable GLIB_ROOT needs to point to GLIB installation, see http://www.gtk.org/)
+endif
+
+CFLAGS 	+= -I$(GLIB_ROOT)/include/glib-2.0 -I$(GLIB_ROOT)/lib/glib-2.0/include
+LDFLAGS += -L$(GLIB_ROOT)/lib -lglib-2.0
+
+else
+
+CFLAGS 	+= $(shell pkg-config --cflags glib-2.0)
+LDFLAGS += $(shell pkg-config --libs glib-2.0)
+
+endif
+
+#------------------------------------------------------------------------------
+# Object files
+#------------------------------------------------------------------------------
+OBJS = 	\
+	asmdrctv.o 		\
+	class.o			\
+	codearea.o		\
+	deffile.o		\
+	die.o			\
+	dynstr.o		\
+	errors.o		\
+	except.o		\
+	exprprsr.o		\
+	file.o			\
+	hist.o			\
+	init.o			\
+	ldinstr.o		\
+	listfile.o		\
+	mapfile.o		\
+	memalloc.o		\
+	model.o			\
+	model_symref.o	\
+	modlink.o		\
+	module.o		\
+	objfile.o		\
+	options.o		\
+	parse.o			\
+	prsident.o		\
+	prsline.o		\
+	safestr.o		\
+	scan.o			\
+	srcfile.o		\
+	strhash.o		\
+	strlist.o		\
+	strpool.o		\
+	strutil.o		\
+	sym.o			\
+	symref.o		\
+	symtab.o		\
+	z80asm.o		\
+	z80instr.o		\
+	z80pass.o		\
+
+#------------------------------------------------------------------------------
+# Initializing modules in the required initialization order
+#------------------------------------------------------------------------------
+MAKE_INIT =			tools/make_init.pl
+INIT = \
+	memalloc.h 		\
+
+#------------------------------------------------------------------------------
+# variables
+#------------------------------------------------------------------------------
+ASTYLE = astyle \
+	--mode=c \
+	--lineend=linux \
+	--indent=spaces=4 \
+	--style=ansi --add-brackets \
+	--indent-switches --indent-classes \
+	--indent-preprocessor --convert-tabs \
+	--break-blocks \
+	--pad-oper --pad-paren-in --pad-header --unpad-paren \
+	--align-pointer=name
+
+TARGET =		z80asm$(EXE)
+MSVC_TARGET =	../../win32/Debug/$(TARGET)
+
+CFLAGS +=		-W -Wformat -Werror=format-security
+
+#------------------------------------------------------------------------------
+# main
+#------------------------------------------------------------------------------
+all: $(TARGET) gccmake.bat
+
+legacy:
+	echo "#define __LEGACY_Z80ASM_SYNTAX " > legacy.h
+	$(MAKE) depend
+	$(MAKE)
+
+new:
+	echo "#undef __LEGACY_Z80ASM_SYNTAX " > legacy.h
+	$(MAKE) depend
+	$(MAKE)
+
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
+
+#------------------------------------------------------------------------------
+# init module
+#------------------------------------------------------------------------------
+init.c init.h : $(INIT) $(MAKE_INIT) $(MAKEFILE)
+	perl $(MAKE_INIT) $(INIT)
+	
+#------------------------------------------------------------------------------
+# flex
+#------------------------------------------------------------------------------
+scan.c scan.h : scan.l
+	flex -L scan.l
+	perl -i.bak -ne "print unless /^#line/" scan.c scan.h
+	$(RM) scan.c.bak scan.h.bak
+
+#------------------------------------------------------------------------------
+# bison
+#------------------------------------------------------------------------------
+parse.c parse.h : parse.y
+	bison parse.y
+	
+#------------------------------------------------------------------------------
+# intall
+#------------------------------------------------------------------------------
+install:
+	install $(TARGET) $(PREFIX)/bin/
+
+#------------------------------------------------------------------------------
+# clean
+#------------------------------------------------------------------------------
+clean :
+	$(RM) *.o *.exe *~ *.bak *.orig core $(TARGET) test* t/*.tmp t/developer/*.tmp 
+	$(RM) microman.bin microman.tap mandel.bin mandel.tap zcc_opt.def
+	$(RM) -rf Debug Release x1 x2 x3
+
+#------------------------------------------------------------------------------
+# test
+#------------------------------------------------------------------------------
+test : $(TARGET)
+	$(MAKE) new    prove
+	$(MAKE) legacy prove
+
+prove: $(TARGET)
+	perl -S prove t/*.t
+
+testmsvc : $(MSVC_TARGET)
+	make Z80ASM=$(MSVC_TARGET) test
+
+testzcc : $(TARGET)
+	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c
+	zcc +zx -lndos -lmzx -create-app -omandel.bin   ../../examples/graphics/mandel.c
+	eightyone microman.tap
+	eightyone mandel.tap
+
+# build with msvc - need to build manualy, devenv not available in Express
+$(MSVC_TARGET) : $(wildcard *.c) $(wildcard *.h)
+	@echo Build z80asm inside Microsoft Visual C++ 2010 Express
+	@exit 1
+
+# formatting style
+astyle:
+	$(ASTYLE) *.c *.h
+
+# gccmake.bat - work arround impossibility of writing a '$' in the perl code
+gccmake.bat : Makefile
+	@perl -e " \
+			print \
+				'@echo off', qq(\n); \
+			@printed = (); \
+			open(F, 'gccmake.bat'); \
+			while (<F>) { \
+				next unless /^rem.*Id/; \
+				push @printed, 1; \
+				print; \
+				last; \
+			} \
+			close(F); \
+			@printed or print 'rem ','$$','Id','$$',qq(\n); \
+			print \
+				qq(\n), \
+				'echo *******************', qq(\n), \
+				'echo * Building z80asm *', qq(\n), \
+				'echo *******************', qq(\n), \
+				'del *.o', qq(\n); \
+			for (@ARGV) { \
+				s/\.o$$//; \
+				print 'gcc -c -o '; \
+				print; \
+				print '.o ', ' ' x (20 - length); \
+				print; \
+				print '.c'; \
+				print qq(\n); \
+			} \
+			print \
+				'gcc -o z80asm.exe *.o', qq(\n), \
+				'copy z80asm.exe ..\\..\\bin', qq(\n), \
+				'del z80asm.exe', qq(\n); \
+		" $(OBJS) > gccmake.bat.new
+	@mv gccmake.bat.new gccmake.bat
+	
+# Dependencies
+depend:
+	makedepend -Y $(OBJS:.o=.c)
+	perl -i.bak -pe "s!\.\.\/config\.h!!g" Makefile
+
+
 # $Log: Makefile,v $
-# Revision 1.69  2013-09-01 00:08:55  pauloscustodio
+# Revision 1.70  2013-09-01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.69  2013/09/01 00:08:55  pauloscustodio
 # - Included GLIB in the Makefile options.
 # - Created a code-generation mechanism for automatic execution of initialize
 #   code before the main() function starts, and methods for struct malloc
@@ -286,244 +529,7 @@
 # Revision 1.1.1.1  2000/07/04 15:33:30  dom
 # First import of z88dk into the sourceforge system <gulp>
 #
-
-#------------------------------------------------------------------------------
-# EXE suffix
-#------------------------------------------------------------------------------
-ifeq ($(OS),Windows_NT)
-    EXE 	:= .exe
-    DLL 	:= .dll
-else
-    EXE := 
-    DLL :=
-endif
-
-
-#------------------------------------------------------------------------------
-# Using GLIB - see http://www.gtk.org/
-#
-# Compile GLIB in Unix, see http://developer.gimp.org/api/2.0/glib/glib-building.html
-#   Use GLIB: see http://developer.gimp.org/api/2.0/glib/glib-compiling.html
-#	E.g. for Debian:
-#		apt-get install pkg-config
-#		apt-get install libglib2.0
-#
-# Use GLIB in Win32/MinGW, see http://www.gtk.org/download/win32.php,
-#   Point environment variable GLIB_ROOT to root of MinGW msys 1.0 dir, e.g
-#	GLIB_ROOT=C:\MinGW\msys\1.0
-#	Extract at $(GLIB_ROOT):
-#	- glib_2.28.8-1_win32.zip
-#	- glib-dev_2.28.8-1_win32.zip
-#	- gettext-runtime_0.18.1.1-2_win32.zip
-#	- gettext-runtime-dev_0.18.1.1-2_win32.zip
-#------------------------------------------------------------------------------
-ifeq ($(OS),Windows_NT)
-
-ifndef GLIB_ROOT
-$(error Environment variable GLIB_ROOT needs to point to GLIB installation, see http://www.gtk.org/)
-endif
-
-CFLAGS 	+= -I$(GLIB_ROOT)/include/glib-2.0 -I$(GLIB_ROOT)/lib/glib-2.0/include
-LDFLAGS += -L$(GLIB_ROOT)/lib -lglib-2.0
-
-else
-
-CFLAGS 	+= $(shell pkg-config --cflags glib-2.0)
-LDFLAGS += $(shell pkg-config --libs glib-2.0)
-
-endif
-
-#------------------------------------------------------------------------------
-# Object files
-#------------------------------------------------------------------------------
-OBJS = 	\
-	asmdrctv.o 		\
-	class.o			\
-	codearea.o		\
-	deffile.o		\
-	die.o			\
-	dynstr.o		\
-	errors.o		\
-	except.o		\
-	exprprsr.o		\
-	file.o			\
-	hist.o			\
-	init.o			\
-	ldinstr.o		\
-	listfile.o		\
-	mapfile.o		\
-	memalloc.o		\
-	model.o			\
-	model_symref.o	\
-	modlink.o		\
-	module.o		\
-	objfile.o		\
-	options.o		\
-	parse.o			\
-	prsident.o		\
-	prsline.o		\
-	safestr.o		\
-	scan.o			\
-	srcfile.o		\
-	strhash.o		\
-	strlist.o		\
-	strpool.o		\
-	strutil.o		\
-	sym.o			\
-	symref.o		\
-	symtab.o		\
-	z80asm.o		\
-	z80instr.o		\
-	z80pass.o		\
-
-#------------------------------------------------------------------------------
-# Initializing modules in the required initialization order
-#------------------------------------------------------------------------------
-MAKE_INIT =			tools/make_init.pl
-INIT = \
-	model.h 		\
-
-#------------------------------------------------------------------------------
-# variables
-#------------------------------------------------------------------------------
-ASTYLE = astyle \
-	--mode=c \
-	--lineend=linux \
-	--indent=spaces=4 \
-	--style=ansi --add-brackets \
-	--indent-switches --indent-classes \
-	--indent-preprocessor --convert-tabs \
-	--break-blocks \
-	--pad-oper --pad-paren-in --pad-header --unpad-paren \
-	--align-pointer=name
-
-TARGET =		z80asm$(EXE)
-MSVC_TARGET =	../../win32/Debug/$(TARGET)
-
-CFLAGS +=		-W -Wformat -Werror=format-security
-
-#------------------------------------------------------------------------------
-# main
-#------------------------------------------------------------------------------
-all: $(TARGET) gccmake.bat
-
-legacy:
-	echo "#define __LEGACY_Z80ASM_SYNTAX " > legacy.h
-	$(MAKE) depend
-	$(MAKE)
-
-new:
-	echo "#undef __LEGACY_Z80ASM_SYNTAX " > legacy.h
-	$(MAKE) depend
-	$(MAKE)
-
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
-
-#------------------------------------------------------------------------------
-# init module
-#------------------------------------------------------------------------------
-init.c init.h : $(INIT) $(MAKE_INIT) $(MAKEFILE)
-	perl $(MAKE_INIT) $(INIT)
 	
-#------------------------------------------------------------------------------
-# flex
-#------------------------------------------------------------------------------
-scan.c scan.h : scan.l
-	flex -L scan.l
-	perl -i.bak -ne "print unless /^#line/" scan.c scan.h
-	$(RM) scan.c.bak scan.h.bak
-
-#------------------------------------------------------------------------------
-# bison
-#------------------------------------------------------------------------------
-parse.c parse.h : parse.y
-	bison parse.y
-	
-#------------------------------------------------------------------------------
-# intall
-#------------------------------------------------------------------------------
-install:
-	install $(TARGET) $(PREFIX)/bin/
-
-#------------------------------------------------------------------------------
-# clean
-#------------------------------------------------------------------------------
-clean :
-	$(RM) *.o *.exe *~ *.bak *.orig core $(TARGET) test* t/*.tmp t/developer/*.tmp 
-	$(RM) microman.bin microman.tap mandel.bin mandel.tap zcc_opt.def
-	$(RM) -rf Debug Release x1 x2 x3
-
-#------------------------------------------------------------------------------
-# test
-#------------------------------------------------------------------------------
-test : $(TARGET)
-	$(MAKE) new    prove
-	$(MAKE) legacy prove
-
-prove: $(TARGET)
-	perl -S prove t/*.t
-
-testmsvc : $(MSVC_TARGET)
-	make Z80ASM=$(MSVC_TARGET) test
-
-testzcc : $(TARGET)
-	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c
-	zcc +zx -lndos -lmzx -create-app -omandel.bin   ../../examples/graphics/mandel.c
-	eightyone microman.tap
-	eightyone mandel.tap
-
-# build with msvc - need to build manualy, devenv not available in Express
-$(MSVC_TARGET) : $(wildcard *.c) $(wildcard *.h)
-	@echo Build z80asm inside Microsoft Visual C++ 2010 Express
-	@exit 1
-
-# formatting style
-astyle:
-	$(ASTYLE) *.c *.h
-
-# gccmake.bat - work arround impossibility of writing a '$' in the perl code
-gccmake.bat : Makefile
-	@perl -e " \
-			print \
-				'@echo off', qq(\n); \
-			@printed = (); \
-			open(F, 'gccmake.bat'); \
-			while (<F>) { \
-				next unless /^rem.*Id/; \
-				push @printed, 1; \
-				print; \
-				last; \
-			} \
-			close(F); \
-			@printed or print 'rem ','$$','Id','$$',qq(\n); \
-			print \
-				qq(\n), \
-				'echo *******************', qq(\n), \
-				'echo * Building z80asm *', qq(\n), \
-				'echo *******************', qq(\n), \
-				'del *.o', qq(\n); \
-			for (@ARGV) { \
-				s/\.o$$//; \
-				print 'gcc -c -o '; \
-				print; \
-				print '.o ', ' ' x (20 - length); \
-				print; \
-				print '.c'; \
-				print qq(\n); \
-			} \
-			print \
-				'gcc -o z80asm.exe *.o', qq(\n), \
-				'copy z80asm.exe ..\\..\\bin', qq(\n), \
-				'del z80asm.exe', qq(\n); \
-		" $(OBJS) > gccmake.bat.new
-	@mv gccmake.bat.new gccmake.bat
-	
-# Dependencies
-depend:
-	makedepend -Y $(OBJS:.o=.c)
-	perl -i.bak -pe "s!\.\.\/config\.h!!g" Makefile
-
 # DO NOT DELETE
 
 asmdrctv.o: memalloc.h codearea.h types.h config.h  errors.h
@@ -556,7 +562,7 @@ file.o: memalloc.h class.h queue.h types.h config.h  errors.h
 file.o: errors_def.h file.h safestr.h strlist.h strpool.h strutil.h uthash.h
 file.o: die.h
 hist.o: memalloc.h hist.h
-init.o: model.h
+init.o: memalloc.h
 ldinstr.o: memalloc.h config.h  z80asm.h types.h sym.h class.h
 ldinstr.o: queue.h symref.h classlist.h symbol.h model.h objfile.h symtab.h
 ldinstr.o: classhash.h strhash.h uthash.h die.h token_def.h errors.h
@@ -619,10 +625,10 @@ symtab.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h token_def.h
 symtab.o: z80asm.h config.h 
 z80asm.o: memalloc.h codearea.h types.h config.h  deffile.h
 z80asm.o: errors.h errors_def.h file.h safestr.h strlist.h class.h queue.h
-z80asm.o: hist.h init.h model.h legacy.h listfile.h dynstr.h symref.h
-z80asm.o: classlist.h mapfile.h objfile.h options.h symbol.h symtab.h
-z80asm.o: classhash.h strhash.h uthash.h die.h sym.h token_def.h strpool.h
-z80asm.o: strutil.h except.h z80asm.h
+z80asm.o: hist.h init.h legacy.h listfile.h dynstr.h symref.h classlist.h
+z80asm.o: mapfile.h objfile.h options.h symbol.h model.h symtab.h classhash.h
+z80asm.o: strhash.h uthash.h die.h sym.h token_def.h strpool.h strutil.h
+z80asm.o: except.h z80asm.h
 z80instr.o: memalloc.h config.h  z80asm.h types.h sym.h class.h
 z80instr.o: queue.h symref.h classlist.h symbol.h model.h objfile.h symtab.h
 z80instr.o: classhash.h strhash.h uthash.h die.h token_def.h options.h

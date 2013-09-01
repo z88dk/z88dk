@@ -13,159 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.38 2013-09-01 00:18:30 pauloscustodio Exp $
-# $Log: test_utils.pl,v $
-# Revision 1.38  2013-09-01 00:18:30  pauloscustodio
-# - Replaced e4c exception mechanism by a much simpler one based on a few
-#   macros. The former did not allow an exit(1) to be called within a
-#   try-catch block.
-#
-# Revision 1.37  2013/08/30 21:50:43  pauloscustodio
-# By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
-# as an identifier reserved by the C standard for implementation-defined behaviour
-# starting with two underscores.
-#
-# Revision 1.36  2013/08/30 01:06:08  pauloscustodio
-# New C-like expressions, defined when __LEGACY_Z80ASM_SYNTAX is not defined. Keeps old
-# behaviour under -D__LEGACY_Z80ASM_SYNTAX (defined in legacy.h)
-#
-# BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-D__LEGACY_Z80ASM_SYNTAX)
-# - Expressions now use more standard C-like operators
-# - Object and library files changed signature to
-#   "Z80RMF02", "Z80LMF02", to avoid usage of old
-#   object files with expressions inside in the old format
-#
-# Detail:
-# - String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
-# - Power:                        changed from '^' to '**'; '^' will be XOR
-# - XOR:                          changed from ':' to '^';
-# - AND:                          changed from '~' to '&';  '~' will be NOT
-# - NOT:                          '~' added as binary not
-#
-# Revision 1.35  2013/06/03 23:21:35  pauloscustodio
-# show wdiff on t_binary() failure
-#
-# Revision 1.34  2013/06/01 01:19:58  pauloscustodio
-# Add linkerr to t_z80asm() for compile OK but failed link.
-#
-# Revision 1.33  2013/05/27 22:45:13  pauloscustodio
-# Allow ASSERT to be used in INIT code in t_compile_module()
-#
-# Revision 1.32  2013/05/16 22:45:21  pauloscustodio
-# Add ObjFile to struct module
-# Use ObjFile to check for valid object file
-#
-# Revision 1.31  2013/05/12 19:41:21  pauloscustodio
-# write binfile
-#
-# Revision 1.30  2013/05/11 00:29:26  pauloscustodio
-# CH_0021 : Exceptions on file IO show file name
-# Keep a hash table of all opened file names, so that the file name
-# is shown on a fatal error.
-# Rename file IO funtions: f..._err to xf...
-#
-# Revision 1.29  2013/03/29 23:53:08  pauloscustodio
-# Added GNU Flex-based scanner. Not yet integrated into assembler.
-#
-# Revision 1.28  2013/03/04 23:23:37  pauloscustodio
-# Removed writeline, that was used to cancel listing of multi-line
-# constructs, as only the first line was shown on the list file. Fixed
-# the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
-#
-# Revision 1.27  2013/02/27 22:32:38  pauloscustodio
-# Abort test at t_compile_module() if compilation failed
-#
-# Revision 1.26  2013/02/25 21:37:30  pauloscustodio
-# Show output difference of t_run_module() in visual-diff, to allow easy merge of changes
-#
-# Revision 1.25  2013/02/22 17:26:34  pauloscustodio
-# Decouple assembler from listfile handling
-#
-# Revision 1.24  2013/02/19 22:52:40  pauloscustodio
-# BUG_0030 : List bytes patching overwrites header
-# BUG_0031 : List file garbled with input lines with 255 chars
-# New listfile.c with all the listing related code
-#
-# Revision 1.23  2013/02/12 00:55:00  pauloscustodio
-# CH_0017 : Align with spaces, deprecate -t option
-#
-# Revision 1.22  2013/02/11 21:54:38  pauloscustodio
-# BUG_0026 : Incorrect paging in symbol list
-#
-# Revision 1.21  2013/01/20 13:18:10  pauloscustodio
-# BUG_0024 : (ix+128) should show warning message
-# Signed integer range was wrongly checked to -128..255 instead
-# of -128..127
-#
-# Revision 1.20  2013/01/14 00:22:31  pauloscustodio
-# Allow t_z80asm_ok() with warnings
-#
-# Revision 1.19  2012/06/07 10:17:57  pauloscustodio
-# delay after deleting files before calling new z80asm
-#
-# Revision 1.18  2012/05/29 21:02:19  pauloscustodio
-# Changes for linux:
-# - call ./z80asm instead of z80asm
-# - memory addresses appear as 0x0xHHHH in Linux (one 0x by user, one by %p)
-#
-# Revision 1.17  2012/05/26 18:50:26  pauloscustodio
-# Use .o instead of .c to build test program, faster compilation.
-# Use gcc to compile instead of cc.
-#
-# Revision 1.16  2012/05/24 10:58:39  pauloscustodio
-# BUG_0018 : stack overflow in '@' includes - wrong range check
-#
-# Revision 1.15  2012/05/23 19:57:59  pauloscustodio
-# Test that files created with -c have correct content
-#
-# Revision 1.14  2012/05/22 20:33:34  pauloscustodio
-# Added tests
-#
-# Revision 1.13  2012/05/20 05:51:19  pauloscustodio
-# Need more test files, mask error return after exception
-#
-# Revision 1.12  2012/05/20 05:40:00  pauloscustodio
-# test asm only delete main test files before attempting to assemble, create other test files for multipl-object assembly
-#
-# Revision 1.11  2012/05/17 15:03:37  pauloscustodio
-# Add functions to white-box test C modules by compiling and running a test C main() function
-#
-# Revision 1.10  2012/05/11 19:41:26  pauloscustodio
-# white space
-#
-# Revision 1.9  2012/04/22 20:34:13  pauloscustodio
-# tab width
-#
-# Revision 1.8	2011/10/07 17:29:10  pauloscustodio
-# Add test functions for lib file format
-#
-# Revision 1.7	2011/08/18 21:49:44  pauloscustodio
-# add objfile() to generate expected object file format
-#
-# Revision 1.6	2011/08/14 19:49:05  pauloscustodio
-# - Added test case to verify that incomplete files are deleted on error
-#
-# Revision 1.5	2011/07/14 01:32:09  pauloscustodio
-#	  - Unified "Integer out of range" and "Out of range" errors; they are the same error.
-#	  - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
-#	  CH_0003 : Error messages should be more informative
-#		  - Added printf-args to error messages, added "Error:" prefix.
-#	  BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
-#		  - Raise ERR_UNBALANCED_PAREN instead
-#
-# Revision 1.4	2011/07/11 16:23:44  pauloscustodio
-# Factor capture code in t_z80asm_capture() in test_utils.pl
-#
-# Revision 1.3	2011/07/09 18:25:35  pauloscustodio
-# Log keyword in checkin comment was expanded inside Log expansion... recursive
-# Added Z80asm banner to all source files
-#
-# Revision 1.2	2011/07/09 17:36:09  pauloscustodio
-# Copied cvs log into Log history
-#
-# Revision 1.1	2011/07/09 01:02:45  pauloscustodio
-# Started to build test suite in t/ *.t unsing Perl prove. Included test for all standard
-# Z80 opcodes; need to be extended with directives and opcodes for Z80 variants.
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.39 2013-09-01 11:52:55 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -175,6 +23,25 @@ use Capture::Tiny::Extended 'capture';
 use Test::Differences; 
 use List::AllUtils 'uniq';
 use Data::HexDump;
+
+my $CFLAGS;
+my $LDFLAGS;
+BEGIN {
+	open(my $pipe, "make -p|") or die;
+	while (<$pipe>) {
+		if (/^CFLAGS\s*=\s*(.*)/) {
+			$CFLAGS = $1;
+			$CFLAGS =~ s/\$\((\w+)\)/ $ENV{$1} /ge;
+			last if $LDFLAGS;
+		}
+		elsif (/^LDFLAGS\s*=\s*(.*)/) {
+			$LDFLAGS = $1;
+			$LDFLAGS =~ s/\$\((\w+)\)/ $ENV{$1} /ge;
+			last if $CFLAGS;
+		}
+	}
+	close($pipe) or die;
+};
 
 my $STOP_ON_ERR = grep {/-stop/} @ARGV; 
 my $KEEP_FILES	= grep {/-keep/} @ARGV; 
@@ -657,12 +524,13 @@ int _exception_raised;
 #define TITLE(title)	fprintf(stderr, "\n---- TEST: %s ----\n\n", (title) )
 
 #define TEST_DIE(err_condition, err_message, expr_str) \
-			if ( err_condition ) { \
-				fprintf(stderr, err_message " (%s) at file %s, line %d\n", \
-								expr_str, __FILE__, __LINE__); \
-				exit(1); \
-			} \
-			else
+			do { \
+				if ( err_condition ) { \
+					fprintf(stderr, err_message " (%s) at file %s, line %d\n", \
+									expr_str, __FILE__, __LINE__); \
+					exit(1); \
+				} \
+			} while(0)
 
 #define ASSERT(expr) 			TEST_DIE( ! (expr), "TEST FAILED", #expr )
 
@@ -707,7 +575,7 @@ int main (int argc, char **argv) {
 	write_file("test.c", $main_code);
 
 	# build
-	my $cc = "cc -o test.exe test.c $compile_args";
+	my $cc = "cc $CFLAGS -o test.exe test.c $compile_args $LDFLAGS";
 	note "line ", (caller)[2], ": $cc";
 	
 	my $ok = (0 == system($cc));
@@ -1120,3 +988,162 @@ sub list_test {
 list_first_line();
 
 1;
+
+__END__
+# $Log: test_utils.pl,v $
+# Revision 1.39  2013-09-01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.38  2013/09/01 00:18:30  pauloscustodio
+# - Replaced e4c exception mechanism by a much simpler one based on a few
+#   macros. The former did not allow an exit(1) to be called within a
+#   try-catch block.
+#
+# Revision 1.37  2013/08/30 21:50:43  pauloscustodio
+# By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
+# as an identifier reserved by the C standard for implementation-defined behaviour
+# starting with two underscores.
+#
+# Revision 1.36  2013/08/30 01:06:08  pauloscustodio
+# New C-like expressions, defined when __LEGACY_Z80ASM_SYNTAX is not defined. Keeps old
+# behaviour under -D__LEGACY_Z80ASM_SYNTAX (defined in legacy.h)
+#
+# BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-D__LEGACY_Z80ASM_SYNTAX)
+# - Expressions now use more standard C-like operators
+# - Object and library files changed signature to
+#   "Z80RMF02", "Z80LMF02", to avoid usage of old
+#   object files with expressions inside in the old format
+#
+# Detail:
+# - String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
+# - Power:                        changed from '^' to '**'; '^' will be XOR
+# - XOR:                          changed from ':' to '^';
+# - AND:                          changed from '~' to '&';  '~' will be NOT
+# - NOT:                          '~' added as binary not
+#
+# Revision 1.35  2013/06/03 23:21:35  pauloscustodio
+# show wdiff on t_binary() failure
+#
+# Revision 1.34  2013/06/01 01:19:58  pauloscustodio
+# Add linkerr to t_z80asm() for compile OK but failed link.
+#
+# Revision 1.33  2013/05/27 22:45:13  pauloscustodio
+# Allow ASSERT to be used in INIT code in t_compile_module()
+#
+# Revision 1.32  2013/05/16 22:45:21  pauloscustodio
+# Add ObjFile to struct module
+# Use ObjFile to check for valid object file
+#
+# Revision 1.31  2013/05/12 19:41:21  pauloscustodio
+# write binfile
+#
+# Revision 1.30  2013/05/11 00:29:26  pauloscustodio
+# CH_0021 : Exceptions on file IO show file name
+# Keep a hash table of all opened file names, so that the file name
+# is shown on a fatal error.
+# Rename file IO funtions: f..._err to xf...
+#
+# Revision 1.29  2013/03/29 23:53:08  pauloscustodio
+# Added GNU Flex-based scanner. Not yet integrated into assembler.
+#
+# Revision 1.28  2013/03/04 23:23:37  pauloscustodio
+# Removed writeline, that was used to cancel listing of multi-line
+# constructs, as only the first line was shown on the list file. Fixed
+# the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
+#
+# Revision 1.27  2013/02/27 22:32:38  pauloscustodio
+# Abort test at t_compile_module() if compilation failed
+#
+# Revision 1.26  2013/02/25 21:37:30  pauloscustodio
+# Show output difference of t_run_module() in visual-diff, to allow easy merge of changes
+#
+# Revision 1.25  2013/02/22 17:26:34  pauloscustodio
+# Decouple assembler from listfile handling
+#
+# Revision 1.24  2013/02/19 22:52:40  pauloscustodio
+# BUG_0030 : List bytes patching overwrites header
+# BUG_0031 : List file garbled with input lines with 255 chars
+# New listfile.c with all the listing related code
+#
+# Revision 1.23  2013/02/12 00:55:00  pauloscustodio
+# CH_0017 : Align with spaces, deprecate -t option
+#
+# Revision 1.22  2013/02/11 21:54:38  pauloscustodio
+# BUG_0026 : Incorrect paging in symbol list
+#
+# Revision 1.21  2013/01/20 13:18:10  pauloscustodio
+# BUG_0024 : (ix+128) should show warning message
+# Signed integer range was wrongly checked to -128..255 instead
+# of -128..127
+#
+# Revision 1.20  2013/01/14 00:22:31  pauloscustodio
+# Allow t_z80asm_ok() with warnings
+#
+# Revision 1.19  2012/06/07 10:17:57  pauloscustodio
+# delay after deleting files before calling new z80asm
+#
+# Revision 1.18  2012/05/29 21:02:19  pauloscustodio
+# Changes for linux:
+# - call ./z80asm instead of z80asm
+# - memory addresses appear as 0x0xHHHH in Linux (one 0x by user, one by %p)
+#
+# Revision 1.17  2012/05/26 18:50:26  pauloscustodio
+# Use .o instead of .c to build test program, faster compilation.
+# Use gcc to compile instead of cc.
+#
+# Revision 1.16  2012/05/24 10:58:39  pauloscustodio
+# BUG_0018 : stack overflow in '@' includes - wrong range check
+#
+# Revision 1.15  2012/05/23 19:57:59  pauloscustodio
+# Test that files created with -c have correct content
+#
+# Revision 1.14  2012/05/22 20:33:34  pauloscustodio
+# Added tests
+#
+# Revision 1.13  2012/05/20 05:51:19  pauloscustodio
+# Need more test files, mask error return after exception
+#
+# Revision 1.12  2012/05/20 05:40:00  pauloscustodio
+# test asm only delete main test files before attempting to assemble, create other test files for multipl-object assembly
+#
+# Revision 1.11  2012/05/17 15:03:37  pauloscustodio
+# Add functions to white-box test C modules by compiling and running a test C main() function
+#
+# Revision 1.10  2012/05/11 19:41:26  pauloscustodio
+# white space
+#
+# Revision 1.9  2012/04/22 20:34:13  pauloscustodio
+# tab width
+#
+# Revision 1.8	2011/10/07 17:29:10  pauloscustodio
+# Add test functions for lib file format
+#
+# Revision 1.7	2011/08/18 21:49:44  pauloscustodio
+# add objfile() to generate expected object file format
+#
+# Revision 1.6	2011/08/14 19:49:05  pauloscustodio
+# - Added test case to verify that incomplete files are deleted on error
+#
+# Revision 1.5	2011/07/14 01:32:09  pauloscustodio
+#	  - Unified "Integer out of range" and "Out of range" errors; they are the same error.
+#	  - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+#	  CH_0003 : Error messages should be more informative
+#		  - Added printf-args to error messages, added "Error:" prefix.
+#	  BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+#		  - Raise ERR_UNBALANCED_PAREN instead
+#
+# Revision 1.4	2011/07/11 16:23:44  pauloscustodio
+# Factor capture code in t_z80asm_capture() in test_utils.pl
+#
+# Revision 1.3	2011/07/09 18:25:35  pauloscustodio
+# Log keyword in checkin comment was expanded inside Log expansion... recursive
+# Added Z80asm banner to all source files
+#
+# Revision 1.2	2011/07/09 17:36:09  pauloscustodio
+# Copied cvs log into Log history
+#
+# Revision 1.1	2011/07/09 01:02:45  pauloscustodio
+# Started to build test suite in t/ *.t unsing Perl prove. Included test for all standard
+# Z80 opcodes; need to be extended with directives and opcodes for Z80 variants.
+

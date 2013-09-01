@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.7 2013-09-01 00:18:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.8 2013-09-01 11:52:55 pauloscustodio Exp $
 # $Log: whitebox-except.t,v $
-# Revision 1.7  2013-09-01 00:18:30  pauloscustodio
+# Revision 1.8  2013-09-01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.7  2013/09/01 00:18:30  pauloscustodio
 # - Replaced e4c exception mechanism by a much simpler one based on a few
 #   macros. The former did not allow an exit(1) to be called within a
 #   try-catch block.
@@ -118,7 +122,7 @@ END
 # THROW outside of TRY
 t_run_module([0], "", <<END, 1);
 Throw without try
-Uncaught runtime exception at file test.c line 65
+Uncaught runtime exception at file test.c line 66
 END
 
 

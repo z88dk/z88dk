@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classhash.t,v 1.3 2013-05-27 22:43:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classhash.t,v 1.4 2013-09-01 11:52:55 pauloscustodio Exp $
 # $Log: whitebox-classhash.t,v $
-# Revision 1.3  2013-05-27 22:43:34  pauloscustodio
+# Revision 1.4  2013-09-01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.3  2013/05/27 22:43:34  pauloscustodio
 # StrHash_set failed when the key string buffer was reused later in the code.
 # StrHash_get failed to retrieve object after the key used by StrHash_set was reused.
 #
@@ -32,7 +36,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test memalloc
-my $objs = "strhash.o strpool.o class.o die.o strutil.o safestr.o except.o";
+my $objs = "strhash.o strpool.o class.o die.o strutil.o safestr.o except.o init.o";
 ok ! system "make $objs";
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 

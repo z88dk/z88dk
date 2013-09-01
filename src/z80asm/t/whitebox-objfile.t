@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.2 2013-05-16 22:45:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.3 2013-09-01 11:52:55 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.2  2013-05-16 22:45:21  pauloscustodio
+# Revision 1.3  2013-09-01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.2  2013/05/16 22:45:21  pauloscustodio
 # Add ObjFile to struct module
 # Use ObjFile to check for valid object file
 #
@@ -31,7 +35,7 @@ require 't/test_utils.pl';
 
 my $objs = "-DMEMALLOC_DEBUG memalloc.c ".
 		   "objfile.o class.o strpool.o file.o ".
-		   "strutil.o safestr.o strlist.o strhash.o errors.o die.o except.o";
+		   "strutil.o safestr.o strlist.o strhash.o errors.o die.o except.o init.o";
 
 t_compile_module('', <<'END', $objs);
 
@@ -149,13 +153,13 @@ for my $code_size (0, 1, 65536) {
 	write_binfile(lib1_file(), libfile($obj1));
 
 	t_run_module([$code_size], "", <<'END', 0);
+memalloc: init
 
 ---- TEST: File not found, test mode ----
 
 
 ---- TEST: File not found, read mode ----
 
-memalloc: init
 memalloc errors.c(1): alloc 40 bytes at ADDR_1
 memalloc strpool.c(1): alloc 32 bytes at ADDR_2
 memalloc strhash.c(1): alloc 32 bytes at ADDR_3

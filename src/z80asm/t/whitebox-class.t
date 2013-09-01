@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.6 2013-05-12 21:39:05 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.7 2013-09-01 11:52:55 pauloscustodio Exp $
 # $Log: whitebox-class.t,v $
-# Revision 1.6  2013-05-12 21:39:05  pauloscustodio
+# Revision 1.7  2013-09-01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.6  2013/05/12 21:39:05  pauloscustodio
 # OBJ_DELETE() now accepts and ignores a NULL argument
 #
 # Revision 1.5  2013/01/20 21:24:29  pauloscustodio
@@ -43,7 +47,7 @@ require 't/test_utils.pl';
 
 # test class
 
-my $objs = "die.o except.o strutil.o safestr.o";
+my $objs = "die.o except.o strutil.o safestr.o init.o";
 ok ! system "make $objs";
 my $compile = "-DCLASS_DEBUG -DMEMALLOC_DEBUG class.c memalloc.c $objs";
 
@@ -145,12 +149,14 @@ t_compile_module($init, <<'END', $compile);
 END
 
 # no allocation
-t_run_module([0], "", <<ERR, 0);
-ERR
+t_run_module([0], "", <<END, 0);
+memalloc: init
+memalloc: cleanup
+END
 
 
 # alloc one, no free
-t_run_module([1], "", <<ERR, 0);
+t_run_module([1], "", <<END, 0);
 memalloc: init
 memalloc test.c(4): alloc 36 bytes at ADDR_1
 Person_init ADDR_1
@@ -169,11 +175,11 @@ memalloc test.c(3): free 5 bytes at ADDR_3 allocated at test.c(2)
 memalloc test.c(1): free 32 bytes at ADDR_2 allocated at test.c(1)
 memalloc test.c(4): free 36 bytes at ADDR_1 allocated at test.c(4)
 memalloc: cleanup
-ERR
+END
 
 
 # alloc one, clone another, no free
-t_run_module([2], "", <<ERR, 0);
+t_run_module([2], "", <<END, 0);
 memalloc: init
 memalloc test.c(5): alloc 36 bytes at ADDR_1
 Person_init ADDR_1
@@ -206,11 +212,11 @@ memalloc test.c(4): free 5 bytes at ADDR_3 allocated at test.c(2)
 memalloc test.c(1): free 32 bytes at ADDR_2 allocated at test.c(1)
 memalloc test.c(5): free 36 bytes at ADDR_1 allocated at test.c(5)
 memalloc: cleanup
-ERR
+END
 
 
 # alloc one, clone another, free first
-t_run_module([3], "", <<ERR, 0);
+t_run_module([3], "", <<END, 0);
 memalloc: init
 memalloc test.c(5): alloc 36 bytes at ADDR_1
 Person_init ADDR_1
@@ -243,11 +249,11 @@ memalloc test.c(4): free 5 bytes at ADDR_6 allocated at test.c(3)
 memalloc test.c(1): free 32 bytes at ADDR_5 allocated at test.c(1)
 memalloc test.c(5): free 36 bytes at ADDR_4 allocated at test.c(5)
 memalloc: cleanup
-ERR
+END
 
 
 # alloc one, clone another, free first and then second
-t_run_module([4], "", <<ERR, 0);
+t_run_module([4], "", <<END, 0);
 memalloc: init
 memalloc test.c(5): alloc 36 bytes at ADDR_1
 Person_init ADDR_1
@@ -280,7 +286,7 @@ memalloc test.c(1): free 32 bytes at ADDR_5 allocated at test.c(1)
 memalloc test.c(5): free 36 bytes at ADDR_4 allocated at test.c(5)
 class: cleanup
 memalloc: cleanup
-ERR
+END
 
 
 unlink_testfiles();

@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.2 2013-05-12 19:20:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.3 2013-09-01 11:52:55 pauloscustodio Exp $
 # $Log: whitebox-classring.t,v $
-# Revision 1.2  2013-05-12 19:20:34  pauloscustodio
+# Revision 1.3  2013-09-01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.2  2013/05/12 19:20:34  pauloscustodio
 # warnings
 #
 # Revision 1.1  2013/04/13 15:55:10  pauloscustodio
@@ -30,7 +34,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test memalloc
-my $objs = "class.o die.o strutil.o safestr.o except.o";
+my $objs = "class.o die.o strutil.o safestr.o except.o init.o";
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 
 t_compile_module(<<'END_INIT', <<'END', $compile);
@@ -251,8 +255,8 @@ END_INIT
 END
 
 t_run_module([], "", <<ERR, 0);
-start
 memalloc: init
+start
 memalloc test.c(5): alloc 60 bytes at ADDR_1
 memalloc test.c(4): alloc 32 bytes at ADDR_2
 memalloc test.c(1): alloc 100 bytes at ADDR_3

@@ -13,9 +13,13 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.6 2013-05-01 21:10:49 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.7 2013-09-01 11:52:55 pauloscustodio Exp $
 # $Log: whitebox-dynstr.t,v $
-# Revision 1.6  2013-05-01 21:10:49  pauloscustodio
+# Revision 1.7  2013-09-01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.6  2013/05/01 21:10:49  pauloscustodio
 # Add getline to Str, converting EOL sequences to LF.
 #
 # Revision 1.5  2013/04/29 22:24:33  pauloscustodio
@@ -40,7 +44,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "dynstr.o class.o die.o safestr.o strutil.o except.o";
+my $objs = "dynstr.o class.o die.o safestr.o strutil.o except.o init.o";
 ok ! system "make $objs";
 
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
@@ -305,8 +309,8 @@ END_INIT
 END
 
 t_run_module([], "", <<ERR, 0);
-init
 memalloc: init
+init
 memalloc dynstr.c(1): alloc 40 bytes at ADDR_1
 memalloc dynstr.c(4): alloc 256 bytes at ADDR_2
 Str_unreserve
