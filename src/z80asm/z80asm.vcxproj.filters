@@ -33,16 +33,10 @@
     <ClInclude Include="dynstr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="e4c.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="errors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="errors_def.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="except.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="file.h">
@@ -144,6 +138,12 @@
     <ClInclude Include="token_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="init.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="except.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asmdrctv.c">
@@ -189,9 +189,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="errors.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="except.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="file.c">
@@ -264,6 +261,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="deffile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="init.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="except.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

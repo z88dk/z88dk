@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.6 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.7 2013-09-01 00:18:30 pauloscustodio Exp $
 # $Log: whitebox-except.t,v $
-# Revision 1.6  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.7  2013-09-01 00:18:30  pauloscustodio
+# - Replaced e4c exception mechanism by a much simpler one based on a few
+#   macros. The former did not allow an exit(1) to be called within a
+#   try-catch block.
+#
+# Revision 1.6  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.5  2012/06/14 15:01:27  pauloscustodio
@@ -40,76 +45,114 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "die.o strutil.o safestr.o";
+my $objs = "die.o strutil.o safestr.o except.o";
 ok ! system "make $objs";
-my $compile = "-DEXCEPT_DEBUG except.c $objs";
 
 # compile
-t_compile_module('', <<'END', $compile);
+t_compile_module('', <<'END', $objs);
 	int test;
 	
 	if (argc != 2) 				return 1;
 	test = atoi(argv[1]);
 	
-	init_except();
-	warn("1\n");	
-	try	{
-		warn("2\n");	
-		if (test == 1) {
-			throw(FatalErrorException, "Error");
-		}
-		else {
-			throw(AssertionException, "Error");
-		}
-		warn("3\n");	
-	}
-	catch (RuntimeException)
+	if (test == 0)
 	{
-		warn("4\n");	
+		warn("Throw without try\n");
+		THROW(RuntimeException);
 	}
-	finally 
+	else 
 	{
-		warn("5\n");	
+		warn("Before try\n");	
+		TRY	{
+			warn("In try\n");	
+			if (test == 1) {
+				warn("Throw FatalErrorException\n");
+				THROW(FatalErrorException);
+			}
+			else if (test == 2) {
+				warn("Throw AssertionException\n");
+				THROW(AssertionException);
+			}
+			else {
+				warn("In test 3, new try\n");
+				TRY
+				{
+					warn("in internal try, throw FatalErrorException\n");
+					THROW(FatalErrorException);
+					warn("not reached\n");
+				}
+				CATCH(FatalErrorException)
+				{
+					warn("Caught FatalErrorException\n");	
+					RETHROW(AssertionException);
+					warn("Has re-thrown\n");
+				}
+				FINALLY
+				{
+					warn("Inner Finally, THROWN() = %d\n", THROWN() );
+				}
+				ETRY;
+				warn("not reached\n");
+			}				
+			warn("End of try\n");	
+		}
+		CATCH (RuntimeException)
+		{
+			warn("Caught RuntimeException\n");	
+		}
+		CATCH (AssertionException)
+		{
+			warn("Caught AssertionException\n");	
+		}
+		FINALLY 
+		{
+			warn("Finally, THROWN() = %d\n", THROWN() );
+		}
+		ETRY;
 	}
-	warn("6\n");	
+	warn("End of main\n");	
 	return 0;
 END
 
 
+# THROW outside of TRY
+t_run_module([0], "", <<END, 1);
+Throw without try
+Uncaught runtime exception at file test.c line 65
+END
+
+
 # run FatalErrorException
-t_run_module([1], "", <<ERR, 0);
-except: init
-1
-2
-4
-5
-6
-except: cleanup
-ERR
+t_run_module([1], "", <<END, 0);
+Before try
+In try
+Throw FatalErrorException
+Finally, THROWN() = 3
+End of main
+END
 
+# run AssertionException
+t_run_module([2], "", <<END, 0);
+Before try
+In try
+Throw AssertionException
+Caught AssertionException
+Finally, THROWN() = 2
+End of main
+END
 
-# run AssertionException - cannot be caught
-t_run_module([2], "", <<ERR, 1);
-except: init
-1
-2
-5
-
-
-Uncaught AssertionException: Error
-
-    thrown at main (test.c:0)
-
-The value of errno was 0.
-
-Exception hierarchy
-________________________________________________________________
-
-    AssertionException
-________________________________________________________________
-except: cleanup
-ERR
-
+# run second-level try and rethrow
+t_run_module([3], "", <<END, 0);
+Before try
+In try
+In test 3, new try
+in internal try, throw FatalErrorException
+Caught FatalErrorException
+Inner Finally, THROWN() = 3
+Caught AssertionException
+Finally, THROWN() = 2
+End of main
+END
 
 unlink_testfiles();
 done_testing;

@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.40 2013-08-30 21:50:43 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.41 2013-09-01 00:18:28 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.40  2013-08-30 21:50:43  pauloscustodio
+/* Revision 1.41  2013-09-01 00:18:28  pauloscustodio
+/* - Replaced e4c exception mechanism by a much simpler one based on a few
+/*   macros. The former did not allow an exit(1) to be called within a
+/*   try-catch block.
+/*
+/* Revision 1.40  2013/08/30 21:50:43  pauloscustodio
 /* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
 /* as an identifier reserved by the C standard for implementation-defined behaviour
 /* starting with two underscores.
@@ -290,19 +295,21 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 #include "memalloc.h"   /* before any other include */
 
-#include <stdio.h>
-#include <limits.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
+#include "codearea.h"
 #include "config.h"
-#include "symbol.h"
-#include "options.h"
 #include "errors.h"
 #include "file.h"
-#include "codearea.h"
-#include "z80asm.h"
 #include "legacy.h"
+#include "options.h"
+#include "symbol.h"
+#include "except.h"
+#include "z80asm.h"
+#include <assert.h>
+#include <ctype.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* external functions */
 enum symbols GetSym( void );
@@ -785,7 +792,7 @@ EvalPfixExpr( struct expr *pfixlist )
     Symbol *symptr;
     long ret;
 
-    try
+    TRY
     {
         pfixlist->rangetype &= EVALUATED; /* prefix expression as evaluated */
         pfixexpr = pfixlist->firstnode;   /* initiate to first node */
@@ -897,11 +904,11 @@ EvalPfixExpr( struct expr *pfixlist )
             ret = 0;    /* Unbalanced stack - probably during low memory... */
         }
     }
-
-    finally
+	FINALLY
     {
         ClearEvalStack( &stackptr );      /* in case stack is not balanced */
     }
+	ETRY;
 
     return ret;
 }
@@ -1095,7 +1102,7 @@ PopItem( struct pfixstack **stackpointer )
     struct pfixstack *stackitem;
     long constant;
 
-    E4C_ASSERT( *stackpointer );
+    assert( *stackpointer );
     constant = ( *stackpointer )->stackconstant;
     stackitem = *stackpointer;
     *stackpointer = ( *stackpointer )->prevstackitem;   /* move stackpointer to previous item */

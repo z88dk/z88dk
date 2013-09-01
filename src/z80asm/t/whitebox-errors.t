@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.5 2013-05-11 00:29:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.6 2013-09-01 00:18:30 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.5  2013-05-11 00:29:26  pauloscustodio
+# Revision 1.6  2013-09-01 00:18:30  pauloscustodio
+# - Replaced e4c exception mechanism by a much simpler one based on a few
+#   macros. The former did not allow an exit(1) to be called within a
+#   try-catch block.
+#
+# Revision 1.5  2013/05/11 00:29:26  pauloscustodio
 # CH_0021 : Exceptions on file IO show file name
 # Keep a hash table of all opened file names, so that the file name
 # is shown on a fatal error.
@@ -64,8 +69,6 @@ END
 
 t_compile_module($init, <<'END', $objs);
 	int test;
-	
-	init_except();
 	
 	if (argc != 2) ERROR;
 	test = atoi(argv[1]);
@@ -198,25 +201,29 @@ t_compile_module($init, <<'END', $objs);
 		break;
 	
 	case 3:
-		try {
+		TRY {
 			warn("Fatal error\n");
 			fatal_error(ERR_FOPEN_READ, "file1");
 			warn("not reached\n");
 		}
-		catch (RuntimeException) {
-			warn("caught fatal error\n");
+		FINALLY {
+			if (THROWN()) 
+				warn("caught fatal error\n");
 		}
+		ETRY;
 		ERROR;
 		
 	case 4:
-		try {
+		TRY {
 			warn("Fatal error at\n");
 			fatal_error_at("f1.c", 5, ERR_FOPEN_READ, "file1");
 			warn("not reached\n");
 		}
-		catch (RuntimeException) {
-			warn("caught fatal error\n");
+		FINALLY {
+			if (THROWN()) 
+				warn("caught fatal error\n");
 		}
+		ETRY;
 		ERROR;
 		
 	default:

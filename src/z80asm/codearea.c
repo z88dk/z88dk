@@ -16,9 +16,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.12 2013-05-12 19:39:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.13 2013-09-01 00:18:28 pauloscustodio Exp $ */
 /* $Log: codearea.c,v $
-/* Revision 1.12  2013-05-12 19:39:32  pauloscustodio
+/* Revision 1.13  2013-09-01 00:18:28  pauloscustodio
+/* - Replaced e4c exception mechanism by a much simpler one based on a few
+/*   macros. The former did not allow an exit(1) to be called within a
+/*   try-catch block.
+/*
+/* Revision 1.12  2013/05/12 19:39:32  pauloscustodio
 /* warnings
 /*
 /* Revision 1.11  2013/03/30 00:02:22  pauloscustodio
@@ -87,6 +92,7 @@ Manage the code area in memory
 
 #include "memalloc.h"   /* before any other include */
 
+#include <assert.h>
 #include <memory.h>
 #include "codearea.h"
 #include "config.h"
@@ -287,7 +293,7 @@ byte_t get_byte( size_t *paddr )
 {
     byte_t byte;
 
-    E4C_ASSERT( *paddr < codeindex );
+    assert( *paddr < codeindex );
     byte = codearea[( *paddr )++];
     return byte;
 }

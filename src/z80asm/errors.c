@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.25 2013-05-12 19:39:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.26 2013-09-01 00:18:28 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.25  2013-05-12 19:39:32  pauloscustodio
+/* Revision 1.26  2013-09-01 00:18:28  pauloscustodio
+/* - Replaced e4c exception mechanism by a much simpler one based on a few
+/*   macros. The former did not allow an exit(1) to be called within a
+/*   try-catch block.
+/*
+/* Revision 1.25  2013/05/12 19:39:32  pauloscustodio
 /* warnings
 /*
 /* Revision 1.24  2013/05/11 00:29:26  pauloscustodio
@@ -133,6 +138,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "strhash.h"
 #include "strpool.h"
 #include "strutil.h"
+#include "except.h"
 #include "types.h"
 #include <assert.h>
 #include <stdarg.h>
@@ -407,7 +413,7 @@ static void out_error_msg( int *countp, char *prefix,
 
     if ( is_fatal )
     {
-        throw( FatalErrorException, sstr_data( str ) );
+		THROW(FatalErrorException);
     }
 }
 

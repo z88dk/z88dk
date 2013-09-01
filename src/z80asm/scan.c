@@ -14,9 +14,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.10 2013-05-01 21:10:49 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.11 2013-09-01 00:18:28 pauloscustodio Exp $ 
 $Log: scan.c,v $
-Revision 1.10  2013-05-01 21:10:49  pauloscustodio
+Revision 1.11  2013-09-01 00:18:28  pauloscustodio
+- Replaced e4c exception mechanism by a much simpler one based on a few
+  macros. The former did not allow an exit(1) to be called within a
+  try-catch block.
+
+Revision 1.10  2013/05/01 21:10:49  pauloscustodio
 Add getline to Str, converting EOL sequences to LF.
 
 Revision 1.8  2013/05/01 19:03:45  pauloscustodio
@@ -1441,7 +1446,7 @@ int yylex_destroy (void);
 
 /* die on error */
 #define YY_FATAL_ERROR(msg) 										\
-	die( AssertionException, msg )
+	die( msg )
 
 /* input function to convert different eol sequences (\r\n, \r, \n) into \n 
    and insert a RS (0x30 - record separator) character before every line,

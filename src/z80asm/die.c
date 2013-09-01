@@ -15,9 +15,44 @@ Copyright (C) Paulo Custodio, 2011-2013
 Exit with a fatal error, warn on stderr
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.c,v 1.10 2013-08-26 21:49:39 pauloscustodio Exp $ */
+#include "memalloc.h"  /* before any other include */
+#include "die.h"
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+
+/*-----------------------------------------------------------------------------
+*   die()
+*----------------------------------------------------------------------------*/
+void die( char *msg, ... )
+{
+    va_list argptr;
+    va_start( argptr, msg ); /* init variable args */
+
+    vfprintf( stderr, msg, argptr );
+	exit(1);
+}
+
+/*-----------------------------------------------------------------------------
+*   warn()
+*----------------------------------------------------------------------------*/
+void warn( char *msg, ... )
+{
+    va_list argptr;
+    va_start( argptr, msg ); /* init variable args */
+
+    vfprintf( stderr, msg, argptr );
+}
+
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.c,v 1.11 2013-09-01 00:18:28 pauloscustodio Exp $ */
 /* $Log: die.c,v $
-/* Revision 1.10  2013-08-26 21:49:39  pauloscustodio
+/* Revision 1.11  2013-09-01 00:18:28  pauloscustodio
+/* - Replaced e4c exception mechanism by a much simpler one based on a few
+/*   macros. The former did not allow an exit(1) to be called within a
+/*   try-catch block.
+/*
+/* Revision 1.10  2013/08/26 21:49:39  pauloscustodio
 /* Bug report 2013-07-27 10:50:27 by rkd77 : compile with -Wformat -Werror=format-security
 /*
 /* Revision 1.9  2013/01/20 21:24:28  pauloscustodio
@@ -49,40 +84,3 @@ Exit with a fatal error, warn on stderr
 /*
 /*
 /* */
-
-#include "memalloc.h"  /* before any other include */
-#include "die.h"
-#include "types.h"
-#include "strutil.h"
-#include "safestr.h"
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-
-/*-----------------------------------------------------------------------------
-*   die()
-*----------------------------------------------------------------------------*/
-void die( e4c_exception_type exception, char *msg, ... )
-{
-    va_list argptr;
-    SSTR_DEFINE( errstr, MAXLINE );
-
-    va_start( argptr, msg ); /* init variable args */
-
-    sstr_vfset( errstr, msg, argptr );   /* build message */
-
-    fputs( sstr_data( errstr ), stderr );
-    throw( exception, sstr_data( errstr ) );
-}
-
-/*-----------------------------------------------------------------------------
-*   warn()
-*----------------------------------------------------------------------------*/
-void warn( char *msg, ... )
-{
-    va_list argptr;
-    va_start( argptr, msg ); /* init variable args */
-
-    vfprintf( stderr, msg, argptr );
-}

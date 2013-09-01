@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.7 2013-05-12 19:20:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.8 2013-09-01 00:18:30 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.7  2013-05-12 19:20:34  pauloscustodio
+# Revision 1.8  2013-09-01 00:18:30  pauloscustodio
+# - Replaced e4c exception mechanism by a much simpler one based on a few
+#   macros. The former did not allow an exit(1) to be called within a
+#   try-catch block.
+#
+# Revision 1.7  2013/05/12 19:20:34  pauloscustodio
 # warnings
 #
 # Revision 1.6  2013/05/01 19:03:46  pauloscustodio
@@ -1539,9 +1544,7 @@ END
 t_compile_module($init, <<'END', $compile);
 	int ret = 1;
 
-    init_except();                      /* init exception mechanism */
-
-    try
+    TRY
     {
 		warn("Test: open text file\n");
 		scan_file("f0");
@@ -1551,10 +1554,12 @@ t_compile_module($init, <<'END', $compile);
 		scan_file("f0");
 		
 	}
-    catch ( FatalErrorException )
+    CATCH ( FatalErrorException )
     {
         ret = 0;		/* ok */
     }
+	FINALLY {}
+	ETRY;
 	
 	return ret;
 END
@@ -1618,9 +1623,7 @@ END
 t_compile_module($init, <<'END', $compile);
 	int ret = 1;
 
-    init_except();                      /* init exception mechanism */
-
-    try
+    TRY
     {
 		warn("Test: open text file\n");
 		scan_file("f0");
@@ -1630,10 +1633,12 @@ t_compile_module($init, <<'END', $compile);
 		scan_file("f1");
 		
 	}
-    catch ( FatalErrorException )
+    CATCH ( FatalErrorException )
     {
         ret = 0;		/* ok */
     }
+	FINALLY {}
+	ETRY;
 	
 	return ret;
 END

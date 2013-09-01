@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.9 2013-05-27 22:43:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.10 2013-09-01 00:18:30 pauloscustodio Exp $
 # $Log: whitebox-strhash.t,v $
-# Revision 1.9  2013-05-27 22:43:34  pauloscustodio
+# Revision 1.10  2013-09-01 00:18:30  pauloscustodio
+# - Replaced e4c exception mechanism by a much simpler one based on a few
+#   macros. The former did not allow an exit(1) to be called within a
+#   try-catch block.
+#
+# Revision 1.9  2013/05/27 22:43:34  pauloscustodio
 # StrHash_set failed when the key string buffer was reused later in the code.
 # StrHash_get failed to retrieve object after the key used by StrHash_set was reused.
 #
@@ -100,12 +105,12 @@ void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 		
 		if (exp_key == NULL && next_elem)
 		{
-			die(AssertionException, "%s %d : got %s, expected end of hash\n", 
+			die("%s %d : got %s, expected end of hash\n", 
 			    file, lineno, iter->key);
 		}
 		else if (exp_key != NULL && ! next_elem)
 		{
-			die(AssertionException, "%s %d : got end of hash, expected %s\n", 
+			die("%s %d : got end of hash, expected %s\n", 
 			    file, lineno, exp_key);
 		}
 		else if (exp_key == NULL && ! next_elem)
@@ -117,26 +122,26 @@ void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 		exp_value = strtok(tokensp, " ");
 		if (exp_value == NULL)
 		{
-			die(AssertionException, "%s %d : exp_value should not be NULL\n", 
+			die("%s %d : exp_value should not be NULL\n", 
 			    file, lineno);
 		}
 				
 		/* check that key and value match */
 		if (strcmp(iter->key, exp_key))
 		{
-			die(AssertionException, "%s %d : key mismatch, got %s, expected %s\n", 
+			die("%s %d : key mismatch, got %s, expected %s\n", 
 			    file, lineno, iter->key, exp_key);
 		}
 		
 		if (strcmp(iter->value, exp_value))
 		{
-			die(AssertionException, "%s %d : value mismatch, got %s, expected %s\n", 
+			die("%s %d : value mismatch, got %s, expected %s\n", 
 			    file, lineno, iter->value, exp_value);
 		}
 		
 		if (iter->value != next_elem)
 		{
-			die(AssertionException, "%s %d : value pointer mismatch\n", 
+			die("%s %d : value pointer mismatch\n", 
 			    file, lineno);
 		}
 		
@@ -148,27 +153,27 @@ void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 		value = StrHash_get(hash, iter->key);
 		if (value == NULL || strcmp(value, iter->value))
 		{
-			die(AssertionException, "%s %d : get(%s) = %s, expected %s\n", 
+			die("%s %d : get(%s) = %s, expected %s\n", 
 			    file, lineno, iter->key, value, iter->value);
 		}
 
 		value = StrHash_get(hash, wrong_key);
 		if (value != NULL)
 		{
-			die(AssertionException, "%s %d : get(%s) = %s, expected NULL\n", 
+			die("%s %d : get(%s) = %s, expected NULL\n", 
 			    file, lineno, wrong_key, value);
 		}
 		
 		/* check positive and negative StrHash_exists() */
 		if ( ! StrHash_exists(hash, iter->key) )
 		{
-			die(AssertionException, "%s %d : exists(%s) = FALSE, expected TRUE\n", 
+			die("%s %d : exists(%s) = FALSE, expected TRUE\n", 
 			    file, lineno, iter->key);
 		}
 
 		if ( StrHash_exists(hash, wrong_key) )
 		{
-			die(AssertionException, "%s %d : exists(%s) = TRUE, expected FALSE\n", 
+			die("%s %d : exists(%s) = TRUE, expected FALSE\n", 
 			    file, lineno, wrong_key);
 		}
 		
@@ -176,14 +181,14 @@ void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 		elem = StrHash_find(hash, iter->key);
 		if ( elem == NULL || elem != iter )
 		{
-			die(AssertionException, "%s %d : find(%s) failed\n", 
+			die("%s %d : find(%s) failed\n", 
 			    file, lineno, iter->key);
 		}
 
 		elem = StrHash_find(hash, wrong_key);
 		if ( elem != NULL )
 		{
-			die(AssertionException, "%s %d : find(%s) failed\n", 
+			die("%s %d : find(%s) failed\n", 
 			    file, lineno, wrong_key);
 		}
 	}

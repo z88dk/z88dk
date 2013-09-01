@@ -20,9 +20,14 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.48 2013-08-30 21:50:43 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.49 2013-09-01 00:18:28 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.48  2013-08-30 21:50:43  pauloscustodio
+/* Revision 1.49  2013-09-01 00:18:28  pauloscustodio
+/* - Replaced e4c exception mechanism by a much simpler one based on a few
+/*   macros. The former did not allow an exit(1) to be called within a
+/*   try-catch block.
+/*
+/* Revision 1.48  2013/08/30 21:50:43  pauloscustodio
 /* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
 /* as an identifier reserved by the C standard for implementation-defined behaviour
 /* starting with two underscores.
@@ -1369,6 +1374,17 @@ Based on 1.0.31
 	By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
 	as an identifier reserved by the C standard for implementation-defined behaviour
 	starting with two underscores.
+
+-------------------------------------------------------------------------------
+01.09.2013 [1.2.8] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- Included GLIB in the Makefile options.
+	- Replaced e4c exception mechanism by a much simpler one based on a few
+	  macros. The former did not allow an exit(1) to be called within a
+	  try-catch block.
+	- Created a code-generation mechanism for automatic execution of initialize 
+	  code before the main() function starts, and methods for struct malloc
+	  and free calling constructors and destructors.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format

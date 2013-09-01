@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.37 2013-08-30 21:50:43 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.38 2013-09-01 00:18:30 pauloscustodio Exp $
 # $Log: test_utils.pl,v $
-# Revision 1.37  2013-08-30 21:50:43  pauloscustodio
+# Revision 1.38  2013-09-01 00:18:30  pauloscustodio
+# - Replaced e4c exception mechanism by a much simpler one based on a few
+#   macros. The former did not allow an exit(1) to be called within a
+#   try-catch block.
+#
+# Revision 1.37  2013/08/30 21:50:43  pauloscustodio
 # By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
 # as an identifier reserved by the C standard for implementation-defined behaviour
 # starting with two underscores.
@@ -648,7 +653,6 @@ sub t_compile_module {
 
 ".join("\n", map {"#include \"$_.h\""} sort keys %modules)."\n".'
 int _exception_raised;
-int _exception_initialized;
 
 #define TITLE(title)	fprintf(stderr, "\n---- TEST: %s ----\n\n", (title) )
 
@@ -663,15 +667,12 @@ int _exception_initialized;
 #define ASSERT(expr) 			TEST_DIE( ! (expr), "TEST FAILED", #expr )
 
 #define TEST_TRY(expr, err_condition, err_message, expr_str) \
-			if ( ! _exception_initialized ) { \
-				init_except(); \
-				_exception_initialized = 1; \
-			} \
 			_exception_raised = 0; \
-			try { expr; } \
-			catch (RuntimeException) { \
-				_exception_raised = 1; \
+			TRY { expr; } \
+			FINALLY { \
+				if (THROWN()) _exception_raised = 1; \
 			} \
+			ETRY; \
 			TEST_DIE( (err_condition), "EXCEPTION " err_message "RAISED", expr_str )
 
 #define TRY_OK(expr) 	TEST_TRY( expr,   _exception_raised, "",     #expr )

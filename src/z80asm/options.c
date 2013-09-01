@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.26 2013-06-08 23:37:32 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.27 2013-09-01 00:18:28 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.26  2013-06-08 23:37:32  pauloscustodio
+/* Revision 1.27  2013-09-01 00:18:28  pauloscustodio
+/* - Replaced e4c exception mechanism by a much simpler one based on a few
+/*   macros. The former did not allow an exit(1) to be called within a
+/*   try-catch block.
+/*
+/* Revision 1.26  2013/06/08 23:37:32  pauloscustodio
 /* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
 /*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
 /* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
@@ -492,7 +497,7 @@ void set_asm_flag( char *flagid )
     else if ( strcmp( flagid, "h" ) == 0 )
     {
         usage();
-        throw( FatalErrorException, "usage" );
+        exit(0);
     }
 
     else

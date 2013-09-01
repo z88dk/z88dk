@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.66 2013-06-16 20:14:39 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.67 2013-09-01 00:18:28 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.66  2013-06-16 20:14:39  pauloscustodio
+/* Revision 1.67  2013-09-01 00:18:28  pauloscustodio
+/* - Replaced e4c exception mechanism by a much simpler one based on a few
+/*   macros. The former did not allow an exit(1) to be called within a
+/*   try-catch block.
+/*
+/* Revision 1.66  2013/06/16 20:14:39  pauloscustodio
 /* Move deffile writing to deffile.c, remove global variable deffile
 /*
 /* Revision 1.65  2013/06/15 00:26:23  pauloscustodio
@@ -392,6 +397,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "strutil.h"
 #include "sym.h"
 #include "symbol.h"
+#include "except.h"
 #include "z80asm.h"
 #include <limits.h>
 #include <stdio.h>
@@ -634,7 +640,7 @@ LinkModules( void )
         reloctable = NULL;
     }
 
-    try
+    TRY
     {
         CURRENTMODULE = modulehdr->first;       /* begin with first module */
         lastobjmodule = modulehdr->last;        /* remember this last module, further modules are libraries */
@@ -743,8 +749,7 @@ LinkModules( void )
         }
 
     }
-
-    finally
+    FINALLY
     {
         set_error_null();
 
@@ -752,6 +757,7 @@ LinkModules( void )
 
         close_error_file();
     }
+	ETRY;
 }
 
 
@@ -859,15 +865,15 @@ LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
         {
             modname = xstrdup( line );
 
-            try
+            TRY
             {
                 SearchLibraries( modname );       /* search name in libraries */
             }
-
-            finally
+            FINALLY
             {
                 xfree( modname ); /* remove copy of module name */
             }
+			ETRY;
         }
     }
     while ( nextname < endnames );
@@ -939,30 +945,32 @@ SearchLibfile( struct libfile *curlib, char *modname )
         {
             if ( ( mname = CheckIfModuleWanted( file, currentlibmodule, modname ) ) != NULL )
             {
-                try
+                TRY
                 {
                     fclose( file );
                     ret =  LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
                 }
-
-                finally
+                FINALLY
                 {
                     xfree( mname );
                 }
+				ETRY;
+
                 return ret;
             }
             else if ( sdcc_hacks == ON && modname[0] == '_' && ( mname = CheckIfModuleWanted( file, currentlibmodule, modname + 1 ) ) != NULL )
             {
-                try
+                TRY
                 {
                     fclose( file );
                     ret =  LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
                 }
-
-                finally
+                FINALLY
                 {
                     xfree( mname );
                 }
+				ETRY;
+
                 return ret;
             }
         }
@@ -1254,7 +1262,7 @@ CreateLib( char *lib_filename )
 
 	CURRENTMODULE = modulehdr->first;
 
-    try
+    TRY
     {
 		/* create library as BINARY file */
 		lib_file = fopen_err( lib_filename, "w+b" );          /* CH_0012 */
@@ -1311,8 +1319,7 @@ CreateLib( char *lib_filename )
         }
         while ( CURRENTMODULE != NULL );
     }
-
-    finally
+    FINALLY
     {
         if ( obj_file )
             fclose( obj_file );
@@ -1329,6 +1336,7 @@ CreateLib( char *lib_filename )
         if ( filebuffer )
             xfree( filebuffer );
     }
+	ETRY;
 }
 
 

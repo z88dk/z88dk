@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.4 2013-05-11 00:29:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.5 2013-09-01 00:18:30 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.4  2013-05-11 00:29:26  pauloscustodio
+# Revision 1.5  2013-09-01 00:18:30  pauloscustodio
+# - Replaced e4c exception mechanism by a much simpler one based on a few
+#   macros. The former did not allow an exit(1) to be called within a
+#   try-catch block.
+#
+# Revision 1.4  2013/05/11 00:29:26  pauloscustodio
 # CH_0021 : Exceptions on file IO show file name
 # Keep a hash table of all opened file names, so that the file name
 # is shown on a fatal error.
@@ -816,10 +821,8 @@ t_compile_module($init_code, <<'END', $compile);
 	SourceFileList *lst;
 	int ret = 1;
 	
-    init_except();                      /* init exception mechanism */
-
     /* start try..catch with finally to cleanup any allocated memory */
-    try
+    TRY
     {
 		add_source_file_path("x1");
 		add_source_file_path("x2");
@@ -838,10 +841,12 @@ t_compile_module($init_code, <<'END', $compile);
 		
 		warn("not reached\n");
 	}
-    catch ( FatalErrorException )
+    CATCH ( FatalErrorException )
     {
         ret = 0;		/* ok */
     }
+	FINALLY {}
+	ETRY;
 	
 	return ret;
 END
@@ -858,10 +863,8 @@ t_compile_module($init_code, <<'END', $compile);
 	SourceFileList *lst;
 	int ret = 1;
 	
-    init_except();                      /* init exception mechanism */
-
     /* start try..catch with finally to cleanup any allocated memory */
-    try
+    TRY
     {
 		lst = OBJ_NEW( SourceFileList );
 		if (lst->count != 0) ERROR;
@@ -869,10 +872,12 @@ t_compile_module($init_code, <<'END', $compile);
 		SourceFileList_open( lst, "fxxx" );
 		warn("not reached\n");
 	}
-    catch ( FatalErrorException )
+    CATCH ( FatalErrorException )
     {
         ret = 0;		/* ok */
     }
+	FINALLY {}
+	ETRY;
 	
 	return ret;
 END
@@ -888,10 +893,8 @@ t_compile_module($init_code, <<'END', $compile);
 	SourceFileList *lst;
 	int ret = 1;
 	
-    init_except();                      /* init exception mechanism */
-
     /* start try..catch with finally to cleanup any allocated memory */
-    try
+    TRY
     {
 		lst = OBJ_NEW( SourceFileList );
 		if (lst->count != 0) ERROR;
@@ -903,10 +906,12 @@ t_compile_module($init_code, <<'END', $compile);
 		
 		warn("not reached\n");
 	}
-    catch ( FatalErrorException )
+    CATCH ( FatalErrorException )
     {
         ret = 0;		/* ok */
     }
+	FINALLY {}
+	ETRY;
 	
 	return ret;
 END

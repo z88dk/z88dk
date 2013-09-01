@@ -13,11 +13,25 @@
 Copyright (C) Paulo Custodio, 2011-2013
 
 Exit with a fatal error, warn on stderr
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.h,v 1.6 2013-09-01 00:18:28 pauloscustodio Exp $ 
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.h,v 1.5 2013-01-20 21:24:28 pauloscustodio Exp $ */
+#pragma once
+
+/* fatal error on stderr with printf-like argument */
+extern void die( char *msg, ... );
+
+/* warning on stderr with printf-like argument */
+extern void warn( char *msg, ... );
+
 /* $Log: die.h,v $
-/* Revision 1.5  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.6  2013-09-01 00:18:28  pauloscustodio
+/* - Replaced e4c exception mechanism by a much simpler one based on a few
+/*   macros. The former did not allow an exit(1) to be called within a
+/*   try-catch block.
+/*
+/* Revision 1.5  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.4  2012/05/24 17:09:27  pauloscustodio
@@ -34,16 +48,3 @@ Exit with a fatal error, warn on stderr
 /*
 /*
 /* */
-
-#ifndef DIE_H
-#define DIE_H
-
-#include "except.h"             /* CH_0004 : Exception mechanism to handle fatal errors */
-
-/* fatal error on stderr with printf-like argument */
-extern void die( e4c_exception_type exception, char *msg, ... );
-
-/* warning on stderr with printf-like argument */
-extern void warn( char *msg, ... );
-
-#endif /* ndef DIE_H */

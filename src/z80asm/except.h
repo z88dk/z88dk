@@ -12,12 +12,97 @@
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-Wrapper module for e4c to setup compile-time defines
+Simple exception mechanism
+
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.9 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* Copyright (C) 2009-2013 Francesco Nidito 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+ * of the Software, and to permit persons to whom the Software is furnished to do
+ * so, subject to the following conditions: 
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software. 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE. 
+ */
+
+/* For the full documentation and explanation of the code below, please refer to
+ * http://www.di.unipi.it/~nids/docs/longjump_try_trow_catch.html
+ */
+
+/* modified to allow THROW() from a called function */
+
+#pragma once
+
+#include "memalloc.h"   /* before any other include */
+
+#include "die.h"
+#include "types.h"
+#include <setjmp.h>
+#include <stdlib.h>
+
+/*-----------------------------------------------------------------------------
+*   exceptions
+*----------------------------------------------------------------------------*/
+#define RuntimeException		1
+#define AssertionException		2
+#define FatalErrorException		3
+
+/*-----------------------------------------------------------------------------
+*   global data
+*----------------------------------------------------------------------------*/
+extern jmp_buf except_current_buf;
+extern int     except_current_count;
+
+/*-----------------------------------------------------------------------------
+*   macros
+*----------------------------------------------------------------------------*/
+#define TRY do{ jmp_buf save_buf; \
+				int except_current_rethrow = 0; \
+				int except_current_throw = 0; \
+				memcpy( save_buf, except_current_buf, sizeof(jmp_buf)); \
+				except_current_count++; \
+				switch( except_current_throw = setjmp(except_current_buf) ){ \
+				case 0: while(1){
+#define CATCH(x) break; case x:
+#define RETHROW(x) except_current_rethrow = (x); break;
+#define FINALLY break; } default:
+#define ETRY } \
+				memcpy( except_current_buf, save_buf, sizeof(jmp_buf)); \
+				except_current_count++; \
+				if (except_current_rethrow) THROW(except_current_rethrow); \
+				}while(0)
+#define THROW(x) do{ \
+					if (except_current_count > 0) { \
+						longjmp(except_current_buf, x); \
+					} \
+					else { \
+						die("Uncaught runtime exception at file %s line %d\n", \
+							__FILE__, __LINE__); \
+					} \
+				}while(0)
+#define THROWN() except_current_throw		/* last thrown */
+
+
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.10 2013-09-01 00:18:28 pauloscustodio Exp $ */
 /* $Log: except.h,v $
-/* Revision 1.9  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.10  2013-09-01 00:18:28  pauloscustodio
+/* - Replaced e4c exception mechanism by a much simpler one based on a few
+/*   macros. The former did not allow an exit(1) to be called within a
+/*   try-catch block.
+/*
+/* Revision 1.9  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.8  2012/11/03 17:39:35  pauloscustodio
@@ -60,25 +145,3 @@ Wrapper module for e4c to setup compile-time defines
 /*
 /*
 /* */
-
-#ifndef EXCEPT_H
-#define EXCEPT_H
-
-#include "memalloc.h"   /* before any other include */
-
-#ifndef __NO_INLINE__
-#define __NO_INLINE__                   /* gcc -O2 fails on "__extension__ inline" */
-#endif
-
-#define _E4C_FUNCTION_NAME      NULL    /* gcc -O2 fails on "__extension__ __FUNCTION__" */
-
-#include "e4c.h"
-
-/* initialize exceptions */
-extern void init_except( void );
-
-/* exceptions */
-E4C_DECLARE_EXCEPTION( FatalErrorException );
-
-#endif /* ndef EXCEPT_H */
-

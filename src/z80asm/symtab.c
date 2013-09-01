@@ -18,9 +18,14 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.11 2013-06-16 22:25:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.12 2013-09-01 00:18:28 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.11  2013-06-16 22:25:39  pauloscustodio
+Revision 1.12  2013-09-01 00:18:28  pauloscustodio
+- Replaced e4c exception mechanism by a much simpler one based on a few
+  macros. The former did not allow an exit(1) to be called within a
+  try-catch block.
+
+Revision 1.11  2013/06/16 22:25:39  pauloscustodio
 New remove_all_{local,static,global}_syms( void ) functions
 to encapsulate calls to get_global_tab().
 
@@ -425,7 +430,7 @@ static void declare_global_symbol( char *name, byte_t type )
                 {
 					/* Already declared global - no possible path, as global tab is deleted between 
 					   modules assembly */
-					die( FatalErrorException, "not reached %s:%d", __FILE__, __LINE__ );
+					die( "not reached %s:%d", __FILE__, __LINE__ );
                 }
             }
             else if ( ( sym->type & ( SYMXDEF | type ) ) != ( SYMXDEF | type ) )
@@ -454,7 +459,7 @@ static void declare_global_symbol( char *name, byte_t type )
         else
         {
             /* local, global - no possible path, as if local & not global, symbol is moved local -> global */
-            die( FatalErrorException, "not reached %s:%d", __FILE__, __LINE__ );
+            die( "not reached %s:%d", __FILE__, __LINE__ );
         }
     }
 }

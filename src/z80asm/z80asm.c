@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.95 2013-08-30 21:50:43 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.96 2013-09-01 00:18:28 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.95  2013-08-30 21:50:43  pauloscustodio
+/* Revision 1.96  2013-09-01 00:18:28  pauloscustodio
+/* - Replaced e4c exception mechanism by a much simpler one based on a few
+/*   macros. The former did not allow an exit(1) to be called within a
+/*   try-catch block.
+/*
+/* Revision 1.95  2013/08/30 21:50:43  pauloscustodio
 /* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
 /* as an identifier reserved by the C standard for implementation-defined behaviour
 /* starting with two underscores.
@@ -569,6 +574,8 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "errors.h"
 #include "file.h"
 #include "hist.h"
+#include "init.h"
+#include "legacy.h"
 #include "listfile.h"
 #include "mapfile.h"
 #include "objfile.h"
@@ -577,8 +584,8 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "strpool.h"
 #include "strutil.h"
 #include "symbol.h"
+#include "except.h"
 #include "z80asm.h"
-#include "legacy.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -793,7 +800,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
     int start_errors = get_num_errors();     /* count errors in this source file */
 
     /* try-catch to delete incomplete files in case of fatal error */
-    try
+    TRY
     {
 		z80asmfile = fopen_err( src_filename, "rb" );           /* CH_0012 */
         set_error_file( src_filename );
@@ -854,8 +861,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
 
         }
     }
-
-    finally
+    FINALLY
     {
         /*
          * Source file no longer needed (file could already have been closed, if fatal error occurred during INCLUDE
@@ -895,6 +901,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
             putchar( '\n' );    /* separate module texts */
         }
     }
+	ETRY;
 }
 
 /*-----------------------------------------------------------------------------
@@ -1329,10 +1336,8 @@ int main( int argc, char *argv[] )
 {
     int    i;
 
-    init_except();                      /* init exception mechanism */
-
     /* start try..catch with finally to cleanup any allocated memory */
-    try
+    TRY
     {
         set_error_null();               /* clear location of error messages */
 
@@ -1354,7 +1359,7 @@ int main( int argc, char *argv[] )
         if ( argc == 1 )
         {
             prompt();
-            throw( FatalErrorException, "No arguments" );
+            exit(0);
         }
 
         TOTALLINES = 0;
@@ -1418,24 +1423,8 @@ int main( int argc, char *argv[] )
 
 
     }
-
-    /* catch and report fatal errors */
-    catch ( NotEnoughMemoryException )
-    {
-        error( ERR_NO_MEMORY );
-    }
-
-    catch ( FatalErrorException )
-    {
-        /* TOTALERRORS is already incremented */
-    }
-    catch ( RuntimeException )  /* catch all */
-    {
-        error( ERR_RUNTIME );
-    }
-
     /* cleanup all allocated memory */
-    finally
+    FINALLY
     {
         set_error_null();
 
@@ -1462,6 +1451,7 @@ int main( int argc, char *argv[] )
 
 #endif
     }
+	ETRY;
 
     if ( get_num_errors() )
     {

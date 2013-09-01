@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-die.t,v 1.7 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-die.t,v 1.8 2013-09-01 00:18:30 pauloscustodio Exp $
 # $Log: whitebox-die.t,v $
-# Revision 1.7  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.8  2013-09-01 00:18:30  pauloscustodio
+# - Replaced e4c exception mechanism by a much simpler one based on a few
+#   macros. The former did not allow an exit(1) to be called within a
+#   try-catch block.
+#
+# Revision 1.7  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.6  2012/06/14 15:01:27  pauloscustodio
@@ -45,51 +50,28 @@ require 't/test_utils.pl';
 
 my $objs = "die.o strutil.o safestr.o";
 ok ! system "make $objs";
-my $compile = "-DEXCEPT_DEBUG except.c $objs";
 
 # test die
-t_compile_module("", <<'END', $compile);
-	init_except();
+t_compile_module("", <<'END', $objs);
 	warn("1\n");	
-	die(NotEnoughMemoryException, "Hello %s\n", "John");
+	die("Hello %s\n", "John");
 	warn("2\n");	
 	
 	return 0;
 END
 t_run_module([], "", <<'END', 1);
-except: init
 1
 Hello John
-
-
-Uncaught NotEnoughMemoryException: Hello John
-
-
-    thrown at die (die.c:0)
-
-The value of errno was 0.
-
-Exception hierarchy
-________________________________________________________________
-
-    RuntimeException
-     |
-     +--NotEnoughMemoryException
-________________________________________________________________
-except: cleanup
 END
 
 
 # test warn
-t_compile_module("", <<'END', $compile);
-	init_except();
+t_compile_module("", <<'END', $objs);
 	warn("Hello %s\n", "John");
 	return 0;
 END
 t_run_module([], "", <<'END', 0);
-except: init
 Hello John
-except: cleanup
 END
 
 unlink_testfiles();

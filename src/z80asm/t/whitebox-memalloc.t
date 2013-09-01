@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.7 2013-02-22 17:16:40 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.8 2013-09-01 00:18:30 pauloscustodio Exp $
 # $Log: whitebox-memalloc.t,v $
-# Revision 1.7  2013-02-22 17:16:40  pauloscustodio
+# Revision 1.8  2013-09-01 00:18:30  pauloscustodio
+# - Replaced e4c exception mechanism by a much simpler one based on a few
+#   macros. The former did not allow an exit(1) to be called within a
+#   try-catch block.
+#
+# Revision 1.7  2013/02/22 17:16:40  pauloscustodio
 # Output memory leaks on exit
 #
 # Revision 1.6  2013/01/20 21:24:29  pauloscustodio
@@ -204,22 +209,6 @@ ERR
 t_run_module([4], "", <<ERR, 1);
 memalloc: init
 memalloc test.c(1): alloc 2147483680 bytes failed
-
-
-Uncaught NotEnoughMemoryException: memalloc test.c(1): alloc 2147483680 bytes failed
-
-
-    thrown at die (die.c:0)
-
-The value of errno was 0.
-
-Exception hierarchy
-________________________________________________________________
-
-    RuntimeException
-     |
-     +--NotEnoughMemoryException
-________________________________________________________________
 memalloc: cleanup
 ERR
 
@@ -227,22 +216,6 @@ ERR
 t_run_module([5], "", <<ERR, 1);
 memalloc: init
 memalloc test.c(1): block not found
-
-
-Uncaught AssertionException: memalloc test.c(1): block not found
-
-
-    thrown at die (die.c:0)
-
-The value of errno was 0.
-
-Exception hierarchy
-________________________________________________________________
-
-    AssertionException
-     |
-     +--AssertionException
-________________________________________________________________
 memalloc: cleanup
 ERR
 
@@ -252,22 +225,6 @@ memalloc: init
 memalloc test.c(1): alloc 1 bytes at ADDR_1
 memalloc test.c(2): free 1 bytes at ADDR_1 allocated at test.c(1)
 memalloc test.c(2): buffer underflow, memory allocated at test.c(1)
-
-
-Uncaught AssertionException: memalloc test.c(2): buffer underflow, memory allocated at test.c(1)
-
-
-    thrown at die (die.c:0)
-
-The value of errno was 0.
-
-Exception hierarchy
-________________________________________________________________
-
-    AssertionException
-     |
-     +--AssertionException
-________________________________________________________________
 memalloc: cleanup
 ERR
 
@@ -277,22 +234,6 @@ memalloc: init
 memalloc test.c(1): alloc 1 bytes at ADDR_1
 memalloc test.c(2): free 1 bytes at ADDR_1 allocated at test.c(1)
 memalloc test.c(2): buffer overflow, memory allocated at test.c(1)
-
-
-Uncaught AssertionException: memalloc test.c(2): buffer overflow, memory allocated at test.c(1)
-
-
-    thrown at die (die.c:0)
-
-The value of errno was 0.
-
-Exception hierarchy
-________________________________________________________________
-
-    AssertionException
-     |
-     +--AssertionException
-________________________________________________________________
 memalloc: cleanup
 ERR
 

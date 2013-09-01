@@ -18,9 +18,14 @@ Only works for memory allocated by xmalloc and freed by xfree.
 Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.c,v 1.8 2013-02-22 17:16:40 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.c,v 1.9 2013-09-01 00:18:28 pauloscustodio Exp $ */
 /* $Log: memalloc.c,v $
-/* Revision 1.8  2013-02-22 17:16:40  pauloscustodio
+/* Revision 1.9  2013-09-01 00:18:28  pauloscustodio
+/* - Replaced e4c exception mechanism by a much simpler one based on a few
+/*   macros. The former did not allow an exit(1) to be called within a
+/*   try-catch block.
+/*
+/* Revision 1.8  2013/02/22 17:16:40  pauloscustodio
 /* Output memory leaks on exit
 /*
 /* Revision 1.7  2013/01/20 21:10:32  pauloscustodio
@@ -172,9 +177,6 @@ static void init( void )
         warn( msg_init );
 #endif
 
-        /* make sure the exceptions are initialized */
-        init_except();
-
 #ifdef _CRTDBG_MAP_ALLOC        /* MS Visual Studio malloc debug */
         _CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
         REPORT_STDERR( _CRT_WARN );
@@ -205,8 +207,7 @@ static MemBlock *new_block( size_t client_size, char *file, int lineno )
 
     if ( block == NULL )
     {
-        die( NotEnoughMemoryException,
-             msg_alloc_failed, file, lineno, block_size );
+        die( msg_alloc_failed, file, lineno, block_size );
         /* not reached */
     }
 
@@ -242,8 +243,7 @@ static MemBlock *find_block( void *client_ptr, char *file, int lineno )
 
     if ( block->signature != MEMBLOCK_SIGN )
     {
-        die( AssertionException,
-             msg_unmatched_block, file, lineno );
+        die( msg_unmatched_block, file, lineno );
         /* not reached */
     }
 
@@ -262,15 +262,13 @@ static void check_fences( MemBlock *block, char *file, int lineno )
     /* check fences */
     if ( 0 != memcmp( fence, START_FENCE_PTR( block ), FENCE_SIZE ) )
     {
-        die( AssertionException,
-             msg_buffer_underflow, file, lineno, block->file, block->lineno );
+        die( msg_buffer_underflow, file, lineno, block->file, block->lineno );
         /* not reached */
     }
 
     if ( 0 != memcmp( fence, END_FENCE_PTR( block ), FENCE_SIZE ) )
     {
-        die( AssertionException,
-             msg_buffer_overflow, file, lineno, block->file, block->lineno );
+        die( msg_buffer_overflow, file, lineno, block->file, block->lineno );
         /* not reached */
     }
 }
@@ -399,8 +397,7 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
 
     if ( block == NULL )
     {
-        die( NotEnoughMemoryException,
-             msg_alloc_failed, file, lineno, block_size );
+        die( msg_alloc_failed, file, lineno, block_size );
         /* not reached */
     }
 

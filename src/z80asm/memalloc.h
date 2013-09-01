@@ -18,9 +18,14 @@ Only works for memory allocated by xmalloc and freed by xfree.
 Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.h,v 1.7 2013-01-20 21:24:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.h,v 1.8 2013-09-01 00:18:28 pauloscustodio Exp $ */
 /* $Log: memalloc.h,v $
-/* Revision 1.7  2013-01-20 21:24:28  pauloscustodio
+/* Revision 1.8  2013-09-01 00:18:28  pauloscustodio
+/* - Replaced e4c exception mechanism by a much simpler one based on a few
+/*   macros. The former did not allow an exit(1) to be called within a
+/*   try-catch block.
+/*
+/* Revision 1.7  2013/01/20 21:24:28  pauloscustodio
 /* Updated copyright year to 2013
 /*
 /* Revision 1.6  2012/05/24 17:09:27  pauloscustodio
@@ -67,7 +72,6 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
 /* include stdlib.h before crtdbg.h */
 #include <stdlib.h>
-#include "except.h"             /* CH_0004 : Exception mechanism to handle fatal errors */
 
 #ifdef _CRTDBG_MAP_ALLOC        /* MS Visual Studio malloc debug */
 #include <crtdbg.h>
@@ -78,8 +82,7 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 /*-----------------------------------------------------------------------------
 *   PUBLIC INTERFACE
 *   alloc memory
-*   throw NotEnoughMemoryException on failure
-*   throw AssertionException on buffer overruns
+*   dies on allocation failure or buffer overruns
 *----------------------------------------------------------------------------*/
 
 extern void *_xmalloc( size_t size, char *file, int lineno );

@@ -70,7 +70,7 @@ typedef unsigned char uint8_t;
 
 #define UTHASH_VERSION 1.9.4
 
-#define uthash_fatal(msg) die(AssertionException, "%s\n", (msg))
+#define uthash_fatal(msg) die("%s\n", (msg))
 /* fatal error (out of memory,etc) */
 #define uthash_malloc(sz) xmalloc(sz)     /* malloc fcn                      */
 #define uthash_free(ptr,sz) xfree(ptr)    /* free fcn                        */

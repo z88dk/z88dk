@@ -12,12 +12,52 @@
 
 Copyright (C) Paulo Custodio, 2011-2013
 
-Wrapper module for e4c to setup compile-time defines
+Simple exception mechanism
+
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.c,v 1.11 2013-03-30 00:02:22 pauloscustodio Exp $ */
+/* Copyright (C) 2009-2013 Francesco Nidito 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+ * of the Software, and to permit persons to whom the Software is furnished to do
+ * so, subject to the following conditions: 
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software. 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE. 
+ */
+
+/* modified to allow THROW() from a called function */
+
+#include "memalloc.h"   /* before any other include */
+
+#include "except.h"
+#include <stdlib.h>
+
+/*-----------------------------------------------------------------------------
+*   global data
+*----------------------------------------------------------------------------*/
+jmp_buf except_current_buf;
+int     except_current_count;
+
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.c,v 1.12 2013-09-01 00:18:28 pauloscustodio Exp $ */
 /* $Log: except.c,v $
-/* Revision 1.11  2013-03-30 00:02:22  pauloscustodio
+/* Revision 1.12  2013-09-01 00:18:28  pauloscustodio
+/* - Replaced e4c exception mechanism by a much simpler one based on a few
+/*   macros. The former did not allow an exit(1) to be called within a
+/*   try-catch block.
+/*
+/* Revision 1.11  2013/03/30 00:02:22  pauloscustodio
 /* include memalloc.h before any other include
 /*
 /* Revision 1.10  2013/01/20 21:10:32  pauloscustodio
@@ -68,50 +108,3 @@ Wrapper module for e4c to setup compile-time defines
 /*
 /*
 /* */
-
-#include "memalloc.h"   /* before any other include */
-#include "except.h"
-#include "types.h"
-#include "die.h"
-#include "e4c.c"
-
-/* exceptions */
-E4C_DEFINE_EXCEPTION( FatalErrorException,  "fatal error",                RuntimeException );
-
-/*-----------------------------------------------------------------------------
-*   fini_except
-*       Ends the exception mechanism, called by atexit()
-*----------------------------------------------------------------------------*/
-static void fini_except( void )
-{
-#ifdef EXCEPT_DEBUG
-    warn( "except: cleanup\n" );
-#endif
-
-    if ( e4c_context_is_ready() )
-    {
-        e4c_context_end();
-    }
-}
-
-/*-----------------------------------------------------------------------------
-*   init_except
-*       Initializes exception mechanism on first call, sets atexit() to
-*       end the exception mechanism.
-*       Must be called before any code that might throw an exception.
-*----------------------------------------------------------------------------*/
-void init_except( void )
-{
-    static BOOL initialized = FALSE;
-
-    if ( ! initialized )
-    {
-#ifdef EXCEPT_DEBUG
-        warn( "except: init\n" );
-#endif
-        e4c_context_begin( E4C_FALSE, e4c_print_exception );
-
-        atexit( fini_except );
-        initialized = TRUE;
-    }
-}
