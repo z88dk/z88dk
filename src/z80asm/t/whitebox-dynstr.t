@@ -12,31 +12,6 @@
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
 # Copyright (C) Paulo Custodio, 2011-2013
-
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.7 2013-09-01 11:52:55 pauloscustodio Exp $
-# $Log: whitebox-dynstr.t,v $
-# Revision 1.7  2013-09-01 11:52:55  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
-#
-# Revision 1.6  2013/05/01 21:10:49  pauloscustodio
-# Add getline to Str, converting EOL sequences to LF.
-#
-# Revision 1.5  2013/04/29 22:24:33  pauloscustodio
-# Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
-#
-# Revision 1.4  2013/02/28 00:32:35  pauloscustodio
-# New interface to Str to copy characters to string
-#
-# Revision 1.3  2013/02/22 17:21:29  pauloscustodio
-# Added chomp()
-#
-# Revision 1.2  2013/01/20 21:24:29  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.1  2012/06/14 15:03:45  pauloscustodio
-# CH_0014 : New Dynamic Strings that grow automatically on creation / concatenation
-#
 #
 # Test dynstr
 
@@ -44,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "dynstr.o class.o die.o safestr.o strutil.o except.o init.o";
+my $objs = "dynstr.o class.o die.o safestr.o strutil.o except.o init.o strpool.o";
 ok ! system "make $objs";
 
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
@@ -73,10 +48,6 @@ void _check_str (Str *str, size_t size, size_t len, char *text,
 		fprintf(stderr, "%s(%d) str->size %u != %u\n", file, lineno, str->size, size);
 	if (str->len != len)
 		fprintf(stderr, "%s(%d) str->len %u != %u\n", file, lineno, str->len, len);
-	if (memcmp(str->data - 4, "\xAA\xAA\xAA\xAA", 4))
-		fprintf(stderr, "%s(%d) fence at start not found\n", file, lineno);
-	if (memcmp(str->data + str->size, "\xAA\xAA\xAA\xAA", 4))
-		fprintf(stderr, "%s(%d) fence at end not found\n", file, lineno);
 	if (str->data[str->len] != 0)
 		fprintf(stderr, "%s(%d) null terminator not found\n", file, lineno);
 	if (memcmp(str->data, text, str->len))
@@ -308,44 +279,35 @@ END_INIT
 	return 0;
 END
 
-t_run_module([], "", <<ERR, 0);
-memalloc: init
+t_run_module([], <<'OUT', <<ERR, 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+         1 |          0 |          0 |          4 |          4 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        40 |          2 |          2 |          0 |          0 |         +0
+       256 |          1 |          2 |          4 |          3 |         +0
+       512 |          0 |          0 |          2 |          2 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2408, zero-initialized=336 (13.95%), freed=2408 (100.00%), remaining=0
+OUT
 init
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_1
-memalloc dynstr.c(4): alloc 256 bytes at ADDR_2
 Str_unreserve
-memalloc dynstr.c(5): free 256 bytes at ADDR_2 allocated at dynstr.c(4)
-memalloc dynstr.c(5): alloc 1 bytes at ADDR_3
 Str_szcat
-memalloc dynstr.c(4): free 1 bytes at ADDR_3 allocated at dynstr.c(5)
-memalloc dynstr.c(4): alloc 256 bytes at ADDR_4
 Str_szset
 Str_clear
 Str_reserve in 256 blocks
-memalloc dynstr.c(4): free 256 bytes at ADDR_4 allocated at dynstr.c(4)
-memalloc dynstr.c(4): alloc 512 bytes at ADDR_5
-memalloc dynstr.c(5): free 512 bytes at ADDR_5 allocated at dynstr.c(4)
-memalloc dynstr.c(5): alloc 1 bytes at ADDR_6
-memalloc dynstr.c(4): free 1 bytes at ADDR_6 allocated at dynstr.c(5)
-memalloc dynstr.c(4): alloc 512 bytes at ADDR_7
 Str_unreserve
-memalloc dynstr.c(5): free 512 bytes at ADDR_7 allocated at dynstr.c(4)
-memalloc dynstr.c(5): alloc 1 bytes at ADDR_8
-memalloc dynstr.c(4): free 1 bytes at ADDR_8 allocated at dynstr.c(5)
-memalloc dynstr.c(4): alloc 256 bytes at ADDR_9
 Str_clone
-memalloc dynstr.c(1): alloc 40 bytes at ADDR_10
-memalloc dynstr.c(2): alloc 256 bytes at ADDR_11
 Str_fset
 Str_fcat
 Str_vfset
 Str_vfcat
 Str_unreserve and Str_fset
-memalloc dynstr.c(5): free 256 bytes at ADDR_9 allocated at dynstr.c(4)
-memalloc dynstr.c(5): alloc 1 bytes at ADDR_12
 expand
-memalloc dynstr.c(4): free 1 bytes at ADDR_12 allocated at dynstr.c(5)
-memalloc dynstr.c(4): alloc 256 bytes at ADDR_13
 Str_bset
 Str_bcat
 Str_set, Str_cat
@@ -382,15 +344,39 @@ C<0A>
 D<0A>
 E<0A>
 delete s1
-memalloc dynstr.c(3): free 256 bytes at ADDR_13 allocated at dynstr.c(4)
-memalloc dynstr.c(1): free 40 bytes at ADDR_1 allocated at dynstr.c(1)
 delete s2
-memalloc dynstr.c(3): free 256 bytes at ADDR_11 allocated at dynstr.c(2)
-memalloc dynstr.c(1): free 40 bytes at ADDR_10 allocated at dynstr.c(1)
 end
-memalloc: cleanup
 ERR
 
 unlink_testfiles();
 done_testing;
 
+
+__END__
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.8 2013-09-01 17:49:47 pauloscustodio Exp $
+# $Log: whitebox-dynstr.t,v $
+# Revision 1.8  2013-09-01 17:49:47  pauloscustodio
+# Change in test output due to memalloc change.
+#
+# Revision 1.7  2013/09/01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.6  2013/05/01 21:10:49  pauloscustodio
+# Add getline to Str, converting EOL sequences to LF.
+#
+# Revision 1.5  2013/04/29 22:24:33  pauloscustodio
+# Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
+#
+# Revision 1.4  2013/02/28 00:32:35  pauloscustodio
+# New interface to Str to copy characters to string
+#
+# Revision 1.3  2013/02/22 17:21:29  pauloscustodio
+# Added chomp()
+#
+# Revision 1.2  2013/01/20 21:24:29  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.1  2012/06/14 15:03:45  pauloscustodio
+# CH_0014 : New Dynamic Strings that grow automatically on creation / concatenation
+#
