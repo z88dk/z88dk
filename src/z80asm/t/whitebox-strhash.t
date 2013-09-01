@@ -12,64 +12,6 @@
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
 # Copyright (C) Paulo Custodio, 2011-2013
-
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.11 2013-09-01 11:52:56 pauloscustodio Exp $
-# $Log: whitebox-strhash.t,v $
-# Revision 1.11  2013-09-01 11:52:56  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
-#
-# Revision 1.10  2013/09/01 00:18:30  pauloscustodio
-# - Replaced e4c exception mechanism by a much simpler one based on a few
-#   macros. The former did not allow an exit(1) to be called within a
-#   try-catch block.
-#
-# Revision 1.9  2013/05/27 22:43:34  pauloscustodio
-# StrHash_set failed when the key string buffer was reused later in the code.
-# StrHash_get failed to retrieve object after the key used by StrHash_set was reused.
-#
-# Revision 1.8  2013/02/25 21:36:17  pauloscustodio
-# Uniform the APIs of classhash, classlist, strhash, strlist
-#
-# Revision 1.7  2013/02/02 00:07:35  pauloscustodio
-# StrHash_next() returns value instead of BOOL
-#
-# Revision 1.6  2013/01/22 22:24:49  pauloscustodio
-# Removed StrHash_set_delptr() - not intuitive and error prone
-# Added StrHash_remove_all() to remove all elements
-# Added StrHash_remove_elem() to remove one item giving its address
-#
-# Revision 1.5  2013/01/22 01:02:54  pauloscustodio
-# Removed CIRCLEQ from StrHash - redundant, UT_hash_handle contains a double-linked list
-# Added StrHash_set_delptr() to define at create-key time the function to free the value when
-# the item is deleted later.
-# Added StrHash_head() to get head of list - usefull in a delete-all loop.
-#
-# Revision 1.4  2013/01/19 23:52:41  pauloscustodio
-# strhash hanged on cleanup - delete by HASH_ITER / HASH_DEL
-# instead of traversing CIRCLEQ
-#
-# Revision 1.3  2013/01/19 01:33:16  pauloscustodio
-# Clean-up strpool code
-#
-# Revision 1.2  2013/01/19 00:04:53  pauloscustodio
-# Implement StrHash_clone, required change in API of class.h and all classes that used it.
-#
-# Revision 1.1  2013/01/18 22:59:18  pauloscustodio
-# CH_0016 : StrHash class to create maps from string to void*
-# Created the StrHash to create hash tables mapping string keys kept in
-# strpool to void* user pointer.
-#
-# Revision 1.3  2012/06/14 15:01:27  pauloscustodio
-# Split safe strings from strutil.c to safestr.c
-#
-# Revision 1.2  2012/05/26 18:50:26  pauloscustodio
-# Use .o instead of .c to build test program, faster compilation.
-# Use gcc to compile instead of cc.
-#
-# Revision 1.1  2012/05/24 21:42:42  pauloscustodio
-# CH_0011 : new string list class to hold lists of strings
-#
 #
 # Test strlist
 
@@ -361,94 +303,91 @@ END_INIT
 	return 0;
 END
 
-t_run_module([], "", <<ERR, 0);
-memalloc: init
+t_run_module([], <<'OUT', <<'ERR', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+        32 |          4 |          4 |          0 |          0 |         +0
+        40 |         16 |         16 |          0 |          0 |         +0
+        44 |          6 |          6 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+       384 |          6 |          6 |          0 |          0 |         +0
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=6248, zero-initialized=5204 (83.29%), freed=4476 (71.64%), remaining=1772
+OUT
 init
-memalloc strhash.c(1): alloc 32 bytes at ADDR_1
-memalloc strpool.c(1): alloc 32 bytes at ADDR_2
-memalloc strhash.c(4): alloc 40 bytes at ADDR_3
-memalloc strpool.c(2): alloc 36 bytes at ADDR_4
-memalloc strpool.c(3): alloc 4 bytes at ADDR_5
-memalloc strpool.c(4): alloc 44 bytes at ADDR_6
-memalloc strpool.c(4): alloc 384 bytes at ADDR_7
-memalloc strhash.c(5): alloc 44 bytes at ADDR_8
-memalloc strhash.c(5): alloc 384 bytes at ADDR_9
-memalloc strhash.c(4): alloc 40 bytes at ADDR_10
-memalloc strpool.c(2): alloc 36 bytes at ADDR_11
-memalloc strpool.c(3): alloc 4 bytes at ADDR_12
-memalloc strhash.c(4): alloc 40 bytes at ADDR_13
-memalloc strpool.c(2): alloc 36 bytes at ADDR_14
-memalloc strpool.c(3): alloc 4 bytes at ADDR_15
-memalloc strhash.c(1): alloc 32 bytes at ADDR_16
-memalloc strhash.c(4): alloc 40 bytes at ADDR_17
-memalloc strhash.c(5): alloc 44 bytes at ADDR_18
-memalloc strhash.c(5): alloc 384 bytes at ADDR_19
-memalloc strhash.c(4): alloc 40 bytes at ADDR_20
-memalloc strhash.c(4): alloc 40 bytes at ADDR_21
-memalloc strhash.c(3): free 40 bytes at ADDR_10 allocated at strhash.c(4)
-memalloc strhash.c(3): free 40 bytes at ADDR_13 allocated at strhash.c(4)
-memalloc strhash.c(2): free 384 bytes at ADDR_9 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_8 allocated at strhash.c(5)
-memalloc strhash.c(3): free 40 bytes at ADDR_3 allocated at strhash.c(4)
-memalloc strhash.c(3): free 40 bytes at ADDR_17 allocated at strhash.c(4)
-memalloc strhash.c(3): free 40 bytes at ADDR_20 allocated at strhash.c(4)
-memalloc strhash.c(2): free 384 bytes at ADDR_19 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_18 allocated at strhash.c(5)
-memalloc strhash.c(3): free 40 bytes at ADDR_21 allocated at strhash.c(4)
-memalloc strhash.c(4): alloc 40 bytes at ADDR_22
-memalloc strhash.c(5): alloc 44 bytes at ADDR_23
-memalloc strhash.c(5): alloc 384 bytes at ADDR_24
-memalloc strhash.c(4): alloc 40 bytes at ADDR_25
-memalloc strhash.c(4): alloc 40 bytes at ADDR_26
-memalloc strhash.c(3): free 40 bytes at ADDR_22 allocated at strhash.c(4)
-memalloc strhash.c(3): free 40 bytes at ADDR_25 allocated at strhash.c(4)
-memalloc strhash.c(2): free 384 bytes at ADDR_24 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_23 allocated at strhash.c(5)
-memalloc strhash.c(3): free 40 bytes at ADDR_26 allocated at strhash.c(4)
-memalloc strhash.c(4): alloc 40 bytes at ADDR_27
-memalloc strhash.c(5): alloc 44 bytes at ADDR_28
-memalloc strhash.c(5): alloc 384 bytes at ADDR_29
-memalloc strhash.c(4): alloc 40 bytes at ADDR_30
-memalloc strhash.c(4): alloc 40 bytes at ADDR_31
-memalloc strhash.c(3): free 40 bytes at ADDR_30 allocated at strhash.c(4)
-memalloc strhash.c(3): free 40 bytes at ADDR_31 allocated at strhash.c(4)
-memalloc strhash.c(2): free 384 bytes at ADDR_29 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_28 allocated at strhash.c(5)
-memalloc strhash.c(3): free 40 bytes at ADDR_27 allocated at strhash.c(4)
-memalloc strhash.c(1): free 32 bytes at ADDR_1 allocated at strhash.c(1)
-memalloc strhash.c(1): alloc 32 bytes at ADDR_32
-memalloc strhash.c(4): alloc 40 bytes at ADDR_33
-memalloc strhash.c(5): alloc 44 bytes at ADDR_34
-memalloc strhash.c(5): alloc 384 bytes at ADDR_35
-memalloc strhash.c(2): free 384 bytes at ADDR_35 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_34 allocated at strhash.c(5)
-memalloc strhash.c(3): free 40 bytes at ADDR_33 allocated at strhash.c(4)
-memalloc strhash.c(1): free 32 bytes at ADDR_32 allocated at strhash.c(1)
-memalloc strhash.c(1): alloc 32 bytes at ADDR_36
-memalloc strhash.c(4): alloc 40 bytes at ADDR_37
-memalloc strhash.c(5): alloc 44 bytes at ADDR_38
-memalloc strhash.c(5): alloc 384 bytes at ADDR_39
-memalloc strhash.c(4): alloc 40 bytes at ADDR_40
-memalloc strhash.c(4): alloc 40 bytes at ADDR_41
-memalloc strhash.c(3): free 40 bytes at ADDR_41 allocated at strhash.c(4)
-memalloc strhash.c(3): free 40 bytes at ADDR_37 allocated at strhash.c(4)
-memalloc strhash.c(2): free 384 bytes at ADDR_39 allocated at strhash.c(5)
-memalloc strhash.c(2): free 44 bytes at ADDR_38 allocated at strhash.c(5)
-memalloc strhash.c(3): free 40 bytes at ADDR_40 allocated at strhash.c(4)
-memalloc strhash.c(1): free 32 bytes at ADDR_36 allocated at strhash.c(1)
-memalloc strhash.c(1): free 32 bytes at ADDR_16 allocated at strhash.c(1)
-memalloc strpool.c(6): free 4 bytes at ADDR_5 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_4 allocated at strpool.c(2)
-memalloc strpool.c(6): free 4 bytes at ADDR_12 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_11 allocated at strpool.c(2)
-memalloc strpool.c(5): free 384 bytes at ADDR_7 allocated at strpool.c(4)
-memalloc strpool.c(5): free 44 bytes at ADDR_6 allocated at strpool.c(4)
-memalloc strpool.c(6): free 4 bytes at ADDR_15 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_14 allocated at strpool.c(2)
-memalloc strpool.c(1): free 32 bytes at ADDR_2 allocated at strpool.c(1)
-memalloc: cleanup
 ERR
 
 
 unlink_testfiles();
 done_testing;
+
+
+__END__
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strhash.t,v 1.12 2013-09-01 17:10:49 pauloscustodio Exp $
+# $Log: whitebox-strhash.t,v $
+# Revision 1.12  2013-09-01 17:10:49  pauloscustodio
+# Change in test output due to memalloc change.
+#
+# Revision 1.11  2013/09/01 11:52:56  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.10  2013/09/01 00:18:30  pauloscustodio
+# - Replaced e4c exception mechanism by a much simpler one based on a few
+#   macros. The former did not allow an exit(1) to be called within a
+#   try-catch block.
+#
+# Revision 1.9  2013/05/27 22:43:34  pauloscustodio
+# StrHash_set failed when the key string buffer was reused later in the code.
+# StrHash_get failed to retrieve object after the key used by StrHash_set was reused.
+#
+# Revision 1.8  2013/02/25 21:36:17  pauloscustodio
+# Uniform the APIs of classhash, classlist, strhash, strlist
+#
+# Revision 1.7  2013/02/02 00:07:35  pauloscustodio
+# StrHash_next() returns value instead of BOOL
+#
+# Revision 1.6  2013/01/22 22:24:49  pauloscustodio
+# Removed StrHash_set_delptr() - not intuitive and error prone
+# Added StrHash_remove_all() to remove all elements
+# Added StrHash_remove_elem() to remove one item giving its address
+#
+# Revision 1.5  2013/01/22 01:02:54  pauloscustodio
+# Removed CIRCLEQ from StrHash - redundant, UT_hash_handle contains a double-linked list
+# Added StrHash_set_delptr() to define at create-key time the function to free the value when
+# the item is deleted later.
+# Added StrHash_head() to get head of list - usefull in a delete-all loop.
+#
+# Revision 1.4  2013/01/19 23:52:41  pauloscustodio
+# strhash hanged on cleanup - delete by HASH_ITER / HASH_DEL
+# instead of traversing CIRCLEQ
+#
+# Revision 1.3  2013/01/19 01:33:16  pauloscustodio
+# Clean-up strpool code
+#
+# Revision 1.2  2013/01/19 00:04:53  pauloscustodio
+# Implement StrHash_clone, required change in API of class.h and all classes that used it.
+#
+# Revision 1.1  2013/01/18 22:59:18  pauloscustodio
+# CH_0016 : StrHash class to create maps from string to void*
+# Created the StrHash to create hash tables mapping string keys kept in
+# strpool to void* user pointer.
+#
+# Revision 1.3  2012/06/14 15:01:27  pauloscustodio
+# Split safe strings from strutil.c to safestr.c
+#
+# Revision 1.2  2012/05/26 18:50:26  pauloscustodio
+# Use .o instead of .c to build test program, faster compilation.
+# Use gcc to compile instead of cc.
+#
+# Revision 1.1  2012/05/24 21:42:42  pauloscustodio
+# CH_0011 : new string list class to hold lists of strings
+#

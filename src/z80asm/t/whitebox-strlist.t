@@ -12,41 +12,6 @@
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
 # Copyright (C) Paulo Custodio, 2011-2013
-
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.10 2013-09-01 11:52:56 pauloscustodio Exp $
-# $Log: whitebox-strlist.t,v $
-# Revision 1.10  2013-09-01 11:52:56  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
-#
-# Revision 1.9  2013/02/27 20:47:30  pauloscustodio
-# Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
-#
-# Revision 1.8  2013/02/25 21:36:17  pauloscustodio
-# Uniform the APIs of classhash, classlist, strhash, strlist
-#
-# Revision 1.7  2013/01/30 20:40:07  pauloscustodio
-# Test cases
-#
-# Revision 1.6  2013/01/20 21:24:29  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.5  2013/01/19 01:33:16  pauloscustodio
-# Clean-up strpool code
-#
-# Revision 1.4  2013/01/19 00:04:53  pauloscustodio
-# Implement StrHash_clone, required change in API of class.h and all classes that used it.
-#
-# Revision 1.3  2012/06/14 15:01:27  pauloscustodio
-# Split safe strings from strutil.c to safestr.c
-#
-# Revision 1.2  2012/05/26 18:50:26  pauloscustodio
-# Use .o instead of .c to build test program, faster compilation.
-# Use gcc to compile instead of cc.
-#
-# Revision 1.1  2012/05/24 21:42:42  pauloscustodio
-# CH_0011 : new string list class to hold lists of strings
-#
 #
 # Test strlist
 
@@ -158,53 +123,64 @@ END_INIT
 	return 0;
 END
 
-t_run_module([], "", <<ERR, 0);
-memalloc: init
-memalloc strlist.c(1): alloc 36 bytes at ADDR_1
-memalloc strpool.c(1): alloc 32 bytes at ADDR_2
-memalloc strlist.c(3): alloc 12 bytes at ADDR_3
-memalloc strpool.c(2): alloc 36 bytes at ADDR_4
-memalloc strpool.c(3): alloc 4 bytes at ADDR_5
-memalloc strpool.c(4): alloc 44 bytes at ADDR_6
-memalloc strpool.c(4): alloc 384 bytes at ADDR_7
-memalloc strlist.c(3): alloc 12 bytes at ADDR_8
-memalloc strpool.c(2): alloc 36 bytes at ADDR_9
-memalloc strpool.c(3): alloc 4 bytes at ADDR_10
-memalloc strlist.c(1): alloc 36 bytes at ADDR_11
-memalloc strlist.c(3): alloc 12 bytes at ADDR_12
-memalloc strlist.c(3): alloc 12 bytes at ADDR_13
-memalloc strlist.c(3): alloc 12 bytes at ADDR_14
-memalloc strpool.c(2): alloc 36 bytes at ADDR_15
-memalloc strpool.c(3): alloc 4 bytes at ADDR_16
-memalloc strlist.c(3): alloc 12 bytes at ADDR_17
-memalloc strpool.c(2): alloc 36 bytes at ADDR_18
-memalloc strpool.c(3): alloc 4 bytes at ADDR_19
-memalloc strlist.c(2): free 12 bytes at ADDR_3 allocated at strlist.c(3)
-memalloc strlist.c(2): free 12 bytes at ADDR_8 allocated at strlist.c(3)
-memalloc strlist.c(2): free 12 bytes at ADDR_14 allocated at strlist.c(3)
-memalloc strlist.c(1): free 36 bytes at ADDR_1 allocated at strlist.c(1)
-memalloc strlist.c(1): alloc 36 bytes at ADDR_20
-memalloc strlist.c(3): alloc 12 bytes at ADDR_21
-memalloc strlist.c(2): free 12 bytes at ADDR_21 allocated at strlist.c(3)
-memalloc strlist.c(1): free 36 bytes at ADDR_20 allocated at strlist.c(1)
-memalloc strlist.c(2): free 12 bytes at ADDR_12 allocated at strlist.c(3)
-memalloc strlist.c(2): free 12 bytes at ADDR_13 allocated at strlist.c(3)
-memalloc strlist.c(2): free 12 bytes at ADDR_17 allocated at strlist.c(3)
-memalloc strlist.c(1): free 36 bytes at ADDR_11 allocated at strlist.c(1)
-memalloc strpool.c(6): free 4 bytes at ADDR_5 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_4 allocated at strpool.c(2)
-memalloc strpool.c(6): free 4 bytes at ADDR_10 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_9 allocated at strpool.c(2)
-memalloc strpool.c(6): free 4 bytes at ADDR_16 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_15 allocated at strpool.c(2)
-memalloc strpool.c(5): free 384 bytes at ADDR_7 allocated at strpool.c(4)
-memalloc strpool.c(5): free 44 bytes at ADDR_6 allocated at strpool.c(4)
-memalloc strpool.c(6): free 4 bytes at ADDR_19 allocated at strpool.c(3)
-memalloc strpool.c(7): free 36 bytes at ADDR_18 allocated at strpool.c(2)
-memalloc strpool.c(1): free 32 bytes at ADDR_2 allocated at strpool.c(1)
-memalloc: cleanup
+t_run_module([], <<'OUT', <<'ERR', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        12 |          7 |          7 |          0 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        36 |          3 |          3 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=3104, zero-initialized=2060 (66.37%), freed=1332 (42.91%), remaining=1772
+OUT
 ERR
 
 
 unlink_testfiles();
 done_testing;
+
+
+__END__
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.11 2013-09-01 17:08:17 pauloscustodio Exp $
+# $Log: whitebox-strlist.t,v $
+# Revision 1.11  2013-09-01 17:08:17  pauloscustodio
+# Change in test output due to memalloc change.
+#
+# Revision 1.10  2013/09/01 11:52:56  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.9  2013/02/27 20:47:30  pauloscustodio
+# Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
+#
+# Revision 1.8  2013/02/25 21:36:17  pauloscustodio
+# Uniform the APIs of classhash, classlist, strhash, strlist
+#
+# Revision 1.7  2013/01/30 20:40:07  pauloscustodio
+# Test cases
+#
+# Revision 1.6  2013/01/20 21:24:29  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.5  2013/01/19 01:33:16  pauloscustodio
+# Clean-up strpool code
+#
+# Revision 1.4  2013/01/19 00:04:53  pauloscustodio
+# Implement StrHash_clone, required change in API of class.h and all classes that used it.
+#
+# Revision 1.3  2012/06/14 15:01:27  pauloscustodio
+# Split safe strings from strutil.c to safestr.c
+#
+# Revision 1.2  2012/05/26 18:50:26  pauloscustodio
+# Use .o instead of .c to build test program, faster compilation.
+# Use gcc to compile instead of cc.
+#
+# Revision 1.1  2012/05/24 21:42:42  pauloscustodio
+# CH_0011 : new string list class to hold lists of strings
