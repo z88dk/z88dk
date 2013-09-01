@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.10 2013-09-01 16:21:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.11 2013-09-01 16:39:29 pauloscustodio Exp $
 #
 # Test memory allocation
 
@@ -46,9 +46,14 @@ END
 unlink_testfiles();
 done_testing;
 
+
 __END__
 # $Log: whitebox-memalloc.t,v $
-# Revision 1.10  2013-09-01 16:21:55  pauloscustodio
+# Revision 1.11  2013-09-01 16:39:29  pauloscustodio
+# Removed memalloc allocation checking code, use MSVC _CRTDBG_MAP_ALLOC instead.
+# Dump memory usage statistics at the end if MEMALLOC_DEBUG defined.
+#
+# Revision 1.10  2013/09/01 16:21:55  pauloscustodio
 # Removed memalloc allocation checking code, use MSVC _CRTDBG_MAP_ALLOC instead.
 # Dump memory usage statistics at the end if MEMALLOC_DEBUG defined.
 #
