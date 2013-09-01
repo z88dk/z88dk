@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle assembly listing and symbol table listing.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.5 2013-09-01 12:00:07 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.6 2013-09-01 18:46:01 pauloscustodio Exp $ */
 /* $Log: listfile.c,v $
-/* Revision 1.5  2013-09-01 12:00:07  pauloscustodio
+/* Revision 1.6  2013-09-01 18:46:01  pauloscustodio
+/* Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
+/*
+/* Revision 1.5  2013/09/01 12:00:07  pauloscustodio
 /* Cleanup compilation warnings
 /*
 /* Revision 1.4  2013/03/04 23:37:09  pauloscustodio
@@ -79,9 +82,6 @@ DEF_CLASS(ListFile);
 *----------------------------------------------------------------------------*/
 void ListFile_init ( ListFile *self )
 { 
-    /* force init strpool to make sure ListFile is destroyed before StrPool */
-    strpool_init();
-
 	self->bytes = OBJ_NEW( Str );
 	OBJ_AUTODELETE( self->bytes ) = FALSE;
 

@@ -17,9 +17,12 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.3 2013-03-10 18:00:24 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.4 2013-09-01 18:46:01 pauloscustodio Exp $ */
 /* $Log: srcfile.c,v $
-/* Revision 1.3  2013-03-10 18:00:24  pauloscustodio
+/* Revision 1.4  2013-09-01 18:46:01  pauloscustodio
+/* Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
+/*
+/* Revision 1.3  2013/03/10 18:00:24  pauloscustodio
 /* Interface with errors (set input position for errors) and  listfile (start list of each input line)
 /*
 /* Revision 1.2  2013/03/02 23:52:49  pauloscustodio
@@ -80,9 +83,6 @@ DEF_CLASS( SourceFile );
 
 void SourceFile_init( SourceFile *self )
 {
-    /* force init strpool to make sure SourceFile is destroyed before StrPool */
-    strpool_init();
-
 	self->filename   = "";
 	self->line       = OBJ_NEW( Str );		
 	OBJ_AUTODELETE( self->line ) = FALSE;

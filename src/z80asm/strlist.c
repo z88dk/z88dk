@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 List of strings (e.g. include path); strings kept in strpool.h
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.c,v 1.4 2013-02-27 20:47:30 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.c,v 1.5 2013-09-01 18:46:01 pauloscustodio Exp $ */
 /* $Log: strlist.c,v $
-/* Revision 1.4  2013-02-27 20:47:30  pauloscustodio
+/* Revision 1.5  2013-09-01 18:46:01  pauloscustodio
+/* Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
+/*
+/* Revision 1.4  2013/02/27 20:47:30  pauloscustodio
 /* Renamed StrList to SzList to solve conflict with CLASS_LIST( Str ) also generating a class StrList
 /*
 /* Revision 1.3  2013/02/25 21:36:17  pauloscustodio
@@ -43,9 +46,6 @@ DEF_CLASS( SzList );
 
 void SzList_init( SzList *self )
 {
-    /* force init strpool to make sure SzList is destroyed before StrPool */
-    strpool_init();
-
     TAILQ_INIT( &self->head );
 }
 

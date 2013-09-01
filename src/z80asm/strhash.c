@@ -18,9 +18,12 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.9 2013-05-27 22:43:34 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.10 2013-09-01 18:46:01 pauloscustodio Exp $ */
 /* $Log: strhash.c,v $
-/* Revision 1.9  2013-05-27 22:43:34  pauloscustodio
+/* Revision 1.10  2013-09-01 18:46:01  pauloscustodio
+/* Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
+/*
+/* Revision 1.9  2013/05/27 22:43:34  pauloscustodio
 /* StrHash_set failed when the key string buffer was reused later in the code.
 /* StrHash_get failed to retrieve object after the key used by StrHash_set was reused.
 /*
@@ -71,9 +74,6 @@ DEF_CLASS( StrHash );
 
 void StrHash_init( StrHash *self )
 {
-    /* force init strpool to make sure StrHash is destroyed before StrPool */
-    strpool_init();
-
 	self->hash = NULL;
 }
 

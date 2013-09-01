@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.5 2013-06-16 16:49:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.6 2013-09-01 18:46:01 pauloscustodio Exp $
 $Log: sym.c,v $
-Revision 1.5  2013-06-16 16:49:20  pauloscustodio
+Revision 1.6  2013-09-01 18:46:01  pauloscustodio
+Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
+
+Revision 1.5  2013/06/16 16:49:20  pauloscustodio
 Symbol_fullname() to return full symbol name NAME@MODULE
 
 Revision 1.4  2013/06/08 23:08:38  pauloscustodio
@@ -50,9 +53,6 @@ DEF_CLASS( Symbol )
 
 void Symbol_init( Symbol *self ) 
 {
-    /* force init strpool to make sure ErrFile is destroyed before StrPool */
-	strpool_init();
-	
 	self->references = OBJ_NEW(SymbolRefList);
 	OBJ_AUTODELETE(self->references) = FALSE;
 }

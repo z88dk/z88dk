@@ -15,10 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle object file contruction, reading and writing
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.8 2013-08-30 21:50:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.9 2013-09-01 18:46:01 pauloscustodio Exp $
 
 $Log: objfile.c,v $
-Revision 1.8  2013-08-30 21:50:43  pauloscustodio
+Revision 1.9  2013-09-01 18:46:01  pauloscustodio
+Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
+
+Revision 1.8  2013/08/30 21:50:43  pauloscustodio
 By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
 as an identifier reserved by the C standard for implementation-defined behaviour
 starting with two underscores.
@@ -101,7 +104,6 @@ DEF_CLASS( ObjFile );
 
 void ObjFile_init (ObjFile *self) 
 {
-	strpool_init();
 	self->org_addr = -1;
 	self->modname_ptr = self->expr_ptr = self->symbols_ptr = self->externsym_ptr 
 					  = self->code_ptr = -1;

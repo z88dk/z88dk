@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.26 2013-09-01 00:18:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.27 2013-09-01 18:46:01 pauloscustodio Exp $ */
 /* $Log: errors.c,v $
-/* Revision 1.26  2013-09-01 00:18:28  pauloscustodio
+/* Revision 1.27  2013-09-01 18:46:01  pauloscustodio
+/* Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
+/*
+/* Revision 1.26  2013/09/01 00:18:28  pauloscustodio
 /* - Replaced e4c exception mechanism by a much simpler one based on a few
 /*   macros. The former did not allow an exit(1) to be called within a
 /*   try-catch block.
@@ -171,9 +174,6 @@ void ErrFile_close( ErrFile *self );
 
 void ErrFile_init( ErrFile *self )
 {
-    /* force init strpool to make sure ErrFile is destroyed before StrPool */
-    strpool_init();
-
 	self->num_errors = OBJ_NEW( StrHash );
 	OBJ_AUTODELETE(self->num_errors) = FALSE;
 }
@@ -381,7 +381,7 @@ static void out_error_msg( int *countp, char *prefix,
     sstr_cat( str, ": " );
 
     /* output error message */
-    if ( err < NUM_ELEMS( error_msg ) )
+    if ( err < G_N_ELEMENTS( error_msg ) )
     {
         switch ( err )
         {

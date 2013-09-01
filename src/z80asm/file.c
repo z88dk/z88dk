@@ -14,9 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.20 2013-05-12 19:20:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.21 2013-09-01 18:46:01 pauloscustodio Exp $
 $Log: file.c,v $
-Revision 1.20  2013-05-12 19:20:34  pauloscustodio
+Revision 1.21  2013-09-01 18:46:01  pauloscustodio
+Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
+
+Revision 1.20  2013/05/12 19:20:34  pauloscustodio
 warnings
 
 Revision 1.19  2013/05/11 00:29:26  pauloscustodio
@@ -151,10 +154,7 @@ END_CLASS;
 
 DEF_CLASS( OpenFile );
 
-void OpenFile_init( OpenFile *self )   
-{
-	strpool_init();
-}
+void OpenFile_init( OpenFile *self ) { }
 
 void OpenFile_copy( OpenFile *self, OpenFile *other ) { }
 

@@ -14,9 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.12 2013-09-01 12:00:07 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.13 2013-09-01 18:46:01 pauloscustodio Exp $ 
 $Log: scan.c,v $
-Revision 1.12  2013-09-01 12:00:07  pauloscustodio
+Revision 1.13  2013-09-01 18:46:01  pauloscustodio
+Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
+
+Revision 1.12  2013/09/01 12:00:07  pauloscustodio
 Cleanup compilation warnings
 
 Revision 1.11  2013/09/01 00:18:28  pauloscustodio
@@ -1478,9 +1481,6 @@ DEF_CLASS(Context);
 
 void Context_init( Context *self )
 {
-    /* force init strpool to make sure Context is destroyed before StrPool */
-    strpool_init();
-	
 	self->buffer = OBJ_NEW(Str);
 	OBJ_AUTODELETE(self->buffer) = FALSE;
 }
