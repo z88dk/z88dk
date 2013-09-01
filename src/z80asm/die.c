@@ -16,6 +16,7 @@ Exit with a fatal error, warn on stderr
 */
 
 #include "memalloc.h"  /* before any other include */
+
 #include "die.h"
 
 #include <stdlib.h>
@@ -45,9 +46,12 @@ void warn( char *msg, ... )
     vfprintf( stderr, msg, argptr );
 }
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.c,v 1.11 2013-09-01 00:18:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/die.c,v 1.12 2013-09-01 18:45:48 pauloscustodio Exp $ */
 /* $Log: die.c,v $
-/* Revision 1.11  2013-09-01 00:18:28  pauloscustodio
+/* Revision 1.12  2013-09-01 18:45:48  pauloscustodio
+/* comments
+/*
+/* Revision 1.11  2013/09/01 00:18:28  pauloscustodio
 /* - Replaced e4c exception mechanism by a much simpler one based on a few
 /*   macros. The former did not allow an exit(1) to be called within a
 /*   try-catch block.
