@@ -12,17 +12,18 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.72 2013-09-01 16:53:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.73 2013-09-04 21:17:52 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
-# EXE suffix
+# EXESUFFIX needs to be defined as .exe for windows
 #------------------------------------------------------------------------------
-ifeq ($(OS),Windows_NT)
-    EXE 	:= .exe
-else
-    EXE := 
+ifndef EXESUFFIX
+  ifeq ($(OS),Windows_NT)
+    EXESUFFIX := .exe
+  else
+    EXESUFFIX := 
+  endif
 endif
-
 
 #------------------------------------------------------------------------------
 # Using GLIB - see http://www.gtk.org/
@@ -103,7 +104,7 @@ OBJS = 	\
 MAKE_INIT =			tools/make_init.pl
 INIT = \
 	memalloc.h 		\
-	strpool.h		\
+	strpool.h
 
 #------------------------------------------------------------------------------
 # variables
@@ -119,7 +120,7 @@ ASTYLE = astyle \
 	--pad-oper --pad-paren-in --pad-header --unpad-paren \
 	--align-pointer=name
 
-TARGET =		z80asm$(EXE)
+TARGET =		z80asm$(EXESUFFIX)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
 CFLAGS +=		-W -Wformat -Werror=format-security
@@ -248,7 +249,10 @@ depend:
 
 
 # $Log: Makefile,v $
-# Revision 1.72  2013-09-01 16:53:18  pauloscustodio
+# Revision 1.73  2013-09-04 21:17:52  pauloscustodio
+# $(EXESUFFIX) is passed down as part of the build
+#
+# Revision 1.72  2013/09/01 16:53:18  pauloscustodio
 # Replaced strpool code by GLib String Chunks.
 #
 # Revision 1.71  2013/09/01 12:28:51  pauloscustodio
@@ -550,9 +554,9 @@ deffile.o: symbol.h model.h objfile.h symtab.h classhash.h strhash.h uthash.h
 deffile.o: die.h sym.h token_def.h z80asm.h config.h 
 die.o: memalloc.h die.h
 dynstr.o: memalloc.h dynstr.h class.h queue.h types.h strutil.h
-errors.o: memalloc.h class.h queue.h types.h errors.h errors_def.h file.h
-errors.o: safestr.h strlist.h strhash.h uthash.h die.h strpool.h strutil.h
-errors.o: except.h
+errors.o: memalloc.h errors.h errors_def.h except.h die.h types.h file.h
+errors.o: safestr.h strlist.h class.h queue.h strpool.h strhash.h uthash.h
+errors.o: strutil.h
 except.o: memalloc.h except.h die.h types.h
 exprprsr.o: memalloc.h codearea.h types.h config.h  errors.h
 exprprsr.o: errors_def.h file.h safestr.h strlist.h class.h queue.h legacy.h
@@ -563,7 +567,7 @@ file.o: memalloc.h class.h queue.h types.h config.h  errors.h
 file.o: errors_def.h file.h safestr.h strlist.h strpool.h strutil.h uthash.h
 file.o: die.h
 hist.o: memalloc.h hist.h
-init.o: memalloc.h strpool.h
+init.o: memalloc.h strpool.h errors.h errors_def.h
 ldinstr.o: memalloc.h config.h  z80asm.h types.h sym.h class.h
 ldinstr.o: queue.h symref.h classlist.h symbol.h model.h objfile.h symtab.h
 ldinstr.o: classhash.h strhash.h uthash.h die.h token_def.h errors.h
