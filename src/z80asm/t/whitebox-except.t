@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.8 2013-09-01 11:52:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.9 2013-09-08 00:40:10 pauloscustodio Exp $
 # $Log: whitebox-except.t,v $
-# Revision 1.8  2013-09-01 11:52:55  pauloscustodio
+# Revision 1.9  2013-09-08 00:40:10  pauloscustodio
+# Changed format of output file name and line number in case of fatal error
+#
+# Revision 1.8  2013/09/01 11:52:55  pauloscustodio
 # Setup memalloc on init.c.
 # Setup GLib memory allocation functions to use memalloc functions.
 #
@@ -122,7 +125,7 @@ END
 # THROW outside of TRY
 t_run_module([0], "", <<END, 1);
 Throw without try
-Uncaught runtime exception at file test.c line 66
+Uncaught runtime exception at test.c(1)
 END
 
 
