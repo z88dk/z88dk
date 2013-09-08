@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.41 2013-09-01 18:31:04 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.42 2013-09-08 00:37:23 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -325,11 +325,11 @@ sub t_binary {
 					 hexdump(substr($binary, $addr, 16)),
 					 hexdump(substr($expected_binary, $addr, 16)));
 		
-		# show wdiff
+		# show winmergeu
 		if ($ENV{DEBUG}) {
 			write_file("test.binary.got", 		HexDump($binary));
 			write_file("test.binary.expected", 	HexDump($expected_binary));
-			system "wdiff test.binary.got test.binary.expected";
+			system "winmergeu test.binary.got test.binary.expected";
 		}
 		
 		exit 1 if $STOP_ON_ERR;
@@ -581,12 +581,12 @@ sub t_run_module {
 	eq_or_diff_text $err, $expected_err;
 	is !!$exit, !!$expected_exit;
 	
-	# if DEBUG, call wdiff to compare out and err with expected out and err
+	# if DEBUG, call winmergeu to compare out and err with expected out and err
 	if ($ENV{DEBUG} && $out."##".$err ne $expected_out."##".$expected_err) {
 		my $temp_input = $0.".tmp";
 		my @input = read_file($0);
 		write_file($temp_input, @input[0 .. (caller)[2] - 1], $out, "OUT\n", $err, "ERR\n" );
-		system "wdiff \"$0\" \"$temp_input\"";
+		system "winmergeu \"$0\" \"$temp_input\"";
 	}
 	
 	exit 1 if $STOP_ON_ERR && 
@@ -1000,7 +1000,10 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.41  2013-09-01 18:31:04  pauloscustodio
+# Revision 1.42  2013-09-08 00:37:23  pauloscustodio
+# Call winmergeu to show differences in test results
+#
+# Revision 1.41  2013/09/01 18:31:04  pauloscustodio
 # Add information to file compare
 #
 # Revision 1.40  2013/09/01 12:28:52  pauloscustodio
@@ -1038,7 +1041,7 @@ __END__
 # - NOT:                          '~' added as binary not
 #
 # Revision 1.35  2013/06/03 23:21:35  pauloscustodio
-# show wdiff on t_binary() failure
+# show winmergeu on t_binary() failure
 #
 # Revision 1.34  2013/06/01 01:19:58  pauloscustodio
 # Add linkerr to t_z80asm() for compile OK but failed link.
