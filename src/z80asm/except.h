@@ -88,16 +88,19 @@ extern int     except_current_count;
 						longjmp(except_current_buf, x); \
 					} \
 					else { \
-						die("Uncaught runtime exception at file %s line %d\n", \
+						die("Uncaught runtime exception at %s(%d)\n", \
 							__FILE__, __LINE__); \
 					} \
 				}while(0)
 #define THROWN() except_current_throw		/* last thrown */
 
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.10 2013-09-01 00:18:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.11 2013-09-08 00:22:09 pauloscustodio Exp $ */
 /* $Log: except.h,v $
-/* Revision 1.10  2013-09-01 00:18:28  pauloscustodio
+/* Revision 1.11  2013-09-08 00:22:09  pauloscustodio
+/* Changed format of output file name and line number in case of fatal error
+/*
+/* Revision 1.10  2013/09/01 00:18:28  pauloscustodio
 /* - Replaced e4c exception mechanism by a much simpler one based on a few
 /*   macros. The former did not allow an exit(1) to be called within a
 /*   try-catch block.
