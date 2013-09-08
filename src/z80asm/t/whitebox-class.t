@@ -35,19 +35,19 @@ DEF_CLASS(Name);
 void Name_init (Name *self)
 { 
 	fprintf(stderr, "Name_init 0x%p\n", self);
-	self->str = xstrdup("John"); 
+	self->str = g_strdup("John"); 
 }
 
 void Name_copy (Name *self, Name *other) 	
 { 
 	fprintf(stderr, "Name_copy 0x%p\n", self);
-	self->str = xstrdup(self->str); 
+	self->str = g_strdup(self->str); 
 }
 
 void Name_fini (Name *self) 	
 { 
 	fprintf(stderr, "Name_fini 0x%p\n", self);
-	xfree(self->str); 
+	g_free(self->str); 
 }
 
 CLASS(Person)
@@ -292,9 +292,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.9 2013-09-08 00:43:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.10 2013-09-08 08:29:21 pauloscustodio Exp $
 # $Log: whitebox-class.t,v $
-# Revision 1.9  2013-09-08 00:43:59  pauloscustodio
+# Revision 1.10  2013-09-08 08:29:21  pauloscustodio
+# Replaced xmalloc et al with g_malloc0 et al.
+#
+# Revision 1.9  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
 # constants. Allows compiler to type-check error message arguments.
 # Included the errors module in the init() mechanism, no need to call

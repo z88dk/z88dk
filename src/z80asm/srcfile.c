@@ -17,9 +17,12 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.5 2013-09-08 00:43:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.6 2013-09-08 08:29:21 pauloscustodio Exp $ */
 /* $Log: srcfile.c,v $
-/* Revision 1.5  2013-09-08 00:43:59  pauloscustodio
+/* Revision 1.6  2013-09-08 08:29:21  pauloscustodio
+/* Replaced xmalloc et al with g_malloc0 et al.
+/*
+/* Revision 1.5  2013/09/08 00:43:59  pauloscustodio
 /* New error module with one error function per error, no need for the error
 /* constants. Allows compiler to type-check error message arguments.
 /* Included the errors module in the init() mechanism, no need to call
@@ -298,9 +301,9 @@ void SourceFile_ungetline( SourceFile *self, char *line )
 	/* is there a next line in input? */
 	if ( search_next_line( line ) != NULL )
 	{
-		line_cpy = xstrdup( line );		/* so that we can modify line */
+		line_cpy = g_strdup( line );		/* so that we can modify line */
 		do_ungetline( self, line_cpy );
-		xfree( line_cpy );
+		g_free( line_cpy );
 	}
 	else 
 	{

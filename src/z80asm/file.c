@@ -14,9 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.22 2013-09-08 00:43:59 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.23 2013-09-08 08:29:21 pauloscustodio Exp $
 $Log: file.c,v $
-Revision 1.22  2013-09-08 00:43:59  pauloscustodio
+Revision 1.23  2013-09-08 08:29:21  pauloscustodio
+Replaced xmalloc et al with g_malloc0 et al.
+
+Revision 1.22  2013/09/08 00:43:59  pauloscustodio
 New error module with one error function per error, no need for the error
 constants. Allows compiler to type-check error message arguments.
 Included the errors module in the init() mechanism, no need to call
@@ -172,7 +175,7 @@ void OpenFile_fini( OpenFile *self )
     HASH_ITER( hh, self->hash, elem, tmp )
     {
         HASH_DEL( self->hash, elem );
-        xfree( elem );
+        g_free( elem );
     }
 }
 
@@ -197,7 +200,7 @@ static void add_filename( FILE *file, char *filename )
 	else
 	{
 		/* new, create hash entry */
-		elem = xcalloc_struct(OpenFileElem);
+		elem = g_new0(OpenFileElem, 1);
 		elem->file 		= file;
 		elem->filename 	= strpool_add(filename);		
 		

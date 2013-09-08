@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.52 2013-09-08 00:43:58 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.53 2013-09-08 08:29:21 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.52  2013-09-08 00:43:58  pauloscustodio
+/* Revision 1.53  2013-09-08 08:29:21  pauloscustodio
+/* Replaced xmalloc et al with g_malloc0 et al.
+/*
+/* Revision 1.52  2013/09/08 00:43:58  pauloscustodio
 /* New error module with one error function per error, no need for the error
 /* constants. Allows compiler to type-check error message arguments.
 /* Included the errors module in the init() mechanism, no need to call
@@ -1259,7 +1262,7 @@ DeclModuleName( void )
     {
         if ( sym == name )
         {
-            CURRENTMODULE->mname = xstrdup( ident );
+            CURRENTMODULE->mname = g_strdup( ident );
         }
         else
         {

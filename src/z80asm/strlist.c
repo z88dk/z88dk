@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 List of strings (e.g. include path); strings kept in strpool.h
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.c,v 1.5 2013-09-01 18:46:01 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.c,v 1.6 2013-09-08 08:29:21 pauloscustodio Exp $ */
 /* $Log: strlist.c,v $
-/* Revision 1.5  2013-09-01 18:46:01  pauloscustodio
+/* Revision 1.6  2013-09-08 08:29:21  pauloscustodio
+/* Replaced xmalloc et al with g_malloc0 et al.
+/*
+/* Revision 1.5  2013/09/01 18:46:01  pauloscustodio
 /* Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
 /*
 /* Revision 1.4  2013/02/27 20:47:30  pauloscustodio
@@ -69,7 +72,7 @@ void SzList_fini( SzList *self )
     while ( elem = TAILQ_FIRST( &self->head ) )
     {
         TAILQ_REMOVE( &self->head, elem, entries );
-        xfree( elem );
+        g_free( elem );
     }
 }
 
@@ -80,7 +83,7 @@ void SzList_push( SzList *self, char *string )
 {
     SzListElem *elem;
 
-    elem = xcalloc_struct( SzListElem );
+    elem = g_new0( SzListElem, 1 );
     elem->string = strpool_add( string );
     TAILQ_INSERT_TAIL( &self->head, elem, entries );
 }

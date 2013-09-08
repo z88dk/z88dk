@@ -37,29 +37,14 @@ On MEMALLOC_DEBUG, shows statistics of memory usage on exit.
 extern void init_memalloc(void);
 extern void fini_memalloc(void);
 
-/*-----------------------------------------------------------------------------
-*   PUBLIC INTERFACE
-*   alloc memory
-*   dies on allocation failure or buffer overruns
-*----------------------------------------------------------------------------*/
-
-#define xmalloc		g_malloc0
-#define xcalloc		g_malloc0_n
-#define xrealloc	g_realloc
-#define xstrdup		g_strdup
-#define xfree		g_free
-
-/* macro to alloc struct
- * use xcalloc for structs to make sure any new pointers
- * in the struct are initialized to NULL */
-#define xcalloc_n_struct(n, type_t)     g_new0(type_t, n)
-#define xcalloc_struct(type_t)          g_new0(type_t, 1)
-
 
 /* */
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.h,v 1.10 2013-09-01 16:21:55 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.h,v 1.11 2013-09-08 08:29:21 pauloscustodio Exp $ */
 /* $Log: memalloc.h,v $
-/* Revision 1.10  2013-09-01 16:21:55  pauloscustodio
+/* Revision 1.11  2013-09-08 08:29:21  pauloscustodio
+/* Replaced xmalloc et al with g_malloc0 et al.
+/*
+/* Revision 1.10  2013/09/01 16:21:55  pauloscustodio
 /* Removed memalloc allocation checking code, use MSVC _CRTDBG_MAP_ALLOC instead.
 /* Dump memory usage statistics at the end if MEMALLOC_DEBUG defined.
 /*

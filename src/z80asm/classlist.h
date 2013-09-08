@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Lists of objects defined by class.h
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classlist.h,v 1.3 2013-02-25 21:36:17 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classlist.h,v 1.4 2013-09-08 08:29:21 pauloscustodio Exp $ */
 /* $Log: classlist.h,v $
-/* Revision 1.3  2013-02-25 21:36:17  pauloscustodio
+/* Revision 1.4  2013-09-08 08:29:21  pauloscustodio
+/* Replaced xmalloc et al with g_malloc0 et al.
+/*
+/* Revision 1.3  2013/02/25 21:36:17  pauloscustodio
 /* Uniform the APIs of classhash, classlist, strhash, strlist
 /*
 /* Revision 1.2  2013/01/30 20:38:59  pauloscustodio
@@ -135,7 +138,7 @@ DEF_CLASS_LIST(T);
 	/* create a new element */												\
 	T##ListElem *T##List_new_elem( T##List *self, T *obj )					\
 	{																		\
-		T##ListElem *elem = xcalloc_struct( T##ListElem );					\
+		T##ListElem *elem = g_new0( T##ListElem, 1 );						\
 		elem->obj = obj;													\
 		OBJ_AUTODELETE(obj) = FALSE;		/* deleted by list */			\
 		self->count++;														\
@@ -153,7 +156,7 @@ DEF_CLASS_LIST(T);
 		obj = elem->obj;													\
 		OBJ_AUTODELETE(obj) = TRUE;		/* deleted by caller */				\
 		TAILQ_REMOVE( &self->head, elem, entries);							\
-		xfree( elem );														\
+		g_free( elem );														\
 		self->count--;														\
 		return obj;															\
 	}																		\
@@ -249,7 +252,7 @@ DEF_CLASS_LIST(T);
 			TAILQ_REMOVE( &self->head, elem, entries );						\
 																			\
 			OBJ_DELETE( elem->obj );										\
-			xfree( elem );													\
+			g_free( elem );													\
 			self->count--;													\
 		}																	\
 	}																		\

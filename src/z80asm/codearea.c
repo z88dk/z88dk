@@ -16,9 +16,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.14 2013-09-08 00:43:58 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.15 2013-09-08 08:29:21 pauloscustodio Exp $ */
 /* $Log: codearea.c,v $
-/* Revision 1.14  2013-09-08 00:43:58  pauloscustodio
+/* Revision 1.15  2013-09-08 08:29:21  pauloscustodio
+/* Replaced xmalloc et al with g_malloc0 et al.
+/*
+/* Revision 1.14  2013/09/08 00:43:58  pauloscustodio
 /* New error module with one error function per error, no need for the error
 /* constants. Allows compiler to type-check error message arguments.
 /* Included the errors module in the init() mechanism, no need to call
@@ -126,7 +129,7 @@ static void fini_codearea_module( void )
 {
 	if ( codearea != NULL )
 	{
-		xfree( codearea );
+		g_free( codearea );
 	}
 }
 
@@ -139,7 +142,7 @@ void init_codearea_module( void )
 	static BOOL initialized = FALSE;
 
     /* allocate memory for Z80 machine code */
-    codearea = (byte_t *) xcalloc( MAXCODESIZE, sizeof( char ) );
+    codearea = (byte_t *) g_malloc0_n( MAXCODESIZE, sizeof( char ) );
 	if ( ! initialized ) 
 	{
 		atexit( fini_codearea_module );

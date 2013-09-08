@@ -32,10 +32,10 @@ CLASS(Obj)
 	char *string;
 END_CLASS;
 
-void Obj_init (Obj *self) 	{ self->string = xstrdup("Hello World"); }
+void Obj_init (Obj *self) 	{ self->string = g_strdup("Hello World"); }
 void Obj_copy (Obj *self, Obj *other)
-							{ self->string = xstrdup(other->string); }
-void Obj_fini (Obj *self)	{ xfree(self->string); }
+							{ self->string = g_strdup(other->string); }
+void Obj_fini (Obj *self)	{ g_free(self->string); }
 
 DEF_CLASS(Obj);
 
@@ -487,9 +487,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classlist.t,v 1.7 2013-09-08 00:43:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classlist.t,v 1.8 2013-09-08 08:29:21 pauloscustodio Exp $
 # $Log: whitebox-classlist.t,v $
-# Revision 1.7  2013-09-08 00:43:59  pauloscustodio
+# Revision 1.8  2013-09-08 08:29:21  pauloscustodio
+# Replaced xmalloc et al with g_malloc0 et al.
+#
+# Revision 1.7  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
 # constants. Allows compiler to type-check error message arguments.
 # Included the errors module in the init() mechanism, no need to call

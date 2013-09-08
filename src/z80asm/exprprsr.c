@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.43 2013-09-08 00:43:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.44 2013-09-08 08:29:21 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.43  2013-09-08 00:43:59  pauloscustodio
+/* Revision 1.44  2013-09-08 08:29:21  pauloscustodio
+/* Replaced xmalloc et al with g_malloc0 et al.
+/*
+/* Revision 1.43  2013/09/08 00:43:59  pauloscustodio
 /* New error module with one error function per error, no need for the error
 /* constants. Allows compiler to type-check error message arguments.
 /* Included the errors module in the init() mechanism, no need to call
@@ -735,7 +738,7 @@ ParseNumExpr( void )
     struct expr *pfixhdr;
     enum symbols constant_expression = nil;
 
-    pfixhdr = xcalloc_struct( struct expr );
+    pfixhdr = g_new0( struct expr, 1 );
 
     pfixhdr->firstnode = NULL;
     pfixhdr->currentnode = NULL;
@@ -745,7 +748,7 @@ ParseNumExpr( void )
     pfixhdr->infixexpr = NULL;
     pfixhdr->infixptr = NULL;
 
-    pfixhdr->infixexpr = xcalloc_n_struct( 128, char );     /* TODO: make size a constant */
+    pfixhdr->infixexpr = g_new0( char, 128 );     /* TODO: make size a constant */
 
     pfixhdr->infixptr = pfixhdr->infixexpr;             /* initialise pointer to start of buffer */
 
@@ -1036,19 +1039,19 @@ RemovePfixlist( struct expr *pfixexpr )
 
         if ( node->id != NULL )
         {
-            xfree( node->id );    /* Remove symbol id, if defined */
+            g_free( node->id );    /* Remove symbol id, if defined */
         }
 
-        xfree( node );
+        g_free( node );
         node = tmpnode;
     }
 
     if ( pfixexpr->infixexpr != NULL )
     {
-        xfree( pfixexpr->infixexpr );    /* release infix expr. string */
+        g_free( pfixexpr->infixexpr );    /* release infix expr. string */
     }
 
-    xfree( pfixexpr );           /* release header of postfix expression */
+    g_free( pfixexpr );           /* release header of postfix expression */
 }
 
 
@@ -1063,7 +1066,7 @@ NewPfixSymbol( struct expr *pfixexpr,
 {
     struct postfixlist *newnode;
 
-    newnode = xcalloc_struct( struct postfixlist );
+    newnode = g_new0( struct postfixlist, 1 );
 
     newnode->operandconst = oprconst;
     newnode->operatortype = oprtype;
@@ -1072,7 +1075,7 @@ NewPfixSymbol( struct expr *pfixexpr,
 
     if ( symident != NULL )
     {
-        newnode->id = xstrdup( symident );    /* Allocate symbol */
+        newnode->id = g_strdup( symident );    /* Allocate symbol */
     }
     else
     {
@@ -1098,7 +1101,7 @@ PushItem( long oprconst, struct pfixstack **stackpointer )
 {
     struct pfixstack *newitem;
 
-    newitem = xcalloc_struct( struct pfixstack );
+    newitem = g_new0( struct pfixstack, 1 );
     newitem->stackconstant = oprconst;
     newitem->prevstackitem = *stackpointer;     /* link new node to current node */
     *stackpointer = newitem;                    /* update stackpointer to new item */
@@ -1116,7 +1119,7 @@ PopItem( struct pfixstack **stackpointer )
     constant = ( *stackpointer )->stackconstant;
     stackitem = *stackpointer;
     *stackpointer = ( *stackpointer )->prevstackitem;   /* move stackpointer to previous item */
-    xfree( stackitem );                                /* return old item memory to OS */
+    g_free( stackitem );                                /* return old item memory to OS */
     return ( constant );
 }
 

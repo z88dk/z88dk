@@ -32,11 +32,11 @@ CLASS(Obj)
 	char *string;
 END_CLASS;
 
-void Obj_init (Obj *self) 	{ self->string = xcalloc(100, sizeof(char)); }
+void Obj_init (Obj *self) 	{ self->string = g_malloc0_n(100, sizeof(char)); }
 void Obj_copy (Obj *self, Obj *other)
-							{ self->string = xcalloc(100, sizeof(char));
+							{ self->string = g_malloc0_n(100, sizeof(char));
 							  strcpy( self->string, other->string); }
-void Obj_fini (Obj *self)	{ xfree(self->string); }
+void Obj_fini (Obj *self)	{ g_free(self->string); }
 void Obj_clear(Obj *self)	{ self->string[0] = 0; }
 
 DEF_CLASS(Obj);
@@ -760,9 +760,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.5 2013-09-08 00:43:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.6 2013-09-08 08:29:21 pauloscustodio Exp $
 # $Log: whitebox-classring.t,v $
-# Revision 1.5  2013-09-08 00:43:59  pauloscustodio
+# Revision 1.6  2013-09-08 08:29:21  pauloscustodio
+# Replaced xmalloc et al with g_malloc0 et al.
+#
+# Revision 1.5  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
 # constants. Allows compiler to type-check error message arguments.
 # Included the errors module in the init() mechanism, no need to call

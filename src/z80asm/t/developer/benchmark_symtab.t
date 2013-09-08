@@ -13,9 +13,12 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.3 2013-09-01 18:45:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.4 2013-09-08 08:29:21 pauloscustodio Exp $
 # $Log: benchmark_symtab.t,v $
-# Revision 1.3  2013-09-01 18:45:35  pauloscustodio
+# Revision 1.4  2013-09-08 08:29:21  pauloscustodio
+# Replaced xmalloc et al with g_malloc0 et al.
+#
+# Revision 1.3  2013/09/01 18:45:35  pauloscustodio
 # Remove NUM_ELEMS, use G_N_ELEMENTS instead (from glib.h)
 # Remove FALSE, TRUE, MIN, MAX; defined in glib.h
 #
@@ -95,7 +98,7 @@ void FreeSym2( Symbol *node )
 		OBJ_DELETE( node->references );
     }
 
-    xfree( node );               /* then release the symbol record */
+    g_free( node );               /* then release the symbol record */
 }
 
 
@@ -113,7 +116,7 @@ void add_avltree(char *name)
 	}
 	else
 	{
-		foundsymbol = xcalloc_struct(Symbol);
+		foundsymbol = g_new0(Symbol, 1);
 		foundsymbol->name = name;
 		foundsymbol->value = 0;
 		insert( &avlroot, foundsymbol, ( int ( * )( void *, void * ) ) 		 cmpid );
@@ -153,7 +156,7 @@ void add_hash(char *name)
 	}
 	else
 	{
-		foundsymbol = xcalloc_struct(Symbol);
+		foundsymbol = g_new0(Symbol, 1);
 		foundsymbol->name = name;
 		foundsymbol->value = 0;
 		StrHash_set( hashroot, name, foundsymbol );
@@ -182,7 +185,7 @@ void test_hash()
 	
     HASH_ITER( hh, hashroot->hash, elem, tmp )
     {
-        xfree(elem->value);
+        g_free(elem->value);
     }
 }
 

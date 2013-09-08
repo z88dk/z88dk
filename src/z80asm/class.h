@@ -20,9 +20,12 @@ each object, which in turn may call destructors of contained objects.
 
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.7 2013-05-12 21:39:05 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.8 2013-09-08 08:29:21 pauloscustodio Exp $ */
 /* $Log: class.h,v $
-/* Revision 1.7  2013-05-12 21:39:05  pauloscustodio
+/* Revision 1.8  2013-09-08 08:29:21  pauloscustodio
+/* Replaced xmalloc et al with g_malloc0 et al.
+/*
+/* Revision 1.7  2013/05/12 21:39:05  pauloscustodio
 /* OBJ_DELETE() now accepts and ignores a NULL argument
 /*
 /* Revision 1.6  2013/01/30 20:38:59  pauloscustodio
@@ -70,10 +73,10 @@ END_CLASS;
 DEF_CLASS(T);
 
 // helper functions, need to be defined
-void T_init (T *self)   { self->string = xcalloc(1000,1); }
+void T_init (T *self)   { self->string = g_malloc0_n(1000,1); }
 void T_copy (T *self, T *other)
-						{ self->string = xstrdup(other->string); }
-void T_fini (T *self)   { xfree(self->string); }
+						{ self->string = g_strdup(other->string); }
+void T_fini (T *self)   { g_free(self->string); }
 
 // usage of class
 T * obj1 = OBJ_NEW(T);  // same as T_new()
@@ -130,7 +133,7 @@ struct ObjRegister;
     /* constructor */                                                       \
     T * T##_new (void)                                                      \
     {                                                                       \
-        T * self = xcalloc_struct(T);       /* allocate object */           \
+        T * self = g_new0(T, 1);            /* allocate object */           \
         OBJ_AUTODELETE(self) = TRUE;        /* auto delete by default */    \
         T##_init(self);                     /* call user initialization */  \
         _register_obj((struct ObjRegister *) self,                          \
@@ -142,7 +145,7 @@ struct ObjRegister;
     /* copy-constructor */                                                  \
     T * T##_clone (T * other)                                               \
     {                                                                       \
-        T * self = xmalloc(sizeof(T));      /* allocate object */           \
+        T * self = g_malloc0(sizeof(T));      /* allocate object */           \
         memcpy(self, other, sizeof(T));     /* byte copy */                 \
         T##_copy(self, other);              /* alloc memory if needed */    \
         _update_register_obj((struct ObjRegister *) self,                   \
@@ -156,7 +159,7 @@ struct ObjRegister;
         _deregister_obj((struct ObjRegister *) self, __FILE__, __LINE__);   \
         /* remove from cleanup list */  \
         T##_fini(self);                     /* call user cleanup */         \
-        xfree(self);                        /* reclaim memory */            \
+        g_free(self);                        /* reclaim memory */            \
     }
 
 /*-----------------------------------------------------------------------------

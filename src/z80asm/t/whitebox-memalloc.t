@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.13 2013-09-08 00:43:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.14 2013-09-08 08:29:21 pauloscustodio Exp $
 #
 # Test memory allocation
 
@@ -27,8 +27,8 @@ my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 
 # show memory leaks
 t_compile_module("", <<'END', $compile);
-	char * p1 = xmalloc(100);
-	char * p2 = xmalloc(100);
+	char * p1 = g_malloc0(100);
+	char * p2 = g_malloc0(100);
 END
 t_run_module([], <<END, "", 0);
 GLib Memory statistics (successful operations):
@@ -52,7 +52,10 @@ done_testing;
 
 __END__
 # $Log: whitebox-memalloc.t,v $
-# Revision 1.13  2013-09-08 00:43:59  pauloscustodio
+# Revision 1.14  2013-09-08 08:29:21  pauloscustodio
+# Replaced xmalloc et al with g_malloc0 et al.
+#
+# Revision 1.13  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
 # constants. Allows compiler to type-check error message arguments.
 # Included the errors module in the init() mechanism, no need to call

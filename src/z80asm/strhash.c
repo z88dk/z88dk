@@ -18,9 +18,12 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.10 2013-09-01 18:46:01 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.11 2013-09-08 08:29:21 pauloscustodio Exp $ */
 /* $Log: strhash.c,v $
-/* Revision 1.10  2013-09-01 18:46:01  pauloscustodio
+/* Revision 1.11  2013-09-08 08:29:21  pauloscustodio
+/* Replaced xmalloc et al with g_malloc0 et al.
+/*
+/* Revision 1.10  2013/09/01 18:46:01  pauloscustodio
 /* Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
 /*
 /* Revision 1.9  2013/05/27 22:43:34  pauloscustodio
@@ -128,7 +131,7 @@ void StrHash_remove_elem( StrHash *self, StrHashElem *elem )
 	if ( elem )
 	{
 		HASH_DEL( self->hash, elem );
-		xfree( elem );
+		g_free( elem );
 	}
 }
 
@@ -145,7 +148,7 @@ void StrHash_set( StrHash *self, char *key, void *value )
 	/* create new element if not found, value is updated at the end */
 	if (elem == NULL) 
 	{						
-		elem = xcalloc_struct( StrHashElem );
+		elem = g_new0( StrHashElem, 1 );
 		elem->key = strpool_add( key );
 		
 		/* add to hash, need to store elem->key instead of key, as it is invariant */

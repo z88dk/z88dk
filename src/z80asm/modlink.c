@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.69 2013-09-08 00:43:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.70 2013-09-08 08:29:21 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.69  2013-09-08 00:43:59  pauloscustodio
+/* Revision 1.70  2013-09-08 08:29:21  pauloscustodio
+/* Replaced xmalloc et al with g_malloc0 et al.
+/*
+/* Revision 1.69  2013/09/08 00:43:59  pauloscustodio
 /* New error module with one error function per error, no need for the error
 /* constants. Allows compiler to type-check error message arguments.
 /* Included the errors module in the init() mechanism, no need to call
@@ -638,7 +641,7 @@ LinkModules( void )
 
     if ( autorelocate == ON )
     {
-        reloctable = ( char * ) xmalloc( 32768U );
+        reloctable = ( char * ) g_malloc0( 32768U );
         relocptr = reloctable;
         relocptr += 4;  /* point at first offset to store */
         totaladdr = 0;
@@ -873,7 +876,7 @@ LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
 
         if ( find_global_symbol( line ) == NULL )
         {
-            modname = xstrdup( line );
+            modname = g_strdup( line );
 
             TRY
             {
@@ -881,7 +884,7 @@ LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
             }
             FINALLY
             {
-                xfree( modname ); /* remove copy of module name */
+                g_free( modname ); /* remove copy of module name */
             }
 			ETRY;
         }
@@ -962,7 +965,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
                 }
                 FINALLY
                 {
-                    xfree( mname );
+                    g_free( mname );
                 }
 				ETRY;
 
@@ -977,7 +980,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
                 }
                 FINALLY
                 {
-                    xfree( mname );
+                    g_free( mname );
                 }
 				ETRY;
 
@@ -1015,7 +1018,7 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
     fptr_name = fgetl_err( file );
     fptr_libname = fgetl_err( file );
     fseek( file, currentlibmodule + 4 + 4 + fptr_mname, SEEK_SET );       /* point at module name  */
-    mname = xstrdup( ReadName( file ) );                      /* read module name */
+    mname = g_strdup( ReadName( file ) );                      /* read module name */
 
     if ( strcmp( mname, modname ) == 0 )
     {
@@ -1063,7 +1066,7 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
 
     if ( !found )
     {
-        xfree( mname );
+        g_free( mname );
         mname = NULL;
     }
 
@@ -1079,7 +1082,7 @@ LinkLibModule( struct libfile *library, long curmodule, char *modname )
     tmpmodule = CURRENTMODULE;  /* remember current module */
 
     CURRENTMODULE = NewModule();
-    CURRENTMODULE->mname = xstrdup( modname );  /* get a copy of module name */
+    CURRENTMODULE->mname = g_strdup( modname );  /* get a copy of module name */
     /* create new module for library */
     CURRENTFILE = Newfile( NULL, library->libfilename ); /* filename for 'module' */
 
@@ -1286,15 +1289,15 @@ CreateLib( char *lib_filename )
 
 			/* replace fname with the .obj extension */
 			path_replace_ext( obj_filename, CURRENTFILE->fname, get_obj_ext() );
-			xfree( CURRENTFILE->fname );
-			CURRENTFILE->fname = xstrdup( obj_filename );
+			g_free( CURRENTFILE->fname );
+			CURRENTFILE->fname = g_strdup( obj_filename );
 
             obj_file = fopen_err( CURRENTFILE->fname, "rb" );           /* CH_0012 */
             fseek( obj_file, 0L, SEEK_END );  /* file pointer to end of file */
             Codesize = ftell( obj_file );
             fseek( obj_file, 0L, SEEK_SET );  /* file pointer to start of file */
 
-            filebuffer = ( char * ) xmalloc( ( size_t ) Codesize );
+            filebuffer = ( char * ) g_malloc0( ( size_t ) Codesize );
             freadc_err( filebuffer, Codesize, obj_file ); /* load object file */
             fclose( obj_file );
             obj_file = NULL;
@@ -1322,7 +1325,7 @@ CreateLib( char *lib_filename )
 
             fputl_err( Codesize, lib_file );    /* size of this module */
             fwritec_err( filebuffer, ( size_t ) Codesize, lib_file ); /* write module to library */
-            xfree( filebuffer );
+            g_free( filebuffer );
 
             CURRENTMODULE = CURRENTMODULE->nextmodule;
         }
@@ -1343,7 +1346,7 @@ CreateLib( char *lib_filename )
         close_error_file();
 
         if ( filebuffer )
-            xfree( filebuffer );
+            g_free( filebuffer );
     }
 	ETRY;
 }
@@ -1358,14 +1361,14 @@ LinkTracedModule( char *filename, long baseptr )
 
     if ( linkhdr == NULL )
     {
-        linkhdr = xcalloc_struct( struct linklist );
+        linkhdr = g_new0( struct linklist, 1 );
         linkhdr->firstlink = NULL;
         linkhdr->lastlink = NULL;       /* Library header initialised */
     }
 
-    fname = xstrdup( filename );        /* get a copy module file name */
+    fname = g_strdup( filename );        /* get a copy module file name */
 
-    newm = xcalloc_struct( struct linkedmod );
+    newm = g_new0( struct linkedmod, 1 );
     newm->nextlink = NULL;
     newm->objfilename = fname;
     newm->modulestart = baseptr;
@@ -1402,15 +1405,15 @@ ReleaseLinkInfo( void )
     {
         if ( m->objfilename != NULL )
         {
-            xfree( m->objfilename );
+            g_free( m->objfilename );
         }
 
         n = m->nextlink;
-        xfree( m );
+        g_free( m );
         m = n;
     }
 
-    xfree( linkhdr );
+    g_free( linkhdr );
 
     linkhdr = NULL;
 }

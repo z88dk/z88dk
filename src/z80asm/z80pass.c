@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.53 2013-09-08 00:43:59 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.54 2013-09-08 08:29:21 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.53  2013-09-08 00:43:59  pauloscustodio
+Revision 1.54  2013-09-08 08:29:21  pauloscustodio
+Replaced xmalloc et al with g_malloc0 et al.
+
+Revision 1.53  2013/09/08 00:43:59  pauloscustodio
 New error module with one error function per error, no need for the error
 constants. Allows compiler to type-check error message arguments.
 Included the errors module in the init() mechanism, no need to call
@@ -804,7 +807,7 @@ Z80pass2( void )
 
                     prevJR = curJR;
                     curJR = curJR->nextref;       /* get ready for next JR instruction */
-                    xfree( prevJR );
+                    g_free( prevJR );
                 }
                 else
                 {
@@ -832,7 +835,7 @@ Z80pass2( void )
 
                         prevJR = curJR;
                         curJR = curJR->nextref;       /* get ready for JR instruction */
-                        xfree( prevJR );
+                        g_free( prevJR );
                         break;
 
                     case RANGE_8UNSIGN:
@@ -880,8 +883,8 @@ Z80pass2( void )
 		set_error_file( NULL );
 		set_error_line( 0 );
 
-		xfree( CURRENTMODULE->mexpr );   /* Release header of expressions list */
-        xfree( CURRENTMODULE->JRaddr );  /* Release header of relative jump address list */
+		g_free( CURRENTMODULE->mexpr );   /* Release header of expressions list */
+        g_free( CURRENTMODULE->JRaddr );  /* Release header of relative jump address list */
         CURRENTMODULE->mexpr = NULL;
         CURRENTMODULE->JRaddr = NULL;
     }
@@ -998,7 +1001,7 @@ Prevfile( void )
     struct usedfile *newusedfile;
     struct sourcefile *ownedfile;
 
-    newusedfile = xcalloc_struct( struct usedfile );
+    newusedfile = g_new0( struct usedfile, 1 );
     ownedfile = CURRENTFILE;
     CURRENTFILE = CURRENTFILE->prevsourcefile;    /* get back to owner file - now the current */
     CURRENTFILE->newsourcefile = NULL;    /* current file is now the last in the list */
@@ -1019,7 +1022,7 @@ Newfile( struct sourcefile *curfile, char *fname )
     struct sourcefile *nfile;
     struct sourcefile *ret;
 
-    nfile = xcalloc_struct( struct sourcefile );
+    nfile = g_new0( struct sourcefile, 1 );
     ret = Setfile( curfile, nfile, fname );
 
     return ret;
@@ -1032,7 +1035,7 @@ Setfile( struct sourcefile *curfile,    /* pointer to record of current source f
                                          * source file */
          char *filename )
 {
-    nfile->fname = xstrdup( filename );   /* pointer to filename string */
+    nfile->fname = g_strdup( filename );   /* pointer to filename string */
     nfile->prevsourcefile = curfile;
     nfile->newsourcefile = NULL;
     nfile->usedsourcefile = NULL;

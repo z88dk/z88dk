@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.10 2013-09-08 00:43:59 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.11 2013-09-08 08:29:21 pauloscustodio Exp $ 
 $Log: scan.l,v $
-Revision 1.10  2013-09-08 00:43:59  pauloscustodio
+Revision 1.11  2013-09-08 08:29:21  pauloscustodio
+Replaced xmalloc et al with g_malloc0 et al.
+
+Revision 1.10  2013/09/08 00:43:59  pauloscustodio
 New error module with one error function per error, no need for the error
 constants. Allows compiler to type-check error message arguments.
 Included the errors module in the init() mechanism, no need to call
@@ -286,14 +289,14 @@ D16		[0-9a-fA-F]
 ;.*			/* comment */
 
 			/* Identifier */
-{ID}		strtoupper( yylval->sval = xstrdup( yytext ) ); return NAME;
-"."{ID}		strtoupper( yylval->sval = xstrdup( yytext + 1 ) ); return NAME;
-{ID}":"		strtoupper( yylval->sval = xstrdup( yytext ) ); yylval->sval[ yyleng - 1 ] = '\0';return NAME;
+{ID}		strtoupper( yylval->sval = g_strdup( yytext ) ); return NAME;
+"."{ID}		strtoupper( yylval->sval = g_strdup( yytext + 1 ) ); return NAME;
+{ID}":"		strtoupper( yylval->sval = g_strdup( yytext ) ); yylval->sval[ yyleng - 1 ] = '\0';return NAME;
 
 			/* String - return string without quotes */
 [\'][^\'\r\n]*[\'] 	|
 [\"][^\"\r\n]*[\"]	{
-				yylval->sval = xstrdup( yytext + 1 );
+				yylval->sval = g_strdup( yytext + 1 );
 				yylval->sval[ yyleng - 2 ] = '\0';
 				return STRING;
 			}
@@ -351,17 +354,17 @@ D16		[0-9a-fA-F]
 *----------------------------------------------------------------------------*/
 void *yyalloc( size_t bytes )
 {
-    return xmalloc( bytes );
+    return g_malloc0( bytes );
 }
 
 void *yyrealloc( void *ptr, size_t bytes )
 {
-    return xrealloc( ptr, bytes );
+    return g_realloc( ptr, bytes );
 }
 
 void yyfree( void *ptr )
 {
-    xfree( ptr );
+    g_free( ptr );
 }
 
 /*-----------------------------------------------------------------------------

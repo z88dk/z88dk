@@ -14,9 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.14 2013-09-08 00:43:59 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.15 2013-09-08 08:29:21 pauloscustodio Exp $ 
 $Log: scan.c,v $
-Revision 1.14  2013-09-08 00:43:59  pauloscustodio
+Revision 1.15  2013-09-08 08:29:21  pauloscustodio
+Replaced xmalloc et al with g_malloc0 et al.
+
+Revision 1.10  2013/09/08 00:43:59  pauloscustodio
 New error module with one error function per error, no need for the error
 constants. Allows compiler to type-check error message arguments.
 Included the errors module in the init() mechanism, no need to call
@@ -1871,22 +1874,22 @@ YY_RULE_SETUP
 /* Identifier */
 case 4:
 YY_RULE_SETUP
-strtoupper( yylval->sval = xstrdup( yytext ) ); return NAME;
+strtoupper( yylval->sval = g_strdup( yytext ) ); return NAME;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-strtoupper( yylval->sval = xstrdup( yytext + 1 ) ); return NAME;
+strtoupper( yylval->sval = g_strdup( yytext + 1 ) ); return NAME;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-strtoupper( yylval->sval = xstrdup( yytext ) ); yylval->sval[ yyleng - 1 ] = '\0';return NAME;
+strtoupper( yylval->sval = g_strdup( yytext ) ); yylval->sval[ yyleng - 1 ] = '\0';return NAME;
 	YY_BREAK
 /* String - return string without quotes */
 case 7:
 case 8:
 YY_RULE_SETUP
 {
-				yylval->sval = xstrdup( yytext + 1 );
+				yylval->sval = g_strdup( yytext + 1 );
 				yylval->sval[ yyleng - 2 ] = '\0';
 				return STRING;
 			}
@@ -2971,17 +2974,17 @@ static int yy_flex_strlen (yyconst char * s )
 *----------------------------------------------------------------------------*/
 void *yyalloc(size_t bytes )
 {
-    return xmalloc( bytes );
+    return g_malloc0( bytes );
 }
 
 void *yyrealloc(void *ptr,size_t bytes )
 {
-    return xrealloc( ptr, bytes );
+    return g_realloc( ptr, bytes );
 }
 
 void yyfree(void *ptr )
 {
-    xfree( ptr );
+    g_free( ptr );
 }
 
 /*-----------------------------------------------------------------------------
