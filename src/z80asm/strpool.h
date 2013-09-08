@@ -31,14 +31,18 @@ extern void fini_strpool(void);
 *   Add a CONST string to the string pool, i.e. the string may be reused
 *	If the given string exists in the pool, return pointer to it.
 *   Else copies it to the pool and returns pointer
+*	String may be NULL, a NULL is returned
 *----------------------------------------------------------------------------*/
 extern char *strpool_add( char *string );
 
 
 /* */
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.h,v 1.3 2013-09-01 16:51:26 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.h,v 1.4 2013-09-08 00:36:42 pauloscustodio Exp $ */
 /* $Log: strpool.h,v $
-/* Revision 1.3  2013-09-01 16:51:26  pauloscustodio
+/* Revision 1.4  2013-09-08 00:36:42  pauloscustodio
+/* strpool_add() accepts NULL
+/*
+/* Revision 1.3  2013/09/01 16:51:26  pauloscustodio
 /* Replaced strpool code by GLib String Chunks.
 /*
 /* Revision 1.2  2013/01/19 01:33:16  pauloscustodio

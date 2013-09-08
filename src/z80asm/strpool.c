@@ -44,7 +44,7 @@ void fini_strpool(void)
 }
 
 /*-----------------------------------------------------------------------------
-*   Add a const string to the pool, return it's address
+*   Add a const string to the pool, return it's address; may be NULL
 *----------------------------------------------------------------------------*/
 char *strpool_add( char *string )
 {
@@ -55,9 +55,12 @@ char *strpool_add( char *string )
 
 
 /* */
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.c,v 1.7 2013-09-01 16:51:26 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strpool.c,v 1.8 2013-09-08 00:36:42 pauloscustodio Exp $ */
 /* $Log: strpool.c,v $
-/* Revision 1.7  2013-09-01 16:51:26  pauloscustodio
+/* Revision 1.8  2013-09-08 00:36:42  pauloscustodio
+/* strpool_add() accepts NULL
+/*
+/* Revision 1.7  2013/09/01 16:51:26  pauloscustodio
 /* Replaced strpool code by GLib String Chunks.
 /*
 /* Revision 1.6  2013/06/08 23:09:06  pauloscustodio
