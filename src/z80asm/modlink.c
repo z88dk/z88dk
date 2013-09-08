@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.68 2013-09-01 12:00:07 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.69 2013-09-08 00:43:59 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.68  2013-09-01 12:00:07  pauloscustodio
+/* Revision 1.69  2013-09-08 00:43:59  pauloscustodio
+/* New error module with one error function per error, no need for the error
+/* constants. Allows compiler to type-check error message arguments.
+/* Included the errors module in the init() mechanism, no need to call
+/* error initialization from main(). Moved all error-testing scripts to
+/* one file errors.t.
+/*
+/* Revision 1.68  2013/09/01 12:00:07  pauloscustodio
 /* Cleanup compilation warnings
 /*
 /* Revision 1.67  2013/09/01 00:18:28  pauloscustodio
@@ -478,7 +485,7 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
                 break;
 
 			default:
-				error( ERR_NOT_OBJ_FILE, filename );
+				error_not_obj_file( filename );
         }
 
         switch ( scope )
@@ -496,7 +503,7 @@ ReadNames( char *filename, FILE *file, long nextname, long endnames )
 				break;
 
 			default:
-				error( ERR_NOT_OBJ_FILE, filename );
+				error_not_obj_file( filename );
 		}
     }
     while ( nextname < endnames );
@@ -538,7 +545,7 @@ ReadExpr( long nextexpr, long endexpr )
             /* parse numerical expression */
             if ( postfixexpr->rangetype & NOTEVALUABLE )
             {
-                error_at( CURRENTFILE->fname, 0, ERR_NOT_DEFINED_EXPR, line );
+                error_not_defined_expr( line );
             }
             else
             {
@@ -549,21 +556,21 @@ ReadExpr( long nextexpr, long endexpr )
                 {
                     case 'U':
                         if ( constant < -128 || constant > 255 )
-							warning( ERR_INT_RANGE_EXPR, constant, line );
+							warn_int_range_expr( constant, line );
 
                         patch_byte( &patchptr, (byte_t) constant );
                         break;
 
                     case 'S':
                         if ( constant < -128 || constant > 127 )
-							warning( ERR_INT_RANGE_EXPR, constant, line );
+							warn_int_range_expr( constant, line );
 
 						patch_byte( &patchptr, (byte_t) constant );    /* opcode is stored, now store signed 8bit value */
                         break;
 
                     case 'C':
                         if ( constant < -32768 || constant > 65535 )
-                            warning_at( CURRENTFILE->fname, 0, ERR_INT_RANGE_EXPR, constant, line );
+                            warn_int_range_expr( constant, line );
 
 						patch_word( &patchptr, constant );
 
@@ -594,7 +601,7 @@ ReadExpr( long nextexpr, long endexpr )
 
                     case 'L':
                         if ( constant < LONG_MIN || constant > LONG_MAX )
-                            warning_at( CURRENTFILE->fname, 0, ERR_INT_RANGE_EXPR, constant, line );
+                            warn_int_range_expr( constant, line );
 
 						patch_long( &patchptr, constant );
                         break;
@@ -605,7 +612,7 @@ ReadExpr( long nextexpr, long endexpr )
         }
         else
         {
-            error_at( CURRENTFILE->fname, 0, ERR_EXPR, line );
+            error_expr( line );
         }
     }
     while ( nextexpr < endexpr );
@@ -684,7 +691,7 @@ LinkModules( void )
             /* compare header of file */
             if ( strcmp( fheader, Z80objhdr ) != 0 )
             {
-                error( ERR_NOT_OBJ_FILE, obj_filename );  /* not a object     file */
+                error_not_obj_file( obj_filename );  /* not a object     file */
                 fclose( z80asmfile );
                 z80asmfile = NULL;
                 break;
@@ -710,7 +717,7 @@ LinkModules( void )
 
                         if ( CURRENTMODULE->origin == 65535U )
                         {
-							error( ERR_ORG_NOT_DEFINED, obj_filename );  /* no ORG */
+							error_org_not_defined();  /* no ORG */
 							fclose( z80asmfile );
 							z80asmfile = NULL;
 							break;
@@ -1126,7 +1133,6 @@ ModuleExpr( void )
         set_error_module( CURRENTMODULE->mname );
         set_error_file( CURRENTFILE->fname );
 
-
         /* open relocatable file for reading */
         z80asmfile = fopen_err( curlink->objfilename, "rb" );           /* CH_0012 */
         fseek( z80asmfile, fptr_base + 10, SEEK_SET );        /* point at module name  pointer   */
@@ -1295,7 +1301,7 @@ CreateLib( char *lib_filename )
 
             if ( memcmp( filebuffer, Z80objhdr, 8U ) != 0 )
             {
-                error( ERR_NOT_OBJ_FILE, CURRENTFILE->fname );
+                error_not_obj_file( CURRENTFILE->fname );
                 break;
             }
 

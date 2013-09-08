@@ -13,9 +13,16 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/op-INCLUDE.t,v 1.5 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/op-INCLUDE.t,v 1.6 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: op-INCLUDE.t,v $
-# Revision 1.5  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.6  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.5  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.4  2012/05/26 18:51:10  pauloscustodio
@@ -63,7 +70,7 @@ write_file($dir.'/'.inc_file(), 'ld a,10');
 
 t_z80asm_ok(0, 'include "'.$dir.'/'.inc_file().'"', "\x3E\x0A");
 t_z80asm_error('include "'.inc_file().'"', 
-				"Error at file 'test.asm' line 1: Cannot open file 'test.inc' for reading");
+				"Error at file 'test.asm' line 1: cannot read file 'test.inc'");
 t_z80asm_ok(0, 'include "'.inc_file().'"', "\x3E\x0A", "-I$dir");
 
 # recursive include
@@ -71,7 +78,7 @@ unlink_testfiles();
 write_file(inc1_file(), 'include "'.inc2_file().'"');
 write_file(inc2_file(), 'include "'.inc1_file().'"');
 t_z80asm_error('include "'.inc1_file().'"', 
-				"Error at file 'test2.inc' line 1: Cannot include file 'test1.inc' recursively");
+				"Error at file 'test2.inc' line 1: cannot include file 'test1.inc' recursively");
 
 unlink_testfiles();
 remove_tree($dir);

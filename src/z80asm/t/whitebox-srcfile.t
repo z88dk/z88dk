@@ -401,7 +401,7 @@ GLib Memory statistics (successful operations):
         40 |         52 |         52 |          0 |          0 |         +0
         44 |          1 |          1 |          0 |          0 |         +0
         48 |          7 |          7 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
+        96 |          2 |          2 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        256 |          0 |          7 |         41 |         34 |         +0
        384 |          1 |          1 |          0 |          0 |         +0
@@ -409,7 +409,7 @@ GLib Memory statistics (successful operations):
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=17265, zero-initialized=5296 (30.67%), freed=15493 (89.74%), remaining=1772
+Total bytes: allocated=17361, zero-initialized=5392 (31.06%), freed=15589 (89.79%), remaining=1772
 OUT
 last object deleted
 ERR
@@ -452,7 +452,7 @@ t_compile_module($init_code, <<'END', $compile);
 END
 
 t_run_module([], '', <<'END', 0);
-Error: Cannot include file 'f0' recursively
+Error: cannot include file 'f0' recursively
 END
 diag "Should show error message location";
 
@@ -483,7 +483,7 @@ t_compile_module($init_code, <<'END', $compile);
 END
 
 t_run_module([], '', <<'END', 0);
-Error: Cannot open file 'fxxx' for reading
+Error: cannot read file 'fxxx'
 END
 
 
@@ -517,7 +517,7 @@ t_compile_module($init_code, <<'END', $compile);
 END
 
 t_run_module([], '', <<'END', 0);
-Error: Cannot open file 'fxxx' for reading
+Error: cannot read file 'fxxx'
 END
 diag "Should show error message location";
 
@@ -529,9 +529,16 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.7 2013-09-01 17:14:02 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.8 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.7  2013-09-01 17:14:02  pauloscustodio
+# Revision 1.8  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.7  2013/09/01 17:14:02  pauloscustodio
 # Change in test output due to memalloc change.
 #
 # Revision 1.6  2013/09/01 11:52:56  pauloscustodio

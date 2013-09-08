@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.19 2013-01-24 23:03:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.20 2013-09-08 00:43:59 pauloscustodio Exp $ */
 /* $Log: ldinstr.c,v $
-/* Revision 1.19  2013-01-24 23:03:03  pauloscustodio
+/* Revision 1.20  2013-09-08 00:43:59  pauloscustodio
+/* New error module with one error function per error, no need for the error
+/* constants. Allows compiler to type-check error message arguments.
+/* Included the errors module in the init() mechanism, no need to call
+/* error initialization from main(). Moved all error-testing scripts to
+/* one file errors.t.
+/*
+/* Revision 1.19  2013/01/24 23:03:03  pauloscustodio
 /* Replaced (unsigned char) by (byte_t)
 /* Replaced (unisigned int) by (size_t)
 /* Replaced (short) by (int)
@@ -205,12 +212,12 @@ LD( void )
                     }
                     else
                     {
-                        error( ERR_ILLEGAL_IDENT );
+                        error_illegal_ident();
                     }
                 }
                 else
                 {
-                    error( ERR_SYNTAX );
+                    error_syntax();
                 }
 
                 break;
@@ -228,12 +235,12 @@ LD( void )
                     }
                     else
                     {
-                        error( ERR_ILLEGAL_IDENT );
+                        error_illegal_ident();
                     }
                 }
                 else
                 {
-                    error( ERR_SYNTAX );
+                    error_syntax();
                 }
 
                 break;
@@ -251,7 +258,7 @@ LD( void )
                 break;
 
             case 6:
-                error( ERR_ILLEGAL_IDENT ); /* LD F,? */
+                error_illegal_ident(); /* LD F,? */
                 break;
 
             case 8:
@@ -268,12 +275,12 @@ LD( void )
                     }
                     else
                     {
-                        error( ERR_ILLEGAL_IDENT );
+                        error_illegal_ident();
                     }
                 }
                 else
                 {
-                    error( ERR_SYNTAX );
+                    error_syntax();
                 }
 
                 break;
@@ -292,12 +299,12 @@ LD( void )
                     }
                     else
                     {
-                        error( ERR_ILLEGAL_IDENT );
+                        error_illegal_ident();
                     }
                 }
                 else
                 {
-                    error( ERR_SYNTAX );
+                    error_syntax();
                 }
 
                 break;
@@ -321,7 +328,7 @@ LD( void )
                                 if ( ( cpu_type & CPU_RABBIT ) )
 
                                 {
-                                    error( ERR_ILLEGAL_IDENT );
+                                    error_illegal_ident();
                                     return;
                                 }
 
@@ -332,7 +339,7 @@ LD( void )
                             {
                                 if ( ( cpu_type & CPU_RABBIT ) )
                                 {
-                                    error( ERR_ILLEGAL_IDENT );
+                                    error_illegal_ident();
                                     return;
                                 }
 
@@ -350,7 +357,7 @@ LD( void )
                         if ( sourcereg == 6 )
                         {
                             /* LD x, F */
-                            error( ERR_ILLEGAL_IDENT );
+                            error_illegal_ident();
                             return;
                         }
 
@@ -377,7 +384,7 @@ LD( void )
                             /* IXl or IXh */
                             if ( ( cpu_type & CPU_RABBIT ) )
                             {
-                                error( ERR_ILLEGAL_IDENT );
+                                error_illegal_ident();
                                 return;
                             }
 
@@ -389,7 +396,7 @@ LD( void )
                             /* IYl or IYh */
                             if ( ( cpu_type & CPU_RABBIT ) )
                             {
-                                error( ERR_ILLEGAL_IDENT );
+                                error_illegal_ident();
                                 return;
                             }
 
@@ -406,7 +413,7 @@ LD( void )
                 }
                 else
                 {
-                    error( ERR_SYNTAX );
+                    error_syntax();
                 }
 
                 break;
@@ -431,7 +438,7 @@ LD_HL8bit_indrct( void )
             case 6:
             case 8:
             case 9:
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
                 break;
 
             case -1:                /* LD  (HL),n  */
@@ -448,7 +455,7 @@ LD_HL8bit_indrct( void )
     }
     else
     {
-        error( ERR_SYNTAX );
+        error_syntax();
     }
 }
 
@@ -482,7 +489,7 @@ LD_index8bit_indrct( int destreg )
 
     if ( sym != rparen )
     {
-        error( ERR_SYNTAX ); /* ')' wasn't found in line */
+        error_syntax(); /* ')' wasn't found in line */
         return;
     }
 
@@ -495,7 +502,7 @@ LD_index8bit_indrct( int destreg )
             case 6:
             case 8:
             case 9:
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
                 break;
 
             case -1:
@@ -511,7 +518,7 @@ LD_index8bit_indrct( int destreg )
     }
     else
     {
-        error( ERR_SYNTAX );
+        error_syntax();
     }
 }
 
@@ -556,7 +563,7 @@ LD_r_8bit_indrct( int destreg )
             }
             else
             {
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
             }
 
             break;
@@ -570,7 +577,7 @@ LD_r_8bit_indrct( int destreg )
             }
             else
             {
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
             }
 
             break;
@@ -584,13 +591,13 @@ LD_r_8bit_indrct( int destreg )
             }
             else
             {
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
             }
 
             break;
 
         default:
-            error( ERR_ILLEGAL_IDENT );
+            error_illegal_ident();
             break;
     }
 }
@@ -614,7 +621,7 @@ LD_address_indrct( long exprptr )
 
     if ( sym != rparen )
     {
-        error( ERR_SYNTAX ); /* Right bracket missing! */
+        error_syntax(); /* Right bracket missing! */
         return;
     }
 
@@ -664,20 +671,20 @@ LD_address_indrct( long exprptr )
                 }
                 else
                 {
-                    error( ERR_ILLEGAL_IDENT );
+                    error_illegal_ident();
                     return;
                 }
 
                 break;
 
             default:
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
                 return;
         }
     }
     else
     {
-        error( ERR_SYNTAX );
+        error_syntax();
         return;
     }
 
@@ -703,7 +710,7 @@ LD_16bit_reg( void )
                 switch ( destreg )
                 {
                     case 4:
-                        error( ERR_ILLEGAL_IDENT );
+                        error_illegal_ident();
                         return;
 
                     case 2:
@@ -747,7 +754,7 @@ LD_16bit_reg( void )
                         switch ( destreg )
                         {
                             case 4:
-                                error( ERR_ILLEGAL_IDENT );
+                                error_illegal_ident();
                                 return;
 
                             case 5:
@@ -786,7 +793,7 @@ LD_16bit_reg( void )
                         }
                         else
                         {
-                            error( ERR_ILLEGAL_IDENT );
+                            error_illegal_ident();
                         }
 
                         break;
@@ -809,22 +816,22 @@ LD_16bit_reg( void )
                         }
                         else
                         {
-                            error( ERR_ILLEGAL_IDENT );
+                            error_illegal_ident();
                         }
 
                         break;
 
                     default:
-                        error( ERR_ILLEGAL_IDENT );
+                        error_illegal_ident();
                         break;
                 }
         else
         {
-            error( ERR_SYNTAX );
+            error_syntax();
         }
     else
     {
-        error( ERR_SYNTAX );
+        error_syntax();
     }
 }
 

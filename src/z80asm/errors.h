@@ -12,11 +12,68 @@
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
+
+Error handling.
+Fatal errors THROW(FatalErrorException)
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.16 2013-09-08 00:43:58 pauloscustodio Exp $ 
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.15 2013-09-01 11:59:05 pauloscustodio Exp $ */
+#pragma once
+
+#include "memalloc.h"   /* before any other include */
+
+#include <stdio.h>
+
+enum ErrType { ErrInfo, ErrWarn, ErrError, ErrFatal };
+
+/*-----------------------------------------------------------------------------
+*   Initialize and Terminate module
+*----------------------------------------------------------------------------*/
+extern void init_errors(void);
+extern void fini_errors(void);
+
+/*-----------------------------------------------------------------------------
+*	define the next FILE, LINENO, MODULE to use in error messages 
+*	error_xxx(), fatal_xxx(), warn_xxx()
+*----------------------------------------------------------------------------*/
+extern void set_error_null( void );             /* clear all locations */
+extern void set_error_file( char *filename );
+extern void set_error_module( char *modulename );
+extern void set_error_line( int lineno );
+
+/*-----------------------------------------------------------------------------
+*	reset count of errors and return current count
+*----------------------------------------------------------------------------*/
+extern void reset_error_count( void );
+extern int  get_num_errors( void );
+
+/*-----------------------------------------------------------------------------
+*	Open file to receive all errors / warnings from now on
+*	File is created on first call and appended on second, to allow assemble
+*	and link errors to be joined in the same file.
+*----------------------------------------------------------------------------*/
+extern void open_error_file( char *filename );
+extern void close_error_file( void );   /* deletes the file if no errors */
+
+/*-----------------------------------------------------------------------------
+*   declare error functions 
+*----------------------------------------------------------------------------*/
+#define ERR(err_type,func,args)	extern func;
+#include "errors_def.h"
+#undef ERR
+
+
+/* */
 /* $Log: errors.h,v $
-/* Revision 1.15  2013-09-01 11:59:05  pauloscustodio
+/* Revision 1.16  2013-09-08 00:43:58  pauloscustodio
+/* New error module with one error function per error, no need for the error
+/* constants. Allows compiler to type-check error message arguments.
+/* Included the errors module in the init() mechanism, no need to call
+/* error initialization from main(). Moved all error-testing scripts to
+/* one file errors.t.
+/*
+/* Revision 1.15  2013/09/01 11:59:05  pauloscustodio
 /* Force memalloc to be the first include, to be able to use MSVC memory debug tools
 /*
 /* Revision 1.14  2013/05/11 00:29:26  pauloscustodio
@@ -86,48 +143,4 @@ Copyright (C) Paulo Custodio, 2011-2013
 /*   replaced all extern declarations of these variables by include errors.h,
 /*   created symbolic constants for error codes.
 /* - Added test scripts for error messages.
-/*
 /* */
-
-#ifndef ERRORS_H
-#define ERRORS_H
-
-#include "memalloc.h"   /* before any other include */
-
-#include <stdio.h>
-
-/* error constants */
-#define DEF_MSG(name,msg)    name,
-typedef enum ErrorCode
-{
-#include "errors_def.h"
-} ErrorCode;
-#undef DEF_MSG
-
-/* define the next FILE, LINENO, MODULE to use in error messages error(), fatal_error(), warning() */
-extern void set_error_null( void );             /* clear all locations */
-extern void set_error_file( char *filename );
-extern void set_error_module( char *modulename );
-extern void set_error_line( int lineno );
-
-/* reset count of errors and warnings and return current count */
-extern void reset_error_count( void );
-extern int  get_num_errors( void );
-extern int  get_num_warnings( void );
-
-/* define file to receive all errors / warnings from now on */
-extern void open_error_file( char *filename );
-extern void close_error_file( void );   /* deletes the file if no errors */
-
-/* error / warning with printf-like argument */
-extern void fatal_error( ErrorCode err, ... );
-extern void error( ErrorCode err, ... );
-extern void warning( ErrorCode err, ... );
-
-/* error / warning at given location */
-extern void fatal_error_at( char *filename, int lineno, ErrorCode err, ... );
-extern void error_at( char *filename, int lineno, ErrorCode err, ... );
-extern void warning_at( char *filename, int lineno, ErrorCode err, ... );
-
-#endif /* ndef ERRORS_H */
-

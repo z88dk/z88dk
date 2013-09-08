@@ -20,7 +20,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test strpool
-my $objs = "strpool.o die.o strutil.o safestr.o except.o init.o";
+my $objs = "strpool.o die.o strutil.o safestr.o except.o init.o errors.o file.o strlist.o";
 ok ! system "make $objs";
 my $compile = "-DCLASS_DEBUG -DMEMALLOC_DEBUG class.c memalloc.c $objs";
 
@@ -422,7 +422,7 @@ GLib Memory statistics (successful operations):
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
         20 |          1 |          1 |          0 |          0 |         +0
-        96 |          2 |          2 |          0 |          0 |         +0
+        96 |          3 |          3 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        384 |          1 |          1 |          0 |          0 |         +0
        768 |          1 |          1 |          0 |          0 |         +0
@@ -433,7 +433,7 @@ GLib Memory statistics (successful operations):
    >  4096 |          1 |          1 |          0 |          0 |        ***
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=15936, zero-initialized=13868 (87.02%), freed=14164 (88.88%), remaining=1772
+Total bytes: allocated=16032, zero-initialized=13964 (87.10%), freed=14260 (88.95%), remaining=1772
 OUT
 first run - create pool for all strings
 second run - check that pool did not move
@@ -445,9 +445,16 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strpool.t,v 1.8 2013-09-01 16:51:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strpool.t,v 1.9 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: whitebox-strpool.t,v $
-# Revision 1.8  2013-09-01 16:51:26  pauloscustodio
+# Revision 1.9  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.8  2013/09/01 16:51:26  pauloscustodio
 # Replaced strpool code by GLib String Chunks.
 #
 # Revision 1.7  2013/09/01 11:52:56  pauloscustodio

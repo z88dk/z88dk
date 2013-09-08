@@ -19,7 +19,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test memalloc
-my $objs = "class.o die.o strutil.o safestr.o except.o init.o strpool.o";
+my $objs = "class.o die.o strutil.o safestr.o except.o init.o strpool.o errors.o file.o strlist.o";
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 
 t_compile_module(<<'END_INIT', <<'END', $compile);
@@ -248,10 +248,13 @@ GLib Memory statistics (successful operations):
         20 |          1 |          1 |          0 |          0 |         +0
         32 |         12 |         12 |          0 |          0 |         +0
         60 |          2 |          2 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
        100 |         12 |         12 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=1724, zero-initialized=1704 (98.84%), freed=1724 (100.00%), remaining=0
+Total bytes: allocated=3592, zero-initialized=3572 (99.44%), freed=1820 (50.67%), remaining=1772
 OUT
 start
 ring = ""
@@ -757,9 +760,16 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.4 2013-09-01 18:08:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.5 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: whitebox-classring.t,v $
-# Revision 1.4  2013-09-01 18:08:29  pauloscustodio
+# Revision 1.5  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.4  2013/09/01 18:08:29  pauloscustodio
 # Change in test output due to memalloc change.
 #
 # Revision 1.3  2013/09/01 11:52:55  pauloscustodio

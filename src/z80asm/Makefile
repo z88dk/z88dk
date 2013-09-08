@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.73 2013-09-04 21:17:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.74 2013-09-08 00:43:58 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -104,7 +104,8 @@ OBJS = 	\
 MAKE_INIT =			tools/make_init.pl
 INIT = \
 	memalloc.h 		\
-	strpool.h
+	strpool.h		\
+	errors.h		\
 
 #------------------------------------------------------------------------------
 # variables
@@ -249,7 +250,14 @@ depend:
 
 
 # $Log: Makefile,v $
-# Revision 1.73  2013-09-04 21:17:52  pauloscustodio
+# Revision 1.74  2013-09-08 00:43:58  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.73  2013/09/04 21:17:52  pauloscustodio
 # $(EXESUFFIX) is passed down as part of the build
 #
 # Revision 1.72  2013/09/01 16:53:18  pauloscustodio
@@ -555,8 +563,7 @@ deffile.o: die.h sym.h token_def.h z80asm.h config.h
 die.o: memalloc.h die.h
 dynstr.o: memalloc.h dynstr.h class.h queue.h types.h strutil.h
 errors.o: memalloc.h errors.h errors_def.h except.h die.h types.h file.h
-errors.o: safestr.h strlist.h class.h queue.h strpool.h strhash.h uthash.h
-errors.o: strutil.h
+errors.o: safestr.h strlist.h class.h queue.h strpool.h
 except.o: memalloc.h except.h die.h types.h
 exprprsr.o: memalloc.h codearea.h types.h config.h  errors.h
 exprprsr.o: errors_def.h file.h safestr.h strlist.h class.h queue.h legacy.h
@@ -606,10 +613,11 @@ prsline.o: queue.h symref.h classlist.h symbol.h model.h objfile.h symtab.h
 prsline.o: classhash.h strhash.h uthash.h die.h token_def.h options.h
 prsline.o: errors.h errors_def.h
 safestr.o: memalloc.h safestr.h types.h strutil.h
-scan.o: memalloc.h parse.h types.h codearea.h class.h queue.h classlist.h
-scan.o: die.h dynstr.h errors.h errors_def.h listfile.h symref.h options.h
-scan.o: symbol.h model.h objfile.h symtab.h classhash.h strhash.h uthash.h
-scan.o: sym.h token_def.h srcfile.h strpool.h strutil.h
+scan.o: memalloc.h parse.h types.h file.h safestr.h strlist.h class.h queue.h
+scan.o: codearea.h classlist.h die.h dynstr.h errors.h errors_def.h
+scan.o: listfile.h symref.h options.h symbol.h model.h objfile.h symtab.h
+scan.o: classhash.h strhash.h uthash.h sym.h token_def.h srcfile.h strpool.h
+scan.o: strutil.h
 srcfile.o: memalloc.h codearea.h types.h errors.h errors_def.h file.h
 srcfile.o: safestr.h strlist.h class.h queue.h listfile.h dynstr.h symref.h
 srcfile.o: classlist.h options.h symbol.h model.h objfile.h symtab.h

@@ -18,7 +18,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test memalloc
-my $objs = "class.o die.o strutil.o safestr.o except.o init.o strpool.o";
+my $objs = "class.o die.o strutil.o safestr.o except.o init.o strpool.o errors.o file.o strlist.o";
 ok ! system "make $objs";
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
 
@@ -472,9 +472,12 @@ GLib Memory statistics (successful operations):
         20 |          1 |          1 |          0 |          0 |         +0
         32 |         24 |         24 |          0 |          0 |         +0
         40 |          7 |          7 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=1548, zero-initialized=1336 (86.30%), freed=1548 (100.00%), remaining=0
+Total bytes: allocated=3416, zero-initialized=3204 (93.79%), freed=1644 (48.13%), remaining=1772
 OUT
 ERR
 
@@ -484,9 +487,16 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classlist.t,v 1.6 2013-09-01 18:11:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classlist.t,v 1.7 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: whitebox-classlist.t,v $
-# Revision 1.6  2013-09-01 18:11:52  pauloscustodio
+# Revision 1.7  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.6  2013/09/01 18:11:52  pauloscustodio
 # Change in test output due to memalloc change.
 #
 # Revision 1.5  2013/09/01 11:52:55  pauloscustodio

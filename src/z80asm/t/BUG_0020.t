@@ -13,9 +13,16 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0020.t,v 1.2 2013-01-20 21:24:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/BUG_0020.t,v 1.3 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: BUG_0020.t,v $
-# Revision 1.2  2013-01-20 21:24:28  pauloscustodio
+# Revision 1.3  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.2  2013/01/20 21:24:28  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.1  2012/06/05 22:24:47  pauloscustodio
@@ -35,7 +42,7 @@ write_file(asm_file(), "
 	ENDIF
 ");
 t_z80asm_capture("-r0 -b -DC ".asm_file(), "", 
-	"Error at file 'test.asm' line 3: Unknown identifier\n".
+	"Error at file 'test.asm' line 3: unknown identifier\n".
 	"1 errors occurred during assembly\n", 1);
 
 t_z80asm_capture("-r0 -b ".asm_file(), "", "", 0);

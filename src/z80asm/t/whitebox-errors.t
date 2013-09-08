@@ -27,267 +27,133 @@ unlink_testfiles();
 my $objs = "errors.o memalloc.o class.o die.o strutil.o strhash.o safestr.o strpool.o except.o ".
 		   "strlist.o file.o init.o";
 
-my $init = <<'END';
+t_compile_module('', <<'END', $objs);
 #define ERROR return __LINE__
-#define check_count(e,w) \
-	if (get_num_errors()   != e)	ERROR;	\
-	if (get_num_warnings() != w)	ERROR
+#define check_count(e) if (get_num_errors() != e) ERROR;
+
+	check_count(0);
 	
-FILE*errfile = NULL;
+	warn("Information\n");
+	info_total_errors();
+	check_count(0);
+
+	warn("Warning\n");
+	warn_option_deprecated("t");
+	check_count(0);
+
+	warn("Error\n");
+	error_syntax();
+	check_count(1);
+
+	warn("Fatal error not caught\n");
+	fatal_read_file("file.asm");
+	warn("NOT REACHED\n");	
 END
 
-t_compile_module($init, <<'END', $objs);
-	int test;
+t_run_module([], <<'OUT', <<'ERR', 1);
+OUT
+Information
+0 errors occurred during assembly
+Warning
+Warning: option '-t' is deprecated
+Error
+Error: syntax error
+Fatal error not caught
+Error: cannot read file 'file.asm'
+Uncaught runtime exception at errors.c(1)
+ERR
+
+
+t_compile_module('', <<'END', $objs);
+#define ERROR return __LINE__
+#define check_count(e) if (get_num_errors() != e) ERROR;
+#define SYNTAX(file,module,line) \
+	_count = get_num_errors(); \
+	set_error_file(file); \
+	set_error_module(module); \
+	set_error_line(line); \
+	error_syntax(); \
+	check_count(_count + 1)
 	
-	if (argc != 2) ERROR;
-	test = atoi(argv[1]);
+#define DOUBLE(x) #x #x
+	int _count;
+	check_count(0);
 	
-	switch (test) {
-	case 1:
-		check_count(0, 0);
-
-		warn("test all error messages\n");
-		error(ERR_OK);
-		check_count(1, 0);
-		
-		error(ERR_FOPEN_READ,	"file1");
-		check_count(2, 0);
-		
-		error(ERR_FOPEN_WRITE, "file2");
-		check_count(3, 0);
-
-		error(100);
-		check_count(4, 0);
-
-		warn("warning\n");
-		warning(ERR_OK);
-		check_count(4, 1);
-		warning(ERR_FOPEN_READ, "file1");
-		check_count(4, 2);
-		
-		warn("reset\n");
-		reset_error_count();
-		error(ERR_OK);
-		warning(ERR_OK);
-		check_count(1, 1);
-
-		warn("error at\n");
-		error_at(NULL, 0, ERR_OK);
-		error_at(NULL, 0, ERR_FOPEN_READ, "file1");
-		check_count(3, 1);
-		
-		error_at("f1.c", 0, ERR_OK);
-		error_at("f1.c", 0, ERR_FOPEN_READ, "file1");
-		check_count(5, 1);
-		
-		error_at(NULL, 5, ERR_OK);
-		error_at(NULL, 5, ERR_FOPEN_READ, "file1");
-		check_count(7, 1);
-		
-		error_at("f1.c", 5, ERR_OK);
-		error_at("f1.c", 5, ERR_FOPEN_READ, "file1");
-		check_count(9, 1);
-		
-		warn("warning at\n");
-		warning_at(NULL, 0, ERR_OK);
-		warning_at(NULL, 0, ERR_FOPEN_READ, "file1");
-		check_count(9, 3);
-		
-		warning_at("f1.c", 0, ERR_OK);
-		warning_at("f1.c", 0, ERR_FOPEN_READ, "file1");
-		check_count(9, 5);
-		
-		warning_at(NULL, 5, ERR_OK);
-		warning_at(NULL, 5, ERR_FOPEN_READ, "file1");
-		check_count(9, 7);
-		
-		warning_at("f1.c", 5, ERR_OK);
-		warning_at("f1.c", 5, ERR_FOPEN_READ, "file1");
-		check_count(9, 9);
-		
-		warn("create and delete error file\n");
-		open_error_file("test1.err");
-		close_error_file();
-		check_count(9, 9);
-		
-		warn("open and close error file\n");
-		open_error_file("test2.err");
-		error_at("f1.c", 5, ERR_FOPEN_READ, "file1");
-		warning_at("f1.c", 5, ERR_FOPEN_READ, "file1");
-		close_error_file();
-		check_count(10, 10);
-
-		reset_error_count();
-		check_count(0, 0);
-		
-		// set_error_...
-		set_error_null();
-		error(ERR_FOPEN_READ, "file2");
-		
-		set_error_null();
-		set_error_file("f2.c");
-		error(ERR_FOPEN_READ, "file2");
-		
-		set_error_null();
-		set_error_module("F2");
-		error(ERR_FOPEN_READ, "file2");
-		
-		set_error_null();
-		set_error_line(123);
-		error(ERR_FOPEN_READ, "file2");
-		
-		set_error_file("f2.c");
-		error(ERR_FOPEN_READ, "file2");
-		
-		set_error_module("F2");
-		error(ERR_FOPEN_READ, "file2");
-
-		set_error_null();
-		
-		check_count(6, 0);
-
-		reset_error_count();
-		check_count(0, 0);
-	
-		warn("open error file\n");
-		open_error_file("test3.err");
-		error_at("f1.c", 5, ERR_FOPEN_READ, "file1");
-		warning_at("f1.c", 5, ERR_FOPEN_READ, "file1");
-		check_count(1, 1);
-
-		warn("open without close error file\n");
-		open_error_file("test4.err");
-		error_at("f1.c", 5, ERR_FOPEN_READ, "file1");
-		warning_at("f1.c", 5, ERR_FOPEN_READ, "file1");
-		check_count(2, 2);
-		
-		break;
-		
-	case 2:
-		warn("open without close error file, unlink\n");
-		open_error_file("test5.err");
-		check_count(0, 0);
-		break;
-	
-	case 3:
-		TRY {
-			warn("Fatal error\n");
-			fatal_error(ERR_FOPEN_READ, "file1");
-			warn("not reached\n");
-		}
-		FINALLY {
-			if (THROWN()) 
-				warn("caught fatal error\n");
-		}
-		ETRY;
-		ERROR;
-		
-	case 4:
-		TRY {
-			warn("Fatal error at\n");
-			fatal_error_at("f1.c", 5, ERR_FOPEN_READ, "file1");
-			warn("not reached\n");
-		}
-		FINALLY {
-			if (THROWN()) 
-				warn("caught fatal error\n");
-		}
-		ETRY;
-		ERROR;
-		
-	default:
-		ERROR;
+	warn("Fatal error\n");
+	TRY
+	{
+		fatal_read_file("file.asm");
+		warn("NOT REACHED\n");	
 	}
-		
-	return 0;
+	FINALLY
+	{
+		if (! THROWN()) ERROR;
+	}
+	ETRY;
+	check_count(1);
+	
+	SYNTAX(	NULL,		NULL,	0 );
+	SYNTAX(	NULL,		NULL,	1 );
+	SYNTAX(	NULL,		"TEST",	0 );
+	SYNTAX(	NULL,		"TEST",	1 );
+	SYNTAX(	"test.asm",	NULL,	0 );
+	SYNTAX(	"test.asm",	NULL,	1 );
+	SYNTAX(	"test.asm",	"TEST",	0 );
+	SYNTAX(	"test.asm",	"TEST",	1 );
+
+	set_error_null();
+	check_count(9);
+	error_syntax();
+	check_count(10);
+	
+	reset_error_count();
+	check_count(0);
+
+	open_error_file("test1.err");
+	close_error_file();
+	
+	error_syntax();
+	
+	open_error_file("test2.err");
+	error_syntax();
+	close_error_file();
+	
+	open_error_file("test3.err");
+	error_syntax();
+	
+	open_error_file("test2.err");
+	error_syntax();
+	
 END
 
-t_run_module([1], "", <<'END', 0);
-test all error messages
-Exit: OK
-Error: Cannot open file 'file1' for reading
-Error: Cannot open file 'file2' for writing
-Error: Error 100
-warning
-Exit: OK
-Warning: Cannot open file 'file1' for reading
-reset
-Exit: OK
-Exit: OK
-error at
-Exit: OK
-Error: Cannot open file 'file1' for reading
-Exit at file 'f1.c': OK
-Error at file 'f1.c': Cannot open file 'file1' for reading
-Exit at line 5: OK
-Error at line 5: Cannot open file 'file1' for reading
-Exit at file 'f1.c' line 5: OK
-Error at file 'f1.c' line 5: Cannot open file 'file1' for reading
-warning at
-Exit: OK
-Warning: Cannot open file 'file1' for reading
-Exit at file 'f1.c': OK
-Warning at file 'f1.c': Cannot open file 'file1' for reading
-Exit at line 5: OK
-Warning at line 5: Cannot open file 'file1' for reading
-Exit at file 'f1.c' line 5: OK
-Warning at file 'f1.c' line 5: Cannot open file 'file1' for reading
-create and delete error file
-open and close error file
-Error at file 'f1.c' line 5: Cannot open file 'file1' for reading
-Warning at file 'f1.c' line 5: Cannot open file 'file1' for reading
-Error: Cannot open file 'file2' for reading
-Error at file 'f2.c': Cannot open file 'file2' for reading
-Error at module 'F2': Cannot open file 'file2' for reading
-Error at line 123: Cannot open file 'file2' for reading
-Error at file 'f2.c' line 123: Cannot open file 'file2' for reading
-Error at file 'f2.c' module 'F2' line 123: Cannot open file 'file2' for reading
-open error file
-Error at file 'f1.c' line 5: Cannot open file 'file1' for reading
-Warning at file 'f1.c' line 5: Cannot open file 'file1' for reading
-open without close error file
-Error at file 'f1.c' line 5: Cannot open file 'file1' for reading
-Warning at file 'f1.c' line 5: Cannot open file 'file1' for reading
-END
+t_run_module([], <<'OUT', <<'ERR', 0);
+OUT
+Fatal error
+Error: cannot read file 'file.asm'
+Error: syntax error
+Error at line 1: syntax error
+Error at module 'TEST': syntax error
+Error at module 'TEST' line 1: syntax error
+Error at file 'test.asm': syntax error
+Error at file 'test.asm' line 1: syntax error
+Error at file 'test.asm' module 'TEST': syntax error
+Error at file 'test.asm' module 'TEST' line 1: syntax error
+Error: syntax error
+Error: syntax error
+Error: syntax error
+Error: syntax error
+Error: syntax error
+ERR
 
-ok ! -f 'test1.err';
+ok ! -f "test1.err", "no errors, file deleted";
 
 eq_or_diff_text scalar(read_file('test2.err')), <<'END';
-Error at file 'f1.c' line 5: Cannot open file 'file1' for reading
-Warning at file 'f1.c' line 5: Cannot open file 'file1' for reading
+Error: syntax error
+Error: syntax error
 END
 
 eq_or_diff_text scalar(read_file('test3.err')), <<'END';
-Error at file 'f1.c' line 5: Cannot open file 'file1' for reading
-Warning at file 'f1.c' line 5: Cannot open file 'file1' for reading
-END
-
-eq_or_diff_text scalar(read_file('test4.err')), <<'END';
-Error at file 'f1.c' line 5: Cannot open file 'file1' for reading
-Warning at file 'f1.c' line 5: Cannot open file 'file1' for reading
-END
-
-
-# bug : StrPool destroyed before ErrFile, unlink used unallocated memory
-t_run_module([2], "", <<'END', 0);
-open without close error file, unlink
-END
-
-ok ! -f 'test5.err';
-
-
-# fatal error
-t_run_module([3], "", <<'END', 1);
-Fatal error
-Error: Cannot open file 'file1' for reading
-caught fatal error
-END
-
-
-t_run_module([4], "", <<'END', 1);
-Fatal error at
-Error at file 'f1.c' line 5: Cannot open file 'file1' for reading
-caught fatal error
+Error: syntax error
 END
 
 
@@ -296,9 +162,16 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.7 2013-09-01 17:45:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.8 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.7  2013-09-01 17:45:46  pauloscustodio
+# Revision 1.8  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.7  2013/09/01 17:45:46  pauloscustodio
 # Need to include init.o to have memory initialized
 #
 # Revision 1.6  2013/09/01 00:18:30  pauloscustodio

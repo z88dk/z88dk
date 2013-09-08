@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.28 2013-09-01 12:00:07 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.29 2013-09-08 00:43:59 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.28  2013-09-01 12:00:07  pauloscustodio
+/* Revision 1.29  2013-09-08 00:43:59  pauloscustodio
+/* New error module with one error function per error, no need for the error
+/* constants. Allows compiler to type-check error message arguments.
+/* Included the errors module in the init() mechanism, no need to call
+/* error initialization from main(). Moved all error-testing scripts to
+/* one file errors.t.
+/*
+/* Revision 1.28  2013/09/01 12:00:07  pauloscustodio
 /* Cleanup compilation warnings
 /*
 /* Revision 1.27  2013/09/01 00:18:28  pauloscustodio
@@ -437,7 +444,7 @@ void set_asm_flag( char *flagid )
     else if ( *flagid == 't' )
     {
 		flagid[1] = '\0';
-		warning( ERR_OPTION_DEPRECATED, flagid );		/* CH_0017 */
+		warn_option_deprecated(flagid);		/* CH_0017 */
     }
 
     else if ( *flagid == 'I' )
@@ -458,7 +465,7 @@ void set_asm_flag( char *flagid )
 
         if ( !isalpha( ident[0] ) )
         {
-            error( ERR_ILLEGAL_IDENT );  /* symbol must begin with alpha */
+            error_illegal_ident();  /* symbol must begin with alpha */
             return;
         }
 
@@ -472,7 +479,7 @@ void set_asm_flag( char *flagid )
                 {
                     if ( ident[i] != '_' )
                     {
-                        error( ERR_ILLEGAL_IDENT );      /* illegal char in identifier */
+                        error_illegal_ident();      /* illegal char in identifier */
                         return;
                     }
                     else
@@ -487,7 +494,7 @@ void set_asm_flag( char *flagid )
             }
             else
             {
-                error( ERR_ILLEGAL_IDENT );              /* illegal char in identifier */
+                error_illegal_ident();              /* illegal char in identifier */
                 return;
             }
 
@@ -506,7 +513,7 @@ void set_asm_flag( char *flagid )
     else
     {
         /* BUG_0003 was missing Illegal Option error */
-        fatal_error( ERR_ILLEGAL_OPTION, flagid );
+        error_illegal_option( flagid );
     }
 }
 

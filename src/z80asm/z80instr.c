@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.33 2013-01-24 23:03:03 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.34 2013-09-08 00:43:59 pauloscustodio Exp $ */
 /* $Log: z80instr.c,v $
-/* Revision 1.33  2013-01-24 23:03:03  pauloscustodio
+/* Revision 1.34  2013-09-08 00:43:59  pauloscustodio
+/* New error module with one error function per error, no need for the error
+/* constants. Allows compiler to type-check error message arguments.
+/* Included the errors module in the init() mechanism, no need to call
+/* error initialization from main(). Moved all error-testing scripts to
+/* one file errors.t.
+/*
+/* Revision 1.33  2013/01/24 23:03:03  pauloscustodio
 /* Replaced (unsigned char) by (byte_t)
 /* Replaced (unisigned int) by (size_t)
 /* Replaced (short) by (int)
@@ -288,11 +295,11 @@ PushPop_instr( int opcode )
                 break;
 
             default:
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
         }
     else
     {
-        error( ERR_SYNTAX );
+        error_syntax();
     }
 }
 
@@ -311,7 +318,7 @@ RET( void )
             }
             else
             {
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
             }
 
             break;
@@ -321,7 +328,7 @@ RET( void )
             break;
 
         default:
-            error( ERR_SYNTAX );
+            error_syntax();
             return;
     }
 
@@ -370,27 +377,27 @@ EX( void )
                                     break;
 
                                 default:
-                                    error( ERR_ILLEGAL_IDENT );
+                                    error_illegal_ident();
                             }
                         else
                         {
-                            error( ERR_SYNTAX );
+                            error_syntax();
                         }
                     else
                     {
-                        error( ERR_SYNTAX );
+                        error_syntax();
                     }
                 else
                 {
-                    error( ERR_SYNTAX );
+                    error_syntax();
                 }
             else
             {
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
             }
         else
         {
-            error( ERR_SYNTAX );
+            error_syntax();
         }
     else if ( sym == name )
     {
@@ -406,15 +413,15 @@ EX( void )
                         }
                         else
                         {
-                            error( ERR_ILLEGAL_IDENT );
+                            error_illegal_ident();
                         }
                     else
                     {
-                        error( ERR_SYNTAX );
+                        error_syntax();
                     }
                 else
                 {
-                    error( ERR_SYNTAX );
+                    error_syntax();
                 }
 
                 break;
@@ -429,26 +436,26 @@ EX( void )
                         }
                         else
                         {
-                            error( ERR_ILLEGAL_IDENT );
+                            error_illegal_ident();
                         }
                     else
                     {
-                        error( ERR_SYNTAX );
+                        error_syntax();
                     }
                 else
                 {
-                    error( ERR_SYNTAX );
+                    error_syntax();
                 }
 
                 break;
 
             default:
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
         }
     }
     else
     {
-        error( ERR_SYNTAX );
+        error_syntax();
     }
 }
 
@@ -461,7 +468,7 @@ OUT( void )
 
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -481,7 +488,7 @@ OUT( void )
                             case 8:
                             case 9:
                             case -1:
-                                error( ERR_ILLEGAL_IDENT );
+                                error_illegal_ident();
                                 break;
 
                             default:
@@ -492,15 +499,15 @@ OUT( void )
                         }
                     else
                     {
-                        error( ERR_SYNTAX );
+                        error_syntax();
                     }
                 else
                 {
-                    error( ERR_SYNTAX );
+                    error_syntax();
                 }
             else
             {
-                error( ERR_SYNTAX );
+                error_syntax();
             }
         }
         else
@@ -520,26 +527,26 @@ OUT( void )
                     {
                         if ( CheckRegister8() != 7 )
                         {
-                            error( ERR_ILLEGAL_IDENT );
+                            error_illegal_ident();
                         }
                     }
                     else
                     {
-                        error( ERR_SYNTAX );
+                        error_syntax();
                     }
                 else
                 {
-                    error( ERR_SYNTAX );
+                    error_syntax();
                 }
             else
             {
-                error( ERR_SYNTAX );
+                error_syntax();
             }
         }
     }
     else
     {
-        error( ERR_SYNTAX );
+        error_syntax();
     }
 }
 
@@ -551,7 +558,7 @@ IN( void )
 
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -562,19 +569,19 @@ IN( void )
             case 8:
             case 9:
             case -1:
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
                 break;
 
             default:
                 if ( GetSym() != comma )
                 {
-                    error( ERR_SYNTAX );
+                    error_syntax();
                     break;
                 }
 
                 if ( GetSym() != lparen )
                 {
-                    error( ERR_SYNTAX );
+                    error_syntax();
                     break;
                 }
 
@@ -596,20 +603,20 @@ IN( void )
                             if ( ExprUnsigned8( 1 ) )
                                 if ( sym != rparen )
                                 {
-                                    error( ERR_SYNTAX );
+                                    error_syntax();
                                 }
 
                             inc_PC( 2 );
                         }
                         else
                         {
-                            error( ERR_ILLEGAL_IDENT );
+                            error_illegal_ident();
                         }
 
                         break;
 
                     default:
-                        error( ERR_ILLEGAL_IDENT );
+                        error_illegal_ident();
                         break;
                 }
 
@@ -618,7 +625,7 @@ IN( void )
     }
     else
     {
-        error( ERR_SYNTAX );
+        error_syntax();
     }
 }
 
@@ -631,7 +638,7 @@ IM( void )
 
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -641,7 +648,7 @@ IM( void )
     {
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            error( ERR_NOT_DEFINED );
+            error_not_defined();
         }
         else
         {
@@ -685,7 +692,7 @@ RST( void )
     {
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            error( ERR_NOT_DEFINED );
+            error_not_defined();
         }
         else
         {
@@ -696,7 +703,7 @@ RST( void )
                 if ( ( cpu_type & CPU_RABBIT ) &&
                         ( ( constant == 0 ) || ( constant == 8 ) || ( constant == 0x30 ) ) )
                 {
-                    error( ERR_ILLEGAL_IDENT );
+                    error_illegal_ident();
                 }
                 else
                 {
@@ -706,7 +713,7 @@ RST( void )
             }
             else
             {
-                error( ERR_INT_RANGE, constant );
+                error_int_range( constant );
             }
         }
 
@@ -732,7 +739,7 @@ void CALL_OZ( void )
     {
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            error( ERR_NOT_DEFINED );    /* CALL_OZ expression must be evaluable */
+            error_not_defined();    /* CALL_OZ expression must be evaluable */
         }
         else
         {
@@ -750,7 +757,7 @@ void CALL_OZ( void )
             }
             else
             {
-                error( ERR_INT_RANGE, constant );
+                error_int_range( constant );
             }
         }
 
@@ -783,7 +790,7 @@ CALL_PKG( void )
     {
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            error( ERR_NOT_DEFINED );    /* CALL_OZ expression must be evaluable */
+            error_not_defined();    /* CALL_OZ expression must be evaluable */
         }
         else
         {
@@ -796,7 +803,7 @@ CALL_PKG( void )
             }
             else
             {
-                error( ERR_INT_RANGE, constant );
+                error_int_range( constant );
             }
         }
 
@@ -830,7 +837,7 @@ INVOKE( void )
     {
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            error( ERR_NOT_DEFINED );    /* INVOKE expression must be evaluable */
+            error_not_defined();    /* INVOKE expression must be evaluable */
         }
         else
         {
@@ -843,7 +850,7 @@ INVOKE( void )
             }
             else
             {
-                error( ERR_INT_RANGE, constant );
+                error_int_range( constant );
             }
         }
 
@@ -869,7 +876,7 @@ FPP( void )
     {
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            error( ERR_NOT_DEFINED );    /* FPP expression must be evaluable */
+            error_not_defined();    /* FPP expression must be evaluable */
         }
         else
         {
@@ -882,7 +889,7 @@ FPP( void )
             }
             else
             {
-                error( ERR_INT_RANGE, constant );
+                error_int_range( constant );
             }
         }
 
@@ -904,7 +911,7 @@ Subroutine_addr( int opcode0, int opcode )
 
         if ( GetSym() != comma )
         {
-            error( ERR_SYNTAX );
+            error_syntax();
             return;
         }
 
@@ -917,7 +924,7 @@ Subroutine_addr( int opcode0, int opcode )
 
             if ( constant >= 4 )
             {
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
                 return;
             }
 
@@ -1046,11 +1053,11 @@ JP_instr( int opc0, int opc )
                 break;
 
             case -1:
-                error( ERR_SYNTAX );
+                error_syntax();
                 break;
 
             default:
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
                 break;
         }
     }
@@ -1086,7 +1093,7 @@ JR( void )
                 }
                 else
                 {
-                    error( ERR_SYNTAX ); /* comma missing */
+                    error_syntax(); /* comma missing */
                     return;
                 }
 
@@ -1095,7 +1102,7 @@ JR( void )
                 break;                /* identifier not a condition id - check for legal expression */
 
             default:
-                error( ERR_SYNTAX );      /* illegal condition, syntax
+                error_syntax();      /* illegal condition, syntax
                                                                      * error  */
                 return;
         }
@@ -1125,7 +1132,7 @@ JR( void )
             else
             {
                 append_byte( 0 );								/* BUG_0025 - store dummy offset */
-                error( ERR_INT_RANGE, constant );
+                error_int_range( constant );
             }
         }
     }
@@ -1169,7 +1176,7 @@ DJNZ( void )
             else
             {
                 append_byte( 0 );								/* BUG_0025 - store dummy offset */
-                error( ERR_INT_RANGE, constant );
+                error_int_range( constant );
             }
         }
     }
@@ -1230,12 +1237,12 @@ ADD( void )
                 }
                 else
                 {
-                    error( ERR_ILLEGAL_IDENT );
+                    error_illegal_ident();
                 }
             }
             else
             {
-                error( ERR_SYNTAX );
+                error_syntax();
             }
 
             break;
@@ -1262,14 +1269,14 @@ ADD( void )
                         }
                         else
                         {
-                            error( ERR_ILLEGAL_IDENT );
+                            error_illegal_ident();
                             return;
                         }
 
                         break;
 
                     default:
-                        error( ERR_ILLEGAL_IDENT );
+                        error_illegal_ident();
                         return;
                 }
 
@@ -1287,13 +1294,13 @@ ADD( void )
             }
             else
             {
-                error( ERR_SYNTAX );
+                error_syntax();
             }
 
             break;
 
         default:
-            error( ERR_UNKNOWN_IDENT );
+            error_unknown_ident();
             break;
     }
 }
@@ -1329,18 +1336,18 @@ SBC( void )
                 }
                 else
                 {
-                    error( ERR_ILLEGAL_IDENT );
+                    error_illegal_ident();
                 }
             }
             else
             {
-                error( ERR_SYNTAX );
+                error_syntax();
             }
 
             break;
 
         default:
-            error( ERR_ILLEGAL_IDENT );
+            error_illegal_ident();
             break;
     }
 }
@@ -1377,18 +1384,18 @@ ADC( void )
                 }
                 else
                 {
-                    error( ERR_ILLEGAL_IDENT );
+                    error_illegal_ident();
                 }
             }
             else
             {
-                error( ERR_SYNTAX );
+                error_syntax();
             }
 
             break;
 
         default:
-            error( ERR_ILLEGAL_IDENT );
+            error_illegal_ident();
             break;
     }
 }
@@ -1428,7 +1435,7 @@ ArithLog8_instr( int opcode )
                 break;
 
             default:
-                error( ERR_SYNTAX );
+                error_syntax();
                 break;
         }
     else
@@ -1448,7 +1455,7 @@ ArithLog8_instr( int opcode )
             case 6:         /* xxx A,F illegal */
             case 8:         /* xxx A,I illegal */
             case 9:         /* xxx A,R illegal */
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
                 break;
 
             default:
@@ -1457,7 +1464,7 @@ ArithLog8_instr( int opcode )
                     /* IXl or IXh */
                     if ( ( cpu_type & CPU_RABBIT ) )
                     {
-                        error( ERR_ILLEGAL_IDENT );
+                        error_illegal_ident();
                         return;
                     }
 
@@ -1469,7 +1476,7 @@ ArithLog8_instr( int opcode )
                     /* IYl or IYh */
                     if ( ( cpu_type & CPU_RABBIT ) )
                     {
-                        error( ERR_ILLEGAL_IDENT );
+                        error_illegal_ident();
                         return;
                     }
 
@@ -1502,7 +1509,7 @@ INC( void )
             break;
 
         case 4:
-            error( ERR_ILLEGAL_IDENT );
+            error_illegal_ident();
             break;
 
         case 5:
@@ -1539,7 +1546,7 @@ DEC( void )
             break;
 
         case 4:
-            error( ERR_ILLEGAL_IDENT );
+            error_illegal_ident();
             break;
 
         case 5:
@@ -1594,7 +1601,7 @@ IncDec_8bit_instr( int opcode )
 
 
             default:
-                error( ERR_SYNTAX );
+                error_syntax();
                 break;
         }
     }
@@ -1608,7 +1615,7 @@ IncDec_8bit_instr( int opcode )
             case 6:
             case 8:
             case 9:
-                error( ERR_ILLEGAL_IDENT );       /* INC/DEC I ;  INC/DEC R
+                error_illegal_ident();       /* INC/DEC I ;  INC/DEC R
                                                                      * illegal */
                 break;
 
@@ -1616,7 +1623,7 @@ IncDec_8bit_instr( int opcode )
             case 13:
                 if ( ( cpu_type & CPU_RABBIT ) )
                 {
-                    error( ERR_ILLEGAL_IDENT );
+                    error_illegal_ident();
                     return;
                 }
 
@@ -1629,7 +1636,7 @@ IncDec_8bit_instr( int opcode )
             case 21:
                 if ( ( cpu_type & CPU_RABBIT ) )
                 {
-                    error( ERR_ILLEGAL_IDENT );
+                    error_illegal_ident();
                     return;
                 }
 
@@ -1661,7 +1668,7 @@ BitTest_instr( int opcode )
         /* Expression must not be stored in object file */
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            error( ERR_NOT_DEFINED );
+            error_not_defined();
         }
         else
         {
@@ -1700,7 +1707,7 @@ BitTest_instr( int opcode )
                                 break;
 
                             default:
-                                error( ERR_SYNTAX );
+                                error_syntax();
                                 break;
                         }
                     }
@@ -1715,7 +1722,7 @@ BitTest_instr( int opcode )
                             case 8:
                             case 9:
                             case -1:
-                                error( ERR_ILLEGAL_IDENT );
+                                error_illegal_ident();
                                 break;
 
                             default:
@@ -1727,12 +1734,12 @@ BitTest_instr( int opcode )
                 }
                 else
                 {
-                    error( ERR_SYNTAX );
+                    error_syntax();
                 }
             }
             else
             {
-                error( ERR_INT_RANGE, bitnumber );
+                error_int_range( bitnumber );
             }
         }
 
@@ -1773,7 +1780,7 @@ RotShift_instr( int opcode )
                 break;
 
             default:
-                error( ERR_SYNTAX );
+                error_syntax();
                 break;
         }
     else
@@ -1787,7 +1794,7 @@ RotShift_instr( int opcode )
             case 8:
             case 9:
             case -1:
-                error( ERR_ILLEGAL_IDENT );
+                error_illegal_ident();
                 break;
 
             default:

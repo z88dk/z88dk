@@ -144,19 +144,27 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
+        12 |          2 |          0 |          0 |          2 |         +0
+        18 |          1 |          0 |          0 |          1 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
-        32 |          2 |          2 |          0 |          0 |         +0
-        40 |          2 |          2 |          0 |          0 |         +0
-        44 |          1 |          1 |          0 |          0 |         +0
+        24 |          3 |          3 |          2 |          2 |         +0
+        28 |          0 |          1 |          1 |          0 |         +0
+        32 |          1 |          1 |          0 |          0 |         +0
+        35 |          0 |          2 |          2 |          0 |         +0
+        36 |          0 |          0 |          1 |          1 |         +0
+        40 |          1 |          1 |          0 |          0 |         +0
+        44 |          4 |          1 |          0 |          3 |         +0
+        48 |          0 |          0 |          2 |          2 |         +0
         80 |          3 |          3 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
+        88 |          0 |          3 |          3 |          0 |         +0
+        96 |          2 |          2 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        384 |          1 |          1 |          0 |          0 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=3724, zero-initialized=2680 (71.97%), freed=1952 (52.42%), remaining=1772
+Total bytes: allocated=4536, zero-initialized=2704 (59.61%), freed=2764 (60.93%), remaining=1772
 OUT
 
 ---- TEST: File not found, test mode ----
@@ -164,21 +172,21 @@ OUT
 
 ---- TEST: File not found, read mode ----
 
-Error: Cannot open file 'test.obj' for reading
+Error: cannot read file 'test.obj'
 
 ---- TEST: Invalid short file, test mode ----
 
 
 ---- TEST: Invalid short file, read mode ----
 
-Error: File 'test.obj' not an object file
+Error: file 'test.obj' not an object file
 
 ---- TEST: Invalid long file, test mode ----
 
 
 ---- TEST: Invalid long file, read mode ----
 
-Error: File 'test.obj' not an object file
+Error: file 'test.obj' not an object file
 
 ---- TEST: TEST1 Object file, read mode ----
 
@@ -200,9 +208,16 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.4 2013-09-01 17:34:50 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.5 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.4  2013-09-01 17:34:50  pauloscustodio
+# Revision 1.5  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.4  2013/09/01 17:34:50  pauloscustodio
 # Change in test output due to memalloc change.
 #
 # Revision 1.3  2013/09/01 11:52:55  pauloscustodio

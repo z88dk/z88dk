@@ -18,9 +18,16 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.12 2013-09-01 00:18:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.13 2013-09-08 00:43:59 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.12  2013-09-01 00:18:28  pauloscustodio
+Revision 1.13  2013-09-08 00:43:59  pauloscustodio
+New error module with one error function per error, no need for the error
+constants. Allows compiler to type-check error message arguments.
+Included the errors module in the init() mechanism, no need to call
+error initialization from main(). Moved all error-testing scripts to
+one file errors.t.
+
+Revision 1.12  2013/09/01 00:18:28  pauloscustodio
 - Replaced e4c exception mechanism by a much simpler one based on a few
   macros. The former did not allow an exit(1) to be called within a
   try-catch block.
@@ -169,9 +176,9 @@ Symbol *_define_sym( char *name, long value, byte_t type,
 	else									/* already defined */
     {
 		if ( sym->owner && sym->owner != owner && sym->owner->mname )
-			error( ERR_SYMBOL_REDEFINED_MODULE, name, sym->owner->mname );
+			error_symbol_redefined_module( name, sym->owner->mname );
 		else
-			error( ERR_SYMBOL_REDEFINED, name );
+			error_symbol_redefined( name );
     }
 
 	/* add symbol references if listing */
@@ -337,7 +344,7 @@ static void define_local_symbol( char *name, long value, byte_t type )
 	}
 	else if ( sym->type & SYMDEFINED )	/* local symbol already defined */
     {
-        error( ERR_SYMBOL_REDEFINED, name );
+        error_symbol_redefined( name );
     }
 	else								/* symbol declared local, but not yet defined */
 	{
@@ -374,7 +381,7 @@ void define_symbol( char *name, long value, byte_t type )
     {
         if ( sym->type & SYMDEFINED )	/* global symbol already defined */
         {
-			error( ERR_SYMBOL_REDEFINED, name );
+			error_symbol_redefined( name );
 		}
 		else							/* symbol declared global, but not yet defined */
 		{
@@ -436,7 +443,7 @@ static void declare_global_symbol( char *name, byte_t type )
             else if ( ( sym->type & ( SYMXDEF | type ) ) != ( SYMXDEF | type ) )
             {
                 /* re-declaration not allowed */
-                error( ERR_SYMBOL_REDECL, name );
+                error_symbol_redecl( name );
             }
         }
     }
@@ -501,7 +508,7 @@ static void declare_extern_symbol( char *name, byte_t type )
                     else
                     {
 						/* Re-declaration not allowed */
-                        error( ERR_SYMBOL_REDECL, name );
+                        error_symbol_redecl( name );
                     }
 				}
             }
@@ -528,13 +535,13 @@ static void declare_extern_symbol( char *name, byte_t type )
             else
             {
 				/* already declared local */
-                error( ERR_SYMBOL_DECL_LOCAL, name );
+                error_symbol_decl_local( name );
             }
         }
         else if ( ( sym->type & ( SYMXREF | type ) ) != ( SYMXREF | type ) )
         {
             /* re-declaration not allowed */
-            error( ERR_SYMBOL_REDECL, name );
+            error_symbol_redecl( name );
         }
     }
 }

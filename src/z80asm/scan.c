@@ -14,20 +14,16 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.13 2013-09-01 18:46:01 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.14 2013-09-08 00:43:59 pauloscustodio Exp $ 
 $Log: scan.c,v $
-Revision 1.13  2013-09-01 18:46:01  pauloscustodio
-Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
+Revision 1.14  2013-09-08 00:43:59  pauloscustodio
+New error module with one error function per error, no need for the error
+constants. Allows compiler to type-check error message arguments.
+Included the errors module in the init() mechanism, no need to call
+error initialization from main(). Moved all error-testing scripts to
+one file errors.t.
 
-Revision 1.12  2013/09/01 12:00:07  pauloscustodio
-Cleanup compilation warnings
-
-Revision 1.11  2013/09/01 00:18:28  pauloscustodio
-- Replaced e4c exception mechanism by a much simpler one based on a few
-  macros. The former did not allow an exit(1) to be called within a
-  try-catch block.
-
-Revision 1.10  2013/05/01 21:10:49  pauloscustodio
+Revision 1.9  2013/05/01 21:10:49  pauloscustodio
 Add getline to Str, converting EOL sequences to LF.
 
 Revision 1.8  2013/05/01 19:03:45  pauloscustodio
@@ -76,6 +72,7 @@ Added GNU Flex-based scanner. Not yet integrated into assembler.
 
 #include "parse.h"
 #include "types.h"
+#include "file.h"
 
 /*-----------------------------------------------------------------------------
 *   scan API
@@ -1490,7 +1487,7 @@ void Context_copy( Context *self, Context *other ) { }
 void Context_fini( Context *self )	/* free resources */
 {
 	if ( self->file )
-		fclose( self->file );
+		xfclose( self->file );
 	
 	OBJ_DELETE(self->buffer);
 }
@@ -1545,7 +1542,7 @@ static void check_circular_includes( char *filename )
 		if ( iter->obj->file != NULL &&			/* open file, not scanned text */
 		     strcmp( filename, iter->obj->filename ) == 0 )
 		{
-            fatal_error( ERR_INCLUDE_RECURSION, filename );
+            fatal_include_recursion( filename );
 		}
 	}
 }	
@@ -1897,7 +1894,7 @@ YY_RULE_SETUP
 case 9:
 case 10:
 YY_RULE_SETUP
-error( ERR_UNCLOSED_STR );
+error_unclosed_string();
 	YY_BREAK
 /* Number - return value in yylval */
 case 11:
@@ -3020,11 +3017,11 @@ static long scan_num (char *text, int num_suffix_chars, int base)
 			digit = (c == '#') ? 1 : 0;
 		}
 		else {							/* invalid digit - should not be reached */
-			error( ERR_SYNTAX );
+			error_syntax();
 		}
 
 		if (digit >= base) {			/* digit out of range - should not be reached */
-			error( ERR_SYNTAX );
+			error_syntax();
 		}
 		
 		value = value * base + digit;
@@ -3033,7 +3030,7 @@ static long scan_num (char *text, int num_suffix_chars, int base)
 	}
 	
 	if ( range_err )
-		warning( ERR_INT_RANGE, value );
+		warn_int_range( value );
 		
 	return value;
 }
@@ -3114,11 +3111,7 @@ void scan_file( char *filename )
 	check_circular_includes( filename );
 	
 	/* try to open the file */
-	file = fopen( filename, "rb" ); 		/* b: to ready \r and \n */
-	if ( file == NULL ) 
-	{
-		fatal_error( ERR_FOPEN_READ, filename );
-	}
+	file = xfopen( filename, "rb" ); 		/* b: to ready \r and \n */
 
 	/* create a new context */
 	context = Context_create( file, filename, 0 );

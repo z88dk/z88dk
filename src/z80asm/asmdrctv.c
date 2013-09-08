@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.51 2013-09-01 12:00:07 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.52 2013-09-08 00:43:58 pauloscustodio Exp $ */
 /* $Log: asmdrctv.c,v $
-/* Revision 1.51  2013-09-01 12:00:07  pauloscustodio
+/* Revision 1.52  2013-09-08 00:43:58  pauloscustodio
+/* New error module with one error function per error, no need for the error
+/* constants. Allows compiler to type-check error message arguments.
+/* Included the errors module in the init() mechanism, no need to call
+/* error initialization from main(). Moved all error-testing scripts to
+/* one file errors.t.
+/*
+/* Revision 1.51  2013/09/01 12:00:07  pauloscustodio
 /* Cleanup compilation warnings
 /*
 /* Revision 1.50  2013/08/30 21:50:43  pauloscustodio
@@ -386,12 +393,12 @@ DEFSP( void )
             }
         else
         {
-            error( ERR_SYNTAX );
+            error_syntax();
             return -1;
         }
     else
     {
-        error( ERR_SYNTAX );
+        error_syntax();
         return -1;
     }
 }
@@ -408,13 +415,13 @@ Parsevarsize( void )
 
     if ( strcmp( ident, "DS" ) != 0 )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
     }
     else
     {
         if ( ( varsize = DEFSP() ) == -1 )
         {
-            error( ERR_UNKNOWN_IDENT );
+            error_unknown_ident();
         }
         else
         {
@@ -424,7 +431,7 @@ Parsevarsize( void )
             {
                 if ( postfixexpr->rangetype & NOTEVALUABLE )
                 {
-                    error( ERR_NOT_DEFINED );
+                    error_not_defined();
                     RemovePfixlist( postfixexpr );
                 }
                 else
@@ -438,7 +445,7 @@ Parsevarsize( void )
                     }
                     else
                     {
-                        error( ERR_INT_RANGE, size_multiplier );
+                        error_int_range( size_multiplier );
                     }
                 }
             }
@@ -472,7 +479,7 @@ Parsedefvarsize( long offset )
             break;
 
         default:
-            error( ERR_SYNTAX );
+            error_syntax();
     }
 
     return varoffset;
@@ -495,7 +502,7 @@ DEFVARS( void )
         /* expr. must not be stored in relocatable file */
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            error( ERR_NOT_DEFINED );
+            error_not_defined();
             RemovePfixlist( postfixexpr );
             return;
         }
@@ -657,7 +664,7 @@ DEFGROUP( void )
                                 {
                                     if ( postfixexpr->rangetype & NOTEVALUABLE )
                                     {
-                                        error( ERR_NOT_DEFINED );
+                                        error_not_defined();
                                     }
                                     else
                                     {
@@ -679,7 +686,7 @@ DEFGROUP( void )
                             break;
 
                         default:
-                            error( ERR_SYNTAX );
+                            error_syntax();
                             break;
                     }
                 }
@@ -707,7 +714,7 @@ DEFS()
         /* expr. must not be stored in relocatable file */
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            error( ERR_NOT_DEFINED );
+            error_not_defined();
         }
         else
         {
@@ -727,7 +734,7 @@ DEFS()
                 {
                     if ( constexpr->rangetype & NOTEVALUABLE )
                     {
-                        error( ERR_NOT_DEFINED );
+                        error_not_defined();
                     }
                     else
                     {
@@ -749,7 +756,7 @@ DEFS()
             }
             else
             {
-                error( ERR_INT_RANGE, constant );
+                error_int_range( constant );
                 return;
             }
         }
@@ -774,7 +781,7 @@ UNDEFINE( void )
         }
         else
         {
-            error( ERR_SYNTAX );
+            error_syntax();
             break;
         }
     }
@@ -792,7 +799,7 @@ DEFINE( void )
         }
         else
         {
-            error( ERR_SYNTAX );
+            error_syntax();
             break;
         }
     }
@@ -822,7 +829,7 @@ DEFC( void )
                        * relocatable file */
                     if ( postfixexpr->rangetype & NOTEVALUABLE )
                     {
-                        error( ERR_NOT_DEFINED );
+                        error_not_defined();
                         break;
                     }
                     else
@@ -841,13 +848,13 @@ DEFC( void )
             }
             else
             {
-                error( ERR_SYNTAX );
+                error_syntax();
                 break;
             }
         }
         else
         {
-            error( ERR_SYNTAX );
+            error_syntax();
             break;
         }
     }
@@ -869,7 +876,7 @@ ORG( void )
     {
         if ( postfixexpr->rangetype & NOTEVALUABLE )
         {
-            error( ERR_NOT_DEFINED );
+            error_not_defined();
         }
         else
         {
@@ -881,7 +888,7 @@ ORG( void )
             }
             else
             {
-                error( ERR_INT_RANGE, constant );
+                error_int_range( constant );
             }
         }
 
@@ -913,7 +920,7 @@ DEFB( void )
         }
         else if ( sym != comma )
         {
-            error( ERR_SYNTAX );
+            error_syntax();
             break;
         }
     }
@@ -945,7 +952,7 @@ DEFW( void )
         }
         else if ( sym != comma )
         {
-            error( ERR_SYNTAX );
+            error_syntax();
             break;
         }
     }
@@ -974,7 +981,7 @@ DEFP( void )
         /* Pointers must be specified as WORD,BYTE pairs separated by commas */
         if ( sym != comma )
         {
-            error( ERR_SYNTAX );
+            error_syntax();
         }
 
         GetSym();
@@ -993,7 +1000,7 @@ DEFP( void )
         }
         else if ( sym != comma )
         {
-            error( ERR_SYNTAX );
+            error_syntax();
             break;
         }
     }
@@ -1025,7 +1032,7 @@ DEFL( void )
         }
         else if ( sym != comma )
         {
-            error( ERR_SYNTAX );
+            error_syntax();
             break;
         }
     }
@@ -1052,7 +1059,7 @@ DEFM( void )
                 {
                     sym = newline;
                     EOL = ON;
-                    error( ERR_SYNTAX );
+                    error_unclosed_string();
                     return;
                 }
                 else
@@ -1071,7 +1078,7 @@ DEFM( void )
 
                         if ( sym != strconq && sym != comma && sym != newline && sym != semicolon )
                         {
-                            error( ERR_SYNTAX );
+                            error_syntax();
                             return;
                         }
 
@@ -1089,7 +1096,7 @@ DEFM( void )
 
             if ( sym != strconq && sym != comma && sym != newline && sym != semicolon )
             {
-                error( ERR_SYNTAX ); /* expression separator not found */
+                error_syntax(); /* expression separator not found */
                 break;
             }
 
@@ -1115,7 +1122,7 @@ INCLUDE( void )
 
         if ( FindFile( CURRENTFILE, filename ) != NULL )
         {
-            error( ERR_INCLUDE_RECURSION, filename );
+            fatal_include_recursion( filename );
             return;
         }
 
@@ -1151,7 +1158,7 @@ INCLUDE( void )
     }
     else
     {
-        error( ERR_SYNTAX );
+        error_syntax();
     }
 
     sym = newline;
@@ -1182,7 +1189,7 @@ BINARY( void )
     }
     else
     {
-        error( ERR_SYNTAX );
+        error_syntax();
     }
 }
 
@@ -1256,12 +1263,12 @@ DeclModuleName( void )
         }
         else
         {
-            error( ERR_ILLEGAL_IDENT );
+            error_illegal_ident();
         }
     }
     else
     {
-        error( ERR_MODULE_REDEFINED );
+        error_module_redefined();
     }
 }
 

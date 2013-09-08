@@ -13,9 +13,16 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.3 2013-06-11 23:16:06 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.4 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: symtab.t,v $
-# Revision 1.3  2013-06-11 23:16:06  pauloscustodio
+# Revision 1.4  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.3  2013/06/11 23:16:06  pauloscustodio
 # Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
 # Add error message for invalid symbol and scope chars in object file.
 #
@@ -34,7 +41,7 @@ require 't/test_utils.pl';
 # -DVAR
 t_z80asm(
 	asm		=> "define VAR",
-	err		=> "Error at file 'test.asm' line 1: Symbol 'VAR' already defined",
+	err		=> "Error at file 'test.asm' line 1: symbol 'VAR' already defined",
 	options	=> "-DVAR"
 );
 
@@ -46,13 +53,13 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "defc VAR=2",
-	err		=> "Error at file 'test.asm' line 1: Symbol 'VAR' already defined",
+	err		=> "Error at file 'test.asm' line 1: symbol 'VAR' already defined",
 	options	=> "-DVAR"
 );
 
 t_z80asm(
 	asm		=> "VAR: nop",
-	err		=> "Error at file 'test.asm' line 1: Symbol 'VAR' already defined",
+	err		=> "Error at file 'test.asm' line 1: symbol 'VAR' already defined",
 	options	=> "-DVAR"
 );
 
@@ -64,7 +71,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "xref VAR",
-	err		=> "Error at file 'test.asm' line 1: Symbol 'VAR' already declared local",
+	err		=> "Error at file 'test.asm' line 1: symbol 'VAR' already declared local",
 	options	=> "-DVAR"
 );
 
@@ -76,7 +83,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "lib VAR",
-	err		=> "Error at file 'test.asm' line 1: Symbol 'VAR' already declared local",
+	err		=> "Error at file 'test.asm' line 1: symbol 'VAR' already declared local",
 	options	=> "-DVAR"
 );
 
@@ -88,7 +95,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "undefine VAR",
-	err		=> "Error at file 'test.asm' line 1: Syntax error",
+	err		=> "Error at file 'test.asm' line 1: syntax error",
 );
 
 t_z80asm(
@@ -98,12 +105,12 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "define VAR : defc VAR=2",
-	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already defined",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
 );
 
 t_z80asm(
 	asm		=> "define VAR : VAR: nop",
-	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already defined",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
 );
 
 t_z80asm(
@@ -113,7 +120,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "define VAR : xref VAR",
-	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already declared local",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
 );
 
 t_z80asm(
@@ -123,7 +130,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "define VAR : lib VAR",
-	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already declared local",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
 );
 
 # defc VAR
@@ -134,17 +141,17 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "defc VAR=1 : define VAR",
-	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already defined",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
 );
 
 t_z80asm(
 	asm		=> "defc VAR=1 : defc VAR=1",
-	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already defined",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
 );
 
 t_z80asm(
 	asm		=> "defc VAR=1 : VAR: nop",
-	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already defined",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
 );
 
 t_z80asm(
@@ -154,7 +161,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "defc VAR=1 : xref VAR",
-	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already declared local",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
 );
 
 t_z80asm(
@@ -164,7 +171,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "defc VAR=1 : lib VAR",
-	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already declared local",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
 );
 
 # VAR:
@@ -180,17 +187,17 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "VAR: : define VAR",
-	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already defined",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
 );
 
 t_z80asm(
 	asm		=> "VAR: : defc VAR=1",
-	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already defined",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
 );
 
 t_z80asm(
 	asm		=> "VAR: : VAR: nop",
-	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already defined",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
 );
 
 t_z80asm(
@@ -205,7 +212,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "VAR: : xref VAR",
-	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already declared local",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
 );
 
 t_z80asm(
@@ -215,7 +222,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "VAR: : lib VAR",
-	err		=> "Error at file 'test.asm' line 2: Symbol 'VAR' already declared local",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
 );
 
 # XDEF
@@ -226,17 +233,17 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "xdef VAR : xref VAR",
-	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
 );
 
 t_z80asm(
 	asm		=> "xdef VAR : lib VAR",
-	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
 );
 
 t_z80asm(
 	asm		=> "xdef VAR : xlib VAR",
-	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
 );
 
 t_z80asm(
@@ -248,7 +255,7 @@ t_z80asm(
 # XREF
 t_z80asm(
 	asm		=> "xref VAR : xdef VAR",
-	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
 );
 
 t_z80asm(
@@ -258,18 +265,18 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "xref VAR : lib VAR",
-	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
 );
 
 t_z80asm(
 	asm		=> "xref VAR : xlib VAR",
-	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
 );
 
 # LIB
 t_z80asm(
 	asm		=> "lib VAR : xdef VAR",
-	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
 );
 
 t_z80asm(
@@ -284,7 +291,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "lib VAR : xlib VAR",
-	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
 );
 
 # XLIB
@@ -295,24 +302,24 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "xlib VAR : xref VAR",
-	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
 );
 
 t_z80asm(
 	asm		=> "xlib VAR : lib VAR",
-	err		=> "Error at file 'test.asm' line 2: Re-declaration of 'VAR' not allowed",
+	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
 );
 
 t_z80asm(
 	asm		=> "xlib VAR : xlib VAR",
-	err		=> "Error at file 'test.asm' line 2: Module name already defined",
+	err		=> "Error at file 'test.asm' line 2: module name already defined",
 );
 
 # Symbol redefined
 t_z80asm(
 	asm		=> "xdef VAR : defc VAR=3 : defb VAR",
 	asm1	=> "xdef VAR : defc VAR=3 : defb VAR",
-	linkerr	=> "Error at module 'TEST1': Symbol 'VAR' already defined in module 'TEST'",
+	linkerr	=> "Error at module 'TEST1': symbol 'VAR' already defined in module 'TEST'",
 );
 
 
@@ -320,7 +327,7 @@ t_z80asm(
 t_z80asm(
 	asm		=> "xdef VAR : defc VAR=2",
 	asm1	=> "xdef VAR : defc VAR=3",
-	linkerr	=> "Error at module 'TEST1': Symbol 'VAR' already defined in module 'TEST'",
+	linkerr	=> "Error at module 'TEST1': symbol 'VAR' already defined in module 'TEST'",
 );
 
 

@@ -18,9 +18,16 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.10 2013-05-01 21:10:49 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.11 2013-09-08 00:43:59 pauloscustodio Exp $ 
 $Log: scan.h,v $
-Revision 1.10  2013-05-01 21:10:49  pauloscustodio
+Revision 1.11  2013-09-08 00:43:59  pauloscustodio
+New error module with one error function per error, no need for the error
+constants. Allows compiler to type-check error message arguments.
+Included the errors module in the init() mechanism, no need to call
+error initialization from main(). Moved all error-testing scripts to
+one file errors.t.
+
+Revision 1.9  2013/05/01 21:10:49  pauloscustodio
 Add getline to Str, converting EOL sequences to LF.
 
 Revision 1.8  2013/05/01 19:03:45  pauloscustodio
@@ -69,6 +76,7 @@ Added GNU Flex-based scanner. Not yet integrated into assembler.
 
 #include "parse.h"
 #include "types.h"
+#include "file.h"
 
 /*-----------------------------------------------------------------------------
 *   scan API

@@ -16,9 +16,16 @@ Copyright (C) Paulo Custodio, 2011-2013
 Manage the code area in memory
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.13 2013-09-01 00:18:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.14 2013-09-08 00:43:58 pauloscustodio Exp $ */
 /* $Log: codearea.c,v $
-/* Revision 1.13  2013-09-01 00:18:28  pauloscustodio
+/* Revision 1.14  2013-09-08 00:43:58  pauloscustodio
+/* New error module with one error function per error, no need for the error
+/* constants. Allows compiler to type-check error message arguments.
+/* Included the errors module in the init() mechanism, no need to call
+/* error initialization from main(). Moved all error-testing scripts to
+/* one file errors.t.
+/*
+/* Revision 1.13  2013/09/01 00:18:28  pauloscustodio
 /* - Replaced e4c exception mechanism by a much simpler one based on a few
 /*   macros. The former did not allow an exit(1) to be called within a
 /*   try-catch block.
@@ -194,7 +201,7 @@ static void check_space( size_t addr, size_t n )
 {
     if ( addr + n > MAXCODESIZE )
     {
-        fatal_error( ERR_MAX_CODESIZE, ( long )MAXCODESIZE );
+        fatal_max_codesize( (long)MAXCODESIZE );
     }
 }
 

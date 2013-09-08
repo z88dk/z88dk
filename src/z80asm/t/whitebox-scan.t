@@ -238,19 +238,21 @@ GLib Memory statistics (successful operations):
         12 |         11 |         11 |          0 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
         28 |          1 |          1 |          0 |          0 |         +0
+        32 |          1 |          1 |          0 |          0 |         +0
         36 |          0 |          1 |          1 |          0 |         +0
-        40 |         12 |         12 |          0 |          0 |         +0
+        40 |         13 |         13 |          0 |          0 |         +0
+        44 |          1 |          1 |          0 |          0 |         +0
         48 |         22 |         22 |          0 |          0 |         +0
-        96 |          2 |          2 |          0 |          0 |         +0
+        96 |          3 |          3 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        256 |          0 |         11 |         11 |          0 |         +0
-       384 |          1 |          1 |          0 |          0 |         +0
+       384 |          2 |          2 |          0 |          0 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
    >  4096 |         11 |         11 |          0 |          0 |        ***
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=188190, zero-initialized=184294 (97.93%), freed=186418 (99.06%), remaining=1772
+Total bytes: allocated=188786, zero-initialized=184890 (97.94%), freed=187014 (99.06%), remaining=1772
 OUT
 Read file test1.asm:
 Token: (0) NULL
@@ -374,17 +376,26 @@ GLib Memory statistics (successful operations):
          5 |          8 |          8 |          0 |          0 |         +0
          6 |          1 |          1 |          0 |          0 |         +0
          8 |          2 |          2 |          0 |          0 |         +0
-         9 |          1 |          1 |          0 |          0 |         +0
-        12 |         16 |         16 |          0 |          0 |         +0
+         9 |          1 |          4 |          3 |          0 |         +0
+        12 |         23 |         16 |          0 |          7 |         +0
+        14 |          0 |          3 |          3 |          0 |         +0
+        15 |          2 |          0 |          0 |          2 |         +0
+        16 |          0 |          2 |          2 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
+        24 |          7 |          7 |          4 |          4 |         +0
         28 |          1 |          1 |          0 |          0 |         +0
+        30 |          0 |          0 |          2 |          2 |         +0
         32 |          1 |          1 |          0 |          0 |         +0
+        35 |          0 |          1 |          1 |          0 |         +0
         36 |          1 |          2 |          1 |          0 |         +0
-        40 |         15 |         15 |          0 |          0 |         +0
-        48 |         33 |         33 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
+        40 |         16 |         16 |          0 |          0 |         +0
+        44 |         10 |          3 |          0 |          7 |         +0
+        48 |         33 |         33 |          1 |          1 |         +0
+        88 |          0 |          7 |          7 |          0 |         +0
+        96 |          2 |          2 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        256 |          0 |         12 |         13 |          1 |         +0
+       384 |          1 |          1 |          0 |          0 |         +0
        512 |          0 |          0 |          1 |          1 |         +0
        768 |          0 |          0 |          1 |          1 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
@@ -403,7 +414,7 @@ GLib Memory statistics (successful operations):
    >  4096 |          6 |          7 |         65 |         64 |        ***
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=948826, zero-initialized=102688 (10.82%), freed=947054 (99.81%), remaining=1772
+Total bytes: allocated=951024, zero-initialized=103252 (10.86%), freed=949252 (99.81%), remaining=1772
 OUT
 Test: Read before start
 Token: (0) NULL
@@ -714,7 +725,7 @@ Token: x2/f2(16) '\n'
 List:x2/f2:17:0 2147483647 2147483648
 Token: x2/f2(17) NUMBER 0
 Token: x2/f2(17) NUMBER 2147483647
-Warning at file 'x2/f2' line 17: Integer '-2147483648' out of range
+Warning at file 'x2/f2' line 17: integer '-2147483648' out of range
 Token: x2/f2(17) NUMBER -2147483648
 Token: x2/f2(17) '\n'
 List:x2/f2:18:
@@ -800,7 +811,7 @@ Token: x2/f2(36) STRING '"'
 Token: x2/f2(36) STRING ';'
 Token: x2/f2(36) '\n'
 List:x2/f2:37:'unclosed
-Error at file 'x2/f2' line 37: Unclosed string
+Error at file 'x2/f2' line 37: unclosed string
 Token: x2/f2(37) '\n'
 List:x2/f2:38:
 Token: x2/f2(38) '\n'
@@ -813,7 +824,7 @@ Token: x2/f2(40) STRING '''
 Token: x2/f2(40) STRING ';'
 Token: x2/f2(40) '\n'
 List:x2/f2:41:"unclosed
-Error at file 'x2/f2' line 41: Unclosed string
+Error at file 'x2/f2' line 41: unclosed string
 Token: x2/f2(41) '\n'
 List:x2/f2:42:
 Token: x2/f2(42) '\n'
@@ -868,21 +879,30 @@ GLib Memory statistics (successful operations):
 ===========|============|============|============|============|===========
          3 |          2 |          2 |          0 |          0 |         +0
          4 |          1 |          1 |          0 |          0 |         +0
-        12 |          1 |          1 |          0 |          0 |         +0
+         8 |          0 |          1 |          1 |          0 |         +0
+        11 |          0 |          1 |          1 |          0 |         +0
+        12 |          3 |          1 |          0 |          2 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
+        21 |          1 |          0 |          0 |          1 |         +0
+        24 |          3 |          3 |          0 |          0 |         +0
         28 |          1 |          1 |          0 |          0 |         +0
         32 |          1 |          1 |          0 |          0 |         +0
+        37 |          0 |          1 |          1 |          0 |         +0
         40 |          3 |          3 |          0 |          0 |         +0
+        42 |          0 |          0 |          1 |          1 |         +0
+        44 |          4 |          1 |          0 |          3 |         +0
         48 |          2 |          2 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
+        88 |          0 |          3 |          3 |          0 |         +0
+        96 |          2 |          2 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        256 |          0 |          1 |          1 |          0 |         +0
+       384 |          1 |          1 |          0 |          0 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
    >  4096 |          1 |          1 |          0 |          0 |        ***
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=19852, zero-initialized=18546 (93.42%), freed=18080 (91.07%), remaining=1772
+Total bytes: allocated=20987, zero-initialized=19070 (90.87%), freed=19215 (91.56%), remaining=1772
 OUT
 Test: open text file
 List:f0:1:F0 1
@@ -896,7 +916,7 @@ Token: f0(3) NAME F0
 Token: f0(3) NUMBER 3
 Token: f0(3) '\n'
 Test: open text file again
-Error at file 'f0' line 3: Cannot include file 'f0' recursively
+Error at file 'f0' line 3: cannot include file 'f0' recursively
 END
 
 
@@ -932,21 +952,30 @@ GLib Memory statistics (successful operations):
 ===========|============|============|============|============|===========
          3 |          2 |          2 |          0 |          0 |         +0
          4 |          1 |          1 |          0 |          0 |         +0
-        12 |          1 |          1 |          0 |          0 |         +0
+         8 |          0 |          1 |          1 |          0 |         +0
+        11 |          0 |          1 |          1 |          0 |         +0
+        12 |          3 |          1 |          0 |          2 |         +0
+        18 |          1 |          0 |          0 |          1 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
+        22 |          0 |          1 |          1 |          0 |         +0
+        24 |          3 |          3 |          0 |          0 |         +0
         28 |          1 |          1 |          0 |          0 |         +0
         32 |          1 |          1 |          0 |          0 |         +0
+        36 |          0 |          0 |          1 |          1 |         +0
         40 |          3 |          3 |          0 |          0 |         +0
+        44 |          4 |          1 |          0 |          3 |         +0
         48 |          2 |          2 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
+        88 |          0 |          3 |          3 |          0 |         +0
+        96 |          2 |          2 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        256 |          0 |          1 |          1 |          0 |         +0
+       384 |          1 |          1 |          0 |          0 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
    >  4096 |          1 |          1 |          0 |          0 |        ***
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=19852, zero-initialized=18546 (93.42%), freed=18080 (91.07%), remaining=1772
+Total bytes: allocated=20963, zero-initialized=19070 (90.97%), freed=19191 (91.55%), remaining=1772
 OUT
 Test: open text file
 List:f0:1:F0 1
@@ -960,7 +989,7 @@ Token: f0(3) NAME F0
 Token: f0(3) NUMBER 3
 Token: f0(3) '\n'
 Test: open fails
-Error at file 'f0' line 3: Cannot open file 'f1' for reading
+Error at file 'f0' line 3: cannot read file 'f1'
 END
 
 
@@ -971,9 +1000,16 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.10 2013-09-01 17:28:48 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.11 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.10  2013-09-01 17:28:48  pauloscustodio
+# Revision 1.11  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.10  2013/09/01 17:28:48  pauloscustodio
 # Change in test output due to memalloc change.
 #
 # Revision 1.9  2013/09/01 11:52:55  pauloscustodio

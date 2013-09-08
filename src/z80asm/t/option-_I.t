@@ -13,9 +13,16 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-_I.t,v 1.5 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-_I.t,v 1.6 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: option-_I.t,v $
-# Revision 1.5  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.6  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.5  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.4  2012/05/26 18:51:10  pauloscustodio
@@ -58,7 +65,7 @@ t_z80asm_ok(0, "include \"$inc\"", "\x3E\x01");
 
 # no -I, only file name : error
 t_z80asm_error("include \"$inc_base\"", 
-			"Error at file 'test.asm' line 1: Cannot open file 'test.inc' for reading");
+			"Error at file 'test.asm' line 1: cannot read file 'test.inc'");
 
 # -I : OK
 t_z80asm_ok(0, "include \"$inc_base\"", "\x3E\x01", "-I$inc_dir");

@@ -13,12 +13,79 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-Define error codes and error messages
+Define error messages
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.15 2013-09-08 00:43:58 pauloscustodio Exp $
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.14 2013-06-11 23:16:06 pauloscustodio Exp $ */
+#define _C_ ,		/* trick to pass comma-separated values as macro argument */
+
+/* information */
+ERR(ErrInfo,	info_total_errors(void),				"%d errors occurred during assembly" _C_ get_num_errors() ) 
+
+/* fatal errors */
+ERR(ErrFatal,	fatal_read_file(char *filename),		"cannot read file '%s'" _C_ filename )
+ERR(ErrFatal,	fatal_write_file(char *filename),		"cannot write file '%s'" _C_ filename )
+ERR(ErrFatal,	fatal_close_file(char *filename),		"cannot close file '%s'" _C_ filename )
+ERR(ErrFatal,	fatal_include_recursion(char *filename),"cannot include file '%s' recursively" _C_ filename )
+
+/* command line parsing errors */
+ERR(ErrWarn,	warn_option_deprecated(char *option),	"option '-%s' is deprecated" _C_ option )
+ERR(ErrError,	error_no_src_file(void),				"source filename missing" )
+ERR(ErrError,	error_illegal_option(char *option),		"illegal option '-%s'" _C_ option )
+ERR(ErrError,	error_illegal_src_filename(char *filename),
+														"illegal source filename '%s'" _C_ filename )
+
+/* assembly errors */
+ERR(ErrError,	error_syntax(void),						"syntax error")
+ERR(ErrError,	error_syntax_expr(void),				"syntax error in expression")
+ERR(ErrError,	error_expr(char *expr),					"error in expression '%s'" _C_ expr )
+ERR(ErrError,	error_unclosed_string(void),			"unclosed string")
+ERR(ErrError,	error_unbanlanced_paren(void),			"unbalanced parenthesis" )
+
+ERR(ErrError,	error_not_defined(void),				"symbol not defined" )
+ERR(ErrError,	error_not_defined_expr(char *expr),		"symbol not defined in expression '%s'" _C_ expr )
+
+ERR(ErrError,	error_unknown_ident(void),		        "unknown identifier" )
+ERR(ErrError,	error_illegal_ident(void),				"illegal identifier" )
+ERR(ErrError,	error_jr_not_local(void),				"relative jump address must be local" )
+
+/* symbol errors */
+ERR(ErrError,	error_symbol_redefined(char *symbol),	"symbol '%s' already defined" _C_ symbol )
+ERR(ErrError,	error_symbol_redefined_module(char *symbol, char *module),	
+														"symbol '%s' already defined in module '%s'" _C_ symbol _C_ module )
+ERR(ErrError,	error_symbol_decl_local(char *symbol),	"symbol '%s' already declared local" _C_ symbol )
+ERR(ErrError,	error_symbol_redecl(char *symbol),		"re-declaration of '%s' not allowed" _C_ symbol )
+
+/* link errors */
+ERR(ErrFatal,	fatal_max_codesize(long size),			"max. code size of %ld bytes reached" _C_ size )
+ERR(ErrError,	error_module_redefined(void),			"module name already defined" )
+ERR(ErrError,	error_org_not_defined(void),			"ORG not defined" )
+ERR(ErrError,	error_env_not_defined(char *var),		"environment variable '%s' not defined" _C_ var )
+
+ERR(ErrError,	error_not_obj_file(char *filename),		"file '%s' not an object file" _C_ filename )
+ERR(ErrError,	error_not_lib_file(char *filename),		"file '%s' not a library file" _C_ filename )
+
+
+/* range error or warning */
+ERR(ErrWarn,	warn_int_range(long value),				"integer '%ld' out of range" _C_ value )
+ERR(ErrError,	error_int_range(long value),			"integer '%ld' out of range" _C_ value )
+ERR(ErrWarn,	warn_int_range_expr(long value, char *expr),
+														"integer '%ld' out of range in expression '%s'" _C_ value _C_ expr )
+
+#undef _C_
+
+
+/* */
 /* $Log: errors_def.h,v $
-/* Revision 1.14  2013-06-11 23:16:06  pauloscustodio
+/* Revision 1.15  2013-09-08 00:43:58  pauloscustodio
+/* New error module with one error function per error, no need for the error
+/* constants. Allows compiler to type-check error message arguments.
+/* Included the errors module in the init() mechanism, no need to call
+/* error initialization from main(). Moved all error-testing scripts to
+/* one file errors.t.
+/*
+/* Revision 1.14  2013/06/11 23:16:06  pauloscustodio
 /* Move symbol creation logic fromReadNames() in  modlink.c to symtab.c.
 /* Add error message for invalid symbol and scope chars in object file.
 /*
@@ -78,62 +145,4 @@ Define error codes and error messages
 /*
 /* Revision 1.1  2012/05/17 20:31:45  pauloscustodio
 /* New errors_def.h with error name and string together, for easier maintenance
-/*
-/*
 /* */
-
-/* information */
-DEF_MSG( ERR_OK,                    "OK" ) /* not used */
-DEF_MSG( ERR_TOTALERRORS,           "%d errors occurred during assembly" )
-DEF_MSG( ERR_OPTION_DEPRECATED,		"option '-%s' is deprecated" )
-
-/* system errors */
-DEF_MSG( ERR_NO_MEMORY,             "Not enough memory" )
-DEF_MSG( ERR_RUNTIME,               "Run-time error" )
-
-/* file errors */
-DEF_MSG( ERR_FOPEN_READ,            "Cannot open file '%s' for reading" )
-DEF_MSG( ERR_FOPEN_WRITE,           "Cannot open file '%s' for writing" )
-DEF_MSG( ERR_FCLOSE,				"Cannot close file '%s'" )
-DEF_MSG( ERR_FWRITE,				"Cannot write to file '%s'" )
-DEF_MSG( ERR_FREAD,					"Unexpected EOF reading from file '%s'" )
-DEF_MSG( ERR_FWRITE_STRING,			"String too long writing to file '%s'" )
-DEF_MSG( ERR_FREAD_STRING,			"String too long reading from file '%s'" )
-
-/* syntax errors */
-DEF_MSG( ERR_SYNTAX,                "Syntax error" )
-DEF_MSG( ERR_SYNTAX_EXPR,           "Syntax error in expression" )
-DEF_MSG( ERR_EXPR,                  "Error in expression '%s'" )
-DEF_MSG( ERR_UNCLOSED_STR,          "Unclosed string" )
-
-DEF_MSG( ERR_INT_RANGE,             "Integer '%ld' out of range" )
-DEF_MSG( ERR_INT_RANGE_EXPR,        "Integer '%ld' out of range in expression '%s'" )
-
-DEF_MSG( ERR_NOT_DEFINED,           "Symbol not defined" )
-DEF_MSG( ERR_NOT_DEFINED_EXPR,      "Symbol not defined in expression '%s'" )
-
-DEF_MSG( ERR_UNBALANCED_PAREN,      "Unbalanced parenthesis" )
-DEF_MSG( ERR_RANGE,                 "Out of range" )   /* not used */
-DEF_MSG( ERR_NO_SRC_FILE,           "Source filename missing" )
-DEF_MSG( ERR_ILLEGAL_OPTION,        "Illegal option '-%s'" )
-DEF_MSG( ERR_UNKNOWN_IDENT,         "Unknown identifier" )
-DEF_MSG( ERR_ILLEGAL_IDENT,         "Illegal identifier" )
-DEF_MSG( ERR_MAX_CODESIZE,          "Max. code size of %ld bytes reached" )
-DEF_MSG( ERR_SYMBOL_REDEFINED,      "Symbol '%s' already defined" )
-DEF_MSG( ERR_SYMBOL_REDEFINED_MODULE,
-									"Symbol '%s' already defined in module '%s'" )
-DEF_MSG( ERR_MODULE_REDEFINED,      "Module name already defined" )
-DEF_MSG( ERR_MODULE_NOT_DEFINED,    "Module name not defined" ) /* not used */
-DEF_MSG( ERR_SYMBOL_DECL_LOCAL,     "Symbol '%s' already declared local" )
-DEF_MSG( ERR_NO_CMD_ARGS,           "No command line arguments" )  /* not used */
-DEF_MSG( ERR_ILLEGAL_SRC_FILENAME,  "Illegal source filename '%s'" )
-DEF_MSG( ERR_SYMBOL_REDECL,         "Re-declaration of '%s' not allowed" )
-DEF_MSG( ERR_ORG_REDEFINED,         "ORG already defined" ) /* not used */
-DEF_MSG( ERR_ORG_NOT_DEFINED,       "ORG not defined" )
-DEF_MSG( ERR_JR_NOT_LOCAL,          "Relative jump address must be local" )
-DEF_MSG( ERR_NOT_OBJ_FILE,          "File '%s' not an object file" )
-DEF_MSG( ERR_RESERVED_NAME,         "Reserved name" )  /* not used */
-DEF_MSG( ERR_OPEN_LIB,              "Couldn't open library file '%s'" )
-DEF_MSG( ERR_NOT_LIB_FILE,          "File '%s' not a library file" )
-DEF_MSG( ERR_ENV_NOT_DEFINED,       "Environment variable '%s' not defined" )
-DEF_MSG( ERR_INCLUDE_RECURSION,     "Cannot include file '%s' recursively" )

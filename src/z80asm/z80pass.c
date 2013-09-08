@@ -13,9 +13,16 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.52 2013-06-15 00:26:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.53 2013-09-08 00:43:59 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.52  2013-06-15 00:26:23  pauloscustodio
+Revision 1.53  2013-09-08 00:43:59  pauloscustodio
+New error module with one error function per error, no need for the error
+constants. Allows compiler to type-check error message arguments.
+Included the errors module in the init() mechanism, no need to call
+error initialization from main(). Moved all error-testing scripts to
+one file errors.t.
+
+Revision 1.52  2013/06/15 00:26:23  pauloscustodio
 Move mapfile writing to mapfile.c.
 
 Revision 1.51  2013/06/08 23:37:32  pauloscustodio
@@ -475,7 +482,7 @@ parseline( enum flag interpret )
             }
             else
             {
-                error( ERR_ILLEGAL_IDENT );       /* a name must follow a label declaration */
+                error_illegal_ident();       /* a name must follow a label declaration */
                 return;       /* read in a new source line */
             }
         }
@@ -498,7 +505,7 @@ parseline( enum flag interpret )
         default:
             if ( interpret == ON )
             {
-                error( ERR_SYNTAX );    /* Syntax error */
+                error_syntax();    /* Syntax error */
             }
     }
 
@@ -745,6 +752,10 @@ Z80pass2( void )
 
         do
         {
+			/* set error location */
+			set_error_file( pass2expr->srcfile );
+			set_error_line( pass2expr->curline );
+
             constant = EvalPfixExpr( pass2expr );
 
             if ( pass2expr->stored == OFF )
@@ -784,11 +795,11 @@ Z80pass2( void )
                     if ( pass2expr->rangetype & EXPREXTERN )
                     {
 						/* JR, DJNZ used an external label - */
-                        error_at( pass2expr->srcfile, pass2expr->curline, ERR_JR_NOT_LOCAL );	
+                        error_jr_not_local();	
                     }     
                     else
                     {
-                        error_at( pass2expr->srcfile, pass2expr->curline, ERR_NOT_DEFINED );
+                        error_not_defined();
                     }
 
                     prevJR = curJR;
@@ -797,7 +808,7 @@ Z80pass2( void )
                 }
                 else
                 {
-                    error_at( pass2expr->srcfile, pass2expr->curline, ERR_NOT_DEFINED );
+                    error_not_defined();
                 }
             }
             else
@@ -816,7 +827,7 @@ Z80pass2( void )
                         }
                         else
                         {
-                            error_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                            error_int_range( constant );
                         }
 
                         prevJR = curJR;
@@ -826,28 +837,28 @@ Z80pass2( void )
 
                     case RANGE_8UNSIGN:
                         if ( constant < -128 || constant > 255 )
-                            warning_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                            warn_int_range( constant );
 
 						patch_byte( &patchptr, (byte_t) constant );
                         break;
 
                     case RANGE_8SIGN:
                         if ( constant < -128 || constant > 127 )
-                            warning_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                            warn_int_range( constant );
 
 						patch_byte( &patchptr, (byte_t) constant );
                         break;
 
                     case RANGE_16CONST:
                         if ( constant < -32768 || constant > 65535 )
-                            warning_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                            warn_int_range( constant );
 
 						patch_word( &patchptr, ( int ) constant );
                         break;
 
                     case RANGE_32SIGN:
                         if ( constant < LONG_MIN || constant > LONG_MAX )
-                            warning_at( pass2expr->srcfile, pass2expr->curline, ERR_INT_RANGE, constant );
+                            warn_int_range( constant );
 
 						patch_long( &patchptr, constant );
                         break;
@@ -865,7 +876,11 @@ Z80pass2( void )
         }
         while ( pass2expr != NULL );      /* re-evaluate expressions and patch in code */
 
-        xfree( CURRENTMODULE->mexpr );   /* Release header of expressions list */
+		/* clean error location */
+		set_error_file( NULL );
+		set_error_line( 0 );
+
+		xfree( CURRENTMODULE->mexpr );   /* Release header of expressions list */
         xfree( CURRENTMODULE->JRaddr );  /* Release header of relative jump address list */
         CURRENTMODULE->mexpr = NULL;
         CURRENTMODULE->JRaddr = NULL;

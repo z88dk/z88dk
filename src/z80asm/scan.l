@@ -15,9 +15,16 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.9 2013-05-01 21:10:49 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.10 2013-09-08 00:43:59 pauloscustodio Exp $ 
 $Log: scan.l,v $
-Revision 1.9  2013-05-01 21:10:49  pauloscustodio
+Revision 1.10  2013-09-08 00:43:59  pauloscustodio
+New error module with one error function per error, no need for the error
+constants. Allows compiler to type-check error message arguments.
+Included the errors module in the init() mechanism, no need to call
+error initialization from main(). Moved all error-testing scripts to
+one file errors.t.
+
+Revision 1.9  2013/05/01 21:10:49  pauloscustodio
 Add getline to Str, converting EOL sequences to LF.
 
 Revision 1.8  2013/05/01 19:03:45  pauloscustodio
@@ -66,6 +73,7 @@ Added GNU Flex-based scanner. Not yet integrated into assembler.
 
 #include "parse.h"
 #include "types.h"
+#include "file.h"
 
 /*-----------------------------------------------------------------------------
 *   scan API
@@ -102,7 +110,7 @@ int yylex_destroy (void);
 
 /* die on error */
 #define YY_FATAL_ERROR(msg) 										\
-	die( AssertionException, msg )
+	die( msg )
 
 /* input function to convert different eol sequences (\r\n, \r, \n) into \n 
    and insert a RS (0x30 - record separator) character before every line,
@@ -131,9 +139,6 @@ DEF_CLASS(Context);
 
 void Context_init( Context *self )
 {
-    /* force init strpool to make sure Context is destroyed before StrPool */
-    strpool_init();
-	
 	self->buffer = OBJ_NEW(Str);
 	OBJ_AUTODELETE(self->buffer) = FALSE;
 }
@@ -143,7 +148,7 @@ void Context_copy( Context *self, Context *other ) { }
 void Context_fini( Context *self )	/* free resources */
 {
 	if ( self->file )
-		fclose( self->file );
+		xfclose( self->file );
 	
 	OBJ_DELETE(self->buffer);
 }
@@ -198,7 +203,7 @@ static void check_circular_includes( char *filename )
 		if ( iter->obj->file != NULL &&			/* open file, not scanned text */
 		     strcmp( filename, iter->obj->filename ) == 0 )
 		{
-            fatal_error( ERR_INCLUDE_RECURSION, filename );
+            fatal_include_recursion( filename );
 		}
 	}
 }	
@@ -294,7 +299,7 @@ D16		[0-9a-fA-F]
 			}
 
 [\'][^\'\r\n]* 	|
-[\"][^\"\r\n]*	error( ERR_UNCLOSED_STR );
+[\"][^\"\r\n]*	error_unclosed_string();
 
 			/* Number - return value in yylval */
 {D10}+				yylval->lval = scan_num(yytext,     0, 10); return NUMBER;
@@ -365,7 +370,7 @@ void yyfree( void *ptr )
 static long scan_num (char *text, int num_suffix_chars, int base)
 {
 	long value;
-	int digit;
+	int digit = 0;
 	int length;
 	char c;
 	int i;
@@ -392,11 +397,11 @@ static long scan_num (char *text, int num_suffix_chars, int base)
 			digit = (c == '#') ? 1 : 0;
 		}
 		else {							/* invalid digit - should not be reached */
-			error( ERR_SYNTAX );
+			error_syntax();
 		}
 
 		if (digit >= base) {			/* digit out of range - should not be reached */
-			error( ERR_SYNTAX );
+			error_syntax();
 		}
 		
 		value = value * base + digit;
@@ -405,7 +410,7 @@ static long scan_num (char *text, int num_suffix_chars, int base)
 	}
 	
 	if ( range_err )
-		warning( ERR_INT_RANGE, value );
+		warn_int_range( value );
 		
 	return value;
 }
@@ -487,11 +492,7 @@ void scan_file( char *filename )
 	check_circular_includes( filename );
 	
 	/* try to open the file */
-	file = fopen( filename, "rb" ); 		/* b: to ready \r and \n */
-	if ( file == NULL ) 
-	{
-		fatal_error( ERR_FOPEN_READ, filename );
-	}
+	file = xfopen( filename, "rb" ); 		/* b: to ready \r and \n */
 
 	/* create a new context */
 	context = Context_create( file, filename, 0 );

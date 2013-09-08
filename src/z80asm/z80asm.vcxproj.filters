@@ -270,4 +270,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="scan.l">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="parse.y">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

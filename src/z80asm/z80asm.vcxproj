@@ -173,6 +173,10 @@
     <ClCompile Include="z80instr.c" />
     <ClCompile Include="z80pass.c" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="parse.y" />
+    <None Include="scan.l" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -13,9 +13,16 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/CH_0001.t,v 1.6 2013-01-20 21:24:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/CH_0001.t,v 1.7 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: CH_0001.t,v $
-# Revision 1.6  2013-01-20 21:24:28  pauloscustodio
+# Revision 1.7  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.6  2013/01/20 21:24:28  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.5  2012/05/26 18:51:10  pauloscustodio
@@ -48,7 +55,7 @@ use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-t_z80asm_error("ld", "Error at file 'test.asm' line 1: Syntax error");
+t_z80asm_error("ld", "Error at file 'test.asm' line 1: syntax error");
 
 unlink_testfiles();
 done_testing();

@@ -230,14 +230,14 @@ GLib Memory statistics (successful operations):
         40 |         35 |         35 |          0 |          0 |         +0
         44 |          6 |          6 |          0 |          0 |         +0
         48 |         19 |         19 |          0 |          0 |         +0
-        96 |          2 |          2 |          0 |          0 |         +0
+        96 |          3 |          3 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        384 |          7 |          7 |          0 |          0 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=9724, zero-initialized=8680 (89.26%), freed=7952 (81.78%), remaining=1772
+Total bytes: allocated=9820, zero-initialized=8776 (89.37%), freed=8048 (81.96%), remaining=1772
 OUT
 
 ---- TEST: Create current module ----
@@ -334,9 +334,16 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.10 2013-09-01 17:04:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.11 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.10  2013-09-01 17:04:44  pauloscustodio
+# Revision 1.11  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.10  2013/09/01 17:04:44  pauloscustodio
 # Change in test output due to memalloc change.
 #
 # Revision 1.9  2013/09/01 11:52:56  pauloscustodio

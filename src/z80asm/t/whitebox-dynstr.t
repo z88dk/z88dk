@@ -19,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "dynstr.o class.o die.o safestr.o strutil.o except.o init.o strpool.o";
+my $objs = "dynstr.o class.o die.o safestr.o strutil.o except.o init.o strpool.o errors.o file.o strlist.o";
 ok ! system "make $objs";
 
 my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
@@ -288,11 +288,14 @@ GLib Memory statistics (successful operations):
          1 |          0 |          0 |          4 |          4 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
         40 |          2 |          2 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
        256 |          1 |          2 |          4 |          3 |         +0
        512 |          0 |          0 |          2 |          2 |         +0
+      1016 |          1 |          0 |          0 |          0 |      +1016
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=2408, zero-initialized=336 (13.95%), freed=2408 (100.00%), remaining=0
+Total bytes: allocated=4276, zero-initialized=2204 (51.54%), freed=2504 (58.56%), remaining=1772
 OUT
 init
 Str_unreserve
@@ -353,9 +356,16 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.8 2013-09-01 17:49:47 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.9 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: whitebox-dynstr.t,v $
-# Revision 1.8  2013-09-01 17:49:47  pauloscustodio
+# Revision 1.9  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.8  2013/09/01 17:49:47  pauloscustodio
 # Change in test output due to memalloc change.
 #
 # Revision 1.7  2013/09/01 11:52:55  pauloscustodio

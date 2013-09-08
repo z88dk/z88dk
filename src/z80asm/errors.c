@@ -12,11 +12,256 @@
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
+
+Error handling.
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.28 2013-09-08 00:43:58 pauloscustodio Exp $ 
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.27 2013-09-01 18:46:01 pauloscustodio Exp $ */
+#include "memalloc.h"   /* before any other include */
+
+#include "errors.h"
+#include "except.h"
+#include "file.h"
+#include "strpool.h"
+#include "types.h"
+#include <glib.h>
+#include <stdio.h>
+
+/*-----------------------------------------------------------------------------
+*   Singleton data
+*----------------------------------------------------------------------------*/
+typedef struct Errors
+{
+	int			 count;				/* total errors */
+	char		*filename;			/* location of error: name of source file */
+	char		*module;			/* location of error: name of module */
+	int			 line;				/* location of error: line number */
+} Errors;
+
+static Errors errors;				/* count errors and locations */
+
+
+typedef struct ErrorFile
+{
+	FILE		*file;				/* currently open error file */
+	char		*filename;			/* name of errror file */
+	GHashTable	*errors;			/* set if errors per file, do delete file if empty */
+} ErrorFile;
+
+static ErrorFile error_file;		/* currently open error file */
+
+/*-----------------------------------------------------------------------------
+*   Initialize and Terminate module
+*----------------------------------------------------------------------------*/
+void init_errors(void)
+{
+	/* init Errors */
+	reset_error_count();			/* clear error count */
+    set_error_null();               /* clear location of error messages */
+
+	/* init ErrorFile */
+	/* create hash table of used error files */
+	error_file.errors = g_hash_table_new( g_str_hash, g_str_equal );
+}
+
+void fini_errors(void)
+{
+	/* close error file, delete it if no errors */
+	close_error_file();
+
+	/* delete hash table */
+	g_hash_table_destroy( error_file.errors );
+}
+
+/*-----------------------------------------------------------------------------
+/*	define the next FILE, LINENO, MODULE to use in error messages 
+*	error_xxx(), fatal_xxx(), warn_xxx()
+*----------------------------------------------------------------------------*/
+void set_error_null( void )
+{
+    errors.filename = errors.module = NULL;
+    errors.line = 0;
+}
+
+void set_error_file( char *filename )
+{
+    errors.filename = strpool_add( filename );	/* may be NULL */
+}
+
+void set_error_module( char *modulename )
+{
+    errors.module = strpool_add( modulename );	/* may be NULL */
+}
+
+void set_error_line( int lineno )
+{
+    errors.line = lineno;
+}
+
+/*-----------------------------------------------------------------------------
+/*	reset count of errors and return current count
+*----------------------------------------------------------------------------*/
+void reset_error_count( void )
+{
+    errors.count = 0;
+}
+
+int get_num_errors( void )
+{
+    return errors.count;
+}
+
+/*-----------------------------------------------------------------------------
+*	Open file to receive all errors / warnings from now on
+*	File is created on first call and appended on second, to allow assemble
+*	and link errors to be joined in the same file.
+*----------------------------------------------------------------------------*/
+void open_error_file( char *filename )
+{
+	char *mode;
+
+	/* close current file if any */
+	close_error_file();
+
+	error_file.filename = strpool_add( filename );
+
+    /* open new file for write or append depending on previous errors 
+	   written to file (BUG_0023, CH_0012) */
+	if ( g_hash_table_lookup( error_file.errors, error_file.filename ) )
+		mode = "a";
+	else
+		mode = "w";
+
+	error_file.file = xfopen( error_file.filename, mode );
+}
+
+void close_error_file( void )
+{
+    /* close current file if any */
+	if ( error_file.file != NULL )
+		xfclose( error_file.file );
+
+    /* delete file if no errors found */
+    if ( error_file.filename != NULL )
+    {
+		if ( ! g_hash_table_lookup( error_file.errors, error_file.filename ) )
+			remove( error_file.filename );
+    }
+
+    /* reset */
+    error_file.file		= NULL;
+    error_file.filename	= NULL;        /* filename kept in strpool, no leak */
+}
+
+static void puts_error_file( char *string )
+{
+    if ( error_file.file != NULL )
+    {
+        fputs( string, error_file.file );
+
+		/* signal errors in file */
+		if ( error_file.filename != NULL )
+			g_hash_table_insert( error_file.errors, 
+								 error_file.filename,	/* key */
+								 error_file.filename );	/* value */
+    }
+}
+
+/*-----------------------------------------------------------------------------
+*   Output error message
+*----------------------------------------------------------------------------*/
+static void do_error( enum ErrType err_type, char *message )
+{
+	char msg[ MAXLINE ];
+	char *p_at, *p_prefix;
+
+	/* init empty message */
+	msg[0] = '\0';
+
+	/* Information messages have no prefix */
+	if ( err_type != ErrInfo ) 
+	{
+		g_strlcat( msg, err_type == ErrWarn ? "Warning" : "Error", sizeof(msg) );
+
+		/* prepare to remove " at" if no prefix */
+		p_at = msg + strlen(msg);
+		g_strlcat( msg, " at", sizeof(msg) );
+		p_prefix = msg + strlen(msg);
+
+		/* output filename */
+		if ( errors.filename && *errors.filename ) 
+		{
+			g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
+						" file '%s'", errors.filename );
+		}
+
+		/* output module */
+		if ( errors.module != NULL && *errors.module )
+		{
+			g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
+						" module '%s'", errors.module );
+		}
+
+		/* output line number */
+		if ( errors.line > 0 )
+		{
+			g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
+						" line %d", errors.line );
+		}
+
+		/* remove at if no prefix */
+		if ( *p_prefix == '\0' )	/* no prefix loaded to string */
+			*p_at = '\0';			/* go back 3 chars to before at */
+
+		g_strlcat( msg, ": ", sizeof(msg) );
+	}
+
+    /* output error message */
+	g_strlcat( msg, message, sizeof(msg) );
+	g_strlcat( msg, "\n", sizeof(msg) );
+
+    /* CH_0001 : Assembly error messages should appear on stderr */
+    fputs( msg, stderr );
+
+    /* send to error file */
+    puts_error_file( msg );
+
+	if (err_type == ErrError || err_type == ErrFatal)
+	{
+		/* count number of errors */
+		errors.count++;
+
+		/* exception if fatal */
+		if (err_type == ErrFatal)
+			THROW(FatalErrorException);
+    }
+}
+
+/*-----------------------------------------------------------------------------
+*   define error functions 
+*----------------------------------------------------------------------------*/
+#define ERR(err_type,func,args)	\
+	func \
+	{ \
+		char message[ MAXLINE ]; \
+		g_snprintf( message, sizeof(message), args ); \
+		do_error(err_type, message); \
+	}
+#include "errors_def.h"
+#undef ERR
+
+
+/* */
 /* $Log: errors.c,v $
-/* Revision 1.27  2013-09-01 18:46:01  pauloscustodio
+/* Revision 1.28  2013-09-08 00:43:58  pauloscustodio
+/* New error module with one error function per error, no need for the error
+/* constants. Allows compiler to type-check error message arguments.
+/* Included the errors module in the init() mechanism, no need to call
+/* error initialization from main(). Moved all error-testing scripts to
+/* one file errors.t.
+/*
+/* Revision 1.27  2013/09/01 18:46:01  pauloscustodio
 /* Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
 /*
 /* Revision 1.26  2013/09/01 00:18:28  pauloscustodio
@@ -129,335 +374,4 @@ Copyright (C) Paulo Custodio, 2011-2013
 /*   replaced all extern declarations of these variables by include errors.h,
 /*   created symbolic constants for error codes.
 /* - Added test scripts for error messages.
-/*
 /* */
-
-#include "memalloc.h"   /* before any other include */
-
-#include "class.h"
-#include "errors.h"
-#include "file.h"
-#include "safestr.h"
-#include "strhash.h"
-#include "strpool.h"
-#include "strutil.h"
-#include "except.h"
-#include "types.h"
-#include <assert.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
-
-/*-----------------------------------------------------------------------------
-*   Error strings
-*----------------------------------------------------------------------------*/
-#define DEF_MSG(name,msg)   msg,
-static char *error_msg[] =
-{
-#include "errors_def.h"
-};
-#undef DEF_MSG
-
-/*-----------------------------------------------------------------------------
-*   Class to keep current output file and close it on program exit
-*----------------------------------------------------------------------------*/
-CLASS( ErrFile )
-FILE    *fp;            /* file handle */
-char    *filename;      /* file name kept in strpool.h */
-StrHash	*num_errors;    /* number of errors per file, do delete file if empty */
-END_CLASS;
-
-DEF_CLASS( ErrFile );
-
-void ErrFile_open( ErrFile *self, char *filename );
-void ErrFile_close( ErrFile *self );
-
-void ErrFile_init( ErrFile *self )
-{
-	self->num_errors = OBJ_NEW( StrHash );
-	OBJ_AUTODELETE(self->num_errors) = FALSE;
-}
-
-void ErrFile_copy( ErrFile *self, ErrFile *other )
-{
-    self->fp = NULL;
-
-	self->num_errors = OBJ_NEW( StrHash );
-	OBJ_AUTODELETE( self->num_errors ) = FALSE;
-}
-
-void ErrFile_fini( ErrFile *self )
-{
-    ErrFile_close( self );
-
-	OBJ_DELETE( self->num_errors );
-}
-
-void ErrFile_open( ErrFile *self, char *filename )
-{
-	int count;
-	char *mode;
-
-    /* close current file if any */
-    ErrFile_close( self );
-
-    /* open new file (BUG_0023, CH_0012) */
-	count = (int)StrHash_get( self->num_errors, filename );
-	if ( count > 0 ) 
-	{			
-		mode = "a";									/* errors registered in this session - append to file */
-	}
-	else 
-	{
-		mode = "w";									/* no errors registered in this session - create to file */
-
-		StrHash_set( self->num_errors, filename, (void*) 0 );	
-													/* init error count */
-	}
-
-    self->fp = fopen_err( filename, mode );
-    self->filename = strpool_add( filename );
-}
-
-void ErrFile_close( ErrFile *self )
-{
-	int count;
-
-    /* close current file if any */
-    if ( self->fp != NULL )
-    {
-        fclose( self->fp );
-    }
-
-    /* delete file if num_errors is zero */
-    if ( self->filename != NULL )
-    {
-		count = (int)StrHash_get( self->num_errors, self->filename );
-		if (count == 0) 
-			remove( self->filename );
-    }
-
-    /* reset */
-    self->fp         = NULL;
-    self->filename   = NULL;        /* file kept in strpool, no leak */
-}
-
-void ErrFile_puts( ErrFile *self, char *str )
-{
-	int count;
-
-    if ( self->fp != NULL )
-    {
-        fputs( str, self->fp );
-
-		/* count errors per file */
-		if ( self->filename != NULL )
-		{
-			count = 1 + (int)StrHash_get( self->num_errors, self->filename );
-			StrHash_set( self->num_errors, self->filename, (void*)count );
-		}
-    }
-}
-
-/*-----------------------------------------------------------------------------
-*   Singletons
-*----------------------------------------------------------------------------*/
-static ErrFile *error_file = NULL;
-static int num_errors      = 0;
-static int num_warnings    = 0;
-static char *error_filename = NULL;
-static char *error_module = NULL;
-static int  error_line     = 0;
-
-/*-----------------------------------------------------------------------------
-*   init - create error_file on first call
-*----------------------------------------------------------------------------*/
-static void init( void )
-{
-    if ( error_file == NULL )
-    {
-        error_file = OBJ_NEW( ErrFile );
-    }
-}
-
-/*-----------------------------------------------------------------------------
-*   define the next FILE, LINENO, MODULE to use in error messages
-*   error(), fatal_error(), warning()
-*----------------------------------------------------------------------------*/
-void set_error_null( void )
-{
-    error_filename = error_module = NULL;
-    error_line = 0;
-}
-
-void set_error_file( char *filename )
-{
-    error_filename = filename ? strpool_add( filename ) : NULL;
-}
-
-void set_error_module( char *modulename )
-{
-    error_module = modulename ? strpool_add( modulename ) : NULL;
-}
-
-void set_error_line( int lineno )
-{
-    error_line = lineno;
-}
-
-/*-----------------------------------------------------------------------------
-*   Error count handling
-*----------------------------------------------------------------------------*/
-void reset_error_count( void )
-{
-    num_errors = num_warnings = 0;
-}
-
-int  get_num_errors( void )
-{
-    return num_errors;
-}
-
-int  get_num_warnings( void )
-{
-    return num_warnings;
-}
-
-/*-----------------------------------------------------------------------------
-*   Handle output file for errors
-*----------------------------------------------------------------------------*/
-void open_error_file( char *filename )
-{
-    init();
-    ErrFile_open( error_file, filename );
-}
-
-void close_error_file( void )
-{
-    init();
-    ErrFile_close( error_file );
-}
-
-/*-----------------------------------------------------------------------------
-*   Send out an error message
-*----------------------------------------------------------------------------*/
-static void out_error_msg( int *countp, char *prefix,
-                           char *filename, int lineno,
-                           BOOL is_fatal,
-                           ErrorCode err, va_list argptr )
-{
-    SSTR_DEFINE( str, MAXLINE );
-    SSTR_DEFINE( location, MAXLINE );
-
-    init();
-
-    /* CH_0003 : output prefix */
-    sstr_set( str, err ? prefix : "Exit" );
-
-    /* output filename */
-    if ( filename && *filename )
-    {
-        sstr_fcat( location, " file '%s'", filename );
-    }
-
-    /* output module */
-    if ( error_module != NULL && *error_module )
-    {
-        sstr_fcat( location, " module '%s'", error_module );
-    }
-
-    /* output line number */
-    if ( lineno > 0 )
-    {
-        sstr_fcat( location, " line %d", lineno );
-    }
-
-    /* add location to str */
-    if ( sstr_len( location ) )
-    {
-        sstr_fcat( str, " at%s", sstr_data( location ) );
-    }
-
-    sstr_cat( str, ": " );
-
-    /* output error message */
-    if ( err < G_N_ELEMENTS( error_msg ) )
-    {
-        switch ( err )
-        {
-            case ERR_TOTALERRORS:
-                /* ignore all the info collected in str */
-                sstr_clear( str );
-                /* fall through to default */
-
-            default:
-                sstr_vfcat( str, error_msg[err], argptr );     /* pass variable args */
-        }
-    }
-    else
-    {
-        sstr_fcat( str, "Error %d", err );
-    }
-
-    /* output newline */
-    sstr_cat( str, "\n" );
-
-    /* CH_0001 : Assembly error messages should appear on stderr */
-    fputs( sstr_data( str ), stderr );
-
-    /* send to error file */
-    ErrFile_puts( error_file, sstr_data( str ) );
-
-    /* count number of errors */
-    ( *countp )++;
-
-    if ( is_fatal )
-    {
-		THROW(FatalErrorException);
-    }
-}
-
-/*-----------------------------------------------------------------------------
-*   error / warning
-*----------------------------------------------------------------------------*/
-void fatal_error( ErrorCode err, ... )
-{
-    va_list argptr;
-    va_start( argptr, err );
-    out_error_msg( &num_errors, "Error", error_filename, error_line, TRUE, err, argptr );
-}
-
-void error( ErrorCode err, ... )
-{
-    va_list argptr;
-    va_start( argptr, err );
-    out_error_msg( &num_errors, "Error", error_filename, error_line, FALSE, err, argptr );
-}
-
-void warning( ErrorCode err, ... )
-{
-    va_list argptr;
-    va_start( argptr, err );
-    out_error_msg( &num_warnings, "Warning", error_filename, error_line, FALSE, err, argptr );
-}
-
-void fatal_error_at( char *filename, int lineno, ErrorCode err, ... )
-{
-    va_list argptr;
-    va_start( argptr, err );
-    out_error_msg( &num_errors, "Error", filename, lineno, TRUE, err, argptr );
-}
-
-void error_at( char *filename, int lineno, ErrorCode err, ... )
-{
-    va_list argptr;
-    va_start( argptr, err );
-    out_error_msg( &num_errors, "Error", filename, lineno, FALSE, err, argptr );
-}
-
-void warning_at( char *filename, int lineno, ErrorCode err, ... )
-{
-    va_list argptr;
-    va_start( argptr, err );
-    out_error_msg( &num_warnings, "Warning", filename, lineno, FALSE, err, argptr );
-}

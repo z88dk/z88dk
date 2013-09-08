@@ -15,10 +15,17 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle object file contruction, reading and writing
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.9 2013-09-01 18:46:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.10 2013-09-08 00:43:59 pauloscustodio Exp $
 
 $Log: objfile.c,v $
-Revision 1.9  2013-09-01 18:46:01  pauloscustodio
+Revision 1.10  2013-09-08 00:43:59  pauloscustodio
+New error module with one error function per error, no need for the error
+constants. Allows compiler to type-check error message arguments.
+Included the errors module in the init() mechanism, no need to call
+error initialization from main(). Moved all error-testing scripts to
+one file errors.t.
+
+Revision 1.9  2013/09/01 18:46:01  pauloscustodio
 Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
 
 Revision 1.8  2013/08/30 21:50:43  pauloscustodio
@@ -180,7 +187,7 @@ ObjFile *_ObjFile_read( char *filename, FILE *libfile, BOOL test_mode )
 	if ( ! test_header(file) )
 	{
 		if ( ! test_mode )
-			error( ERR_NOT_OBJ_FILE, filename );	/* error except test_mode */
+			error_not_obj_file( filename );	/* error except test_mode */
 
 		if ( ! in_library )
 			xfclose(file);							/* close except in library */

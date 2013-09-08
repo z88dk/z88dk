@@ -17,9 +17,16 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.4 2013-09-01 18:46:01 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.5 2013-09-08 00:43:59 pauloscustodio Exp $ */
 /* $Log: srcfile.c,v $
-/* Revision 1.4  2013-09-01 18:46:01  pauloscustodio
+/* Revision 1.5  2013-09-08 00:43:59  pauloscustodio
+/* New error module with one error function per error, no need for the error
+/* constants. Allows compiler to type-check error message arguments.
+/* Included the errors module in the init() mechanism, no need to call
+/* error initialization from main(). Moved all error-testing scripts to
+/* one file errors.t.
+/*
+/* Revision 1.4  2013/09/01 18:46:01  pauloscustodio
 /* Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
 /*
 /* Revision 1.3  2013/03/10 18:00:24  pauloscustodio
@@ -324,7 +331,7 @@ void SourceFileList_open( SourceFileList *self, char *source_file )
 	{
 		if ( strcmp( filename, iter->obj->filename ) == 0 )
 		{
-            fatal_error( ERR_INCLUDE_RECURSION, filename );
+            fatal_include_recursion( filename );
             return;
 		}
 	}

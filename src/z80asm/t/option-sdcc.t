@@ -13,9 +13,16 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-sdcc.t,v 1.4 2013-01-20 21:24:29 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/option-sdcc.t,v 1.5 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: option-sdcc.t,v $
-# Revision 1.4  2013-01-20 21:24:29  pauloscustodio
+# Revision 1.5  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.4  2013/01/20 21:24:29  pauloscustodio
 # Updated copyright year to 2013
 #
 # Revision 1.3  2012/05/26 18:51:10  pauloscustodio
@@ -42,7 +49,7 @@ use Test::More;
 require 't/test_utils.pl';
 
 t_z80asm_error("defc main = 0x1234\ncall _main", 
-		"Error at file 'test.asm' module 'TEST' line 2: Symbol not defined");
+		"Error at file 'test.asm' module 'TEST' line 2: symbol not defined");
 t_z80asm_ok(0, "defc main = 0x1234\ncall _main", "\xCD\x34\x12", "-sdcc");
 
 unlink_testfiles();

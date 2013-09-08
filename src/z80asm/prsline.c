@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.34 2013-09-01 18:45:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.35 2013-09-08 00:43:59 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.34  2013-09-01 18:45:35  pauloscustodio
+/* Revision 1.35  2013-09-08 00:43:59  pauloscustodio
+/* New error module with one error function per error, no need for the error
+/* constants. Allows compiler to type-check error message arguments.
+/* Included the errors module in the init() mechanism, no need to call
+/* error initialization from main(). Moved all error-testing scripts to
+/* one file errors.t.
+/*
+/* Revision 1.34  2013/09/01 18:45:35  pauloscustodio
 /* Remove NUM_ELEMS, use G_N_ELEMENTS instead (from glib.h)
 /* Remove FALSE, TRUE, MIN, MAX; defined in glib.h
 /*
@@ -709,7 +716,7 @@ CheckRegister8( void )
                 {
                     if ( ( cpu_type & CPU_RABBIT ) )
                     {
-                        error( ERR_ILLEGAL_IDENT );
+                        error_illegal_ident();
                         return -1;
                     }
 
@@ -720,7 +727,7 @@ CheckRegister8( void )
                 {
                     if ( ( cpu_type & CPU_RABBIT ) )
                     {
-                        error( ERR_ILLEGAL_IDENT );
+                        error_illegal_ident();
                         return -1;
                     }
 
@@ -871,7 +878,7 @@ IndirectRegisters( void )
             }
             else
             {
-                error( ERR_SYNTAX );     /* Right bracket missing! */
+                error_syntax();     /* Right bracket missing! */
                 return -1;
             }
 
@@ -884,7 +891,7 @@ IndirectRegisters( void )
             return 7;
 
         default:
-            error( ERR_ILLEGAL_IDENT );
+            error_illegal_ident();
             return -1;
     }
 }

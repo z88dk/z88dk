@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.42 2013-09-01 18:45:35 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.43 2013-09-08 00:43:59 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.42  2013-09-01 18:45:35  pauloscustodio
+/* Revision 1.43  2013-09-08 00:43:59  pauloscustodio
+/* New error module with one error function per error, no need for the error
+/* constants. Allows compiler to type-check error message arguments.
+/* Included the errors module in the init() mechanism, no need to call
+/* error initialization from main(). Moved all error-testing scripts to
+/* one file errors.t.
+/*
+/* Revision 1.42  2013/09/01 18:45:35  pauloscustodio
 /* Remove NUM_ELEMS, use G_N_ELEMENTS instead (from glib.h)
 /* Remove FALSE, TRUE, MIN, MAX; defined in glib.h
 /*
@@ -474,7 +481,7 @@ ParseIdent( enum flag interpret )
     {
         if ( interpret == ON )      /* only issue error message if interpreting */
         {
-            error( ERR_UNKNOWN_IDENT );
+            error_unknown_ident();
         }
     }
     else
@@ -589,7 +596,7 @@ XDEF( void )
         }
         else
         {
-            error( ERR_SYNTAX );
+            error_syntax();
             return;
         }
     }
@@ -597,7 +604,7 @@ XDEF( void )
 
     if ( sym != newline )
     {
-        error( ERR_SYNTAX );
+        error_syntax();
     }
 }
 
@@ -613,7 +620,7 @@ XLIB( void )
     }
     else
     {
-        error( ERR_SYNTAX );
+        error_syntax();
         return;
     }
 }
@@ -637,7 +644,7 @@ XREF( void )
         }
         else
         {
-            error( ERR_SYNTAX );
+            error_syntax();
             return;
         }
     }
@@ -645,7 +652,7 @@ XREF( void )
 
     if ( sym != newline )
     {
-        error( ERR_SYNTAX );
+        error_syntax();
     }
 }
 
@@ -663,7 +670,7 @@ LIB( void )
         }
         else
         {
-            error( ERR_SYNTAX );
+            error_syntax();
             return;
         }
     }
@@ -671,7 +678,7 @@ LIB( void )
 
     if ( sym != newline )
     {
-        error( ERR_SYNTAX );
+        error_syntax();
     }
 }
 
@@ -706,7 +713,7 @@ HALT( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -825,7 +832,7 @@ IND( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -841,7 +848,7 @@ INDR( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -857,7 +864,7 @@ INI( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -873,7 +880,7 @@ INIR( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -889,7 +896,7 @@ OUTI( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -905,7 +912,7 @@ OUTD( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -921,7 +928,7 @@ OTIR( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -937,7 +944,7 @@ OTDR( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -1102,7 +1109,7 @@ SLL( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -1205,7 +1212,7 @@ RETN( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -1297,7 +1304,7 @@ DI( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -1312,7 +1319,7 @@ EI( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 
@@ -1327,7 +1334,7 @@ DAA( void )
 {
     if ( ( cpu_type & CPU_RABBIT ) )
     {
-        error( ERR_ILLEGAL_IDENT );
+        error_illegal_ident();
         return;
     }
 

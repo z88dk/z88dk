@@ -434,80 +434,89 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
+        18 |         17 |          0 |          0 |         17 |         +0
+        19 |         11 |          0 |          0 |         11 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
-        32 |          2 |          2 |          0 |          0 |         +0
-        40 |          2 |          2 |          0 |          0 |         +0
-        44 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
+        24 |         28 |         28 |          0 |          0 |         +0
+        29 |          0 |         15 |         15 |          0 |         +0
+        30 |          0 |         10 |         10 |          0 |         +0
+        32 |          1 |          1 |          0 |          0 |         +0
+        33 |          0 |          2 |          2 |          0 |         +0
+        36 |          0 |          0 |         17 |         17 |         +0
+        38 |          0 |          1 |         11 |         10 |         +0
+        40 |          1 |          1 |          0 |          0 |         +0
+        44 |         29 |          1 |          0 |         28 |         +0
+        88 |          0 |         28 |         28 |          0 |         +0
+        96 |          2 |          2 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        384 |          1 |          1 |          0 |          0 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=3484, zero-initialized=2440 (70.03%), freed=1712 (49.14%), remaining=1772
+Total bytes: allocated=10222, zero-initialized=2464 (24.10%), freed=8450 (82.66%), remaining=1772
 OUT
 
 ---- TEST: xfopen ----
 
-Error: Cannot open file 'test1xxxx.bin' for reading
-Error: Cannot open file 'x/x/x/x/test1.bin' for writing
+Error: cannot read file 'test1xxxx.bin'
+Error: cannot write file 'x/x/x/x/test1.bin'
 
 ---- TEST: xfclose ----
 
-Error: Cannot close file 'test1.bin'
+Error: cannot close file 'test1.bin'
 
 ---- TEST: xstat ----
 
-Error: Cannot open file 'test1xxxx.bin' for reading
+Error: cannot read file 'test1xxxx.bin'
 
 ---- TEST: xfwrite ----
 
 File: test1.bin:
    0   1    2    3    4   
-Error: Cannot write to file 'test1.bin'
+Error: cannot write file 'test1.bin'
 
 ---- TEST: xfread ----
 
-Error: Unexpected EOF reading from file 'test1.bin'
+Error: cannot read file 'test1.bin'
 
 ---- TEST: xfput_char ----
 
 File: test1.bin:
    0   1    2    3    4   
-Error: Cannot write to file 'test1.bin'
+Error: cannot write file 'test1.bin'
 
 ---- TEST: xfget_char ----
 
-Error: Unexpected EOF reading from file 'test1.bin'
+Error: cannot read file 'test1.bin'
 
 ---- TEST: xfput_u8 ----
 
 File: test1.bin:
    0  <80> <81> <00> <7F> <80> <FF> 
-Error: Cannot write to file 'test1.bin'
+Error: cannot write file 'test1.bin'
 
 ---- TEST: xfget_u8 ----
 
-Error: Unexpected EOF reading from file 'test1.bin'
+Error: cannot read file 'test1.bin'
 
 ---- TEST: xfget_i8 ----
 
-Error: Unexpected EOF reading from file 'test1.bin'
+Error: cannot read file 'test1.bin'
 
 ---- TEST: xfput_u16 ----
 
 File: test1.bin:
    0  <00> <80> <01> <80> <00> <00> <FF> <7F> <00> <80> <FF> <FF> 
-Error: Cannot write to file 'test1.bin'
+Error: cannot write file 'test1.bin'
 
 ---- TEST: xfget_u16 ----
 
-Error: Unexpected EOF reading from file 'test1.bin'
+Error: cannot read file 'test1.bin'
 
 ---- TEST: xfget_i16 ----
 
-Error: Unexpected EOF reading from file 'test1.bin'
+Error: cannot read file 'test1.bin'
 
 ---- TEST: xfput_u32 ----
 
@@ -515,31 +524,31 @@ File: test1.bin:
    0  <00> <00> <00> <80> <01> <00> <00> <80> <00> <00> <00> <00> <01> <00> <00> <00> 
   10  <00> <01> <00> <00> <00> <00> <01> <00> <00> <00> <00> <01> <FF> <FF> <FF> <7F> 
   20  <00> <00> <00> <80> <FF> <FF> <FF> <FF> 
-Error: Cannot write to file 'test1.bin'
+Error: cannot write file 'test1.bin'
 
 ---- TEST: xfget_u32 ----
 
-Error: Unexpected EOF reading from file 'test1.bin'
+Error: cannot read file 'test1.bin'
 
 ---- TEST: xfget_i32 ----
 
-Error: Unexpected EOF reading from file 'test1.bin'
+Error: cannot read file 'test1.bin'
 
 ---- TEST: xfput_sstr ----
 
 File: test1.bin:
    0   1    2    3    4   
-Error: Cannot write to file 'test1.bin'
+Error: cannot write file 'test1.bin'
 
 ---- TEST: xfget_sstr ----
 
-Error: Unexpected EOF reading from file 'test1.bin'
-Error: Unexpected EOF reading from file 'test1.bin'
-Error: String too long reading from file 'test1.bin'
+Error: cannot read file 'test1.bin'
+Error: cannot read file 'test1.bin'
+Error: cannot read file 'test1.bin'
 
 ---- TEST: xfput_c1sstr ----
 
-Error: String too long writing to file 'test1.bin'
+Error: cannot write file 'test1.bin'
 File: test1.bin:
    0  <00> <01>  1   <FF>  1    2    3    4    5    6    7    8    9    0    1    2   
   10   3    4    5    6    7    8    9    0    1    2    3    4    5    6    7    8   
@@ -558,12 +567,12 @@ File: test1.bin:
   E0   1    2    3    4    5    6    7    8    9    0    1    2    3    4    5    6   
   F0   7    8    9    0    1    2    3    4    5    6    7    8    9    0    1    2   
  100   3    4    5   
-Error: Cannot write to file 'test1.bin'
+Error: cannot write file 'test1.bin'
 
 ---- TEST: xfget_c1sstr ----
 
-Error: Unexpected EOF reading from file 'test1.bin'
-Error: String too long reading from file 'test1.bin'
+Error: cannot read file 'test1.bin'
+Error: cannot read file 'test1.bin'
 
 ---- TEST: xfput_c2sstr ----
 
@@ -601,12 +610,12 @@ File: test1.bin:
  1E0   7    8    9    0    1    2    3    4    5    6    7    8    9    0    1    2   
  1F0   3    4    5    6    7    8    9    0    1    2    3    4    5    6    7    8   
  200   9    0    1    2    3    4    5    6   
-Error: Cannot write to file 'test1.bin'
+Error: cannot write file 'test1.bin'
 
 ---- TEST: xfget_c2sstr ----
 
-Error: Unexpected EOF reading from file 'test1.bin'
-Error: String too long reading from file 'test1.bin'
+Error: cannot read file 'test1.bin'
+Error: cannot read file 'test1.bin'
 END
 
 # delete directories and files
@@ -616,9 +625,16 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.13 2013-09-01 17:39:26 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.14 2013-09-08 00:43:59 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.13  2013-09-01 17:39:26  pauloscustodio
+# Revision 1.14  2013-09-08 00:43:59  pauloscustodio
+# New error module with one error function per error, no need for the error
+# constants. Allows compiler to type-check error message arguments.
+# Included the errors module in the init() mechanism, no need to call
+# error initialization from main(). Moved all error-testing scripts to
+# one file errors.t.
+#
+# Revision 1.13  2013/09/01 17:39:26  pauloscustodio
 # Change in test output due to memalloc change.
 #
 # Revision 1.12  2013/09/01 11:52:55  pauloscustodio

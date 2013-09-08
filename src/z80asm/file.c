@@ -14,9 +14,16 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.21 2013-09-01 18:46:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.22 2013-09-08 00:43:59 pauloscustodio Exp $
 $Log: file.c,v $
-Revision 1.21  2013-09-01 18:46:01  pauloscustodio
+Revision 1.22  2013-09-08 00:43:59  pauloscustodio
+New error module with one error function per error, no need for the error
+constants. Allows compiler to type-check error message arguments.
+Included the errors module in the init() mechanism, no need to call
+error initialization from main(). Moved all error-testing scripts to
+one file errors.t.
+
+Revision 1.21  2013/09/01 18:46:01  pauloscustodio
 Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
 
 Revision 1.20  2013/05/12 19:20:34  pauloscustodio
@@ -218,15 +225,19 @@ void xstat( char *filename, struct stat *filestat )
     int result = stat( filename, filestat );
 
     if ( result < 0 )
-        fatal_error( ERR_FOPEN_READ, filename );
+        fatal_read_file( filename );
 }
 
 FILE *xfopen( char *filename, char *mode )
 {
     FILE *file = fopen( filename, mode );
     if ( file == NULL )
-        fatal_error( mode[0] == 'r' ? ERR_FOPEN_READ  : ERR_FOPEN_WRITE,
-                     filename );
+	{
+		if ( mode[0] == 'r' )
+			fatal_read_file( filename );
+		else
+			fatal_write_file( filename );
+	}
 
 	add_filename( file, filename );		/* never deleted from hash */
     return file;
@@ -236,7 +247,7 @@ void xfclose( FILE *file )
 {
 	int result = fclose( file );
 	if ( result < 0 )
-		fatal_error( ERR_FCLOSE, get_filename(file) );
+		fatal_close_file( get_filename(file) );
 }
 
 /*-----------------------------------------------------------------------------
@@ -246,14 +257,14 @@ void xfwrite( const void *buffer, size_t size, size_t count, FILE *file )
 {
     size_t written = fwrite( buffer, size, count, file );
     if ( written != count )
-        fatal_error( ERR_FWRITE, get_filename(file) );
+        fatal_write_file( get_filename(file) );
 }
 
 void xfread( void *buffer, size_t size, size_t count, FILE *file )
 {
     size_t read = fread( buffer, size, count, file );
     if ( read != count )
-        fatal_error( ERR_FREAD, get_filename(file) );
+        fatal_read_file( get_filename(file) );
 }
 
 void xfput_char( const char *buffer, size_t len, FILE *file )
@@ -273,14 +284,14 @@ void xfput_u8( int value, FILE *file )
 {
     int result = fputc( value, file );
     if ( result < 0 )
-        fatal_error( ERR_FWRITE, get_filename(file) );
+        fatal_write_file( get_filename(file) );
 }
 
 int xfget_u8( FILE *file )
 {
     int result = getc( file );
     if ( result < 0 )
-        fatal_error( ERR_FREAD, get_filename(file) );
+        fatal_read_file( get_filename(file) );
     return result;
 }
 
@@ -368,7 +379,7 @@ void xfput_sstr( sstr_t *str, FILE *file )
 void xfget_sstr( sstr_t *str, size_t len, FILE *file )
 {
 	if ( len + 1 > str->size )
-		fatal_error( ERR_FREAD_STRING, get_filename(file) );/* too long */
+		fatal_read_file( get_filename(file) );/* too long */
 	
 	xfget_char( sstr_data(str), len, file );				/* characters */
 	sstr_data(str)[len] = '\0';								/* terminate string */
@@ -383,7 +394,7 @@ void xfget_sstr( sstr_t *str, size_t len, FILE *file )
 void xfput_c1sstr( sstr_t *str, FILE *file )
 {
 	if ( sstr_len(str) > 0xFF )
-		fatal_error( ERR_FWRITE_STRING, get_filename(file) );	/* too long */
+		fatal_write_file( get_filename(file) );					/* too long */
 	xfput_u8( sstr_len(str), file );							/* byte count */
 	xfput_sstr( str, file );									/* characters */
 }
@@ -398,7 +409,7 @@ void xfget_c1sstr( sstr_t *str, FILE *file )
 void xfput_c2sstr( sstr_t *str, FILE *file )
 {
 	if ( sstr_len(str) > 0xFFFF )
-		fatal_error( ERR_FWRITE_STRING, get_filename(file) );	/* too long */
+		fatal_write_file( get_filename(file) );					/* too long */
 	xfput_u16( sstr_len(str), file );							/* word count */
 	xfput_sstr( str, file );									/* characters */
 }

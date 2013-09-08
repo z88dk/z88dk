@@ -14,9 +14,16 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.42 2013-09-01 12:00:07 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.43 2013-09-08 00:43:59 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.42  2013-09-01 12:00:07  pauloscustodio
+/* Revision 1.43  2013-09-08 00:43:59  pauloscustodio
+/* New error module with one error function per error, no need for the error
+/* constants. Allows compiler to type-check error message arguments.
+/* Included the errors module in the init() mechanism, no need to call
+/* error initialization from main(). Moved all error-testing scripts to
+/* one file errors.t.
+/*
+/* Revision 1.42  2013/09/01 12:00:07  pauloscustodio
 /* Cleanup compilation warnings
 /*
 /* Revision 1.41  2013/09/01 00:18:28  pauloscustodio
@@ -390,7 +397,7 @@ Factor( struct expr *pfixexpr )
 
             if ( eval_err == 1 )
             {
-                error( ERR_SYNTAX_EXPR );
+                error_syntax_expr();
                 return 0;           /* syntax error in expression */
             }
             else
@@ -419,7 +426,7 @@ Factor( struct expr *pfixexpr )
                 }
                 else
                 {
-                    error( ERR_UNBALANCED_PAREN );
+                    error_unbanlanced_paren();
                     return 0;
                 }
             }
@@ -463,7 +470,7 @@ Factor( struct expr *pfixexpr )
 
             if ( feof( z80asmfile ) )
             {
-                error( ERR_SYNTAX );
+                error_syntax();
                 return 0;
             }
             else
@@ -472,7 +479,7 @@ Factor( struct expr *pfixexpr )
 
                 if ( constant == EOF )
                 {
-                    error( ERR_SYNTAX );
+                    error_syntax();
                     return 0;
                 }
                 else
@@ -486,7 +493,7 @@ Factor( struct expr *pfixexpr )
                     }
                     else
                     {
-                        error( ERR_SYNTAX_EXPR );
+                        error_syntax_expr();
                         return 0;
                     }
                 }
@@ -517,7 +524,7 @@ Factor( struct expr *pfixexpr )
             break;
 
         default:
-            error( ERR_SYNTAX_EXPR );  /* syntax error */
+            error_syntax_expr();  /* syntax error */
             return 0;
     }
 
@@ -1168,7 +1175,7 @@ ExprLong( int listoffset )
                     RemovePfixlist( pfixexpr );
 
                     if ( constant < LONG_MIN || constant > LONG_MAX )
-						warning( ERR_INT_RANGE, constant );
+						warn_int_range( constant );
 
                     append_long( constant );
                 }
@@ -1230,7 +1237,7 @@ ExprAddress( int listoffset )
                     RemovePfixlist( pfixexpr );
 
                     if ( constant < -32768 || constant > 65535 )
-                        warning( ERR_INT_RANGE, constant );
+                        warn_int_range( constant );
 
 					append_word( constant );
                 }
@@ -1291,7 +1298,7 @@ ExprUnsigned8( int listoffset )
                     RemovePfixlist( pfixexpr );
 
                     if ( constant < -128 || constant > 255 )
-                        warning( ERR_INT_RANGE, constant );
+                        warn_int_range( constant );
 
 					append_byte( (byte_t) constant );
                 }
@@ -1333,7 +1340,7 @@ ExprSigned8( int listoffset )
             break;              /* continue into parsing expression */
 
         default:                /* Syntax error, e.g. (ix 4) */
-            error( ERR_SYNTAX );
+            error_syntax();
             return 0;           /* FAIL */
     }
 
@@ -1368,7 +1375,7 @@ ExprSigned8( int listoffset )
                     RemovePfixlist( pfixexpr );
 
                     if ( constant < -128 || constant > 127 )
-						warning( ERR_INT_RANGE, constant );
+						warn_int_range( constant );
 
 					append_byte( (byte_t) constant );
                 }
