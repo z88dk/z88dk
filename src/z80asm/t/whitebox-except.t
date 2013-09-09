@@ -12,39 +12,8 @@
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
 # Copyright (C) Paulo Custodio, 2011-2013
-
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.9 2013-09-08 00:40:10 pauloscustodio Exp $
-# $Log: whitebox-except.t,v $
-# Revision 1.9  2013-09-08 00:40:10  pauloscustodio
-# Changed format of output file name and line number in case of fatal error
 #
-# Revision 1.8  2013/09/01 11:52:55  pauloscustodio
-# Setup memalloc on init.c.
-# Setup GLib memory allocation functions to use memalloc functions.
-#
-# Revision 1.7  2013/09/01 00:18:30  pauloscustodio
-# - Replaced e4c exception mechanism by a much simpler one based on a few
-#   macros. The former did not allow an exit(1) to be called within a
-#   try-catch block.
-#
-# Revision 1.6  2013/01/20 21:24:29  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.5  2012/06/14 15:01:27  pauloscustodio
-# Split safe strings from strutil.c to safestr.c
-#
-# Revision 1.4  2012/05/26 18:50:26  pauloscustodio
-# Use .o instead of .c to build test program, faster compilation.
-# Use gcc to compile instead of cc.
-#
-# Revision 1.3  2012/05/22 20:33:34  pauloscustodio
-# Added tests
-#
-# Revision 1.2  2012/05/20 05:53:01  pauloscustodio
-# Test raising RuntimeException and AssertionException
-#
-# Revision 1.1  2012/05/17 15:04:47  pauloscustodio
-# white box test of new modules
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-except.t,v 1.10 2013-09-09 00:20:45 pauloscustodio Exp $
 #
 # Test exceptions
 
@@ -52,8 +21,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "die.o strutil.o safestr.o except.o";
-ok ! system "make $objs";
+my $objs = "strutil.o safestr.o";
 
 # compile
 t_compile_module('', <<'END', $objs);
@@ -123,33 +91,73 @@ END
 
 
 # THROW outside of TRY
-t_run_module([0], "", <<END, 1);
+t_run_module([0], <<'OUT', <<'ERR', 1);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=20, zero-initialized=0 (0.00%), freed=20 (100.00%), remaining=0
+OUT
 Throw without try
 Uncaught runtime exception at test.c(1)
-END
+ERR
 
 
 # run FatalErrorException
-t_run_module([1], "", <<END, 0);
+t_run_module([1], <<'OUT', <<'ERR', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=20, zero-initialized=0 (0.00%), freed=20 (100.00%), remaining=0
+OUT
 Before try
 In try
 Throw FatalErrorException
 Finally, THROWN() = 3
 End of main
-END
+ERR
 
 # run AssertionException
-t_run_module([2], "", <<END, 0);
+t_run_module([2], <<'OUT', <<'ERR', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=20, zero-initialized=0 (0.00%), freed=20 (100.00%), remaining=0
+OUT
 Before try
 In try
 Throw AssertionException
 Caught AssertionException
 Finally, THROWN() = 2
 End of main
-END
+ERR
 
 # run second-level try and rethrow
-t_run_module([3], "", <<END, 0);
+t_run_module([3], <<'OUT', <<'ERR', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=20, zero-initialized=0 (0.00%), freed=20 (100.00%), remaining=0
+OUT
 Before try
 In try
 In test 3, new try
@@ -159,7 +167,45 @@ Inner Finally, THROWN() = 3
 Caught AssertionException
 Finally, THROWN() = 2
 End of main
-END
+ERR
 
 unlink_testfiles();
 done_testing;
+
+
+__END__
+# $Log: whitebox-except.t,v $
+# Revision 1.10  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.9  2013/09/08 00:40:10  pauloscustodio
+# Changed format of output file name and line number in case of fatal error
+#
+# Revision 1.8  2013/09/01 11:52:55  pauloscustodio
+# Setup memalloc on init.c.
+# Setup GLib memory allocation functions to use memalloc functions.
+#
+# Revision 1.7  2013/09/01 00:18:30  pauloscustodio
+# - Replaced e4c exception mechanism by a much simpler one based on a few
+#   macros. The former did not allow an exit(1) to be called within a
+#   try-catch block.
+#
+# Revision 1.6  2013/01/20 21:24:29  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.5  2012/06/14 15:01:27  pauloscustodio
+# Split safe strings from strutil.c to safestr.c
+#
+# Revision 1.4  2012/05/26 18:50:26  pauloscustodio
+# Use .o instead of .c to build test program, faster compilation.
+# Use gcc to compile instead of cc.
+#
+# Revision 1.3  2012/05/22 20:33:34  pauloscustodio
+# Added tests
+#
+# Revision 1.2  2012/05/20 05:53:01  pauloscustodio
+# Test raising RuntimeException and AssertionException
+#
+# Revision 1.1  2012/05/17 15:04:47  pauloscustodio
+# white box test of new modules

@@ -12,27 +12,8 @@
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
 # Copyright (C) Paulo Custodio, 2011-2013
-
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-safestr.t,v 1.6 2013-05-07 22:10:56 pauloscustodio Exp $
-# $Log: whitebox-safestr.t,v $
-# Revision 1.6  2013-05-07 22:10:56  pauloscustodio
-# sstr_getchars(): get N characters from input, return FALSE on EOF
 #
-# Revision 1.5  2013/05/01 22:23:39  pauloscustodio
-# Added chomp and normalize_eol
-#
-# Revision 1.4  2013/05/01 21:37:50  pauloscustodio
-# Added chset, chcat and getline
-#
-# Revision 1.3  2013/04/06 10:55:15  pauloscustodio
-# SSTR_DEFINE() caused compilation error "C2099: initializer is not a constant" when used to define global variables
-#
-# Revision 1.2  2013/01/20 21:24:29  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.1  2012/06/14 15:01:27  pauloscustodio
-# Split safe strings from strutil.c to safestr.c
-#
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-safestr.t,v 1.7 2013-09-09 00:20:45 pauloscustodio Exp $
 #
 # Test safestr
 
@@ -40,8 +21,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "safestr.o strutil.o die.o except.o";
-ok ! system "make $objs";
+my $objs = "safestr.o strutil.o";
 
 write_file(asm1_file(), {binmode => ':raw'}, "");
 write_file(asm2_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE");
@@ -300,7 +280,17 @@ INIT
 	return 0;
 END
 
-t_run_module([], "", <<'END', 0);
+t_run_module([], <<'OUT', <<'END', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=20, zero-initialized=0 (0.00%), freed=20 (100.00%), remaining=0
+OUT
 Read file test7.asm:
 getchars(3) got 1, ABC
 getchars(3) got 1, DEF
@@ -348,3 +338,29 @@ END
 
 unlink_testfiles();
 done_testing;
+
+
+__END__
+# $Log: whitebox-safestr.t,v $
+# Revision 1.7  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.6  2013/05/07 22:10:56  pauloscustodio
+# sstr_getchars(): get N characters from input, return FALSE on EOF
+#
+# Revision 1.5  2013/05/01 22:23:39  pauloscustodio
+# Added chomp and normalize_eol
+#
+# Revision 1.4  2013/05/01 21:37:50  pauloscustodio
+# Added chset, chcat and getline
+#
+# Revision 1.3  2013/04/06 10:55:15  pauloscustodio
+# SSTR_DEFINE() caused compilation error "C2099: initializer is not a constant" when used to define global variables
+#
+# Revision 1.2  2013/01/20 21:24:29  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.1  2012/06/14 15:01:27  pauloscustodio
+# Split safe strings from strutil.c to safestr.c
+#

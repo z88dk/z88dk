@@ -20,11 +20,9 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test memalloc
-my $objs = "strlist.o strpool.o class.o die.o strutil.o safestr.o except.o init.o errors.o file.o";
-ok ! system "make $objs";
-my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
+my $objs = "strlist.o class.o";
 
-t_compile_module(<<'END_INIT', <<'END', $compile);
+t_compile_module(<<'END_INIT', <<'END', $objs);
 #include "die.h"
 
 #define ERROR return __LINE__
@@ -132,13 +130,13 @@ GLib Memory statistics (successful operations):
         12 |          7 |          7 |          0 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
         36 |          3 |          3 |          0 |          0 |         +0
-        96 |          2 |          2 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=3200, zero-initialized=2156 (67.38%), freed=1428 (44.63%), remaining=1772
+Total bytes: allocated=3104, zero-initialized=2060 (66.37%), freed=1332 (42.91%), remaining=1772
 OUT
 ERR
 
@@ -148,9 +146,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.12 2013-09-08 00:43:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strlist.t,v 1.13 2013-09-09 00:20:45 pauloscustodio Exp $
 # $Log: whitebox-strlist.t,v $
-# Revision 1.12  2013-09-08 00:43:59  pauloscustodio
+# Revision 1.13  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.12  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
 # constants. Allows compiler to type-check error message arguments.
 # Included the errors module in the init() mechanism, no need to call

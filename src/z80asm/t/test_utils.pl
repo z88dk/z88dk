@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.42 2013-09-08 00:37:23 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.43 2013-09-09 00:20:45 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -467,6 +467,9 @@ sub libfile {
 sub t_compile_module {
 	my($init_code, $main_code, $compile_args) = @_;
 
+	# modules to include always
+	$compile_args .= " -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o";
+	
 	# wait for previous run to finish
 	while (-f 'test.exe' && ! unlink('test.exe')) {
 		sleep(1);
@@ -549,10 +552,19 @@ void dump_file ( char *filename )
 	fclose(fp);
 }
 '.$init_code.'
-int main (int argc, char **argv) {
+int user_main (int argc, char **argv) 
+{
 '.$main_code."
 	return 0;
 }
+
+int main (int argc, char **argv) 
+{
+	init_memalloc(); atexit( fini_memalloc );
+	init_strpool(); atexit( fini_strpool );
+	return user_main( argc, argv );
+}
+
 ";
 	
 	write_file("test.c", $main_code);
@@ -1000,7 +1012,11 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.42  2013-09-08 00:37:23  pauloscustodio
+# Revision 1.43  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.42  2013/09/08 00:37:23  pauloscustodio
 # Call winmergeu to show differences in test results
 #
 # Revision 1.41  2013/09/01 18:31:04  pauloscustodio

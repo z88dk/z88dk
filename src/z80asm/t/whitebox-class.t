@@ -21,9 +21,7 @@ require 't/test_utils.pl';
 
 # test class
 
-my $objs = "die.o except.o strutil.o safestr.o init.o strpool.o errors.o file.o strlist.o";
-ok ! system "make $objs";
-my $compile = "-DCLASS_DEBUG -DMEMALLOC_DEBUG class.c memalloc.c $objs";
+my $objs = "-DCLASS_DEBUG class.c";
 
 my $init = <<'END';
 CLASS(Name)
@@ -79,7 +77,7 @@ void Person_fini (Person *self)
 END
 
 
-t_compile_module($init, <<'END', $compile);
+t_compile_module($init, <<'END', $objs);
 	Person *p1, *p2;
 	int test;
 	
@@ -130,12 +128,9 @@ GLib Memory statistics (successful operations):
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
         20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=1888, zero-initialized=1868 (98.94%), freed=116 (6.14%), remaining=1772
+Total bytes: allocated=20, zero-initialized=0 (0.00%), freed=20 (100.00%), remaining=0
 END
 
 
@@ -150,12 +145,9 @@ GLib Memory statistics (successful operations):
         20 |          1 |          1 |          0 |          0 |         +0
         32 |          1 |          1 |          0 |          0 |         +0
         36 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=1961, zero-initialized=1936 (98.73%), freed=189 (9.64%), remaining=1772
+Total bytes: allocated=93, zero-initialized=68 (73.12%), freed=93 (100.00%), remaining=0
 OUT
 Person_init ADDR_1
 Name_init ADDR_2
@@ -181,12 +173,9 @@ GLib Memory statistics (successful operations):
         20 |          1 |          1 |          0 |          0 |         +0
         32 |          2 |          2 |          0 |          0 |         +0
         36 |          2 |          2 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=2034, zero-initialized=2004 (98.53%), freed=262 (12.88%), remaining=1772
+Total bytes: allocated=166, zero-initialized=136 (81.93%), freed=166 (100.00%), remaining=0
 OUT
 Person_init ADDR_1
 Name_init ADDR_2
@@ -220,12 +209,9 @@ GLib Memory statistics (successful operations):
         20 |          1 |          1 |          0 |          0 |         +0
         32 |          2 |          2 |          0 |          0 |         +0
         36 |          2 |          2 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=2034, zero-initialized=2004 (98.53%), freed=262 (12.88%), remaining=1772
+Total bytes: allocated=166, zero-initialized=136 (81.93%), freed=166 (100.00%), remaining=0
 OUT
 Person_init ADDR_1
 Name_init ADDR_2
@@ -259,12 +245,9 @@ GLib Memory statistics (successful operations):
         20 |          1 |          1 |          0 |          0 |         +0
         32 |          2 |          2 |          0 |          0 |         +0
         36 |          2 |          2 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=2034, zero-initialized=2004 (98.53%), freed=262 (12.88%), remaining=1772
+Total bytes: allocated=166, zero-initialized=136 (81.93%), freed=166 (100.00%), remaining=0
 OUT
 Person_init ADDR_1
 Name_init ADDR_2
@@ -292,9 +275,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.10 2013-09-08 08:29:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.11 2013-09-09 00:20:45 pauloscustodio Exp $
 # $Log: whitebox-class.t,v $
-# Revision 1.10  2013-09-08 08:29:21  pauloscustodio
+# Revision 1.11  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.10  2013/09/08 08:29:21  pauloscustodio
 # Replaced xmalloc et al with g_malloc0 et al.
 #
 # Revision 1.9  2013/09/08 00:43:59  pauloscustodio

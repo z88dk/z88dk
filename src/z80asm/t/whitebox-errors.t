@@ -24,12 +24,13 @@ require 't/test_utils.pl';
 # test errors.c
 unlink_testfiles();
 
-my $objs = "errors.o memalloc.o class.o die.o strutil.o strhash.o safestr.o strpool.o except.o ".
-		   "strlist.o file.o init.o";
+my $objs = "errors.o file.o class.o safestr.o strlist.o strutil.o";
 
 t_compile_module('', <<'END', $objs);
 #define ERROR return __LINE__
 #define check_count(e) if (get_num_errors() != e) ERROR;
+
+	init_errors(); atexit( fini_errors );
 
 	check_count(0);
 	
@@ -51,6 +52,32 @@ t_compile_module('', <<'END', $objs);
 END
 
 t_run_module([], <<'OUT', <<'ERR', 1);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        12 |          3 |          0 |          0 |          3 |         +0
+        13 |          0 |          1 |          1 |          0 |         +0
+        18 |          1 |          0 |          0 |          1 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        24 |          3 |          3 |          1 |          1 |         +0
+        25 |          0 |          0 |          1 |          1 |         +0
+        26 |          0 |          1 |          1 |          0 |         +0
+        28 |          0 |          1 |          1 |          0 |         +0
+        33 |          0 |          0 |          1 |          1 |         +0
+        34 |          0 |          1 |          1 |          0 |         +0
+        36 |          0 |          0 |          1 |          1 |         +0
+        44 |          4 |          1 |          0 |          3 |         +0
+        50 |          0 |          0 |          1 |          1 |         +0
+        66 |          0 |          0 |          1 |          1 |         +0
+        88 |          0 |          3 |          3 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2789, zero-initialized=1868 (66.98%), freed=1017 (36.46%), remaining=1772
 OUT
 Information
 0 errors occurred during assembly
@@ -77,6 +104,9 @@ t_compile_module('', <<'END', $objs);
 	
 #define DOUBLE(x) #x #x
 	int _count;
+
+	init_errors(); atexit( fini_errors );
+
 	check_count(0);
 	
 	warn("Fatal error\n");
@@ -127,6 +157,33 @@ t_compile_module('', <<'END', $objs);
 END
 
 t_run_module([], <<'OUT', <<'ERR', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+         8 |          0 |          4 |          4 |          0 |         +0
+        12 |         25 |          0 |          0 |         25 |         +0
+        13 |          0 |         13 |         13 |          0 |         +0
+        15 |          0 |          4 |          4 |          0 |         +0
+        17 |          0 |          4 |          4 |          0 |         +0
+        18 |          1 |          0 |          0 |          1 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        24 |         13 |         13 |         21 |         21 |         +0
+        28 |          0 |          1 |          1 |          0 |         +0
+        32 |          1 |          1 |          0 |          0 |         +0
+        36 |          0 |          0 |          1 |          1 |         +0
+        40 |          1 |          1 |          0 |          0 |         +0
+        44 |         27 |         14 |          0 |         13 |         +0
+        88 |          0 |         13 |         13 |          0 |         +0
+        96 |          2 |          2 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+       384 |          1 |          1 |          0 |          0 |         +0
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=7323, zero-initialized=2464 (33.65%), freed=5551 (75.80%), remaining=1772
 OUT
 Fatal error
 Error: cannot read file 'file.asm'
@@ -162,9 +219,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.8 2013-09-08 00:43:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.9 2013-09-09 00:20:45 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.8  2013-09-08 00:43:59  pauloscustodio
+# Revision 1.9  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.8  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
 # constants. Allows compiler to type-check error message arguments.
 # Included the errors module in the init() mechanism, no need to call

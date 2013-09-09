@@ -18,11 +18,9 @@ use Test::More;
 require 't/test_utils.pl';
 
 # test memalloc
-my $objs = "strhash.o class.o die.o strutil.o safestr.o except.o init.o strpool.o errors.o file.o strlist.o";
-ok ! system "make $objs";
-my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
+my $objs = "strhash.o class.o "; 
 
-t_compile_module(<<'END_INIT', <<'END', $compile);
+t_compile_module(<<'END_INIT', <<'END', $objs);
 
 #define ERROR return __LINE__
 
@@ -371,14 +369,14 @@ GLib Memory statistics (successful operations):
         32 |         25 |         25 |          0 |          0 |         +0
         40 |         16 |         16 |          0 |          0 |         +0
         44 |          6 |          6 |          0 |          0 |         +0
-        96 |          2 |          2 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        384 |          6 |          6 |          0 |          0 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=7196, zero-initialized=5972 (82.99%), freed=5424 (75.38%), remaining=1772
+Total bytes: allocated=7100, zero-initialized=5876 (82.76%), freed=5328 (75.04%), remaining=1772
 OUT
 ERR
 
@@ -388,9 +386,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classhash.t,v 1.7 2013-09-08 08:29:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classhash.t,v 1.8 2013-09-09 00:20:45 pauloscustodio Exp $
 # $Log: whitebox-classhash.t,v $
-# Revision 1.7  2013-09-08 08:29:21  pauloscustodio
+# Revision 1.8  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.7  2013/09/08 08:29:21  pauloscustodio
 # Replaced xmalloc et al with g_malloc0 et al.
 #
 # Revision 1.6  2013/09/08 00:43:59  pauloscustodio

@@ -12,42 +12,8 @@
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
 # Copyright (C) Paulo Custodio, 2011-2013
-
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.10 2013-04-29 22:24:33 pauloscustodio Exp $
-# $Log: whitebox-strutil.t,v $
-# Revision 1.10  2013-04-29 22:24:33  pauloscustodio
-# Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
 #
-# Revision 1.9  2013/02/22 17:21:29  pauloscustodio
-# Added chomp()
-#
-# Revision 1.8  2013/01/20 21:24:29  pauloscustodio
-# Updated copyright year to 2013
-#
-# Revision 1.7  2012/06/14 15:01:27  pauloscustodio
-# Split safe strings from strutil.c to safestr.c
-#
-# Revision 1.6  2012/06/07 11:49:59  pauloscustodio
-# stricompare() instead of Flncmp()
-#
-# Revision 1.5  2012/06/06 22:42:57  pauloscustodio
-# BUG_0021 : Different behaviour in string truncation in strutil in Linux and Win32
-#
-# Revision 1.4  2012/05/26 18:50:26  pauloscustodio
-# Use .o instead of .c to build test program, faster compilation.
-# Use gcc to compile instead of cc.
-#
-# Revision 1.3  2012/05/26 17:46:01  pauloscustodio
-# Put back strtoupper, strupr does not exist in all systems, was causing nightly build to fail
-#
-# Revision 1.2  2012/05/24 15:07:03  pauloscustodio
-# Rename safestr_t to sstr_t, keep length to speed-up appending chars
-#
-# Revision 1.1  2012/05/22 20:26:17  pauloscustodio
-# Safe strings
-# New type sstr_t to hold strings with size to prevent buffer overruns.
-# Remove strtoupper, use POSIX strupr instead
-#
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.11 2013-09-09 00:20:45 pauloscustodio Exp $
 #
 # Test strutil
 
@@ -56,7 +22,6 @@ use Test::More;
 require 't/test_utils.pl';
 
 my $objs = "strutil.o";
-ok ! system "make $objs";
 
 t_compile_module('', <<'END', $objs);
 #define ERROR return __LINE__
@@ -116,7 +81,58 @@ t_compile_module('', <<'END', $objs);
 	return 0;
 END
 
-t_run_module([], "", "", 0);
+t_run_module([], <<'OUT', "", 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=20, zero-initialized=0 (0.00%), freed=20 (100.00%), remaining=0
+OUT
 
 unlink_testfiles();
 done_testing;
+
+
+__END__
+# $Log: whitebox-strutil.t,v $
+# Revision 1.11  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.10  2013/04/29 22:24:33  pauloscustodio
+# Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
+#
+# Revision 1.9  2013/02/22 17:21:29  pauloscustodio
+# Added chomp()
+#
+# Revision 1.8  2013/01/20 21:24:29  pauloscustodio
+# Updated copyright year to 2013
+#
+# Revision 1.7  2012/06/14 15:01:27  pauloscustodio
+# Split safe strings from strutil.c to safestr.c
+#
+# Revision 1.6  2012/06/07 11:49:59  pauloscustodio
+# stricompare() instead of Flncmp()
+#
+# Revision 1.5  2012/06/06 22:42:57  pauloscustodio
+# BUG_0021 : Different behaviour in string truncation in strutil in Linux and Win32
+#
+# Revision 1.4  2012/05/26 18:50:26  pauloscustodio
+# Use .o instead of .c to build test program, faster compilation.
+# Use gcc to compile instead of cc.
+#
+# Revision 1.3  2012/05/26 17:46:01  pauloscustodio
+# Put back strtoupper, strupr does not exist in all systems, was causing nightly build to fail
+#
+# Revision 1.2  2012/05/24 15:07:03  pauloscustodio
+# Rename safestr_t to sstr_t, keep length to speed-up appending chars
+#
+# Revision 1.1  2012/05/22 20:26:17  pauloscustodio
+# Safe strings
+# New type sstr_t to hold strings with size to prevent buffer overruns.
+# Remove strtoupper, use POSIX strupr instead
+#

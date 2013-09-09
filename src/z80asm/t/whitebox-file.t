@@ -20,12 +20,9 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "file.o errors.o strlist.o strhash.o class.o ".
-		   "die.o strutil.o safestr.o except.o init.o strpool.o";
-my $objs_r = "$objs                  memalloc.o";
-my $objs_d = "$objs -DMEMALLOC_DEBUG memalloc.c";
+my $objs = "file.o class.o strlist.o safestr.o errors.o strutil.o";
 
-t_compile_module('', <<'END', $objs_r);
+t_compile_module('', <<'END', $objs);
 	SzList *list;
 	
 	if (argv[2][0] == '0')
@@ -54,20 +51,190 @@ write_file('x2/f2', "");
 write_file('x3/f2', "");
 write_file('x3/f3', "");
 
-t_run_module(['f0', '0'], "f0\n", "", 0);
-t_run_module(['f1', '0'], "f1\n", "", 0);
-t_run_module(['f2', '0'], "f2\n", "", 0);
-t_run_module(['f3', '0'], "f3\n", "", 0);
-t_run_module(['f4', '0'], "f4\n", "", 0);
+t_run_module(['f0', '0'], <<'OUT', "", 0);
+f0
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
+OUT
 
-t_run_module(['f0', '1'], "f0\n", "", 0);
-t_run_module(['f1', '1'], "x1/f1\n", "", 0);
-t_run_module(['f2', '1'], "x2/f2\n", "", 0);
-t_run_module(['f3', '1'], "x3/f3\n", "", 0);
-t_run_module(['f4', '1'], "f4\n", "", 0);
+t_run_module(['f1', '0'], <<'OUT', "", 0);
+f1
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
+OUT
+
+t_run_module(['f2', '0'], <<'OUT', "", 0);
+f2
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
+OUT
+
+t_run_module(['f3', '0'], <<'OUT', "", 0);
+f3
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
+OUT
+
+t_run_module(['f4', '0'], <<'OUT', "", 0);
+f4
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
+OUT
+
+
+t_run_module(['f0', '1'], <<'OUT', "", 0);
+f0
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        12 |          3 |          3 |          0 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        36 |          1 |          1 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2984, zero-initialized=1940 (65.01%), freed=1212 (40.62%), remaining=1772
+OUT
+
+t_run_module(['f1', '1'], <<'OUT', "", 0);
+x1/f1
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        12 |          3 |          3 |          0 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        36 |          1 |          1 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2984, zero-initialized=1940 (65.01%), freed=1212 (40.62%), remaining=1772
+OUT
+
+t_run_module(['f2', '1'], <<'OUT', "", 0);
+x2/f2
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        12 |          3 |          3 |          0 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        36 |          1 |          1 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2984, zero-initialized=1940 (65.01%), freed=1212 (40.62%), remaining=1772
+OUT
+
+t_run_module(['f3', '1'], <<'OUT', "", 0);
+x3/f3
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        12 |          3 |          3 |          0 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        36 |          1 |          1 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2984, zero-initialized=1940 (65.01%), freed=1212 (40.62%), remaining=1772
+OUT
+
+t_run_module(['f4', '1'], <<'OUT', "", 0);
+f4
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        12 |          3 |          3 |          0 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        36 |          1 |          1 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2984, zero-initialized=1940 (65.01%), freed=1212 (40.62%), remaining=1772
+OUT
+
 
 # test file manipulation
-t_compile_module('', <<'END', $objs_r);
+t_compile_module('', <<'END', $objs);
 #define T1(init, func, result) \
 		strcpy( file, init); \
 		p = func; \
@@ -121,10 +288,21 @@ t_compile_module('', <<'END', $objs_r);
 	T2((map_filename_ext("./abc.xpt")),		"./abc.map");
 END
 
-t_run_module([], "", "", 0);
+t_run_module([], <<'OUT', <<'ERR', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=20, zero-initialized=0 (0.00%), freed=20 (100.00%), remaining=0
+OUT
+ERR
 
 # test file IO
-t_compile_module('', <<'END', $objs_d);
+t_compile_module('', <<'END', $objs);
 /* 256 characters */
 #define BIG_STR "1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
 				"1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
@@ -447,14 +625,14 @@ GLib Memory statistics (successful operations):
         40 |          1 |          1 |          0 |          0 |         +0
         44 |         29 |          1 |          0 |         28 |         +0
         88 |          0 |         28 |         28 |          0 |         +0
-        96 |          2 |          2 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        384 |          1 |          1 |          0 |          0 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=10222, zero-initialized=2464 (24.10%), freed=8450 (82.66%), remaining=1772
+Total bytes: allocated=10126, zero-initialized=2368 (23.39%), freed=8354 (82.50%), remaining=1772
 OUT
 
 ---- TEST: xfopen ----
@@ -625,9 +803,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.14 2013-09-08 00:43:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.15 2013-09-09 00:20:45 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.14  2013-09-08 00:43:59  pauloscustodio
+# Revision 1.15  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.14  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
 # constants. Allows compiler to type-check error message arguments.
 # Included the errors module in the init() mechanism, no need to call

@@ -20,11 +20,8 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-# test scan
-my $objs = "scan.o scan_token.o scan_struct.o scan_context.o class.o die.o strutil.o safestr.o ".
-		   "except.o errors.o dynstr.o strpool.o srcfile.o strhash.o strlist.o file.o init.o";
-ok ! system "make $objs parse.h";
-my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
+my $objs = "scan.o class.o dynstr.o errors.o strutil.o file.o safestr.o strlist.o srcfile.o";
+ok ! system "make parse.h";
 
 # build list of case TOKEN: return "TOKEN" from parse.h
 my @token_case;
@@ -180,7 +177,7 @@ write_file('x2/f3', {binmode => ':raw'},
 			"ld b," . '0' x 20000 . "1\n");
 
 # test yy_input
-t_compile_module($init, <<'END', $compile);
+t_compile_module($init, <<'END', $objs);
 	int yy_input( char *buffer, size_t size );
 	FILE *fp;
 	int read, i, j;
@@ -243,7 +240,7 @@ GLib Memory statistics (successful operations):
         40 |         13 |         13 |          0 |          0 |         +0
         44 |          1 |          1 |          0 |          0 |         +0
         48 |         22 |         22 |          0 |          0 |         +0
-        96 |          3 |          3 |          0 |          0 |         +0
+        96 |          2 |          2 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        256 |          0 |         11 |         11 |          0 |         +0
        384 |          2 |          2 |          0 |          0 |         +0
@@ -252,7 +249,7 @@ GLib Memory statistics (successful operations):
    >  4096 |         11 |         11 |          0 |          0 |        ***
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=188786, zero-initialized=184890 (97.94%), freed=187014 (99.06%), remaining=1772
+Total bytes: allocated=188690, zero-initialized=184794 (97.94%), freed=186918 (99.06%), remaining=1772
 OUT
 Read file test1.asm:
 Token: (0) NULL
@@ -307,7 +304,7 @@ END
 
 
 # tests without error catching
-t_compile_module($init, <<'END', $compile);
+t_compile_module($init, <<'END', $objs);
 	
 	add_source_file_path("x1");
 	add_source_file_path("x2");
@@ -392,7 +389,7 @@ GLib Memory statistics (successful operations):
         44 |         10 |          3 |          0 |          7 |         +0
         48 |         33 |         33 |          1 |          1 |         +0
         88 |          0 |          7 |          7 |          0 |         +0
-        96 |          2 |          2 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        256 |          0 |         12 |         13 |          1 |         +0
        384 |          1 |          1 |          0 |          0 |         +0
@@ -414,7 +411,7 @@ GLib Memory statistics (successful operations):
    >  4096 |          6 |          7 |         65 |         64 |        ***
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=951024, zero-initialized=103252 (10.86%), freed=949252 (99.81%), remaining=1772
+Total bytes: allocated=950928, zero-initialized=103156 (10.85%), freed=949156 (99.81%), remaining=1772
 OUT
 Test: Read before start
 Token: (0) NULL
@@ -848,7 +845,7 @@ END
 
 
 # test circular includes
-t_compile_module($init, <<'END', $compile);
+t_compile_module($init, <<'END', $objs);
 	int ret = 1;
 
     TRY
@@ -893,7 +890,7 @@ GLib Memory statistics (successful operations):
         44 |          4 |          1 |          0 |          3 |         +0
         48 |          2 |          2 |          0 |          0 |         +0
         88 |          0 |          3 |          3 |          0 |         +0
-        96 |          2 |          2 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        256 |          0 |          1 |          1 |          0 |         +0
        384 |          1 |          1 |          0 |          0 |         +0
@@ -902,7 +899,7 @@ GLib Memory statistics (successful operations):
    >  4096 |          1 |          1 |          0 |          0 |        ***
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=20987, zero-initialized=19070 (90.87%), freed=19215 (91.56%), remaining=1772
+Total bytes: allocated=20891, zero-initialized=18974 (90.82%), freed=19119 (91.52%), remaining=1772
 OUT
 Test: open text file
 List:f0:1:F0 1
@@ -921,7 +918,7 @@ END
 
 
 # test open file error
-t_compile_module($init, <<'END', $compile);
+t_compile_module($init, <<'END', $objs);
 	int ret = 1;
 
     TRY
@@ -966,7 +963,7 @@ GLib Memory statistics (successful operations):
         44 |          4 |          1 |          0 |          3 |         +0
         48 |          2 |          2 |          0 |          0 |         +0
         88 |          0 |          3 |          3 |          0 |         +0
-        96 |          2 |          2 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        256 |          0 |          1 |          1 |          0 |         +0
        384 |          1 |          1 |          0 |          0 |         +0
@@ -975,7 +972,7 @@ GLib Memory statistics (successful operations):
    >  4096 |          1 |          1 |          0 |          0 |        ***
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=20963, zero-initialized=19070 (90.97%), freed=19191 (91.55%), remaining=1772
+Total bytes: allocated=20867, zero-initialized=18974 (90.93%), freed=19095 (91.51%), remaining=1772
 OUT
 Test: open text file
 List:f0:1:F0 1
@@ -1000,9 +997,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.12 2013-09-08 08:29:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.13 2013-09-09 00:20:45 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.12  2013-09-08 08:29:21  pauloscustodio
+# Revision 1.13  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.12  2013/09/08 08:29:21  pauloscustodio
 # Replaced xmalloc et al with g_malloc0 et al.
 #
 # Revision 1.11  2013/09/08 00:43:59  pauloscustodio

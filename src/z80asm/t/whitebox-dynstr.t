@@ -19,10 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "dynstr.o class.o die.o safestr.o strutil.o except.o init.o strpool.o errors.o file.o strlist.o";
-ok ! system "make $objs";
-
-my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
+my $objs = "class.o dynstr.o strutil.o";
 
 write_file(asm1_file(), {binmode => ':raw'}, "");
 write_file(asm2_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE");
@@ -32,7 +29,7 @@ write_file(asm5_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\r\n");
 write_file(asm6_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\n\r");
 
 
-t_compile_module(<<'END_INIT', <<'END', $compile);
+t_compile_module(<<'END_INIT', <<'END', $objs);
 #include "die.h"
 
 #define ERROR return __LINE__
@@ -288,14 +285,11 @@ GLib Memory statistics (successful operations):
          1 |          0 |          0 |          4 |          4 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
         40 |          2 |          2 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
        256 |          1 |          2 |          4 |          3 |         +0
        512 |          0 |          0 |          2 |          2 |         +0
-      1016 |          1 |          0 |          0 |          0 |      +1016
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=4276, zero-initialized=2204 (51.54%), freed=2504 (58.56%), remaining=1772
+Total bytes: allocated=2408, zero-initialized=336 (13.95%), freed=2408 (100.00%), remaining=0
 OUT
 init
 Str_unreserve
@@ -356,9 +350,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.9 2013-09-08 00:43:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.10 2013-09-09 00:20:45 pauloscustodio Exp $
 # $Log: whitebox-dynstr.t,v $
-# Revision 1.9  2013-09-08 00:43:59  pauloscustodio
+# Revision 1.10  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.9  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
 # constants. Allows compiler to type-check error message arguments.
 # Included the errors module in the init() mechanism, no need to call

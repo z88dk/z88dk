@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.14 2013-09-08 08:29:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-memalloc.t,v 1.15 2013-09-09 00:20:45 pauloscustodio Exp $
 #
 # Test memory allocation
 
@@ -21,12 +21,10 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "die.o except.o strutil.o safestr.o init.o strpool.o errors.o file.o class.o strlist.o";
-ok ! system "make $objs";
-my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
+my $objs = "";
 
 # show memory leaks
-t_compile_module("", <<'END', $compile);
+t_compile_module("", <<'END', $objs);
 	char * p1 = g_malloc0(100);
 	char * p2 = g_malloc0(100);
 END
@@ -37,13 +35,10 @@ GLib Memory statistics (successful operations):
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
         20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
        100 |          2 |          0 |          0 |          0 |       +200
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=2088, zero-initialized=2068 (99.04%), freed=116 (5.56%), remaining=1972
+Total bytes: allocated=220, zero-initialized=200 (90.91%), freed=20 (9.09%), remaining=200
 END
 
 unlink_testfiles();
@@ -52,7 +47,11 @@ done_testing;
 
 __END__
 # $Log: whitebox-memalloc.t,v $
-# Revision 1.14  2013-09-08 08:29:21  pauloscustodio
+# Revision 1.15  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.14  2013/09/08 08:29:21  pauloscustodio
 # Replaced xmalloc et al with g_malloc0 et al.
 #
 # Revision 1.13  2013/09/08 00:43:59  pauloscustodio

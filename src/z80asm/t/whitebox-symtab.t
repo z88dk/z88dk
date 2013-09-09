@@ -17,10 +17,10 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "-DMEMALLOC_DEBUG memalloc.c ".
-		   "sym.o symtab.o symref.o ".
-		   "class.o strpool.o strutil.o safestr.o strlist.o strhash.o ".
-		   "file.o errors.o die.o except.o init.o";
+my $objs = "sym.o symtab.o symref.o class.o safestr.o strhash.o errors.o strutil.o file.o strlist.o";
+#		   strpool.o ".
+#		   " die.o except.o init.o ".
+#		   "codearea.o listfile.o dynstr.o hist.o sym.o symref.o";
 
 my $init = <<'END';
 #include "symbol.h"
@@ -230,14 +230,14 @@ GLib Memory statistics (successful operations):
         40 |         35 |         35 |          0 |          0 |         +0
         44 |          6 |          6 |          0 |          0 |         +0
         48 |         19 |         19 |          0 |          0 |         +0
-        96 |          3 |          3 |          0 |          0 |         +0
+        96 |          2 |          2 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        384 |          7 |          7 |          0 |          0 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=9820, zero-initialized=8776 (89.37%), freed=8048 (81.96%), remaining=1772
+Total bytes: allocated=9724, zero-initialized=8680 (89.26%), freed=7952 (81.78%), remaining=1772
 OUT
 
 ---- TEST: Create current module ----
@@ -334,9 +334,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.11 2013-09-08 00:43:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.12 2013-09-09 00:20:45 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.11  2013-09-08 00:43:59  pauloscustodio
+# Revision 1.12  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.11  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
 # constants. Allows compiler to type-check error message arguments.
 # Included the errors module in the init() mechanism, no need to call

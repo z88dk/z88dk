@@ -18,11 +18,9 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-# test memalloc
-my $objs = "class.o die.o strutil.o safestr.o except.o init.o strpool.o errors.o file.o strlist.o";
-my $compile = "-DMEMALLOC_DEBUG memalloc.c $objs";
+my $objs = "class.o";
 
-t_compile_module(<<'END_INIT', <<'END', $compile);
+t_compile_module(<<'END_INIT', <<'END', $objs);
 
 #define ERROR return __LINE__
 
@@ -248,13 +246,10 @@ GLib Memory statistics (successful operations):
         20 |          1 |          1 |          0 |          0 |         +0
         32 |         12 |         12 |          0 |          0 |         +0
         60 |          2 |          2 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
        100 |         12 |         12 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=3592, zero-initialized=3572 (99.44%), freed=1820 (50.67%), remaining=1772
+Total bytes: allocated=1724, zero-initialized=1704 (98.84%), freed=1724 (100.00%), remaining=0
 OUT
 start
 ring = ""
@@ -760,9 +755,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.6 2013-09-08 08:29:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.7 2013-09-09 00:20:45 pauloscustodio Exp $
 # $Log: whitebox-classring.t,v $
-# Revision 1.6  2013-09-08 08:29:21  pauloscustodio
+# Revision 1.7  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.6  2013/09/08 08:29:21  pauloscustodio
 # Replaced xmalloc et al with g_malloc0 et al.
 #
 # Revision 1.5  2013/09/08 00:43:59  pauloscustodio

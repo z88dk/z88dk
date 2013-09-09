@@ -19,9 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "-DMEMALLOC_DEBUG memalloc.c ".
-		   "objfile.o class.o file.o ".
-		   "strutil.o safestr.o strlist.o strhash.o errors.o die.o except.o init.o strpool.o";
+my $objs = "objfile.o class.o file.o safestr.o errors.o strlist.o strutil.o";
 
 t_compile_module('', <<'END', $objs);
 
@@ -157,14 +155,14 @@ GLib Memory statistics (successful operations):
         48 |          0 |          0 |          2 |          2 |         +0
         80 |          3 |          3 |          0 |          0 |         +0
         88 |          0 |          3 |          3 |          0 |         +0
-        96 |          2 |          2 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
        384 |          1 |          1 |          0 |          0 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=4536, zero-initialized=2704 (59.61%), freed=2764 (60.93%), remaining=1772
+Total bytes: allocated=4440, zero-initialized=2608 (58.74%), freed=2668 (60.09%), remaining=1772
 OUT
 
 ---- TEST: File not found, test mode ----
@@ -208,9 +206,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.5 2013-09-08 00:43:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.6 2013-09-09 00:20:45 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.5  2013-09-08 00:43:59  pauloscustodio
+# Revision 1.6  2013-09-09 00:20:45  pauloscustodio
+# Add default set of modules to t_compile_module:
+# -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
+#
+# Revision 1.5  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
 # constants. Allows compiler to type-check error message arguments.
 # Included the errors module in the init() mechanism, no need to call
