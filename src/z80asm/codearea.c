@@ -14,91 +14,9 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 Manage the code area in memory
-*/
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.15 2013-09-08 08:29:21 pauloscustodio Exp $ */
-/* $Log: codearea.c,v $
-/* Revision 1.15  2013-09-08 08:29:21  pauloscustodio
-/* Replaced xmalloc et al with g_malloc0 et al.
-/*
-/* Revision 1.14  2013/09/08 00:43:58  pauloscustodio
-/* New error module with one error function per error, no need for the error
-/* constants. Allows compiler to type-check error message arguments.
-/* Included the errors module in the init() mechanism, no need to call
-/* error initialization from main(). Moved all error-testing scripts to
-/* one file errors.t.
-/*
-/* Revision 1.13  2013/09/01 00:18:28  pauloscustodio
-/* - Replaced e4c exception mechanism by a much simpler one based on a few
-/*   macros. The former did not allow an exit(1) to be called within a
-/*   try-catch block.
-/*
-/* Revision 1.12  2013/05/12 19:39:32  pauloscustodio
-/* warnings
-/*
-/* Revision 1.11  2013/03/30 00:02:22  pauloscustodio
-/* include memalloc.h before any other include
-/*
-/* Revision 1.10  2013/02/22 17:19:19  pauloscustodio
-/* Add listfile interface to append bytes to the listing
-/* Remove oldPC - no longer needed with new listfile
-/* Solve memory leak
-/*
-/* Revision 1.9  2013/01/24 23:03:03  pauloscustodio
-/* Replaced (unsigned char) by (byte_t)
-/* Replaced (unisigned int) by (size_t)
-/* Replaced (short) by (int)
-/*
-/* Revision 1.8  2013/01/20 21:24:28  pauloscustodio
-/* Updated copyright year to 2013
-/*
-/* Revision 1.7  2012/05/26 18:51:10  pauloscustodio
-/* CH_0012 : wrappers on OS calls to raise fatal error
-/* CH_0013 : new errors interface to decouple calling code from errors.c
-/*
-/* Revision 1.6  2012/05/24 17:09:27  pauloscustodio
-/* Unify copyright header
-/*
-/* Revision 1.5  2012/05/24 16:18:53  pauloscustodio
-/* Let garbage collector do memory release atexit()
-/*
-/* Revision 1.4  2012/05/20 06:02:08  pauloscustodio
-/* Garbage collector
-/* Added automatic garbage collection on exit and simple fence mechanism
-/* to detect buffer underflow and overflow, to memalloc functions.
-/* No longer needed to call init_malloc().
-/* No longer need to try/catch during creation of memory structures to
-/* free partially created data - all not freed data is freed atexit().
-/* Renamed xfree0() to xfree().
-/*
-/* Revision 1.3  2012/05/11 19:29:49  pauloscustodio
-/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
-/*         --mode=c
-/*         --lineend=linux
-/*         --indent=spaces=4
-/*         --style=ansi --add-brackets
-/*         --indent-switches --indent-classes
-/*         --indent-preprocessor --convert-tabs
-/*         --break-blocks
-/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
-/*         --align-pointer=name
-/*
-/* Revision 1.2  2011/10/07 17:53:04  pauloscustodio
-/* BUG_0015 : Relocation issue - dubious addresses come out of linking
-/* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
-/* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
-/* - This caused the problem because CODESIZE keeps track of the start offset of each module in the sequence they will appear in the object file, and codeptr is reset to the start of the codearea for each module.
-/* The effect was that all address calculations at link phase were considering
-/*  a start offset of zero for all modules.
-/* - Moreover, when linking modules from a libary, the modules are pulled in to the code area as they are needed, and not in the sequence they will be in the object file. The start offset was being ignored and the modules were being loaded in the incorrect order
-/* - Consequence of these two issues were all linked addresses wrong.
-/*
-/* Revision 1.1  2011/08/19 15:53:58  pauloscustodio
-/* BUG_0010 : heap corruption when reaching MAXCODESIZE
-/* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
-/* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
-/*
-/* */
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.16 2013-09-09 00:15:11 pauloscustodio Exp $
+*/
 
 #include "memalloc.h"   /* before any other include */
 
@@ -123,38 +41,20 @@ static size_t codesize;                 /* size of all modules before current,
 static size_t PC;		                /* Program Counter */
 
 /*-----------------------------------------------------------------------------
-*   cleanup memory on exit
+*   Initialize and Terminate module
 *----------------------------------------------------------------------------*/
-static void fini_codearea_module( void )
+void init_codearea(void)
 {
-	if ( codearea != NULL )
-	{
-		g_free( codearea );
-	}
-}
-
-/*-----------------------------------------------------------------------------
-*   init_codearea_module
-*       Alloc all global structures
-*----------------------------------------------------------------------------*/
-void init_codearea_module( void )
-{
-	static BOOL initialized = FALSE;
-
     /* allocate memory for Z80 machine code */
     codearea = (byte_t *) g_malloc0_n( MAXCODESIZE, sizeof( char ) );
-	if ( ! initialized ) 
-	{
-		atexit( fini_codearea_module );
-		initialized = TRUE;
-	}
 
-    init_codearea();                    /* init vars */
+    reset_codearea();	/* init vars */
+    codesize  = 0;		/* marks start of each new module, always incremented, BUG_0015 */
+}
 
-    codesize  = 0;                      /* marks start of each new module,
-                                           always incremented
-                                           BUG_0015 */
-
+void fini_codearea(void)
+{
+	g_free( codearea );
 }
 
 /*-----------------------------------------------------------------------------
@@ -178,7 +78,7 @@ size_t get_PC( void )
 /*-----------------------------------------------------------------------------
 *   init the code area, return current size
 *----------------------------------------------------------------------------*/
-void init_codearea( void )
+void reset_codearea( void )
 {
     codeindex = 0;                      /* where to store next opcode byte */
     set_PC( 0 );
@@ -308,3 +208,90 @@ byte_t get_byte( size_t *paddr )
     return byte;
 }
 
+
+/* */
+/* $Log: codearea.c,v $
+/* Revision 1.16  2013-09-09 00:15:11  pauloscustodio
+/* Integrate codearea in init() mechanism.
+/*
+/* Revision 1.15  2013/09/08 08:29:21  pauloscustodio
+/* Replaced xmalloc et al with g_malloc0 et al.
+/*
+/* Revision 1.14  2013/09/08 00:43:58  pauloscustodio
+/* New error module with one error function per error, no need for the error
+/* constants. Allows compiler to type-check error message arguments.
+/* Included the errors module in the init() mechanism, no need to call
+/* error initialization from main(). Moved all error-testing scripts to
+/* one file errors.t.
+/*
+/* Revision 1.13  2013/09/01 00:18:28  pauloscustodio
+/* - Replaced e4c exception mechanism by a much simpler one based on a few
+/*   macros. The former did not allow an exit(1) to be called within a
+/*   try-catch block.
+/*
+/* Revision 1.12  2013/05/12 19:39:32  pauloscustodio
+/* warnings
+/*
+/* Revision 1.11  2013/03/30 00:02:22  pauloscustodio
+/* include memalloc.h before any other include
+/*
+/* Revision 1.10  2013/02/22 17:19:19  pauloscustodio
+/* Add listfile interface to append bytes to the listing
+/* Remove oldPC - no longer needed with new listfile
+/* Solve memory leak
+/*
+/* Revision 1.9  2013/01/24 23:03:03  pauloscustodio
+/* Replaced (unsigned char) by (byte_t)
+/* Replaced (unisigned int) by (size_t)
+/* Replaced (short) by (int)
+/*
+/* Revision 1.8  2013/01/20 21:24:28  pauloscustodio
+/* Updated copyright year to 2013
+/*
+/* Revision 1.7  2012/05/26 18:51:10  pauloscustodio
+/* CH_0012 : wrappers on OS calls to raise fatal error
+/* CH_0013 : new errors interface to decouple calling code from errors.c
+/*
+/* Revision 1.6  2012/05/24 17:09:27  pauloscustodio
+/* Unify copyright header
+/*
+/* Revision 1.5  2012/05/24 16:18:53  pauloscustodio
+/* Let garbage collector do memory release atexit()
+/*
+/* Revision 1.4  2012/05/20 06:02:08  pauloscustodio
+/* Garbage collector
+/* Added automatic garbage collection on exit and simple fence mechanism
+/* to detect buffer underflow and overflow, to memalloc functions.
+/* No longer needed to call init_malloc().
+/* No longer need to try/catch during creation of memory structures to
+/* free partially created data - all not freed data is freed atexit().
+/* Renamed xfree0() to xfree().
+/*
+/* Revision 1.3  2012/05/11 19:29:49  pauloscustodio
+/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+/*         --mode=c
+/*         --lineend=linux
+/*         --indent=spaces=4
+/*         --style=ansi --add-brackets
+/*         --indent-switches --indent-classes
+/*         --indent-preprocessor --convert-tabs
+/*         --break-blocks
+/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
+/*         --align-pointer=name
+/*
+/* Revision 1.2  2011/10/07 17:53:04  pauloscustodio
+/* BUG_0015 : Relocation issue - dubious addresses come out of linking
+/* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
+/* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
+/* - This caused the problem because CODESIZE keeps track of the start offset of each module in the sequence they will appear in the object file, and codeptr is reset to the start of the codearea for each module.
+/* The effect was that all address calculations at link phase were considering
+/*  a start offset of zero for all modules.
+/* - Moreover, when linking modules from a libary, the modules are pulled in to the code area as they are needed, and not in the sequence they will be in the object file. The start offset was being ignored and the modules were being loaded in the incorrect order
+/* - Consequence of these two issues were all linked addresses wrong.
+/*
+/* Revision 1.1  2011/08/19 15:53:58  pauloscustodio
+/* BUG_0010 : heap corruption when reaching MAXCODESIZE
+/* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+/* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
+/*
+/* */

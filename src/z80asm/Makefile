@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.74 2013-09-08 00:43:58 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.75 2013-09-09 00:15:10 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -106,6 +106,8 @@ INIT = \
 	memalloc.h 		\
 	strpool.h		\
 	errors.h		\
+					\
+	codearea.h		\
 
 #------------------------------------------------------------------------------
 # variables
@@ -147,9 +149,10 @@ $(TARGET): $(OBJS)
 #------------------------------------------------------------------------------
 # init module
 #------------------------------------------------------------------------------
-init.c init.h : $(INIT) $(MAKE_INIT) $(MAKEFILE)
+init.c init.h : $(INIT) $(MAKE_INIT) Makefile
 	perl $(MAKE_INIT) $(INIT)
-	
+	$(ASTYLE) init.c init.h
+
 #------------------------------------------------------------------------------
 # flex
 #------------------------------------------------------------------------------
@@ -250,7 +253,10 @@ depend:
 
 
 # $Log: Makefile,v $
-# Revision 1.74  2013-09-08 00:43:58  pauloscustodio
+# Revision 1.75  2013-09-09 00:15:10  pauloscustodio
+# Integrate codearea in init() mechanism.
+#
+# Revision 1.74  2013/09/08 00:43:58  pauloscustodio
 # New error module with one error function per error, no need for the error
 # constants. Allows compiler to type-check error message arguments.
 # Included the errors module in the init() mechanism, no need to call
@@ -574,7 +580,7 @@ file.o: memalloc.h class.h queue.h types.h config.h  errors.h
 file.o: errors_def.h file.h safestr.h strlist.h strpool.h strutil.h uthash.h
 file.o: die.h
 hist.o: memalloc.h hist.h
-init.o: memalloc.h strpool.h errors.h errors_def.h
+init.o: memalloc.h strpool.h errors.h errors_def.h codearea.h types.h
 ldinstr.o: memalloc.h config.h  z80asm.h types.h sym.h class.h
 ldinstr.o: queue.h symref.h classlist.h symbol.h model.h objfile.h symtab.h
 ldinstr.o: classhash.h strhash.h uthash.h die.h token_def.h errors.h

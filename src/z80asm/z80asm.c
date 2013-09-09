@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.99 2013-09-08 08:29:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.100 2013-09-09 00:15:11 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.99  2013-09-08 08:29:21  pauloscustodio
+/* Revision 1.100  2013-09-09 00:15:11  pauloscustodio
+/* Integrate codearea in init() mechanism.
+/*
+/* Revision 1.99  2013/09/08 08:29:21  pauloscustodio
 /* Replaced xmalloc et al with g_malloc0 et al.
 /*
 /* Revision 1.98  2013/09/08 00:43:59  pauloscustodio
@@ -711,7 +714,7 @@ void assemble_file( char *filename )
     /* normal case - assemble a asm source file */
     z80asmfile = objfile = NULL;
 
-    init_codearea();            /* Pointer (PC) to store z80 instruction */
+    reset_codearea();            /* Pointer (PC) to store z80 instruction */
 
     src_filename = asm_filename_ext( filename );      /* set '.asm' extension */
     obj_filename = obj_filename_ext( filename );      /* set '.obj' extension */
@@ -1354,8 +1357,6 @@ int main( int argc, char *argv[] )
 	/* start try..catch with finally to cleanup any allocated memory */
     TRY
     {
-        init_codearea_module();         /* init data for object file creation */
-
         library = createlibrary = OFF;
 
         reset_options();

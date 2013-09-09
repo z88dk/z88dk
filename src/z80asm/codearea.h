@@ -14,11 +14,74 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 Manage the code area in memory
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.10 2013-09-09 00:15:11 pauloscustodio Exp $
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.9 2013-05-16 22:39:39 pauloscustodio Exp $ */
+#pragma once
+
+#include "memalloc.h"   /* before any other include */
+#include "types.h"
+
+#include <stdio.h>
+
+/*-----------------------------------------------------------------------------
+*   Initialize and Terminate module
+*----------------------------------------------------------------------------*/
+extern void init_codearea(void);
+extern void fini_codearea(void);
+
+/*-----------------------------------------------------------------------------
+*   move PC, return new value
+*----------------------------------------------------------------------------*/
+extern size_t set_PC( size_t n );
+extern size_t inc_PC( size_t n );
+extern size_t get_PC( void );
+
+/*-----------------------------------------------------------------------------
+*   reset the code area, return current size
+*----------------------------------------------------------------------------*/
+extern void reset_codearea( void );              /* set code area to zeros */
+extern size_t get_codeindex( void );            /* return number of bytes appended */
+
+extern size_t get_codesize( void );              /* size of all modules before current,
+                                                   i.e. base address of current module */
+extern size_t inc_codesize( size_t n );         /* increment loaded codesize */
+
+/*-----------------------------------------------------------------------------
+*   write code area to an open file
+*----------------------------------------------------------------------------*/
+extern void fwrite_codearea( FILE *stream );
+extern void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size );
+extern void fread_codearea( FILE *stream, size_t size );        /* append to codearea */
+extern void fread_codearea_offset( FILE *stream, size_t offset, size_t size );  /* read to codearea at offset */
+
+/*-----------------------------------------------------------------------------
+*   patch a value at a position, or append to the end of the code area
+*	the patch address is incremented after store
+*----------------------------------------------------------------------------*/
+extern void  patch_byte( size_t *paddr, byte_t byte );   /* one byte */
+extern void append_byte( byte_t byte );
+
+extern void  patch_word( size_t *paddr, int word );             /* 2-byte word */
+extern void append_word( int word );
+
+extern void  patch_long( size_t *paddr, long dword );           /* 4-byte long */
+extern void append_long( long dword );
+
+/*-----------------------------------------------------------------------------
+*   get a byte at the given address
+*	the patch address is incremented after fetch
+*----------------------------------------------------------------------------*/
+extern byte_t get_byte( size_t *paddr );
+
+
+/* */
 /* $Log: codearea.h,v $
-/* Revision 1.9  2013-05-16 22:39:39  pauloscustodio
+/* Revision 1.10  2013-09-09 00:15:11  pauloscustodio
+/* Integrate codearea in init() mechanism.
+/*
+/* Revision 1.9  2013/05/16 22:39:39  pauloscustodio
 /* Bad include-once define
 /*
 /* Revision 1.8  2013/02/22 17:19:19  pauloscustodio
@@ -68,51 +131,3 @@ Manage the code area in memory
 /* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
 /*
 /* */
-
-#ifndef CODEAREA_H
-#define CODEAREA_H
-
-#include "memalloc.h"   /* before any other include */
-#include "types.h"
-
-#include <stdio.h>
-
-/* Start the module */
-extern void init_codearea_module( void );
-
-/* move PC, return new value */
-extern size_t set_PC( size_t n );
-extern size_t inc_PC( size_t n );
-extern size_t get_PC( void );
-
-/* init the code area, return current size */
-extern void init_codearea( void );              /* set code area to zeros */
-extern size_t get_codeindex( void );            /* return number of bytes appended */
-
-extern size_t get_codesize( void );              /* size of all modules before current,
-                                                   i.e. base address of current module */
-extern size_t inc_codesize( size_t n );         /* increment loaded codesize */
-
-/* write code area to an open file */
-extern void fwrite_codearea( FILE *stream );
-extern void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size );
-extern void fread_codearea( FILE *stream, size_t size );        /* append to codearea */
-extern void fread_codearea_offset( FILE *stream, size_t offset, size_t size );  /* read to codearea at offset */
-
-/* patch a value at a position, or append to the end of the code area */
-/* the patch address is incremented after store */
-extern void  patch_byte( size_t *paddr, byte_t byte );   /* one byte */
-extern void append_byte( byte_t byte );
-
-extern void  patch_word( size_t *paddr, int word );             /* 2-byte word */
-extern void append_word( int word );
-
-extern void  patch_long( size_t *paddr, long dword );           /* 4-byte long */
-extern void append_long( long dword );
-
-/* get a byte at the given address */
-/* the patch address is incremented after fetch */
-extern byte_t get_byte( size_t *paddr );
-
-#endif /* ndef CODEAREA_H */
-
