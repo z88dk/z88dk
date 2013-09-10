@@ -14,256 +14,260 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.53 2013-09-08 08:29:21 pauloscustodio Exp $ */
-/* $Log: asmdrctv.c,v $
-/* Revision 1.53  2013-09-08 08:29:21  pauloscustodio
-/* Replaced xmalloc et al with g_malloc0 et al.
-/*
-/* Revision 1.52  2013/09/08 00:43:58  pauloscustodio
-/* New error module with one error function per error, no need for the error
-/* constants. Allows compiler to type-check error message arguments.
-/* Included the errors module in the init() mechanism, no need to call
-/* error initialization from main(). Moved all error-testing scripts to
-/* one file errors.t.
-/*
-/* Revision 1.51  2013/09/01 12:00:07  pauloscustodio
-/* Cleanup compilation warnings
-/*
-/* Revision 1.50  2013/08/30 21:50:43  pauloscustodio
-/* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
-/* as an identifier reserved by the C standard for implementation-defined behaviour
-/* starting with two underscores.
-/*
-/* Revision 1.49  2013/08/29 21:42:10  pauloscustodio
-/* comment
-/*
-/* Revision 1.48  2013/06/15 00:26:23  pauloscustodio
-/* Move mapfile writing to mapfile.c.
-/*
-/* Revision 1.47  2013/06/14 22:14:36  pauloscustodio
-/* find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
-/*
-/* Revision 1.46  2013/06/08 23:37:32  pauloscustodio
-/* Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
-/*  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
-/* Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
-/*
-/* Revision 1.45  2013/06/01 01:24:21  pauloscustodio
-/* CH_0022 : Replace avltree by hash table for symbol table
-/*
-/* Revision 1.44  2013/05/23 22:22:23  pauloscustodio
-/* Move symbol to sym.c, rename to Symbol
-/*
-/* Revision 1.43  2013/05/12 19:39:32  pauloscustodio
-/* warnings
-/*
-/* Revision 1.42  2013/03/06 00:02:17  pauloscustodio
-/* 	BUG_0032 : DEFGROUP ignores name after assignment
-/* 		The code
-/* DEFGROUP {
-/*   f10 = 10, f11
-/* }
-/* did not define f11 - all text after the expression was discarded.
-/*
-/* Revision 1.41  2013/03/04 23:23:37  pauloscustodio
-/* Removed writeline, that was used to cancel listing of multi-line
-/* constructs, as only the first line was shown on the list file. Fixed
-/* the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
-/*
-/* Revision 1.40  2013/03/02 23:48:55  pauloscustodio
-/* New __LEGACY_Z80ASM_SYNTAX define to mark code that should be removed but is kept
-/* to keep backwards compatibility
-/*
-/* Revision 1.39  2013/02/27 22:34:16  pauloscustodio
-/* Move include path search to srcfile.c
-/*
-/* Revision 1.38  2013/02/19 22:52:40  pauloscustodio
-/* BUG_0030 : List bytes patching overwrites header
-/* BUG_0031 : List file garbled with input lines with 255 chars
-/* New listfile.c with all the listing related code
-/*
-/* Revision 1.37  2013/01/24 23:03:03  pauloscustodio
-/* Replaced (unsigned char) by (byte_t)
-/* Replaced (unisigned int) by (size_t)
-/* Replaced (short) by (int)
-/*
-/* Revision 1.36  2013/01/20 21:24:28  pauloscustodio
-/* Updated copyright year to 2013
-/*
-/* Revision 1.35  2012/11/03 17:39:36  pauloscustodio
-/* astyle, comments
-/*
-/* Revision 1.34  2012/06/07 11:54:13  pauloscustodio
-/* - Make mapfile static to module modlink.
-/* - Remove modsrcfile, not used.
-/* - GetModuleSize(): use local variable for file handle instead of objfile
-/*
-/* Revision 1.33  2012/05/30 22:06:48  pauloscustodio
-/* BUG_0019 : z80asm closes a closed file handle, crash in Linux
-/*
-/* Revision 1.32  2012/05/29 21:00:35  pauloscustodio
-/* BUG_0019 : z80asm closes a closed file handle, crash in Linux
-/*
-/* Revision 1.31  2012/05/26 18:51:10  pauloscustodio
-/* CH_0012 : wrappers on OS calls to raise fatal error
-/* CH_0013 : new errors interface to decouple calling code from errors.c
-/*
-/* Revision 1.30  2012/05/24 21:48:24  pauloscustodio
-/* Remove the global variables include_dir, lib_dir, and respective
-/* counts, create instead the paths in the options module and
-/* create new search_include_file() and search_lib_file()
-/* functions to replace SearchFile().
-/*
-/* Revision 1.29  2012/05/24 17:09:27  pauloscustodio
-/* Unify copyright header
-/*
-/* Revision 1.28  2012/05/23 20:45:42  pauloscustodio
-/* Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
-/* Add tests.
-/*
-/* Revision 1.27  2012/05/18 00:20:32  pauloscustodio
-/* ParseIndent(): remove hard coded IDs of IF, ELSE, ENDIF
-/* Z80ident[]: make always handling function the same name as assembler ident.
-/*
-/* Revision 1.26  2012/05/17 17:42:14  pauloscustodio
-/* define_symbol() defined as void, a fatal error is
-/* always raised on error.
-/*
-/* Revision 1.25  2012/05/11 19:29:49  pauloscustodio
-/* Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
-/*         --mode=c
-/*         --lineend=linux
-/*         --indent=spaces=4
-/*         --style=ansi --add-brackets
-/*         --indent-switches --indent-classes
-/*         --indent-preprocessor --convert-tabs
-/*         --break-blocks
-/*         --pad-oper --pad-paren-in --pad-header --unpad-paren
-/*         --align-pointer=name
-/*
-/* Revision 1.24  2011/10/14 14:46:03  pauloscustodio
-/* -  BUG_0013 : defm check for MAX_CODESIZE incorrect
-/*  - Remove un-necessary tests for MAX_CODESIZE; all tests are concentrated in check_space() from codearea.c.
-/*
-/* Revision 1.23  2011/10/07 17:53:04  pauloscustodio
-/* BUG_0015 : Relocation issue - dubious addresses come out of linking
-/* (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
-/* - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
-/* - This caused the problem because CODESIZE keeps track of the start offset of each module in the sequence they will appear in the object file, and codeptr is reset to the start of the codearea for each module.
-/* The effect was that all address calculations at link phase were considering
-/*  a start offset of zero for all modules.
-/* - Moreover, when linking modules from a libary, the modules are pulled in to the code area as they are needed, and not in the sequence they will be in the object file. The start offset was being ignored and the modules were being loaded in the incorrect order
-/* - Consequence of these two issues were all linked addresses wrong.
-/*
-/* Revision 1.22  2011/08/19 15:53:58  pauloscustodio
-/* BUG_0010 : heap corruption when reaching MAXCODESIZE
-/* - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
-/* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
-/*
-/* Revision 1.21  2011/08/18 23:27:54  pauloscustodio
-/* BUG_0009 : file read/write not tested for errors
-/* - In case of disk full file write fails, but assembler does not detect the error
-/*   and leaves back corruped object/binary files
-/* - Created new exception FileIOException and ERR_FILE_IO error.
-/* - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
-/*
-/* Revision 1.20  2011/08/14 19:46:46  pauloscustodio
-/* - INCLUDE(), BINARY(): throw the new exception FatalErrorException for fatal error ERR_FILE_OPEN, no need to re-open the original source file after the error
-/* - INCLUDE(): no need to check for fatal error and return; bypassed by exception mechanism
-/* - source_file_open flag removed; z80asmfile is used for the same purpose
-/*
-/* Revision 1.19  2011/08/05 19:37:38  pauloscustodio
-/* CH_0004 : Exception mechanism to handle fatal errors
-/* Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
-/* Replaced all functions that allocated memory structures by the new xcalloc_struct().
-/* Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
-/*
-/* Revision 1.18  2011/07/18 00:52:01  pauloscustodio
-/* Initialize MS Visual Studio DEBUG build to show memory leaks on exit
-/* BUG_0007 : memory leaks - Cleaned memory leaks in DEFS()
-/*
-/* Revision 1.17  2011/07/14 01:32:08  pauloscustodio
-/*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
-/*     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
-/*     CH_0003 : Error messages should be more informative
-/*         - Added printf-args to error messages, added "Error:" prefix.
-/*     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
-/*         - Raise ERR_UNBALANCED_PAREN instead
-/*
-/* Revision 1.16  2011/07/12 22:47:59  pauloscustodio
-/* - Moved all error variables and error reporting code to a separate module errors.c,
-/*   replaced all extern declarations of these variables by include errors.h,
-/*   created symbolic constants for error codes.
-/* - Added test scripts for error messages.
-/*
-/* Revision 1.15  2011/07/11 15:56:46  pauloscustodio
-/* Moved all option variables and option handling code to a separate module options.c,
-/* replaced all extern declarations of these variables by include options.h.
-/*
-/* Revision 1.14  2011/07/09 18:25:35  pauloscustodio
-/* Log keyword in checkin comment was expanded inside Log expansion... recursive
-/* Added Z80asm banner to all source files
-/*
-/* Revision 1.13  2011/07/09 17:36:09  pauloscustodio
-/* Copied cvs log into Log history
-/*
-/* Revision 1.12  2011/07/09 01:46:00  pauloscustodio
-/* Added Log keyword
-/*
-/* Revision 1.11  2011/07/09 01:14:13  pauloscustodio
-/* added casts to clean up warnings
-/*
-/* Revision 1.10  2010/04/16 17:34:37  dom
-/* Make line number an int - 32768 lines isn't big enough...
-/*
-/* Revision 1.9  2009/08/14 22:23:12  dom
-/* clean up some compiler warnings
-/*
-/* Revision 1.8  2009/06/22 21:26:28  dom
-/* don't expand a zero length file
-/*
-/* Revision 1.7  2009/06/13 17:36:24  dom
-/* Add -I and -L to specify search paths for libraries and includes
-/*
-/* Revision 1.6  2003/10/11 15:41:04  dom
-/* changes from garry
-/*
-/* - support for defp -> defp addr,bank
-/* - square brackets can be used in expressions
-/* - comma can be used in defm
-/*
-/* Revision 1.5  2002/02/20 21:37:57  dom
-/* merged in changes from rc1.4 branch to handle empty lines in list files
-/*
-/* Revision 1.4  2001/06/27 08:53:28  dom
-/* branches:  1.4.2;
-/* Added a second parameter to defs to indicate what the filler byte should be
-/*
-/* Revision 1.3  2001/02/28 17:59:22  dom
-/* Added UNDEFINE for undefining symbols, bumped version to 1.0.18
-/*
-/* Revision 1.2  2001/01/23 10:00:08  dom
-/* Changes by x1cygnus:
-/*
-/* just added a harcoded macro Invoke, similar to callpkg except that the
-/* instruction 'Invoke' resolves to a call by default (ti83) and to a RST if
-/* the parameter -plus is specified on the command line.
-/*
-/* Changes by dom:
-/* Added in a rudimentary default directory set up (Defined at compile time)
-/* a bit kludgy and not very nice!
-/*
-/* Revision 1.1  2000/07/04 15:33:30  dom
-/* branches:  1.1.1;
-/* Initial revision
-/*
-/* Revision 1.1.1.1  2000/07/04 15:33:30  dom
-/* First import of z88dk into the sourceforge system <gulp>
-/*
-/* Revision 1.4.2.1  2002/02/20 21:35:19  dom
-/* changes from dennis to handle blank lines in file list files
-/*
-/* */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.54 2013-09-10 20:29:32 dom Exp $ */
+/* 
+ * $Log: asmdrctv.c,v $
+ * Revision 1.54  2013-09-10 20:29:32  dom
+ * Fix nested comment problem with clang
+ *
+ * Revision 1.53  2013/09/08 08:29:21  pauloscustodio
+ * Replaced xmalloc et al with g_malloc0 et al.
+ *
+ * Revision 1.52  2013/09/08 00:43:58  pauloscustodio
+ * New error module with one error function per error, no need for the error
+ * constants. Allows compiler to type-check error message arguments.
+ * Included the errors module in the init() mechanism, no need to call
+ * error initialization from main(). Moved all error-testing scripts to
+ * one file errors.t.
+ *
+ * Revision 1.51  2013/09/01 12:00:07  pauloscustodio
+ * Cleanup compilation warnings
+ *
+ * Revision 1.50  2013/08/30 21:50:43  pauloscustodio
+ * By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
+ * as an identifier reserved by the C standard for implementation-defined behaviour
+ * starting with two underscores.
+ *
+ * Revision 1.49  2013/08/29 21:42:10  pauloscustodio
+ * comment
+ *
+ * Revision 1.48  2013/06/15 00:26:23  pauloscustodio
+ * Move mapfile writing to mapfile.c.
+ *
+ * Revision 1.47  2013/06/14 22:14:36  pauloscustodio
+ * find_local_symbol() and find_global_symbol() to encapsulate usage of get_global_tab()
+ *
+ * Revision 1.46  2013/06/08 23:37:32  pauloscustodio
+ * Replace define_def_symbol() by one function for each symbol table type: define_static_def_sym(),
+ *  define_global_def_sym(), define_local_def_sym(), encapsulating the symbol table used.
+ * Define keywords for special symbols ASMPC, ASMSIZE, ASMTAIL
+ *
+ * Revision 1.45  2013/06/01 01:24:21  pauloscustodio
+ * CH_0022 : Replace avltree by hash table for symbol table
+ *
+ * Revision 1.44  2013/05/23 22:22:23  pauloscustodio
+ * Move symbol to sym.c, rename to Symbol
+ *
+ * Revision 1.43  2013/05/12 19:39:32  pauloscustodio
+ * warnings
+ *
+ * Revision 1.42  2013/03/06 00:02:17  pauloscustodio
+ * 	BUG_0032 : DEFGROUP ignores name after assignment
+ * 		The code
+ * DEFGROUP {
+ *   f10 = 10, f11
+ * }
+ * did not define f11 - all text after the expression was discarded.
+ *
+ * Revision 1.41  2013/03/04 23:23:37  pauloscustodio
+ * Removed writeline, that was used to cancel listing of multi-line
+ * constructs, as only the first line was shown on the list file. Fixed
+ * the problem in DEFVARS and DEFGROUP. Side-effect: LSTOFF line is listed.
+ *
+ * Revision 1.40  2013/03/02 23:48:55  pauloscustodio
+ * New __LEGACY_Z80ASM_SYNTAX define to mark code that should be removed but is kept
+ * to keep backwards compatibility
+ *
+ * Revision 1.39  2013/02/27 22:34:16  pauloscustodio
+ * Move include path search to srcfile.c
+ *
+ * Revision 1.38  2013/02/19 22:52:40  pauloscustodio
+ * BUG_0030 : List bytes patching overwrites header
+ * BUG_0031 : List file garbled with input lines with 255 chars
+ * New listfile.c with all the listing related code
+ *
+ * Revision 1.37  2013/01/24 23:03:03  pauloscustodio
+ * Replaced (unsigned char) by (byte_t)
+ * Replaced (unisigned int) by (size_t)
+ * Replaced (short) by (int)
+ *
+ * Revision 1.36  2013/01/20 21:24:28  pauloscustodio
+ * Updated copyright year to 2013
+ *
+ * Revision 1.35  2012/11/03 17:39:36  pauloscustodio
+ * astyle, comments
+ *
+ * Revision 1.34  2012/06/07 11:54:13  pauloscustodio
+ * - Make mapfile static to module modlink.
+ * - Remove modsrcfile, not used.
+ * - GetModuleSize(): use local variable for file handle instead of objfile
+ *
+ * Revision 1.33  2012/05/30 22:06:48  pauloscustodio
+ * BUG_0019 : z80asm closes a closed file handle, crash in Linux
+ *
+ * Revision 1.32  2012/05/29 21:00:35  pauloscustodio
+ * BUG_0019 : z80asm closes a closed file handle, crash in Linux
+ *
+ * Revision 1.31  2012/05/26 18:51:10  pauloscustodio
+ * CH_0012 : wrappers on OS calls to raise fatal error
+ * CH_0013 : new errors interface to decouple calling code from errors.c
+ *
+ * Revision 1.30  2012/05/24 21:48:24  pauloscustodio
+ * Remove the global variables include_dir, lib_dir, and respective
+ * counts, create instead the paths in the options module and
+ * create new search_include_file() and search_lib_file()
+ * functions to replace SearchFile().
+ *
+ * Revision 1.29  2012/05/24 17:09:27  pauloscustodio
+ * Unify copyright header
+ *
+ * Revision 1.28  2012/05/23 20:45:42  pauloscustodio
+ * Replace ERR_FILE_OPEN by ERR_FOPEN_READ and ERR_FOPEN_WRITE.
+ * Add tests.
+ *
+ * Revision 1.27  2012/05/18 00:20:32  pauloscustodio
+ * ParseIndent(): remove hard coded IDs of IF, ELSE, ENDIF
+ * Z80ident[]: make always handling function the same name as assembler ident.
+ *
+ * Revision 1.26  2012/05/17 17:42:14  pauloscustodio
+ * define_symbol() defined as void, a fatal error is
+ * always raised on error.
+ *
+ * Revision 1.25  2012/05/11 19:29:49  pauloscustodio
+ * Format code with AStyle (http://astyle.sourceforge.net/) to unify brackets, spaces instead of tabs, indenting style, space padding in parentheses and operators. Options written in the makefile, target astyle.
+ *         --mode=c
+ *         --lineend=linux
+ *         --indent=spaces=4
+ *         --style=ansi --add-brackets
+ *         --indent-switches --indent-classes
+ *         --indent-preprocessor --convert-tabs
+ *         --break-blocks
+ *         --pad-oper --pad-paren-in --pad-header --unpad-paren
+ *         --align-pointer=name
+ *
+ * Revision 1.24  2011/10/14 14:46:03  pauloscustodio
+ * -  BUG_0013 : defm check for MAX_CODESIZE incorrect
+ *  - Remove un-necessary tests for MAX_CODESIZE; all tests are concentrated in check_space() from codearea.c.
+ *
+ * Revision 1.23  2011/10/07 17:53:04  pauloscustodio
+ * BUG_0015 : Relocation issue - dubious addresses come out of linking
+ * (reported on Tue, Sep 27, 2011 at 8:09 PM by dom)
+ * - Introduced in version 1.1.8, when the CODESIZE and the codeptr were merged into the same entity.
+ * - This caused the problem because CODESIZE keeps track of the start offset of each module in the sequence they will appear in the object file, and codeptr is reset to the start of the codearea for each module.
+ * The effect was that all address calculations at link phase were considering
+ *  a start offset of zero for all modules.
+ * - Moreover, when linking modules from a libary, the modules are pulled in to the code area as they are needed, and not in the sequence they will be in the object file. The start offset was being ignored and the modules were being loaded in the incorrect order
+ * - Consequence of these two issues were all linked addresses wrong.
+ *
+ * Revision 1.22  2011/08/19 15:53:58  pauloscustodio
+ * BUG_0010 : heap corruption when reaching MAXCODESIZE
+ * - test for overflow of MAXCODESIZE is done before each instruction at parseline(); if only one byte is available in codearea, and a 2 byte instruction is assembled, the heap is corrupted before the exception is raised.
+ * - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
+ *
+ * Revision 1.21  2011/08/18 23:27:54  pauloscustodio
+ * BUG_0009 : file read/write not tested for errors
+ * - In case of disk full file write fails, but assembler does not detect the error
+ *   and leaves back corruped object/binary files
+ * - Created new exception FileIOException and ERR_FILE_IO error.
+ * - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
+ *
+ * Revision 1.20  2011/08/14 19:46:46  pauloscustodio
+ * - INCLUDE(), BINARY(): throw the new exception FatalErrorException for fatal error ERR_FILE_OPEN, no need to re-open the original source file after the error
+ * - INCLUDE(): no need to check for fatal error and return; bypassed by exception mechanism
+ * - source_file_open flag removed; z80asmfile is used for the same purpose
+ *
+ * Revision 1.19  2011/08/05 19:37:38  pauloscustodio
+ * CH_0004 : Exception mechanism to handle fatal errors
+ * Replaced all ERR_NO_MEMORY/return sequences by an exception, captured at main().
+ * Replaced all functions that allocated memory structures by the new xcalloc_struct().
+ * Replaced 'l' (lower case letter L) by 'len' - too easy to confuse with numeral '1'.
+ *
+ * Revision 1.18  2011/07/18 00:52:01  pauloscustodio
+ * Initialize MS Visual Studio DEBUG build to show memory leaks on exit
+ * BUG_0007 : memory leaks - Cleaned memory leaks in DEFS()
+ *
+ * Revision 1.17  2011/07/14 01:32:08  pauloscustodio
+ *     - Unified "Integer out of range" and "Out of range" errors; they are the same error.
+ *     - Unified ReportIOError as ReportError(ERR_FILE_OPEN)
+ *     CH_0003 : Error messages should be more informative
+ *         - Added printf-args to error messages, added "Error:" prefix.
+ *     BUG_0006 : sub-expressions with unbalanced parentheses type accepted, e.g. (2+3] or [2+3)
+ *         - Raise ERR_UNBALANCED_PAREN instead
+ *
+ * Revision 1.16  2011/07/12 22:47:59  pauloscustodio
+ * - Moved all error variables and error reporting code to a separate module errors.c,
+ *   replaced all extern declarations of these variables by include errors.h,
+ *   created symbolic constants for error codes.
+ * - Added test scripts for error messages.
+ *
+ * Revision 1.15  2011/07/11 15:56:46  pauloscustodio
+ * Moved all option variables and option handling code to a separate module options.c,
+ * replaced all extern declarations of these variables by include options.h.
+ *
+ * Revision 1.14  2011/07/09 18:25:35  pauloscustodio
+ * Log keyword in checkin comment was expanded inside Log expansion... recursive
+ * Added Z80asm banner to all source files
+ *
+ * Revision 1.13  2011/07/09 17:36:09  pauloscustodio
+ * Copied cvs log into Log history
+ *
+ * Revision 1.12  2011/07/09 01:46:00  pauloscustodio
+ * Added Log keyword
+ *
+ * Revision 1.11  2011/07/09 01:14:13  pauloscustodio
+ * added casts to clean up warnings
+ *
+ * Revision 1.10  2010/04/16 17:34:37  dom
+ * Make line number an int - 32768 lines isn't big enough...
+ *
+ * Revision 1.9  2009/08/14 22:23:12  dom
+ * clean up some compiler warnings
+ *
+ * Revision 1.8  2009/06/22 21:26:28  dom
+ * don't expand a zero length file
+ *
+ * Revision 1.7  2009/06/13 17:36:24  dom
+ * Add -I and -L to specify search paths for libraries and includes
+ *
+ * Revision 1.6  2003/10/11 15:41:04  dom
+ * changes from garry
+ *
+ * - support for defp -> defp addr,bank
+ * - square brackets can be used in expressions
+ * - comma can be used in defm
+ *
+ * Revision 1.5  2002/02/20 21:37:57  dom
+ * merged in changes from rc1.4 branch to handle empty lines in list files
+ *
+ * Revision 1.4  2001/06/27 08:53:28  dom
+ * branches:  1.4.2;
+ * Added a second parameter to defs to indicate what the filler byte should be
+ *
+ * Revision 1.3  2001/02/28 17:59:22  dom
+ * Added UNDEFINE for undefining symbols, bumped version to 1.0.18
+ *
+ * Revision 1.2  2001/01/23 10:00:08  dom
+ * Changes by x1cygnus:
+ *
+ * just added a harcoded macro Invoke, similar to callpkg except that the
+ * instruction 'Invoke' resolves to a call by default (ti83) and to a RST if
+ * the parameter -plus is specified on the command line.
+ *
+ * Changes by dom:
+ * Added in a rudimentary default directory set up (Defined at compile time)
+ * a bit kludgy and not very nice!
+ *
+ * Revision 1.1  2000/07/04 15:33:30  dom
+ * branches:  1.1.1;
+ * Initial revision
+ *
+ * Revision 1.1.1.1  2000/07/04 15:33:30  dom
+ * First import of z88dk into the sourceforge system <gulp>
+ *
+ * Revision 1.4.2.1  2002/02/20 21:35:19  dom
+ * changes from dennis to handle blank lines in file list files
+ *
+ */
 
 /* $History: Asmdrctv.c $ */
 /*  */
