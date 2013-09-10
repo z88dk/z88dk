@@ -15,6 +15,8 @@ OBJS = 	asmdrctv.o 	\
 	z80asm.o	\
 	z80instr.o	\
 	z80pass.o
+
+INSTALL ?= install
 	
 all: z80asm$(EXESUFFIX)
 
@@ -23,7 +25,7 @@ z80asm$(EXESUFFIX): $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o z80asm$(EXESUFFIX)  $(OBJS)
 
 install:
-	install  z80asm$(EXESUFFIX) $(PREFIX)/bin/
+	$(INSTALL) z80asm$(EXESUFFIX) $(PREFIX)/bin/
 
 
 clean :

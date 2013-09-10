@@ -1,9 +1,10 @@
 #
 # Makefile for sccz80
 #
-# $Id: Makefile,v 1.11 2013-01-20 20:43:59 pauloscustodio Exp $
+# $Id: Makefile,v 1.12 2013-09-10 23:47:51 dom Exp $
 #
 
+INSTALL ?= install
 
 OBJS =	callfunc.o     	\
 	codegen.o	\
@@ -33,7 +34,7 @@ sccz80$(EXESUFFIX): $(OBJS)
 	$(CC) $(LDFLAGS) -o sccz80$(EXESUFFIX) $(OBJS)
 
 install:
-	install -m 755 sccz80$(EXESUFFIX) $(PREFIX)/bin/
+	$(INSTALL) -m 755 sccz80$(EXESUFFIX) $(PREFIX)/bin/
 
 clean :
 	$(RM) *.o *~ core sccz80$(EXESUFFIX)

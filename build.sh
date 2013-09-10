@@ -23,7 +23,15 @@ export CC
 export CFLAGS
 export CCOPT
 
-make -e
-make -C `pwd`/libsrc
-make -C `pwd`/libsrc install
+MAKE="make"
+INSTALL="install"
+
+if [ "`uname -s`" = "SunOS" ]; then
+   MAKE="gmake"
+   INSTALL="ginstall"
+fi
+
+$(MAKE) -e
+$(MAKE) -C `pwd`/libsrc
+$(MAKE) -C `pwd`/libsrc install
 

@@ -1,4 +1,5 @@
 
+INSTALL ?= install
 OBJS=cpp1.o cpp2.o cpp3.o cpp4.o cpp5.o cpp6.o
 
 zcpp$(EXESUFFIX):$(OBJS)
@@ -12,7 +13,7 @@ cpp5.o:cpp5.c cpp.h cppdef.h
 cpp6.o:cpp6.c cpp.h cppdef.h
 
 install:
-	install zcpp$(EXESUFFIX) $(PREFIX)/bin
+	$(INSTALL) zcpp$(EXESUFFIX) $(PREFIX)/bin
 
 clean:
 	$(RM) *.o core *~ zcpp$(EXESUFFIX)

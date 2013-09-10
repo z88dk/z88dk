@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.75 2013-09-09 00:15:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.76 2013-09-10 23:47:51 dom Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -24,6 +24,8 @@ ifndef EXESUFFIX
     EXESUFFIX := 
   endif
 endif
+
+INSTALL ?= install
 
 #------------------------------------------------------------------------------
 # Using GLIB - see http://www.gtk.org/
@@ -171,7 +173,7 @@ parse.c parse.h : parse.y
 # intall
 #------------------------------------------------------------------------------
 install:
-	install $(TARGET) $(PREFIX)/bin/
+	$(INSTALL) $(TARGET) $(PREFIX)/bin/
 
 #------------------------------------------------------------------------------
 # clean
@@ -253,7 +255,10 @@ depend:
 
 
 # $Log: Makefile,v $
-# Revision 1.75  2013-09-09 00:15:10  pauloscustodio
+# Revision 1.76  2013-09-10 23:47:51  dom
+# Pass install down to cope with non-gnu compatible install commands.
+#
+# Revision 1.75  2013/09/09 00:15:10  pauloscustodio
 # Integrate codearea in init() mechanism.
 #
 # Revision 1.74  2013/09/08 00:43:58  pauloscustodio

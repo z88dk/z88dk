@@ -1,3 +1,4 @@
+INSTALL ?= install
 
 OBJS = appmake.o z88.o zxvgs.o zx.o z88shell.o abc80.o zx81.o msx.o mtx.o mz.o nec.o \
 	aquarius.o sorcerer.o svi.o sc3000.o ace-tap.o hex.o rex6000.o tixx.o nascom.o \
@@ -10,10 +11,10 @@ all: appmake$(EXESUFFIX)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
 appmake$(EXESUFFIX): $(OBJS)
-	${CC} -o appmake$(EXESUFFIX) $(LDFLAGS) $(OBJS)
+	$(CC) -o appmake$(EXESUFFIX) $(LDFLAGS) $(OBJS)
 
 install:
-	install appmake$(EXESUFFIX) $(PREFIX)/bin
+	$(INSTALL) appmake$(EXESUFFIX) $(PREFIX)/bin
 
 clean:
 	$(RM) appmake$(EXESUFFIX) $(OBJS) core
