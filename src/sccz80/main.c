@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.22 2011-06-26 16:07:29 dom Exp $
+ *      $Id: main.c,v 1.23 2013-09-11 18:07:49 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -490,8 +490,10 @@ dumpfns()
     }
 /* Now output the org */
     if (zorg) {
+        fprintf(fp,"\nIF !DEFINED_myzorg\n");
         fprintf(fp,"\tDEFINE DEFINED_myzorg\n");
         fprintf(fp,"\tdefc myzorg = %u\n",zorg);
+        fprintf(fp,"ENDIF");
     }
     if (appz88) {
         int k,value=0;
