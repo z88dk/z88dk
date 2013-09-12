@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.76 2013-09-10 23:47:51 dom Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.77 2013-09-12 00:05:34 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -153,7 +153,6 @@ $(TARGET): $(OBJS)
 #------------------------------------------------------------------------------
 init.c init.h : $(INIT) $(MAKE_INIT) Makefile
 	perl $(MAKE_INIT) $(INIT)
-	$(ASTYLE) init.c init.h
 
 #------------------------------------------------------------------------------
 # flex
@@ -255,7 +254,10 @@ depend:
 
 
 # $Log: Makefile,v $
-# Revision 1.76  2013-09-10 23:47:51  dom
+# Revision 1.77  2013-09-12 00:05:34  pauloscustodio
+# ASTYLE is optional, do not call it to make init.c
+#
+# Revision 1.76  2013/09/10 23:47:51  dom
 # Pass install down to cope with non-gnu compatible install commands.
 #
 # Revision 1.75  2013/09/09 00:15:10  pauloscustodio
