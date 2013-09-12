@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.16 2013-09-09 00:15:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.17 2013-09-12 00:10:02 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -54,7 +54,7 @@ void init_codearea(void)
 
 void fini_codearea(void)
 {
-	g_free( codearea );
+	g_free0( codearea );
 }
 
 /*-----------------------------------------------------------------------------
@@ -211,7 +211,11 @@ byte_t get_byte( size_t *paddr )
 
 /* */
 /* $Log: codearea.c,v $
-/* Revision 1.16  2013-09-09 00:15:11  pauloscustodio
+/* Revision 1.17  2013-09-12 00:10:02  pauloscustodio
+/* Create g_free0() macro that NULLs the pointer after free, required
+/* by z80asm to find out if a pointer was already freed.
+/*
+/* Revision 1.16  2013/09/09 00:15:11  pauloscustodio
 /* Integrate codearea in init() mechanism.
 /*
 /* Revision 1.15  2013/09/08 08:29:21  pauloscustodio

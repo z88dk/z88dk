@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.100 2013-09-09 00:15:11 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.101 2013-09-12 00:10:02 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.100  2013-09-09 00:15:11  pauloscustodio
+/* Revision 1.101  2013-09-12 00:10:02  pauloscustodio
+/* Create g_free0() macro that NULLs the pointer after free, required
+/* by z80asm to find out if a pointer was already freed.
+/*
+/* Revision 1.100  2013/09/09 00:15:11  pauloscustodio
 /* Integrate codearea in init() mechanism.
 /*
 /* Revision 1.99  2013/09/08 08:29:21  pauloscustodio
@@ -1186,27 +1190,26 @@ ReleaseModules( void )
             {
                 prevJR = curJR;
                 curJR = curJR->nextref; /* get ready for next JR instruction */
-                g_free( prevJR );
+                g_free0( prevJR );
             }
 
-            g_free( curptr->JRaddr );
+            g_free0( curptr->JRaddr );
             curptr->JRaddr = NULL;
         }
 
         if ( curptr->mname != NULL )
         {
-            g_free( curptr->mname );
+            g_free0( curptr->mname );
         }
 
 		OBJ_DELETE( curptr->obj_file );
 
         tmpptr = curptr;
         curptr = curptr->nextmodule;
-        g_free( tmpptr );       /* Release module */
+        g_free0( tmpptr );       /* Release module */
     }
 
-    g_free( modulehdr );
-    modulehdr = NULL;
+    g_free0( modulehdr );
     CURRENTMODULE = NULL;
 }
 
@@ -1223,16 +1226,15 @@ ReleaseLibraries( void )
     {
         if ( curptr->libfilename != NULL )
         {
-            g_free( curptr->libfilename );
+            g_free0( curptr->libfilename );
         }
 
         tmpptr = curptr;
         curptr = curptr->nextlib;
-        g_free( tmpptr );       /* release library */
+        g_free0( tmpptr );       /* release library */
     }
 
-    g_free( libraryhdr );       /* Release library header */
-    libraryhdr = NULL;
+    g_free0( libraryhdr );       /* Release library header */
 }
 
 
@@ -1251,7 +1253,7 @@ ReleaseExprns( struct expression *express )
         curexpr = tmpexpr;
     }
 
-    g_free( express );
+    g_free0( express );
 }
 
 
@@ -1263,8 +1265,8 @@ ReleaseFile( struct sourcefile *srcfile )
         ReleaseOwnedFile( srcfile->usedsourcefile );
     }
 
-    g_free( srcfile->fname );   /* Release allocated area for filename */
-    g_free( srcfile );          /* Release file information record for this file */
+    g_free0( srcfile->fname );   /* Release allocated area for filename */
+    g_free0( srcfile );          /* Release file information record for this file */
 }
 
 
@@ -1283,7 +1285,7 @@ ReleaseOwnedFile( struct usedfile *ownedfile )
         ReleaseFile( ownedfile->ownedsourcefile );
     }
 
-    g_free( ownedfile );        /* Then release this owned file */
+    g_free0( ownedfile );        /* Then release this owned file */
 }
 
 
@@ -1458,7 +1460,7 @@ int main( int argc, char *argv[] )
         {
             if ( reloctable != NULL )
             {
-                g_free( reloctable );
+                g_free0( reloctable );
             }
         }
 

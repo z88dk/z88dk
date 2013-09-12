@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 List of strings (e.g. include path); strings kept in strpool.h
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.c,v 1.6 2013-09-08 08:29:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strlist.c,v 1.7 2013-09-12 00:10:02 pauloscustodio Exp $ */
 /* $Log: strlist.c,v $
-/* Revision 1.6  2013-09-08 08:29:21  pauloscustodio
+/* Revision 1.7  2013-09-12 00:10:02  pauloscustodio
+/* Create g_free0() macro that NULLs the pointer after free, required
+/* by z80asm to find out if a pointer was already freed.
+/*
+/* Revision 1.6  2013/09/08 08:29:21  pauloscustodio
 /* Replaced xmalloc et al with g_malloc0 et al.
 /*
 /* Revision 1.5  2013/09/01 18:46:01  pauloscustodio
@@ -72,7 +76,7 @@ void SzList_fini( SzList *self )
     while ( elem = TAILQ_FIRST( &self->head ) )
     {
         TAILQ_REMOVE( &self->head, elem, entries );
-        g_free( elem );
+        g_free0( elem );
     }
 }
 

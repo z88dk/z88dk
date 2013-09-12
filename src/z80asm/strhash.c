@@ -18,9 +18,13 @@ Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.11 2013-09-08 08:29:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strhash.c,v 1.12 2013-09-12 00:10:02 pauloscustodio Exp $ */
 /* $Log: strhash.c,v $
-/* Revision 1.11  2013-09-08 08:29:21  pauloscustodio
+/* Revision 1.12  2013-09-12 00:10:02  pauloscustodio
+/* Create g_free0() macro that NULLs the pointer after free, required
+/* by z80asm to find out if a pointer was already freed.
+/*
+/* Revision 1.11  2013/09/08 08:29:21  pauloscustodio
 /* Replaced xmalloc et al with g_malloc0 et al.
 /*
 /* Revision 1.10  2013/09/01 18:46:01  pauloscustodio
@@ -131,7 +135,7 @@ void StrHash_remove_elem( StrHash *self, StrHashElem *elem )
 	if ( elem )
 	{
 		HASH_DEL( self->hash, elem );
-		g_free( elem );
+		g_free0( elem );
 	}
 }
 

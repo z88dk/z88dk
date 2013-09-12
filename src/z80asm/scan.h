@@ -18,9 +18,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.12 2013-09-08 08:29:21 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.13 2013-09-12 00:10:02 pauloscustodio Exp $ 
 $Log: scan.h,v $
-Revision 1.12  2013-09-08 08:29:21  pauloscustodio
+Revision 1.13  2013-09-12 00:10:02  pauloscustodio
+Create g_free0() macro that NULLs the pointer after free, required
+by z80asm to find out if a pointer was already freed.
+
+Revision 1.11  2013/09/08 08:29:21  pauloscustodio
 Replaced xmalloc et al with g_malloc0 et al.
 
 Revision 1.10  2013/09/08 00:43:59  pauloscustodio

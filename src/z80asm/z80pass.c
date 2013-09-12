@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.54 2013-09-08 08:29:21 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.55 2013-09-12 00:10:02 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.54  2013-09-08 08:29:21  pauloscustodio
+Revision 1.55  2013-09-12 00:10:02  pauloscustodio
+Create g_free0() macro that NULLs the pointer after free, required
+by z80asm to find out if a pointer was already freed.
+
+Revision 1.54  2013/09/08 08:29:21  pauloscustodio
 Replaced xmalloc et al with g_malloc0 et al.
 
 Revision 1.53  2013/09/08 00:43:59  pauloscustodio
@@ -807,7 +811,7 @@ Z80pass2( void )
 
                     prevJR = curJR;
                     curJR = curJR->nextref;       /* get ready for next JR instruction */
-                    g_free( prevJR );
+                    g_free0( prevJR );
                 }
                 else
                 {
@@ -835,7 +839,7 @@ Z80pass2( void )
 
                         prevJR = curJR;
                         curJR = curJR->nextref;       /* get ready for JR instruction */
-                        g_free( prevJR );
+                        g_free0( prevJR );
                         break;
 
                     case RANGE_8UNSIGN:
@@ -883,10 +887,8 @@ Z80pass2( void )
 		set_error_file( NULL );
 		set_error_line( 0 );
 
-		g_free( CURRENTMODULE->mexpr );   /* Release header of expressions list */
-        g_free( CURRENTMODULE->JRaddr );  /* Release header of relative jump address list */
-        CURRENTMODULE->mexpr = NULL;
-        CURRENTMODULE->JRaddr = NULL;
+		g_free0( CURRENTMODULE->mexpr );   /* Release header of expressions list */
+        g_free0( CURRENTMODULE->JRaddr );  /* Release header of relative jump address list */
     }
 
     if ( ! get_num_errors() && option_symtable )

@@ -72,7 +72,7 @@ typedef unsigned char uint8_t;
 #define uthash_fatal(msg) die("%s\n", (msg))
 /* fatal error (out of memory,etc) */
 #define uthash_malloc(sz) g_malloc0(sz)     /* malloc fcn                      */
-#define uthash_free(ptr,sz) g_free(ptr)    /* free fcn                        */
+#define uthash_free(ptr,sz) g_free0(ptr)    /* free fcn                        */
 
 #define uthash_noexpand_fyi(tbl)          /* can be defined to log noexpand  */
 #define uthash_expand_fyi(tbl)            /* can be defined to log expands   */

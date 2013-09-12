@@ -20,9 +20,13 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.49 2013-09-01 00:18:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.50 2013-09-12 00:10:02 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.49  2013-09-01 00:18:28  pauloscustodio
+/* Revision 1.50  2013-09-12 00:10:02  pauloscustodio
+/* Create g_free0() macro that NULLs the pointer after free, required
+/* by z80asm to find out if a pointer was already freed.
+/*
+/* Revision 1.49  2013/09/01 00:18:28  pauloscustodio
 /* - Replaced e4c exception mechanism by a much simpler one based on a few
 /*   macros. The former did not allow an exit(1) to be called within a
 /*   try-catch block.
@@ -1376,15 +1380,31 @@ Based on 1.0.31
 	starting with two underscores.
 
 -------------------------------------------------------------------------------
-01.09.2013 [1.2.8] (pauloscustodio)
+12.09.2013 [1.2.8] (pauloscustodio)
 -------------------------------------------------------------------------------
-	- Included GLIB in the Makefile options.
+	- Included GLIB in the Makefile options. Setup GLib memory allocation 
+	  functions to use memalloc functions. Unified glib compilation options 
+	  between MinGW and Linux.
+	- Replaced xmalloc et al with g_malloc0 et al.
 	- Replaced e4c exception mechanism by a much simpler one based on a few
 	  macros. The former did not allow an exit(1) to be called within a
 	  try-catch block.
 	- Created a code-generation mechanism for automatic execution of initialize 
 	  code before the main() function starts, and methods for struct malloc
 	  and free calling constructors and destructors.
+	- Force memalloc to be the first include, to be able to use MSVC 
+	  memory debug tools
+	- Removed memalloc allocation checking code, use MSVC _CRTDBG_MAP_ALLOC instead.
+	  Dump memory usage statistics at the end if MEMALLOC_DEBUG defined.
+	- Replaced strpool code by GLib String Chunks.
+	- New error module with one error function per error, no need for the error
+	  constants. Allows compiler to type-check error message arguments. 
+	  Included the errors module in the init() mechanism, no need to call 
+	  error initialization from main(). Moved all error-testing scripts to 
+	  one file errors.t.
+	- Integrate codearea in init() mechanism.
+	- Create g_free0() macro that NULLs the pointer after free, required
+	  by z80asm to find out if a pointer was already freed.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
@@ -1409,7 +1429,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "1.2.7"
+#define VERSION     "1.2.8"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS

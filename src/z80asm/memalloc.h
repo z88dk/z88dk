@@ -37,11 +37,17 @@ On MEMALLOC_DEBUG, shows statistics of memory usage on exit.
 extern void init_memalloc(void);
 extern void fini_memalloc(void);
 
+/* call g_free() and set pointer to NULL */
+#define g_free0(p)	(g_free(p), p = NULL)
 
 /* */
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.h,v 1.11 2013-09-08 08:29:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/memalloc.h,v 1.12 2013-09-12 00:10:02 pauloscustodio Exp $ */
 /* $Log: memalloc.h,v $
-/* Revision 1.11  2013-09-08 08:29:21  pauloscustodio
+/* Revision 1.12  2013-09-12 00:10:02  pauloscustodio
+/* Create g_free0() macro that NULLs the pointer after free, required
+/* by z80asm to find out if a pointer was already freed.
+/*
+/* Revision 1.11  2013/09/08 08:29:21  pauloscustodio
 /* Replaced xmalloc et al with g_malloc0 et al.
 /*
 /* Revision 1.10  2013/09/01 16:21:55  pauloscustodio

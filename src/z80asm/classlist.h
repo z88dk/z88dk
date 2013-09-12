@@ -15,9 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 Lists of objects defined by class.h
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classlist.h,v 1.4 2013-09-08 08:29:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/classlist.h,v 1.5 2013-09-12 00:10:02 pauloscustodio Exp $ */
 /* $Log: classlist.h,v $
-/* Revision 1.4  2013-09-08 08:29:21  pauloscustodio
+/* Revision 1.5  2013-09-12 00:10:02  pauloscustodio
+/* Create g_free0() macro that NULLs the pointer after free, required
+/* by z80asm to find out if a pointer was already freed.
+/*
+/* Revision 1.4  2013/09/08 08:29:21  pauloscustodio
 /* Replaced xmalloc et al with g_malloc0 et al.
 /*
 /* Revision 1.3  2013/02/25 21:36:17  pauloscustodio
@@ -156,7 +160,7 @@ DEF_CLASS_LIST(T);
 		obj = elem->obj;													\
 		OBJ_AUTODELETE(obj) = TRUE;		/* deleted by caller */				\
 		TAILQ_REMOVE( &self->head, elem, entries);							\
-		g_free( elem );														\
+		g_free0( elem );														\
 		self->count--;														\
 		return obj;															\
 	}																		\
@@ -252,7 +256,7 @@ DEF_CLASS_LIST(T);
 			TAILQ_REMOVE( &self->head, elem, entries );						\
 																			\
 			OBJ_DELETE( elem->obj );										\
-			g_free( elem );													\
+			g_free0( elem );													\
 			self->count--;													\
 		}																	\
 	}																		\

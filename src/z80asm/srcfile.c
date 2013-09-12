@@ -17,9 +17,13 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.6 2013-09-08 08:29:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.7 2013-09-12 00:10:02 pauloscustodio Exp $ */
 /* $Log: srcfile.c,v $
-/* Revision 1.6  2013-09-08 08:29:21  pauloscustodio
+/* Revision 1.7  2013-09-12 00:10:02  pauloscustodio
+/* Create g_free0() macro that NULLs the pointer after free, required
+/* by z80asm to find out if a pointer was already freed.
+/*
+/* Revision 1.6  2013/09/08 08:29:21  pauloscustodio
 /* Replaced xmalloc et al with g_malloc0 et al.
 /*
 /* Revision 1.5  2013/09/08 00:43:59  pauloscustodio
@@ -303,7 +307,7 @@ void SourceFile_ungetline( SourceFile *self, char *line )
 	{
 		line_cpy = g_strdup( line );		/* so that we can modify line */
 		do_ungetline( self, line_cpy );
-		g_free( line_cpy );
+		g_free0( line_cpy );
 	}
 	else 
 	{

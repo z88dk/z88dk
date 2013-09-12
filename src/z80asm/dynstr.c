@@ -17,9 +17,13 @@ Using class.h for automatic garbage collection.
 Strings may contain zero byte, length is defined by separate field.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.10 2013-09-08 08:29:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.11 2013-09-12 00:10:02 pauloscustodio Exp $ */
 /* $Log: dynstr.c,v $
-/* Revision 1.10  2013-09-08 08:29:21  pauloscustodio
+/* Revision 1.11  2013-09-12 00:10:02  pauloscustodio
+/* Create g_free0() macro that NULLs the pointer after free, required
+/* by z80asm to find out if a pointer was already freed.
+/*
+/* Revision 1.10  2013/09/08 08:29:21  pauloscustodio
 /* Replaced xmalloc et al with g_malloc0 et al.
 /*
 /* Revision 1.9  2013/05/01 21:10:49  pauloscustodio
@@ -83,7 +87,7 @@ void Str_copy( Str *self, Str *other )
 
 void Str_fini( Str *self )
 {
-    g_free( self->data );
+    g_free0( self->data );
 }
 
 /*-----------------------------------------------------------------------------

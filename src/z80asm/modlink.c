@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.70 2013-09-08 08:29:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.71 2013-09-12 00:10:02 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.70  2013-09-08 08:29:21  pauloscustodio
+/* Revision 1.71  2013-09-12 00:10:02  pauloscustodio
+/* Create g_free0() macro that NULLs the pointer after free, required
+/* by z80asm to find out if a pointer was already freed.
+/*
+/* Revision 1.70  2013/09/08 08:29:21  pauloscustodio
 /* Replaced xmalloc et al with g_malloc0 et al.
 /*
 /* Revision 1.69  2013/09/08 00:43:59  pauloscustodio
@@ -884,7 +888,7 @@ LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
             }
             FINALLY
             {
-                g_free( modname ); /* remove copy of module name */
+                g_free0( modname ); /* remove copy of module name */
             }
 			ETRY;
         }
@@ -965,7 +969,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
                 }
                 FINALLY
                 {
-                    g_free( mname );
+                    g_free0( mname );
                 }
 				ETRY;
 
@@ -980,7 +984,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
                 }
                 FINALLY
                 {
-                    g_free( mname );
+                    g_free0( mname );
                 }
 				ETRY;
 
@@ -1066,8 +1070,7 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
 
     if ( !found )
     {
-        g_free( mname );
-        mname = NULL;
+        g_free0( mname );
     }
 
     return mname;
@@ -1289,7 +1292,7 @@ CreateLib( char *lib_filename )
 
 			/* replace fname with the .obj extension */
 			path_replace_ext( obj_filename, CURRENTFILE->fname, get_obj_ext() );
-			g_free( CURRENTFILE->fname );
+			g_free0( CURRENTFILE->fname );
 			CURRENTFILE->fname = g_strdup( obj_filename );
 
             obj_file = fopen_err( CURRENTFILE->fname, "rb" );           /* CH_0012 */
@@ -1325,7 +1328,7 @@ CreateLib( char *lib_filename )
 
             fputl_err( Codesize, lib_file );    /* size of this module */
             fwritec_err( filebuffer, ( size_t ) Codesize, lib_file ); /* write module to library */
-            g_free( filebuffer );
+            g_free0( filebuffer );
 
             CURRENTMODULE = CURRENTMODULE->nextmodule;
         }
@@ -1346,7 +1349,7 @@ CreateLib( char *lib_filename )
         close_error_file();
 
         if ( filebuffer )
-            g_free( filebuffer );
+            g_free0( filebuffer );
     }
 	ETRY;
 }
@@ -1405,15 +1408,15 @@ ReleaseLinkInfo( void )
     {
         if ( m->objfilename != NULL )
         {
-            g_free( m->objfilename );
+            g_free0( m->objfilename );
         }
 
         n = m->nextlink;
-        g_free( m );
+        g_free0( m );
         m = n;
     }
 
-    g_free( linkhdr );
+    g_free0( linkhdr );
 
     linkhdr = NULL;
 }

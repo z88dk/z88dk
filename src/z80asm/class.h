@@ -20,9 +20,13 @@ each object, which in turn may call destructors of contained objects.
 
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.8 2013-09-08 08:29:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/class.h,v 1.9 2013-09-12 00:10:02 pauloscustodio Exp $ */
 /* $Log: class.h,v $
-/* Revision 1.8  2013-09-08 08:29:21  pauloscustodio
+/* Revision 1.9  2013-09-12 00:10:02  pauloscustodio
+/* Create g_free0() macro that NULLs the pointer after free, required
+/* by z80asm to find out if a pointer was already freed.
+/*
+/* Revision 1.8  2013/09/08 08:29:21  pauloscustodio
 /* Replaced xmalloc et al with g_malloc0 et al.
 /*
 /* Revision 1.7  2013/05/12 21:39:05  pauloscustodio
@@ -76,7 +80,7 @@ DEF_CLASS(T);
 void T_init (T *self)   { self->string = g_malloc0_n(1000,1); }
 void T_copy (T *self, T *other)
 						{ self->string = g_strdup(other->string); }
-void T_fini (T *self)   { g_free(self->string); }
+void T_fini (T *self)   { g_free0(self->string); }
 
 // usage of class
 T * obj1 = OBJ_NEW(T);  // same as T_new()
@@ -159,7 +163,7 @@ struct ObjRegister;
         _deregister_obj((struct ObjRegister *) self, __FILE__, __LINE__);   \
         /* remove from cleanup list */  \
         T##_fini(self);                     /* call user cleanup */         \
-        g_free(self);                        /* reclaim memory */            \
+        g_free0(self);                        /* reclaim memory */            \
     }
 
 /*-----------------------------------------------------------------------------
