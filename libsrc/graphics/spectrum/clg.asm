@@ -3,12 +3,16 @@
 ;       Stefano - 10/1/2007
 ;
 ;
-;	$Id: clg.asm,v 1.2 2007-01-10 20:31:19 stefano Exp $
+;	$Id: clg.asm,v 1.3 2013-09-17 12:00:07 stefano Exp $
 ;
 
-                XLIB    clg
+        XLIB    clg
 
 .clg
+        ld a,i
+        push af
+        di
+
 		ld	hl,0
 		ld	d,h
 		ld	e,h
@@ -34,4 +38,7 @@
 		djnz	clgloop
 
 		ld	sp,hl
-		ret
+        pop af
+        ret po
+        ei
+        ret

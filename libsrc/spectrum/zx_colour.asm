@@ -5,7 +5,11 @@
 XLIB zx_colour
 
 .zx_colour
-   ld 	a,l
+        ld a,i
+        push af
+        di
+
+		ld 	a,l
 		ld	d,l
 		ld	e,l
 		ld	hl,0
@@ -25,4 +29,7 @@ XLIB zx_colour
 		djnz	clrloop
 
 		ld	sp,hl
-		ret
+        pop af
+        ret po
+        ei
+        ret
