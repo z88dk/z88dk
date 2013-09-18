@@ -3,17 +3,54 @@
 #pragma once
 #define main user_main
 
+/* includes */
+#include "memalloc.h"   			/* before any other include */
+
 #include "mod1.h"
+
 #include "mod2.h"
+
 #include "mod3.h"
 
-extern struct Module1 * new_Module1(void);
-extern void delete_Module1(struct Module1 **pself);
 
-extern struct Module2 * new_Module2(void);
-extern void delete_Module2(struct Module2 **pself);
-
-extern struct Module3 * new_Module3(void);
-extern void delete_Module3(struct Module3 **pself);
+/* data types */
+typedef int BOOL;
 
 
+typedef struct Person Person;
+
+typedef struct Person0 Person0;
+
+typedef struct Person1 Person1;
+
+typedef struct Person2 Person2;
+
+typedef struct Person3 Person3;
+
+
+/* declare functions */
+
+/* Person: create, destroy, set/clear autodelete */
+extern Person * new_Person (  char * name,  int age );
+extern void delete_Person ( Person **pself );
+extern void autodelete_Person ( Person *self, BOOL autodelete );
+
+/* Person0: create, destroy, set/clear autodelete */
+extern Person0 * new_Person0 ( void );
+extern void delete_Person0 ( Person0 **pself );
+extern void autodelete_Person0 ( Person0 *self, BOOL autodelete );
+
+/* Person1: create, destroy, set/clear autodelete */
+extern Person1 * new_Person1 ( void );
+extern void delete_Person1 ( Person1 **pself );
+extern void autodelete_Person1 ( Person1 *self, BOOL autodelete );
+
+/* Person2: create, destroy, set/clear autodelete */
+extern Person2 * new_Person2 ( void );
+extern void delete_Person2 ( Person2 **pself );
+extern void autodelete_Person2 ( Person2 *self, BOOL autodelete );
+
+/* Person3: create, destroy, set/clear autodelete */
+extern Person3 * new_Person3 ( void );
+extern void delete_Person3 ( Person3 **pself );
+extern void autodelete_Person3 ( Person3 *self, BOOL autodelete );

@@ -12,16 +12,15 @@ void fini_1(void)
 	printf("fini_1()\n");
 }
 
-void struct_Module1_init(struct Module1 *self)
+void struct_Person_init(struct Person *self, char *name, int age)
 {
-	self->name = g_strdup("module 1 calling");
-	printf("Module1 init %s\n", self->name);
+	self->name = g_strdup(name);
+	self->age  = age;
+	printf("Person init name=%s, age=%d, allocated memory\n", self->name, self->age);
 }
 
-void struct_Module1_fini(struct Module1 *self)
+void struct_Person_fini(struct Person *self)
 {
-	printf("Module1 fini %s\n", self->name);
+	printf("Person fini %s, freed memory\n", self->name);
 	g_free(self->name);
 }
-
-

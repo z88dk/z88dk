@@ -1,12 +1,19 @@
 #include <stdio.h>
 #include "init.h"
 
-void main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	int i;
-	struct Module1 *mod1;
+	Person *person;
 	
-	mod1 = new_Module1();
+	printf("main start\n");
+	
+	person = new_Person("Jack", 33);
+	printf("person %s, age %d\n", person->name, person->age);
+	
+	printf("leak person\n");
+	person = new_Person("Ripper", 34);
+	printf("person %s, age %d\n", person->name, person->age);
 	
 	if ( argc > 1 )
 	{
@@ -20,5 +27,10 @@ void main(int argc, char *argv[])
 	else
 		printf("Hello world\n");
 		
-	delete_Module1(&mod1);
+	delete_Person(&person);
+	printf("person = %d\n", person);
+	
+	printf("main end\n");
+	
+	return 0;
 }
