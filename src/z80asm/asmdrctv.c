@@ -14,10 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.54 2013-09-10 20:29:32 dom Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.55 2013-09-22 21:34:48 pauloscustodio Exp $ */
 /* 
  * $Log: asmdrctv.c,v $
- * Revision 1.54  2013-09-10 20:29:32  dom
+ * Revision 1.55  2013-09-22 21:34:48  pauloscustodio
+ * Remove legacy xxx_err() interface
+ *
+ * Revision 1.54  2013/09/10 20:29:32  dom
  * Fix nested comment problem with clang
  *
  * Revision 1.53  2013/09/08 08:29:21  pauloscustodio
@@ -169,7 +172,7 @@ Copyright (C) Paulo Custodio, 2011-2013
  * - In case of disk full file write fails, but assembler does not detect the error
  *   and leaves back corruped object/binary files
  * - Created new exception FileIOException and ERR_FILE_IO error.
- * - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
+ * - Created new functions xfput_u8, xfget_u8, ... to raise the exception on error.
  *
  * Revision 1.20  2011/08/14 19:46:46  pauloscustodio
  * - INCLUDE(), BINARY(): throw the new exception FatalErrorException for fatal error ERR_FILE_OPEN, no need to re-open the original source file after the error
@@ -1137,9 +1140,9 @@ INCLUDE( void )
         fclose( z80asmfile );     /* close current source file */
         z80asmfile = NULL;          /* NOTE: this is necessary to make sure
                                        z80asmfile is NULL in case the next
-                                       fopen_err() throws an exception */
+                                       xfopen() throws an exception */
 
-        z80asmfile = fopen_err( filename, "rb" );           /* CH_0012 */
+        z80asmfile = xfopen( filename, "rb" );           /* CH_0012 */
         CURRENTFILE = Newfile( CURRENTFILE, filename );       /* Allocate new file into file information list */
 
         set_error_file( filename );
@@ -1158,9 +1161,9 @@ INCLUDE( void )
         fclose( z80asmfile );
         z80asmfile = NULL;          /* NOTE: this is necessary to make sure
                                        z80asmfile is NULL in case the next
-                                       fopen_err() throws an exception */
+                                       xfopen() throws an exception */
 
-        z80asmfile = fopen_err( CURRENTFILE->fname, "rb" );           /* CH_0012 */
+        z80asmfile = xfopen( CURRENTFILE->fname, "rb" );           /* CH_0012 */
         fseek( z80asmfile, CURRENTFILE->filepointer, 0 ); /* file position to beginning of */
     }
     else
@@ -1183,7 +1186,7 @@ BINARY( void )
     {
         filename = Fetchfilename( z80asmfile );
 
-        binfile = fopen_err( filename, "rb" );           /* CH_0012 */
+        binfile = xfopen( filename, "rb" );           /* CH_0012 */
         fseek( binfile, 0L, SEEK_END ); /* file pointer to end of file */
         Codesize = ftell( binfile );
         fseek( binfile, 0L, SEEK_SET ); /* file pointer to start of file */

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.25 2013-09-22 21:04:21 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.26 2013-09-22 21:34:48 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -430,7 +430,7 @@ long xfget_u32( FILE *file )
 {
     char buffer[4];
 
-    freadc_err( buffer, sizeof( buffer ), file );
+    xfget_char( buffer, sizeof( buffer ), file );
     return
         ( ( buffer[0] << 0  ) & 0x000000FF ) |
         ( ( buffer[1] << 8  ) & 0x0000FF00 ) |
@@ -684,7 +684,10 @@ char *search_file( char *filename, SzList *dir_list )
 
 /*
 $Log: file.c,v $
-Revision 1.25  2013-09-22 21:04:21  pauloscustodio
+Revision 1.26  2013-09-22 21:34:48  pauloscustodio
+Remove legacy xxx_err() interface
+
+Revision 1.25  2013/09/22 21:04:21  pauloscustodio
 New File and FileStack objects
 
 Revision 1.23  2013/09/08 08:29:21  pauloscustodio
@@ -739,7 +742,7 @@ Revision 1.10  2012/06/14 15:01:27  pauloscustodio
 Split safe strings from strutil.c to safestr.c
 
 Revision 1.9  2012/05/26 18:36:36  pauloscustodio
-Replaced xfputc and friends with fputc_err, raising a fatal_error() instead of an
+Replaced xfputc and friends with xfput_u8, raising a fatal_error() instead of an
 exception, moved to errors.c
 
 Revision 1.8  2012/05/24 21:44:00  pauloscustodio
@@ -779,7 +782,7 @@ BUG_0009 : file read/write not tested for errors
 - In case of disk full file write fails, but assembler does not detect the error
   and leaves back corruped object/binary files
 - Created new exception FileIOException and ERR_FILE_IO error.
-- Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
+- Created new functions xfput_u8, xfget_u8, ... to raise the exception on error.
 
 Revision 1.1  2011/08/18 21:42:05  pauloscustodio
 Utilities for file handling

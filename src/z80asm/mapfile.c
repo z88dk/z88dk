@@ -14,9 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.4 2013-06-16 20:14:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.5 2013-09-22 21:34:48 pauloscustodio Exp $
 $Log: mapfile.c,v $
-Revision 1.4  2013-06-16 20:14:39  pauloscustodio
+Revision 1.5  2013-09-22 21:34:48  pauloscustodio
+Remove legacy xxx_err() interface
+
+Revision 1.4  2013/06/16 20:14:39  pauloscustodio
 Move deffile writing to deffile.c, remove global variable deffile
 
 Revision 1.3  2013/06/16 17:51:57  pauloscustodio
@@ -71,11 +74,11 @@ static void write_map_syms( FILE *file, SymbolHash *symtab )
 
 		if ( sym->type & SYMLOCAL )
 		{
-			fputc_err( 'L', file );
+			xfput_u8( 'L', file );
 		}
 		else
 		{
-			fputc_err( 'G', file );
+			xfput_u8( 'G', file );
 		}
 
 		fprintf( file, ": %s\n", sym->owner->mname );

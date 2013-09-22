@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.14 2013-09-22 21:04:21 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.15 2013-09-22 21:34:48 pauloscustodio Exp $
 */
 
 #pragma once
@@ -129,21 +129,6 @@ extern void   xfget_c1sstr( sstr_t *str, FILE *file );
 extern void   xfput_c2sstr( sstr_t *str, FILE *file );
 extern void   xfget_c2sstr( sstr_t *str, FILE *file );
 
-/* legacy interface - to be deleted */
-#define stat_err	xstat
-#define fopen_err	xfopen
-#define fwrite_err	xfwrite
-#define fwritec_err	xfput_char
-#define fread_err	xfread
-#define freadc_err	xfget_char
-#define fputc_err	xfput_u8
-#define fgetc_err	xfget_u8
-#define fputw_err	xfput_u16
-#define fgetw_err	xfget_u16
-#define fputl_err	xfput_u32
-#define fgetl_err	xfget_i32
-
-
 /* pathname manipulation
  * All filenames are passed as char file[FILENAME_MAX] elements, instead of always strdup'ing
  */
@@ -191,7 +176,10 @@ extern char *search_file( char *filename, SzList *dir_list );
 
 /* 
 $Log: file.h,v $
-Revision 1.14  2013-09-22 21:04:21  pauloscustodio
+Revision 1.15  2013-09-22 21:34:48  pauloscustodio
+Remove legacy xxx_err() interface
+
+Revision 1.14  2013/09/22 21:04:21  pauloscustodio
 New File and FileStack objects
 
 Revision 1.13  2013/05/11 00:29:26  pauloscustodio
@@ -215,7 +203,7 @@ Revision 1.9  2013/01/20 21:24:28  pauloscustodio
 Updated copyright year to 2013
 
 Revision 1.8  2012/05/26 18:36:36  pauloscustodio
-Replaced xfputc and friends with fputc_err, raising a fatal_error() instead of an
+Replaced xfputc and friends with xfput_u8, raising a fatal_error() instead of an
 exception, moved to errors.c
 
 Revision 1.7  2012/05/24 21:44:00  pauloscustodio
@@ -249,7 +237,7 @@ BUG_0009 : file read/write not tested for errors
 - In case of disk full file write fails, but assembler does not detect the error
   and leaves back corruped object/binary files
 - Created new exception FileIOException and ERR_FILE_IO error.
-- Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
+- Created new functions xfput_u8, xfget_u8, ... to raise the exception on error.
 
 Revision 1.1  2011/08/18 21:42:05  pauloscustodio
 Utilities for file handling

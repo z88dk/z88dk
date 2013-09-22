@@ -95,9 +95,12 @@ extern int     except_current_count;
 #define THROWN() except_current_throw		/* last thrown */
 
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.11 2013-09-08 00:22:09 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.h,v 1.12 2013-09-22 21:34:48 pauloscustodio Exp $ */
 /* $Log: except.h,v $
-/* Revision 1.11  2013-09-08 00:22:09  pauloscustodio
+/* Revision 1.12  2013-09-22 21:34:48  pauloscustodio
+/* Remove legacy xxx_err() interface
+/*
+/* Revision 1.11  2013/09/08 00:22:09  pauloscustodio
 /* Changed format of output file name and line number in case of fatal error
 /*
 /* Revision 1.10  2013/09/01 00:18:28  pauloscustodio
@@ -137,7 +140,7 @@ extern int     except_current_count;
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
 /* - Created new exception FileIOException and ERR_FILE_IO error.
-/* - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
+/* - Created new functions xfput_u8, xfget_u8, ... to raise the exception on error.
 /*
 /* Revision 1.2  2011/08/14 19:25:55  pauloscustodio
 /* - New exception FatalErrorException to raise on fatal assembly errors

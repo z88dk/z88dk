@@ -50,9 +50,12 @@ Simple exception mechanism
 jmp_buf except_current_buf;
 int     except_current_count;
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.c,v 1.12 2013-09-01 00:18:28 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/except.c,v 1.13 2013-09-22 21:34:48 pauloscustodio Exp $ */
 /* $Log: except.c,v $
-/* Revision 1.12  2013-09-01 00:18:28  pauloscustodio
+/* Revision 1.13  2013-09-22 21:34:48  pauloscustodio
+/* Remove legacy xxx_err() interface
+/*
+/* Revision 1.12  2013/09/01 00:18:28  pauloscustodio
 /* - Replaced e4c exception mechanism by a much simpler one based on a few
 /*   macros. The former did not allow an exit(1) to be called within a
 /*   try-catch block.
@@ -97,7 +100,7 @@ int     except_current_count;
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
 /* - Created new exception FileIOException and ERR_FILE_IO error.
-/* - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
+/* - Created new functions xfput_u8, xfget_u8, ... to raise the exception on error.
 /*
 /* Revision 1.2  2011/08/14 19:25:55  pauloscustodio
 /* - New exception FatalErrorException to raise on fatal assembly errors

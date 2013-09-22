@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.45 2013-09-12 00:10:02 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.46 2013-09-22 21:34:48 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.45  2013-09-12 00:10:02  pauloscustodio
+/* Revision 1.46  2013-09-22 21:34:48  pauloscustodio
+/* Remove legacy xxx_err() interface
+/*
+/* Revision 1.45  2013/09/12 00:10:02  pauloscustodio
 /* Create g_free0() macro that NULLs the pointer after free, required
 /* by z80asm to find out if a pointer was already freed.
 /*
@@ -160,7 +163,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
 /* - Created new exception FileIOException and ERR_FILE_IO error.
-/* - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
+/* - Created new functions xfput_u8, xfget_u8, ... to raise the exception on error.
 /*
 /* Revision 1.17  2011/08/15 17:12:31  pauloscustodio
 /* Upgrade to Exceptions4c 2.8.9 to solve memory leak.
@@ -789,12 +792,12 @@ StoreExpr( struct expr *pfixexpr, char range )
 {
     byte_t b;
 
-    fputc_err( range, objfile );     /* range of expression */
-    fputw_err( pfixexpr->codepos, objfile );     /* patchptr */
+    xfput_u8( range, objfile );     /* range of expression */
+    xfput_u16( pfixexpr->codepos, objfile );     /* patchptr */
     b = strlen( pfixexpr->infixexpr );
-    fputc_err( b, objfile );         /* length prefixed string */
-    fwritec_err( pfixexpr->infixexpr, ( size_t ) b, objfile );
-    fputc_err( 0, objfile );         /* nul-terminate expression */
+    xfput_u8( b, objfile );         /* length prefixed string */
+    xfput_char( pfixexpr->infixexpr, ( size_t ) b, objfile );
+    xfput_u8( 0, objfile );         /* nul-terminate expression */
 
     pfixexpr->stored = ON;
 }

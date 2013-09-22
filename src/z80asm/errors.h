@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 Error handling.
 Fatal errors THROW(FatalErrorException)
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.16 2013-09-08 00:43:58 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.17 2013-09-22 21:34:48 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -66,7 +66,10 @@ extern void close_error_file( void );   /* deletes the file if no errors */
 
 /* */
 /* $Log: errors.h,v $
-/* Revision 1.16  2013-09-08 00:43:58  pauloscustodio
+/* Revision 1.17  2013-09-22 21:34:48  pauloscustodio
+/* Remove legacy xxx_err() interface
+/*
+/* Revision 1.16  2013/09/08 00:43:58  pauloscustodio
 /* New error module with one error function per error, no need for the error
 /* constants. Allows compiler to type-check error message arguments.
 /* Included the errors module in the init() mechanism, no need to call
@@ -128,7 +131,7 @@ extern void close_error_file( void );   /* deletes the file if no errors */
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
 /* - Created new exception FileIOException and ERR_FILE_IO error.
-/* - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
+/* - Created new functions xfput_u8, xfget_u8, ... to raise the exception on error.
 /*
 /* Revision 1.2  2011/07/14 01:32:08  pauloscustodio
 /*     - Unified "Integer out of range" and "Out of range" errors; they are the same error.

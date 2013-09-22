@@ -13,9 +13,12 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.55 2013-09-12 00:10:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.56 2013-09-22 21:34:48 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.55  2013-09-12 00:10:02  pauloscustodio
+Revision 1.56  2013-09-22 21:34:48  pauloscustodio
+Remove legacy xxx_err() interface
+
+Revision 1.55  2013/09/12 00:10:02  pauloscustodio
 Create g_free0() macro that NULLs the pointer after free, required
 by z80asm to find out if a pointer was already freed.
 
@@ -200,15 +203,15 @@ BUG_0010 : heap corruption when reaching MAXCODESIZE
   every write.
 
 Revision 1.18  2011/08/19 10:20:32  pauloscustodio
-- Factored code to read/write word from file into fgetw_err/fputw_err.
-- Renamed ReadLong/WriteLong to fgetl_err/fputl_err for symetry.
+- Factored code to read/write word from file into xfget_u16/xfput_u16.
+- Renamed ReadLong/WriteLong to xfget_i32/xfput_u32 for symetry.
 
 Revision 1.17  2011/08/18 23:27:54  pauloscustodio
 BUG_0009 : file read/write not tested for errors
 - In case of disk full file write fails, but assembler does not detect the error
   and leaves back corruped object/binary files
 - Created new exception FileIOException and ERR_FILE_IO error.
-- Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
+- Created new functions xfput_u8, xfget_u8, ... to raise the exception on error.
 
 Revision 1.16  2011/08/14 19:37:43  pauloscustodio
 Z80pass1(): no need to check for fatal error and return; bypassed by exception mechanism
@@ -646,17 +649,17 @@ StoreName( Symbol *node, byte_t scope )
     switch ( scope )
     {
         case SYMLOCAL:
-            fputc_err( 'L', objfile );
+            xfput_u8( 'L', objfile );
             break;
 
         case SYMXDEF:
             if ( node->type & SYMDEF )
             {
-                fputc_err( 'X', objfile );
+                xfput_u8( 'X', objfile );
             }
             else
             {
-                fputc_err( 'G', objfile );
+                xfput_u8( 'G', objfile );
             }
 
             break;
@@ -664,18 +667,18 @@ StoreName( Symbol *node, byte_t scope )
 
     if ( node->type & SYMADDR )   /* then write type of symbol */
     {
-        fputc_err( 'A', objfile );    /* either a relocatable address */
+        xfput_u8( 'A', objfile );    /* either a relocatable address */
     }
     else
     {
-        fputc_err( 'C', objfile );    /* or a constant */
+        xfput_u8( 'C', objfile );    /* or a constant */
     }
 
-    fputl_err( node->value, objfile );
+    xfput_u32( node->value, objfile );
 
     b = strlen( node->name );
-    fputc_err( b, objfile );         /* write length of symbol name to relocatable file */
-    fwritec_err( node->name, ( size_t ) b, objfile ); /* write symbol name to relocatable file */
+    xfput_u8( b, objfile );         /* write length of symbol name to relocatable file */
+    xfput_char( node->name, ( size_t ) b, objfile ); /* write symbol name to relocatable file */
 }
 
 
@@ -733,8 +736,8 @@ StoreLibReferences( SymbolHash *symtab )
 		if ( ( sym->type & SYMXREF ) && ( sym->type & SYMDEF ) && ( sym->type & SYMTOUCHED ) )
 		{
 			b = strlen( sym->name );
-			fputc_err( ( int ) b, objfile ); /* write length of symbol name to relocatable file */
-			fwritec_err( sym->name, b, objfile );    /* write symbol name to relocatable file */
+			xfput_u8( ( int ) b, objfile ); /* write length of symbol name to relocatable file */
+			xfput_char( sym->name, b, objfile );    /* write symbol name to relocatable file */
 		}
 	}
 }
@@ -912,8 +915,8 @@ Z80pass2( void )
 
     fptr_modname = ftell( objfile );
     constant = strlen( CURRENTMODULE->mname );
-    fputc_err( constant, objfile );  /* write length of module name to relocatable file */
-    fwritec_err( CURRENTMODULE->mname, ( size_t ) constant, objfile );   /* write module name to relocatable file */
+    xfput_u8( constant, objfile );  /* write length of module name to relocatable file */
+    xfput_char( CURRENTMODULE->mname, ( size_t ) constant, objfile );   /* write module name to relocatable file */
 
     if ( ( constant = get_codeindex() ) == 0 )    /* BUG_0015 */
     {
@@ -922,7 +925,7 @@ Z80pass2( void )
     else
     {
         fptr_modcode = ftell( objfile );
-        fputw_err( constant, objfile );  /* two bytes of module code size */
+        xfput_u16( constant, objfile );  /* two bytes of module code size */
         fwrite_codearea( objfile );
     }
 
@@ -943,7 +946,7 @@ Z80pass2( void )
         }
     }
 
-    fputw_err( CURRENTMODULE->origin, objfile );         /* two bytes of origin */
+    xfput_u16( CURRENTMODULE->origin, objfile );         /* two bytes of origin */
 
     fptr_exprdecl = 30;           /* expressions always begins at file position 24 */
 
@@ -962,11 +965,11 @@ Z80pass2( void )
         fptr_libnmdecl = -1;    /* no library reference declarations */
     }
 
-    fputl_err( fptr_modname, objfile );  /* write fptr. to module name */
-    fputl_err( fptr_exprdecl, objfile ); /* write fptr. to name declarations */
-    fputl_err( fptr_namedecl, objfile ); /* write fptr. to name declarations */
-    fputl_err( fptr_libnmdecl, objfile ); /* write fptr. to library name declarations */
-    fputl_err( fptr_modcode, objfile );  /* write fptr. to module code */
+    xfput_u32( fptr_modname, objfile );  /* write fptr. to module name */
+    xfput_u32( fptr_exprdecl, objfile ); /* write fptr. to name declarations */
+    xfput_u32( fptr_namedecl, objfile ); /* write fptr. to name declarations */
+    xfput_u32( fptr_libnmdecl, objfile ); /* write fptr. to library name declarations */
+    xfput_u32( fptr_modcode, objfile );  /* write fptr. to module code */
 }
 
 

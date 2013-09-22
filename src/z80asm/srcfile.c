@@ -17,9 +17,12 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.7 2013-09-12 00:10:02 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.8 2013-09-22 21:34:48 pauloscustodio Exp $ */
 /* $Log: srcfile.c,v $
-/* Revision 1.7  2013-09-12 00:10:02  pauloscustodio
+/* Revision 1.8  2013-09-22 21:34:48  pauloscustodio
+/* Remove legacy xxx_err() interface
+/*
+/* Revision 1.7  2013/09/12 00:10:02  pauloscustodio
 /* Create g_free0() macro that NULLs the pointer after free, required
 /* by z80asm to find out if a pointer was already freed.
 /*
@@ -145,7 +148,7 @@ void SourceFile_open( SourceFile *self, char *source_file )
 	self->filename = strpool_add( search_source_file( source_file ) );
 
 	/* open new file in binary mode, for cross-platform newline processing */
-	self->file = fopen_err( self->filename, "rb" );
+	self->file = xfopen( self->filename, "rb" );
 
 	Str_clear( self->line );
 	self->line_nr = 0;

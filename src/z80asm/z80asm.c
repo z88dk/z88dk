@@ -14,9 +14,12 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.101 2013-09-12 00:10:02 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.102 2013-09-22 21:34:48 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.101  2013-09-12 00:10:02  pauloscustodio
+/* Revision 1.102  2013-09-22 21:34:48  pauloscustodio
+/* Remove legacy xxx_err() interface
+/*
+/* Revision 1.101  2013/09/12 00:10:02  pauloscustodio
 /* Create g_free0() macro that NULLs the pointer after free, required
 /* by z80asm to find out if a pointer was already freed.
 /*
@@ -283,15 +286,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 /* - Factored all the codearea-accessing code into a new module, checking for MAXCODESIZE on every write.
 /*
 /* Revision 1.38  2011/08/19 10:20:32  pauloscustodio
-/* - Factored code to read/write word from file into fgetw_err/fputw_err.
-/* - Renamed ReadLong/WriteLong to fgetl_err/fputl_err for symetry.
+/* - Factored code to read/write word from file into xfget_u16/xfput_u16.
+/* - Renamed ReadLong/WriteLong to xfget_i32/xfput_u32 for symetry.
 /*
 /* Revision 1.37  2011/08/18 23:27:54  pauloscustodio
 /* BUG_0009 : file read/write not tested for errors
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
 /* - Created new exception FileIOException and ERR_FILE_IO error.
-/* - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
+/* - Created new functions xfput_u8, xfget_u8, ... to raise the exception on error.
 /*
 /* Revision 1.36  2011/08/18 21:47:48  pauloscustodio
 /* BUG_0008 : code block of 64K is read as zero
@@ -768,7 +771,7 @@ static void assemble_list( char *filename )
 	FILE *fp;
 	SSTR_DEFINE( line, MAXLINE );
 
-	fp = fopen_err( filename, "rb" );
+	fp = xfopen( filename, "rb" );
 
 	/* read lines from file and assemble each one in turn */
 	while ( sstr_getline( line, fp ) )
@@ -823,7 +826,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
     /* try-catch to delete incomplete files in case of fatal error */
     TRY
     {
-		z80asmfile = fopen_err( src_filename, "rb" );           /* CH_0012 */
+		z80asmfile = xfopen( src_filename, "rb" );           /* CH_0012 */
         set_error_file( src_filename );
 
         /* Create error file */
@@ -839,9 +842,9 @@ static void do_assemble( char *src_filename, char *obj_filename )
         }
 
         /* Create relocatable object file */
-        objfile = fopen_err( obj_filename, "w+b" );           /* CH_0012 */
-        fwritec_err( Z80objhdr,    strlen( Z80objhdr ),    objfile );
-        fwritec_err( objhdrprefix, strlen( objhdrprefix ), objfile );
+        objfile = xfopen( obj_filename, "w+b" );           /* CH_0012 */
+        xfput_char( Z80objhdr,    strlen( Z80objhdr ),    objfile );
+        xfput_char( objhdrprefix, strlen( objhdrprefix ), objfile );
 
         set_PC( 0 );
 
@@ -1049,8 +1052,8 @@ char *GetLibfile( char *filename )
 
     newlib->libfilename = g_strdup( found_libfilename );		/* freed when newlib is freed */
 
-    file = fopen_err( found_libfilename, "rb" );           /* CH_0012 */
-    freadc_err( fheader, 8U, file );     /* read first 8 chars from file into array */
+    file = xfopen( found_libfilename, "rb" );           /* CH_0012 */
+    xfget_char( fheader, 8U, file );     /* read first 8 chars from file into array */
     fheader[8] = '\0';
 
     if ( strcmp( fheader, Z80libhdr ) != 0 )            /* compare header of file */

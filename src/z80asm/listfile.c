@@ -15,9 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle assembly listing and symbol table listing.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.6 2013-09-01 18:46:01 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.7 2013-09-22 21:34:48 pauloscustodio Exp $ */
 /* $Log: listfile.c,v $
-/* Revision 1.6  2013-09-01 18:46:01  pauloscustodio
+/* Revision 1.7  2013-09-22 21:34:48  pauloscustodio
+/* Remove legacy xxx_err() interface
+/*
+/* Revision 1.6  2013/09/01 18:46:01  pauloscustodio
 /* Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
 /*
 /* Revision 1.5  2013/09/01 12:00:07  pauloscustodio
@@ -128,7 +131,7 @@ static void ListFile_fprintf( ListFile *self, char *msg, ... )
 		/* output to list file, advance line if newline, insert header on new page */
 		for ( p = sstr_data(str) ; *p ; p++ ) 
 		{
-			fputc_err( *p, self->file );
+			xfput_u8( *p, self->file );
 			if ( *p == '\n' ) 
 			{
 				self->line_nr++;
@@ -184,7 +187,7 @@ static void ListFile_write_header( ListFile *self )
 			fpos2 = ftell( self->file );		/* before last newline */
 		}
 
-		fputc_err( '\n', self->file );
+		xfput_u8( '\n', self->file );
 
 		/* compute header size and newline size on first call */
 		if ( header_size == 0 ) 
@@ -230,7 +233,7 @@ void ListFile_open( ListFile *self, char *source_file, char *extension )
 	path_replace_ext( list_filename, source_file, extension );
 
 	self->filename	= strpool_add(list_filename);
-	self->file		= fopen_err( list_filename, "w+" );
+	self->file		= xfopen( list_filename, "w+" );
 	self->source_list_ended = FALSE;
 
 	/* output header */
@@ -257,7 +260,7 @@ void ListFile_close( ListFile *self, BOOL keep_file )
 		/* close any pending line started */
 		ListFile_end( self );
 
-        fputc_err( '\f', self->file );     /* end listing with a FF */
+        xfput_u8( '\f', self->file );     /* end listing with a FF */
         fclose( self->file );
 
 		if ( ! keep_file) 

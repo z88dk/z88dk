@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.17 2013-09-12 00:10:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.18 2013-09-22 21:34:48 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -113,7 +113,7 @@ static void check_space( size_t addr, size_t n )
 *----------------------------------------------------------------------------*/
 void fwrite_codearea( FILE *stream )
 {
-    fwritec_err( codearea, codeindex, stream );
+    xfput_char( codearea, codeindex, stream );
 }
 
 void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size )
@@ -125,7 +125,7 @@ void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size )
             size = codeindex - addr;
         }
 
-        fwritec_err( codearea + addr, size, stream );
+        xfput_char( codearea + addr, size, stream );
     }
 }
 
@@ -133,7 +133,7 @@ void fwrite_codearea_chunk( FILE *stream, size_t addr, size_t size )
 void fread_codearea( FILE *stream, size_t size )
 {
     check_space( codeindex, size );
-    freadc_err( codearea + codeindex, size, stream );
+    xfget_char( codearea + codeindex, size, stream );
     codeindex += size;
 }
 
@@ -141,7 +141,7 @@ void fread_codearea( FILE *stream, size_t size )
 void fread_codearea_offset( FILE *stream, size_t offset, size_t size )
 {
     check_space( offset, size );
-    freadc_err( codearea + offset, size, stream );
+    xfget_char( codearea + offset, size, stream );
 
     if ( codeindex < offset + size )
     {
@@ -211,7 +211,10 @@ byte_t get_byte( size_t *paddr )
 
 /* */
 /* $Log: codearea.c,v $
-/* Revision 1.17  2013-09-12 00:10:02  pauloscustodio
+/* Revision 1.18  2013-09-22 21:34:48  pauloscustodio
+/* Remove legacy xxx_err() interface
+/*
+/* Revision 1.17  2013/09/12 00:10:02  pauloscustodio
 /* Create g_free0() macro that NULLs the pointer after free, required
 /* by z80asm to find out if a pointer was already freed.
 /*

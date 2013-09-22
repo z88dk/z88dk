@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.28 2013-09-08 00:43:58 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.29 2013-09-22 21:34:48 pauloscustodio Exp $ 
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -254,7 +254,10 @@ static void do_error( enum ErrType err_type, char *message )
 
 /* */
 /* $Log: errors.c,v $
-/* Revision 1.28  2013-09-08 00:43:58  pauloscustodio
+/* Revision 1.29  2013-09-22 21:34:48  pauloscustodio
+/* Remove legacy xxx_err() interface
+/*
+/* Revision 1.28  2013/09/08 00:43:58  pauloscustodio
 /* New error module with one error function per error, no need for the error
 /* constants. Allows compiler to type-check error message arguments.
 /* Included the errors module in the init() mechanism, no need to call
@@ -353,7 +356,7 @@ static void do_error( enum ErrType err_type, char *message )
 /* - In case of disk full file write fails, but assembler does not detect the error
 /*   and leaves back corruped object/binary files
 /* - Created new exception FileIOException and ERR_FILE_IO error.
-/* - Created new functions fputc_err, fgetc_err, ... to raise the exception on error.
+/* - Created new functions xfput_u8, xfget_u8, ... to raise the exception on error.
 /*
 /* Revision 1.4  2011/08/14 19:27:52  pauloscustodio
 /* - ReportError() raises the new exception FatalErrorException for fatal error ERR_MAX_CODESIZE
