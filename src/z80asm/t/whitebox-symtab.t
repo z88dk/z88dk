@@ -17,7 +17,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "sym.o symtab.o symref.o class.o safestr.o strhash.o errors.o strutil.o file.o strlist.o";
+my $objs = "sym.o symtab.o symref.o class.o safestr.o strhash.o errors.o strutil.o file.o init_obj.o init_obj_file.o strlist.o";
 #		   strpool.o ".
 #		   " die.o except.o init.o ".
 #		   "codearea.o listfile.o dynstr.o hist.o sym.o symref.o";
@@ -334,9 +334,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.12 2013-09-09 00:20:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.13 2013-09-22 21:04:22 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.12  2013-09-09 00:20:45  pauloscustodio
+# Revision 1.13  2013-09-22 21:04:22  pauloscustodio
+# New File and FileStack objects
+#
+# Revision 1.12  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
 # -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
 #

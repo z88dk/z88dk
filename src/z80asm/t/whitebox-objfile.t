@@ -19,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "objfile.o class.o file.o safestr.o errors.o strlist.o strutil.o";
+my $objs = "objfile.o class.o file.o init_obj.o init_obj_file.o safestr.o errors.o strlist.o strutil.o";
 
 t_compile_module('', <<'END', $objs);
 
@@ -206,9 +206,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.6 2013-09-09 00:20:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.7 2013-09-22 21:04:22 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.6  2013-09-09 00:20:45  pauloscustodio
+# Revision 1.7  2013-09-22 21:04:22  pauloscustodio
+# New File and FileStack objects
+#
+# Revision 1.6  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
 # -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
 #

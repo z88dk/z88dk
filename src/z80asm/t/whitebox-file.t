@@ -20,9 +20,320 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "file.o class.o strlist.o safestr.o errors.o strutil.o";
+my $objs = "file.o init_obj.o init_obj_file.o class.o strlist.o safestr.o errors.o strutil.o";
 
-t_compile_module('', <<'END', $objs);
+# get init code except init() and main()
+my $init = read_file("init.c"); $init =~ s/static void init\(\)\s*\{.*//s;
+
+# test deleting of objects
+t_compile_module($init, <<'END', $objs);
+	File *file;
+	FileStack *file_stack;
+
+	/* test delete of NULL */
+	delete_File(NULL);
+	file_stack = new_FileStack();	/* items are NULL */
+	delete0_FileStack(&file_stack);
+	delete_FileStack(NULL);
+END
+
+t_run_module([], <<'OUT', <<'ERR', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        20 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=1792, zero-initialized=1772 (98.88%), freed=20 (1.12%), remaining=1772
+OUT
+ERR
+
+write_file(asm1_file(), {binmode => ':raw'}, "");
+write_file(asm2_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE");
+write_file(asm3_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\n");
+write_file(asm4_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\r");
+write_file(asm5_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\r\n");
+write_file(asm6_file(), {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE\n\r");
+write_file(asm7_file(), {binmode => ':raw'}, "ABCDEFGHIJ\nabcdefghij\n");
+
+# test file reading
+t_compile_module($init, <<'END', $objs);
+	File *file;
+	char *p;
+	int i;
+	
+	for (i = 1; i < argc; i++) 
+	{
+		file = new_File(argv[i], "rb");
+		
+		printf("Read file %s:\n", argv[i]);
+		while (getline_File(file)) 
+		{
+			printf("%s:%d:", file->filename, file->line_nr);
+			for (p = file->line->str; *p; p++) 
+			{
+				if ( *p > 32 && *p < 127 )
+					putchar(*p);
+				else
+					printf("{%02X}", *p);
+			}
+			putchar('\n');
+		}
+		printf("End of file\n");
+		
+		/* let garbage collector delete files */
+	}
+	delete0_File(&file);
+	ASSERT( file == NULL );
+	
+END
+
+t_run_module([ asm_file(), 
+			   asm1_file(), 
+			   asm2_file(), 
+			   asm3_file(), 
+			   asm4_file(), 
+			   asm5_file(), 
+			   asm6_file(), 
+			   asm7_file() ], <<'OUT', <<'ERR', 1);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        18 |          1 |          0 |          0 |          1 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        24 |          1 |          1 |          0 |          0 |         +0
+        28 |          0 |          1 |          1 |          0 |         +0
+        36 |          0 |          0 |          1 |          1 |         +0
+        44 |          1 |          0 |          0 |          1 |         +0
+        88 |          0 |          1 |          1 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2030, zero-initialized=1772 (87.29%), freed=258 (12.71%), remaining=1772
+OUT
+Error: cannot read file 'test.asm'
+Uncaught runtime exception at errors.c(1)
+ERR
+
+
+t_run_module([ asm1_file(), 
+			   asm2_file(), 
+			   asm3_file(), 
+			   asm4_file(), 
+			   asm5_file(), 
+			   asm6_file(), 
+			   asm7_file() ], <<'OUT', <<'ERR', 0);
+Read file test1.asm:
+End of file
+Read file test2.asm:
+test2.asm:1:A{0A}
+test2.asm:2:B{0A}
+test2.asm:3:C{0A}
+test2.asm:4:D{0A}
+test2.asm:5:E{0A}
+End of file
+Read file test3.asm:
+test3.asm:1:A{0A}
+test3.asm:2:B{0A}
+test3.asm:3:C{0A}
+test3.asm:4:D{0A}
+test3.asm:5:E{0A}
+End of file
+Read file test4.asm:
+test4.asm:1:A{0A}
+test4.asm:2:B{0A}
+test4.asm:3:C{0A}
+test4.asm:4:D{0A}
+test4.asm:5:E{0A}
+End of file
+Read file test5.asm:
+test5.asm:1:A{0A}
+test5.asm:2:B{0A}
+test5.asm:3:C{0A}
+test5.asm:4:D{0A}
+test5.asm:5:E{0A}
+End of file
+Read file test6.asm:
+test6.asm:1:A{0A}
+test6.asm:2:B{0A}
+test6.asm:3:C{0A}
+test6.asm:4:D{0A}
+test6.asm:5:E{0A}
+End of file
+Read file test7.asm:
+test7.asm:1:ABCDEFGHIJ{0A}
+test7.asm:2:abcdefghij{0A}
+End of file
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+         4 |          0 |          6 |          7 |          1 |         +0
+         8 |          0 |          0 |          1 |          1 |         +0
+        16 |          0 |          1 |          1 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2964, zero-initialized=1868 (63.02%), freed=1192 (40.22%), remaining=1772
+OUT
+ERR
+
+
+# test file-stack reading
+t_compile_module($init, <<'END', $objs);
+	FileStack *fs;
+	char *p;
+	char *files[] = {"test2.asm", "test3.asm", "test4.asm", NULL};
+	int i;
+	
+	fs = new_FileStack(); ASSERT( fs );
+	ASSERT( getline_FileStack( fs ) == NULL );
+	
+	read_to_FileStack(fs, "test1.asm");
+	ASSERT( getline_FileStack( fs ) == NULL );
+	
+	i = 0;
+	read_to_FileStack(fs, files[i++]);
+	while (	p = getline_FileStack( fs ) )
+	{
+		ASSERT( strcmp( p, fs->top->line->str ) == 0 );
+		printf("%s:%d:%s", fs->top->filename, fs->top->line_nr, fs->top->line->str);
+		
+		if (files[i]) 
+			read_to_FileStack(fs, files[i++]);
+	}
+	
+	/* error */
+	read_to_FileStack(fs, "test1.asm");
+	read_to_FileStack(fs, "test1.asm");
+END
+
+t_run_module([], <<'OUT', <<'ERR', 1);
+test2.asm:1:A
+test3.asm:1:A
+test4.asm:1:A
+test4.asm:2:B
+test4.asm:3:C
+test4.asm:4:D
+test4.asm:5:E
+test3.asm:2:B
+test3.asm:3:C
+test3.asm:4:D
+test3.asm:5:E
+test2.asm:2:B
+test2.asm:3:C
+test2.asm:4:D
+test2.asm:5:E
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+         4 |          0 |          1 |          4 |          0 |        +12
+        20 |          1 |          1 |          0 |          0 |         +0
+        21 |          1 |          0 |          0 |          1 |         +0
+        24 |          1 |          1 |          0 |          0 |         +0
+        42 |          0 |          0 |          1 |          1 |         +0
+        44 |          1 |          1 |          1 |          1 |         +0
+        84 |          0 |          0 |          1 |          1 |         +0
+        88 |          0 |          1 |          1 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=3275, zero-initialized=1868 (57.04%), freed=1491 (45.53%), remaining=1784
+OUT
+Error: cannot include file 'test1.asm' recursively
+Uncaught runtime exception at errors.c(1)
+ERR
+
+
+
+
+# test file writing
+t_compile_module($init, <<'END', $objs);
+	File *file;
+	
+	file = new_File("x/y/z/test1.asm", "w");
+	printf("write file failed\n");
+END
+
+t_run_module([], <<'OUT', <<'ERR', 1);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+        19 |          1 |          0 |          0 |          1 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        24 |          1 |          1 |          0 |          0 |         +0
+        36 |          0 |          1 |          1 |          0 |         +0
+        38 |          0 |          0 |          1 |          1 |         +0
+        44 |          1 |          0 |          0 |          1 |         +0
+        88 |          0 |          1 |          1 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2041, zero-initialized=1772 (86.82%), freed=269 (13.18%), remaining=1772
+OUT
+Error: cannot write file 'x/y/z/test1.asm'
+Uncaught runtime exception at errors.c(1)
+ERR
+
+
+t_compile_module($init, <<'END', $objs);
+	File *file;
+	
+	file = new_File("test1.asm", "w");
+	fprintf(file->fp, "write file not flushed\n");
+	
+	/* leak memory, do not close, test1.asm will be deleted */
+	file = new_File("test2.asm", "w");
+	fprintf(file->fp, "write file ok\n");
+	close_File(file);
+END
+
+
+t_run_module([], <<'OUT', <<'ERR', 0);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+         4 |          0 |          2 |          2 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=2920, zero-initialized=1868 (63.97%), freed=1148 (39.32%), remaining=1772
+OUT
+ERR
+
+ok ! -f "test1.asm";
+is read_file("test2.asm"), "write file ok\n";
+
+
+# TEST OLD INTERFACE
+
+t_compile_module($init, <<'END', $objs);
 	SzList *list;
 	
 	if (argv[2][0] == '0')
@@ -234,7 +545,7 @@ OUT
 
 
 # test file manipulation
-t_compile_module('', <<'END', $objs);
+t_compile_module($init, <<'END', $objs);
 #define T1(init, func, result) \
 		strcpy( file, init); \
 		p = func; \
@@ -302,7 +613,7 @@ OUT
 ERR
 
 # test file IO
-t_compile_module('', <<'END', $objs);
+t_compile_module($init, <<'END', $objs);
 /* 256 characters */
 #define BIG_STR "1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
 				"1234567890" "1234567890" "1234567890" "1234567890" "1234567890" \
@@ -803,9 +1114,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.15 2013-09-09 00:20:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.16 2013-09-22 21:04:21 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.15  2013-09-09 00:20:45  pauloscustodio
+# Revision 1.16  2013-09-22 21:04:21  pauloscustodio
+# New File and FileStack objects
+#
+# Revision 1.15  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
 # -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
 #

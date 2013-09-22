@@ -20,7 +20,7 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "scan.o class.o dynstr.o errors.o strutil.o file.o safestr.o strlist.o srcfile.o";
+my $objs = "scan.o class.o dynstr.o errors.o strutil.o file.o init_obj.o init_obj_file.o safestr.o strlist.o srcfile.o";
 ok ! system "make parse.h";
 
 # build list of case TOKEN: return "TOKEN" from parse.h
@@ -52,10 +52,10 @@ char *decode_token (int token, YYSTYPE *yylval)
 		case NUMBER: 	sprintf(token_str, "NUMBER %ld", yylval->lval); 
 						return token_str;
 		case STRING: 	sprintf(token_str, "STRING '%s'", yylval->sval); 
-						g_free(yylval->sval);
+						g_free0(yylval->sval);
 						return token_str;
 		case NAME:	 	sprintf(token_str, "NAME %s", yylval->sval); 
-						g_free(yylval->sval);
+						g_free0(yylval->sval);
 						return token_str;
 <TOKEN_CASE>
 		default:
@@ -997,9 +997,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.13 2013-09-09 00:20:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.14 2013-09-22 21:04:22 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.13  2013-09-09 00:20:45  pauloscustodio
+# Revision 1.14  2013-09-22 21:04:22  pauloscustodio
+# New File and FileStack objects
+#
+# Revision 1.13  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
 # -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
 #

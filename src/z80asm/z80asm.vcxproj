@@ -143,6 +143,8 @@
     <ClCompile Include="file.c" />
     <ClCompile Include="hist.c" />
     <ClCompile Include="init.c" />
+    <ClCompile Include="init_obj.c" />
+    <ClCompile Include="init_obj_file.c" />
     <ClCompile Include="ldinstr.c" />
     <ClCompile Include="listfile.c" />
     <ClCompile Include="mapfile.c" />

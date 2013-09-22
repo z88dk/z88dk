@@ -20,7 +20,7 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "srcfile.o class.o file.o errors.o strlist.o dynstr.o safestr.o strutil.o";
+my $objs = "srcfile.o class.o file.o init_obj.o init_obj_file.o errors.o strlist.o dynstr.o safestr.o strutil.o";
 
 my $init_code = <<'END';
 #define ERROR return __LINE__
@@ -768,9 +768,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.9 2013-09-09 00:20:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.10 2013-09-22 21:04:22 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.9  2013-09-09 00:20:45  pauloscustodio
+# Revision 1.10  2013-09-22 21:04:22  pauloscustodio
+# New File and FileStack objects
+#
+# Revision 1.9  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
 # -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
 #

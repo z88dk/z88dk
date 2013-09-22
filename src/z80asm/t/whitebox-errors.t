@@ -24,7 +24,7 @@ require 't/test_utils.pl';
 # test errors.c
 unlink_testfiles();
 
-my $objs = "errors.o file.o class.o safestr.o strlist.o strutil.o";
+my $objs = "errors.o file.o init_obj.o init_obj_file.o class.o safestr.o strlist.o strutil.o";
 
 t_compile_module('', <<'END', $objs);
 #define ERROR return __LINE__
@@ -219,9 +219,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.9 2013-09-09 00:20:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.10 2013-09-22 21:04:21 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.9  2013-09-09 00:20:45  pauloscustodio
+# Revision 1.10  2013-09-22 21:04:21  pauloscustodio
+# New File and FileStack objects
+#
+# Revision 1.9  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
 # -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
 #

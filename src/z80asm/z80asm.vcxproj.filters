@@ -138,10 +138,10 @@
     <ClInclude Include="token_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="init.h">
+    <ClInclude Include="except.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="except.h">
+    <ClInclude Include="init.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -263,10 +263,16 @@
     <ClCompile Include="deffile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="except.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="init.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="except.c">
+    <ClCompile Include="init_obj.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="init_obj_file.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

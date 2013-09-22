@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.77 2013-09-12 00:05:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.78 2013-09-22 21:04:21 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -60,6 +60,11 @@ LDFLAGS += $(shell pkg-config --libs glib-2.0)
 #------------------------------------------------------------------------------
 # Object files
 #------------------------------------------------------------------------------
+GENERATED_OBJS =			\
+	init.o					\
+	init_obj.o				\
+	init_obj_file.o			\
+
 OBJS = 	\
 	asmdrctv.o 		\
 	class.o			\
@@ -72,7 +77,6 @@ OBJS = 	\
 	exprprsr.o		\
 	file.o			\
 	hist.o			\
-	init.o			\
 	ldinstr.o		\
 	listfile.o		\
 	mapfile.o		\
@@ -99,15 +103,20 @@ OBJS = 	\
 	z80asm.o		\
 	z80instr.o		\
 	z80pass.o		\
+	$(GENERATED_OBJS)
 
 #------------------------------------------------------------------------------
 # Initializing modules in the required initialization order
 #------------------------------------------------------------------------------
-MAKE_INIT =			tools/make_init.pl
-INIT = \
+MAKE_INIT :=		tools/make_init.pl
+INIT_TMPL :=		$(wildcard tools/*.c tools/*.h)
+INIT_OUT  :=		init.c init.h $(wildcard init_obj*.c)
+INIT := \
 	memalloc.h 		\
 	strpool.h		\
 	errors.h		\
+					\
+	file.h			\
 					\
 	codearea.h		\
 
@@ -118,12 +127,13 @@ ASTYLE = astyle \
 	--mode=c \
 	--lineend=linux \
 	--indent=spaces=4 \
-	--style=ansi --add-brackets \
+	--style=ansi \
 	--indent-switches --indent-classes \
 	--indent-preprocessor --convert-tabs \
 	--break-blocks \
 	--pad-oper --pad-paren-in --pad-header --unpad-paren \
-	--align-pointer=name
+	--align-pointer=name \
+	--suffix=none
 
 TARGET =		z80asm$(EXESUFFIX)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
@@ -151,7 +161,7 @@ $(TARGET): $(OBJS)
 #------------------------------------------------------------------------------
 # init module
 #------------------------------------------------------------------------------
-init.c init.h : $(INIT) $(MAKE_INIT) Makefile
+$(INIT_OUT) : $(INIT) $(MAKE_INIT) $(INIT_TMPL) Makefile
 	perl $(MAKE_INIT) $(INIT)
 
 #------------------------------------------------------------------------------
@@ -201,16 +211,22 @@ testzcc : $(TARGET)
 	eightyone microman.tap
 	eightyone mandel.tap
 
+#------------------------------------------------------------------------------
 # build with msvc - need to build manualy, devenv not available in Express
+#------------------------------------------------------------------------------
 $(MSVC_TARGET) : $(wildcard *.c) $(wildcard *.h)
 	@echo Build z80asm inside Microsoft Visual C++ 2010 Express
 	@exit 1
 
+#------------------------------------------------------------------------------
 # formatting style
+#------------------------------------------------------------------------------
 astyle:
 	$(ASTYLE) *.c *.h
 
+#------------------------------------------------------------------------------
 # gccmake.bat - work arround impossibility of writing a '$' in the perl code
+#------------------------------------------------------------------------------
 gccmake.bat : Makefile
 	@perl -e " \
 			print \
@@ -247,14 +263,20 @@ gccmake.bat : Makefile
 		" $(OBJS) > gccmake.bat.new
 	@mv gccmake.bat.new gccmake.bat
 	
+#------------------------------------------------------------------------------
 # Dependencies
+#------------------------------------------------------------------------------
 depend:
 	makedepend -Y $(OBJS:.o=.c)
 	perl -i.bak -pe "s!\.\.\/config\.h!!g" Makefile
 
 
+#------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.77  2013-09-12 00:05:34  pauloscustodio
+# Revision 1.78  2013-09-22 21:04:21  pauloscustodio
+# New File and FileStack objects
+#
+# Revision 1.77  2013/09/12 00:05:34  pauloscustodio
 # ASTYLE is optional, do not call it to make init.c
 #
 # Revision 1.76  2013/09/10 23:47:51  dom
@@ -569,7 +591,7 @@ codearea.o: errors_def.h symbol.h model.h objfile.h class.h queue.h symtab.h
 codearea.o: classhash.h strhash.h uthash.h die.h sym.h symref.h classlist.h
 codearea.o: token_def.h z80asm.h file.h safestr.h strlist.h listfile.h
 codearea.o: dynstr.h
-deffile.o: memalloc.h deffile.h file.h safestr.h types.h strlist.h class.h
+deffile.o: memalloc.h deffile.h file.h types.h safestr.h strlist.h class.h
 deffile.o: queue.h listfile.h dynstr.h symref.h classlist.h options.h
 deffile.o: symbol.h model.h objfile.h symtab.h classhash.h strhash.h uthash.h
 deffile.o: die.h sym.h token_def.h z80asm.h config.h 
@@ -583,11 +605,10 @@ exprprsr.o: errors_def.h file.h safestr.h strlist.h class.h queue.h legacy.h
 exprprsr.o: options.h symbol.h model.h objfile.h symtab.h classhash.h
 exprprsr.o: strhash.h uthash.h die.h sym.h symref.h classlist.h token_def.h
 exprprsr.o: except.h z80asm.h
-file.o: memalloc.h class.h queue.h types.h config.h  errors.h
-file.o: errors_def.h file.h safestr.h strlist.h strpool.h strutil.h uthash.h
-file.o: die.h
+file.o: memalloc.h errors.h errors_def.h file.h types.h safestr.h strlist.h
+file.o: class.h queue.h init.h strpool.h codearea.h config.h 
+file.o: strutil.h uthash.h die.h
 hist.o: memalloc.h hist.h
-init.o: memalloc.h strpool.h errors.h errors_def.h codearea.h types.h
 ldinstr.o: memalloc.h config.h  z80asm.h types.h sym.h class.h
 ldinstr.o: queue.h symref.h classlist.h symbol.h model.h objfile.h symtab.h
 ldinstr.o: classhash.h strhash.h uthash.h die.h token_def.h errors.h
@@ -597,7 +618,7 @@ listfile.o: classlist.h file.h safestr.h strlist.h options.h symbol.h model.h
 listfile.o: objfile.h symtab.h classhash.h strhash.h uthash.h die.h sym.h
 listfile.o: token_def.h z80asm.h config.h  errors.h errors_def.h
 listfile.o: hist.h strpool.h strutil.h codearea.h
-mapfile.o: memalloc.h file.h safestr.h types.h strlist.h class.h queue.h
+mapfile.o: memalloc.h file.h types.h safestr.h strlist.h class.h queue.h
 mapfile.o: listfile.h dynstr.h symref.h classlist.h mapfile.h options.h
 mapfile.o: symbol.h model.h objfile.h symtab.h classhash.h strhash.h uthash.h
 mapfile.o: die.h sym.h token_def.h strpool.h z80asm.h config.h 
@@ -611,7 +632,7 @@ module.o: memalloc.h module.h class.h queue.h types.h classlist.h dynstr.h
 module.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h symref.h
 objfile.o: memalloc.h class.h queue.h types.h errors.h errors_def.h file.h
 objfile.o: safestr.h strlist.h objfile.h strpool.h legacy.h
-options.o: memalloc.h errors.h errors_def.h file.h safestr.h types.h
+options.o: memalloc.h errors.h errors_def.h file.h types.h safestr.h
 options.o: strlist.h class.h queue.h options.h symbol.h model.h objfile.h
 options.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h symref.h
 options.o: classlist.h token_def.h srcfile.h dynstr.h strpool.h z80asm.h
@@ -664,3 +685,9 @@ z80pass.o: errors_def.h file.h safestr.h strlist.h class.h queue.h hist.h
 z80pass.o: listfile.h dynstr.h symref.h classlist.h model.h options.h
 z80pass.o: symbol.h objfile.h symtab.h classhash.h strhash.h uthash.h die.h
 z80pass.o: sym.h token_def.h scan.h parse.h strutil.h z80asm.h
+init.o: memalloc.h init.h strpool.h errors.h errors_def.h file.h types.h
+init.o: safestr.h strlist.h class.h queue.h codearea.h
+init_obj.o: memalloc.h init.h strpool.h errors.h errors_def.h file.h types.h
+init_obj.o: safestr.h strlist.h class.h queue.h codearea.h
+init_obj_file.o: memalloc.h init.h strpool.h errors.h errors_def.h file.h
+init_obj_file.o: types.h safestr.h strlist.h class.h queue.h codearea.h
