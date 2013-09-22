@@ -34,7 +34,7 @@ void Obj_init (Obj *self) 	{ self->string = g_malloc0_n(100, sizeof(char)); }
 void Obj_copy (Obj *self, Obj *other)
 							{ self->string = g_malloc0_n(100, sizeof(char));
 							  strcpy( self->string, other->string); }
-void Obj_fini (Obj *self)	{ g_free(self->string); }
+void Obj_fini (Obj *self)	{ g_free0(self->string); }
 void Obj_clear(Obj *self)	{ self->string[0] = 0; }
 
 DEF_CLASS(Obj);
@@ -755,9 +755,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.7 2013-09-09 00:20:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classring.t,v 1.8 2013-09-22 21:06:00 pauloscustodio Exp $
 # $Log: whitebox-classring.t,v $
-# Revision 1.7  2013-09-09 00:20:45  pauloscustodio
+# Revision 1.8  2013-09-22 21:06:00  pauloscustodio
+# replace g_free by g_free0
+#
+# Revision 1.7  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
 # -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
 #

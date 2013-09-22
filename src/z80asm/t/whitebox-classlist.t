@@ -33,7 +33,7 @@ END_CLASS;
 void Obj_init (Obj *self) 	{ self->string = g_strdup("Hello World"); }
 void Obj_copy (Obj *self, Obj *other)
 							{ self->string = g_strdup(other->string); }
-void Obj_fini (Obj *self)	{ g_free(self->string); }
+void Obj_fini (Obj *self)	{ g_free0(self->string); }
 
 DEF_CLASS(Obj);
 
@@ -482,9 +482,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classlist.t,v 1.9 2013-09-09 00:20:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-classlist.t,v 1.10 2013-09-22 21:06:00 pauloscustodio Exp $
 # $Log: whitebox-classlist.t,v $
-# Revision 1.9  2013-09-09 00:20:45  pauloscustodio
+# Revision 1.10  2013-09-22 21:06:00  pauloscustodio
+# replace g_free by g_free0
+#
+# Revision 1.9  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
 # -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
 #

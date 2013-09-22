@@ -45,7 +45,7 @@ void Name_copy (Name *self, Name *other)
 void Name_fini (Name *self) 	
 { 
 	fprintf(stderr, "Name_fini 0x%p\n", self);
-	g_free(self->str); 
+	g_free0(self->str); 
 }
 
 CLASS(Person)
@@ -275,9 +275,12 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.11 2013-09-09 00:20:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-class.t,v 1.12 2013-09-22 21:06:00 pauloscustodio Exp $
 # $Log: whitebox-class.t,v $
-# Revision 1.11  2013-09-09 00:20:45  pauloscustodio
+# Revision 1.12  2013-09-22 21:06:00  pauloscustodio
+# replace g_free by g_free0
+#
+# Revision 1.11  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
 # -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
 #
