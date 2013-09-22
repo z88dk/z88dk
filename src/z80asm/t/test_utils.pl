@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.43 2013-09-09 00:20:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.44 2013-09-22 21:02:18 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -504,7 +504,7 @@ sub t_compile_module {
 #include <stdlib.h>
 #include <stdio.h>
 
-".join("\n", map {"#include \"$_.h\""} sort keys %modules)."\n".'
+".join("\n", map {"#include \"$_\""} grep {-f $_} map {"$_.h"} sort keys %modules)."\n".'
 int _exception_raised;
 
 #define TITLE(title)	fprintf(stderr, "\n---- TEST: %s ----\n\n", (title) )
@@ -1012,7 +1012,11 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.43  2013-09-09 00:20:45  pauloscustodio
+# Revision 1.44  2013-09-22 21:02:18  pauloscustodio
+# Separate init_struct code in one source file per module.
+# Separare obect regsitry code from init code.
+#
+# Revision 1.43  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
 # -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
 #
