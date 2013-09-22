@@ -41,7 +41,7 @@
 #										being referenced by mistake. The function is 
 #										declared in init.h
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/tools/Attic/make_init.pl,v 1.4 2013-09-18 23:03:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/tools/Attic/make_init.pl,v 1.5 2013-09-22 20:45:33 pauloscustodio Exp $
 # Log at end of file
 
 use Modern::Perl;
@@ -50,6 +50,7 @@ use File::Slurp;
 use Win32::Autoglob;
 use Template;
 use Iterator::Simple::Lookahead;
+use List::Uniq 'uniq';
 use Data::Dump 'dump';
 
 #------------------------------------------------------------------------------
@@ -91,10 +92,10 @@ my $tokens = qr/ (?<space>		(?:	^ [ \t]* \# (?: \\ \n | . )* \n
 #------------------------------------------------------------------------------
 my $VARS = {
 	prog		=> basename($0),
-	input		=> basename($0, ".pl"),
 	args		=> [],
 	init_module	=> [], 	# { type => 'init', func => 'init_1' },
-	init_struct => 	[],	# { struct => 'Person', 
+	init_struct => 	[],	# { file => 'file.h',
+						#   struct => 'Person', 
 						#	methods => { 
 						#		init => { 
 						#			func => 'struct_Person_init',
@@ -130,10 +131,26 @@ my $tt = Template->new(
 	END_TAG			=> '}}',
 );
 
-for my $file ('c', 'h') {
-	$tt->process($VARS->{input}.".$file", $VARS, "init.$file") or die $tt->error;
+for my $file ('init.c', 'init.h', 'init_obj.c') {
+	process_template($tt, $file, $VARS, $file);
 }
 
+for my $file (uniq map { $_->{file} } @{$VARS->{init_struct}}) {
+	process_template($tt, 'init_obj_X.c', {%$VARS, file => $file}, 
+				          'init_obj_'.basename($file, '.h').'.c');
+}
+
+#------------------------------------------------------------------------------
+# process template, change EOL in output file to \n
+#------------------------------------------------------------------------------
+sub process_template {
+	my($tt, $input, $vars, $output) = @_;
+
+	my $text;
+	$tt->process($input, $vars, \$text) or die $tt->error;
+	write_file( $output, {binmode => ':raw'}, $text );
+}
+	
 #------------------------------------------------------------------------------
 # C lexer
 #------------------------------------------------------------------------------
@@ -193,6 +210,7 @@ sub parse {
 				$init_struct{$struct} = {};
 				push @{$VARS->{init_struct}}, $init_struct{$struct};
 			}
+			$init_struct{$struct}{file}   = $file;
 			$init_struct{$struct}{struct} = $struct;
 			$init_struct{$struct}{methods}{new}{decl}  = "void";
 			skip_block($lex);
@@ -365,7 +383,11 @@ exit 0;
 
 __END__
 # $Log: make_init.pl,v $
-# Revision 1.4  2013-09-18 23:03:39  pauloscustodio
+# Revision 1.5  2013-09-22 20:45:33  pauloscustodio
+# Separate init_struct code in one source file per module.
+# Separare obect regsitry code from init code.
+#
+# Revision 1.4  2013/09/18 23:03:39  pauloscustodio
 # Separate parsing code from templates.
 # Add object registry to auto-delete objects on exit.
 #

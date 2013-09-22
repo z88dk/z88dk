@@ -12,10 +12,10 @@
 
 #include "mod3.h"
 
+#include <glib.h>
 
 /* data types */
 typedef int BOOL;
-
 
 typedef struct Person Person;
 
@@ -28,29 +28,43 @@ typedef struct Person2 Person2;
 typedef struct Person3 Person3;
 
 
+/* global data */
+extern GSList *object_register;		/* all registered objects for cleanup at end */
+#define OBJREG_STORE_ADDR(data)	(((char *)(data))  - sizeof(void*))
+#define OBJREG_DATA_ADDR(store)	(((char *)(store)) + sizeof(void*))
+
 /* declare functions */
+extern void xatexit(void (*fini)(void));
+extern void register_object(void *object);
+extern void unregister_object(void *object);
+
 
 /* Person: create, destroy, set/clear autodelete */
 extern Person * new_Person (  char * name,  int age );
-extern void delete_Person ( Person **pself );
+extern void delete_Person ( Person *self );
+extern void delete0_Person ( Person **pself );
 extern void autodelete_Person ( Person *self, BOOL autodelete );
 
 /* Person0: create, destroy, set/clear autodelete */
 extern Person0 * new_Person0 ( void );
-extern void delete_Person0 ( Person0 **pself );
+extern void delete_Person0 ( Person0 *self );
+extern void delete0_Person0 ( Person0 **pself );
 extern void autodelete_Person0 ( Person0 *self, BOOL autodelete );
 
 /* Person1: create, destroy, set/clear autodelete */
 extern Person1 * new_Person1 ( void );
-extern void delete_Person1 ( Person1 **pself );
+extern void delete_Person1 ( Person1 *self );
+extern void delete0_Person1 ( Person1 **pself );
 extern void autodelete_Person1 ( Person1 *self, BOOL autodelete );
 
 /* Person2: create, destroy, set/clear autodelete */
 extern Person2 * new_Person2 ( void );
-extern void delete_Person2 ( Person2 **pself );
+extern void delete_Person2 ( Person2 *self );
+extern void delete0_Person2 ( Person2 **pself );
 extern void autodelete_Person2 ( Person2 *self, BOOL autodelete );
 
 /* Person3: create, destroy, set/clear autodelete */
 extern Person3 * new_Person3 ( void );
-extern void delete_Person3 ( Person3 **pself );
+extern void delete_Person3 ( Person3 *self );
+extern void delete0_Person3 ( Person3 **pself );
 extern void autodelete_Person3 ( Person3 *self, BOOL autodelete );

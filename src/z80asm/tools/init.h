@@ -8,18 +8,28 @@
 {{ FOREACH i IN args }}
 #include "{{ i }}"
 {{ END }}
+#include <glib.h>
 
 /* data types */
 typedef int BOOL;
-
 {{ FOR i IN init_struct }}
 typedef struct {{ i.struct }} {{ i.struct }};
 {{ END }}
 
+/* global data */
+extern GSList *object_register;		/* all registered objects for cleanup at end */
+#define OBJREG_STORE_ADDR(data)	(((char *)(data))  - sizeof(void*))
+#define OBJREG_DATA_ADDR(store)	(((char *)(store)) + sizeof(void*))
+
 /* declare functions */
+extern void xatexit(void (*fini)(void));
+extern void register_object(void *object);
+extern void unregister_object(void *object);
+
 {{ FOR i IN init_struct }}
 /* {{ i.struct }}: create, destroy, set/clear autodelete */
 extern {{ i.struct }} * new_{{ i.struct }} ( {{ i.methods.new.decl }} );
-extern void delete_{{ i.struct }} ( {{ i.struct }} **pself );
+extern void delete_{{ i.struct }} ( {{ i.struct }} *self );
+extern void delete0_{{ i.struct }} ( {{ i.struct }} **pself );
 extern void autodelete_{{ i.struct }} ( {{ i.struct }} *self, BOOL autodelete );
 {{ END }}

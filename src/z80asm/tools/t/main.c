@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	else
 		printf("Hello world\n");
 		
-	delete_Person(&person);
+	delete0_Person(&person);
 	printf("person = %d\n", person);
 	
 	printf("main end\n");
