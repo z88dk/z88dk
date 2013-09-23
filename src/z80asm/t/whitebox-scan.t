@@ -20,7 +20,7 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "scan.o class.o dynstr.o errors.o strutil.o file.o init_obj.o init_obj_file.o safestr.o strlist.o srcfile.o";
+my $objs = "scan.o class.o dynstr.o errors.o strutil.o file.o init_obj.o init_obj_file.o safestr.o srcfile.o";
 ok ! system "make parse.h";
 
 # build list of case TOKEN: return "TOKEN" from parse.h
@@ -374,7 +374,7 @@ GLib Memory statistics (successful operations):
          6 |          1 |          1 |          0 |          0 |         +0
          8 |          2 |          2 |          0 |          0 |         +0
          9 |          1 |          4 |          3 |          0 |         +0
-        12 |         23 |         16 |          0 |          7 |         +0
+        12 |         20 |         13 |          0 |          7 |         +0
         14 |          0 |          3 |          3 |          0 |         +0
         15 |          2 |          0 |          0 |          2 |         +0
         16 |          0 |          2 |          2 |          0 |         +0
@@ -384,7 +384,7 @@ GLib Memory statistics (successful operations):
         30 |          0 |          0 |          2 |          2 |         +0
         32 |          1 |          1 |          0 |          0 |         +0
         35 |          0 |          1 |          1 |          0 |         +0
-        36 |          1 |          2 |          1 |          0 |         +0
+        36 |          0 |          1 |          1 |          0 |         +0
         40 |         16 |         16 |          0 |          0 |         +0
         44 |         10 |          3 |          0 |          7 |         +0
         48 |         33 |         33 |          1 |          1 |         +0
@@ -411,7 +411,7 @@ GLib Memory statistics (successful operations):
    >  4096 |          6 |          7 |         65 |         64 |        ***
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=950928, zero-initialized=103156 (10.85%), freed=949156 (99.81%), remaining=1772
+Total bytes: allocated=950856, zero-initialized=103084 (10.84%), freed=949084 (99.81%), remaining=1772
 OUT
 Test: Read before start
 Token: (0) NULL
@@ -997,9 +997,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.14 2013-09-22 21:04:22 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.15 2013-09-23 23:14:10 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.14  2013-09-22 21:04:22  pauloscustodio
+# Revision 1.15  2013-09-23 23:14:10  pauloscustodio
+# Renamed SzList to StringList, simplified interface by assuming that
+# list lives in memory util program ends; it is used for directory searches
+# only. Moved interface to strutil.c, removed strlist.c.
+#
+# Revision 1.14  2013/09/22 21:04:22  pauloscustodio
 # New File and FileStack objects
 #
 # Revision 1.13  2013/09/09 00:20:45  pauloscustodio

@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.29 2013-09-08 00:43:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.30 2013-09-23 23:14:10 pauloscustodio Exp $ */
 /* $Log: options.c,v $
-/* Revision 1.29  2013-09-08 00:43:59  pauloscustodio
+/* Revision 1.30  2013-09-23 23:14:10  pauloscustodio
+/* Renamed SzList to StringList, simplified interface by assuming that
+/* list lives in memory util program ends; it is used for directory searches
+/* only. Moved interface to strutil.c, removed strlist.c.
+/*
+/* Revision 1.29  2013/09/08 00:43:59  pauloscustodio
 /* New error module with one error function per error, no need for the error
 /* constants. Allows compiler to type-check error message arguments.
 /* Included the errors module in the init() mechanism, no need to call
@@ -155,7 +160,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 #include "file.h"
 #include "options.h"
 #include "srcfile.h"
-#include "strlist.h"
+#include "strutil.h"
 #include "strpool.h"
 #include "symbol.h"
 #include "z80asm.h"
@@ -187,7 +192,7 @@ char binfilename[FILENAME_MAX]; /* -o explicit filename buffer (BUG_0012) */
 int  cpu_type;
 
 /* directory list for search_lib_file() */
-static SzList *lib_path = NULL;
+static StringList *lib_path = NULL;
 
 /*-----------------------------------------------------------------------------
 *   Initialize search paths
@@ -201,12 +206,6 @@ static void init_search_paths( void )
     if ( dir != NULL )
     {
         add_source_file_path( dir );
-    }
-
-	/* init lib path */
-    if ( lib_path == NULL )
-    {
-        lib_path = OBJ_NEW( SzList );
     }
 }
 
@@ -454,7 +453,7 @@ void set_asm_flag( char *flagid )
 
     else if ( *flagid == 'L' )
     {
-        SzList_push( lib_path, flagid + 1 );
+        add_StringList( &lib_path, flagid + 1 );
     }
 
     else if ( *flagid == 'D' )

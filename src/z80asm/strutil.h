@@ -13,11 +13,69 @@
 Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities working on char *
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.15 2013-09-23 23:14:10 pauloscustodio Exp $
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.14 2013-04-29 22:24:33 pauloscustodio Exp $ */
+#pragma once
+
+#include "memalloc.h"				/* before any other include */
+
+#include <glib.h>
+
+/*-----------------------------------------------------------------------------
+*   List of fixed strings (e.g. include path); 
+*	strings kept in strpool.h and list is never freed.
+*----------------------------------------------------------------------------*/
+typedef GSList StringList;			/* singly-linked list of strings, NULL if empty */
+
+/* Append a string to the string-list. 
+   The string is added to strpool and not freed.
+   Traverses the whole list searching for last item */
+extern void add_StringList( StringList **plist, char *string );
+
+/* Traverses the string-list, setting string to each string in turn
+   (StringList *list, char *string) */
+#define FOR_StringList( list, string )	\
+	do { \
+		StringList *iter; \
+		for ( iter = (list) ; iter ; iter = iter->next ) \
+		{ \
+			(string) = (char *) iter->data; \
+
+#define ENDFOR_StringList \
+		} \
+	} while(0)
+
+
+/*-----------------------------------------------------------------------------
+*   Utilities
+*----------------------------------------------------------------------------*/
+
+/* convert string to upper/lower case - modify in place,
+   return address of string */
+extern char *strtoupper( char *string );
+extern char *strtolower( char *string );
+
+/* case insensitive compare */
+extern int stricompare( char *s1, char *s2 );
+
+/* remove end newline and whitespace - modify in place, return address of string */
+extern char *chomp( char *string );
+
+/* convert end-of-line sequences CR, CRLF, LFCR, LF all to LF 
+   - modify in place, return address of string */
+extern char *normalize_eol( char *string );
+
+
+/* */
 /* $Log: strutil.h,v $
-/* Revision 1.14  2013-04-29 22:24:33  pauloscustodio
+/* Revision 1.15  2013-09-23 23:14:10  pauloscustodio
+/* Renamed SzList to StringList, simplified interface by assuming that
+/* list lives in memory util program ends; it is used for directory searches
+/* only. Moved interface to strutil.c, removed strlist.c.
+/*
+/* Revision 1.14  2013/04/29 22:24:33  pauloscustodio
 /* Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
 /*
 /* Revision 1.13  2013/02/19 22:52:40  pauloscustodio
@@ -72,28 +130,4 @@ Utilities working on char *
 /* Revision 1.1  2011/10/14 13:48:05  pauloscustodio
 /* String utilities
 /*
-/*
 /* */
-
-#ifndef STRUTIL_H
-#define STRUTIL_H
-
-#include "memalloc.h"   /* before any other include */
-
-/* convert string to upper/lower case - modify in place,
-   return address of string */
-extern char *strtoupper( char *string );
-extern char *strtolower( char *string );
-
-/* case insensitive compare */
-extern int stricompare( char *s1, char *s2 );
-
-/* remove end newline and whitespace - modify in place, return address of string */
-extern char *chomp( char *string );
-
-/* convert end-of-line sequences CR, CRLF, LFCR, LF all to LF 
-   - modify in place, return address of string */
-extern char *normalize_eol( char *string );
-
-
-#endif /* ndef STRUTIL_H */

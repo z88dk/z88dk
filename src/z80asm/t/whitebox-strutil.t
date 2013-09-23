@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.11 2013-09-09 00:20:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.12 2013-09-23 23:14:10 pauloscustodio Exp $
 #
 # Test strutil
 
@@ -28,7 +28,33 @@ t_compile_module('', <<'END', $objs);
 
 	char s[255];
 	char * p;
+	StringList *list1 = NULL;
+	StringList *list2 = NULL;
 
+	// StringList
+	add_StringList(&list1, "one");
+	add_StringList(&list1, "two");
+	add_StringList(&list1, "three");
+	add_StringList(&list1, "four");
+	
+	printf("List1\n");
+	FOR_StringList(list1, p)
+		printf("->%s\n", p);
+	ENDFOR_StringList;
+	
+	printf("List1, break at two\n");
+	FOR_StringList(list1, p)
+	{
+		printf("->%s\n", p);
+		if (strcmp(p, "two") == 0) break;
+	}
+	ENDFOR_StringList;
+	
+	printf("List2\n");
+	FOR_StringList(list2, p)
+		printf("->%s\n", p);
+	ENDFOR_StringList;
+	
 	// strtoupper, strtolower
 	strcpy(s, "Abc1");
 	p = strtolower(s);
@@ -82,15 +108,28 @@ t_compile_module('', <<'END', $objs);
 END
 
 t_run_module([], <<'OUT', "", 0);
+List1
+->one
+->two
+->three
+->four
+List1, break at two
+->one
+->two
+List2
 GLib Memory statistics (successful operations):
  blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
         20 |          1 |          1 |          0 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=20, zero-initialized=0 (0.00%), freed=20 (100.00%), remaining=0
+Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
 OUT
 
 unlink_testfiles();
@@ -99,7 +138,12 @@ done_testing;
 
 __END__
 # $Log: whitebox-strutil.t,v $
-# Revision 1.11  2013-09-09 00:20:45  pauloscustodio
+# Revision 1.12  2013-09-23 23:14:10  pauloscustodio
+# Renamed SzList to StringList, simplified interface by assuming that
+# list lives in memory util program ends; it is used for directory searches
+# only. Moved interface to strutil.c, removed strlist.c.
+#
+# Revision 1.11  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
 # -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
 #

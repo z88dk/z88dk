@@ -20,7 +20,7 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "file.o init_obj.o init_obj_file.o class.o strlist.o safestr.o errors.o strutil.o";
+my $objs = "file.o init_obj.o init_obj_file.o class.o safestr.o errors.o strutil.o";
 
 # get init code except init() and main()
 my $init = read_file("init.c"); $init =~ s/static void init\(\)\s*\{.*//s;
@@ -334,19 +334,13 @@ is read_file("test2.asm"), "write file ok\n";
 # TEST OLD INTERFACE
 
 t_compile_module($init, <<'END', $objs);
-	SzList *list;
+	StringList *list = NULL;
 	
-	if (argv[2][0] == '0')
+	if (argv[2][0] != '0')
 	{
-		list = NULL;
-	}
-	else
-	{
-		list = OBJ_NEW(SzList);
-	
-		SzList_push(list, "x1");
-		SzList_push(list, "x2");
-		SzList_push(list, "x3");
+		add_StringList(&list, "x1");
+		add_StringList(&list, "x2");
+		add_StringList(&list, "x3");
 	}
 	
 	puts( search_file(argv[1], list) );
@@ -455,16 +449,14 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
-        12 |          3 |          3 |          0 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
-        36 |          1 |          1 |          0 |          0 |         +0
         96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=2984, zero-initialized=1940 (65.01%), freed=1212 (40.62%), remaining=1772
+Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
 OUT
 
 t_run_module(['f1', '1'], <<'OUT', "", 0);
@@ -474,16 +466,14 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
-        12 |          3 |          3 |          0 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
-        36 |          1 |          1 |          0 |          0 |         +0
         96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=2984, zero-initialized=1940 (65.01%), freed=1212 (40.62%), remaining=1772
+Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
 OUT
 
 t_run_module(['f2', '1'], <<'OUT', "", 0);
@@ -493,16 +483,14 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
-        12 |          3 |          3 |          0 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
-        36 |          1 |          1 |          0 |          0 |         +0
         96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=2984, zero-initialized=1940 (65.01%), freed=1212 (40.62%), remaining=1772
+Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
 OUT
 
 t_run_module(['f3', '1'], <<'OUT', "", 0);
@@ -512,16 +500,14 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
-        12 |          3 |          3 |          0 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
-        36 |          1 |          1 |          0 |          0 |         +0
         96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=2984, zero-initialized=1940 (65.01%), freed=1212 (40.62%), remaining=1772
+Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
 OUT
 
 t_run_module(['f4', '1'], <<'OUT', "", 0);
@@ -531,16 +517,14 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
-        12 |          3 |          3 |          0 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
-        36 |          1 |          1 |          0 |          0 |         +0
         96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=2984, zero-initialized=1940 (65.01%), freed=1212 (40.62%), remaining=1772
+Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
 OUT
 
 
@@ -1114,9 +1098,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.16 2013-09-22 21:04:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.17 2013-09-23 23:14:10 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.16  2013-09-22 21:04:21  pauloscustodio
+# Revision 1.17  2013-09-23 23:14:10  pauloscustodio
+# Renamed SzList to StringList, simplified interface by assuming that
+# list lives in memory util program ends; it is used for directory searches
+# only. Moved interface to strutil.c, removed strlist.c.
+#
+# Revision 1.16  2013/09/22 21:04:21  pauloscustodio
 # New File and FileStack objects
 #
 # Revision 1.15  2013/09/09 00:20:45  pauloscustodio

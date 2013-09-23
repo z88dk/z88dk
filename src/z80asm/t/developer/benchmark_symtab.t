@@ -13,9 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.5 2013-09-22 21:04:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.6 2013-09-23 23:14:10 pauloscustodio Exp $
 # $Log: benchmark_symtab.t,v $
-# Revision 1.5  2013-09-22 21:04:21  pauloscustodio
+# Revision 1.6  2013-09-23 23:14:10  pauloscustodio
+# Renamed SzList to StringList, simplified interface by assuming that
+# list lives in memory util program ends; it is used for directory searches
+# only. Moved interface to strutil.c, removed strlist.c.
+#
+# Revision 1.5  2013/09/22 21:04:21  pauloscustodio
 # New File and FileStack objects
 #
 # Revision 1.4  2013/09/08 08:29:21  pauloscustodio
@@ -39,7 +44,7 @@ use Test::More;
 use List::AllUtils 'uniq';
 require 't/test_utils.pl';
 
-my $objs = "avltree.o memalloc.o die.o except.o safestr.o strutil.o  errors.o strpool.o strhash.o class.o file.o init_obj.o init_obj_file.o strlist.o ";
+my $objs = "avltree.o memalloc.o die.o except.o safestr.o strutil.o  errors.o strpool.o strhash.o class.o file.o init_obj.o init_obj_file.o ";
 my $src = "t/data/zx48.asm";
 my @words;
 

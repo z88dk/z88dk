@@ -24,7 +24,7 @@ require 't/test_utils.pl';
 # test errors.c
 unlink_testfiles();
 
-my $objs = "errors.o file.o init_obj.o init_obj_file.o class.o safestr.o strlist.o strutil.o";
+my $objs = "errors.o file.o init_obj.o init_obj_file.o class.o safestr.o strutil.o";
 
 t_compile_module('', <<'END', $objs);
 #define ERROR return __LINE__
@@ -219,9 +219,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.10 2013-09-22 21:04:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.11 2013-09-23 23:14:10 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.10  2013-09-22 21:04:21  pauloscustodio
+# Revision 1.11  2013-09-23 23:14:10  pauloscustodio
+# Renamed SzList to StringList, simplified interface by assuming that
+# list lives in memory util program ends; it is used for directory searches
+# only. Moved interface to strutil.c, removed strlist.c.
+#
+# Revision 1.10  2013/09/22 21:04:21  pauloscustodio
 # New File and FileStack objects
 #
 # Revision 1.9  2013/09/09 00:20:45  pauloscustodio

@@ -118,7 +118,6 @@
     <ClInclude Include="scan_token.h" />
     <ClInclude Include="srcfile.h" />
     <ClInclude Include="strhash.h" />
-    <ClInclude Include="strlist.h" />
     <ClInclude Include="strpool.h" />
     <ClInclude Include="strutil.h" />
     <ClInclude Include="sym.h" />
@@ -165,7 +164,6 @@
     <ClCompile Include="scan_token.c" />
     <ClCompile Include="srcfile.c" />
     <ClCompile Include="strhash.c" />
-    <ClCompile Include="strlist.c" />
     <ClCompile Include="strpool.c" />
     <ClCompile Include="strutil.c" />
     <ClCompile Include="sym.c" />

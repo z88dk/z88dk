@@ -19,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "objfile.o class.o file.o init_obj.o init_obj_file.o safestr.o errors.o strlist.o strutil.o";
+my $objs = "objfile.o class.o file.o init_obj.o init_obj_file.o safestr.o errors.o strutil.o";
 
 t_compile_module('', <<'END', $objs);
 
@@ -206,9 +206,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.7 2013-09-22 21:04:22 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.8 2013-09-23 23:14:10 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.7  2013-09-22 21:04:22  pauloscustodio
+# Revision 1.8  2013-09-23 23:14:10  pauloscustodio
+# Renamed SzList to StringList, simplified interface by assuming that
+# list lives in memory util program ends; it is used for directory searches
+# only. Moved interface to strutil.c, removed strlist.c.
+#
+# Revision 1.7  2013/09/22 21:04:22  pauloscustodio
 # New File and FileStack objects
 #
 # Revision 1.6  2013/09/09 00:20:45  pauloscustodio

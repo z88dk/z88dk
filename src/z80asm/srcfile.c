@@ -17,9 +17,14 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.8 2013-09-22 21:34:48 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.9 2013-09-23 23:14:10 pauloscustodio Exp $ */
 /* $Log: srcfile.c,v $
-/* Revision 1.8  2013-09-22 21:34:48  pauloscustodio
+/* Revision 1.9  2013-09-23 23:14:10  pauloscustodio
+/* Renamed SzList to StringList, simplified interface by assuming that
+/* list lives in memory util program ends; it is used for directory searches
+/* only. Moved interface to strutil.c, removed strlist.c.
+/*
+/* Revision 1.8  2013/09/22 21:34:48  pauloscustodio
 /* Remove legacy xxx_err() interface
 /*
 /* Revision 1.7  2013/09/12 00:10:02  pauloscustodio
@@ -60,7 +65,7 @@ Allows pushing back of lines, for example to expand macros.
 #include "listfile.h"
 #include "options.h"
 #include "srcfile.h"
-#include "strlist.h"
+#include "strutil.h"
 #include "strpool.h"
 #include <stdio.h>
 #include <string.h>
@@ -70,15 +75,12 @@ Allows pushing back of lines, for example to expand macros.
 *----------------------------------------------------------------------------*/
 
 /* directory list for search_source_file() */
-static SzList *source_path = NULL;
+static StringList *source_path = NULL;
 
 /* add a directory to the search path */
 void add_source_file_path( char *directory )
 {
-	if ( source_path == NULL )
-		source_path = OBJ_NEW(SzList);
-
-	SzList_push( source_path, directory );
+	add_StringList( &source_path, directory );
 }
 
 /* search for a source file in the list of directories - path is returned 

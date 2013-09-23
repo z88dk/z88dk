@@ -60,9 +60,6 @@
     <ClInclude Include="safestr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="strlist.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="strpool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -204,9 +201,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="safestr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="strlist.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="strpool.c">

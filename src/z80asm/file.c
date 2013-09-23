@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.26 2013-09-22 21:34:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.27 2013-09-23 23:14:10 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -645,9 +645,8 @@ char *get_obj_ext( void )
 *  Search for a file on the given directory list, return full path name
 *  pathname is stored in strpool, no need to remove
 *----------------------------------------------------------------------------*/
-char *search_file( char *filename, SzList *dir_list )
+char *search_file( char *filename, StringList *dir_list )
 {
-    SzListElem *iter;
     char        *dir;
     struct stat sb;
     SSTR_DEFINE( pathname, FILENAME_MAX );
@@ -665,17 +664,16 @@ char *search_file( char *filename, SzList *dir_list )
     }
 
     /* search in dir_list */
-	for ( iter = SzList_first( dir_list ); iter != NULL ; 
-		  iter = SzList_next( iter ) )
+	FOR_StringList( dir_list, dir )
 	{
-		dir = iter->string;
         sstr_fset( pathname, "%s/%s", dir, filename );
 
         if ( stat( sstr_data( pathname ), &sb ) == 0 )
         {
             return strpool_add( sstr_data( pathname ) );
         }
-    }
+	}
+	ENDFOR_StringList;
 
     /* return unchanged pathname if not found */
     return strpool_add( filename );
@@ -684,7 +682,12 @@ char *search_file( char *filename, SzList *dir_list )
 
 /*
 $Log: file.c,v $
-Revision 1.26  2013-09-22 21:34:48  pauloscustodio
+Revision 1.27  2013-09-23 23:14:10  pauloscustodio
+Renamed SzList to StringList, simplified interface by assuming that
+list lives in memory util program ends; it is used for directory searches
+only. Moved interface to strutil.c, removed strlist.c.
+
+Revision 1.26  2013/09/22 21:34:48  pauloscustodio
 Remove legacy xxx_err() interface
 
 Revision 1.25  2013/09/22 21:04:21  pauloscustodio
