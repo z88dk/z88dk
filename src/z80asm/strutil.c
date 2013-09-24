@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities working on char *
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.17 2013-09-24 00:05:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.18 2013-09-24 00:08:45 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -43,9 +43,7 @@ char *strtoupper( char *string )
     char *p;
 
     for ( p = string; *p; p++ )
-    {
         *p = g_ascii_toupper( *p );
-    }
 
     return string;
 }
@@ -55,9 +53,7 @@ char *strtolower( char *string )
     char *p;
 
     for ( p = string; *p; p++ )
-    {
         *p = g_ascii_tolower( *p );
-    }
 
     return string;
 }
@@ -65,7 +61,10 @@ char *strtolower( char *string )
 
 /* */
 /* $Log: strutil.c,v $
-/* Revision 1.17  2013-09-24 00:05:36  pauloscustodio
+/* Revision 1.18  2013-09-24 00:08:45  pauloscustodio
+/* braces
+/*
+/* Revision 1.17  2013/09/24 00:05:36  pauloscustodio
 /* Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
 /* toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
 /* Removed normalize_eol.
