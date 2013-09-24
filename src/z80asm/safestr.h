@@ -15,9 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 Safe strings : char array with the size
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.h,v 1.7 2013-05-07 22:10:56 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.h,v 1.8 2013-09-24 00:05:35 pauloscustodio Exp $ */
 /* $Log: safestr.h,v $
-/* Revision 1.7  2013-05-07 22:10:56  pauloscustodio
+/* Revision 1.8  2013-09-24 00:05:35  pauloscustodio
+/* Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
+/* toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
+/* Removed normalize_eol.
+/*
+/* Revision 1.7  2013/05/07 22:10:56  pauloscustodio
 /* sstr_getchars(): get N characters from input, return FALSE on EOF
 /*
 /* Revision 1.6  2013/05/01 22:23:39  pauloscustodio
@@ -114,9 +119,6 @@ extern char *sstr_vfcat( sstr_t *self, char *format, va_list argptr );
 
 /* remove end newlines and whitespace */
 extern void sstr_chomp( sstr_t *self );
-
-/* convert end-of-line sequences CR, CRLF, LFCR, LF all to LF */
-extern void sstr_normalize_eol( sstr_t *self );
 
 /* get N characters from input, return FALSE on EOF */
 extern BOOL sstr_getchars( sstr_t *self, FILE *fp, int num_chars );

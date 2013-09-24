@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-safestr.t,v 1.7 2013-09-09 00:20:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-safestr.t,v 1.8 2013-09-24 00:05:36 pauloscustodio Exp $
 #
 # Test safestr
 
@@ -218,31 +218,6 @@ INIT
 	sstr_chomp(s);
 	TEST(s, "");
 
-	// normalize_eol
-	sstr_set(s, "A" "\r" "B" "\n");
-	sstr_normalize_eol(s);
-	TEST(s, "A\nB\n");
-	
-	sstr_set(s, "A" "\n" "B");
-	sstr_normalize_eol(s);
-	TEST(s, "A\nB");
-	
-	sstr_set(s, "A" "\r");
-	sstr_normalize_eol(s);
-	TEST(s, "A\n");
-	
-	sstr_set(s, "A" "\n");
-	sstr_normalize_eol(s);
-	TEST(s, "A\n");
-	
-	sstr_set(s, "A" "\r\n");
-	sstr_normalize_eol(s);
-	TEST(s, "A\n");
-	
-	sstr_set(s, "A" "\n\r");
-	sstr_normalize_eol(s);
-	TEST(s, "A\n");
-	
 	// getchars
 	sprintf( filename, "test7.asm" );
 	fp = fopen( filename, "rb" );
@@ -342,7 +317,12 @@ done_testing;
 
 __END__
 # $Log: whitebox-safestr.t,v $
-# Revision 1.7  2013-09-09 00:20:45  pauloscustodio
+# Revision 1.8  2013-09-24 00:05:36  pauloscustodio
+# Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
+# toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
+# Removed normalize_eol.
+#
+# Revision 1.7  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
 # -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
 #

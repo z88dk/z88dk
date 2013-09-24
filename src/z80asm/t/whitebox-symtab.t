@@ -18,9 +18,6 @@ use Test::More;
 require 't/test_utils.pl';
 
 my $objs = "sym.o symtab.o symref.o class.o safestr.o strhash.o errors.o strutil.o file.o init_obj.o init_obj_file.o ";
-#		   strpool.o ".
-#		   " die.o except.o init.o ".
-#		   "codearea.o listfile.o dynstr.o hist.o sym.o symref.o";
 
 my $init = <<'END';
 #include "symbol.h"
@@ -334,9 +331,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.14 2013-09-23 23:14:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.15 2013-09-24 00:05:36 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.14  2013-09-23 23:14:10  pauloscustodio
+# Revision 1.15  2013-09-24 00:05:36  pauloscustodio
+# Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
+# toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
+# Removed normalize_eol.
+#
+# Revision 1.14  2013/09/23 23:14:10  pauloscustodio
 # Renamed SzList to StringList, simplified interface by assuming that
 # list lives in memory util program ends; it is used for directory searches
 # only. Moved interface to strutil.c, removed strlist.c.

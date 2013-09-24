@@ -15,9 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 Safe strings : char array with the size
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.c,v 1.9 2013-09-01 12:00:07 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/safestr.c,v 1.10 2013-09-24 00:05:35 pauloscustodio Exp $ */
 /* $Log: safestr.c,v $
-/* Revision 1.9  2013-09-01 12:00:07  pauloscustodio
+/* Revision 1.10  2013-09-24 00:05:35  pauloscustodio
+/* Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
+/* toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
+/* Removed normalize_eol.
+/*
+/* Revision 1.9  2013/09/01 12:00:07  pauloscustodio
 /* Cleanup compilation warnings
 /*
 /* Revision 1.8  2013/05/07 22:10:56  pauloscustodio
@@ -168,16 +173,7 @@ char *sstr_fcat( sstr_t *self, char *format, ... )
 *----------------------------------------------------------------------------*/
 void sstr_chomp( sstr_t *self )
 {
-	chomp( sstr_data(self) );
-	sstr_sync_len(self);
-}
-
-/*-----------------------------------------------------------------------------
-*   convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
-*----------------------------------------------------------------------------*/
-void sstr_normalize_eol( sstr_t *self )
-{
-	normalize_eol( sstr_data(self) );
+	g_strchomp( sstr_data(self) );
 	sstr_sync_len(self);
 }
 

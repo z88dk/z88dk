@@ -221,20 +221,6 @@ END_INIT
 	Str_chomp(s1);
 	check_str(s1, 256, 0, "");
 
-	// normalize_eol
-	Str_szset(s1, "A" "\r\n" "B" "\n\r" "C" "\n" "D" "\r" "E");
-	Str_normalize_eol(s1);
-	check_str(s1, 256, 9, "A\nB\nC\nD\nE");
-	
-	Str_szset(s1, "A" "\r");
-	Str_normalize_eol(s1);
-	check_str(s1, 256, 2, "A\n");
-	
-	Str_szset(s1, "A" "\n");
-	Str_normalize_eol(s1);
-	check_str(s1, 256, 2, "A\n");
-	
-
 	// getline
 	for ( i = 1 ; 1 ; i++ )
 	{
@@ -350,9 +336,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.10 2013-09-09 00:20:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-dynstr.t,v 1.11 2013-09-24 00:05:36 pauloscustodio Exp $
 # $Log: whitebox-dynstr.t,v $
-# Revision 1.10  2013-09-09 00:20:45  pauloscustodio
+# Revision 1.11  2013-09-24 00:05:36  pauloscustodio
+# Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
+# toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
+# Removed normalize_eol.
+#
+# Revision 1.10  2013/09/09 00:20:45  pauloscustodio
 # Add default set of modules to t_compile_module:
 # -DMEMALLOC_DEBUG memalloc.c die.o except.o strpool.o
 #

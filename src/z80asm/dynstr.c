@@ -17,9 +17,14 @@ Using class.h for automatic garbage collection.
 Strings may contain zero byte, length is defined by separate field.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.11 2013-09-12 00:10:02 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/dynstr.c,v 1.12 2013-09-24 00:05:35 pauloscustodio Exp $ */
 /* $Log: dynstr.c,v $
-/* Revision 1.11  2013-09-12 00:10:02  pauloscustodio
+/* Revision 1.12  2013-09-24 00:05:35  pauloscustodio
+/* Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
+/* toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
+/* Removed normalize_eol.
+/*
+/* Revision 1.11  2013/09/12 00:10:02  pauloscustodio
 /* Create g_free0() macro that NULLs the pointer after free, required
 /* by z80asm to find out if a pointer was already freed.
 /*
@@ -233,16 +238,7 @@ void Str_fcat( Str *self, char *format, ... )
 *----------------------------------------------------------------------------*/
 void Str_chomp( Str *self )
 {
-	chomp( Str_data(self) );
-	Str_sync_len(self);
-}
-
-/*-----------------------------------------------------------------------------
-*   convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
-*----------------------------------------------------------------------------*/
-void Str_normalize_eol( Str *self )
-{
-	normalize_eol( Str_data(self) );
+	g_strchomp( Str_data(self) );
 	Str_sync_len(self);
 }
 

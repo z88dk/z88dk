@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities working on char *
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.15 2013-09-23 23:14:10 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.h,v 1.16 2013-09-24 00:05:36 pauloscustodio Exp $
 */
 
 #pragma once
@@ -57,20 +57,15 @@ extern void add_StringList( StringList **plist, char *string );
 extern char *strtoupper( char *string );
 extern char *strtolower( char *string );
 
-/* case insensitive compare */
-extern int stricompare( char *s1, char *s2 );
-
-/* remove end newline and whitespace - modify in place, return address of string */
-extern char *chomp( char *string );
-
-/* convert end-of-line sequences CR, CRLF, LFCR, LF all to LF 
-   - modify in place, return address of string */
-extern char *normalize_eol( char *string );
-
 
 /* */
 /* $Log: strutil.h,v $
-/* Revision 1.15  2013-09-23 23:14:10  pauloscustodio
+/* Revision 1.16  2013-09-24 00:05:36  pauloscustodio
+/* Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
+/* toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
+/* Removed normalize_eol.
+/*
+/* Revision 1.15  2013/09/23 23:14:10  pauloscustodio
 /* Renamed SzList to StringList, simplified interface by assuming that
 /* list lives in memory util program ends; it is used for directory searches
 /* only. Moved interface to strutil.c, removed strlist.c.

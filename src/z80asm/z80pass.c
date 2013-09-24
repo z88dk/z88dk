@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.56 2013-09-22 21:34:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.57 2013-09-24 00:05:36 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.56  2013-09-22 21:34:48  pauloscustodio
+Revision 1.57  2013-09-24 00:05:36  pauloscustodio
+Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
+toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
+Removed normalize_eol.
+
+Revision 1.56  2013/09/22 21:34:48  pauloscustodio
 Remove legacy xxx_err() interface
 
 Revision 1.55  2013/09/12 00:10:02  pauloscustodio
@@ -1062,7 +1067,7 @@ FindFile( struct sourcefile *srcfile, char *flnm )
             return foundfile;    /* trying to include an already included file recursively! */
         }
 
-        if ( stricompare( srcfile->fname, flnm ) == 0 )
+        if ( g_ascii_strcasecmp( srcfile->fname, flnm ) == 0 )
         {
             return srcfile;    /* this include file already used! */
         }

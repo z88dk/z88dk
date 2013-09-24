@@ -15,9 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.12 2013-09-12 00:10:02 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.13 2013-09-24 00:05:36 pauloscustodio Exp $ 
 $Log: scan.l,v $
-Revision 1.12  2013-09-12 00:10:02  pauloscustodio
+Revision 1.13  2013-09-24 00:05:36  pauloscustodio
+Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
+toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
+Removed normalize_eol.
+
+Revision 1.12  2013/09/12 00:10:02  pauloscustodio
 Create g_free0() macro that NULLs the pointer after free, required
 by z80asm to find out if a pointer was already freed.
 
@@ -542,8 +547,8 @@ void scan_text( char *text )
 	/* make a copy of text and normalize eol sequences; yy_scan_string() will make  
 	   a new copy of string */
 	Str_szset( context->buffer, text );
-	Str_normalize_eol( context->buffer );
-	Str_bcat( context->buffer, "\0\0", 2 );
+	Str_chomp( context->buffer );
+	Str_bcat( context->buffer, "\n\0\0", 3 );
 	
 	/* save lexer state - need to push a dummy created buffer, replaced afterwards
 	   by yy_scan_buffer() because of bug in yy_scan_buffer(): overwrites last

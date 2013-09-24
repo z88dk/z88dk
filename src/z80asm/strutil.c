@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities working on char *
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.16 2013-09-23 23:14:10 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/strutil.c,v 1.17 2013-09-24 00:05:36 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -44,7 +44,7 @@ char *strtoupper( char *string )
 
     for ( p = string; *p; p++ )
     {
-        *p = toupper( *p );
+        *p = g_ascii_toupper( *p );
     }
 
     return string;
@@ -56,81 +56,21 @@ char *strtolower( char *string )
 
     for ( p = string; *p; p++ )
     {
-        *p = tolower( *p );
+        *p = g_ascii_tolower( *p );
     }
 
     return string;
 }
 
-int stricompare( char *s1, char *s2 )
-{
-    char c1, c2;
-
-    while ( 1 )
-    {
-        c1 = *s1++;
-        c1 = tolower( c1 );
-        c2 = *s2++;
-        c2 = tolower( c2 );
-
-        if ( c1 == 0 && c2 == 0 )
-        {
-            return 0;           /* equal */
-        }
-        else if ( c1 < c2 )
-        {
-            return -1;          /* s1 comes before */
-        }
-        else if ( c1 > c2 )
-        {
-            return 1;           /* s2 comes before */
-        }
-        else
-        {
-            ;                   /* check next */
-        }
-    }
-}
-
-char *chomp( char *string )
-{
-	char *p;
-
-	p = string + strlen(string) - 1;	/* point at last char */
-	while (p >= string && (*p == '\n' || *p == '\r' || *p == '\f' || *p == '\t' || *p == ' '))
-	{
-		*p = '\0';
-		p--;
-	}
-	return string;
-}
-
-char *normalize_eol( char *string )
-{
-	char *in, *out;
-	
-    for ( in = out = string; *in; in++ )
-    {
-		if ( in[0] == '\r' || in[0] == '\n' )
-		{
-			if ( ( in[1] == '\r' || in[1] == '\n' ) && in[0] != in[1] )
-				in++;				/* skip next */
-			*out++ = '\n';			
-		}
-		else
-		{
-			*out++ = in[0];
-		}
-	}
-	*out = '\0';
-	
-	return string;
-}
-
 
 /* */
 /* $Log: strutil.c,v $
-/* Revision 1.16  2013-09-23 23:14:10  pauloscustodio
+/* Revision 1.17  2013-09-24 00:05:36  pauloscustodio
+/* Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
+/* toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
+/* Removed normalize_eol.
+/*
+/* Revision 1.16  2013/09/23 23:14:10  pauloscustodio
 /* Renamed SzList to StringList, simplified interface by assuming that
 /* list lives in memory util program ends; it is used for directory searches
 /* only. Moved interface to strutil.c, removed strlist.c.

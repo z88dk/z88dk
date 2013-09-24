@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.12 2013-09-23 23:14:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-strutil.t,v 1.13 2013-09-24 00:05:36 pauloscustodio Exp $
 #
 # Test strutil
 
@@ -66,44 +66,28 @@ t_compile_module('', <<'END', $objs);
 	if (p != s)							ERROR;
 	if(strcmp(s, "ABC1"))				ERROR;
 	
-	// stricompare
-	if (stricompare("","") != 0)		ERROR;
-	if (stricompare("a","") != 1)		ERROR;
-	if (stricompare("","a") != -1)		ERROR;
-	if (stricompare("a","a") != 0)		ERROR;
-	if (stricompare("a","A") != 0)		ERROR;
-	if (stricompare("A","a") != 0)		ERROR;
-	if (stricompare("ab","a") != 1)		ERROR;
-	if (stricompare("a","ab") != -1)	ERROR;
-	if (stricompare("ab","ab") != 0)	ERROR;
+	// g_ascii_strcasecmp
+	if (g_ascii_strcasecmp("","") != 0)			ERROR;
+	if (g_ascii_strcasecmp("a","") < 1)			ERROR;
+	if (g_ascii_strcasecmp("","a") > -1)		ERROR;
+	if (g_ascii_strcasecmp("a","a") != 0)		ERROR;
+	if (g_ascii_strcasecmp("a","A") != 0)		ERROR;
+	if (g_ascii_strcasecmp("A","a") != 0)		ERROR;
+	if (g_ascii_strcasecmp("ab","a") < 1)		ERROR;
+	if (g_ascii_strcasecmp("a","ab") > -1)		ERROR;
+	if (g_ascii_strcasecmp("ab","ab") != 0)		ERROR;
 	
-	// chomp
+	// g_strchomp
 	strcpy(s, "\r\n \t\fx\r\n \t\f");
-	p = chomp(s);
+	p = g_strchomp(s);
 	if (p != s)							ERROR;
 	if(strcmp(s, "\r\n \t\fx"))			ERROR;
 	
 	strcpy(s, "\r\n \t\f \r\n \t\f");
-	p = chomp(s);
+	p = g_strchomp(s);
 	if (p != s)							ERROR;
 	if(strcmp(s, ""))					ERROR;
 	
-	// normalize_eol
-	strcpy(s, "A" "\r\n" "B" "\n\r" "C" "\n" "D" "\r" "E");
-	p = normalize_eol(s);
-	if (p != s)							ERROR;
-	if(strcmp(s, "A\nB\nC\nD\nE"))		ERROR;
-	
-	strcpy(s, "A" "\r");
-	p = normalize_eol(s);
-	if (p != s)							ERROR;
-	if(strcmp(s, "A\n"))				ERROR;
-	
-	strcpy(s, "A" "\n");
-	p = normalize_eol(s);
-	if (p != s)							ERROR;
-	if(strcmp(s, "A\n"))				ERROR;
-
 	return 0;
 END
 
@@ -138,7 +122,12 @@ done_testing;
 
 __END__
 # $Log: whitebox-strutil.t,v $
-# Revision 1.12  2013-09-23 23:14:10  pauloscustodio
+# Revision 1.13  2013-09-24 00:05:36  pauloscustodio
+# Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
+# toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
+# Removed normalize_eol.
+#
+# Revision 1.12  2013/09/23 23:14:10  pauloscustodio
 # Renamed SzList to StringList, simplified interface by assuming that
 # list lives in memory util program ends; it is used for directory searches
 # only. Moved interface to strutil.c, removed strlist.c.
