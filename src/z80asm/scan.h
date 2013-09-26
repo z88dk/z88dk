@@ -18,9 +18,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.14 2013-09-24 00:05:36 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.15 2013-09-26 21:38:47 pauloscustodio Exp $ 
 $Log: scan.h,v $
-Revision 1.14  2013-09-24 00:05:36  pauloscustodio
+Revision 1.15  2013-09-26 21:38:47  pauloscustodio
+.
+
+Revision 1.13  2013/09/24 00:05:36  pauloscustodio
 Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
 toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
 Removed normalize_eol.
