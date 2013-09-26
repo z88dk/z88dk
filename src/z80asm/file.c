@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.27 2013-09-23 23:14:10 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.28 2013-09-26 21:38:08 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -48,6 +48,10 @@ void struct_File_init(struct File *self, char *filename, char *mode)
 	self->line		= g_string_new("");
 	self->line_nr	= 0;
 	self->writing	= writing;
+
+	/* set error location */
+	set_error_file( filename );
+	set_error_line( 0 );
 }
 
 void struct_File_fini(struct File *self)
@@ -67,6 +71,9 @@ void struct_File_fini(struct File *self)
 		g_string_free( self->line, TRUE );		
 		self->line = NULL;
 	}
+
+	/* clear error location */
+	set_error_null();
 }
 
 /*-----------------------------------------------------------------------------
@@ -80,6 +87,9 @@ void close_File(struct File *self)
 		fclose( self->fp );
 		self->fp = NULL;
 	}
+
+	/* clear error location */
+	set_error_null();
 }
 
 /*-----------------------------------------------------------------------------
@@ -112,8 +122,23 @@ char *getline_File(File *self)
 		}
 	}
 	
-	self->line_nr++;
-	return self->line->len > 0 ? self->line->str : NULL;
+	if ( self->line->len > 0 )
+	{
+		self->line_nr++;
+	
+		/* set error location */
+		set_error_file( self->filename );
+		set_error_line( self->line_nr );
+
+		return self->line->str;
+	}
+	else
+	{
+		/* clear error location */
+		set_error_null();
+
+		return NULL;
+	}
 }
 
 
@@ -171,12 +196,13 @@ char *getline_FileStack(FileStack *self)
 			return ret;
 
 		/* end of file, pop from stack */
-		if ( ! self->stack )
-			break;			/* stack empty */
-
-		/* pop one */
-		self->top = self->stack->data;
-		self->stack = g_slist_remove( self->stack, self->top );
+		delete0_File( &(self->top) );
+		if ( self->stack )
+		{
+			/* pop one */
+			self->top = self->stack->data;
+			self->stack = g_slist_remove( self->stack, self->top );
+		}
 	}
 
 	return NULL;
@@ -682,7 +708,11 @@ char *search_file( char *filename, StringList *dir_list )
 
 /*
 $Log: file.c,v $
-Revision 1.27  2013-09-23 23:14:10  pauloscustodio
+Revision 1.28  2013-09-26 21:38:08  pauloscustodio
+Set error location while reading files.
+Delete File object when popping from FileStack.
+
+Revision 1.27  2013/09/23 23:14:10  pauloscustodio
 Renamed SzList to StringList, simplified interface by assuming that
 list lives in memory util program ends; it is used for directory searches
 only. Moved interface to strutil.c, removed strlist.c.

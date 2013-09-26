@@ -241,23 +241,25 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
-         4 |          0 |          1 |          4 |          0 |        +12
+         4 |          0 |          5 |          5 |          0 |         +0
+        12 |          1 |          0 |          0 |          1 |         +0
+        18 |          0 |          1 |          1 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
         21 |          1 |          0 |          0 |          1 |         +0
-        24 |          1 |          1 |          0 |          0 |         +0
+        24 |          2 |          2 |          1 |          1 |         +0
         42 |          0 |          0 |          1 |          1 |         +0
-        44 |          1 |          1 |          1 |          1 |         +0
+        44 |          2 |          1 |          1 |          2 |         +0
         84 |          0 |          0 |          1 |          1 |         +0
-        88 |          0 |          1 |          1 |          0 |         +0
+        88 |          0 |          2 |          2 |          0 |         +0
         96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=3275, zero-initialized=1868 (57.04%), freed=1491 (45.53%), remaining=1784
+Total bytes: allocated=3489, zero-initialized=1868 (53.54%), freed=1717 (49.21%), remaining=1772
 OUT
-Error: cannot include file 'test1.asm' recursively
+Error at file 'test1.asm': cannot include file 'test1.asm' recursively
 Uncaught runtime exception at errors.c(1)
 ERR
 
@@ -1098,9 +1100,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.17 2013-09-23 23:14:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.18 2013-09-26 21:38:08 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.17  2013-09-23 23:14:10  pauloscustodio
+# Revision 1.18  2013-09-26 21:38:08  pauloscustodio
+# Set error location while reading files.
+# Delete File object when popping from FileStack.
+#
+# Revision 1.17  2013/09/23 23:14:10  pauloscustodio
 # Renamed SzList to StringList, simplified interface by assuming that
 # list lives in memory util program ends; it is used for directory searches
 # only. Moved interface to strutil.c, removed strlist.c.
