@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.15 2013-09-08 00:43:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.16 2013-09-27 01:14:33 pauloscustodio Exp $
 */
 
 #define _C_ ,		/* trick to pass comma-separated values as macro argument */
@@ -32,7 +32,8 @@ ERR(ErrFatal,	fatal_include_recursion(char *filename),"cannot include file '%s' 
 /* command line parsing errors */
 ERR(ErrWarn,	warn_option_deprecated(char *option),	"option '-%s' is deprecated" _C_ option )
 ERR(ErrError,	error_no_src_file(void),				"source filename missing" )
-ERR(ErrError,	error_illegal_option(char *option),		"illegal option '-%s'" _C_ option )
+ERR(ErrError,	error_illegal_option(char *option),		"illegal option '%s'" _C_ option )
+ERR(ErrError,	error_illegal_option_OLD(char *option),	"illegal option '-%s'" _C_ option )
 ERR(ErrError,	error_illegal_src_filename(char *filename),
 														"illegal source filename '%s'" _C_ filename )
 
@@ -78,7 +79,11 @@ ERR(ErrWarn,	warn_int_range_expr(long value, char *expr),
 
 /* */
 /* $Log: errors_def.h,v $
-/* Revision 1.15  2013-09-08 00:43:58  pauloscustodio
+/* Revision 1.16  2013-09-27 01:14:33  pauloscustodio
+/* Parse command line options via look-up tables:
+/* --help, --verbose
+/*
+/* Revision 1.15  2013/09/08 00:43:58  pauloscustodio
 /* New error module with one error function per error, no need for the error
 /* constants. Allows compiler to type-check error message arguments.
 /* Included the errors module in the init() mechanism, no need to call

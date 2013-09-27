@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.45 2013-09-23 23:15:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.46 2013-09-27 01:14:33 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -348,8 +348,8 @@ sub t_z80asm_capture {
 		system z80asm()." ".$args;
 	};
 
-	is $stdout, $expected_out, "$line stdout";
-	is $stderr, $expected_err, "$line stderr";
+	eq_or_diff_text $stdout, $expected_out, "$line stdout";
+	eq_or_diff_text $stderr, $expected_err, "$line stderr";
 	ok !!$return == !!$expected_retval, "$line retval";
 	
 	exit 1 if $STOP_ON_ERR && 
@@ -1014,7 +1014,11 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.45  2013-09-23 23:15:15  pauloscustodio
+# Revision 1.46  2013-09-27 01:14:33  pauloscustodio
+# Parse command line options via look-up tables:
+# --help, --verbose
+#
+# Revision 1.45  2013/09/23 23:15:15  pauloscustodio
 # Abort test if winmergeu fails, as next diffs will notr be synchronized with source file.
 #
 # Revision 1.44  2013/09/22 21:02:18  pauloscustodio

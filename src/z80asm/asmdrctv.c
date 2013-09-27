@@ -14,10 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.55 2013-09-22 21:34:48 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.56 2013-09-27 01:14:33 pauloscustodio Exp $ */
 /* 
  * $Log: asmdrctv.c,v $
- * Revision 1.55  2013-09-22 21:34:48  pauloscustodio
+ * Revision 1.56  2013-09-27 01:14:33  pauloscustodio
+ * Parse command line options via look-up tables:
+ * --help, --verbose
+ *
+ * Revision 1.55  2013/09/22 21:34:48  pauloscustodio
  * Remove legacy xxx_err() interface
  *
  * Revision 1.54  2013/09/10 20:29:32  dom
@@ -1147,7 +1151,7 @@ INCLUDE( void )
 
         set_error_file( filename );
 
-        if ( verbose )
+        if ( opts.verbose )
         {
             puts( CURRENTFILE->fname );    /* display name of INCLUDE file */
         }

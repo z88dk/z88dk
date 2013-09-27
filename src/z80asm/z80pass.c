@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.57 2013-09-24 00:05:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.58 2013-09-27 01:14:33 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.57  2013-09-24 00:05:36  pauloscustodio
+Revision 1.58  2013-09-27 01:14:33  pauloscustodio
+Parse command line options via look-up tables:
+--help, --verbose
+
+Revision 1.57  2013/09/24 00:05:36  pauloscustodio
 Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
 toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
 Removed normalize_eol.
@@ -936,7 +940,7 @@ Z80pass2( void )
 
     inc_codesize( constant );             /* BUG_0015 */
 
-    if ( verbose )
+    if ( opts.verbose )
     {
         printf( "Size of module is %ld bytes\n", constant );
     }

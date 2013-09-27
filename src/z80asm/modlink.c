@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.72 2013-09-22 21:34:48 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.73 2013-09-27 01:14:33 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.72  2013-09-22 21:34:48  pauloscustodio
+/* Revision 1.73  2013-09-27 01:14:33  pauloscustodio
+/* Parse command line options via look-up tables:
+/* --help, --verbose
+/*
+/* Revision 1.72  2013/09/22 21:34:48  pauloscustodio
 /* Remove legacy xxx_err() interface
 /*
 /* Revision 1.71  2013/09/12 00:10:02  pauloscustodio
@@ -457,7 +461,7 @@ extern char line[], ident[];
 extern char Z80objhdr[];
 extern char Z80libhdr[];
 extern enum symbols sym, GetSym( void );
-extern enum flag EOL, library;
+extern enum flag EOL;
 extern byte_t reloc_routine[];
 extern struct liblist *libraryhdr;
 extern struct module *CURRENTMODULE;
@@ -641,7 +645,7 @@ LinkModules( void )
     option_symtable = listing = OFF;
     linkhdr = NULL;
 
-    if ( verbose )
+    if ( opts.verbose )
     {
         puts( "linking module(s)...\nPass1..." );
     }
@@ -735,7 +739,7 @@ LinkModules( void )
                     }
                 }
 
-                if ( verbose == ON )
+                if ( opts.verbose )
                 {
                     printf( "ORG address for code is %04lX\n", CURRENTMODULE->origin );
                 }
@@ -758,7 +762,7 @@ LinkModules( void )
         define_global_def_sym( ASMSIZE_KW, get_codesize() );
         define_global_def_sym( ASMTAIL_KW, modulehdr->first->origin + get_codesize() );
 
-        if ( verbose == ON )
+        if ( opts.verbose )
         {
             printf( "Code size of linked modules is %d bytes\n", ( int )get_codesize() );
         }
@@ -1092,7 +1096,7 @@ LinkLibModule( struct libfile *library, long curmodule, char *modname )
     /* create new module for library */
     CURRENTFILE = Newfile( NULL, library->libfilename ); /* filename for 'module' */
 
-    if ( verbose )
+    if ( opts.verbose )
     {
         printf( "Linking library module <%s>\n", modname );
     }
@@ -1126,7 +1130,7 @@ ModuleExpr( void )
     long fptr_base;
     struct linkedmod *curlink;
 
-    if ( verbose )
+    if ( opts.verbose )
     {
         puts( "Pass2..." );
     }
@@ -1255,7 +1259,7 @@ CreateBinFile( void )
         binaryfile = NULL;
     }
 
-    if ( verbose )
+    if ( opts.verbose )
     {
         puts( "Code generation completed." );
     }
@@ -1273,7 +1277,7 @@ CreateLib( char *lib_filename )
     long fptr;
 	char obj_filename[FILENAME_MAX];
 
-    if ( verbose )
+    if ( opts.verbose )
     {
         puts( "Creating library..." );
     }
@@ -1314,7 +1318,7 @@ CreateLib( char *lib_filename )
                 break;
             }
 
-            if ( verbose )
+            if ( opts.verbose )
             {
                 printf( "<%s> module at %04lX.\n", CURRENTFILE->fname, ftell( lib_file ) );
             }

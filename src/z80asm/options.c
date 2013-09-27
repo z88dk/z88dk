@@ -12,11 +12,295 @@
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
+
+Parse command line options
+
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.31 2013-09-27 01:14:33 pauloscustodio Exp $
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.30 2013-09-23 23:14:10 pauloscustodio Exp $ */
+#include "memalloc.h"   /* before any other include */
+
+#include "errors.h"
+#include "file.h"
+#include "hist.h"
+#include "options.h"
+#include <glib.h>
+#include <string.h>
+
+/* declare functions */
+static void reset_options( void );
+static void exit_help(void);
+static void exit_copyright(void);
+static void display_options(void);
+static void parse_options(int *parg, int argc, char *argv[]);
+static void parse_files(int arg, int argc, char *argv[], 
+ 			            void (*process_file)(char *filename) );
+
+/*-----------------------------------------------------------------------------
+*   singleton opts
+*----------------------------------------------------------------------------*/
+#define OPT_VAR(type, name, default)	default,
+Opts opts =
+{
+#include "options_def.h"
+};
+
+/*-----------------------------------------------------------------------------
+*   lookup-table for all options
+*----------------------------------------------------------------------------*/
+typedef struct OptsLU
+{
+	enum OptType	 type;		/* type of option */
+	void			*arg;		/* option argument */
+	char			*short_opt;	/* option text, including starting "-" */
+	char			*long_opt;	/* option text, including starting "--" */
+} 
+OptsLU;
+
+#define OPT(type, arg, short_opt, long_opt, help_text, help_arg) \
+		  { type, arg, short_opt, long_opt },
+
+static OptsLU opts_lu[] =
+{
+#include "options_def.h"
+};
+
+/*-----------------------------------------------------------------------------
+*   Parse command line, set options, call back for each non-option, 
+*	process @lists
+*----------------------------------------------------------------------------*/
+void parse_argv(int argc, char *argv[], 
+ 			    void (*process_file)(char *filename) )
+{
+	int arg;
+
+    reset_options();					/* set defaults */
+
+	if ( argc == 1 )
+		exit_copyright();				/* exit if no arguments */
+
+	parse_options(&arg, argc, argv);	/* process all options, set arg to next */
+
+    if ( arg >= argc )
+        error_no_src_file();			/* no source file */
+
+    if ( opts.verbose )
+        display_options();				/* display status messages of select assembler options */
+
+	parse_files(arg, argc, argv, process_file);		/* process each source file */
+}
+
+/*-----------------------------------------------------------------------------
+*   process all options
+*----------------------------------------------------------------------------*/
+static char *opt_arg(char *arg, char *opt)
+{
+	size_t len = strlen(opt);
+	if ( strncmp( arg, opt, len ) == 0 )
+		return arg + len;		/* point to after argument */
+	else
+		return NULL;			/* not found */
+}
+
+static BOOL process_opt(int *parg, int argc, char *argv[])
+{
+#define i (*parg)
+	int		 j;
+	char	*opt_arg_ptr;
+
+	/* search opts_lu[] */
+	for ( j = 0; j < (int)G_N_ELEMENTS(opts_lu); j++ )
+	{
+		if ( (opt_arg_ptr = opt_arg( argv[i], opts_lu[j].long_opt )) != NULL ||
+			 (opt_arg_ptr = opt_arg( argv[i], opts_lu[j].short_opt )) != NULL )
+		{
+			/* found option, opt_arg_ptr points to after option */
+			switch ( opts_lu[j].type )
+			{
+			case OptClear:
+				if ( *opt_arg_ptr )
+					error_illegal_option( argv[i] );
+				else
+					*((BOOL *)(opts_lu[j].arg)) = FALSE;
+				break;
+
+			case OptSet:
+				if ( *opt_arg_ptr )
+					error_illegal_option( argv[i] );
+				else
+					*((BOOL *)(opts_lu[j].arg)) = TRUE;
+				break;
+
+			case OptCall:
+				if ( *opt_arg_ptr )
+					error_illegal_option( argv[i] );
+				else
+					((void (*)(void))(opts_lu[j].arg)) ();
+				break;
+
+			default:
+				error_illegal_option( argv[i] );
+			}
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+
+#undef i
+}
+
+static void parse_options(int *parg, int argc, char *argv[])
+{
+#define i (*parg)
+
+    for ( i = 1; i < argc && argv[i][0] == '-'; i++ )
+    {
+		if ( ! process_opt( &i, argc, argv ) )
+			set_asm_flag( argv[i] + 1 );
+    }
+
+#undef i
+}
+
+/*-----------------------------------------------------------------------------
+*   process all files
+*----------------------------------------------------------------------------*/
+void parse_files(int arg, int argc, char *argv[], 
+	             void (*process_file)(char *filename) )
+{
+	int i; 
+
+    /* Assemble file list */
+    for ( i = arg; i < argc; i++ )
+        process_file( argv[i] );
+}
+
+
+/*-----------------------------------------------------------------------------
+*   Show information and exit - functions
+*----------------------------------------------------------------------------*/
+#define OPT_TITLE(text)		puts(""); puts(text);
+#define OPT(type, arg, short_opt, long_opt, help_text, help_arg) \
+							show_option(short_opt, long_opt, help_text, help_arg);
+
+#define ALIGN_HELP	24
+
+static void show_option(char *short_opt, char *long_opt, char *help_text, char *help_arg)
+{
+	char msg[ MAXLINE ];
+	char *arg_sep = *help_arg ? "=" : "";
+
+	g_snprintf( msg, sizeof(msg), 
+				"  %s, %s%s%s", short_opt, long_opt, arg_sep, help_arg );
+
+	if ( strlen(msg) > ALIGN_HELP )
+		printf("%s\n%-*s %s\n", msg, ALIGN_HELP, "",  help_text );
+	else
+		printf(    "%-*s %s\n",      ALIGN_HELP, msg, help_text );
+}
+#undef ALIGN_HELP
+
+static void exit_help(void)
+{
+    puts(  copyrightmsg );
+	puts(  "" );
+	puts(  "Usage:" );
+    puts(  "  z80asm [options] { @<modulefile> | <filename> }" );
+	puts(  "" );
+    puts(  "  [] = optional, {} = may be repeated, | = OR clause." );
+	puts(  "" );
+    printf("  To assemble 'fred%s' use 'fred' or 'fred%s'\n", get_asm_ext(), get_asm_ext() );
+	puts(  "" );
+    puts(  "  <modulefile> contains list of file names of all modules to be linked," );
+	puts(  "  one module per line." );
+	puts(  "" );
+    puts(  "  File types recognized or created by z80asm:" );
+    printf("    %s = source file (default), or alternative -e<ext>\n", get_asm_ext() );
+    printf("    %s = object file (default), or alternative -M<ext>\n", get_obj_ext() );
+    printf("    %s = list file\n", FILEEXT_LST );
+    printf("    %s = Z80 binary file\n", FILEEXT_BIN );
+    printf("    %s = symbols file\n", FILEEXT_SYM );
+    printf("    %s = map file\n", FILEEXT_MAP );
+    printf("    %s = global address definition file\n", FILEEXT_DEF );
+    printf("    %s = error file\n", FILEEXT_ERR );
+
+#include "options_def.h"
+
+	puts(  "" );
+    puts( "Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)" );
+    printf( "-l listing file, -s symbol table, -m map listing file\n" );
+    puts( "-r<ORG> Explicit relocation <ORG> defined in hex (ignore ORG in first module)" );
+    puts( "-plus Interpret 'Invoke' as RST 28h" );
+    puts( "-R Generate relocatable code (Automatical relocation before execution)" );
+    puts( "-D<symbol> define symbol as logically TRUE (used for conditional assembly)" );
+    puts( "-b assemble files & link to ORG address. -c split code in 16K banks" );
+    puts( "-d date stamp control, assemble only if source file > object file" );
+    puts( "-a: -b & -d (assemble only updated source files, then link & relocate)" );
+    puts( "-o<bin filename> expl. output filename, -g XDEF reloc. addr. from all modules" );
+    printf( "-i<library> include <library> LIB modules with %s modules during linking\n", get_obj_ext() );
+    puts( "-x<library> create library from specified modules ( e.g. with @<modules> )" );
+    printf( "-t<n> tabulator width for %s, %s, %s files. Column width is 4 times -t\n", FILEEXT_MAP, FILEEXT_DEF, FILEEXT_SYM );
+    printf( "-I<path> additional path to search for includes\n" );
+    printf( "-L<path> path to search for libraries\n" );
+    puts( "Default options: -nv -nd -nb -nl -s -m -ng -nc -nR -t8" );
+
+	exit(0);
+}
+
+static void exit_copyright(void)
+{
+    printf("%s\n", copyrightmsg);
+	exit(0);
+}
+
+static void display_options(void)
+{
+    if ( datestamp == ON )
+        puts( "Assemble only updated files." );
+    else
+        puts( "Assemble all files." );
+
+    if ( symfile == ON )
+        puts( "Create symbol table file." );
+
+    if ( listing == ON )
+        puts( "Create listing file." );
+
+    if ( globaldef == ON )
+        puts( "Create global definition file." );
+
+    if ( createlibrary == ON )
+        puts( "Create library from specified modules." );
+
+    if ( z80bin == ON )
+        puts( "Link/relocate assembled modules." );
+
+    if ( library == ON )
+        puts( "Link library modules with code." );
+
+    if ( z80bin == ON && mapref == ON )
+        puts( "Create address map file." );
+
+    if ( codesegment == ON && autorelocate == OFF )
+        puts( "Split code into 16K banks." );
+
+    if ( autorelocate == ON )
+        puts( "Create relocatable code." );
+
+    putchar( '\n' );
+}
+
+
+
+
+
 /* $Log: options.c,v $
-/* Revision 1.30  2013-09-23 23:14:10  pauloscustodio
+/* Revision 1.31  2013-09-27 01:14:33  pauloscustodio
+/* Parse command line options via look-up tables:
+/* --help, --verbose
+/*
+/* Revision 1.30  2013/09/23 23:14:10  pauloscustodio
 /* Renamed SzList to StringList, simplified interface by assuming that
 /* list lives in memory util program ends; it is used for directory searches
 /* only. Moved interface to strutil.c, removed strlist.c.
@@ -182,7 +466,6 @@ enum flag option_symtable;
 enum flag symfile;
 enum flag z80bin;
 enum flag mapref;
-enum flag verbose;
 enum flag globaldef;
 enum flag autorelocate;
 enum flag deforigin;
@@ -190,6 +473,9 @@ enum flag expl_binflnm;
 char *libfilename;				/* -i, -x library file, kept in strpool */
 char binfilename[FILENAME_MAX]; /* -o explicit filename buffer (BUG_0012) */
 int  cpu_type;
+enum flag library;
+enum flag createlibrary;
+
 
 /* directory list for search_lib_file() */
 static StringList *lib_path = NULL;
@@ -221,7 +507,7 @@ char *search_lib_file( char *filename )
 *   reset_options
 *       Reset globals to defaults
 *----------------------------------------------------------------------------*/
-void reset_options( void )
+static void reset_options( void )
 {
     ti83plus        = OFF;
     swapIXIY        = OFF;
@@ -237,12 +523,13 @@ void reset_options( void )
     symfile         = ON;
     z80bin          = OFF;
     mapref          = ON;
-    verbose         = OFF;
     globaldef       = OFF;
     autorelocate    = OFF;
     deforigin       = OFF;
     expl_binflnm    = OFF;
     cpu_type        = CPU_Z80;
+	library			= OFF;
+	createlibrary   = OFF;
 
     init_search_paths();                /* initialize the search paths */
 }
@@ -376,16 +663,6 @@ void set_asm_flag( char *flagid )
         datestamp = ON;
     }
 
-    else if ( strcmp( flagid, "v" ) == 0 )
-    {
-        verbose = ON;
-    }
-
-    else if ( strcmp( flagid, "nv" ) == 0 )
-    {
-        verbose = OFF;
-    }
-
     else if ( strcmp( flagid, "m" ) == 0 )
     {
         mapref = ON;
@@ -503,16 +780,10 @@ void set_asm_flag( char *flagid )
         define_static_def_sym( ident, 1 );
     }
 
-    else if ( strcmp( flagid, "h" ) == 0 )
-    {
-        usage();
-        exit(0);
-    }
-
     else
     {
         /* BUG_0003 was missing Illegal Option error */
-        error_illegal_option( flagid );
+        error_illegal_option_OLD( flagid );
     }
 }
 

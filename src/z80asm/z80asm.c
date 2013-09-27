@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.102 2013-09-22 21:34:48 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.103 2013-09-27 01:14:33 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.102  2013-09-22 21:34:48  pauloscustodio
+/* Revision 1.103  2013-09-27 01:14:33  pauloscustodio
+/* Parse command line options via look-up tables:
+/* --help, --verbose
+/*
+/* Revision 1.102  2013/09/22 21:34:48  pauloscustodio
 /* Remove legacy xxx_err() interface
 /*
 /* Revision 1.101  2013/09/12 00:10:02  pauloscustodio
@@ -631,7 +635,6 @@ long GetConstant( char *evalerr );
 
 
 /* local functions */
-void prompt( void );
 void ReleaseFile( struct sourcefile *srcfile );
 void ReleaseLibraries( void );
 void ReleaseOwnedFile( struct usedfile *ownedfile );
@@ -665,7 +668,7 @@ char separators[] =
 #undef TOKEN
 ;
 
-enum flag EOL, library, createlibrary;
+enum flag EOL;
 
 long TOTALLINES;
 char line[255], stringconst[255], ident[FILENAME_MAX + 1];
@@ -854,7 +857,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
         /* Create standard 'ASMPC' identifier */
         ASMPC = define_global_def_sym( ASMPC_KW, get_PC() );
 
-        if ( verbose )
+        if ( opts.verbose )
         {
             printf( "Assembling '%s'...\nPass1...\n", src_filename );
         }
@@ -876,7 +879,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
 
         if ( start_errors == get_num_errors() )
         {
-            if ( verbose )
+            if ( opts.verbose )
             {
                 puts( "Pass2..." );
             }
@@ -920,7 +923,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
         remove_all_local_syms();
         remove_all_global_syms();
 
-        if ( verbose )
+        if ( opts.verbose )
         {
             putchar( '\n' );    /* separate module texts */
         }
@@ -1292,80 +1295,14 @@ ReleaseOwnedFile( struct usedfile *ownedfile )
 }
 
 
-void
-display_options( void )
-{
-    if ( datestamp == ON )
-    {
-        puts( "Assemble only updated files." );
-    }
-    else
-    {
-        puts( "Assemble all files" );
-    }
-
-    if ( symfile == ON )
-    {
-        puts( "Create symbol table file." );
-    }
-
-    if ( listing == ON )
-    {
-        puts( "Create listing file." );
-    }
-
-    if ( globaldef == ON )
-    {
-        puts( "Create global definition file." );
-    }
-
-    if ( createlibrary == ON )
-    {
-        puts( "Create library from specified modules." );
-    }
-
-    if ( z80bin == ON )
-    {
-        puts( "Link/relocate assembled modules." );
-    }
-
-    if ( library == ON )
-    {
-        puts( "Link library modules with code." );
-    }
-
-    if ( z80bin == ON && mapref == ON )
-    {
-        puts( "Create address map file." );
-    }
-
-    if ( codesegment == ON && autorelocate == OFF )
-    {
-        puts( "Split code into 16K banks." );
-    }
-
-    if ( autorelocate == ON )
-    {
-        puts( "Create relocatable code." );
-    }
-
-    putchar( '\n' );
-}
-
 /***************************************************************************************************
  * Main entry of Z80asm
  ***************************************************************************************************/
 int main( int argc, char *argv[] )
 {
-    int    i;
-
 	/* start try..catch with finally to cleanup any allocated memory */
     TRY
     {
-        library = createlibrary = OFF;
-
-        reset_options();
-
         CURRENTMODULE = NULL;
         modulehdr = NULL;               /* initialise to no modules */
         libraryhdr = NULL;              /* initialise to no library files */
@@ -1373,36 +1310,10 @@ int main( int argc, char *argv[] )
         /* define OS_ID */
         define_static_def_sym( OS_ID, 1 );
 
-        /* Get command line arguments, if any... */
-        if ( argc == 1 )
-        {
-            prompt();
-            exit(0);
-        }
-
         TOTALLINES = 0;
 
-        /* Get options first */
-        for ( i = 1; i < argc && argv[i][0] == '-'; i++ )
-        {
-            set_asm_flag( argv[i] + 1 );
-        }
-
-        if ( i >= argc )
-        {
-            error_no_src_file();
-        }
-
-        if ( verbose == ON )
-        {
-            display_options();    /* display status messages of select assembler options */
-        }
-
-        /* Assemble file list */
-        for ( ; i < argc; i++ )
-        {
-            assemble_file( argv[i] );
-        }
+		/* parse command line and call-back via assemble_file() */
+		parse_argv(argc, argv, assemble_file);
 
         /* Link */
         CloseFiles();
@@ -1413,8 +1324,7 @@ int main( int argc, char *argv[] )
             CreateLib( libfilename );
         }
 
-
-        if ( ! get_num_errors() && verbose )
+        if ( ! get_num_errors() && opts.verbose )
         {
             printf( "Total of %ld lines assembled.\n", TOTALLINES );
         }
@@ -1480,44 +1390,6 @@ int main( int argc, char *argv[] )
     {
         return 0;    /* assembler successfully ended */
     }
-}
-
-void
-prompt( void )
-{
-    printf( "%s\n", copyrightmsg );
-}
-
-void
-usage( void )
-{
-    printf( "%s\n", copyrightmsg );
-    puts( "z80asm [options] [ @<modulefile> | {<filename>} ]" );
-    puts( "[] = may be ignored. {} = may be repeated. | = OR clause." );
-    printf( "To assemble 'fred%s' use 'fred' or 'fred%s'\n", get_asm_ext(), get_asm_ext() );
-    puts( "<modulefile> contains file names of all modules to be linked:" );
-    puts( "File names are put on separate lines ended with \\n. File types recognized or" );
-    puts( "created by z80asm (defined by the following extension):" );
-    printf( "%s = source file (default), or alternative -e<ext>\n", get_asm_ext() );
-    printf( "%s = object file (default), or alternative -M<ext>\n", get_obj_ext() );
-    printf( "%s = list file, %s = Z80 code file\n", FILEEXT_LST, FILEEXT_BIN );
-    printf( "%s = symbols file, %s = map file, %s = XDEF file, %s = error file\n", FILEEXT_SYM, FILEEXT_MAP, FILEEXT_DEF, FILEEXT_ERR );
-    puts( "Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)" );
-    printf( "-v verbose, -l listing file, -s symbol table, -m map listing file\n" );
-    puts( "-r<ORG> Explicit relocation <ORG> defined in hex (ignore ORG in first module)" );
-    puts( "-plus Interpret 'Invoke' as RST 28h" );
-    puts( "-R Generate relocatable code (Automatical relocation before execution)" );
-    puts( "-D<symbol> define symbol as logically TRUE (used for conditional assembly)" );
-    puts( "-b assemble files & link to ORG address. -c split code in 16K banks" );
-    puts( "-d date stamp control, assemble only if source file > object file" );
-    puts( "-a: -b & -d (assemble only updated source files, then link & relocate)" );
-    puts( "-o<bin filename> expl. output filename, -g XDEF reloc. addr. from all modules" );
-    printf( "-i<library> include <library> LIB modules with %s modules during linking\n", get_obj_ext() );
-    puts( "-x<library> create library from specified modules ( e.g. with @<modules> )" );
-    printf( "-t<n> tabulator width for %s, %s, %s files. Column width is 4 times -t\n", FILEEXT_MAP, FILEEXT_DEF, FILEEXT_SYM );
-    printf( "-I<path> additional path to search for includes\n" );
-    printf( "-L<path> path to search for libraries\n" );
-    puts( "Default options: -nv -nd -nb -nl -s -m -ng -nc -nR -t8" );
 }
 
 

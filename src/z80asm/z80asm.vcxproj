@@ -109,6 +109,7 @@
     <ClInclude Include="module.h" />
     <ClInclude Include="objfile.h" />
     <ClInclude Include="options.h" />
+    <ClInclude Include="options_def.h" />
     <ClInclude Include="parse.h" />
     <ClInclude Include="queue.h" />
     <ClInclude Include="safestr.h" />

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.16 2013-09-23 23:14:10 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.17 2013-09-27 01:14:33 pauloscustodio Exp $
 */
 
 #pragma once
@@ -84,7 +84,7 @@ extern char *getline_FileStack(FileStack *self);
 
 
 
-
+#include "config.h"
 #include "safestr.h"
 #include "strutil.h"
 #include "types.h"
@@ -176,7 +176,11 @@ extern char *search_file( char *filename, StringList *dir_list );
 
 /* 
 $Log: file.h,v $
-Revision 1.16  2013-09-23 23:14:10  pauloscustodio
+Revision 1.17  2013-09-27 01:14:33  pauloscustodio
+Parse command line options via look-up tables:
+--help, --verbose
+
+Revision 1.16  2013/09/23 23:14:10  pauloscustodio
 Renamed SzList to StringList, simplified interface by assuming that
 list lives in memory util program ends; it is used for directory searches
 only. Moved interface to strutil.c, removed strlist.c.

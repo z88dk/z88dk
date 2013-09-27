@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.36 2013-09-01 11:59:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.37 2013-09-27 01:14:33 pauloscustodio Exp $
 $Log: z80asm.h,v $
-Revision 1.36  2013-09-01 11:59:05  pauloscustodio
+Revision 1.37  2013-09-27 01:14:33  pauloscustodio
+Parse command line options via look-up tables:
+--help, --verbose
+
+Revision 1.36  2013/09/01 11:59:05  pauloscustodio
 Force memalloc to be the first include, to be able to use MSVC memory debug tools
 
 Revision 1.35  2013/06/16 20:14:39  pauloscustodio
@@ -212,7 +216,6 @@ extern size_t sizeof_relocroutine, sizeof_reloctable;
 extern char *Fetchfilename( FILE *fptr );
 extern char *CreateLibfile( char *filename );
 extern char *GetLibfile( char *filename );
-extern void usage( void );
 extern long TOTALLINES;
 
 extern void assemble_file( char *filename );

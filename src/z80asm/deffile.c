@@ -14,9 +14,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.1 2013-06-16 20:14:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.2 2013-09-27 01:14:33 pauloscustodio Exp $
 $Log: deffile.c,v $
-Revision 1.1  2013-06-16 20:14:39  pauloscustodio
+Revision 1.2  2013-09-27 01:14:33  pauloscustodio
+Parse command line options via look-up tables:
+--help, --verbose
+
+Revision 1.1  2013/06/16 20:14:39  pauloscustodio
 Move deffile writing to deffile.c, remove global variable deffile
 
 
@@ -77,7 +81,7 @@ void write_def_file( void )
     /* Create DEF file */
     file = xfopen( filename, "w" );           /* CH_0012 */
 
-    if ( verbose )
+    if ( opts.verbose )
     {
         puts( "Creating global definition file..." );
     }
