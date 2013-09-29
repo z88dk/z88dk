@@ -14,13 +14,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.17 2013-09-27 01:14:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.18 2013-09-29 21:40:13 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "memalloc.h"   /* before any other include */
 
+#include "init.h"
 #include "types.h"
 #include <glib.h>
 
@@ -176,7 +177,10 @@ extern char *search_file( char *filename, StringList *dir_list );
 
 /* 
 $Log: file.h,v $
-Revision 1.17  2013-09-27 01:14:33  pauloscustodio
+Revision 1.18  2013-09-29 21:40:13  pauloscustodio
+include
+
+Revision 1.17  2013/09/27 01:14:33  pauloscustodio
 Parse command line options via look-up tables:
 --help, --verbose
 
