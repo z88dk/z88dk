@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.103 2013-09-27 01:14:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.104 2013-09-29 21:43:48 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.103  2013-09-27 01:14:33  pauloscustodio
+/* Revision 1.104  2013-09-29 21:43:48  pauloscustodio
+/* Parse command line options via look-up tables:
+/* move @file handling to options.c
+/*
+/* Revision 1.103  2013/09/27 01:14:33  pauloscustodio
 /* Parse command line options via look-up tables:
 /* --help, --verbose
 /*
@@ -703,8 +707,6 @@ struct liblist *libraryhdr;
 Symbol *ASMPC;
 
 /* local functions */
-static void assemble_list( char *filename );
-static BOOL assemble_special( char *filename );
 static BOOL load_module_object( char *filename );
 static void query_assemble( char *src_filename, char *obj_filename );
 static void do_assemble( char *src_filename, char *obj_filename );
@@ -718,9 +720,6 @@ void assemble_file( char *filename )
 {
 	char *src_filename, *obj_filename;
 
-	if ( assemble_special( filename ) )
-		return;								/* handled a special file */
-		
     /* normal case - assemble a asm source file */
     z80asmfile = objfile = NULL;
 
@@ -737,53 +736,6 @@ void assemble_file( char *filename )
 
 	query_assemble( src_filename, obj_filename );
     set_error_null();           /* no more module in error messages */
-}
-
-/*-----------------------------------------------------------------------------
-*   Check for special file name started with '@' to read a list of files to 
-*	assemble; 
-*	Return TRUE if filename was special and was handled
-*----------------------------------------------------------------------------*/
-static BOOL assemble_special( char *filename )
-{
-    switch ( filename[0] )
-    {
-        case '\0':
-            /* no file to include */
-            return TRUE;
-
-        case '-':
-            /* Illegal source file name */
-            error_illegal_src_filename( filename );
-            return TRUE;
-
-        case '@':
-            assemble_list( filename + 1 );     	/* skip '@' marker */
-            return TRUE;
-
-        default:
-            return FALSE;
-    }
-}
-
-/*-----------------------------------------------------------------------------
-*   Assemble list of files read from given file name
-*----------------------------------------------------------------------------*/
-static void assemble_list( char *filename )
-{
-	FILE *fp;
-	SSTR_DEFINE( line, MAXLINE );
-
-	fp = xfopen( filename, "rb" );
-
-	/* read lines from file and assemble each one in turn */
-	while ( sstr_getline( line, fp ) )
-	{
-		sstr_chomp( line );
-		assemble_file( sstr_data( line ) );		/* may contain '@' -> recurse */
-	}
-
-	fclose( fp );
 }
 
 /*-----------------------------------------------------------------------------

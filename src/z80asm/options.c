@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.31 2013-09-27 01:14:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.32 2013-09-29 21:43:48 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -164,18 +164,67 @@ static void parse_options(int *parg, int argc, char *argv[])
 }
 
 /*-----------------------------------------------------------------------------
-*   process all files
+*   process a file
 *----------------------------------------------------------------------------*/
-void parse_files(int arg, int argc, char *argv[], 
-	             void (*process_file)(char *filename) )
+static void parse_file( char *filename, void (*process_file)(char *filename) )
 {
-	int i; 
+	switch ( filename[0] )
+	{
+        case '-':		/* Illegal source file name */
+            error_illegal_src_filename( filename );
+            break;
 
-    /* Assemble file list */
-    for ( i = arg; i < argc; i++ )
-        process_file( argv[i] );
+        case '\0':		/* no file */
+			break;
+
+        default:
+            process_file( filename );
+	}
 }
 
+/*-----------------------------------------------------------------------------
+*   process a @list file or a simple file
+*----------------------------------------------------------------------------*/
+static void parse_file_list( FileStack *files, 
+						     char *filename, void (*process_file)(char *filename) )
+{
+	char *line;
+
+	if ( filename[0] == '@' )
+	{
+		read_to_FileStack( files, filename+1 );
+
+		while ( (line = getline_FileStack( files )) != NULL )
+		{
+			g_strstrip(line);
+			if ( line[0] == '@' )
+				read_to_FileStack( files, line+1 );		/* recurse */
+			else 
+				parse_file( line, process_file );
+		}
+	}
+	else 
+	{
+		parse_file( filename, process_file );
+	}
+}
+
+/*-----------------------------------------------------------------------------
+*   process all files
+*----------------------------------------------------------------------------*/
+static void parse_files(int arg, int argc, char *argv[], 
+						void (*process_file)(char *filename) )
+{
+	FileStack *files = new_FileStack();
+	{
+		int i; 
+
+		/* Assemble file list */
+		for ( i = arg; i < argc; i++ )
+			parse_file_list( files, argv[i], process_file );
+	}
+	delete0_FileStack( &files );
+}
 
 /*-----------------------------------------------------------------------------
 *   Show information and exit - functions
@@ -296,7 +345,11 @@ static void display_options(void)
 
 
 /* $Log: options.c,v $
-/* Revision 1.31  2013-09-27 01:14:33  pauloscustodio
+/* Revision 1.32  2013-09-29 21:43:48  pauloscustodio
+/* Parse command line options via look-up tables:
+/* move @file handling to options.c
+/*
+/* Revision 1.31  2013/09/27 01:14:33  pauloscustodio
 /* Parse command line options via look-up tables:
 /* --help, --verbose
 /*

@@ -13,17 +13,52 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.1 2013-09-27 01:14:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.2 2013-09-29 21:43:48 pauloscustodio Exp $
 #
 # Test options
 
 use strict;
 use warnings;
 use File::Slurp;
+use Capture::Tiny 'capture_merged';
 use Test::More;
 require 't/test_utils.pl';
 
 my $copyrightmsg = get_copyright()."\n";
+
+#------------------------------------------------------------------------------
+# no arguments
+#------------------------------------------------------------------------------
+unlink_testfiles();
+t_z80asm_capture("", 		$copyrightmsg, 	"", 0);
+
+#------------------------------------------------------------------------------
+# list of files
+#------------------------------------------------------------------------------
+unlink_testfiles();
+write_file(asm1_file(), "defb 1");
+write_file(asm2_file(), "defb 2");
+write_file(asm3_file(), "defb 3");
+write_file(asm4_file(), "defb 4");
+t_z80asm_capture(join(" ", "-r0", "-b", asm1_file(), asm2_file(), asm3_file(), asm4_file()),
+				 "", "", 0);
+t_binary(read_binfile(bin1_file()), "\1\2\3\4");
+ok unlink bin1_file();
+
+write_file(asmlst1_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@".asmlst2_file());
+write_file(asmlst2_file(), "\r\r\n\n  ".asm3_file()."  \r\r\n\n    ".asm4_file()."\n");
+t_z80asm_capture(join(" ", "-r0", "-b", asm1_file(), '@'.asmlst1_file()),
+				 "", "", 0);
+t_binary(read_binfile(bin1_file()), "\1\2\3\4");
+ok unlink bin1_file();
+
+write_file(asmlst1_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@".asmlst2_file());
+write_file(asmlst2_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@".asmlst1_file());
+t_z80asm_capture(join(" ", "-r0", "-b", asm1_file(), '@'.asmlst1_file()),
+				 "", <<'ERR', 1);
+Error at file 'test2.asmlst' line 9: cannot include file 'test1.asmlst' recursively
+1 errors occurred during assembly
+ERR
 
 #------------------------------------------------------------------------------
 # --help, -h
@@ -76,9 +111,14 @@ Default options: -nv -nd -nb -nl -s -m -ng -nc -nR -t8
 END
 
 unlink_testfiles();
-t_z80asm_capture("", 		$copyrightmsg, 	"", 0);
 t_z80asm_capture("-h", 		$help_text, 	"", 0);
 t_z80asm_capture("--help", 	$help_text, 	"", 0);
+
+# make sure help fist in 80 columns
+my $out = capture_merged { system z80asm()." --help"; };
+my @long_lines = grep {length > 80} split(/\n/, $out);
+ok !@long_lines, "help within 80 columns";
+diag join("\n", @long_lines) if @long_lines;
 
 #------------------------------------------------------------------------------
 # --verbose, -v
@@ -142,7 +182,11 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.1  2013-09-27 01:14:33  pauloscustodio
+# Revision 1.2  2013-09-29 21:43:48  pauloscustodio
+# Parse command line options via look-up tables:
+# move @file handling to options.c
+#
+# Revision 1.1  2013/09/27 01:14:33  pauloscustodio
 # Parse command line options via look-up tables:
 # --help, --verbose
 #

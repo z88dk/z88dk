@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.46 2013-09-27 01:14:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.47 2013-09-29 21:43:48 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -506,6 +506,7 @@ sub t_compile_module {
 #include <stdio.h>
 
 ".join("\n", map {"#include \"$_\""} grep {-f $_} map {"$_.h"} sort keys %modules)."\n".'
+#undef main
 int _exception_raised;
 
 #define TITLE(title)	fprintf(stderr, "\n---- TEST: %s ----\n\n", (title) )
@@ -1014,7 +1015,11 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.46  2013-09-27 01:14:33  pauloscustodio
+# Revision 1.47  2013-09-29 21:43:48  pauloscustodio
+# Parse command line options via look-up tables:
+# move @file handling to options.c
+#
+# Revision 1.46  2013/09/27 01:14:33  pauloscustodio
 # Parse command line options via look-up tables:
 # --help, --verbose
 #
