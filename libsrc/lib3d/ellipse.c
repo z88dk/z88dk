@@ -8,7 +8,7 @@
 	specified in degrees.
 	
 	
-	$Id: ellipse.c,v 1.1 2013-05-06 10:39:17 stefano Exp $
+	$Id: ellipse.c,v 1.2 2013-09-30 15:10:35 stefano Exp $
 */
 
 
@@ -19,14 +19,13 @@
 int ellipse(int cx, int cy, int sa, int ea, int xradius, int yradius)
 {
 
-int i;
+int i,k;
 
-	plot(cx+icos(sa)*xradius/256,cy+isin(sa)*yradius/256);
+	k=sa;
+	plot(cx+icos(k)*xradius/256,cy+isin(k)*yradius/256);
 
-	for (i=sa;i!=ea;i++) {
-		if (i==360)  i=0;
-		drawto(cx+icos(i)*xradius/256,cy+isin(i)*yradius/256);
-	}
-	drawto(cx+icos(i)*xradius/256,cy+isin(i)*yradius/256);
+	for (i=sa;i++<ea;k++)
+		drawto(cx+icos(k)*xradius/256,cy+isin(k)*yradius/256);
+
+	//drawto(cx+icos(sa)*xradius/256,cy+isin(sa)*yradius/256);
 }
-

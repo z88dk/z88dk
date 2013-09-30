@@ -3,16 +3,23 @@
  *
  *  bgi.h - Turbo C compatibility
  * 
- *	Minimal interface for BGI graphics
- *	and few more TC peculiarities.
+ *	Minimal implementation of the Borland BGI style functions
+ *	plus few more TC peculiarities.
+ *
+ * 
+ *  Good value for gfxscale (256x192):  -DGFXSCALEX=2/5 and -DGFXSCALEY=2/5   (try also 1/3)
+ *  TS2068 HR (512x192):  -DGFXSCALEX=4/5 -DGFXSCALEY=2/5
+ * 
+ *  Do not use GFXSCALEX/Y if the program relies on getmaxx() and getmaxy()
+ * 
  * 
  * Build examples:
- *  zcc +zx -lndos -create_app -DGFXSCALEX=2/5 -lx11 myprogram.c
- *  zcc +ts2068 -startup=2 -lgfx2068hr -lndos -DGFXSCALEX=4/5 -DGFXSCALEY=2/5 -lx11 -create-app -zorg=40000 -O3 bar3d.c
+ *  zcc +zx -lndos -create_app -DGFXSCALEX=2/5 -lx11 -llib3d myprogram.c
+ *  zcc +ts2068 -startup=2 -lgfx2068hr -lndos -DGFXSCALEX=4/5 -DGFXSCALEY=2/5 -lx11 -llib3d -create-app -zorg=40000 -O3 bar3d.c
  *
  *      stefano - 22/10/2012
  *
- *	$Id: bgi.h,v 1.1 2012-10-24 06:44:12 stefano Exp $
+ *	$Id: bgi.h,v 1.2 2013-09-30 15:10:34 stefano Exp $
  */
 
 #ifndef __BGI_H__
@@ -20,8 +27,10 @@
 
 /* Let's assure <graphics.h> is already loaded */
 #include <graphics.h>
+#include <lib3d.h>
 #include <conio.h>
 #include <X11/XLib.h>
+
 
 #define	setfillstyle(a,b) {}
 // setcolor(a) printf("\033[%um",PCDOS_COLORS[a]+30)
@@ -29,7 +38,6 @@
 #define setbkcolor(a) {}
 #define setlinestyle(a,b,c) {}
 #define getmacc(a) {}
-
 
 enum horiz { LEFT_TEXT, CENTER_TEXT, RIGHT_TEXT };
 
@@ -86,6 +94,7 @@ char bgi_font[]="9xxxxx";
 int bgi_x;
 int bgi_y;
 
+#define setviewport(a,b,c,d,e) {}
 //#define initgraph(a,b,c)	bgi_display=XOpenDisplay(NULL);bgi_screen=DefaultScreen(bgi_display);bgi_win=XCreateSimpleWindow(bgi_display,RootWindow(bgi_display,bgi_screen),0,0,DisplayWidth(bgi_display,bgi_screen)-4,DisplayHeight(bgi_display,bgi_screen)-4,4,BlackPixel(bgi_display,bgi_screen),WhitePixel(bgi_display,bgi_screen));XMapWindow(bgi_display,bgi_win)
 #define initgraph(a,b,c)	clg();bgi_mywin.a_x=bgi_mywin.a_y=0;bgi_gc=XCreateGC(bgi_display,0,0,0);bgi_font_info=XLoadQueryFont(0,"9");XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
 #define detectgraph(a,b)	{}
@@ -103,37 +112,82 @@ int bgi_y;
 
 
 #define	settextjustify(a,b)	{}
+//#define setviewport(vp) {}
+#define getviewsettings(vp) {}
 
-/* 
- *  Good value for gfxscale (256x192):  -DGFXSCALEX=2/5 and -DGFXSCALEY=2/5   (try also 1/3)
- *  TS2068 HR (512x192):  -DGFXSCALEX=4/5 -DGFXSCALEY=2/5
- * 
- *  Do not use GFXSCALEX/Y if the program relies on getmaxx() and getmaxy()
- */
+typedef struct arccoordstype {
+    int x;
+    int y;
+    int xstart;
+    int ystart;
+    int xend;
+    int yend;
+} arccoordstype;
+
+//typedef char fillpatterntype[8];
+
+struct fillsettingstype {
+    int pattern;
+    int color;
+};
+
+struct linesettingstype {
+    int linestyle;
+    unsigned int upattern;
+    int thickness;
+};
+
+struct palettetype {
+    unsigned char size;
+    signed char colors[16];
+};
+
+struct textsettingstype {
+    int font;	
+    int direction;  
+    int charsize;
+    int horiz;
+    int vert;
+};
+
+struct viewporttype {
+    int left;
+    int top;
+    int right;
+    int bottom;
+    int clip;
+};
+
 
 #ifndef GFXSCALEY
 #define GFXSCALEY GFXSCALEX
 #endif
 
 #ifdef GFXSCALEX
-#define	getpixel(a,b)	point(a*GFXSCALEX,b*GFXSCALEY)
-#define	putpixel(a,b,c)	(c ? plot(a*GFXSCALEX,b*GFXSCALEY):unplot(a*GFXSCALEX,b*GFXSCALEY))
+#define	getpixel(a,b)	point((a)*GFXSCALEX,(b)*GFXSCALEY)
+#define	putpixel(a,b,c)	((c) ? plot((a)*GFXSCALEX,(b)*GFXSCALEY):unplot((a)*GFXSCALEX,(b)*GFXSCALEY))
 //#define	linerel(a,b)	drawr(a*GFXSCALEX,b*GFXSCALEY)
-#define	rectangle(a,b,c,d)	drawb(a*GFXSCALEX,b*GFXSCALEY,(c-a)*GFXSCALEX,(d-b)*GFXSCALEY)
-#define	bar(a,b,c,d)	drawb(a*GFXSCALEX,b*GFXSCALEY,(c-a)*GFXSCALEX,(d-b)*GFXSCALEY);fill(a*GFXSCALEX+1,b*GFXSCALEY+1);xorborder(a*GFXSCALEX+1,b*GFXSCALEY+1,(c-a+1)*GFXSCALEX+2,(d-b+1)*GFXSCALEY+2)
-#define	circle(a,b,c)	circle(a*GFXSCALEX,b*GFXSCALEY,c*GFXSCALEX,1)
-#define	ellipse(a,b,c,d,e,f)	plot((a-e)*GFXSCALEX,b*GFXSCALEY);drawr(e*GFXSCALEX,f*GFXSCALEY);drawr(e*GFXSCALEX,-f*GFXSCALEY);drawr(-e*GFXSCALEX,-f*GFXSCALEY);drawr(-e*GFXSCALEX,f*GFXSCALEY)
-#define	sector(a,b,c,d,e,f)	plot((a-e)*GFXSCALEX,b*GFXSCALEY);drawr(e*GFXSCALEX,f*GFXSCALEY);drawr(e*GFXSCALEX,-f*GFXSCALEY);drawr(-e*GFXSCALEX,-f*GFXSCALEY);drawr(-e*GFXSCALEX,f*GFXSCALEY);fill((a-e/2)*GFXSCALEX,b*GFXSCALEY);
-#define	fillellipse(a,b,c,d)	circle(a*GFXSCALEX,b*GFXSCALEY,c*GFXSCALEX,1);fill(a*GFXSCALEX,b*GFXSCALEY);
-#define	line(a,b,c,d)	draw(a*GFXSCALEX,b*GFXSCALEY,c*GFXSCALEX,d*GFXSCALEY)
+#define	rectangle(a,b,c,d)	drawb((a)*GFXSCALEX,(b)*GFXSCALEY,((c)-(a))*GFXSCALEX,((d)-(b))*GFXSCALEY)
+#define	bar(a,b,c,d)	drawb((a)*GFXSCALEX,(b)*GFXSCALEY,((c)-(a))*GFXSCALEX,((d)-(b))*GFXSCALEY);fill((a)*GFXSCALEX+1,(b)*GFXSCALEY+1);xorborder((a)*GFXSCALEX+1,(b)*GFXSCALEY+1,((c)-(a)+1)*GFXSCALEX+2,((d)-(b)+1)*GFXSCALEY+2)
+//#define	circle(a,b,c)	circle(a*GFXSCALEX,b*GFXSCALEY,c*GFXSCALEX,1)
+#define	ellipse(a,b,c,d,e,f)	ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,c,d,(e)*GFXSCALEX,(f)*GFXSCALEY)
+#define	circle(a,b,c)	ellipse(a,b,0,360,c,c)
+#define	circle(a,b,c) polygon((a)*GFXSCALEX,(b)*GFXSCALEY,180,(c)*GFXSCALEY,0);
+//#define	ellipse(a,b,c,d,e,f)	plot((a-e)*GFXSCALEX,b*GFXSCALEY);drawr(e*GFXSCALEX,f*GFXSCALEY);drawr(e*GFXSCALEX,-f*GFXSCALEY);drawr(-e*GFXSCALEX,-f*GFXSCALEY);drawr(-e*GFXSCALEX,f*GFXSCALEY)
+//#define	ellipse(a,b,c,d,e,f)	ellipse(a*GFXSCALEX,b*GFXSCALEY,c*GFXSCALEX,d*GFXSCALEY,e*GFXSCALEX,f*GFXSCALEY)
+#define	sector(a,b,c,d,e,f)	plot(((a)-(e))*GFXSCALEX,(b)*GFXSCALEY);drawr((e)*GFXSCALEX,(f)*GFXSCALEY);drawr((e)*GFXSCALEX,-(f)*GFXSCALEY);drawr(-(e)*GFXSCALEX,-(f)*GFXSCALEY);drawr(-(e)*GFXSCALEX,(f)*GFXSCALEY);fill(((a)-(e)/2)*GFXSCALEX,(b)*GFXSCALEY);
+//#define	fillellipse(a,b,c,d)	ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,1,350,(c)*GFXSCALEX,(d)*GFXSCALEY);plot((a)*GFXSCALEX,(b)*GFXSCALEY)
+#define	fillellipse(a,b,c,d)	ellipse(a,b,0,360,c,d)
+#define	line(a,b,c,d)	draw((a)*GFXSCALEX,(b)*GFXSCALEY,(c)*GFXSCALEX,(d)*GFXSCALEY)
 //#define	arc(a,b,c,d,e)	draw(a*GFXSCALEX,b*GFXSCALEY,(a+e)*GFXSCALEX,(d+e)*GFXSCALEY)
 //#define	pieslice(a,b,c,d,e)	draw(a*GFXSCALEX,b*GFXSCALEY,(a+e)*GFXSCALEX,(d+e)*GFXSCALEY)
-#define	drawpoly(a,b)	for(bgi_x=0;bgi_x<(a-1);bgi_x++){draw(b[bgi_x*2]*GFXSCALEX,b[1+bgi_x*2]*GFXSCALEY,b[2+bgi_x*2]*GFXSCALEX,b[3+bgi_x*2]*GFXSCALEY);}
-#define floodfill(a,b,c)	fill(a*GFXSCALEX,b*GFXSCALEY)
+#define	drawpoly(a,b)	for(bgi_x=0;bgi_x<((a)-1);bgi_x++){draw(b[bgi_x*2]*GFXSCALEX,b[1+bgi_x*2]*GFXSCALEY,b[2+bgi_x*2]*GFXSCALEX,b[3+bgi_x*2]*GFXSCALEY);}
+#define floodfill(a,b,c)	fill((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	outtext(c) XDrawString(bgi_display,bgi_mywin,&bgi_gc,bgi_x*GFXSCALEX,bgi_y*GFXSCALEY,c,strlen(c));bgi_x+=XTextWidth(bgi_font_info->fid,c,strlen(c))
-#define	outtextxy(a,b,c) XDrawString(bgi_display,bgi_mywin,&bgi_gc,a*GFXSCALEX,b*GFXSCALEY,c,strlen(c));
-#define	settextstyle(a,b,c) itoa(c+a*3*GFXSCALEX,bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
-#define	setusercharsize(a,b,c,d) itoa(10*a*GFXSCALEX/b,bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
+#define	outtextxy(a,b,c) XDrawString(bgi_display,bgi_mywin,&bgi_gc,(a)*GFXSCALEX,(b)*GFXSCALEY,c,strlen(c));
+#define	settextstyle(a,b,c) itoa((c)+(a)*3*GFXSCALEX,bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
+#define	setusercharsize(a,b,c,d) itoa(10*(a)*GFXSCALEX/(b),bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
+#define textheight(a) 10*GFXSCALEX
 
 #else
 #define	getpixel(a,b)	point(a,b)
@@ -141,10 +195,13 @@ int bgi_y;
 //#define	linerel(a,b)	drawr(a,b)
 #define	rectangle(a,b,c,d)	drawb(a,b,c-a+1,d-b+1)
 #define	bar(a,b,c,d)	drawb(a,b,c-a+1,d-b+1);fill(a+1,b+1);xorborder(a+1,b+1,c-a+3,d-b+3)
-#define	circle(a,b,c)	circle(a,b,c,1)
-#define	ellipse(a,b,c,d,e,f)	plot((a-e),b);drawr(e,f);drawr(e,-f);drawr(-e,-f);drawr(-e,f)
-#define	sector(a,b,c,d,e,f)	plot((a-e),b);drawr(e,f);drawr(e,-f);drawr(-e,-f);drawr(-e,f);fill((a-e/2),b);
-#define	fillellipse(a,b,c,d)	circle(a,b,c,1);fill(a,b);
+//#define	circle(a,b,c)	circle(a,b,c,1)
+#define	circle(a,b,c)	ellipse(a,b,0,360,c,c)
+//#define	ellipse(a,b,c,d,e,f)	plot((a-e),b);drawr(e,f);drawr(e,-f);drawr(-e,-f);drawr(-e,f)
+#define	sector(a,b,c,d,e,f)	plot((a-e),b);drawr(e,f);drawr(e,-f);drawr(-e,-f);drawr(-e,f);fill((a-e/2),b)
+//#define	fillellipse(a,b,c,d)	plot((a-c),b);drawr(c,d);drawr(c,-d);drawr(-c,-d);drawr(-c,d)
+#define	fillellipse(a,b,c,d)	ellipse(a,b,0,360,c,d);fill(a,b)
+//#define	circle(a,b,c)	ellipse(a,b,0,360,c,c)
 #define	line(a,b,c,d)	draw(a,b,c,d)
 //#define	arc(a,b,c,d,e)	draw(a*GFXSCALEX,b*GFXSCALEY,(a+e)*GFXSCALEX,(d+e)*GFXSCALEY)
 //#define	pieslice(a,b,c,d,e)	draw(a*GFXSCALEX,b*GFXSCALEY,(a+e)*GFXSCALEX,(d+e)*GFXSCALEY)
@@ -154,6 +211,7 @@ int bgi_y;
 #define	outtextxy(a,b,c) XDrawString(bgi_display,bgi_mywin,&bgi_gc,a,b,c,strlen(c))
 #define	settextstyle(a,b,c) itoa(c+a*2,bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
 #define	setusercharsize(a,b,c,d) itoa(10*a/b,bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
+#define textheight(a) 10
 
 #endif
 

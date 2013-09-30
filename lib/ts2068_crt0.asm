@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.15 2013-06-18 06:11:23 stefano Exp $
+;       $Id: ts2068_crt0.asm,v 1.16 2013-09-30 15:10:34 stefano Exp $
 ;
 
 
@@ -41,6 +41,8 @@
 
         XDEF    call_extrom     ; TS2068 extension ROM interposer
 
+        XDEF    _FRAMES
+        defc    _FRAMES = 23672	; Timer
 
 ;--------
 ; Set an origin for the application (-zorg=) default to 32768

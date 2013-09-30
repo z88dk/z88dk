@@ -5,7 +5,7 @@
  *
  *      djm 9/1/2000
  *
- *	$Id: time.h,v 1.19 2013-04-11 16:44:55 stefano Exp $
+ *	$Id: time.h,v 1.20 2013-09-30 15:10:34 stefano Exp $
  */
 
 
@@ -67,6 +67,7 @@ extern time_t __LIB__ mktime(struct tm *tp);
 extern clock_t __LIB__ clock(void);
 #endif
 
+extern int FRAMES;
 
 /* This could make srand(time(NULL)) work, but do not expect much more.. */
 
@@ -84,17 +85,14 @@ extern clock_t __LIB__ clock(void);
 
 #ifdef __SPECTRUM__
 #define time(NULL) clock()
-extern int FRAMES @23672;
 #endif
 
 #ifdef __ZX81__
 #define time(NULL) clock()
-extern int FRAMES @16436;
 #endif
 
 #ifdef __ZX80__
 #define time(NULL) clock()
-extern int FRAMES @16414;
 #endif
 
 #ifdef __MC1000__

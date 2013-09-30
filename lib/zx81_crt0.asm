@@ -24,7 +24,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.36 2013-06-18 06:11:23 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.37 2013-09-30 15:10:34 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -72,6 +72,8 @@ ENDIF
         XDEF    restore81       ;Restore ZX81 critical registers
 
         ;; XDEF    frames         ;Frame counter for time()
+        XDEF    _FRAMES
+        defc    _FRAMES = 16436	; Timer
 
         IF      !myzorg
                 defc    myzorg  = 16514

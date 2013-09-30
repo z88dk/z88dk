@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx80_crt0.asm,v 1.3 2013-06-18 06:11:23 stefano Exp $
+;       $Id: zx80_crt0.asm,v 1.4 2013-09-30 15:10:34 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -50,6 +50,9 @@
         XDEF    restore81       ;Restore ZX81 critical registers
 
         ;; XDEF    frames         ;Frame counter for time()
+        XDEF    _FRAMES
+        defc    _FRAMES = 16414	; Timer
+
         LIB    filltxt        ; used by custom CLS
 
         IF      !myzorg
