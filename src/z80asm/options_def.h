@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.2 2013-09-30 00:24:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.3 2013-09-30 00:33:11 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -48,8 +48,8 @@ OPT( OptSet,	&opts.verbose,	"-v", 	"--verbose", 		"Be verbose", "" )
 OPT( OptClear,	&opts.verbose,	"-nv", 	"--not-verbose", 	"Be silent", "" )
 
 OPT_TITLE(	"Input Options:"	)
-OPT( OptString,	&opts.asm_ext,	"-e", 	"--asm-ext", 		"ASM file extension", "EXT" )
-OPT( OptString,	&opts.obj_ext,	"-M", 	"--obj-ext", 		"OBJ file extension", "EXT" )
+OPT( OptString,	&opts.asm_ext,	"-e", 	"--asm-ext", 		"ASM file extension, excluding '.'", "EXT" )
+OPT( OptString,	&opts.obj_ext,	"-M", 	"--obj-ext", 		"OBJ file extension, excluding '.'", "EXT" )
 
 /*-----------------------------------------------------------------------------
 *   clear macros

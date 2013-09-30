@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.3 2013-09-30 00:26:57 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.4 2013-09-30 00:33:11 pauloscustodio Exp $
 #
 # Test options
 
@@ -91,8 +91,8 @@ Help Options:
   -nv, --not-verbose     Be silent
 
 Input Options:
-  -e, --asm-ext=EXT      ASM file extension
-  -M, --obj-ext=EXT      OBJ file extension
+  -e, --asm-ext=EXT      ASM file extension, excluding '.'
+  -M, --obj-ext=EXT      OBJ file extension, excluding '.'
 
 Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)
 -l listing file, -s symbol table, -m map listing file
@@ -331,7 +331,10 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.3  2013-09-30 00:26:57  pauloscustodio
+# Revision 1.4  2013-09-30 00:33:11  pauloscustodio
+# help text
+#
+# Revision 1.3  2013/09/30 00:26:57  pauloscustodio
 # Parse command line options via look-up tables:
 # -e, --asm-ext
 # -M, --obj-ext
