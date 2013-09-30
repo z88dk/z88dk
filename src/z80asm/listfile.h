@@ -15,9 +15,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle assembly listing and symbol table listing.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.5 2013-05-16 23:39:48 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.6 2013-09-30 00:24:25 pauloscustodio Exp $ */
 /* $Log: listfile.h,v $
-/* Revision 1.5  2013-05-16 23:39:48  pauloscustodio
+/* Revision 1.6  2013-09-30 00:24:25  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -e, --asm-ext
+/* -M, --obj-ext
+/* Move filename extension functions to options.c
+/*
+/* Revision 1.5  2013/05/16 23:39:48  pauloscustodio
 /* Move struct node to sym.c, rename to Symbol
 /* Move SymbolRef to symref.c
 /*
@@ -86,9 +92,8 @@ END_CLASS;
 *	Object API  
 *----------------------------------------------------------------------------*/
 
-/* open the list file for writing, given the assembly source file name and
-   the extension of the list file */
-extern void ListFile_open( ListFile *self, char *source_file, char *extension );
+/* open the list file for writing, given the list file name */
+extern void ListFile_open( ListFile *self, char *list_file );
 
 /* close the list file, and remove the file if the passed flag is FALSE */
 extern void ListFile_close( ListFile *self, BOOL keep_file );
@@ -128,7 +133,7 @@ extern int ListFile_get_page_nr( ListFile *self );
 *	Singleton API - all methods work on one global list object
 *	See description for corresponding method above
 *----------------------------------------------------------------------------*/
-extern void list_open( char *source_file, char *extension );
+extern void list_open( char *list_file );
 extern void list_close( BOOL keep_file );
 extern void list_start_line( size_t address, 
 							 char *source_file, int source_line_nr, char *line );

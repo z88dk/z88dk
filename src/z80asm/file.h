@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.18 2013-09-29 21:40:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.19 2013-09-30 00:24:25 pauloscustodio Exp $
 */
 
 #pragma once
@@ -22,6 +22,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.18 2013-09-29
 #include "memalloc.h"   /* before any other include */
 
 #include "init.h"
+#include "strutil.h"
 #include "types.h"
 #include <glib.h>
 
@@ -75,6 +76,19 @@ extern void read_to_FileStack(FileStack *self, char *filename);
 /* read the next line from the file stack, closing and poping files at eof */
 extern char *getline_FileStack(FileStack *self);
 
+/*-----------------------------------------------------------------------------
+*   Pathname manipulation
+*   All filenames are passed as char file[FILENAME_MAX] elements
+*   return string is written to passed buffer and returned by the function
+*----------------------------------------------------------------------------*/
+extern char *path_remove_ext( char *filename );
+extern char *path_replace_ext( char *dest, const char *source, const char *new_ext );
+extern char *path_basename( char *dest, const char *source );
+
+/* search for a file on the given directory list, return full path name
+ * pathname is stored in strpool, no need to remove */
+extern char *search_file( char *filename, StringList *dir_list );
+
 
 
 
@@ -87,7 +101,6 @@ extern char *getline_FileStack(FileStack *self);
 
 #include "config.h"
 #include "safestr.h"
-#include "strutil.h"
 #include "types.h"
 #include <stdio.h>
 #include <sys/stat.h>
@@ -130,54 +143,15 @@ extern void   xfget_c1sstr( sstr_t *str, FILE *file );
 extern void   xfput_c2sstr( sstr_t *str, FILE *file );
 extern void   xfget_c2sstr( sstr_t *str, FILE *file );
 
-/* pathname manipulation
- * All filenames are passed as char file[FILENAME_MAX] elements, instead of always strdup'ing
- */
-extern char *path_remove_ext( char *filename );
-extern char *path_replace_ext( char *dest, const char *source, const char *new_ext );
-extern char *path_basename( char *dest, const char *source );
-
-/* default file name extensions */
-#define FILEEXT_ASM     FILEEXT_SEPARATOR "asm"    /* ".asm" / "_asm" */
-#define FILEEXT_LST     FILEEXT_SEPARATOR "lst"    /* ".lst" / "_lst" */
-#define FILEEXT_OBJ     FILEEXT_SEPARATOR "obj"    /* ".obj" / "_obj" */
-#define FILEEXT_DEF     FILEEXT_SEPARATOR "def"    /* ".def" / "_def" */
-#define FILEEXT_ERR     FILEEXT_SEPARATOR "err"    /* ".err" / "_err" */
-#define FILEEXT_BIN     FILEEXT_SEPARATOR "bin"    /* ".bin" / "_bin" */
-#define FILEEXT_SEGBIN  FILEEXT_SEPARATOR "bn0"    /* ".bn0" / "_bn0" */
-#define FILEEXT_LIB     FILEEXT_SEPARATOR "lib"    /* ".lib" / "_lib" */
-#define FILEEXT_SYM     FILEEXT_SEPARATOR "sym"    /* ".sym" / "_sym" */
-#define FILEEXT_MAP     FILEEXT_SEPARATOR "map"    /* ".map" / "_map" */
-
-/* return address of static buffer with copy of filename converted to .XXX extension 
-   NOT REENTRANT! */
-extern char *asm_filename_ext( char *filename );
-extern char *lst_filename_ext( char *filename );
-extern char *obj_filename_ext( char *filename );
-extern char *def_filename_ext( char *filename );
-extern char *err_filename_ext( char *filename );
-extern char *bin_filename_ext( char *filename );
-extern char *segbin_filename_ext( char *filename );
-extern char *lib_filename_ext( char *filename );
-extern char *sym_filename_ext( char *filename );
-extern char *map_filename_ext( char *filename );
-
-/* define new extensions for asm and obj, instead of default */
-extern void set_asm_ext( char *ext );
-extern void set_obj_ext( char *ext );
-
-extern char *get_asm_ext( void );
-extern char *get_obj_ext( void );
-
-/* search for a file on the given directory list, return full path name
- * pathname is stored in strpool, no need to remove */
-extern char *search_file( char *filename, StringList *dir_list );
-
-
-
 /* 
 $Log: file.h,v $
-Revision 1.18  2013-09-29 21:40:13  pauloscustodio
+Revision 1.19  2013-09-30 00:24:25  pauloscustodio
+Parse command line options via look-up tables:
+-e, --asm-ext
+-M, --obj-ext
+Move filename extension functions to options.c
+
+Revision 1.18  2013/09/29 21:40:13  pauloscustodio
 include
 
 Revision 1.17  2013/09/27 01:14:33  pauloscustodio

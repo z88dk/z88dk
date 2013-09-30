@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.28 2013-09-26 21:38:08 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.29 2013-09-30 00:24:25 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -208,6 +208,118 @@ char *getline_FileStack(FileStack *self)
 	return NULL;
 }
 
+/*-----------------------------------------------------------------------------
+*   Pathname manipulation
+*   All filenames are passed as char file[FILENAME_MAX] elements
+*   return string is written to passed buffer and returned by the function
+*----------------------------------------------------------------------------*/
+
+/* remove the extension of the passed filename, modifies the string in place */
+char *path_remove_ext( char *filename )
+{
+    char *dot_pos = strrchr( filename, FILEEXT_SEPARATOR[0] );
+    char *dir_pos;
+
+    if ( dot_pos != NULL )
+    {
+        /* BUG_0014 : need to ignore dot if before a directory separator */
+        dir_pos = strrchr( filename, '/' );
+
+        if ( dir_pos != NULL && dot_pos < dir_pos )
+        {
+            return filename;    /* dot before slash */
+        }
+
+        dir_pos = strrchr( filename, '\\' );
+
+        if ( dir_pos != NULL && dot_pos < dir_pos )
+        {
+            return filename;    /* dot before backslash */
+        }
+
+        *dot_pos = '\0';                /* terminate the string */
+    }
+
+    return filename;
+}
+
+/* make a copy of the file name, replacing the extension */
+char *path_replace_ext( char *dest, const char *source, const char *new_ext )
+{
+    int length;
+
+	g_strlcpy( dest, source, FILENAME_MAX );
+    path_remove_ext( dest );						/* file without extension */
+	g_strlcat( dest, new_ext, FILENAME_MAX );		/* copy new extension */
+
+    return dest;
+}
+
+/* make a copy of the file basename, skipping the directory part */
+char *path_basename( char *dest, const char *source )
+{
+    const char *path_sep1, *path_sep2, *basename;
+
+    path_sep1 = strrchr( source, '/' );
+
+    if ( path_sep1 == NULL )
+    {
+        path_sep1 = source - 1;
+    }
+
+    path_sep2 = strrchr( source, '\\' );
+
+    if ( path_sep2 == NULL )
+    {
+        path_sep2 = source - 1;
+    }
+
+    if ( path_sep1 > path_sep2 )
+    {
+        basename = path_sep1 + 1;
+    }
+    else
+    {
+        basename = path_sep2 + 1;
+    }
+
+	g_strlcpy( dest, basename, FILENAME_MAX );
+
+    return dest;
+}
+
+/*-----------------------------------------------------------------------------
+*  Search for a file on the given directory list, return full path name
+*  pathname is stored in strpool, no need to remove
+*----------------------------------------------------------------------------*/
+char *search_file( char *filename, StringList *dir_list )
+{
+    char        *dir;
+    struct stat sb;
+    char		pathname[ FILENAME_MAX ];
+
+	/* if no dir_list, return file */
+	if ( dir_list == NULL )
+        return strpool_add( filename );
+
+    /* check if file exists in current directory */
+    if ( stat( filename, &sb ) == 0 )
+        return strpool_add( filename );
+
+    /* search in dir_list */
+	FOR_StringList( dir_list, dir )
+	{
+		g_snprintf( pathname, sizeof(pathname), "%s/%s", dir, filename );
+        if ( stat( pathname, &sb ) == 0 )
+            return strpool_add( pathname );
+	}
+	ENDFOR_StringList;
+
+    /* return unchanged pathname if not found */
+    return strpool_add( filename );
+}
+
+
 
 
 
@@ -231,21 +343,6 @@ char *getline_FileStack(FileStack *self)
 #include "uthash.h"
 #include <sys/stat.h>
 #include <sys/types.h>
-
-/*-----------------------------------------------------------------------------
-*   Default extensions
-*----------------------------------------------------------------------------*/
-static SSTR_DEFINE( asm_ext, FILENAME_MAX );
-static SSTR_DEFINE( obj_ext, FILENAME_MAX );
-
-/* init asm_ext and obj_ext before first use */
-static BOOL ext_initialized = FALSE;
-#define init_ext() \
-	if (! ext_initialized ) { \
-		sstr_set( asm_ext, FILEEXT_ASM ); \
-		sstr_set( obj_ext, FILEEXT_OBJ ); \
-		ext_initialized = TRUE; \
-	}
 
 /*-----------------------------------------------------------------------------
 *	Keep hash table of FILE* to file names for error messages
@@ -524,191 +621,16 @@ void xfget_c2sstr( sstr_t *str, FILE *file )
 	xfget_sstr( str, len, file );
 }
 
-/*-----------------------------------------------------------------------------
-*   Pathname manipulation
-*   All filenames are passed as char file[FILENAME_MAX] elements
-*   return string is written to passed buffer and returned by the function
-*----------------------------------------------------------------------------*/
-
-/* remove the extension of the passed filename, modifies the string in place */
-char *path_remove_ext( char *filename )
-{
-    char *dot_pos = strrchr( filename, FILEEXT_SEPARATOR[0] );
-    char *dir_pos;
-
-    if ( dot_pos != NULL )
-    {
-        /* BUG_0014 : need to ignore dot if before a directory separator */
-        dir_pos = strrchr( filename, '/' );
-
-        if ( dir_pos != NULL && dot_pos < dir_pos )
-        {
-            return filename;    /* dot before slash */
-        }
-
-        dir_pos = strrchr( filename, '\\' );
-
-        if ( dir_pos != NULL && dot_pos < dir_pos )
-        {
-            return filename;    /* dot before backslash */
-        }
-
-        *dot_pos = '\0';                /* terminate the string */
-    }
-
-    return filename;
-}
-
-/* make a copy of the file name, replacing the extension */
-char *path_replace_ext( char *dest, const char *source, const char *new_ext )
-{
-    int length;
-
-    dest[0] = '\0';                     /* prepare for strncat */
-    strncat( dest, source, FILENAME_MAX - 1 );
-
-    path_remove_ext( dest );            /* file without extension */
-
-    /* copy extension, make sure the final file fits in FILENAME_MAX-1 */
-    length = strlen( dest );
-    strncat( dest + length, new_ext, FILENAME_MAX - 1 - length );
-
-    return dest;
-}
-
-/* make a copy of the file basename, skipping the directory part */
-char *path_basename( char *dest, const char *source )
-{
-    const char *path_sep1, *path_sep2, *basename;
-
-    path_sep1 = strrchr( source, '/' );
-
-    if ( path_sep1 == NULL )
-    {
-        path_sep1 = source - 1;
-    }
-
-    path_sep2 = strrchr( source, '\\' );
-
-    if ( path_sep2 == NULL )
-    {
-        path_sep2 = source - 1;
-    }
-
-    if ( path_sep1 > path_sep2 )
-    {
-        basename = path_sep1 + 1;
-    }
-    else
-    {
-        basename = path_sep2 + 1;
-    }
-
-    dest[0] = '\0';                     /* prepare for strncat */
-    strncat( dest, basename, FILENAME_MAX - 1 );
-
-    return dest;
-}
-
-/*-----------------------------------------------------------------------------
-*  return address of static buffer with copy of filename converted to .XXX extension 
-*   NOT REENTRANT!
-*----------------------------------------------------------------------------*/
-#define DEF_FUNC(ext,EXT) \
-	char *ext##_filename_ext( char *filename ) \
-	{ \
-		static SSTR_DEFINE( buff, FILENAME_MAX ); \
-		\
-		init_ext(); \
-		path_replace_ext( sstr_data( buff ), filename, EXT ); \
-		sstr_sync_len( buff ); \
-		return sstr_data( buff ); \
-	}
-
-	DEF_FUNC( asm,    sstr_data( asm_ext ) )
-	DEF_FUNC( obj,    sstr_data( obj_ext ) )
-	DEF_FUNC( lst,    FILEEXT_LST    )
-	DEF_FUNC( def,    FILEEXT_DEF    )
-	DEF_FUNC( err,    FILEEXT_ERR    )
-	DEF_FUNC( bin,    FILEEXT_BIN    )
-	DEF_FUNC( segbin, FILEEXT_SEGBIN )
-	DEF_FUNC( lib,    FILEEXT_LIB    )
-	DEF_FUNC( sym,    FILEEXT_SYM    )
-	DEF_FUNC( map,    FILEEXT_MAP    )
-
-#undef DEF_FUNC
-
-/* define new extensions for asm and obj, instead of default */
-void set_asm_ext( char *ext )
-{
-	init_ext();
-	sstr_set( asm_ext, FILEEXT_SEPARATOR );
-	sstr_cat( asm_ext, ext );
-}
-
-void set_obj_ext( char *ext )
-{
-	init_ext();
-	sstr_set( obj_ext, FILEEXT_SEPARATOR );
-	sstr_cat( obj_ext, ext );
-}
-
-char *get_asm_ext( void )
-{
-	init_ext();
-	return sstr_data( asm_ext );
-}
-
-char *get_obj_ext( void )
-{
-	init_ext();
-	return sstr_data( obj_ext );
-}
-
-
-
-/*-----------------------------------------------------------------------------
-*  Search for a file on the given directory list, return full path name
-*  pathname is stored in strpool, no need to remove
-*----------------------------------------------------------------------------*/
-char *search_file( char *filename, StringList *dir_list )
-{
-    char        *dir;
-    struct stat sb;
-    SSTR_DEFINE( pathname, FILENAME_MAX );
-
-	/* if no dir_list, return file */
-	if ( dir_list == NULL )
-    {
-        return strpool_add( filename );
-    }
-
-    /* check if file exists in current directory */
-    if ( stat( filename, &sb ) == 0 )
-    {
-        return strpool_add( filename );
-    }
-
-    /* search in dir_list */
-	FOR_StringList( dir_list, dir )
-	{
-        sstr_fset( pathname, "%s/%s", dir, filename );
-
-        if ( stat( sstr_data( pathname ), &sb ) == 0 )
-        {
-            return strpool_add( sstr_data( pathname ) );
-        }
-	}
-	ENDFOR_StringList;
-
-    /* return unchanged pathname if not found */
-    return strpool_add( filename );
-}
-
 
 /*
 $Log: file.c,v $
-Revision 1.28  2013-09-26 21:38:08  pauloscustodio
+Revision 1.29  2013-09-30 00:24:25  pauloscustodio
+Parse command line options via look-up tables:
+-e, --asm-ext
+-M, --obj-ext
+Move filename extension functions to options.c
+
+Revision 1.28  2013/09/26 21:38:08  pauloscustodio
 Set error location while reading files.
 Delete File object when popping from FileStack.
 

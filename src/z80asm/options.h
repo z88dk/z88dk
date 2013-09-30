@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.15 2013-09-27 01:14:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.16 2013-09-30 00:24:25 pauloscustodio Exp $
 */
 
 #pragma once
@@ -25,7 +25,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.15 2013-09-27 01
 #include "types.h"
 
 
-enum OptType { OptClear, OptSet, OptCall };
+enum OptType { OptClear, OptSet, OptCall, OptString };
 
 /*-----------------------------------------------------------------------------
 *   singleton opts
@@ -46,9 +46,31 @@ extern Opts opts;
 extern void parse_argv(int argc, char *argv[], 
 					   void (*process_file)(char *filename) );
 
+/*-----------------------------------------------------------------------------
+*   Change extension of given file name, return pointer to file name in
+*	strpool
+*	Extensions may be changed by options.
+*----------------------------------------------------------------------------*/
+extern char *get_asm_filename( char *filename );
+extern char *get_lst_filename( char *filename );
+extern char *get_obj_filename( char *filename );
+extern char *get_def_filename( char *filename );
+extern char *get_err_filename( char *filename );
+extern char *get_bin_filename( char *filename );
+extern char *get_segbin_filename( char *filename, int segment );
+extern char *get_lib_filename( char *filename );
+extern char *get_sym_filename( char *filename );
+extern char *get_map_filename( char *filename );
+
 
 /* $Log: options.h,v $
-/* Revision 1.15  2013-09-27 01:14:33  pauloscustodio
+/* Revision 1.16  2013-09-30 00:24:25  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -e, --asm-ext
+/* -M, --obj-ext
+/* Move filename extension functions to options.c
+/*
+/* Revision 1.15  2013/09/27 01:14:33  pauloscustodio
 /* Parse command line options via look-up tables:
 /* --help, --verbose
 /*

@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.104 2013-09-29 21:43:48 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.105 2013-09-30 00:24:25 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.104  2013-09-29 21:43:48  pauloscustodio
+/* Revision 1.105  2013-09-30 00:24:25  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -e, --asm-ext
+/* -M, --obj-ext
+/* Move filename extension functions to options.c
+/*
+/* Revision 1.104  2013/09/29 21:43:48  pauloscustodio
 /* Parse command line options via look-up tables:
 /* move @file handling to options.c
 /*
@@ -725,8 +731,8 @@ void assemble_file( char *filename )
 
     reset_codearea();            /* Pointer (PC) to store z80 instruction */
 
-    src_filename = asm_filename_ext( filename );      /* set '.asm' extension */
-    obj_filename = obj_filename_ext( filename );      /* set '.obj' extension */
+    src_filename = get_asm_filename( filename );      /* set '.asm' extension */
+    obj_filename = get_obj_filename( filename );      /* set '.obj' extension */
 
     /* Create module data structures for new file */
     CURRENTMODULE = NewModule();
@@ -785,15 +791,14 @@ static void do_assemble( char *src_filename, char *obj_filename )
         set_error_file( src_filename );
 
         /* Create error file */
-        open_error_file( err_filename_ext( src_filename ) );
+        open_error_file( get_err_filename( src_filename ) );
 
         if ( option_list || symfile )
         {
             /* Create LIST or SYMBOL file */
-			list_open( src_filename,
-						option_list ? 
-							  FILEEXT_LST           /* set '.lst' extension */
-							: FILEEXT_SYM );		/* set '.sym' extension */
+			list_open( option_list ? 
+						get_lst_filename(src_filename) :	/* set '.lst' extension */
+						get_sym_filename(src_filename) );	/* set '.sym' extension */
         }
 
         /* Create relocatable object file */
@@ -939,15 +944,13 @@ CloseFiles( void )
 char *CreateLibfile( char *filename )
 {
     size_t len;
-	char buff[FILENAME_MAX];
 	char *found_libfilename;
 
     len = strlen( filename );
 
     if ( len )
     {
-        path_replace_ext( buff, filename, FILEEXT_LIB );     /* add '.lib' extension */
-		found_libfilename = strpool_add( buff );
+		found_libfilename = get_lib_filename( filename );     /* add '.lib' extension */
     }
     else
     {
@@ -971,7 +974,6 @@ char *CreateLibfile( char *filename )
 /* search library file name, return found name in strpool */
 char *GetLibfile( char *filename )
 {
-    char            buff[FILENAME_MAX];
     struct libfile *newlib;
     char           *found_libfilename;
     char           *ext = "";
@@ -986,8 +988,7 @@ char *GetLibfile( char *filename )
     if ( len )
     {
 		/* set lib extension */
-		path_replace_ext( buff, filename, FILEEXT_LIB );
-        found_libfilename = search_lib_file( buff );		/* copied to strpool */
+        found_libfilename = search_lib_file( get_lib_filename(filename));		/* copied to strpool */
     }
     else
     {

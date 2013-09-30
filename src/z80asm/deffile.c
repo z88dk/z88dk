@@ -14,16 +14,20 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.2 2013-09-27 01:14:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.3 2013-09-30 00:24:25 pauloscustodio Exp $
 $Log: deffile.c,v $
-Revision 1.2  2013-09-27 01:14:33  pauloscustodio
+Revision 1.3  2013-09-30 00:24:25  pauloscustodio
+Parse command line options via look-up tables:
+-e, --asm-ext
+-M, --obj-ext
+Move filename extension functions to options.c
+
+Revision 1.2  2013/09/27 01:14:33  pauloscustodio
 Parse command line options via look-up tables:
 --help, --verbose
 
 Revision 1.1  2013/06/16 20:14:39  pauloscustodio
 Move deffile writing to deffile.c, remove global variable deffile
-
-
 
 */
 
@@ -76,7 +80,7 @@ void write_def_file( void )
 	SymbolHash *def_symtab;
 
 	/* use first module filename to create global def file */
-	filename = def_filename_ext( modulehdr->first->cfile->fname ); /* set '.def' extension */
+	filename = get_def_filename( modulehdr->first->cfile->fname ); /* set '.def' extension */
 
     /* Create DEF file */
     file = xfopen( filename, "w" );           /* CH_0012 */

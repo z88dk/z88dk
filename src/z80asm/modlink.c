@@ -14,9 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.73 2013-09-27 01:14:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.74 2013-09-30 00:24:25 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.73  2013-09-27 01:14:33  pauloscustodio
+/* Revision 1.74  2013-09-30 00:24:25  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -e, --asm-ext
+/* -M, --obj-ext
+/* Move filename extension functions to options.c
+/*
+/* Revision 1.73  2013/09/27 01:14:33  pauloscustodio
 /* Parse command line options via look-up tables:
 /* --help, --verbose
 /*
@@ -670,7 +676,7 @@ LinkModules( void )
         lastobjmodule = modulehdr->last;        /* remember this last module, further modules are libraries */
 
         /* open error file */
-        open_error_file( err_filename_ext( CURRENTFILE->fname ) );
+        open_error_file( get_err_filename( CURRENTFILE->fname ) );
 
         set_PC( 0 );
         ASMPC = define_global_def_sym( ASMPC_KW, get_PC() );  /* Create standard 'ASMPC' identifier */
@@ -695,7 +701,7 @@ LinkModules( void )
             }
 
             /* overwrite '.asm' extension with * '.obj' */
-            obj_filename = obj_filename_ext( CURRENTFILE->fname );
+            obj_filename = get_obj_filename( CURRENTFILE->fname );
 
             /* open relocatable file for reading */
             z80asmfile = xfopen( obj_filename, "rb" );           /* CH_0012 */
@@ -1189,33 +1195,32 @@ CreateBinFile( void )
 {
     FILE *binaryfile;
     size_t codesize, codeblock, offset;
-    SSTR_DEFINE( filename, FILENAME_MAX );
+	int segment;
+    char *filename;
 
     if ( expl_binflnm == ON )
         /* use predined output filename from command line */
     {
-        sstr_set( filename, binfilename );
+        filename = binfilename;
     }
     else
     {
         /* create output filename, based on project filename */
         /* get source filename from first module */
-        sstr_set( filename, modulehdr->first->cfile->fname );
-        path_remove_ext( sstr_data( filename ) );
-        sstr_sync_len( filename );
-
         if ( codesegment == ON && get_codesize() > 16384 )
         {
-            sstr_cat( filename, FILEEXT_SEGBIN );   /* add '.bn0' extension */
+			/* add '.bn0' extension */
+			filename = get_segbin_filename( modulehdr->first->cfile->fname, 0 );
         }
         else
         {
-            sstr_cat( filename, FILEEXT_BIN );      /* add '.bin' extension */
+			/* add '.bin' extension */
+			filename = get_bin_filename( modulehdr->first->cfile->fname );
         }
     }
 
     /* binary output to filename.bin */
-    binaryfile = xfopen( sstr_data( filename ), "wb" );         /* CH_0012 */
+    binaryfile = xfopen( filename, "wb" );         /* CH_0012 */
 
     if ( autorelocate == ON && totaladdr != 0 )
     {
@@ -1236,19 +1241,22 @@ CreateBinFile( void )
         fclose( binaryfile );
         binaryfile = NULL;
         offset = 0;
+		segment = 0;
         codesize = get_codesize();
 
         do
         {
             codeblock = ( codesize > 16384U ) ? 16384U : codesize;
             codesize -= codeblock;
-            binaryfile = xfopen( sstr_data( filename ), "wb" );         /* CH_0012 */
+            binaryfile = xfopen( filename, "wb" );         /* CH_0012 */
             fwrite_codearea_chunk( binaryfile, offset, codeblock ); /* code in 16K chunks */
             fclose( binaryfile );
             binaryfile = NULL;
 
             offset += codeblock;
-            ++(sstr_data( filename )[sstr_len( filename ) - 1]); /* path code file with number */
+			segment++;
+
+			filename = get_segbin_filename( filename, segment );	/* path code file with number */
         }
         while ( codesize );
     }
@@ -1275,7 +1283,7 @@ CreateLib( char *lib_filename )
     FILE *obj_file = NULL;
     char *filebuffer = NULL;
     long fptr;
-	char obj_filename[FILENAME_MAX];
+	char *obj_filename;
 
     if ( opts.verbose )
     {
@@ -1290,7 +1298,7 @@ CreateLib( char *lib_filename )
 		lib_file = xfopen( lib_filename, "w+b" );          /* CH_0012 */
 		xfput_char( Z80libhdr, 8U, lib_file );				/* write library header */
 
-        open_error_file( err_filename_ext( lib_filename ) );
+        open_error_file( get_err_filename( lib_filename ) );
 
         do
         {
@@ -1298,7 +1306,7 @@ CreateLib( char *lib_filename )
             set_error_module( CURRENTMODULE->mname );
 
 			/* replace fname with the .obj extension */
-			path_replace_ext( obj_filename, CURRENTFILE->fname, get_obj_ext() );
+			obj_filename = get_obj_filename( CURRENTFILE->fname );
 			g_free0( CURRENTFILE->fname );
 			CURRENTFILE->fname = g_strdup( obj_filename );
 

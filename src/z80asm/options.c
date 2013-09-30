@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.32 2013-09-29 21:43:48 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.33 2013-09-30 00:24:25 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -24,8 +24,21 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.32 2013-09-29 21
 #include "file.h"
 #include "hist.h"
 #include "options.h"
+#include "strpool.h"
 #include <glib.h>
 #include <string.h>
+
+/* default file name extensions */
+#define FILEEXT_ASM     FILEEXT_SEPARATOR "asm"    /* ".asm" / "_asm" */
+#define FILEEXT_LST     FILEEXT_SEPARATOR "lst"    /* ".lst" / "_lst" */
+#define FILEEXT_OBJ     FILEEXT_SEPARATOR "obj"    /* ".obj" / "_obj" */
+#define FILEEXT_DEF     FILEEXT_SEPARATOR "def"    /* ".def" / "_def" */
+#define FILEEXT_ERR     FILEEXT_SEPARATOR "err"    /* ".err" / "_err" */
+#define FILEEXT_BIN     FILEEXT_SEPARATOR "bin"    /* ".bin" / "_bin" */
+#define FILEEXT_SEGBIN  FILEEXT_SEPARATOR "bn0"    /* ".bn0" / "_bn0" */
+#define FILEEXT_LIB     FILEEXT_SEPARATOR "lib"    /* ".lib" / "_lib" */
+#define FILEEXT_SYM     FILEEXT_SEPARATOR "sym"    /* ".sym" / "_sym" */
+#define FILEEXT_MAP     FILEEXT_SEPARATOR "map"    /* ".map" / "_map" */
 
 /* declare functions */
 static void reset_options( void );
@@ -102,6 +115,32 @@ static char *opt_arg(char *arg, char *opt)
 		return NULL;			/* not found */
 }
 
+static char *get_opt_arg(char *opt_arg_ptr, int *parg, int argc, char *argv[])
+{
+#define i (*parg)
+
+	if ( *opt_arg_ptr )		/* get argument from same argv */
+	{
+		/* skip '=' */
+		if ( *opt_arg_ptr == '=' )
+			opt_arg_ptr++;
+
+		return opt_arg_ptr;
+	}
+	else					/* get argument from next argv */
+	{
+		if ( i+1 < argc )
+			return argv[ ++i ];
+		else
+		{
+			error_illegal_option( argv[i] );
+			return NULL;
+		}
+	}
+
+#undef i
+}
+
 static BOOL process_opt(int *parg, int argc, char *argv[])
 {
 #define i (*parg)
@@ -136,6 +175,12 @@ static BOOL process_opt(int *parg, int argc, char *argv[])
 					error_illegal_option( argv[i] );
 				else
 					((void (*)(void))(opts_lu[j].arg)) ();
+				break;
+
+			case OptString:
+				opt_arg_ptr = get_opt_arg( opt_arg_ptr, parg, argc, argv );
+				if ( opt_arg_ptr )
+					*((char **)(opts_lu[j].arg)) = opt_arg_ptr;
 				break;
 
 			default:
@@ -259,14 +304,18 @@ static void exit_help(void)
 	puts(  "" );
     puts(  "  [] = optional, {} = may be repeated, | = OR clause." );
 	puts(  "" );
-    printf("  To assemble 'fred%s' use 'fred' or 'fred%s'\n", get_asm_ext(), get_asm_ext() );
+    printf("  To assemble 'fred%s%s' use 'fred' or 'fred%s%s'\n", 
+		   FILEEXT_SEPARATOR, opts.asm_ext, 
+		   FILEEXT_SEPARATOR, opts.asm_ext );
 	puts(  "" );
     puts(  "  <modulefile> contains list of file names of all modules to be linked," );
 	puts(  "  one module per line." );
 	puts(  "" );
     puts(  "  File types recognized or created by z80asm:" );
-    printf("    %s = source file (default), or alternative -e<ext>\n", get_asm_ext() );
-    printf("    %s = object file (default), or alternative -M<ext>\n", get_obj_ext() );
+    printf("    %s%s = source file (default), or alternative -e<ext>\n", 
+		   FILEEXT_SEPARATOR, opts.asm_ext );
+    printf("    %s%s = object file (default), or alternative -M<ext>\n", 
+		   FILEEXT_SEPARATOR, opts.obj_ext );
     printf("    %s = list file\n", FILEEXT_LST );
     printf("    %s = Z80 binary file\n", FILEEXT_BIN );
     printf("    %s = symbols file\n", FILEEXT_SYM );
@@ -287,7 +336,8 @@ static void exit_help(void)
     puts( "-d date stamp control, assemble only if source file > object file" );
     puts( "-a: -b & -d (assemble only updated source files, then link & relocate)" );
     puts( "-o<bin filename> expl. output filename, -g XDEF reloc. addr. from all modules" );
-    printf( "-i<library> include <library> LIB modules with %s modules during linking\n", get_obj_ext() );
+    printf( "-i<library> include <library> LIB modules with %s%s modules during linking\n", 
+		   FILEEXT_SEPARATOR, opts.obj_ext );
     puts( "-x<library> create library from specified modules ( e.g. with @<modules> )" );
     printf( "-t<n> tabulator width for %s, %s, %s files. Column width is 4 times -t\n", FILEEXT_MAP, FILEEXT_DEF, FILEEXT_SYM );
     printf( "-I<path> additional path to search for includes\n" );
@@ -340,12 +390,65 @@ static void display_options(void)
     putchar( '\n' );
 }
 
+/*-----------------------------------------------------------------------------
+*   Change extension of given file name, return pointer to file name in
+*	strpool
+*	Extensions may be changed by options.
+*----------------------------------------------------------------------------*/
+
+static char *replace_ext( char *filename, char *ext )
+{
+	char new_filename[ FILENAME_MAX ];
+	return strpool_add( path_replace_ext( new_filename, filename, ext ));
+}
+
+char *get_lst_filename( char *filename ) { return replace_ext( filename, FILEEXT_LST ); }
+char *get_def_filename( char *filename ) { return replace_ext( filename, FILEEXT_DEF ); }
+char *get_err_filename( char *filename ) { return replace_ext( filename, FILEEXT_ERR ); }
+char *get_bin_filename( char *filename ) { return replace_ext( filename, FILEEXT_BIN ); }
+char *get_lib_filename( char *filename ) { return replace_ext( filename, FILEEXT_LIB ); }
+char *get_sym_filename( char *filename ) { return replace_ext( filename, FILEEXT_SYM ); }
+char *get_map_filename( char *filename ) { return replace_ext( filename, FILEEXT_MAP ); }
+
+char *get_asm_filename( char *filename ) 
+{ 
+	char ext[ FILENAME_MAX ];
+	g_snprintf( ext, sizeof(ext), "%s%s", FILEEXT_SEPARATOR, opts.asm_ext );
+	return replace_ext( filename, ext ); 
+}
+
+char *get_obj_filename( char *filename ) 
+{ 
+	char ext[ FILENAME_MAX ];
+	g_snprintf( ext, sizeof(ext), "%s%s", FILEEXT_SEPARATOR, opts.obj_ext );
+	return replace_ext( filename, ext ); 
+}
+
+char *get_segbin_filename( char *filename, int segment ) 
+{
+	char ext[ FILENAME_MAX ];
+	int len;
+
+	g_strlcpy( ext, FILEEXT_SEGBIN, sizeof(ext) );
+	len = strlen(ext);
+	g_snprintf( ext + len - 1, sizeof(ext) - (len-1), "%d", segment );
+	return replace_ext( filename, ext ); 
+}
+
+
+
 
 
 
 
 /* $Log: options.c,v $
-/* Revision 1.32  2013-09-29 21:43:48  pauloscustodio
+/* Revision 1.33  2013-09-30 00:24:25  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -e, --asm-ext
+/* -M, --obj-ext
+/* Move filename extension functions to options.c
+/*
+/* Revision 1.32  2013/09/29 21:43:48  pauloscustodio
 /* Parse command line options via look-up tables:
 /* move @file handling to options.c
 /*
@@ -596,21 +699,8 @@ static void reset_options( void )
 *----------------------------------------------------------------------------*/
 void set_asm_flag( char *flagid )
 {
-	/* use ".xxx" as source file in stead of ".asm" */
-    if ( *flagid == 'e' )
-    {
-		set_asm_ext( flagid + 1 );
-    }
-
-    /* djm: mod to get .o files produced instead of .obj */
-    /* gbs: extended to use argument as definition, e.g. -Mo, which defines .o extension */
-    else if ( *flagid == 'M' )
-    {
-		set_obj_ext( flagid + 1 );
-    }
-
     /** Check whether this is for the RCM2000/RCM3000 series of Z80-like CPU's */
-    else if ( strcmp( flagid, "RCMX000" ) == 0 )
+    if ( strcmp( flagid, "RCMX000" ) == 0 )
     {
         cpu_type = CPU_RCM2000;
     }

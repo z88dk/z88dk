@@ -15,9 +15,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 Handle assembly listing and symbol table listing.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.7 2013-09-22 21:34:48 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.8 2013-09-30 00:24:25 pauloscustodio Exp $ */
 /* $Log: listfile.c,v $
-/* Revision 1.7  2013-09-22 21:34:48  pauloscustodio
+/* Revision 1.8  2013-09-30 00:24:25  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -e, --asm-ext
+/* -M, --obj-ext
+/* Move filename extension functions to options.c
+/*
+/* Revision 1.7  2013/09/22 21:34:48  pauloscustodio
 /* Remove legacy xxx_err() interface
 /*
 /* Revision 1.6  2013/09/01 18:46:01  pauloscustodio
@@ -218,10 +224,8 @@ static void ListFile_init_page( ListFile *self )
 /*-----------------------------------------------------------------------------
 *	open the list file
 *----------------------------------------------------------------------------*/
-void ListFile_open( ListFile *self, char *source_file, char *extension )
+void ListFile_open( ListFile *self, char *list_file )
 {
-	char list_filename[FILENAME_MAX];
-
 	/* close and discard any open list file */
 	ListFile_close( self, FALSE );
 
@@ -230,24 +234,22 @@ void ListFile_open( ListFile *self, char *source_file, char *extension )
     list_date = asctime( localtime( &list_time ) ); /* get current system time for date in list file */
 
 	/* open the file */
-	path_replace_ext( list_filename, source_file, extension );
-
-	self->filename	= strpool_add(list_filename);
-	self->file		= xfopen( list_filename, "w+" );
+	self->filename	= strpool_add(list_file);
+	self->file		= xfopen( list_file, "w+" );
 	self->source_list_ended = FALSE;
 
 	/* output header */
 	ListFile_init_page( self );
 }
 
-void list_open( char *source_file, char *extension )
+void list_open( char *list_file )
 {
 	if (the_list == NULL)
 	{
 		the_list = OBJ_NEW(ListFile);
 	}
 
-	ListFile_open( the_list, source_file, extension );
+	ListFile_open( the_list, list_file );
 }
 
 /*-----------------------------------------------------------------------------

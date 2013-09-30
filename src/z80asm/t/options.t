@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.2 2013-09-29 21:43:48 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.3 2013-09-30 00:26:57 pauloscustodio Exp $
 #
 # Test options
 
@@ -90,7 +90,9 @@ Help Options:
   -v, --verbose          Be verbose
   -nv, --not-verbose     Be silent
 
-Application Options:
+Input Options:
+  -e, --asm-ext=EXT      ASM file extension
+  -M, --obj-ext=EXT      OBJ file extension
 
 Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)
 -l listing file, -s symbol table, -m map listing file
@@ -119,6 +121,19 @@ my $out = capture_merged { system z80asm()." --help"; };
 my @long_lines = grep {length > 80} split(/\n/, $out);
 ok !@long_lines, "help within 80 columns";
 diag join("\n", @long_lines) if @long_lines;
+
+# check no arguments
+t_z80asm_capture("-h=x", 	"", 	<<'ERR', 1);
+Error: illegal option '-h=x'
+Error: source filename missing
+2 errors occurred during assembly
+ERR
+
+t_z80asm_capture("--help=x", 	"", 	<<'ERR', 1);
+Error: illegal option '--help=x'
+Error: source filename missing
+2 errors occurred during assembly
+ERR
 
 #------------------------------------------------------------------------------
 # --verbose, -v
@@ -158,6 +173,18 @@ ok -f obj_file();
 ok -f bin_file();
 is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
 
+# check no arguments
+t_z80asm_capture("-v=x", 	"", 	<<'ERR', 1);
+Error: illegal option '-v=x'
+Error: source filename missing
+2 errors occurred during assembly
+ERR
+
+t_z80asm_capture("--verbose=x", 	"", 	<<'ERR', 1);
+Error: illegal option '--verbose=x'
+Error: source filename missing
+2 errors occurred during assembly
+ERR
 
 #------------------------------------------------------------------------------
 # --not-verbose, -nv
@@ -175,6 +202,128 @@ ok -f obj_file();
 ok -f bin_file();
 is read_file(bin_file(), binmode => ':raw'), "\0";
 
+# check no arguments
+t_z80asm_capture("-nv=x", 	"", 	<<'ERR', 1);
+Error: illegal option '-nv=x'
+Error: source filename missing
+2 errors occurred during assembly
+ERR
+
+t_z80asm_capture("--not-verbose=x", 	"", 	<<'ERR', 1);
+Error: illegal option '--not-verbose=x'
+Error: source filename missing
+2 errors occurred during assembly
+ERR
+
+#------------------------------------------------------------------------------
+# --asm-ext=EXT, -eEXT
+#------------------------------------------------------------------------------
+unlink_testfiles();
+write_file(asm_file(), "ret");
+my $base = asm_file(); $base =~ s/\.\w+$//;
+t_z80asm_capture("-r0 -b ".$base, "", "", 0);
+is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
+
+unlink_testfiles();
+write_file($base.".xxx", "ret");
+t_z80asm_capture("-r0 -b -exxx ".$base, "", "", 0);
+is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
+
+unlink_testfiles();
+write_file($base.".xxx", "ret");
+t_z80asm_capture("-r0 -b -e=xxx ".$base, "", "", 0);
+is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
+
+unlink_testfiles();
+write_file($base.".xxx", "ret");
+t_z80asm_capture("-r0 -b -e xxx ".$base, "", "", 0);
+is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
+
+unlink_testfiles();
+write_file($base.".xxx", "ret");
+t_z80asm_capture("-r0 -b --asm-extxxx ".$base, "", "", 0);
+is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
+
+unlink_testfiles();
+write_file($base.".xxx", "ret");
+t_z80asm_capture("-r0 -b --asm-ext=xxx ".$base, "", "", 0);
+is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
+
+unlink_testfiles();
+write_file($base.".xxx", "ret");
+t_z80asm_capture("-r0 -b --asm-ext xxx ".$base, "", "", 0);
+is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
+
+unlink_testfiles($base.".xxx");
+
+# check no arguments
+t_z80asm_capture("-e", 	"", 	<<'ERR', 1);
+Error: illegal option '-e'
+Error: source filename missing
+2 errors occurred during assembly
+ERR
+
+t_z80asm_capture("--asm-ext", 	"", 	<<'ERR', 1);
+Error: illegal option '--asm-ext'
+Error: source filename missing
+2 errors occurred during assembly
+ERR
+
+#------------------------------------------------------------------------------
+# --obj-ext=EXT, -MEXT
+#------------------------------------------------------------------------------
+unlink_testfiles();
+write_file(asm_file(), "ret");
+$base = asm_file(); $base =~ s/\.\w+$//;
+t_z80asm_capture($base, "", "", 0);
+like read_file(obj_file(), binary => ':raw'), qr/\xC9\z/, "assemble ok";
+
+unlink_testfiles();
+write_file(asm_file(), "ret");
+t_z80asm_capture("-Mo ".$base, "", "", 0);
+like read_file($base.".o", binary => ':raw'), qr/\xC9\z/, "assemble ok";
+
+unlink_testfiles();
+write_file(asm_file(), "ret");
+t_z80asm_capture("-M=o ".$base, "", "", 0);
+like read_file($base.".o", binary => ':raw'), qr/\xC9\z/, "assemble ok";
+
+unlink_testfiles();
+write_file(asm_file(), "ret");
+t_z80asm_capture("-M o ".$base, "", "", 0);
+like read_file($base.".o", binary => ':raw'), qr/\xC9\z/, "assemble ok";
+
+unlink_testfiles();
+write_file(asm_file(), "ret");
+t_z80asm_capture("--obj-exto ".$base, "", "", 0);
+like read_file($base.".o", binary => ':raw'), qr/\xC9\z/, "assemble ok";
+
+unlink_testfiles();
+write_file(asm_file(), "ret");
+t_z80asm_capture("--obj-ext=o ".$base, "", "", 0);
+like read_file($base.".o", binary => ':raw'), qr/\xC9\z/, "assemble ok";
+
+unlink_testfiles();
+write_file(asm_file(), "ret");
+t_z80asm_capture("--obj-ext o ".$base, "", "", 0);
+like read_file($base.".o", binary => ':raw'), qr/\xC9\z/, "assemble ok";
+
+unlink_testfiles($base.".o");
+
+# check no arguments
+t_z80asm_capture("-M", 	"", 	<<'ERR', 1);
+Error: illegal option '-M'
+Error: source filename missing
+2 errors occurred during assembly
+ERR
+
+t_z80asm_capture("--obj-ext", 	"", 	<<'ERR', 1);
+Error: illegal option '--obj-ext'
+Error: source filename missing
+2 errors occurred during assembly
+ERR
+
+
 
 
 unlink_testfiles();
@@ -182,7 +331,13 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.2  2013-09-29 21:43:48  pauloscustodio
+# Revision 1.3  2013-09-30 00:26:57  pauloscustodio
+# Parse command line options via look-up tables:
+# -e, --asm-ext
+# -M, --obj-ext
+# Move filename extension functions to options.c
+#
+# Revision 1.2  2013/09/29 21:43:48  pauloscustodio
 # Parse command line options via look-up tables:
 # move @file handling to options.c
 #

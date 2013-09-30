@@ -14,9 +14,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.6 2013-09-27 01:14:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.7 2013-09-30 00:24:25 pauloscustodio Exp $
 $Log: mapfile.c,v $
-Revision 1.6  2013-09-27 01:14:33  pauloscustodio
+Revision 1.7  2013-09-30 00:24:25  pauloscustodio
+Parse command line options via look-up tables:
+-e, --asm-ext
+-M, --obj-ext
+Move filename extension functions to options.c
+
+Revision 1.6  2013/09/27 01:14:33  pauloscustodio
 Parse command line options via look-up tables:
 --help, --verbose
 
@@ -100,7 +106,7 @@ void write_map_file( void )
 	SymbolHash *map_symtab;
 
 	/* use first module filename to create global map file */
-	filename = map_filename_ext( modulehdr->first->cfile->fname ); /* set '.map' extension */
+	filename = get_map_filename( modulehdr->first->cfile->fname ); /* set '.map' extension */
 
     /* Create MAP file */
     file = xfopen( filename, "w" );           /* CH_0012 */
