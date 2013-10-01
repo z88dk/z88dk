@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.29 2013-09-30 00:24:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.30 2013-10-01 21:27:44 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -246,8 +246,6 @@ char *path_remove_ext( char *filename )
 /* make a copy of the file name, replacing the extension */
 char *path_replace_ext( char *dest, const char *source, const char *new_ext )
 {
-    int length;
-
 	g_strlcpy( dest, source, FILENAME_MAX );
     path_remove_ext( dest );						/* file without extension */
 	g_strlcat( dest, new_ext, FILENAME_MAX );		/* copy new extension */
@@ -624,7 +622,10 @@ void xfget_c2sstr( sstr_t *str, FILE *file )
 
 /*
 $Log: file.c,v $
-Revision 1.29  2013-09-30 00:24:25  pauloscustodio
+Revision 1.30  2013-10-01 21:27:44  pauloscustodio
+warnings
+
+Revision 1.29  2013/09/30 00:24:25  pauloscustodio
 Parse command line options via look-up tables:
 -e, --asm-ext
 -M, --obj-ext
