@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.46 2013-09-22 21:34:48 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/exprprsr.c,v 1.47 2013-10-01 23:23:53 pauloscustodio Exp $ */
 /* $Log: exprprsr.c,v $
-/* Revision 1.46  2013-09-22 21:34:48  pauloscustodio
+/* Revision 1.47  2013-10-01 23:23:53  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -l, --list
+/* -nl, --no-list
+/*
+/* Revision 1.46  2013/09/22 21:34:48  pauloscustodio
 /* Remove legacy xxx_err() interface
 /*
 /* Revision 1.45  2013/09/12 00:10:02  pauloscustodio
@@ -1168,7 +1173,7 @@ ExprLong( int listoffset )
         }
         else
         {
-            if ( ( pfixexpr->rangetype & EXPRADDR ) && ( listing == OFF ) )     /* expression contains address
+            if ( ( pfixexpr->rangetype & EXPRADDR ) && ! opts.cur_list )     /* expression contains address
                                                                            * label */
             {
                 RemovePfixlist( pfixexpr );    /* no listing - evaluate during linking... */
@@ -1230,7 +1235,7 @@ ExprAddress( int listoffset )
         }
         else
         {
-            if ( ( pfixexpr->rangetype & EXPRADDR ) && ( listing == OFF ) )     /* expression contains address
+            if ( ( pfixexpr->rangetype & EXPRADDR ) && ! opts.cur_list )     /* expression contains address
                                                                            * label */
             {
                 RemovePfixlist( pfixexpr );    /* no listing - evaluate during linking... */
@@ -1291,7 +1296,7 @@ ExprUnsigned8( int listoffset )
         }
         else
         {
-            if ( ( pfixexpr->rangetype & EXPRADDR ) && ( listing == OFF ) )     /* expression contains address
+            if ( ( pfixexpr->rangetype & EXPRADDR ) && ! opts.cur_list )     /* expression contains address
                                                                            * label */
             {
                 RemovePfixlist( pfixexpr );    /* no listing - evaluate during linking... */
@@ -1369,7 +1374,7 @@ ExprSigned8( int listoffset )
         }
         else
         {
-            if ( ( pfixexpr->rangetype & EXPRADDR ) && ( listing == OFF ) ) /* expression contains address label */
+            if ( ( pfixexpr->rangetype & EXPRADDR ) && ! opts.cur_list ) /* expression contains address label */
             {
                 RemovePfixlist( pfixexpr );    /* no listing - evaluate during linking... */
             }

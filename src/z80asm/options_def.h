@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.5 2013-10-01 22:50:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.6 2013-10-01 23:23:53 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -37,6 +37,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.5 2013-10-01
 *----------------------------------------------------------------------------*/
 OPT_VAR(	BOOL,	verbose,	FALSE )
 OPT_VAR(	BOOL,	symtable,	TRUE 	)
+OPT_VAR(	BOOL,	list,		FALSE 	)			/* -l flag */
+OPT_VAR(	BOOL,	cur_list,	FALSE 	)			/* current LSTON/LSTOFF status */
 
 OPT_VAR(	char *,	asm_ext,	(FILEEXT_ASM)+1 )	/* skip "." */
 OPT_VAR(	char *,	obj_ext,	(FILEEXT_OBJ)+1 )	/* skip "." */
@@ -60,6 +62,8 @@ OPT( OptSet,	&opts.sdcc,		"-sdcc","", 				"Assemble for Small Device C Compiler"
 OPT_TITLE(	"Output Options:" )
 OPT( OptSet,	&opts.symtable,	"-s", 	"--symtable", 	"Generate symbol table file" FILEEXT_SYM, "" )
 OPT( OptClear,	&opts.symtable,	"-ns", 	"--no-symtable","No symbol table file", "" )
+OPT( OptSet,	&opts.list,		"-l", 	"--list", 		"Generate list file" FILEEXT_LST, "" )
+OPT( OptClear,	&opts.list,		"-nl", 	"--no-list",	"No list file", "" )
 
 
 /*-----------------------------------------------------------------------------

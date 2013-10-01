@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.6 2013-10-01 22:50:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.7 2013-10-01 23:23:53 pauloscustodio Exp $
 #
 # Test options
 
@@ -100,9 +100,11 @@ Code Generation Options:
 Output Options:
   -s, --symtable         Generate symbol table file.sym
   -ns, --no-symtable     No symbol table file
+  -l, --list             Generate list file.lst
+  -nl, --no-list         No list file
 
 Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)
--l listing file, -s symbol table, -m map listing file
+-m map listing file
 -r<ORG> Explicit relocation <ORG> defined in hex (ignore ORG in first module)
 -plus Interpret 'Invoke' as RST 28h
 -R Generate relocatable code (Automatical relocation before execution)
@@ -396,7 +398,12 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.6  2013-10-01 22:50:27  pauloscustodio
+# Revision 1.7  2013-10-01 23:23:53  pauloscustodio
+# Parse command line options via look-up tables:
+# -l, --list
+# -nl, --no-list
+#
+# Revision 1.6  2013/10/01 22:50:27  pauloscustodio
 # Parse command line options via look-up tables:
 # -s, --symtable
 # -ns, --no-symtable

@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.76 2013-10-01 22:50:26 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.77 2013-10-01 23:23:53 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.76  2013-10-01 22:50:26  pauloscustodio
+/* Revision 1.77  2013-10-01 23:23:53  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -l, --list
+/* -nl, --no-list
+/*
+/* Revision 1.76  2013/10/01 22:50:26  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -s, --symtable
 /* -ns, --no-symtable
@@ -657,8 +662,7 @@ LinkModules( void )
     struct module *lastobjmodule;
 	char *obj_filename;
 
-    opts.symtable = FALSE;
-	listing = OFF;
+    opts.symtable = opts.cur_list = FALSE;
     linkhdr = NULL;
 
     if ( opts.verbose )

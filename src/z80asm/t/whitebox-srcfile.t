@@ -28,9 +28,15 @@ struct module *CURRENTMODULE;
 FILE *errfile;
 int clinemode;
 int clineno;
-int listing;
 size_t get_PC( void ) { return 0; }
 void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) {}
+struct {
+	int list;
+	int cur_list;
+} opts = {
+	0,
+	0,
+};
 END
 
 # check source path
@@ -766,9 +772,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.12 2013-09-30 00:26:57 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.13 2013-10-01 23:23:53 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.12  2013-09-30 00:26:57  pauloscustodio
+# Revision 1.13  2013-10-01 23:23:53  pauloscustodio
+# Parse command line options via look-up tables:
+# -l, --list
+# -nl, --no-list
+#
+# Revision 1.12  2013/09/30 00:26:57  pauloscustodio
 # Parse command line options via look-up tables:
 # -e, --asm-ext
 # -M, --obj-ext

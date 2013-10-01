@@ -14,10 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.56 2013-09-27 01:14:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.57 2013-10-01 23:23:53 pauloscustodio Exp $ */
 /* 
  * $Log: asmdrctv.c,v $
- * Revision 1.56  2013-09-27 01:14:33  pauloscustodio
+ * Revision 1.57  2013-10-01 23:23:53  pauloscustodio
+ * Parse command line options via look-up tables:
+ * -l, --list
+ * -nl, --no-list
+ *
+ * Revision 1.56  2013/09/27 01:14:33  pauloscustodio
  * Parse command line options via look-up tables:
  * --help, --verbose
  *
@@ -562,7 +567,7 @@ DEFVARS( void )
             set_error_line( CURRENTFILE->line );    /* error location */
         }
 
-		if ( listing )
+		if ( opts.cur_list )
 		{
 			getasmline();    /* get a copy of current source line */
 			list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
@@ -584,7 +589,7 @@ DEFVARS( void )
                     set_error_line( CURRENTFILE->line );    /* error location */
                 }
 
-				if ( listing )
+				if ( opts.cur_list )
 				{
 					getasmline();    /* get a copy of current source line */
 					list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
@@ -624,7 +629,7 @@ DEFGROUP( void )
             set_error_line( CURRENTFILE->line );    /* error location */
         }
 
-		if ( listing )
+		if ( opts.cur_list )
 		{
 			getasmline();    /* get a copy of current source line */
 			list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
@@ -646,7 +651,7 @@ DEFGROUP( void )
                     set_error_line( CURRENTFILE->line );    /* error location */
                 }
 
-				if ( listing )
+				if ( opts.cur_list )
 				{
 					getasmline();    /* get a copy of current source line */
 					list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );

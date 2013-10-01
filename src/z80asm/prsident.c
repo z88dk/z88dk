@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.44 2013-10-01 22:09:33 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.45 2013-10-01 23:23:53 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.44  2013-10-01 22:09:33  pauloscustodio
+/* Revision 1.45  2013-10-01 23:23:53  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -l, --list
+/* -nl, --no-list
+/*
+/* Revision 1.44  2013/10/01 22:09:33  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -sdcc
 /*
@@ -522,9 +527,9 @@ ParseIdent( enum flag interpret )
 void
 LSTON( void )
 {
-    if ( option_list == ON )
+    if ( opts.list )
     {
-        listing = ON;				/* switch listing ON again... */
+        opts.cur_list = TRUE;				/* switch listing ON again... */
         line[0] = '\0';
     }
 }
@@ -534,9 +539,9 @@ LSTON( void )
 void
 LSTOFF( void )
 {
-    if ( option_list == ON )
+    if ( opts.list )
     {
-        listing = OFF;        
+        opts.cur_list = FALSE;        
         line[0] = '\0';
     }
 }

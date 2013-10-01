@@ -105,7 +105,14 @@ void n_tokens (int n)
 }
 
 int clinemode = 0;
-int listing = 1;
+
+struct {
+	int list;
+	int cur_list;
+} opts = {
+	1,
+	1,
+};
 
 size_t
 get_PC( void ) { return 0; }
@@ -1002,9 +1009,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.16 2013-09-24 00:05:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.17 2013-10-01 23:23:53 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.16  2013-09-24 00:05:36  pauloscustodio
+# Revision 1.17  2013-10-01 23:23:53  pauloscustodio
+# Parse command line options via look-up tables:
+# -l, --list
+# -nl, --no-list
+#
+# Revision 1.16  2013/09/24 00:05:36  pauloscustodio
 # Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
 # toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
 # Removed normalize_eol.

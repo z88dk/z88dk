@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.106 2013-10-01 22:50:27 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.107 2013-10-01 23:23:53 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.106  2013-10-01 22:50:27  pauloscustodio
+/* Revision 1.107  2013-10-01 23:23:53  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -l, --list
+/* -nl, --no-list
+/*
+/* Revision 1.106  2013/10/01 22:50:27  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -s, --symtable
 /* -ns, --no-symtable
@@ -733,8 +738,8 @@ void assemble_file( char *filename )
 
     /* normal case - assemble a asm source file */
     z80asmfile = objfile = NULL;
-
-    reset_codearea();            /* Pointer (PC) to store z80 instruction */
+	opts.cur_list = opts.list;		/* initial LSTON status */
+    reset_codearea();           /* Pointer (PC) to store z80 instruction */
 
     src_filename = get_asm_filename( filename );      /* set '.asm' extension */
     obj_filename = get_obj_filename( filename );      /* set '.obj' extension */
@@ -799,7 +804,7 @@ static void do_assemble( char *src_filename, char *obj_filename )
         open_error_file( get_err_filename( src_filename ) );
 
 		/* create list file or symtable */
-		if ( option_list )
+		if ( opts.list )
 			list_open( get_lst_filename(src_filename) );	/* set '.lst' extension */
 		else if ( opts.symtable )
 			list_open( get_sym_filename(src_filename) );	/* set '.sym' extension */

@@ -15,9 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.13 2013-09-24 00:05:36 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.l,v 1.14 2013-10-01 23:23:53 pauloscustodio Exp $ 
 $Log: scan.l,v $
-Revision 1.13  2013-09-24 00:05:36  pauloscustodio
+Revision 1.14  2013-10-01 23:23:53  pauloscustodio
+Parse command line options via look-up tables:
+-l, --list
+-nl, --no-list
+
+Revision 1.13  2013/09/24 00:05:36  pauloscustodio
 Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
 toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
 Removed normalize_eol.
@@ -287,7 +292,7 @@ D16		[0-9a-fA-F]
 				if ( !clinemode )
 					set_error_line( context->line_nr );
 
-				if ( listing )
+				if ( opts.cur_list )
 					list_start_line( get_PC(), 
 									 context->filename, context->line_nr, 
 									 yytext + 1 );

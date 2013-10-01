@@ -14,10 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.18 2013-09-26 21:38:47 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.19 2013-10-01 23:23:53 pauloscustodio Exp $ 
 $Log: scan.c,v $
-Revision 1.18  2013-09-26 21:38:47  pauloscustodio
-.
+Revision 1.19  2013-10-01 23:23:53  pauloscustodio
+Parse command line options via look-up tables:
+-l, --list
+-nl, --no-list
 
 Revision 1.13  2013/09/24 00:05:36  pauloscustodio
 Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
@@ -1868,7 +1870,7 @@ YY_RULE_SETUP
 				if ( !clinemode )
 					set_error_line( context->line_nr );
 
-				if ( listing )
+				if ( opts.cur_list )
 					list_start_line( get_PC(), 
 									 context->filename, context->line_nr, 
 									 yytext + 1 );

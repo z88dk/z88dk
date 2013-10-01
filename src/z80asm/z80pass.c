@@ -13,9 +13,14 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.59 2013-10-01 22:50:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.60 2013-10-01 23:23:53 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.59  2013-10-01 22:50:27  pauloscustodio
+Revision 1.60  2013-10-01 23:23:53  pauloscustodio
+Parse command line options via look-up tables:
+-l, --list
+-nl, --no-list
+
+Revision 1.59  2013/10/01 22:50:27  pauloscustodio
 Parse command line options via look-up tables:
 -s, --symtable
 -ns, --no-symtable
@@ -483,7 +488,7 @@ parseline( enum flag interpret )
 
     ++TOTALLINES;
 
-    if ( listing )
+    if ( opts.cur_list )
     {
         getasmline();    /* get a copy of current source line */
 		list_start_line( get_PC(), CURRENTFILE->fname, CURRENTFILE->line, line );
@@ -889,7 +894,7 @@ Z80pass2( void )
                 }
             }
 
-            if ( option_list )
+            if ( opts.list )
             {
 				list_patch_data( pass2expr->listpos, constant, RANGE_SIZE(pass2expr->rangetype) );
             }

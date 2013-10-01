@@ -17,9 +17,14 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.9 2013-09-23 23:14:10 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.10 2013-10-01 23:23:53 pauloscustodio Exp $ */
 /* $Log: srcfile.c,v $
-/* Revision 1.9  2013-09-23 23:14:10  pauloscustodio
+/* Revision 1.10  2013-10-01 23:23:53  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -l, --list
+/* -nl, --no-list
+/*
+/* Revision 1.9  2013/09/23 23:14:10  pauloscustodio
 /* Renamed SzList to StringList, simplified interface by assuming that
 /* list lives in memory util program ends; it is used for directory searches
 /* only. Moved interface to strutil.c, removed strlist.c.
@@ -239,7 +244,7 @@ char *SourceFile_getline( SourceFile *self )
 		}
 
 		/* interface with list */
-		if ( listing )
+		if ( opts.cur_list )
 		{
 			list_start_line( get_PC(), self->filename, self->line_nr, Str_data( self->line ) );
 		}

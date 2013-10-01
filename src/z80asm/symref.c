@@ -15,9 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Cross reference list of symbol usage
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.c,v 1.3 2013-10-01 22:50:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.c,v 1.4 2013-10-01 23:23:53 pauloscustodio Exp $
 $Log: symref.c,v $
-Revision 1.3  2013-10-01 22:50:27  pauloscustodio
+Revision 1.4  2013-10-01 23:23:53  pauloscustodio
+Parse command line options via look-up tables:
+-l, --list
+-nl, --no-list
+
+Revision 1.3  2013/10/01 22:50:27  pauloscustodio
 Parse command line options via look-up tables:
 -s, --symtable
 -ns, --no-symtable
@@ -78,7 +83,7 @@ void add_symbol_ref( SymbolRefList *list, int page_nr, BOOL defined )
 {
 	SymbolRef *obj;
 
-	if ( opts.symtable && option_list && 
+	if ( opts.symtable && opts.list && 
 		 page_nr > 0 )							/* = -1 in link phase */
 	{
 		/* check if page_nr was already referenced at start (definition) or end (usage) */
