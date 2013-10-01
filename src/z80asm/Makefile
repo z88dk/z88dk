@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.82 2013-09-30 00:24:25 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.83 2013-10-01 22:50:26 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -272,7 +272,12 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.82  2013-09-30 00:24:25  pauloscustodio
+# Revision 1.83  2013-10-01 22:50:26  pauloscustodio
+# Parse command line options via look-up tables:
+# -s, --symtable
+# -ns, --no-symtable
+#
+# Revision 1.82  2013/09/30 00:24:25  pauloscustodio
 # Parse command line options via look-up tables:
 # -e, --asm-ext
 # -M, --obj-ext
@@ -688,7 +693,9 @@ sym.o: memalloc.h listfile.h class.h queue.h types.h dynstr.h symref.h
 sym.o: classlist.h options.h options_def.h symbol.h model.h objfile.h
 sym.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h token_def.h
 sym.o: safestr.h strpool.h
-symref.o: memalloc.h symref.h class.h queue.h types.h classlist.h
+symref.o: memalloc.h options.h types.h options_def.h symbol.h model.h
+symref.o: objfile.h class.h queue.h symtab.h classhash.h strhash.h uthash.h
+symref.o: die.h sym.h symref.h classlist.h token_def.h
 symtab.o: memalloc.h errors.h errors_def.h listfile.h class.h queue.h types.h
 symtab.o: dynstr.h symref.h classlist.h options.h options_def.h symbol.h
 symtab.o: model.h objfile.h symtab.h classhash.h strhash.h uthash.h die.h

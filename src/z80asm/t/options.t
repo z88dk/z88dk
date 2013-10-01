@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.5 2013-10-01 22:09:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.6 2013-10-01 22:50:27 pauloscustodio Exp $
 #
 # Test options
 
@@ -96,6 +96,10 @@ Input Options:
 
 Code Generation Options:
   -sdcc                  Assemble for Small Device C Compiler
+
+Output Options:
+  -s, --symtable         Generate symbol table file.sym
+  -ns, --no-symtable     No symbol table file
 
 Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)
 -l listing file, -s symbol table, -m map listing file
@@ -330,10 +334,61 @@ ERR
 # -sdcc
 #------------------------------------------------------------------------------
 unlink_testfiles();
-
 t_z80asm_error("defc main = 0x1234\ncall _main", 
 		"Error at file 'test.asm' module 'TEST' line 2: symbol not defined");
 t_z80asm_ok(0, "defc main = 0x1234\ncall _main", "\xCD\x34\x12", "-sdcc");
+
+#------------------------------------------------------------------------------
+# -s, --symtable, -ns, --no-symtable
+#------------------------------------------------------------------------------
+unlink_testfiles();
+
+my $asm = "
+	xdef main
+main:	ld b,10
+loop:	djnz loop
+	ret
+";
+my $bin = pack("C*", 
+	0x06, 10,
+	0x10, -2 & 0xFF,
+	0xC9
+);
+
+# no symbol table, no list
+t_z80asm(
+	asm		=> $asm,
+	bin		=> $bin,
+	options	=> '-nl -ns',
+	nolist	=> 1,
+);
+t_z80asm(
+	asm		=> $asm,
+	bin		=> $bin,
+	options	=> '-nl --no-symtable',
+	nolist	=> 1,
+);
+
+# list file implies no symbol table
+for my $option ('-l', '-l -s', '-l --symtable') {
+	t_z80asm(
+		asm		=> $asm,
+		bin		=> $bin,
+		options	=> $option,
+		nolist	=> 1,
+	);
+}
+
+# no list file implies symbol table
+for my $option ('', '-nl', '-s', '--symtable', '-nl -s', '-nl --symtable') {
+	t_z80asm(
+		asm		=> $asm,
+		bin		=> $bin,
+		options	=> $option,
+		nolist	=> 1,
+	);
+}
+
 
 
 unlink_testfiles();
@@ -341,7 +396,12 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.5  2013-10-01 22:09:33  pauloscustodio
+# Revision 1.6  2013-10-01 22:50:27  pauloscustodio
+# Parse command line options via look-up tables:
+# -s, --symtable
+# -ns, --no-symtable
+#
+# Revision 1.5  2013/10/01 22:09:33  pauloscustodio
 # Parse command line options via look-up tables:
 # -sdcc
 #

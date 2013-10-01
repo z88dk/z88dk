@@ -24,12 +24,13 @@ my $init = <<'END';
 
 struct {
 	int sdcc;
+	int symtable;
 } opts = {
 	0,
+	1,
 };
 
 int listing				= 0;
-int option_symtable		= 1;
 int option_list			= 1;
 int page_nr 			= 1;
 int list_get_page_nr() { return page_nr; }
@@ -336,9 +337,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.16 2013-10-01 22:09:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.17 2013-10-01 22:50:27 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.16  2013-10-01 22:09:33  pauloscustodio
+# Revision 1.17  2013-10-01 22:50:27  pauloscustodio
+# Parse command line options via look-up tables:
+# -s, --symtable
+# -ns, --no-symtable
+#
+# Revision 1.16  2013/10/01 22:09:33  pauloscustodio
 # Parse command line options via look-up tables:
 # -sdcc
 #

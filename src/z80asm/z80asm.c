@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.105 2013-09-30 00:24:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.106 2013-10-01 22:50:27 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.105  2013-09-30 00:24:25  pauloscustodio
+/* Revision 1.106  2013-10-01 22:50:27  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -s, --symtable
+/* -ns, --no-symtable
+/*
+/* Revision 1.105  2013/09/30 00:24:25  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -e, --asm-ext
 /* -M, --obj-ext
@@ -793,13 +798,13 @@ static void do_assemble( char *src_filename, char *obj_filename )
         /* Create error file */
         open_error_file( get_err_filename( src_filename ) );
 
-        if ( option_list || symfile )
-        {
-            /* Create LIST or SYMBOL file */
-			list_open( option_list ? 
-						get_lst_filename(src_filename) :	/* set '.lst' extension */
-						get_sym_filename(src_filename) );	/* set '.sym' extension */
-        }
+		/* create list file or symtable */
+		if ( option_list )
+			list_open( get_lst_filename(src_filename) );	/* set '.lst' extension */
+		else if ( opts.symtable )
+			list_open( get_sym_filename(src_filename) );	/* set '.sym' extension */
+		else 
+		{}													/* no list file */
 
         /* Create relocatable object file */
         objfile = xfopen( obj_filename, "w+b" );           /* CH_0012 */

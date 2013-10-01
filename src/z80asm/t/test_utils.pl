@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.47 2013-09-29 21:43:48 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.48 2013-10-01 22:50:27 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -209,11 +209,11 @@ sub t_z80asm {
 	
 	# list file or symbol table
 	if (defined($args{bin})) {
-		if ($cmd =~ / -l /) {
+		if ($cmd =~ / (-l|--list) /) {
 			ok   -f $_, "$line $_" for (@lst);
 			ok ! -f $_, "$line no $_" for (@sym);
 		}
-		elsif ($cmd =~ / -ns /) {
+		elsif ($cmd =~ / (-ns|--no-symtable) /) {
 			ok ! -f $_, "$line no $_" for (@lst);
 			ok ! -f $_, "$line no $_" for (@sym);
 		}
@@ -1015,7 +1015,12 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.47  2013-09-29 21:43:48  pauloscustodio
+# Revision 1.48  2013-10-01 22:50:27  pauloscustodio
+# Parse command line options via look-up tables:
+# -s, --symtable
+# -ns, --no-symtable
+#
+# Revision 1.47  2013/09/29 21:43:48  pauloscustodio
 # Parse command line options via look-up tables:
 # move @file handling to options.c
 #

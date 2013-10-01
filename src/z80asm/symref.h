@@ -15,9 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Cross reference list of symbol usage
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.h,v 1.1 2013-05-16 23:39:49 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.h,v 1.2 2013-10-01 22:50:27 pauloscustodio Exp $
 $Log: symref.h,v $
-Revision 1.1  2013-05-16 23:39:49  pauloscustodio
+Revision 1.2  2013-10-01 22:50:27  pauloscustodio
+Parse command line options via look-up tables:
+-s, --symtable
+-ns, --no-symtable
+
+Revision 1.1  2013/05/16 23:39:49  pauloscustodio
 Move struct node to sym.c, rename to Symbol
 Move SymbolRef to symref.c
 
@@ -45,9 +50,6 @@ CLASS_LIST( SymbolRef );		/* list of references sorted by page_nr, with
 
 /* add a symbol reference, create the list if NULL */
 extern void add_symbol_ref( SymbolRefList *list, int page_nr, BOOL defined );
-
-/* concatenate two symbol reference lists */
-extern void cat_symbol_refs( SymbolRefList *list, SymbolRefList *other );
 
 #endif /* ndef SYMREF_H */
 

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.17 2013-10-01 22:09:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.18 2013-10-01 22:50:26 pauloscustodio Exp $
 */
 
 #pragma once
@@ -64,7 +64,12 @@ extern char *get_map_filename( char *filename );
 
 
 /* $Log: options.h,v $
-/* Revision 1.17  2013-10-01 22:09:33  pauloscustodio
+/* Revision 1.18  2013-10-01 22:50:26  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -s, --symtable
+/* -ns, --no-symtable
+/*
+/* Revision 1.17  2013/10/01 22:09:33  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -sdcc
 /*
@@ -160,8 +165,6 @@ extern enum flag datestamp;
 extern enum flag force_xlib;
 extern enum flag listing;
 extern enum flag option_list;
-extern enum flag option_symtable;
-extern enum flag symfile;
 extern enum flag z80bin;
 extern enum flag mapref;
 extern enum flag globaldef;

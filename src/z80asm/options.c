@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.34 2013-10-01 22:09:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.35 2013-10-01 22:50:26 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -383,10 +383,10 @@ static void display_options(void)
     else
         puts( "Assemble all files." );
 
-    if ( symfile == ON )
+    if ( opts.symtable )
         puts( "Create symbol table file." );
 
-    if ( listing == ON )
+    if ( option_list == ON )
         puts( "Create listing file." );
 
     if ( globaldef == ON )
@@ -465,7 +465,12 @@ char *get_segbin_filename( char *filename, int segment )
 
 
 /* $Log: options.c,v $
-/* Revision 1.34  2013-10-01 22:09:33  pauloscustodio
+/* Revision 1.35  2013-10-01 22:50:26  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -s, --symtable
+/* -ns, --no-symtable
+/*
+/* Revision 1.34  2013/10/01 22:09:33  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -sdcc
 /*
@@ -644,8 +649,6 @@ enum flag datestamp;
 enum flag force_xlib;
 enum flag listing;
 enum flag option_list;
-enum flag option_symtable;
-enum flag symfile;
 enum flag z80bin;
 enum flag mapref;
 enum flag globaldef;
@@ -700,8 +703,6 @@ static void reset_options( void )
     force_xlib      = OFF;
     listing         = OFF;
     option_list     = OFF;
-    option_symtable = ON;
-    symfile         = ON;
     z80bin          = OFF;
     mapref          = ON;
     globaldef       = OFF;
@@ -762,40 +763,11 @@ void set_asm_flag( char *flagid )
     else if ( strcmp( flagid, "l" ) == 0 )
     {
         option_list = listing = ON;
-
-		if ( option_symtable )
-        {
-            symfile = OFF;
-        }
     }
 
     else if ( strcmp( flagid, "nl" ) == 0 )
     {
         option_list = listing = OFF;
-
-		if ( option_symtable )
-        {
-            symfile = ON;
-        }
-    }
-
-    else if ( strcmp( flagid, "s" ) == 0 )
-    {
-        option_symtable = ON;
-
-        if ( option_list )
-        {
-            symfile = OFF;
-        }
-        else
-        {
-            symfile = ON;
-        }
-    }
-
-    else if ( strcmp( flagid, "ns" ) == 0 )
-    {
-        option_symtable = symfile = OFF;
     }
 
     else if ( strcmp( flagid, "b" ) == 0 )

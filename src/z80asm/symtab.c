@@ -18,9 +18,14 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.14 2013-10-01 22:09:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.15 2013-10-01 22:50:27 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.14  2013-10-01 22:09:33  pauloscustodio
+Revision 1.15  2013-10-01 22:50:27  pauloscustodio
+Parse command line options via look-up tables:
+-s, --symtable
+-ns, --no-symtable
+
+Revision 1.14  2013/10/01 22:09:33  pauloscustodio
 Parse command line options via look-up tables:
 -sdcc
 
@@ -186,8 +191,7 @@ Symbol *_define_sym( char *name, long value, byte_t type,
     }
 
 	/* add symbol references if listing */
-    if ( option_symtable && option_list )
-		add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
+	add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
 
 	return sym;
 }
@@ -215,8 +219,7 @@ Symbol *get_used_symbol( char *name )
 	}
 
 	/* add page references */
-	if ( option_symtable && option_list )
-		add_symbol_ref( sym->references, list_get_page_nr(), FALSE );
+	add_symbol_ref( sym->references, list_get_page_nr(), FALSE );
 
 	return sym;
 }
@@ -340,11 +343,8 @@ static void define_local_symbol( char *name, long value, byte_t type )
         sym = Symbol_create( name, value, type | SYMLOCAL | SYMDEFINED, CURRENTMODULE );
 		SymbolHash_set( CURRENTMODULE->local_tab, name, sym );
 
-        if ( option_symtable && option_list )
-        {
-            /* First element in list is definition of symbol */
-			add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
-        }
+        /* First element in list is definition of symbol */
+		add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
 	}
 	else if ( sym->type & SYMDEFINED )	/* local symbol already defined */
     {
@@ -356,11 +356,8 @@ static void define_local_symbol( char *name, long value, byte_t type )
         sym->type |= type | SYMLOCAL | SYMDEFINED;	/* local symbol type set to address label or constant */
         sym->owner = CURRENTMODULE;					/* owner of symbol is always creator */
 
-        if ( option_symtable && option_list )
-        {
-            /* First element in list is definition of symbol */
-			add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
-        }
+        /* First element in list is definition of symbol */
+		add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
 	}
 }
 
@@ -393,11 +390,8 @@ void define_symbol( char *name, long value, byte_t type )
             sym->type |= type | SYMDEFINED;	/* defined, and typed as address label or constant */
             sym->owner = CURRENTMODULE;		/* owner of symbol is always creator */
 
-            if ( option_symtable && option_list )
-            {
-				/* First element in list is definition of symbol */
-                add_symbol_ref( sym->references, list_get_page_nr(), TRUE );     
-			}
+			/* First element in list is definition of symbol */
+            add_symbol_ref( sym->references, list_get_page_nr(), TRUE );     
 		}
 	}
 	else								/* Extern declaration of symbol, now define local symbol. */

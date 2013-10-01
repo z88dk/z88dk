@@ -15,9 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.6 2013-09-01 18:46:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.7 2013-10-01 22:50:26 pauloscustodio Exp $
 $Log: sym.c,v $
-Revision 1.6  2013-09-01 18:46:01  pauloscustodio
+Revision 1.7  2013-10-01 22:50:26  pauloscustodio
+Parse command line options via look-up tables:
+-s, --symtable
+-ns, --no-symtable
+
+Revision 1.6  2013/09/01 18:46:01  pauloscustodio
 Remove call to strpool_init(). String pool is initialized in init.c before main() starts.
 
 Revision 1.5  2013/06/16 16:49:20  pauloscustodio
@@ -81,8 +86,7 @@ Symbol *Symbol_create( char *name, long value, byte_t type, struct module *owner
     self->owner 	= owner;
 	
 	/* add reference */
-    if ( option_symtable && option_list )
-		add_symbol_ref( self->references, list_get_page_nr(), FALSE );
+	add_symbol_ref( self->references, list_get_page_nr(), FALSE );
 
     return self;              						/* pointer to new symbol */
 }

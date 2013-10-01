@@ -15,9 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Cross reference list of symbol usage
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.c,v 1.2 2013-06-01 01:24:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.c,v 1.3 2013-10-01 22:50:27 pauloscustodio Exp $
 $Log: symref.c,v $
-Revision 1.2  2013-06-01 01:24:22  pauloscustodio
+Revision 1.3  2013-10-01 22:50:27  pauloscustodio
+Parse command line options via look-up tables:
+-s, --symtable
+-ns, --no-symtable
+
+Revision 1.2  2013/06/01 01:24:22  pauloscustodio
 CH_0022 : Replace avltree by hash table for symbol table
 
 Revision 1.1  2013/05/16 23:39:48  pauloscustodio
@@ -39,6 +44,7 @@ Revision 1.1  2013/02/19 22:52:40  pauloscustodio
 
 #include "memalloc.h"   /* before any other include */
 
+#include "options.h"
 #include "symref.h"
 
 /*-----------------------------------------------------------------------------
@@ -72,7 +78,8 @@ void add_symbol_ref( SymbolRefList *list, int page_nr, BOOL defined )
 {
 	SymbolRef *obj;
 
-	if ( page_nr > 0 )							/* = -1 in link phase */
+	if ( opts.symtable && option_list && 
+		 page_nr > 0 )							/* = -1 in link phase */
 	{
 		/* check if page_nr was already referenced at start (definition) or end (usage) */
 		if ( ! ref_repeated( list, page_nr ) )
@@ -101,17 +108,3 @@ void add_symbol_ref( SymbolRefList *list, int page_nr, BOOL defined )
 	}
 }
 
-/* concatenate two symbol reference lists */
-void cat_symbol_refs( SymbolRefList *list, SymbolRefList *other )
-{
-	SymbolRef *obj;
-
-	if ( other != NULL )
-	{
-		while ( ( obj = SymbolRefList_shift( other ) ) != NULL )
-		{
-			add_symbol_ref( list, obj->page_nr, FALSE );
-			OBJ_DELETE( obj );
-		}
-	}
-}
