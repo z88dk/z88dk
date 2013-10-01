@@ -18,9 +18,13 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.13 2013-09-08 00:43:59 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.14 2013-10-01 22:09:33 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.13  2013-09-08 00:43:59  pauloscustodio
+Revision 1.14  2013-10-01 22:09:33  pauloscustodio
+Parse command line options via look-up tables:
+-sdcc
+
+Revision 1.13  2013/09/08 00:43:59  pauloscustodio
 New error module with one error function per error, no need for the error
 constants. Allows compiler to type-check error message arguments.
 Included the errors module in the init() mechanism, no need to call
@@ -134,7 +138,7 @@ Symbol *find_symbol( char *name, SymbolHash *symtab )
 	sym = SymbolHash_get( symtab, name );
 
 	/* Bodge for handling underscores (sdcc hack) */
-    if ( sym == NULL && sdcc_hacks && name[0] == '_' )
+    if ( sym == NULL && opts.sdcc && name[0] == '_' )
         sym = SymbolHash_get( symtab, name + 1 );
 
 	if ( sym != NULL )
@@ -501,7 +505,7 @@ static void declare_extern_symbol( char *name, byte_t type )
             {
                 if ( ( sym->type & ( SYMXREF | type ) ) != ( SYMXREF | type ) )
 				{
-                    if ( sdcc_hacks )
+                    if ( opts.sdcc )
                     {
                         sym->type = SYMXREF | type ;
                     }

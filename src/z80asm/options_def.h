@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.3 2013-09-30 00:33:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.4 2013-10-01 22:09:33 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -38,6 +38,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.3 2013-09-30
 OPT_VAR(	BOOL,	verbose,	FALSE )
 OPT_VAR(	char *,	asm_ext,	(FILEEXT_ASM)+1 )	/* skip "." */
 OPT_VAR(	char *,	obj_ext,	(FILEEXT_OBJ)+1 )	/* skip "." */
+OPT_VAR(	BOOL,	sdcc,		FALSE )
 
 /*-----------------------------------------------------------------------------
 *   define options
@@ -50,6 +51,9 @@ OPT( OptClear,	&opts.verbose,	"-nv", 	"--not-verbose", 	"Be silent", "" )
 OPT_TITLE(	"Input Options:"	)
 OPT( OptString,	&opts.asm_ext,	"-e", 	"--asm-ext", 		"ASM file extension, excluding '.'", "EXT" )
 OPT( OptString,	&opts.obj_ext,	"-M", 	"--obj-ext", 		"OBJ file extension, excluding '.'", "EXT" )
+
+OPT_TITLE(	"Code Generation Options:" )
+OPT( OptSet,	&opts.sdcc,		"-sdcc","", 				"Assemble for Small Device C Compiler", "" )
 
 /*-----------------------------------------------------------------------------
 *   clear macros

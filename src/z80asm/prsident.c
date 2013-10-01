@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.43 2013-09-08 00:43:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.44 2013-10-01 22:09:33 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.43  2013-09-08 00:43:59  pauloscustodio
+/* Revision 1.44  2013-10-01 22:09:33  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -sdcc
+/*
+/* Revision 1.43  2013/09/08 00:43:59  pauloscustodio
 /* New error module with one error function per error, no need for the error
 /* constants. Allows compiler to type-check error message arguments.
 /* Included the errors module in the init() mechanism, no need to call
@@ -630,7 +634,7 @@ XLIB( void )
 void
 XREF( void )
 {
-    if ( sdcc_hacks == ON )
+    if ( opts.sdcc )
     {
         LIB();
         return;

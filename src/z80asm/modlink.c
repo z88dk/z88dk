@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.74 2013-09-30 00:24:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.75 2013-10-01 22:09:33 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.74  2013-09-30 00:24:25  pauloscustodio
+/* Revision 1.75  2013-10-01 22:09:33  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -sdcc
+/*
+/* Revision 1.74  2013/09/30 00:24:25  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -e, --asm-ext
 /* -M, --obj-ext
@@ -988,7 +992,9 @@ SearchLibfile( struct libfile *curlib, char *modname )
 
                 return ret;
             }
-            else if ( sdcc_hacks == ON && modname[0] == '_' && ( mname = CheckIfModuleWanted( file, currentlibmodule, modname + 1 ) ) != NULL )
+            else if ( opts.sdcc && 
+					  modname[0] == '_' && 
+					  ( mname = CheckIfModuleWanted( file, currentlibmodule, modname + 1 ) ) != NULL )
             {
                 TRY
                 {

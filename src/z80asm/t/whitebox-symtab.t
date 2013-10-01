@@ -22,11 +22,16 @@ my $objs = "sym.o symtab.o symref.o class.o safestr.o strhash.o errors.o strutil
 my $init = <<'END';
 #include "symbol.h"
 
+struct {
+	int sdcc;
+} opts = {
+	0,
+};
+
 int listing				= 0;
 int option_symtable		= 1;
 int option_list			= 1;
 int page_nr 			= 1;
-int sdcc_hacks			= 0;
 int list_get_page_nr() { return page_nr; }
 
 struct module the_module;
@@ -331,9 +336,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.15 2013-09-24 00:05:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.16 2013-10-01 22:09:33 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.15  2013-09-24 00:05:36  pauloscustodio
+# Revision 1.16  2013-10-01 22:09:33  pauloscustodio
+# Parse command line options via look-up tables:
+# -sdcc
+#
+# Revision 1.15  2013/09/24 00:05:36  pauloscustodio
 # Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
 # toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
 # Removed normalize_eol.

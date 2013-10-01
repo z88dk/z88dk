@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.33 2013-09-30 00:24:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.34 2013-10-01 22:09:33 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -109,7 +109,8 @@ void parse_argv(int argc, char *argv[],
 static char *opt_arg(char *arg, char *opt)
 {
 	size_t len = strlen(opt);
-	if ( strncmp( arg, opt, len ) == 0 )
+	if ( *opt &&				/* ignore empty option strings */
+		 strncmp( arg, opt, len ) == 0 )
 		return arg + len;		/* point to after argument */
 	else
 		return NULL;			/* not found */
@@ -283,10 +284,32 @@ static void parse_files(int arg, int argc, char *argv[],
 static void show_option(char *short_opt, char *long_opt, char *help_text, char *help_arg)
 {
 	char msg[ MAXLINE ];
-	char *arg_sep = *help_arg ? "=" : "";
+	int count_opts = 0;
 
 	g_snprintf( msg, sizeof(msg), 
-				"  %s, %s%s%s", short_opt, long_opt, arg_sep, help_arg );
+				"  " );
+	if ( *short_opt )
+	{
+		g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
+					"%s", short_opt );
+		count_opts++;
+	}
+	
+	if ( *long_opt )
+	{
+		if ( count_opts )
+			g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
+						", " );
+		g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
+					"%s", long_opt );
+		count_opts++;
+	}
+
+	if ( *help_arg )
+	{
+		g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
+					"=%s", help_arg );
+	}
 
 	if ( strlen(msg) > ALIGN_HELP )
 		printf("%s\n%-*s %s\n", msg, ALIGN_HELP, "",  help_text );
@@ -442,7 +465,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 
 /* $Log: options.c,v $
-/* Revision 1.33  2013-09-30 00:24:25  pauloscustodio
+/* Revision 1.34  2013-10-01 22:09:33  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -sdcc
+/*
+/* Revision 1.33  2013/09/30 00:24:25  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -e, --asm-ext
 /* -M, --obj-ext
@@ -614,7 +641,6 @@ enum flag clinemode;
 long clineno;
 enum flag codesegment;
 enum flag datestamp;
-enum flag sdcc_hacks;
 enum flag force_xlib;
 enum flag listing;
 enum flag option_list;
@@ -671,7 +697,6 @@ static void reset_options( void )
     clineno         = 0;
     codesegment     = OFF;
     datestamp       = OFF;
-    sdcc_hacks      = OFF;
     force_xlib      = OFF;
     listing         = OFF;
     option_list     = OFF;
@@ -727,11 +752,6 @@ void set_asm_flag( char *flagid )
     else if ( strcmp( flagid, "c" ) == 0 )
     {
         codesegment = ON;
-    }
-
-    else if ( strcmp( flagid, "sdcc" ) == 0 )
-    {
-        sdcc_hacks = ON;
     }
 
     else if ( strcmp( flagid, "forcexlib" ) == 0 )
