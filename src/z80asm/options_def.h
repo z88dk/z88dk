@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.6 2013-10-01 23:23:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.7 2013-10-01 23:46:28 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -35,14 +35,15 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.6 2013-10-01
 /*-----------------------------------------------------------------------------
 *   define option variables
 *----------------------------------------------------------------------------*/
-OPT_VAR(	BOOL,	verbose,	FALSE )
+OPT_VAR(	BOOL,	verbose,	FALSE	)
 OPT_VAR(	BOOL,	symtable,	TRUE 	)
 OPT_VAR(	BOOL,	list,		FALSE 	)			/* -l flag */
 OPT_VAR(	BOOL,	cur_list,	FALSE 	)			/* current LSTON/LSTOFF status */
+OPT_VAR(	BOOL,	map,		TRUE 	)
+OPT_VAR(	BOOL,	sdcc,		FALSE	)
 
 OPT_VAR(	char *,	asm_ext,	(FILEEXT_ASM)+1 )	/* skip "." */
 OPT_VAR(	char *,	obj_ext,	(FILEEXT_OBJ)+1 )	/* skip "." */
-OPT_VAR(	BOOL,	sdcc,		FALSE )
 
 /*-----------------------------------------------------------------------------
 *   define options
@@ -64,7 +65,8 @@ OPT( OptSet,	&opts.symtable,	"-s", 	"--symtable", 	"Generate symbol table file" 
 OPT( OptClear,	&opts.symtable,	"-ns", 	"--no-symtable","No symbol table file", "" )
 OPT( OptSet,	&opts.list,		"-l", 	"--list", 		"Generate list file" FILEEXT_LST, "" )
 OPT( OptClear,	&opts.list,		"-nl", 	"--no-list",	"No list file", "" )
-
+OPT( OptSet,	&opts.map,		"-m", 	"--map", 		"Generate address map file" FILEEXT_MAP, "" )
+OPT( OptClear,	&opts.map,		"-nm", 	"--no-map",		"No address map file", "" )
 
 /*-----------------------------------------------------------------------------
 *   clear macros

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.7 2013-10-01 23:23:53 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.8 2013-10-01 23:46:28 pauloscustodio Exp $
 #
 # Test options
 
@@ -21,6 +21,7 @@ use strict;
 use warnings;
 use File::Slurp;
 use Capture::Tiny 'capture_merged';
+use Test::Differences; 
 use Test::More;
 require 't/test_utils.pl';
 
@@ -102,9 +103,10 @@ Output Options:
   -ns, --no-symtable     No symbol table file
   -l, --list             Generate list file.lst
   -nl, --no-list         No list file
+  -m, --map              Generate address map file.map
+  -nm, --no-map          No address map file
 
 Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)
--m map listing file
 -r<ORG> Explicit relocation <ORG> defined in hex (ignore ORG in first module)
 -plus Interpret 'Invoke' as RST 28h
 -R Generate relocatable code (Automatical relocation before execution)
@@ -341,7 +343,7 @@ t_z80asm_error("defc main = 0x1234\ncall _main",
 t_z80asm_ok(0, "defc main = 0x1234\ncall _main", "\xCD\x34\x12", "-sdcc");
 
 #------------------------------------------------------------------------------
-# -s, --symtable, -ns, --no-symtable
+# -s, --symtable, -ns, --no-symtable, -l, --list, -nl, --no-list
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
@@ -391,6 +393,124 @@ for my $option ('', '-nl', '-s', '--symtable', '-nl -s', '-nl --symtable') {
 	);
 }
 
+#------------------------------------------------------------------------------
+# -m, --map, -nm, --no-map
+#------------------------------------------------------------------------------
+$asm = "
+	define not_shown
+	defc zero=0
+	xdef main
+main: ld b,10
+loop: djnz loop
+x31_x31_x31_x31_x31_x31_x31_x31: defb zero
+x_32_x32_x32_x32_x32_x32_x32_x32: defb zero
+";
+my $asm2 = "
+	define not_shown
+	xdef func
+func: ld b,10
+loop: djnz loop
+	  ret
+";
+$bin = "\x06\x0A\x10\xFE\x00\x00\x06\x0A\x10\xFE\xC9";
+
+
+# -m, no symbols
+unlink_testfiles();
+t_z80asm(
+	asm		=> "ld b,10 : djnz ASMPC : defw 0",
+	asm2	=> "ld b,10 : djnz ASMPC : ret",
+	bin		=> $bin,
+	options	=> '-m',
+);
+ok -f map_file(), map_file();
+eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
+None.
+END
+
+unlink_testfiles();
+t_z80asm(
+	asm		=> "ld b,10 : djnz ASMPC : defw 0",
+	asm2	=> "ld b,10 : djnz ASMPC : ret",
+	bin		=> $bin,
+	options	=> '--map',
+);
+ok -f map_file(), map_file();
+eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
+None.
+END
+
+# -m
+unlink_testfiles();
+t_z80asm(
+	asm		=> $asm,
+	asm2	=> $asm2,
+	bin		=> $bin,
+	options	=> '-m',
+);
+ok -f map_file(), map_file();
+eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
+FUNC                            = 0006, G: TEST2
+LOOP                            = 0002, L: TEST
+LOOP                            = 0008, L: TEST2
+MAIN                            = 0000, G: TEST
+X31_X31_X31_X31_X31_X31_X31_X31 = 0004, L: TEST
+X_32_X32_X32_X32_X32_X32_X32_X32 = 0005, L: TEST
+
+
+MAIN                            = 0000, G: TEST
+LOOP                            = 0002, L: TEST
+X31_X31_X31_X31_X31_X31_X31_X31 = 0004, L: TEST
+X_32_X32_X32_X32_X32_X32_X32_X32 = 0005, L: TEST
+FUNC                            = 0006, G: TEST2
+LOOP                            = 0008, L: TEST2
+END
+
+unlink_testfiles();
+t_z80asm(
+	asm		=> $asm,
+	asm2	=> $asm2,
+	bin		=> $bin,
+	options	=> '--map',
+);
+ok -f map_file(), map_file();
+eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
+FUNC                            = 0006, G: TEST2
+LOOP                            = 0002, L: TEST
+LOOP                            = 0008, L: TEST2
+MAIN                            = 0000, G: TEST
+X31_X31_X31_X31_X31_X31_X31_X31 = 0004, L: TEST
+X_32_X32_X32_X32_X32_X32_X32_X32 = 0005, L: TEST
+
+
+MAIN                            = 0000, G: TEST
+LOOP                            = 0002, L: TEST
+X31_X31_X31_X31_X31_X31_X31_X31 = 0004, L: TEST
+X_32_X32_X32_X32_X32_X32_X32_X32 = 0005, L: TEST
+FUNC                            = 0006, G: TEST2
+LOOP                            = 0008, L: TEST2
+END
+
+
+# -nm
+unlink_testfiles();
+t_z80asm(
+	asm		=> $asm,
+	asm2	=> $asm2,
+	bin		=> $bin,
+	options	=> '-m -nm',
+);
+ok ! -f map_file(), "no ".map_file();
+
+unlink_testfiles();
+t_z80asm(
+	asm		=> $asm,
+	asm2	=> $asm2,
+	bin		=> $bin,
+	options	=> '--map --no-map',
+);
+ok ! -f map_file(), "no ".map_file();
+
 
 
 unlink_testfiles();
@@ -398,7 +518,12 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.7  2013-10-01 23:23:53  pauloscustodio
+# Revision 1.8  2013-10-01 23:46:28  pauloscustodio
+# Parse command line options via look-up tables:
+# -m, --map
+# -nm, --no-map
+#
+# Revision 1.7  2013/10/01 23:23:53  pauloscustodio
 # Parse command line options via look-up tables:
 # -l, --list
 # -nl, --no-list

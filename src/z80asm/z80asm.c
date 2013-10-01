@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.107 2013-10-01 23:23:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.108 2013-10-01 23:46:28 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.107  2013-10-01 23:23:53  pauloscustodio
+/* Revision 1.108  2013-10-01 23:46:28  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -m, --map
+/* -nm, --no-map
+/*
+/* Revision 1.107  2013/10/01 23:23:53  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -l, --list
 /* -nl, --no-list
@@ -1299,15 +1304,11 @@ int main( int argc, char *argv[] )
 
         if ( ! get_num_errors() && z80bin )
         {
-            if ( mapref )
-            {
+            if ( opts.map )
                 write_map_file();
-            }
 
 			if ( globaldef )
-			{
 				write_def_file();
-			}
 
             CreateBinFile();
         }

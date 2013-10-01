@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.36 2013-10-01 23:23:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.37 2013-10-01 23:46:28 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -350,7 +350,6 @@ static void exit_help(void)
 
 	puts(  "" );
     puts( "Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)" );
-    printf( "-m map listing file\n" );
     puts( "-r<ORG> Explicit relocation <ORG> defined in hex (ignore ORG in first module)" );
     puts( "-plus Interpret 'Invoke' as RST 28h" );
     puts( "-R Generate relocatable code (Automatical relocation before execution)" );
@@ -401,7 +400,7 @@ static void display_options(void)
     if ( library == ON )
         puts( "Link library modules with code." );
 
-    if ( z80bin == ON && mapref == ON )
+    if ( z80bin == ON && opts.map )
         puts( "Create address map file." );
 
     if ( codesegment == ON && autorelocate == OFF )
@@ -465,7 +464,12 @@ char *get_segbin_filename( char *filename, int segment )
 
 
 /* $Log: options.c,v $
-/* Revision 1.36  2013-10-01 23:23:53  pauloscustodio
+/* Revision 1.37  2013-10-01 23:46:28  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -m, --map
+/* -nm, --no-map
+/*
+/* Revision 1.36  2013/10/01 23:23:53  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -l, --list
 /* -nl, --no-list
@@ -653,7 +657,6 @@ enum flag codesegment;
 enum flag datestamp;
 enum flag force_xlib;
 enum flag z80bin;
-enum flag mapref;
 enum flag globaldef;
 enum flag autorelocate;
 enum flag deforigin;
@@ -705,7 +708,6 @@ static void reset_options( void )
     datestamp       = OFF;
     force_xlib      = OFF;
     z80bin          = OFF;
-    mapref          = ON;
     globaldef       = OFF;
     autorelocate    = OFF;
     deforigin       = OFF;
@@ -769,7 +771,6 @@ void set_asm_flag( char *flagid )
     else if ( strcmp( flagid, "nb" ) == 0 )
     {
         z80bin = OFF;
-        mapref = OFF;
     }
 
     else if ( strcmp( flagid, "d" ) == 0 )
@@ -787,16 +788,6 @@ void set_asm_flag( char *flagid )
     {
         z80bin = ON;
         datestamp = ON;
-    }
-
-    else if ( strcmp( flagid, "m" ) == 0 )
-    {
-        mapref = ON;
-    }
-
-    else if ( strcmp( flagid, "nm" ) == 0 )
-    {
-        mapref = OFF;
     }
 
     else if ( strcmp( flagid, "g" ) == 0 )

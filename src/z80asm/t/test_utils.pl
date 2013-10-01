@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.48 2013-10-01 22:50:27 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.49 2013-10-01 23:46:28 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -165,7 +165,7 @@ sub t_z80asm {
 		ok -f $_, "$line $_" for (@obj, bin_file());
 		
 		# map file
-		if ($cmd =~ / -nm /) {
+		if ($cmd =~ / (-nm|--no-map) /) {
 			ok ! -f map_file(), "$line no ".map_file();
 		}
 		else {
@@ -1015,7 +1015,12 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.48  2013-10-01 22:50:27  pauloscustodio
+# Revision 1.49  2013-10-01 23:46:28  pauloscustodio
+# Parse command line options via look-up tables:
+# -m, --map
+# -nm, --no-map
+#
+# Revision 1.48  2013/10/01 22:50:27  pauloscustodio
 # Parse command line options via look-up tables:
 # -s, --symtable
 # -ns, --no-symtable
