@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.8 2013-10-01 23:46:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.9 2013-10-02 23:20:44 pauloscustodio Exp $
 #
 # Test options
 
@@ -105,6 +105,8 @@ Output Options:
   -nl, --no-list         No list file
   -m, --map              Generate address map file.map
   -nm, --no-map          No address map file
+  -g, --globaldef        Generate global address definition file.def
+  -ng, --no-globaldef    No global address definition file
 
 Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)
 -r<ORG> Explicit relocation <ORG> defined in hex (ignore ORG in first module)
@@ -114,7 +116,7 @@ Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)
 -b assemble files & link to ORG address. -c split code in 16K banks
 -d date stamp control, assemble only if source file > object file
 -a: -b & -d (assemble only updated source files, then link & relocate)
--o<bin filename> expl. output filename, -g XDEF reloc. addr. from all modules
+-o<bin filename> expl. output filename
 -i<library> include <library> LIB modules with .obj modules during linking
 -x<library> create library from specified modules ( e.g. with @<modules> )
 -t<n> tabulator width for .map, .def, .sym files. Column width is 4 times -t
@@ -170,19 +172,14 @@ Creating map...
 Code generation completed.
 END
 
-unlink_testfiles();
-write_file(asm_file(), " nop \n nop \n nop");
-t_z80asm_capture("-r0 -b -v ".asm_file(), $verbose_text, "", 0);
-ok -f obj_file();
-ok -f bin_file();
-is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
-
-unlink_testfiles();
-write_file(asm_file(), " nop \n nop \n nop");
-t_z80asm_capture("-r0 -b --verbose ".asm_file(), $verbose_text, "", 0);
-ok -f obj_file();
-ok -f bin_file();
-is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
+for my $options ('-v', '--verbose') {
+	unlink_testfiles();
+	write_file(asm_file(), " nop \n nop \n nop");
+	t_z80asm_capture("-r0 -b $options ".asm_file(), $verbose_text, "", 0);
+	ok -f obj_file();
+	ok -f bin_file();
+	is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
+}
 
 # check no arguments
 t_z80asm_capture("-v=x", 	"", 	<<'ERR', 1);
@@ -203,15 +200,12 @@ ERR
 unlink_testfiles();
 write_file(asm_file(), "nop");
 
-t_z80asm_capture("-r0 -b -nv ".asm_file(), "", "", 0);
-ok -f obj_file();
-ok -f bin_file();
-is read_file(bin_file(), binmode => ':raw'), "\0";
-
-t_z80asm_capture("-r0 -b --not-verbose ".asm_file(), "", "", 0);
-ok -f obj_file();
-ok -f bin_file();
-is read_file(bin_file(), binmode => ':raw'), "\0";
+for my $options ('-nv', '--not-verbose') {
+	t_z80asm_capture("-r0 -b $options ".asm_file(), "", "", 0);
+	ok -f obj_file();
+	ok -f bin_file();
+	is read_file(bin_file(), binmode => ':raw'), "\0";
+}
 
 # check no arguments
 t_z80asm_capture("-nv=x", 	"", 	<<'ERR', 1);
@@ -229,41 +223,19 @@ ERR
 #------------------------------------------------------------------------------
 # --asm-ext=EXT, -eEXT
 #------------------------------------------------------------------------------
+my $base = asm_file(); $base =~ s/\.\w+$//;
+
 unlink_testfiles();
 write_file(asm_file(), "ret");
-my $base = asm_file(); $base =~ s/\.\w+$//;
 t_z80asm_capture("-r0 -b ".$base, "", "", 0);
 is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
 
-unlink_testfiles();
-write_file($base.".xxx", "ret");
-t_z80asm_capture("-r0 -b -exxx ".$base, "", "", 0);
-is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
-
-unlink_testfiles();
-write_file($base.".xxx", "ret");
-t_z80asm_capture("-r0 -b -e=xxx ".$base, "", "", 0);
-is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
-
-unlink_testfiles();
-write_file($base.".xxx", "ret");
-t_z80asm_capture("-r0 -b -e xxx ".$base, "", "", 0);
-is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
-
-unlink_testfiles();
-write_file($base.".xxx", "ret");
-t_z80asm_capture("-r0 -b --asm-extxxx ".$base, "", "", 0);
-is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
-
-unlink_testfiles();
-write_file($base.".xxx", "ret");
-t_z80asm_capture("-r0 -b --asm-ext=xxx ".$base, "", "", 0);
-is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
-
-unlink_testfiles();
-write_file($base.".xxx", "ret");
-t_z80asm_capture("-r0 -b --asm-ext xxx ".$base, "", "", 0);
-is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
+for my $options ('-exxx', '-e=xxx', '-e xxx', '--asm-extxxx', '--asm-ext=xxx', '--asm-ext xxx') {
+	unlink_testfiles();
+	write_file($base.".xxx", "ret");
+	t_z80asm_capture("-r0 -b $options $base", "", "", 0);
+	is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
+}
 
 unlink_testfiles($base.".xxx");
 
@@ -283,41 +255,19 @@ ERR
 #------------------------------------------------------------------------------
 # --obj-ext=EXT, -MEXT
 #------------------------------------------------------------------------------
+$base = asm_file(); $base =~ s/\.\w+$//;
+
 unlink_testfiles();
 write_file(asm_file(), "ret");
-$base = asm_file(); $base =~ s/\.\w+$//;
 t_z80asm_capture($base, "", "", 0);
 like read_file(obj_file(), binary => ':raw'), qr/\xC9\z/, "assemble ok";
 
-unlink_testfiles();
-write_file(asm_file(), "ret");
-t_z80asm_capture("-Mo ".$base, "", "", 0);
-like read_file($base.".o", binary => ':raw'), qr/\xC9\z/, "assemble ok";
-
-unlink_testfiles();
-write_file(asm_file(), "ret");
-t_z80asm_capture("-M=o ".$base, "", "", 0);
-like read_file($base.".o", binary => ':raw'), qr/\xC9\z/, "assemble ok";
-
-unlink_testfiles();
-write_file(asm_file(), "ret");
-t_z80asm_capture("-M o ".$base, "", "", 0);
-like read_file($base.".o", binary => ':raw'), qr/\xC9\z/, "assemble ok";
-
-unlink_testfiles();
-write_file(asm_file(), "ret");
-t_z80asm_capture("--obj-exto ".$base, "", "", 0);
-like read_file($base.".o", binary => ':raw'), qr/\xC9\z/, "assemble ok";
-
-unlink_testfiles();
-write_file(asm_file(), "ret");
-t_z80asm_capture("--obj-ext=o ".$base, "", "", 0);
-like read_file($base.".o", binary => ':raw'), qr/\xC9\z/, "assemble ok";
-
-unlink_testfiles();
-write_file(asm_file(), "ret");
-t_z80asm_capture("--obj-ext o ".$base, "", "", 0);
-like read_file($base.".o", binary => ':raw'), qr/\xC9\z/, "assemble ok";
+for my $options ('-Mo', '-M=o', '-M o', '--obj-exto', '--obj-ext=o', '--obj-ext o') {
+	unlink_testfiles();
+	write_file(asm_file(), "ret");
+	t_z80asm_capture("$options $base", "", "", 0);
+	like read_file($base.".o", binary => ':raw'), qr/\xC9\z/, "assemble ok";
+}
 
 unlink_testfiles($base.".o");
 
@@ -360,35 +310,31 @@ my $bin = pack("C*",
 );
 
 # no symbol table, no list
-t_z80asm(
-	asm		=> $asm,
-	bin		=> $bin,
-	options	=> '-nl -ns',
-	nolist	=> 1,
-);
-t_z80asm(
-	asm		=> $asm,
-	bin		=> $bin,
-	options	=> '-nl --no-symtable',
-	nolist	=> 1,
-);
-
-# list file implies no symbol table
-for my $option ('-l', '-l -s', '-l --symtable') {
+for my $options ('-nl -ns', '-nl --no-symtable') {
 	t_z80asm(
 		asm		=> $asm,
 		bin		=> $bin,
-		options	=> $option,
+		options	=> $options,
+		nolist	=> 1,
+	);
+}
+
+# list file implies no symbol table
+for my $options ('-l', '-l -s', '-l --symtable') {
+	t_z80asm(
+		asm		=> $asm,
+		bin		=> $bin,
+		options	=> $options,
 		nolist	=> 1,
 	);
 }
 
 # no list file implies symbol table
-for my $option ('', '-nl', '-s', '--symtable', '-nl -s', '-nl --symtable') {
+for my $options ('', '-nl', '-s', '--symtable', '-nl -s', '-nl --symtable') {
 	t_z80asm(
 		asm		=> $asm,
 		bin		=> $bin,
-		options	=> $option,
+		options	=> $options,
 		nolist	=> 1,
 	);
 }
@@ -416,40 +362,29 @@ $bin = "\x06\x0A\x10\xFE\x00\x00\x06\x0A\x10\xFE\xC9";
 
 
 # -m, no symbols
-unlink_testfiles();
-t_z80asm(
-	asm		=> "ld b,10 : djnz ASMPC : defw 0",
-	asm2	=> "ld b,10 : djnz ASMPC : ret",
-	bin		=> $bin,
-	options	=> '-m',
-);
-ok -f map_file(), map_file();
-eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
+for my $options ('-m', '--map') {
+	t_z80asm(
+		asm		=> "ld b,10 : djnz ASMPC : defw 0",
+		asm2	=> "ld b,10 : djnz ASMPC : ret",
+		bin		=> $bin,
+		options	=> $options,
+	);
+	ok -f map_file(), map_file();
+	eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
 None.
 END
-
-unlink_testfiles();
-t_z80asm(
-	asm		=> "ld b,10 : djnz ASMPC : defw 0",
-	asm2	=> "ld b,10 : djnz ASMPC : ret",
-	bin		=> $bin,
-	options	=> '--map',
-);
-ok -f map_file(), map_file();
-eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
-None.
-END
+}
 
 # -m
-unlink_testfiles();
-t_z80asm(
-	asm		=> $asm,
-	asm2	=> $asm2,
-	bin		=> $bin,
-	options	=> '-m',
-);
-ok -f map_file(), map_file();
-eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
+for my $options ('-m', '--map') {
+	t_z80asm(
+		asm		=> $asm,
+		asm2	=> $asm2,
+		bin		=> $bin,
+		options	=> $options,
+	);
+	ok -f map_file(), map_file();
+	eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
 FUNC                            = 0006, G: TEST2
 LOOP                            = 0002, L: TEST
 LOOP                            = 0008, L: TEST2
@@ -465,60 +400,74 @@ X_32_X32_X32_X32_X32_X32_X32_X32 = 0005, L: TEST
 FUNC                            = 0006, G: TEST2
 LOOP                            = 0008, L: TEST2
 END
-
-unlink_testfiles();
-t_z80asm(
-	asm		=> $asm,
-	asm2	=> $asm2,
-	bin		=> $bin,
-	options	=> '--map',
-);
-ok -f map_file(), map_file();
-eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
-FUNC                            = 0006, G: TEST2
-LOOP                            = 0002, L: TEST
-LOOP                            = 0008, L: TEST2
-MAIN                            = 0000, G: TEST
-X31_X31_X31_X31_X31_X31_X31_X31 = 0004, L: TEST
-X_32_X32_X32_X32_X32_X32_X32_X32 = 0005, L: TEST
-
-
-MAIN                            = 0000, G: TEST
-LOOP                            = 0002, L: TEST
-X31_X31_X31_X31_X31_X31_X31_X31 = 0004, L: TEST
-X_32_X32_X32_X32_X32_X32_X32_X32 = 0005, L: TEST
-FUNC                            = 0006, G: TEST2
-LOOP                            = 0008, L: TEST2
-END
-
+}
 
 # -nm
-unlink_testfiles();
-t_z80asm(
-	asm		=> $asm,
-	asm2	=> $asm2,
-	bin		=> $bin,
-	options	=> '-m -nm',
-);
-ok ! -f map_file(), "no ".map_file();
+for my $options ('-m -nm', '--map --no-map') {
+	t_z80asm(
+		asm		=> $asm,
+		asm2	=> $asm2,
+		bin		=> $bin,
+		options	=> $options,
+	);
+	ok ! -f map_file(), "no ".map_file();
+}
 
-unlink_testfiles();
-t_z80asm(
-	asm		=> $asm,
-	asm2	=> $asm2,
-	bin		=> $bin,
-	options	=> '--map --no-map',
-);
-ok ! -f map_file(), "no ".map_file();
+#------------------------------------------------------------------------------
+# -g, --globaldef, -ng, --no-globaldef
+#------------------------------------------------------------------------------
+$asm = "
+	xdef main, x31_x31_x31_x31_x31_x31_x31_x31, x_32_x32_x32_x32_x32_x32_x32_x32
+main: ld b,10
+loop: djnz loop
+x31_x31_x31_x31_x31_x31_x31_x31: defb 0
+x_32_x32_x32_x32_x32_x32_x32_x32: defb 0
+";
+$asm2 = "
+	xdef func
+func: ret
+";
+$bin = "\x06\x0A\x10\xFE\x00\x00\xC9";
 
+# -g
+for my $options ('-g', '--globaldef') {
+	t_z80asm(
+		asm		=> $asm,
+		asm2	=> $asm2,
+		bin		=> $bin,
+		options	=> $options,
+	);
+	ok -f def_file(), def_file();
+	eq_or_diff scalar(read_file(def_file())), <<'END', "deffile contents";
+DEFC MAIN                            = $0000 ; Module TEST
+DEFC X31_X31_X31_X31_X31_X31_X31_X31 = $0004 ; Module TEST
+DEFC X_32_X32_X32_X32_X32_X32_X32_X32 = $0005 ; Module TEST
+DEFC FUNC                            = $0006 ; Module TEST2
+END
+}
 
+# -ng
+for my $options ('-g -ng', '--globaldef --no-globaldef') {
+	t_z80asm(
+		asm		=> $asm,
+		asm2	=> $asm2,
+		bin		=> $bin,
+		options	=> $options,
+	);
+	ok ! -f def_file(), "no ".def_file();
+}
 
 unlink_testfiles();
 done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.8  2013-10-01 23:46:28  pauloscustodio
+# Revision 1.9  2013-10-02 23:20:44  pauloscustodio
+# Parse command line options via look-up tables:
+# -g, --globaldef
+# -ng, --no-globaldef
+#
+# Revision 1.8  2013/10/01 23:46:28  pauloscustodio
 # Parse command line options via look-up tables:
 # -m, --map
 # -nm, --no-map

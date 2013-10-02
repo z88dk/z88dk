@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.37 2013-10-01 23:46:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.38 2013-10-02 23:20:43 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -357,7 +357,7 @@ static void exit_help(void)
     puts( "-b assemble files & link to ORG address. -c split code in 16K banks" );
     puts( "-d date stamp control, assemble only if source file > object file" );
     puts( "-a: -b & -d (assemble only updated source files, then link & relocate)" );
-    puts( "-o<bin filename> expl. output filename, -g XDEF reloc. addr. from all modules" );
+    puts( "-o<bin filename> expl. output filename" );
     printf( "-i<library> include <library> LIB modules with %s%s modules during linking\n", 
 		   FILEEXT_SEPARATOR, opts.obj_ext );
     puts( "-x<library> create library from specified modules ( e.g. with @<modules> )" );
@@ -388,7 +388,7 @@ static void display_options(void)
     if ( opts.list )
         puts( "Create listing file." );
 
-    if ( globaldef == ON )
+    if ( opts.globaldef )
         puts( "Create global definition file." );
 
     if ( createlibrary == ON )
@@ -464,7 +464,12 @@ char *get_segbin_filename( char *filename, int segment )
 
 
 /* $Log: options.c,v $
-/* Revision 1.37  2013-10-01 23:46:28  pauloscustodio
+/* Revision 1.38  2013-10-02 23:20:43  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -g, --globaldef
+/* -ng, --no-globaldef
+/*
+/* Revision 1.37  2013/10/01 23:46:28  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -m, --map
 /* -nm, --no-map
@@ -657,7 +662,6 @@ enum flag codesegment;
 enum flag datestamp;
 enum flag force_xlib;
 enum flag z80bin;
-enum flag globaldef;
 enum flag autorelocate;
 enum flag deforigin;
 enum flag expl_binflnm;
@@ -708,7 +712,6 @@ static void reset_options( void )
     datestamp       = OFF;
     force_xlib      = OFF;
     z80bin          = OFF;
-    globaldef       = OFF;
     autorelocate    = OFF;
     deforigin       = OFF;
     expl_binflnm    = OFF;
@@ -788,16 +791,6 @@ void set_asm_flag( char *flagid )
     {
         z80bin = ON;
         datestamp = ON;
-    }
-
-    else if ( strcmp( flagid, "g" ) == 0 )
-    {
-        globaldef = ON;
-    }
-
-    else if ( strcmp( flagid, "ng" ) == 0 )
-    {
-        globaldef = OFF;
     }
 
     else if ( strcmp( flagid, "R" ) == 0 )
