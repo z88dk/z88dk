@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.38 2013-10-02 23:20:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.39 2013-10-02 23:34:44 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -277,17 +277,24 @@ static void parse_files(int arg, int argc, char *argv[],
 *----------------------------------------------------------------------------*/
 #define OPT_TITLE(text)		puts(""); puts(text);
 #define OPT(type, arg, short_opt, long_opt, help_text, help_arg) \
-							show_option(short_opt, long_opt, help_text, help_arg);
+							show_option(type, (BOOL *)arg, \
+										short_opt, long_opt, help_text, help_arg);
 
 #define ALIGN_HELP	24
 
-static void show_option(char *short_opt, char *long_opt, char *help_text, char *help_arg)
+static void show_option(enum OptType type, BOOL *pflag, 
+						char *short_opt, char *long_opt, char *help_text, char *help_arg)
 {
 	char msg[ MAXLINE ];
 	int count_opts = 0;
 
-	g_snprintf( msg, sizeof(msg), 
-				"  " );
+	/* show default option */
+	if ( type == OptSet   &&   *pflag ||
+		 type == OptClear && ! *pflag )
+		g_snprintf( msg, sizeof(msg), "* " );
+	else
+		g_snprintf( msg, sizeof(msg), "  " );
+
 	if ( *short_opt )
 	{
 		g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
@@ -364,7 +371,7 @@ static void exit_help(void)
     printf( "-t<n> tabulator width for %s, %s, %s files. Column width is 4 times -t\n", FILEEXT_MAP, FILEEXT_DEF, FILEEXT_SYM );
     printf( "-I<path> additional path to search for includes\n" );
     printf( "-L<path> path to search for libraries\n" );
-    puts( "Default options: -nv -nd -nb -nl -s -m -ng -nc -nR -t8" );
+    puts( "Default options: -nd -nb -nc -nR -t8" );
 
 	exit(0);
 }
@@ -464,7 +471,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 
 /* $Log: options.c,v $
-/* Revision 1.38  2013-10-02 23:20:43  pauloscustodio
+/* Revision 1.39  2013-10-02 23:34:44  pauloscustodio
+/* Parse command line options via look-up tables:
+/* show default option in help
+/*
+/* Revision 1.38  2013/10/02 23:20:43  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -g, --globaldef
 /* -ng, --no-globaldef

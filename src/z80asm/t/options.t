@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.9 2013-10-02 23:20:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.10 2013-10-02 23:34:44 pauloscustodio Exp $
 #
 # Test options
 
@@ -89,7 +89,7 @@ Usage:
 Help Options:
   -h, --help             Show help options
   -v, --verbose          Be verbose
-  -nv, --not-verbose     Be silent
+* -nv, --not-verbose     Be silent
 
 Input Options:
   -e, --asm-ext=EXT      ASM file extension, excluding '.'
@@ -99,14 +99,14 @@ Code Generation Options:
   -sdcc                  Assemble for Small Device C Compiler
 
 Output Options:
-  -s, --symtable         Generate symbol table file.sym
+* -s, --symtable         Generate symbol table file.sym
   -ns, --no-symtable     No symbol table file
   -l, --list             Generate list file.lst
-  -nl, --no-list         No list file
-  -m, --map              Generate address map file.map
+* -nl, --no-list         No list file
+* -m, --map              Generate address map file.map
   -nm, --no-map          No address map file
   -g, --globaldef        Generate global address definition file.def
-  -ng, --no-globaldef    No global address definition file
+* -ng, --no-globaldef    No global address definition file
 
 Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)
 -r<ORG> Explicit relocation <ORG> defined in hex (ignore ORG in first module)
@@ -122,7 +122,7 @@ Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)
 -t<n> tabulator width for .map, .def, .sym files. Column width is 4 times -t
 -I<path> additional path to search for includes
 -L<path> path to search for libraries
-Default options: -nv -nd -nb -nl -s -m -ng -nc -nR -t8
+Default options: -nd -nb -nc -nR -t8
 END
 
 unlink_testfiles();
@@ -462,7 +462,11 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.9  2013-10-02 23:20:44  pauloscustodio
+# Revision 1.10  2013-10-02 23:34:44  pauloscustodio
+# Parse command line options via look-up tables:
+# show default option in help
+#
+# Revision 1.9  2013/10/02 23:20:44  pauloscustodio
 # Parse command line options via look-up tables:
 # -g, --globaldef
 # -ng, --no-globaldef
