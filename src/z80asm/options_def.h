@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.9 2013-10-02 23:42:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.10 2013-10-02 23:43:57 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -77,3 +77,12 @@ OPT( OptClear,	&opts.globaldef,"-ng", 	"--no-globaldef","No global address defin
 #undef OPT_VAR
 #undef OPT_TITLE
 #undef OPT
+
+
+/*
+$Log: options_def.h,v $
+Revision 1.10  2013-10-02 23:43:57  pauloscustodio
+add log
+
+*/
+
