@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.8 2013-10-02 23:20:44 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.9 2013-10-02 23:42:09 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -59,7 +59,7 @@ OPT( OptString,	&opts.asm_ext,	"-e", 	"--asm-ext", 	"ASM file extension, excludi
 OPT( OptString,	&opts.obj_ext,	"-M", 	"--obj-ext", 	"OBJ file extension, excluding '.'", "EXT" )
 
 OPT_TITLE(	"Code Generation Options:" )
-OPT( OptSet,	&opts.sdcc,		"-sdcc","", 			"Assemble for Small Device C Compiler", "" )
+OPT( OptSet,	&opts.sdcc,		"-sdcc","--sdcc",		"Assemble for Small Device C Compiler", "" )
 
 OPT_TITLE(	"Output Options:" )
 OPT( OptSet,	&opts.symtable,	"-s", 	"--symtable", 	"Generate symbol table file" FILEEXT_SYM, "" )

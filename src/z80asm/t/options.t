@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.10 2013-10-02 23:34:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.11 2013-10-02 23:42:09 pauloscustodio Exp $
 #
 # Test options
 
@@ -96,7 +96,7 @@ Input Options:
   -M, --obj-ext=EXT      OBJ file extension, excluding '.'
 
 Code Generation Options:
-  -sdcc                  Assemble for Small Device C Compiler
+  -sdcc, --sdcc          Assemble for Small Device C Compiler
 
 Output Options:
 * -s, --symtable         Generate symbol table file.sym
@@ -290,7 +290,9 @@ ERR
 unlink_testfiles();
 t_z80asm_error("defc main = 0x1234\ncall _main", 
 		"Error at file 'test.asm' module 'TEST' line 2: symbol not defined");
-t_z80asm_ok(0, "defc main = 0x1234\ncall _main", "\xCD\x34\x12", "-sdcc");
+for my $options ('-sdcc', '--sdcc') {
+	t_z80asm_ok(0, "defc main = 0x1234\ncall _main", "\xCD\x34\x12", $options);
+}
 
 #------------------------------------------------------------------------------
 # -s, --symtable, -ns, --no-symtable, -l, --list, -nl, --no-list
@@ -462,7 +464,11 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.10  2013-10-02 23:34:44  pauloscustodio
+# Revision 1.11  2013-10-02 23:42:09  pauloscustodio
+# Parse command line options via look-up tables:
+# add --sdcc in addition to -sdcc, for consistency
+#
+# Revision 1.10  2013/10/02 23:34:44  pauloscustodio
 # Parse command line options via look-up tables:
 # show default option in help
 #
