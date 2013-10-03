@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.11 2013-10-03 00:01:44 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.12 2013-10-03 21:58:41 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -42,6 +42,7 @@ OPT_VAR(	BOOL,	cur_list,	FALSE 	)			/* current LSTON/LSTOFF status */
 OPT_VAR(	BOOL,	map,		TRUE 	)
 OPT_VAR(	BOOL,	sdcc,		FALSE	)
 OPT_VAR(	BOOL,	globaldef,	FALSE	)
+OPT_VAR(	BOOL,	make_bin,	FALSE	)
 
 OPT_VAR(	char *,	asm_ext,	(FILEEXT_ASM)+1 )	/* skip "." */
 OPT_VAR(	char *,	obj_ext,	(FILEEXT_OBJ)+1 )	/* skip "." */
@@ -62,12 +63,19 @@ OPT_TITLE(	"Code Generation Options:" )
 OPT( OptSet,	&opts.sdcc,		"-sdcc","--sdcc",		"Assemble for Small Device C Compiler", "" )
 
 OPT_TITLE(	"Output Options:" )
+
+OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 	"Link and relocate object files to file" FILEEXT_BIN, "" )
+OPT( OptClear,	&opts.make_bin,	"-nb", 	"--no-make-bin","No binary file", "" )
+
 OPT( OptSet,	&opts.symtable,	"-s", 	"--symtable", 	"Generate symbol table file" FILEEXT_SYM, "" )
 OPT( OptClear,	&opts.symtable,	"-ns", 	"--no-symtable","No symbol table file", "" )
+
 OPT( OptSet,	&opts.list,		"-l", 	"--list", 		"Generate list file" FILEEXT_LST, "" )
 OPT( OptClear,	&opts.list,		"-nl", 	"--no-list",	"No list file", "" )
+
 OPT( OptSet,	&opts.map,		"-m", 	"--map", 		"Generate address map file" FILEEXT_MAP, "" )
 OPT( OptClear,	&opts.map,		"-nm", 	"--no-map",		"No address map file", "" )
+
 OPT( OptSet,	&opts.globaldef,"-g", 	"--globaldef", 	"Generate global address definition file" FILEEXT_DEF, "" )
 OPT( OptClear,	&opts.globaldef,"-ng", 	"--no-globaldef","No global address definition file", "" )
 
@@ -81,8 +89,10 @@ OPT( OptClear,	&opts.globaldef,"-ng", 	"--no-globaldef","No global address defin
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.11  2013-10-03 00:01:44  pauloscustodio
-* log
+* Revision 1.12  2013-10-03 21:58:41  pauloscustodio
+* Parse command line options via look-up tables:
+* -b, --make-bin
+* -nb, --no-make-bin
 *
 * Revision 1.10  2013/10/02 23:43:57  pauloscustodio
 * add log

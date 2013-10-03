@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.40 2013-10-03 00:04:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.41 2013-10-03 21:58:41 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -176,6 +176,12 @@ static BOOL process_opt(int *parg, int argc, char *argv[])
 					error_illegal_option( argv[i] );
 				else
 					((void (*)(void))(opts_lu[j].arg)) ();
+				break;
+
+			case OptCallArg:
+				opt_arg_ptr = get_opt_arg( opt_arg_ptr, parg, argc, argv );
+				if ( opt_arg_ptr )
+					((void (*)(char *))(opts_lu[j].arg)) ( opt_arg_ptr );
 				break;
 
 			case OptString:
@@ -401,13 +407,13 @@ static void display_options(void)
     if ( createlibrary == ON )
         puts( "Create library from specified modules." );
 
-    if ( z80bin == ON )
+    if ( opts.make_bin )
         puts( "Link/relocate assembled modules." );
 
     if ( library == ON )
         puts( "Link library modules with code." );
 
-    if ( z80bin == ON && opts.map )
+    if ( opts.make_bin && opts.map )
         puts( "Create address map file." );
 
     if ( codesegment == ON && autorelocate == OFF )
@@ -472,7 +478,12 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.40  2013-10-03 00:04:38  pauloscustodio
+* Revision 1.41  2013-10-03 21:58:41  pauloscustodio
+* Parse command line options via look-up tables:
+* -b, --make-bin
+* -nb, --no-make-bin
+*
+* Revision 1.40  2013/10/03 00:04:38  pauloscustodio
 * log
 *
 * Revision 1.39  2013/10/02 23:34:44  pauloscustodio
@@ -675,7 +686,6 @@ long clineno;
 enum flag codesegment;
 enum flag datestamp;
 enum flag force_xlib;
-enum flag z80bin;
 enum flag autorelocate;
 enum flag deforigin;
 enum flag expl_binflnm;
@@ -725,7 +735,6 @@ static void reset_options( void )
     codesegment     = OFF;
     datestamp       = OFF;
     force_xlib      = OFF;
-    z80bin          = OFF;
     autorelocate    = OFF;
     deforigin       = OFF;
     expl_binflnm    = OFF;
@@ -780,16 +789,6 @@ void set_asm_flag( char *flagid )
         force_xlib = ON;
     }
 
-    else if ( strcmp( flagid, "b" ) == 0 )
-    {
-        z80bin = ON;            /* perform address relocation & linking */
-    }
-
-    else if ( strcmp( flagid, "nb" ) == 0 )
-    {
-        z80bin = OFF;
-    }
-
     else if ( strcmp( flagid, "d" ) == 0 )
     {
         datestamp = ON;         /* assemble only if source > object file */
@@ -803,7 +802,7 @@ void set_asm_flag( char *flagid )
     /* -b, -d */
     else if ( strcmp( flagid, "a" ) == 0 )
     {
-        z80bin = ON;
+        opts.make_bin = TRUE;
         datestamp = ON;
     }
 

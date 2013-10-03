@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.11 2013-10-02 23:42:09 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.12 2013-10-03 21:58:41 pauloscustodio Exp $
 #
 # Test options
 
@@ -99,6 +99,8 @@ Code Generation Options:
   -sdcc, --sdcc          Assemble for Small Device C Compiler
 
 Output Options:
+  -b, --make-bin         Link and relocate object files to file.bin
+* -nb, --no-make-bin     No binary file
 * -s, --symtable         Generate symbol table file.sym
   -ns, --no-symtable     No symbol table file
   -l, --list             Generate list file.lst
@@ -459,12 +461,45 @@ for my $options ('-g -ng', '--globaldef --no-globaldef') {
 	ok ! -f def_file(), "no ".def_file();
 }
 
+#------------------------------------------------------------------------------
+# -b, --make-bin, -nb, --no-make-bin
+#------------------------------------------------------------------------------
+
+# -b
+for my $options ('-b', '--make-bin') {
+	unlink_testfiles();
+	write_file(asm_file(), "nop");
+
+	t_z80asm_capture("-r0 $options ".asm_file(), "", "", 0);
+	ok -f obj_file();
+	ok -f bin_file();
+	ok -f map_file();
+	is read_file(bin_file(), binmode => ':raw'), "\0";
+}
+
+# -nb
+for my $options ('-b -nb', '--make-bin --no-make-bin') {
+	unlink_testfiles();
+	write_file(asm_file(), "nop");
+
+	t_z80asm_capture("$options ".asm_file(), "", "", 0);
+	ok -f obj_file();
+	ok ! -f map_file();
+	ok ! -f bin_file();
+}
+
+
 unlink_testfiles();
 done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.11  2013-10-02 23:42:09  pauloscustodio
+# Revision 1.12  2013-10-03 21:58:41  pauloscustodio
+# Parse command line options via look-up tables:
+# -b, --make-bin
+# -nb, --no-make-bin
+#
+# Revision 1.11  2013/10/02 23:42:09  pauloscustodio
 # Parse command line options via look-up tables:
 # add --sdcc in addition to -sdcc, for consistency
 #

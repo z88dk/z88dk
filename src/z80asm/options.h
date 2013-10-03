@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.22 2013-10-03 00:04:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.23 2013-10-03 21:58:41 pauloscustodio Exp $
 */
 
 #pragma once
@@ -25,7 +25,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.22 2013-10-03 00
 #include "types.h"
 
 
-enum OptType { OptClear, OptSet, OptCall, OptString };
+enum OptType { OptClear, OptSet, OptCall, OptCallArg, OptString };
 
 /*-----------------------------------------------------------------------------
 *   singleton opts
@@ -65,7 +65,12 @@ extern char *get_map_filename( char *filename );
 
 /* 
 * $Log: options.h,v $
-* Revision 1.22  2013-10-03 00:04:38  pauloscustodio
+* Revision 1.23  2013-10-03 21:58:41  pauloscustodio
+* Parse command line options via look-up tables:
+* -b, --make-bin
+* -nb, --no-make-bin
+*
+* Revision 1.22  2013/10/03 00:04:38  pauloscustodio
 * log
 *
 * Revision 1.21  2013/10/02 23:20:43  pauloscustodio
@@ -181,7 +186,6 @@ extern long clineno;
 extern enum flag codesegment;
 extern enum flag datestamp;
 extern enum flag force_xlib;
-extern enum flag z80bin;
 extern enum flag autorelocate;
 extern enum flag deforigin;
 extern enum flag expl_binflnm;

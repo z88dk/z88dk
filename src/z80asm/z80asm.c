@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.109 2013-10-02 23:20:44 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.110 2013-10-03 21:58:41 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.109  2013-10-02 23:20:44  pauloscustodio
+/* Revision 1.110  2013-10-03 21:58:41  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -b, --make-bin
+/* -nb, --no-make-bin
+/*
+/* Revision 1.109  2013/10/02 23:20:44  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -g, --globaldef
 /* -ng, --no-globaldef
@@ -1302,12 +1307,12 @@ int main( int argc, char *argv[] )
             printf( "Total of %ld lines assembled.\n", TOTALLINES );
         }
 
-        if ( ! get_num_errors() && z80bin )
+        if ( ! get_num_errors() && opts.make_bin )
         {
             LinkModules();
         }
 
-        if ( ! get_num_errors() && z80bin )
+        if ( ! get_num_errors() && opts.make_bin )
         {
             if ( opts.map )
                 write_map_file();
