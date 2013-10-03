@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.43 2013-10-03 22:35:21 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.44 2013-10-03 22:54:06 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -45,6 +45,8 @@ static void reset_options( void );
 static void exit_help(void);
 static void exit_copyright(void);
 static void display_options(void);
+static void option_make_updated_bin(void);
+
 static void parse_options(int *parg, int argc, char *argv[]);
 static void parse_files(int arg, int argc, char *argv[], 
  			            void (*process_file)(char *filename) );
@@ -368,7 +370,6 @@ static void exit_help(void)
     puts( "-R Generate relocatable code (Automatical relocation before execution)" );
     puts( "-D<symbol> define symbol as logically TRUE (used for conditional assembly)" );
     puts( "-c split code in 16K banks" );
-    puts( "-a: -b & -d (assemble only updated source files, then link & relocate)" );
     printf( "-i<library> include <library> LIB modules with %s%s modules during linking\n", 
 		   FILEEXT_SEPARATOR, opts.obj_ext );
     puts( "-x<library> create library from specified modules ( e.g. with @<modules> )" );
@@ -424,6 +425,14 @@ static void display_options(void)
 }
 
 /*-----------------------------------------------------------------------------
+*   Option functions called from Opts table
+*----------------------------------------------------------------------------*/
+static void option_make_updated_bin(void)
+{
+    opts.make_bin = opts.date_stamp = TRUE;
+}
+
+/*-----------------------------------------------------------------------------
 *   Change extension of given file name, return pointer to file name in
 *	strpool
 *	Extensions may be changed by options.
@@ -476,7 +485,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.43  2013-10-03 22:35:21  pauloscustodio
+* Revision 1.44  2013-10-03 22:54:06  pauloscustodio
+* Parse command line options via look-up tables:
+* -a, --make-updated-bin
+*
+* Revision 1.43  2013/10/03 22:35:21  pauloscustodio
 * Parse command line options via look-up tables:
 * -d, --date-stamp
 * -nd, --no-date-stamp
@@ -789,12 +802,6 @@ void set_asm_flag( char *flagid )
     else if ( strcmp( flagid, "forcexlib" ) == 0 )
     {
         force_xlib = ON;
-    }
-
-    /* -b, -d */
-    else if ( strcmp( flagid, "a" ) == 0 )
-    {
-        opts.make_bin = opts.date_stamp = TRUE;
     }
 
     else if ( strcmp( flagid, "R" ) == 0 )

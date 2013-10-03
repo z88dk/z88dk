@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.14 2013-10-03 22:35:21 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.15 2013-10-03 22:54:06 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -67,11 +67,14 @@ OPT( OptSet,	&opts.sdcc,		"-sdcc","--sdcc",		"Assemble for Small Device C Compil
 
 OPT_TITLE(	"Output Options:" )
 
-OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 	"Link and relocate object files to file" FILEEXT_BIN, "" )
+OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 	"Assemble files and link objects to file" FILEEXT_BIN, "" )
 OPT( OptClear,	&opts.make_bin,	"-nb", 	"--no-make-bin","No binary file", "" )
 
-OPT( OptSet,	&opts.date_stamp,"-d", 	"--date-stamp", "Assemble only if source older than object", "" )
+OPT( OptSet,	&opts.date_stamp,"-d", 	"--date-stamp", "Assemble only updated files", "" )
 OPT( OptClear,	&opts.date_stamp,"-nd", "--no-date-stamp","No date stamp", "" )
+
+OPT( OptCall,	option_make_updated_bin,
+								"-a", "--make-updated-bin","Assemble updated files and link objects to file" FILEEXT_BIN, "" )
 
 OPT_TITLE(	"Other Output File Options:" )
 
@@ -97,7 +100,11 @@ OPT( OptClear,	&opts.globaldef,"-ng", 	"--no-globaldef","No global address defin
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.14  2013-10-03 22:35:21  pauloscustodio
+* Revision 1.15  2013-10-03 22:54:06  pauloscustodio
+* Parse command line options via look-up tables:
+* -a, --make-updated-bin
+*
+* Revision 1.14  2013/10/03 22:35:21  pauloscustodio
 * Parse command line options via look-up tables:
 * -d, --date-stamp
 * -nd, --no-date-stamp
