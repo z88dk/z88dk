@@ -19,7 +19,7 @@
  *
  *      stefano - 22/10/2012
  *
- *	$Id: bgi.h,v 1.2 2013-09-30 15:10:34 stefano Exp $
+ *	$Id: bgi.h,v 1.3 2013-10-03 11:45:40 stefano Exp $
  */
 
 #ifndef __BGI_H__
@@ -94,7 +94,6 @@ char bgi_font[]="9xxxxx";
 int bgi_x;
 int bgi_y;
 
-#define setviewport(a,b,c,d,e) {}
 //#define initgraph(a,b,c)	bgi_display=XOpenDisplay(NULL);bgi_screen=DefaultScreen(bgi_display);bgi_win=XCreateSimpleWindow(bgi_display,RootWindow(bgi_display,bgi_screen),0,0,DisplayWidth(bgi_display,bgi_screen)-4,DisplayHeight(bgi_display,bgi_screen)-4,4,BlackPixel(bgi_display,bgi_screen),WhitePixel(bgi_display,bgi_screen));XMapWindow(bgi_display,bgi_win)
 #define initgraph(a,b,c)	clg();bgi_mywin.a_x=bgi_mywin.a_y=0;bgi_gc=XCreateGC(bgi_display,0,0,0);bgi_font_info=XLoadQueryFont(0,"9");XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
 #define detectgraph(a,b)	{}
@@ -112,8 +111,19 @@ int bgi_y;
 
 
 #define	settextjustify(a,b)	{}
-//#define setviewport(vp) {}
-#define getviewsettings(vp) {}
+
+#define getviewsettings(vp) (vp)->right=intvp->right;(vp)->bottom=intvp->bottom;(vp)->top=intvp->top;(vp)->left=intvp->left
+#define setviewport(l,t,r,b,c) intvp->left=l;intvp->top=t;intvp->right=r;intvp->bottom=b
+
+struct viewporttype {
+    int left;
+    int top;
+    int right;
+    int bottom;
+    int clip;
+};
+
+struct viewporttype intvp;
 
 typedef struct arccoordstype {
     int x;
@@ -123,8 +133,6 @@ typedef struct arccoordstype {
     int xend;
     int yend;
 } arccoordstype;
-
-//typedef char fillpatterntype[8];
 
 struct fillsettingstype {
     int pattern;
@@ -150,13 +158,6 @@ struct textsettingstype {
     int vert;
 };
 
-struct viewporttype {
-    int left;
-    int top;
-    int right;
-    int bottom;
-    int clip;
-};
 
 
 #ifndef GFXSCALEY
@@ -169,14 +170,16 @@ struct viewporttype {
 //#define	linerel(a,b)	drawr(a*GFXSCALEX,b*GFXSCALEY)
 #define	rectangle(a,b,c,d)	drawb((a)*GFXSCALEX,(b)*GFXSCALEY,((c)-(a))*GFXSCALEX,((d)-(b))*GFXSCALEY)
 #define	bar(a,b,c,d)	drawb((a)*GFXSCALEX,(b)*GFXSCALEY,((c)-(a))*GFXSCALEX,((d)-(b))*GFXSCALEY);fill((a)*GFXSCALEX+1,(b)*GFXSCALEY+1);xorborder((a)*GFXSCALEX+1,(b)*GFXSCALEY+1,((c)-(a)+1)*GFXSCALEX+2,((d)-(b)+1)*GFXSCALEY+2)
+#define	bar3d(a,b,c,d,e,f) bar(a,b,c,d)
 //#define	circle(a,b,c)	circle(a*GFXSCALEX,b*GFXSCALEY,c*GFXSCALEX,1)
 #define	ellipse(a,b,c,d,e,f)	ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,c,d,(e)*GFXSCALEX,(f)*GFXSCALEY)
-#define	circle(a,b,c)	ellipse(a,b,0,360,c,c)
+//#define	circle(a,b,c)	ellipse(a,b,0,360,c,c)
 #define	circle(a,b,c) polygon((a)*GFXSCALEX,(b)*GFXSCALEY,180,(c)*GFXSCALEY,0);
 //#define	ellipse(a,b,c,d,e,f)	plot((a-e)*GFXSCALEX,b*GFXSCALEY);drawr(e*GFXSCALEX,f*GFXSCALEY);drawr(e*GFXSCALEX,-f*GFXSCALEY);drawr(-e*GFXSCALEX,-f*GFXSCALEY);drawr(-e*GFXSCALEX,f*GFXSCALEY)
 //#define	ellipse(a,b,c,d,e,f)	ellipse(a*GFXSCALEX,b*GFXSCALEY,c*GFXSCALEX,d*GFXSCALEY,e*GFXSCALEX,f*GFXSCALEY)
-#define	sector(a,b,c,d,e,f)	plot(((a)-(e))*GFXSCALEX,(b)*GFXSCALEY);drawr((e)*GFXSCALEX,(f)*GFXSCALEY);drawr((e)*GFXSCALEX,-(f)*GFXSCALEY);drawr(-(e)*GFXSCALEX,-(f)*GFXSCALEY);drawr(-(e)*GFXSCALEX,(f)*GFXSCALEY);fill(((a)-(e)/2)*GFXSCALEX,(b)*GFXSCALEY);
-//#define	fillellipse(a,b,c,d)	ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,1,350,(c)*GFXSCALEX,(d)*GFXSCALEY);plot((a)*GFXSCALEX,(b)*GFXSCALEY)
+//#define	sector(a,b,c,d,e,f)	plot(((a)-(e))*GFXSCALEX,(b)*GFXSCALEY);drawr((e)*GFXSCALEX,(f)*GFXSCALEY);drawr((e)*GFXSCALEX,-(f)*GFXSCALEY);drawr(-(e)*GFXSCALEX,-(f)*GFXSCALEY);drawr(-(e)*GFXSCALEX,(f)*GFXSCALEY);fill(((a)-(e)/2)*GFXSCALEX,(b)*GFXSCALEY);
+//#define	sector(a,b,c,d,e,f)	ellipse(a,b,360-d,360-c,e,f);drawto((a)*GFXSCALEX,(b)*GFXSCALEY)
+#define	sector(a,b,c,d,e,f)	ellipse(a,b,360-d,360-c,e,f);drawto(a*GFXSCALEX,b*GFXSCALEY);drawto((a+icos(360-d)*e/256)*GFXSCALEX,(b+isin(360-d)*f/256)*GFXSCALEY);fill((a+icos(358-c)*(e-2)/256)*GFXSCALEX,(b+isin(358-c)*(f-2)/256)*GFXSCALEY)
 #define	fillellipse(a,b,c,d)	ellipse(a,b,0,360,c,d)
 #define	line(a,b,c,d)	draw((a)*GFXSCALEX,(b)*GFXSCALEY,(c)*GFXSCALEX,(d)*GFXSCALEY)
 //#define	arc(a,b,c,d,e)	draw(a*GFXSCALEX,b*GFXSCALEY,(a+e)*GFXSCALEX,(d+e)*GFXSCALEY)
@@ -187,21 +190,24 @@ struct viewporttype {
 #define	outtextxy(a,b,c) XDrawString(bgi_display,bgi_mywin,&bgi_gc,(a)*GFXSCALEX,(b)*GFXSCALEY,c,strlen(c));
 #define	settextstyle(a,b,c) itoa((c)+(a)*3*GFXSCALEX,bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
 #define	setusercharsize(a,b,c,d) itoa(10*(a)*GFXSCALEX/(b),bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
-#define textheight(a) 10*GFXSCALEX
+#define textheight(a) 10*GFXSCALEY
+#define imagesize(lx,ly,rx,ry) (((rx-lx)*GFXSCALEX/8+1)*(ry-ly)*GFXSCALEY+2)
+//#define getimage(lx,ly,rx,ry,i) i[0]=rx*GFXSCALEX;i[1]=ry*GFXSCALEY;getsprite(lx*GFXSCALEX,ly*GFXSCALEY,i)
+#define getimage(lx,ly,rx,ry,i) {}
+#define putimage(lx,ly,i,putmode) putsprite(putmode,lx*GFXSCALEX,ly*GFXSCALEY,i);
 
 #else
 #define	getpixel(a,b)	point(a,b)
 #define	putpixel(a,b,c)	(c ? plot(a,b):unplot(a,b))
 //#define	linerel(a,b)	drawr(a,b)
-#define	rectangle(a,b,c,d)	drawb(a,b,c-a+1,d-b+1)
-#define	bar(a,b,c,d)	drawb(a,b,c-a+1,d-b+1);fill(a+1,b+1);xorborder(a+1,b+1,c-a+3,d-b+3)
+#define	rectangle(a,b,c,d)	drawb(a,b,(c)-(a),(d)-(b))
+#define	bar(a,b,c,d)	drawb(a,b,(c)-(a),(d)-(b));fill(a+1,b+1);xorborder(a+1,b+1,(c)-(a)+2,(d)-(b)+2)
+#define	bar3d(a,b,c,d,e,f) bar(a,b,c,d)
 //#define	circle(a,b,c)	circle(a,b,c,1)
 #define	circle(a,b,c)	ellipse(a,b,0,360,c,c)
 //#define	ellipse(a,b,c,d,e,f)	plot((a-e),b);drawr(e,f);drawr(e,-f);drawr(-e,-f);drawr(-e,f)
-#define	sector(a,b,c,d,e,f)	plot((a-e),b);drawr(e,f);drawr(e,-f);drawr(-e,-f);drawr(-e,f);fill((a-e/2),b)
-//#define	fillellipse(a,b,c,d)	plot((a-c),b);drawr(c,d);drawr(c,-d);drawr(-c,-d);drawr(-c,d)
-#define	fillellipse(a,b,c,d)	ellipse(a,b,0,360,c,d);fill(a,b)
-//#define	circle(a,b,c)	ellipse(a,b,0,360,c,c)
+#define	sector(a,b,c,d,e,f)	ellipse(a,b,360-d,360-c,e,f);drawto(a,b);drawto(a+icos(360-d)*e/256,b+isin(360-d)*f/256);(c>180?fill(a-1,b):fill(a+1,b)
+#define	fillellipse(a,b,c,d)	ellipse(a,b,0,360,c,d)
 #define	line(a,b,c,d)	draw(a,b,c,d)
 //#define	arc(a,b,c,d,e)	draw(a*GFXSCALEX,b*GFXSCALEY,(a+e)*GFXSCALEX,(d+e)*GFXSCALEY)
 //#define	pieslice(a,b,c,d,e)	draw(a*GFXSCALEX,b*GFXSCALEY,(a+e)*GFXSCALEX,(d+e)*GFXSCALEY)
@@ -211,12 +217,17 @@ struct viewporttype {
 #define	outtextxy(a,b,c) XDrawString(bgi_display,bgi_mywin,&bgi_gc,a,b,c,strlen(c))
 #define	settextstyle(a,b,c) itoa(c+a*2,bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
 #define	setusercharsize(a,b,c,d) itoa(10*a/b,bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
-#define textheight(a) 10
+#define textheight(a) 6
+#define imagesize(lx,ly,rx,ry) ((((rx)-(lx))/8+1)*((ry)-(ly))+2)
+//#define getimage(lx,ly,rx,ry,i) i[0]=rx;i[1]=ry;getsprite(lx,ly,i)
+#define getimage(lx,ly,rx,ry,i) {}
+#define putimage(lx,ly,i,putmode) putsprite(putmode,lx,ly,i);
 
 #endif
 
 
-#define putimage(x,y,i,m) {}
+#define XOR_PUT SPR_XOR
+
 
 
 #endif /* __BGI_H__ */
