@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.77 2013-10-01 23:23:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.78 2013-10-03 22:20:10 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.77  2013-10-01 23:23:53  pauloscustodio
+/* Revision 1.78  2013-10-03 22:20:10  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -o, --output
+/*
+/* Revision 1.77  2013/10/01 23:23:53  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -l, --list
 /* -nl, --no-list
@@ -1214,10 +1218,10 @@ CreateBinFile( void )
 	int segment;
     char *filename;
 
-    if ( expl_binflnm == ON )
+    if ( opts.bin_file )
         /* use predined output filename from command line */
     {
-        filename = binfilename;
+        filename = opts.bin_file;
     }
     else
     {

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.23 2013-10-03 21:58:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.24 2013-10-03 22:20:10 pauloscustodio Exp $
 */
 
 #pragma once
@@ -65,7 +65,11 @@ extern char *get_map_filename( char *filename );
 
 /* 
 * $Log: options.h,v $
-* Revision 1.23  2013-10-03 21:58:41  pauloscustodio
+* Revision 1.24  2013-10-03 22:20:10  pauloscustodio
+* Parse command line options via look-up tables:
+* -o, --output
+*
+* Revision 1.23  2013/10/03 21:58:41  pauloscustodio
 * Parse command line options via look-up tables:
 * -b, --make-bin
 * -nb, --no-make-bin
@@ -188,9 +192,7 @@ extern enum flag datestamp;
 extern enum flag force_xlib;
 extern enum flag autorelocate;
 extern enum flag deforigin;
-extern enum flag expl_binflnm;
 extern char *libfilename;				/* -i, -x library file, kept in strpool */
-extern char binfilename[];              /* -o explicit filename buffer */
 extern enum flag library;
 extern enum flag createlibrary;
 

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.41 2013-10-03 21:58:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.42 2013-10-03 22:20:10 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -367,17 +367,16 @@ static void exit_help(void)
     puts( "-plus Interpret 'Invoke' as RST 28h" );
     puts( "-R Generate relocatable code (Automatical relocation before execution)" );
     puts( "-D<symbol> define symbol as logically TRUE (used for conditional assembly)" );
-    puts( "-b assemble files & link to ORG address. -c split code in 16K banks" );
+    puts( "-c split code in 16K banks" );
     puts( "-d date stamp control, assemble only if source file > object file" );
     puts( "-a: -b & -d (assemble only updated source files, then link & relocate)" );
-    puts( "-o<bin filename> expl. output filename" );
     printf( "-i<library> include <library> LIB modules with %s%s modules during linking\n", 
 		   FILEEXT_SEPARATOR, opts.obj_ext );
     puts( "-x<library> create library from specified modules ( e.g. with @<modules> )" );
     printf( "-t<n> tabulator width for %s, %s, %s files. Column width is 4 times -t\n", FILEEXT_MAP, FILEEXT_DEF, FILEEXT_SYM );
     printf( "-I<path> additional path to search for includes\n" );
     printf( "-L<path> path to search for libraries\n" );
-    puts( "Default options: -nd -nb -nc -nR -t8" );
+    puts( "Default options: -nd -nc -nR -t8" );
 
 	exit(0);
 }
@@ -478,7 +477,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.41  2013-10-03 21:58:41  pauloscustodio
+* Revision 1.42  2013-10-03 22:20:10  pauloscustodio
+* Parse command line options via look-up tables:
+* -o, --output
+*
+* Revision 1.41  2013/10/03 21:58:41  pauloscustodio
 * Parse command line options via look-up tables:
 * -b, --make-bin
 * -nb, --no-make-bin
@@ -688,9 +691,7 @@ enum flag datestamp;
 enum flag force_xlib;
 enum flag autorelocate;
 enum flag deforigin;
-enum flag expl_binflnm;
 char *libfilename;				/* -i, -x library file, kept in strpool */
-char binfilename[FILENAME_MAX]; /* -o explicit filename buffer (BUG_0012) */
 int  cpu_type;
 enum flag library;
 enum flag createlibrary;
@@ -737,7 +738,6 @@ static void reset_options( void )
     force_xlib      = OFF;
     autorelocate    = OFF;
     deforigin       = OFF;
-    expl_binflnm    = OFF;
     cpu_type        = CPU_Z80;
 	library			= OFF;
 	createlibrary   = OFF;
@@ -830,14 +830,6 @@ void set_asm_flag( char *flagid )
     {
         sscanf( flagid + 1, "%x", (size_t *)&EXPLICIT_ORIGIN );
         deforigin = ON;         /* explicit origin has been defined */
-    }
-
-    else if ( *flagid == 'o' )
-    {
-        /* store explicit filename for .BIN file (BUG_0012) */
-        binfilename[0] = '\0';          /* prepare for strncat */
-        strncat( binfilename, flagid + 1, sizeof( binfilename ) - 1 );
-        expl_binflnm = ON;
     }
 
     else if ( *flagid == 't' )

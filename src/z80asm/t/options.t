@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.12 2013-10-03 21:58:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.13 2013-10-03 22:20:10 pauloscustodio Exp $
 #
 # Test options
 
@@ -91,9 +91,10 @@ Help Options:
   -v, --verbose          Be verbose
 * -nv, --not-verbose     Be silent
 
-Input Options:
+Input / Output File Options:
   -e, --asm-ext=EXT      ASM file extension, excluding '.'
   -M, --obj-ext=EXT      OBJ file extension, excluding '.'
+  -o, --output=FILE.BIN  Output binary file
 
 Code Generation Options:
   -sdcc, --sdcc          Assemble for Small Device C Compiler
@@ -101,6 +102,8 @@ Code Generation Options:
 Output Options:
   -b, --make-bin         Link and relocate object files to file.bin
 * -nb, --no-make-bin     No binary file
+
+Other Output File Options:
 * -s, --symtable         Generate symbol table file.sym
   -ns, --no-symtable     No symbol table file
   -l, --list             Generate list file.lst
@@ -115,16 +118,15 @@ Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)
 -plus Interpret 'Invoke' as RST 28h
 -R Generate relocatable code (Automatical relocation before execution)
 -D<symbol> define symbol as logically TRUE (used for conditional assembly)
--b assemble files & link to ORG address. -c split code in 16K banks
+-c split code in 16K banks
 -d date stamp control, assemble only if source file > object file
 -a: -b & -d (assemble only updated source files, then link & relocate)
--o<bin filename> expl. output filename
 -i<library> include <library> LIB modules with .obj modules during linking
 -x<library> create library from specified modules ( e.g. with @<modules> )
 -t<n> tabulator width for .map, .def, .sym files. Column width is 4 times -t
 -I<path> additional path to search for includes
 -L<path> path to search for libraries
-Default options: -nd -nb -nc -nR -t8
+Default options: -nd -nc -nR -t8
 END
 
 unlink_testfiles();
@@ -488,13 +490,46 @@ for my $options ('-b -nb', '--make-bin --no-make-bin') {
 	ok ! -f bin_file();
 }
 
+#------------------------------------------------------------------------------
+# -o, --output
+#------------------------------------------------------------------------------
+$bin = bin_file(); $bin =~ s/\.bin$/2.bin/i;
+
+# no -o
+unlink_testfiles($bin);
+write_file(asm_file(), "nop");
+
+t_z80asm_capture("-r0 -b ".asm_file(), "", "", 0);
+ok -f bin_file();
+ok ! -f $bin;
+t_binary(read_file(bin_file(), binmode => ':raw'), "\0");
+
+# -o
+for my $options ("-o$bin", "-o=$bin", "-o $bin", "--output$bin", "--output=$bin", "--output $bin") {
+	unlink_testfiles($bin);
+	write_file(asm_file(), "nop");
+
+	t_z80asm_capture("-r0 -b $options ".asm_file(), "", "", 0);
+	ok ! -f bin_file();
+	ok -f $bin;
+	t_binary(read_file($bin, binmode => ':raw'), "\0");
+}
+
+unlink_testfiles($bin);
+
+
+
 
 unlink_testfiles();
 done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.12  2013-10-03 21:58:41  pauloscustodio
+# Revision 1.13  2013-10-03 22:20:10  pauloscustodio
+# Parse command line options via look-up tables:
+# -o, --output
+#
+# Revision 1.12  2013/10/03 21:58:41  pauloscustodio
 # Parse command line options via look-up tables:
 # -b, --make-bin
 # -nb, --no-make-bin

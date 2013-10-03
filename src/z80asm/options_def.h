@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.12 2013-10-03 21:58:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.13 2013-10-03 22:20:10 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -46,6 +46,7 @@ OPT_VAR(	BOOL,	make_bin,	FALSE	)
 
 OPT_VAR(	char *,	asm_ext,	(FILEEXT_ASM)+1 )	/* skip "." */
 OPT_VAR(	char *,	obj_ext,	(FILEEXT_OBJ)+1 )	/* skip "." */
+OPT_VAR(	char *,	bin_file,	NULL 			)	/* set by -o */
 
 /*-----------------------------------------------------------------------------
 *   define options
@@ -55,9 +56,10 @@ OPT( OptCall,	exit_help,		"-h", 	"--help",		"Show help options", "" )
 OPT( OptSet,	&opts.verbose,	"-v", 	"--verbose", 	"Be verbose", "" )
 OPT( OptClear,	&opts.verbose,	"-nv", 	"--not-verbose","Be silent", "" )
 
-OPT_TITLE(	"Input Options:"	)
+OPT_TITLE(	"Input / Output File Options:"	)
 OPT( OptString,	&opts.asm_ext,	"-e", 	"--asm-ext", 	"ASM file extension, excluding '.'", "EXT" )
 OPT( OptString,	&opts.obj_ext,	"-M", 	"--obj-ext", 	"OBJ file extension, excluding '.'", "EXT" )
+OPT( OptString,	&opts.bin_file,	"-o", 	"--output", 	"Output binary file", "FILE.BIN" )
 
 OPT_TITLE(	"Code Generation Options:" )
 OPT( OptSet,	&opts.sdcc,		"-sdcc","--sdcc",		"Assemble for Small Device C Compiler", "" )
@@ -66,6 +68,8 @@ OPT_TITLE(	"Output Options:" )
 
 OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 	"Link and relocate object files to file" FILEEXT_BIN, "" )
 OPT( OptClear,	&opts.make_bin,	"-nb", 	"--no-make-bin","No binary file", "" )
+
+OPT_TITLE(	"Other Output File Options:" )
 
 OPT( OptSet,	&opts.symtable,	"-s", 	"--symtable", 	"Generate symbol table file" FILEEXT_SYM, "" )
 OPT( OptClear,	&opts.symtable,	"-ns", 	"--no-symtable","No symbol table file", "" )
@@ -89,7 +93,11 @@ OPT( OptClear,	&opts.globaldef,"-ng", 	"--no-globaldef","No global address defin
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.12  2013-10-03 21:58:41  pauloscustodio
+* Revision 1.13  2013-10-03 22:20:10  pauloscustodio
+* Parse command line options via look-up tables:
+* -o, --output
+*
+* Revision 1.12  2013/10/03 21:58:41  pauloscustodio
 * Parse command line options via look-up tables:
 * -b, --make-bin
 * -nb, --no-make-bin
