@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.42 2013-10-03 22:20:10 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.43 2013-10-03 22:35:21 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -368,7 +368,6 @@ static void exit_help(void)
     puts( "-R Generate relocatable code (Automatical relocation before execution)" );
     puts( "-D<symbol> define symbol as logically TRUE (used for conditional assembly)" );
     puts( "-c split code in 16K banks" );
-    puts( "-d date stamp control, assemble only if source file > object file" );
     puts( "-a: -b & -d (assemble only updated source files, then link & relocate)" );
     printf( "-i<library> include <library> LIB modules with %s%s modules during linking\n", 
 		   FILEEXT_SEPARATOR, opts.obj_ext );
@@ -389,7 +388,7 @@ static void exit_copyright(void)
 
 static void display_options(void)
 {
-    if ( datestamp == ON )
+    if ( opts.date_stamp )
         puts( "Assemble only updated files." );
     else
         puts( "Assemble all files." );
@@ -477,7 +476,12 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.42  2013-10-03 22:20:10  pauloscustodio
+* Revision 1.43  2013-10-03 22:35:21  pauloscustodio
+* Parse command line options via look-up tables:
+* -d, --date-stamp
+* -nd, --no-date-stamp
+*
+* Revision 1.42  2013/10/03 22:20:10  pauloscustodio
 * Parse command line options via look-up tables:
 * -o, --output
 *
@@ -687,7 +691,6 @@ enum flag swapIXIY;
 enum flag clinemode;
 long clineno;
 enum flag codesegment;
-enum flag datestamp;
 enum flag force_xlib;
 enum flag autorelocate;
 enum flag deforigin;
@@ -734,7 +737,6 @@ static void reset_options( void )
     clinemode       = OFF;
     clineno         = 0;
     codesegment     = OFF;
-    datestamp       = OFF;
     force_xlib      = OFF;
     autorelocate    = OFF;
     deforigin       = OFF;
@@ -789,21 +791,10 @@ void set_asm_flag( char *flagid )
         force_xlib = ON;
     }
 
-    else if ( strcmp( flagid, "d" ) == 0 )
-    {
-        datestamp = ON;         /* assemble only if source > object file */
-    }
-
-    else if ( strcmp( flagid, "nd" ) == 0 )
-    {
-        datestamp = OFF;
-    }
-
     /* -b, -d */
     else if ( strcmp( flagid, "a" ) == 0 )
     {
-        opts.make_bin = TRUE;
-        datestamp = ON;
+        opts.make_bin = opts.date_stamp = TRUE;
     }
 
     else if ( strcmp( flagid, "R" ) == 0 )

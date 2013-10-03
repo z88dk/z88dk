@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.13 2013-10-03 22:20:10 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.14 2013-10-03 22:35:21 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -43,6 +43,7 @@ OPT_VAR(	BOOL,	map,		TRUE 	)
 OPT_VAR(	BOOL,	sdcc,		FALSE	)
 OPT_VAR(	BOOL,	globaldef,	FALSE	)
 OPT_VAR(	BOOL,	make_bin,	FALSE	)
+OPT_VAR(	BOOL,	date_stamp,	FALSE	)
 
 OPT_VAR(	char *,	asm_ext,	(FILEEXT_ASM)+1 )	/* skip "." */
 OPT_VAR(	char *,	obj_ext,	(FILEEXT_OBJ)+1 )	/* skip "." */
@@ -69,6 +70,9 @@ OPT_TITLE(	"Output Options:" )
 OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 	"Link and relocate object files to file" FILEEXT_BIN, "" )
 OPT( OptClear,	&opts.make_bin,	"-nb", 	"--no-make-bin","No binary file", "" )
 
+OPT( OptSet,	&opts.date_stamp,"-d", 	"--date-stamp", "Assemble only if source older than object", "" )
+OPT( OptClear,	&opts.date_stamp,"-nd", "--no-date-stamp","No date stamp", "" )
+
 OPT_TITLE(	"Other Output File Options:" )
 
 OPT( OptSet,	&opts.symtable,	"-s", 	"--symtable", 	"Generate symbol table file" FILEEXT_SYM, "" )
@@ -93,7 +97,12 @@ OPT( OptClear,	&opts.globaldef,"-ng", 	"--no-globaldef","No global address defin
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.13  2013-10-03 22:20:10  pauloscustodio
+* Revision 1.14  2013-10-03 22:35:21  pauloscustodio
+* Parse command line options via look-up tables:
+* -d, --date-stamp
+* -nd, --no-date-stamp
+*
+* Revision 1.13  2013/10/03 22:20:10  pauloscustodio
 * Parse command line options via look-up tables:
 * -o, --output
 *

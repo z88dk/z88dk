@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.13 2013-10-03 22:20:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.14 2013-10-03 22:35:21 pauloscustodio Exp $
 #
 # Test options
 
@@ -102,6 +102,8 @@ Code Generation Options:
 Output Options:
   -b, --make-bin         Link and relocate object files to file.bin
 * -nb, --no-make-bin     No binary file
+  -d, --date-stamp       Assemble only if source older than object
+* -nd, --no-date-stamp   No date stamp
 
 Other Output File Options:
 * -s, --symtable         Generate symbol table file.sym
@@ -119,7 +121,6 @@ Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)
 -R Generate relocatable code (Automatical relocation before execution)
 -D<symbol> define symbol as logically TRUE (used for conditional assembly)
 -c split code in 16K banks
--d date stamp control, assemble only if source file > object file
 -a: -b & -d (assemble only updated source files, then link & relocate)
 -i<library> include <library> LIB modules with .obj modules during linking
 -x<library> create library from specified modules ( e.g. with @<modules> )
@@ -517,6 +518,47 @@ for my $options ("-o$bin", "-o=$bin", "-o $bin", "--output$bin", "--output=$bin"
 
 unlink_testfiles($bin);
 
+#------------------------------------------------------------------------------
+# -d, --date-stamp
+#------------------------------------------------------------------------------
+
+for my $options ('-d', '--date-stamp') {
+	# first compiles; second skips
+	unlink_testfiles();
+	write_file(asm_file(), "nop");
+
+	t_z80asm_capture("$options ".asm_file(), "", "", 0);
+	is substr(read_file(obj_file(), binmode => ':raw'), -1, 1), "\0";
+
+	my $date_obj = -M obj_file();
+
+	# now skips compile
+	sleep 2;		# make sure our obj is older
+	t_z80asm_capture("$options ".asm_file(), "", "", 0);
+	is substr(read_file(obj_file(), binmode => ':raw'), -1, 1), "\0";
+
+	is -M obj_file(), $date_obj;	# same object
+
+	# touch source
+	sleep 2;		# make sure our obj is older
+	write_file(asm_file(), "nop");
+	t_z80asm_capture("$options ".asm_file(), "", "", 0);
+	is substr(read_file(obj_file(), binmode => ':raw'), -1, 1), "\0";
+
+	isnt -M obj_file(), $date_obj;	# new object
+
+	$date_obj = -M obj_file();
+
+	# compile again
+	for my $options2 ('-nd', '--no-date-stamp') {
+		sleep 2;		# make sure our obj is older
+		t_z80asm_capture("$options $options2 ".asm_file(), "", "", 0);
+		is substr(read_file(obj_file(), binmode => ':raw'), -1, 1), "\0";
+
+		isnt -M obj_file(), $date_obj;	# new object
+	}
+}
+
 
 
 
@@ -525,7 +567,12 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.13  2013-10-03 22:20:10  pauloscustodio
+# Revision 1.14  2013-10-03 22:35:21  pauloscustodio
+# Parse command line options via look-up tables:
+# -d, --date-stamp
+# -nd, --no-date-stamp
+#
+# Revision 1.13  2013/10/03 22:20:10  pauloscustodio
 # Parse command line options via look-up tables:
 # -o, --output
 #
