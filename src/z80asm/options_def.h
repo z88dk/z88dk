@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.10 2013-10-02 23:43:57 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.11 2013-10-03 00:01:44 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -80,9 +80,52 @@ OPT( OptClear,	&opts.globaldef,"-ng", 	"--no-globaldef","No global address defin
 
 
 /*
-$Log: options_def.h,v $
-Revision 1.10  2013-10-02 23:43:57  pauloscustodio
-add log
-
+* $Log: options_def.h,v $
+* Revision 1.11  2013-10-03 00:01:44  pauloscustodio
+* log
+*
+* Revision 1.10  2013/10/02 23:43:57  pauloscustodio
+* add log
+* 
+* Revision 1.9  2013/10/02 23:42:09  pauloscustodio
+* Parse command line options via look-up tables:
+* add --sdcc in addition to -sdcc, for consistency
+* 
+* Revision 1.8  2013/10/02 23:20:44  pauloscustodio
+* Parse command line options via look-up tables:
+* -g, --globaldef
+* -ng, --no-globaldef
+* 
+* Revision 1.7  2013/10/01 23:46:28  pauloscustodio
+* Parse command line options via look-up tables:
+* -m, --map
+* -nm, --no-map
+* 
+* Revision 1.6  2013/10/01 23:23:53  pauloscustodio
+* Parse command line options via look-up tables:
+* -l, --list
+* -nl, --no-list
+* 
+* Revision 1.5  2013/10/01 22:50:26  pauloscustodio
+* Parse command line options via look-up tables:
+* -s, --symtable
+* -ns, --no-symtable
+* 
+* Revision 1.4  2013/10/01 22:09:33  pauloscustodio
+* Parse command line options via look-up tables:
+* -sdcc
+* 
+* Revision 1.3  2013/09/30 00:33:11  pauloscustodio
+* help text
+* 
+* Revision 1.2  2013/09/30 00:24:25  pauloscustodio
+* Parse command line options via look-up tables:
+* -e, --asm-ext
+* -M, --obj-ext
+* Move filename extension functions to options.c
+* 
+* Revision 1.1  2013/09/27 01:14:33  pauloscustodio
+* Parse command line options via look-up tables:
+* --help, --verbose
 */
 
