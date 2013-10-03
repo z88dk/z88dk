@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.111 2013-10-03 22:35:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.112 2013-10-03 23:48:31 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.111  2013-10-03 22:35:21  pauloscustodio
+/* Revision 1.112  2013-10-03 23:48:31  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -r, --origin=ORG_HEX
+/*
+/* Revision 1.111  2013/10/03 22:35:21  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -d, --date-stamp
 /* -nd, --no-date-stamp
@@ -735,7 +739,6 @@ size_t sizeof_reloctable   = 0;
 char *reloctable = NULL, *relocptr = NULL;
 
 size_t DEFVPC;          /* DEFVARS address counter */
-size_t EXPLICIT_ORIGIN;         /* origin defined from command line */
 
 struct modules *modulehdr;
 struct module *CURRENTMODULE;

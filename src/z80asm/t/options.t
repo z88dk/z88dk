@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.15 2013-10-03 22:54:06 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.16 2013-10-03 23:48:31 pauloscustodio Exp $
 #
 # Test options
 
@@ -105,6 +105,7 @@ Output Options:
   -d, --date-stamp       Assemble only updated files
 * -nd, --no-date-stamp   No date stamp
   -a, --make-updated-bin Assemble updated files and link objects to file.bin
+  -r, --origin=ORG_HEX   Relocate binary file to given address
 
 Other Output File Options:
 * -s, --symtable         Generate symbol table file.sym
@@ -117,7 +118,6 @@ Other Output File Options:
 * -ng, --no-globaldef    No global address definition file
 
 Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)
--r<ORG> Explicit relocation <ORG> defined in hex (ignore ORG in first module)
 -plus Interpret 'Invoke' as RST 28h
 -R Generate relocatable code (Automatical relocation before execution)
 -D<symbol> define symbol as logically TRUE (used for conditional assembly)
@@ -589,9 +589,33 @@ for my $options ('-a', '--make-updated-bin') {
 	isnt -M obj_file(), $date_obj;	# new object
 }
 
+#------------------------------------------------------------------------------
+# -r, --origin
+#------------------------------------------------------------------------------
 
+for my $org ('0', '100') {
+	for my $options ("-r$org", "-r=$org", "-r $org", 
+					 "--origin$org", "--origin=$org", "--origin $org", ) {
+		unlink_testfiles();
+		write_file(asm_file(), "start: jp start");
 
+		t_z80asm_capture("$options -b ".asm_file(), "", "", 0);
+		t_binary(read_file(bin_file(), binmode => ':raw'), "\xC3".pack("v", oct('0x'.$org)));
+	}
+}
 
+for (['-1', '-1'], ['10000', '65536']) {
+	my($org_h, $org_d) = @$_;
+	
+	unlink_testfiles();
+	write_file(asm_file(), "nop");
+	t_z80asm_capture("--make-bin --origin=$org_h ".asm_file(), "", <<"ERR", 1);
+Error: integer '$org_d' out of range
+1 errors occurred during assembly
+ERR
+	ok ! -f obj_file();
+	ok ! -f bin_file();
+}
 
 
 unlink_testfiles();
@@ -599,7 +623,11 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.15  2013-10-03 22:54:06  pauloscustodio
+# Revision 1.16  2013-10-03 23:48:31  pauloscustodio
+# Parse command line options via look-up tables:
+# -r, --origin=ORG_HEX
+#
+# Revision 1.15  2013/10/03 22:54:06  pauloscustodio
 # Parse command line options via look-up tables:
 # -a, --make-updated-bin
 #

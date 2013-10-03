@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.60 2013-10-01 23:23:53 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.61 2013-10-03 23:48:31 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.60  2013-10-01 23:23:53  pauloscustodio
+Revision 1.61  2013-10-03 23:48:31  pauloscustodio
+Parse command line options via look-up tables:
+-r, --origin=ORG_HEX
+
+Revision 1.60  2013/10/01 23:23:53  pauloscustodio
 Parse command line options via look-up tables:
 -l, --list
 -nl, --no-list
@@ -959,9 +963,9 @@ Z80pass2( void )
 
     if ( ( modulehdr->first == CURRENTMODULE ) )
     {
-        if ( deforigin )
+        if ( opts.origin >= 0 )
         {
-            CURRENTMODULE->origin = EXPLICIT_ORIGIN;    /* use origin from command line */
+            CURRENTMODULE->origin = opts.origin;    /* use origin from command line */
         }
     }
 

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.44 2013-10-03 22:54:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.45 2013-10-03 23:48:31 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -46,6 +46,7 @@ static void exit_help(void);
 static void exit_copyright(void);
 static void display_options(void);
 static void option_make_updated_bin(void);
+static void option_origin(char *origin_hex);
 
 static void parse_options(int *parg, int argc, char *argv[]);
 static void parse_files(int arg, int argc, char *argv[], 
@@ -102,7 +103,8 @@ void parse_argv(int argc, char *argv[],
     if ( opts.verbose )
         display_options();				/* display status messages of select assembler options */
 
-	parse_files(arg, argc, argv, process_file);		/* process each source file */
+	if ( ! get_num_errors() )
+		parse_files(arg, argc, argv, process_file);		/* process each source file */
 }
 
 /*-----------------------------------------------------------------------------
@@ -365,7 +367,6 @@ static void exit_help(void)
 
 	puts(  "" );
     puts( "Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)" );
-    puts( "-r<ORG> Explicit relocation <ORG> defined in hex (ignore ORG in first module)" );
     puts( "-plus Interpret 'Invoke' as RST 28h" );
     puts( "-R Generate relocatable code (Automatical relocation before execution)" );
     puts( "-D<symbol> define symbol as logically TRUE (used for conditional assembly)" );
@@ -432,6 +433,14 @@ static void option_make_updated_bin(void)
     opts.make_bin = opts.date_stamp = TRUE;
 }
 
+static void option_origin(char *origin_hex)
+{
+	long origin = strtol( origin_hex, NULL, 16 );
+	if ( origin < 0 || origin > 0xFFFF )
+		error_int_range(origin);
+	opts.origin = (int) origin;
+}
+
 /*-----------------------------------------------------------------------------
 *   Change extension of given file name, return pointer to file name in
 *	strpool
@@ -485,7 +494,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.44  2013-10-03 22:54:06  pauloscustodio
+* Revision 1.45  2013-10-03 23:48:31  pauloscustodio
+* Parse command line options via look-up tables:
+* -r, --origin=ORG_HEX
+*
+* Revision 1.44  2013/10/03 22:54:06  pauloscustodio
 * Parse command line options via look-up tables:
 * -a, --make-updated-bin
 *
@@ -706,7 +719,6 @@ long clineno;
 enum flag codesegment;
 enum flag force_xlib;
 enum flag autorelocate;
-enum flag deforigin;
 char *libfilename;				/* -i, -x library file, kept in strpool */
 int  cpu_type;
 enum flag library;
@@ -752,7 +764,6 @@ static void reset_options( void )
     codesegment     = OFF;
     force_xlib      = OFF;
     autorelocate    = OFF;
-    deforigin       = OFF;
     cpu_type        = CPU_Z80;
 	library			= OFF;
 	createlibrary   = OFF;
@@ -822,12 +833,6 @@ void set_asm_flag( char *flagid )
     else if ( *flagid == 'x' )
     {
         libfilename = CreateLibfile( ( flagid + 1 ) );
-    }
-
-    else if ( *flagid == 'r' )
-    {
-        sscanf( flagid + 1, "%x", (size_t *)&EXPLICIT_ORIGIN );
-        deforigin = ON;         /* explicit origin has been defined */
     }
 
     else if ( *flagid == 't' )

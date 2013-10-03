@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.15 2013-10-03 22:54:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.16 2013-10-03 23:48:31 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -45,6 +45,8 @@ OPT_VAR(	BOOL,	globaldef,	FALSE	)
 OPT_VAR(	BOOL,	make_bin,	FALSE	)
 OPT_VAR(	BOOL,	date_stamp,	FALSE	)
 
+OPT_VAR(	int, 	origin,		-1		)			/* -1 == not defined */
+
 OPT_VAR(	char *,	asm_ext,	(FILEEXT_ASM)+1 )	/* skip "." */
 OPT_VAR(	char *,	obj_ext,	(FILEEXT_OBJ)+1 )	/* skip "." */
 OPT_VAR(	char *,	bin_file,	NULL 			)	/* set by -o */
@@ -71,10 +73,13 @@ OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 	"Assemble files and link obje
 OPT( OptClear,	&opts.make_bin,	"-nb", 	"--no-make-bin","No binary file", "" )
 
 OPT( OptSet,	&opts.date_stamp,"-d", 	"--date-stamp", "Assemble only updated files", "" )
-OPT( OptClear,	&opts.date_stamp,"-nd", "--no-date-stamp","No date stamp", "" )
+OPT( OptClear,	&opts.date_stamp,"-nd", "--no-date-stamp",
+														"No date stamp", "" )
 
 OPT( OptCall,	option_make_updated_bin,
-								"-a", "--make-updated-bin","Assemble updated files and link objects to file" FILEEXT_BIN, "" )
+								"-a", "--make-updated-bin",
+														"Assemble updated files and link objects to file" FILEEXT_BIN, "" )
+OPT( OptCallArg,option_origin,	"-r", "--origin",		"Relocate binary file to given address", "ORG_HEX" )
 
 OPT_TITLE(	"Other Output File Options:" )
 
@@ -100,7 +105,11 @@ OPT( OptClear,	&opts.globaldef,"-ng", 	"--no-globaldef","No global address defin
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.15  2013-10-03 22:54:06  pauloscustodio
+* Revision 1.16  2013-10-03 23:48:31  pauloscustodio
+* Parse command line options via look-up tables:
+* -r, --origin=ORG_HEX
+*
+* Revision 1.15  2013/10/03 22:54:06  pauloscustodio
 * Parse command line options via look-up tables:
 * -a, --make-updated-bin
 *

@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.37 2013-09-27 01:14:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.38 2013-10-03 23:48:31 pauloscustodio Exp $
 $Log: z80asm.h,v $
-Revision 1.37  2013-09-27 01:14:33  pauloscustodio
+Revision 1.38  2013-10-03 23:48:31  pauloscustodio
+Parse command line options via look-up tables:
+-r, --origin=ORG_HEX
+
+Revision 1.37  2013/09/27 01:14:33  pauloscustodio
 Parse command line options via look-up tables:
 --help, --verbose
 
@@ -203,7 +207,6 @@ $History: Z80ASM.C $
 #define FLAGS_M 7
 
 
-extern size_t EXPLICIT_ORIGIN;
 extern char line[];
 extern char ident[];
 extern char separators[];
