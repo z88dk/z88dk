@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.16 2013-10-03 23:48:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.17 2013-10-04 21:18:34 pauloscustodio Exp $
 #
 # Test options
 
@@ -97,7 +97,7 @@ Input / Output File Options:
   -o, --output=FILE.BIN  Output binary file
 
 Code Generation Options:
-  -sdcc, --sdcc          Assemble for Small Device C Compiler
+  --sdcc                 Assemble for Small Device C Compiler
 
 Output Options:
   -b, --make-bin         Assemble files and link objects to file.bin
@@ -623,7 +623,11 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.16  2013-10-03 23:48:31  pauloscustodio
+# Revision 1.17  2013-10-04 21:18:34  pauloscustodio
+# dont show short_opt if short_opt is same as long_opt, except for extra '-',
+# e.g. -sdcc and --sdcc
+#
+# Revision 1.16  2013/10/03 23:48:31  pauloscustodio
 # Parse command line options via look-up tables:
 # -r, --origin=ORG_HEX
 #

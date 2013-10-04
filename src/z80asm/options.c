@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.45 2013-10-03 23:48:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.46 2013-10-04 21:18:34 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -307,9 +307,14 @@ static void show_option(enum OptType type, BOOL *pflag,
 
 	if ( *short_opt )
 	{
-		g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
-					"%s", short_opt );
-		count_opts++;
+		/* dont show short_opt if short_opt is same as long_opt, except for extra '-',
+		   e.g. -sdcc and --sdcc */
+		if ( ! (*long_opt && strcmp(short_opt, long_opt+1) == 0) )
+		{
+			g_snprintf( msg + strlen(msg), sizeof(msg) - strlen(msg), 
+						"%s", short_opt );
+			count_opts++;
+		}
 	}
 	
 	if ( *long_opt )
@@ -494,7 +499,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.45  2013-10-03 23:48:31  pauloscustodio
+* Revision 1.46  2013-10-04 21:18:34  pauloscustodio
+* dont show short_opt if short_opt is same as long_opt, except for extra '-',
+* e.g. -sdcc and --sdcc
+*
+* Revision 1.45  2013/10/03 23:48:31  pauloscustodio
 * Parse command line options via look-up tables:
 * -r, --origin=ORG_HEX
 *
