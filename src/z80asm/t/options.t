@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.18 2013-10-04 22:04:52 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.19 2013-10-04 22:24:01 pauloscustodio Exp $
 #
 # Test options
 
@@ -106,6 +106,7 @@ Output Options:
 * -nd, --no-date-stamp   Assemble all files
   -a, --make-updated-bin Assemble updated files and link/relocate to file.bin
   -r, --origin=ORG_HEX   Relocate binary file to given address
+  -c, --code-seg         Split code in 16K banks
 
 Other Output File Options:
 * -s, --symtable         Create symbol table file.sym
@@ -629,13 +630,40 @@ ERR
 	ok ! -f bin_file();
 }
 
+#------------------------------------------------------------------------------
+# -c, --code-seg
+#------------------------------------------------------------------------------
+
+($asm, $bin) = ("", "");
+for my $byte (0, 1, 2, 3) {
+	$asm .= "defb $byte\n" x 0x4000;
+	$bin .= chr($byte)     x 0x4000;
+}
+
+# one block
+t_z80asm_ok(0, $asm, $bin);
+
+# 4 16K blocks
+for my $options ('-c', '--code-seg') {
+	t_z80asm_capture("-r0 -b $options ".asm_file(), "", "", 0);
+	is read_binfile(bn0_file()), substr($bin, 0x0000, 0x4000);
+	is read_binfile(bn1_file()), substr($bin, 0x4000, 0x4000);
+	is read_binfile(bn2_file()), substr($bin, 0x8000, 0x4000);
+	is read_binfile(bn3_file()), substr($bin, 0xC000, 0x4000);
+}
+
+
 
 unlink_testfiles();
 done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.18  2013-10-04 22:04:52  pauloscustodio
+# Revision 1.19  2013-10-04 22:24:01  pauloscustodio
+# Parse command line options via look-up tables:
+# -c, --code-seg
+#
+# Revision 1.18  2013/10/04 22:04:52  pauloscustodio
 # Unify option describing texts
 #
 # Revision 1.17  2013/10/04 21:18:34  pauloscustodio

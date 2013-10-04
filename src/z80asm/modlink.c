@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.79 2013-10-03 23:48:30 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.80 2013-10-04 22:24:01 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.79  2013-10-03 23:48:30  pauloscustodio
+/* Revision 1.80  2013-10-04 22:24:01  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -c, --code-seg
+/*
+/* Revision 1.79  2013/10/03 23:48:30  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -r, --origin=ORG_HEX
 /*
@@ -1231,7 +1235,7 @@ CreateBinFile( void )
     {
         /* create output filename, based on project filename */
         /* get source filename from first module */
-        if ( codesegment == ON && get_codesize() > 16384 )
+        if ( opts.code_seg && get_codesize() > 16384 )
         {
 			/* add '.bn0' extension */
 			filename = get_segbin_filename( modulehdr->first->cfile->fname, 0 );
@@ -1260,7 +1264,7 @@ CreateBinFile( void )
         fclose( binaryfile );
         binaryfile = NULL;
     }
-    else if ( codesegment == ON && get_codesize() > 16384 )
+    else if ( opts.code_seg && get_codesize() > 16384 )
     {
         fclose( binaryfile );
         binaryfile = NULL;

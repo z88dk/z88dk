@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.47 2013-10-04 22:04:52 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.48 2013-10-04 22:24:01 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -415,8 +415,7 @@ static void display_options(void)
 
     if ( opts.make_bin && opts.map )	puts( OPT_HELP_MAP );
 
-    if ( codesegment == ON && autorelocate == OFF )
-        puts( "Split code into 16K banks." );
+    if ( opts.code_seg && autorelocate == OFF )	puts( OPT_HELP_CODE_SEG );
 
     if ( autorelocate == ON )
         puts( "Create relocatable code." );
@@ -493,7 +492,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.47  2013-10-04 22:04:52  pauloscustodio
+* Revision 1.48  2013-10-04 22:24:01  pauloscustodio
+* Parse command line options via look-up tables:
+* -c, --code-seg
+*
+* Revision 1.47  2013/10/04 22:04:52  pauloscustodio
 * Unify option describing texts
 *
 * Revision 1.46  2013/10/04 21:18:34  pauloscustodio
@@ -722,7 +725,6 @@ enum flag ti83plus;
 enum flag swapIXIY;
 enum flag clinemode;
 long clineno;
-enum flag codesegment;
 enum flag force_xlib;
 enum flag autorelocate;
 char *libfilename;				/* -i, -x library file, kept in strpool */
@@ -767,7 +769,6 @@ static void reset_options( void )
     swapIXIY        = OFF;
     clinemode       = OFF;
     clineno         = 0;
-    codesegment     = OFF;
     force_xlib      = OFF;
     autorelocate    = OFF;
     cpu_type        = CPU_Z80;
@@ -808,12 +809,6 @@ void set_asm_flag( char *flagid )
     else if ( strcmp( flagid, "C" ) == 0 )
     {
         clinemode = ON;
-    }
-
-    /* split in 16K blocks */
-    else if ( strcmp( flagid, "c" ) == 0 )
-    {
-        codesegment = ON;
     }
 
     else if ( strcmp( flagid, "forcexlib" ) == 0 )

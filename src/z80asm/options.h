@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.26 2013-10-03 23:48:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.27 2013-10-04 22:24:01 pauloscustodio Exp $
 */
 
 #pragma once
@@ -65,7 +65,11 @@ extern char *get_map_filename( char *filename );
 
 /* 
 * $Log: options.h,v $
-* Revision 1.26  2013-10-03 23:48:31  pauloscustodio
+* Revision 1.27  2013-10-04 22:24:01  pauloscustodio
+* Parse command line options via look-up tables:
+* -c, --code-seg
+*
+* Revision 1.26  2013/10/03 23:48:31  pauloscustodio
 * Parse command line options via look-up tables:
 * -r, --origin=ORG_HEX
 *
@@ -196,7 +200,6 @@ extern enum flag ti83plus;
 extern enum flag swapIXIY;
 extern enum flag clinemode;
 extern long clineno;
-extern enum flag codesegment;
 extern enum flag force_xlib;
 extern enum flag autorelocate;
 extern char *libfilename;				/* -i, -x library file, kept in strpool */
