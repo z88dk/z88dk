@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.29 2013-10-04 23:20:21 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.30 2013-10-04 23:31:50 pauloscustodio Exp $
 */
 
 #pragma once
@@ -72,7 +72,11 @@ extern char *get_map_filename( char *filename );
 
 /* 
 * $Log: options.h,v $
-* Revision 1.29  2013-10-04 23:20:21  pauloscustodio
+* Revision 1.30  2013-10-04 23:31:50  pauloscustodio
+* Parse command line options via look-up tables:
+* -IXIY, --swap-ix-iy
+*
+* Revision 1.29  2013/10/04 23:20:21  pauloscustodio
 * Parse command line options via look-up tables:
 * -plus, --ti83plus
 *
@@ -212,7 +216,6 @@ extern char *get_map_filename( char *filename );
 #include "symbol.h"
 
 /* global option variables */
-extern enum flag swapIXIY;
 extern enum flag clinemode;
 extern long clineno;
 extern enum flag force_xlib;

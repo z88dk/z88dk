@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.36 2013-10-04 23:09:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.37 2013-10-04 23:31:50 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.36  2013-10-04 23:09:25  pauloscustodio
+/* Revision 1.37  2013-10-04 23:31:50  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -IXIY, --swap-ix-iy
+/*
+/* Revision 1.36  2013/10/04 23:09:25  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -R, --relocatable
 /* --RCMX000
@@ -747,7 +751,7 @@ CheckRegister8( void )
         {
             if ( strcmp( ident, "IXL" ) == 0 )
             {
-                if ( swapIXIY == ON )
+                if ( opts.swap_ix_iy )
                 {
                     return ( 16 + 5 );
                 }
@@ -759,7 +763,7 @@ CheckRegister8( void )
 
             else if ( strcmp( ident, "IXH" ) == 0 )
             {
-                if ( swapIXIY == ON )
+                if ( opts.swap_ix_iy )
                 {
                     return ( 16 + 4 );
                 }
@@ -771,7 +775,7 @@ CheckRegister8( void )
 
             else if ( strcmp( ident, "IYL" ) == 0 )
             {
-                if ( swapIXIY == ON )
+                if ( opts.swap_ix_iy )
                 {
                     return ( 8 + 5 );
                 }
@@ -783,7 +787,7 @@ CheckRegister8( void )
 
             else if ( strcmp( ident, "IYH" ) == 0 )
             {
-                if ( swapIXIY == ON )
+                if ( opts.swap_ix_iy )
                 {
                     return ( 8 + 4 );
                 }
@@ -842,11 +846,11 @@ CheckRegister16( void )
         }
         else if ( strcmp( ident, "IX" ) == 0 )
         {
-            return swapIXIY == ON ? REG16_IY : REG16_IX;
+            return opts.swap_ix_iy ? REG16_IY : REG16_IX;
         }
         else if ( strcmp( ident, "IY" ) == 0 )
         {
-            return swapIXIY == ON ? REG16_IX : REG16_IY;
+            return opts.swap_ix_iy ? REG16_IX : REG16_IY;
         }
     }
 

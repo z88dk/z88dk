@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.50 2013-10-04 23:20:21 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.51 2013-10-04 23:31:50 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -489,7 +489,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.50  2013-10-04 23:20:21  pauloscustodio
+* Revision 1.51  2013-10-04 23:31:50  pauloscustodio
+* Parse command line options via look-up tables:
+* -IXIY, --swap-ix-iy
+*
+* Revision 1.50  2013/10/04 23:20:21  pauloscustodio
 * Parse command line options via look-up tables:
 * -plus, --ti83plus
 *
@@ -727,7 +731,6 @@ char *get_segbin_filename( char *filename, int segment )
 #include <string.h>
 
 /* global option variables */
-enum flag swapIXIY;
 enum flag clinemode;
 long clineno;
 enum flag force_xlib;
@@ -768,7 +771,6 @@ char *search_lib_file( char *filename )
 *----------------------------------------------------------------------------*/
 static void reset_options( void )
 {
-    swapIXIY        = OFF;
     clinemode       = OFF;
     clineno         = 0;
     force_xlib      = OFF;
@@ -787,14 +789,8 @@ static void reset_options( void )
 *----------------------------------------------------------------------------*/
 void set_asm_flag( char *flagid )
 {
-    /* (stefano) IX and IY swap option */
-    if ( strcmp( flagid, "IXIY" ) == 0 )
-    {
-        swapIXIY = ON;
-    }
-
     /* djm turn on c line mode to report line number of C source */
-    else if ( strcmp( flagid, "C" ) == 0 )
+    if ( strcmp( flagid, "C" ) == 0 )
     {
         clinemode = ON;
     }
