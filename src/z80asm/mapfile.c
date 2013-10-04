@@ -14,9 +14,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.7 2013-09-30 00:24:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.8 2013-10-04 23:09:25 pauloscustodio Exp $
 $Log: mapfile.c,v $
-Revision 1.7  2013-09-30 00:24:25  pauloscustodio
+Revision 1.8  2013-10-04 23:09:25  pauloscustodio
+Parse command line options via look-up tables:
+-R, --relocatable
+--RCMX000
+
+Revision 1.7  2013/09/30 00:24:25  pauloscustodio
 Parse command line options via look-up tables:
 -e, --asm-ext
 -M, --obj-ext
@@ -73,7 +78,7 @@ static void write_map_syms( FILE *file, SymbolHash *symtab )
 		/* CH_0017 */
 		fprintf( file, "%-*s ", COLUMN_WIDTH - 1, sym->name );
 
-		if ( autorelocate )
+		if ( opts.relocatable )
 		{
 			fprintf( file, "= %04lX, ", sizeof_relocroutine + sizeof_reloctable + 4 + sym->value );
 		}

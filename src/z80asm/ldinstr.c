@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.20 2013-09-08 00:43:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/ldinstr.c,v 1.21 2013-10-04 23:09:24 pauloscustodio Exp $ */
 /* $Log: ldinstr.c,v $
-/* Revision 1.20  2013-09-08 00:43:59  pauloscustodio
+/* Revision 1.21  2013-10-04 23:09:24  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -R, --relocatable
+/* --RCMX000
+/*
+/* Revision 1.20  2013/09/08 00:43:59  pauloscustodio
 /* New error module with one error function per error, no need for the error
 /* constants. Allows compiler to type-check error message arguments.
 /* Included the errors module in the init() mechanism, no need to call
@@ -325,7 +330,7 @@ LD( void )
                             /* LD  r,n */
                             if ( destreg & 8 )
                             {
-                                if ( ( cpu_type & CPU_RABBIT ) )
+                                if ( ( opts.cpu & CPU_RABBIT ) )
 
                                 {
                                     error_illegal_ident();
@@ -337,7 +342,7 @@ LD( void )
                             }
                             else if ( destreg & 16 )
                             {
-                                if ( ( cpu_type & CPU_RABBIT ) )
+                                if ( ( opts.cpu & CPU_RABBIT ) )
                                 {
                                     error_illegal_ident();
                                     return;
@@ -382,7 +387,7 @@ LD( void )
                         if ( ( destreg & 8 ) || ( sourcereg & 8 ) )
                         {
                             /* IXl or IXh */
-                            if ( ( cpu_type & CPU_RABBIT ) )
+                            if ( ( opts.cpu & CPU_RABBIT ) )
                             {
                                 error_illegal_ident();
                                 return;
@@ -394,7 +399,7 @@ LD( void )
                         else if ( ( destreg & 16 ) || ( sourcereg & 16 ) )
                         {
                             /* IYl or IYh */
-                            if ( ( cpu_type & CPU_RABBIT ) )
+                            if ( ( opts.cpu & CPU_RABBIT ) )
                             {
                                 error_illegal_ident();
                                 return;

@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.112 2013-10-03 23:48:31 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.113 2013-10-04 23:09:25 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.112  2013-10-03 23:48:31  pauloscustodio
+/* Revision 1.113  2013-10-04 23:09:25  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -R, --relocatable
+/* --RCMX000
+/*
+/* Revision 1.112  2013/10/03 23:48:31  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -r, --origin=ORG_HEX
 /*
@@ -1351,7 +1356,7 @@ int main( int argc, char *argv[] )
             ReleaseLibraries();    /* Release library information */
         }
 
-        if ( autorelocate )
+        if ( opts.relocatable )
         {
             if ( reloctable != NULL )
             {

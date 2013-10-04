@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.45 2013-10-01 23:23:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.46 2013-10-04 23:09:25 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.45  2013-10-01 23:23:53  pauloscustodio
+/* Revision 1.46  2013-10-04 23:09:25  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -R, --relocatable
+/* --RCMX000
+/*
+/* Revision 1.45  2013/10/01 23:23:53  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -l, --list
 /* -nl, --no-list
@@ -720,7 +725,7 @@ NOP( void )
 void
 HALT( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -775,7 +780,7 @@ LDDR( void )
 void
 CPI( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         SetTemporaryLine( "\nlib rcmx_cpi\ncall rcmx_cpi\n" );
         return;
@@ -791,7 +796,7 @@ CPI( void )
 void
 CPIR( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         SetTemporaryLine( "\nlib rcmx_cpir\ncall rcmx_cpir\n" );
         return;
@@ -807,7 +812,7 @@ CPIR( void )
 void
 CPD( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         SetTemporaryLine( "\nlib rcmx_cpd\ncall rcmx_cpd\n" );
         return;
@@ -823,7 +828,7 @@ CPD( void )
 void
 CPDR( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         SetTemporaryLine( "\nlib rcmx_cpdr\ncall rcmx_cpdr\n" );
         return;
@@ -839,7 +844,7 @@ CPDR( void )
 void
 IND( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -855,7 +860,7 @@ IND( void )
 void
 INDR( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -871,7 +876,7 @@ INDR( void )
 void
 INI( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -887,7 +892,7 @@ INI( void )
 void
 INIR( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -903,7 +908,7 @@ INIR( void )
 void
 OUTI( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -919,7 +924,7 @@ OUTI( void )
 void
 OUTD( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -935,7 +940,7 @@ OUTD( void )
 void
 OTIR( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -951,7 +956,7 @@ OTIR( void )
 void
 OTDR( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -1116,7 +1121,7 @@ SRA( void )
 void
 SLL( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -1219,7 +1224,7 @@ RETI( void )
 void
 RETN( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -1235,7 +1240,7 @@ RETN( void )
 void
 RLD( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         SetTemporaryLine( "\nlib rcmx_rld\ncall rcmx_rld\n" );
         return;
@@ -1251,7 +1256,7 @@ RLD( void )
 void
 RRD( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         SetTemporaryLine( "\nlib rcmx_rrd\ncall rcmx_rrd\n" );
         return;
@@ -1311,7 +1316,7 @@ SCF( void )
 void
 DI( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -1326,7 +1331,7 @@ DI( void )
 void
 EI( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -1341,7 +1346,7 @@ EI( void )
 void
 DAA( void )
 {
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;

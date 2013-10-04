@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.35 2013-09-08 00:43:59 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsline.c,v 1.36 2013-10-04 23:09:25 pauloscustodio Exp $ */
 /* $Log: prsline.c,v $
-/* Revision 1.35  2013-09-08 00:43:59  pauloscustodio
+/* Revision 1.36  2013-10-04 23:09:25  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -R, --relocatable
+/* --RCMX000
+/*
+/* Revision 1.35  2013/09/08 00:43:59  pauloscustodio
 /* New error module with one error function per error, no need for the error
 /* constants. Allows compiler to type-check error message arguments.
 /* Included the errors module in the init() mechanism, no need to call
@@ -669,7 +674,7 @@ CheckCondition( void )
 
         if ( strcmp( text, flags[i].name ) == 0 )
         {
-            if ( ( cpu_type & flags[i].cpu ) == 0 )
+            if ( ( opts.cpu & flags[i].cpu ) == 0 )
             {
                 continue;
             }
@@ -714,7 +719,7 @@ CheckRegister8( void )
 
                 case 'I':
                 {
-                    if ( ( cpu_type & CPU_RABBIT ) )
+                    if ( ( opts.cpu & CPU_RABBIT ) )
                     {
                         error_illegal_ident();
                         return -1;
@@ -725,7 +730,7 @@ CheckRegister8( void )
 
                 case 'R':
                 {
-                    if ( ( cpu_type & CPU_RABBIT ) )
+                    if ( ( opts.cpu & CPU_RABBIT ) )
                     {
                         error_illegal_ident();
                         return -1;
@@ -790,14 +795,14 @@ CheckRegister8( void )
 
             else if ( strcmp( ident, "IIR" ) == 0 ) /** Was 'I' register */
             {
-                if ( ( cpu_type & CPU_RABBIT ) )
+                if ( ( opts.cpu & CPU_RABBIT ) )
                 {
                     return 8;
                 }
             }
             else if ( strcmp( ident, "EIR" ) == 0 ) /** Was 'R' register */
             {
-                if ( ( cpu_type & CPU_RABBIT ) )
+                if ( ( opts.cpu & CPU_RABBIT ) )
                 {
                     return 9;
                 }

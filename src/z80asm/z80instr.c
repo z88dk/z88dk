@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.35 2013-09-08 08:29:21 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.36 2013-10-04 23:09:25 pauloscustodio Exp $ */
 /* $Log: z80instr.c,v $
-/* Revision 1.35  2013-09-08 08:29:21  pauloscustodio
+/* Revision 1.36  2013-10-04 23:09:25  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -R, --relocatable
+/* --RCMX000
+/*
+/* Revision 1.35  2013/09/08 08:29:21  pauloscustodio
 /* Replaced xmalloc et al with g_malloc0 et al.
 /*
 /* Revision 1.34  2013/09/08 00:43:59  pauloscustodio
@@ -352,7 +357,7 @@ EX( void )
                             switch ( CheckRegister16() )
                             {
                                 case REG16_HL:
-                                    if ( ( cpu_type & CPU_RABBIT ) )
+                                    if ( ( opts.cpu & CPU_RABBIT ) )
                                     {
                                         /* Instruction code changed */
                                         append_byte( 0xED );
@@ -469,7 +474,7 @@ OUT( void )
 {
     long reg;
 
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -559,7 +564,7 @@ IN( void )
 {
     long inreg;
 
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -639,7 +644,7 @@ IM( void )
     long constant;
     struct expr *postfixexpr;
 
-    if ( ( cpu_type & CPU_RABBIT ) )
+    if ( ( opts.cpu & CPU_RABBIT ) )
     {
         error_illegal_ident();
         return;
@@ -703,7 +708,7 @@ RST( void )
 
             if ( ( constant >= 0 && constant <= 56 ) && ( constant % 8 == 0 ) )
             {
-                if ( ( cpu_type & CPU_RABBIT ) &&
+                if ( ( opts.cpu & CPU_RABBIT ) &&
                         ( ( constant == 0 ) || ( constant == 8 ) || ( constant == 0x30 ) ) )
                 {
                     error_illegal_ident();
@@ -919,7 +924,7 @@ Subroutine_addr( int opcode0, int opcode )
         }
 
 
-        if ( opcode0 == 205 && ( cpu_type & CPU_RABBIT ) )
+        if ( opcode0 == 205 && ( opts.cpu & CPU_RABBIT ) )
         {
             static char buffer[200];
 
@@ -1465,7 +1470,7 @@ ArithLog8_instr( int opcode )
                 if ( reg & 8 )
                 {
                     /* IXl or IXh */
-                    if ( ( cpu_type & CPU_RABBIT ) )
+                    if ( ( opts.cpu & CPU_RABBIT ) )
                     {
                         error_illegal_ident();
                         return;
@@ -1477,7 +1482,7 @@ ArithLog8_instr( int opcode )
                 else if ( reg & 16 )
                 {
                     /* IYl or IYh */
-                    if ( ( cpu_type & CPU_RABBIT ) )
+                    if ( ( opts.cpu & CPU_RABBIT ) )
                     {
                         error_illegal_ident();
                         return;
@@ -1624,7 +1629,7 @@ IncDec_8bit_instr( int opcode )
 
             case 12:
             case 13:
-                if ( ( cpu_type & CPU_RABBIT ) )
+                if ( ( opts.cpu & CPU_RABBIT ) )
                 {
                     error_illegal_ident();
                     return;
@@ -1637,7 +1642,7 @@ IncDec_8bit_instr( int opcode )
 
             case 20:
             case 21:
-                if ( ( cpu_type & CPU_RABBIT ) )
+                if ( ( opts.cpu & CPU_RABBIT ) )
                 {
                     error_illegal_ident();
                     return;

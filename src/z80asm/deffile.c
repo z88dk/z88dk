@@ -14,9 +14,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.3 2013-09-30 00:24:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.4 2013-10-04 23:09:24 pauloscustodio Exp $
 $Log: deffile.c,v $
-Revision 1.3  2013-09-30 00:24:25  pauloscustodio
+Revision 1.4  2013-10-04 23:09:24  pauloscustodio
+Parse command line options via look-up tables:
+-R, --relocatable
+--RCMX000
+
+Revision 1.3  2013/09/30 00:24:25  pauloscustodio
 Parse command line options via look-up tables:
 -e, --asm-ext
 -M, --obj-ext
@@ -56,7 +61,7 @@ static void write_def_syms( FILE *file, SymbolHash *symtab )
 		/* CH_0017 */
 		fprintf( file, "DEFC %-*s ", COLUMN_WIDTH - 1, sym->name );
 
-		if ( autorelocate )
+		if ( opts.relocatable )
 		{
 			fprintf( file, "= $%04lX ; ", sizeof_relocroutine + sizeof_reloctable + 4 + sym->value );
 		}

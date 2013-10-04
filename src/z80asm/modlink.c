@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.80 2013-10-04 22:24:01 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.81 2013-10-04 23:09:25 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.80  2013-10-04 22:24:01  pauloscustodio
+/* Revision 1.81  2013-10-04 23:09:25  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -R, --relocatable
+/* --RCMX000
+/*
+/* Revision 1.80  2013/10/04 22:24:01  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -c, --code-seg
 /*
@@ -620,7 +625,7 @@ ReadExpr( long nextexpr, long endexpr )
 
 						patch_word( &patchptr, constant );
 
-                        if ( autorelocate )
+                        if ( opts.relocatable )
                             if ( postfixexpr->rangetype & SYMADDR )
                             {
                                 /* Expression contains relocatable address */
@@ -682,7 +687,7 @@ LinkModules( void )
         puts( "linking module(s)...\nPass1..." );
     }
 
-    if ( autorelocate == ON )
+    if ( opts.relocatable )
     {
         reloctable = ( char * ) g_malloc0( 32768U );
         relocptr = reloctable;
@@ -747,7 +752,7 @@ LinkModules( void )
 
             if ( modulehdr->first == CURRENTMODULE )            /* origin of first module */
             {
-                if ( autorelocate )
+                if ( opts.relocatable )
                 {
                     CURRENTMODULE->origin = 0;    /* ORG 0 on auto relocation */
                 }
@@ -1250,7 +1255,7 @@ CreateBinFile( void )
     /* binary output to filename.bin */
     binaryfile = xfopen( filename, "wb" );         /* CH_0012 */
 
-    if ( autorelocate == ON && totaladdr != 0 )
+    if ( opts.relocatable && totaladdr != 0 )
     {
         xfput_char( reloc_routine, sizeof_relocroutine, binaryfile );   /* relocate routine */
         *( reloctable + 0 ) = (size_t) totaladdr % 256U;

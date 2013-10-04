@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.19 2013-10-04 22:24:01 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.20 2013-10-04 23:09:25 pauloscustodio Exp $
 #
 # Test options
 
@@ -97,6 +97,7 @@ Input / Output File Options:
   -o, --output=FILE.BIN  Output binary file
 
 Code Generation Options:
+  --RCMX000              Assemble for RCM2000/RCM3000 series of Z80-like CPU
   --sdcc                 Assemble for Small Device C Compiler
 
 Output Options:
@@ -107,6 +108,7 @@ Output Options:
   -a, --make-updated-bin Assemble updated files and link/relocate to file.bin
   -r, --origin=ORG_HEX   Relocate binary file to given address
   -c, --code-seg         Split code in 16K banks
+  -R, --relocatable      Create relocatable code
 
 Other Output File Options:
 * -s, --symtable         Create symbol table file.sym
@@ -118,17 +120,13 @@ Other Output File Options:
   -g, --globaldef        Create global definition file.def
 * -ng, --no-globaldef    No global definition file
 
-Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)
+Options:
 -plus Interpret 'Invoke' as RST 28h
--R Generate relocatable code (Automatical relocation before execution)
 -D<symbol> define symbol as logically TRUE (used for conditional assembly)
--c split code in 16K banks
 -i<library> include <library> LIB modules with .obj modules during linking
 -x<library> create library from specified modules ( e.g. with @<modules> )
--t<n> tabulator width for .map, .def, .sym files. Column width is 4 times -t
 -I<path> additional path to search for includes
 -L<path> path to search for libraries
-Default options: -nd -nc -nR -t8
 END
 
 unlink_testfiles();
@@ -652,6 +650,46 @@ for my $options ('-c', '--code-seg') {
 	is read_binfile(bn3_file()), substr($bin, 0xC000, 0x4000);
 }
 
+#------------------------------------------------------------------------------
+# -R, --relocatable
+#------------------------------------------------------------------------------
+
+# copied from z80asm.c:
+# unsigned char reloc_routine[] =
+my $reloc_routine =
+"\x08\xD9\xFD\xE5\xE1\x01\x49\x00\x09\x5E\x23\x56\xD5\x23\x4E\x23".
+"\x46\x23\xE5\x09\x44\x4D\xE3\x7E\x23\xB7\x20\x06\x5E\x23\x56\x23".
+"\x18\x03\x16\x00\x5F\xE3\x19\x5E\x23\x56\xEB\x09\xEB\x72\x2B\x73".
+"\xD1\xE3\x2B\x7C\xB5\xE3\xD5\x20\xDD\xF1\xF1\xFD\x36\x00\xC3\xFD".
+"\x71\x01\xFD\x70\x02\xD9\x08\xFD\xE9";
+
+$asm = "start: jp start";
+$bin = "\xC3\x00\x00";
+my $reloc_data = "\x01\x00\x01\x00\x01";
+
+# -R
+for my $options ('-R', '--relocatable') {
+	unlink_testfiles();
+	write_file(asm_file(), $asm);
+	t_z80asm_capture("-r0 -b $options ".asm_file(), "Relocation header is 78 bytes.\n", "", 0);
+	t_binary(read_file(bin_file(), binmode => ':raw'), $reloc_routine.$reloc_data.$bin);
+}
+
+# not -R
+unlink_testfiles();
+write_file(asm_file(), $asm);
+t_z80asm_capture("-r0 -b ".asm_file(), "", "", 0);
+t_binary(read_file(bin_file(), binmode => ':raw'), $bin);
+
+#------------------------------------------------------------------------------
+# --RCMX000
+#------------------------------------------------------------------------------
+
+t_z80asm_ok(0, "ex (sp),hl", "\xE3");
+t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "-RCMX000");
+t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "--RCMX000");
+
+
 
 
 unlink_testfiles();
@@ -659,7 +697,12 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.19  2013-10-04 22:24:01  pauloscustodio
+# Revision 1.20  2013-10-04 23:09:25  pauloscustodio
+# Parse command line options via look-up tables:
+# -R, --relocatable
+# --RCMX000
+#
+# Revision 1.19  2013/10/04 22:24:01  pauloscustodio
 # Parse command line options via look-up tables:
 # -c, --code-seg
 #

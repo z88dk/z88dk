@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.27 2013-10-04 22:24:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.28 2013-10-04 23:09:25 pauloscustodio Exp $
 */
 
 #pragma once
@@ -24,8 +24,15 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.27 2013-10-04 22
 
 #include "types.h"
 
+/* CPU type */
+#define CPU_Z80     1
+#define CPU_RCM2000 2
+#define CPU_RCM3000 4
+#define CPU_Z180    8
 
-enum OptType { OptClear, OptSet, OptCall, OptCallArg, OptString };
+#define CPU_RABBIT (CPU_RCM2000|CPU_RCM3000)
+#define CPU_ZILOG  (CPU_Z80    |CPU_Z180)
+#define CPU_ALL    (CPU_ZILOG  |CPU_RABBIT)
 
 /*-----------------------------------------------------------------------------
 *   singleton opts
@@ -65,7 +72,12 @@ extern char *get_map_filename( char *filename );
 
 /* 
 * $Log: options.h,v $
-* Revision 1.27  2013-10-04 22:24:01  pauloscustodio
+* Revision 1.28  2013-10-04 23:09:25  pauloscustodio
+* Parse command line options via look-up tables:
+* -R, --relocatable
+* --RCMX000
+*
+* Revision 1.27  2013/10/04 22:24:01  pauloscustodio
 * Parse command line options via look-up tables:
 * -c, --code-seg
 *
@@ -201,22 +213,9 @@ extern enum flag swapIXIY;
 extern enum flag clinemode;
 extern long clineno;
 extern enum flag force_xlib;
-extern enum flag autorelocate;
 extern char *libfilename;				/* -i, -x library file, kept in strpool */
 extern enum flag library;
 extern enum flag createlibrary;
-
-/* CPU type */
-#define CPU_Z80     1
-#define CPU_RCM2000 2
-#define CPU_RCM3000 4
-#define CPU_Z180    8
-
-#define CPU_RABBIT (CPU_RCM2000|CPU_RCM3000)
-#define CPU_ZILOG  (CPU_Z80    |CPU_Z180)
-#define CPU_ALL    (CPU_ZILOG  |CPU_RABBIT)
-
-extern int cpu_type;
 
 /* parse one command line option */
 extern void set_asm_flag( char *flagid );

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.18 2013-10-04 22:24:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.19 2013-10-04 23:09:25 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -45,8 +45,10 @@ OPT_VAR(	BOOL,	globaldef,	FALSE	)
 OPT_VAR(	BOOL,	make_bin,	FALSE	)
 OPT_VAR(	BOOL,	date_stamp,	FALSE	)
 OPT_VAR(	BOOL,	code_seg,	FALSE	)
+OPT_VAR(	BOOL,	relocatable,FALSE	)
 
 OPT_VAR(	int, 	origin,		-1		)			/* -1 == not defined */
+OPT_VAR(	int, 	cpu,		CPU_Z80	)
 
 OPT_VAR(	char *,	asm_ext,	(FILEEXT_ASM)+1 )	/* skip "." */
 OPT_VAR(	char *,	obj_ext,	(FILEEXT_OBJ)+1 )	/* skip "." */
@@ -63,6 +65,7 @@ OPT_VAR(	char *,	bin_file,	NULL 			)	/* set by -o */
 #define OPT_HELP_OBJ_EXT		"Object file extension excluding '" FILEEXT_SEPARATOR "'"
 #define OPT_HELP_BIN_FILE		"Output binary file"
 
+#define OPT_HELP_CPU_RCM2000	"Assemble for RCM2000/RCM3000 series of Z80-like CPU"
 #define OPT_HELP_SDCC			"Assemble for Small Device C Compiler"
 
 #define OPT_HELP_MAKE_BIN		"Assemble and link/relocate to file" FILEEXT_BIN
@@ -76,6 +79,7 @@ OPT_VAR(	char *,	bin_file,	NULL 			)	/* set by -o */
 #define OPT_HELP_ORIGIN			"Relocate binary file to given address"
 
 #define OPT_HELP_CODE_SEG		"Split code in 16K banks"
+#define OPT_HELP_RELOCATABLE	"Create relocatable code"
 
 #define OPT_HELP_SYMTABLE		"Create symbol table file" FILEEXT_SYM
 #define OPT_HELP_NO_SYMTABLE	"No symbol table file"
@@ -103,6 +107,8 @@ OPT( OptString,	&opts.obj_ext,	"-M", 	"--obj-ext", 		OPT_HELP_OBJ_EXT, "EXT" )
 OPT( OptString,	&opts.bin_file,	"-o", 	"--output", 		OPT_HELP_BIN_FILE, "FILE.BIN" )
 
 OPT_TITLE(	"Code Generation Options:" )
+OPT( OptCall,	option_cpu_RCM2000,
+								"-RCMX000", "--RCMX000",	OPT_HELP_CPU_RCM2000, "" )
 OPT( OptSet,	&opts.sdcc,		"-sdcc","--sdcc",			OPT_HELP_SDCC, "" )
 
 OPT_TITLE(	"Output Options:" )
@@ -117,6 +123,8 @@ OPT( OptCall,	option_make_updated_bin,
 															OPT_HELP_MAKE_UPDATED_BIN, "" )
 OPT( OptCallArg,option_origin,	"-r", 	"--origin",			OPT_HELP_ORIGIN, "ORG_HEX" )
 OPT( OptSet,	&opts.code_seg,	"-c", 	"--code-seg",		OPT_HELP_CODE_SEG, "" )
+OPT( OptSet,	&opts.relocatable,
+								"-R", 	"--relocatable",	OPT_HELP_RELOCATABLE, "" )
 
 OPT_TITLE(	"Other Output File Options:" )
 OPT( OptSet,	&opts.symtable,	"-s", 	"--symtable", 		OPT_HELP_SYMTABLE, "" )
@@ -141,7 +149,12 @@ OPT( OptClear,	&opts.globaldef,"-ng", 	"--no-globaldef",	OPT_HELP_NO_GLOBALDEF, 
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.18  2013-10-04 22:24:01  pauloscustodio
+* Revision 1.19  2013-10-04 23:09:25  pauloscustodio
+* Parse command line options via look-up tables:
+* -R, --relocatable
+* --RCMX000
+*
+* Revision 1.18  2013/10/04 22:24:01  pauloscustodio
 * Parse command line options via look-up tables:
 * -c, --code-seg
 *

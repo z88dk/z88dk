@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.48 2013-10-04 22:24:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.49 2013-10-04 23:09:25 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -40,6 +40,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.48 2013-10-04 22
 #define FILEEXT_SYM     FILEEXT_SEPARATOR "sym"    /* ".sym" / "_sym" */
 #define FILEEXT_MAP     FILEEXT_SEPARATOR "map"    /* ".map" / "_map" */
 
+/* types */
+enum OptType { OptClear, OptSet, OptCall, OptCallArg, OptString };
+
 /* declare functions */
 static void reset_options( void );
 static void exit_help(void);
@@ -47,6 +50,7 @@ static void exit_copyright(void);
 static void display_options(void);
 static void option_make_updated_bin(void);
 static void option_origin(char *origin_hex);
+static void option_cpu_RCM2000(void);
 
 static void parse_options(int *parg, int argc, char *argv[]);
 static void parse_files(int arg, int argc, char *argv[], 
@@ -371,18 +375,14 @@ static void exit_help(void)
 #include "options_def.h"
 
 	puts(  "" );
-    puts( "Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)" );
+    puts( "Options:" );
     puts( "-plus Interpret 'Invoke' as RST 28h" );
-    puts( "-R Generate relocatable code (Automatical relocation before execution)" );
     puts( "-D<symbol> define symbol as logically TRUE (used for conditional assembly)" );
-    puts( "-c split code in 16K banks" );
     printf( "-i<library> include <library> LIB modules with %s%s modules during linking\n", 
 		   FILEEXT_SEPARATOR, opts.obj_ext );
     puts( "-x<library> create library from specified modules ( e.g. with @<modules> )" );
-    printf( "-t<n> tabulator width for %s, %s, %s files. Column width is 4 times -t\n", FILEEXT_MAP, FILEEXT_DEF, FILEEXT_SYM );
     printf( "-I<path> additional path to search for includes\n" );
     printf( "-L<path> path to search for libraries\n" );
-    puts( "Default options: -nd -nc -nR -t8" );
 
 	exit(0);
 }
@@ -395,30 +395,23 @@ static void exit_copyright(void)
 
 static void display_options(void)
 {
-    if ( opts.date_stamp )		
-		puts( OPT_HELP_DATE_STAMP );
-    else
-		puts( OPT_HELP_NO_DATE_STAMP );
-	
-    if ( opts.symtable )				puts( OPT_HELP_SYMTABLE );
-    if ( opts.list )					puts( OPT_HELP_LIST );
-
-    if ( opts.globaldef )    			puts( OPT_HELP_GLOBALDEF );
+    if ( opts.date_stamp )						puts( OPT_HELP_DATE_STAMP );
+    else										puts( OPT_HELP_NO_DATE_STAMP );	
+    if ( opts.symtable )						puts( OPT_HELP_SYMTABLE );
+    if ( opts.list )							puts( OPT_HELP_LIST );
+    if ( opts.globaldef )    					puts( OPT_HELP_GLOBALDEF );
 
     if ( createlibrary == ON )
         puts( "Create library from specified modules." );
 
-    if ( opts.make_bin )				puts( OPT_HELP_MAKE_BIN );
+    if ( opts.make_bin )						puts( OPT_HELP_MAKE_BIN );
 
     if ( library == ON )
         puts( "Link library modules with code." );
 
-    if ( opts.make_bin && opts.map )	puts( OPT_HELP_MAP );
-
-    if ( opts.code_seg && autorelocate == OFF )	puts( OPT_HELP_CODE_SEG );
-
-    if ( autorelocate == ON )
-        puts( "Create relocatable code." );
+    if ( opts.make_bin && opts.map )			puts( OPT_HELP_MAP );
+    if ( opts.code_seg && ! opts.relocatable )	puts( OPT_HELP_CODE_SEG );
+    if ( opts.relocatable )						puts( OPT_HELP_RELOCATABLE );
 
     putchar( '\n' );
 }
@@ -437,6 +430,11 @@ static void option_origin(char *origin_hex)
 	if ( origin < 0 || origin > 0xFFFF )
 		error_int_range(origin);
 	opts.origin = (int) origin;
+}
+
+static void option_cpu_RCM2000(void)
+{
+	opts.cpu = CPU_RCM2000;
 }
 
 /*-----------------------------------------------------------------------------
@@ -492,7 +490,12 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.48  2013-10-04 22:24:01  pauloscustodio
+* Revision 1.49  2013-10-04 23:09:25  pauloscustodio
+* Parse command line options via look-up tables:
+* -R, --relocatable
+* --RCMX000
+*
+* Revision 1.48  2013/10/04 22:24:01  pauloscustodio
 * Parse command line options via look-up tables:
 * -c, --code-seg
 *
@@ -726,9 +729,7 @@ enum flag swapIXIY;
 enum flag clinemode;
 long clineno;
 enum flag force_xlib;
-enum flag autorelocate;
 char *libfilename;				/* -i, -x library file, kept in strpool */
-int  cpu_type;
 enum flag library;
 enum flag createlibrary;
 
@@ -770,8 +771,6 @@ static void reset_options( void )
     clinemode       = OFF;
     clineno         = 0;
     force_xlib      = OFF;
-    autorelocate    = OFF;
-    cpu_type        = CPU_Z80;
 	library			= OFF;
 	createlibrary   = OFF;
 
@@ -787,14 +786,8 @@ static void reset_options( void )
 *----------------------------------------------------------------------------*/
 void set_asm_flag( char *flagid )
 {
-    /** Check whether this is for the RCM2000/RCM3000 series of Z80-like CPU's */
-    if ( strcmp( flagid, "RCMX000" ) == 0 )
-    {
-        cpu_type = CPU_RCM2000;
-    }
-
     /* check weather to use an RST or CALL when Invoke is used */
-    else if ( strcmp( flagid, "plus" ) == 0 )
+    if ( strcmp( flagid, "plus" ) == 0 )
     {
         ti83plus = ON;
     }
@@ -814,16 +807,6 @@ void set_asm_flag( char *flagid )
     else if ( strcmp( flagid, "forcexlib" ) == 0 )
     {
         force_xlib = ON;
-    }
-
-    else if ( strcmp( flagid, "R" ) == 0 )
-    {
-        autorelocate = ON;
-    }
-
-    else if ( strcmp( flagid, "nR" ) == 0 )
-    {
-        autorelocate = OFF;
     }
 
     else if ( *flagid == 'i' )
