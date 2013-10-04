@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.17 2013-10-04 21:18:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.18 2013-10-04 22:04:52 pauloscustodio Exp $
 #
 # Test options
 
@@ -89,33 +89,33 @@ Usage:
 Help Options:
   -h, --help             Show help options
   -v, --verbose          Be verbose
-* -nv, --not-verbose     Be silent
+* -nv, --not-verbose     Don't be verbose
 
 Input / Output File Options:
-  -e, --asm-ext=EXT      ASM file extension, excluding '.'
-  -M, --obj-ext=EXT      OBJ file extension, excluding '.'
+  -e, --asm-ext=EXT      Assembly file extension excluding '.'
+  -M, --obj-ext=EXT      Object file extension excluding '.'
   -o, --output=FILE.BIN  Output binary file
 
 Code Generation Options:
   --sdcc                 Assemble for Small Device C Compiler
 
 Output Options:
-  -b, --make-bin         Assemble files and link objects to file.bin
+  -b, --make-bin         Assemble and link/relocate to file.bin
 * -nb, --no-make-bin     No binary file
   -d, --date-stamp       Assemble only updated files
-* -nd, --no-date-stamp   No date stamp
-  -a, --make-updated-bin Assemble updated files and link objects to file.bin
+* -nd, --no-date-stamp   Assemble all files
+  -a, --make-updated-bin Assemble updated files and link/relocate to file.bin
   -r, --origin=ORG_HEX   Relocate binary file to given address
 
 Other Output File Options:
-* -s, --symtable         Generate symbol table file.sym
+* -s, --symtable         Create symbol table file.sym
   -ns, --no-symtable     No symbol table file
-  -l, --list             Generate list file.lst
-* -nl, --no-list         No list file
-* -m, --map              Generate address map file.map
+  -l, --list             Create listing file.lst
+* -nl, --no-list         No listing file
+* -m, --map              Create address map file.map
   -nm, --no-map          No address map file
-  -g, --globaldef        Generate global address definition file.def
-* -ng, --no-globaldef    No global address definition file
+  -g, --globaldef        Create global definition file.def
+* -ng, --no-globaldef    No global definition file
 
 Options: -n defines option to be turned OFF (except -r -R -i -x -D -t -o)
 -plus Interpret 'Invoke' as RST 28h
@@ -157,10 +157,11 @@ ERR
 # --verbose, -v
 #------------------------------------------------------------------------------
 my $verbose_text = <<'END';
-Assemble all files.
-Create symbol table file.
-Link/relocate assembled modules.
-Create address map file.
+Create symbol table file.sym
+Create listing file.lst
+Create global definition file.def
+Assemble and link/relocate to file.bin
+Create address map file.map
 
 Assembling 'test.asm'...
 Pass1...
@@ -174,16 +175,27 @@ ORG address for code is 0000
 Code size of linked modules is 3 bytes
 Pass2...
 Creating map...
+Creating global definition file...
 Code generation completed.
 END
 
 for my $options ('-v', '--verbose') {
 	unlink_testfiles();
 	write_file(asm_file(), " nop \n nop \n nop");
-	t_z80asm_capture("-r0 -b $options ".asm_file(), $verbose_text, "", 0);
+	t_z80asm_capture("-r0 -a -s -l -g $options ".asm_file(), 
+					"Assemble only updated files\n".$verbose_text, "", 0);
 	ok -f obj_file();
 	ok -f bin_file();
 	is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
+	
+	unlink_testfiles();
+	write_file(asm_file(), " nop \n nop \n nop");
+	t_z80asm_capture("-r0 -b -s -l -g $options ".asm_file(), 
+					"Assemble all files\n".$verbose_text, "", 0);
+	ok -f obj_file();
+	ok -f bin_file();
+	is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
+	
 }
 
 # check no arguments
@@ -623,7 +635,10 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.17  2013-10-04 21:18:34  pauloscustodio
+# Revision 1.18  2013-10-04 22:04:52  pauloscustodio
+# Unify option describing texts
+#
+# Revision 1.17  2013/10/04 21:18:34  pauloscustodio
 # dont show short_opt if short_opt is same as long_opt, except for extra '-',
 # e.g. -sdcc and --sdcc
 #

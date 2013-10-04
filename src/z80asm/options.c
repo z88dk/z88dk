@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.46 2013-10-04 21:18:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.47 2013-10-04 22:04:52 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -395,31 +395,25 @@ static void exit_copyright(void)
 
 static void display_options(void)
 {
-    if ( opts.date_stamp )
-        puts( "Assemble only updated files." );
+    if ( opts.date_stamp )		
+		puts( OPT_HELP_DATE_STAMP );
     else
-        puts( "Assemble all files." );
+		puts( OPT_HELP_NO_DATE_STAMP );
+	
+    if ( opts.symtable )				puts( OPT_HELP_SYMTABLE );
+    if ( opts.list )					puts( OPT_HELP_LIST );
 
-    if ( opts.symtable )
-        puts( "Create symbol table file." );
-
-    if ( opts.list )
-        puts( "Create listing file." );
-
-    if ( opts.globaldef )
-        puts( "Create global definition file." );
+    if ( opts.globaldef )    			puts( OPT_HELP_GLOBALDEF );
 
     if ( createlibrary == ON )
         puts( "Create library from specified modules." );
 
-    if ( opts.make_bin )
-        puts( "Link/relocate assembled modules." );
+    if ( opts.make_bin )				puts( OPT_HELP_MAKE_BIN );
 
     if ( library == ON )
         puts( "Link library modules with code." );
 
-    if ( opts.make_bin && opts.map )
-        puts( "Create address map file." );
+    if ( opts.make_bin && opts.map )	puts( OPT_HELP_MAP );
 
     if ( codesegment == ON && autorelocate == OFF )
         puts( "Split code into 16K banks." );
@@ -499,7 +493,10 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.46  2013-10-04 21:18:34  pauloscustodio
+* Revision 1.47  2013-10-04 22:04:52  pauloscustodio
+* Unify option describing texts
+*
+* Revision 1.46  2013/10/04 21:18:34  pauloscustodio
 * dont show short_opt if short_opt is same as long_opt, except for extra '-',
 * e.g. -sdcc and --sdcc
 *
