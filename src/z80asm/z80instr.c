@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.36 2013-10-04 23:09:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.37 2013-10-04 23:20:21 pauloscustodio Exp $ */
 /* $Log: z80instr.c,v $
-/* Revision 1.36  2013-10-04 23:09:25  pauloscustodio
+/* Revision 1.37  2013-10-04 23:20:21  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -plus, --ti83plus
+/*
+/* Revision 1.36  2013/10/04 23:09:25  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -R, --relocatable
 /* --RCMX000
@@ -825,7 +829,7 @@ INVOKE( void )
     long constant;
     struct expr *postfixexpr;
 
-    if ( ti83plus == ON )
+    if ( opts.ti83plus )
     {
         append_byte( 0xEF );    /* Ti83Plus: RST 28H instruction */
     }

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.49 2013-10-04 23:09:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.50 2013-10-04 23:20:21 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -376,7 +376,6 @@ static void exit_help(void)
 
 	puts(  "" );
     puts( "Options:" );
-    puts( "-plus Interpret 'Invoke' as RST 28h" );
     puts( "-D<symbol> define symbol as logically TRUE (used for conditional assembly)" );
     printf( "-i<library> include <library> LIB modules with %s%s modules during linking\n", 
 		   FILEEXT_SEPARATOR, opts.obj_ext );
@@ -490,7 +489,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.49  2013-10-04 23:09:25  pauloscustodio
+* Revision 1.50  2013-10-04 23:20:21  pauloscustodio
+* Parse command line options via look-up tables:
+* -plus, --ti83plus
+*
+* Revision 1.49  2013/10/04 23:09:25  pauloscustodio
 * Parse command line options via look-up tables:
 * -R, --relocatable
 * --RCMX000
@@ -724,7 +727,6 @@ char *get_segbin_filename( char *filename, int segment )
 #include <string.h>
 
 /* global option variables */
-enum flag ti83plus;
 enum flag swapIXIY;
 enum flag clinemode;
 long clineno;
@@ -766,7 +768,6 @@ char *search_lib_file( char *filename )
 *----------------------------------------------------------------------------*/
 static void reset_options( void )
 {
-    ti83plus        = OFF;
     swapIXIY        = OFF;
     clinemode       = OFF;
     clineno         = 0;
@@ -786,14 +787,8 @@ static void reset_options( void )
 *----------------------------------------------------------------------------*/
 void set_asm_flag( char *flagid )
 {
-    /* check weather to use an RST or CALL when Invoke is used */
-    if ( strcmp( flagid, "plus" ) == 0 )
-    {
-        ti83plus = ON;
-    }
-
     /* (stefano) IX and IY swap option */
-    else if ( strcmp( flagid, "IXIY" ) == 0 )
+    if ( strcmp( flagid, "IXIY" ) == 0 )
     {
         swapIXIY = ON;
     }

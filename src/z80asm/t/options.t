@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.20 2013-10-04 23:09:25 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.21 2013-10-04 23:20:21 pauloscustodio Exp $
 #
 # Test options
 
@@ -99,6 +99,7 @@ Input / Output File Options:
 Code Generation Options:
   --RCMX000              Assemble for RCM2000/RCM3000 series of Z80-like CPU
   --sdcc                 Assemble for Small Device C Compiler
+  -plus, --ti83plus      Interpret 'Invoke' as RST 28h
 
 Output Options:
   -b, --make-bin         Assemble and link/relocate to file.bin
@@ -121,7 +122,6 @@ Other Output File Options:
 * -ng, --no-globaldef    No global definition file
 
 Options:
--plus Interpret 'Invoke' as RST 28h
 -D<symbol> define symbol as logically TRUE (used for conditional assembly)
 -i<library> include <library> LIB modules with .obj modules during linking
 -x<library> create library from specified modules ( e.g. with @<modules> )
@@ -689,6 +689,13 @@ t_z80asm_ok(0, "ex (sp),hl", "\xE3");
 t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "-RCMX000");
 t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "--RCMX000");
 
+#------------------------------------------------------------------------------
+# -plus, --ti83plus
+#------------------------------------------------------------------------------
+
+t_z80asm_ok(0, "invoke 0x1234", "\xCD\x34\x12");
+t_z80asm_ok(0, "invoke 0x1234", "\xEF\x34\x12", "-plus");
+t_z80asm_ok(0, "invoke 0x1234", "\xEF\x34\x12", "--ti83plus");
 
 
 
@@ -697,7 +704,11 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.20  2013-10-04 23:09:25  pauloscustodio
+# Revision 1.21  2013-10-04 23:20:21  pauloscustodio
+# Parse command line options via look-up tables:
+# -plus, --ti83plus
+#
+# Revision 1.20  2013/10/04 23:09:25  pauloscustodio
 # Parse command line options via look-up tables:
 # -R, --relocatable
 # --RCMX000
