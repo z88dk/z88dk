@@ -1,5 +1,5 @@
 @echo off
-rem $Id: gccmake.bat,v 1.16 2013-09-23 23:14:10 pauloscustodio Exp $
+rem $Id: gccmake.bat,v 1.17 2013-10-05 10:54:35 pauloscustodio Exp $
 
 echo *******************
 echo * Building z80asm *
@@ -44,6 +44,7 @@ gcc -c -o z80pass.o              z80pass.c
 gcc -c -o init.o                 init.c
 gcc -c -o init_obj.o             init_obj.c
 gcc -c -o init_obj_file.o        init_obj_file.c
+gcc -c -o init_obj_options.o     init_obj_options.c
 gcc -o z80asm.exe *.o
 copy z80asm.exe ..\..\bin
 del z80asm.exe

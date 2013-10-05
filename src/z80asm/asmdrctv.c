@@ -14,10 +14,15 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.58 2013-10-05 08:14:43 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.59 2013-10-05 10:54:35 pauloscustodio Exp $ */
 /* 
  * $Log: asmdrctv.c,v $
- * Revision 1.58  2013-10-05 08:14:43  pauloscustodio
+ * Revision 1.59  2013-10-05 10:54:35  pauloscustodio
+ * Parse command line options via look-up tables:
+ * -I, --inc-path
+ * -L, --lib-path
+ *
+ * Revision 1.58  2013/10/05 08:14:43  pauloscustodio
  * Parse command line options via look-up tables:
  * -C, --line-mode
  *
@@ -1270,7 +1275,7 @@ Fetchfilename( FILE *fptr )
     }
 #endif
 
-    return strlen( ptr ) ? search_source_file( ptr ) : "";
+    return strlen( ptr ) ? search_file( ptr, opts.inc_path ) : "";
 }
 
 

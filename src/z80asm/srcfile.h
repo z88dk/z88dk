@@ -17,9 +17,14 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.2 2013-03-02 23:52:49 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.h,v 1.3 2013-10-05 10:54:36 pauloscustodio Exp $ */
 /* $Log: srcfile.h,v $
-/* Revision 1.2  2013-03-02 23:52:49  pauloscustodio
+/* Revision 1.3  2013-10-05 10:54:36  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -I, --inc-path
+/* -L, --lib-path
+/*
+/* Revision 1.2  2013/03/02 23:52:49  pauloscustodio
 /* Add API to handle a stack of open sorce files and singleton API
 /*
 /* Revision 1.1  2013/02/27 22:31:43  pauloscustodio
@@ -38,17 +43,6 @@ Allows pushing back of lines, for example to expand macros.
 #include "classlist.h"
 #include "dynstr.h"
 #include "types.h"
-
-/*-----------------------------------------------------------------------------
-*   Include path handling, used by SourceFile_open() to search for file in disk
-*----------------------------------------------------------------------------*/
-
-/* add a directory to the search path */
-extern void add_source_file_path( char *directory );
-
-/* search for a source file in the list of directories - path is returned 
-   in strpool, no need to free */
-extern char *search_source_file( char *filename );
 
 /*-----------------------------------------------------------------------------
 *   Class to hold stack of input lines to read next
@@ -74,7 +68,7 @@ END_CLASS;
 *	SourceFile API
 *----------------------------------------------------------------------------*/
 
-/* open the source file for reading, calls search_source_file() to search
+/* open the source file for reading, calls search_file() to search
    the source file path list */
 extern void SourceFile_open( SourceFile *self, char *source_file );
 

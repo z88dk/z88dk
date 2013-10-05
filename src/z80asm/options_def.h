@@ -14,27 +14,16 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.24 2013-10-05 09:24:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.25 2013-10-05 10:54:36 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
-*   define default macros
+*   define option variables
 *----------------------------------------------------------------------------*/
 #ifndef OPT_VAR
 #define OPT_VAR(type, name, default)
 #endif
 
-#ifndef OPT_TITLE
-#define OPT_TITLE(text)
-#endif
-
-#ifndef OPT
-#define OPT(type, arg, short_opt, long_opt, help_text, help_arg)
-#endif
-
-/*-----------------------------------------------------------------------------
-*   define option variables
-*----------------------------------------------------------------------------*/
 OPT_VAR(	BOOL,	verbose,	FALSE	)
 OPT_VAR(	BOOL,	symtable,	TRUE 	)
 OPT_VAR(	BOOL,	list,		FALSE 	)			/* -l flag */
@@ -57,6 +46,9 @@ OPT_VAR(	int, 	cpu,		CPU_Z80	)
 OPT_VAR(	char *,	asm_ext,	(FILEEXT_ASM)+1 )	/* skip "." */
 OPT_VAR(	char *,	obj_ext,	(FILEEXT_OBJ)+1 )	/* skip "." */
 OPT_VAR(	char *,	bin_file,	NULL 			)	/* set by -o */
+
+OPT_VAR(	StringList *,	inc_path,	NULL )		/* path for include files */
+OPT_VAR(	StringList *,	lib_path,	NULL )		/* path for library files */
 
 /*-----------------------------------------------------------------------------
 *   define help text
@@ -101,9 +93,20 @@ OPT_VAR(	char *,	bin_file,	NULL 			)	/* set by -o */
 #define OPT_HELP_GLOBALDEF		"Create global definition file" FILEEXT_DEF
 #define OPT_HELP_NO_GLOBALDEF	"No global definition file"
 
+#define OPT_HELP_INC_PATH		"Add directory to include search path"
+#define OPT_HELP_LIB_PATH		"Add directory to library search path"
+
 /*-----------------------------------------------------------------------------
 *   define options
 *----------------------------------------------------------------------------*/
+#ifndef OPT_TITLE
+#define OPT_TITLE(text)
+#endif
+
+#ifndef OPT
+#define OPT(type, arg, short_opt, long_opt, help_text, help_arg)
+#endif
+
 OPT_TITLE(	"Help Options:"	)
 OPT( OptCall,	exit_help,		"-h", 	"--help",			OPT_HELP_HELP, "" )
 OPT( OptSet,	&opts.verbose,	"-v", 	"--verbose", 		OPT_HELP_VERBOSE, "" )
@@ -125,6 +128,10 @@ OPT( OptSet,	&opts.force_xlib,
 								"-forcexlib","--forcexlib",	OPT_HELP_FORCE_XLIB, "" )
 OPT( OptSet,	&opts.line_mode,
 								"-C",	"--line-mode",		OPT_HELP_LINE_MODE, "" )
+
+OPT_TITLE(	"Environment:"	)
+OPT( OptStringList,	&opts.inc_path,	"-I", "--inc-path",		OPT_HELP_INC_PATH, "PATH" )
+OPT( OptStringList,	&opts.lib_path,	"-L", "--lib-path",		OPT_HELP_LIB_PATH, "PATH" )
 
 OPT_TITLE(	"Output Options:" )
 OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 		OPT_HELP_MAKE_BIN, "" )
@@ -167,7 +174,12 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.24  2013-10-05 09:24:13  pauloscustodio
+* Revision 1.25  2013-10-05 10:54:36  pauloscustodio
+* Parse command line options via look-up tables:
+* -I, --inc-path
+* -L, --lib-path
+*
+* Revision 1.24  2013/10/05 09:24:13  pauloscustodio
 * Parse command line options via look-up tables:
 * -t (deprecated)
 *

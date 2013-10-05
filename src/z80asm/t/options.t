@@ -13,13 +13,14 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.25 2013-10-05 09:24:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.26 2013-10-05 10:54:36 pauloscustodio Exp $
 #
 # Test options
 
 use strict;
 use warnings;
 use File::Slurp;
+use File::Basename;
 use Capture::Tiny 'capture_merged';
 use Test::Differences; 
 use Test::More;
@@ -104,6 +105,10 @@ Code Generation Options:
   --forcexlib            Force XLIB call on MODULE directive
   -C, --line-mode        Enable LINE directive
 
+Environment:
+  -I, --inc-path=PATH    Add directory to include search path
+  -L, --lib-path=PATH    Add directory to library search path
+
 Output Options:
   -b, --make-bin         Assemble and link/relocate to file.bin
 * -nb, --no-make-bin     No binary file
@@ -128,8 +133,6 @@ Options:
 -D<symbol> define symbol as logically TRUE (used for conditional assembly)
 -i<library> include <library> LIB modules with .obj modules during linking
 -x<library> create library from specified modules ( e.g. with @<modules> )
--I<path> additional path to search for includes
--L<path> path to search for libraries
 END
 
 unlink_testfiles();
@@ -815,6 +818,63 @@ t_z80asm(
 ok -f map_file(), map_file();
 eq_or_diff scalar(read_file(map_file())), $map, "mapfile contents";
 
+#------------------------------------------------------------------------------
+# -I, --inc-path
+#------------------------------------------------------------------------------
+
+# create include file
+my $inc = 't/data/'.basename(inc_file());
+my $inc_base = basename($inc);
+my $inc_dir  = dirname($inc);
+write_file($inc, "ld a,1");
+
+# no -I, full path : OK
+t_z80asm_ok(0, "include \"$inc\"", "\x3E\x01");
+
+# no -I, only file name : error
+t_z80asm_error("include \"$inc_base\"", 
+			"Error at file 'test.asm' line 1: cannot read file 'test.inc'");
+
+# -I : OK
+for my $options ('-I', '-I=', '-I ', '--inc-path', '--inc-path=', '--inc-path ') {
+	t_z80asm_ok(0, "include \"$inc_base\"", "\x3E\x01", "$options$inc_dir");
+}
+
+# Z80_OZFILES : OK
+$ENV{Z80_OZFILES} = $inc_dir;
+t_z80asm_ok(0, "include \"$inc_base\"", "\x3E\x01");
+
+unlink_testfiles($inc);
+
+#------------------------------------------------------------------------------
+# -L, --lib-path
+#------------------------------------------------------------------------------
+
+# create library
+$lib = 't/data/'.basename(lib_file());
+my $lib_base = basename($lib);
+my $lib_dir  = dirname($lib);
+
+write_file(asm_file(), "xlib main \n main: ret ");
+t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
+ok -f $lib;
+
+$asm = "lib main \n call main \n ret";
+$bin = "\xCD\x04\x00\xC9\xC9";
+
+# no -L, full path : OK
+t_z80asm_ok(0, $asm, $bin, "-i".$lib);
+
+# no -L, only file name : error
+write_file(asm_file(), $asm);
+t_z80asm_capture("-i".$lib_base." ".asm_file(), "", 
+		"Error: cannot read file 'test.lib'\n".
+		"1 errors occurred during assembly\n", 1);
+
+# -L : OK
+t_z80asm_ok(0, $asm, $bin, "-L".$lib_dir." -i".$lib_base);
+
+unlink_testfiles($lib);
 
 
 
@@ -825,7 +885,12 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.25  2013-10-05 09:24:13  pauloscustodio
+# Revision 1.26  2013-10-05 10:54:36  pauloscustodio
+# Parse command line options via look-up tables:
+# -I, --inc-path
+# -L, --lib-path
+#
+# Revision 1.25  2013/10/05 09:24:13  pauloscustodio
 # Parse command line options via look-up tables:
 # -t (deprecated)
 #

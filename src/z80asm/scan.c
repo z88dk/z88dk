@@ -14,9 +14,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.20 2013-10-05 08:14:43 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.21 2013-10-05 10:54:36 pauloscustodio Exp $ 
 $Log: scan.c,v $
-Revision 1.20  2013-10-05 08:14:43  pauloscustodio
+Revision 1.21  2013-10-05 10:54:36  pauloscustodio
+Parse command line options via look-up tables:
+-I, --inc-path
+-L, --lib-path
+
+Revision 1.15  2013/10/05 08:14:43  pauloscustodio
 Parse command line options via look-up tables:
 -C, --line-mode
 
@@ -3126,7 +3131,7 @@ void scan_file( char *filename )
 	init_scan();
 	
 	/* search source path */
-	filename = search_source_file( filename );
+	filename = search_file( filename, opts.inc_path );
 	
 	/* check for circular includes */
 	check_circular_includes( filename );

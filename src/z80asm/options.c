@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.54 2013-10-05 09:24:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.55 2013-10-05 10:54:36 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -84,6 +84,17 @@ static OptsLU opts_lu[] =
 {
 #include "options_def.h"
 };
+
+/*-----------------------------------------------------------------------------
+*   Initialize module
+*----------------------------------------------------------------------------*/
+void init_options(void)
+{
+    char *directory = getenv("Z80_OZFILES");
+    if ( directory )
+		add_StringList( &opts.inc_path, directory );
+}
+
 
 /*-----------------------------------------------------------------------------
 *   Parse command line, set options, call back for each non-option, 
@@ -398,8 +409,6 @@ static void exit_help(void)
     printf( "-i<library> include <library> LIB modules with %s%s modules during linking\n", 
 		   FILEEXT_SEPARATOR, opts.obj_ext );
     puts( "-x<library> create library from specified modules ( e.g. with @<modules> )" );
-    printf( "-I<path> additional path to search for includes\n" );
-    printf( "-L<path> path to search for libraries\n" );
 
 	exit(0);
 }
@@ -507,7 +516,12 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.54  2013-10-05 09:24:13  pauloscustodio
+* Revision 1.55  2013-10-05 10:54:36  pauloscustodio
+* Parse command line options via look-up tables:
+* -I, --inc-path
+* -L, --lib-path
+*
+* Revision 1.54  2013/10/05 09:24:13  pauloscustodio
 * Parse command line options via look-up tables:
 * -t (deprecated)
 *
@@ -766,32 +780,6 @@ enum flag library;
 enum flag createlibrary;
 
 
-/* directory list for search_lib_file() */
-static StringList *lib_path = NULL;
-
-/*-----------------------------------------------------------------------------
-*   Initialize search paths
-*----------------------------------------------------------------------------*/
-static void init_search_paths( void )
-{
-    char *dir;
-
-	/* init source path */
-    dir = getenv( "Z80_OZFILES" );
-    if ( dir != NULL )
-    {
-        add_source_file_path( dir );
-    }
-}
-
-/*-----------------------------------------------------------------------------
-*   Search file
-*----------------------------------------------------------------------------*/
-char *search_lib_file( char *filename )
-{
-    return search_file( filename, lib_path );
-}
-
 /*-----------------------------------------------------------------------------
 *   reset_options
 *       Reset globals to defaults
@@ -800,8 +788,6 @@ static void reset_options( void )
 {
 	library			= OFF;
 	createlibrary   = OFF;
-
-    init_search_paths();                /* initialize the search paths */
 }
 
 /*-----------------------------------------------------------------------------
@@ -821,16 +807,6 @@ void set_asm_flag( char *flagid )
     else if ( *flagid == 'x' )
     {
         libfilename = CreateLibfile( ( flagid + 1 ) );
-    }
-
-    else if ( *flagid == 'I' )
-    {
-        add_source_file_path( flagid + 1 );
-    }
-
-    else if ( *flagid == 'L' )
-    {
-        add_StringList( &lib_path, flagid + 1 );
     }
 
     else if ( *flagid == 'D' )

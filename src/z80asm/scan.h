@@ -18,9 +18,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.17 2013-10-05 08:14:43 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.18 2013-10-05 10:54:36 pauloscustodio Exp $ 
 $Log: scan.h,v $
-Revision 1.17  2013-10-05 08:14:43  pauloscustodio
+Revision 1.18  2013-10-05 10:54:36  pauloscustodio
+Parse command line options via look-up tables:
+-I, --inc-path
+-L, --lib-path
+
+Revision 1.15  2013/10/05 08:14:43  pauloscustodio
 Parse command line options via look-up tables:
 -C, --line-mode
 

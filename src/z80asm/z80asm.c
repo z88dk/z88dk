@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.113 2013-10-04 23:09:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.114 2013-10-05 10:54:36 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.113  2013-10-04 23:09:25  pauloscustodio
+/* Revision 1.114  2013-10-05 10:54:36  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -I, --inc-path
+/* -L, --lib-path
+/*
+/* Revision 1.113  2013/10/04 23:09:25  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -R, --relocatable
 /* --RCMX000
@@ -1025,8 +1030,7 @@ char *GetLibfile( char *filename )
 
     if ( len )
     {
-		/* set lib extension */
-        found_libfilename = search_lib_file( get_lib_filename(filename));		/* copied to strpool */
+        found_libfilename = search_file( get_lib_filename(filename), opts.lib_path );
     }
     else
     {

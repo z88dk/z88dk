@@ -20,7 +20,7 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "srcfile.o class.o file.o init_obj.o init_obj_file.o errors.o dynstr.o safestr.o strutil.o";
+my $objs = "srcfile.o class.o file.o init_obj.o init_obj_file.o errors.o dynstr.o safestr.o strutil.o options.o hist.o";
 
 my $init_code = <<'END';
 #define ERROR return __LINE__
@@ -28,28 +28,11 @@ struct module *CURRENTMODULE;
 FILE *errfile;
 size_t get_PC( void ) { return 0; }
 void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) {}
-struct {
-	int list;
-	int cur_list;
-} opts = {
-	0,
-	0,
-};
-END
-
-# check source path
-t_compile_module($init_code, <<'END', $objs);
-	/* main */
-	int i;
-	
-	/* add args 2..N as directories in path */
-	for ( i = 2 ; i < argc ; i++ )
-		add_source_file_path(argv[i]);
-	
-	/* search file in arg 1 */
-	puts( search_source_file(argv[1]) );
-	
-	return 0;
+char *CreateLibfile( char *filename ) {}
+char *GetLibfile( char *filename ) {}
+Symbol *define_static_def_sym( char *name, long value ) {return NULL;}
+char ident[MAXLINE];
+char separators[MAXLINE];
 END
 
 # create directories and files
@@ -61,182 +44,6 @@ write_file('x2/f1', {binmode => ':raw'}, "");
 write_file('x2/f2', {binmode => ':raw'}, "");
 write_file('x3/f2', {binmode => ':raw'}, "");
 write_file('x3/f3', {binmode => ':raw'}, "");
-
-t_run_module(['f0'], <<'OUT', "", 0);
-f0
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
-OUT
-
-t_run_module(['f1'], <<'OUT', "", 0);
-f1
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
-OUT
-
-t_run_module(['f2'], <<'OUT', "", 0);
-f2
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
-OUT
-
-t_run_module(['f3'], <<'OUT', "", 0);
-f3
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
-OUT
-
-t_run_module(['f4'], <<'OUT', "", 0);
-f4
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
-OUT
-
-
-t_run_module(['f0', 'x1', 'x2', 'x3'], <<'OUT', "", 0);
-f0
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-        20 |          1 |          1 |          0 |          0 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=2912, zero-initialized=1868 (64.15%), freed=1140 (39.15%), remaining=1772
-OUT
-
-t_run_module(['f1', 'x1', 'x2', 'x3'], <<'OUT', "", 0);
-x1/f1
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         6 |          0 |          1 |          1 |          0 |         +0
-        12 |          1 |          0 |          0 |          1 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |          1 |          0 |          0 |          1 |         +0
-        44 |          1 |          0 |          0 |          1 |         +0
-        48 |          0 |          1 |          1 |          0 |         +0
-        88 |          0 |          0 |          1 |          1 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       176 |          0 |          1 |          1 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=3310, zero-initialized=1868 (56.44%), freed=1538 (46.47%), remaining=1772
-OUT
-
-t_run_module(['f3', 'x1', 'x2', 'x3'], <<'OUT', "", 0);
-x3/f3
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         6 |          0 |          3 |          3 |          0 |         +0
-        12 |          3 |          0 |          0 |          3 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |          3 |          0 |          0 |          3 |         +0
-        44 |          3 |          0 |          0 |          3 |         +0
-        48 |          0 |          3 |          3 |          0 |         +0
-        88 |          0 |          0 |          3 |          3 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       176 |          0 |          3 |          3 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=4106, zero-initialized=1868 (45.49%), freed=2334 (56.84%), remaining=1772
-OUT
-
-t_run_module(['f4', 'x1', 'x2', 'x3'], <<'OUT', "", 0);
-f4
-GLib Memory statistics (successful operations):
- blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
-  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
-           | malloc()   | free()     | realloc()  | realloc()  |           
-===========|============|============|============|============|===========
-         6 |          0 |          3 |          3 |          0 |         +0
-        12 |          3 |          0 |          0 |          3 |         +0
-        20 |          1 |          1 |          0 |          0 |         +0
-        24 |          3 |          0 |          0 |          3 |         +0
-        44 |          3 |          0 |          0 |          3 |         +0
-        48 |          0 |          3 |          3 |          0 |         +0
-        88 |          0 |          0 |          3 |          3 |         +0
-        96 |          1 |          1 |          0 |          0 |         +0
-       176 |          0 |          3 |          3 |          0 |         +0
-       252 |          3 |          0 |          0 |          0 |       +756
-      1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-GLib Memory statistics (failing operations):
- --- none ---
-Total bytes: allocated=4106, zero-initialized=1868 (45.49%), freed=2334 (56.84%), remaining=1772
-OUT
-
 
 
 # test module
@@ -287,9 +94,9 @@ t_compile_module($init_code, <<'END', $objs);
 	SourceFileList *lst;
 	char *line;
 	
-	add_source_file_path("x1");
-	add_source_file_path("x2");
-	add_source_file_path("x3");
+	add_StringList(&opts.inc_path, "x1");
+	add_StringList(&opts.inc_path, "x2");
+	add_StringList(&opts.inc_path, "x3");
 	
 	src = OBJ_NEW( SourceFile );
 	if (strcmp(src->filename, "")) 			ERROR;
@@ -590,9 +397,9 @@ t_compile_module($init_code, <<'END', $objs);
     /* start try..catch with finally to cleanup any allocated memory */
     TRY
     {
-		add_source_file_path("x1");
-		add_source_file_path("x2");
-		add_source_file_path("x3");
+		add_StringList(&opts.inc_path, "x1");
+		add_StringList(&opts.inc_path, "x2");
+		add_StringList(&opts.inc_path, "x3");
 		
 		lst = OBJ_NEW( SourceFileList );
 		if (lst->count != 0) ERROR;
@@ -770,9 +577,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.14 2013-10-05 08:14:43 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.15 2013-10-05 10:54:36 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.14  2013-10-05 08:14:43  pauloscustodio
+# Revision 1.15  2013-10-05 10:54:36  pauloscustodio
+# Parse command line options via look-up tables:
+# -I, --inc-path
+# -L, --lib-path
+#
+# Revision 1.14  2013/10/05 08:14:43  pauloscustodio
 # Parse command line options via look-up tables:
 # -C, --line-mode
 #

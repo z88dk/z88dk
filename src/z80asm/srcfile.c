@@ -17,9 +17,14 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.11 2013-10-05 08:14:43 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.12 2013-10-05 10:54:36 pauloscustodio Exp $ */
 /* $Log: srcfile.c,v $
-/* Revision 1.11  2013-10-05 08:14:43  pauloscustodio
+/* Revision 1.12  2013-10-05 10:54:36  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -I, --inc-path
+/* -L, --lib-path
+/*
+/* Revision 1.11  2013/10/05 08:14:43  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -C, --line-mode
 /*
@@ -80,26 +85,6 @@ Allows pushing back of lines, for example to expand macros.
 #include <string.h>
 
 /*-----------------------------------------------------------------------------
-*   Include path handling
-*----------------------------------------------------------------------------*/
-
-/* directory list for search_source_file() */
-static StringList *source_path = NULL;
-
-/* add a directory to the search path */
-void add_source_file_path( char *directory )
-{
-	add_StringList( &source_path, directory );
-}
-
-/* search for a source file in the list of directories - path is returned 
-   in strpool, no need to free */
-char *search_source_file( char *filename )
-{
-	return search_file( filename, source_path );
-}
-
-/*-----------------------------------------------------------------------------
 *   Class to hold stack of input lines to read next
 *----------------------------------------------------------------------------*/
 DEF_CLASS_LIST( Str );
@@ -144,7 +129,7 @@ void SourceFile_fini( SourceFile *self )
 *	SourceFile API
 *----------------------------------------------------------------------------*/
 
-/* open the source file for reading, calls search_source_file() to search
+/* open the source file for reading, calls search_file() to search
    the source file path list */
 void SourceFile_open( SourceFile *self, char *source_file )
 {
@@ -156,7 +141,7 @@ void SourceFile_open( SourceFile *self, char *source_file )
 	}
 
 	/* init state */
-	self->filename = strpool_add( search_source_file( source_file ) );
+	self->filename = search_file( source_file, opts.inc_path );
 
 	/* open new file in binary mode, for cross-platform newline processing */
 	self->file = xfopen( self->filename, "rb" );
@@ -346,7 +331,7 @@ void SourceFileList_open( SourceFileList *self, char *source_file )
 	SourceFileListElem *iter;
 
 	/* search stack */
-	filename = search_source_file( source_file );
+	filename = search_file( source_file, opts.inc_path );
 	for ( iter = SourceFileList_first( self ) ; iter != NULL ; 
 		  iter = SourceFileList_next( iter ) )
 	{

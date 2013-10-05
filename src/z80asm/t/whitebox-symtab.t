@@ -17,26 +17,18 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "sym.o symtab.o symref.o class.o safestr.o strhash.o errors.o strutil.o file.o init_obj.o init_obj_file.o ";
+my $objs = "sym.o symtab.o symref.o class.o safestr.o strhash.o errors.o strutil.o file.o init_obj.o init_obj_file.o options.o hist.o";
 
 my $init = <<'END';
 #include "symbol.h"
-
-struct {
-	int sdcc;
-	int symtable;
-	int list;
-	int cur_list;
-} opts = {
-	0,
-	1,
-	1,
-	0,
-};
-
-
 int page_nr 			= 1;
 int list_get_page_nr() { return page_nr; }
+
+char ident[MAXLINE];
+char separators[MAXLINE];
+
+char *CreateLibfile( char *filename ) {}
+char *GetLibfile( char *filename ) {}
 
 struct module the_module;
 struct module *CURRENTMODULE = &the_module;
@@ -117,6 +109,9 @@ t_compile_module($init, <<'END', $objs);
 
 	Symbol *sym;
 	SymbolHash *symtab, *symtab2;
+	
+	opts.symtable = TRUE;
+	opts.list     = TRUE;
 	
 	TITLE("Create current module");	
     CURRENTMODULE->local_tab   = OBJ_NEW(SymbolHash);
@@ -340,9 +335,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.18 2013-10-01 23:23:53 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.19 2013-10-05 10:54:36 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.18  2013-10-01 23:23:53  pauloscustodio
+# Revision 1.19  2013-10-05 10:54:36  pauloscustodio
+# Parse command line options via look-up tables:
+# -I, --inc-path
+# -L, --lib-path
+#
+# Revision 1.18  2013/10/01 23:23:53  pauloscustodio
 # Parse command line options via look-up tables:
 # -l, --list
 # -nl, --no-list

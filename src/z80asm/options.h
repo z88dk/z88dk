@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.32 2013-10-05 08:54:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.33 2013-10-05 10:54:36 pauloscustodio Exp $
 */
 
 #pragma once
@@ -23,8 +23,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.32 2013-10-05 08
 #include "memalloc.h"   /* before any other include */
 
 #include "types.h"
+#include "strutil.h"
 
-/* CPU type */
+/*-----------------------------------------------------------------------------
+*   CPU type
+*----------------------------------------------------------------------------*/
 #define CPU_Z80     1
 #define CPU_RCM2000 2
 #define CPU_RCM3000 4
@@ -33,6 +36,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.32 2013-10-05 08
 #define CPU_RABBIT (CPU_RCM2000|CPU_RCM3000)
 #define CPU_ZILOG  (CPU_Z80    |CPU_Z180)
 #define CPU_ALL    (CPU_ZILOG  |CPU_RABBIT)
+
+/*-----------------------------------------------------------------------------
+*   Initialize module
+*----------------------------------------------------------------------------*/
+extern void init_options(void);
 
 /*-----------------------------------------------------------------------------
 *   singleton opts
@@ -72,7 +80,12 @@ extern char *get_map_filename( char *filename );
 
 /* 
 * $Log: options.h,v $
-* Revision 1.32  2013-10-05 08:54:01  pauloscustodio
+* Revision 1.33  2013-10-05 10:54:36  pauloscustodio
+* Parse command line options via look-up tables:
+* -I, --inc-path
+* -L, --lib-path
+*
+* Revision 1.32  2013/10/05 08:54:01  pauloscustodio
 * Parse command line options via look-up tables:
 * -forcexlib, --forcexlib
 *
@@ -230,9 +243,6 @@ extern enum flag createlibrary;
 
 /* parse one command line option */
 extern void set_asm_flag( char *flagid );
-
-/* search files in paths */
-extern char *search_lib_file( char *filename );
 
 #endif /* ndef OPTIONS_H */
 
