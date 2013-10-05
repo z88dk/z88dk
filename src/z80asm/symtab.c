@@ -18,9 +18,14 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.15 2013-10-01 22:50:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.16 2013-10-05 13:43:05 pauloscustodio Exp $
 $Log: symtab.c,v $
-Revision 1.15  2013-10-01 22:50:27  pauloscustodio
+Revision 1.16  2013-10-05 13:43:05  pauloscustodio
+Parse command line options via look-up tables:
+-i, --use-lib
+-x, --make-lib
+
+Revision 1.15  2013/10/01 22:50:27  pauloscustodio
 Parse command line options via look-up tables:
 -s, --symtable
 -ns, --no-symtable
@@ -89,6 +94,7 @@ Move symbol to sym.c, rename to Symbol
 #include "errors.h"
 #include "listfile.h"
 #include "options.h"
+#include "symbol.h"
 #include "symtab.h"
 #include "z80asm.h"
 

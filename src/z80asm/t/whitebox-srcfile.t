@@ -23,6 +23,7 @@ require 't/test_utils.pl';
 my $objs = "srcfile.o class.o file.o init_obj.o init_obj_file.o errors.o dynstr.o safestr.o strutil.o options.o hist.o";
 
 my $init_code = <<'END';
+#include "symbol.h"
 #define ERROR return __LINE__
 struct module *CURRENTMODULE;
 FILE *errfile;
@@ -577,9 +578,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.15 2013-10-05 10:54:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.16 2013-10-05 13:43:05 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.15  2013-10-05 10:54:36  pauloscustodio
+# Revision 1.16  2013-10-05 13:43:05  pauloscustodio
+# Parse command line options via look-up tables:
+# -i, --use-lib
+# -x, --make-lib
+#
+# Revision 1.15  2013/10/05 10:54:36  pauloscustodio
 # Parse command line options via look-up tables:
 # -I, --inc-path
 # -L, --lib-path

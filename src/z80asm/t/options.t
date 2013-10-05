@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.27 2013-10-05 11:31:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.28 2013-10-05 13:43:05 pauloscustodio Exp $
 #
 # Test options
 
@@ -21,6 +21,7 @@ use strict;
 use warnings;
 use File::Slurp;
 use File::Basename;
+use File::Copy;
 use Capture::Tiny 'capture_merged';
 use Test::Differences; 
 use Test::More;
@@ -95,7 +96,7 @@ Help Options:
 Input / Output File Options:
   -e, --asm-ext=EXT      Assembly file extension excluding '.'
   -M, --obj-ext=EXT      Object file extension excluding '.'
-  -o, --output=FILE.BIN  Output binary file
+  -o, --output=FILE      Output binary file
 
 Code Generation Options:
   --RCMX000              Assemble for RCM2000/RCM3000 series of Z80-like CPU
@@ -109,6 +110,8 @@ Environment:
   -I, --inc-path=PATH    Add directory to include search path
   -L, --lib-path=PATH    Add directory to library search path
   -D, --define=SYMBOL    Define a static symbol
+  -x, --make-lib=[FILE]  Create a library file.lib
+  -i, --use-lib=[FILE]   Link library file.lib
 
 Output Options:
   -b, --make-bin         Assemble and link/relocate to file.bin
@@ -129,11 +132,6 @@ Other Output File Options:
   -nm, --no-map          No address map file
   -g, --globaldef        Create global definition file.def
 * -ng, --no-globaldef    No global definition file
-
-Options:
--D<symbol> define symbol as logically TRUE (used for conditional assembly)
--i<library> include <library> LIB modules with .obj modules during linking
--x<library> create library from specified modules ( e.g. with @<modules> )
 END
 
 unlink_testfiles();
@@ -253,7 +251,7 @@ write_file(asm_file(), "ret");
 t_z80asm_capture("-r0 -b ".$base, "", "", 0);
 is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
 
-for my $options ('-exxx', '-e=xxx', '-e xxx', '--asm-extxxx', '--asm-ext=xxx', '--asm-ext xxx') {
+for my $options ('-exxx', '-e=xxx', '--asm-extxxx', '--asm-ext=xxx') {
 	unlink_testfiles();
 	write_file($base.".xxx", "ret");
 	t_z80asm_capture("-r0 -b $options $base", "", "", 0);
@@ -285,7 +283,7 @@ write_file(asm_file(), "ret");
 t_z80asm_capture($base, "", "", 0);
 like read_file(obj_file(), binary => ':raw'), qr/\xC9\z/, "assemble ok";
 
-for my $options ('-Mo', '-M=o', '-M o', '--obj-exto', '--obj-ext=o', '--obj-ext o') {
+for my $options ('-Mo', '-M=o', '--obj-exto', '--obj-ext=o') {
 	unlink_testfiles();
 	write_file(asm_file(), "ret");
 	t_z80asm_capture("$options $base", "", "", 0);
@@ -524,7 +522,7 @@ ok ! -f $bin;
 t_binary(read_file(bin_file(), binmode => ':raw'), "\0");
 
 # -o
-for my $options ("-o$bin", "-o=$bin", "-o $bin", "--output$bin", "--output=$bin", "--output $bin") {
+for my $options ("-o$bin", "-o=$bin", "--output$bin", "--output=$bin") {
 	unlink_testfiles($bin);
 	write_file(asm_file(), "nop");
 
@@ -612,12 +610,11 @@ for my $options ('-a', '--make-updated-bin') {
 #------------------------------------------------------------------------------
 
 for my $org ('0', '100') {
-	for my $options ("-r$org", "-r=$org", "-r $org", 
-					 "--origin$org", "--origin=$org", "--origin $org", ) {
+	for my $options ("-r", "-r=", "--origin", "--origin=") {
 		unlink_testfiles();
 		write_file(asm_file(), "start: jp start");
 
-		t_z80asm_capture("$options -b ".asm_file(), "", "", 0);
+		t_z80asm_capture("$options$org -b ".asm_file(), "", "", 0);
 		t_binary(read_file(bin_file(), binmode => ':raw'), "\xC3".pack("v", oct('0x'.$org)));
 	}
 }
@@ -837,7 +834,7 @@ t_z80asm_error("include \"$inc_base\"",
 			"Error at file 'test.asm' line 1: cannot read file 'test.inc'");
 
 # -I : OK
-for my $options ('-I', '-I=', '-I ', '--inc-path', '--inc-path=', '--inc-path ') {
+for my $options ('-I', '-I=', '--inc-path', '--inc-path=') {
 	t_z80asm_ok(0, "include \"$inc_base\"", "\x3E\x01", "$options$inc_dir");
 }
 
@@ -873,7 +870,7 @@ t_z80asm_capture("-i".$lib_base." ".asm_file(), "",
 		"1 errors occurred during assembly\n", 1);
 
 # -L : OK
-for my $options ('-L', '-L=', '-L ', '--lib-path', '--lib-path=', '--lib-path ') {
+for my $options ('-L', '-L=', '--lib-path', '--lib-path=') {
 	t_z80asm_ok(0, $asm, $bin, $options.$lib_dir." -i".$lib_base);
 }
 
@@ -897,9 +894,101 @@ for my $options ('-D23', '-Da*') {
 }
 
 # -D
-for my $options ('-D', '-D=', '-D ', '--define', '--define=', '--define ') {
+for my $options ('-D', '-D=', '--define', '--define=') {
 	t_z80asm_ok(0, $asm, "\x3E\x01", $options."Value");
 }
+
+#------------------------------------------------------------------------------
+# -i, --use-lib, -x, --make-lib
+# test BUG_0002
+#------------------------------------------------------------------------------
+
+unlink_testfiles();
+
+# create a lib name that is not removed by unlink_testfiles()
+$lib = lib_file(); $lib =~ s/\.lib$/_lib.lib/i;
+unlink $lib;
+
+# create a library without Z80_STDLIB
+delete $ENV{Z80_STDLIB};
+write_file(asm_file(), "
+	xlib one
+one: 
+	ld a,1
+	ret
+");
+for my $options ('-x', '-x=', '--make-lib', '--make-lib=') {
+	t_z80asm_capture($options.lib_file()." ".asm_file(), "", "", 0);
+	ok -f obj_file(), obj_file()." created";
+	ok -f lib_file(), lib_file()." created";
+	is unlink(obj_file(), lib_file()), 2, "delete old obj and lib";
+}
+
+# create the same library with Z80_STDLIB
+$ENV{Z80_STDLIB} = lib_file();
+for my $options ('-x', '-x=', '--make-lib', '--make-lib=') {
+	t_z80asm_capture($options." ".asm_file(), "", "", 0);
+	ok -f obj_file(), obj_file()." created";
+	ok -f lib_file(), lib_file()." created";
+}
+
+# create $lib
+ok copy(lib_file(), $lib), "create $lib";
+
+# link with the library without Z80_STDLIB
+delete $ENV{Z80_STDLIB};
+for my $options ('-i', '-i=', '--use-lib', '--use-lib=') {
+	t_z80asm_ok(0, "
+		lib one
+		jp one
+	", "\xC3\x03\x00\x3E\x01\xC9", $options.$lib);
+}
+
+# link with the library with Z80_STDLIB
+# cause the buffer overrun, detected in MSVC debug version
+$ENV{Z80_STDLIB} = $lib;
+for my $options ('-i', '-i=', '--use-lib', '--use-lib=') {
+	t_z80asm_ok(0, "
+		lib one
+		jp one
+	", "\xC3\x03\x00\x3E\x01\xC9", $options);
+}
+
+unlink_testfiles($lib);
+
+
+# link objects and libs
+# library modules are loaded in alpha-sequence of labels, starting at 10
+unlink_testfiles();
+write_file(asm1_file(), "xlib A1 \n A1: defb 1");
+write_file(asm2_file(), "xlib A2 \n A2: defb 2");
+write_file(asm3_file(), "xlib A3 \n A3: defb 3");
+t_z80asm_capture("-x".lib1_file()." ".asm1_file()." ".asm2_file()." ".asm3_file(), "", "", 0);
+ok -f lib1_file();
+
+write_file(asm4_file(), "xlib A4 \n A4: defb 4");
+write_file(asm5_file(), "xlib A5 \n A5: defb 5");
+write_file(asm6_file(), "xlib A6 \n A6: defb 6");
+t_z80asm_capture("-x".lib2_file()." ".asm4_file()." ".asm5_file()." ".asm6_file(), "", "", 0);
+ok -f lib2_file();
+
+write_file(asm_file(),  "A0: \n ".
+						"lib  A1,A2,A3,A4,A5,A6 \n xref A7,A8,A9 \n ".
+						"defb A1,A2,A3,A4,A5,A6,        A7,A8,A9 \n ".
+						"defb 0 \n");
+write_file(asm7_file(), "xdef A7 \n A7: defb 7");
+write_file(asm8_file(), "xdef A8 \n A8: defb 8");
+write_file(asm9_file(), "xdef A9 \n A9: defb 9");
+t_z80asm_capture("-l -b -r0 -i".lib1_file()." -i".lib2_file()." ".
+				 asm_file()." ".asm7_file()." ".asm8_file()." ".asm9_file(), "", "", 0);
+ok -f bin_file();
+my $binary = read_file(bin_file(), binmode => ':raw', err_mode => 'quiet');
+t_binary($binary, pack("C*", 
+						13, 14, 15, 16, 17, 18, 10, 11, 12,
+						0,
+						7, 8, 9, 1, 2, 3, 4, 5, 6,
+						));
+
 
 
 
@@ -910,7 +999,12 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.27  2013-10-05 11:31:46  pauloscustodio
+# Revision 1.28  2013-10-05 13:43:05  pauloscustodio
+# Parse command line options via look-up tables:
+# -i, --use-lib
+# -x, --make-lib
+#
+# Revision 1.27  2013/10/05 11:31:46  pauloscustodio
 # Parse command line options via look-up tables:
 # -D, --define
 #

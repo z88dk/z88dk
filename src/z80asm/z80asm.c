@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.114 2013-10-05 10:54:36 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.115 2013-10-05 13:43:05 pauloscustodio Exp $ */
 /* $Log: z80asm.c,v $
-/* Revision 1.114  2013-10-05 10:54:36  pauloscustodio
+/* Revision 1.115  2013-10-05 13:43:05  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -i, --use-lib
+/* -x, --make-lib
+/*
+/* Revision 1.114  2013/10/05 10:54:36  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -I, --inc-path
 /* -L, --lib-path
@@ -1008,8 +1013,6 @@ char *CreateLibfile( char *filename )
         }
     }
 
-    createlibrary = ON;
-
 	return found_libfilename;
 }
 
@@ -1060,7 +1063,7 @@ char *GetLibfile( char *filename )
     }
     else
     {
-        library = ON;
+        opts.library = TRUE;
     }
 
     fclose( file );
@@ -1314,9 +1317,9 @@ int main( int argc, char *argv[] )
         CloseFiles();
 
         /* Create library */
-        if ( createlibrary && ! get_num_errors() )
+        if ( opts.lib_file && ! get_num_errors() )
         {
-            CreateLib( libfilename );
+            CreateLib( opts.lib_file );
         }
 
         if ( ! get_num_errors() && opts.verbose )

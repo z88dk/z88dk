@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.17 2013-10-05 09:24:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.18 2013-10-05 13:43:05 pauloscustodio Exp $
 */
 
 #define _C_ ,		/* trick to pass comma-separated values as macro argument */
@@ -33,7 +33,6 @@ ERR(ErrFatal,	fatal_include_recursion(char *filename),"cannot include file '%s' 
 ERR(ErrWarn,	warn_option_deprecated(char *option),	"option '%s' is deprecated" _C_ option )
 ERR(ErrError,	error_no_src_file(void),				"source filename missing" )
 ERR(ErrError,	error_illegal_option(char *option),		"illegal option '%s'" _C_ option )
-ERR(ErrError,	error_illegal_option_OLD(char *option),	"illegal option '-%s'" _C_ option )
 ERR(ErrError,	error_illegal_src_filename(char *filename),
 														"illegal source filename '%s'" _C_ filename )
 
@@ -79,7 +78,12 @@ ERR(ErrWarn,	warn_int_range_expr(long value, char *expr),
 
 /* */
 /* $Log: errors_def.h,v $
-/* Revision 1.17  2013-10-05 09:24:12  pauloscustodio
+/* Revision 1.18  2013-10-05 13:43:05  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -i, --use-lib
+/* -x, --make-lib
+/*
+/* Revision 1.17  2013/10/05 09:24:12  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -t (deprecated)
 /*

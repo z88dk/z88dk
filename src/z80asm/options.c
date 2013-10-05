@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.56 2013-10-05 11:31:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.57 2013-10-05 13:43:05 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -26,6 +26,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.56 2013-10-05 11
 #include "options.h"
 #include "strpool.h"
 #include "symtab.h"
+#include "z80asm.h"
 #include <ctype.h>
 #include <glib.h>
 #include <string.h>
@@ -43,16 +44,23 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.56 2013-10-05 11
 #define FILEEXT_MAP     FILEEXT_SEPARATOR "map"    /* ".map" / "_map" */
 
 /* types */
-enum OptType { OptClear, OptSet, OptCall, OptCallArg, OptString, OptStringList, OptDeprecated };
+enum OptType 
+{ 
+	OptClear, OptSet, 
+	OptCall, OptCallArg, OptCallOptArg, 
+	OptString, OptStringList, 
+	OptDeprecated,
+};
 
 /* declare functions */
-static void reset_options( void );
 static void exit_help(void);
 static void exit_copyright(void);
 static void display_options(void);
 static void option_make_updated_bin(void);
 static void option_origin(char *origin_hex);
 static void option_define(char *symbol);
+static void option_make_lib(char *library);
+static void option_use_lib(char *library);
 static void option_cpu_RCM2000(void);
 
 static void parse_options(int *parg, int argc, char *argv[]);
@@ -108,8 +116,6 @@ void parse_argv(int argc, char *argv[],
 {
 	int arg;
 
-    reset_options();					/* set defaults */
-
 	if ( argc == 1 )
 		exit_copyright();				/* exit if no arguments */
 
@@ -128,54 +134,33 @@ void parse_argv(int argc, char *argv[],
 /*-----------------------------------------------------------------------------
 *   process all options
 *----------------------------------------------------------------------------*/
-static char *opt_arg(char *arg, char *opt)
+/* check if this oprion is matched, return char pointer after option, ready
+   to retrieve an argument, if any */
+static char *check_option(char *arg, char *opt)
 {
 	size_t len = strlen(opt);
 	if ( *opt &&				/* ignore empty option strings */
 		 strncmp( arg, opt, len ) == 0 )
+	{
+		if ( arg[len] == '=' )	
+			len++;				/* skip '=' after option, to point at argument */
 		return arg + len;		/* point to after argument */
+	}
 	else
 		return NULL;			/* not found */
 }
 
-static char *get_opt_arg(char *opt_arg_ptr, int *parg, int argc, char *argv[])
-{
-#define i (*parg)
-
-	if ( *opt_arg_ptr )		/* get argument from same argv */
-	{
-		/* skip '=' */
-		if ( *opt_arg_ptr == '=' )
-			opt_arg_ptr++;
-
-		return opt_arg_ptr;
-	}
-	else					/* get argument from next argv */
-	{
-		if ( i+1 < argc )
-			return argv[ ++i ];
-		else
-		{
-			error_illegal_option( argv[i] );
-			return NULL;
-		}
-	}
-
-#undef i
-}
-
-static BOOL process_opt(int *parg, int argc, char *argv[])
+static void process_opt(int *parg, int argc, char *argv[])
 {
 #define i (*parg)
 	int		 j;
 	char	*opt_arg_ptr;
-	char	*arg;
 
 	/* search opts_lu[] */
 	for ( j = 0; j < (int)G_N_ELEMENTS(opts_lu); j++ )
 	{
-		if ( (opt_arg_ptr = opt_arg( argv[i], opts_lu[j].long_opt )) != NULL ||
-			 (opt_arg_ptr = opt_arg( argv[i], opts_lu[j].short_opt )) != NULL )
+		if ( (opt_arg_ptr = check_option( argv[i], opts_lu[j].long_opt )) != NULL ||
+			 (opt_arg_ptr = check_option( argv[i], opts_lu[j].short_opt )) != NULL )
 		{
 			/* found option, opt_arg_ptr points to after option */
 			switch ( opts_lu[j].type )
@@ -202,39 +187,45 @@ static BOOL process_opt(int *parg, int argc, char *argv[])
 				break;
 
 			case OptCallArg:
-				opt_arg_ptr = get_opt_arg( opt_arg_ptr, parg, argc, argv );
-				if ( opt_arg_ptr )
+				if ( *opt_arg_ptr )
 					((void (*)(char *))(opts_lu[j].arg)) ( opt_arg_ptr );
+				else
+					error_illegal_option( argv[i] );
+				break;
+
+			case OptCallOptArg:
+				((void (*)(char *))(opts_lu[j].arg)) ( opt_arg_ptr );
 				break;
 
 			case OptString:
-				opt_arg_ptr = get_opt_arg( opt_arg_ptr, parg, argc, argv );
-				if ( opt_arg_ptr )
+				if ( *opt_arg_ptr )
 					*((char **)(opts_lu[j].arg)) = opt_arg_ptr;
+				else
+					error_illegal_option( argv[i] );
 				break;
 
 			case OptStringList:
-				opt_arg_ptr = get_opt_arg( opt_arg_ptr, parg, argc, argv );
-				if ( opt_arg_ptr )
+				if ( *opt_arg_ptr )
 					add_StringList( (StringList **)(opts_lu[j].arg), opt_arg_ptr );
+				else
+					error_illegal_option( argv[i] );
 				break;
 
 			case OptDeprecated:
-				arg = argv[i];
-				opt_arg_ptr = get_opt_arg( opt_arg_ptr, parg, argc, argv );
 				if ( *opt_arg_ptr )
 					*opt_arg_ptr = '\0';		/* delete option argument for warning message */
-				warn_option_deprecated( arg );
+				warn_option_deprecated( argv[i] );
 				break;
 
 			default:
-				error_illegal_option( argv[i] );
+				die( "missing case at %s:%d\n", __FILE__, __LINE__ );
 			}
-			return TRUE;
+			return;
 		}
 	}
 
-	return FALSE;
+	/* not found */
+	error_illegal_option( argv[i] );
 
 #undef i
 }
@@ -244,10 +235,7 @@ static void parse_options(int *parg, int argc, char *argv[])
 #define i (*parg)
 
     for ( i = 1; i < argc && argv[i][0] == '-'; i++ )
-    {
-		if ( ! process_opt( &i, argc, argv ) )
-			set_asm_flag( argv[i] + 1 );
-    }
+		process_opt( &i, argc, argv );
 
 #undef i
 }
@@ -406,13 +394,6 @@ static void exit_help(void)
 
 #include "options_def.h"
 
-	puts(  "" );
-    puts( "Options:" );
-    puts( "-D<symbol> define symbol as logically TRUE (used for conditional assembly)" );
-    printf( "-i<library> include <library> LIB modules with %s%s modules during linking\n", 
-		   FILEEXT_SEPARATOR, opts.obj_ext );
-    puts( "-x<library> create library from specified modules ( e.g. with @<modules> )" );
-
 	exit(0);
 }
 
@@ -429,15 +410,9 @@ static void display_options(void)
     if ( opts.symtable )						puts( OPT_HELP_SYMTABLE );
     if ( opts.list )							puts( OPT_HELP_LIST );
     if ( opts.globaldef )    					puts( OPT_HELP_GLOBALDEF );
-
-    if ( createlibrary == ON )
-        puts( "Create library from specified modules." );
-
+    if ( opts.lib_file )						puts( OPT_HELP_MAKE_LIB );
     if ( opts.make_bin )						puts( OPT_HELP_MAKE_BIN );
-
-    if ( library == ON )
-        puts( "Link library modules with code." );
-
+    if ( opts.library )							puts( OPT_HELP_USE_LIB );
     if ( opts.make_bin && opts.map )			puts( OPT_HELP_MAP );
     if ( opts.code_seg && ! opts.relocatable )	puts( OPT_HELP_CODE_SEG );
     if ( opts.relocatable )						puts( OPT_HELP_RELOCATABLE );
@@ -484,6 +459,16 @@ static void option_define(char *symbol)
 	}
 
     define_static_def_sym( symbol, 1 );
+}
+
+static void option_make_lib(char *library)
+{
+	opts.lib_file = CreateLibfile( library );
+}
+
+static void option_use_lib(char *library)
+{
+	GetLibfile( library );
 }
 
 static void option_cpu_RCM2000(void)
@@ -544,7 +529,12 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.56  2013-10-05 11:31:46  pauloscustodio
+* Revision 1.57  2013-10-05 13:43:05  pauloscustodio
+* Parse command line options via look-up tables:
+* -i, --use-lib
+* -x, --make-lib
+*
+* Revision 1.56  2013/10/05 11:31:46  pauloscustodio
 * Parse command line options via look-up tables:
 * -D, --define
 *
@@ -792,61 +782,3 @@ char *get_segbin_filename( char *filename, int segment )
 * Revision 1.1  2011/07/11 15:40:46  pauloscustodio
 * Moved all option variables and option handling code to a separate module options.c
 */
-
-#include "memalloc.h"   /* before any other include */
-
-#include "errors.h"
-#include "file.h"
-#include "options.h"
-#include "srcfile.h"
-#include "strutil.h"
-#include "strpool.h"
-#include "symbol.h"
-#include "z80asm.h"
-#include <ctype.h>
-#include <string.h>
-
-/* global option variables */
-char *libfilename;				/* -i, -x library file, kept in strpool */
-enum flag library;
-enum flag createlibrary;
-
-
-/*-----------------------------------------------------------------------------
-*   reset_options
-*       Reset globals to defaults
-*----------------------------------------------------------------------------*/
-static void reset_options( void )
-{
-	library			= OFF;
-	createlibrary   = OFF;
-}
-
-/*-----------------------------------------------------------------------------
-*   set_asm_flag
-*       Parse one command line option
-*   Args:
-*       string after the initial '-' option start
-*   Sets global option variables, stop with error if option cannot be parsed
-*----------------------------------------------------------------------------*/
-void set_asm_flag( char *flagid )
-{
-    if ( *flagid == 'i' )
-    {
-        libfilename = GetLibfile( ( flagid + 1 ) );
-    }
-
-    else if ( *flagid == 'x' )
-    {
-        libfilename = CreateLibfile( ( flagid + 1 ) );
-    }
-
-
-    else
-    {
-        /* BUG_0003 was missing Illegal Option error */
-        error_illegal_option_OLD( flagid );
-    }
-}
-
-

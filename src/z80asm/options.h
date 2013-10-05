@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.33 2013-10-05 10:54:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.34 2013-10-05 13:43:05 pauloscustodio Exp $
 */
 
 #pragma once
@@ -80,7 +80,12 @@ extern char *get_map_filename( char *filename );
 
 /* 
 * $Log: options.h,v $
-* Revision 1.33  2013-10-05 10:54:36  pauloscustodio
+* Revision 1.34  2013-10-05 13:43:05  pauloscustodio
+* Parse command line options via look-up tables:
+* -i, --use-lib
+* -x, --make-lib
+*
+* Revision 1.33  2013/10/05 10:54:36  pauloscustodio
 * Parse command line options via look-up tables:
 * -I, --inc-path
 * -L, --lib-path
@@ -230,19 +235,3 @@ extern char *get_map_filename( char *filename );
 * Revision 1.1  2011/07/11 15:40:46  pauloscustodio
 * Moved all option variables and option handling code to a separate module options.c
 */
-
-#ifndef OPTIONS_H
-#define OPTIONS_H
-
-#include "symbol.h"
-
-/* global option variables */
-extern char *libfilename;				/* -i, -x library file, kept in strpool */
-extern enum flag library;
-extern enum flag createlibrary;
-
-/* parse one command line option */
-extern void set_asm_flag( char *flagid );
-
-#endif /* ndef OPTIONS_H */
-

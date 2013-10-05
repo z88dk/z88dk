@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.26 2013-10-05 11:31:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.27 2013-10-05 13:43:05 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -39,6 +39,7 @@ OPT_VAR(	BOOL,	make_bin,	FALSE	)
 OPT_VAR(	BOOL,	date_stamp,	FALSE	)
 OPT_VAR(	BOOL,	code_seg,	FALSE	)
 OPT_VAR(	BOOL,	relocatable,FALSE	)
+OPT_VAR(	BOOL,	library,	FALSE	)			/* true if linking with libs */
 
 OPT_VAR(	int, 	origin,		-1		)			/* -1 == not defined */
 OPT_VAR(	int, 	cpu,		CPU_Z80	)
@@ -46,6 +47,7 @@ OPT_VAR(	int, 	cpu,		CPU_Z80	)
 OPT_VAR(	char *,	asm_ext,	(FILEEXT_ASM)+1 )	/* skip "." */
 OPT_VAR(	char *,	obj_ext,	(FILEEXT_OBJ)+1 )	/* skip "." */
 OPT_VAR(	char *,	bin_file,	NULL 			)	/* set by -o */
+OPT_VAR(	char *,	lib_file,	NULL 			)	/* set by -x */
 
 OPT_VAR(	StringList *,	inc_path,	NULL )		/* path for include files */
 OPT_VAR(	StringList *,	lib_path,	NULL )		/* path for library files */
@@ -97,6 +99,10 @@ OPT_VAR(	StringList *,	lib_path,	NULL )		/* path for library files */
 #define OPT_HELP_LIB_PATH		"Add directory to library search path"
 #define OPT_HELP_DEFINE			"Define a static symbol"
 
+#define OPT_HELP_MAKE_LIB		"Create a library file" FILEEXT_LIB
+#define OPT_HELP_USE_LIB		"Link library file" FILEEXT_LIB
+
+
 /*-----------------------------------------------------------------------------
 *   define options
 *----------------------------------------------------------------------------*/
@@ -116,7 +122,7 @@ OPT( OptClear,	&opts.verbose,	"-nv", 	"--not-verbose",	OPT_HELP_NOT_VERBOSE, "" 
 OPT_TITLE(	"Input / Output File Options:"	)
 OPT( OptString,	&opts.asm_ext,	"-e", 	"--asm-ext", 		OPT_HELP_ASM_EXT, "EXT" )
 OPT( OptString,	&opts.obj_ext,	"-M", 	"--obj-ext", 		OPT_HELP_OBJ_EXT, "EXT" )
-OPT( OptString,	&opts.bin_file,	"-o", 	"--output", 		OPT_HELP_BIN_FILE, "FILE.BIN" )
+OPT( OptString,	&opts.bin_file,	"-o", 	"--output", 		OPT_HELP_BIN_FILE, "FILE" )
 
 OPT_TITLE(	"Code Generation Options:" )
 OPT( OptCall,	option_cpu_RCM2000,
@@ -134,6 +140,10 @@ OPT_TITLE(	"Environment:"	)
 OPT( OptStringList,	&opts.inc_path,	"-I", "--inc-path",		OPT_HELP_INC_PATH, "PATH" )
 OPT( OptStringList,	&opts.lib_path,	"-L", "--lib-path",		OPT_HELP_LIB_PATH, "PATH" )
 OPT( OptCallArg,	option_define,	"-D", "--define",		OPT_HELP_DEFINE, "SYMBOL" )
+
+OPT( OptCallOptArg, option_make_lib,"-x", 	"--make-lib", 		OPT_HELP_MAKE_LIB, "[FILE]" )
+OPT( OptCallOptArg, option_use_lib,	"-i", 	"--use-lib", 		OPT_HELP_USE_LIB,  "[FILE]" )
+
 
 OPT_TITLE(	"Output Options:" )
 OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 		OPT_HELP_MAKE_BIN, "" )
@@ -176,7 +186,12 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.26  2013-10-05 11:31:46  pauloscustodio
+* Revision 1.27  2013-10-05 13:43:05  pauloscustodio
+* Parse command line options via look-up tables:
+* -i, --use-lib
+* -x, --make-lib
+*
+* Revision 1.26  2013/10/05 11:31:46  pauloscustodio
 * Parse command line options via look-up tables:
 * -D, --define
 *

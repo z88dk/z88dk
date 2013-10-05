@@ -14,9 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.82 2013-10-05 08:14:43 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.83 2013-10-05 13:43:05 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.82  2013-10-05 08:14:43  pauloscustodio
+/* Revision 1.83  2013-10-05 13:43:05  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -i, --use-lib
+/* -x, --make-lib
+/*
+/* Revision 1.82  2013/10/05 08:14:43  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -C, --line-mode
 /*
@@ -721,7 +726,7 @@ LinkModules( void )
             set_error_null();
             set_error_module( CURRENTMODULE->mname );
 
-            if ( library )
+            if ( opts.library )
             {
                 CURRENTLIB = libraryhdr->firstlib;      /* begin library search  from first library for each
                                                         * module */
@@ -889,7 +894,7 @@ LinkModule( char *filename, long fptr_base )
 
     if ( fptr_libnmdecl != -1 )
     {
-        if ( library )
+        if ( opts.library )
         {
             /* search in libraries, if present */
             flag = LinkLibModules( filename, fptr_base, fptr_libnmdecl, fptr_modname );   /* link library modules */

@@ -15,9 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.7 2013-10-01 22:50:26 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.8 2013-10-05 13:43:05 pauloscustodio Exp $
 $Log: sym.c,v $
-Revision 1.7  2013-10-01 22:50:26  pauloscustodio
+Revision 1.8  2013-10-05 13:43:05  pauloscustodio
+Parse command line options via look-up tables:
+-i, --use-lib
+-x, --make-lib
+
+Revision 1.7  2013/10/01 22:50:26  pauloscustodio
 Parse command line options via look-up tables:
 -s, --symtable
 -ns, --no-symtable
@@ -50,6 +55,7 @@ Move SymbolRef to symref.c
 #include "safestr.h"
 #include "strpool.h"
 #include "sym.h"
+#include "symbol.h"
 
 /*-----------------------------------------------------------------------------
 *   Symbol
