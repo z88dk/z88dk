@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.22 2013-10-04 23:31:51 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.23 2013-10-05 08:14:43 pauloscustodio Exp $
 #
 # Test options
 
@@ -101,6 +101,7 @@ Code Generation Options:
   --sdcc                 Assemble for Small Device C Compiler
   -plus, --ti83plus      Interpret 'Invoke' as RST 28h
   -IXIY, --swap-ix-iy    Swap IX and IY registers
+  -C, --line-mode        Enable LINE directive
 
 Output Options:
   -b, --make-bin         Assemble and link/relocate to file.bin
@@ -710,6 +711,28 @@ t_z80asm_ok(0, "ld iy,0x1234", "\xFD\x21\x34\x12");
 t_z80asm_ok(0, "ld iy,0x1234", "\xDD\x21\x34\x12", "-IXIY");
 t_z80asm_ok(0, "ld iy,0x1234", "\xDD\x21\x34\x12", "--swap-ix-iy");
 
+#------------------------------------------------------------------------------
+# -C, --line-mode
+#------------------------------------------------------------------------------
+
+t_z80asm_error("
+	line 10
+	ld
+", 
+"Error at file 'test.asm' line 3: syntax error");
+	
+t_z80asm_error("
+	line 10
+	ld
+", 
+"Error at file 'test.asm' line 10: syntax error", "-C");
+
+t_z80asm_error("
+	line 10
+	ld
+", 
+"Error at file 'test.asm' line 10: syntax error", "--line-mode");
+
 
 
 unlink_testfiles();
@@ -717,7 +740,11 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.22  2013-10-04 23:31:51  pauloscustodio
+# Revision 1.23  2013-10-05 08:14:43  pauloscustodio
+# Parse command line options via look-up tables:
+# -C, --line-mode
+#
+# Revision 1.22  2013/10/04 23:31:51  pauloscustodio
 # Parse command line options via look-up tables:
 # -IXIY, --swap-ix-iy
 #

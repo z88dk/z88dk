@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.21 2013-10-04 23:31:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.22 2013-10-05 08:14:43 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -43,6 +43,7 @@ OPT_VAR(	BOOL,	map,		TRUE 	)
 OPT_VAR(	BOOL,	sdcc,		FALSE	)
 OPT_VAR(	BOOL,	ti83plus,	FALSE	)
 OPT_VAR(	BOOL,	swap_ix_iy,	FALSE	)
+OPT_VAR(	BOOL,	line_mode,	FALSE	)
 OPT_VAR(	BOOL,	globaldef,	FALSE	)
 OPT_VAR(	BOOL,	make_bin,	FALSE	)
 OPT_VAR(	BOOL,	date_stamp,	FALSE	)
@@ -71,6 +72,7 @@ OPT_VAR(	char *,	bin_file,	NULL 			)	/* set by -o */
 #define OPT_HELP_SDCC			"Assemble for Small Device C Compiler"
 #define OPT_HELP_TI83PLUS		"Interpret 'Invoke' as RST 28h"
 #define OPT_HELP_SWAP_IX_IY		"Swap IX and IY registers"
+#define OPT_HELP_LINE_MODE		"Enable LINE directive"
 
 #define OPT_HELP_MAKE_BIN		"Assemble and link/relocate to file" FILEEXT_BIN
 #define OPT_HELP_NO_MAKE_BIN	"No binary file"
@@ -117,6 +119,8 @@ OPT( OptSet,	&opts.sdcc,		"-sdcc","--sdcc",			OPT_HELP_SDCC, "" )
 OPT( OptSet,	&opts.ti83plus,	"-plus","--ti83plus",		OPT_HELP_TI83PLUS, "" )
 OPT( OptSet,	&opts.swap_ix_iy,
 								"-IXIY","--swap-ix-iy",		OPT_HELP_SWAP_IX_IY, "" )
+OPT( OptSet,	&opts.line_mode,
+								"-C",	"--line-mode",		OPT_HELP_LINE_MODE, "" )
 
 OPT_TITLE(	"Output Options:" )
 OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 		OPT_HELP_MAKE_BIN, "" )
@@ -156,7 +160,11 @@ OPT( OptClear,	&opts.globaldef,"-ng", 	"--no-globaldef",	OPT_HELP_NO_GLOBALDEF, 
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.21  2013-10-04 23:31:50  pauloscustodio
+* Revision 1.22  2013-10-05 08:14:43  pauloscustodio
+* Parse command line options via look-up tables:
+* -C, --line-mode
+*
+* Revision 1.21  2013/10/04 23:31:50  pauloscustodio
 * Parse command line options via look-up tables:
 * -IXIY, --swap-ix-iy
 *

@@ -104,8 +104,6 @@ void n_tokens (int n)
 	}
 }
 
-int clinemode = 0;
-
 struct {
 	int list;
 	int cur_list;
@@ -1009,9 +1007,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.17 2013-10-01 23:23:53 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.18 2013-10-05 08:14:43 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.17  2013-10-01 23:23:53  pauloscustodio
+# Revision 1.18  2013-10-05 08:14:43  pauloscustodio
+# Parse command line options via look-up tables:
+# -C, --line-mode
+#
+# Revision 1.17  2013/10/01 23:23:53  pauloscustodio
 # Parse command line options via look-up tables:
 # -l, --list
 # -nl, --no-list

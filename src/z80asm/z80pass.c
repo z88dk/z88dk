@@ -13,9 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.61 2013-10-03 23:48:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.62 2013-10-05 08:14:43 pauloscustodio Exp $
 $Log: z80pass.c,v $
-Revision 1.61  2013-10-03 23:48:31  pauloscustodio
+Revision 1.62  2013-10-05 08:14:43  pauloscustodio
+Parse command line options via look-up tables:
+-C, --line-mode
+
+Revision 1.61  2013/10/03 23:48:31  pauloscustodio
 Parse command line options via look-up tables:
 -r, --origin=ORG_HEX
 
@@ -485,7 +489,7 @@ parseline( enum flag interpret )
 
     ++CURRENTFILE->line;
 
-    if ( !clinemode )
+    if ( !opts.line_mode )
     {
         set_error_line( CURRENTFILE->line );    /* error location */
     }

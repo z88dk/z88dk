@@ -26,8 +26,6 @@ my $init_code = <<'END';
 #define ERROR return __LINE__
 struct module *CURRENTMODULE;
 FILE *errfile;
-int clinemode;
-int clineno;
 size_t get_PC( void ) { return 0; }
 void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) {}
 struct {
@@ -772,9 +770,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.13 2013-10-01 23:23:53 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.14 2013-10-05 08:14:43 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.13  2013-10-01 23:23:53  pauloscustodio
+# Revision 1.14  2013-10-05 08:14:43  pauloscustodio
+# Parse command line options via look-up tables:
+# -C, --line-mode
+#
+# Revision 1.13  2013/10/01 23:23:53  pauloscustodio
 # Parse command line options via look-up tables:
 # -l, --list
 # -nl, --no-list

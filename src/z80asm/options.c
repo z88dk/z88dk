@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.51 2013-10-04 23:31:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.52 2013-10-05 08:14:43 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -489,7 +489,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.51  2013-10-04 23:31:50  pauloscustodio
+* Revision 1.52  2013-10-05 08:14:43  pauloscustodio
+* Parse command line options via look-up tables:
+* -C, --line-mode
+*
+* Revision 1.51  2013/10/04 23:31:50  pauloscustodio
 * Parse command line options via look-up tables:
 * -IXIY, --swap-ix-iy
 *
@@ -731,8 +735,6 @@ char *get_segbin_filename( char *filename, int segment )
 #include <string.h>
 
 /* global option variables */
-enum flag clinemode;
-long clineno;
 enum flag force_xlib;
 char *libfilename;				/* -i, -x library file, kept in strpool */
 enum flag library;
@@ -771,8 +773,6 @@ char *search_lib_file( char *filename )
 *----------------------------------------------------------------------------*/
 static void reset_options( void )
 {
-    clinemode       = OFF;
-    clineno         = 0;
     force_xlib      = OFF;
 	library			= OFF;
 	createlibrary   = OFF;
@@ -789,13 +789,7 @@ static void reset_options( void )
 *----------------------------------------------------------------------------*/
 void set_asm_flag( char *flagid )
 {
-    /* djm turn on c line mode to report line number of C source */
-    if ( strcmp( flagid, "C" ) == 0 )
-    {
-        clinemode = ON;
-    }
-
-    else if ( strcmp( flagid, "forcexlib" ) == 0 )
+    if ( strcmp( flagid, "forcexlib" ) == 0 )
     {
         force_xlib = ON;
     }

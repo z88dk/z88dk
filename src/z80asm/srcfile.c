@@ -17,9 +17,13 @@ Handles the include paths to search for files.
 Allows pushing back of lines, for example to expand macros.
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.10 2013-10-01 23:23:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/srcfile.c,v 1.11 2013-10-05 08:14:43 pauloscustodio Exp $ */
 /* $Log: srcfile.c,v $
-/* Revision 1.10  2013-10-01 23:23:53  pauloscustodio
+/* Revision 1.11  2013-10-05 08:14:43  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -C, --line-mode
+/*
+/* Revision 1.10  2013/10/01 23:23:53  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -l, --list
 /* -nl, --no-list
@@ -237,7 +241,7 @@ char *SourceFile_getline( SourceFile *self )
 		self->line_nr++;
 
 		/* interface with error - set error location */
-		if ( !clinemode )
+		if ( !opts.line_mode )
 		{
 			set_error_file( self->filename );   /* error location */
 			set_error_line( self->line_nr ); 
@@ -254,7 +258,7 @@ char *SourceFile_getline( SourceFile *self )
 	else 
 	{
 		/* interface with error - set error location */
-		if ( !clinemode )
+		if ( !opts.line_mode )
 		{
 			set_error_null();				/* clear error location */
 		}

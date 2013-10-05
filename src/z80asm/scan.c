@@ -14,9 +14,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: flex -L scan.l
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.19 2013-10-01 23:23:53 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.20 2013-10-05 08:14:43 pauloscustodio Exp $ 
 $Log: scan.c,v $
-Revision 1.19  2013-10-01 23:23:53  pauloscustodio
+Revision 1.20  2013-10-05 08:14:43  pauloscustodio
+Parse command line options via look-up tables:
+-C, --line-mode
+
+Revision 1.14  2013/10/01 23:23:53  pauloscustodio
 Parse command line options via look-up tables:
 -l, --list
 -nl, --no-list
@@ -1867,7 +1871,7 @@ case 1:
 YY_RULE_SETUP
 {
 				context->line_nr++;
-				if ( !clinemode )
+				if ( !opts.line_mode )
 					set_error_line( context->line_nr );
 
 				if ( opts.cur_list )

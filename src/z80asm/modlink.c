@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.81 2013-10-04 23:09:25 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.82 2013-10-05 08:14:43 pauloscustodio Exp $ */
 /* $Log: modlink.c,v $
-/* Revision 1.81  2013-10-04 23:09:25  pauloscustodio
+/* Revision 1.82  2013-10-05 08:14:43  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -C, --line-mode
+/*
+/* Revision 1.81  2013/10/04 23:09:25  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -R, --relocatable
 /* --RCMX000
@@ -726,7 +730,7 @@ LinkModules( void )
 
             CURRENTFILE->line = 0;              /* no line references on errors during link processing */
 
-            if ( !clinemode )
+            if ( !opts.line_mode )
             {
                 set_error_line( CURRENTFILE->line );    /* error location */
             }

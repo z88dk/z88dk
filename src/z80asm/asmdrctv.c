@@ -14,10 +14,14 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.57 2013-10-01 23:23:53 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.58 2013-10-05 08:14:43 pauloscustodio Exp $ */
 /* 
  * $Log: asmdrctv.c,v $
- * Revision 1.57  2013-10-01 23:23:53  pauloscustodio
+ * Revision 1.58  2013-10-05 08:14:43  pauloscustodio
+ * Parse command line options via look-up tables:
+ * -C, --line-mode
+ *
+ * Revision 1.57  2013/10/01 23:23:53  pauloscustodio
  * Parse command line options via look-up tables:
  * -l, --list
  * -nl, --no-list
@@ -562,7 +566,7 @@ DEFVARS( void )
         EOL = OFF;
         ++CURRENTFILE->line;
 
-        if ( !clinemode )
+        if ( !opts.line_mode )
         {
             set_error_line( CURRENTFILE->line );    /* error location */
         }
@@ -584,7 +588,7 @@ DEFVARS( void )
             {
                 ++CURRENTFILE->line;
 
-                if ( !clinemode )
+                if ( !opts.line_mode )
                 {
                     set_error_line( CURRENTFILE->line );    /* error location */
                 }
@@ -624,7 +628,7 @@ DEFGROUP( void )
         EOL = OFF;
         ++CURRENTFILE->line;
 
-        if ( !clinemode )
+        if ( !opts.line_mode )
         {
             set_error_line( CURRENTFILE->line );    /* error location */
         }
@@ -646,7 +650,7 @@ DEFGROUP( void )
             {
                 ++CURRENTFILE->line;
 
-                if ( !clinemode )
+                if ( !opts.line_mode )
                 {
                     set_error_line( CURRENTFILE->line );    /* error location */
                 }
