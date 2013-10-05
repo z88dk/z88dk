@@ -20,9 +20,12 @@ Copyright (C) Paulo Custodio, 2011-2013
  * converted from QL SuperBASIC version 0.956. Initially ported to Lattice C then C68 on QDOS.
  */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.50 2013-09-12 00:10:02 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.51 2013-10-05 13:45:19 pauloscustodio Exp $ */
 /* $Log: hist.c,v $
-/* Revision 1.50  2013-09-12 00:10:02  pauloscustodio
+/* Revision 1.51  2013-10-05 13:45:19  pauloscustodio
+/* Version 1.2.9
+/*
+/* Revision 1.50  2013/09/12 00:10:02  pauloscustodio
 /* Create g_free0() macro that NULLs the pointer after free, required
 /* by z80asm to find out if a pointer was already freed.
 /*
@@ -857,7 +860,7 @@ Based on 1.0.31
         - In case of disk full file write fails, but assembler does not
           detect the error and leaves back corruped object/binary files
         - Created new exception FileIOException and ERR_FILE_IO error.
-        - Created new functions fputc_err, fgetc_err, ... to raise the
+        - Created new functions xfput_u8, xfget_u8, ... to raise the
           exception on error.
 
     BUG_0010 : heap corruption when reaching MAXCODESIZE
@@ -872,8 +875,8 @@ Based on 1.0.31
           data - whatever was in memory at that location in codearea.
 
         - Upgrade to Exceptions4c 2.8.9 to solve memory leak.
-        - Factored code to read/write word from file into fgetw_err/fputw_err.
-        - Renamed ReadLong/WriteLong to fgetl_err/fputl_err for symetry.
+        - Factored code to read/write word from file into xfget_u16/xfput_u16.
+        - Renamed ReadLong/WriteLong to xfget_i32/xfput_u32 for symetry.
 
 -------------------------------------------------------------------------------
 29.09.2011 [1.1.9] (pauloscustodio)
@@ -1038,7 +1041,7 @@ Based on 1.0.31
 
     CH_0012 : wrappers on OS calls to raise fatal error
         Remove all the checks for failure after fopen(), localize the error
-        checking and fatal error in fopen_err().
+        checking and fatal error in xfopen().
         Removed exception FileIOException and ERR_FILE_IO error.
 
     CH_0013 : new errors interface to decouple calling code from errors.c
@@ -1071,7 +1074,7 @@ Based on 1.0.31
     - Remove EarlyReturnException, FileIOException: no longer used.
     - Put back strtoupper, strupr does not exist in all systems,
       was causing nightly build to fail
-    - Replaced xfputc and friends with fputc_err, raising a fatal_error()
+    - Replaced xfputc and friends with xfput_u8, raising a fatal_error()
       instead of an exception, moved to errors.c.
 
 -------------------------------------------------------------------------------
@@ -1407,6 +1410,19 @@ Based on 1.0.31
 	  by z80asm to find out if a pointer was already freed.
 
 -------------------------------------------------------------------------------
+05.10.2013 [1.2.9] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- New File and FileStack objects
+	- Remove legacy xxx_err() interface
+	- Renamed SzList to StringList, simplified interface by assuming that
+	  list lives in memory util program ends; it is used for directory searches
+	  only. Moved interface to strutil.c, removed strlist.c.
+	- Replaced chomp by g_strchomp; tolower by g_ascii_tolower;
+	  toupper by g_ascii_toupper; stricompare by g_ascii_strcasecmp.
+	- Removed normalize_eol.
+	- Parse command line options via look-up tables.
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES - require change of the object file format
 -------------------------------------------------------------------------------
     BUG_0011 : ASMPC should refer to start of statememnt, not current element in DEFB/DEFW
@@ -1429,7 +1445,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "1.2.8"
+#define VERSION     "1.2.9"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2013"
 
 #ifdef QDOS
