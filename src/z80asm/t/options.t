@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.24 2013-10-05 08:54:01 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.25 2013-10-05 09:24:13 pauloscustodio Exp $
 #
 # Test options
 
@@ -774,6 +774,49 @@ for my $options ('-forcexlib', '--forcexlib') {
 
 unlink_testfiles($lib);
 
+#------------------------------------------------------------------------------
+# -t (deprecated)
+#------------------------------------------------------------------------------
+
+$asm = "
+	xdef main
+main:	ld b,10
+loop:	djnz loop
+	ret
+";
+$bin = "\x06\x0A\x10\xFE\xC9";
+my $map = <<'END';
+LOOP                            = 0002, L: TEST
+MAIN                            = 0000, G: TEST
+
+
+MAIN                            = 0000, G: TEST
+LOOP                            = 0002, L: TEST
+END
+
+
+# no -t
+t_z80asm(
+	asm		=> $asm,
+	bin		=> $bin,
+	options	=> '-m',
+);
+ok -f map_file(), map_file();
+eq_or_diff scalar(read_file(map_file())), $map, "mapfile contents";
+
+
+# -t4
+t_z80asm(
+	asm		=> $asm,
+	bin		=> $bin,
+	options	=> '-m -t4',
+	err		=> "Warning: option '-t' is deprecated",
+);
+ok -f map_file(), map_file();
+eq_or_diff scalar(read_file(map_file())), $map, "mapfile contents";
+
+
+
 
 
 
@@ -782,7 +825,11 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.24  2013-10-05 08:54:01  pauloscustodio
+# Revision 1.25  2013-10-05 09:24:13  pauloscustodio
+# Parse command line options via look-up tables:
+# -t (deprecated)
+#
+# Revision 1.24  2013/10/05 08:54:01  pauloscustodio
 # Parse command line options via look-up tables:
 # -forcexlib, --forcexlib
 #

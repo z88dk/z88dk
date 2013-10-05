@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.23 2013-10-05 08:54:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.24 2013-10-05 09:24:13 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -154,6 +154,9 @@ OPT( OptClear,	&opts.map,		"-nm", 	"--no-map",			OPT_HELP_NO_MAP, "" )
 OPT( OptSet,	&opts.globaldef,"-g", 	"--globaldef", 		OPT_HELP_GLOBALDEF, "" )
 OPT( OptClear,	&opts.globaldef,"-ng", 	"--no-globaldef",	OPT_HELP_NO_GLOBALDEF, "" )
 
+
+OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
+
 /*-----------------------------------------------------------------------------
 *   clear macros
 *----------------------------------------------------------------------------*/
@@ -164,7 +167,11 @@ OPT( OptClear,	&opts.globaldef,"-ng", 	"--no-globaldef",	OPT_HELP_NO_GLOBALDEF, 
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.23  2013-10-05 08:54:01  pauloscustodio
+* Revision 1.24  2013-10-05 09:24:13  pauloscustodio
+* Parse command line options via look-up tables:
+* -t (deprecated)
+*
+* Revision 1.23  2013/10/05 08:54:01  pauloscustodio
 * Parse command line options via look-up tables:
 * -forcexlib, --forcexlib
 *

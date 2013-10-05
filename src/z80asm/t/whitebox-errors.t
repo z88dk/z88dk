@@ -39,7 +39,7 @@ t_compile_module('', <<'END', $objs);
 	check_count(0);
 
 	warn("Warning\n");
-	warn_option_deprecated("t");
+	warn_option_deprecated("-t");
 	check_count(0);
 
 	warn("Error\n");
@@ -219,9 +219,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.11 2013-09-23 23:14:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.12 2013-10-05 09:24:13 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.11  2013-09-23 23:14:10  pauloscustodio
+# Revision 1.12  2013-10-05 09:24:13  pauloscustodio
+# Parse command line options via look-up tables:
+# -t (deprecated)
+#
+# Revision 1.11  2013/09/23 23:14:10  pauloscustodio
 # Renamed SzList to StringList, simplified interface by assuming that
 # list lives in memory util program ends; it is used for directory searches
 # only. Moved interface to strutil.c, removed strlist.c.

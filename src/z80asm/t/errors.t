@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.1 2013-09-08 00:43:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.2 2013-10-05 09:24:13 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -39,7 +39,7 @@ t_z80asm_capture(asm_file(), "",
 # warn_option_deprecated
 unlink_testfiles();
 write_file(asm_file(), "nop");
-t_z80asm_capture("-t ".asm_file(), "",
+t_z80asm_capture("-t0 ".asm_file(), "",
 		"Warning: option '-t' is deprecated\n",
 		0);
 
@@ -1011,7 +1011,11 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.1  2013-09-08 00:43:59  pauloscustodio
+# Revision 1.2  2013-10-05 09:24:13  pauloscustodio
+# Parse command line options via look-up tables:
+# -t (deprecated)
+#
+# Revision 1.1  2013/09/08 00:43:59  pauloscustodio
 # New error module with one error function per error, no need for the error
 # constants. Allows compiler to type-check error message arguments.
 # Included the errors module in the init() mechanism, no need to call

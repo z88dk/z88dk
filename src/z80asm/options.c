@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.53 2013-10-05 08:54:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.54 2013-10-05 09:24:13 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -41,7 +41,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.53 2013-10-05 08
 #define FILEEXT_MAP     FILEEXT_SEPARATOR "map"    /* ".map" / "_map" */
 
 /* types */
-enum OptType { OptClear, OptSet, OptCall, OptCallArg, OptString };
+enum OptType { OptClear, OptSet, OptCall, OptCallArg, OptString, OptStringList, OptDeprecated };
 
 /* declare functions */
 static void reset_options( void );
@@ -155,6 +155,7 @@ static BOOL process_opt(int *parg, int argc, char *argv[])
 #define i (*parg)
 	int		 j;
 	char	*opt_arg_ptr;
+	char	*arg;
 
 	/* search opts_lu[] */
 	for ( j = 0; j < (int)G_N_ELEMENTS(opts_lu); j++ )
@@ -196,6 +197,20 @@ static BOOL process_opt(int *parg, int argc, char *argv[])
 				opt_arg_ptr = get_opt_arg( opt_arg_ptr, parg, argc, argv );
 				if ( opt_arg_ptr )
 					*((char **)(opts_lu[j].arg)) = opt_arg_ptr;
+				break;
+
+			case OptStringList:
+				opt_arg_ptr = get_opt_arg( opt_arg_ptr, parg, argc, argv );
+				if ( opt_arg_ptr )
+					add_StringList( (StringList **)(opts_lu[j].arg), opt_arg_ptr );
+				break;
+
+			case OptDeprecated:
+				arg = argv[i];
+				opt_arg_ptr = get_opt_arg( opt_arg_ptr, parg, argc, argv );
+				if ( *opt_arg_ptr )
+					*opt_arg_ptr = '\0';		/* delete option argument for warning message */
+				warn_option_deprecated( arg );
 				break;
 
 			default:
@@ -301,6 +316,9 @@ static void show_option(enum OptType type, BOOL *pflag,
 {
 	char msg[ MAXLINE ];
 	int count_opts = 0;
+
+	if ( type == OptDeprecated )
+		return;							/* skip deprecated options */
 
 	/* show default option */
 	if ( type == OptSet   &&   *pflag ||
@@ -489,7 +507,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.53  2013-10-05 08:54:01  pauloscustodio
+* Revision 1.54  2013-10-05 09:24:13  pauloscustodio
+* Parse command line options via look-up tables:
+* -t (deprecated)
+*
+* Revision 1.53  2013/10/05 08:54:01  pauloscustodio
 * Parse command line options via look-up tables:
 * -forcexlib, --forcexlib
 *
@@ -799,12 +821,6 @@ void set_asm_flag( char *flagid )
     else if ( *flagid == 'x' )
     {
         libfilename = CreateLibfile( ( flagid + 1 ) );
-    }
-
-    else if ( *flagid == 't' )
-    {
-		flagid[1] = '\0';
-		warn_option_deprecated(flagid);		/* CH_0017 */
     }
 
     else if ( *flagid == 'I' )
