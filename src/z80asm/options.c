@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.55 2013-10-05 10:54:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.56 2013-10-05 11:31:46 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -25,6 +25,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.55 2013-10-05 10
 #include "hist.h"
 #include "options.h"
 #include "strpool.h"
+#include "symtab.h"
+#include <ctype.h>
 #include <glib.h>
 #include <string.h>
 
@@ -50,6 +52,7 @@ static void exit_copyright(void);
 static void display_options(void);
 static void option_make_updated_bin(void);
 static void option_origin(char *origin_hex);
+static void option_define(char *symbol);
 static void option_cpu_RCM2000(void);
 
 static void parse_options(int *parg, int argc, char *argv[]);
@@ -458,6 +461,31 @@ static void option_origin(char *origin_hex)
 	opts.origin = (int) origin;
 }
 
+static void option_define(char *symbol)
+{
+	int i;
+
+	strtoupper(symbol);			/* convert to upper case */
+
+	/* check syntax */
+	if ( ! isalpha( symbol[0] ) )
+	{
+		error_illegal_ident();
+		return;
+	}
+
+	for ( i = 1; symbol[i]; i++ )
+	{
+		if ( ! isalnum( symbol[i] ) && symbol[i] != '_' )
+		{
+			error_illegal_ident();
+			return;
+		}
+	}
+
+    define_static_def_sym( symbol, 1 );
+}
+
 static void option_cpu_RCM2000(void)
 {
 	opts.cpu = CPU_RCM2000;
@@ -516,7 +544,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.55  2013-10-05 10:54:36  pauloscustodio
+* Revision 1.56  2013-10-05 11:31:46  pauloscustodio
+* Parse command line options via look-up tables:
+* -D, --define
+*
+* Revision 1.55  2013/10/05 10:54:36  pauloscustodio
 * Parse command line options via look-up tables:
 * -I, --inc-path
 * -L, --lib-path
@@ -809,52 +841,6 @@ void set_asm_flag( char *flagid )
         libfilename = CreateLibfile( ( flagid + 1 ) );
     }
 
-    else if ( *flagid == 'D' )
-    {
-        int i;
-
-        strcpy( ident, ( flagid + 1 ) ); /* copy argument string */
-
-        if ( !isalpha( ident[0] ) )
-        {
-            error_illegal_ident();  /* symbol must begin with alpha */
-            return;
-        }
-
-        i = 0;
-
-        while ( ident[i] != '\0' )
-        {
-            if ( strchr( separators, ident[i] ) == NULL )
-            {
-                if ( !isalnum( ident[i] ) )
-                {
-                    if ( ident[i] != '_' )
-                    {
-                        error_illegal_ident();      /* illegal char in identifier */
-                        return;
-                    }
-                    else
-                    {
-                        ident[i] = '_';                 /* underscore in identifier */
-                    }
-                }
-                else
-                {
-                    ident[i] = toupper( ident[i] );
-                }
-            }
-            else
-            {
-                error_illegal_ident();              /* illegal char in identifier */
-                return;
-            }
-
-            ++i;
-        }
-
-        define_static_def_sym( ident, 1 );
-    }
 
     else
     {

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.26 2013-10-05 10:54:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.27 2013-10-05 11:31:46 pauloscustodio Exp $
 #
 # Test options
 
@@ -108,6 +108,7 @@ Code Generation Options:
 Environment:
   -I, --inc-path=PATH    Add directory to include search path
   -L, --lib-path=PATH    Add directory to library search path
+  -D, --define=SYMBOL    Define a static symbol
 
 Output Options:
   -b, --make-bin         Assemble and link/relocate to file.bin
@@ -872,9 +873,33 @@ t_z80asm_capture("-i".$lib_base." ".asm_file(), "",
 		"1 errors occurred during assembly\n", 1);
 
 # -L : OK
-t_z80asm_ok(0, $asm, $bin, "-L".$lib_dir." -i".$lib_base);
+for my $options ('-L', '-L=', '-L ', '--lib-path', '--lib-path=', '--lib-path ') {
+	t_z80asm_ok(0, $asm, $bin, $options.$lib_dir." -i".$lib_base);
+}
 
 unlink_testfiles($lib);
+
+#------------------------------------------------------------------------------
+# -D, --define
+#------------------------------------------------------------------------------
+
+$asm = "ld a,value";
+
+# no -D
+t_z80asm_error($asm, "Error at file 'test.asm' module 'TEST' line 1: symbol not defined");
+
+# invalid -D
+for my $options ('-D23', '-Da*') {
+	write_file(asm_file(), $asm);
+	t_z80asm_capture("$options ".asm_file(), "", 
+					"Error: illegal identifier\n".
+					"1 errors occurred during assembly\n", 1);
+}
+
+# -D
+for my $options ('-D', '-D=', '-D ', '--define', '--define=', '--define ') {
+	t_z80asm_ok(0, $asm, "\x3E\x01", $options."Value");
+}
 
 
 
@@ -885,7 +910,11 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.26  2013-10-05 10:54:36  pauloscustodio
+# Revision 1.27  2013-10-05 11:31:46  pauloscustodio
+# Parse command line options via look-up tables:
+# -D, --define
+#
+# Revision 1.26  2013/10/05 10:54:36  pauloscustodio
 # Parse command line options via look-up tables:
 # -I, --inc-path
 # -L, --lib-path

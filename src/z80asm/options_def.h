@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.25 2013-10-05 10:54:36 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.26 2013-10-05 11:31:46 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -95,6 +95,7 @@ OPT_VAR(	StringList *,	lib_path,	NULL )		/* path for library files */
 
 #define OPT_HELP_INC_PATH		"Add directory to include search path"
 #define OPT_HELP_LIB_PATH		"Add directory to library search path"
+#define OPT_HELP_DEFINE			"Define a static symbol"
 
 /*-----------------------------------------------------------------------------
 *   define options
@@ -132,6 +133,7 @@ OPT( OptSet,	&opts.line_mode,
 OPT_TITLE(	"Environment:"	)
 OPT( OptStringList,	&opts.inc_path,	"-I", "--inc-path",		OPT_HELP_INC_PATH, "PATH" )
 OPT( OptStringList,	&opts.lib_path,	"-L", "--lib-path",		OPT_HELP_LIB_PATH, "PATH" )
+OPT( OptCallArg,	option_define,	"-D", "--define",		OPT_HELP_DEFINE, "SYMBOL" )
 
 OPT_TITLE(	"Output Options:" )
 OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 		OPT_HELP_MAKE_BIN, "" )
@@ -174,7 +176,11 @@ OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
 
 /*
 * $Log: options_def.h,v $
-* Revision 1.25  2013-10-05 10:54:36  pauloscustodio
+* Revision 1.26  2013-10-05 11:31:46  pauloscustodio
+* Parse command line options via look-up tables:
+* -D, --define
+*
+* Revision 1.25  2013/10/05 10:54:36  pauloscustodio
 * Parse command line options via look-up tables:
 * -I, --inc-path
 * -L, --lib-path
