@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.52 2013-10-05 08:14:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.53 2013-10-05 08:54:01 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -489,7 +489,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.52  2013-10-05 08:14:43  pauloscustodio
+* Revision 1.53  2013-10-05 08:54:01  pauloscustodio
+* Parse command line options via look-up tables:
+* -forcexlib, --forcexlib
+*
+* Revision 1.52  2013/10/05 08:14:43  pauloscustodio
 * Parse command line options via look-up tables:
 * -C, --line-mode
 *
@@ -735,7 +739,6 @@ char *get_segbin_filename( char *filename, int segment )
 #include <string.h>
 
 /* global option variables */
-enum flag force_xlib;
 char *libfilename;				/* -i, -x library file, kept in strpool */
 enum flag library;
 enum flag createlibrary;
@@ -773,7 +776,6 @@ char *search_lib_file( char *filename )
 *----------------------------------------------------------------------------*/
 static void reset_options( void )
 {
-    force_xlib      = OFF;
 	library			= OFF;
 	createlibrary   = OFF;
 
@@ -789,12 +791,7 @@ static void reset_options( void )
 *----------------------------------------------------------------------------*/
 void set_asm_flag( char *flagid )
 {
-    if ( strcmp( flagid, "forcexlib" ) == 0 )
-    {
-        force_xlib = ON;
-    }
-
-    else if ( *flagid == 'i' )
+    if ( *flagid == 'i' )
     {
         libfilename = GetLibfile( ( flagid + 1 ) );
     }

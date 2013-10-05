@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.31 2013-10-05 08:14:43 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.32 2013-10-05 08:54:01 pauloscustodio Exp $
 */
 
 #pragma once
@@ -72,7 +72,11 @@ extern char *get_map_filename( char *filename );
 
 /* 
 * $Log: options.h,v $
-* Revision 1.31  2013-10-05 08:14:43  pauloscustodio
+* Revision 1.32  2013-10-05 08:54:01  pauloscustodio
+* Parse command line options via look-up tables:
+* -forcexlib, --forcexlib
+*
+* Revision 1.31  2013/10/05 08:14:43  pauloscustodio
 * Parse command line options via look-up tables:
 * -C, --line-mode
 *
@@ -220,7 +224,6 @@ extern char *get_map_filename( char *filename );
 #include "symbol.h"
 
 /* global option variables */
-extern enum flag force_xlib;
 extern char *libfilename;				/* -i, -x library file, kept in strpool */
 extern enum flag library;
 extern enum flag createlibrary;

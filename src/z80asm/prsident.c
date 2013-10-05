@@ -14,9 +14,13 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2013
 */
 
-/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.47 2013-10-05 08:14:43 pauloscustodio Exp $ */
+/* $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.48 2013-10-05 08:54:01 pauloscustodio Exp $ */
 /* $Log: prsident.c,v $
-/* Revision 1.47  2013-10-05 08:14:43  pauloscustodio
+/* Revision 1.48  2013-10-05 08:54:01  pauloscustodio
+/* Parse command line options via look-up tables:
+/* -forcexlib, --forcexlib
+/*
+/* Revision 1.47  2013/10/05 08:14:43  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -C, --line-mode
 /*
@@ -707,7 +711,7 @@ LIB( void )
 void
 MODULE( void )
 {
-    if ( force_xlib == ON )
+    if ( opts.force_xlib )
     {
         XLIB();
     }
