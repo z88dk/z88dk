@@ -15,13 +15,16 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.4 2013-09-01 12:00:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.5 2013-10-07 00:06:18 pauloscustodio Exp $
 */
+
+#ifndef TOKEN
+#define TOKEN(name, str_legacy, str_new)
+#endif
 
 /* define list of tokens with corresponding string representation, 
    use a " " when not single-char token 
-   newline must be the last token so that it is returned when a '\0' char is searched
-		name,		legacy,	new		 */
+   newline must be the last token so that it is returned when a '\0' char is searched */
 TOKEN(	space, 		" ", " " )
 TOKEN(	dquote, 	"\"","\"")
 TOKEN(	squote, 	"'", "'" )
@@ -72,38 +75,44 @@ TOKEN(	label,		" ", " " )
 /* must be last and empty string to match '\0' */
 TOKEN(	newline,	"",  ""  )
 
+
+
+#undef TOKEN
+
 /* $Log: token_def.h,v $
-/* Revision 1.4  2013-09-01 12:00:07  pauloscustodio
-/* Cleanup compilation warnings
+/* Revision 1.5  2013-10-07 00:06:18  pauloscustodio
+/* Create default empty TOKEN() macro if not defined
 /*
-/* Revision 1.3  2013/08/30 21:50:43  pauloscustodio
-/* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
-/* as an identifier reserved by the C standard for implementation-defined behaviour
-/* starting with two underscores.
-/*
-/* Revision 1.2  2013/08/30 01:11:54  pauloscustodio
-/* Symbols in symbol.h enum definition and in z80asm.c ssyms[] must be in the exact
-/* same order. Moreover need to define some different symbols for the legacy
-/* version.
-/*
-/* Move all defintions to token_def.h, included in both other files.
-/*
-/* Revision 1.1  2013/08/30 01:06:08  pauloscustodio
-/* New C-like expressions, defined when __LEGACY_Z80ASM_SYNTAX is not defined. Keeps old
-/* behaviour under -D__LEGACY_Z80ASM_SYNTAX (defined in legacy.h)
-/*
-/* BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-D__LEGACY_Z80ASM_SYNTAX)
-/* - Expressions now use more standard C-like operators
-/* - Object and library files changed signature to
-/*   "Z80RMF02", "Z80LMF02", to avoid usage of old
-/*   object files with expressions inside in the old format
-/*
-/* Detail:
-/* - String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
-/* - Power:                        changed from '^' to '**'; '^' will be XOR
-/* - XOR:                          changed from ':' to '^';
-/* - AND:                          changed from '~' to '&';  '~' will be NOT
-/* - NOT:                          '~' added as binary not
-/*
-/*
-/* */
+* Revision 1.4  2013/09/01 12:00:07  pauloscustodio
+* Cleanup compilation warnings
+*
+* Revision 1.3  2013/08/30 21:50:43  pauloscustodio
+* By suggestion of Philipp Klaus Krause: rename LEGACY to __LEGACY_Z80ASM_SYNTAX,
+* as an identifier reserved by the C standard for implementation-defined behaviour
+* starting with two underscores.
+*
+* Revision 1.2  2013/08/30 01:11:54  pauloscustodio
+* Symbols in symbol.h enum definition and in z80asm.c ssyms[] must be in the exact
+* same order. Moreover need to define some different symbols for the legacy
+* version.
+*
+* Move all defintions to token_def.h, included in both other files.
+*
+* Revision 1.1  2013/08/30 01:06:08  pauloscustodio
+* New C-like expressions, defined when __LEGACY_Z80ASM_SYNTAX is not defined. Keeps old
+* behaviour under -D__LEGACY_Z80ASM_SYNTAX (defined in legacy.h)
+*
+* BACKWARDS INCOMPATIBLE CHANGE, turned OFF by default (-D__LEGACY_Z80ASM_SYNTAX)
+* - Expressions now use more standard C-like operators
+* - Object and library files changed signature to
+*   "Z80RMF02", "Z80LMF02", to avoid usage of old
+*   object files with expressions inside in the old format
+*
+* Detail:
+* - String concatenation in DEFM: changed from '&' to ',';  '&' will be AND
+* - Power:                        changed from '^' to '**'; '^' will be XOR
+* - XOR:                          changed from ':' to '^';
+* - AND:                          changed from '~' to '&';  '~' will be NOT
+* - NOT:                          '~' added as binary not
+*
+*/
