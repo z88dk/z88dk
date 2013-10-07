@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.18 2013-10-05 13:43:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.19 2013-10-07 00:12:33 pauloscustodio Exp $
 */
 
 #define _C_ ,		/* trick to pass comma-separated values as macro argument */
@@ -40,7 +40,8 @@ ERR(ErrError,	error_illegal_src_filename(char *filename),
 ERR(ErrError,	error_syntax(void),						"syntax error")
 ERR(ErrError,	error_syntax_expr(void),				"syntax error in expression")
 ERR(ErrError,	error_expr(char *expr),					"error in expression '%s'" _C_ expr )
-ERR(ErrError,	error_unclosed_string(void),			"unclosed string")
+ERR(ErrError,	error_invalid_squoted_string(void),		"invalid single quoted character")
+ERR(ErrError,	error_unclosed_string(void),			"unclosed quoted string")
 ERR(ErrError,	error_unbanlanced_paren(void),			"unbalanced parenthesis" )
 
 ERR(ErrError,	error_not_defined(void),				"symbol not defined" )
@@ -78,7 +79,10 @@ ERR(ErrWarn,	warn_int_range_expr(long value, char *expr),
 
 /* */
 /* $Log: errors_def.h,v $
-/* Revision 1.18  2013-10-05 13:43:05  pauloscustodio
+/* Revision 1.19  2013-10-07 00:12:33  pauloscustodio
+/* New error message for single-quoted character
+/*
+/* Revision 1.18  2013/10/05 13:43:05  pauloscustodio
 /* Parse command line options via look-up tables:
 /* -i, --use-lib
 /* -x, --make-lib
