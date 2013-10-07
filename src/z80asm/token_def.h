@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.5 2013-10-07 00:06:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/token_def.h,v 1.6 2013-10-07 00:07:05 pauloscustodio Exp $
 */
 
 #ifndef TOKEN
@@ -79,10 +79,14 @@ TOKEN(	newline,	"",  ""  )
 
 #undef TOKEN
 
-/* $Log: token_def.h,v $
-/* Revision 1.5  2013-10-07 00:06:18  pauloscustodio
-/* Create default empty TOKEN() macro if not defined
 /*
+* $Log: token_def.h,v $
+* Revision 1.6  2013-10-07 00:07:05  pauloscustodio
+* log
+*
+* Revision 1.5  2013/10/07 00:06:18  pauloscustodio
+* Create default empty TOKEN() macro if not defined
+*
 * Revision 1.4  2013/09/01 12:00:07  pauloscustodio
 * Cleanup compilation warnings
 *
