@@ -20,10 +20,27 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "file.o init_obj.o init_obj_file.o class.o safestr.o errors.o strutil.o";
+my $objs = "file.o scan.o init_obj.o init_obj_file.o class.o safestr.o errors.o strutil.o options.o hist.o";
 
 # get init code except init() and main()
-my $init = read_file("init.c"); $init =~ s/static void init\(\)\s*\{.*//s;
+my $init = <<'END' . read_file("init.c"); $init =~ s/static void init\(\)\s*\{.*//s;
+
+#include "symbol.h"
+
+struct module *CURRENTMODULE;
+FILE *errfile;
+size_t get_PC( void ) { return 0; }
+void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) 
+{	
+	warn("%04X %-16s %5d %s", address, source_file, source_line_nr, line);
+}
+char *CreateLibfile( char *filename ) {}
+char *GetLibfile( char *filename ) {}
+Symbol *define_static_def_sym( char *name, long value ) {return NULL;}
+char ident[MAXLINE];
+char separators[MAXLINE];
+
+END
 
 # test deleting of objects
 t_compile_module($init, <<'END', $objs);
@@ -198,6 +215,9 @@ t_compile_module($init, <<'END', $objs);
 	char *files[] = {"test2.asm", "test3.asm", "test4.asm", NULL};
 	int i;
 	
+	if (argc == 2 && strcmp(argv[1], "-C") == 0) opts.line_mode = TRUE;
+	if (argc == 2 && strcmp(argv[1], "-l") == 0) opts.list = opts.cur_list = TRUE;
+	
 	fs = new_FileStack(); ASSERT( fs );
 	ASSERT( getline_FileStack( fs ) == NULL );
 	
@@ -209,7 +229,8 @@ t_compile_module($init, <<'END', $objs);
 	while (	p = getline_FileStack( fs ) )
 	{
 		ASSERT( strcmp( p, fs->top->line->str ) == 0 );
-		printf("%s:%d:%s", fs->top->filename, fs->top->line_nr, fs->top->line->str);
+		warn_option_deprecated("");
+		warn("%s:%d:%s", fs->top->filename, fs->top->line_nr, fs->top->line->str);
 		
 		if (files[i]) 
 			read_to_FileStack(fs, files[i++]);
@@ -221,44 +242,536 @@ t_compile_module($init, <<'END', $objs);
 END
 
 t_run_module([], <<'OUT', <<'ERR', 1);
-test2.asm:1:A
-test3.asm:1:A
-test4.asm:1:A
-test4.asm:2:B
-test4.asm:3:C
-test4.asm:4:D
-test4.asm:5:E
-test3.asm:2:B
-test3.asm:3:C
-test3.asm:4:D
-test3.asm:5:E
-test2.asm:2:B
-test2.asm:3:C
-test2.asm:4:D
-test2.asm:5:E
 GLib Memory statistics (successful operations):
  blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
          4 |          0 |          5 |          5 |          0 |         +0
-        12 |          1 |          0 |          0 |          1 |         +0
-        18 |          0 |          1 |          1 |          0 |         +0
+         8 |          0 |         15 |         15 |          0 |         +0
+        12 |         46 |          0 |          0 |         46 |         +0
+        18 |          0 |         16 |         16 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
         21 |          1 |          0 |          0 |          1 |         +0
-        24 |          2 |          2 |          1 |          1 |         +0
+        24 |         47 |         62 |         31 |         16 |         +0
         42 |          0 |          0 |          1 |          1 |         +0
-        44 |          2 |          1 |          1 |          2 |         +0
+        44 |         47 |          1 |          1 |         47 |         +0
         84 |          0 |          0 |          1 |          1 |         +0
-        88 |          0 |          2 |          2 |          0 |         +0
+        88 |          0 |         47 |         47 |          0 |         +0
         96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=3489, zero-initialized=1868 (53.54%), freed=1717 (49.21%), remaining=1772
+Total bytes: allocated=12159, zero-initialized=1868 (15.36%), freed=10387 (85.43%), remaining=1772
 OUT
+Warning at file 'test2.asm' line 1: option '' is deprecated
+test2.asm:1:A
+Warning at file 'test3.asm' line 1: option '' is deprecated
+test3.asm:1:A
+Warning at file 'test4.asm' line 1: option '' is deprecated
+test4.asm:1:A
+Warning at file 'test4.asm' line 2: option '' is deprecated
+test4.asm:2:B
+Warning at file 'test4.asm' line 3: option '' is deprecated
+test4.asm:3:C
+Warning at file 'test4.asm' line 4: option '' is deprecated
+test4.asm:4:D
+Warning at file 'test4.asm' line 5: option '' is deprecated
+test4.asm:5:E
+Warning at file 'test3.asm' line 2: option '' is deprecated
+test3.asm:2:B
+Warning at file 'test3.asm' line 3: option '' is deprecated
+test3.asm:3:C
+Warning at file 'test3.asm' line 4: option '' is deprecated
+test3.asm:4:D
+Warning at file 'test3.asm' line 5: option '' is deprecated
+test3.asm:5:E
+Warning at file 'test2.asm' line 2: option '' is deprecated
+test2.asm:2:B
+Warning at file 'test2.asm' line 3: option '' is deprecated
+test2.asm:3:C
+Warning at file 'test2.asm' line 4: option '' is deprecated
+test2.asm:4:D
+Warning at file 'test2.asm' line 5: option '' is deprecated
+test2.asm:5:E
+Error at file 'test1.asm': cannot include file 'test1.asm' recursively
+Uncaught runtime exception at errors.c(1)
+ERR
+
+
+t_run_module(['-l'], <<'OUT', <<'ERR', 1);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+         4 |          0 |          5 |          5 |          0 |         +0
+         8 |          0 |         15 |         15 |          0 |         +0
+        12 |         46 |          0 |          0 |         46 |         +0
+        18 |          0 |         16 |         16 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        21 |          1 |          0 |          0 |          1 |         +0
+        24 |         47 |         62 |         31 |         16 |         +0
+        42 |          0 |          0 |          1 |          1 |         +0
+        44 |         47 |          1 |          1 |         47 |         +0
+        84 |          0 |          0 |          1 |          1 |         +0
+        88 |          0 |         47 |         47 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=12159, zero-initialized=1868 (15.36%), freed=10387 (85.43%), remaining=1772
+OUT
+0000 test2.asm            1 A
+Warning at file 'test2.asm' line 1: option '' is deprecated
+test2.asm:1:A
+0000 test3.asm            1 A
+Warning at file 'test3.asm' line 1: option '' is deprecated
+test3.asm:1:A
+0000 test4.asm            1 A
+Warning at file 'test4.asm' line 1: option '' is deprecated
+test4.asm:1:A
+0000 test4.asm            2 B
+Warning at file 'test4.asm' line 2: option '' is deprecated
+test4.asm:2:B
+0000 test4.asm            3 C
+Warning at file 'test4.asm' line 3: option '' is deprecated
+test4.asm:3:C
+0000 test4.asm            4 D
+Warning at file 'test4.asm' line 4: option '' is deprecated
+test4.asm:4:D
+0000 test4.asm            5 E
+Warning at file 'test4.asm' line 5: option '' is deprecated
+test4.asm:5:E
+0000 test3.asm            2 B
+Warning at file 'test3.asm' line 2: option '' is deprecated
+test3.asm:2:B
+0000 test3.asm            3 C
+Warning at file 'test3.asm' line 3: option '' is deprecated
+test3.asm:3:C
+0000 test3.asm            4 D
+Warning at file 'test3.asm' line 4: option '' is deprecated
+test3.asm:4:D
+0000 test3.asm            5 E
+Warning at file 'test3.asm' line 5: option '' is deprecated
+test3.asm:5:E
+0000 test2.asm            2 B
+Warning at file 'test2.asm' line 2: option '' is deprecated
+test2.asm:2:B
+0000 test2.asm            3 C
+Warning at file 'test2.asm' line 3: option '' is deprecated
+test2.asm:3:C
+0000 test2.asm            4 D
+Warning at file 'test2.asm' line 4: option '' is deprecated
+test2.asm:4:D
+0000 test2.asm            5 E
+Warning at file 'test2.asm' line 5: option '' is deprecated
+test2.asm:5:E
+Error at file 'test1.asm': cannot include file 'test1.asm' recursively
+Uncaught runtime exception at errors.c(1)
+ERR
+
+
+t_run_module(['-C'], <<'OUT', <<'ERR', 1);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+         4 |          0 |          5 |          5 |          0 |         +0
+        12 |         31 |          0 |          0 |         31 |         +0
+        18 |          0 |         16 |         16 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        21 |          1 |          0 |          0 |          1 |         +0
+        24 |         32 |         47 |         31 |         16 |         +0
+        42 |          0 |          0 |          1 |          1 |         +0
+        44 |         32 |          1 |          1 |         32 |         +0
+        84 |          0 |          0 |          1 |          1 |         +0
+        88 |          0 |         32 |         32 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=9519, zero-initialized=1868 (19.62%), freed=7747 (81.38%), remaining=1772
+OUT
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:1:A
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:1:A
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:1:A
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:2:B
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:3:C
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:4:D
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:5:E
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:2:B
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:3:C
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:4:D
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:5:E
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:2:B
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:3:C
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:4:D
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:5:E
+Error at file 'test1.asm': cannot include file 'test1.asm' recursively
+Uncaught runtime exception at errors.c(1)
+ERR
+
+
+# test file-stack by tokens
+t_compile_module($init, <<'END', $objs);
+	FileStack *fs;
+	enum token token;
+	char *files[] = {"test2.asm", "test3.asm", "test4.asm", NULL};
+	int i;
+	
+	if (argc == 2 && strcmp(argv[1], "-C") == 0) opts.line_mode = TRUE;
+	if (argc == 2 && strcmp(argv[1], "-l") == 0) opts.list = opts.cur_list = TRUE;
+	
+	init_scan(); atexit( fini_scan );
+	
+	fs = new_FileStack(); ASSERT( fs );
+	ASSERT( getline_FileStack( fs ) == NULL );
+	
+	read_to_FileStack(fs, "test1.asm");
+	ASSERT( getline_FileStack( fs ) == NULL );
+	
+	i = 0;
+	read_to_FileStack(fs, files[i++]);
+	while (	token = get_token_FileStack( fs ) )
+	{
+		warn_option_deprecated("");
+		warn("%s:%d:%5d %s \"%s\"\n", 
+			   fs->top->filename, fs->top->line_nr, 
+			   token,
+			   token == t_newline ? "t_newline" : token == t_name ? "t_name" : "?",
+			   last_token_str->str);
+		
+		if ( *(last_token_str->str) == 'A' )
+			insert_to_scan_FileStack(fs, "ZZ");
+
+		if (files[i]) 
+			read_to_FileStack(fs, files[i++]);
+	}
+	
+	/* error */
+	read_to_FileStack(fs, "test1.asm");
+	read_to_FileStack(fs, "test1.asm");
+END
+
+t_run_module([], <<'OUT', <<'ERR', 1);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+         4 |          0 |          3 |          6 |          3 |         +0
+         8 |          0 |         36 |         36 |          0 |         +0
+        12 |        100 |          0 |          0 |        100 |         +0
+        18 |          0 |         34 |         34 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        21 |          1 |          0 |          0 |          1 |         +0
+        24 |        101 |        134 |         67 |         34 |         +0
+        42 |          0 |          0 |          1 |          1 |         +0
+        44 |        101 |          1 |          1 |        101 |         +0
+        84 |          0 |          0 |          1 |          1 |         +0
+        88 |          0 |        101 |        101 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=22591, zero-initialized=1868 (8.27%), freed=20819 (92.16%), remaining=1772
+OUT
+Warning at file 'test2.asm' line 1: option '' is deprecated
+test2.asm:1:    1 t_name "A"
+Warning at file 'test3.asm' line 1: option '' is deprecated
+test3.asm:1:    1 t_name "A"
+Warning at file 'test4.asm' line 1: option '' is deprecated
+test4.asm:1:    1 t_name "A"
+Warning at file 'test4.asm' line 1: option '' is deprecated
+test4.asm:1:    1 t_name "ZZ"
+Warning at file 'test4.asm' line 1: option '' is deprecated
+test4.asm:1:   10 t_newline ""
+Warning at file 'test4.asm' line 2: option '' is deprecated
+test4.asm:2:    1 t_name "B"
+Warning at file 'test4.asm' line 2: option '' is deprecated
+test4.asm:2:   10 t_newline ""
+Warning at file 'test4.asm' line 3: option '' is deprecated
+test4.asm:3:    1 t_name "C"
+Warning at file 'test4.asm' line 3: option '' is deprecated
+test4.asm:3:   10 t_newline ""
+Warning at file 'test4.asm' line 4: option '' is deprecated
+test4.asm:4:    1 t_name "D"
+Warning at file 'test4.asm' line 4: option '' is deprecated
+test4.asm:4:   10 t_newline ""
+Warning at file 'test4.asm' line 5: option '' is deprecated
+test4.asm:5:    1 t_name "E"
+Warning at file 'test4.asm' line 5: option '' is deprecated
+test4.asm:5:   10 t_newline ""
+Warning at file 'test3.asm' line 1: option '' is deprecated
+test3.asm:1:    1 t_name "ZZ"
+Warning at file 'test3.asm' line 1: option '' is deprecated
+test3.asm:1:   10 t_newline ""
+Warning at file 'test3.asm' line 2: option '' is deprecated
+test3.asm:2:    1 t_name "B"
+Warning at file 'test3.asm' line 2: option '' is deprecated
+test3.asm:2:   10 t_newline ""
+Warning at file 'test3.asm' line 3: option '' is deprecated
+test3.asm:3:    1 t_name "C"
+Warning at file 'test3.asm' line 3: option '' is deprecated
+test3.asm:3:   10 t_newline ""
+Warning at file 'test3.asm' line 4: option '' is deprecated
+test3.asm:4:    1 t_name "D"
+Warning at file 'test3.asm' line 4: option '' is deprecated
+test3.asm:4:   10 t_newline ""
+Warning at file 'test3.asm' line 5: option '' is deprecated
+test3.asm:5:    1 t_name "E"
+Warning at file 'test3.asm' line 5: option '' is deprecated
+test3.asm:5:   10 t_newline ""
+Warning at file 'test2.asm' line 1: option '' is deprecated
+test2.asm:1:    1 t_name "ZZ"
+Warning at file 'test2.asm' line 1: option '' is deprecated
+test2.asm:1:   10 t_newline ""
+Warning at file 'test2.asm' line 2: option '' is deprecated
+test2.asm:2:    1 t_name "B"
+Warning at file 'test2.asm' line 2: option '' is deprecated
+test2.asm:2:   10 t_newline ""
+Warning at file 'test2.asm' line 3: option '' is deprecated
+test2.asm:3:    1 t_name "C"
+Warning at file 'test2.asm' line 3: option '' is deprecated
+test2.asm:3:   10 t_newline ""
+Warning at file 'test2.asm' line 4: option '' is deprecated
+test2.asm:4:    1 t_name "D"
+Warning at file 'test2.asm' line 4: option '' is deprecated
+test2.asm:4:   10 t_newline ""
+Warning at file 'test2.asm' line 5: option '' is deprecated
+test2.asm:5:    1 t_name "E"
+Warning at file 'test2.asm' line 5: option '' is deprecated
+test2.asm:5:   10 t_newline ""
+Error at file 'test1.asm': cannot include file 'test1.asm' recursively
+Uncaught runtime exception at errors.c(1)
+ERR
+
+t_run_module(['-l'], <<'OUT', <<'ERR', 1);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+         4 |          0 |          3 |          6 |          3 |         +0
+         8 |          0 |         36 |         36 |          0 |         +0
+        12 |        100 |          0 |          0 |        100 |         +0
+        18 |          0 |         34 |         34 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        21 |          1 |          0 |          0 |          1 |         +0
+        24 |        101 |        134 |         67 |         34 |         +0
+        42 |          0 |          0 |          1 |          1 |         +0
+        44 |        101 |          1 |          1 |        101 |         +0
+        84 |          0 |          0 |          1 |          1 |         +0
+        88 |          0 |        101 |        101 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=22591, zero-initialized=1868 (8.27%), freed=20819 (92.16%), remaining=1772
+OUT
+0000 test2.asm            1 A
+Warning at file 'test2.asm' line 1: option '' is deprecated
+test2.asm:1:    1 t_name "A"
+0000 test3.asm            1 A
+Warning at file 'test3.asm' line 1: option '' is deprecated
+test3.asm:1:    1 t_name "A"
+0000 test4.asm            1 A
+Warning at file 'test4.asm' line 1: option '' is deprecated
+test4.asm:1:    1 t_name "A"
+Warning at file 'test4.asm' line 1: option '' is deprecated
+test4.asm:1:    1 t_name "ZZ"
+Warning at file 'test4.asm' line 1: option '' is deprecated
+test4.asm:1:   10 t_newline ""
+0000 test4.asm            2 B
+Warning at file 'test4.asm' line 2: option '' is deprecated
+test4.asm:2:    1 t_name "B"
+Warning at file 'test4.asm' line 2: option '' is deprecated
+test4.asm:2:   10 t_newline ""
+0000 test4.asm            3 C
+Warning at file 'test4.asm' line 3: option '' is deprecated
+test4.asm:3:    1 t_name "C"
+Warning at file 'test4.asm' line 3: option '' is deprecated
+test4.asm:3:   10 t_newline ""
+0000 test4.asm            4 D
+Warning at file 'test4.asm' line 4: option '' is deprecated
+test4.asm:4:    1 t_name "D"
+Warning at file 'test4.asm' line 4: option '' is deprecated
+test4.asm:4:   10 t_newline ""
+0000 test4.asm            5 E
+Warning at file 'test4.asm' line 5: option '' is deprecated
+test4.asm:5:    1 t_name "E"
+Warning at file 'test4.asm' line 5: option '' is deprecated
+test4.asm:5:   10 t_newline ""
+Warning at file 'test3.asm' line 1: option '' is deprecated
+test3.asm:1:    1 t_name "ZZ"
+Warning at file 'test3.asm' line 1: option '' is deprecated
+test3.asm:1:   10 t_newline ""
+0000 test3.asm            2 B
+Warning at file 'test3.asm' line 2: option '' is deprecated
+test3.asm:2:    1 t_name "B"
+Warning at file 'test3.asm' line 2: option '' is deprecated
+test3.asm:2:   10 t_newline ""
+0000 test3.asm            3 C
+Warning at file 'test3.asm' line 3: option '' is deprecated
+test3.asm:3:    1 t_name "C"
+Warning at file 'test3.asm' line 3: option '' is deprecated
+test3.asm:3:   10 t_newline ""
+0000 test3.asm            4 D
+Warning at file 'test3.asm' line 4: option '' is deprecated
+test3.asm:4:    1 t_name "D"
+Warning at file 'test3.asm' line 4: option '' is deprecated
+test3.asm:4:   10 t_newline ""
+0000 test3.asm            5 E
+Warning at file 'test3.asm' line 5: option '' is deprecated
+test3.asm:5:    1 t_name "E"
+Warning at file 'test3.asm' line 5: option '' is deprecated
+test3.asm:5:   10 t_newline ""
+Warning at file 'test2.asm' line 1: option '' is deprecated
+test2.asm:1:    1 t_name "ZZ"
+Warning at file 'test2.asm' line 1: option '' is deprecated
+test2.asm:1:   10 t_newline ""
+0000 test2.asm            2 B
+Warning at file 'test2.asm' line 2: option '' is deprecated
+test2.asm:2:    1 t_name "B"
+Warning at file 'test2.asm' line 2: option '' is deprecated
+test2.asm:2:   10 t_newline ""
+0000 test2.asm            3 C
+Warning at file 'test2.asm' line 3: option '' is deprecated
+test2.asm:3:    1 t_name "C"
+Warning at file 'test2.asm' line 3: option '' is deprecated
+test2.asm:3:   10 t_newline ""
+0000 test2.asm            4 D
+Warning at file 'test2.asm' line 4: option '' is deprecated
+test2.asm:4:    1 t_name "D"
+Warning at file 'test2.asm' line 4: option '' is deprecated
+test2.asm:4:   10 t_newline ""
+0000 test2.asm            5 E
+Warning at file 'test2.asm' line 5: option '' is deprecated
+test2.asm:5:    1 t_name "E"
+Warning at file 'test2.asm' line 5: option '' is deprecated
+test2.asm:5:   10 t_newline ""
+Error at file 'test1.asm': cannot include file 'test1.asm' recursively
+Uncaught runtime exception at errors.c(1)
+ERR
+
+t_run_module(['-C'], <<'OUT', <<'ERR', 1);
+GLib Memory statistics (successful operations):
+ blocks of | allocated  | freed      | allocated  | freed      | n_bytes   
+  n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
+           | malloc()   | free()     | realloc()  | realloc()  |           
+===========|============|============|============|============|===========
+         4 |          0 |          3 |          6 |          3 |         +0
+         8 |          0 |          3 |          3 |          0 |         +0
+        12 |         67 |          0 |          0 |         67 |         +0
+        18 |          0 |         34 |         34 |          0 |         +0
+        20 |          1 |          1 |          0 |          0 |         +0
+        21 |          1 |          0 |          0 |          1 |         +0
+        24 |         68 |        101 |         67 |         34 |         +0
+        42 |          0 |          0 |          1 |          1 |         +0
+        44 |         68 |          1 |          1 |         68 |         +0
+        84 |          0 |          0 |          1 |          1 |         +0
+        88 |          0 |         68 |         68 |          0 |         +0
+        96 |          1 |          1 |          0 |          0 |         +0
+       252 |          3 |          0 |          0 |          0 |       +756
+      1016 |          1 |          0 |          0 |          0 |      +1016
+      1024 |          1 |          1 |          0 |          0 |         +0
+GLib Memory statistics (failing operations):
+ --- none ---
+Total bytes: allocated=16783, zero-initialized=1868 (11.13%), freed=15011 (89.44%), remaining=1772
+OUT
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:1:    1 t_name "A"
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:1:    1 t_name "A"
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:1:    1 t_name "A"
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:1:    1 t_name "ZZ"
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:1:   10 t_newline ""
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:2:    1 t_name "B"
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:2:   10 t_newline ""
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:3:    1 t_name "C"
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:3:   10 t_newline ""
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:4:    1 t_name "D"
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:4:   10 t_newline ""
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:5:    1 t_name "E"
+Warning at file 'test4.asm': option '' is deprecated
+test4.asm:5:   10 t_newline ""
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:1:    1 t_name "ZZ"
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:1:   10 t_newline ""
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:2:    1 t_name "B"
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:2:   10 t_newline ""
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:3:    1 t_name "C"
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:3:   10 t_newline ""
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:4:    1 t_name "D"
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:4:   10 t_newline ""
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:5:    1 t_name "E"
+Warning at file 'test3.asm': option '' is deprecated
+test3.asm:5:   10 t_newline ""
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:1:    1 t_name "ZZ"
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:1:   10 t_newline ""
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:2:    1 t_name "B"
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:2:   10 t_newline ""
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:3:    1 t_name "C"
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:3:   10 t_newline ""
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:4:    1 t_name "D"
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:4:   10 t_newline ""
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:5:    1 t_name "E"
+Warning at file 'test2.asm': option '' is deprecated
+test2.asm:5:   10 t_newline ""
 Error at file 'test1.asm': cannot include file 'test1.asm' recursively
 Uncaught runtime exception at errors.c(1)
 ERR
@@ -1118,9 +1631,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.19 2013-09-30 00:26:57 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.20 2013-10-08 21:53:07 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.19  2013-09-30 00:26:57  pauloscustodio
+# Revision 1.20  2013-10-08 21:53:07  pauloscustodio
+# Replace Flex-based lexer by a Ragel-based one.
+# Add interface to file.c to read files by tokens, calling the lexer.
+#
+# Revision 1.19  2013/09/30 00:26:57  pauloscustodio
 # Parse command line options via look-up tables:
 # -e, --asm-ext
 # -M, --obj-ext

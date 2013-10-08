@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.19 2013-09-30 00:24:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.20 2013-10-08 21:53:06 pauloscustodio Exp $
 */
 
 #pragma once
@@ -22,6 +22,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.19 2013-09-30
 #include "memalloc.h"   /* before any other include */
 
 #include "init.h"
+#include "scan.h"
 #include "strutil.h"
 #include "types.h"
 #include <glib.h>
@@ -30,6 +31,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.19 2013-09-30
 *   Object representing an open file
 *	Files open for writing and not closed are removed on exit, to avoid 
 *	having half-created files left over on errors.
+*	Interface with lexer to read by tokens.
+*	Interface with listing to output list lines on each read line.
 *----------------------------------------------------------------------------*/
 typedef struct File
 {
@@ -40,6 +43,10 @@ typedef struct File
 	int		 line_nr;		/* line number, starting at 1 */
 
 	BOOL	 writing;		/* TRUE if writing, FALSE if reading */
+
+	/* lexer support */
+	BOOL	 lexing;		/* TRUE if text will be retrieved by tokens */
+	ScanState scan;			/* scanner state */
 }
 File;
 
@@ -54,6 +61,13 @@ extern void close_File(File *self);
    convert end-of-line characters to '\n'
    return NULL on end of file */
 extern char *getline_File(File *self);
+
+/* read the next token from the open file, calling the lexer;
+   needs to be called instead of getline_File(), sets lexing as side-effect */
+extern enum token get_token_File(File *self);
+
+/* Insert new text to scan in the input at the current position */
+extern void insert_to_scan_File(File *self, char *new_text );
 
 
 /*-----------------------------------------------------------------------------
@@ -75,6 +89,13 @@ extern void read_to_FileStack(FileStack *self, char *filename);
 
 /* read the next line from the file stack, closing and poping files at eof */
 extern char *getline_FileStack(FileStack *self);
+
+/* read the next token from the file stack, closing and poping files at eof */
+extern enum token get_token_FileStack(FileStack *self);
+
+/* Insert new text to scan to the top file of the stack at the current position */
+extern void insert_to_scan_FileStack(FileStack *self, char *new_text );
+
 
 /*-----------------------------------------------------------------------------
 *   Pathname manipulation
@@ -145,7 +166,11 @@ extern void   xfget_c2sstr( sstr_t *str, FILE *file );
 
 /* 
 $Log: file.h,v $
-Revision 1.19  2013-09-30 00:24:25  pauloscustodio
+Revision 1.20  2013-10-08 21:53:06  pauloscustodio
+Replace Flex-based lexer by a Ragel-based one.
+Add interface to file.c to read files by tokens, calling the lexer.
+
+Revision 1.19  2013/09/30 00:24:25  pauloscustodio
 Parse command line options via look-up tables:
 -e, --asm-ext
 -M, --obj-ext

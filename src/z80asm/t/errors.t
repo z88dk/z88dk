@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.2 2013-10-05 09:24:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.3 2013-10-08 21:53:07 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -150,7 +150,7 @@ t_z80asm_capture("-r0 -a ".obj_file(),
 #------------------------------------------------------------------------------
 # error_unclosed_string
 unlink_testfiles();
-t_z80asm_error('defm "hello', "Error at file 'test.asm' line 1: unclosed string");
+t_z80asm_error('defm "hello', "Error at file 'test.asm' line 1: unclosed quoted string");
 
 #------------------------------------------------------------------------------
 # warn_int_range / error_int_range
@@ -1011,7 +1011,11 @@ done_testing();
 
 __END__
 # $Log: errors.t,v $
-# Revision 1.2  2013-10-05 09:24:13  pauloscustodio
+# Revision 1.3  2013-10-08 21:53:07  pauloscustodio
+# Replace Flex-based lexer by a Ragel-based one.
+# Add interface to file.c to read files by tokens, calling the lexer.
+#
+# Revision 1.2  2013/10/05 09:24:13  pauloscustodio
 # Parse command line options via look-up tables:
 # -t (deprecated)
 #

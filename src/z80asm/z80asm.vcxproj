@@ -114,9 +114,6 @@
     <ClInclude Include="queue.h" />
     <ClInclude Include="safestr.h" />
     <ClInclude Include="scan.h" />
-    <ClInclude Include="scan_context.h" />
-    <ClInclude Include="scan_struct.h" />
-    <ClInclude Include="scan_token.h" />
     <ClInclude Include="srcfile.h" />
     <ClInclude Include="strhash.h" />
     <ClInclude Include="strpool.h" />
@@ -145,6 +142,8 @@
     <ClCompile Include="init.c" />
     <ClCompile Include="init_obj.c" />
     <ClCompile Include="init_obj_file.c" />
+    <ClCompile Include="init_obj_options.c" />
+    <ClCompile Include="init_obj_scan.c" />
     <ClCompile Include="ldinstr.c" />
     <ClCompile Include="listfile.c" />
     <ClCompile Include="mapfile.c" />
@@ -155,14 +154,10 @@
     <ClCompile Include="module.c" />
     <ClCompile Include="objfile.c" />
     <ClCompile Include="options.c" />
-    <ClCompile Include="parse.c" />
     <ClCompile Include="prsident.c" />
     <ClCompile Include="prsline.c" />
     <ClCompile Include="safestr.c" />
     <ClCompile Include="scan.c" />
-    <ClCompile Include="scan_context.c" />
-    <ClCompile Include="scan_struct.c" />
-    <ClCompile Include="scan_token.c" />
     <ClCompile Include="srcfile.c" />
     <ClCompile Include="strhash.c" />
     <ClCompile Include="strpool.c" />
@@ -176,7 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="parse.y" />
-    <None Include="scan.l" />
+    <None Include="scan.rl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

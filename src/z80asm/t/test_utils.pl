@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.49 2013-10-01 23:46:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.50 2013-10-08 21:53:07 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -554,17 +554,16 @@ void dump_file ( char *filename )
 	fclose(fp);
 }
 '.$init_code.'
-int user_main (int argc, char **argv) 
-{
-'.$main_code."
-	return 0;
-}
-
 int main (int argc, char **argv) 
 {
 	init_memalloc(); atexit( fini_memalloc );
 	init_strpool(); atexit( fini_strpool );
-	return user_main( argc, argv );
+
+	{
+'.$main_code."
+	}
+	
+	return 0;
 }
 
 ";
@@ -1015,7 +1014,11 @@ sub get_gcc_options {
 
 __END__
 # $Log: test_utils.pl,v $
-# Revision 1.49  2013-10-01 23:46:28  pauloscustodio
+# Revision 1.50  2013-10-08 21:53:07  pauloscustodio
+# Replace Flex-based lexer by a Ragel-based one.
+# Add interface to file.c to read files by tokens, calling the lexer.
+#
+# Revision 1.49  2013/10/01 23:46:28  pauloscustodio
 # Parse command line options via look-up tables:
 # -m, --map
 # -nm, --no-map

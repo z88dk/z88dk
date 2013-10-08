@@ -24,9 +24,29 @@ require 't/test_utils.pl';
 # test errors.c
 unlink_testfiles();
 
-my $objs = "errors.o file.o init_obj.o init_obj_file.o class.o safestr.o strutil.o";
+my $objs = "errors.o scan.o file.o init_obj.o init_obj_file.o class.o safestr.o strutil.o options.o hist.o";
 
-t_compile_module('', <<'END', $objs);
+# get init code except init() and main()
+my $init = <<'END' . read_file("init.c"); $init =~ s/static void init\(\)\s*\{.*//s;
+
+#include "symbol.h"
+
+struct module *CURRENTMODULE;
+FILE *errfile;
+size_t get_PC( void ) { return 0; }
+void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) 
+{	
+	warn("%04X %-16s %5d %s", address, source_file, source_line_nr, line);
+}
+char *CreateLibfile( char *filename ) {}
+char *GetLibfile( char *filename ) {}
+Symbol *define_static_def_sym( char *name, long value ) {return NULL;}
+char ident[MAXLINE];
+char separators[MAXLINE];
+
+END
+
+t_compile_module($init, <<'END', $objs);
 #define ERROR return __LINE__
 #define check_count(e) if (get_num_errors() != e) ERROR;
 
@@ -91,7 +111,7 @@ Uncaught runtime exception at errors.c(1)
 ERR
 
 
-t_compile_module('', <<'END', $objs);
+t_compile_module($init, <<'END', $objs);
 #define ERROR return __LINE__
 #define check_count(e) if (get_num_errors() != e) ERROR;
 #define SYNTAX(file,module,line) \
@@ -219,9 +239,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.12 2013-10-05 09:24:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.13 2013-10-08 21:53:07 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.12  2013-10-05 09:24:13  pauloscustodio
+# Revision 1.13  2013-10-08 21:53:07  pauloscustodio
+# Replace Flex-based lexer by a Ragel-based one.
+# Add interface to file.c to read files by tokens, calling the lexer.
+#
+# Revision 1.12  2013/10/05 09:24:13  pauloscustodio
 # Parse command line options via look-up tables:
 # -t (deprecated)
 #

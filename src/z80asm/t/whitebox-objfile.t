@@ -19,9 +19,30 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "objfile.o class.o file.o init_obj.o init_obj_file.o safestr.o errors.o strutil.o";
+my $objs = "objfile.o class.o file.o init_obj.o init_obj_file.o safestr.o errors.o strutil.o scan.o options.o hist.o";
 
-t_compile_module('', <<'END', $objs);
+# get init code except init() and main()
+my $init = <<'END' . read_file("init.c"); $init =~ s/static void init\(\)\s*\{.*//s;
+
+#include "symbol.h"
+
+struct module *CURRENTMODULE;
+FILE *errfile;
+size_t get_PC( void ) { return 0; }
+void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) 
+{	
+	warn("%04X %-16s %5d %s", address, source_file, source_line_nr, line);
+}
+char *CreateLibfile( char *filename ) {}
+char *GetLibfile( char *filename ) {}
+Symbol *define_static_def_sym( char *name, long value ) {return NULL;}
+char ident[MAXLINE];
+char separators[MAXLINE];
+
+END
+
+
+t_compile_module($init, <<'END', $objs);
 
 #define SEL3(i,a,b,c)	((i)<=0?(a):(i)<=1?(b):(c))
 
@@ -206,9 +227,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.8 2013-09-23 23:14:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-objfile.t,v 1.9 2013-10-08 21:53:07 pauloscustodio Exp $
 # $Log: whitebox-objfile.t,v $
-# Revision 1.8  2013-09-23 23:14:10  pauloscustodio
+# Revision 1.9  2013-10-08 21:53:07  pauloscustodio
+# Replace Flex-based lexer by a Ragel-based one.
+# Add interface to file.c to read files by tokens, calling the lexer.
+#
+# Revision 1.8  2013/09/23 23:14:10  pauloscustodio
 # Renamed SzList to StringList, simplified interface by assuming that
 # list lives in memory util program ends; it is used for directory searches
 # only. Moved interface to strutil.c, removed strlist.c.

@@ -111,15 +111,6 @@
     <ClInclude Include="symref.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="scan_context.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scan_struct.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scan_token.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="symtab.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -227,9 +218,6 @@
     <ClCompile Include="scan.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="parse.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="model.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -237,15 +225,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sym.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scan_context.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scan_struct.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scan_token.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="symtab.c">
@@ -263,21 +242,27 @@
     <ClCompile Include="except.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="init.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="init_obj.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="init_obj_file.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="init_obj_options.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="init.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="init_obj_scan.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="scan.l">
+    <None Include="parse.y">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="parse.y">
+    <None Include="scan.rl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

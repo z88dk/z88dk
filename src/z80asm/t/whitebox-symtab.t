@@ -17,10 +17,17 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "sym.o symtab.o symref.o class.o safestr.o strhash.o errors.o strutil.o file.o init_obj.o init_obj_file.o options.o hist.o";
+my $objs = "sym.o symtab.o symref.o class.o safestr.o strhash.o errors.o strutil.o file.o init_obj.o init_obj_file.o options.o hist.o scan.o";
 
 my $init = <<'END';
 #include "symbol.h"
+
+size_t get_PC( void ) { return 0; }
+void list_start_line( size_t address, char *source_file, int source_line_nr, char *line ) 
+{	
+	warn("%04X %-16s %5d %s", address, source_file, source_line_nr, line);
+}
+
 int page_nr 			= 1;
 int list_get_page_nr() { return page_nr; }
 
@@ -335,9 +342,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.19 2013-10-05 10:54:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.20 2013-10-08 21:53:07 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.19  2013-10-05 10:54:36  pauloscustodio
+# Revision 1.20  2013-10-08 21:53:07  pauloscustodio
+# Replace Flex-based lexer by a Ragel-based one.
+# Add interface to file.c to read files by tokens, calling the lexer.
+#
+# Revision 1.19  2013/10/05 10:54:36  pauloscustodio
 # Parse command line options via look-up tables:
 # -I, --inc-path
 # -L, --lib-path
