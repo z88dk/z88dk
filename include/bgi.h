@@ -14,12 +14,12 @@
  * 
  * 
  * Build examples:
- *  zcc +zx -lndos -create_app -DGFXSCALEX=2/5 -lx11 -llib3d myprogram.c
+ *  zcc +zx -lndos -DGFXSCALEX=2/5 -lx11 -llib3d -create-app myprogram.c
  *  zcc +ts2068 -startup=2 -lgfx2068hr -lndos -DGFXSCALEX=4/5 -DGFXSCALEY=2/5 -lx11 -llib3d -create-app -zorg=40000 -O3 bar3d.c
  *
  *      stefano - 22/10/2012
  *
- *	$Id: bgi.h,v 1.4 2013-10-03 16:05:21 stefano Exp $
+ *	$Id: bgi.h,v 1.5 2013-10-08 07:34:33 stefano Exp $
  */
 
 #ifndef __BGI_H__
@@ -107,7 +107,7 @@ int bgi_y;
 #define grapherrormsg(a) "z88dk gfx emulation ready"
 //#define DETECT	0
 
-#define	moveto(a,b) bgi_x=a;bgi_y=b
+#define	moveto(a,b) bgi_x=a;bgi_y=b;putpixel(a,b,1)
 
 
 #define	settextjustify(a,b)	{}
@@ -164,6 +164,8 @@ struct textsettingstype {
 #define GFXSCALEY GFXSCALEX
 #endif
 
+#define getaspectratio(xasp,yasp) *(xasp)=1;*(yasp)=1
+
 #ifdef GFXSCALEX
 #define	getpixel(a,b)	point((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	putpixel(a,b,c)	((c) ? plot((a)*GFXSCALEX,(b)*GFXSCALEY):unplot((a)*GFXSCALEX,(b)*GFXSCALEY))
@@ -171,15 +173,15 @@ struct textsettingstype {
 #define	rectangle(a,b,c,d)	drawb((a)*GFXSCALEX,(b)*GFXSCALEY,((c)-(a))*GFXSCALEX,((d)-(b))*GFXSCALEY)
 #define	bar(a,b,c,d)	drawb((a)*GFXSCALEX,(b)*GFXSCALEY,((c)-(a))*GFXSCALEX,((d)-(b))*GFXSCALEY);fill((a)*GFXSCALEX+1,(b)*GFXSCALEY+1);xorborder((a)*GFXSCALEX+1,(b)*GFXSCALEY+1,((c)-(a)+1)*GFXSCALEX+2,((d)-(b)+1)*GFXSCALEY+2)
 #define	bar3d(a,b,c,d,e,f) bar(a,b,c,d)
-//#define	circle(a,b,c)	circle(a*GFXSCALEX,b*GFXSCALEY,c*GFXSCALEX,1)
+#define	circle(a,b,c)	circle((a)*GFXSCALEX,(b)*GFXSCALEY,(c)*GFXSCALEX,1)
 //#define	circle(a,b,c)	ellipse(a,b,0,360,c,c)
-#define	circle(a,b,c) polygon((a)*GFXSCALEX,(b)*GFXSCALEY,180,(c)*GFXSCALEY,0);
-#define	sector(a,b,c,d,e,f)	ellipse(a,b,360-d,360-c,e,f);drawto(a*GFXSCALEX,b*GFXSCALEY);drawto((a+icos(360-d)*e/256)*GFXSCALEX,(b+isin(360-d)*f/256)*GFXSCALEY);fill((a+icos(358-c)*(e-2)/256)*GFXSCALEX,(b+isin(358-c)*(f-2)/256)*GFXSCALEY)
+//#define	circle(a,b,c) polygon((a)*GFXSCALEX,(b)*GFXSCALEY,180,(c)*GFXSCALEY,0);
+#define	sector(a,b,c,d,e,f)	ellipse(a,b,360-(d),360-(c),e,f);drawto((a)*GFXSCALEX,(b)*GFXSCALEY);drawto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(f)/256)*GFXSCALEY);fill(((a)+icos(358-(c))*((e)-2)/256)*GFXSCALEX,((b)+isin(358-(c))*((f)-2)/256)*GFXSCALEY)
 #define	ellipse(a,b,c,d,e,f)	ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,c,d,(e)*GFXSCALEX,(f)*GFXSCALEY)
 #define	fillellipse(a,b,c,d)	ellipse(a,b,0,360,c,d);fill((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	line(a,b,c,d)	draw((a)*GFXSCALEX,(b)*GFXSCALEY,(c)*GFXSCALEX,(d)*GFXSCALEY)
-#define	arc(a,b,c,d,e)	ellipse(a,b,360-d,360-c,e,e)
-//#define	pieslice(a,b,c,d,e)	draw(a*GFXSCALEX,b*GFXSCALEY,(a+e)*GFXSCALEX,(d+e)*GFXSCALEY)
+#define	arc(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e)
+#define	pieslice(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e);drawto((a)*GFXSCALEX,(b)*GFXSCALEY);drawto((a+icos(360-(d))*e/256)*GFXSCALEX,(b+isin(360-(d))*e/256)*GFXSCALEY)
 #define	drawpoly(a,b)	for(bgi_x=0;bgi_x<((a)-1);bgi_x++){draw(b[bgi_x*2]*GFXSCALEX,b[1+bgi_x*2]*GFXSCALEY,b[2+bgi_x*2]*GFXSCALEX,b[3+bgi_x*2]*GFXSCALEY);}
 #define floodfill(a,b,c)	fill((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	outtext(c) XDrawString(bgi_display,bgi_mywin,&bgi_gc,bgi_x*GFXSCALEX,bgi_y*GFXSCALEY,c,strlen(c));bgi_x+=XTextWidth(bgi_font_info->fid,c,strlen(c))
@@ -201,17 +203,17 @@ struct textsettingstype {
 #define	bar3d(a,b,c,d,e,f) bar(a,b,c,d)
 //#define	circle(a,b,c)	circle(a,b,c,1)
 #define	circle(a,b,c)	ellipse(a,b,0,360,c,c)
-#define	sector(a,b,c,d,e,f)	ellipse(a,b,360-d,360-c,e,f);drawto(a,b);drawto((a+icos(360-d)*e/256),(b+isin(360-d)*f/256));fill((a+icos(358-c)*(e-2)/256),(b+isin(358-c)*(f-2)/256))
+#define	sector(a,b,c,d,e,f)	ellipse(a,b,360-(d),360-(c),e,f);drawto(a,b);drawto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(f)/256));fill(((a)+icos(358-(c))*((e)-2)/256),((b)+isin(358-(c))*((f)-2)/256))
 #define	fillellipse(a,b,c,d)	ellipse(a,b,0,360,c,d);fill(a,b)
 #define	line(a,b,c,d)	draw(a,b,c,d)
-#define	arc(a,b,c,d,e)	ellipse(a,b,360-d,360-c,e,e)
-//#define	pieslice(a,b,c,d,e)	draw(a*GFXSCALEX,b*GFXSCALEY,(a+e)*GFXSCALEX,(d+e)*GFXSCALEY)
+#define	arc(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e)
+#define	pieslice(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e);drawto(a,b);drawto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(e)/256))
 #define	drawpoly(a,b)	for(bgi_x=0;bgi_x<(a-1);bgi_x++){draw(b[bgi_x*2],b[1+bgi_x*2],b[2+bgi_x*2],b[3+bgi_x*2]);}
 #define floodfill(a,b,c)	fill(a,b)
 #define	outtext(c) XDrawString(bgi_display,bgi_mywin,&bgi_gc,bgi_x,bgi_y,c,strlen(c));bgi_x+=XTextWidth(bgi_font_info->fid,c,strlen(c))
 #define	outtextxy(a,b,c) XDrawString(bgi_display,bgi_mywin,&bgi_gc,a,b,c,strlen(c))
-#define	settextstyle(a,b,c) itoa(c+a*2,bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
-#define	setusercharsize(a,b,c,d) itoa(10*a/b,bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
+#define	settextstyle(a,b,c) itoa((c)+(a)*2,bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
+#define	setusercharsize(a,b,c,d) itoa(10*(a)/(b),bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
 #define textheight(a) 6
 #define imagesize(lx,ly,rx,ry) ((((rx)-(lx))/8+1)*((ry)-(ly))+2)
 //#define getimage(lx,ly,rx,ry,i) i[0]=rx;i[1]=ry;getsprite(lx,ly,i)
