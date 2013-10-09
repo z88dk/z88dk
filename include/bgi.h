@@ -19,7 +19,7 @@
  *
  *      stefano - 22/10/2012
  *
- *	$Id: bgi.h,v 1.5 2013-10-08 07:34:33 stefano Exp $
+ *	$Id: bgi.h,v 1.6 2013-10-09 06:15:40 stefano Exp $
  */
 
 #ifndef __BGI_H__
@@ -180,6 +180,7 @@ struct textsettingstype {
 #define	ellipse(a,b,c,d,e,f)	ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,c,d,(e)*GFXSCALEX,(f)*GFXSCALEY)
 #define	fillellipse(a,b,c,d)	ellipse(a,b,0,360,c,d);fill((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	line(a,b,c,d)	draw((a)*GFXSCALEX,(b)*GFXSCALEY,(c)*GFXSCALEX,(d)*GFXSCALEY)
+//#define	line(a,b,c,d)	plot((a)*GFXSCALEX,(b)*GFXSCALEY);drawto((c)*GFXSCALEX,(d)*GFXSCALEY)
 #define	arc(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e)
 #define	pieslice(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e);drawto((a)*GFXSCALEX,(b)*GFXSCALEY);drawto((a+icos(360-(d))*e/256)*GFXSCALEX,(b+isin(360-(d))*e/256)*GFXSCALEY)
 #define	drawpoly(a,b)	for(bgi_x=0;bgi_x<((a)-1);bgi_x++){draw(b[bgi_x*2]*GFXSCALEX,b[1+bgi_x*2]*GFXSCALEY,b[2+bgi_x*2]*GFXSCALEX,b[3+bgi_x*2]*GFXSCALEY);}
