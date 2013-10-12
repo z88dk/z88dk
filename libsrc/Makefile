@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.180 2013-05-28 06:02:44 stefano Exp $
+# $Id: Makefile,v 1.181 2013-10-12 15:11:56 stefano Exp $
 
 
 include Make.config
@@ -110,6 +110,7 @@ zx81deps:
 	$(RM) -f zx81/*.o
 	$(RM) -f zx81/tape/*.o
 	$(RM) -f zx81/basic/*.o
+	$(RM) -f time/zx81/*.o
 
 # interesting algorithms - aralbrec
 algorithm.lib:
