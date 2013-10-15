@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.57 2013-10-05 13:43:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.58 2013-10-15 23:16:02 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -23,6 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.57 2013-10-05 13
 #include "errors.h"
 #include "file.h"
 #include "hist.h"
+#include "init.h"
 #include "options.h"
 #include "strpool.h"
 #include "symtab.h"
@@ -529,7 +530,10 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.57  2013-10-05 13:43:05  pauloscustodio
+* Revision 1.58  2013-10-15 23:16:02  pauloscustodio
+* includes
+*
+* Revision 1.57  2013/10/05 13:43:05  pauloscustodio
 * Parse command line options via look-up tables:
 * -i, --use-lib
 * -x, --make-lib
