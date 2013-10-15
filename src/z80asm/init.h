@@ -31,7 +31,9 @@ typedef struct FileStack FileStack;
 
 typedef struct Opts Opts;
 
-typedef struct ScanState ScanState;
+typedef struct ScanContext ScanContext;
+
+typedef struct Scan Scan;
 
 
 /* global data */
@@ -63,8 +65,14 @@ extern void delete_Opts ( Opts *self );
 extern void delete0_Opts ( Opts **pself );
 extern void autodelete_Opts ( Opts *self, BOOL autodelete );
 
-/* ScanState: create, destroy, set/clear autodelete */
-extern ScanState * new_ScanState ( void );
-extern void delete_ScanState ( ScanState *self );
-extern void delete0_ScanState ( ScanState **pself );
-extern void autodelete_ScanState ( ScanState *self, BOOL autodelete );
+/* ScanContext: create, destroy, set/clear autodelete */
+extern ScanContext * new_ScanContext ( void );
+extern void delete_ScanContext ( ScanContext *self );
+extern void delete0_ScanContext ( ScanContext **pself );
+extern void autodelete_ScanContext ( ScanContext *self, BOOL autodelete );
+
+/* Scan: create, destroy, set/clear autodelete */
+extern Scan * new_Scan ( void );
+extern void delete_Scan ( Scan *self );
+extern void delete0_Scan ( Scan **pself );
+extern void autodelete_Scan ( Scan *self, BOOL autodelete );

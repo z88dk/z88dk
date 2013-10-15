@@ -20,7 +20,7 @@ use Test::More;
 use File::Path qw(make_path remove_tree);
 require 't/test_utils.pl';
 
-my $objs = "srcfile.o class.o file.o init_obj.o init_obj_file.o errors.o dynstr.o safestr.o strutil.o scan.o options.o hist.o";
+my $objs = "srcfile.o class.o file.o init_obj.o init_obj_file.o init_obj_scan.o errors.o dynstr.o safestr.o strutil.o scan.o options.o hist.o";
 
 my $init_code = <<'END';
 #include "symbol.h"
@@ -578,9 +578,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.17 2013-10-08 21:53:07 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-srcfile.t,v 1.18 2013-10-15 23:24:33 pauloscustodio Exp $
 # $Log: whitebox-srcfile.t,v $
-# Revision 1.17  2013-10-08 21:53:07  pauloscustodio
+# Revision 1.18  2013-10-15 23:24:33  pauloscustodio
+# Move reading by lines or tokens and file reading interface to scan.rl
+# to decouple file.c from scan.c.
+# Add singleton interface to scan to be used by parser.
+#
+# Revision 1.17  2013/10/08 21:53:07  pauloscustodio
 # Replace Flex-based lexer by a Ragel-based one.
 # Add interface to file.c to read files by tokens, calling the lexer.
 #

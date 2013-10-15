@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.19 2013-10-08 21:53:06 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.20 2013-10-15 23:24:33 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -23,6 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.19 2013-10-08 21:53
 
 #include "types.h"
 #include <glib.h>
+#include <stdio.h>
 
 /*-----------------------------------------------------------------------------
 *   A scanner token is represented as an integer that is the ascii code for 
@@ -85,51 +86,99 @@ enum token {
 };
 
 /*-----------------------------------------------------------------------------
-*   Initialize and Terminate module
-*----------------------------------------------------------------------------*/
-extern void init_scan(void);
-extern void fini_scan(void);
-
-/*-----------------------------------------------------------------------------
-* Scanner state structure
-*----------------------------------------------------------------------------*/
-typedef struct ScanState
-{
-	GString	*input;				/* text being scanned, owned by caller */
-	BOOL	 bol;				/* true if at beginning of line */
-	
-	int      cs, act;			/* Ragel state variables */
-	char	*p, *pe, *eof, *ts, *te;	
-} 
-ScanState;
-
-/*-----------------------------------------------------------------------------
-* Globals that keep last token read
+* Globals - last token retrieved
 *----------------------------------------------------------------------------*/
 extern enum token last_token;
 extern int		  last_token_num;
 extern GString	 *last_token_str;
 
 /*-----------------------------------------------------------------------------
-* Scanner API
+*   Initialize and Terminate module
+*----------------------------------------------------------------------------*/
+extern void init_scan(void);
+extern void fini_scan(void);
+
+/*-----------------------------------------------------------------------------
+* State of one scan context
+*----------------------------------------------------------------------------*/
+typedef struct ScanContext
+{
+	GString	*input;				/* text being scanned */
+	
+	FILE	*file;				/* file being scanned, if any */
+	char	*filename;			/* name of file, kept in strpool */
+	int		 line_nr;			/* line number, starting at 1 */
+	
+	BOOL	 bol;				/* true if at beginning of line */
+	
+	int      cs, act;			/* Ragel state variables */
+	char	*p, *pe, *eof, *ts, *te;	
+} 
+ScanContext;
+
+extern void struct_ScanContext_init(ScanContext *self);
+extern void struct_ScanContext_fini(ScanContext *self);
+
+/*-----------------------------------------------------------------------------
+* Scanner object - stack of ScanContext's
+*----------------------------------------------------------------------------*/
+typedef struct Scan
+{
+	ScanContext	*ctx;			/* current context */
+	GSList		*stack;			/* stack of previous contexts */
+}
+Scan;
+
+extern void struct_Scan_init(Scan *self);
+extern void struct_Scan_fini(Scan *self);
+
+/*-----------------------------------------------------------------------------
+* Scanner API - methods without Scan* argument operate on a singleton
 *----------------------------------------------------------------------------*/
 
-/* Initialize the scanner to read the given string */
-extern void start_scan( ScanState *self, GString *input );
+/* push current scan context, start scanning a string */
+extern void scan_string( char *text );
+extern void scan_string_Scan( Scan *self, char *text );
 
-/* Insert new text to scan in the input at the current position */
-extern void insert_to_scan( ScanState *self, char *new_text );
+/* push current scan context, start scanning a file */
+extern void scan_file( char *filename );
+extern void scan_file_Scan( Scan *self, char *filename );
 
-/* Get the next token, set last_token, last_token_num, last_token_str as side-effect */
-extern enum token get_token( ScanState *self );
+/* get the next token, set last_tokenXXX as side-effect */
+extern enum token get_token( void );
+extern enum token get_token_Scan( Scan *self );
 
-/* Get the scan position before a scan, to be able to set if afterwards to rollback */
-extern int  get_scan_pos( ScanState *self );
-extern void set_scan_pos( ScanState *self, int pos );
+/* get the next input line from file - return pointer to 
+   input string in ScanConext, or NULL at end of input */
+extern char *get_line( void );
+extern char *get_line_Scan( Scan *self );
+
+#if 0
+/*-----------------------------------------------------------------------------
+* Bridge to OLD-SCAN interface
+*----------------------------------------------------------------------------*/
+#include "symbol.h"
+
+/* last returned symbol */
+extern enum symbols sym;
+extern char ident[];
+
+/* get the next token */
+extern enum symbols GetSym( void );
+
+/* skip to end of line */
+extern void Skipline( void );
+#endif
+
 
 /*
 * $Log: scan.h,v $
-* Revision 1.19  2013-10-08 21:53:06  pauloscustodio
+* Revision 1.20  2013-10-15 23:24:33  pauloscustodio
+* Move reading by lines or tokens and file reading interface to scan.rl
+* to decouple file.c from scan.c.
+* Add singleton interface to scan to be used by parser.
+*
+* Revision 1.19  2013/10/08 21:53:06  pauloscustodio
 * Replace Flex-based lexer by a Ragel-based one.
 * Add interface to file.c to read files by tokens, calling the lexer.
 *

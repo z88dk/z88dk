@@ -24,7 +24,7 @@ require 't/test_utils.pl';
 # test errors.c
 unlink_testfiles();
 
-my $objs = "errors.o scan.o file.o init_obj.o init_obj_file.o class.o safestr.o strutil.o options.o hist.o";
+my $objs = "errors.o scan.o file.o init_obj.o init_obj_file.o init_obj_scan.o class.o safestr.o strutil.o options.o hist.o";
 
 # get init code except init() and main()
 my $init = <<'END' . read_file("init.c"); $init =~ s/static void init\(\)\s*\{.*//s;
@@ -239,9 +239,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.13 2013-10-08 21:53:07 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.14 2013-10-15 23:24:33 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.13  2013-10-08 21:53:07  pauloscustodio
+# Revision 1.14  2013-10-15 23:24:33  pauloscustodio
+# Move reading by lines or tokens and file reading interface to scan.rl
+# to decouple file.c from scan.c.
+# Add singleton interface to scan to be used by parser.
+#
+# Revision 1.13  2013/10/08 21:53:07  pauloscustodio
 # Replace Flex-based lexer by a Ragel-based one.
 # Add interface to file.c to read files by tokens, calling the lexer.
 #

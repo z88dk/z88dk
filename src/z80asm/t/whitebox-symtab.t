@@ -17,7 +17,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "sym.o symtab.o symref.o class.o safestr.o strhash.o errors.o strutil.o file.o init_obj.o init_obj_file.o options.o hist.o scan.o";
+my $objs = "sym.o symtab.o symref.o class.o safestr.o strhash.o errors.o strutil.o file.o init_obj.o init_obj_file.o init_obj_scan.o options.o hist.o scan.o";
 
 my $init = <<'END';
 #include "symbol.h"
@@ -342,9 +342,14 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.20 2013-10-08 21:53:07 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-symtab.t,v 1.21 2013-10-15 23:24:33 pauloscustodio Exp $
 # $Log: whitebox-symtab.t,v $
-# Revision 1.20  2013-10-08 21:53:07  pauloscustodio
+# Revision 1.21  2013-10-15 23:24:33  pauloscustodio
+# Move reading by lines or tokens and file reading interface to scan.rl
+# to decouple file.c from scan.c.
+# Add singleton interface to scan to be used by parser.
+#
+# Revision 1.20  2013/10/08 21:53:07  pauloscustodio
 # Replace Flex-based lexer by a Ragel-based one.
 # Add interface to file.c to read files by tokens, calling the lexer.
 #

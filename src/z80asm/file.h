@@ -14,15 +14,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.20 2013-10-08 21:53:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.21 2013-10-15 23:24:31 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "memalloc.h"   /* before any other include */
 
-#include "init.h"
-#include "scan.h"
 #include "strutil.h"
 #include "types.h"
 #include <glib.h>
@@ -43,10 +41,6 @@ typedef struct File
 	int		 line_nr;		/* line number, starting at 1 */
 
 	BOOL	 writing;		/* TRUE if writing, FALSE if reading */
-
-	/* lexer support */
-	BOOL	 lexing;		/* TRUE if text will be retrieved by tokens */
-	ScanState scan;			/* scanner state */
 }
 File;
 
@@ -61,14 +55,6 @@ extern void close_File(File *self);
    convert end-of-line characters to '\n'
    return NULL on end of file */
 extern char *getline_File(File *self);
-
-/* read the next token from the open file, calling the lexer;
-   needs to be called instead of getline_File(), sets lexing as side-effect */
-extern enum token get_token_File(File *self);
-
-/* Insert new text to scan in the input at the current position */
-extern void insert_to_scan_File(File *self, char *new_text );
-
 
 /*-----------------------------------------------------------------------------
 *   Object representing stack of files open for reading, to enable #includes
@@ -90,11 +76,6 @@ extern void read_to_FileStack(FileStack *self, char *filename);
 /* read the next line from the file stack, closing and poping files at eof */
 extern char *getline_FileStack(FileStack *self);
 
-/* read the next token from the file stack, closing and poping files at eof */
-extern enum token get_token_FileStack(FileStack *self);
-
-/* Insert new text to scan to the top file of the stack at the current position */
-extern void insert_to_scan_FileStack(FileStack *self, char *new_text );
 
 
 /*-----------------------------------------------------------------------------
@@ -166,7 +147,12 @@ extern void   xfget_c2sstr( sstr_t *str, FILE *file );
 
 /* 
 $Log: file.h,v $
-Revision 1.20  2013-10-08 21:53:06  pauloscustodio
+Revision 1.21  2013-10-15 23:24:31  pauloscustodio
+Move reading by lines or tokens and file reading interface to scan.rl
+to decouple file.c from scan.c.
+Add singleton interface to scan to be used by parser.
+
+Revision 1.20  2013/10/08 21:53:06  pauloscustodio
 Replace Flex-based lexer by a Ragel-based one.
 Add interface to file.c to read files by tokens, calling the lexer.
 

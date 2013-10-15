@@ -14,19 +14,16 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.31 2013-10-08 21:53:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.32 2013-10-15 23:24:31 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
 
-#include "errors.h"
 #include "file.h"
 #include "init.h"
 #include "listfile.h"
 #include "options.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "strpool.h"
 
 /*-----------------------------------------------------------------------------
 *   Initialize and Terminate functions called by init()
@@ -47,7 +44,7 @@ void struct_File_init(struct File *self, char *filename, char *mode)
 	/* init structure */
 	self->fp		= fp;
 	self->filename	= strpool_add(filename);
-	self->line		= g_string_new("");
+	self->line		= g_string_sized_new( MAXLINE );
 	self->line_nr	= 0;
 	self->writing	= writing;
 
@@ -124,10 +121,6 @@ char *getline_File(File *self)
 		}
 	}
 	
-	/* init lexer */
-	if ( self->lexing )
-		start_scan( &self->scan, self->line );
-
 	if ( self->line->len > 0 )
 	{
 		self->line_nr++;
@@ -150,40 +143,6 @@ char *getline_File(File *self)
 
 		return NULL;
 	}
-}
-
-/*-----------------------------------------------------------------------------
-*	read the next token from the open file, calling the lexer;
-*   needs to be called instead of getline_File(), sets lexing as side-effect
-*----------------------------------------------------------------------------*/
-enum token get_token_File(File *self)
-{
-	enum token token;
-
-	self->lexing = TRUE;				/* from now on, getting by tokens */
-
-	if ( self->line->len == 0 )			/* first time or end of file */
-		if ( ! getline_File(self) )		/* calls start_scan(); fails on end of input */
-			return t_end;				/* no more tokens */
-
-	while (1) 
-	{
-		token = get_token( &self->scan );
-		if ( token )
-			return token;				/* got next token */
-
-		if ( ! getline_File(self) )		/* calls start_scan(); fails on end of input */
-			return t_end;				/* no more tokens */
-	}
-}
-
-/*-----------------------------------------------------------------------------
-*   Insert new text to scan in the input at the current position
-*----------------------------------------------------------------------------*/
-void insert_to_scan_File(File *self, char *new_text )
-{
-	if ( self->lexing )
-		insert_to_scan( &self->scan, new_text );
 }
 
 /*-----------------------------------------------------------------------------
@@ -251,48 +210,6 @@ char *getline_FileStack(FileStack *self)
 
 	return NULL;
 }
-
-/*-----------------------------------------------------------------------------
-*   read the next token from the file stack, closing and poping files at eof
-*----------------------------------------------------------------------------*/
-enum token get_token_FileStack(FileStack *self)
-{
-	enum token token;
-
-	while ( self->top )
-	{
-		/* get line from top file */
-		token = get_token_File( self->top );
-		if ( token )
-			return token;
-
-		/* end of file, pop from stack */
-		delete0_File( &(self->top) );
-		if ( self->stack )
-		{
-			/* pop one */
-			self->top = self->stack->data;
-			self->stack = g_slist_remove( self->stack, self->top );
-
-			/* recover error position */
-			set_error_file( self->top->filename );
-			if ( !opts.line_mode )
-				set_error_line( self->top->line_nr );
-		}
-	}
-
-	return t_end;
-}
-
-/*-----------------------------------------------------------------------------
-*   Insert new text to scan to the top file of the stack at the current position
-*----------------------------------------------------------------------------*/
-void insert_to_scan_FileStack(FileStack *self, char *new_text )
-{
-	if ( self->top )
-		insert_to_scan_File( self->top, new_text );
-}
-
 
 /*-----------------------------------------------------------------------------
 *   Pathname manipulation
@@ -518,7 +435,7 @@ FILE *xfopen( char *filename, char *mode )
     FILE *file = fopen( filename, mode );
     if ( file == NULL )
 	{
-		if ( mode[0] == 'r' )
+		if ( strchr(mode, 'r') )
 			fatal_read_file( filename );
 		else
 			fatal_write_file( filename );
@@ -708,7 +625,12 @@ void xfget_c2sstr( sstr_t *str, FILE *file )
 
 /*
 $Log: file.c,v $
-Revision 1.31  2013-10-08 21:53:06  pauloscustodio
+Revision 1.32  2013-10-15 23:24:31  pauloscustodio
+Move reading by lines or tokens and file reading interface to scan.rl
+to decouple file.c from scan.c.
+Add singleton interface to scan to be used by parser.
+
+Revision 1.31  2013/10/08 21:53:06  pauloscustodio
 Replace Flex-based lexer by a Ragel-based one.
 Add interface to file.c to read files by tokens, calling the lexer.
 
