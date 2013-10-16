@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.33 2013-10-16 00:14:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.34 2013-10-16 21:42:06 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -36,6 +36,7 @@ void struct_File_init(struct File *self, char *filename, char *mode)
 	/* init structure */
 	self->fp		= fp;
 	self->filename	= strpool_add(filename);
+	self->text		= g_string_new("");
 	self->writing	= writing;
 }
 
@@ -49,6 +50,14 @@ void struct_File_fini(struct File *self)
 		if ( self->writing )
 			unlink( self->filename );
 	}
+
+	/* free string and data */
+	if ( self->text )
+	{
+		g_string_free( self->text, TRUE );		
+		self->text = NULL;
+	}
+
 }
 
 /*-----------------------------------------------------------------------------
@@ -478,7 +487,11 @@ void xfget_c2sstr( sstr_t *str, FILE *file )
 
 /*
 $Log: file.c,v $
-Revision 1.33  2013-10-16 00:14:37  pauloscustodio
+Revision 1.34  2013-10-16 21:42:06  pauloscustodio
+Allocate minimum-sized string, grow as needed.
+Allocate a GString text inside of File, to be used by file reading methods.
+
+Revision 1.33  2013/10/16 00:14:37  pauloscustodio
 Move FileStack implementation to scan.c, remove FileStack.
 Move getline_File() to scan.c.
 

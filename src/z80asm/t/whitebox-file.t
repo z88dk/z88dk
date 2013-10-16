@@ -166,6 +166,7 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
+         4 |          0 |          7 |          7 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
         32 |          1 |          1 |          0 |          0 |         +0
         40 |          7 |          7 |          0 |          0 |         +0
@@ -177,7 +178,7 @@ GLib Memory statistics (successful operations):
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=3652, zero-initialized=2608 (71.41%), freed=1880 (51.48%), remaining=1772
+Total bytes: allocated=3680, zero-initialized=2608 (70.87%), freed=1908 (51.85%), remaining=1772
 OUT
 ERR
 
@@ -233,6 +234,7 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
+         4 |          0 |          2 |          2 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
         32 |          1 |          1 |          0 |          0 |         +0
         40 |          2 |          2 |          0 |          0 |         +0
@@ -244,7 +246,7 @@ GLib Memory statistics (successful operations):
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=3452, zero-initialized=2408 (69.76%), freed=1680 (48.67%), remaining=1772
+Total bytes: allocated=3460, zero-initialized=2408 (69.60%), freed=1688 (48.79%), remaining=1772
 OUT
 ERR
 
@@ -1037,9 +1039,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.22 2013-10-16 00:14:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-file.t,v 1.23 2013-10-16 21:42:07 pauloscustodio Exp $
 # $Log: whitebox-file.t,v $
-# Revision 1.22  2013-10-16 00:14:37  pauloscustodio
+# Revision 1.23  2013-10-16 21:42:07  pauloscustodio
+# Allocate minimum-sized string, grow as needed.
+# Allocate a GString text inside of File, to be used by file reading methods.
+#
+# Revision 1.22  2013/10/16 00:14:37  pauloscustodio
 # Move FileStack implementation to scan.c, remove FileStack.
 # Move getline_File() to scan.c.
 #

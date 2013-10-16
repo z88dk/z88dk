@@ -240,33 +240,38 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
-         4 |          0 |          0 |          1 |          1 |         +0
+         4 |          0 |          5 |         20 |         15 |         +0
+         8 |          0 |          0 |         12 |         12 |         +0
          9 |          0 |         18 |         18 |          0 |         +0
         12 |         42 |          0 |          0 |         42 |         +0
-        16 |          0 |          1 |          1 |          0 |         +0
+        16 |          0 |          2 |         14 |         12 |         +0
         18 |          0 |         18 |         18 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
         22 |          4 |          0 |          0 |          4 |         +0
         23 |          0 |          4 |          4 |          0 |         +0
         24 |         42 |         42 |         24 |         24 |         +0
         31 |          8 |          0 |          0 |          8 |         +0
-        32 |          1 |          9 |          8 |          0 |         +0
+        32 |          1 |          9 |         21 |         13 |         +0
         35 |          0 |          6 |          6 |          0 |         +0
         40 |          1 |          1 |          0 |          0 |         +0
         44 |         55 |         13 |          4 |         46 |         +0
         48 |          0 |          0 |          6 |          6 |         +0
         62 |          0 |          0 |          8 |          8 |         +0
+        64 |          0 |          0 |         12 |         12 |         +0
         88 |          0 |         42 |         42 |          0 |         +0
         96 |          1 |          1 |          0 |          0 |         +0
+       128 |          0 |          4 |         12 |          8 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
+       256 |          0 |          0 |          8 |          8 |         +0
        384 |          1 |          1 |          0 |          0 |         +0
+       512 |          0 |          4 |          9 |          5 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-      2048 |          0 |         14 |         19 |          5 |         +0
+      1024 |          1 |          1 |          4 |          4 |         +0
+      2048 |          0 |          0 |          4 |          4 |         +0
    >  4096 |          0 |          5 |         21 |         16 |        ***
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=626284, zero-initialized=2368 (0.38%), freed=624512 (99.72%), remaining=1772
+Total bytes: allocated=609416, zero-initialized=2368 (0.39%), freed=607644 (99.71%), remaining=1772
 OUT
 Scan file "test1.asm" by lines (0)
     0 t_end       , value     0, ""
@@ -1044,28 +1049,34 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
-         8 |          0 |          1 |          1 |          0 |         +0
+         4 |          0 |          3 |          7 |          4 |         +0
+         8 |          0 |          1 |          4 |          3 |         +0
         12 |          2 |          0 |          0 |          2 |         +0
+        16 |          0 |          0 |          3 |          3 |         +0
         18 |          0 |          1 |          1 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
         21 |          1 |          0 |          0 |          1 |         +0
         24 |          3 |          3 |          1 |          1 |         +0
-        32 |          1 |          1 |          0 |          0 |         +0
+        32 |          1 |          2 |          4 |          3 |         +0
         40 |          3 |          3 |          0 |          0 |         +0
         42 |          0 |          0 |          1 |          1 |         +0
         44 |          4 |          2 |          1 |          3 |         +0
+        64 |          0 |          1 |          3 |          2 |         +0
         84 |          0 |          0 |          1 |          1 |         +0
         88 |          0 |          3 |          3 |          0 |         +0
         96 |          1 |          1 |          0 |          0 |         +0
+       128 |          0 |          0 |          2 |          2 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
+       256 |          0 |          0 |          2 |          2 |         +0
        384 |          1 |          1 |          0 |          0 |         +0
+       512 |          0 |          1 |          2 |          1 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
-      1024 |          1 |          1 |          0 |          0 |         +0
-      2048 |          0 |          6 |          7 |          1 |         +0
+      1024 |          1 |          1 |          1 |          1 |         +0
+      2048 |          0 |          0 |          1 |          1 |         +0
    >  4096 |          0 |          1 |          5 |          4 |        ***
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=145537, zero-initialized=2448 (1.68%), freed=143765 (98.78%), remaining=1772
+Total bytes: allocated=136485, zero-initialized=2448 (1.79%), freed=134713 (98.70%), remaining=1772
 OUT
 Scan file "test1.asm"
     0 t_end       , value     0, ""
@@ -1147,8 +1158,10 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
-         8 |          0 |         27 |         27 |          0 |         +0
+         4 |          0 |          6 |          8 |          2 |         +0
+         8 |          0 |         27 |         28 |          1 |         +0
         12 |         81 |          0 |          0 |         81 |         +0
+        16 |          0 |          2 |          2 |          0 |         +0
         18 |          0 |         27 |         27 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
         24 |         81 |        108 |         54 |         27 |         +0
@@ -1161,10 +1174,9 @@ GLib Memory statistics (successful operations):
        384 |          1 |          1 |          0 |          0 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
-      2048 |          0 |          8 |          8 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=35642, zero-initialized=2608 (7.32%), freed=33870 (95.03%), remaining=1772
+Total bytes: allocated=19330, zero-initialized=2608 (13.49%), freed=17558 (90.83%), remaining=1772
 OUT
 Scan test1.asm
 Warning at file 'test1.asm' line 1: option '' is deprecated
@@ -1235,8 +1247,10 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
-         8 |          0 |         27 |         27 |          0 |         +0
+         4 |          0 |          6 |          8 |          2 |         +0
+         8 |          0 |         27 |         28 |          1 |         +0
         12 |         81 |          0 |          0 |         81 |         +0
+        16 |          0 |          2 |          2 |          0 |         +0
         18 |          0 |         27 |         27 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
         24 |         81 |        108 |         54 |         27 |         +0
@@ -1249,10 +1263,9 @@ GLib Memory statistics (successful operations):
        384 |          1 |          1 |          0 |          0 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
-      2048 |          0 |          8 |          8 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=35642, zero-initialized=2608 (7.32%), freed=33870 (95.03%), remaining=1772
+Total bytes: allocated=19330, zero-initialized=2608 (13.49%), freed=17558 (90.83%), remaining=1772
 OUT
 Scan test1.asm
 0000 test1.asm            1 A
@@ -1350,7 +1363,10 @@ GLib Memory statistics (successful operations):
   n_bytes  | n_times by | n_times by | n_times by | n_times by | remaining 
            | malloc()   | free()     | realloc()  | realloc()  |           
 ===========|============|============|============|============|===========
+         4 |          0 |          6 |          8 |          2 |         +0
+         8 |          0 |          0 |          1 |          1 |         +0
         12 |         54 |          0 |          0 |         54 |         +0
+        16 |          0 |          2 |          2 |          0 |         +0
         18 |          0 |         27 |         27 |          0 |         +0
         20 |          1 |          1 |          0 |          0 |         +0
         24 |         54 |         81 |         54 |         27 |         +0
@@ -1363,10 +1379,9 @@ GLib Memory statistics (successful operations):
        384 |          1 |          1 |          0 |          0 |         +0
       1016 |          1 |          0 |          0 |          0 |      +1016
       1024 |          1 |          1 |          0 |          0 |         +0
-      2048 |          0 |          8 |          8 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=30890, zero-initialized=2608 (8.44%), freed=29118 (94.26%), remaining=1772
+Total bytes: allocated=14578, zero-initialized=2608 (17.89%), freed=12806 (87.84%), remaining=1772
 OUT
 Scan test1.asm
 Warning at file 'test1.asm': option '' is deprecated
@@ -1438,9 +1453,13 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.20 2013-10-15 23:24:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.21 2013-10-16 21:42:07 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.20  2013-10-15 23:24:33  pauloscustodio
+# Revision 1.21  2013-10-16 21:42:07  pauloscustodio
+# Allocate minimum-sized string, grow as needed.
+# Allocate a GString text inside of File, to be used by file reading methods.
+#
+# Revision 1.20  2013/10/15 23:24:33  pauloscustodio
 # Move reading by lines or tokens and file reading interface to scan.rl
 # to decouple file.c from scan.c.
 # Add singleton interface to scan to be used by parser.

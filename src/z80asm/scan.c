@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: ragel -G2 scan.rl
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.24 2013-10-16 00:14:37 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.25 2013-10-16 21:42:06 pauloscustodio Exp $ 
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -114,7 +114,7 @@ static int scan_num (char *text, int length, int base)
 *----------------------------------------------------------------------------*/
 void init_scan(void)
 {
-	last_token_str = g_string_sized_new( MAXLINE );
+	last_token_str = g_string_new("");
 	the_scan = new_Scan();
 }
 	
@@ -129,7 +129,7 @@ void fini_scan(void)
 *----------------------------------------------------------------------------*/
 void struct_ScanContext_init(ScanContext *self)
 {
-	self->input = g_string_sized_new( MAXLINE );
+	self->input = g_string_new("");
 }
 
 void struct_ScanContext_fini(ScanContext *self)
@@ -7604,7 +7604,11 @@ void Skipline( void )
 
 /*
 * $Log: scan.c,v $
-* Revision 1.24  2013-10-16 00:14:37  pauloscustodio
+* Revision 1.25  2013-10-16 21:42:06  pauloscustodio
+* Allocate minimum-sized string, grow as needed.
+* Allocate a GString text inside of File, to be used by file reading methods.
+*
+* Revision 1.3  2013/10/16 00:14:37  pauloscustodio
 * Move FileStack implementation to scan.c, remove FileStack.
 * Move getline_File() to scan.c.
 *

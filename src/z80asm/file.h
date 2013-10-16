@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.22 2013-10-16 00:14:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.23 2013-10-16 21:42:06 pauloscustodio Exp $
 */
 
 #pragma once
@@ -34,6 +34,7 @@ typedef struct File
 {
 	FILE	*fp;			/* open file handle */
 	char	*filename;		/* name of file, kept in strpool */
+	GString	*text;			/* reading text buffer */
 	BOOL	 writing;		/* TRUE if writing, FALSE if reading */
 }
 File;
@@ -114,7 +115,11 @@ extern void   xfget_c2sstr( sstr_t *str, FILE *file );
 
 /* 
 $Log: file.h,v $
-Revision 1.22  2013-10-16 00:14:37  pauloscustodio
+Revision 1.23  2013-10-16 21:42:06  pauloscustodio
+Allocate minimum-sized string, grow as needed.
+Allocate a GString text inside of File, to be used by file reading methods.
+
+Revision 1.22  2013/10/16 00:14:37  pauloscustodio
 Move FileStack implementation to scan.c, remove FileStack.
 Move getline_File() to scan.c.
 
