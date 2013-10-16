@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: ragel -G2 scan.rl
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.2 2013-10-15 23:24:33 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.3 2013-10-16 00:14:37 pauloscustodio Exp $ 
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -484,7 +484,6 @@ void scan_file_Scan( Scan *self, char *filename )
 {
 	GSList		*i;
 	ScanContext *ctx;
-	File		*file;
 
 	/* create the context */
 	push_context( self );
@@ -658,7 +657,11 @@ void Skipline( void )
 
 /*
 * $Log: scan.rl,v $
-* Revision 1.2  2013-10-15 23:24:33  pauloscustodio
+* Revision 1.3  2013-10-16 00:14:37  pauloscustodio
+* Move FileStack implementation to scan.c, remove FileStack.
+* Move getline_File() to scan.c.
+*
+* Revision 1.2  2013/10/15 23:24:33  pauloscustodio
 * Move reading by lines or tokens and file reading interface to scan.rl
 * to decouple file.c from scan.c.
 * Add singleton interface to scan to be used by parser.

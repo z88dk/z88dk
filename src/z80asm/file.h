@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.21 2013-10-15 23:24:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.22 2013-10-16 00:14:37 pauloscustodio Exp $
 */
 
 #pragma once
@@ -29,17 +29,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.h,v 1.21 2013-10-15
 *   Object representing an open file
 *	Files open for writing and not closed are removed on exit, to avoid 
 *	having half-created files left over on errors.
-*	Interface with lexer to read by tokens.
-*	Interface with listing to output list lines on each read line.
 *----------------------------------------------------------------------------*/
 typedef struct File
 {
 	FILE	*fp;			/* open file handle */
 	char	*filename;		/* name of file, kept in strpool */
-
-	GString	*line;			/* last line read */
-	int		 line_nr;		/* line number, starting at 1 */
-
 	BOOL	 writing;		/* TRUE if writing, FALSE if reading */
 }
 File;
@@ -50,33 +44,6 @@ extern void struct_File_fini(File *self);
 /* close an open file
    if not called, delete_File() will delete a file open for writing */
 extern void close_File(File *self);
-
-/* read the next line from an open file into self->line, update self->line_nr
-   convert end-of-line characters to '\n'
-   return NULL on end of file */
-extern char *getline_File(File *self);
-
-/*-----------------------------------------------------------------------------
-*   Object representing stack of files open for reading, to enable #includes
-*----------------------------------------------------------------------------*/
-typedef struct FileStack
-{
-	File	*top;			/* current input file, NULL if no file open */
-	GSList	*stack;			/* stack of previously open files */
-}
-FileStack;
-
-extern void struct_FileStack_init(FileStack *self);
-extern void struct_FileStack_fini(FileStack *self);
-
-/* open a new file for reading (always in binary mode to be able to translate eol sequences)
-   and push to the stack; fatal error on failure or include loop */
-extern void read_to_FileStack(FileStack *self, char *filename);
-
-/* read the next line from the file stack, closing and poping files at eof */
-extern char *getline_FileStack(FileStack *self);
-
-
 
 /*-----------------------------------------------------------------------------
 *   Pathname manipulation
@@ -147,7 +114,11 @@ extern void   xfget_c2sstr( sstr_t *str, FILE *file );
 
 /* 
 $Log: file.h,v $
-Revision 1.21  2013-10-15 23:24:31  pauloscustodio
+Revision 1.22  2013-10-16 00:14:37  pauloscustodio
+Move FileStack implementation to scan.c, remove FileStack.
+Move getline_File() to scan.c.
+
+Revision 1.21  2013/10/15 23:24:31  pauloscustodio
 Move reading by lines or tokens and file reading interface to scan.rl
 to decouple file.c from scan.c.
 Add singleton interface to scan to be used by parser.

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.32 2013-10-15 23:24:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.33 2013-10-16 00:14:37 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -30,27 +30,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.32 2013-10-15
 *----------------------------------------------------------------------------*/
 void struct_File_init(struct File *self, char *filename, char *mode)
 {
-    FILE *fp     = fopen( filename, mode );
+    FILE *fp     = xfopen( filename, mode );
 	BOOL writing = strchr(mode, 'w') ? TRUE : FALSE;
-
-    if ( fp == NULL )
-	{
-		if ( writing )
-			fatal_write_file( filename );
-		else
-			fatal_read_file( filename );
-	}
 
 	/* init structure */
 	self->fp		= fp;
 	self->filename	= strpool_add(filename);
-	self->line		= g_string_sized_new( MAXLINE );
-	self->line_nr	= 0;
 	self->writing	= writing;
-
-	/* set error location */
-	set_error_file( filename );
-	set_error_line( 0 );
 }
 
 void struct_File_fini(struct File *self)
@@ -63,16 +49,6 @@ void struct_File_fini(struct File *self)
 		if ( self->writing )
 			unlink( self->filename );
 	}
-
-	/* free string and data, set line to NULL */
-	if ( self->line )
-	{
-		g_string_free( self->line, TRUE );		
-		self->line = NULL;
-	}
-
-	/* clear error location */
-	set_error_null();
 }
 
 /*-----------------------------------------------------------------------------
@@ -83,132 +59,9 @@ void close_File(struct File *self)
 {
 	if ( self->fp )
 	{
-		fclose( self->fp );
+		xfclose( self->fp );
 		self->fp = NULL;
 	}
-
-	/* clear error location */
-	set_error_null();
-}
-
-/*-----------------------------------------------------------------------------
-*   read the next line from an open file into self->line, update self->line_nr
-*   convert end-of-line characters to '\n'
-*   return NULL on end of file
-*----------------------------------------------------------------------------*/
-char *getline_File(File *self)
-{
-	int c1, c2;
-	
-	g_string_truncate( self->line, 0 );
-	while ( (c1 = getc( self->fp )) != EOF && c1 != '\n' && c1 != '\r' )
-		g_string_append_c( self->line, c1 );
-	
-	if ( c1 == EOF )
-	{
-		if ( self->line->len > 0 )					/* read some chars */
-			g_string_append_c( self->line, '\n' );	/* missing newline at end of line */
-	}
-	else 						
-	{
-		g_string_append_c( self->line, '\n' );		/* end of line */
-		
-		if ( (c2 = getc( self->fp )) != EOF &&
-			 ! ( c1 == '\n' && c2 == '\r' ||
-				 c1 == '\r' && c2 == '\n' ) )
-		{
-			ungetc( c2, self->fp );					/* push back to input */
-		}
-	}
-	
-	if ( self->line->len > 0 )
-	{
-		self->line_nr++;
-	
-		/* call listing */
-		if ( opts.cur_list )
-			list_start_line( get_PC(), self->filename, self->line_nr, self->line->str );
-
-		/* set error location; in line_mode, only set error line at LINE directive */
-		set_error_file( self->filename );
-	    if ( !opts.line_mode )
-			set_error_line( self->line_nr );
-
-		return self->line->str;
-	}
-	else
-	{
-		/* clear error location */
-		set_error_null();
-
-		return NULL;
-	}
-}
-
-/*-----------------------------------------------------------------------------
-*   Initialize and Terminate functions called by init()
-*----------------------------------------------------------------------------*/
-void struct_FileStack_init(FileStack *self)
-{
-}
-
-void struct_FileStack_fini(FileStack *self)
-{
-	g_slist_free_full( self->stack, (GDestroyNotify) delete_File );
-	delete_File( self->top );
-}
-
-/*-----------------------------------------------------------------------------
-*   open a new file for reading (always in binary mode to be able to translate eol sequences)
-*   and push to the stack; fatal error on failure or include loop
-*----------------------------------------------------------------------------*/
-void read_to_FileStack(FileStack *self, char *filename)
-{
-	GSList	*i;
-	File	*file;
-
-	/* push current top file to stack */
-	if ( self->top )
-		self->stack = g_slist_prepend( self->stack, self->top );
-
-	/* check for recursive includes */
-	for ( i = self->stack; i; i = g_slist_next(i) )
-	{
-		file = i->data;
-		if ( strcmp(filename, file->filename) == 0 )
-			fatal_include_recursion( filename );
-	}
-
-	/* open the new file */
-	self->top = new_File( filename, "rb" );		/* "b" to return eol chars */
-	autodelete_File( self->top, FALSE );		/* will be deleted by delete_FileStack */
-}
-
-/*-----------------------------------------------------------------------------
-*   read the next line from the file stack, closing and poping files at eof
-*----------------------------------------------------------------------------*/
-char *getline_FileStack(FileStack *self)
-{
-	char *ret;
-
-	while ( self->top )
-	{
-		/* get line from top file */
-		ret = getline_File( self->top );
-		if ( ret )
-			return ret;
-
-		/* end of file, pop from stack */
-		delete0_File( &(self->top) );
-		if ( self->stack )
-		{
-			/* pop one */
-			self->top = self->stack->data;
-			self->stack = g_slist_remove( self->stack, self->top );
-		}
-	}
-
-	return NULL;
 }
 
 /*-----------------------------------------------------------------------------
@@ -625,7 +478,11 @@ void xfget_c2sstr( sstr_t *str, FILE *file )
 
 /*
 $Log: file.c,v $
-Revision 1.32  2013-10-15 23:24:31  pauloscustodio
+Revision 1.33  2013-10-16 00:14:37  pauloscustodio
+Move FileStack implementation to scan.c, remove FileStack.
+Move getline_File() to scan.c.
+
+Revision 1.32  2013/10/15 23:24:31  pauloscustodio
 Move reading by lines or tokens and file reading interface to scan.rl
 to decouple file.c from scan.c.
 Add singleton interface to scan to be used by parser.

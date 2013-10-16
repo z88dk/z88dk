@@ -27,8 +27,6 @@ typedef int BOOL;
 
 typedef struct File File;
 
-typedef struct FileStack FileStack;
-
 typedef struct Opts Opts;
 
 typedef struct ScanContext ScanContext;
@@ -52,12 +50,6 @@ extern File * new_File (  char * filename,  char * mode );
 extern void delete_File ( File *self );
 extern void delete0_File ( File **pself );
 extern void autodelete_File ( File *self, BOOL autodelete );
-
-/* FileStack: create, destroy, set/clear autodelete */
-extern FileStack * new_FileStack ( void );
-extern void delete_FileStack ( FileStack *self );
-extern void delete0_FileStack ( FileStack **pself );
-extern void autodelete_FileStack ( FileStack *self, BOOL autodelete );
 
 /* Opts: create, destroy, set/clear autodelete */
 extern Opts * new_Opts ( void );

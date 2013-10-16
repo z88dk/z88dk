@@ -9,8 +9,6 @@
 
 
 
-
-
 /* data store for managed object */
 typedef struct Opts_store
 {

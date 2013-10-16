@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.28 2013-10-05 13:43:05 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.29 2013-10-16 00:14:37 pauloscustodio Exp $
 #
 # Test options
 
@@ -48,15 +48,15 @@ t_z80asm_capture(join(" ", "-r0", "-b", asm1_file(), asm2_file(), asm3_file(), a
 t_binary(read_binfile(bin1_file()), "\1\2\3\4");
 ok unlink bin1_file();
 
-write_file(asmlst1_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@".asmlst2_file());
+write_file(asmlst1_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst2_file());
 write_file(asmlst2_file(), "\r\r\n\n  ".asm3_file()."  \r\r\n\n    ".asm4_file()."\n");
 t_z80asm_capture(join(" ", "-r0", "-b", asm1_file(), '@'.asmlst1_file()),
 				 "", "", 0);
 t_binary(read_binfile(bin1_file()), "\1\2\3\4");
 ok unlink bin1_file();
 
-write_file(asmlst1_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@".asmlst2_file());
-write_file(asmlst2_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@".asmlst1_file());
+write_file(asmlst1_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst2_file());
+write_file(asmlst2_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst1_file());
 t_z80asm_capture(join(" ", "-r0", "-b", asm1_file(), '@'.asmlst1_file()),
 				 "", <<'ERR', 1);
 Error at file 'test2.asmlst' line 9: cannot include file 'test1.asmlst' recursively
@@ -999,7 +999,11 @@ done_testing();
 
 __END__
 # $Log: options.t,v $
-# Revision 1.28  2013-10-05 13:43:05  pauloscustodio
+# Revision 1.29  2013-10-16 00:14:37  pauloscustodio
+# Move FileStack implementation to scan.c, remove FileStack.
+# Move getline_File() to scan.c.
+#
+# Revision 1.28  2013/10/05 13:43:05  pauloscustodio
 # Parse command line options via look-up tables:
 # -i, --use-lib
 # -x, --make-lib

@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.87 2013-10-15 23:13:53 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.88 2013-10-16 00:14:37 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -283,7 +283,11 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.87  2013-10-15 23:13:53  pauloscustodio
+# Revision 1.88  2013-10-16 00:14:37  pauloscustodio
+# Move FileStack implementation to scan.c, remove FileStack.
+# Move getline_File() to scan.c.
+#
+# Revision 1.87  2013/10/15 23:13:53  pauloscustodio
 # Keep //#line when generating scan.c from scan.rl
 #
 # Revision 1.86  2013/10/08 21:53:06  pauloscustodio
@@ -684,9 +688,9 @@ module.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h symref.h
 objfile.o: memalloc.h class.h queue.h types.h errors.h errors_def.h file.h
 objfile.o: strutil.h config.h  safestr.h objfile.h strpool.h
 objfile.o: legacy.h
-options.o: memalloc.h errors.h errors_def.h file.h strutil.h types.h config.h
-options.o:  safestr.h hist.h init.h strpool.h options.h
-options.o: options_def.h scan.h codearea.h symtab.h classhash.h queue.h
+options.o: memalloc.h errors.h errors_def.h scan.h types.h hist.h init.h
+options.o: strpool.h file.h strutil.h config.h  safestr.h
+options.o: options.h options_def.h codearea.h symtab.h classhash.h queue.h
 options.o: class.h strhash.h uthash.h die.h sym.h symref.h classlist.h
 options.o: z80asm.h
 prsident.o: memalloc.h codearea.h types.h config.h  errors.h

@@ -11,8 +11,6 @@
 
 
 
-
-
 /* data store for managed object */
 typedef struct ScanContext_store
 {

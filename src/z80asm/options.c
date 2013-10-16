@@ -15,13 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.58 2013-10-15 23:16:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.59 2013-10-16 00:14:37 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
 
 #include "errors.h"
-#include "file.h"
+#include "scan.h"
 #include "hist.h"
 #include "init.h"
 #include "options.h"
@@ -246,6 +246,7 @@ static void parse_options(int *parg, int argc, char *argv[])
 *----------------------------------------------------------------------------*/
 static void parse_file( char *filename, void (*process_file)(char *filename) )
 {
+	g_strstrip(filename);
 	switch ( filename[0] )
 	{
         case '-':		/* Illegal source file name */
@@ -263,22 +264,29 @@ static void parse_file( char *filename, void (*process_file)(char *filename) )
 /*-----------------------------------------------------------------------------
 *   process a @list file or a simple file
 *----------------------------------------------------------------------------*/
-static void parse_file_list( FileStack *files, 
+static void parse_file_list( Scan *files, 
 						     char *filename, void (*process_file)(char *filename) )
 {
 	char *line;
 
+	g_strstrip(filename);
 	if ( filename[0] == '@' )
 	{
-		read_to_FileStack( files, filename+1 );
+		g_strstrip(filename+1);
+		scan_file_Scan( files, filename+1 );
 
-		while ( (line = getline_FileStack( files )) != NULL )
+		while ( (line = get_line_Scan( files )) != NULL )
 		{
 			g_strstrip(line);
 			if ( line[0] == '@' )
-				read_to_FileStack( files, line+1 );		/* recurse */
+			{
+				g_strstrip(line+1);
+				scan_file_Scan( files, line+1 );		/* recurse */
+			}
 			else 
+			{
 				parse_file( line, process_file );
+			}
 		}
 	}
 	else 
@@ -293,7 +301,7 @@ static void parse_file_list( FileStack *files,
 static void parse_files(int arg, int argc, char *argv[], 
 						void (*process_file)(char *filename) )
 {
-	FileStack *files = new_FileStack();
+	Scan *files = new_Scan();
 	{
 		int i; 
 
@@ -301,7 +309,7 @@ static void parse_files(int arg, int argc, char *argv[],
 		for ( i = arg; i < argc; i++ )
 			parse_file_list( files, argv[i], process_file );
 	}
-	delete0_FileStack( &files );
+	delete0_Scan( &files );
 }
 
 /*-----------------------------------------------------------------------------
@@ -530,7 +538,11 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.58  2013-10-15 23:16:02  pauloscustodio
+* Revision 1.59  2013-10-16 00:14:37  pauloscustodio
+* Move FileStack implementation to scan.c, remove FileStack.
+* Move getline_File() to scan.c.
+*
+* Revision 1.58  2013/10/15 23:16:02  pauloscustodio
 * includes
 *
 * Revision 1.57  2013/10/05 13:43:05  pauloscustodio
