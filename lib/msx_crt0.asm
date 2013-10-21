@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.25 2013-06-18 06:11:23 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.26 2013-10-21 14:23:44 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -34,20 +34,21 @@
 
         XDEF    _std_seed
 
-	XDEF	snd_tick	; Sound variable
+        XDEF	snd_tick	; Sound variable
+        XDEF	bit_irqstatus	; current irq status when DI is necessary
 
-	XDEF	_vfprintf
+        XDEF	_vfprintf
 
         XDEF    exitsp
         XDEF    exitcount
 
        	XDEF	heaplast	; Near malloc heap variables
-	XDEF	heapblocks
+        XDEF	heapblocks
 
         XDEF    __sgoioblk
 
 ; Graphics stuff
-	XDEF	pixelbyte	; Temp store for non-buffered mode
+        XDEF	pixelbyte	; Temp store for non-buffered mode
         XDEF    base_graphics   ; Graphical variables
         XDEF    coords          ; Current xy position
 
@@ -347,7 +348,8 @@ pixelbyte:      defb	0
 
 
 IF DEFINED_NEED1bitsound
-snd_tick:	defb	0	; Sound variable
+snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
 ENDIF
 
 ;Seed for integer rand() routines

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.18 2013-06-18 06:11:23 stefano Exp $
+;       $Id: cpc_crt0.asm,v 1.19 2013-10-21 14:23:44 stefano Exp $
 ;
 
         MODULE  cpc_crt0
@@ -36,6 +36,7 @@
         XDEF    coords          ;Current xy position
 
         XDEF    snd_tick        ;Sound variable
+        XDEF	bit_irqstatus	; current irq status when DI is necessary
 
         XDEF    firmware_bc     ;Needed by the firmware interposer
         XDEF    firmware_af     ;Needed by the firmware interposer
@@ -183,6 +184,7 @@ firmware_af:    defw    0
 
 heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
+
 IF DEFINED_USING_amalloc
 XREF ASMTAIL
 XDEF _heap
@@ -192,6 +194,11 @@ XDEF _heap
 _heap:
                 defw ASMTAIL	; Location of the last program byte
                 defw 0
+ENDIF
+
+IF DEFINED_NEED1bitsound
+snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
 ENDIF
 
                 defm    "Small C+ CPC"

@@ -1,7 +1,7 @@
 ;
 ; Startup for Residos packages
 ;
-; $Id: zxr_crt0.asm,v 1.4 2009-06-22 21:20:05 dom Exp $
+; $Id: zxr_crt0.asm,v 1.5 2013-10-21 14:23:44 stefano Exp $
 ;
 
         MODULE	zxs_crt0
@@ -169,7 +169,9 @@ exitsp:         defw    0       ; Address of where the atexit() stack is
 exitcount:      defb    0       ; How many routines on the atexit() stack
 
 IF DEFINED_NEED1bitsound
-snd_tick:       defb    0       ; Sound variable
+snd_asave:      defb    0	; Sound variable
+snd_tick:       defb    0	;  "      "
+bit_irqstatus:	defw	0
 ENDIF
 
                 defm    "Small C+ ZXR"   ;Unnecessary file signature

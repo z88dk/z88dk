@@ -1,4 +1,4 @@
-; $Id: bit_close_ei.asm,v 1.1 2008-12-09 17:48:18 stefano Exp $
+; $Id: bit_close_ei.asm,v 1.2 2013-10-21 14:23:45 stefano Exp $
 ;
 ; Galaksija 1 bit sound functions
 ;
@@ -8,8 +8,15 @@
 ;
 
     XLIB     bit_close_ei
+    XREF     bit_irqstatus
 
 .bit_close_ei
-          ei
-          ret
+	push hl
+	ld	hl,(bit_irqstatus)
+	ex	(sp),hl
+	pop af
 
+	ret po
+
+	ei
+	ret

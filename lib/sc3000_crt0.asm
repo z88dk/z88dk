@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jun 2010
 ;
-;	$Id: sc3000_crt0.asm,v 1.6 2013-08-30 01:26:40 pauloscustodio Exp $
+;	$Id: sc3000_crt0.asm,v 1.7 2013-10-21 14:23:44 stefano Exp $
 ;
 
 	; Constants for ROM mode (-startup=2)
@@ -58,6 +58,7 @@
 
 ; 1 bit sound status byte
 		XDEF	snd_tick
+        XDEF	bit_irqstatus	; current irq status when DI is necessary
 
 ; SEGA and MSX specific
 		XDEF	msxbios
@@ -318,6 +319,7 @@ IF (startup=2)
 	base_graphics       ds.w    1
 	coords              ds.w    1
 	snd_tick            ds.w    1
+	bit_irqstatus		ds.w	1	;current irq status when DI is necessary
 	fp_seed             ds.w    3       ;Floating point seed (not used ATM)
 	extra               ds.w    3       ;Floating point spare register
 	fa                  ds.w    3       ;Floating point accumulator
@@ -441,7 +443,8 @@ ENDIF
 	pixelbyte:	defb	0
 	base_graphics:	defw	0
 	coords:		defw	0
-	snd_tick:	defb	0
+	snd_tick:       defb	0	; Sound variable
+	bit_irqstatus:	defw	0
 	
 	; imported form the pre-existing Sega Master System libs
 	fputc_vdp_offs:		defw	0	;Current character pointer

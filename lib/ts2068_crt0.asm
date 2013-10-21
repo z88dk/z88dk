@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.16 2013-09-30 15:10:34 stefano Exp $
+;       $Id: ts2068_crt0.asm,v 1.17 2013-10-21 14:23:44 stefano Exp $
 ;
 
 
@@ -35,7 +35,8 @@
         XDEF    base_graphics   ; Graphical variables
         XDEF	coords          ; Current xy position
 
-        XDEF	snd_tick        ; Sound variable
+        XDEF	snd_tick	; Sound variable
+        XDEF	bit_irqstatus	; current irq status when DI is necessary
 
         XDEF    call_rom3       ; Interposer
 
@@ -433,7 +434,10 @@ _heap:
                 defw 0
 ENDIF
 
+IF DEFINED_NEED1bitsound
 snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
+ENDIF
 
 
 ; ZXMMC SD/MMC interface

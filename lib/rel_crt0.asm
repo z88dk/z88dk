@@ -4,7 +4,7 @@
 ;
 ;       Created 18/5/99 djm
 ;
-;	$Id: rel_crt0.asm,v 1.8 2013-06-18 06:11:23 stefano Exp $
+;	$Id: rel_crt0.asm,v 1.9 2013-10-21 14:23:44 stefano Exp $
 
 
 ;-----------
@@ -197,6 +197,7 @@ packintrout:	defw	0	; Address of user interrupt routine
 IF DEFINED_NEED1bitsound
 snd_asave:      defb    0       ; Sound variable
 snd_tick:       defb    0       ;  "      "
+bit_irqstatus:	defw	0
 ENDIF
 
 ;-----------

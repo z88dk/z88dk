@@ -32,6 +32,9 @@
 	XDEF	base_graphics	; Graphics stuff
 	XDEF	coords		;
 
+	XDEF	snd_tick	; Sound variable
+	XDEF	bit_irqstatus	; current irq status when DI is necessary
+
 	XDEF	cpygraph	; TI calc specific stuff
 	XDEF	tidi		;
 	XDEF	tiei		;
@@ -245,6 +248,10 @@ coords
 base_graphics
         ds.w    1	;  2 bytes
 gfx_bank
+        ds.w    1	;  2 bytes
+snd_tick
+        ds.b    1	;  2 bytes
+bit_irqstatus
         ds.w    1	;  2 bytes
 _std_seed
         ds.w    1	;  2 bytes

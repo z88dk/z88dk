@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.9 2009-06-22 21:20:05 dom Exp $
+;	$Id: app_crt0.asm,v 1.10 2013-10-21 14:23:44 stefano Exp $
 
 
 ;--------
@@ -372,6 +372,7 @@ fasign		ds.b	1	;Floating point variable
 packintrout	ds.w	1	;User interrupt handler
 snd_asave	ds.b	1	;Sound
 snd_tick	ds.b	1	;Sound
+bit_irqstatus	ds.w	1	;current irq status when DI is necessary
 }
 
 ;--------

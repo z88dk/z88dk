@@ -1,4 +1,4 @@
-; $Id: bit_fx.asm,v 1.5 2008-07-11 15:10:57 stefano Exp $
+; $Id: bit_fx.asm,v 1.6 2013-10-21 14:23:45 stefano Exp $
 ;
 ; Generic platform sound effects module.
 ;
@@ -103,7 +103,8 @@
 .fx2_2    djnz  fx2_2  
           inc   e  
           jr    nz,fx2_1  
-          jp    bit_close_ei
+          call    bit_close_ei
+          ret
           
           
 ;Laser repeat sound
@@ -148,8 +149,9 @@
           jr    z,zap0_3
           ex    af,af
           jr    zap0_1  
-.zap0_3   jp    bit_close_ei
-          
+.zap0_3   call    bit_close_ei
+          ret
+
           
 ;Clackson sound
           
@@ -232,7 +234,8 @@
           djnz  zap3_3
           pop   bc
           djnz  zap3_1
-          jp    bit_close_ei
+          call    bit_close_ei
+          ret
           
           
 ;Sound for warp

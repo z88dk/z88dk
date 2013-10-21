@@ -1,7 +1,7 @@
 ;
 ;       Startup for Sorcerer Exidy
 ;
-;       $Id: sorcerer_crt0.asm,v 1.2 2013-06-18 06:11:23 stefano Exp $
+;       $Id: sorcerer_crt0.asm,v 1.3 2013-10-21 14:23:44 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -43,6 +43,7 @@
 ;-----------------------
 
 	XDEF	snd_tick	; for sound code, if any
+	XDEF	bit_irqstatus	; current irq status when DI is necessary
 	XDEF	pixelbyte	; VDP gfx driver, byte temp storage
 	XDEF	coords
 
@@ -160,7 +161,8 @@ _std_seed:       defw    0      ; Seed for integer rand() routines
 ENDIF
 
 IF DEFINED_NEED1bitsound
-snd_tick:	defb	0	; Sound variable
+snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
 ENDIF
 
 ;-----------------------------------------------------

@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti82_crt0.asm,v 1.22 2013-06-18 06:11:23 stefano Exp $
+;	$Id: ti82_crt0.asm,v 1.23 2013-10-21 14:23:44 stefano Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -23,13 +23,16 @@
 	XDEF	exitsp		; Exit variables
 	XDEF	exitcount	;
 
-       	XDEF	heaplast	;Near malloc heap variables
+	XDEF	heaplast	;Near malloc heap variables
 	XDEF	heapblocks
 
 	XDEF	__sgoioblk	; For stdin, stdout, stder
 
 	XDEF	base_graphics	; Graphics stuff
 	XDEF	coords		;
+
+	XDEF	snd_tick	; Sound variable
+	XDEF	bit_irqstatus	; current irq status when DI is necessary
 
 	XDEF	cpygraph	; TI calc specific stuff
 	XDEF	tidi		;
@@ -184,7 +187,12 @@ ENDIF
 ;mem stuff
 base_graphics:	defw	GRAPH_MEM
 coords:		defw	0
-	
+
+IF DEFINED_NEED1bitsound
+snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
+ENDIF
+
 IF !DEFINED_GRAYlib
 	defc cpygraph = CR_GRBCopy	; CrASH FastCopy
 ENDIF

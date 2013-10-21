@@ -2,7 +2,7 @@
 ;       Grundy NewBrain startup code
 ;
 ;
-;       $Id: newbrain_crt0.asm,v 1.8 2013-06-18 06:11:23 stefano Exp $
+;       $Id: newbrain_crt0.asm,v 1.9 2013-10-21 14:23:44 stefano Exp $
 ;
 
                 MODULE  newbrain_crt0
@@ -28,14 +28,15 @@
         XDEF    exitcount
 
        	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+        XDEF	heapblocks
 
         XDEF    __sgoioblk      ;stdio info block
 
         XDEF    base_graphics   ;Graphical variables
-	XDEF	coords		;Current xy position
+        XDEF	coords		;Current xy position
 
-	XDEF	snd_tick	;Sound variable
+        XDEF	snd_tick	;Sound variable
+        XDEF	bit_irqstatus	; current irq status when DI is necessary
 
 	XDEF	nbclockptr	;ptr to clock counter location
 IF (startup=2)
@@ -211,7 +212,8 @@ _heap:
 ENDIF
 
 IF DEFINED_NEED1bitsound
-snd_tick:	defb	0	; Sound variable
+snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
 ENDIF
 
 		defm	"Small C+ NewBrain"	;Unnecessary file signature

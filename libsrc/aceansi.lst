@@ -28,10 +28,10 @@ graphics/liner
 graphics/stencil_render
 graphics/swapgfxbk_foo
 games/joystick
-games/ace/bit_open
-games/ace/bit_open_di
-games/ace/bit_close
-games/ace/bit_close_ei
+games/bit_open
+games/bit_open_di
+games/bit_close
+games/bit_close_ei
 games/bit_click
 games/bit_play
 games/bit_fx

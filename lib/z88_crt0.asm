@@ -16,7 +16,7 @@
 ;
 ; - - - - - - - -
 ;
-; $Id: z88_crt0.asm,v 1.7 2009-06-22 21:20:05 dom Exp $
+; $Id: z88_crt0.asm,v 1.8 2013-10-21 14:23:44 stefano Exp $
 ;
 ; - - - - - - - -
 
@@ -61,6 +61,7 @@
 
 	XDEF	snd_asave	;sound
 	XDEF	snd_tick	;sound
+	XDEF	bit_irqstatus	; current irq status when DI is necessary
 
 ;-------
 ; Select which particular startup we want

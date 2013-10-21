@@ -1,4 +1,4 @@
-; $Id: beeper.asm,v 1.3 2009-02-22 08:33:25 stefano Exp $
+; $Id: beeper.asm,v 1.4 2013-10-21 14:23:45 stefano Exp $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
@@ -45,8 +45,13 @@
 ; ----------------------------------------------------------------
 
 	XREF  call_rom3
+    LIB      bit_open_di
+    LIB      bit_close_ei
 
 .beeper
+     call    bit_open_di
 	 call    call_rom3
-	 defw	949
+	 defw    949
+	 di
+	 call    bit_close_ei
 	 ret

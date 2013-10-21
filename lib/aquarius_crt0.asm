@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: aquarius_crt0.asm,v 1.9 2013-06-18 06:11:23 stefano Exp $
+;       $Id: aquarius_crt0.asm,v 1.10 2013-10-21 14:23:44 stefano Exp $
 ;
 
 
@@ -34,12 +34,13 @@
         XDEF    __sgoioblk      ;stdio info block
 
        	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+        XDEF	heapblocks
 
         XDEF    base_graphics   ;Graphical variables
-	XDEF	coords		;Current xy position
+        XDEF	coords		;Current xy position
 
-	XDEF	snd_tick	;Sound variable
+        XDEF	snd_tick	;Sound variable
+        XDEF	bit_irqstatus	; current irq status when DI is necessary
 
 
         ;;org     14768		; Mattel relocating loader
@@ -149,7 +150,8 @@ _heap:
 ENDIF
 
 IF DEFINED_NEED1bitsound
-snd_tick:       defb    0       ; Sound variable
+snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
 ENDIF
 
 		defm	"Small C+ Aquarius"	;Unnecessary file signature

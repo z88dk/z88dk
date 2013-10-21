@@ -3,7 +3,7 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.11 2013-06-18 06:11:23 stefano Exp $
+;	$Id: z88s_crt0.asm,v 1.12 2013-10-21 14:23:44 stefano Exp $
 
 
 
@@ -349,6 +349,7 @@ exitcount:	defb	0	; How many routines on the atexit() stack
 IF DEFINED_NEED1bitsound
 snd_asave:      defb    0	; Sound variable
 snd_tick:       defb    0	;  "      "
+bit_irqstatus:	defw	0
 ENDIF
 
 

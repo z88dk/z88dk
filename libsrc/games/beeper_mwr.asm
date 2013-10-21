@@ -1,4 +1,4 @@
-; $Id: beeper_mwr.asm,v 1.1 2008-03-31 17:16:18 stefano Exp $
+; $Id: beeper_mwr.asm,v 1.2 2013-10-21 14:23:44 stefano Exp $
 ;
 ; 1 bit sound library - version for "memory write" I/O architectures
 ; by Stefano Bodrato, 31/03/08
@@ -57,4 +57,5 @@
           jp   (ix)
 .be_end
 
-          jp   bit_close_ei
+          call   bit_close_ei
+          ret

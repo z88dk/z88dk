@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.11 2013-06-18 06:11:22 stefano Exp $
+;	$Id: ace_crt0.asm,v 1.12 2013-10-21 14:23:43 stefano Exp $
 ;
 
 
@@ -18,8 +18,10 @@
 ; No matter what set up we have, main is always, always external to
 ; this file
 
-                XREF    _main
+        XREF    _main
+
 		XDEF	snd_tick
+        XDEF	bit_irqstatus	; current irq status when DI is necessary
 ;
 ; Some variables which are needed for both app and basic startup
 ;
@@ -34,7 +36,7 @@
 ; vprintf is internal to this file so we only ever include one of the set
 ; of routines
 
-	XDEF	_vfprintf
+        XDEF	_vfprintf
 
 ;Exit variables
 
@@ -175,7 +177,11 @@ ENDIF
 base_graphics:
 		defw	$2400
 coords:		defw	0
-snd_tick:	defb	0
+
+IF DEFINED_NEED1bitsound
+snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
+ENDIF
 
          defm  "Small C+ J.ACE"
 	 defb  0

@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.2 2008-12-11 16:42:22 stefano Exp $
+; $Id: bit_open_di.asm,v 1.3 2013-10-21 14:23:45 stefano Exp $
 ;
 ; Galaksija 1 bit sound functions
 ;
@@ -9,10 +9,23 @@
 
     XLIB     bit_open_di
     XREF     snd_tick
+    XREF     bit_irqstatus
 
+    INCLUDE  "games/games.inc"
+    
 .bit_open_di
+        
+        ld a,i		; get the current status of the irq line
+        di
+        push af
+        
+        ex (sp),hl
+        ld (bit_irqstatus),hl
+        pop hl
+        
           ld   a,@10111000
           ld   (snd_tick),a
-          di
           ld   (8248),a
-          ret
+
+        ret
+

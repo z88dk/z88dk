@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.1 2011-03-18 07:12:41 stefano Exp $
+; $Id: bit_open.asm,v 1.2 2013-10-21 14:23:45 stefano Exp $
 ;
 ; Enterprise 64/128 1 bit sound functions
 ;
@@ -8,10 +8,12 @@
 ;
 
     XLIB     bit_open
+    XREF     snd_tick
 
 .bit_open
 
         ld      a,@00001000	; Set D/A mode on left channel
         out     ($A7),a
+        ld  a,(snd_tick)
 
         ret

@@ -15,10 +15,10 @@ stdio/ansi/ts2068/f_ansi_dline
 stdio/ansi/ts2068/f_ansi_scrollup
 time/spectrum/clock
 games/spectrum/joystick
-games/spectrum/bit_open
-games/spectrum/bit_open_di
-games/spectrum/bit_close
-games/spectrum/bit_close_ei
+games/bit_open
+games/bit_open_di
+games/bit_close
+games/bit_close_ei
 games/bit_click
 games/bit_play
 games/bit_fx

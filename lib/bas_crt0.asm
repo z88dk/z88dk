@@ -2,7 +2,7 @@
 ;
 ;       Created 1/4/99 djm
 ;
-;	$Id: bas_crt0.asm,v 1.9 2013-08-30 01:22:25 pauloscustodio Exp $
+;	$Id: bas_crt0.asm,v 1.10 2013-10-21 14:23:44 stefano Exp $
 
 
 ;-----------
@@ -185,8 +185,8 @@ exitcount:	defb	0	; How many routines on the atexit() stack
 IF DEFINED_NEED1bitsound
 snd_asave:      defb    0	; Sound variable
 snd_tick:       defb    0	;  "      "
+bit_irqstatus:	defw	0
 ENDIF
-
 
 heaplast:	defw	0	; Address of last block on heap
 heapblocks:	defw 	0	; Number of blocks

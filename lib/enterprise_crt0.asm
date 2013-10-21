@@ -4,7 +4,7 @@
 ;       Stefano Bodrato - 2011
 ;
 ;
-;	$Id: enterprise_crt0.asm,v 1.12 2013-06-18 06:11:23 stefano Exp $
+;	$Id: enterprise_crt0.asm,v 1.13 2013-10-21 14:23:44 stefano Exp $
 ;
 
 
@@ -38,6 +38,7 @@
         XDEF    _std_seed
 
         XDEF	snd_tick	; Sound variable
+        XDEF	bit_irqstatus	; current irq status when DI is necessary
 
         XDEF	_vfprintf
 
@@ -268,7 +269,8 @@ ENDIF
 ; ---------------
 
 IF DEFINED_NEED1bitsound
-snd_tick:	defb	0	; Sound variable
+snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
 ENDIF
 
 ;Seed for integer rand() routines

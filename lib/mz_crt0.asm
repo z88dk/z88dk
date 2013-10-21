@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 5/5/2000
 ;
-;       $Id: mz_crt0.asm,v 1.12 2013-06-18 06:11:23 stefano Exp $
+;       $Id: mz_crt0.asm,v 1.13 2013-10-21 14:23:44 stefano Exp $
 ;
 
 
@@ -37,14 +37,15 @@
         XDEF    exitcount
 
        	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+        XDEF	heapblocks
 
         XDEF    __sgoioblk      ;stdio info block
 
         XDEF    base_graphics   ;Graphical variables
-	XDEF	coords		;Current xy position
+        XDEF	coords		;Current xy position
 
-	XDEF	snd_tick	;Sound variable
+        XDEF	snd_tick	;Sound variable
+        XDEF	bit_irqstatus	; current irq status when DI is necessary
 
 ; Now, getting to the real stuff now!
 
@@ -162,7 +163,8 @@ _heap:
 ENDIF
 
 IF DEFINED_NEED1bitsound
-snd_tick:	defb	0	; Sound variable
+snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
 ENDIF
 
 		defm  "Small C+ SHARP MZ"

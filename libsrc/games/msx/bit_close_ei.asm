@@ -1,4 +1,4 @@
-; $Id: bit_close_ei.asm,v 1.1 2007-12-03 16:05:19 stefano Exp $
+; $Id: bit_close_ei.asm,v 1.2 2013-10-21 14:23:45 stefano Exp $
 ;
 ; MSX bit sound functions
 ;
@@ -8,8 +8,16 @@
 ;
 
     XLIB     bit_close_ei
+    XREF     bit_irqstatus
 
 .bit_close_ei
-          ei
-          ret
+	push hl
+	ld	hl,(bit_irqstatus)
+	ex	(sp),hl
+	pop af
+
+	ret po
+
+	ei
+	ret
 

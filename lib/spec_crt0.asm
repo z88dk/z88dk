@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.33 2013-09-30 15:10:34 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.34 2013-10-21 14:23:44 stefano Exp $
 ;
 
 
@@ -41,6 +41,7 @@
         XDEF    coords          ; Current xy position
 
         XDEF    snd_tick        ; Sound variable
+        XDEF	bit_irqstatus	; current irq status when DI is necessary
 
         XDEF    call_rom3       ; Interposer
        
@@ -483,6 +484,7 @@ extra           ds.w    3       ; Floating point spare register
 fa              ds.w    3       ; Floating point accumulator
 fasign          ds.b    1       ; Floating point variable
 snd_tick        ds.b    1       ; Sound
+bit_irqstatus   ds.w    1       ; used to save the current IRQ status
 heaplast        ds.w    1       ; Address of last block on heap
 heapblocks      ds.w    1       ; Number of blocks
 card_select		ds.b	1		; Currently selected MMC/SD slot for ZXMMC
@@ -531,8 +533,10 @@ _heap:
                 defw 0
 ENDIF
 
-snd_tick:       defb    0       ; Sound variable
-
+IF DEFINED_NEED1bitsound
+snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
+ENDIF
 
 ; ZXMMC SD/MMC interface
 IF DEFINED_NEED_ZXMMC

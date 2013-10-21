@@ -1,4 +1,4 @@
-; $Id: beeper.asm,v 1.3 2008-07-11 15:10:57 stefano Exp $
+; $Id: beeper.asm,v 1.4 2013-10-21 14:23:44 stefano Exp $
 ;
 ; Generic 1 bit sound functions
 ;
@@ -73,5 +73,6 @@
           jp   (ix)
 .be_end
 
-          jp   bit_close_ei
+          call   bit_close_ei
+          ret
 

@@ -3,7 +3,7 @@
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.24 2013-06-18 06:11:23 stefano Exp $
+;	$Id: ti83p_crt0.asm,v 1.25 2013-10-21 14:23:44 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells
@@ -42,6 +42,9 @@
 
 	XDEF	base_graphics	; Graphics stuff
 	XDEF	coords		;
+
+	XDEF	snd_tick	; Sound variable
+	XDEF	bit_irqstatus	; current irq status when DI is necessary
 
 	XDEF	cpygraph	; TI calc specific stuff
 	XDEF	tidi		;
@@ -291,6 +294,11 @@ ENDIF
 ; mem stuff
 base_graphics:	defw	plotSScreen
 coords:		defw	0
+
+IF DEFINED_NEED1bitsound
+snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
+ENDIF
 
 IF !DEFINED_GRAYlib
  IF DEFINED_GimmeSpeed

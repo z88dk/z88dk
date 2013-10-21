@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.1 2007-12-03 16:05:19 stefano Exp $
+; $Id: bit_open_di.asm,v 1.2 2013-10-21 14:23:45 stefano Exp $
 ;
 ; MSX bit sound functions
 ;
@@ -9,6 +9,7 @@
 
     XLIB     bit_open_di
     XREF     snd_tick
+    XREF     bit_irqstatus
 
 
 ;Port 0AAh, PPI Port C - Keyboard Row,LED,Cassette (Read/Write)
@@ -21,6 +22,14 @@
 
  
 .bit_open_di
+        ld a,i		; get the current status of the irq line
+        di
+        push af
+        
+        ex (sp),hl
+        ld (bit_irqstatus),hl
+        pop hl
+
           di
           ld    a,@11110000
           ld   (snd_tick),a

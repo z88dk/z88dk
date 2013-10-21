@@ -1,4 +1,4 @@
-; $Id: bit_fx4.asm,v 1.1 2006-05-23 20:42:52 stefano Exp $
+; $Id: bit_fx4.asm,v 1.2 2013-10-21 14:23:45 stefano Exp $
 ;
 ; Generic platform sound effects module.
 ;
@@ -237,36 +237,33 @@
           
           
 ; FX8 effect
-.fx8
-          ld	hl,100
-          ld    de,1
-.fx8_1    
+.fx8      ld    b,1  
+.fx8_1    push  bc  
+          ld    hl,2600
+          ld    de,2
+.fx8_2    push  hl
+          push  de
+          call  beeper
+          inc   hl
+          pop   de
+          pop   hl
           push  hl
           push  de
+          ld	bc,400
+          sbc   hl,bc
+          ld	l,c
+          ld	h,b
           call  beeper
           pop   de
           pop   hl
-          
-          call	bit_open_di
-          call  bit_click
-          call	bit_close_ei
-          
-          push  hl
-          push  de
-          ld	bc,50
-.fx8_2
-          djnz  fx8_2
-          pop   de
-          pop   hl
-
-          call	bit_open_di
-          call  bit_click
-          call	bit_close_ei
-          
-          inc	hl
-          ld	a,l
-          and	50
-          jr	nz,fx8_1
+          ld    bc,40
+          and   a
+          sbc   hl,bc
+          jr    nc,fx8_2
+          pop   bc
+          djnz  fx8_1
+          ret 
+          ld	hl,100
+          ld    de,1
           ret
-          
-          
+

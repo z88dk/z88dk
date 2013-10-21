@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.7 2013-06-18 06:11:23 stefano Exp $
+;       $Id: mc1000_crt0.asm,v 1.8 2013-10-21 14:23:44 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma optimization directives 
@@ -62,6 +62,7 @@
         XDEF	FRAMES
 
        	XDEF	snd_tick        ;Sound variable
+        XDEF	bit_irqstatus	; current irq status when DI is necessary
 
         IF      !myzorg
 			IF (startup=2)
@@ -616,7 +617,8 @@ _heap:
 ENDIF
 
 IF DEFINED_NEED1bitsound
-snd_tick:	defb	0	; Sound variable
+snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
 ENDIF
 
          defm  "Small C+ MC1000"

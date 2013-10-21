@@ -1,4 +1,4 @@
-; $Id: bit_close.asm,v 1.2 2002-04-17 21:30:24 dom Exp $
+; $Id: bit_close.asm,v 1.3 2013-10-21 14:23:45 stefano Exp $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
@@ -10,6 +10,5 @@
     XLIB     bit_close
 
 .bit_close
-          ei
           ret
 

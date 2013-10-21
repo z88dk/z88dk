@@ -1,6 +1,6 @@
 ;       Memotech MTX CRT0 stub
 ;
-;       $Id: mtx_crt0.asm,v 1.3 2013-06-18 06:11:23 stefano Exp $
+;       $Id: mtx_crt0.asm,v 1.4 2013-10-21 14:23:44 stefano Exp $
 ;
 
 
@@ -39,6 +39,7 @@
 
 ; 1 bit sound status byte
         XDEF    snd_tick        ; Sound variable
+        XDEF	bit_irqstatus	; current irq status when DI is necessary
 
 ; SEGA and MSX specific
 		XDEF	msxbios
@@ -214,7 +215,8 @@ _heap:
 ENDIF
 
 IF DEFINED_NEED1bitsound
-snd_tick:       defb    0       ; Sound variable
+snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
 ENDIF
 
 

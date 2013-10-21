@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti85_crt0.asm,v 1.23 2013-06-18 06:11:23 stefano Exp $
+;	$Id: ti85_crt0.asm,v 1.24 2013-10-21 14:23:44 stefano Exp $
 ;
 ;-----------------------------------------------------
 ; Some general XDEFs and XREFs needed by the assembler
@@ -32,6 +32,7 @@
 	XDEF	coords		;
 
 	XDEF	snd_tick	; Sound variable
+	XDEF	bit_irqstatus	; current irq status when DI is necessary
 
 	XDEF	cpygraph	; TI calc specific stuff
 	XDEF	tidi		;
@@ -316,7 +317,8 @@ base_graphics:	defw	VIDEO_MEM
 coords:		defw	0
 
 IF DEFINED_NEED1bitsound
-snd_tick:	defb	0	; Sound variable
+snd_tick:       defb	0	; Sound variable
+bit_irqstatus:	defw	0
 ENDIF
 
 IF NEED_floatpack
