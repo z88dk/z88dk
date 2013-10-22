@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.1 2013-10-21 14:23:45 stefano Exp $
+; $Id: bit_open_di.asm,v 1.2 2013-10-22 07:18:26 stefano Exp $
 ;
 ; Generic 1 bit sound functions
 ;
@@ -10,13 +10,10 @@
 
     XLIB     bit_open_di
     XREF     snd_tick
-    XDEf     bit_irqstatus
+    XREF     bit_irqstatus
 
     INCLUDE  "games/games.inc"
     
-.bit_irqstatus
-	defw 0
-
 .bit_open_di
         
         ld a,i		; get the current status of the irq line

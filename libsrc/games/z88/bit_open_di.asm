@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.4 2013-10-22 06:09:32 stefano Exp $
+; $Id: bit_open_di.asm,v 1.5 2013-10-22 07:18:26 stefano Exp $
 ;
 ; Z88 1 bit sound functions
 ;
@@ -10,6 +10,8 @@
 
     XLIB     bit_open_di
     INCLUDE  "interrpt.def"
+
+    XREF     bit_irqstatus
 
     XREF     snd_asave
     XREF     snd_tick
