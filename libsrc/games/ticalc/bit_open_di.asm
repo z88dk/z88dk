@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.4 2013-10-22 06:09:32 stefano Exp $
+; $Id: bit_open_di.asm,v 1.5 2013-10-22 10:47:33 stefano Exp $
 ;
 ; TI calculator "Infrared port" 1 bit sound functions stub
 ;
@@ -9,6 +9,7 @@
 
     XLIB     bit_open_di
     XREF     bit_irqstatus
+    XREF     snd_tick
     
 .bit_open_di
         ld a,i		; get the current status of the irq line
