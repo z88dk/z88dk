@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
+; $Id: bit_open_di.asm,v 1.4 2013-10-22 06:09:32 stefano Exp $
 ;
 ; Z88 1 bit sound functions
 ;
@@ -15,7 +15,14 @@
     XREF     snd_tick
 
 .bit_open_di
+
+          ld a,i		; get the current status of the irq line
           call oz_di
+          push af
+          ex (sp),hl
+          ld (bit_irqstatus),hl
+          pop hl
+          
           ld   (snd_asave),a
           ld   a,($4B0)
           and  63

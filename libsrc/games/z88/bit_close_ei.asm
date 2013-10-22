@@ -1,4 +1,4 @@
-; $Id: bit_close_ei.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
+; $Id: bit_close_ei.asm,v 1.4 2013-10-22 06:09:32 stefano Exp $
 ;
 ; Z88 1 bit sound functions
 ;
@@ -14,7 +14,17 @@
     XREF     snd_asave
 
 .bit_close_ei
-          ld   a,(snd_asave)
-          call oz_ei
-          ret
+
+	push hl
+	ld	hl,(bit_irqstatus)
+	ex	(sp),hl
+	pop af
+
+    ld   a,(snd_asave)
+
+	ret po
+
+	call oz_ei
+	ret
+
 

@@ -1,4 +1,4 @@
-; $Id: bit_close_ei.asm,v 1.3 2002-04-17 21:30:24 dom Exp $
+; $Id: bit_close_ei.asm,v 1.4 2013-10-22 06:09:32 stefano Exp $
 ;
 ; TI calculator "Infrared port" 1 bit sound functions stub
 ;
@@ -8,9 +8,16 @@
 ;
 
     XLIB     bit_close_ei
-    XREF     tiei
+    XREF     bit_irqstatus
 
 .bit_close_ei
+
+	push hl
+	ld	hl,(bit_irqstatus)
+	ex	(sp),hl
+	pop af
+
+	ret po
+
 	ei
 	ret
-
