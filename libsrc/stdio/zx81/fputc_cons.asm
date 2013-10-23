@@ -5,7 +5,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: fputc_cons.asm,v 1.15 2012-04-27 12:16:57 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.16 2013-10-23 17:11:58 stefano Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -22,13 +22,20 @@
 	DEFC	ROWS=24
 	DEFC	COLUMNS=32
 
+IF FORzx81
 	DEFC	COLUMN=$4039    ; S_POSN_x
 	DEFC	ROW=$403A       ; S_POSN_y
+ELSE
+	DEFC	COLUMN=$4024    ; S_POSN_x
+	DEFC	ROW=$4025       ; S_POSN_y
+ENDIF
+
 ;.ROW	defb	0
 ;.COLUMN	defb	0
 
 
 .fputc_cons
+
 	ld	hl,2
 	add	hl,sp
 	ld	(charpos+1),hl
@@ -44,7 +51,7 @@
 	jp   zx_coord_adj
 
 
-.doput	
+.doput
 	cp  13		; CR?
 	jr  z,isLF
 	cp  10      ; LF?
