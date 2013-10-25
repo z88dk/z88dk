@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx80_crt0.asm,v 1.4 2013-09-30 15:10:34 stefano Exp $
+;       $Id: zx80_crt0.asm,v 1.5 2013-10-25 07:15:43 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -48,6 +48,8 @@
 
         XDEF    save81          ;Save ZX81 critical registers
         XDEF    restore81       ;Restore ZX81 critical registers
+        XDEF    zx_fast
+        XDEF    zx_slow
 
         ;; XDEF    frames         ;Frame counter for time()
         XDEF    _FRAMES
@@ -135,6 +137,8 @@ restore81:
 ;        ex      af,af
         ld      iy,16384	; no ix/iy swap here
 save81:
+zx_fast:
+zx_slow:
         ret
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
