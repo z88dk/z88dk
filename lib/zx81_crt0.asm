@@ -13,7 +13,8 @@
 ;       OPTIMIZATIONS:
 ;
 ;       If in HRG mode it is possible to exclude the SLOW mode text with the
-;       '-Dnoslowfix' parameter it helps to save some memory.
+;       '-DDEFINED_noslowfix' parameter it helps to save some memory.
+;       "#pragma output noslowfix = 1" in the source program has the same effect.
 ;
 ;       If in WRX HRG mode a static position for HRGPAGE cam be defined in 
 ;       program (i.e. "#pragma output hrgpage=32768"), moving the video frame
@@ -24,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.37 2013-09-30 15:10:34 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.38 2013-10-30 16:09:17 stefano Exp $
 ;
 ; - - - - - - -
 

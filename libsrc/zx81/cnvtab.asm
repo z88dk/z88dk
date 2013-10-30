@@ -7,7 +7,7 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: cnvtab.asm,v 1.5 2012-12-31 10:38:24 stefano Exp $
+;	$Id: cnvtab.asm,v 1.6 2013-10-30 16:09:18 stefano Exp $
 ;
 
 	XLIB	zx81_cnvtab
@@ -65,9 +65,9 @@ IF FORzx81
 	defb	'.'
 	defb	1
 	defb	39 ;"'"
-	defb	134
+	defb	152 ; inverse "/"
 	defb	'%'
-	defb	12
+	defb	149 ; inverse "+"
 	defb	'&'
 	defb	5
 	defb	'['
@@ -75,9 +75,11 @@ IF FORzx81
 	defb	']'
 	defb	128
 	defb	'@'
+	defb	8
+	defb	'#'
 	defb	2
 	defb	96	; reversed "'"
-	defb	10
+	defb	151	; inverse "*"
 	defb	'^'
 	defb	147
 	defb	'{'
@@ -97,7 +99,7 @@ ELSE
 	defb	12
 	defb	118	; Newline
 	defb	13
-	defb	6
+	defb	11
 	defb	'"'
 	defb	10
 	defb	'_'
@@ -135,19 +137,21 @@ ELSE
 	defb	'.'
 	defb	4
 	defb	39 ;"'"
-	defb	136
+	defb	149 ; inverse "/"
 	defb	'%'
-	defb	12
+	defb	147 ; inverse "+"
 	defb	'&'
 	defb	2
 	defb	'['
-	defb	129
+	defb	130
 	defb	']'
 	defb	128
 	defb	'@'
+	defb	9
+	defb	'#'
 	defb	5
 	defb	96	; reversed "'"
-	defb	11
+	defb	148	; inverse "*"
 	defb	'^'
 	defb	152
 	defb	'{'
