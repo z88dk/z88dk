@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.88 2013-10-16 00:14:37 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.89 2013-10-31 22:59:48 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -163,15 +163,15 @@ $(TARGET): $(OBJS)
 # init module
 #------------------------------------------------------------------------------
 $(INIT_OUT) : $(INIT) $(MAKE_INIT) $(INIT_TMPL) Makefile
-	perl $(MAKE_INIT) $(INIT)
+	-perl $(MAKE_INIT) $(INIT)
 
 
 #------------------------------------------------------------------------------
 # ragel
 #------------------------------------------------------------------------------
 scan.c : scan.rl
-	ragel -G2 scan.rl
-	perl -i.bak -pe "s/^#line/\/\/#line/" scan.c
+	-ragel -G2 scan.rl
+	-perl -i.bak -pe "s/^#line/\/\/#line/" scan.c
 	$(RM) scan.c.bak
 
 #------------------------------------------------------------------------------
@@ -283,7 +283,12 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.88  2013-10-16 00:14:37  pauloscustodio
+# Revision 1.89  2013-10-31 22:59:48  pauloscustodio
+# Preprocessors (perl, ragel) might not be available in the target platform.
+# Ignore errors when calling these tools and use the pre-generated files
+# that are in the CVS repository.
+#
+# Revision 1.88  2013/10/16 00:14:37  pauloscustodio
 # Move FileStack implementation to scan.c, remove FileStack.
 # Move getline_File() to scan.c.
 #
