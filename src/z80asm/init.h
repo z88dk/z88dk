@@ -23,15 +23,15 @@
 #include <glib.h>
 
 /* data types */
-typedef int BOOL;
+/* typedef int BOOL; */
 
-typedef struct File File;
+/* typedef struct File File; */
 
-typedef struct Opts Opts;
+/* typedef struct Opts Opts; */
 
-typedef struct ScanContext ScanContext;
+/* typedef struct ScanContext ScanContext; */
 
-typedef struct Scan Scan;
+/* typedef struct Scan Scan; */
 
 
 /* global data */

@@ -11,9 +11,9 @@
 #include <glib.h>
 
 /* data types */
-typedef int BOOL;
+/* typedef int BOOL; */
 {{ FOR i IN init_struct }}
-typedef struct {{ i.struct }} {{ i.struct }};
+/* typedef struct {{ i.struct }} {{ i.struct }}; */
 {{ END }}
 
 /* global data */
