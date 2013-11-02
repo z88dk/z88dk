@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: ragel -G2 scan.rl
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.25 2013-10-16 21:42:06 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.26 2013-11-02 23:14:05 pauloscustodio Exp $ 
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -150,7 +150,10 @@ void struct_Scan_init(Scan *self)
 
 void struct_Scan_fini(Scan *self)
 {
-	g_slist_free_full( self->stack, (GDestroyNotify) delete_ScanContext );
+	/* delete all list elements */
+	g_slist_foreach( self->stack, (GFunc) delete_ScanContext, 0 );
+	g_slist_free( self->stack );
+	
 	delete0_ScanContext( &self->ctx );
 }
 
@@ -176,7 +179,7 @@ static void reset_scan( ScanContext *ctx )
 	ctx->eof	= ctx->pe;	/* tokens are not split acros input lines */
 	
 	
-//#line 180 "scan.c"
+//#line 183 "scan.c"
 	{
 	(		ctx->cs) = asm_start;
 	(		ctx->ts) = 0;
@@ -184,7 +187,7 @@ static void reset_scan( ScanContext *ctx )
 	(	ctx->act) = 0;
 	}
 
-//#line 349 "scan.rl"
+//#line 352 "scan.rl"
 
 	reset_last_token();
 }
@@ -359,7 +362,7 @@ static enum token _get_token_Scan( Scan *self, BOOL by_lines )
 	while ( (ctx = self->ctx) != NULL )
 	{
 		
-//#line 363 "scan.c"
+//#line 366 "scan.c"
 	{
 	short _widec;
 	if ( (		ctx->p) == (		ctx->pe) )
@@ -748,7 +751,7 @@ st7:
 case 7:
 //#line 1 "NONE"
 	{(		ctx->ts) = (		ctx->p);}
-//#line 752 "scan.c"
+//#line 755 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 58 ) {
 		if ( (*(		ctx->p)) < 38 ) {
@@ -1386,7 +1389,7 @@ st8:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof8;
 case 8:
-//#line 1390 "scan.c"
+//#line 1393 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 10 ) {
 		if ( (*(		ctx->p)) <= 9 ) {
@@ -1483,7 +1486,7 @@ st11:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof11;
 case 11:
-//#line 1487 "scan.c"
+//#line 1490 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 65 ) {
 		if ( 48 <= (*(		ctx->p)) && (*(		ctx->p)) <= 57 ) {
@@ -1524,7 +1527,7 @@ st12:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof12;
 case 12:
-//#line 1528 "scan.c"
+//#line 1531 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 48 ) {
 		if ( 34 <= (*(		ctx->p)) && (*(		ctx->p)) <= 34 ) {
@@ -1704,7 +1707,7 @@ st17:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof17;
 case 17:
-//#line 1708 "scan.c"
+//#line 1711 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 72 ) {
 		if ( (*(		ctx->p)) < 50 ) {
@@ -1826,7 +1829,7 @@ st18:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof18;
 case 18:
-//#line 1830 "scan.c"
+//#line 1833 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 67 ) {
 		if ( (*(		ctx->p)) < 50 ) {
@@ -1932,7 +1935,7 @@ st19:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof19;
 case 19:
-//#line 1936 "scan.c"
+//#line 1939 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 72 ) {
 		if ( (*(		ctx->p)) > 57 ) {
@@ -2043,7 +2046,7 @@ st20:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof20;
 case 20:
-//#line 2047 "scan.c"
+//#line 2050 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 72 ) {
 		if ( (*(		ctx->p)) > 57 ) {
@@ -2108,7 +2111,7 @@ st21:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof21;
 case 21:
-//#line 2112 "scan.c"
+//#line 2115 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 65 ) {
 		if ( (*(		ctx->p)) < 49 ) {
@@ -2492,7 +2495,7 @@ st30:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof30;
 case 30:
-//#line 2496 "scan.c"
+//#line 2499 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 58 ) {
 		if ( (*(		ctx->p)) < 10 ) {
@@ -2616,7 +2619,7 @@ st31:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof31;
 case 31:
-//#line 2620 "scan.c"
+//#line 2623 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 34 ) {
 		if ( (*(		ctx->p)) < 10 ) {
@@ -2716,7 +2719,7 @@ st32:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof32;
 case 32:
-//#line 2720 "scan.c"
+//#line 2723 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 35 ) {
 		if ( (*(		ctx->p)) < 10 ) {
@@ -2800,7 +2803,7 @@ st33:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof33;
 case 33:
-//#line 2804 "scan.c"
+//#line 2807 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 34 ) {
 		if ( (*(		ctx->p)) < 10 ) {
@@ -3149,7 +3152,7 @@ st38:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof38;
 case 38:
-//#line 3153 "scan.c"
+//#line 3156 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 72 ) {
 		if ( (*(		ctx->p)) < 50 ) {
@@ -3432,7 +3435,7 @@ st39:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof39;
 case 39:
-//#line 3436 "scan.c"
+//#line 3439 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 67 ) {
 		if ( (*(		ctx->p)) < 49 ) {
@@ -3669,7 +3672,7 @@ st40:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof40;
 case 40:
-//#line 3673 "scan.c"
+//#line 3676 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 71 ) {
 		if ( (*(		ctx->p)) < 11 ) {
@@ -3842,7 +3845,7 @@ st41:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof41;
 case 41:
-//#line 3846 "scan.c"
+//#line 3849 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 71 ) {
 		if ( (*(		ctx->p)) < 11 ) {
@@ -4015,7 +4018,7 @@ st42:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof42;
 case 42:
-//#line 4019 "scan.c"
+//#line 4022 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 65 ) {
 		if ( (*(		ctx->p)) < 48 ) {
@@ -4214,7 +4217,7 @@ st43:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof43;
 case 43:
-//#line 4218 "scan.c"
+//#line 4221 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 58 ) {
 		if ( (*(		ctx->p)) < 10 ) {
@@ -4814,7 +4817,7 @@ st52:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof52;
 case 52:
-//#line 4818 "scan.c"
+//#line 4821 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 65 ) {
 		if ( (*(		ctx->p)) > 9 ) {
@@ -4951,7 +4954,7 @@ st53:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof53;
 case 53:
-//#line 4955 "scan.c"
+//#line 4958 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 58 ) {
 		if ( (*(		ctx->p)) < 32 ) {
@@ -5087,7 +5090,7 @@ st54:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof54;
 case 54:
-//#line 5091 "scan.c"
+//#line 5094 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 70 ) {
 		if ( (*(		ctx->p)) < 48 ) {
@@ -5237,7 +5240,7 @@ st55:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof55;
 case 55:
-//#line 5241 "scan.c"
+//#line 5244 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 58 ) {
 		if ( (*(		ctx->p)) < 32 ) {
@@ -5343,7 +5346,7 @@ st56:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof56;
 case 56:
-//#line 5347 "scan.c"
+//#line 5350 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 48 ) {
 		if ( (*(		ctx->p)) < 32 ) {
@@ -5947,7 +5950,7 @@ st60:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof60;
 case 60:
-//#line 5951 "scan.c"
+//#line 5954 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 33 ) {
 		if ( (*(		ctx->p)) < 10 ) {
@@ -6136,7 +6139,7 @@ st61:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof61;
 case 61:
-//#line 6140 "scan.c"
+//#line 6143 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 58 ) {
 		if ( (*(		ctx->p)) < 11 ) {
@@ -6378,7 +6381,7 @@ st62:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof62;
 case 62:
-//#line 6382 "scan.c"
+//#line 6385 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 11 ) {
 		if ( (*(		ctx->p)) < 9 ) {
@@ -6493,7 +6496,7 @@ st63:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof63;
 case 63:
-//#line 6497 "scan.c"
+//#line 6500 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 65 ) {
 		if ( (*(		ctx->p)) < 32 ) {
@@ -6806,7 +6809,7 @@ st64:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof64;
 case 64:
-//#line 6810 "scan.c"
+//#line 6813 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 58 ) {
 		if ( (*(		ctx->p)) < 11 ) {
@@ -7059,7 +7062,7 @@ st65:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof65;
 case 65:
-//#line 7063 "scan.c"
+//#line 7066 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 48 ) {
 		if ( (*(		ctx->p)) < 11 ) {
@@ -7466,7 +7469,7 @@ case 65:
 	_out: {}
 	}
 
-//#line 523 "scan.rl"
+//#line 526 "scan.rl"
 		
 		ctx->bol = (last_token == t_newline) ? TRUE : FALSE;
 	
@@ -7604,7 +7607,10 @@ void Skipline( void )
 
 /*
 * $Log: scan.c,v $
-* Revision 1.25  2013-10-16 21:42:06  pauloscustodio
+* Revision 1.26  2013-11-02 23:14:05  pauloscustodio
+* g_slist_free_full() requires GLib 2.28, replaced by g_slist_foreach() and g_slist_free()
+*
+* Revision 1.4  2013/10/16 21:42:07  pauloscustodio
 * Allocate minimum-sized string, grow as needed.
 * Allocate a GString text inside of File, to be used by file reading methods.
 *

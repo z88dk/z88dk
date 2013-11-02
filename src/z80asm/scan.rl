@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: ragel -G2 scan.rl
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.4 2013-10-16 21:42:07 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/scan.rl,v 1.5 2013-11-02 23:14:05 pauloscustodio Exp $ 
 */
 
 #include "memalloc.h"   /* before any other include */
@@ -320,7 +320,10 @@ void struct_Scan_init(Scan *self)
 
 void struct_Scan_fini(Scan *self)
 {
-	g_slist_free_full( self->stack, (GDestroyNotify) delete_ScanContext );
+	/* delete all list elements */
+	g_slist_foreach( self->stack, (GFunc) delete_ScanContext, 0 );
+	g_slist_free( self->stack );
+	
 	delete0_ScanContext( &self->ctx );
 }
 
@@ -657,7 +660,10 @@ void Skipline( void )
 
 /*
 * $Log: scan.rl,v $
-* Revision 1.4  2013-10-16 21:42:07  pauloscustodio
+* Revision 1.5  2013-11-02 23:14:05  pauloscustodio
+* g_slist_free_full() requires GLib 2.28, replaced by g_slist_foreach() and g_slist_free()
+*
+* Revision 1.4  2013/10/16 21:42:07  pauloscustodio
 * Allocate minimum-sized string, grow as needed.
 * Allocate a GString text inside of File, to be used by file reading methods.
 *
