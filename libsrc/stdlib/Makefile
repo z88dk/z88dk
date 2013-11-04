@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.20 2012-05-16 16:59:56 stefano Exp $
+# $Id: Makefile,v 1.21 2013-11-04 08:57:56 stefano Exp $
 
 include ../Make.config
 
@@ -17,6 +17,8 @@ lz88: deps z88_stdlib
 
 lzx: deps zx_stdlib
 
+lzx80: deps zx80_stdlib
+
 generic: deps gen
 
 gen: $(GENOBJECTS)
@@ -31,6 +33,9 @@ z88_stdlib:
 zx_stdlib:
 	zcc +zx $(CFLAGS) *.c
 	cd spectrum  ; cd ..
+
+zx80_stdlib:
+	zcc +zx80 $(CFLAGS) *.c
 
 # Rabbit Control Module and timer dependencies
 deps:
