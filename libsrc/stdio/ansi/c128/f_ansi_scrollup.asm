@@ -5,7 +5,7 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.3 2002-04-17 21:30:26 dom Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.4 2013-11-05 16:02:43 stefano Exp $
 ;
 
 	XLIB	ansi_SCROLLUP
@@ -32,7 +32,7 @@
 	ld	l,e
 	ld	b,40
 .reslloop2
-	ld	(hl),32
+	ld	(hl),1
 	inc	hl
 	djnz	reslloop2
 

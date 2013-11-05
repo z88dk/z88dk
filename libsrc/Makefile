@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.181 2013-10-12 15:11:56 stefano Exp $
+# $Id: Makefile,v 1.182 2013-11-05 16:02:43 stefano Exp $
 
 
 include Make.config
@@ -25,7 +25,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib \
 	trs80_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib \
 	embedded_clib.lib test_clib.lib \
-	preempt.lib zx80_clib.lib zx81libs
+	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs
 
 genlibs: z80_crt0.lib gen_math.lib debug.lib malloc.lib ndos.lib adt.lib balloc.lib \
 	 im2.lib rect.lib algorithm.lib lib3d.lib x11.lib
@@ -521,7 +521,7 @@ zx80_clib.lib:
 	@echo ''
 	$(MAKE) zx81deps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdlib ; $(MAKE) lzx80 ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -1388,6 +1388,20 @@ x07_clib.lib:
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/x07_clib @$(LISTFILE_DIRECTORY)/x07.lst
+
+# Sharp X1 (ANSI VT) - Karl Von Dyson (X1s.org)
+x1ansi_clib.lib:
+	@echo ''
+	@echo '--- Building Sharp X1 ANSI Library ---'
+	@echo ''
+	cd strings ; $(MAKE) ; cd ..
+	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdio ; $(MAKE) generic ; cd ..
+	cd printflike ; $(MAKE) ; cd ..
+	cd setjmp ; $(MAKE) ; cd ..
+	cd assert ; $(MAKE) ; cd ..
+	cd x1 ; $(MAKE) ; cd ..
+	$(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1ansi_clib @$(LISTFILE_DIRECTORY)/x1ansi.lst
 
 # OSCA / FLOS - Stefano
 osca_clib.lib:

@@ -1,0 +1,15 @@
+stdio/x1/fgetc_cons
+stdio/x1/getk
+stdio/ansi/puts_cons
+stdio/ansi/f_ansi
+stdio/ansi/f_ansi_lf
+stdio/ansi/f_ansi_putc
+stdio/ansi/fputc_cons
+stdio/ansi/f_ansi_dsr6
+stdio/ansi/x1/f_ansi_attr
+stdio/ansi/x1/f_ansi_bel
+stdio/ansi/x1/f_ansi_char
+stdio/ansi/x1/f_ansi_cls
+stdio/ansi/x1/f_ansi_dline
+stdio/ansi/x1/f_ansi_scrollup
+@z80.lst

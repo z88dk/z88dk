@@ -1,13 +1,12 @@
 ;
-; 	ANSI Video handling for the Commodore 128 (Z80 mode)
-;	By Stefano Bodrato - 22/08/2001
+; 	ANSI Video handling for the Sharp X1
 ;
 ; 	Clean a text line
 ;
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.3 2013-11-05 16:02:43 stefano Exp $
+;	$Id: f_ansi_dline.asm,v 1.1 2013-11-05 16:02:43 stefano Exp $
 ;
 
 
@@ -15,7 +14,7 @@
 
 
 .ansi_del_line
-	ld	hl,$2000
+	ld	hl,$3000
 	and	a
 	jr	z,isz
 	ld	de,40
@@ -26,7 +25,11 @@
 .isz
 	ld	b,39
 .dlineloop
-	ld	(hl),32
+	ld	a,32
+	ld	b,h
+	ld	c,l
+	out (c),a
+	;ld	(hl),32
 	inc	hl
 	djnz	dlineloop
 	ret
