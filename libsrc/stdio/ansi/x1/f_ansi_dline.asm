@@ -6,7 +6,7 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.1 2013-11-05 16:02:43 stefano Exp $
+;	$Id: f_ansi_dline.asm,v 1.2 2013-11-06 09:40:35 stefano Exp $
 ;
 
 

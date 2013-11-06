@@ -7,27 +7,30 @@
 ; 	Text Attributes
 ;	m - Set Graphic Rendition
 ;	
-;	$Id: f_ansi_attr.asm,v 1.1 2013-11-05 16:02:43 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.2 2013-11-06 09:40:35 stefano Exp $
 ;
 
 	XLIB	ansi_attr
 
-	XREF	INVRS
+	;XREF	INVRS
 	XREF	ATTR
 
 .ansi_attr
         and     a
         jr      nz,noreset
-        ld      a,1		;White on black
+        ld      a,15		;White on black
         ld      (ATTR+1),a
-	xor	a
-	ld	(INVRS+1),a
+;	xor	a
+;	ld	(INVRS+1),a
         ret
 .noreset
         cp      1
         jr      nz,nobold
-	ld	a,128
-	ld	(INVRS+1),a
+        ld		a,(ATTR+1)
+        set		3,a
+        ld      (ATTR+1),a
+;	ld	a,128
+;	ld	(INVRS+1),a
         ret
 .nobold
         cp      2
@@ -35,44 +38,51 @@
         cp      8
         jr      nz,nodim
 .dim
-	xor	a
-	ld	(INVRS+1),a
+        ld		a,(ATTR+1)
+        res		3,a
+        ld      (ATTR+1),a
         ret
 .nodim
         cp      4
         jr      nz,nounderline
-	ld	a,128
-	ld	(INVRS+1),a
+        ld		a,(ATTR+1)
+        set		4,a
+        ld      (ATTR+1),a
         ret
 .nounderline
         cp      24
         jr      nz,noCunderline
-	xor	a
-	ld	(INVRS+1),a
+        ld		a,(ATTR+1)
+        res		4,a
+        ld      (ATTR+1),a
         ret
 .noCunderline
         cp      5
         jr      nz,noblink
-	ld	a,128
-	ld	(INVRS+1),a
+        ld		a,(ATTR+1)
+        set		4,a
+        ld      (ATTR+1),a
         ret
 .noblink
         cp      25
         jr      nz,nocblink
-	xor	a
-	ld	(INVRS+1),a
+        ld		a,(ATTR+1)
+        res		4,a
+        ld      (ATTR+1),a
         ret
 .nocblink
         cp      7
         jr      nz,noreverse
-	ld	a,128
-	ld	(INVRS+1),a	;inverse 1
+        ld		a,(ATTR+1)
+        set		3,a
+        ld      (ATTR+1),a
         ret
 .noreverse
         cp      27
         jr      nz,noCreverse
-        xor     a
-        ld      (INVRS+1),a      ; inverse 0
+        ld		a,(ATTR+1)
+        res		3,a
+        ld      (ATTR+1),a
         ret
 .noCreverse
         cp      8
@@ -113,12 +123,13 @@
         jp      p,noback
         sub     40		; Workaround for background: we force to inverse video.
         call	palette		; could work in some cases, but isn't much compatible !
+        set		3,a
 ;''''''''''''''''''''''
 ;	ld	(53280),a	;border
 ;	ld	(53281),a	;background
         ld      (ATTR+1),a
-	ld	a,128
-	ld	(INVRS+1),a
+	;ld	a,128
+	;ld	(INVRS+1),a
 .noback
         ret
 
@@ -134,9 +145,9 @@
 .attrtab
 	defb	0
 	defb	2
+	defb	4
+	defb	6
+	defb	1
+	defb	3
 	defb	5
 	defb	7
-	defb	6
-	defb	4
-	defb	3
-	defb	1

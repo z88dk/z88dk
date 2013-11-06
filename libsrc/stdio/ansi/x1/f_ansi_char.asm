@@ -11,7 +11,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.1 2013-11-05 16:02:43 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.2 2013-11-06 09:40:35 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -19,7 +19,6 @@
 	XDEF	text_cols
 	XDEF	text_rows
 
-	XDEF	INVRS
 	XDEF	ATTR
 
 	XREF	ansi_ROW
@@ -52,18 +51,13 @@
 
 .setout
 
-.INVRS
-	or	0	; This byte is set to 128 when INVERSE is ON
 	ld	(hl),a
 	
 	ld b,h
 	ld c,l
 	out(c),a
 
-	ld	de,$1000
-	sbc	hl,de		; Color map location
-	ld b,h
-	ld c,l
+	res 4,b
 .ATTR
 	ld	a,15
 	out(c),a

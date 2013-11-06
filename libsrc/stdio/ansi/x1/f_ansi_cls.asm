@@ -5,19 +5,22 @@
 ; 	CLS - Clear the screen
 ;	
 ;
-;	$Id: f_ansi_cls.asm,v 1.1 2013-11-05 16:02:43 stefano Exp $
+;	$Id: f_ansi_cls.asm,v 1.2 2013-11-06 09:40:35 stefano Exp $
 ;
 
 	XLIB	ansi_cls
+	XREF	ATTR
 
 ansi_cls:
         ld bc, $3000
-        ld hl, $2007
+        ;ld hl, $200F	; ' ' char and attribute
         ld de, $2028
 clr1:   set 4, b
-        out (c), h
+		ld	a,32
+        out (c), a
         res 4, b
-        out (c), l
+        ld	a,(ATTR+1)
+        out (c), a
         inc bc
         dec e
         jp nz, clr1
