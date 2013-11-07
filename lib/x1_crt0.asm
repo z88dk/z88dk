@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.2 2013-11-07 14:00:07 stefano Exp $
+;    $Id: x1_crt0.asm,v 1.3 2013-11-07 15:20:13 stefano Exp $
 ;
 
 	MODULE x1_crt0
@@ -62,12 +62,13 @@
 start:
 		di
         ld      sp,$FDFF
-        ld      (exitsp),sp
+        ;ld      (exitsp),sp
         
 IF (!DEFINED_startup | (startup=1))
-if (myzorg != 0)
+if (myzorg > 0)
         defs    ZORG_NOT_ZERO
 endif
+
 		im 1
 		ei
 ENDIF
@@ -102,6 +103,9 @@ isr_table_fill:
 	
 	im 2
 	ei
+
+ENDIF
+
 	call _wait_sub_cpu
 	ld bc, $1900
 	ld a, $E4
@@ -110,8 +114,6 @@ isr_table_fill:
 	ld bc, $1900
 	ld a, $52
 	out (c), a
-
-ENDIF
 
 ;IF !DEFINED_x1_no_clrscr
 ;	LIB _x1_cls
@@ -236,7 +238,7 @@ IF !DEFINED_HAVESEED
 _std_seed:      defw    0                ; Seed for integer rand() routines
 ENDIF
 
-exitsp:    defw    0
+exitsp:    defw    $FDFF
 exitcount: defb    0
 
 ; Heap stuff
