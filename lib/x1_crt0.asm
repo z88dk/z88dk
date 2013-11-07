@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.1 2013-11-05 16:02:43 stefano Exp $
+;    $Id: x1_crt0.asm,v 1.2 2013-11-07 14:00:07 stefano Exp $
 ;
 
 	MODULE x1_crt0
@@ -45,7 +45,11 @@
 ;--------
 
         IF      !myzorg
+			IF (startup=2)
+                defc    myzorg  = 32768
+            ELSE
                 defc    myzorg  = 0
+            ENDIF
         ENDIF
 
 
@@ -56,18 +60,29 @@
 ; Execution starts here
 ;--------
 start:
+		di
         ld      sp,$FDFF
         ld      (exitsp),sp
         
 IF (!DEFINED_startup | (startup=1))
+if (myzorg != 0)
+        defs    ZORG_NOT_ZERO
+endif
 		im 1
 		ei
 ENDIF
 
 IF (startup=2)
-        ;call    _x1_init_interrupts
-        
-	di
+
+if (myzorg < 32768)
+        defs    ZORG_TOO_LOW
+endif
+
+	; re-activate IPL
+	ld bc,$1D00
+	xor a
+	out (c),a
+
 	ld	hl,$FE00
 	push hl
 	LIB im2_Init
@@ -82,7 +97,7 @@ isr_table_fill:
 	inc hl
 	inc hl
 	djnz isr_table_fill
-	ld	hl,_im2_kbd_isr
+	ld	hl,_kbd_isr
 	ld ($FE52),hl
 	
 	im 2
@@ -133,8 +148,9 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
-	push    hl				; return code
-        ld      sp,$FFFF
+		push    hl				; return code
+        ;ld      sp,$FFFF
+		ld      sp,$FDFF
 cleanup_exit:
         ret
 
@@ -153,7 +169,7 @@ ENDIF
 ; Don't move the following block !
 ; It must be aligned when startup=1 !!
 
-_im2_kbd_isr:
+_kbd_isr:
 	push af
 	push bc
 	;push de
