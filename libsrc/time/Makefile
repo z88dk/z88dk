@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.19 2013-11-08 09:10:53 stefano Exp $
+# $Id: Makefile,v 1.20 2013-11-08 09:41:29 stefano Exp $
 
 include ../Make.config
 
@@ -43,12 +43,13 @@ x1_time:
 clean:
 	$(RM) *.o* *.i *.sym *.map zcc_opt.def
 	$(RM) zx81/*.o*
-	$(RM) x1/*.o*
 	$(RM) ace/*.o*
 	$(RM) enterprise/*.o*
 	$(RM) newbrain/*.o*
+	$(RM) osca/*.o*
 	$(RM) rcmx000/*.o*
 	$(RM) mc1000/*.o*
+	cd x1 ; $(MAKE) clean ; cd ..
 	cd z88 ; $(MAKE) clean ; cd ..
 	cd spectrum ; $(MAKE) clean ; cd ..
 	cd sprinter ; $(MAKE) clean ; cd ..
