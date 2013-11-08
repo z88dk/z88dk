@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.183 2013-11-07 17:05:25 dom Exp $
+# $Id: Makefile,v 1.184 2013-11-08 09:10:53 stefano Exp $
 
 
 include Make.config
@@ -1398,9 +1398,10 @@ x1ansi_clib.lib:
 	cd stdlib ; $(MAKE) generic ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
+	cd time ; $(MAKE) lx1 ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
 	cd assert ; $(MAKE) ; cd ..
-#	cd x1 ; $(MAKE) ; cd ..
+	cd x1 ; $(MAKE) ; cd ..
 	$(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1ansi_clib @$(LISTFILE_DIRECTORY)/x1ansi.lst
 
 # OSCA / FLOS - Stefano

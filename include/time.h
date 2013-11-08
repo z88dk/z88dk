@@ -5,7 +5,7 @@
  *
  *      djm 9/1/2000
  *
- *	$Id: time.h,v 1.20 2013-09-30 15:10:34 stefano Exp $
+ *	$Id: time.h,v 1.21 2013-11-08 09:10:53 stefano Exp $
  */
 
 
@@ -17,6 +17,10 @@
 
 #ifdef __Z88__
 #define CLOCKS_PER_SEC 100
+#endif
+
+#ifdef __X1__
+#define CLOCKS_PER_SEC 1
 #endif
 
 #ifdef __MC1000__
@@ -102,5 +106,6 @@ extern int FRAMES;
 #ifdef __OSCA__
 #define time(NULL) clock()
 #endif
+
 
 #endif /* _TIME_H */

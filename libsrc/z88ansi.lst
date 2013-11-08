@@ -41,6 +41,7 @@ stdlib/z88/getcwd
 stdlib/z88/mkdir
 time/gmtime
 time/localtime
+time/mktime
 time/z88/clock
 time/z88/time
 games/joystick

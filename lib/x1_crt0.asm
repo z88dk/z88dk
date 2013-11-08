@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.3 2013-11-07 15:20:13 stefano Exp $
+;    $Id: x1_crt0.asm,v 1.4 2013-11-08 09:10:53 stefano Exp $
 ;
 
 	MODULE x1_crt0
@@ -61,23 +61,26 @@
 ;--------
 start:
 		di
-        ld      sp,$FDFF
-        ;ld      (exitsp),sp
         
 IF (!DEFINED_startup | (startup=1))
+
 if (myzorg > 0)
         defs    ZORG_NOT_ZERO
 endif
 
+        ld      sp,$FFFF
 		im 1
 		ei
 ENDIF
+
 
 IF (startup=2)
 
 if (myzorg < 32768)
         defs    ZORG_TOO_LOW
 endif
+
+    ld      sp,$FDFF
 
 	; re-activate IPL
 	ld bc,$1D00
@@ -108,11 +111,11 @@ ENDIF
 
 	call _wait_sub_cpu
 	ld bc, $1900
-	ld a, $E4
+	ld a, $E4	; Interrupt vector set
 	out (c), a
 	call _wait_sub_cpu
 	ld bc, $1900
-	ld a, $52
+	ld a, $52	; 
 	out (c), a
 
 ;IF !DEFINED_x1_no_clrscr
@@ -151,10 +154,11 @@ ENDIF
 ENDIF
 
 		push    hl				; return code
-        ;ld      sp,$FFFF
-		ld      sp,$FDFF
+
+		rst 0
+
 cleanup_exit:
-        ret
+		ret
 
 
 IF (!DEFINED_startup | (startup=1))
