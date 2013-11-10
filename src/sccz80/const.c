@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.19 2010-09-16 21:37:36 dom Exp $
+ *      $Id: const.c,v 1.20 2013-11-10 21:53:50 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -608,9 +608,9 @@ void size_of(LVALUE *lval)
 	} ;
 	lval->const_val=length;
     } else if ( symname(sname) ) {  /* Size of an object */
-	if (  ( ( ptr = findglb(sname) ) != NULL ) || 
-	      ( ( ptr = findloc(sname) ) != NULL ) ||
-	      ( ( ptr = findstc(sname) ) != NULL ) ) {
+	    if (  ( ( ptr = findloc(sname) ) != NULL ) ||
+	      ( ( ptr = findstc(sname) ) != NULL ) ||
+              ( ( ptr = findglb(sname) ) != NULL ) )  {
 	    /* Actually found sommat..very good! */
 	    if ( ptr->ident!=FUNCTION && ptr->ident!=MACRO) {
 		if (ptr->type!=STRUCT){

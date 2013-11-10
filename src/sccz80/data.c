@@ -6,7 +6,7 @@
  *      I'm starting to split these up once more and stick them in
  *      the relevant files..
  *
- *      $Id: data.c,v 1.35 2010-04-16 00:48:28 dom Exp $
+ *      $Id: data.c,v 1.36 2013-11-10 21:53:50 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -16,7 +16,7 @@
 char amivers[] = "$VER: sccz80 " __DATE__;
 char titlec[] = "Small-C/Plus - z80 Crosscompiler ";
 char Banner[]  = "* * * * *  Small-C/Plus z88dk * * * * *" ;
-char Version[] = "  Version: 20100416.1";
+char Version[] = "  Version: 20131110.1";
 
 
 
