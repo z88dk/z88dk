@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.20 2013-11-08 09:41:29 stefano Exp $
+# $Id: Makefile,v 1.21 2013-11-11 17:23:53 stefano Exp $
 
 include ../Make.config
 
@@ -15,7 +15,7 @@ lnewbrain: newbrain_time
 
 lenterprise: enterprise_time
 
-lx1: x1_time
+lx1: time x1_time
 
 time: gmtime.o localtime.o mktime.o
 
