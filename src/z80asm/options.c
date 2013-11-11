@@ -15,15 +15,15 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.59 2013-10-16 00:14:37 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.60 2013-11-11 23:47:03 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
 
 #include "errors.h"
 #include "scan.h"
+#include "file.h"
 #include "hist.h"
-#include "init.h"
 #include "options.h"
 #include "strpool.h"
 #include "symtab.h"
@@ -301,7 +301,7 @@ static void parse_file_list( Scan *files,
 static void parse_files(int arg, int argc, char *argv[], 
 						void (*process_file)(char *filename) )
 {
-	Scan *files = new_Scan();
+	Scan *files = OBJ_NEW(Scan);
 	{
 		int i; 
 
@@ -309,7 +309,7 @@ static void parse_files(int arg, int argc, char *argv[],
 		for ( i = arg; i < argc; i++ )
 			parse_file_list( files, argv[i], process_file );
 	}
-	delete0_Scan( &files );
+	OBJ_DELETE(files);
 }
 
 /*-----------------------------------------------------------------------------
@@ -538,7 +538,13 @@ char *get_segbin_filename( char *filename, int segment )
 
 /* 
 * $Log: options.c,v $
-* Revision 1.59  2013-10-16 00:14:37  pauloscustodio
+* Revision 1.60  2013-11-11 23:47:03  pauloscustodio
+* Move source code generation tools to dev/Makefile, only called on request,
+* and keep the generated files in z80asm directory, so that build does
+* not require tools used for the code generation (ragel, perl).
+* Remove code generation for structs - use CLASS macro instead.
+*
+* Revision 1.59  2013/10/16 00:14:37  pauloscustodio
 * Move FileStack implementation to scan.c, remove FileStack.
 * Move getline_File() to scan.c.
 *

@@ -14,13 +14,14 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.20 2013-10-15 23:24:33 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.21 2013-11-11 23:47:03 pauloscustodio Exp $ 
 */
 
 #pragma once
 
 #include "memalloc.h"   /* before any other include */
 
+#include "class.h"
 #include "types.h"
 #include <glib.h>
 #include <stdio.h>
@@ -101,8 +102,7 @@ extern void fini_scan(void);
 /*-----------------------------------------------------------------------------
 * State of one scan context
 *----------------------------------------------------------------------------*/
-typedef struct ScanContext
-{
+CLASS(ScanContext)
 	GString	*input;				/* text being scanned */
 	
 	FILE	*file;				/* file being scanned, if any */
@@ -113,24 +113,15 @@ typedef struct ScanContext
 	
 	int      cs, act;			/* Ragel state variables */
 	char	*p, *pe, *eof, *ts, *te;	
-} 
-ScanContext;
-
-extern void struct_ScanContext_init(ScanContext *self);
-extern void struct_ScanContext_fini(ScanContext *self);
+END_CLASS;
 
 /*-----------------------------------------------------------------------------
 * Scanner object - stack of ScanContext's
 *----------------------------------------------------------------------------*/
-typedef struct Scan
-{
+CLASS(Scan)
 	ScanContext	*ctx;			/* current context */
 	GSList		*stack;			/* stack of previous contexts */
-}
-Scan;
-
-extern void struct_Scan_init(Scan *self);
-extern void struct_Scan_fini(Scan *self);
+END_CLASS;
 
 /*-----------------------------------------------------------------------------
 * Scanner API - methods without Scan* argument operate on a singleton
@@ -173,7 +164,13 @@ extern void Skipline( void );
 
 /*
 * $Log: scan.h,v $
-* Revision 1.20  2013-10-15 23:24:33  pauloscustodio
+* Revision 1.21  2013-11-11 23:47:03  pauloscustodio
+* Move source code generation tools to dev/Makefile, only called on request,
+* and keep the generated files in z80asm directory, so that build does
+* not require tools used for the code generation (ragel, perl).
+* Remove code generation for structs - use CLASS macro instead.
+*
+* Revision 1.20  2013/10/15 23:24:33  pauloscustodio
 * Move reading by lines or tokens and file reading interface to scan.rl
 * to decouple file.c from scan.c.
 * Add singleton interface to scan to be used by parser.

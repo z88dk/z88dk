@@ -14,16 +14,16 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Utilities for file handling, raise fatal errors on failure
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.34 2013-10-16 21:42:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/file.c,v 1.35 2013-11-11 23:47:03 pauloscustodio Exp $
 */
 
 #include "memalloc.h"   /* before any other include */
 
 #include "file.h"
-#include "init.h"
 #include "listfile.h"
 #include "options.h"
 #include "strpool.h"
+#include "errors.h"
 
 /*-----------------------------------------------------------------------------
 *   Initialize and Terminate functions called by init()
@@ -487,7 +487,13 @@ void xfget_c2sstr( sstr_t *str, FILE *file )
 
 /*
 $Log: file.c,v $
-Revision 1.34  2013-10-16 21:42:06  pauloscustodio
+Revision 1.35  2013-11-11 23:47:03  pauloscustodio
+Move source code generation tools to dev/Makefile, only called on request,
+and keep the generated files in z80asm directory, so that build does
+not require tools used for the code generation (ragel, perl).
+Remove code generation for structs - use CLASS macro instead.
+
+Revision 1.34  2013/10/16 21:42:06  pauloscustodio
 Allocate minimum-sized string, grow as needed.
 Allocate a GString text inside of File, to be used by file reading methods.
 

@@ -24,10 +24,10 @@ require 't/test_utils.pl';
 # test errors.c
 unlink_testfiles();
 
-my $objs = "errors.o scan.o file.o init_obj.o init_obj_file.o init_obj_scan.o class.o safestr.o strutil.o options.o hist.o";
+my $objs = "errors.o scan.o file.o class.o safestr.o strutil.o options.o hist.o";
 
 # get init code except init() and main()
-my $init = <<'END' . read_file("init.c"); $init =~ s/static void init\(\)\s*\{.*//s;
+my $init = <<'END';
 
 #include "symbol.h"
 
@@ -239,9 +239,15 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.14 2013-10-15 23:24:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-errors.t,v 1.15 2013-11-11 23:47:04 pauloscustodio Exp $
 # $Log: whitebox-errors.t,v $
-# Revision 1.14  2013-10-15 23:24:33  pauloscustodio
+# Revision 1.15  2013-11-11 23:47:04  pauloscustodio
+# Move source code generation tools to dev/Makefile, only called on request,
+# and keep the generated files in z80asm directory, so that build does
+# not require tools used for the code generation (ragel, perl).
+# Remove code generation for structs - use CLASS macro instead.
+#
+# Revision 1.14  2013/10/15 23:24:33  pauloscustodio
 # Move reading by lines or tokens and file reading interface to scan.rl
 # to decouple file.c from scan.c.
 # Add singleton interface to scan to be used by parser.

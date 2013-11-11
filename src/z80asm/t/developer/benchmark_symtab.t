@@ -13,9 +13,15 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.6 2013-09-23 23:14:10 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/developer/benchmark_symtab.t,v 1.7 2013-11-11 23:47:04 pauloscustodio Exp $
 # $Log: benchmark_symtab.t,v $
-# Revision 1.6  2013-09-23 23:14:10  pauloscustodio
+# Revision 1.7  2013-11-11 23:47:04  pauloscustodio
+# Move source code generation tools to dev/Makefile, only called on request,
+# and keep the generated files in z80asm directory, so that build does
+# not require tools used for the code generation (ragel, perl).
+# Remove code generation for structs - use CLASS macro instead.
+#
+# Revision 1.6  2013/09/23 23:14:10  pauloscustodio
 # Renamed SzList to StringList, simplified interface by assuming that
 # list lives in memory util program ends; it is used for directory searches
 # only. Moved interface to strutil.c, removed strlist.c.
@@ -44,7 +50,7 @@ use Test::More;
 use List::AllUtils 'uniq';
 require 't/test_utils.pl';
 
-my $objs = "avltree.o memalloc.o die.o except.o safestr.o strutil.o  errors.o strpool.o strhash.o class.o file.o init_obj.o init_obj_file.o ";
+my $objs = "avltree.o memalloc.o die.o except.o safestr.o strutil.o  errors.o strpool.o strhash.o class.o file.o";
 my $src = "t/data/zx48.asm";
 my @words;
 

@@ -16,17 +16,17 @@ Copyright (C) Paulo Custodio, 2011-2013
 
 Scanner - to be processed by: ragel -G2 scan.rl
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.26 2013-11-02 23:14:05 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.27 2013-11-11 23:47:03 pauloscustodio Exp $ 
 */
 
 #include "memalloc.h"   /* before any other include */
 
 #include "scan.h"
 
+#include "codearea.h"
 #include "ctype.h"
 #include "errors.h"
 #include "file.h"
-#include "init.h"
 #include "legacy.h"
 #include "listfile.h"
 #include "options.h"
@@ -115,24 +115,26 @@ static int scan_num (char *text, int length, int base)
 void init_scan(void)
 {
 	last_token_str = g_string_new("");
-	the_scan = new_Scan();
+	the_scan = OBJ_NEW(Scan);
 }
 	
 void fini_scan(void)
 {
 	g_string_free( last_token_str, TRUE );
-	delete0_Scan( &the_scan );
+	OBJ_DELETE(the_scan);
 }
 
 /*-----------------------------------------------------------------------------
 * Initialize and Terminate scan context
 *----------------------------------------------------------------------------*/
-void struct_ScanContext_init(ScanContext *self)
+DEF_CLASS(ScanContext);
+
+void ScanContext_init(ScanContext *self)
 {
 	self->input = g_string_new("");
 }
 
-void struct_ScanContext_fini(ScanContext *self)
+void ScanContext_fini(ScanContext *self)
 {
 	if ( self->input )
 		g_string_free( self->input, TRUE );
@@ -141,21 +143,33 @@ void struct_ScanContext_fini(ScanContext *self)
 		xfclose( self->file );
 }
 
-/*-----------------------------------------------------------------------------
-* Initialize and Terminate scan
-*----------------------------------------------------------------------------*/
-void struct_Scan_init(Scan *self)
+void ScanContext_copy(ScanContext *self, ScanContext *other)
 {
 }
 
-void struct_Scan_fini(Scan *self)
+
+/*-----------------------------------------------------------------------------
+* Initialize and Terminate scan
+*----------------------------------------------------------------------------*/
+DEF_CLASS(Scan);
+
+void Scan_init(Scan *self)
+{
+}
+
+void Scan_fini(Scan *self)
 {
 	/* delete all list elements */
-	g_slist_foreach( self->stack, (GFunc) delete_ScanContext, 0 );
+	g_slist_foreach( self->stack, (GFunc) ScanContext_delete, 0 );
 	g_slist_free( self->stack );
 	
-	delete0_ScanContext( &self->ctx );
+	OBJ_DELETE(self->ctx);
 }
+
+void Scan_copy(Scan *self, Scan *other)
+{
+}
+
 
 /*-----------------------------------------------------------------------------
 * Reset last token variables before each new scan
@@ -179,7 +193,7 @@ static void reset_scan( ScanContext *ctx )
 	ctx->eof	= ctx->pe;	/* tokens are not split acros input lines */
 	
 	
-//#line 183 "scan.c"
+//#line 197 "scan.c"
 	{
 	(		ctx->cs) = asm_start;
 	(		ctx->ts) = 0;
@@ -187,7 +201,7 @@ static void reset_scan( ScanContext *ctx )
 	(	ctx->act) = 0;
 	}
 
-//#line 352 "scan.rl"
+//#line 366 "scan.rl"
 
 	reset_last_token();
 }
@@ -271,8 +285,8 @@ static void push_context( Scan *self )
 	}
 
 	/* create the new context */
-	self->ctx = new_ScanContext();
-	autodelete_ScanContext( self->ctx, FALSE );
+	self->ctx = OBJ_NEW(ScanContext);
+	OBJ_AUTODELETE(self->ctx) = FALSE;
 	
 	/* init filename/line_nr */
 	self->ctx->filename = filename;
@@ -284,7 +298,7 @@ static void push_context( Scan *self )
 *----------------------------------------------------------------------------*/
 static void pop_context( Scan *self )
 {
-	delete0_ScanContext( &self->ctx );
+	OBJ_DELETE(self->ctx);
 	if ( self->stack )
 	{
 		/* pop one */
@@ -362,7 +376,7 @@ static enum token _get_token_Scan( Scan *self, BOOL by_lines )
 	while ( (ctx = self->ctx) != NULL )
 	{
 		
-//#line 366 "scan.c"
+//#line 380 "scan.c"
 	{
 	short _widec;
 	if ( (		ctx->p) == (		ctx->pe) )
@@ -751,7 +765,7 @@ st7:
 case 7:
 //#line 1 "NONE"
 	{(		ctx->ts) = (		ctx->p);}
-//#line 755 "scan.c"
+//#line 769 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 58 ) {
 		if ( (*(		ctx->p)) < 38 ) {
@@ -1389,7 +1403,7 @@ st8:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof8;
 case 8:
-//#line 1393 "scan.c"
+//#line 1407 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 10 ) {
 		if ( (*(		ctx->p)) <= 9 ) {
@@ -1486,7 +1500,7 @@ st11:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof11;
 case 11:
-//#line 1490 "scan.c"
+//#line 1504 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 65 ) {
 		if ( 48 <= (*(		ctx->p)) && (*(		ctx->p)) <= 57 ) {
@@ -1527,7 +1541,7 @@ st12:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof12;
 case 12:
-//#line 1531 "scan.c"
+//#line 1545 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 48 ) {
 		if ( 34 <= (*(		ctx->p)) && (*(		ctx->p)) <= 34 ) {
@@ -1707,7 +1721,7 @@ st17:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof17;
 case 17:
-//#line 1711 "scan.c"
+//#line 1725 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 72 ) {
 		if ( (*(		ctx->p)) < 50 ) {
@@ -1829,7 +1843,7 @@ st18:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof18;
 case 18:
-//#line 1833 "scan.c"
+//#line 1847 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 67 ) {
 		if ( (*(		ctx->p)) < 50 ) {
@@ -1935,7 +1949,7 @@ st19:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof19;
 case 19:
-//#line 1939 "scan.c"
+//#line 1953 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 72 ) {
 		if ( (*(		ctx->p)) > 57 ) {
@@ -2046,7 +2060,7 @@ st20:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof20;
 case 20:
-//#line 2050 "scan.c"
+//#line 2064 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 72 ) {
 		if ( (*(		ctx->p)) > 57 ) {
@@ -2111,7 +2125,7 @@ st21:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof21;
 case 21:
-//#line 2115 "scan.c"
+//#line 2129 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 65 ) {
 		if ( (*(		ctx->p)) < 49 ) {
@@ -2495,7 +2509,7 @@ st30:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof30;
 case 30:
-//#line 2499 "scan.c"
+//#line 2513 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 58 ) {
 		if ( (*(		ctx->p)) < 10 ) {
@@ -2619,7 +2633,7 @@ st31:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof31;
 case 31:
-//#line 2623 "scan.c"
+//#line 2637 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 34 ) {
 		if ( (*(		ctx->p)) < 10 ) {
@@ -2719,7 +2733,7 @@ st32:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof32;
 case 32:
-//#line 2723 "scan.c"
+//#line 2737 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 35 ) {
 		if ( (*(		ctx->p)) < 10 ) {
@@ -2803,7 +2817,7 @@ st33:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof33;
 case 33:
-//#line 2807 "scan.c"
+//#line 2821 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 34 ) {
 		if ( (*(		ctx->p)) < 10 ) {
@@ -3152,7 +3166,7 @@ st38:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof38;
 case 38:
-//#line 3156 "scan.c"
+//#line 3170 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 72 ) {
 		if ( (*(		ctx->p)) < 50 ) {
@@ -3435,7 +3449,7 @@ st39:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof39;
 case 39:
-//#line 3439 "scan.c"
+//#line 3453 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 67 ) {
 		if ( (*(		ctx->p)) < 49 ) {
@@ -3672,7 +3686,7 @@ st40:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof40;
 case 40:
-//#line 3676 "scan.c"
+//#line 3690 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 71 ) {
 		if ( (*(		ctx->p)) < 11 ) {
@@ -3845,7 +3859,7 @@ st41:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof41;
 case 41:
-//#line 3849 "scan.c"
+//#line 3863 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 71 ) {
 		if ( (*(		ctx->p)) < 11 ) {
@@ -4018,7 +4032,7 @@ st42:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof42;
 case 42:
-//#line 4022 "scan.c"
+//#line 4036 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 65 ) {
 		if ( (*(		ctx->p)) < 48 ) {
@@ -4217,7 +4231,7 @@ st43:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof43;
 case 43:
-//#line 4221 "scan.c"
+//#line 4235 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 58 ) {
 		if ( (*(		ctx->p)) < 10 ) {
@@ -4817,7 +4831,7 @@ st52:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof52;
 case 52:
-//#line 4821 "scan.c"
+//#line 4835 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 65 ) {
 		if ( (*(		ctx->p)) > 9 ) {
@@ -4954,7 +4968,7 @@ st53:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof53;
 case 53:
-//#line 4958 "scan.c"
+//#line 4972 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 58 ) {
 		if ( (*(		ctx->p)) < 32 ) {
@@ -5090,7 +5104,7 @@ st54:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof54;
 case 54:
-//#line 5094 "scan.c"
+//#line 5108 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 70 ) {
 		if ( (*(		ctx->p)) < 48 ) {
@@ -5240,7 +5254,7 @@ st55:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof55;
 case 55:
-//#line 5244 "scan.c"
+//#line 5258 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 58 ) {
 		if ( (*(		ctx->p)) < 32 ) {
@@ -5346,7 +5360,7 @@ st56:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof56;
 case 56:
-//#line 5350 "scan.c"
+//#line 5364 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 48 ) {
 		if ( (*(		ctx->p)) < 32 ) {
@@ -5950,7 +5964,7 @@ st60:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof60;
 case 60:
-//#line 5954 "scan.c"
+//#line 5968 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 33 ) {
 		if ( (*(		ctx->p)) < 10 ) {
@@ -6139,7 +6153,7 @@ st61:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof61;
 case 61:
-//#line 6143 "scan.c"
+//#line 6157 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 58 ) {
 		if ( (*(		ctx->p)) < 11 ) {
@@ -6381,7 +6395,7 @@ st62:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof62;
 case 62:
-//#line 6385 "scan.c"
+//#line 6399 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 11 ) {
 		if ( (*(		ctx->p)) < 9 ) {
@@ -6496,7 +6510,7 @@ st63:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof63;
 case 63:
-//#line 6500 "scan.c"
+//#line 6514 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 65 ) {
 		if ( (*(		ctx->p)) < 32 ) {
@@ -6809,7 +6823,7 @@ st64:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof64;
 case 64:
-//#line 6813 "scan.c"
+//#line 6827 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 58 ) {
 		if ( (*(		ctx->p)) < 11 ) {
@@ -7062,7 +7076,7 @@ st65:
 	if ( ++(		ctx->p) == (		ctx->pe) )
 		goto _test_eof65;
 case 65:
-//#line 7066 "scan.c"
+//#line 7080 "scan.c"
 	_widec = (*(		ctx->p));
 	if ( (*(		ctx->p)) < 48 ) {
 		if ( (*(		ctx->p)) < 11 ) {
@@ -7469,7 +7483,7 @@ case 65:
 	_out: {}
 	}
 
-//#line 526 "scan.rl"
+//#line 540 "scan.rl"
 		
 		ctx->bol = (last_token == t_newline) ? TRUE : FALSE;
 	
@@ -7607,7 +7621,13 @@ void Skipline( void )
 
 /*
 * $Log: scan.c,v $
-* Revision 1.26  2013-11-02 23:14:05  pauloscustodio
+* Revision 1.27  2013-11-11 23:47:03  pauloscustodio
+* Move source code generation tools to dev/Makefile, only called on request,
+* and keep the generated files in z80asm directory, so that build does
+* not require tools used for the code generation (ragel, perl).
+* Remove code generation for structs - use CLASS macro instead.
+*
+* Revision 1.5  2013/11/02 23:14:05  pauloscustodio
 * g_slist_free_full() requires GLib 2.28, replaced by g_slist_foreach() and g_slist_free()
 *
 * Revision 1.4  2013/10/16 21:42:07  pauloscustodio

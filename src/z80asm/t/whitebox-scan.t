@@ -19,7 +19,7 @@ use Modern::Perl;
 use Test::More;
 require 't/test_utils.pl';
 
-my $objs = "scan.o errors.o file.o init_obj.o init_obj_file.o init_obj_scan.o class.o safestr.o strutil.o options.o hist.o";
+my $objs = "scan.o errors.o file.o class.o safestr.o strutil.o options.o hist.o";
 
 # build list of case TOKEN: return "TOKEN" from scan.h
 my @token_case;
@@ -33,9 +33,6 @@ for (read_file("scan.h")) {
 }
 
 my $init = <<'END'; $init =~ s/<TOKEN_CASE>/@token_case/;
-#include "init.h"
-#undef main
-
 #include "symbol.h"
 
 struct module *CURRENTMODULE;
@@ -127,7 +124,7 @@ END
 
 t_compile_module($init, <<'END', $objs);
 	GString *input = g_string_new("");
-	Scan *scan = new_Scan();
+	Scan *scan = OBJ_NEW(Scan);
 	int i, j;
 	
 	init_scan(); atexit(fini_scan);
@@ -171,7 +168,7 @@ t_compile_module($init, <<'END', $objs);
 	get_tokens( NULL, -1, FALSE );
 	
 	g_string_free( input, TRUE );
-	delete0_Scan(&scan);
+	OBJ_DELETE(scan);
 END
 
 write_file(asm1_file(), "" );
@@ -253,11 +250,13 @@ GLib Memory statistics (successful operations):
         31 |          8 |          0 |          0 |          8 |         +0
         32 |          1 |          9 |         21 |         13 |         +0
         35 |          0 |          6 |          6 |          0 |         +0
+        36 |          2 |          2 |          0 |          0 |         +0
         40 |          1 |          1 |          0 |          0 |         +0
         44 |         55 |         13 |          4 |         46 |         +0
         48 |          0 |          0 |          6 |          6 |         +0
         62 |          0 |          0 |          8 |          8 |         +0
         64 |          0 |          0 |         12 |         12 |         +0
+        76 |         18 |         18 |          0 |          0 |         +0
         88 |          0 |         42 |         42 |          0 |         +0
         96 |          1 |          1 |          0 |          0 |         +0
        128 |          0 |          4 |         12 |          8 |         +0
@@ -271,7 +270,7 @@ GLib Memory statistics (successful operations):
    >  4096 |          0 |          5 |         21 |         16 |        ***
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=609416, zero-initialized=2368 (0.39%), freed=607644 (99.71%), remaining=1772
+Total bytes: allocated=610856, zero-initialized=3808 (0.62%), freed=609084 (99.71%), remaining=1772
 OUT
 Scan file "test1.asm" by lines (0)
     0 t_end       , value     0, ""
@@ -1058,10 +1057,12 @@ GLib Memory statistics (successful operations):
         21 |          1 |          0 |          0 |          1 |         +0
         24 |          3 |          3 |          1 |          1 |         +0
         32 |          1 |          2 |          4 |          3 |         +0
+        36 |          1 |          1 |          0 |          0 |         +0
         40 |          3 |          3 |          0 |          0 |         +0
         42 |          0 |          0 |          1 |          1 |         +0
         44 |          4 |          2 |          1 |          3 |         +0
         64 |          0 |          1 |          3 |          2 |         +0
+        76 |          6 |          6 |          0 |          0 |         +0
         84 |          0 |          0 |          1 |          1 |         +0
         88 |          0 |          3 |          3 |          0 |         +0
         96 |          1 |          1 |          0 |          0 |         +0
@@ -1076,7 +1077,7 @@ GLib Memory statistics (successful operations):
    >  4096 |          0 |          1 |          5 |          4 |        ***
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=136485, zero-initialized=2448 (1.79%), freed=134713 (98.70%), remaining=1772
+Total bytes: allocated=136977, zero-initialized=2940 (2.15%), freed=135205 (98.71%), remaining=1772
 OUT
 Scan file "test1.asm"
     0 t_end       , value     0, ""
@@ -1166,8 +1167,10 @@ GLib Memory statistics (successful operations):
         20 |          1 |          1 |          0 |          0 |         +0
         24 |         81 |        108 |         54 |         27 |         +0
         32 |          1 |          1 |          0 |          0 |         +0
+        36 |          1 |          1 |          0 |          0 |         +0
         40 |          7 |          7 |          0 |          0 |         +0
         44 |         82 |          1 |          0 |         81 |         +0
+        76 |          7 |          7 |          0 |          0 |         +0
         88 |          0 |         81 |         81 |          0 |         +0
         96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
@@ -1176,7 +1179,7 @@ GLib Memory statistics (successful operations):
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=19330, zero-initialized=2608 (13.49%), freed=17558 (90.83%), remaining=1772
+Total bytes: allocated=19898, zero-initialized=3176 (15.96%), freed=18126 (91.09%), remaining=1772
 OUT
 Scan test1.asm
 Warning at file 'test1.asm' line 1: option '' is deprecated
@@ -1255,8 +1258,10 @@ GLib Memory statistics (successful operations):
         20 |          1 |          1 |          0 |          0 |         +0
         24 |         81 |        108 |         54 |         27 |         +0
         32 |          1 |          1 |          0 |          0 |         +0
+        36 |          1 |          1 |          0 |          0 |         +0
         40 |          7 |          7 |          0 |          0 |         +0
         44 |         82 |          1 |          0 |         81 |         +0
+        76 |          7 |          7 |          0 |          0 |         +0
         88 |          0 |         81 |         81 |          0 |         +0
         96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
@@ -1265,7 +1270,7 @@ GLib Memory statistics (successful operations):
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=19330, zero-initialized=2608 (13.49%), freed=17558 (90.83%), remaining=1772
+Total bytes: allocated=19898, zero-initialized=3176 (15.96%), freed=18126 (91.09%), remaining=1772
 OUT
 Scan test1.asm
 0000 test1.asm            1 A
@@ -1371,8 +1376,10 @@ GLib Memory statistics (successful operations):
         20 |          1 |          1 |          0 |          0 |         +0
         24 |         54 |         81 |         54 |         27 |         +0
         32 |          1 |          1 |          0 |          0 |         +0
+        36 |          1 |          1 |          0 |          0 |         +0
         40 |          7 |          7 |          0 |          0 |         +0
         44 |         55 |          1 |          0 |         54 |         +0
+        76 |          7 |          7 |          0 |          0 |         +0
         88 |          0 |         54 |         54 |          0 |         +0
         96 |          1 |          1 |          0 |          0 |         +0
        252 |          3 |          0 |          0 |          0 |       +756
@@ -1381,7 +1388,7 @@ GLib Memory statistics (successful operations):
       1024 |          1 |          1 |          0 |          0 |         +0
 GLib Memory statistics (failing operations):
  --- none ---
-Total bytes: allocated=14578, zero-initialized=2608 (17.89%), freed=12806 (87.84%), remaining=1772
+Total bytes: allocated=15146, zero-initialized=3176 (20.97%), freed=13374 (88.30%), remaining=1772
 OUT
 Scan test1.asm
 Warning at file 'test1.asm': option '' is deprecated
@@ -1453,9 +1460,15 @@ done_testing;
 
 
 __END__
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.21 2013-10-16 21:42:07 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/whitebox-scan.t,v 1.22 2013-11-11 23:47:04 pauloscustodio Exp $
 # $Log: whitebox-scan.t,v $
-# Revision 1.21  2013-10-16 21:42:07  pauloscustodio
+# Revision 1.22  2013-11-11 23:47:04  pauloscustodio
+# Move source code generation tools to dev/Makefile, only called on request,
+# and keep the generated files in z80asm directory, so that build does
+# not require tools used for the code generation (ragel, perl).
+# Remove code generation for structs - use CLASS macro instead.
+#
+# Revision 1.21  2013/10/16 21:42:07  pauloscustodio
 # Allocate minimum-sized string, grow as needed.
 # Allocate a GString text inside of File, to be used by file reading methods.
 #

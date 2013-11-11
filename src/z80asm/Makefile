@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.89 2013-10-31 22:59:48 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.90 2013-11-11 23:47:03 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -55,18 +55,11 @@ INSTALL ?= install
 #	4) Setup environment variable PKG_CONFIG_PATH to C:\MinGW\msys\1.0\lib\pkgconfig
 #------------------------------------------------------------------------------
 CFLAGS 	+= $(shell pkg-config --cflags glib-2.0)
-LDFLAGS += $(shell pkg-config --libs glib-2.0)
+LDFLAGS += $(shell pkg-config --libs   glib-2.0)
 
 #------------------------------------------------------------------------------
 # Object files
 #------------------------------------------------------------------------------
-GENERATED_OBJS =			\
-	init.o					\
-	init_obj.o				\
-	init_obj_file.o			\
-	init_obj_options.o		\
-	init_obj_scan.o			\
-
 OBJS = 	\
 	asmdrctv.o 		\
 	class.o			\
@@ -79,6 +72,7 @@ OBJS = 	\
 	exprprsr.o		\
 	file.o			\
 	hist.o			\
+	init.o			\
 	ldinstr.o		\
 	listfile.o		\
 	mapfile.o		\
@@ -103,23 +97,6 @@ OBJS = 	\
 	z80asm.o		\
 	z80instr.o		\
 	z80pass.o		\
-	$(GENERATED_OBJS)
-
-#------------------------------------------------------------------------------
-# Initializing modules in the required initialization order
-#------------------------------------------------------------------------------
-MAKE_INIT :=		tools/make_init.pl
-INIT_TMPL :=		$(wildcard tools/*.c tools/*.h)
-INIT_OUT  :=		init.c init.h $(wildcard init_obj*.c)
-INIT := \
-	memalloc.h 		\
-	strpool.h		\
-	errors.h		\
-	file.h			\
-	options.h		\
-	scan.h			\
-					\
-	codearea.h		\
 
 #------------------------------------------------------------------------------
 # variables
@@ -160,34 +137,12 @@ $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
 
 #------------------------------------------------------------------------------
-# init module
+# developer generated source files
 #------------------------------------------------------------------------------
-$(INIT_OUT) : $(INIT) $(MAKE_INIT) $(INIT_TMPL) Makefile
-	-perl $(MAKE_INIT) $(INIT)
+gen :
+	$(MAKE) -f dev/Makefile
+	$(MAKE) all
 
-
-#------------------------------------------------------------------------------
-# ragel
-#------------------------------------------------------------------------------
-scan.c : scan.rl
-	-ragel -G2 scan.rl
-	-perl -i.bak -pe "s/^#line/\/\/#line/" scan.c
-	$(RM) scan.c.bak
-
-#------------------------------------------------------------------------------
-# flex
-#------------------------------------------------------------------------------
-#scan.c scan.h : scan.l
-#	flex -L scan.l
-#	perl -i.bak -ne "print unless /^#line/" scan.c scan.h
-#	$(RM) scan.c.bak scan.h.bak
-
-#------------------------------------------------------------------------------
-# bison
-#------------------------------------------------------------------------------
-#parse.c parse.h : parse.y
-#	bison parse.y
-	
 #------------------------------------------------------------------------------
 # intall
 #------------------------------------------------------------------------------
@@ -283,7 +238,13 @@ depend:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.89  2013-10-31 22:59:48  pauloscustodio
+# Revision 1.90  2013-11-11 23:47:03  pauloscustodio
+# Move source code generation tools to dev/Makefile, only called on request,
+# and keep the generated files in z80asm directory, so that build does
+# not require tools used for the code generation (ragel, perl).
+# Remove code generation for structs - use CLASS macro instead.
+#
+# Revision 1.89  2013/10/31 22:59:48  pauloscustodio
 # Preprocessors (perl, ragel) might not be available in the target platform.
 # Ignore errors when calling these tools and use the pre-generated files
 # that are in the CVS repository.
@@ -665,10 +626,11 @@ exprprsr.o: options_def.h symbol.h model.h objfile.h class.h queue.h symtab.h
 exprprsr.o: classhash.h strhash.h uthash.h die.h sym.h symref.h classlist.h
 exprprsr.o: token_def.h except.h z80asm.h
 file.o: memalloc.h file.h strutil.h types.h config.h  safestr.h
-file.o: init.h strpool.h errors.h errors_def.h options.h options_def.h scan.h
-file.o: codearea.h listfile.h class.h queue.h dynstr.h symref.h classlist.h
-file.o: uthash.h die.h
+file.o: listfile.h class.h queue.h dynstr.h symref.h classlist.h options.h
+file.o: options_def.h strpool.h errors.h errors_def.h uthash.h die.h
 hist.o: memalloc.h hist.h
+init.o: memalloc.h strpool.h errors.h errors_def.h options.h types.h
+init.o: strutil.h options_def.h scan.h class.h queue.h codearea.h
 ldinstr.o: memalloc.h config.h  z80asm.h types.h sym.h class.h
 ldinstr.o: queue.h symref.h classlist.h symbol.h model.h objfile.h symtab.h
 ldinstr.o: classhash.h strhash.h uthash.h die.h token_def.h errors.h
@@ -693,11 +655,10 @@ module.o: symtab.h classhash.h strhash.h uthash.h die.h sym.h symref.h
 objfile.o: memalloc.h class.h queue.h types.h errors.h errors_def.h file.h
 objfile.o: strutil.h config.h  safestr.h objfile.h strpool.h
 objfile.o: legacy.h
-options.o: memalloc.h errors.h errors_def.h scan.h types.h hist.h init.h
-options.o: strpool.h file.h strutil.h config.h  safestr.h
-options.o: options.h options_def.h codearea.h symtab.h classhash.h queue.h
-options.o: class.h strhash.h uthash.h die.h sym.h symref.h classlist.h
-options.o: z80asm.h
+options.o: memalloc.h errors.h errors_def.h scan.h class.h queue.h types.h
+options.o: file.h strutil.h config.h  safestr.h hist.h options.h
+options.o: options_def.h strpool.h symtab.h classhash.h strhash.h uthash.h
+options.o: die.h sym.h symref.h classlist.h z80asm.h
 prsident.o: memalloc.h codearea.h types.h config.h  errors.h
 prsident.o: errors_def.h listfile.h class.h queue.h dynstr.h symref.h
 prsident.o: classlist.h options.h strutil.h options_def.h symbol.h model.h
@@ -708,10 +669,10 @@ prsline.o: queue.h symref.h classlist.h symbol.h model.h objfile.h symtab.h
 prsline.o: classhash.h strhash.h uthash.h die.h token_def.h options.h
 prsline.o: strutil.h options_def.h errors.h errors_def.h
 safestr.o: memalloc.h safestr.h types.h strutil.h
-scan.o: memalloc.h scan.h types.h errors.h errors_def.h file.h strutil.h
-scan.o: config.h  safestr.h init.h strpool.h options.h
-scan.o: options_def.h codearea.h legacy.h listfile.h class.h queue.h dynstr.h
-scan.o: symref.h classlist.h
+scan.o: memalloc.h scan.h class.h queue.h types.h codearea.h errors.h
+scan.o: errors_def.h file.h strutil.h config.h  safestr.h legacy.h
+scan.o: listfile.h dynstr.h symref.h classlist.h options.h options_def.h
+scan.o: strpool.h
 srcfile.o: memalloc.h codearea.h types.h errors.h errors_def.h file.h
 srcfile.o: strutil.h config.h  safestr.h listfile.h class.h
 srcfile.o: queue.h dynstr.h symref.h classlist.h options.h options_def.h
@@ -732,10 +693,10 @@ symtab.o: symbol.h model.h objfile.h symtab.h classhash.h strhash.h uthash.h
 symtab.o: die.h sym.h token_def.h z80asm.h config.h 
 z80asm.o: memalloc.h codearea.h types.h config.h  deffile.h
 z80asm.o: errors.h errors_def.h file.h strutil.h safestr.h hist.h init.h
-z80asm.o: strpool.h options.h options_def.h scan.h legacy.h listfile.h
-z80asm.o: class.h queue.h dynstr.h symref.h classlist.h mapfile.h objfile.h
-z80asm.o: symbol.h model.h symtab.h classhash.h strhash.h uthash.h die.h
-z80asm.o: sym.h token_def.h except.h z80asm.h
+z80asm.o: legacy.h listfile.h class.h queue.h dynstr.h symref.h classlist.h
+z80asm.o: mapfile.h objfile.h options.h options_def.h strpool.h symbol.h
+z80asm.o: model.h symtab.h classhash.h strhash.h uthash.h die.h sym.h
+z80asm.o: token_def.h except.h z80asm.h
 z80instr.o: memalloc.h config.h  z80asm.h types.h sym.h class.h
 z80instr.o: queue.h symref.h classlist.h symbol.h model.h objfile.h symtab.h
 z80instr.o: classhash.h strhash.h uthash.h die.h token_def.h options.h
@@ -745,18 +706,3 @@ z80pass.o: errors_def.h file.h strutil.h safestr.h hist.h listfile.h class.h
 z80pass.o: queue.h dynstr.h symref.h classlist.h model.h options.h
 z80pass.o: options_def.h scan.h sym.h symbol.h objfile.h symtab.h classhash.h
 z80pass.o: strhash.h uthash.h die.h token_def.h z80asm.h
-init.o: memalloc.h init.h strpool.h errors.h errors_def.h file.h strutil.h
-init.o: types.h config.h  safestr.h options.h options_def.h scan.h
-init.o: codearea.h
-init_obj.o: memalloc.h init.h strpool.h errors.h errors_def.h file.h
-init_obj.o: strutil.h types.h config.h  safestr.h options.h
-init_obj.o: options_def.h scan.h codearea.h
-init_obj_file.o: memalloc.h init.h strpool.h errors.h errors_def.h file.h
-init_obj_file.o: strutil.h types.h config.h  safestr.h options.h
-init_obj_file.o: options_def.h scan.h codearea.h
-init_obj_options.o: memalloc.h init.h strpool.h errors.h errors_def.h file.h
-init_obj_options.o: strutil.h types.h config.h  safestr.h
-init_obj_options.o: options.h options_def.h scan.h codearea.h
-init_obj_scan.o: memalloc.h init.h strpool.h errors.h errors_def.h file.h
-init_obj_scan.o: strutil.h types.h config.h  safestr.h options.h
-init_obj_scan.o: options_def.h scan.h codearea.h

@@ -242,27 +242,15 @@
     <ClCompile Include="except.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="init_obj.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="init_obj_file.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="init_obj_options.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="init.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="init_obj_scan.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="parse.y">
+    <None Include="scan.rl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="scan.rl">
+    <None Include="parse.y">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
