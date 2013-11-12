@@ -4,7 +4,7 @@
 ; 	BEL - chr(7)   Beep it out
 ;
 ;
-;	$Id: f_ansi_bel.asm,v 1.2 2013-11-06 09:40:35 stefano Exp $
+;	$Id: f_ansi_bel.asm,v 1.3 2013-11-12 13:50:15 stefano Exp $
 ;
 
 	XLIB	ansi_BEL

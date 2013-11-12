@@ -5,17 +5,24 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.2 2013-11-06 09:40:35 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.3 2013-11-12 13:50:15 stefano Exp $
 ;
 
 	XLIB	ansi_SCROLLUP
 	XREF	ATTR
-
+	XREF	text_cols
 
 .ansi_SCROLLUP
-	ld	hl,$3000+40	; Text
 	ld	de,$3000
 	ld	bc,40*24
+	ld	a,(text_cols)
+	ld	h,d
+	ld	l,a
+	push af
+	cp	80
+	jr	nz,outldir1
+	rl	c
+	rl	b
 .outldir1
 	push bc
 	ld b,h
@@ -42,7 +49,9 @@
 	
 	ld	h,d
 	ld	l,e
-	ld	b,40
+	pop	af
+	ld	b,a
+	;ld	b,40
 .reslloop
 	push bc
 	ld b,h

@@ -5,16 +5,21 @@
 ; 	CLS - Clear the screen
 ;	
 ;
-;	$Id: f_ansi_cls.asm,v 1.2 2013-11-06 09:40:35 stefano Exp $
+;	$Id: f_ansi_cls.asm,v 1.3 2013-11-12 13:50:15 stefano Exp $
 ;
 
 	XLIB	ansi_cls
 	XREF	ATTR
+	XREF	text_cols
 
 ansi_cls:
         ld bc, $3000
         ;ld hl, $200F	; ' ' char and attribute
-        ld de, $2028
+        ld	a,(text_cols)
+        ld	d, $20
+clr2:
+        ld	e,a
+		push af
 clr1:   set 4, b
 		ld	a,32
         out (c), a
@@ -24,8 +29,8 @@ clr1:   set 4, b
         inc bc
         dec e
         jp nz, clr1
-        ld e, 40
+        pop	af
         dec d 
-        jp nz, clr1
+        jp nz, clr2
 
         ret

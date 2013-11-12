@@ -20,4 +20,10 @@ time/x1/time
 x1/subcpu_command
 x1/subcpu_get
 x1/subcpu_set
+x1/set_crtc
+x1/set_crtc_10
+x1/set_crtc_reg
+x1/x1_get_pcg_version
+x1/x1_set_text_80
+x1/x1_set_text_40
 @z80.lst

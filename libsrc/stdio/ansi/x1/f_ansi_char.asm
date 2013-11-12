@@ -11,7 +11,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.2 2013-11-06 09:40:35 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.3 2013-11-12 13:50:15 stefano Exp $
 ;
 
 	XLIB	ansi_CHAR
@@ -37,7 +37,9 @@
 	and	a
 	jr	z,r_zero
 	ld	b,a
-	ld	de,40
+	ld	d,l
+	ld	a,(text_cols)
+	ld	e,a
 .r_loop
 	add	hl,de
 	djnz	r_loop
@@ -59,7 +61,8 @@
 
 	res 4,b
 .ATTR
-	ld	a,15
+	;ld	a,15
+	ld	a,7
 	out(c),a
 
 	ret

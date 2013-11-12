@@ -1,13 +1,33 @@
 /*
  * Header file for Sharp X1 specific stuff
  *
- * $Id: x1.h,v 1.2 2013-11-08 11:35:29 stefano Exp $
+ * $Id: x1.h,v 1.3 2013-11-12 13:50:15 stefano Exp $
  *
  */
 
 #ifndef __X1_H__
 #define __X1_H__
 
+
+// Programmable Character Generator
+// Get the PCG version (1 or 2), depending on the X1 model (or chipset)
+// and on the mode DIP switch
+extern int __LIB__ x1_get_pcg_version();
+
+// Switch to 40 columns text mode
+extern void __LIB__ x1_set_text_40();
+
+// Switch to 80 columns text mode
+extern void __LIB__ x1_set_text_80();
+
+// Set 16 6845 CRTC registers at once
+extern void __FASTCALL__ __LIB__ set_crtc(void *reg_list);
+
+// Set the first 10 6845 CRTC registers
+extern void __FASTCALL__ __LIB__ set_crtc_10(void *reg_list);
+
+// Set a single register in the 6845 CRTC
+extern void __LIB__ set_crtc_reg(int reg, int val);
 
 // Send a command to the SUB-CPU
 extern void __FASTCALL__ __LIB__ subcpu_command(int command);
