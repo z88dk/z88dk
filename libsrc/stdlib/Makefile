@@ -1,12 +1,15 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.21 2013-11-04 08:57:56 stefano Exp $
+# $Id: Makefile,v 1.22 2013-11-13 15:34:45 stefano Exp $
 
 include ../Make.config
 
 GENCFILES = \
 	sleep.c   \
+	csleep.c  \
+	delay.c   \
+	wcmatch.c \
 	getopt.c
 
 
@@ -18,6 +21,12 @@ lz88: deps z88_stdlib
 lzx: deps zx_stdlib
 
 lzx80: deps zx80_stdlib
+
+lx1: deps x1_stdlib
+
+lmc1000: deps mc1000_stdlib
+
+losca: deps osca_stdlib
 
 generic: deps gen
 
@@ -37,12 +46,20 @@ zx_stdlib:
 zx80_stdlib:
 	zcc +zx80 $(CFLAGS) *.c
 
+x1_stdlib:
+	zcc +test -D__X1__ $(CFLAGS) *.c
+
+mc1000_stdlib:
+	zcc +test -D__MC1000__ $(CFLAGS) *.c
+
+osca_stdlib:
+	zcc +test -D__OSCA__ $(CFLAGS) *.c
+
 # Rabbit Control Module and timer dependencies
 deps:
 	$(RM) delay.o
 	$(RM) sleep.o
 	$(RM) csleep.o
-	$(RM) sleep.o
 	$(RM) inp.o
 	$(RM) outp_callee.o
 	$(RM) randomize.o

@@ -1,10 +1,7 @@
 /*
- *	Generic sleep() function, relies on an implemented clock()
- *	function
+ *	WildCard matching
  *
- *	djm 15/10/2001
- *
- *	$Id: wcmatch.c,v 1.1 2013-06-06 08:58:33 stefano Exp $
+ *	$Id: wcmatch.c,v 1.2 2013-11-13 15:34:46 stefano Exp $
  */
 
 #include <stdlib.h>

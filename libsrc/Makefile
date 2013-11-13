@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.184 2013-11-08 09:10:53 stefano Exp $
+# $Id: Makefile,v 1.185 2013-11-13 15:34:45 stefano Exp $
 
 
 include Make.config
@@ -1106,7 +1106,7 @@ mc1000_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdlib ; $(MAKE) lmc1000 ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -1123,7 +1123,7 @@ mc1000ansi_clib.lib:
 	$(RM) stdio/ansi/mc1000/f_ansi_char.o
 	$(MAKE) gfxdeps
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdlib ; $(MAKE) lmc1000 ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd setjmp ; $(MAKE) ; cd ..
@@ -1395,7 +1395,7 @@ x1ansi_clib.lib:
 	@echo '--- Building Sharp X1 ANSI Library ---'
 	@echo ''
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdlib ; $(MAKE) lx1 ; cd ..
 	cd stdio ; $(MAKE) generic ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd time ; $(MAKE) lx1 ; cd ..
@@ -1410,7 +1410,7 @@ osca_clib.lib:
 	@echo '--- Building Old School Computer Architecture Library ---'
 	@echo ''
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdlib ; $(MAKE) losca ; cd ..
 	cd stdio ; $(MAKE) lcpm ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
 	cd rs232 ; $(MAKE) losca ; cd ..
@@ -1425,7 +1425,7 @@ oscaansi_clib.lib:
 	@echo '--- Building OSCA Library ANSI VT version ---'
 	@echo ''
 	cd strings ; $(MAKE) ; cd ..
-	cd stdlib ; $(MAKE) generic ; cd ..
+	cd stdlib ; $(MAKE) losca ; cd ..
 	cd stdio ; $(MAKE) lcpm ; cd ..
 	cd rs232 ; $(MAKE) losca ; cd ..
 	cd printflike ; $(MAKE) ; cd ..
