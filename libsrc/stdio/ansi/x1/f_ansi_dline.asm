@@ -6,12 +6,13 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.3 2013-11-12 13:50:15 stefano Exp $
+;	$Id: f_ansi_dline.asm,v 1.4 2013-11-13 11:04:54 stefano Exp $
 ;
 
 
 	XLIB	ansi_del_line
 	XREF	text_cols
+	XREF	ATTR
 
 
 .ansi_del_line
@@ -32,11 +33,15 @@
 	ld	b,e
 	;ld	b,39
 .dlineloop
-	ld	a,32
+	push bc
 	ld	b,h
 	ld	c,l
+	ld	a,32
 	out (c),a
-	;ld	(hl),32
+        res 4, b
+        ld	a,(ATTR+1)
+        out (c), a
 	inc	hl
+	pop bc
 	djnz	dlineloop
 	ret
