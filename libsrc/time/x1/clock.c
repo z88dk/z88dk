@@ -12,7 +12,7 @@
  *	stefano, 11/2013
  *	
  * --------
- * $Id: clock.c,v 1.1 2013-11-08 09:10:54 stefano Exp $
+ * $Id: clock.c,v 1.2 2013-11-13 20:46:42 stefano Exp $
  */
 
 #include <time.h>
@@ -23,8 +23,13 @@
  * Get the current time
  */
 
+unsigned int unbcd(unsigned int value) {
+	return ( (value >> 4) * 10 + (value & 15) );
+}
+
 clock_t clock()
 {
-	subcpu_command(SUBCPU_GET_CALENDAR);
-	return( ((clock_t)subcpu_get()*3600) + ((clock_t)subcpu_get()*60) + (clock_t)subcpu_get() );
+	subcpu_command(SUBCPU_GET_CLOCK);
+	return( ((clock_t)unbcd(subcpu_get())*3600) + ((clock_t)unbcd(subcpu_get())*60) + (clock_t)unbcd(subcpu_get()) );
 }
+

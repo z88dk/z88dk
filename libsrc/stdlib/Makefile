@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.22 2013-11-13 15:34:45 stefano Exp $
+# $Id: Makefile,v 1.23 2013-11-13 20:46:42 stefano Exp $
 
 include ../Make.config
 
@@ -9,6 +9,7 @@ GENCFILES = \
 	sleep.c   \
 	csleep.c  \
 	delay.c   \
+	unbcd.c   \
 	wcmatch.c \
 	getopt.c
 

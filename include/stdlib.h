@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.43 2013-06-13 17:25:58 stefano Exp $
+ * $Id: stdlib.h,v 1.44 2013-11-13 20:46:42 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -228,6 +228,8 @@ extern unsigned long __LIB__ __CALLEE__  extract_bits_callee(unsigned char *data
 // Compare a file name in "8.3" format to a wildcard expression
 extern int __LIB__ wcmatch(char *wildnam, char *filnam);
 
+// Convert a BCD encoded value to unsigned int
+extern int __LIB__ unbcd(unsigned int value);
 
 #ifdef __Z88__
 #endif

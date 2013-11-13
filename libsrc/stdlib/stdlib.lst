@@ -47,3 +47,4 @@ stdlib/t_delay
 stdlib/sleep
 stdlib/csleep
 stdlib/wcmatch
+stdlib/unbcd

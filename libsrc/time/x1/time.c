@@ -6,14 +6,16 @@
  *	Our epoch is the UNIX epoch of 00:00:00 1/1/1970
  *
  * --------
- * $Id: time.c,v 1.1 2013-11-08 09:10:54 stefano Exp $
+ * $Id: time.c,v 1.2 2013-11-13 20:46:42 stefano Exp $
  */
 
 
 #include <time.h>
 #include <x1.h>
 
-long gtoy();
+unsigned int unbcd(unsigned int value) {
+	return ( (value >> 4) * 10 + (value & 15) );
+}
 
 time_t time(time_t *store)
 {
@@ -29,9 +31,9 @@ time_t time(time_t *store)
     t.tm_mday  =  subcpu_get();
 
 	subcpu_command(SUBCPU_GET_CLOCK);
-    t.tm_hour  =  subcpu_get();
-    t.tm_min   =  subcpu_get();
-    t.tm_sec   =  subcpu_get();
+    t.tm_hour  =  unbcd(subcpu_get());
+    t.tm_min   =  unbcd(subcpu_get());
+    t.tm_sec   =  unbcd(subcpu_get());
     t.tm_isdst = -1;
 
     tim = mktime(&t);
@@ -40,3 +42,4 @@ time_t time(time_t *store)
 
 	return (tim);
 }
+
